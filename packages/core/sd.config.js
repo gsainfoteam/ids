@@ -232,14 +232,12 @@ const buildColorBridgeCSS = (dictionary) => {
 
 // @theme { --spacing-xs: var(--ids-spacing-xs); } + :root { --ids-spacing-xs: 4px; }
 const buildStaticCSS = (dictionary) => {
-  const spacing = byCategory(dictionary, "spacing");
+  // const spacing = byCategory(dictionary, "spacing");
   const motion = byCategory(dictionary, "motion");
   return render(T_CSS_THEME_ROOT, {
-    THEME: spacing
-      .map((t) => `  ${TW_NS.spacing}${slug(t)}: var(${idsVar("spacing", t)});`)
-      .join("\n"),
+    THEME: "", // spacing.map((t) => `  ${TW_NS.spacing}${slug(t)}: var(${idsVar("spacing", t)});`).join("\n"),
     ROOT: [
-      ...spacing.map((t) => `  ${idsVar("spacing", t)}: ${toVal(t)};`),
+      // ...spacing.map((t) => `  ${idsVar("spacing", t)}: ${toVal(t)};`),
       ...motion.map((t) => `  ${idsVar("motion", t)}: ${toVal(t)};`),
     ].join("\n"),
   });
@@ -413,7 +411,7 @@ for (const [name, format] of [
   ["ids/ts-types", tsTypesFormatter],
   ["ids/dart-enums", dartEnumsFormatter],
   ["ids/dart-color-tokens", dartColorTokensFormatter],
-  ["ids/dart-spacing", dartSpacingFormatter],
+  // ["ids/dart-spacing", dartSpacingFormatter],
   ["ids/dart-motion", dartMotionFormatter],
   ["ids/dart-typography", dartTypographyFormatter],
 ]) {
@@ -443,7 +441,7 @@ export default {
           destination: "../flutter/lib/tokens/ids_color_tokens.dart",
           format: "ids/dart-color-tokens",
         },
-        { destination: "../flutter/lib/tokens/ids_spacing.dart", format: "ids/dart-spacing" },
+        // { destination: "../flutter/lib/tokens/ids_spacing.dart", format: "ids/dart-spacing" },
         { destination: "../flutter/lib/tokens/ids_motion.dart", format: "ids/dart-motion" },
         {
           destination: "../flutter/lib/tokens/ids_typography.dart",
