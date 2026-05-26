@@ -1,0 +1,5 @@
+packages:
+  - 'packages/core'
+  - 'packages/css'
+  - 'packages/react'
+  # packages/flutter is Dart — excluded from pnpm workspace

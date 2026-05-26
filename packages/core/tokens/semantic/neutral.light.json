@@ -1,0 +1,9 @@
+{
+  "color": {
+    "surface":    { "$value": "{neutral.0}",   "$type": "color" },
+    "on-surface": { "$value": "{neutral.900}", "$type": "color" },
+    "muted":      { "$value": "{neutral.100}", "$type": "color" },
+    "on-muted":   { "$value": "{neutral.600}", "$type": "color" },
+    "outline":    { "$value": "{neutral.300}", "$type": "color" }
+  }
+}

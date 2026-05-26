@@ -1,0 +1,13 @@
+{
+  "name": "@infoteam/ids-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "style-dictionary build --config sd.config.js"
+  },
+  "devDependencies": {
+    "style-dictionary": "^5.4.0",
+    "style-dictionary-utils": "^6.0.1"
+  }
+}

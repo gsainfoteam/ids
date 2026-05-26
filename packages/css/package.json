@@ -1,0 +1,12 @@
+{
+  "name": "@infoteam/ids-css",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/ids.css",
+  "exports": {
+    ".": "./dist/ids.css"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
+  }
+}

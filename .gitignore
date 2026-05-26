@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+storybook-static/
+
+# Turbo
+.turbo/
+
+# Dart / Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+*.g.dart
+
+# Misc
+.DS_Store
+*.local
+.env
+.env.*
+!.env.example

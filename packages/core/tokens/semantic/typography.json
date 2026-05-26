@@ -1,0 +1,58 @@
+{
+  "text": {
+    "display": {
+      "$value": {
+        "fontSize":      "{font-size.xxxl}",
+        "fontWeight":    "{font-weight.bold}",
+        "lineHeight":    "{line-height.tight}",
+        "letterSpacing": "{letter-spacing.tight}"
+      },
+      "$type": "typography"
+    },
+    "heading": {
+      "$value": {
+        "fontSize":      "{font-size.xxl}",
+        "fontWeight":    "{font-weight.semibold}",
+        "lineHeight":    "{line-height.tight}",
+        "letterSpacing": "{letter-spacing.tight}"
+      },
+      "$type": "typography"
+    },
+    "title": {
+      "$value": {
+        "fontSize":      "{font-size.xl}",
+        "fontWeight":    "{font-weight.semibold}",
+        "lineHeight":    "{line-height.normal}",
+        "letterSpacing": "{letter-spacing.normal}"
+      },
+      "$type": "typography"
+    },
+    "body": {
+      "$value": {
+        "fontSize":      "{font-size.md}",
+        "fontWeight":    "{font-weight.regular}",
+        "lineHeight":    "{line-height.normal}",
+        "letterSpacing": "{letter-spacing.normal}"
+      },
+      "$type": "typography"
+    },
+    "label": {
+      "$value": {
+        "fontSize":      "{font-size.sm}",
+        "fontWeight":    "{font-weight.medium}",
+        "lineHeight":    "{line-height.normal}",
+        "letterSpacing": "{letter-spacing.normal}"
+      },
+      "$type": "typography"
+    },
+    "caption": {
+      "$value": {
+        "fontSize":      "{font-size.xs}",
+        "fontWeight":    "{font-weight.regular}",
+        "lineHeight":    "{line-height.normal}",
+        "letterSpacing": "{letter-spacing.wide}"
+      },
+      "$type": "typography"
+    }
+  }
+}

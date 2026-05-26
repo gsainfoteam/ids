@@ -1,0 +1,16 @@
+{
+  "ids": {
+    "color": {
+      "values": { "$value": ["blue", "orange"], "$type": "other" }
+    },
+    "mode": {
+      "values": { "$value": ["light", "dark"], "$type": "other" }
+    },
+    "size": {
+      "values": { "$value": ["xs", "sm", "md", "lg", "xl", "xxl"], "$type": "other" }
+    },
+    "variant": {
+      "values": { "$value": ["solid", "soft", "outline", "ghost"], "$type": "other" }
+    }
+  }
+}

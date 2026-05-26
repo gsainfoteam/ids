@@ -1,0 +1,24 @@
+{
+  "name": "ids",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "codegen": "pnpm --filter @infoteam/ids-core build",
+    "storybook": "pnpm --filter @infoteam/ids-react storybook",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.4",
+    "turbo": "^2.5.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "lightningcss"
+    ]
+  },
+  "packageManager": "pnpm@10.11.0"
+}

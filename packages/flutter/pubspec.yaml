@@ -1,0 +1,20 @@
+name: ids_flutter
+description: Infoteam Design System — Flutter package.
+version: 0.0.0
+repository: https://github.com/gsainfoteam/ids
+
+environment:
+  sdk: ^3.11.5
+  flutter: '>=3.32.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
