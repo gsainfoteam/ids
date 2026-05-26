@@ -1,17 +1,96 @@
 # ids_flutter
 
-A new Flutter project.
+IDS Flutter 컴포넌트 라이브러리.
 
-## Getting Started
+## 설치
 
-This project is a starting point for a Flutter application.
+`pubspec.yaml`에 추가:
 
-A few resources to get you started if this is your first Flutter project:
+```yaml
+dependencies:
+  ids_flutter: ^1.0.0
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+flutter pub get
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 설정
+
+앱 최상단에 `ThemeProvider` 추가:
+
+```dart
+import 'package:ids_flutter/ids.dart';
+
+void main() {
+  runApp(
+    ThemeProvider(
+      color: IdsColor.blue,
+      mode: IdsMode.light,
+      child: const MyApp(),
+    ),
+  );
+}
+```
+
+`ThemeProvider` 없이는 `ThemeProvider.of(context)` 호출 시 에러가 발생한다.
+
+## ThemeProvider
+
+| 파라미터 | 타입 | 기본값 |
+|---|---|---|
+| `color` | `IdsColor` | `IdsColor.blue` |
+| `mode` | `IdsMode` | `IdsMode.light` |
+
+테마 접근:
+
+```dart
+final theme = ThemeProvider.of(context);
+// theme.primary, theme.onPrimary, theme.secondary, ...
+```
+
+## 컴포넌트
+
+### IdsButton
+
+```dart
+IdsButton(
+  onPressed: () {},
+  variant: IdsVariant.solid,
+  size: IdsSize.md,
+  child: const Text('클릭'),
+)
+```
+
+| 파라미터 | 타입 | 기본값 |
+|---|---|---|
+| `variant` | `IdsVariant` | `IdsVariant.solid` |
+| `size` | `IdsSize` | `IdsSize.md` |
+| `disabled` | `bool` | `false` |
+
+**IdsVariant**: `solid`, `soft`, `outline`, `ghost`
+
+**IdsSize**: `xs`, `sm`, `md`, `lg`, `xl`, `xxl`
+
+## 토큰 직접 사용
+
+```dart
+import 'package:ids_flutter/ids.dart';
+
+// 간격
+SizedBox(height: IdsSpacing.md)
+
+// 타이포그래피
+Text('제목', style: IdsTypography.heading)
+
+// 애니메이션 지속시간
+AnimatedOpacity(duration: IdsMotion.fast, ...)
+```
+
+## 개발
+
+```bash
+cd packages/flutter
+flutter pub get
+flutter test
+```
