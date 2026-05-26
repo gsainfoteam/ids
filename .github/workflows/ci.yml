@@ -1,21 +1,17 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  ci:
-    name: Build, Lint, Typecheck
+  js:
+    name: JS (lint / typecheck / build)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:
@@ -24,12 +20,33 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: turbo-${{ runner.os }}-${{ github.sha }}
-          restore-keys: turbo-${{ runner.os }}-
+      - run: pnpm codegen
+
+      - name: Check generated files are up to date
+        run: |
+          if ! git diff --exit-code -- packages/css/dist packages/react/src/tokens packages/flutter/lib/tokens; then
+            echo "Generated files are out of date. Run 'pnpm codegen' and commit the result."
+            exit 1
+          fi
+
+      - run: pnpm typecheck
+
+      - run: pnpm lint
 
       - run: pnpm build
-      - run: pnpm lint
-      - run: pnpm typecheck
+
+  flutter:
+    name: Flutter (test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.3"
+
+      - run: flutter pub get
+        working-directory: packages/flutter
+
+      - run: flutter test
+        working-directory: packages/flutter
