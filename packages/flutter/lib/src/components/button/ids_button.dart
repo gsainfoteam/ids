@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../theme/theme_provider.dart';
-import '../../../tokens/ids_spacing.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
 
@@ -33,12 +32,12 @@ class IdsButton extends StatelessWidget {
     };
 
     final (hPad, vPad, textStyle) = switch (size) {
-      IdsSize.xs  => (IdsSpacing.sm,     IdsSpacing.xs / 2,  IdsTypography.caption),
-      IdsSize.sm  => (IdsSpacing.sm + 2, IdsSpacing.xs,      IdsTypography.label),
-      IdsSize.md  => (IdsSpacing.md,     IdsSpacing.sm,      IdsTypography.label),
-      IdsSize.lg  => (IdsSpacing.lg - 4, IdsSpacing.sm + 2,  IdsTypography.body),
-      IdsSize.xl  => (IdsSpacing.lg,     IdsSpacing.md - 4,  IdsTypography.title),
-      IdsSize.xxl => (IdsSpacing.xl,     IdsSpacing.md,      IdsTypography.heading),
+      IdsSize.xs  => (8.0,  2.0,  IdsTypography.caption),
+      IdsSize.sm  => (10.0, 4.0,  IdsTypography.label),
+      IdsSize.md  => (16.0, 8.0,  IdsTypography.label),
+      IdsSize.lg  => (20.0, 10.0, IdsTypography.body),
+      IdsSize.xl  => (24.0, 12.0, IdsTypography.title),
+      IdsSize.xxl => (32.0, 16.0, IdsTypography.heading),
     };
 
     return GestureDetector(
