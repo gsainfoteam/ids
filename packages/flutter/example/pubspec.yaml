@@ -1,0 +1,19 @@
+name: ids_flutter_example
+description: Widgetbook catalog for ids_flutter.
+publish_to: none
+
+environment:
+  sdk: ^3.11.5
+  flutter: '>=3.32.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ids_flutter:
+    path: ../
+  widgetbook: ^3.23.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

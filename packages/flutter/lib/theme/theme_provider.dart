@@ -34,6 +34,13 @@ class _ThemeProviderState extends State<ThemeProvider> {
   late IdsColor _color = widget.color;
   late IdsMode _mode = widget.mode;
 
+  @override
+  void didUpdateWidget(ThemeProvider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.color != widget.color) setState(() => _color = widget.color);
+    if (oldWidget.mode != widget.mode) setState(() => _mode = widget.mode);
+  }
+
   void _setColor(IdsColor color) => setState(() => _color = color);
   void _setMode(IdsMode mode) => setState(() => _mode = mode);
   void _toggleMode() =>
