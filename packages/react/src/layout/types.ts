@@ -38,6 +38,9 @@ export function createStackVariants({
         content: 'inline-flex',
       },
     },
+    defaultVariants: {
+      fit: 'fill',
+    },
   });
 }
 
