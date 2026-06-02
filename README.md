@@ -23,11 +23,10 @@ npm install -g pnpm
 pnpm install
 ```
 
-Flutter 작업 시 [FVM](https://fvm.app) 설치 후:
+Flutter 작업 시 [mise](https://mise.jdx.dev) 사용을 권장한다:
 
 ```bash
-cd packages/flutter
-fvm install   # .fvmrc에 명시된 버전 설치
+mise install   # .mise.toml에 명시된 Flutter 버전 설치
 ```
 
 ## CI
@@ -103,8 +102,8 @@ pnpm lint
 
 ```bash
 cd packages/flutter
-fvm flutter pub get
-fvm flutter test
+flutter pub get
+flutter test
 ```
 
 ## 배포
