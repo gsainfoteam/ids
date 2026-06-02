@@ -57,7 +57,11 @@ class IdsButton extends StatelessWidget {
           ),
           child: DefaultTextStyle(
             style: textStyle.copyWith(color: fg, fontWeight: FontWeight.w600),
-            child: IdsHStack(gap: 8, children: children),
+            child: IdsHStack(
+              gap: 8,
+              fit: IdsStackFit.content,
+              children: children,
+            ),
           ),
         ),
       ),

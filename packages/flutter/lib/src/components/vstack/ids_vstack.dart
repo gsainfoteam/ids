@@ -3,8 +3,8 @@ import '../../layout/ids_axis.dart';
 
 export '../../layout/ids_axis.dart';
 
-class IdsHStack extends StatelessWidget {
-  const IdsHStack({
+class IdsVStack extends StatelessWidget {
+  const IdsVStack({
     super.key,
     required this.children,
     this.gap = 0,
@@ -23,11 +23,11 @@ class IdsHStack extends StatelessWidget {
   Widget build(BuildContext context) {
     final spaced = <Widget>[];
     for (int i = 0; i < children.length; i++) {
-      if (i > 0 && gap > 0) spaced.add(SizedBox(width: gap));
+      if (i > 0 && gap > 0) spaced.add(SizedBox(height: gap));
       spaced.add(children[i]);
     }
 
-    return Row(
+    return Column(
       mainAxisSize: fit.mainAxisSize,
       mainAxisAlignment: mainAxis.alignment,
       crossAxisAlignment: crossAxis.alignment,
