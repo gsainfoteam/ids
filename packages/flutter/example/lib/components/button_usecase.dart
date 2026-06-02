@@ -41,7 +41,7 @@ final buttonUseCases = [
             variant: variant,
             size: size,
             disabled: disabled,
-            child: const Text('Button'),
+            children: const [Text('Button')],
           ),
         ),
       );

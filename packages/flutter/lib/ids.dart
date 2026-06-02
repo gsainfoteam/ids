@@ -10,3 +10,5 @@ export 'theme/ids_scope.dart';
 export 'theme/ids_theme.dart';
 
 export 'src/components/button/ids_button.dart';
+export 'src/components/hstack/ids_hstack.dart';
+export 'src/layout/ids_axis.dart';
