@@ -16,6 +16,9 @@ storybook-static/
 build/
 *.g.dart
 
+# Claude
+.claude/
+
 # Misc
 .DS_Store
 *.local
