@@ -4,3 +4,11 @@
 .pub/
 build/
 pubspec.lock
+
+# Generated platform directories — run `flutter create .` to regenerate locally
+android/
+ios/
+linux/
+macos/
+web/
+windows/
