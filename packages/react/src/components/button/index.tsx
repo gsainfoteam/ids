@@ -1,4 +1,5 @@
 import { cn } from '../../utils';
+
 import type { IdsSize, IdsVariant } from '../../tokens/types';
 
 export function Button({ children, variant = 'solid', size = 'md', disabled, onClick }: Button.Props) {
