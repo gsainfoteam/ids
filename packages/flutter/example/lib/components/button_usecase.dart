@@ -6,25 +6,25 @@ final buttonUseCases = [
   WidgetbookUseCase(
     name: 'Playground',
     builder: (context) {
-      final color = context.knobs.list(
+      final color = context.knobs.object.dropdown(
         label: 'Color',
         options: IdsColor.values,
         initialOption: IdsColor.blue,
         labelBuilder: (c) => c.name,
       );
-      final mode = context.knobs.list(
+      final mode = context.knobs.object.dropdown(
         label: 'Mode',
         options: IdsMode.values,
         initialOption: IdsMode.light,
         labelBuilder: (m) => m.name,
       );
-      final variant = context.knobs.list(
+      final variant = context.knobs.object.dropdown(
         label: 'Variant',
         options: IdsVariant.values,
         initialOption: IdsVariant.solid,
         labelBuilder: (v) => v.name,
       );
-      final size = context.knobs.list(
+      final size = context.knobs.object.dropdown(
         label: 'Size',
         options: IdsSize.values,
         initialOption: IdsSize.md,
