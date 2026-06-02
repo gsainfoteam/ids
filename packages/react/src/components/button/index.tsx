@@ -5,7 +5,14 @@ import { HStack } from '../hstack';
 
 import type { IdsVariant, IdsSize } from '../../tokens/types';
 
-export function Button({ children, variant = 'solid', size = 'md', disabled, onClick }: Button.Props) {
+export function Button({
+  children,
+  variant = 'solid',
+  size = 'md',
+  disabled,
+  fit = 'content',
+  onClick,
+}: Button.Props) {
   return (
     <button
       onClick={onClick}
@@ -27,7 +34,7 @@ export function Button({ children, variant = 'solid', size = 'md', disabled, onC
         },
       )}
     >
-      <HStack gap={2} crossAxis="center">
+      <HStack gap={8} crossAxis="center" fit={fit}>
         {children}
       </HStack>
     </button>
@@ -40,6 +47,7 @@ export namespace Button {
     variant?: IdsVariant;
     size?: Exclude<IdsSize, '2xl'>;
     disabled?: boolean;
+    fit?: HStack.Props['fit'];
     onClick?: () => void;
   };
 }

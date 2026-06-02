@@ -3,6 +3,7 @@ export { useTheme } from './theme/use-theme';
 
 export { Button } from './components/button';
 export { HStack } from './components/hstack';
-export type { MainAxis, CrossAxis } from './layout/types';
+export { VStack } from './components/vstack';
+export type { MainAxis, CrossAxis, StackFit } from './layout/types';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';

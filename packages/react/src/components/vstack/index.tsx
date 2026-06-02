@@ -4,22 +4,21 @@ import { createStackVariants } from '../../layout/types';
 
 import type { VariantProps } from 'tailwind-variants';
 
+const vstack = createStackVariants({ direction: 'vertical' });
 
-const hstack = createStackVariants({ direction: 'horizontal' });
+type VStackVariantProps = VariantProps<typeof vstack>;
 
-type HStackVariantProps = VariantProps<typeof hstack>;
-
-export function HStack({
+export function VStack({
   children,
   gap,
   mainAxis = 'start',
   crossAxis = 'stretch',
   fit = 'fill',
   className,
-}: HStack.Props) {
+}: VStack.Props) {
   return (
     <div
-      className={hstack({ fit, mainAxis, crossAxis, class: className })}
+      className={vstack({ fit, mainAxis, crossAxis, class: className })}
       style={gap !== undefined ? { gap: `${gap}px` } : undefined}
     >
       {children}
@@ -27,10 +26,10 @@ export function HStack({
   );
 }
 
-export namespace HStack {
+export namespace VStack {
   export type Props = {
     children: ReactNode;
     gap?: number;
     className?: string;
-  } & HStackVariantProps;
+  } & VStackVariantProps;
 }
