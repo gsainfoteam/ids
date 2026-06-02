@@ -36,6 +36,12 @@ final stackUseCases = [
         initialOption: CrossAxis.center,
         labelBuilder: (a) => a.name,
       );
+      final textBaseline = context.knobs.object.dropdown(
+        label: 'Text baseline',
+        options: TextBaseline.values,
+        initialOption: TextBaseline.alphabetic,
+        labelBuilder: (b) => b.name,
+      );
       final fit = context.knobs.object.dropdown(
         label: 'Fit',
         options: IdsStackFit.values,
@@ -55,6 +61,7 @@ final stackUseCases = [
               mainAxis: mainAxis,
               crossAxis: crossAxis,
               fit: fit,
+              textBaseline: textBaseline,
               children: const [
                 _StackTile(label: 'A', width: 64, height: 64),
                 _StackTile(label: 'B', width: 64, height: 40),
@@ -95,7 +102,9 @@ final stackUseCases = [
       );
       final crossAxis = context.knobs.object.dropdown(
         label: 'Cross axis',
-        options: CrossAxis.values,
+        options: CrossAxis.values
+            .where((axis) => axis != CrossAxis.baseline)
+            .toList(),
         initialOption: CrossAxis.stretch,
         labelBuilder: (a) => a.name,
       );

@@ -23,7 +23,7 @@ extension IdsCrossAxisAlignment on CrossAxis {
     CrossAxis.center => CrossAxisAlignment.center,
     CrossAxis.end => CrossAxisAlignment.end,
     CrossAxis.stretch => CrossAxisAlignment.stretch,
-    CrossAxis.baseline => CrossAxisAlignment.center,
+    CrossAxis.baseline => CrossAxisAlignment.baseline,
   };
 }
 

@@ -21,6 +21,10 @@ class IdsVStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (crossAxis == CrossAxis.baseline) {
+      throw UnsupportedError('CrossAxis.baseline is only supported by IdsHStack.');
+    }
+
     final spaced = <Widget>[];
     for (int i = 0; i < children.length; i++) {
       if (i > 0 && gap > 0) spaced.add(SizedBox(height: gap));

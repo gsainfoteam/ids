@@ -11,6 +11,7 @@ class IdsHStack extends StatelessWidget {
     this.mainAxis = MainAxis.start,
     this.crossAxis = CrossAxis.stretch,
     this.fit = IdsStackFit.fill,
+    this.textBaseline = TextBaseline.alphabetic,
   });
 
   final List<Widget> children;
@@ -18,6 +19,7 @@ class IdsHStack extends StatelessWidget {
   final MainAxis mainAxis;
   final CrossAxis crossAxis;
   final IdsStackFit fit;
+  final TextBaseline textBaseline;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +33,7 @@ class IdsHStack extends StatelessWidget {
       mainAxisSize: fit.mainAxisSize,
       mainAxisAlignment: mainAxis.alignment,
       crossAxisAlignment: crossAxis.alignment,
+      textBaseline: crossAxis == CrossAxis.baseline ? textBaseline : null,
       children: spaced,
     );
   }
