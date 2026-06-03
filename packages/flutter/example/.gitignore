@@ -5,6 +5,8 @@
 build/
 pubspec.lock
 
+.metadata
+
 # Generated platform directories — run `flutter create .` to regenerate locally
 android/
 ios/

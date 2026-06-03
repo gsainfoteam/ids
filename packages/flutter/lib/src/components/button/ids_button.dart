@@ -3,19 +3,20 @@ import '../../../tokens/ids_enums.dart';
 import '../../../theme/theme_provider.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
+import '../hstack/ids_hstack.dart';
 
 class IdsButton extends StatelessWidget {
   const IdsButton({
     super.key,
     required this.onPressed,
-    required this.child,
+    required this.children,
     this.variant = IdsVariant.solid,
     this.size = IdsSize.md,
     this.disabled = false,
   });
 
   final VoidCallback? onPressed;
-  final Widget child;
+  final List<Widget> children;
   final IdsVariant variant;
   final IdsSize size;
   final bool disabled;
@@ -31,13 +32,13 @@ class IdsButton extends StatelessWidget {
       IdsVariant.ghost   => (null,            theme.primary,     null),
     };
 
-    final (hPad, vPad, textStyle) = switch (size) {
-      IdsSize.xs  => (8.0,  2.0,  IdsTypography.caption),
-      IdsSize.sm  => (10.0, 4.0,  IdsTypography.label),
-      IdsSize.md  => (16.0, 8.0,  IdsTypography.label),
-      IdsSize.lg  => (20.0, 10.0, IdsTypography.body),
-      IdsSize.xl  => (24.0, 12.0, IdsTypography.title),
-      IdsSize.xxl => (32.0, 16.0, IdsTypography.heading),
+    final (hPad, textStyle) = switch (size) {
+      IdsSize.xs  => (8.0,  IdsTypography.caption),
+      IdsSize.sm  => (10.0, IdsTypography.label),
+      IdsSize.md  => (16.0, IdsTypography.label),
+      IdsSize.lg  => (20.0, IdsTypography.body),
+      IdsSize.xl  => (24.0, IdsTypography.title),
+      IdsSize.xxl => (32.0, IdsTypography.heading),
     };
 
     return GestureDetector(
@@ -46,15 +47,21 @@ class IdsButton extends StatelessWidget {
         opacity: disabled ? 0.4 : 1.0,
         duration: IdsMotion.fast,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
+          height: 48,
+          padding: EdgeInsets.symmetric(horizontal: hPad),
+          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(12),
             border: border != null ? Border.all(color: border) : null,
           ),
           child: DefaultTextStyle(
             style: textStyle.copyWith(color: fg, fontWeight: FontWeight.w600),
-            child: child,
+            child: IdsHStack(
+              gap: 8,
+              fit: IdsStackFit.content,
+              children: children,
+            ),
           ),
         ),
       ),
