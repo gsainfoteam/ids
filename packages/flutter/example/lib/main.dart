@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
+import 'components/avatar_usecase.dart';
+import 'components/badge_usecase.dart';
 import 'components/button_usecase.dart';
 import 'components/divider_usecase.dart';
+import 'components/icon_button_usecase.dart';
 import 'components/stack_usecase.dart';
 import 'components/text_usecase.dart';
 
@@ -39,6 +42,18 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(
           name: 'IdsHeading',
           useCases: headingUseCases,
+        ),
+        WidgetbookComponent(
+          name: 'IdsAvatar',
+          useCases: avatarUseCases,
+        ),
+        WidgetbookComponent(
+          name: 'IdsBadge',
+          useCases: badgeUseCases,
+        ),
+        WidgetbookComponent(
+          name: 'IdsIconButton',
+          useCases: iconButtonUseCases,
         ),
       ],
     );

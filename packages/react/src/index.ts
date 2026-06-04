@@ -8,6 +8,9 @@ export { Spacer } from './components/spacer';
 export { Divider } from './components/divider';
 export { Text } from './components/text';
 export { Heading } from './components/heading';
+export { Avatar } from './components/avatar';
+export { Badge } from './components/badge';
+export { IconButton } from './components/icon-button';
 export type { TextVariant } from './components/text';
 export type { MainAxis, CrossAxis, StackFit } from './layout/types';
 
