@@ -1,7 +1,7 @@
 {
   "ids": {
     "color": {
-      "values": { "$value": ["blue", "orange"], "$type": "other" }
+      "values": { "$value": ["blue", "orange", "green"], "$type": "other" }
     },
     "mode": {
       "values": { "$value": ["light", "dark"], "$type": "other" }

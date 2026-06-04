@@ -50,9 +50,17 @@
     "600": { "$value": "#ca8a04", "$type": "color" }
   },
   "green": {
-    "400": { "$value": "#4ade80", "$type": "color" },
-    "500": { "$value": "#22c55e", "$type": "color" },
-    "600": { "$value": "#16a34a", "$type": "color" }
+    "50":  { "$value": "#f0fdf0", "$type": "color" },
+    "100": { "$value": "#dcfcdc", "$type": "color" },
+    "200": { "$value": "#bbf7bb", "$type": "color" },
+    "300": { "$value": "#86ef86", "$type": "color" },
+    "400": { "$value": "#4ade5e", "$type": "color" },
+    "500": { "$value": "#22c53e", "$type": "color" },
+    "600": { "$value": "#418501", "$type": "color" },
+    "700": { "$value": "#366e01", "$type": "color" },
+    "800": { "$value": "#2a5701", "$type": "color" },
+    "900": { "$value": "#1e4001", "$type": "color" },
+    "950": { "$value": "#0f2400", "$type": "color" }
   },
   "sky": {
     "400": { "$value": "#38bdf8", "$type": "color" },
