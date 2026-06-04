@@ -4,7 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 final headingUseCases = [
   WidgetbookUseCase(
-    name: 'Playground',
+    name: 'Levels',
     builder: (context) {
       final color = context.knobs.object.dropdown(
         label: 'Color',
@@ -18,12 +18,6 @@ final headingUseCases = [
         initialOption: IdsMode.light,
         labelBuilder: (m) => m.name,
       );
-      final variant = context.knobs.object.dropdown(
-        label: 'Variant',
-        options: [IdsTextVariant.display, IdsTextVariant.heading, IdsTextVariant.title],
-        initialOption: IdsTextVariant.heading,
-        labelBuilder: (v) => v.name,
-      );
 
       return ThemeProvider(
         color: color,
@@ -31,7 +25,15 @@ final headingUseCases = [
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: IdsHeading('제목 텍스트', variant: variant),
+            child: IdsVStack(
+              gap: 12,
+              crossAxis: CrossAxis.start,
+              children: const [
+                IdsHeading('h1 Display', variant: IdsTextVariant.display),
+                IdsHeading('h2 Heading', variant: IdsTextVariant.heading),
+                IdsHeading('h3 Title', variant: IdsTextVariant.title),
+              ],
+            ),
           ),
         ),
       );

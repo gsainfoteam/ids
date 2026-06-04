@@ -7,7 +7,7 @@ const meta: Meta<typeof Button> = {
   component: Button,
   tags: ['autodocs'],
   argTypes: {
-    variant: { control: 'radio', options: ['solid', 'outline', 'ghost'] },
+    variant: { control: 'radio', options: ['solid', 'soft', 'outline', 'ghost'] },
     size: { control: 'radio', options: ['xs', 'sm', 'md', 'lg', 'xl'] },
   },
 };
@@ -17,6 +17,10 @@ type Story = StoryObj<typeof Button>;
 
 export const Solid: Story = {
   args: { children: '확인', variant: 'solid', size: 'md' },
+};
+
+export const Soft: Story = {
+  args: { children: '보조', variant: 'soft', size: 'md' },
 };
 
 export const Outline: Story = {
@@ -31,6 +35,7 @@ export const AllVariants: Story = {
   render: () => (
     <div className="flex gap-3">
       <Button variant="solid">확인</Button>
+      <Button variant="soft">보조</Button>
       <Button variant="outline">취소</Button>
       <Button variant="ghost">더보기</Button>
     </div>
