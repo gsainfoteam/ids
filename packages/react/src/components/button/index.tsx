@@ -18,14 +18,14 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'inline-flex items-center justify-center h-12 rounded-xl font-semibold leading-none transition-colors',
+        'inline-flex items-center justify-center rounded-xl font-semibold transition-colors',
         'focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40',
         {
-          'px-2 text-xs': size === 'xs',
-          'px-2.5 text-sm': size === 'sm',
-          'px-4 text-sm': size === 'md',
-          'px-5 text-base': size === 'lg',
-          'px-6 text-lg': size === 'xl',
+          'px-2 py-2 text-xs': size === 'xs',
+          'px-2.5 py-2.5 text-sm': size === 'sm',
+          'px-4 py-3 text-sm': size === 'md',
+          'px-5 py-3.5 text-base': size === 'lg',
+          'px-6 py-4 text-lg': size === 'xl',
         },
         {
           'bg-[var(--ids-color-primary)] text-[var(--ids-color-on-primary)] hover:opacity-90': variant === 'solid',
