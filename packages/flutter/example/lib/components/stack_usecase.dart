@@ -4,7 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 final stackUseCases = [
   WidgetbookUseCase(
-    name: 'HStack',
+    name: 'HStack Playground',
     builder: (context) {
       final color = context.knobs.object.dropdown(
         label: 'Color',
@@ -62,10 +62,21 @@ final stackUseCases = [
               crossAxis: crossAxis,
               fit: fit,
               textBaseline: textBaseline,
-              children: const [
-                _StackTile(label: 'A', width: 64, height: 64),
-                _StackTile(label: 'B', width: 64, height: 40),
-                _StackTile(label: 'C', width: 64, height: 88),
+              children: [
+                IdsButton(
+                  onPressed: () {},
+                  children: const [Text('첫 번째')],
+                ),
+                IdsButton(
+                  onPressed: () {},
+                  variant: IdsVariant.outline,
+                  children: const [Text('두 번째')],
+                ),
+                IdsButton(
+                  onPressed: () {},
+                  variant: IdsVariant.ghost,
+                  children: const [Text('세 번째')],
+                ),
               ],
             ),
           ),
@@ -74,7 +85,40 @@ final stackUseCases = [
     },
   ),
   WidgetbookUseCase(
-    name: 'VStack',
+    name: 'HStack Alignment',
+    builder: (context) {
+      final color = context.knobs.object.dropdown(
+        label: 'Color',
+        options: IdsColor.values,
+        initialOption: IdsColor.blue,
+        labelBuilder: (c) => c.name,
+      );
+      final mode = context.knobs.object.dropdown(
+        label: 'Mode',
+        options: IdsMode.values,
+        initialOption: IdsMode.light,
+        labelBuilder: (m) => m.name,
+      );
+
+      return ThemeProvider(
+        color: color,
+        mode: mode,
+        child: Center(
+          child: IdsHStack(
+            gap: 12,
+            crossAxis: CrossAxis.center,
+            children: [
+              _ColorBlock(width: 80, height: 64, variant: _BlockVariant.primary),
+              _ColorBlock(width: 80, height: 40, variant: _BlockVariant.secondary),
+              _ColorBlock(width: 80, height: 96, variant: _BlockVariant.muted),
+            ],
+          ),
+        ),
+      );
+    },
+  ),
+  WidgetbookUseCase(
+    name: 'VStack Playground',
     builder: (context) {
       final color = context.knobs.object.dropdown(
         label: 'Color',
@@ -127,10 +171,21 @@ final stackUseCases = [
               mainAxis: mainAxis,
               crossAxis: crossAxis,
               fit: fit,
-              children: const [
-                _StackTile(label: 'A', width: 64, height: 48),
-                _StackTile(label: 'B', width: 96, height: 48),
-                _StackTile(label: 'C', width: 128, height: 48),
+              children: [
+                IdsButton(
+                  onPressed: () {},
+                  children: const [Text('첫 번째')],
+                ),
+                IdsButton(
+                  onPressed: () {},
+                  variant: IdsVariant.outline,
+                  children: const [Text('두 번째')],
+                ),
+                IdsButton(
+                  onPressed: () {},
+                  variant: IdsVariant.ghost,
+                  children: const [Text('세 번째')],
+                ),
               ],
             ),
           ),
@@ -138,7 +193,87 @@ final stackUseCases = [
       );
     },
   ),
+  WidgetbookUseCase(
+    name: 'VStack ContentFit',
+    builder: (context) {
+      final color = context.knobs.object.dropdown(
+        label: 'Color',
+        options: IdsColor.values,
+        initialOption: IdsColor.blue,
+        labelBuilder: (c) => c.name,
+      );
+      final mode = context.knobs.object.dropdown(
+        label: 'Mode',
+        options: IdsMode.values,
+        initialOption: IdsMode.light,
+        labelBuilder: (m) => m.name,
+      );
+
+      return ThemeProvider(
+        color: color,
+        mode: mode,
+        child: Center(
+          child: IdsVStack(
+            gap: 12,
+            fit: IdsStackFit.content,
+            crossAxis: CrossAxis.start,
+            children: [
+              IdsButton(
+                onPressed: () {},
+                children: const [Text('저장')],
+              ),
+              IdsButton(
+                onPressed: () {},
+                variant: IdsVariant.outline,
+                children: const [Text('취소')],
+              ),
+              IdsButton(
+                onPressed: () {},
+                variant: IdsVariant.ghost,
+                children: const [Text('초기화')],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  ),
 ];
+
+enum _BlockVariant { primary, secondary, muted }
+
+class _ColorBlock extends StatelessWidget {
+  const _ColorBlock({
+    required this.width,
+    required this.height,
+    required this.variant,
+  });
+
+  final double width;
+  final double height;
+  final _BlockVariant variant;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+    final bgColor = switch (variant) {
+      _BlockVariant.primary => theme.primary,
+      _BlockVariant.secondary => theme.secondary,
+      _BlockVariant.muted => theme.muted,
+    };
+
+    return SizedBox(
+      width: width,
+      height: height,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(6),
+        ),
+      ),
+    );
+  }
+}
 
 class _StackFrame extends StatelessWidget {
   const _StackFrame({
@@ -166,43 +301,6 @@ class _StackFrame extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: child,
-        ),
-      ),
-    );
-  }
-}
-
-class _StackTile extends StatelessWidget {
-  const _StackTile({
-    required this.label,
-    required this.width,
-    required this.height,
-  });
-
-  final String label;
-  final double width;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
-
-    return SizedBox(
-      width: width,
-      height: height,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: theme.secondary,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: theme.onSecondary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
         ),
       ),
     );

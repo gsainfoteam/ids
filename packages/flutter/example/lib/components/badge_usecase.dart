@@ -4,7 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 final badgeUseCases = [
   WidgetbookUseCase(
-    name: 'All Variants',
+    name: 'Solid',
     builder: (context) {
       final color = context.knobs.object.dropdown(
         label: 'Color',
@@ -22,16 +22,58 @@ final badgeUseCases = [
       return ThemeProvider(
         color: color,
         mode: mode,
-        child: Center(
-          child: IdsHStack(
-            gap: 8,
-            mainAxis: MainAxis.center,
-            children: const [
-              IdsBadge('Solid', variant: IdsVariant.solid),
-              IdsBadge('Soft', variant: IdsVariant.soft),
-              IdsBadge('Outline', variant: IdsVariant.outline),
-            ],
-          ),
+        child: const Center(
+          child: IdsBadge('12일 남음', variant: IdsVariant.solid),
+        ),
+      );
+    },
+  ),
+  WidgetbookUseCase(
+    name: 'Soft',
+    builder: (context) {
+      final color = context.knobs.object.dropdown(
+        label: 'Color',
+        options: IdsColor.values,
+        initialOption: IdsColor.orange,
+        labelBuilder: (c) => c.name,
+      );
+      final mode = context.knobs.object.dropdown(
+        label: 'Mode',
+        options: IdsMode.values,
+        initialOption: IdsMode.light,
+        labelBuilder: (m) => m.name,
+      );
+
+      return ThemeProvider(
+        color: color,
+        mode: mode,
+        child: const Center(
+          child: IdsBadge('#모집', variant: IdsVariant.soft),
+        ),
+      );
+    },
+  ),
+  WidgetbookUseCase(
+    name: 'Outline',
+    builder: (context) {
+      final color = context.knobs.object.dropdown(
+        label: 'Color',
+        options: IdsColor.values,
+        initialOption: IdsColor.orange,
+        labelBuilder: (c) => c.name,
+      );
+      final mode = context.knobs.object.dropdown(
+        label: 'Mode',
+        options: IdsMode.values,
+        initialOption: IdsMode.light,
+        labelBuilder: (m) => m.name,
+      );
+
+      return ThemeProvider(
+        color: color,
+        mode: mode,
+        child: const Center(
+          child: IdsBadge('#인포팀', variant: IdsVariant.outline),
         ),
       );
     },
