@@ -4,6 +4,15 @@ import { cn } from '../../utils';
 
 export type TextVariant = 'display' | 'heading' | 'title' | 'body' | 'label' | 'caption';
 
+const variantClass: Record<TextVariant, string> = {
+  display: 'text-display',
+  heading: 'text-heading',
+  title: 'text-title',
+  body: 'text-body',
+  label: 'text-label',
+  caption: 'text-caption',
+};
+
 const defaultTag: Record<TextVariant, ElementType> = {
   display: 'p',
   heading: 'p',
@@ -26,12 +35,14 @@ export function Text({
   return (
     <Tag
       className={cn(
-        `text-${variant}`,
+        variantClass[variant],
         color === 'muted' && 'text-[var(--ids-color-on-muted)]',
         color === 'primary' && 'text-[var(--ids-color-primary)]',
         color === 'on-surface' && 'text-[var(--ids-color-on-surface)]',
         !color && 'text-[var(--ids-color-on-surface)]',
-        align && `text-${align}`,
+        align === 'left' && 'text-left',
+        align === 'center' && 'text-center',
+        align === 'right' && 'text-right',
         className,
       )}
     >
