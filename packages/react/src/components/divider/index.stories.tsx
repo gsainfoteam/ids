@@ -1,5 +1,6 @@
-import { Divider } from '.';
 import { VStack } from '../vstack';
+
+import { Divider } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 

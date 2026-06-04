@@ -1,5 +1,6 @@
-import { Spacer } from '.';
 import { HStack } from '../hstack';
+
+import { Spacer } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
