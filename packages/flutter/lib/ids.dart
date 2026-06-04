@@ -12,4 +12,6 @@ export 'theme/ids_theme.dart';
 export 'src/components/button/ids_button.dart';
 export 'src/components/hstack/ids_hstack.dart';
 export 'src/components/vstack/ids_vstack.dart';
+export 'src/components/spacer/ids_spacer.dart';
+export 'src/components/divider/ids_divider.dart';
 export 'src/layout/ids_axis.dart';
