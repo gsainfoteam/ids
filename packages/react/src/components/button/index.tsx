@@ -29,6 +29,7 @@ export function Button({
         },
         {
           'bg-[var(--ids-color-primary)] text-[var(--ids-color-on-primary)] hover:opacity-90': variant === 'solid',
+          'bg-[var(--ids-color-secondary)] text-[var(--ids-color-on-secondary)] hover:opacity-80': variant === 'soft',
           'border border-[var(--ids-color-primary)] text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10': variant === 'outline',
           'text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10': variant === 'ghost',
         },
