@@ -3,6 +3,7 @@
 enum IdsColor {
   blue,
   orange,
+  green,
 }
 
 enum IdsMode {
