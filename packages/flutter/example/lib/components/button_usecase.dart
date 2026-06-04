@@ -34,6 +34,36 @@ final buttonUseCases = [
     },
   ),
   WidgetbookUseCase(
+    name: 'Soft',
+    builder: (context) {
+      final color = context.knobs.object.dropdown(
+        label: 'Color',
+        options: IdsColor.values,
+        initialOption: IdsColor.blue,
+        labelBuilder: (c) => c.name,
+      );
+      final mode = context.knobs.object.dropdown(
+        label: 'Mode',
+        options: IdsMode.values,
+        initialOption: IdsMode.light,
+        labelBuilder: (m) => m.name,
+      );
+
+      return ThemeProvider(
+        color: color,
+        mode: mode,
+        child: Center(
+          child: IdsButton(
+            onPressed: () {},
+            variant: IdsVariant.soft,
+            size: IdsSize.md,
+            children: const [Text('보조')],
+          ),
+        ),
+      );
+    },
+  ),
+  WidgetbookUseCase(
     name: 'Outline',
     builder: (context) {
       final color = context.knobs.object.dropdown(
@@ -122,6 +152,11 @@ final buttonUseCases = [
                 onPressed: () {},
                 variant: IdsVariant.solid,
                 children: const [Text('확인')],
+              ),
+              IdsButton(
+                onPressed: () {},
+                variant: IdsVariant.soft,
+                children: const [Text('보조')],
               ),
               IdsButton(
                 onPressed: () {},
