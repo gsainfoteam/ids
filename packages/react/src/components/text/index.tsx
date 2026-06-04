@@ -1,19 +1,35 @@
 import { type ElementType, type ReactNode } from 'react';
 
-import { cn } from '../../utils';
+import { tv, type VariantProps } from 'tailwind-variants';
 
-export type TextVariant = 'display' | 'heading' | 'title' | 'body' | 'label' | 'caption';
+const text = tv({
+  base: 'text-[var(--ids-color-on-surface)]',
+  variants: {
+    variant: {
+      display: 'text-display',
+      heading: 'text-heading',
+      title: 'text-title',
+      body: 'text-body',
+      label: 'text-label',
+      caption: 'text-caption',
+    },
+    color: {
+      'on-surface': 'text-[var(--ids-color-on-surface)]',
+      muted: 'text-[var(--ids-color-on-muted)]',
+      primary: 'text-[var(--ids-color-primary)]',
+    },
+    align: {
+      left: 'text-left',
+      center: 'text-center',
+      right: 'text-right',
+    },
+  },
+  defaultVariants: {
+    variant: 'body',
+  },
+});
 
-const variantClass: Record<TextVariant, string> = {
-  display: 'text-display',
-  heading: 'text-heading',
-  title: 'text-title',
-  body: 'text-body',
-  label: 'text-label',
-  caption: 'text-caption',
-};
-
-const defaultTag: Record<TextVariant, ElementType> = {
+const defaultTag: Record<NonNullable<TextVariantProps['variant']>, ElementType> = {
   display: 'p',
   heading: 'p',
   title: 'p',
@@ -21,6 +37,9 @@ const defaultTag: Record<TextVariant, ElementType> = {
   label: 'span',
   caption: 'span',
 };
+
+type TextVariantProps = VariantProps<typeof text>;
+export type TextVariant = NonNullable<TextVariantProps['variant']>;
 
 export function Text({
   children,
@@ -33,19 +52,7 @@ export function Text({
   const Tag = as ?? defaultTag[variant];
 
   return (
-    <Tag
-      className={cn(
-        variantClass[variant],
-        color === 'muted' && 'text-[var(--ids-color-on-muted)]',
-        color === 'primary' && 'text-[var(--ids-color-primary)]',
-        color === 'on-surface' && 'text-[var(--ids-color-on-surface)]',
-        !color && 'text-[var(--ids-color-on-surface)]',
-        align === 'left' && 'text-left',
-        align === 'center' && 'text-center',
-        align === 'right' && 'text-right',
-        className,
-      )}
-    >
+    <Tag className={text({ variant, color, align, class: className })}>
       {children}
     </Tag>
   );
@@ -54,10 +61,7 @@ export function Text({
 export namespace Text {
   export type Props = {
     children: ReactNode;
-    variant?: TextVariant;
-    color?: 'on-surface' | 'muted' | 'primary';
-    align?: 'left' | 'center' | 'right';
     as?: ElementType;
     className?: string;
-  };
+  } & TextVariantProps;
 }
