@@ -46,6 +46,7 @@ class IdsIconButton extends StatelessWidget {
     return Semantics(
       label: label,
       button: true,
+      enabled: !disabled && onPressed != null,
       child: AnimatedOpacity(
         opacity: disabled ? 0.4 : 1.0,
         duration: IdsMotion.fast,

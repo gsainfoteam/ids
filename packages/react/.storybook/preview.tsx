@@ -1,9 +1,8 @@
-import type { Preview, ReactRenderer } from '@storybook/react-vite';
-import type { DecoratorFunction } from 'storybook/internal/types';
+import type { Preview } from '@storybook/react-vite';
 
 import '../src/styles.css';
 
-const withIdsTheme: DecoratorFunction<ReactRenderer> = (Story, context) => {
+const withIdsTheme: NonNullable<Preview['decorators']>[number] = (Story, context) => {
   const color = context.globals['idsColor'] ?? 'blue';
   const mode = context.globals['idsMode'] ?? 'light';
 

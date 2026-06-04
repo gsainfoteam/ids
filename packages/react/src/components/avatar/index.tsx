@@ -18,8 +18,9 @@ const avatar = tv({
 type AvatarVariantProps = VariantProps<typeof avatar>;
 
 function getInitials(name: string): string {
-  return name
-    .split(' ')
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  return parts
     .map((w) => w[0])
     .join('')
     .toUpperCase()
@@ -39,7 +40,7 @@ export function Avatar({ src, name, size = 'md', className }: Avatar.Props) {
 
   return (
     <span className={avatar({ size, class: className })}>
-      {name ? getInitials(name) : '?'}
+      {name?.trim() ? getInitials(name) : '?'}
     </span>
   );
 }

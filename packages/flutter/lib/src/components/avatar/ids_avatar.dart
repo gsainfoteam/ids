@@ -34,12 +34,11 @@ class IdsAvatar extends StatelessWidget {
   };
 
   String _getInitials(String name) {
-    return name
-        .split(' ')
-        .map((w) => w.isNotEmpty ? w[0] : '')
-        .join()
-        .toUpperCase()
-        .substring(0, name.split(' ').length > 1 ? 2 : 1);
+    final parts = name.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+    if (parts.isEmpty) return '?';
+    final letters = parts.map((w) => w[0]).join().toUpperCase();
+    final maxLen = parts.length > 1 ? 2 : 1;
+    return letters.substring(0, letters.length < maxLen ? letters.length : maxLen);
   }
 
   @override
@@ -72,7 +71,7 @@ class IdsAvatar extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text(
-        name != null ? _getInitials(name!) : '?',
+        (name != null && name!.trim().isNotEmpty) ? _getInitials(name!) : '?',
         style: TextStyle(
           color: theme.onMuted,
           fontSize: _fontSize,

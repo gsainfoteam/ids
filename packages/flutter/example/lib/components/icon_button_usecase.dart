@@ -137,6 +137,7 @@ final iconButtonUseCases = [
                 ),
                 variant: IdsVariant.ghost,
                 label: '북마크',
+                onPressed: () {},
               ),
               IdsIconButton(
                 icon: (color, size) => HugeIcon(
@@ -146,6 +147,7 @@ final iconButtonUseCases = [
                 ),
                 variant: IdsVariant.ghost,
                 label: '공유',
+                onPressed: () {},
               ),
             ],
           ),
