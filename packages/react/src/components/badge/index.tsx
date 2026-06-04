@@ -9,6 +9,7 @@ const badge = tv({
       solid: 'bg-[var(--ids-color-primary)] text-[var(--ids-color-on-primary)]',
       soft: 'bg-[var(--ids-color-secondary)] text-[var(--ids-color-on-secondary)]',
       outline: 'border border-[var(--ids-color-outline)] text-[var(--ids-color-on-surface)]',
+      ghost: 'text-[var(--ids-color-on-surface)]',
     },
     size: {
       sm: 'px-2 py-0.5 text-xs',
