@@ -30,22 +30,22 @@ final iconButtonUseCases = [
             crossAxis: CrossAxis.center,
             children: [
               IdsIconButton(
-                icon: HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: Colors.transparent),
+                icon: Icon(HugeIcons.strokeRoundedBookmark01),
                 variant: IdsVariant.solid,
                 label: 'solid',
               ),
               IdsIconButton(
-                icon: HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: Colors.transparent),
+                icon: Icon(HugeIcons.strokeRoundedBookmark01),
                 variant: IdsVariant.soft,
                 label: 'soft',
               ),
               IdsIconButton(
-                icon: HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: Colors.transparent),
+                icon: Icon(HugeIcons.strokeRoundedBookmark01),
                 variant: IdsVariant.outline,
                 label: 'outline',
               ),
               IdsIconButton(
-                icon: HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: Colors.transparent),
+                icon: Icon(HugeIcons.strokeRoundedBookmark01),
                 variant: IdsVariant.ghost,
                 label: 'ghost',
               ),
