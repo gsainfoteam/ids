@@ -12,6 +12,7 @@ dependencies:
   ids_flutter:
     path: ../
   widgetbook: ^3.23.0
+  hugeicons: ^1.1.7
 
 dev_dependencies:
   flutter_test:

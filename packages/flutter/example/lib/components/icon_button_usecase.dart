@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -22,29 +23,29 @@ final iconButtonUseCases = [
       return ThemeProvider(
         color: color,
         mode: mode,
-        child: Center(
+        child: const Center(
           child: IdsHStack(
             gap: 8,
             mainAxis: MainAxis.center,
             crossAxis: CrossAxis.center,
-            children: const [
+            children: [
               IdsIconButton(
-                icon: Icon(Icons.bookmark_outline),
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: Colors.transparent),
                 variant: IdsVariant.solid,
                 label: 'solid',
               ),
               IdsIconButton(
-                icon: Icon(Icons.bookmark_outline),
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: Colors.transparent),
                 variant: IdsVariant.soft,
                 label: 'soft',
               ),
               IdsIconButton(
-                icon: Icon(Icons.bookmark_outline),
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: Colors.transparent),
                 variant: IdsVariant.outline,
                 label: 'outline',
               ),
               IdsIconButton(
-                icon: Icon(Icons.bookmark_outline),
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: Colors.transparent),
                 variant: IdsVariant.ghost,
                 label: 'ghost',
               ),
