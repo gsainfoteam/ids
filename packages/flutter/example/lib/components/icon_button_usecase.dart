@@ -23,29 +23,29 @@ final iconButtonUseCases = [
       return ThemeProvider(
         color: color,
         mode: mode,
-        child: const Center(
+        child: Center(
           child: IdsHStack(
             gap: 8,
             mainAxis: MainAxis.center,
             crossAxis: CrossAxis.center,
             children: [
               IdsIconButton(
-                icon: Icon(HugeIcons.strokeRoundedBookmark01),
+                icon: (color, size) => HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: color, size: size),
                 variant: IdsVariant.solid,
                 label: 'solid',
               ),
               IdsIconButton(
-                icon: Icon(HugeIcons.strokeRoundedBookmark01),
+                icon: (color, size) => HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: color, size: size),
                 variant: IdsVariant.soft,
                 label: 'soft',
               ),
               IdsIconButton(
-                icon: Icon(HugeIcons.strokeRoundedBookmark01),
+                icon: (color, size) => HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: color, size: size),
                 variant: IdsVariant.outline,
                 label: 'outline',
               ),
               IdsIconButton(
-                icon: Icon(HugeIcons.strokeRoundedBookmark01),
+                icon: (color, size) => HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: color, size: size),
                 variant: IdsVariant.ghost,
                 label: 'ghost',
               ),

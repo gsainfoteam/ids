@@ -15,14 +15,16 @@ class IdsIconButton extends StatelessWidget {
     required this.label,
   });
 
-  final Widget icon;
+  /// Icon builder that receives the foreground color and icon size.
+  /// Usage: `icon: (color, size) => HugeIcon(icon: HugeIcons.strokeRoundedBookmark01, color: color, size: size)`
+  final Widget Function(Color color, double size) icon;
   final IdsVariant variant;
   final IdsSize size;
   final bool disabled;
   final VoidCallback? onPressed;
   final String label;
 
-  double get _size => switch (size) {
+  double get _dimension => switch (size) {
     IdsSize.sm || IdsSize.xs => 32,
     IdsSize.md => 40,
     _ => 48,
@@ -39,7 +41,7 @@ class IdsIconButton extends StatelessWidget {
       IdsVariant.ghost => (null, theme.onSurface, null),
     };
 
-    final d = _size;
+    final d = _dimension;
 
     return Semantics(
       label: label,
@@ -58,10 +60,7 @@ class IdsIconButton extends StatelessWidget {
               border: border != null ? Border.all(color: border) : null,
             ),
             alignment: Alignment.center,
-            child: IconTheme(
-              data: IconThemeData(color: fg, size: d * 0.5),
-              child: icon,
-            ),
+            child: icon(fg, d * 0.5),
           ),
         ),
       ),
