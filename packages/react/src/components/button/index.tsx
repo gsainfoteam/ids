@@ -18,7 +18,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'inline-flex items-center justify-center h-12 rounded-xl font-semibold transition-colors',
+        'inline-flex items-center justify-center h-12 rounded-xl font-semibold leading-none transition-colors',
         'focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40',
         {
           'px-2 text-xs': size === 'xs',
