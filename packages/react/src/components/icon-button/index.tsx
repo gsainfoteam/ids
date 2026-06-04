@@ -8,8 +8,8 @@ const iconButton = tv({
     variant: {
       solid: 'bg-[var(--ids-color-primary)] text-[var(--ids-color-on-primary)] hover:opacity-90',
       soft: 'bg-[var(--ids-color-secondary)] text-[var(--ids-color-on-secondary)] hover:opacity-80',
-      outline: 'border border-[var(--ids-color-outline)] text-[var(--ids-color-on-surface)] hover:bg-[var(--ids-color-muted)]',
-      ghost: 'text-[var(--ids-color-on-surface)] hover:bg-[var(--ids-color-muted)]',
+      outline: 'border border-[var(--ids-color-primary)] text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10',
+      ghost: 'text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10',
     },
     size: {
       sm: 'size-8',

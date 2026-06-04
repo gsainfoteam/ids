@@ -37,8 +37,8 @@ class IdsIconButton extends StatelessWidget {
     final (bg, fg, border) = switch (variant) {
       IdsVariant.solid => (theme.primary, theme.onPrimary, null),
       IdsVariant.soft => (theme.secondary, theme.onSecondary, null),
-      IdsVariant.outline => (null, theme.onSurface, theme.outline),
-      IdsVariant.ghost => (null, theme.onSurface, null),
+      IdsVariant.outline => (null, theme.primary, theme.primary),
+      IdsVariant.ghost => (null, theme.primary, null),
     };
 
     final d = _dimension;
