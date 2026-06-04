@@ -18,14 +18,14 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'inline-flex items-center justify-center rounded-xl font-semibold transition-colors',
+        'inline-flex items-center justify-center h-12 rounded-xl font-semibold transition-colors',
         'focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40',
         {
-          'px-2 py-2 text-xs': size === 'xs',
-          'px-2.5 py-2.5 text-sm': size === 'sm',
-          'px-4 py-3 text-sm': size === 'md',
-          'px-5 py-3.5 text-base': size === 'lg',
-          'px-6 py-4 text-lg': size === 'xl',
+          'h-8 px-2 text-xs': size === 'xs',
+          'h-9 px-2.5 text-sm': size === 'sm',
+          'h-12 px-4 text-sm': size === 'md',
+          'h-14 px-5 text-base': size === 'lg',
+          'h-16 px-6 text-lg': size === 'xl',
         },
         {
           'bg-[var(--ids-color-primary)] text-[var(--ids-color-on-primary)] hover:opacity-90': variant === 'solid',
@@ -35,7 +35,7 @@ export function Button({
         },
       )}
     >
-      <HStack gap={8} crossAxis="center" fit={fit}>
+      <HStack gap={8} crossAxis="center" fit={fit} className="leading-none">
         {children}
       </HStack>
     </button>
