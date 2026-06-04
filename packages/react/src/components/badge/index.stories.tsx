@@ -9,7 +9,7 @@ const meta: Meta<typeof Badge> = {
   component: Badge,
   tags: ['autodocs'],
   argTypes: {
-    variant: { control: 'radio', options: ['solid', 'soft', 'outline'] },
+    variant: { control: 'radio', options: ['solid', 'soft', 'outline', 'ghost'] },
     size: { control: 'radio', options: ['sm', 'md'] },
   },
 };
@@ -27,6 +27,10 @@ export const Soft: Story = {
 
 export const Outline: Story = {
   args: { children: '#인포팀', variant: 'outline' },
+};
+
+export const Ghost: Story = {
+  args: { children: '#디자인', variant: 'ghost' },
 };
 
 export const TagChips: Story = {

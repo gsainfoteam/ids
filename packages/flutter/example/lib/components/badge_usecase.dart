@@ -79,6 +79,31 @@ final badgeUseCases = [
     },
   ),
   WidgetbookUseCase(
+    name: 'Ghost',
+    builder: (context) {
+      final color = context.knobs.object.dropdown(
+        label: 'Color',
+        options: IdsColor.values,
+        initialOption: IdsColor.orange,
+        labelBuilder: (c) => c.name,
+      );
+      final mode = context.knobs.object.dropdown(
+        label: 'Mode',
+        options: IdsMode.values,
+        initialOption: IdsMode.light,
+        labelBuilder: (m) => m.name,
+      );
+
+      return ThemeProvider(
+        color: color,
+        mode: mode,
+        child: const Center(
+          child: IdsBadge('#디자인', variant: IdsVariant.ghost),
+        ),
+      );
+    },
+  ),
+  WidgetbookUseCase(
     name: 'Tag Chips',
     builder: (context) {
       final color = context.knobs.object.dropdown(
