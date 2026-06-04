@@ -25,12 +25,20 @@ class WidgetbookApp extends StatelessWidget {
           useCases: stackUseCases,
         ),
         WidgetbookComponent(
+          name: 'IdsSpacer',
+          useCases: spacerUseCases,
+        ),
+        WidgetbookComponent(
           name: 'IdsDivider',
           useCases: dividerUseCases,
         ),
         WidgetbookComponent(
           name: 'IdsText',
           useCases: textUseCases,
+        ),
+        WidgetbookComponent(
+          name: 'IdsHeading',
+          useCases: headingUseCases,
         ),
       ],
     );

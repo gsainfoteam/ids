@@ -2,6 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+final headingUseCases = [
+  WidgetbookUseCase(
+    name: 'Playground',
+    builder: (context) {
+      final color = context.knobs.object.dropdown(
+        label: 'Color',
+        options: IdsColor.values,
+        initialOption: IdsColor.blue,
+        labelBuilder: (c) => c.name,
+      );
+      final mode = context.knobs.object.dropdown(
+        label: 'Mode',
+        options: IdsMode.values,
+        initialOption: IdsMode.light,
+        labelBuilder: (m) => m.name,
+      );
+      final variant = context.knobs.object.dropdown(
+        label: 'Variant',
+        options: [IdsTextVariant.display, IdsTextVariant.heading, IdsTextVariant.title],
+        initialOption: IdsTextVariant.heading,
+        labelBuilder: (v) => v.name,
+      );
+
+      return ThemeProvider(
+        color: color,
+        mode: mode,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: IdsHeading('제목 텍스트', variant: variant),
+          ),
+        ),
+      );
+    },
+  ),
+];
+
 final textUseCases = [
   WidgetbookUseCase(
     name: 'All Variants',

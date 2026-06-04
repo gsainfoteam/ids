@@ -2,6 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+final spacerUseCases = [
+  WidgetbookUseCase(
+    name: 'In HStack',
+    builder: (context) {
+      final color = context.knobs.object.dropdown(
+        label: 'Color',
+        options: IdsColor.values,
+        initialOption: IdsColor.blue,
+        labelBuilder: (c) => c.name,
+      );
+      final mode = context.knobs.object.dropdown(
+        label: 'Mode',
+        options: IdsMode.values,
+        initialOption: IdsMode.light,
+        labelBuilder: (m) => m.name,
+      );
+
+      return ThemeProvider(
+        color: color,
+        mode: mode,
+        child: Builder(
+          builder: (context) {
+            final theme = ThemeProvider.of(context);
+            return Center(
+              child: SizedBox(
+                width: 320,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.muted,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const IdsHStack(
+                    crossAxis: CrossAxis.center,
+                    children: [
+                      Text('왼쪽'),
+                      IdsSpacer(),
+                      Text('오른쪽'),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    },
+  ),
+];
+
 final dividerUseCases = [
   WidgetbookUseCase(
     name: 'Horizontal',
