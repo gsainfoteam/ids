@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../theme/theme_provider.dart';
@@ -23,7 +24,14 @@ class IdsItem extends StatelessWidget {
     );
 
     if (onPressed != null) {
-      return GestureDetector(onTap: onPressed, child: content);
+      return Semantics(
+        button: true,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onPressed,
+          child: content,
+        ),
+      );
     }
     return content;
   }
