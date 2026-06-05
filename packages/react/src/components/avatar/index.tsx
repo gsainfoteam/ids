@@ -1,4 +1,4 @@
-import { tv, type VariantProps } from 'tailwind-variants';
+import { tv, type VariantProps } from '../../utils';
 
 const avatar = tv({
   base: 'inline-flex items-center justify-center rounded-full overflow-hidden shrink-0 bg-[var(--ids-color-muted)] text-[var(--ids-color-on-muted)] font-semibold select-none',

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import { createStackVariants } from '../../layout/types';
 
-import type { VariantProps } from 'tailwind-variants';
+import type { VariantProps } from '../../utils';
 
 
 const hstack = createStackVariants({ direction: 'horizontal' });

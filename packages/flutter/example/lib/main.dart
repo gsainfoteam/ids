@@ -3,7 +3,9 @@ import 'package:widgetbook/widgetbook.dart';
 import 'components/avatar_usecase.dart';
 import 'components/badge_usecase.dart';
 import 'components/button_usecase.dart';
+import 'components/card_usecase.dart';
 import 'components/divider_usecase.dart';
+import 'components/item_usecase.dart';
 import 'components/icon_button_usecase.dart';
 import 'components/stack_usecase.dart';
 import 'components/text_usecase.dart';
@@ -54,6 +56,14 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(
           name: 'IdsIconButton',
           useCases: iconButtonUseCases,
+        ),
+        WidgetbookComponent(
+          name: 'IdsCard',
+          useCases: cardUseCases,
+        ),
+        WidgetbookComponent(
+          name: 'IdsItem',
+          useCases: itemUseCases,
         ),
       ],
     );

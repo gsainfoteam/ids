@@ -19,4 +19,6 @@ export 'src/components/heading/ids_heading.dart';
 export 'src/components/avatar/ids_avatar.dart';
 export 'src/components/badge/ids_badge.dart';
 export 'src/components/icon_button/ids_icon_button.dart';
+export 'src/components/card/ids_card.dart';
+export 'src/components/item/ids_item.dart';
 export 'src/layout/ids_axis.dart';
