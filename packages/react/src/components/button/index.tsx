@@ -28,10 +28,10 @@ export function Button({
           'h-16 px-6 text-lg': size === 'xl',
         },
         {
-          'bg-[var(--ids-color-primary)] text-[var(--ids-color-on-primary)] hover:opacity-90': variant === 'solid',
-          'bg-[var(--ids-color-secondary)] text-[var(--ids-color-on-secondary)] hover:opacity-80': variant === 'soft',
-          'border border-[var(--ids-color-primary)] text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10': variant === 'outline',
-          'text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10': variant === 'ghost',
+          'bg-(--ids-color-primary) text-(--ids-color-on-primary) hover:opacity-90': variant === 'solid',
+          'bg-(--ids-color-secondary) text-(--ids-color-on-secondary) hover:opacity-80': variant === 'soft',
+          'border border-(--ids-color-primary) text-(--ids-color-primary) hover:bg-(--ids-color-primary)/10': variant === 'outline',
+          'text-(--ids-color-primary) hover:bg-(--ids-color-primary)/10': variant === 'ghost',
         },
       )}
     >

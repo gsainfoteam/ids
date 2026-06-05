@@ -7,7 +7,7 @@ export function Divider({
   return (
     <hr
       className={cn(
-        'border-none m-0 shrink-0 bg-[var(--ids-color-outline)]',
+        'border-none m-0 shrink-0 bg-(--ids-color-outline)',
         orientation === 'horizontal' ? 'h-px w-full' : 'w-px h-full',
         className,
       )}

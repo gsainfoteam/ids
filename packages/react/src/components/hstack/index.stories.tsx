@@ -33,7 +33,7 @@ export const Playground: Story = {
     fit: 'fill',
   },
   render: (args) => (
-    <div className="h-40 w-full rounded-lg border border-[var(--ids-color-outline)] p-4">
+    <div className="h-40 w-full rounded-lg border border-(--ids-color-outline) p-4">
       <HStack {...args}>
         <Button>첫 번째</Button>
         <Button variant="outline">두 번째</Button>
@@ -46,9 +46,9 @@ export const Playground: Story = {
 export const Alignment: Story = {
   render: () => (
     <HStack gap={12} crossAxis="center">
-      <div className="h-16 w-20 rounded-md bg-[var(--ids-color-primary)]" />
-      <div className="h-10 w-20 rounded-md bg-[var(--ids-color-secondary)]" />
-      <div className="h-24 w-20 rounded-md bg-[var(--ids-color-muted)]" />
+      <div className="h-16 w-20 rounded-md bg-(--ids-color-primary)" />
+      <div className="h-10 w-20 rounded-md bg-(--ids-color-secondary)" />
+      <div className="h-24 w-20 rounded-md bg-(--ids-color-muted)" />
     </HStack>
   ),
 };
