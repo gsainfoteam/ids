@@ -3,7 +3,7 @@ import { type ElementType, type ReactNode } from 'react';
 import { tv, type VariantProps } from '../../utils';
 
 const text = tv({
-  base: 'text-on-surface',
+  base: 'text-[var(--ids-color-on-surface)]',
   variants: {
     variant: {
       display: 'text-display',
@@ -14,9 +14,9 @@ const text = tv({
       caption: 'text-caption',
     },
     color: {
-      'on-surface': 'text-on-surface',
-      muted: 'text-on-muted',
-      primary: 'text-primary',
+      'on-surface': 'text-[var(--ids-color-on-surface)]',
+      muted: 'text-[var(--ids-color-on-muted)]',
+      primary: 'text-[var(--ids-color-primary)]',
     },
     align: {
       left: 'text-left',

@@ -33,7 +33,7 @@ export const Playground: Story = {
     fit: 'fill',
   },
   render: (args) => (
-    <div className="h-72 w-80 rounded-lg border border-outline p-4">
+    <div className="h-72 w-80 rounded-lg border border-[var(--ids-color-outline)] p-4">
       <VStack {...args}>
         <Button>첫 번째</Button>
         <Button variant="outline">두 번째</Button>

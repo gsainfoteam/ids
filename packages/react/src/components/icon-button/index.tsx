@@ -3,14 +3,13 @@ import type { ReactNode } from 'react';
 import { tv, type VariantProps } from '../../utils';
 
 const iconButton = tv({
-  // TODO: hover/active 인터랙션 스타일 추가 (opacity modifier 전략 확정 후)
-  base: 'inline-flex items-center justify-center rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40',
+  base: 'inline-flex items-center justify-center rounded-xl transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40',
   variants: {
     variant: {
-      solid: 'bg-primary text-on-primary',
-      soft: 'bg-secondary text-on-secondary',
-      outline: 'border border-primary text-primary',
-      ghost: 'text-primary',
+      solid: 'bg-[var(--ids-color-primary)] text-[var(--ids-color-on-primary)] hover:opacity-90',
+      soft: 'bg-[var(--ids-color-secondary)] text-[var(--ids-color-on-secondary)] hover:opacity-80',
+      outline: 'border border-[var(--ids-color-primary)] text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10',
+      ghost: 'text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10',
     },
     size: {
       sm: 'size-8',

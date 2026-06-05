@@ -18,8 +18,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        // TODO: hover/active 인터랙션 스타일 추가 (opacity modifier 전략 확정 후)
-        'inline-flex items-center justify-center h-12 rounded-xl font-semibold',
+        'inline-flex items-center justify-center h-12 rounded-xl font-semibold transition-colors',
         'focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40',
         {
           'h-8 px-2 text-xs': size === 'xs',
@@ -29,10 +28,10 @@ export function Button({
           'h-16 px-6 text-lg': size === 'xl',
         },
         {
-          'bg-primary text-on-primary': variant === 'solid',
-          'bg-secondary text-on-secondary': variant === 'soft',
-          'border border-primary text-primary': variant === 'outline',
-          'text-primary': variant === 'ghost',
+          'bg-[var(--ids-color-primary)] text-[var(--ids-color-on-primary)] hover:opacity-90': variant === 'solid',
+          'bg-[var(--ids-color-secondary)] text-[var(--ids-color-on-secondary)] hover:opacity-80': variant === 'soft',
+          'border border-[var(--ids-color-primary)] text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10': variant === 'outline',
+          'text-[var(--ids-color-primary)] hover:bg-[var(--ids-color-primary)]/10': variant === 'ghost',
         },
       )}
     >
