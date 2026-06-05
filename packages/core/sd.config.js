@@ -390,9 +390,11 @@ const dartTypographyFormatter = ({ dictionary }) => {
   const palette = buildPalette(dictionary);
   const sansFontFamily = byPath(dictionary, "font-family")
     .find((t) => t.path[1] === "sans");
-  const fontFamily = sansFontFamily
+  const baseFontFamily = sansFontFamily
     ? val(sansFontFamily)[0]
-    : "Pretendard";
+    : "Pretendard Variable";
+  // Package fonts must be referenced as 'package_name/Family Name' in consuming apps
+  const fontFamily = `ids_flutter/${baseFontFamily}`;
   const members = [
     `  static const sansFontFamily = '${fontFamily}';`,
     ...readTypographyEntries(palette).map(
