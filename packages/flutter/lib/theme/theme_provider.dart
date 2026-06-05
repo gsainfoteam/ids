@@ -46,8 +46,6 @@ class _ThemeProviderState extends State<ThemeProvider> {
   void _toggleMode() =>
       setState(() => _mode = _mode == IdsMode.light ? IdsMode.dark : IdsMode.light);
 
-  static const defaultFontFamily = 'Pretendard Variable';
-
   @override
   Widget build(BuildContext context) {
     return IdsScope(
@@ -56,10 +54,7 @@ class _ThemeProviderState extends State<ThemeProvider> {
       setColor: _setColor,
       setMode: _setMode,
       toggleMode: _toggleMode,
-      child: DefaultTextStyle(
-        style: const TextStyle(fontFamily: defaultFontFamily),
-        child: widget.child,
-      ),
+      child: widget.child,
     );
   }
 }

@@ -209,7 +209,7 @@ const T_CSS_TEXT_ROOT = `  --ids-text-{{NAME}}: {{FONT_SIZE}};
   --ids-text-{{NAME}}--line-height: {{LINE_HEIGHT}};
   --ids-text-{{NAME}}--letter-spacing: {{LETTER_SPACING}};`;
 
-const T_DART_TEXT_STYLE = `TextStyle(fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
+const T_DART_TEXT_STYLE = `TextStyle(fontFamily: '{{FONT_FAMILY}}', fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
 
 // ─── CSS helpers ─────────────────────────────────────────────────────────────
 
@@ -388,12 +388,18 @@ const dartMotionFormatter = ({ dictionary }) =>
 
 const dartTypographyFormatter = ({ dictionary }) => {
   const palette = buildPalette(dictionary);
+  const sansFontFamily = byPath(dictionary, "font-family")
+    .find((t) => t.path[1] === "sans");
+  const fontFamily = sansFontFamily
+    ? val(sansFontFamily)[0]
+    : "Pretendard";
   return render(T_DART_ABSTRACT_CLASS, {
     NAME: "IdsTypography",
     MEMBERS: readTypographyEntries(palette)
       .map(
         ({ name, fontSize, fontWeight, lineHeight, letterSpacing }) =>
           `  static const ${toCamel(name)} = ${render(T_DART_TEXT_STYLE, {
+            FONT_FAMILY: fontFamily,
             FONT_SIZE: parseFloat(fontSize),
             FONT_WEIGHT: parseInt(fontWeight),
             LINE_HEIGHT: parseFloat(lineHeight),
