@@ -6,80 +6,117 @@ import '../../../tokens/ids_typography.dart';
 class IdsItem extends StatelessWidget {
   const IdsItem({
     super.key,
-    this.leading,
-    required this.title,
-    this.description,
-    this.trailing,
+    required this.children,
     this.onPressed,
   });
 
-  final Widget? leading;
-  final String title;
-  final String? description;
-  final Widget? trailing;
+  final List<Widget> children;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
-
-    final content = Row(
-      children: [
-        if (leading != null) ...[
-          IconTheme(
-            data: IconThemeData(color: theme.onSurface, size: 20),
-            child: leading!,
-          ),
-          const SizedBox(width: 12),
-        ],
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: IdsTypography.label.copyWith(
-                  color: theme.onSurface,
-                  leadingDistribution: TextLeadingDistribution.even,
-                ),
-              ),
-              if (description != null) ...[
-                const SizedBox(height: 2),
-                Text(
-                  description!,
-                  style: IdsTypography.caption.copyWith(
-                    color: theme.onMuted,
-                    leadingDistribution: TextLeadingDistribution.even,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-        if (trailing != null) ...[
-          const SizedBox(width: 12),
-          IconTheme(
-            data: IconThemeData(color: theme.onMuted, size: 20),
-            child: trailing!,
-          ),
-        ],
-      ],
+    final content = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: children,
+      ),
     );
 
     if (onPressed != null) {
-      return GestureDetector(
-        onTap: onPressed,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: content,
-        ),
-      );
+      return GestureDetector(onTap: onPressed, child: content);
     }
+    return content;
+  }
+}
 
+class IdsItemLeading extends StatelessWidget {
+  const IdsItemLeading({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: content,
+      padding: const EdgeInsets.only(right: 12),
+      child: IconTheme(
+        data: IconThemeData(color: theme.onSurface, size: 20),
+        child: child,
+      ),
+    );
+  }
+}
+
+class IdsItemContent extends StatelessWidget {
+  const IdsItemContent({super.key, required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: children,
+      ),
+    );
+  }
+}
+
+class IdsItemTitle extends StatelessWidget {
+  const IdsItemTitle(this.data, {super.key});
+
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+    return Text(
+      data,
+      style: IdsTypography.label.copyWith(
+        color: theme.onSurface,
+        leadingDistribution: TextLeadingDistribution.even,
+      ),
+    );
+  }
+}
+
+class IdsItemDescription extends StatelessWidget {
+  const IdsItemDescription(this.data, {super.key});
+
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Text(
+        data,
+        style: IdsTypography.caption.copyWith(
+          color: theme.onMuted,
+          leadingDistribution: TextLeadingDistribution.even,
+        ),
+      ),
+    );
+  }
+}
+
+class IdsItemTrailing extends StatelessWidget {
+  const IdsItemTrailing({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(left: 12),
+      child: IconTheme(
+        data: IconThemeData(color: theme.onMuted, size: 20),
+        child: child,
+      ),
     );
   }
 }

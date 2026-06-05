@@ -17,33 +17,49 @@ export default meta;
 type Story = StoryObj<typeof Item>;
 
 export const Basic: Story = {
-  args: {
-    leading: <UserCircle02Icon size={20} />,
-    title: '계정',
-    description: '회원 정보 수정 · 아이디 및 비밀번호 변경',
-  },
+  render: () => (
+    <Item>
+      <Item.Leading><UserCircle02Icon size={20} /></Item.Leading>
+      <Item.Content>
+        <Item.Title>계정</Item.Title>
+        <Item.Description>회원 정보 수정 · 아이디 및 비밀번호 변경</Item.Description>
+      </Item.Content>
+    </Item>
+  ),
 };
 
 export const ProfileMenu: Story = {
   render: () => (
     <VStack gap={0} className="max-w-sm">
-      <Item
-        leading={<UserCircle02Icon size={20} />}
-        title="계정"
-        description="회원 정보 수정 · 아이디 및 비밀번호 변경"
-        onClick={() => {}}
-      />
+      <Item onClick={() => {}}>
+        <Item.Leading><UserCircle02Icon size={20} /></Item.Leading>
+        <Item.Content>
+          <Item.Title>계정</Item.Title>
+          <Item.Description>회원 정보 수정 · 아이디 및 비밀번호 변경</Item.Description>
+        </Item.Content>
+      </Item>
       <Divider />
-      <Item leading={<Logout03Icon size={20} />} title="로그아웃" onClick={() => {}} />
+      <Item onClick={() => {}}>
+        <Item.Leading><Logout03Icon size={20} /></Item.Leading>
+        <Item.Content>
+          <Item.Title>로그아웃</Item.Title>
+        </Item.Content>
+      </Item>
       <Divider />
-      <Item
-        leading={<Settings02Icon size={20} />}
-        title="설정"
-        description="알림 · 언어 · 정보"
-        onClick={() => {}}
-      />
+      <Item onClick={() => {}}>
+        <Item.Leading><Settings02Icon size={20} /></Item.Leading>
+        <Item.Content>
+          <Item.Title>설정</Item.Title>
+          <Item.Description>알림 · 언어 · 정보</Item.Description>
+        </Item.Content>
+      </Item>
       <Divider />
-      <Item leading={<MessageEdit01Icon size={20} />} title="피드백 · 버그 제보하기" onClick={() => {}} />
+      <Item onClick={() => {}}>
+        <Item.Leading><MessageEdit01Icon size={20} /></Item.Leading>
+        <Item.Content>
+          <Item.Title>피드백 · 버그 제보하기</Item.Title>
+        </Item.Content>
+      </Item>
     </VStack>
   ),
 };

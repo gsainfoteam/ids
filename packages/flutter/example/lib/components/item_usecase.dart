@@ -30,9 +30,15 @@ final itemUseCases = [
               child: SizedBox(
                 width: 320,
                 child: IdsItem(
-                  leading: HugeIcon(icon: HugeIcons.strokeRoundedUser, color: theme.onSurface, size: 20),
-                  title: '계정',
-                  description: '회원 정보 수정 · 아이디 및 비밀번호 변경',
+                  children: [
+                    IdsItemLeading(
+                      child: HugeIcon(icon: HugeIcons.strokeRoundedUser, color: theme.onSurface, size: 20),
+                    ),
+                    const IdsItemContent(children: [
+                      IdsItemTitle('계정'),
+                      IdsItemDescription('회원 정보 수정 · 아이디 및 비밀번호 변경'),
+                    ]),
+                  ],
                 ),
               ),
             );
@@ -69,29 +75,53 @@ final itemUseCases = [
                 child: IdsVStack(
                   children: [
                     IdsItem(
-                      leading: HugeIcon(icon: HugeIcons.strokeRoundedUser, color: theme.onSurface, size: 20),
-                      title: '계정',
-                      description: '회원 정보 수정 · 아이디 및 비밀번호 변경',
                       onPressed: () {},
+                      children: [
+                        IdsItemLeading(
+                          child: HugeIcon(icon: HugeIcons.strokeRoundedUser, color: theme.onSurface, size: 20),
+                        ),
+                        const IdsItemContent(children: [
+                          IdsItemTitle('계정'),
+                          IdsItemDescription('회원 정보 수정 · 아이디 및 비밀번호 변경'),
+                        ]),
+                      ],
                     ),
                     const IdsDivider(),
                     IdsItem(
-                      leading: HugeIcon(icon: HugeIcons.strokeRoundedLogout03, color: theme.onSurface, size: 20),
-                      title: '로그아웃',
                       onPressed: () {},
+                      children: [
+                        IdsItemLeading(
+                          child: HugeIcon(icon: HugeIcons.strokeRoundedLogout03, color: theme.onSurface, size: 20),
+                        ),
+                        const IdsItemContent(children: [
+                          IdsItemTitle('로그아웃'),
+                        ]),
+                      ],
                     ),
                     const IdsDivider(),
                     IdsItem(
-                      leading: HugeIcon(icon: HugeIcons.strokeRoundedSettings02, color: theme.onSurface, size: 20),
-                      title: '설정',
-                      description: '알림 · 언어 · 정보',
                       onPressed: () {},
+                      children: [
+                        IdsItemLeading(
+                          child: HugeIcon(icon: HugeIcons.strokeRoundedSettings02, color: theme.onSurface, size: 20),
+                        ),
+                        const IdsItemContent(children: [
+                          IdsItemTitle('설정'),
+                          IdsItemDescription('알림 · 언어 · 정보'),
+                        ]),
+                      ],
                     ),
                     const IdsDivider(),
                     IdsItem(
-                      leading: HugeIcon(icon: HugeIcons.strokeRoundedMessageEdit01, color: theme.onSurface, size: 20),
-                      title: '피드백 · 버그 제보하기',
                       onPressed: () {},
+                      children: [
+                        IdsItemLeading(
+                          child: HugeIcon(icon: HugeIcons.strokeRoundedMessageEdit01, color: theme.onSurface, size: 20),
+                        ),
+                        const IdsItemContent(children: [
+                          IdsItemTitle('피드백 · 버그 제보하기'),
+                        ]),
+                      ],
                     ),
                   ],
                 ),
