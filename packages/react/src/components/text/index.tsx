@@ -1,6 +1,6 @@
 import { type ElementType, type ReactNode } from 'react';
 
-import { tv, type VariantProps } from 'tailwind-variants';
+import { tv, type VariantProps } from '../../utils';
 
 const text = tv({
   base: 'text-[var(--ids-color-on-surface)]',

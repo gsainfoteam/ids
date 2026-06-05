@@ -1,4 +1,4 @@
-import { tv, type VariantProps } from 'tailwind-variants';
+import { tv, type VariantProps } from '../utils';
 
 export const axisVariants = tv({
   variants: {
