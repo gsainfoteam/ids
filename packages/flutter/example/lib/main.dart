@@ -20,6 +20,10 @@ class WidgetbookApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Widgetbook.material(
+      appBuilder: (context, child) => MaterialApp(
+        theme: ThemeData(fontFamily: 'packages/ids_flutter/Pretendard Variable'),
+        home: child,
+      ),
       directories: [
         WidgetbookComponent(
           name: 'IdsButton',
