@@ -32,7 +32,7 @@ final itemUseCases = [
                 child: IdsItem(
                   children: [
                     IdsItemLeading(
-                      child: HugeIcon(icon: HugeIcons.strokeRoundedUser, color: theme.onSurface, size: 20),
+                      child: HugeIcon(icon: HugeIcons.strokeRoundedUserCircle02, color: theme.onSurface, size: 20),
                     ),
                     const IdsItemContent(children: [
                       IdsItemTitle('계정'),
@@ -78,7 +78,7 @@ final itemUseCases = [
                       onPressed: () {},
                       children: [
                         IdsItemLeading(
-                          child: HugeIcon(icon: HugeIcons.strokeRoundedUser, color: theme.onSurface, size: 20),
+                          child: HugeIcon(icon: HugeIcons.strokeRoundedUserCircle02, color: theme.onSurface, size: 20),
                         ),
                         const IdsItemContent(children: [
                           IdsItemTitle('계정'),
