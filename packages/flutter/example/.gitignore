@@ -13,5 +13,4 @@ ios/
 linux/
 macos/
 web/
-!web/index.html
 windows/
