@@ -11,7 +11,7 @@ export function Item({ children, onClick, className }: Item.Props) {
       onClick={onClick}
       className={cn(
         'flex items-center gap-3 w-full text-left py-3',
-        onClick && 'cursor-pointer hover:bg-[var(--ids-color-muted)] transition-colors rounded-xl -mx-2 px-2',
+        onClick && 'cursor-pointer hover:bg-muted transition-colors rounded-xl -mx-2 px-2',
         className,
       )}
     >
@@ -21,7 +21,7 @@ export function Item({ children, onClick, className }: Item.Props) {
 }
 
 function ItemLeading({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('shrink-0 text-[var(--ids-color-on-surface)]', className)}>{children}</span>;
+  return <span className={cn('shrink-0 text-on-surface', className)}>{children}</span>;
 }
 
 function ItemContent({ children, className }: { children: ReactNode; className?: string }) {
@@ -29,15 +29,15 @@ function ItemContent({ children, className }: { children: ReactNode; className?:
 }
 
 function ItemTitle({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('text-label text-[var(--ids-color-on-surface)]', className)}>{children}</span>;
+  return <span className={cn('text-label text-on-surface', className)}>{children}</span>;
 }
 
 function ItemDescription({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('text-caption text-[var(--ids-color-on-muted)]', className)}>{children}</span>;
+  return <span className={cn('text-caption text-on-muted', className)}>{children}</span>;
 }
 
 function ItemTrailing({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('shrink-0 text-[var(--ids-color-on-muted)]', className)}>{children}</span>;
+  return <span className={cn('shrink-0 text-on-muted', className)}>{children}</span>;
 }
 
 Item.Leading = ItemLeading;
