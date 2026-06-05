@@ -54,7 +54,7 @@ final cardUseCases = [
       return ThemeProvider(
         color: color,
         mode: mode,
-        child: Center(
+        child: const Center(
           child: SizedBox(
             width: 320,
             child: IdsCard(
@@ -62,18 +62,18 @@ final cardUseCases = [
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const IdsCardHeader(children: [
+                  IdsCardHeader(children: [
                     IdsCardTitle('공지 제목'),
                     IdsCardDescription('2024년 3월 30일'),
                   ]),
-                  const IdsCardContent(
+                  IdsCardContent(
                     child: IdsText('카드 본문 내용이 들어갑니다.', variant: IdsTextVariant.body),
                   ),
                   IdsCardFooter(
-                    child: IdsHStack(
-                      gap: 6,
-                      children: const [
+                    child: Row(
+                      children: [
                         IdsBadge('#모집', variant: IdsVariant.soft),
+                        SizedBox(width: 6),
                         IdsBadge('#인포팀', variant: IdsVariant.soft),
                       ],
                     ),
@@ -105,7 +105,7 @@ final cardUseCases = [
       return ThemeProvider(
         color: color,
         mode: mode,
-        child: Center(
+        child: const Center(
           child: SizedBox(
             width: 320,
             child: IdsCard(
@@ -113,14 +113,14 @@ final cardUseCases = [
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const IdsCardHeader(children: [
+                  IdsCardHeader(children: [
                     IdsCardDescription('지스트 → 송정역'),
                     IdsCardTitle('13:10~14:00'),
                   ]),
                   IdsCardFooter(
-                    child: IdsHStack(
-                      mainAxis: MainAxis.end,
-                      children: const [
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
                         IdsBadge('정원 1/4', variant: IdsVariant.outline),
                       ],
                     ),
