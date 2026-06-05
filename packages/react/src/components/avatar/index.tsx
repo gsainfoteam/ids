@@ -1,7 +1,7 @@
 import { tv, type VariantProps } from '../../utils';
 
 const avatar = tv({
-  base: 'inline-flex items-center justify-center rounded-full overflow-hidden shrink-0 bg-[var(--ids-color-muted)] text-[var(--ids-color-on-muted)] font-semibold select-none',
+  base: 'inline-flex items-center justify-center rounded-full overflow-hidden shrink-0 bg-muted text-on-muted font-semibold select-none',
   variants: {
     size: {
       sm: 'size-8 text-xs',
