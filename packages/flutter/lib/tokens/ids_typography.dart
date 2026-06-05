@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 abstract final class IdsTypography {
+  static const sansFontFamily = 'Pretendard Variable';
   static const display = TextStyle(fontFamily: 'Pretendard Variable', fontSize: 32, fontWeight: FontWeight.w700, height: 1.2, letterSpacing: -0.5);
   static const heading = TextStyle(fontFamily: 'Pretendard Variable', fontSize: 24, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.5);
   static const title = TextStyle(fontFamily: 'Pretendard Variable', fontSize: 20, fontWeight: FontWeight.w600, height: 1.5, letterSpacing: 0);
