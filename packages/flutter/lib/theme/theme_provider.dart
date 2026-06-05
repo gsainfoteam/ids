@@ -46,8 +46,6 @@ class _ThemeProviderState extends State<ThemeProvider> {
   void _toggleMode() =>
       setState(() => _mode = _mode == IdsMode.light ? IdsMode.dark : IdsMode.light);
 
-  /// Default font family applied to all IDS text.
-  /// Consumers must ensure Pretendard is available (asset bundle or web font).
   static const defaultFontFamily = 'Pretendard Variable';
 
   @override
