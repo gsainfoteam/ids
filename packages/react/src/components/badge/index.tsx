@@ -6,10 +6,10 @@ const badge = tv({
   base: 'inline-flex items-center justify-center rounded-full font-medium whitespace-nowrap',
   variants: {
     variant: {
-      solid: 'bg-[var(--ids-color-primary)] text-[var(--ids-color-on-primary)]',
-      soft: 'bg-[var(--ids-color-secondary)] text-[var(--ids-color-on-secondary)]',
-      outline: 'border border-[var(--ids-color-outline)] text-[var(--ids-color-on-surface)]',
-      ghost: 'text-[var(--ids-color-on-surface)]',
+      solid: 'bg-(--ids-color-primary) text-(--ids-color-on-primary)',
+      soft: 'bg-(--ids-color-secondary) text-(--ids-color-on-secondary)',
+      outline: 'border border-(--ids-color-outline) text-(--ids-color-on-surface)',
+      ghost: 'text-(--ids-color-on-surface)',
     },
     size: {
       sm: 'px-2 py-0.5 text-xs',

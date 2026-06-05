@@ -6,7 +6,7 @@ export function Card({ children, className }: Card.Props) {
   return (
     <div
       className={cn(
-        'rounded-2xl border border-[var(--ids-color-outline)] bg-[var(--ids-color-surface)]',
+        'rounded-2xl border border-(--ids-color-outline) bg-(--ids-color-surface)',
         className,
       )}
     >
@@ -20,11 +20,11 @@ function CardHeader({ children, className }: { children: ReactNode; className?: 
 }
 
 function CardTitle({ children, className }: { children: ReactNode; className?: string }) {
-  return <h3 className={cn('text-title text-[color:var(--ids-color-on-surface)]', className)}>{children}</h3>;
+  return <h3 className={cn('text-title text-(--ids-color-on-surface)', className)}>{children}</h3>;
 }
 
 function CardDescription({ children, className }: { children: ReactNode; className?: string }) {
-  return <p className={cn('text-caption text-[color:var(--ids-color-on-muted)]', className)}>{children}</p>;
+  return <p className={cn('text-caption text-(--ids-color-on-muted)', className)}>{children}</p>;
 }
 
 function CardContent({ children, className }: { children: ReactNode; className?: string }) {
