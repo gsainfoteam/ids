@@ -26,19 +26,28 @@ class IdsButton extends StatelessWidget {
     final theme = ThemeProvider.of(context);
 
     final (bg, fg, border) = switch (variant) {
-      IdsVariant.solid   => (theme.primary,   theme.onPrimary,   null),
-      IdsVariant.soft    => (theme.secondary, theme.onSecondary, null),
-      IdsVariant.outline => (null,            theme.primary,     theme.primary),
-      IdsVariant.ghost   => (null,            theme.primary,     null),
+      IdsVariant.solid => (theme.primary, theme.onPrimary, null),
+      IdsVariant.soft => (theme.secondary, theme.onSecondary, null),
+      IdsVariant.outline => (null, theme.primary, theme.primary),
+      IdsVariant.ghost => (null, theme.primary, null),
     };
 
     final (hPad, textStyle) = switch (size) {
-      IdsSize.xs  => (8.0,  IdsTypography.caption),
-      IdsSize.sm  => (10.0, IdsTypography.label),
-      IdsSize.md  => (16.0, IdsTypography.label),
-      IdsSize.lg  => (20.0, IdsTypography.body),
-      IdsSize.xl  => (24.0, IdsTypography.title),
+      IdsSize.xs => (8.0, IdsTypography.caption),
+      IdsSize.sm => (10.0, IdsTypography.label),
+      IdsSize.md => (16.0, IdsTypography.label),
+      IdsSize.lg => (20.0, IdsTypography.body),
+      IdsSize.xl => (24.0, IdsTypography.title),
       IdsSize.xxl => (32.0, IdsTypography.heading),
+    };
+
+    final iconSize = switch (size) {
+      IdsSize.xs => 16.0,
+      IdsSize.sm => 18.0,
+      IdsSize.md => 20.0,
+      IdsSize.lg => 22.0,
+      IdsSize.xl => 24.0,
+      IdsSize.xxl => 28.0,
     };
 
     return GestureDetector(
@@ -61,11 +70,14 @@ class IdsButton extends StatelessWidget {
               fontWeight: FontWeight.w600,
               leadingDistribution: TextLeadingDistribution.even,
             ),
-            child: IdsHStack(
-              gap: 8,
-              fit: IdsStackFit.content,
-              crossAxis: CrossAxis.center,
-              children: children,
+            child: IconTheme(
+              data: IconThemeData(color: fg, size: iconSize),
+              child: IdsHStack(
+                gap: 8,
+                fit: IdsStackFit.content,
+                crossAxis: CrossAxis.center,
+                children: children,
+              ),
             ),
           ),
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/tokens/ids_typography.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 final mvpFrameUseCases = [
@@ -449,16 +450,16 @@ class _ReactionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Wrap(
-      spacing: 10,
-      runSpacing: 10,
+      spacing: 8,
+      runSpacing: 8,
       children: [
-        _ReactionChip(label: '🔥 268', selected: true, width: 92),
-        _ReactionChip(label: '😮 37', width: 84),
-        _ReactionChip(label: '😭 2', width: 76),
-        _ReactionChip(label: '🤔 1', width: 76),
-        _ReactionChip(label: '☹️ 0', width: 76),
-        _ReactionChip(label: '공유하기', width: 118),
-        _ReactionChip(label: '링크 복사하기', width: 138),
+        _ReactionChip(label: '🔥 268', selected: true, width: 72),
+        _ReactionChip(label: '😮 37', width: 66),
+        _ReactionChip(label: '😭 2', width: 58),
+        _ReactionChip(label: '🤔 1', width: 58),
+        _ReactionChip(label: '☹️ 0', width: 58),
+        _ReactionChip(label: '공유하기', width: 92),
+        _ReactionChip(label: '링크 복사하기', width: 112),
       ],
     );
   }
@@ -477,13 +478,27 @@ class _ReactionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
     return SizedBox(
       width: width,
-      child: IdsButton(
-        onPressed: () {},
-        size: IdsSize.sm,
-        variant: selected ? IdsVariant.solid : IdsVariant.soft,
-        children: [Text(label)],
+      child: Container(
+        height: 36,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? theme.primary : theme.secondary,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          label,
+          style: IdsTypography.label.copyWith(
+            color: selected ? theme.onPrimary : theme.onSecondary,
+            fontWeight: FontWeight.w700,
+            leadingDistribution: TextLeadingDistribution.even,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
     );
   }
@@ -494,27 +509,43 @@ class _ZiggleProfileFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
     return Column(
       children: [
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
             child: IdsVStack(
               gap: 24,
               children: [
-                const IdsCard(
+                IdsCard(
                   size: IdsCardSize.lg,
                   child: IdsCardContent(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 24),
+                      padding: const EdgeInsets.symmetric(vertical: 28),
                       child: IdsVStack(
-                        gap: 10,
+                        gap: 12,
                         crossAxis: CrossAxis.center,
                         children: [
-                          IdsAvatar(name: '류현승', size: IdsSize.xxl),
-                          IdsText('류현승', variant: IdsTextVariant.heading),
-                          IdsText('20255070', variant: IdsTextVariant.title),
-                          IdsText('rhseungg@gm.gist.ac.kr'),
+                          const IdsAvatar(name: '류현승', size: IdsSize.xxl),
+                          const IdsVStack(
+                            gap: 4,
+                            fit: IdsStackFit.content,
+                            crossAxis: CrossAxis.center,
+                            children: [
+                              IdsText('류현승', variant: IdsTextVariant.heading),
+                              IdsText(
+                                '20255070',
+                                variant: IdsTextVariant.title,
+                              ),
+                            ],
+                          ),
+                          IdsText(
+                            'rhseungg@gm.gist.ac.kr',
+                            variant: IdsTextVariant.label,
+                            color: theme.onMuted,
+                          ),
                         ],
                       ),
                     ),
@@ -522,15 +553,23 @@ class _ZiggleProfileFrame extends StatelessWidget {
                 ),
                 _ProfileSection(
                   items: const [
-                    ('계정', '회원 정보 수정 · 아이디 및 비밀번호 변경'),
-                    ('회원 탈퇴', null),
-                    ('로그아웃', null),
+                    (
+                      HugeIcons.strokeRoundedUserCircle02,
+                      '계정',
+                      '회원 정보 수정 · 아이디 및 비밀번호 변경',
+                    ),
+                    (HugeIcons.strokeRoundedUserRemove01, '회원 탈퇴', null),
+                    (HugeIcons.strokeRoundedLogout03, '로그아웃', null),
                   ],
                 ),
                 _ProfileSection(
                   items: const [
-                    ('설정', '알림 · 언어 · 정보'),
-                    ('피드백 · 버그 제보하기', null),
+                    (HugeIcons.strokeRoundedSettings02, '설정', '알림 · 언어 · 정보'),
+                    (
+                      HugeIcons.strokeRoundedMessageEdit01,
+                      '피드백 · 버그 제보하기',
+                      null,
+                    ),
                   ],
                 ),
               ],
@@ -554,27 +593,35 @@ class _ZiggleProfileFrame extends StatelessWidget {
 class _ProfileSection extends StatelessWidget {
   const _ProfileSection({required this.items});
 
-  final List<(String, String?)> items;
+  final List<(List<List<dynamic>>, String, String?)> items;
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
     return IdsCard(
       child: IdsCardContent(
         child: Column(
           children: [
             for (var i = 0; i < items.length; i++) ...[
               IdsItem(
+                onPressed: () {},
                 children: [
+                  IdsItemLeading(
+                    child: IconTheme(
+                      data: IconThemeData(color: theme.onSurface, size: 22),
+                      child: _HugeIcon(items[i].$1),
+                    ),
+                  ),
                   IdsItemContent(
                     children: [
-                      IdsItemTitle(items[i].$1),
-                      if (items[i].$2 != null) IdsItemDescription(items[i].$2!),
+                      IdsItemTitle(items[i].$2),
+                      if (items[i].$3 != null) IdsItemDescription(items[i].$3!),
                     ],
                   ),
                 ],
               ),
-              if (i < items.length - 1)
-                Container(height: 1, color: ThemeProvider.of(context).outline),
+              if (i < items.length - 1) const IdsDivider(),
             ],
           ],
         ),
@@ -596,7 +643,7 @@ class _PotgMainListFrame extends StatelessWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 128),
                 child: IdsVStack(
                   gap: 20,
                   crossAxis: CrossAxis.start,
@@ -741,20 +788,37 @@ class _TaxiPotCard extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: IdsCardContent(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
               child: IdsVStack(
-                gap: 8,
+                gap: 10,
                 crossAxis: CrossAxis.start,
                 children: [
-                  IdsText('$from → $to', variant: IdsTextVariant.label),
+                  IdsHStack(
+                    gap: 8,
+                    fit: IdsStackFit.content,
+                    crossAxis: CrossAxis.center,
+                    children: [
+                      IconTheme(
+                        data: IconThemeData(color: theme.primary, size: 18),
+                        child: const _HugeIcon(HugeIcons.strokeRoundedRoute01),
+                      ),
+                      Expanded(
+                        child: IdsText(
+                          '$from → $to',
+                          variant: IdsTextVariant.label,
+                        ),
+                      ),
+                    ],
+                  ),
                   IdsText(time, variant: IdsTextVariant.title),
                 ],
               ),
             ),
           ),
           Container(
-            width: 88,
-            height: 92,
+            width: 86,
+            height: 96,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: theme.secondary,
@@ -785,6 +849,8 @@ class _PotgSearchEmptyFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
     return Stack(
       children: [
         Column(
@@ -801,10 +867,32 @@ class _PotgSearchEmptyFrame extends StatelessWidget {
                       child: Center(
                         child: IdsEmpty(
                           children: [
-                            const IdsEmptyMedia(
-                              child: _HugeIcon(HugeIcons.strokeRoundedSad01),
+                            IdsEmptyMedia(
+                              child: Container(
+                                width: 84,
+                                height: 84,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: theme.secondary,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconTheme(
+                                  data: IconThemeData(
+                                    color: theme.primary,
+                                    size: 48,
+                                  ),
+                                  child: const _HugeIcon(
+                                    HugeIcons.strokeRoundedSad01,
+                                  ),
+                                ),
+                              ),
                             ),
-                            const IdsEmptyDescription('해당 조건의 택시 팟이 존재하지 않습니다'),
+                            IdsText(
+                              '해당 조건의 택시 팟이 존재하지 않습니다',
+                              variant: IdsTextVariant.label,
+                              color: theme.primary,
+                              align: TextAlign.center,
+                            ),
                             IdsEmptyActions(
                               children: [
                                 IdsButton(
