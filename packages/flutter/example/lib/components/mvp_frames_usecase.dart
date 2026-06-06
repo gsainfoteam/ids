@@ -941,74 +941,77 @@ class _PotgCreateTimeFrame extends StatelessWidget {
 
     return ColoredBox(
       color: theme.surface,
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
-        child: IdsVStack(
-          gap: 24,
-          crossAxis: CrossAxis.start,
-          children: [
-            const IdsText('팟 생성', variant: IdsTextVariant.heading),
-            _StepRow(index: '1', label: '지스트 → 광주송정역', filled: true),
-            _StepRow(index: '2', label: '11월 14일 금요일', filled: true),
-            _StepRow(index: '3', label: '시간대 설정', filled: false),
-            const IdsCard(
-              child: IdsCardContent(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _TimeSummary(label: '금요일 오전', time: '9:41'),
-                    IdsText('~', variant: IdsTextVariant.heading),
-                    _TimeSummary(label: '금요일 오후', time: '12:30'),
-                  ],
-                ),
-              ),
-            ),
-            const IdsText(
-              '출발 가능한 가장 늦은 시각을 설정하세요',
-              variant: IdsTextVariant.title,
-            ),
-            IdsCard(
-              variant: IdsCardVariant.filled,
-              child: IdsCardContent(
-                child: SizedBox(
-                  height: 240,
-                  child: IdsVStack(
-                    gap: 28,
-                    mainAxis: MainAxis.center,
-                    crossAxis: CrossAxis.center,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 696),
+          child: IdsVStack(
+            gap: 24,
+            crossAxis: CrossAxis.start,
+            children: [
+              const IdsText('팟 생성', variant: IdsTextVariant.heading),
+              _StepRow(index: '1', label: '지스트 → 광주송정역', filled: true),
+              _StepRow(index: '2', label: '11월 14일 금요일', filled: true),
+              _StepRow(index: '3', label: '시간대 설정', filled: false),
+              const IdsCard(
+                child: IdsCardContent(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      IdsHStack(
-                        gap: 32,
-                        fit: IdsStackFit.content,
-                        children: [
-                          IdsText(
-                            '9',
-                            variant: IdsTextVariant.heading,
-                            color: theme.onMuted,
-                          ),
-                          IdsText(
-                            '41',
-                            variant: IdsTextVariant.heading,
-                            color: theme.onMuted,
-                          ),
-                          IdsText(
-                            'AM',
-                            variant: IdsTextVariant.heading,
-                            color: theme.onMuted,
-                          ),
-                        ],
-                      ),
-                      IdsButton(
-                        onPressed: () {},
-                        variant: IdsVariant.outline,
-                        children: const [Text('확인')],
-                      ),
+                      _TimeSummary(label: '금요일 오전', time: '9:41'),
+                      IdsText('~', variant: IdsTextVariant.heading),
+                      _TimeSummary(label: '금요일 오후', time: '12:30'),
                     ],
                   ),
                 ),
               ),
-            ),
-          ],
+              const IdsText(
+                '출발 가능한 가장 늦은 시각을 설정하세요',
+                variant: IdsTextVariant.title,
+              ),
+              IdsCard(
+                variant: IdsCardVariant.filled,
+                child: IdsCardContent(
+                  child: SizedBox(
+                    height: 240,
+                    child: IdsVStack(
+                      gap: 28,
+                      mainAxis: MainAxis.center,
+                      crossAxis: CrossAxis.center,
+                      children: [
+                        IdsHStack(
+                          gap: 32,
+                          fit: IdsStackFit.content,
+                          children: [
+                            IdsText(
+                              '9',
+                              variant: IdsTextVariant.heading,
+                              color: theme.onMuted,
+                            ),
+                            IdsText(
+                              '41',
+                              variant: IdsTextVariant.heading,
+                              color: theme.onMuted,
+                            ),
+                            IdsText(
+                              'AM',
+                              variant: IdsTextVariant.heading,
+                              color: theme.onMuted,
+                            ),
+                          ],
+                        ),
+                        IdsButton(
+                          onPressed: () {},
+                          variant: IdsVariant.outline,
+                          children: const [Text('확인')],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
