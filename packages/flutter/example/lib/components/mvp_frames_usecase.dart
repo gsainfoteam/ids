@@ -458,8 +458,16 @@ class _ReactionBar extends StatelessWidget {
         _ReactionChip(label: '😭 2', width: 58),
         _ReactionChip(label: '🤔 1', width: 58),
         _ReactionChip(label: '☹️ 0', width: 58),
-        _ReactionChip(label: '공유하기', width: 92),
-        _ReactionChip(label: '링크 복사하기', width: 112),
+        _ReactionChip(
+          label: '공유하기',
+          icon: HugeIcons.strokeRoundedShare01,
+          width: 112,
+        ),
+        _ReactionChip(
+          label: '링크 복사하기',
+          icon: HugeIcons.strokeRoundedCopyLink,
+          width: 136,
+        ),
       ],
     );
   }
@@ -469,11 +477,13 @@ class _ReactionChip extends StatelessWidget {
   const _ReactionChip({
     required this.label,
     required this.width,
+    this.icon,
     this.selected = false,
   });
 
   final String label;
   final double width;
+  final List<List<dynamic>>? icon;
   final bool selected;
 
   @override
@@ -489,15 +499,29 @@ class _ReactionChip extends StatelessWidget {
           color: selected ? theme.primary : theme.secondary,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Text(
-          label,
-          style: IdsTypography.label.copyWith(
+        child: IconTheme(
+          data: IconThemeData(
             color: selected ? theme.onPrimary : theme.onSecondary,
-            fontWeight: FontWeight.w700,
-            leadingDistribution: TextLeadingDistribution.even,
+            size: 17,
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+          child: IdsHStack(
+            gap: icon == null ? 0 : 5,
+            fit: IdsStackFit.content,
+            crossAxis: CrossAxis.center,
+            children: [
+              if (icon != null) _HugeIcon(icon!),
+              Text(
+                label,
+                style: IdsTypography.label.copyWith(
+                  color: selected ? theme.onPrimary : theme.onSecondary,
+                  fontWeight: FontWeight.w700,
+                  leadingDistribution: TextLeadingDistribution.even,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
