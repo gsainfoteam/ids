@@ -13,6 +13,12 @@ export { Badge } from './components/badge';
 export { IconButton } from './components/icon-button';
 export { Card } from './components/card';
 export { Item } from './components/item';
+export { FloatingButton } from './components/floating-button';
+export { BottomNavigation } from './components/bottom-navigation';
+export { Tabs } from './components/tabs';
+export { Checkbox } from './components/checkbox';
+export { Dialog } from './components/dialog';
+export { Empty } from './components/empty';
 export type { TextVariant } from './components/text';
 export type { MainAxis, CrossAxis, StackFit } from './layout/types';
 
