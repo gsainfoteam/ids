@@ -322,6 +322,7 @@ class _PhoneHeader extends StatelessWidget {
     final theme = ThemeProvider.of(context);
 
     return Container(
+      width: double.infinity,
       height: 56,
       decoration: BoxDecoration(
         color: theme.surface,
@@ -333,10 +334,14 @@ class _PhoneHeader extends StatelessWidget {
           if (backLabel != null)
             Positioned(
               left: 16,
-              child: IdsText(
-                backLabel!,
-                variant: IdsTextVariant.label,
-                color: theme.primary,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: IdsText(
+                  backLabel!,
+                  variant: IdsTextVariant.label,
+                  color: theme.primary,
+                ),
               ),
             ),
           IdsText(title, variant: IdsTextVariant.label),
