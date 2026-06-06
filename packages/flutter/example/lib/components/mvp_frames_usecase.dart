@@ -605,11 +605,7 @@ class _PotgMainListFrame extends StatelessWidget {
             ),
           ],
         ),
-        IdsFloatingButton(
-          semanticLabel: '새 팟 만들기',
-          onPressed: () {},
-          children: const [_HugeIcon(HugeIcons.strokeRoundedCar03)],
-        ),
+        const _PotgFloatingButton(),
       ],
     );
   }
@@ -769,11 +765,7 @@ class _PotgSearchEmptyFrame extends StatelessWidget {
             _PotgBottomNavigation(currentIndex: 1),
           ],
         ),
-        IdsFloatingButton(
-          semanticLabel: '새 팟 만들기',
-          onPressed: () {},
-          children: const [_HugeIcon(HugeIcons.strokeRoundedCar03)],
-        ),
+        const _PotgFloatingButton(),
       ],
     );
   }
@@ -850,11 +842,7 @@ class _PotgFilterDialogFrameState extends State<_PotgFilterDialogFrame> {
             _PotgBottomNavigation(currentIndex: 1),
           ],
         ),
-        IdsFloatingButton(
-          semanticLabel: '새 팟 만들기',
-          onPressed: () {},
-          children: const [_HugeIcon(HugeIcons.strokeRoundedCar03)],
-        ),
+        const _PotgFloatingButton(),
         IdsDialog(
           open: open,
           onOpenChanged: (value) => setState(() => open = value),
@@ -1103,6 +1091,22 @@ class _PotgBottomNavigation extends StatelessWidget {
         _navItem(HugeIcons.strokeRoundedMessage01, '채팅방'),
         _navItem(HugeIcons.strokeRoundedUserCircle02, '내 정보'),
       ],
+    );
+  }
+}
+
+class _PotgFloatingButton extends StatelessWidget {
+  const _PotgFloatingButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 88),
+      child: IdsFloatingButton(
+        semanticLabel: '새 팟 만들기',
+        onPressed: () {},
+        children: const [_HugeIcon(HugeIcons.strokeRoundedCar03)],
+      ),
     );
   }
 }
