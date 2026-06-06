@@ -59,6 +59,10 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(name: 'IdsDialog', useCases: dialogUseCases),
         WidgetbookComponent(name: 'IdsEmpty', useCases: emptyUseCases),
         WidgetbookComponent(name: 'MVP Frames', useCases: mvpFrameUseCases),
+        WidgetbookComponent(
+          name: 'MVP Potg Create Time',
+          useCases: potgCreateTimeFrameUseCases,
+        ),
       ],
     );
   }

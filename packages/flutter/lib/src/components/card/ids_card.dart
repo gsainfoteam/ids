@@ -25,9 +25,9 @@ class IdsCard extends StatelessWidget {
   final bool interactive;
 
   double get _radius => switch (size) {
-    IdsCardSize.sm => 6,
-    IdsCardSize.md => 8,
-    IdsCardSize.lg => 12,
+    IdsCardSize.sm => 10,
+    IdsCardSize.md => 16,
+    IdsCardSize.lg => 24,
   };
 
   @override
