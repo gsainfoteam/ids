@@ -477,7 +477,7 @@ class _ZiggleProfileFrame extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: IdsVStack(
               gap: 24,
