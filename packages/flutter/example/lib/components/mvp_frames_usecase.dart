@@ -118,68 +118,85 @@ class _ZiggleGroupsFrame extends StatelessWidget {
       children: [
         const _GroupHeader(),
         Expanded(
-          child: IdsTabs<String>(
-            defaultValue: 'notice',
-            items: [
-              const IdsTabItem(
-                value: 'intro',
-                label: '소개',
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: IdsText('지속 가능한 개발 문화를 통해 지스트 학부생의 삶의 질을 높이는 팀입니다.'),
-                ),
-              ),
-              IdsTabItem(
-                value: 'notice',
-                label: '공지',
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: IdsVStack(
-                    gap: 16,
-                    children: [
-                      const _GroupNoticeCard(),
-                      IdsCard(
-                        variant: IdsCardVariant.elevated,
-                        child: IdsCardContent(
-                          child: IdsVStack(
-                            gap: 12,
-                            crossAxis: CrossAxis.start,
-                            children: [
-                              const IdsText(
-                                '제휴업체 댓글 이벤트 당첨자 공지',
-                                variant: IdsTextVariant.title,
-                              ),
-                              const _NoticePoster(),
-                              Wrap(
-                                spacing: 8,
-                                children: const [
-                                  IdsBadge('# 태그1'),
-                                  IdsBadge('# 태그1'),
-                                  IdsBadge('# 태그1'),
-                                ],
-                              ),
-                              IdsText(
-                                '10일 남음',
-                                variant: IdsTextVariant.caption,
-                                color: theme.primary,
-                              ),
-                            ],
-                          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final panelHeight = constraints.maxHeight - 49;
+
+              return IdsTabs<String>(
+                defaultValue: 'notice',
+                items: [
+                  IdsTabItem(
+                    value: 'intro',
+                    label: '소개',
+                    child: SizedBox(
+                      height: panelHeight,
+                      child: const Padding(
+                        padding: EdgeInsets.all(24),
+                        child: IdsText(
+                          '지속 가능한 개발 문화를 통해 지스트 학부생의 삶의 질을 높이는 팀입니다.',
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              const IdsTabItem(
-                value: 'members',
-                label: '멤버',
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: IdsText('멤버 목록'),
-                ),
-              ),
-            ],
+                  IdsTabItem(
+                    value: 'notice',
+                    label: '공지',
+                    child: SizedBox(
+                      height: panelHeight,
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: IdsVStack(
+                          gap: 16,
+                          children: [
+                            const _GroupNoticeCard(),
+                            IdsCard(
+                              variant: IdsCardVariant.elevated,
+                              child: IdsCardContent(
+                                child: IdsVStack(
+                                  gap: 12,
+                                  crossAxis: CrossAxis.start,
+                                  children: [
+                                    const IdsText(
+                                      '제휴업체 댓글 이벤트 당첨자 공지',
+                                      variant: IdsTextVariant.title,
+                                    ),
+                                    const _NoticePoster(),
+                                    Wrap(
+                                      spacing: 8,
+                                      children: const [
+                                        IdsBadge('# 태그1'),
+                                        IdsBadge('# 태그1'),
+                                        IdsBadge('# 태그1'),
+                                      ],
+                                    ),
+                                    IdsText(
+                                      '10일 남음',
+                                      variant: IdsTextVariant.caption,
+                                      color: theme.primary,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  IdsTabItem(
+                    value: 'members',
+                    label: '멤버',
+                    child: SizedBox(
+                      height: panelHeight,
+                      child: const Padding(
+                        padding: EdgeInsets.all(24),
+                        child: IdsText('멤버 목록'),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ],
