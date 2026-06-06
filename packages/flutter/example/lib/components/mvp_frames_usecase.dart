@@ -5,6 +5,14 @@ import 'package:widgetbook/widgetbook.dart';
 
 final mvpFrameUseCases = [
   WidgetbookUseCase(
+    name: 'Ziggle Groups',
+    builder: (context) => _withTheme(
+      context,
+      initialColor: IdsColor.orange,
+      child: const _Phone(child: _ZiggleGroupsFrame()),
+    ),
+  ),
+  WidgetbookUseCase(
     name: 'Ziggle Notice Detail',
     builder: (context) => _withTheme(
       context,
@@ -26,6 +34,22 @@ final mvpFrameUseCases = [
       context,
       initialColor: IdsColor.green,
       child: const _Phone(child: _PotgMainListFrame()),
+    ),
+  ),
+  WidgetbookUseCase(
+    name: 'Potg Search Empty',
+    builder: (context) => _withTheme(
+      context,
+      initialColor: IdsColor.green,
+      child: const _Phone(child: _PotgSearchEmptyFrame()),
+    ),
+  ),
+  WidgetbookUseCase(
+    name: 'Potg Filter Dialog',
+    builder: (context) => _withTheme(
+      context,
+      initialColor: IdsColor.green,
+      child: const _Phone(child: _PotgFilterDialogFrame()),
     ),
   ),
   WidgetbookUseCase(
@@ -78,6 +102,182 @@ class _Phone extends StatelessWidget {
         height: 760,
         color: theme.muted,
         child: child,
+      ),
+    );
+  }
+}
+
+class _ZiggleGroupsFrame extends StatelessWidget {
+  const _ZiggleGroupsFrame();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return Column(
+      children: [
+        const _GroupHeader(),
+        Expanded(
+          child: IdsTabs<String>(
+            defaultValue: 'notice',
+            items: [
+              const IdsTabItem(
+                value: 'intro',
+                label: '소개',
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: IdsText('지속 가능한 개발 문화를 통해 지스트 학부생의 삶의 질을 높이는 팀입니다.'),
+                ),
+              ),
+              IdsTabItem(
+                value: 'notice',
+                label: '공지',
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: IdsVStack(
+                    gap: 16,
+                    children: [
+                      const _GroupNoticeCard(),
+                      IdsCard(
+                        variant: IdsCardVariant.elevated,
+                        child: IdsCardContent(
+                          child: IdsVStack(
+                            gap: 12,
+                            crossAxis: CrossAxis.start,
+                            children: [
+                              const IdsText(
+                                '제휴업체 댓글 이벤트 당첨자 공지',
+                                variant: IdsTextVariant.title,
+                              ),
+                              const _NoticePoster(),
+                              Wrap(
+                                spacing: 8,
+                                children: const [
+                                  IdsBadge('# 태그1'),
+                                  IdsBadge('# 태그1'),
+                                  IdsBadge('# 태그1'),
+                                ],
+                              ),
+                              IdsText(
+                                '10일 남음',
+                                variant: IdsTextVariant.caption,
+                                color: theme.primary,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const IdsTabItem(
+                value: 'members',
+                label: '멤버',
+                child: Padding(
+                  padding: EdgeInsets.all(24),
+                  child: IdsText('멤버 목록'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GroupHeader extends StatelessWidget {
+  const _GroupHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return ColoredBox(
+      color: theme.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: IdsVStack(
+          gap: 18,
+          children: [
+            const IdsHStack(
+              gap: 16,
+              crossAxis: CrossAxis.center,
+              children: [
+                IdsAvatar(name: '짭인포팀', size: IdsSize.xxl),
+                Expanded(
+                  child: IdsVStack(
+                    gap: 4,
+                    crossAxis: CrossAxis.start,
+                    children: [
+                      IdsText('짭인포팀', variant: IdsTextVariant.heading),
+                      IdsText(
+                        '구독자 19명 · 게시글 5개',
+                        variant: IdsTextVariant.label,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            IdsCard(
+              variant: IdsCardVariant.filled,
+              child: IdsCardContent(
+                child: IdsText(
+                  '지속 가능한 개발 문화를 통해 지스트 학부생의 삶의 질을 높이는 팀, 인포팀입니다.',
+                  color: theme.onMuted,
+                ),
+              ),
+            ),
+            IdsButton(onPressed: () {}, children: const [Text('즐겨찾기')]),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GroupNoticeCard extends StatelessWidget {
+  const _GroupNoticeCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return IdsCard(
+      variant: IdsCardVariant.elevated,
+      child: IdsCardContent(
+        child: IdsVStack(
+          gap: 12,
+          crossAxis: CrossAxis.start,
+          children: [
+            const IdsHStack(
+              gap: 10,
+              crossAxis: CrossAxis.center,
+              children: [
+                IdsAvatar(name: '짭인포팀'),
+                IdsVStack(
+                  gap: 2,
+                  crossAxis: CrossAxis.start,
+                  fit: IdsStackFit.content,
+                  children: [
+                    IdsText('짭인포팀', variant: IdsTextVariant.label),
+                    IdsText('10분 전', variant: IdsTextVariant.caption),
+                  ],
+                ),
+              ],
+            ),
+            const IdsText('공지 제목', variant: IdsTextVariant.title),
+            const _NoticePoster(),
+            Wrap(
+              spacing: 8,
+              children: const [
+                IdsBadge('# 태그1'),
+                IdsBadge('# 태그1'),
+                IdsBadge('# 태그1'),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -495,6 +695,229 @@ class _TaxiPotCard extends StatelessWidget {
   }
 }
 
+class _PotgSearchEmptyFrame extends StatelessWidget {
+  const _PotgSearchEmptyFrame();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: IdsVStack(
+                  gap: 24,
+                  crossAxis: CrossAxis.start,
+                  children: [
+                    const IdsText('팟 검색', variant: IdsTextVariant.heading),
+                    Expanded(
+                      child: Center(
+                        child: IdsEmpty(
+                          children: [
+                            const IdsEmptyMedia(
+                              child: _HugeIcon(HugeIcons.strokeRoundedSad01),
+                            ),
+                            const IdsEmptyDescription('해당 조건의 택시 팟이 존재하지 않습니다'),
+                            IdsEmptyActions(
+                              children: [
+                                IdsButton(
+                                  onPressed: () {},
+                                  variant: IdsVariant.outline,
+                                  children: const [
+                                    _HugeIcon(HugeIcons.strokeRoundedCar03),
+                                    Text('새 팟 만들기'),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            _PotgBottomNavigation(currentIndex: 1),
+          ],
+        ),
+        IdsFloatingButton(
+          semanticLabel: '새 팟 만들기',
+          onPressed: () {},
+          children: const [_HugeIcon(HugeIcons.strokeRoundedCar03)],
+        ),
+      ],
+    );
+  }
+}
+
+class _PotgFilterDialogFrame extends StatefulWidget {
+  const _PotgFilterDialogFrame();
+
+  @override
+  State<_PotgFilterDialogFrame> createState() => _PotgFilterDialogFrameState();
+}
+
+class _PotgFilterDialogFrameState extends State<_PotgFilterDialogFrame> {
+  var checked = true;
+  var open = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: IdsVStack(
+                  gap: 20,
+                  crossAxis: CrossAxis.start,
+                  children: [
+                    const IdsText('팟 검색', variant: IdsTextVariant.heading),
+                    const IdsText('노선 필터', variant: IdsTextVariant.caption),
+                    const IdsCard(
+                      child: IdsCardContent(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IdsText('지스트', variant: IdsTextVariant.title),
+                            IdsText('→', variant: IdsTextVariant.title),
+                            IdsText('유스퀘어', variant: IdsTextVariant.title),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const IdsText('날짜 필터', variant: IdsTextVariant.caption),
+                    const _CalendarFilterCard(),
+                    IdsHStack(
+                      gap: 8,
+                      crossAxis: CrossAxis.center,
+                      children: [
+                        IdsCheckbox(
+                          checked: checked,
+                          semanticLabel: '정원이 가득 찬 팟 숨기기',
+                          onChanged: (value) => setState(() => checked = value),
+                        ),
+                        const Expanded(
+                          child: IdsText(
+                            '정원이 가득 찬 팟 숨기기',
+                            variant: IdsTextVariant.label,
+                          ),
+                        ),
+                      ],
+                    ),
+                    IdsButton(
+                      onPressed: () => setState(() => open = true),
+                      children: const [Text('적용')],
+                    ),
+                    _TaxiPotCard(),
+                  ],
+                ),
+              ),
+            ),
+            _PotgBottomNavigation(currentIndex: 1),
+          ],
+        ),
+        IdsFloatingButton(
+          semanticLabel: '새 팟 만들기',
+          onPressed: () {},
+          children: const [_HugeIcon(HugeIcons.strokeRoundedCar03)],
+        ),
+        IdsDialog(
+          open: open,
+          onOpenChanged: (value) => setState(() => open = value),
+          children: [
+            const IdsDialogHeader(children: [IdsDialogTitle('입장하시겠습니까?')]),
+            const IdsDialogContent(
+              child: IdsVStack(
+                gap: 8,
+                crossAxis: CrossAxis.start,
+                children: [
+                  IdsText('노선  송정역 → 지스트', variant: IdsTextVariant.label),
+                  IdsText(
+                    '날짜  2025년 12월 13일 토요일',
+                    variant: IdsTextVariant.label,
+                  ),
+                  IdsText('시간  23:30~01:00', variant: IdsTextVariant.label),
+                  IdsText(
+                    '참여자 목록  홍길동, 심청이, 변사또',
+                    variant: IdsTextVariant.label,
+                  ),
+                ],
+              ),
+            ),
+            IdsDialogFooter(
+              children: [
+                IdsButton(
+                  onPressed: () => setState(() => open = false),
+                  variant: IdsVariant.ghost,
+                  children: const [Text('아니요')],
+                ),
+                IdsButton(
+                  onPressed: () => setState(() => open = false),
+                  variant: IdsVariant.ghost,
+                  children: [Text('네', style: TextStyle(color: theme.primary))],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _CalendarFilterCard extends StatelessWidget {
+  const _CalendarFilterCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return IdsCard(
+      child: IdsCardContent(
+        child: IdsVStack(
+          gap: 16,
+          children: [
+            const IdsText(
+              '2025년 11월',
+              variant: IdsTextVariant.title,
+              align: TextAlign.center,
+            ),
+            Wrap(
+              spacing: 18,
+              runSpacing: 14,
+              children: [
+                for (var day = 8; day <= 22; day++)
+                  Container(
+                    width: 34,
+                    height: 34,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: day == 14 ? theme.primary : null,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: IdsText(
+                      '$day',
+                      variant: IdsTextVariant.label,
+                      color: day == 14 ? theme.onPrimary : theme.onSurface,
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _PotgCreateTimeFrame extends StatelessWidget {
   const _PotgCreateTimeFrame();
 
@@ -633,6 +1056,26 @@ class _TimeSummary extends StatelessWidget {
       children: [
         IdsText(label, variant: IdsTextVariant.caption),
         IdsText(time, variant: IdsTextVariant.title),
+      ],
+    );
+  }
+}
+
+class _PotgBottomNavigation extends StatelessWidget {
+  const _PotgBottomNavigation({required this.currentIndex});
+
+  final int currentIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return IdsBottomNavigation(
+      currentIndex: currentIndex,
+      onTap: (_) {},
+      items: [
+        _navItem(HugeIcons.strokeRoundedHome01, '모든 팟'),
+        _navItem(HugeIcons.strokeRoundedSearch01, '팟 검색'),
+        _navItem(HugeIcons.strokeRoundedMessage01, '채팅방'),
+        _navItem(HugeIcons.strokeRoundedUserCircle02, '내 정보'),
       ],
     );
   }
