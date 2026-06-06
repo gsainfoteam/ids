@@ -58,6 +58,7 @@ class _ThemeProviderState extends State<ThemeProvider> {
       child: DefaultTextStyle(
         style: DefaultTextStyle.of(context).style.copyWith(
           fontFamily: IdsTypography.sansFontFamily,
+          package: IdsTypography.sansFontPackage,
         ),
         child: widget.child,
       ),

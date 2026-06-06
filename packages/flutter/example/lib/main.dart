@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'components/avatar_usecase.dart';
 import 'components/badge_usecase.dart';
@@ -21,7 +22,10 @@ class WidgetbookApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Widgetbook.material(
       appBuilder: (context, child) => MaterialApp(
-        theme: ThemeData(fontFamily: 'ids_flutter/Pretendard Variable'),
+        theme: ThemeData(
+          fontFamily: IdsTypography.sansFontFamily,
+          package: IdsTypography.sansFontPackage,
+        ),
         home: child,
       ),
       directories: [
