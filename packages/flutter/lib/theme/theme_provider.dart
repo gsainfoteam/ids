@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import '../tokens/ids_enums.dart';
+import '../tokens/ids_typography.dart';
 import 'ids_scope.dart';
 import 'ids_theme.dart';
 
@@ -54,7 +55,13 @@ class _ThemeProviderState extends State<ThemeProvider> {
       setColor: _setColor,
       setMode: _setMode,
       toggleMode: _toggleMode,
-      child: widget.child,
+      child: DefaultTextStyle(
+        style: DefaultTextStyle.of(context).style.copyWith(
+          fontFamily: IdsTypography.sansFontFamily,
+          package: IdsTypography.sansFontPackage,
+        ),
+        child: widget.child,
+      ),
     );
   }
 }

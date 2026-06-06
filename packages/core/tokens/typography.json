@@ -26,7 +26,7 @@
     "wider":  { "$value": "1px",    "$type": "dimension" }
   },
   "font-family": {
-    "sans": { "$value": ["Pretendard", "sans-serif"], "$type": "fontFamily" },
+    "sans": { "$value": ["Pretendard Variable", "Pretendard", "sans-serif"], "$type": "fontFamily" },
     "mono": { "$value": ["JetBrains Mono", "monospace"], "$type": "fontFamily" }
   }
 }
