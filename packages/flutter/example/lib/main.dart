@@ -9,6 +9,7 @@ import 'components/feedback_usecase.dart';
 import 'components/divider_usecase.dart';
 import 'components/item_usecase.dart';
 import 'components/icon_button_usecase.dart';
+import 'components/mvp_frames_usecase.dart';
 import 'components/navigation_usecase.dart';
 import 'components/stack_usecase.dart';
 import 'components/text_usecase.dart';
@@ -57,6 +58,7 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(name: 'IdsCheckbox', useCases: checkboxUseCases),
         WidgetbookComponent(name: 'IdsDialog', useCases: dialogUseCases),
         WidgetbookComponent(name: 'IdsEmpty', useCases: emptyUseCases),
+        WidgetbookComponent(name: 'MVP Frames', useCases: mvpFrameUseCases),
       ],
     );
   }
