@@ -32,7 +32,7 @@ export function Card({
         'bg-(--ids-color-surface) transition-colors',
         {
           'border border-(--ids-color-outline)': variant === 'outline',
-          'border border-transparent shadow-lg': variant === 'elevated',
+          'border border-transparent': variant === 'elevated',
           'border border-transparent bg-(--ids-color-muted)': variant === 'filled',
           'border border-transparent bg-transparent': variant === 'ghost',
         },

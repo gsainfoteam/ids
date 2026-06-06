@@ -43,15 +43,6 @@ class IdsCard extends StatelessWidget {
       border: variant == IdsCardVariant.outline
           ? Border.all(color: theme.outline)
           : null,
-      boxShadow: variant == IdsCardVariant.elevated
-          ? [
-              BoxShadow(
-                color: const Color(0xFF000000).withValues(alpha: 0.12),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ]
-          : null,
     );
 
     final card = AnimatedContainer(
