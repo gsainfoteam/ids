@@ -46,7 +46,12 @@ export function Checkbox({
         )}
         {...props}
       />
-      <span className="pointer-events-none absolute text-(--ids-color-on-primary) opacity-0 peer-checked:opacity-100">
+      <span
+        className={cn(
+          'pointer-events-none absolute text-(--ids-color-on-primary)',
+          indeterminate ? 'opacity-100' : 'opacity-0 peer-checked:opacity-100',
+        )}
+      >
         {children ?? (indeterminate ? '−' : '✓')}
       </span>
     </span>

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 
 import '../../../theme/theme_provider.dart';
 import '../../../tokens/ids_typography.dart';
@@ -32,8 +33,6 @@ class IdsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = ThemeProvider.of(context);
-    final isInteractive = interactive || onPressed != null;
-
     final decoration = BoxDecoration(
       color: switch (variant) {
         IdsCardVariant.filled => theme.muted,
@@ -61,11 +60,35 @@ class IdsCard extends StatelessWidget {
       child: child,
     );
 
-    if (!isInteractive) return card;
+    if (onPressed == null) return card;
 
-    return GestureDetector(
-      onTap: onPressed,
-      child: Semantics(button: true, enabled: onPressed != null, child: card),
+    return Shortcuts(
+      shortcuts: const {
+        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+      },
+      child: Actions(
+        actions: {
+          ActivateIntent: CallbackAction<ActivateIntent>(
+            onInvoke: (_) {
+              onPressed?.call();
+              return null;
+            },
+          ),
+        },
+        child: FocusableActionDetector(
+          enabled: onPressed != null,
+          child: Semantics(
+            button: true,
+            enabled: true,
+            child: GestureDetector(
+              onTap: onPressed,
+              behavior: HitTestBehavior.opaque,
+              child: card,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

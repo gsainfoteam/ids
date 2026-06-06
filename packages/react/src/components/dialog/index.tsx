@@ -32,12 +32,16 @@ export function Dialog({
   return (
     <DialogContext.Provider value={{ onOpenChange }}>
       <div className="fixed inset-0 z-50 flex bg-black/50 p-4">
-        <button
-          type="button"
-          aria-label="닫기"
-          className="absolute inset-0 cursor-default"
-          onClick={() => dismissible && onOpenChange?.(false)}
-        />
+        {dismissible ? (
+          <button
+            type="button"
+            aria-label="닫기"
+            className="absolute inset-0 cursor-default"
+            onClick={() => onOpenChange?.(false)}
+          />
+        ) : (
+          <div aria-hidden className="absolute inset-0" />
+        )}
         <div
           role={role}
           aria-modal="true"

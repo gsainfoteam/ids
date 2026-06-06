@@ -1,4 +1,11 @@
-import { createContext, useContext, useId, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useId,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react';
 
 import { cn } from '../../utils';
 
@@ -52,17 +59,45 @@ function TabsTrigger({ value, disabled, children, className }: Tabs.TriggerProps
   const active = context.value === value;
   const triggerId = `${context.baseId}-trigger-${value}`;
   const panelId = `${context.baseId}-panel-${value}`;
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];
+    if (!keys.includes(event.key)) return;
+
+    const tabList = event.currentTarget.closest('[role="tablist"]');
+    const tabs = Array.from(
+      tabList?.querySelectorAll<HTMLButtonElement>('[role="tab"]:not(:disabled)') ?? [],
+    );
+    const currentIndex = tabs.indexOf(event.currentTarget);
+    if (currentIndex < 0) return;
+
+    const targetIndex = (() => {
+      if (event.key === 'Home') return 0;
+      if (event.key === 'End') return tabs.length - 1;
+      if (event.key === 'ArrowLeft') return (currentIndex - 1 + tabs.length) % tabs.length;
+      return (currentIndex + 1) % tabs.length;
+    })();
+
+    const target = tabs[targetIndex];
+    const targetValue = target?.dataset.idsTabsValue;
+    if (!target || !targetValue) return;
+
+    event.preventDefault();
+    context.setValue(targetValue);
+    target.focus();
+  };
 
   return (
     <button
       type="button"
       id={triggerId}
       role="tab"
+      data-ids-tabs-value={value}
       disabled={disabled}
       aria-selected={active}
       aria-controls={panelId}
       tabIndex={active ? 0 : -1}
       onClick={() => context.setValue(value)}
+      onKeyDown={handleKeyDown}
       className={cn(
         'relative flex flex-1 items-center justify-center px-4 py-3 font-medium transition-colors',
         'focus-visible:outline-2 focus-visible:outline-offset-[-2px] disabled:pointer-events-none disabled:opacity-40',

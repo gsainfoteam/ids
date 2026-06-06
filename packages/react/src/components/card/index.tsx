@@ -10,20 +10,24 @@ export function Card({
   onClick,
   className,
 }: Card.Props) {
-  const isInteractive = interactive ?? Boolean(onClick);
+  const hasAction = Boolean(onClick);
+  const isInteractiveStyle = interactive ?? hasAction;
 
   return (
     <div
-      role={isInteractive ? 'button' : undefined}
-      tabIndex={isInteractive ? 0 : undefined}
+      role={hasAction ? 'button' : undefined}
+      tabIndex={hasAction ? 0 : undefined}
       onClick={onClick}
-      onKeyDown={(event) => {
-        if (!onClick) return;
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          onClick();
-        }
-      }}
+      onKeyDown={
+        hasAction
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onClick?.();
+              }
+            }
+          : undefined
+      }
       className={cn(
         'bg-(--ids-color-surface) transition-colors',
         {
@@ -37,7 +41,7 @@ export function Card({
           'rounded-lg': size === 'md',
           'rounded-xl': size === 'lg',
         },
-        isInteractive &&
+        isInteractiveStyle &&
           'cursor-pointer hover:bg-(--ids-color-muted) focus-visible:outline-2 focus-visible:outline-offset-2',
         className,
       )}

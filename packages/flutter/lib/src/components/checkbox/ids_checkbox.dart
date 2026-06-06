@@ -38,13 +38,20 @@ class IdsCheckbox extends StatelessWidget {
     final border = invalid
         ? const Color(0xFFEF4444)
         : (active ? theme.primary : theme.outline);
+    final label = indeterminate
+        ? '${semanticLabel ?? ''} indeterminate'.trim()
+        : semanticLabel;
 
     return Semantics(
-      label: semanticLabel,
+      label: label,
       checked: checked,
       enabled: !disabled && onChanged != null,
       child: GestureDetector(
-        onTap: disabled ? null : () => onChanged?.call(!checked),
+        onTap: disabled
+            ? null
+            : () {
+                onChanged?.call(indeterminate ? true : !checked);
+              },
         child: AnimatedOpacity(
           duration: IdsMotion.fast,
           opacity: disabled ? 0.4 : 1,
