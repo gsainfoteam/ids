@@ -3,22 +3,69 @@ import 'package:flutter/widgets.dart';
 import '../../../theme/theme_provider.dart';
 import '../../../tokens/ids_typography.dart';
 
+enum IdsCardVariant { outline, elevated, filled, ghost }
+
+enum IdsCardSize { sm, md, lg }
+
 class IdsCard extends StatelessWidget {
-  const IdsCard({super.key, required this.child});
+  const IdsCard({
+    super.key,
+    required this.child,
+    this.variant = IdsCardVariant.outline,
+    this.size = IdsCardSize.md,
+    this.onPressed,
+    this.interactive = false,
+  });
 
   final Widget child;
+  final IdsCardVariant variant;
+  final IdsCardSize size;
+  final VoidCallback? onPressed;
+  final bool interactive;
+
+  double get _radius => switch (size) {
+    IdsCardSize.sm => 6,
+    IdsCardSize.md => 8,
+    IdsCardSize.lg => 12,
+  };
 
   @override
   Widget build(BuildContext context) {
     final theme = ThemeProvider.of(context);
+    final isInteractive = interactive || onPressed != null;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.outline),
-      ),
+    final decoration = BoxDecoration(
+      color: switch (variant) {
+        IdsCardVariant.filled => theme.muted,
+        IdsCardVariant.ghost => null,
+        _ => theme.surface,
+      },
+      borderRadius: BorderRadius.circular(_radius),
+      border: variant == IdsCardVariant.outline
+          ? Border.all(color: theme.outline)
+          : null,
+      boxShadow: variant == IdsCardVariant.elevated
+          ? [
+              BoxShadow(
+                color: const Color(0xFF000000).withValues(alpha: 0.12),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+              ),
+            ]
+          : null,
+    );
+
+    final card = AnimatedContainer(
+      duration: const Duration(milliseconds: 150),
+      decoration: decoration,
       child: child,
+    );
+
+    if (!isInteractive) return card;
+
+    return GestureDetector(
+      onTap: onPressed,
+      child: Semantics(button: true, enabled: onPressed != null, child: card),
     );
   }
 }
@@ -84,10 +131,7 @@ class IdsCardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: child,
-    );
+    return Padding(padding: const EdgeInsets.all(16), child: child);
   }
 }
 
