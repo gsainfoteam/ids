@@ -56,7 +56,9 @@ class _ThemeProviderState extends State<ThemeProvider> {
       setMode: _setMode,
       toggleMode: _toggleMode,
       child: DefaultTextStyle(
-        style: const TextStyle(fontFamily: IdsTypography.sansFontFamily),
+        style: DefaultTextStyle.of(context).style.copyWith(
+          fontFamily: IdsTypography.sansFontFamily,
+        ),
         child: widget.child,
       ),
     );
