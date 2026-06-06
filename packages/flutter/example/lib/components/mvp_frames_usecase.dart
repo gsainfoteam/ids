@@ -428,34 +428,43 @@ class _ReactionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
+    return const Wrap(
+      spacing: 10,
+      runSpacing: 10,
       children: [
-        IdsButton(
-          onPressed: () {},
-          size: IdsSize.sm,
-          children: const [Text('🔥 268')],
-        ),
-        IdsButton(
-          onPressed: () {},
-          size: IdsSize.sm,
-          variant: IdsVariant.soft,
-          children: const [Text('😮 37')],
-        ),
-        IdsButton(
-          onPressed: () {},
-          size: IdsSize.sm,
-          variant: IdsVariant.soft,
-          children: const [Text('공유하기')],
-        ),
-        IdsButton(
-          onPressed: () {},
-          size: IdsSize.sm,
-          variant: IdsVariant.soft,
-          children: const [Text('링크 복사하기')],
-        ),
+        _ReactionChip(label: '🔥 268', selected: true, width: 92),
+        _ReactionChip(label: '😮 37', width: 84),
+        _ReactionChip(label: '😭 2', width: 76),
+        _ReactionChip(label: '🤔 1', width: 76),
+        _ReactionChip(label: '☹️ 0', width: 76),
+        _ReactionChip(label: '공유하기', width: 118),
+        _ReactionChip(label: '링크 복사하기', width: 138),
       ],
+    );
+  }
+}
+
+class _ReactionChip extends StatelessWidget {
+  const _ReactionChip({
+    required this.label,
+    required this.width,
+    this.selected = false,
+  });
+
+  final String label;
+  final double width;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: IdsButton(
+        onPressed: () {},
+        size: IdsSize.sm,
+        variant: selected ? IdsVariant.solid : IdsVariant.soft,
+        children: [Text(label)],
+      ),
     );
   }
 }
