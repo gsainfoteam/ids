@@ -146,6 +146,7 @@ class _ZiggleGroupsFrame extends StatelessWidget {
                         padding: EdgeInsets.all(24),
                         child: IdsText(
                           '지속 가능한 개발 문화를 통해 지스트 학부생의 삶의 질을 높이는 팀입니다.',
+                          variant: IdsTextVariant.label,
                         ),
                       ),
                     ),
@@ -170,7 +171,7 @@ class _ZiggleGroupsFrame extends StatelessWidget {
                                   children: [
                                     const IdsText(
                                       '2026 봄학기 개발자 모집 안내',
-                                      variant: IdsTextVariant.title,
+                                      variant: IdsTextVariant.body,
                                     ),
                                     const _NoticePoster(),
                                     Wrap(
@@ -202,7 +203,7 @@ class _ZiggleGroupsFrame extends StatelessWidget {
                       height: panelHeight,
                       child: const Padding(
                         padding: EdgeInsets.all(24),
-                        child: IdsText('멤버 목록'),
+                        child: IdsText('멤버 목록', variant: IdsTextVariant.label),
                       ),
                     ),
                   ),
@@ -240,10 +241,10 @@ class _GroupHeader extends StatelessWidget {
                     gap: 4,
                     crossAxis: CrossAxis.start,
                     children: [
-                      IdsText('GIST 인포팀', variant: IdsTextVariant.heading),
+                      IdsText('GIST 인포팀', variant: IdsTextVariant.title),
                       IdsText(
                         '구독자 248명 · 게시글 12개',
-                        variant: IdsTextVariant.label,
+                        variant: IdsTextVariant.caption,
                       ),
                     ],
                   ),
@@ -255,6 +256,7 @@ class _GroupHeader extends StatelessWidget {
               child: IdsCardContent(
                 child: IdsText(
                   'GIST 학생을 위한 웹 서비스와 인증 인프라를 만들고 운영하는 개발팀입니다.',
+                  variant: IdsTextVariant.label,
                   color: theme.onMuted,
                 ),
               ),
@@ -289,13 +291,13 @@ class _GroupNoticeCard extends StatelessWidget {
                   crossAxis: CrossAxis.start,
                   fit: IdsStackFit.content,
                   children: [
-                    IdsText('GIST 인포팀', variant: IdsTextVariant.label),
+                    IdsText('GIST 인포팀', variant: IdsTextVariant.caption),
                     IdsText('12분 전', variant: IdsTextVariant.caption),
                   ],
                 ),
               ],
             ),
-            const IdsText('2026 봄학기 인포팀 개발자 모집', variant: IdsTextVariant.title),
+            const IdsText('2026 봄학기 인포팀 개발자 모집', variant: IdsTextVariant.body),
             const _NoticePoster(),
             Wrap(
               spacing: 8,
@@ -340,12 +342,12 @@ class _PhoneHeader extends StatelessWidget {
               child: Center(
                 child: IdsText(
                   backLabel!,
-                  variant: IdsTextVariant.label,
+                  variant: IdsTextVariant.caption,
                   color: theme.primary,
                 ),
               ),
             ),
-          IdsText(title, variant: IdsTextVariant.label),
+          IdsText(title, variant: IdsTextVariant.caption),
         ],
       ),
     );
@@ -380,12 +382,12 @@ class _ZiggleNoticeDetailFrame extends StatelessWidget {
                     crossAxis: CrossAxis.center,
                     children: [
                       IdsAvatar(name: '인포팀'),
-                      IdsText('인포팀 · 32분 전', variant: IdsTextVariant.label),
+                      IdsText('인포팀 · 32분 전', variant: IdsTextVariant.caption),
                     ],
                   ),
                   const IdsText(
                     '2026 봄학기 인포팀 개발자 모집',
-                    variant: IdsTextVariant.heading,
+                    variant: IdsTextVariant.title,
                   ),
                   Wrap(
                     spacing: 8,
@@ -402,9 +404,11 @@ class _ZiggleNoticeDetailFrame extends StatelessWidget {
                   const _NoticePoster(),
                   const IdsText(
                     'GIST 인포팀에서 2026 봄학기 신규 멤버를 모집합니다.\n지원서 작성 구글 폼 링크',
+                    variant: IdsTextVariant.label,
                   ),
                   const IdsText(
                     '인포팀은 지글(Ziggle), IdP, 디자인 시스템 등 학생들이 매일 사용하는 서비스를 설계하고 운영합니다. 제품 개발과 서비스 운영을 함께 경험하고 싶은 분을 기다립니다.',
+                    variant: IdsTextVariant.label,
                   ),
                   const _ReactionBar(),
                 ],
@@ -436,7 +440,7 @@ class _NoticePoster extends StatelessWidget {
       ),
       child: const IdsText(
         '2026 봄학기\n인포팀 개발자 모집',
-        variant: IdsTextVariant.heading,
+        variant: IdsTextVariant.title,
         align: TextAlign.center,
         color: Color(0xFFE85F6A),
       ),
@@ -512,7 +516,7 @@ class _ReactionChip extends StatelessWidget {
               if (icon != null) _HugeIcon(icon!),
               Text(
                 label,
-                style: IdsTypography.label.copyWith(
+                style: IdsTypography.caption.copyWith(
                   color: selected ? theme.onPrimary : theme.onSecondary,
                   fontWeight: FontWeight.w700,
                   leadingDistribution: TextLeadingDistribution.even,
@@ -558,16 +562,13 @@ class _ZiggleProfileFrame extends StatelessWidget {
                             fit: IdsStackFit.content,
                             crossAxis: CrossAxis.center,
                             children: [
-                              IdsText('류현승', variant: IdsTextVariant.heading),
-                              IdsText(
-                                '20255070',
-                                variant: IdsTextVariant.title,
-                              ),
+                              IdsText('류현승', variant: IdsTextVariant.title),
+                              IdsText('20255070', variant: IdsTextVariant.body),
                             ],
                           ),
                           IdsText(
                             'rhseungg@gm.gist.ac.kr',
-                            variant: IdsTextVariant.label,
+                            variant: IdsTextVariant.caption,
                             color: theme.onMuted,
                           ),
                         ],
@@ -672,11 +673,11 @@ class _PotgMainListFrame extends StatelessWidget {
                   gap: 20,
                   crossAxis: CrossAxis.start,
                   children: [
-                    const IdsText('팟쥐', variant: IdsTextVariant.heading),
+                    const IdsText('팟쥐', variant: IdsTextVariant.title),
                     const _WeekStatusCard(),
                     IdsText(
                       '2025/11/15 토요일',
-                      variant: IdsTextVariant.label,
+                      variant: IdsTextVariant.caption,
                       color: theme.onMuted,
                     ),
                     const _TaxiPotCard(
@@ -739,7 +740,7 @@ class _WeekStatusCard extends StatelessWidget {
           gap: 16,
           crossAxis: CrossAxis.start,
           children: [
-            const IdsText('요일 별 팟 현황', variant: IdsTextVariant.title),
+            const IdsText('요일 별 팟 현황', variant: IdsTextVariant.body),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -760,7 +761,7 @@ class _WeekStatusCard extends StatelessWidget {
                           ),
                           child: IdsText(
                             i == 6 && row == 1 ? '5' : (row == 0 ? '0' : '1'),
-                            variant: IdsTextVariant.label,
+                            variant: IdsTextVariant.caption,
                             color: i == 6 && row == 1
                                 ? theme.onPrimary
                                 : theme.onSurface,
@@ -827,12 +828,12 @@ class _TaxiPotCard extends StatelessWidget {
                       Expanded(
                         child: IdsText(
                           '$from → $to',
-                          variant: IdsTextVariant.label,
+                          variant: IdsTextVariant.caption,
                         ),
                       ),
                     ],
                   ),
-                  IdsText(time, variant: IdsTextVariant.title),
+                  IdsText(time, variant: IdsTextVariant.body),
                 ],
               ),
             ),
@@ -853,7 +854,7 @@ class _TaxiPotCard extends StatelessWidget {
                 const IdsText('정원', variant: IdsTextVariant.caption),
                 IdsText(
                   capacity,
-                  variant: IdsTextVariant.title,
+                  variant: IdsTextVariant.body,
                   color: theme.primary,
                 ),
               ],
@@ -883,7 +884,7 @@ class _PotgSearchEmptyFrame extends StatelessWidget {
                   gap: 24,
                   crossAxis: CrossAxis.start,
                   children: [
-                    const IdsText('팟 검색', variant: IdsTextVariant.heading),
+                    const IdsText('팟 검색', variant: IdsTextVariant.title),
                     Expanded(
                       child: Center(
                         child: IdsEmpty(
@@ -910,7 +911,7 @@ class _PotgSearchEmptyFrame extends StatelessWidget {
                             ),
                             IdsText(
                               '해당 조건의 택시 팟이 존재하지 않습니다',
-                              variant: IdsTextVariant.label,
+                              variant: IdsTextVariant.caption,
                               color: theme.primary,
                               align: TextAlign.center,
                             ),
@@ -969,16 +970,16 @@ class _PotgFilterDialogFrameState extends State<_PotgFilterDialogFrame> {
                   gap: 20,
                   crossAxis: CrossAxis.start,
                   children: [
-                    const IdsText('팟 검색', variant: IdsTextVariant.heading),
+                    const IdsText('팟 검색', variant: IdsTextVariant.title),
                     const IdsText('노선 필터', variant: IdsTextVariant.caption),
                     const IdsCard(
                       child: IdsCardContent(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            IdsText('지스트', variant: IdsTextVariant.title),
-                            IdsText('→', variant: IdsTextVariant.title),
-                            IdsText('유스퀘어', variant: IdsTextVariant.title),
+                            IdsText('지스트', variant: IdsTextVariant.body),
+                            IdsText('→', variant: IdsTextVariant.body),
+                            IdsText('유스퀘어', variant: IdsTextVariant.body),
                           ],
                         ),
                       ),
@@ -997,7 +998,7 @@ class _PotgFilterDialogFrameState extends State<_PotgFilterDialogFrame> {
                         const Expanded(
                           child: IdsText(
                             '정원이 가득 찬 팟 숨기기',
-                            variant: IdsTextVariant.label,
+                            variant: IdsTextVariant.caption,
                           ),
                         ),
                       ],
@@ -1025,15 +1026,15 @@ class _PotgFilterDialogFrameState extends State<_PotgFilterDialogFrame> {
                 gap: 8,
                 crossAxis: CrossAxis.start,
                 children: [
-                  IdsText('노선  광주송정역 → 지스트', variant: IdsTextVariant.label),
+                  IdsText('노선  광주송정역 → 지스트', variant: IdsTextVariant.caption),
                   IdsText(
                     '날짜  2025년 12월 13일 토요일',
-                    variant: IdsTextVariant.label,
+                    variant: IdsTextVariant.caption,
                   ),
-                  IdsText('시간  23:30~01:00', variant: IdsTextVariant.label),
+                  IdsText('시간  23:30~01:00', variant: IdsTextVariant.caption),
                   IdsText(
                     '참여자 목록  김민준, 박서연, 이서연',
-                    variant: IdsTextVariant.label,
+                    variant: IdsTextVariant.caption,
                   ),
                 ],
               ),
@@ -1073,7 +1074,7 @@ class _CalendarFilterCard extends StatelessWidget {
           children: [
             const IdsText(
               '2025년 11월',
-              variant: IdsTextVariant.title,
+              variant: IdsTextVariant.body,
               align: TextAlign.center,
             ),
             Wrap(
@@ -1091,7 +1092,7 @@ class _CalendarFilterCard extends StatelessWidget {
                     ),
                     child: IdsText(
                       '$day',
-                      variant: IdsTextVariant.label,
+                      variant: IdsTextVariant.caption,
                       color: day == 14 ? theme.onPrimary : theme.onSurface,
                     ),
                   ),
@@ -1121,7 +1122,7 @@ class _PotgCreateTimeFrame extends StatelessWidget {
             gap: 24,
             crossAxis: CrossAxis.start,
             children: [
-              const IdsText('팟 생성', variant: IdsTextVariant.heading),
+              const IdsText('팟 생성', variant: IdsTextVariant.title),
               _StepRow(index: '1', label: '지스트 → 광주송정역', filled: true),
               _StepRow(index: '2', label: '11월 14일 금요일', filled: true),
               _StepRow(index: '3', label: '시간대 설정', filled: false),
@@ -1131,7 +1132,7 @@ class _PotgCreateTimeFrame extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _TimeSummary(label: '금요일 오전', time: '9:41'),
-                      IdsText('~', variant: IdsTextVariant.heading),
+                      IdsText('~', variant: IdsTextVariant.title),
                       _TimeSummary(label: '금요일 오후', time: '12:30'),
                     ],
                   ),
@@ -1139,7 +1140,7 @@ class _PotgCreateTimeFrame extends StatelessWidget {
               ),
               const IdsText(
                 '출발 가능한 가장 늦은 시각을 설정하세요',
-                variant: IdsTextVariant.title,
+                variant: IdsTextVariant.body,
               ),
               IdsCard(
                 variant: IdsCardVariant.filled,
@@ -1157,17 +1158,17 @@ class _PotgCreateTimeFrame extends StatelessWidget {
                           children: [
                             IdsText(
                               '9',
-                              variant: IdsTextVariant.heading,
+                              variant: IdsTextVariant.title,
                               color: theme.onMuted,
                             ),
                             IdsText(
                               '41',
-                              variant: IdsTextVariant.heading,
+                              variant: IdsTextVariant.title,
                               color: theme.onMuted,
                             ),
                             IdsText(
                               'AM',
-                              variant: IdsTextVariant.heading,
+                              variant: IdsTextVariant.title,
                               color: theme.onMuted,
                             ),
                           ],
@@ -1220,11 +1221,11 @@ class _StepRow extends StatelessWidget {
           ),
           child: IdsText(
             index,
-            variant: IdsTextVariant.title,
+            variant: IdsTextVariant.body,
             color: filled ? theme.onPrimary : theme.primary,
           ),
         ),
-        Expanded(child: IdsText(label, variant: IdsTextVariant.title)),
+        Expanded(child: IdsText(label, variant: IdsTextVariant.body)),
       ],
     );
   }
@@ -1244,7 +1245,7 @@ class _TimeSummary extends StatelessWidget {
       crossAxis: CrossAxis.center,
       children: [
         IdsText(label, variant: IdsTextVariant.caption),
-        IdsText(time, variant: IdsTextVariant.title),
+        IdsText(time, variant: IdsTextVariant.body),
       ],
     );
   }
