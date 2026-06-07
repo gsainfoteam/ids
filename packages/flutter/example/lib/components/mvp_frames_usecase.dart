@@ -1024,15 +1024,15 @@ class _PotgFilterDialogFrameState extends State<_PotgFilterDialogFrame> {
                 gap: 8,
                 crossAxis: CrossAxis.start,
                 children: [
-                  IdsText('노선  광주송정역 → 지스트', variant: IdsTextVariant.caption),
+                  IdsText('노선  광주송정역 → 지스트', variant: IdsTextVariant.label),
                   IdsText(
                     '날짜  2025년 12월 13일 토요일',
-                    variant: IdsTextVariant.caption,
+                    variant: IdsTextVariant.label,
                   ),
-                  IdsText('시간  23:30~01:00', variant: IdsTextVariant.caption),
+                  IdsText('시간  23:30~01:00', variant: IdsTextVariant.label),
                   IdsText(
                     '참여자 목록  김민준, 박서연, 이서연',
-                    variant: IdsTextVariant.caption,
+                    variant: IdsTextVariant.label,
                   ),
                 ],
               ),
