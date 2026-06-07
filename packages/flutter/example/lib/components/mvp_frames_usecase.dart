@@ -801,6 +801,9 @@ class _TaxiPotCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.surface,
         borderRadius: BorderRadius.circular(18),
+      ),
+      foregroundDecoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: theme.outline),
       ),
       child: Row(
