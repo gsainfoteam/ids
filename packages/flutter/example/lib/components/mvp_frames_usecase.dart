@@ -909,7 +909,7 @@ class _PotgSearchEmptyFrame extends StatelessWidget {
                             ),
                             IdsText(
                               '해당 조건의 택시 팟이 존재하지 않습니다',
-                              variant: IdsTextVariant.caption,
+                              variant: IdsTextVariant.label,
                               color: theme.primary,
                               align: TextAlign.center,
                             ),
