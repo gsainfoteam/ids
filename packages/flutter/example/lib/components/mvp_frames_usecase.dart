@@ -1329,9 +1329,10 @@ class _HugeIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconTheme = IconTheme.of(context);
+    final theme = ThemeProvider.of(context);
     return HugeIcon(
       icon: icon,
-      color: iconTheme.color ?? const Color(0xFF000000),
+      color: iconTheme.color ?? theme.onSurface,
       size: iconTheme.size ?? 24,
     );
   }
