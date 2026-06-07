@@ -826,7 +826,7 @@ class _TaxiPotCard extends StatelessWidget {
                       Expanded(
                         child: IdsText(
                           '$from → $to',
-                          variant: IdsTextVariant.caption,
+                          variant: IdsTextVariant.label,
                         ),
                       ),
                     ],
@@ -849,10 +849,10 @@ class _TaxiPotCard extends StatelessWidget {
               fit: IdsStackFit.content,
               crossAxis: CrossAxis.center,
               children: [
-                const IdsText('정원', variant: IdsTextVariant.caption),
+                const IdsText('정원', variant: IdsTextVariant.label),
                 IdsText(
                   capacity,
-                  variant: IdsTextVariant.body,
+                  variant: IdsTextVariant.title,
                   color: theme.primary,
                 ),
               ],
