@@ -63,6 +63,17 @@ final mvpFrameUseCases = [
   ),
 ];
 
+final potgCreateTimeFrameUseCases = [
+  WidgetbookUseCase(
+    name: 'Time Range',
+    builder: (context) => _withTheme(
+      context,
+      initialColor: IdsColor.green,
+      child: const _Phone(child: _PotgCreateTimeFrame()),
+    ),
+  ),
+];
+
 Widget _withTheme(
   BuildContext context, {
   required IdsColor initialColor,
@@ -1129,7 +1140,9 @@ class _PotgCreateTimeFrame extends StatelessWidget {
 
     return ColoredBox(
       color: theme.surface,
-      child: SizedBox.expand(
+      child: SizedBox(
+        width: double.infinity,
+        height: 760,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32),
           child: IdsVStack(
