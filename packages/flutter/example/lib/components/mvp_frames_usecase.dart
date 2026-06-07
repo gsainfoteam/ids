@@ -331,12 +331,12 @@ class _PhoneHeader extends StatelessWidget {
               child: Center(
                 child: IdsText(
                   backLabel!,
-                  variant: IdsTextVariant.caption,
+                  variant: IdsTextVariant.label,
                   color: theme.primary,
                 ),
               ),
             ),
-          IdsText(title, variant: IdsTextVariant.caption),
+          IdsText(title, variant: IdsTextVariant.label),
         ],
       ),
     );
@@ -371,7 +371,7 @@ class _ZiggleNoticeDetailFrame extends StatelessWidget {
                     crossAxis: CrossAxis.center,
                     children: [
                       IdsAvatar(name: '인포팀'),
-                      IdsText('인포팀 · 32분 전', variant: IdsTextVariant.caption),
+                      IdsText('인포팀 · 32분 전', variant: IdsTextVariant.label),
                     ],
                   ),
                   const IdsText(
@@ -446,11 +446,32 @@ class _ReactionBar extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: [
-        _ReactionChip(label: '🔥 268', selected: true, width: 72),
-        _ReactionChip(label: '😮 37', width: 66),
-        _ReactionChip(label: '😭 2', width: 58),
-        _ReactionChip(label: '🤔 1', width: 58),
-        _ReactionChip(label: '☹️ 0', width: 58),
+        _ReactionChip(
+          label: '268',
+          icon: HugeIcons.strokeRoundedFire,
+          selected: true,
+          width: 70,
+        ),
+        _ReactionChip(
+          label: '37',
+          icon: HugeIcons.strokeRoundedSurprise,
+          width: 64,
+        ),
+        _ReactionChip(
+          label: '2',
+          icon: HugeIcons.strokeRoundedCrying,
+          width: 58,
+        ),
+        _ReactionChip(
+          label: '1',
+          icon: HugeIcons.strokeRoundedIdea01,
+          width: 58,
+        ),
+        _ReactionChip(
+          label: '0',
+          icon: HugeIcons.strokeRoundedSad01,
+          width: 58,
+        ),
         _ReactionChip(
           label: '공유하기',
           icon: HugeIcons.strokeRoundedShare01,
@@ -612,7 +633,8 @@ class _ProfileSection extends StatelessWidget {
     final theme = ThemeProvider.of(context);
 
     return IdsCard(
-      child: IdsCardContent(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         child: Column(
           children: [
             for (var i = 0; i < items.length; i++) ...[
@@ -809,13 +831,19 @@ class _TaxiPotCard extends StatelessWidget {
                     crossAxis: CrossAxis.center,
                     children: [
                       IconTheme(
-                        data: IconThemeData(color: theme.primary, size: 18),
+                        data: IconThemeData(color: theme.primary, size: 20),
                         child: const _HugeIcon(HugeIcons.strokeRoundedRoute01),
                       ),
                       Expanded(
-                        child: IdsText(
+                        child: Text(
                           '$from → $to',
-                          variant: IdsTextVariant.label,
+                          style: IdsTypography.body.copyWith(
+                            color: theme.onSurface,
+                            fontWeight: FontWeight.w600,
+                            leadingDistribution: TextLeadingDistribution.even,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
