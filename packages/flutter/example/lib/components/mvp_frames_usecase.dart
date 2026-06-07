@@ -549,30 +549,28 @@ class _ZiggleProfileFrame extends StatelessWidget {
               children: [
                 IdsCard(
                   size: IdsCardSize.lg,
-                  child: IdsCardContent(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 28),
-                      child: IdsVStack(
-                        gap: 12,
-                        crossAxis: CrossAxis.center,
-                        children: [
-                          const IdsAvatar(name: '류현승', size: IdsSize.xxl),
-                          const IdsVStack(
-                            gap: 4,
-                            fit: IdsStackFit.content,
-                            crossAxis: CrossAxis.center,
-                            children: [
-                              IdsText('류현승', variant: IdsTextVariant.title),
-                              IdsText('20255070', variant: IdsTextVariant.body),
-                            ],
-                          ),
-                          IdsText(
-                            'rhseungg@gm.gist.ac.kr',
-                            variant: IdsTextVariant.caption,
-                            color: theme.onMuted,
-                          ),
-                        ],
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(28),
+                    child: IdsVStack(
+                      gap: 10,
+                      crossAxis: CrossAxis.center,
+                      children: [
+                        const IdsAvatar(name: '류현승', size: IdsSize.xxl),
+                        const IdsVStack(
+                          gap: 4,
+                          fit: IdsStackFit.content,
+                          crossAxis: CrossAxis.center,
+                          children: [
+                            IdsText('류현승', variant: IdsTextVariant.title),
+                            IdsText('20255070', variant: IdsTextVariant.body),
+                          ],
+                        ),
+                        IdsText(
+                          'rhseungg@gm.gist.ac.kr',
+                          variant: IdsTextVariant.caption,
+                          color: theme.onMuted,
+                        ),
+                      ],
                     ),
                   ),
                 ),
