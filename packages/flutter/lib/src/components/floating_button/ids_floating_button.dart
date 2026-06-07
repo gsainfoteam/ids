@@ -72,6 +72,13 @@ class IdsFloatingButton extends StatelessWidget {
               color: bg,
               borderRadius: BorderRadius.circular(999),
               border: border,
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF000000).withValues(alpha: 0.16),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: DefaultTextStyle(
               style: IdsTypography.label.copyWith(

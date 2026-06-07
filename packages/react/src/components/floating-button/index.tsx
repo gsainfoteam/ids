@@ -16,9 +16,9 @@ export function FloatingButton({
       type="button"
       disabled={disabled}
       className={cn(
-        'fixed z-40 inline-flex items-center justify-center gap-2 font-semibold transition-all',
+        'fixed z-40 inline-flex items-center justify-center gap-2 font-semibold shadow-lg transition-all',
         'focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40',
-        'hover:-translate-y-0.5',
+        'hover:-translate-y-0.5 hover:shadow-xl',
         {
           'bg-(--ids-color-primary) text-(--ids-color-on-primary)': variant === 'solid',
           'border border-(--ids-color-outline) bg-(--ids-color-surface) text-(--ids-color-on-surface)':
