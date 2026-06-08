@@ -39,10 +39,10 @@ final mvpFrameUseCases = [
   ),
   WidgetbookUseCase(
     name: 'Potg Create Time',
-    builder: (context) => _withTheme(
-      context,
-      initialColor: IdsColor.green,
-      child: const _Phone(child: _PotgCreateTimeFrame()),
+    builder: (context) => const ThemeProvider(
+      color: IdsColor.green,
+      mode: IdsMode.light,
+      child: Center(child: _Phone(child: _PotgCreateTimeFrame())),
     ),
   ),
   WidgetbookUseCase(
@@ -63,16 +63,139 @@ final mvpFrameUseCases = [
   ),
 ];
 
-final potgCreateTimeFrameUseCases = [
-  WidgetbookUseCase(
-    name: 'Time Range',
-    builder: (context) => _withTheme(
-      context,
-      initialColor: IdsColor.green,
-      child: const _Phone(child: _PotgCreateTimeFrame()),
+class MvpFramesApp extends StatefulWidget {
+  const MvpFramesApp({super.key});
+
+  @override
+  State<MvpFramesApp> createState() => _MvpFramesAppState();
+}
+
+class _MvpFramesAppState extends State<MvpFramesApp> {
+  var _index = 0;
+
+  static const _frames = [
+    _MvpFrameSpec(
+      label: '공지 상세',
+      color: IdsColor.orange,
+      child: _ZiggleNoticeDetailFrame(),
     ),
-  ),
-];
+    _MvpFrameSpec(
+      label: '프로필',
+      color: IdsColor.orange,
+      child: _ZiggleProfileFrame(),
+    ),
+    _MvpFrameSpec(
+      label: '그룹',
+      color: IdsColor.orange,
+      child: _ZiggleGroupsFrame(),
+    ),
+    _MvpFrameSpec(
+      label: '팟 리스트',
+      color: IdsColor.green,
+      child: _PotgMainListFrame(),
+    ),
+    _MvpFrameSpec(
+      label: '팟 생성',
+      color: IdsColor.green,
+      child: _PotgCreateTimeFrame(),
+    ),
+    _MvpFrameSpec(
+      label: '팟 검색',
+      color: IdsColor.green,
+      child: _PotgSearchEmptyFrame(),
+    ),
+    _MvpFrameSpec(
+      label: '팟 필터',
+      color: IdsColor.green,
+      child: _PotgFilterDialogFrame(),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final frame = _frames[_index];
+
+    return ThemeProvider(
+      color: frame.color,
+      mode: IdsMode.light,
+      child: Builder(
+        builder: (context) {
+          final theme = ThemeProvider.of(context);
+
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              fontFamily: IdsTypography.sansFontFamily,
+              package: IdsTypography.sansFontPackage,
+              scaffoldBackgroundColor: theme.muted,
+            ),
+            home: ColoredBox(
+              color: theme.muted,
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 52,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final selected = index == _index;
+
+                          return GestureDetector(
+                            onTap: () => setState(() => _index = index),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected ? theme.primary : theme.surface,
+                                borderRadius: BorderRadius.circular(999),
+                                border: Border.all(color: theme.outline),
+                              ),
+                              child: IdsText(
+                                _frames[index].label,
+                                variant: IdsTextVariant.caption,
+                                color: selected
+                                    ? theme.onPrimary
+                                    : theme.onSurface,
+                              ),
+                            ),
+                          );
+                        },
+                        separatorBuilder: (_, _) => const SizedBox(width: 8),
+                        itemCount: _frames.length,
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(child: _Phone(child: frame.child)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _MvpFrameSpec {
+  const _MvpFrameSpec({
+    required this.label,
+    required this.color,
+    required this.child,
+  });
+
+  final String label;
+  final IdsColor color;
+  final Widget child;
+}
 
 Widget _withTheme(
   BuildContext context, {

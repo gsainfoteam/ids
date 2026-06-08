@@ -7,9 +7,8 @@ pubspec.lock
 
 .metadata
 
-# Generated platform directories — run `flutter create .` to regenerate locally
+# Generated platform directories. iOS is committed for simulator demos.
 android/
-ios/
 linux/
 macos/
 web/

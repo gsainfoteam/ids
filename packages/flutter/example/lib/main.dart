@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -15,7 +16,7 @@ import 'components/stack_usecase.dart';
 import 'components/text_usecase.dart';
 
 void main() {
-  runApp(const WidgetbookApp());
+  runApp(kIsWeb ? const WidgetbookApp() : const MvpFramesApp());
 }
 
 class WidgetbookApp extends StatelessWidget {
@@ -59,10 +60,6 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(name: 'IdsDialog', useCases: dialogUseCases),
         WidgetbookComponent(name: 'IdsEmpty', useCases: emptyUseCases),
         WidgetbookComponent(name: 'MVP Frames', useCases: mvpFrameUseCases),
-        WidgetbookComponent(
-          name: 'MVP Potg Create Time',
-          useCases: potgCreateTimeFrameUseCases,
-        ),
       ],
     );
   }
