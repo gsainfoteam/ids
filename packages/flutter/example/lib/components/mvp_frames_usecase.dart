@@ -4,7 +4,18 @@ import 'package:ids_flutter/ids.dart';
 import 'package:ids_flutter/tokens/ids_typography.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+const _recruitPosterAsset = 'assets/mvp/ziggle-infoteam-recruit.png';
+const _hackathonPosterAsset = 'assets/mvp/ziggle-impact-ai-hackathon.png';
+
 final mvpFrameUseCases = [
+  WidgetbookUseCase(
+    name: 'Ziggle Notice List',
+    builder: (context) => _withTheme(
+      context,
+      initialColor: IdsColor.orange,
+      child: const _Phone(child: _ZiggleNoticeListFrame()),
+    ),
+  ),
   WidgetbookUseCase(
     name: 'Ziggle Groups',
     builder: (context) => _withTheme(
@@ -69,6 +80,11 @@ class MvpFramesApp extends StatelessWidget {
   const MvpFramesApp({super.key});
 
   static const _frames = [
+    _MvpFrameSpec(
+      label: '공지 목록',
+      color: IdsColor.orange,
+      child: _ZiggleNoticeListFrame(),
+    ),
     _MvpFrameSpec(
       label: '공지 상세',
       color: IdsColor.orange,
@@ -203,6 +219,284 @@ class _Phone extends StatelessWidget {
         height: 760,
         color: theme.muted,
         child: child,
+      ),
+    );
+  }
+}
+
+class _ZiggleNoticeListFrame extends StatelessWidget {
+  const _ZiggleNoticeListFrame();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(14, 28, 14, 96),
+                child: IdsVStack(
+                  gap: 18,
+                  crossAxis: CrossAxis.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: IdsHStack(
+                        gap: 8,
+                        fit: IdsStackFit.content,
+                        crossAxis: CrossAxis.center,
+                        children: [
+                          const Text('🔥', style: TextStyle(fontSize: 28)),
+                          Text(
+                            'zgl',
+                            style: IdsTypography.title.copyWith(
+                              color: theme.onSurface,
+                              fontWeight: FontWeight.w800,
+                              height: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const _ZiggleCategoryRail(),
+                    const _ZiggleNoticeFeedCard(
+                      author: '홍길동',
+                      title: '공지 제목',
+                      dueLabel: '12일 남음',
+                      posterAsset: _recruitPosterAsset,
+                      tags: ['# 태그1', '# 태그1', '# 태그1', '# 태그1', '# 태그1'],
+                    ),
+                    const _ZiggleNoticeFeedCard(
+                      author: 'GDSC GIST',
+                      title: 'Impact AI Hackathon 참가자 모집',
+                      posterAsset: _hackathonPosterAsset,
+                      tags: ['#해커톤', '#AI', '#행사', '#GDSC'],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            _ZiggleBottomNavigation(currentIndex: 0),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _ZiggleCategoryRail extends StatelessWidget {
+  const _ZiggleCategoryRail();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return SizedBox(
+      height: 48,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _ZiggleCategoryPill(
+            label: '일반',
+            icon: HugeIcons.strokeRoundedMegaphone01,
+            selected: true,
+          ),
+          _ZiggleCategoryPill(icon: HugeIcons.strokeRoundedCalendar03),
+          _ZiggleCategoryPill(icon: HugeIcons.strokeRoundedGift),
+          _ZiggleCategoryPill(icon: HugeIcons.strokeRoundedTarget02),
+          Container(
+            width: 78,
+            margin: const EdgeInsets.only(left: 10),
+            decoration: BoxDecoration(
+              color: theme.secondary,
+              borderRadius: BorderRadius.circular(18),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ZiggleCategoryPill extends StatelessWidget {
+  const _ZiggleCategoryPill({
+    required this.icon,
+    this.label,
+    this.selected = false,
+  });
+
+  final List<List<dynamic>> icon;
+  final String? label;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return Container(
+      height: 48,
+      margin: const EdgeInsets.only(right: 10),
+      padding: EdgeInsets.symmetric(horizontal: label == null ? 20 : 22),
+      decoration: BoxDecoration(
+        color: selected ? theme.primary : theme.secondary,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: IdsHStack(
+        gap: 8,
+        fit: IdsStackFit.content,
+        crossAxis: CrossAxis.center,
+        children: [
+          IconTheme(
+            data: IconThemeData(
+              color: selected ? theme.onPrimary : theme.onSecondary,
+              size: 22,
+            ),
+            child: _HugeIcon(icon),
+          ),
+          if (label != null)
+            Text(
+              label!,
+              style: IdsTypography.body.copyWith(
+                color: selected ? theme.onPrimary : theme.onSecondary,
+                fontWeight: FontWeight.w800,
+                leadingDistribution: TextLeadingDistribution.even,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ZiggleNoticeFeedCard extends StatelessWidget {
+  const _ZiggleNoticeFeedCard({
+    required this.author,
+    required this.title,
+    required this.posterAsset,
+    required this.tags,
+    this.dueLabel,
+  });
+
+  final String author;
+  final String title;
+  final String posterAsset;
+  final List<String> tags;
+  final String? dueLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return IdsCard(
+      variant: IdsCardVariant.elevated,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+        child: IdsVStack(
+          gap: 12,
+          crossAxis: CrossAxis.start,
+          children: [
+            Row(
+              children: [
+                const IdsAvatar(name: '홍길동', size: IdsSize.lg),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: IdsVStack(
+                    gap: 2,
+                    crossAxis: CrossAxis.start,
+                    fit: IdsStackFit.content,
+                    children: [
+                      IdsHStack(
+                        gap: 4,
+                        fit: IdsStackFit.content,
+                        crossAxis: CrossAxis.center,
+                        children: [
+                          IdsText(author, variant: IdsTextVariant.body),
+                          IconTheme(
+                            data: IconThemeData(color: theme.primary, size: 18),
+                            child: const _HugeIcon(
+                              HugeIcons.strokeRoundedCheckmarkBadge01,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IdsText(
+                        '10분 전',
+                        variant: IdsTextVariant.caption,
+                        color: theme.onMuted,
+                      ),
+                    ],
+                  ),
+                ),
+                if (dueLabel != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: IdsText(
+                      dueLabel!,
+                      variant: IdsTextVariant.caption,
+                      color: theme.onPrimary,
+                    ),
+                  ),
+              ],
+            ),
+            IdsHStack(
+              gap: 8,
+              crossAxis: CrossAxis.center,
+              children: [
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: theme.primary,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                Expanded(child: IdsText(title, variant: IdsTextVariant.body)),
+              ],
+            ),
+            Center(
+              child: _NoticePoster(
+                assetPath: posterAsset,
+                height: 230,
+                width: 250,
+              ),
+            ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [for (final tag in tags) IdsBadge(tag)],
+            ),
+            Row(
+              children: [
+                IconTheme(
+                  data: IconThemeData(color: theme.primary, size: 28),
+                  child: const _HugeIcon(HugeIcons.strokeRoundedFire),
+                ),
+                const SizedBox(width: 6),
+                const IdsText('10', variant: IdsTextVariant.body),
+                const SizedBox(width: 18),
+                IconTheme(
+                  data: IconThemeData(color: theme.primary, size: 28),
+                  child: const _HugeIcon(HugeIcons.strokeRoundedBookmark01),
+                ),
+                const Spacer(),
+                IconTheme(
+                  data: IconThemeData(color: theme.onSurface, size: 24),
+                  child: const _HugeIcon(HugeIcons.strokeRoundedShare01),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -511,27 +805,33 @@ class _ZiggleNoticeDetailFrame extends StatelessWidget {
 }
 
 class _NoticePoster extends StatelessWidget {
-  const _NoticePoster();
+  const _NoticePoster({
+    this.assetPath = _recruitPosterAsset,
+    this.height = 320,
+    this.width,
+  });
+
+  final String assetPath;
+  final double height;
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 320,
+      height: height,
+      width: width ?? double.infinity,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFFFECE8), Color(0xFFFFD6DC)],
-        ),
+        color: ThemeProvider.of(context).surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: ThemeProvider.of(context).outline),
       ),
-      child: const IdsText(
-        '2026 봄학기\n인포팀 개발자 모집',
-        variant: IdsTextVariant.title,
-        align: TextAlign.center,
-        color: Color(0xFFE85F6A),
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        assetPath,
+        fit: BoxFit.contain,
+        width: double.infinity,
+        height: double.infinity,
       ),
     );
   }
@@ -1459,6 +1759,26 @@ class _PotgBottomNavigation extends StatelessWidget {
         _navItem(HugeIcons.strokeRoundedHome01, '모든 팟'),
         _navItem(HugeIcons.strokeRoundedSearch01, '팟 검색'),
         _navItem(HugeIcons.strokeRoundedMessage01, '채팅방'),
+        _navItem(HugeIcons.strokeRoundedUserCircle02, '내 정보'),
+      ],
+    );
+  }
+}
+
+class _ZiggleBottomNavigation extends StatelessWidget {
+  const _ZiggleBottomNavigation({required this.currentIndex});
+
+  final int currentIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return IdsBottomNavigation(
+      currentIndex: currentIndex,
+      onTap: (_) {},
+      items: [
+        _navItem(HugeIcons.strokeRoundedHome01, '홈'),
+        _navItem(HugeIcons.strokeRoundedSearch01, '검색'),
+        _navItem(HugeIcons.strokeRoundedEdit02, '작성'),
         _navItem(HugeIcons.strokeRoundedUserCircle02, '내 정보'),
       ],
     );
