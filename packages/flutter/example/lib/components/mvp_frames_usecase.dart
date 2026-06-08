@@ -39,9 +39,9 @@ final mvpFrameUseCases = [
   ),
   WidgetbookUseCase(
     name: 'Potg Create Time',
-    builder: (context) => const ThemeProvider(
-      color: IdsColor.green,
-      mode: IdsMode.light,
+    builder: (context) => _withTheme(
+      context,
+      initialColor: IdsColor.green,
       child: Center(child: _Phone(child: _PotgCreateTimeFrame())),
     ),
   ),
@@ -63,15 +63,10 @@ final mvpFrameUseCases = [
   ),
 ];
 
-class MvpFramesApp extends StatefulWidget {
+const mvpFrameIndex = int.fromEnvironment('MVP_FRAME_INDEX');
+
+class MvpFramesApp extends StatelessWidget {
   const MvpFramesApp({super.key});
-
-  @override
-  State<MvpFramesApp> createState() => _MvpFramesAppState();
-}
-
-class _MvpFramesAppState extends State<MvpFramesApp> {
-  var _index = 0;
 
   static const _frames = [
     _MvpFrameSpec(
@@ -113,7 +108,8 @@ class _MvpFramesAppState extends State<MvpFramesApp> {
 
   @override
   Widget build(BuildContext context) {
-    final frame = _frames[_index];
+    final index = mvpFrameIndex.clamp(0, _frames.length - 1);
+    final frame = _frames[index];
 
     return ThemeProvider(
       color: frame.color,
@@ -129,54 +125,9 @@ class _MvpFramesAppState extends State<MvpFramesApp> {
               package: IdsTypography.sansFontPackage,
               scaffoldBackgroundColor: theme.muted,
             ),
-            home: ColoredBox(
-              color: theme.muted,
-              child: SafeArea(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 52,
-                      child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          final selected = index == _index;
-
-                          return GestureDetector(
-                            onTap: () => setState(() => _index = index),
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                              ),
-                              decoration: BoxDecoration(
-                                color: selected ? theme.primary : theme.surface,
-                                borderRadius: BorderRadius.circular(999),
-                                border: Border.all(color: theme.outline),
-                              ),
-                              child: IdsText(
-                                _frames[index].label,
-                                variant: IdsTextVariant.caption,
-                                color: selected
-                                    ? theme.onPrimary
-                                    : theme.onSurface,
-                              ),
-                            ),
-                          );
-                        },
-                        separatorBuilder: (_, _) => const SizedBox(width: 8),
-                        itemCount: _frames.length,
-                      ),
-                    ),
-                    Expanded(
-                      child: Center(child: _Phone(child: frame.child)),
-                    ),
-                  ],
-                ),
-              ),
+            home: Scaffold(
+              backgroundColor: theme.muted,
+              body: SafeArea(bottom: false, child: frame.child),
             ),
           );
         },
@@ -218,7 +169,16 @@ Widget _withTheme(
   return ThemeProvider(
     color: color,
     mode: mode,
-    child: Center(child: child),
+    child: Builder(
+      builder: (context) {
+        final theme = ThemeProvider.of(context);
+
+        return Scaffold(
+          backgroundColor: theme.muted,
+          body: Center(child: child),
+        );
+      },
+    ),
   );
 }
 
@@ -1305,6 +1265,7 @@ class _PotgCreateTimeFrame extends StatelessWidget {
                         IdsHStack(
                           gap: 32,
                           fit: IdsStackFit.content,
+                          crossAxis: CrossAxis.center,
                           children: [
                             IdsText(
                               '9',

@@ -27,24 +27,26 @@ class IdsBottomNavigation extends StatelessWidget {
     final theme = ThemeProvider.of(context);
 
     return Container(
-      height: 72,
       decoration: BoxDecoration(
         color: theme.surface,
         border: Border(top: BorderSide(color: theme.outline)),
       ),
       child: SafeArea(
         top: false,
-        child: Row(
-          children: [
-            for (var i = 0; i < items.length; i++)
-              Expanded(
-                child: _IdsBottomNavigationButton(
-                  item: items[i],
-                  active: i == currentIndex,
-                  onTap: () => onTap(i),
+        child: SizedBox(
+          height: 72,
+          child: Row(
+            children: [
+              for (var i = 0; i < items.length; i++)
+                Expanded(
+                  child: _IdsBottomNavigationButton(
+                    item: items[i],
+                    active: i == currentIndex,
+                    onTap: () => onTap(i),
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
