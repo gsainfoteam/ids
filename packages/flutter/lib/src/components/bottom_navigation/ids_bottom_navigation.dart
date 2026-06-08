@@ -25,16 +25,18 @@ class IdsBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = ThemeProvider.of(context);
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final bottomGap = bottomInset > 20 ? bottomInset - 20 : 8.0;
 
     return Container(
       decoration: BoxDecoration(
         color: theme.surface,
         border: Border(top: BorderSide(color: theme.outline)),
       ),
-      child: SafeArea(
-        top: false,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: bottomGap),
         child: SizedBox(
-          height: 72,
+          height: 64,
           child: Row(
             children: [
               for (var i = 0; i < items.length; i++)
