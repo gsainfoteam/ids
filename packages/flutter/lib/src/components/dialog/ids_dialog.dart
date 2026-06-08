@@ -49,13 +49,6 @@ class IdsDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: theme.surface,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF000000).withValues(alpha: 0.2),
-                      blurRadius: 24,
-                      offset: const Offset(0, 12),
-                    ),
-                  ],
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

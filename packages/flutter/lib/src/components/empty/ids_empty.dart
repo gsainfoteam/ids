@@ -30,7 +30,7 @@ class IdsEmpty extends StatelessWidget {
   List<Widget> _withGaps(List<Widget> widgets) {
     return [
       for (var i = 0; i < widgets.length; i++) ...[
-        if (i > 0) const SizedBox(height: 10),
+        if (i > 0) SizedBox(height: widgets[i] is IdsEmptyActions ? 18 : 10),
         widgets[i],
       ],
     ];
@@ -82,7 +82,7 @@ class IdsEmptyDescription extends StatelessWidget {
     final theme = ThemeProvider.of(context);
     return Text(
       data,
-      style: IdsTypography.label.copyWith(
+      style: IdsTypography.body.copyWith(
         color: theme.onMuted,
         leadingDistribution: TextLeadingDistribution.even,
       ),

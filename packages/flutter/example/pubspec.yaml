@@ -1,6 +1,7 @@
 name: ids_flutter_example
 description: Widgetbook catalog for ids_flutter.
 publish_to: none
+version: 0.0.0+1
 
 environment:
   sdk: ^3.11.5
@@ -13,6 +14,10 @@ dependencies:
     path: ../
   widgetbook: ^3.23.0
   hugeicons: ^1.1.7
+
+flutter:
+  assets:
+    - assets/mvp/
 
 dev_dependencies:
   flutter_test:

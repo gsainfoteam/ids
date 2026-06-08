@@ -25,9 +25,9 @@ class IdsCard extends StatelessWidget {
   final bool interactive;
 
   double get _radius => switch (size) {
-    IdsCardSize.sm => 6,
-    IdsCardSize.md => 8,
-    IdsCardSize.lg => 12,
+    IdsCardSize.sm => 10,
+    IdsCardSize.md => 16,
+    IdsCardSize.lg => 24,
   };
 
   @override
@@ -42,15 +42,6 @@ class IdsCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(_radius),
       border: variant == IdsCardVariant.outline
           ? Border.all(color: theme.outline)
-          : null,
-      boxShadow: variant == IdsCardVariant.elevated
-          ? [
-              BoxShadow(
-                color: const Color(0xFF000000).withValues(alpha: 0.12),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ]
           : null,
     );
 

@@ -46,7 +46,7 @@ export function Dialog({
           role={role}
           aria-modal="true"
           className={cn(
-            'relative w-full rounded-xl bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-xl',
+            'relative w-full rounded-xl bg-(--ids-color-surface) text-(--ids-color-on-surface)',
             {
               'max-w-sm': size === 'sm',
               'max-w-md': size === 'md',

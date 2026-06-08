@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -9,12 +10,13 @@ import 'components/feedback_usecase.dart';
 import 'components/divider_usecase.dart';
 import 'components/item_usecase.dart';
 import 'components/icon_button_usecase.dart';
+import 'components/mvp_frames_usecase.dart';
 import 'components/navigation_usecase.dart';
 import 'components/stack_usecase.dart';
 import 'components/text_usecase.dart';
 
 void main() {
-  runApp(const WidgetbookApp());
+  runApp(kIsWeb ? const WidgetbookApp() : const MvpFramesApp());
 }
 
 class WidgetbookApp extends StatelessWidget {
@@ -57,6 +59,7 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(name: 'IdsCheckbox', useCases: checkboxUseCases),
         WidgetbookComponent(name: 'IdsDialog', useCases: dialogUseCases),
         WidgetbookComponent(name: 'IdsEmpty', useCases: emptyUseCases),
+        WidgetbookComponent(name: 'MVP Frames', useCases: mvpFrameUseCases),
       ],
     );
   }
