@@ -50,16 +50,16 @@ class IdsTokens {
   };
 
   static const _orangeDark = <String, Color>{
-    'primary': const Color(0xFFFB923C),
+    'primary': const Color(0xFFFF7650),
     'on-primary': const Color(0xFF030712),
-    'secondary': const Color(0xFF7C2D12),
-    'on-secondary': const Color(0xFFFED7AA),
+    'secondary': const Color(0xFF7A2200),
+    'on-secondary': const Color(0xFFFFC8B4),
   };
 
   static const _orangeLight = <String, Color>{
-    'primary': const Color(0xFFEA580C),
+    'primary': const Color(0xFFFF4500),
     'on-primary': const Color(0xFFFFFFFF),
-    'secondary': const Color(0xFFFFEDD5),
-    'on-secondary': const Color(0xFF9A3412),
+    'secondary': const Color(0xFFFFE8DE),
+    'on-secondary': const Color(0xFFA32D00),
   };
 }

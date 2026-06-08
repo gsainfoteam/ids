@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:ids_flutter/tokens/ids_typography.dart';
@@ -88,6 +89,7 @@ class MvpFramesApp extends StatelessWidget {
     _MvpFrameSpec(
       label: '공지 상세',
       color: IdsColor.orange,
+      surfaceBackground: true,
       child: _ZiggleNoticeDetailFrame(),
     ),
     _MvpFrameSpec(
@@ -98,6 +100,7 @@ class MvpFramesApp extends StatelessWidget {
     _MvpFrameSpec(
       label: '그룹',
       color: IdsColor.orange,
+      surfaceBackground: true,
       child: _ZiggleGroupsFrame(),
     ),
     _MvpFrameSpec(
@@ -229,36 +232,22 @@ class _ZiggleNoticeListFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
-
     return Stack(
       children: [
         Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(14, 28, 14, 96),
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 96),
                 child: IdsVStack(
                   gap: 18,
                   crossAxis: CrossAxis.start,
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: IdsHStack(
-                        gap: 8,
-                        fit: IdsStackFit.content,
-                        crossAxis: CrossAxis.center,
-                        children: [
-                          const Text('🔥', style: TextStyle(fontSize: 28)),
-                          Text(
-                            'zgl',
-                            style: IdsTypography.title.copyWith(
-                              color: theme.onSurface,
-                              fontWeight: FontWeight.w800,
-                              height: 1,
-                            ),
-                          ),
-                        ],
+                      child: SvgPicture.asset(
+                        'assets/mvp/ziggle-logo.svg',
+                        height: 32,
                       ),
                     ),
                     const _ZiggleCategoryRail(),
@@ -295,7 +284,7 @@ class _ZiggleCategoryRail extends StatelessWidget {
     final theme = ThemeProvider.of(context);
 
     return SizedBox(
-      height: 48,
+      height: 38,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
@@ -307,14 +296,7 @@ class _ZiggleCategoryRail extends StatelessWidget {
           _ZiggleCategoryPill(icon: HugeIcons.strokeRoundedCalendar03),
           _ZiggleCategoryPill(icon: HugeIcons.strokeRoundedGift),
           _ZiggleCategoryPill(icon: HugeIcons.strokeRoundedTarget02),
-          Container(
-            width: 78,
-            margin: const EdgeInsets.only(left: 10),
-            decoration: BoxDecoration(
-              color: theme.secondary,
-              borderRadius: BorderRadius.circular(18),
-            ),
-          ),
+          _ZiggleCategoryPill(icon: HugeIcons.strokeRoundedClock01),
         ],
       ),
     );
@@ -337,12 +319,12 @@ class _ZiggleCategoryPill extends StatelessWidget {
     final theme = ThemeProvider.of(context);
 
     return Container(
-      height: 48,
-      margin: const EdgeInsets.only(right: 10),
-      padding: EdgeInsets.symmetric(horizontal: label == null ? 20 : 22),
+      height: 38,
+      margin: const EdgeInsets.only(right: 8),
+      padding: EdgeInsets.symmetric(horizontal: label == null ? 20 : 24),
       decoration: BoxDecoration(
         color: selected ? theme.primary : theme.secondary,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: IdsHStack(
         gap: 8,
@@ -352,7 +334,7 @@ class _ZiggleCategoryPill extends StatelessWidget {
           IconTheme(
             data: IconThemeData(
               color: selected ? theme.onPrimary : theme.onSecondary,
-              size: 22,
+              size: 18,
             ),
             child: _HugeIcon(icon),
           ),
@@ -460,7 +442,15 @@ class _ZiggleNoticeFeedCard extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                 ),
-                Expanded(child: IdsText(title, variant: IdsTextVariant.body)),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: IdsTypography.body.copyWith(
+                      color: theme.onSurface,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
               ],
             ),
             Center(
@@ -517,19 +507,22 @@ class _ZiggleGroupsFrame extends StatelessWidget {
             builder: (context, constraints) {
               final panelHeight = constraints.maxHeight - 49;
 
-              return IdsTabs<String>(
+                return IdsTabs<String>(
                 defaultValue: 'notice',
                 items: [
                   IdsTabItem(
                     value: 'intro',
                     label: '소개',
-                    child: SizedBox(
-                      height: panelHeight,
-                      child: const Padding(
-                        padding: EdgeInsets.all(24),
-                        child: IdsText(
-                          '지속 가능한 개발 문화를 통해 지스트 학부생의 삶의 질을 높이는 팀입니다.',
-                          variant: IdsTextVariant.label,
+                    child: ColoredBox(
+                      color: theme.muted,
+                      child: SizedBox(
+                        height: panelHeight,
+                        child: const Padding(
+                          padding: EdgeInsets.all(24),
+                          child: IdsText(
+                            '지속 가능한 개발 문화를 통해 지스트 학부생의 삶의 질을 높이는 팀입니다.',
+                            variant: IdsTextVariant.label,
+                          ),
                         ),
                       ),
                     ),
@@ -537,10 +530,12 @@ class _ZiggleGroupsFrame extends StatelessWidget {
                   IdsTabItem(
                     value: 'notice',
                     label: '공지',
-                    child: SizedBox(
-                      height: panelHeight,
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
+                    child: ColoredBox(
+                      color: theme.muted,
+                      child: SizedBox(
+                        height: panelHeight,
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(20),
                         child: IdsVStack(
                           gap: 16,
                           children: [
@@ -576,17 +571,21 @@ class _ZiggleGroupsFrame extends StatelessWidget {
                             ),
                           ],
                         ),
+                        ),
                       ),
                     ),
                   ),
                   IdsTabItem(
                     value: 'members',
                     label: '멤버',
-                    child: SizedBox(
-                      height: panelHeight,
-                      child: const Padding(
-                        padding: EdgeInsets.all(24),
-                        child: IdsText('멤버 목록', variant: IdsTextVariant.label),
+                    child: ColoredBox(
+                      color: theme.muted,
+                      child: SizedBox(
+                        height: panelHeight,
+                        child: const Padding(
+                          padding: EdgeInsets.all(24),
+                          child: IdsText('멤버 목록', variant: IdsTextVariant.label),
+                        ),
                       ),
                     ),
                   ),
@@ -765,7 +764,7 @@ class _ZiggleNoticeDetailFrame extends StatelessWidget {
                     crossAxis: CrossAxis.center,
                     children: [
                       IdsAvatar(name: '인포팀'),
-                      IdsText('인포팀 · 32분 전', variant: IdsTextVariant.label),
+                      IdsText('인포팀 · 32분 전', variant: IdsTextVariant.body),
                     ],
                   ),
                   const IdsText(
@@ -820,16 +819,13 @@ class _NoticePoster extends StatelessWidget {
     return Container(
       height: height,
       width: width ?? double.infinity,
-      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: ThemeProvider.of(context).surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: ThemeProvider.of(context).outline),
       ),
       clipBehavior: Clip.antiAlias,
       child: Image.asset(
         assetPath,
-        fit: BoxFit.contain,
+        fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
       ),
@@ -1077,12 +1073,20 @@ class _PotgMainListFrame extends StatelessWidget {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 128),
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 128),
                 child: IdsVStack(
                   gap: 20,
                   crossAxis: CrossAxis.start,
                   children: [
-                    const IdsText('팟쥐', variant: IdsTextVariant.title),
+                    IdsHStack(
+                      gap: 8,
+                      fit: IdsStackFit.content,
+                      crossAxis: CrossAxis.center,
+                      children: [
+                        SvgPicture.asset('assets/mvp/potg-logo.svg', height: 38),
+                        const IdsText('팟지', variant: IdsTextVariant.title),
+                      ],
+                    ),
                     const _WeekStatusCard(),
                     IdsText(
                       '2025/11/15 토요일',
@@ -1294,7 +1298,7 @@ class _PotgSearchEmptyFrame extends StatelessWidget {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
                 child: IdsVStack(
                   gap: 24,
                   crossAxis: CrossAxis.start,
@@ -1567,6 +1571,13 @@ class _PotgCreateTimeFrame extends StatelessWidget {
                 variant: IdsTextVariant.body,
               ),
               const _TimeWheelPickerMock(),
+              SizedBox(
+                width: double.infinity,
+                child: IdsButton(
+                  onPressed: () {},
+                  children: const [Text('확인')],
+                ),
+              ),
             ],
           ),
         ),
@@ -1630,7 +1641,7 @@ class _TimeWheelPickerMock extends StatelessWidget {
     final theme = ThemeProvider.of(context);
 
     return Container(
-      height: 250,
+      height: 200,
       width: double.infinity,
       decoration: BoxDecoration(
         color: theme.muted,
@@ -1640,7 +1651,7 @@ class _TimeWheelPickerMock extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Positioned(
-            top: 98,
+            top: 84,
             left: 32,
             right: 32,
             child: Container(
@@ -1652,7 +1663,7 @@ class _TimeWheelPickerMock extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 28,
+            top: 14,
             child: IdsHStack(
               gap: 28,
               fit: IdsStackFit.content,
@@ -1664,19 +1675,6 @@ class _TimeWheelPickerMock extends StatelessWidget {
                 ),
                 _WheelColumn(values: ['', '', '', 'AM', 'PM', '', '']),
               ],
-            ),
-          ),
-          Positioned(
-            bottom: 24,
-            child: SizedBox(
-              width: 64,
-              height: 42,
-              child: IdsButton(
-                onPressed: () {},
-                variant: IdsVariant.outline,
-                size: IdsSize.sm,
-                children: const [Text('확인')],
-              ),
             ),
           ),
         ],
