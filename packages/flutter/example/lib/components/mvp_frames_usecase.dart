@@ -92,6 +92,7 @@ class MvpFramesApp extends StatelessWidget {
     _MvpFrameSpec(
       label: '팟 생성',
       color: IdsColor.green,
+      surfaceBackground: true,
       child: _PotgCreateTimeFrame(),
     ),
     _MvpFrameSpec(
@@ -117,16 +118,19 @@ class MvpFramesApp extends StatelessWidget {
       child: Builder(
         builder: (context) {
           final theme = ThemeProvider.of(context);
+          final background = frame.surfaceBackground
+              ? theme.surface
+              : theme.muted;
 
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               fontFamily: IdsTypography.sansFontFamily,
               package: IdsTypography.sansFontPackage,
-              scaffoldBackgroundColor: theme.muted,
+              scaffoldBackgroundColor: background,
             ),
             home: Scaffold(
-              backgroundColor: theme.muted,
+              backgroundColor: background,
               body: SafeArea(bottom: false, child: frame.child),
             ),
           );
@@ -141,11 +145,13 @@ class _MvpFrameSpec {
     required this.label,
     required this.color,
     required this.child,
+    this.surfaceBackground = false,
   });
 
   final String label;
   final IdsColor color;
   final Widget child;
+  final bool surfaceBackground;
 }
 
 Widget _withTheme(
@@ -1223,18 +1229,26 @@ class _PotgCreateTimeFrame extends StatelessWidget {
 
     return ColoredBox(
       color: theme.surface,
-      child: SizedBox(
-        width: double.infinity,
-        height: 760,
+      child: SizedBox.expand(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 40),
           child: IdsVStack(
-            gap: 24,
+            gap: 20,
             crossAxis: CrossAxis.start,
             children: [
               const IdsText('팟 생성', variant: IdsTextVariant.title),
-              _StepRow(index: '1', label: '지스트 → 광주송정역', filled: true),
-              _StepRow(index: '2', label: '11월 14일 금요일', filled: true),
+              _StepRow(
+                index: '1',
+                label: '지스트 → 광주송정역',
+                filled: true,
+                editable: true,
+              ),
+              _StepRow(
+                index: '2',
+                label: '11월 14일 금요일',
+                filled: true,
+                editable: true,
+              ),
               _StepRow(index: '3', label: '시간대 설정', filled: false),
               const IdsCard(
                 child: IdsCardContent(
@@ -1252,48 +1266,7 @@ class _PotgCreateTimeFrame extends StatelessWidget {
                 '출발 가능한 가장 늦은 시각을 설정하세요',
                 variant: IdsTextVariant.body,
               ),
-              IdsCard(
-                variant: IdsCardVariant.filled,
-                child: IdsCardContent(
-                  child: SizedBox(
-                    height: 240,
-                    child: IdsVStack(
-                      gap: 28,
-                      mainAxis: MainAxis.center,
-                      crossAxis: CrossAxis.center,
-                      children: [
-                        IdsHStack(
-                          gap: 32,
-                          fit: IdsStackFit.content,
-                          crossAxis: CrossAxis.center,
-                          children: [
-                            IdsText(
-                              '9',
-                              variant: IdsTextVariant.title,
-                              color: theme.onMuted,
-                            ),
-                            IdsText(
-                              '41',
-                              variant: IdsTextVariant.title,
-                              color: theme.onMuted,
-                            ),
-                            IdsText(
-                              'AM',
-                              variant: IdsTextVariant.title,
-                              color: theme.onMuted,
-                            ),
-                          ],
-                        ),
-                        IdsButton(
-                          onPressed: () {},
-                          variant: IdsVariant.outline,
-                          children: const [Text('확인')],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              const _TimeWheelPickerMock(),
             ],
           ),
         ),
@@ -1307,11 +1280,13 @@ class _StepRow extends StatelessWidget {
     required this.index,
     required this.label,
     required this.filled,
+    this.editable = false,
   });
 
   final String index;
   final String label;
   final bool filled;
+  final bool editable;
 
   @override
   Widget build(BuildContext context) {
@@ -1337,7 +1312,115 @@ class _StepRow extends StatelessWidget {
           ),
         ),
         Expanded(child: IdsText(label, variant: IdsTextVariant.body)),
+        if (editable)
+          IconTheme(
+            data: IconThemeData(color: theme.onMuted, size: 20),
+            child: const _HugeIcon(HugeIcons.strokeRoundedEdit02),
+          ),
       ],
+    );
+  }
+}
+
+class _TimeWheelPickerMock extends StatelessWidget {
+  const _TimeWheelPickerMock();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return Container(
+      height: 250,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: theme.muted,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            top: 98,
+            left: 32,
+            right: 32,
+            child: Container(
+              height: 32,
+              decoration: BoxDecoration(
+                color: theme.surface.withValues(alpha: 0.56),
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 28,
+            child: IdsHStack(
+              gap: 28,
+              fit: IdsStackFit.content,
+              crossAxis: CrossAxis.center,
+              children: const [
+                _WheelColumn(values: ['6', '7', '8', '9', '10', '11', '12']),
+                _WheelColumn(
+                  values: ['38', '39', '40', '41', '42', '43', '44'],
+                ),
+                _WheelColumn(values: ['', '', '', 'AM', 'PM', '', '']),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 24,
+            child: SizedBox(
+              width: 64,
+              height: 42,
+              child: IdsButton(
+                onPressed: () {},
+                variant: IdsVariant.outline,
+                size: IdsSize.sm,
+                children: const [Text('확인')],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WheelColumn extends StatelessWidget {
+  const _WheelColumn({required this.values});
+
+  final List<String> values;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
+    return SizedBox(
+      width: 50,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < values.length; i++)
+            SizedBox(
+              height: 24,
+              child: Center(
+                child: IdsText(
+                  values[i],
+                  variant: i == 3
+                      ? IdsTextVariant.body
+                      : IdsTextVariant.caption,
+                  color: theme.onMuted.withValues(
+                    alpha: switch ((i - 3).abs()) {
+                      0 => 0.72,
+                      1 => 0.48,
+                      2 => 0.28,
+                      _ => 0.1,
+                    },
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
