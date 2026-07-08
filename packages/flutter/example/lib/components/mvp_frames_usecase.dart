@@ -232,6 +232,8 @@ class _ZiggleNoticeListFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeProvider.of(context);
+
     return Stack(
       children: [
         Column(
