@@ -20,10 +20,6 @@ flutter:
   assets:
     - assets/mvp/
 
-flutter:
-  assets:
-    - assets/mvp/
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
