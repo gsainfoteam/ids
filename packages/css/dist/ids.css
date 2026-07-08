@@ -125,17 +125,17 @@
 }
 
 [data-color="orange"][data-mode="dark"] {
-  --ids-color-primary: #fb923c;
+  --ids-color-primary: #ff7650;
   --ids-color-on-primary: #030712;
-  --ids-color-secondary: #7c2d12;
-  --ids-color-on-secondary: #fed7aa;
+  --ids-color-secondary: #7a2200;
+  --ids-color-on-secondary: #ffc8b4;
 }
 
 [data-color="orange"][data-mode="light"] {
-  --ids-color-primary: #ea580c;
+  --ids-color-primary: #ff4500;
   --ids-color-on-primary: #ffffff;
-  --ids-color-secondary: #ffedd5;
-  --ids-color-on-secondary: #9a3412;
+  --ids-color-secondary: #ffe8de;
+  --ids-color-on-secondary: #a32d00;
 }
 
 [data-mode="light"] {
