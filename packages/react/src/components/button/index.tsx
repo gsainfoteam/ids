@@ -1,60 +1,97 @@
-import type { ReactNode } from 'react';
+import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
-import { cn } from '../../utils';
-import { HStack } from '../hstack';
+import {
+  interactiveDataProps,
+  useInteractive,
+  type InteractiveState,
+} from '../../hooks/use-interactive';
+import { tv, type VariantProps } from '../../utils';
 
-import type { IdsVariant, IdsSize } from '../../tokens/types';
+function resolveProp<T>(value: T | ((state: InteractiveState) => T) | undefined, state: InteractiveState) {
+  return typeof value === 'function' ? (value as (state: InteractiveState) => T)(state) : value;
+}
 
 export function Button({
   children,
-  variant = 'solid',
-  size = 'md',
-  disabled,
-  fit = 'content',
-  onClick,
   className,
+  style,
+  variant,
+  size,
+  type = 'button',
+  disabled,
+  onPointerEnter,
+  onPointerLeave,
+  onPointerDown,
+  onPointerUp,
+  onPointerCancel,
+  onFocus,
+  onBlur,
+  onKeyDown,
+  onKeyUp,
+  ...props
 }: Button.Props) {
+  const { state, handlers } = useInteractive<HTMLButtonElement>({
+    disabled,
+    onPointerEnter,
+    onPointerLeave,
+    onPointerDown,
+    onPointerUp,
+    onPointerCancel,
+    onFocus,
+    onBlur,
+    onKeyDown,
+    onKeyUp,
+  });
+
   return (
     <button
-      onClick={onClick}
+      type={type}
       disabled={disabled}
-      className={cn(
-        'inline-flex h-12 items-center justify-center rounded-xl font-semibold transition-colors',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 disabled:pointer-events-none disabled:opacity-40',
-        {
-          'h-8 px-2 text-xs': size === 'xs',
-          'h-9 px-2.5 text-sm': size === 'sm',
-          'h-12 px-4 text-sm': size === 'md',
-          'h-14 px-5 text-base': size === 'lg',
-          'h-16 px-6 text-lg': size === 'xl',
-        },
-        {
-          'bg-(--ids-color-primary) text-(--ids-color-on-primary) hover:opacity-90':
-            variant === 'solid',
-          'bg-(--ids-color-secondary) text-(--ids-color-on-secondary) hover:opacity-80':
-            variant === 'soft',
-          'border border-(--ids-color-primary) text-(--ids-color-primary) hover:bg-(--ids-color-primary)/10':
-            variant === 'outline',
-          'text-(--ids-color-primary) hover:bg-(--ids-color-primary)/10': variant === 'ghost',
-        },
-        className,
-      )}
+      className={Button.Style({ variant, size, className: resolveProp(className, state) })}
+      style={resolveProp(style, state)}
+      {...interactiveDataProps(state)}
+      {...handlers}
+      {...props}
     >
-      <HStack gap={8} crossAxis="center" fit={fit} className="leading-none">
-        {children}
-      </HStack>
+      {resolveProp(children, state)}
     </button>
   );
 }
 
 export namespace Button {
-  export type Props = {
-    children: ReactNode;
-    variant?: IdsVariant;
-    size?: Exclude<IdsSize, '2xl'>;
-    disabled?: boolean;
-    fit?: HStack.Props['fit'];
-    onClick?: () => void;
-    className?: string;
-  };
+  export const Style = tv({
+    base: [
+      'inline-flex items-center justify-center gap-2 select-none transition-all',
+      'cursor-pointer data-disabled:cursor-not-allowed',
+      'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
+      'data-active:scale-[0.98] data-disabled:opacity-40',
+      'motion-reduce:transition-none motion-reduce:data-active:scale-100',
+    ],
+    variants: {
+      variant: {
+        solid:
+          'bg-(--ids-color-primary) text-(--ids-color-on-primary) data-hovered:opacity-90 data-active:opacity-95',
+        soft: 'bg-(--ids-color-primary)/15 text-(--ids-color-primary) data-hovered:bg-(--ids-color-primary)/20 data-active:bg-(--ids-color-primary)/25',
+        outline:
+          'inset-ring-1 inset-ring-(--ids-color-outline) bg-transparent text-(--ids-color-primary) data-hovered:bg-(--ids-color-primary)/10 data-active:bg-(--ids-color-primary)/15',
+        ghost:
+          'bg-transparent text-(--ids-color-primary) data-hovered:bg-(--ids-color-primary)/10 data-active:bg-(--ids-color-primary)/15',
+      },
+      size: {
+        standard: 'h-12 px-4.5 text-button-standard rounded-xl',
+        tiny: 'h-8 px-2.5 text-button-tiny rounded-lg',
+      },
+    },
+    defaultVariants: {
+      variant: 'solid',
+      size: 'standard',
+    },
+  });
+
+  export type Props = Omit<ComponentProps<'button'>, 'children' | 'className' | 'style'> &
+    VariantProps<typeof Style> & {
+      children?: ReactNode | ((state: InteractiveState) => ReactNode);
+      className?: string | ((state: InteractiveState) => string | undefined);
+      style?: CSSProperties | ((state: InteractiveState) => CSSProperties | undefined);
+    };
 }
