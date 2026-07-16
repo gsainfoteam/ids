@@ -1,0 +1,8 @@
+/* Storybook canvas — themed wrapper가 배경을 채우도록 기본 패딩·배경 제거 */
+.sb-show-main.sb-main-padded {
+  padding: 0;
+}
+
+#storybook-root {
+  min-height: 100vh;
+}

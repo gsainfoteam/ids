@@ -1,13 +1,18 @@
-import type { Preview } from '@storybook/react-vite';
+import type { Decorator, Preview } from '@storybook/react-vite';
 
 import '../src/styles.css';
+import './preview.css';
 
-const withIdsTheme: NonNullable<Preview['decorators']>[number] = (Story, context) => {
+const withIdsTheme: Decorator = (Story, context) => {
   const color = context.globals['idsColor'] ?? 'blue';
   const mode = context.globals['idsMode'] ?? 'light';
 
   return (
-    <div data-color={color} data-mode={mode}>
+    <div
+      data-color={color}
+      data-mode={mode}
+      className="min-h-screen w-full bg-(--ids-color-surface) p-6 text-(--ids-color-on-surface)"
+    >
       <Story />
     </div>
   );
@@ -15,6 +20,8 @@ const withIdsTheme: NonNullable<Preview['decorators']>[number] = (Story, context
 
 const preview: Preview = {
   parameters: {
+    layout: 'fullscreen',
+    backgrounds: { disable: true },
     controls: {
       matchers: {
         color: /(background|color)$/i,
