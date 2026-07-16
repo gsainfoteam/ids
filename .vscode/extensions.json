@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "Dart-Code.dart-code",
+    "bradlc.vscode-tailwindcss"
+  ]
+}
