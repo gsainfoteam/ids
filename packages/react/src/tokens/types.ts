@@ -2,5 +2,5 @@
 
 export type IdsColor = 'blue' | 'orange' | 'green';
 export type IdsMode = 'light' | 'dark';
-export type IdsSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+export type IdsSize = 'standard' | 'tiny';
 export type IdsVariant = 'solid' | 'soft' | 'outline' | 'ghost';

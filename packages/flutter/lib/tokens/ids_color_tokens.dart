@@ -22,44 +22,50 @@ class IdsTokens {
   }
 
   static const _blueDark = <String, Color>{
-    'primary': const Color(0xFF60A5FA),
-    'on-primary': const Color(0xFF030712),
+    'primary': const Color(0xFF2563EB),
+    'on-primary': const Color(0xFFFFFFFF),
     'secondary': const Color(0xFF1E3A8A),
-    'on-secondary': const Color(0xFFBFDBFE),
+    'on-secondary': const Color(0xFF60A5FA),
+    'outline': const Color(0xFF3B82F6),
   };
 
   static const _blueLight = <String, Color>{
     'primary': const Color(0xFF2563EB),
     'on-primary': const Color(0xFFFFFFFF),
     'secondary': const Color(0xFFDBEAFE),
-    'on-secondary': const Color(0xFF1E40AF),
+    'on-secondary': const Color(0xFF2563EB),
+    'outline': const Color(0xFFBFDBFE),
   };
 
   static const _greenDark = <String, Color>{
-    'primary': const Color(0xFF4ADE5E),
-    'on-primary': const Color(0xFF030712),
+    'primary': const Color(0xFF418501),
+    'on-primary': const Color(0xFFFFFFFF),
     'secondary': const Color(0xFF1E4001),
-    'on-secondary': const Color(0xFFBBF7BB),
+    'on-secondary': const Color(0xFF4ADE5E),
+    'outline': const Color(0xFF22C53E),
   };
 
   static const _greenLight = <String, Color>{
     'primary': const Color(0xFF418501),
     'on-primary': const Color(0xFFFFFFFF),
     'secondary': const Color(0xFFDCFCDC),
-    'on-secondary': const Color(0xFF2A5701),
+    'on-secondary': const Color(0xFF418501),
+    'outline': const Color(0xFFBBF7BB),
   };
 
   static const _orangeDark = <String, Color>{
-    'primary': const Color(0xFFFF7650),
-    'on-primary': const Color(0xFF030712),
+    'primary': const Color(0xFFFF4500),
+    'on-primary': const Color(0xFFFFFFFF),
     'secondary': const Color(0xFF7A2200),
-    'on-secondary': const Color(0xFFFFC8B4),
+    'on-secondary': const Color(0xFFFF7650),
+    'outline': const Color(0xFFFF5722),
   };
 
   static const _orangeLight = <String, Color>{
     'primary': const Color(0xFFFF4500),
     'on-primary': const Color(0xFFFFFFFF),
     'secondary': const Color(0xFFFFE8DE),
-    'on-secondary': const Color(0xFFA32D00),
+    'on-secondary': const Color(0xFFFF4500),
+    'outline': const Color(0xFFFFC8B4),
   };
 }

@@ -12,7 +12,8 @@ const toVal = (t) => {
   return Array.isArray(v) ? v.join(", ") : v;
 };
 const idsVar = (prefix, t) => `--ids-${prefix}-${slug(t)}`;
-const toCamel = (str) => str.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+const toCamel = (str) =>
+  str.replace(/-([a-zA-Z0-9]+)/g, (_, s) => s.charAt(0).toUpperCase() + s.slice(1));
 const enumName = (key) => `Ids${key.charAt(0).toUpperCase() + key.slice(1)}`;
 const mapName = (color, mode) =>
   `_${color}${mode.charAt(0).toUpperCase() + mode.slice(1)}`;
@@ -60,21 +61,51 @@ const readColorEntries = (color, mode, palette) => {
   }));
 };
 
+const isTypographyToken = (node) =>
+  node &&
+  typeof node === "object" &&
+  (node.$type === "typography" ||
+    (node.$value && typeof node.$value === "object" && "fontSize" in node.$value));
+
+// Flatten nested text.* typography composites → [{ name: 'headline-h1-bold', ... }]
+const flattenTypography = (node, path = []) => {
+  if (isTypographyToken(node)) {
+    const raw = node.$value ?? node.value;
+    return [
+      {
+        name: path.join("-"),
+        fontSize: raw.fontSize,
+        fontWeight: raw.fontWeight,
+        lineHeight: raw.lineHeight,
+        letterSpacing: raw.letterSpacing,
+      },
+    ];
+  }
+  if (!node || typeof node !== "object") return [];
+  return Object.entries(node).flatMap(([key, child]) =>
+    flattenTypography(child, [...path, key]),
+  );
+};
+
 // Reads semantic/typography.json and returns resolved composite entries
 const readTypographyEntries = (palette) => {
   const json = JSON.parse(
     readFileSync("./tokens/semantic/typography.json", "utf8"),
   );
-  return Object.entries(json.text ?? {}).map(([name, token]) => {
-    const raw = token.$value ?? token.value;
-    return {
-      name,
-      fontSize: resolveRef(raw.fontSize, palette),
-      fontWeight: resolveRef(raw.fontWeight, palette),
-      lineHeight: resolveRef(raw.lineHeight, palette),
-      letterSpacing: resolveRef(raw.letterSpacing, palette),
-    };
-  });
+  return flattenTypography(json.text ?? {}).map((entry) => ({
+    name: entry.name,
+    fontSize: resolveRef(entry.fontSize, palette),
+    fontWeight: resolveRef(entry.fontWeight, palette),
+    lineHeight: resolveRef(entry.lineHeight, palette),
+    letterSpacing: resolveRef(entry.letterSpacing, palette),
+  }));
+};
+
+// Flutter letterSpacing is px — convert em relative to fontSize when needed
+const letterSpacingToPx = (letterSpacing, fontSize) => {
+  const raw = String(letterSpacing);
+  if (raw.endsWith("em")) return parseFloat(raw) * parseFloat(fontSize);
+  return parseFloat(raw);
 };
 
 const parseEnums = (dictionary) => {
@@ -230,34 +261,28 @@ const buildColorBridgeCSS = (dictionary) => {
   return render(T_CSS_THEME, { THEME: theme });
 };
 
-// @theme { --spacing-xs: var(--ids-spacing-xs); } + :root { --ids-spacing-xs: 4px; }
+// :root { --ids-motion-fast: 150ms; ... }
 const buildStaticCSS = (dictionary) => {
-  // const spacing = byCategory(dictionary, "spacing");
   const motion = byCategory(dictionary, "motion");
-  return render(T_CSS_THEME_ROOT, {
-    THEME: "", // spacing.map((t) => `  ${TW_NS.spacing}${slug(t)}: var(${idsVar("spacing", t)});`).join("\n"),
-    ROOT: [
-      // ...spacing.map((t) => `  ${idsVar("spacing", t)}: ${toVal(t)};`),
-      ...motion.map((t) => `  ${idsVar("motion", t)}: ${toVal(t)};`),
-    ].join("\n"),
-  });
+  return `:root {\n${motion.map((t) => `  ${idsVar("motion", t)}: ${toVal(t)};`).join("\n")}\n}\n`;
 };
 
-// @theme { --text-display: 32px; --text-display--font-weight: 700; ... }
-// + :root { --ids-font-size-xxxl: 32px; ... } (primitives for internal use)
+// :root { --ids-text-button-standard: ...; --ids-font-size-h1: ... }
+// @theme { --text-button-standard: var(--ids-text-button-standard); --font-weight-semibold: ... }
 const buildTypographyCSS = (dictionary) => {
   const palette = buildPalette(dictionary);
   const entries = readTypographyEntries(palette);
 
-  const themeFontLines = byPath(dictionary, "font-family").map(
-    (t) =>
-      `  ${TW_NS["font-family"]}${slug(t)}: var(${idsVar("font-family", t)});`,
+  const themePrimitiveLines = TYPOGRAPHY_CATS.flatMap((cat) =>
+    byPath(dictionary, cat).map(
+      (t) => `  ${TW_NS[cat]}${slug(t)}: var(${idsVar(cat, t)});`,
+    ),
   );
 
   return render(T_CSS_THEME_ROOT, {
     THEME: [
       ...entries.map(({ name }) => render(T_CSS_TEXT_THEME, { NAME: name })),
-      ...themeFontLines,
+      ...themePrimitiveLines,
     ].join("\n"),
     ROOT: [
       ...entries.map(
@@ -406,7 +431,7 @@ const dartTypographyFormatter = ({ dictionary }) => {
           FONT_SIZE: parseFloat(fontSize),
           FONT_WEIGHT: parseInt(fontWeight),
           LINE_HEIGHT: parseFloat(lineHeight),
-          LETTER_SPACING: parseFloat(letterSpacing),
+          LETTER_SPACING: letterSpacingToPx(letterSpacing, fontSize),
         })};`,
     ),
   ];

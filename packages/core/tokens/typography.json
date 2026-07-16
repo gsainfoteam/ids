@@ -1,12 +1,16 @@
 {
   "font-size": {
-    "xs":  { "$value": "12px", "$type": "dimension" },
-    "sm":  { "$value": "14px", "$type": "dimension" },
-    "md":  { "$value": "16px", "$type": "dimension" },
-    "lg":  { "$value": "18px", "$type": "dimension" },
-    "xl":  { "$value": "20px", "$type": "dimension" },
-    "xxl": { "$value": "24px", "$type": "dimension" },
-    "xxxl": { "$value": "32px", "$type": "dimension" }
+    "c2": { "$value": "10px", "$type": "dimension" },
+    "c1": { "$value": "12px", "$type": "dimension" },
+    "b3": { "$value": "14px", "$type": "dimension" },
+    "b2": { "$value": "16px", "$type": "dimension" },
+    "b1": { "$value": "18px", "$type": "dimension" },
+    "h6": { "$value": "20px", "$type": "dimension" },
+    "h5": { "$value": "24px", "$type": "dimension" },
+    "h4": { "$value": "28px", "$type": "dimension" },
+    "h3": { "$value": "32px", "$type": "dimension" },
+    "h2": { "$value": "40px", "$type": "dimension" },
+    "h1": { "$value": "48px", "$type": "dimension" }
   },
   "font-weight": {
     "regular":  { "$value": 400, "$type": "fontWeight" },
@@ -15,15 +19,16 @@
     "bold":     { "$value": 700, "$type": "fontWeight" }
   },
   "line-height": {
-    "tight":  { "$value": 1.2, "$type": "number" },
-    "normal": { "$value": 1.5, "$type": "number" },
-    "loose":  { "$value": 1.75, "$type": "number" }
+    "none":     { "$value": 1,      "$type": "number" },
+    "tight":    { "$value": 1.2,    "$type": "number" },
+    "snug":     { "$value": 1.35,   "$type": "number" },
+    "body-b1":  { "$value": 1.333,  "$type": "number" },
+    "body-b2":  { "$value": 1.375,  "$type": "number" },
+    "body-b3":  { "$value": 1.429,  "$type": "number" }
   },
   "letter-spacing": {
-    "tight":  { "$value": "-0.5px", "$type": "dimension" },
-    "normal": { "$value": "0px",    "$type": "dimension" },
-    "wide":   { "$value": "0.5px",  "$type": "dimension" },
-    "wider":  { "$value": "1px",    "$type": "dimension" }
+    "normal": { "$value": "0em",    "$type": "dimension" },
+    "tight":  { "$value": "-0.01em", "$type": "dimension" }
   },
   "font-family": {
     "sans": { "$value": ["Pretendard Variable", "Pretendard", "sans-serif"], "$type": "fontFamily" },

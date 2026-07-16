@@ -1,8 +1,9 @@
 {
   "color": {
-    "primary":    { "$value": "{blue.400}", "$type": "color" },
-    "on-primary": { "$value": "{neutral.950}", "$type": "color" },
-    "secondary":  { "$value": "{blue.900}", "$type": "color" },
-    "on-secondary": { "$value": "{blue.200}", "$type": "color" }
+    "primary": { "$value": "{blue.600}", "$type": "color" },
+    "on-primary": { "$value": "{neutral.0}", "$type": "color" },
+    "secondary": { "$value": "{blue.950}", "$type": "color" },
+    "on-secondary": { "$value": "{blue.500}", "$type": "color" },
+    "outline": { "$value": "{blue.800}", "$type": "color" }
   }
 }

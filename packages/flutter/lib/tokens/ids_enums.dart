@@ -12,12 +12,8 @@ enum IdsMode {
 }
 
 enum IdsSize {
-  xs,
-  sm,
-  md,
-  lg,
-  xl,
-  xxl,
+  standard,
+  tiny,
 }
 
 enum IdsVariant {
