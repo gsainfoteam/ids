@@ -11,7 +11,7 @@ class IdsButton extends StatelessWidget {
     required this.onPressed,
     required this.children,
     this.variant = IdsVariant.solid,
-    this.size = IdsSize.md,
+    this.size = IdsSize.standard,
     this.disabled = false,
   });
 
@@ -27,27 +27,18 @@ class IdsButton extends StatelessWidget {
 
     final (bg, fg, border) = switch (variant) {
       IdsVariant.solid => (theme.primary, theme.onPrimary, null),
-      IdsVariant.soft => (theme.secondary, theme.onSecondary, null),
-      IdsVariant.outline => (null, theme.primary, theme.primary),
+      IdsVariant.soft => (
+        theme.primary.withValues(alpha: 0.15),
+        theme.primary,
+        null,
+      ),
+      IdsVariant.outline => (null, theme.primary, theme.outline),
       IdsVariant.ghost => (null, theme.primary, null),
     };
 
-    final (hPad, textStyle) = switch (size) {
-      IdsSize.xs => (8.0, IdsTypography.caption),
-      IdsSize.sm => (10.0, IdsTypography.label),
-      IdsSize.md => (16.0, IdsTypography.label),
-      IdsSize.lg => (20.0, IdsTypography.body),
-      IdsSize.xl => (24.0, IdsTypography.title),
-      IdsSize.xxl => (32.0, IdsTypography.heading),
-    };
-
-    final iconSize = switch (size) {
-      IdsSize.xs => 16.0,
-      IdsSize.sm => 18.0,
-      IdsSize.md => 20.0,
-      IdsSize.lg => 22.0,
-      IdsSize.xl => 24.0,
-      IdsSize.xxl => 28.0,
+    final (height, hPad, textStyle, iconSize) = switch (size) {
+      IdsSize.tiny => (32.0, 10.0, IdsTypography.buttonTiny, 16.0),
+      IdsSize.standard => (48.0, 16.0, IdsTypography.buttonStandard, 20.0),
     };
 
     return GestureDetector(
@@ -56,7 +47,7 @@ class IdsButton extends StatelessWidget {
         opacity: disabled ? 0.4 : 1.0,
         duration: IdsMotion.fast,
         child: Container(
-          height: 48,
+          height: height,
           padding: EdgeInsets.symmetric(horizontal: hPad),
           alignment: Alignment.center,
           decoration: BoxDecoration(
@@ -67,7 +58,6 @@ class IdsButton extends StatelessWidget {
           child: DefaultTextStyle(
             style: textStyle.copyWith(
               color: fg,
-              fontWeight: FontWeight.w600,
               leadingDistribution: TextLeadingDistribution.even,
             ),
             child: IconTheme(

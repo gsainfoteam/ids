@@ -82,7 +82,7 @@ class IdsItemTitle extends StatelessWidget {
     final theme = ThemeProvider.of(context);
     return Text(
       data,
-      style: IdsTypography.label.copyWith(
+      style: IdsTypography.bodyB3Medium.copyWith(
         color: theme.onSurface,
         leadingDistribution: TextLeadingDistribution.even,
       ),
@@ -102,7 +102,7 @@ class IdsItemDescription extends StatelessWidget {
       padding: const EdgeInsets.only(top: 2),
       child: Text(
         data,
-        style: IdsTypography.caption.copyWith(
+        style: IdsTypography.captionC1Regular.copyWith(
           color: theme.onMuted,
           leadingDistribution: TextLeadingDistribution.even,
         ),

@@ -8,7 +8,7 @@ class IdsBadge extends StatelessWidget {
     this.data, {
     super.key,
     this.variant = IdsVariant.soft,
-    this.size = IdsSize.sm,
+    this.size = IdsSize.tiny,
   });
 
   final String data;
@@ -27,8 +27,8 @@ class IdsBadge extends StatelessWidget {
     };
 
     final (hPad, vPad, fontSize) = switch (size) {
-      IdsSize.sm || IdsSize.xs => (8.0, 2.0, 12.0),
-      _ => (10.0, 2.0, 14.0),
+      IdsSize.tiny => (8.0, 2.0, 12.0),
+      IdsSize.standard => (10.0, 2.0, 14.0),
     };
 
     return Container(

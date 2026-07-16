@@ -9,7 +9,7 @@ class IdsIconButton extends StatelessWidget {
     super.key,
     required this.icon,
     this.variant = IdsVariant.ghost,
-    this.size = IdsSize.md,
+    this.size = IdsSize.standard,
     this.disabled = false,
     this.onPressed,
     required this.label,
@@ -25,9 +25,8 @@ class IdsIconButton extends StatelessWidget {
   final String label;
 
   double get _dimension => switch (size) {
-    IdsSize.sm || IdsSize.xs => 32,
-    IdsSize.md => 40,
-    _ => 48,
+    IdsSize.tiny => 32,
+    IdsSize.standard => 40,
   };
 
   @override
@@ -36,8 +35,12 @@ class IdsIconButton extends StatelessWidget {
 
     final (bg, fg, border) = switch (variant) {
       IdsVariant.solid => (theme.primary, theme.onPrimary, null),
-      IdsVariant.soft => (theme.secondary, theme.onSecondary, null),
-      IdsVariant.outline => (null, theme.primary, theme.primary),
+      IdsVariant.soft => (
+        theme.primary.withValues(alpha: 0.15),
+        theme.primary,
+        null,
+      ),
+      IdsVariant.outline => (null, theme.primary, theme.outline),
       IdsVariant.ghost => (null, theme.primary, null),
     };
 

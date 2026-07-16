@@ -84,7 +84,7 @@ class _IdsBottomNavigationButton extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               item.label,
-              style: IdsTypography.caption.copyWith(
+              style: IdsTypography.captionC1Regular.copyWith(
                 color: color,
                 leadingDistribution: TextLeadingDistribution.even,
               ),

@@ -12,7 +12,7 @@ class IdsCheckbox extends StatelessWidget {
     this.indeterminate = false,
     this.disabled = false,
     this.invalid = false,
-    this.size = IdsSize.md,
+    this.size = IdsSize.standard,
     this.semanticLabel,
   });
 
@@ -25,9 +25,8 @@ class IdsCheckbox extends StatelessWidget {
   final String? semanticLabel;
 
   double get _dimension => switch (size) {
-    IdsSize.sm || IdsSize.xs => 14,
-    IdsSize.md => 16,
-    _ => 20,
+    IdsSize.tiny => 14,
+    IdsSize.standard => 16,
   };
 
   @override

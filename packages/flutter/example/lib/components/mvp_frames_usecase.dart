@@ -343,7 +343,7 @@ class _ZiggleCategoryPill extends StatelessWidget {
           if (label != null)
             Text(
               label!,
-              style: IdsTypography.body.copyWith(
+              style: IdsTypography.bodyB2Regular.copyWith(
                 color: selected ? theme.onPrimary : theme.onSecondary,
                 fontWeight: FontWeight.w800,
                 leadingDistribution: TextLeadingDistribution.even,
@@ -384,7 +384,7 @@ class _ZiggleNoticeFeedCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const IdsAvatar(name: '홍길동', size: IdsSize.lg),
+                const IdsAvatar(name: '홍길동', size: IdsSize.standard),
                 const SizedBox(width: 10),
                 Expanded(
                   child: IdsVStack(
@@ -397,7 +397,7 @@ class _ZiggleNoticeFeedCard extends StatelessWidget {
                         fit: IdsStackFit.content,
                         crossAxis: CrossAxis.center,
                         children: [
-                          IdsText(author, variant: IdsTextVariant.body),
+                          IdsText(author, style: IdsTypography.bodyB2Regular),
                           IconTheme(
                             data: IconThemeData(color: theme.primary, size: 18),
                             child: const _HugeIcon(
@@ -408,7 +408,7 @@ class _ZiggleNoticeFeedCard extends StatelessWidget {
                       ),
                       IdsText(
                         '10분 전',
-                        variant: IdsTextVariant.caption,
+                        style: IdsTypography.captionC1Regular,
                         color: theme.onMuted,
                       ),
                     ],
@@ -426,7 +426,7 @@ class _ZiggleNoticeFeedCard extends StatelessWidget {
                     ),
                     child: IdsText(
                       dueLabel!,
-                      variant: IdsTextVariant.caption,
+                      style: IdsTypography.captionC1Regular,
                       color: theme.onPrimary,
                     ),
                   ),
@@ -447,7 +447,7 @@ class _ZiggleNoticeFeedCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: IdsTypography.body.copyWith(
+                    style: IdsTypography.bodyB2Regular.copyWith(
                       color: theme.onSurface,
                       fontWeight: FontWeight.w700,
                     ),
@@ -474,7 +474,7 @@ class _ZiggleNoticeFeedCard extends StatelessWidget {
                   child: const _HugeIcon(HugeIcons.strokeRoundedFire),
                 ),
                 const SizedBox(width: 6),
-                const IdsText('10', variant: IdsTextVariant.body),
+                const IdsText('10', style: IdsTypography.bodyB2Regular),
                 const SizedBox(width: 18),
                 IconTheme(
                   data: IconThemeData(color: theme.primary, size: 28),
@@ -523,7 +523,7 @@ class _ZiggleGroupsFrame extends StatelessWidget {
                           padding: EdgeInsets.all(24),
                           child: IdsText(
                             '지속 가능한 개발 문화를 통해 지스트 학부생의 삶의 질을 높이는 팀입니다.',
-                            variant: IdsTextVariant.label,
+                            style: IdsTypography.bodyB3Medium,
                           ),
                         ),
                       ),
@@ -551,7 +551,7 @@ class _ZiggleGroupsFrame extends StatelessWidget {
                                   children: [
                                     const IdsText(
                                       '2026 봄학기 개발자 모집 안내',
-                                      variant: IdsTextVariant.body,
+                                      style: IdsTypography.bodyB2Regular,
                                     ),
                                     const _NoticePoster(),
                                     Wrap(
@@ -564,7 +564,7 @@ class _ZiggleGroupsFrame extends StatelessWidget {
                                     ),
                                     IdsText(
                                       '10일 남음',
-                                      variant: IdsTextVariant.caption,
+                                      style: IdsTypography.captionC1Regular,
                                       color: theme.primary,
                                     ),
                                   ],
@@ -586,7 +586,7 @@ class _ZiggleGroupsFrame extends StatelessWidget {
                         height: panelHeight,
                         child: const Padding(
                           padding: EdgeInsets.all(24),
-                          child: IdsText('멤버 목록', variant: IdsTextVariant.label),
+                          child: IdsText('멤버 목록', style: IdsTypography.bodyB3Medium),
                         ),
                       ),
                     ),
@@ -619,16 +619,16 @@ class _GroupHeader extends StatelessWidget {
               gap: 16,
               crossAxis: CrossAxis.center,
               children: [
-                IdsAvatar(name: '인포팀', size: IdsSize.xxl),
+                IdsAvatar(name: '인포팀', size: IdsSize.standard),
                 Expanded(
                   child: IdsVStack(
                     gap: 4,
                     crossAxis: CrossAxis.start,
                     children: [
-                      IdsText('GIST 인포팀', variant: IdsTextVariant.title),
+                      IdsText('GIST 인포팀', style: IdsTypography.headlineH6Semibold),
                       IdsText(
                         '구독자 248명 · 게시글 12개',
-                        variant: IdsTextVariant.caption,
+                        style: IdsTypography.captionC1Regular,
                       ),
                     ],
                   ),
@@ -640,7 +640,7 @@ class _GroupHeader extends StatelessWidget {
               child: IdsCardContent(
                 child: IdsText(
                   'GIST 학생을 위한 웹 서비스와 인증 인프라를 만들고 운영하는 개발팀입니다.',
-                  variant: IdsTextVariant.label,
+                  style: IdsTypography.bodyB3Medium,
                   color: theme.onMuted,
                 ),
               ),
@@ -675,13 +675,13 @@ class _GroupNoticeCard extends StatelessWidget {
                   crossAxis: CrossAxis.start,
                   fit: IdsStackFit.content,
                   children: [
-                    IdsText('GIST 인포팀', variant: IdsTextVariant.caption),
-                    IdsText('12분 전', variant: IdsTextVariant.caption),
+                    IdsText('GIST 인포팀', style: IdsTypography.captionC1Regular),
+                    IdsText('12분 전', style: IdsTypography.captionC1Regular),
                   ],
                 ),
               ],
             ),
-            const IdsText('2026 봄학기 인포팀 개발자 모집', variant: IdsTextVariant.body),
+            const IdsText('2026 봄학기 인포팀 개발자 모집', style: IdsTypography.bodyB2Regular),
             const _NoticePoster(),
             Wrap(
               spacing: 8,
@@ -726,12 +726,12 @@ class _PhoneHeader extends StatelessWidget {
               child: Center(
                 child: IdsText(
                   backLabel!,
-                  variant: IdsTextVariant.label,
+                  style: IdsTypography.bodyB3Medium,
                   color: theme.primary,
                 ),
               ),
             ),
-          IdsText(title, variant: IdsTextVariant.label),
+          IdsText(title, style: IdsTypography.bodyB3Medium),
         ],
       ),
     );
@@ -766,12 +766,12 @@ class _ZiggleNoticeDetailFrame extends StatelessWidget {
                     crossAxis: CrossAxis.center,
                     children: [
                       IdsAvatar(name: '인포팀'),
-                      IdsText('인포팀 · 32분 전', variant: IdsTextVariant.body),
+                      IdsText('인포팀 · 32분 전', style: IdsTypography.bodyB2Regular),
                     ],
                   ),
                   const IdsText(
                     '2026 봄학기 인포팀 개발자 모집',
-                    variant: IdsTextVariant.title,
+                    style: IdsTypography.headlineH6Semibold,
                   ),
                   Wrap(
                     spacing: 8,
@@ -788,11 +788,11 @@ class _ZiggleNoticeDetailFrame extends StatelessWidget {
                   const _NoticePoster(),
                   const IdsText(
                     'GIST 인포팀에서 2026 봄학기 신규 멤버를 모집합니다.\n지원서 작성 구글 폼 링크',
-                    variant: IdsTextVariant.label,
+                    style: IdsTypography.bodyB3Medium,
                   ),
                   const IdsText(
                     '인포팀은 지글(Ziggle), IdP, 디자인 시스템 등 학생들이 매일 사용하는 서비스를 설계하고 운영합니다. 제품 개발과 서비스 운영을 함께 경험하고 싶은 분을 기다립니다.',
-                    variant: IdsTextVariant.label,
+                    style: IdsTypography.bodyB3Medium,
                   ),
                   const _ReactionBar(),
                 ],
@@ -924,7 +924,7 @@ class _ReactionChip extends StatelessWidget {
               if (icon != null) _HugeIcon(icon!),
               Text(
                 label,
-                style: IdsTypography.caption.copyWith(
+                style: IdsTypography.captionC1Regular.copyWith(
                   color: selected ? theme.onPrimary : theme.onSecondary,
                   fontWeight: FontWeight.w700,
                   leadingDistribution: TextLeadingDistribution.even,
@@ -963,19 +963,19 @@ class _ZiggleProfileFrame extends StatelessWidget {
                       gap: 10,
                       crossAxis: CrossAxis.center,
                       children: [
-                        const IdsAvatar(name: '류현승', size: IdsSize.xxl),
+                        const IdsAvatar(name: '류현승', size: IdsSize.standard),
                         const IdsVStack(
                           gap: 4,
                           fit: IdsStackFit.content,
                           crossAxis: CrossAxis.center,
                           children: [
-                            IdsText('류현승', variant: IdsTextVariant.title),
-                            IdsText('20255070', variant: IdsTextVariant.body),
+                            IdsText('류현승', style: IdsTypography.headlineH6Semibold),
+                            IdsText('20255070', style: IdsTypography.bodyB2Regular),
                           ],
                         ),
                         IdsText(
                           'rhseungg@gm.gist.ac.kr',
-                          variant: IdsTextVariant.caption,
+                          style: IdsTypography.captionC1Regular,
                           color: theme.onMuted,
                         ),
                       ],
@@ -1086,13 +1086,13 @@ class _PotgMainListFrame extends StatelessWidget {
                       crossAxis: CrossAxis.center,
                       children: [
                         SvgPicture.asset('assets/mvp/potg-logo.svg', height: 38),
-                        const IdsText('팟지', variant: IdsTextVariant.title),
+                        const IdsText('팟지', style: IdsTypography.headlineH6Semibold),
                       ],
                     ),
                     const _WeekStatusCard(),
                     IdsText(
                       '2025/11/15 토요일',
-                      variant: IdsTextVariant.caption,
+                      style: IdsTypography.captionC1Regular,
                       color: theme.onMuted,
                     ),
                     const _TaxiPotCard(
@@ -1155,14 +1155,14 @@ class _WeekStatusCard extends StatelessWidget {
           gap: 16,
           crossAxis: CrossAxis.start,
           children: [
-            const IdsText('요일 별 팟 현황', variant: IdsTextVariant.body),
+            const IdsText('요일 별 팟 현황', style: IdsTypography.bodyB2Regular),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 for (var i = 0; i < days.length; i++)
                   Column(
                     children: [
-                      IdsText(days[i], variant: IdsTextVariant.caption),
+                      IdsText(days[i], style: IdsTypography.captionC1Regular),
                       const SizedBox(height: 8),
                       for (var row = 0; row < 3; row++) ...[
                         Container(
@@ -1176,7 +1176,7 @@ class _WeekStatusCard extends StatelessWidget {
                           ),
                           child: IdsText(
                             i == 6 && row == 1 ? '5' : (row == 0 ? '0' : '1'),
-                            variant: IdsTextVariant.caption,
+                            style: IdsTypography.captionC1Regular,
                             color: i == 6 && row == 1
                                 ? theme.onPrimary
                                 : theme.onSurface,
@@ -1243,7 +1243,7 @@ class _TaxiPotCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           '$from → $to',
-                          style: IdsTypography.body.copyWith(
+                          style: IdsTypography.bodyB2Regular.copyWith(
                             color: theme.onSurface,
                             fontWeight: FontWeight.w600,
                             leadingDistribution: TextLeadingDistribution.even,
@@ -1254,7 +1254,7 @@ class _TaxiPotCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  IdsText(time, variant: IdsTextVariant.body),
+                  IdsText(time, style: IdsTypography.bodyB2Regular),
                 ],
               ),
             ),
@@ -1272,10 +1272,10 @@ class _TaxiPotCard extends StatelessWidget {
               fit: IdsStackFit.content,
               crossAxis: CrossAxis.center,
               children: [
-                const IdsText('정원', variant: IdsTextVariant.label),
+                const IdsText('정원', style: IdsTypography.bodyB3Medium),
                 IdsText(
                   capacity,
-                  variant: IdsTextVariant.title,
+                  style: IdsTypography.headlineH6Semibold,
                   color: theme.primary,
                 ),
               ],
@@ -1305,7 +1305,7 @@ class _PotgSearchEmptyFrame extends StatelessWidget {
                   gap: 24,
                   crossAxis: CrossAxis.start,
                   children: [
-                    const IdsText('팟 검색', variant: IdsTextVariant.title),
+                    const IdsText('팟 검색', style: IdsTypography.headlineH6Semibold),
                     Expanded(
                       child: Center(
                         child: IdsEmpty(
@@ -1332,7 +1332,7 @@ class _PotgSearchEmptyFrame extends StatelessWidget {
                             ),
                             IdsText(
                               '해당 조건의 택시 팟이 존재하지 않습니다',
-                              variant: IdsTextVariant.label,
+                              style: IdsTypography.bodyB3Medium,
                               color: theme.primary,
                               align: TextAlign.center,
                             ),
@@ -1391,21 +1391,21 @@ class _PotgFilterDialogFrameState extends State<_PotgFilterDialogFrame> {
                   gap: 20,
                   crossAxis: CrossAxis.start,
                   children: [
-                    const IdsText('팟 검색', variant: IdsTextVariant.title),
-                    const IdsText('노선 필터', variant: IdsTextVariant.caption),
+                    const IdsText('팟 검색', style: IdsTypography.headlineH6Semibold),
+                    const IdsText('노선 필터', style: IdsTypography.captionC1Regular),
                     const IdsCard(
                       child: IdsCardContent(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            IdsText('지스트', variant: IdsTextVariant.body),
-                            IdsText('→', variant: IdsTextVariant.body),
-                            IdsText('유스퀘어', variant: IdsTextVariant.body),
+                            IdsText('지스트', style: IdsTypography.bodyB2Regular),
+                            IdsText('→', style: IdsTypography.bodyB2Regular),
+                            IdsText('유스퀘어', style: IdsTypography.bodyB2Regular),
                           ],
                         ),
                       ),
                     ),
-                    const IdsText('날짜 필터', variant: IdsTextVariant.caption),
+                    const IdsText('날짜 필터', style: IdsTypography.captionC1Regular),
                     const _CalendarFilterCard(),
                     IdsHStack(
                       gap: 8,
@@ -1419,7 +1419,7 @@ class _PotgFilterDialogFrameState extends State<_PotgFilterDialogFrame> {
                         const Expanded(
                           child: IdsText(
                             '정원이 가득 찬 팟 숨기기',
-                            variant: IdsTextVariant.caption,
+                            style: IdsTypography.captionC1Regular,
                           ),
                         ),
                       ],
@@ -1447,15 +1447,15 @@ class _PotgFilterDialogFrameState extends State<_PotgFilterDialogFrame> {
                 gap: 8,
                 crossAxis: CrossAxis.start,
                 children: [
-                  IdsText('노선  광주송정역 → 지스트', variant: IdsTextVariant.label),
+                  IdsText('노선  광주송정역 → 지스트', style: IdsTypography.bodyB3Medium),
                   IdsText(
                     '날짜  2025년 12월 13일 토요일',
-                    variant: IdsTextVariant.label,
+                    style: IdsTypography.bodyB3Medium,
                   ),
-                  IdsText('시간  23:30~01:00', variant: IdsTextVariant.label),
+                  IdsText('시간  23:30~01:00', style: IdsTypography.bodyB3Medium),
                   IdsText(
                     '참여자 목록  김민준, 박서연, 이서연',
-                    variant: IdsTextVariant.label,
+                    style: IdsTypography.bodyB3Medium,
                   ),
                 ],
               ),
@@ -1495,7 +1495,7 @@ class _CalendarFilterCard extends StatelessWidget {
           children: [
             const IdsText(
               '2025년 11월',
-              variant: IdsTextVariant.body,
+              style: IdsTypography.bodyB2Regular,
               align: TextAlign.center,
             ),
             Wrap(
@@ -1513,7 +1513,7 @@ class _CalendarFilterCard extends StatelessWidget {
                     ),
                     child: IdsText(
                       '$day',
-                      variant: IdsTextVariant.caption,
+                      style: IdsTypography.captionC1Regular,
                       color: day == 14 ? theme.onPrimary : theme.onSurface,
                     ),
                   ),
@@ -1542,7 +1542,7 @@ class _PotgCreateTimeFrame extends StatelessWidget {
             gap: 20,
             crossAxis: CrossAxis.start,
             children: [
-              const IdsText('팟 생성', variant: IdsTextVariant.title),
+              const IdsText('팟 생성', style: IdsTypography.headlineH6Semibold),
               _StepRow(
                 index: '1',
                 label: '지스트 → 광주송정역',
@@ -1562,7 +1562,7 @@ class _PotgCreateTimeFrame extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _TimeSummary(label: '금요일 오전', time: '9:41'),
-                      IdsText('~', variant: IdsTextVariant.title),
+                      IdsText('~', style: IdsTypography.headlineH6Semibold),
                       _TimeSummary(label: '금요일 오후', time: '12:30'),
                     ],
                   ),
@@ -1570,7 +1570,7 @@ class _PotgCreateTimeFrame extends StatelessWidget {
               ),
               const IdsText(
                 '출발 가능한 가장 늦은 시각을 설정하세요',
-                variant: IdsTextVariant.body,
+                style: IdsTypography.bodyB2Regular,
               ),
               const _TimeWheelPickerMock(),
               SizedBox(
@@ -1620,11 +1620,11 @@ class _StepRow extends StatelessWidget {
           ),
           child: IdsText(
             index,
-            variant: IdsTextVariant.body,
+            style: IdsTypography.bodyB2Regular,
             color: filled ? theme.onPrimary : theme.primary,
           ),
         ),
-        Expanded(child: IdsText(label, variant: IdsTextVariant.body)),
+        Expanded(child: IdsText(label, style: IdsTypography.bodyB2Regular)),
         if (editable)
           IconTheme(
             data: IconThemeData(color: theme.onMuted, size: 20),
@@ -1705,9 +1705,9 @@ class _WheelColumn extends StatelessWidget {
               child: Center(
                 child: IdsText(
                   values[i],
-                  variant: i == 3
-                      ? IdsTextVariant.body
-                      : IdsTextVariant.caption,
+                  style: i == 3
+                      ? IdsTypography.bodyB2Regular
+                      : IdsTypography.captionC1Regular,
                   color: theme.onMuted.withValues(
                     alpha: switch ((i - 3).abs()) {
                       0 => 0.72,
@@ -1738,8 +1738,8 @@ class _TimeSummary extends StatelessWidget {
       fit: IdsStackFit.content,
       crossAxis: CrossAxis.center,
       children: [
-        IdsText(label, variant: IdsTextVariant.caption),
-        IdsText(time, variant: IdsTextVariant.body),
+        IdsText(label, style: IdsTypography.captionC1Regular),
+        IdsText(time, style: IdsTypography.bodyB2Regular),
       ],
     );
   }

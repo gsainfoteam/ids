@@ -26,7 +26,7 @@ final avatarUseCases = [
           child: IdsAvatar(
             src: 'https://i.pravatar.cc/80',
             name: '홍길동',
-            size: IdsSize.md,
+            size: IdsSize.standard,
           ),
         ),
       );
@@ -54,7 +54,7 @@ final avatarUseCases = [
         child: const Center(
           child: IdsAvatar(
             name: '홍길동',
-            size: IdsSize.md,
+            size: IdsSize.standard,
           ),
         ),
       );
@@ -85,10 +85,8 @@ final avatarUseCases = [
             mainAxis: MainAxis.center,
             crossAxis: CrossAxis.center,
             children: const [
-              IdsAvatar(name: '홍길동', size: IdsSize.sm),
-              IdsAvatar(name: '홍길동', size: IdsSize.md),
-              IdsAvatar(name: '홍길동', size: IdsSize.lg),
-              IdsAvatar(name: '홍길동', size: IdsSize.xl),
+              IdsAvatar(name: '홍길동', size: IdsSize.tiny),
+              IdsAvatar(name: '홍길동', size: IdsSize.standard),
             ],
           ),
         ),

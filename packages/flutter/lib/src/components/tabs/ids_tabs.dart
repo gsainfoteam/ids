@@ -88,7 +88,7 @@ class _IdsTabsState<T> extends State<IdsTabs<T>> {
                         alignment: Alignment.center,
                         child: Text(
                           item.label,
-                          style: IdsTypography.label.copyWith(
+                          style: IdsTypography.bodyB3Medium.copyWith(
                             color: item.value == _currentValue
                                 ? theme.primary
                                 : theme.onMuted,

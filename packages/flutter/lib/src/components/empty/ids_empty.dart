@@ -62,7 +62,7 @@ class IdsEmptyTitle extends StatelessWidget {
     final theme = ThemeProvider.of(context);
     return Text(
       data,
-      style: IdsTypography.title.copyWith(
+      style: IdsTypography.headlineH6Semibold.copyWith(
         color: theme.onSurface,
         fontWeight: FontWeight.w700,
         leadingDistribution: TextLeadingDistribution.even,
@@ -82,7 +82,7 @@ class IdsEmptyDescription extends StatelessWidget {
     final theme = ThemeProvider.of(context);
     return Text(
       data,
-      style: IdsTypography.body.copyWith(
+      style: IdsTypography.bodyB2Regular.copyWith(
         color: theme.onMuted,
         leadingDistribution: TextLeadingDistribution.even,
       ),

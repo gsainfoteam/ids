@@ -57,7 +57,7 @@ final theme = ThemeProvider.of(context);
 IdsButton(
   onPressed: () {},
   variant: IdsVariant.solid,
-  size: IdsSize.md,
+  size: IdsSize.standard,
   child: const Text('클릭'),
 )
 ```
@@ -65,12 +65,12 @@ IdsButton(
 | 파라미터 | 타입 | 기본값 |
 |---|---|---|
 | `variant` | `IdsVariant` | `IdsVariant.solid` |
-| `size` | `IdsSize` | `IdsSize.md` |
+| `size` | `IdsSize` | `IdsSize.standard` |
 | `disabled` | `bool` | `false` |
 
 **IdsVariant**: `solid`, `soft`, `outline`, `ghost`
 
-**IdsSize**: `xs`, `sm`, `md`, `lg`, `xl`, `xxl`
+**IdsSize**: `standard`, `tiny`
 
 ## 토큰 직접 사용
 
@@ -81,7 +81,7 @@ import 'package:ids_flutter/ids.dart';
 SizedBox(height: IdsSpacing.md)
 
 // 타이포그래피
-Text('제목', style: IdsTypography.heading)
+Text('제목', style: IdsTypography.headlineH5Semibold)
 
 // 애니메이션 지속시간
 AnimatedOpacity(duration: IdsMotion.fast, ...)

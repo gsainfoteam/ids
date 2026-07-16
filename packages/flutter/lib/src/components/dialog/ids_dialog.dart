@@ -92,7 +92,7 @@ class IdsDialogTitle extends StatelessWidget {
     final theme = ThemeProvider.of(context);
     return Text(
       data,
-      style: IdsTypography.title.copyWith(
+      style: IdsTypography.headlineH6Semibold.copyWith(
         color: theme.onSurface,
         fontWeight: FontWeight.w700,
         leadingDistribution: TextLeadingDistribution.even,

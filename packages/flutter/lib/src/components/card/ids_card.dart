@@ -112,7 +112,7 @@ class IdsCardTitle extends StatelessWidget {
     final theme = ThemeProvider.of(context);
     return Text(
       data,
-      style: IdsTypography.title.copyWith(
+      style: IdsTypography.headlineH6Semibold.copyWith(
         color: theme.onSurface,
         leadingDistribution: TextLeadingDistribution.even,
       ),
@@ -130,7 +130,7 @@ class IdsCardDescription extends StatelessWidget {
     final theme = ThemeProvider.of(context);
     return Text(
       data,
-      style: IdsTypography.caption.copyWith(
+      style: IdsTypography.captionC1Regular.copyWith(
         color: theme.onMuted,
         leadingDistribution: TextLeadingDistribution.even,
       ),

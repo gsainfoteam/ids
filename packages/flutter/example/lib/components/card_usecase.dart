@@ -27,7 +27,7 @@ final cardUseCases = [
             width: 320,
             child: IdsCard(
               child: IdsCardContent(
-                child: IdsText('기본 카드', variant: IdsTextVariant.body),
+                child: IdsText('기본 카드', style: IdsTypography.bodyB2Regular),
               ),
             ),
           ),
@@ -67,7 +67,7 @@ final cardUseCases = [
                     IdsCardDescription('2024년 3월 30일'),
                   ]),
                   IdsCardContent(
-                    child: IdsText('카드 본문 내용이 들어갑니다.', variant: IdsTextVariant.body),
+                    child: IdsText('카드 본문 내용이 들어갑니다.', style: IdsTypography.bodyB2Regular),
                   ),
                   IdsCardFooter(
                     child: Row(

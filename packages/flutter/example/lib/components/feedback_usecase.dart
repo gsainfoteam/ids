@@ -124,7 +124,7 @@ class _PotgCheckboxDemoState extends State<_PotgCheckboxDemo> {
             semanticLabel: '정원이 가득 찬 팟 숨기기',
             onChanged: (value) => setState(() => checked = value),
           ),
-          const IdsText('정원이 가득 찬 팟 숨기기', variant: IdsTextVariant.label),
+          const IdsText('정원이 가득 찬 팟 숨기기', style: IdsTypography.bodyB3Medium),
         ],
       ),
     );
@@ -166,15 +166,15 @@ class _PotgDialogDemoState extends State<_PotgDialogDemo> {
                     gap: 8,
                     crossAxis: CrossAxis.start,
                     children: [
-                      IdsText('노선  송정역 → 지스트', variant: IdsTextVariant.label),
+                      IdsText('노선  송정역 → 지스트', style: IdsTypography.bodyB3Medium),
                       IdsText(
                         '날짜  2025년 12월 13일 토요일',
-                        variant: IdsTextVariant.label,
+                        style: IdsTypography.bodyB3Medium,
                       ),
-                      IdsText('시간  23:30~01:00', variant: IdsTextVariant.label),
+                      IdsText('시간  23:30~01:00', style: IdsTypography.bodyB3Medium),
                       IdsText(
                         '참여자 목록  홍길동, 심청이, 변사또',
-                        variant: IdsTextVariant.label,
+                        style: IdsTypography.bodyB3Medium,
                       ),
                     ],
                   ),

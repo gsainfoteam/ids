@@ -26,7 +26,7 @@ final buttonUseCases = [
           child: IdsButton(
             onPressed: () {},
             variant: IdsVariant.solid,
-            size: IdsSize.md,
+            size: IdsSize.standard,
             children: const [Text('확인')],
           ),
         ),
@@ -56,7 +56,7 @@ final buttonUseCases = [
           child: IdsButton(
             onPressed: () {},
             variant: IdsVariant.soft,
-            size: IdsSize.md,
+            size: IdsSize.standard,
             children: const [Text('보조')],
           ),
         ),
@@ -86,7 +86,7 @@ final buttonUseCases = [
           child: IdsButton(
             onPressed: () {},
             variant: IdsVariant.outline,
-            size: IdsSize.md,
+            size: IdsSize.standard,
             children: const [Text('취소')],
           ),
         ),
@@ -116,7 +116,7 @@ final buttonUseCases = [
           child: IdsButton(
             onPressed: () {},
             variant: IdsVariant.ghost,
-            size: IdsSize.md,
+            size: IdsSize.standard,
             children: const [Text('더보기')],
           ),
         ),
@@ -201,28 +201,13 @@ final buttonUseCases = [
             children: [
               IdsButton(
                 onPressed: () {},
-                size: IdsSize.xs,
-                children: const [Text('xs')],
+                size: IdsSize.standard,
+                children: const [Text('standard')],
               ),
               IdsButton(
                 onPressed: () {},
-                size: IdsSize.sm,
-                children: const [Text('sm')],
-              ),
-              IdsButton(
-                onPressed: () {},
-                size: IdsSize.md,
-                children: const [Text('md')],
-              ),
-              IdsButton(
-                onPressed: () {},
-                size: IdsSize.lg,
-                children: const [Text('lg')],
-              ),
-              IdsButton(
-                onPressed: () {},
-                size: IdsSize.xl,
-                children: const [Text('xl')],
+                size: IdsSize.tiny,
+                children: const [Text('tiny')],
               ),
             ],
           ),

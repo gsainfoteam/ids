@@ -14,7 +14,7 @@ class IdsFloatingButton extends StatelessWidget {
     super.key,
     required this.children,
     this.variant = IdsFloatingButtonVariant.solid,
-    this.size = IdsSize.lg,
+    this.size = IdsSize.standard,
     this.placement = IdsFloatingPlacement.bottomRight,
     this.disabled = false,
     this.onPressed,
@@ -37,9 +37,8 @@ class IdsFloatingButton extends StatelessWidget {
   };
 
   double get _height => switch (size) {
-    IdsSize.md || IdsSize.sm || IdsSize.xs => 48,
-    IdsSize.lg => 56,
-    _ => 64,
+    IdsSize.tiny => 48,
+    IdsSize.standard => 56,
   };
 
   @override
@@ -81,7 +80,7 @@ class IdsFloatingButton extends StatelessWidget {
               ],
             ),
             child: DefaultTextStyle(
-              style: IdsTypography.label.copyWith(
+              style: IdsTypography.bodyB3Medium.copyWith(
                 color: fg,
                 fontWeight: FontWeight.w700,
                 leadingDistribution: TextLeadingDistribution.even,

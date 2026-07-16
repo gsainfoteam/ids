@@ -8,7 +8,7 @@ class IdsAvatar extends StatelessWidget {
     super.key,
     this.src,
     this.name,
-    this.size = IdsSize.md,
+    this.size = IdsSize.standard,
   });
 
   final String? src;
@@ -16,21 +16,13 @@ class IdsAvatar extends StatelessWidget {
   final IdsSize size;
 
   double get _diameter => switch (size) {
-    IdsSize.xs => 24,
-    IdsSize.sm => 32,
-    IdsSize.md => 40,
-    IdsSize.lg => 48,
-    IdsSize.xl => 64,
-    IdsSize.xxl => 80,
+    IdsSize.tiny => 32,
+    IdsSize.standard => 40,
   };
 
   double get _fontSize => switch (size) {
-    IdsSize.xs => 10,
-    IdsSize.sm => 12,
-    IdsSize.md => 14,
-    IdsSize.lg => 16,
-    IdsSize.xl => 18,
-    IdsSize.xxl => 20,
+    IdsSize.tiny => 12,
+    IdsSize.standard => 14,
   };
 
   String _getInitials(String name) {

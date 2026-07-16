@@ -1,18 +1,19 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../tokens/ids_typography.dart';
 import '../text/ids_text.dart';
 
 class IdsHeading extends StatelessWidget {
   const IdsHeading(
     this.data, {
     super.key,
-    this.variant = IdsTextVariant.heading,
+    this.style = IdsTypography.headlineH5Semibold,
     this.color,
     this.align,
   });
 
   final String data;
-  final IdsTextVariant variant;
+  final TextStyle style;
   final Color? color;
   final TextAlign? align;
 
@@ -20,7 +21,7 @@ class IdsHeading extends StatelessWidget {
   Widget build(BuildContext context) {
     return IdsText(
       data,
-      variant: variant,
+      style: style,
       color: color,
       align: align,
     );
