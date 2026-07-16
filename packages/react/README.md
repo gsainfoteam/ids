@@ -57,15 +57,15 @@ function ThemeToggle() {
 ```tsx
 import { Button } from '@infoteam/ids-react';
 
-<Button variant="solid" size="md" onClick={() => {}}>
+<Button variant="solid" size="standard" onClick={() => {}}>
   클릭
 </Button>
 ```
 
 | prop | 타입 | 기본값 |
 |---|---|---|
-| `variant` | `'solid' \| 'outline' \| 'ghost'` | `'solid'` |
-| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` |
+| `variant` | `'solid' \| 'soft' \| 'outline' \| 'ghost'` | `'solid'` |
+| `size` | `'standard' \| 'tiny'` | `'standard'` |
 | `disabled` | `boolean` | `false` |
 
 ## 개발
