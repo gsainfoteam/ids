@@ -5,25 +5,17 @@ IDS 디자인 토큰을 CSS 변수와 Tailwind v4 `@theme`으로 제공하는 �
 ## 설치
 
 ```bash
-npm install @infoteam/ids-css
-```
-
-Tailwind v4가 peerDependency다.
-
-```bash
-npm install tailwindcss
+npm install @infoteam/ids-css tailwindcss
 ```
 
 ## 사용법
 
-CSS 파일 또는 Tailwind 엔트리포인트에서 import:
-
 ```css
-@import "@infoteam/ids-css";
 @import "tailwindcss";
+@import "@infoteam/ids-css";
 ```
 
-그 다음 루트 요소에 `data-color`와 `data-mode` 속성을 설정한다:
+루트에 `data-color` / `data-mode`를 설정한다:
 
 ```html
 <div data-color="blue" data-mode="light">
@@ -31,38 +23,51 @@ CSS 파일 또는 Tailwind 엔트리포인트에서 import:
 </div>
 ```
 
-## 제공하는 것
+## Tailwind 유틸리티
 
-### CSS 변수
-
-| 변수 | 예시 |
-|---|---|
-| `--ids-color-*` | `--ids-color-primary`, `--ids-color-on-primary` |
-| `--ids-spacing-*` | `--ids-spacing-xs`, `--ids-spacing-md` |
-| `--ids-text-*` | `--ids-text-body`, `--ids-text-display` |
-| `--ids-motion-*` | `--ids-motion-fast`, `--ids-motion-normal` |
-
-### Tailwind @theme 브리지
-
-Tailwind 유틸리티 클래스에서 토큰을 바로 사용할 수 있다:
+`@theme` 브리지로 클래스에서 바로 쓴다:
 
 ```html
-<button class="bg-[--ids-color-primary] text-[--ids-color-on-primary]">
-  버튼
-</button>
+<!-- 색상 -->
+<button class="bg-primary text-on-primary">확인</button>
+
+<!-- 타이포 (피그마 Text style = 크기+weight+leading+tracking 묶음) -->
+<p class="text-headline-h5-semibold">제목</p>
+<p class="text-body-b2-regular text-on-muted">본문</p>
+<button class="text-button-standard">CTA</button>
+<button class="text-button-tiny">작은 CTA</button>
+
+<!-- 프리미티브 -->
+<span class="text-h1 font-bold tracking-tight leading-tight">48px</span>
+<span class="font-semibold tracking-normal leading-snug">…</span>
 ```
+
+### 타이포 스타일 이름
+
+| 그룹 | 클래스 예 |
+|---|---|
+| headline | `text-headline-h1-bold` … `text-headline-h6-medium` |
+| subtitle | `text-subtitle-s1-semibold`, `text-subtitle-s2-medium` |
+| body | `text-body-b1-regular` … `text-body-b3-bold` |
+| caption | `text-caption-c1-regular`, `text-caption-c2-medium` |
+| button | `text-button-standard`, `text-button-tiny` |
 
 ### 지원 색상 테마
 
-`data-color` 속성에 아래 값을 사용할 수 있다:
-
-| 값 | 설명 |
+| `data-color` | 설명 |
 |---|---|
-| `blue` | 기본 블루 테마 |
-| `orange` | 오렌지 테마 |
+| `blue` | 기본 블루 |
+| `orange` | 오렌지 (지글) |
+| `green` | 그린 (팟쥐) |
 
 `data-mode`는 `light` / `dark`.
 
-## 직접 편집 금지
+## 빌드
 
-`dist/ids.css`는 `pnpm codegen`이 생성한다. 직접 수정하면 다음 codegen 시 덮어쓴다.
+`dist/ids.css`는 Style Dictionary가 생성한다. 직접 수정하지 말 것.
+
+```bash
+pnpm codegen
+# 또는
+pnpm --filter @infoteam/ids-css build
+```
