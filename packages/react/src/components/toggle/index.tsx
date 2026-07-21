@@ -1,7 +1,11 @@
 import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
+import {
+  useInteractiveProps,
+  type InteractiveState,
+  type WithInteractiveValues,
+} from '../../hooks/use-interactive';
 import { invariant, tv, type VariantProps } from '../../utils';
 import { controlSurface } from '../control-surface';
 import { useGroupedSize } from '../group';
@@ -107,6 +111,7 @@ export namespace Toggle {
       pressed?: boolean;
       defaultPressed?: boolean;
       onPressedChange?: (pressed: boolean) => void;
+      onInteractionChange?: (state: InteractiveState) => void;
       value?: string;
     };
 

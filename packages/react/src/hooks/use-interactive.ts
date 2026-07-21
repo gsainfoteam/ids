@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import type { FocusEvent, KeyboardEvent, PointerEvent } from 'react';
 
 import { isFunction, pickBy } from 'es-toolkit';
@@ -24,6 +24,8 @@ const INTERACTIVE_INIT = {
 export type UseInteractiveOptions<E extends Element = Element> = {
   disabled?: boolean;
   pressed?: boolean;
+  /** 컴포넌트가 소유한 InteractiveState를 부모에 mirror. 구독/controlled가 아님. */
+  onInteractionChange?: (state: InteractiveState) => void;
   onPointerEnter?: (e: PointerEvent<E>) => void;
   onPointerLeave?: (e: PointerEvent<E>) => void;
   onPointerDown?: (e: PointerEvent<E>) => void;
@@ -38,6 +40,7 @@ export type UseInteractiveOptions<E extends Element = Element> = {
 export function useInteractive<E extends Element = Element>({
   disabled,
   pressed,
+  onInteractionChange,
   onPointerEnter,
   onPointerLeave,
   onPointerDown,
@@ -49,6 +52,35 @@ export function useInteractive<E extends Element = Element>({
   onKeyUp,
 }: UseInteractiveOptions<E> = {}) {
   const [state, setState] = useState(INTERACTIVE_INIT);
+  const interactiveState: InteractiveState = {
+    ...state,
+    pressed: pressed ?? false,
+    disabled: disabled ?? false,
+  };
+
+  const onInteractionChangeRef = useRef(onInteractionChange);
+
+  useLayoutEffect(() => {
+    onInteractionChangeRef.current = onInteractionChange;
+  });
+
+  useLayoutEffect(() => {
+    onInteractionChangeRef.current?.({
+      hovered: state.hovered,
+      active: state.active,
+      focused: state.focused,
+      focusVisible: state.focusVisible,
+      pressed: pressed ?? false,
+      disabled: disabled ?? false,
+    });
+  }, [
+    state.hovered,
+    state.active,
+    state.focused,
+    state.focusVisible,
+    pressed,
+    disabled,
+  ]);
 
   const handlers = {
     onPointerEnter(e: PointerEvent<E>) {
@@ -95,11 +127,7 @@ export function useInteractive<E extends Element = Element>({
   };
 
   return {
-    state: {
-      ...state,
-      pressed: pressed ?? false,
-      disabled: disabled ?? false,
-    },
+    state: interactiveState,
     handlers,
   };
 }
@@ -205,7 +233,12 @@ export function resolveInteractiveProps<P extends Record<string, unknown>>(
   return resolved as ResolvedInteractiveValues<P>;
 }
 
-const INTERACTIVE_OPTION_KEYS = [...INTERACTIVE_HANDLER_KEYS, 'disabled', 'pressed'] as const;
+const INTERACTIVE_OPTION_KEYS = [
+  ...INTERACTIVE_HANDLER_KEYS,
+  'disabled',
+  'pressed',
+  'onInteractionChange',
+] as const;
 
 function pickInteractiveOptions<E extends Element>(
   props: Record<string, unknown>,
@@ -225,7 +258,12 @@ function omitInteractiveHandlers<P extends Record<string, unknown>>(props: P) {
   return rest as Omit<P, (typeof INTERACTIVE_HANDLER_KEYS)[number]>;
 }
 
-const NON_DOM_KEYS = ['pressed', 'defaultPressed', 'onPressedChange'] as const;
+const NON_DOM_KEYS = [
+  'pressed',
+  'defaultPressed',
+  'onPressedChange',
+  'onInteractionChange',
+] as const;
 
 function omitNonDomProps<P extends Record<string, unknown>>(props: P) {
   const rest = { ...props };

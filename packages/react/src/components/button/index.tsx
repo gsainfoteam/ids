@@ -1,6 +1,10 @@
 import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
-import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
+import {
+  useInteractiveProps,
+  type InteractiveState,
+  type WithInteractiveValues,
+} from '../../hooks/use-interactive';
 import { tv, type VariantProps } from '../../utils';
 import { controlSurface } from '../control-surface';
 import { useGroupedSize } from '../group';
@@ -48,6 +52,7 @@ export namespace Button {
       children?: ReactNode;
       className?: string;
       style?: CSSProperties;
+      onInteractionChange?: (state: InteractiveState) => void;
     };
 
   export type Props = WithInteractiveValues<BaseProps>;
