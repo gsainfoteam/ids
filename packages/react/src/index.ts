@@ -25,5 +25,7 @@ export type { UseControllableStateOptions } from './hooks/use-controllable-state
 export { IdsError, invariant } from './utils/invariant';
 
 export { Button } from './components/button/index.tsx';
+export { IconButton } from './components/icon-button/index.tsx';
+export { ButtonGroup } from './components/button-group/index.tsx';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
