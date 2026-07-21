@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "es-toolkit": "^1.49.0",
     "tailwind-merge": "^3.5.0",
     "tailwind-variants": "^3.2.2"
   },
