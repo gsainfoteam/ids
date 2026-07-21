@@ -52,8 +52,8 @@ function ThemeToggle() {
 
 ## 인터랙션 state
 
-IDS는 hover / press / focus 같은 상태를 **외부 구독 API로 열지 않는다.**  
-필요한 쪽(부모 또는 그 노드)이 state를 소유하고, props·render prop으로 흘린다.
+IDS는 hover / press / focus의 **소유권을 컴포넌트 안에 둔다.**  
+외부 구독·controlled 인터랙션 API는 두지 않고, 아래 두 길로만 바깥에 노출한다.
 
 실행 예시는 Storybook `Patterns/Interactive state`를 참고한다.
 
@@ -70,35 +70,42 @@ IDS는 hover / press / focus 같은 상태를 **외부 구독 API로 열지 않�
 
 DOM에는 `data-hovered` 등이 붙으므로, 자손 스타일만 필요하면 CSS `group` / 셀렉터로도 충분하다.
 
-### 2. Lift (sibling)
+### 2. Mirror (sibling)
 
 형제끼리 JS로 같은 인터랙션에 반응해야 할 때.  
-Button에 Context를 심지 말고, **공통 조상(부모)이 `useInteractive`로 state를 들고** 나눠 준다.
+`onInteractionChange`로 부모가 **복사본만** 받는다. 소유권·핸들러는 계속 `<Button>`에 있다.
 
 ```tsx
 function Row() {
-  const { state, handlers } = useInteractive<HTMLButtonElement>();
+  const [interaction, setInteraction] = useState(INTERACTIVE_STATE_DEFAULTS);
 
   return (
     <>
-      <button {...handlers} {...interactiveDataProps(state)}>
+      <Button variant="outline" onInteractionChange={setInteraction}>
         Hover me
-      </button>
-      {state.hovered && <Hint />}
+      </Button>
+      {interaction.hovered && <Hint />}
     </>
   );
 }
 ```
 
-sibling 스타일만 맞추면 Tailwind `group` / `peer` + `data-*`로도 된다. JS 분기가 필요할 때만 lift한다.
+정리:
+
+| 목표 | 방법 |
+|---|---|
+| IDS 컴포넌트 + 자손만 반응 | 노드 로컬 `(s) => …` |
+| IDS 컴포넌트 + sibling **스타일만** | `peer` / `group` + `data-*` |
+| sibling이 **JS로 분기** | `onInteractionChange` (mirror) |
 
 ### 하지 않는 것
 
-- 컴포넌트마다 Context로 hover 등을 바깥에 뿌리는 구조
+- `hovered` 등을 controlled prop으로 올리는 것
+- 컴포넌트마다 Context로 hover를 바깥에 뿌리는 구조
 - 범용 sibling 구독 / store subscribe API
+- sibling JS를 위해 `Button.Style` + 훅을 다시 조립하는 것 (Button이 이미 하는 일의 중복)
 
-Tabs·Menu처럼 **진짜 compound**가 생기면 그때 Root Context(또는 store)를 도입한다.  
-transient 인터랙션(hover 등)까지 구독 레이어로 빼지 않는다.
+Tabs·Menu처럼 **진짜 compound**가 생기면 그때 Root Context(또는 store)를 도입한다.
 
 ## 컴포넌트
 
