@@ -20,6 +20,9 @@ build/
 # Claude
 .claude/
 
+# Cursor
+.cursor/
+
 # Misc
 .DS_Store
 *.local
