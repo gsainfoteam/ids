@@ -427,9 +427,9 @@
 [data-color="blue"][data-mode="dark"] {
   --ids-color-primary: #2563eb;
   --ids-color-on-primary: #ffffff;
-  --ids-color-secondary: #1e3a8a;
-  --ids-color-on-secondary: #60a5fa;
-  --ids-color-outline: #3b82f6;
+  --ids-color-secondary: #172554;
+  --ids-color-on-secondary: #3b82f6;
+  --ids-color-outline: #1e40af;
 }
 
 [data-color="blue"][data-mode="light"] {
@@ -443,9 +443,9 @@
 [data-color="green"][data-mode="dark"] {
   --ids-color-primary: #418501;
   --ids-color-on-primary: #ffffff;
-  --ids-color-secondary: #1e4001;
-  --ids-color-on-secondary: #4ade5e;
-  --ids-color-outline: #22c53e;
+  --ids-color-secondary: #0f2400;
+  --ids-color-on-secondary: #22c53e;
+  --ids-color-outline: #2a5701;
 }
 
 [data-color="green"][data-mode="light"] {
@@ -459,9 +459,9 @@
 [data-color="orange"][data-mode="dark"] {
   --ids-color-primary: #ff4500;
   --ids-color-on-primary: #ffffff;
-  --ids-color-secondary: #7a2200;
-  --ids-color-on-secondary: #ff7650;
-  --ids-color-outline: #ff5722;
+  --ids-color-secondary: #451300;
+  --ids-color-on-secondary: #ff5722;
+  --ids-color-outline: #a32d00;
 }
 
 [data-color="orange"][data-mode="light"] {
