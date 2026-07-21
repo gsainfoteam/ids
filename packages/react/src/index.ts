@@ -30,5 +30,7 @@ export { ButtonGroup } from './components/button-group/index.tsx';
 export { Toggle } from './components/toggle/index.tsx';
 export { IconToggle } from './components/icon-toggle/index.tsx';
 export { ToggleGroup } from './components/toggle-group/index.tsx';
+export { TextField } from './components/text-field/index.tsx';
+export { TextFieldGroup } from './components/text-field-group/index.tsx';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
