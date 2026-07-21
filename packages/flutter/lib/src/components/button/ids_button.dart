@@ -38,7 +38,7 @@ class IdsButton extends StatelessWidget {
 
     final (height, hPad, textStyle, iconSize) = switch (size) {
       IdsSize.tiny => (32.0, 10.0, IdsTypography.buttonTiny, 16.0),
-      IdsSize.standard => (48.0, 16.0, IdsTypography.buttonStandard, 20.0),
+      IdsSize.standard => (44.0, 16.0, IdsTypography.buttonStandard, 20.0),
     };
 
     return GestureDetector(
