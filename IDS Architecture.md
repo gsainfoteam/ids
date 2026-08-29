@@ -70,7 +70,7 @@
 - **Turborepo** — 태스크 파이프라인 정의 (`css` 빌드 완료 후 `react` 빌드 등), 로컬 빌드 캐시
 - **Changesets (fixed mode)** — 버전 bump, CHANGELOG 생성, GitHub Packages publish 자동화
 
-```
+```text
 ids/                          # 모노레포 루트
   packages/
     core/                     # 파일 저장소. 패키지 아님. 빌드 시스템 없음.
@@ -328,7 +328,9 @@ abstract final class IdsTypography {
 
 ### 버전 관리
 
-**Changesets (fixed mode)** — `@gsainfoteam/ids-css`, `@gsainfoteam/ids-react`, `ids_flutter` 항상 동일 버전. 각 패키지의 `package.json version`이 single source of truth.
+**Changesets (fixed mode)** — `@gsainfoteam/ids-css`와 `@gsainfoteam/ids-react`는 항상 동일 버전. 각 패키지의 `package.json version`이 single source of truth.
+
+`ids_flutter`는 pnpm workspace 밖의 Dart 패키지라 Changesets가 관리하지 않는다. `publish_to: none`이고 버전 고정은 소비자가 참조하는 릴리스 태그가 담당하므로, `pubspec.yaml`의 `version` 필드는 배포 좌표가 아니다.
 
 워크플로우:
 

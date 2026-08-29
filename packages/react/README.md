@@ -7,7 +7,7 @@ IDS React 컴포넌트 라이브러리.
 GitHub Packages에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하므로,
 프로젝트 루트에 `.npmrc`를 먼저 둔다:
 
-```
+```ini
 @gsainfoteam:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```

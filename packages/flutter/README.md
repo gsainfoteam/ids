@@ -12,7 +12,7 @@ dependencies:
     git:
       url: https://github.com/gsainfoteam/ids.git
       path: packages/flutter
-      ref: v1.0.0
+      ref: v0.1.0
 ```
 
 `ref`는 릴리스 태그다. 생략하면 `main`을 따라가므로 항상 태그를 고정한다.

@@ -7,7 +7,7 @@ IDS 디자인 토큰을 CSS 변수와 Tailwind v4 `@theme`으로 제공하는 �
 GitHub Packages에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하므로,
 프로젝트 루트에 `.npmrc`를 먼저 둔다:
 
-```
+```ini
 @gsainfoteam:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
