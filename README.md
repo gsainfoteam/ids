@@ -11,7 +11,7 @@ React (Web)과 Flutter (Mobile)을 동시 지원하며, 토큰 파이프라인�
 | `packages/core` | 토큰 소스 + Style Dictionary codegen. 배포 안 함. |
 | `@gsainfoteam/ids-css` | CSS 변수 + Tailwind `@theme`. GitHub Packages 배포. |
 | `@gsainfoteam/ids-react` | React 컴포넌트. GitHub Packages 배포. |
-| `ids_flutter` | Flutter 컴포넌트. pub.dev 배포. |
+| `ids_flutter` | Flutter 컴포넌트. git dependency로 참조. |
 
 ## 환경 세팅
 
@@ -119,13 +119,13 @@ pnpm changeset
 # 3. PR 머지 후 버전 bump
 pnpm changeset version   # package.json 버전 올리고 CHANGELOG 생성
 
-# 4. 버전 bump 커밋 후 GitHub Release 생성 → CI가 GitHub Packages + pub.dev 자동 배포
+# 4. 버전 bump 커밋 후 GitHub Release 생성 → CI가 GitHub Packages로 자동 배포
 gh release create v1.2.3 --generate-notes
 ```
 
 npm 패키지는 `secrets.GITHUB_TOKEN`으로 배포하므로 갱신할 토큰이 없다.
 
-Flutter pubspec 버전 동기화 및 `flutter pub publish`는 CI가 자동으로 처리한다.
+`ids_flutter`는 배포하지 않는다. 소비자가 릴리스 태그를 git dependency로 참조한다 ([packages/flutter/README.md](packages/flutter/README.md)).
 
 ## 의존성 구조
 

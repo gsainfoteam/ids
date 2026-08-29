@@ -336,7 +336,7 @@ abstract final class IdsTypography {
 2. PR 머지
 3. Changesets GitHub Action이 자동으로 "Version Packages" PR 생성
 4. "Version Packages" PR 머지 → `package.json` 버전 bump + CHANGELOG 자동 생성
-5. `release.yml`이 GitHub Packages publish + `pubspec.yaml` 버전 동기화 스크립트 실행
+5. `release.yml`이 GitHub Packages로 publish (`secrets.GITHUB_TOKEN` 사용)
 
 `codegen.yml` 트리거: `packages/core/tokens/**` 변경 시
 
@@ -480,7 +480,7 @@ void main() {
 
 - [ ]  `@gsainfoteam/ids-css` GitHub Packages 배포 (Changesets + release.yml 자동화)
 - [ ]  `@gsainfoteam/ids-react` GitHub Packages 배포 (동일)
-- [ ]  `ids_flutter` [pub.dev](http://pub.dev) 배포 (release.yml에서 pubspec.yaml 버전 동기화 후 배포)
+- [ ]  `ids_flutter` git dependency 참조 (배포 없음, 릴리스 태그로 고정)
 
 ### Phase 3 — 템플릿 세팅
 
