@@ -9,8 +9,8 @@ React (Web)과 Flutter (Mobile)을 동시 지원하며, 토큰 파이프라인�
 | 패키지 | 설명 |
 |---|---|
 | `packages/core` | 토큰 소스 + Style Dictionary codegen. 배포 안 함. |
-| `@infoteam/ids-css` | CSS 변수 + Tailwind `@theme`. npm 배포. |
-| `@infoteam/ids-react` | React 컴포넌트. npm 배포. |
+| `@gsainfoteam/ids-css` | CSS 변수 + Tailwind `@theme`. GitHub Packages 배포. |
+| `@gsainfoteam/ids-react` | React 컴포넌트. GitHub Packages 배포. |
 | `ids_flutter` | Flutter 컴포넌트. pub.dev 배포. |
 
 ## 환경 세팅
@@ -108,7 +108,7 @@ flutter test
 
 ## 배포
 
-배포는 Changesets로 관리한다. `@infoteam/ids-css`와 `@infoteam/ids-react`는 항상 동일한 버전을 가진다.
+배포는 Changesets로 관리한다. `@gsainfoteam/ids-css`와 `@gsainfoteam/ids-react`는 항상 동일한 버전을 가진다.
 
 ```bash
 # 1. 변경 내용 기록 (어떤 패키지가 어떻게 바뀌는지 작성)
@@ -119,9 +119,11 @@ pnpm changeset
 # 3. PR 머지 후 버전 bump
 pnpm changeset version   # package.json 버전 올리고 CHANGELOG 생성
 
-# 4. 버전 bump 커밋 후 GitHub Release 생성 → CI가 npm + pub.dev 자동 배포
+# 4. 버전 bump 커밋 후 GitHub Release 생성 → CI가 GitHub Packages + pub.dev 자동 배포
 gh release create v1.2.3 --generate-notes
 ```
+
+npm 패키지는 `secrets.GITHUB_TOKEN`으로 배포하므로 갱신할 토큰이 없다.
 
 Flutter pubspec 버전 동기화 및 `flutter pub publish`는 CI가 자동으로 처리한다.
 
@@ -130,8 +132,8 @@ Flutter pubspec 버전 동기화 및 `flutter pub publish`는 CI가 자동으로
 ```mermaid
 graph LR
   core["packages/core (codegen source)"]
-  css["@infoteam/ids-css"]
-  react["@infoteam/ids-react"]
+  css["@gsainfoteam/ids-css"]
+  react["@gsainfoteam/ids-react"]
   flutter["ids_flutter"]
   tw["tailwindcss"]
 

@@ -7,8 +7,8 @@ Monorepo (`gsainfoteam/ids`). pnpm workspace + Turborepo.
 ```
 packages/
   core/     tokens + Style Dictionary codegen. Private — not published.
-  css/      @infoteam/ids-css npm package. CSS variables + Tailwind @theme.
-  react/    @infoteam/ids-react npm package. React components + ThemeProvider.
+  css/      @gsainfoteam/ids-css GitHub Packages npm package. CSS variables + Tailwind @theme.
+  react/    @gsainfoteam/ids-react GitHub Packages npm package. React components + ThemeProvider.
   flutter/  ids_flutter pub.dev package. Flutter components + ThemeProvider.
 ```
 
@@ -36,7 +36,7 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 
 **core** — Token source of truth. `sd.config.js` defines all formatters. Output goes directly to sibling packages. No build artifact. `pnpm build` in core = `style-dictionary build`.
 
-**css** — Pure CSS package. No React dependency. Consumers import `@infoteam/ids-css` and add Tailwind themselves (peerDep). Do not `@import "tailwindcss"` inside this package.
+**css** — Pure CSS package. No React dependency. Consumers import `@gsainfoteam/ids-css` and add Tailwind themselves (peerDep). Do not `@import "tailwindcss"` inside this package.
 
 **react** — Component library. Library build via Vite (`dist/index.js`, `dist/index.cjs`). All components are implemented from scratch — no Radix, Base UI, or other headless deps. Storybook for development.
 
@@ -61,12 +61,12 @@ Every IDS component relies on `data-color` and `data-mode` attributes injected b
 
 ## Versioning — Changesets (fixed mode)
 
-`@infoteam/ids-css` and `@infoteam/ids-react` always share the same version. `ids_flutter` pubspec version is synced by `release.yml` to match.
+`@gsainfoteam/ids-css` and `@gsainfoteam/ids-react` always share the same version. `ids_flutter` pubspec version is synced by `release.yml` to match.
 
 ```bash
 pnpm changeset        # Describe a change → creates .changeset/*.md
 # → open PR → Changesets bot creates "Version Packages" PR automatically
-# → merge "Version Packages" PR → release.yml publishes to npm + pub.dev
+# → merge "Version Packages" PR → release.yml publishes to GitHub Packages + pub.dev
 ```
 
 ## Dependency graph
@@ -74,8 +74,8 @@ pnpm changeset        # Describe a change → creates .changeset/*.md
 ```mermaid
 graph LR
   core["packages/core (codegen source)"]
-  css["@infoteam/ids-css"]
-  react["@infoteam/ids-react"]
+  css["@gsainfoteam/ids-css"]
+  react["@gsainfoteam/ids-react"]
   flutter["ids_flutter"]
   tw["tailwindcss"]
 

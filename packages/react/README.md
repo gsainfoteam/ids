@@ -1,11 +1,22 @@
-# @infoteam/ids-react
+# @gsainfoteam/ids-react
 
 IDS React 컴포넌트 라이브러리.
 
 ## 설치
 
+GitHub Packages에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하므로,
+프로젝트 루트에 `.npmrc`를 먼저 둔다:
+
+```
+@gsainfoteam:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+`GITHUB_TOKEN`은 `read:packages` 스코프를 가진 PAT다. GitHub Actions 안에서는
+`secrets.GITHUB_TOKEN`을 그대로 넘기면 되고, Vercel 같은 외부 빌드에서는 환경변수로 PAT를 넣는다.
+
 ```bash
-npm install @infoteam/ids-react @infoteam/ids-css
+npm install @gsainfoteam/ids-react @gsainfoteam/ids-css
 npm install tailwindcss  # peerDependency
 ```
 
@@ -14,14 +25,14 @@ npm install tailwindcss  # peerDependency
 CSS 엔트리포인트에서 import:
 
 ```css
-@import "@infoteam/ids-css";
+@import "@gsainfoteam/ids-css";
 @import "tailwindcss";
 ```
 
 앱 최상단에 `ThemeProvider` 추가:
 
 ```tsx
-import { ThemeProvider } from '@infoteam/ids-react';
+import { ThemeProvider } from '@gsainfoteam/ids-react';
 
 function App() {
   return (
@@ -42,7 +53,7 @@ function App() {
 | `mode` | `IdsMode` | `'light'` | 라이트/다크 모드 |
 
 ```tsx
-import { useTheme } from '@infoteam/ids-react';
+import { useTheme } from '@gsainfoteam/ids-react';
 
 function ThemeToggle() {
   const { toggleMode } = useTheme();
@@ -112,7 +123,7 @@ Tabs·Menu처럼 **진짜 compound**가 생기면 그때 Root Context(또는 sto
 ### Button
 
 ```tsx
-import { Button } from '@infoteam/ids-react';
+import { Button } from '@gsainfoteam/ids-react';
 
 <Button variant="solid" size="standard" onClick={() => {}}>
   클릭

@@ -68,14 +68,14 @@
 
 - **pnpm workspace** — 패키지 간 로컬 의존성 연결, 공통 의존성 호이스팅
 - **Turborepo** — 태스크 파이프라인 정의 (`css` 빌드 완료 후 `react` 빌드 등), 로컬 빌드 캐시
-- **Changesets (fixed mode)** — 버전 bump, CHANGELOG 생성, npm publish 자동화
+- **Changesets (fixed mode)** — 버전 bump, CHANGELOG 생성, GitHub Packages publish 자동화
 
 ```
 ids/                          # 모노레포 루트
   packages/
     core/                     # 파일 저장소. 패키지 아님. 빌드 시스템 없음.
-    css/                      # @infoteam/ids-css npm 패키지
-    react/                    # @infoteam/ids-react npm 패키지
+    css/                      # @gsainfoteam/ids-css npm 패키지
+    react/                    # @gsainfoteam/ids-react npm 패키지
     flutter/                  # ids_flutter pub 패키지 (Dart)
   package.json                # pnpm workspace root
   pnpm-workspace.yaml
@@ -122,8 +122,8 @@ packages:
 ```mermaid
 graph LR
   core["packages/core (codegen source)"]
-  css["@infoteam/ids-css"]
-  react["@infoteam/ids-react"]
+  css["@gsainfoteam/ids-css"]
+  react["@gsainfoteam/ids-react"]
   flutter["ids_flutter (Flutter)"]
   tw["tailwindcss"]
  
@@ -328,7 +328,7 @@ abstract final class IdsTypography {
 
 ### 버전 관리
 
-**Changesets (fixed mode)** — `@infoteam/ids-css`, `@infoteam/ids-react`, `ids_flutter` 항상 동일 버전. 각 패키지의 `package.json version`이 single source of truth.
+**Changesets (fixed mode)** — `@gsainfoteam/ids-css`, `@gsainfoteam/ids-react`, `ids_flutter` 항상 동일 버전. 각 패키지의 `package.json version`이 single source of truth.
 
 워크플로우:
 
@@ -336,7 +336,7 @@ abstract final class IdsTypography {
 2. PR 머지
 3. Changesets GitHub Action이 자동으로 "Version Packages" PR 생성
 4. "Version Packages" PR 머지 → `package.json` 버전 bump + CHANGELOG 자동 생성
-5. `release.yml`이 npm publish + `pubspec.yaml` 버전 동기화 스크립트 실행
+5. `release.yml`이 GitHub Packages publish + `pubspec.yaml` 버전 동기화 스크립트 실행
 
 `codegen.yml` 트리거: `packages/core/tokens/**` 변경 시
 
@@ -367,7 +367,7 @@ packages/css/
 ```css
 /* global.css */
 @import "tailwindcss";
-@import "@infoteam/ids-css";
+@import "@gsainfoteam/ids-css";
 ```
 
 ---
@@ -384,7 +384,7 @@ packages/react/
       theme-provider.tsx
       use-theme.ts
     components/
-  package.json                   # peerDependencies: @infoteam/ids-css, tailwindcss, react
+  package.json                   # peerDependencies: @gsainfoteam/ids-css, tailwindcss, react
 ```
 
 ### ThemeProvider
@@ -409,7 +409,7 @@ export function ThemeProvider({ color = 'blue', mode = 'light', children }) {
 
 ```tsx
 // App.tsx — 반드시 최상단 엔트리포인트에
-import { ThemeProvider } from '@infoteam/ids-react'
+import { ThemeProvider } from '@gsainfoteam/ids-react'
 
 export function App() {
   return (
@@ -478,13 +478,13 @@ void main() {
 
 ### Phase 2 — 배포
 
-- [ ]  `@infoteam/ids-css` npm 배포 (Changesets + release.yml 자동화)
-- [ ]  `@infoteam/ids-react` npm 배포 (동일)
+- [ ]  `@gsainfoteam/ids-css` GitHub Packages 배포 (Changesets + release.yml 자동화)
+- [ ]  `@gsainfoteam/ids-react` GitHub Packages 배포 (동일)
 - [ ]  `ids_flutter` [pub.dev](http://pub.dev) 배포 (release.yml에서 pubspec.yaml 버전 동기화 후 배포)
 
 ### Phase 3 — 템플릿 세팅
 
-- [ ]  `gsainfoteam/template-csr-fe` — `@infoteam/ids-css`, `@infoteam/ids-react` 삽입, ThemeProvider 엔트리포인트 적용
+- [ ]  `gsainfoteam/template-csr-fe` — `@gsainfoteam/ids-css`, `@gsainfoteam/ids-react` 삽입, ThemeProvider 엔트리포인트 적용
 - [ ]  `gsainfoteam/template-ssr-fe` — 동일 + SSR FOUC 대응
 - [ ]  `gsainfoteam/template-flutter` — 신규 생성, ids_flutter 삽입, ThemeProvider 적용
 

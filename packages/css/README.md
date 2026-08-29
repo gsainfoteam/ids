@@ -1,18 +1,29 @@
-# @infoteam/ids-css
+# @gsainfoteam/ids-css
 
 IDS 디자인 토큰을 CSS 변수와 Tailwind v4 `@theme`으로 제공하는 패키지.
 
 ## 설치
 
+GitHub Packages에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하므로,
+프로젝트 루트에 `.npmrc`를 먼저 둔다:
+
+```
+@gsainfoteam:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+`GITHUB_TOKEN`은 `read:packages` 스코프를 가진 PAT다. GitHub Actions 안에서는
+`secrets.GITHUB_TOKEN`을 그대로 넘기면 되고, Vercel 같은 외부 빌드에서는 환경변수로 PAT를 넣는다.
+
 ```bash
-npm install @infoteam/ids-css tailwindcss
+npm install @gsainfoteam/ids-css tailwindcss
 ```
 
 ## 사용법
 
 ```css
 @import "tailwindcss";
-@import "@infoteam/ids-css";
+@import "@gsainfoteam/ids-css";
 ```
 
 루트에 `data-color` / `data-mode`를 설정한다:
@@ -69,5 +80,5 @@ npm install @infoteam/ids-css tailwindcss
 ```bash
 pnpm codegen
 # 또는
-pnpm --filter @infoteam/ids-css build
+pnpm --filter @gsainfoteam/ids-css build
 ```
