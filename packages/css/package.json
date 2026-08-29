@@ -10,6 +10,9 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
+  "files": [
+    "dist"
+  ],
   "main": "dist/ids.css",
   "exports": {
     ".": "./dist/ids.css"
