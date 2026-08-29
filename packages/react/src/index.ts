@@ -24,13 +24,13 @@ export type { UseControllableStateOptions } from './hooks/use-controllable-state
 
 export { IdsError, invariant } from './utils/invariant';
 
-export { Button } from './components/button/index.tsx';
-export { IconButton } from './components/icon-button/index.tsx';
-export { ButtonGroup } from './components/button-group/index.tsx';
-export { Toggle } from './components/toggle/index.tsx';
-export { IconToggle } from './components/icon-toggle/index.tsx';
-export { ToggleGroup } from './components/toggle-group/index.tsx';
-export { TextField } from './components/text-field/index.tsx';
-export { TextFieldGroup } from './components/text-field-group/index.tsx';
+export { Button } from './components/button';
+export { IconButton } from './components/icon-button';
+export { ButtonGroup } from './components/button-group';
+export { Toggle } from './components/toggle';
+export { IconToggle } from './components/icon-toggle';
+export { ToggleGroup } from './components/toggle-group';
+export { TextField } from './components/text-field';
+export { TextFieldGroup } from './components/text-field-group';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
