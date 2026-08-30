@@ -27,8 +27,31 @@ export NODE_AUTH_TOKEN=$(gh auth token)
 npm install @gsainfoteam/ids-css tailwindcss
 ```
 
+## CI 설정
+
 GitHub Actions 에서는 토큰을 따로 발급하지 않는다. `secrets.GITHUB_TOKEN` 을
-`NODE_AUTH_TOKEN` 으로 넘기고 잡에 `packages: read` 를 선언한다.
+그대로 쓴다. `.npmrc` 는 위와 동일하다.
+
+```yaml
+permissions:
+  contents: read
+  packages: read
+
+steps:
+  - uses: actions/setup-node@v4
+    with:
+      registry-url: https://npm.pkg.github.com
+      scope: '@gsainfoteam'
+
+  - run: npm ci
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+`packages: read` 를 빠뜨리면 401 이 난다. `permissions` 블록을 선언하는 순간
+적지 않은 권한은 전부 `none` 이 되기 때문이다.
+
+Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환경변수로 넣는다.
 
 ## 사용법
 
