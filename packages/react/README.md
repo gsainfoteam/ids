@@ -5,20 +5,44 @@ IDS React 컴포넌트 라이브러리.
 ## 설치
 
 GitHub Packages에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하다.
-프로젝트 루트에 `.npmrc`를 둔다:
+
+### 1. 토큰 발급
+
+GitHub > Settings > Developer settings > Personal access tokens > **Tokens (classic)**
+에서 `read:packages` 스코프만 체크해 발급한다.
+fine-grained 토큰은 npm 레지스트리 지원이 제한적이라 classic 을 쓴다.
+
+### 2. 토큰을 환경변수로 둔다
+
+`~/.zshrc` 나 `~/.bashrc` 에 넣는다.
+
+```bash
+export NODE_AUTH_TOKEN=ghp_여기에_발급받은_토큰
+```
+
+### 3. 프로젝트 루트에 `.npmrc` 를 만든다
 
 ```ini
 @gsainfoteam:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-토큰은 환경에 따라 다르다.
+**`${NODE_AUTH_TOKEN}` 은 이 글자 그대로 적는다.** 토큰 값으로 바꾸지 않는다.
+npm 이 설치할 때 환경변수에서 읽어 채운다. 파일에 토큰을 직접 적으면 커밋돼서 새어나간다.
 
-**로컬, Vercel 등 외부 빌드** — `read:packages` 스코프를 가진 classic PAT를
-`NODE_AUTH_TOKEN` 환경변수로 넣는다. npm 레지스트리는 fine-grained PAT 지원이 제한적이라
-classic 을 쓴다.
+`.npmrc` 는 커밋해도 된다. 토큰이 들어 있지 않다.
 
-**GitHub Actions** — `secrets.GITHUB_TOKEN`을 그대로 쓴다. 잡에 권한을 선언해야 한다.
+### 4. 설치
+
+```bash
+npm install @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install tailwindcss  # peerDependency
+```
+
+### GitHub Actions 에서 설치할 때
+
+토큰을 따로 발급하지 않는다. `secrets.GITHUB_TOKEN` 을 그대로 넘긴다.
+`.npmrc` 는 위와 동일하다.
 
 ```yaml
 permissions:
@@ -34,11 +58,6 @@ steps:
   - run: npm ci
     env:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
-
-```bash
-npm install @gsainfoteam/ids-react @gsainfoteam/ids-css
-npm install tailwindcss  # peerDependency
 ```
 
 ## 설정
