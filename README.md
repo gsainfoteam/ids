@@ -6,12 +6,14 @@ React (Web)과 Flutter (Mobile)을 동시 지원하며, 토큰 파이프라인�
 
 ## 패키지
 
-| 패키지 | 설명 |
-|---|---|
-| `packages/core` | 토큰 소스 + Style Dictionary codegen. 배포 안 함. |
-| `@gsainfoteam/ids-css` | CSS 변수 + Tailwind `@theme`. GitHub Packages 배포. |
-| `@gsainfoteam/ids-react` | React 컴포넌트. GitHub Packages 배포. |
-| `ids_flutter` | Flutter 컴포넌트. pub.dev 배포 (`gistory.me`). |
+| 패키지 | 설명 | 배포 |
+|---|---|---|
+| [`@gsainfoteam/ids-css`](packages/css) | CSS 변수 + Tailwind `@theme` | [GitHub Packages](https://github.com/gsainfoteam/ids/pkgs/npm/ids-css) |
+| [`@gsainfoteam/ids-react`](packages/react) | React 컴포넌트 | [GitHub Packages](https://github.com/gsainfoteam/ids/pkgs/npm/ids-react) |
+| [`ids_flutter`](packages/flutter) | Flutter 컴포넌트 | [pub.dev](https://pub.dev/packages/ids_flutter) |
+| [`packages/core`](packages/core) | 토큰 소스 + Style Dictionary codegen | - |
+
+설치법은 각 패키지 README 에 있다. npm 패키지는 GitHub Packages 라 인증이 필요하다.
 
 ## 환경 세팅
 
