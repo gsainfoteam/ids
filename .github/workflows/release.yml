@@ -45,13 +45,16 @@ jobs:
         with:
           persist-credentials: false
 
-      # pub.dev OIDC 자격 증명을 주입한다. flutter-action 은 이걸 하지 않아서
-      # 이 스텝이 없으면 publish 가 인증 없이 실패한다.
-      - uses: dart-lang/setup-dart@v1
-
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.44.0"
+
+      # pub.dev OIDC 자격 증명을 주입한다. flutter-action 은 이걸 하지 않아서
+      # 이 스텝이 없으면 publish 가 인증 없이 실패한다.
+      #
+      # 타사 action 이 전부 끝난 뒤에 둔다. 이 스텝은 PUB_TOKEN 을 이후 스텝의
+      # 환경에 심으므로, 앞에 두면 그 뒤 action 이 토큰을 읽을 수 있다.
+      - uses: dart-lang/setup-dart@v1
 
       - run: flutter pub get
         working-directory: packages/flutter
