@@ -1,8 +1,10 @@
 name: Release
 
+# pub.dev 는 태그 push 로 트리거된 워크플로에서만 게시를 허용한다.
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   npm:
@@ -13,6 +15,8 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: pnpm/action-setup@v4
 
@@ -29,3 +33,27 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  flutter:
+    name: Publish to pub.dev
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.0"
+
+      # flutter-action 은 pub.dev 인증을 하지 않는다. PUB_TOKEN 이 이후 스텝에
+      # 노출되므로 타사 action 을 전부 지난 뒤에 둔다.
+      - uses: dart-lang/setup-dart@v1
+
+      - run: flutter pub get
+        working-directory: packages/flutter
+
+      - run: flutter pub publish --force
+        working-directory: packages/flutter

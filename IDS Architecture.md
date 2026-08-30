@@ -330,15 +330,17 @@ abstract final class IdsTypography {
 
 **Changesets (fixed mode)** — `@gsainfoteam/ids-css`와 `@gsainfoteam/ids-react`는 항상 동일 버전. 각 패키지의 `package.json version`이 single source of truth.
 
-`ids_flutter`는 pnpm workspace 밖의 Dart 패키지라 Changesets가 관리하지 않는다. `publish_to: none`이고 버전 고정은 소비자가 참조하는 릴리스 태그가 담당하므로, `pubspec.yaml`의 `version` 필드는 배포 좌표가 아니다.
+`ids_flutter`는 pnpm workspace 밖의 Dart 패키지라 Changesets가 직접 관리하지 않는다. `pnpm version:packages`가 `changeset version` 직후 `pubspec.yaml`의 `version`을 `ids-css`에 맞춘다. pub.dev 자동 배포가 태그와 pubspec 버전 일치를 요구하기 때문이다.
 
 워크플로우:
 
 1. 변경 작업 후 `pnpm changeset` 실행 → `.changeset/*.md` 파일 생성 (변경 내용 기록)
 2. PR 머지
-3. Changesets GitHub Action이 자동으로 "Version Packages" PR 생성
-4. "Version Packages" PR 머지 → `package.json` 버전 bump + CHANGELOG 자동 생성
-5. `release.yml`이 GitHub Packages로 publish (`secrets.GITHUB_TOKEN` 사용)
+3. `pnpm version:packages` 실행 → `package.json`·`pubspec.yaml` 버전 bump + CHANGELOG 생성
+4. 결과를 커밋해 PR 머지
+5. `git push origin vX.Y.Z` → `release.yml`이 GitHub Packages(`secrets.GITHUB_TOKEN`)와 pub.dev(OIDC)로 publish
+
+버전 bump 는 사람이 실행한다. "Version Packages" PR 을 자동 생성하는 Changesets Action 은 두지 않았다.
 
 `codegen.yml` 트리거: `packages/core/tokens/**` 변경 시
 
@@ -482,7 +484,7 @@ void main() {
 
 - [ ]  `@gsainfoteam/ids-css` GitHub Packages 배포 (Changesets + release.yml 자동화)
 - [ ]  `@gsainfoteam/ids-react` GitHub Packages 배포 (동일)
-- [ ]  `ids_flutter` git dependency 참조 (배포 없음, 릴리스 태그로 고정)
+- [ ]  `ids_flutter` pub.dev 배포 (publisher: gistory.me, OIDC 자동 배포)
 
 ### Phase 3 — 템플릿 세팅
 

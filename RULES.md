@@ -9,7 +9,7 @@ packages/
   core/     tokens + Style Dictionary codegen. Private — not published.
   css/      @gsainfoteam/ids-css GitHub Packages npm package. CSS variables + Tailwind @theme.
   react/    @gsainfoteam/ids-react GitHub Packages npm package. React components + ThemeProvider.
-  flutter/  ids_flutter Flutter package. Consumed via git dependency, not published.
+  flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + ThemeProvider.
 ```
 
 ## Generated files — do not edit manually
@@ -40,7 +40,7 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 
 **react** — Component library. Library build via Vite (`dist/index.js`, `dist/index.cjs`). All components are implemented from scratch — no Radix, Base UI, or other headless deps. Storybook for development.
 
-**flutter** — Dart package. Platform directories (android/, ios/, etc.) intentionally absent — this is a package, not an app. `publish_to: none` — consumers reference it by git tag.
+**flutter** — Dart package. Platform directories (android/, ios/, etc.) intentionally absent — this is a package, not an app. Published to pub.dev via OIDC — no token.
 
 ## ThemeProvider
 
@@ -61,12 +61,16 @@ Every IDS component relies on `data-color` and `data-mode` attributes injected b
 
 ## Versioning — Changesets (fixed mode)
 
-`@gsainfoteam/ids-css` and `@gsainfoteam/ids-react` always share the same version.
+`@gsainfoteam/ids-css` and `@gsainfoteam/ids-react` always share the same version. `ids_flutter` pubspec version is synced by `pnpm version:packages` — pub.dev OIDC publishing requires it to match the release tag.
 
 ```bash
-pnpm changeset        # Describe a change → creates .changeset/*.md
-# → open PR → Changesets bot creates "Version Packages" PR automatically
-# → merge "Version Packages" PR → release.yml publishes to GitHub Packages
+pnpm changeset          # Describe a change → creates .changeset/*.md
+# → open PR, merge it
+pnpm version:packages   # Bump package.json + pubspec.yaml, write CHANGELOGs
+# → commit, open PR, merge it
+git tag v1.2.3 && git push origin v1.2.3
+# → release.yml publishes to GitHub Packages + pub.dev
+gh release create v1.2.3 --generate-notes --verify-tag
 ```
 
 ## Dependency graph

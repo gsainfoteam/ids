@@ -11,7 +11,7 @@ React (Web)과 Flutter (Mobile)을 동시 지원하며, 토큰 파이프라인�
 | `packages/core` | 토큰 소스 + Style Dictionary codegen. 배포 안 함. |
 | `@gsainfoteam/ids-css` | CSS 변수 + Tailwind `@theme`. GitHub Packages 배포. |
 | `@gsainfoteam/ids-react` | React 컴포넌트. GitHub Packages 배포. |
-| `ids_flutter` | Flutter 컴포넌트. git dependency로 참조. |
+| `ids_flutter` | Flutter 컴포넌트. pub.dev 배포 (`gistory.me`). |
 
 ## 환경 세팅
 
@@ -116,16 +116,21 @@ pnpm changeset
 
 # 2. 생성된 .changeset/*.md 파일을 커밋에 포함해서 PR
 
-# 3. PR 머지 후 버전 bump
-pnpm changeset version   # package.json 버전 올리고 CHANGELOG 생성
+# 3. PR 머지 후 버전 bump. 파일만 바뀌므로 직접 커밋해서 PR 을 올린다
+pnpm version:packages    # package.json + pubspec 버전 올리고 CHANGELOG 생성
+git commit -am "chore(release): version packages"
 
-# 4. 버전 bump 커밋 후 GitHub Release 생성 → CI가 GitHub Packages로 자동 배포
-gh release create v1.2.3 --generate-notes
+# 4. 버전 bump 가 main 에 머지된 뒤 그 커밋에 태그를 찍는다
+git switch main && git pull
+git tag v1.2.3 && git push origin v1.2.3   # CI 가 GitHub Packages + pub.dev 로 배포
+gh release create v1.2.3 --generate-notes --verify-tag
 ```
 
 npm 패키지는 `secrets.GITHUB_TOKEN`으로 배포하므로 갱신할 토큰이 없다.
 
-`ids_flutter`는 배포하지 않는다. 소비자가 릴리스 태그를 git dependency로 참조한다 ([packages/flutter/README.md](packages/flutter/README.md)).
+3번에서 `changeset version`을 직접 쓰지 않는다. pub.dev 자동 배포는 태그와 `pubspec.yaml`의 `version`이 일치해야 통과하므로, 태그를 찍기 전에 pubspec 값이 커밋돼 있어야 한다.
+
+4번에서 태그를 직접 push 한다. pub.dev 는 태그 push 로 트리거된 워크플로에서만 게시를 허용하고, `gh release create` 가 만드는 릴리스 이벤트로는 거부한다.
 
 ## 의존성 구조
 

@@ -1,8 +1,7 @@
 name: ids_flutter
 description: Infoteam Design System — Flutter package.
-version: 0.0.0
+version: 0.1.0
 repository: https://github.com/gsainfoteam/ids
-publish_to: none
 
 environment:
   sdk: ^3.11.5

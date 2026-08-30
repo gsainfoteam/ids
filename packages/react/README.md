@@ -36,10 +36,6 @@ steps:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-다른 레포의 워크플로에서 설치하려면 패키지 쪽에서 그 레포를 허용해야 한다.
-패키지 페이지 > Package settings > Manage Actions access 에서 소비자 레포를 추가한다.
-없으면 `GITHUB_TOKEN`을 넘겨도 404가 난다.
-
 ```bash
 npm install @gsainfoteam/ids-react @gsainfoteam/ids-css
 npm install tailwindcss  # peerDependency
