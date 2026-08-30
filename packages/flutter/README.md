@@ -4,11 +4,11 @@ IDS Flutter 컴포넌트 라이브러리.
 
 ## 설치
 
-`pubspec.yaml`에 추가한다.
+[pub.dev](https://pub.dev/packages/ids_flutter) 에서 배포한다.
 
 ```yaml
 dependencies:
-  ids_flutter: ^0.1.0
+  ids_flutter: ^0.1.1
 ```
 
 ```bash
