@@ -1,6 +1,6 @@
 {
   "name": "@gsainfoteam/ids-react",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
     "check": "prettier --write . && eslint --fix"
   },
   "peerDependencies": {
-    "@gsainfoteam/ids-css": "^0.0.0",
+    "@gsainfoteam/ids-css": "^0.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.0.0"
