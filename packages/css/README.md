@@ -1,18 +1,54 @@
-# @infoteam/ids-css
+# @gsainfoteam/ids-css
 
 IDS 디자인 토큰을 CSS 변수와 Tailwind v4 `@theme`으로 제공하는 패키지.
 
 ## 설치
 
+GitHub Packages에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하다.
+프로젝트 루트에 `.npmrc`를 둔다:
+
+```ini
+@gsainfoteam:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+토큰은 환경에 따라 다르다.
+
+**로컬, Vercel 등 외부 빌드** — `read:packages` 스코프를 가진 classic PAT를
+`NODE_AUTH_TOKEN` 환경변수로 넣는다. npm 레지스트리는 fine-grained PAT 지원이 제한적이라
+classic 을 쓴다.
+
+**GitHub Actions** — `secrets.GITHUB_TOKEN`을 그대로 쓴다. 잡에 권한을 선언해야 한다.
+
+```yaml
+permissions:
+  contents: read
+  packages: read
+
+steps:
+  - uses: actions/setup-node@v4
+    with:
+      registry-url: https://npm.pkg.github.com
+      scope: '@gsainfoteam'
+
+  - run: npm ci
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+다른 레포의 워크플로에서 설치하려면 패키지 쪽에서 그 레포를 허용해야 한다.
+패키지 페이지 > Package settings > Manage Actions access 에서 소비자 레포를 추가한다.
+없으면 `GITHUB_TOKEN`을 넘겨도 404가 난다.
+
 ```bash
-npm install @infoteam/ids-css tailwindcss
+npm install @gsainfoteam/ids-css tailwindcss
 ```
 
 ## 사용법
 
 ```css
 @import "tailwindcss";
-@import "@infoteam/ids-css";
+@import "@gsainfoteam/ids-css";
 ```
 
 루트에 `data-color` / `data-mode`를 설정한다:
@@ -69,5 +105,5 @@ npm install @infoteam/ids-css tailwindcss
 ```bash
 pnpm codegen
 # 또는
-pnpm --filter @infoteam/ids-css build
+pnpm --filter @gsainfoteam/ids-css build
 ```

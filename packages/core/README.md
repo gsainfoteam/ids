@@ -1,4 +1,4 @@
-# @infoteam/ids-core
+# @gsainfoteam/ids-core
 
 토큰 소스 + Style Dictionary codegen. **배포하지 않음** — 빌드 타임 전용.
 

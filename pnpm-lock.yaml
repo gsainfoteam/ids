@@ -48,7 +48,7 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.4.0(jiti@2.7.0))
-      '@infoteam/ids-css':
+      '@gsainfoteam/ids-css':
         specifier: workspace:*
         version: link:../css
       '@phosphor-icons/react':

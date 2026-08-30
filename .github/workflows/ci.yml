@@ -35,6 +35,9 @@ jobs:
 
       - run: pnpm build
 
+      - name: Check react ships type declarations
+        run: test -f packages/react/dist/index.d.ts
+
   flutter:
     name: Flutter (test)
     runs-on: ubuntu-latest
