@@ -4,70 +4,31 @@ IDS React 컴포넌트 라이브러리.
 
 ## 설치
 
-GitHub Packages에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하다.
+GitHub Packages 에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하다.
 
-### 1. 토큰 준비
-
-`gh` 가 깔려 있으면 PAT 를 따로 만들지 않아도 된다. 이미 로그인한 토큰에
-스코프만 더한다.
-
-```bash
-gh auth refresh -s read:packages          # 최초 1회
-export NODE_AUTH_TOKEN=$(gh auth token)   # ~/.zshrc 에 넣어둔다
-```
-
-`gh` 를 안 쓰거나 Vercel 처럼 `gh` 가 없는 환경이면 PAT 를 만든다.
-GitHub > Settings > Developer settings > Personal access tokens > **Tokens (classic)**
-에서 `read:packages` 만 체크한다. fine-grained 토큰은 npm 레지스트리 지원이
-제한적이라 classic 을 쓴다. 발급한 값을 `NODE_AUTH_TOKEN` 환경변수로 넣는다.
-
-### 2. 프로젝트 루트에 `.npmrc` 를 만든다
+프로젝트 루트에 `.npmrc` 를 둔다.
 
 ```ini
 @gsainfoteam:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-두 줄 다 필요하다. 첫 줄은 `@gsainfoteam` 스코프를 어느 레지스트리에서 받을지,
-둘째 줄은 그 레지스트리에 쓸 토큰을 정한다.
+`NODE_AUTH_TOKEN` 은 `read:packages` 스코프를 가진 토큰이다. `gh` 가 있으면
 
-**둘째 줄 앞의 `//` 는 주석이 아니다.** `https:` 를 생략한 레지스트리 주소이고,
-지우면 인증이 빠져서 401 이 난다. `.npmrc` 의 주석은 `#` 다.
-
-**`${NODE_AUTH_TOKEN}` 은 이 글자 그대로 적는다.** `gh` 로 받았든 PAT 를 만들었든
-똑같다. 토큰 값으로 치환하지 않는다.
-
-```ini
-# O - 이대로 적는다
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-
-# X - 토큰을 직접 적으면 커밋돼서 새어나간다
-//npm.pkg.github.com/:_authToken=ghp_AbCdEf123456
+```bash
+gh auth refresh -s read:packages
+export NODE_AUTH_TOKEN=$(gh auth token)
 ```
 
-토큰은 셸의 환경변수에 있고, npm 이 설치하는 순간 `${...}` 자리에 채워 넣는다.
-그래서 `.npmrc` 에는 토큰이 남지 않고, 커밋해도 된다.
-
-### 3. 설치
+없으면 classic PAT 를 발급해 같은 환경변수에 넣는다. fine-grained 는 npm
+레지스트리 지원이 제한적이다.
 
 ```bash
 npm install @gsainfoteam/ids-react @gsainfoteam/ids-css
 npm install tailwindcss  # peerDependency
 ```
 
-`bun` 도 같은 `.npmrc` 를 읽는다.
-
-```bash
-bun add @gsainfoteam/ids-react @gsainfoteam/ids-css tailwindcss
-```
-
-registry 줄만 두고 `_authToken` 을 빼면 npm 도 bun 도 401 로 거부한다.
-퍼블릭 패키지여도 익명 설치가 안 된다.
-
-### GitHub Actions 에서 설치할 때
-
-토큰을 따로 발급하지 않는다. `secrets.GITHUB_TOKEN` 을 그대로 넘긴다.
-`.npmrc` 는 위와 동일하다.
+GitHub Actions 에서는 `secrets.GITHUB_TOKEN` 을 그대로 쓴다.
 
 ```yaml
 permissions:
