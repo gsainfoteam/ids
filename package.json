@@ -8,6 +8,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "codegen": "pnpm --filter @gsainfoteam/ids-core build",
+    "version:packages": "changeset version && node scripts/sync-flutter-version.mjs",
     "storybook": "pnpm --filter @gsainfoteam/ids-react storybook",
     "release": "pnpm build && changeset publish"
   },
