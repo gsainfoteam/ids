@@ -28,10 +28,25 @@ GitHub > Settings > Developer settings > Personal access tokens > **Tokens (clas
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-**`${NODE_AUTH_TOKEN}` 은 이 글자 그대로 적는다.** 토큰 값으로 바꾸지 않는다.
-npm 이 설치할 때 환경변수에서 읽어 채운다. 파일에 토큰을 직접 적으면 커밋돼서 새어나간다.
+두 줄 다 필요하다. 첫 줄은 `@gsainfoteam` 스코프를 어느 레지스트리에서 받을지,
+둘째 줄은 그 레지스트리에 쓸 토큰을 정한다.
 
-`.npmrc` 는 커밋해도 된다. 토큰이 들어 있지 않다.
+**둘째 줄 앞의 `//` 는 주석이 아니다.** `https:` 를 생략한 레지스트리 주소이고,
+지우면 인증이 빠져서 401 이 난다. `.npmrc` 의 주석은 `#` 다.
+
+**`${NODE_AUTH_TOKEN}` 은 이 글자 그대로 적는다.** `gh` 로 받았든 PAT 를 만들었든
+똑같다. 토큰 값으로 치환하지 않는다.
+
+```ini
+# O - 이대로 적는다
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+
+# X - 토큰을 직접 적으면 커밋돼서 새어나간다
+//npm.pkg.github.com/:_authToken=ghp_AbCdEf123456
+```
+
+토큰은 셸의 환경변수에 있고, npm 이 설치하는 순간 `${...}` 자리에 채워 넣는다.
+그래서 `.npmrc` 에는 토큰이 남지 않고, 커밋해도 된다.
 
 ### 3. 설치
 
