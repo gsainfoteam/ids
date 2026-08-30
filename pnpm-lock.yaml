@@ -30,6 +30,8 @@ importers:
         specifier: ^4.0.0
         version: 4.3.0
 
+  packages/flutter: {}
+
   packages/react:
     dependencies:
       clsx:

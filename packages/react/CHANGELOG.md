@@ -1,5 +1,13 @@
 # @gsainfoteam/ids-react
 
+## 0.1.1
+
+### Patch Changes
+
+- 설치 문서에서 Manage Actions access 절차를 제거했다. 두 패키지 모두 public 이라 소비자 레포를 따로 등록할 필요가 없다.
+- Updated dependencies
+  - @gsainfoteam/ids-css@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes

@@ -61,7 +61,11 @@ Every IDS component relies on `data-color` and `data-mode` attributes injected b
 
 ## Versioning — Changesets (fixed mode)
 
-`@gsainfoteam/ids-css` and `@gsainfoteam/ids-react` always share the same version. `ids_flutter` pubspec version is synced by `pnpm version:packages` — pub.dev OIDC publishing requires it to match the release tag.
+`@gsainfoteam/ids-css`, `@gsainfoteam/ids-react` and `ids_flutter` always share the same version.
+
+`packages/flutter` carries a minimal private `package.json` so Changesets can track it — Changesets
+only reads npm manifests. `pnpm version:packages` bumps that file and then mirrors the version into
+`pubspec.yaml`; pub.dev OIDC publishing requires it to match the release tag.
 
 ```bash
 pnpm changeset          # Describe a change → creates .changeset/*.md

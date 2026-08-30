@@ -5,10 +5,15 @@
   "fixed": [
     [
       "@gsainfoteam/ids-css",
-      "@gsainfoteam/ids-react"
+      "@gsainfoteam/ids-react",
+      "ids_flutter"
     ]
   ],
   "linked": [],
+  "privatePackages": {
+    "version": true,
+    "tag": false
+  },
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
