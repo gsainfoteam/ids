@@ -4,21 +4,34 @@ IDS React 컴포넌트 라이브러리.
 
 ## 설치
 
-GitHub Packages에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하다.
-프로젝트 루트에 `.npmrc`를 둔다:
+GitHub Packages 에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하다.
+
+프로젝트 루트에 `.npmrc` 를 둔다.
 
 ```ini
 @gsainfoteam:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-토큰은 환경에 따라 다르다.
+`NODE_AUTH_TOKEN` 은 `read:packages` 스코프를 가진 토큰이다. `gh` 가 있으면
 
-**로컬, Vercel 등 외부 빌드** — `read:packages` 스코프를 가진 classic PAT를
-`NODE_AUTH_TOKEN` 환경변수로 넣는다. npm 레지스트리는 fine-grained PAT 지원이 제한적이라
-classic 을 쓴다.
+```bash
+gh auth refresh -s read:packages
+export NODE_AUTH_TOKEN=$(gh auth token)
+```
 
-**GitHub Actions** — `secrets.GITHUB_TOKEN`을 그대로 쓴다. 잡에 권한을 선언해야 한다.
+없으면 classic PAT 를 발급해 같은 환경변수에 넣는다. fine-grained 는 npm
+레지스트리 지원이 제한적이다.
+
+```bash
+npm install @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install tailwindcss  # peerDependency
+```
+
+## CI 설정
+
+GitHub Actions 에서는 토큰을 따로 발급하지 않는다. `secrets.GITHUB_TOKEN` 을
+그대로 쓴다. `.npmrc` 는 위와 동일하다.
 
 ```yaml
 permissions:
@@ -36,10 +49,10 @@ steps:
       NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-```bash
-npm install @gsainfoteam/ids-react @gsainfoteam/ids-css
-npm install tailwindcss  # peerDependency
-```
+`packages: read` 를 빠뜨리면 401 이 난다. `permissions` 블록을 선언하는 순간
+적지 않은 권한은 전부 `none` 이 되기 때문이다.
+
+Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환경변수로 넣는다.
 
 ## 설정
 
