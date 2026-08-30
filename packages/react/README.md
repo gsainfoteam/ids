@@ -39,6 +39,15 @@ npm install @gsainfoteam/ids-react @gsainfoteam/ids-css
 npm install tailwindcss  # peerDependency
 ```
 
+`bun` 도 같은 `.npmrc` 를 읽는다.
+
+```bash
+bun add @gsainfoteam/ids-react @gsainfoteam/ids-css tailwindcss
+```
+
+registry 줄만 두고 `_authToken` 을 빼면 npm 도 bun 도 401 로 거부한다.
+퍼블릭 패키지여도 익명 설치가 안 된다.
+
 ### GitHub Actions 에서 설치할 때
 
 토큰을 따로 발급하지 않는다. `secrets.GITHUB_TOKEN` 을 그대로 넘긴다.
