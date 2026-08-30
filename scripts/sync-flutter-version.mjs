@@ -3,12 +3,12 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 const PUBSPEC = 'packages/flutter/pubspec.yaml';
 
-// css 와 react 는 changesets fixed 그룹이라 늘 같은 버전이다. 아무 쪽이나 읽으면 된다.
-const { version } = JSON.parse(readFileSync('packages/css/package.json', 'utf8'));
+// changesets 는 package.json 까지만 올린다. pub 은 pubspec 을 보므로 여기서 옮긴다.
+const { version } = JSON.parse(readFileSync('packages/flutter/package.json', 'utf8'));
 const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 
 if (typeof version !== 'string' || !SEMVER.test(version)) {
-  throw new Error(`packages/css/package.json 의 version 이 유효하지 않다: ${JSON.stringify(version)}`);
+  throw new Error(`packages/flutter/package.json 의 version 이 유효하지 않다: ${JSON.stringify(version)}`);
 }
 
 const pubspec = readFileSync(PUBSPEC, 'utf8');

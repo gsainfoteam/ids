@@ -2,4 +2,6 @@ packages:
   - 'packages/core'
   - 'packages/css'
   - 'packages/react'
-  # packages/flutter is Dart — excluded from pnpm workspace
+  # Dart 패키지지만 changesets 가 package.json 만 인식해서 워크스페이스에 넣는다.
+  # 버전 원본은 package.json 이고 pubspec 은 sync-flutter-version.mjs 가 맞춘다.
+  - 'packages/flutter'
