@@ -118,6 +118,8 @@ pnpm changeset
 
 # 3. PR 머지 후 버전 bump. 파일만 바뀌므로 직접 커밋해서 PR 을 올린다
 pnpm version:packages    # package.json + pubspec 버전 올리고 CHANGELOG 생성
+#    packages/flutter/CHANGELOG.md 는 직접 쓴다. changesets 대상이 아니라서
+#    항목이 없으면 pub publish 가 경고하고 pub points 가 깎인다
 git commit -am "chore(release): version packages"
 
 # 4. 버전 bump 가 main 에 머지된 뒤 그 커밋에 태그를 찍는다
