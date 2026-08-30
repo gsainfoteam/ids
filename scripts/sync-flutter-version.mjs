@@ -6,7 +6,11 @@ const PUBSPEC = 'packages/flutter/pubspec.yaml';
 
 // css 와 react 는 changesets fixed 그룹이라 늘 같은 버전이다. 아무 쪽이나 읽으면 된다.
 const { version } = JSON.parse(readFileSync('packages/css/package.json', 'utf8'));
-if (typeof version !== 'string' || !/^\d+\.\d+\.\d+/.test(version)) {
+// 전체를 앵커한다. 접두사만 보면 '1.2.3garbage' 나 '1.2.3.4' 가 통과해서
+// pubspec 에 그대로 실리고, 태그와 어긋나 pub.dev 게시가 거부된다.
+const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
+
+if (typeof version !== 'string' || !SEMVER.test(version)) {
   throw new Error(`packages/css/package.json 의 version 이 유효하지 않다: ${JSON.stringify(version)}`);
 }
 
