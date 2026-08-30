@@ -56,8 +56,7 @@ Every IDS component relies on `data-color` and `data-mode` attributes injected b
 
 1. Add palette values to `packages/core/tokens/palette.json`
 2. Add `packages/core/tokens/semantic/[color].light.json` and `[color].dark.json`
-3. Run `pnpm codegen`
-4. CI runs accessibility (contrast ratio) check on PR
+3. Run `pnpm codegen` and commit the generated files
 
 ## Versioning — Changesets (fixed mode)
 
