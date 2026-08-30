@@ -6,21 +6,22 @@ IDS 디자인 토큰을 CSS 변수와 Tailwind v4 `@theme`으로 제공하는 �
 
 GitHub Packages에서 배포한다. 퍼블릭 패키지여도 설치에 인증이 필요하다.
 
-### 1. 토큰 발급
+### 1. 토큰 준비
 
-GitHub > Settings > Developer settings > Personal access tokens > **Tokens (classic)**
-에서 `read:packages` 스코프만 체크해 발급한다.
-fine-grained 토큰은 npm 레지스트리 지원이 제한적이라 classic 을 쓴다.
-
-### 2. 토큰을 환경변수로 둔다
-
-`~/.zshrc` 나 `~/.bashrc` 에 넣는다.
+`gh` 가 깔려 있으면 PAT 를 따로 만들지 않아도 된다. 이미 로그인한 토큰에
+스코프만 더한다.
 
 ```bash
-export NODE_AUTH_TOKEN=ghp_여기에_발급받은_토큰
+gh auth refresh -s read:packages          # 최초 1회
+export NODE_AUTH_TOKEN=$(gh auth token)   # ~/.zshrc 에 넣어둔다
 ```
 
-### 3. 프로젝트 루트에 `.npmrc` 를 만든다
+`gh` 를 안 쓰거나 Vercel 처럼 `gh` 가 없는 환경이면 PAT 를 만든다.
+GitHub > Settings > Developer settings > Personal access tokens > **Tokens (classic)**
+에서 `read:packages` 만 체크한다. fine-grained 토큰은 npm 레지스트리 지원이
+제한적이라 classic 을 쓴다. 발급한 값을 `NODE_AUTH_TOKEN` 환경변수로 넣는다.
+
+### 2. 프로젝트 루트에 `.npmrc` 를 만든다
 
 ```ini
 @gsainfoteam:registry=https://npm.pkg.github.com
@@ -32,7 +33,7 @@ npm 이 설치할 때 환경변수에서 읽어 채운다. 파일에 토큰을 �
 
 `.npmrc` 는 커밋해도 된다. 토큰이 들어 있지 않다.
 
-### 4. 설치
+### 3. 설치
 
 ```bash
 npm install @gsainfoteam/ids-css tailwindcss
