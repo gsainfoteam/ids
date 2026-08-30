@@ -4,19 +4,12 @@ IDS Flutter 컴포넌트 라이브러리.
 
 ## 설치
 
-pub.dev에 배포하지 않는다. `pubspec.yaml`에서 git dependency로 참조한다.
+`pubspec.yaml`에 추가한다.
 
 ```yaml
 dependencies:
-  ids_flutter:
-    git:
-      url: https://github.com/gsainfoteam/ids.git
-      path: packages/flutter
-      ref: v0.1.0
+  ids_flutter: ^0.1.0
 ```
-
-`ref`는 릴리스 태그다. 생략하면 `main`을 따라가므로 항상 태그를 고정한다.
-퍼블릭 레포라 토큰은 필요 없다.
 
 ```bash
 flutter pub get
