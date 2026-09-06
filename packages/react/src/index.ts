@@ -36,3 +36,4 @@ export { Spinner } from './components/spinner';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export { Label } from './components/label';
+export { Kbd } from './components/kbd';
