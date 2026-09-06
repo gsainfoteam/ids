@@ -32,8 +32,13 @@ export { IconToggle } from './components/icon-toggle';
 export { ToggleGroup } from './components/toggle-group';
 export { TextField } from './components/text-field';
 export { TextFieldGroup } from './components/text-field-group';
-export { Spinner } from './components/spinner';
 
-export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
+export { Spinner } from './components/spinner';
 export { Label } from './components/label';
 export { Kbd } from './components/kbd';
+
+export { Divider } from './components/divider';
+export { Spacer } from './components/spacer';
+export { AspectRatio } from './components/aspect-ratio';
+
+export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
