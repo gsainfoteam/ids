@@ -35,3 +35,4 @@ export { TextFieldGroup } from './components/text-field-group';
 export { Divider } from './components/divider';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
+export { Spacer } from './components/spacer';
