@@ -35,3 +35,4 @@ export { TextFieldGroup } from './components/text-field-group';
 export { Spinner } from './components/spinner';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
+export { Label } from './components/label';
