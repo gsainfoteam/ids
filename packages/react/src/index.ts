@@ -36,3 +36,4 @@ export { Divider } from './components/divider';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export { Spacer } from './components/spacer';
+export { AspectRatio } from './components/aspect-ratio';
