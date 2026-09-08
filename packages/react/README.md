@@ -170,6 +170,33 @@ import { Button } from '@gsainfoteam/ids-react';
 | `size` | `'standard' \| 'tiny'` | `'standard'` |
 | `disabled` | `boolean` | `false` |
 
+### Spinner
+
+부모의 글자색을 상속하는 로딩 표시다. `standard`는 20px, `tiny`는 16px이며
+모션 감소 설정에서는 회전을 멈춘다. 네이티브 span 속성과 ref를 전달할 수 있다.
+
+```tsx
+import { Button, Spinner } from '@gsainfoteam/ids-react';
+
+// 단독 사용: role="status"와 스크린 리더 텍스트를 제공한다.
+<Spinner label="불러오는 중" />
+
+// 이미 로딩 텍스트가 있는 버튼: Spinner의 중복 알림을 생략한다.
+<Button disabled aria-busy="true">
+  <Spinner decorative />
+  저장 중
+</Button>
+```
+
+| prop | 타입 | 기본값 | 설명 |
+|---|---|---|---|
+| `size` | `'standard' \| 'tiny'` | `'standard'` | 표시 크기 |
+| `label` | `string` | `'Loading'` | 스크린 리더용 로딩 텍스트 |
+| `decorative` | `boolean` | `false` | `true`이면 접근성 트리에서 숨김 |
+
+단독 사용 시 비어 있지 않은 `label`을 사용한다. `decorative`는 버튼 텍스트나
+`IconButton`의 `aria-label` 등 다른 요소가 로딩 상태를 설명할 때 사용한다.
+
 ## 개발
 
 ```bash
