@@ -2,6 +2,7 @@ import type { ComponentProps, KeyboardEvent, ReactNode } from 'react';
 
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
 import { tv } from '../../utils';
+import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 export function Card(props: Card.Props) {
@@ -39,7 +40,7 @@ export function Card(props: Card.Props) {
 export namespace Card {
   export const Style = tv({
     slots: {
-      root: 'flex flex-col rounded-xl text-(--ids-color-on-surface)',
+      root: 'flex flex-col rounded-lg text-(--ids-color-on-surface)',
       header: 'flex flex-col gap-1 p-4',
       content: 'flex flex-1 flex-col gap-2 p-4 pt-0',
       footer: 'flex items-center gap-2 p-4 pt-0',
@@ -56,10 +57,10 @@ export namespace Card {
       interactive: {
         true: {
           root: [
-            'cursor-pointer transition-all select-none',
+            'cursor-pointer select-none transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
             'data-hovered:bg-(--ids-color-primary)/10',
             'data-active:bg-(--ids-color-primary)/15',
-            'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
+            focusRing.data,
             'motion-reduce:transition-none',
           ],
         },

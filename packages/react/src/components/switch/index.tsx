@@ -1,6 +1,7 @@
 import type { ChangeEvent, ComponentProps } from 'react';
 
 import { invariant, tv } from '../../utils';
+import { focusRing } from '../focus-ring';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -29,13 +30,13 @@ export function Switch({ size = 'standard', onChange, className, ...rest }: Swit
 export namespace Switch {
   export const Style = tv({
     slots: {
-      root: 'relative inline-flex shrink-0 items-center align-middle has-disabled:opacity-40',
+      root: 'relative inline-flex shrink-0 items-center align-middle has-disabled:opacity-50',
       track: [
-        'peer appearance-none rounded-full',
-        'cursor-pointer transition-colors disabled:cursor-not-allowed',
+        'peer appearance-none rounded-full shadow-xs',
+        'cursor-pointer transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) disabled:cursor-not-allowed',
         'bg-(--ids-color-muted) inset-ring-1 inset-ring-(--ids-color-outline)',
         'checked:bg-(--ids-color-primary) checked:inset-ring-(--ids-color-primary)',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ids-color-primary)',
+        focusRing.native,
         'motion-reduce:transition-none',
       ],
       thumb: [

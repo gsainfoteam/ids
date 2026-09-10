@@ -4,6 +4,7 @@ import type { ChangeEvent, ComponentProps, ReactNode } from 'react';
 import { CheckIcon, MinusIcon } from '@heroicons/react/16/solid';
 
 import { invariant, mergeRefs, tv } from '../../utils';
+import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -56,15 +57,15 @@ export function Checkbox({
 export namespace Checkbox {
   export const Style = tv({
     slots: {
-      root: 'relative inline-grid shrink-0 align-middle has-disabled:opacity-40',
+      root: 'relative inline-grid shrink-0 align-middle has-disabled:opacity-50',
       box: [
-        'peer col-start-1 row-start-1 size-full appearance-none rounded-md',
-        'cursor-pointer transition-[background-color,box-shadow] disabled:cursor-not-allowed',
+        'peer col-start-1 row-start-1 size-full appearance-none rounded-xs shadow-xs',
+        'cursor-pointer transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) disabled:cursor-not-allowed',
         'inset-ring-1 inset-ring-(--ids-color-outline)',
         'enabled:hover:bg-(--ids-color-primary)/10',
         'checked:bg-(--checkbox-fill) checked:inset-ring-(--checkbox-fill)',
         'indeterminate:bg-(--checkbox-fill) indeterminate:inset-ring-(--checkbox-fill)',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ids-color-primary)',
+        focusRing.native,
         'motion-reduce:transition-none',
       ],
       indicator: [

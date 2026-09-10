@@ -68,6 +68,27 @@ variant system and duplicates the variant keys.
 Colors that a variant fans out to several parts go through a CSS custom property
 (`[--chip-accent:var(--ids-color-primary)]`) rather than one class per part-and-scheme pair.
 
+**Tailwind only generates classes it can see as literal text in a source file.** A class assembled
+at runtime never reaches the stylesheet, and the failure is silent — the class lands in the DOM
+and does nothing.
+
+```tsx
+const halo = (p: string) => `${p}ring-[3px]`; // never generated
+export const focusRing = { native: 'focus-visible:ring-[3px]' }; // fine, it is literal
+```
+
+Shared style fragments (`focus-ring.ts`, `control-surface.ts`) therefore spell every variant out
+in full rather than composing prefixes.
+
+**Focus is a soft ring, never an offset outline.** Use `focusRing.native` for real form controls,
+`focusRing.data` for components driven by `useInteractive`, and `focusRing.textField` for the
+group shell. The border stays an `inset-ring`, so the focus `ring` sits outside it without
+shifting layout.
+
+**Radius comes from the token scale.** `rounded-*` resolves to `--ids-radius-*`: controls take
+`md`, surfaces (Card, Alert, Accordion, Item) take `lg`, small boxes take `xs`, pills take `full`.
+Do not hardcode `rounded-[10px]`.
+
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
 

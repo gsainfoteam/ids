@@ -4,6 +4,7 @@ import type { ComponentProps, KeyboardEvent, MouseEvent, ReactNode } from 'react
 import { XMarkIcon } from '@heroicons/react/16/solid';
 
 import { tv } from '../../utils';
+import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 const ASSERTIVE_VARIANTS = new Set(['warning', 'danger']);
@@ -51,7 +52,7 @@ export namespace Alert {
   export const Style = tv({
     slots: {
       root: [
-        'grid w-full items-start gap-y-0.5 rounded-xl px-4 py-3 inset-ring-1',
+        'grid w-full items-start gap-y-0.5 rounded-lg px-4 py-3 inset-ring-1',
         'bg-(--alert-tint)/8 text-(--ids-color-on-surface) inset-ring-(--alert-tint)/25',
       ],
       icon: [
@@ -62,10 +63,10 @@ export namespace Alert {
       description: 'text-body-b3-regular text-(--ids-color-on-muted)',
       actions: 'mt-2 flex items-center gap-2',
       close: [
-        'inline-flex h-[1lh] w-6 shrink-0 cursor-pointer items-center justify-center rounded-lg',
+        'inline-flex h-[1lh] w-6 shrink-0 cursor-pointer items-center justify-center rounded-sm',
         'text-subtitle-s2-semibold',
         'opacity-60 transition-opacity hover:opacity-100',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current',
+        focusRing.native,
         'motion-reduce:transition-none',
         '[&_svg]:size-4',
       ],

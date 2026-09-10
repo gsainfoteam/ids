@@ -2,6 +2,7 @@ import type { ComponentProps, KeyboardEvent, ReactNode } from 'react';
 
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
 import { tv } from '../../utils';
+import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -42,7 +43,7 @@ export function Item(props: Item.Props) {
 export namespace Item {
   export const Style = tv({
     slots: {
-      root: 'flex w-full items-center rounded-xl bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+      root: 'flex w-full items-center rounded-lg bg-(--ids-color-surface) text-(--ids-color-on-surface)',
       media:
         'inline-flex shrink-0 items-center justify-center text-(--ids-color-on-muted) [&_svg]:size-5',
       content: 'flex min-w-0 flex-1 flex-col',
@@ -58,11 +59,11 @@ export namespace Item {
       interactive: {
         true: {
           root: [
-            'cursor-pointer transition-all select-none',
+            'cursor-pointer select-none transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
             'data-hovered:bg-(--ids-color-primary)/10',
             'data-active:bg-(--ids-color-primary)/15',
             'data-selected:bg-(--ids-color-primary)/15',
-            'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
+            focusRing.data,
             'motion-reduce:transition-none',
           ],
         },

@@ -3,6 +3,7 @@ import type { ComponentProps, KeyboardEvent, ReactNode } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { invariant, tv } from '../../utils';
+import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -126,11 +127,12 @@ export namespace Accordion {
       root: 'flex w-full flex-col',
       item: 'flex flex-col',
       trigger: [
-        'flex w-full cursor-pointer items-center gap-2 text-left transition-colors select-none',
+        'flex w-full cursor-pointer items-center gap-2 text-left select-none',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
         'text-(--ids-color-on-surface)',
         'hover:bg-(--ids-color-primary)/10',
-        'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--ids-color-primary)',
-        'disabled:cursor-not-allowed disabled:opacity-40',
+        focusRing.native,
+        'disabled:cursor-not-allowed disabled:opacity-50',
         'motion-reduce:transition-none',
       ],
       indicator: [
@@ -147,11 +149,11 @@ export namespace Accordion {
     variants: {
       variant: {
         bordered: {
-          root: 'overflow-hidden rounded-xl inset-ring-1 inset-ring-(--ids-color-outline) [&>*+*]:border-t [&>*+*]:border-(--ids-color-outline)',
+          root: 'overflow-hidden rounded-lg inset-ring-1 inset-ring-(--ids-color-outline) [&>*+*]:border-t [&>*+*]:border-(--ids-color-outline)',
         },
         separated: {
           root: 'gap-2',
-          item: 'overflow-hidden rounded-xl inset-ring-1 inset-ring-(--ids-color-outline)',
+          item: 'overflow-hidden rounded-lg inset-ring-1 inset-ring-(--ids-color-outline)',
         },
         ghost: {},
       },
