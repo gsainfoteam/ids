@@ -45,6 +45,7 @@ export { Switch } from './components/switch';
 export { Radio } from './components/radio';
 export { RadioGroup } from './components/radio-group';
 export { CheckboxGroup } from './components/checkbox-group';
+export { Slider } from './components/slider';
 export { TextField } from './components/text-field';
 export { TextFieldGroup } from './components/text-field-group';
 
