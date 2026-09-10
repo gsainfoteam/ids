@@ -1,6 +1,5 @@
 import { useState, type ComponentProps, type ComponentType } from 'react';
 
-import { XMarkIcon } from '@heroicons/react/24/outline';
 import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
@@ -134,9 +133,7 @@ export const Dismissible: Story = {
       <Alert variant="warning">
         <Alert.Title>세션 만료 임박</Alert.Title>
         <Alert.Description>5분 뒤 자동 로그아웃됩니다.</Alert.Description>
-        <Alert.Close onClose={() => setShown(false)}>
-          <XMarkIcon />
-        </Alert.Close>
+        <Alert.Close onClose={() => setShown(false)} />
       </Alert>
     ) : (
       <p data-testid="closed">닫혔습니다.</p>
@@ -158,9 +155,7 @@ export const EscapeCloses: Story = {
         <Alert.Actions>
           <Button size="tiny">다시 시도</Button>
         </Alert.Actions>
-        <Alert.Close onClose={() => setShown(false)}>
-          <XMarkIcon />
-        </Alert.Close>
+        <Alert.Close onClose={() => setShown(false)} />
       </Alert>
     ) : (
       <p data-testid="closed">닫혔습니다.</p>
@@ -180,9 +175,7 @@ export const CustomClose: Story = {
     return shown ? (
       <Alert variant="neutral">
         <Alert.Title>공지</Alert.Title>
-        <Alert.Close aria-label="공지 닫기" onClose={() => setShown(false)}>
-          <XMarkIcon />
-        </Alert.Close>
+        <Alert.Close aria-label="공지 닫기" onClose={() => setShown(false)} />
       </Alert>
     ) : (
       <p data-testid="closed">닫혔습니다.</p>

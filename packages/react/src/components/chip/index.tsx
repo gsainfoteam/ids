@@ -1,5 +1,7 @@
 import type { ComponentProps, KeyboardEvent, MouseEvent, ReactNode } from 'react';
 
+import { XMarkIcon } from '@heroicons/react/16/solid';
+
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
 import { invariant, tv } from '../../utils';
@@ -149,8 +151,6 @@ export namespace Chip {
   }
 
   export function Close({ onClose, children, className, ...rest }: CloseProps) {
-    invariant(children != null, '`<Chip.Close>` requires an icon as its `children`.');
-
     return (
       <button
         type="button"
@@ -162,7 +162,7 @@ export namespace Chip {
           onClose(event);
         }}
       >
-        {children}
+        {children ?? <XMarkIcon />}
       </button>
     );
   }
@@ -177,7 +177,7 @@ export namespace Chip {
     'className' | 'children' | 'onClick' | 'type'
   > & {
     onClose: (event: MouseEvent<HTMLButtonElement>) => void;
-    children: ReactNode;
+    children?: ReactNode;
     className?: string;
   };
 

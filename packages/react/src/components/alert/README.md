@@ -50,13 +50,10 @@ WCAG AA(4.5:1)를 못 넘기기 때문이다.
   shown && (
     <Alert variant="warning">
       <Alert.Title>세션 만료 임박</Alert.Title>
-      <Alert.Close onClose={() => setShown(false)}>
-        <XMarkIcon />
-      </Alert.Close>
+      <Alert.Close onClose={() => setShown(false)} />
     </Alert>
   );
 }
 ```
 
-`children`은 필수다. IDS는 아이콘 세트를 들고 다니지 않는다 — `IconButton`이 `icon`을
-요구하는 것과 같다. 빠뜨리면 `IdsError`를 던진다.
+글리프는 기본이 X 아이콘이다. 바꾸려면 `children`으로 넘긴다.

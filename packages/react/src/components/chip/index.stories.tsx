@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { CheckIcon } from '@heroicons/react/24/outline';
 import { expect, userEvent } from 'storybook/test';
 
 import { Chip } from '.';
@@ -126,9 +126,7 @@ export const Removable: Story = {
             <Chip.Close
               aria-label={`${tag} 삭제`}
               onClose={() => setTags((prev) => prev.filter((t) => t !== tag))}
-            >
-              <XMarkIcon />
-            </Chip.Close>
+            />
           </Chip>
         ))}
       </div>
@@ -150,9 +148,7 @@ export const CloseDoesNotToggle: Story = {
       <div className="flex items-center gap-2">
         <Chip colorScheme="primary" selected={selected} onSelectedChange={setSelected}>
           <Chip.Label>태그</Chip.Label>
-          <Chip.Close aria-label="태그 삭제" onClose={() => setClosed((prev) => prev + 1)}>
-            <XMarkIcon />
-          </Chip.Close>
+          <Chip.Close aria-label="태그 삭제" onClose={() => setClosed((prev) => prev + 1)} />
         </Chip>
         <output data-testid="state">
           {String(selected)} / {closed}

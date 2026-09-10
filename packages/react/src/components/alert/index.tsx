@@ -1,7 +1,9 @@
 import { Children, isValidElement } from 'react';
 import type { ComponentProps, KeyboardEvent, MouseEvent, ReactNode } from 'react';
 
-import { invariant, tv } from '../../utils';
+import { XMarkIcon } from '@heroicons/react/16/solid';
+
+import { tv } from '../../utils';
 import { Slot } from '../slot';
 
 const ASSERTIVE_VARIANTS = new Set(['warning', 'danger']);
@@ -119,8 +121,6 @@ export namespace Alert {
   }
 
   export function Close({ onClose, children, className, ...rest }: CloseProps) {
-    invariant(children != null, '`<Alert.Close>` requires an icon as its `children`.');
-
     return (
       <button
         type="button"
@@ -132,7 +132,7 @@ export namespace Alert {
           onClose(event);
         }}
       >
-        {children}
+        {children ?? <XMarkIcon />}
       </button>
     );
   }
@@ -147,7 +147,7 @@ export namespace Alert {
     'className' | 'children' | 'onClick' | 'type'
   > & {
     onClose: (event: MouseEvent<HTMLButtonElement>) => void;
-    children: ReactNode;
+    children?: ReactNode;
     className?: string;
   };
 
