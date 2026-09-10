@@ -29,7 +29,7 @@ export function Avatar({
   children,
   ...rest
 }: Avatar.Props) {
-  const [failed, setFailed] = useState(false);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
   const fallback = Children.toArray(children).find(
     (child) => isValidElement(child) && child.type === Avatar.Fallback,
@@ -50,13 +50,13 @@ export function Avatar({
       {...rest}
       className={Avatar.Style({ variant, size, className })}
     >
-      {src != null && !failed ? (
+      {src != null && failedSrc !== src ? (
         <img
           src={src}
           alt=""
           loading="lazy"
           className="size-full object-cover"
-          onError={() => setFailed(true)}
+          onError={() => setFailedSrc(src)}
         />
       ) : (
         (fallback ?? <Avatar.Fallback>{initials}</Avatar.Fallback>)
