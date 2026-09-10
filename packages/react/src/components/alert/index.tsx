@@ -4,7 +4,6 @@ import type { ComponentProps, KeyboardEvent, MouseEvent, ReactNode } from 'react
 import { XMarkIcon } from '@heroicons/react/16/solid';
 
 import { tv } from '../../utils';
-import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 const ASSERTIVE_VARIANTS = new Set(['warning', 'danger']);
@@ -66,7 +65,7 @@ export namespace Alert {
         'inline-flex h-[1lh] w-6 shrink-0 cursor-pointer items-center justify-center rounded-sm',
         'text-subtitle-s2-semibold',
         'opacity-60 transition-opacity hover:opacity-100',
-        focusRing.native,
+        'focus-ring',
         'motion-reduce:transition-none',
         '[&_svg]:size-4',
       ],

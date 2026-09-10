@@ -1,5 +1,3 @@
-import { focusRing } from './focus-ring';
-
 import type { IdsSize, IdsVariant } from '../tokens/types';
 
 export const controlSurface = {
@@ -7,7 +5,7 @@ export const controlSurface = {
     'inline-flex items-center justify-center gap-2 select-none',
     'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
     'cursor-pointer data-disabled:cursor-not-allowed',
-    focusRing.data,
+    'focus-ring',
     'data-disabled:opacity-50',
     'motion-reduce:transition-none',
   ],

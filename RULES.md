@@ -80,10 +80,11 @@ export const focusRing = { native: 'focus-visible:ring-[3px]' }; // fine, it is 
 Shared style fragments (`focus-ring.ts`, `control-surface.ts`) therefore spell every variant out
 in full rather than composing prefixes.
 
-**Focus is a soft ring, never an offset outline.** Use `focusRing.native` for real form controls,
-`focusRing.data` for components driven by `useInteractive`, and `focusRing.textField` for the
-group shell. The border stays an `inset-ring`, so the focus `ring` sits outside it without
-shifting layout.
+**Focus is a soft ring, never an offset outline.** Add the `focus-ring` class. It is a single
+`@utility` in the CSS package that covers every trigger IDS uses — `:focus-visible` for real form
+controls, `[data-focus-visible]` for components driven by `useInteractive`, and
+`:has([data-text-field]:focus-visible)` for a shell wrapping a field. Borders stay `inset-ring`,
+so the focus ring sits outside them and composes with `shadow-xs` instead of replacing it.
 
 **Radius comes from the token scale.** `rounded-*` resolves to `--ids-radius-*`: controls take
 `md`, surfaces (Card, Alert, Accordion, Item) take `lg`, small boxes take `xs`, pills take `full`.

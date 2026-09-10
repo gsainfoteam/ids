@@ -4,7 +4,6 @@ import type { ChangeEvent, ComponentProps, ReactNode } from 'react';
 import { CheckIcon, MinusIcon } from '@heroicons/react/16/solid';
 
 import { invariant, mergeRefs, tv } from '../../utils';
-import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -65,7 +64,7 @@ export namespace Checkbox {
         'enabled:hover:bg-(--ids-color-primary)/10',
         'checked:bg-(--checkbox-fill) checked:inset-ring-(--checkbox-fill)',
         'indeterminate:bg-(--checkbox-fill) indeterminate:inset-ring-(--checkbox-fill)',
-        focusRing.native,
+        'focus-ring',
         'motion-reduce:transition-none',
       ],
       indicator: [

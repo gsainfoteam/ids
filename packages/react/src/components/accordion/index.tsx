@@ -3,7 +3,6 @@ import type { ComponentProps, KeyboardEvent, ReactNode } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { invariant, tv } from '../../utils';
-import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -131,7 +130,7 @@ export namespace Accordion {
         'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
         'text-(--ids-color-on-surface)',
         'hover:bg-(--ids-color-primary)/10',
-        focusRing.native,
+        'focus-ring',
         'disabled:cursor-not-allowed disabled:opacity-50',
         'motion-reduce:transition-none',
       ],

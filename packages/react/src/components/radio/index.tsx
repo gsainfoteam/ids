@@ -1,7 +1,6 @@
 import type { ChangeEvent, ComponentProps } from 'react';
 
 import { invariant, tv } from '../../utils';
-import { focusRing } from '../focus-ring';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -43,7 +42,7 @@ export namespace Radio {
         'bg-(--ids-color-surface) inset-ring-1 inset-ring-(--ids-color-outline)',
         'enabled:hover:bg-(--ids-color-primary)/10',
         'checked:inset-ring-2 checked:inset-ring-(--radio-fill)',
-        focusRing.native,
+        'focus-ring',
         'motion-reduce:transition-none',
       ],
       dot: [

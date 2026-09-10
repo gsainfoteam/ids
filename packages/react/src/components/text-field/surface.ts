@@ -1,8 +1,6 @@
 import { createContext, useContext, type Ref } from 'react';
 
 import { tv, type VariantProps } from '../../utils';
-import { focusRing } from '../focus-ring';
-
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -49,12 +47,12 @@ export const textFieldSurface = tv({
     {
       as: 'field',
       variant: 'outline',
-      class: focusRing.native,
+      class: 'focus-ring',
     },
     {
       as: 'field',
       variant: 'filled',
-      class: ['focus-visible:bg-(--ids-color-primary)/15', focusRing.native],
+      class: ['focus-visible:bg-(--ids-color-primary)/15', 'focus-ring'],
     },
     {
       as: 'field',
@@ -64,15 +62,12 @@ export const textFieldSurface = tv({
     {
       as: 'group',
       variant: 'outline',
-      class: focusRing.textField,
+      class: 'focus-ring',
     },
     {
       as: 'group',
       variant: 'filled',
-      class: [
-        'has-[[data-text-field]:focus-visible]:bg-(--ids-color-primary)/15',
-        focusRing.textField,
-      ],
+      class: ['has-[[data-text-field]:focus-visible]:bg-(--ids-color-primary)/15', 'focus-ring'],
     },
     {
       as: 'group',

@@ -2,7 +2,6 @@ import type { ComponentProps, KeyboardEvent, ReactNode } from 'react';
 
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
 import { tv } from '../../utils';
-import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 export function Card(props: Card.Props) {
@@ -60,7 +59,7 @@ export namespace Card {
             'cursor-pointer select-none transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
             'data-hovered:bg-(--ids-color-primary)/10',
             'data-active:bg-(--ids-color-primary)/15',
-            focusRing.data,
+            'focus-ring',
             'motion-reduce:transition-none',
           ],
         },

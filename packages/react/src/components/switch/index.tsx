@@ -1,7 +1,6 @@
 import type { ChangeEvent, ComponentProps } from 'react';
 
 import { invariant, tv } from '../../utils';
-import { focusRing } from '../focus-ring';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -36,7 +35,7 @@ export namespace Switch {
         'cursor-pointer transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) disabled:cursor-not-allowed',
         'bg-(--ids-color-muted) inset-ring-1 inset-ring-(--ids-color-outline)',
         'checked:bg-(--ids-color-primary) checked:inset-ring-(--ids-color-primary)',
-        focusRing.native,
+        'focus-ring',
         'motion-reduce:transition-none',
       ],
       thumb: [

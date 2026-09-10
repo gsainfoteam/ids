@@ -2,7 +2,6 @@ import type { ComponentProps, KeyboardEvent, ReactNode } from 'react';
 
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
 import { tv } from '../../utils';
-import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -63,7 +62,7 @@ export namespace Item {
             'data-hovered:bg-(--ids-color-primary)/10',
             'data-active:bg-(--ids-color-primary)/15',
             'data-selected:bg-(--ids-color-primary)/15',
-            focusRing.data,
+            'focus-ring',
             'motion-reduce:transition-none',
           ],
         },

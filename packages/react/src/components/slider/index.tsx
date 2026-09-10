@@ -3,7 +3,6 @@ import type { ComponentProps, KeyboardEvent, PointerEvent } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { invariant, tv } from '../../utils';
-import { focusRing } from '../focus-ring';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -194,7 +193,7 @@ export namespace Slider {
         'absolute rounded-full bg-(--ids-color-surface) shadow-sm',
         'inset-ring-2 inset-ring-(--ids-color-primary)',
         'transition-[box-shadow] motion-reduce:transition-none',
-        focusRing.native,
+        'focus-ring',
       ],
       marksRoot: 'relative',
       mark: 'absolute text-caption-c2-regular text-(--ids-color-on-muted)',

@@ -5,7 +5,6 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
 import { invariant, tv } from '../../utils';
-import { focusRing } from '../focus-ring';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -85,7 +84,7 @@ export namespace Chip {
       close: [
         'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full',
         'opacity-60 transition-opacity hover:opacity-100',
-        focusRing.native,
+        'focus-ring',
         '[&_svg]:size-[1em]',
       ],
     },
@@ -125,7 +124,7 @@ export namespace Chip {
             'cursor-pointer select-none transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
             'data-hovered:bg-(--chip-tint)/25',
             'data-selected:bg-(--chip-fill) data-selected:text-(--chip-on-fill)',
-            focusRing.data,
+            'focus-ring',
             'motion-reduce:transition-none',
           ],
         },

@@ -56,6 +56,16 @@
   --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
 }
 
+@utility focus-ring {
+  outline: none;
+
+  &:focus-visible,
+  &[data-focus-visible],
+  &:has([data-text-field]:focus-visible) {
+    @apply ring-[3px] ring-(--ids-color-primary)/40;
+  }
+}
+
 :root {
   --ids-text-headline-h1-bold: 48px;
   --ids-text-headline-h1-bold--font-weight: 700;

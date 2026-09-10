@@ -290,6 +290,19 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 }
 `;
 
+// One definition for every focus trigger IDS uses: real form controls, components
+// driven by useInteractive, and a shell that wraps a focusable field.
+const T_CSS_UTILITIES = `@utility focus-ring {
+  outline: none;
+
+  &:focus-visible,
+  &[data-focus-visible],
+  &:has([data-text-field]:focus-visible) {
+    @apply ring-[3px] ring-(--ids-color-primary)/40;
+  }
+}
+`;
+
 // :root { --ids-text-button-standard: ...; --ids-font-size-h1: ... }
 // @theme { --text-button-standard: var(--ids-text-button-standard); --font-weight-semibold: ... }
 const buildTypographyCSS = (dictionary) => {
@@ -341,6 +354,7 @@ const cssFormatter = ({ dictionary }) =>
     buildColorBridgeCSS(dictionary),
     buildStaticCSS(dictionary),
     T_CSS_ANIMATIONS,
+    T_CSS_UTILITIES,
     buildTypographyCSS(dictionary),
     ...colorPairs.map(([c, m]) =>
       buildColorThemeCSS(
