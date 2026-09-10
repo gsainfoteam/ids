@@ -263,8 +263,10 @@ const buildColorBridgeCSS = (dictionary) => {
 
 // :root { --ids-motion-fast: 150ms; ... }
 const buildStaticCSS = (dictionary) => {
-  const motion = byCategory(dictionary, "motion");
-  return `:root {\n${motion.map((t) => `  ${idsVar("motion", t)}: ${toVal(t)};`).join("\n")}\n}\n`;
+  const lines = ["motion", "scale"].flatMap((cat) =>
+    byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
+  );
+  return `:root {\n${lines.join("\n")}\n}\n`;
 };
 
 // :root { --ids-text-button-standard: ...; --ids-font-size-h1: ... }

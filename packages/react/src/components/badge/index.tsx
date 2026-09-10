@@ -101,7 +101,7 @@ export namespace Badge {
         true: [
           'cursor-pointer transition-all select-none',
           'data-hovered:bg-(--badge-accent)/25',
-          'data-active:scale-[0.96]',
+          'data-active:scale-(--ids-scale-pressed-strong)',
           'data-selected:bg-(--badge-fill) data-selected:text-(--badge-on-fill)',
           'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
           'motion-reduce:transition-none motion-reduce:data-active:scale-100',

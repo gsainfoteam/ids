@@ -22,6 +22,9 @@
   --ids-motion-fast: 150ms;
   --ids-motion-normal: 250ms;
   --ids-motion-slow: 400ms;
+  --ids-scale-pressed: 0.98;
+  --ids-scale-pressed-subtle: 0.99;
+  --ids-scale-pressed-strong: 0.96;
 }
 
 :root {

@@ -50,7 +50,7 @@ export namespace Card {
         true: [
           'cursor-pointer transition-all select-none',
           'data-hovered:bg-(--ids-color-primary)/10',
-          'data-active:scale-[0.99] data-active:bg-(--ids-color-primary)/15',
+          'data-active:scale-(--ids-scale-pressed-subtle) data-active:bg-(--ids-color-primary)/15',
           'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
           'motion-reduce:transition-none motion-reduce:data-active:scale-100',
         ],
