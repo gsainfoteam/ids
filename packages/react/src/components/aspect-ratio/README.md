@@ -15,6 +15,6 @@ import { AspectRatio } from '@gsainfoteam/ids-react';
 자식은 내부 absolute 영역에 배치되므로 콘텐츠의 원래 크기가 바깥 비율을 늘리지 않는다.
 
 미디어 크기와 자르기 방식은 자식의 className으로 지정한다. 넘치는 콘텐츠는 기본적으로
-보이며, 잘라야 할 때만 루트에 `overflow-hidden`을 추가한다. 포커스 표시가 잘리지 않도록
-인터랙티브 콘텐츠에는 주의한다. native div 속성과 ref는 바깥 컨테이너에 전달된다.
+보이며, 잘라야 할 때만 루트에 `overflow-hidden`을 추가한다. 포커스 표시가 잘릴 수 있으므로
+인터랙티브 콘텐츠를 넣을 때는 주의한다. native div 속성과 ref는 바깥 컨테이너에 전달된다.
 명시한 style은 내부 aspectRatio보다 우선하며, 고정 height를 주면 비율 유지가 해제될 수 있다.
