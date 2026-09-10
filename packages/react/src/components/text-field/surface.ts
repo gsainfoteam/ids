@@ -1,8 +1,8 @@
 import { createContext, useContext, type Ref } from 'react';
 
+import { tv, type VariantProps } from '../../utils';
 import { focusRing } from '../focus-ring';
 
-import { tv, type VariantProps } from '../../utils';
 
 import type { IdsSize } from '../../tokens/types';
 
