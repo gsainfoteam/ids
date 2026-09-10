@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ChevronDownIcon, UserIcon } from '@heroicons/react/24/outline';
 import { expect, userEvent } from 'storybook/test';
 
-import { Badge } from '../badge';
+import { Chip } from '../chip';
 
 import { Accordion } from '.';
 
@@ -234,9 +234,9 @@ export const RichTrigger: Story = {
         <Accordion.Trigger>
           <UserIcon className="size-4" />
           프로필 설정
-          <Badge size="tiny" colorScheme="primary">
+          <Chip size="tiny" colorScheme="primary">
             2
-          </Badge>
+          </Chip>
           <Accordion.Indicator>
             <ChevronDownIcon />
           </Accordion.Indicator>

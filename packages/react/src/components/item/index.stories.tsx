@@ -12,7 +12,7 @@ import { expect, userEvent } from 'storybook/test';
 
 import { Avatar } from '../avatar';
 import { AvatarGroup } from '../avatar-group';
-import { Badge } from '../badge';
+import { Chip } from '../chip';
 import { IconButton } from '../icon-button';
 import { Kbd } from '../kbd';
 
@@ -92,9 +92,9 @@ export const AvatarGroupAnchor: Story = {
         <Item.Description>토큰 정리 끝났습니다</Item.Description>
       </Item.Content>
       <Item.Actions>
-        <Badge colorScheme="danger" variant="solid" size="tiny">
+        <Chip colorScheme="danger" variant="solid" size="tiny">
           3
-        </Badge>
+        </Chip>
       </Item.Actions>
     </Item>
   ),

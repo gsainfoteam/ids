@@ -1,17 +1,17 @@
 import { useState } from 'react';
 
-import { BellIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { expect, userEvent } from 'storybook/test';
 
-import { Badge } from '.';
+import { Chip } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const COLOR_SCHEMES = ['neutral', 'primary', 'success', 'warning', 'danger', 'info'] as const;
 
-const meta: Meta<typeof Badge> = {
-  title: 'Components/Badge',
-  component: Badge,
+const meta: Meta<typeof Chip> = {
+  title: 'Components/Chip',
+  component: Chip,
   tags: ['autodocs'],
   args: { variant: 'soft', colorScheme: 'neutral', size: 'standard', children: 'Beta' },
   argTypes: {
@@ -22,7 +22,7 @@ const meta: Meta<typeof Badge> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof Badge>;
+type Story = StoryObj<typeof Chip>;
 
 export const Playground: Story = {
   play: async ({ canvas }) => {
@@ -38,9 +38,9 @@ export const ColorSchemes: Story = {
       {(['solid', 'soft', 'outline'] as const).map((variant) => (
         <div key={variant} className="flex flex-wrap items-center gap-2">
           {COLOR_SCHEMES.map((colorScheme) => (
-            <Badge key={colorScheme} variant={variant} colorScheme={colorScheme}>
+            <Chip key={colorScheme} variant={variant} colorScheme={colorScheme}>
               {colorScheme}
-            </Badge>
+            </Chip>
           ))}
         </div>
       ))}
@@ -51,37 +51,20 @@ export const ColorSchemes: Story = {
 export const Sizes: Story = {
   render: () => (
     <div className="flex items-center gap-2">
-      <Badge size="standard">standard</Badge>
-      <Badge size="tiny">tiny</Badge>
+      <Chip size="standard">standard</Chip>
+      <Chip size="tiny">tiny</Chip>
     </div>
   ),
 };
 
 export const WithIconAndLabel: Story = {
   render: () => (
-    <Badge colorScheme="success">
-      <Badge.Icon>
+    <Chip colorScheme="success">
+      <Chip.Icon>
         <CheckIcon />
-      </Badge.Icon>
-      <Badge.Label>Done</Badge.Label>
-    </Badge>
-  ),
-};
-
-export const AttachedCount: Story = {
-  render: () => (
-    <div className="relative inline-block p-2">
-      <BellIcon className="size-7" />
-      <Badge
-        colorScheme="danger"
-        variant="solid"
-        size="tiny"
-        className="absolute top-0 right-0"
-        aria-label="읽지 않은 알림 3개"
-      >
-        3
-      </Badge>
-    </div>
+      </Chip.Icon>
+      <Chip.Label>Done</Chip.Label>
+    </Chip>
   ),
 };
 
@@ -91,7 +74,7 @@ export const Clickable: Story = {
 
     return (
       <div className="flex items-center gap-2">
-        <Badge onClick={() => setClicks((prev) => prev + 1)}>Filter</Badge>
+        <Chip onClick={() => setClicks((prev) => prev + 1)}>Filter</Chip>
         <output data-testid="clicks">{clicks}</output>
       </div>
     );
@@ -115,9 +98,9 @@ export const Toggle: Story = {
     const [following, setFollowing] = useState(false);
 
     return (
-      <Badge colorScheme="primary" selected={following} onSelectedChange={setFollowing}>
+      <Chip colorScheme="primary" selected={following} onSelectedChange={setFollowing}>
         {following ? 'Following' : 'Follow'}
-      </Badge>
+      </Chip>
     );
   },
   play: async ({ canvas }) => {
@@ -138,15 +121,15 @@ export const Removable: Story = {
     return (
       <div className="flex flex-wrap gap-2">
         {tags.map((tag) => (
-          <Badge key={tag}>
-            <Badge.Label>{tag}</Badge.Label>
-            <Badge.Close
+          <Chip key={tag}>
+            <Chip.Label>{tag}</Chip.Label>
+            <Chip.Close
               aria-label={`${tag} 삭제`}
               onClose={() => setTags((prev) => prev.filter((t) => t !== tag))}
             >
               <XMarkIcon />
-            </Badge.Close>
-          </Badge>
+            </Chip.Close>
+          </Chip>
         ))}
       </div>
     );
@@ -165,12 +148,12 @@ export const CloseDoesNotToggle: Story = {
 
     return (
       <div className="flex items-center gap-2">
-        <Badge colorScheme="primary" selected={selected} onSelectedChange={setSelected}>
-          <Badge.Label>태그</Badge.Label>
-          <Badge.Close aria-label="태그 삭제" onClose={() => setClosed((prev) => prev + 1)}>
+        <Chip colorScheme="primary" selected={selected} onSelectedChange={setSelected}>
+          <Chip.Label>태그</Chip.Label>
+          <Chip.Close aria-label="태그 삭제" onClose={() => setClosed((prev) => prev + 1)}>
             <XMarkIcon />
-          </Badge.Close>
-        </Badge>
+          </Chip.Close>
+        </Chip>
         <output data-testid="state">
           {String(selected)} / {closed}
         </output>

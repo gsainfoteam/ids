@@ -7,7 +7,7 @@ import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
 
-export function Badge(props: Badge.Props) {
+export function Chip(props: Chip.Props) {
   const {
     props: {
       variant,
@@ -23,11 +23,11 @@ export function Badge(props: Badge.Props) {
     },
     handlers,
     dataProps,
-  } = useInteractiveProps<HTMLSpanElement, Badge.Props>(props);
+  } = useInteractiveProps<HTMLSpanElement, Chip.Props>(props);
 
   invariant(
     selectedProp == null || onSelectedChange != null,
-    '`<Badge>` `selected` requires `onSelectedChange`.',
+    '`<Chip>` `selected` requires `onSelectedChange`.',
   );
 
   const [selected, setSelected] = useControllableState({
@@ -64,14 +64,14 @@ export function Badge(props: Badge.Props) {
       {...rest}
       {...(isInteractive ? { onClick } : {})}
       {...(needsButtonSemantics ? { onKeyDown } : {})}
-      className={Badge.Style({ variant, colorScheme, size, interactive: isInteractive, className })}
+      className={Chip.Style({ variant, colorScheme, size, interactive: isInteractive, className })}
     >
       {children}
     </Root>
   );
 }
 
-export namespace Badge {
+export namespace Chip {
   export const Style = tv({
     base: 'inline-flex shrink-0 items-center gap-1 rounded-full align-middle',
     variants: {
@@ -128,7 +128,7 @@ export namespace Badge {
   }
 
   export function Close({ onClose, children, className, ...rest }: CloseProps) {
-    invariant(children != null, '`<Badge.Close>` requires an icon as its `children`.');
+    invariant(children != null, '`<Chip.Close>` requires an icon as its `children`.');
 
     return (
       <button
