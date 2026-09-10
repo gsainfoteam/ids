@@ -77,21 +77,21 @@ export namespace Chip {
     variants: {
       colorScheme: {
         neutral:
-          '[--badge-accent:var(--ids-color-on-surface)] [--badge-fill:var(--ids-color-muted)] [--badge-on-fill:var(--ids-color-on-surface)]',
+          '[--chip-tint:var(--ids-color-on-surface)] [--chip-accent:var(--ids-color-on-surface)] [--chip-fill:var(--ids-color-muted)] [--chip-on-fill:var(--ids-color-on-surface)]',
         primary:
-          '[--badge-accent:var(--ids-color-primary)] [--badge-fill:var(--ids-color-primary)] [--badge-on-fill:var(--ids-color-on-primary)]',
+          '[--chip-tint:var(--ids-color-primary)] [--chip-accent:var(--ids-color-primary)] [--chip-fill:var(--ids-color-primary)] [--chip-on-fill:var(--ids-color-on-primary)]',
         success:
-          '[--badge-accent:var(--ids-color-success)] [--badge-fill:var(--ids-color-success)] [--badge-on-fill:var(--ids-color-on-success)]',
+          '[--chip-tint:var(--ids-color-success)] [--chip-accent:var(--ids-color-success-strong)] [--chip-fill:var(--ids-color-success)] [--chip-on-fill:var(--ids-color-on-success)]',
         warning:
-          '[--badge-accent:var(--ids-color-warning)] [--badge-fill:var(--ids-color-warning)] [--badge-on-fill:var(--ids-color-on-warning)]',
+          '[--chip-tint:var(--ids-color-warning)] [--chip-accent:var(--ids-color-warning-strong)] [--chip-fill:var(--ids-color-warning)] [--chip-on-fill:var(--ids-color-on-warning)]',
         danger:
-          '[--badge-accent:var(--ids-color-danger)] [--badge-fill:var(--ids-color-danger)] [--badge-on-fill:var(--ids-color-on-danger)]',
-        info: '[--badge-accent:var(--ids-color-info)] [--badge-fill:var(--ids-color-info)] [--badge-on-fill:var(--ids-color-on-info)]',
+          '[--chip-tint:var(--ids-color-danger)] [--chip-accent:var(--ids-color-danger-strong)] [--chip-fill:var(--ids-color-danger)] [--chip-on-fill:var(--ids-color-on-danger)]',
+        info: '[--chip-tint:var(--ids-color-info)] [--chip-accent:var(--ids-color-info-strong)] [--chip-fill:var(--ids-color-info)] [--chip-on-fill:var(--ids-color-on-info)]',
       },
       variant: {
-        solid: 'bg-(--badge-fill) text-(--badge-on-fill)',
-        soft: 'bg-(--badge-accent)/15 text-(--badge-accent)',
-        outline: 'inset-ring-1 inset-ring-(--badge-accent)/40 text-(--badge-accent)',
+        solid: 'bg-(--chip-fill) text-(--chip-on-fill)',
+        soft: 'bg-(--chip-tint)/15 text-(--chip-accent)',
+        outline: 'inset-ring-1 inset-ring-(--chip-accent)/40 text-(--chip-accent)',
       },
       size: {
         standard: 'min-h-[22px] px-2 text-caption-c1-medium',
@@ -100,9 +100,9 @@ export namespace Chip {
       interactive: {
         true: [
           'cursor-pointer transition-all select-none',
-          'data-hovered:bg-(--badge-accent)/25',
+          'data-hovered:bg-(--chip-tint)/25',
           'data-active:scale-(--ids-scale-pressed-strong)',
-          'data-selected:bg-(--badge-fill) data-selected:text-(--badge-on-fill)',
+          'data-selected:bg-(--chip-fill) data-selected:text-(--chip-on-fill)',
           'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
           'motion-reduce:transition-none motion-reduce:data-active:scale-100',
         ],
