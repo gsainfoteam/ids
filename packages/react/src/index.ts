@@ -31,6 +31,7 @@ export { Alert } from './components/alert';
 export { Avatar, initialsOf } from './components/avatar';
 export { AvatarGroup } from './components/avatar-group';
 export { Item } from './components/item';
+export { Accordion } from './components/accordion';
 
 export { Button } from './components/button';
 export { IconButton } from './components/icon-button';
