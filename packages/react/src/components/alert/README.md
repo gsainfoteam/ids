@@ -42,18 +42,21 @@ WCAG AA(4.5:1)를 못 넘기기 때문이다.
 
 ## 닫기
 
-`dismissible`을 주면 우상단 닫기 버튼이 붙고, `onClose`가 호출된다. Alert 안쪽에 포커스가
-있을 때 `Escape`로도 닫힌다. 실제 제거는 부모의 몫이다 — Alert가 스스로 사라지지 않는다.
+`Alert.Close`를 넣으면 우상단에 닫기 버튼이 붙는다. Alert 안쪽에 포커스가 있을 때 `Escape`로도
+같은 버튼이 눌린다. 실제 제거는 부모의 몫이다 — Alert가 스스로 사라지지 않는다.
 
 ```tsx
 {
   shown && (
-    <Alert variant="warning" dismissible onClose={() => setShown(false)}>
+    <Alert variant="warning">
       <Alert.Title>세션 만료 임박</Alert.Title>
+      <Alert.Close onClose={() => setShown(false)}>
+        <XMarkIcon />
+      </Alert.Close>
     </Alert>
   );
 }
 ```
 
-버튼의 레이블이나 아이콘을 바꾸려면 `Alert.Close`를 직접 쓴다. 이때는 `dismissible`이
-필요 없다.
+`children`은 필수다. IDS는 아이콘 세트를 들고 다니지 않는다 — `IconButton`이 `icon`을
+요구하는 것과 같다. 빠뜨리면 `IdsError`를 던진다.

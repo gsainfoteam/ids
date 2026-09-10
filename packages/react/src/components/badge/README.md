@@ -33,13 +33,16 @@ import { Badge } from '@gsainfoteam/ids-react';
 </Badge>
 ```
 
-`Badge.Close`는 `onClose`가 필수고, 클릭을 부모 Badge로 전파하지 않는다. 실제 제거는 부모의
-몫이다 — Badge가 스스로 unmount하지 않는다.
+`Badge.Close`는 `onClose`와 `children`이 둘 다 필수고, 클릭을 부모 Badge로 전파하지 않는다.
+`children`이 필수인 것은 IDS가 아이콘 세트를 들고 다니지 않기 때문이다 — `IconButton`이
+`icon`을 요구하는 것과 같다. 실제 제거는 부모의 몫이다 — Badge가 스스로 unmount하지 않는다.
 
 ```tsx
 <Badge>
   <Badge.Label>frontend</Badge.Label>
-  <Badge.Close aria-label="frontend 삭제" onClose={() => removeTag('frontend')} />
+  <Badge.Close aria-label="frontend 삭제" onClose={() => removeTag('frontend')}>
+    <XMarkIcon />
+  </Badge.Close>
 </Badge>
 ```
 
@@ -50,7 +53,7 @@ Badge가 부착 위치를 직접 관리하지 않는다.
 
 ```tsx
 <div className="relative inline-block">
-  <BellIcon />
+  <BellIcon className="size-7" />
   <Badge colorScheme="danger" variant="solid" size="tiny" className="absolute top-0 right-0">
     3
   </Badge>

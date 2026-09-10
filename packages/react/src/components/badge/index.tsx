@@ -3,7 +3,6 @@ import type { ComponentProps, KeyboardEvent, MouseEvent, ReactNode } from 'react
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
 import { cn, invariant, tv } from '../../utils';
-import { CloseIcon } from '../close-icon';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -132,6 +131,8 @@ export namespace Badge {
   }
 
   export function Close({ onClose, children, className, ...rest }: CloseProps) {
+    invariant(children != null, '`<Badge.Close>` requires an icon as its `children`.');
+
     return (
       <button
         type="button"
@@ -150,7 +151,7 @@ export namespace Badge {
           onClose(event);
         }}
       >
-        {children ?? <CloseIcon />}
+        {children}
       </button>
     );
   }
@@ -160,8 +161,13 @@ export namespace Badge {
     className?: string;
   };
 
-  export type CloseProps = Omit<ComponentProps<'button'>, 'className' | 'onClick' | 'type'> & {
+  export type CloseProps = Omit<
+    ComponentProps<'button'>,
+    'className' | 'children' | 'onClick' | 'type'
+  > & {
     onClose: (event: MouseEvent<HTMLButtonElement>) => void;
+    /** The close glyph. IDS ships no icon set — pass your own, as `IconButton` does. */
+    children: ReactNode;
     className?: string;
   };
 

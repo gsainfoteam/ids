@@ -1,19 +1,14 @@
-import { Children, isValidElement, type ComponentProps, type KeyboardEvent, type MouseEvent, type ReactNode  } from 'react';
+import { Children, isValidElement } from 'react';
+import type { ComponentProps, KeyboardEvent, MouseEvent, ReactNode } from 'react';
 
-import { cn, tv } from '../../utils';
-import { CloseIcon } from '../close-icon';
+import { cn, invariant, tv } from '../../utils';
 import { Slot } from '../slot';
 
 const ASSERTIVE_VARIANTS = new Set(['warning', 'danger']);
 
-export function Alert({
-  variant = 'info',
-  dismissible = false,
-  onClose,
-  className,
-  children,
-  ...rest
-}: Alert.Props) {
+const CLOSE_ATTRIBUTE = 'data-alert-close';
+
+export function Alert({ variant = 'info', className, children, ...rest }: Alert.Props) {
   const assertive = ASSERTIVE_VARIANTS.has(variant);
 
   // Icon과 Close는 텍스트 열의 좌우에 붙는다. 나머지 자식만 열 안으로 넣어야 하므로
@@ -25,8 +20,14 @@ export function Alert({
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     rest.onKeyDown?.(event);
-    if (event.defaultPrevented || event.key !== 'Escape' || !dismissible) return;
-    onClose?.();
+    if (event.defaultPrevented || event.key !== 'Escape') return;
+
+    // 닫기 버튼을 그대로 누른 것으로 처리한다. onClose를 Alert에도 중복으로
+    // 받지 않으려는 것 — 닫는 방법은 Alert.Close 하나뿐이다.
+    const button = event.currentTarget.querySelector<HTMLButtonElement>(`[${CLOSE_ATTRIBUTE}]`);
+    if (button == null) return;
+    event.preventDefault();
+    button.click();
   }
 
   return (
@@ -40,7 +41,7 @@ export function Alert({
     >
       {icon}
       <div className="flex min-w-0 flex-1 flex-col gap-1">{body}</div>
-      {close ?? (dismissible ? <Alert.Close onClose={() => onClose?.()} /> : null)}
+      {close}
     </div>
   );
 }
@@ -96,10 +97,13 @@ export namespace Alert {
   }
 
   export function Close({ onClose, children, className, ...rest }: CloseProps) {
+    invariant(children != null, '`<Alert.Close>` requires an icon as its `children`.');
+
     return (
       <button
         type="button"
         aria-label="닫기"
+        {...{ [CLOSE_ATTRIBUTE]: '' }}
         {...rest}
         className={cn(
           'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-lg',
@@ -113,7 +117,7 @@ export namespace Alert {
           onClose(event);
         }}
       >
-        {children ?? <CloseIcon />}
+        {children}
       </button>
     );
   }
@@ -123,16 +127,18 @@ export namespace Alert {
     className?: string;
   };
 
-  export type CloseProps = Omit<ComponentProps<'button'>, 'className' | 'onClick' | 'type'> & {
+  export type CloseProps = Omit<
+    ComponentProps<'button'>,
+    'className' | 'children' | 'onClick' | 'type'
+  > & {
     onClose: (event: MouseEvent<HTMLButtonElement>) => void;
+    /** The close glyph. IDS ships no icon set — pass your own, as `IconButton` does. */
+    children: ReactNode;
     className?: string;
   };
 
   export type Props = Omit<ComponentProps<'div'>, 'children' | 'className' | 'role'> & {
     variant?: 'info' | 'success' | 'warning' | 'danger' | 'neutral';
-    /** Render the built-in close button. Pair with `onClose`. */
-    dismissible?: boolean;
-    onClose?: () => void;
     className?: string;
     children?: ReactNode;
   };

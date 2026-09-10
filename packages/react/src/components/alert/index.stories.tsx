@@ -1,5 +1,6 @@
 import { useState, type ComponentProps, type ComponentType } from 'react';
 
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
@@ -32,10 +33,9 @@ const meta: Meta<typeof Alert> = {
   title: 'Components/Alert',
   component: Alert,
   tags: ['autodocs'],
-  args: { variant: 'info', dismissible: false },
+  args: { variant: 'info' },
   argTypes: {
     variant: { control: 'radio', options: VARIANTS },
-    dismissible: { control: 'boolean' },
   },
   decorators: [
     (Story) => (
@@ -133,9 +133,12 @@ export const Dismissible: Story = {
     const [shown, setShown] = useState(true);
 
     return shown ? (
-      <Alert variant="warning" dismissible onClose={() => setShown(false)}>
+      <Alert variant="warning">
         <Alert.Title>세션 만료 임박</Alert.Title>
         <Alert.Description>5분 뒤 자동 로그아웃됩니다.</Alert.Description>
+        <Alert.Close onClose={() => setShown(false)}>
+          <XMarkIcon />
+        </Alert.Close>
       </Alert>
     ) : (
       <p data-testid="closed">닫혔습니다.</p>
@@ -147,17 +150,20 @@ export const Dismissible: Story = {
   },
 };
 
-/** dismissible이면 안쪽에서 Escape로도 닫힌다. */
+/** Alert.Close가 있으면 안쪽에서 Escape로도 닫힌다. */
 export const EscapeCloses: Story = {
   render: function EscapeCloses() {
     const [shown, setShown] = useState(true);
 
     return shown ? (
-      <Alert variant="danger" dismissible onClose={() => setShown(false)}>
+      <Alert variant="danger">
         <Alert.Title>저장 실패</Alert.Title>
         <Alert.Actions>
           <Button size="tiny">다시 시도</Button>
         </Alert.Actions>
+        <Alert.Close onClose={() => setShown(false)}>
+          <XMarkIcon />
+        </Alert.Close>
       </Alert>
     ) : (
       <p data-testid="closed">닫혔습니다.</p>
@@ -170,7 +176,7 @@ export const EscapeCloses: Story = {
   },
 };
 
-/** Alert.Close를 직접 쓰면 dismissible 없이도 우측에 배치된다. */
+/** Alert.Close는 어디에 적든 우측으로 간다. */
 export const CustomClose: Story = {
   render: function CustomClose() {
     const [shown, setShown] = useState(true);
@@ -178,7 +184,9 @@ export const CustomClose: Story = {
     return shown ? (
       <Alert variant="neutral">
         <Alert.Title>공지</Alert.Title>
-        <Alert.Close aria-label="공지 닫기" onClose={() => setShown(false)} />
+        <Alert.Close aria-label="공지 닫기" onClose={() => setShown(false)}>
+          <XMarkIcon />
+        </Alert.Close>
       </Alert>
     ) : (
       <p data-testid="closed">닫혔습니다.</p>

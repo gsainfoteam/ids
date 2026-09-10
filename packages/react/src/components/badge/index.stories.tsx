@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { BellIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { BellIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { expect, userEvent } from 'storybook/test';
 
 import { Badge } from '.';
@@ -146,7 +146,9 @@ export const Removable: Story = {
             <Badge.Close
               aria-label={`${tag} 삭제`}
               onClose={() => setTags((prev) => prev.filter((t) => t !== tag))}
-            />
+            >
+              <XMarkIcon />
+            </Badge.Close>
           </Badge>
         ))}
       </div>
@@ -169,7 +171,9 @@ export const CloseDoesNotToggle: Story = {
       <div className="flex items-center gap-2">
         <Badge colorScheme="primary" selected={selected} onSelectedChange={setSelected}>
           <Badge.Label>태그</Badge.Label>
-          <Badge.Close aria-label="태그 삭제" onClose={() => setClosed((prev) => prev + 1)} />
+          <Badge.Close aria-label="태그 삭제" onClose={() => setClosed((prev) => prev + 1)}>
+            <XMarkIcon />
+          </Badge.Close>
         </Badge>
         <output data-testid="state">
           {String(selected)} / {closed}
