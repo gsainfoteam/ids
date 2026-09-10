@@ -1,17 +1,18 @@
 import { useState, type ReactNode } from 'react';
 
 import {
-  CaretDownIcon,
+  ChevronDownIcon,
   CheckIcon,
-  CopyIcon,
+  DocumentDuplicateIcon,
   CreditCardIcon,
-  DotsThreeIcon,
+  EllipsisHorizontalIcon,
   EnvelopeIcon,
-  InfoIcon,
+  InformationCircleIcon,
   MagnifyingGlassIcon,
   StarIcon,
-  XIcon,
-} from '@phosphor-icons/react';
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
+import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 
 import { Button } from '../button';
 import { IconButton } from '../icon-button';
@@ -99,7 +100,7 @@ export const Gallery: Story = {
               <IconButton
                 variant="ghost"
                 aria-label="더보기"
-                icon={<DotsThreeIcon />}
+                icon={<EllipsisHorizontalIcon />}
                 onClick={() => undefined}
               />
             </TextFieldGroup.Adornment>
@@ -119,14 +120,14 @@ export const Gallery: Story = {
 
           <TextFieldGroup>
             <TextFieldGroup.Adornment>
-              <InfoIcon />
+              <InformationCircleIcon />
             </TextFieldGroup.Adornment>
             <TextField defaultValue="https://" />
             <TextFieldGroup.Adornment>
               <IconToggle
                 variant="ghost"
                 aria-label="즐겨찾기"
-                icon={(state) => <StarIcon weight={state.pressed ? 'fill' : 'regular'} />}
+                icon={(state) => (state.pressed ? <StarIconSolid /> : <StarIcon />)}
               />
             </TextFieldGroup.Adornment>
           </TextFieldGroup>
@@ -150,14 +151,14 @@ export const Gallery: Story = {
             <IconToggle
               variant="ghost"
               aria-label="즐겨찾기"
-              icon={(state) => <StarIcon weight={state.pressed ? 'fill' : 'regular'} />}
+              icon={(state) => (state.pressed ? <StarIconSolid /> : <StarIcon />)}
             />
           </TextFieldGroup.Adornment>
           <TextFieldGroup.Adornment>
             <IconButton
               variant="ghost"
               aria-label="정보"
-              icon={<InfoIcon />}
+              icon={<InformationCircleIcon />}
               onClick={() => undefined}
             />
           </TextFieldGroup.Adornment>
@@ -192,7 +193,7 @@ export const Gallery: Story = {
             <TextFieldGroup.Adornment>
               <Button variant="ghost" onClick={() => undefined}>
                 Search In...
-                <CaretDownIcon />
+                <ChevronDownIcon />
               </Button>
             </TextFieldGroup.Adornment>
           </TextFieldGroup>
@@ -278,7 +279,7 @@ function CopyUrlField() {
         <IconButton
           variant="ghost"
           aria-label={copied ? '복사됨' : '복사'}
-          icon={copied ? <CheckIcon /> : <CopyIcon />}
+          icon={copied ? <CheckIcon /> : <DocumentDuplicateIcon />}
           onClick={() => {
             void navigator.clipboard?.writeText(url);
             setCopied(true);
@@ -304,7 +305,7 @@ function SearchWithClear() {
           <IconButton
             variant="ghost"
             aria-label="지우기"
-            icon={<XIcon />}
+            icon={<XMarkIcon />}
             onClick={() => setValue('')}
           />
         </TextFieldGroup.Adornment>

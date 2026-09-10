@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { BellIcon, CheckIcon } from '@phosphor-icons/react';
+import { BellIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { expect, userEvent } from 'storybook/test';
 
 import { Badge } from '.';
@@ -62,7 +62,7 @@ export const WithIconAndLabel: Story = {
   render: () => (
     <Badge colorScheme="success">
       <Badge.Icon>
-        <CheckIcon weight="bold" />
+        <CheckIcon />
       </Badge.Icon>
       <Badge.Label>Done</Badge.Label>
     </Badge>
@@ -73,7 +73,7 @@ export const WithIconAndLabel: Story = {
 export const AttachedCount: Story = {
   render: () => (
     <div className="relative inline-block p-2">
-      <BellIcon size={28} />
+      <BellIcon className="size-7" />
       <Badge
         colorScheme="danger"
         variant="solid"

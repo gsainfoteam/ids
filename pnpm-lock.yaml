@@ -53,9 +53,9 @@ importers:
       '@gsainfoteam/ids-css':
         specifier: workspace:*
         version: link:../css
-      '@phosphor-icons/react':
-        specifier: ^2.1.10
-        version: 2.1.10(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@heroicons/react':
+        specifier: ^2.2.0
+        version: 2.2.0(react@19.2.6)
       '@storybook/addon-themes':
         specifier: 10.3.1
         version: 10.3.1(storybook@10.3.1(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))
@@ -107,12 +107,6 @@ importers:
       globals:
         specifier: ^17.4.0
         version: 17.6.0
-      hugeicons-react:
-        specifier: ^0.4.0
-        version: 0.4.0(react@19.2.6)
-      lucide-react:
-        specifier: ^0.545.0
-        version: 0.545.0(react@19.2.6)
       prettier:
         specifier: ^3.8.1
         version: 3.8.3
@@ -504,13 +498,10 @@ packages:
     resolution: {integrity: sha512-rZAP3aVgB9ds9KOeUSL+zZ21hPmo8dh6fnIFwRQj5EAZl9gzR7wxYbYXYysAM8CTqGmUGyp2S4kUdV17MnGuWQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@hugeicons/core-free-icons@3.3.0':
-    resolution: {integrity: sha512-qYyr4JQ2eQIHTSTbITvnJvs6ERNK64D9gpwZnf2IyuG0exzqfyABLO/oTB71FB3RZPfu1GbwycdiGSo46apjMQ==}
-
-  '@hugeicons/react@1.1.6':
-    resolution: {integrity: sha512-c2LhXJMAW5wN1pC/smBXG0YPqUON6ceR/ZdXHCjEI9KvB+hjtqYjmzIxok5hAQOeXGz0WtORgCQMzqewFKAZwg==}
+  '@heroicons/react@2.2.0':
+    resolution: {integrity: sha512-LMcepvRaS9LYHJGsF0zzmgKCUim/X3N/DQKc4jepAXJ7l8QxJ1PmxJzqplF2Z3FE4PqBAIGyJAQ/w4B5dsqbtQ==}
     peerDependencies:
-      react: '>=16.0.0'
+      react: '>= 16 || ^19.0.0-rc'
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -712,13 +703,6 @@ packages:
 
   '@package-json/types@0.0.12':
     resolution: {integrity: sha512-uu43FGU34B5VM9mCNjXCwLaGHYjXdNincqKLaraaCW+7S2+SmiBg1Nv8bPnmschrIfZmfKNY9f3fC376MRrObw==}
-
-  '@phosphor-icons/react@2.1.10':
-    resolution: {integrity: sha512-vt8Tvq8GLjheAZZYa+YG/pW7HDbov8El/MANW8pOAz4eGxrwhnbfrQZq0Cp4q8zBEu8NIhHdnr+r8thnfRSNYA==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: '>= 16.8'
-      react-dom: '>= 16.8'
 
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
@@ -1850,11 +1834,6 @@ packages:
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
-  hugeicons-react@0.4.0:
-    resolution: {integrity: sha512-HA2UI3VkDd1dNi9P4JGjaMODdGEs4QVMwQcc34W0aoGHptdsIex/756Jik4GFYN/023jGFKNVvQKhx2IpZtV+g==}
-    peerDependencies:
-      react: '>=16.0.0'
-
   human-id@4.1.3:
     resolution: {integrity: sha512-tsYlhAYpjCKa//8rXZ9DqKEawhPoSytweBC2eNvcaDK+57RZLHGqNs3PZTQO6yekLFSuvA6AlnAfrw1uBvtb+Q==}
     hasBin: true
@@ -2098,11 +2077,6 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
-
-  lucide-react@0.545.0:
-    resolution: {integrity: sha512-7r1/yUuflQDSt4f1bpn5ZAocyIxcTyVyBBChSVtBKn5M+392cPmI5YJMWOJKk/HUWGm5wg83chlAZtCcGbEZtw==}
-    peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
@@ -3212,9 +3186,7 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@hugeicons/core-free-icons@3.3.0': {}
-
-  '@hugeicons/react@1.1.6(react@19.2.6)':
+  '@heroicons/react@2.2.0(react@19.2.6)':
     dependencies:
       react: 19.2.6
 
@@ -3431,11 +3403,6 @@ snapshots:
       fastq: 1.20.1
 
   '@package-json/types@0.0.12': {}
-
-  '@phosphor-icons/react@2.1.10(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
-    dependencies:
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
@@ -4524,12 +4491,6 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hugeicons-react@0.4.0(react@19.2.6):
-    dependencies:
-      '@hugeicons/core-free-icons': 3.3.0
-      '@hugeicons/react': 1.1.6(react@19.2.6)
-      react: 19.2.6
-
   human-id@4.1.3: {}
 
   hyperdyperid@1.2.0: {}
@@ -4721,10 +4682,6 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
-
-  lucide-react@0.545.0(react@19.2.6):
-    dependencies:
-      react: 19.2.6
 
   lz-string@1.5.0: {}
 

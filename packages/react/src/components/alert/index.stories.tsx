@@ -1,13 +1,12 @@
-import { useState } from 'react';
+import { useState, type ComponentProps, type ComponentType } from 'react';
 
 import {
   CheckCircleIcon,
-  InfoIcon,
-  SparkleIcon,
-  WarningIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+  SparklesIcon,
   XCircleIcon,
-  type Icon,
-} from '@phosphor-icons/react';
+} from '@heroicons/react/24/solid';
 import { expect, userEvent } from 'storybook/test';
 
 import { Button } from '../button';
@@ -18,10 +17,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const VARIANTS = ['info', 'success', 'warning', 'danger', 'neutral'] as const;
 
-const VARIANT_ICONS: Record<(typeof VARIANTS)[number], Icon | null> = {
-  info: InfoIcon,
+const VARIANT_ICONS: Record<
+  (typeof VARIANTS)[number],
+  ComponentType<ComponentProps<'svg'>> | null
+> = {
+  info: InformationCircleIcon,
   success: CheckCircleIcon,
-  warning: WarningIcon,
+  warning: ExclamationTriangleIcon,
   danger: XCircleIcon,
   neutral: null,
 };
@@ -69,7 +71,7 @@ export const Variants: Story = {
           <Alert key={variant} variant={variant}>
             {VariantIcon ? (
               <Alert.Icon>
-                <VariantIcon weight="fill" />
+                <VariantIcon />
               </Alert.Icon>
             ) : null}
             <Alert.Title>{variant}</Alert.Title>
@@ -100,7 +102,7 @@ export const WithIcon: Story = {
   render: () => (
     <Alert variant="info">
       <Alert.Icon>
-        <SparkleIcon weight="fill" />
+        <SparklesIcon />
       </Alert.Icon>
       <Alert.Title>새 기능 출시</Alert.Title>
       <Alert.Description>AI 어시스턴트가 추가되었습니다.</Alert.Description>
