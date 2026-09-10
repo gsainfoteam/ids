@@ -5,8 +5,8 @@ export const controlSurface = {
     'inline-flex items-center justify-center gap-2 select-none transition-all',
     'cursor-pointer data-disabled:cursor-not-allowed',
     'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
-    'data-active:scale-(--ids-scale-pressed) data-disabled:opacity-40',
-    'motion-reduce:transition-none motion-reduce:data-active:scale-100',
+    'data-disabled:opacity-40',
+    'motion-reduce:transition-none',
   ],
   size: {
     standard: 'h-11 px-4.5 text-button-standard rounded-xl',

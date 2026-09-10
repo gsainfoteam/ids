@@ -1,7 +1,0 @@
-{
-  "scale": {
-    "pressed":        { "$value": "0.98", "$type": "number" },
-    "pressed-subtle": { "$value": "0.99", "$type": "number" },
-    "pressed-strong": { "$value": "0.96", "$type": "number" }
-  }
-}

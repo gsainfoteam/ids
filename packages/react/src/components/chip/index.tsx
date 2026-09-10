@@ -51,7 +51,7 @@ export function Chip(props: Chip.Props) {
 
   function onKeyDown(event: KeyboardEvent<HTMLSpanElement>) {
     handlers.onKeyDown(event);
-    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== ' ')) return;
+    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== '')) return;
     event.preventDefault();
     event.currentTarget.click();
   }
@@ -123,10 +123,10 @@ export namespace Chip {
           root: [
             'cursor-pointer transition-all select-none',
             'data-hovered:bg-(--chip-tint)/25',
-            'data-active:scale-(--ids-scale-pressed-strong)',
+            '',
             'data-selected:bg-(--chip-fill) data-selected:text-(--chip-on-fill)',
             'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
-            'motion-reduce:transition-none motion-reduce:data-active:scale-100',
+            'motion-reduce:transition-none',
           ],
         },
         false: {},

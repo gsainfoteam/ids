@@ -17,7 +17,7 @@ export function Card(props: Card.Props) {
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     handlers.onKeyDown(event);
-    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== ' ')) return;
+    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== '')) return;
     event.preventDefault();
     event.currentTarget.click();
   }
@@ -58,9 +58,9 @@ export namespace Card {
           root: [
             'cursor-pointer transition-all select-none',
             'data-hovered:bg-(--ids-color-primary)/10',
-            'data-active:scale-(--ids-scale-pressed-subtle) data-active:bg-(--ids-color-primary)/15',
+            'data-active:bg-(--ids-color-primary)/15',
             'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
-            'motion-reduce:transition-none motion-reduce:data-active:scale-100',
+            'motion-reduce:transition-none',
           ],
         },
         false: {},

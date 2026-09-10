@@ -1,7 +1,7 @@
 import type { IdsSize } from '../tokens/types';
 
 export const iconSquare = {
-  base: 'shrink-0 gap-0 [&_svg]:shrink-0 data-active:scale-(--ids-scale-pressed-strong)',
+  base: 'shrink-0 gap-0 [&_svg]:shrink-0',
   size: {
     standard: 'size-11 px-0 [&_svg]:size-5',
     tiny: 'size-8 px-0 [&_svg]:size-4',

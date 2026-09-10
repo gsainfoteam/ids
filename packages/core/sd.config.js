@@ -141,6 +141,7 @@ const TW_NS = {
   "tab-size": "--tab-size-",
   breakpoint: "--breakpoint-",
   container: "--container-",
+  radius: "--radius-",
   "border-radius": "--radius-",
   shadow: "--shadow-",
   "inset-shadow": "--inset-shadow-",
@@ -263,10 +264,14 @@ const buildColorBridgeCSS = (dictionary) => {
 
 // :root { --ids-motion-fast: 150ms; ... }
 const buildStaticCSS = (dictionary) => {
-  const lines = ["motion", "scale"].flatMap((cat) =>
+  const lines = ["motion", "radius"].flatMap((cat) =>
     byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
   );
-  return `:root {\n${lines.join("\n")}\n}\n`;
+  // rounded-* has to resolve to the IDS scale, so bridge radius into @theme too.
+  const theme = byCategory(dictionary, "radius").map(
+    (t) => `  --radius-${slug(t)}: var(${idsVar("radius", t)});`,
+  );
+  return `:root {\n${lines.join("\n")}\n}\n\n@theme {\n${theme.join("\n")}\n}\n`;
 };
 
 // Keyframes can't come from a token file, but they have to ship with the CSS
