@@ -27,6 +27,7 @@ export { IdsError, invariant } from './utils/invariant';
 export { Slot } from './components/slot';
 export { Card } from './components/card';
 export { Chip } from './components/chip';
+export { Badge } from './components/badge';
 export { Alert } from './components/alert';
 export { Avatar, initialsOf } from './components/avatar';
 export { AvatarGroup } from './components/avatar-group';
