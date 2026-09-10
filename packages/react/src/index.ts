@@ -41,6 +41,7 @@ export { Toggle } from './components/toggle';
 export { IconToggle } from './components/icon-toggle';
 export { ToggleGroup } from './components/toggle-group';
 export { Checkbox } from './components/checkbox';
+export { Switch } from './components/switch';
 export { TextField } from './components/text-field';
 export { TextFieldGroup } from './components/text-field-group';
 
