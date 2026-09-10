@@ -59,7 +59,6 @@ export const CallsBothHandlers: Story = {
   },
   play: async ({ canvas }) => {
     await userEvent.click(canvas.getByRole('button', { name: '둘 다 실행' }));
-    // 자식이 먼저, 그 다음 Slot.
     await expect(canvas.getByTestId('log')).toHaveTextContent('child slot');
   },
 };

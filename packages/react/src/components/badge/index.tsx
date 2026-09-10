@@ -50,7 +50,6 @@ export function Badge(props: Badge.Props) {
   function onKeyDown(event: KeyboardEvent<HTMLSpanElement>) {
     handlers.onKeyDown(event);
     if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== ' ')) return;
-    // <span>은 role="button"을 줘도 브라우저가 키보드로 클릭해주지 않는다.
     event.preventDefault();
     event.currentTarget.click();
   }
@@ -76,8 +75,6 @@ export namespace Badge {
   export const Style = tv({
     base: 'inline-flex shrink-0 items-center gap-1 rounded-full align-middle',
     variants: {
-      // colorScheme는 색 두 개만 정하고, 그 색을 어떻게 쓸지는 variant가 정한다.
-      // 6 x 3 조합을 일일이 나열하지 않으려고 커스텀 프로퍼티를 경유한다.
       colorScheme: {
         neutral:
           '[--badge-accent:var(--ids-color-on-surface)] [--badge-fill:var(--ids-color-muted)] [--badge-on-fill:var(--ids-color-on-surface)]',
@@ -146,7 +143,6 @@ export namespace Badge {
           className,
         )}
         onClick={(event) => {
-          // 부모 Badge의 클릭과 토글까지 같이 터지면 안 된다.
           event.stopPropagation();
           onClose(event);
         }}
@@ -166,7 +162,6 @@ export namespace Badge {
     'className' | 'children' | 'onClick' | 'type'
   > & {
     onClose: (event: MouseEvent<HTMLButtonElement>) => void;
-    /** The close glyph. IDS ships no icon set — pass your own, as `IconButton` does. */
     children: ReactNode;
     className?: string;
   };
@@ -175,7 +170,6 @@ export namespace Badge {
     variant?: 'solid' | 'soft' | 'outline';
     colorScheme?: 'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
     size?: IdsSize;
-    /** Controlled toggle state. Requires `onSelectedChange`. */
     selected?: boolean;
     defaultSelected?: boolean;
     onSelectedChange?: (selected: boolean) => void;

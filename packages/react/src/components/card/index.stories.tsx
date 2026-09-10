@@ -81,7 +81,6 @@ export const SectionsAreOptional: Story = {
   ),
 };
 
-/** 자식의 순서가 곧 시각적 순서다. Content를 Header 위에 두면 이미지가 먼저 온다. */
 export const ContentBeforeHeader: Story = {
   render: () => (
     <Card variant="elevated">
@@ -122,7 +121,6 @@ export const Interactive: Story = {
     await userEvent.click(card);
     await expect(canvas.getByTestId('clicks')).toHaveTextContent('1');
 
-    // role="button"인 div는 브라우저가 키보드 활성화를 대신해주지 않는다.
     card.focus();
     await userEvent.keyboard('{Enter}');
     await expect(canvas.getByTestId('clicks')).toHaveTextContent('2');
@@ -131,7 +129,6 @@ export const Interactive: Story = {
   },
 };
 
-/** asChild면 자식의 시맨틱을 그대로 쓴다. role="button"을 덧씌우지 않는다. */
 export const AsChildLink: Story = {
   render: () => (
     <Card interactive asChild>

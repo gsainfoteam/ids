@@ -27,7 +27,6 @@ type Story = StoryObj<typeof Badge>;
 export const Playground: Story = {
   play: async ({ canvas }) => {
     const badge = canvas.getByText('Beta');
-    // 인터랙션 prop이 없으면 정적 라벨이다.
     await expect(badge).not.toHaveAttribute('role');
     await expect(badge).not.toHaveAttribute('tabindex');
   },
@@ -69,7 +68,6 @@ export const WithIconAndLabel: Story = {
   ),
 };
 
-/** 다른 element 모서리에 붙일 때는 부모가 relative, Badge가 absolute다. */
 export const AttachedCount: Story = {
   render: () => (
     <div className="relative inline-block p-2">
@@ -101,7 +99,6 @@ export const Clickable: Story = {
   play: async ({ canvas }) => {
     const badge = canvas.getByRole('button', { name: 'Filter' });
     await expect(badge).toHaveAttribute('tabindex', '0');
-    // 토글이 아니면 aria-pressed를 달지 않는다.
     await expect(badge).not.toHaveAttribute('aria-pressed');
 
     await userEvent.click(badge);
@@ -161,7 +158,6 @@ export const Removable: Story = {
   },
 };
 
-/** Close는 부모 Badge의 토글까지 같이 터뜨리지 않는다. */
 export const CloseDoesNotToggle: Story = {
   render: function CloseDoesNotToggle() {
     const [selected, setSelected] = useState(false);

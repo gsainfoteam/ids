@@ -83,7 +83,6 @@ export const Variants: Story = {
   ),
 };
 
-/** warning과 danger는 진행 중인 작업을 끊어서라도 읽혀야 하므로 assertive다. */
 export const AssertiveVariantsUseAlertRole: Story = {
   render: () => (
     <Alert variant="danger">
@@ -109,7 +108,6 @@ export const WithIcon: Story = {
     </Alert>
   ),
   play: async ({ canvasElement, canvas }) => {
-    // 아이콘은 장식이라 접근성 트리에서 빠진다.
     await expect(canvas.getByRole('status').querySelector('[aria-hidden="true"]')).toContainElement(
       canvasElement.querySelector('svg'),
     );
@@ -150,7 +148,6 @@ export const Dismissible: Story = {
   },
 };
 
-/** Alert.Close가 있으면 안쪽에서 Escape로도 닫힌다. */
 export const EscapeCloses: Story = {
   render: function EscapeCloses() {
     const [shown, setShown] = useState(true);
@@ -176,7 +173,6 @@ export const EscapeCloses: Story = {
   },
 };
 
-/** Alert.Close는 어디에 적든 우측으로 간다. */
 export const CustomClose: Story = {
   render: function CustomClose() {
     const [shown, setShown] = useState(true);

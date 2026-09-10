@@ -12,15 +12,12 @@ export function Card(props: Card.Props) {
   } = useInteractiveProps<HTMLDivElement, Card.Props>(props);
 
   const isInteractive = interactive ?? rest.onClick != null;
-  // asChild면 자식이 <a>나 <button>이라 그쪽 시맨틱을 그대로 두고, div로 그릴 때만
-  // role/tabIndex/키보드 활성화를 직접 얹는다.
   const needsButtonSemantics = isInteractive && asChild !== true;
   const Root = asChild === true ? Slot : 'div';
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     handlers.onKeyDown(event);
     if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== ' ')) return;
-    // Space는 스크롤을, Enter는 폼 제출을 유발하므로 막고 클릭으로 바꾼다.
     event.preventDefault();
     event.currentTarget.click();
   }
@@ -100,7 +97,6 @@ export namespace Card {
 
   type BaseProps = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
     variant?: 'outline' | 'elevated' | 'filled' | 'ghost';
-    /** Opt into hover, focus and keyboard affordances. Inferred from `onClick`. */
     interactive?: boolean;
     asChild?: boolean;
     className?: string;
