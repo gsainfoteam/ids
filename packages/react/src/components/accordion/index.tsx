@@ -111,7 +111,7 @@ export namespace Accordion {
     variants: {
       variant: {
         bordered:
-          'rounded-xl inset-ring-1 inset-ring-(--ids-color-outline) [&>*+*]:border-t [&>*+*]:border-(--ids-color-outline)',
+          'overflow-hidden rounded-xl inset-ring-1 inset-ring-(--ids-color-outline) [&>*+*]:border-t [&>*+*]:border-(--ids-color-outline)',
         separated: 'gap-2',
         ghost: '',
       },
@@ -124,7 +124,7 @@ export namespace Accordion {
     variants: {
       variant: {
         bordered: '',
-        separated: 'rounded-xl inset-ring-1 inset-ring-(--ids-color-outline)',
+        separated: 'overflow-hidden rounded-xl inset-ring-1 inset-ring-(--ids-color-outline)',
         ghost: '',
       },
     },
@@ -136,7 +136,6 @@ export namespace Accordion {
       'flex w-full cursor-pointer items-center gap-2 text-left transition-colors select-none',
       'text-(--ids-color-on-surface)',
       'hover:bg-(--ids-color-primary)/10',
-      'data-[state=open]:bg-(--ids-color-muted)',
       'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--ids-color-primary)',
       'disabled:cursor-not-allowed disabled:opacity-40',
       'motion-reduce:transition-none',
@@ -249,8 +248,8 @@ export namespace Accordion {
             className={cn(
               'text-(--ids-color-on-surface)',
               size === 'tiny'
-                ? 'text-caption-c1-regular px-3 pb-2'
-                : 'text-body-b3-regular px-4 pb-3',
+                ? 'text-caption-c1-regular px-3 pt-0.5 pb-2'
+                : 'text-body-b3-regular px-4 pt-1 pb-3',
             )}
           >
             {children}
