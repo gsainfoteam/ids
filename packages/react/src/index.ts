@@ -28,6 +28,7 @@ export { Slot } from './components/slot';
 export { Card } from './components/card';
 export { Badge } from './components/badge';
 export { Alert } from './components/alert';
+export { Avatar, initialsOf } from './components/avatar';
 
 export { Button } from './components/button';
 export { IconButton } from './components/icon-button';
