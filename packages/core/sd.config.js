@@ -328,6 +328,8 @@ const cssFormatter = ({ dictionary }) =>
     ),
     buildColorThemeCSS(dictionary, "neutral", "light", '[data-mode="light"]'),
     buildColorThemeCSS(dictionary, "neutral", "dark", '[data-mode="dark"]'),
+    buildColorThemeCSS(dictionary, "status", "light", '[data-mode="light"]'),
+    buildColorThemeCSS(dictionary, "status", "dark", '[data-mode="dark"]'),
   ].join("\n");
 
 // ─── TS formatters ────────────────────────────────────────────────────────────
@@ -377,11 +379,18 @@ const dartColorTokensFormatter = ({ dictionary }) => {
     )
     .join("\n");
 
+  // status는 테마 색과 무관하고 mode에만 반응하므로 각 (color, mode) 맵에 그대로 얹는다.
+  // resolve()가 (color, mode) 한 쌍만 받기 때문에 별도 맵을 두면 조회 경로가 갈라진다.
   const maps = colorPairs
     .map(([c, m]) =>
       render(T_DART_COLOR_MAP, {
         NAME: mapName(c, m),
-        ENTRIES: readColorEntries(c, m, palette).map(toColorLine).join("\n"),
+        ENTRIES: [
+          ...readColorEntries(c, m, palette),
+          ...readColorEntries("status", m, palette),
+        ]
+          .map(toColorLine)
+          .join("\n"),
       }),
     )
     .join("\n\n");

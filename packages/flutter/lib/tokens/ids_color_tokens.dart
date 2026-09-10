@@ -27,6 +27,14 @@ class IdsTokens {
     'secondary': const Color(0xFF172554),
     'on-secondary': const Color(0xFF3B82F6),
     'outline': const Color(0xFF1E40AF),
+    'success': const Color(0xFF4ADE5E),
+    'on-success': const Color(0xFF0A0A0A),
+    'warning': const Color(0xFFFACC15),
+    'on-warning': const Color(0xFF0A0A0A),
+    'danger': const Color(0xFFF87171),
+    'on-danger': const Color(0xFF0A0A0A),
+    'info': const Color(0xFF38BDF8),
+    'on-info': const Color(0xFF0A0A0A),
   };
 
   static const _blueLight = <String, Color>{
@@ -35,6 +43,14 @@ class IdsTokens {
     'secondary': const Color(0xFFDBEAFE),
     'on-secondary': const Color(0xFF2563EB),
     'outline': const Color(0xFFBFDBFE),
+    'success': const Color(0xFF418501),
+    'on-success': const Color(0xFFFFFFFF),
+    'warning': const Color(0xFFEAB308),
+    'on-warning': const Color(0xFF0A0A0A),
+    'danger': const Color(0xFFB91C1C),
+    'on-danger': const Color(0xFFFFFFFF),
+    'info': const Color(0xFF0369A1),
+    'on-info': const Color(0xFFFFFFFF),
   };
 
   static const _greenDark = <String, Color>{
@@ -43,6 +59,14 @@ class IdsTokens {
     'secondary': const Color(0xFF0F2400),
     'on-secondary': const Color(0xFF22C53E),
     'outline': const Color(0xFF2A5701),
+    'success': const Color(0xFF4ADE5E),
+    'on-success': const Color(0xFF0A0A0A),
+    'warning': const Color(0xFFFACC15),
+    'on-warning': const Color(0xFF0A0A0A),
+    'danger': const Color(0xFFF87171),
+    'on-danger': const Color(0xFF0A0A0A),
+    'info': const Color(0xFF38BDF8),
+    'on-info': const Color(0xFF0A0A0A),
   };
 
   static const _greenLight = <String, Color>{
@@ -51,6 +75,14 @@ class IdsTokens {
     'secondary': const Color(0xFFDCFCDC),
     'on-secondary': const Color(0xFF418501),
     'outline': const Color(0xFFBBF7BB),
+    'success': const Color(0xFF418501),
+    'on-success': const Color(0xFFFFFFFF),
+    'warning': const Color(0xFFEAB308),
+    'on-warning': const Color(0xFF0A0A0A),
+    'danger': const Color(0xFFB91C1C),
+    'on-danger': const Color(0xFFFFFFFF),
+    'info': const Color(0xFF0369A1),
+    'on-info': const Color(0xFFFFFFFF),
   };
 
   static const _orangeDark = <String, Color>{
@@ -59,6 +91,14 @@ class IdsTokens {
     'secondary': const Color(0xFF451300),
     'on-secondary': const Color(0xFFFF5722),
     'outline': const Color(0xFFA32D00),
+    'success': const Color(0xFF4ADE5E),
+    'on-success': const Color(0xFF0A0A0A),
+    'warning': const Color(0xFFFACC15),
+    'on-warning': const Color(0xFF0A0A0A),
+    'danger': const Color(0xFFF87171),
+    'on-danger': const Color(0xFF0A0A0A),
+    'info': const Color(0xFF38BDF8),
+    'on-info': const Color(0xFF0A0A0A),
   };
 
   static const _orangeLight = <String, Color>{
@@ -67,5 +107,13 @@ class IdsTokens {
     'secondary': const Color(0xFFFFE8DE),
     'on-secondary': const Color(0xFFFF4500),
     'outline': const Color(0xFFFFC8B4),
+    'success': const Color(0xFF418501),
+    'on-success': const Color(0xFFFFFFFF),
+    'warning': const Color(0xFFEAB308),
+    'on-warning': const Color(0xFF0A0A0A),
+    'danger': const Color(0xFFB91C1C),
+    'on-danger': const Color(0xFFFFFFFF),
+    'info': const Color(0xFF0369A1),
+    'on-info': const Color(0xFFFFFFFF),
   };
 }
