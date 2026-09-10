@@ -207,3 +207,10 @@ pnpm lint
 ```
 
 외부 headless 라이브러리(Radix, Base UI 등)에 의존하지 않고 전부 직접 구현한다.
+
+## Field
+
+`Field`는 Label/Description/Hint/Error를 입력에 자동 연결합니다.
+일반 사용은 `@gsainfoteam/ids-react`, 선택형 RHF 자동 연동은
+`@gsainfoteam/ids-react/react-hook-form`에서 가져옵니다.
+[Field API와 연결 계약](./src/components/field/README.md)을 참고하세요.

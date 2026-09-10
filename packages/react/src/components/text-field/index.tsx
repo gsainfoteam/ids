@@ -2,6 +2,7 @@ import type { ComponentProps, CSSProperties } from 'react';
 
 import { textFieldSurface, useTextFieldGroupContext, type TextFieldVariant } from './surface';
 import { invariant, mergeRefs, tv } from '../../utils';
+import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -14,6 +15,7 @@ export function TextField({
   ref,
   ...rest
 }: TextField.Props) {
+  const fieldSize = useFieldSize(size);
   const group = useTextFieldGroupContext();
   const grouped = group != null;
 
@@ -22,7 +24,7 @@ export function TextField({
     `\`<TextField>\` inside a group must use the group's \`size\` (${group?.size}).`,
   );
 
-  const resolvedSize = grouped ? group.size : (size ?? 'standard');
+  const resolvedSize = grouped ? group.size : (fieldSize ?? 'standard');
   const disabled = disabledProp ?? group?.disabled;
 
   return (

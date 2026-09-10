@@ -42,3 +42,7 @@ export { Spacer } from './components/spacer';
 export { AspectRatio } from './components/aspect-ratio';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
+
+export { Field } from './components/field';
+export type { FieldProps } from './components/field';
+export { useFieldSize } from './components/field/context';

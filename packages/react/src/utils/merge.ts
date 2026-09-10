@@ -23,10 +23,20 @@ export function mergeEventHandlers<E extends SyntheticEvent>(
 
 export function mergeRefs<T>(...refs: Array<Ref<T> | null | undefined>): RefCallback<T> {
   return (value) => {
-    for (const ref of refs) {
-      if (isFunction(ref)) ref(value);
-      else if (isNotNil(ref)) ref.current = value;
-    }
+    const cleanups = refs.map((ref) => {
+      if (isFunction(ref)) {
+        const cleanup = ref(value);
+        return isFunction(cleanup) ? cleanup : () => ref(null);
+      }
+      if (isNotNil(ref)) {
+        ref.current = value;
+        return () => {
+          ref.current = null;
+        };
+      }
+      return undefined;
+    });
+    return () => cleanups.forEach((cleanup) => cleanup?.());
   };
 }
 
