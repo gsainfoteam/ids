@@ -24,6 +24,8 @@ export type { UseControllableStateOptions } from './hooks/use-controllable-state
 
 export { IdsError, invariant } from './utils/invariant';
 
+export { Slot } from './components/slot';
+
 export { Button } from './components/button';
 export { IconButton } from './components/icon-button';
 export { ButtonGroup } from './components/button-group';
