@@ -44,6 +44,7 @@ export { TextField } from './components/text-field';
 export { TextFieldGroup } from './components/text-field-group';
 
 export { Spinner } from './components/spinner';
+export { Progress } from './components/progress';
 export { Label } from './components/label';
 export { Kbd } from './components/kbd';
 
