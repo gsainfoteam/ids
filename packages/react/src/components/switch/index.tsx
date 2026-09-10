@@ -40,23 +40,21 @@ export namespace Switch {
       ],
       thumb: [
         'pointer-events-none absolute left-(--switch-gap) rounded-full bg-(--ids-color-surface) shadow-sm',
-        'transition-transform peer-checked:translate-x-(--switch-travel)',
-        'motion-reduce:transition-none',
+        'size-(--switch-thumb) transition-transform motion-reduce:transition-none',
+        'peer-checked:translate-x-[calc(var(--switch-track)-var(--switch-thumb)-var(--switch-gap)*2)]',
       ],
     },
     variants: {
       size: {
         standard: {
-          root: '[--switch-gap:2px] [--switch-travel:16px]',
-          track: 'h-6 w-11',
-          thumb: 'size-5',
+          root: '[--switch-gap:2px] [--switch-thumb:20px] [--switch-track:44px]',
+          track: 'h-6 w-(--switch-track)',
         },
         tiny: {
-          root: '[--switch-gap:2px] [--switch-travel:12px]',
-          track: 'h-4.5 w-8',
-          thumb: 'size-3.5',
+          root: '[--switch-gap:2px] [--switch-thumb:14px] [--switch-track:32px]',
+          track: 'h-4.5 w-(--switch-track)',
         },
-      } satisfies Record<IdsSize, { root: string; track: string; thumb: string }>,
+      } satisfies Record<IdsSize, { root: string; track: string }>,
     },
     defaultVariants: { size: 'standard' },
   });
