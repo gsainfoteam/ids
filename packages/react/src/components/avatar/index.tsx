@@ -1,7 +1,7 @@
 import { Children, isValidElement, useState } from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 
-import { cn, invariant, tv } from '../../utils';
+import { invariant, tv } from '../../utils';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -48,14 +48,14 @@ export function Avatar({
       role="img"
       aria-label={label}
       {...rest}
-      className={Avatar.Style({ variant, size, className })}
+      className={Avatar.Style({ variant, size }).root({ className })}
     >
       {src != null && failedSrc !== src ? (
         <img
           src={src}
           alt=""
           loading="lazy"
-          className="size-full object-cover"
+          className={Avatar.Style().image()}
           onError={() => setFailedSrc(src)}
         />
       ) : (
@@ -67,29 +67,27 @@ export function Avatar({
 
 export namespace Avatar {
   export const Style = tv({
-    base: 'inline-flex shrink-0 items-center justify-center overflow-hidden bg-(--ids-color-muted) text-(--ids-color-on-muted) select-none',
+    slots: {
+      root: 'inline-flex shrink-0 items-center justify-center overflow-hidden bg-(--ids-color-muted) text-(--ids-color-on-muted) select-none',
+      image: 'size-full object-cover',
+      fallback: 'inline-flex items-center justify-center [&_svg]:size-[60%]',
+    },
     variants: {
       variant: {
-        circle: 'rounded-full',
-        square: 'rounded-lg',
+        circle: { root: 'rounded-full' },
+        square: { root: 'rounded-lg' },
       },
       size: {
-        standard: 'size-10 text-body-b3-medium',
-        tiny: 'size-6 text-caption-c2-medium',
-      } satisfies Record<IdsSize, string>,
+        standard: { root: 'text-body-b3-medium size-10' },
+        tiny: { root: 'text-caption-c2-medium size-6' },
+      } satisfies Record<IdsSize, { root: string }>,
     },
     defaultVariants: { variant: 'circle', size: 'standard' },
   });
 
   export function Fallback({ asChild, className, ...rest }: FallbackProps) {
     const Root = asChild === true ? Slot : 'span';
-    return (
-      <Root
-        aria-hidden
-        {...rest}
-        className={cn('inline-flex items-center justify-center [&_svg]:size-[60%]', className)}
-      />
-    );
+    return <Root aria-hidden {...rest} className={Style().fallback({ className })} />;
   }
 
   export type FallbackProps = Omit<ComponentProps<'span'>, 'className'> & {

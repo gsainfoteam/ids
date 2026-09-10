@@ -2,7 +2,7 @@ import type { ComponentProps, KeyboardEvent, MouseEvent, ReactNode } from 'react
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
-import { cn, invariant, tv } from '../../utils';
+import { invariant, tv } from '../../utils';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -64,7 +64,9 @@ export function Chip(props: Chip.Props) {
       {...rest}
       {...(isInteractive ? { onClick } : {})}
       {...(needsButtonSemantics ? { onKeyDown } : {})}
-      className={Chip.Style({ variant, colorScheme, size, interactive: isInteractive, className })}
+      className={Chip.Style({ variant, colorScheme, size, interactive: isInteractive }).root({
+        className,
+      })}
     >
       {children}
     </Root>
@@ -73,40 +75,59 @@ export function Chip(props: Chip.Props) {
 
 export namespace Chip {
   export const Style = tv({
-    base: 'inline-flex shrink-0 items-center gap-1 rounded-full align-middle',
+    slots: {
+      root: 'inline-flex shrink-0 items-center gap-1 rounded-full align-middle',
+      icon: 'inline-flex shrink-0 [&_svg]:size-[1em]',
+      label: 'truncate',
+      close: [
+        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full',
+        'opacity-60 transition-opacity hover:opacity-100',
+        'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-current',
+        '[&_svg]:size-[1em]',
+      ],
+    },
     variants: {
       colorScheme: {
-        neutral:
-          '[--chip-tint:var(--ids-color-on-surface)] [--chip-accent:var(--ids-color-on-surface)] [--chip-fill:var(--ids-color-muted)] [--chip-on-fill:var(--ids-color-on-surface)]',
-        primary:
-          '[--chip-tint:var(--ids-color-primary)] [--chip-accent:var(--ids-color-primary)] [--chip-fill:var(--ids-color-primary)] [--chip-on-fill:var(--ids-color-on-primary)]',
-        success:
-          '[--chip-tint:var(--ids-color-success)] [--chip-accent:var(--ids-color-success-strong)] [--chip-fill:var(--ids-color-success)] [--chip-on-fill:var(--ids-color-on-success)]',
-        warning:
-          '[--chip-tint:var(--ids-color-warning)] [--chip-accent:var(--ids-color-warning-strong)] [--chip-fill:var(--ids-color-warning)] [--chip-on-fill:var(--ids-color-on-warning)]',
-        danger:
-          '[--chip-tint:var(--ids-color-danger)] [--chip-accent:var(--ids-color-danger-strong)] [--chip-fill:var(--ids-color-danger)] [--chip-on-fill:var(--ids-color-on-danger)]',
-        info: '[--chip-tint:var(--ids-color-info)] [--chip-accent:var(--ids-color-info-strong)] [--chip-fill:var(--ids-color-info)] [--chip-on-fill:var(--ids-color-on-info)]',
+        neutral: {
+          root: '[--chip-tint:var(--ids-color-on-surface)] [--chip-accent:var(--ids-color-on-surface)] [--chip-fill:var(--ids-color-muted)] [--chip-on-fill:var(--ids-color-on-surface)]',
+        },
+        primary: {
+          root: '[--chip-tint:var(--ids-color-primary)] [--chip-accent:var(--ids-color-primary)] [--chip-fill:var(--ids-color-primary)] [--chip-on-fill:var(--ids-color-on-primary)]',
+        },
+        success: {
+          root: '[--chip-tint:var(--ids-color-success)] [--chip-accent:var(--ids-color-success-strong)] [--chip-fill:var(--ids-color-success)] [--chip-on-fill:var(--ids-color-on-success)]',
+        },
+        warning: {
+          root: '[--chip-tint:var(--ids-color-warning)] [--chip-accent:var(--ids-color-warning-strong)] [--chip-fill:var(--ids-color-warning)] [--chip-on-fill:var(--ids-color-on-warning)]',
+        },
+        danger: {
+          root: '[--chip-tint:var(--ids-color-danger)] [--chip-accent:var(--ids-color-danger-strong)] [--chip-fill:var(--ids-color-danger)] [--chip-on-fill:var(--ids-color-on-danger)]',
+        },
+        info: {
+          root: '[--chip-tint:var(--ids-color-info)] [--chip-accent:var(--ids-color-info-strong)] [--chip-fill:var(--ids-color-info)] [--chip-on-fill:var(--ids-color-on-info)]',
+        },
       },
       variant: {
-        solid: 'bg-(--chip-fill) text-(--chip-on-fill)',
-        soft: 'bg-(--chip-tint)/15 text-(--chip-accent)',
-        outline: 'inset-ring-1 inset-ring-(--chip-accent)/40 text-(--chip-accent)',
+        solid: { root: 'bg-(--chip-fill) text-(--chip-on-fill)' },
+        soft: { root: 'bg-(--chip-tint)/15 text-(--chip-accent)' },
+        outline: { root: 'inset-ring-1 inset-ring-(--chip-accent)/40 text-(--chip-accent)' },
       },
       size: {
-        standard: 'min-h-[22px] px-2 text-caption-c1-medium',
-        tiny: 'min-h-[18px] px-1.5 text-caption-c2-medium',
-      } satisfies Record<IdsSize, string>,
+        standard: { root: 'text-caption-c1-medium min-h-[22px] px-2' },
+        tiny: { root: 'text-caption-c2-medium min-h-[18px] px-1.5' },
+      } satisfies Record<IdsSize, { root: string }>,
       interactive: {
-        true: [
-          'cursor-pointer transition-all select-none',
-          'data-hovered:bg-(--chip-tint)/25',
-          'data-active:scale-(--ids-scale-pressed-strong)',
-          'data-selected:bg-(--chip-fill) data-selected:text-(--chip-on-fill)',
-          'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
-          'motion-reduce:transition-none motion-reduce:data-active:scale-100',
-        ],
-        false: '',
+        true: {
+          root: [
+            'cursor-pointer transition-all select-none',
+            'data-hovered:bg-(--chip-tint)/25',
+            'data-active:scale-(--ids-scale-pressed-strong)',
+            'data-selected:bg-(--chip-fill) data-selected:text-(--chip-on-fill)',
+            'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
+            'motion-reduce:transition-none motion-reduce:data-active:scale-100',
+          ],
+        },
+        false: {},
       },
     },
     defaultVariants: {
@@ -119,12 +140,12 @@ export namespace Chip {
 
   export function Icon({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'span';
-    return <Root {...rest} className={cn('inline-flex shrink-0 [&_svg]:size-[1em]', className)} />;
+    return <Root {...rest} className={Style().icon({ className })} />;
   }
 
   export function Label({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'span';
-    return <Root {...rest} className={cn('truncate', className)} />;
+    return <Root {...rest} className={Style().label({ className })} />;
   }
 
   export function Close({ onClose, children, className, ...rest }: CloseProps) {
@@ -135,13 +156,7 @@ export namespace Chip {
         type="button"
         aria-label="삭제"
         {...rest}
-        className={cn(
-          'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full',
-          'opacity-60 transition-opacity hover:opacity-100',
-          'focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-current',
-          '[&_svg]:size-[1em]',
-          className,
-        )}
+        className={Style().close({ className })}
         onClick={(event) => {
           event.stopPropagation();
           onClose(event);

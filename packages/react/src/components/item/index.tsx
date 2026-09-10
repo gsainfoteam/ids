@@ -1,7 +1,7 @@
 import type { ComponentProps, KeyboardEvent, ReactNode } from 'react';
 
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
-import { cn, tv } from '../../utils';
+import { tv } from '../../utils';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -32,7 +32,7 @@ export function Item(props: Item.Props) {
       {...handlers}
       {...rest}
       {...(needsButtonSemantics ? { onKeyDown } : {})}
-      className={Item.Style({ size, interactive: isInteractive, className })}
+      className={Item.Style({ size, interactive: isInteractive }).root({ className })}
     >
       {children}
     </Root>
@@ -41,22 +41,32 @@ export function Item(props: Item.Props) {
 
 export namespace Item {
   export const Style = tv({
-    base: 'flex w-full items-center rounded-xl bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+    slots: {
+      root: 'flex w-full items-center rounded-xl bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+      media:
+        'inline-flex shrink-0 items-center justify-center text-(--ids-color-on-muted) [&_svg]:size-5',
+      content: 'flex min-w-0 flex-1 flex-col',
+      title: 'text-body-b3-medium truncate',
+      description: 'text-caption-c1-regular truncate text-(--ids-color-on-muted)',
+      actions: 'ml-auto flex shrink-0 items-center gap-2',
+    },
     variants: {
       size: {
-        standard: 'min-h-14 gap-3 p-3',
-        tiny: 'min-h-10 gap-2 p-2',
-      } satisfies Record<IdsSize, string>,
+        standard: { root: 'min-h-14 gap-3 p-3' },
+        tiny: { root: 'min-h-10 gap-2 p-2' },
+      } satisfies Record<IdsSize, { root: string }>,
       interactive: {
-        true: [
-          'cursor-pointer transition-all select-none',
-          'data-hovered:bg-(--ids-color-primary)/10',
-          'data-active:scale-(--ids-scale-pressed-subtle) data-active:bg-(--ids-color-primary)/15',
-          'data-selected:bg-(--ids-color-primary)/15',
-          'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
-          'motion-reduce:transition-none motion-reduce:data-active:scale-100',
-        ],
-        false: 'data-selected:bg-(--ids-color-primary)/15',
+        true: {
+          root: [
+            'cursor-pointer transition-all select-none',
+            'data-hovered:bg-(--ids-color-primary)/10',
+            'data-active:scale-(--ids-scale-pressed-subtle) data-active:bg-(--ids-color-primary)/15',
+            'data-selected:bg-(--ids-color-primary)/15',
+            'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
+            'motion-reduce:transition-none motion-reduce:data-active:scale-100',
+          ],
+        },
+        false: { root: 'data-selected:bg-(--ids-color-primary)/15' },
       },
     },
     defaultVariants: { size: 'standard', interactive: false },
@@ -64,40 +74,27 @@ export namespace Item {
 
   export function Media({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'div';
-    return (
-      <Root
-        {...rest}
-        className={cn(
-          'inline-flex shrink-0 items-center justify-center text-(--ids-color-on-muted) [&_svg]:size-5',
-          className,
-        )}
-      />
-    );
+    return <Root {...rest} className={Style().media({ className })} />;
   }
 
   export function Content({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={cn('flex min-w-0 flex-1 flex-col', className)} />;
+    return <Root {...rest} className={Style().content({ className })} />;
   }
 
   export function Title({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={cn('text-body-b3-medium truncate', className)} />;
+    return <Root {...rest} className={Style().title({ className })} />;
   }
 
   export function Description({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'div';
-    return (
-      <Root
-        {...rest}
-        className={cn('text-caption-c1-regular truncate text-(--ids-color-on-muted)', className)}
-      />
-    );
+    return <Root {...rest} className={Style().description({ className })} />;
   }
 
   export function Actions({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={cn('ml-auto flex shrink-0 items-center gap-2', className)} />;
+    return <Root {...rest} className={Style().actions({ className })} />;
   }
 
   export type PartProps = Omit<ComponentProps<'div'>, 'className'> & {

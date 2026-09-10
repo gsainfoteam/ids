@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 
-import { cn, invariant, tv } from '../../utils';
+import { invariant, tv } from '../../utils';
 import { Arc } from '../arc';
 import { Slot } from '../slot';
 
@@ -87,6 +87,8 @@ export namespace Progress {
       track: 'w-full overflow-hidden rounded-full bg-(--ids-color-muted)',
       bar: 'h-full rounded-full bg-(--progress-fill)',
       circle: 'relative inline-flex shrink-0 items-center justify-center',
+      label: 'text-body-b3-medium truncate',
+      value: 'shrink-0 text-(--ids-color-on-muted) tabular-nums',
     },
     variants: {
       colorScheme: {
@@ -129,7 +131,7 @@ export namespace Progress {
 
   export function Label({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'span';
-    return <Root {...rest} className={cn('text-body-b3-medium truncate', className)} />;
+    return <Root {...rest} className={Style().label({ className })} />;
   }
 
   export function Value({ asChild, className, children, ...rest }: PartProps) {
@@ -137,10 +139,7 @@ export namespace Progress {
     const Root = asChild === true ? Slot : 'span';
 
     return (
-      <Root
-        {...rest}
-        className={cn('shrink-0 text-(--ids-color-on-muted) tabular-nums', className)}
-      >
+      <Root {...rest} className={Style().value({ className })}>
         {children ?? (value == null ? '' : `${Math.round((value / max) * 100)}%`)}
       </Root>
     );

@@ -1,7 +1,7 @@
 import { Children, isValidElement } from 'react';
 import type { ComponentProps, KeyboardEvent, MouseEvent, ReactNode } from 'react';
 
-import { cn, invariant, tv } from '../../utils';
+import { invariant, tv } from '../../utils';
 import { Slot } from '../slot';
 
 const ASSERTIVE_VARIANTS = new Set(['warning', 'danger']);
@@ -36,8 +36,7 @@ export function Alert({ variant = 'info', className, children, ...rest }: Alert.
         variant,
         icon: icon != null,
         close: close != null,
-        className,
-      })}
+      }).root({ className })}
     >
       {icon}
       <div className="flex min-w-0 flex-col gap-0.5">{body}</div>
@@ -48,67 +47,75 @@ export function Alert({ variant = 'info', className, children, ...rest }: Alert.
 
 export namespace Alert {
   export const Style = tv({
-    base: [
-      'grid w-full items-start gap-y-0.5 rounded-xl px-4 py-3 inset-ring-1',
-      'bg-(--alert-tint)/8 text-(--ids-color-on-surface) inset-ring-(--alert-tint)/25',
-    ],
+    slots: {
+      root: [
+        'grid w-full items-start gap-y-0.5 rounded-xl px-4 py-3 inset-ring-1',
+        'bg-(--alert-tint)/8 text-(--ids-color-on-surface) inset-ring-(--alert-tint)/25',
+      ],
+      icon: [
+        'text-subtitle-s2-semibold inline-flex h-[1lh] shrink-0 items-center',
+        'text-(--alert-accent) [&_svg]:size-5',
+      ],
+      title: 'text-subtitle-s2-semibold',
+      description: 'text-body-b3-regular text-(--ids-color-on-muted)',
+      actions: 'mt-2 flex items-center gap-2',
+      close: [
+        'inline-flex h-[1lh] w-6 shrink-0 cursor-pointer items-center justify-center rounded-lg',
+        'text-subtitle-s2-semibold',
+        'opacity-60 transition-opacity hover:opacity-100',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current',
+        'motion-reduce:transition-none',
+        '[&_svg]:size-4',
+      ],
+    },
     variants: {
       variant: {
-        info: '[--alert-tint:var(--ids-color-info)] [--alert-accent:var(--ids-color-info-strong)]',
-        success:
-          '[--alert-tint:var(--ids-color-success)] [--alert-accent:var(--ids-color-success-strong)]',
-        warning:
-          '[--alert-tint:var(--ids-color-warning)] [--alert-accent:var(--ids-color-warning-strong)]',
-        danger:
-          '[--alert-tint:var(--ids-color-danger)] [--alert-accent:var(--ids-color-danger-strong)]',
-        neutral:
-          '[--alert-tint:var(--ids-color-on-surface)] [--alert-accent:var(--ids-color-on-surface)]',
+        info: {
+          root: '[--alert-tint:var(--ids-color-info)] [--alert-accent:var(--ids-color-info-strong)]',
+        },
+        success: {
+          root: '[--alert-tint:var(--ids-color-success)] [--alert-accent:var(--ids-color-success-strong)]',
+        },
+        warning: {
+          root: '[--alert-tint:var(--ids-color-warning)] [--alert-accent:var(--ids-color-warning-strong)]',
+        },
+        danger: {
+          root: '[--alert-tint:var(--ids-color-danger)] [--alert-accent:var(--ids-color-danger-strong)]',
+        },
+        neutral: {
+          root: '[--alert-tint:var(--ids-color-on-surface)] [--alert-accent:var(--ids-color-on-surface)]',
+        },
       },
-      icon: { true: 'gap-x-3', false: '' },
-      close: { true: 'gap-x-3', false: '' },
+      icon: { true: { root: 'gap-x-3' }, false: {} },
+      close: { true: { root: 'gap-x-3' }, false: {} },
     },
     compoundVariants: [
-      { icon: false, close: false, class: 'grid-cols-1' },
-      { icon: true, close: false, class: 'grid-cols-[auto_1fr]' },
-      { icon: false, close: true, class: 'grid-cols-[1fr_auto]' },
-      { icon: true, close: true, class: 'grid-cols-[auto_1fr_auto]' },
+      { icon: false, close: false, class: { root: 'grid-cols-1' } },
+      { icon: true, close: false, class: { root: 'grid-cols-[auto_1fr]' } },
+      { icon: false, close: true, class: { root: 'grid-cols-[1fr_auto]' } },
+      { icon: true, close: true, class: { root: 'grid-cols-[auto_1fr_auto]' } },
     ],
     defaultVariants: { variant: 'info', icon: false, close: false },
   });
 
   export function Icon({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'span';
-    return (
-      <Root
-        aria-hidden
-        {...rest}
-        className={cn(
-          'text-subtitle-s2-semibold inline-flex h-[1lh] shrink-0 items-center',
-          'text-(--alert-accent) [&_svg]:size-5',
-          className,
-        )}
-      />
-    );
+    return <Root aria-hidden {...rest} className={Style().icon({ className })} />;
   }
 
   export function Title({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={cn('text-subtitle-s2-semibold', className)} />;
+    return <Root {...rest} className={Style().title({ className })} />;
   }
 
   export function Description({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'div';
-    return (
-      <Root
-        {...rest}
-        className={cn('text-body-b3-regular text-(--ids-color-on-muted)', className)}
-      />
-    );
+    return <Root {...rest} className={Style().description({ className })} />;
   }
 
   export function Actions({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={cn('mt-2 flex items-center gap-2', className)} />;
+    return <Root {...rest} className={Style().actions({ className })} />;
   }
 
   export function Close({ onClose, children, className, ...rest }: CloseProps) {
@@ -120,15 +127,7 @@ export namespace Alert {
         aria-label="닫기"
         {...{ [CLOSE_ATTRIBUTE]: '' }}
         {...rest}
-        className={cn(
-          'inline-flex h-[1lh] w-6 shrink-0 cursor-pointer items-center justify-center rounded-lg',
-          'text-subtitle-s2-semibold',
-          'opacity-60 transition-opacity hover:opacity-100',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current',
-          'motion-reduce:transition-none',
-          '[&_svg]:size-4',
-          className,
-        )}
+        className={Style().close({ className })}
         onClick={(event) => {
           onClose(event);
         }}
