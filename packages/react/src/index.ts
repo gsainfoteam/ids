@@ -42,6 +42,8 @@ export { IconToggle } from './components/icon-toggle';
 export { ToggleGroup } from './components/toggle-group';
 export { Checkbox } from './components/checkbox';
 export { Switch } from './components/switch';
+export { Radio } from './components/radio';
+export { RadioGroup } from './components/radio-group';
 export { TextField } from './components/text-field';
 export { TextFieldGroup } from './components/text-field-group';
 
