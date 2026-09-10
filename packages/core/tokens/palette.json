@@ -48,7 +48,9 @@
   "yellow": {
     "400": { "$value": "#facc15", "$type": "color" },
     "500": { "$value": "#eab308", "$type": "color" },
-    "600": { "$value": "#ca8a04", "$type": "color" }
+    "600": { "$value": "#ca8a04", "$type": "color" },
+    "700": { "$value": "#a16207", "$type": "color" },
+    "800": { "$value": "#854d0e", "$type": "color" }
   },
   "green": {
     "50": { "$value": "#f0fdf0", "$type": "color" },

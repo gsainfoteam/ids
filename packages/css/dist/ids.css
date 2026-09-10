@@ -10,12 +10,16 @@
   --color-on-muted: var(--ids-color-on-muted);
   --color-success: var(--ids-color-success);
   --color-on-success: var(--ids-color-on-success);
+  --color-success-strong: var(--ids-color-success-strong);
   --color-warning: var(--ids-color-warning);
   --color-on-warning: var(--ids-color-on-warning);
+  --color-warning-strong: var(--ids-color-warning-strong);
   --color-danger: var(--ids-color-danger);
   --color-on-danger: var(--ids-color-on-danger);
+  --color-danger-strong: var(--ids-color-danger-strong);
   --color-info: var(--ids-color-info);
   --color-on-info: var(--ids-color-on-info);
+  --color-info-strong: var(--ids-color-info-strong);
 }
 
 :root {
@@ -500,21 +504,29 @@
 [data-mode="light"] {
   --ids-color-success: #418501;
   --ids-color-on-success: #ffffff;
+  --ids-color-success-strong: #366e01;
   --ids-color-warning: #eab308;
   --ids-color-on-warning: #0a0a0a;
+  --ids-color-warning-strong: #854d0e;
   --ids-color-danger: #b91c1c;
   --ids-color-on-danger: #ffffff;
+  --ids-color-danger-strong: #b91c1c;
   --ids-color-info: #0369a1;
   --ids-color-on-info: #ffffff;
+  --ids-color-info-strong: #0369a1;
 }
 
 [data-mode="dark"] {
   --ids-color-success: #4ade5e;
   --ids-color-on-success: #0a0a0a;
+  --ids-color-success-strong: #4ade5e;
   --ids-color-warning: #facc15;
   --ids-color-on-warning: #0a0a0a;
+  --ids-color-warning-strong: #facc15;
   --ids-color-danger: #f87171;
   --ids-color-on-danger: #0a0a0a;
+  --ids-color-danger-strong: #f87171;
   --ids-color-info: #38bdf8;
   --ids-color-on-info: #0a0a0a;
+  --ids-color-info-strong: #38bdf8;
 }

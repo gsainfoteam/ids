@@ -1,12 +1,16 @@
 {
   "color": {
-    "success":    { "$value": "{green.400}",   "$type": "color" },
-    "on-success": { "$value": "{neutral.950}", "$type": "color" },
-    "warning":    { "$value": "{yellow.400}",  "$type": "color" },
-    "on-warning": { "$value": "{neutral.950}", "$type": "color" },
-    "danger":     { "$value": "{red.400}",     "$type": "color" },
-    "on-danger":  { "$value": "{neutral.950}", "$type": "color" },
-    "info":       { "$value": "{sky.400}",     "$type": "color" },
-    "on-info":    { "$value": "{neutral.950}", "$type": "color" }
+    "success":         { "$value": "{green.400}",   "$type": "color" },
+    "on-success":      { "$value": "{neutral.950}", "$type": "color" },
+    "success-strong":  { "$value": "{green.400}",   "$type": "color" },
+    "warning":         { "$value": "{yellow.400}",  "$type": "color" },
+    "on-warning":      { "$value": "{neutral.950}", "$type": "color" },
+    "warning-strong":  { "$value": "{yellow.400}",  "$type": "color" },
+    "danger":          { "$value": "{red.400}",     "$type": "color" },
+    "on-danger":       { "$value": "{neutral.950}", "$type": "color" },
+    "danger-strong":   { "$value": "{red.400}",     "$type": "color" },
+    "info":            { "$value": "{sky.400}",     "$type": "color" },
+    "on-info":         { "$value": "{neutral.950}", "$type": "color" },
+    "info-strong":     { "$value": "{sky.400}",     "$type": "color" }
   }
 }
