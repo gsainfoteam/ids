@@ -56,7 +56,7 @@ export namespace Alert {
       ],
       icon: [
         'text-subtitle-s2-semibold inline-flex h-[1lh] shrink-0 items-center',
-        'text-(--alert-accent) [&_svg]:size-5',
+        'text-(--alert-accent) [&_svg]:size-(--ids-size-icon-standard)',
       ],
       title: 'text-subtitle-s2-semibold',
       description: 'text-body-b3-regular text-(--ids-color-on-muted)',

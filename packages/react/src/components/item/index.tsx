@@ -44,7 +44,7 @@ export namespace Item {
     slots: {
       root: 'flex w-full items-center rounded-lg bg-(--ids-color-surface) text-(--ids-color-on-surface)',
       media:
-        'inline-flex shrink-0 items-center justify-center text-(--ids-color-on-muted) [&_svg]:size-5',
+        'inline-flex shrink-0 items-center justify-center text-(--ids-color-on-muted) [&_svg]:size-(--ids-size-icon-standard)',
       content: 'flex min-w-0 flex-1 flex-col',
       title: 'text-body-b3-medium truncate',
       description: 'text-caption-c1-regular truncate text-(--ids-color-on-muted)',

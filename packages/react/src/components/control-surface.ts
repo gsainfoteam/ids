@@ -10,8 +10,8 @@ export const controlSurface = {
     'motion-reduce:transition-none',
   ],
   size: {
-    standard: 'h-11 rounded-md px-4.5 text-button-standard',
-    tiny: 'h-8 rounded-sm px-2.5 text-button-tiny',
+    standard: 'h-(--ids-size-control-standard) rounded-md px-4 text-button-standard',
+    tiny: 'h-(--ids-size-control-tiny) rounded-sm px-3 text-button-tiny',
   } satisfies Record<IdsSize, string>,
   variant: {
     solid:

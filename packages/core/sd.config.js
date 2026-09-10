@@ -264,7 +264,7 @@ const buildColorBridgeCSS = (dictionary) => {
 
 // :root { --ids-motion-fast: 150ms; ... }
 const buildStaticCSS = (dictionary) => {
-  const lines = ["motion", "radius"].flatMap((cat) =>
+  const lines = ["motion", "radius", "size"].flatMap((cat) =>
     byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
   );
   // rounded-* has to resolve to the IDS scale, so bridge radius into @theme too.

@@ -1,0 +1,8 @@
+{
+  "size": {
+    "control-standard": { "$value": "36px", "$type": "dimension" },
+    "control-tiny":     { "$value": "32px", "$type": "dimension" },
+    "icon-standard":    { "$value": "16px", "$type": "dimension" },
+    "icon-tiny":        { "$value": "14px", "$type": "dimension" }
+  }
+}

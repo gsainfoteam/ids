@@ -43,7 +43,7 @@ export namespace Card {
       header: 'flex flex-col gap-1 p-4',
       content: 'flex flex-1 flex-col gap-2 p-4 pt-0',
       footer: 'flex items-center gap-2 p-4 pt-0',
-      title: 'text-subtitle-s1-semibold',
+      title: 'text-subtitle-s2-semibold',
       description: 'text-body-b3-regular text-(--ids-color-on-muted)',
     },
     variants: {

@@ -123,11 +123,11 @@ export namespace TextFieldGroup {
         size: {
           standard: [
             'gap-1',
-            'not-has-[button]:text-body-b2-regular not-has-[button]:[&_svg]:size-5',
+            'not-has-[button]:text-body-b2-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
           ],
           tiny: [
             'gap-0.5',
-            'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-4',
+            'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',
           ],
         } satisfies Record<IdsSize, string[]>,
       },

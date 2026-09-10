@@ -32,6 +32,10 @@
   --ids-radius-lg: 12px;
   --ids-radius-xl: 16px;
   --ids-radius-full: 9999px;
+  --ids-size-control-standard: 36px;
+  --ids-size-control-tiny: 32px;
+  --ids-size-icon-standard: 16px;
+  --ids-size-icon-tiny: 14px;
 }
 
 @theme {
@@ -235,11 +239,11 @@
   --ids-text-caption-c2-regular--font-weight: 400;
   --ids-text-caption-c2-regular--line-height: 1.35;
   --ids-text-caption-c2-regular--letter-spacing: 0em;
-  --ids-text-button-standard: 16px;
+  --ids-text-button-standard: 14px;
   --ids-text-button-standard--font-weight: 500;
   --ids-text-button-standard--line-height: 1;
   --ids-text-button-standard--letter-spacing: 0em;
-  --ids-text-button-tiny: 14px;
+  --ids-text-button-tiny: 12px;
   --ids-text-button-tiny--font-weight: 500;
   --ids-text-button-tiny--line-height: 1;
   --ids-text-button-tiny--letter-spacing: 0em;

@@ -39,8 +39,8 @@ export const textFieldSurface = tv({
       underline: 'rounded-none border-b-2 border-(--ids-color-outline)',
     } satisfies Record<TextFieldVariant, string>,
     size: {
-      standard: 'h-11 text-body-b2-regular',
-      tiny: 'h-8 text-body-b3-regular',
+      standard: 'h-(--ids-size-control-standard) text-body-b3-regular',
+      tiny: 'h-(--ids-size-control-tiny) text-caption-c1-regular',
     } satisfies Record<IdsSize, string>,
   },
   compoundVariants: [

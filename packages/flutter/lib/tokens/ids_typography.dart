@@ -47,6 +47,6 @@ abstract final class IdsTypography {
   static const captionC2Semibold = TextStyle(fontFamily: 'Pretendard Variable', package: 'ids_flutter', fontSize: 10, fontWeight: FontWeight.w600, height: 1.35, letterSpacing: 0);
   static const captionC2Medium = TextStyle(fontFamily: 'Pretendard Variable', package: 'ids_flutter', fontSize: 10, fontWeight: FontWeight.w500, height: 1.35, letterSpacing: 0);
   static const captionC2Regular = TextStyle(fontFamily: 'Pretendard Variable', package: 'ids_flutter', fontSize: 10, fontWeight: FontWeight.w400, height: 1.35, letterSpacing: 0);
-  static const buttonStandard = TextStyle(fontFamily: 'Pretendard Variable', package: 'ids_flutter', fontSize: 16, fontWeight: FontWeight.w500, height: 1, letterSpacing: 0);
-  static const buttonTiny = TextStyle(fontFamily: 'Pretendard Variable', package: 'ids_flutter', fontSize: 14, fontWeight: FontWeight.w500, height: 1, letterSpacing: 0);
+  static const buttonStandard = TextStyle(fontFamily: 'Pretendard Variable', package: 'ids_flutter', fontSize: 14, fontWeight: FontWeight.w500, height: 1, letterSpacing: 0);
+  static const buttonTiny = TextStyle(fontFamily: 'Pretendard Variable', package: 'ids_flutter', fontSize: 12, fontWeight: FontWeight.w500, height: 1, letterSpacing: 0);
 }
