@@ -75,13 +75,17 @@ export namespace Avatar {
     variants: {
       variant: {
         circle: { root: 'rounded-full' },
-        square: { root: 'rounded-lg' },
+        square: {},
       },
       size: {
         standard: { root: 'text-body-b3-medium size-10' },
         tiny: { root: 'text-caption-c2-medium size-6' },
       } satisfies Record<IdsSize, { root: string }>,
     },
+    compoundVariants: [
+      { variant: 'square', size: 'standard', class: { root: 'rounded-md' } },
+      { variant: 'square', size: 'tiny', class: { root: 'rounded-sm' } },
+    ],
     defaultVariants: { variant: 'circle', size: 'standard' },
   });
 
