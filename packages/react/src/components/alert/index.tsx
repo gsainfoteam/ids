@@ -32,10 +32,15 @@ export function Alert({ variant = 'info', className, children, ...rest }: Alert.
       aria-live={assertive ? 'assertive' : 'polite'}
       {...rest}
       onKeyDown={onKeyDown}
-      className={Alert.Style({ variant, className })}
+      className={Alert.Style({
+        variant,
+        icon: icon != null,
+        close: close != null,
+        className,
+      })}
     >
       {icon}
-      <div className="flex min-w-0 flex-1 flex-col gap-1">{body}</div>
+      <div className="flex min-w-0 flex-col gap-0.5">{body}</div>
       {close}
     </div>
   );
@@ -44,19 +49,31 @@ export function Alert({ variant = 'info', className, children, ...rest }: Alert.
 export namespace Alert {
   export const Style = tv({
     base: [
-      'flex items-start gap-3 rounded-xl p-4 inset-ring-1',
-      'bg-(--alert-accent)/10 text-(--ids-color-on-surface) inset-ring-(--alert-accent)/30',
+      'grid w-full items-start gap-y-0.5 rounded-xl px-4 py-3 inset-ring-1',
+      'bg-(--alert-tint)/8 text-(--ids-color-on-surface) inset-ring-(--alert-tint)/25',
     ],
     variants: {
       variant: {
-        info: '[--alert-accent:var(--ids-color-info)]',
-        success: '[--alert-accent:var(--ids-color-success)]',
-        warning: '[--alert-accent:var(--ids-color-warning)]',
-        danger: '[--alert-accent:var(--ids-color-danger)]',
-        neutral: '[--alert-accent:var(--ids-color-on-surface)]',
+        info: '[--alert-tint:var(--ids-color-info)] [--alert-accent:var(--ids-color-info-strong)]',
+        success:
+          '[--alert-tint:var(--ids-color-success)] [--alert-accent:var(--ids-color-success-strong)]',
+        warning:
+          '[--alert-tint:var(--ids-color-warning)] [--alert-accent:var(--ids-color-warning-strong)]',
+        danger:
+          '[--alert-tint:var(--ids-color-danger)] [--alert-accent:var(--ids-color-danger-strong)]',
+        neutral:
+          '[--alert-tint:var(--ids-color-on-surface)] [--alert-accent:var(--ids-color-on-surface)]',
       },
+      icon: { true: 'gap-x-3', false: '' },
+      close: { true: 'gap-x-3', false: '' },
     },
-    defaultVariants: { variant: 'info' },
+    compoundVariants: [
+      { icon: false, close: false, class: 'grid-cols-1' },
+      { icon: true, close: false, class: 'grid-cols-[auto_1fr]' },
+      { icon: false, close: true, class: 'grid-cols-[1fr_auto]' },
+      { icon: true, close: true, class: 'grid-cols-[auto_1fr_auto]' },
+    ],
+    defaultVariants: { variant: 'info', icon: false, close: false },
   });
 
   export function Icon({ asChild, className, ...rest }: PartProps) {
@@ -65,7 +82,11 @@ export namespace Alert {
       <Root
         aria-hidden
         {...rest}
-        className={cn('inline-flex shrink-0 text-(--alert-accent) [&_svg]:size-5', className)}
+        className={cn(
+          'text-subtitle-s2-semibold inline-flex h-[1lh] shrink-0 items-center',
+          'text-(--alert-accent) [&_svg]:size-5',
+          className,
+        )}
       />
     );
   }
@@ -77,7 +98,12 @@ export namespace Alert {
 
   export function Description({ asChild, className, ...rest }: PartProps) {
     const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={cn('text-body-b3-regular', className)} />;
+    return (
+      <Root
+        {...rest}
+        className={cn('text-body-b3-regular text-(--ids-color-on-muted)', className)}
+      />
+    );
   }
 
   export function Actions({ asChild, className, ...rest }: PartProps) {
@@ -95,7 +121,8 @@ export namespace Alert {
         {...{ [CLOSE_ATTRIBUTE]: '' }}
         {...rest}
         className={cn(
-          'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-lg',
+          'inline-flex h-[1lh] w-6 shrink-0 cursor-pointer items-center justify-center rounded-lg',
+          'text-subtitle-s2-semibold',
           'opacity-60 transition-opacity hover:opacity-100',
           'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current',
           'motion-reduce:transition-none',
