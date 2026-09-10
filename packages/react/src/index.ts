@@ -31,6 +31,8 @@ export { Toggle } from './components/toggle';
 export { IconToggle } from './components/icon-toggle';
 export { ToggleGroup } from './components/toggle-group';
 export { TextField } from './components/text-field';
+export { NumberField } from './components/number-field';
+export type { NumberFieldProps, NumberFieldVariant } from './components/number-field';
 export { TextArea } from './components/text-area';
 export type { TextAreaProps, TextAreaVariant } from './components/text-area';
 export { TextFieldGroup } from './components/text-field-group';

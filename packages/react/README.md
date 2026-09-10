@@ -220,3 +220,8 @@ pnpm lint
 `TextArea`는 여러 줄 입력과 위·아래 도구 영역을 합성하고, `autoResize`와
 `minRows`/`maxRows`로 높이를 제한합니다. Field의 라벨·오류 및 선택적 RHF 어댑터와 연결됩니다.
 [TextArea API와 예제](./src/components/text-area/README.md)를 참고하세요.
+
+## NumberField
+
+`NumberField`는 숫자/null 값, 소수점 증감, 통화·백분율 표시와 Input/Stepper/Clear 합성을 제공합니다.
+RHF에는 `controlMode="value"`로 연결합니다. [NumberField API와 값 계약](./src/components/number-field/README.md)을 참고하세요.
