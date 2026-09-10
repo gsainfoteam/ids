@@ -269,6 +269,22 @@ const buildStaticCSS = (dictionary) => {
   return `:root {\n${lines.join("\n")}\n}\n`;
 };
 
+// Keyframes can't come from a token file, but they have to ship with the CSS
+// package so consumers get the same motion the components assume.
+const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
+
+@theme {
+  --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
+}
+`;
+
 // :root { --ids-text-button-standard: ...; --ids-font-size-h1: ... }
 // @theme { --text-button-standard: var(--ids-text-button-standard); --font-weight-semibold: ... }
 const buildTypographyCSS = (dictionary) => {
@@ -319,6 +335,7 @@ const cssFormatter = ({ dictionary }) =>
   [
     buildColorBridgeCSS(dictionary),
     buildStaticCSS(dictionary),
+    T_CSS_ANIMATIONS,
     buildTypographyCSS(dictionary),
     ...colorPairs.map(([c, m]) =>
       buildColorThemeCSS(

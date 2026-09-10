@@ -31,6 +31,19 @@
   --ids-scale-pressed-strong: 0.96;
 }
 
+@keyframes ids-progress-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
+
+@theme {
+  --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
+}
+
 :root {
   --ids-text-headline-h1-bold: 48px;
   --ids-text-headline-h1-bold--font-weight: 700;
