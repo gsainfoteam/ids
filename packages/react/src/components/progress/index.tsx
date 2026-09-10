@@ -2,12 +2,10 @@ import { createContext, useContext } from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 
 import { cn, invariant, tv } from '../../utils';
+import { Arc } from '../arc';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
-
-const RADIUS = 9;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 type ProgressContextValue = { value: number | null; max: number };
 
@@ -48,35 +46,18 @@ export function Progress({
     ...(current == null ? {} : { 'aria-valuenow': current }),
   };
 
+  const { root, track, bar, circle } = Progress.Style({ colorScheme, size, running });
+
   if (shape === 'circular') {
     return (
       <ProgressContext.Provider value={{ value: current, max }}>
-        <div {...aria} {...rest} className={Progress.Circle({ size, colorScheme, className })}>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            className={cn('size-full', running && 'animate-spin motion-reduce:animate-none')}
-          >
-            <circle
-              cx="12"
-              cy="12"
-              r={RADIUS}
-              stroke="currentColor"
-              strokeWidth="3"
-              className="text-(--ids-color-muted)"
-            />
-            <circle
-              cx="12"
-              cy="12"
-              r={RADIUS}
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              className="origin-center -rotate-90 text-(--progress-fill) transition-[stroke-dashoffset] duration-(--ids-motion-normal) motion-reduce:transition-none"
-              strokeDasharray={CIRCUMFERENCE}
-              strokeDashoffset={CIRCUMFERENCE * (1 - (running ? 0.25 : ratio))}
-            />
-          </svg>
+        <div {...aria} {...rest} className={circle({ className })}>
+          <Arc
+            ratio={running ? 0.25 : ratio}
+            spin={running}
+            trackClassName="text-(--ids-color-muted)"
+            indicatorClassName="text-(--progress-fill) transition-[stroke-dashoffset] duration-(--ids-motion-normal) motion-reduce:transition-none"
+          />
           {children == null ? null : (
             <span className="absolute inset-0 flex items-center justify-center">{children}</span>
           )}
@@ -87,20 +68,12 @@ export function Progress({
 
   return (
     <ProgressContext.Provider value={{ value: current, max }}>
-      <div {...rest} className={Progress.Style({ colorScheme, className })}>
+      <div {...rest} className={root({ className })}>
         {children == null ? null : (
           <div className="flex items-baseline justify-between gap-2">{children}</div>
         )}
-        <div {...aria} className={Progress.Track({ size })}>
-          <div
-            className={cn(
-              'h-full rounded-full bg-(--progress-fill)',
-              running
-                ? 'animate-progress-slide w-1/4 motion-reduce:w-full motion-reduce:animate-none motion-reduce:opacity-40'
-                : 'transition-[width] duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
-            )}
-            style={running ? undefined : { width: `${ratio * 100}%` }}
-          />
+        <div {...aria} className={track()}>
+          <div className={bar()} style={running ? undefined : { width: `${ratio * 100}%` }} />
         </div>
       </div>
     </ProgressContext.Provider>
@@ -108,41 +81,50 @@ export function Progress({
 }
 
 export namespace Progress {
-  const scheme = {
-    primary: '[--progress-fill:var(--ids-color-primary)]',
-    success: '[--progress-fill:var(--ids-color-success)]',
-    warning: '[--progress-fill:var(--ids-color-warning)]',
-    danger: '[--progress-fill:var(--ids-color-danger)]',
-    neutral: '[--progress-fill:var(--ids-color-on-muted)]',
-  } as const;
-
   export const Style = tv({
-    base: 'flex w-full flex-col gap-1.5',
-    variants: { colorScheme: scheme },
-    defaultVariants: { colorScheme: 'primary' },
-  });
-
-  export const Track = tv({
-    base: 'w-full overflow-hidden rounded-full bg-(--ids-color-muted)',
-    variants: {
-      size: {
-        standard: 'h-2',
-        tiny: 'h-1',
-      } satisfies Record<IdsSize, string>,
+    slots: {
+      root: 'flex w-full flex-col gap-1.5',
+      track: 'w-full overflow-hidden rounded-full bg-(--ids-color-muted)',
+      bar: 'h-full rounded-full bg-(--progress-fill)',
+      circle: 'relative inline-flex shrink-0 items-center justify-center',
     },
-    defaultVariants: { size: 'standard' },
-  });
-
-  export const Circle = tv({
-    base: 'relative inline-flex shrink-0 items-center justify-center',
     variants: {
-      colorScheme: scheme,
+      colorScheme: {
+        primary: {
+          root: '[--progress-fill:var(--ids-color-primary)]',
+          circle: '[--progress-fill:var(--ids-color-primary)]',
+        },
+        success: {
+          root: '[--progress-fill:var(--ids-color-success)]',
+          circle: '[--progress-fill:var(--ids-color-success)]',
+        },
+        warning: {
+          root: '[--progress-fill:var(--ids-color-warning)]',
+          circle: '[--progress-fill:var(--ids-color-warning)]',
+        },
+        danger: {
+          root: '[--progress-fill:var(--ids-color-danger)]',
+          circle: '[--progress-fill:var(--ids-color-danger)]',
+        },
+        neutral: {
+          root: '[--progress-fill:var(--ids-color-on-muted)]',
+          circle: '[--progress-fill:var(--ids-color-on-muted)]',
+        },
+      },
       size: {
-        standard: 'size-10 text-caption-c2-medium',
-        tiny: 'size-6 text-[9px]/none font-medium',
-      } satisfies Record<IdsSize, string>,
+        standard: { track: 'h-2', circle: 'text-caption-c2-medium size-10' },
+        tiny: { track: 'h-1', circle: 'size-6 text-[9px]/none font-medium' },
+      } satisfies Record<IdsSize, { track: string; circle: string }>,
+      running: {
+        true: {
+          bar: 'animate-progress-slide w-1/4 motion-reduce:w-full motion-reduce:animate-none motion-reduce:opacity-40',
+        },
+        false: {
+          bar: 'transition-[width] duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
+        },
+      },
     },
-    defaultVariants: { colorScheme: 'primary', size: 'standard' },
+    defaultVariants: { colorScheme: 'primary', size: 'standard', running: false },
   });
 
   export function Label({ asChild, className, ...rest }: PartProps) {
