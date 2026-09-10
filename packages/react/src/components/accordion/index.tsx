@@ -13,6 +13,7 @@ const ROOT_ATTRIBUTE = 'data-accordion';
 type AccordionContextValue = {
   size: IdsSize;
   variant: 'bordered' | 'separated' | 'ghost';
+  headingLevel: 1 | 2 | 3 | 4 | 5 | 6;
   isOpen: (value: string) => boolean;
   toggle: (value: string) => void;
 };
@@ -64,7 +65,14 @@ function moveFocus(event: KeyboardEvent<HTMLButtonElement>) {
 }
 
 export function Accordion<T extends string>(props: Accordion.Props<T>) {
-  const { variant = 'bordered', size = 'standard', className, children, ...rest } = props;
+  const {
+    variant = 'bordered',
+    size = 'standard',
+    headingLevel = 3,
+    className,
+    children,
+    ...rest
+  } = props;
 
   const single = props.type === 'single';
   const [value, setValue] = useControllableState<T | null | T[]>({
@@ -88,12 +96,19 @@ export function Accordion<T extends string>(props: Accordion.Props<T>) {
   }
 
   const forwarded = { ...rest } as Record<string, unknown>;
-  for (const key of ['type', 'value', 'defaultValue', 'onValueChange', 'collapsible']) {
+  for (const key of [
+    'type',
+    'value',
+    'defaultValue',
+    'onValueChange',
+    'collapsible',
+    'headingLevel',
+  ]) {
     delete forwarded[key];
   }
 
   return (
-    <AccordionContext.Provider value={{ size, variant, isOpen, toggle }}>
+    <AccordionContext.Provider value={{ size, variant, headingLevel, isOpen, toggle }}>
       <div
         {...forwarded}
         {...{ [ROOT_ATTRIBUTE]: '' }}
@@ -176,33 +191,36 @@ export namespace Accordion {
   }
 
   export function Trigger({ className, children, ...rest }: TriggerProps) {
-    const { size, toggle } = useAccordionContext('Accordion.Trigger');
+    const { size, headingLevel, toggle } = useAccordionContext('Accordion.Trigger');
     const { open, disabled, value, triggerId, contentId } = useItemContext('Accordion.Trigger');
+    const Heading = `h${headingLevel}` as const;
 
     return (
-      <button
-        type="button"
-        id={triggerId}
-        aria-expanded={open}
-        aria-controls={contentId}
-        disabled={disabled}
-        data-state={open ? 'open' : 'closed'}
-        {...{ [TRIGGER_ATTRIBUTE]: '' }}
-        {...rest}
-        className={TriggerStyle({ size, className })}
-        onClick={(event) => {
-          rest.onClick?.(event);
-          if (event.defaultPrevented) return;
-          toggle(value);
-        }}
-        onKeyDown={(event) => {
-          rest.onKeyDown?.(event);
-          if (event.defaultPrevented) return;
-          moveFocus(event);
-        }}
-      >
-        {children}
-      </button>
+      <Heading className="flex">
+        <button
+          type="button"
+          id={triggerId}
+          aria-expanded={open}
+          aria-controls={contentId}
+          disabled={disabled}
+          data-state={open ? 'open' : 'closed'}
+          {...{ [TRIGGER_ATTRIBUTE]: '' }}
+          {...rest}
+          className={TriggerStyle({ size, className })}
+          onClick={(event) => {
+            rest.onClick?.(event);
+            if (event.defaultPrevented) return;
+            toggle(value);
+          }}
+          onKeyDown={(event) => {
+            rest.onKeyDown?.(event);
+            if (event.defaultPrevented) return;
+            moveFocus(event);
+          }}
+        >
+          {children}
+        </button>
+      </Heading>
     );
   }
 
@@ -287,6 +305,7 @@ export namespace Accordion {
   type CommonProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 'defaultValue'> & {
     variant?: 'bordered' | 'separated' | 'ghost';
     size?: IdsSize;
+    headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
     className?: string;
     children?: ReactNode;
   };
