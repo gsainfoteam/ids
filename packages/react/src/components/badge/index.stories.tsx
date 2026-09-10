@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { BellIcon, CheckIcon } from '@phosphor-icons/react';
 import { expect, userEvent } from 'storybook/test';
 
 import { Badge } from '.';
@@ -60,7 +61,9 @@ export const Sizes: Story = {
 export const WithIconAndLabel: Story = {
   render: () => (
     <Badge colorScheme="success">
-      <Badge.Icon aria-hidden>✓</Badge.Icon>
+      <Badge.Icon>
+        <CheckIcon weight="bold" />
+      </Badge.Icon>
       <Badge.Label>Done</Badge.Label>
     </Badge>
   ),
@@ -70,9 +73,7 @@ export const WithIconAndLabel: Story = {
 export const AttachedCount: Story = {
   render: () => (
     <div className="relative inline-block p-2">
-      <span aria-hidden className="text-2xl">
-        🔔
-      </span>
+      <BellIcon size={28} />
       <Badge
         colorScheme="danger"
         variant="solid"

@@ -3,6 +3,7 @@ import type { ComponentProps, KeyboardEvent, MouseEvent, ReactNode } from 'react
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useInteractiveProps, type WithInteractiveValues } from '../../hooks/use-interactive';
 import { cn, invariant, tv } from '../../utils';
+import { CloseIcon } from '../close-icon';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -149,7 +150,7 @@ export namespace Badge {
           onClose(event);
         }}
       >
-        {children ?? '×'}
+        {children ?? <CloseIcon />}
       </button>
     );
   }
