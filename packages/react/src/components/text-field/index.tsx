@@ -1,16 +1,7 @@
-import {
-  Children,
-  isValidElement,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from 'react';
+import { Children, isValidElement, useRef, type CSSProperties, type ReactNode } from 'react';
 
 import { isNotNil } from 'es-toolkit';
 
-import { invariant, mergeRefs, tv } from '../../utils';
-import { IconButton } from '../icon-button';
 import {
   TextFieldContext,
   textFieldAdornment,
@@ -19,12 +10,9 @@ import {
   type TextFieldInputProps,
   type TextFieldVariant,
 } from './surface';
+import { invariant, mergeRefs, tv } from '../../utils';
 
 import type { IdsSize } from '../../tokens/types';
-
-function hasText(value: unknown) {
-  return value != null && String(value) !== '';
-}
 
 function splitByInput(children: ReactNode) {
   const items = Children.toArray(children);
@@ -56,41 +44,16 @@ export function TextField({
   ...inputProps
 }: TextField.Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [uncontrolledHasValue, setUncontrolledHasValue] = useState(() =>
-    hasText(inputProps.defaultValue),
-  );
 
   invariant(
     inputProps.value == null || inputProps.onChange != null || inputProps.readOnly === true,
     '`<TextField>` with `value` requires `onChange` (or `readOnly`).',
   );
 
-  const controlled = inputProps.value !== undefined;
   const { leading, input, trailing } = splitByInput(children);
 
-  function clear() {
-    const el = inputRef.current;
-    if (el == null) return;
-
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(el, '');
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.focus();
-  }
-
   return (
-    <TextFieldContext.Provider
-      value={{
-        size,
-        disabled,
-        inputProps,
-        inputRef,
-        hasValue: controlled ? hasText(inputProps.value) : uncontrolledHasValue,
-        trackValue: (next) => {
-          if (!controlled) setUncontrolledHasValue(hasText(next));
-        },
-        clear,
-      }}
-    >
+    <TextFieldContext.Provider value={{ size, disabled, inputProps, inputRef }}>
       <div
         data-text-field=""
         data-variant={variant}
@@ -127,8 +90,7 @@ export namespace TextField {
     const field = useTextFieldContext();
     invariant(field != null, '`<TextField.Input>` must be used inside `<TextField>`.');
 
-    const { inputProps, inputRef, trackValue } = field;
-    const onChange = rest.onChange ?? inputProps.onChange;
+    const { inputProps, inputRef } = field;
 
     return (
       <input
@@ -139,10 +101,6 @@ export namespace TextField {
         className={Input.Style({ className })}
         style={style}
         ref={mergeRefs(inputRef, inputProps.ref, ref)}
-        onChange={(event) => {
-          trackValue(event.target.value);
-          onChange?.(event);
-        }}
       />
     );
   }
@@ -161,38 +119,6 @@ export namespace TextField {
       disabled?: boolean;
       className?: string;
       style?: CSSProperties;
-    };
-  }
-
-  export function Clear({ onClear, onClick, ...rest }: Clear.Props) {
-    const field = useTextFieldContext();
-    invariant(field != null, '`<TextField.Clear>` must be used inside `<TextField>`.');
-
-    if (!field.hasValue || field.disabled) return null;
-
-    return (
-      <IconButton
-        aria-label="지우기"
-        {...rest}
-        size={field.size}
-        icon={
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-            <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
-          </svg>
-        }
-        onClick={(event) => {
-          onClick?.(event);
-          if (event.defaultPrevented) return;
-          (onClear ?? field.clear)();
-        }}
-      />
-    );
-  }
-
-  export namespace Clear {
-    export type Props = Omit<IconButton.Props, 'icon' | 'size' | 'aria-label'> & {
-      onClear?: () => void;
-      'aria-label'?: string;
     };
   }
 

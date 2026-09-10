@@ -10,6 +10,7 @@ import {
   InfoIcon,
   MagnifyingGlassIcon,
   StarIcon,
+  XIcon,
 } from '@phosphor-icons/react';
 import { expect } from 'storybook/test';
 
@@ -234,26 +235,17 @@ export const Gallery: Story = {
 };
 
 export const Clearable: Story = {
-  render: () => (
-    <div className="flex max-w-xs flex-col gap-3">
-      <TextField defaultValue="인포팀" placeholder="검색어" aria-label="검색어">
-        <MagnifyingGlassIcon />
-        <TextField.Input />
-        <TextField.Clear />
-      </TextField>
-      <ControlledClearField />
-    </div>
-  ),
+  render: () => <SearchWithClear />,
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole('textbox', { name: '검색어' });
     await expect(input).toHaveValue('인포팀');
 
-    await userEvent.click(canvas.getAllByRole('button', { name: '지우기' })[0]!);
+    await userEvent.click(canvas.getByRole('button', { name: '지우기' }));
     await expect(input).toHaveValue('');
-    await expect(canvas.queryAllByRole('button', { name: '지우기' })).toHaveLength(1);
+    await expect(canvas.queryByRole('button', { name: '지우기' })).not.toBeInTheDocument();
 
     await userEvent.type(input, '지스트');
-    await expect(canvas.getAllByRole('button', { name: '지우기' })).toHaveLength(2);
+    await expect(canvas.getByRole('button', { name: '지우기' })).toBeInTheDocument();
   },
 };
 
@@ -311,18 +303,27 @@ function CopyUrlField() {
   );
 }
 
-function ControlledClearField() {
-  const [value, setValue] = useState('지스트');
+function SearchWithClear() {
+  const [value, setValue] = useState('인포팀');
 
   return (
     <TextField
+      className="max-w-xs"
       value={value}
       onChange={(e) => setValue(e.target.value)}
-      placeholder="controlled"
-      aria-label="controlled"
+      placeholder="검색어"
+      aria-label="검색어"
     >
+      <MagnifyingGlassIcon />
       <TextField.Input />
-      <TextField.Clear />
+      {value !== '' && (
+        <IconButton
+          variant="ghost"
+          aria-label="지우기"
+          icon={<XIcon />}
+          onClick={() => setValue('')}
+        />
+      )}
     </TextField>
   );
 }

@@ -16,9 +16,6 @@ export type TextFieldContextValue = {
   disabled?: boolean;
   inputProps: TextFieldInputProps;
   inputRef: RefObject<HTMLInputElement | null>;
-  hasValue: boolean;
-  trackValue: (value: string) => void;
-  clear: () => void;
 };
 
 export const TextFieldContext = createContext<TextFieldContextValue | null>(null);
