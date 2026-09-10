@@ -214,3 +214,9 @@ pnpm lint
 일반 사용은 `@gsainfoteam/ids-react`, 선택형 RHF 자동 연동은
 `@gsainfoteam/ids-react/react-hook-form`에서 가져옵니다.
 [Field API와 연결 계약](./src/components/field/README.md)을 참고하세요.
+
+## TextArea
+
+`TextArea`는 여러 줄 입력과 위·아래 도구 영역을 합성하고, `autoResize`와
+`minRows`/`maxRows`로 높이를 제한합니다. Field의 라벨·오류 및 선택적 RHF 어댑터와 연결됩니다.
+[TextArea API와 예제](./src/components/text-area/README.md)를 참고하세요.
