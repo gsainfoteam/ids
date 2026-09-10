@@ -2,7 +2,7 @@ import { createContext, useContext, useId } from 'react';
 import type { ComponentProps, KeyboardEvent, ReactNode } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
-import { cn, invariant, tv } from '../../utils';
+import { invariant, tv } from '../../utils';
 import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
@@ -112,7 +112,7 @@ export function Accordion<T extends string>(props: Accordion.Props<T>) {
       <div
         {...forwarded}
         {...{ [ROOT_ATTRIBUTE]: '' }}
-        className={Accordion.Style({ variant, className })}
+        className={Accordion.Style({ variant }).root({ className })}
       >
         {children}
       </div>
@@ -122,46 +122,51 @@ export function Accordion<T extends string>(props: Accordion.Props<T>) {
 
 export namespace Accordion {
   export const Style = tv({
-    base: 'flex w-full flex-col',
+    slots: {
+      root: 'flex w-full flex-col',
+      item: 'flex flex-col',
+      trigger: [
+        'flex w-full cursor-pointer items-center gap-2 text-left transition-colors select-none',
+        'text-(--ids-color-on-surface)',
+        'hover:bg-(--ids-color-primary)/10',
+        'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--ids-color-primary)',
+        'disabled:cursor-not-allowed disabled:opacity-40',
+        'motion-reduce:transition-none',
+      ],
+      indicator: [
+        'ml-auto inline-flex shrink-0 transition-transform duration-(--ids-motion-fast)',
+        'data-[state=open]:rotate-180 motion-reduce:transition-none',
+        '[&_svg]:size-4',
+      ],
+      panel: [
+        'grid grid-rows-[0fr] transition-[grid-template-rows] duration-(--ids-motion-fast)',
+        'data-[state=open]:grid-rows-[1fr] motion-reduce:transition-none',
+      ],
+      body: 'text-(--ids-color-on-surface)',
+    },
     variants: {
       variant: {
-        bordered:
-          'overflow-hidden rounded-xl inset-ring-1 inset-ring-(--ids-color-outline) [&>*+*]:border-t [&>*+*]:border-(--ids-color-outline)',
-        separated: 'gap-2',
-        ghost: '',
+        bordered: {
+          root: 'overflow-hidden rounded-xl inset-ring-1 inset-ring-(--ids-color-outline) [&>*+*]:border-t [&>*+*]:border-(--ids-color-outline)',
+        },
+        separated: {
+          root: 'gap-2',
+          item: 'overflow-hidden rounded-xl inset-ring-1 inset-ring-(--ids-color-outline)',
+        },
+        ghost: {},
       },
-    },
-    defaultVariants: { variant: 'bordered' },
-  });
-
-  export const ItemStyle = tv({
-    base: 'flex flex-col',
-    variants: {
-      variant: {
-        bordered: '',
-        separated: 'overflow-hidden rounded-xl inset-ring-1 inset-ring-(--ids-color-outline)',
-        ghost: '',
-      },
-    },
-    defaultVariants: { variant: 'bordered' },
-  });
-
-  export const TriggerStyle = tv({
-    base: [
-      'flex w-full cursor-pointer items-center gap-2 text-left transition-colors select-none',
-      'text-(--ids-color-on-surface)',
-      'hover:bg-(--ids-color-primary)/10',
-      'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--ids-color-primary)',
-      'disabled:cursor-not-allowed disabled:opacity-40',
-      'motion-reduce:transition-none',
-    ],
-    variants: {
       size: {
-        standard: 'min-h-12 px-4 py-3 text-body-b3-medium',
-        tiny: 'min-h-9 px-3 py-2 text-caption-c1-medium',
-      } satisfies Record<IdsSize, string>,
+        standard: {
+          trigger: 'text-body-b3-medium min-h-12 px-4 py-3',
+          body: 'text-body-b3-regular px-4 pt-1 pb-3',
+        },
+        tiny: {
+          trigger: 'text-caption-c1-medium min-h-9 px-3 py-2',
+          body: 'text-caption-c1-regular px-3 pt-0.5 pb-2',
+        },
+      } satisfies Record<IdsSize, { trigger: string; body: string }>,
     },
-    defaultVariants: { size: 'standard' },
+    defaultVariants: { variant: 'bordered', size: 'standard' },
   });
 
   export function Item({ value, disabled = false, className, children, ...rest }: ItemProps) {
@@ -182,7 +187,7 @@ export namespace Accordion {
         <div
           {...rest}
           data-state={open ? 'open' : 'closed'}
-          className={ItemStyle({ variant, className })}
+          className={Style({ variant }).item({ className })}
         >
           {children}
         </div>
@@ -206,7 +211,7 @@ export namespace Accordion {
           data-state={open ? 'open' : 'closed'}
           {...{ [TRIGGER_ATTRIBUTE]: '' }}
           {...rest}
-          className={TriggerStyle({ size, className })}
+          className={Style({ size }).trigger({ className })}
           onClick={(event) => {
             rest.onClick?.(event);
             if (event.defaultPrevented) return;
@@ -233,12 +238,7 @@ export namespace Accordion {
         aria-hidden
         data-state={open ? 'open' : 'closed'}
         {...rest}
-        className={cn(
-          'ml-auto inline-flex shrink-0 transition-transform duration-(--ids-motion-fast)',
-          'data-[state=open]:rotate-180 motion-reduce:transition-none',
-          '[&_svg]:size-4',
-          className,
-        )}
+        className={Style().indicator({ className })}
       />
     );
   }
@@ -255,23 +255,10 @@ export namespace Accordion {
         data-state={open ? 'open' : 'closed'}
         inert={!open}
         {...rest}
-        className={cn(
-          'grid grid-rows-[0fr] transition-[grid-template-rows] duration-(--ids-motion-fast)',
-          'data-[state=open]:grid-rows-[1fr] motion-reduce:transition-none',
-          className,
-        )}
+        className={Style().panel({ className })}
       >
         <div className="overflow-hidden">
-          <div
-            className={cn(
-              'text-(--ids-color-on-surface)',
-              size === 'tiny'
-                ? 'text-caption-c1-regular px-3 pt-0.5 pb-2'
-                : 'text-body-b3-regular px-4 pt-1 pb-3',
-            )}
-          >
-            {children}
-          </div>
+          <div className={Style({ size }).body()}>{children}</div>
         </div>
       </div>
     );
