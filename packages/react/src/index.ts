@@ -30,6 +30,7 @@ export { Badge } from './components/badge';
 export { Alert } from './components/alert';
 export { Avatar, initialsOf } from './components/avatar';
 export { AvatarGroup } from './components/avatar-group';
+export { Item } from './components/item';
 
 export { Button } from './components/button';
 export { IconButton } from './components/icon-button';
