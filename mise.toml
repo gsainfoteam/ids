@@ -1,0 +1,4 @@
+[tools]
+node = "22"
+pnpm = "10.11.0"
+flutter = "3.44.0"
