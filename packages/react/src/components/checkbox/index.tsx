@@ -39,9 +39,9 @@ export function Checkbox({
   return (
     <span className={root()}>
       <input
+        {...rest}
         type="checkbox"
         aria-invalid={invalid || undefined}
-        {...rest}
         ref={mergeRefs(inputRef, ref)}
         onChange={(event: ChangeEvent<HTMLInputElement>) => onChange?.(event.target.checked, event)}
         className={box({ className })}

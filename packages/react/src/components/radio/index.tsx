@@ -21,9 +21,9 @@ export function Radio({
   return (
     <span className={root()}>
       <input
+        {...rest}
         type="radio"
         aria-invalid={invalid || undefined}
-        {...rest}
         onChange={(event: ChangeEvent<HTMLInputElement>) => onChange?.(event.target.checked, event)}
         className={box({ className })}
       />
