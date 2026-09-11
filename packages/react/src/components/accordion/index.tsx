@@ -204,6 +204,7 @@ export namespace Accordion {
     return (
       <Heading className="flex">
         <button
+          {...rest}
           type="button"
           id={triggerId}
           aria-expanded={open}
@@ -211,7 +212,6 @@ export namespace Accordion {
           disabled={disabled}
           data-state={open ? 'open' : 'closed'}
           {...{ [TRIGGER_ATTRIBUTE]: '' }}
-          {...rest}
           className={Style({ size }).trigger({ className })}
           onClick={(event) => {
             rest.onClick?.(event);
@@ -250,12 +250,12 @@ export namespace Accordion {
 
     return (
       <div
+        {...rest}
         id={contentId}
         role="region"
         aria-labelledby={triggerId}
         data-state={open ? 'open' : 'closed'}
         inert={!open}
-        {...rest}
         className={Style().panel({ className })}
       >
         <div className="overflow-hidden">
@@ -279,13 +279,16 @@ export namespace Accordion {
 
   export type TriggerProps = Omit<
     ComponentProps<'button'>,
-    'children' | 'className' | 'type' | 'disabled'
+    'children' | 'className' | 'type' | 'disabled' | 'id' | 'aria-expanded' | 'aria-controls'
   > & {
     className?: string;
     children?: ReactNode;
   };
 
-  export type ContentProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 'role'> & {
+  export type ContentProps = Omit<
+    ComponentProps<'div'>,
+    'children' | 'className' | 'role' | 'id' | 'aria-labelledby' | 'inert'
+  > & {
     className?: string;
     children?: ReactNode;
   };
