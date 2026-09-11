@@ -8,14 +8,14 @@ import { Search, X } from 'lucide-react';
   <TextFieldGroup.Adornment>
     <Search />
   </TextFieldGroup.Adornment>
-  <TextField placeholder="검색" />
+  <TextField aria-label="검색" placeholder="검색어" />
   <TextFieldGroup.Adornment>
     <IconButton icon={<X />} aria-label="지우기" onClick={clear} />
   </TextFieldGroup.Adornment>
 </TextFieldGroup>
 
 <TextFieldGroup variant="filled" size="tiny">
-  <TextField />
+  <TextField aria-label="금액" />
   <TextFieldGroup.Adornment>원</TextFieldGroup.Adornment>
 </TextFieldGroup>
 ```

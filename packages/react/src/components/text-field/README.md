@@ -6,7 +6,7 @@ import { TextField, Label } from '@gsainfoteam/ids-react';
 <Label htmlFor="email">이메일</Label>
 <TextField id="email" type="email" placeholder="you@gm.gist.ac.kr" />
 
-<TextField variant="underline" size="tiny" defaultValue="검색어" />
+<TextField variant="underline" size="tiny" aria-label="검색" defaultValue="검색어" />
 ```
 
 native `<input>`에 IDS 필드 표면을 적용한다. `variant`는 `outline`(기본), `filled`,
