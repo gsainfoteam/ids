@@ -20,8 +20,9 @@ import { Search, X } from 'lucide-react';
 </TextFieldGroup>
 ```
 
-입력 앞뒤에 아이콘, 단위, 버튼을 붙일 때 쓰는 컨테이너다. `variant`, `size`, `disabled`를
-그룹이 소유하고 자식 TextField로 내려보낸다. 테두리와 배경은 그룹이 그리며, 안쪽 입력이
+입력 앞뒤에 아이콘, 단위, 버튼을 붙일 때 쓰는 컨테이너다. 테두리와 배경은 그룹이 `variant`에
+맞춰 그리므로 자식 TextField의 `variant`는 쓰이지 않는다. `size`는 그룹 값이 자식의 크기를
+정하고, `disabled`는 자식이 직접 지정하지 않았을 때만 그룹 값을 물려준다. 안쪽 입력이
 focus-visible이 되면 그룹 전체에 outline이 걸린다.
 
 `<TextField />`는 정확히 하나만 넣어야 하고 없거나 둘 이상이면 에러를 던진다. 이 필드가
