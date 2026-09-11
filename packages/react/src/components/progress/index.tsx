@@ -39,8 +39,14 @@ export function Progress({
   const current = running ? null : value;
   const ratio = current == null ? 0 : current / max;
 
+  // 선형에서 progressbar 는 바깥 래퍼가 아니라 트랙이다. 이름과 id 를 래퍼에 두면
+  // 실제 role 을 가진 요소가 이름 없이 남는다.
+  const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, id, ...rootProps } = rest;
   const aria = {
     role: 'progressbar' as const,
+    id,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
     'aria-valuemin': 0,
     'aria-valuemax': max,
     ...(current == null ? {} : { 'aria-valuenow': current }),
@@ -51,7 +57,7 @@ export function Progress({
   if (shape === 'circular') {
     return (
       <ProgressContext.Provider value={{ value: current, max }}>
-        <div {...aria} {...rest} className={circle({ className })}>
+        <div {...aria} {...rootProps} className={circle({ className })}>
           <Arc
             ratio={running ? 0.25 : ratio}
             spin={running}
@@ -68,7 +74,7 @@ export function Progress({
 
   return (
     <ProgressContext.Provider value={{ value: current, max }}>
-      <div {...rest} className={root({ className })}>
+      <div {...rootProps} className={root({ className })}>
         {children == null ? null : (
           <div className="flex items-baseline justify-between gap-2">{children}</div>
         )}
