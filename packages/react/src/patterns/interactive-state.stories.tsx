@@ -1,12 +1,9 @@
 import { useState, type ReactNode } from 'react';
 
-import { InfoIcon } from '@phosphor-icons/react';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 import { Button } from '../components/button';
-import {
-  INTERACTIVE_STATE_DEFAULTS,
-  type InteractiveState,
-} from '../hooks/use-interactive';
+import { INTERACTIVE_STATE_DEFAULTS, type InteractiveState } from '../hooks/use-interactive';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -77,7 +74,7 @@ export const MirrorToParent: Story = {
             </Button>
             {interaction.hovered ? (
               <span className="flex items-center gap-1 text-sm text-(--ids-color-primary)">
-                <InfoIcon className="size-4" weight="bold" />
+                <InformationCircleIcon className="size-4" />
                 sibling hint
               </span>
             ) : (

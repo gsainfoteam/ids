@@ -30,7 +30,7 @@ function SpecLine({
   const lineHeightPx = Math.round(fontSizePx * leading);
 
   return (
-    <div className="mt-2 flex items-center gap-3 text-caption-c2-regular text-(--ids-color-on-muted)">
+    <div className="text-caption-c2-regular mt-2 flex items-center gap-3 text-(--ids-color-on-muted)">
       <span>{fontSizePx}px</span>
       <span>{trackingLabel}</span>
       <span>
@@ -115,7 +115,8 @@ function CaptionBlock({
   return (
     <div className="pb-6">
       <div className={className}>
-        {level.toUpperCase()} Caption. 동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세
+        {level.toUpperCase()} Caption. 동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라
+        만세
       </div>
       <SpecLine fontSizePx={fontSizePx} tracking="normal" leading={1.35} />
     </div>
@@ -167,13 +168,20 @@ export const Overview: Story = {
         <div className="grid grid-cols-3 gap-12">
           {(['bold', 'semibold', 'medium'] as const).map((weight) => (
             <div key={weight}>
-              <div className="text-body-b3-medium text-(--ids-color-on-muted)">{weightLabel[weight]}</div>
+              <div className="text-body-b3-medium text-(--ids-color-on-muted)">
+                {weightLabel[weight]}
+              </div>
               <div className="mt-8">
                 {headlineLevels.map(({ level, fontSizePx }) => (
                   <HeadingBlock key={level} level={level} fontSizePx={fontSizePx} weight={weight} />
                 ))}
                 {subtitleLevels.map(({ level, fontSizePx }) => (
-                  <SubtitleBlock key={level} level={level} fontSizePx={fontSizePx} weight={weight} />
+                  <SubtitleBlock
+                    key={level}
+                    level={level}
+                    fontSizePx={fontSizePx}
+                    weight={weight}
+                  />
                 ))}
               </div>
             </div>
@@ -184,7 +192,13 @@ export const Overview: Story = {
           {(['bold', 'semibold', 'medium', 'regular'] as const).map((weight) => (
             <div key={weight}>
               <div className="text-body-b3-medium text-(--ids-color-on-muted)">
-                {weight === 'semibold' ? 'sb' : weight === 'medium' ? 'm' : weight === 'regular' ? 'r' : 'Bold'}
+                {weight === 'semibold'
+                  ? 'sb'
+                  : weight === 'medium'
+                    ? 'm'
+                    : weight === 'regular'
+                      ? 'r'
+                      : 'Bold'}
               </div>
               <div className="mt-8">
                 {bodyLevels.map(({ level, fontSizePx, leading }) => (
@@ -216,4 +230,3 @@ export const Overview: Story = {
     );
   },
 };
-

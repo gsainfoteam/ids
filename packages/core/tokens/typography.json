@@ -28,7 +28,7 @@
   },
   "letter-spacing": {
     "normal": { "$value": "0em",    "$type": "dimension" },
-    "tight":  { "$value": "-0.01em", "$type": "dimension" }
+    "tight":  { "$value": "-0.025em", "$type": "dimension" }
   },
   "font-family": {
     "sans": { "$value": ["Pretendard Variable", "Pretendard", "sans-serif"], "$type": "fontFamily" },
