@@ -31,8 +31,9 @@ function useGroup(component: string) {
 function Item({ value, disabled = false, ...rest }: CheckboxGroup.ItemProps) {
   const group = useGroup('Item');
   const { register } = group;
+  const isDisabled = disabled || group.disabled;
 
-  useEffect(() => register(value), [register, value]);
+  useEffect(() => (isDisabled ? undefined : register(value)), [register, value, isDisabled]);
 
   return (
     <Checkbox
@@ -40,7 +41,7 @@ function Item({ value, disabled = false, ...rest }: CheckboxGroup.ItemProps) {
       value={value}
       size={group.size}
       checked={group.value.includes(value)}
-      disabled={disabled || group.disabled}
+      disabled={isDisabled}
       onChange={(checked) => group.toggle(value, checked)}
     />
   );

@@ -187,3 +187,41 @@ export const DisabledItem: Story = {
     await expect(canvas.getByRole('checkbox', { name: 'Rust (준비 중)' })).toBeDisabled();
   },
 };
+
+export const AllSkipsDisabled: Story = {
+  render: function AllSkipsDisabled() {
+    const [skills, setSkills] = useState<readonly Skill[]>([]);
+
+    return (
+      <div className="flex flex-col gap-2">
+        <CheckboxGroup<Skill> value={skills} onChange={setSkills} aria-label="관심 기술">
+          {({ Item, All }) => (
+            <>
+              <Label className="inline-flex items-center gap-2">
+                <All />
+                전체 선택
+              </Label>
+              <Label className="inline-flex items-center gap-2">
+                <Item value="js" />
+                JavaScript
+              </Label>
+              <Label className="inline-flex items-center gap-2">
+                <Item value="rs" disabled />
+                Rust (준비 중)
+              </Label>
+            </>
+          )}
+        </CheckboxGroup>
+        <output data-testid="value">{skills.join(' ')}</output>
+      </div>
+    );
+  },
+  play: async ({ canvas }) => {
+    await userEvent.click(canvas.getByRole('checkbox', { name: '전체 선택' }));
+
+    // 비활성 Item 은 집계에도 setAll 에도 들어가지 않는다.
+    await expect(canvas.getByTestId('value')).toHaveTextContent('js');
+    await expect(canvas.getByRole('checkbox', { name: '전체 선택' })).toBeChecked();
+    await expect(canvas.getByRole('checkbox', { name: 'Rust (준비 중)' })).not.toBeChecked();
+  },
+};
