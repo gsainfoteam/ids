@@ -28,6 +28,7 @@ export function Slider({
   step = 1,
   largeStep = step * 10,
   marks = false,
+  thumbLabels = ['시작', '끝'],
   formatLabel = String,
   disabled = false,
   value: valueProp,
@@ -141,6 +142,9 @@ export function Slider({
   const start = range ? ratio(values[0]) : 0;
   const end = ratio(range ? values[1] : values[0]);
 
+  const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rootProps } = rest;
+
+  // 단일 모드의 래퍼는 thumb 하나만 감싸므로 group 으로 묶을 것이 없다. 이름은 thumb 으로 간다.
   const { root, track, rangeBar, thumb, marksRoot, mark } = Slider.Style({
     orientation,
     size,
@@ -148,7 +152,13 @@ export function Slider({
   });
 
   return (
-    <span role="group" {...rest} className={root({ className })}>
+    <span
+      {...rootProps}
+      {...(range
+        ? { role: 'group' as const, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy }
+        : {})}
+      className={root({ className })}
+    >
       <span
         ref={trackRef}
         className={track()}
@@ -171,6 +181,9 @@ export function Slider({
             role="slider"
             tabIndex={disabled ? -1 : 0}
             aria-orientation={orientation}
+            {...(range
+              ? { 'aria-label': thumbLabels[index] }
+              : { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy })}
             aria-valuemin={range && index === 1 ? values[0] : min}
             aria-valuemax={range && index === 0 ? values[1] : max}
             aria-valuenow={item}
@@ -255,6 +268,7 @@ export namespace Slider {
     step?: number;
     largeStep?: number;
     marks?: boolean | number[];
+    thumbLabels?: [string, string];
     formatLabel?: (value: number) => string;
     disabled?: boolean;
     value?: Value;

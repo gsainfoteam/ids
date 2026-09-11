@@ -3,10 +3,12 @@
 ```tsx
 import { Slider } from '@gsainfoteam/ids-react';
 
-<Slider value={volume} onChange={(next) => setVolume(next as number)} />
+<Slider aria-label="볼륨" value={volume} onChange={(next) => setVolume(next as number)} />
 
 <Slider
   selectionMode="range"
+  aria-label="가격"
+  thumbLabels={['최저가', '최고가']}
   value={price}
   onChange={(next) => setPrice(next as [number, number])}
 />
@@ -26,12 +28,16 @@ vertical일 때는 바깥에서 높이를 준다.
 
 thumb마다 `role="slider"`이고 각자 포커스를 받는다.
 
-| 키 | 동작 |
-| --- | --- |
-| `←` `→` (vertical은 `↓` `↑`) | `step` 만큼 이동 |
-| `Shift` + 방향키 | `largeStep`(기본 `step * 10`) 만큼 |
-| `PageUp` `PageDown` | `largeStep` 만큼 |
-| `Home` `End` | `min` / `max` |
+이름은 thumb에 붙어야 읽힌다. 단일 모드에서는 `aria-label`과 `aria-labelledby`가 thumb으로
+내려가고 바깥 래퍼에는 role이 없다. range 모드에서는 래퍼가 `role="group"`으로 전체 이름을
+갖고, 두 thumb은 `thumbLabels`(기본 `['시작', '끝']`)로 각각 구분된다.
+
+| 키                           | 동작                               |
+| ---------------------------- | ---------------------------------- |
+| `←` `→` (vertical은 `↓` `↑`) | `step` 만큼 이동                   |
+| `Shift` + 방향키             | `largeStep`(기본 `step * 10`) 만큼 |
+| `PageUp` `PageDown`          | `largeStep` 만큼                   |
+| `Home` `End`                 | `min` / `max`                      |
 
 ## 포인터
 
