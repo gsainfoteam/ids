@@ -47,11 +47,21 @@ export function Slider({
     onChange: onChange as ((next: Slider.Value) => void) | undefined,
   });
 
+  const inBounds = (n: unknown) =>
+    typeof n === 'number' && Number.isFinite(n) && n >= min && n <= max;
+
   invariant(
-    !range || Array.isArray(value),
-    '`<Slider>` in range mode needs a `[start, end]` value.',
+    !range ||
+      (Array.isArray(value) &&
+        value.length === 2 &&
+        value.every(inBounds) &&
+        value[0]! <= value[1]!),
+    `\`<Slider>\` in range mode needs a \`[start, end]\` value inside [${min}, ${max}] with \`start <= end\`.`,
   );
-  invariant(range || !Array.isArray(value), '`<Slider>` in single mode needs a number value.');
+  invariant(
+    range || inBounds(value),
+    `\`<Slider>\` in single mode needs a finite number inside [${min}, ${max}].`,
+  );
 
   const values = Array.isArray(value) ? value : [value];
   const trackRef = useRef<HTMLSpanElement>(null);

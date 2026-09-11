@@ -16,7 +16,8 @@ import { Slider } from '@gsainfoteam/ids-react';
 `range`면 `[start, end]`다. 모드와 값의 모양이 어긋나면 `IdsError`를 던진다.
 
 `min`(0) `max`(100) `step`(1)로 범위와 간격을 정한다. `min >= max`이거나 `step`이 0 이하면
-`IdsError`를 던진다.
+`IdsError`를 던진다. 값이 유한하지 않거나 `[min, max]`를 벗어나도, range 모드에서 시작이
+끝보다 커도 마찬가지다.
 
 `orientation`은 `horizontal`(기본) `vertical`, `size`는 `standard`(기본) `tiny`.
 vertical일 때는 바깥에서 높이를 준다.
