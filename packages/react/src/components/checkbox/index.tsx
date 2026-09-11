@@ -43,7 +43,12 @@ export function Checkbox({
         type="checkbox"
         aria-invalid={invalid || undefined}
         ref={mergeRefs(inputRef, ref)}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => onChange?.(event.target.checked, event)}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          // 체크박스를 조작하면 브라우저가 DOM의 indeterminate 를 false 로 내린다.
+          // prop 은 그대로라 effect 가 다시 돌지 않으므로 여기서 되돌려놔야 한다.
+          event.target.indeterminate = indeterminate;
+          onChange?.(event.target.checked, event);
+        }}
         className={box({ className })}
       />
       {indicator ?? (

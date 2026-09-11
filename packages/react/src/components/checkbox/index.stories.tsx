@@ -165,3 +165,24 @@ export const Keyboard: Story = {
     await expect(box).toBeChecked();
   },
 };
+
+export const IndeterminateSurvivesClick: Story = {
+  render: function IndeterminateSurvivesClick() {
+    const [checked, setChecked] = useState(false);
+
+    return (
+      <Label className="inline-flex items-center gap-2">
+        <Checkbox indeterminate checked={checked} onChange={setChecked} />
+        계속 indeterminate
+      </Label>
+    );
+  },
+  play: async ({ canvas }) => {
+    const box = canvas.getByRole('checkbox');
+    await expect(box).toBePartiallyChecked();
+
+    // 브라우저는 클릭할 때 DOM 의 indeterminate 를 스스로 내린다.
+    await userEvent.click(box);
+    await expect(box).toBePartiallyChecked();
+  },
+};
