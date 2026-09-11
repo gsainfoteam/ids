@@ -6,15 +6,17 @@ import { invariant, tv } from '../../utils';
 
 import type { IdsSize } from '../../tokens/types';
 
-function decimalsOf(step: number) {
-  const text = String(step);
-  const dot = text.indexOf('.');
-  return dot === -1 ? 0 : text.length - dot - 1;
+function decimalsOf(n: number) {
+  const [mantissa, exponent] = String(n).split('e');
+  const fraction = mantissa!.split('.')[1]?.length ?? 0;
+  return fraction + (exponent == null ? 0 : Math.max(0, -Number(exponent)));
 }
 
 function snap(raw: number, min: number, max: number, step: number) {
   const stepped = Math.round((raw - min) / step) * step + min;
-  return Number(Math.min(max, Math.max(min, stepped)).toFixed(decimalsOf(step)));
+  // step 의 자릿수만 쓰면 min 0.25 / step 0.5 에서 0.25 가 0.3 으로 잘린다.
+  const decimals = Math.min(100, Math.max(decimalsOf(min), decimalsOf(max), decimalsOf(step)));
+  return Number(Math.min(max, Math.max(min, stepped)).toFixed(decimals));
 }
 
 export function Slider({
