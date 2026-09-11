@@ -19,7 +19,7 @@ export function Item(props: Item.Props) {
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     handlers.onKeyDown(event);
-    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== '')) return;
+    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== ' ')) return;
     event.preventDefault();
     event.currentTarget.click();
   }

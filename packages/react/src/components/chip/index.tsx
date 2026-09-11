@@ -51,7 +51,7 @@ export function Chip(props: Chip.Props) {
 
   function onKeyDown(event: KeyboardEvent<HTMLSpanElement>) {
     handlers.onKeyDown(event);
-    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== '')) return;
+    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== ' ')) return;
     event.preventDefault();
     event.currentTarget.click();
   }

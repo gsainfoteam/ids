@@ -17,7 +17,7 @@ export function Card(props: Card.Props) {
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     handlers.onKeyDown(event);
-    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== '')) return;
+    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== ' ')) return;
     event.preventDefault();
     event.currentTarget.click();
   }
