@@ -7,7 +7,7 @@ import { Search, X } from 'lucide-react';
 <Label htmlFor="email">이메일</Label>
 <TextField id="email" type="email" placeholder="you@gm.gist.ac.kr" />
 
-<TextField value={query} onChange={(e) => setQuery(e.target.value)}>
+<TextField aria-label="검색" value={query} onChange={(e) => setQuery(e.target.value)}>
   <Search />
   <TextField.Input />
   {query !== '' && (
@@ -15,7 +15,7 @@ import { Search, X } from 'lucide-react';
   )}
 </TextField>
 
-<TextField variant="filled" size="tiny" defaultValue="0.00">
+<TextField variant="filled" size="tiny" aria-label="금액" defaultValue="0.00">
   <span>$</span>
   <TextField.Input />
   <span>USD</span>
