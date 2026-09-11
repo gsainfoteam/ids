@@ -187,17 +187,18 @@ export const Selectable: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('button', { name: /보고서/ })).toHaveAttribute(
-      'aria-selected',
+      'aria-pressed',
       'true',
     );
 
     await userEvent.click(canvas.getByRole('button', { name: /예산안/ }));
     await expect(canvas.getByRole('button', { name: /예산안/ })).toHaveAttribute(
-      'aria-selected',
+      'aria-pressed',
       'true',
     );
-    await expect(canvas.getByRole('button', { name: /보고서/ })).not.toHaveAttribute(
-      'aria-selected',
+    await expect(canvas.getByRole('button', { name: /보고서/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
     );
   },
 };

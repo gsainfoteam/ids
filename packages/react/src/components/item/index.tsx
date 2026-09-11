@@ -26,8 +26,8 @@ export function Item(props: Item.Props) {
 
   return (
     <Root
-      {...(needsButtonSemantics ? { role: 'button', tabIndex: 0 } : {})}
-      {...(selected === true ? { 'aria-selected': true, 'data-selected': '' } : {})}
+      {...(needsButtonSemantics ? { role: 'button', tabIndex: 0, 'aria-pressed': selected } : {})}
+      {...(selected === true ? { 'data-selected': '' } : {})}
       {...dataProps}
       {...handlers}
       {...rest}

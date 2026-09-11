@@ -39,7 +39,10 @@ import { Item, Avatar, IconButton } from '@gsainfoteam/ids-react';
 </Item>
 ```
 
-`selected`는 시각적 강조와 `aria-selected="true"`를 붙인다.
+`selected`는 시각적 강조와 `data-selected`를 붙인다. `role="button"`으로 그릴 때는
+`aria-pressed`로 눌림 상태를 알린다. `aria-selected`는 `option`, `row`, `tab`, `gridcell`
+에만 쓸 수 있어서 여기서는 맞지 않는다. 진짜 listbox가 필요하면 `asChild`로 `role="option"`
+을 직접 지정하고 `aria-selected`도 직접 붙인다.
 
 ## 리스트
 
