@@ -27,6 +27,7 @@ export function Avatar({
   size = 'standard',
   className,
   children,
+  'aria-label': ariaLabel,
   ...rest
 }: Avatar.Props) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
@@ -35,13 +36,16 @@ export function Avatar({
     (child) => isValidElement(child) && child.type === Avatar.Fallback,
   );
   const initials = name == null ? '' : initialsOf(name);
-  const label = alt ?? name;
+  const label = ariaLabel ?? alt ?? name;
 
   invariant(
     src != null || fallback != null || initials !== '',
     '`<Avatar>` requires one of `src`, `name` or `<Avatar.Fallback>`.',
   );
-  invariant(label != null, '`<Avatar>` requires `name` or `alt` for assistive technology.');
+  invariant(
+    label != null,
+    '`<Avatar>` requires `name`, `alt` or `aria-label` for assistive technology.',
+  );
 
   return (
     <span
