@@ -48,7 +48,7 @@ function moveFocus(event: KeyboardEvent<HTMLButtonElement>) {
 
   const triggers = [
     ...root.querySelectorAll<HTMLButtonElement>(`[${TRIGGER_ATTRIBUTE}]:not(:disabled)`),
-  ];
+  ].filter((trigger) => trigger.closest(`[${ROOT_ATTRIBUTE}]`) === root);
   if (triggers.length === 0) return;
 
   const current = triggers.indexOf(event.currentTarget);
