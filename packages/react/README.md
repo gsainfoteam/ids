@@ -267,3 +267,7 @@ Calendar 팝업으로 날짜·기간·여러 날짜를 선택합니다. [DateFie
 ## TimePicker
 
 시·분·초 컬럼과 12/24시간제를 지원합니다. [TimePicker API](./src/components/time-picker/README.md).
+
+## TimeField
+
+TimePicker 팝업으로 시간을 선택합니다. [TimeField API](./src/components/time-field/README.md).
