@@ -83,3 +83,6 @@ export type { TimePickerProps, TimePickerOptions, TimePrecision, TimeFormat } fr
 
 export { TimeField } from './components/time-field';
 export type { TimeFieldProps } from './components/time-field';
+
+export { DateTimeField } from './components/date-time-field';
+export type { DateTimeFieldProps } from './components/date-time-field';
