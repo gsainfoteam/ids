@@ -182,3 +182,81 @@ test('empty 12h picker can enter an afternoon-only range', async () => {
   await click(option('period', 1));
   assert.equal(value.getHours(), 14);
 });
+
+test('empty constrained picker starts on a valid draft without committing a value', async () => {
+  let emitted;
+  await render(
+    h(TimePicker, {
+      format: '24h',
+      min: d(9, 30),
+      max: d(18),
+      step: 15,
+      onChange: (v) => (emitted = v),
+    }),
+  );
+  assert.equal(col('hour').getAttribute('aria-activedescendant'), option('hour', 9).id);
+  assert.equal(option('minute', 30).getAttribute('aria-disabled'), 'false');
+  assert.equal(host.querySelector('[aria-selected=true]'), null);
+  assert.equal(emitted, undefined);
+  await click(option('minute', 45));
+  assert.equal(emitted.getHours(), 9);
+});
+
+test('column positioning ignores its page offset and keeps clicked time visible', async () => {
+  await render(h(TimePicker, { defaultValue: d(9), format: '24h' }));
+  const column = col('hour');
+  Object.defineProperties(column, {
+    offsetTop: { value: 900 },
+    clientHeight: { value: 180 },
+    scrollHeight: { value: 864 },
+  });
+  for (const child of column.children)
+    Object.defineProperties(child, {
+      offsetTop: { value: Number(child.dataset.timeOption) * 36 },
+      offsetHeight: { value: 36 },
+    });
+  await click(option('hour', 10));
+  assert.equal(column.scrollTop, 288);
+});
+
+test('wheel commits at both edges without requiring another scroll event', async () => {
+  let value;
+  await render(
+    h(TimePicker, {
+      defaultValue: d(9),
+      format: '24h',
+      variant: 'wheel',
+      onChange: (v) => (value = v),
+    }),
+  );
+  for (const hour of [23, 0]) {
+    await act(() => {
+      col('hour').dispatchEvent(new Event('wheel', { bubbles: true }));
+      col('hour').scrollTop = hour * 36;
+      col('hour').dispatchEvent(new Event('scroll', { bubbles: true }));
+    });
+    await act(async () => new Promise((resolve) => setTimeout(resolve, 200)));
+    assert.equal(value?.getHours(), hour);
+  }
+});
+
+test('pending wheel settlement respects a new readonly prop', async () => {
+  let calls = 0;
+  const view = (readOnly) =>
+    h(TimePicker, {
+      value: d(9),
+      format: '24h',
+      variant: 'wheel',
+      readOnly,
+      onChange: () => calls++,
+    });
+  await render(view(false));
+  await act(() => {
+    col('hour').dispatchEvent(new Event('wheel', { bubbles: true }));
+    col('hour').scrollTop = 360;
+    col('hour').dispatchEvent(new Event('scroll', { bubbles: true }));
+  });
+  await render(view(true));
+  await act(async () => new Promise((resolve) => setTimeout(resolve, 200)));
+  assert.equal(calls, 0);
+});

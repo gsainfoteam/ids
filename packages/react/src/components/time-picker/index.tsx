@@ -2,6 +2,7 @@ import {
   createContext,
   isValidElement,
   useContext,
+  useEffect,
   useId,
   useLayoutEffect,
   useMemo,
@@ -115,7 +116,9 @@ function Column({ unit, asChild, children, ...props }: BoxProps & { unit: TimeUn
   const c = useTimePicker(),
     id = useId(),
     node = useRef<HTMLDivElement>(null);
-  const current = secondsOf(c.value ?? c.base);
+  const current = c.value
+    ? secondsOf(c.value)
+    : (nearestSlot(c.slots, secondsOf(c.base)) ?? secondsOf(c.base));
   const numbers =
     unit === 'period'
       ? [0, 1]
@@ -160,32 +163,55 @@ function Column({ unit, asChild, children, ...props }: BoxProps & { unit: TimeUn
   const wheel = c.variant === 'wheel',
     cell = c.size === 'tiny' ? 28 : 36;
   const scrolling = useRef(false);
-  useLayoutEffect(() => {
-    const el = node.current;
-    if (!el) return;
-    const target = el.querySelector<HTMLElement>(`[data-time-option="${selectedNumber}"]`);
-    if (target) {
-      // Only scroll this column, never the page containing the picker.
-      el.scrollTop = wheel
-        ? numbers.indexOf(selectedNumber) * cell
-        : Math.max(0, target.offsetTop - el.offsetTop - el.clientHeight / 2 + cell / 2);
-    }
-    // A controlled value change is reflected when the column next receives focus.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedNumber, wheel, cell]);
-  const focusOption = (n: number) => {
-    setActive(n);
+  const settleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const align = (n: number) => {
     const el = node.current,
       target = el?.querySelector<HTMLElement>(`[data-time-option="${n}"]`);
-    if (el && target)
-      el.scrollTop = wheel
-        ? numbers.indexOf(n) * cell
-        : Math.max(0, target.offsetTop - el.offsetTop - el.clientHeight / 2 + cell / 2);
+    if (!el || !target || !el.clientHeight) return;
+    // Options and their positioned column share an offset parent coordinate system.
+    const top = Math.max(0, target.offsetTop - el.clientHeight / 2 + target.offsetHeight / 2);
+    if (Math.abs(el.scrollTop - top) > 1) el.scrollTop = top;
+  };
+  useLayoutEffect(() => {
+    if (!scrolling.current) align(selectedNumber);
+    const el = node.current;
+    // A column can mount inside a hidden native popover. Align after it becomes visible.
+    const observer =
+      el && typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(() => {
+            if (!scrolling.current) align(selectedNumber);
+          })
+        : null;
+    if (el) observer?.observe(el);
+    return () => observer?.disconnect();
+  }, [selectedNumber, wheel, cell]);
+  useEffect(() => () => clearTimeout(settleTimer.current), []);
+  const focusOption = (n: number) => {
+    setActive(n);
+    align(n);
   };
   const choose = (n: number) => {
     const option = options.find((o) => o.n === n);
     if (option?.seconds !== undefined) c.choose(option.seconds);
   };
+  const centeredNumber = () => {
+    const el = node.current;
+    return numbers[
+      Math.max(0, Math.min(numbers.length - 1, Math.round((el?.scrollTop ?? 0) / cell)))
+    ];
+  };
+  const finishScroll = () => {
+    clearTimeout(settleTimer.current);
+    if (!wheel || !scrolling.current) return;
+    scrolling.current = false;
+    const n = centeredNumber();
+    setActive(n);
+    choose(n);
+  };
+  const latestFinish = useRef(finishScroll);
+  useLayoutEffect(() => {
+    latestFinish.current = finishScroll;
+  });
   const label =
     props['aria-label'] ??
     (unit === 'period'
@@ -209,11 +235,11 @@ function Column({ unit, asChild, children, ...props }: BoxProps & { unit: TimeUn
           data-time-option={n}
           onClick={() => {
             scrolling.current = false;
-            node.current?.focus();
+            node.current?.focus({ preventScroll: true });
             focusOption(n);
             choose(n);
           }}
-          className={`flex shrink-0 snap-center items-center justify-center rounded-md px-2 tabular-nums select-none ${c.size === 'tiny' ? 'text-sm' : 'text-base'} ${c.value && selected === n ? 'bg-(--ids-color-primary) text-(--ids-color-on-primary)' : 'hover:bg-(--ids-color-primary)/10'} ${activeNumber === n ? 'outline-offset-[-2px] group-focus:outline-2 group-focus:outline-(--ids-color-primary)' : ''} ${c.disabled || seconds === undefined ? 'cursor-not-allowed opacity-35' : 'cursor-pointer'}`}
+          className={`flex shrink-0 snap-center items-center justify-center rounded-md px-2 tabular-nums select-none ${c.size === 'tiny' ? 'text-sm' : 'text-base'} ${c.value && selected === n ? 'bg-(--ids-color-primary) text-(--ids-color-on-primary)' : 'hover:bg-(--ids-color-primary)/10'} ${activeNumber === n ? 'outline-offset-[-2px] group-focus-visible:outline-2 group-focus-visible:outline-(--ids-color-primary)' : ''} ${c.disabled || seconds === undefined ? 'cursor-not-allowed opacity-35' : 'cursor-pointer'}`}
           style={{ height: cell, scrollSnapAlign: 'center' }}
         >
           {unit === 'period'
@@ -234,40 +260,32 @@ function Column({ unit, asChild, children, ...props }: BoxProps & { unit: TimeUn
       'aria-activedescendant': `${id}-${activeNumber}`,
       tabIndex: c.disabled ? -1 : 0,
       'data-time-column': unit,
-      className: `group relative min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-lg border border-(--ids-color-outline) focus-visible:outline-2 focus-visible:outline-(--ids-color-primary) ${wheel ? 'snap-y snap-mandatory' : ''}`,
+      className: `group relative min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-lg border border-(--ids-color-outline) focus-visible:outline-2 focus-visible:outline-(--ids-color-primary) ${wheel ? 'snap-y snap-mandatory [overflow-anchor:none]' : ''}`,
       style: {
         height: cell * 5,
         paddingBlock: wheel ? cell * 2 : 0,
         scrollBehavior: 'auto',
         ...props.style,
       },
-      onFocus: () => setActive(selectedNumber),
+      onFocus: () => {
+        setActive(selectedNumber);
+        if (!scrolling.current) align(selectedNumber);
+      },
       onPointerDown: () => {
         scrolling.current = true;
       },
       onWheel: () => {
         scrolling.current = true;
       },
-      onScroll: (e: React.UIEvent<HTMLDivElement>) => {
+      onScroll: () => {
         if (!wheel || !scrolling.current) return;
-        const n =
-          numbers[
-            Math.max(0, Math.min(numbers.length - 1, Math.round(e.currentTarget.scrollTop / cell)))
-          ];
-        setActive(n);
+        setActive(centeredNumber());
+        clearTimeout(settleTimer.current);
+        // Safari/embedded engines may omit scrollend at a boundary. Restart on every
+        // momentum event so selection is committed once the column actually rests.
+        settleTimer.current = setTimeout(() => latestFinish.current(), 150);
       },
-      onScrollEnd: () => {
-        if (!wheel || !scrolling.current) return;
-        scrolling.current = false;
-        const n =
-          numbers[
-            Math.max(
-              0,
-              Math.min(numbers.length - 1, Math.round((node.current?.scrollTop ?? 0) / cell)),
-            )
-          ];
-        choose(n);
-      },
+      onScrollEnd: finishScroll,
       onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.defaultPrevented || c.disabled) return;
         const index = numbers.indexOf(activeNumber);
@@ -298,7 +316,9 @@ function Column({ unit, asChild, children, ...props }: BoxProps & { unit: TimeUn
               ?.closest('[data-time-picker]')
               ?.querySelectorAll<HTMLElement>('[data-time-column]') ?? [],
           );
-          columns[columns.indexOf(node.current!) + (e.key === 'ArrowRight' ? 1 : -1)]?.focus();
+          columns[columns.indexOf(node.current!) + (e.key === 'ArrowRight' ? 1 : -1)]?.focus({
+            preventScroll: true,
+          });
         }
       },
     }),

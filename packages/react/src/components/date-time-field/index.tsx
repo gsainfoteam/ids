@@ -125,7 +125,10 @@ export function DateTimeField({
             </div>
             <div className="min-w-0 sm:w-52">
               <TimePicker
-                value={base}
+                value={withTime(
+                  base,
+                  nearestSlot(slotsFor(base), secondsOf(base)) ?? secondsOf(base),
+                )}
                 onChange={(next) => {
                   if (!dayDisabled(next) && (!min || next >= min) && (!max || next <= max))
                     change(next);
