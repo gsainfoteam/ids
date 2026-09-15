@@ -230,3 +230,8 @@ RHF에는 `controlMode="value"`로 연결합니다. [NumberField API와 값 계�
 
 `PasswordField`는 native 비밀번호 입력과 표시 전환, Input/VisibilityToggle 합성을 제공합니다.
 Field의 라벨·오류 및 RHF의 native 등록을 지원합니다. [PasswordField API](./src/components/password-field/README.md)를 참고하세요.
+
+## OTPField
+
+`OTPField`는 여러 칸에 입력한 코드를 하나의 문자열로 관리하고, 붙여넣기·자동 이동·마스킹을 지원합니다.
+RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규칙](./src/components/otp-field/README.md)을 참고하세요.

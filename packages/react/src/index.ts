@@ -53,3 +53,6 @@ export { useFieldSize } from './components/field/context';
 
 export { PasswordField } from './components/password-field';
 export type { PasswordFieldProps, PasswordFieldVariant } from './components/password-field';
+
+export { OTPField } from './components/otp-field';
+export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './components/otp-field';
