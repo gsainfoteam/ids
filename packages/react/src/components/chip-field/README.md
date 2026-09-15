@@ -38,3 +38,5 @@ function Tags() {
 - name/form으로 선택값마다 hidden input 한 개를 제출합니다. disabled면 제외합니다. native reset은 uncontrolled 기본값과 빈 검색어로 복원합니다. controlled 값은 부모가 reset합니다.
 - RHF는 optional `/react-hook-form` Field에 `controlMode="value"`, defaultValues `{tags:[]}`, registerOptions.validate 또는 Zod 배열 검증을 지정합니다. 오류 포커스는 검색 input으로 갑니다.
 - Storybook: SearchCreateAndRemove, Playground.
+
+- 활성 옵션은 팝업 내부만 스크롤해 표시합니다. 키보드 탐색·선택·닫기 과정에서 배경 문서를 자동 스크롤하지 않습니다.

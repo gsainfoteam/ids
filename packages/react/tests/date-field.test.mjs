@@ -244,3 +244,41 @@ test('RHF required validation, trigger focus, Date value, reset and disabled omi
   await submit();
   assert.equal(result.date, undefined);
 });
+
+test('popup width is anchored to the whole field and ignores descendant scrolls', async () => {
+  const { DateTimeField } = await import('../dist/index.js');
+  const original = HTMLElement.prototype.getBoundingClientRect;
+  let reads = 0;
+  HTMLElement.prototype.getBoundingClientRect = function () {
+    if (this.hasAttribute('data-field-popup')) return { height: 300 };
+    reads++;
+    return {
+      left: 40,
+      top: 100,
+      bottom: 144,
+      width:
+        this.hasAttribute('data-date-field') || this.hasAttribute('data-temporal-field')
+          ? 700
+          : 664,
+    };
+  };
+  try {
+    for (const component of [
+      h(DateField, { selectionMode: 'multiple', today: d(15) }),
+      h(DateTimeField, { today: d(15) }),
+    ]) {
+      await render(component);
+      await click(trigger());
+      const popup = host.querySelector('[role=dialog]');
+      assert.equal(popup.style.width, '700px');
+      const before = reads;
+      await act(() =>
+        popup.firstElementChild.dispatchEvent(new Event('scroll', { bubbles: false })),
+      );
+      assert.equal(reads, before);
+      await key(popup, 'Escape');
+    }
+  } finally {
+    HTMLElement.prototype.getBoundingClientRect = original;
+  }
+});

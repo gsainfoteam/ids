@@ -141,12 +141,13 @@ export function TemporalField({
     [open, setOpen] = useState(false);
   const current = value === undefined ? stored : value,
     trigger = useRef<HTMLButtonElement>(null),
+    surface = useRef<HTMLDivElement>(null),
     id = `ids-temporal-${useId()}`;
   const blocked = !!disabled || !!readOnly,
     resolvedSize = useFieldSize(size) ?? 'standard';
   const close = useCallback((restore: boolean) => {
     setOpen(false);
-    if (restore) trigger.current?.focus();
+    if (restore) trigger.current?.focus({ preventScroll: true });
   }, []);
   const change = (next: Date | null) => {
     if (blocked) return;
@@ -230,6 +231,7 @@ export function TemporalField({
       }}
     >
       <div
+        ref={surface}
         data-temporal-field=""
         aria-invalid={triggerProps['aria-invalid']}
         className={fieldTriggerStyle({
@@ -244,7 +246,7 @@ export function TemporalField({
       </div>
       {open && !blocked && (
         <FieldPopup
-          anchor={trigger}
+          anchor={surface}
           onClose={close}
           mobileVariant={mobileVariant}
           preferredWidth={preferredWidth}

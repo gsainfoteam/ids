@@ -27,3 +27,5 @@
 - name/form은 hidden input으로 정규화된 값 하나를 제출합니다. native reset은 uncontrolled 기본값으로 복원합니다. required는 ARIA 힌트입니다. button의 native constraint validation 대신 앱 검증을 사용하세요.
 - RHF: `@gsainfoteam/ids-react/react-hook-form`의 Field에 `controlMode="value"`, defaultValues `{color:''}`를 지정하세요. Zod 또는 registerOptions로 검증하며 오류 시 trigger를 포커스합니다.
 - 외부 value/format/alpha 변경은 표시를 정규화하지만 onChange를 호출하지 않습니다. 부모가 보관한 원본은 부모가 갱신하며 FormData는 표시 형식의 값을 제출합니다.
+
+- 팝업 위치·폭은 Clear를 포함한 필드 전체를 기준으로 계산합니다. 내부 목록 스크롤은 팝업 위치를 다시 계산하지 않으며, 모바일 drawer는 하단 safe area를 확보합니다.

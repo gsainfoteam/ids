@@ -141,6 +141,7 @@ export function ColorField({
   const normalized = parsed ? serializeColor(parsed, format, alpha) : current;
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
+  const surface = useRef<HTMLDivElement>(null);
   const uid = useId();
   const id = `ids-color-${uid}`;
   const blocked = !!native.disabled || !!readOnly;
@@ -148,7 +149,7 @@ export function ColorField({
   const close = useCallback(
     (restore: boolean) => {
       setOpen(false);
-      if (restore) trigger.current?.focus();
+      if (restore) trigger.current?.focus({ preventScroll: true });
     },
     [setOpen],
   );
@@ -221,7 +222,7 @@ export function ColorField({
         trigger: triggerProps,
         clear: () => {
           change('');
-          trigger.current?.focus();
+          trigger.current?.focus({ preventScroll: true });
         },
         controls: {
           value: normalized,
@@ -235,6 +236,7 @@ export function ColorField({
       }}
     >
       <div
+        ref={surface}
         data-color-field=""
         aria-invalid={triggerProps['aria-invalid']}
         className={fieldTriggerStyle({
@@ -249,7 +251,7 @@ export function ColorField({
       </div>
       {open && !blocked && (
         <FieldPopup
-          anchor={trigger}
+          anchor={surface}
           mobileVariant={mobileVariant}
           onClose={close}
           role="dialog"

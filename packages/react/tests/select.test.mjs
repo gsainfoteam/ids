@@ -246,3 +246,16 @@ test('explicit asChild Content/Group collect items and allow empty string option
   await key(trigger(), 'Enter');
   assert.equal(host.querySelector('[role=listbox]'), null);
 });
+
+test('keyboard navigation only scrolls the popup containing the active option', async () => {
+  await render(h(Select, null, ...items()));
+  await click(trigger());
+  const popup = host.querySelector('[data-field-popup]');
+  const cherry = host.querySelector('[role=option]:last-child');
+  popup.getBoundingClientRect = () => ({ top: 100, bottom: 300 });
+  Object.defineProperties(popup, { clientTop: { value: 0 }, clientHeight: { value: 200 } });
+  cherry.getBoundingClientRect = () => ({ top: 320, bottom: 360 });
+  cherry.scrollIntoView = () => assert.fail('must not scroll document ancestors');
+  await key(trigger(), 'End');
+  assert.equal(popup.scrollTop, 60);
+});

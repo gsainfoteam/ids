@@ -33,3 +33,5 @@ function Meeting() {
 - name/form은 로컬 `YYYY-MM-DDTHH[:mm[:ss]]` 또는 빈 값을 제출합니다. UTC/오프셋 문자열이 아닙니다. disabled=true는 제외합니다. native reset/uncontrolled, 부모 reset/controlled와 RHF Field(controlMode=value)를 지원합니다. required는 ARIA이므로 Zod 등에서 Date/null 검증을 적용하세요.
 - DST gap은 선택 불가, 중복 시각은 native Date의 이른 오프셋입니다. 별도 시간대/오프셋 선택은 없습니다. 지역의 반복 시각을 각각 예약해야 하는 앱은 별도의 시간대 정책을 구현해야 합니다.
 - Storybook: PreserveDateAndTime.
+
+- 팝업 위치·폭은 Clear를 포함한 필드 전체를 기준으로 계산합니다. 내부 목록 스크롤은 팝업 위치를 다시 계산하지 않으며, 모바일 drawer는 하단 safe area를 확보합니다.

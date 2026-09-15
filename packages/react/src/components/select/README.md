@@ -26,3 +26,5 @@
 - mobileVariant="drawer"는 640px 미만에서 화면 아래에 표시하는 **비모달** 팝업입니다. 외부 클릭/포커스로 닫으며 배경을 잠그지 않습니다. 기본 popover는 trigger 위치와 뷰포트에 맞춰 배치합니다. 지원 브라우저는 native Popover top layer를 사용합니다.
 - disabled/readOnly는 열기와 편집을 막습니다. name/form은 hidden input으로 제출하며 multiple은 같은 이름으로 값을 각각 제출합니다. 비어 있는 선택은 제출 항목이 없습니다. native form.reset은 uncontrolled 기본값으로 복원하고 팝업을 닫습니다.
 - RHF는 선택적 `@gsainfoteam/ids-react/react-hook-form`의 Field에 `controlMode="value"`, defaultValues에 단일 null / 다중 []를 지정하세요. `registerOptions={{required:'선택하세요'}}` 또는 Zod resolver로 검증합니다. required는 ARIA 힌트이며 native button constraint validation은 제공하지 않습니다.
+
+- 활성 옵션은 팝업 내부만 스크롤해 표시합니다. 키보드 탐색·선택·닫기 과정에서 배경 문서를 자동 스크롤하지 않습니다.

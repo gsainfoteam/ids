@@ -14,7 +14,13 @@ import {
 
 import { invariant, mergeProps, mergeRefs } from '../../utils';
 import { useFieldSize } from '../field/context';
-import { FieldPopup, fieldTriggerStyle, flattenParts, part } from '../field-popup';
+import {
+  FieldPopup,
+  fieldTriggerStyle,
+  flattenParts,
+  part,
+  revealPopupOption,
+} from '../field-popup';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -169,7 +175,7 @@ function ChipItem({
       'aria-disabled': blocked || undefined,
       'data-active': c.active === value ? '' : undefined,
       className:
-        'cursor-default rounded-lg px-3 py-2 data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-40',
+        'cursor-default wrap-anywhere rounded-lg px-3 py-2 data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-40',
       onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
       onPointerMove: () => {
         if (!blocked) c.setActive(value);
@@ -212,7 +218,8 @@ function ChipCreate({ asChild, children, ...props }: BoxProps) {
       role: 'option',
       'aria-selected': false,
       'data-active': c.active === undefined ? '' : undefined,
-      className: 'cursor-default rounded-lg px-3 py-2 data-active:bg-(--ids-color-primary)/15',
+      className:
+        'cursor-default wrap-anywhere rounded-lg px-3 py-2 data-active:bg-(--ids-color-primary)/15',
       onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
       onPointerMove: () => c.setActive(null),
       onClick: c.create,
@@ -332,7 +339,7 @@ export function ChipField({
         : enabled[0]?.value;
   const close = useCallback((restore: boolean) => {
     setOpen(false);
-    if (restore) input.current?.focus();
+    if (restore) input.current?.focus({ preventScroll: true });
   }, []);
   useLayoutEffect(() => {
     const owner = input.current?.form;
@@ -354,13 +361,13 @@ export function ChipField({
   }, [value, defaultValue, form, close]);
   useLayoutEffect(() => {
     if (open && !blocked)
-      input.current?.ownerDocument
-        .getElementById(
+      revealPopupOption(
+        input.current?.ownerDocument.getElementById(
           activeValue === undefined
             ? `${id}-create`
             : `${id}-option-${encodeURIComponent(activeValue)}`,
-        )
-        ?.scrollIntoView?.({ block: 'nearest' });
+        ),
+      );
   }, [open, blocked, activeValue, id]);
   const emit = (next: string[]) => {
     if (value === undefined) setStored(next);
@@ -369,14 +376,14 @@ export function ChipField({
   const remove = (next: string) => {
     if (blocked || options.find((o) => o.value === next)?.disabled) return;
     emit(selected.filter((v) => v !== next));
-    input.current?.focus();
+    input.current?.focus({ preventScroll: true });
   };
   const choose = (next: string) => {
     if (blocked || options.find((o) => o.value === next)?.disabled) return;
     if (selected.includes(next)) remove(next);
     else if (!full) emit([...selected, next]);
     setQuery('');
-    input.current?.focus();
+    input.current?.focus({ preventScroll: true });
   };
   const create = () => {
     if (blocked || !canCreate) return;
@@ -385,7 +392,7 @@ export function ChipField({
     emit([...selected, next]);
     setQuery('');
     setActive(undefined);
-    input.current?.focus();
+    input.current?.focus({ preventScroll: true });
   };
   const search = flattenParts(children).filter((n) => isValidElement(n) && n.type === ChipSearch);
   const explicit = flattenParts(children).filter(
@@ -502,7 +509,7 @@ export function ChipField({
     'data-chip-field': '',
     onClick: (e) => {
       if (e.target === e.currentTarget && !blocked) {
-        input.current?.focus();
+        input.current?.focus({ preventScroll: true });
         setOpen(true);
       }
     },

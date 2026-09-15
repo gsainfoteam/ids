@@ -40,7 +40,7 @@ export function part(
   return createElement(tag, props, tag === 'input' ? undefined : children);
 }
 export const fieldTriggerStyle = tv({
-  base: 'flex w-full min-w-0 items-center gap-2 text-left text-(--ids-color-on-surface) disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ids-color-primary) [--ids-popup-danger:var(--ids-field-danger,#b42318)] [[data-mode=dark]_&]:[--ids-popup-danger:var(--ids-field-danger,#fda29b)] aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-popup-danger)',
+  base: 'touch-manipulation flex w-full min-w-0 items-center gap-2 text-left text-(--ids-color-on-surface) disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ids-color-primary) [--ids-popup-danger:var(--ids-field-danger,#b42318)] [[data-mode=dark]_&]:[--ids-popup-danger:var(--ids-field-danger,#fda29b)] aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-popup-danger)',
   variants: {
     variant: {
       outline: 'bg-transparent inset-ring-1 inset-ring-(--ids-color-outline)',
@@ -94,7 +94,7 @@ export function FieldPopup({
       node.style.top = drawer
         ? 'auto'
         : `${Math.max(8, rect.bottom + height + 8 <= win.innerHeight ? rect.bottom + 4 : rect.top - height - 4)}px`;
-      node.style.bottom = drawer ? '8px' : 'auto';
+      node.style.bottom = drawer ? 'max(8px, env(safe-area-inset-bottom))' : 'auto';
     };
     // Older engines and DOM tests use the same fixed-position fallback.
     if (typeof node.showPopover === 'function') node.showPopover();
@@ -116,8 +116,12 @@ export function FieldPopup({
     doc.addEventListener('pointerdown', outside);
     doc.addEventListener('focusin', outside);
     doc.addEventListener('keydown', escape);
+    const onScroll = (event: Event) => {
+      if (event.target && 'nodeType' in event.target && node.contains(event.target as Node)) return;
+      position();
+    };
     win.addEventListener('resize', position);
-    win.addEventListener('scroll', position, true);
+    win.addEventListener('scroll', onScroll, true);
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(position) : null;
     observer?.observe(node);
     observer?.observe(trigger);
@@ -127,7 +131,7 @@ export function FieldPopup({
       doc.removeEventListener('focusin', outside);
       doc.removeEventListener('keydown', escape);
       win.removeEventListener('resize', position);
-      win.removeEventListener('scroll', position, true);
+      win.removeEventListener('scroll', onScroll, true);
     };
   }, [anchor, mobileVariant, preferredWidth, initialFocusSelector, onClose]);
   return (
@@ -136,10 +140,22 @@ export function FieldPopup({
       ref={popup}
       popover="manual"
       data-field-popup=""
-      className={`fixed z-50 m-0 overflow-auto rounded-xl border border-(--ids-color-outline) bg-(--ids-color-surface) p-2 text-(--ids-color-on-surface) shadow-lg ${props.className ?? ''}`}
+      className={`fixed z-50 m-0 overflow-auto overscroll-contain rounded-xl border border-(--ids-color-outline) bg-(--ids-color-surface) p-2 text-(--ids-color-on-surface) shadow-lg [overflow-anchor:none] ${props.className ?? ''}`}
       style={{ ...props.style, position: 'fixed' }}
     >
       {children}
     </div>
   );
+}
+
+/** Reveal an active option without scrolling the document behind its top-layer popup. */
+export function revealPopupOption(option: HTMLElement | null | undefined) {
+  const popup = option?.closest<HTMLElement>('[data-field-popup]');
+  if (!option || !popup) return;
+  const bounds = popup.getBoundingClientRect(),
+    rect = option.getBoundingClientRect();
+  const top = bounds.top + popup.clientTop,
+    bottom = top + popup.clientHeight;
+  if (rect.top < top) popup.scrollTop += rect.top - top;
+  else if (rect.bottom > bottom) popup.scrollTop += rect.bottom - bottom;
 }

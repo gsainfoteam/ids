@@ -15,7 +15,13 @@ import {
 
 import { invariant, mergeProps, mergeRefs } from '../../utils';
 import { useFieldSize } from '../field/context';
-import { FieldPopup, fieldTriggerStyle, flattenParts, part } from '../field-popup';
+import {
+  FieldPopup,
+  fieldTriggerStyle,
+  flattenParts,
+  part,
+  revealPopupOption,
+} from '../field-popup';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -150,7 +156,7 @@ function SelectItem({
       'aria-disabled': disabled || undefined,
       'data-active': c.active === value ? '' : undefined,
       className:
-        'flex cursor-default items-center rounded-lg px-3 py-2 data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-40',
+        'flex cursor-default wrap-anywhere items-center rounded-lg px-3 py-2 data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-40',
       onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
       onPointerMove: () => {
         if (!disabled) c.setActive(value);
@@ -187,28 +193,26 @@ function SelectGroup({ heading, asChild, children, ...props }: Select.GroupProps
 }
 function SelectSearch({ asChild, children, ...props }: Select.SearchFieldProps) {
   const c = useSelect();
-  return part(
-    'input',
-    asChild,
-    children,
-    mergeProps(props, {
-      type: 'text',
-      role: 'combobox',
-      'aria-label': props['aria-label'] ?? '옵션 검색',
-      'aria-expanded': true,
-      'aria-controls': c.id,
-      'aria-autocomplete': 'list',
-      'aria-activedescendant':
-        c.active !== undefined ? `${c.id}-option-${encodeURIComponent(c.active)}` : undefined,
-      'data-popup-autofocus': '',
-      value: c.query,
-      placeholder: props.placeholder ?? '검색…',
-      className:
-        'mb-2 h-9 w-full rounded-lg border border-(--ids-color-outline) bg-transparent px-3 outline-(--ids-color-primary)',
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => c.search(e.target.value),
-      onKeyDown: c.keydown,
-    }),
-  );
+  const defaults: ComponentProps<'input'> & { 'data-popup-autofocus': string } = {
+    type: 'text',
+    autoComplete: props.autoComplete ?? 'off',
+    spellCheck: props.spellCheck ?? false,
+    role: 'combobox',
+    'aria-label': props['aria-label'] ?? '옵션 검색',
+    'aria-expanded': true,
+    'aria-controls': c.id,
+    'aria-autocomplete': 'list',
+    'aria-activedescendant':
+      c.active !== undefined ? `${c.id}-option-${encodeURIComponent(c.active)}` : undefined,
+    'data-popup-autofocus': '',
+    value: c.query,
+    placeholder: props.placeholder ?? '검색…',
+    className:
+      'mb-2 h-9 w-full rounded-lg border border-(--ids-color-outline) bg-transparent px-3 outline-(--ids-color-primary)',
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => c.search(e.target.value),
+    onKeyDown: c.keydown,
+  };
+  return part('input', asChild, children, mergeProps(props, { ...defaults }));
 }
 function SelectEmpty({ asChild, children = '검색 결과가 없습니다.', ...props }: BoxProps) {
   const c = useSelect();
@@ -300,7 +304,7 @@ export function Select(props: SelectProps) {
   const close = useCallback(
     (restore: boolean) => {
       setOpen(false);
-      if (restore) trigger.current?.focus();
+      if (restore) trigger.current?.focus({ preventScroll: true });
     },
     [setOpen],
   );
@@ -324,9 +328,11 @@ export function Select(props: SelectProps) {
   }, [value, defaultValue, multiple, form, close]);
   useLayoutEffect(() => {
     if (open && activeValue !== undefined)
-      document
-        .getElementById(`${id}-option-${encodeURIComponent(activeValue)}`)
-        ?.scrollIntoView?.({ block: 'nearest' });
+      revealPopupOption(
+        trigger.current?.ownerDocument.getElementById(
+          `${id}-option-${encodeURIComponent(activeValue)}`,
+        ),
+      );
   }, [open, activeValue, id]);
   const begin = () => {
     if (!blocked) {
@@ -353,7 +359,7 @@ export function Select(props: SelectProps) {
     const searching = event.currentTarget.tagName === 'INPUT';
     if (event.key === 'Tab') {
       if (open) {
-        trigger.current?.focus();
+        trigger.current?.focus({ preventScroll: true });
         close(false);
       }
       return;

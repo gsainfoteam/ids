@@ -36,3 +36,5 @@ function BookingDate() {
 - native reset은 uncontrolled 기본값으로 복원하고 팝업을 닫습니다. controlled reset은 부모가 처리합니다. required는 ARIA 힌트이며 native button constraint validation은 사용하지 않습니다.
 - RHF는 optional `/react-hook-form` Field의 `controlMode="value"`로 연결합니다. defaultValues는 null/[]이며 단일 날짜는 `z.date().nullable().refine(Boolean)` 등으로, 범위는 start/end 모두 존재하는지 검증하세요. 오류 시 trigger로 포커스합니다.
 - Storybook: SelectAndClear, Range, Multiple.
+
+- 팝업 위치·폭은 Clear를 포함한 필드 전체를 기준으로 계산합니다. 내부 목록 스크롤은 팝업 위치를 다시 계산하지 않으며, 모바일 drawer는 하단 safe area를 확보합니다.

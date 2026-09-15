@@ -33,3 +33,5 @@ function Alarm() {
 - name/form은 hidden input에 precision별 HH, HH:mm, HH:mm:ss(또는 빈 문자열)를 제출합니다. disabled는 제출에서 제외합니다. uncontrolled native reset은 defaultValue로 돌아가고 팝업을 닫습니다. controlled reset은 부모가 값을 변경합니다.
 - required는 ARIA이며 button에 native constraint validation은 없습니다. RHF optional entry의 Field(controlMode=value), defaultValues의 null, `z.date().nullable().refine(Boolean)` 등으로 검증하세요. blur는 picker 내부 이동을 제외하고 전달합니다.
 - Storybook: SelectAndClear.
+
+- 팝업 위치·폭은 Clear를 포함한 필드 전체를 기준으로 계산합니다. 내부 목록 스크롤은 팝업 위치를 다시 계산하지 않으며, 모바일 drawer는 하단 safe area를 확보합니다.

@@ -162,12 +162,13 @@ export function DateField(props: DateFieldProps) {
         ];
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
+  const surface = useRef<HTMLDivElement>(null);
   const id = `ids-date-${useId()}`;
   const blocked = disabled === true || !!readOnly;
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const close = useCallback((restore: boolean) => {
     setOpen(false);
-    if (restore) trigger.current?.focus();
+    if (restore) trigger.current?.focus({ preventScroll: true });
   }, []);
   const change = (next: CalendarValue) => {
     if (blocked) return;
@@ -279,6 +280,7 @@ export function DateField(props: DateFieldProps) {
       }}
     >
       <div
+        ref={surface}
         data-date-field=""
         aria-invalid={triggerProps['aria-invalid']}
         className={fieldTriggerStyle({
@@ -293,7 +295,7 @@ export function DateField(props: DateFieldProps) {
       </div>
       {open && !blocked && (
         <FieldPopup
-          anchor={trigger}
+          anchor={surface}
           onClose={close}
           mobileVariant={mobileVariant}
           preferredWidth={(resolvedSize === 'tiny' ? 240 : 288) * Math.min(monthsToShow, 2)}
