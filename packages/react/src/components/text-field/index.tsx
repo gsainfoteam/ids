@@ -1,4 +1,11 @@
-import { Children, isValidElement, useRef, type CSSProperties, type ReactNode } from 'react';
+import {
+  Children,
+  isValidElement,
+  useRef,
+  type CSSProperties,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
 import { isNotNil } from 'es-toolkit';
 
@@ -29,7 +36,7 @@ function splitByInput(children: ReactNode) {
 
   return {
     leading: items.slice(0, inputIndex),
-    input: items[inputIndex],
+    input: items[inputIndex] as ReactElement<TextField.Input.Props>,
     trailing: items.slice(inputIndex + 1),
   };
 }
@@ -44,25 +51,29 @@ export function TextField({
   ...inputProps
 }: TextField.Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { leading, input, trailing } = splitByInput(children);
+
+  // The sentinel's own props win over the container's, so validate and derive
+  // container state from the merged result, not from the container props alone.
+  const merged = { ...inputProps, ...input.props };
+  const isDisabled = input.props.disabled ?? disabled;
 
   invariant(
-    inputProps.value == null || inputProps.onChange != null || inputProps.readOnly === true,
+    merged.value == null || merged.onChange != null || merged.readOnly === true,
     '`<TextField>` with `value` requires `onChange` (or `readOnly`).',
   );
 
-  const { leading, input, trailing } = splitByInput(children);
-
   return (
-    <TextFieldContext.Provider value={{ size, disabled, inputProps, inputRef }}>
+    <TextFieldContext.Provider value={{ size, disabled: isDisabled, inputProps, inputRef }}>
       <div
         data-text-field=""
         data-variant={variant}
         data-size={size}
-        data-disabled={disabled ? '' : undefined}
+        data-disabled={isDisabled ? '' : undefined}
         className={textFieldSurface({ variant, size, className })}
         style={style}
         onMouseDown={(event) => {
-          if (disabled) return;
+          if (isDisabled) return;
           const target = event.target as HTMLElement;
           if (target.closest('button, a, input, textarea, select, label')) return;
           event.preventDefault();
