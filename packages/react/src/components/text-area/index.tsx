@@ -29,7 +29,6 @@ export type TextAreaInputProps = Omit<
 export type TextAreaContextValue = {
   size: IdsSize;
   disabled?: boolean;
-  resize: TextAreaResize;
   autoResize: boolean;
   maxRows?: number;
   inputProps: TextAreaInputProps;
@@ -88,7 +87,11 @@ export function TextArea({
   );
   const inputProps = { ...rest, rows };
   const { top, input, bottom } = splitByInput(children);
-  const { root, bar } = TextArea.Style({ variant, size });
+  const { root, bar } = TextArea.Style({
+    variant,
+    size,
+    resize: autoResize ? 'none' : (resize ?? 'vertical'),
+  });
 
   // The sentinel's own props win over the container's, so validate and derive
   // container state from the merged result, not from the container props alone.
@@ -106,7 +109,6 @@ export function TextArea({
         size,
         disabled: isDisabled,
         autoResize,
-        resize: autoResize ? 'none' : (resize ?? 'vertical'),
         maxRows,
         inputProps,
         inputRef,
@@ -148,7 +150,7 @@ export namespace TextArea {
         '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
       ],
       input: [
-        'w-full min-w-0 bg-transparent outline-none',
+        'w-full min-w-0 grow resize-none bg-transparent outline-none',
         'text-inherit placeholder:text-(--ids-color-on-muted)',
         'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
         'disabled:cursor-not-allowed',
@@ -197,11 +199,13 @@ export namespace TextArea {
         top: { bar: 'border-b' },
         bottom: { bar: 'border-t' },
       },
+      // The handle lives on the root: resizing the textarea itself would push it past
+      // the rounded border and the bars instead of growing the whole field.
       resize: {
-        none: { input: 'resize-none' },
-        vertical: { input: 'resize-y' },
-        horizontal: { input: 'resize-x' },
-        both: { input: 'resize' },
+        none: { root: 'resize-none' },
+        vertical: { root: 'resize-y' },
+        horizontal: { root: 'resize-x' },
+        both: { root: 'resize' },
       },
       autoResize: {
         true: { input: 'field-sizing-content' },
@@ -226,8 +230,8 @@ export namespace TextArea {
     const field = useTextAreaContext();
     invariant(field != null, '`<TextArea.Input>` must be used inside `<TextArea>`.');
 
-    const { size, autoResize, resize, maxRows, inputProps, inputRef } = field;
-    const { input } = Style({ size, resize, autoResize });
+    const { size, autoResize, maxRows, inputProps, inputRef } = field;
+    const { input } = Style({ size, autoResize });
 
     return (
       <textarea
