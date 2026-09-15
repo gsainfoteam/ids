@@ -71,3 +71,6 @@ export type { ChipFieldProps } from './components/chip-field';
 
 export { FileField } from './components/file-field';
 export type { FileFieldProps, FileFieldRejection } from './components/file-field';
+
+export { Calendar } from './components/calendar';
+export type { CalendarProps, CalendarOptions, CalendarCellState, DateRange } from './components/calendar';
