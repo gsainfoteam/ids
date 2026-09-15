@@ -90,7 +90,11 @@ export function TextField({
 
 function Adornments({ items, size }: { items: ReactNode[]; size: IdsSize }) {
   return items.map((item, index) => (
-    <span key={index} data-text-field-adornment="" className={textFieldAdornment({ size })}>
+    <span
+      key={(isValidElement(item) && item.key) || index}
+      data-text-field-adornment=""
+      className={textFieldAdornment({ size })}
+    >
       {item}
     </span>
   ));
