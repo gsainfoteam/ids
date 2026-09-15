@@ -6,6 +6,7 @@ import {
   useRef,
   type ComponentProps,
   type CSSProperties,
+  type ReactElement,
   type ReactNode,
   type RefObject,
 } from 'react';
@@ -61,7 +62,7 @@ function splitByInput(children: ReactNode) {
 
   return {
     top: items.slice(0, inputIndex),
-    input: items[inputIndex],
+    input: items[inputIndex] as ReactElement<TextArea.Input.Props>,
     bottom: items.slice(inputIndex + 1),
   };
 }
@@ -85,20 +86,25 @@ export function TextArea({
     !autoResize || resize == null || resize === 'none',
     '`<TextArea>` cannot use `resize` together with `autoResize`.',
   );
-  invariant(
-    rest.value == null || rest.onChange != null || rest.readOnly === true,
-    '`<TextArea>` with `value` requires `onChange` (or `readOnly`).',
-  );
-
   const inputProps = { ...rest, rows };
   const { top, input, bottom } = splitByInput(children);
   const { root, bar } = TextArea.Style({ variant, size });
+
+  // The sentinel's own props win over the container's, so validate and derive
+  // container state from the merged result, not from the container props alone.
+  const merged = { ...inputProps, ...input.props };
+  const isDisabled = input.props.disabled ?? disabled;
+
+  invariant(
+    merged.value == null || merged.onChange != null || merged.readOnly === true,
+    '`<TextArea>` with `value` requires `onChange` (or `readOnly`).',
+  );
 
   return (
     <TextAreaContext.Provider
       value={{
         size,
-        disabled,
+        disabled: isDisabled,
         autoResize,
         resize: autoResize ? 'none' : (resize ?? 'vertical'),
         maxRows,
@@ -110,7 +116,7 @@ export function TextArea({
         data-text-area=""
         data-variant={variant}
         data-size={size}
-        data-disabled={disabled ? '' : undefined}
+        data-disabled={isDisabled ? '' : undefined}
         className={root({ className })}
         style={style}
       >
