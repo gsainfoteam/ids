@@ -235,3 +235,7 @@ Field의 라벨·오류 및 RHF의 native 등록을 지원합니다. [PasswordFi
 
 `OTPField`는 여러 칸에 입력한 코드를 하나의 문자열로 관리하고, 붙여넣기·자동 이동·마스킹을 지원합니다.
 RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규칙](./src/components/otp-field/README.md)을 참고하세요.
+
+## Select
+
+검색·그룹·다중 선택과 키보드 탐색을 지원합니다. RHF는 `controlMode="value"`를 사용합니다. [Select API](./src/components/select/README.md).

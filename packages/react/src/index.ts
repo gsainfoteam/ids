@@ -56,3 +56,6 @@ export type { PasswordFieldProps, PasswordFieldVariant } from './components/pass
 
 export { OTPField } from './components/otp-field';
 export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './components/otp-field';
+
+export { Select } from './components/select';
+export type { SelectProps, SelectVariant } from './components/select';
