@@ -58,12 +58,16 @@ export const fieldTriggerStyle = tv({
 export function FieldPopup({
   anchor,
   mobileVariant = 'popover',
+  preferredWidth = 240,
+  initialFocusSelector,
   onClose,
   children,
   ...props
 }: ComponentProps<'div'> & {
   anchor: RefObject<HTMLElement | null>;
   mobileVariant?: 'popover' | 'drawer';
+  preferredWidth?: number;
+  initialFocusSelector?: string;
   onClose: (restoreFocus: boolean) => void;
 }) {
   const popup = useRef<HTMLDivElement>(null);
@@ -79,7 +83,7 @@ export function FieldPopup({
       node.dataset.presentation = drawer ? 'drawer' : 'popover';
       node.style.width = drawer
         ? 'calc(100vw - 16px)'
-        : `${Math.min(Math.max(rect.width, 240), win.innerWidth - 16)}px`;
+        : `${Math.min(Math.max(rect.width, preferredWidth), win.innerWidth - 16)}px`;
       node.style.maxHeight = drawer
         ? 'min(70dvh, 520px)'
         : `${Math.max(120, Math.min(360, win.innerHeight - 24))}px`;
@@ -95,7 +99,10 @@ export function FieldPopup({
     // Older engines and DOM tests use the same fixed-position fallback.
     if (typeof node.showPopover === 'function') node.showPopover();
     position();
-    node.querySelector<HTMLElement>('[data-popup-autofocus]')?.focus({ preventScroll: true });
+    const initialFocus =
+      (initialFocusSelector ? node.querySelector<HTMLElement>(initialFocusSelector) : null) ??
+      node.querySelector<HTMLElement>('[data-popup-autofocus]');
+    initialFocus?.focus({ preventScroll: true });
     const outside = (event: Event) => {
       const target = event.target as Node;
       if (!node.contains(target) && !trigger.contains(target)) onClose(false);
@@ -122,7 +129,7 @@ export function FieldPopup({
       win.removeEventListener('resize', position);
       win.removeEventListener('scroll', position, true);
     };
-  }, [anchor, mobileVariant, onClose]);
+  }, [anchor, mobileVariant, preferredWidth, initialFocusSelector, onClose]);
   return (
     <div
       {...props}

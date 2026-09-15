@@ -74,3 +74,6 @@ export type { FileFieldProps, FileFieldRejection } from './components/file-field
 
 export { Calendar } from './components/calendar';
 export type { CalendarProps, CalendarOptions, CalendarCellState, DateRange } from './components/calendar';
+
+export { DateField } from './components/date-field';
+export type { DateFieldProps, DateFieldFormat } from './components/date-field';
