@@ -237,7 +237,7 @@ export namespace TextArea {
         disabled={disabledProp ?? field.disabled}
         className={input({ className })}
         style={{
-          minHeight: autoResize ? rowsToHeight(inputProps.rows) : undefined,
+          minHeight: autoResize ? rowsToHeight(rest.rows ?? inputProps.rows) : undefined,
           maxHeight: rowsToHeight(maxRows),
           ...style,
         }}
