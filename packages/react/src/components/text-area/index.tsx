@@ -139,7 +139,10 @@ export namespace TextArea {
     slots: {
       root: [
         'flex w-full min-w-0 flex-col overflow-hidden',
-        'bg-transparent text-(--ids-color-on-surface) transition-all',
+        // Not transition-all: the root carries the resize handle, and animating its
+        // width/height makes the field lag behind the pointer while dragging.
+        'bg-transparent text-(--ids-color-on-surface)',
+        'transition-[color,background-color,border-color,outline-color,outline-width,outline-offset,box-shadow,opacity]',
         'data-disabled:cursor-not-allowed data-disabled:opacity-40',
       ],
       bar: [
