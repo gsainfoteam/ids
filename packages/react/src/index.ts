@@ -68,3 +68,6 @@ export type { ColorFieldProps, ColorFormat } from './components/color-field';
 
 export { ChipField } from './components/chip-field';
 export type { ChipFieldProps } from './components/chip-field';
+
+export { FileField } from './components/file-field';
+export type { FileFieldProps, FileFieldRejection } from './components/file-field';
