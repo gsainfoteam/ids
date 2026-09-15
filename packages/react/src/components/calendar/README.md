@@ -26,3 +26,5 @@ function TripDates() {
 - ↑↓←→ 일자 이동, Home/End 주 시작/끝, PageUp/Down 월 이동, Shift+PageUp/Down 년 이동, Enter/Space 선택. 월말 이동은 마지막 날짜로 보정합니다. 달력 전체에서 날짜 버튼 하나만 Tab 순서에 포함합니다. autoFocus=true는 해당 날짜 버튼으로 포커스합니다.
 - root는 group, 날짜는 grid/row/gridcell+aria-selected, 오늘은 aria-current=date입니다. application 역할로 스크린리더 탐색 모드를 강제하지 않습니다. 전환 애니메이션은 없으므로 reduced-motion에서도 동일합니다.
 - Storybook: RangeAndKeyboard, Playground.
+
+- 확정된 기간 배경은 시작 날짜의 중앙부터 종료 날짜의 중앙까지 이어져 선택 버튼의 둥근 모서리 아래에서 연결됩니다. 부분 기간·하루짜리 기간은 연결 띠를 표시하지 않습니다.

@@ -202,8 +202,17 @@ function CalendarCell({ date, children, ...props }: Calendar.CellProps) {
       aria-selected={state.selected}
       aria-disabled={state.disabled || undefined}
       data-range-middle={rangeMiddle ? '' : undefined}
-      className="min-w-0 data-range-middle:bg-(--ids-color-primary)/10"
+      className="relative isolate min-w-0"
     >
+      {range?.end &&
+        !sameDay(range.start, range.end) &&
+        (rangeStart || rangeMiddle || rangeEnd) && (
+          <span
+            aria-hidden="true"
+            data-calendar-range-band=""
+            className={`pointer-events-none absolute inset-y-0 -z-10 bg-(--ids-color-primary)/10 ${rangeStart ? 'start-1/2 end-0' : rangeEnd ? 'start-0 end-1/2' : 'inset-x-0'}`}
+          />
+        )}
       <button
         {...props}
         type="button"
@@ -218,7 +227,7 @@ function CalendarCell({ date, children, ...props }: Calendar.CellProps) {
         aria-current={state.today ? 'date' : undefined}
         aria-disabled={state.disabled || undefined}
         tabIndex={focused && !c.allDisabled ? 0 : -1}
-        className={`flex w-full items-center justify-center rounded-lg text-sm outline-offset-1 hover:bg-(--ids-color-primary)/10 focus-visible:outline-2 focus-visible:outline-(--ids-color-primary) aria-disabled:opacity-30 data-outside-month:text-(--ids-color-on-muted) ${c.size === 'tiny' ? 'h-7' : 'h-9'} ${state.today ? 'inset-ring-1 inset-ring-(--ids-color-primary)' : ''} ${state.selected && !rangeMiddle ? 'bg-(--ids-color-primary) text-(--ids-color-on-primary) hover:bg-(--ids-color-primary)' : ''} ${props.className ?? ''}`}
+        className={`flex w-full items-center justify-center rounded-lg text-sm outline-offset-1 focus-visible:outline-2 focus-visible:outline-(--ids-color-primary) aria-disabled:opacity-30 data-outside-month:text-(--ids-color-on-muted) ${c.size === 'tiny' ? 'h-7' : 'h-9'} ${state.today ? 'inset-ring-1 inset-ring-(--ids-color-primary)' : ''} ${state.selected && !rangeMiddle ? 'bg-(--ids-color-primary) text-(--ids-color-on-primary)' : 'hover:bg-(--ids-color-primary)/10'} ${props.className ?? ''}`}
         onFocus={(e) => {
           props.onFocus?.(e);
           if (!e.defaultPrevented) c.setFocus(dayOnly(date));
