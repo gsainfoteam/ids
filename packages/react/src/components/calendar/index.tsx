@@ -447,7 +447,7 @@ export function Calendar(props: CalendarProps) {
   const choose = (date: Date) => {
     if (readOnly || selectionMode === 'none' || blocked(date)) return;
     const next = dayOnly(date);
-    move(next, false);
+    move(next, true);
     let result: CalendarValue;
     if (selectionMode === 'multiple') {
       const selected = current as Date[];

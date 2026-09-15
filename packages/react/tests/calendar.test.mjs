@@ -220,3 +220,13 @@ test('custom grid body and cell state, controlled month callback, contextual dia
     /inside Calendar.Grid.Body/,
   );
 });
+
+test('selecting an outside-month day preserves focus for the next keyboard action', async () => {
+  await render(
+    h(Calendar, { selectionMode: 'range', defaultMonth: d(2026, 9, 1), today: d(2026, 9, 15) }),
+  );
+  await click(day('2026-10-01'));
+  assert.equal(document.activeElement === day('2026-10-01'), true);
+  await key(document.activeElement, 'ArrowRight');
+  assert.equal(document.activeElement.dataset.calendarDay, '2026-10-02');
+});
