@@ -77,3 +77,6 @@ export type { CalendarProps, CalendarOptions, CalendarCellState, DateRange } fro
 
 export { DateField } from './components/date-field';
 export type { DateFieldProps, DateFieldFormat } from './components/date-field';
+
+export { TimePicker } from './components/time-picker';
+export type { TimePickerProps, TimePickerOptions, TimePrecision, TimeFormat } from './components/time-picker';

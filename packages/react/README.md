@@ -263,3 +263,7 @@ RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규�
 ## DateField
 
 Calendar 팝업으로 날짜·기간·여러 날짜를 선택합니다. [DateField API](./src/components/date-field/README.md).
+
+## TimePicker
+
+시·분·초 컬럼과 12/24시간제를 지원합니다. [TimePicker API](./src/components/time-picker/README.md).
