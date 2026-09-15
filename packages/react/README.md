@@ -239,3 +239,7 @@ RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규�
 ## Select
 
 검색·그룹·다중 선택과 키보드 탐색을 지원합니다. RHF는 `controlMode="value"`를 사용합니다. [Select API](./src/components/select/README.md).
+
+## TelField
+
+전화번호 자동 포맷과 검색 가능한 국가 선택을 제공합니다. [TelField API](./src/components/tel-field/README.md).

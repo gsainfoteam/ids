@@ -59,3 +59,6 @@ export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './componen
 
 export { Select } from './components/select';
 export type { SelectProps, SelectVariant } from './components/select';
+
+export { TelField } from './components/tel-field';
+export type { TelFieldProps, TelFieldFormat } from './components/tel-field';
