@@ -324,7 +324,7 @@ export function FileField(props: FileFieldProps) {
     setRejections([]);
     if (files.length) emit([]);
     if (input.current) input.current.value = '';
-    trigger.current?.focus();
+    trigger.current?.focus({ preventScroll: true });
   };
   const remove = (file: File) => {
     if (blocked) return;
@@ -332,7 +332,7 @@ export function FileField(props: FileFieldProps) {
     if (index < 0) return;
     setRejections([]);
     emit(files.filter((_, i) => i !== index));
-    trigger.current?.focus();
+    trigger.current?.focus({ preventScroll: true });
   };
   const triggerProps: ComponentProps<'button'> & { 'data-dragover'?: string } = {
     // mergeRefs composes callbacks without reading current during render.
@@ -447,7 +447,11 @@ export function FileField(props: FileFieldProps) {
           </>
         )}
         {!!rejections.length && (
-          <div id={errorId} role="alert" className="text-sm text-(--ids-field-danger,#b42318)">
+          <div
+            id={errorId}
+            role="alert"
+            className="text-sm wrap-anywhere text-(--ids-field-danger,#b42318)"
+          >
             {rejections.map(({ file, reason }, index) => (
               <div key={index}>
                 {file.name}:{' '}

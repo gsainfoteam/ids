@@ -1,8 +1,4 @@
-import {
-  createContext,
-  useContext,
-  type Ref,
-} from 'react';
+import { createContext, useContext, type Ref } from 'react';
 
 import { tv, type VariantProps } from '../../utils';
 
@@ -26,7 +22,7 @@ export function useTextFieldGroupContext() {
 export const textFieldSurface = tv({
   base: [
     'w-full min-w-0',
-    'bg-transparent text-(--ids-color-on-surface) transition-all',
+    'bg-transparent text-(--ids-color-on-surface) transition-colors duration-150 ease-out focus-within:transition-none motion-reduce:transition-none',
     'data-disabled:cursor-not-allowed data-disabled:opacity-40',
   ],
   variants: {

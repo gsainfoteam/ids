@@ -219,6 +219,8 @@ export function PasswordField({
     ref,
     type: visible ? 'text' : 'password',
     autoComplete,
+    spellCheck: native.spellCheck ?? false,
+    autoCapitalize: native.autoCapitalize ?? 'none',
     'aria-invalid': ariaInvalid,
     ...{ 'data-password-field-input': '', 'data-size': resolvedSize },
     className: inputStyle({ className: native.className }),

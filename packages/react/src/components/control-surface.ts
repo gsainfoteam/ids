@@ -2,11 +2,11 @@ import type { IdsSize, IdsVariant } from '../tokens/types';
 
 export const controlSurface = {
   base: [
-    'inline-flex items-center justify-center gap-2 select-none transition-all',
+    'inline-flex items-center justify-center gap-2 select-none touch-manipulation transition-[color,background-color,box-shadow,transform,scale,opacity] duration-150 ease-out data-focus-visible:transition-none',
     'cursor-pointer data-disabled:cursor-not-allowed',
     'data-focus-visible:outline-2 data-focus-visible:outline-offset-2 data-focus-visible:outline-(--ids-color-primary)',
-    'data-active:scale-[0.98] data-disabled:opacity-40',
-    'motion-reduce:transition-none motion-reduce:data-active:scale-100',
+    'motion-safe:data-active:not-data-focus-visible:scale-[0.98] data-disabled:opacity-40',
+    'motion-reduce:transition-none',
   ],
   size: {
     standard: 'h-11 px-4.5 text-button-standard rounded-xl',

@@ -66,8 +66,8 @@ export function ColorControls({
             background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent), hsl(${hue}, 100%, 50%)`,
           }}
           onPointerDown={(event) => {
-            if (event.button !== 0) return;
-            event.currentTarget.focus();
+            if (event.button !== 0 || event.isPrimary === false) return;
+            event.currentTarget.focus({ preventScroll: true });
             event.currentTarget.setPointerCapture(event.pointerId);
             move(event);
           }}

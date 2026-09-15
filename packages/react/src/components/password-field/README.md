@@ -103,3 +103,5 @@ const methods = useForm({
 
 기본 native 등록 모드를 사용합니다. 값 변환이나 controlMode=value는 필요하지 않습니다.
 기본 패키지 export는 RHF를 로드하지 않습니다. 위 길이/일치 규칙은 예제이며 앱의 비밀번호 정책은 앱에서 정합니다.
+
+- 표시 상태에서도 기본 `spellCheck=false`, `autoCapitalize=none`을 유지합니다. 네이티브 props로 명시적으로 바꿀 수 있습니다.
