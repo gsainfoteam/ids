@@ -243,3 +243,7 @@ RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규�
 ## TelField
 
 전화번호 자동 포맷과 검색 가능한 국가 선택을 제공합니다. [TelField API](./src/components/tel-field/README.md).
+
+## ColorField
+
+색상 패널·팔레트·투명도와 HEX/RGB/HSL 형식 입력을 제공합니다. [ColorField API](./src/components/color-field/README.md).
