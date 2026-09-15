@@ -65,3 +65,6 @@ export type { TelFieldProps, TelFieldFormat } from './components/tel-field';
 
 export { ColorField } from './components/color-field';
 export type { ColorFieldProps, ColorFormat } from './components/color-field';
+
+export { ChipField } from './components/chip-field';
+export type { ChipFieldProps } from './components/chip-field';

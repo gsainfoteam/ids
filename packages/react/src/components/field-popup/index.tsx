@@ -62,7 +62,7 @@ export function FieldPopup({
   children,
   ...props
 }: ComponentProps<'div'> & {
-  anchor: RefObject<HTMLButtonElement | null>;
+  anchor: RefObject<HTMLElement | null>;
   mobileVariant?: 'popover' | 'drawer';
   onClose: (restoreFocus: boolean) => void;
 }) {

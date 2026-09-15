@@ -247,3 +247,7 @@ RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규�
 ## ColorField
 
 색상 패널·팔레트·투명도와 HEX/RGB/HSL 형식 입력을 제공합니다. [ColorField API](./src/components/color-field/README.md).
+
+## ChipField
+
+검색·다중 선택·새 태그 생성과 칩 삭제를 지원합니다. [ChipField API](./src/components/chip-field/README.md).
