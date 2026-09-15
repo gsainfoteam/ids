@@ -31,7 +31,7 @@ export { Toggle } from './components/toggle';
 export { IconToggle } from './components/icon-toggle';
 export { ToggleGroup } from './components/toggle-group';
 export { TextField } from './components/text-field';
-export { TextFieldGroup } from './components/text-field-group';
+export { TextArea } from './components/text-area';
 
 export { Spinner } from './components/spinner';
 export { Label } from './components/label';
