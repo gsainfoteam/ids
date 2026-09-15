@@ -225,3 +225,8 @@ pnpm lint
 
 `NumberField`는 숫자/null 값, 소수점 증감, 통화·백분율 표시와 Input/Stepper/Clear 합성을 제공합니다.
 RHF에는 `controlMode="value"`로 연결합니다. [NumberField API와 값 계약](./src/components/number-field/README.md)을 참고하세요.
+
+## PasswordField
+
+`PasswordField`는 native 비밀번호 입력과 표시 전환, Input/VisibilityToggle 합성을 제공합니다.
+Field의 라벨·오류 및 RHF의 native 등록을 지원합니다. [PasswordField API](./src/components/password-field/README.md)를 참고하세요.

@@ -50,3 +50,6 @@ export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export { Field } from './components/field';
 export type { FieldProps } from './components/field';
 export { useFieldSize } from './components/field/context';
+
+export { PasswordField } from './components/password-field';
+export type { PasswordFieldProps, PasswordFieldVariant } from './components/password-field';
