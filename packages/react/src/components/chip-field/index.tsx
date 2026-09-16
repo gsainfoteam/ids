@@ -12,6 +12,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+
 import { invariant, mergeProps, mergeRefs } from '../../utils';
 import { useFieldSize } from '../field/context';
 import {
@@ -105,7 +107,7 @@ function ChipTrigger({ asChild, children, ...props }: BoxProps) {
       <>
         <ChipValue />
         <ChipSearch />
-        <span aria-hidden="true">▾</span>
+        <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
       </>
     ),
     mergeProps(props, { ...c.surfaceProps }),
@@ -133,7 +135,7 @@ function ChipValue({ asChild, children, ...props }: BoxProps) {
               className="shrink-0 rounded px-1 focus-visible:outline-2 disabled:opacity-40"
               onClick={() => c.remove(value)}
             >
-              ×
+              <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
             </button>
           </span>
         );
@@ -502,7 +504,7 @@ export function ChipField({
     className: fieldTriggerStyle({
       variant,
       size: resolvedSize,
-      className: `h-auto ${resolvedSize === 'tiny' ? 'min-h-8' : 'min-h-11'} flex-wrap gap-1 py-1 focus-within:outline-2 focus-within:outline-(--ids-color-primary) ${native.disabled ? 'opacity-40' : ''} ${className ?? ''}`,
+      className: `h-auto ${resolvedSize === 'tiny' ? 'min-h-8' : 'min-h-11'} flex-wrap gap-1 py-1 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${native.disabled ? 'opacity-40' : ''} ${className ?? ''}`,
     }),
     style,
     'aria-invalid': invalid,
@@ -543,7 +545,7 @@ export function ChipField({
         <ChipTrigger>
           <ChipValue />
           {search.length ? search : <ChipSearch />}
-          <span aria-hidden="true">▾</span>
+          <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
         </ChipTrigger>
       )}
       {open && !blocked && (

@@ -10,6 +10,8 @@ import {
   type ComponentProps,
 } from 'react';
 
+import { XMarkIcon } from '@heroicons/react/24/outline';
+
 import { invariant, mergeProps, mergeRefs } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { FieldPopup, fieldTriggerStyle, flattenParts, part } from '../field-popup';
@@ -97,7 +99,7 @@ function ColorClear({ asChild, children, ...props }: ColorField.ClearProps) {
   return part(
     'button',
     asChild,
-    children ?? '×',
+    children ?? <XMarkIcon aria-hidden="true" className="size-4" />,
     mergeProps(props, {
       type: 'button',
       'aria-label': props['aria-label'] ?? '색상 지우기',
@@ -188,7 +190,11 @@ export function ColorField({
     // mergeRefs returns a callback; it does not read ref.current here.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(trigger, forwardedRef),
-    className: fieldTriggerStyle({ variant: 'unstyled', size: resolvedSize, className: 'flex-1' }),
+    className: fieldTriggerStyle({
+      variant: 'unstyled',
+      size: resolvedSize,
+      className: 'flex-1 focus-visible:outline-none',
+    }),
     onClick: (e) => {
       native.onClick?.(e);
       if (!e.defaultPrevented && !blocked) setOpen((previous) => !previous);
@@ -242,7 +248,7 @@ export function ColorField({
         className={fieldTriggerStyle({
           variant: surfaceVariant,
           size: resolvedSize,
-          className: `gap-0 px-0 ${className ?? ''}`,
+          className: `gap-0 px-0 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${className ?? ''}`,
         })}
         style={style}
       >
@@ -275,7 +281,7 @@ export function ColorField({
               onClick={() => close(true)}
               className="size-7 rounded focus-visible:outline-2"
             >
-              ×
+              <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
             </button>
           </div>
           {contents.length ? contents : <ColorContent />}

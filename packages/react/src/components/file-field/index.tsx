@@ -10,6 +10,8 @@ import {
   type ComponentProps,
 } from 'react';
 
+import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+
 import { invariant, mergeProps, mergeRefs } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { fieldTriggerStyle, flattenParts, part } from '../field-popup';
@@ -82,7 +84,7 @@ function FileTrigger({ asChild, children, ...props }: FileField.TriggerProps) {
     asChild,
     children ?? (
       <>
-        <span aria-hidden="true">＋</span>
+        <PlusIcon aria-hidden="true" className="size-4 shrink-0" />
         <FileValue />
       </>
     ),
@@ -104,7 +106,11 @@ function FileValue({ asChild, children, placeholder, ...props }: FileField.Value
     mergeProps({ className: 'min-w-0 flex-1 truncate' }, props),
   );
 }
-function FileClear({ asChild, children = '×', ...props }: FileField.ClearProps) {
+function FileClear({
+  asChild,
+  children = <XMarkIcon aria-hidden="true" className="size-4" />,
+  ...props
+}: FileField.ClearProps) {
   const c = useFile();
   if (!c.files.length && !c.hasErrors) return null;
   return part(
@@ -140,7 +146,7 @@ function FileItem({ file, asChild, children, ...props }: FileField.ItemProps) {
           onClick={() => c.remove(file)}
           className="rounded px-2 py-1 focus-visible:outline-2 disabled:opacity-40"
         >
-          ×
+          <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
         </button>
       </>
     ),

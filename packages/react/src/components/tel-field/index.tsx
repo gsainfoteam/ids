@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import {
   AsYouType,
   getCountries,
@@ -73,8 +74,9 @@ function TelCountrySelect({ asChild, children, ...props }: TelField.CountrySelec
         {asChild ? (
           children
         ) : (
-          <span>
-            {c.country} +{getCountryCallingCode(c.country)} ▾
+          <span className="inline-flex items-center gap-1">
+            {c.country} +{getCountryCallingCode(c.country)}{' '}
+            <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
           </span>
         )}
       </Select.Trigger>
@@ -311,7 +313,7 @@ export function TelField({
         className={fieldTriggerStyle({
           variant,
           size: resolvedSize,
-          className: `focus-within:outline-2 focus-within:outline-(--ids-color-primary) ${native.disabled ? 'opacity-40' : ''} ${className ?? ''}`,
+          className: `has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${native.disabled ? 'opacity-40' : ''} ${className ?? ''}`,
         })}
         style={style}
       >

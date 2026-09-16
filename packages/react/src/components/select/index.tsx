@@ -13,6 +13,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+
 import { invariant, mergeProps, mergeRefs } from '../../utils';
 import { useFieldSize } from '../field/context';
 import {
@@ -114,7 +116,9 @@ function SelectTrigger({ asChild, children, ...props }: Select.TriggerProps) {
     children ?? (
       <>
         <SelectValue />
-        <span aria-hidden="true">{c.open ? '▴' : '▾'}</span>
+        <span aria-hidden="true" className="size-4 shrink-0">
+          {c.open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+        </span>
       </>
     ),
     mergeProps(props, { ...c.triggerProps }),

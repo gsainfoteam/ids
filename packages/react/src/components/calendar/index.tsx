@@ -10,6 +10,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+
 import { invariant, mergeProps } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { part } from '../field-popup';
@@ -111,7 +113,7 @@ function CalendarNavigation({ asChild, children, ...props }: BoxProps) {
           onClick={() => c.navigate(-1)}
           className="size-8 shrink-0 rounded-lg hover:bg-(--ids-color-primary)/10 focus-visible:outline-2 disabled:opacity-30"
         >
-          ‹
+          <ChevronLeftIcon aria-hidden="true" className="mx-auto size-4" />
         </button>
         <span aria-live="polite" className="flex-1 text-center font-medium">
           {new Intl.DateTimeFormat(c.locale, {
@@ -127,7 +129,7 @@ function CalendarNavigation({ asChild, children, ...props }: BoxProps) {
           onClick={() => c.navigate(1)}
           className="size-8 shrink-0 rounded-lg hover:bg-(--ids-color-primary)/10 focus-visible:outline-2 disabled:opacity-30"
         >
-          ›
+          <ChevronRightIcon aria-hidden="true" className="mx-auto size-4" />
         </button>
       </>
     ),

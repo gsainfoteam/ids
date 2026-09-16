@@ -24,6 +24,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
+        '@heroicons/react/24/outline',
         'react',
         'react/jsx-runtime',
         'react/jsx-dev-runtime',

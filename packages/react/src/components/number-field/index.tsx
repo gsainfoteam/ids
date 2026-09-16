@@ -15,6 +15,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { ChevronUpIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+
 import { addDecimal, clampNumber, createNumberFormat, shiftDecimal } from './number-format';
 import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
@@ -91,16 +93,10 @@ function NumberInput(_props: NumberField.InputProps): ReactNode {
   );
 }
 function StepIcon({ direction }: { direction: 1 | -1 }) {
-  return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path
-        d={direction === 1 ? 'M4 10 8 6l4 4' : 'm4 6 4 4 4-4'}
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+  return direction === 1 ? (
+    <ChevronUpIcon aria-hidden="true" />
+  ) : (
+    <ChevronDownIcon aria-hidden="true" />
   );
 }
 function NumberStepper({ asChild, children, ...props }: NumberField.StepperProps) {
@@ -185,16 +181,7 @@ function NumberClear({ asChild, onClear, children, ...props }: NumberField.Clear
       variant="ghost"
       aria-label={props['aria-label'] ?? context.clearLabel}
       className="size-6 min-w-0 p-0"
-      icon={
-        <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path
-            d="m4 4 8 8M4 12l8-8"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      }
+      icon={<XMarkIcon aria-hidden="true" />}
     />
   );
 }
@@ -527,8 +514,8 @@ export namespace NumberField {
       '[--ids-number-field-danger:var(--ids-field-danger,#b42318)]',
       '[[data-mode=dark]_&]:[--ids-number-field-danger:var(--ids-field-danger,#fda29b)]',
       'data-disabled:cursor-not-allowed data-disabled:opacity-40',
-      'has-[[data-number-field-input]:focus-visible]:outline-2 has-[[data-number-field-input]:focus-visible]:outline-offset-2',
-      'has-[[data-number-field-input]:focus-visible]:outline-(--ids-color-primary)',
+      'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2',
+      'has-[:focus-visible]:outline-(--ids-color-primary)',
     ],
     variants: {
       variant: {
@@ -547,7 +534,7 @@ export namespace NumberField {
       {
         variant: ['outline', 'filled'],
         class:
-          'data-invalid:inset-ring-1 data-invalid:inset-ring-(--ids-number-field-danger) data-invalid:has-[[data-number-field-input]:focus-visible]:outline-(--ids-number-field-danger)',
+          'data-invalid:inset-ring-1 data-invalid:inset-ring-(--ids-number-field-danger) data-invalid:has-[:focus-visible]:outline-(--ids-number-field-danger)',
       },
     ],
   });

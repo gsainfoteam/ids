@@ -197,7 +197,7 @@ export namespace TextArea {
         filled:
           'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent hover:bg-(--ids-color-primary)/15',
         unstyled:
-          'has-[[data-text-area-input]:focus-visible]:outline-2 has-[[data-text-area-input]:focus-visible]:outline-(--ids-color-primary)',
+          'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-(--ids-color-primary)',
       } satisfies Record<TextAreaVariant, string>,
       size: {
         standard: 'rounded-xl text-body-b2-regular',
@@ -208,11 +208,11 @@ export namespace TextArea {
       {
         variant: ['outline', 'filled'],
         class: [
-          'has-[[data-text-area-input]:focus-visible]:outline-2',
-          'has-[[data-text-area-input]:focus-visible]:outline-offset-2',
-          'has-[[data-text-area-input]:focus-visible]:outline-(--ids-color-primary)',
+          'has-[:focus-visible]:outline-2',
+          'has-[:focus-visible]:outline-offset-2',
+          'has-[:focus-visible]:outline-(--ids-color-primary)',
           'data-invalid:inset-ring-1 data-invalid:inset-ring-(--ids-text-area-danger)',
-          'data-invalid:has-[[data-text-area-input]:focus-visible]:outline-(--ids-text-area-danger)',
+          'data-invalid:has-[:focus-visible]:outline-(--ids-text-area-danger)',
         ],
       },
     ],

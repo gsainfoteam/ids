@@ -11,6 +11,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { ClockIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+
 import { invariant, mergeProps, mergeRefs } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { FieldPopup, fieldTriggerStyle, flattenParts, part } from '../field-popup';
@@ -79,15 +81,19 @@ export function TemporalTrigger({ asChild, children, ...props }: TriggerProps) {
     asChild,
     children ?? (
       <>
-        <span aria-hidden="true">◷</span>
+        <ClockIcon aria-hidden="true" className="size-4 shrink-0" />
         <TemporalValue />
-        <span aria-hidden="true">▾</span>
+        <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
       </>
     ),
     mergeProps(props, { ...c.trigger }),
   );
 }
-export function TemporalClear({ asChild, children = '×', ...props }: TriggerProps) {
+export function TemporalClear({
+  asChild,
+  children = <XMarkIcon aria-hidden="true" className="size-4" />,
+  ...props
+}: TriggerProps) {
   const c = useTemporal();
   return c.hasValue
     ? part(
@@ -187,7 +193,11 @@ export function TemporalField({
     // mergeRefs creates a callback without reading refs during render.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(trigger, forwardedRef),
-    className: fieldTriggerStyle({ variant: 'unstyled', size: resolvedSize, className: 'flex-1' }),
+    className: fieldTriggerStyle({
+      variant: 'unstyled',
+      size: resolvedSize,
+      className: 'flex-1 focus-visible:outline-none',
+    }),
     onClick: (e) => {
       native.onClick?.(e);
       if (!e.defaultPrevented && !blocked) setOpen((previous) => !previous);
@@ -237,7 +247,7 @@ export function TemporalField({
         className={fieldTriggerStyle({
           variant,
           size: resolvedSize,
-          className: `gap-0 px-0 ${disabled ? 'opacity-40' : ''} ${className ?? ''}`,
+          className: `gap-0 px-0 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${disabled ? 'opacity-40' : ''} ${className ?? ''}`,
         })}
         style={style}
       >
@@ -272,7 +282,7 @@ export function TemporalField({
               onClick={() => close(true)}
               className="size-7 rounded focus-visible:outline-2"
             >
-              ×
+              <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
             </button>
           </div>
           {contents.length ? contents : <TemporalContent />}

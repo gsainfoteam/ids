@@ -15,6 +15,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+
 import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { IconButton } from '../icon-button';
@@ -49,21 +51,6 @@ function PasswordInput(_props: PasswordField.InputProps): ReactNode {
   invariant(
     false,
     'PasswordField.Input must be a direct child of PasswordField (or inside a Fragment).',
-  );
-}
-function EyeIcon({ visible }: { visible: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
-      {visible && (
-        <path d="m3 3 18 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      )}
-    </svg>
   );
 }
 function PasswordVisibilityToggle({
@@ -111,7 +98,7 @@ function PasswordVisibilityToggle({
       variant="ghost"
       aria-label={internal['aria-label']!}
       className="size-7 min-w-0 shrink-0 p-1"
-      icon={<EyeIcon visible={context.visible} />}
+      icon={context.visible ? <EyeSlashIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />}
     />
   );
 }
@@ -296,8 +283,8 @@ export namespace PasswordField {
       '[--ids-password-field-danger:var(--ids-field-danger,#b42318)]',
       '[[data-mode=dark]_&]:[--ids-password-field-danger:var(--ids-field-danger,#fda29b)]',
       'data-disabled:cursor-not-allowed data-disabled:opacity-40',
-      'has-[[data-password-field-input]:focus-visible]:outline-2 has-[[data-password-field-input]:focus-visible]:outline-offset-2',
-      'has-[[data-password-field-input]:focus-visible]:outline-(--ids-color-primary)',
+      'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2',
+      'has-[:focus-visible]:outline-(--ids-color-primary)',
     ],
     variants: {
       variant: {
@@ -316,7 +303,7 @@ export namespace PasswordField {
       {
         variant: ['outline', 'filled'],
         class:
-          'data-invalid:inset-ring-1 data-invalid:inset-ring-(--ids-password-field-danger) data-invalid:has-[[data-password-field-input]:focus-visible]:outline-(--ids-password-field-danger)',
+          'data-invalid:inset-ring-1 data-invalid:inset-ring-(--ids-password-field-danger) data-invalid:has-[:focus-visible]:outline-(--ids-password-field-danger)',
       },
     ],
   });

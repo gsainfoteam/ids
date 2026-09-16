@@ -10,6 +10,8 @@ import {
   type ComponentProps,
 } from 'react';
 
+import { CalendarDaysIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+
 import { invariant, mergeProps, mergeRefs } from '../../utils';
 import { Calendar, type CalendarOptions, type CalendarProps } from '../calendar';
 import {
@@ -71,15 +73,19 @@ function DateTrigger({ asChild, children, ...props }: DateField.TriggerProps) {
     asChild,
     children ?? (
       <>
-        <span aria-hidden="true">▦</span>
+        <CalendarDaysIcon aria-hidden="true" className="size-4 shrink-0" />
         <DateValue />
-        <span aria-hidden="true">▾</span>
+        <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
       </>
     ),
     mergeProps(props, { ...c.trigger }),
   );
 }
-function DateClear({ asChild, children = '×', ...props }: DateField.ClearProps) {
+function DateClear({
+  asChild,
+  children = <XMarkIcon aria-hidden="true" className="size-4" />,
+  ...props
+}: DateField.ClearProps) {
   const c = useDateField();
   if (!c.hasValue) return null;
   return part(
@@ -211,7 +217,11 @@ export function DateField(props: DateFieldProps) {
     // mergeRefs only composes callbacks, without reading current during render.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(trigger, forwardedRef),
-    className: fieldTriggerStyle({ variant: 'unstyled', size: resolvedSize, className: 'flex-1' }),
+    className: fieldTriggerStyle({
+      variant: 'unstyled',
+      size: resolvedSize,
+      className: 'flex-1 focus-visible:outline-none',
+    }),
     onClick: (e) => {
       native.onClick?.(e);
       if (!e.defaultPrevented && !blocked) setOpen((previous) => !previous);
@@ -286,7 +296,7 @@ export function DateField(props: DateFieldProps) {
         className={fieldTriggerStyle({
           variant,
           size: resolvedSize,
-          className: `gap-0 px-0 ${disabled === true ? 'opacity-40' : ''} ${className ?? ''}`,
+          className: `gap-0 px-0 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${disabled === true ? 'opacity-40' : ''} ${className ?? ''}`,
         })}
         style={style}
       >
@@ -327,7 +337,7 @@ export function DateField(props: DateFieldProps) {
               onClick={() => close(true)}
               className="size-7 rounded focus-visible:outline-2"
             >
-              ×
+              <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
             </button>
           </div>
           {contents.length ? contents : <DateContent />}
