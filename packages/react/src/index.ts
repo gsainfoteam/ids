@@ -89,3 +89,6 @@ export type { DateTimeFieldProps } from './components/date-time-field';
 
 export { Input } from './components/input';
 export type { InputProps } from './components/input';
+
+export { Rating } from './components/rating';
+export type { RatingProps } from './components/rating';

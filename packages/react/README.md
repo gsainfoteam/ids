@@ -279,3 +279,7 @@ Calendar와 TimePicker로 일시를 선택합니다. [DateTimeField API](./src/c
 ## Interaction feedback
 
 Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만 150ms로 전환합니다. 키보드 포커스에서는 전환과 누름 배율을 적용하지 않으며 reduced-motion도 지원합니다. TextField 계열은 색상만 전환하고 포커스 표시는 즉시 반영합니다. ThemeProvider는 `color-scheme`도 모드에 맞춰 네이티브 폼 컨트롤과 스크롤바에 전달합니다.
+
+## Rating
+
+반 점 평점 선택·키보드 조작·커스텀 그래픽·표시 전용 모드를 지원합니다. RHF는 `controlMode="value"`를 사용합니다. [Rating API](./src/components/rating/README.md).
