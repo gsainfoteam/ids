@@ -283,3 +283,7 @@ Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만
 ## Rating
 
 반 점 평점 선택·키보드 조작·커스텀 그래픽·표시 전용 모드를 지원합니다. RHF는 `controlMode="value"`를 사용합니다. [Rating API](./src/components/rating/README.md).
+
+## FloatingButton
+
+화면 모서리에 고정된 아이콘/확장형 행동 버튼입니다. safe-area와 링크 합성·비활성 상태를 지원합니다. [FloatingButton API](./src/components/floating-button/README.md).

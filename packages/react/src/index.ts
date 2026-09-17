@@ -92,3 +92,6 @@ export type { InputProps } from './components/input';
 
 export { Rating } from './components/rating';
 export type { RatingProps } from './components/rating';
+
+export { FloatingButton } from './components/floating-button';
+export type { FloatingButtonProps, FloatingPlacement } from './components/floating-button';
