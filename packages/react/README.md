@@ -207,3 +207,83 @@ pnpm lint
 ```
 
 외부 headless 라이브러리(Radix, Base UI 등)에 의존하지 않고 전부 직접 구현한다.
+
+## Field
+
+`Field`는 Label/Description/Hint/Error를 입력에 자동 연결합니다.
+일반 사용은 `@gsainfoteam/ids-react`, 선택형 RHF 자동 연동은
+`@gsainfoteam/ids-react/react-hook-form`에서 가져옵니다.
+[Field API와 연결 계약](./src/components/field/README.md)을 참고하세요.
+
+## TextArea
+
+`TextArea`는 여러 줄 입력과 위·아래 도구 영역을 합성하고, `autoResize`와
+`minRows`/`maxRows`로 높이를 제한합니다. Field의 라벨·오류 및 선택적 RHF 어댑터와 연결됩니다.
+[TextArea API와 예제](./src/components/text-area/README.md)를 참고하세요.
+
+## NumberField
+
+`NumberField`는 숫자/null 값, 소수점 증감, 통화·백분율 표시와 Input/Stepper/Clear 합성을 제공합니다.
+RHF에는 `controlMode="value"`로 연결합니다. [NumberField API와 값 계약](./src/components/number-field/README.md)을 참고하세요.
+
+## PasswordField
+
+`PasswordField`는 native 비밀번호 입력과 표시 전환, Input/VisibilityToggle 합성을 제공합니다.
+Field의 라벨·오류 및 RHF의 native 등록을 지원합니다. [PasswordField API](./src/components/password-field/README.md)를 참고하세요.
+
+## OTPField
+
+`OTPField`는 여러 칸에 입력한 코드를 하나의 문자열로 관리하고, 붙여넣기·자동 이동·마스킹을 지원합니다.
+RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규칙](./src/components/otp-field/README.md)을 참고하세요.
+
+## Select
+
+검색·그룹·다중 선택과 키보드 탐색을 지원합니다. RHF는 `controlMode="value"`를 사용합니다. [Select API](./src/components/select/README.md).
+
+## TelField
+
+전화번호 자동 포맷과 검색 가능한 국가 선택을 제공합니다. [TelField API](./src/components/tel-field/README.md).
+
+## ColorField
+
+색상 패널·팔레트·투명도와 HEX/RGB/HSL 형식 입력을 제공합니다. [ColorField API](./src/components/color-field/README.md).
+
+## ChipField
+
+검색·다중 선택·새 태그 생성과 칩 삭제를 지원합니다. [ChipField API](./src/components/chip-field/README.md).
+
+## FileField
+
+파일 선택·드롭·목록 삭제와 형식·크기·개수 제한을 지원합니다. [FileField API](./src/components/file-field/README.md).
+
+## Calendar
+
+단일·범위·다중 날짜 선택과 키보드 월 탐색을 제공합니다. [Calendar API](./src/components/calendar/README.md).
+
+## DateField
+
+Calendar 팝업으로 날짜·기간·여러 날짜를 선택합니다. [DateField API](./src/components/date-field/README.md).
+
+## TimePicker
+
+시·분·초 컬럼과 12/24시간제를 지원합니다. [TimePicker API](./src/components/time-picker/README.md).
+
+## TimeField
+
+TimePicker 팝업으로 시간을 선택합니다. [TimeField API](./src/components/time-field/README.md).
+
+## DateTimeField
+
+Calendar와 TimePicker로 일시를 선택합니다. [DateTimeField API](./src/components/date-time-field/README.md).
+
+## Interaction feedback
+
+Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만 150ms로 전환합니다. 키보드 포커스에서는 전환과 누름 배율을 적용하지 않으며 reduced-motion도 지원합니다. TextField 계열은 색상만 전환하고 포커스 표시는 즉시 반영합니다. ThemeProvider는 `color-scheme`도 모드에 맞춰 네이티브 폼 컨트롤과 스크롤바에 전달합니다.
+
+## Rating
+
+반 점 평점 선택·키보드 조작·커스텀 그래픽·표시 전용 모드를 지원합니다. RHF는 `controlMode="value"`를 사용합니다. [Rating API](./src/components/rating/README.md).
+
+## FloatingButton
+
+화면 모서리에 고정된 아이콘/확장형 행동 버튼입니다. safe-area와 링크 합성·비활성 상태를 지원합니다. [FloatingButton API](./src/components/floating-button/README.md).
