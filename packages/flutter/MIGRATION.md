@@ -1,6 +1,6 @@
 # ids_flutter 컴포넌트 재구축
 
-임시 문서. 마이그레이션이 끝나면 삭제한다. 삭제 전에 아래 미결 건을 이슈로 옮긴다. 설계 원칙은 [IDS Architecture.md](../../IDS%20Architecture.md).
+임시 문서. 마이그레이션이 끝나면 삭제한다. 삭제 전에 아래 미결 건을 이슈로 옮기고, [RULES.md](RULES.md)의 이 문서 링크도 지운다. 설계 원칙은 [IDS Architecture.md](../../IDS%20Architecture.md).
 
 ## 원칙
 
