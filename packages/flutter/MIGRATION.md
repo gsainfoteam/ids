@@ -1,6 +1,6 @@
 # ids_flutter 컴포넌트 재구축
 
-임시 문서. 마이그레이션이 끝나면 삭제한다. 설계 원칙은 [IDS Architecture.md](../../IDS%20Architecture.md).
+임시 문서. 마이그레이션이 끝나면 삭제한다. 삭제 전에 아래 미결 건을 이슈로 옮긴다. 설계 원칙은 [IDS Architecture.md](../../IDS%20Architecture.md).
 
 ## 원칙
 
@@ -23,14 +23,16 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
 - **StateMask는 만들지 않는다.** 상태는 배경색 알파로 표현한다. 상태 감지는 `useInteractive`의 Flutter 대응물 `IdsInteractive`.
 - **로컬 enum은 만들지 않는다.** `IdsSize`/`IdsVariant`로 안 되는 축은 `packages/core/tokens/enums.json`에 추가한다. 추가는 FE가 그 컴포넌트를 만들 때 한다.
-- **치수·상태 알파는 React가 기준.** [control-surface.ts](../react/src/components/control-surface.ts) 하드코딩 값을 쓴다. core에는 없다(`--ids-state-*`, radius·height 토큰 없음, `spacing.json`은 미출력). Flutter도 이 값을 파일 한 곳에만 둔다. 값이 굳으면 core로 올린다.
+- **치수·상태 알파는 React가 기준.** [control-surface.ts](../react/src/components/control-surface.ts) 하드코딩 값을 쓴다. core에는 없다(`--ids-state-*`, radius·height 토큰 없음, spacing은 아래 미결 참고). Flutter도 이 값을 파일 한 곳에만 둔다. 값이 굳으면 core로 올린다.
 - **`dragged`는 지금 넣지 않는다.** FE `useInteractive`에 들어올 때 따라간다.
-- **Notion 문서와 다른 곳은 코드를 따른다.** 어느 쪽이 맞는지는 미결.
+- **컴포넌트 `color` prop도 지금 넣지 않는다.** FE 컴포넌트에 아직 없다. 들어올 때 따라간다.
+- **설계 문서(Notion, `IDS Architecture.md`)와 다른 곳은 코드를 따른다.** 어느 쪽이 맞는지는 미결.
   - soft: 코드는 `primary`/15 + 전경 `primary`. 문서는 `primary-weak` + `on-primary-weak` (core에 없는 토큰)
   - disabled: 코드는 opacity 0.40. 문서는 opacity-50 또는 disabled 토큰 (core에 없음)
   - 그룹 size: 코드는 불일치 시 항상 throw, `variant`는 전파 안 함. 문서는 자식 명시값 우선
   - `Ids` prefix: codegen과 `IdsScope`·`IdsTheme`에 있음. 문서는 prefix 없음
   - size / variant: `enums.json`의 `standard` `tiny` / `solid` `soft` `outline` `ghost`. 문서의 `sm`/`md`/`lg`, `link`는 코드에 없음
+  - spacing: `IdsSpacing`·`ids_spacing.dart`·`--spacing-*`는 없다. `sd.config.js`에서 `ids/dart-spacing`이 주석 처리. 문서는 있다고 적음
 
 이전 기록에서 참조하는 것: 컴포넌트 목록, 서브컴포넌트 조립 구조, 다뤘던 기능·상태.
 참조하지 않는 것: 로컬 enum, 치수, 상태 처리 방식.
@@ -72,9 +74,6 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 - 스타일 적용은 `pressed > active > hovered` 우선순위로 하나만. state 객체는 원시값 그대로
 - `onInteractionChange`로 부모에 미러링. controlled 아님
 - `T | (state) => T`: `Button` `Toggle`의 `children` `variant` `size`와 스타일 prop. 이벤트 핸들러, `disabled`, `pressed`, `value`는 제외
-- `color` prop: FE 컴포넌트에 아직 없다. FE에 들어올 때 따라간다
-- Semantics는 컴포넌트가 내부에서 주입 (button, label, enabled)
-- 전환 시간은 `IdsMotion.fast`
 
 | React                             | Flutter                                         |
 | --------------------------------- | ----------------------------------------------- |
@@ -116,16 +115,17 @@ focusVisible = focused
 | `ghost`   | 투명    | 0.10  | 0.15             |
 
 - 전경: `solid`만 `onPrimary`, 나머지 `primary`
-- `outline`: 안쪽 1px 테두리, 색은 `outline` 토큰. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
+- `outline`: 안쪽 1px 테두리, 색은 `IdsTheme.outline`(variant 이름과 같은 색 토큰). `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
 - `active`: scale 0.98
 - `focusVisible`: 2px outline, offset 2, primary
 - `disabled`: opacity 0.40
-- reduced motion: 전환 없음, scale 1.0
+- 전환 시간은 `IdsMotion.fast`. reduced motion: 전환 없음, scale 1.0
+- Semantics는 컴포넌트가 내부에서 주입 (button, label, enabled. Toggle은 `toggled` 추가 — React의 `aria-pressed`)
 - `standard` h44 / px18 / r12, `tiny` h32 / px10 / r8
 
-### 그룹 size
+### 그룹 전파
 
-자식은 `size`를 생략하거나 그룹과 같아야 한다. 어긋나면 throw. [group.tsx](../react/src/components/group.tsx) `useGroupedSize`.
+자식은 `size`를 생략하거나 그룹과 같아야 한다. 어긋나면 throw. 그룹이 전파하는 것은 `orientation`과 `size`뿐이고 `variant`는 전파하지 않는다. [group.tsx](../react/src/components/group.tsx) `useGroupedSize`.
 
 ## 순서
 
@@ -144,7 +144,7 @@ focusVisible = focused
 
 ## 이전 구조 (B와 `bottom_navigation`만)
 
-서브컴포넌트 조립 구조와 다뤘던 기능만 적는다. 정확한 시그니처는 기준 커밋에서 본다.
+서브컴포넌트 조립 구조와 다뤘던 기능만 적는다. `text` `heading` `badge`는 적을 구조가 없어 뺐다. 정확한 시그니처는 기준 커밋에서 본다.
 
 - `hstack` `vstack`: `gap` `mainAxis` `crossAxis` `fit`. enum은 남아 있는 `lib/src/layout/ids_axis.dart`
 - `avatar`: `src` 없으면 `name` fallback
