@@ -23,8 +23,14 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
 - **StateMask는 만들지 않는다.** 상태는 배경색 알파로 표현한다. 상태 감지는 `useInteractive`의 Flutter 대응물 `IdsInteractive`.
 - **로컬 enum은 만들지 않는다.** `IdsSize`/`IdsVariant`로 안 되는 축은 `packages/core/tokens/enums.json`에 추가한다. 추가는 FE가 그 컴포넌트를 만들 때 한다.
-- **치수는 React가 기준.** 예: Button tiny radius 8, standard 좌우 패딩 18.
+- **치수·상태 알파는 React가 기준.** [control-surface.ts](../react/src/components/control-surface.ts) 하드코딩 값을 쓴다. core에는 없다(`--ids-state-*`, radius·height 토큰 없음, `spacing.json`은 미출력). Flutter도 이 값을 파일 한 곳에만 둔다. 값이 굳으면 core로 올린다.
 - **`dragged`는 지금 넣지 않는다.** FE `useInteractive`에 들어올 때 따라간다.
+- **Notion 문서와 다른 곳은 코드를 따른다.** 어느 쪽이 맞는지는 미결.
+  - soft: 코드는 `primary`/15 + 전경 `primary`. 문서는 `primary-weak` + `on-primary-weak` (core에 없는 토큰)
+  - disabled: 코드는 opacity 0.40. 문서는 opacity-50 또는 disabled 토큰 (core에 없음)
+  - 그룹 size: 코드는 불일치 시 항상 throw, `variant`는 전파 안 함. 문서는 자식 명시값 우선
+  - `Ids` prefix: codegen과 `IdsScope`·`IdsTheme`에 있음. 문서는 prefix 없음
+  - size / variant: `enums.json`의 `standard` `tiny` / `solid` `soft` `outline` `ghost`. 문서의 `sm`/`md`/`lg`, `link`는 코드에 없음
 
 이전 기록에서 참조하는 것: 컴포넌트 목록, 서브컴포넌트 조립 구조, 다뤘던 기능·상태.
 참조하지 않는 것: 로컬 enum, 치수, 상태 처리 방식.
@@ -65,15 +71,38 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 - `onPointerCancel`에서 `active`, `hovered` 복구
 - 스타일 적용은 `pressed > active > hovered` 우선순위로 하나만. state 객체는 원시값 그대로
 - `onInteractionChange`로 부모에 미러링. controlled 아님
-- 대부분의 prop을 `T | (state) => T`로 받음
+- `T | (state) => T`: `Button` `Toggle`의 `children` `variant` `size`와 스타일 prop. 이벤트 핸들러, `disabled`, `pressed`, `value`는 제외
+- `color` prop: FE 컴포넌트에 아직 없다. FE에 들어올 때 따라간다
+- Semantics는 컴포넌트가 내부에서 주입 (button, label, enabled)
+- 전환 시간은 `IdsMotion.fast`
 
 | React                             | Flutter                                         |
 | --------------------------------- | ----------------------------------------------- |
 | `onPointerEnter/Leave`            | `MouseRegion`                                   |
 | `onPointerDown/Up/Cancel`         | `Listener` 또는 `GestureDetector`               |
-| `onFocus/Blur` + `:focus-visible` | `Focus` + `FocusManager.instance.highlightMode` |
+| `onFocus/Blur` + `:focus-visible` | `Focus` + 포커스 원인 추적 (아래 참고)          |
 | `onKeyDown` Enter/Space           | `Focus.onKeyEvent` 또는 `Shortcuts`/`Actions`   |
 | `T \| (state) => T`               | `ValueBuilder<IdsInteractiveState>` 계열        |
+
+**`focusVisible`.** `FocusManager.instance.highlightMode`만으로 정하지 않는다. 전역 입력 모드라서 마우스 입력도 `traditional`이고, 그대로 쓰면 마우스 클릭으로 포커스된 컨트롤에도 포커스 링이 뜬다. React는 포커스를 얻는 시점의 `:focus-visible`을 스냅샷하므로 마우스 클릭에는 링이 없다.
+
+`IdsInteractive`가 포커스 원인을 직접 추적한다. 포커스를 얻는 시점에 한 번 계산하고, blur에서 `false`로 되돌린다.
+
+```text
+focusVisible = focused
+            && 자기 자신의 pointer down으로 얻은 포커스가 아님
+            && highlightMode == FocusHighlightMode.traditional
+```
+
+| 포커스 원인                                  | `focusVisible` |
+| -------------------------------------------- | -------------- |
+| Tab / 방향키 이동                            | `true`         |
+| 마우스 클릭                                  | `false`        |
+| 터치 탭                                      | `false`        |
+| `requestFocus()` — 직전 입력이 키보드·마우스 | `true`         |
+| `requestFocus()` — 직전 입력이 터치          | `false`        |
+
+위 표가 `IdsInteractive` 위젯 테스트의 계약이다.
 
 ### control surface — Button / IconButton / Toggle 공통
 
@@ -87,7 +116,7 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 | `ghost`   | 투명    | 0.10  | 0.15             |
 
 - 전경: `solid`만 `onPrimary`, 나머지 `primary`
-- `outline`: 안쪽 1px 테두리. `Border.all`은 바깥으로 나가므로 주의
+- `outline`: 안쪽 1px 테두리, 색은 `outline` 토큰. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
 - `active`: scale 0.98
 - `focusVisible`: 2px outline, offset 2, primary
 - `disabled`: opacity 0.40
@@ -96,7 +125,7 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 
 ### 그룹 size
 
-자식은 `size`를 생략하거나 그룹과 같아야 한다. 어긋나면 개발 중 에러. [group.tsx](../react/src/components/group.tsx) `useGroupedSize`.
+자식은 `size`를 생략하거나 그룹과 같아야 한다. 어긋나면 throw. [group.tsx](../react/src/components/group.tsx) `useGroupedSize`.
 
 ## 순서
 
@@ -113,69 +142,17 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 - `example/lib/main.dart` — usecase import 정리
 - `test/widget_test.dart` — enum만 확인하므로 그대로
 
-## 삭제되는 API (기준 커밋 기준)
+## 이전 구조 (B와 `bottom_navigation`만)
 
-```dart
-// ── A ──
-IdsButton({ required VoidCallback? onPressed, required List<Widget> children,
-            IdsVariant variant = solid, IdsSize size = standard, bool disabled = false })
-IdsIconButton({ required Widget Function(Color, double) icon, IdsVariant variant, IdsSize size,
-                bool disabled, VoidCallback? onPressed, required String label })
-IdsDivider({ IdsDividerOrientation orientation, double thickness })
-  enum IdsDividerOrientation { horizontal, vertical }
-IdsSpacer({ int flex })
+서브컴포넌트 조립 구조와 다뤘던 기능만 적는다. 정확한 시그니처는 기준 커밋에서 본다.
 
-// ── B ──
-IdsText(String data, { TextStyle style = IdsTypography.bodyB2Regular, Color? color,
-        TextAlign? align, int? maxLines, TextOverflow? overflow })
-IdsHeading(String data, { TextStyle style = IdsTypography.headlineH5Semibold, Color? color, TextAlign? align })
-
-IdsHStack({ required List<Widget> children, double gap = 0, MainAxis mainAxis = start,
-            CrossAxis crossAxis = stretch, IdsStackFit fit = fill, TextBaseline textBaseline = alphabetic })
-IdsVStack({ required List<Widget> children, double gap = 0, MainAxis mainAxis = start,
-            CrossAxis crossAxis = stretch, IdsStackFit fit = fill })
-  // lib/src/layout/ids_axis.dart
-  enum MainAxis { start, center, end, between, around, evenly }
-  enum CrossAxis { start, center, end, stretch, baseline }
-  enum IdsStackFit { fill, content }
-
-IdsAvatar({ String? src, String? name, IdsSize size = standard })
-IdsBadge(String data, { IdsVariant variant = soft, IdsSize size = tiny })
-
-IdsCard({ required Widget child, IdsCardVariant variant = outline, IdsCardSize size = md,
-          VoidCallback? onPressed, bool interactive = false })
-  enum IdsCardVariant { outline, elevated, filled, ghost }
-  enum IdsCardSize { sm 10, md 16, lg 24 }  // 안쪽 패딩
-  IdsCardHeader({ children }), IdsCardTitle(data), IdsCardDescription(data),
-  IdsCardContent({ child }), IdsCardFooter({ child })
-
-IdsItem({ required List<Widget> children, VoidCallback? onPressed })
-  IdsItemLeading({ child }), IdsItemContent({ children }), IdsItemTitle(data),
-  IdsItemDescription(data), IdsItemTrailing({ child })
-
-IdsEmpty({ required List<Widget> children, IdsEmptyVariant variant = default_ })
-  enum IdsEmptyVariant { default_ 48, compact 24 }  // 패딩
-  IdsEmptyMedia({ child }), IdsEmptyTitle(data), IdsEmptyDescription(data), IdsEmptyActions({ children })
-
-IdsDialog({ required bool open, required List<Widget> children, ValueChanged<bool>? onOpenChanged,
-            IdsDialogSize size = md, bool dismissible = true })
-  enum IdsDialogSize { sm 320, md 420, lg 560, xl 720, full }  // 최대 너비
-  IdsDialogHeader({ children }), IdsDialogTitle(data), IdsDialogContent({ child }), IdsDialogFooter({ children })
-
-IdsTabs<T>({ required List<IdsTabItem<T>> items, T? value, T? defaultValue, ValueChanged<T>? onChanged })
-  IdsTabItem<T>({ required T value, required String label, required Widget child, bool disabled = false })
-  // StatefulWidget. value/defaultValue로 controlled/uncontrolled 전환
-
-IdsBottomNavigation({ required int currentIndex, required ValueChanged<int> onTap,
-                      required List<IdsBottomNavigationItem> items })
-  IdsBottomNavigationItem({ required Widget Function(Color, double) icon, required String label })
-
-IdsFloatingButton({ required List<Widget> children, IdsFloatingButtonVariant variant = solid,
-                    IdsSize size = standard, IdsFloatingPlacement placement = bottomRight,
-                    bool disabled = false, VoidCallback? onPressed, required String semanticLabel })
-  enum IdsFloatingButtonVariant { solid, surface }
-  enum IdsFloatingPlacement { topLeft, topRight, bottomLeft, bottomRight }
-
-IdsCheckbox({ required bool checked, required ValueChanged<bool>? onChanged, bool indeterminate = false,
-              bool disabled = false, bool invalid = false, IdsSize size = standard, String? semanticLabel })
-```
+- `hstack` `vstack`: `gap` `mainAxis` `crossAxis` `fit`. enum은 남아 있는 `lib/src/layout/ids_axis.dart`
+- `avatar`: `src` 없으면 `name` fallback
+- `card`: Header / Title / Description / Content / Footer. `onPressed` `interactive`
+- `item`: Leading / Content / Title / Description / Trailing. `onPressed`
+- `empty`: Media / Title / Description / Actions
+- `dialog`: Header / Title / Content / Footer. `open` `onOpenChanged` `dismissible`
+- `tabs`: `IdsTabItem(value, label, child, disabled)`. `value`/`defaultValue`로 controlled/uncontrolled
+- `bottom_navigation`: `currentIndex` `onTap`, item은 `icon` `label`
+- `floating_button`: `placement` 네 모서리, `semanticLabel` 필수
+- `checkbox`: `indeterminate` `invalid` `semanticLabel`
