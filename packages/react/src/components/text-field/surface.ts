@@ -1,8 +1,4 @@
-import {
-  createContext,
-  useContext,
-  type Ref,
-} from 'react';
+import { createContext, useContext, type Ref } from 'react';
 
 import { tv, type VariantProps } from '../../utils';
 
@@ -26,7 +22,7 @@ export function useTextFieldGroupContext() {
 export const textFieldSurface = tv({
   base: [
     'w-full min-w-0',
-    'bg-transparent text-(--ids-color-on-surface) transition-all',
+    'bg-transparent text-(--ids-color-on-surface) transition-colors duration-150 ease-out focus-within:transition-none motion-reduce:transition-none',
     'data-disabled:cursor-not-allowed data-disabled:opacity-40',
   ],
   variants: {
@@ -70,25 +66,25 @@ export const textFieldSurface = tv({
       as: 'group',
       variant: 'outline',
       class: [
-        'has-[[data-text-field]:focus-visible]:outline-2',
-        'has-[[data-text-field]:focus-visible]:outline-offset-2',
-        'has-[[data-text-field]:focus-visible]:outline-(--ids-color-primary)',
+        'has-[:focus-visible]:outline-2',
+        'has-[:focus-visible]:outline-offset-2',
+        'has-[:focus-visible]:outline-(--ids-color-primary)',
       ],
     },
     {
       as: 'group',
       variant: 'filled',
       class: [
-        'has-[[data-text-field]:focus-visible]:bg-(--ids-color-primary)/15',
-        'has-[[data-text-field]:focus-visible]:outline-2',
-        'has-[[data-text-field]:focus-visible]:outline-offset-2',
-        'has-[[data-text-field]:focus-visible]:outline-(--ids-color-primary)',
+        'has-[:focus-visible]:bg-(--ids-color-primary)/15',
+        'has-[:focus-visible]:outline-2',
+        'has-[:focus-visible]:outline-offset-2',
+        'has-[:focus-visible]:outline-(--ids-color-primary)',
       ],
     },
     {
       as: 'group',
       variant: 'underline',
-      class: 'has-[[data-text-field]:focus-visible]:border-(--ids-color-primary)',
+      class: 'has-[:focus-visible]:border-(--ids-color-primary)',
     },
     { as: 'group', size: 'standard', class: 'gap-2' },
     { as: 'group', size: 'tiny', class: 'gap-1.5' },

@@ -31,6 +31,10 @@ export { Toggle } from './components/toggle';
 export { IconToggle } from './components/icon-toggle';
 export { ToggleGroup } from './components/toggle-group';
 export { TextField } from './components/text-field';
+export { NumberField } from './components/number-field';
+export type { NumberFieldProps, NumberFieldVariant } from './components/number-field';
+export { TextArea } from './components/text-area';
+export type { TextAreaProps, TextAreaVariant } from './components/text-area';
 export { TextFieldGroup } from './components/text-field-group';
 
 export { Spinner } from './components/spinner';
@@ -42,3 +46,52 @@ export { Spacer } from './components/spacer';
 export { AspectRatio } from './components/aspect-ratio';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
+
+export { Field } from './components/field';
+export type { FieldProps } from './components/field';
+export { useFieldSize } from './components/field/context';
+
+export { PasswordField } from './components/password-field';
+export type { PasswordFieldProps, PasswordFieldVariant } from './components/password-field';
+
+export { OTPField } from './components/otp-field';
+export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './components/otp-field';
+
+export { Select } from './components/select';
+export type { SelectProps, SelectVariant } from './components/select';
+
+export { TelField } from './components/tel-field';
+export type { TelFieldProps, TelFieldFormat } from './components/tel-field';
+
+export { ColorField } from './components/color-field';
+export type { ColorFieldProps, ColorFormat } from './components/color-field';
+
+export { ChipField } from './components/chip-field';
+export type { ChipFieldProps } from './components/chip-field';
+
+export { FileField } from './components/file-field';
+export type { FileFieldProps, FileFieldRejection } from './components/file-field';
+
+export { Calendar } from './components/calendar';
+export type { CalendarProps, CalendarOptions, CalendarCellState, DateRange } from './components/calendar';
+
+export { DateField } from './components/date-field';
+export type { DateFieldProps, DateFieldFormat } from './components/date-field';
+
+export { TimePicker } from './components/time-picker';
+export type { TimePickerProps, TimePickerOptions, TimePrecision, TimeFormat } from './components/time-picker';
+
+export { TimeField } from './components/time-field';
+export type { TimeFieldProps } from './components/time-field';
+
+export { DateTimeField } from './components/date-time-field';
+export type { DateTimeFieldProps } from './components/date-time-field';
+
+export { Input } from './components/input';
+export type { InputProps } from './components/input';
+
+export { Rating } from './components/rating';
+export type { RatingProps } from './components/rating';
+
+export { FloatingButton } from './components/floating-button';
+export type { FloatingButtonProps, FloatingPlacement } from './components/floating-button';

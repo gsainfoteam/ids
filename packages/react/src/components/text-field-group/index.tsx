@@ -69,10 +69,10 @@ export function TextFieldGroup({
         style={style}
         onPointerDown={(e) => {
           onPointerDown?.(e);
-          if (disabled) return;
+          if (e.defaultPrevented || disabled) return;
           const target = e.target as HTMLElement;
           if (target.closest('button, a, input, textarea, select, [data-text-field]')) return;
-          inputRef.current?.focus();
+          inputRef.current?.focus({ preventScroll: true });
         }}
       >
         {leading}
