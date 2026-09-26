@@ -16,7 +16,6 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 
 ## 합성
 
-
 ```tsx
 import { Button, IconButton, TextArea } from '@gsainfoteam/ids-react';
 import { BoldIcon, ItalicIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
