@@ -1,17 +1,18 @@
 import { useState, type ReactNode } from 'react';
 
 import {
-  CaretDownIcon,
   CheckIcon,
-  CopyIcon,
+  ChevronDownIcon,
   CreditCardIcon,
-  DotsThreeIcon,
+  DocumentDuplicateIcon,
+  EllipsisHorizontalIcon,
   EnvelopeIcon,
-  InfoIcon,
+  InformationCircleIcon,
   MagnifyingGlassIcon,
   StarIcon,
-  XIcon,
-} from '@phosphor-icons/react';
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
+import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { expect } from 'storybook/test';
 
 import { Button } from '../button';
@@ -105,7 +106,7 @@ export const Gallery: Story = {
             <IconButton
               variant="ghost"
               aria-label="더보기"
-              icon={<DotsThreeIcon />}
+              icon={<EllipsisHorizontalIcon />}
               onClick={() => undefined}
             />
           </TextField>
@@ -121,12 +122,12 @@ export const Gallery: Story = {
           </TextField>
 
           <TextField defaultValue="https://">
-            <InfoIcon />
+            <InformationCircleIcon />
             <TextField.Input />
             <IconToggle
               variant="ghost"
               aria-label="즐겨찾기"
-              icon={(state) => <StarIcon weight={state.pressed ? 'fill' : 'regular'} />}
+              icon={(state) => (state.pressed ? <StarIconSolid /> : <StarIcon />)}
             />
           </TextField>
 
@@ -144,12 +145,12 @@ export const Gallery: Story = {
           <IconToggle
             variant="ghost"
             aria-label="즐겨찾기"
-            icon={(state) => <StarIcon weight={state.pressed ? 'fill' : 'regular'} />}
+            icon={(state) => (state.pressed ? <StarIconSolid /> : <StarIcon />)}
           />
           <IconButton
             variant="ghost"
             aria-label="정보"
-            icon={<InfoIcon />}
+            icon={<InformationCircleIcon />}
             onClick={() => undefined}
           />
         </TextField>
@@ -182,7 +183,7 @@ export const Gallery: Story = {
             <TextField.Input />
             <Button variant="ghost" onClick={() => undefined}>
               Search In...
-              <CaretDownIcon />
+              <ChevronDownIcon />
             </Button>
           </TextField>
 
@@ -292,7 +293,7 @@ function CopyUrlField() {
       <IconButton
         variant="ghost"
         aria-label={copied ? '복사됨' : '복사'}
-        icon={copied ? <CheckIcon /> : <CopyIcon />}
+        icon={copied ? <CheckIcon /> : <DocumentDuplicateIcon />}
         onClick={() => {
           void navigator.clipboard?.writeText(url);
           setCopied(true);
@@ -320,7 +321,7 @@ function SearchWithClear() {
         <IconButton
           variant="ghost"
           aria-label="지우기"
-          icon={<XIcon />}
+          icon={<XMarkIcon />}
           onClick={() => setValue('')}
         />
       )}

@@ -1,13 +1,13 @@
 import { useState, type ReactNode } from 'react';
 
 import {
-  ImageIcon,
-  PaperPlaneTiltIcon,
-  PaperclipIcon,
-  TextBIcon,
-  TextItalicIcon,
-  TextUnderlineIcon,
-} from '@phosphor-icons/react';
+  BoldIcon,
+  ItalicIcon,
+  PaperAirplaneIcon,
+  PaperClipIcon,
+  PhotoIcon,
+  UnderlineIcon,
+} from '@heroicons/react/24/outline';
 import { expect } from 'storybook/test';
 
 import { Button } from '../button';
@@ -81,9 +81,9 @@ export const Gallery: Story = {
       <Section title="Menubar (top)">
         <TextArea placeholder="마크다운으로 작성하세요">
           <div className="flex gap-1">
-            <IconButton variant="ghost" aria-label="굵게" icon={<TextBIcon />} />
-            <IconButton variant="ghost" aria-label="기울임" icon={<TextItalicIcon />} />
-            <IconButton variant="ghost" aria-label="밑줄" icon={<TextUnderlineIcon />} />
+            <IconButton variant="ghost" aria-label="굵게" icon={<BoldIcon />} />
+            <IconButton variant="ghost" aria-label="기울임" icon={<ItalicIcon />} />
+            <IconButton variant="ghost" aria-label="밑줄" icon={<UnderlineIcon />} />
           </div>
           <TextArea.Input />
         </TextArea>
@@ -100,8 +100,8 @@ export const Gallery: Story = {
       <Section title="Menubar + actionbar">
         <TextArea placeholder="마크다운 지원">
           <div className="flex gap-1">
-            <IconButton variant="ghost" aria-label="굵게" icon={<TextBIcon />} />
-            <IconButton variant="ghost" aria-label="기울임" icon={<TextItalicIcon />} />
+            <IconButton variant="ghost" aria-label="굵게" icon={<BoldIcon />} />
+            <IconButton variant="ghost" aria-label="기울임" icon={<ItalicIcon />} />
           </div>
           <TextArea.Input className="font-mono" />
           <div className="flex w-full items-center justify-between">
@@ -192,13 +192,13 @@ function ChatComposer() {
       <TextArea.Input />
       <div className="flex w-full items-center justify-between">
         <div className="flex gap-1">
-          <IconButton variant="ghost" aria-label="첨부" icon={<PaperclipIcon />} />
-          <IconButton variant="ghost" aria-label="이미지" icon={<ImageIcon />} />
+          <IconButton variant="ghost" aria-label="첨부" icon={<PaperClipIcon />} />
+          <IconButton variant="ghost" aria-label="이미지" icon={<PhotoIcon />} />
         </div>
         <IconButton
           aria-label="보내기"
           variant="solid"
-          icon={<PaperPlaneTiltIcon />}
+          icon={<PaperAirplaneIcon />}
           disabled={message === ''}
           onClick={() => setMessage('')}
         />
