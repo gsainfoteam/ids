@@ -1,5 +1,4 @@
 import {
-  Children,
   Fragment,
   cloneElement,
   createContext,
@@ -16,9 +15,10 @@ import {
 } from 'react';
 
 import { ChevronUpIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { isNotNil } from 'es-toolkit';
 
 import { addDecimal, clampNumber, createNumberFormat, shiftDecimal } from './number-format';
-import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { IconButton } from '../icon-button';
 
@@ -69,28 +69,92 @@ type NumberContext = {
   incrementLabel: string;
   decrementLabel: string;
   clearLabel: string;
+  rootProps: NumberFieldRootInputProps;
+  inputProps: (native: NativeInputProps) => NativeInputProps;
   changeBy: (direction: 1 | -1, large?: boolean) => void;
   clear: () => void;
   focus: () => void;
 };
+type NumberFieldRootInputProps = Omit<
+  NumberFieldProps,
+  | 'value'
+  | 'defaultValue'
+  | 'onChange'
+  | 'min'
+  | 'max'
+  | 'step'
+  | 'largeStep'
+  | 'locale'
+  | 'formatOptions'
+  | 'hideStepper'
+  | 'invalid'
+  | 'size'
+  | 'variant'
+  | 'incrementLabel'
+  | 'decrementLabel'
+  | 'clearLabel'
+  | 'children'
+  | 'className'
+  | 'style'
+>;
 const Context = createContext<NumberContext | null>(null);
 function useNumberContext() {
   const context = useContext(Context);
   invariant(context, 'NumberField parts must be inside NumberField.');
   return context;
 }
-function flatten(children: ReactNode, prefix = ''): ReactNode[] {
-  return Children.toArray(children).flatMap((child, index) =>
-    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
-      ? flatten(child.props.children, `${prefix}${index}:`)
-      : [isValidElement(child) ? cloneElement(child, { key: `${prefix}${child.key}` }) : child],
-  );
-}
-function NumberInput(_props: NumberField.InputProps): ReactNode {
+function splitByInput(children: ReactNode) {
+  const items = flattenFragments(children);
+  const inputIndexes = items
+    .map((child, index) => (isValidElement(child) && child.type === NumberInput ? index : null))
+    .filter(isNotNil);
   invariant(
-    false,
-    'NumberField.Input must be a direct child of NumberField (or inside a Fragment).',
+    inputIndexes.length <= 1,
+    '`<NumberField>` accepts at most one `<NumberField.Input />`.',
   );
+  const inputIndex = inputIndexes[0];
+  if (inputIndex == null) {
+    return {
+      items,
+      leading: items,
+      input: <NumberInput />,
+      trailing: [] as ReactNode[],
+    };
+  }
+  return {
+    items,
+    leading: items.slice(0, inputIndex),
+    input: items[inputIndex] as ReactElement<NumberField.InputProps>,
+    trailing: items.slice(inputIndex + 1),
+  };
+}
+function NumberInput({ asChild, children, ...own }: NumberField.InputProps) {
+  const context = useContext(Context);
+  invariant(context != null, '`<NumberField.Input>` must be used inside `<NumberField>`.');
+  let child: ReactElement<NativeInputProps> | undefined;
+  if (asChild) {
+    invariant(
+      isValidElement<NativeInputProps>(children) &&
+        children.type !== Fragment &&
+        (typeof children.type !== 'string' || children.type === 'input'),
+      '`<NumberField.Input asChild>` requires one input, or a component forwarding input props and ref.',
+    );
+    child = children;
+  } else {
+    invariant(
+      children == null,
+      '`<NumberField.Input>` takes its value from `<NumberField>`, not children.',
+    );
+  }
+  // Input values win over root values, which win over the asChild child's. Handlers compose
+  // (child -> root -> Input) so Field and react-hook-form wiring on the root still runs.
+  const { children: _childChildren, ...childProps } = child?.props ?? {};
+  const native = mergeProps(mergeProps(childProps, context.rootProps), own);
+  const actual = context.inputProps(native);
+  // The child's props are already folded into `actual`; Slot would merge them a second time
+  // and could not clear the child's own `name`/`defaultValue` (it keeps `base` when `next` is
+  // undefined), so the child is cloned with the final props instead.
+  return child ? cloneElement(child, actual) : <input {...actual} />;
 }
 function StepIcon({ direction }: { direction: 1 | -1 }) {
   return direction === 1 ? (
@@ -224,49 +288,15 @@ export function NumberField({
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = NumberField.Style({ variant, size: resolvedSize });
   const generatedId = useId();
-  const parts = flatten(children);
-  const sentinels = parts.filter((part) => isValidElement(part) && part.type === NumberInput);
-  invariant(sentinels.length <= 1, 'NumberField: Input은 한 번만 명시할 수 있습니다.');
-  invariant(
-    parts.length === 0 || sentinels.length === 1,
-    'NumberField: children require one NumberField.Input.',
-  );
-  const sentinel = sentinels[0] as ReactElement<NumberField.InputProps> | undefined;
-  const { asChild, children: inputChild, ...inputProps } = sentinel?.props ?? {};
-  let child: ReactElement<NativeInputProps> | undefined;
-  if (asChild) {
-    invariant(
-      isValidElement<NativeInputProps>(inputChild) && inputChild.type !== Fragment,
-      'NumberField.Input asChild requires one input or a component forwarding input props/ref.',
-    );
-    invariant(
-      typeof inputChild.type !== 'string' || inputChild.type === 'input',
-      'NumberField.Input asChild must render an input.',
-    );
-    child = inputChild;
-  } else
-    invariant(inputChild == null, 'NumberField.Input does not accept children without asChild.');
-  const native: NativeInputProps = mergeProps(
-    mergeProps({ ...child?.props }, inputProps),
-    rootProps,
-  );
+  const { items, leading, input, trailing } = splitByInput(children);
+  const { asChild: _asChild, children: _inputChildren, ...inputOwnProps } = input.props;
+  // The Input's own props win over the root's, so container state is derived from the merged
+  // result rather than from the root props alone.
+  const native: NativeInputProps = mergeProps(rootProps, inputOwnProps);
   const disabled = !!native.disabled;
   const readOnly = !!native.readOnly;
   const id = native.id ?? `ids-number-${generatedId}`;
   const inputRef = useRef<HTMLInputElement>(null);
-  const forwardedRef = native.ref;
-  const ref = (node: HTMLInputElement | null) => {
-    invariant(
-      !node || node.tagName === 'INPUT',
-      'NumberField.Input asChild must forward its ref to an input.',
-    );
-    inputRef.current = node;
-    const cleanup = mergeRefs(forwardedRef)(node);
-    return () => {
-      inputRef.current = null;
-      cleanup?.();
-    };
-  };
   const controlled = value !== undefined;
   const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
   const current = controlled ? value : uncontrolledValue;
@@ -342,10 +372,21 @@ export function NumberField({
   const outOfRange =
     current != null && (current < (min ?? -Infinity) || current > (max ?? Infinity));
   const ariaInvalid = native['aria-invalid'] ?? invalid ?? (outOfRange || undefined);
-  const actual: NativeInputProps = {
+  const inputProps = (native: NativeInputProps): NativeInputProps => ({
     ...native,
     id,
-    ref,
+    ref: (node: HTMLInputElement | null) => {
+      invariant(
+        !node || node.tagName === 'INPUT',
+        '`<NumberField.Input asChild>` must forward its ref to an input.',
+      );
+      inputRef.current = node;
+      const cleanup = mergeRefs(native.ref)(node);
+      return () => {
+        inputRef.current = null;
+        cleanup?.();
+      };
+    },
     type: 'text',
     role: 'spinbutton',
     name: undefined,
@@ -423,14 +464,8 @@ export function NumberField({
       )
         event.preventDefault();
     },
-  };
-  // React.cloneElement forwards callback refs without reading ref.current.
-  // eslint-disable-next-line react-hooks/refs
-  const input = child ? cloneElement(child, actual) : <input {...actual} />;
-  const inputIndex = sentinel ? parts.indexOf(sentinel) : -1;
-  const lead = sentinel ? parts.slice(0, inputIndex) : [];
-  const trail = sentinel ? parts.slice(inputIndex + 1) : [];
-  const explicitSteppers = parts.filter(
+  });
+  const explicitSteppers = items.filter(
     (part) => isValidElement(part) && part.type === NumberStepper,
   );
   invariant(explicitSteppers.length <= 1, 'NumberField: Stepper must be declared at most once.');
@@ -445,6 +480,8 @@ export function NumberField({
     incrementLabel,
     decrementLabel,
     clearLabel,
+    rootProps,
+    inputProps,
     changeBy,
     clear: () => {
       if (!disabled && !readOnly) {
@@ -468,17 +505,9 @@ export function NumberField({
         className={styles.root({ className })}
         style={style}
       >
-        {lead.length > 0 && (
-          <div data-number-field-part="lead" className={styles.part()}>
-            {lead}
-          </div>
-        )}
+        <Adornments items={leading} className={styles.adornment()} />
         {input}
-        {trail.length > 0 && (
-          <div data-number-field-part="trail" className={styles.part()}>
-            {trail}
-          </div>
-        )}
+        <Adornments items={trailing} className={styles.adornment()} />
         {!hideStepper && explicitSteppers.length === 0 && <NumberStepper />}
       </div>
       {native.name && (
@@ -493,10 +522,28 @@ export function NumberField({
     </Context.Provider>
   );
 }
+// Stepper and Clear are NumberField's own parts with their own sizing, so they skip the
+// adornment wrapper; its button reset exists to flatten arbitrary buttons a consumer drops in.
+function Adornments({ items, className }: { items: ReactNode[]; className: string }) {
+  return items.map((item, index) =>
+    isValidElement(item) && (item.type === NumberStepper || item.type === NumberClear) ? (
+      item
+    ) : (
+      <span
+        key={(isValidElement(item) && item.key) || index}
+        data-number-field-adornment=""
+        className={className}
+      >
+        {item}
+      </span>
+    ),
+  );
+}
 export namespace NumberField {
   export type Props = NumberFieldProps;
   export type InputProps = Omit<NativeInputProps, 'type' | 'size' | 'value' | 'defaultValue'> & {
     asChild?: boolean;
+    children?: ReactNode;
   };
   export type StepperProps = ComponentProps<'div'> & { asChild?: boolean };
   export type ClearProps = ComponentProps<'button'> & { asChild?: boolean; onClear?: () => void };
@@ -522,7 +569,13 @@ export namespace NumberField {
         'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
         'disabled:cursor-not-allowed',
       ],
-      part: 'inline-flex shrink-0 items-center gap-1',
+      adornment: [
+        'inline-flex shrink-0 items-center empty:hidden',
+        'not-has-[button]:text-(--ids-color-on-muted)',
+        'not-has-[button]:[&_svg]:shrink-0 not-has-[button]:[&_svg]:text-current',
+        '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
+        '[&_button]:p-0',
+      ],
       stepper: 'flex shrink-0 flex-col',
       stepButton: 'min-w-0 p-0 [&_svg]:size-3',
       clear: 'min-w-0 p-0',
@@ -549,11 +602,19 @@ export namespace NumberField {
       size: {
         standard: {
           root: 'h-(--ids-size-control-standard) gap-2 rounded-md px-3 text-body-b3-regular',
+          adornment: [
+            'gap-1',
+            'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
+          ],
           stepButton: 'h-4 w-6 rounded-xs',
           clear: 'size-7 rounded-sm',
         },
         tiny: {
           root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-sm px-2 text-caption-c1-regular',
+          adornment: [
+            'gap-0.5',
+            'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',
+          ],
           stepButton: 'h-3.5 w-5 rounded-xs',
           clear: 'size-6 rounded-xs',
         },

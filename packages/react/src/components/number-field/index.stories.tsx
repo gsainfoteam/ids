@@ -79,6 +79,29 @@ export const DecimalSteps: Story = {
   },
 };
 
+export const Adornments: Story = {
+  render: () => (
+    <div className="grid w-80 gap-3">
+      <NumberField aria-label="가격" defaultValue={1200} min={0} step={100}>
+        <span aria-hidden="true">₩</span>
+      </NumberField>
+      <NumberField aria-label="무게" placeholder="root" defaultValue={null} hideStepper>
+        <NumberField.Input placeholder="0.0" />
+        <span aria-hidden="true">kg</span>
+        <NumberField.Clear />
+      </NumberField>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const price = canvas.getByRole('spinbutton', { name: '가격' });
+    await expect(price.previousElementSibling).toHaveTextContent('₩');
+    await expect(canvas.getByRole('spinbutton', { name: '무게' })).toHaveAttribute(
+      'placeholder',
+      '0.0',
+    );
+  },
+};
+
 function FormatsExample() {
   const [currency, setCurrency] = useState<number | null>(1234.567);
   return (

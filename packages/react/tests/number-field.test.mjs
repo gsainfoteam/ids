@@ -299,7 +299,7 @@ test('sentinel/asChild forwards refs and events, explicit Stepper is not duplica
   assert.equal(seen, input());
   assert.equal(host.querySelectorAll('[data-number-field-stepper]').length, 1);
   await focus();
-  assert.deepEqual(events, ['child-focus', 'input-focus', 'root-focus']);
+  assert.deepEqual(events, ['child-focus', 'root-focus', 'input-focus']);
   await act(async () => button('Increase value').click());
   assert.equal(form.value(), 11);
   assert.equal(document.activeElement, input());
@@ -465,10 +465,133 @@ test('invalid props/structures fail clearly and hideStepper removes automatic co
     { value: NaN },
   ])
     assert.throws(() => renderToString(h(NumberField, props)), /\[IDS\] NumberField/);
+  for (const node of [
+    h(NumberField, null, h(NumberField.Input), h(NumberField.Input)),
+    h(NumberField, null, h(NumberField.Input, { asChild: true }, h('textarea'))),
+    h(NumberField, null, h(NumberField.Input, null, 'text')),
+  ])
+    assert.throws(() => renderToString(node), /\[IDS\] `<NumberField/);
   assert.throws(
-    () => renderToString(h(NumberField, null, h(NumberField.Input), h(NumberField.Input))),
-    /Input/,
+    () => renderToString(h(NumberField.Input)),
+    /`<NumberField.Input>` must be used inside `<NumberField>`/,
   );
   const markup = renderToString(h(NumberField, { hideStepper: true }));
   assert.equal(new JSDOM(markup).window.document.querySelector('button'), null);
+});
+
+const shell = () => host.querySelector('[data-number-field]');
+const layout = () =>
+  Array.from(shell().children, (el) =>
+    'numberFieldAdornment' in el.dataset
+      ? el.textContent
+      : 'numberFieldStepper' in el.dataset
+        ? 'STEPPER'
+        : el.tagName,
+  );
+
+test('Input values win over root values, but root and Input handlers both run', async () => {
+  const events = [];
+  await render(
+    h(
+      NumberField,
+      {
+        id: 'root-id',
+        placeholder: 'root',
+        defaultValue: 1,
+        onChange: (value) => events.push(['root-value', value]),
+        onBlur: () => events.push('root-blur'),
+      },
+      h(NumberField.Input, {
+        placeholder: 'input',
+        onChange: () => events.push('input-change'),
+        onBlur: () => events.push('input-blur'),
+      }),
+    ),
+  );
+  assert.equal(input().id, 'root-id');
+  assert.equal(input().placeholder, 'input');
+  await focus();
+  await type('4');
+  await blur();
+  assert.deepEqual(events, ['input-change', ['root-value', 4], 'root-blur', 'input-blur']);
+});
+
+test('Input disabled/readOnly override the root and drive container state', async () => {
+  await render(
+    h(NumberField, { defaultValue: 1, disabled: true }, h(NumberField.Input, { disabled: false })),
+  );
+  assert.equal(input().disabled, false);
+  assert.equal(shell().dataset.disabled, undefined);
+  await render(h(NumberField, { defaultValue: 1 }, h(NumberField.Input, { readOnly: true })));
+  assert.equal(shell().dataset.readonly, '');
+  assert.equal(button('Increase value').disabled, true);
+});
+
+test('children without an Input become leading adornments before an auto-inserted Input', async () => {
+  await render(h(NumberField, { defaultValue: 1 }, h('span', null, '$')));
+  assert.deepEqual(layout(), ['$', 'INPUT', 'STEPPER']);
+  await render(h(NumberField, { defaultValue: 1, hideStepper: true }, h('span', null, '$')));
+  assert.deepEqual(layout(), ['$', 'INPUT']);
+});
+
+test('Input inside a Fragment splits adornments, and Stepper/Clear render unwrapped', async () => {
+  await render(
+    h(
+      NumberField,
+      { defaultValue: 1 },
+      h(
+        Fragment,
+        null,
+        h('span', null, 'Lead'),
+        h(NumberField.Input),
+        h('span', null, 'Trail'),
+        h(NumberField.Clear),
+        h(NumberField.Stepper),
+      ),
+    ),
+  );
+  assert.deepEqual(layout(), ['Lead', 'INPUT', 'Trail', 'BUTTON', 'STEPPER']);
+  assert.equal(host.querySelector('[data-number-field-adornment] button'), null);
+});
+
+test('asChild merges Input and root props over the child and keeps the numeric model', async () => {
+  let node;
+  const events = [];
+  await render(
+    h(
+      'form',
+      null,
+      h(
+        NumberField,
+        {
+          name: 'amount',
+          defaultValue: 2,
+          ref: (value) => {
+            node = value;
+          },
+          onChange: (value) => events.push(['root', value]),
+        },
+        h(
+          NumberField.Input,
+          { asChild: true, placeholder: 'input' },
+          h('input', {
+            name: 'child',
+            placeholder: 'child',
+            spellCheck: false,
+            onChange: () => events.push('child'),
+          }),
+        ),
+      ),
+    ),
+  );
+  assert.equal(node, input());
+  assert.equal(input().placeholder, 'input');
+  assert.equal(input().getAttribute('spellcheck'), 'false');
+  assert.equal(input().name, '');
+  assert.ok('numberFieldInput' in input().dataset);
+  await focus();
+  await type('3');
+  assert.deepEqual(events, ['child', ['root', 3]]);
+  assert.equal(hidden().name, 'amount');
+  assert.equal(hidden().value, '3');
 });

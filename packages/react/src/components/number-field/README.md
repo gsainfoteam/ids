@@ -78,10 +78,12 @@ const [length, setLength] = useState<number | null>(0.1);
 | `ref`, `id`, ARIA 및 native 이벤트               | 실제 HTMLInputElement에 전달                                                |
 | `name`, `form`                                   | 숨김 입력이 정규화된 숫자 문자열을 제출. 빈 값은 빈 문자열, disabled는 제외 |
 
-- 자식이 없으면 Input과 자동 Stepper를 생성합니다. 자식이 있으면 직접 자식 또는 Fragment에 Input을 정확히 하나 배치합니다.
-- Input 앞은 lead, 뒤는 trail입니다. 임의의 DOM/사용자 컴포넌트 내부는 탐색하지 않습니다.
+- `NumberField`는 바깥 표면이고, `NumberField.Input`이 실제 input을 렌더합니다. Input은 `NumberField` 안에서만 쓸 수 있으며 한 번만 둘 수 있습니다. 직접 자식 또는 Fragment 안에 두세요.
+- 자식이 없으면 Input과 자동 Stepper를 생성합니다. 자식에 Input이 없으면 자식 뒤에 Input을 자동으로 넣습니다. 이때 자식은 모두 Input 앞에 놓입니다.
+- Input 앞의 자식은 앞쪽, 뒤의 자식은 뒤쪽 adornment입니다. 각 자식은 `data-number-field-adornment` span으로 감싸 muted 색과 아이콘 크기를 맞추고, 안에 든 버튼의 크기와 padding을 초기화합니다. `NumberField.Stepper`와 `NumberField.Clear`는 자체 크기를 유지하도록 감싸지 않습니다. 임의의 DOM/사용자 컴포넌트 내부는 탐색하지 않습니다.
 - 직접 선언한 Stepper는 자동 Stepper를 대체합니다. Stepper도 한 번만 직접 선언합니다.
-- root의 native 속성이 Input/asChild보다 우선합니다. 이벤트/ref는 asChild → Input → root 순서로 합성하며, preventDefault된 이벤트의 후속 핸들러는 생략합니다.
+- 값 속성은 Input → root → asChild 자식 순서로 우선합니다. 예를 들어 root와 Input에 모두 `placeholder`를 주면 Input의 값을 씁니다. 이벤트 핸들러는 덮어쓰지 않고 asChild 자식 → root → Input 순서로 모두 실행하며, preventDefault된 이벤트의 후속 핸들러는 생략합니다. ref는 모두 받습니다.
+- disabled/readOnly/id/aria-invalid 같은 바깥 표면의 상태도 root와 Input을 합친 값으로 정합니다.
 - Input의 value/defaultValue/type/role/수치 ARIA는 컴포넌트가 관리합니다. 숫자 값·범위·상태는 root에 선언하세요. Input의 onChange는 native 이벤트용이며 root onChange와 다릅니다.
 - Input asChild는 props/ref를 실제 input으로 전달하는 한 개의 input 또는 사용자 컴포넌트를 받습니다.
 - Stepper asChild는 생성된 두 버튼을 담을 한 개의 비상호작용 wrapper를 받습니다. 기존 wrapper children은 생성 버튼으로 대체합니다.
