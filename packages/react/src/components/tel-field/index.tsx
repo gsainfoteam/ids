@@ -9,10 +9,13 @@ import {
   useRef,
   useState,
   type ComponentProps,
+  type ReactElement,
   type ReactNode,
+  type RefObject,
 } from 'react';
 
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { isNotNil } from 'es-toolkit';
 import {
   AsYouType,
   getCountries,
@@ -22,9 +25,8 @@ import {
   type CountryCode,
 } from 'libphonenumber-js/min';
 
-import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
-import { flattenParts } from '../field-popup';
 import { Select } from '../select';
 
 import type { IdsSize } from '../../tokens/types';
@@ -43,26 +45,101 @@ export type TelFieldProps = Omit<
   size?: IdsSize;
   invalid?: boolean;
 };
-type CountryContext = {
+type NativeProps = Omit<ComponentProps<'input'>, 'type' | 'size' | 'value' | 'defaultValue'>;
+type TelFieldContextValue = {
+  size: IdsSize;
   country: CountryCode;
-  change: (country: CountryCode) => void;
+  changeCountry: (country: CountryCode) => void;
   disabled?: boolean;
   readOnly?: boolean;
-  size: IdsSize;
+  invalid: ComponentProps<'input'>['aria-invalid'];
+  id: string;
+  display: string;
+  rootProps: NativeProps;
+  nodeRef: RefObject<HTMLInputElement | null>;
+  handleInput: (node: HTMLInputElement) => void;
+  startComposition: (node: HTMLInputElement) => void;
+  endComposition: () => void;
 };
-const Context = createContext<CountryContext | null>(null);
-function TelInput(_props: TelField.InputProps): ReactNode {
-  invariant(false, 'TelField.Input must be a direct child or in a Fragment.');
+const Context = createContext<TelFieldContextValue | null>(null);
+
+function TelInput({ asChild, children, ref, ...rest }: TelField.InputProps) {
+  const field = useContext(Context);
+  invariant(field != null, '`<TelField.Input>` must be used inside `<TelField>`.');
+
+  let child: ReactElement<ComponentProps<'input'>> | undefined;
+  if (asChild === true) {
+    invariant(
+      isValidElement(children) &&
+        children.type !== Fragment &&
+        (typeof children.type !== 'string' || children.type === 'input'),
+      '`<TelField.Input asChild>` requires one input, or a component forwarding input props and ref.',
+    );
+    child = children as ReactElement<ComponentProps<'input'>>;
+  } else {
+    invariant(
+      children == null,
+      '`<TelField.Input>` takes no children; set `value`/`defaultValue` on `<TelField>`.',
+    );
+  }
+
+  // Values: Input over root over the asChild child. Handlers compose so Field and
+  // react-hook-form wiring on the root still runs when the Input sets its own.
+  const native: NativeProps = mergeProps(mergeProps({ ...child?.props }, field.rootProps), rest);
+  const { input } = TelField.Style({ size: field.size });
+
+  // The formatter owns value, type and the change pipeline, so these are applied last and
+  // wrap the user handlers instead of being overridable by them.
+  const actual: ComponentProps<'input'> = {
+    ...native,
+    'data-tel-field-input': '',
+    id: native.id ?? field.id,
+    type: 'tel',
+    name: undefined,
+    value: field.display,
+    defaultValue: undefined,
+    disabled: field.disabled,
+    readOnly: field.readOnly,
+    autoComplete: native.autoComplete ?? 'tel',
+    inputMode: native.inputMode ?? 'tel',
+    'aria-invalid': field.invalid,
+    className: input({ className: native.className }),
+    ref: (node: HTMLInputElement | null) => {
+      invariant(
+        !node || node.tagName === 'INPUT',
+        '`<TelField.Input>` must forward its ref to an input.',
+      );
+      return mergeRefs(field.nodeRef, native.ref, ref)(node);
+    },
+    onChange: (e) => {
+      native.onChange?.(e);
+      if (!e.defaultPrevented) field.handleInput(e.currentTarget);
+    },
+    onCompositionStart: (e) => {
+      field.startComposition(e.currentTarget);
+      native.onCompositionStart?.(e);
+    },
+    onCompositionEnd: (e) => {
+      field.endComposition();
+      native.onCompositionEnd?.(e);
+      if (!e.defaultPrevented) field.handleInput(e.currentTarget);
+    },
+  } as ComponentProps<'input'>;
+
+  // cloneElement forwards a callback ref; ref values are read in effects/handlers only.
+  // eslint-disable-next-line react-hooks/refs
+  return child ? cloneElement(child, actual) : <input {...actual} />;
 }
+
 function TelCountrySelect({ asChild, children, ...props }: TelField.CountrySelectProps) {
   const c = useContext(Context);
-  invariant(c, 'TelField.CountrySelect must be inside TelField.');
+  invariant(c, '`<TelField.CountrySelect>` must be used inside `<TelField>`.');
   const { country, countryLabel, countryIcon } = TelField.Style({ size: c.size });
   return (
     <Select
       value={c.country}
       onChange={(next) => {
-        if (next) c.change(next as CountryCode);
+        if (next) c.changeCountry(next as CountryCode);
       }}
       aria-label="국가 코드"
       disabled={c.disabled}
@@ -96,6 +173,7 @@ function TelCountrySelect({ asChild, children, ...props }: TelField.CountrySelec
     </Select>
   );
 }
+
 function formatPhone(
   raw: string,
   country: CountryCode,
@@ -118,6 +196,40 @@ function formatPhone(
       : formatted;
   return { model, display };
 }
+
+function splitByInput(children: ReactNode) {
+  const items = flattenFragments(children);
+  const indexesOf = (type: unknown) =>
+    items
+      .map((child, index) => (isValidElement(child) && child.type === type ? index : null))
+      .filter(isNotNil);
+  const inputIndexes = indexesOf(TelField.Input);
+
+  invariant(inputIndexes.length <= 1, '`<TelField>` accepts at most one `<TelField.Input />`.');
+  invariant(
+    indexesOf(TelField.CountrySelect).length <= 1,
+    '`<TelField>` accepts at most one `<TelField.CountrySelect />`.',
+  );
+
+  const hasCountrySelect = indexesOf(TelField.CountrySelect).length > 0;
+  const inputIndex = inputIndexes[0];
+  if (inputIndex == null) {
+    return {
+      leading: items,
+      input: <TelField.Input key="tel-field-input" />,
+      trailing: [] as ReactNode[],
+      hasCountrySelect,
+    };
+  }
+
+  return {
+    leading: items.slice(0, inputIndex),
+    input: items[inputIndex] as ReactElement<TelField.InputProps>,
+    trailing: items.slice(inputIndex + 1),
+    hasCountrySelect,
+  };
+}
+
 export function TelField({
   value,
   defaultValue = '',
@@ -130,11 +242,11 @@ export function TelField({
   children,
   className,
   style,
-  ...root
+  ...rootProps
 }: TelFieldProps) {
   invariant(
     isSupportedCountry(defaultCountry),
-    'TelField: defaultCountry must be a supported ISO alpha-2 code.',
+    '`<TelField>` `defaultCountry` must be a supported ISO alpha-2 code.',
   );
   const [country, setCountry] = useState(defaultCountry);
   const [stored, setStored] = useState(defaultValue);
@@ -142,36 +254,26 @@ export function TelField({
   const [draft, setDraft] = useState<{ model: string; display: string } | null>(null);
   const composing = useRef(false);
   const [composition, setComposition] = useState<string | null>(null);
-  const parts = flattenParts(children);
-  const inputs = parts.filter((p) => isValidElement(p) && p.type === TelInput);
-  const countries = parts.filter((p) => isValidElement(p) && p.type === TelCountrySelect);
-  invariant(
-    inputs.length <= 1 && (parts.length === 0 || inputs.length === 1),
-    'TelField: children require exactly one Input.',
-  );
-  invariant(countries.length <= 1, 'TelField: only one CountrySelect is allowed.');
-  const sentinel = inputs[0];
-  const {
-    asChild,
-    children: inputChild,
-    ...inputProps
-  } = isValidElement<TelField.InputProps>(sentinel) ? sentinel.props : {};
-  const child =
-    asChild && isValidElement<ComponentProps<'input'>>(inputChild) ? inputChild : undefined;
-  invariant(
-    !asChild ||
-      (!!child &&
-        child.type !== Fragment &&
-        (typeof child.type !== 'string' || child.type === 'input')),
-    'TelField.Input asChild must render an input.',
-  );
-  const native = mergeProps(mergeProps({ ...child?.props }, inputProps), root);
+  const { leading, input, trailing, hasCountrySelect } = splitByInput(children);
+
+  // The sentinel's own props win over the container's, so derive container state from
+  // the merged result, not from the container props alone.
+  const { asChild, children: inputChild } = input.props;
+  const childProps =
+    asChild === true && isValidElement<ComponentProps<'input'>>(inputChild) ? inputChild.props : {};
+  const merged: NativeProps = { ...childProps, ...rootProps };
+  for (const [key, next] of Object.entries(input.props)) {
+    if (next !== undefined) (merged as Record<string, unknown>)[key] = next;
+  }
+  const locked = !!merged.disabled || !!merged.readOnly;
+  const ariaInvalid = merged['aria-invalid'] ?? invalid;
+
   const nodeRef = useRef<HTMLInputElement>(null);
   const caret = useRef<number | null>(null);
   const uid = useId();
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = TelField.Style({ variant, size: resolvedSize, disabled: !!native.disabled });
-  const formatted = formatPhone(current, country, format, countries.length > 0);
+  const styles = TelField.Style({ variant, size: resolvedSize, disabled: !!merged.disabled });
+  const formatted = formatPhone(current, country, format, hasCountrySelect);
   const display = composition ?? (draft?.model === current ? draft.display : formatted.display);
   const emit = (next: { model: string; display: string }) => {
     setDraft(next);
@@ -204,13 +306,13 @@ export function TelField({
       alive = false;
       form.removeEventListener('reset', reset);
     };
-  }, [value, defaultValue, defaultCountry, native.form]);
+  }, [value, defaultValue, defaultCountry, merged.form]);
   const accept = (node: HTMLInputElement) => {
     let raw = node.value;
     let position = node.selectionStart ?? raw.length;
     // Deleting a formatting separator must also remove a digit rather than reinserting it forever.
     if (
-      (format !== 'none' || countries.length > 0) &&
+      (format !== 'none' || hasCountrySelect) &&
       raw.length < display.length &&
       parseIncompletePhoneNumber(raw) === parseIncompletePhoneNumber(display) &&
       position > 0
@@ -219,8 +321,8 @@ export function TelField({
       position--;
     }
     const significant = parseIncompletePhoneNumber(raw.slice(0, position)).length;
-    const next = formatPhone(raw, country, format, countries.length > 0);
-    if (format === 'none' && !countries.length) caret.current = position;
+    const next = formatPhone(raw, country, format, hasCountrySelect);
+    if (format === 'none' && !hasCountrySelect) caret.current = position;
     else {
       let count = 0;
       caret.current = next.display.length;
@@ -234,55 +336,8 @@ export function TelField({
     }
     emit(next);
   };
-  const actual: ComponentProps<'input'> = {
-    ...native,
-    id: native.id ?? `ids-tel-${uid}`,
-    type: 'tel',
-    name: undefined,
-    value: display,
-    defaultValue: undefined,
-    autoComplete: native.autoComplete ?? 'tel',
-    inputMode: native.inputMode ?? 'tel',
-    'aria-invalid': native['aria-invalid'] ?? invalid,
-    className: styles.input({ className: native.className }),
-    ref: (node) => {
-      invariant(
-        !node || node.tagName === 'INPUT',
-        'TelField.Input must forward its ref to an input.',
-      );
-      nodeRef.current = node;
-      const cleanup = mergeRefs(native.ref)(node);
-      return () => {
-        nodeRef.current = null;
-        cleanup?.();
-      };
-    },
-    onChange: (e) => {
-      native.onChange?.(e);
-      if (e.defaultPrevented || native.disabled || native.readOnly) return;
-      if (composing.current) {
-        setComposition(e.currentTarget.value);
-        return;
-      }
-      accept(e.currentTarget);
-    },
-    onCompositionStart: (e) => {
-      composing.current = true;
-      setComposition(e.currentTarget.value);
-      native.onCompositionStart?.(e);
-    },
-    onCompositionEnd: (e) => {
-      composing.current = false;
-      setComposition(null);
-      native.onCompositionEnd?.(e);
-      if (!e.defaultPrevented && !native.disabled && !native.readOnly) accept(e.currentTarget);
-    },
-  };
-  // cloneElement forwards a callback ref; ref values are read in effects/handlers only.
-  // eslint-disable-next-line react-hooks/refs
-  const input = child ? cloneElement(child, actual) : <input {...actual} />;
   const changeCountry = (next: CountryCode) => {
-    if (native.disabled || native.readOnly) return;
+    if (locked) return;
     const parser = new AsYouType(country);
     parser.input(current);
     const digits =
@@ -298,53 +353,81 @@ export function TelField({
       ),
     );
   };
+  const adornments = (items: ReactNode[]) =>
+    items.map((item, index) =>
+      // CountrySelect is TelField's own part with its own trigger styling; the adornment
+      // wrapper's button reset would flatten it, so it renders bare.
+      isValidElement(item) && item.type === TelField.CountrySelect ? (
+        item
+      ) : (
+        <span
+          key={(isValidElement(item) && item.key) || index}
+          data-tel-field-adornment=""
+          className={styles.adornment()}
+        >
+          {item}
+        </span>
+      ),
+    );
+
   return (
     <Context.Provider
       value={{
-        country,
-        change: changeCountry,
-        disabled: native.disabled,
-        readOnly: native.readOnly,
         size: resolvedSize,
+        country,
+        changeCountry,
+        disabled: merged.disabled,
+        readOnly: merged.readOnly,
+        invalid: ariaInvalid,
+        id: `ids-tel-${uid}`,
+        display,
+        rootProps,
+        nodeRef,
+        handleInput: (node) => {
+          if (locked) return;
+          if (composing.current) {
+            setComposition(node.value);
+            return;
+          }
+          accept(node);
+        },
+        startComposition: (node) => {
+          composing.current = true;
+          setComposition(node.value);
+        },
+        endComposition: () => {
+          composing.current = false;
+          setComposition(null);
+        },
       }}
     >
       <div
         data-tel-field=""
         data-size={resolvedSize}
-        aria-invalid={actual['aria-invalid']}
+        aria-invalid={ariaInvalid}
         className={styles.root({ className })}
         style={style}
       >
-        {parts.length
-          ? parts.map((p, i) =>
-              p === sentinel ? (
-                <span key={i} className={styles.inputWrap()}>
-                  {input}
-                </span>
-              ) : (
-                p
-              ),
-            )
-          : input}
+        {adornments(leading)}
+        {input}
+        {adornments(trailing)}
       </div>
-      {native.name && (
+      {merged.name && (
         <input
           type="hidden"
-          name={native.name}
-          form={native.form}
+          name={merged.name}
+          form={merged.form}
           value={formatted.model}
-          disabled={native.disabled}
+          disabled={merged.disabled}
         />
       )}
     </Context.Provider>
   );
 }
+
 export namespace TelField {
   export type Props = TelFieldProps;
-  export type InputProps = Omit<
-    ComponentProps<'input'>,
-    'type' | 'size' | 'value' | 'defaultValue'
-  > & { asChild?: boolean };
+  export type InputProps = NativeProps & { asChild?: boolean; children?: ReactNode };
   export type CountrySelectProps = ComponentProps<'button'> & { asChild?: boolean };
   export const Input = TelInput;
   export const CountrySelect = TelCountrySelect;
@@ -357,17 +440,23 @@ export namespace TelField {
         'motion-reduce:transition-none',
         // Keyed to the tel input so the country trigger and its popup search field,
         // which render inside the shell, do not ring it as well.
-        'has-[input[type=tel]:focus-visible]:ring-[3px]',
-        'has-[input[type=tel]:focus-visible]:ring-(--ids-color-primary)/40',
+        'has-[[data-tel-field-input]:focus-visible]:ring-[3px]',
+        'has-[[data-tel-field-input]:focus-visible]:ring-(--ids-color-primary)/40',
         'aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-color-danger)',
-        'aria-invalid:has-[input[type=tel]:focus-visible]:ring-(--ids-color-danger)/40',
+        'aria-invalid:has-[[data-tel-field-input]:focus-visible]:ring-(--ids-color-danger)/40',
       ],
-      inputWrap: 'h-full min-w-0 flex-1',
       input: [
         'h-full w-full min-w-0 flex-1 bg-transparent outline-none',
         'text-inherit placeholder:text-(--ids-color-on-muted)',
         'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
         'disabled:cursor-not-allowed',
+      ],
+      adornment: [
+        'inline-flex shrink-0 items-center empty:hidden',
+        'not-has-[button]:text-(--ids-color-on-muted)',
+        'not-has-[button]:[&_svg]:shrink-0 not-has-[button]:[&_svg]:text-current',
+        '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
+        '[&_button]:p-0',
       ],
       country: 'w-auto shrink-0 px-1',
       countryLabel: 'inline-flex items-center gap-1',
@@ -379,7 +468,7 @@ export namespace TelField {
         filled: {
           root: [
             'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
-            'has-[input[type=tel]:focus-visible]:bg-(--ids-color-primary)/15',
+            'has-[[data-tel-field-input]:focus-visible]:bg-(--ids-color-primary)/15',
           ],
         },
         unstyled: {},
@@ -387,10 +476,18 @@ export namespace TelField {
       size: {
         standard: {
           root: 'h-(--ids-size-control-standard) gap-2 rounded-md px-3 text-body-b3-regular',
+          adornment: [
+            'gap-1',
+            'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
+          ],
           countryIcon: 'size-(--ids-size-icon-standard)',
         },
         tiny: {
           root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-sm px-2 text-caption-c1-regular',
+          adornment: [
+            'gap-0.5',
+            'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',
+          ],
           countryIcon: 'size-(--ids-size-icon-tiny)',
         },
       } satisfies Record<IdsSize, object>,

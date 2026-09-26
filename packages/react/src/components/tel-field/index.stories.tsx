@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { PhoneIcon } from '@heroicons/react/24/outline';
 import { expect } from 'storybook/test';
 
 import { Field } from '../field';
@@ -43,6 +44,27 @@ export const CountryAndFormatting: Story = {
     await userEvent.keyboard('{Enter}');
     await expect(canvas.getByLabelText('전화번호 값')).toHaveTextContent('+11012345678');
     await expect(canvas.getByRole('combobox', { name: '국가 코드' })).toHaveTextContent('US +1');
+  },
+};
+export const Adornments: Story = {
+  render: () => (
+    <div className="grid w-80 gap-3">
+      {/* No Input: the children become leading and TelField appends one. */}
+      <TelField aria-label="국가 코드 포함 전화번호" defaultCountry="KR">
+        <TelField.CountrySelect />
+      </TelField>
+      {/* Values on the Input win over the root; handlers on both run. */}
+      <TelField aria-label="휴대전화" placeholder="root" defaultCountry="KR">
+        <PhoneIcon />
+        <TelField.Input placeholder="010-0000-0000" />
+        <span>필수</span>
+      </TelField>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('textbox', { name: '휴대전화' });
+    await expect(input).toHaveAttribute('placeholder', '010-0000-0000');
+    await expect(canvas.getByRole('combobox', { name: '국가 코드' })).toBeInTheDocument();
   },
 };
 export const Playground: Story = {

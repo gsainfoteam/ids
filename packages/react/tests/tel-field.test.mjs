@@ -17,7 +17,7 @@ for (const key of [
 ])
   globalThis[key] = dom.window[key];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-const { createElement: h, act } = await import('react');
+const { createElement: h, act, Fragment } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
 const { TelField, Field } = await import('../dist/index.js');
@@ -42,7 +42,7 @@ async function type(node, value) {
   });
 }
 const input = () => host.querySelector('[type=tel]');
-test('SSR native input, Field label/ARIA, canonical FormData and missing sentinel diagnostics', () => {
+test('SSR native input, Field label/ARIA and canonical FormData', () => {
   const doc = new JSDOM(
     renderToString(
       h(
@@ -71,10 +71,110 @@ test('SSR native input, Field label/ARIA, canonical FormData and missing sentine
     [...new doc.defaultView.FormData(doc.querySelector('form'))],
     [['phone', '+821012345678']],
   );
-  assert.throws(
-    () => renderToString(h(TelField, null, h(TelField.Input), h(TelField.Input))),
-    /Input/,
+});
+test('invalid structures fail clearly', () => {
+  for (const [node, message] of [
+    [h(TelField, null, h(TelField.Input), h(TelField.Input)), /at most one `<TelField.Input/],
+    [
+      h(TelField, null, h(TelField.CountrySelect), h(TelField.CountrySelect)),
+      /at most one `<TelField.CountrySelect/,
+    ],
+    [h(TelField.Input), /must be used inside `<TelField>`/],
+    [h(TelField, null, h(TelField.Input, { asChild: true }, h('textarea'))), /asChild>` requires/],
+    [h(TelField, null, h(TelField.Input, null, 'text')), /takes no children/],
+  ])
+    assert.throws(() => renderToString(node), message);
+});
+test('Input values win over root values, but root and Input handlers both run', async () => {
+  const events = [];
+  let last;
+  await render(
+    h(
+      TelField,
+      {
+        id: 'root-id',
+        placeholder: 'root',
+        onBlur: () => events.push('root'),
+        onChange: (v) => (last = v),
+      },
+      h(TelField.Input, {
+        placeholder: 'input',
+        onBlur: () => events.push('input'),
+        onChange: () => events.push('input-change'),
+      }),
+    ),
   );
+  assert.equal(input().id, 'root-id');
+  assert.equal(input().placeholder, 'input');
+  assert.ok('telFieldInput' in input().dataset);
+  await type(input(), '01012345678');
+  assert.deepEqual(events, ['input-change']);
+  assert.equal(input().value, '010-1234-5678');
+  assert.equal(last, '010-1234-5678');
+  await act(() => input().dispatchEvent(new window.FocusEvent('focusout', { bubbles: true })));
+  assert.deepEqual(events, ['input-change', 'root', 'input']);
+});
+test('children without an Input become leading adornments before an auto-inserted Input', async () => {
+  await render(
+    h(TelField, { 'aria-label': 'Phone' }, h(TelField.CountrySelect), h('span', null, 'Tel')),
+  );
+  const shell = host.querySelector('[data-tel-field]');
+  assert.deepEqual(
+    Array.from(shell.children, (el) =>
+      'telFieldAdornment' in el.dataset ? el.textContent : el.tagName,
+    ),
+    ['BUTTON', 'Tel', 'INPUT'],
+  );
+  assert.equal(input().getAttribute('aria-label'), 'Phone');
+  await type(input(), '01012345678');
+  assert.equal(input().value, '010-1234-5678');
+});
+test('sentinel inside a Fragment splits leading and trailing adornments', async () => {
+  await render(
+    h(
+      TelField,
+      null,
+      h(Fragment, null, h('span', null, 'Lead'), h(TelField.Input), h('span', null, 'Trail')),
+    ),
+  );
+  assert.deepEqual(
+    Array.from(host.querySelector('[data-tel-field]').children, (el) =>
+      'telFieldAdornment' in el.dataset ? el.textContent : el.tagName,
+    ),
+    ['Lead', 'INPUT', 'Trail'],
+  );
+});
+test('asChild merges props and ref into the child input and keeps formatting', async () => {
+  let node;
+  const changes = [];
+  await render(
+    h(
+      TelField,
+      {
+        name: 'tel',
+        onBlur: () => changes.push('root'),
+        ref: (value) => {
+          node = value;
+        },
+      },
+      h(
+        TelField.Input,
+        { asChild: true },
+        h('input', {
+          spellCheck: false,
+          onChange: () => changes.push('child'),
+          onBlur: () => changes.push('child-blur'),
+        }),
+      ),
+    ),
+  );
+  assert.equal(node, input());
+  assert.equal(input().getAttribute('spellcheck'), 'false');
+  assert.ok('telFieldInput' in input().dataset);
+  await type(input(), '01012345678');
+  assert.equal(input().value, '010-1234-5678');
+  await act(() => input().dispatchEvent(new window.FocusEvent('focusout', { bubbles: true })));
+  assert.deepEqual(changes, ['child', 'child-blur', 'root']);
 });
 test('progressive formatting, separator deletion, caret, raw mode and IME', async () => {
   let changes = [];
