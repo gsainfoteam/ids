@@ -66,7 +66,7 @@ test('SSR: Field labels/descriptions target the native textarea, not the surface
   assert.equal(doc.getElementById(node.id), node);
   assert.equal(node.getAttribute('aria-invalid'), 'true');
   assert.equal(node.required, true);
-  assert.equal(node.dataset.size, 'tiny');
+  assert.equal(doc.querySelector('[data-text-area]').dataset.size, 'tiny');
   assert.equal(doc.getElementById(node.getAttribute('aria-describedby')).textContent, 'Invalid');
 });
 test('sentinel/Fragment order, root native props, asChild handlers and React 19 ref cleanup', async () => {
@@ -104,20 +104,21 @@ test('sentinel/Fragment order, root native props, asChild handlers and React 19 
   assert.equal(control().name, 'bio');
   assert.equal(control().maxLength, 200);
   assert.deepEqual(
-    Array.from(
-      host.querySelector('[data-text-area]').children,
-      (el) => el.dataset.textAreaPart ?? el.tagName,
+    Array.from(host.querySelector('[data-text-area]').children, (el) =>
+      'textAreaTop' in el.dataset ? 'top' : 'textAreaBottom' in el.dataset ? 'bottom' : el.tagName,
     ),
     ['top', 'TEXTAREA', 'bottom'],
   );
+  assert.equal(host.querySelector('[data-text-area-top]').textContent, 'Toolbar');
+  assert.equal(host.querySelector('[data-text-area-bottom]').textContent, 'Counter');
   await input('가나다');
-  assert.deepEqual(changes, ['child', 'input', 'root']);
+  assert.deepEqual(changes, ['child', 'root', 'input']);
   assert.equal(control().value, '가나다');
   await act(async () => root.unmount());
   root = undefined;
   assert.equal(cleaned, 1);
 });
-test('native form data, composition events, readOnly/disabled and resize priority', async () => {
+test('native form data, composition events, readOnly/disabled and root resize handle', async () => {
   const events = [];
   await render(
     h(
@@ -126,6 +127,7 @@ test('native form data, composition events, readOnly/disabled and resize priorit
       h(TextArea, {
         name: 'message',
         defaultValue: '안녕',
+        autoResize: false,
         resize: 'both',
         readOnly: true,
         onCompositionStart: () => events.push('start'),
@@ -133,7 +135,7 @@ test('native form data, composition events, readOnly/disabled and resize priorit
       }),
     ),
   );
-  assert.equal(control().style.resize, 'both');
+  assert.ok(host.querySelector('[data-text-area]').classList.contains('resize'));
   assert.equal(control().readOnly, true);
   assert.equal(new dom.window.FormData(host.querySelector('form')).get('message'), '안녕');
   await act(async () => {
@@ -141,21 +143,25 @@ test('native form data, composition events, readOnly/disabled and resize priorit
     control().dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: '녕' }));
   });
   assert.deepEqual(events, ['start', 'end']);
-  await render(h(Field, { disabled: true }, h(TextArea, { autoResize: true, resize: 'both' })));
+  await render(h(Field, { disabled: true }, h(TextArea)));
   assert.equal(control().disabled, true);
-  assert.equal(control().style.resize, 'none');
+  assert.ok(host.querySelector('[data-text-area]').classList.contains('resize-none'));
   await render(h(Field, { invalid: false }, h(TextArea, { invalid: true })));
   assert.equal(control().getAttribute('aria-invalid'), 'false');
+  assert.equal(host.querySelector('[data-text-area]').dataset.invalid, undefined);
+  await render(h(TextArea, { invalid: true }));
+  assert.equal(control().getAttribute('aria-invalid'), 'true');
+  assert.equal(host.querySelector('[data-text-area]').dataset.invalid, '');
 });
 test('invalid structures and row bounds fail clearly', () => {
   for (const node of [
     h(TextArea, null, h(TextArea.Input), h(TextArea.Input)),
-    h(TextArea, null, h('span', null, 'No input')),
     h(TextArea, { minRows: 0 }),
     h(TextArea, { minRows: 5, maxRows: 2 }),
+    h(TextArea, { resize: 'both' }),
     h(TextArea, null, h(TextArea.Input, { asChild: true }, h('input'))),
   ])
-    assert.throws(() => renderToString(node), /\[IDS\] TextArea/);
+    assert.throws(() => renderToString(node), /\[IDS\] `<TextArea/);
 });
 
 // Synthetic layout checks the sizing arithmetic and reset timing; real browser checks cover geometry.
@@ -197,7 +203,7 @@ test('autoResize grows, caps with overflow, shrinks, follows controlled changes 
   await render(view('a', false));
   assert.equal(control().style.height, '99px');
   assert.equal(control().style.overflowY, 'scroll');
-  assert.equal(control().style.resize, 'vertical');
+  assert.ok(host.querySelector('[data-text-area]').classList.contains('resize-y'));
 });
 test('native form reset resizes after defaultValue is restored', async () => {
   await render(

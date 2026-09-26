@@ -1,6 +1,8 @@
 import {
   Children,
+  cloneElement,
   createContext,
+  Fragment,
   isValidElement,
   useContext,
   useRef,
@@ -13,7 +15,10 @@ import {
 
 import { isNotNil } from 'es-toolkit';
 
-import { invariant, mergeRefs, tv } from '../../utils';
+import { useAutoResize } from './use-auto-resize';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { useFieldSize } from '../field/context';
+import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -30,7 +35,9 @@ export type TextAreaContextValue = {
   size: IdsSize;
   disabled?: boolean;
   autoResize: boolean;
+  minRows?: number;
   maxRows?: number;
+  invalid: boolean;
   inputProps: TextAreaInputProps;
   inputRef: RefObject<HTMLTextAreaElement | null>;
 };
@@ -41,13 +48,21 @@ export function useTextAreaContext() {
   return useContext(TextAreaContext);
 }
 
-/** `field-sizing: content`는 `rows`를 무시하므로 높이 경계를 직접 계산한다. */
 function rowsToHeight(rows: number | undefined) {
   return rows == null ? undefined : `calc(${rows} * 1lh + var(--ids-text-area-pad-y) * 2)`;
 }
 
+// Fragments are transparent; arbitrary components are never executed to find the Input.
+function flatten(children: ReactNode, prefix = ''): ReactNode[] {
+  return Children.toArray(children).flatMap((child, index) =>
+    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
+      ? flatten(child.props.children, `${prefix}${index}:`)
+      : [isValidElement(child) ? cloneElement(child, { key: `${prefix}${child.key}` }) : child],
+  );
+}
+
 function splitByInput(children: ReactNode) {
-  const items = Children.toArray(children);
+  const items = flatten(children);
   const inputIndexes = items
     .map((child, index) => (isValidElement(child) && child.type === TextArea.Input ? index : null))
     .filter(isNotNil);
@@ -68,10 +83,12 @@ function splitByInput(children: ReactNode) {
 
 export function TextArea({
   variant = 'outline',
-  size = 'standard',
+  size: sizeProp,
   disabled,
+  invalid,
   autoResize = true,
   resize,
+  minRows,
   maxRows,
   rows = 3,
   className,
@@ -79,11 +96,22 @@ export function TextArea({
   children,
   ...rest
 }: TextArea.Props) {
+  const size = useFieldSize(sizeProp) ?? 'standard';
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   invariant(
     !autoResize || resize == null || resize === 'none',
     '`<TextArea>` cannot use `resize` together with `autoResize`.',
+  );
+  for (const [name, value] of Object.entries({ minRows, maxRows })) {
+    invariant(
+      value == null || (Number.isInteger(value) && value > 0),
+      `\`<TextArea>\` \`${name}\` must be a positive integer.`,
+    );
+  }
+  invariant(
+    minRows == null || maxRows == null || minRows <= maxRows,
+    '`<TextArea>` `minRows` must not exceed `maxRows`.',
   );
   const inputProps = { ...rest, rows };
   const { top, input, bottom } = splitByInput(children);
@@ -97,6 +125,8 @@ export function TextArea({
   // container state from the merged result, not from the container props alone.
   const merged = { ...inputProps, ...input.props };
   const isDisabled = input.props.disabled ?? disabled;
+  const ariaInvalid = merged['aria-invalid'] ?? invalid;
+  const isInvalid = ariaInvalid != null && ariaInvalid !== false && ariaInvalid !== 'false';
 
   invariant(
     merged.value == null || merged.onChange != null || merged.readOnly === true,
@@ -109,7 +139,9 @@ export function TextArea({
         size,
         disabled: isDisabled,
         autoResize,
+        minRows,
         maxRows,
+        invalid: isInvalid,
         inputProps,
         inputRef,
       }}
@@ -119,6 +151,7 @@ export function TextArea({
         data-variant={variant}
         data-size={size}
         data-disabled={isDisabled ? '' : undefined}
+        data-invalid={isInvalid ? '' : undefined}
         className={root({ className })}
         style={style}
       >
@@ -163,12 +196,17 @@ export namespace TextArea {
     variants: {
       variant: {
         outline: {
-          root: ['shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)', 'focus-ring'],
+          root: [
+            'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
+            'data-invalid:inset-ring-(--ids-color-danger)',
+            'focus-ring',
+          ],
         },
         filled: {
           root: [
             'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
             'has-[[data-text-area-input]:focus-visible]:bg-(--ids-color-primary)/15',
+            'data-invalid:inset-ring-(--ids-color-danger)',
             'focus-ring',
           ],
         },
@@ -176,6 +214,7 @@ export namespace TextArea {
           root: [
             'rounded-none border-b-2 border-(--ids-color-outline)',
             'has-[[data-text-area-input]:focus-visible]:border-(--ids-color-primary)',
+            'data-invalid:border-(--ids-color-danger)',
           ],
         },
       },
@@ -203,10 +242,6 @@ export namespace TextArea {
         horizontal: { root: 'resize-x' },
         both: { root: 'resize' },
       },
-      autoResize: {
-        true: { input: 'field-sizing-content' },
-        false: { input: '' },
-      },
     },
     compoundVariants: [
       { variant: 'outline', size: 'standard', class: { root: 'rounded-md' } },
@@ -218,36 +253,57 @@ export namespace TextArea {
       variant: 'outline',
       size: 'standard',
       resize: 'none',
-      autoResize: true,
     },
   });
 
-  export function Input({ disabled: disabledProp, className, style, ref, ...rest }: Input.Props) {
+  export function Input({
+    asChild,
+    children,
+    disabled: disabledProp,
+    className,
+    style,
+    ref,
+    ...rest
+  }: Input.Props) {
     const field = useTextAreaContext();
     invariant(field != null, '`<TextArea.Input>` must be used inside `<TextArea>`.');
 
-    const { size, autoResize, maxRows, inputProps, inputRef } = field;
-    const { input } = Style({ size, autoResize });
+    const { size, autoResize, minRows, maxRows, invalid, inputProps, inputRef } = field;
+    const { input } = Style({ size });
+    // JS measurement rather than `field-sizing: content`, which Safari and Firefox ignore.
+    useAutoResize(inputRef, { autoResize, minRows, maxRows });
 
-    return (
-      <textarea
-        data-text-area-input=""
-        {...inputProps}
-        {...rest}
-        disabled={disabledProp ?? field.disabled}
-        className={input({ className })}
-        style={{
-          minHeight: autoResize ? rowsToHeight(rest.rows ?? inputProps.rows) : undefined,
-          maxHeight: rowsToHeight(maxRows),
-          ...style,
-        }}
-        ref={mergeRefs(inputRef, inputProps.ref, ref)}
-      />
-    );
+    const props = {
+      'data-text-area-input': '',
+      'aria-invalid': invalid || undefined,
+      // Input values win, but handlers compose so Field and react-hook-form wiring on the
+      // root still runs when the Input sets its own onChange or onBlur.
+      ...mergeProps(inputProps, rest),
+      disabled: disabledProp ?? field.disabled,
+      className: input({ className }),
+      style: { maxHeight: autoResize ? undefined : rowsToHeight(maxRows), ...style },
+    };
+
+    if (asChild === true) {
+      invariant(
+        isValidElement(children) &&
+          (typeof children.type !== 'string' || children.type === 'textarea'),
+        '`<TextArea.Input asChild>` requires one textarea, or a component forwarding textarea props and ref.',
+      );
+      return (
+        <Slot {...(props as Slot.Props)} ref={mergeRefs(inputRef, inputProps.ref, ref)}>
+          {children}
+        </Slot>
+      );
+    }
+    invariant(children == null, '`<TextArea.Input>` takes `value`/`defaultValue`, not children.');
+    return <textarea {...props} ref={mergeRefs(inputRef, inputProps.ref, ref)} />;
   }
 
   export namespace Input {
     export type Props = TextAreaInputProps & {
+      asChild?: boolean;
+      children?: ReactNode;
       disabled?: boolean;
       className?: string;
       style?: CSSProperties;
@@ -258,11 +314,15 @@ export namespace TextArea {
     variant?: TextAreaVariant;
     size?: IdsSize;
     disabled?: boolean;
+    invalid?: boolean;
     autoResize?: boolean;
     resize?: TextAreaResize;
+    minRows?: number;
     maxRows?: number;
     children?: ReactNode;
     className?: string;
     style?: CSSProperties;
   };
 }
+
+export type TextAreaProps = TextArea.Props;
