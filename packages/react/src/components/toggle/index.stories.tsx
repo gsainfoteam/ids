@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 
-import { CheckIcon, StarIcon } from '@phosphor-icons/react';
+import { CheckIcon, StarIcon } from '@heroicons/react/24/outline';
 
 import { Toggle } from '.';
 
@@ -80,11 +80,11 @@ export const Gallery: Story = {
         <Section title="With icons">
           <Row>
             <Toggle defaultPressed>
-              <CheckIcon className="size-5" weight="bold" />
+              <CheckIcon className="size-5" />
               선택됨
             </Toggle>
             <Toggle variant="soft" defaultPressed={false}>
-              <StarIcon className="size-5" weight="bold" />
+              <StarIcon className="size-5" />
               즐겨찾기
             </Toggle>
             <Toggle variant="ghost" size="tiny" defaultPressed>

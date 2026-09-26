@@ -42,6 +42,57 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 
 **flutter** — Dart package. Platform directories (android/, ios/, etc.) intentionally absent — this is a package, not an app. Published to pub.dev via OIDC — no token.
 
+## Component styling
+
+**Multi-part components use one `tv({ slots })`, not several `tv()` calls.** A component with a
+root plus parts (track/thumb, trigger/panel, box/indicator) declares every part as a slot in a
+single `Style`, so a variant like `colorScheme` or `size` is written once and fans out to the
+parts that need it.
+
+```tsx
+export const Style = tv({
+  slots: { root: '...', track: '...', thumb: '...' },
+  variants: {
+    size: { standard: { track: 'h-2', thumb: 'size-4' }, tiny: { track: 'h-1', thumb: 'size-3' } },
+  },
+  defaultVariants: { size: 'standard' },
+});
+
+const { root, track, thumb } = Style({ size });
+```
+
+Do not declare `Root`/`TrackStyle`/`ThumbStyle` as separate `tv()` calls, and do not style a part
+with a bare `cn('...')` when it belongs to the same component — that hides the part from the
+variant system and duplicates the variant keys.
+
+Colors that a variant fans out to several parts go through a CSS custom property
+(`[--chip-accent:var(--ids-color-primary)]`) rather than one class per part-and-scheme pair.
+
+**Tailwind only generates classes it can see as literal text in a source file.** A class assembled
+at runtime never reaches the stylesheet, and the failure is silent — the class lands in the DOM
+and does nothing.
+
+```tsx
+const halo = (p: string) => `${p}ring-[3px]`; // never generated
+export const focusRing = { native: 'focus-visible:ring-[3px]' }; // fine, it is literal
+```
+
+Shared style fragments (`focus-ring.ts`, `control-surface.ts`) therefore spell every variant out
+in full rather than composing prefixes.
+
+**Focus is a soft ring, never an offset outline.** Add the `focus-ring` class. It is a single
+`@utility` in the CSS package that covers every trigger IDS uses — `:focus-visible` for real form
+controls, `[data-focus-visible]` for components driven by `useInteractive`, and
+`:has([data-text-field]:focus-visible)` for a shell wrapping a field. Borders stay `inset-ring`,
+so the focus ring sits outside them and composes with `shadow-xs` instead of replacing it.
+
+**Radius comes from the token scale.** `rounded-*` resolves to `--ids-radius-*`: controls take
+`md`, surfaces (Card, Alert, Accordion, Item) take `lg`, small boxes take `xs`, pills take `full`.
+Do not hardcode `rounded-[10px]`.
+
+Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
+through the matching `*.Indicator` / `*.Close` part.
+
 ## ThemeProvider
 
 Every IDS component relies on `data-color` and `data-mode` attributes injected by `ThemeProvider`. Without it, CSS variables are undefined and colors will not render.

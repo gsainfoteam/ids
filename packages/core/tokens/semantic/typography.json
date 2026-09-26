@@ -416,17 +416,17 @@
       "standard": {
         "$type": "typography",
         "$value": {
-          "fontSize": "{font-size.b1}",
-          "fontWeight": "{font-weight.semibold}",
+          "fontSize": "{font-size.b3}",
+          "fontWeight": "{font-weight.medium}",
           "lineHeight": "{line-height.none}",
-          "letterSpacing": "{letter-spacing.tight}"
+          "letterSpacing": "{letter-spacing.normal}"
         }
       },
       "tiny": {
         "$type": "typography",
         "$value": {
           "fontSize": "{font-size.c1}",
-          "fontWeight": "{font-weight.semibold}",
+          "fontWeight": "{font-weight.medium}",
           "lineHeight": "{line-height.none}",
           "letterSpacing": "{letter-spacing.normal}"
         }

@@ -3,17 +3,17 @@ import type { ReactNode } from 'react';
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
-  CaretDownIcon,
+  ChevronDownIcon,
   CheckIcon,
-  CircleNotchIcon,
-  DownloadSimpleIcon,
-  FloppyDiskIcon,
+  ArrowPathIcon,
+  ArrowDownTrayIcon,
+  DocumentCheckIcon,
   MagnifyingGlassIcon,
-  PaperPlaneTiltIcon,
+  PaperAirplaneIcon,
   PlusIcon,
   TrashIcon,
-  XIcon,
-} from '@phosphor-icons/react';
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import { compact } from 'es-toolkit';
 
 import { Button } from '.';
@@ -100,9 +100,8 @@ export const Gallery: Story = {
               <span className="w-16 shrink-0 text-xs text-(--ids-color-on-muted)">{size}</span>
               {variants.map((variant) => (
                 <Button key={variant} variant={variant} size={size} disabled>
-                  <CircleNotchIcon
+                  <ArrowPathIcon
                     className={size === 'tiny' ? 'size-4 animate-spin' : 'size-5 animate-spin'}
-                    weight="bold"
                   />
                   로딩
                 </Button>
@@ -115,53 +114,53 @@ export const Gallery: Story = {
       <Section title="Icons">
         <Row>
           <Button>
-            <PlusIcon className="size-5" weight="bold" />
+            <PlusIcon className="size-5" />
             추가
           </Button>
           <Button variant="soft">
             보내기
-            <PaperPlaneTiltIcon className="size-5" weight="bold" />
+            <PaperAirplaneIcon className="size-5" />
           </Button>
           <Button variant="outline">
-            <MagnifyingGlassIcon className="size-5" weight="bold" />
+            <MagnifyingGlassIcon className="size-5" />
             검색
-            <ArrowRightIcon className="size-5" weight="bold" />
+            <ArrowRightIcon className="size-5" />
           </Button>
           <Button variant="ghost">
             더보기
-            <CaretDownIcon className="size-5" weight="bold" />
+            <ChevronDownIcon className="size-5" />
           </Button>
         </Row>
         <Row>
           <Button size="tiny">
-            <DownloadSimpleIcon className="size-4" weight="bold" />
+            <ArrowDownTrayIcon className="size-4" />
             다운로드
           </Button>
           <Button variant="soft" size="tiny">
-            <FloppyDiskIcon className="size-4" weight="bold" />
+            <DocumentCheckIcon className="size-4" />
             저장
           </Button>
           <Button variant="outline" size="tiny">
-            <CheckIcon className="size-4" weight="bold" />
+            <CheckIcon className="size-4" />
             완료
           </Button>
           <Button variant="ghost" size="tiny">
-            <TrashIcon className="size-4" weight="bold" />
+            <TrashIcon className="size-4" />
             삭제
           </Button>
         </Row>
         <Row>
           <Button aria-label="추가">
-            <PlusIcon className="size-5" weight="bold" />
+            <PlusIcon className="size-5" />
           </Button>
           <Button variant="soft" aria-label="닫기">
-            <XIcon className="size-5" weight="bold" />
+            <XMarkIcon className="size-5" />
           </Button>
           <Button variant="outline" size="tiny" aria-label="검색">
-            <MagnifyingGlassIcon className="size-4" weight="bold" />
+            <MagnifyingGlassIcon className="size-4" />
           </Button>
           <Button variant="ghost" size="tiny" aria-label="삭제">
-            <TrashIcon className="size-4" weight="bold" />
+            <TrashIcon className="size-4" />
           </Button>
         </Row>
       </Section>
@@ -170,18 +169,18 @@ export const Gallery: Story = {
         <div className="flex max-w-sm flex-col gap-2">
           <Button className="w-full">전체 너비 확인</Button>
           <Button variant="outline" className="w-full justify-between">
-            <MagnifyingGlassIcon className="size-5" weight="bold" />
+            <MagnifyingGlassIcon className="size-5" />
             필터
-            <CaretDownIcon className="size-5" weight="bold" />
+            <ChevronDownIcon className="size-5" />
           </Button>
           <Row>
             <Button variant="ghost" className="flex-1">
-              <ArrowLeftIcon className="size-5" weight="bold" />
+              <ArrowLeftIcon className="size-5" />
               이전
             </Button>
             <Button className="flex-1">
               다음
-              <ArrowRightIcon className="size-5" weight="bold" />
+              <ArrowRightIcon className="size-5" />
             </Button>
           </Row>
         </div>
@@ -192,7 +191,7 @@ export const Gallery: Story = {
           <Button variant="ghost">취소</Button>
           <Button variant="soft">임시저장</Button>
           <Button>
-            <CheckIcon className="size-5" weight="bold" />
+            <CheckIcon className="size-5" />
             게시
           </Button>
         </Row>
@@ -204,15 +203,15 @@ export const Gallery: Story = {
         </Row>
         <Row>
           <Button variant="ghost" size="tiny">
-            <XIcon className="size-4" weight="bold" />
+            <XMarkIcon className="size-4" />
             닫기
           </Button>
           <Button variant="soft" size="tiny" disabled>
-            <CircleNotchIcon className="size-4 animate-spin" weight="bold" />
+            <ArrowPathIcon className="size-4 animate-spin" />
             업로드 중
           </Button>
           <Button size="tiny">
-            <PaperPlaneTiltIcon className="size-4" weight="bold" />
+            <PaperAirplaneIcon className="size-4" />
             전송
           </Button>
         </Row>
@@ -259,11 +258,10 @@ export const Gallery: Story = {
             className="min-w-36 justify-between"
             children={(s) => (
               <>
-                <MagnifyingGlassIcon className="size-4" weight="bold" />
+                <MagnifyingGlassIcon className="size-4" />
                 <span className="font-mono text-[10px]">{s.hovered ? 'hot' : 'cold'}</span>
                 <ArrowRightIcon
                   className={`size-4 transition-transform ${s.hovered ? 'translate-x-0.5' : ''}`}
-                  weight="bold"
                 />
               </>
             )}

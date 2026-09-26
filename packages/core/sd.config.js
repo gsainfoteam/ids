@@ -141,6 +141,7 @@ const TW_NS = {
   "tab-size": "--tab-size-",
   breakpoint: "--breakpoint-",
   container: "--container-",
+  radius: "--radius-",
   "border-radius": "--radius-",
   shadow: "--shadow-",
   "inset-shadow": "--inset-shadow-",
@@ -263,9 +264,44 @@ const buildColorBridgeCSS = (dictionary) => {
 
 // :root { --ids-motion-fast: 150ms; ... }
 const buildStaticCSS = (dictionary) => {
-  const motion = byCategory(dictionary, "motion");
-  return `:root {\n${motion.map((t) => `  ${idsVar("motion", t)}: ${toVal(t)};`).join("\n")}\n}\n`;
+  const lines = ["motion", "radius", "size"].flatMap((cat) =>
+    byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
+  );
+  // rounded-* has to resolve to the IDS scale, so bridge radius into @theme too.
+  const theme = byCategory(dictionary, "radius").map(
+    (t) => `  --radius-${slug(t)}: var(${idsVar("radius", t)});`,
+  );
+  return `:root {\n${lines.join("\n")}\n}\n\n@theme {\n${theme.join("\n")}\n}\n`;
 };
+
+// Keyframes can't come from a token file, but they have to ship with the CSS
+// package so consumers get the same motion the components assume.
+const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
+
+@theme {
+  --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
+}
+`;
+
+// One definition for every focus trigger IDS uses: real form controls, components
+// driven by useInteractive, and a shell that wraps a focusable field.
+const T_CSS_UTILITIES = `@utility focus-ring {
+  outline: none;
+
+  &:focus-visible,
+  &[data-focus-visible],
+  &:has([data-text-field]:focus-visible) {
+    @apply ring-[3px] ring-(--ids-color-primary)/40;
+  }
+}
+`;
 
 // :root { --ids-text-button-standard: ...; --ids-font-size-h1: ... }
 // @theme { --text-button-standard: var(--ids-text-button-standard); --font-weight-semibold: ... }
@@ -317,6 +353,8 @@ const cssFormatter = ({ dictionary }) =>
   [
     buildColorBridgeCSS(dictionary),
     buildStaticCSS(dictionary),
+    T_CSS_ANIMATIONS,
+    T_CSS_UTILITIES,
     buildTypographyCSS(dictionary),
     ...colorPairs.map(([c, m]) =>
       buildColorThemeCSS(
@@ -328,6 +366,8 @@ const cssFormatter = ({ dictionary }) =>
     ),
     buildColorThemeCSS(dictionary, "neutral", "light", '[data-mode="light"]'),
     buildColorThemeCSS(dictionary, "neutral", "dark", '[data-mode="dark"]'),
+    buildColorThemeCSS(dictionary, "status", "light", '[data-mode="light"]'),
+    buildColorThemeCSS(dictionary, "status", "dark", '[data-mode="dark"]'),
   ].join("\n");
 
 // ─── TS formatters ────────────────────────────────────────────────────────────
@@ -381,7 +421,12 @@ const dartColorTokensFormatter = ({ dictionary }) => {
     .map(([c, m]) =>
       render(T_DART_COLOR_MAP, {
         NAME: mapName(c, m),
-        ENTRIES: readColorEntries(c, m, palette).map(toColorLine).join("\n"),
+        ENTRIES: [
+          ...readColorEntries(c, m, palette),
+          ...readColorEntries("status", m, palette),
+        ]
+          .map(toColorLine)
+          .join("\n"),
       }),
     )
     .join("\n\n");

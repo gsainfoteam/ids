@@ -27,23 +27,17 @@ export function useTextFieldContext() {
 export const textFieldSurface = tv({
   base: [
     'inline-flex w-full min-w-0 items-center',
-    'bg-transparent text-(--ids-color-on-surface) transition-all',
-    'data-disabled:cursor-not-allowed data-disabled:opacity-40',
+    'bg-transparent text-(--ids-color-on-surface)',
+    'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+    'data-disabled:cursor-not-allowed data-disabled:opacity-50',
   ],
   variants: {
     variant: {
-      outline: [
-        'inset-ring-1 inset-ring-(--ids-color-outline)',
-        'has-[[data-text-field-input]:focus-visible]:outline-2',
-        'has-[[data-text-field-input]:focus-visible]:outline-offset-2',
-        'has-[[data-text-field-input]:focus-visible]:outline-(--ids-color-primary)',
-      ],
+      outline: ['shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)', 'focus-ring'],
       filled: [
         'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
         'has-[[data-text-field-input]:focus-visible]:bg-(--ids-color-primary)/15',
-        'has-[[data-text-field-input]:focus-visible]:outline-2',
-        'has-[[data-text-field-input]:focus-visible]:outline-offset-2',
-        'has-[[data-text-field-input]:focus-visible]:outline-(--ids-color-primary)',
+        'focus-ring',
       ],
       underline: [
         'rounded-none border-b-2 border-(--ids-color-outline)',
@@ -51,15 +45,15 @@ export const textFieldSurface = tv({
       ],
     } satisfies Record<TextFieldVariant, string[]>,
     size: {
-      standard: 'h-11 gap-2 text-body-b2-regular',
-      tiny: 'h-8 gap-1.5 text-body-b3-regular',
+      standard: 'h-(--ids-size-control-standard) gap-2 text-body-b3-regular',
+      tiny: 'h-(--ids-size-control-tiny) gap-1.5 text-caption-c1-regular',
     } satisfies Record<IdsSize, string>,
   },
   compoundVariants: [
-    { variant: 'outline', size: 'standard', class: 'rounded-xl px-3' },
-    { variant: 'outline', size: 'tiny', class: 'rounded-lg px-2' },
-    { variant: 'filled', size: 'standard', class: 'rounded-xl px-3' },
-    { variant: 'filled', size: 'tiny', class: 'rounded-lg px-2' },
+    { variant: 'outline', size: 'standard', class: 'rounded-md px-3' },
+    { variant: 'outline', size: 'tiny', class: 'rounded-sm px-2' },
+    { variant: 'filled', size: 'standard', class: 'rounded-md px-3' },
+    { variant: 'filled', size: 'tiny', class: 'rounded-sm px-2' },
     { variant: 'underline', size: 'standard', class: 'px-1' },
     { variant: 'underline', size: 'tiny', class: 'px-0.5' },
   ],
