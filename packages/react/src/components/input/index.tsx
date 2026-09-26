@@ -2,14 +2,12 @@ import { useEffect, useRef } from 'react';
 
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-import { mergeRefs } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { IconButton } from '../icon-button';
 import { NumberField, type NumberFieldProps } from '../number-field';
 import { PasswordField, type PasswordFieldProps } from '../password-field';
 import { TelField, type TelFieldProps } from '../tel-field';
 import { TextField } from '../text-field';
-import { TextFieldGroup } from '../text-field-group';
 
 type TextInputProps = Omit<TextField.Props, 'type'> & {
   type?: 'text' | 'email' | 'url' | 'search';
@@ -49,21 +47,14 @@ export function Input(props: InputProps) {
   return <TextField {...native} type={supported ? type : 'text'} />;
 }
 
-function SearchInput({ variant, size, className, style, ref, ...props }: TextField.Props) {
+function SearchInput({ size, ...props }: TextField.Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const resolvedSize = useFieldSize(size) ?? 'standard';
   return (
-    <TextFieldGroup
-      variant={variant}
-      size={resolvedSize}
-      disabled={props.disabled}
-      className={className}
-      style={style}
-    >
-      <TextField
-        {...props}
+    <TextField {...props} size={resolvedSize}>
+      <TextField.Input
         type="search"
-        ref={mergeRefs(inputRef, ref)}
+        ref={inputRef}
         className="[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
       />
       <IconButton
@@ -72,7 +63,6 @@ function SearchInput({ variant, size, className, style, ref, ...props }: TextFie
         icon={<XMarkIcon aria-hidden="true" />}
         variant="ghost"
         size={resolvedSize}
-        className="size-7 shrink-0 p-1"
         disabled={props.disabled || props.readOnly}
         onPointerDown={(event) => {
           if (event.button === 0) event.preventDefault();
@@ -92,7 +82,7 @@ function SearchInput({ variant, size, className, style, ref, ...props }: TextFie
           input.dispatchEvent(new view.Event('input', { bubbles: true }));
         }}
       />
-    </TextFieldGroup>
+    </TextField>
   );
 }
 

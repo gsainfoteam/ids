@@ -20,9 +20,9 @@
 
 타입별 props, 실제 input ref, disabled/readOnly, Field 크기와 ARIA 연결을 그대로 전달합니다. 텍스트 계열은 outline/filled/underline, 나머지는 해당 필드의 variant를 사용합니다. `invalid`는 텍스트 계열에서 `aria-invalid`로 변환됩니다. 명시한 `aria-invalid`가 우선합니다.
 
-Search는 TextFieldGroup과 Heroicons 지우기 버튼을 조합합니다. 버튼 공간을 항상 확보하여 값 변경에도 너비와 탭 순서를 유지합니다. 지우기는 네이티브 input 이벤트로 전달되며 입력 위치에 포커스가 유지됩니다. disabled/readOnly이면 지울 수 없습니다. 네이티브 브라우저의 중복 검색 지우기 아이콘은 숨깁니다.
+Search는 TextField 뒤쪽 adornment에 Heroicons 지우기 버튼을 둡니다. 버튼 공간을 항상 확보하여 값 변경에도 너비와 탭 순서를 유지합니다. 지우기는 네이티브 input 이벤트로 전달되며 입력 위치에 포커스가 유지됩니다. disabled/readOnly이면 지울 수 없습니다. 네이티브 브라우저의 중복 검색 지우기 아이콘은 숨깁니다.
 
-NumberField.Input, PasswordField.Input 등 전용 필드의 compound children을 해당 타입에 전달할 수 있습니다. Input 자체에는 별도의 compound 파트가 없습니다. TextFieldGroup의 구조적 자식에는 TextField를 직접 사용하세요.
+NumberField.Input, PasswordField.Input 등 전용 필드의 compound children을 해당 타입에 전달할 수 있습니다. Input 자체에는 별도의 compound 파트가 없습니다. 아이콘이나 버튼을 붙이려면 `TextField`와 `TextField.Input`을 직접 조합하세요.
 
 ## React Hook Form / Zod
 
