@@ -18,7 +18,7 @@ export function useControllableState<T>({
   const current = isControlled ? value : uncontrolled;
 
   function setValue(next: T | ((prev: T) => T)) {
-    const resolved = isFunction(next) ? (next as (prev: T) => T)(current) : next;
+    const resolved = isFunction(next) ? next(current) : next;
     if (!isControlled) setUncontrolled(resolved);
     onChange?.(resolved);
   }

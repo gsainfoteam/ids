@@ -2,14 +2,15 @@ import type { ReactNode } from 'react';
 
 import {
   BellIcon,
-  CircleNotchIcon,
-  DotsThreeIcon,
+  ArrowPathIcon,
+  EllipsisHorizontalIcon,
   HeartIcon,
   MagnifyingGlassIcon,
   PlusIcon,
   TrashIcon,
-  XIcon,
-} from '@phosphor-icons/react';
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 
 import { IconButton } from '.';
 
@@ -46,7 +47,7 @@ const meta: Meta<typeof IconButton> = {
     'aria-label': '검색',
     variant: 'ghost',
     size: 'standard',
-    icon: <MagnifyingGlassIcon weight="bold" />,
+    icon: <MagnifyingGlassIcon />,
   },
 };
 
@@ -68,7 +69,7 @@ export const Gallery: Story = {
                 variant={variant}
                 size={size}
                 aria-label={`${variant} 검색`}
-                icon={<MagnifyingGlassIcon weight="bold" />}
+                icon={<MagnifyingGlassIcon />}
               />
             ))}
           </Row>
@@ -86,7 +87,7 @@ export const Gallery: Story = {
                 size={size}
                 disabled
                 aria-label={`${variant} 비활성`}
-                icon={<TrashIcon weight="bold" />}
+                icon={<TrashIcon />}
               />
             ))}
           </Row>
@@ -101,7 +102,7 @@ export const Gallery: Story = {
               variant={variant}
               disabled
               aria-label="로딩 중"
-              icon={<CircleNotchIcon className="animate-spin" weight="bold" />}
+              icon={<ArrowPathIcon className="animate-spin" />}
             />
           ))}
         </Row>
@@ -109,36 +110,21 @@ export const Gallery: Story = {
 
       <Section title="Common actions">
         <Row>
-          <IconButton variant="solid" aria-label="추가" icon={<PlusIcon weight="bold" />} />
-          <IconButton variant="soft" aria-label="좋아요" icon={<HeartIcon weight="bold" />} />
-          <IconButton variant="outline" aria-label="알림" icon={<BellIcon weight="bold" />} />
-          <IconButton variant="ghost" aria-label="더보기" icon={<DotsThreeIcon weight="bold" />} />
-          <IconButton variant="ghost" aria-label="닫기" icon={<XIcon weight="bold" />} />
+          <IconButton variant="solid" aria-label="추가" icon={<PlusIcon />} />
+          <IconButton variant="soft" aria-label="좋아요" icon={<HeartIcon />} />
+          <IconButton variant="outline" aria-label="알림" icon={<BellIcon />} />
+          <IconButton variant="ghost" aria-label="더보기" icon={<EllipsisHorizontalIcon />} />
+          <IconButton variant="ghost" aria-label="닫기" icon={<XMarkIcon />} />
         </Row>
         <Row>
-          <IconButton
-            variant="solid"
-            size="tiny"
-            aria-label="추가"
-            icon={<PlusIcon weight="bold" />}
-          />
-          <IconButton
-            variant="soft"
-            size="tiny"
-            aria-label="좋아요"
-            icon={<HeartIcon weight="bold" />}
-          />
-          <IconButton
-            variant="outline"
-            size="tiny"
-            aria-label="알림"
-            icon={<BellIcon weight="bold" />}
-          />
+          <IconButton variant="solid" size="tiny" aria-label="추가" icon={<PlusIcon />} />
+          <IconButton variant="soft" size="tiny" aria-label="좋아요" icon={<HeartIcon />} />
+          <IconButton variant="outline" size="tiny" aria-label="알림" icon={<BellIcon />} />
           <IconButton
             variant="ghost"
             size="tiny"
             aria-label="더보기"
-            icon={<DotsThreeIcon weight="bold" />}
+            icon={<EllipsisHorizontalIcon />}
           />
         </Row>
       </Section>
@@ -148,13 +134,13 @@ export const Gallery: Story = {
           <IconButton
             aria-label="좋아요 토글"
             variant={(s) => (s.hovered ? 'soft' : 'ghost')}
-            icon={(s) => <HeartIcon weight={s.hovered ? 'fill' : 'bold'} />}
+            icon={(s) => (s.hovered ? <HeartIconSolid /> : <HeartIcon />)}
           />
           <IconButton
             aria-label={(s) => (s.active ? '삭제' : '추가')}
             variant={(s) => (s.active ? 'solid' : 'outline')}
             className="[&_svg]:transition-transform data-active:[&_svg]:rotate-45"
-            icon={<PlusIcon weight="bold" />}
+            icon={<PlusIcon />}
           />
         </Row>
       </Section>

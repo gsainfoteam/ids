@@ -1,15 +1,15 @@
 import type { ReactNode } from 'react';
 
 import {
-  ArchiveIcon,
+  ArchiveBoxIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
-  DotsThreeIcon,
-  FloppyDiskIcon,
+  EllipsisHorizontalIcon,
+  DocumentCheckIcon,
   MagnifyingGlassIcon,
-  PaperPlaneTiltIcon,
+  PaperAirplaneIcon,
   TrashIcon,
-} from '@phosphor-icons/react';
+} from '@heroicons/react/24/outline';
 
 import { Button } from '../button';
 import { IconButton } from '../icon-button';
@@ -93,11 +93,7 @@ export const Gallery: Story = {
             <Row key={variant}>
               <Label>{variant}</Label>
               <ButtonGroup>
-                <IconButton
-                  aria-label="뒤로"
-                  variant={variant}
-                  icon={<ArrowLeftIcon weight="bold" />}
-                />
+                <IconButton aria-label="뒤로" variant={variant} icon={<ArrowLeftIcon />} />
                 <ButtonGroup.Separator />
                 <Button variant={variant}>Archive</Button>
                 <Button variant={variant}>Report</Button>
@@ -106,7 +102,7 @@ export const Gallery: Story = {
                 <IconButton
                   aria-label="더보기"
                   variant={variant}
-                  icon={<DotsThreeIcon weight="bold" />}
+                  icon={<EllipsisHorizontalIcon />}
                 />
               </ButtonGroup>
             </Row>
@@ -121,12 +117,12 @@ export const Gallery: Story = {
               <Label>{orientation}</Label>
               <ButtonGroup orientation={orientation}>
                 <Button variant="outline">
-                  <ArrowLeftIcon className="size-5" weight="bold" />
+                  <ArrowLeftIcon className="size-5" />
                   이전
                 </Button>
                 <Button variant="outline">
                   다음
-                  <ArrowRightIcon className="size-5" weight="bold" />
+                  <ArrowRightIcon className="size-5" />
                 </Button>
                 <ButtonGroup.Separator />
                 <Button variant="outline">완료</Button>
@@ -142,21 +138,9 @@ export const Gallery: Story = {
             <Label>icon only</Label>
             {variants.map((variant) => (
               <ButtonGroup key={variant}>
-                <IconButton
-                  aria-label="이전"
-                  variant={variant}
-                  icon={<ArrowLeftIcon weight="bold" />}
-                />
-                <IconButton
-                  aria-label="검색"
-                  variant={variant}
-                  icon={<MagnifyingGlassIcon weight="bold" />}
-                />
-                <IconButton
-                  aria-label="다음"
-                  variant={variant}
-                  icon={<ArrowRightIcon weight="bold" />}
-                />
+                <IconButton aria-label="이전" variant={variant} icon={<ArrowLeftIcon />} />
+                <IconButton aria-label="검색" variant={variant} icon={<MagnifyingGlassIcon />} />
+                <IconButton aria-label="다음" variant={variant} icon={<ArrowRightIcon />} />
               </ButtonGroup>
             ))}
           </Row>
@@ -164,15 +148,15 @@ export const Gallery: Story = {
             <Label>mixed</Label>
             <ButtonGroup>
               <Button variant="outline">
-                <FloppyDiskIcon className="size-5" weight="bold" />
+                <DocumentCheckIcon className="size-5" />
                 저장
               </Button>
               <Button variant="outline">
-                <PaperPlaneTiltIcon className="size-5" weight="bold" />
+                <PaperAirplaneIcon className="size-5" />
                 전송
               </Button>
               <ButtonGroup.Separator />
-              <IconButton aria-label="삭제" variant="outline" icon={<TrashIcon weight="bold" />} />
+              <IconButton aria-label="삭제" variant="outline" icon={<TrashIcon />} />
             </ButtonGroup>
           </Row>
         </div>
@@ -193,7 +177,7 @@ export const Gallery: Story = {
               aria-label="더보기"
               variant="outline"
               disabled
-              icon={<DotsThreeIcon weight="bold" />}
+              icon={<EllipsisHorizontalIcon />}
             />
           </ButtonGroup>
         </Row>
@@ -201,7 +185,7 @@ export const Gallery: Story = {
           <Label>partial</Label>
           <ButtonGroup>
             <Button variant="outline">
-              <ArchiveIcon className="size-5" weight="bold" />
+              <ArchiveBoxIcon className="size-5" />
               Archive
             </Button>
             <Button variant="outline" disabled>

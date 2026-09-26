@@ -8,87 +8,141 @@
   --color-on-surface: var(--ids-color-on-surface);
   --color-muted: var(--ids-color-muted);
   --color-on-muted: var(--ids-color-on-muted);
+  --color-success: var(--ids-color-success);
+  --color-on-success: var(--ids-color-on-success);
+  --color-success-strong: var(--ids-color-success-strong);
+  --color-warning: var(--ids-color-warning);
+  --color-on-warning: var(--ids-color-on-warning);
+  --color-warning-strong: var(--ids-color-warning-strong);
+  --color-danger: var(--ids-color-danger);
+  --color-on-danger: var(--ids-color-on-danger);
+  --color-danger-strong: var(--ids-color-danger-strong);
+  --color-info: var(--ids-color-info);
+  --color-on-info: var(--ids-color-on-info);
+  --color-info-strong: var(--ids-color-info-strong);
 }
 
 :root {
   --ids-motion-fast: 150ms;
   --ids-motion-normal: 250ms;
   --ids-motion-slow: 400ms;
+  --ids-radius-xs: 4px;
+  --ids-radius-sm: 6px;
+  --ids-radius-md: 8px;
+  --ids-radius-lg: 12px;
+  --ids-radius-xl: 16px;
+  --ids-radius-full: 9999px;
+  --ids-size-control-standard: 36px;
+  --ids-size-control-tiny: 32px;
+  --ids-size-icon-standard: 16px;
+  --ids-size-icon-tiny: 14px;
+}
+
+@theme {
+  --radius-xs: var(--ids-radius-xs);
+  --radius-sm: var(--ids-radius-sm);
+  --radius-md: var(--ids-radius-md);
+  --radius-lg: var(--ids-radius-lg);
+  --radius-xl: var(--ids-radius-xl);
+  --radius-full: var(--ids-radius-full);
+}
+
+@keyframes ids-progress-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
+
+@theme {
+  --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
+}
+
+@utility focus-ring {
+  outline: none;
+
+  &:focus-visible,
+  &[data-focus-visible],
+  &:has([data-text-field]:focus-visible) {
+    @apply ring-[3px] ring-(--ids-color-primary)/40;
+  }
 }
 
 :root {
   --ids-text-headline-h1-bold: 48px;
   --ids-text-headline-h1-bold--font-weight: 700;
   --ids-text-headline-h1-bold--line-height: 1.2;
-  --ids-text-headline-h1-bold--letter-spacing: -0.01em;
+  --ids-text-headline-h1-bold--letter-spacing: -0.025em;
   --ids-text-headline-h1-semibold: 48px;
   --ids-text-headline-h1-semibold--font-weight: 600;
   --ids-text-headline-h1-semibold--line-height: 1.2;
-  --ids-text-headline-h1-semibold--letter-spacing: -0.01em;
+  --ids-text-headline-h1-semibold--letter-spacing: -0.025em;
   --ids-text-headline-h1-medium: 48px;
   --ids-text-headline-h1-medium--font-weight: 500;
   --ids-text-headline-h1-medium--line-height: 1.2;
-  --ids-text-headline-h1-medium--letter-spacing: -0.01em;
+  --ids-text-headline-h1-medium--letter-spacing: -0.025em;
   --ids-text-headline-h2-bold: 40px;
   --ids-text-headline-h2-bold--font-weight: 700;
   --ids-text-headline-h2-bold--line-height: 1.2;
-  --ids-text-headline-h2-bold--letter-spacing: -0.01em;
+  --ids-text-headline-h2-bold--letter-spacing: -0.025em;
   --ids-text-headline-h2-semibold: 40px;
   --ids-text-headline-h2-semibold--font-weight: 600;
   --ids-text-headline-h2-semibold--line-height: 1.2;
-  --ids-text-headline-h2-semibold--letter-spacing: -0.01em;
+  --ids-text-headline-h2-semibold--letter-spacing: -0.025em;
   --ids-text-headline-h2-medium: 40px;
   --ids-text-headline-h2-medium--font-weight: 500;
   --ids-text-headline-h2-medium--line-height: 1.2;
-  --ids-text-headline-h2-medium--letter-spacing: -0.01em;
+  --ids-text-headline-h2-medium--letter-spacing: -0.025em;
   --ids-text-headline-h3-bold: 32px;
   --ids-text-headline-h3-bold--font-weight: 700;
   --ids-text-headline-h3-bold--line-height: 1.2;
-  --ids-text-headline-h3-bold--letter-spacing: -0.01em;
+  --ids-text-headline-h3-bold--letter-spacing: -0.025em;
   --ids-text-headline-h3-semibold: 32px;
   --ids-text-headline-h3-semibold--font-weight: 600;
   --ids-text-headline-h3-semibold--line-height: 1.2;
-  --ids-text-headline-h3-semibold--letter-spacing: -0.01em;
+  --ids-text-headline-h3-semibold--letter-spacing: -0.025em;
   --ids-text-headline-h3-medium: 32px;
   --ids-text-headline-h3-medium--font-weight: 500;
   --ids-text-headline-h3-medium--line-height: 1.2;
-  --ids-text-headline-h3-medium--letter-spacing: -0.01em;
+  --ids-text-headline-h3-medium--letter-spacing: -0.025em;
   --ids-text-headline-h4-bold: 28px;
   --ids-text-headline-h4-bold--font-weight: 700;
   --ids-text-headline-h4-bold--line-height: 1.2;
-  --ids-text-headline-h4-bold--letter-spacing: -0.01em;
+  --ids-text-headline-h4-bold--letter-spacing: -0.025em;
   --ids-text-headline-h4-semibold: 28px;
   --ids-text-headline-h4-semibold--font-weight: 600;
   --ids-text-headline-h4-semibold--line-height: 1.2;
-  --ids-text-headline-h4-semibold--letter-spacing: -0.01em;
+  --ids-text-headline-h4-semibold--letter-spacing: -0.025em;
   --ids-text-headline-h4-medium: 28px;
   --ids-text-headline-h4-medium--font-weight: 500;
   --ids-text-headline-h4-medium--line-height: 1.2;
-  --ids-text-headline-h4-medium--letter-spacing: -0.01em;
+  --ids-text-headline-h4-medium--letter-spacing: -0.025em;
   --ids-text-headline-h5-bold: 24px;
   --ids-text-headline-h5-bold--font-weight: 700;
   --ids-text-headline-h5-bold--line-height: 1.2;
-  --ids-text-headline-h5-bold--letter-spacing: -0.01em;
+  --ids-text-headline-h5-bold--letter-spacing: -0.025em;
   --ids-text-headline-h5-semibold: 24px;
   --ids-text-headline-h5-semibold--font-weight: 600;
   --ids-text-headline-h5-semibold--line-height: 1.2;
-  --ids-text-headline-h5-semibold--letter-spacing: -0.01em;
+  --ids-text-headline-h5-semibold--letter-spacing: -0.025em;
   --ids-text-headline-h5-medium: 24px;
   --ids-text-headline-h5-medium--font-weight: 500;
   --ids-text-headline-h5-medium--line-height: 1.2;
-  --ids-text-headline-h5-medium--letter-spacing: -0.01em;
+  --ids-text-headline-h5-medium--letter-spacing: -0.025em;
   --ids-text-headline-h6-bold: 20px;
   --ids-text-headline-h6-bold--font-weight: 700;
   --ids-text-headline-h6-bold--line-height: 1.2;
-  --ids-text-headline-h6-bold--letter-spacing: -0.01em;
+  --ids-text-headline-h6-bold--letter-spacing: -0.025em;
   --ids-text-headline-h6-semibold: 20px;
   --ids-text-headline-h6-semibold--font-weight: 600;
   --ids-text-headline-h6-semibold--line-height: 1.2;
-  --ids-text-headline-h6-semibold--letter-spacing: -0.01em;
+  --ids-text-headline-h6-semibold--letter-spacing: -0.025em;
   --ids-text-headline-h6-medium: 20px;
   --ids-text-headline-h6-medium--font-weight: 500;
   --ids-text-headline-h6-medium--line-height: 1.2;
-  --ids-text-headline-h6-medium--letter-spacing: -0.01em;
+  --ids-text-headline-h6-medium--letter-spacing: -0.025em;
   --ids-text-subtitle-s1-bold: 18px;
   --ids-text-subtitle-s1-bold--font-weight: 700;
   --ids-text-subtitle-s1-bold--line-height: 1.35;
@@ -185,12 +239,12 @@
   --ids-text-caption-c2-regular--font-weight: 400;
   --ids-text-caption-c2-regular--line-height: 1.35;
   --ids-text-caption-c2-regular--letter-spacing: 0em;
-  --ids-text-button-standard: 18px;
-  --ids-text-button-standard--font-weight: 600;
+  --ids-text-button-standard: 14px;
+  --ids-text-button-standard--font-weight: 500;
   --ids-text-button-standard--line-height: 1;
-  --ids-text-button-standard--letter-spacing: -0.01em;
+  --ids-text-button-standard--letter-spacing: 0em;
   --ids-text-button-tiny: 12px;
-  --ids-text-button-tiny--font-weight: 600;
+  --ids-text-button-tiny--font-weight: 500;
   --ids-text-button-tiny--line-height: 1;
   --ids-text-button-tiny--letter-spacing: 0em;
   --ids-font-size-c2: 10px;
@@ -211,7 +265,7 @@
   --ids-font-weight-semibold: 600;
   --ids-font-weight-bold: 700;
   --ids-letter-spacing-normal: 0em;
-  --ids-letter-spacing-tight: -0.01em;
+  --ids-letter-spacing-tight: -0.025em;
   --ids-line-height-none: 1;
   --ids-line-height-tight: 1.2;
   --ids-line-height-snug: 1.35;
@@ -484,4 +538,34 @@
   --ids-color-on-surface: #fafafa;
   --ids-color-muted: #262626;
   --ids-color-on-muted: #a3a3a3;
+}
+
+[data-mode="light"] {
+  --ids-color-success: #418501;
+  --ids-color-on-success: #ffffff;
+  --ids-color-success-strong: #366e01;
+  --ids-color-warning: #eab308;
+  --ids-color-on-warning: #0a0a0a;
+  --ids-color-warning-strong: #854d0e;
+  --ids-color-danger: #b91c1c;
+  --ids-color-on-danger: #ffffff;
+  --ids-color-danger-strong: #b91c1c;
+  --ids-color-info: #0369a1;
+  --ids-color-on-info: #ffffff;
+  --ids-color-info-strong: #0369a1;
+}
+
+[data-mode="dark"] {
+  --ids-color-success: #4ade5e;
+  --ids-color-on-success: #0a0a0a;
+  --ids-color-success-strong: #4ade5e;
+  --ids-color-warning: #facc15;
+  --ids-color-on-warning: #0a0a0a;
+  --ids-color-warning-strong: #facc15;
+  --ids-color-danger: #f87171;
+  --ids-color-on-danger: #0a0a0a;
+  --ids-color-danger-strong: #f87171;
+  --ids-color-info: #38bdf8;
+  --ids-color-on-info: #0a0a0a;
+  --ids-color-info-strong: #38bdf8;
 }
