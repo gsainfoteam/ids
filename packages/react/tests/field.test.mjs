@@ -113,7 +113,7 @@ test('asChild uses real custom label IDs and retains its handler and required ma
 });
 test('size inheritance, explicit child size, disabled and explicit state override', async () => {
   await render(h(Field, { size: 'tiny', disabled: true, 'aria-label': 'Name' }, h(TextField)));
-  assert.equal(control().dataset.size, 'tiny');
+  assert.equal(control().closest('[data-text-field]').dataset.size, 'tiny');
   assert.equal(control().disabled, true);
   await render(
     h(
@@ -122,7 +122,7 @@ test('size inheritance, explicit child size, disabled and explicit state overrid
       h(TextField, { size: 'standard', disabled: true, 'aria-invalid': true }),
     ),
   );
-  assert.equal(control().dataset.size, 'standard');
+  assert.equal(control().closest('[data-text-field]').dataset.size, 'standard');
   assert.equal(control().disabled, false);
   assert.equal(control().getAttribute('aria-invalid'), 'false');
 });

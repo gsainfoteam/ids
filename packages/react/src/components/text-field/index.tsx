@@ -18,6 +18,7 @@ import {
   type TextFieldVariant,
 } from './surface';
 import { invariant, mergeRefs, tv } from '../../utils';
+import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -43,13 +44,14 @@ function splitByInput(children: ReactNode) {
 
 export function TextField({
   variant = 'outline',
-  size = 'standard',
+  size: sizeProp,
   disabled,
   className,
   style,
   children,
   ...inputProps
 }: TextField.Props) {
+  const size = useFieldSize(sizeProp) ?? 'standard';
   const inputRef = useRef<HTMLInputElement>(null);
   const { leading, input, trailing } = splitByInput(children);
 
