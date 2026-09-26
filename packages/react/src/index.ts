@@ -47,7 +47,7 @@ export { RadioGroup } from './components/radio-group';
 export { CheckboxGroup } from './components/checkbox-group';
 export { Slider } from './components/slider';
 export { TextField } from './components/text-field';
-export { TextFieldGroup } from './components/text-field-group';
+export { TextArea } from './components/text-area';
 
 export { Spinner } from './components/spinner';
 export { Progress } from './components/progress';

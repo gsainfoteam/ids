@@ -83,7 +83,8 @@ in full rather than composing prefixes.
 **Focus is a soft ring, never an offset outline.** Add the `focus-ring` class. It is a single
 `@utility` in the CSS package that covers every trigger IDS uses — `:focus-visible` for real form
 controls, `[data-focus-visible]` for components driven by `useInteractive`, and
-`:has([data-text-field]:focus-visible)` for a shell wrapping a field. Borders stay `inset-ring`,
+`:has([data-text-field-input]:focus-visible)` / `:has([data-text-area-input]:focus-visible)` for a
+TextField or TextArea container wrapping its sentinel input. Borders stay `inset-ring`,
 so the focus ring sits outside them and composes with `shadow-xs` instead of replacing it.
 
 **Radius comes from the token scale.** `rounded-*` resolves to `--ids-radius-*`: controls take
