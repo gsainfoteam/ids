@@ -297,7 +297,8 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 
   &:focus-visible,
   &[data-focus-visible],
-  &:has([data-text-field]:focus-visible) {
+  &:has([data-text-field-input]:focus-visible),
+  &:has([data-text-area-input]:focus-visible) {
     @apply ring-[3px] ring-(--ids-color-primary)/40;
   }
 }
