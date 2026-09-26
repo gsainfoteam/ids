@@ -1,5 +1,4 @@
 import {
-  Children,
   isValidElement,
   useRef,
   type CSSProperties,
@@ -17,13 +16,14 @@ import {
   type TextFieldInputProps,
   type TextFieldVariant,
 } from './surface';
-import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
+import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
 
 function splitByInput(children: ReactNode) {
-  const items = Children.toArray(children);
+  const items = flattenFragments(children);
   const inputIndexes = items
     .map((child, index) => (isValidElement(child) && child.type === TextField.Input ? index : null))
     .filter(isNotNil);
@@ -103,24 +103,43 @@ function Adornments({ items, size }: { items: ReactNode[]; size: IdsSize }) {
 }
 
 export namespace TextField {
-  export function Input({ disabled: disabledProp, className, style, ref, ...rest }: Input.Props) {
+  export function Input({
+    asChild,
+    children,
+    disabled: disabledProp,
+    className,
+    style,
+    ref,
+    ...rest
+  }: Input.Props) {
     const field = useTextFieldContext();
     invariant(field != null, '`<TextField.Input>` must be used inside `<TextField>`.');
 
     const { inputProps, inputRef } = field;
+    const props = {
+      'data-text-field-input': '',
+      // Input values win, but handlers compose so Field and react-hook-form wiring on the
+      // root still runs when the Input sets its own onChange or onBlur.
+      ...mergeProps(inputProps, rest),
+      disabled: disabledProp ?? field.disabled,
+      className: Input.Style({ className }),
+      style,
+    };
 
-    return (
-      <input
-        data-text-field-input=""
-        // Input values win, but handlers compose so Field and react-hook-form wiring on the
-        // root still runs when the Input sets its own onChange or onBlur.
-        {...mergeProps(inputProps, rest)}
-        disabled={disabledProp ?? field.disabled}
-        className={Input.Style({ className })}
-        style={style}
-        ref={mergeRefs(inputRef, inputProps.ref, ref)}
-      />
-    );
+    if (asChild === true) {
+      invariant(
+        isValidElement(children) &&
+          (typeof children.type !== 'string' || children.type === 'input'),
+        '`<TextField.Input asChild>` requires one input, or a component forwarding input props and ref.',
+      );
+      return (
+        <Slot {...(props as Slot.Props)} ref={mergeRefs(inputRef, inputProps.ref, ref)}>
+          {children}
+        </Slot>
+      );
+    }
+    invariant(children == null, '`<TextField.Input>` takes `value`/`defaultValue`, not children.');
+    return <input {...props} ref={mergeRefs(inputRef, inputProps.ref, ref)} />;
   }
 
   export namespace Input {
@@ -134,6 +153,8 @@ export namespace TextField {
     });
 
     export type Props = TextFieldInputProps & {
+      asChild?: boolean;
+      children?: ReactNode;
       disabled?: boolean;
       className?: string;
       style?: CSSProperties;

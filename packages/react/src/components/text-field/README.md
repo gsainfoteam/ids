@@ -30,7 +30,11 @@ import { Search, X } from 'lucide-react';
 `TextField.Input`이 sentinel이다. 그 앞에 놓은 자식은 leading, 뒤에 놓은 자식은 trailing이
 된다. `placement` 같은 prop 없이 JSX 순서가 곧 시각적 순서다. 생략하면 TextField가 하나
 만들어 넣으므로 `<TextField placeholder="..." />`만 써도 된다. 둘 이상 넣으면 개발 중에
-에러가 난다.
+에러가 난다. Fragment 안에 둔 `TextField.Input`도 찾지만, 다른 컴포넌트 안에 숨긴 것은 찾지
+않는다.
+
+`TextField.Input asChild`는 자식 input에 props와 ref를 합쳐 넘긴다. 자식은 input이거나 native
+input으로 props와 ref를 전달하는 컴포넌트여야 한다.
 
 native input 속성은 TextField에 직접 주든 `TextField.Input`에 주든 같은 input에 도달한다.
 `id`도 마찬가지라 Label과는 `htmlFor`/`id`로 그냥 연결하면 되고, 클릭 시 포커스는 브라우저
