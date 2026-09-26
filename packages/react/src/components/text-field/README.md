@@ -34,9 +34,10 @@ import { Search, X } from 'lucide-react';
 
 native input 속성은 TextField에 직접 주든 `TextField.Input`에 주든 같은 input에 도달한다.
 `id`도 마찬가지라 Label과는 `htmlFor`/`id`로 그냥 연결하면 되고, 클릭 시 포커스는 브라우저
-기본 동작을 탄다. `Input`에 직접 준 값이 TextField에 준 값을 이긴다. HTML의 `size` 속성은
-IDS `size`가 이름을 차지하므로 쓸 수 없다. 폭은 className으로 지정한다. `className`과
-`style`은 컨테이너로 간다.
+기본 동작을 탄다. `Input`에 직접 준 값이 TextField에 준 값을 이긴다. 단 `onChange` 같은
+핸들러는 덮어쓰지 않고 둘 다 실행하므로, `Field`나 react-hook-form이 건 핸들러가 `Input`의
+핸들러 때문에 빠지지 않는다. HTML의 `size` 속성은 IDS `size`가 이름을 차지하므로 쓸 수 없다.
+폭은 className으로 지정한다. `className`과 `style`은 컨테이너로 간다.
 
 leading/trailing 자식은 각각 span으로 감싸 톤을 맞춘다. 버튼이 없으면 muted 색과 크기에
 맞는 타이포그래피, 아이콘 크기를 적용하고, 버튼이 있으면 패딩과 고정 크기만 제거하고

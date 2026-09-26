@@ -17,7 +17,7 @@ import {
   type TextFieldInputProps,
   type TextFieldVariant,
 } from './surface';
-import { invariant, mergeRefs, tv } from '../../utils';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../tokens/types';
@@ -112,8 +112,9 @@ export namespace TextField {
     return (
       <input
         data-text-field-input=""
-        {...inputProps}
-        {...rest}
+        // Input values win, but handlers compose so Field and react-hook-form wiring on the
+        // root still runs when the Input sets its own onChange or onBlur.
+        {...mergeProps(inputProps, rest)}
         disabled={disabledProp ?? field.disabled}
         className={Input.Style({ className })}
         style={style}
