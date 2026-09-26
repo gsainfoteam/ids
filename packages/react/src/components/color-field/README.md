@@ -1,6 +1,9 @@
 # ColorField
 
-색상 미리보기와 값을 보여주고 팝업에서 색을 고르는 필드. 값은 색상 문자열이다.
+- 색상 미리보기와 값을 보여주고 팝업에서 색을 고르는 필드
+- 값은 `hex` / `rgb` / `hsl` 색상 문자열. `alpha`로 투명도를 포함한다
+- 패널은 `default` / `compact` / `swatchOnly`, `swatches`로 팔레트를 준다
+- `Field`, react-hook-form(`controlMode="value"`)과 연결된다
 
 ```tsx
 import { ColorField, Field } from '@gsainfoteam/ids-react';

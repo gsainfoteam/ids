@@ -1,6 +1,9 @@
 # FloatingButton
 
-화면 모서리에 고정되는 주 행동 버튼.
+- 화면 모서리에 고정되는 주 행동 버튼
+- 아이콘만 있으면 원형, 보이는 텍스트가 있으면 확장형
+- `placement`로 네 모서리 중 하나에 둔다
+- `asChild`로 링크(`a`)로도 렌더한다
 
 ```tsx
 import { PlusIcon } from '@heroicons/react/24/outline';
@@ -63,7 +66,7 @@ import { FloatingButton } from '@gsainfoteam/ids-react';
 
 ## 진행 상태
 
-로딩, 스크롤 숨김, 비동기 작업은 앱에서 제어한다.
+- 로딩, 스크롤 숨김, 비동기 작업은 앱에서 제어한다
 
 ```tsx
 <FloatingButton disabled={pending} aria-label={pending ? '저장 중' : '저장'}>

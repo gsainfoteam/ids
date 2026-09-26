@@ -1,6 +1,9 @@
 # TelField
 
-국가 선택과 입력 중 번호 포맷을 갖춘 전화번호 입력.
+- 국가 선택과 입력 중 번호 포맷을 갖춘 전화번호 입력
+- 값은 `string`. `auto` / `international` / `none` 포맷
+- 국가 목록과 포맷은 libphonenumber-js 기반
+- `TextField`와 같은 sentinel 합성: `CountrySelect`나 아이콘을 앞뒤에 붙인다
 
 ```tsx
 import { Field, TelField } from '@gsainfoteam/ids-react';
@@ -39,7 +42,10 @@ import { Field, TelField } from '@gsainfoteam/ids-react';
 </TelField>
 ```
 
-leading/trailing 자식은 각각 span으로 감싼다. 버튼이 없으면 muted 색, 크기에 맞는 글자와 아이콘 크기가 적용되고, 버튼이 있으면 버튼의 패딩과 고정 크기만 없앤다. Fragment 안의 Input도 찾지만 다른 컴포넌트 안은 찾지 않는다.
+- leading/trailing 자식은 각각 span으로 감싼다
+- 버튼이 없으면 muted 색, 크기에 맞는 글자와 아이콘 크기가 적용된다
+- 버튼이 있으면 버튼의 패딩과 고정 크기만 없앤다
+- Fragment 안의 Input도 찾지만 다른 컴포넌트 안은 찾지 않는다
 
 ## 속성 우선순위
 

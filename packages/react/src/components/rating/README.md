@@ -1,6 +1,9 @@
 # Rating
 
-아이콘 개수로 점수를 고르거나 보여주는 컨트롤. 값은 `number`다.
+- 아이콘 개수로 점수를 고르거나 보여주는 컨트롤
+- 값은 `number`. `step={0.5}`로 반 점을 고른다
+- `star` / `heart` / `circle` 아이콘, `custom`이면 직접 준 아이콘
+- `selectionMode="none"`이면 표시 전용 이미지
 
 ```tsx
 import { Rating } from '@gsainfoteam/ids-react';

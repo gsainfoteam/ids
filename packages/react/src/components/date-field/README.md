@@ -1,6 +1,9 @@
 # DateField
 
-`Calendar` 팝업으로 날짜를 고르는 필드. 텍스트 입력과 파싱은 없다.
+- `Calendar` 팝업으로 날짜를 고르는 필드. 텍스트 입력과 파싱은 없다
+- 값은 로컬 날짜 `Date`. `range` / `multiple` 선택도 된다
+- `format` 패턴이나 Intl 옵션으로 표시 형식을 정한다
+- `Field`, react-hook-form(`controlMode="value"`)과 연결된다
 
 ```tsx
 import { useState } from 'react';
@@ -26,7 +29,7 @@ function BookingDate() {
 // range 표시는 "시작 – 끝"(end 전이면 "시작 – …"), multiple은 두 개까지 보이고 나머지는 "+n"
 ```
 
-기간, 제한, 표시 월은 `Calendar`와 같다. [Calendar](../calendar/README.md)를 본다.
+- 기간, 제한, 표시 월은 [Calendar](../calendar/README.md)와 같다
 
 ```tsx
 <DateField

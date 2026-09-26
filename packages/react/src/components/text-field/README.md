@@ -1,6 +1,9 @@
 # TextField
 
-한 줄 입력과 그 앞뒤의 아이콘, 텍스트, 버튼을 담는 컨테이너.
+- 한 줄 입력과 그 앞뒤의 아이콘, 텍스트, 버튼을 담는 컨테이너
+- sentinel `TextField.Input` 합성: Input 앞 자식은 leading, 뒤 자식은 trailing
+- `outline` / `filled` / `underline`, 크기는 `Field`를 따른다
+- `Field`, react-hook-form과 연결된다
 
 ```tsx
 import { Field, TextField } from '@gsainfoteam/ids-react';
@@ -39,7 +42,9 @@ import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 </TextField>
 ```
 
-leading/trailing 자식은 각각 span으로 감싼다. 버튼이 없으면 muted 색, 크기에 맞는 글자와 아이콘 크기가 적용되고, 버튼이 있으면 버튼의 패딩과 고정 크기만 없앤다.
+- leading/trailing 자식은 각각 span으로 감싼다
+- 버튼이 없으면 muted 색, 크기에 맞는 글자와 아이콘 크기가 적용된다
+- 버튼이 있으면 버튼의 패딩과 고정 크기만 없앤다
 
 ## 속성 우선순위
 

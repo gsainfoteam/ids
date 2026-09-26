@@ -1,6 +1,9 @@
 # OTPField
 
-인증 코드를 한 칸에 한 글자씩 나눠 입력하는 필드. 값은 전체 코드 `string` 하나다.
+- 인증 코드를 한 칸에 한 글자씩 나눠 입력하는 필드
+- 값은 전체 코드 `string` 하나. 모든 칸이 차면 `onComplete`
+- `numeric` / `alphanumeric` / `RegExp` 허용 문자, 전체 코드 붙여넣기
+- `Slot`, `Separator`로 칸 배치를 바꾼다
 
 ```tsx
 import { Field, OTPField } from '@gsainfoteam/ids-react';
@@ -93,7 +96,7 @@ Backspace  // 현재 문자를 지우고 이전 칸으로. 현재 칸이 비었�
 
 ## React Hook Form + Zod
 
-칸마다 `register`하지 말고 `controlMode="value"`로 전체 문자열을 바인딩한다.
+- 칸마다 `register`하지 말고 `controlMode="value"`로 전체 문자열을 바인딩한다
 
 ```tsx
 import { OTPField } from '@gsainfoteam/ids-react';

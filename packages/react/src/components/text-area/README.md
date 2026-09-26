@@ -1,6 +1,9 @@
 # TextArea
 
-여러 줄 입력과 그 위아래 바(메뉴바, 액션바, 글자 수)를 담는 컨테이너.
+- 여러 줄 입력과 그 위아래 바(메뉴바, 액션바, 글자 수)를 담는 컨테이너
+- sentinel `TextArea.Input` 합성: Input 위 자식은 top 바, 아래 자식은 bottom 바
+- 기본으로 내용에 맞춰 높이가 늘고 준다 (`autoResize`)
+- `Field`, react-hook-form과 연결된다
 
 ```tsx
 import { Field, TextArea } from '@gsainfoteam/ids-react';
@@ -13,7 +16,6 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 
 ## 합성
 
-`TextField`와 같은 sentinel 패턴이지만 방향이 수직이다.
 
 ```tsx
 import { Button, IconButton, TextArea } from '@gsainfoteam/ids-react';
@@ -38,7 +40,9 @@ import { BoldIcon, ItalicIcon, PaperAirplaneIcon } from '@heroicons/react/24/out
 </TextArea>
 ```
 
-바는 얇은 구분선으로 입력과 나뉘고, 비어 있으면 구분선까지 접힌다. 여러 개를 한 줄에 놓으려면 `<div className="flex ...">`로 직접 묶는다. `IconButton`은 고정 크기만 풀려 바 높이에 맞는다.
+- 바는 얇은 구분선으로 입력과 나뉘고, 비어 있으면 구분선까지 접힌다
+- 여러 개를 한 줄에 놓으려면 `<div className="flex ...">`로 직접 묶는다
+- `IconButton`은 고정 크기만 풀려 바 높이에 맞는다
 
 ## 높이
 

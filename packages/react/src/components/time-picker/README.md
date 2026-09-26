@@ -1,6 +1,9 @@
 # TimePicker
 
-시, 분, 초와 AM/PM 컬럼으로 시각을 고르는 독립 컴포넌트.
+- 시, 분, 초와 AM/PM 컬럼으로 시각을 고르는 독립 컴포넌트
+- 값은 `Date | null`. 날짜는 두고 시각만 바꾼다
+- `grid` / `wheel` 표시
+- `precision`, `step`, `min` / `max`로 고를 수 있는 시각을 제한한다
 
 ```tsx
 import { useState } from 'react';

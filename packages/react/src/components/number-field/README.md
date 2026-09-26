@@ -1,6 +1,9 @@
 # NumberField
 
-`number | null` 값, 증감 버튼, 로케일 포맷을 갖춘 숫자 입력.
+- `number | null` 값을 다루는 숫자 입력
+- 증감 버튼과 키보드 증감, `min` / `max` 범위
+- `Intl.NumberFormat` 로케일 포맷 (통화, 퍼센트 등)
+- `TextField`와 같은 sentinel 합성: 앞뒤에 아이콘, 단위, `Clear`를 붙인다
 
 ```tsx
 import { Field, NumberField } from '@gsainfoteam/ids-react';

@@ -1,6 +1,9 @@
 # PasswordField
 
-비밀번호 입력과 표시 전환 버튼.
+- 비밀번호 입력과 표시 전환 버튼
+- `name`으로 `current-password` / `new-password` 자동완성을 고른다
+- `TextField`와 같은 sentinel 합성: 앞뒤에 아이콘이나 버튼을 붙인다
+- `Field`, react-hook-form과 연결된다
 
 ```tsx
 import { Field, PasswordField } from '@gsainfoteam/ids-react';

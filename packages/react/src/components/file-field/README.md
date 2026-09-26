@@ -1,6 +1,9 @@
 # FileField
 
-파일을 고르거나 끌어다 놓는 필드. 업로드, 진행률, 서버 저장은 앱이 맡는다.
+- 파일을 고르거나 끌어다 놓는 필드
+- 값은 `File | null`, `multiple`이면 `File[]`
+- `accept`, `maxSize`, `maxCount`로 거르고 거부 사유를 보여준다
+- 업로드, 진행률, 서버 저장은 앱이 맡는다
 
 ```tsx
 import { Field, FileField } from '@gsainfoteam/ids-react';

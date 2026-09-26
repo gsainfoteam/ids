@@ -1,6 +1,9 @@
 # Calendar
 
-로컬 날짜를 고르는 달력. `DateField` 팝업도 이 컴포넌트를 쓴다.
+- 로컬 날짜를 고르는 달력
+- `single` / `range` / `multiple` / `none` 선택 모드
+- 날짜 라이브러리 없이 native `Date`와 Intl만 쓴다
+- `DateField`, `DateTimeField` 팝업도 이 컴포넌트를 쓴다
 
 ```tsx
 import { useState } from 'react';

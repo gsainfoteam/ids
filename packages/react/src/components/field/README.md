@@ -1,6 +1,9 @@
 # Field
 
-입력 하나에 라벨, 설명, 도움말, 오류를 연결하는 래퍼.
+- 입력 하나에 라벨, 설명, 도움말, 오류를 연결하는 래퍼
+- `id`, ARIA, `size` / `disabled` / `required` / `invalid` 상태를 입력에 전달한다
+- `vertical` / `horizontal` 배치
+- `/react-hook-form` 경로의 `Field`는 `FormProvider` 아래에서 `name`으로 RHF에 등록한다
 
 ```tsx
 import { Field, TextField } from '@gsainfoteam/ids-react';
@@ -30,7 +33,7 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 </Field>
 ```
 
-입력은 native 요소이거나, 받은 `id`, ARIA, 상태, 이벤트, ref를 실제 입력으로 전달하는 컴포넌트여야 한다.
+- 입력은 native 요소이거나, 받은 `id`, ARIA, 상태, 이벤트, ref를 실제 입력으로 전달하는 컴포넌트여야 한다
 
 ## 상태 상속
 
@@ -67,7 +70,8 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 </Field>
 ```
 
-Label은 label, 나머지 파트는 div로 렌더한다. 클릭 포커스가 필요하면 Label은 label 요소로 둔다.
+- Label은 label, 나머지 파트는 div로 렌더한다
+- 클릭 포커스가 필요하면 Label의 `asChild` 자식도 label 요소로 둔다
 
 ## React Hook Form
 

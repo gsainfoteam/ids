@@ -1,6 +1,9 @@
 # Select
 
-목록에서 하나 또는 여러 옵션을 고르는 버튼형 필드.
+- 목록에서 하나 또는 여러 옵션을 고르는 버튼형 필드
+- 값은 `string | null`, `multiple`이면 `string[]`
+- `SearchField`로 옵션 검색, `Group`으로 묶기
+- `mobileVariant="drawer"`면 640px 미만에서 하단 팝업으로 연다
 
 ```tsx
 import { Field, Select } from '@gsainfoteam/ids-react';

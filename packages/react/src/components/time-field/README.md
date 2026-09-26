@@ -1,6 +1,9 @@
 # TimeField
 
-`TimePicker` 팝업으로 시각을 고르는 필드. 텍스트 입력과 파싱은 없다.
+- `TimePicker` 팝업으로 시각을 고르는 필드. 텍스트 입력과 파싱은 없다
+- 값은 `Date | null`. 날짜는 유지하고 시각만 바꾼다
+- `12h` / `24h` 또는 패턴으로 표시 형식을 정한다
+- `Field`, react-hook-form(`controlMode="value"`)과 연결된다
 
 ```tsx
 import { useState } from 'react';
@@ -28,7 +31,7 @@ function Alarm() {
 <TimeField selectionMode="none" />                                     // 팝업을 열어 탐색만
 ```
 
-단위와 간격 규칙은 [TimePicker](../time-picker/README.md)를 본다.
+- 단위와 간격 규칙은 [TimePicker](../time-picker/README.md)를 본다
 
 ## 표시 형식
 

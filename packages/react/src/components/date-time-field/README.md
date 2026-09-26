@@ -1,6 +1,9 @@
 # DateTimeField
 
-`Calendar`와 `TimePicker`를 한 팝업에 놓고 로컬 날짜와 시각을 고르는 필드. 값은 `Date | null` 하나다.
+- `Calendar`와 `TimePicker`를 한 팝업에 놓고 로컬 날짜와 시각을 고르는 필드
+- 값은 `Date | null` 하나. 날짜를 바꾸면 시각을, 시각을 바꾸면 날짜를 유지한다
+- 오프셋 없는 로컬 문자열(`2026-09-15T14:30`)로 제출한다
+- `Field`, react-hook-form(`controlMode="value"`)과 연결된다
 
 ```tsx
 import { useState } from 'react';
@@ -41,7 +44,8 @@ function Meeting() {
 />
 ```
 
-달력 옵션(`monthsToShow`, `weekStartsOn`, `month`/`defaultMonth`/`onMonthChange`, `today`)은 [Calendar](../calendar/README.md), 시각 단위는 [TimePicker](../time-picker/README.md)와 같다.
+- 달력 옵션(`monthsToShow`, `weekStartsOn`, `month`/`defaultMonth`/`onMonthChange`, `today`)은 [Calendar](../calendar/README.md)와 같다
+- 시각 단위는 [TimePicker](../time-picker/README.md)와 같다
 
 ## 표시 형식
 

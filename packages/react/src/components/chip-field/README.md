@@ -1,6 +1,9 @@
 # ChipField
 
-검색해서 여러 옵션을 고르고 칩으로 보여주는 필드. 값은 `string[]`이다.
+- 검색해서 여러 옵션을 고르고 칩으로 보여주는 필드
+- 값은 `string[]`. `creatable`이면 검색어로 새 항목을 만든다
+- `TextField`와 같은 sentinel 합성: 앞뒤에 아이콘이나 버튼을 붙인다
+- `Field`, react-hook-form(`controlMode="value"`)과 연결된다
 
 ```tsx
 import { ChipField, Field } from '@gsainfoteam/ids-react';

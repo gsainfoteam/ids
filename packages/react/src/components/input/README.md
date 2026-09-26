@@ -1,6 +1,8 @@
 # Input
 
-스키마의 `type` 하나로 알맞은 IDS 필드를 고르는 편의 컴포넌트.
+- 스키마의 `type` 하나로 알맞은 IDS 필드를 고르는 편의 컴포넌트
+- `TextField`, `PasswordField`, `NumberField`, `TelField`에 위임한다
+- `type="search"`에는 지우기 버튼이 붙는다
 
 ```tsx
 import { Field, Input } from '@gsainfoteam/ids-react';
@@ -22,7 +24,8 @@ import { Field, Input } from '@gsainfoteam/ids-react';
 <Input type="tel" value={phone} onChange={setPhone} />                   // TelField. string
 ```
 
-props, ref, `disabled`/`readOnly`, `Field` 크기와 ARIA 연결은 위임한 필드로 그대로 간다. `variant`도 해당 필드의 것을 쓴다.
+- props, ref, `disabled`/`readOnly`, `Field` 크기와 ARIA 연결은 위임한 필드로 그대로 간다
+- `variant`도 해당 필드의 것을 쓴다
 
 ## 합성
 
