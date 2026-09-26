@@ -1,165 +1,227 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { FormProvider, useForm } from 'react-hook-form';
-import { expect, waitFor } from 'storybook/test';
-import { z } from 'zod';
+import {
+  BoldIcon,
+  ItalicIcon,
+  PaperAirplaneIcon,
+  PaperClipIcon,
+  PhotoIcon,
+  UnderlineIcon,
+} from '@heroicons/react/24/outline';
+import { expect } from 'storybook/test';
 
-import { Field as FormField } from '../../react-hook-form';
 import { Button } from '../button';
-import { Field } from '../field';
+import { IconButton } from '../icon-button';
+import { Label } from '../label';
 
 import { TextArea } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const meta = {
+const variants = ['outline', 'filled', 'underline'] as const;
+const sizes = ['standard', 'tiny'] as const;
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="flex flex-col gap-2">
+      <h3 className="text-xs font-semibold tracking-wide text-(--ids-color-on-muted) uppercase">
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
+}
+
+const meta: Meta<typeof TextArea> = {
   title: 'Components/TextArea',
   component: TextArea,
   tags: ['autodocs'],
+  argTypes: {
+    variant: { control: 'radio', options: [...variants] },
+    size: { control: 'radio', options: [...sizes] },
+    disabled: { control: 'boolean' },
+    autoResize: { control: 'boolean' },
+    placeholder: { control: 'text' },
+  },
   args: {
-    'aria-label': '내용',
-    placeholder: '내용을 입력하세요',
     variant: 'outline',
     size: 'standard',
+    placeholder: '내용을 입력하세요',
   },
-} satisfies Meta<typeof TextArea>;
+};
+
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof TextArea>;
 
 export const Playground: Story = {};
-export const Variants: Story = {
+
+export const Gallery: Story = {
   render: () => (
-    <div className="grid w-80 gap-4">
-      {(['outline', 'filled', 'unstyled'] as const).map((variant) => (
-        <Field key={variant}>
-          <Field.Label>{variant}</Field.Label>
-          <TextArea variant={variant} placeholder={variant} />
-        </Field>
-      ))}
-      <TextArea aria-label="Disabled" disabled defaultValue="비활성화" />
-      <TextArea aria-label="Read only" readOnly defaultValue="읽기 전용" />
-      <Field invalid size="tiny">
-        <Field.Label>오류</Field.Label>
-        <TextArea />
-        <Field.Error>내용을 확인하세요.</Field.Error>
-      </Field>
+    <div className="flex max-w-md flex-col gap-8">
+      <Section title="Bare">
+        <TextArea placeholder="내용을 입력하세요" />
+      </Section>
+
+      <Section title="Size">
+        <div className="flex flex-col gap-3">
+          {sizes.map((size) => (
+            <TextArea key={size} size={size} placeholder={`${size} area`} />
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Variant">
+        <div className="flex flex-col gap-3">
+          {variants.map((variant) => (
+            <TextArea key={variant} variant={variant} placeholder={`${variant} area`} />
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Menubar (top)">
+        <TextArea placeholder="마크다운으로 작성하세요">
+          <div className="flex gap-1">
+            <IconButton variant="ghost" aria-label="굵게" icon={<BoldIcon />} />
+            <IconButton variant="ghost" aria-label="기울임" icon={<ItalicIcon />} />
+            <IconButton variant="ghost" aria-label="밑줄" icon={<UnderlineIcon />} />
+          </div>
+          <TextArea.Input />
+        </TextArea>
+      </Section>
+
+      <Section title="Actionbar (bottom)">
+        <ChatComposer />
+      </Section>
+
+      <Section title="Counter (bottom)">
+        <CountedArea />
+      </Section>
+
+      <Section title="Menubar + actionbar">
+        <TextArea placeholder="마크다운 지원">
+          <div className="flex gap-1">
+            <IconButton variant="ghost" aria-label="굵게" icon={<BoldIcon />} />
+            <IconButton variant="ghost" aria-label="기울임" icon={<ItalicIcon />} />
+          </div>
+          <TextArea.Input className="font-mono" />
+          <div className="flex w-full items-center justify-between">
+            <span className="text-body-b3-regular">마크다운 지원</span>
+            <Button size="tiny">저장</Button>
+          </div>
+        </TextArea>
+      </Section>
+
+      <Section title="Fixed height with a resize handle">
+        <TextArea autoResize={false} resize="vertical" rows={4} placeholder="직접 늘려보세요" />
+      </Section>
+
+      <Section title="Disabled">
+        <TextArea disabled defaultValue="수정 불가" />
+      </Section>
     </div>
   ),
 };
 
-function GrowingExample() {
-  const [value, setValue] = useState('');
-  return (
-    <div className="w-80">
-      <Field>
-        <Field.Label>메모</Field.Label>
-        <TextArea
-          autoResize
-          minRows={2}
-          maxRows={4}
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-        >
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              onClick={() => setValue('첫째\n둘째\n셋째\n넷째\n다섯째\n여섯째')}
-            >
-              긴 내용
-            </Button>
-            <Button type="button" onClick={() => setValue('')}>
-              비우기
-            </Button>
-          </div>
-          <TextArea.Input />
-          <output aria-label="글자 수">{value.length}자</output>
-        </TextArea>
-        <Field.Hint>2–4줄 자동 높이</Field.Hint>
-      </Field>
+export const AutoHeight: Story = {
+  render: () => (
+    <div className="flex max-w-xs flex-col gap-2">
+      <Label htmlFor="text-area-bio">자기소개</Label>
+      <TextArea id="text-area-bio" rows={1} maxRows={5} placeholder="자신을 소개해주세요" />
     </div>
-  );
-}
-export const AutoResize: Story = {
-  render: () => <GrowingExample />,
+  ),
   play: async ({ canvas, userEvent }) => {
-    const input = canvas.getByRole('textbox', { name: '메모' });
-    const initial = input.getBoundingClientRect().height;
-    await userEvent.click(canvas.getByText('메모', { selector: 'label' }));
-    await expect(input).toHaveFocus();
-    await userEvent.click(canvas.getByRole('button', { name: '긴 내용' }));
-    await expect(input).toHaveValue('첫째\n둘째\n셋째\n넷째\n다섯째\n여섯째');
-    await expect(input.getBoundingClientRect().height).toBeGreaterThan(initial);
-    await expect(getComputedStyle(input).overflowY).toBe('auto');
-    await expect(getComputedStyle(input).resize).toBe('none');
-    const css = getComputedStyle(input);
-    const max =
-      4 * parseFloat(css.lineHeight) + parseFloat(css.paddingTop) + parseFloat(css.paddingBottom);
-    await expect(input.getBoundingClientRect().height).toBeCloseTo(max, 0);
-    await userEvent.click(canvas.getByRole('button', { name: '비우기' }));
-    await expect(input.getBoundingClientRect().height).toBeCloseTo(initial, 0);
-    await userEvent.type(input, '한글 메모');
-    await expect(canvas.getByLabelText('글자 수')).toHaveTextContent('5자');
+    const input = canvas.getByRole('textbox', { name: '자기소개' });
+    const start = input.clientHeight;
+
+    await userEvent.type(input, '한 줄\n두 줄\n세 줄');
+    const grown = input.clientHeight;
+    await expect(grown).toBeGreaterThan(start);
+    await expect(input.scrollHeight).toBe(grown);
+
+    await userEvent.type(input, '\n네 줄\n다섯 줄\n여섯 줄\n일곱 줄');
+    await expect(input.clientHeight).toBeLessThan(input.scrollHeight);
+    await expect(input.clientHeight).toBe(grown + 2 * 22);
   },
 };
 
-const schema = z.object({
-  description: z
-    .string()
-    .trim()
-    .min(10, '10자 이상 작성하세요.')
-    .max(200, '200자 이내로 작성하세요.'),
-});
-function FormExample() {
-  const methods = useForm({ resolver: zodResolver(schema), defaultValues: { description: '' } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="grid w-80 gap-3"
-        noValidate
-        onSubmit={methods.handleSubmit((values) => setResult(values.description))}
-      >
-        <FormField name="description" required>
-          <FormField.Label>소개</FormField.Label>
-          <TextArea autoResize minRows={2} maxRows={5} />
-          <FormField.Hint>10–200자</FormField.Hint>
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">제출</Button>
-        <Button
-          type="button"
-          onClick={() => {
-            methods.reset();
-            setResult('');
-          }}
-        >
-          초기화
-        </Button>
-        <output aria-label="제출 내용">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-export const ZodForm: Story = {
-  render: () => <FormExample />,
-  play: async ({ canvas, userEvent }) => {
-    const input = canvas.getByRole('textbox', { name: '소개' });
-    const initial = input.getBoundingClientRect().height;
-    await userEvent.click(canvas.getByRole('button', { name: '제출' }));
-    await expect(await canvas.findByText('10자 이상 작성하세요.')).toBeVisible();
-    await expect(input).toHaveFocus();
-    await expect(input).toHaveAccessibleDescription('10자 이상 작성하세요.');
-    await userEvent.type(
-      input,
-      '첫 번째 소개입니다.{enter}두 번째 줄입니다.{enter}세 번째 줄입니다.{enter}네 번째 줄입니다.',
-    );
-    await expect(input.getBoundingClientRect().height).toBeGreaterThan(initial);
-    await userEvent.click(canvas.getByRole('button', { name: '제출' }));
-    await expect(canvas.getByLabelText('제출 내용')).toHaveTextContent('첫 번째 소개입니다.');
-    await userEvent.click(canvas.getByRole('button', { name: '초기화' }));
-    await expect(input).toHaveValue('');
-    await waitFor(() => expect(input.getBoundingClientRect().height).toBeCloseTo(initial, 0));
-    await expect(canvas.getByLabelText('제출 내용')).toBeEmptyDOMElement();
+export const Sentinel: Story = {
+  render: () => (
+    <TextArea className="max-w-xs" aria-label="본문" placeholder="본문">
+      <span>위</span>
+      <TextArea.Input />
+      <span>아래</span>
+    </TextArea>
+  ),
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole('textbox', { name: '본문' });
+    const root = input.closest('[data-text-area]')!;
+
+    await expect(root.querySelector('[data-text-area-top]')).toHaveTextContent('위');
+    await expect(root.querySelector('[data-text-area-bottom]')).toHaveTextContent('아래');
+    await expect(input.previousElementSibling).toHaveAttribute('data-text-area-top');
+    await expect(input.nextElementSibling).toHaveAttribute('data-text-area-bottom');
   },
 };
+
+export const WithLabel: Story = {
+  render: () => (
+    <Label className="flex max-w-xs flex-col gap-2">
+      메모
+      <TextArea name="memo" placeholder="메모를 입력하세요" />
+    </Label>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('textbox', { name: '메모' });
+    await userEvent.click(canvas.getByText('메모'));
+    await expect(input).toHaveFocus();
+  },
+};
+
+function ChatComposer() {
+  const [message, setMessage] = useState('');
+
+  return (
+    <TextArea
+      value={message}
+      onChange={(e) => setMessage(e.target.value)}
+      rows={1}
+      maxRows={6}
+      placeholder="메시지 입력..."
+      aria-label="메시지"
+    >
+      <TextArea.Input />
+      <div className="flex w-full items-center justify-between">
+        <div className="flex gap-1">
+          <IconButton variant="ghost" aria-label="첨부" icon={<PaperClipIcon />} />
+          <IconButton variant="ghost" aria-label="이미지" icon={<PhotoIcon />} />
+        </div>
+        <IconButton
+          aria-label="보내기"
+          variant="solid"
+          icon={<PaperAirplaneIcon />}
+          disabled={message === ''}
+          onClick={() => setMessage('')}
+        />
+      </div>
+    </TextArea>
+  );
+}
+
+function CountedArea() {
+  const [value, setValue] = useState('');
+
+  return (
+    <TextArea
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      maxLength={200}
+      placeholder="200자 이내로 작성하세요"
+      aria-label="소개"
+    >
+      <TextArea.Input />
+      <div className="flex w-full justify-end">
+        <span className="text-body-b3-regular">{value.length} / 200</span>
+      </div>
+    </TextArea>
+  );
+}

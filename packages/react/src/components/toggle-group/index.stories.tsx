@@ -1,13 +1,13 @@
 import { useState, type ReactNode } from 'react';
 
 import {
-  TextBIcon,
-  TextItalicIcon,
-  TextUnderlineIcon,
-  TextAlignLeftIcon,
-  TextAlignCenterIcon,
-  TextAlignRightIcon,
-} from '@phosphor-icons/react';
+  BoldIcon,
+  ItalicIcon,
+  UnderlineIcon,
+  Bars3BottomLeftIcon,
+  Bars3Icon,
+  Bars3BottomRightIcon,
+} from '@heroicons/react/24/outline';
 
 import { IconToggle } from '../icon-toggle';
 import { Toggle } from '../toggle';
@@ -123,7 +123,7 @@ export const Gallery: Story = {
                       value="left"
                       aria-label={`${variant} 왼쪽`}
                       variant={variant}
-                      icon={<TextAlignLeftIcon weight="bold" />}
+                      icon={<Bars3BottomLeftIcon />}
                     />
                     <Toggle value="center" variant={variant}>
                       Center
@@ -132,7 +132,7 @@ export const Gallery: Story = {
                       value="right"
                       aria-label={`${variant} 오른쪽`}
                       variant={variant}
-                      icon={<TextAlignRightIcon weight="bold" />}
+                      icon={<Bars3BottomRightIcon />}
                     />
                   </ToggleGroup>
                 ))}
@@ -151,13 +151,13 @@ export const Gallery: Story = {
                     value="bold"
                     aria-label={`${variant} 굵게`}
                     variant={variant}
-                    icon={<TextBIcon weight="bold" />}
+                    icon={<BoldIcon />}
                   />
                   <IconToggle
                     value="italic"
                     aria-label={`${variant} 기울임`}
                     variant={variant}
-                    icon={<TextItalicIcon weight="bold" />}
+                    icon={<ItalicIcon />}
                   />
                   <ToggleGroup.Separator />
                   <Toggle value="quote" variant={variant}>
@@ -167,7 +167,7 @@ export const Gallery: Story = {
                     value="underline"
                     aria-label={`${variant} 밑줄`}
                     variant={variant}
-                    icon={<TextUnderlineIcon weight="bold" />}
+                    icon={<UnderlineIcon />}
                   />
                 </ToggleGroup>
               </Row>
@@ -177,21 +177,9 @@ export const Gallery: Story = {
 
         <Section title="Single (radio)">
           <ToggleGroup type="single" value={align} onValueChange={setAlign}>
-            <IconToggle
-              value="left"
-              aria-label="왼쪽 정렬"
-              icon={<TextAlignLeftIcon weight="bold" />}
-            />
-            <IconToggle
-              value="center"
-              aria-label="가운데 정렬"
-              icon={<TextAlignCenterIcon weight="bold" />}
-            />
-            <IconToggle
-              value="right"
-              aria-label="오른쪽 정렬"
-              icon={<TextAlignRightIcon weight="bold" />}
-            />
+            <IconToggle value="left" aria-label="왼쪽 정렬" icon={<Bars3BottomLeftIcon />} />
+            <IconToggle value="center" aria-label="가운데 정렬" icon={<Bars3Icon />} />
+            <IconToggle value="right" aria-label="오른쪽 정렬" icon={<Bars3BottomRightIcon />} />
           </ToggleGroup>
           <p className="font-mono text-xs text-(--ids-color-on-muted)">
             align: {align || '(none)'}
@@ -200,18 +188,10 @@ export const Gallery: Story = {
 
         <Section title="Multiple (bold + italic)">
           <ToggleGroup type="multiple" value={marks} onValueChange={setMarks}>
-            <IconToggle value="bold" aria-label="굵게" icon={<TextBIcon weight="bold" />} />
-            <IconToggle
-              value="italic"
-              aria-label="기울임"
-              icon={<TextItalicIcon weight="bold" />}
-            />
+            <IconToggle value="bold" aria-label="굵게" icon={<BoldIcon />} />
+            <IconToggle value="italic" aria-label="기울임" icon={<ItalicIcon />} />
             <ToggleGroup.Separator />
-            <IconToggle
-              value="underline"
-              aria-label="밑줄"
-              icon={<TextUnderlineIcon weight="bold" />}
-            />
+            <IconToggle value="underline" aria-label="밑줄" icon={<UnderlineIcon />} />
           </ToggleGroup>
           <p className="font-mono text-xs text-(--ids-color-on-muted)">
             marks: {JSON.stringify([...marks])}
@@ -238,12 +218,8 @@ export const Gallery: Story = {
 
         <Section title="Disabled">
           <ToggleGroup type="multiple" defaultValue={new Set(['bold'])} disabled>
-            <IconToggle value="bold" aria-label="굵게" icon={<TextBIcon weight="bold" />} />
-            <IconToggle
-              value="italic"
-              aria-label="기울임"
-              icon={<TextItalicIcon weight="bold" />}
-            />
+            <IconToggle value="bold" aria-label="굵게" icon={<BoldIcon />} />
+            <IconToggle value="italic" aria-label="기울임" icon={<ItalicIcon />} />
           </ToggleGroup>
         </Section>
       </div>

@@ -48,6 +48,22 @@ export const WrappingControl: Story = {
   },
 };
 
+export const WrappingTextField: Story = {
+  render: () => (
+    <Label className="flex max-w-xs flex-col gap-2">
+      이름
+      <TextField name="name" placeholder="이름을 입력하세요" />
+    </Label>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole('textbox', { name: '이름' });
+    await userEvent.click(canvas.getByText('이름'));
+    await expect(input).toHaveFocus();
+    await userEvent.type(input, '인포팀');
+    await expect(input).toHaveValue('인포팀');
+  },
+};
+
 export const DisabledControl: Story = {
   render: () => (
     <div className="flex max-w-xs flex-col gap-2">

@@ -1,3 +1,7 @@
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# 문서의 JSX 예제는 최상위 요소가 여러 개라 파싱되지 않는다. 파싱되는 일부만
+# 세미콜론이 붙어 오히려 예제끼리 어긋난다.
+src/components/*/README.md

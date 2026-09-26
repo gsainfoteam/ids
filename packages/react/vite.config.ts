@@ -24,12 +24,9 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
-        '@heroicons/react/24/outline',
-        '@heroicons/react/24/solid',
-        'react',
-        'react/jsx-runtime',
-        'react/jsx-dev-runtime',
-        'react-dom',
+        /^react($|\/)/,
+        /^react-dom($|\/)/,
+        /^@heroicons\/react($|\/)/,
         'react-hook-form',
         'tailwindcss',
       ],

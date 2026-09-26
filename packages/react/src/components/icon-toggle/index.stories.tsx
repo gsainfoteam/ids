@@ -1,6 +1,13 @@
 import { useState, type ReactNode } from 'react';
 
-import { BellIcon, HeartIcon, ListIcon, SquaresFourIcon, StarIcon } from '@phosphor-icons/react';
+import {
+  BellIcon,
+  HeartIcon,
+  ListBulletIcon,
+  Squares2X2Icon,
+  StarIcon,
+} from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconSolid, StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 
 import { IconToggle } from '.';
 
@@ -38,7 +45,7 @@ const meta: Meta<typeof IconToggle> = {
     'aria-label': '즐겨찾기',
     variant: 'ghost',
     size: 'standard',
-    icon: <StarIcon weight="bold" />,
+    icon: <StarIcon />,
   },
 };
 
@@ -66,7 +73,7 @@ export const Gallery: Story = {
                   variant={variant}
                   size={size}
                   aria-label={`${variant} 토글`}
-                  icon={<StarIcon weight="bold" />}
+                  icon={<StarIcon />}
                 />
               ))}
             </Row>
@@ -81,7 +88,7 @@ export const Gallery: Story = {
                 variant={variant}
                 defaultPressed
                 aria-label={`${variant} on`}
-                icon={<StarIcon weight="fill" />}
+                icon={<StarIconSolid />}
               />
             ))}
           </Row>
@@ -94,14 +101,9 @@ export const Gallery: Story = {
               pressed={liked}
               onPressedChange={setLiked}
               variant={(s) => (s.pressed ? 'soft' : 'ghost')}
-              icon={(s) => <HeartIcon weight={s.pressed ? 'fill' : 'bold'} />}
+              icon={(s) => (s.pressed ? <HeartIconSolid /> : <HeartIcon />)}
             />
-            <IconToggle
-              aria-label="알림"
-              defaultPressed
-              variant="outline"
-              icon={<BellIcon weight="bold" />}
-            />
+            <IconToggle aria-label="알림" defaultPressed variant="outline" icon={<BellIcon />} />
           </Row>
         </Section>
 
@@ -111,13 +113,13 @@ export const Gallery: Story = {
               aria-label="리스트"
               pressed={layout === 'list'}
               onPressedChange={(on) => on && setLayout('list')}
-              icon={<ListIcon weight="bold" />}
+              icon={<ListBulletIcon />}
             />
             <IconToggle
               aria-label="그리드"
               pressed={layout === 'grid'}
               onPressedChange={(on) => on && setLayout('grid')}
-              icon={<SquaresFourIcon weight="bold" />}
+              icon={<Squares2X2Icon />}
             />
           </Row>
           <p className="text-xs text-(--ids-color-on-muted)">layout: {layout}</p>
@@ -125,8 +127,8 @@ export const Gallery: Story = {
 
         <Section title="Disabled">
           <Row>
-            <IconToggle disabled aria-label="off" icon={<StarIcon weight="bold" />} />
-            <IconToggle disabled defaultPressed aria-label="on" icon={<StarIcon weight="fill" />} />
+            <IconToggle disabled aria-label="off" icon={<StarIcon />} />
+            <IconToggle disabled defaultPressed aria-label="on" icon={<StarIconSolid />} />
           </Row>
         </Section>
       </div>

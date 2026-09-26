@@ -9,7 +9,7 @@ import { Kbd } from '@gsainfoteam/ids-react';
 <Kbd size="tiny">Esc</Kbd>
 ```
 
-네이티브 `<kbd>`로 키 입력을 표시한다. `size`는 `standard`(기본) 또는 `tiny`이며,
+native `<kbd>`로 키 입력을 표시한다. `size`는 `standard`(기본) 또는 `tiny`이며,
 기존 caption 타이포그래피, muted 배경, on-surface 글자색, outline 테두리를 사용한다.
 키 조합은 Kbd 여러 개와 텍스트로 합성한다. 기호의 설명이 필요하면
 `<Kbd><abbr title="Command">⌘</abbr></Kbd>`처럼 의미를 함께 전달한다.
