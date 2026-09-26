@@ -142,8 +142,8 @@ export namespace TextArea {
         // Not transition-all: the root carries the resize handle, and animating its
         // width/height makes the field lag behind the pointer while dragging.
         'bg-transparent text-(--ids-color-on-surface)',
-        'transition-[color,background-color,border-color,outline-color,outline-width,outline-offset,box-shadow,opacity]',
-        'data-disabled:cursor-not-allowed data-disabled:opacity-40',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
       ],
       bar: [
         'flex shrink-0 items-center empty:hidden',
@@ -163,20 +163,13 @@ export namespace TextArea {
     variants: {
       variant: {
         outline: {
-          root: [
-            'inset-ring-1 inset-ring-(--ids-color-outline)',
-            'has-[[data-text-area-input]:focus-visible]:outline-2',
-            'has-[[data-text-area-input]:focus-visible]:outline-offset-2',
-            'has-[[data-text-area-input]:focus-visible]:outline-(--ids-color-primary)',
-          ],
+          root: ['shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)', 'focus-ring'],
         },
         filled: {
           root: [
             'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
             'has-[[data-text-area-input]:focus-visible]:bg-(--ids-color-primary)/15',
-            'has-[[data-text-area-input]:focus-visible]:outline-2',
-            'has-[[data-text-area-input]:focus-visible]:outline-offset-2',
-            'has-[[data-text-area-input]:focus-visible]:outline-(--ids-color-primary)',
+            'focus-ring',
           ],
         },
         underline: {
@@ -188,14 +181,14 @@ export namespace TextArea {
       },
       size: {
         standard: {
-          root: 'text-body-b2-regular',
-          bar: 'gap-1 px-3 py-2 [&_svg]:size-5',
-          input: 'px-3 [--ids-text-area-pad-y:0.625rem]',
+          root: 'text-body-b3-regular',
+          bar: 'gap-1 px-3 py-2 [&_svg]:size-(--ids-size-icon-standard)',
+          input: 'px-3 [--ids-text-area-pad-y:0.5rem]',
         },
         tiny: {
-          root: 'text-body-b3-regular',
-          bar: 'gap-0.5 px-2 py-1.5 [&_svg]:size-4',
-          input: 'px-2 [--ids-text-area-pad-y:0.375rem]',
+          root: 'text-caption-c1-regular',
+          bar: 'gap-0.5 px-2 py-1.5 [&_svg]:size-(--ids-size-icon-tiny)',
+          input: 'px-2 [--ids-text-area-pad-y:0.5rem]',
         },
       },
       position: {
@@ -216,10 +209,10 @@ export namespace TextArea {
       },
     },
     compoundVariants: [
-      { variant: 'outline', size: 'standard', class: { root: 'rounded-xl' } },
-      { variant: 'outline', size: 'tiny', class: { root: 'rounded-lg' } },
-      { variant: 'filled', size: 'standard', class: { root: 'rounded-xl' } },
-      { variant: 'filled', size: 'tiny', class: { root: 'rounded-lg' } },
+      { variant: 'outline', size: 'standard', class: { root: 'rounded-md' } },
+      { variant: 'outline', size: 'tiny', class: { root: 'rounded-sm' } },
+      { variant: 'filled', size: 'standard', class: { root: 'rounded-md' } },
+      { variant: 'filled', size: 'tiny', class: { root: 'rounded-sm' } },
     ],
     defaultVariants: {
       variant: 'outline',
