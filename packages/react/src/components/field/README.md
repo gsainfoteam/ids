@@ -98,7 +98,7 @@ FormProvider.defaultValues와 RHF 상태가 우선합니다. 두 모드에서 �
 
 - Notion의 Hint/Error 동시 선언 경고는 상태별 표시 전환 예제와 모순되어 경고하지 않습니다. 실제 중복 anatomy만 경고합니다.
 - RHF 선택 설치와 동기 FormProvider 자동 감지를 함께 보장하기 위해 import subpath를 분리했습니다.
-- size는 main의 standard/tiny를 유지합니다. 색상은 main 토큰을 사용하며 미정인 danger 토큰은 `--ids-field-danger`로 조정할 수 있습니다. 기본 fallback은 light `#b42318`, dark `#fda29b`입니다. 디자인 확정 토큰은 후속 반영합니다.
+- size는 main의 standard/tiny를 유지합니다. 오류 색상은 light/dark를 따르는 `--ids-color-danger` 토큰을 사용합니다.
 - 미병합 Slot PR을 복제하지 않고 기존 mergeProps/cloneElement를 사용합니다.
 - 현 main TextField 및 native 입력과 검증했습니다. 미병합 sentinel TextField, 아직 없는 Select 등은 최종 입력으로 prop/ref를 전달하는 계약을 충족해야 합니다.
 

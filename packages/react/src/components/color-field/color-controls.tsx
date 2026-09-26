@@ -9,6 +9,7 @@ import {
   type ColorFormat,
   type RGBA,
 } from './color';
+import { tv } from '../../utils';
 export type ColorControlsProps = {
   value: string;
   onChange: (value: string) => void;
@@ -48,9 +49,10 @@ export function ColorControls({
         1 - clamp((event.clientY - rect.top) / rect.height),
       );
   };
+  const styles = Style({ size });
   const gradient = 'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)';
   return (
-    <div className="grid gap-3 p-1" data-color-controls="">
+    <div className={styles.root()} data-color-controls="">
       {variant === 'default' && (
         <div
           role="slider"
@@ -60,9 +62,8 @@ export function ColorControls({
           aria-valuemax={100}
           aria-valuenow={Math.round(saturation * 100)}
           aria-valuetext={`채도 ${Math.round(saturation * 100)}%, 명도 ${Math.round(hsv.v * 100)}%`}
-          className="relative w-full touch-none overflow-hidden rounded-lg outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--ids-color-primary)"
+          className={styles.area()}
           style={{
-            height: size === 'tiny' ? 140 : 200,
             background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent), hsl(${hue}, 100%, 50%)`,
           }}
           onPointerDown={(event) => {
@@ -103,7 +104,7 @@ export function ColorControls({
         >
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
+            className={styles.thumb()}
             style={{
               left: `${saturation * 100}%`,
               top: `${(1 - hsv.v) * 100}%`,
@@ -114,7 +115,7 @@ export function ColorControls({
       )}
       {variant !== 'swatchOnly' && (
         <>
-          <label className="grid gap-1 text-xs">
+          <label className={styles.label()}>
             색조
             <input
               type="range"
@@ -124,11 +125,11 @@ export function ColorControls({
               value={Math.round(hue)}
               onChange={(e) => setHsv(Number(e.target.value), saturation, hsv.v)}
               style={{ background: gradient }}
-              className="h-4 w-full cursor-pointer appearance-none rounded-full"
+              className={styles.hue()}
             />
           </label>
           {alpha && (
-            <label className="grid gap-1 text-xs">
+            <label className={styles.label()}>
               투명도
               <input
                 type="range"
@@ -140,7 +141,7 @@ export function ColorControls({
               />
             </label>
           )}
-          <label className="grid gap-1 text-xs">
+          <label className={styles.label()}>
             색상 값
             <input
               type="text"
@@ -150,7 +151,7 @@ export function ColorControls({
               placeholder={
                 format === 'hex' ? '#RRGGBB' : format === 'rgb' ? 'rgb(0, 0, 0)' : 'hsl(0, 0%, 0%)'
               }
-              className="h-9 min-w-0 rounded-lg border border-(--ids-color-outline) bg-transparent px-2 text-sm"
+              className={styles.input()}
               onChange={(e) => {
                 const raw = e.target.value;
                 const parsed = parseColor(raw);
@@ -170,7 +171,7 @@ export function ColorControls({
         </>
       )}
       {!!swatches?.length && (
-        <div role="group" aria-label="색상 팔레트" className="flex flex-wrap gap-2">
+        <div role="group" aria-label="색상 팔레트" className={styles.swatches()}>
           {swatches.map((swatch, index) => {
             const parsed = parseColor(swatch);
             if (!parsed) return null;
@@ -183,7 +184,7 @@ export function ColorControls({
                 aria-pressed={normalized === value}
                 title={swatch}
                 onClick={() => emit(parsed)}
-                className="size-7 rounded-md border border-(--ids-color-outline) outline-offset-2 focus-visible:outline-2 aria-pressed:outline-2 aria-pressed:outline-(--ids-color-primary)"
+                className={styles.swatch()}
                 style={{ backgroundColor: serializeColor(parsed, 'rgb', true) }}
               />
             );
@@ -191,8 +192,46 @@ export function ColorControls({
         </div>
       )}
       {variant === 'swatchOnly' && !swatches?.length && (
-        <p className="text-sm">선택 가능한 색상이 없습니다.</p>
+        <p className={styles.empty()}>선택 가능한 색상이 없습니다.</p>
       )}
     </div>
   );
 }
+
+const Style = tv({
+  slots: {
+    root: 'grid gap-3 p-1',
+    area: 'focus-ring relative w-full touch-none overflow-hidden rounded-md',
+    thumb:
+      'pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow',
+    label: 'grid gap-1 text-caption-c1-regular',
+    hue: 'focus-ring h-4 w-full cursor-pointer appearance-none rounded-full',
+    input: [
+      'min-w-0 bg-transparent text-(--ids-color-on-surface) shadow-xs',
+      'inset-ring-1 inset-ring-(--ids-color-outline) aria-invalid:inset-ring-(--ids-color-danger)',
+      'focus-ring transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+    ],
+    swatches: 'flex flex-wrap gap-2',
+    // The selected ring sits behind a surface-colored gap so it stays visible against a swatch of
+    // the same hue as the primary color.
+    swatch: [
+      'size-7 cursor-pointer rounded-sm inset-ring-1 inset-ring-(--ids-color-outline)',
+      'aria-pressed:ring-2 aria-pressed:ring-(--ids-color-primary) aria-pressed:ring-offset-2 aria-pressed:ring-offset-(--ids-color-surface)',
+      'focus-ring',
+    ],
+    empty: 'text-body-b3-regular',
+  },
+  variants: {
+    size: {
+      standard: {
+        area: 'h-50',
+        input: 'h-(--ids-size-control-standard) rounded-md px-3 text-body-b3-regular',
+      },
+      tiny: {
+        area: 'h-35',
+        input: 'h-(--ids-size-control-tiny) rounded-sm px-2 text-caption-c1-regular',
+      },
+    },
+  },
+  defaultVariants: { size: 'standard' },
+});

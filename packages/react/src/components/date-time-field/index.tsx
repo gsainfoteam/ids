@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { invariant } from '../../utils';
+import { invariant, tv } from '../../utils';
 import { Calendar, type CalendarOptions } from '../calendar';
 import { dayKey, dayOnly, sameDay } from '../calendar/date';
 import {
@@ -9,6 +9,7 @@ import {
   TemporalValue,
   TemporalContent,
   TemporalClear,
+  temporalFieldStyle,
   type TemporalFieldProps,
   type TriggerProps as SharedTriggerProps,
   type ValueProps as SharedValueProps,
@@ -34,6 +35,14 @@ export type DateTimeFieldProps = Omit<TemporalFieldProps, 'disabled'> &
     step?: number;
     pickerVariant?: 'grid' | 'wheel';
   };
+const Style = tv({
+  slots: {
+    layout: 'flex flex-col gap-4 sm:flex-row',
+    date: 'min-w-0 flex-1',
+    time: 'min-w-0 sm:w-52',
+    hint: 'mt-2 text-body-b3-regular text-(--ids-color-on-muted)',
+  },
+});
 function dayBounds(day: Date, min?: Date, max?: Date): { min?: Date; max?: Date } | null {
   const key = dayKey(day);
   if ((min && key < dayKey(min)) || (max && key > dayKey(max))) return null;
@@ -100,9 +109,10 @@ export function DateTimeField({
         };
         const bounds = dayBounds(base, min, max),
           unavailable = dayDisabled(base);
+        const styles = Style();
         return (
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <div className="min-w-0 flex-1">
+          <div className={styles.layout()}>
+            <div className={styles.date()}>
               <Calendar
                 value={value}
                 onChange={(day) => {
@@ -123,7 +133,7 @@ export function DateTimeField({
                 size={props.size}
               />
             </div>
-            <div className="min-w-0 sm:w-52">
+            <div className={styles.time()}>
               <TimePicker
                 value={withTime(
                   base,
@@ -143,7 +153,7 @@ export function DateTimeField({
                 variant={pickerVariant}
                 disabled={unavailable}
               />
-              {unavailable && <p className="mt-2 text-sm">선택 가능한 날짜를 먼저 고르세요.</p>}
+              {unavailable && <p className={styles.hint()}>선택 가능한 날짜를 먼저 고르세요.</p>}
             </div>
           </div>
         );
@@ -161,4 +171,5 @@ export namespace DateTimeField {
     Value = TemporalValue,
     Content = TemporalContent,
     Clear = TemporalClear;
+  export const Style = temporalFieldStyle;
 }

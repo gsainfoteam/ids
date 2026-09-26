@@ -97,7 +97,7 @@ function PasswordVisibilityToggle({
       size={context.size}
       variant="ghost"
       aria-label={internal['aria-label']!}
-      className="size-7 min-w-0 shrink-0 p-1"
+      className={PasswordField.Style({ size: context.size }).toggle()}
       icon={context.visible ? <EyeSlashIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />}
     />
   );
@@ -115,6 +115,7 @@ export function PasswordField({
   ...rootProps
 }: PasswordFieldProps) {
   const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = PasswordField.Style({ variant, size: resolvedSize });
   const generatedId = useId();
   const [visible, setVisible] = useState(false);
   const parts = flatten(children);
@@ -210,7 +211,7 @@ export function PasswordField({
     autoCapitalize: native.autoCapitalize ?? 'none',
     'aria-invalid': ariaInvalid,
     ...{ 'data-password-field-input': '', 'data-size': resolvedSize },
-    className: inputStyle({ className: native.className }),
+    className: styles.input({ className: native.className }),
   };
   // cloneElement forwards a callback ref without reading ref.current.
   // eslint-disable-next-line react-hooks/refs
@@ -249,17 +250,17 @@ export function PasswordField({
         data-invalid={
           ariaInvalid != null && ariaInvalid !== false && ariaInvalid !== 'false' ? '' : undefined
         }
-        className={PasswordField.Style({ variant, size: resolvedSize, className })}
+        className={styles.root({ className })}
         style={style}
       >
         {lead.length > 0 && (
-          <div data-password-field-part="lead" className="inline-flex shrink-0 items-center gap-1">
+          <div data-password-field-part="lead" className={styles.part()}>
             {lead}
           </div>
         )}
         {input}
         {trail.length > 0 && (
-          <div data-password-field-part="trail" className="inline-flex shrink-0 items-center gap-1">
+          <div data-password-field-part="trail" className={styles.part()}>
             {trail}
           </div>
         )}
@@ -268,9 +269,6 @@ export function PasswordField({
     </Context.Provider>
   );
 }
-const inputStyle = tv({
-  base: 'h-full w-full min-w-0 flex-1 border-0 bg-transparent text-inherit outline-none placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
-});
 export namespace PasswordField {
   export type Props = PasswordFieldProps;
   export type InputProps = Omit<NativeProps, 'type' | 'size'> & { asChild?: boolean };
@@ -278,33 +276,60 @@ export namespace PasswordField {
   export const Input = PasswordInput;
   export const VisibilityToggle = PasswordVisibilityToggle;
   export const Style = tv({
-    base: [
-      'inline-flex w-full min-w-0 items-center gap-2 text-(--ids-color-on-surface)',
-      '[--ids-password-field-danger:var(--ids-field-danger,#b42318)]',
-      '[[data-mode=dark]_&]:[--ids-password-field-danger:var(--ids-field-danger,#fda29b)]',
-      'data-disabled:cursor-not-allowed data-disabled:opacity-40',
-      'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2',
-      'has-[:focus-visible]:outline-(--ids-color-primary)',
-    ],
+    slots: {
+      root: [
+        'inline-flex w-full min-w-0 items-center',
+        'bg-transparent text-(--ids-color-on-surface)',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+        'motion-reduce:transition-none',
+        // The ring keys off the input alone so tabbing onto the visibility toggle rings
+        // only that button, not the whole shell as well.
+        'has-[[data-password-field-input]:focus-visible]:ring-[3px]',
+        'has-[[data-password-field-input]:focus-visible]:ring-(--ids-color-primary)/40',
+        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
+      ],
+      input: [
+        'h-full w-full min-w-0 flex-1 border-0 bg-transparent outline-none',
+        'text-inherit placeholder:text-(--ids-color-on-muted)',
+        'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
+        'disabled:cursor-not-allowed',
+      ],
+      part: 'inline-flex shrink-0 items-center gap-1',
+      toggle: 'min-w-0 shrink-0 p-0',
+    },
     variants: {
       variant: {
-        outline:
-          'inset-ring-1 inset-ring-(--ids-color-outline) hover:inset-ring-(--ids-color-primary)',
-        filled:
-          'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent hover:bg-(--ids-color-primary)/15',
-        unstyled: '',
-      } satisfies Record<PasswordFieldVariant, string>,
+        outline: {
+          root: [
+            'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
+            'data-invalid:inset-ring-(--ids-color-danger)',
+            'data-invalid:has-[[data-password-field-input]:focus-visible]:ring-(--ids-color-danger)/40',
+          ],
+        },
+        filled: {
+          root: [
+            'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
+            'has-[[data-password-field-input]:focus-visible]:bg-(--ids-color-primary)/15',
+            'data-invalid:inset-ring-(--ids-color-danger)',
+            'data-invalid:has-[[data-password-field-input]:focus-visible]:ring-(--ids-color-danger)/40',
+          ],
+        },
+        unstyled: {},
+      } satisfies Record<PasswordFieldVariant, object>,
       size: {
-        standard: 'h-11 rounded-xl px-3 text-body-b2-regular',
-        tiny: 'h-8 gap-1 rounded-lg px-2 text-body-b3-regular',
-      } satisfies Record<IdsSize, string>,
+        standard: {
+          root: 'h-(--ids-size-control-standard) gap-2 rounded-md px-3 text-body-b3-regular',
+          toggle: 'size-7 rounded-sm',
+        },
+        tiny: {
+          root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-sm px-2 text-caption-c1-regular',
+          toggle: 'size-6 rounded-xs',
+        },
+      } satisfies Record<IdsSize, object>,
     },
-    compoundVariants: [
-      {
-        variant: ['outline', 'filled'],
-        class:
-          'data-invalid:inset-ring-1 data-invalid:inset-ring-(--ids-password-field-danger) data-invalid:has-[:focus-visible]:outline-(--ids-password-field-danger)',
-      },
-    ],
+    defaultVariants: {
+      variant: 'outline',
+      size: 'standard',
+    },
   });
 }

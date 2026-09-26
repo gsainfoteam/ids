@@ -23,7 +23,8 @@ import {
   type DateSelection,
 } from '../calendar/date';
 import { useFieldSize } from '../field/context';
-import { FieldPopup, fieldTriggerStyle, flattenParts, part } from '../field-popup';
+import { FieldPopup, flattenParts, part } from '../field-popup';
+import { temporalFieldStyle } from '../temporal-field';
 import { dateFormatter, type DateFieldFormat } from './format';
 
 export type DateFieldProps = Omit<
@@ -46,6 +47,7 @@ type ContextValue = {
   trigger: ComponentProps<'button'>;
   calendar: CalendarProps;
   clear: () => void;
+  styles: ReturnType<typeof temporalFieldStyle>;
 };
 const Context = createContext<ContextValue | null>(null);
 function useDateField() {
@@ -59,7 +61,7 @@ function DateValue({ asChild, children, ...props }: DateField.ValueProps) {
     'span',
     asChild,
     children ?? c.display,
-    mergeProps({ className: 'min-w-0 flex-1 truncate' }, props),
+    mergeProps({ className: c.styles.value() }, props),
   );
 }
 function DateTrigger({ asChild, children, ...props }: DateField.TriggerProps) {
@@ -73,9 +75,9 @@ function DateTrigger({ asChild, children, ...props }: DateField.TriggerProps) {
     asChild,
     children ?? (
       <>
-        <CalendarDaysIcon aria-hidden="true" className="size-4 shrink-0" />
+        <CalendarDaysIcon aria-hidden="true" className={c.styles.icon()} />
         <DateValue />
-        <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
+        <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
       </>
     ),
     mergeProps(props, { ...c.trigger }),
@@ -83,7 +85,7 @@ function DateTrigger({ asChild, children, ...props }: DateField.TriggerProps) {
 }
 function DateClear({
   asChild,
-  children = <XMarkIcon aria-hidden="true" className="size-4" />,
+  children = <XMarkIcon aria-hidden="true" />,
   ...props
 }: DateField.ClearProps) {
   const c = useDateField();
@@ -96,8 +98,7 @@ function DateClear({
       type: 'button',
       'aria-label': props['aria-label'] ?? '날짜 지우기',
       disabled: c.blocked,
-      className:
-        'mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg focus-visible:outline-2 disabled:opacity-40',
+      className: c.styles.clear(),
       onClick: c.clear,
     }),
   );
@@ -172,6 +173,12 @@ export function DateField(props: DateFieldProps) {
   const id = `ids-date-${useId()}`;
   const blocked = disabled === true || !!readOnly;
   const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = temporalFieldStyle({
+    variant,
+    size: resolvedSize,
+    disabled: disabled === true,
+    placeholder: !hasValue,
+  });
   const close = useCallback((restore: boolean) => {
     setOpen(false);
     if (restore) trigger.current?.focus({ preventScroll: true });
@@ -217,11 +224,7 @@ export function DateField(props: DateFieldProps) {
     // mergeRefs only composes callbacks, without reading current during render.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(trigger, forwardedRef),
-    className: fieldTriggerStyle({
-      variant: 'unstyled',
-      size: resolvedSize,
-      className: 'flex-1 focus-visible:outline-none',
-    }),
+    className: styles.trigger(),
     onClick: (e) => {
       native.onClick?.(e);
       if (!e.defaultPrevented && !blocked) setOpen((previous) => !previous);
@@ -287,17 +290,14 @@ export function DateField(props: DateFieldProps) {
           change(selectionMode === 'multiple' ? [] : null);
           close(true);
         },
+        styles,
       }}
     >
       <div
         ref={surface}
         data-date-field=""
         aria-invalid={triggerProps['aria-invalid']}
-        className={fieldTriggerStyle({
-          variant,
-          size: resolvedSize,
-          className: `gap-0 px-0 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${disabled === true ? 'opacity-40' : ''} ${className ?? ''}`,
-        })}
+        className={styles.root({ className })}
         style={style}
       >
         {triggers.length ? triggers : <DateTrigger />}
@@ -322,8 +322,8 @@ export function DateField(props: DateFieldProps) {
               native.onBlur?.(e as unknown as React.FocusEvent<HTMLButtonElement>);
           }}
         >
-          <div className="mb-1 flex items-center justify-between px-1">
-            <span className="text-sm font-medium">
+          <div className={styles.popupHeader()}>
+            <span className={styles.popupTitle()}>
               {selectionMode === 'range'
                 ? '기간 선택'
                 : selectionMode === 'multiple'
@@ -335,9 +335,9 @@ export function DateField(props: DateFieldProps) {
               data-popup-autofocus=""
               aria-label="날짜 선택 닫기"
               onClick={() => close(true)}
-              className="size-7 rounded focus-visible:outline-2"
+              className={styles.popupClose()}
             >
-              <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
+              <XMarkIcon aria-hidden="true" />
             </button>
           </div>
           {contents.length ? contents : <DateContent />}
@@ -367,6 +367,6 @@ export namespace DateField {
     Value = DateValue,
     Content = DateContent,
     Clear = DateClear;
-  export const Style = fieldTriggerStyle;
+  export const Style = temporalFieldStyle;
 }
 export type { DateFieldFormat } from './format';

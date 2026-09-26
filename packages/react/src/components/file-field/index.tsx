@@ -12,9 +12,10 @@ import {
 
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-import { invariant, mergeProps, mergeRefs } from '../../utils';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
-import { fieldTriggerStyle, flattenParts, part } from '../field-popup';
+import { flattenParts, part } from '../field-popup';
+import { iconSquare } from '../icon-square';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -56,6 +57,7 @@ export type FileFieldProps = BaseProps &
   );
 type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
 type ContextValue = {
+  styles: ReturnType<typeof FileField.Style>;
   files: File[];
   blocked: boolean;
   hasErrors: boolean;
@@ -84,7 +86,7 @@ function FileTrigger({ asChild, children, ...props }: FileField.TriggerProps) {
     asChild,
     children ?? (
       <>
-        <PlusIcon aria-hidden="true" className="size-4 shrink-0" />
+        <PlusIcon aria-hidden="true" />
         <FileValue />
       </>
     ),
@@ -103,12 +105,12 @@ function FileValue({ asChild, children, placeholder, ...props }: FileField.Value
             .map((f) => f.name)
             .join(', ')}${c.files.length > 2 ? `, +${c.files.length - 2}` : ''}`
         : (placeholder ?? c.placeholder)),
-    mergeProps({ className: 'min-w-0 flex-1 truncate' }, props),
+    mergeProps({ className: c.styles.value() }, props),
   );
 }
 function FileClear({
   asChild,
-  children = <XMarkIcon aria-hidden="true" className="size-4" />,
+  children = <XMarkIcon aria-hidden="true" />,
   ...props
 }: FileField.ClearProps) {
   const c = useFile();
@@ -121,7 +123,7 @@ function FileClear({
       type: 'button',
       'aria-label': props['aria-label'] ?? '파일 모두 지우기',
       disabled: c.blocked,
-      className: 'shrink-0 rounded-lg p-2 focus-visible:outline-2 disabled:opacity-40',
+      className: c.styles.clear(),
       onClick: c.clear,
     }),
   );
@@ -133,27 +135,24 @@ function FileItem({ file, asChild, children, ...props }: FileField.ItemProps) {
     asChild,
     children ?? (
       <>
-        <span className="min-w-0 flex-1 truncate" title={file.name}>
+        <span className={c.styles.itemName()} title={file.name}>
           {file.name}
         </span>
-        <span className="shrink-0 text-xs text-(--ids-color-on-muted)">
-          {file.size.toLocaleString()} B
-        </span>
+        <span className={c.styles.itemSize()}>{file.size.toLocaleString()} B</span>
         <button
           type="button"
           aria-label={`${file.name} 삭제`}
           disabled={c.blocked}
           onClick={() => c.remove(file)}
-          className="rounded px-2 py-1 focus-visible:outline-2 disabled:opacity-40"
+          className={c.styles.itemRemove()}
         >
-          <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
+          <XMarkIcon aria-hidden="true" />
         </button>
       </>
     ),
     mergeProps(
       {
-        className:
-          'flex min-w-0 items-center gap-2 rounded-lg bg-(--ids-color-primary)/5 px-3 py-1',
+        className: c.styles.item(),
         role: 'listitem',
       },
       props,
@@ -167,7 +166,7 @@ function FileList({ asChild, children, ...props }: BoxProps) {
     'div',
     asChild,
     children ?? c.files.map((file, index) => <FileItem key={index} file={file} />),
-    mergeProps({ role: 'list', 'aria-label': '선택 파일', className: 'grid gap-1' }, props),
+    mergeProps({ role: 'list', 'aria-label': '선택 파일', className: c.styles.list() }, props),
   );
 }
 const isFile = (file: unknown): file is File =>
@@ -267,6 +266,7 @@ export function FileField(props: FileFieldProps) {
     errorId = `${id}-rejections`;
   const blocked = !!disabled || !!readOnly;
   const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = FileField.Style({ variant, size: resolvedSize });
   useLayoutEffect(() => {
     const node = input.current,
       owner = node?.form;
@@ -360,11 +360,7 @@ export function FileField(props: FileFieldProps) {
     'aria-required': native['aria-required'] ?? required,
     'aria-disabled': blocked || undefined,
     'data-dragover': dragOver && !blocked ? '' : undefined,
-    className: fieldTriggerStyle({
-      variant: 'outline',
-      size: resolvedSize,
-      className: `flex-1 data-dragover:bg-(--ids-color-primary)/15 ${variant === 'dropzone' ? 'h-auto min-h-32 justify-center border border-dashed border-(--ids-color-outline) p-6 inset-ring-0' : ''}`,
-    }),
+    className: styles.trigger(),
     onClick: (e) => {
       onClick?.(e);
       if (!e.defaultPrevented && !blocked) input.current?.click();
@@ -382,6 +378,7 @@ export function FileField(props: FileFieldProps) {
   return (
     <Context.Provider
       value={{
+        styles,
         files,
         blocked,
         hasErrors: !!rejections.length,
@@ -392,7 +389,7 @@ export function FileField(props: FileFieldProps) {
       }}
     >
       <div
-        className={`grid min-w-0 gap-2 ${className ?? ''}`}
+        className={styles.root({ className })}
         style={style}
         data-file-field=""
         data-dragover={dragOver && !blocked ? '' : undefined}
@@ -445,7 +442,7 @@ export function FileField(props: FileFieldProps) {
           parts
         ) : (
           <>
-            <div className="flex min-w-0 items-center gap-1">
+            <div className={styles.row()}>
               <FileTrigger />
               <FileClear />
             </div>
@@ -453,11 +450,7 @@ export function FileField(props: FileFieldProps) {
           </>
         )}
         {!!rejections.length && (
-          <div
-            id={errorId}
-            role="alert"
-            className="text-sm wrap-anywhere text-(--ids-field-danger,#b42318)"
-          >
+          <div id={errorId} role="alert" className={styles.error()}>
             {rejections.map(({ file, reason }, index) => (
               <div key={index}>
                 {file.name}:{' '}
@@ -485,5 +478,78 @@ export namespace FileField {
     List = FileList,
     Item = FileItem,
     Clear = FileClear;
-  export const Style = fieldTriggerStyle;
+  export const Style = tv({
+    slots: {
+      root: 'grid min-w-0 gap-2',
+      row: 'flex min-w-0 items-center gap-1',
+      trigger: [
+        'flex w-full min-w-0 flex-1 touch-manipulation items-center text-left',
+        'cursor-pointer bg-transparent text-(--ids-color-on-surface)',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+        'focus-ring data-dragover:bg-(--ids-color-primary)/15',
+        'disabled:cursor-not-allowed disabled:opacity-50',
+        '[&_svg]:shrink-0',
+      ],
+      value: 'min-w-0 flex-1 truncate',
+      clear: [
+        iconSquare.base,
+        'inline-flex cursor-pointer items-center justify-center rounded-md text-(--ids-color-on-muted)',
+        'focus-ring disabled:cursor-not-allowed disabled:opacity-50',
+      ],
+      list: 'grid gap-1',
+      item: 'flex min-w-0 items-center gap-2 rounded-md bg-(--ids-color-primary)/5 px-3 py-1',
+      itemName: 'min-w-0 flex-1 truncate',
+      itemSize: 'shrink-0 text-caption-c1-regular text-(--ids-color-on-muted)',
+      itemRemove: [
+        'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-xs',
+        'focus-ring disabled:cursor-not-allowed disabled:opacity-50',
+        '[&_svg]:size-(--ids-size-icon-tiny)',
+      ],
+      error: 'wrap-anywhere text-(--ids-color-danger)',
+    },
+    variants: {
+      variant: {
+        outline: {
+          trigger: [
+            'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
+            'aria-invalid:inset-ring-(--ids-color-danger)',
+          ],
+        },
+        dropzone: {
+          trigger: [
+            'min-h-32 justify-center rounded-lg p-6',
+            'border border-dashed border-(--ids-color-outline)',
+            'aria-invalid:border-(--ids-color-danger)',
+          ],
+        },
+      },
+      size: {
+        standard: {
+          trigger: 'gap-2 text-body-b3-regular [&_svg]:size-(--ids-size-icon-standard)',
+          clear: iconSquare.size.standard,
+          item: 'text-body-b3-regular',
+          error: 'text-body-b3-regular',
+        },
+        tiny: {
+          trigger: 'gap-1.5 text-caption-c1-regular [&_svg]:size-(--ids-size-icon-tiny)',
+          clear: iconSquare.size.tiny,
+          item: 'text-caption-c1-regular',
+          error: 'text-caption-c1-regular',
+        },
+      } satisfies Record<IdsSize, object>,
+    },
+    compoundVariants: [
+      {
+        variant: 'outline',
+        size: 'standard',
+        class: { trigger: 'h-(--ids-size-control-standard) rounded-md px-3' },
+      },
+      {
+        variant: 'outline',
+        size: 'tiny',
+        class: { trigger: 'h-(--ids-size-control-tiny) rounded-sm px-2' },
+      },
+    ],
+    defaultVariants: { variant: 'outline', size: 'standard' },
+  });
 }

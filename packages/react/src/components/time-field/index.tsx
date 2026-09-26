@@ -4,6 +4,7 @@ import {
   TemporalValue,
   TemporalContent,
   TemporalClear,
+  temporalFieldStyle,
   type TemporalFieldProps,
   type TriggerProps as SharedTriggerProps,
   type ValueProps as SharedValueProps,
@@ -67,4 +68,5 @@ export namespace TimeField {
     Value = TemporalValue,
     Content = TemporalContent,
     Clear = TemporalClear;
+  export const Style = temporalFieldStyle;
 }

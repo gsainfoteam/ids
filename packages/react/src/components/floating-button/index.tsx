@@ -188,15 +188,15 @@ export namespace FloatingButton {
       },
       tone: {
         default: '',
-        weak: 'bg-(--ids-color-primary)/15 text-(--ids-color-primary) data-hovered:bg-(--ids-color-primary)/20 data-active:bg-(--ids-color-primary)/25',
+        weak: 'bg-(--ids-color-primary)/15 text-(--ids-color-primary) data-hovered:bg-(--ids-color-primary)/20 data-active:bg-(--ids-color-primary)/25 data-pressed:bg-(--ids-color-primary)/25',
         contrast:
-          'bg-(--ids-color-on-surface) text-(--ids-color-surface) data-hovered:bg-(--ids-color-on-surface)/90 data-active:bg-(--ids-color-on-surface)/80',
+          'bg-(--ids-color-on-surface) text-(--ids-color-surface) data-hovered:bg-(--ids-color-on-surface)/90 data-active:bg-(--ids-color-on-surface)/80 data-pressed:bg-(--ids-color-on-surface)/80',
       },
       size: {
         standard: 'min-h-14 gap-2 px-5 text-button-standard',
         tiny: 'min-h-11 gap-1.5 px-3 text-button-tiny [&_svg]:size-5',
       },
-      iconOnly: { true: 'aspect-square rounded-full p-0', false: 'rounded-2xl py-3' },
+      iconOnly: { true: 'aspect-square rounded-full p-0', false: 'rounded-lg py-3' },
       placement: {
         'top-left':
           'top-[calc(1.5rem+env(safe-area-inset-top))] left-[calc(1.5rem+env(safe-area-inset-left))]',

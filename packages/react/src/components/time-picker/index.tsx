@@ -11,7 +11,7 @@ import {
   type ComponentProps,
 } from 'react';
 
-import { invariant, mergeProps, mergeRefs } from '../../utils';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { dateAt, dayKey } from '../calendar/date';
 import { useFieldSize } from '../field/context';
 import { flattenParts, part } from '../field-popup';
@@ -50,6 +50,58 @@ export type TimePickerProps = Omit<ComponentProps<'div'>, 'defaultValue' | 'onCh
     onChange?: (value: Date) => void;
   };
 type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
+const TimePickerStyle = tv({
+  slots: {
+    root: 'flex min-w-0 flex-wrap gap-2 text-(--ids-color-on-surface)',
+    header: 'flex w-full basis-full justify-around gap-2 text-(--ids-color-on-muted)',
+    separator: 'self-center text-(--ids-color-on-muted)',
+    column: [
+      'group relative min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-lg',
+      // A real border, not inset-ring: on a scroll container the inset shadow is painted
+      // under the options, so a highlighted option scrolling past the edge would hide it.
+      'border border-(--ids-color-outline)',
+      'focus-ring',
+    ],
+    option: [
+      'flex shrink-0 snap-center items-center justify-center rounded-sm px-2 tabular-nums select-none',
+      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+      'motion-reduce:transition-none',
+    ],
+  },
+  variants: {
+    size: {
+      standard: { header: 'text-body-b3-regular', option: 'text-body-b2-regular' },
+      tiny: { header: 'text-caption-c1-regular', option: 'text-body-b3-regular' },
+    } satisfies Record<IdsSize, object>,
+    wheel: {
+      true: { column: 'snap-y snap-mandatory [overflow-anchor:none]' },
+    },
+    selected: {
+      true: { option: 'bg-(--ids-color-primary) text-(--ids-color-on-primary)' },
+      false: { option: 'hover:bg-(--ids-color-primary)/10' },
+    },
+    active: {
+      true: {
+        option:
+          'group-focus-visible:inset-ring-2 group-focus-visible:inset-ring-(--ids-color-primary)',
+      },
+    },
+    unavailable: {
+      true: { option: 'cursor-not-allowed opacity-50' },
+      false: { option: 'cursor-pointer' },
+    },
+  },
+  compoundVariants: [
+    {
+      selected: true,
+      active: true,
+      class: { option: 'group-focus-visible:inset-ring-(--ids-color-on-primary)/60' },
+    },
+  ],
+  defaultVariants: {
+    size: 'standard',
+  },
+});
 type ContextValue = {
   value: Date | null;
   base: Date;
@@ -63,6 +115,7 @@ type ContextValue = {
   readOnly: boolean;
   variant: 'grid' | 'wheel';
   choose: (seconds: number) => void;
+  styles: ReturnType<typeof TimePickerStyle>;
 };
 const Context = createContext<ContextValue | null>(null);
 function useTimePicker() {
@@ -71,14 +124,14 @@ function useTimePicker() {
   return c;
 }
 function TimeHeader({ asChild, children, ...props }: BoxProps) {
-  useTimePicker();
+  const c = useTimePicker();
   return part(
     'div',
     asChild,
     children,
     mergeProps(
       {
-        className: 'flex w-full basis-full justify-around gap-2 text-sm opacity-70',
+        className: c.styles.header(),
         'aria-hidden': true,
       },
       props,
@@ -90,12 +143,12 @@ function TimeSeparator({
   children = ':',
   ...props
 }: ComponentProps<'span'> & { asChild?: boolean }) {
-  useTimePicker();
+  const c = useTimePicker();
   return part(
     'span',
     asChild,
     children,
-    mergeProps({ 'aria-hidden': true, className: 'self-center opacity-60' }, props),
+    mergeProps({ 'aria-hidden': true, className: c.styles.separator() }, props),
   );
 }
 function unitValue(seconds: number, unit: TimeUnit, format: TimeFormat) {
@@ -239,7 +292,12 @@ function Column({ unit, asChild, children, ...props }: BoxProps & { unit: TimeUn
             focusOption(n);
             choose(n);
           }}
-          className={`flex shrink-0 snap-center items-center justify-center rounded-md px-2 tabular-nums select-none ${c.size === 'tiny' ? 'text-sm' : 'text-base'} ${c.value && selected === n ? 'bg-(--ids-color-primary) text-(--ids-color-on-primary)' : 'hover:bg-(--ids-color-primary)/10'} ${activeNumber === n ? 'outline-offset-[-2px] group-focus-visible:outline-2 group-focus-visible:outline-(--ids-color-primary)' : ''} ${c.disabled || seconds === undefined ? 'cursor-not-allowed opacity-35' : 'cursor-pointer'}`}
+          className={TimePickerStyle({
+            size: c.size,
+            selected: !!c.value && selected === n,
+            active: activeNumber === n,
+            unavailable: c.disabled || seconds === undefined,
+          }).option()}
           style={{ height: cell, scrollSnapAlign: 'center' }}
         >
           {unit === 'period'
@@ -260,7 +318,7 @@ function Column({ unit, asChild, children, ...props }: BoxProps & { unit: TimeUn
       'aria-activedescendant': `${id}-${activeNumber}`,
       tabIndex: c.disabled ? -1 : 0,
       'data-time-column': unit,
-      className: `group relative min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-lg border border-(--ids-color-outline) focus-visible:outline-2 focus-visible:outline-(--ids-color-primary) ${wheel ? 'snap-y snap-mandatory [overflow-anchor:none]' : ''}`,
+      className: TimePickerStyle({ wheel }).column(),
       style: {
         height: cell * 5,
         paddingBlock: wheel ? cell * 2 : 0,
@@ -368,7 +426,8 @@ export function TimePicker({
     );
   }, [day, precision, step, low, high]);
   const resolvedFormat = resolveTimeFormat(format, locale),
-    resolvedSize = useFieldSize(size) ?? 'standard';
+    resolvedSize = useFieldSize(size) ?? 'standard',
+    styles = TimePickerStyle({ size: resolvedSize });
   const parts = flattenParts(children),
     units: string[] = [];
   for (const child of parts)
@@ -413,6 +472,7 @@ export function TimePicker({
           if (value === undefined) setStored(next);
           onChange?.(new Date(next));
         },
+        styles,
       }}
     >
       <div
@@ -421,7 +481,7 @@ export function TimePicker({
         aria-label={props['aria-label'] ?? 'Time picker'}
         data-time-picker=""
         data-variant={variant}
-        className={`flex min-w-0 flex-wrap gap-2 text-(--ids-color-on-surface) ${props.className ?? ''}`}
+        className={styles.root({ className: props.className })}
       >
         {children ?? (
           <>
@@ -438,6 +498,7 @@ export function TimePicker({
 export namespace TimePicker {
   export type Props = TimePickerProps;
   export type ColumnProps = BoxProps & { unit: 'hour' | 'minute' | 'second' };
+  export const Style = TimePickerStyle;
   export const Column = TimeColumn,
     Period = TimePeriod,
     Header = TimeHeader,

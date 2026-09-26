@@ -56,7 +56,7 @@ function OTPSlot(_props: OTPField.SlotProps): ReactNode {
   invariant(false, 'OTPField.Slot must be a direct child of OTPField (or inside a Fragment).');
 }
 function OTPSeparator({ asChild, children = '−', ...props }: OTPField.SeparatorProps) {
-  const merged = mergeProps({ className: 'px-0.5 text-(--ids-color-on-muted)' }, props);
+  const merged = mergeProps({ className: OTPField.Style().separator() }, props);
   if (asChild) {
     invariant(
       isValidElement<ComponentProps<'span'>>(children) && children.type !== Fragment,
@@ -119,6 +119,7 @@ export function OTPField({
     'OTPField: value/defaultValue must be strings.',
   );
   const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = OTPField.Style({ variant, size: resolvedSize });
   const generatedId = useId();
   const id = rootProps.id ?? `ids-otp-${generatedId}`;
   const controlled = value !== undefined;
@@ -266,7 +267,7 @@ export function OTPField({
         'data-size': resolvedSize,
         'data-filled': characters[index] ? '' : undefined,
       },
-      className: OTPField.SlotStyle({ variant, size: resolvedSize, className: native.className }),
+      className: styles.slot({ className: native.className }),
       onFocus: (event) => {
         native.onFocus?.(event);
         setActive(index);
@@ -343,7 +344,7 @@ export function OTPField({
     const input = child ? cloneElement(child, actual) : <input {...actual} />;
     return (
       <Fragment key={part.key ?? position}>
-        <span id={positionId} className="sr-only">
+        <span id={positionId} className={styles.positionLabel()}>
           {index + 1} / {length}
         </span>
         {input}
@@ -368,7 +369,7 @@ export function OTPField({
         aria-label={rootProps['aria-labelledby'] ? undefined : groupLabel}
         aria-labelledby={rootProps['aria-labelledby']}
         aria-describedby={rootProps['aria-describedby']}
-        className={OTPField.Style({ className })}
+        className={styles.root({ className })}
         style={style}
       >
         {rendered}
@@ -395,33 +396,57 @@ export namespace OTPField {
   export const Slot = OTPSlot;
   export const Separator = OTPSeparator;
   export const Style = tv({
-    base: [
-      'inline-flex max-w-full flex-wrap items-center gap-2 text-(--ids-color-on-surface)',
-      '[--ids-otp-danger:var(--ids-field-danger,#b42318)]',
-      '[[data-mode=dark]_&]:[--ids-otp-danger:var(--ids-field-danger,#fda29b)]',
-      'data-disabled:opacity-40',
-    ],
-  });
-  export const SlotStyle = tv({
-    base: [
-      'box-border min-w-0 shrink-0 bg-transparent text-center font-medium outline-none',
-      'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ids-color-primary)',
-      'caret-(--ids-color-primary) disabled:cursor-not-allowed',
-      'aria-invalid:inset-ring-(--ids-otp-danger) aria-invalid:focus-visible:outline-(--ids-otp-danger)',
-    ],
+    slots: {
+      root: [
+        'inline-flex max-w-full flex-wrap items-center gap-2 text-(--ids-color-on-surface)',
+        'data-disabled:opacity-50',
+      ],
+      slot: [
+        'box-border min-w-0 shrink-0 bg-transparent text-center outline-none',
+        'caret-(--ids-color-primary) disabled:cursor-not-allowed',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+        'motion-reduce:transition-none',
+      ],
+      separator: 'px-0.5 text-(--ids-color-on-muted)',
+      positionLabel: 'sr-only',
+    },
     variants: {
       variant: {
-        outline:
-          'rounded-lg inset-ring-1 inset-ring-(--ids-color-outline) hover:inset-ring-(--ids-color-primary)',
-        filled:
-          'rounded-lg bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent hover:bg-(--ids-color-primary)/15',
-        underline:
-          'rounded-none border-b-2 border-(--ids-color-outline) aria-invalid:border-(--ids-otp-danger)',
-      } satisfies Record<OTPFieldVariant, string>,
-      size: { standard: 'size-10 text-lg', tiny: 'size-8 text-sm' } satisfies Record<
-        IdsSize,
-        string
-      >,
+        outline: {
+          slot: [
+            'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
+            'aria-invalid:inset-ring-(--ids-color-danger)',
+            'focus-ring aria-invalid:focus-visible:ring-(--ids-color-danger)/40',
+          ],
+        },
+        filled: {
+          slot: [
+            'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
+            'focus-visible:bg-(--ids-color-primary)/15',
+            'aria-invalid:inset-ring-(--ids-color-danger)',
+            'focus-ring aria-invalid:focus-visible:ring-(--ids-color-danger)/40',
+          ],
+        },
+        underline: {
+          slot: [
+            'rounded-none border-b-2 border-(--ids-color-outline)',
+            'focus-visible:border-(--ids-color-primary)',
+            'aria-invalid:border-(--ids-color-danger)',
+          ],
+        },
+      } satisfies Record<OTPFieldVariant, object>,
+      size: {
+        standard: { slot: 'size-(--ids-size-control-standard) text-body-b1-medium' },
+        tiny: { slot: 'size-(--ids-size-control-tiny) text-body-b3-medium' },
+      } satisfies Record<IdsSize, object>,
+    },
+    compoundVariants: [
+      { variant: ['outline', 'filled'], size: 'standard', class: { slot: 'rounded-md' } },
+      { variant: ['outline', 'filled'], size: 'tiny', class: { slot: 'rounded-sm' } },
+    ],
+    defaultVariants: {
+      variant: 'outline',
+      size: 'standard',
     },
   });
 }

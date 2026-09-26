@@ -14,11 +14,12 @@ import {
 
 import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-import { invariant, mergeProps, mergeRefs } from '../../utils';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
 import {
   FieldPopup,
-  fieldTriggerStyle,
+  fieldListbox,
+  fieldTrigger,
   flattenParts,
   part,
   revealPopupOption,
@@ -59,6 +60,7 @@ type ContextValue = {
   remove: (value: string) => void;
   create: () => void;
   setActive: (value: string | null) => void;
+  styles: ReturnType<typeof ChipField.Style>;
 };
 const Context = createContext<ContextValue | null>(null);
 function useChip() {
@@ -107,7 +109,7 @@ function ChipTrigger({ asChild, children, ...props }: BoxProps) {
       <>
         <ChipValue />
         <ChipSearch />
-        <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
+        <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
       </>
     ),
     mergeProps(props, { ...c.surfaceProps }),
@@ -123,19 +125,16 @@ function ChipValue({ asChild, children, ...props }: BoxProps) {
         const option = c.options.find((o) => o.value === value);
         const title = option?.label ?? value;
         return (
-          <span
-            key={value}
-            className="inline-flex max-w-full items-center gap-1 rounded-md bg-(--ids-color-primary)/10 px-2 py-1 text-sm"
-          >
-            <span className="truncate">{title}</span>
+          <span key={value} className={c.styles.chip()}>
+            <span className={c.styles.chipLabel()}>{title}</span>
             <button
               type="button"
               disabled={c.blocked || option?.disabled}
               aria-label={`${title} 삭제`}
-              className="shrink-0 rounded px-1 focus-visible:outline-2 disabled:opacity-40"
+              className={c.styles.chipRemove()}
               onClick={() => c.remove(value)}
             >
-              <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
+              <XMarkIcon aria-hidden="true" className={c.styles.chipRemoveIcon()} />
             </button>
           </span>
         );
@@ -176,8 +175,7 @@ function ChipItem({
       'aria-selected': c.selected.includes(value),
       'aria-disabled': blocked || undefined,
       'data-active': c.active === value ? '' : undefined,
-      className:
-        'cursor-default wrap-anywhere rounded-lg px-3 py-2 data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-40',
+      className: c.styles.item(),
       onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
       onPointerMove: () => {
         if (!blocked) c.setActive(value);
@@ -195,7 +193,7 @@ function ChipGroup({ heading, asChild, children, ...props }: ChipField.GroupProp
     return null;
   const nodes = (
     <>
-      <div id={id} className="px-3 py-2 text-xs text-(--ids-color-on-muted)">
+      <div id={id} className={c.styles.groupHeading()}>
         {heading}
       </div>
       {content(children, asChild)}
@@ -220,8 +218,7 @@ function ChipCreate({ asChild, children, ...props }: BoxProps) {
       role: 'option',
       'aria-selected': false,
       'data-active': c.active === undefined ? '' : undefined,
-      className:
-        'cursor-default wrap-anywhere rounded-lg px-3 py-2 data-active:bg-(--ids-color-primary)/15',
+      className: c.styles.item(),
       onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
       onPointerMove: () => c.setActive(null),
       onClick: c.create,
@@ -235,7 +232,7 @@ function ChipEmpty({ asChild, children = '검색 결과가 없습니다.', ...pr
     : part('div', asChild, children, {
         ...props,
         role: 'status',
-        className: `p-3 text-sm ${props.className ?? ''}`,
+        className: c.styles.empty({ className: props.className }),
       });
 }
 function ChipContent({ asChild, children, ...props }: BoxProps) {
@@ -313,7 +310,11 @@ export function ChipField({
     anchor = useRef<HTMLDivElement>(null),
     composing = useRef(false);
   const id = `ids-chip-${useId()}`;
-  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = ChipField.Style({
+    variant,
+    size: useFieldSize(size) ?? 'standard',
+    disabled: !!native.disabled,
+  });
   const blocked = !!native.disabled || !!native.readOnly,
     full = maxCount !== undefined && selected.length >= maxCount;
   const normalized = query.trim().toLocaleLowerCase();
@@ -430,7 +431,7 @@ export function ChipField({
         : undefined,
     'aria-invalid': native['aria-invalid'] ?? invalid,
     'aria-required': native['aria-required'] ?? required,
-    className: 'min-w-20 flex-1 bg-transparent py-1 outline-none',
+    className: styles.search(),
     onClick: (e) => {
       native.onClick?.(e);
       if (!e.defaultPrevented && !blocked) setOpen(true);
@@ -501,11 +502,7 @@ export function ChipField({
   };
   const surfaceProps: ComponentProps<'div'> = {
     ref: anchor,
-    className: fieldTriggerStyle({
-      variant,
-      size: resolvedSize,
-      className: `h-auto ${resolvedSize === 'tiny' ? 'min-h-8' : 'min-h-11'} flex-wrap gap-1 py-1 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${native.disabled ? 'opacity-40' : ''} ${className ?? ''}`,
-    }),
+    className: styles.trigger({ className }),
     style,
     'aria-invalid': invalid,
     'data-chip-field': '',
@@ -537,6 +534,7 @@ export function ChipField({
         remove,
         create,
         setActive,
+        styles,
       }}
     >
       {explicit.length ? (
@@ -545,7 +543,7 @@ export function ChipField({
         <ChipTrigger>
           <ChipValue />
           {search.length ? search : <ChipSearch />}
-          <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
+          <ChevronDownIcon aria-hidden="true" className={styles.icon()} />
         </ChipTrigger>
       )}
       {open && !blocked && (
@@ -580,5 +578,60 @@ export namespace ChipField {
     Group = ChipGroup,
     Create = ChipCreate,
     Empty = ChipEmpty;
-  export const Style = fieldTriggerStyle;
+  export const Style = tv({
+    slots: {
+      trigger: [
+        ...fieldTrigger.base,
+        'flex-wrap gap-1 py-1',
+        // The utility only recognises TextField/TextArea inputs, so the shell rings for its
+        // own search input here. Scoped to the input so a focused chip button rings alone.
+        'has-[input:focus-visible]:ring-[3px] has-[input:focus-visible]:ring-(--ids-color-primary)/40',
+      ],
+      chip: 'inline-flex max-w-full items-center gap-1 rounded-sm bg-(--ids-color-primary)/10',
+      chipLabel: 'truncate',
+      chipRemove:
+        'shrink-0 cursor-pointer rounded-xs px-0.5 focus-ring disabled:cursor-not-allowed disabled:opacity-50',
+      chipRemoveIcon: 'mx-auto',
+      search: [
+        'min-w-20 flex-1 bg-transparent py-1 outline-none',
+        'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
+      ],
+      icon: 'shrink-0',
+      item: fieldListbox.option,
+      groupHeading: fieldListbox.heading,
+      empty: fieldListbox.empty,
+    },
+    variants: {
+      variant: {
+        outline: { trigger: fieldTrigger.variant.outline },
+        filled: {
+          trigger: [
+            fieldTrigger.variant.filled,
+            'has-[input:focus-visible]:bg-(--ids-color-primary)/15',
+          ],
+        },
+        unstyled: { trigger: fieldTrigger.variant.unstyled },
+      } satisfies Record<NonNullable<ChipFieldProps['variant']>, object>,
+      // The shell grows with wrapped chips, so the control height is a floor, not a height.
+      size: {
+        standard: {
+          trigger: [fieldTrigger.size.standard, 'h-auto min-h-(--ids-size-control-standard)'],
+          chip: 'px-2 py-0.5',
+          chipRemoveIcon: fieldTrigger.icon.tiny,
+          icon: fieldTrigger.icon.standard,
+        },
+        tiny: {
+          trigger: [fieldTrigger.size.tiny, 'h-auto min-h-(--ids-size-control-tiny)'],
+          chip: 'px-1.5 py-px',
+          chipRemoveIcon: 'size-3',
+          icon: fieldTrigger.icon.tiny,
+        },
+      } satisfies Record<IdsSize, object>,
+      // The shell is a div, so the trigger's `disabled:` classes never match it.
+      disabled: {
+        true: { trigger: 'cursor-not-allowed opacity-50' },
+      },
+    },
+    defaultVariants: { variant: 'outline', size: 'standard' },
+  });
 }

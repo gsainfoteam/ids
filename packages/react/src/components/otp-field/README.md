@@ -75,7 +75,7 @@ Slot onChange는 native 이벤트용이고 root onChange는 전체 문자열용�
 | onChange / onComplete      | 전체 문자열 콜백                                               |
 | pattern                    | numeric / alphanumeric / RegExp, 기본 numeric                  |
 | variant                    | outline / filled / underline, 기본 outline                     |
-| size                       | 명시 값 → Field → standard. standard 40px/18px, tiny 32px/14px |
+| size                       | 명시 값 → Field → standard. standard 36px/18px, tiny 32px/14px |
 | mask / disabled / readOnly | false                                                          |
 | invalid                    | 명시적인 aria-invalid(Field 포함)가 우선                       |
 | className / style          | 그룹 표면, 개별 입력 스타일은 Slot에 지정                      |
@@ -84,7 +84,7 @@ Slot onChange는 native 이벤트용이고 root onChange는 전체 문자열용�
 | Slot props                 | index 필수, native input에서 관리 속성 제외, asChild           |
 | Separator props            | native span 속성, children, asChild                            |
 
-기존 전역 standard/tiny와 danger fallback을 유지합니다. 12칸 등 넓은 입력은 가용 너비에 따라 줄바꿈합니다.
+전역 standard/tiny를 따르고, invalid 색은 `--ids-color-danger` 토큰을 씁니다. 12칸 등 넓은 입력은 가용 너비에 따라 줄바꿈합니다.
 
 ## React Hook Form + Zod
 

@@ -12,7 +12,7 @@ import {
 
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
-import { invariant, mergeProps } from '../../utils';
+import { invariant, mergeProps, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { part } from '../field-popup';
 import {
@@ -59,6 +59,69 @@ export type CalendarProps = Omit<
     | { selectionMode: 'none'; value?: Date | null; defaultValue?: Date | null; onChange?: never }
   ) & { children?: ReactNode };
 type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
+const CalendarStyle = tv({
+  slots: {
+    root: 'min-w-0 text-(--ids-color-on-surface)',
+    header: 'mb-2 flex items-center justify-between gap-2',
+    navigation: 'flex w-full items-center gap-2',
+    navButton: [
+      'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md',
+      'enabled:hover:bg-(--ids-color-primary)/10',
+      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+      'motion-reduce:transition-none',
+      'focus-ring',
+      'disabled:cursor-not-allowed disabled:opacity-50',
+    ],
+    title: 'flex-1 text-center font-medium',
+    months: 'flex flex-wrap gap-4',
+    month: 'min-w-0 flex-1',
+    monthTitle: 'pb-1 text-center font-medium',
+    headerRow: 'grid grid-cols-7',
+    weekday: 'py-2 text-center text-caption-c1-regular text-(--ids-color-on-muted)',
+    row: 'grid grid-cols-7',
+    cell: 'relative isolate min-w-0',
+    band: 'pointer-events-none absolute inset-y-0 -z-10 bg-(--ids-color-primary)/10',
+    day: [
+      'flex w-full cursor-pointer items-center justify-center rounded-sm',
+      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+      'motion-reduce:transition-none',
+      'focus-ring',
+      'aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
+      'data-outside-month:text-(--ids-color-on-muted)',
+    ],
+  },
+  variants: {
+    size: {
+      standard: {
+        root: 'text-body-b3-regular',
+        navButton: 'size-8 [&_svg]:size-(--ids-size-icon-standard)',
+        month: 'min-w-56',
+        day: 'h-9',
+      },
+      tiny: {
+        root: 'text-caption-c1-regular',
+        navButton: 'size-7 [&_svg]:size-(--ids-size-icon-tiny)',
+        month: 'min-w-48',
+        day: 'h-7',
+      },
+    } satisfies Record<IdsSize, object>,
+    band: {
+      start: { band: 'start-1/2 end-0' },
+      middle: { band: 'inset-x-0' },
+      end: { band: 'start-0 end-1/2' },
+    },
+    today: {
+      true: { day: 'inset-ring-1 inset-ring-(--ids-color-primary)' },
+    },
+    filled: {
+      true: { day: 'bg-(--ids-color-primary) text-(--ids-color-on-primary)' },
+      false: { day: 'hover:bg-(--ids-color-primary)/10' },
+    },
+  },
+  defaultVariants: {
+    size: 'standard',
+  },
+});
 type ContextValue = {
   value: CalendarValue;
   mode: string;
@@ -77,6 +140,7 @@ type ContextValue = {
   canNavigate: (amount: number) => boolean;
   setFocus: (date: Date) => void;
   months: Date[];
+  styles: ReturnType<typeof CalendarStyle>;
 };
 const Context = createContext<ContextValue | null>(null),
   MonthContext = createContext<Date | null>(null),
@@ -91,12 +155,8 @@ function useMonth() {
   return useContext(MonthContext) ?? c.month;
 }
 function CalendarHeader({ asChild, children, ...props }: BoxProps) {
-  return part(
-    'div',
-    asChild,
-    children,
-    mergeProps({ className: 'mb-2 flex items-center justify-between gap-2' }, props),
-  );
+  const c = useCalendar();
+  return part('div', asChild, children, mergeProps({ className: c.styles.header() }, props));
 }
 function CalendarNavigation({ asChild, children, ...props }: BoxProps) {
   const c = useCalendar(),
@@ -111,11 +171,11 @@ function CalendarNavigation({ asChild, children, ...props }: BoxProps) {
           aria-label="이전 달"
           disabled={!c.canNavigate(-1)}
           onClick={() => c.navigate(-1)}
-          className="size-8 shrink-0 rounded-lg hover:bg-(--ids-color-primary)/10 focus-visible:outline-2 disabled:opacity-30"
+          className={c.styles.navButton()}
         >
-          <ChevronLeftIcon aria-hidden="true" className="mx-auto size-4" />
+          <ChevronLeftIcon aria-hidden="true" />
         </button>
-        <span aria-live="polite" className="flex-1 text-center font-medium">
+        <span aria-live="polite" className={c.styles.title()}>
           {new Intl.DateTimeFormat(c.locale, {
             year: 'numeric',
             month: 'long',
@@ -127,13 +187,13 @@ function CalendarNavigation({ asChild, children, ...props }: BoxProps) {
           aria-label="다음 달"
           disabled={!c.canNavigate(1)}
           onClick={() => c.navigate(1)}
-          className="size-8 shrink-0 rounded-lg hover:bg-(--ids-color-primary)/10 focus-visible:outline-2 disabled:opacity-30"
+          className={c.styles.navButton()}
         >
-          <ChevronRightIcon aria-hidden="true" className="mx-auto size-4" />
+          <ChevronRightIcon aria-hidden="true" />
         </button>
       </>
     ),
-    mergeProps({ className: 'flex w-full items-center gap-2' }, props),
+    mergeProps({ className: c.styles.navigation() }, props),
   );
 }
 function CalendarHeaderRow({ asChild, children, ...props }: BoxProps) {
@@ -149,13 +209,13 @@ function CalendarHeaderRow({ asChild, children, ...props }: BoxProps) {
             key={index}
             role="columnheader"
             aria-label={new Intl.DateTimeFormat(c.locale, { weekday: 'long' }).format(date)}
-            className="py-2 text-center text-xs text-(--ids-color-on-muted)"
+            className={c.styles.weekday()}
           >
             {new Intl.DateTimeFormat(c.locale, { weekday: 'short' }).format(date)}
           </div>
         );
       }),
-    mergeProps({ role: 'row', className: 'grid grid-cols-7' }, props),
+    mergeProps({ role: 'row', className: c.styles.headerRow() }, props),
   );
 }
 export type CalendarCellState = {
@@ -204,7 +264,7 @@ function CalendarCell({ date, children, ...props }: Calendar.CellProps) {
       aria-selected={state.selected}
       aria-disabled={state.disabled || undefined}
       data-range-middle={rangeMiddle ? '' : undefined}
-      className="relative isolate min-w-0"
+      className={c.styles.cell()}
     >
       {range?.end &&
         !sameDay(range.start, range.end) &&
@@ -212,7 +272,9 @@ function CalendarCell({ date, children, ...props }: Calendar.CellProps) {
           <span
             aria-hidden="true"
             data-calendar-range-band=""
-            className={`pointer-events-none absolute inset-y-0 -z-10 bg-(--ids-color-primary)/10 ${rangeStart ? 'start-1/2 end-0' : rangeEnd ? 'start-0 end-1/2' : 'inset-x-0'}`}
+            className={CalendarStyle({
+              band: rangeStart ? 'start' : rangeEnd ? 'end' : 'middle',
+            }).band()}
           />
         )}
       <button
@@ -229,7 +291,11 @@ function CalendarCell({ date, children, ...props }: Calendar.CellProps) {
         aria-current={state.today ? 'date' : undefined}
         aria-disabled={state.disabled || undefined}
         tabIndex={focused && !c.allDisabled ? 0 : -1}
-        className={`flex w-full items-center justify-center rounded-lg text-sm outline-offset-1 focus-visible:outline-2 focus-visible:outline-(--ids-color-primary) aria-disabled:opacity-30 data-outside-month:text-(--ids-color-on-muted) ${c.size === 'tiny' ? 'h-7' : 'h-9'} ${state.today ? 'inset-ring-1 inset-ring-(--ids-color-primary)' : ''} ${state.selected && !rangeMiddle ? 'bg-(--ids-color-primary) text-(--ids-color-on-primary)' : 'hover:bg-(--ids-color-primary)/10'} ${props.className ?? ''}`}
+        className={CalendarStyle({
+          size: c.size,
+          today: state.today,
+          filled: state.selected && !rangeMiddle,
+        }).day({ className: props.className })}
         onFocus={(e) => {
           props.onFocus?.(e);
           if (!e.defaultPrevented) c.setFocus(dayOnly(date));
@@ -285,7 +351,7 @@ function CalendarBody({ asChild, children, ...props }: Calendar.BodyProps) {
     month = useMonth();
   const first = addDays(month, -((month.getDay() - c.weekStart + 7) % 7));
   const rows = Array.from({ length: 6 }, (_, week) => (
-    <div key={week} role="row" className="grid grid-cols-7">
+    <div key={week} role="row" className={c.styles.row()}>
       {Array.from({ length: 7 }, (_, day) => {
         const date = addDays(first, week * 7 + day);
         return validDate(date) ? (
@@ -413,6 +479,7 @@ export function Calendar(props: CalendarProps) {
     pendingFocus = useRef(autoFocus);
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const weekStart = weekStartsOn ?? firstWeekday(locale);
+  const styles = CalendarStyle({ size: resolvedSize });
   const blocked = (date: Date) =>
     !validDate(date) ||
     disabled === true ||
@@ -499,6 +566,7 @@ export function Calendar(props: CalendarProps) {
         canNavigate,
         setFocus: setFocused,
         months,
+        styles,
       }}
     >
       <div
@@ -512,21 +580,18 @@ export function Calendar(props: CalendarProps) {
         role={native.role ?? 'group'}
         aria-label={native['aria-label'] ?? '달력'}
         aria-disabled={disabled === true || undefined}
-        className={`min-w-0 text-(--ids-color-on-surface) ${className ?? ''}`}
+        className={styles.root({ className })}
       >
         {children ?? (
           <>
             <CalendarHeader>
               <CalendarNavigation />
             </CalendarHeader>
-            <div className="flex flex-wrap gap-4">
+            <div className={styles.months()}>
               {months.map((m, index) => (
-                <div
-                  key={dayKey(m)}
-                  className={`min-w-0 flex-1 ${resolvedSize === 'tiny' ? 'min-w-48' : 'min-w-56'}`}
-                >
+                <div key={dayKey(m)} className={styles.month()}>
                   {monthsToShow > 1 && (
-                    <div className="pb-1 text-center text-sm font-medium">
+                    <div className={styles.monthTitle()}>
                       {new Intl.DateTimeFormat(locale, {
                         year: 'numeric',
                         month: 'long',
@@ -554,6 +619,7 @@ export namespace Calendar {
     date: Date;
     children?: ReactNode | ((state: CalendarCellState) => ReactNode);
   };
+  export const Style = CalendarStyle;
   export const Header = CalendarHeader,
     Navigation = CalendarNavigation;
   export const Grid = Object.assign(CalendarGrid, {

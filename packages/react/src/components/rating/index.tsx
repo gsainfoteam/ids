@@ -142,6 +142,7 @@ export function Rating({
     if (value === undefined) setInternal(next);
     if (next !== current) onChange?.(next);
   };
+  const styles = Rating.Style({ size: resolvedSize });
   const radio = (score: number, extraClass: string) => (
     <button
       key={score}
@@ -157,7 +158,7 @@ export function Rating({
       aria-disabled={readOnly || undefined}
       disabled={disabled}
       tabIndex={!disabled && score === current ? 0 : -1}
-      className={`touch-manipulation rounded-lg outline-none ${extraClass}`}
+      className={styles.radio({ className: extraClass })}
       onClick={() => {
         choose(score);
         preview(null);
@@ -194,7 +195,7 @@ export function Rating({
       data-rating=""
       data-size={resolvedSize}
       data-disabled={disabled ? '' : undefined}
-      className={Rating.Style({ size: resolvedSize, className })}
+      className={styles.root({ className })}
       onPointerLeave={(event) => {
         onPointerLeave?.(event);
         preview(null);
@@ -235,11 +236,7 @@ export function Rating({
         const item = explicit.get(index)?.props;
         let graphic =
           item?.children ??
-          (variant === 'circle' ? (
-            <span className="block size-full rounded-full bg-current" />
-          ) : (
-            <Icon />
-          ));
+          (variant === 'circle' ? <span className={styles.circle()} /> : <Icon />);
         if (item?.asChild) {
           invariant(
             isValidElement<ComponentProps<'span'>>(graphic),
@@ -253,16 +250,12 @@ export function Rating({
             key={index}
             data-rating-item=""
             data-state={fill === 1 ? 'full' : fill === 0 ? 'empty' : 'half'}
-            className={`relative inline-flex shrink-0 items-center justify-center rounded-lg has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${resolvedSize === 'tiny' ? 'size-8' : 'size-11'} ${item?.className ?? ''}`}
+            className={styles.item({ className: item?.className })}
           >
-            <span
-              aria-hidden="true"
-              inert
-              className={`pointer-events-none relative block [&_svg]:size-full ${resolvedSize === 'tiny' ? 'size-5' : 'size-7'}`}
-            >
-              <span className="absolute inset-0 text-(--ids-color-outline)">{graphic}</span>
+            <span aria-hidden="true" inert className={styles.graphic()}>
+              <span className={styles.track()}>{graphic}</span>
               <span
-                className="absolute inset-0"
+                className={styles.fill()}
                 style={{ clipPath: `inset(0 ${100 - fill * 100}% 0 0)` }}
               >
                 {graphic}
@@ -300,7 +293,37 @@ export namespace Rating {
   export type Props = RatingProps;
   export const Item = RatingItem;
   export const Style = tv({
-    base: 'relative inline-flex max-w-full flex-wrap gap-1 rounded-xl text-(--ids-rating-color,var(--ids-color-primary)) has-[[data-rating-value="0"]:focus-visible]:outline-2 has-[[data-rating-value="0"]:focus-visible]:outline-offset-2 has-[[data-rating-value="0"]:focus-visible]:outline-(--ids-color-primary) data-disabled:opacity-40',
-    variants: { size: { standard: '', tiny: 'gap-0.5' } },
+    slots: {
+      root: [
+        'relative inline-flex max-w-full flex-wrap rounded-md',
+        'text-(--ids-rating-color,var(--ids-color-primary))',
+        'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-(--ids-color-primary)/40',
+        'data-disabled:opacity-50',
+      ],
+      item: [
+        'relative inline-flex shrink-0 items-center justify-center rounded-md',
+        'has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-(--ids-color-primary)/40',
+      ],
+      graphic: 'pointer-events-none relative block [&_svg]:size-full',
+      track: 'absolute inset-0 text-(--ids-color-outline)',
+      fill: 'absolute inset-0',
+      circle: 'block size-full rounded-full bg-current',
+      radio: 'touch-manipulation rounded-md outline-none',
+    },
+    variants: {
+      size: {
+        standard: {
+          root: 'gap-1',
+          item: 'size-(--ids-size-control-standard)',
+          graphic: 'size-7',
+        },
+        tiny: {
+          root: 'gap-0.5',
+          item: 'size-(--ids-size-control-tiny)',
+          graphic: 'size-5',
+        },
+      } satisfies Record<IdsSize, object>,
+    },
+    defaultVariants: { size: 'standard' },
   });
 }

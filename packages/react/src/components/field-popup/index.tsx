@@ -11,7 +11,9 @@ import {
   type RefObject,
 } from 'react';
 
-import { invariant, mergeProps, tv } from '../../utils';
+import { cn, invariant, mergeProps } from '../../utils';
+
+import type { IdsSize } from '../../tokens/types';
 
 export function flattenParts(children: ReactNode): ReactNode[] {
   return Children.toArray(children).flatMap((child) =>
@@ -39,20 +41,40 @@ export function part(
   }
   return createElement(tag, props, tag === 'input' ? undefined : children);
 }
-export const fieldTriggerStyle = tv({
-  base: 'touch-manipulation flex w-full min-w-0 items-center gap-2 text-left text-(--ids-color-on-surface) disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--ids-color-primary) [--ids-popup-danger:var(--ids-field-danger,#b42318)] [[data-mode=dark]_&]:[--ids-popup-danger:var(--ids-field-danger,#fda29b)] aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-popup-danger)',
-  variants: {
-    variant: {
-      outline: 'bg-transparent inset-ring-1 inset-ring-(--ids-color-outline)',
-      filled: 'bg-(--ids-color-primary)/10',
-      unstyled: 'bg-transparent',
-    },
-    size: {
-      standard: 'h-11 rounded-xl px-3 text-body-b2-regular',
-      tiny: 'h-8 rounded-lg px-2 text-body-b3-regular',
-    },
-  },
-});
+export type FieldTriggerVariant = 'outline' | 'filled' | 'unstyled';
+
+// Plain class lists so a component's own `tv({ slots })` can spread them into its trigger
+// slot; every string stays literal for Tailwind.
+export const fieldTrigger = {
+  base: [
+    'flex w-full min-w-0 touch-manipulation items-center gap-2 text-left text-(--ids-color-on-surface)',
+    'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+    'disabled:cursor-not-allowed disabled:opacity-50',
+    'focus-ring',
+    'aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-color-danger)',
+  ],
+  variant: {
+    outline: 'bg-transparent shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
+    filled:
+      'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent focus-visible:bg-(--ids-color-primary)/15',
+    unstyled: 'bg-transparent',
+  } satisfies Record<FieldTriggerVariant, string>,
+  size: {
+    standard: 'h-(--ids-size-control-standard) rounded-md px-3 text-body-b3-regular',
+    tiny: 'h-(--ids-size-control-tiny) rounded-sm px-2 text-caption-c1-regular',
+  } satisfies Record<IdsSize, string>,
+  icon: {
+    standard: 'size-(--ids-size-icon-standard)',
+    tiny: 'size-(--ids-size-icon-tiny)',
+  } satisfies Record<IdsSize, string>,
+} as const;
+
+export const fieldListbox = {
+  option:
+    'flex cursor-default items-center rounded-sm px-3 py-2 wrap-anywhere data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-50',
+  heading: 'px-3 py-2 text-caption-c1-regular text-(--ids-color-on-muted)',
+  empty: 'p-3 text-body-b3-regular',
+} as const;
 
 /** Internal field popup. Native top layer preserves inherited IDS theme and avoids clipping. */
 export function FieldPopup({
@@ -140,7 +162,12 @@ export function FieldPopup({
       ref={popup}
       popover="manual"
       data-field-popup=""
-      className={`fixed z-50 m-0 overflow-auto overscroll-contain rounded-xl border border-(--ids-color-outline) bg-(--ids-color-surface) p-2 text-(--ids-color-on-surface) shadow-lg [overflow-anchor:none] ${props.className ?? ''}`}
+      className={cn(
+        // A real border, not inset-ring: on a scroll container the inset shadow is painted
+        // under the content, so highlighted options scrolling past the edge would hide it.
+        'text-body-b3-regular fixed z-50 m-0 overflow-auto overscroll-contain rounded-lg border border-(--ids-color-outline) bg-(--ids-color-surface) p-2 text-(--ids-color-on-surface) shadow-lg [overflow-anchor:none]',
+        props.className,
+      )}
       style={{ ...props.style, position: 'fixed' }}
     >
       {children}

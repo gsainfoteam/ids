@@ -22,9 +22,9 @@ import {
   type CountryCode,
 } from 'libphonenumber-js/min';
 
-import { invariant, mergeProps, mergeRefs } from '../../utils';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
-import { fieldTriggerStyle, flattenParts } from '../field-popup';
+import { flattenParts } from '../field-popup';
 import { Select } from '../select';
 
 import type { IdsSize } from '../../tokens/types';
@@ -57,6 +57,7 @@ function TelInput(_props: TelField.InputProps): ReactNode {
 function TelCountrySelect({ asChild, children, ...props }: TelField.CountrySelectProps) {
   const c = useContext(Context);
   invariant(c, 'TelField.CountrySelect must be inside TelField.');
+  const { country, countryLabel, countryIcon } = TelField.Style({ size: c.size });
   return (
     <Select
       value={c.country}
@@ -68,15 +69,15 @@ function TelCountrySelect({ asChild, children, ...props }: TelField.CountrySelec
       readOnly={c.readOnly}
       size={c.size}
       variant="unstyled"
-      className="w-auto shrink-0 px-1"
+      className={country()}
     >
       <Select.Trigger {...props} asChild={asChild}>
         {asChild ? (
           children
         ) : (
-          <span className="inline-flex items-center gap-1">
+          <span className={countryLabel()}>
             {c.country} +{getCountryCallingCode(c.country)}{' '}
-            <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
+            <ChevronDownIcon aria-hidden="true" className={countryIcon()} />
           </span>
         )}
       </Select.Trigger>
@@ -169,6 +170,7 @@ export function TelField({
   const caret = useRef<number | null>(null);
   const uid = useId();
   const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = TelField.Style({ variant, size: resolvedSize, disabled: !!native.disabled });
   const formatted = formatPhone(current, country, format, countries.length > 0);
   const display = composition ?? (draft?.model === current ? draft.display : formatted.display);
   const emit = (next: { model: string; display: string }) => {
@@ -242,7 +244,7 @@ export function TelField({
     autoComplete: native.autoComplete ?? 'tel',
     inputMode: native.inputMode ?? 'tel',
     'aria-invalid': native['aria-invalid'] ?? invalid,
-    className: `h-full w-full min-w-0 flex-1 bg-transparent outline-none ${native.className ?? ''}`,
+    className: styles.input({ className: native.className }),
     ref: (node) => {
       invariant(
         !node || node.tagName === 'INPUT',
@@ -310,17 +312,13 @@ export function TelField({
         data-tel-field=""
         data-size={resolvedSize}
         aria-invalid={actual['aria-invalid']}
-        className={fieldTriggerStyle({
-          variant,
-          size: resolvedSize,
-          className: `has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${native.disabled ? 'opacity-40' : ''} ${className ?? ''}`,
-        })}
+        className={styles.root({ className })}
         style={style}
       >
         {parts.length
           ? parts.map((p, i) =>
               p === sentinel ? (
-                <span key={i} className="h-full min-w-0 flex-1">
+                <span key={i} className={styles.inputWrap()}>
                   {input}
                 </span>
               ) : (
@@ -350,5 +348,59 @@ export namespace TelField {
   export type CountrySelectProps = ComponentProps<'button'> & { asChild?: boolean };
   export const Input = TelInput;
   export const CountrySelect = TelCountrySelect;
-  export const Style = fieldTriggerStyle;
+  export const Style = tv({
+    slots: {
+      root: [
+        'flex w-full min-w-0 touch-manipulation items-center text-left',
+        'bg-transparent text-(--ids-color-on-surface)',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+        'motion-reduce:transition-none',
+        // Keyed to the tel input so the country trigger and its popup search field,
+        // which render inside the shell, do not ring it as well.
+        'has-[input[type=tel]:focus-visible]:ring-[3px]',
+        'has-[input[type=tel]:focus-visible]:ring-(--ids-color-primary)/40',
+        'aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-color-danger)',
+        'aria-invalid:has-[input[type=tel]:focus-visible]:ring-(--ids-color-danger)/40',
+      ],
+      inputWrap: 'h-full min-w-0 flex-1',
+      input: [
+        'h-full w-full min-w-0 flex-1 bg-transparent outline-none',
+        'text-inherit placeholder:text-(--ids-color-on-muted)',
+        'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
+        'disabled:cursor-not-allowed',
+      ],
+      country: 'w-auto shrink-0 px-1',
+      countryLabel: 'inline-flex items-center gap-1',
+      countryIcon: 'shrink-0',
+    },
+    variants: {
+      variant: {
+        outline: { root: 'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)' },
+        filled: {
+          root: [
+            'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
+            'has-[input[type=tel]:focus-visible]:bg-(--ids-color-primary)/15',
+          ],
+        },
+        unstyled: {},
+      } satisfies Record<NonNullable<TelFieldProps['variant']>, object>,
+      size: {
+        standard: {
+          root: 'h-(--ids-size-control-standard) gap-2 rounded-md px-3 text-body-b3-regular',
+          countryIcon: 'size-(--ids-size-icon-standard)',
+        },
+        tiny: {
+          root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-sm px-2 text-caption-c1-regular',
+          countryIcon: 'size-(--ids-size-icon-tiny)',
+        },
+      } satisfies Record<IdsSize, object>,
+      disabled: {
+        true: { root: 'cursor-not-allowed opacity-50' },
+      },
+    },
+    defaultVariants: {
+      variant: 'outline',
+      size: 'standard',
+    },
+  });
 }

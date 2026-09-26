@@ -15,11 +15,12 @@ import {
 
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
-import { invariant, mergeProps, mergeRefs } from '../../utils';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
 import {
   FieldPopup,
-  fieldTriggerStyle,
+  fieldListbox,
+  fieldTrigger,
   flattenParts,
   part,
   revealPopupOption,
@@ -69,6 +70,7 @@ type ContextValue = {
   triggerProps: ComponentProps<'button'>;
   keydown: (event: KeyboardEvent<HTMLElement>) => void;
   multiple: boolean;
+  styles: ReturnType<typeof Select.Style>;
 };
 const Context = createContext<ContextValue | null>(null);
 function useSelect() {
@@ -116,7 +118,7 @@ function SelectTrigger({ asChild, children, ...props }: Select.TriggerProps) {
     children ?? (
       <>
         <SelectValue />
-        <span aria-hidden="true" className="size-4 shrink-0">
+        <span aria-hidden="true" className={c.styles.icon()}>
           {c.open ? <ChevronUpIcon /> : <ChevronDownIcon />}
         </span>
       </>
@@ -136,7 +138,7 @@ function SelectValue({ asChild, children, placeholder, ...props }: Select.ValueP
       (labels.length
         ? `${labels.slice(0, 2).join(', ')}${labels.length > 2 ? `, +${labels.length - 2}` : ''}`
         : (placeholder ?? c.placeholder)),
-    mergeProps({ className: 'min-w-0 flex-1 truncate' }, props),
+    mergeProps({ className: c.styles.value() }, props),
   );
 }
 function SelectItem({
@@ -159,8 +161,7 @@ function SelectItem({
       'aria-selected': c.selected.includes(value),
       'aria-disabled': disabled || undefined,
       'data-active': c.active === value ? '' : undefined,
-      className:
-        'flex cursor-default wrap-anywhere items-center rounded-lg px-3 py-2 data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-40',
+      className: c.styles.item(),
       onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
       onPointerMove: () => {
         if (!disabled) c.setActive(value);
@@ -182,7 +183,7 @@ function SelectGroup({ heading, asChild, children, ...props }: Select.GroupProps
     return null;
   const content = (
     <>
-      <div id={headingId} className="px-3 py-2 text-xs text-(--ids-color-on-muted)">
+      <div id={headingId} className={c.styles.groupHeading()}>
         {heading}
       </div>
       {slotChildren(children, asChild)}
@@ -211,8 +212,7 @@ function SelectSearch({ asChild, children, ...props }: Select.SearchFieldProps) 
     'data-popup-autofocus': '',
     value: c.query,
     placeholder: props.placeholder ?? '검색…',
-    className:
-      'mb-2 h-9 w-full rounded-lg border border-(--ids-color-outline) bg-transparent px-3 outline-(--ids-color-primary)',
+    className: c.styles.search(),
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => c.search(e.target.value),
     onKeyDown: c.keydown,
   };
@@ -225,7 +225,7 @@ function SelectEmpty({ asChild, children = '검색 결과가 없습니다.', ...
     : part('div', asChild, children, {
         ...props,
         role: 'status',
-        className: `p-3 text-sm ${props.className ?? ''}`,
+        className: c.styles.empty({ className: props.className }),
       });
 }
 function SelectContent({ asChild, children, ...props }: BoxProps) {
@@ -273,6 +273,7 @@ export function Select(props: SelectProps) {
     ...native
   } = props;
   const multiple = selectionMode === 'multiple';
+  const styles = Select.Style({ variant, size: useFieldSize(size) ?? 'standard' });
   const [stored, setStored] = useState<string | string[] | null>(
     defaultValue ?? (multiple ? [] : null),
   );
@@ -434,11 +435,7 @@ export function Select(props: SelectProps) {
     'aria-invalid': native['aria-invalid'] ?? invalid,
     'aria-required': native['aria-required'] ?? required,
     'aria-readonly': readOnly,
-    className: fieldTriggerStyle({
-      variant,
-      size: useFieldSize(size) ?? 'standard',
-      className: native.className,
-    }),
+    className: styles.trigger({ className: native.className }),
     onClick: (e) => {
       native.onClick?.(e);
       if (!e.defaultPrevented) {
@@ -485,6 +482,7 @@ export function Select(props: SelectProps) {
         triggerProps,
         keydown,
         multiple,
+        styles,
       }}
     >
       {explicit.length ? explicit : <SelectTrigger />}
@@ -537,5 +535,31 @@ export namespace Select {
   export const Group = SelectGroup;
   export const SearchField = SelectSearch;
   export const Empty = SelectEmpty;
-  export const Style = fieldTriggerStyle;
+  export const Style = tv({
+    slots: {
+      trigger: fieldTrigger.base,
+      value: 'min-w-0 flex-1 truncate',
+      icon: 'shrink-0',
+      search: [
+        'mb-2 h-(--ids-size-control-standard) w-full rounded-md bg-transparent px-3 text-body-b3-regular',
+        'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline) placeholder:text-(--ids-color-on-muted)',
+        'focus-ring',
+      ],
+      item: fieldListbox.option,
+      groupHeading: fieldListbox.heading,
+      empty: fieldListbox.empty,
+    },
+    variants: {
+      variant: {
+        outline: { trigger: fieldTrigger.variant.outline },
+        filled: { trigger: fieldTrigger.variant.filled },
+        unstyled: { trigger: fieldTrigger.variant.unstyled },
+      } satisfies Record<SelectVariant, object>,
+      size: {
+        standard: { trigger: fieldTrigger.size.standard, icon: fieldTrigger.icon.standard },
+        tiny: { trigger: fieldTrigger.size.tiny, icon: fieldTrigger.icon.tiny },
+      } satisfies Record<IdsSize, object>,
+    },
+    defaultVariants: { variant: 'outline', size: 'standard' },
+  });
 }

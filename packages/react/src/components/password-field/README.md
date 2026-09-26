@@ -59,7 +59,7 @@ root native 속성이 Input/asChild 속성보다 우선합니다. 이벤트와 r
 | Input props                            | native input에서 type/size 제외, asChild 추가                  |
 | VisibilityToggle props                 | native button 및 asChild. type/ARIA 상태는 내부 관리           |
 
-전역 size와 기존 danger fallback 계약을 유지합니다. 강도 추정은 앱에서 계산해 Field.Hint와 합성하세요.
+전역 size를 따르고, invalid 색은 `--ids-color-danger` 토큰을 씁니다. 강도 추정은 앱에서 계산해 Field.Hint와 합성하세요.
 
 ## React Hook Form + Zod
 

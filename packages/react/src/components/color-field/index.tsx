@@ -12,9 +12,9 @@ import {
 
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-import { invariant, mergeProps, mergeRefs } from '../../utils';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
-import { FieldPopup, fieldTriggerStyle, flattenParts, part } from '../field-popup';
+import { FieldPopup, flattenParts, part } from '../field-popup';
 import { parseColor, serializeColor, type ColorFormat } from './color';
 import { ColorControls, type ColorControlsProps } from './color-controls';
 
@@ -39,6 +39,7 @@ export type ColorFieldProps = Omit<
   mobileVariant?: 'popover' | 'drawer';
 };
 type ContextValue = {
+  styles: ReturnType<typeof ColorField.Style>;
   value: string;
   placeholder: string;
   blocked: boolean;
@@ -61,7 +62,7 @@ function ColorSwatch({ asChild, children, ...props }: ColorField.SwatchProps) {
     children,
     mergeProps(props, {
       'aria-hidden': true,
-      className: 'size-5 shrink-0 rounded border border-(--ids-color-outline)',
+      className: c.styles.swatch(),
       style: { backgroundColor: color ? serializeColor(color, 'rgb', true) : 'transparent' },
     }),
   );
@@ -72,7 +73,7 @@ function ColorValue({ asChild, children, ...props }: ColorField.ValueProps) {
     'span',
     asChild,
     children ?? (c.value || c.placeholder),
-    mergeProps({ className: 'min-w-0 flex-1 truncate font-mono text-sm' }, props),
+    mergeProps({ className: c.styles.value() }, props),
   );
 }
 function ColorTrigger({ asChild, children, ...props }: ColorField.TriggerProps) {
@@ -99,13 +100,12 @@ function ColorClear({ asChild, children, ...props }: ColorField.ClearProps) {
   return part(
     'button',
     asChild,
-    children ?? <XMarkIcon aria-hidden="true" className="size-4" />,
+    children ?? <XMarkIcon aria-hidden="true" />,
     mergeProps(props, {
       type: 'button',
       'aria-label': props['aria-label'] ?? '색상 지우기',
       disabled: c.blocked,
-      className:
-        'flex size-8 shrink-0 items-center justify-center rounded-lg text-lg focus-visible:outline-2 disabled:opacity-40',
+      className: c.styles.clear(),
       onClick: () => c.clear(),
     }),
   );
@@ -148,6 +148,7 @@ export function ColorField({
   const id = `ids-color-${uid}`;
   const blocked = !!native.disabled || !!readOnly;
   const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = ColorField.Style({ surfaceVariant, size: resolvedSize });
   const close = useCallback(
     (restore: boolean) => {
       setOpen(false);
@@ -190,11 +191,7 @@ export function ColorField({
     // mergeRefs returns a callback; it does not read ref.current here.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(trigger, forwardedRef),
-    className: fieldTriggerStyle({
-      variant: 'unstyled',
-      size: resolvedSize,
-      className: 'flex-1 focus-visible:outline-none',
-    }),
+    className: styles.trigger(),
     onClick: (e) => {
       native.onClick?.(e);
       if (!e.defaultPrevented && !blocked) setOpen((previous) => !previous);
@@ -222,6 +219,7 @@ export function ColorField({
   return (
     <Context.Provider
       value={{
+        styles,
         value: normalized,
         placeholder,
         blocked,
@@ -245,11 +243,7 @@ export function ColorField({
         ref={surface}
         data-color-field=""
         aria-invalid={triggerProps['aria-invalid']}
-        className={fieldTriggerStyle({
-          variant: surfaceVariant,
-          size: resolvedSize,
-          className: `gap-0 px-0 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${className ?? ''}`,
-        })}
+        className={styles.root({ className })}
         style={style}
       >
         {triggers.length ? triggers : <ColorTrigger />}
@@ -272,16 +266,16 @@ export function ColorField({
               native.onBlur?.(e as unknown as React.FocusEvent<HTMLButtonElement>);
           }}
         >
-          <div className="mb-2 flex items-center justify-between px-1">
-            <span className="text-sm font-medium">색상 선택</span>
+          <div className={styles.header()}>
+            <span className={styles.title()}>색상 선택</span>
             <button
               type="button"
               data-popup-autofocus=""
               aria-label="색상 선택 닫기"
               onClick={() => close(true)}
-              className="size-7 rounded focus-visible:outline-2"
+              className={styles.close()}
             >
-              <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
+              <XMarkIcon aria-hidden="true" />
             </button>
           </div>
           {contents.length ? contents : <ColorContent />}
@@ -311,6 +305,55 @@ export namespace ColorField {
   export const Swatch = ColorSwatch;
   export const Content = ColorContent;
   export const Clear = ColorClear;
-  export const Style = fieldTriggerStyle;
+  export const Style = tv({
+    slots: {
+      // The shell is a div around two buttons, so it cannot use `focus-ring` and lights up for
+      // whichever of them has keyboard focus.
+      root: [
+        'flex w-full min-w-0 items-center text-(--ids-color-on-surface)',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+        'has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-(--ids-color-primary)/40',
+        'aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-color-danger)',
+      ],
+      trigger: [
+        'flex h-full min-w-0 flex-1 touch-manipulation items-center text-left outline-none',
+        'cursor-pointer disabled:cursor-not-allowed disabled:opacity-50',
+      ],
+      swatch: 'shrink-0 rounded-xs inset-ring-1 inset-ring-(--ids-color-outline)',
+      value: 'min-w-0 flex-1 truncate font-mono',
+      clear: [
+        'inline-flex shrink-0 cursor-pointer items-center justify-center text-(--ids-color-on-muted)',
+        'focus-ring disabled:cursor-not-allowed disabled:opacity-50',
+      ],
+      header: 'mb-2 flex items-center justify-between px-1',
+      title: 'text-body-b3-medium',
+      close: [
+        'inline-flex size-7 cursor-pointer items-center justify-center rounded-sm',
+        'focus-ring [&_svg]:size-(--ids-size-icon-standard)',
+      ],
+    },
+    variants: {
+      surfaceVariant: {
+        outline: { root: 'bg-transparent shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)' },
+        filled: { root: 'bg-(--ids-color-primary)/10' },
+        unstyled: { root: 'bg-transparent' },
+      },
+      size: {
+        standard: {
+          root: 'h-(--ids-size-control-standard) rounded-md text-body-b3-regular',
+          trigger: 'gap-2 px-3',
+          swatch: 'size-5',
+          clear: 'mr-1 size-7 rounded-sm [&_svg]:size-(--ids-size-icon-standard)',
+        },
+        tiny: {
+          root: 'h-(--ids-size-control-tiny) rounded-sm text-caption-c1-regular',
+          trigger: 'gap-1.5 px-2',
+          swatch: 'size-4',
+          clear: 'mr-1 size-6 rounded-xs [&_svg]:size-(--ids-size-icon-tiny)',
+        },
+      } satisfies Record<IdsSize, object>,
+    },
+    defaultVariants: { surfaceVariant: 'outline', size: 'standard' },
+  });
 }
 export type { ColorFormat } from './color';

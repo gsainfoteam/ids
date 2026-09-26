@@ -101,6 +101,7 @@ function StepIcon({ direction }: { direction: 1 | -1 }) {
 }
 function NumberStepper({ asChild, children, ...props }: NumberField.StepperProps) {
   const context = useNumberContext();
+  const { stepper, stepButton } = NumberField.Style({ size: context.size });
   const buttons = (
     <>
       {([1, -1] as const).map((direction) => (
@@ -117,7 +118,7 @@ function NumberStepper({ asChild, children, ...props }: NumberField.StepperProps
             context.readOnly ||
             !(direction === 1 ? context.canIncrease : context.canDecrease)
           }
-          className="h-5 w-6 min-w-0 rounded-sm p-0 [&_svg]:size-3"
+          className={stepButton()}
           onPointerDown={(event) => event.preventDefault()}
           onClick={(event) => {
             context.changeBy(direction, event.shiftKey);
@@ -127,10 +128,7 @@ function NumberStepper({ asChild, children, ...props }: NumberField.StepperProps
       ))}
     </>
   );
-  const merged = mergeProps(
-    { 'data-number-field-stepper': '', className: 'flex shrink-0 flex-col' },
-    props,
-  );
+  const merged = mergeProps({ 'data-number-field-stepper': '', className: stepper() }, props);
   if (asChild) {
     invariant(
       isValidElement<ComponentProps<'div'>>(children) && children.type !== Fragment,
@@ -180,7 +178,7 @@ function NumberClear({ asChild, onClear, children, ...props }: NumberField.Clear
       size={context.size}
       variant="ghost"
       aria-label={props['aria-label'] ?? context.clearLabel}
-      className="size-6 min-w-0 p-0"
+      className={NumberField.Style({ size: context.size }).clear()}
       icon={<XMarkIcon aria-hidden="true" />}
     />
   );
@@ -224,6 +222,7 @@ export function NumberField({
   invariant(min == null || max == null || min <= max, 'NumberField: min은 max보다 작아야 합니다.');
   invariant(step > 0 && largeStep > 0, 'NumberField: step과 largeStep은 양수여야 합니다.');
   const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = NumberField.Style({ variant, size: resolvedSize });
   const generatedId = useId();
   const parts = flatten(children);
   const sentinels = parts.filter((part) => isValidElement(part) && part.type === NumberInput);
@@ -362,7 +361,7 @@ export function NumberField({
     'aria-valuetext': current == null ? undefined : format.format(current),
     'aria-invalid': ariaInvalid,
     ...{ 'data-number-field-input': '', 'data-size': resolvedSize },
-    className: inputStyle({ className: native.className }),
+    className: styles.input({ className: native.className }),
     onFocus: (event) => {
       native.onFocus?.(event);
       setFocused(true);
@@ -466,17 +465,17 @@ export function NumberField({
         data-invalid={
           ariaInvalid != null && ariaInvalid !== false && ariaInvalid !== 'false' ? '' : undefined
         }
-        className={NumberField.Style({ variant, size: resolvedSize, className })}
+        className={styles.root({ className })}
         style={style}
       >
         {lead.length > 0 && (
-          <div data-number-field-part="lead" className="inline-flex shrink-0 items-center gap-1">
+          <div data-number-field-part="lead" className={styles.part()}>
             {lead}
           </div>
         )}
         {input}
         {trail.length > 0 && (
-          <div data-number-field-part="trail" className="inline-flex shrink-0 items-center gap-1">
+          <div data-number-field-part="trail" className={styles.part()}>
             {trail}
           </div>
         )}
@@ -494,10 +493,6 @@ export function NumberField({
     </Context.Provider>
   );
 }
-const inputStyle = tv({
-  base: 'h-full w-full min-w-0 flex-1 border-0 bg-transparent text-inherit outline-none placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
-});
-
 export namespace NumberField {
   export type Props = NumberFieldProps;
   export type InputProps = Omit<NativeInputProps, 'type' | 'size' | 'value' | 'defaultValue'> & {
@@ -509,33 +504,64 @@ export namespace NumberField {
   export const Stepper = NumberStepper;
   export const Clear = NumberClear;
   export const Style = tv({
-    base: [
-      'inline-flex w-full min-w-0 items-center gap-2 text-(--ids-color-on-surface)',
-      '[--ids-number-field-danger:var(--ids-field-danger,#b42318)]',
-      '[[data-mode=dark]_&]:[--ids-number-field-danger:var(--ids-field-danger,#fda29b)]',
-      'data-disabled:cursor-not-allowed data-disabled:opacity-40',
-      'has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2',
-      'has-[:focus-visible]:outline-(--ids-color-primary)',
-    ],
+    slots: {
+      root: [
+        'inline-flex w-full min-w-0 items-center',
+        'bg-transparent text-(--ids-color-on-surface)',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+        'motion-reduce:transition-none',
+        // The ring keys off the input alone so tabbing onto a stepper or clear button
+        // rings only that button, not the whole shell as well.
+        'has-[[data-number-field-input]:focus-visible]:ring-[3px]',
+        'has-[[data-number-field-input]:focus-visible]:ring-(--ids-color-primary)/40',
+        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
+      ],
+      input: [
+        'h-full w-full min-w-0 flex-1 border-0 bg-transparent outline-none',
+        'text-inherit placeholder:text-(--ids-color-on-muted)',
+        'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
+        'disabled:cursor-not-allowed',
+      ],
+      part: 'inline-flex shrink-0 items-center gap-1',
+      stepper: 'flex shrink-0 flex-col',
+      stepButton: 'min-w-0 p-0 [&_svg]:size-3',
+      clear: 'min-w-0 p-0',
+    },
     variants: {
       variant: {
-        outline:
-          'inset-ring-1 inset-ring-(--ids-color-outline) hover:inset-ring-(--ids-color-primary)',
-        filled:
-          'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent hover:bg-(--ids-color-primary)/15',
-        unstyled: '',
-      } satisfies Record<NumberFieldVariant, string>,
+        outline: {
+          root: [
+            'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
+            'data-invalid:inset-ring-(--ids-color-danger)',
+            'data-invalid:has-[[data-number-field-input]:focus-visible]:ring-(--ids-color-danger)/40',
+          ],
+        },
+        filled: {
+          root: [
+            'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
+            'has-[[data-number-field-input]:focus-visible]:bg-(--ids-color-primary)/15',
+            'data-invalid:inset-ring-(--ids-color-danger)',
+            'data-invalid:has-[[data-number-field-input]:focus-visible]:ring-(--ids-color-danger)/40',
+          ],
+        },
+        unstyled: {},
+      } satisfies Record<NumberFieldVariant, object>,
       size: {
-        standard: 'h-11 rounded-xl px-3 text-body-b2-regular',
-        tiny: 'h-8 gap-1 rounded-lg px-2 text-body-b3-regular [&_[data-number-field-stepper]_button]:h-3.5',
-      } satisfies Record<IdsSize, string>,
+        standard: {
+          root: 'h-(--ids-size-control-standard) gap-2 rounded-md px-3 text-body-b3-regular',
+          stepButton: 'h-4 w-6 rounded-xs',
+          clear: 'size-7 rounded-sm',
+        },
+        tiny: {
+          root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-sm px-2 text-caption-c1-regular',
+          stepButton: 'h-3.5 w-5 rounded-xs',
+          clear: 'size-6 rounded-xs',
+        },
+      } satisfies Record<IdsSize, object>,
     },
-    compoundVariants: [
-      {
-        variant: ['outline', 'filled'],
-        class:
-          'data-invalid:inset-ring-1 data-invalid:inset-ring-(--ids-number-field-danger) data-invalid:has-[:focus-visible]:outline-(--ids-number-field-danger)',
-      },
-    ],
+    defaultVariants: {
+      variant: 'outline',
+      size: 'standard',
+    },
   });
 }

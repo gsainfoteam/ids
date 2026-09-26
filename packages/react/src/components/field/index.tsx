@@ -16,7 +16,7 @@ import {
 } from 'react';
 
 import { FieldSizeContext } from './context';
-import { cn, invariant, mergeProps } from '../../utils';
+import { invariant, mergeProps, tv } from '../../utils';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -59,23 +59,17 @@ function FieldPart({
   invariant(context, `[IDS] Field.${part} must be inside Field.`);
   if ((part === 'hint' && context.invalid) || (part === 'error' && !context.invalid)) return null;
   const content = part === 'error' ? (children ?? context.errorMessage) : children;
+  const styles = fieldStyle({ invalid: context.invalid, disabled: context.disabled });
   const props = {
     ...rest,
     id: context.ids[part],
     htmlFor: part === 'label' ? context.controlId : undefined,
     'data-field-part': part,
-    className: cn(
-      part === 'label'
-        ? 'font-medium text-(--ids-color-on-surface)'
-        : 'text-(--ids-color-on-muted)',
-      (part === 'error' || (part === 'label' && context.invalid)) && 'text-(--ids-field-danger)',
-      context.disabled && 'opacity-50',
-      className,
-    ),
+    className: styles[part]({ className }),
   };
   const marker =
     part === 'label' && context.required ? (
-      <span aria-hidden="true" className="ml-1 text-(--ids-field-danger)">
+      <span aria-hidden="true" className={styles.marker()}>
         *
       </span>
     ) : null;
@@ -138,6 +132,56 @@ function joinIds(...values: unknown[]) {
     ].join(' ') || undefined
   );
 }
+
+const fieldStyle = tv({
+  slots: {
+    root: 'grid min-w-0 gap-x-3 gap-y-1.5',
+    label: 'font-medium text-(--ids-color-on-surface)',
+    description: 'text-(--ids-color-on-muted)',
+    hint: 'text-(--ids-color-on-muted)',
+    error: 'text-(--ids-color-danger)',
+    marker: 'ml-1 text-(--ids-color-danger)',
+    control: 'min-w-0 [&>input:not([type=checkbox]):not([type=radio])]:w-full [&>textarea]:w-full',
+  },
+  variants: {
+    size: {
+      standard: { root: 'text-body-b3-regular' },
+      tiny: { root: 'text-caption-c1-regular' },
+    } satisfies Record<IdsSize, object>,
+    variant: {
+      vertical: {},
+      horizontal: {
+        root: 'grid-cols-[auto_minmax(0,1fr)] [&>:not([data-field-part=label])]:col-start-2 [&>[data-field-part=label]]:col-start-1 [&>[data-field-part=label]]:self-center',
+      },
+    },
+    // A horizontal label lines up with the control, which sits below the description.
+    described: { true: {}, false: {} },
+    invalid: {
+      true: { label: 'text-(--ids-color-danger)' },
+    },
+    disabled: {
+      true: {
+        label: 'opacity-50',
+        description: 'opacity-50',
+        hint: 'opacity-50',
+        error: 'opacity-50',
+      },
+    },
+  },
+  compoundVariants: [
+    {
+      variant: 'horizontal',
+      described: true,
+      class: { root: '[&>[data-field-part=label]]:row-start-2' },
+    },
+    {
+      variant: 'horizontal',
+      described: false,
+      class: { root: '[&>[data-field-part=label]]:row-start-1' },
+    },
+  ],
+  defaultVariants: { size: 'standard', variant: 'vertical' },
+});
 
 /** Internal bridge shared with the optional RHF entry point. */
 export function FieldRoot({
@@ -221,6 +265,11 @@ export function FieldRoot({
     'aria-invalid': invalidProp !== undefined || invalid ? invalid : original['aria-invalid'],
     'aria-required': requiredProp !== undefined || required ? required : original['aria-required'],
   };
+  const { root, control: controlSlot } = fieldStyle({
+    size,
+    variant,
+    described: Boolean(ids.description),
+  });
   return (
     <FieldContext.Provider value={{ controlId, ids, invalid, disabled, required, errorMessage }}>
       <FieldSizeContext.Provider value={size}>
@@ -233,28 +282,14 @@ export function FieldRoot({
           data-invalid={invalid ? '' : undefined}
           data-disabled={disabled ? '' : undefined}
           data-required={required ? '' : undefined}
-          className={cn(
-            'grid min-w-0 gap-x-3 gap-y-1.5 [--ids-field-danger:var(--ids-color-danger,#b42318)] [[data-mode=dark]_&]:[--ids-field-danger:var(--ids-color-danger,#fda29b)]',
-            size === 'tiny' ? 'text-body-b3-regular' : 'text-body-b2-regular',
-            variant === 'horizontal' &&
-              'grid-cols-[auto_minmax(0,1fr)] [&>:not([data-field-part=label])]:col-start-2 [&>[data-field-part=label]]:col-start-1 [&>[data-field-part=label]]:self-center',
-            variant === 'horizontal' &&
-              (ids.description
-                ? '[&>[data-field-part=label]]:row-start-2'
-                : '[&>[data-field-part=label]]:row-start-1'),
-            className,
-          )}
+          className={root({ className })}
           style={style}
         >
           {nodes.map((node, index) =>
             parts.has(node.type) ? (
               cloneElement(node, { key: node.key ?? index })
             ) : node === control ? (
-              <div
-                key={node.key ?? index}
-                className="min-w-0 [&>input:not([type=checkbox]):not([type=radio])]:w-full [&>textarea]:w-full"
-                data-field-control=""
-              >
+              <div key={node.key ?? index} className={controlSlot()} data-field-control="">
                 {cloneElement(node, controlProps)}
               </div>
             ) : (

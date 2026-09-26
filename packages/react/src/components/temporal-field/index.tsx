@@ -13,12 +13,86 @@ import {
 
 import { ClockIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-import { invariant, mergeProps, mergeRefs } from '../../utils';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
-import { FieldPopup, fieldTriggerStyle, flattenParts, part } from '../field-popup';
+import { FieldPopup, flattenParts, part } from '../field-popup';
 import { validateTime } from '../time-picker/time';
 
 import type { IdsSize } from '../../tokens/types';
+
+export const temporalFieldStyle = tv({
+  slots: {
+    root: [
+      'inline-flex w-full min-w-0 items-center bg-transparent text-(--ids-color-on-surface)',
+      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+      'motion-reduce:transition-none',
+      // The shell wraps a native combobox button, which focus-ring's :has() triggers do not
+      // match. Scoping to the combobox keeps the shell quiet while Clear shows its own ring.
+      'has-[[role=combobox]:focus-visible]:ring-[3px]',
+      'has-[[role=combobox]:focus-visible]:ring-(--ids-color-primary)/40',
+      'aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-color-danger)',
+    ],
+    trigger: [
+      'flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center self-stretch',
+      'bg-transparent text-left outline-none',
+      'disabled:cursor-not-allowed',
+    ],
+    icon: 'shrink-0 text-(--ids-color-on-muted)',
+    value: 'min-w-0 flex-1 truncate',
+    clear: [
+      'me-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-sm',
+      'text-(--ids-color-on-muted) enabled:hover:bg-(--ids-color-primary)/10',
+      'enabled:hover:text-(--ids-color-on-surface)',
+      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+      'motion-reduce:transition-none',
+      'focus-ring',
+      'disabled:cursor-not-allowed disabled:opacity-50',
+    ],
+    popupHeader: 'mb-2 flex items-center justify-between px-1',
+    popupTitle: 'text-body-b3-medium',
+    popupClose: [
+      'inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm',
+      'text-(--ids-color-on-muted) hover:bg-(--ids-color-primary)/10',
+      'hover:text-(--ids-color-on-surface)',
+      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+      'motion-reduce:transition-none',
+      'focus-ring',
+      '[&_svg]:size-(--ids-size-icon-standard)',
+    ],
+  },
+  variants: {
+    variant: {
+      outline: { root: 'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)' },
+      filled: { root: 'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent' },
+      unstyled: {},
+    },
+    size: {
+      standard: {
+        root: 'h-(--ids-size-control-standard) rounded-md text-body-b3-regular',
+        trigger: 'gap-2 px-3',
+        icon: 'size-(--ids-size-icon-standard)',
+        clear: 'size-7 [&_svg]:size-(--ids-size-icon-standard)',
+      },
+      tiny: {
+        root: 'h-(--ids-size-control-tiny) rounded-sm text-caption-c1-regular',
+        trigger: 'gap-1.5 px-2',
+        icon: 'size-(--ids-size-icon-tiny)',
+        clear: 'size-6 [&_svg]:size-(--ids-size-icon-tiny)',
+      },
+    } satisfies Record<IdsSize, object>,
+    disabled: {
+      true: { root: 'cursor-not-allowed opacity-50' },
+    },
+    placeholder: {
+      true: { value: 'text-(--ids-color-on-muted)' },
+    },
+  },
+  defaultVariants: {
+    variant: 'outline',
+    size: 'standard',
+  },
+});
+
 export type TemporalFieldProps = Omit<
   ComponentProps<'button'>,
   'value' | 'defaultValue' | 'onChange'
@@ -54,6 +128,7 @@ type ContextValue = {
   clear: () => void;
   content: ReactNode;
   label: string;
+  styles: ReturnType<typeof temporalFieldStyle>;
 };
 const Context = createContext<ContextValue | null>(null);
 function useTemporal() {
@@ -67,7 +142,7 @@ export function TemporalValue({ asChild, children, ...props }: ValueProps) {
     'span',
     asChild,
     children ?? c.text,
-    mergeProps({ className: 'min-w-0 flex-1 truncate' }, props),
+    mergeProps({ className: c.styles.value() }, props),
   );
 }
 export function TemporalTrigger({ asChild, children, ...props }: TriggerProps) {
@@ -81,9 +156,9 @@ export function TemporalTrigger({ asChild, children, ...props }: TriggerProps) {
     asChild,
     children ?? (
       <>
-        <ClockIcon aria-hidden="true" className="size-4 shrink-0" />
+        <ClockIcon aria-hidden="true" className={c.styles.icon()} />
         <TemporalValue />
-        <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
+        <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
       </>
     ),
     mergeProps(props, { ...c.trigger }),
@@ -91,7 +166,7 @@ export function TemporalTrigger({ asChild, children, ...props }: TriggerProps) {
 }
 export function TemporalClear({
   asChild,
-  children = <XMarkIcon aria-hidden="true" className="size-4" />,
+  children = <XMarkIcon aria-hidden="true" />,
   ...props
 }: TriggerProps) {
   const c = useTemporal();
@@ -104,8 +179,7 @@ export function TemporalClear({
           type: 'button',
           'aria-label': props['aria-label'] ?? `${c.label} 지우기`,
           disabled: c.blocked,
-          className:
-            'mr-1 flex size-8 shrink-0 items-center justify-center rounded-lg focus-visible:outline-2 disabled:opacity-40',
+          className: c.styles.clear(),
           onClick: c.clear,
         }),
       )
@@ -151,6 +225,12 @@ export function TemporalField({
     id = `ids-temporal-${useId()}`;
   const blocked = !!disabled || !!readOnly,
     resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = temporalFieldStyle({
+    variant,
+    size: resolvedSize,
+    disabled: !!disabled,
+    placeholder: !current,
+  });
   const close = useCallback((restore: boolean) => {
     setOpen(false);
     if (restore) trigger.current?.focus({ preventScroll: true });
@@ -193,11 +273,7 @@ export function TemporalField({
     // mergeRefs creates a callback without reading refs during render.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(trigger, forwardedRef),
-    className: fieldTriggerStyle({
-      variant: 'unstyled',
-      size: resolvedSize,
-      className: 'flex-1 focus-visible:outline-none',
-    }),
+    className: styles.trigger(),
     onClick: (e) => {
       native.onClick?.(e);
       if (!e.defaultPrevented && !blocked) setOpen((previous) => !previous);
@@ -238,17 +314,14 @@ export function TemporalField({
         },
         content: open && !blocked ? picker({ value: current, change }) : null,
         label,
+        styles,
       }}
     >
       <div
         ref={surface}
         data-temporal-field=""
         aria-invalid={triggerProps['aria-invalid']}
-        className={fieldTriggerStyle({
-          variant,
-          size: resolvedSize,
-          className: `gap-0 px-0 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-(--ids-color-primary) ${disabled ? 'opacity-40' : ''} ${className ?? ''}`,
-        })}
+        className={styles.root({ className })}
         style={style}
       >
         {triggers.length ? triggers : <TemporalTrigger />}
@@ -273,16 +346,16 @@ export function TemporalField({
               native.onBlur?.(e as unknown as React.FocusEvent<HTMLButtonElement>);
           }}
         >
-          <div className="mb-2 flex items-center justify-between px-1">
-            <span className="text-sm font-medium">{label} 선택</span>
+          <div className={styles.popupHeader()}>
+            <span className={styles.popupTitle()}>{label} 선택</span>
             <button
               type="button"
               data-popup-autofocus=""
               aria-label={`${label} 선택 닫기`}
               onClick={() => close(true)}
-              className="size-7 rounded focus-visible:outline-2"
+              className={styles.popupClose()}
             >
-              <XMarkIcon aria-hidden="true" className="mx-auto size-4" />
+              <XMarkIcon aria-hidden="true" />
             </button>
           </div>
           {contents.length ? contents : <TemporalContent />}
