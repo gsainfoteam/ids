@@ -36,7 +36,7 @@ export function Avatar({
     (child) => isValidElement(child) && child.type === Avatar.Fallback,
   );
   const initials = name == null ? '' : initialsOf(name);
-  const label = ariaLabel ?? alt ?? name;
+  const label = [ariaLabel, alt, name].find((candidate) => candidate?.trim());
 
   invariant(
     src != null || fallback != null || initials !== '',
