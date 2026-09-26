@@ -24,7 +24,7 @@ import { Search, X } from 'lucide-react';
 
 입력 하나를 감싸는 컨테이너다. 테두리, 배경, 포커스 링을 컨테이너가 그리고 안쪽 input은
 배경 없이 남는 폭을 채운다. `variant`는 `outline`(기본), `filled`, `underline`이고 `size`는
-`standard`(높이 44px, body-b2) 또는 `tiny`(32px, body-b3)다.
+`standard`(높이 36px, body-b3) 또는 `tiny`(32px, caption-c1)다.
 
 `TextField.Input`이 sentinel이다. 그 앞에 놓은 자식은 leading, 뒤에 놓은 자식은 trailing이
 된다. `placement` 같은 prop 없이 JSX 순서가 곧 시각적 순서다. 생략하면 TextField가 하나
