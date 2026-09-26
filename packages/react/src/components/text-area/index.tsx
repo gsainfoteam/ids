@@ -1,8 +1,5 @@
 import {
-  Children,
-  cloneElement,
   createContext,
-  Fragment,
   isValidElement,
   useContext,
   useRef,
@@ -16,7 +13,7 @@ import {
 import { isNotNil } from 'es-toolkit';
 
 import { useAutoResize } from './use-auto-resize';
-import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { Slot } from '../slot';
 
@@ -52,17 +49,8 @@ function rowsToHeight(rows: number | undefined) {
   return rows == null ? undefined : `calc(${rows} * 1lh + var(--ids-text-area-pad-y) * 2)`;
 }
 
-// Fragments are transparent; arbitrary components are never executed to find the Input.
-function flatten(children: ReactNode, prefix = ''): ReactNode[] {
-  return Children.toArray(children).flatMap((child, index) =>
-    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
-      ? flatten(child.props.children, `${prefix}${index}:`)
-      : [isValidElement(child) ? cloneElement(child, { key: `${prefix}${child.key}` }) : child],
-  );
-}
-
 function splitByInput(children: ReactNode) {
-  const items = flatten(children);
+  const items = flattenFragments(children);
   const inputIndexes = items
     .map((child, index) => (isValidElement(child) && child.type === TextArea.Input ? index : null))
     .filter(isNotNil);

@@ -1,3 +1,4 @@
+export * from './children';
 export * from './cn';
 export * from './invariant';
 export * from './merge';
