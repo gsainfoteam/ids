@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { TagIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { expect } from 'storybook/test';
 
 import { Field } from '../field';
@@ -21,8 +22,14 @@ function Example() {
     <div className="grid max-w-md gap-4">
       <Field>
         <Field.Label>기술 태그</Field.Label>
-        <ChipField value={value} onChange={setValue} creatable onCreate={setCreated} maxCount={3}>
-          <ChipField.SearchField placeholder="검색하거나 새 태그 입력" />
+        <ChipField
+          value={value}
+          onChange={setValue}
+          creatable
+          onCreate={setCreated}
+          maxCount={3}
+          placeholder="검색하거나 새 태그 입력"
+        >
           <ChipField.Group heading="개발">
             <ChipField.Item value="react">React</ChipField.Item>
             <ChipField.Item value="ts">TypeScript</ChipField.Item>
@@ -53,6 +60,33 @@ export const SearchCreateAndRemove: Story = {
     await expect(canvas.getByLabelText('태그 결과')).toHaveTextContent('["New tag"]');
     await userEvent.keyboard('{Backspace}');
     await expect(canvas.getByLabelText('태그 결과')).toHaveTextContent('[]');
+  },
+};
+function WithAdornmentsExample() {
+  const [value, setValue] = useState<string[]>(['react']);
+  return (
+    <Field className="max-w-md">
+      <Field.Label>관심 분야</Field.Label>
+      <ChipField value={value} onChange={setValue}>
+        <TagIcon aria-hidden="true" />
+        <ChipField.Input placeholder="분야 검색" spellCheck={false} />
+        {value.length > 0 && (
+          <button type="button" aria-label="모두 지우기" onClick={() => setValue([])}>
+            <XMarkIcon aria-hidden="true" className="size-4" />
+          </button>
+        )}
+        <ChipField.Item value="react">React</ChipField.Item>
+        <ChipField.Item value="flutter">Flutter</ChipField.Item>
+        <ChipField.Item value="design">Design</ChipField.Item>
+      </ChipField>
+    </Field>
+  );
+}
+export const WithAdornments: Story = {
+  render: () => <WithAdornmentsExample />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '모두 지우기' }));
+    await expect(canvas.queryByRole('button', { name: 'React 삭제' })).toBeNull();
   },
 };
 export const Playground: Story = {

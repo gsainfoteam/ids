@@ -17,7 +17,7 @@ for (const key of [
 ])
   globalThis[key] = dom.window[key];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-const { createElement: h, act } = await import('react');
+const { createElement: h, act, Fragment } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
 const { ChipField, Field } = await import('../dist/index.js');
@@ -42,7 +42,6 @@ async function type(node, value) {
   });
 }
 const trigger = () => host.querySelector('[role=combobox]');
-const editor = () => host.querySelector('[type=text]');
 async function click(node) {
   await act(async () => node.click());
 }
@@ -87,7 +86,7 @@ test('SSR Field labels and repeated FormData; no nested buttons; diagnostics', (
   assert.throws(() => renderToString(h(ChipField, { creatable: true })), /onCreate/);
   assert.throws(
     () => renderToString(h(ChipField, null, h(ChipField.Item, null, 'Bad'))),
-    /value is required/,
+    /`value` is required/,
   );
 });
 test('search, group filtering, keyboard selection, chip removal and maxCount', async () => {
@@ -148,7 +147,7 @@ test('creation trims input, prevents duplicates and IME commits, obeys limits', 
   await key(trigger(), 'Enter');
   assert.equal(created.length, 1);
 });
-test('native reset, prevented reset, readonly, disabled and explicit trigger composition', async () => {
+test('native reset, prevented reset, readonly, disabled and explicit composition', async () => {
   const view = (p) =>
     h(
       'form',
@@ -156,12 +155,7 @@ test('native reset, prevented reset, readonly, disabled and explicit trigger com
       h(
         ChipField,
         { name: 'skills', defaultValue: ['js'], ...p },
-        h(
-          ChipField.Trigger,
-          null,
-          h(ChipField.Value),
-          h(ChipField.SearchField, { asChild: true }, h('input', { 'data-test': 'search' })),
-        ),
+        h(ChipField.Input, { asChild: true }, h('input', { 'data-test': 'search' })),
         h(ChipField.Content, null, ...items()),
       ),
     );
@@ -227,4 +221,97 @@ test('RHF array validation, focus, value, reset and disabled omission', async ()
   await render(h(App, { disabled: true }));
   await submit();
   assert.equal(result.tags, undefined);
+});
+test('Input values win over root values, but root and Input handlers both run', async () => {
+  const keys = [];
+  await render(
+    h(
+      ChipField,
+      {
+        id: 'root-id',
+        placeholder: 'root',
+        spellCheck: false,
+        onKeyDown: () => keys.push('root'),
+      },
+      h(ChipField.Input, { placeholder: 'input', onKeyDown: () => keys.push('input') }),
+      ...items(),
+    ),
+  );
+  assert.equal(trigger().id, 'root-id');
+  assert.equal(trigger().placeholder, 'input');
+  assert.equal(trigger().getAttribute('spellcheck'), 'false');
+  await key(trigger(), 'ArrowDown');
+  assert.deepEqual(keys, ['root', 'input']);
+  assert.notEqual(host.querySelector('[role=listbox]'), null);
+  assert.equal(trigger().getAttribute('aria-expanded'), 'true');
+});
+const layout = () =>
+  Array.from(host.querySelector('[data-chip-field]').children, (el) =>
+    'chipFieldAdornment' in el.dataset
+      ? el.textContent
+      : 'chipFieldChip' in el.dataset
+        ? 'CHIP'
+        : el.tagName.toUpperCase(),
+  );
+test('without an Input, leading children come before the chips and the Input is appended', async () => {
+  await render(
+    h(
+      ChipField,
+      { 'aria-label': 'Tags', defaultValue: ['js'] },
+      h('span', { key: 'a' }, 'Lead'),
+      ...items(),
+    ),
+  );
+  assert.deepEqual(layout(), ['Lead', 'CHIP', 'INPUT', 'SVG']);
+  assert.equal(trigger().tagName, 'INPUT');
+});
+test('Input inside a Fragment splits leading and trailing adornments', async () => {
+  await render(
+    h(
+      ChipField,
+      { 'aria-label': 'Tags', defaultValue: ['js'] },
+      h(Fragment, null, h('span', null, 'Lead'), h(ChipField.Input), h('span', null, 'Trail')),
+      ...items(),
+    ),
+  );
+  assert.deepEqual(layout(), ['Lead', 'CHIP', 'INPUT', 'Trail', 'SVG']);
+});
+test('asChild merges props, handlers and ref into the child input', async () => {
+  let node;
+  const keys = [];
+  await render(
+    h(
+      ChipField,
+      {
+        'aria-label': 'Tags',
+        onKeyDown: () => keys.push('root'),
+        ref: (value) => {
+          node = value;
+        },
+      },
+      h(
+        ChipField.Input,
+        { asChild: true },
+        h('input', { spellCheck: false, onKeyDown: () => keys.push('child') }),
+      ),
+      ...items(),
+    ),
+  );
+  assert.equal(node, trigger());
+  assert.equal(trigger().getAttribute('spellcheck'), 'false');
+  assert.ok('chipFieldInput' in trigger().dataset);
+  await type(trigger(), 'Type');
+  await key(trigger(), 'Enter');
+  assert.deepEqual(keys, ['child', 'root']);
+  assert.equal(host.querySelector('[aria-label="TypeScript 삭제"]') != null, true);
+});
+test('invalid structures fail clearly', () => {
+  for (const node of [
+    h(ChipField, null, h(ChipField.Input), h(ChipField.Input)),
+    h(ChipField, null, h(ChipField.Input, { asChild: true }, h('textarea'))),
+    h(ChipField, null, h(ChipField.Input, null, 'text')),
+    h(ChipField.Input),
+    h(ChipField, null, h(ChipField.Content), h(ChipField.Item, { value: 'x' }, 'X')),
+  ])
+    assert.throws(() => renderToString(node), /\[IDS\] `<ChipField/);
 });

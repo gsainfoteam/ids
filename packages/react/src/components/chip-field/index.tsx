@@ -9,12 +9,16 @@ import {
   useRef,
   useState,
   type ComponentProps,
+  type CSSProperties,
+  type ReactElement,
   type ReactNode,
+  type RefObject,
 } from 'react';
 
 import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { isNotNil } from 'es-toolkit';
 
-import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
 import {
   FieldPopup,
@@ -24,26 +28,35 @@ import {
   part,
   revealPopupOption,
 } from '../field-popup';
+import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
 
 type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
 type Option = { value: string; label: string; disabled?: boolean };
-export type ChipFieldProps = Omit<
+
+export type ChipFieldVariant = 'outline' | 'filled' | 'unstyled';
+
+// `name`, `form` and `required` describe the submitted chips, not the typed query, so they
+// stay on the root: a named query input would submit the half-typed search text.
+export type ChipFieldInputProps = Omit<
   ComponentProps<'input'>,
-  'type' | 'size' | 'value' | 'defaultValue' | 'onChange'
-> & {
-  value?: string[];
-  defaultValue?: string[];
-  onChange?: (value: string[]) => void;
-  creatable?: boolean;
-  onCreate?: (value: string) => void;
-  maxCount?: number;
-  variant?: 'outline' | 'filled' | 'unstyled';
-  size?: IdsSize;
-  invalid?: boolean;
-  mobileVariant?: 'popover' | 'drawer';
-};
+  | 'type'
+  | 'size'
+  | 'value'
+  | 'defaultValue'
+  | 'onChange'
+  | 'name'
+  | 'form'
+  | 'required'
+  | 'children'
+  | 'className'
+  | 'style'
+  | 'color'
+  | 'disabled'
+>;
+
+type InputAttributes = Omit<ComponentProps<'input'>, 'children'>;
 type ContextValue = {
   selected: string[];
   options: Option[];
@@ -54,8 +67,10 @@ type ContextValue = {
   full: boolean;
   canCreate: boolean;
   query: string;
-  inputProps: ComponentProps<'input'>;
-  surfaceProps: ComponentProps<'div'>;
+  inputProps: ChipFieldInputProps;
+  inputDefaults: InputAttributes;
+  control: InputAttributes & { 'data-chip-field-input': string };
+  inputRef: RefObject<HTMLInputElement | null>;
   choose: (value: string) => void;
   remove: (value: string) => void;
   create: () => void;
@@ -63,9 +78,9 @@ type ContextValue = {
   styles: ReturnType<typeof ChipField.Style>;
 };
 const Context = createContext<ContextValue | null>(null);
-function useChip() {
+function useChip(name: string) {
   const c = useContext(Context);
-  invariant(c, 'ChipField parts must be inside ChipField.');
+  invariant(c, `\`<ChipField.${name}>\` must be used inside \`<ChipField>\`.`);
   return c;
 }
 function content(children: ReactNode, asChild?: boolean): ReactNode {
@@ -100,59 +115,108 @@ function collect(children: ReactNode): Option[] {
     return [];
   });
 }
-function ChipTrigger({ asChild, children, ...props }: BoxProps) {
-  const c = useChip();
-  return part(
-    'div',
-    asChild,
-    children ?? (
-      <>
-        <ChipValue />
-        <ChipSearch />
-        <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
-      </>
-    ),
-    mergeProps(props, { ...c.surfaceProps }),
+function isPopupPart(node: ReactNode) {
+  return (
+    isValidElement(node) &&
+    (node.type === ChipContent ||
+      node.type === ChipItem ||
+      node.type === ChipGroup ||
+      node.type === ChipCreate ||
+      node.type === ChipEmpty)
   );
 }
-function ChipValue({ asChild, children, ...props }: BoxProps) {
-  const c = useChip();
-  return part(
-    'div',
-    asChild,
-    children ??
-      c.selected.map((value) => {
-        const option = c.options.find((o) => o.value === value);
-        const title = option?.label ?? value;
-        return (
-          <span key={value} className={c.styles.chip()}>
-            <span className={c.styles.chipLabel()}>{title}</span>
-            <button
-              type="button"
-              disabled={c.blocked || option?.disabled}
-              aria-label={`${title} 삭제`}
-              className={c.styles.chipRemove()}
-              onClick={() => c.remove(value)}
-            >
-              <XMarkIcon aria-hidden="true" className={c.styles.chipRemoveIcon()} />
-            </button>
-          </span>
-        );
-      }),
-    mergeProps({ className: 'contents' }, props),
+function splitChildren(children: ReactNode) {
+  const nodes = flattenFragments(children);
+  const popup = nodes.filter(isPopupPart);
+  const contents = popup.filter((n) => isValidElement(n) && n.type === ChipContent);
+  invariant(contents.length <= 1, '`<ChipField>` accepts at most one `<ChipField.Content>`.');
+  invariant(
+    contents.length === 0 || popup.length === 1,
+    '`<ChipField>` takes options either inside `<ChipField.Content>` or directly, not both.',
   );
+
+  const items = nodes.filter((n) => !isPopupPart(n));
+  const inputIndexes = items
+    .map((child, index) => (isValidElement(child) && child.type === ChipInput ? index : null))
+    .filter(isNotNil);
+  invariant(inputIndexes.length <= 1, '`<ChipField>` accepts at most one `<ChipField.Input />`.');
+
+  const inputIndex = inputIndexes[0];
+  const adornments =
+    inputIndex == null
+      ? { leading: items, input: <ChipInput />, trailing: [] as ReactNode[] }
+      : {
+          leading: items.slice(0, inputIndex),
+          input: items[inputIndex] as ReactElement<ChipField.Input.Props>,
+          trailing: items.slice(inputIndex + 1),
+        };
+  return { ...adornments, popup: contents.length ? contents : <ChipContent>{popup}</ChipContent> };
 }
-function ChipSearch({ asChild, children, ...props }: ChipField.SearchFieldProps) {
-  const c = useChip();
-  return part(
-    'input',
-    asChild,
-    children,
-    mergeProps(props, {
-      ...c.inputProps,
-      placeholder: c.inputProps.placeholder ?? props.placeholder ?? '항목 추가…',
-    }),
-  );
+function Adornments({ items, className }: { items: ReactNode[]; className: string }) {
+  return items.map((item, index) => (
+    <span
+      key={(isValidElement(item) && item.key) || index}
+      data-chip-field-adornment=""
+      className={className}
+    >
+      {item}
+    </span>
+  ));
+}
+function Chips({ c }: { c: ContextValue }) {
+  return c.selected.map((value) => {
+    const option = c.options.find((o) => o.value === value);
+    const title = option?.label ?? value;
+    return (
+      <span key={value} data-chip-field-chip="" className={c.styles.chip()}>
+        <span className={c.styles.chipLabel()}>{title}</span>
+        <button
+          type="button"
+          disabled={c.blocked || option?.disabled}
+          aria-label={`${title} 삭제`}
+          className={c.styles.chipRemove()}
+          onClick={() => c.remove(value)}
+        >
+          <XMarkIcon aria-hidden="true" className={c.styles.chipRemoveIcon()} />
+        </button>
+      </span>
+    );
+  });
+}
+function ChipInput({
+  asChild,
+  children,
+  disabled: _disabled,
+  className,
+  style,
+  ref,
+  ...rest
+}: ChipField.Input.Props) {
+  const c = useContext(Context);
+  invariant(c != null, '`<ChipField.Input>` must be used inside `<ChipField>`.');
+
+  const props = {
+    // Input values win over the root's, and handlers compose so Field and react-hook-form
+    // wiring on the root still runs. The combobox wiring is merged last: its handlers run
+    // after the user's (skipped if they preventDefault) and its ARIA state cannot be replaced.
+    ...mergeProps(mergeProps(c.inputDefaults, mergeProps(c.inputProps, rest)), c.control),
+    className: c.styles.input({ className }),
+    style,
+  };
+
+  if (asChild === true) {
+    invariant(
+      isValidElement(children) && (typeof children.type !== 'string' || children.type === 'input'),
+      '`<ChipField.Input asChild>` requires one input, or a component forwarding input props and ref.',
+    );
+    return (
+      <Slot {...(props as Slot.Props)} ref={mergeRefs(c.inputRef, c.inputProps.ref, ref)}>
+        {children}
+      </Slot>
+    );
+  }
+  invariant(children == null, '`<ChipField.Input>` renders the search text itself, not children.');
+  return <input {...props} ref={mergeRefs(c.inputRef, c.inputProps.ref, ref)} />;
 }
 function ChipItem({
   value,
@@ -162,7 +226,7 @@ function ChipItem({
   children,
   ...props
 }: ChipField.ItemProps) {
-  const c = useChip();
+  const c = useChip('Item');
   if (!c.visible.some((o) => o.value === value)) return null;
   const blocked = disabled || (c.full && !c.selected.includes(value));
   return part(
@@ -187,7 +251,7 @@ function ChipItem({
   );
 }
 function ChipGroup({ heading, asChild, children, ...props }: ChipField.GroupProps) {
-  const c = useChip(),
+  const c = useChip('Group'),
     id = useId();
   if (!collect(content(children, asChild)).some((o) => c.visible.some((v) => v.value === o.value)))
     return null;
@@ -207,7 +271,7 @@ function ChipGroup({ heading, asChild, children, ...props }: ChipField.GroupProp
   );
 }
 function ChipCreate({ asChild, children, ...props }: BoxProps) {
-  const c = useChip();
+  const c = useChip('Create');
   if (!c.canCreate) return null;
   return part(
     'div',
@@ -226,7 +290,7 @@ function ChipCreate({ asChild, children, ...props }: BoxProps) {
   );
 }
 function ChipEmpty({ asChild, children = '검색 결과가 없습니다.', ...props }: BoxProps) {
-  const c = useChip();
+  const c = useChip('Empty');
   return c.visible.length || c.canCreate
     ? null
     : part('div', asChild, children, {
@@ -236,7 +300,7 @@ function ChipEmpty({ asChild, children = '검색 결과가 없습니다.', ...pr
       });
 }
 function ChipContent({ asChild, children, ...props }: BoxProps) {
-  const c = useChip();
+  const c = useChip('Content');
   const nodes = flattenParts(content(children, asChild));
   const empty = nodes.filter((n) => isValidElement(n) && n.type === ChipEmpty);
   const items = nodes.filter((n) => !empty.includes(n));
@@ -269,15 +333,15 @@ export function ChipField({
   size,
   invalid,
   mobileVariant = 'drawer',
+  disabled,
   children,
   className,
   style,
-  ref: forwardedRef,
   name,
   form,
   required,
-  ...native
-}: ChipFieldProps) {
+  ...inputProps
+}: ChipField.Props) {
   const [stored, setStored] = useState(defaultValue),
     [query, setQuery] = useState(''),
     [open, setOpen] = useState(false),
@@ -287,35 +351,44 @@ export function ChipField({
     Array.isArray(selected) &&
       selected.every((v) => typeof v === 'string') &&
       new Set(selected).size === selected.length,
-    'ChipField: value must contain unique strings.',
+    '`<ChipField>` `value` must contain unique strings.',
   );
   invariant(
     !creatable || typeof onCreate === 'function',
-    'ChipField: creatable requires onCreate.',
+    '`<ChipField>` with `creatable` requires `onCreate`.',
   );
   invariant(
     maxCount === undefined || (Number.isInteger(maxCount) && maxCount >= 0),
-    'ChipField: maxCount must be a non-negative integer.',
+    '`<ChipField>` `maxCount` must be a non-negative integer.',
   );
   const options = collect(children);
   invariant(
     options.every((o) => typeof o.value === 'string'),
-    'ChipField.Item: value is required.',
+    '`<ChipField.Item>` `value` is required.',
   );
   invariant(
     new Set(options.map((o) => o.value)).size === options.length,
-    'ChipField: duplicate Item value.',
+    '`<ChipField>` has a duplicate `<ChipField.Item>` value.',
   );
-  const input = useRef<HTMLInputElement>(null),
+  const { leading, input, trailing, popup } = splitChildren(children);
+
+  // The sentinel's own props win over the root's, so derive container state from the
+  // merged result, not from the root props alone.
+  const merged = { ...inputProps, ...input.props };
+  const isDisabled = !!(input.props.disabled ?? disabled);
+  const ariaInvalid = merged['aria-invalid'] ?? invalid;
+  const isInvalid = ariaInvalid != null && ariaInvalid !== false && ariaInvalid !== 'false';
+
+  const inputRef = useRef<HTMLInputElement>(null),
     anchor = useRef<HTMLDivElement>(null),
     composing = useRef(false);
   const id = `ids-chip-${useId()}`;
   const styles = ChipField.Style({
     variant,
     size: useFieldSize(size) ?? 'standard',
-    disabled: !!native.disabled,
+    disabled: isDisabled,
   });
-  const blocked = !!native.disabled || !!native.readOnly,
+  const blocked = isDisabled || !!merged.readOnly,
     full = maxCount !== undefined && selected.length >= maxCount;
   const normalized = query.trim().toLocaleLowerCase();
   const visible = options.filter((o) => o.label.toLocaleLowerCase().includes(normalized));
@@ -342,10 +415,10 @@ export function ChipField({
         : enabled[0]?.value;
   const close = useCallback((restore: boolean) => {
     setOpen(false);
-    if (restore) input.current?.focus({ preventScroll: true });
+    if (restore) inputRef.current?.focus({ preventScroll: true });
   }, []);
   useLayoutEffect(() => {
-    const owner = input.current?.form;
+    const owner = inputRef.current?.form;
     if (!owner) return;
     let alive = true;
     const reset = (e: Event) =>
@@ -365,7 +438,7 @@ export function ChipField({
   useLayoutEffect(() => {
     if (open && !blocked)
       revealPopupOption(
-        input.current?.ownerDocument.getElementById(
+        inputRef.current?.ownerDocument.getElementById(
           activeValue === undefined
             ? `${id}-create`
             : `${id}-option-${encodeURIComponent(activeValue)}`,
@@ -379,14 +452,14 @@ export function ChipField({
   const remove = (next: string) => {
     if (blocked || options.find((o) => o.value === next)?.disabled) return;
     emit(selected.filter((v) => v !== next));
-    input.current?.focus({ preventScroll: true });
+    inputRef.current?.focus({ preventScroll: true });
   };
   const choose = (next: string) => {
     if (blocked || options.find((o) => o.value === next)?.disabled) return;
     if (selected.includes(next)) remove(next);
     else if (!full) emit([...selected, next]);
     setQuery('');
-    input.current?.focus({ preventScroll: true });
+    inputRef.current?.focus({ preventScroll: true });
   };
   const create = () => {
     if (blocked || !canCreate) return;
@@ -395,46 +468,34 @@ export function ChipField({
     emit([...selected, next]);
     setQuery('');
     setActive(undefined);
-    input.current?.focus({ preventScroll: true });
+    inputRef.current?.focus({ preventScroll: true });
   };
-  const search = flattenParts(children).filter((n) => isValidElement(n) && n.type === ChipSearch);
-  const explicit = flattenParts(children).filter(
-    (n) => isValidElement(n) && n.type === ChipTrigger,
-  );
-  const contents = flattenParts(children).filter(
-    (n) => isValidElement(n) && n.type === ChipContent,
-  );
-  invariant(
-    search.length <= 1 && explicit.length <= 1 && contents.length <= 1,
-    'ChipField: use at most one Trigger, SearchField and Content.',
-  );
-  const inputProps: ComponentProps<'input'> = {
-    ...native,
-    // mergeRefs only composes ref callbacks; it does not access current here.
-    // eslint-disable-next-line react-hooks/refs
-    ref: mergeRefs(input, forwardedRef),
-    id: native.id ?? `${id}-input`,
+  const inputDefaults: InputAttributes = {
+    placeholder: '항목 추가…',
+    autoComplete: 'off',
+    'aria-invalid': isInvalid || undefined,
+    'aria-required': required,
+  };
+  const expanded = open && !blocked;
+  const control: ContextValue['control'] = {
+    'data-chip-field-input': '',
+    id: typeof merged.id === 'string' ? merged.id : `${id}-input`,
     form,
     type: 'text',
     role: 'combobox',
     value: query,
-    autoComplete: native.autoComplete ?? 'off',
-    placeholder: native.placeholder,
-    'aria-expanded': open && !blocked,
-    'aria-controls': open && !blocked ? id : undefined,
+    disabled: isDisabled,
+    'aria-expanded': expanded,
+    'aria-controls': expanded ? id : undefined,
     'aria-autocomplete': 'list',
     'aria-activedescendant':
-      open && !blocked && (activeValue !== undefined || canCreate)
+      expanded && (activeValue !== undefined || canCreate)
         ? activeValue === undefined
           ? `${id}-create`
           : `${id}-option-${encodeURIComponent(activeValue)}`
         : undefined,
-    'aria-invalid': native['aria-invalid'] ?? invalid,
-    'aria-required': native['aria-required'] ?? required,
-    className: styles.search(),
-    onClick: (e) => {
-      native.onClick?.(e);
-      if (!e.defaultPrevented && !blocked) setOpen(true);
+    onClick: () => {
+      if (!blocked) setOpen(true);
     },
     onChange: (e) => {
       if (!blocked) {
@@ -443,24 +504,14 @@ export function ChipField({
         setOpen(true);
       }
     },
-    onCompositionStart: (e) => {
+    onCompositionStart: () => {
       composing.current = true;
-      native.onCompositionStart?.(e);
     },
-    onCompositionEnd: (e) => {
+    onCompositionEnd: () => {
       composing.current = false;
-      native.onCompositionEnd?.(e);
     },
     onKeyDown: (e) => {
-      native.onKeyDown?.(e);
-      if (
-        e.defaultPrevented ||
-        blocked ||
-        composing.current ||
-        e.nativeEvent.isComposing ||
-        e.keyCode === 229
-      )
-        return;
+      if (blocked || composing.current || e.nativeEvent.isComposing || e.keyCode === 229) return;
       if (e.key === 'Escape' && open) {
         e.preventDefault();
         close(true);
@@ -500,99 +551,122 @@ export function ChipField({
       }
     },
   };
-  const surfaceProps: ComponentProps<'div'> = {
-    ref: anchor,
-    className: styles.trigger({ className }),
-    style,
-    'aria-invalid': invalid,
-    'data-chip-field': '',
-    onClick: (e) => {
-      if (e.target === e.currentTarget && !blocked) {
-        input.current?.focus({ preventScroll: true });
-        setOpen(true);
-      }
-    },
-  } as ComponentProps<'div'>;
-  const others = flattenParts(children).filter(
-    (n) => !explicit.includes(n) && !search.includes(n) && !contents.includes(n),
-  );
+  const context: ContextValue = {
+    selected,
+    options,
+    visible,
+    active: activeValue,
+    id,
+    blocked,
+    full,
+    canCreate,
+    query,
+    inputProps,
+    inputDefaults,
+    control,
+    inputRef,
+    choose,
+    remove,
+    create,
+    setActive,
+    styles,
+  };
   return (
-    <Context.Provider
-      value={{
-        selected,
-        options,
-        visible,
-        active: activeValue,
-        id,
-        blocked,
-        full,
-        canCreate,
-        query,
-        inputProps,
-        surfaceProps,
-        choose,
-        remove,
-        create,
-        setActive,
-        styles,
-      }}
-    >
-      {explicit.length ? (
-        explicit
-      ) : (
-        <ChipTrigger>
-          <ChipValue />
-          {search.length ? search : <ChipSearch />}
-          <ChevronDownIcon aria-hidden="true" className={styles.icon()} />
-        </ChipTrigger>
-      )}
-      {open && !blocked && (
+    <Context.Provider value={context}>
+      <div
+        ref={anchor}
+        data-chip-field=""
+        data-disabled={isDisabled ? '' : undefined}
+        aria-invalid={isInvalid || undefined}
+        className={styles.root({ className })}
+        style={style}
+        onClick={(e) => {
+          if (blocked) return;
+          const target = e.target as HTMLElement;
+          if (target.closest('button, a, input, textarea, select, label')) return;
+          inputRef.current?.focus({ preventScroll: true });
+          setOpen(true);
+        }}
+      >
+        <Adornments items={leading} className={styles.adornment()} />
+        <Chips c={context} />
+        {input}
+        <Adornments items={trailing} className={styles.adornment()} />
+        <ChevronDownIcon aria-hidden="true" className={styles.icon()} />
+      </div>
+      {expanded && (
         <FieldPopup anchor={anchor} onClose={close} mobileVariant={mobileVariant}>
-          {contents.length ? contents : <ChipContent>{others}</ChipContent>}
+          {popup}
         </FieldPopup>
       )}
       {name &&
         selected.map((v) => (
-          <input
-            key={v}
-            type="hidden"
-            name={name}
-            form={form}
-            value={v}
-            disabled={native.disabled}
-          />
+          <input key={v} type="hidden" name={name} form={form} value={v} disabled={isDisabled} />
         ))}
     </Context.Provider>
   );
 }
 export namespace ChipField {
-  export type Props = ChipFieldProps;
+  export type Props = ChipFieldInputProps & {
+    value?: string[];
+    defaultValue?: string[];
+    onChange?: (value: string[]) => void;
+    creatable?: boolean;
+    onCreate?: (value: string) => void;
+    maxCount?: number;
+    variant?: ChipFieldVariant;
+    size?: IdsSize;
+    invalid?: boolean;
+    mobileVariant?: 'popover' | 'drawer';
+    name?: string;
+    form?: string;
+    required?: boolean;
+    disabled?: boolean;
+    children?: ReactNode;
+    className?: string;
+    style?: CSSProperties;
+  };
   export type ItemProps = BoxProps & { value: string; searchValue?: string; disabled?: boolean };
   export type GroupProps = BoxProps & { heading: ReactNode };
-  export type SearchFieldProps = ComponentProps<'input'> & { asChild?: boolean };
-  export const Trigger = ChipTrigger,
-    Value = ChipValue,
-    SearchField = ChipSearch,
+  export const Input = ChipInput,
     Content = ChipContent,
     Item = ChipItem,
     Group = ChipGroup,
     Create = ChipCreate,
     Empty = ChipEmpty;
+  export namespace Input {
+    // `onChange` here observes the typed search text; the selected chips are the root's.
+    export type Props = ChipFieldInputProps & {
+      onChange?: ComponentProps<'input'>['onChange'];
+      asChild?: boolean;
+      children?: ReactNode;
+      disabled?: boolean;
+      className?: string;
+      style?: CSSProperties;
+    };
+  }
   export const Style = tv({
     slots: {
-      trigger: [
+      root: [
         ...fieldTrigger.base,
         'flex-wrap gap-1 py-1',
         // The utility only recognises TextField/TextArea inputs, so the shell rings for its
-        // own search input here. Scoped to the input so a focused chip button rings alone.
-        'has-[input:focus-visible]:ring-[3px] has-[input:focus-visible]:ring-(--ids-color-primary)/40',
+        // own Input here. Scoped to the Input so a focused chip button rings alone.
+        'has-[[data-chip-field-input]:focus-visible]:ring-[3px] has-[[data-chip-field-input]:focus-visible]:ring-(--ids-color-primary)/40',
+      ],
+      adornment: [
+        'inline-flex shrink-0 items-center empty:hidden',
+        'not-has-[button]:text-(--ids-color-on-muted)',
+        'not-has-[button]:[&_svg]:shrink-0 not-has-[button]:[&_svg]:text-current',
+        '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
+        '[&_button]:p-0',
       ],
       chip: 'inline-flex max-w-full items-center gap-1 rounded-sm bg-(--ids-color-primary)/10',
       chipLabel: 'truncate',
       chipRemove:
         'shrink-0 cursor-pointer rounded-xs px-0.5 focus-ring disabled:cursor-not-allowed disabled:opacity-50',
       chipRemoveIcon: 'mx-auto',
-      search: [
+      input: [
         'min-w-20 flex-1 bg-transparent py-1 outline-none',
         'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
       ],
@@ -603,25 +677,33 @@ export namespace ChipField {
     },
     variants: {
       variant: {
-        outline: { trigger: fieldTrigger.variant.outline },
+        outline: { root: fieldTrigger.variant.outline },
         filled: {
-          trigger: [
+          root: [
             fieldTrigger.variant.filled,
-            'has-[input:focus-visible]:bg-(--ids-color-primary)/15',
+            'has-[[data-chip-field-input]:focus-visible]:bg-(--ids-color-primary)/15',
           ],
         },
-        unstyled: { trigger: fieldTrigger.variant.unstyled },
-      } satisfies Record<NonNullable<ChipFieldProps['variant']>, object>,
+        unstyled: { root: fieldTrigger.variant.unstyled },
+      } satisfies Record<ChipFieldVariant, object>,
       // The shell grows with wrapped chips, so the control height is a floor, not a height.
       size: {
         standard: {
-          trigger: [fieldTrigger.size.standard, 'h-auto min-h-(--ids-size-control-standard)'],
+          root: [fieldTrigger.size.standard, 'h-auto min-h-(--ids-size-control-standard)'],
+          adornment: [
+            'gap-1',
+            'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
+          ],
           chip: 'px-2 py-0.5',
           chipRemoveIcon: fieldTrigger.icon.tiny,
           icon: fieldTrigger.icon.standard,
         },
         tiny: {
-          trigger: [fieldTrigger.size.tiny, 'h-auto min-h-(--ids-size-control-tiny)'],
+          root: [fieldTrigger.size.tiny, 'h-auto min-h-(--ids-size-control-tiny)'],
+          adornment: [
+            'gap-0.5',
+            'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',
+          ],
           chip: 'px-1.5 py-px',
           chipRemoveIcon: 'size-3',
           icon: fieldTrigger.icon.tiny,
@@ -629,9 +711,10 @@ export namespace ChipField {
       } satisfies Record<IdsSize, object>,
       // The shell is a div, so the trigger's `disabled:` classes never match it.
       disabled: {
-        true: { trigger: 'cursor-not-allowed opacity-50' },
+        true: { root: 'cursor-not-allowed opacity-50' },
       },
     },
     defaultVariants: { variant: 'outline', size: 'standard' },
   });
 }
+export type ChipFieldProps = ChipField.Props;
