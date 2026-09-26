@@ -1,8 +1,7 @@
 import {
-  Children,
-  Fragment,
   cloneElement,
   createContext,
+  Fragment,
   isValidElement,
   useContext,
   useEffect,
@@ -13,53 +12,142 @@ import {
   type ComponentProps,
   type ReactElement,
   type ReactNode,
+  type RefObject,
 } from 'react';
 
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { isNotNil } from 'es-toolkit';
 
-import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { useFieldSize } from '../field/context';
 import { IconButton } from '../icon-button';
+import { Slot } from '../slot';
 
 import type { IdsSize } from '../../tokens/types';
 
 type NativeProps = ComponentProps<'input'>;
+type NativeButtonProps = ComponentProps<'button'>;
+type RootInputProps = Omit<NativeProps, 'type' | 'size' | 'color' | 'children'>;
+
 export type PasswordFieldVariant = 'outline' | 'filled' | 'unstyled';
-export type PasswordFieldProps = Omit<NativeProps, 'type' | 'size' | 'color' | 'children'> & {
+export type PasswordFieldProps = RootInputProps & {
   variant?: PasswordFieldVariant;
   size?: IdsSize;
   invalid?: boolean;
   hideVisibilityToggle?: boolean;
   children?: ReactNode;
 };
-type VisibilityContext = {
+
+type PasswordFieldContextValue = {
+  size: IdsSize;
   visible: boolean;
   disabled: boolean;
   id: string;
-  size: IdsSize;
   toggle: (pointer: boolean) => void;
+  inputProps: Omit<RootInputProps, 'className' | 'style'>;
+  // Computed from the merged root, Input and asChild props, so applying them last does not
+  // discard anything the caller set; it only fills in the password-specific defaults.
+  internal: Pick<
+    NativeProps,
+    'id' | 'type' | 'autoComplete' | 'spellCheck' | 'autoCapitalize' | 'aria-invalid' | 'disabled'
+  >;
+  inputRef: RefObject<HTMLInputElement | null>;
 };
-const Context = createContext<VisibilityContext | null>(null);
-function flatten(children: ReactNode, prefix = ''): ReactNode[] {
-  return Children.toArray(children).flatMap((child, index) =>
-    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
-      ? flatten(child.props.children, `${prefix}${index}:`)
-      : [isValidElement(child) ? cloneElement(child, { key: `${prefix}${child.key}` }) : child],
-  );
-}
-function PasswordInput(_props: PasswordField.InputProps): ReactNode {
+
+const PasswordFieldContext = createContext<PasswordFieldContextValue | null>(null);
+
+function splitByInput(children: ReactNode) {
+  const items = flattenFragments(children);
+  const indexesOf = (type: unknown) =>
+    items
+      .map((child, index) => (isValidElement(child) && child.type === type ? index : null))
+      .filter(isNotNil);
+  const inputIndexes = indexesOf(PasswordInput);
+
   invariant(
-    false,
-    'PasswordField.Input must be a direct child of PasswordField (or inside a Fragment).',
+    inputIndexes.length <= 1,
+    '`<PasswordField>` accepts at most one `<PasswordField.Input />`.',
   );
+  invariant(
+    indexesOf(PasswordVisibilityToggle).length <= 1,
+    '`<PasswordField>` accepts at most one `<PasswordField.VisibilityToggle />`.',
+  );
+
+  const hasToggle = indexesOf(PasswordVisibilityToggle).length > 0;
+  const inputIndex = inputIndexes[0];
+  if (inputIndex == null) {
+    return { leading: items, input: <PasswordInput />, trailing: [] as ReactNode[], hasToggle };
+  }
+
+  return {
+    leading: items.slice(0, inputIndex),
+    input: items[inputIndex] as ReactElement<PasswordField.InputProps>,
+    trailing: items.slice(inputIndex + 1),
+    hasToggle,
+  };
 }
+
+function PasswordInput({
+  asChild,
+  children,
+  className,
+  style,
+  ref,
+  ...rest
+}: PasswordField.InputProps) {
+  const field = useContext(PasswordFieldContext);
+  invariant(field != null, '`<PasswordField.Input>` must be used inside `<PasswordField>`.');
+
+  const { size, inputProps, internal, inputRef } = field;
+  const register = (node: HTMLInputElement | null) => {
+    invariant(
+      !node || node.tagName === 'INPUT',
+      '`<PasswordField.Input asChild>` must forward its ref to an input.',
+    );
+    inputRef.current = node;
+    return () => {
+      inputRef.current = null;
+    };
+  };
+  const props = {
+    'data-password-field-input': '',
+    'data-size': size,
+    // Input values win, but handlers compose so Field and react-hook-form wiring on the
+    // root still runs when the Input sets its own onChange or onBlur.
+    ...mergeProps(inputProps, rest),
+    ...internal,
+    className: PasswordField.Style({ size }).input({ className }),
+    style,
+  };
+
+  if (asChild === true) {
+    invariant(
+      isValidElement(children) && (typeof children.type !== 'string' || children.type === 'input'),
+      '`<PasswordField.Input asChild>` requires one input, or a component forwarding input props and ref.',
+    );
+    return (
+      <Slot {...(props as Slot.Props)} ref={mergeRefs(register, inputProps.ref, ref)}>
+        {children}
+      </Slot>
+    );
+  }
+  invariant(
+    children == null,
+    '`<PasswordField.Input>` takes `value`/`defaultValue`, not children.',
+  );
+  return <input {...props} ref={mergeRefs(register, inputProps.ref, ref)} />;
+}
+
 function PasswordVisibilityToggle({
   asChild,
   children,
   ...props
 }: PasswordField.VisibilityToggleProps) {
-  const context = useContext(Context);
-  invariant(context, 'PasswordField.VisibilityToggle must be inside PasswordField.');
+  const context = useContext(PasswordFieldContext);
+  invariant(
+    context != null,
+    '`<PasswordField.VisibilityToggle>` must be used inside `<PasswordField>`.',
+  );
   const internal: Omit<NativeButtonProps, 'children'> = {
     type: 'button',
     disabled: context.disabled || props.disabled,
@@ -76,11 +164,11 @@ function PasswordVisibilityToggle({
   if (asChild) {
     invariant(
       isValidElement<NativeButtonProps>(children) && children.type !== Fragment,
-      'PasswordField.VisibilityToggle asChild requires one button or a component forwarding button props/ref.',
+      '`<PasswordField.VisibilityToggle asChild>` requires one button, or a component forwarding button props and ref.',
     );
     invariant(
       typeof children.type !== 'string' || children.type === 'button',
-      'PasswordField.VisibilityToggle asChild must render a button.',
+      '`<PasswordField.VisibilityToggle asChild>` must render a button.',
     );
     return cloneElement(
       children,
@@ -89,7 +177,7 @@ function PasswordVisibilityToggle({
   }
   invariant(
     children == null,
-    'PasswordField.VisibilityToggle supplies its own icon; use asChild to customize.',
+    '`<PasswordField.VisibilityToggle>` supplies its own icon; use `asChild` to customize it.',
   );
   return (
     <IconButton
@@ -102,7 +190,6 @@ function PasswordVisibilityToggle({
     />
   );
 }
-type NativeButtonProps = ComponentProps<'button'>;
 
 export function PasswordField({
   variant = 'outline',
@@ -112,39 +199,20 @@ export function PasswordField({
   children,
   className,
   style,
-  ...rootProps
+  ...inputProps
 }: PasswordFieldProps) {
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = PasswordField.Style({ variant, size: resolvedSize });
   const generatedId = useId();
   const [visible, setVisible] = useState(false);
-  const parts = flatten(children);
-  const sentinels = parts.filter((part) => isValidElement(part) && part.type === PasswordInput);
-  invariant(sentinels.length <= 1, 'PasswordField: Input은 한 번만 명시할 수 있습니다.');
-  invariant(
-    parts.length === 0 || sentinels.length === 1,
-    'PasswordField: children require one PasswordField.Input.',
-  );
-  const toggles = parts.filter(
-    (part) => isValidElement(part) && part.type === PasswordVisibilityToggle,
-  );
-  invariant(toggles.length <= 1, 'PasswordField: VisibilityToggle must be declared at most once.');
-  const sentinel = sentinels[0] as ReactElement<PasswordField.InputProps> | undefined;
-  const { asChild, children: inputChild, ...inputProps } = sentinel?.props ?? {};
-  let child: ReactElement<NativeProps> | undefined;
-  if (asChild) {
-    invariant(
-      isValidElement<NativeProps>(inputChild) && inputChild.type !== Fragment,
-      'PasswordField.Input asChild requires one input or a component forwarding input props/ref.',
-    );
-    invariant(
-      typeof inputChild.type !== 'string' || inputChild.type === 'input',
-      'PasswordField.Input asChild must render an input.',
-    );
-    child = inputChild;
-  } else
-    invariant(inputChild == null, 'PasswordField.Input does not accept children without asChild.');
-  const native: NativeProps = mergeProps(mergeProps({ ...child?.props }, inputProps), rootProps);
+  const { leading, input, trailing, hasToggle } = splitByInput(children);
+
+  // Container state and the internal input attributes read the same precedence the Input
+  // renders with (asChild child < root < Input), so they never disagree with the DOM.
+  const { asChild, children: inputChild, ...ownInputProps } = input.props;
+  const childProps =
+    asChild === true && isValidElement<NativeProps>(inputChild) ? inputChild.props : {};
+  const native: NativeProps = mergeProps(mergeProps({ ...childProps }, inputProps), ownInputProps);
   const id = native.id ?? `ids-password-${generatedId}`;
   const inputRef = useRef<HTMLInputElement>(null);
   const selection = useRef<{
@@ -152,18 +220,6 @@ export function PasswordField({
     end: number;
     direction: 'forward' | 'backward' | 'none';
   } | null>(null);
-  const ref = (node: HTMLInputElement | null) => {
-    invariant(
-      !node || node.tagName === 'INPUT',
-      'PasswordField.Input asChild must forward its ref to an input.',
-    );
-    inputRef.current = node;
-    const cleanup = mergeRefs(native.ref)(node);
-    return () => {
-      inputRef.current = null;
-      cleanup?.();
-    };
-  };
   useLayoutEffect(() => {
     const node = inputRef.current;
     const saved = selection.current;
@@ -201,29 +257,23 @@ export function PasswordField({
   const autoComplete =
     native.autoComplete ??
     (/^new[-_]?password$/i.test(nameLeaf ?? '') ? 'new-password' : 'current-password');
-  const actual: NativeProps = {
-    ...native,
-    id,
-    ref,
-    type: visible ? 'text' : 'password',
-    autoComplete,
-    spellCheck: native.spellCheck ?? false,
-    autoCapitalize: native.autoCapitalize ?? 'none',
-    'aria-invalid': ariaInvalid,
-    ...{ 'data-password-field-input': '', 'data-size': resolvedSize },
-    className: styles.input({ className: native.className }),
-  };
-  // cloneElement forwards a callback ref without reading ref.current.
-  // eslint-disable-next-line react-hooks/refs
-  const input = child ? cloneElement(child, actual) : <input {...actual} />;
-  const inputIndex = sentinel ? parts.indexOf(sentinel) : -1;
-  const lead = sentinel ? parts.slice(0, inputIndex) : [];
-  const trail = sentinel ? parts.slice(inputIndex + 1) : [];
-  const context: VisibilityContext = {
+
+  const context: PasswordFieldContextValue = {
+    size: resolvedSize,
     visible,
     disabled: !!native.disabled,
     id,
-    size: resolvedSize,
+    inputProps,
+    internal: {
+      id,
+      type: visible ? 'text' : 'password',
+      autoComplete,
+      spellCheck: native.spellCheck ?? false,
+      autoCapitalize: native.autoCapitalize ?? 'none',
+      'aria-invalid': ariaInvalid,
+      disabled: native.disabled,
+    },
+    inputRef,
     toggle: (pointer) => {
       const node = inputRef.current;
       if (!node || native.disabled) return;
@@ -240,7 +290,7 @@ export function PasswordField({
     },
   };
   return (
-    <Context.Provider value={context}>
+    <PasswordFieldContext.Provider value={context}>
       <div
         data-password-field=""
         data-size={resolvedSize}
@@ -253,25 +303,39 @@ export function PasswordField({
         className={styles.root({ className })}
         style={style}
       >
-        {lead.length > 0 && (
-          <div data-password-field-part="lead" className={styles.part()}>
-            {lead}
-          </div>
-        )}
+        <Adornments items={leading} className={styles.adornment()} />
         {input}
-        {trail.length > 0 && (
-          <div data-password-field-part="trail" className={styles.part()}>
-            {trail}
-          </div>
-        )}
-        {!hideVisibilityToggle && toggles.length === 0 && <PasswordVisibilityToggle />}
+        <Adornments items={trailing} className={styles.adornment()} />
+        {!hideVisibilityToggle && !hasToggle && <PasswordVisibilityToggle />}
       </div>
-    </Context.Provider>
+    </PasswordFieldContext.Provider>
   );
 }
+
+function Adornments({ items, className }: { items: ReactNode[]; className: string }) {
+  return items.map((item, index) =>
+    // The toggle is our own part with its own sizing; the adornment span resets nested
+    // buttons to their content size, which would shrink it.
+    isValidElement(item) && item.type === PasswordVisibilityToggle ? (
+      item
+    ) : (
+      <span
+        key={(isValidElement(item) && item.key) || index}
+        data-password-field-adornment=""
+        className={className}
+      >
+        {item}
+      </span>
+    ),
+  );
+}
+
 export namespace PasswordField {
   export type Props = PasswordFieldProps;
-  export type InputProps = Omit<NativeProps, 'type' | 'size'> & { asChild?: boolean };
+  export type InputProps = Omit<NativeProps, 'type' | 'size' | 'children'> & {
+    asChild?: boolean;
+    children?: ReactNode;
+  };
   export type VisibilityToggleProps = NativeButtonProps & { asChild?: boolean };
   export const Input = PasswordInput;
   export const VisibilityToggle = PasswordVisibilityToggle;
@@ -294,7 +358,13 @@ export namespace PasswordField {
         'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
         'disabled:cursor-not-allowed',
       ],
-      part: 'inline-flex shrink-0 items-center gap-1',
+      adornment: [
+        'inline-flex shrink-0 items-center empty:hidden',
+        'not-has-[button]:text-(--ids-color-on-muted)',
+        'not-has-[button]:[&_svg]:shrink-0 not-has-[button]:[&_svg]:text-current',
+        '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
+        '[&_button]:p-0',
+      ],
       toggle: 'min-w-0 shrink-0 p-0',
     },
     variants: {
@@ -319,10 +389,18 @@ export namespace PasswordField {
       size: {
         standard: {
           root: 'h-(--ids-size-control-standard) gap-2 rounded-md px-3 text-body-b3-regular',
+          adornment: [
+            'gap-1',
+            'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
+          ],
           toggle: 'size-7 rounded-sm',
         },
         tiny: {
           root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-sm px-2 text-caption-c1-regular',
+          adornment: [
+            'gap-0.5',
+            'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',
+          ],
           toggle: 'size-6 rounded-xs',
         },
       } satisfies Record<IdsSize, object>,

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect } from 'storybook/test';
@@ -70,6 +71,28 @@ export const Visibility: Story = {
     await expect(toggle).toHaveFocus();
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await expect(canvas.getByLabelText('입력 길이')).toHaveTextContent('13자');
+  },
+};
+export const Adornments: Story = {
+  render: () => (
+    <div className="grid w-80 gap-3">
+      {/* No Input: the children become leading and PasswordField inserts the Input after them. */}
+      <PasswordField name="password" aria-label="아이콘만 둔 비밀번호">
+        <LockClosedIcon />
+      </PasswordField>
+      {/* Input props win over the root's; handlers on both still run. */}
+      <PasswordField name="password" aria-label="순서를 지정한 비밀번호" placeholder="root">
+        <LockClosedIcon />
+        <PasswordField.Input placeholder="Input이 이깁니다" />
+        <PasswordField.VisibilityToggle />
+        <span>KR</span>
+      </PasswordField>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const [leadingOnly, ordered] = canvas.getAllByLabelText(/비밀번호$/, { selector: 'input' });
+    await expect(leadingOnly).toHaveAttribute('type', 'password');
+    await expect(ordered).toHaveAttribute('placeholder', 'Input이 이깁니다');
   },
 };
 const schema = z

@@ -220,7 +220,7 @@ test('sentinel/asChild event/ref composition, explicit toggle and preventDefault
   assert.equal(input().autocomplete, 'new-password');
   assert.equal(host.querySelectorAll('button').length, 1);
   await act(async () => input().focus());
-  assert.deepEqual(events, ['child', 'sentinel', 'root']);
+  assert.deepEqual(events, ['child', 'root', 'sentinel']);
   await click();
   assert.equal(input().type, 'text');
   await act(async () => root.unmount());
@@ -316,15 +316,97 @@ test('RHF native + Zod matching: error focus, input retained on toggle, submit, 
   await submit();
   assert.equal(result.password, undefined);
 });
-test('ambiguous composition fails clearly', () => {
+test('Input values win over root values, but root and Input handlers both run', async () => {
+  const changes = [];
+  await render(
+    h(
+      PasswordField,
+      { id: 'root-id', name: 'root', onChange: () => changes.push('root') },
+      h(PasswordField.Input, { name: 'new-password', onChange: () => changes.push('input') }),
+    ),
+  );
+  assert.equal(input().id, 'root-id');
+  assert.equal(input().name, 'new-password');
+  assert.equal(input().autocomplete, 'new-password');
+  assert.equal(toggle().getAttribute('aria-controls'), 'root-id');
+  await type('a');
+  assert.deepEqual(changes, ['root', 'input']);
+});
+test('children without an Input become leading adornments before an inserted Input', async () => {
+  await render(h(PasswordField, { name: 'password' }, h('span', null, 'Lock')));
+  assert.deepEqual(
+    Array.from(host.querySelector('[data-password-field]').children, (el) =>
+      'passwordFieldAdornment' in el.dataset ? el.textContent : el.tagName,
+    ),
+    ['Lock', 'INPUT', 'BUTTON'],
+  );
+  assert.equal(input().type, 'password');
+});
+test('sentinel inside a Fragment splits leading and trailing; the toggle stays unwrapped', async () => {
+  await render(
+    h(
+      PasswordField,
+      { name: 'password' },
+      h(
+        Fragment,
+        null,
+        h('span', null, 'Lead'),
+        h(PasswordField.Input),
+        h(PasswordField.VisibilityToggle),
+        h('span', null, 'Trail'),
+      ),
+    ),
+  );
+  assert.deepEqual(
+    Array.from(host.querySelector('[data-password-field]').children, (el) =>
+      'passwordFieldAdornment' in el.dataset ? el.textContent : el.tagName,
+    ),
+    ['Lead', 'INPUT', 'BUTTON', 'Trail'],
+  );
+  await click();
+  assert.equal(input().type, 'text');
+});
+test('asChild merges root and Input props and ref into the child input, keeping the internal type', async () => {
+  let node;
+  const changes = [];
+  await render(
+    h(
+      PasswordField,
+      {
+        name: 'password',
+        onChange: () => changes.push('root'),
+        ref: (value) => {
+          node = value;
+        },
+      },
+      h(
+        PasswordField.Input,
+        { asChild: true, placeholder: 'input' },
+        h('input', { type: 'email', placeholder: 'child', onChange: () => changes.push('child') }),
+      ),
+    ),
+  );
+  assert.equal(node, input());
+  assert.equal(input().name, 'password');
+  assert.equal(input().placeholder, 'input');
+  assert.equal(input().type, 'password');
+  assert.ok('passwordFieldInput' in input().dataset);
+  await type('a');
+  assert.deepEqual(changes, ['child', 'root']);
+});
+test('invalid structures fail clearly', () => {
   for (const children of [
     [h(PasswordField.Input), h(PasswordField.Input)],
-    [h('span', null, 'missing')],
     [h(PasswordField.Input), h(PasswordField.VisibilityToggle), h(PasswordField.VisibilityToggle)],
     [h(PasswordField.Input, { asChild: true }, h('textarea'))],
+    [h(PasswordField.Input, null, 'text')],
   ])
     assert.throws(
       () => renderToString(h(PasswordField, { name: 'password' }, ...children)),
-      /PasswordField/,
+      /\[IDS\] `<PasswordField/,
     );
+  assert.throws(
+    () => renderToString(h(PasswordField.Input)),
+    /\[IDS\] `<PasswordField.Input>` must be used inside `<PasswordField>`/,
+  );
 });

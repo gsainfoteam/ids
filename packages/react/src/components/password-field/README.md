@@ -38,13 +38,31 @@ name이 없으면 개발 빌드에서 진단 메시지를 표시합니다. 폼 �
 <PasswordField name="password" hideVisibilityToggle />;
 ```
 
-자식이 없으면 Input과 VisibilityToggle을 자동 생성합니다. 자식이 있으면 직접 자식 또는 Fragment에 Input을 정확히 하나 선언합니다. 앞은 lead, 뒤는 trail입니다.
-직접 선언한 VisibilityToggle은 자동 토글을 대체합니다. hideVisibilityToggle은 자동 토글만 숨기므로 명시한 토글도 숨기려면 조건부 렌더하세요.
-임의의 DOM이나 사용자 컴포넌트 내부를 탐색하지 않습니다.
+`PasswordField`는 컨테이너이고 `PasswordField.Input`이 실제 input을 렌더하는 sentinel입니다.
+Input 앞에 놓은 자식은 leading, 뒤에 놓은 자식은 trailing이 됩니다. Input을 생략하면 자식을 모두
+leading으로 두고 그 뒤에 Input을 넣습니다. 자식이 없으면 Input과 VisibilityToggle만 렌더합니다.
+Input은 최대 하나이고 Fragment 안의 Input도 찾지만, 임의의 DOM이나 사용자 컴포넌트 내부는
+탐색하지 않습니다.
+
+```tsx
+<PasswordField name="password">
+  <LockIcon />
+</PasswordField>;
+```
+
+leading/trailing 자식은 각각 `data-password-field-adornment` span으로 감싸 TextField와 같은 톤(muted
+색, 크기별 아이콘 크기, 버튼의 고정 크기 제거)을 맞춥니다. VisibilityToggle은 자체 크기를 유지하도록
+감싸지 않고 그대로 렌더합니다.
+직접 선언한 VisibilityToggle은 자동 토글을 대체합니다. 자동 토글은 마지막 자식 뒤에 붙습니다.
+hideVisibilityToggle은 자동 토글만 숨기므로 명시한 토글도 숨기려면 조건부 렌더하세요.
 
 Input asChild는 props/ref를 실제 input으로 전달하는 한 개의 자식을 받습니다. type은 내부에서 관리합니다.
 VisibilityToggle asChild는 button으로 렌더되는 자식을 받습니다. 자식 내용은 유지하며 버튼 역할·라벨·pressed·클릭 동작을 연결합니다.
-root native 속성이 Input/asChild 속성보다 우선합니다. 이벤트와 ref는 child → Input → root 순서로 합성합니다. 토글의 사용자 onClick에서 preventDefault하면 전환을 취소합니다.
+native 속성은 PasswordField에 주든 Input에 주든 같은 input에 도달합니다. 값은 Input 속성이 root
+속성을, root 속성이 asChild 자식 속성을 이깁니다. 이벤트 핸들러는 덮어쓰지 않고 child → root →
+Input 순서로 모두 실행하므로 Field나 react-hook-form이 root에 건 핸들러가 빠지지 않습니다.
+type, id, autoComplete 기본값처럼 PasswordField가 관리하는 속성은 이 병합 결과를 기준으로 계산해
+마지막에 적용합니다. 토글의 사용자 onClick에서 preventDefault하면 전환을 취소합니다.
 
 ## 속성
 
@@ -54,9 +72,9 @@ root native 속성이 Input/asChild 속성보다 우선합니다. 이벤트와 r
 | size                                   | 명시 값 → Field → standard. standard / tiny                    |
 | invalid                                | standalone 오류 상태, 명시적인 aria-invalid(Field 포함)가 우선 |
 | hideVisibilityToggle                   | false. 자동 버튼만 숨김                                        |
-| className / style                      | 바깥 표면. 실제 입력 스타일은 Input에 지정                     |
+| className / style                      | 컨테이너. 실제 입력 스타일은 Input에 지정                      |
 | id / ref / name / ARIA / native 이벤트 | 실제 input에 전달                                              |
-| Input props                            | native input에서 type/size 제외, asChild 추가                  |
+| Input props                            | native input에서 type/size 제외, asChild 추가. root보다 우선   |
 | VisibilityToggle props                 | native button 및 asChild. type/ARIA 상태는 내부 관리           |
 
 전역 size를 따르고, invalid 색은 `--ids-color-danger` 토큰을 씁니다. 강도 추정은 앱에서 계산해 Field.Hint와 합성하세요.
