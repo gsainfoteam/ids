@@ -1,39 +1,93 @@
 # Input
 
-`Input`은 스키마의 `type`을 기존 필드에 연결하는 편의 컴포넌트입니다. `ThemeProvider` 안에서 사용합니다.
-
-| type                            | 컴포넌트      | value / onChange                   |
-| ------------------------------- | ------------- | ---------------------------------- |
-| text (기본), email, url, search | TextField     | 네이티브 input props / ChangeEvent |
-| number                          | NumberField   | number 또는 null                   |
-| password                        | PasswordField | 네이티브 input props / ChangeEvent |
-| tel                             | TelField      | string                             |
+스키마의 `type` 하나로 알맞은 IDS 필드를 고르는 편의 컴포넌트.
 
 ```tsx
+import { Field, Input } from '@gsainfoteam/ids-react';
+
 <Field required>
   <Field.Label>이메일</Field.Label>
   <Input type="email" name="email" autoComplete="email" />
-</Field>
-<Input type="number" value={quantity} onChange={setQuantity} min={1} step={1} />
-<Input type="search" name="query" aria-label="검색" />
+</Field>;
 ```
 
-타입별 props, 실제 input ref, disabled/readOnly, Field 크기와 ARIA 연결을 그대로 전달합니다. 텍스트 계열은 outline/filled/underline, 나머지는 해당 필드의 variant를 사용합니다. `invalid`는 텍스트 계열에서 `aria-invalid`로 변환됩니다. 명시한 `aria-invalid`가 우선합니다.
-
-Search는 TextField 뒤쪽 adornment에 Heroicons 지우기 버튼을 둡니다. 버튼 공간을 항상 확보하여 값 변경에도 너비와 탭 순서를 유지합니다. 지우기는 네이티브 input 이벤트로 전달되며 입력 위치에 포커스가 유지됩니다. disabled/readOnly이면 지울 수 없습니다. 네이티브 브라우저의 중복 검색 지우기 아이콘은 숨깁니다.
-
-NumberField.Input, PasswordField.Input 등 전용 필드의 compound children을 해당 타입에 전달할 수 있습니다. Input 자체에는 별도의 compound 파트가 없습니다. 아이콘이나 버튼을 붙이려면 `TextField`와 `TextField.Input`을 직접 조합하세요.
-
-## React Hook Form / Zod
-
-`@gsainfoteam/ids-react/react-hook-form`의 Field와 FormProvider를 사용하세요.
+## type별 위임
 
 ```tsx
-<RhfField name="email"><RhfField.Label>이메일</RhfField.Label><Input type="email" /><RhfField.Error /></RhfField>
-<RhfField name="quantity" controlMode="value"><RhfField.Label>수량</RhfField.Label><Input type="number" min={1} /><RhfField.Error /></RhfField>
-<RhfField name="phone" controlMode="value"><RhfField.Label>전화번호</RhfField.Label><Input type="tel" /><RhfField.Error /></RhfField>
+<Input />                                   // TextField type="text". onChange는 ChangeEvent
+<Input type="email" />                      // email, url도 TextField
+<Input type="search" aria-label="검색" />   // TextField + 검색어 지우기 버튼
+<Input type="password" name="password" />   // PasswordField. onChange는 ChangeEvent
+<Input type="number" value={quantity} onChange={setQuantity} min={1} />  // NumberField. number | null
+<Input type="tel" value={phone} onChange={setPhone} />                   // TelField. string
 ```
 
-number/tel은 `controlMode="value"`가 필요합니다. 기본값은 number에 null/숫자, tel에 문자열을 지정하세요. Zod 스키마도 각 값 타입과 일치시킵니다. 서로 다른 타입으로 동적으로 바꿀 때는 `key={type}`으로 값과 필드 상태를 초기화하거나 새 타입에 맞는 controlled 값을 함께 전달하세요.
+props, ref, `disabled`/`readOnly`, `Field` 크기와 ARIA 연결은 위임한 필드로 그대로 간다. `variant`도 해당 필드의 것을 쓴다.
 
-OTP, file, color, date, time, datetime-local은 각각 전용 필드를 사용합니다. TypeScript에서는 미지원 type을 거부합니다. JavaScript 런타임에서 미지원 type이 전달되면 개발 모드 경고 후 text로 표시합니다.
+## 합성
+
+```tsx
+<Input type="number" value={n} onChange={setN}>
+  <NumberField.Input />                     {/* 전용 필드의 compound children도 그대로 전달된다 */}
+  <NumberField.Clear />
+</Input>
+
+<TextField aria-label="검색">               {/* 아이콘이나 버튼을 붙이려면 TextField를 직접 쓴다 */}
+  <MagnifyingGlassIcon />
+  <TextField.Input />
+</TextField>
+```
+
+## 오류 상태
+
+```tsx
+<Input type="email" invalid />                        // 텍스트 계열에서 aria-invalid로 바뀐다
+<Input type="email" invalid aria-invalid={false} />   // 명시한 aria-invalid가 우선
+```
+
+## React Hook Form + Zod
+
+```tsx
+import { Input } from '@gsainfoteam/ids-react';
+import { Field } from '@gsainfoteam/ids-react/react-hook-form';
+
+const schema = z.object({ email: z.string().email(), quantity: z.number().nullable(), phone: z.string() });
+const methods = useForm({
+  resolver: zodResolver(schema),
+  defaultValues: { email: '', quantity: null, phone: '' }, // number는 number | null, tel은 string
+});
+
+<FormProvider {...methods}>
+  <Field name="email">
+    <Field.Label>이메일</Field.Label>
+    <Input type="email" />
+    <Field.Error />
+  </Field>
+  <Field name="quantity" controlMode="value">   {/* number, tel은 controlMode="value" */}
+    <Field.Label>수량</Field.Label>
+    <Input type="number" min={1} />
+    <Field.Error />
+  </Field>
+  <Field name="phone" controlMode="value">
+    <Field.Label>전화번호</Field.Label>
+    <Input type="tel" />
+    <Field.Error />
+  </Field>
+</FormProvider>;
+```
+
+## 속성
+
+| 속성                    | 기본 / 동작                                                      |
+| ----------------------- | ---------------------------------------------------------------- |
+| `type`                  | `text`(기본) / `email` / `url` / `search` / `number` / `password` / `tel` |
+| `invalid`               | 텍스트 계열은 `aria-invalid`로 변환. 나머지는 해당 필드의 `invalid` |
+| 그 외                   | 위임한 필드의 속성을 그대로 받는다                               |
+
+## 알아둘 것
+
+- search의 지우기 버튼은 값이 없어도 자리를 차지해 너비와 탭 순서가 바뀌지 않는다. 브라우저 기본 지우기 아이콘은 숨긴다.
+- 지우기는 native `input` 이벤트를 발생시키므로 `onChange`와 RHF native 등록이 모두 받는다. 포커스는 input에 남는다.
+- `disabled`나 `readOnly`면 지우기 버튼이 비활성화된다.
+- `type`을 동적으로 바꿀 때는 `key={type}`으로 상태를 초기화하거나 새 타입에 맞는 값을 함께 넘긴다.
+- OTP, file, color, date, time, datetime-local은 전용 필드를 쓴다. TypeScript는 이런 `type`을 거부하고, 런타임에 들어오면 개발 빌드에서 경고한 뒤 text로 표시한다.

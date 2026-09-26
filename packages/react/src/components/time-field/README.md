@@ -1,37 +1,112 @@
 # TimeField
 
-TimePicker를 팝업으로 여는 시간 선택 필드입니다. 직접 문자열 입력·파싱은 제공하지 않습니다.
+`TimePicker` 팝업으로 시각을 고르는 필드. 텍스트 입력과 파싱은 없다.
 
 ```tsx
 import { useState } from 'react';
 import { Field, TimeField } from '@gsainfoteam/ids-react';
+
 function Alarm() {
   const [time, setTime] = useState<Date | null>(null);
   return (
     <Field>
       <Field.Label>알람</Field.Label>
-      <TimeField
-        value={time}
-        onChange={setTime}
-        format="HH:mm"
-        hourCycle="24h"
-        step={15}
-        mobileVariant="drawer"
-      />
+      <TimeField name="alarm" value={time} onChange={setTime} hourCycle="24h" step={15} />
     </Field>
   );
 }
 ```
 
-- value/defaultValue: Date|null, onChange: Date|null. 생략 시 uncontrolled. Clear는 null입니다. 시간 선택은 입력 Date의 날짜를 유지하며, 빈 모델의 기준 날짜는 2000-01-01입니다.
-- precision=hour/minute(default)/second, step=1, min/max, locale=en-US는 [TimePicker](../time-picker/README.md)에 전달합니다. min/max는 로컬 시각 기준으로 날짜를 무시합니다. 시간대 변환과 자정을 가로지르는 범위는 지원하지 않습니다.
-- format=12h/24h 또는 표시 문자열. 기본은 locale입니다. 문자열 토큰 HH/H(24시간), hh/h(12시간), mm/m, ss/s, a. 영문 리터럴은 작은따옴표, ''는 따옴표입니다. 문자열 패턴은 표시 전용이며 picker의 시간제는 hourCycle=12h/24h로 지정합니다. hourCycle이 명시되면 format의 12h/24h보다 우선합니다.
-- variant=outline/filled/unstyled, size=standard/tiny(Field 상속). pickerVariant=grid/wheel은 내부 TimePicker 변형입니다. disabled/readOnly는 열기·변경·Clear를 막습니다. selectionMode=none은 picker 탐색만 허용합니다.
-- Trigger/Value/Content/Clear 합성 및 asChild를 제공합니다. Clear는 Trigger 형제입니다. Content children은 기본 picker를 대체합니다. root className/style은 표면, id/ref/ARIA/native button 속성은 실제 button+combobox에 적용합니다. autoFocus도 trigger입니다.
-- 클릭·Enter·Space·ArrowDown으로 열며 첫 시간 컬럼에 포커스합니다. 컬럼별 방향키 탐색과 Enter/Space 선택 후에도 팝업은 유지됩니다. Escape·닫기·trigger 재클릭·외부 클릭/포커스로 닫으며 이미 선택한 값은 유지합니다. Clear/명시 닫기는 trigger로 포커스를 돌립니다.
-- mobileVariant=drawer는 640px 미만에서 하단 비모달 팝업입니다. 포커스 트랩·배경 스크롤 잠금은 없습니다.
-- name/form은 hidden input에 precision별 HH, HH:mm, HH:mm:ss(또는 빈 문자열)를 제출합니다. disabled는 제출에서 제외합니다. uncontrolled native reset은 defaultValue로 돌아가고 팝업을 닫습니다. controlled reset은 부모가 값을 변경합니다.
-- required는 ARIA이며 button에 native constraint validation은 없습니다. RHF optional entry의 Field(controlMode=value), defaultValues의 null, `z.date().nullable().refine(Boolean)` 등으로 검증하세요. blur는 picker 내부 이동을 제외하고 전달합니다.
-- Storybook: SelectAndClear.
+## 값과 제한
 
-- 팝업 위치·폭은 Clear를 포함한 필드 전체를 기준으로 계산합니다. 내부 목록 스크롤은 팝업 위치를 다시 계산하지 않으며, 모바일 drawer는 하단 safe area를 확보합니다.
+```tsx
+<TimeField value={time} onChange={setTime} />
+// value의 날짜는 유지하고 시각만 바꾼다. 빈 값이면 2000-01-01 기준. Clear는 null
+
+<TimeField precision="second" step={10} />                             // precision, step은 TimePicker와 같다
+<TimeField min={new Date(0, 0, 1, 9)} max={new Date(0, 0, 1, 18)} />   // 로컬 시각만 비교, 자정을 넘는 범위는 불가
+<TimeField selectionMode="none" />                                     // 팝업을 열어 탐색만
+```
+
+단위와 간격 규칙은 [TimePicker](../time-picker/README.md)를 본다.
+
+## 표시 형식
+
+```tsx
+<TimeField locale="ko-KR" />                      // 기본: locale 형식과 시간제
+<TimeField format="24h" />                        // 14:30
+<TimeField format="12h" />                        // 02:30 PM
+<TimeField format="a h:mm" hourCycle="12h" />     // 문자열 패턴은 표시에만 쓴다. picker 시간제는 hourCycle로
+<TimeField format="HH'h' mm'm'" />                // 영문 리터럴은 작은따옴표. ''는 따옴표 하나
+<TimeField format="24h" hourCycle="12h" />        // hourCycle이 우선한다
+// 토큰: HH H(24시간) / hh h(12시간) / mm m / ss s / a. 날짜 토큰은 DateTimeField에서만
+```
+
+## 폼 제출
+
+```tsx
+<TimeField name="alarm" precision="hour" />     // "14"
+<TimeField name="alarm" />                      // "14:30"
+<TimeField name="alarm" precision="second" />   // "14:30:05". 값이 없으면 ""
+<TimeField name="alarm" disabled />             // 제출에서 빠진다
+```
+
+## 합성
+
+```tsx
+<TimeField value={time} onChange={setTime} pickerVariant="wheel">
+  <TimeField.Trigger>
+    <ClockIcon />
+    <TimeField.Value />             {/* 선택 값 또는 placeholder("시간 선택") */}
+  </TimeField.Trigger>
+  <TimeField.Clear />               {/* Trigger의 형제로 둔다. 값이 없으면 렌더링하지 않는다 */}
+  <TimeField.Content />             {/* children을 주면 기본 TimePicker를 대체한다 */}
+</TimeField>
+// Trigger, Value, Content, Clear는 asChild를 지원한다. 각각 하나까지
+```
+
+## React Hook Form + Zod
+
+```tsx
+import { TimeField } from '@gsainfoteam/ids-react';
+import { Field } from '@gsainfoteam/ids-react/react-hook-form';
+
+const schema = z.object({ alarm: z.date().nullable().refine(Boolean, '시간을 선택하세요.') });
+const methods = useForm({ resolver: zodResolver(schema), defaultValues: { alarm: null } });
+
+<Field name="alarm" controlMode="value" required>
+  <Field.Label>알람</Field.Label>
+  <TimeField hourCycle="24h" />
+  <Field.Error />                   {/* 오류 시 Trigger로 포커스 */}
+</Field>;
+```
+
+## 속성
+
+| 속성                                  | 기본 / 동작                                          |
+| ------------------------------------- | ---------------------------------------------------- |
+| `value` / `defaultValue` / `onChange` | `Date \| null`. 생략하면 uncontrolled                |
+| `format`                              | locale 형식. `12h` / `24h` 또는 표시 패턴            |
+| `hourCycle`                           | `format`의 `12h`/`24h`, 없으면 locale. picker 시간제 |
+| `precision` / `step` / `min` / `max`  | `minute` / `1`. `TimePicker`로 전달                  |
+| `locale`                              | `en-US`                                              |
+| `pickerVariant`                       | `grid`(기본) / `wheel`                               |
+| `selectionMode`                       | `single`(기본) / `none`                              |
+| `placeholder`                         | `시간 선택`                                          |
+| `mobileVariant`                       | `popover`(기본) / `drawer`. 640px 미만에서 하단 팝업 |
+| `variant`                             | `outline`(기본) / `filled` / `unstyled`              |
+| `size`                                | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`  |
+| `invalid`                             | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선  |
+| `disabled` / `readOnly`               | 열기, 변경, Clear 차단                               |
+| `className` / `style`                 | 필드 표면으로 간다                                   |
+| 그 외 native 속성, `ref`, `autoFocus` | 실제 Trigger 버튼으로 간다                           |
+
+## 알아둘 것
+
+- 시각을 골라도 팝업은 열려 있다. Escape, 닫기 버튼, Trigger 재클릭, 바깥 클릭으로 닫아도 고른 값은 유지된다. Clear는 값을 비우고 Trigger로 포커스를 돌린다.
+- Trigger에서 `ArrowDown`으로도 연다. 열리면 첫 컬럼에 포커스한다.
+- `onBlur`는 포커스가 팝업 안으로 옮겨갈 때는 발생하지 않는다.
+- 시간대 변환은 없다. 값은 로컬 시각이다.
+- `drawer`는 비모달이다. 배경 스크롤 잠금과 포커스 트랩이 없다.
+- `form.reset()`은 uncontrolled 값을 `defaultValue`로 되돌리고 팝업을 닫는다. controlled 값은 부모가 되돌린다.
+- `required`는 ARIA 표시만 한다. native constraint validation은 없으므로 스키마로 검증한다.

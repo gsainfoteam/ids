@@ -1,31 +1,110 @@
 # ColorField
 
-색상 미리보기와 값 표시, Clear 버튼 및 색상 선택 팝업을 합성합니다.
+색상 미리보기와 값을 보여주고 팝업에서 색을 고르는 필드. 값은 색상 문자열이다.
 
 ```tsx
+import { ColorField, Field } from '@gsainfoteam/ids-react';
+
+const [color, setColor] = useState('');
+
 <Field>
   <Field.Label>브랜드 색상</Field.Label>
-  <ColorField
-    value={color}
-    onChange={setColor}
-    format="hex"
-    alpha
-    swatches={['#3B82F6', '#22C55E', '#F97316']}
-  />
-</Field>
+  <ColorField value={color} onChange={setColor} swatches={['#3B82F6', '#22C55E', '#F97316']} />
+</Field>;
 ```
 
-- value/defaultValue/onChange는 문자열이며 빈 문자열은 선택 없음입니다. value를 생략하면 uncontrolled입니다. 팝업에서 편집하면 실시간 onChange, Esc/닫기/외부 클릭으로 닫습니다. Esc는 이미 변경한 색상을 되돌리지 않습니다.
-- format: hex / rgb / hsl (기본 hex). alpha=true이면 #RRGGBBAA / rgba / hsla 형태로 값을 반환하고 투명도 슬라이더를 표시합니다. 정수 RGB 채널과 3자리 소수 alpha로 직렬화하므로 형식 간 변환에 반올림이 있습니다.
-- HEX 3/4/6/8자리, rgb(a), hsl(a) 문자열 입력을 파싱합니다. CSS named color, var(), calc(), color()는 지원하지 않습니다. 불완전한 텍스트는 편집 중 유지하고 유효한 색만 콜백을 호출합니다. blur/Enter에서 형식을 정리합니다.
-- variant는 색상 패널의 default / compact / swatchOnly입니다. default: 2D 채도/명도 + 색조 + 텍스트. compact는 2D 영역을 생략합니다. swatchOnly는 전달한 swatches만 보여줍니다. **표면 스타일은 surfaceVariant**=outline/filled/unstyled로 구분합니다.
-- size는 standard/tiny이며 Field 크기를 상속합니다. default 영역 높이는 200/140px입니다.
-- 2D 패널은 포인터 드래그와 방향키를 지원합니다. ←→ 채도, ↑↓ 명도, Shift는 10단위, Home/End는 채도 0/100입니다. 색조·투명도는 native range 키보드 동작을 사용합니다.
-- Trigger/Value/Swatch/Content/Clear를 명시 합성하거나 자동 생성할 수 있습니다. asChild는 해당 element의 props/ref를 전달하는 단일 자식을 받습니다. **Clear는 Trigger의 형제**로 선언하세요. 버튼 안에 다른 버튼을 중첩하지 않습니다. Content의 사용자 children은 기본 패널을 대체합니다.
-- Field의 id/ref/ARIA는 실제 trigger button에 연결됩니다. Clear는 값만 비우고 trigger에 초점을 돌려줍니다. disabled/readOnly는 팝업 열기·값 변경·지우기를 막습니다.
-- mobileVariant=drawer는 640px 미만에서 하단 비모달 팝업입니다. 외부 포커스와 상호작용이 가능하며 배경 스크롤을 잠그지 않습니다. 기본은 anchor popover이며 지원 환경에서 native top layer를 사용합니다.
-- name/form은 hidden input으로 정규화된 값 하나를 제출합니다. native reset은 uncontrolled 기본값으로 복원합니다. required는 ARIA 힌트입니다. button의 native constraint validation 대신 앱 검증을 사용하세요.
-- RHF: `@gsainfoteam/ids-react/react-hook-form`의 Field에 `controlMode="value"`, defaultValues `{color:''}`를 지정하세요. Zod 또는 registerOptions로 검증하며 오류 시 trigger를 포커스합니다.
-- 외부 value/format/alpha 변경은 표시를 정규화하지만 onChange를 호출하지 않습니다. 부모가 보관한 원본은 부모가 갱신하며 FormData는 표시 형식의 값을 제출합니다.
+## 형식
 
-- 팝업 위치·폭은 Clear를 포함한 필드 전체를 기준으로 계산합니다. 내부 목록 스크롤은 팝업 위치를 다시 계산하지 않으며, 모바일 drawer는 하단 safe area를 확보합니다.
+```tsx
+<ColorField format="hex" />          // "#3B82F6"
+<ColorField format="hex" alpha />    // "#3B82F6CC", 투명도 슬라이더 표시
+<ColorField format="rgb" alpha />    // "rgba(59, 130, 246, 0.8)"
+<ColorField format="hsl" />          // "hsl(217, 91%, 60%)"
+// 빈 문자열 = 선택 없음
+// 읽는 형식: HEX 3/4/6/8자리, rgb(a), hsl(a). named color, var(), calc(), color()는 읽지 않는다
+// RGB 채널은 정수, alpha는 소수 셋째 자리로 직렬화하므로 형식을 바꾸면 반올림이 생긴다
+```
+
+## 패널
+
+```tsx
+<ColorField variant="default" />                       // 채도/명도 영역 + 색조 + 텍스트 입력
+<ColorField variant="compact" />                       // 채도/명도 영역 없이
+<ColorField variant="swatchOnly" swatches={palette} /> // swatches만
+<ColorField surfaceVariant="filled" />                 // 필드 표면: outline(기본) / filled / unstyled
+// 팝업 편집은 바로 onChange를 부른다. Esc, 닫기 버튼, 바깥 클릭으로 닫고 바뀐 값은 되돌리지 않는다
+// 텍스트 입력은 불완전한 값을 편집 중에 유지하고, 유효한 색일 때만 onChange. blur/Enter에서 형식을 정리한다
+```
+
+## 합성
+
+```tsx
+<ColorField value={color} onChange={setColor}>
+  <ColorField.Trigger>                 {/* 생략하면 Swatch + Value로 자동 생성 */}
+    <ColorField.Swatch />
+    <ColorField.Value />
+  </ColorField.Trigger>
+  <ColorField.Clear />                 {/* Trigger의 형제로 둔다. 안에 넣으면 오류 */}
+  <ColorField.Content>
+    <MyPicker />                       {/* children을 주면 기본 패널을 대체 */}
+  </ColorField.Content>
+</ColorField>
+// Clear는 값이 있을 때만 보이고, 값을 비운 뒤 트리거로 포커스를 돌린다
+// 모든 part는 asChild를 받는다. 자식은 props와 ref를 해당 element에 전달해야 한다
+```
+
+## 키보드
+
+```text
+↓                 트리거에서 팝업 열기
+← →               채도 (Shift: 10 단위)
+↑ ↓               명도 (Shift: 10 단위)
+Home  End         채도 0 / 100
+색조, 투명도       native range 키보드 동작
+```
+
+## React Hook Form
+
+```tsx
+import { ColorField } from '@gsainfoteam/ids-react';
+import { Field } from '@gsainfoteam/ids-react/react-hook-form';
+
+const methods = useForm({ defaultValues: { color: '' } });
+
+<FormProvider {...methods}>
+  <form onSubmit={methods.handleSubmit(save)}>
+    <Field name="color" controlMode="value" registerOptions={{ required: '색상을 고르세요' }}>
+      <Field.Label>색상</Field.Label>
+      <ColorField />
+      <Field.Error />                  {/* 오류 시 트리거로 포커스 */}
+    </Field>
+  </form>
+</FormProvider>;
+```
+
+## 속성
+
+| 속성                     | 기본 / 동작                                                   |
+| ------------------------ | ------------------------------------------------------------- |
+| `value` / `defaultValue` | `string` / `''`                                               |
+| `format`                 | `hex`(기본) / `rgb` / `hsl`                                   |
+| `alpha`                  | `false`. 투명도 포함 형식과 슬라이더                          |
+| `swatches`               | 팔레트 색 목록. 읽을 수 없는 항목은 건너뛴다                  |
+| `variant`                | 패널: `default`(기본) / `compact` / `swatchOnly`              |
+| `surfaceVariant`         | 표면: `outline`(기본) / `filled` / `unstyled`                 |
+| `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`           |
+| `mobileVariant`          | `popover`(기본) / `drawer`: 640px 미만에서 하단 팝업          |
+| `placeholder`            | `색상 선택`                                                   |
+| `invalid`                | 오류 표시. 명시한 `aria-invalid`가 우선. 읽을 수 없는 값도 오류 |
+| `disabled` / `readOnly`  | 열기, 변경, 지우기를 막는다                                   |
+| `name` / `form`          | 정규화한 값 하나를 hidden input으로 제출. `disabled`면 제외   |
+| `required`               | ARIA 힌트만. 검증은 RHF나 앱이 한다                           |
+| `className` / `style`    | 트리거와 Clear를 감싸는 컨테이너로 간다                       |
+| 그 외 native 속성, `ref` | 트리거 button으로 간다                                        |
+
+## 알아둘 것
+
+- 외부에서 `value`, `format`, `alpha`를 바꾸면 표시와 제출 값은 정규화되지만 `onChange`는 발생하지 않는다. 부모가 가진 원본은 부모가 갱신한다.
+- `onBlur`는 포커스가 트리거와 팝업을 모두 벗어날 때만 발생한다.
+- 팝업은 비모달이다. 배경 스크롤을 잠그지 않는다. 위치와 폭은 Clear를 포함한 필드 전체를 기준으로 잡는다.
+- `form.reset()`은 uncontrolled 값을 `defaultValue`로 되돌리고 팝업을 닫는다.
