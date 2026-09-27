@@ -20,7 +20,7 @@ import { Field, Input } from '@gsainfoteam/ids-react';
 <Input type="email" />                      // email, url도 TextField
 <Input type="search" aria-label="검색" />   // TextField + 검색어 지우기 버튼
 <Input type="password" name="password" />   // PasswordField. onChange는 ChangeEvent
-<Input type="number" value={quantity} onChange={setQuantity} min={1} />  // NumberField. number | null
+<Input type="number" value={quantity} onValueChange={setQuantity} min={1} /> // NumberField. number | null
 <Input type="tel" value={phone} onChange={setPhone} />                   // TelField. string
 ```
 
@@ -30,7 +30,7 @@ import { Field, Input } from '@gsainfoteam/ids-react';
 ## 합성
 
 ```tsx
-<Input type="number" value={n} onChange={setN}>
+<Input type="number" value={n} onValueChange={setN}>
   <NumberField.Input />                     {/* 전용 필드의 compound children도 그대로 전달된다 */}
   <NumberField.Clear />
 </Input>

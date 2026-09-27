@@ -1,26 +1,4 @@
-/** Move the decimal point without multiplication/division rounding artifacts. */
-export function shiftDecimal(value: number, places: number): number {
-  const [mantissa, exponent = '0'] = value.toString().split('e');
-  return Number(`${mantissa}e${Number(exponent) + places}`);
-}
-
-/** Add the decimal representations of JS numbers without introducing 0.1 + 0.2 noise. */
-export function addDecimal(left: number, right: number): number {
-  const split = (value: number) => {
-    const [mantissa, exponent = '0'] = value.toString().split('e');
-    const fraction = mantissa.split('.')[1]?.length ?? 0;
-    return { digits: BigInt(mantissa.replace('.', '')), scale: fraction - Number(exponent) };
-  };
-  const a = split(left);
-  const b = split(right);
-  const scale = Math.max(a.scale, b.scale);
-  const sum = a.digits * 10n ** BigInt(scale - a.scale) + b.digits * 10n ** BigInt(scale - b.scale);
-  return Number(`${sum}e${-scale}`);
-}
-
-export function clampNumber(value: number, min?: number, max?: number) {
-  return Math.min(max ?? Infinity, Math.max(min ?? -Infinity, value));
-}
+import { shiftDecimal } from './number-step';
 
 export type ParsedNumber = { text: string; value: number | null };
 

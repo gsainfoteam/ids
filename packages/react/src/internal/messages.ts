@@ -7,6 +7,12 @@ export const messages = {
   textField: {
     clear: '지우기',
   },
+  numberField: {
+    increment: '값 늘리기',
+    decrement: '값 줄이기',
+    rangeUnderflow: (min: string) => `값은 ${min} 이상이어야 합니다.`,
+    rangeOverflow: (max: string) => `값은 ${max} 이하여야 합니다.`,
+  },
   passwordField: {
     show: '비밀번호 표시',
     capsLock: 'Caps Lock이 켜져 있습니다.',

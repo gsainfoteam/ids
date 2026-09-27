@@ -16,6 +16,8 @@ for (const name of [
   'KeyboardEvent',
   'CompositionEvent',
   'WheelEvent',
+  'MouseEvent',
+  'FocusEvent',
 ])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -72,7 +74,7 @@ function controlled(props = {}) {
     return h(NumberField, {
       ...props,
       value: current,
-      onChange: (value) => {
+      onValueChange: (value) => {
         changes.push(value);
         set(value);
       },
@@ -111,7 +113,7 @@ test('SSR Field wiring, formatted ARIA, and canonical native FormData', () => {
   assert.equal(node.getAttribute('aria-valuemin'), '0');
   assert.equal(node.getAttribute('aria-valuemax'), '2000');
   assert.equal(node.getAttribute('aria-valuetext'), '$1,234.50');
-  assert.equal(node.dataset.size, 'tiny');
+  assert.equal(doc.querySelector('[data-number-field]').dataset.size, 'tiny');
   assert.equal(doc.querySelector('label').htmlFor, node.id);
   assert.equal(
     doc.getElementById(node.getAttribute('aria-describedby')).textContent,
@@ -223,14 +225,14 @@ test('min/max commit on blur/Enter, decimal/large steps, empty start and endpoin
   assert.equal(form.value(), 0.8);
   await key('PageUp');
   assert.equal(form.value(), 1);
-  assert.equal(button('Increase value').disabled, true);
+  assert.equal(button('값 늘리기').disabled, true);
   await key('ArrowDown');
   assert.equal(form.value(), 0.9);
   await type('-20');
   assert.equal(form.value(), -20);
   await blur();
   assert.equal(form.value(), -1);
-  assert.equal(button('Decrease value').disabled, true);
+  assert.equal(button('값 줄이기').disabled, true);
   await focus();
   await type('20');
   await key('Enter');
@@ -300,12 +302,12 @@ test('sentinel/asChild forwards refs and events, explicit Stepper is not duplica
   assert.equal(host.querySelectorAll('[data-number-field-stepper]').length, 1);
   await focus();
   assert.deepEqual(events, ['child-focus', 'root-focus', 'input-focus']);
-  await act(async () => button('Increase value').click());
+  await act(async () => button('값 늘리기').click());
   assert.equal(form.value(), 11);
   assert.equal(document.activeElement, input());
-  await act(async () => button('Clear value').click());
+  await act(async () => button('지우기').click());
   assert.equal(form.value(), null);
-  assert.equal(button('Clear value'), null);
+  assert.equal(button('지우기'), null);
   assert.equal(document.activeElement, input());
   await act(async () => root.unmount());
   root = undefined;
@@ -316,12 +318,17 @@ test('sentinel/asChild forwards refs and events, explicit Stepper is not duplica
       NumberField,
       { defaultValue: 5 },
       h(NumberField.Input),
-      h(NumberField.Clear, { onClear: () => clears++ }),
+      h(NumberField.Clear, {
+        onClick: (event) => {
+          clears++;
+          event.preventDefault();
+        },
+      }),
     ),
   );
-  await act(async () => button('Clear value').click());
+  await act(async () => button('지우기').click());
   assert.equal(clears, 1);
-  assert.equal(input().value, '5');
+  assert.equal(input().value, '5', 'preventDefault keeps the value');
 });
 test('readOnly/disabled, custom key cancellation, wheel and native editing shortcuts', async () => {
   const changes = [];
@@ -329,7 +336,11 @@ test('readOnly/disabled, custom key cancellation, wheel and native editing short
     h(
       Field,
       { disabled: true, invalid: false },
-      h(NumberField, { defaultValue: 5, invalid: true, onChange: (value) => changes.push(value) }),
+      h(NumberField, {
+        defaultValue: 5,
+        invalid: true,
+        onValueChange: (value) => changes.push(value),
+      }),
     ),
   );
   assert.equal(input().disabled, true);
@@ -337,7 +348,7 @@ test('readOnly/disabled, custom key cancellation, wheel and native editing short
   await key('ArrowUp');
   assert.deepEqual(changes, []);
   await render(h(NumberField, { defaultValue: 5, readOnly: true }));
-  assert.equal(button('Increase value').disabled, true);
+  assert.equal(button('값 늘리기').disabled, true);
   await key('ArrowUp');
   assert.equal(input().value, '5');
   await render(
@@ -498,7 +509,8 @@ test('Input values win over root values, but root and Input handlers both run', 
         id: 'root-id',
         placeholder: 'root',
         defaultValue: 1,
-        onChange: (value) => events.push(['root-value', value]),
+        onChange: () => events.push('root-change'),
+        onValueChange: (value) => events.push(['root-value', value]),
         onBlur: () => events.push('root-blur'),
       },
       h(NumberField.Input, {
@@ -513,7 +525,13 @@ test('Input values win over root values, but root and Input handlers both run', 
   await focus();
   await type('4');
   await blur();
-  assert.deepEqual(events, ['input-change', ['root-value', 4], 'root-blur', 'input-blur']);
+  assert.deepEqual(events, [
+    'root-change',
+    'input-change',
+    ['root-value', 4],
+    'root-blur',
+    'input-blur',
+  ]);
 });
 
 test('Input disabled/readOnly override the root and drive container state', async () => {
@@ -524,7 +542,7 @@ test('Input disabled/readOnly override the root and drive container state', asyn
   assert.equal(shell().dataset.disabled, undefined);
   await render(h(NumberField, { defaultValue: 1 }, h(NumberField.Input, { readOnly: true })));
   assert.equal(shell().dataset.readonly, '');
-  assert.equal(button('Increase value').disabled, true);
+  assert.equal(button('값 늘리기').disabled, true);
 });
 
 test('children without an Input become leading adornments before an auto-inserted Input', async () => {
@@ -569,7 +587,7 @@ test('asChild merges Input and root props over the child and keeps the numeric m
           ref: (value) => {
             node = value;
           },
-          onChange: (value) => events.push(['root', value]),
+          onValueChange: (value) => events.push(['root', value]),
         },
         h(
           NumberField.Input,
@@ -594,4 +612,229 @@ test('asChild merges Input and root props over the child and keeps the numeric m
   assert.deepEqual(events, ['child', ['root', 3]]);
   assert.equal(hidden().name, 'amount');
   assert.equal(hidden().value, '3');
+});
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function pointer(target, type, pointerType = 'mouse') {
+  await act(async () => {
+    const event = new MouseEvent(type, { bubbles: true, cancelable: true, button: 0 });
+    Object.defineProperty(event, 'pointerType', { value: pointerType });
+    Object.defineProperty(event, 'pointerId', { value: 1 });
+    target.dispatchEvent(event);
+  });
+}
+
+test('Home and End jump to the bounds, Alt steps by smallStep, PageUp by largeStep', async () => {
+  const form = controlled({ defaultValue: 5, min: 0, max: 10 });
+  await render(form.node);
+  await focus();
+  assert.equal((await key('End')).defaultPrevented, true);
+  assert.equal(form.value(), 10);
+  await key('Home');
+  assert.equal(form.value(), 0);
+  await key('ArrowUp', { altKey: true });
+  assert.equal(form.value(), 0.1);
+  await key('PageUp');
+  assert.equal(form.value(), 10.1 > 10 ? 10 : 10.1);
+  await render(h(NumberField, { key: 'unbounded', defaultValue: 5 }));
+  await focus();
+  assert.equal((await key('Home')).defaultPrevented, false, 'without a bound the caret moves');
+});
+
+test('an explicit step snaps typed values on blur and arrows land on the grid', async () => {
+  const half = controlled({ step: 0.5 });
+  await render(half.node);
+  await focus();
+  await type('1.3');
+  assert.equal(half.value(), 1.3, 'typing is not snapped while editing');
+  await blur();
+  assert.equal(half.value(), 1.5);
+  await focus();
+  await type('1.2');
+  await key('ArrowUp');
+  assert.equal(half.value(), 1.5, 'an off-grid value steps to the next grid value');
+  await key('ArrowUp');
+  assert.equal(half.value(), 2);
+  await act(async () => root.unmount());
+  root = undefined;
+
+  const odd = controlled({ min: 1, max: 10, step: 2 });
+  await render(odd.node);
+  await focus();
+  await type('4');
+  await blur();
+  assert.equal(odd.value(), 5, 'the grid is anchored at min: 1, 3, 5');
+  await focus();
+  await type('20');
+  await blur();
+  assert.equal(odd.value(), 9, 'clamping keeps the value on the grid');
+  await act(async () => root.unmount());
+  root = undefined;
+
+  const free = controlled({});
+  await render(free.node);
+  await focus();
+  await type('1.3');
+  await blur();
+  assert.equal(free.value(), 1.3, 'without an explicit step nothing is snapped');
+});
+
+test('a value set from outside is left alone when the field is focused and left', async () => {
+  const form = controlled({ min: 0, max: 10, step: 1, defaultValue: 20 });
+  await render(form.node);
+  await focus();
+  await blur();
+  assert.equal(form.value(), 20);
+  assert.deepEqual(form.changes, []);
+  assert.equal(input().getAttribute('aria-invalid'), 'true');
+  assert.equal(input().validity.customError, true);
+  assert.equal(input().validationMessage, '값은 10 이하여야 합니다.');
+  await focus();
+  await type('3');
+  assert.equal(input().validity.valid, true);
+});
+
+test('out-of-range values reach Field.Error through native validity', async () => {
+  await render(
+    h(
+      'form',
+      null,
+      h(
+        Field,
+        null,
+        h(Field.Label, null, 'Seats'),
+        h(NumberField, { min: 1, defaultValue: 0, name: 'seats' }),
+        h(Field.Error),
+      ),
+    ),
+  );
+  await act(async () => host.querySelector('form').checkValidity());
+  assert.equal(
+    host.querySelector('[data-field-part=error]').textContent,
+    '값은 1 이상이어야 합니다.',
+  );
+  await focus();
+  await key('ArrowUp');
+  assert.equal(input().value, '1');
+  assert.equal(
+    host.querySelector('[data-field-part=error]'),
+    null,
+    'a step without an input event still clears the error',
+  );
+});
+
+test('the wheel steps only when allowed and the input has focus', async () => {
+  const form = controlled({ defaultValue: 1, allowWheelScrub: true });
+  await render(form.node);
+  const wheel = async (deltaY, init = {}) => {
+    let event;
+    await act(async () => {
+      event = new WheelEvent('wheel', { deltaY, bubbles: true, cancelable: true, ...init });
+      input().dispatchEvent(event);
+    });
+    return event;
+  };
+  assert.equal(
+    (await wheel(-100)).defaultPrevented,
+    false,
+    'an unfocused field lets the page scroll',
+  );
+  assert.equal(form.value(), 1);
+  await focus();
+  assert.equal((await wheel(-100)).defaultPrevented, true);
+  assert.equal(form.value(), 2);
+  await wheel(100, { shiftKey: true });
+  assert.equal(form.value(), -8);
+  await wheel(-100, { ctrlKey: true });
+  assert.equal(form.value(), -8, 'ctrl+wheel stays the browser zoom');
+});
+
+test('holding a stepper repeats and speeds up; releasing stops it', async () => {
+  const form = controlled({ defaultValue: 0 });
+  await render(form.node);
+  const increment = button('값 늘리기');
+  assert.equal(increment.tabIndex, -1);
+  await pointer(increment, 'pointerdown');
+  assert.equal(form.value(), 1, 'the press steps at once');
+  assert.equal(document.activeElement, input(), 'a mouse press keeps focus in the input');
+  for (let i = 0; i < 14; i++) await act(async () => wait(50));
+  const held = form.value();
+  assert.ok(held >= 4, `holding repeats (reached ${held})`);
+  await pointer(increment, 'pointerup');
+  await act(async () =>
+    increment.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })),
+  );
+  const released = form.value();
+  assert.equal(released, held, 'the click after a press does not step again');
+  for (let i = 0; i < 6; i++) await act(async () => wait(50));
+  assert.equal(form.value(), released, 'releasing stops the repeat');
+});
+
+test('Increment and Decrement lay out beside the input; Escape clears with a Clear part', async () => {
+  const form = controlled({
+    defaultValue: 2,
+    children: h(
+      Fragment,
+      null,
+      h(NumberField.Decrement),
+      h(NumberField.Input),
+      h(NumberField.Clear),
+      h(NumberField.Increment),
+    ),
+  });
+  await render(form.node);
+  assert.deepEqual(
+    Array.from(shell().children, (el) => el.dataset.numberFieldStep ?? el.tagName),
+    ['decrement', 'INPUT', 'BUTTON', 'increment'],
+  );
+  assert.equal(host.querySelectorAll('[data-number-field-stepper]').length, 0);
+  await act(async () => button('값 줄이기').click());
+  assert.equal(form.value(), 1);
+  await focus();
+  const escape = await key('Escape');
+  assert.equal(escape.defaultPrevented, true);
+  assert.equal(form.value(), null);
+});
+
+test('input hints: inputmode follows the range and grid, autocomplete is off', async () => {
+  const hints = (props) =>
+    new JSDOM(renderToString(h(NumberField, props))).window.document.querySelector('input');
+  assert.equal(hints({}).getAttribute('inputmode'), 'decimal');
+  assert.equal(hints({ min: 0, step: 1 }).getAttribute('inputmode'), 'numeric');
+  assert.equal(hints({ inputMode: 'text' }).getAttribute('inputmode'), 'text');
+  assert.equal(hints({}).getAttribute('autocomplete'), 'off');
+  assert.equal(hints({ autoComplete: 'on' }).getAttribute('autocomplete'), 'on');
+});
+
+test('a tap on a stepper steps without focusing the input, and a cancelled press stops', async () => {
+  const form = controlled({ defaultValue: 0 });
+  await render(form.node);
+  const increment = button('값 늘리기');
+  await pointer(increment, 'pointerdown', 'touch');
+  assert.equal(form.value(), 1);
+  assert.notEqual(document.activeElement, input(), 'no on-screen keyboard for a tap');
+  await pointer(increment, 'pointercancel', 'touch');
+  for (let i = 0; i < 10; i++) await act(async () => wait(50));
+  assert.equal(form.value(), 1, 'a cancelled press does not keep stepping');
+});
+
+test('on iOS a field that accepts negatives asks for the full keyboard', async () => {
+  const original = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  Object.defineProperty(globalThis, 'navigator', {
+    configurable: true,
+    value: {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0)',
+      platform: 'iPhone',
+      maxTouchPoints: 5,
+    },
+  });
+  try {
+    await render(h(NumberField, { 'aria-label': 'Delta' }));
+    assert.equal(input().getAttribute('inputmode'), 'text');
+    await render(h(NumberField, { key: 'positive', 'aria-label': 'Count', min: 0 }));
+    assert.equal(input().getAttribute('inputmode'), 'decimal');
+  } finally {
+    if (original) Object.defineProperty(globalThis, 'navigator', original);
+    else delete globalThis.navigator;
+  }
 });

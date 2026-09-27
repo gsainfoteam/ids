@@ -140,14 +140,15 @@ test('number compound children and numeric callback pass through Input', async (
   await render(
     h(
       Input,
-      { type: 'number', defaultValue: 2, min: 0, step: 0.5, onChange: (v) => values.push(v) },
+      { type: 'number', defaultValue: 2, min: 0, step: 0.5, onValueChange: (v) => values.push(v) },
       h(NumberField.Input),
       h(NumberField.Clear),
+      h(NumberField.Stepper),
     ),
   );
-  await click('button[aria-label="Increase value"]');
+  await click('button[aria-label="값 늘리기"]');
   assert.deepEqual(values, [2.5]);
-  await click('button[aria-label="Clear value"]');
+  await click('button[aria-label="지우기"]');
   assert.equal(values.at(-1), null);
 });
 test('RHF native search and controlled number/tel retain value types, clear, reset and error focus', async () => {

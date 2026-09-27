@@ -1,6 +1,7 @@
 import { Input, type InputProps } from '../src/components/form/input';
 export const native = <Input type="email" onChange={(event) => event.target.value} />;
-export const numeric = <Input type="number" onChange={(value) => value?.toFixed(2)} />;
+export const numeric = <Input type="number" onValueChange={(value) => value?.toFixed(2)} />;
+export const numericEvent = <Input type="number" onChange={(event) => event.target.value} />;
 export const phone = <Input type="tel" onChange={(value) => value.trim()} />;
 export const config: InputProps = { type: 'number', value: null, step: 0.1 };
 // @ts-expect-error NumberField expects a number, not a string.
