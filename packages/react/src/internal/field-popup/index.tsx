@@ -8,6 +8,7 @@ import {
   shift,
   size,
 } from '@floating-ui/react-dom';
+import { clamp } from 'es-toolkit';
 import { createFocusTrap } from 'focus-trap';
 import { RemoveScroll } from 'react-remove-scroll';
 import { tabbable } from 'tabbable';
@@ -175,7 +176,7 @@ export function FieldPopup({
               node.style.setProperty('--anchor-width', `${anchorWidth}px`);
               Object.assign(node.style, {
                 width: `${Math.min(width, viewport - VIEWPORT_MARGIN * 2)}px`,
-                maxHeight: `${Math.max(Math.min(MIN_HEIGHT, maxHeight), Math.min(maxHeight, availableHeight))}px`,
+                maxHeight: `${clamp(availableHeight, Math.min(MIN_HEIGHT, maxHeight), maxHeight)}px`,
               });
             },
           }),
