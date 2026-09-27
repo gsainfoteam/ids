@@ -7,6 +7,10 @@ export const messages = {
   textField: {
     clear: '지우기',
   },
+  passwordField: {
+    show: '비밀번호 표시',
+    capsLock: 'Caps Lock이 켜져 있습니다.',
+  },
   textArea: {
     count: (count: number, maxLength: number | undefined) =>
       maxLength === undefined ? `${count}` : `${count} / ${maxLength}`,
