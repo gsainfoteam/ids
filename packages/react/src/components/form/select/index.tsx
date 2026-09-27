@@ -12,6 +12,7 @@ import {
   type FocusEvent,
   type KeyboardEvent,
   type PointerEvent,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 
@@ -30,10 +31,12 @@ import {
   type FieldTriggerVariant,
 } from '../../../internal/field-popup';
 import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../internal/field-popup/search';
+import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -102,6 +105,7 @@ type Context = {
   placeholder: string;
   triggerProps: Record<string, unknown>;
   listLabel: { 'aria-label'?: string; 'aria-labelledby'?: string };
+  size: IdsSize;
   styles: ReturnType<typeof Select.Style>;
 };
 
@@ -279,6 +283,7 @@ export function Select(props: SelectProps) {
         placeholder,
         triggerProps,
         listLabel,
+        size: resolvedSize,
         styles,
       }}
     >
@@ -402,19 +407,26 @@ function SelectIcon({ asChild, children, className, ...props }: Select.IconProps
 function SelectClear({ asChild, children, className, ...props }: Select.ClearProps) {
   const c = useSelectContext('Select.Clear');
   if (!c.select.state.selected.length || c.state.readOnly) return null;
-  return part(
-    'button',
-    asChild,
-    children ?? <XMarkIcon aria-hidden="true" />,
-    mergeProps(props, {
-      type: 'button',
-      'aria-label': props['aria-label'] ?? messages.select.clear,
-      disabled: c.state.disabled,
-      'data-select-clear': '',
-      className: c.styles.clear({ className }),
-      onClick: c.select.actions.clear,
-    }),
-  );
+  const own = mergeProps(props as Record<string, unknown>, {
+    'aria-label': props['aria-label'] ?? messages.select.clear,
+    disabled: c.state.disabled,
+    'data-select-clear': '',
+    onClick: c.select.actions.clear,
+  }) as Omit<Select.ClearProps, 'asChild' | 'children' | 'className'>;
+  const button = {
+    ...own,
+    variant: 'ghost' as const,
+    size: c.size,
+    className: c.styles.clear({ className }),
+  };
+  if (asChild)
+    return (
+      <IconButton {...button} asChild>
+        {children as ReactElement}
+      </IconButton>
+    );
+  const glyph = children ?? <XMarkIcon aria-hidden="true" />;
+  return <IconButton {...button} icon={isValidElement(glyph) ? glyph : <>{glyph}</>} />;
 }
 
 function SelectContent({ asChild, children, className, ...props }: Select.ContentProps) {
@@ -698,12 +710,10 @@ export namespace Select {
       valueText: 'truncate',
       more: 'shrink-0 text-(--ids-color-on-muted)',
       icon: 'inline-flex shrink-0 text-(--ids-color-on-muted)',
-      clear: [
-        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
-        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'focus-ring disabled:pointer-events-none',
-      ],
+      // Clear is a ghost IconButton with fieldAction's look. The trigger holds the field's padding,
+      // not the root, so fieldAction's pull into the padding at the end would push it past the
+      // border; it keeps the same 4px inset with a margin instead.
+      clear: [fieldAction.base, 'me-1'],
       listbox: fieldListbox.list,
       item: fieldListbox.option,
       indicator: fieldListbox.indicator,
@@ -723,13 +733,13 @@ export namespace Select {
           root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
           trigger: 'gap-2 px-3',
           icon: '[&_svg]:size-(--ids-size-icon-standard)',
-          clear: 'me-1 size-7 [&_svg]:size-(--ids-size-icon-standard)',
+          clear: 'size-7',
         },
         tiny: {
           root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
           trigger: 'gap-1.5 px-2.5',
           icon: '[&_svg]:size-(--ids-size-icon-tiny)',
-          clear: 'me-1 size-6 [&_svg]:size-(--ids-size-icon-tiny)',
+          clear: 'size-6',
         },
       } satisfies Record<IdsSize, object>,
     },

@@ -313,6 +313,11 @@ test('Clear returns a single select to null and focuses the trigger; hidden when
   await render(state.node);
   const clear = host.querySelector('[data-select-clear]');
   assert.equal(clear.getAttribute('aria-label'), '선택 지우기');
+  assert.equal(clear.type, 'button');
+  assert.equal(clear.dataset.variant, 'ghost', 'a ghost IconButton');
+  assert.equal(clear.tabIndex, 0, 'still a stop of its own in the Tab order');
+  assert.match(clear.className, /(^| )size-7( |$)/);
+  assert.match(clear.className, /(^| )me-1( |$)/, 'inset from the border, not pulled past it');
   await click(clear);
   assert.deepEqual(state.changes, [null]);
   assert.equal(document.activeElement, trigger());

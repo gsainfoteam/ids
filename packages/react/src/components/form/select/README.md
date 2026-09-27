@@ -87,6 +87,7 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 ```
 
 - 지운 뒤에는 트리거로 포커스가 갑니다. `readOnly` 면 지우기 버튼이 보이지 않습니다.
+- `Select.Clear` 는 필드 안의 ghost `IconButton` 입니다. `Tab` 으로 따로 갈 수 있고, 포커스 링도 따로 그립니다. children 은 글리프, `asChild` 면 그릴 버튼입니다.
 - 트리거에는 두 개까지 라벨을 보이고 나머지는 `+2` 처럼 셉니다. 라벨이 잘려도 숫자는 잘리지 않습니다.
 
 ## 구성
