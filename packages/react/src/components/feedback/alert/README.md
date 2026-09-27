@@ -79,6 +79,7 @@ import { Alert } from '@gsainfoteam/ids-react';
 | 안에 포커스가 있을 때 `Esc`  | 닫힌다. 조합 중인 입력은 조합만 취소한다 |
 | 닫힐 때 안에 포커스가 있었음 | 포커스가 다음 요소(없으면 이전 요소)로   |
 
+- `Alert.Close` 는 ghost `IconButton` 입니다. 알림의 `colorScheme` 색으로 hover와 포커스 링을 그리고, `solid` 에서는 채운 색 위의 대비 색을 씁니다. 자식으로 아이콘을 바꿉니다.
 - 닫힐 때 짧게 흐려지며 사라집니다. `prefers-reduced-motion` 이면 바로 사라집니다.
 - `onOpenChange(false)` 는 닫기를 누른 순간 불리고, 요소는 전환이 끝난 뒤에 빠집니다.
 - `Alert.Close` 가 없으면 Escape로 닫히지 않습니다.

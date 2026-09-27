@@ -23,6 +23,7 @@ import { useAlert } from './use-alert';
 import { messages } from '../../../internal/messages';
 import { flattenFragments, invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+import { IconButton } from '../../action/icon-button';
 import { Slot } from '../../utility/slot';
 
 type Context = {
@@ -232,25 +233,27 @@ export namespace Alert {
     export type Props = PartProps<'div'>;
   }
 
-  // Calling preventDefault in onClick keeps the alert open.
+  // Calling preventDefault in onClick keeps the alert open. The alert's scheme names are
+  // IconButton's too, so the button hovers and rings in the alert's own color.
   export function Close({ className, children, onClick, ...props }: Close.Props) {
     const { state, styles, close } = useAlertContext('Alert.Close');
     return (
-      <button
-        type="button"
+      <IconButton
         aria-label={messages.alert.close}
         {...props}
+        variant="ghost"
+        colorScheme={state.colorScheme}
+        icon={children ?? <XMarkIcon />}
         onClick={mergeEventHandlers(onClick, (_event: MouseEvent<HTMLButtonElement>) => close())}
         data-alert-close=""
         className={styles.close({ className: resolve(className, state) })}
-      >
-        {children ?? <XMarkIcon />}
-      </button>
+      />
     );
   }
   export namespace Close {
-    export type Props = Omit<ComponentProps<'button'>, 'className' | 'type'> & {
+    export type Props = Omit<ComponentProps<'button'>, 'className' | 'type' | 'children'> & {
       className?: string | ((state: State) => string | undefined);
+      children?: ReactElement;
     };
   }
 
@@ -269,12 +272,7 @@ export namespace Alert {
       title: 'text-body-b3-semibold text-(--alert-title)',
       description: 'text-(--alert-body) [&_ul]:list-disc [&_ul]:ps-5',
       actions: 'mt-2 flex flex-wrap items-center gap-2',
-      close: [
-        '-my-0.5 -me-1.5 flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-full',
-        'text-(--alert-title) opacity-70 transition-[opacity,background-color] duration-(--ids-motion-fast)',
-        'hover:bg-current/10 hover:opacity-100 focus-ring motion-reduce:transition-none',
-        '[&_svg]:size-(--ids-size-icon-standard)',
-      ],
+      close: '-my-0.5 -me-1.5 size-6 rounded-full',
     },
     variants: {
       // Meaning sets three colors; the variant decides where each one is painted.
@@ -302,6 +300,12 @@ export namespace Alert {
           root: [
             'bg-(--alert-tint) text-(--alert-on)',
             '[--alert-accent:var(--alert-on)] [--alert-title:var(--alert-on)] [--alert-body:var(--alert-on)]',
+          ],
+          // On the scheme's own fill, IconButton's scheme colors would vanish, so the close button
+          // takes the color written on the fill instead.
+          close: [
+            '[--control-quiet:var(--alert-on)] [--control-ring:var(--alert-on)]',
+            '[--control-hover:color-mix(in_oklab,var(--alert-on)_15%,transparent)]',
           ],
         },
         soft: {
