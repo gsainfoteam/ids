@@ -109,6 +109,11 @@ every story in `ThemeProvider`, so stories do not add their own theme or page pa
 
 ## Component styling
 
+**Development warnings use `isDevelopment` from `src/utils/dev.ts`, never `import.meta.env.DEV`.**
+Vite bakes `import.meta.env.DEV` into the library build as `false`, which strips every warning from
+the published package. `isDevelopment` reads `process.env.NODE_ENV`, which the app's bundler
+replaces.
+
 **Multi-part components use one `tv({ slots })`, not several `tv()` calls.** A component with a
 root plus parts (track/thumb, trigger/panel, box/indicator) declares every part as a slot in a
 single `Style`, so a variant like `colorScheme` or `size` is written once and fans out to the
