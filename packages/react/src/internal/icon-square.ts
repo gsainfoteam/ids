@@ -1,15 +1,10 @@
 import type { IdsSize } from '../tokens/types';
 
-// controlSurface trims the padding on the side holding an icon. A square has no padding at all,
-// so those same conditional classes are reset here; tailwind-merge only drops the trimmed
-// padding when the override uses the identical has-[...] condition.
+// An icon-only control is exactly as wide as it is tall. It is composed from the control surface's
+// base and variants but never its sizes, whose padding and icon-side trims would break the square.
+// A Spinner swapped in for the icon is a span around a spinning svg; it takes the icon size too.
 export const iconSquare = {
-  base: [
-    'shrink-0 gap-0 px-0 rounded-standard [&_svg]:shrink-0',
-    'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-0',
-    'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-0',
-  ],
-  // A Spinner swapped in for the icon is a span around a spinning svg; it takes the icon size too.
+  base: 'shrink-0 gap-0 p-0 rounded-standard [&_svg]:shrink-0',
   size: {
     standard: [
       'size-(--ids-size-control-standard) [&_svg]:size-(--ids-size-icon-standard)',
