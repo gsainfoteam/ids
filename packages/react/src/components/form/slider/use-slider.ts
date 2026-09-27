@@ -11,9 +11,10 @@ import {
   type RefCallback,
 } from 'react';
 
+import { clamp, isEqual } from 'es-toolkit';
 import { flushSync } from 'react-dom';
 
-import { clamp, closestThumb, moveThumb, ratioAlong } from './slider-math';
+import { closestThumb, moveThumb, ratioAlong } from './slider-math';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { mergeRefs } from '../../../utils';
@@ -43,10 +44,6 @@ type Drag = { index: number; tied: boolean; from: readonly number[]; pointerId: 
 function toArray(value: SliderValue | undefined) {
   if (value === undefined) return undefined;
   return typeof value === 'number' ? [value] : [...value];
-}
-
-function same(a: readonly number[], b: readonly number[]) {
-  return a.length === b.length && a.every((value, index) => Object.is(value, b[index]));
 }
 
 export function useSlider({
@@ -81,7 +78,7 @@ export function useSlider({
     .map((entry) => clamp(Number.isFinite(entry) ? entry : min, min, max))
     .sort((a, b) => a - b);
   useEffect(() => {
-    if (isDevelopment && !same(values, stored))
+    if (isDevelopment && !isEqual(values, stored))
       console.warn(
         `[IDS] Slider: value ${JSON.stringify(stored)} is out of order or outside [${min}, ${max}].`,
       );
@@ -100,7 +97,7 @@ export function useSlider({
   const [dragging, setDragging] = useState<number | null>(null);
 
   const commit = (from: readonly number[]) => {
-    if (!same(from, latest.current)) onValueCommit?.(output(latest.current));
+    if (!isEqual(from, latest.current)) onValueCommit?.(output(latest.current));
   };
 
   // A drag reports on every pointer move. Each move is rendered at once so the next move measures
