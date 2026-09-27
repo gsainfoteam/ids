@@ -1,117 +1,168 @@
-import { createContext, useContext, useId, useMemo } from 'react';
-import type { ComponentType, ReactNode, ComponentProps } from 'react';
+import {
+  useId,
+  type ComponentProps,
+  type ComponentType,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 
-import { useControllableState } from '../../../hooks/use-controllable-state';
-import { invariant, tv } from '../../../utils';
+import { RadioGroupContext } from './context';
+import { useRadioGroup } from './use-radio-group';
+import { tv } from '../../../utils';
 import { Radio } from '../radio';
 
 import type { IdsSize } from '../../../tokens/types';
 
-type RadioGroupContextValue = {
-  name: string;
-  value: string | undefined;
-  size: IdsSize;
+export type RadioGroupOrientation = 'vertical' | 'horizontal';
+
+export type RadioGroupState = {
+  value: string | null;
+  orientation: RadioGroupOrientation;
   disabled: boolean;
-  select: (value: string) => void;
+  readOnly: boolean;
+  required: boolean;
+  invalid: boolean;
 };
 
-const RadioGroupContext = createContext<RadioGroupContextValue | null>(null);
+type StateProp<T> = T | ((state: RadioGroupState) => T);
 
-function Item({ value, disabled = false, ...rest }: RadioGroup.ItemProps) {
-  const context = useContext(RadioGroupContext);
-  invariant(context != null, '`<Item>` must come from the `<RadioGroup>` render children.');
-
-  return (
-    <Radio
-      {...rest}
-      name={context.name}
-      value={value}
-      size={context.size}
-      checked={context.value === value}
-      disabled={disabled || context.disabled}
-      onChange={(checked) => {
-        if (checked) context.select(value);
-      }}
-    />
-  );
+function resolve<T>(value: StateProp<T>, state: RadioGroupState): T {
+  return typeof value === 'function' ? (value as (state: RadioGroupState) => T)(state) : value;
 }
 
+export type RadioGroupItemProps<T extends string> = Omit<
+  Radio.Props,
+  'value' | 'checked' | 'defaultChecked' | 'name'
+> & { value: T };
+
+export type RadioGroupRenderProps<T extends string> = {
+  Item: ComponentType<RadioGroupItemProps<T>>;
+};
+
+export type RadioGroupProps<T extends string> = Omit<
+  ComponentProps<'div'>,
+  'children' | 'defaultValue' | 'onChange' | 'role' | 'className' | 'style'
+> & {
+  value?: T | null;
+  defaultValue?: T | null;
+  onValueChange?: (value: T) => void;
+  name?: string;
+  form?: string;
+  orientation?: RadioGroupOrientation;
+  size?: IdsSize;
+  variant?: Radio.Variant;
+  disabled?: boolean;
+  readOnly?: boolean;
+  required?: boolean;
+  invalid?: boolean;
+  className?: StateProp<string | undefined>;
+  style?: StateProp<CSSProperties | undefined>;
+  children: ReactNode | ((render: RadioGroupRenderProps<T>) => ReactNode);
+};
+
+const render = { Item: Radio } as RadioGroupRenderProps<string>;
+
 export function RadioGroup<T extends string>({
-  variant = 'vertical',
-  size = 'standard',
-  disabled = false,
-  name,
   value: valueProp,
   defaultValue,
-  onChange,
+  onValueChange,
+  name,
+  form,
+  orientation = 'vertical',
+  size,
+  variant,
+  disabled = false,
+  readOnly = false,
+  required = false,
+  invalid,
   className,
+  style,
   children,
+  ref,
+  onFocus,
   ...rest
-}: RadioGroup.Props<T>) {
+}: RadioGroupProps<T>) {
   const generatedName = useId();
-  const [value, setValue] = useControllableState<T | undefined>({
+  const groupName = name ?? generatedName;
+  const { value, select, rootRef, focusChecked } = useRadioGroup<T>({
     value: valueProp,
     defaultValue,
-    onValueChange: onChange as ((next: T | undefined) => void) | undefined,
+    onValueChange,
+    name: groupName,
+    ref,
   });
-
-  const context: RadioGroupContextValue = {
-    name: name ?? generatedName,
+  const ariaInvalid = rest['aria-invalid'] ?? invalid;
+  const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
+  const state: RadioGroupState = {
     value,
-    size,
+    orientation,
     disabled,
-    select: (next) => setValue(next as T),
+    readOnly,
+    required,
+    invalid: isInvalid,
   };
 
-  const render = useMemo(() => ({ Item: Item as ComponentType<RadioGroup.TypedItemProps<T>> }), []);
-
   return (
-    <RadioGroupContext.Provider value={context}>
-      <div role="radiogroup" {...rest} className={RadioGroup.Style({ variant, className })}>
-        {children(render)}
+    <RadioGroupContext.Provider
+      value={{
+        name: groupName,
+        value,
+        select,
+        disabled,
+        readOnly,
+        required,
+        invalid: isInvalid,
+        form,
+        size,
+        variant,
+      }}
+    >
+      <div
+        {...rest}
+        ref={rootRef}
+        role="radiogroup"
+        tabIndex={-1}
+        aria-orientation={orientation}
+        aria-disabled={disabled || undefined}
+        aria-readonly={readOnly || undefined}
+        aria-required={required || undefined}
+        aria-invalid={ariaInvalid}
+        data-radio-group=""
+        data-orientation={orientation}
+        data-disabled={disabled ? '' : undefined}
+        data-readonly={readOnly ? '' : undefined}
+        data-required={required ? '' : undefined}
+        data-invalid={isInvalid ? '' : undefined}
+        className={RadioGroup.Style({ orientation, className: resolve(className, state) })}
+        style={resolve(style, state)}
+        onFocus={(event) => {
+          focusChecked(event);
+          onFocus?.(event);
+        }}
+      >
+        {typeof children === 'function'
+          ? children(render as unknown as RadioGroupRenderProps<T>)
+          : children}
       </div>
     </RadioGroupContext.Provider>
   );
 }
 
 export namespace RadioGroup {
+  export type Props<T extends string = string> = RadioGroupProps<T>;
+  export type State = RadioGroupState;
+  export type Orientation = RadioGroupOrientation;
+  export type ItemProps<T extends string = string> = RadioGroupItemProps<T>;
+  export type RenderProps<T extends string = string> = RadioGroupRenderProps<T>;
+
   export const Style = tv({
-    base: 'flex',
+    base: 'flex outline-none',
     variants: {
-      variant: {
-        vertical: 'flex-col gap-2',
-        horizontal: 'flex-row flex-wrap gap-4',
-      },
+      orientation: {
+        vertical: 'flex-col gap-3',
+        horizontal: 'flex-row flex-wrap gap-x-6 gap-y-3',
+      } satisfies Record<RadioGroupOrientation, string>,
     },
-    defaultVariants: { variant: 'vertical' },
+    defaultVariants: { orientation: 'vertical' },
   });
-
-  export type ItemProps = Omit<
-    ComponentProps<'input'>,
-    'type' | 'size' | 'name' | 'checked' | 'value' | 'onChange' | 'className' | 'children'
-  > & {
-    value: string;
-    disabled?: boolean;
-  };
-
-  export type TypedItemProps<T extends string> = Omit<ItemProps, 'value'> & { value: T };
-
-  export type RenderProps<T extends string> = {
-    Item: ComponentType<TypedItemProps<T>>;
-  };
-
-  export type Props<T extends string> = Omit<
-    ComponentProps<'div'>,
-    'children' | 'className' | 'role' | 'onChange' | 'defaultValue'
-  > & {
-    variant?: 'vertical' | 'horizontal';
-    size?: IdsSize;
-    disabled?: boolean;
-    name?: string;
-    value?: T;
-    defaultValue?: T;
-    onChange?: (value: T) => void;
-    className?: string;
-    children: (render: RenderProps<T>) => ReactNode;
-  };
 }

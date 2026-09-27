@@ -19,7 +19,7 @@ type Props = Record<string, unknown>;
 // RHF must observe changes even when a consumer handler prevents the default action.
 function bind(props: Props, binding: Props) {
   const result = { ...props, ...binding };
-  for (const key of ['onChange', 'onBlur', 'onValueChange']) {
+  for (const key of ['onChange', 'onBlur', 'onValueChange', 'onCheckedChange']) {
     if (!(key in binding)) continue;
     result[key] = (...args: unknown[]) => {
       (props[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
@@ -44,6 +44,28 @@ function bind(props: Props, binding: Props) {
     return () => cleanups.forEach((cleanup) => cleanup?.());
   };
   return result;
+}
+
+function isBubbledEvent(value: unknown) {
+  if (typeof value !== 'object' || value === null) return false;
+  const { target, currentTarget } = value as { target?: unknown; currentTarget?: unknown };
+  return currentTarget != null && target !== currentTarget;
+}
+
+// A custom control reports through onValueChange or onCheckedChange, a native input through
+// onChange, and a control with both reports one edit twice. A group's onChange also hears the
+// change events bubbling up from its own checkboxes, whose target value is not the group's value.
+// So a bubbled event is ignored and only the first report of an edit reaches react-hook-form.
+function firstReport(onChange: (value: unknown) => void) {
+  let reported = false;
+  return (value: unknown) => {
+    if (reported || isBubbledEvent(value)) return;
+    reported = true;
+    queueMicrotask(() => {
+      reported = false;
+    });
+    onChange(value);
+  };
 }
 
 function NativeField({
@@ -94,16 +116,16 @@ function ControlledField({
       invalid={props.invalid ?? fieldState.invalid}
       errorMessage={fieldState.error?.message}
       bindControl={(original) => {
-        const { value, ...binding } = field;
+        const { value, onChange, ...binding } = field;
         // A native text input needs a string for an unset value; custom controls may use null.
         const resolvedValue =
           value === undefined ? (controlMode === 'checked' ? false : '') : value;
         const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
+        const report = firstReport(onChange);
         return bind(rest, {
           ...binding,
-          // Custom controls report a raw value through onValueChange and leave onChange to the
-          // native event; field.onChange accepts either, so value mode binds both.
-          ...(controlMode === 'value' ? { onValueChange: binding.onChange } : {}),
+          onChange: report,
+          [controlMode === 'checked' ? 'onCheckedChange' : 'onValueChange']: report,
           [controlMode]: resolvedValue,
           disabled: disabled ?? original.disabled,
         });

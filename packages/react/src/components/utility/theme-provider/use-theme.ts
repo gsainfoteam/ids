@@ -1,7 +1,7 @@
-import { useContext } from 'react';
+import { use } from 'react';
 
-import { ThemeContext } from './theme-provider';
+import { ThemeContext, type ThemeContextValue } from './use-theme-provider';
 
-export function useTheme() {
-  return useContext(ThemeContext);
+export function useTheme(): ThemeContextValue {
+  return use(ThemeContext);
 }
