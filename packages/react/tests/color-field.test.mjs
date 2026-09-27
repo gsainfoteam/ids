@@ -383,6 +383,8 @@ test('a surrounding Field follows the value once the popup closes', async () => 
   };
   assert.deepEqual(flags(), [false, false]);
   await click(trigger());
+  assert.ok(dialog());
+  assert.deepEqual(flags(), [false, false], "the popup's own controls are not the field's value");
   await key(document.activeElement, 'Escape');
   assert.equal(dialog(), null);
   assert.deepEqual(flags(), [false, false], 'opening and closing the popup changes nothing');

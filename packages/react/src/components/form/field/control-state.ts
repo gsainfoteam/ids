@@ -22,9 +22,17 @@ const VALIDITY_KEYS: FieldValidityKey[] = [
 
 const ACTION_TYPES = new Set(['button', 'submit', 'reset', 'image']);
 
+const isAction = (control: Control) =>
+  control.tagName === 'INPUT' && ACTION_TYPES.has(control.type);
+
+function isInPopupOf(root: Element, control: Control) {
+  const popup = control.closest('[data-field-popup]');
+  return popup !== null && root.contains(popup);
+}
+
 function controlsIn(root: Element) {
   return Array.from(root.querySelectorAll<Control>('input, textarea, select')).filter(
-    (control) => !(control.tagName === 'INPUT' && ACTION_TYPES.has(control.type)),
+    (control) => !isAction(control) && !isInPopupOf(root, control),
   );
 }
 
