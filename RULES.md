@@ -169,23 +169,23 @@ instead of replacing it. Focus also recolors that inset-ring border to primary, 
 with `aria-invalid="true"` or `data-invalid` gets a danger border and a danger ring; neither
 state is repeated in component styles.
 
-**Radius is 12px, and containers grow it concentrically.** The scale is `standard` (12px, every
+**Radius is 10px, and containers grow it concentrically.** The scale is `standard` (10px, every
 control at every size), `indicator` (4px, only for boxes under 24px such as the Checkbox box or
-Kbd, where 12px would read as a circle) and `full`. There is no `sm`/`md`/`lg` radius.
+Kbd, where 10px would read as a circle) and `full`. There is no `sm`/`md`/`lg` radius.
 
 A padded container (Card, Alert, Item, a popup) takes its padding from `concentric-p-*` instead of
 `p-*` plus `rounded-*`. The utility sets the padding and makes the corner the content's corner
-plus that padding, so a Card at `concentric-p-4` holding a Button is 28px around a 12px button.
+plus that padding, so a Card at `concentric-p-4` holding a Button is 26px around a 10px button.
 Nesting adds up: the utility detects nested `concentric-p-*` containers with `:has()` and sums
 their padding in, exact for two levels. Popovers are excluded because they are not visually
 nested in the element that contains them in the DOM.
 
 ```tsx
-root: 'concentric-p-4',        // padding 16px, radius 12 + 16 (+ nested padding)
+root: 'concentric-p-4',        // padding 16px, radius 10 + 16 (+ nested padding)
 root: 'concentric-p-3 px-4',   // asymmetric: radius follows the concentric value, px overrides inline
 ```
 
-Do not hardcode `rounded-[10px]`, and do not pair `p-*` with a hand-computed radius.
+Do not hardcode `rounded-[14px]`, and do not pair `p-*` with a hand-computed radius.
 
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
 `--ids-color-border` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets

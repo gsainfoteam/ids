@@ -258,7 +258,7 @@ export namespace Avatar {
       } satisfies Record<AvatarShape, object>,
       size: {
         standard: { root: 'size-10 [--avatar-radius:var(--ids-radius-standard)]' },
-        // 12px would turn a 24px square into a circle.
+        // The standard radius would round a 24px square nearly into a circle.
         tiny: { root: 'size-6 [--avatar-radius:var(--ids-radius-indicator)]' },
       } satisfies Record<IdsSize, object>,
       cutout: { start: {}, end: {}, none: {} },

@@ -33,10 +33,10 @@ export const Scale: Story = {
     <Showcase>
       <Showcase.Section
         title="Scale"
-        description="컨트롤은 크기와 상관없이 standard(12px)를 씁니다. 24px 미만 표시 요소만 indicator를 씁니다."
+        description="컨트롤은 크기와 상관없이 standard(10px)를 씁니다. 24px 미만 표시 요소만 indicator를 씁니다."
       >
         <Showcase.Row>
-          <Measured className="rounded-standard" label="standard · 12px" />
+          <Measured className="rounded-standard" label="standard · 10px" />
           <Measured className="rounded-indicator" label="indicator · 4px" />
           <Measured className="rounded-full" label="full" />
         </Showcase.Row>
@@ -63,20 +63,20 @@ export const Concentric: Story = {
         description="concentric-p-* 컨테이너의 모서리는 안쪽 모서리 + 패딩입니다. 중첩되면 안쪽 컨테이너의 패딩까지 더해집니다."
       >
         <Showcase.Row label="1단계">
-          <div data-radius="20" className={`concentric-p-2 ${surface}`}>
-            <Button>p-2 · 20px</Button>
+          <div data-radius="18" className={`concentric-p-2 ${surface}`}>
+            <Button>p-2 · 18px</Button>
           </div>
-          <div data-radius="28" className={`concentric-p-4 ${surface}`}>
-            <Button>p-4 · 28px</Button>
+          <div data-radius="26" className={`concentric-p-4 ${surface}`}>
+            <Button>p-4 · 26px</Button>
           </div>
-          <div data-radius="36" className={`concentric-p-6 ${surface}`}>
-            <Button>p-6 · 36px</Button>
+          <div data-radius="34" className={`concentric-p-6 ${surface}`}>
+            <Button>p-6 · 34px</Button>
           </div>
         </Showcase.Row>
         <Showcase.Row label="2단계">
-          <div data-radius="36" className={`concentric-p-4 ${surface}`}>
-            <div data-radius="20" className={`concentric-p-2 ${surface}`}>
-              <Button>12 → 20 → 36px</Button>
+          <div data-radius="34" className={`concentric-p-4 ${surface}`}>
+            <div data-radius="18" className={`concentric-p-2 ${surface}`}>
+              <Button>10 → 18 → 34px</Button>
             </div>
           </div>
         </Showcase.Row>

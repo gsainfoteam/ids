@@ -436,7 +436,7 @@ export namespace ColorField {
         'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
         'focus-ring disabled:pointer-events-none',
       ],
-      // Padding that keeps the popup's corner concentric with the 12px area inside it.
+      // Padding that keeps the popup's corner concentric with the standard-radius area inside it.
       popup: 'concentric-p-3',
       popupHeader: '-mt-1 mb-2 flex items-center justify-between ps-1',
       popupTitle: 'text-body-b3-medium',

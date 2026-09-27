@@ -198,9 +198,9 @@ export const Joined: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const [first, middle, last] = canvas.getAllByRole('button');
-    await expect(radii(first!)).toEqual(['12px', '0px', '0px', '12px']);
+    await expect(radii(first!)).toEqual(['10px', '0px', '0px', '10px']);
     await expect(radii(middle!)).toEqual(['0px', '0px', '0px', '0px']);
-    await expect(radii(last!)).toEqual(['0px', '12px', '12px', '0px']);
+    await expect(radii(last!)).toEqual(['0px', '10px', '10px', '0px']);
     await expect(middle!.getBoundingClientRect().left - first!.getBoundingClientRect().right).toBe(
       -1,
     );
@@ -283,7 +283,7 @@ export const RightToLeft: Story = {
   },
   play: async ({ canvas }) => {
     const first = canvas.getByRole('button', { name: '첫째' });
-    await expect(getComputedStyle(first).borderTopRightRadius).toBe('12px');
+    await expect(getComputedStyle(first).borderTopRightRadius).toBe('10px');
     await expect(getComputedStyle(first).borderTopLeftRadius).toBe('0px');
   },
 };

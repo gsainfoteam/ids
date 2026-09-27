@@ -234,7 +234,7 @@ export const Shape: Story = {
     docs: {
       description: {
         story:
-          '보이는 글자가 없으면 56px 원, 있으면 높이 56px에 모서리 12px인 확장형입니다. 확장형은 아이콘 쪽 여백이 조금 줄어듭니다.',
+          '보이는 글자가 없으면 56px 원, 있으면 높이 56px에 모서리 10px인 확장형입니다. 확장형은 아이콘 쪽 여백이 조금 줄어듭니다.',
       },
     },
   },
@@ -243,10 +243,10 @@ export const Shape: Story = {
     const extended = canvas.getByRole('button', { name: '업로드' });
     await expect(icon).toHaveAttribute('data-icon-only');
     await expect([icon.offsetWidth, icon.offsetHeight]).toEqual([56, 56]);
-    await expect(getComputedStyle(icon).borderRadius).not.toBe('12px');
+    await expect(getComputedStyle(icon).borderRadius).not.toBe('10px');
     await expect(extended).not.toHaveAttribute('data-icon-only');
     await expect(extended.offsetHeight).toBe(56);
-    await expect(getComputedStyle(extended).borderTopLeftRadius).toBe('12px');
+    await expect(getComputedStyle(extended).borderTopLeftRadius).toBe('10px');
     await expect(getComputedStyle(extended).paddingInlineStart).toBe('16px');
   },
 };
