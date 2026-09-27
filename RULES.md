@@ -43,6 +43,7 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 **What we build and what we install.** Prefer a well-maintained package over hand-rolled logic:
 
 - Generic helpers come from `es-toolkit` (`clamp`, `isEqual`, `noop`, `debounce`, `uniq`, ...), never a local copy.
+- Classes are merged by `cn` (the package, in place of `clsx` + `tailwind-merge`). `utils/cn.ts` only adds the IDS config, and `utils/tv.ts` runs the lite build of `tailwind-variants` through the same `cn`, so one engine resolves every conflict.
 - Utility engines are installed, not written: positioning `@floating-ui/react-dom`, focus `tabbable` / `focus-trap`, scroll lock `react-remove-scroll`, dates `date-fns`, numbers `@internationalized/number`, colors `culori`, textarea sizing `react-textarea-autosize`, phone numbers `libphonenumber-js`.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation).
@@ -206,7 +207,7 @@ so the browser blocks the submit, anchors its message there and hands focus to t
 **`dark:` follows `data-mode`.** The CSS package defines the `dark` variant against the nearest
 `data-mode`, so it works in any app and inside a nested ThemeProvider, not only when the OS is dark.
 
-**tailwind-merge needs line height after text size.** `text-*` composites carry their own line
+**`cn` needs line height after text size.** `text-*` composites carry their own line
 height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regular leading-none`.
 
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph

@@ -1,11 +1,6 @@
-import { type ClassValue, clsx } from 'clsx';
-import {
-  type ConfigExtension,
-  type DefaultClassGroupIds,
-  type DefaultThemeGroupIds,
-  extendTailwindMerge,
-  validators,
-} from 'tailwind-merge';
+import { createCn, validators, type ConfigExtension, type DefaultClassGroupIds } from 'cn/config';
+
+import type { CnFunction } from 'cn';
 
 const idsTextSizes = [
   'text-headline-h1-bold',
@@ -67,9 +62,7 @@ const roundedGroups: DefaultClassGroupIds[] = [
   'rounded-l',
 ];
 
-type IdsClassGroupIds = DefaultClassGroupIds | 'concentric-p';
-
-export const twMergeConfig: ConfigExtension<IdsClassGroupIds, DefaultThemeGroupIds> = {
+const config = {
   extend: {
     theme: {
       radius: ['standard', 'indicator'],
@@ -82,10 +75,6 @@ export const twMergeConfig: ConfigExtension<IdsClassGroupIds, DefaultThemeGroupI
       'concentric-p': [...paddingGroups, ...roundedGroups],
     },
   },
-};
+} satisfies ConfigExtension;
 
-const twMerge = extendTailwindMerge<IdsClassGroupIds>(twMergeConfig);
-
-export function cn(...classes: ClassValue[]) {
-  return twMerge(clsx(classes));
-}
+export const cn: CnFunction = createCn(config);

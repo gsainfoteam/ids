@@ -219,7 +219,7 @@ export namespace Badge {
           indicator: ['pointer-events-none absolute z-10', 'ring-2 ring-(--ids-color-surface)'],
         },
       },
-      // leading-none follows the text size: tailwind-merge drops a line height set before it.
+      // leading-none follows the text size: cn drops a line height set before it.
       {
         dot: false,
         size: 'standard',
