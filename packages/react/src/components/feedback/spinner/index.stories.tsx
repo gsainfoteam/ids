@@ -1,7 +1,14 @@
-import { expect } from 'storybook/test';
+import { useState } from 'react';
+
+import { CheckIcon } from '@heroicons/react/16/solid';
+import { expect, waitFor, within } from 'storybook/test';
+
+import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { Field } from '../../form/field';
+import { TextField } from '../../form/text-field';
 
 import { Spinner } from '.';
 
@@ -10,103 +17,235 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const sizes = ['standard', 'tiny'] as const;
 const variants = ['solid', 'soft', 'outline', 'ghost'] as const;
 
-const meta: Meta<typeof Spinner> = {
+const meta = {
   title: 'Feedback/Spinner',
   component: Spinner,
   tags: ['autodocs'],
   argTypes: {
-    size: { control: 'radio', options: [...sizes] },
-    label: { control: 'text' },
-    decorative: { control: 'boolean' },
+    size: { control: 'radio', options: [undefined, ...sizes] },
+    decorative: { control: 'radio', options: [undefined, true, false] },
+    'aria-label': { control: 'text' },
   },
-  args: {
-    size: 'standard',
-    label: '불러오는 중',
-    decorative: false,
-  },
+  args: {},
+} satisfies Meta<typeof Spinner>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+const width = (element: Element | null) => element?.getBoundingClientRect().width ?? 0;
+const token = (name: string) =>
+  parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
+
+export const Playground: Story = {};
+
+export const Gallery: Story = {
+  render: () => (
+    <Showcase>
+      <Showcase.Section
+        title="Size"
+        description="size를 주지 않으면 주변 글자 크기를 따릅니다. standard와 tiny는 아이콘 토큰 크기입니다."
+      >
+        <Showcase.Row label="auto">
+          <span className="text-body-b1-regular">
+            <Spinner /> b1
+          </span>
+          <span className="text-body-b3-regular">
+            <Spinner /> b3
+          </span>
+          <span className="text-caption-c1-regular">
+            <Spinner /> c1
+          </span>
+        </Showcase.Row>
+        <Showcase.Row label="standard">
+          <Spinner size="standard" />
+        </Showcase.Row>
+        <Showcase.Row label="tiny">
+          <Spinner size="tiny" />
+        </Showcase.Row>
+        <Showcase.Row label="className">
+          <Spinner className="size-8" />
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Button × Size"
+        description="컨트롤 안에서는 그 컨트롤의 아이콘 크기가 되고 글자색을 따릅니다."
+      >
+        <Showcase.Matrix
+          rows={sizes}
+          columns={variants}
+          render={(size, variant) => (
+            <Button size={size} variant={variant} disabled>
+              <Spinner />
+              저장 중
+            </Button>
+          )}
+        />
+        <Showcase.Row label="IconButton">
+          {sizes.map((size) => (
+            <IconButton
+              key={size}
+              size={size}
+              variant="outline"
+              disabled
+              aria-label="저장 중"
+              icon={<Spinner />}
+            />
+          ))}
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section title="Color" description="색은 currentColor입니다.">
+        <Showcase.Row label="on-surface">
+          <Spinner size="standard" />
+        </Showcase.Row>
+        <Showcase.Row label="primary">
+          <Spinner size="standard" className="text-(--ids-color-primary)" />
+        </Showcase.Row>
+        <Showcase.Row label="on-muted">
+          <Spinner size="standard" className="text-(--ids-color-on-muted)" />
+        </Showcase.Row>
+      </Showcase.Section>
+    </Showcase>
+  ),
+};
+
+export const FollowsControl: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <Button disabled>
+        <Spinner data-testid="standard" />
+        저장 중
+      </Button>
+      <Button size="tiny" disabled>
+        <Spinner data-testid="tiny" />
+        저장 중
+      </Button>
+      <IconButton size="tiny" aria-label="새로고침 중" icon={<Spinner data-testid="icon" />} />
+    </div>
+  ),
   parameters: {
     docs: {
       description: {
-        component:
-          '부모의 글자색을 상속하는 로딩 표시입니다. 단독 사용 시 label을 알리고, 이미 로딩 텍스트가 있는 버튼에서는 decorative를 사용합니다. 모션 감소 설정에서는 회전을 멈춥니다.',
+        story:
+          'Button과 IconButton은 크기를 주지 않은 아이콘을 자기 아이콘 크기로 맞춥니다. Spinner도 그 규칙을 그대로 따릅니다.',
       },
     },
   },
-};
-
-export default meta;
-type Story = StoryObj<typeof Spinner>;
-
-export const Playground: Story = {
-  play: async ({ canvas, args }) => {
-    if (args.decorative) {
-      await expect(canvas.queryByRole('status')).not.toBeInTheDocument();
-    } else {
-      await expect(canvas.getByRole('status')).toHaveTextContent(args.label ?? 'Loading');
-    }
-  },
-};
-
-export const Sizes: Story = {
-  render: () => (
-    <div className="flex items-center gap-6">
-      {sizes.map((size) => (
-        <div key={size} className="flex items-center gap-2">
-          <Spinner size={size} label={`${size} 불러오는 중`} />
-          <span>{size}</span>
-        </div>
-      ))}
-    </div>
-  ),
-};
-
-export const InButtons: Story = {
   play: async ({ canvas }) => {
-    await expect(canvas.queryByRole('status')).not.toBeInTheDocument();
-    for (const button of canvas.getAllByRole('button', { name: '저장 중' })) {
-      await expect(button).toBeDisabled();
-      await expect(button).toHaveAttribute('aria-busy', 'true');
-    }
+    await expect(width(canvas.getByTestId('standard'))).toBeCloseTo(
+      token('--ids-size-icon-standard'),
+    );
+    await expect(width(canvas.getByTestId('tiny'))).toBeCloseTo(token('--ids-size-icon-tiny'));
+    await expect(width(canvas.getByTestId('icon'))).toBeCloseTo(token('--ids-size-icon-tiny'));
   },
-  render: () => (
-    <div className="flex flex-col gap-4">
-      {sizes.map((size) => (
-        <div key={size} className="flex flex-wrap items-center gap-3">
-          {variants.map((variant) => (
-            <Button key={variant} size={size} variant={variant} disabled aria-busy="true">
-              <Spinner size={size} decorative />
-              저장 중
-            </Button>
-          ))}
-          <IconButton
-            size={size}
-            disabled
-            aria-busy="true"
-            aria-label="저장 중"
-            icon={<Spinner size={size} decorative />}
-          />
-        </div>
-      ))}
-    </div>
-  ),
 };
 
-export const Themes: Story = {
+export const FollowsField: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4">
-      {(['light', 'dark'] as const).map((mode) =>
-        (['blue', 'orange', 'green'] as const).map((color) => (
-          <div
-            key={`${color}-${mode}`}
-            data-color={color}
-            data-mode={mode}
-            className="flex items-center gap-3 rounded-standard bg-(--ids-color-surface) p-4 text-(--ids-color-primary)"
-          >
-            <Spinner label={`${color} ${mode} 불러오는 중`} />
-            <span>{`${color} / ${mode}`}</span>
-          </div>
-        )),
+    <Field size="tiny">
+      <Field.Label>아이디</Field.Label>
+      <TextField defaultValue="infoteam" />
+      <Field.Hint>
+        <span className="inline-flex items-center gap-1">
+          <Spinner data-testid="hint" /> 사용할 수 있는지 확인하는 중
+        </span>
+      </Field.Hint>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Field 안에서는 Field의 size를 따릅니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const spinner = canvas.getByTestId('hint');
+    await expect(spinner).toHaveAttribute('data-size', 'tiny');
+    await expect(width(spinner)).toBeCloseTo(token('--ids-size-icon-tiny'));
+  },
+};
+
+function LoadingExample() {
+  const [loading, setLoading] = useState(false);
+  return (
+    <div className="flex flex-col items-start gap-4">
+      <Button variant="outline" onClick={() => setLoading((value) => !value)}>
+        {loading ? '멈추기' : '불러오기'}
+      </Button>
+      {loading ? (
+        <div className="flex items-center gap-2 text-(--ids-color-on-muted)">
+          <Spinner aria-label="댓글을 불러오는 중" />
+        </div>
+      ) : (
+        <p className="flex items-center gap-2">
+          <CheckIcon className="size-4" /> 준비됨
+        </p>
       )}
     </div>
+  );
+}
+
+export const Announcement: Story = {
+  render: () => <LoadingExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '혼자 놓인 Spinner는 나타나고 잠시 뒤 role="status"에 이름을 적어 스크린 리더가 한 번 읽게 합니다. 이름은 aria-label로 바꿉니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '불러오기' }));
+    const status = canvas.getByRole('status');
+    await waitFor(() => expect(status).toHaveTextContent('댓글을 불러오는 중'));
+  },
+};
+
+export const SilentInsideControls: Story = {
+  render: () => (
+    <div className="flex items-center gap-3">
+      <Button disabled aria-busy="true">
+        <Spinner />
+        저장 중
+      </Button>
+      <IconButton disabled aria-busy="true" aria-label="동기화 중" icon={<Spinner />} />
+    </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '버튼, 링크, 라벨처럼 내용이 이름이 되는 요소 안에서는 스스로 조용해져 이름에 섞이지 않습니다. 이때 상태는 버튼 글자와 aria-busy가 전합니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    await waitFor(() => expect(canvas.queryByRole('status')).not.toBeInTheDocument());
+    const button = canvas.getByRole('button', { name: '저장 중' });
+    await expect(within(button).queryByText('불러오는 중')).not.toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: '동기화 중' })).toBeInTheDocument();
+  },
+};
+
+export const Decorative: Story = {
+  render: () => (
+    <p className="flex items-center gap-2">
+      <Spinner decorative />
+      파일을 올리는 중입니다
+    </p>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: '옆 문장이 이미 로딩을 설명하면 decorative로 접근성 트리에서 뺍니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await expect(canvas.queryByRole('status')).not.toBeInTheDocument();
+  },
 };

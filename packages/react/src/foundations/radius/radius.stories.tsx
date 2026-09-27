@@ -1,3 +1,5 @@
+import { expect } from 'storybook/test';
+
 import { Showcase } from '~story-kit';
 
 import { Button } from '../../components/action/button';
@@ -7,6 +9,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const meta = {
   title: 'Foundations/Radius',
   tags: ['!autodocs'],
+  parameters: { controls: { disable: true } },
 } satisfies Meta;
 
 export default meta;
@@ -60,19 +63,19 @@ export const Concentric: Story = {
         description="concentric-p-* 컨테이너의 모서리는 안쪽 모서리 + 패딩입니다. 중첩되면 안쪽 컨테이너의 패딩까지 더해집니다."
       >
         <Showcase.Row label="1단계">
-          <div className={`concentric-p-2 ${surface}`}>
+          <div data-radius="20" className={`concentric-p-2 ${surface}`}>
             <Button>p-2 · 20px</Button>
           </div>
-          <div className={`concentric-p-4 ${surface}`}>
+          <div data-radius="28" className={`concentric-p-4 ${surface}`}>
             <Button>p-4 · 28px</Button>
           </div>
-          <div className={`concentric-p-6 ${surface}`}>
+          <div data-radius="36" className={`concentric-p-6 ${surface}`}>
             <Button>p-6 · 36px</Button>
           </div>
         </Showcase.Row>
         <Showcase.Row label="2단계">
-          <div className={`concentric-p-4 ${surface}`}>
-            <div className={`concentric-p-2 ${surface}`}>
+          <div data-radius="36" className={`concentric-p-4 ${surface}`}>
+            <div data-radius="20" className={`concentric-p-2 ${surface}`}>
               <Button>12 → 20 → 36px</Button>
             </div>
           </div>
@@ -89,4 +92,8 @@ export const Concentric: Story = {
       </Showcase.Section>
     </Showcase>
   ),
+  play: async ({ canvasElement }) => {
+    for (const box of canvasElement.querySelectorAll<HTMLElement>('[data-radius]'))
+      await expect(getComputedStyle(box).borderTopLeftRadius).toBe(`${box.dataset.radius}px`);
+  },
 };

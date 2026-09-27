@@ -1,3 +1,5 @@
+import { useGlobals } from 'storybook/preview-api';
+
 import { ThemeProvider } from '../src/components/utility/theme-provider';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
@@ -5,16 +7,19 @@ import type { Decorator, Preview } from '@storybook/react-vite';
 import '../src/styles.css';
 import './preview.css';
 
-// ThemeProvider takes color and mode as initial state, so the toolbar remounts it by key.
-const withIdsTheme: Decorator = (Story, context) => {
-  const color = context.globals['idsColor'] ?? 'blue';
-  const mode = context.globals['idsMode'] ?? 'light';
+// The toolbar owns the theme, so a story that calls useTheme().setMode moves the toolbar too.
+const withIdsTheme: Decorator = (Story) => {
+  const [globals, updateGlobals] = useGlobals();
 
   return (
-    <ThemeProvider key={`${color}:${mode}`} color={color} mode={mode}>
-      <div className="min-h-screen w-full bg-(--ids-color-surface) p-8 text-(--ids-color-on-surface)">
-        <Story />
-      </div>
+    <ThemeProvider
+      color={globals['idsColor'] ?? 'blue'}
+      mode={globals['idsMode'] ?? 'light'}
+      onColorChange={(color) => updateGlobals({ idsColor: color })}
+      onModeChange={(mode) => updateGlobals({ idsMode: mode })}
+      className="min-h-screen w-full bg-(--ids-color-surface) p-8 text-(--ids-color-on-surface)"
+    >
+      <Story />
     </ThemeProvider>
   );
 };
@@ -33,6 +38,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Foundations',
+          ['Color', 'Typography', 'Radius', 'InteractiveState'],
           'Action',
           'Form',
           'Data',
@@ -62,7 +68,7 @@ const preview: Preview = {
       toolbar: {
         title: 'Mode',
         icon: 'mirror',
-        items: ['light', 'dark'],
+        items: ['light', 'dark', 'system'],
         dynamicTitle: true,
       },
     },

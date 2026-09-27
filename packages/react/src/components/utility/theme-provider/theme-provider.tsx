@@ -1,44 +1,86 @@
-import { createContext, useState } from 'react';
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useRef, type ComponentProps } from 'react';
 
-import type { IdsColor, IdsMode } from '../../../tokens/types';
+import {
+  ThemeContext,
+  useThemeProvider,
+  type ThemeContextValue,
+  type ThemeMode,
+} from './use-theme-provider';
+import { cn, mergeRefs } from '../../../utils';
+import { Slot } from '../slot';
 
-type ThemeContextValue = {
-  color: IdsColor;
-  mode: IdsMode;
-  setColor: (color: IdsColor) => void;
-  setMode: (mode: IdsMode) => void;
-  toggleMode: () => void;
-};
+import type { IdsColor } from '../../../tokens/types';
 
-export const ThemeContext = createContext<ThemeContextValue>({
-  color: 'blue',
-  mode: 'light',
-  setColor: () => {},
-  setMode: () => {},
-  toggleMode: () => {},
-});
-
-type ThemeProviderProps = {
-  color?: IdsColor;
-  mode?: IdsMode;
-  children: ReactNode;
-};
+export { ThemeContext };
 
 export function ThemeProvider({
-  color: initialColor = 'blue',
-  mode: initialMode = 'light',
-  children,
-}: ThemeProviderProps) {
-  const [color, setColor] = useState<IdsColor>(initialColor);
-  const [mode, setMode] = useState<IdsMode>(initialMode);
-  const toggleMode = () => setMode((m) => (m === 'light' ? 'dark' : 'light'));
+  color,
+  defaultColor,
+  onColorChange,
+  mode,
+  defaultMode,
+  onModeChange,
+  asChild = false,
+  className,
+  style,
+  ref,
+  ...rest
+}: ThemeProvider.Props) {
+  const { context, paintsSurface } = useThemeProvider({
+    color,
+    defaultColor,
+    onColorChange,
+    mode,
+    defaultMode,
+    onModeChange,
+  });
+  const elementRef = useRef<HTMLElement>(null);
+  const mergedRef = useCallback(
+    (node: HTMLElement | null) => mergeRefs(elementRef, ref)(node),
+    [ref],
+  );
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || !elementRef.current) return;
+    const primary = getComputedStyle(elementRef.current).getPropertyValue('--ids-color-primary');
+    if (primary.trim() === '')
+      console.warn(
+        `[IDS] ThemeProvider: no color tokens for data-color="${context.color}" data-mode="${context.resolvedMode}". Import @gsainfoteam/ids-css and use a color it defines.`,
+      );
+  }, [context.color, context.resolvedMode]);
+
+  const Root = asChild ? Slot : 'div';
 
   return (
-    <ThemeContext.Provider value={{ color, mode, setColor, setMode, toggleMode }}>
-      <div data-color={color} data-mode={mode} style={{ colorScheme: mode }}>
-        {children}
-      </div>
-    </ThemeContext.Provider>
+    <ThemeContext value={context}>
+      <Root
+        {...rest}
+        ref={mergedRef}
+        data-color={context.color}
+        data-mode={context.resolvedMode}
+        className={cn(
+          paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+          className,
+        )}
+        // Native form controls, scrollbars and the canvas behind them follow color-scheme.
+        style={{ colorScheme: context.resolvedMode, ...style }}
+      />
+    </ThemeContext>
   );
+}
+
+export namespace ThemeProvider {
+  export type Mode = ThemeMode;
+
+  export type State = ThemeContextValue;
+
+  export type Props = Omit<ComponentProps<'div'>, 'color'> & {
+    color?: IdsColor;
+    defaultColor?: IdsColor;
+    onColorChange?: (color: IdsColor) => void;
+    mode?: Mode;
+    defaultMode?: Mode;
+    onModeChange?: (mode: Mode) => void;
+    asChild?: boolean;
+  };
 }

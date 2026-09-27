@@ -1,21 +1,87 @@
 # Label
 
+폼 컨트롤의 이름표입니다. native `<label>` 그대로 쓰면서, 브라우저가 하지 않는 일을 채웁니다. `Field` 안에서는 `Field.Label` 을 씁니다.
+
+- **어떤 컨트롤이든.** `input` 과 `button` 은 브라우저가 연결하고, `role="slider"` 처럼 브라우저가 라벨로 인식하지 않는 위젯은 Label이 `aria-labelledby` 로 이름을 붙이고 클릭하면 포커스를 옮깁니다.
+- **컨트롤을 따라갑니다.** 연결된 컨트롤이 `disabled` 면 흐려지고, `required` 면 `*` 가 붙습니다. 나중에 바뀌어도 바로 따라갑니다.
+- **감싸기와 htmlFor.** 컨트롤을 감싸면 htmlFor 없이 연결되고, 떨어져 있으면 `htmlFor` 와 `id` 로 연결합니다.
+- **두 번 눌러도 선택되지 않습니다.** 라벨을 빠르게 누를 때 글자가 선택되지 않습니다.
+
 ```tsx
 import { Label, TextField } from '@gsainfoteam/ids-react';
 
 <Label htmlFor="email">이메일</Label>
-<TextField id="email" type="email" />
-
-<Label>
-  <input type="checkbox" /> 알림 받기
-</Label>
+<TextField id="email" type="email" required />   {/* 라벨에 * 가 붙는다 */}
 ```
 
-native `<label>`에 IDS body-b2-medium 타이포그래피와 on-surface 색상을 적용한다.
-`htmlFor`/`id`로 연결하거나 하나의 입력 요소를 감싸서 사용한다. 입력의 접근 가능한
-이름, 클릭 시 포커스와 체크박스 토글은 브라우저의 기본 동작을 그대로 따른다.
+## 연결
 
-native label 속성, children, className/style/ref를 전달한다. 라벨은 별도의 disabled,
-required 상태를 소유하지 않는다. 해당 상태는 실제 입력에 지정하고 필요한 표시를
-children/className으로 합성한다. 라벨 안에 링크나 다른 버튼을 함께 넣지 않는다.
-간격은 부모의 gap 등으로 지정한다.
+```tsx
+<Label htmlFor="email">이메일</Label>          // 떨어진 위치
+<TextField id="email" />
+
+<Label>                                        // 감싸기
+  <Checkbox />
+  알림 받기
+</Label>
+
+<Label htmlFor="volume">볼륨</Label>           // role="slider" 위젯도
+<Slider id="volume" />
+```
+
+- 커스텀 위젯에는 이미 `aria-label` 이나 `aria-labelledby` 가 있으면 건드리지 않습니다. 라벨이 사라지면 붙였던 속성도 뗍니다.
+- `role="checkbox"`, `"switch"`, `"radio"` 위젯은 라벨을 누르면 native 라벨처럼 토글됩니다.
+
+## 필수와 비활성
+
+```tsx
+<Label htmlFor="name">이름</Label>
+<TextField id="name" required />      {/* 자동으로 * */}
+
+<Label required>이름</Label>           // 직접 표시
+<Label required={false}>이름</Label>   // 컨트롤이 required여도 * 없이
+
+<Label disabled>이름</Label>           // 직접 흐리게
+```
+
+- `*` 는 `aria-hidden` 입니다. 필수라는 사실은 컨트롤의 `required` 가 스크린 리더에 전합니다. 컨트롤에도 `required` 를 주세요.
+- 컨트롤의 `disabled`, `aria-disabled="true"`, `data-disabled` 를 비활성으로, `required`, `aria-required="true"` 를 필수로 읽습니다.
+- 비활성일 때 라벨을 눌러도 커스텀 위젯으로 포커스를 옮기지 않습니다.
+
+## 크기
+
+```tsx
+<Label size="standard" />   // 14px medium (기본)
+<Label size="tiny" />       // 12px medium
+```
+
+## 상태
+
+| 상태       | 뜻                            |
+| ---------- | ----------------------------- |
+| `disabled` | 비활성이다 (직접 또는 컨트롤) |
+| `required` | 필수다 (직접 또는 컨트롤)     |
+
+```tsx
+<Label className={(state) => (state.required ? 'font-semibold' : undefined)} />
+```
+
+- 요소에는 `data-label`, `data-disabled`, `data-required` 가, `*` 에는 `data-label-required` 가 붙습니다.
+
+## 속성
+
+| 속성                  | 기본 / 동작                                        |
+| --------------------- | -------------------------------------------------- |
+| `htmlFor`             | 연결할 컨트롤의 `id`                               |
+| `required`            | 생략하면 컨트롤을 따른다. `true` / `false` 로 고정 |
+| `disabled`            | 생략하면 컨트롤을 따른다. `true` / `false` 로 고정 |
+| `size`                | `standard`(기본) / `tiny`                          |
+| `id`                  | 생략하면 만들어 붙인다                             |
+| `className` / `style` | 상태를 받는 함수도 된다                            |
+| 그 외 속성            | `<label>` 로 간다                                  |
+
+## 알아둘 것
+
+- `Field` 안에 Label을 두면 개발 모드에서 `Field.Label` 을 쓰라는 경고가 나옵니다.
+- 어떤 컨트롤과도 연결되지 않으면 개발 모드에서 경고가 나옵니다.
+- 라벨 안에 링크나 다른 버튼을 넣지 마세요. 라벨을 누르는 동작과 겹칩니다.
