@@ -7,4 +7,7 @@ export const messages = {
   spinner: {
     label: '불러오는 중',
   },
+  alert: {
+    close: '닫기',
+  },
 } as const;
