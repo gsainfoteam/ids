@@ -109,8 +109,11 @@ export const Gallery: Story = {
 };
 ```
 
-Declare the meta as `const meta = { ... } satisfies Meta<typeof X>`. The global decorator wraps
-every story in `ThemeProvider`, so stories do not add their own theme or page padding.
+Declare the meta as `const meta = { ... } satisfies Meta<typeof X>` with `tags: ['autodocs']`, which
+gives each component a Docs page (every story with Show code, plus the props table); foundation
+stories opt out with `'!autodocs'`. Every story also has a Code tab beside the canvas. The global
+decorator wraps every story in `ThemeProvider`, so stories do not add their own theme or page
+padding.
 
 ## Component styling
 
