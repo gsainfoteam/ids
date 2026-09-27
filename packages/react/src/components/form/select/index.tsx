@@ -338,6 +338,7 @@ export function Select(props: SelectProps) {
   );
 }
 
+// A bare combobox button, since the field draws the box; a Button would add its own inside it.
 function SelectTrigger({ asChild, children, className, ...props }: Select.TriggerProps) {
   const c = useSelectContext('Select.Trigger');
   return part(
@@ -486,6 +487,7 @@ function SelectSearchField({ placeholder, ...props }: Select.SearchFieldProps) {
   );
 }
 
+// An option highlighted through aria-activedescendant, not an Item row that takes focus itself.
 function SelectItem({
   value,
   label: _label,

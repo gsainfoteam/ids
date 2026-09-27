@@ -328,7 +328,8 @@ export function ChipField({
         <Chips />
         {input}
         <Adornments items={trailing} className={styles.adornment()} />
-        {/* A field that only creates values, like a list of addresses, has nothing to open. */}
+        {/* A field that only creates values, like a list of addresses, has nothing to open. The
+            chevron is a glyph, not an IconButton, since the input is the field's one Tab stop. */}
         {options.length > 0 && (
           <ChevronDownIcon aria-hidden="true" data-chip-field-icon="" className={styles.icon()} />
         )}
@@ -398,6 +399,7 @@ function Chips() {
   });
 }
 
+// A bare input among the chips: the field draws the box, so a TextField would add a second one.
 function ChipInput({
   asChild,
   children,
@@ -492,6 +494,7 @@ function ChipContent({ asChild, children, className, ...props }: ChipField.Conte
   );
 }
 
+// An option highlighted through aria-activedescendant, not an Item row that takes focus itself.
 function ChipItem({
   value,
   label: _label,
