@@ -151,6 +151,7 @@ function DefaultLayout() {
   );
 }
 
+// Drawn here rather than with Slider, which moves one value along one axis; IDS has no 2D control.
 // Two range inputs carry the area for assistive technology, one per axis, since a slider has a
 // single value. The arrow keys move either axis from whichever input has focus, and only the
 // first is in the Tab order; the second is still reachable by a screen reader's own navigation.
