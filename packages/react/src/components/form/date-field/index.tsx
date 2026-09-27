@@ -34,9 +34,10 @@ export type DateFieldProps = Omit<
   TemporalFieldProps<CalendarValue>,
   'value' | 'defaultValue' | 'onValueChange' | 'disabled'
 > &
-  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly'> &
+  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'dir' | 'locale'> &
   DateSelection & {
     format?: DateFieldFormat;
+    locale?: string;
   };
 
 export function DateField(props: DateFieldProps) {
@@ -57,6 +58,16 @@ export function DateField(props: DateFieldProps) {
     defaultMonth,
     onMonthChange,
     today,
+    showOutsideDays,
+    fixedWeeks,
+    showWeekNumber,
+    numerals,
+    modifiers,
+    modifiersClassNames,
+    components,
+    formatters,
+    labels,
+    footer,
     ...rest
   } = props;
   const empty = emptyValue(selectionMode);
@@ -116,6 +127,16 @@ export function DateField(props: DateFieldProps) {
               defaultMonth={defaultMonth}
               onMonthChange={onMonthChange}
               today={today}
+              showOutsideDays={showOutsideDays}
+              fixedWeeks={fixedWeeks}
+              showWeekNumber={showWeekNumber}
+              numerals={numerals}
+              modifiers={modifiers}
+              modifiersClassNames={modifiersClassNames}
+              components={components}
+              formatters={formatters}
+              labels={labels}
+              footer={footer}
               size={size}
             />
           </CalendarPickContext>

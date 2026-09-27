@@ -162,7 +162,7 @@ export const Limits: Story = {
   },
   play: async ({ canvas, args, userEvent }) => {
     await userEvent.click(canvas.getByRole('combobox', { name: '면담 일시' }));
-    await expect(day('2026-09-19')).toHaveAttribute('aria-disabled', 'true');
+    await expect(day('2026-09-19')).toBeDisabled();
     await userEvent.click(day('2026-09-15'));
     await expect(args.onValueChange).toHaveBeenLastCalledWith(at(15, 9, 30));
     await expect(option('hour', 8)).toHaveAttribute('aria-disabled', 'true');

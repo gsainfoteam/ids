@@ -1,43 +1,52 @@
 import {
-  Fragment,
-  cloneElement,
   createContext,
-  isValidElement,
   use,
+  useEffect,
+  useRef,
   type ComponentProps,
   type CSSProperties,
   type ReactNode,
+  type Ref,
 } from 'react';
 
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+} from '@heroicons/react/24/outline';
+import { omit } from 'es-toolkit';
+import {
+  DateLib,
+  DayPicker,
+  type ChevronProps,
+  type CustomComponents,
+  type DayButtonProps as DayPickerDayButtonProps,
+  type DayPickerLocale,
+  type DayPickerProps,
+  type DropdownProps,
+  type Formatters,
+  type Labels,
+  type Modifiers,
+  type ModifiersClassNames,
+  type MonthGridProps,
+  type Numerals,
+  type RootProps,
+} from 'react-day-picker';
 
 import {
-  dateAt,
-  dateFormat,
   dayKey,
-  lastOfMonth,
-  monthNames,
-  monthWeeks,
-  numberFormat,
-  sameMonth,
-  validDate,
-  weekdayNames,
-  yearSpan,
   type CalendarSelectionMode,
   type CalendarValue,
   type DateRange,
   type DateSelection,
+  type Matcher,
 } from './date';
-import {
-  useCalendar,
-  type CalendarApi,
-  type CalendarCellState,
-  type CalendarState,
-} from './use-calendar';
+import { useCalendar, type CalendarState } from './use-calendar';
 import { controlSurface } from '../../../internal/control-surface';
-import { part } from '../../../internal/field-popup';
+import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
-import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -47,10 +56,11 @@ export type CalendarCaptionLayout = 'label' | 'dropdown';
 export type CalendarOptions = {
   min?: Date;
   max?: Date;
-  disabled?: boolean | ((date: Date) => boolean);
+  // DayPicker matchers: true for the whole calendar, a function, dates, ranges or weekdays.
+  disabled?: Matcher | Matcher[];
   readOnly?: boolean;
   monthsToShow?: number;
-  locale?: string;
+  locale?: DateLocale;
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   captionLayout?: CalendarCaptionLayout;
   size?: IdsSize;
@@ -59,6 +69,17 @@ export type CalendarOptions = {
   onMonthChange?: (month: Date) => void;
   today?: Date;
   autoFocus?: boolean;
+  dir?: 'ltr' | 'rtl';
+  showOutsideDays?: boolean;
+  fixedWeeks?: boolean;
+  showWeekNumber?: boolean;
+  numerals?: Numerals;
+  modifiers?: Record<string, Matcher | Matcher[] | undefined>;
+  modifiersClassNames?: ModifiersClassNames;
+  components?: Partial<CustomComponents>;
+  formatters?: Partial<Formatters>;
+  labels?: Partial<Labels>;
+  footer?: ReactNode;
 };
 
 type NoneSelection = {
@@ -68,29 +89,28 @@ type NoneSelection = {
   onValueChange?: never;
 };
 
-export type CalendarProps = Omit<
+type NativeProps = Omit<
   ComponentProps<'div'>,
-  'defaultValue' | 'onChange' | 'onSelect' | 'children' | 'className' | 'style'
-> &
+  'defaultValue' | 'onChange' | 'onSelect' | 'children' | 'className' | 'style' | 'dir'
+>;
+
+export type CalendarProps = NativeProps &
   CalendarOptions &
   (DateSelection | NoneSelection) & {
     className?: string | ((state: CalendarState) => string | undefined);
     style?: CSSProperties | ((state: CalendarState) => CSSProperties | undefined);
-    children?: ReactNode;
   };
 
-type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
-
-type ContextValue = CalendarApi & {
-  locale: string;
+type ContextValue = {
+  state: CalendarState;
   size: IdsSize;
-  captionLayout: CalendarCaptionLayout;
   styles: ReturnType<typeof Calendar.Style>;
+  native: Omit<NativeProps, 'ref'>;
+  rootRef: Ref<HTMLDivElement>;
+  onGridMouseLeave: () => void;
 };
 
 const CalendarContext = createContext<ContextValue | null>(null);
-const MonthContext = createContext<{ month: Date; index: number } | null>(null);
-const BodyContext = createContext(false);
 
 function useCalendarContext(part: string) {
   const context = use(CalendarContext);
@@ -98,35 +118,24 @@ function useCalendarContext(part: string) {
   return context;
 }
 
-// Parts inside Calendar.Month describe that month. Outside one they describe the whole view,
-// which is how a single header above several grids still gets both buttons and a range title.
-function useMonth(c: ContextValue, monthIndex?: number) {
-  const scoped = use(MonthContext);
-  if (scoped) return { ...scoped, whole: false };
-  const month = c.state.months[monthIndex ?? 0];
-  invariant(month, 'Calendar: monthIndex must be within monthsToShow.');
-  return { month, index: monthIndex ?? 0, whole: monthIndex === undefined };
-}
-
-// An asChild element without children of its own still gets the part's default content, so
-// <Calendar.Title asChild><h2 /></Calendar.Title> reads the month.
-function withDefault(asChild: boolean | undefined, children: ReactNode, fallback: ReactNode) {
-  if (!asChild) return children ?? fallback;
-  return isValidElement<{ children?: ReactNode }>(children) && children.props.children == null
-    ? cloneElement(children, undefined, fallback)
-    : children;
-}
-
-const monthLabel = (locale: string, month: Date) =>
-  dateFormat(locale, { year: 'numeric', month: 'long' }).format(month);
-
-function viewLabel(locale: string, months: Date[]) {
-  const first = months[0];
-  const last = months[months.length - 1];
-  return months.length === 1
-    ? monthLabel(locale, first)
-    : dateFormat(locale, { year: 'numeric', month: 'long' }).formatRange(first, last);
-}
+// Labels a locale from react-day-picker/locale translates stay translated; the rest follow the
+// IDS messages, so the default calendar reads entirely in Korean.
+const messageLabels: Partial<Labels> = {
+  labelPrevious: () => messages.calendar.previousMonth,
+  labelNext: () => messages.calendar.nextMonth,
+  labelMonthDropdown: () => messages.calendar.month,
+  labelYearDropdown: () => messages.calendar.year,
+  labelWeekNumber: (week) => messages.calendar.weekNumber(week),
+  labelWeekNumberHeader: () => messages.calendar.weekNumberHeader,
+  labelDayButton: (date, modifiers, options, dateLib) =>
+    [
+      modifiers.today && messages.calendar.today,
+      (dateLib ?? new DateLib(options)).format(date, 'PPPP'),
+      modifiers.selected && messages.calendar.selected,
+    ]
+      .filter(Boolean)
+      .join(', '),
+};
 
 export function Calendar(props: CalendarProps) {
   const {
@@ -139,7 +148,7 @@ export function Calendar(props: CalendarProps) {
     disabled,
     readOnly = false,
     monthsToShow = 1,
-    locale = messages.locale,
+    locale,
     weekStartsOn,
     captionLayout = 'label',
     size,
@@ -148,7 +157,17 @@ export function Calendar(props: CalendarProps) {
     onMonthChange,
     today,
     autoFocus = false,
-    children,
+    dir,
+    showOutsideDays,
+    fixedWeeks = true,
+    showWeekNumber,
+    numerals,
+    modifiers,
+    modifiersClassNames,
+    components,
+    formatters,
+    labels,
+    footer,
     className,
     style,
     ref,
@@ -164,475 +183,293 @@ export function Calendar(props: CalendarProps) {
     disabled,
     readOnly,
     monthsToShow,
-    locale,
     weekStartsOn,
     month,
     defaultMonth,
     onMonthChange,
     today,
-    autoFocus,
+    dropdown: captionLayout === 'dropdown',
+    dir,
   });
   const { state } = api;
+  const resolved: Partial<DayPickerLocale> = resolveLocale(locale);
+  // DayPicker fills a locale without labels from its English one, which would name the grid
+  // "2월 2024"; an empty set leaves the rest to DayPicker's locale-neutral defaults.
+  const dateLocale = { ...resolved, labels: resolved.labels ?? {} };
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = Calendar.Style({ size: resolvedSize });
 
   return (
-    <CalendarContext.Provider value={{ ...api, locale, size: resolvedSize, captionLayout, styles }}>
-      <div
-        {...native}
-        ref={mergeRefs(api.rootRef, ref)}
-        role={native.role ?? 'group'}
-        aria-label={native['aria-label'] ?? messages.calendar.label}
-        aria-disabled={state.disabled || undefined}
-        data-calendar=""
-        data-size={resolvedSize}
-        data-selection-mode={selectionMode}
-        data-disabled={state.disabled ? '' : undefined}
-        data-readonly={state.readOnly ? '' : undefined}
-        className={styles.root({
-          className: typeof className === 'function' ? className(state) : className,
-        })}
-        style={typeof style === 'function' ? style(state) : style}
-      >
-        {children ?? (
-          <div className={styles.months()}>
-            {state.months.map((_, index) => (
-              <Calendar.Month key={index} index={index} />
-            ))}
-          </div>
-        )}
-        {/* Buttons and menus change the month without moving focus, so the change is read out here. */}
-        <span aria-live="polite" className="sr-only">
-          {viewLabel(locale, state.months)}
-        </span>
-      </div>
-    </CalendarContext.Provider>
-  );
-}
-
-function NavButton({
-  direction,
-  asChild,
-  children,
-  ...props
-}: Calendar.NavButtonProps & { direction: -1 | 1 }) {
-  const c = useCalendarContext(direction < 0 ? 'Calendar.Previous' : 'Calendar.Next');
-  const enabled = c.canNavigate(direction);
-  const Icon = direction < 0 ? ChevronLeftIcon : ChevronRightIcon;
-  // aria-disabled rather than disabled: a button that disables itself under the pointer or the
-  // keyboard would drop focus to the page.
-  return part(
-    'button',
-    asChild,
-    withDefault(asChild, children, <Icon aria-hidden="true" />),
-    mergeProps(props, {
-      type: 'button',
-      'aria-label':
-        props['aria-label'] ??
-        (direction < 0 ? messages.calendar.previousMonth : messages.calendar.nextMonth),
-      'aria-disabled': !enabled || undefined,
-      'data-disabled': enabled ? undefined : '',
-      'data-calendar-nav': direction < 0 ? 'previous' : 'next',
-      className: c.styles.navButton(),
-      onClick: () => {
-        if (enabled) c.navigate(direction);
-      },
-    }),
-  );
-}
-
-function Select({
-  kind,
-  className,
-  ...props
-}: Omit<ComponentProps<'select'>, 'value' | 'defaultValue' | 'children'> & {
-  kind: 'month' | 'year';
-}) {
-  const c = useCalendarContext(kind === 'month' ? 'Calendar.MonthSelect' : 'Calendar.YearSelect');
-  const { month, index } = useMonth(c);
-  const { min, max } = c.limits;
-  const names = monthNames(c.locale);
-  const years = yearSpan(month, c.today, min, max);
-  const yearFormat = dateFormat(c.locale, { year: 'numeric' });
-  const options =
-    kind === 'month'
-      ? names.map((name, m) => {
-          const start = dateAt(month.getFullYear(), m, 1);
-          const outside =
-            (!!min && dayKey(lastOfMonth(start)) < dayKey(min)) ||
-            (!!max && dayKey(start) > dayKey(max));
-          return { value: m, label: name, disabled: outside };
-        })
-      : years.map((year) => ({
-          value: year,
-          label: yearFormat.format(dateAt(year, 0, 1)),
-          disabled: false,
-        }));
-  const current = kind === 'month' ? month.getMonth() : month.getFullYear();
-  return (
-    <span className={c.styles.dropdown({ className })} data-calendar-dropdown={kind}>
-      <select
-        aria-label={kind === 'month' ? messages.calendar.month : messages.calendar.year}
-        disabled={c.state.disabled}
-        {...props}
-        data-field-input=""
-        value={current}
-        onChange={(event) => {
-          props.onChange?.(event);
-          const picked = Number(event.currentTarget.value);
-          c.showMonth(
-            kind === 'month'
-              ? dateAt(month.getFullYear(), picked, 1)
-              : dateAt(picked, month.getMonth(), 1),
-            index,
-          );
+    <CalendarContext
+      value={{
+        state,
+        size: resolvedSize,
+        styles,
+        native,
+        // mergeRefs only builds a callback; no ref is read while rendering.
+        // eslint-disable-next-line react-hooks/refs
+        rootRef: mergeRefs(api.rootRef, ref),
+        onGridMouseLeave: api.onGridMouseLeave,
+      }}
+    >
+      <DayPicker
+        {...(api.selection as DayPickerProps)}
+        locale={dateLocale}
+        weekStartsOn={weekStartsOn}
+        numberOfMonths={monthsToShow}
+        month={state.month}
+        onMonthChange={api.setMonth}
+        startMonth={api.startMonth}
+        endMonth={api.endMonth}
+        disabled={api.disabled}
+        disableNavigation={state.disabled}
+        today={today}
+        autoFocus={autoFocus}
+        captionLayout={captionLayout}
+        // Previous and Next sit beside the caption, so Tab visits them in the order they are drawn.
+        navLayout="around"
+        fixedWeeks={fixedWeeks}
+        // With several months the neighbours' days are already on screen in their own grid.
+        showOutsideDays={showOutsideDays ?? monthsToShow === 1}
+        showWeekNumber={showWeekNumber}
+        numerals={numerals}
+        dir={api.dir}
+        footer={footer}
+        modifiers={api.modifiers(modifiers)}
+        modifiersClassNames={{
+          range_preview: styles.rangeMiddle(),
+          range_preview_start: styles.rangeStart(),
+          range_preview_end: styles.rangeEnd(),
+          ...modifiersClassNames,
         }}
-        className={c.styles.dropdownSelect()}
-      >
-        {options.map((option) => (
+        style={typeof style === 'function' ? style(state) : style}
+        classNames={{
+          root: styles.root({
+            className: typeof className === 'function' ? className(state) : className,
+          }),
+          months: styles.months(),
+          month: styles.month(),
+          month_caption: styles.caption(),
+          caption_label: styles.captionLabel(),
+          dropdowns: styles.dropdowns(),
+          button_previous: styles.previous(),
+          button_next: styles.next(),
+          chevron: styles.chevron(),
+          month_grid: styles.grid(),
+          weekdays: styles.weekdays(),
+          weekday: styles.weekday(),
+          week: styles.week(),
+          week_number_header: styles.weekNumber(),
+          week_number: styles.weekNumber(),
+          day: styles.day(),
+          range_start: styles.rangeStart(),
+          range_middle: styles.rangeMiddle(),
+          range_end: styles.rangeEnd(),
+          hidden: styles.hidden(),
+          footer: styles.footer(),
+        }}
+        labels={{
+          ...omit(messageLabels, Object.keys(dateLocale.labels) as (keyof Labels)[]),
+          ...labels,
+        }}
+        formatters={formatters}
+        components={{
+          Root,
+          DayButton: CalendarDayButton,
+          Chevron,
+          Dropdown,
+          MonthGrid,
+          ...components,
+        }}
+        onDayMouseEnter={api.onDayMouseEnter}
+        onDayFocus={api.onDayFocus}
+        onDayBlur={api.onDayBlur}
+        onDayKeyDown={api.onDayKeyDown}
+      />
+    </CalendarContext>
+  );
+}
+
+function Root({ rootRef, ...props }: RootProps) {
+  const c = useCalendarContext('Calendar');
+  const { native, state } = c;
+  return (
+    <div
+      {...props}
+      {...native}
+      ref={mergeRefs(rootRef, c.rootRef)}
+      role={native.role ?? 'group'}
+      aria-label={
+        native['aria-label'] ?? (native['aria-labelledby'] ? undefined : messages.calendar.label)
+      }
+      aria-disabled={state.disabled || undefined}
+      data-calendar=""
+      data-size={c.size}
+      data-selection-mode={state.selectionMode}
+      data-disabled={state.disabled ? '' : undefined}
+      data-readonly={state.readOnly ? '' : undefined}
+    />
+  );
+}
+
+function MonthGrid({ onMouseLeave, ...props }: MonthGridProps) {
+  const c = useCalendarContext('Calendar');
+  return (
+    <table
+      {...props}
+      aria-readonly={c.state.readOnly || undefined}
+      aria-disabled={c.state.disabled || undefined}
+      onMouseLeave={mergeEventHandlers(onMouseLeave, c.onGridMouseLeave)}
+    />
+  );
+}
+
+const chevrons = {
+  left: ChevronLeftIcon,
+  right: ChevronRightIcon,
+  up: ChevronUpIcon,
+  down: ChevronDownIcon,
+};
+
+function Chevron({ orientation = 'left', className, style }: ChevronProps) {
+  const Icon = chevrons[orientation];
+  return <Icon aria-hidden="true" className={className} style={style} />;
+}
+
+// The native select stays on top, transparent, so it opens the platform picker, while the label
+// under it keeps the calendar's type and a chevron.
+function Dropdown({ options, className, ...props }: DropdownProps) {
+  const c = useCalendarContext('Calendar');
+  const selected = options?.find((option) => option.value === props.value);
+  return (
+    <span data-disabled={props.disabled ? '' : undefined} className={c.styles.dropdownRoot()}>
+      <select {...props} data-field-input="" className={c.styles.dropdown({ className })}>
+        {options?.map((option) => (
           <option key={option.value} value={option.value} disabled={option.disabled}>
             {option.label}
           </option>
         ))}
       </select>
       <span aria-hidden="true" className={c.styles.dropdownLabel()}>
-        {options.find((option) => option.value === current)?.label}
+        {selected?.label}
         <ChevronDownIcon />
       </span>
     </span>
   );
 }
 
-function Cell({ date, className, style, children, ...props }: Calendar.CellProps) {
-  const c = useCalendarContext('Calendar.Grid.Cell');
-  const { month } = useMonth(c);
-  invariant(use(BodyContext), 'Calendar.Grid.Cell must be inside Calendar.Grid.Body.');
-  invariant(validDate(date), 'Calendar.Grid.Cell requires a valid date.');
-  const state = c.dayState(date, month);
-  // With several months on screen, a trailing or leading day that another grid shows in full
-  // is left blank here so every date has exactly one focusable button.
-  const shownElsewhere =
-    state.outsideMonth && c.state.months.some((visible) => sameMonth(visible, date));
-  if (shownElsewhere) return <div role="gridcell" aria-hidden="true" className={c.styles.cell()} />;
-  const band = c.bandOf(date);
+function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calendar.DayButtonProps) {
+  const c = useCalendarContext('Calendar.DayButton');
+  const own = useRef<HTMLButtonElement>(null);
+  // DayPicker moves the keyboard by marking a day focused and leaves the focusing to the button.
+  useEffect(() => {
+    if (modifiers.focused) own.current?.focus();
+  }, [modifiers.focused]);
+  const preview = !!modifiers.range_preview && !modifiers.selected;
   const styles = Calendar.Style({
     size: c.size,
-    band,
-    selected: state.selected && !state.rangeMiddle,
-    onBand: band !== undefined && !state.rangeStart && !state.rangeEnd,
-    today: state.today,
-    outside: state.outsideMonth,
-    unavailable: state.disabled,
+    selected: !!modifiers.selected && !modifiers.range_middle,
+    onBand: !!modifiers.range_middle || preview,
+    today: !!modifiers.today,
+    outside: !!modifiers.outside,
+    unavailable: !!modifiers.disabled,
   });
+  const flag = (on: boolean | undefined) => (on ? '' : undefined);
   return (
-    <div
-      role="gridcell"
-      aria-selected={state.selected}
-      aria-disabled={state.disabled || undefined}
-      data-band={band}
-      className={styles.cell()}
-    >
-      <button
-        {...props}
-        type="button"
-        data-calendar-day={dayKey(date)}
-        data-selected={state.selected && !state.rangeMiddle ? '' : undefined}
-        data-today={state.today ? '' : undefined}
-        data-disabled={state.disabled ? '' : undefined}
-        data-outside-month={state.outsideMonth ? '' : undefined}
-        data-range-start={state.rangeStart ? '' : undefined}
-        data-range-end={state.rangeEnd ? '' : undefined}
-        data-range-middle={state.rangeMiddle ? '' : undefined}
-        data-range-preview={state.preview ? '' : undefined}
-        aria-label={props['aria-label'] ?? dateFormat(c.locale, { dateStyle: 'full' }).format(date)}
-        aria-current={state.today ? 'date' : undefined}
-        aria-disabled={state.disabled || undefined}
-        tabIndex={state.focused && !c.state.disabled ? 0 : -1}
-        className={styles.day({
-          className: typeof className === 'function' ? className(state) : className,
-        })}
-        style={typeof style === 'function' ? style(state) : style}
-        onFocus={(event) => {
-          props.onFocus?.(event);
-          if (!event.defaultPrevented) c.onDayFocus(date);
-        }}
-        onPointerEnter={(event) => {
-          props.onPointerEnter?.(event);
-          if (event.pointerType === 'mouse') c.onDayHover(date);
-        }}
-        onClick={(event) => {
-          props.onClick?.(event);
-          if (!event.defaultPrevented) c.select(date);
-        }}
-        onKeyDown={(event) => {
-          props.onKeyDown?.(event);
-          c.onDayKeyDown(event, date);
-        }}
-      >
-        {typeof children === 'function'
-          ? children(state)
-          : (children ?? numberFormat(c.locale).format(date.getDate()))}
-      </button>
-    </div>
+    <button
+      {...props}
+      ref={mergeRefs(own, ref)}
+      // DayPicker writes isoDate in the numeral system shown, so the key is formatted here.
+      data-calendar-day={dayKey(day.date)}
+      data-selected={flag(modifiers.selected)}
+      data-today={flag(modifiers.today)}
+      data-disabled={flag(modifiers.disabled)}
+      data-outside={flag(modifiers.outside)}
+      data-range-start={flag(modifiers.range_start)}
+      data-range-middle={flag(modifiers.range_middle)}
+      data-range-end={flag(modifiers.range_end)}
+      data-range-preview={flag(preview)}
+      className={styles.dayButton({ className })}
+    />
   );
 }
+
+const navButton = [
+  controlSurface.base,
+  'row-start-1 size-(--calendar-cell) rounded-standard bg-transparent p-0 text-(--ids-color-on-surface)',
+  'hover:bg-(--ids-color-muted) aria-disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:hover:bg-transparent',
+];
 
 export namespace Calendar {
   export type Props = CalendarProps;
   export type State = CalendarState;
-  export type CellState = CalendarCellState;
   export type Range = DateRange;
   export type SelectionMode = CalendarSelectionMode;
   export type CaptionLayout = CalendarCaptionLayout;
-  export type NavButtonProps = ComponentProps<'button'> & { asChild?: boolean };
-  export type TitleProps = ComponentProps<'span'> & { asChild?: boolean };
-  export type SelectProps = Omit<ComponentProps<'select'>, 'value' | 'defaultValue' | 'children'>;
-  export type MonthProps = BoxProps & { index?: number };
-  export type GridProps = BoxProps & { monthIndex?: number };
-  export type BodyProps = Omit<BoxProps, 'children'> & {
-    children?: ReactNode | ((date: Date) => ReactNode);
-  };
-  export type CellProps = Omit<ComponentProps<'button'>, 'children' | 'className' | 'style'> & {
-    date: Date;
-    className?: string | ((state: CellState) => string | undefined);
-    style?: CSSProperties | ((state: CellState) => CSSProperties | undefined);
-    children?: ReactNode | ((state: CellState) => ReactNode);
-  };
+  export type DayModifiers = Modifiers;
+  export type Components = Partial<CustomComponents>;
+  export type DayButtonProps = DayPickerDayButtonProps & { ref?: Ref<HTMLButtonElement> };
 
-  export function Month({ index = 0, asChild, children, ...props }: MonthProps) {
-    const c = useCalendarContext('Calendar.Month');
-    const month = c.state.months[index];
-    invariant(month, 'Calendar.Month index must be within monthsToShow.');
-    return (
-      <MonthContext.Provider value={{ month, index }}>
-        {part(
-          'div',
-          asChild,
-          withDefault(
-            asChild,
-            children,
-            <>
-              <Header />
-              <Grid />
-            </>,
-          ),
-          mergeProps({ className: c.styles.month(), 'data-calendar-month': dayKey(month) }, props),
-        )}
-      </MonthContext.Provider>
-    );
-  }
-
-  export function Header({ asChild, children, ...props }: BoxProps) {
-    const c = useCalendarContext('Calendar.Header');
-    return part(
-      'div',
-      asChild,
-      withDefault(asChild, children, <Navigation />),
-      mergeProps({ className: c.styles.header() }, props),
-    );
-  }
-
-  // Previous sits on the first month and Next on the last, so several months share one pair.
-  export function Navigation({ asChild, children, ...props }: BoxProps) {
-    const c = useCalendarContext('Calendar.Navigation');
-    const { index, whole } = useMonth(c);
-    const first = whole || index === 0;
-    const lastMonth = whole || index === c.state.months.length - 1;
-    const spacer = <span aria-hidden="true" className={c.styles.navSpacer()} />;
-    return part(
-      'div',
-      asChild,
-      withDefault(
-        asChild,
-        children,
-        <>
-          {first ? <Previous /> : spacer}
-          {c.captionLayout === 'dropdown' ? (
-            <span className={c.styles.dropdowns()}>
-              <MonthSelect />
-              <YearSelect />
-            </span>
-          ) : (
-            <Title />
-          )}
-          {lastMonth ? <Next /> : spacer}
-        </>,
-      ),
-      mergeProps({ className: c.styles.navigation() }, props),
-    );
-  }
-
-  export function Previous(props: NavButtonProps) {
-    return <NavButton {...props} direction={-1} />;
-  }
-
-  export function Next(props: NavButtonProps) {
-    return <NavButton {...props} direction={1} />;
-  }
-
-  export function Title({ asChild, children, ...props }: TitleProps) {
-    const c = useCalendarContext('Calendar.Title');
-    const { month, whole } = useMonth(c);
-    return part(
-      'span',
-      asChild,
-      withDefault(
-        asChild,
-        children,
-        whole ? viewLabel(c.locale, c.state.months) : monthLabel(c.locale, month),
-      ),
-      mergeProps({ className: c.styles.title() }, props),
-    );
-  }
-
-  export function MonthSelect(props: SelectProps) {
-    return <Select {...props} kind="month" />;
-  }
-
-  export function YearSelect(props: SelectProps) {
-    return <Select {...props} kind="year" />;
-  }
-
-  function GridRoot({ asChild, children, monthIndex, ...props }: GridProps) {
-    const c = useCalendarContext('Calendar.Grid');
-    const month = useMonth(c, monthIndex);
-    return (
-      <MonthContext.Provider value={month}>
-        {part(
-          'div',
-          asChild,
-          withDefault(
-            asChild,
-            children,
-            <>
-              <Grid.HeaderRow />
-              <Grid.Body />
-            </>,
-          ),
-          mergeProps(props, {
-            role: 'grid',
-            'aria-label': props['aria-label'] ?? monthLabel(c.locale, month.month),
-            'aria-multiselectable':
-              c.state.selectionMode === 'multiple' ||
-              c.state.selectionMode === 'range' ||
-              undefined,
-            'aria-readonly': c.state.readOnly || undefined,
-            'aria-disabled': c.state.disabled || undefined,
-            'data-calendar-grid': dayKey(month.month),
-            className: c.styles.grid(),
-            onPointerLeave: () => c.onDayHover(null),
-            onFocus: () => c.onGridFocusChange(true),
-            onBlur: (event: React.FocusEvent<HTMLElement>) => {
-              if (!event.currentTarget.contains(event.relatedTarget as Node | null))
-                c.onGridFocusChange(false);
-            },
-          }),
-        )}
-      </MonthContext.Provider>
-    );
-  }
-
-  function HeaderRow({ asChild, children, ...props }: BoxProps) {
-    const c = useCalendarContext('Calendar.Grid.HeaderRow');
-    return part(
-      'div',
-      asChild,
-      withDefault(
-        asChild,
-        children,
-        weekdayNames(c.locale, c.weekStart).map((name) => (
-          <div
-            key={name.long}
-            role="columnheader"
-            aria-label={name.long}
-            className={c.styles.weekday()}
-          >
-            {name.short}
-          </div>
-        )),
-      ),
-      mergeProps({ role: 'row', className: c.styles.headerRow() }, props),
-    );
-  }
-
-  function Body({ asChild, children, ...props }: BodyProps) {
-    const c = useCalendarContext('Calendar.Grid.Body');
-    const { month } = useMonth(c);
-    const rows = monthWeeks(month, c.weekStart).map((week, row) => (
-      <div key={row} role="row" className={c.styles.row()}>
-        {week.map((date, column) =>
-          validDate(date) ? (
-            <Fragment key={column}>
-              {typeof children === 'function' ? children(date) : <Grid.Cell date={date} />}
-            </Fragment>
-          ) : (
-            <div key={column} role="gridcell" aria-hidden="true" className={c.styles.cell()} />
-          ),
-        )}
-      </div>
-    ));
-    return (
-      <BodyContext.Provider value>
-        {part(
-          'div',
-          asChild,
-          typeof children === 'function' || children === undefined
-            ? rows
-            : withDefault(asChild, children, rows),
-          mergeProps({ role: 'rowgroup', className: c.styles.body() }, props),
-        )}
-      </BodyContext.Provider>
-    );
-  }
-
-  export const Grid = Object.assign(GridRoot, { HeaderRow, Body, Cell });
+  // The IDS day, for a components.DayButton that only changes what a day shows.
+  export const DayButton = CalendarDayButton;
 
   export const Style = tv({
     slots: {
       root: 'relative w-fit min-w-0 text-(--ids-color-on-surface)',
       months: 'flex flex-wrap gap-4',
-      month: 'flex flex-col gap-2',
-      header: 'min-w-0',
-      navigation: 'flex h-(--calendar-cell) items-center justify-between gap-1',
-      navSpacer: 'size-(--calendar-cell) shrink-0',
-      navButton: [
-        controlSurface.base,
-        'size-(--calendar-cell) rounded-standard bg-transparent p-0 text-(--ids-color-on-surface)',
-        'hover:bg-(--ids-color-muted) data-disabled:hover:bg-transparent',
-        '[&_svg]:size-(--ids-size-icon-standard) rtl:[&_svg]:-scale-x-100',
-      ],
-      title: 'min-w-0 flex-1 truncate text-center font-medium select-none',
-      dropdowns: 'flex min-w-0 flex-1 items-center justify-center gap-1.5',
-      dropdown: [
+      // Previous and Next sit in the caption row of the first and last month. Every month keeps
+      // both columns, so the captions line up whether or not a button stands beside them.
+      month:
+        'grid grid-cols-[var(--calendar-cell)_minmax(0,1fr)_var(--calendar-cell)] content-start gap-y-2',
+      previous: [navButton, 'col-start-1'],
+      next: [navButton, 'col-start-3'],
+      chevron: 'size-(--calendar-icon)',
+      caption:
+        'col-start-2 row-start-1 flex h-(--calendar-cell) min-w-0 items-center justify-center',
+      captionLabel: 'truncate font-medium select-none',
+      dropdowns: 'flex min-w-0 items-center justify-center gap-1.5',
+      dropdownRoot: [
         'relative inline-flex min-w-0 items-center rounded-standard shadow-xs',
         'inset-ring-1 inset-ring-(--ids-color-border) focus-ring',
-        'has-disabled:opacity-50',
+        'data-disabled:opacity-50',
       ],
-      // The native select stays on top, transparent, so it opens the platform picker, while the
-      // label under it keeps the calendar's type and a chevron.
-      dropdownSelect:
-        'peer absolute inset-0 size-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed',
+      dropdown:
+        'absolute inset-0 size-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed',
       dropdownLabel: [
         'pointer-events-none flex h-(--calendar-dropdown) items-center gap-1 ps-2 pe-1 font-medium whitespace-nowrap',
         '[&_svg]:size-3.5 [&_svg]:text-(--ids-color-on-muted)',
       ],
-      grid: 'flex flex-col',
-      headerRow: 'flex',
+      grid: 'col-span-3 row-start-2',
+      // Rows are flex boxes, so a day cell sizes like any box and its corners can round.
+      weekdays: 'flex',
       weekday: [
-        'flex h-(--calendar-weekday) w-(--calendar-cell) items-center justify-center',
+        'flex h-(--calendar-weekday) w-(--calendar-cell) items-center justify-center p-0',
         'font-normal text-(--ids-color-on-muted) select-none',
       ],
-      body: 'flex flex-col gap-y-1',
-      row: 'flex',
+      week: 'flex not-first:mt-1',
+      weekNumber: [
+        'flex h-(--calendar-cell) w-(--calendar-cell) items-center justify-center p-0',
+        'text-caption-c1-regular text-(--ids-color-on-muted) select-none',
+      ],
       // The range band is the cell's own background. It runs under the rounded end days and
-      // rounds off where a week wraps, so a range reads as one strip per week.
-      cell: 'relative size-(--calendar-cell) shrink-0 p-0 first:rounded-s-standard last:rounded-e-standard',
+      // rounds off where a week wraps or a month ends beside hidden days, so a range reads as one
+      // strip per week and month.
       day: [
+        'relative size-(--calendar-cell) p-0 text-center',
+        'first:rounded-s-standard last:rounded-e-standard',
+        '[[data-hidden]+&]:rounded-s-standard [&:has(+[data-hidden])]:rounded-e-standard',
+      ],
+      rangeStart: 'rounded-s-standard bg-(--ids-color-muted)',
+      rangeMiddle: 'bg-(--ids-color-muted)',
+      rangeEnd: 'rounded-e-standard bg-(--ids-color-muted)',
+      hidden: 'invisible',
+      dayButton: [
         'relative inline-flex size-full cursor-pointer items-center justify-center rounded-standard',
         'tabular-nums select-none focus-ring focus-visible:z-10',
         'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
         'motion-reduce:transition-none',
       ],
+      footer: 'mt-3 text-caption-c1-regular text-(--ids-color-on-muted)',
     },
     variants: {
       size: {
@@ -640,43 +477,45 @@ export namespace Calendar {
           root: [
             'text-body-b3-regular',
             '[--calendar-cell:var(--ids-size-control-standard)] [--calendar-dropdown:--spacing(8)] [--calendar-weekday:--spacing(8)]',
+            '[--calendar-icon:var(--ids-size-icon-standard)]',
           ],
         },
         tiny: {
           root: [
             'text-caption-c1-regular',
             '[--calendar-cell:var(--ids-size-control-tiny)] [--calendar-dropdown:--spacing(7)] [--calendar-weekday:--spacing(7)]',
+            '[--calendar-icon:var(--ids-size-icon-tiny)]',
           ],
-          navButton: '[&_svg]:size-(--ids-size-icon-tiny)',
         },
       } satisfies Record<IdsSize, object>,
-      band: {
-        start: { cell: 'rounded-s-standard bg-(--ids-color-muted)' },
-        middle: { cell: 'bg-(--ids-color-muted)' },
-        end: { cell: 'rounded-e-standard bg-(--ids-color-muted)' },
-      },
       // Later variants win a conflict, so selected comes after today and outside.
-      today: { true: { day: 'font-semibold' } },
-      outside: { true: { day: 'text-(--ids-color-on-muted)' } },
+      today: { true: { dayButton: 'font-semibold' } },
+      outside: { true: { dayButton: 'text-(--ids-color-on-muted)' } },
       selected: {
         true: {
-          day: 'bg-(--ids-color-primary) font-medium text-(--ids-color-on-primary) hover:bg-(--ids-color-primary)/90',
+          dayButton:
+            'bg-(--ids-color-primary) font-medium text-(--ids-color-on-primary) hover:bg-(--ids-color-primary)/90',
         },
       },
       // A day inside a range already sits on the muted band, so its hover goes one step darker.
-      onBand: { true: { day: 'hover:bg-(--ids-color-border)' } },
-      unavailable: { true: { day: 'cursor-not-allowed opacity-50' } },
+      onBand: { true: { dayButton: 'hover:bg-(--ids-color-border)' } },
+      unavailable: { true: { dayButton: 'cursor-not-allowed opacity-50' } },
     },
     compoundVariants: [
-      { selected: false, onBand: false, today: true, class: { day: 'bg-(--ids-color-muted)' } },
+      {
+        selected: false,
+        onBand: false,
+        today: true,
+        class: { dayButton: 'bg-(--ids-color-muted)' },
+      },
       {
         selected: false,
         onBand: false,
         unavailable: false,
-        class: { day: 'hover:bg-(--ids-color-muted)' },
+        class: { dayButton: 'hover:bg-(--ids-color-muted)' },
       },
-      { selected: true, unavailable: true, class: { day: 'hover:bg-(--ids-color-primary)' } },
-      { onBand: true, unavailable: true, class: { day: 'hover:bg-transparent' } },
+      { selected: true, unavailable: true, class: { dayButton: 'hover:bg-(--ids-color-primary)' } },
+      { onBand: true, unavailable: true, class: { dayButton: 'hover:bg-transparent' } },
     ],
     defaultVariants: {
       size: 'standard',
@@ -690,5 +529,5 @@ export namespace Calendar {
 }
 
 export { CalendarPickContext } from './use-calendar';
-export type { CalendarCellState, CalendarState } from './use-calendar';
-export type { DateRange, CalendarSelectionMode, CalendarValue } from './date';
+export type { CalendarState } from './use-calendar';
+export type { DateRange, CalendarSelectionMode, CalendarValue, Matcher } from './date';

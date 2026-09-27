@@ -1,62 +1,40 @@
-import {
-  createContext,
-  useContext,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type KeyboardEvent,
-} from 'react';
+import { createContext, use, useLayoutEffect, useRef, useState } from 'react';
 
 import {
-  addMonths,
-  clampDay,
-  dateAt,
+  addYears,
+  clamp,
+  endOfYear,
+  isBefore,
+  isSameDay,
+  startOfMonth,
+  startOfYear,
+} from 'date-fns';
+import { maxTime, minTime } from 'date-fns/constants';
+
+import {
   datesOf,
-  dayKey,
-  dayOnly,
   emptyValue,
-  firstWeekday,
-  isBlocked,
-  keyTarget,
-  lastOfMonth,
-  nextSelection,
-  sameDay,
-  sameMonth,
-  startMonth,
+  limitMatchers,
   validDate,
   validateValue,
   type CalendarSelectionMode,
   type CalendarValue,
   type DateLimits,
   type DateRange,
+  type Matcher,
 } from './date';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { invariant } from '../../../utils';
+
+import type { DateRange as DayPickerRange } from 'react-day-picker';
 
 export type CalendarState = {
   value: CalendarValue;
   selectionMode: CalendarSelectionMode;
   month: Date;
-  months: Date[];
-  focusedDate: Date;
   disabled: boolean;
   readOnly: boolean;
 };
-
-export type CalendarCellState = {
-  date: Date;
-  selected: boolean;
-  today: boolean;
-  disabled: boolean;
-  outsideMonth: boolean;
-  rangeStart: boolean;
-  rangeEnd: boolean;
-  rangeMiddle: boolean;
-  preview: boolean;
-  focused: boolean;
-};
-
-export type CalendarBand = 'start' | 'middle' | 'end';
 
 // A field that shows the calendar in a popup needs to hear about every pick, including a click
 // on the day that is already selected, which is not a value change and so never reaches
@@ -70,13 +48,13 @@ export type UseCalendarOptions = DateLimits & {
   onValueChange?: (value: CalendarValue) => void;
   readOnly: boolean;
   monthsToShow: number;
-  locale: string;
   weekStartsOn?: number;
   month?: Date;
   defaultMonth?: Date;
   onMonthChange?: (month: Date) => void;
   today?: Date;
-  autoFocus: boolean;
+  dropdown: boolean;
+  dir?: 'ltr' | 'rtl';
 };
 
 function validateOptions({
@@ -89,9 +67,7 @@ function validateOptions({
   weekStartsOn,
 }: UseCalendarOptions) {
   invariant(
-    (!min || validDate(min)) &&
-      (!max || validDate(max)) &&
-      (!min || !max || dayKey(min) <= dayKey(max)),
+    (!min || validDate(min)) && (!max || validDate(max)) && (!min || !max || !isBefore(max, min)),
     'Calendar: min/max must be valid dates with min <= max.',
   );
   invariant(
@@ -111,211 +87,131 @@ function validateOptions({
   );
 }
 
+const toDayPicker = (range: DateRange | null): DayPickerRange | undefined =>
+  range?.start ? { from: range.start, to: range.end ?? undefined } : undefined;
+const fromDayPicker = (range: DayPickerRange | undefined): DateRange | null =>
+  range?.from ? { start: range.from, end: range.to ?? null } : null;
+
 export function useCalendar(options: UseCalendarOptions) {
   validateOptions(options);
-  const {
-    selectionMode,
-    min,
-    max,
-    disabled,
-    readOnly,
-    monthsToShow,
-    locale,
-    onMonthChange,
-    autoFocus,
-  } = options;
+  const { selectionMode, min, max, disabled, dropdown } = options;
   const [value, setValue] = useControllableState<CalendarValue>({
     value: options.value,
     defaultValue: options.defaultValue ?? emptyValue(selectionMode),
     onValueChange: options.onValueChange,
   });
   validateValue(value, selectionMode);
-  const pick = useContext(CalendarPickContext);
-
-  // Today is read once so a calendar left open over midnight does not move under the user.
-  const [mountedToday] = useState(() => dayOnly(new Date()));
-  const today = options.today ? dayOnly(options.today) : mountedToday;
-  const limits = { min, max, disabled };
-  const initial = clampDay(datesOf(value)[0] ?? today, min, max);
-
-  const [storedMonth, setStoredMonth] = useState(() => startMonth(options.defaultMonth ?? initial));
-  const month = startMonth(options.month ?? storedMonth);
-  const months = Array.from({ length: monthsToShow }, (_, index) => addMonths(month, index));
-  invariant(months.every(validDate), 'Calendar: displayed months must stay in years 1..9999.');
-  const lastDay = lastOfMonth(months[months.length - 1]);
-
-  const [focusTarget, setFocusTarget] = useState(initial);
-  const focusedDate = clampDay(focusTarget, month, lastDay);
-  const [hovered, setHovered] = useState<Date | null>(null);
-  const [gridFocused, setGridFocused] = useState(false);
-
-  const rootRef = useRef<HTMLDivElement>(null);
-  const pendingFocus = useRef(autoFocus);
-  const weekStart = options.weekStartsOn ?? firstWeekday(locale);
+  const pick = use(CalendarPickContext);
   const allDisabled = disabled === true;
+  const readOnly = options.readOnly || selectionMode === 'none';
 
-  const changeMonth = (next: Date) => {
-    const start = startMonth(next);
-    if (sameMonth(start, month)) return;
-    if (options.month === undefined) setStoredMonth(start);
-    onMonthChange?.(start);
-  };
-
-  // Moving focus past the visible months brings the new day into view: backwards it becomes the
-  // first month, forwards the last, so the months already on screen shift as little as possible.
-  const moveFocus = (target: Date, focus: boolean) => {
-    const date = clampDay(target, min, max);
-    pendingFocus.current = focus;
-    setFocusTarget(date);
-    if (dayKey(date) < dayKey(month)) changeMonth(date);
-    else if (dayKey(date) > dayKey(lastDay))
-      changeMonth(addMonths(startMonth(date), 1 - monthsToShow));
-  };
-
-  useLayoutEffect(() => {
-    if (!pendingFocus.current) return;
-    pendingFocus.current = false;
-    rootRef.current
-      ?.querySelector<HTMLElement>(`[data-calendar-day="${dayKey(focusedDate)}"]`)
-      ?.focus({ preventScroll: true });
+  // Read once, so the first month and the year menu do not move under a calendar left open.
+  const [mountedToday] = useState(() => new Date());
+  const today = options.today ?? mountedToday;
+  const [month, setMonth] = useControllableState<Date>({
+    value: options.month && startOfMonth(options.month),
+    defaultValue: startOfMonth(
+      options.defaultMonth ??
+        clamp(datesOf(value)[0] ?? today, { start: min ?? minTime, end: max ?? maxTime }),
+    ),
+    onValueChange: options.onMonthChange,
   });
 
-  const canNavigate = (amount: number) => {
-    const start = addMonths(month, amount);
-    const end = lastOfMonth(addMonths(start, monthsToShow - 1));
-    return (
-      !allDisabled &&
-      validDate(start) &&
-      validDate(end) &&
-      (!min || dayKey(end) >= dayKey(min)) &&
-      (!max || dayKey(start) <= dayKey(max))
-    );
-  };
+  // DayPicker ends the year menu at the current year; a calendar that is not only for birthdays
+  // needs the years ahead as well.
+  const startMonth = min ?? (dropdown ? startOfYear(addYears(today, -100)) : undefined);
+  const endMonth = max ?? (dropdown ? endOfYear(addYears(today, 100)) : undefined);
 
-  const navigate = (amount: number) => {
-    if (!canNavigate(amount)) return;
-    changeMonth(addMonths(month, amount));
-    setFocusTarget(clampDay(addMonths(focusedDate, amount), min, max));
+  const change = (next: CalendarValue, day: Date) => {
+    if (readOnly || allDisabled) return;
+    setValue(next);
+    pick?.(day);
   };
-
-  // A month picked in the caption of the n-th visible month puts that month n places in.
-  const showMonth = (target: Date, index: number) => {
-    if (allDisabled) return;
-    let start = addMonths(startMonth(target), -index);
-    if (min && dayKey(lastOfMonth(addMonths(start, monthsToShow - 1))) < dayKey(min))
-      start = startMonth(min);
-    if (max && dayKey(start) > dayKey(max)) start = addMonths(startMonth(max), 1 - monthsToShow);
-    if (!validDate(start)) return;
-    changeMonth(start);
-    const day = dateAt(start.getFullYear(), start.getMonth() + index, focusedDate.getDate());
-    setFocusTarget(
-      clampDay(
-        sameMonth(day, addMonths(start, index)) ? day : lastOfMonth(addMonths(start, index)),
-        min,
-        max,
-      ),
-    );
-  };
-
-  const select = (date: Date) => {
-    if (readOnly || selectionMode === 'none' || isBlocked(date, limits)) return;
-    moveFocus(date, true);
-    const next = nextSelection(selectionMode, value, date);
-    if (!(selectionMode === 'single' && sameDay(value as Date | null, next as Date)))
-      setValue(next);
-    setHovered(null);
-    pick?.(dayOnly(date));
-  };
-
-  const onDayKeyDown = (event: KeyboardEvent<HTMLElement>, date: Date) => {
-    if (event.defaultPrevented || allDisabled) return;
-    const element = event.currentTarget;
-    // The dir attribute is the fallback where computed direction is unavailable (jsdom).
-    const direction =
-      getComputedStyle(element).direction || element.closest('[dir]')?.getAttribute('dir');
-    const rtl = direction === 'rtl';
-    const target = keyTarget(date, event.key, { shiftKey: event.shiftKey, weekStart, rtl });
-    if (!target) return;
-    event.preventDefault();
-    if (!validDate(target)) return;
-    setHovered(null);
-    moveFocus(target, true);
-  };
+  const selection =
+    selectionMode === 'range'
+      ? {
+          mode: 'range' as const,
+          // A third click starts a new range rather than moving an end, and a range is never
+          // emptied by a click, the way the single mode keeps its day.
+          required: true as const,
+          resetOnSelect: true,
+          selected: toDayPicker(value as DateRange | null),
+          onSelect: (range: DayPickerRange, day: Date) => change(fromDayPicker(range), day),
+        }
+      : selectionMode === 'multiple'
+        ? {
+            mode: 'multiple' as const,
+            selected: value as Date[],
+            onSelect: (dates: Date[] | undefined, day: Date) => change(dates ?? [], day),
+          }
+        : {
+            mode: 'single' as const,
+            required: true as const,
+            selected: (value as Date | null) ?? undefined,
+            // The day already picked, even at another time of day, is not a change.
+            onSelect: (_: Date, day: Date) =>
+              change(value instanceof Date && isSameDay(value, day) ? value : day, day),
+          };
 
   // An unfinished range previews its end at whatever the user touched last: the day under the
   // pointer, or the focused day once the keyboard moves.
+  const [hovered, setHovered] = useState<Date | null>(null);
+  const [focused, setFocused] = useState<Date | null>(null);
   const range = selectionMode === 'range' ? (value as DateRange | null) : null;
-  const previewTarget =
-    range?.start && !range.end && !readOnly
-      ? (hovered ?? (gridFocused ? focusedDate : null))
-      : null;
-  const [bandStart, bandEnd] = (() => {
-    if (range?.start && range.end) return [range.start, range.end];
-    if (range?.start && previewTarget)
-      return dayKey(previewTarget) < dayKey(range.start)
-        ? [previewTarget, range.start]
-        : [range.start, previewTarget];
-    return [null, null];
-  })();
-  const previewing = !!range?.start && !range.end && !!previewTarget;
+  const target = range?.start && !range.end && !readOnly ? (hovered ?? focused) : null;
+  const preview =
+    range?.start && target && !isSameDay(range.start, target)
+      ? isBefore(target, range.start)
+        ? { from: target, to: range.start }
+        : { from: range.start, to: target }
+      : undefined;
+  const modifiers = (own?: Record<string, Matcher | Matcher[] | undefined>) => ({
+    ...own,
+    ...(preview && {
+      range_preview: preview,
+      range_preview_start: preview.from,
+      range_preview_end: preview.to,
+    }),
+  });
 
-  const selectedKeys = new Set(datesOf(value).map(dayKey));
-
-  const dayState = (date: Date, visibleMonth: Date): CalendarCellState => {
-    const key = dayKey(date);
-    const inBand = !!bandStart && !!bandEnd && key >= dayKey(bandStart) && key <= dayKey(bandEnd);
-    const rangeStart = sameDay(range?.start, date);
-    const rangeEnd = sameDay(range?.end, date);
-    const rangeMiddle =
-      !!range?.start && !!range.end && key > dayKey(range.start) && key < dayKey(range.end);
-    return {
-      date,
-      selected: selectedKeys.has(key) || rangeMiddle,
-      today: sameDay(date, today),
-      disabled: isBlocked(date, limits),
-      outsideMonth: !sameMonth(date, visibleMonth),
-      rangeStart,
-      rangeEnd,
-      rangeMiddle,
-      preview: previewing && inBand && !rangeStart,
-      focused: sameDay(date, focusedDate),
-    };
-  };
-
-  const bandOf = (date: Date): CalendarBand | undefined => {
-    if (!bandStart || !bandEnd || sameDay(bandStart, bandEnd)) return undefined;
-    const key = dayKey(date);
-    if (key === dayKey(bandStart)) return 'start';
-    if (key === dayKey(bandEnd)) return 'end';
-    return key > dayKey(bandStart) && key < dayKey(bandEnd) ? 'middle' : undefined;
-  };
+  // DayPicker swaps the horizontal arrows only for an explicit dir, so the direction the calendar
+  // inherits is read once it is in the document. Until then no dir is written, which would
+  // otherwise pin a right-to-left page's calendar to left-to-right.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [inherited, setInherited] = useState<'rtl'>();
+  useLayoutEffect(() => {
+    const parent = rootRef.current?.parentElement;
+    if (!parent) return;
+    // jsdom computes no direction, so the nearest dir attribute stands in there.
+    const direction =
+      getComputedStyle(parent).direction || parent.closest('[dir]')?.getAttribute('dir');
+    setInherited(direction === 'rtl' ? 'rtl' : undefined);
+  }, []);
 
   const state: CalendarState = {
     value,
     selectionMode,
     month,
-    months,
-    focusedDate,
     disabled: allDisabled,
-    readOnly: readOnly || selectionMode === 'none',
+    readOnly,
   };
 
   return {
     state,
     rootRef,
-    today,
-    weekStart,
-    limits,
-    dayState,
-    bandOf,
-    select,
-    canNavigate,
-    navigate,
-    showMonth,
-    onDayKeyDown,
-    onDayFocus: (date: Date) => setFocusTarget(dayOnly(date)),
-    onDayHover: (date: Date | null) => setHovered(date && dayOnly(date)),
-    onGridFocusChange: setGridFocused,
+    dir: options.dir ?? inherited,
+    selection,
+    setMonth,
+    startMonth,
+    endMonth,
+    disabled: limitMatchers({ min, max, disabled }),
+    modifiers,
+    onDayMouseEnter: (day: Date) => setHovered(day),
+    onGridMouseLeave: () => setHovered(null),
+    onDayFocus: (day: Date) => setFocused(day),
+    onDayBlur: () => setFocused(null),
+    // Once the keyboard moves, the preview follows focus rather than a pointer left behind.
+    onDayKeyDown: () => setHovered(null),
   };
 }
 

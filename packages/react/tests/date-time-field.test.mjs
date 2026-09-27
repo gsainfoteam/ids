@@ -170,8 +170,8 @@ test('limits cover the whole moment: first and last day clamp the clock, blocked
     }),
   );
   await click(trigger());
-  assert.equal(day(14).getAttribute('aria-disabled'), 'true');
-  assert.equal(day(17).getAttribute('aria-disabled'), 'true');
+  assert.ok(day(14).hasAttribute('data-disabled'));
+  assert.ok(day(17).hasAttribute('data-disabled'));
   await click(day(18));
   assert.deepEqual([value.getHours(), value.getMinutes()], [10, 15]);
   assert.equal(option('hour', 11).getAttribute('aria-disabled'), 'true');
@@ -258,7 +258,7 @@ test('a sub-second range with no representable time disables the day and the clo
     max = new Date(2026, 8, 15, 9, 30, 0, 999);
   await render(h(DateTimeField, { today: d(), min, max, precision: 'second', hourCycle: '24h' }));
   await click(trigger());
-  assert.equal(day(15).getAttribute('aria-disabled'), 'true');
+  assert.ok(day(15).hasAttribute('data-disabled'));
   assert.equal(column('hour').getAttribute('aria-disabled'), 'true');
   assert.equal(popup().textContent.includes('고를 수 있는 날짜를 먼저 고르세요.'), true);
 });

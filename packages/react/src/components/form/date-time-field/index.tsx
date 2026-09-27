@@ -37,7 +37,8 @@ import { useFieldSize } from '../field/context';
 import type { IdsSize } from '../../../tokens/types';
 
 export type DateTimeFieldProps = Omit<TemporalFieldProps<Date | null>, 'disabled'> &
-  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'disabled'> & {
+  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'disabled' | 'dir' | 'locale'> & {
+    locale?: string;
     disabled?: boolean | ((date: Date) => boolean);
     precision?: TimePrecision;
     format?: string;
@@ -55,6 +56,16 @@ type PanelProps = Pick<
   | 'month'
   | 'defaultMonth'
   | 'onMonthChange'
+  | 'showOutsideDays'
+  | 'fixedWeeks'
+  | 'showWeekNumber'
+  | 'numerals'
+  | 'modifiers'
+  | 'modifiersClassNames'
+  | 'components'
+  | 'formatters'
+  | 'labels'
+  | 'footer'
   | 'pickerVariant'
 > & {
   value: Date | null;
@@ -143,6 +154,16 @@ export function DateTimeField({
   defaultMonth,
   onMonthChange,
   today,
+  showOutsideDays,
+  fixedWeeks,
+  showWeekNumber,
+  numerals,
+  modifiers,
+  modifiersClassNames,
+  components,
+  formatters,
+  labels,
+  footer,
   ...props
 }: DateTimeFieldProps) {
   validateTime(props.value);
@@ -188,6 +209,16 @@ export function DateTimeField({
             month={month}
             defaultMonth={defaultMonth}
             onMonthChange={onMonthChange}
+            showOutsideDays={showOutsideDays}
+            fixedWeeks={fixedWeeks}
+            showWeekNumber={showWeekNumber}
+            numerals={numerals}
+            modifiers={modifiers}
+            modifiersClassNames={modifiersClassNames}
+            components={components}
+            formatters={formatters}
+            labels={labels}
+            footer={footer}
           />
         ),
       }}

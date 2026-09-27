@@ -463,7 +463,7 @@ test('the chevron gives way to Clear once there is a value', async () => {
 test('every opening starts on the month of the chosen date', async () => {
   await render(h(DateField, { defaultValue: d(15), today: d(15) }));
   await click(trigger());
-  await click(host.querySelector('[data-calendar-nav=next]'));
+  await click(host.querySelector('[aria-label="다음 달"]'));
   assert.ok(day('2026-10-15'));
   await key(popup(), 'Escape');
   await click(trigger());

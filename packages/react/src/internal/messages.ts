@@ -1,8 +1,8 @@
 // Every string a component renders on its own lives here, so a later locale provider only has to
 // swap this object. Components expose an override for each through their own props.
 export const messages = {
-  // Month, weekday and period names come from Intl in this locale unless a component is given its
-  // own `locale`, so they read in the same language as the strings below.
+  // Month, weekday and period names come from the date-fns locale for this tag unless a component
+  // is given its own `locale`, so they read in the same language as the strings below.
   locale: 'ko-KR',
   avatarGroup: {
     overflow: (count: number) => `외 ${count}명`,
@@ -19,6 +19,10 @@ export const messages = {
     nextMonth: '다음 달',
     month: '월',
     year: '연도',
+    today: '오늘',
+    selected: '선택됨',
+    weekNumber: (week: number) => `${week}주차`,
+    weekNumberHeader: '주차',
   },
   timePicker: {
     label: '시간',
