@@ -63,7 +63,7 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 | `Space` `Enter` | 고르거나 푼다                   | 켜고 끈다                                   |
 
 - 끝에서 처음으로 돌아갑니다. `loop={false}` 면 끝에서 멈춥니다.
-- 비활성 항목은 건너뜁니다.
+- 비활성 항목과, `inert` 나 CSS 로 숨겨져 포커스를 받을 수 없는 항목은 건너뜁니다.
 - 오른쪽에서 왼쪽으로 쓰는 화면에서는 `←` 와 `→` 가 바뀝니다.
 - `Ctrl`, `Alt`, `⌘`, `Shift` 와 함께 누른 화살표는 그룹이 가로채지 않습니다.
 

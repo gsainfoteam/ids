@@ -17,6 +17,9 @@ for (const name of [
   'FormData',
 ])
   globalThis[name] = dom.window[name];
+globalThis.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
+// tabbable asks the browser whether an item is rendered; jsdom lays nothing out and lacks the API.
+dom.window.Element.prototype.checkVisibility ??= () => true;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
@@ -113,6 +116,13 @@ test('single: arrow keys move focus and the check together, skip disabled items 
   assert.deepEqual(clicks, ['c']);
   await press('ArrowRight', document.activeElement, { ctrlKey: true });
   assert.equal(document.activeElement, named('a'));
+});
+
+test('an inert item is passed over like a disabled one', async () => {
+  await render(group({ defaultValue: 'a' }, ['a', 'b', 'c'], { b: { inert: true } }));
+  await focus(named('a'));
+  await press('ArrowRight');
+  assert.equal(document.activeElement, named('c'));
 });
 
 test('loop={false} stops at the ends, and the arrow key is still consumed', async () => {
