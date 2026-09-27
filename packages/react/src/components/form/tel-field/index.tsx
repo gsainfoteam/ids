@@ -9,8 +9,6 @@ import {
   type ReactNode,
 } from 'react';
 
-import { ChevronDownIcon } from '@heroicons/react/16/solid';
-
 import { callingCodeOf, countryOptions, type CountryCode, type TelFieldFormat } from './phone';
 import { useTelField, type TelFieldInputProps } from './use-tel-field';
 import { type FieldSurfaceVariant } from '../../../internal/field-surface';
@@ -222,10 +220,12 @@ export namespace TelField {
           {asChild ? (
             children
           ) : (
-            <span className={styles.countryLabel()}>
-              {field.country} +{callingCodeOf(field.country)}
-              <ChevronDownIcon aria-hidden="true" className={styles.countryIcon()} />
-            </span>
+            <>
+              <Select.Value className={styles.countryValue()}>
+                {field.country} +{callingCodeOf(field.country)}
+              </Select.Value>
+              <Select.Icon />
+            </>
           )}
         </Select.Trigger>
         <Select.Content>
@@ -258,8 +258,7 @@ export namespace TelField {
         'hover:bg-(--ids-color-muted) ring-0! inset-ring-transparent!',
       ],
       countryTrigger: 'gap-1',
-      countryLabel: 'inline-flex items-center gap-1 tabular-nums',
-      countryIcon: 'shrink-0 text-(--ids-color-on-muted)',
+      countryValue: 'tabular-nums',
       countryName: 'min-w-0 flex-1 truncate',
       countryCode: 'shrink-0 text-(--ids-color-on-muted) tabular-nums',
     },
@@ -268,12 +267,10 @@ export namespace TelField {
         standard: {
           country: 'h-7 first:-ms-2 last:-me-2',
           countryTrigger: 'px-2',
-          countryIcon: 'size-(--ids-size-icon-standard)',
         },
         tiny: {
           country: 'h-6 first:-ms-1.5 last:-me-1.5',
           countryTrigger: 'px-1.5',
-          countryIcon: 'size-(--ids-size-icon-tiny)',
         },
       } satisfies Record<IdsSize, object>,
     },
