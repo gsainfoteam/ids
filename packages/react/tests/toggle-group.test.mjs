@@ -17,6 +17,9 @@ for (const name of [
   'FormData',
 ])
   globalThis[name] = dom.window[name];
+globalThis.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
+// tabbable asks the browser whether an item is rendered; jsdom lays nothing out and lacks the API.
+dom.window.Element.prototype.checkVisibility ??= () => true;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
@@ -115,6 +118,13 @@ test('single: arrow keys move focus and the check together, skip disabled items 
   assert.equal(document.activeElement, named('a'));
 });
 
+test('an inert item is passed over like a disabled one', async () => {
+  await render(group({ defaultValue: 'a' }, ['a', 'b', 'c'], { b: { inert: true } }));
+  await focus(named('a'));
+  await press('ArrowRight');
+  assert.equal(document.activeElement, named('c'));
+});
+
 test('loop={false} stops at the ends, and the arrow key is still consumed', async () => {
   await render(group({ defaultValue: 'c', loop: false }));
   await focus(named('c'));
@@ -198,11 +208,12 @@ test('controlled: null clears a single group', async () => {
 });
 
 test('form: one entry per pressed value, a required validator, and reset to the default', async () => {
+  const changes = [];
   await render(
     h(
       'form',
       null,
-      group({ name: 'size', required: true }),
+      group({ name: 'size', required: true, onValueChange: (next) => changes.push(next) }),
       group({ name: 'tags', selectionMode: 'multiple', defaultValue: ['x'] }, ['x', 'y', 'z']),
     ),
   );
@@ -224,6 +235,8 @@ test('form: one entry per pressed value, a required validator, and reset to the 
   const reset = new FormData(form);
   assert.equal(reset.get('size'), null);
   assert.deepEqual(reset.getAll('tags'), ['x']);
+  // A native reset fires no change event, so the group reports none either.
+  assert.deepEqual(changes, ['b']);
 });
 
 test('form names a form elsewhere in the document', async () => {

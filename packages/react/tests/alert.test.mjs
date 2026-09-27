@@ -9,9 +9,11 @@ const dom = new JSDOM('<!doctype html><html><body></body></html>', {
 for (const name of [
   'window',
   'document',
+  'Element',
   'HTMLElement',
   'Node',
   'Event',
+  'getComputedStyle',
   'KeyboardEvent',
   'MouseEvent',
   'requestAnimationFrame',
@@ -19,6 +21,11 @@ for (const name of [
 ])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+// jsdom has no layout, so every element reports no boxes and tabbable would treat the whole page
+// as hidden. One box per element stands in for a rendered page.
+dom.window.Element.prototype.getClientRects = function () {
+  return [{ width: 1, height: 1 }];
+};
 const { createElement: h, act, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');

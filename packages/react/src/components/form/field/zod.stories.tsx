@@ -54,7 +54,7 @@ function ZodExample() {
           <Field.Hint>위 주소와 같아야 합니다.</Field.Hint>
           <Field.Error />
         </Field>
-        <Field name="agreed" required variant="horizontal">
+        <Field name="agreed" required orientation="horizontal">
           <Field.Label>이용 약관 동의</Field.Label>
           <input type="checkbox" />
           <Field.Error />

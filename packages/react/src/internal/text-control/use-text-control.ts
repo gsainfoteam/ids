@@ -1,0 +1,62 @@
+import {
+  useState,
+  type FocusEvent,
+  type KeyboardEvent,
+  type MouseEvent,
+  type RefObject,
+} from 'react';
+
+import { clearInput } from './clear-input';
+
+type TextElement = HTMLInputElement | HTMLTextAreaElement;
+
+export type UseTextControlOptions = {
+  inputRef: RefObject<TextElement | null>;
+  disabled: boolean;
+  readOnly: boolean;
+  clearable?: boolean;
+};
+
+export function useTextControl({ inputRef, disabled, readOnly, clearable }: UseTextControlOptions) {
+  const [focused, setFocused] = useState(false);
+
+  const clear = () => {
+    const input = inputRef.current;
+    if (input && !disabled && !readOnly) clearInput(input);
+  };
+
+  const rootProps = {
+    onFocus: () => setFocused(true),
+    onBlur: (event: FocusEvent<HTMLElement>) => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
+    },
+    // A press on the shell's padding or on an icon reaches the input, the way a press anywhere in
+    // a plain input's box does. Anything that handles presses itself keeps them.
+    onMouseDown: (event: MouseEvent<HTMLElement>) => {
+      if (disabled || event.button !== 0) return;
+      const target = event.target as Element;
+      if (target.closest('button, a, input, textarea, select, label, [role=button]')) return;
+      event.preventDefault();
+      inputRef.current?.focus();
+    },
+  };
+
+  // With a Clear part present, Escape clears the way a search field does. An empty field lets
+  // the key through so an enclosing dialog or popup can still close.
+  const onEscape = (event: KeyboardEvent<TextElement>) => {
+    if (
+      !clearable ||
+      event.key !== 'Escape' ||
+      event.defaultPrevented ||
+      event.nativeEvent.isComposing ||
+      event.currentTarget.value === '' ||
+      disabled ||
+      readOnly
+    )
+      return;
+    event.preventDefault();
+    clearInput(event.currentTarget);
+  };
+
+  return { focused, rootProps, clear, onEscape };
+}

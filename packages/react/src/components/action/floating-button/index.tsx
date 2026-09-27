@@ -87,14 +87,8 @@ export namespace FloatingButton {
       } satisfies Record<Variant, string[]>,
       colorScheme: controlSurface.colorScheme,
       size: {
-        standard: [
-          'text-button-standard',
-          "[&_svg:not([class*='size-'])]:size-6 [&>:has(>svg.animate-spin)]:size-6",
-        ],
-        tiny: [
-          'text-button-tiny',
-          "[&_svg:not([class*='size-'])]:size-5 [&>:has(>svg.animate-spin)]:size-5",
-        ],
+        standard: ['text-button-standard', "[&_svg:not([class*='size-'])]:size-6"],
+        tiny: ['text-button-tiny', "[&_svg:not([class*='size-'])]:size-5"],
       } satisfies Record<IdsSize, string[]>,
       iconOnly: {
         true: 'aspect-square rounded-full p-0',
