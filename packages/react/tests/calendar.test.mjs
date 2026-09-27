@@ -379,6 +379,39 @@ test('a month picked in the second caption lands in the second grid', async () =
   assert.equal(host.querySelectorAll('[role=grid]')[1].getAttribute('aria-label'), '2026년 1월');
 });
 
+test('Previous and Next are ghost IconButtons that keep focus once the last month is reached', async () => {
+  const months = [];
+  await render(
+    h(Calendar, {
+      today: d(2026, 9, 15),
+      max: d(2026, 10, 31),
+      size: 'tiny',
+      onMonthChange: (next) => months.push(next),
+    }),
+  );
+  const next = button('다음 달');
+  assert.equal(next.dataset.variant, 'ghost');
+  assert.equal(next.dataset.size, 'tiny');
+  assert.equal(next.type, 'button');
+  assert.equal(next.hasAttribute('aria-disabled'), false);
+  assert.equal(next.hasAttribute('tabindex'), false);
+  await focus(next);
+  await click(next);
+  assert.deepEqual(months.map(dateKey), ['2026-10-01']);
+  assert.equal(button('다음 달'), next, 'the same button stays in place');
+  assert.equal(next.getAttribute('aria-disabled'), 'true');
+  assert.equal(next.disabled, false, 'aria-disabled rather than disabled, so focus stays');
+  assert.ok(next.hasAttribute('data-disabled'));
+  assert.equal(next.tabIndex, -1);
+  assert.equal(document.activeElement, next);
+  await click(next);
+  assert.equal(months.length, 1, 'an unavailable month is not reached');
+  const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+  await act(async () => next.dispatchEvent(enter));
+  assert.equal(enter.defaultPrevented, true, 'Enter does not press it either');
+  assert.equal(button('이전 달').hasAttribute('aria-disabled'), false);
+});
+
 test('several months: Previous before the first grid only, Next after the last only', async () => {
   await render(h(Calendar, { today: d(2026, 9, 15), monthsToShow: 3 }));
   const months = [...host.querySelectorAll('[role=grid]')].map((grid) => grid.parentElement);

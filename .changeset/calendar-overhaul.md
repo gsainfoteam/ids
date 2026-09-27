@@ -14,7 +14,8 @@ announced as they change, `Calendar.DayButton` for custom day content, the react
 `components`, `modifiers`, `modifiersClassNames`, `formatters`, `labels`, `footer`,
 `showWeekNumber`, `showOutsideDays`, `fixedWeeks` and `numerals` options, `Calendar.State`, and
 function `className` / `style` on the root. With several months, Previous sits on the first and
-Next on the last.
+Next on the last. Previous and Next are ghost IconButtons; at the end of the range they turn
+`aria-disabled` rather than disabled, so the button that reached the last month keeps focus.
 
 Breaking: `onChange` is now `onValueChange`, and it no longer fires when the selected day is
 picked again. The default `locale` is `ko-KR` (from the shared messages) instead of `en-US`, and a

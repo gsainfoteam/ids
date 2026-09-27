@@ -60,7 +60,8 @@ const [range, setRange] = useState<DateRange | null>(null);
 
 - 처음 보이는 달은 `defaultMonth`, 첫 선택 날, 오늘 순서이고 min/max 안으로 들어옵니다.
 - 연도 목록은 `min` 부터 `max` 까지입니다. 없으면 오늘 기준 앞뒤 100년입니다. 한국어는 연도 목록이 먼저 옵니다.
-- 범위 밖의 달은 월 목록에서 고를 수 없고, 이전/다음 버튼은 `aria-disabled` 가 되어 눌리지 않습니다.
+- 범위 밖의 달은 월 목록에서 고를 수 없습니다.
+- 이전/다음은 ghost [IconButton](../../action/icon-button/README.md) 입니다. 범위 끝에서는 `disabled` 대신 `aria-disabled` 가 되어 눌리지 않고, 마지막 달로 넘긴 버튼에서 포커스가 빠지지 않습니다.
 - 두 번째 달의 목록에서 고른 달은 두 번째 칸에 옵니다.
 - 달 제목은 `role="status"` 라서 달이 바뀌면 화면 읽기 프로그램이 새 달을 읽습니다.
 
@@ -139,7 +140,7 @@ function EventDay(props: Calendar.DayButtonProps) {
 />;
 ```
 
-- `components` 는 [react-day-picker 의 부분](https://daypicker.dev/guides/custom-components)을 바꿉니다. IDS 는 `Root`, `DayButton`, `Chevron`, `Dropdown`, `MonthGrid` 를 채워 두고, 넘긴 것이 그 위에 덮입니다.
+- `components` 는 [react-day-picker 의 부분](https://daypicker.dev/guides/custom-components)을 바꿉니다. IDS 는 `Root`, `DayButton`, `Chevron`, `Dropdown`, `MonthGrid`, `PreviousMonthButton`, `NextMonthButton` 을 채워 두고, 넘긴 것이 그 위에 덮입니다.
 - `Calendar.DayButton` 을 감싸면 IDS 날짜 모양, 상태 속성, 포커스 이동은 그대로 두고 내용만 바꿉니다.
 - 부분 컴포넌트는 모듈 최상단에 선언합니다. 렌더 안에서 만들면 매번 새 컴포넌트라 날짜가 다시 마운트됩니다.
 
