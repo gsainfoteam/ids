@@ -246,8 +246,8 @@ export namespace Avatar {
       image: 'absolute inset-0 size-full object-cover',
       // Container units keep initials in proportion when a consumer resizes the avatar.
       fallback: [
-        'inline-flex size-full items-center justify-center leading-none font-medium',
-        'text-[length:max(10px,40cqi)] [&_svg]:size-[62%]',
+        'inline-flex size-full items-center justify-center font-medium',
+        'text-[length:max(10px,40cqi)] leading-none [&_svg]:size-[62%]',
       ],
     },
     variants: {
