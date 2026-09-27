@@ -42,7 +42,7 @@ function Item({ value, disabled = false, ...rest }: CheckboxGroup.ItemProps) {
       size={group.size}
       checked={group.value.includes(value)}
       disabled={isDisabled}
-      onChange={(checked) => group.toggle(value, checked)}
+      onCheckedChange={(checked) => group.toggle(value, checked)}
     />
   );
 }
@@ -57,9 +57,8 @@ function All({ ...rest }: CheckboxGroup.AllProps) {
       {...rest}
       size={group.size}
       disabled={group.disabled}
-      checked={all}
-      indeterminate={selected.length > 0 && !all}
-      onChange={() => group.setAll(!all)}
+      checked={all ? true : selected.length > 0 ? 'indeterminate' : false}
+      onCheckedChange={() => group.setAll(!all)}
     />
   );
 }

@@ -1,126 +1,232 @@
-import { Children, isValidElement, useEffect, useRef } from 'react';
-import type { ChangeEvent, ComponentProps, ReactNode } from 'react';
+import { createContext, use, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { CheckIcon, MinusIcon } from '@heroicons/react/16/solid';
 
-import { invariant, mergeRefs, tv } from '../../../utils';
+import { useCheckbox, type CheckedState } from './use-checkbox';
+import { invariant, tv } from '../../../utils';
 import { Slot } from '../../utility/slot';
+import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
+export type { CheckedState } from './use-checkbox';
+export type CheckboxVariant = 'outline' | 'soft';
+
+export type CheckboxState = {
+  checked: boolean;
+  indeterminate: boolean;
+  disabled: boolean;
+  readOnly: boolean;
+  required: boolean;
+  invalid: boolean;
+  hovered: boolean;
+  active: boolean;
+  focused: boolean;
+  focusVisible: boolean;
+};
+
+type StateProp<T> = T | ((state: CheckboxState) => T);
+
+type NativeInputProps = Omit<
+  ComponentProps<'input'>,
+  'type' | 'size' | 'checked' | 'defaultChecked' | 'className' | 'style' | 'children'
+>;
+
+export type CheckboxProps = NativeInputProps & {
+  checked?: CheckedState;
+  defaultChecked?: CheckedState;
+  onCheckedChange?: (checked: boolean) => void;
+  invalid?: boolean;
+  variant?: CheckboxVariant;
+  size?: IdsSize;
+  className?: StateProp<string | undefined>;
+  style?: StateProp<CSSProperties | undefined>;
+  children?: StateProp<ReactNode>;
+};
+
+type Context = {
+  state: CheckboxState;
+  styles: ReturnType<typeof Checkbox.Style>;
+};
+
+const CheckboxContext = createContext<Context | null>(null);
+
+function resolve<T>(value: StateProp<T>, state: CheckboxState): T {
+  return typeof value === 'function' ? (value as (state: CheckboxState) => T)(state) : value;
+}
+
+function dataState(state: CheckboxState) {
+  if (state.indeterminate) return 'indeterminate';
+  return state.checked ? 'checked' : 'unchecked';
+}
+
 export function Checkbox({
+  checked: checkedProp,
+  defaultChecked,
+  onCheckedChange,
+  invalid,
   variant = 'outline',
-  size = 'standard',
-  indeterminate = false,
-  invalid = false,
-  onChange,
+  size,
   className,
+  style,
   children,
   ref,
-  ...rest
-}: Checkbox.Props) {
+  readOnly = false,
+  onChange,
+  onClick,
+  onFocus,
+  onBlur,
+  onKeyDown,
+  onKeyUp,
+  onPointerEnter,
+  onPointerLeave,
+  onPointerDown,
+  onPointerUp,
+  onPointerCancel,
+  ...inputProps
+}: CheckboxProps) {
   invariant(
-    rest.checked == null || rest.defaultChecked == null,
-    '`<Checkbox>` takes either `checked` or `defaultChecked`, not both.',
+    checkedProp === undefined || defaultChecked === undefined,
+    'Checkbox takes either `checked` or `defaultChecked`, not both.',
   );
+  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const { checked, interaction, inputRef, handlers } = useCheckbox({
+    checked: checkedProp,
+    defaultChecked,
+    onCheckedChange,
+    readOnly,
+    disabled: inputProps.disabled,
+    ref,
+    onChange,
+    onClick,
+    onFocus,
+    onBlur,
+    onKeyDown,
+    onKeyUp,
+    onPointerEnter,
+    onPointerLeave,
+    onPointerDown,
+    onPointerUp,
+    onPointerCancel,
+  });
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (inputRef.current != null) inputRef.current.indeterminate = indeterminate;
-  }, [indeterminate]);
-
-  const indicator = Children.toArray(children).find(
-    (child) => isValidElement(child) && child.type === Checkbox.Indicator,
-  );
-
-  const { root, box } = Checkbox.Style({ size, variant, invalid });
+  const ariaInvalid = inputProps['aria-invalid'] ?? invalid;
+  const state: CheckboxState = {
+    checked: checked === true,
+    indeterminate: checked === 'indeterminate',
+    disabled: Boolean(inputProps.disabled),
+    readOnly,
+    required: Boolean(inputProps.required),
+    invalid: ariaInvalid === true || ariaInvalid === 'true',
+    hovered: interaction.hovered,
+    active: interaction.active,
+    focused: interaction.focused,
+    focusVisible: interaction.focusVisible,
+  };
+  const styles = Checkbox.Style({ size: resolvedSize, variant });
+  const content = resolve(children, state);
 
   return (
-    <span className={root()}>
-      <input
-        {...rest}
-        type="checkbox"
-        aria-invalid={invalid || undefined}
-        ref={mergeRefs(inputRef, ref)}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          // 체크박스를 조작하면 브라우저가 DOM의 indeterminate 를 false 로 내린다.
-          // prop 은 그대로라 effect 가 다시 돌지 않으므로 여기서 되돌려놔야 한다.
-          event.target.indeterminate = indeterminate;
-          onChange?.(event.target.checked, event);
-        }}
-        className={box({ className })}
-      />
-      {indicator ?? (
-        <Checkbox.Indicator>{indeterminate ? <MinusIcon /> : <CheckIcon />}</Checkbox.Indicator>
-      )}
-    </span>
+    <CheckboxContext.Provider value={{ state, styles }}>
+      <span
+        data-checkbox=""
+        data-state={dataState(state)}
+        data-size={resolvedSize}
+        data-variant={variant}
+        data-disabled={state.disabled ? '' : undefined}
+        data-readonly={readOnly ? '' : undefined}
+        data-required={state.required ? '' : undefined}
+        data-invalid={state.invalid ? '' : undefined}
+        data-hovered={state.hovered ? '' : undefined}
+        data-active={state.active ? '' : undefined}
+        data-focused={state.focused ? '' : undefined}
+        data-focus-visible={state.focusVisible ? '' : undefined}
+        className={styles.root({ className: resolve(className, state) })}
+        style={resolve(style, state)}
+      >
+        <input
+          {...inputProps}
+          {...handlers}
+          ref={inputRef}
+          type="checkbox"
+          checked={state.checked}
+          aria-invalid={ariaInvalid}
+          aria-readonly={readOnly || undefined}
+          data-field-input=""
+          className={styles.input()}
+        />
+        {content ?? <Checkbox.Indicator />}
+      </span>
+    </CheckboxContext.Provider>
   );
 }
 
 export namespace Checkbox {
+  export type Props = CheckboxProps;
+  export type State = CheckboxState;
+  export type Variant = CheckboxVariant;
+  export type Checked = CheckedState;
+
+  export type IndicatorProps = Omit<ComponentProps<'span'>, 'className' | 'style' | 'children'> & {
+    asChild?: boolean;
+    className?: StateProp<string | undefined>;
+    style?: StateProp<CSSProperties | undefined>;
+    children?: StateProp<ReactNode>;
+  };
+
+  export function Indicator({ asChild, className, style, children, ...props }: IndicatorProps) {
+    const context = use(CheckboxContext);
+    invariant(context, 'Checkbox.Indicator must be rendered inside Checkbox.');
+    const { state, styles } = context;
+    const content =
+      resolve(children, state) ?? (state.indeterminate ? <MinusIcon /> : <CheckIcon />);
+    const shared = {
+      ...props,
+      'aria-hidden': true,
+      'data-state': dataState(state),
+      className: styles.indicator({ className: resolve(className, state) }),
+      style: resolve(style, state),
+    };
+    return asChild ? <Slot {...shared}>{content}</Slot> : <span {...shared}>{content}</span>;
+  }
+
+  export namespace Indicator {
+    export type Props = IndicatorProps;
+  }
+
   export const Style = tv({
     slots: {
-      root: 'relative inline-grid shrink-0 align-middle has-disabled:opacity-50',
-      box: [
-        'peer col-start-1 row-start-1 size-full appearance-none rounded-indicator shadow-xs',
-        'cursor-pointer transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) disabled:cursor-not-allowed',
-        'inset-ring-1 inset-ring-(--ids-color-outline)',
-        'enabled:hover:bg-(--ids-color-primary)/10',
-        'checked:bg-(--checkbox-fill) checked:inset-ring-(--checkbox-fill)',
-        'indeterminate:bg-(--checkbox-fill) indeterminate:inset-ring-(--checkbox-fill)',
-        'focus-ring',
-        'motion-reduce:transition-none',
+      root: [
+        'relative inline-flex shrink-0 items-center justify-center align-middle',
+        'rounded-indicator focus-ring',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+        '[--checkbox-accent:var(--ids-color-primary)] [--checkbox-on-accent:var(--ids-color-on-primary)]',
+        'data-invalid:[--checkbox-accent:var(--ids-color-danger)] data-invalid:[--checkbox-on-accent:var(--ids-color-on-danger)]',
+        'data-[state=checked]:bg-(--checkbox-accent) data-[state=checked]:text-(--checkbox-on-accent) data-[state=checked]:inset-ring-(--checkbox-accent)',
+        'data-[state=indeterminate]:bg-(--checkbox-accent) data-[state=indeterminate]:text-(--checkbox-on-accent) data-[state=indeterminate]:inset-ring-(--checkbox-accent)',
+        'data-disabled:opacity-50',
       ],
+      // The real input covers the box, so a click, a tap and a wrapping <label> all reach it.
+      input:
+        'absolute inset-0 m-0 size-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed',
       indicator: [
-        'pointer-events-none col-start-1 row-start-1 grid place-items-center',
-        'text-(--ids-color-on-primary) opacity-0',
-        'peer-checked:opacity-100 peer-indeterminate:opacity-100',
-        '[&_svg]:size-(--checkbox-glyph)',
+        'pointer-events-none flex shrink-0 items-center justify-center [&>svg]:size-full',
+        'transition-[opacity,scale] duration-(--ids-motion-fast) motion-reduce:transition-none',
+        'data-[state=unchecked]:scale-50 data-[state=unchecked]:opacity-0',
       ],
     },
     variants: {
-      size: {
-        standard: { root: 'size-5 [--checkbox-glyph:1rem]' },
-        tiny: { root: 'size-4 [--checkbox-glyph:0.75rem]' },
-      } satisfies Record<IdsSize, { root: string }>,
       variant: {
-        outline: { box: 'bg-(--ids-color-surface)' },
-        filled: { box: 'bg-(--ids-color-muted) inset-ring-transparent' },
-      },
-      invalid: {
-        true: { box: '[--checkbox-fill:var(--ids-color-danger)] inset-ring-(--ids-color-danger)' },
-        false: { box: '[--checkbox-fill:var(--ids-color-primary)]' },
-      },
+        outline: {
+          root: 'bg-(--ids-color-surface) shadow-xs inset-ring-1 inset-ring-(--ids-color-border) dark:bg-(--ids-color-muted)/30',
+        },
+        soft: { root: 'bg-(--ids-color-muted) inset-ring-1 inset-ring-transparent' },
+      } satisfies Record<CheckboxVariant, object>,
+      size: {
+        standard: { root: 'size-4', indicator: 'size-3.5' },
+        tiny: { root: 'size-3.5', indicator: 'size-3' },
+      } satisfies Record<IdsSize, object>,
     },
-    defaultVariants: { size: 'standard', variant: 'outline', invalid: false },
+    defaultVariants: { variant: 'outline', size: 'standard' },
   });
-
-  export function Indicator({ asChild, className, children, ...rest }: IndicatorProps) {
-    const Root = asChild === true ? Slot : 'span';
-
-    return (
-      <Root aria-hidden {...rest} className={Style().indicator({ className })}>
-        {children}
-      </Root>
-    );
-  }
-
-  export type IndicatorProps = Omit<ComponentProps<'span'>, 'className'> & {
-    asChild?: boolean;
-    className?: string;
-  };
-
-  export type Props = Omit<
-    ComponentProps<'input'>,
-    'type' | 'size' | 'className' | 'children' | 'onChange'
-  > & {
-    variant?: 'outline' | 'filled';
-    size?: IdsSize;
-    indeterminate?: boolean;
-    invalid?: boolean;
-    onChange?: (checked: boolean, event: ChangeEvent<HTMLInputElement>) => void;
-    className?: string;
-    children?: ReactNode;
-  };
 }
