@@ -19,7 +19,8 @@ type Props = Record<string, unknown>;
 // RHF must observe changes even when a consumer handler prevents the default action.
 function bind(props: Props, binding: Props) {
   const result = { ...props, ...binding };
-  for (const key of ['onChange', 'onBlur']) {
+  for (const key of ['onChange', 'onBlur', 'onValueChange']) {
+    if (!(key in binding)) continue;
     result[key] = (...args: unknown[]) => {
       (props[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
       (binding[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
@@ -43,6 +44,26 @@ function bind(props: Props, binding: Props) {
     return () => cleanups.forEach((cleanup) => cleanup?.());
   };
   return result;
+}
+
+// Custom controls report a raw value through onValueChange rather than a native change event, and
+// RHF's field.onChange accepts either. A control with a real input may report one edit both ways;
+// the value callback carries the typed value (a number, a File, null), so the event that follows
+// it in the same task is dropped rather than overwriting it with the input's string.
+function valueChannel(onChange: (...args: unknown[]) => void) {
+  let reported = false;
+  return {
+    onChange: (...args: unknown[]) => {
+      if (!reported) onChange(...args);
+    },
+    onValueChange: (value: unknown) => {
+      reported = true;
+      queueMicrotask(() => {
+        reported = false;
+      });
+      onChange(value);
+    },
+  };
 }
 
 function NativeField({
@@ -100,6 +121,7 @@ function ControlledField({
         const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
         return bind(rest, {
           ...binding,
+          ...(controlMode === 'value' && valueChannel(binding.onChange)),
           [controlMode]: resolvedValue,
           disabled: disabled ?? original.disabled,
         });
