@@ -3,13 +3,21 @@ import { afterEach, test } from 'node:test';
 import { JSDOM } from 'jsdom';
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost' });
-for (const name of ['window', 'document', 'HTMLElement', 'HTMLInputElement', 'Event', 'MouseEvent'])
+for (const name of [
+  'window',
+  'document',
+  'HTMLElement',
+  'HTMLInputElement',
+  'Event',
+  'MouseEvent',
+  'FocusEvent',
+])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, useState, Fragment } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
-const { Field, TextField } = await import('../dist/index.js');
+const { Field, TextField, useFieldState } = await import('../dist/index.js');
 const { Field: RhfField } = await import('../dist/react-hook-form.js');
 const { useForm, FormProvider } = await import('react-hook-form');
 let root;
@@ -35,6 +43,9 @@ async function input(node, value) {
 }
 const part = (name) => host.querySelector(`[data-field-part="${name}"]`);
 const control = () => host.querySelector('input');
+const fieldRoot = () => host.querySelector('[data-field]');
+const has = (node, name) => node.hasAttribute(`data-${name}`);
+const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 // Verify the published bundle, not a source alias.
 test('SSR wires generated IDs immediately, without effects', () => {
@@ -383,4 +394,266 @@ test('Zod resolver: nested native + controlled cross-field errors, parsed output
   assert.equal(field('confirmation').value, '');
   assert.equal(field('agreed').checked, false);
   assert.deepEqual(errors(), []);
+});
+
+test('state attributes follow the control on the root and every part', async () => {
+  await render(
+    h(
+      Field,
+      null,
+      h(Field.Label, null, 'Name'),
+      h(TextField, { defaultValue: '' }),
+      h(Field.Hint, null, 'Hint'),
+    ),
+  );
+  assert.equal(fieldRoot().dataset.orientation, 'vertical');
+  assert.equal(has(fieldRoot(), 'filled'), false);
+  await act(async () => control().focus());
+  assert.ok(has(fieldRoot(), 'focused'));
+  assert.ok(has(part('label'), 'focused'), 'parts carry the same state');
+  assert.equal(has(fieldRoot(), 'touched'), false);
+  await input(control(), 'a');
+  assert.ok(has(fieldRoot(), 'filled'));
+  assert.ok(has(fieldRoot(), 'dirty'));
+  await act(async () => control().blur());
+  assert.equal(has(fieldRoot(), 'focused'), false);
+  assert.ok(has(fieldRoot(), 'touched'));
+  await input(control(), '');
+  assert.equal(has(fieldRoot(), 'dirty'), false, 'back to the initial value is not dirty');
+  assert.equal(has(fieldRoot(), 'filled'), false);
+});
+
+test('filled reads checked boxes and the hidden inputs a custom control writes', async () => {
+  await render(h(Field, { 'aria-label': 'Agree' }, h('input', { type: 'checkbox' })));
+  assert.equal(has(fieldRoot(), 'filled'), false);
+  await act(async () => control().click());
+  assert.ok(has(fieldRoot(), 'filled'));
+  assert.ok(has(fieldRoot(), 'dirty'));
+  function Picker({ id, value }) {
+    return h(
+      'span',
+      null,
+      h('button', { id, type: 'button' }, 'Pick'),
+      h('input', { type: 'hidden', name: 'pick', value }),
+    );
+  }
+  await render(h(Field, { key: 'picker', 'aria-label': 'Pick' }, h(Picker, { value: '' })));
+  assert.equal(has(fieldRoot(), 'filled'), false);
+  await render(h(Field, { key: 'picker', 'aria-label': 'Pick' }, h(Picker, { value: 'a' })));
+  assert.ok(has(fieldRoot(), 'filled'), 'a re-render with a new hidden value is picked up');
+  assert.ok(has(fieldRoot(), 'dirty'));
+});
+
+test('orientation lays the label beside the control; variant stays as an alias', async () => {
+  await render(h(Field, { orientation: 'horizontal', 'aria-label': 'x' }, h(TextField)));
+  assert.equal(fieldRoot().dataset.orientation, 'horizontal');
+  assert.ok(fieldRoot().className.includes('grid-cols-[auto_minmax(0,1fr)]'));
+  await render(h(Field, { variant: 'horizontal', 'aria-label': 'x' }, h(TextField)));
+  assert.equal(fieldRoot().dataset.orientation, 'horizontal');
+});
+
+test('native validation: an invalid event shows the message, editing clears it', async () => {
+  await render(
+    h(
+      'form',
+      null,
+      h(
+        Field,
+        null,
+        h(Field.Label, null, 'Email'),
+        h(TextField, { type: 'email', required: true }),
+        h(Field.Hint, null, 'Work email'),
+        h(Field.Error),
+      ),
+    ),
+  );
+  const form = host.querySelector('form');
+  assert.equal(part('error'), null, 'nothing is reported before the user submits');
+  await act(async () => form.checkValidity());
+  assert.equal(part('error').textContent, control().validationMessage);
+  assert.equal(control().getAttribute('aria-invalid'), 'true');
+  assert.ok(has(fieldRoot(), 'invalid'));
+  assert.equal(part('hint'), null);
+  assert.equal(control().getAttribute('aria-describedby'), part('error').id);
+  await input(control(), 'user@example.com');
+  assert.equal(part('error'), null, 'the error follows edits once shown');
+  assert.equal(control().hasAttribute('aria-invalid'), false);
+  assert.equal(control().getAttribute('aria-describedby'), part('hint').id);
+});
+
+test('native validation on blur only reports a value the user changed', async () => {
+  await render(
+    h(
+      'form',
+      null,
+      h(
+        Field,
+        null,
+        h(Field.Label, null, 'Email'),
+        h(TextField, { type: 'email', required: true }),
+        h(Field.Error),
+      ),
+    ),
+  );
+  await act(async () => control().focus());
+  await act(async () => control().blur());
+  assert.equal(part('error'), null, 'an empty required field tabbed past is not an error yet');
+  await act(async () => control().focus());
+  await input(control(), 'nope');
+  assert.equal(part('error'), null, 'typing does not report before the first blur');
+  await act(async () => control().blur());
+  assert.equal(part('error').textContent, control().validationMessage);
+});
+
+test('custom validity, match, noValidate and explicit invalid', async () => {
+  let node;
+  await render(
+    h(
+      'form',
+      null,
+      h(
+        Field,
+        null,
+        h(Field.Label, null, 'Email'),
+        h(TextField, { type: 'email', required: true, ref: (value) => (node = value) }),
+        h(Field.Error, { match: 'valueMissing' }, 'Required'),
+        h(Field.Error, { match: 'typeMismatch' }, 'Not an email'),
+        h(Field.Error, { match: 'customError' }),
+      ),
+    ),
+  );
+  const form = host.querySelector('form');
+  const errors = () =>
+    [...host.querySelectorAll('[data-field-part=error]')].map((el) => el.textContent);
+  await act(async () => form.checkValidity());
+  assert.deepEqual(errors(), ['Required']);
+  await input(control(), 'x');
+  assert.deepEqual(errors(), ['Not an email']);
+  const ids = [...host.querySelectorAll('[data-field-part=error]')].map((el) => el.id);
+  assert.equal(control().getAttribute('aria-describedby'), ids.join(' '));
+  await act(async () => node.setCustomValidity('Taken'));
+  await input(control(), 'a@b.co');
+  assert.deepEqual(errors(), ['Taken'], 'a match without children shows the browser message');
+
+  await render(
+    h(
+      'form',
+      { key: 'novalidate', noValidate: true },
+      h(
+        Field,
+        null,
+        h(Field.Label, null, 'Email'),
+        h(TextField, { required: true }),
+        h(Field.Error),
+      ),
+    ),
+  );
+  await act(async () => host.querySelector('form').checkValidity());
+  assert.equal(part('error'), null, 'noValidate keeps the field out of native validation');
+
+  await render(
+    h(
+      'form',
+      { key: 'explicit' },
+      h(
+        Field,
+        { invalid: false },
+        h(Field.Label, null, 'Email'),
+        h(TextField, { required: true }),
+        h(Field.Error),
+      ),
+    ),
+  );
+  await act(async () => host.querySelector('form').checkValidity());
+  assert.equal(part('error'), null, 'an explicit invalid wins over native validity');
+});
+
+test('an error without content renders nothing and is left out of aria-describedby', async () => {
+  await render(
+    h(Field, { invalid: true }, h(Field.Label, null, 'Name'), h(TextField), h(Field.Error)),
+  );
+  assert.equal(part('error'), null);
+  assert.equal(control().getAttribute('aria-describedby'), null);
+  assert.equal(control().getAttribute('aria-invalid'), 'true');
+});
+
+test('native form reset clears touched, dirty and the shown error', async () => {
+  await render(
+    h(
+      'form',
+      null,
+      h(
+        Field,
+        null,
+        h(Field.Label, null, 'Name'),
+        h(TextField, { required: true, defaultValue: '' }),
+        h(Field.Error),
+      ),
+    ),
+  );
+  await act(async () => host.querySelector('form').checkValidity());
+  await act(async () => control().focus());
+  await input(control(), 'typed');
+  await act(async () => control().blur());
+  assert.ok(has(fieldRoot(), 'dirty') && has(fieldRoot(), 'touched'));
+  await act(async () => {
+    host.querySelector('form').reset();
+    await settle();
+  });
+  assert.equal(control().value, '');
+  assert.equal(has(fieldRoot(), 'dirty'), false);
+  assert.equal(has(fieldRoot(), 'touched'), false);
+  assert.equal(part('error'), null);
+});
+
+test('className, style and children accept a function of the field state', async () => {
+  await render(
+    h(
+      Field,
+      {
+        required: true,
+        className: (state) => (state.focused ? 'is-focused' : 'is-idle'),
+        style: (state) => ({ opacity: state.filled ? 1 : 0.5 }),
+      },
+      h(Field.Label, { className: (state) => (state.required ? 'needs' : '') }, 'Name'),
+      h(TextField),
+      h(Field.Description, null, (state) => (state.filled ? 'Filled' : 'Empty')),
+    ),
+  );
+  assert.ok(fieldRoot().classList.contains('is-idle'));
+  assert.equal(fieldRoot().style.opacity, '0.5');
+  assert.ok(part('label').classList.contains('needs'));
+  assert.equal(part('description').textContent, 'Empty');
+  await act(async () => control().focus());
+  await input(control(), 'a');
+  assert.ok(fieldRoot().classList.contains('is-focused'));
+  assert.equal(fieldRoot().style.opacity, '1');
+  assert.equal(part('description').textContent, 'Filled');
+});
+
+test('useFieldState exposes the state to a custom control', async () => {
+  function Custom(props) {
+    const state = useFieldState();
+    return h('input', {
+      ...props,
+      'data-seen': state ? `${state.required}:${state.size}` : 'none',
+    });
+  }
+  await render(h(Field, { required: true, size: 'tiny', 'aria-label': 'Custom' }, h(Custom)));
+  assert.equal(control().dataset.seen, 'true:tiny');
+  await render(h(Custom, { key: 'outside' }));
+  assert.equal(control().dataset.seen, 'none');
+});
+
+test('RHF passes its own dirty and touched state and keeps native errors reachable', async () => {
+  const form = rhfHarness();
+  await render(form.node);
+  await act(async () => control().focus());
+  await input(control(), 'user@example.com');
+  await act(async () => control().blur());
+  assert.ok(has(fieldRoot(), 'dirty'));
+  assert.ok(has(fieldRoot(), 'touched'));
+  await act(async () => form.methods().reset());
+  assert.equal(has(fieldRoot(), 'dirty'), false);
+  assert.equal(has(fieldRoot(), 'touched'), false);
 });

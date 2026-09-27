@@ -15,14 +15,17 @@ export type FieldProps = BaseProps &
     | { controlMode: 'value' | 'checked'; registerOptions?: ControlledOptions }
   );
 type Props = Record<string, unknown>;
+type Handler = (...args: unknown[]) => void;
 
-// RHF must observe changes even when a consumer handler prevents the default action.
+// RHF must observe changes even when a consumer handler prevents the default action, so the
+// consumer's handler runs first and RHF's always runs after it.
 function bind(props: Props, binding: Props) {
   const result = { ...props, ...binding };
-  for (const key of ['onChange', 'onBlur']) {
+  for (const key of Object.keys(binding)) {
+    if (!/^on[A-Z]/.test(key)) continue;
     result[key] = (...args: unknown[]) => {
-      (props[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
-      (binding[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
+      (props[key] as Handler | undefined)?.(...args);
+      (binding[key] as Handler | undefined)?.(...args);
     };
   }
   result.ref = (node: HTMLElement | null) => {
@@ -59,7 +62,9 @@ function NativeField({
       {...props}
       name={name}
       disabled={disabled}
-      invalid={props.invalid ?? state.invalid}
+      invalid={props.invalid ?? (state.invalid || undefined)}
+      dirty={props.dirty ?? state.isDirty}
+      touched={props.touched ?? state.isTouched}
       errorMessage={state.error?.message}
       bindControl={(original) =>
         bind(original, { ...registration, disabled: disabled ?? original.disabled })
@@ -90,7 +95,9 @@ function ControlledField({
       {...props}
       name={name}
       disabled={disabled}
-      invalid={props.invalid ?? fieldState.invalid}
+      invalid={props.invalid ?? (fieldState.invalid || undefined)}
+      dirty={props.dirty ?? fieldState.isDirty}
+      touched={props.touched ?? fieldState.isTouched}
       errorMessage={fieldState.error?.message}
       bindControl={(original) => {
         const { value, ...binding } = field;
@@ -134,4 +141,14 @@ export const Field = Object.assign(RhfField, {
   Description: BaseField.Description,
   Hint: BaseField.Hint,
   Error: BaseField.Error,
+  Style: BaseField.Style,
 });
+
+export namespace Field {
+  export type Props = FieldProps;
+  export type State = BaseField.State;
+  export type LabelProps = BaseField.LabelProps;
+  export type DescriptionProps = BaseField.DescriptionProps;
+  export type HintProps = BaseField.HintProps;
+  export type ErrorProps = BaseField.ErrorProps;
+}
