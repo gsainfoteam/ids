@@ -315,12 +315,15 @@ const T_CSS_VARIANTS = `@custom-variant dark (&:where([data-mode="dark"], [data-
 // inset-ring border when the element has one; the color alone draws nothing on an element
 // without an inset ring, so solid controls are unaffected. An invalid element keeps a danger
 // border and turns its focus ring danger too.
+// A shell rings for a focused field input inside it, but not for one inside a popup it holds: a
+// popup is drawn apart from the field even where the DOM nests it there, as with TelField's
+// country list, so the field would light up for focus the user sees elsewhere.
 const T_CSS_UTILITIES = `@utility focus-ring {
   outline: none;
 
   &:focus-visible,
   &[data-focus-visible],
-  &:has([data-field-input]:focus-visible),
+  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
   &:has([data-text-field-input]:focus-visible),
   &:has([data-text-area-input]:focus-visible) {
     @apply ring-[3px] ring-(--ids-color-primary)/40 inset-ring-(--ids-color-primary);
@@ -332,7 +335,7 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 
     &:focus-visible,
     &[data-focus-visible],
-    &:has([data-field-input]:focus-visible),
+    &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
     &:has([data-text-field-input]:focus-visible),
     &:has([data-text-area-input]:focus-visible) {
       @apply ring-(--ids-color-danger)/40 inset-ring-(--ids-color-danger);

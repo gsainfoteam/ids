@@ -75,7 +75,7 @@
 
   &:focus-visible,
   &[data-focus-visible],
-  &:has([data-field-input]:focus-visible),
+  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
   &:has([data-text-field-input]:focus-visible),
   &:has([data-text-area-input]:focus-visible) {
     @apply ring-[3px] ring-(--ids-color-primary)/40 inset-ring-(--ids-color-primary);
@@ -87,7 +87,7 @@
 
     &:focus-visible,
     &[data-focus-visible],
-    &:has([data-field-input]:focus-visible),
+    &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
     &:has([data-text-field-input]:focus-visible),
     &:has([data-text-area-input]:focus-visible) {
       @apply ring-(--ids-color-danger)/40 inset-ring-(--ids-color-danger);
