@@ -17,6 +17,7 @@ import {
 
 import { FieldSizeContext } from './context';
 import { invariant, mergeProps, tv } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -241,7 +242,7 @@ export function FieldRoot({
     ariaLabel ||
     ariaLabelledby;
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    if (!isDevelopment) return;
     if (controls.length !== 1)
       console.warn('[IDS] Field: exactly one direct child control is required.');
     if (!accessibleName) console.warn('[IDS] Field: Field.Label or aria-label is required.');

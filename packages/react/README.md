@@ -170,8 +170,11 @@ import { Button } from '@gsainfoteam/ids-react';
 | prop | 타입 | 기본값 |
 |---|---|---|
 | `variant` | `'solid' \| 'soft' \| 'outline' \| 'ghost'` | `'solid'` |
+| `colorScheme` | `'primary' \| 'neutral' \| 'danger' \| 'success' \| 'warning' \| 'info'` | `'primary'` |
 | `size` | `'standard' \| 'tiny'` | `'standard'` |
 | `disabled` | `boolean` | `false` |
+
+`asChild`, `focusableWhenDisabled` 와 로딩 합성은 [Button API](./src/components/action/button/README.md) 를 참고하세요.
 
 ### Spinner
 
@@ -288,4 +291,4 @@ Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만
 
 ## FloatingButton
 
-화면 모서리에 고정된 아이콘/확장형 행동 버튼입니다. safe-area와 링크 합성·비활성 상태를 지원합니다. [FloatingButton API](./src/components/floating-button/README.md).
+화면 모서리에 떠 있는 아이콘/확장형 주 동작 버튼입니다. safe area, 읽는 방향, 링크 합성과 비활성 상태를 챙깁니다. [FloatingButton API](./src/components/action/floating-button/README.md).

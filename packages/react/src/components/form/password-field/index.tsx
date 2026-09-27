@@ -20,6 +20,7 @@ import { isNotNil } from 'es-toolkit';
 
 import { fieldSurface, type FieldSurfaceVariant } from '../../../internal/field-surface';
 import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { IconButton } from '../../action/icon-button';
 import { Slot } from '../../utility/slot';
 import { useFieldSize } from '../field/context';
@@ -229,7 +230,7 @@ export function PasswordField({
     selection.current = null;
   }, [visible]);
   useEffect(() => {
-    if (import.meta.env.DEV && !native.name)
+    if (isDevelopment && !native.name)
       console.warn(
         '[IDS] PasswordField: name="password" 등을 명시하면 자동완성 매니저 호환성이 향상됩니다.',
       );

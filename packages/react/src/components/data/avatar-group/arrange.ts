@@ -1,6 +1,7 @@
 import { isValidElement, type ReactNode } from 'react';
 
 import { flattenFragments } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 
 import type { AvatarCutout } from '../avatar/context';
 
@@ -26,7 +27,7 @@ export function arrangeAvatarGroup({
   isOverflow: (node: ReactNode) => boolean;
   nameOf: (node: ReactNode) => string | undefined;
 }) {
-  if (import.meta.env.DEV && max !== undefined && !(max >= 1))
+  if (isDevelopment && max !== undefined && !(max >= 1))
     console.warn('[IDS] AvatarGroup: max must be at least 1.');
   const limit = max === undefined ? Infinity : Math.max(1, Math.floor(max));
 

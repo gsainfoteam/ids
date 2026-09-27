@@ -12,6 +12,7 @@ import {
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { mergeRefs } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 
 export type UseRatingOptions = {
   value?: number;
@@ -43,7 +44,7 @@ export function useRating({
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (import.meta.env.DEV && (!Number.isFinite(raw) || raw < 0 || raw > max))
+    if (isDevelopment && (!Number.isFinite(raw) || raw < 0 || raw > max))
       console.warn('[IDS] Rating: value must be between 0 and max.');
   }, [raw, max]);
 
