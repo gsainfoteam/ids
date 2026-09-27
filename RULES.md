@@ -73,26 +73,26 @@ public goes into `internal/`, never loose at the root of `components/`.
 Every component's `index.stories.tsx` has the same shape, in this order:
 
 1. `Playground` — args wired to controls, nothing else.
-2. `Gallery` — **required.** Every variant, size and state on one screen, built from the story kit
+2. `Gallery` — **required.** Every variant, size and state on one screen, built from the `Showcase` kit
    so all galleries read alike. Import it as `~story-kit`.
 3. One story per feature worth showing (keyboard, paste, form integration, composition), each with
    a `play` function when the behaviour can be asserted.
 
 ```tsx
-import { Gallery } from '~story-kit';
+import { Showcase } from '~story-kit';
 
 export const Gallery: Story = {
   render: () => (
-    <Gallery>
-      <Gallery.Section title="Variant × Size">
-        <Gallery.Matrix rows={sizes} columns={variants} render={(size, variant) => (
+    <Showcase>
+      <Showcase.Section title="Variant × Size">
+        <Showcase.Matrix rows={sizes} columns={variants} render={(size, variant) => (
           <Button size={size} variant={variant}>{variant}</Button>
         )} />
-      </Gallery.Section>
-      <Gallery.Section title="States">
-        <Gallery.Row label="disabled">...</Gallery.Row>
-      </Gallery.Section>
-    </Gallery>
+      </Showcase.Section>
+      <Showcase.Section title="States">
+        <Showcase.Row label="disabled">...</Showcase.Row>
+      </Showcase.Section>
+    </Showcase>
   ),
 };
 ```

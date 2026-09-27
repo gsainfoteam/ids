@@ -5,11 +5,11 @@ import { cn } from '../src/utils';
 // Every Gallery story is built from these parts so that all components read the same way:
 // a titled section per axis, a label column on the left, and a matrix for two-axis grids.
 
-export function Gallery({ children, className }: { children: ReactNode; className?: string }) {
+export function Showcase({ children, className }: { children: ReactNode; className?: string }) {
   return <div className={cn('flex w-full max-w-5xl flex-col gap-12', className)}>{children}</div>;
 }
 
-export namespace Gallery {
+export namespace Showcase {
   export function Section({
     title,
     description,
@@ -21,7 +21,7 @@ export namespace Gallery {
   }) {
     return (
       <section className="flex flex-col gap-4">
-        <header className="flex flex-col gap-1 border-b border-(--ids-color-outline) pb-2">
+        <header className="flex flex-col gap-1 border-b border-(--ids-color-border) pb-2">
           <h2 className="text-subtitle-s2-semibold">{title}</h2>
           {description !== undefined && (
             <p className="text-body-b3-regular text-(--ids-color-on-muted)">{description}</p>
