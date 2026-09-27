@@ -87,6 +87,26 @@ test('explicit props win over the control', async () => {
   assert.ok(label().hasAttribute('data-disabled'));
 });
 
+test('a label given both states does not observe its control', async () => {
+  const observer = globalThis.MutationObserver;
+  delete globalThis.MutationObserver;
+  try {
+    await render(
+      h(
+        'div',
+        null,
+        h(Label, { htmlFor: 'y', required: true, disabled: false }, 'Y'),
+        h('input', { id: 'y', disabled: true }),
+      ),
+    );
+    await flush();
+  } finally {
+    globalThis.MutationObserver = observer;
+  }
+  assert.ok(label().hasAttribute('data-required'));
+  assert.equal(label().hasAttribute('data-disabled'), false);
+});
+
 test('a role widget gets a name by reference and focus on click', async () => {
   await render(
     h(

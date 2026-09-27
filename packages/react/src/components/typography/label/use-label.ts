@@ -84,20 +84,22 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
   );
 
   // The label mirrors its control, so `disabled` or `required` set on the input shows here too,
-  // and follows it when it changes later.
+  // and follows it when it changes later. A label given both has nothing to mirror, so it keeps
+  // no observer on the control.
+  const mirroring = disabled === undefined || required === undefined;
   const subscribe = useCallback(
     (notify: () => void) => {
-      const control = controlOf(node, htmlFor);
+      const control = mirroring ? controlOf(node, htmlFor) : null;
       if (!control) return () => {};
       const observer = new MutationObserver(notify);
       observer.observe(control, { attributes: true, attributeFilter: WATCHED });
       return () => observer.disconnect();
     },
-    [node, htmlFor],
+    [node, htmlFor, mirroring],
   );
   const mirrored = useSyncExternalStore(
     subscribe,
-    () => readState(controlOf(node, htmlFor)),
+    () => (mirroring ? readState(controlOf(node, htmlFor)) : 0),
     () => 0,
   );
 
