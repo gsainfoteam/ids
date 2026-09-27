@@ -2,12 +2,12 @@
 
 채도와 밝기 영역, 색조와 투명도 슬라이더, 값 입력, 팔레트로 색을 고르는 패널입니다. 팝업 필드가 필요하면 `ColorField` 를 씁니다. `ColorField` 도 안에서 이 패널을 씁니다.
 
-- **키보드와 스크린 리더.** 영역은 채도와 밝기 두 슬라이더로 읽히고, 방향키로 두 축을 모두 움직입니다. 색조와 투명도도 슬라이더라 스크린 리더의 조정 동작이 그대로 됩니다.
+- **키보드와 스크린 리더.** 영역은 채도와 밝기 두 슬라이더로 읽히고, 방향키로 두 축을 모두 움직입니다. 색조와 투명도는 IDS `Slider` 라서 키보드, 포인터, 읽히는 값이 [Slider](../../form/slider/README.md) 와 같습니다.
 - **검정과 회색을 지나도 색이 남는다.** 밝기를 0 까지 내렸다 올리면 원래 색조로 돌아옵니다.
 - **입력은 초안.** 값을 치는 동안은 영역이 따라 움직이지 않고, `Enter` 나 포커스를 옮길 때 반영합니다. `#` 없이 쳐도 읽습니다.
 - **스포이트.** EyeDropper API 가 있는 브라우저에서는 화면의 색을 바로 집습니다.
 - **복사.** 지금 값을 클립보드에 넣고 스크린 리더에 알립니다.
-- **팔레트.** 라디오 그룹이라 `Tab` 한 번으로 들어가고, 방향키로 옆 색을 고릅니다.
+- **팔레트.** native 라디오의 `RadioGroup` 이라 `Tab` 한 번으로 들어가고, 방향키로 옆 색을, `Home` `End` 로 처음과 끝 색을 고릅니다.
 
 ```tsx
 import { ColorPicker } from '@gsainfoteam/ids-react';
@@ -44,6 +44,7 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 - 영역을 누르면 그 자리로 옮기고 포커스를 줍니다. 누른 채 끌면 포인터를 붙잡아 영역 밖으로 나가도 따라갑니다.
 - 영역은 `Tab` 한 번에 들어갑니다. 스크린 리더는 채도와 밝기를 따로 읽고, 두 슬라이더 모두 `채도 60%, 밝기 80%` 처럼 두 값을 함께 알려 줍니다.
 - 슬라이더는 페이지 방향과 상관없이 왼쪽이 작은 값입니다.
+- 팔레트는 라디오 그룹의 키를 따릅니다. 방향키는 옆 색을 고르고 끝에서 반대편으로 돌며, `Home` `End` 는 처음과 끝 색을 고릅니다. `readOnly` 면 포커스만 옮겨집니다.
 
 ## 값 입력
 
@@ -74,9 +75,18 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
   <ColorPicker.Swatch value="#EF4444" label="빨강" />
   <ColorPicker.Swatch value="rgba(59, 130, 246, 0.5)" label="반투명 파랑" />
 </ColorPicker.Swatches>
+
+<ColorPicker.Copy aria-label="HEX 복사">   {/* 자식이 아이콘을 바꾼다 */}
+  <DocumentDuplicateIcon />
+</ColorPicker.Copy>
 ```
 
 - 자식이 없으면 영역, 스포이트와 슬라이더, 입력과 복사, 팔레트 순으로 그립니다.
+- `HueSlider` 와 `AlphaSlider` 는 채운 구간 없이 그라데이션 트랙을 쓰는 `Slider` 입니다. 받은 속성은 Slider 루트로 가고, `aria-label` 은 thumb의 이름이 됩니다.
+- `EyeDropper` 와 `Copy` 는 `IconButton variant="outline"` 입니다. 자식을 주면 기본 아이콘 대신 그 아이콘을 씁니다.
+- `Input` 은 고정폭 글꼴의 `TextField` 입니다. `className` 과 `style` 은 테두리 상자로, 그 밖의 속성은 input으로 갑니다.
+- `Swatches` 는 `RadioGroup`, `Swatch` 는 색 네모로 그린 `Radio` 입니다. 고른 색은 둘레의 고리로 보이고, `Swatch` 의 `ref` 와 속성은 라디오 input으로 갑니다.
+- 팔레트의 라디오는 어느 폼에도 속하지 않습니다. 피커를 폼 안에 두어도 제출되거나 검증되지 않습니다.
 - `swatches` 는 색 문자열이나 `{ value, label }` 입니다. 읽을 수 없는 색은 건너뜁니다. 이름이 없으면 값이 이름이 됩니다.
 - 반투명 색은 체크무늬 위에 그려서 투명도가 보입니다. 체크무늬는 테마의 surface 와 muted 색이라 다크 모드에서도 튀지 않습니다.
 
@@ -87,10 +97,11 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 | 루트     | `data-disabled`, `data-readonly`, `data-empty`, `data-size` |
 | 영역     | `data-color-picker-area`, `data-disabled`                   |
 | 슬라이더 | `data-color-picker-hue`, `data-color-picker-alpha`          |
-| 팔레트   | `role="radiogroup"`, 고른 색은 `aria-checked="true"`        |
+| 팔레트   | `role="radiogroup"`, 고른 색은 `data-state="checked"`       |
 | 복사     | 복사한 뒤 잠깐 `data-copied`                                |
 
 - 루트의 `className` 은 `ColorPicker.State` 를 받는 함수도 됩니다.
+- 슬라이더 속성은 Slider 루트에 붙고, 끄는 중이나 비활성 같은 나머지는 [Slider](../../form/slider/README.md) 의 `data-*` 그대로입니다.
 
 ## 속성
 

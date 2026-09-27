@@ -114,21 +114,8 @@ export function useColorPicker({
     });
   };
 
-  // The thumb stays inside the track, so the usable length is the track minus one thumb.
-  const sliderFromPointer = (
-    channel: 'hue' | 'alpha',
-    thumb: number,
-    event: PointerEvent<HTMLElement>,
-  ) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const usable = rect.width - thumb;
-    if (usable <= 0) return;
-    const ratio = clamp((event.clientX - rect.left - thumb / 2) / usable, 0, 1);
-    update(channel === 'hue' ? { h: ratio * 360 } : { a: ratio });
-  };
-
-  // Dragging starts on press, captures the pointer so it continues outside the control, and
-  // moves focus to the control's input so the arrow keys pick up where the pointer left off.
+  // Dragging starts on press, captures the pointer so it continues outside the area, and moves
+  // focus to the area's input so the arrow keys pick up where the pointer left off.
   const startDrag = (event: PointerEvent<HTMLElement>, move: () => void) => {
     if (blocked || event.button !== 0) return;
     event.preventDefault();
@@ -157,32 +144,8 @@ export function useColorPicker({
     update(patch);
   };
 
-  const onSliderKeyDown = (channel: 'hue' | 'alpha', event: KeyboardEvent<HTMLInputElement>) => {
-    if (blocked) return;
-    const max = channel === 'hue' ? 360 : 1;
-    const unit = (channel === 'hue' ? 1 : 0.01) * (event.shiftKey ? 10 : 1);
-    const page = channel === 'hue' ? 10 : 0.1;
-    const current = channel === 'hue' ? color.h : color.a;
-    const next = {
-      ArrowLeft: current - unit,
-      ArrowDown: current - unit,
-      ArrowRight: current + unit,
-      ArrowUp: current + unit,
-      PageDown: current - page,
-      PageUp: current + page,
-      Home: 0,
-      End: max,
-    }[event.key];
-    if (next === undefined) return;
-    event.preventDefault();
-    const bounded = clamp(next, 0, max);
-    update(channel === 'hue' ? { h: bounded } : { a: bounded });
-  };
-
-  // Assistive technology changes a slider through the input's own value, not through keys.
-  const onChannelChange = (channel: ColorChannel, event: ChangeEvent<HTMLInputElement>) => {
-    const n = Number(event.currentTarget.value);
-    if (!Number.isFinite(n)) return;
+  // Every channel but hue is a percentage on its control, hue is in degrees.
+  const setChannel = (channel: ColorChannel, n: number) =>
     update(
       channel === 'saturation'
         ? { s: n / 100 }
@@ -192,6 +155,12 @@ export function useColorPicker({
             ? { h: n }
             : { a: n / 100 },
     );
+
+  // Assistive technology changes an axis of the area through its input's own value, not through
+  // keys.
+  const onChannelChange = (channel: ColorChannel, event: ChangeEvent<HTMLInputElement>) => {
+    const n = Number(event.currentTarget.value);
+    if (Number.isFinite(n)) setChannel(channel, n);
   };
 
   // Typed text stays a draft until Enter or blur, so the area does not jump through "#1",
@@ -266,37 +235,6 @@ export function useColorPicker({
     if (next) commitRgba(alpha ? next : { ...next, alpha: 1 });
   };
 
-  // Swatches are one radio group: the arrows move to the next swatch and choose it, wrapping at
-  // the ends, Home and End jump, and Tab leaves the group in one step.
-  const onSwatchesKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    const radios = Array.from(
-      event.currentTarget.querySelectorAll<HTMLButtonElement>('[role=radio]:not(:disabled)'),
-    );
-    const index = radios.findIndex((radio) => radio === radio.ownerDocument.activeElement);
-    if (index < 0) return;
-    const rtl =
-      event.currentTarget.ownerDocument.defaultView?.getComputedStyle(event.currentTarget)
-        .direction === 'rtl';
-    const step = {
-      ArrowRight: rtl ? -1 : 1,
-      ArrowLeft: rtl ? 1 : -1,
-      ArrowDown: 1,
-      ArrowUp: -1,
-    }[event.key];
-    const next =
-      step !== undefined
-        ? (index + step + radios.length) % radios.length
-        : event.key === 'Home'
-          ? 0
-          : event.key === 'End'
-            ? radios.length - 1
-            : undefined;
-    if (next === undefined) return;
-    event.preventDefault();
-    radios[next].focus();
-    radios[next].click();
-  };
-
   return {
     state: { value, parsed, color, rgba, text, blocked, copied },
     input,
@@ -308,14 +246,6 @@ export function useColorPicker({
       },
       onKeyDown: onAreaKeyDown,
     },
-    slider: (channel: 'hue' | 'alpha', thumb: number) => ({
-      onPointerDown: (event: PointerEvent<HTMLElement>) =>
-        startDrag(event, () => sliderFromPointer(channel, thumb, event)),
-      onPointerMove: (event: PointerEvent<HTMLElement>) => {
-        if (dragging(event)) sliderFromPointer(channel, thumb, event);
-      },
-      onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => onSliderKeyDown(channel, event),
-    }),
-    actions: { onChannelChange, pickFromScreen, copy, isCurrent, chooseSwatch, onSwatchesKeyDown },
+    actions: { setChannel, onChannelChange, pickFromScreen, copy, isCurrent, chooseSwatch },
   };
 }

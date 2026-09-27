@@ -7,11 +7,14 @@ theme-colored dot, and add `Radio.Indicator` with `asChild`. A Radio now joins t
 rendered in, so the group takes plain `Radio` children as well as its typed render-function
 `Item`. State is exposed as `data-state` and the other `data-*` flags, with `Radio.State` and
 state-function `className`, `style` and `children`. An uncontrolled Radio follows its native
-group, so choosing a groupmate updates its `data-state` and reports `onCheckedChange(false)`.
+group, so choosing a groupmate updates its `data-state` and reports `onCheckedChange(false)`. The
+input takes the corners given to the circle, so a Radio restyled as a square answers at its
+corners.
 
 RadioGroup gains `readOnly`, `required` (native), `invalid`, `form`, `variant`, reset to
 `defaultValue`, and a stable root for `ref` and `id` whose `focus()` lands on the checked radio,
-which is where react-hook-form's error focus now goes. `controlMode="value"` connects it.
+which is where react-hook-form's error focus now goes. `controlMode="value"` connects it. Home and
+End, which native radios ignore, choose the group's first and last enabled radio.
 
 Breaking: RadioGroup's `onChange(value)` is now `onValueChange(value)`, and its `variant`
 (`vertical` / `horizontal`) is now `orientation`; `variant` is the items' `outline` / `soft`.

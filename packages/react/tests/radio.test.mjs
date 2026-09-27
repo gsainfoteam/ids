@@ -55,6 +55,10 @@ test('SSR: a native radio in a drawn circle, labelled by Field', () => {
   assert.equal(circle.dataset.size, 'tiny');
   assert.ok(circle.hasAttribute('data-invalid'));
   assert.equal(circle.querySelector('[aria-hidden=true]').dataset.state, 'checked');
+  assert.ok(
+    input.classList.contains('rounded-[inherit]'),
+    'the input takes the corners drawn on the circle, so a restyled shape answers everywhere',
+  );
 });
 
 test('uncontrolled radios sharing a name: choosing one un-marks its groupmate', async () => {

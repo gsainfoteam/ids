@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type FocusEvent,
   type KeyboardEvent,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 
@@ -23,9 +24,11 @@ import {
   useDrawerPresentation,
   type FieldTriggerVariant,
 } from '../../../internal/field-popup';
+import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
-import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { invariant, mergeEventHandlers, mergeProps, mergeRefs, tv } from '../../../utils';
+import { IconButton } from '../../action/icon-button';
 import { ColorPicker, type ColorPickerSwatchOption } from '../../data/color-picker';
 import { cssColor, type ColorFormat } from '../../data/color-picker/color';
 import { useFieldSize } from '../field/context';
@@ -76,6 +79,7 @@ type Context = {
   triggerProps: Record<string, unknown>;
   valueId: string;
   picker: ComponentProps<typeof ColorPicker>;
+  size: IdsSize;
   styles: ReturnType<typeof ColorField.Style>;
 };
 
@@ -94,9 +98,13 @@ const isNode = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'nodeType' in value;
 
 // Focus lands on the first control of whatever the popup holds: the area, a slider, the
-// input, or the chosen swatch of a palette-only picker.
-const FIRST_CONTROL =
-  '[data-color-picker] input:not([tabindex="-1"]), [data-color-picker] [role=radio][tabindex="0"]';
+// input, or the swatches. The swatches' group root takes it, since it hands focus on to the
+// chosen swatch, or to the first when none is chosen, where Tab would land.
+const FIRST_CONTROL = [
+  '[data-color-picker] input:not([type=radio]):not([tabindex="-1"])',
+  '[data-color-picker] [role=slider]:not([tabindex="-1"])',
+  '[data-color-picker] [role=radiogroup]',
+].join(', ');
 
 const CHECKER =
   'conic-gradient(var(--ids-color-muted) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-muted) 0 75%, var(--ids-color-surface) 0)';
@@ -222,6 +230,7 @@ export function ColorField({
           disabled,
           readOnly,
         },
+        size: resolvedSize,
         styles,
       }}
     >
@@ -353,22 +362,34 @@ function ColorFieldValue({ asChild, children, className, ...props }: ColorField.
   );
 }
 
-function ColorFieldClear({ asChild, children, className, ...props }: ColorField.ClearProps) {
+function ColorFieldClear({
+  asChild,
+  children,
+  className,
+  onClick,
+  ...props
+}: ColorField.ClearProps) {
   const c = useColor('ColorField.Clear');
   if (!c.field.state.value || c.state.readOnly) return null;
-  return part(
-    'button',
-    asChild,
-    children ?? <XMarkIcon aria-hidden="true" />,
-    mergeProps(props, {
-      type: 'button',
-      'aria-label': props['aria-label'] ?? messages.colorField.clear,
-      disabled: c.state.disabled,
-      'data-color-field-clear': '',
-      className: c.styles.clear({ className }),
-      onClick: c.field.actions.clear,
-    }),
-  );
+  const button = {
+    ...props,
+    'aria-label': props['aria-label'] ?? messages.colorField.clear,
+    disabled: c.state.disabled,
+    'data-color-field-clear': '',
+    variant: 'ghost' as const,
+    size: c.size,
+    className: c.styles.clear({ className }),
+    onClick: mergeEventHandlers(onClick, c.field.actions.clear),
+  };
+  if (asChild) {
+    invariant(isValidElement(children), '`ColorField.Clear asChild` requires one element.');
+    return (
+      <IconButton {...button} asChild>
+        {children}
+      </IconButton>
+    );
+  }
+  return <IconButton {...button} icon={children ?? <XMarkIcon aria-hidden="true" />} />;
 }
 
 // The popup's body: a ColorPicker bound to the field. Its children are ColorPicker parts, so a
@@ -392,7 +413,11 @@ export namespace ColorField {
   };
   export type SwatchProps = ComponentProps<'span'> & { asChild?: boolean };
   export type ValueProps = ComponentProps<'span'> & { asChild?: boolean };
-  export type ClearProps = ComponentProps<'button'> & { asChild?: boolean };
+  // One element: the icon, or with asChild the button drawn in its place.
+  export type ClearProps = Omit<ComponentProps<'button'>, 'children'> & {
+    asChild?: boolean;
+    children?: ReactElement;
+  };
   export type ContentProps = Omit<
     ComponentProps<'div'>,
     'defaultValue' | 'onChange' | 'className' | 'children'
@@ -425,12 +450,8 @@ export namespace ColorField {
         'min-w-0 flex-1 truncate font-mono',
         'data-placeholder:font-sans data-placeholder:text-(--ids-color-on-muted)',
       ],
-      clear: [
-        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
-        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'focus-ring disabled:pointer-events-none',
-      ],
+      // A disabled field is dimmed at its root already, and Clear is only disabled with it.
+      clear: [fieldAction.base, 'me-1 data-disabled:opacity-100'],
       // Padding that keeps the popup's corner concentric with the standard-radius area inside it.
       popup: 'concentric-p-3',
     },
@@ -440,18 +461,20 @@ export namespace ColorField {
         soft: { root: fieldTrigger.variant.soft },
         ghost: { root: fieldTrigger.variant.ghost },
       } satisfies Record<ColorFieldVariant, object>,
+      // The trigger carries the field's padding, not the box, so Clear keeps 4px from the border
+      // even when it is the box's last child, where fieldAction would pull it into the padding.
       size: {
         standard: {
           root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
           trigger: 'gap-2 px-3',
           swatch: 'size-5',
-          clear: 'me-1 size-7 [&_svg]:size-(--ids-size-icon-standard)',
+          clear: [fieldAction.size.standard, 'last:me-1'],
         },
         tiny: {
           root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
           trigger: 'gap-1.5 px-2.5',
           swatch: 'size-4',
-          clear: 'me-1 size-6 [&_svg]:size-(--ids-size-icon-tiny)',
+          clear: [fieldAction.size.tiny, 'last:me-1'],
         },
       } satisfies Record<IdsSize, object>,
     },

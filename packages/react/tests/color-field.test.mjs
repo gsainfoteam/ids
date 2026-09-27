@@ -63,8 +63,12 @@ async function type(node, value) {
 const trigger = () => host.querySelector('[data-color-field] button[aria-haspopup]');
 const dialog = () => host.querySelector('[role=dialog]');
 const editor = () => host.querySelector('[data-color-picker-input]');
-const slider = (name) => host.querySelector(`input[type=range][aria-label="${name}"]`);
-const swatch = (name) => host.querySelector(`[role=radio][aria-label="${name}"]`);
+// The area's two axes are native range inputs; hue and alpha are Slider thumbs.
+const slider = (name) =>
+  host.querySelector(
+    `input[type=range][aria-label="${name}"], [role=slider][aria-label="${name}"]`,
+  );
+const swatch = (name) => host.querySelector(`input[type=radio][aria-label="${name}"]`);
 const clearButton = () => host.querySelector('[data-color-field-clear]');
 function tracked(props = {}, ...children) {
   const changes = [];
@@ -171,9 +175,9 @@ test('every change reaches onValueChange at once; a typed value waits for Enter'
   assert.ok(dialog(), 'choosing a swatch keeps the popup open');
   await key(slider('채도'), 'ArrowDown', { shiftKey: true });
   assert.equal(state.changes.at(-1), '#00E600FF');
-  await type(slider('투명도'), '50');
-  assert.equal(state.changes.at(-1), '#00E60080');
-  assert.equal(trigger().textContent, '#00E60080');
+  await key(slider('투명도'), 'Home');
+  assert.equal(state.changes.at(-1), '#00E60000');
+  assert.equal(trigger().textContent, '#00E60000');
   const before = state.changes.length;
   await type(editor(), 'rgb(0, 0, 255)');
   assert.equal(state.changes.length, before, 'a draft is not a value');
@@ -191,9 +195,15 @@ test('every change reaches onValueChange at once; a typed value waits for Enter'
 });
 
 test('Clear empties the value and focuses the trigger; it is hidden while read-only', async () => {
-  const state = tracked({ defaultValue: '#FF0000' });
+  const state = tracked({ defaultValue: '#FF0000', size: 'tiny' });
   await render(state.node);
   assert.equal(clearButton().getAttribute('aria-label'), '색상 지우기');
+  assert.deepEqual(
+    [clearButton().dataset.variant, clearButton().dataset.size],
+    ['ghost', 'tiny'],
+    'a ghost IconButton of the field size',
+  );
+  assert.equal(clearButton().getAttribute('tabindex'), null, 'Clear stays in the Tab order');
   await click(clearButton());
   assert.deepEqual(state.changes, ['']);
   assert.equal(document.activeElement, trigger());
@@ -202,6 +212,21 @@ test('Clear empties the value and focuses the trigger; it is hidden while read-o
   assert.equal(trigger().textContent, '색상 선택');
   await render(tracked({ defaultValue: '#FF0000', readOnly: true }).node);
   assert.equal(clearButton(), null);
+  await render(tracked({ key: 'disabled', defaultValue: '#FF0000', disabled: true }).node);
+  assert.equal(clearButton().disabled, true);
+  let own = 0;
+  const custom = tracked(
+    { key: 'custom', defaultValue: '#FF0000' },
+    h(
+      ColorField.Clear,
+      { asChild: true, onClick: () => own++ },
+      h('button', { className: 'mine' }),
+    ),
+  );
+  await render(custom.node);
+  assert.ok(clearButton().classList.contains('mine'), 'asChild draws the given button');
+  await click(clearButton());
+  assert.deepEqual([own, custom.changes], [1, ['']], "the part's own onClick runs as well");
 });
 
 test('an unreadable value is shown as it is and marks the field invalid', async () => {
@@ -343,6 +368,32 @@ test('onBlur waits until focus leaves both the trigger and the popup', async () 
   assert.equal(blurs, 1);
 });
 
+test('a surrounding Field follows the value once the popup closes', async () => {
+  await render(
+    h(
+      Field,
+      null,
+      h(Field.Label, null, 'Brand'),
+      h(ColorField, { name: 'color', swatches: ['#FF0000'] }),
+    ),
+  );
+  const flags = () => {
+    const field = host.querySelector('[data-field]');
+    return [field.hasAttribute('data-filled'), field.hasAttribute('data-dirty')];
+  };
+  assert.deepEqual(flags(), [false, false]);
+  await click(trigger());
+  await key(document.activeElement, 'Escape');
+  assert.equal(dialog(), null);
+  assert.deepEqual(flags(), [false, false], 'opening and closing the popup changes nothing');
+  await click(trigger());
+  await click(swatch('#FF0000'));
+  await key(swatch('#FF0000'), 'Escape');
+  assert.deepEqual(flags(), [true, true]);
+  await click(clearButton());
+  assert.deepEqual(flags(), [false, false], 'cleared back to where it started');
+});
+
 test('Content holds ColorPicker parts, and focus goes to the first one given', async () => {
   const state = tracked(
     { defaultValue: '#0000FF', swatches: ['#FF0000', '#0000FF'] },
@@ -353,8 +404,16 @@ test('Content holds ColorPicker parts, and focus goes to the first one given', a
   assert.equal(host.querySelector('[data-color-picker-area]'), null);
   assert.equal(editor(), null);
   assert.equal(document.activeElement, swatch('#0000FF'), 'the chosen swatch takes focus');
-  await key(swatch('#0000FF'), 'ArrowRight');
-  assert.deepEqual(state.changes, ['#FF0000'], 'arrows wrap to the next color');
+  await key(swatch('#0000FF'), 'Home');
+  assert.deepEqual(state.changes, ['#FF0000'], 'Home chooses the first color');
+  await render(
+    tracked(
+      { key: 'unlisted', defaultValue: '#123456', swatches: ['#FF0000', '#0000FF'] },
+      h(ColorField.Content, null, h(ColorPicker.Swatches)),
+    ).node,
+  );
+  await click(trigger());
+  assert.equal(document.activeElement, swatch('#FF0000'), 'with no chosen swatch, the first');
   await render(
     tracked(
       { key: 'hue', defaultValue: '#FF0000', alpha: true },

@@ -80,11 +80,12 @@ export function RadioGroup<T extends string>({
   children,
   ref,
   onFocus,
+  onKeyDown,
   ...rest
 }: RadioGroupProps<T>) {
   const generatedName = useId();
   const groupName = name ?? generatedName;
-  const { value, select, rootRef, focusChecked } = useRadioGroup<T>({
+  const { value, select, rootRef, focusChecked, moveToEnd } = useRadioGroup<T>({
     value: valueProp,
     defaultValue,
     onValueChange,
@@ -138,6 +139,10 @@ export function RadioGroup<T extends string>({
         onFocus={(event) => {
           focusChecked(event);
           onFocus?.(event);
+        }}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (!event.defaultPrevented) moveToEnd(event);
         }}
       >
         {typeof children === 'function'

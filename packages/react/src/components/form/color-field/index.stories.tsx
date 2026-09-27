@@ -233,11 +233,16 @@ export const NativeForm: Story = {
     docs: {
       description: {
         story:
-          'name 을 주면 형식에 맞춘 값 하나가 FormData 에 들어갑니다. required 인데 비어 있으면 브라우저가 제출을 막고 트리거로 포커스를 보냅니다.',
+          'name 을 주면 형식에 맞춘 값 하나가 FormData 에 들어갑니다. required 인데 비어 있으면 브라우저가 제출을 막고 트리거로 포커스를 보냅니다. 팝업을 열었다 닫기만 하면 Field 는 채워지지도 바뀌지도 않은 상태로 남습니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
+    const field = () => canvas.getByRole('button', { name: /^테마 색/ }).closest('[data-field]');
+    await userEvent.click(canvas.getByRole('button', { name: /^테마 색/ }));
+    await userEvent.keyboard('{Escape}');
+    await expect(field()).not.toHaveAttribute('data-filled');
+    await expect(field()).not.toHaveAttribute('data-dirty');
     const trigger = canvas.getByRole('button', { name: /^테마 색/ });
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toBeEmptyDOMElement();
