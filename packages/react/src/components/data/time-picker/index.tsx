@@ -193,6 +193,7 @@ export function TimePicker({
   );
 }
 
+// A listbox that keeps focus and points at its active option, so the options are not Toggles.
 function ColumnView({
   unit,
   asChild,
@@ -284,6 +285,7 @@ export namespace TimePicker {
     );
   }
 
+  // A colon between two columns, not a rule, so it is not a Divider.
   export function Separator({ asChild, children = ':', ...props }: SeparatorProps) {
     const c = useTimePickerContext('TimePicker.Separator');
     return part(

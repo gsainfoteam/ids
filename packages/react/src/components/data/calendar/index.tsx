@@ -362,6 +362,7 @@ function MonthButton({
   );
 }
 
+// DayPicker hands this a native select's props and change events, so it stays a select, not Select.
 // The native select stays on top, transparent, so it opens the platform picker, while the label
 // under it keeps the calendar's type and a chevron.
 function Dropdown({ options, className, ...props }: DropdownProps) {
@@ -384,6 +385,7 @@ function Dropdown({ options, className, ...props }: DropdownProps) {
   );
 }
 
+// A grid cell under DayPicker's roving focus, with aria-selected on its td, so it is not a Button.
 function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calendar.DayButtonProps) {
   const c = useCalendarContext('Calendar.DayButton');
   const own = useRef<HTMLButtonElement>(null);

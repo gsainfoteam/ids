@@ -215,6 +215,7 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
       <IconButton {...button} icon={(children as ReactElement) ?? <c.icon aria-hidden="true" />} />
     );
   }
+  // The field's combobox fills the field surface and carries its label, so it is not a Button.
   return part(
     'button',
     asChild,
@@ -235,6 +236,7 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
 export function TemporalInput({ asChild, ...props }: InputProps) {
   const c = useTemporal('Input');
   invariant(c.input, 'Input must be a direct part of its field.');
+  // A bare input inside this field's surface; TextField would draw a second box around it.
   return part('input', asChild, undefined, mergeProps(props, c.input));
 }
 
