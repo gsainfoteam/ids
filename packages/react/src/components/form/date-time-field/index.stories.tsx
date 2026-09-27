@@ -34,7 +34,7 @@ export const PreserveDateAndTime: Story = {
     await userEvent.click(trigger);
     await userEvent.keyboard('{ArrowRight}{Enter}');
     await expect(trigger).toHaveTextContent('2026-09-16 09:30');
-    await userEvent.click(canvas.getByRole('listbox', { name: 'Hour' }));
+    await userEvent.click(canvas.getByRole('listbox', { name: '시' }));
     await userEvent.keyboard('{Home}{ArrowDown}{Enter}{Escape}');
     await expect(trigger).toHaveTextContent('2026-09-16 01:30');
     await expect(trigger).toHaveFocus();

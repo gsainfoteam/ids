@@ -14,4 +14,11 @@ export const messages = {
     month: '월',
     year: '연도',
   },
+  timePicker: {
+    label: '시간',
+    hour: '시',
+    minute: '분',
+    second: '초',
+    period: '오전/오후',
+  },
 } as const;

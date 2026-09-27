@@ -139,7 +139,8 @@ export function DateTimeField({
                   base,
                   nearestSlot(slotsFor(base), secondsOf(base)) ?? secondsOf(base),
                 )}
-                onChange={(next) => {
+                onValueChange={(next) => {
+                  if (!next) return;
                   if (!dayDisabled(next) && (!min || next >= min) && (!max || next <= max))
                     change(next);
                 }}

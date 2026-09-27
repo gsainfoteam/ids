@@ -30,7 +30,7 @@ export const SelectAndClear: Story = {
   play: async ({ canvas, userEvent }) => {
     const trigger = canvas.getByRole('combobox', { name: '알람 시간' });
     await userEvent.click(trigger);
-    await expect(canvas.getByRole('listbox', { name: 'Hour' })).toHaveFocus();
+    await expect(canvas.getByRole('listbox', { name: '시' })).toHaveFocus();
     await userEvent.keyboard('{Home}{ArrowDown}{Enter}{ArrowRight}{End}{Enter}{Escape}');
     await expect(trigger).toHaveTextContent('01:45');
     await expect(trigger).toHaveFocus();

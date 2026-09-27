@@ -43,7 +43,7 @@ export function TimeField({
       picker={({ value, change }) => (
         <TimePicker
           value={value}
-          onChange={change}
+          onValueChange={change}
           precision={precision}
           format={cycle}
           step={step}
