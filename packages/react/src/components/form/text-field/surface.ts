@@ -1,10 +1,11 @@
 import { createContext, useContext, type ComponentProps, type RefObject } from 'react';
 
+import { fieldSurface, type FieldSurfaceVariant } from '../../../internal/field-surface';
 import { tv, type VariantProps } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
 
-export type TextFieldVariant = 'outline' | 'filled' | 'underline';
+export type TextFieldVariant = FieldSurfaceVariant;
 
 export type TextFieldInputProps = Omit<
   ComponentProps<'input'>,
@@ -25,38 +26,11 @@ export function useTextFieldContext() {
 }
 
 export const textFieldSurface = tv({
-  base: [
-    'inline-flex w-full min-w-0 items-center',
-    'bg-transparent text-(--ids-color-on-surface)',
-    'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-    'data-disabled:cursor-not-allowed data-disabled:opacity-50',
-  ],
+  base: ['inline-flex w-full min-w-0 items-center', fieldSurface.base],
   variants: {
-    variant: {
-      outline: ['shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)', 'focus-ring'],
-      filled: [
-        'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
-        'has-[[data-text-field-input]:focus-visible]:bg-(--ids-color-primary)/15',
-        'focus-ring',
-      ],
-      underline: [
-        'rounded-none border-b-2 border-(--ids-color-outline)',
-        'has-[[data-text-field-input]:focus-visible]:border-(--ids-color-primary)',
-      ],
-    } satisfies Record<TextFieldVariant, string[]>,
-    size: {
-      standard: 'h-(--ids-size-control-standard) gap-2 text-body-b3-regular',
-      tiny: 'h-(--ids-size-control-tiny) gap-1.5 text-caption-c1-regular',
-    } satisfies Record<IdsSize, string>,
+    variant: fieldSurface.variant,
+    size: fieldSurface.size,
   },
-  compoundVariants: [
-    { variant: 'outline', size: 'standard', class: 'rounded-standard px-3' },
-    { variant: 'outline', size: 'tiny', class: 'rounded-standard px-2' },
-    { variant: 'filled', size: 'standard', class: 'rounded-standard px-3' },
-    { variant: 'filled', size: 'tiny', class: 'rounded-standard px-2' },
-    { variant: 'underline', size: 'standard', class: 'px-1' },
-    { variant: 'underline', size: 'tiny', class: 'px-0.5' },
-  ],
   defaultVariants: {
     variant: 'outline',
     size: 'standard',

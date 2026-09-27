@@ -18,6 +18,7 @@ import { ChevronUpIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/o
 import { isNotNil } from 'es-toolkit';
 
 import { addDecimal, clampNumber, createNumberFormat, shiftDecimal } from './number-format';
+import { fieldSurface, type FieldSurfaceVariant } from '../../../internal/field-surface';
 import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../field/context';
@@ -25,7 +26,7 @@ import { useFieldSize } from '../field/context';
 import type { IdsSize } from '../../../tokens/types';
 
 type NativeInputProps = ComponentProps<'input'>;
-export type NumberFieldVariant = 'outline' | 'filled' | 'unstyled';
+export type NumberFieldVariant = FieldSurfaceVariant;
 export type NumberFieldProps = Omit<
   NativeInputProps,
   | 'type'
@@ -401,7 +402,7 @@ export function NumberField({
     'aria-valuemax': max,
     'aria-valuetext': current == null ? undefined : format.format(current),
     'aria-invalid': ariaInvalid,
-    ...{ 'data-number-field-input': '', 'data-size': resolvedSize },
+    ...{ 'data-number-field-input': '', 'data-field-input': '', 'data-size': resolvedSize },
     className: styles.input({ className: native.className }),
     onFocus: (event) => {
       native.onFocus?.(event);
@@ -552,17 +553,7 @@ export namespace NumberField {
   export const Clear = NumberClear;
   export const Style = tv({
     slots: {
-      root: [
-        'inline-flex w-full min-w-0 items-center',
-        'bg-transparent text-(--ids-color-on-surface)',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-        'motion-reduce:transition-none',
-        // The ring keys off the input alone so tabbing onto a stepper or clear button
-        // rings only that button, not the whole shell as well.
-        'has-[[data-number-field-input]:focus-visible]:ring-[3px]',
-        'has-[[data-number-field-input]:focus-visible]:ring-(--ids-color-primary)/40',
-        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
-      ],
+      root: ['inline-flex w-full min-w-0 items-center', fieldSurface.base],
       input: [
         'h-full w-full min-w-0 flex-1 border-0 bg-transparent outline-none',
         'text-inherit placeholder:text-(--ids-color-on-muted)',
@@ -582,26 +573,13 @@ export namespace NumberField {
     },
     variants: {
       variant: {
-        outline: {
-          root: [
-            'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
-            'data-invalid:inset-ring-(--ids-color-danger)',
-            'data-invalid:has-[[data-number-field-input]:focus-visible]:ring-(--ids-color-danger)/40',
-          ],
-        },
-        filled: {
-          root: [
-            'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
-            'has-[[data-number-field-input]:focus-visible]:bg-(--ids-color-primary)/15',
-            'data-invalid:inset-ring-(--ids-color-danger)',
-            'data-invalid:has-[[data-number-field-input]:focus-visible]:ring-(--ids-color-danger)/40',
-          ],
-        },
-        unstyled: {},
+        outline: { root: fieldSurface.variant.outline },
+        soft: { root: fieldSurface.variant.soft },
+        ghost: { root: fieldSurface.variant.ghost },
       } satisfies Record<NumberFieldVariant, object>,
       size: {
         standard: {
-          root: 'h-(--ids-size-control-standard) gap-2 rounded-standard px-3 text-body-b3-regular',
+          root: fieldSurface.size.standard,
           adornment: [
             'gap-1',
             'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
@@ -610,7 +588,7 @@ export namespace NumberField {
           clear: 'size-7 rounded-standard',
         },
         tiny: {
-          root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-2 text-caption-c1-regular',
+          root: fieldSurface.size.tiny,
           adornment: [
             'gap-0.5',
             'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',

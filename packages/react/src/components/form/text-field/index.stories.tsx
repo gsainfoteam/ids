@@ -24,7 +24,7 @@ import { TextField } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['outline', 'filled', 'underline'] as const;
+const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -197,14 +197,14 @@ export const Gallery: Story = {
         </div>
       </Section>
 
-      <Section title="Filled">
+      <Section title="Soft">
         <div className="flex flex-col gap-3">
-          <TextField variant="filled" placeholder="Search...">
+          <TextField variant="soft" placeholder="Search...">
             <MagnifyingGlassIcon />
             <TextField.Input />
             <span>12 results</span>
           </TextField>
-          <TextField variant="filled" size="tiny" defaultValue="0.00">
+          <TextField variant="soft" size="tiny" defaultValue="0.00">
             <span>$</span>
             <TextField.Input />
             <span>USD</span>
@@ -212,13 +212,13 @@ export const Gallery: Story = {
         </div>
       </Section>
 
-      <Section title="Underline">
+      <Section title="Ghost">
         <div className="flex flex-col gap-3">
-          <TextField variant="underline" placeholder="Enter your email">
+          <TextField variant="ghost" placeholder="Enter your email">
             <EnvelopeIcon />
             <TextField.Input />
           </TextField>
-          <TextField variant="underline" placeholder="Enter your username">
+          <TextField variant="ghost" placeholder="Enter your username">
             <TextField.Input />
             <span>@company.com</span>
           </TextField>

@@ -19,6 +19,7 @@ import {
   FieldPopup,
   fieldListbox,
   fieldTrigger,
+  type FieldTriggerVariant,
   flattenParts,
   part,
   revealPopupOption,
@@ -28,7 +29,7 @@ import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
-export type SelectVariant = 'outline' | 'filled' | 'unstyled';
+export type SelectVariant = FieldTriggerVariant;
 type BaseProps = Omit<ComponentProps<'button'>, 'value' | 'defaultValue' | 'onChange'> & {
   placeholder?: string;
   variant?: SelectVariant;
@@ -541,8 +542,8 @@ export namespace Select {
       value: 'min-w-0 flex-1 truncate',
       icon: 'shrink-0',
       search: [
-        'mb-2 h-(--ids-size-control-standard) w-full rounded-standard bg-transparent px-3 text-body-b3-regular',
-        'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline) placeholder:text-(--ids-color-on-muted)',
+        'mb-1 h-(--ids-size-control-standard) w-full rounded-standard bg-transparent px-2.5 text-body-b3-regular',
+        'inset-ring-1 inset-ring-(--ids-color-border) placeholder:text-(--ids-color-on-muted)',
         'focus-ring',
       ],
       item: fieldListbox.option,
@@ -552,8 +553,8 @@ export namespace Select {
     variants: {
       variant: {
         outline: { trigger: fieldTrigger.variant.outline },
-        filled: { trigger: fieldTrigger.variant.filled },
-        unstyled: { trigger: fieldTrigger.variant.unstyled },
+        soft: { trigger: fieldTrigger.variant.soft },
+        ghost: { trigger: fieldTrigger.variant.ghost },
       } satisfies Record<SelectVariant, object>,
       size: {
         standard: { trigger: fieldTrigger.size.standard, icon: fieldTrigger.icon.standard },

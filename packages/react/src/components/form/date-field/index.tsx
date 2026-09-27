@@ -27,6 +27,8 @@ import {
 } from '../../data/calendar/date';
 import { useFieldSize } from '../field/context';
 
+import type { FieldSurfaceVariant } from '../../../internal/field-surface';
+
 export type DateFieldProps = Omit<
   ComponentProps<'button'>,
   'value' | 'defaultValue' | 'onChange' | 'disabled'
@@ -34,7 +36,7 @@ export type DateFieldProps = Omit<
   CalendarOptions &
   DateSelection & {
     format?: DateFieldFormat;
-    variant?: 'outline' | 'filled' | 'unstyled';
+    variant?: FieldSurfaceVariant;
     invalid?: boolean;
     required?: boolean;
     placeholder?: string;
@@ -215,6 +217,7 @@ export function DateField(props: DateFieldProps) {
     id: native.id ?? `${id}-trigger`,
     type: 'button',
     role: 'combobox',
+    ...{ 'data-field-input': '' },
     'aria-haspopup': 'dialog',
     'aria-expanded': open && !blocked,
     'aria-controls': open && !blocked ? id : undefined,
@@ -296,7 +299,11 @@ export function DateField(props: DateFieldProps) {
       <div
         ref={surface}
         data-date-field=""
-        aria-invalid={triggerProps['aria-invalid']}
+        data-invalid={
+          triggerProps['aria-invalid'] === true || triggerProps['aria-invalid'] === 'true'
+            ? ''
+            : undefined
+        }
         className={styles.root({ className })}
         style={style}
       >

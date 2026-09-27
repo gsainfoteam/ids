@@ -97,7 +97,7 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { passwo
 
 | 속성                   | 기본 / 동작                                                  |
 | ---------------------- | ------------------------------------------------------------ |
-| `variant`              | `outline`(기본) / `filled` / `unstyled`                      |
+| `variant`              | `outline`(기본) / `soft` / `ghost`                      |
 | `size`                 | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`          |
 | `invalid`              | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선          |
 | `hideVisibilityToggle` | `false`. 자동 토글만 숨김                                    |

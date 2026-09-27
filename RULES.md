@@ -172,6 +172,12 @@ only content and focus carry color. Buttons follow the same rule: only `solid` a
 the theme color, while `outline` and `ghost` stay neutral. `--ids-color-outline` is the
 theme-tinted line for the rare edge that should itself read as the brand.
 
+**Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
+TelField, ChipField, Select and the date, time and color triggers draw their box from
+`internal/field-surface.ts`. Their `variant` is intensity only: `outline` (default), `soft` (muted
+fill) and `ghost` (no fill, no border). Put `data-field-input` on the element that takes focus and
+`data-invalid` on the shell; `focus-ring` does the rest.
+
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
 

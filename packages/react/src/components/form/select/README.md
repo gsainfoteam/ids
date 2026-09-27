@@ -106,7 +106,7 @@ const methods = useForm({ defaultValues: { fruit: null, skills: [] } }); // 단�
 | `value` / `defaultValue` | 생략하면 uncontrolled. 기본 `null` / `[]`                             |
 | `onChange`               | 값 콜백                                                               |
 | `placeholder`            | `선택하세요`                                                          |
-| `variant`                | `outline`(기본) / `filled` / `unstyled`                               |
+| `variant`                | `outline`(기본) / `soft` / `ghost`                               |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`                   |
 | `mobileVariant`          | `popover`(기본) / `drawer`: 640px 미만에서 하단 팝업                  |
 | `invalid`                | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선                   |

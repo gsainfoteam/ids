@@ -18,7 +18,7 @@ import { TextArea } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['outline', 'filled', 'underline'] as const;
+const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 function Section({ title, children }: { title: string; children: ReactNode }) {

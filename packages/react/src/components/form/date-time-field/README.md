@@ -110,7 +110,7 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { when: 
 | `today`                               | 마운트 시점. 빈 값의 기준 날짜                       |
 | `locale`                              | `en-US`                                              |
 | `mobileVariant`                       | `popover`(기본) / `drawer`. 모바일에서 세로 배치     |
-| `variant`                             | `outline`(기본) / `filled` / `unstyled`              |
+| `variant`                             | `outline`(기본) / `soft` / `ghost`              |
 | `size`                                | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`  |
 | `invalid`                             | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선  |
 | `className` / `style`                 | 필드 표면으로 간다                                   |

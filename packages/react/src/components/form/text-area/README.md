@@ -76,7 +76,7 @@ import { BoldIcon, ItalicIcon, PaperAirplaneIcon } from '@heroicons/react/24/out
 
 | 속성                  | 기본 / 동작                                                           |
 | --------------------- | --------------------------------------------------------------------- |
-| `variant`             | `outline`(기본) / `filled` / `underline`                              |
+| `variant`             | `outline`(기본) / `soft` / `ghost`                              |
 | `size`                | 생략하면 `Field` 크기, 없으면 `standard`. 글자, 패딩, radius만 정하고 높이는 정하지 않는다 |
 | `invalid`             | danger 테두리와 `aria-invalid`. 명시한 `aria-invalid`(Field 포함)가 우선 |
 | `autoResize`          | `true`. 내용에 맞춰 높이 조절                                         |

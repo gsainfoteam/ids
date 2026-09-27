@@ -12,6 +12,7 @@ import {
 } from 'react';
 
 import { cn, invariant, mergeProps } from '../../utils';
+import { fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -41,39 +42,30 @@ export function part(
   }
   return createElement(tag, props, tag === 'input' ? undefined : children);
 }
-export type FieldTriggerVariant = 'outline' | 'filled' | 'unstyled';
+export type FieldTriggerVariant = FieldSurfaceVariant;
 
 // Plain class lists so a component's own `tv({ slots })` can spread them into its trigger
 // slot; every string stays literal for Tailwind.
 export const fieldTrigger = {
-  base: [
-    'flex w-full min-w-0 touch-manipulation items-center gap-2 text-left text-(--ids-color-on-surface)',
-    'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-    'disabled:cursor-not-allowed disabled:opacity-50',
-    'focus-ring',
-    'aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-color-danger)',
-  ],
-  variant: {
-    outline: 'bg-transparent shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
-    filled:
-      'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent focus-visible:bg-(--ids-color-primary)/15',
-    unstyled: 'bg-transparent',
-  } satisfies Record<FieldTriggerVariant, string>,
-  size: {
-    standard: 'h-(--ids-size-control-standard) rounded-standard px-3 text-body-b3-regular',
-    tiny: 'h-(--ids-size-control-tiny) rounded-standard px-2 text-caption-c1-regular',
-  } satisfies Record<IdsSize, string>,
+  base: ['flex w-full min-w-0 touch-manipulation items-center text-start', fieldSurface.base],
+  variant: fieldSurface.variant,
+  size: fieldSurface.size,
   icon: {
     standard: 'size-(--ids-size-icon-standard)',
     tiny: 'size-(--ids-size-icon-tiny)',
   } satisfies Record<IdsSize, string>,
 } as const;
 
+// Options highlight with the neutral muted fill, like a menu, and the selected one is marked by
+// weight; the theme color is left to the trigger's focus.
 export const fieldListbox = {
-  option:
-    'flex cursor-default items-center rounded-standard px-3 py-2 wrap-anywhere data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-50',
-  heading: 'px-3 py-2 text-caption-c1-regular text-(--ids-color-on-muted)',
-  empty: 'p-3 text-body-b3-regular',
+  option: [
+    'flex cursor-default items-center gap-2 rounded-standard px-2.5 py-1.5 outline-none select-none wrap-anywhere',
+    'data-active:bg-(--ids-color-muted) aria-selected:font-medium',
+    'aria-disabled:pointer-events-none aria-disabled:opacity-50',
+  ],
+  heading: 'px-2.5 pt-2 pb-1 text-caption-c1-medium text-(--ids-color-on-muted)',
+  empty: 'px-2.5 py-6 text-center text-body-b3-regular text-(--ids-color-on-muted)',
 } as const;
 
 /** Internal field popup. Native top layer preserves inherited IDS theme and avoids clipping. */
@@ -165,7 +157,7 @@ export function FieldPopup({
       className={cn(
         // A real border, not inset-ring: on a scroll container the inset shadow is painted
         // under the content, so highlighted options scrolling past the edge would hide it.
-        'text-body-b3-regular fixed z-50 m-0 overflow-auto overscroll-contain concentric-p-2 border border-(--ids-color-outline) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-lg [overflow-anchor:none]',
+        'text-body-b3-regular concentric-p-1 fixed z-50 m-0 overflow-auto overscroll-contain border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-md [overflow-anchor:none]',
         props.className,
       )}
       style={{ ...props.style, position: 'fixed' }}

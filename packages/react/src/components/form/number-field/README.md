@@ -138,7 +138,7 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { quanti
 | `min` / `max`                                    | 제한 없음. `min <= max`                                           |
 | `step` / `largeStep`                             | `1` / `step * 10`. 양수                                           |
 | `locale` / `formatOptions`                       | `en-US` / `Intl.NumberFormat` 옵션                                |
-| `variant`                                        | `outline`(기본) / `filled` / `unstyled`. unstyled도 포커스 링 유지 |
+| `variant`                                        | `outline`(기본) / `soft` / `ghost`. ghost도 포커스 링 유지 |
 | `size`                                           | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`             |
 | `invalid`                                        | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선               |
 | `hideStepper`                                    | `false`. 자동 Stepper만 숨김                                      |

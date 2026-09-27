@@ -34,7 +34,7 @@ const [color, setColor] = useState('');
 <ColorField variant="default" />                       // 채도/명도 영역 + 색조 + 텍스트 입력
 <ColorField variant="compact" />                       // 채도/명도 영역 없이
 <ColorField variant="swatchOnly" swatches={palette} /> // swatches만
-<ColorField surfaceVariant="filled" />                 // 필드 표면: outline(기본) / filled / unstyled
+<ColorField surfaceVariant="soft" />                   // 필드 표면: outline(기본) / soft / ghost
 // 팝업 편집은 바로 onChange를 부른다. Esc, 닫기 버튼, 바깥 클릭으로 닫고 바뀐 값은 되돌리지 않는다
 // 텍스트 입력은 불완전한 값을 편집 중에 유지하고, 유효한 색일 때만 onChange. blur/Enter에서 형식을 정리한다
 ```
@@ -94,7 +94,7 @@ const methods = useForm({ defaultValues: { color: '' } });
 | `alpha`                  | `false`. 투명도 포함 형식과 슬라이더                          |
 | `swatches`               | 팔레트 색 목록. 읽을 수 없는 항목은 건너뛴다                  |
 | `variant`                | 패널: `default`(기본) / `compact` / `swatchOnly`              |
-| `surfaceVariant`         | 표면: `outline`(기본) / `filled` / `unstyled`                 |
+| `surfaceVariant`         | 표면: `outline`(기본) / `soft` / `ghost`                 |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`           |
 | `mobileVariant`          | `popover`(기본) / `drawer`: 640px 미만에서 하단 팝업          |
 | `placeholder`            | `색상 선택`                                                   |

@@ -13,13 +13,14 @@ import {
 import { isNotNil } from 'es-toolkit';
 
 import { useAutoResize } from './use-auto-resize';
+import { fieldSurface, type FieldSurfaceVariant } from '../../../internal/field-surface';
 import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { Slot } from '../../utility/slot';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
-export type TextAreaVariant = 'outline' | 'filled' | 'underline';
+export type TextAreaVariant = FieldSurfaceVariant;
 
 export type TextAreaResize = 'none' | 'vertical' | 'horizontal' | 'both';
 
@@ -158,17 +159,12 @@ export function TextArea({
 export namespace TextArea {
   export const Style = tv({
     slots: {
-      root: [
-        'flex w-full min-w-0 flex-col overflow-hidden',
-        // Not transition-all: the root carries the resize handle, and animating its
-        // width/height makes the field lag behind the pointer while dragging.
-        'bg-transparent text-(--ids-color-on-surface)',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
-      ],
+      // Not transition-all: the root carries the resize handle, and animating its width or
+      // height makes the field lag behind the pointer while dragging.
+      root: ['flex w-full min-w-0 flex-col overflow-hidden rounded-standard', fieldSurface.base],
       bar: [
         'flex shrink-0 items-center empty:hidden',
-        'border-(--ids-color-outline)',
+        'border-(--ids-color-border)',
         'not-has-[button]:text-(--ids-color-on-muted)',
         '[&_svg]:shrink-0',
         '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
@@ -183,29 +179,10 @@ export namespace TextArea {
     },
     variants: {
       variant: {
-        outline: {
-          root: [
-            'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
-            'data-invalid:inset-ring-(--ids-color-danger)',
-            'focus-ring',
-          ],
-        },
-        filled: {
-          root: [
-            'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
-            'has-[[data-text-area-input]:focus-visible]:bg-(--ids-color-primary)/15',
-            'data-invalid:inset-ring-(--ids-color-danger)',
-            'focus-ring',
-          ],
-        },
-        underline: {
-          root: [
-            'rounded-none border-b-2 border-(--ids-color-outline)',
-            'has-[[data-text-area-input]:focus-visible]:border-(--ids-color-primary)',
-            'data-invalid:border-(--ids-color-danger)',
-          ],
-        },
-      },
+        outline: { root: fieldSurface.variant.outline },
+        soft: { root: fieldSurface.variant.soft },
+        ghost: { root: fieldSurface.variant.ghost },
+      } satisfies Record<TextAreaVariant, object>,
       size: {
         standard: {
           root: 'text-body-b3-regular',
@@ -231,12 +208,6 @@ export namespace TextArea {
         both: { root: 'resize' },
       },
     },
-    compoundVariants: [
-      { variant: 'outline', size: 'standard', class: { root: 'rounded-standard' } },
-      { variant: 'outline', size: 'tiny', class: { root: 'rounded-standard' } },
-      { variant: 'filled', size: 'standard', class: { root: 'rounded-standard' } },
-      { variant: 'filled', size: 'tiny', class: { root: 'rounded-standard' } },
-    ],
     defaultVariants: {
       variant: 'outline',
       size: 'standard',

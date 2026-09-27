@@ -25,6 +25,7 @@ import {
   type CountryCode,
 } from 'libphonenumber-js/min';
 
+import { fieldSurface, type FieldSurfaceVariant } from '../../../internal/field-surface';
 import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { useFieldSize } from '../field/context';
 import { Select } from '../select';
@@ -41,7 +42,7 @@ export type TelFieldProps = Omit<
   onChange?: (value: string) => void;
   defaultCountry?: CountryCode;
   format?: TelFieldFormat;
-  variant?: 'outline' | 'filled' | 'unstyled';
+  variant?: FieldSurfaceVariant;
   size?: IdsSize;
   invalid?: boolean;
 };
@@ -93,6 +94,7 @@ function TelInput({ asChild, children, ref, ...rest }: TelField.InputProps) {
   const actual: ComponentProps<'input'> = {
     ...native,
     'data-tel-field-input': '',
+    'data-field-input': '',
     id: native.id ?? field.id,
     type: 'tel',
     name: undefined,
@@ -145,7 +147,7 @@ function TelCountrySelect({ asChild, children, ...props }: TelField.CountrySelec
       disabled={c.disabled}
       readOnly={c.readOnly}
       size={c.size}
-      variant="unstyled"
+      variant="ghost"
       className={country()}
     >
       <Select.Trigger {...props} asChild={asChild}>
@@ -404,7 +406,9 @@ export function TelField({
       <div
         data-tel-field=""
         data-size={resolvedSize}
-        aria-invalid={ariaInvalid}
+        data-invalid={
+          ariaInvalid != null && ariaInvalid !== false && ariaInvalid !== 'false' ? '' : undefined
+        }
         className={styles.root({ className })}
         style={style}
       >
@@ -433,18 +437,7 @@ export namespace TelField {
   export const CountrySelect = TelCountrySelect;
   export const Style = tv({
     slots: {
-      root: [
-        'flex w-full min-w-0 touch-manipulation items-center text-left',
-        'bg-transparent text-(--ids-color-on-surface)',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-        'motion-reduce:transition-none',
-        // Keyed to the tel input so the country trigger and its popup search field,
-        // which render inside the shell, do not ring it as well.
-        'has-[[data-tel-field-input]:focus-visible]:ring-[3px]',
-        'has-[[data-tel-field-input]:focus-visible]:ring-(--ids-color-primary)/40',
-        'aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-color-danger)',
-        'aria-invalid:has-[[data-tel-field-input]:focus-visible]:ring-(--ids-color-danger)/40',
-      ],
+      root: ['flex w-full min-w-0 touch-manipulation items-center text-start', fieldSurface.base],
       input: [
         'h-full w-full min-w-0 flex-1 bg-transparent outline-none',
         'text-inherit placeholder:text-(--ids-color-on-muted)',
@@ -464,18 +457,13 @@ export namespace TelField {
     },
     variants: {
       variant: {
-        outline: { root: 'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)' },
-        filled: {
-          root: [
-            'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
-            'has-[[data-tel-field-input]:focus-visible]:bg-(--ids-color-primary)/15',
-          ],
-        },
-        unstyled: {},
+        outline: { root: fieldSurface.variant.outline },
+        soft: { root: fieldSurface.variant.soft },
+        ghost: { root: fieldSurface.variant.ghost },
       } satisfies Record<NonNullable<TelFieldProps['variant']>, object>,
       size: {
         standard: {
-          root: 'h-(--ids-size-control-standard) gap-2 rounded-standard px-3 text-body-b3-regular',
+          root: fieldSurface.size.standard,
           adornment: [
             'gap-1',
             'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
@@ -483,7 +471,7 @@ export namespace TelField {
           countryIcon: 'size-(--ids-size-icon-standard)',
         },
         tiny: {
-          root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-2 text-caption-c1-regular',
+          root: fieldSurface.size.tiny,
           adornment: [
             'gap-0.5',
             'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',

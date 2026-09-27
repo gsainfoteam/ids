@@ -22,6 +22,7 @@ import {
   FieldPopup,
   fieldListbox,
   fieldTrigger,
+  type FieldTriggerVariant,
   flattenParts,
   part,
   revealPopupOption,
@@ -35,7 +36,7 @@ import type { IdsSize } from '../../../tokens/types';
 type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
 type Option = { value: string; label: string; disabled?: boolean };
 
-export type ChipFieldVariant = 'outline' | 'filled' | 'unstyled';
+export type ChipFieldVariant = FieldTriggerVariant;
 
 // `name`, `form` and `required` describe the submitted chips, not the typed query, so they
 // stay on the root: a named query input would submit the half-typed search text.
@@ -69,7 +70,7 @@ type ContextValue = {
   query: string;
   inputProps: ChipFieldInputProps;
   inputDefaults: InputAttributes;
-  control: InputAttributes & { 'data-chip-field-input': string };
+  control: InputAttributes & { 'data-chip-field-input': string; 'data-field-input': string };
   inputRef: RefObject<HTMLInputElement | null>;
   choose: (value: string) => void;
   remove: (value: string) => void;
@@ -479,6 +480,7 @@ export function ChipField({
   const expanded = open && !blocked;
   const control: ContextValue['control'] = {
     'data-chip-field-input': '',
+    'data-field-input': '',
     id: typeof merged.id === 'string' ? merged.id : `${id}-input`,
     form,
     type: 'text',
@@ -647,13 +649,7 @@ export namespace ChipField {
   }
   export const Style = tv({
     slots: {
-      root: [
-        ...fieldTrigger.base,
-        'flex-wrap gap-1 py-1',
-        // The utility only recognises TextField/TextArea inputs, so the shell rings for its
-        // own Input here. Scoped to the Input so a focused chip button rings alone.
-        'has-[[data-chip-field-input]:focus-visible]:ring-[3px] has-[[data-chip-field-input]:focus-visible]:ring-(--ids-color-primary)/40',
-      ],
+      root: [...fieldTrigger.base, 'flex-wrap gap-1 py-1'],
       adornment: [
         'inline-flex shrink-0 items-center empty:hidden',
         'not-has-[button]:text-(--ids-color-on-muted)',
@@ -661,7 +657,7 @@ export namespace ChipField {
         '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
         '[&_button]:p-0',
       ],
-      chip: 'inline-flex max-w-full items-center gap-1 rounded-standard bg-(--ids-color-primary)/10',
+      chip: 'inline-flex max-w-full items-center gap-1 rounded-standard bg-(--ids-color-muted)',
       chipLabel: 'truncate',
       chipRemove:
         'shrink-0 cursor-pointer rounded-indicator px-0.5 focus-ring disabled:cursor-not-allowed disabled:opacity-50',
@@ -678,13 +674,8 @@ export namespace ChipField {
     variants: {
       variant: {
         outline: { root: fieldTrigger.variant.outline },
-        filled: {
-          root: [
-            fieldTrigger.variant.filled,
-            'has-[[data-chip-field-input]:focus-visible]:bg-(--ids-color-primary)/15',
-          ],
-        },
-        unstyled: { root: fieldTrigger.variant.unstyled },
+        soft: { root: fieldTrigger.variant.soft },
+        ghost: { root: fieldTrigger.variant.ghost },
       } satisfies Record<ChipFieldVariant, object>,
       // The shell grows with wrapped chips, so the control height is a floor, not a height.
       size: {

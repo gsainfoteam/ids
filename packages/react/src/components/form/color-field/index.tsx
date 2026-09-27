@@ -15,6 +15,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { parseColor, serializeColor, type ColorFormat } from './color';
 import { ColorControls, type ColorControlsProps } from './color-controls';
 import { FieldPopup, flattenParts, part } from '../../../internal/field-popup';
+import { fieldSurface, type FieldSurfaceVariant } from '../../../internal/field-surface';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -30,7 +31,7 @@ export type ColorFieldProps = Omit<
   alpha?: boolean;
   swatches?: string[];
   variant?: 'default' | 'compact' | 'swatchOnly';
-  surfaceVariant?: 'outline' | 'filled' | 'unstyled';
+  surfaceVariant?: FieldSurfaceVariant;
   size?: IdsSize;
   invalid?: boolean;
   readOnly?: boolean;
@@ -184,6 +185,7 @@ export function ColorField({
     id: native.id ?? `${id}-trigger`,
     type: 'button',
     'aria-haspopup': 'dialog',
+    ...{ 'data-field-input': '' },
     'aria-expanded': open && !blocked,
     'aria-controls': open && !blocked ? id : undefined,
     'aria-invalid': native['aria-invalid'] ?? invalid ?? (!!current && !parsed),
@@ -242,7 +244,11 @@ export function ColorField({
       <div
         ref={surface}
         data-color-field=""
-        aria-invalid={triggerProps['aria-invalid']}
+        data-invalid={
+          triggerProps['aria-invalid'] === true || triggerProps['aria-invalid'] === 'true'
+            ? ''
+            : undefined
+        }
         className={styles.root({ className })}
         style={style}
       >
@@ -307,19 +313,14 @@ export namespace ColorField {
   export const Clear = ColorClear;
   export const Style = tv({
     slots: {
-      // The shell is a div around two buttons, so it cannot use `focus-ring` and lights up for
-      // whichever of them has keyboard focus.
-      root: [
-        'flex w-full min-w-0 items-center text-(--ids-color-on-surface)',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-(--ids-color-primary)/40',
-        'aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-color-danger)',
-      ],
+      // The trigger carries data-field-input, so focus-ring rings the shell for the trigger
+      // only and Clear shows its own ring.
+      root: ['flex w-full min-w-0 items-center', fieldSurface.base],
       trigger: [
         'flex h-full min-w-0 flex-1 touch-manipulation items-center text-left outline-none',
         'cursor-pointer disabled:cursor-not-allowed disabled:opacity-50',
       ],
-      swatch: 'shrink-0 rounded-indicator inset-ring-1 inset-ring-(--ids-color-outline)',
+      swatch: 'shrink-0 rounded-indicator inset-ring-1 inset-ring-(--ids-color-border)',
       value: 'min-w-0 flex-1 truncate font-mono',
       clear: [
         'inline-flex shrink-0 cursor-pointer items-center justify-center text-(--ids-color-on-muted)',
@@ -334,10 +335,10 @@ export namespace ColorField {
     },
     variants: {
       surfaceVariant: {
-        outline: { root: 'bg-transparent shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)' },
-        filled: { root: 'bg-(--ids-color-primary)/10' },
-        unstyled: { root: 'bg-transparent' },
-      },
+        outline: { root: fieldSurface.variant.outline },
+        soft: { root: fieldSurface.variant.soft },
+        ghost: { root: fieldSurface.variant.ghost },
+      } satisfies Record<FieldSurfaceVariant, object>,
       size: {
         standard: {
           root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',

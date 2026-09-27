@@ -17,21 +17,15 @@ import { validateTime } from '../../components/data/time-picker/time';
 import { useFieldSize } from '../../components/form/field/context';
 import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { FieldPopup, flattenParts, part } from '../field-popup';
+import { fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 
 import type { IdsSize } from '../../tokens/types';
 
 export const temporalFieldStyle = tv({
   slots: {
-    root: [
-      'inline-flex w-full min-w-0 items-center bg-transparent text-(--ids-color-on-surface)',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-      'motion-reduce:transition-none',
-      // The shell wraps a native combobox button, which focus-ring's :has() triggers do not
-      // match. Scoping to the combobox keeps the shell quiet while Clear shows its own ring.
-      'has-[[role=combobox]:focus-visible]:ring-[3px]',
-      'has-[[role=combobox]:focus-visible]:ring-(--ids-color-primary)/40',
-      'aria-invalid:inset-ring-1 aria-invalid:inset-ring-(--ids-color-danger)',
-    ],
+    // The trigger carries data-field-input, so focus-ring rings the shell for the trigger
+    // only and Clear shows its own ring.
+    root: ['inline-flex w-full min-w-0 items-center', fieldSurface.base],
     trigger: [
       'flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center self-stretch',
       'bg-transparent text-left outline-none',
@@ -41,7 +35,7 @@ export const temporalFieldStyle = tv({
     value: 'min-w-0 flex-1 truncate',
     clear: [
       'me-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
-      'text-(--ids-color-on-muted) enabled:hover:bg-(--ids-color-primary)/10',
+      'text-(--ids-color-on-muted) enabled:hover:bg-(--ids-color-muted)',
       'enabled:hover:text-(--ids-color-on-surface)',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
@@ -52,7 +46,7 @@ export const temporalFieldStyle = tv({
     popupTitle: 'text-body-b3-medium',
     popupClose: [
       'inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-standard',
-      'text-(--ids-color-on-muted) hover:bg-(--ids-color-primary)/10',
+      'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted)',
       'hover:text-(--ids-color-on-surface)',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
@@ -62,10 +56,10 @@ export const temporalFieldStyle = tv({
   },
   variants: {
     variant: {
-      outline: { root: 'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)' },
-      filled: { root: 'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent' },
-      unstyled: {},
-    },
+      outline: { root: fieldSurface.variant.outline },
+      soft: { root: fieldSurface.variant.soft },
+      ghost: { root: fieldSurface.variant.ghost },
+    } satisfies Record<FieldSurfaceVariant, object>,
     size: {
       standard: {
         root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
@@ -100,7 +94,7 @@ export type TemporalFieldProps = Omit<
   value?: Date | null;
   defaultValue?: Date | null;
   onChange?: (value: Date | null) => void;
-  variant?: 'outline' | 'filled' | 'unstyled';
+  variant?: FieldSurfaceVariant;
   size?: IdsSize;
   invalid?: boolean;
   required?: boolean;
@@ -264,6 +258,7 @@ export function TemporalField({
     id: native.id ?? `${id}-trigger`,
     type: 'button',
     role: 'combobox',
+    ...{ 'data-field-input': '' },
     'aria-haspopup': 'dialog',
     'aria-expanded': open && !blocked,
     'aria-controls': open && !blocked ? id : undefined,
@@ -320,7 +315,11 @@ export function TemporalField({
       <div
         ref={surface}
         data-temporal-field=""
-        aria-invalid={triggerProps['aria-invalid']}
+        data-invalid={
+          triggerProps['aria-invalid'] === true || triggerProps['aria-invalid'] === 'true'
+            ? ''
+            : undefined
+        }
         className={styles.root({ className })}
         style={style}
       >

@@ -2,7 +2,7 @@
 
 - 한 줄 입력과 그 앞뒤의 아이콘, 텍스트, 버튼을 담는 컨테이너
 - sentinel `TextField.Input` 합성: Input 앞 자식은 leading, 뒤 자식은 trailing
-- `outline` / `filled` / `underline`, 크기는 `Field`를 따른다
+- `outline` / `soft` / `ghost`, 크기는 `Field`를 따른다
 - `Field`, react-hook-form과 연결된다
 
 ```tsx
@@ -70,7 +70,7 @@ import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 ## 크기와 variant
 
 ```tsx
-<TextField variant="filled" />        // outline(기본) / filled / underline
+<TextField variant="soft" />          // outline(기본) / soft / ghost
 <TextField size="tiny" />             // standard(36px, body-b3) / tiny(32px, caption-c1)
 
 <Field size="tiny">
@@ -83,7 +83,7 @@ import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 | 속성                  | 기본 / 동작                                           |
 | --------------------- | ----------------------------------------------------- |
-| `variant`             | `outline`(기본) / `filled` / `underline`              |
+| `variant`             | `outline`(기본) / `soft` / `ghost`              |
 | `size`                | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard` |
 | `disabled`            | 컨테이너와 input에 함께 적용. Input의 값이 우선       |
 | `className` / `style` | 컨테이너로 간다. Input에 주면 input으로 간다          |

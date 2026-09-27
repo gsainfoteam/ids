@@ -98,7 +98,7 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { phone:
 | `onChange`               | `(value: string) => void`                                    |
 | `format`                 | `auto`(기본) / `international` / `none`                      |
 | `defaultCountry`         | `KR`. 지원하는 ISO alpha-2 코드                              |
-| `variant`                | `outline`(기본) / `filled` / `unstyled`                      |
+| `variant`                | `outline`(기본) / `soft` / `ghost`                      |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`        |
 | `invalid`                | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선          |
 | `disabled` / `readOnly`  | input과 국가 선택에 함께 적용                                |

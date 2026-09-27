@@ -140,7 +140,7 @@ const methods = useForm({ defaultValues: { tags: [] as string[] } });
 | `onChange`               | 선택값 `string[]` 콜백                                        |
 | `creatable` / `onCreate` | `false`. `creatable`이면 `onCreate` 필수                      |
 | `maxCount`               | 0 이상 정수. 새 선택만 제한                                   |
-| `variant`                | `outline`(기본) / `filled` / `unstyled`                       |
+| `variant`                | `outline`(기본) / `soft` / `ghost`                       |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`           |
 | `mobileVariant`          | `drawer`(기본): 640px 미만에서 하단 팝업 / `popover`          |
 | `invalid`                | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선           |
