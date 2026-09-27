@@ -1,10 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
+import { messages } from '../../../internal/messages';
 import { isDevelopment } from '../../../utils/dev';
-import { IconButton } from '../../action/icon-button';
-import { useFieldSize } from '../field/context';
 import { NumberField, type NumberFieldProps } from '../number-field';
 import { PasswordField, type PasswordFieldProps } from '../password-field';
 import { TelField, type TelFieldProps } from '../tel-field';
@@ -12,24 +11,31 @@ import { TextField } from '../text-field';
 
 type TextInputProps = Omit<TextField.Props, 'type'> & {
   type?: 'text' | 'email' | 'url' | 'search';
-  invalid?: boolean;
 };
+
 export type InputProps =
   | TextInputProps
   | ({ type: 'number' } & NumberFieldProps)
   | ({ type: 'password' } & PasswordFieldProps)
   | ({ type: 'tel' } & TelFieldProps);
 
-/** Dispatches a schema's input type without changing the delegated field's value contract. */
+const SUPPORTED = ['text', 'email', 'url', 'search', 'number', 'password', 'tel'];
+
+// Addresses are typed exactly: a capital or a "corrected" word breaks them, so the phone
+// keyboard is told to leave them alone.
+const addressHints = { autoCapitalize: 'none', autoCorrect: 'off', spellCheck: false } as const;
+
+/** Dispatches a schema's input type to the IDS field built for it, keeping that field's API. */
 export function Input(props: InputProps) {
   const { type = 'text' } = props;
-  const supported = ['text', 'email', 'url', 'search', 'number', 'password', 'tel'].includes(type);
+  const supported = SUPPORTED.includes(type);
   useEffect(() => {
     if (isDevelopment && !supported)
       console.warn(
         `[IDS] Input: unsupported type "${type}"; using text. Use the dedicated field for dates, times, colors, files and OTP.`,
       );
   }, [supported, type]);
+
   if (props.type === 'number') {
     const { type: _type, ...rest } = props;
     return <NumberField {...rest} />;
@@ -42,47 +48,23 @@ export function Input(props: InputProps) {
     const { type: _type, ...rest } = props;
     return <TelField {...rest} />;
   }
-  const { invalid, type: _type, ...rest } = props;
-  const native = { ...rest, 'aria-invalid': rest['aria-invalid'] ?? invalid };
-  if (type === 'search') return <SearchInput {...native} />;
-  return <TextField {...native} type={supported ? type : 'text'} />;
-}
-
-function SearchInput({ size, ...props }: TextField.Props) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const { type: _type, children, ...rest } = props;
+  if (type === 'search')
+    return (
+      <TextField enterKeyHint="search" {...rest} type="search">
+        {children ?? (
+          <>
+            <MagnifyingGlassIcon />
+            <TextField.Input />
+            <TextField.Clear aria-label={messages.input.clearSearch} />
+          </>
+        )}
+      </TextField>
+    );
+  const hints = type === 'email' || type === 'url' ? addressHints : undefined;
   return (
-    <TextField {...props} size={resolvedSize}>
-      <TextField.Input
-        type="search"
-        ref={inputRef}
-        className="[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
-      />
-      <IconButton
-        type="button"
-        aria-label="검색어 지우기"
-        icon={<XMarkIcon aria-hidden="true" />}
-        variant="ghost"
-        size={resolvedSize}
-        disabled={props.disabled || props.readOnly}
-        onPointerDown={(event) => {
-          if (event.button === 0) event.preventDefault();
-        }}
-        onClick={() => {
-          const input = inputRef.current;
-          if (!input) return;
-          input.focus({ preventScroll: true });
-          if (!input.value) return;
-          // Use a native input event so both React and native RHF registration observe clear.
-          // The owner window also supports inputs rendered into another document.
-          const view = input.ownerDocument.defaultView!;
-          Object.getOwnPropertyDescriptor(view.HTMLInputElement.prototype, 'value')!.set!.call(
-            input,
-            '',
-          );
-          input.dispatchEvent(new view.Event('input', { bubbles: true }));
-        }}
-      />
+    <TextField {...hints} {...rest} type={supported ? type : 'text'}>
+      {children}
     </TextField>
   );
 }

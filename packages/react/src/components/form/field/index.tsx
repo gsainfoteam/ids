@@ -2,84 +2,141 @@ import {
   Children,
   Fragment,
   cloneElement,
-  createElement,
   createContext,
+  createElement,
   isValidElement,
-  useContext,
+  use,
   useEffect,
   useId,
   type ComponentProps,
-  type HTMLAttributes,
-  type Ref,
+  type CSSProperties,
   type ReactElement,
   type ReactNode,
 } from 'react';
 
-import { FieldSizeContext } from './context';
+import { isString, uniq } from 'es-toolkit';
+
+import {
+  FieldNotifyContext,
+  FieldSizeContext,
+  FieldStateContext,
+  type FieldOrientation,
+  type FieldState,
+} from './context';
+import { useField } from './use-field';
 import { invariant, mergeProps, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
+import type { FieldValidity, FieldValidityKey } from './control-state';
 import type { IdsSize } from '../../../tokens/types';
 
-export type FieldProps = Omit<ComponentProps<'div'>, 'children'> & {
+export type { FieldOrientation, FieldState } from './context';
+export type { FieldValidity, FieldValidityKey } from './control-state';
+
+type StateValue<S, T> = T | ((state: S) => T);
+
+type PartOwnProps<S> = {
+  asChild?: boolean;
+  className?: StateValue<S, string | undefined>;
+  style?: StateValue<S, CSSProperties | undefined>;
+  children?: StateValue<S, ReactNode>;
+};
+type PartProps<Tag extends 'label' | 'div', S> = Omit<ComponentProps<Tag>, keyof PartOwnProps<S>> &
+  PartOwnProps<S>;
+
+export type FieldProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 'style'> & {
   children: ReactNode;
-  variant?: 'vertical' | 'horizontal';
+  orientation?: FieldOrientation;
+  /** @deprecated Use `orientation`. */
+  variant?: FieldOrientation;
   size?: IdsSize;
   invalid?: boolean;
   disabled?: boolean;
   required?: boolean;
+  dirty?: boolean;
+  touched?: boolean;
   /** Forwarded to the control. For automatic registration use /react-hook-form. */
   name?: string;
+  className?: StateValue<FieldState, string | undefined>;
+  style?: StateValue<FieldState, CSSProperties | undefined>;
 };
 
-type PartName = 'label' | 'description' | 'hint' | 'error';
-type PartProps = HTMLAttributes<HTMLElement> & {
-  asChild?: boolean;
-  ref?: Ref<HTMLElement>;
-  htmlFor?: string;
+export type FieldErrorState = FieldState & {
+  message: ReactNode;
+  validity: FieldValidity['flags'] | null;
 };
+
 type ControlProps = Record<string, unknown>;
+type PartName = 'label' | 'description' | 'hint' | 'error';
+
 type FieldContextValue = {
   controlId: string;
-  ids: Partial<Record<PartName, string>>;
-  invalid: boolean;
-  required: boolean;
-  disabled: boolean;
-  errorMessage?: ReactNode;
+  state: FieldState;
+  errorMessage: ReactNode;
+  validity: FieldValidity | null;
+  styles: ReturnType<typeof Field.Style>;
 };
+
 const FieldContext = createContext<FieldContextValue | null>(null);
 
-function FieldPart({
-  part,
-  asChild,
-  children,
-  className,
-  ...rest
-}: PartProps & { part: PartName }) {
-  const context = useContext(FieldContext);
-  invariant(context, `[IDS] Field.${part} must be inside Field.`);
-  if ((part === 'hint' && context.invalid) || (part === 'error' && !context.invalid)) return null;
-  const content = part === 'error' ? (children ?? context.errorMessage) : children;
-  const styles = fieldStyle({ invalid: context.invalid, disabled: context.disabled });
-  const props = {
-    ...rest,
-    id: context.ids[part],
-    htmlFor: part === 'label' ? context.controlId : undefined,
-    'data-field-part': part,
-    className: styles[part]({ className }),
+function usePart(name: string) {
+  const context = use(FieldContext);
+  invariant(context, `Field.${name} must be inside Field.`);
+  return context;
+}
+
+function resolve<S, T>(value: StateValue<S, T>, state: S): T {
+  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
+}
+
+function present(value: ReactNode) {
+  return value != null && value !== false && value !== '';
+}
+
+function stateAttributes(state: FieldState) {
+  return {
+    'data-orientation': state.orientation,
+    'data-size': state.size,
+    'data-invalid': state.invalid ? '' : undefined,
+    'data-disabled': state.disabled ? '' : undefined,
+    'data-required': state.required ? '' : undefined,
+    'data-filled': state.filled ? '' : undefined,
+    'data-focused': state.focused ? '' : undefined,
+    'data-touched': state.touched ? '' : undefined,
+    'data-dirty': state.dirty ? '' : undefined,
   };
-  const marker =
-    part === 'label' && context.required ? (
-      <span aria-hidden="true" className={styles.marker()}>
-        *
-      </span>
-    ) : null;
+}
+
+// FieldRoot decides which errors reach aria-describedby with the same rule the part renders by,
+// so the description never points at an error that is not on screen.
+function errorShown(
+  { match, children }: { match?: FieldValidityKey; children?: unknown },
+  { state, errorMessage, validity }: Pick<FieldContextValue, 'state' | 'errorMessage' | 'validity'>,
+) {
+  if (!state.invalid) return false;
+  if (match !== undefined) return validity?.flags[match] === true;
+  return (
+    typeof children === 'function' ||
+    present(children as ReactNode) ||
+    present(errorMessage) ||
+    present(validity?.message)
+  );
+}
+
+function renderPart(
+  name: string,
+  tag: 'label' | 'div',
+  asChild: boolean | undefined,
+  props: Record<string, unknown>,
+  content: ReactNode,
+  marker?: ReactNode,
+) {
   if (asChild) {
     invariant(
-      isValidElement<PartProps>(content),
-      `[IDS] Field.${part} asChild requires one element.`,
+      isValidElement<{ children?: ReactNode }>(content),
+      `Field.${name} asChild requires one element.`,
     );
-    const merged = mergeProps(content.props as unknown as Record<string, unknown>, props);
+    const merged = mergeProps(content.props as Record<string, unknown>, props);
     return cloneElement(
       content,
       merged,
@@ -93,27 +150,8 @@ function FieldPart({
       ),
     );
   }
-  return createElement(part === 'label' ? 'label' : 'div', props, content, marker);
+  return createElement(tag, props, content, marker);
 }
-
-function FieldLabel(props: ComponentProps<'label'> & { asChild?: boolean }) {
-  return <FieldPart {...props} part="label" />;
-}
-function FieldDescription(props: ComponentProps<'div'> & { asChild?: boolean }) {
-  return <FieldPart {...props} part="description" />;
-}
-function FieldHint(props: ComponentProps<'div'> & { asChild?: boolean }) {
-  return <FieldPart {...props} part="hint" />;
-}
-function FieldError(props: ComponentProps<'div'> & { asChild?: boolean }) {
-  return <FieldPart {...props} part="error" />;
-}
-const parts = new Map<unknown, PartName>([
-  [FieldLabel, 'label'],
-  [FieldDescription, 'description'],
-  [FieldHint, 'hint'],
-  [FieldError, 'error'],
-]);
 
 function flatten(children: ReactNode): ReactElement<ControlProps>[] {
   return Children.toArray(children).flatMap((child) => {
@@ -121,68 +159,11 @@ function flatten(children: ReactNode): ReactElement<ControlProps>[] {
     return child.type === Fragment ? flatten(child.props.children as ReactNode) : [child];
   });
 }
-function joinIds(...values: unknown[]) {
-  return (
-    [
-      ...new Set(
-        values
-          .filter((value) => typeof value === 'string')
-          .flatMap((value) => (value as string).split(/\s+/))
-          .filter(Boolean),
-      ),
-    ].join(' ') || undefined
-  );
-}
 
-const fieldStyle = tv({
-  slots: {
-    root: 'grid min-w-0 gap-x-3 gap-y-1.5',
-    label: 'font-medium text-(--ids-color-on-surface)',
-    description: 'text-(--ids-color-on-muted)',
-    hint: 'text-(--ids-color-on-muted)',
-    error: 'text-(--ids-color-danger)',
-    marker: 'ml-1 text-(--ids-color-danger)',
-    control: 'min-w-0 [&>input:not([type=checkbox]):not([type=radio])]:w-full [&>textarea]:w-full',
-  },
-  variants: {
-    size: {
-      standard: { root: 'text-body-b3-regular' },
-      tiny: { root: 'text-caption-c1-regular' },
-    } satisfies Record<IdsSize, object>,
-    variant: {
-      vertical: {},
-      horizontal: {
-        root: 'grid-cols-[auto_minmax(0,1fr)] [&>:not([data-field-part=label])]:col-start-2 [&>[data-field-part=label]]:col-start-1 [&>[data-field-part=label]]:self-center',
-      },
-    },
-    // A horizontal label lines up with the control, which sits below the description.
-    described: { true: {}, false: {} },
-    invalid: {
-      true: { label: 'text-(--ids-color-danger)' },
-    },
-    disabled: {
-      true: {
-        label: 'opacity-50',
-        description: 'opacity-50',
-        hint: 'opacity-50',
-        error: 'opacity-50',
-      },
-    },
-  },
-  compoundVariants: [
-    {
-      variant: 'horizontal',
-      described: true,
-      class: { root: '[&>[data-field-part=label]]:row-start-2' },
-    },
-    {
-      variant: 'horizontal',
-      described: false,
-      class: { root: '[&>[data-field-part=label]]:row-start-1' },
-    },
-  ],
-  defaultVariants: { size: 'standard', variant: 'vertical' },
-});
+function joinIds(...values: unknown[]) {
+  const ids = values.filter(isString).flatMap((value) => value.split(/\s+/));
+  return uniq(ids.filter(Boolean)).join(' ') || undefined;
+}
 
 /** Internal bridge shared with the optional RHF entry point. */
 export function FieldRoot({
@@ -190,10 +171,13 @@ export function FieldRoot({
   id,
   name,
   size = 'standard',
-  variant = 'vertical',
+  orientation: orientationProp,
+  variant,
   invalid: invalidProp,
   disabled: disabledProp,
   required: requiredProp,
+  dirty,
+  touched,
   className,
   style,
   'aria-label': ariaLabel,
@@ -203,10 +187,12 @@ export function FieldRoot({
   errorMessage,
   ...rest
 }: FieldProps & {
-  bindControl?: (props: ControlProps) => ControlProps;
+  bindControl?: (props: ControlProps, control: ReactElement<ControlProps>) => ControlProps;
   errorMessage?: ReactNode;
 }) {
+  const orientation = orientationProp ?? variant ?? 'vertical';
   const generatedId = useId();
+  const field = useField({ dirty, touched });
   const nodes = flatten(children);
   const controls = nodes.filter(
     (node) =>
@@ -215,39 +201,73 @@ export function FieldRoot({
   );
   const control = controls[0];
   const original = control?.props ?? {};
-  const bound = bindControl ? bindControl(original) : original;
+  const bound = control && bindControl ? bindControl(original, control) : original;
   const controlId =
     typeof original.id === 'string' ? original.id : (id ?? `ids-field-${generatedId}`);
-  const invalid =
-    invalidProp ?? (original['aria-invalid'] === true || original['aria-invalid'] === 'true');
+  const ariaInvalid = original['aria-invalid'] === true || original['aria-invalid'] === 'true';
+  const invalid = invalidProp ?? (ariaInvalid || field.validity !== null);
   const disabled = disabledProp ?? Boolean(bound.disabled);
   const required = requiredProp ?? Boolean(original.required);
-  const ids: FieldContextValue['ids'] = {};
-  const duplicates: string[] = [];
+  const state: FieldState = { orientation, size, invalid, disabled, required, ...field.state };
+
+  const partIds = new Map<ReactElement, string>();
+  const counts: Record<PartName, number> = { label: 0, description: 0, hint: 0, error: 0 };
   for (const node of nodes) {
     const part = parts.get(node.type);
     if (!part) continue;
-    if (ids[part]) duplicates.push(part);
+    const index = counts[part]++;
     const childId = isValidElement<ControlProps>(node.props.children)
       ? node.props.children.props.id
       : undefined;
-    ids[part] = String(
-      node.props.id ?? (node.props.asChild ? childId : undefined) ?? `${controlId}-${part}`,
+    partIds.set(
+      node,
+      String(
+        node.props.id ??
+          (node.props.asChild ? childId : undefined) ??
+          `${controlId}-${part}${index ? `-${index + 1}` : ''}`,
+      ),
     );
   }
+
+  const context: FieldContextValue = {
+    controlId,
+    state,
+    errorMessage,
+    validity: field.validity,
+    styles: Field.Style({
+      size,
+      orientation,
+      invalid,
+      disabled,
+      described: counts.description > 0,
+    }),
+  };
+  const idsOf = (
+    part: PartName,
+    shown: (node: ReactElement<ControlProps>) => boolean = () => true,
+  ) =>
+    nodes
+      .filter((node) => parts.get(node.type) === part && shown(node))
+      .map((node) => partIds.get(node));
+  const labelIds = idsOf('label');
+  const statusIds = invalid
+    ? idsOf('error', (node) =>
+        errorShown(node.props as { match?: FieldValidityKey; children?: unknown }, context),
+      )
+    : idsOf('hint');
+  const duplicated = (['label', 'description', 'hint'] as const)
+    .filter((part) => counts[part] > 1)
+    .join(', ');
   const accessibleName =
-    ids.label ||
-    original['aria-label'] ||
-    original['aria-labelledby'] ||
-    ariaLabel ||
-    ariaLabelledby;
+    labelIds.length > 0 ||
+    Boolean(original['aria-label'] || original['aria-labelledby'] || ariaLabel || ariaLabelledby);
   useEffect(() => {
     if (!isDevelopment) return;
     if (controls.length !== 1)
       console.warn('[IDS] Field: exactly one direct child control is required.');
     if (!accessibleName) console.warn('[IDS] Field: Field.Label or aria-label is required.');
-    if (duplicates.length) console.warn('[IDS] Field: duplicate anatomy parts are not supported.');
-  }, [controls.length, accessibleName, duplicates.length]);
+    if (duplicated) console.warn(`[IDS] Field: only one ${duplicated} part is supported.`);
+  }, [controls.length, accessibleName, duplicated]);
 
   const controlProps = {
     ...bound,
@@ -256,61 +276,219 @@ export function FieldRoot({
     disabled,
     required,
     'aria-label': original['aria-label'] ?? ariaLabel,
-    'aria-labelledby': joinIds(original['aria-labelledby'], ariaLabelledby, ids.label),
+    'aria-labelledby': joinIds(original['aria-labelledby'], ariaLabelledby, ...labelIds),
     'aria-describedby': joinIds(
       original['aria-describedby'],
       ariaDescribedby,
-      ids.description,
-      invalid ? ids.error : ids.hint,
+      ...idsOf('description'),
+      ...statusIds,
     ),
     'aria-invalid': invalidProp !== undefined || invalid ? invalid : original['aria-invalid'],
     'aria-required': requiredProp !== undefined || required ? required : original['aria-required'],
   };
-  const { root, control: controlSlot } = fieldStyle({
-    size,
-    variant,
-    described: Boolean(ids.description),
-  });
+
   return (
-    <FieldContext.Provider value={{ controlId, ids, invalid, disabled, required, errorMessage }}>
-      <FieldSizeContext.Provider value={size}>
-        <div
-          {...rest}
-          id={id ? `${id}-root` : undefined}
-          data-field=""
-          data-size={size}
-          data-variant={variant}
-          data-invalid={invalid ? '' : undefined}
-          data-disabled={disabled ? '' : undefined}
-          data-required={required ? '' : undefined}
-          className={root({ className })}
-          style={style}
-        >
-          {nodes.map((node, index) =>
-            parts.has(node.type) ? (
-              cloneElement(node, { key: node.key ?? index })
-            ) : node === control ? (
-              <div key={node.key ?? index} className={controlSlot()} data-field-control="">
-                {cloneElement(node, controlProps)}
-              </div>
-            ) : (
-              node
-            ),
-          )}
-        </div>
-      </FieldSizeContext.Provider>
-    </FieldContext.Provider>
+    <FieldContext value={context}>
+      <FieldStateContext value={state}>
+        <FieldSizeContext value={size}>
+          <div
+            {...rest}
+            id={id ? `${id}-root` : undefined}
+            data-field=""
+            {...stateAttributes(state)}
+            className={context.styles.root({ className: resolve(className, state) })}
+            style={resolve(style, state)}
+          >
+            {nodes.map((node, index) =>
+              parts.has(node.type) ? (
+                cloneElement(node, { key: node.key ?? index, id: partIds.get(node) })
+              ) : node === control ? (
+                <div
+                  key={node.key ?? index}
+                  ref={field.controlRef}
+                  className={context.styles.control()}
+                  data-field-control=""
+                >
+                  <FieldNotifyContext value={field.notify}>
+                    {cloneElement(node, controlProps)}
+                  </FieldNotifyContext>
+                </div>
+              ) : (
+                node
+              ),
+            )}
+          </div>
+        </FieldSizeContext>
+      </FieldStateContext>
+    </FieldContext>
   );
 }
 
-export const Field = Object.assign(
-  function Field(props: FieldProps) {
-    return <FieldRoot {...props} />;
-  },
-  {
-    Label: FieldLabel,
-    Description: FieldDescription,
-    Hint: FieldHint,
-    Error: FieldError,
-  },
-);
+export function Field(props: FieldProps) {
+  return <FieldRoot {...props} />;
+}
+
+export namespace Field {
+  export type Props = FieldProps;
+  export type State = FieldState;
+  export type Orientation = FieldOrientation;
+  export type ErrorState = FieldErrorState;
+  export type ValidityKey = FieldValidityKey;
+
+  export type LabelProps = PartProps<'label', FieldState>;
+  export type DescriptionProps = PartProps<'div', FieldState>;
+  export type HintProps = PartProps<'div', FieldState>;
+  export type ErrorProps = PartProps<'div', FieldErrorState> & { match?: FieldValidityKey };
+
+  export function Label({ asChild, className, style, children, ...rest }: LabelProps) {
+    const { controlId, state, styles } = usePart('Label');
+    const marker = state.required ? (
+      <span aria-hidden="true" className={styles.marker()}>
+        *
+      </span>
+    ) : null;
+    return renderPart(
+      'Label',
+      'label',
+      asChild,
+      {
+        ...rest,
+        htmlFor: controlId,
+        'data-field-part': 'label',
+        ...stateAttributes(state),
+        className: styles.label({ className: resolve(className, state) }),
+        style: resolve(style, state),
+      },
+      resolve(children, state),
+      marker,
+    );
+  }
+
+  export function Description({ asChild, className, style, children, ...rest }: DescriptionProps) {
+    const { state, styles } = usePart('Description');
+    return renderPart(
+      'Description',
+      'div',
+      asChild,
+      {
+        ...rest,
+        'data-field-part': 'description',
+        ...stateAttributes(state),
+        className: styles.description({ className: resolve(className, state) }),
+        style: resolve(style, state),
+      },
+      resolve(children, state),
+    );
+  }
+
+  // A hint is replaced by the error while the field is invalid.
+  export function Hint({ asChild, className, style, children, ...rest }: HintProps) {
+    const { state, styles } = usePart('Hint');
+    if (state.invalid) return null;
+    return renderPart(
+      'Hint',
+      'div',
+      asChild,
+      {
+        ...rest,
+        'data-field-part': 'hint',
+        ...stateAttributes(state),
+        className: styles.hint({ className: resolve(className, state) }),
+        style: resolve(style, state),
+      },
+      resolve(children, state),
+    );
+  }
+
+  export function Error({ asChild, match, className, style, children, ...rest }: ErrorProps) {
+    const context = usePart('Error');
+    if (!errorShown({ match, children }, context)) return null;
+    const { state, errorMessage, validity, styles } = context;
+    const fallback = match === undefined ? (errorMessage ?? validity?.message) : validity?.message;
+    const errorState: FieldErrorState = {
+      ...state,
+      message: present(fallback) ? fallback : undefined,
+      validity: validity?.flags ?? null,
+    };
+    return renderPart(
+      'Error',
+      'div',
+      asChild,
+      {
+        ...rest,
+        'data-field-part': 'error',
+        'data-match': match,
+        ...stateAttributes(state),
+        className: styles.error({ className: resolve(className, errorState) }),
+        style: resolve(style, errorState),
+      },
+      typeof children === 'function' ? children(errorState) : (children ?? errorState.message),
+    );
+  }
+
+  export const Style = tv({
+    slots: {
+      root: 'grid min-w-0 gap-x-3 gap-y-2',
+      label: 'text-(--ids-color-on-surface)',
+      description: 'text-(--ids-color-on-muted)',
+      hint: 'text-(--ids-color-on-muted)',
+      error: 'text-(--ids-color-danger)',
+      marker: 'ms-0.5 text-(--ids-color-danger)',
+      control:
+        'min-w-0 [&>input:not([type=checkbox]):not([type=radio])]:w-full [&>textarea]:w-full',
+    },
+    variants: {
+      size: {
+        standard: {
+          root: 'text-body-b3-regular',
+          label: 'text-body-b3-medium',
+        },
+        tiny: {
+          root: 'text-caption-c1-regular',
+          label: 'text-caption-c1-medium',
+        },
+      } satisfies Record<IdsSize, object>,
+      orientation: {
+        vertical: {},
+        // The label takes the first column and lines up with the control; every other part sits
+        // in the second column under the control.
+        horizontal: {
+          root: 'grid-cols-[auto_minmax(0,1fr)] [&>:not([data-field-part=label])]:col-start-2 [&>[data-field-part=label]]:col-start-1 [&>[data-field-part=label]]:self-center',
+        },
+      } satisfies Record<FieldOrientation, object>,
+      // A horizontal label lines up with the control, which sits below the description.
+      described: { true: {}, false: {} },
+      invalid: {
+        true: { label: 'text-(--ids-color-danger)' },
+      },
+      disabled: {
+        true: {
+          label: 'opacity-50',
+          description: 'opacity-50',
+          hint: 'opacity-50',
+          error: 'opacity-50',
+        },
+      },
+    },
+    compoundVariants: [
+      {
+        orientation: 'horizontal',
+        described: true,
+        class: { root: '[&>[data-field-part=label]]:row-start-2' },
+      },
+      {
+        orientation: 'horizontal',
+        described: false,
+        class: { root: '[&>[data-field-part=label]]:row-start-1' },
+      },
+    ],
+    defaultVariants: { size: 'standard', orientation: 'vertical' },
+  });
+}
+
+const parts = new Map<unknown, PartName>([
+  [Field.Label, 'label'],
+  [Field.Description, 'description'],
+  [Field.Hint, 'hint'],
+  [Field.Error, 'error'],
+]);

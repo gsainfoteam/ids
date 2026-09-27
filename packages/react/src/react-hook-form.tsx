@@ -1,4 +1,4 @@
-import { useEffect, type Ref } from 'react';
+import { useEffect, type ReactElement, type Ref } from 'react';
 
 import { useController, useFormContext, type RegisterOptions } from 'react-hook-form';
 
@@ -16,15 +16,17 @@ export type FieldProps = BaseProps &
     | { controlMode: 'value' | 'checked'; registerOptions?: ControlledOptions }
   );
 type Props = Record<string, unknown>;
+type Handler = (...args: unknown[]) => void;
 
-// RHF must observe changes even when a consumer handler prevents the default action.
+// RHF must observe changes even when a consumer handler prevents the default action, so the
+// consumer's handler runs first and RHF's always runs after it.
 function bind(props: Props, binding: Props) {
   const result = { ...props, ...binding };
-  for (const key of ['onChange', 'onBlur', 'onValueChange', 'onCheckedChange']) {
-    if (!(key in binding)) continue;
+  for (const key of Object.keys(binding)) {
+    if (!/^on[A-Z]/.test(key)) continue;
     result[key] = (...args: unknown[]) => {
-      (props[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
-      (binding[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
+      (props[key] as Handler | undefined)?.(...args);
+      (binding[key] as Handler | undefined)?.(...args);
     };
   }
   result.ref = (node: HTMLElement | null) => {
@@ -47,25 +49,38 @@ function bind(props: Props, binding: Props) {
   return result;
 }
 
-function isBubbledEvent(value: unknown) {
-  if (typeof value !== 'object' || value === null) return false;
-  const { target, currentTarget } = value as { target?: unknown; currentTarget?: unknown };
-  return currentTarget != null && target !== currentTarget;
+function isEvent(value: unknown) {
+  return (
+    typeof value === 'object' && value !== null && 'target' in value && 'currentTarget' in value
+  );
 }
 
-// A custom control reports through onValueChange or onCheckedChange, a native input through
-// onChange, and a control with both reports one edit twice. A group's onChange also hears the
-// change events bubbling up from its own checkboxes, whose target value is not the group's value.
-// So a bubbled event is ignored and only the first report of an edit reaches react-hook-form.
-function firstReport(onChange: (value: unknown) => void) {
+// Which callback carries a control's value in the value and checked modes. A native element
+// reports through its change event, which RHF reads target.value or checked from. A component
+// reports the value itself: through onValueChange or onCheckedChange, or a value-first onChange.
+// A change event a component passes on, from its own input or bubbling up from a group's
+// checkboxes, carries what is on screen (`1,234`, a checkbox's own value) rather than the value,
+// so it never reaches RHF. One edit reported through two callbacks reaches RHF once.
+function reportsFor(
+  control: ReactElement,
+  controlMode: 'value' | 'checked',
+  onChange: (value: unknown) => void,
+) {
+  if (typeof control.type === 'string') return { onChange };
   let reported = false;
-  return (value: unknown) => {
-    if (reported || isBubbledEvent(value)) return;
+  const once = (value: unknown) => {
+    if (reported) return;
     reported = true;
     queueMicrotask(() => {
       reported = false;
     });
     onChange(value);
+  };
+  return {
+    [controlMode === 'checked' ? 'onCheckedChange' : 'onValueChange']: once,
+    onChange: (next: unknown) => {
+      if (!isEvent(next)) once(next);
+    },
   };
 }
 
@@ -83,7 +98,9 @@ function NativeField({
       {...props}
       name={name}
       disabled={disabled}
-      invalid={props.invalid ?? state.invalid}
+      invalid={props.invalid ?? (state.invalid || undefined)}
+      dirty={props.dirty ?? state.isDirty}
+      touched={props.touched ?? state.isTouched}
       errorMessage={state.error?.message}
       bindControl={(original) =>
         bind(original, { ...registration, disabled: disabled ?? original.disabled })
@@ -114,19 +131,19 @@ function ControlledField({
       {...props}
       name={name}
       disabled={disabled}
-      invalid={props.invalid ?? fieldState.invalid}
+      invalid={props.invalid ?? (fieldState.invalid || undefined)}
+      dirty={props.dirty ?? fieldState.isDirty}
+      touched={props.touched ?? fieldState.isTouched}
       errorMessage={fieldState.error?.message}
-      bindControl={(original) => {
+      bindControl={(original, control) => {
         const { value, onChange, ...binding } = field;
         // A native text input needs a string for an unset value; custom controls may use null.
         const resolvedValue =
           value === undefined ? (controlMode === 'checked' ? false : '') : value;
         const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
-        const report = firstReport(onChange);
         return bind(rest, {
           ...binding,
-          onChange: report,
-          [controlMode === 'checked' ? 'onCheckedChange' : 'onValueChange']: report,
+          ...reportsFor(control, controlMode, onChange),
           [controlMode]: resolvedValue,
           disabled: disabled ?? original.disabled,
         });
@@ -161,4 +178,14 @@ export const Field = Object.assign(RhfField, {
   Description: BaseField.Description,
   Hint: BaseField.Hint,
   Error: BaseField.Error,
+  Style: BaseField.Style,
 });
+
+export namespace Field {
+  export type Props = FieldProps;
+  export type State = BaseField.State;
+  export type LabelProps = BaseField.LabelProps;
+  export type DescriptionProps = BaseField.DescriptionProps;
+  export type HintProps = BaseField.HintProps;
+  export type ErrorProps = BaseField.ErrorProps;
+}
