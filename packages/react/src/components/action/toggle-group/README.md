@@ -63,7 +63,7 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 | `Space` `Enter` | 고르거나 푼다                   | 켜고 끈다                                   |
 
 - 끝에서 처음으로 돌아갑니다. `loop={false}` 면 끝에서 멈춥니다.
-- 비활성 항목은 건너뜁니다.
+- 비활성 항목과, `inert` 나 CSS 로 숨겨져 포커스를 받을 수 없는 항목은 건너뜁니다.
 - 오른쪽에서 왼쪽으로 쓰는 화면에서는 `←` 와 `→` 가 바뀝니다.
 - `Ctrl`, `Alt`, `⌘`, `Shift` 와 함께 누른 화살표는 그룹이 가로채지 않습니다.
 
@@ -88,6 +88,7 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 
 - `required` 인데 비어 있으면 브라우저가 제출을 막고, 그 메시지를 그룹에 띄우고, 첫 항목으로 포커스를 옮깁니다.
 - `disabled` 그룹은 제출되지 않습니다. `form` 으로 바깥 폼을 가리킬 수 있습니다.
+- 폼을 초기화하면 `defaultValue` 로 돌아가고 `onValueChange` 는 부르지 않습니다. 네이티브 입력도 초기화에는 change 이벤트를 내지 않습니다.
 
 ## 모양
 

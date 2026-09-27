@@ -17,6 +17,7 @@ import {
 } from 'react';
 
 import { useInteractiveProps } from '../../../hooks/use-interactive';
+import { usePressable } from '../../../internal/pressable';
 import { cn, invariant, mergeProps, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -148,18 +149,19 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (softDisabled && isActivationKey(event.key)) return blockActivation(event);
     handlers.onKeyDown(event);
-    // A host element standing in for a button clicks on Enter at once and on Space when the key
-    // is released, as a native button does, and Space must not scroll the page meanwhile.
-    if (kind !== 'element' || event.defaultPrevented) return;
-    if (event.key === 'Enter') event.currentTarget.click();
-    if (event.key === ' ') event.preventDefault();
   };
 
-  const onKeyUp = (event: KeyboardEvent<HTMLElement>) => {
-    handlers.onKeyUp(event);
-    if (kind === 'element' && !softDisabled && event.key === ' ' && !event.defaultPrevented)
-      event.currentTarget.click();
-  };
+  // A host element standing in for a button (asChild on a span or div) does what the browser does
+  // for a native one: Enter clicks on key down, Space on key up, and a press that starts on a
+  // control nested inside it stays with that control.
+  const press = usePressable<HTMLElement>({
+    enabled: kind === 'element',
+    disabled: softDisabled,
+    onClick: softDisabled ? blockActivation : onClick,
+    onKeyDown,
+    onKeyUp: handlers.onKeyUp,
+    onBlur: handlers.onBlur,
+  });
 
   // What the button shows: its children, or with asChild the child element's children. A component
   // that draws its own content (IconButton's icon) passes it to render instead.
@@ -169,9 +171,10 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
     const control: Record<string, unknown> = {
       ...dataProps,
       ...handlers,
-      onKeyDown,
-      onKeyUp,
-      onClick: softDisabled ? blockActivation : onClick,
+      onClick: press.onClick,
+      onKeyDown: press.onKeyDown,
+      onKeyUp: press.onKeyUp,
+      onBlur: press.onBlur,
       ref: mergedRef,
     };
     if (kind === 'button' || (kind === 'component' && type !== undefined))

@@ -62,23 +62,21 @@ export const controlSurface = {
     schemes.primary,
   ],
   // An icon next to a label already adds visual weight at that edge, so the padding on the side
-  // holding the icon shrinks. A decorative Spinner (an aria-hidden span) or a status Spinner counts
-  // as an icon there, and anything wrapping a spinning svg takes the icon size, so swapping an icon
-  // for a Spinner while loading moves nothing. Icons without an explicit size follow the icon token.
+  // holding the icon shrinks. A Spinner is an svg too, and its screen reader status span (or any
+  // aria-hidden decoration) counts as the icon at an edge, so swapping an icon for a Spinner while
+  // loading moves nothing. Icons without an explicit size follow the icon token.
   size: {
     standard: [
       'h-(--ids-size-control-standard) rounded-standard px-4 text-button-standard',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-3',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-3',
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
-      '[&>:has(>svg.animate-spin)]:size-(--ids-size-icon-standard)',
     ],
     tiny: [
       'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-3 text-button-tiny',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2.5',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2.5',
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
-      '[&>:has(>svg.animate-spin)]:size-(--ids-size-icon-tiny)',
     ],
   } satisfies Record<IdsSize, string[]>,
   variant: {

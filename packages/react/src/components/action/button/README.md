@@ -86,7 +86,7 @@ import { Button } from '@gsainfoteam/ids-react';
 
 - 자식의 `onClick` 이 먼저 돌고, 자식이 `preventDefault` 하면 Button 의 `onClick` 은 돌지 않습니다.
 - 자식의 `className` 과 `style` 이 마지막에 붙어 이깁니다.
-- `<a>` 와 `<button>` 이 아닌 요소(`span`, `div`)는 `role="button"` 과 `tabIndex={0}` 을 받고 Enter 와 Space 로 눌립니다.
+- `<a>` 와 `<button>` 이 아닌 요소(`span`, `div`)는 `role="button"` 과 `tabIndex={0}` 을 받고 Enter 와 Space 로 눌립니다. 그 안에 든 링크나 버튼을 누르면 그 컨트롤만 반응합니다.
 - 라우터 `Link` 처럼 무엇을 그릴지 모르는 컴포넌트는 비활성이어도 `href` 를 떼지 않고 클릭만 막습니다.
 
 ## 키보드
