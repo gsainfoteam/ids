@@ -36,6 +36,7 @@ import {
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { Slot } from '../../utility/slot';
 import { useFieldSize } from '../field/context';
 import { collectOptions, slotChildren, type SelectOption } from '../select/select-options';
@@ -229,7 +230,7 @@ export function ChipField({
   );
   const hidesItems = !options.length && !creatable && isForeignComponent(popup);
   useEffect(() => {
-    if (import.meta.env.DEV && hidesItems)
+    if (isDevelopment && hidesItems)
       console.warn(
         '[IDS] ChipField found no ChipField.Item. Items are read from the children of ChipField, ChipField.Content and ChipField.Group, and from Fragments, but not from inside other components.',
       );

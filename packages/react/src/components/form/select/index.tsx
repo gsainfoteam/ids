@@ -37,6 +37,7 @@ import {
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -186,7 +187,7 @@ export function Select(props: SelectProps) {
   const popupNodes = contents.length ? contents : rest;
   const hidesItems = !options.length && popupNodes.some(isForeignComponent);
   useEffect(() => {
-    if (import.meta.env.DEV && hidesItems)
+    if (isDevelopment && hidesItems)
       console.warn(
         '[IDS] Select found no Select.Item. Items are read from the children of Select, Select.Content and Select.Group, and from Fragments, but not from inside other components.',
       );
