@@ -7,6 +7,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
@@ -489,9 +490,9 @@ export const ControlledOpen: Story = {
 };
 
 const statuses = [
-  ['todo', '할 일', 'bg-(--ids-color-on-muted)'],
-  ['doing', '진행 중', 'bg-(--ids-color-info)'],
-  ['done', '완료', 'bg-(--ids-color-success)'],
+  ['todo', '할 일', cn('bg-(--ids-color-on-muted)')],
+  ['doing', '진행 중', cn('bg-(--ids-color-info)')],
+  ['done', '완료', cn('bg-(--ids-color-success)')],
 ] as const;
 
 export const CustomItems: Story = {
@@ -504,7 +505,7 @@ export const CustomItems: Story = {
         label={label}
         className={(state) => (state.selected ? 'font-medium' : undefined)}
       >
-        <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${dot}`} />
+        <span aria-hidden="true" className={cn('size-2 shrink-0 rounded-full', dot)} />
         {label}
         <Select.ItemIndicator className="text-(--ids-color-success)">
           <CheckCircleIcon />

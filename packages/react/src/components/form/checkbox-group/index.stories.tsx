@@ -6,6 +6,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Label } from '../../typography/label';
 import { Checkbox } from '../checkbox';
@@ -26,7 +27,7 @@ const skills: Array<{ value: Skill; label: string }> = [
 
 const orientations = ['vertical', 'horizontal'] as const;
 const sizes = ['standard', 'tiny'] as const;
-const row = 'inline-flex items-center gap-2 text-body-b3-medium';
+const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
 
 const meta = {
   title: 'Form/CheckboxGroup',

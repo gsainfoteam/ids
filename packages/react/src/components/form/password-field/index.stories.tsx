@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
@@ -41,7 +42,7 @@ const meta = {
     'aria-label': '비밀번호',
     variant: 'outline',
     size: 'standard',
-    className: 'w-72',
+    className: cn('w-72'),
     onValueChange: fn(),
     onVisibleChange: fn(),
   },

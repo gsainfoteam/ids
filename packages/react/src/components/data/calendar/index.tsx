@@ -46,7 +46,7 @@ import { useCalendar, type CalendarState } from './use-calendar';
 import { controlSurface } from '../../../internal/control-surface';
 import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
-import { invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
+import { cn, invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -394,11 +394,11 @@ function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calenda
   );
 }
 
-const navButton = [
+const navButton = cn(
   controlSurface.base,
   'row-start-1 size-(--calendar-cell) rounded-standard bg-transparent p-0 text-(--ids-color-on-surface)',
   'hover:bg-(--ids-color-muted) aria-disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:hover:bg-transparent',
-];
+);
 
 export namespace Calendar {
   export type Props = CalendarProps;

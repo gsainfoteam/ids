@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Label } from '../../typography/label';
 import { Field } from '../field';
@@ -44,7 +45,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const row = 'inline-flex items-center gap-2 text-body-b3-medium';
+const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
 
 export const Playground: Story = {};
 

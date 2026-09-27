@@ -153,11 +153,19 @@ and does nothing.
 
 ```tsx
 const halo = (p: string) => `${p}ring-[3px]`; // never generated
-export const focusRing = { native: 'focus-visible:ring-[3px]' }; // fine, it is literal
+export const focusHalo = { native: cn('focus-visible:ring-[3px]') }; // fine, literal and inside cn()
 ```
 
-Shared style fragments (`focus-ring.ts`, `control-surface.ts`) therefore spell every variant out
+Shared style fragments (`control-surface.ts`, `field-surface.ts`) therefore spell every variant out
 in full rather than composing prefixes.
+
+**Every class string is written inside `cn()`, `tv()` or a JSX `className`.** Tailwind IntelliSense
+only reads classes there (`.vscode/settings.json` registers `cn`, `tv` and `cva`), so a bare string
+in an object, a constant, an array or a story's `args` gets no completion and no lint. A shared
+fragment is an object of `cn('...')` values that components take into their own `tv` slots, and a
+class joined with a variable is `cn('concentric-p-4', surface)`, not a template literal. The one
+exception is the class-group list in `utils/cn.ts`, which only tells the merger about IDS classes
+and is never rendered.
 
 **Focus is a soft ring, never an offset outline.** Add the `focus-ring` class. It is a single
 `@utility` in the CSS package that covers every trigger IDS uses — `:focus-visible` for real form

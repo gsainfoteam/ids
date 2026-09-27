@@ -1,19 +1,19 @@
-import { tv } from '../../utils';
+import { cn, tv } from '../../utils';
 import { fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 
 import type { IdsSize } from '../../tokens/types';
 
 export type FieldTriggerVariant = FieldSurfaceVariant;
 
-// Plain class lists so a component's own `tv({ slots })` can spread them into its trigger
-// slot; every string stays literal for Tailwind.
+// Class lists a component's own `tv({ slots })` takes as slot values. Each is written inside
+// `cn()` so Tailwind IntelliSense reads it.
 export const fieldTrigger = {
-  base: ['flex w-full min-w-0 touch-manipulation items-center text-start', fieldSurface.base],
+  base: cn('flex w-full min-w-0 touch-manipulation items-center text-start', fieldSurface.base),
   variant: fieldSurface.variant,
   size: fieldSurface.size,
   icon: {
-    standard: 'size-(--ids-size-icon-standard)',
-    tiny: 'size-(--ids-size-icon-tiny)',
+    standard: cn('size-(--ids-size-icon-standard)'),
+    tiny: cn('size-(--ids-size-icon-tiny)'),
   } satisfies Record<IdsSize, string>,
 } as const;
 
@@ -21,36 +21,36 @@ export const fieldTrigger = {
 // at its end, the way shadcn/ui marks it; the theme color is left to the trigger's focus. The end
 // padding is reserved even without a check so labels do not shift when one appears.
 export const fieldListbox = {
-  option: [
+  option: cn(
     'relative flex cursor-default items-center gap-2 rounded-standard py-1.5 ps-2.5 pe-8 outline-none select-none wrap-anywhere',
     'data-highlighted:bg-(--ids-color-muted)',
     'aria-disabled:pointer-events-none aria-disabled:opacity-50',
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
-  ],
-  indicator: [
+  ),
+  indicator: cn(
     'pointer-events-none absolute end-2.5 flex items-center justify-center',
     '[&_svg]:size-(--ids-size-icon-standard)',
-  ],
+  ),
   // The scroll container for the options, so keyboard moves scroll it and not the popup. It
   // reaches into the popup's padding so full-width separators are not clipped by it, and is
   // positioned so it is the options' offset parent.
-  list: [
+  list: cn(
     'relative -mx-1 flex min-h-0 flex-col overflow-x-hidden overflow-y-auto overscroll-contain px-1',
     'outline-none [overflow-anchor:none]',
-  ],
-  heading: 'px-2.5 pt-2 pb-1 text-caption-c1-medium text-(--ids-color-on-muted)',
-  separator: '-mx-1 my-1 h-px bg-(--ids-color-border)',
-  empty: 'px-2.5 py-6 text-center text-body-b3-regular text-(--ids-color-on-muted)',
+  ),
+  heading: cn('px-2.5 pt-2 pb-1 text-caption-c1-medium text-(--ids-color-on-muted)'),
+  separator: cn('-mx-1 my-1 h-px bg-(--ids-color-border)'),
+  empty: cn('px-2.5 py-6 text-center text-body-b3-regular text-(--ids-color-on-muted)'),
   // A search box at the top of a list, like shadcn/ui's command input: no ring of its own, since
   // the caret already shows where focus is, and a rule under it instead of a box around it.
-  searchRoot: [
+  searchRoot: cn(
     '-mx-1 -mt-1 mb-1 flex items-center gap-2 border-b border-(--ids-color-border) px-3',
     'text-(--ids-color-on-muted) [&_svg]:size-(--ids-size-icon-standard) [&_svg]:shrink-0',
-  ],
-  search: [
+  ),
+  search: cn(
     'h-10 w-full min-w-0 bg-transparent text-body-b3-regular text-(--ids-color-on-surface) outline-none',
     'placeholder:text-(--ids-color-on-muted)',
-  ],
+  ),
 } as const;
 
 export const popupStyle = tv({

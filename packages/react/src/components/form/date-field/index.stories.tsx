@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
@@ -39,7 +40,7 @@ const meta = {
     today,
     variant: 'outline',
     size: 'standard',
-    className: 'w-72',
+    className: cn('w-72'),
     onValueChange: fn(),
     onOpenChange: fn(),
   },
@@ -190,7 +191,7 @@ export const SelectAndClear: Story = {
 };
 
 export const Range: Story = {
-  args: { selectionMode: 'range', monthsToShow: 2, format: 'yyyy-MM-dd', className: 'w-80' },
+  args: { selectionMode: 'range', monthsToShow: 2, format: 'yyyy-MM-dd', className: cn('w-80') },
   parameters: {
     docs: {
       description: {

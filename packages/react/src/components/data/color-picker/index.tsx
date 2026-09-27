@@ -14,7 +14,7 @@ import { useClipboardSupport, useColorPicker, useEyeDropperSupport } from './use
 import { flattenParts, resolveState } from '../../../internal/field-popup';
 import { fieldSurface } from '../../../internal/field-surface';
 import { messages } from '../../../internal/messages';
-import { invariant, mergeProps, tv } from '../../../utils';
+import { cn, invariant, mergeProps, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -482,11 +482,11 @@ export namespace ColorPicker {
   export const Swatches = ColorPickerSwatches;
   export const Swatch = ColorPickerSwatch;
 
-  const thumb = [
+  const thumb = cn(
     'pointer-events-none absolute rounded-full border-2 border-white',
     'shadow-[0_0_0_1px_rgb(0_0_0/0.25),0_1px_3px_rgb(0_0_0/0.3)]',
     'transition-[box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-  ];
+  );
 
   export const Style = tv({
     slots: {

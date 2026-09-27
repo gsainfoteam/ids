@@ -36,6 +36,8 @@ export type RatingItemState = RatingState & {
 
 type StateProp<T, S> = T | ((state: S) => T);
 
+type RatingOptionPlacement = 'zero' | 'whole' | 'start' | 'end';
+
 export type RatingProps = Omit<
   ComponentProps<'div'>,
   'defaultValue' | 'onChange' | 'className' | 'style' | 'children' | 'role'
@@ -162,7 +164,7 @@ export function Rating({
   const generatedId = useId();
   const scoreId = `${id ?? generatedId}-score`;
 
-  const option = (score: number, placement: string) => (
+  const option = (score: number, placement: RatingOptionPlacement) => (
     <button
       key={score}
       type="button"
@@ -176,7 +178,7 @@ export function Rating({
       aria-disabled={readOnly || undefined}
       disabled={disabled}
       tabIndex={!disabled && score === current ? 0 : -1}
-      className={styles.option({ className: placement })}
+      className={styles.option({ placement })}
       onClick={() => {
         choose(score);
         preview(null);
@@ -235,7 +237,7 @@ export function Rating({
         if (!event.defaultPrevented) rating.onKeyDown(event);
       }}
     >
-      {!displayOnly && option(0, 'sr-only')}
+      {!displayOnly && option(0, 'zero')}
       {Array.from({ length: max }, (_, index) => {
         const item = (indexed.get(index) ?? template)?.props;
         const fill = Math.min(1, Math.max(0, displayed - index));
@@ -266,11 +268,11 @@ export function Rating({
             {!displayOnly &&
               (step === 0.5 ? (
                 <>
-                  {option(index + 0.5, 'start-0 w-1/2')}
-                  {option(index + 1, 'end-0 w-1/2')}
+                  {option(index + 0.5, 'start')}
+                  {option(index + 1, 'end')}
                 </>
               ) : (
-                option(index + 1, 'inset-x-0')
+                option(index + 1, 'whole')
               ))}
           </span>
         );
@@ -341,6 +343,14 @@ export namespace Rating {
           graphic: 'size-5',
         },
       } satisfies Record<IdsSize, object>,
+      // Each star is one option, or two half-width ones when step is 0.5. The zero option has no
+      // star of its own and only exists for the keyboard and screen readers.
+      placement: {
+        zero: { option: 'sr-only' },
+        whole: { option: 'inset-x-0' },
+        start: { option: 'start-0 w-1/2' },
+        end: { option: 'end-0 w-1/2' },
+      } satisfies Record<RatingOptionPlacement, object>,
     },
     defaultVariants: { size: 'standard' },
   });

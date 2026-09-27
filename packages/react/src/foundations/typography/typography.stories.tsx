@@ -2,6 +2,8 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../utils';
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
@@ -16,87 +18,87 @@ type Story = StoryObj<typeof meta>;
 // Written out in full so Tailwind sees every class; a name assembled at runtime is never generated.
 const headline = {
   h1: {
-    bold: 'text-headline-h1-bold',
-    semibold: 'text-headline-h1-semibold',
-    medium: 'text-headline-h1-medium',
+    bold: cn('text-headline-h1-bold'),
+    semibold: cn('text-headline-h1-semibold'),
+    medium: cn('text-headline-h1-medium'),
   },
   h2: {
-    bold: 'text-headline-h2-bold',
-    semibold: 'text-headline-h2-semibold',
-    medium: 'text-headline-h2-medium',
+    bold: cn('text-headline-h2-bold'),
+    semibold: cn('text-headline-h2-semibold'),
+    medium: cn('text-headline-h2-medium'),
   },
   h3: {
-    bold: 'text-headline-h3-bold',
-    semibold: 'text-headline-h3-semibold',
-    medium: 'text-headline-h3-medium',
+    bold: cn('text-headline-h3-bold'),
+    semibold: cn('text-headline-h3-semibold'),
+    medium: cn('text-headline-h3-medium'),
   },
   h4: {
-    bold: 'text-headline-h4-bold',
-    semibold: 'text-headline-h4-semibold',
-    medium: 'text-headline-h4-medium',
+    bold: cn('text-headline-h4-bold'),
+    semibold: cn('text-headline-h4-semibold'),
+    medium: cn('text-headline-h4-medium'),
   },
   h5: {
-    bold: 'text-headline-h5-bold',
-    semibold: 'text-headline-h5-semibold',
-    medium: 'text-headline-h5-medium',
+    bold: cn('text-headline-h5-bold'),
+    semibold: cn('text-headline-h5-semibold'),
+    medium: cn('text-headline-h5-medium'),
   },
   h6: {
-    bold: 'text-headline-h6-bold',
-    semibold: 'text-headline-h6-semibold',
-    medium: 'text-headline-h6-medium',
+    bold: cn('text-headline-h6-bold'),
+    semibold: cn('text-headline-h6-semibold'),
+    medium: cn('text-headline-h6-medium'),
   },
 };
 
 const subtitle = {
   s1: {
-    bold: 'text-subtitle-s1-bold',
-    semibold: 'text-subtitle-s1-semibold',
-    medium: 'text-subtitle-s1-medium',
+    bold: cn('text-subtitle-s1-bold'),
+    semibold: cn('text-subtitle-s1-semibold'),
+    medium: cn('text-subtitle-s1-medium'),
   },
   s2: {
-    bold: 'text-subtitle-s2-bold',
-    semibold: 'text-subtitle-s2-semibold',
-    medium: 'text-subtitle-s2-medium',
+    bold: cn('text-subtitle-s2-bold'),
+    semibold: cn('text-subtitle-s2-semibold'),
+    medium: cn('text-subtitle-s2-medium'),
   },
 };
 
 const body = {
   b1: {
-    bold: 'text-body-b1-bold',
-    semibold: 'text-body-b1-semibold',
-    medium: 'text-body-b1-medium',
-    regular: 'text-body-b1-regular',
+    bold: cn('text-body-b1-bold'),
+    semibold: cn('text-body-b1-semibold'),
+    medium: cn('text-body-b1-medium'),
+    regular: cn('text-body-b1-regular'),
   },
   b2: {
-    bold: 'text-body-b2-bold',
-    semibold: 'text-body-b2-semibold',
-    medium: 'text-body-b2-medium',
-    regular: 'text-body-b2-regular',
+    bold: cn('text-body-b2-bold'),
+    semibold: cn('text-body-b2-semibold'),
+    medium: cn('text-body-b2-medium'),
+    regular: cn('text-body-b2-regular'),
   },
   b3: {
-    bold: 'text-body-b3-bold',
-    semibold: 'text-body-b3-semibold',
-    medium: 'text-body-b3-medium',
-    regular: 'text-body-b3-regular',
+    bold: cn('text-body-b3-bold'),
+    semibold: cn('text-body-b3-semibold'),
+    medium: cn('text-body-b3-medium'),
+    regular: cn('text-body-b3-regular'),
   },
 };
 
 const caption = {
   c1: {
-    semibold: 'text-caption-c1-semibold',
-    medium: 'text-caption-c1-medium',
-    regular: 'text-caption-c1-regular',
+    semibold: cn('text-caption-c1-semibold'),
+    medium: cn('text-caption-c1-medium'),
+    regular: cn('text-caption-c1-regular'),
   },
   c2: {
-    semibold: 'text-caption-c2-semibold',
-    medium: 'text-caption-c2-medium',
-    regular: 'text-caption-c2-regular',
+    semibold: cn('text-caption-c2-semibold'),
+    medium: cn('text-caption-c2-medium'),
+    regular: cn('text-caption-c2-regular'),
   },
 };
 
 const button = {
-  standard: { medium: 'text-button-standard' },
-  tiny: { medium: 'text-button-tiny' },
+  standard: { medium: cn('text-button-standard') },
+  tiny: { medium: cn('text-button-tiny') },
 };
 
 const px = (value: string) => `${Math.round(parseFloat(value) * 10) / 10}`;
@@ -115,7 +117,7 @@ function measure(element: HTMLElement | null) {
 function Specimen({ className, sample }: { className: string; sample: string }) {
   return (
     <div ref={measure} data-style={className} title={className} className="flex flex-col gap-1">
-      <span data-sample="" className={`${className} whitespace-nowrap`}>
+      <span data-sample="" className={cn(className, 'whitespace-nowrap')}>
         {sample}
       </span>
       <code data-spec="" className="text-caption-c1-regular text-(--ids-color-on-muted)" />

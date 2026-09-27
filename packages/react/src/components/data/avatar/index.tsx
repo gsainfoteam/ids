@@ -27,7 +27,7 @@ import {
   type AvatarStatus,
 } from './use-avatar';
 import { resolveState, type StateValue } from '../../../internal/state-props';
-import { flattenFragments, invariant, mergeRefs, tv } from '../../../utils';
+import { cn, flattenFragments, invariant, mergeRefs, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Slot } from '../../utility/slot';
 
@@ -226,13 +226,14 @@ export namespace Avatar {
 
   // Masks cut the overlapped side out of an avatar in a stack. The gap then shows the real
   // background, whatever it is, where a colored ring would only match one background.
-  const circleMask =
-    '[mask-image:radial-gradient(50%_50%_at_var(--avatar-hole-x)_50%,transparent_calc(100%_+_var(--ag-gap)),#000_calc(100%_+_var(--ag-gap)_+_0.5px))]';
-  const squareMask = [
+  const circleMask = cn(
+    '[mask-image:radial-gradient(50%_50%_at_var(--avatar-hole-x)_50%,transparent_calc(100%_+_var(--ag-gap)),#000_calc(100%_+_var(--ag-gap)_+_0.5px))]',
+  );
+  const squareMask = cn(
     '[mask-image:linear-gradient(to_var(--avatar-band),transparent_calc(var(--ag-overlap)_+_var(--ag-gap)),#000_0),radial-gradient(circle_calc(var(--avatar-radius)_+_var(--ag-gap))_at_var(--avatar-corner-x)_100%,transparent_100%,#000_calc(100%_+_0.5px)),radial-gradient(circle_calc(var(--avatar-radius)_+_var(--ag-gap))_at_var(--avatar-corner-x)_0%,transparent_100%,#000_calc(100%_+_0.5px))]',
     '[mask-size:100%_100%,100%_var(--avatar-radius),100%_var(--avatar-radius)]',
     '[mask-position:0_0,0_0,0_100%] [mask-repeat:no-repeat]',
-  ];
+  );
 
   export const Style = tv({
     slots: {

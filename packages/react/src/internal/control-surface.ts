@@ -1,3 +1,5 @@
+import { cn } from '../utils/cn';
+
 import type { IdsSize, IdsVariant } from '../tokens/types';
 
 export type ControlColorScheme = 'primary' | 'neutral' | 'danger' | 'success' | 'warning' | 'info';
@@ -11,42 +13,42 @@ export type ControlColorScheme = 'primary' | 'neutral' | 'danger' | 'success' | 
 //   --control-hover    outline and ghost hover fill: muted, or a tint of the status color
 //   --control-ring     focus ring and focused border
 const schemes = {
-  primary: [
+  primary: cn(
     '[--control-fill:var(--ids-color-primary)] [--control-on-fill:var(--ids-color-on-primary)]',
     '[--control-accent:var(--ids-color-primary)] [--control-quiet:var(--ids-color-on-surface)]',
     '[--control-hover:var(--ids-color-muted)] [--control-ring:var(--ids-color-primary)]',
-  ],
-  neutral: [
+  ),
+  neutral: cn(
     '[--control-fill:var(--ids-color-on-surface)] [--control-on-fill:var(--ids-color-surface)]',
     '[--control-accent:var(--ids-color-on-surface)] [--control-quiet:var(--ids-color-on-surface)]',
     '[--control-hover:var(--ids-color-muted)] [--control-ring:var(--ids-color-primary)]',
-  ],
-  danger: [
+  ),
+  danger: cn(
     '[--control-fill:var(--ids-color-danger)] [--control-on-fill:var(--ids-color-on-danger)]',
     '[--control-accent:var(--ids-color-danger-strong)] [--control-quiet:var(--ids-color-danger-strong)]',
     '[--control-hover:color-mix(in_oklab,var(--ids-color-danger)_10%,transparent)] [--control-ring:var(--ids-color-danger)]',
-  ],
-  success: [
+  ),
+  success: cn(
     '[--control-fill:var(--ids-color-success)] [--control-on-fill:var(--ids-color-on-success)]',
     '[--control-accent:var(--ids-color-success-strong)] [--control-quiet:var(--ids-color-success-strong)]',
     '[--control-hover:color-mix(in_oklab,var(--ids-color-success)_10%,transparent)] [--control-ring:var(--ids-color-success)]',
-  ],
-  warning: [
+  ),
+  warning: cn(
     '[--control-fill:var(--ids-color-warning)] [--control-on-fill:var(--ids-color-on-warning)]',
     '[--control-accent:var(--ids-color-warning-strong)] [--control-quiet:var(--ids-color-warning-strong)]',
     '[--control-hover:color-mix(in_oklab,var(--ids-color-warning)_10%,transparent)] [--control-ring:var(--ids-color-warning)]',
-  ],
-  info: [
+  ),
+  info: cn(
     '[--control-fill:var(--ids-color-info)] [--control-on-fill:var(--ids-color-on-info)]',
     '[--control-accent:var(--ids-color-info-strong)] [--control-quiet:var(--ids-color-info-strong)]',
     '[--control-hover:color-mix(in_oklab,var(--ids-color-info)_10%,transparent)] [--control-ring:var(--ids-color-info)]',
-  ],
-} satisfies Record<ControlColorScheme, string[]>;
+  ),
+} satisfies Record<ControlColorScheme, string>;
 
 // Only solid and soft carry the scheme color. Outline and ghost stay neutral for primary, with the
 // brand left to focus, the way shadcn/ui keeps secondary actions quiet next to one primary action.
 export const controlSurface = {
-  base: [
+  base: cn(
     'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap select-none touch-manipulation',
     'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast)',
     'cursor-pointer data-disabled:not-aria-busy:cursor-not-allowed data-disabled:opacity-50',
@@ -60,43 +62,43 @@ export const controlSurface = {
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
     // A component that exposes no colorScheme still needs every property defined.
     schemes.primary,
-  ],
+  ),
   // An icon next to a label already adds visual weight at that edge, so the padding on the side
   // holding the icon shrinks. A Spinner is an svg too, and its screen reader status span (or any
   // aria-hidden decoration) counts as the icon at an edge, so swapping an icon for a Spinner while
   // loading moves nothing. Icons without an explicit size follow the icon token.
   size: {
-    standard: [
+    standard: cn(
       'h-(--ids-size-control-standard) rounded-standard px-4 text-button-standard',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-3',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-3',
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
-    ],
-    tiny: [
+    ),
+    tiny: cn(
       'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-3 text-button-tiny',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2.5',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2.5',
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
-    ],
-  } satisfies Record<IdsSize, string[]>,
+    ),
+  } satisfies Record<IdsSize, string>,
   variant: {
-    solid: [
+    solid: cn(
       'bg-(--control-fill) text-(--control-on-fill) shadow-xs',
       'data-hovered:bg-(--control-fill)/90 data-active:bg-(--control-fill)/80',
-    ],
-    soft: [
+    ),
+    soft: cn(
       'bg-(--control-fill)/10 text-(--control-accent)',
       'data-hovered:bg-(--control-fill)/15 data-active:bg-(--control-fill)/20',
-    ],
-    outline: [
+    ),
+    outline: cn(
       'bg-(--ids-color-surface) text-(--control-quiet) shadow-xs',
       'inset-ring-1 inset-ring-(--ids-color-border) dark:bg-(--ids-color-muted)/30',
       'data-hovered:bg-(--control-hover) data-active:bg-(--control-hover)',
-    ],
-    ghost: [
+    ),
+    ghost: cn(
       'bg-transparent text-(--control-quiet)',
       'data-hovered:bg-(--control-hover) data-active:bg-(--control-hover)',
-    ],
-  } satisfies Record<IdsVariant, string[]>,
+    ),
+  } satisfies Record<IdsVariant, string>,
   colorScheme: schemes,
 } as const;

@@ -11,7 +11,7 @@ import {
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 import { IconButton } from '../../components/action/icon-button';
-import { flattenFragments, invariant, mergeProps, tv } from '../../utils';
+import { cn, flattenFragments, invariant, mergeProps, tv } from '../../utils';
 import { fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 import { messages } from '../messages';
 
@@ -172,10 +172,12 @@ export function TextControlClear({
 // 24px). An icon button carries its required aria-label and stays square; a text button keeps
 // some padding around its label.
 export const insetButtons = {
-  base: '[&_button]:w-auto [&_button]:gap-1 [&_button]:px-1 [&_button:not([aria-label])]:px-2.5',
+  base: cn(
+    '[&_button]:w-auto [&_button]:gap-1 [&_button]:px-1 [&_button:not([aria-label])]:px-2.5',
+  ),
   size: {
-    standard: '[&_button]:h-7 [&_button]:min-w-7',
-    tiny: '[&_button]:h-6 [&_button]:min-w-6 [&_button:not([aria-label])]:px-2',
+    standard: cn('[&_button]:h-7 [&_button]:min-w-7'),
+    tiny: cn('[&_button]:h-6 [&_button]:min-w-6 [&_button:not([aria-label])]:px-2'),
   } satisfies Record<IdsSize, string>,
 } as const;
 

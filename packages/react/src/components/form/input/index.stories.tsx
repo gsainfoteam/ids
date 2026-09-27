@@ -2,6 +2,7 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../../utils';
 import { Field } from '../field';
 
 import { Input } from '.';
@@ -30,7 +31,7 @@ const meta = {
     disabled: { control: 'boolean' },
     invalid: { control: 'boolean' },
   },
-  args: { type: 'text', 'aria-label': '입력', className: 'w-72' },
+  args: { type: 'text', 'aria-label': '입력', className: cn('w-72') },
 } satisfies Meta<typeof Input>;
 
 export default meta;

@@ -12,6 +12,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
 import { Field } from '../field';
@@ -41,7 +42,7 @@ const meta = {
     size: 'standard',
     placeholder: '내용을 입력하세요',
     'aria-label': '내용',
-    className: 'w-80',
+    className: cn('w-80'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof TextArea>;

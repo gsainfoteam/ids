@@ -3,6 +3,7 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Kbd } from '../../typography/kbd';
 
@@ -21,13 +22,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const frame = 'rounded-standard inset-ring-1 inset-ring-(--ids-color-border)';
+const frame = cn('rounded-standard inset-ring-1 inset-ring-(--ids-color-border)');
 // Stretched so the space a Spacer takes shows even in a row that centers its items.
-const fill = 'self-stretch bg-(--ids-color-primary)/15';
+const fill = cn('self-stretch bg-(--ids-color-primary)/15');
 
 export const Playground: Story = {
   render: (args) => (
-    <div className={`flex w-80 items-center gap-2 p-3 ${frame}`}>
+    <div className={cn('flex w-80 items-center gap-2 p-3', frame)}>
       <span>제목</span>
       <Spacer {...args} className={fill} />
       <Button size="tiny" variant="outline">
@@ -45,14 +46,14 @@ export const Gallery: Story = {
         description="부모 flex의 방향을 따릅니다. 칠한 부분이 Spacer가 차지한 공간입니다."
       >
         <Showcase.Row label="row">
-          <div className={`flex h-12 w-80 items-center p-2 ${frame}`}>
+          <div className={cn('flex h-12 w-80 items-center p-2', frame)}>
             <span>로고</span>
             <Spacer className={fill} />
             <span>로그인</span>
           </div>
         </Showcase.Row>
         <Showcase.Row label="column">
-          <div className={`flex h-40 w-40 flex-col p-2 ${frame}`}>
+          <div className={cn('flex h-40 w-40 flex-col p-2', frame)}>
             <span>머리글</span>
             <Spacer className={fill} />
             <span>바닥글</span>
@@ -62,7 +63,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="flex" description="여러 개를 두면 flex 비율로 남는 공간을 나눕니다.">
         <Showcase.Row label="1 : 1">
-          <div className={`flex h-12 w-80 items-center p-2 ${frame}`}>
+          <div className={cn('flex h-12 w-80 items-center p-2', frame)}>
             <span>A</span>
             <Spacer className={fill} />
             <span>B</span>
@@ -71,7 +72,7 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
         <Showcase.Row label="1 : 2">
-          <div className={`flex h-12 w-80 items-center p-2 ${frame}`}>
+          <div className={cn('flex h-12 w-80 items-center p-2', frame)}>
             <span>A</span>
             <Spacer className={fill} />
             <span>B</span>

@@ -20,7 +20,7 @@ import {
   type TemporalFieldState,
 } from './use-temporal-field';
 import { useFieldSize } from '../../components/form/field/context';
-import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { cn, invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { FieldPopup, flattenParts, part } from '../field-popup';
 import { fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 import { FormValue } from '../form-value';
@@ -118,12 +118,12 @@ function useTemporal(part: string) {
   return context;
 }
 
-const iconButton = [
+const iconButton = cn(
   'me-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
   'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
   'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
   'focus-ring disabled:pointer-events-none disabled:opacity-50',
-];
+);
 
 export const temporalFieldStyle = tv({
   slots: {

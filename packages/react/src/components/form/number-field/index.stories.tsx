@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
@@ -39,7 +40,7 @@ const meta = {
     defaultValue: 1,
     variant: 'outline',
     size: 'standard',
-    className: 'w-56',
+    className: cn('w-56'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof NumberField>;

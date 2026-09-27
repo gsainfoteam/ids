@@ -4,6 +4,7 @@ import { expect, within } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 
 import { ThemeProvider, useTheme } from '.';
@@ -58,7 +59,7 @@ function Sample({ children }: { children?: ReactNode }) {
   );
 }
 
-const region = 'concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)';
+const region = cn('concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)');
 
 export const Playground: Story = {
   render: (args) => (

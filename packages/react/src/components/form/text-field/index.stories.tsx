@@ -16,6 +16,7 @@ import { expect, fn } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Field as RhfField } from '../../../react-hook-form';
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
 import { IconToggle } from '../../action/icon-toggle';
@@ -46,7 +47,7 @@ const meta = {
     size: 'standard',
     placeholder: '검색어를 입력하세요',
     'aria-label': '검색어',
-    className: 'w-72',
+    className: cn('w-72'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof TextField>;

@@ -3,6 +3,7 @@ import { expect } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { ThemeProvider, useTheme } from '../../components/utility/theme-provider';
+import { cn } from '../../utils';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -141,7 +142,7 @@ function Pair({ background, foreground }: { background: string; foreground: stri
   );
 }
 
-const panel = 'concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)';
+const panel = cn('concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)');
 
 function TokenTable({
   tokens,

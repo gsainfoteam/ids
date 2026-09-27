@@ -5,6 +5,8 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../../utils';
+
 import { TimePicker } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -32,7 +34,7 @@ const meta = {
     size: 'standard',
     precision: 'minute',
     step: 1,
-    className: 'w-72',
+    className: cn('w-72'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof TimePicker>;
@@ -239,7 +241,7 @@ export const Wheel: Story = {
     format: '12h',
     locale: 'en-US',
     defaultValue: at(14, 30),
-    className: 'w-64',
+    className: cn('w-64'),
   },
   parameters: {
     docs: {

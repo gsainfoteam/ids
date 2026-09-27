@@ -6,6 +6,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Label } from '../../typography/label';
 
@@ -39,7 +40,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const row = 'inline-flex items-center gap-2 text-body-b3-medium';
+const row = cn('inline-flex items-center gap-2 text-body-b3-medium');
 const stateOf = (radio: HTMLElement) => radio.closest('[data-radio]')!.getAttribute('data-state');
 
 export const Playground: Story = {};

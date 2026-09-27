@@ -5,6 +5,7 @@ import { expect, fn } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
@@ -34,7 +35,7 @@ const meta = {
     defaultCountry: 'KR',
     variant: 'outline',
     size: 'standard',
-    className: 'w-72',
+    className: cn('w-72'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof TelField>;

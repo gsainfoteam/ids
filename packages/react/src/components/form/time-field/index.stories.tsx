@@ -4,6 +4,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 import { Field } from '../field';
 
@@ -35,7 +36,7 @@ const meta = {
     'aria-label': '시간',
     variant: 'outline',
     size: 'standard',
-    className: 'w-60',
+    className: cn('w-60'),
     onValueChange: fn(),
   },
 } satisfies Meta<typeof TimeField>;
