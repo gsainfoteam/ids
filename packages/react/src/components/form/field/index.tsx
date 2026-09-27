@@ -14,6 +14,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { isString, uniq } from 'es-toolkit';
+
 import {
   FieldNotifyContext,
   FieldSizeContext,
@@ -159,16 +161,8 @@ function flatten(children: ReactNode): ReactElement<ControlProps>[] {
 }
 
 function joinIds(...values: unknown[]) {
-  return (
-    [
-      ...new Set(
-        values
-          .filter((value) => typeof value === 'string')
-          .flatMap((value) => (value as string).split(/\s+/))
-          .filter(Boolean),
-      ),
-    ].join(' ') || undefined
-  );
+  const ids = values.filter(isString).flatMap((value) => value.split(/\s+/));
+  return uniq(ids.filter(Boolean)).join(' ') || undefined;
 }
 
 /** Internal bridge shared with the optional RHF entry point. */

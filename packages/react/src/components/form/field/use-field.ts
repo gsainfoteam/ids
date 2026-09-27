@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { isEqual } from 'es-toolkit';
+
 import {
   formOf,
   readValidity,
   readValue,
-  sameValidity,
   validatesNatively,
   type FieldValidity,
 } from './control-state';
@@ -38,7 +39,7 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
     if (!root) return;
     const next = validatesNatively(root) ? readValidity(root) : null;
     shown.current = next !== null;
-    setValidity((prev) => (sameValidity(prev, next) ? prev : next));
+    setValidity((prev) => (isEqual(prev, next) ? prev : next));
   }, []);
 
   // Once an error is showing it follows every edit, so it clears the moment the value is valid.

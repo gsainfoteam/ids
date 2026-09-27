@@ -19,16 +19,10 @@ import {
 } from 'react';
 
 import { NumberFormatter, NumberParser } from '@internationalized/number';
+import { clamp, noop } from 'es-toolkit';
 
 import { textAfterInput } from './number-input';
-import {
-  addDecimal,
-  clampNumber,
-  clampToStep,
-  isOnStep,
-  shiftDecimal,
-  snapToStep,
-} from './number-step';
+import { addDecimal, clampToStep, isOnStep, shiftDecimal, snapToStep } from './number-step';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { messages } from '../../../internal/messages';
@@ -96,7 +90,7 @@ function repeatDelay(count: number) {
 
 // iOS number keyboards have no minus key, so a field that accepts negatives asks for the full
 // keyboard there. The platform is unknown on the server, so it is read after hydration.
-const noop = () => () => {};
+const subscribeToNothing = () => noop;
 function isAppleTouch() {
   const { userAgent, platform, maxTouchPoints } = navigator;
   return /iPad|iPhone|iPod/.test(userAgent) || (platform === 'MacIntel' && maxTouchPoints > 1);
@@ -157,6 +151,8 @@ export function useNumberField({
   // An explicit step defines a grid, anchored at min, that typed values snap to.
   const snap = step !== undefined;
   const base = min ?? 0;
+  const lower = min ?? -Infinity;
+  const upper = max ?? Infinity;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const generatedId = useId();
@@ -201,7 +197,7 @@ export function useNumberField({
   });
 
   const fit = (next: number) =>
-    snap ? clampToStep(next, stepSize, base, min, max) : clampNumber(next, min, max);
+    snap ? clampToStep(next, stepSize, base, min, max) : clamp(next, lower, upper);
 
   const read = (text: string) => {
     if (!DIGIT.test(text)) return null;
@@ -238,7 +234,7 @@ export function useNumberField({
   const stepBy = (direction: 1 | -1, amount: number) => {
     if (locked) return false;
     const previous = latestValue.current;
-    const from = previous ?? clampNumber(0, min, max);
+    const from = previous ?? clamp(0, lower, upper);
     let next =
       previous == null && from !== 0
         ? from
@@ -246,7 +242,7 @@ export function useNumberField({
           ? snapToStep(from, stepSize, base, direction > 0 ? 'up' : 'down')
           : addDecimal(from, direction * amount);
     if ((min !== undefined && next < min) || (max !== undefined && next > max))
-      next = snap ? clampToStep(next, stepSize, base, min, max) : clampNumber(next, min, max);
+      next = snap ? clampToStep(next, stepSize, base, min, max) : clamp(next, lower, upper);
     if (!Number.isFinite(next)) return false;
     setDraft(null);
     setCurrent(next);
@@ -350,7 +346,7 @@ export function useNumberField({
     notify?.();
   }, [rangeMessage, current, notify]);
 
-  const appleTouch = useSyncExternalStore(noop, isAppleTouch, () => false);
+  const appleTouch = useSyncExternalStore(subscribeToNothing, isAppleTouch, () => false);
   const acceptsNegative = min === undefined || min < 0;
   const acceptsFraction =
     formatOptions?.maximumFractionDigits !== 0 &&
@@ -473,8 +469,8 @@ export function useNumberField({
     value: current,
     name: native.name,
     form: native.form,
-    canIncrease: current == null || current < (max ?? Infinity),
-    canDecrease: current == null || current > (min ?? -Infinity),
+    canIncrease: current == null || current < upper,
+    canDecrease: current == null || current > lower,
     state: {
       disabled,
       readOnly,

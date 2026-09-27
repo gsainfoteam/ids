@@ -1,3 +1,5 @@
+import { clamp } from 'es-toolkit';
+
 type Decimal = { digits: bigint; scale: number };
 
 // A JS number written out as integer digits over a power of ten, so 0.1 is exactly 1/10 and
@@ -33,10 +35,6 @@ export function addDecimal(left: number, right: number): number {
   const b = toDecimal(right);
   const scale = Math.max(a.scale, b.scale);
   return fromDigits(atScale(a, scale) + atScale(b, scale), scale);
-}
-
-export function clampNumber(value: number, min?: number, max?: number) {
-  return Math.min(max ?? Infinity, Math.max(min ?? -Infinity, value));
 }
 
 export function isOnStep(value: number, step: number, base: number) {
@@ -81,5 +79,5 @@ export function clampToStep(value: number, step: number, base: number, min?: num
   if (max !== undefined && next > max) next = snapToStep(max, step, base, 'down');
   if (min !== undefined && next < min) next = snapToStep(min, step, base, 'nearest');
   if (min !== undefined && next < min) next = snapToStep(min, step, base, 'up');
-  return clampNumber(next, min, max);
+  return clamp(next, min ?? -Infinity, max ?? Infinity);
 }

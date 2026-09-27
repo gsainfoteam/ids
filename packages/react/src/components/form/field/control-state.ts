@@ -63,12 +63,6 @@ export function readValidity(root: Element): FieldValidity | null {
   return null;
 }
 
-export function sameValidity(a: FieldValidity | null, b: FieldValidity | null) {
-  if (a === b) return true;
-  if (!a || !b || a.message !== b.message) return false;
-  return VALIDITY_KEYS.every((key) => a.flags[key] === b.flags[key]);
-}
-
 // A form with noValidate asked the browser to stay out of validation, so the field does too.
 export function validatesNatively(root: Element) {
   const form = controlsIn(root)[0]?.form;
