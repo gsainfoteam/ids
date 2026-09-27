@@ -163,9 +163,7 @@ in full rather than composing prefixes.
 only reads classes there (`.vscode/settings.json` registers `cn`, `tv` and `cva`), so a bare string
 in an object, a constant, an array or a story's `args` gets no completion and no lint. A shared
 fragment is an object of `cn('...')` values that components take into their own `tv` slots, and a
-class joined with a variable is `cn('concentric-p-4', surface)`, not a template literal. The one
-exception is the class-group list in `utils/cn.ts`, which only tells the merger about IDS classes
-and is never rendered.
+class joined with a variable is `cn('concentric-p-4', surface)`, not a template literal.
 
 **Focus is a soft ring, never an offset outline.** Add the `focus-ring` class. It is a single
 `@utility` in the CSS package that covers every trigger IDS uses — `:focus-visible` for real form
