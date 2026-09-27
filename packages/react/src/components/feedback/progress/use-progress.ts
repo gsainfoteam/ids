@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { describeProblem, formatPercent, resolveProgress } from './progress-value';
+import { isDevelopment } from '../../../utils/dev';
 
 export type UseProgressOptions = {
   value: number | null | undefined;
@@ -26,13 +27,13 @@ export function useProgress({
         : formatPercent(resolved.percent);
 
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    if (!isDevelopment) return;
     const problem = describeProblem(value, max);
     if (problem) console.warn(`[IDS] Progress: ${problem}`);
   }, [value, max]);
 
   useEffect(() => {
-    if (!import.meta.env.DEV || labelled) return;
+    if (!isDevelopment || labelled) return;
     console.warn('[IDS] Progress: add a Progress.Label or an aria-label so it has a name.');
   }, [labelled]);
 

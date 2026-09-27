@@ -22,6 +22,7 @@ import {
 import { useAlert } from './use-alert';
 import { messages } from '../../../internal/messages';
 import { flattenFragments, invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { Slot } from '../../utility/slot';
 
 type Context = {
@@ -96,7 +97,7 @@ export function Alert({
   );
 
   useEffect(() => {
-    if (import.meta.env.DEV && !hasText)
+    if (isDevelopment && !hasText)
       console.warn('[IDS] Alert: give it an Alert.Title or an Alert.Description.');
   }, [hasText]);
 

@@ -1,3 +1,4 @@
+import { clamp } from 'es-toolkit';
 export type ResolvedProgress = {
   value: number | null;
   max: number;
@@ -17,7 +18,7 @@ export function resolveProgress(
   const safeMax = validMax ? max : DEFAULT_MAX;
   if (indeterminate || value == null || !validMax || !Number.isFinite(value))
     return { value: null, max: safeMax, percent: null };
-  const clamped = Math.min(Math.max(value, 0), safeMax);
+  const clamped = clamp(value, 0, safeMax);
   return { value: clamped, max: safeMax, percent: (clamped / safeMax) * 100 };
 }
 

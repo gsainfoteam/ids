@@ -1,31 +1,17 @@
-import type { ComponentProps, ReactNode } from 'react';
+import { Group, useGroupNameWarning } from '../../utility/group';
 
-import { GroupRoot, GroupSeparator } from '../../utility/group';
-
-import type { StackDirection } from '../../../layout/types';
-import type { IdsSize } from '../../../tokens/types';
-
-export function ButtonGroup({
-  orientation = 'horizontal',
-  size = 'standard',
-  className,
-  children,
-  ...rest
-}: ButtonGroup.Props) {
-  return (
-    <GroupRoot orientation={orientation} size={size} className={className} {...rest}>
-      {children}
-    </GroupRoot>
-  );
+export function ButtonGroup(props: ButtonGroup.Props) {
+  useGroupNameWarning('ButtonGroup', props);
+  return <Group {...props} />;
 }
 
 export namespace ButtonGroup {
-  export const Separator = GroupSeparator;
+  // orientation, attached, and the size and variant its buttons take unless they set their own.
+  export type Props = Group.Props;
+  export type SeparatorProps = Group.SeparatorProps;
+  export type TextProps = Group.TextProps;
 
-  export type Props = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
-    orientation?: StackDirection;
-    size?: IdsSize;
-    className?: string;
-    children?: ReactNode;
-  };
+  export const Separator = Group.Separator;
+  export const Text = Group.Text;
+  export const Style = Group.Style;
 }

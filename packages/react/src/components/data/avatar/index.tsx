@@ -28,6 +28,7 @@ import {
 } from './use-avatar';
 import { resolveState, type StateValue } from '../../../internal/state-props';
 import { flattenFragments, invariant, mergeRefs, tv } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { Slot } from '../../utility/slot';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -87,7 +88,7 @@ export function Avatar({
   const decorative = alt === '' || ariaHidden === true || ariaHidden === 'true';
   const label = [ariaLabel, alt, name].find((candidate) => candidate?.trim());
   useEffect(() => {
-    if (import.meta.env.DEV && !decorative && label === undefined)
+    if (isDevelopment && !decorative && label === undefined)
       console.warn(
         '[IDS] Avatar: pass name, alt or aria-label so it has an accessible name, or alt="" when it is decorative.',
       );

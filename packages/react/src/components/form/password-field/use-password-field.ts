@@ -22,6 +22,7 @@ import {
   useTextControl,
 } from '../../../internal/text-control';
 import { invariant, mergeProps } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { FieldNotifyContext } from '../field/context';
 
 export type PasswordFieldInputProps = Omit<
@@ -107,7 +108,7 @@ export function usePasswordField({
   }, [visible]);
 
   useEffect(() => {
-    if (import.meta.env.DEV && !native.name)
+    if (isDevelopment && !native.name)
       console.warn(
         '[IDS] PasswordField: give it a name such as name="password" so password managers recognise it.',
       );

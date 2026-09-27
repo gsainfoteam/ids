@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 import { messages } from '../../../internal/messages';
+import { isDevelopment } from '../../../utils/dev';
 import { NumberField, type NumberFieldProps } from '../number-field';
 import { PasswordField, type PasswordFieldProps } from '../password-field';
 import { TelField, type TelFieldProps } from '../tel-field';
@@ -29,7 +30,7 @@ export function Input(props: InputProps) {
   const { type = 'text' } = props;
   const supported = SUPPORTED.includes(type);
   useEffect(() => {
-    if (import.meta.env.DEV && !supported)
+    if (isDevelopment && !supported)
       console.warn(
         `[IDS] Input: unsupported type "${type}"; using text. Use the dedicated field for dates, times, colors, files and OTP.`,
       );

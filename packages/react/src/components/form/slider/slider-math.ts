@@ -1,6 +1,4 @@
-export function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
+import { clamp } from 'es-toolkit';
 
 function decimalsOf(n: number) {
   const [mantissa, exponent] = String(n).split('e');

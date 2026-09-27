@@ -1,67 +1,93 @@
-import { Children, type ReactElement } from 'react';
+import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 
-import { resolveInteractiveValue, type InteractiveValue } from '../../../hooks/use-interactive';
+import { controlSurface, type ControlColorScheme } from '../../../internal/control-surface';
+import { useIconLabel } from '../../../internal/icon-label';
 import { iconSquare } from '../../../internal/icon-square';
 import { invariant, tv } from '../../../utils';
 import { useGroupContext } from '../../utility/group';
-import { Button } from '../button';
+import { useButton } from '../button/use-button';
 
-import type { IdsSize } from '../../../tokens/types';
+import type {
+  InteractiveState,
+  InteractiveValue,
+  WithInteractiveValues,
+} from '../../../hooks/use-interactive';
+import type { IdsSize, IdsVariant } from '../../../tokens/types';
 
-export function IconButton({
-  icon,
-  children,
-  className,
-  variant = 'ghost',
-  size,
-  'aria-label': ariaLabel,
-  ...rest
-}: IconButton.Props) {
+export function IconButton(props: IconButton.Props) {
   const group = useGroupContext();
+  const {
+    props: { icon, variant: ownVariant, colorScheme, size, className, style, ...rest },
+    element,
+    content,
+    render,
+  } = useButton(props, 'IconButton');
 
-  invariant(children == null, '`<IconButton>` does not accept `children`. Use the `icon` prop.');
-  invariant(icon != null, '`<IconButton>` requires an `icon` prop.');
-  invariant(ariaLabel != null, '`<IconButton>` requires an `aria-label` prop.');
   invariant(
-    typeof ariaLabel !== 'string' || ariaLabel.trim() !== '',
-    '`<IconButton>` `aria-label` must not be empty.',
+    props.asChild || content == null,
+    'IconButton: pass the icon through the `icon` prop, not as children.',
   );
+  invariant(icon != null || props.asChild, 'IconButton: the `icon` prop is required.');
 
-  return (
-    <Button
-      {...rest}
-      aria-label={ariaLabel}
-      variant={variant}
-      size={size}
-      className={(state) => {
-        const resolvedSize = resolveInteractiveValue(size, state) as IdsSize | undefined;
-        invariant(
-          group == null || resolvedSize == null || resolvedSize === group.size,
-          `\`<IconButton>\` inside a group must use the group's \`size\` (${group?.size}).`,
-        );
+  const glyph = icon ?? content;
+  const label = useIconLabel('IconButton', glyph, rest, element?.props as object | undefined);
+  const variant = ownVariant ?? group?.variant ?? 'ghost';
+  const resolvedSize = size ?? group?.size ?? 'standard';
 
-        return IconButton.Style({
-          size: group?.size ?? resolvedSize ?? 'standard',
-          className: resolveInteractiveValue(className, state),
-        });
-      }}
-    >
-      {(state) => Children.only(resolveInteractiveValue(icon, state)!)}
-    </Button>
+  return render(
+    {
+      ...rest,
+      'aria-label': label ?? rest['aria-label'],
+      className: IconButton.Style({ variant, colorScheme, size: resolvedSize, className }),
+      style,
+      'data-variant': variant,
+      'data-size': resolvedSize,
+    },
+    glyph,
   );
 }
 
 export namespace IconButton {
+  export type State = InteractiveState;
+  export type Variant = IdsVariant;
+  export type ColorScheme = ControlColorScheme;
+
+  type BaseProps = Omit<ComponentProps<'button'>, 'children' | 'className' | 'style'> & {
+    variant?: Variant;
+    colorScheme?: ColorScheme;
+    size?: IdsSize;
+    className?: string;
+    style?: CSSProperties;
+    onInteractionChange?: (state: State) => void;
+  };
+
+  export type Props = WithInteractiveValues<BaseProps> & {
+    focusableWhenDisabled?: boolean;
+  } & (
+      | {
+          asChild?: false;
+          icon: InteractiveValue<ReactElement>;
+          children?: never;
+        }
+      | {
+          // The child element (a link) is drawn as the square; its content, or `icon`, is the icon.
+          asChild: true;
+          icon?: InteractiveValue<ReactElement>;
+          children: InteractiveValue<ReactElement>;
+        }
+    );
+
   export const Style = tv({
-    base: iconSquare.base,
+    base: [controlSurface.base, iconSquare.base],
     variants: {
+      variant: controlSurface.variant,
+      colorScheme: controlSurface.colorScheme,
       size: iconSquare.size,
     },
+    defaultVariants: {
+      variant: 'ghost',
+      colorScheme: 'primary',
+      size: 'standard',
+    },
   });
-
-  export type Props = Omit<Button.Props, 'children'> & {
-    icon: InteractiveValue<ReactElement>;
-    children?: never;
-    'aria-label': InteractiveValue<string>;
-  };
 }

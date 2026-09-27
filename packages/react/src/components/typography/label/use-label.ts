@@ -11,6 +11,7 @@ import {
 } from 'react';
 
 import { mergeRefs } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { FieldSizeContext } from '../../form/field/context';
 
 // Anything a label can stand for. A native input, select, textarea or button is labelled by the
@@ -116,7 +117,7 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
 
   const insideField = use(FieldSizeContext) !== undefined;
   useEffect(() => {
-    if (!import.meta.env.DEV || !node) return;
+    if (!isDevelopment || !node) return;
     if (insideField) console.warn('[IDS] Label: inside a Field, use Field.Label instead.');
     else if (!controlOf(node, htmlFor))
       console.warn('[IDS] Label: it is not linked to a control. Wrap the control or set htmlFor.');

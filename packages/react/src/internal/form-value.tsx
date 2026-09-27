@@ -1,5 +1,7 @@
 import type { RefObject } from 'react';
 
+import { noop } from 'es-toolkit';
+
 export type FormValueProps = {
   name?: string;
   form?: string;
@@ -12,8 +14,6 @@ export type FormValueProps = {
   // for a group of checkboxes or a rating.
   message?: string;
 };
-
-const noop = () => {};
 
 // A custom control (a button trigger, a listbox, a group of radios drawn as buttons) has no native
 // input, so it is invisible to FormData and to the form's constraint validation.
