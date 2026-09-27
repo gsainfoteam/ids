@@ -122,8 +122,13 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
   const insideField = use(FieldSizeContext) !== undefined;
   useEffect(() => {
     if (!isDevelopment || !node || fieldLabel) return;
-    if (insideField) console.warn('[IDS] Label: inside a Field, use Field.Label instead.');
-    else if (!controlOf(node, htmlFor))
+    const control = controlOf(node, htmlFor);
+    // A label wrapping its own control, such as an option of a CheckboxGroup, names that control
+    // rather than the field, so only a label standing apart from its control is taken for a
+    // misplaced Field.Label.
+    if (insideField && !(control && node.contains(control)))
+      console.warn('[IDS] Label: inside a Field, use Field.Label instead.');
+    else if (!control)
       console.warn('[IDS] Label: it is not linked to a control. Wrap the control or set htmlFor.');
   }, [node, htmlFor, insideField, fieldLabel]);
 

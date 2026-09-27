@@ -273,3 +273,36 @@ test('inside a Field it still renders', () => {
   );
   assert.match(html, /data-label/);
 });
+
+test('inside a Field a label wrapping its own control stays quiet; one standing apart warns', async () => {
+  const { Checkbox, CheckboxGroup } = await import('../dist/index.js');
+  const warnings = [];
+  const original = console.warn;
+  console.warn = (message) => warnings.push(String(message));
+  try {
+    await render(
+      h(
+        Field,
+        null,
+        h(Field.Label, null, 'Topics'),
+        h(
+          CheckboxGroup,
+          { defaultValue: [] },
+          h(Label, null, h(Checkbox, { value: 'news' }), 'News'),
+        ),
+      ),
+    );
+    await flush();
+    assert.deepEqual(
+      warnings.filter((warning) => warning.includes('Field.Label')),
+      [],
+    );
+    await act(async () => root.unmount());
+    root = undefined;
+    await render(h(Field, null, h('input', { id: 'name' }), h(Label, { htmlFor: 'name' }, 'Name')));
+    await flush();
+    assert.ok(warnings.some((warning) => warning.includes('Field.Label')));
+  } finally {
+    console.warn = original;
+  }
+});
