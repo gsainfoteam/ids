@@ -45,7 +45,10 @@ const preview: Preview = {
       },
     },
     options: {
+      // Components sort by name inside each category; stories keep their export order, which
+      // puts Playground and Gallery first.
       storySort: {
+        method: 'alphabetical',
         order: [
           'Foundations',
           ['Color', 'Typography', 'Radius', 'InteractiveState'],
