@@ -448,6 +448,17 @@ test('parts: none gives Trigger and Clear, given parts are drawn as given, Trigg
   );
 });
 
+test('the chevron gives way to Clear once there is a value', async () => {
+  await render(h(DateField, { today: d(15) }));
+  assert.equal(trigger().querySelectorAll('svg').length, 2, 'icon and chevron while empty');
+  await click(trigger());
+  await click(day('2026-09-18'));
+  assert.equal(trigger().querySelectorAll('svg').length, 1, 'the icon alone beside Clear');
+  assert.ok(clear());
+  await render(h(DateField, { key: 'no-clear', defaultValue: d(15) }, h(DateField.Trigger)));
+  assert.equal(trigger().querySelectorAll('svg').length, 2, 'no Clear, so the chevron stays');
+});
+
 test('every opening starts on the month of the chosen date', async () => {
   await render(h(DateField, { defaultValue: d(15), today: d(15) }));
   await click(trigger());

@@ -87,6 +87,7 @@ export type ContentProps = ComponentProps<'div'> & { asChild?: boolean };
 
 type ContextValue = {
   state: TemporalFieldState<unknown>;
+  hasClear: boolean;
   blocked: boolean;
   clear: () => void;
   onBlur: TemporalFieldApi<unknown>['onBlur'];
@@ -192,7 +193,10 @@ export function TemporalTrigger({ asChild, children, ...props }: TriggerProps) {
       <>
         <c.icon aria-hidden="true" className={c.styles.icon()} />
         <TemporalValue />
-        <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
+        {/* Clear takes the chevron's place once there is a value, so the end holds one icon. */}
+        {(c.state.empty || !c.hasClear) && (
+          <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
+        )}
       </>
     ),
     mergeProps(props, c.trigger),
@@ -338,6 +342,7 @@ export function TemporalField<V>({
     <TemporalContext.Provider
       value={{
         state,
+        hasClear: !composed || count(TemporalClear) > 0,
         blocked,
         clear,
         onBlur: handleBlur,

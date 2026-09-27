@@ -8,7 +8,8 @@ and close button only in the mobile drawer. New: `open` / `defaultOpen` / `onOpe
 `required` enforced by the browser through a hidden form value that hands focus back to the
 trigger, `X.State`, function `className` / `style` on the field surface, `data-open`,
 `data-empty`, `data-invalid`, `data-disabled`, `data-readonly` and `data-required` on it,
-`data-placeholder` on the value, `referenceDate` on TimeField, `captionLayout` passed through to
+`data-placeholder` on the value, a Clear button that takes the chevron's place once there is a
+value, `referenceDate` on TimeField, `captionLayout` passed through to
 the calendar, one `onOpenChange(false)` per outside click, and a DateTimeField clock that stays
 empty until a time is picked and sits beside the calendar at its height.
 
