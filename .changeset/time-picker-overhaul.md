@@ -16,8 +16,8 @@ columns, and `asChild` on `Column` and `Period`.
 
 Breaking: `onChange(value: Date)` is now `onValueChange(value: Date | null)` and no longer fires
 when the selected time is picked again. The default `locale` is `ko-KR` (from the shared
-messages), whose date-fns data reads a 24-hour clock; `format="12h"` adds the `오전` / `오후`
-column. A tag other than `ko` / `ko-KR` / `en` / `en-US` throws; pass a date-fns `Locale`
+messages). The clock follows the CLDR hour cycle Intl reports, so Korean opens on a 12-hour
+clock with the `오전` / `오후` column first; `format="24h"` drops it. A tag other than `ko` / `ko-KR` / `en` / `en-US` throws; pass a date-fns `Locale`
 instead. An empty picker builds the time on today instead of 2000-01-01. The group and column
 names are Korean (`시간`, `시`, `분`, `초`, `오전/오후`). A `Column` function child now renders
 each option's label instead of replacing the whole option list.

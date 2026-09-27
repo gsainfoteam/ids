@@ -84,7 +84,7 @@ test('SSR formatting, local serialization, Field ARIA and diagnostics for both c
     new JSDOM(
       renderToString(h(DateTimeField, { defaultValue: d(15, 14, 5), ...props })),
     ).window.document.querySelector('[role=combobox]').textContent;
-  assert.equal(shown({}), '2026.09.15 14:05', 'the locale short date and clock');
+  assert.equal(shown({}), '2026.09.15 오후 2:05', 'the locale short date and its CLDR clock');
   assert.equal(shown({ locale: 'en-US' }), '09/15/2026 2:05 PM');
   assert.equal(shown({ hourCycle: '12h' }), '2026.09.15 오후 2:05');
   const empty = new JSDOM(renderToString(h(DateTimeField, {}))).window.document;

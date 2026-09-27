@@ -55,8 +55,8 @@ const periods = (doc) =>
 test('SSR: Korean names by default, the clock and periods from the date-fns locale, diagnostics', () => {
   const doc = ssr({ precision: 'second', step: 15 });
   assert.equal(doc.querySelector('[role=group]').getAttribute('aria-label'), '시간');
-  assert.deepEqual(labels(doc), ['시', '분', '초'], 'date-fns ko reads a 24-hour clock');
-  assert.equal(doc.querySelector('[data-time-picker]').dataset.format, '24h');
+  assert.deepEqual(labels(doc), ['오전/오후', '시', '분', '초'], 'Korean expects a 12-hour clock, as CLDR does');
+  assert.equal(doc.querySelector('[data-time-picker]').dataset.format, '12h');
   assert.equal(doc.querySelectorAll('[data-time-column=second] [role=option]').length, 4);
   assert.ok(doc.querySelector('[data-time-picker]').hasAttribute('data-empty'));
   assert.deepEqual(periods(ssr({ format: '12h' })), ['오전', '오후']);

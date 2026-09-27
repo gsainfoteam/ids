@@ -33,8 +33,25 @@ export const tokensOf = (pattern: string) => pattern.replace(/'[^']*'/g, '');
 const timeTokens = (locale: Locale, width: 'short' | 'long' | 'full') =>
   tokensOf(locale.formatLong?.time({ width }) ?? '');
 
-export function hourCycleOf(locale: Locale): HourCycle {
+// The clock a locale's own time pattern is written in. `p` can only be used as is for that clock.
+export function patternHourCycle(locale: Locale): HourCycle {
   return /[ahK]/.test(timeTokens(locale, 'short')) ? '12h' : '24h';
+}
+
+// The clock people expect comes from CLDR, which the browser's Intl carries: Korean reads
+// "오후 2:30" there, while date-fns's ko pattern is "HH:mm". The pattern is only the fallback for a
+// locale code Intl cannot resolve.
+export function hourCycleOf(locale: Locale): HourCycle {
+  try {
+    if (locale.code) {
+      const cycle = new Intl.DateTimeFormat(locale.code, { hour: 'numeric' }).resolvedOptions()
+        .hourCycle;
+      if (cycle) return cycle === 'h11' || cycle === 'h12' ? '12h' : '24h';
+    }
+  } catch {
+    // An unknown code falls through to the pattern.
+  }
+  return patternHourCycle(locale);
 }
 
 // Korean and Chinese write the day period before the hour. A 24-hour locale shown on a 12-hour

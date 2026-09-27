@@ -69,7 +69,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Hour cycle × Precision"
-        description="시간제는 date-fns locale을 따르고 format으로 정합니다. 12시간제에는 오전/오후 컬럼이 붙습니다."
+        description="시간제는 locale의 CLDR 시간제를 따르고 format으로 정합니다. 12시간제에는 오전/오후 컬럼이 locale이 쓰는 자리에 붙습니다."
       >
         <Showcase.Row label="24h minute">
           <TimePicker format="24h" defaultValue={at(14, 30)} className="w-56" aria-label="24시간" />
@@ -261,12 +261,12 @@ export const Wheel: Story = {
 export const Locale: Story = {
   render: () => (
     <div className="flex flex-wrap gap-8">
-      <TimePicker defaultValue={at(14, 30)} className="w-44" aria-label="한국어" />
+      <TimePicker defaultValue={at(14, 30)} className="w-64" aria-label="한국어" />
       <TimePicker
-        format="12h"
+        format="24h"
         defaultValue={at(14, 30)}
-        className="w-64"
-        aria-label="한국어 12시간"
+        className="w-44"
+        aria-label="한국어 24시간"
       />
       <TimePicker locale="en-US" defaultValue={at(14, 30)} className="w-64" aria-label="English" />
       <TimePicker locale={de} defaultValue={at(14, 30)} className="w-44" aria-label="Deutsch" />
@@ -276,18 +276,19 @@ export const Locale: Story = {
     docs: {
       description: {
         story:
-          '시간제와 오전/오후 이름은 date-fns locale을 따릅니다. date-fns의 한국어와 독일어는 24시간제, 미국 영어는 12시간제이고 format="12h"로 바꿀 수 있습니다.',
+          '시간제는 브라우저의 CLDR 데이터를, 오전/오후 이름은 date-fns locale을 따릅니다. 한국어와 미국 영어는 12시간제, 독일어는 24시간제이고 format으로 바꿀 수 있습니다. 한국어는 오전/오후 컬럼이 앞에 옵니다.',
       },
     },
   },
   play: async ({ canvas }) => {
     const korean = canvas.getByRole('group', { name: '한국어' });
-    await expect(korean.querySelector('[data-time-column=period]')).toBeNull();
-    await expect(korean).toHaveAttribute('data-format', '24h');
-    const twelve = canvas.getByRole('group', { name: '한국어 12시간' });
+    await expect(korean).toHaveAttribute('data-format', '12h');
     await expect(
-      twelve.querySelector('[data-time-column=period] [data-selected]'),
+      korean.querySelector('[data-time-column=period] [data-selected]'),
     ).toHaveTextContent('오후');
+    await expect(korean.querySelector('[role=listbox]')).toHaveAttribute('aria-label', '오전/오후');
+    const twentyFour = canvas.getByRole('group', { name: '한국어 24시간' });
+    await expect(twentyFour.querySelector('[data-time-column=period]')).toBeNull();
     const english = canvas.getByRole('group', { name: 'English' });
     await expect(
       english.querySelector('[data-time-column=period] [data-selected]'),

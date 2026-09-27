@@ -47,8 +47,8 @@ import { DateTimeField, Field } from '@gsainfoteam/ids-react';
 ## 표시 형식
 
 ```tsx
-<DateTimeField />                                              // ko-KR: 2026.09.15 14:30
-<DateTimeField hourCycle="12h" />                              // 2026.09.15 오후 2:30
+<DateTimeField />                                              // ko-KR: 2026.09.15 오후 2:30
+<DateTimeField hourCycle="24h" />                              // 2026.09.15 14:30
 <DateTimeField locale="en-US" />                               // 09/15/2026 2:30 PM
 <DateTimeField format="yyyy년 M월 d일 HH:mm" />               // 2026년 9월 15일 14:30
 <DateTimeField format="EEE, MMM d 'at' h:mm a" hourCycle="12h" locale="en-US" />

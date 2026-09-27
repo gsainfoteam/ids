@@ -2,7 +2,7 @@
 
 누르면 시계가 열리고, 고른 시각을 필드에 보여 주는 시간 입력입니다.
 
-- **date-fns locale 시간제.** 한국어와 독일어는 `14:30`, 미국 영어는 `2:30 PM` 처럼 보이고, 시계도 같은 시간제로 열립니다. `format` 과 `hourCycle` 로 바꿉니다.
+- **locale 시간제.** 한국어는 `오후 2:30`, 미국 영어는 `2:30 PM`, 독일어는 `14:30` 처럼 브라우저의 CLDR 데이터를 따라 보이고, 시계도 같은 시간제로 열립니다. `format` 과 `hourCycle` 로 바꿉니다.
 - **간격과 범위.** `step` 으로 15분 단위처럼 끊고 `min` / `max` 밖은 고를 수 없습니다.
 - **키보드.** Trigger에서 `↓` 로 열면 첫 컬럼에 포커스가 가고, 숫자를 치거나 방향키로 옮겨 Enter로 고릅니다.
 - **폼.** `name` 을 주면 `14:30` 이 FormData에 들어가고, `required` 인데 비어 있으면 브라우저가 제출을 막습니다. `reset` 은 `defaultValue` 로 되돌립니다.
@@ -32,8 +32,8 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 ## 표시 형식
 
 ```tsx
-<TimeField />                                  // ko-KR: 14:30 (date-fns p)
-<TimeField format="12h" />                     // 오후 2:30. 시계도 12시간제
+<TimeField />                                  // ko-KR: 오후 2:30
+<TimeField format="24h" />                     // 14:30. 시계도 24시간제
 <TimeField locale="en-US" />                   // 2:30 PM
 <TimeField format="24h" locale="en-US" />      // 14:30
 <TimeField format="a h:mm" hourCycle="12h" />  // 패턴은 글자만 바꾼다. 시계 시간제는 hourCycle
@@ -41,9 +41,9 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 <TimeField format={(date) => `${date.getHours()}시`} />   // 함수
 ```
 
-- 기본 글자는 locale 의 짧은 시각(date-fns `p`, 초까지면 `pp`)입니다. locale 과 다른 시간제를 고르면 `HH:mm` 이나 `h:mm a` 로 쓰고, 한국어처럼 오전/오후가 앞인 locale 은 `a h:mm` 입니다.
+- 기본 글자는 locale 의 짧은 시각(date-fns `p`, 초까지면 `pp`)입니다. 시간제가 그 형식과 다르면 `HH:mm` 이나 `h:mm a` 로 쓰고, 한국어처럼 오전/오후가 앞인 locale 은 `a h:mm` 입니다. date-fns 의 한국어 형식은 24시간제라, 한국어 기본은 `a h:mm` 입니다.
 - 패턴은 [date-fns 토큰](https://date-fns.org/docs/format)입니다. 모르는 영문자는 date-fns 가 오류를 냅니다.
-- `hourCycle` 이 `format` 의 `12h` / `24h` 보다 먼저입니다. 둘 다 없으면 locale 을 따릅니다.
+- `hourCycle` 이 `format` 의 `12h` / `24h` 보다 먼저입니다. 둘 다 없으면 locale 의 CLDR 시간제를 따릅니다.
 
 ## 시계 옵션
 

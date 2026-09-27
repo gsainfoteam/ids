@@ -16,7 +16,7 @@ import {
   type TimePickerOptionState,
   type TimePickerState,
 } from './use-time-picker';
-import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
+import { periodFirst, resolveLocale, type DateLocale } from '../../../internal/date-locale';
 import { flattenParts, part } from '../../../internal/field-popup';
 import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
@@ -55,7 +55,10 @@ export type TimePickerProps = Omit<
   };
 
 type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
-type ContextValue = TimePickerApi & { styles: ReturnType<typeof TimePicker.Style> };
+type ContextValue = TimePickerApi & {
+  styles: ReturnType<typeof TimePicker.Style>;
+  periodLeads: boolean;
+};
 
 const TimePickerContext = createContext<ContextValue | null>(null);
 
@@ -79,13 +82,20 @@ function withDefault(children: ReactNode, fallback: ReactNode) {
     : children;
 }
 
-function defaultUnits(precision: TimePrecision, format: TimeFormat): TimeUnit[] {
-  return [
+// The period column sits where the locale writes the day period: first in Korean ("오후 2:05"),
+// last in English ("2:05 PM").
+function defaultUnits(
+  precision: TimePrecision,
+  format: TimeFormat,
+  periodLeads: boolean,
+): TimeUnit[] {
+  const clock: TimeUnit[] = [
     'hour',
     ...(precision !== 'hour' ? (['minute'] as const) : []),
     ...(precision === 'second' ? (['second'] as const) : []),
-    ...(format === '12h' ? (['period'] as const) : []),
   ];
+  if (format !== '12h') return clock;
+  return periodLeads ? ['period', ...clock] : [...clock, 'period'];
 }
 
 export function TimePicker({
@@ -124,6 +134,7 @@ export function TimePicker({
     readOnly: readOnly || selectionMode === 'none',
   });
   const { state } = api;
+  const periodLeads = periodFirst(resolveLocale(locale));
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = TimePicker.Style({ size: resolvedSize });
 
@@ -149,7 +160,9 @@ export function TimePicker({
   }
 
   return (
-    <TimePickerContext.Provider value={{ ...api, variant, size: resolvedSize, styles }}>
+    <TimePickerContext.Provider
+      value={{ ...api, variant, size: resolvedSize, styles, periodLeads }}
+    >
       <div
         {...props}
         role="group"
@@ -168,7 +181,7 @@ export function TimePicker({
         style={typeof style === 'function' ? style(state) : style}
       >
         {children ??
-          defaultUnits(precision, state.format).map((unit) =>
+          defaultUnits(precision, state.format, periodLeads).map((unit) =>
             unit === 'period' ? (
               <TimePicker.Period key={unit} />
             ) : (
@@ -258,7 +271,7 @@ export namespace TimePicker {
   // Labels for the columns above them, hidden from screen readers since each column is named.
   export function Header({ asChild, children, ...props }: BoxProps) {
     const c = useTimePickerContext('TimePicker.Header');
-    const labels = defaultUnits(c.state.precision, c.state.format).map((unit) => (
+    const labels = defaultUnits(c.state.precision, c.state.format, c.periodLeads).map((unit) => (
       <span key={unit} className={c.styles.headerLabel()}>
         {unitMessage[unit]}
       </span>

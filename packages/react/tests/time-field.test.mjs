@@ -63,9 +63,9 @@ test('SSR: display follows format, hourCycle and the date-fns locale; FormData f
   const text = (props) =>
     html({ defaultValue: at, ...props }).querySelector('[role=combobox]').textContent;
   const at = d(15, 14, 5, 9);
-  assert.equal(text({}), '14:05', 'date-fns ko writes a 24-hour clock');
+  assert.equal(text({}), '오후 2:05', 'Korean expects a 12-hour clock, as CLDR does');
   assert.equal(text({ format: '12h' }), '오후 2:05', 'Korean puts the period first');
-  assert.equal(text({ precision: 'second' }), '14:05:09');
+  assert.equal(text({ precision: 'second' }), '오후 2:05:09');
   assert.equal(text({ locale: 'en-US' }), '2:05 PM');
   assert.equal(text({ locale: 'en-US', format: '24h' }), '14:05');
   assert.equal(text({ locale: de }), '14:05');
