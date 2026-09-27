@@ -223,3 +223,30 @@ export const CustomControl: Story = {
     await expect(slider).toHaveFocus();
   },
 };
+
+export const AsChild: Story = {
+  render: () => (
+    <div className="flex w-64 flex-col gap-3">
+      <Label asChild htmlFor="label-as-child" required>
+        <span id="label-as-child-text">밝기</span>
+      </Label>
+      <Slider id="label-as-child" defaultValue={60} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'asChild로 자식 요소를 라벨로 그립니다. 자식의 id를 그대로 쓰고, label이 아닌 요소도 컨트롤의 이름이 되며 누르면 포커스가 갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const text = canvas.getByText('밝기');
+    await expect(text).toHaveAttribute('data-label');
+    await expect(text).toHaveAttribute('id', 'label-as-child-text');
+    const slider = canvas.getByRole('slider', { name: '밝기' });
+    await userEvent.click(text);
+    await expect(slider).toHaveFocus();
+  },
+};

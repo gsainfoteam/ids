@@ -213,6 +213,34 @@ test('invalid is set directly, not read from the control', async () => {
   assert.equal(mirrored.hasAttribute('data-invalid'), false);
 });
 
+test('asChild draws the label as its child element, with the id and handler it carries', async () => {
+  const clicks = [];
+  await render(
+    h(
+      'div',
+      null,
+      h(
+        Label,
+        { asChild: true, htmlFor: 'level', required: true },
+        h('span', { id: 'own', className: 'own', onClick: () => clicks.push('child') }, 'Level'),
+      ),
+      h('div', { id: 'level', role: 'slider', tabIndex: 0, 'aria-valuenow': 3 }),
+    ),
+  );
+  await flush();
+  const span = host.querySelector('span[data-label]');
+  assert.equal(span.id, 'own');
+  assert.match(span.className, /own/);
+  assert.match(span.className, /text-body-b3-medium/);
+  assert.equal(span.querySelector('[data-label-required]').textContent, '*');
+  const slider = host.querySelector('[role="slider"]');
+  assert.equal(slider.getAttribute('aria-labelledby'), 'own');
+  await act(async () => span.click());
+  assert.deepEqual(clicks, ['child']);
+  assert.equal(document.activeElement, slider);
+  assert.throws(() => renderToString(h(Label, { asChild: true }, 'Level')), /Label asChild/);
+});
+
 test('inside a Field it still renders', () => {
   const html = renderToString(
     h(

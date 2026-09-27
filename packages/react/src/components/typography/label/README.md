@@ -58,6 +58,18 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 <Label size="tiny" />       // 12px medium
 ```
 
+## asChild
+
+```tsx
+<Label asChild htmlFor="volume">
+  <span>볼륨</span>          {/* span 이 라벨이 된다 */}
+</Label>
+<Slider id="volume" />
+```
+
+- 자식이 가진 `id` 와 `htmlFor` 를 라벨의 것으로 씁니다. 필수 `*` 는 자식 안 끝에 붙습니다.
+- `label` 이 아닌 요소도 컨트롤의 이름이 되고, 누르면 컨트롤로 포커스가 갑니다.
+
 ## 상태
 
 | 상태       | 뜻                            |
@@ -81,9 +93,10 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 | `disabled`            | 생략하면 컨트롤을 따른다. `true` / `false` 로 고정 |
 | `invalid`             | `true` 면 danger 색. 기본 `false`                  |
 | `size`                | `standard`(기본) / `tiny`                          |
+| `asChild`             | 자식 요소 하나를 라벨로 그린다                     |
 | `id`                  | 생략하면 만들어 붙인다                             |
 | `className` / `style` | 상태를 받는 함수도 된다                            |
-| 그 외 속성            | `<label>` 로 간다                                  |
+| 그 외 속성            | `<label>` 로, `asChild` 면 자식 요소로 간다        |
 
 ## 알아둘 것
 
