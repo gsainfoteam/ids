@@ -7,6 +7,7 @@ import { Showcase } from '~story-kit';
 
 import { Field as FormField } from '../../../react-hook-form';
 import { Button } from '../../action/button';
+import { Item } from '../../data/item';
 import { Field } from '../field';
 
 import { FileField } from '.';
@@ -123,8 +124,18 @@ export const Gallery: Story = {
               defaultValue={[
                 photo('cover.svg', '#3b82f6'),
                 pdf('report.pdf'),
-                pdf('appendix.pdf', 2_400_000),
+                pdf('부록 - 2026 상반기 예산 집행 결과 (최종 수정본).pdf', 2_400_000),
               ]}
+            />
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="multiple · tiny" className="items-start">
+          <div className="w-80">
+            <FileField
+              aria-label="여럿 tiny"
+              size="tiny"
+              multiple
+              defaultValue={[photo('cover.svg', '#a855f7'), pdf('report.pdf')]}
             />
           </div>
         </Showcase.Row>
@@ -354,10 +365,14 @@ export const CustomItems: Story = {
                 {({ index }) => (
                   <>
                     <FileField.Preview file={file} />
-                    <span className="flex-1 truncate">
-                      {index + 1}. {file.name}
-                    </span>
-                    <FileField.Remove file={file} />
+                    <Item.Content>
+                      <Item.Title truncate>
+                        {index + 1}. {file.name}
+                      </Item.Title>
+                    </Item.Content>
+                    <Item.Actions>
+                      <FileField.Remove file={file} />
+                    </Item.Actions>
                   </>
                 )}
               </FileField.Item>
@@ -371,8 +386,17 @@ export const CustomItems: Story = {
     docs: {
       description: {
         story:
-          'Trigger, List, Item, Preview, Remove 를 직접 두어 목록을 바꿀 수 있습니다. List 의 children 은 지금 파일 목록을, Item 의 children 은 { file, index } 를 받는 함수도 됩니다.',
+          'Trigger, List, Item, Preview, Remove 를 직접 두어 목록을 바꿀 수 있습니다. List 의 children 은 지금 파일 목록을, Item 의 children 은 { file, index } 를 받는 함수도 됩니다. FileField.Item 은 Item 이라 Item.Content, Item.Title, Item.Actions 를 그대로 씁니다.',
       },
     },
+  },
+  play: async ({ canvas }) => {
+    const rows = canvas.getAllByRole('listitem');
+    await expect(rows.map((row) => row.textContent)).toEqual(['1. a.svg', '2. b.pdf']);
+    await expect(rows[0].querySelector('[data-item-media] img')).not.toBeNull();
+    await expect(canvas.getByRole('button', { name: 'b.pdf 삭제' })).toHaveAttribute(
+      'data-variant',
+      'ghost',
+    );
   },
 };

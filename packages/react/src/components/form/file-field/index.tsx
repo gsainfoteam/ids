@@ -8,6 +8,7 @@ import {
   type DragEvent,
   type DragEventHandler,
   type MouseEvent,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 
@@ -23,9 +24,12 @@ import {
 } from './file-rules';
 import { useFileField, usePreviewUrl, type FileFieldValue } from './use-file-field';
 import { fieldTrigger, flattenParts, part, resolveState } from '../../../internal/field-popup';
+import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { IconButton } from '../../action/icon-button';
+import { Item } from '../../data/item';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -105,6 +109,7 @@ export type FileFieldProps = BaseProps &
 type Context = {
   field: Omit<ReturnType<typeof useFileField>, 'rootRef' | 'inputRef' | 'triggerRef'>;
   state: FileFieldState;
+  size: IdsSize;
   placeholder: ReactNode;
   limits: string;
   limitsId: string;
@@ -113,6 +118,8 @@ type Context = {
 };
 
 const FileContext = createContext<Context | null>(null);
+// Set inside a FileField.Item, where a preview is the row's media rather than an inline thumbnail.
+const FileRowContext = createContext(false);
 
 function useFile(part: string) {
   const context = use(FileContext);
@@ -217,7 +224,8 @@ export function FileField(props: FileFieldProps) {
     empty: s.files.length === 0,
     multiple,
   };
-  const styles = FileField.Style({ appearance, variant, size: useFieldSize(size) ?? 'standard' });
+  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = FileField.Style({ appearance, variant, size: resolvedSize });
 
   const triggerProps = {
     // mergeRefs only composes the refs into a callback; nothing reads them during render.
@@ -274,6 +282,7 @@ export function FileField(props: FileFieldProps) {
       value={{
         field,
         state,
+        size: resolvedSize,
         placeholder:
           placeholder ??
           (appearance === 'dropzone'
@@ -387,7 +396,7 @@ function FileTrigger({ asChild, children, className, ...props }: FileField.Trigg
     ) : (
       <>
         {!c.state.multiple && files[0] ? (
-          <FilePreview file={files[0]} className={c.styles.thumb()} />
+          <FilePreview file={files[0]} />
         ) : (
           <PaperClipIcon aria-hidden="true" className={c.styles.icon()} />
         )}
@@ -426,22 +435,45 @@ function FileValue({ asChild, children, placeholder, className, ...props }: File
   );
 }
 
-function FileClear({ asChild, children, className, ...props }: FileField.ClearProps) {
+type GhostButtonProps = Omit<ComponentProps<'button'>, 'children' | 'onClick'> & {
+  asChild?: boolean;
+  children?: ReactElement;
+  size: IdsSize;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+};
+
+// Clear and Remove are ghost IconButtons. With asChild the given button takes their look, and
+// otherwise the child is the glyph.
+function GhostButton({ asChild, children, ...props }: GhostButtonProps) {
+  if (!asChild)
+    return (
+      <IconButton {...props} variant="ghost" icon={children ?? <XMarkIcon aria-hidden="true" />} />
+    );
+  invariant(isValidElement(children), 'FileField: asChild requires one button element.');
+  return (
+    <IconButton {...props} variant="ghost" asChild>
+      {children}
+    </IconButton>
+  );
+}
+
+function FileClear({ className, onClick, ...props }: FileField.ClearProps) {
   const c = useFile('FileField.Clear');
   const { files, rejections } = c.field.state;
   if ((!files.length && !rejections.length) || c.state.readOnly) return null;
-  return part(
-    'button',
-    asChild,
-    children ?? <XMarkIcon aria-hidden="true" />,
-    mergeProps(props, {
-      type: 'button',
-      'aria-label': props['aria-label'] ?? messages.fileField.clear,
-      disabled: c.state.disabled,
-      'data-file-field-clear': '',
-      className: c.styles.clear({ className }),
-      onClick: c.field.actions.clear,
-    }),
+  return (
+    <GhostButton
+      {...props}
+      aria-label={props['aria-label'] ?? messages.fileField.clear}
+      disabled={c.state.disabled}
+      data-file-field-clear=""
+      size={c.size}
+      className={c.styles.clear({ className })}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) c.field.actions.clear();
+      }}
+    />
   );
 }
 
@@ -449,17 +481,20 @@ function FileList({ asChild, children, className, ...props }: FileField.ListProp
   const c = useFile('FileField.List');
   const { files } = c.field.state;
   if (!files.length) return null;
-  return part(
-    'div',
-    asChild,
+  const items =
     typeof children === 'function'
       ? children(files)
-      : (children ?? files.map((file) => <FileItem key={fileKey(file)} file={file} />)),
-    mergeProps(props, {
-      role: 'list',
-      'aria-label': props['aria-label'] ?? messages.fileField.list,
-      className: c.styles.list({ className }),
-    }),
+      : (children ?? files.map((file) => <FileItem key={fileKey(file)} file={file} />));
+  const list = {
+    'aria-label': props['aria-label'] ?? messages.fileField.list,
+    className: c.styles.list({ className }),
+  };
+  // With asChild the given element is the list and holds its own rows.
+  if (asChild) return part('div', true, items, mergeProps(props, { ...list, role: 'list' }));
+  return (
+    <Item.Group {...props} {...list} size={c.size} dense>
+      {items}
+    </Item.Group>
   );
 }
 
@@ -472,57 +507,79 @@ function FileItem({ file, asChild, children, className, ...props }: FileField.It
       : (children ?? (
           <>
             <FilePreview file={file} />
-            <span className={c.styles.itemText()}>
-              <span className={c.styles.itemName()} title={file.name}>
+            <Item.Content>
+              <Item.Title truncate title={file.name}>
                 {file.name}
-              </span>
-              <span className={c.styles.itemSize()}>{formatBytes(file.size)}</span>
-            </span>
-            <FileRemove file={file} />
+              </Item.Title>
+              <Item.Description className={c.styles.itemSize()}>
+                {formatBytes(file.size)}
+              </Item.Description>
+            </Item.Content>
+            <Item.Actions>
+              <FileRemove file={file} />
+            </Item.Actions>
           </>
         ));
-  return part(
-    'div',
-    asChild,
-    content,
-    mergeProps(props, {
-      role: 'listitem',
-      'data-file-field-item': '',
-      className: c.styles.item({ className }),
-    }),
+  return (
+    <FileRowContext value>
+      <Item
+        {...props}
+        asChild={asChild}
+        variant="outline"
+        size={c.size}
+        dense
+        data-file-field-item=""
+        className={c.styles.item({ className })}
+      >
+        {content}
+      </Item>
+    </FileRowContext>
   );
 }
 
-function FileRemove({ file, asChild, children, className, ...props }: FileField.RemoveProps) {
+function FileRemove({ file, className, onClick, ...props }: FileField.RemoveProps) {
   const c = useFile('FileField.Remove');
   if (c.state.readOnly) return null;
-  return part(
-    'button',
-    asChild,
-    children ?? <XMarkIcon aria-hidden="true" />,
-    mergeProps(props, {
-      type: 'button',
-      'aria-label': props['aria-label'] ?? messages.fileField.remove(file.name),
-      disabled: c.state.disabled,
-      'data-file-field-remove': '',
-      className: c.styles.itemRemove({ className }),
-      onClick: () => c.field.actions.remove(file),
-    }),
+  return (
+    <GhostButton
+      {...props}
+      aria-label={props['aria-label'] ?? messages.fileField.remove(file.name)}
+      disabled={c.state.disabled}
+      data-file-field-remove=""
+      size={c.size}
+      className={c.styles.itemRemove({ className })}
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) c.field.actions.remove(file);
+      }}
+    />
   );
 }
 
 function FilePreview({ file, className, ...props }: FileField.PreviewProps) {
   const c = useFile('FileField.Preview');
+  const inRow = use(FileRowContext);
   const url = usePreviewUrl(file);
+  const glyph = url ? <img src={url} alt="" draggable={false} /> : <DocumentIcon />;
+  // A button may only hold phrasing content, so the trigger's thumbnail stays a span; in a row
+  // the same span becomes the row's media tile.
+  if (!inRow)
+    return (
+      <span
+        {...props}
+        aria-hidden="true"
+        data-file-field-preview=""
+        className={c.styles.thumb({ className })}
+      >
+        {glyph}
+      </span>
+    );
   return (
-    <span
-      {...props}
-      aria-hidden="true"
-      data-file-field-preview=""
-      className={c.styles.preview({ className })}
-    >
-      {url ? <img src={url} alt="" draggable={false} /> : <DocumentIcon />}
-    </span>
+    <Item.Media asChild variant="soft" className={c.styles.preview({ className })}>
+      <span {...props} aria-hidden="true" data-file-field-preview="">
+        {glyph}
+      </span>
+    </Item.Media>
   );
 }
 
@@ -542,8 +599,11 @@ export namespace FileField {
     asChild?: boolean;
     placeholder?: ReactNode;
   };
-  export type ClearProps = ComponentProps<'button'> & { asChild?: boolean };
-  export type ListProps = Omit<ComponentProps<'div'>, 'children'> & {
+  export type ClearProps = Omit<ComponentProps<'button'>, 'children'> & {
+    asChild?: boolean;
+    children?: ReactElement;
+  };
+  export type ListProps = Omit<ComponentProps<'ul'>, 'children'> & {
     asChild?: boolean;
     children?: ReactNode | ((files: File[]) => ReactNode);
   };
@@ -552,7 +612,11 @@ export namespace FileField {
     asChild?: boolean;
     children?: ReactNode | ((state: FileFieldItemState) => ReactNode);
   };
-  export type RemoveProps = ComponentProps<'button'> & { file: File; asChild?: boolean };
+  export type RemoveProps = Omit<ComponentProps<'button'>, 'children'> & {
+    file: File;
+    asChild?: boolean;
+    children?: ReactElement;
+  };
   export type PreviewProps = Omit<ComponentProps<'span'>, 'children'> & { file: File };
 
   export const Trigger = FileTrigger;
@@ -573,37 +637,24 @@ export namespace FileField {
         'disabled:cursor-not-allowed aria-disabled:cursor-default',
       ],
       icon: 'shrink-0 text-(--ids-color-on-muted)',
-      thumb: 'size-5 rounded-indicator bg-transparent [&_svg]:size-3.5',
-      value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
-      clear: [
-        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
-        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'focus-ring disabled:pointer-events-none',
+      // The single file's thumbnail in the trigger, the size of a glyph.
+      thumb: [
+        'flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-indicator',
+        'text-(--ids-color-on-muted) [&_img]:size-full [&_img]:object-cover [&_svg]:size-3.5',
       ],
+      value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
+      // The control already dims as a whole when disabled, so Clear does not dim again.
+      clear: [fieldAction.base, 'data-disabled:opacity-100'],
       dropzoneIcon: 'mb-1 size-6 text-(--ids-color-on-muted)',
       // Korean wraps between words, not inside one, and the lines are balanced.
       dropzoneTitle: 'font-medium break-keep text-balance',
       dropzoneHint: 'text-caption-c1-regular text-(--ids-color-on-muted) break-keep text-balance',
-      list: 'grid gap-1',
-      item: [
-        'flex min-w-0 items-center gap-3 concentric-p-1.5 pe-2',
-        'bg-(--ids-color-surface) inset-ring-1 inset-ring-(--ids-color-border) dark:bg-(--ids-color-muted)/30',
-      ],
-      preview: [
-        'flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-standard',
-        'bg-(--ids-color-muted) text-(--ids-color-on-muted) [&_img]:size-full [&_img]:object-cover',
-        '[&_svg]:size-(--ids-size-icon-standard)',
-      ],
-      itemText: 'grid min-w-0 flex-1',
-      itemName: 'truncate text-(--ids-color-on-surface)',
-      itemSize: 'text-caption-c1-regular text-(--ids-color-on-muted)',
-      itemRemove: [
-        'inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-standard',
-        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
-        'focus-ring disabled:pointer-events-none disabled:opacity-50',
-        '[&_svg]:size-(--ids-size-icon-standard)',
-      ],
+      list: 'flex flex-col gap-1',
+      // Outline Items with the field's own fill, so the rows read as part of the field.
+      item: 'bg-(--ids-color-surface) dark:bg-(--ids-color-muted)/30',
+      preview: 'text-(--ids-color-on-muted)',
+      itemSize: 'text-caption-c1-regular',
+      itemRemove: fieldAction.base,
       rejections: 'grid gap-0.5 wrap-anywhere text-(--ids-color-danger)',
     },
     variants: {
@@ -627,16 +678,20 @@ export namespace FileField {
         soft: {},
         ghost: {},
       } satisfies Record<FileFieldVariant, object>,
+      // The control has no padding of its own, since the trigger fills it, so Clear keeps a 4px
+      // inset from the border instead of pulling into padding.
       size: {
         standard: {
           root: 'text-body-b3-regular',
-          clear: 'me-1 size-7 [&_svg]:size-(--ids-size-icon-standard)',
+          clear: [fieldAction.size.standard, 'first:ms-1 last:me-1'],
+          itemRemove: 'size-7',
           icon: fieldTrigger.icon.standard,
           rejections: 'text-body-b3-regular',
         },
         tiny: {
           root: 'text-caption-c1-regular',
-          clear: 'me-1 size-6 [&_svg]:size-(--ids-size-icon-tiny)',
+          clear: [fieldAction.size.tiny, 'first:ms-1 last:me-1'],
+          itemRemove: 'size-6',
           icon: fieldTrigger.icon.tiny,
           rejections: 'text-caption-c1-regular',
         },

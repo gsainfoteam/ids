@@ -13,7 +13,14 @@ Adds `FileField.Remove`, `FileField.Preview`, a function of the files as `FileFi
 children, a function of `{ file, index }` as `FileField.Item` children, a function `className`,
 and `data-*` state. `required` is enforced by the browser's own validation.
 
+The file list is built from IDS components: an `Item.Group` of dense outline `Item`s, where a
+file's preview is its `Item.Media`, its name an `Item.Title` that truncates and its size an
+`Item.Description`. Clear and Remove are ghost `IconButton`s, so custom rows can use the `Item`
+parts directly.
+
 Breaking: `onChange(value)` is now `onValueChange(value)`. `variant="dropzone"` is now
 `appearance="dropzone"`, and `variant` is the fill of either appearance: `outline`, `soft` or
 `ghost`. In the field appearance Clear sits inside the field's border, and several files read as
 a count. A dropzone lists its file in single mode too and has no Clear by default.
+`FileField.List` renders a `ul` with an `li` per file, and `Clear` and `Remove` take an icon
+element as `children`.
