@@ -3,6 +3,7 @@
     "surface":    { "$value": "{neutral.0}",   "$type": "color" },
     "on-surface": { "$value": "{neutral.900}", "$type": "color" },
     "muted":      { "$value": "{neutral.100}", "$type": "color" },
+    "border":     { "$value": "{neutral.200}", "$type": "color" },
     "on-muted":   { "$value": "{neutral.600}", "$type": "color" }
   }
 }

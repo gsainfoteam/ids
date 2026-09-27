@@ -163,6 +163,11 @@ root: 'concentric-p-3 px-4',   // asymmetric: radius follows the concentric valu
 
 Do not hardcode `rounded-[10px]`, and do not pair `p-*` with a hand-computed radius.
 
+**Structural lines are neutral.** Field borders, card edges, dividers and group seams use
+`--ids-color-border` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
+only content and focus carry color. `--ids-color-outline` is the theme-tinted line; keep it for
+places that should read as the brand, such as an outline Button.
+
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
 
