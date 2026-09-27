@@ -17,6 +17,7 @@ import {
 import { isString, uniq } from 'es-toolkit';
 
 import {
+  FieldLabelContext,
   FieldNotifyContext,
   FieldSizeContext,
   FieldStateContext,
@@ -26,6 +27,7 @@ import {
 import { useField } from './use-field';
 import { invariant, mergeProps, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+import { Label as BaseLabel } from '../../typography/label';
 
 import type { FieldValidity, FieldValidityKey } from './control-state';
 import type { IdsSize } from '../../../tokens/types';
@@ -125,32 +127,15 @@ function errorShown(
 
 function renderPart(
   name: string,
-  tag: 'label' | 'div',
   asChild: boolean | undefined,
   props: Record<string, unknown>,
   content: ReactNode,
-  marker?: ReactNode,
 ) {
   if (asChild) {
-    invariant(
-      isValidElement<{ children?: ReactNode }>(content),
-      `Field.${name} asChild requires one element.`,
-    );
-    const merged = mergeProps(content.props as Record<string, unknown>, props);
-    return cloneElement(
-      content,
-      merged,
-      marker ? (
-        <>
-          {content.props.children}
-          {marker}
-        </>
-      ) : (
-        content.props.children
-      ),
-    );
+    invariant(isValidElement(content), `Field.${name} asChild requires one element.`);
+    return cloneElement(content, mergeProps(content.props as Record<string, unknown>, props));
   }
-  return createElement(tag, props, content, marker);
+  return createElement('div', props, content);
 }
 
 function flatten(children: ReactNode): ReactElement<ControlProps>[] {
@@ -237,7 +222,6 @@ export function FieldRoot({
     styles: Field.Style({
       size,
       orientation,
-      invalid,
       disabled,
       described: counts.description > 0,
     }),
@@ -340,27 +324,25 @@ export namespace Field {
   export type HintProps = PartProps<'div', FieldState>;
   export type ErrorProps = PartProps<'div', FieldErrorState> & { match?: FieldValidityKey };
 
-  export function Label({ asChild, className, style, children, ...rest }: LabelProps) {
-    const { controlId, state, styles } = usePart('Label');
-    const marker = state.required ? (
-      <span aria-hidden="true" className={styles.marker()}>
-        *
-      </span>
-    ) : null;
-    return renderPart(
-      'Label',
-      'label',
-      asChild,
-      {
-        ...rest,
-        htmlFor: controlId,
-        'data-field-part': 'label',
-        ...stateAttributes(state),
-        className: styles.label({ className: resolve(className, state) }),
-        style: resolve(style, state),
-      },
-      resolve(children, state),
-      marker,
+  export function Label({ className, style, children, ...rest }: LabelProps) {
+    const { controlId, state } = usePart('Label');
+    return (
+      <FieldLabelContext value>
+        <BaseLabel
+          {...rest}
+          htmlFor={controlId}
+          size={state.size}
+          required={state.required}
+          disabled={state.disabled}
+          invalid={state.invalid}
+          data-field-part="label"
+          {...stateAttributes(state)}
+          className={resolve(className, state)}
+          style={resolve(style, state)}
+        >
+          {resolve(children, state)}
+        </BaseLabel>
+      </FieldLabelContext>
     );
   }
 
@@ -368,7 +350,6 @@ export namespace Field {
     const { state, styles } = usePart('Description');
     return renderPart(
       'Description',
-      'div',
       asChild,
       {
         ...rest,
@@ -387,7 +368,6 @@ export namespace Field {
     if (state.invalid) return null;
     return renderPart(
       'Hint',
-      'div',
       asChild,
       {
         ...rest,
@@ -412,7 +392,6 @@ export namespace Field {
     };
     return renderPart(
       'Error',
-      'div',
       asChild,
       {
         ...rest,
@@ -427,26 +406,20 @@ export namespace Field {
   }
 
   export const Style = tv({
+    // No label slot: Field.Label is a Label, which draws its own size, required, disabled and
+    // invalid looks.
     slots: {
       root: 'grid min-w-0 gap-x-3 gap-y-2',
-      label: 'text-(--ids-color-on-surface)',
       description: 'text-(--ids-color-on-muted)',
       hint: 'text-(--ids-color-on-muted)',
       error: 'text-(--ids-color-danger)',
-      marker: 'ms-0.5 text-(--ids-color-danger)',
       control:
         'min-w-0 [&>input:not([type=checkbox]):not([type=radio])]:w-full [&>textarea]:w-full',
     },
     variants: {
       size: {
-        standard: {
-          root: 'text-body-b3-regular',
-          label: 'text-body-b3-medium',
-        },
-        tiny: {
-          root: 'text-caption-c1-regular',
-          label: 'text-caption-c1-medium',
-        },
+        standard: { root: 'text-body-b3-regular' },
+        tiny: { root: 'text-caption-c1-regular' },
       } satisfies Record<IdsSize, object>,
       orientation: {
         vertical: {},
@@ -458,12 +431,8 @@ export namespace Field {
       } satisfies Record<FieldOrientation, object>,
       // A horizontal label lines up with the control, which sits below the description.
       described: { true: {}, false: {} },
-      invalid: {
-        true: { label: 'text-(--ids-color-danger)' },
-      },
       disabled: {
         true: {
-          label: 'opacity-50',
           description: 'opacity-50',
           hint: 'opacity-50',
           error: 'opacity-50',

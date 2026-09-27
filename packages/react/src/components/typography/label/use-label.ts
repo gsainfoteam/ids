@@ -12,7 +12,7 @@ import {
 
 import { mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
-import { FieldSizeContext } from '../../form/field/context';
+import { FieldLabelContext, FieldSizeContext } from '../../form/field/context';
 
 // Anything a label can stand for. A native input, select, textarea or button is labelled by the
 // browser itself; the ARIA widgets are not, so the label does that part by hand.
@@ -103,10 +103,12 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
     () => 0,
   );
 
+  const fieldLabel = use(FieldLabelContext);
+
   // A div with role="slider" is not labelable, so htmlFor would name nothing. The label names it
   // by reference instead and hands the attribute back when it goes away.
   useEffect(() => {
-    if (!node) return;
+    if (!node || fieldLabel) return;
     const control = customControl(node, htmlFor);
     if (!control || control.hasAttribute('aria-labelledby') || control.hasAttribute('aria-label'))
       return;
@@ -115,15 +117,15 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
       if (control.getAttribute('aria-labelledby') === labelId)
         control.removeAttribute('aria-labelledby');
     };
-  }, [node, htmlFor, labelId]);
+  }, [node, htmlFor, labelId, fieldLabel]);
 
   const insideField = use(FieldSizeContext) !== undefined;
   useEffect(() => {
-    if (!isDevelopment || !node) return;
+    if (!isDevelopment || !node || fieldLabel) return;
     if (insideField) console.warn('[IDS] Label: inside a Field, use Field.Label instead.');
     else if (!controlOf(node, htmlFor))
       console.warn('[IDS] Label: it is not linked to a control. Wrap the control or set htmlFor.');
-  }, [node, htmlFor, insideField]);
+  }, [node, htmlFor, insideField, fieldLabel]);
 
   const state = {
     disabled: disabled ?? (mirrored & DISABLED) !== 0,

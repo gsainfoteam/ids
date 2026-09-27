@@ -15,6 +15,10 @@ Field. A form with `noValidate` keeps Field out of native validation, and an exp
 still wins. An error with nothing to show no longer renders an empty node or enters
 `aria-describedby`.
 
+`Field.Label` is drawn with `Label`: it takes the field's size, required asterisk, disabled and
+invalid looks from Label, carries `data-label`, and pressing it moves focus to a custom control
+such as a RadioGroup. `Field.Style` loses its `label` and `marker` slots.
+
 Breaking: the layout prop is `orientation` and the root carries `data-orientation` instead of
 `data-variant`. `variant` still works as a deprecated alias. When react-hook-form has no error
 for a field, the Field no longer forces `invalid={false}`, so native validation can report.

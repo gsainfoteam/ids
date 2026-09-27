@@ -122,6 +122,67 @@ test('asChild uses real custom label IDs and retains its handler and required ma
   assert.equal(part('label').control === control(), true);
   assert.equal(part('label').querySelector('[aria-hidden]').textContent, '*');
 });
+test('Field.Label is a Label that takes the field state, without the Label warnings', async () => {
+  const warnings = [];
+  const original = console.warn;
+  console.warn = (...args) => warnings.push(args.map(String).join(' '));
+  try {
+    await render(
+      h(
+        Field,
+        { size: 'tiny', required: true, invalid: true, disabled: true },
+        h(Field.Label, null, 'Name'),
+        h(TextField),
+      ),
+    );
+  } finally {
+    console.warn = original;
+  }
+  const label = part('label');
+  assert.ok(label.hasAttribute('data-label'));
+  for (const name of ['required', 'invalid', 'disabled']) assert.ok(has(label, name), name);
+  assert.match(label.className, /text-caption-c1-medium/);
+  assert.equal(label.querySelector('[data-label-required]').textContent, '*');
+  assert.deepEqual(
+    warnings.filter((warning) => warning.includes('Label')),
+    [],
+  );
+});
+test('a group control keeps the names of its options', async () => {
+  const { CheckboxGroup } = await import('../dist/index.js');
+  await render(
+    h(
+      Field,
+      null,
+      h(Field.Label, null, 'Fruits'),
+      h(CheckboxGroup, null, ({ Item }) =>
+        ['apple', 'pear'].map((value) => h('label', { key: value }, h(Item, { value }), value)),
+      ),
+    ),
+  );
+  await act(settle);
+  assert.equal(
+    host.querySelector('[role=group]').getAttribute('aria-labelledby'),
+    part('label').id,
+  );
+  for (const box of host.querySelectorAll('input[type=checkbox]'))
+    assert.equal(box.hasAttribute('aria-labelledby'), false, 'an option keeps its own label');
+});
+test('pressing the label of a radio group focuses its checked radio', async () => {
+  const { RadioGroup } = await import('../dist/index.js');
+  await render(
+    h(
+      Field,
+      null,
+      h(Field.Label, null, 'Delivery'),
+      h(RadioGroup, { defaultValue: 'pickup' }, ({ Item }) =>
+        ['parcel', 'pickup'].map((value) => h('label', { key: value }, h(Item, { value }), value)),
+      ),
+    ),
+  );
+  await act(async () => part('label').click());
+  assert.equal(document.activeElement, host.querySelector('input[value=pickup]'));
+});
 test('size inheritance, explicit child size, disabled and explicit state override', async () => {
   await render(h(Field, { size: 'tiny', disabled: true, 'aria-label': 'Name' }, h(TextField)));
   assert.equal(control().closest('[data-text-field]').dataset.size, 'tiny');
