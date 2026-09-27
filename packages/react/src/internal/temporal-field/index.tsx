@@ -1,58 +1,163 @@
 import {
   createContext,
   isValidElement,
-  useCallback,
-  useContext,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
+  use,
   type ComponentProps,
+  type ComponentType,
+  type CSSProperties,
+  type FocusEvent,
+  type KeyboardEvent,
+  type MouseEvent,
   type ReactNode,
 } from 'react';
 
-import { ClockIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
-import { validateTime } from '../../components/data/time-picker/time';
+import {
+  useTemporalField,
+  type TemporalChange,
+  type TemporalFieldApi,
+  type TemporalFieldState,
+} from './use-temporal-field';
 import { useFieldSize } from '../../components/form/field/context';
 import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { FieldPopup, flattenParts, part } from '../field-popup';
 import { fieldSurface, type FieldSurfaceVariant } from '../field-surface';
+import { FormValue } from '../form-value';
 
 import type { IdsSize } from '../../tokens/types';
 
+export type { TemporalFieldState, TemporalChange } from './use-temporal-field';
+
+export type TemporalFieldProps<V> = Omit<
+  ComponentProps<'button'>,
+  'value' | 'defaultValue' | 'onChange' | 'className' | 'style' | 'disabled' | 'children'
+> & {
+  value?: V;
+  defaultValue?: V;
+  onValueChange?: (value: V) => void;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  variant?: FieldSurfaceVariant;
+  size?: IdsSize;
+  invalid?: boolean;
+  required?: boolean;
+  readOnly?: boolean;
+  disabled?: boolean;
+  placeholder?: string;
+  mobileVariant?: 'popover' | 'drawer';
+  // Only read by an Input part, where it defaults to off.
+  autoComplete?: ComponentProps<'input'>['autoComplete'];
+  className?: string | ((state: TemporalFieldState<V>) => string | undefined);
+  style?: CSSProperties | ((state: TemporalFieldState<V>) => CSSProperties | undefined);
+  children?: ReactNode;
+};
+
+export type TemporalMessages = {
+  placeholder: string;
+  title: string;
+  clear: string;
+  close: string;
+  open?: string;
+};
+
+export type TemporalPicker<V> = (api: {
+  value: V;
+  change: TemporalChange<V>;
+  close: (restoreFocus: boolean) => void;
+  size: IdsSize;
+}) => ReactNode;
+
+export type TemporalConfig<V> = {
+  kind: 'date' | 'time' | 'date-time';
+  empty: V;
+  isEmpty: (value: V) => boolean;
+  isSame: (a: V, b: V) => boolean;
+  display: (value: V) => string;
+  serialize: (value: V) => string | string[];
+  messages: TemporalMessages;
+  icon: ComponentType<ComponentProps<'svg'>>;
+  picker: TemporalPicker<V>;
+  preferredWidth?: number;
+  initialFocusSelector: string;
+  // Present on fields that take typed text through an Input part.
+  parse?: (text: string) => V | undefined;
+  inputHint?: string;
+};
+
+export type TriggerProps = ComponentProps<'button'> & { asChild?: boolean };
+export type ValueProps = ComponentProps<'span'> & { asChild?: boolean };
+export type ClearProps = ComponentProps<'button'> & { asChild?: boolean };
+export type ContentProps = ComponentProps<'div'> & { asChild?: boolean };
+export type InputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue' | 'type'> & {
+  asChild?: boolean;
+};
+
+type ContextValue = {
+  state: TemporalFieldState<unknown>;
+  hasClear: boolean;
+  hasInput: boolean;
+  input: Record<string, unknown> | undefined;
+  blocked: boolean;
+  clear: () => void;
+  onBlur: TemporalFieldApi<unknown>['onBlur'];
+  trigger: Record<string, unknown>;
+  text: string;
+  icon: ComponentType<ComponentProps<'svg'>>;
+  messages: TemporalMessages;
+  content: () => ReactNode;
+  styles: ReturnType<typeof temporalFieldStyle>;
+};
+
+const TemporalContext = createContext<ContextValue | null>(null);
+
+function useTemporal(part: string) {
+  const context = use(TemporalContext);
+  invariant(context, `${part} must be inside its field.`);
+  return context;
+}
+
+const iconButton = [
+  'me-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
+  'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
+  'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+  'focus-ring disabled:pointer-events-none disabled:opacity-50',
+];
+
 export const temporalFieldStyle = tv({
   slots: {
-    // The trigger carries data-field-input, so focus-ring rings the shell for the trigger
-    // only and Clear shows its own ring.
-    root: ['inline-flex w-full min-w-0 items-center', fieldSurface.base],
+    // The trigger carries data-field-input, so focus-ring rings the whole shell for it while
+    // Clear keeps a ring of its own.
+    root: ['relative inline-flex w-full min-w-0 items-center', fieldSurface.base],
     trigger: [
       'flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center self-stretch',
-      'bg-transparent text-left outline-none',
-      'disabled:cursor-not-allowed',
+      'bg-transparent text-start outline-none disabled:cursor-not-allowed',
     ],
     icon: 'shrink-0 text-(--ids-color-on-muted)',
-    value: 'min-w-0 flex-1 truncate',
-    clear: [
-      'me-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
-      'text-(--ids-color-on-muted) enabled:hover:bg-(--ids-color-muted)',
-      'enabled:hover:text-(--ids-color-on-surface)',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-      'motion-reduce:transition-none',
-      'focus-ring',
-      'disabled:cursor-not-allowed disabled:opacity-50',
+    value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
+    clear: iconButton,
+    // With an Input part the text box takes the focus and the label, and the trigger shrinks to
+    // an icon button that opens the popup.
+    input: [
+      'h-full min-w-0 flex-1 self-stretch bg-transparent outline-none',
+      'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
     ],
-    popupHeader: 'mb-2 flex items-center justify-between px-1',
+    button: iconButton,
+    // The header only shows in the mobile drawer, where there is no field left in view to tap.
+    popupHeader: 'mb-2 hidden items-center justify-between ps-1 in-data-[presentation=drawer]:flex',
     popupTitle: 'text-body-b3-medium',
     popupClose: [
-      'inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-standard',
-      'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted)',
-      'hover:text-(--ids-color-on-surface)',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-      'motion-reduce:transition-none',
-      'focus-ring',
-      '[&_svg]:size-(--ids-size-icon-standard)',
+      'inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-standard',
+      'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
+      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'focus-ring [&_svg]:size-(--ids-size-icon-standard)',
     ],
+    content: 'flex justify-center',
+    // DateTimeField's popup: the calendar beside the clock, stacked on a phone.
+    panel: 'flex flex-col gap-4 sm:flex-row',
+    panelTime: 'flex min-w-0 flex-col gap-2 sm:w-52',
+    panelHint: 'text-caption-c1-regular text-(--ids-color-on-muted)',
   },
   variants: {
     variant: {
@@ -66,19 +171,20 @@ export const temporalFieldStyle = tv({
         trigger: 'gap-2 px-3',
         icon: 'size-(--ids-size-icon-standard)',
         clear: 'size-7 [&_svg]:size-(--ids-size-icon-standard)',
+        input: 'ps-3',
+        button: 'size-7 [&_svg]:size-(--ids-size-icon-standard)',
       },
       tiny: {
         root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
-        trigger: 'gap-1.5 px-2',
+        trigger: 'gap-1.5 px-2.5',
         icon: 'size-(--ids-size-icon-tiny)',
         clear: 'size-6 [&_svg]:size-(--ids-size-icon-tiny)',
+        input: 'ps-2.5',
+        button: 'size-6 [&_svg]:size-(--ids-size-icon-tiny)',
       },
     } satisfies Record<IdsSize, object>,
     disabled: {
       true: { root: 'cursor-not-allowed opacity-50' },
-    },
-    placeholder: {
-      true: { value: 'text-(--ids-color-on-muted)' },
     },
   },
   defaultVariants: {
@@ -87,60 +193,19 @@ export const temporalFieldStyle = tv({
   },
 });
 
-export type TemporalFieldProps = Omit<
-  ComponentProps<'button'>,
-  'value' | 'defaultValue' | 'onChange'
-> & {
-  value?: Date | null;
-  defaultValue?: Date | null;
-  onChange?: (value: Date | null) => void;
-  variant?: FieldSurfaceVariant;
-  size?: IdsSize;
-  invalid?: boolean;
-  required?: boolean;
-  readOnly?: boolean;
-  placeholder?: string;
-  mobileVariant?: 'popover' | 'drawer';
-};
-type PickerState = { value: Date | null; change: (value: Date | null) => void };
-type InternalProps = TemporalFieldProps & {
-  label: string;
-  display: (value: Date) => string;
-  serialize: (value: Date) => string;
-  picker: (state: PickerState) => ReactNode;
-  preferredWidth?: number;
-  initialFocusSelector: string;
-};
-export type TriggerProps = ComponentProps<'button'> & { asChild?: boolean };
-export type ValueProps = ComponentProps<'span'> & { asChild?: boolean };
-export type ContentProps = ComponentProps<'div'> & { asChild?: boolean };
-type ContextValue = {
-  trigger: ComponentProps<'button'>;
-  text: string;
-  hasValue: boolean;
-  blocked: boolean;
-  clear: () => void;
-  content: ReactNode;
-  label: string;
-  styles: ReturnType<typeof temporalFieldStyle>;
-};
-const Context = createContext<ContextValue | null>(null);
-function useTemporal() {
-  const c = useContext(Context);
-  invariant(c, 'TimeField/DateTimeField parts must be inside their field.');
-  return c;
-}
 export function TemporalValue({ asChild, children, ...props }: ValueProps) {
-  const c = useTemporal();
+  const c = useTemporal('Value');
+  const empty = c.state.empty;
   return part(
     'span',
     asChild,
     children ?? c.text,
-    mergeProps({ className: c.styles.value() }, props),
+    mergeProps({ className: c.styles.value(), 'data-placeholder': empty ? '' : undefined }, props),
   );
 }
+
 export function TemporalTrigger({ asChild, children, ...props }: TriggerProps) {
-  const c = useTemporal();
+  const c = useTemporal('Trigger');
   invariant(
     !flattenParts(children).some((n) => isValidElement(n) && n.type === TemporalClear),
     'Clear must be a sibling of Trigger.',
@@ -148,209 +213,299 @@ export function TemporalTrigger({ asChild, children, ...props }: TriggerProps) {
   return part(
     'button',
     asChild,
-    children ?? (
-      <>
-        <ClockIcon aria-hidden="true" className={c.styles.icon()} />
-        <TemporalValue />
-        <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
-      </>
-    ),
-    mergeProps(props, { ...c.trigger }),
+    children ??
+      (c.hasInput ? (
+        <c.icon aria-hidden="true" />
+      ) : (
+        <>
+          <c.icon aria-hidden="true" className={c.styles.icon()} />
+          <TemporalValue />
+          {/* Clear takes the chevron's place once there is a value, so the end holds one icon. */}
+          {(c.state.empty || !c.hasClear) && (
+            <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
+          )}
+        </>
+      )),
+    mergeProps(props, c.trigger),
   );
 }
+
+export function TemporalInput({ asChild, ...props }: InputProps) {
+  const c = useTemporal('Input');
+  invariant(c.input, 'Input must be a direct part of its field.');
+  return part('input', asChild, undefined, mergeProps(props, c.input));
+}
+
 export function TemporalClear({
   asChild,
   children = <XMarkIcon aria-hidden="true" />,
   ...props
-}: TriggerProps) {
-  const c = useTemporal();
-  return c.hasValue
-    ? part(
-        'button',
-        asChild,
-        children,
-        mergeProps(props, {
-          type: 'button',
-          'aria-label': props['aria-label'] ?? `${c.label} 지우기`,
-          disabled: c.blocked,
-          className: c.styles.clear(),
-          onClick: c.clear,
-        }),
-      )
-    : null;
+}: ClearProps) {
+  const c = useTemporal('Clear');
+  if (c.state.empty) return null;
+  return part(
+    'button',
+    asChild,
+    children,
+    mergeProps(props, {
+      type: 'button',
+      'aria-label': props['aria-label'] ?? c.messages.clear,
+      disabled: c.blocked,
+      'data-temporal-clear': '',
+      className: c.styles.clear(),
+      onClick: c.clear,
+      onBlur: c.onBlur,
+    }),
+  );
 }
+
 export function TemporalContent({ asChild, children, ...props }: ContentProps) {
-  const c = useTemporal();
-  return part('div', asChild, children ?? c.content, props);
+  const c = useTemporal('Content');
+  return part(
+    'div',
+    asChild,
+    children ?? c.content(),
+    mergeProps({ className: c.styles.content() }, props),
+  );
 }
-export function TemporalField({
+
+export function TemporalField<V>({
+  config,
   value,
-  defaultValue = null,
-  onChange,
+  defaultValue,
+  onValueChange,
+  open,
+  defaultOpen,
+  onOpenChange,
   variant = 'outline',
   size,
   invalid,
-  required,
-  readOnly,
+  required = false,
+  readOnly = false,
+  disabled = false,
   placeholder,
   mobileVariant,
-  children,
-  ref: forwardedRef,
   name,
   form,
   className,
   style,
-  disabled,
-  label,
-  display,
-  serialize,
-  picker,
-  preferredWidth,
-  initialFocusSelector,
+  children,
+  ref,
+  onBlur,
   ...native
-}: InternalProps) {
-  validateTime(value);
-  validateTime(defaultValue);
-  const [stored, setStored] = useState(defaultValue),
-    [open, setOpen] = useState(false);
-  const current = value === undefined ? stored : value,
-    trigger = useRef<HTMLButtonElement>(null),
-    surface = useRef<HTMLDivElement>(null),
-    id = `ids-temporal-${useId()}`;
-  const blocked = !!disabled || !!readOnly,
-    resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = temporalFieldStyle({
-    variant,
-    size: resolvedSize,
-    disabled: !!disabled,
-    placeholder: !current,
+}: TemporalFieldProps<V> & { config: TemporalConfig<V> }) {
+  const ariaInvalid = native['aria-invalid'];
+  const {
+    state,
+    input,
+    blocked,
+    popupId,
+    triggerRef,
+    rootRef,
+    change,
+    clear,
+    close,
+    toggle,
+    show,
+    onBlur: handleBlur,
+  } = useTemporalField<V>({
+    value,
+    defaultValue: defaultValue ?? config.empty,
+    onValueChange,
+    empty: config.empty,
+    isEmpty: config.isEmpty,
+    isSame: config.isSame,
+    open,
+    defaultOpen,
+    onOpenChange,
+    disabled,
+    readOnly,
+    invalid: ariaInvalid === undefined ? invalid : ariaInvalid === true || ariaInvalid === 'true',
+    required,
+    display: config.display,
+    parse: config.parse,
+    onBlur,
   });
-  const close = useCallback((restore: boolean) => {
-    setOpen(false);
-    if (restore) trigger.current?.focus({ preventScroll: true });
-  }, []);
-  const change = (next: Date | null) => {
-    if (blocked) return;
-    if (value === undefined) setStored(next);
-    onChange?.(next);
-  };
-  useLayoutEffect(() => {
-    const owner = trigger.current?.form;
-    if (!owner) return;
-    let alive = true;
-    const reset = (event: Event) =>
-      queueMicrotask(() => {
-        if (alive && !event.defaultPrevented) {
-          if (value === undefined) setStored(defaultValue);
-          close(false);
-        }
-      });
-    owner.addEventListener('reset', reset);
-    return () => {
-      alive = false;
-      owner.removeEventListener('reset', reset);
-    };
-  }, [value, defaultValue, form, close]);
-  const triggerProps: ComponentProps<'button'> = {
+  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = temporalFieldStyle({ variant, size: resolvedSize, disabled });
+
+  const parts = flattenParts(children);
+  const contents = parts.filter((n) => isValidElement(n) && n.type === TemporalContent);
+  const shell = parts.filter((n) => !(isValidElement(n) && n.type === TemporalContent));
+  const count = (type: unknown) => parts.filter((n) => isValidElement(n) && n.type === type).length;
+  invariant(
+    count(TemporalTrigger) <= 1 &&
+      contents.length <= 1 &&
+      count(TemporalClear) <= 1 &&
+      count(TemporalInput) <= 1,
+    'A date or time field accepts at most one Trigger, Input, Content and Clear.',
+  );
+  // With no parts of its own the field draws Trigger then Clear. Once parts are given they are
+  // drawn as given, and only a missing Trigger is filled in, since the field cannot open without it.
+  const composed = shell.length > 0;
+  const hasTrigger = count(TemporalTrigger) > 0;
+  const hasInput = count(TemporalInput) > 0;
+  invariant(
+    !hasInput || !!config.parse,
+    'Input is only available on a field that reads typed text.',
+  );
+
+  // The control that carries the field's id, label, description and combobox role: the trigger,
+  // or the text box when there is one.
+  const control = {
     ...native,
+    role: 'combobox',
+    id: native.id ?? `${popupId}-trigger`,
     disabled,
     form,
-    id: native.id ?? `${id}-trigger`,
-    type: 'button',
-    role: 'combobox',
-    ...{ 'data-field-input': '' },
+    'data-field-input': '',
     'aria-haspopup': 'dialog',
-    'aria-expanded': open && !blocked,
-    'aria-controls': open && !blocked ? id : undefined,
-    'aria-invalid': native['aria-invalid'] ?? invalid,
-    'aria-required': native['aria-required'] ?? required,
-    'aria-readonly': readOnly,
-    // mergeRefs creates a callback without reading refs during render.
+    'aria-expanded': state.open,
+    'aria-controls': state.open ? popupId : undefined,
+    'aria-invalid': state.invalid || undefined,
+    'aria-required': native['aria-required'] ?? (required || undefined),
+    'aria-readonly': readOnly || undefined,
+    // mergeRefs only builds a callback; no ref is read while rendering.
     // eslint-disable-next-line react-hooks/refs
-    ref: mergeRefs(trigger, forwardedRef),
-    className: styles.trigger(),
-    onClick: (e) => {
-      native.onClick?.(e);
-      if (!e.defaultPrevented && !blocked) setOpen((previous) => !previous);
-    },
-    onKeyDown: (e) => {
-      native.onKeyDown?.(e);
-      if (!e.defaultPrevented && !blocked && e.key === 'ArrowDown') {
-        e.preventDefault();
-        setOpen(true);
-      }
-    },
-    onBlur: (e) => {
-      if (
-        !e.relatedTarget ||
-        !(e.relatedTarget as Element).closest?.(`[data-temporal-owner="${id}"]`)
-      )
-        native.onBlur?.(e);
-    },
+    ref: mergeRefs(triggerRef, ref),
   };
-  const parts = flattenParts(children),
-    triggers = parts.filter((n) => isValidElement(n) && n.type === TemporalTrigger),
-    contents = parts.filter((n) => isValidElement(n) && n.type === TemporalContent),
-    clears = parts.filter((n) => isValidElement(n) && n.type === TemporalClear);
-  invariant(
-    triggers.length <= 1 && contents.length <= 1 && clears.length <= 1,
-    'TimeField/DateTimeField accepts at most one Trigger, Content and Clear.',
-  );
-  return (
-    <Context.Provider
-      value={{
-        trigger: triggerProps,
-        text: current ? display(current) : (placeholder ?? `${label} 선택`),
-        hasValue: !!current,
-        blocked,
-        clear: () => {
-          change(null);
-          close(true);
+  const trigger = hasInput
+    ? {
+        type: 'button',
+        // The text box opens the popup with Down Arrow, so the button stays out of the tab
+        // order, as in the APG date picker combobox.
+        tabIndex: -1,
+        'aria-label': config.messages.open,
+        'aria-haspopup': 'dialog',
+        'aria-expanded': state.open,
+        'aria-controls': state.open ? popupId : undefined,
+        disabled: disabled || readOnly,
+        className: styles.button(),
+        onClick: toggle,
+        onBlur: handleBlur,
+      }
+    : {
+        ...control,
+        type: 'button',
+        className: styles.trigger(),
+        onClick: (event: MouseEvent<HTMLButtonElement>) => {
+          native.onClick?.(event);
+          if (!event.defaultPrevented) toggle();
         },
-        content: open && !blocked ? picker({ value: current, change }) : null,
-        label,
+        // APG combobox: Down Arrow opens; Enter and Space already click the button.
+        onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => {
+          native.onKeyDown?.(event);
+          if (event.defaultPrevented || event.key !== 'ArrowDown') return;
+          event.preventDefault();
+          show();
+        },
+        onBlur: handleBlur,
+      };
+  const textBox = hasInput
+    ? {
+        ...control,
+        type: 'text',
+        readOnly,
+        autoComplete: native.autoComplete ?? 'off',
+        spellCheck: false,
+        placeholder: placeholder ?? config.inputHint,
+        className: styles.input(),
+        value: input.value,
+        onChange: input.onChange,
+        onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
+          (native.onKeyDown as ((event: KeyboardEvent<HTMLInputElement>) => void) | undefined)?.(
+            event,
+          );
+          input.onKeyDown(event);
+        },
+        onBlur: input.onBlur,
+      }
+    : undefined;
+
+  return (
+    <TemporalContext.Provider
+      value={{
+        state,
+        hasClear: !composed || count(TemporalClear) > 0,
+        hasInput,
+        input: textBox,
+        blocked,
+        clear,
+        onBlur: handleBlur,
+        trigger,
+        text: state.empty
+          ? (placeholder ?? config.messages.placeholder)
+          : config.display(state.value),
+        icon: config.icon,
+        messages: config.messages,
+        content: () =>
+          config.picker({
+            value: state.value,
+            change,
+            close,
+            size: resolvedSize,
+          }),
         styles,
       }}
     >
       <div
-        ref={surface}
-        data-temporal-field=""
-        data-invalid={
-          triggerProps['aria-invalid'] === true || triggerProps['aria-invalid'] === 'true'
-            ? ''
-            : undefined
-        }
-        className={styles.root({ className })}
-        style={style}
+        ref={rootRef}
+        {...{ [`data-${config.kind}-field`]: '' }}
+        data-temporal-field={config.kind}
+        data-size={resolvedSize}
+        data-variant={variant}
+        data-open={state.open ? '' : undefined}
+        data-empty={state.empty ? '' : undefined}
+        data-invalid={state.invalid ? '' : undefined}
+        data-disabled={disabled ? '' : undefined}
+        data-readonly={readOnly ? '' : undefined}
+        data-required={required ? '' : undefined}
+        className={styles.root({
+          className: typeof className === 'function' ? className(state) : className,
+        })}
+        style={typeof style === 'function' ? style(state) : style}
       >
-        {triggers.length ? triggers : <TemporalTrigger />}
-        {clears.length ? clears : <TemporalClear />}
+        {composed ? (
+          <>
+            {!hasTrigger && !hasInput && <TemporalTrigger />}
+            {shell}
+            {!hasTrigger && hasInput && <TemporalTrigger />}
+          </>
+        ) : (
+          <>
+            <TemporalTrigger />
+            <TemporalClear />
+          </>
+        )}
+        <FormValue
+          name={name}
+          form={form}
+          value={state.empty ? null : config.serialize(state.value)}
+          required={required}
+          disabled={disabled}
+          anchor={triggerRef}
+        />
       </div>
-      {open && !blocked && (
+      {state.open && (
         <FieldPopup
-          anchor={surface}
+          anchor={rootRef}
           onClose={close}
           mobileVariant={mobileVariant}
-          preferredWidth={preferredWidth}
-          initialFocusSelector={initialFocusSelector}
+          preferredWidth={config.preferredWidth}
+          initialFocusSelector={config.initialFocusSelector}
           role="dialog"
-          id={id}
-          aria-label={`${label} 선택`}
-          data-temporal-owner={id}
-          onBlur={(e) => {
-            if (
-              !e.currentTarget.contains(e.relatedTarget as Node) &&
-              e.relatedTarget !== trigger.current
-            )
-              native.onBlur?.(e as unknown as React.FocusEvent<HTMLButtonElement>);
-          }}
+          id={popupId}
+          aria-label={config.messages.title}
+          data-temporal-owner={popupId}
+          className="concentric-p-3"
+          onBlur={handleBlur as (event: FocusEvent<HTMLDivElement>) => void}
         >
           <div className={styles.popupHeader()}>
-            <span className={styles.popupTitle()}>{label} 선택</span>
+            <span className={styles.popupTitle()}>{config.messages.title}</span>
             <button
               type="button"
               data-popup-autofocus=""
-              aria-label={`${label} 선택 닫기`}
+              aria-label={config.messages.close}
               onClick={() => close(true)}
               className={styles.popupClose()}
             >
@@ -360,15 +515,6 @@ export function TemporalField({
           {contents.length ? contents : <TemporalContent />}
         </FieldPopup>
       )}
-      {name && (
-        <input
-          type="hidden"
-          name={name}
-          form={form}
-          value={current ? serialize(current) : ''}
-          disabled={disabled}
-        />
-      )}
-    </Context.Provider>
+    </TemporalContext.Provider>
   );
 }

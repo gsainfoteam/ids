@@ -1,34 +1,31 @@
 import {
+  cloneElement,
   createContext,
   isValidElement,
-  useContext,
-  useEffect,
+  use,
   useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
   type ComponentProps,
+  type CSSProperties,
+  type ReactNode,
 } from 'react';
 
 import {
-  nearestSlot,
-  periodLabel,
-  resolveTimeFormat,
-  secondsOf,
-  timeSlots,
-  validateTime,
-  withTime,
-  type TimeFormat,
-  type TimePrecision,
-  type TimeUnit,
-} from './time';
+  useTimeColumn,
+  useTimePicker,
+  type TimePickerApi,
+  type TimePickerOptionState,
+  type TimePickerState,
+} from './use-time-picker';
+import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
 import { flattenParts, part } from '../../../internal/field-popup';
+import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
-import { dateAt, dayKey } from '../calendar/date';
 
+import type { TimeFormat, TimePrecision, TimeUnit } from './time';
 import type { IdsSize } from '../../../tokens/types';
+
+export type TimePickerVariant = 'grid' | 'wheel';
 
 export type TimePickerOptions = {
   precision?: TimePrecision;
@@ -36,472 +33,304 @@ export type TimePickerOptions = {
   step?: number;
   min?: Date;
   max?: Date;
-  locale?: string;
+  locale?: DateLocale;
   size?: IdsSize;
   disabled?: boolean;
   readOnly?: boolean;
-  variant?: 'grid' | 'wheel';
+  variant?: TimePickerVariant;
   selectionMode?: 'single' | 'none';
 };
-export type TimePickerProps = Omit<ComponentProps<'div'>, 'defaultValue' | 'onChange'> &
+
+export type TimePickerProps = Omit<
+  ComponentProps<'div'>,
+  'defaultValue' | 'onChange' | 'className' | 'style'
+> &
   TimePickerOptions & {
     value?: Date | null;
     defaultValue?: Date | null;
-    onChange?: (value: Date) => void;
+    onValueChange?: (value: Date | null) => void;
+    referenceDate?: Date;
+    className?: string | ((state: TimePickerState) => string | undefined);
+    style?: CSSProperties | ((state: TimePickerState) => CSSProperties | undefined);
   };
+
 type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
-const TimePickerStyle = tv({
-  slots: {
-    root: 'flex min-w-0 flex-wrap gap-2 text-(--ids-color-on-surface)',
-    header: 'flex w-full basis-full justify-around gap-2 text-(--ids-color-on-muted)',
-    separator: 'self-center text-(--ids-color-on-muted)',
-    column: [
-      'group relative min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-standard',
-      // A real border, not inset-ring: on a scroll container the inset shadow is painted
-      // under the options, so a highlighted option scrolling past the edge would hide it.
-      'border border-(--ids-color-outline)',
-      'focus-ring',
-    ],
-    option: [
-      'flex shrink-0 snap-center items-center justify-center rounded-standard px-2 tabular-nums select-none',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-      'motion-reduce:transition-none',
-    ],
-  },
-  variants: {
-    size: {
-      standard: { header: 'text-body-b3-regular', option: 'text-body-b2-regular' },
-      tiny: { header: 'text-caption-c1-regular', option: 'text-body-b3-regular' },
-    } satisfies Record<IdsSize, object>,
-    wheel: {
-      true: { column: 'snap-y snap-mandatory [overflow-anchor:none]' },
-    },
-    selected: {
-      true: { option: 'bg-(--ids-color-primary) text-(--ids-color-on-primary)' },
-      false: { option: 'hover:bg-(--ids-color-primary)/10' },
-    },
-    active: {
-      true: {
-        option:
-          'group-focus-visible:inset-ring-2 group-focus-visible:inset-ring-(--ids-color-primary)',
-      },
-    },
-    unavailable: {
-      true: { option: 'cursor-not-allowed opacity-50' },
-      false: { option: 'cursor-pointer' },
-    },
-  },
-  compoundVariants: [
-    {
-      selected: true,
-      active: true,
-      class: { option: 'group-focus-visible:inset-ring-(--ids-color-on-primary)/60' },
-    },
-  ],
-  defaultVariants: {
-    size: 'standard',
-  },
-});
-type ContextValue = {
-  value: Date | null;
-  base: Date;
-  slots: number[];
-  format: TimeFormat;
-  precision: TimePrecision;
-  step: number;
-  locale: string;
-  size: IdsSize;
-  disabled: boolean;
-  readOnly: boolean;
-  variant: 'grid' | 'wheel';
-  choose: (seconds: number) => void;
-  styles: ReturnType<typeof TimePickerStyle>;
+type ContextValue = TimePickerApi & { styles: ReturnType<typeof TimePicker.Style> };
+
+const TimePickerContext = createContext<ContextValue | null>(null);
+
+function useTimePickerContext(part: string) {
+  const context = use(TimePickerContext);
+  invariant(context, `${part} must be inside TimePicker.`);
+  return context;
+}
+
+const unitMessage: Record<TimeUnit, string> = {
+  hour: messages.timePicker.hour,
+  minute: messages.timePicker.minute,
+  second: messages.timePicker.second,
+  period: messages.timePicker.period,
 };
-const Context = createContext<ContextValue | null>(null);
-function useTimePicker() {
-  const c = useContext(Context);
-  invariant(c, 'TimePicker parts must be inside TimePicker.');
-  return c;
+
+// An asChild element without children of its own still gets the part's default content.
+function withDefault(children: ReactNode, fallback: ReactNode) {
+  return isValidElement<{ children?: ReactNode }>(children) && children.props.children == null
+    ? cloneElement(children, undefined, fallback)
+    : children;
 }
-function TimeHeader({ asChild, children, ...props }: BoxProps) {
-  const c = useTimePicker();
-  return part(
-    'div',
-    asChild,
-    children,
-    mergeProps(
-      {
-        className: c.styles.header(),
-        'aria-hidden': true,
-      },
-      props,
-    ),
-  );
+
+function defaultUnits(precision: TimePrecision, format: TimeFormat): TimeUnit[] {
+  return [
+    'hour',
+    ...(precision !== 'hour' ? (['minute'] as const) : []),
+    ...(precision === 'second' ? (['second'] as const) : []),
+    ...(format === '12h' ? (['period'] as const) : []),
+  ];
 }
-function TimeSeparator({
-  asChild,
-  children = ':',
-  ...props
-}: ComponentProps<'span'> & { asChild?: boolean }) {
-  const c = useTimePicker();
-  return part(
-    'span',
-    asChild,
-    children,
-    mergeProps({ 'aria-hidden': true, className: c.styles.separator() }, props),
-  );
-}
-function unitValue(seconds: number, unit: TimeUnit, format: TimeFormat) {
-  const h = Math.floor(seconds / 3600);
-  return unit === 'hour'
-    ? format === '12h'
-      ? h % 12 || 12
-      : h
-    : unit === 'minute'
-      ? Math.floor(seconds / 60) % 60
-      : unit === 'second'
-        ? seconds % 60
-        : Math.floor(h / 12);
-}
-// part/mergeProps compose callbacks; refs below are only read by events/effects.
-/* eslint-disable react-hooks/refs */
-function Column({ unit, asChild, children, ...props }: BoxProps & { unit: TimeUnit }) {
-  const c = useTimePicker(),
-    id = useId(),
-    node = useRef<HTMLDivElement>(null);
-  const current = c.value
-    ? secondsOf(c.value)
-    : (nearestSlot(c.slots, secondsOf(c.base)) ?? secondsOf(c.base));
-  const numbers =
-    unit === 'period'
-      ? [0, 1]
-      : unit === 'hour'
-        ? Array.from({ length: c.format === '12h' ? 12 : 24 }, (_, i) =>
-            c.format === '12h' ? i + 1 : i,
-          )
-        : Array.from(
-            { length: Math.ceil(60 / (unit === c.precision ? c.step : 1)) },
-            (_, i) => i * (unit === c.precision ? c.step : 1),
-          );
-  const options = numbers.map((n) => {
-    const hour = Math.floor(current / 3600),
-      minute = Math.floor(current / 60) % 60;
-    const targetHour =
-      unit === 'period'
-        ? (hour % 12) + n * 12
-        : unit === 'hour'
-          ? c.format === '12h'
-            ? (n % 12) + Math.floor(hour / 12) * 12
-            : n
-          : hour;
-    const target =
-      unit === 'minute'
-        ? hour * 3600 + n * 60 + (current % 60)
-        : unit === 'second'
-          ? hour * 3600 + minute * 60 + n
-          : targetHour * 3600 + (current % 3600);
-    const matches = c.slots.filter(
-      (s) =>
-        (unit === 'period' ? Math.floor(s / 43200) === n : Math.floor(s / 3600) === targetHour) &&
-        ((unit !== 'minute' && unit !== 'second') ||
-          Math.floor(s / 60) % 60 === (unit === 'minute' ? n : minute)) &&
-        (unit !== 'second' || s % 60 === n),
-    );
-    return { n, seconds: nearestSlot(matches, target) };
-  });
-  const selected = unitValue(current, unit, c.format);
-  const [active, setActive] = useState(selected);
-  const activeNumber = numbers.includes(active) ? active : numbers[0];
-  const selectedNumber = numbers.includes(selected) ? selected : numbers[0];
-  const wheel = c.variant === 'wheel',
-    cell = c.size === 'tiny' ? 28 : 36;
-  const scrolling = useRef(false);
-  const settleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const align = (n: number) => {
-    const el = node.current,
-      target = el?.querySelector<HTMLElement>(`[data-time-option="${n}"]`);
-    if (!el || !target || !el.clientHeight) return;
-    // Options and their positioned column share an offset parent coordinate system.
-    const top = Math.max(0, target.offsetTop - el.clientHeight / 2 + target.offsetHeight / 2);
-    if (Math.abs(el.scrollTop - top) > 1) el.scrollTop = top;
-  };
-  useLayoutEffect(() => {
-    if (!scrolling.current) align(selectedNumber);
-    const el = node.current;
-    // A column can mount inside a hidden native popover. Align after it becomes visible.
-    const observer =
-      el && typeof ResizeObserver !== 'undefined'
-        ? new ResizeObserver(() => {
-            if (!scrolling.current) align(selectedNumber);
-          })
-        : null;
-    if (el) observer?.observe(el);
-    return () => observer?.disconnect();
-  }, [selectedNumber, wheel, cell]);
-  useEffect(() => () => clearTimeout(settleTimer.current), []);
-  const focusOption = (n: number) => {
-    setActive(n);
-    align(n);
-  };
-  const choose = (n: number) => {
-    const option = options.find((o) => o.n === n);
-    if (option?.seconds !== undefined) c.choose(option.seconds);
-  };
-  const centeredNumber = () => {
-    const el = node.current;
-    return numbers[
-      Math.max(0, Math.min(numbers.length - 1, Math.round((el?.scrollTop ?? 0) / cell)))
-    ];
-  };
-  const finishScroll = () => {
-    clearTimeout(settleTimer.current);
-    if (!wheel || !scrolling.current) return;
-    scrolling.current = false;
-    const n = centeredNumber();
-    setActive(n);
-    choose(n);
-  };
-  const latestFinish = useRef(finishScroll);
-  useLayoutEffect(() => {
-    latestFinish.current = finishScroll;
-  });
-  const label =
-    props['aria-label'] ??
-    (unit === 'period'
-      ? 'AM/PM'
-      : unit === 'hour'
-        ? 'Hour'
-        : unit === 'minute'
-          ? 'Minute'
-          : 'Second');
-  return part(
-    'div',
-    asChild,
-    children ??
-      options.map(({ n, seconds }) => (
-        <div
-          key={n}
-          id={`${id}-${n}`}
-          role="option"
-          aria-selected={!!c.value && selected === n}
-          aria-disabled={c.disabled || seconds === undefined}
-          data-time-option={n}
-          onClick={() => {
-            scrolling.current = false;
-            node.current?.focus({ preventScroll: true });
-            focusOption(n);
-            choose(n);
-          }}
-          className={TimePickerStyle({
-            size: c.size,
-            selected: !!c.value && selected === n,
-            active: activeNumber === n,
-            unavailable: c.disabled || seconds === undefined,
-          }).option()}
-          style={{ height: cell, scrollSnapAlign: 'center' }}
-        >
-          {unit === 'period'
-            ? periodLabel(n, c.locale)
-            : new Intl.NumberFormat(c.locale, {
-                minimumIntegerDigits: 2,
-                useGrouping: false,
-              }).format(n)}
-        </div>
-      )),
-    mergeProps(props, {
-      ref: mergeRefs(node, props.ref),
-      role: 'listbox',
-      'aria-label': label,
-      'aria-orientation': 'vertical',
-      'aria-disabled': c.disabled,
-      'aria-readonly': c.readOnly,
-      'aria-activedescendant': `${id}-${activeNumber}`,
-      tabIndex: c.disabled ? -1 : 0,
-      'data-time-column': unit,
-      className: TimePickerStyle({ wheel }).column(),
-      style: {
-        height: cell * 5,
-        paddingBlock: wheel ? cell * 2 : 0,
-        scrollBehavior: 'auto',
-        ...props.style,
-      },
-      onFocus: () => {
-        setActive(selectedNumber);
-        if (!scrolling.current) align(selectedNumber);
-      },
-      onPointerDown: () => {
-        scrolling.current = true;
-      },
-      onWheel: () => {
-        scrolling.current = true;
-      },
-      onScroll: () => {
-        if (!wheel || !scrolling.current) return;
-        setActive(centeredNumber());
-        clearTimeout(settleTimer.current);
-        // Safari/embedded engines may omit scrollend at a boundary. Restart on every
-        // momentum event so selection is committed once the column actually rests.
-        settleTimer.current = setTimeout(() => latestFinish.current(), 150);
-      },
-      onScrollEnd: finishScroll,
-      onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.defaultPrevented || c.disabled) return;
-        const index = numbers.indexOf(activeNumber);
-        if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.key)) {
-          e.preventDefault();
-          scrolling.current = false;
-          const next =
-            e.key === 'Home'
-              ? 0
-              : e.key === 'End'
-                ? numbers.length - 1
-                : index +
-                  (e.key === 'ArrowUp'
-                    ? -1
-                    : e.key === 'ArrowDown'
-                      ? 1
-                      : e.key === 'PageUp'
-                        ? -5
-                        : 5);
-          focusOption(numbers[Math.max(0, Math.min(numbers.length - 1, next))]);
-        } else if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          choose(activeNumber);
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-          e.preventDefault();
-          const columns = Array.from(
-            node.current
-              ?.closest('[data-time-picker]')
-              ?.querySelectorAll<HTMLElement>('[data-time-column]') ?? [],
-          );
-          columns[columns.indexOf(node.current!) + (e.key === 'ArrowRight' ? 1 : -1)]?.focus({
-            preventScroll: true,
-          });
-        }
-      },
-    }),
-  );
-}
-/* eslint-enable react-hooks/refs */
-function TimeColumn(props: TimePicker.ColumnProps) {
-  return <Column {...props} />;
-}
-function TimePeriod(props: BoxProps) {
-  return <Column {...props} unit="period" />;
-}
+
 export function TimePicker({
   value,
   defaultValue = null,
-  onChange,
+  onValueChange,
+  referenceDate,
   precision = 'minute',
   format,
   step = 1,
   min,
   max,
-  locale = 'en-US',
+  locale,
   size,
   disabled = false,
   readOnly = false,
   selectionMode = 'single',
   variant = 'grid',
+  className,
+  style,
   children,
   ...props
 }: TimePickerProps) {
-  validateTime(value);
-  validateTime(defaultValue);
-  const [stored, setStored] = useState(defaultValue);
-  const current = value === undefined ? stored : value;
-  const base = current ?? new Date(2000, 0, 1);
-  const day = dayKey(base),
-    low = min?.getTime(),
-    high = max?.getTime();
-  const slots = useMemo(() => {
-    const [year, month, date] = day.split('-').map(Number);
-    return timeSlots(
-      dateAt(year, month - 1, date),
-      precision,
-      step,
-      low === undefined ? undefined : new Date(low),
-      high === undefined ? undefined : new Date(high),
+  const api = useTimePicker({
+    value,
+    defaultValue,
+    onValueChange,
+    referenceDate,
+    precision,
+    format,
+    step,
+    min,
+    max,
+    locale: resolveLocale(locale),
+    disabled,
+    readOnly: readOnly || selectionMode === 'none',
+  });
+  const { state } = api;
+  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = TimePicker.Style({ size: resolvedSize });
+
+  const units: string[] = [];
+  for (const child of flattenParts(children)) {
+    if (!isValidElement<{ unit?: TimeUnit }>(child)) continue;
+    if (child.type !== TimePicker.Column && child.type !== TimePicker.Period) continue;
+    const unit = child.type === TimePicker.Period ? 'period' : child.props.unit!;
+    invariant(!units.includes(unit), 'TimePicker: duplicate Column unit.');
+    invariant(
+      unit !== 'period' || state.format === '12h',
+      'TimePicker: Period requires 12h format.',
     );
-  }, [day, precision, step, low, high]);
-  const resolvedFormat = resolveTimeFormat(format, locale),
-    resolvedSize = useFieldSize(size) ?? 'standard',
-    styles = TimePickerStyle({ size: resolvedSize });
-  const parts = flattenParts(children),
-    units: string[] = [];
-  for (const child of parts)
-    if (
-      isValidElement<{ unit?: string }>(child) &&
-      (child.type === TimeColumn || child.type === TimePeriod)
-    ) {
-      const unit = child.type === TimePeriod ? 'period' : child.props.unit!;
-      invariant(!units.includes(unit), 'TimePicker: duplicate Column unit.');
-      invariant(
-        unit !== 'period' || resolvedFormat === '12h',
-        'TimePicker: Period requires 12h format.',
-      );
-      invariant(
-        unit !== 'second' || precision === 'second',
-        'TimePicker: Second requires second precision.',
-      );
-      invariant(
-        unit !== 'minute' || precision !== 'hour',
-        'TimePicker: Minute requires minute/second precision.',
-      );
-      units.push(unit);
-    }
+    invariant(
+      unit !== 'second' || precision === 'second',
+      'TimePicker: Second requires second precision.',
+    );
+    invariant(
+      unit !== 'minute' || precision !== 'hour',
+      'TimePicker: Minute requires minute/second precision.',
+    );
+    units.push(unit);
+  }
+
   return (
-    <Context.Provider
-      value={{
-        value: current,
-        base,
-        slots,
-        format: resolvedFormat,
-        precision,
-        step,
-        locale,
-        size: resolvedSize,
-        disabled,
-        readOnly: readOnly || selectionMode === 'none',
-        variant,
-        choose: (s) => {
-          if (disabled || readOnly || selectionMode === 'none') return;
-          const next = withTime(base, s);
-          if (!next) return;
-          if (value === undefined) setStored(next);
-          onChange?.(new Date(next));
-        },
-        styles,
-      }}
-    >
+    <TimePickerContext.Provider value={{ ...api, variant, size: resolvedSize, styles }}>
       <div
         {...props}
         role="group"
-        aria-label={props['aria-label'] ?? 'Time picker'}
+        aria-label={props['aria-label'] ?? messages.timePicker.label}
+        aria-disabled={disabled || undefined}
         data-time-picker=""
         data-variant={variant}
-        className={styles.root({ className: props.className })}
+        data-size={resolvedSize}
+        data-format={state.format}
+        data-disabled={disabled ? '' : undefined}
+        data-readonly={state.readOnly ? '' : undefined}
+        data-empty={state.value ? undefined : ''}
+        className={styles.root({
+          className: typeof className === 'function' ? className(state) : className,
+        })}
+        style={typeof style === 'function' ? style(state) : style}
       >
-        {children ?? (
-          <>
-            <TimeColumn unit="hour" />
-            {precision !== 'hour' && <TimeColumn unit="minute" />}
-            {precision === 'second' && <TimeColumn unit="second" />}
-            {resolvedFormat === '12h' && <TimePeriod />}
-          </>
-        )}
+        {children ??
+          defaultUnits(precision, state.format).map((unit) =>
+            unit === 'period' ? (
+              <TimePicker.Period key={unit} />
+            ) : (
+              <TimePicker.Column key={unit} unit={unit} />
+            ),
+          )}
       </div>
-    </Context.Provider>
+    </TimePickerContext.Provider>
   );
 }
+
+function ColumnView({
+  unit,
+  asChild,
+  children,
+  ...props
+}: Omit<TimePicker.ColumnProps, 'unit'> & { unit: TimeUnit }) {
+  const c = useTimePickerContext(unit === 'period' ? 'TimePicker.Period' : 'TimePicker.Column');
+  const id = useId();
+  const column = useTimeColumn(c, unit);
+  const options = column.options.map((option) => (
+    <div
+      key={option.value}
+      id={`${id}-${option.value}`}
+      role="option"
+      aria-selected={option.selected}
+      aria-disabled={option.disabled || undefined}
+      data-time-option={option.value}
+      data-selected={option.selected ? '' : undefined}
+      data-active={option.active ? '' : undefined}
+      data-disabled={option.disabled ? '' : undefined}
+      onClick={() => {
+        if (!option.disabled) column.onOptionClick(option.value);
+      }}
+      className={c.styles.option()}
+    >
+      {typeof children === 'function' ? children(option) : option.label}
+    </div>
+  ));
+  return part(
+    'div',
+    asChild,
+    asChild && typeof children !== 'function' ? withDefault(children, options) : options,
+    mergeProps(props, {
+      ref: mergeRefs(column.node, props.ref),
+      role: 'listbox',
+      'aria-label': props['aria-label'] ?? unitMessage[unit],
+      'aria-orientation': 'vertical',
+      'aria-disabled': c.state.disabled || undefined,
+      'aria-readonly': c.state.readOnly || undefined,
+      'aria-activedescendant': `${id}-${column.activeNumber}`,
+      tabIndex: c.state.disabled ? -1 : 0,
+      'data-time-column': unit,
+      'data-variant': c.variant,
+      className: c.styles.column({ className: props.className }),
+      onFocus: column.onFocus,
+      onPointerDown: column.onScrollStart,
+      onWheel: column.onScrollStart,
+      onScroll: column.onScroll,
+      onScrollEnd: column.onScrollEnd,
+      onKeyDown: column.onKeyDown,
+    }),
+  );
+}
+
 export namespace TimePicker {
   export type Props = TimePickerProps;
-  export type ColumnProps = BoxProps & { unit: 'hour' | 'minute' | 'second' };
-  export const Style = TimePickerStyle;
-  export const Column = TimeColumn,
-    Period = TimePeriod,
-    Header = TimeHeader,
-    Separator = TimeSeparator;
+  export type State = TimePickerState;
+  export type OptionState = TimePickerOptionState;
+  export type Variant = TimePickerVariant;
+  export type ColumnProps = Omit<ComponentProps<'div'>, 'children'> & {
+    unit: 'hour' | 'minute' | 'second';
+    asChild?: boolean;
+    children?: ReactNode | ((option: OptionState) => ReactNode);
+  };
+  export type PeriodProps = Omit<ColumnProps, 'unit'>;
+  export type SeparatorProps = ComponentProps<'span'> & { asChild?: boolean };
+
+  export function Column(props: ColumnProps) {
+    return <ColumnView {...props} />;
+  }
+
+  export function Period(props: PeriodProps) {
+    return <ColumnView {...props} unit="period" />;
+  }
+
+  // Labels for the columns above them, hidden from screen readers since each column is named.
+  export function Header({ asChild, children, ...props }: BoxProps) {
+    const c = useTimePickerContext('TimePicker.Header');
+    const labels = defaultUnits(c.state.precision, c.state.format).map((unit) => (
+      <span key={unit} className={c.styles.headerLabel()}>
+        {unitMessage[unit]}
+      </span>
+    ));
+    return part(
+      'div',
+      asChild,
+      asChild ? withDefault(children, labels) : (children ?? labels),
+      mergeProps({ 'aria-hidden': true, className: c.styles.header() }, props),
+    );
+  }
+
+  export function Separator({ asChild, children = ':', ...props }: SeparatorProps) {
+    const c = useTimePickerContext('TimePicker.Separator');
+    return part(
+      'span',
+      asChild,
+      children,
+      mergeProps({ 'aria-hidden': true, className: c.styles.separator() }, props),
+    );
+  }
+
+  export const Style = tv({
+    slots: {
+      root: 'flex min-w-0 flex-wrap gap-1 text-(--ids-color-on-surface)',
+      header: 'flex w-full basis-full gap-1 text-(--ids-color-on-muted) select-none',
+      headerLabel: 'min-w-12 flex-1 text-center',
+      separator: 'self-center text-(--ids-color-on-muted) select-none',
+      // A column is five options tall unless --time-picker-height says otherwise, with half a
+      // column of space before the first option and after the last, so any option can sit in the
+      // middle row and the picked time reads across one line.
+      column: [
+        'group/column relative h-(--time-picker-height) min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-standard',
+        'before:block before:h-[calc(50%-var(--time-option)/2)] after:block after:h-[calc(50%-var(--time-option)/2)]',
+        '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+        'focus-ring aria-disabled:cursor-not-allowed',
+        'data-[variant=wheel]:snap-y data-[variant=wheel]:snap-mandatory data-[variant=wheel]:[overflow-anchor:none]',
+      ],
+      option: [
+        'flex h-(--time-option) shrink-0 snap-center items-center justify-center rounded-standard px-2 tabular-nums select-none',
+        'cursor-pointer transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+        'hover:bg-(--ids-color-muted)',
+        'group-focus-visible/column:data-active:bg-(--ids-color-muted)',
+        'data-selected:bg-(--ids-color-primary) data-selected:font-medium data-selected:text-(--ids-color-on-primary)',
+        'data-selected:hover:bg-(--ids-color-primary)/90',
+        'group-focus-visible/column:data-selected:data-active:inset-ring-2 group-focus-visible/column:data-selected:data-active:inset-ring-(--ids-color-on-primary)/60',
+        'data-disabled:cursor-not-allowed data-disabled:opacity-50 data-disabled:hover:bg-transparent',
+      ],
+    },
+    variants: {
+      size: {
+        standard: {
+          root: [
+            '[--time-option:var(--ids-size-control-standard)] text-body-b3-regular',
+            '[--time-picker-height:calc(var(--time-option)*5)]',
+          ],
+          header: 'text-caption-c1-regular',
+          option: 'text-body-b3-regular',
+        },
+        tiny: {
+          root: [
+            '[--time-option:var(--ids-size-control-tiny)] text-caption-c1-regular',
+            '[--time-picker-height:calc(var(--time-option)*5)]',
+          ],
+          header: 'text-caption-c2-regular',
+          option: 'text-caption-c1-regular',
+        },
+      } satisfies Record<IdsSize, object>,
+    },
+    defaultVariants: { size: 'standard' },
+  });
 }
+
 export type { TimePrecision, TimeFormat } from './time';
+export type { TimePickerOptionState, TimePickerState } from './use-time-picker';

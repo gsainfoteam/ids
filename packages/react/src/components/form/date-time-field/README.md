@@ -1,127 +1,111 @@
 # DateTimeField
 
-- `Calendar`와 `TimePicker`를 한 팝업에 놓고 로컬 날짜와 시각을 고르는 필드
-- 값은 `Date | null` 하나. 날짜를 바꾸면 시각을, 시각을 바꾸면 날짜를 유지한다
-- 오프셋 없는 로컬 문자열(`2026-09-15T14:30`)로 제출한다
-- `Field`, react-hook-form(`controlMode="value"`)과 연결된다
+달력과 시계를 한 팝업에 놓고 날짜와 시각을 함께 고르는 입력입니다.
+
+- **값은 `Date` 하나.** 달력에서 날을 바꾸면 시각이, 시계에서 시각을 바꾸면 날짜가 그대로 남습니다.
+- **경계는 날짜와 시각을 합친 순간.** `min` 이 15일 09:30 이면 15일에는 09:30 부터, 16일부터는 하루 종일 고를 수 있습니다. 고를 시각이 하나도 없는 날은 막힙니다.
+- **폼.** 오프셋 없는 로컬 문자열 `2026-09-15T14:30` 을 FormData에 넣고, `required` 인데 비어 있으면 브라우저가 제출을 막습니다.
+- **react-hook-form, TanStack Form.** `controlMode="value"` 나 `value` / `onValueChange` 로 Date 값을 그대로 주고받습니다.
 
 ```tsx
-import { useState } from 'react';
 import { DateTimeField, Field } from '@gsainfoteam/ids-react';
 
-function Meeting() {
-  const [when, setWhen] = useState<Date | null>(null);
-  return (
-    <Field>
-      <Field.Label>회의 일시</Field.Label>
-      <DateTimeField name="when" value={when} onChange={setWhen} hourCycle="24h" step={15} />
-    </Field>
-  );
-}
+<Field>
+  <Field.Label>회의 일시</Field.Label>
+  <DateTimeField name="when" value={when} onValueChange={setWhen} step={15} />
+</Field>;
 ```
 
-## 날짜와 시각 보존
+## 날짜와 시각
 
 ```tsx
-<DateTimeField value={new Date(2026, 8, 15, 14, 30)} onChange={setWhen} />
-// 달력에서 20일을 고르면 2026-09-20 14:30. 시각을 유지한다
-// 시계에서 9시를 고르면 2026-09-15 09:30. 날짜를 유지한다
-// 새 날짜에서 그 시각이 제한, 간격, DST 때문에 안 되면 가장 가까운 허용 시각으로 맞춘다
+<DateTimeField value={new Date(2026, 8, 15, 14, 30)} onValueChange={setWhen} />
+// 달력에서 20일 → 2026-09-20 14:30
+// 시계에서 9시  → 2026-09-15 09:30
+// 새 날에 그 시각이 없으면(제한, 간격, 서머타임) 가장 가까운 시각으로 맞춘다
 
 <DateTimeField value={null} today={new Date(2026, 8, 15)} />
-// 빈 값에서 시각부터 고르면 today의 00:00을 기준으로 시작한다. today가 범위 밖이면 날짜를 먼저 고른다
+// 비어 있으면 시계에 선택 표시가 없다. 시각부터 고르면 today 의 그 시각이 된다
 ```
+
+- 고르는 동안 팝업은 열려 있습니다. `Esc` 나 바깥 클릭으로 닫습니다.
+- 시계에서 `Delete` 를 누르거나 Clear 를 누르면 값 전체가 `null` 이 됩니다.
 
 ## 제한
 
 ```tsx
 <DateTimeField
-  min={new Date(2026, 8, 15, 9, 30)}        // 날짜와 시각을 포함한 전체 경계. 양 끝 포함
-  max={new Date(2026, 8, 20, 18, 0)}        // 시각 제한은 첫날과 마지막 날에만 걸린다
-  disabled={(date) => date.getDay() === 0}  // 날짜별 선택 차단. true면 전체 차단
-  precision="minute"
-  step={15}                                 // 허용 시각이 하나도 없는 날은 비활성화된다
+  min={new Date(2026, 8, 15, 9, 30)} // 날짜와 시각을 합친 경계. 양 끝 포함
+  max={new Date(2026, 8, 20, 18, 0)}
+  disabled={{ dayOfWeek: [0] }} // 날짜별로 막는 matcher. true 면 필드 전체
+  step={30} // 고를 시각이 하나도 없는 날은 막힌다
 />
 ```
 
-- 달력 옵션(`monthsToShow`, `weekStartsOn`, `month`/`defaultMonth`/`onMonthChange`, `today`)은 [Calendar](../calendar/README.md)와 같다
-- 시각 단위는 [TimePicker](../time-picker/README.md)와 같다
+- 막힌 날을 보고 있으면 시계가 막히고 `고를 수 있는 날짜를 먼저 고르세요.` 가 나옵니다.
 
 ## 표시 형식
 
 ```tsx
-<DateTimeField locale="ko-KR" />                          // 기본: locale의 숫자 연월일과 시각
-<DateTimeField format="24h" />                            // 09/15/2026, 14:30
-<DateTimeField format="yyyy년 M월 d일 HH:mm" />           // 2026년 9월 15일 14:30
-<DateTimeField format="EEE, MMM d 'at' h:mm a" hourCycle="12h" /> // 패턴은 표시 전용. picker 시간제는 hourCycle로
-// 날짜 토큰 yyyy yy / MMMM MMM MM M / dd d / EEEE EEE, 시간 토큰 HH H / hh h / mm m / ss s / a
+<DateTimeField />                                              // ko-KR: 2026.09.15 14:30
+<DateTimeField hourCycle="12h" />                              // 2026.09.15 오후 2:30
+<DateTimeField locale="en-US" />                               // 09/15/2026 2:30 PM
+<DateTimeField format="yyyy년 M월 d일 HH:mm" />               // 2026년 9월 15일 14:30
+<DateTimeField format="EEE, MMM d 'at' h:mm a" hourCycle="12h" locale="en-US" />
 ```
 
-## 폼 제출
+- 기본 글자는 locale 의 짧은 날짜(date-fns `P`)와 [TimeField](../time-field/README.md#표시-형식) 의 시각입니다.
+- 패턴은 [date-fns 토큰](https://date-fns.org/docs/format)이고, 함수도 받습니다.
+- 달력 옵션(`monthsToShow`, `captionLayout`, `weekStartsOn`, `month`, `today`)은 [Calendar](../../data/calendar/README.md), 시계 옵션(`precision`, `step`, `hourCycle`, `pickerVariant`)은 [TimePicker](../../data/time-picker/README.md) 와 같습니다.
+
+## 폼
 
 ```tsx
-<DateTimeField name="when" />                       // "2026-09-15T14:30". 값이 없으면 ""
-<DateTimeField name="when" precision="second" />    // "2026-09-15T14:30:05"
-<DateTimeField name="when" disabled />              // 제출에서 빠진다
-// 오프셋 없는 로컬 문자열이다. UTC로 바꾸지 않는다
+<DateTimeField name="when" required />            {/* when=2026-09-15T14:30 */}
+<DateTimeField name="when" precision="second" />  {/* when=2026-09-15T14:30:05 */}
 ```
 
-## 합성
+- UTC로 바꾸지 않은 로컬 문자열입니다. 비어 있으면 FormData에 항목이 없습니다.
+- reset 은 팝업을 닫고 `defaultValue` 로 돌아갑니다. `onValueChange` 는 부르지 않습니다.
+
+## react-hook-form
 
 ```tsx
-<DateTimeField value={when} onChange={setWhen}>
-  <DateTimeField.Trigger>
-    <CalendarDaysIcon />
-    <DateTimeField.Value />         {/* 선택 값 또는 placeholder("날짜와 시간 선택") */}
-  </DateTimeField.Trigger>
-  <DateTimeField.Clear />           {/* Trigger의 형제로 둔다. 값이 없으면 렌더링하지 않는다 */}
-  <DateTimeField.Content />         {/* children을 주면 기본 Calendar + TimePicker를 대체한다 */}
-</DateTimeField>
-```
-
-## React Hook Form + Zod
-
-```tsx
-import { DateTimeField } from '@gsainfoteam/ids-react';
 import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
-const schema = z.object({ when: z.date().nullable().refine(Boolean, '일시를 선택하세요.') });
-const methods = useForm({ resolver: zodResolver(schema), defaultValues: { when: null } });
-
-<Field name="when" controlMode="value" required>
+<Field name="when" controlMode="value" registerOptions={{ required: '일시를 고르세요' }}>
   <Field.Label>회의 일시</Field.Label>
   <DateTimeField hourCycle="24h" />
-  <Field.Error />                   {/* 오류 시 Trigger로 포커스 */}
+  <Field.Error />
 </Field>;
 ```
 
+## 합성과 상태
+
+- `DateTimeField.Trigger`, `Value`, `Clear`, `Content` 와 부분 규칙은 [DateField](../date-field/README.md#합성) 와 같습니다. `Content` 의 기본은 달력과 시계입니다.
+- `DateTimeField.State` 와 `data-*` 는 [DateField](../date-field/README.md#상태) 와 같습니다.
+
 ## 속성
 
-| 속성                                  | 기본 / 동작                                          |
-| ------------------------------------- | ---------------------------------------------------- |
-| `value` / `defaultValue` / `onChange` | `Date \| null`. 생략하면 uncontrolled                |
-| `min` / `max`                         | 날짜와 시각을 포함한 전체 경계                       |
-| `disabled`                            | `true`면 전체 차단, 함수면 날짜별 선택 차단          |
-| `readOnly`                            | 열기, 변경, Clear 차단                               |
-| `format`                              | locale 형식. `12h` / `24h` 또는 표시 패턴            |
-| `hourCycle`                           | `format`의 `12h`/`24h`, 없으면 locale. picker 시간제 |
-| `precision` / `step`                  | `minute` / `1`                                       |
-| `pickerVariant`                       | `grid`(기본) / `wheel`                               |
-| `today`                               | 마운트 시점. 빈 값의 기준 날짜                       |
-| `locale`                              | `en-US`                                              |
-| `mobileVariant`                       | `popover`(기본) / `drawer`. 모바일에서 세로 배치     |
-| `variant`                             | `outline`(기본) / `soft` / `ghost`              |
-| `size`                                | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`  |
-| `invalid`                             | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선  |
-| `className` / `style`                 | 필드 표면으로 간다                                   |
-| 그 외 native 속성, `ref`, `autoFocus` | 실제 Trigger 버튼으로 간다                           |
+| 속성                                             | 기본 / 동작                            |
+| ------------------------------------------------ | -------------------------------------- |
+| `value` / `defaultValue` / `onValueChange`       | `Date \| null`. 기본 `null`            |
+| `open` / `defaultOpen` / `onOpenChange`          | 팝업 열림                              |
+| `min` / `max`                                    | 날짜와 시각을 합친 경계                |
+| `disabled`                                       | `true` 면 필드 전체, matcher 면 날짜별 |
+| `format` / `hourCycle`                           | locale 형식 / locale 시간제            |
+| `precision` / `step` / `pickerVariant`           | `minute` / `1` / `grid`                |
+| `today`                                          | 마운트한 날. 비어 있을 때의 기준 날    |
+| `locale`                                         | `ko-KR`. 태그나 date-fns `Locale`      |
+| `placeholder`                                    | `날짜와 시간 선택`                     |
+| `name` / `form` / `required`                     | 숨은 값 입력과 브라우저 검증           |
+| `readOnly`                                       | 열기, 고르기, Clear 를 막는다          |
+| `invalid` / `variant` / `size` / `mobileVariant` | DateField 와 같다                      |
+| 그 외 native 속성, `ref`                         | Trigger `button` 으로 간다             |
 
 ## 알아둘 것
 
-- 날짜나 시각을 골라도 팝업은 열려 있다. Escape, 닫기 버튼, Trigger 재클릭, 바깥 클릭으로 닫아도 고른 값은 유지된다. Clear는 값을 비우고 Trigger로 포커스를 돌린다.
-- 외부 `value`는 제한에 맞춰 고치지 않는다. 고를 때 정밀도보다 작은 단위와 밀리초는 0이 된다.
-- DST로 존재하지 않는 시각은 고를 수 없고, 두 번 있는 시각은 native `Date`의 이른 오프셋을 쓴다. 시간대, 오프셋 선택은 없으므로 반복 시각을 구분해야 하면 앱에서 시간대 정책을 따로 둔다.
-- SSR과 클라이언트의 기준 날짜를 맞추려면 `today`를 고정한다.
-- `drawer`는 비모달이다. 배경 스크롤 잠금과 포커스 트랩이 없다.
-- `form.reset()`은 uncontrolled 값을 `defaultValue`로 되돌리고 팝업을 닫는다. controlled 값은 부모가 되돌린다.
-- `required`는 ARIA 표시만 한다. native constraint validation은 없으므로 스키마로 검증한다.
+- 넓은 화면에서는 달력 옆에 시계가, 640px 보다 좁은 화면에서는 아래에 놓입니다.
+- 서머타임으로 없는 시각은 고를 수 없고, 두 번 있는 시각은 `Date` 의 이른 오프셋을 씁니다. 시간대를 구분해야 하면 앱에서 따로 정합니다.
+- 바깥에서 준 값은 제한에 맞춰 고치지 않습니다. 고를 때 정밀도보다 작은 단위와 밀리초는 0이 됩니다.
+- 서버 렌더링 결과를 클라이언트와 맞추려면 `today` 를 고정합니다.

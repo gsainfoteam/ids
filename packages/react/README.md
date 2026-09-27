@@ -263,23 +263,23 @@ RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규�
 
 ## Calendar
 
-단일·범위·다중 날짜 선택과 키보드 월 탐색을 제공합니다. [Calendar API](./src/components/calendar/README.md).
+단일·범위·다중 날짜 선택과 키보드 월 탐색을 제공합니다. [Calendar API](./src/components/data/calendar/README.md).
 
 ## DateField
 
-Calendar 팝업으로 날짜·기간·여러 날짜를 선택합니다. [DateField API](./src/components/date-field/README.md).
+Calendar 팝업으로 날짜·기간·여러 날짜를 선택하고, 날짜를 글자로 칠 수도 있습니다. [DateField API](./src/components/form/date-field/README.md).
 
 ## TimePicker
 
-시·분·초 컬럼과 12/24시간제를 지원합니다. [TimePicker API](./src/components/time-picker/README.md).
+시·분·초 컬럼과 12/24시간제를 지원합니다. [TimePicker API](./src/components/data/time-picker/README.md).
 
 ## TimeField
 
-TimePicker 팝업으로 시간을 선택합니다. [TimeField API](./src/components/time-field/README.md).
+TimePicker 팝업으로 시간을 선택합니다. [TimeField API](./src/components/form/time-field/README.md).
 
 ## DateTimeField
 
-Calendar와 TimePicker로 일시를 선택합니다. [DateTimeField API](./src/components/date-time-field/README.md).
+Calendar와 TimePicker로 일시를 선택합니다. [DateTimeField API](./src/components/form/date-time-field/README.md).
 
 ## Interaction feedback
 
