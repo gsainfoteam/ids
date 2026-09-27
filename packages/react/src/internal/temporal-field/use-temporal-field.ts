@@ -1,7 +1,5 @@
 import {
-  useCallback,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
   type ChangeEvent,
@@ -92,20 +90,10 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
     return true;
   };
 
-  // FieldPopup re-runs its placement and initial focus whenever onClose changes identity, so
-  // close must stay the same function for the life of the field. It also hears both the
-  // pointerdown and the focusin of one outside click, which must report a single close.
-  const latest = useRef({ setOpen, open: expanded });
-  useLayoutEffect(() => {
-    latest.current = { setOpen, open: expanded };
-  });
-  const close = useCallback((restoreFocus: boolean) => {
-    if (latest.current.open) {
-      latest.current.open = false;
-      latest.current.setOpen(false);
-    }
+  const close = (restoreFocus: boolean) => {
+    setOpen(false);
     if (restoreFocus) triggerRef.current?.focus({ preventScroll: true });
-  }, []);
+  };
 
   const change: TemporalChange<V> = (next, { close: shouldClose = false } = {}) => {
     if (blocked) return;
