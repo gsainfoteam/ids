@@ -73,8 +73,12 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
           {({ index }) => (
             <>
               <FileField.Preview file={file} /> {/* 이미지면 썸네일, 아니면 문서 아이콘 */}
-              {index + 1}. {file.name}
-              <FileField.Remove file={file} />
+              <Item.Content>
+                <Item.Title truncate>{index + 1}. {file.name}</Item.Title>
+              </Item.Content>
+              <Item.Actions>
+                <FileField.Remove file={file} />
+              </Item.Actions>
             </>
           )}
         </FileField.Item>
@@ -86,7 +90,10 @@ import { Field, FileField } from '@gsainfoteam/ids-react';
 
 - `Trigger` 는 꼭 하나 둡니다. `Clear`, `List`, `Item` 은 `Trigger` 안이 아니라 옆에 둡니다.
 - `field` 모양에서는 `Trigger` 와 `Clear` 가 필드 테두리 안에 함께 들어갑니다.
-- 기본 목록은 여러 개를 받거나 dropzone 일 때 나옵니다. 파일마다 미리보기, 이름, 크기, 삭제 버튼이 있습니다.
+- 기본 목록은 여러 개를 받거나 dropzone 일 때 나옵니다. 파일마다 미리보기, 이름, 크기, 삭제 버튼이 있고, 긴 이름은 한 줄에서 줄입니다.
+- 목록은 `Item.Group`, 파일 한 줄은 `dense` 한 outline `Item` 입니다. `FileField.Item` 안에서 `Item.Content`, `Item.Title`, `Item.Description`, `Item.Actions` 를 그대로 씁니다.
+- `Preview` 는 행 안에서는 `Item.Media` 타일이고, 하나만 받는 필드의 트리거 안에서는 글자 크기의 썸네일입니다.
+- `Clear` 와 `Remove` 는 ghost `IconButton` 입니다. children 은 아이콘이고, `asChild` 면 넘긴 버튼이 같은 모양과 동작을 받습니다.
 - 목록에서 파일을 지우면 포커스가 그 자리에 온 파일로, 마지막 파일이면 트리거로 갑니다.
 - 모든 part 는 `asChild` 를 받습니다.
 

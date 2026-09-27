@@ -290,8 +290,94 @@ test('dropzone: limits are described up front, and a single file is listed with 
   );
   assert.equal(hint.textContent, '이미지, PDF, ZIP · 파일당 최대 5 MB');
   assert.equal(fieldRoot().dataset.appearance, 'dropzone');
-  assert.equal(host.querySelectorAll('[role=listitem]').length, 1);
+  assert.equal(host.querySelectorAll('[role=list] > li [data-file-field-item]').length, 1);
   assert.equal(host.querySelector('[data-file-field-control]'), null);
+});
+
+test('rows are dense outline Items in a group; Clear and Remove are ghost IconButtons', async () => {
+  stubObjectUrls();
+  await render(
+    tracked({
+      multiple: true,
+      defaultValue: [file('quarterly-report.pdf'), file('photo.png', 'png', 'image/png')],
+    }).node,
+  );
+  const list = host.querySelector('[data-item-group]');
+  assert.equal(list.tagName, 'UL');
+  assert.equal(list.getAttribute('role'), 'list');
+  assert.equal(list.getAttribute('aria-label'), '고른 파일');
+  assert.deepEqual(
+    [...list.children].map((child) => child.tagName),
+    ['LI', 'LI'],
+  );
+  const [row, image] = host.querySelectorAll('[data-file-field-item]');
+  assert.ok(row.hasAttribute('data-item'));
+  assert.equal(row.dataset.variant, 'outline');
+  assert.equal(row.dataset.size, 'standard');
+  assert.ok(row.hasAttribute('data-dense'));
+  assert.equal(row.hasAttribute('role'), false, 'a static row is not a button');
+  const title = row.querySelector('[data-item-title]');
+  assert.equal(title.textContent, 'quarterly-report.pdf');
+  assert.equal(title.title, 'quarterly-report.pdf', 'the full name survives truncation');
+  assert.match(title.className, /(^| )truncate( |$)/);
+  assert.equal(row.querySelector('[data-item-description]').textContent, '5 B');
+  const preview = image.querySelector('[data-file-field-preview]');
+  assert.ok(preview.hasAttribute('data-item-media'), 'the preview is the row media');
+  assert.equal(preview.dataset.variant, 'soft');
+  assert.equal(preview.querySelector('img').getAttribute('src'), 'blob:photo.png:0');
+  const remove = row.querySelector('[data-item-actions] [data-file-field-remove]');
+  assert.equal(remove.tagName, 'BUTTON');
+  assert.equal(remove.dataset.variant, 'ghost');
+  assert.match(remove.className, /(^| )size-7( |$)/);
+  const clear = host.querySelector('[data-file-field-control] [data-file-field-clear]');
+  assert.equal(clear.dataset.variant, 'ghost');
+  assert.match(clear.className, /(^| )size-7( |$)/);
+  assert.match(clear.className, /(^| )last:me-1( |$)/, 'Clear keeps its inset in the bare control');
+  assert.doesNotMatch(clear.className, /-me-2/);
+  await render(
+    tracked({ multiple: true, size: 'tiny', defaultValue: [file('a.pdf')], key: 'tiny' }).node,
+  );
+  const tiny = host.querySelector('[data-file-field-item]');
+  assert.equal(tiny.dataset.size, 'tiny');
+  assert.match(tiny.querySelector('[data-file-field-remove]').className, /(^| )size-6( |$)/);
+});
+
+test('Clear and Remove keep their handlers, and asChild lends their look to the given button', async () => {
+  const state = tracked({ multiple: true, defaultValue: [file('a.pdf'), file('b.pdf')] });
+  await render(
+    h(
+      FileField,
+      { ...state.node.props, key: 'custom' },
+      h(FileField.Trigger),
+      h(
+        FileField.Clear,
+        { onClick: (event) => event.preventDefault() },
+        h('svg', { 'data-glyph': '' }),
+      ),
+      h(FileField.List, null, (files) =>
+        files.map((item) =>
+          h(
+            FileField.Item,
+            { key: item.name, file: item },
+            item.name,
+            h(FileField.Remove, { file: item, asChild: true }, h('button', { className: 'own' })),
+          ),
+        ),
+      ),
+    ),
+  );
+  const clear = host.querySelector('[data-file-field-clear]');
+  assert.ok(clear.querySelector('[data-glyph]'), 'a child of Clear is its glyph');
+  await click(clear);
+  assert.equal(state.changes.length, 0, 'a prevented click keeps the files');
+  const remove = host.querySelector('[aria-label="a.pdf 삭제"]');
+  assert.ok(remove.classList.contains('own'));
+  assert.equal(remove.dataset.variant, 'ghost');
+  await click(remove);
+  assert.deepEqual(
+    state.changes.at(-1).map((item) => item.name),
+    ['b.pdf'],
+  );
 });
 
 test('required is enforced natively; reset, prevented reset, read-only and disabled', async () => {
@@ -368,7 +454,7 @@ test('custom composition: asChild trigger, List as a function, event cancellatio
   assert.equal(pickerClicks, 1);
   await upload([file('a.pdf'), file('b.pdf')]);
   assert.deepEqual(
-    [...host.querySelectorAll('[role=listitem]')].map((item) => item.textContent),
+    [...host.querySelectorAll('[role=list] > li')].map((item) => item.textContent),
     ['0:a.pdf', '1:b.pdf'],
   );
   assert.equal(calls, 1);
@@ -431,8 +517,8 @@ test('sizes read in familiar units', async () => {
     }).node,
   );
   assert.deepEqual(
-    [...host.querySelectorAll('[role=listitem]')].map(
-      (item) => item.querySelector('span span:last-child').textContent,
+    [...host.querySelectorAll('[data-file-field-item] [data-item-description]')].map(
+      (size) => size.textContent,
     ),
     ['512 B', '1.5 KB', '23 MB'],
   );

@@ -156,9 +156,77 @@ test('Group: a list with an item per row; separators are hidden and size is shar
   );
   assert.equal(children[1].getAttribute('aria-hidden'), 'true');
   assert.ok(children[1].hasAttribute('data-item-separator'));
+  assert.ok(children[1].hasAttribute('data-divider'), 'the separator is a Divider');
+  assert.equal(children[1].hasAttribute('role'), false);
   assert.ok(children[3].classList.contains('own'), 'an li is not wrapped again');
   assert.ok([...doc.querySelectorAll('[data-item]')].every((row) => row.dataset.size === 'tiny'));
-  assert.equal(html(h(Item.Separator)).querySelector('hr').tagName, 'HR');
+  const rule = html(h(Item.Separator, { id: 'rule' })).querySelector('hr');
+  assert.equal(rule.id, 'rule');
+  assert.ok(rule.hasAttribute('data-divider'));
+  assert.equal(rule.getAttribute('role'), 'separator');
+  assert.match(rule.className, /border-0/, 'the hr border does not paint over the line');
+});
+
+test('dense halves the padding and a group shares it with its rows', () => {
+  const doc = html(
+    h(
+      Item.Group,
+      { dense: true, 'aria-label': 'Files' },
+      h(Item, null, 'One'),
+      h(Item, { size: 'tiny' }, 'Two'),
+      h(Item, { dense: false }, 'Three'),
+    ),
+  );
+  const [one, two, three] = doc.querySelectorAll('[data-item]');
+  assert.ok(one.hasAttribute('data-dense'));
+  assert.match(one.className, /(^| )min-h-12( |$)/);
+  assert.match(one.className, /(^| )concentric-p-1\.5( |$)/);
+  assert.doesNotMatch(one.className, /min-h-14|concentric-p-3/, 'the standard padding is replaced');
+  assert.match(two.className, /(^| )min-h-8( |$)/);
+  assert.match(two.className, /(^| )concentric-p-1( |$)/);
+  assert.equal(three.hasAttribute('data-dense'), false, 'a row can opt out of the group');
+  assert.match(three.className, /(^| )concentric-p-3( |$)/);
+  const plain = html(h(Item, null, 'x')).querySelector('[data-item]');
+  assert.equal(plain.hasAttribute('data-dense'), false, 'rows are not dense by default');
+});
+
+test('a truncated title stays on one line within its row', () => {
+  const title = (props) =>
+    html(
+      h(Item, null, h(Item.Content, null, h(Item.Title, props, 'a-very-long-file-name.pdf'))),
+    ).querySelector('[data-item-title]');
+  const wrapping = title({});
+  assert.match(wrapping.className, /(^| )flex( |$)/);
+  assert.doesNotMatch(wrapping.className, /truncate/, 'titles wrap by default');
+  const cut = title({ truncate: true });
+  assert.match(cut.className, /(^| )truncate( |$)/);
+  assert.match(cut.className, /(^| )max-w-full( |$)/);
+  assert.match(cut.className, /(^| )block( |$)/);
+  assert.doesNotMatch(cut.className, /(^| )flex( |$)/, 'a flex box would clip without an ellipsis');
+  assert.equal(cut.hasAttribute('truncate'), false);
+});
+
+test('a group and its rows shrink with their parent, so a truncated title cannot widen them', () => {
+  const doc = html(h(Item.Group, null, h(Item, null, h(Item.Title, { truncate: true }, 'x'))));
+  assert.match(doc.querySelector('[data-item-group]').className, /(^| )min-w-0( |$)/);
+  assert.match(doc.querySelector('[data-item]').className, /(^| )min-w-0( |$)/);
+});
+
+test('an image fills its media tile', () => {
+  const media = (variant) =>
+    html(h(Item, null, h(Item.Media, { variant }, h('img', { alt: '' })))).querySelector(
+      '[data-item-media]',
+    );
+  for (const variant of ['soft', 'outline']) {
+    const tile = media(variant);
+    assert.match(tile.className, /(^| )overflow-hidden( |$)/, variant);
+    assert.match(tile.className, /\[&>img\]:size-full/, variant);
+  }
+  assert.doesNotMatch(
+    media('ghost').className,
+    /size-full/,
+    'an image without a tile keeps its size',
+  );
 });
 
 test('className takes the row state', () => {

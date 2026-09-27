@@ -12,6 +12,7 @@ import { useItem } from './use-item';
 import { resolveState, type StateValue } from '../../../internal/state-props';
 import { useRegisteredId } from '../../../internal/surface';
 import { invariant, tv } from '../../../utils';
+import { Divider } from '../../layout/divider';
 import { Slot } from '../../utility/slot';
 
 import type { InteractiveState } from '../../../hooks/use-interactive';
@@ -26,7 +27,10 @@ type Context = {
 };
 
 const ItemContext = createContext<Context | null>(null);
-const ItemGroupContext = createContext<{ size: IdsSize | undefined } | null>(null);
+const ItemGroupContext = createContext<{
+  size: IdsSize | undefined;
+  dense: boolean | undefined;
+} | null>(null);
 
 function useItemContext(part: string) {
   const context = use(ItemContext);
@@ -45,6 +49,7 @@ function isCurrent(value: unknown) {
 export function Item({
   variant = 'ghost',
   size,
+  dense,
   interactive: interactiveProp,
   selected,
   disabled = false,
@@ -67,6 +72,7 @@ export function Item({
 }: Item.Props) {
   const group = use(ItemGroupContext);
   const resolvedSize = size ?? group?.size ?? 'standard';
+  const resolvedDense = dense ?? group?.dense ?? false;
   // A link or button passed through asChild is interactive by what it is.
   const nativeControl =
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
@@ -92,7 +98,7 @@ export function Item({
     },
   });
   const state: Item.State = { ...interaction, interactive, selected: selected === true };
-  const styles = Item.Style({ variant, size: resolvedSize, interactive });
+  const styles = Item.Style({ variant, size: resolvedSize, dense: resolvedDense, interactive });
   const Root = asChild ? Slot : 'div';
 
   return (
@@ -107,6 +113,7 @@ export function Item({
         data-item=""
         data-variant={variant}
         data-size={resolvedSize}
+        data-dense={flag(resolvedDense)}
         data-interactive={flag(interactive)}
         data-selected={flag(selected === true)}
         data-disabled={flag(disabled)}
@@ -137,6 +144,7 @@ export namespace Item {
   export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children'> & {
     variant?: ItemVariant;
     size?: IdsSize;
+    dense?: boolean;
     interactive?: boolean;
     selected?: boolean;
     disabled?: boolean;
@@ -173,13 +181,20 @@ export namespace Item {
     export type Props = PartProps;
   }
 
-  export function Title({ className, id, ...props }: Title.Props) {
+  export function Title({ truncate = false, className, id, ...props }: Title.Props) {
     const { styles, setTitleId } = useItemContext('Item.Title');
     const titleId = useRegisteredId(setTitleId, id);
-    return <Part {...props} id={titleId} kind="title" className={styles.title({ className })} />;
+    return (
+      <Part
+        {...props}
+        id={titleId}
+        kind="title"
+        className={styles.title({ truncate, className })}
+      />
+    );
   }
   export namespace Title {
-    export type Props = PartProps;
+    export type Props = PartProps & { truncate?: boolean };
   }
 
   export function Description({ className, id, ...props }: Description.Props) {
@@ -208,10 +223,10 @@ export namespace Item {
 
   // Safari drops the list role of a <ul> without bullets unless it is written out. Each child is
   // placed in an <li>, so items can be dropped in as they are.
-  export function Group({ size, className, children, ...props }: Group.Props) {
+  export function Group({ size, dense, className, children, ...props }: Group.Props) {
     const styles = Style();
     return (
-      <ItemGroupContext value={{ size }}>
+      <ItemGroupContext value={{ size, dense }}>
         <ul role="list" {...props} data-item-group="" className={styles.group({ className })}>
           {Children.map(children, (child) => {
             if (child == null || typeof child === 'boolean') return child;
@@ -224,17 +239,24 @@ export namespace Item {
     );
   }
   export namespace Group {
-    export type Props = ComponentProps<'ul'> & { size?: IdsSize };
+    export type Props = ComponentProps<'ul'> & { size?: IdsSize; dense?: boolean };
   }
 
+  // In a group the line is an li left out of the list count; on its own it is an hr.
   export function Separator({ className, ...props }: Separator.Props) {
     const inGroup = use(ItemGroupContext) !== null;
-    const styles = Style();
+    const separator = Style().separator({ className });
     if (inGroup)
       return (
-        <li aria-hidden="true" data-item-separator="" className={styles.separator({ className })} />
+        <Divider asChild decorative data-item-separator="" className={separator}>
+          <li />
+        </Divider>
       );
-    return <hr {...props} data-item-separator="" className={styles.separator({ className })} />;
+    return (
+      <Divider asChild data-item-separator="" className={separator}>
+        <hr {...props} />
+      </Divider>
+    );
   }
   export namespace Separator {
     export type Props = ComponentProps<'hr'>;
@@ -243,9 +265,11 @@ export namespace Item {
   export const Style = tv({
     slots: {
       // Hover, press and selection lay a translucent layer over whatever the variant's background
-      // is, instead of one color per variant and state.
+      // is, instead of one color per variant and state. min-w-0 here and on the group lets a
+      // grid or flex parent shrink them, where a truncated title would otherwise widen them to its
+      // full length.
       root: [
-        'group/item relative isolate flex w-full items-center text-start text-(--ids-color-on-surface)',
+        'group/item relative isolate flex w-full min-w-0 items-center text-start text-(--ids-color-on-surface)',
         'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit]',
         'before:bg-(--ids-color-on-surface) before:opacity-0',
         'before:transition-opacity before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
@@ -261,9 +285,11 @@ export namespace Item {
       title: 'flex w-fit items-center gap-2',
       description: 'line-clamp-2 text-(--ids-color-on-muted)',
       actions: 'ms-auto flex shrink-0 items-center gap-2',
-      group: 'flex flex-col',
+      group: 'flex min-w-0 flex-col',
       groupItem: 'flex',
-      separator: 'h-px shrink-0 border-0 bg-(--ids-color-border)',
+      // Divider fills the line with the border color, but an hr keeps the base style's 1px top
+      // border, which would cover that fill in the text color.
+      separator: 'border-0',
     },
     variants: {
       variant: {
@@ -291,6 +317,10 @@ export namespace Item {
           description: 'text-caption-c1-regular',
         },
       } satisfies Record<IdsSize, object>,
+      dense: { true: {}, false: {} },
+      // A flex box never draws an ellipsis, so a truncated title becomes a block no wider than
+      // its row.
+      truncate: { true: { title: 'block max-w-full truncate' }, false: {} },
       interactive: {
         true: {
           root: [
@@ -306,7 +336,19 @@ export namespace Item {
     compoundVariants: [
       { media: ['soft', 'outline'], size: 'standard', class: { media: 'size-8' } },
       { media: ['soft', 'outline'], size: 'tiny', class: { media: 'size-7' } },
+      // An image in a tile is a thumbnail: it fills the tile and takes its corners.
+      { media: ['soft', 'outline'], class: { media: 'overflow-hidden [&>img]:size-full' } },
+      // Half the padding, so a standard row holding a 36px control is 48px tall.
+      { dense: true, size: 'standard', class: { root: 'min-h-12 concentric-p-1.5' } },
+      { dense: true, size: 'tiny', class: { root: 'min-h-8 concentric-p-1' } },
     ],
-    defaultVariants: { variant: 'ghost', media: 'ghost', size: 'standard', interactive: false },
+    defaultVariants: {
+      variant: 'ghost',
+      media: 'ghost',
+      size: 'standard',
+      dense: false,
+      truncate: false,
+      interactive: false,
+    },
   });
 }

@@ -8,6 +8,7 @@ import {
   HomeIcon,
   InboxIcon,
   MoonIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { expect, fn } from 'storybook/test';
 
@@ -27,6 +28,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['ghost', 'outline', 'soft'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
+// A 4:3 picture, so a tile shows it cropped to a square.
+const photo = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 48"><rect width="64" height="48" fill="#93c5fd"/><circle cx="46" cy="14" r="6" fill="#fde68a"/><path d="M0 48 22 20l14 16 8-8 20 20z" fill="#1d4ed8"/></svg>',
+)}`;
+
 const meta = {
   title: 'Data/Item',
   component: Item,
@@ -34,6 +40,7 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
+    dense: { control: 'boolean' },
     interactive: { control: 'boolean' },
     selected: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -86,6 +93,24 @@ export const Gallery: Story = {
         />
       </Showcase.Section>
 
+      <Showcase.Section title="Dense · Variant × Size">
+        <Showcase.Matrix
+          rows={sizes}
+          columns={variants}
+          render={(size, variant) => (
+            <Item variant={variant} size={size} dense className="w-64">
+              <Item.Media variant="soft">
+                <BellIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>{variant}</Item.Title>
+                <Item.Description>size {size} · dense</Item.Description>
+              </Item.Content>
+            </Item>
+          )}
+        />
+      </Showcase.Section>
+
       <Showcase.Section title="Media">
         <Showcase.Row label="icon">
           {variants.map((variant) => (
@@ -95,6 +120,18 @@ export const Gallery: Story = {
               </Item.Media>
               <Item.Content>
                 <Item.Title>media {variant}</Item.Title>
+              </Item.Content>
+            </Item>
+          ))}
+        </Showcase.Row>
+        <Showcase.Row label="image">
+          {(['soft', 'outline'] as const).map((variant) => (
+            <Item key={variant} variant="outline" className="w-56">
+              <Item.Media variant={variant}>
+                <img src={photo} alt="" />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>image {variant}</Item.Title>
               </Item.Content>
             </Item>
           ))}
@@ -131,6 +168,17 @@ export const Gallery: Story = {
             </Item.Content>
             <Item.Content className="text-caption-c1-regular items-end text-(--ids-color-on-muted)">
               2분 전
+            </Item.Content>
+          </Item>
+        </Showcase.Row>
+        <Showcase.Row label="truncate">
+          <Item variant="outline" className="w-80">
+            <Item.Media variant="soft">
+              <DocumentIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title truncate>2026 상반기 예산 집행 결과 보고서 (최종 수정본).pdf</Item.Title>
+              <Item.Description>2.4 MB</Item.Description>
             </Item.Content>
           </Item>
         </Showcase.Row>
@@ -360,5 +408,69 @@ export const Navigation: Story = {
     await expect(home).toHaveAttribute('data-selected');
     await expect(canvas.getAllByRole('listitem')).toHaveLength(3);
     await expect(home).toHaveAttribute('data-size', 'tiny');
+  },
+};
+
+const attachments = [
+  { name: '2026 상반기 예산 집행 결과 보고서 (최종 수정본).pdf', size: '2.4 MB' },
+  { name: '현장 사진.jpg', size: '1.2 MB', thumbnail: photo },
+  { name: '회의록.md', size: '3 KB' },
+];
+
+export const Dense: Story = {
+  render: () => (
+    <div className="grid w-80">
+      <Item.Group dense aria-label="첨부 파일" className="gap-1">
+        {attachments.map((file) => (
+          <Item key={file.name} variant="outline">
+            <Item.Media variant="soft">
+              {file.thumbnail ? <img src={file.thumbnail} alt="" /> : <DocumentIcon />}
+            </Item.Media>
+            <Item.Content>
+              <Item.Title truncate title={file.name}>
+                {file.name}
+              </Item.Title>
+              <Item.Description>{file.size}</Item.Description>
+            </Item.Content>
+            <Item.Actions>
+              <IconButton
+                aria-label={`${file.name} 삭제`}
+                variant="ghost"
+                size="tiny"
+                icon={<XMarkIcon />}
+              />
+            </Item.Actions>
+          </Item>
+        ))}
+      </Item.Group>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`dense` 는 패딩을 반으로 줄여 첨부 파일이나 메뉴처럼 행이 많은 목록을 촘촘하게 보여 줍니다. `Item.Group` 에 주면 안의 행이 모두 따릅니다. `Item.Title truncate` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄이고, grid 안에서도 목록을 넓히지 않습니다. 타일 안의 이미지는 타일을 채웁니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const rows = canvas.getAllByRole('listitem').map((item) => item.firstElementChild!);
+    await expect(rows).toHaveLength(3);
+    for (const row of rows) {
+      await expect(row).toHaveAttribute('data-dense');
+      await expect(getComputedStyle(row).paddingTop).toBe('6px');
+    }
+    const list = canvas.getByRole('list');
+    await expect(list.getBoundingClientRect().width).toBe(
+      list.parentElement!.getBoundingClientRect().width,
+    );
+    const title = canvas.getByText(attachments[0].name);
+    const line = parseFloat(getComputedStyle(title).lineHeight);
+    await expect(title.scrollWidth).toBeGreaterThan(title.clientWidth);
+    await expect(title.getBoundingClientRect().height).toBeLessThan(line * 1.5);
+    const image = canvasElement.querySelector('[data-item-media] img')!;
+    const tile = image.parentElement!.getBoundingClientRect();
+    await expect(image.getBoundingClientRect().width).toBe(tile.width);
+    await expect(image.getBoundingClientRect().height).toBe(tile.height);
   },
 };
