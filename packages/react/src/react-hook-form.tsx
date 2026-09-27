@@ -19,7 +19,8 @@ type Props = Record<string, unknown>;
 // RHF must observe changes even when a consumer handler prevents the default action.
 function bind(props: Props, binding: Props) {
   const result = { ...props, ...binding };
-  for (const key of ['onChange', 'onBlur']) {
+  for (const key of ['onChange', 'onBlur', 'onValueChange']) {
+    if (!(key in binding)) continue;
     result[key] = (...args: unknown[]) => {
       (props[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
       (binding[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
@@ -100,6 +101,9 @@ function ControlledField({
         const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
         return bind(rest, {
           ...binding,
+          // Custom controls report a raw value through onValueChange and leave onChange to the
+          // native event; field.onChange accepts either, so value mode binds both.
+          ...(controlMode === 'value' ? { onValueChange: binding.onChange } : {}),
           [controlMode]: resolvedValue,
           disabled: disabled ?? original.disabled,
         });
