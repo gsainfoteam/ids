@@ -1,3 +1,4 @@
+import { memoize } from 'es-toolkit';
 import {
   AsYouType,
   getCountries,
@@ -121,13 +122,9 @@ export function callingCodeOf(country: CountryCode) {
 
 export type CountryOption = { code: CountryCode; name: string; callingCode: string };
 
-const optionsCache = new Map<string, CountryOption[]>();
-
 // Every supported region with its name in the given locale, sorted by that name, so "미국",
-// "US" and "+1" all find the United States.
-export function countryOptions(locale: string) {
-  const cached = optionsCache.get(locale);
-  if (cached) return cached;
+// "US" and "+1" all find the United States. Each locale's list is built once.
+export const countryOptions = memoize((locale: string): CountryOption[] => {
   let names: Intl.DisplayNames | undefined;
   try {
     names = new Intl.DisplayNames([locale], { type: 'region' });
@@ -135,13 +132,11 @@ export function countryOptions(locale: string) {
     names = undefined;
   }
   const collator = new Intl.Collator(locale);
-  const options = getCountries()
+  return getCountries()
     .map((code) => ({
       code,
       name: names?.of(code) ?? code,
       callingCode: getCountryCallingCode(code),
     }))
     .sort((a, b) => collator.compare(a.name, b.name));
-  optionsCache.set(locale, options);
-  return options;
-}
+});
