@@ -23,12 +23,30 @@ import {
   validateValue,
   type CalendarValue,
   type DateRange,
-  type DateSelection,
 } from '../../data/calendar/date';
 import { useFieldSize } from '../field/context';
 
 import type { FieldSurfaceVariant } from '../../../internal/field-surface';
 
+type DateSelection =
+  | {
+      selectionMode?: 'single';
+      value?: Date | null;
+      defaultValue?: Date | null;
+      onChange?: (value: Date | null) => void;
+    }
+  | {
+      selectionMode: 'range';
+      value?: DateRange | null;
+      defaultValue?: DateRange | null;
+      onChange?: (value: DateRange | null) => void;
+    }
+  | {
+      selectionMode: 'multiple';
+      value?: Date[];
+      defaultValue?: Date[];
+      onChange?: (value: Date[]) => void;
+    };
 export type DateFieldProps = Omit<
   ComponentProps<'button'>,
   'value' | 'defaultValue' | 'onChange' | 'disabled'
@@ -268,11 +286,16 @@ export function DateField(props: DateFieldProps) {
           ...options,
           selectionMode: 'range',
           value: current as DateRange | null,
-          onChange: onSelection,
+          onValueChange: onSelection,
         }
       : selectionMode === 'multiple'
-        ? { ...options, selectionMode: 'multiple', value: current as Date[], onChange: onSelection }
-        : { ...options, value: current as Date | null, onChange: onSelection };
+        ? {
+            ...options,
+            selectionMode: 'multiple',
+            value: current as Date[],
+            onValueChange: onSelection,
+          }
+        : { ...options, value: current as Date | null, onValueChange: onSelection };
   const parts = flattenParts(children),
     triggers = parts.filter((n) => isValidElement(n) && n.type === DateTrigger),
     contents = parts.filter((n) => isValidElement(n) && n.type === DateContent),

@@ -1,39 +1,49 @@
 import {
+  Fragment,
   cloneElement,
   createContext,
   isValidElement,
-  useContext,
-  useLayoutEffect,
-  useRef,
-  useState,
+  use,
   type ComponentProps,
+  type CSSProperties,
   type ReactNode,
 } from 'react';
 
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 import {
-  addDays,
-  addMonths,
-  clampDay,
   dateAt,
-  datesOf,
+  dateFormat,
   dayKey,
-  dayOnly,
-  firstWeekday,
-  sameDay,
-  startMonth,
+  lastOfMonth,
+  monthNames,
+  monthWeeks,
+  numberFormat,
+  sameMonth,
   validDate,
-  validateValue,
+  weekdayNames,
+  yearSpan,
+  type CalendarSelectionMode,
   type CalendarValue,
   type DateRange,
   type DateSelection,
 } from './date';
+import {
+  useCalendar,
+  type CalendarApi,
+  type CalendarCellState,
+  type CalendarState,
+} from './use-calendar';
+import { controlSurface } from '../../../internal/control-surface';
 import { part } from '../../../internal/field-popup';
-import { invariant, mergeProps, tv } from '../../../utils';
+import { messages } from '../../../internal/messages';
+import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { IdsSize } from '../../../tokens/types';
+
+export type CalendarCaptionLayout = 'label' | 'dropdown';
+
 export type CalendarOptions = {
   min?: Date;
   max?: Date;
@@ -42,6 +52,7 @@ export type CalendarOptions = {
   monthsToShow?: number;
   locale?: string;
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  captionLayout?: CalendarCaptionLayout;
   size?: IdsSize;
   month?: Date;
   defaultMonth?: Date;
@@ -49,583 +60,635 @@ export type CalendarOptions = {
   today?: Date;
   autoFocus?: boolean;
 };
+
+type NoneSelection = {
+  selectionMode: 'none';
+  value?: Date | null;
+  defaultValue?: Date | null;
+  onValueChange?: never;
+};
+
 export type CalendarProps = Omit<
   ComponentProps<'div'>,
-  'defaultValue' | 'onChange' | 'onSelect' | 'children'
+  'defaultValue' | 'onChange' | 'onSelect' | 'children' | 'className' | 'style'
 > &
   CalendarOptions &
-  (
-    | DateSelection
-    | { selectionMode: 'none'; value?: Date | null; defaultValue?: Date | null; onChange?: never }
-  ) & { children?: ReactNode };
-type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
-const CalendarStyle = tv({
-  slots: {
-    root: 'min-w-0 text-(--ids-color-on-surface)',
-    header: 'mb-2 flex items-center justify-between gap-2',
-    navigation: 'flex w-full items-center gap-2',
-    navButton: [
-      'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
-      'enabled:hover:bg-(--ids-color-primary)/10',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-      'motion-reduce:transition-none',
-      'focus-ring',
-      'disabled:cursor-not-allowed disabled:opacity-50',
-    ],
-    title: 'flex-1 text-center font-medium',
-    months: 'flex flex-wrap gap-4',
-    month: 'min-w-0 flex-1',
-    monthTitle: 'pb-1 text-center font-medium',
-    headerRow: 'grid grid-cols-7',
-    weekday: 'py-2 text-center text-caption-c1-regular text-(--ids-color-on-muted)',
-    row: 'grid grid-cols-7',
-    cell: 'relative isolate min-w-0',
-    band: 'pointer-events-none absolute inset-y-0 -z-10 bg-(--ids-color-primary)/10',
-    day: [
-      'flex w-full cursor-pointer items-center justify-center rounded-standard',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-      'motion-reduce:transition-none',
-      'focus-ring',
-      'aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
-      'data-outside-month:text-(--ids-color-on-muted)',
-    ],
-  },
-  variants: {
-    size: {
-      standard: {
-        root: 'text-body-b3-regular',
-        navButton: 'size-8 [&_svg]:size-(--ids-size-icon-standard)',
-        month: 'min-w-56',
-        day: 'h-9',
-      },
-      tiny: {
-        root: 'text-caption-c1-regular',
-        navButton: 'size-7 [&_svg]:size-(--ids-size-icon-tiny)',
-        month: 'min-w-48',
-        day: 'h-7',
-      },
-    } satisfies Record<IdsSize, object>,
-    band: {
-      start: { band: 'start-1/2 end-0' },
-      middle: { band: 'inset-x-0' },
-      end: { band: 'start-0 end-1/2' },
-    },
-    today: {
-      true: { day: 'inset-ring-1 inset-ring-(--ids-color-primary)' },
-    },
-    filled: {
-      true: { day: 'bg-(--ids-color-primary) text-(--ids-color-on-primary)' },
-      false: { day: 'hover:bg-(--ids-color-primary)/10' },
-    },
-  },
-  defaultVariants: {
-    size: 'standard',
-  },
-});
-type ContextValue = {
-  value: CalendarValue;
-  mode: string;
-  month: Date;
-  today: Date;
-  size: IdsSize;
-  locale: string;
-  weekStart: number;
-  focus: Date;
-  allDisabled: boolean;
-  blocked: (date: Date) => boolean;
-  readOnly: boolean;
-  choose: (date: Date) => void;
-  move: (date: Date, focus: boolean) => void;
-  navigate: (amount: number) => void;
-  canNavigate: (amount: number) => boolean;
-  setFocus: (date: Date) => void;
-  months: Date[];
-  styles: ReturnType<typeof CalendarStyle>;
-};
-const Context = createContext<ContextValue | null>(null),
-  MonthContext = createContext<Date | null>(null),
-  BodyContext = createContext(false);
-function useCalendar() {
-  const c = useContext(Context);
-  invariant(c, 'Calendar parts must be inside Calendar.');
-  return c;
-}
-function useMonth() {
-  const c = useCalendar();
-  return useContext(MonthContext) ?? c.month;
-}
-function CalendarHeader({ asChild, children, ...props }: BoxProps) {
-  const c = useCalendar();
-  return part('div', asChild, children, mergeProps({ className: c.styles.header() }, props));
-}
-function CalendarNavigation({ asChild, children, ...props }: BoxProps) {
-  const c = useCalendar(),
-    month = useMonth();
-  return part(
-    'div',
-    asChild,
-    children ?? (
-      <>
-        <button
-          type="button"
-          aria-label="이전 달"
-          disabled={!c.canNavigate(-1)}
-          onClick={() => c.navigate(-1)}
-          className={c.styles.navButton()}
-        >
-          <ChevronLeftIcon aria-hidden="true" />
-        </button>
-        <span aria-live="polite" className={c.styles.title()}>
-          {new Intl.DateTimeFormat(c.locale, {
-            year: 'numeric',
-            month: 'long',
-            calendar: 'gregory',
-          }).format(month)}
-        </span>
-        <button
-          type="button"
-          aria-label="다음 달"
-          disabled={!c.canNavigate(1)}
-          onClick={() => c.navigate(1)}
-          className={c.styles.navButton()}
-        >
-          <ChevronRightIcon aria-hidden="true" />
-        </button>
-      </>
-    ),
-    mergeProps({ className: c.styles.navigation() }, props),
-  );
-}
-function CalendarHeaderRow({ asChild, children, ...props }: BoxProps) {
-  const c = useCalendar();
-  return part(
-    'div',
-    asChild,
-    children ??
-      Array.from({ length: 7 }, (_, index) => {
-        const date = dateAt(2026, 5, 7 + c.weekStart + index);
-        return (
-          <div
-            key={index}
-            role="columnheader"
-            aria-label={new Intl.DateTimeFormat(c.locale, { weekday: 'long' }).format(date)}
-            className={c.styles.weekday()}
-          >
-            {new Intl.DateTimeFormat(c.locale, { weekday: 'short' }).format(date)}
-          </div>
-        );
-      }),
-    mergeProps({ role: 'row', className: c.styles.headerRow() }, props),
-  );
-}
-export type CalendarCellState = {
-  selected: boolean;
-  today: boolean;
-  disabled: boolean;
-  outsideMonth: boolean;
-  rangeStart: boolean;
-  rangeEnd: boolean;
-  rangeMiddle: boolean;
-};
-function CalendarCell({ date, children, ...props }: Calendar.CellProps) {
-  const c = useCalendar(),
-    month = useMonth();
-  invariant(useContext(BodyContext), 'Calendar.Grid.Cell must be inside Calendar.Grid.Body.');
-  invariant(validDate(date), 'Calendar.Grid.Cell requires a valid date.');
-  const outsideMonth =
-    date.getMonth() !== month.getMonth() || date.getFullYear() !== month.getFullYear();
-  const duplicate =
-    outsideMonth &&
-    c.months.some(
-      (m) => m.getFullYear() === date.getFullYear() && m.getMonth() === date.getMonth(),
-    );
-  if (duplicate) return <div role="gridcell" aria-hidden="true" />;
-  const range = c.mode === 'range' ? (c.value as DateRange | null) : null;
-  const rangeStart = sameDay(range?.start, date),
-    rangeEnd = sameDay(range?.end, date),
-    rangeMiddle =
-      !!range?.start &&
-      !!range.end &&
-      dayKey(date) > dayKey(range.start) &&
-      dayKey(date) < dayKey(range.end);
-  const state = {
-    selected: datesOf(c.value).some((d) => sameDay(d, date)) || rangeMiddle,
-    today: sameDay(date, c.today),
-    disabled: c.blocked(date) || !!props.disabled,
-    outsideMonth,
-    rangeStart,
-    rangeEnd,
-    rangeMiddle,
+  (DateSelection | NoneSelection) & {
+    className?: string | ((state: CalendarState) => string | undefined);
+    style?: CSSProperties | ((state: CalendarState) => CSSProperties | undefined);
+    children?: ReactNode;
   };
-  const focused = sameDay(date, c.focus);
-  return (
-    <div
-      role="gridcell"
-      aria-selected={state.selected}
-      aria-disabled={state.disabled || undefined}
-      data-range-middle={rangeMiddle ? '' : undefined}
-      className={c.styles.cell()}
-    >
-      {range?.end &&
-        !sameDay(range.start, range.end) &&
-        (rangeStart || rangeMiddle || rangeEnd) && (
-          <span
-            aria-hidden="true"
-            data-calendar-range-band=""
-            className={CalendarStyle({
-              band: rangeStart ? 'start' : rangeEnd ? 'end' : 'middle',
-            }).band()}
-          />
-        )}
-      <button
-        {...props}
-        type="button"
-        data-calendar-day={dayKey(date)}
-        data-outside-month={outsideMonth ? '' : undefined}
-        data-selected={state.selected ? '' : undefined}
-        data-range-endpoint={rangeStart || rangeEnd ? '' : undefined}
-        aria-label={
-          props['aria-label'] ??
-          new Intl.DateTimeFormat(c.locale, { dateStyle: 'full', calendar: 'gregory' }).format(date)
-        }
-        aria-current={state.today ? 'date' : undefined}
-        aria-disabled={state.disabled || undefined}
-        tabIndex={focused && !c.allDisabled ? 0 : -1}
-        className={CalendarStyle({
-          size: c.size,
-          today: state.today,
-          filled: state.selected && !rangeMiddle,
-        }).day({ className: props.className })}
-        onFocus={(e) => {
-          props.onFocus?.(e);
-          if (!e.defaultPrevented) c.setFocus(dayOnly(date));
-        }}
-        onClick={(e) => {
-          props.onClick?.(e);
-          if (!e.defaultPrevented) c.choose(date);
-        }}
-        onKeyDown={(e) => {
-          props.onKeyDown?.(e);
-          if (e.defaultPrevented || c.allDisabled) return;
-          let next: Date | undefined;
-          const offset = (date.getDay() - c.weekStart + 7) % 7;
-          switch (e.key) {
-            case 'ArrowLeft':
-              next = addDays(date, -1);
-              break;
-            case 'ArrowRight':
-              next = addDays(date, 1);
-              break;
-            case 'ArrowUp':
-              next = addDays(date, -7);
-              break;
-            case 'ArrowDown':
-              next = addDays(date, 7);
-              break;
-            case 'Home':
-              next = addDays(date, -offset);
-              break;
-            case 'End':
-              next = addDays(date, 6 - offset);
-              break;
-            case 'PageUp':
-              next = addMonths(date, e.shiftKey ? -12 : -1);
-              break;
-            case 'PageDown':
-              next = addMonths(date, e.shiftKey ? 12 : 1);
-              break;
-          }
-          if (next) {
-            e.preventDefault();
-            if (validDate(next)) c.move(next, true);
-          }
-        }}
-      >
-        {typeof children === 'function' ? children(state) : (children ?? date.getDate())}
-      </button>
-    </div>
-  );
+
+type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
+
+type ContextValue = CalendarApi & {
+  locale: string;
+  size: IdsSize;
+  captionLayout: CalendarCaptionLayout;
+  styles: ReturnType<typeof Calendar.Style>;
+};
+
+const CalendarContext = createContext<ContextValue | null>(null);
+const MonthContext = createContext<{ month: Date; index: number } | null>(null);
+const BodyContext = createContext(false);
+
+function useCalendarContext(part: string) {
+  const context = use(CalendarContext);
+  invariant(context, `${part} must be inside Calendar.`);
+  return context;
 }
-function CalendarBody({ asChild, children, ...props }: Calendar.BodyProps) {
-  const c = useCalendar(),
-    month = useMonth();
-  const first = addDays(month, -((month.getDay() - c.weekStart + 7) % 7));
-  const rows = Array.from({ length: 6 }, (_, week) => (
-    <div key={week} role="row" className={c.styles.row()}>
-      {Array.from({ length: 7 }, (_, day) => {
-        const date = addDays(first, week * 7 + day);
-        return validDate(date) ? (
-          <div key={day} role="presentation" className="contents">
-            {typeof children === 'function' ? children(date) : <CalendarCell date={date} />}
-          </div>
-        ) : (
-          <div key={day} role="gridcell" />
-        );
-      })}
-    </div>
-  ));
-  return (
-    <BodyContext.Provider value>
-      {part(
-        'div',
-        asChild,
-        asChild && isValidElement(children)
-          ? cloneElement(children, {}, rows)
-          : typeof children === 'function' || children === undefined
-            ? rows
-            : children,
-        { ...props, role: 'rowgroup' },
-      )}
-    </BodyContext.Provider>
-  );
+
+// Parts inside Calendar.Month describe that month. Outside one they describe the whole view,
+// which is how a single header above several grids still gets both buttons and a range title.
+function useMonth(c: ContextValue, monthIndex?: number) {
+  const scoped = use(MonthContext);
+  if (scoped) return { ...scoped, whole: false };
+  const month = c.state.months[monthIndex ?? 0];
+  invariant(month, 'Calendar: monthIndex must be within monthsToShow.');
+  return { month, index: monthIndex ?? 0, whole: monthIndex === undefined };
 }
-function CalendarGrid({ asChild, children, monthIndex = 0, ...props }: Calendar.GridProps) {
-  const c = useCalendar(),
-    month = c.months[monthIndex];
-  invariant(month, 'Calendar.Grid monthIndex must be within monthsToShow.');
-  return (
-    <MonthContext.Provider value={month}>
-      {part(
-        'div',
-        asChild,
-        children ?? (
-          <>
-            <CalendarHeaderRow />
-            <CalendarBody />
-          </>
-        ),
-        {
-          ...props,
-          role: 'grid',
-          'aria-label':
-            props['aria-label'] ??
-            new Intl.DateTimeFormat(c.locale, {
-              year: 'numeric',
-              month: 'long',
-              calendar: 'gregory',
-            }).format(month),
-          'aria-multiselectable': c.mode === 'multiple' || c.mode === 'range' || undefined,
-        },
-      )}
-    </MonthContext.Provider>
-  );
+
+// An asChild element without children of its own still gets the part's default content, so
+// <Calendar.Title asChild><h2 /></Calendar.Title> reads the month.
+function withDefault(asChild: boolean | undefined, children: ReactNode, fallback: ReactNode) {
+  if (!asChild) return children ?? fallback;
+  return isValidElement<{ children?: ReactNode }>(children) && children.props.children == null
+    ? cloneElement(children, undefined, fallback)
+    : children;
 }
+
+const monthLabel = (locale: string, month: Date) =>
+  dateFormat(locale, { year: 'numeric', month: 'long' }).format(month);
+
+function viewLabel(locale: string, months: Date[]) {
+  const first = months[0];
+  const last = months[months.length - 1];
+  return months.length === 1
+    ? monthLabel(locale, first)
+    : dateFormat(locale, { year: 'numeric', month: 'long' }).formatRange(first, last);
+}
+
 export function Calendar(props: CalendarProps) {
   const {
     selectionMode = 'single',
     value,
     defaultValue,
-    onChange: _onChange,
+    onValueChange,
     min,
     max,
     disabled,
     readOnly = false,
     monthsToShow = 1,
-    locale = 'en-US',
+    locale = messages.locale,
     weekStartsOn,
+    captionLayout = 'label',
     size,
     month,
     defaultMonth,
     onMonthChange,
-    today: todayProp,
+    today,
     autoFocus = false,
     children,
     className,
-    ref: forwardedRef,
+    style,
+    ref,
     ...native
   } = props;
-  const [stored, setStored] = useState<CalendarValue>(
-    defaultValue ?? (selectionMode === 'multiple' ? [] : null),
-  );
-  const current = value === undefined ? stored : value;
-  validateValue(current, selectionMode);
-  invariant(
-    (!min || validDate(min)) &&
-      (!max || validDate(max)) &&
-      (!min || !max || dayKey(min) <= dayKey(max)),
-    'Calendar: min/max must be valid dates with min <= max.',
-  );
-  invariant(
-    Number.isInteger(monthsToShow) && monthsToShow >= 1 && monthsToShow <= 12,
-    'Calendar: monthsToShow must be 1..12.',
-  );
-  invariant(
-    (!month || validDate(month)) &&
-      (!defaultMonth || validDate(defaultMonth)) &&
-      (!todayProp || validDate(todayProp)),
-    'Calendar: month/defaultMonth/today must be valid dates.',
-  );
-  invariant(
-    weekStartsOn === undefined ||
-      (Number.isInteger(weekStartsOn) && weekStartsOn >= 0 && weekStartsOn <= 6),
-    'Calendar: weekStartsOn must be 0..6.',
-  );
-  const [today] = useState(() => dayOnly(todayProp ?? new Date()));
-  const effectiveToday = todayProp ?? today;
-  const initial = clampDay(datesOf(current)[0] ?? effectiveToday, min, max);
-  const [storedMonth, setStoredMonth] = useState(() => startMonth(defaultMonth ?? initial));
-  const visibleMonth = startMonth(month ?? storedMonth);
-  const months = Array.from({ length: monthsToShow }, (_, index) => addMonths(visibleMonth, index));
-  invariant(months.every(validDate), 'Calendar: displayed months must stay in years 1..9999.');
-  const [focused, setFocused] = useState(() => initial);
-  const firstDay = visibleMonth,
-    lastDay = dateAt(
-      months[months.length - 1].getFullYear(),
-      months[months.length - 1].getMonth() + 1,
-      0,
-    );
-  const focus = clampDay(focused, firstDay, lastDay);
-  const root = useRef<HTMLDivElement>(null),
-    pendingFocus = useRef(autoFocus);
+  const api = useCalendar({
+    selectionMode,
+    value,
+    defaultValue,
+    onValueChange: onValueChange as ((value: CalendarValue) => void) | undefined,
+    min,
+    max,
+    disabled,
+    readOnly,
+    monthsToShow,
+    locale,
+    weekStartsOn,
+    month,
+    defaultMonth,
+    onMonthChange,
+    today,
+    autoFocus,
+  });
+  const { state } = api;
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const weekStart = weekStartsOn ?? firstWeekday(locale);
-  const styles = CalendarStyle({ size: resolvedSize });
-  const blocked = (date: Date) =>
-    !validDate(date) ||
-    disabled === true ||
-    (!!min && dayKey(date) < dayKey(min)) ||
-    (!!max && dayKey(date) > dayKey(max)) ||
-    (typeof disabled === 'function' && disabled(dayOnly(date)));
-  const changeMonth = (next: Date) => {
-    if (month === undefined) setStoredMonth(startMonth(next));
-    if (!sameDay(startMonth(next), visibleMonth)) onMonthChange?.(startMonth(next));
-  };
-  const move = (next: Date, shouldFocus: boolean) => {
-    const date = clampDay(next, min, max);
-    pendingFocus.current = shouldFocus;
-    setFocused(date);
-    if (dayKey(date) < dayKey(firstDay)) changeMonth(date);
-    else if (dayKey(date) > dayKey(lastDay))
-      changeMonth(addMonths(startMonth(date), 1 - monthsToShow));
-  };
-  const canNavigate = (amount: number) => {
-    const next = addMonths(visibleMonth, amount),
-      end = dateAt(next.getFullYear(), next.getMonth() + monthsToShow, 0);
-    return (
-      disabled !== true &&
-      validDate(next) &&
-      validDate(end) &&
-      (!min || dayKey(end) >= dayKey(min)) &&
-      (!max || dayKey(next) <= dayKey(max))
-    );
-  };
-  const navigate = (amount: number) => {
-    if (!canNavigate(amount)) return;
-    changeMonth(addMonths(visibleMonth, amount));
-    setFocused(clampDay(addMonths(focus, amount), min, max));
-  };
-  useLayoutEffect(() => {
-    if (pendingFocus.current) {
-      pendingFocus.current = false;
-      root.current
-        ?.querySelector<HTMLButtonElement>(`[data-calendar-day="${dayKey(focus)}"]`)
-        ?.focus({ preventScroll: true });
-    }
-  }, [focus, visibleMonth]);
-  const choose = (date: Date) => {
-    if (readOnly || selectionMode === 'none' || blocked(date)) return;
-    const next = dayOnly(date);
-    move(next, true);
-    let result: CalendarValue;
-    if (selectionMode === 'multiple') {
-      const selected = current as Date[];
-      result = selected.some((d) => sameDay(d, next))
-        ? selected.filter((d) => !sameDay(d, next))
-        : [...selected, next];
-    } else if (selectionMode === 'range') {
-      const range = current as DateRange | null;
-      result =
-        !range?.start || range.end
-          ? { start: next, end: null }
-          : dayKey(next) < dayKey(range.start)
-            ? { start: next, end: dayOnly(range.start) }
-            : { start: dayOnly(range.start), end: next };
-    } else result = next;
-    if (value === undefined) setStored(result);
-    if (props.selectionMode === 'multiple') props.onChange?.(result as Date[]);
-    else if (props.selectionMode === 'range') props.onChange?.(result as DateRange);
-    else if (props.selectionMode !== 'none') props.onChange?.(result as Date);
-  };
+  const styles = Calendar.Style({ size: resolvedSize });
+
   return (
-    <Context.Provider
-      value={{
-        value: current,
-        mode: selectionMode,
-        month: visibleMonth,
-        today: effectiveToday,
-        size: resolvedSize,
-        locale,
-        weekStart,
-        focus,
-        allDisabled: disabled === true,
-        blocked,
-        readOnly,
-        choose,
-        move,
-        navigate,
-        canNavigate,
-        setFocus: setFocused,
-        months,
-        styles,
-      }}
-    >
+    <CalendarContext.Provider value={{ ...api, locale, size: resolvedSize, captionLayout, styles }}>
       <div
         {...native}
-        ref={(node) => {
-          root.current = node;
-          if (typeof forwardedRef === 'function') return forwardedRef(node);
-          if (forwardedRef) forwardedRef.current = node;
-        }}
-        data-calendar=""
+        ref={mergeRefs(api.rootRef, ref)}
         role={native.role ?? 'group'}
-        aria-label={native['aria-label'] ?? '달력'}
-        aria-disabled={disabled === true || undefined}
-        className={styles.root({ className })}
+        aria-label={native['aria-label'] ?? messages.calendar.label}
+        aria-disabled={state.disabled || undefined}
+        data-calendar=""
+        data-size={resolvedSize}
+        data-selection-mode={selectionMode}
+        data-disabled={state.disabled ? '' : undefined}
+        data-readonly={state.readOnly ? '' : undefined}
+        className={styles.root({
+          className: typeof className === 'function' ? className(state) : className,
+        })}
+        style={typeof style === 'function' ? style(state) : style}
       >
         {children ?? (
-          <>
-            <CalendarHeader>
-              <CalendarNavigation />
-            </CalendarHeader>
-            <div className={styles.months()}>
-              {months.map((m, index) => (
-                <div key={dayKey(m)} className={styles.month()}>
-                  {monthsToShow > 1 && (
-                    <div className={styles.monthTitle()}>
-                      {new Intl.DateTimeFormat(locale, {
-                        year: 'numeric',
-                        month: 'long',
-                        calendar: 'gregory',
-                      }).format(m)}
-                    </div>
-                  )}
-                  <CalendarGrid monthIndex={index} />
-                </div>
-              ))}
-            </div>
-          </>
+          <div className={styles.months()}>
+            {state.months.map((_, index) => (
+              <Calendar.Month key={index} index={index} />
+            ))}
+          </div>
         )}
+        {/* Buttons and menus change the month without moving focus, so the change is read out here. */}
+        <span aria-live="polite" className="sr-only">
+          {viewLabel(locale, state.months)}
+        </span>
       </div>
-    </Context.Provider>
+    </CalendarContext.Provider>
   );
 }
+
+function NavButton({
+  direction,
+  asChild,
+  children,
+  ...props
+}: Calendar.NavButtonProps & { direction: -1 | 1 }) {
+  const c = useCalendarContext(direction < 0 ? 'Calendar.Previous' : 'Calendar.Next');
+  const enabled = c.canNavigate(direction);
+  const Icon = direction < 0 ? ChevronLeftIcon : ChevronRightIcon;
+  // aria-disabled rather than disabled: a button that disables itself under the pointer or the
+  // keyboard would drop focus to the page.
+  return part(
+    'button',
+    asChild,
+    withDefault(asChild, children, <Icon aria-hidden="true" />),
+    mergeProps(props, {
+      type: 'button',
+      'aria-label':
+        props['aria-label'] ??
+        (direction < 0 ? messages.calendar.previousMonth : messages.calendar.nextMonth),
+      'aria-disabled': !enabled || undefined,
+      'data-disabled': enabled ? undefined : '',
+      'data-calendar-nav': direction < 0 ? 'previous' : 'next',
+      className: c.styles.navButton(),
+      onClick: () => {
+        if (enabled) c.navigate(direction);
+      },
+    }),
+  );
+}
+
+function Select({
+  kind,
+  className,
+  ...props
+}: Omit<ComponentProps<'select'>, 'value' | 'defaultValue' | 'children'> & {
+  kind: 'month' | 'year';
+}) {
+  const c = useCalendarContext(kind === 'month' ? 'Calendar.MonthSelect' : 'Calendar.YearSelect');
+  const { month, index } = useMonth(c);
+  const { min, max } = c.limits;
+  const names = monthNames(c.locale);
+  const years = yearSpan(month, c.today, min, max);
+  const yearFormat = dateFormat(c.locale, { year: 'numeric' });
+  const options =
+    kind === 'month'
+      ? names.map((name, m) => {
+          const start = dateAt(month.getFullYear(), m, 1);
+          const outside =
+            (!!min && dayKey(lastOfMonth(start)) < dayKey(min)) ||
+            (!!max && dayKey(start) > dayKey(max));
+          return { value: m, label: name, disabled: outside };
+        })
+      : years.map((year) => ({
+          value: year,
+          label: yearFormat.format(dateAt(year, 0, 1)),
+          disabled: false,
+        }));
+  const current = kind === 'month' ? month.getMonth() : month.getFullYear();
+  return (
+    <span className={c.styles.dropdown({ className })} data-calendar-dropdown={kind}>
+      <select
+        aria-label={kind === 'month' ? messages.calendar.month : messages.calendar.year}
+        disabled={c.state.disabled}
+        {...props}
+        data-field-input=""
+        value={current}
+        onChange={(event) => {
+          props.onChange?.(event);
+          const picked = Number(event.currentTarget.value);
+          c.showMonth(
+            kind === 'month'
+              ? dateAt(month.getFullYear(), picked, 1)
+              : dateAt(picked, month.getMonth(), 1),
+            index,
+          );
+        }}
+        className={c.styles.dropdownSelect()}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value} disabled={option.disabled}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <span aria-hidden="true" className={c.styles.dropdownLabel()}>
+        {options.find((option) => option.value === current)?.label}
+        <ChevronDownIcon />
+      </span>
+    </span>
+  );
+}
+
+function Cell({ date, className, style, children, ...props }: Calendar.CellProps) {
+  const c = useCalendarContext('Calendar.Grid.Cell');
+  const { month } = useMonth(c);
+  invariant(use(BodyContext), 'Calendar.Grid.Cell must be inside Calendar.Grid.Body.');
+  invariant(validDate(date), 'Calendar.Grid.Cell requires a valid date.');
+  const state = c.dayState(date, month);
+  // With several months on screen, a trailing or leading day that another grid shows in full
+  // is left blank here so every date has exactly one focusable button.
+  const shownElsewhere =
+    state.outsideMonth && c.state.months.some((visible) => sameMonth(visible, date));
+  if (shownElsewhere) return <div role="gridcell" aria-hidden="true" className={c.styles.cell()} />;
+  const band = c.bandOf(date);
+  const styles = Calendar.Style({
+    size: c.size,
+    band,
+    selected: state.selected && !state.rangeMiddle,
+    onBand: band !== undefined && !state.rangeStart && !state.rangeEnd,
+    today: state.today,
+    outside: state.outsideMonth,
+    unavailable: state.disabled,
+  });
+  return (
+    <div
+      role="gridcell"
+      aria-selected={state.selected}
+      aria-disabled={state.disabled || undefined}
+      data-band={band}
+      className={styles.cell()}
+    >
+      <button
+        {...props}
+        type="button"
+        data-calendar-day={dayKey(date)}
+        data-selected={state.selected && !state.rangeMiddle ? '' : undefined}
+        data-today={state.today ? '' : undefined}
+        data-disabled={state.disabled ? '' : undefined}
+        data-outside-month={state.outsideMonth ? '' : undefined}
+        data-range-start={state.rangeStart ? '' : undefined}
+        data-range-end={state.rangeEnd ? '' : undefined}
+        data-range-middle={state.rangeMiddle ? '' : undefined}
+        data-range-preview={state.preview ? '' : undefined}
+        aria-label={props['aria-label'] ?? dateFormat(c.locale, { dateStyle: 'full' }).format(date)}
+        aria-current={state.today ? 'date' : undefined}
+        aria-disabled={state.disabled || undefined}
+        tabIndex={state.focused && !c.state.disabled ? 0 : -1}
+        className={styles.day({
+          className: typeof className === 'function' ? className(state) : className,
+        })}
+        style={typeof style === 'function' ? style(state) : style}
+        onFocus={(event) => {
+          props.onFocus?.(event);
+          if (!event.defaultPrevented) c.onDayFocus(date);
+        }}
+        onPointerEnter={(event) => {
+          props.onPointerEnter?.(event);
+          if (event.pointerType === 'mouse') c.onDayHover(date);
+        }}
+        onClick={(event) => {
+          props.onClick?.(event);
+          if (!event.defaultPrevented) c.select(date);
+        }}
+        onKeyDown={(event) => {
+          props.onKeyDown?.(event);
+          c.onDayKeyDown(event, date);
+        }}
+      >
+        {typeof children === 'function'
+          ? children(state)
+          : (children ?? numberFormat(c.locale).format(date.getDate()))}
+      </button>
+    </div>
+  );
+}
+
 export namespace Calendar {
   export type Props = CalendarProps;
+  export type State = CalendarState;
+  export type CellState = CalendarCellState;
+  export type Range = DateRange;
+  export type SelectionMode = CalendarSelectionMode;
+  export type CaptionLayout = CalendarCaptionLayout;
+  export type NavButtonProps = ComponentProps<'button'> & { asChild?: boolean };
+  export type TitleProps = ComponentProps<'span'> & { asChild?: boolean };
+  export type SelectProps = Omit<ComponentProps<'select'>, 'value' | 'defaultValue' | 'children'>;
+  export type MonthProps = BoxProps & { index?: number };
   export type GridProps = BoxProps & { monthIndex?: number };
   export type BodyProps = Omit<BoxProps, 'children'> & {
     children?: ReactNode | ((date: Date) => ReactNode);
   };
-  export type CellProps = Omit<ComponentProps<'button'>, 'children'> & {
+  export type CellProps = Omit<ComponentProps<'button'>, 'children' | 'className' | 'style'> & {
     date: Date;
-    children?: ReactNode | ((state: CalendarCellState) => ReactNode);
+    className?: string | ((state: CellState) => string | undefined);
+    style?: CSSProperties | ((state: CellState) => CSSProperties | undefined);
+    children?: ReactNode | ((state: CellState) => ReactNode);
   };
-  export const Style = CalendarStyle;
-  export const Header = CalendarHeader,
-    Navigation = CalendarNavigation;
-  export const Grid = Object.assign(CalendarGrid, {
-    HeaderRow: CalendarHeaderRow,
-    Body: CalendarBody,
-    Cell: CalendarCell,
+
+  export function Month({ index = 0, asChild, children, ...props }: MonthProps) {
+    const c = useCalendarContext('Calendar.Month');
+    const month = c.state.months[index];
+    invariant(month, 'Calendar.Month index must be within monthsToShow.');
+    return (
+      <MonthContext.Provider value={{ month, index }}>
+        {part(
+          'div',
+          asChild,
+          withDefault(
+            asChild,
+            children,
+            <>
+              <Header />
+              <Grid />
+            </>,
+          ),
+          mergeProps({ className: c.styles.month(), 'data-calendar-month': dayKey(month) }, props),
+        )}
+      </MonthContext.Provider>
+    );
+  }
+
+  export function Header({ asChild, children, ...props }: BoxProps) {
+    const c = useCalendarContext('Calendar.Header');
+    return part(
+      'div',
+      asChild,
+      withDefault(asChild, children, <Navigation />),
+      mergeProps({ className: c.styles.header() }, props),
+    );
+  }
+
+  // Previous sits on the first month and Next on the last, so several months share one pair.
+  export function Navigation({ asChild, children, ...props }: BoxProps) {
+    const c = useCalendarContext('Calendar.Navigation');
+    const { index, whole } = useMonth(c);
+    const first = whole || index === 0;
+    const lastMonth = whole || index === c.state.months.length - 1;
+    const spacer = <span aria-hidden="true" className={c.styles.navSpacer()} />;
+    return part(
+      'div',
+      asChild,
+      withDefault(
+        asChild,
+        children,
+        <>
+          {first ? <Previous /> : spacer}
+          {c.captionLayout === 'dropdown' ? (
+            <span className={c.styles.dropdowns()}>
+              <MonthSelect />
+              <YearSelect />
+            </span>
+          ) : (
+            <Title />
+          )}
+          {lastMonth ? <Next /> : spacer}
+        </>,
+      ),
+      mergeProps({ className: c.styles.navigation() }, props),
+    );
+  }
+
+  export function Previous(props: NavButtonProps) {
+    return <NavButton {...props} direction={-1} />;
+  }
+
+  export function Next(props: NavButtonProps) {
+    return <NavButton {...props} direction={1} />;
+  }
+
+  export function Title({ asChild, children, ...props }: TitleProps) {
+    const c = useCalendarContext('Calendar.Title');
+    const { month, whole } = useMonth(c);
+    return part(
+      'span',
+      asChild,
+      withDefault(
+        asChild,
+        children,
+        whole ? viewLabel(c.locale, c.state.months) : monthLabel(c.locale, month),
+      ),
+      mergeProps({ className: c.styles.title() }, props),
+    );
+  }
+
+  export function MonthSelect(props: SelectProps) {
+    return <Select {...props} kind="month" />;
+  }
+
+  export function YearSelect(props: SelectProps) {
+    return <Select {...props} kind="year" />;
+  }
+
+  function GridRoot({ asChild, children, monthIndex, ...props }: GridProps) {
+    const c = useCalendarContext('Calendar.Grid');
+    const month = useMonth(c, monthIndex);
+    return (
+      <MonthContext.Provider value={month}>
+        {part(
+          'div',
+          asChild,
+          withDefault(
+            asChild,
+            children,
+            <>
+              <Grid.HeaderRow />
+              <Grid.Body />
+            </>,
+          ),
+          mergeProps(props, {
+            role: 'grid',
+            'aria-label': props['aria-label'] ?? monthLabel(c.locale, month.month),
+            'aria-multiselectable':
+              c.state.selectionMode === 'multiple' ||
+              c.state.selectionMode === 'range' ||
+              undefined,
+            'aria-readonly': c.state.readOnly || undefined,
+            'aria-disabled': c.state.disabled || undefined,
+            'data-calendar-grid': dayKey(month.month),
+            className: c.styles.grid(),
+            onPointerLeave: () => c.onDayHover(null),
+            onFocus: () => c.onGridFocusChange(true),
+            onBlur: (event: React.FocusEvent<HTMLElement>) => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null))
+                c.onGridFocusChange(false);
+            },
+          }),
+        )}
+      </MonthContext.Provider>
+    );
+  }
+
+  function HeaderRow({ asChild, children, ...props }: BoxProps) {
+    const c = useCalendarContext('Calendar.Grid.HeaderRow');
+    return part(
+      'div',
+      asChild,
+      withDefault(
+        asChild,
+        children,
+        weekdayNames(c.locale, c.weekStart).map((name) => (
+          <div
+            key={name.long}
+            role="columnheader"
+            aria-label={name.long}
+            className={c.styles.weekday()}
+          >
+            {name.short}
+          </div>
+        )),
+      ),
+      mergeProps({ role: 'row', className: c.styles.headerRow() }, props),
+    );
+  }
+
+  function Body({ asChild, children, ...props }: BodyProps) {
+    const c = useCalendarContext('Calendar.Grid.Body');
+    const { month } = useMonth(c);
+    const rows = monthWeeks(month, c.weekStart).map((week, row) => (
+      <div key={row} role="row" className={c.styles.row()}>
+        {week.map((date, column) =>
+          validDate(date) ? (
+            <Fragment key={column}>
+              {typeof children === 'function' ? children(date) : <Grid.Cell date={date} />}
+            </Fragment>
+          ) : (
+            <div key={column} role="gridcell" aria-hidden="true" className={c.styles.cell()} />
+          ),
+        )}
+      </div>
+    ));
+    return (
+      <BodyContext.Provider value>
+        {part(
+          'div',
+          asChild,
+          typeof children === 'function' || children === undefined
+            ? rows
+            : withDefault(asChild, children, rows),
+          mergeProps({ role: 'rowgroup', className: c.styles.body() }, props),
+        )}
+      </BodyContext.Provider>
+    );
+  }
+
+  export const Grid = Object.assign(GridRoot, { HeaderRow, Body, Cell });
+
+  export const Style = tv({
+    slots: {
+      root: 'relative w-fit min-w-0 text-(--ids-color-on-surface)',
+      months: 'flex flex-wrap gap-4',
+      month: 'flex flex-col gap-2',
+      header: 'min-w-0',
+      navigation: 'flex h-(--calendar-cell) items-center justify-between gap-1',
+      navSpacer: 'size-(--calendar-cell) shrink-0',
+      navButton: [
+        controlSurface.base,
+        'size-(--calendar-cell) rounded-standard bg-transparent p-0 text-(--ids-color-on-surface)',
+        'hover:bg-(--ids-color-muted) data-disabled:hover:bg-transparent',
+        '[&_svg]:size-(--ids-size-icon-standard) rtl:[&_svg]:-scale-x-100',
+      ],
+      title: 'min-w-0 flex-1 truncate text-center font-medium select-none',
+      dropdowns: 'flex min-w-0 flex-1 items-center justify-center gap-1.5',
+      dropdown: [
+        'relative inline-flex min-w-0 items-center rounded-standard shadow-xs',
+        'inset-ring-1 inset-ring-(--ids-color-border) focus-ring',
+        'has-disabled:opacity-50',
+      ],
+      // The native select stays on top, transparent, so it opens the platform picker, while the
+      // label under it keeps the calendar's type and a chevron.
+      dropdownSelect:
+        'peer absolute inset-0 size-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed',
+      dropdownLabel: [
+        'pointer-events-none flex h-(--calendar-dropdown) items-center gap-1 ps-2 pe-1 font-medium whitespace-nowrap',
+        '[&_svg]:size-3.5 [&_svg]:text-(--ids-color-on-muted)',
+      ],
+      grid: 'flex flex-col',
+      headerRow: 'flex',
+      weekday: [
+        'flex h-(--calendar-weekday) w-(--calendar-cell) items-center justify-center',
+        'font-normal text-(--ids-color-on-muted) select-none',
+      ],
+      body: 'flex flex-col gap-y-1',
+      row: 'flex',
+      // The range band is the cell's own background. It runs under the rounded end days and
+      // rounds off where a week wraps, so a range reads as one strip per week.
+      cell: 'relative size-(--calendar-cell) shrink-0 p-0 first:rounded-s-standard last:rounded-e-standard',
+      day: [
+        'relative inline-flex size-full cursor-pointer items-center justify-center rounded-standard',
+        'tabular-nums select-none focus-ring focus-visible:z-10',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+        'motion-reduce:transition-none',
+      ],
+    },
+    variants: {
+      size: {
+        standard: {
+          root: [
+            'text-body-b3-regular',
+            '[--calendar-cell:var(--ids-size-control-standard)] [--calendar-dropdown:--spacing(8)] [--calendar-weekday:--spacing(8)]',
+          ],
+        },
+        tiny: {
+          root: [
+            'text-caption-c1-regular',
+            '[--calendar-cell:var(--ids-size-control-tiny)] [--calendar-dropdown:--spacing(7)] [--calendar-weekday:--spacing(7)]',
+          ],
+          navButton: '[&_svg]:size-(--ids-size-icon-tiny)',
+        },
+      } satisfies Record<IdsSize, object>,
+      band: {
+        start: { cell: 'rounded-s-standard bg-(--ids-color-muted)' },
+        middle: { cell: 'bg-(--ids-color-muted)' },
+        end: { cell: 'rounded-e-standard bg-(--ids-color-muted)' },
+      },
+      // Later variants win a conflict, so selected comes after today and outside.
+      today: { true: { day: 'font-semibold' } },
+      outside: { true: { day: 'text-(--ids-color-on-muted)' } },
+      selected: {
+        true: {
+          day: 'bg-(--ids-color-primary) font-medium text-(--ids-color-on-primary) hover:bg-(--ids-color-primary)/90',
+        },
+      },
+      // A day inside a range already sits on the muted band, so its hover goes one step darker.
+      onBand: { true: { day: 'hover:bg-(--ids-color-border)' } },
+      unavailable: { true: { day: 'cursor-not-allowed opacity-50' } },
+    },
+    compoundVariants: [
+      { selected: false, onBand: false, today: true, class: { day: 'bg-(--ids-color-muted)' } },
+      {
+        selected: false,
+        onBand: false,
+        unavailable: false,
+        class: { day: 'hover:bg-(--ids-color-muted)' },
+      },
+      { selected: true, unavailable: true, class: { day: 'hover:bg-(--ids-color-primary)' } },
+      { onBand: true, unavailable: true, class: { day: 'hover:bg-transparent' } },
+    ],
+    defaultVariants: {
+      size: 'standard',
+      selected: false,
+      onBand: false,
+      today: false,
+      outside: false,
+      unavailable: false,
+    },
   });
 }
-export type { DateRange } from './date';
+
+export { CalendarPickContext } from './use-calendar';
+export type { CalendarCellState, CalendarState } from './use-calendar';
+export type { DateRange, CalendarSelectionMode, CalendarValue } from './date';

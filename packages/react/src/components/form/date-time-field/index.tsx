@@ -115,7 +115,7 @@ export function DateTimeField({
             <div className={styles.date()}>
               <Calendar
                 value={value}
-                onChange={(day) => {
+                onValueChange={(day) => {
                   if (!day) return;
                   const seconds = nearestSlot(slotsFor(day), secondsOf(base));
                   if (seconds !== undefined) change(withTime(day, seconds));
