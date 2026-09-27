@@ -38,6 +38,7 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 
 - 입력은 native 요소이거나, 받은 `id`, ARIA, 상태, 이벤트, ref를 실제 입력으로 넘기는 컴포넌트여야 합니다.
 - `aria-describedby` 에는 화면에 보이는 설명과 오류만 들어갑니다.
+- `Field.Label` 은 `Label` 로 그립니다. 크기, 필수 `*`, 비활성, 오류 색을 Field에서 받고, 누르면 RadioGroup 같은 커스텀 컨트롤로도 포커스가 갑니다.
 
 ## 상태
 
@@ -144,7 +145,7 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 </Field>
 ```
 
-- Label은 `label`, 나머지 파트는 `div` 로 렌더합니다. 클릭 포커스가 필요하면 Label의 `asChild` 자식도 `label` 로 둡니다.
+- Label은 `label`, 나머지 파트는 `div` 로 렌더합니다. Label의 `asChild` 자식은 `label` 이 아니어도 누르면 입력으로 포커스가 갑니다.
 
 ## react-hook-form
 

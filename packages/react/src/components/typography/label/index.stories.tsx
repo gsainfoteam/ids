@@ -22,6 +22,7 @@ const meta = {
     size: { control: 'radio', options: ['standard', 'tiny'] },
     required: { control: 'radio', options: [undefined, true, false] },
     disabled: { control: 'radio', options: [undefined, true, false] },
+    invalid: { control: 'boolean' },
   },
   args: { children: '이름', htmlFor: 'label-playground' },
 } satisfies Meta<typeof Label>;
@@ -61,6 +62,12 @@ export const Gallery: Story = {
                 이메일
               </Label>
               <TextField id={`gallery-${size}-disabled`} size={size} disabled />
+            </div>
+            <div className="flex w-48 flex-col gap-2">
+              <Label size={size} htmlFor={`gallery-${size}-invalid`} invalid>
+                이메일
+              </Label>
+              <TextField id={`gallery-${size}-invalid`} size={size} invalid />
             </div>
           </Showcase.Row>
         ))}
@@ -213,6 +220,33 @@ export const CustomControl: Story = {
   play: async ({ canvas, userEvent }) => {
     const slider = canvas.getByRole('slider', { name: '볼륨' });
     await userEvent.click(canvas.getByText('볼륨'));
+    await expect(slider).toHaveFocus();
+  },
+};
+
+export const AsChild: Story = {
+  render: () => (
+    <div className="flex w-64 flex-col gap-3">
+      <Label asChild htmlFor="label-as-child" required>
+        <span id="label-as-child-text">밝기</span>
+      </Label>
+      <Slider id="label-as-child" defaultValue={60} />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'asChild로 자식 요소를 라벨로 그립니다. 자식의 id를 그대로 쓰고, label이 아닌 요소도 컨트롤의 이름이 되며 누르면 포커스가 갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const text = canvas.getByText('밝기');
+    await expect(text).toHaveAttribute('data-label');
+    await expect(text).toHaveAttribute('id', 'label-as-child-text');
+    const slider = canvas.getByRole('slider', { name: '밝기' });
+    await userEvent.click(text);
     await expect(slider).toHaveFocus();
   },
 };

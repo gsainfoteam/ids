@@ -87,6 +87,26 @@ test('explicit props win over the control', async () => {
   assert.ok(label().hasAttribute('data-disabled'));
 });
 
+test('a label given both states does not observe its control', async () => {
+  const observer = globalThis.MutationObserver;
+  delete globalThis.MutationObserver;
+  try {
+    await render(
+      h(
+        'div',
+        null,
+        h(Label, { htmlFor: 'y', required: true, disabled: false }, 'Y'),
+        h('input', { id: 'y', disabled: true }),
+      ),
+    );
+    await flush();
+  } finally {
+    globalThis.MutationObserver = observer;
+  }
+  assert.ok(label().hasAttribute('data-required'));
+  assert.equal(label().hasAttribute('data-disabled'), false);
+});
+
 test('a role widget gets a name by reference and focus on click', async () => {
   await render(
     h(
@@ -184,6 +204,61 @@ test('className and style read the state', async () => {
   await flush();
   assert.match(label().className, /is-required/);
   assert.equal(label().style.opacity, '1');
+});
+
+test('invalid is set directly, not read from the control', async () => {
+  await render(
+    h(
+      'div',
+      null,
+      h(
+        Label,
+        {
+          htmlFor: 'e',
+          invalid: true,
+          className: (state) => (state.invalid ? 'is-invalid' : 'is-valid'),
+        },
+        'E',
+      ),
+      h(Label, { htmlFor: 'f' }, 'F'),
+      h('input', { id: 'e' }),
+      h('input', { id: 'f', 'aria-invalid': true }),
+    ),
+  );
+  await flush();
+  const [explicit, mirrored] = host.querySelectorAll('label');
+  assert.ok(explicit.hasAttribute('data-invalid'));
+  assert.match(explicit.className, /is-invalid/);
+  assert.match(explicit.className, /data-invalid:text-\(--ids-color-danger\)/);
+  assert.equal(mirrored.hasAttribute('data-invalid'), false);
+});
+
+test('asChild draws the label as its child element, with the id and handler it carries', async () => {
+  const clicks = [];
+  await render(
+    h(
+      'div',
+      null,
+      h(
+        Label,
+        { asChild: true, htmlFor: 'level', required: true },
+        h('span', { id: 'own', className: 'own', onClick: () => clicks.push('child') }, 'Level'),
+      ),
+      h('div', { id: 'level', role: 'slider', tabIndex: 0, 'aria-valuenow': 3 }),
+    ),
+  );
+  await flush();
+  const span = host.querySelector('span[data-label]');
+  assert.equal(span.id, 'own');
+  assert.match(span.className, /own/);
+  assert.match(span.className, /text-body-b3-medium/);
+  assert.equal(span.querySelector('[data-label-required]').textContent, '*');
+  const slider = host.querySelector('[role="slider"]');
+  assert.equal(slider.getAttribute('aria-labelledby'), 'own');
+  await act(async () => span.click());
+  assert.deepEqual(clicks, ['child']);
+  assert.equal(document.activeElement, slider);
+  assert.throws(() => renderToString(h(Label, { asChild: true }, 'Level')), /Label asChild/);
 });
 
 test('inside a Field it still renders', () => {

@@ -10,6 +10,8 @@ is controlled through `open` / `defaultOpen` / `onOpenChange`; it fades out unle
 reduced, Escape closes it except during IME composition, and focus inside moves on to the next
 element instead of the page top, also when the parent closes or unmounts the alert. `role` can
 be overridden, every part takes `asChild`, and `className` / `style` may read `Alert.State`.
+`Alert.Close` is a ghost `IconButton` in the alert's scheme, drawn in the fill's contrast color on
+`solid`, so it hovers and rings like one; its one child element replaces the glyph.
 
 Breaking: `variant="info" | "success" | "warning" | "danger" | "neutral"` is now `colorScheme`,
 and `variant` means intensity (default `soft`). `Alert.Close` no longer takes `onClose`; use

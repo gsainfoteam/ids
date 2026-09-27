@@ -58,7 +58,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Color scheme × Variant"
-        description="variant는 강도, colorScheme은 의미입니다. 제목과 아이콘만 의미 색을 쓰고 본문은 중립색입니다."
+        description="variant는 강도, colorScheme은 의미입니다. 제목과 아이콘, 닫기 버튼만 의미 색을 쓰고 본문은 중립색입니다."
       >
         <Showcase.Matrix
           rows={schemes}
@@ -67,6 +67,7 @@ export const Gallery: Story = {
             <Alert colorScheme={colorScheme} variant={variant} className="w-72">
               <Alert.Title>{copy[colorScheme][0]}</Alert.Title>
               <Alert.Description>{copy[colorScheme][1]}</Alert.Description>
+              <Alert.Close />
             </Alert>
           )}
         />

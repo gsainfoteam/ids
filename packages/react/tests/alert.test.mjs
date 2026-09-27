@@ -122,6 +122,23 @@ test('the icon, content and close button land in their own columns', () => {
   );
 });
 
+test('Close is a ghost IconButton in the alert scheme, and its child replaces the glyph', () => {
+  const close = (props, ...children) =>
+    html(
+      h(Alert, props, h(Alert.Title, null, 'x'), h(Alert.Close, null, ...children)),
+    ).querySelector('[data-alert-close]');
+  const danger = close({ colorScheme: 'danger' });
+  assert.equal(danger.dataset.variant, 'ghost');
+  assert.match(danger.className, /\[--control-quiet:var\(--ids-color-danger-strong\)\]/);
+  assert.match(danger.className, /rounded-full/);
+  assert.match(
+    close({ colorScheme: 'danger', variant: 'solid' }).className,
+    /\[--control-quiet:var\(--alert-on\)\]/,
+    'on the fill it takes the fill contrast color',
+  );
+  assert.ok(close({}, h('svg', { id: 'glyph' })).querySelector('#glyph'));
+});
+
 test('uncontrolled: Close hides it, focus moves on to the next element', async () => {
   const changes = [];
   await render(

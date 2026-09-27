@@ -130,6 +130,9 @@ test('children without an Input become leading adornments before an auto-inserte
     ['DIV', 'Tel', 'INPUT'],
   );
   assert.ok(shell.firstElementChild.matches('[data-select]'));
+  const trigger = shell.querySelector('[role=combobox]');
+  assert.equal(trigger.querySelector('[data-select-value]').textContent, 'KR +82');
+  assert.equal(trigger.lastElementChild.getAttribute('aria-hidden'), 'true', 'the Select.Icon');
   assert.equal(input().getAttribute('aria-label'), 'Phone');
   await type(input(), '01012345678');
   assert.equal(input().value, '010-1234-5678');
