@@ -8,6 +8,9 @@ const dom = new JSDOM('<!doctype html><html><body></body></html>', {
 });
 for (const key of [
   'window',
+  'Element',
+  'Node',
+  'getComputedStyle',
   'document',
   'HTMLElement',
   'HTMLInputElement',
@@ -38,6 +41,10 @@ async function render(node) {
     root = createRoot(host);
   }
   await act(() => root.render(node));
+}
+// Placement resolves asynchronously; a macrotask lets it land.
+async function positioned() {
+  await act(() => new Promise((resolve) => setTimeout(resolve)));
 }
 
 const items = () => [
@@ -476,21 +483,24 @@ test('asChild Content and Group still collect items; an empty string is a value'
 });
 
 test('the list opens centered on the selection and later moves scroll only the popup', async () => {
-  const rects = new Map();
+  // Where each option sits while the popup, at 100, is scrolled to the top.
+  const layout = { Cherry: 380, Apple: 160 };
   const original = dom.window.HTMLElement.prototype.getBoundingClientRect;
   dom.window.HTMLElement.prototype.getBoundingClientRect = function () {
-    return rects.get(this.textContent) ?? rects.get(this.dataset.fieldPopup) ?? original.call(this);
+    const popup = this.closest('[data-field-popup]');
+    if (popup === this) return { top: 100, bottom: 300, height: 200, left: 0, right: 0, width: 0 };
+    const top = popup ? layout[this.textContent] : undefined;
+    if (top === undefined) return original.call(this);
+    const at = top - popup.scrollTop;
+    return { top: at, bottom: at + 40, height: 40, left: 0, right: 0, width: 0 };
   };
   try {
     await render(tracked({ defaultValue: 'cherry' }).node);
-    const popupRect = { top: 100, bottom: 300, height: 200 };
-    rects.set('', popupRect);
-    rects.set('Cherry', { top: 380, bottom: 420, height: 40 });
-    rects.set('Apple', { top: 60, bottom: 100, height: 40 });
     Object.defineProperties(dom.window.HTMLElement.prototype, {
       clientHeight: { configurable: true, get: () => 200 },
     });
     await click(trigger());
+    await positioned();
     const popup = host.querySelector('[data-field-popup]');
     assert.equal(popup.scrollTop, 200, 'centered: 380 - 100 - (200 - 40) / 2');
     popup.scrollTop = 100;
@@ -505,11 +515,20 @@ test('the list opens centered on the selection and later moves scroll only the p
 
 test('the popup flips above a trigger near the bottom and stays inside the viewport', async () => {
   let popupHeight = 300;
-  Object.defineProperty(dom.window.HTMLElement.prototype, 'offsetHeight', {
+  const html = document.documentElement;
+  Object.defineProperties(html, {
+    clientWidth: { configurable: true, get: () => 1024 },
+    clientHeight: { configurable: true, get: () => 768 },
+  });
+  const popupOnly = (measure) => ({
     configurable: true,
     get() {
-      return this.hasAttribute('data-field-popup') ? popupHeight : 0;
+      return this.hasAttribute('data-field-popup') ? measure(this) : 0;
     },
+  });
+  Object.defineProperties(dom.window.HTMLElement.prototype, {
+    offsetHeight: popupOnly(() => popupHeight),
+    offsetWidth: popupOnly((node) => parseFloat(node.style.width) || 0),
   });
   try {
     await render(tracked().node);
@@ -520,8 +539,11 @@ test('the popup flips above a trigger near the bottom and stays inside the viewp
       right: 1100,
       width: 200,
       height: 36,
+      x: 900,
+      y: 700,
     });
     await click(trigger());
+    await positioned();
     const popup = host.querySelector('[data-field-popup]');
     assert.equal(popup.dataset.side, 'top');
     assert.equal(popup.style.top, `${700 - 4 - 300}px`);
@@ -529,10 +551,14 @@ test('the popup flips above a trigger near the bottom and stays inside the viewp
     assert.equal(popup.style.left, `${1024 - 8 - 240}px`, 'shifted back inside the viewport');
     popupHeight = 150;
     await act(() => window.dispatchEvent(new Event('resize')));
+    await positioned();
     assert.equal(popup.dataset.side, 'top', 'a shorter list keeps the side it opened on');
     assert.equal(popup.style.top, `${700 - 4 - 150}px`);
   } finally {
+    delete html.clientWidth;
+    delete html.clientHeight;
     delete dom.window.HTMLElement.prototype.offsetHeight;
+    delete dom.window.HTMLElement.prototype.offsetWidth;
   }
 });
 

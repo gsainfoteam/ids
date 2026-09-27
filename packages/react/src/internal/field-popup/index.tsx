@@ -1,6 +1,15 @@
 import { useLayoutEffect, useRef, type ComponentProps, type RefObject } from 'react';
 
 import {
+  autoUpdate,
+  computePosition,
+  flip,
+  offset as offsetBy,
+  shift,
+  size,
+} from '@floating-ui/react-dom';
+
+import {
   isTopPopup,
   lockScroll,
   registerPopup,
@@ -10,13 +19,14 @@ import {
   useDrawerPresentation,
   type PopupPresentation,
 } from './layer';
-import { placePopup, type PopupAlign, type PopupSide } from './position';
 import { popupStyle } from './styles';
 
 export { flattenParts, part, resolveState } from './parts';
 export { fieldListbox, fieldTrigger, type FieldTriggerVariant } from './styles';
 export { useDrawerPresentation, type PopupPresentation } from './layer';
-export type { PopupAlign, PopupSide } from './position';
+
+export type PopupSide = 'top' | 'bottom';
+export type PopupAlign = 'start' | 'end';
 
 export type FieldPopupProps = ComponentProps<'div'> & {
   anchor: RefObject<HTMLElement | null>;
@@ -45,6 +55,11 @@ const isNode = (value: unknown): value is Node =>
 const MIN_HEIGHT = 120;
 const DRAWER_MAX_HEIGHT = 520;
 
+// Placement is asynchronous and can still shrink a popup after it opens, so centering an option
+// on open is repeated once the first placement lands.
+const placed = new WeakSet<HTMLElement>();
+const pendingCenter = new WeakMap<HTMLElement, HTMLElement>();
+
 /**
  * Internal field popup. The native top layer keeps the inherited IDS theme and escapes clipping.
  * On small screens a `drawer` popup is a modal bottom sheet: a dimmed backdrop, focus held
@@ -72,7 +87,6 @@ export function FieldPopup({
   const drawer = useDrawerPresentation(mobileVariant);
   const presentation: PopupPresentation = drawer ? 'drawer' : 'popover';
   const close = useRef(onClose);
-  const placedSide = useRef(side);
   const focused = useRef(false);
 
   useLayoutEffect(() => {
@@ -99,67 +113,101 @@ export function FieldPopup({
     };
   }, [drawer]);
 
+  // A popover follows its anchor. It keeps the side it opened on while its content still fits
+  // there, so a list that shrinks while it is filtered does not jump across the trigger, which is
+  // why the side it landed on is fed back in as the placement it prefers.
+  useLayoutEffect(() => {
+    const node = popup.current,
+      reference = anchor.current;
+    if (!node || !reference || drawer) return;
+    const doc = node.ownerDocument;
+    let current: PopupSide = side;
+    let active = true;
+    node.dataset.side = side;
+    // The UA's `inset: 0` for popovers would otherwise over-constrain the box, and in RTL the
+    // browser then drops `left` rather than `right`. The height starts at its cap so the first
+    // flip weighs the height the popup will have, not the full length of a long list.
+    Object.assign(node.style, { right: 'auto', bottom: 'auto', maxHeight: `${maxHeight}px` });
+    const update = () => {
+      const other: PopupSide = current === 'bottom' ? 'top' : 'bottom';
+      void computePosition(reference, node, {
+        strategy: 'fixed',
+        placement: `${current}-${align}`,
+        middleware: [
+          offsetBy(offset),
+          flip({
+            padding: VIEWPORT_MARGIN,
+            crossAxis: false,
+            fallbackPlacements: [`${other}-${align}`],
+          }),
+          size({
+            padding: VIEWPORT_MARGIN,
+            apply({ availableHeight, rects }) {
+              const anchorWidth = rects.reference.width;
+              const viewport = doc.documentElement.clientWidth || doc.defaultView!.innerWidth;
+              const width = matchWidth ? anchorWidth : Math.max(anchorWidth, preferredWidth);
+              node.style.setProperty('--anchor-width', `${anchorWidth}px`);
+              Object.assign(node.style, {
+                width: `${Math.min(width, viewport - VIEWPORT_MARGIN * 2)}px`,
+                maxHeight: `${Math.max(Math.min(MIN_HEIGHT, maxHeight), Math.min(maxHeight, availableHeight))}px`,
+              });
+            },
+          }),
+          // A popup too tall for either side still stays on screen, over the trigger if it must.
+          shift({ padding: VIEWPORT_MARGIN, crossAxis: true }),
+        ],
+      }).then(({ x, y, placement }) => {
+        if (!active) return;
+        current = placement.startsWith('top') ? 'top' : 'bottom';
+        node.dataset.side = current;
+        Object.assign(node.style, { left: `${x}px`, top: `${y}px` });
+        settle(node);
+      });
+    };
+    const stop = autoUpdate(reference, node, update);
+    return () => {
+      active = false;
+      stop();
+    };
+  }, [anchor, drawer, side, align, offset, matchWidth, preferredWidth, maxHeight]);
+
+  // A drawer is a bottom sheet. The on-screen keyboard shrinks the visual viewport but not the
+  // layout viewport that fixed elements use, so the sheet is lifted by the part the keyboard
+  // covers.
+  useLayoutEffect(() => {
+    const node = popup.current;
+    if (!node || !drawer) return;
+    const win = node.ownerDocument.defaultView!;
+    const place = () => {
+      const visual = win.visualViewport;
+      const covered = visual ? Math.max(0, win.innerHeight - visual.height - visual.offsetTop) : 0;
+      delete node.dataset.side;
+      Object.assign(node.style, {
+        top: 'auto',
+        left: `${VIEWPORT_MARGIN}px`,
+        right: `${VIEWPORT_MARGIN}px`,
+        width: 'auto',
+        bottom: `calc(max(${VIEWPORT_MARGIN}px, env(safe-area-inset-bottom)) + ${covered}px)`,
+        maxHeight: `${Math.min(DRAWER_MAX_HEIGHT, (visual?.height ?? win.innerHeight) * 0.7)}px`,
+      });
+      settle(node);
+    };
+    place();
+    win.addEventListener('resize', place);
+    win.visualViewport?.addEventListener('resize', place);
+    win.visualViewport?.addEventListener('scroll', place);
+    return () => {
+      win.removeEventListener('resize', place);
+      win.visualViewport?.removeEventListener('resize', place);
+      win.visualViewport?.removeEventListener('scroll', place);
+    };
+  }, [drawer]);
+
   useLayoutEffect(() => {
     const node = popup.current,
       trigger = anchor.current;
     if (!node || !trigger) return;
-    const doc = node.ownerDocument,
-      win = doc.defaultView!;
-
-    const position = () => {
-      if (drawer) {
-        // The on-screen keyboard shrinks the visual viewport but not the layout viewport that
-        // fixed elements use, so the sheet is lifted by the part the keyboard covers.
-        const visual = win.visualViewport;
-        const covered = visual
-          ? Math.max(0, win.innerHeight - visual.height - visual.offsetTop)
-          : 0;
-        Object.assign(node.style, {
-          top: 'auto',
-          left: `${VIEWPORT_MARGIN}px`,
-          right: `${VIEWPORT_MARGIN}px`,
-          width: 'auto',
-          bottom: `calc(max(${VIEWPORT_MARGIN}px, env(safe-area-inset-bottom)) + ${covered}px)`,
-          maxHeight: `${Math.min(DRAWER_MAX_HEIGHT, (visual?.height ?? win.innerHeight) * 0.7)}px`,
-        });
-        return;
-      }
-      const rect = trigger.getBoundingClientRect();
-      const viewport = {
-        width: doc.documentElement.clientWidth || win.innerWidth,
-        height: doc.documentElement.clientHeight || win.innerHeight,
-      };
-      const width = Math.min(
-        matchWidth ? rect.width : Math.max(rect.width, preferredWidth),
-        viewport.width - VIEWPORT_MARGIN * 2,
-      );
-      // The UA's `inset: 0` for popovers would otherwise over-constrain the box, and in RTL the
-      // browser then drops `left` rather than `right`.
-      Object.assign(node.style, { width: `${width}px`, right: 'auto', bottom: 'auto' });
-      const placement = placePopup({
-        anchor: rect,
-        width,
-        height: naturalHeight(node),
-        viewport,
-        side: placedSide.current,
-        align,
-        rtl: win.getComputedStyle(trigger).direction === 'rtl',
-        offset,
-        margin: VIEWPORT_MARGIN,
-        maxHeight,
-        minHeight: MIN_HEIGHT,
-      });
-      placedSide.current = placement.side;
-      node.dataset.side = placement.side;
-      node.style.setProperty('--anchor-width', `${rect.width}px`);
-      Object.assign(node.style, {
-        top: `${placement.top}px`,
-        left: `${placement.left}px`,
-        maxHeight: `${placement.maxHeight}px`,
-      });
-    };
-    position();
-
+    const doc = node.ownerDocument;
     const outside = (target: EventTarget | null) =>
       !isNode(target) || (!node.contains(target) && !trigger.contains(target));
     // An outside press moves focus as well, and the focus it moves belongs to the same close; a
@@ -198,32 +246,16 @@ export function FieldPopup({
         first.focus();
       }
     };
-    const onScroll = (event: Event) => {
-      if (isNode(event.target) && node.contains(event.target)) return;
-      position();
-    };
 
     doc.addEventListener('pointerdown', onPointerDown);
     doc.addEventListener('focusin', onFocusIn);
     doc.addEventListener('keydown', onKeyDown);
-    win.addEventListener('resize', position);
-    win.addEventListener('scroll', onScroll, true);
-    win.visualViewport?.addEventListener('resize', position);
-    win.visualViewport?.addEventListener('scroll', position);
-    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(position) : null;
-    observer?.observe(node);
-    observer?.observe(trigger);
     return () => {
-      observer?.disconnect();
       doc.removeEventListener('pointerdown', onPointerDown);
       doc.removeEventListener('focusin', onFocusIn);
       doc.removeEventListener('keydown', onKeyDown);
-      win.removeEventListener('resize', position);
-      win.removeEventListener('scroll', onScroll, true);
-      win.visualViewport?.removeEventListener('resize', position);
-      win.visualViewport?.removeEventListener('scroll', position);
     };
-  }, [anchor, drawer, matchWidth, preferredWidth, align, offset, maxHeight]);
+  }, [anchor, drawer]);
 
   // Initial focus runs once, and again only if the popup turns into a drawer while focus is
   // still outside it, since a modal sheet must hold focus.
@@ -272,15 +304,12 @@ export function FieldPopup({
   );
 }
 
-// The height the popup would take uncapped: its own height plus whatever it, or a list scrolling
-// inside it, hides. Lifting max-height to measure instead would reset that list's scroll position.
-// offsetHeight also ignores the scale of the opening transition.
-function naturalHeight(node: HTMLElement) {
-  const hidden = (element: Element) => Math.max(0, element.scrollHeight - element.clientHeight);
-  return Array.from(node.children).reduce(
-    (height, child) => height + hidden(child),
-    node.offsetHeight + hidden(node),
-  );
+function settle(node: HTMLElement) {
+  placed.add(node);
+  const option = pendingCenter.get(node);
+  if (!option) return;
+  pendingCenter.delete(node);
+  if (node.contains(option)) scrollToOption(option, node, true);
 }
 
 function scrollParent(option: HTMLElement, popup: HTMLElement) {
@@ -292,16 +321,7 @@ function scrollParent(option: HTMLElement, popup: HTMLElement) {
   return popup;
 }
 
-/**
- * Reveal an option without scrolling the document behind its top-layer popup. `center` puts it in
- * the middle, which is how a list should open on its selected option.
- */
-export function revealPopupOption(
-  option: HTMLElement | null | undefined,
-  { center = false }: { center?: boolean } = {},
-) {
-  const popup = option?.closest<HTMLElement>('[data-field-popup]');
-  if (!option || !popup) return;
+function scrollToOption(option: HTMLElement, popup: HTMLElement, center: boolean) {
   const scroller = scrollParent(option, popup);
   const view = scroller.clientHeight,
     from = scroller.scrollTop;
@@ -320,4 +340,18 @@ export function revealPopupOption(
   if (center) scroller.scrollTop = top - (view - height) / 2;
   else if (top < from) scroller.scrollTop = top;
   else if (top + height > from + view) scroller.scrollTop = top + height - view;
+}
+
+/**
+ * Reveal an option without scrolling the document behind its top-layer popup. `center` puts it in
+ * the middle, which is how a list should open on its selected option.
+ */
+export function revealPopupOption(
+  option: HTMLElement | null | undefined,
+  { center = false }: { center?: boolean } = {},
+) {
+  const popup = option?.closest<HTMLElement>('[data-field-popup]');
+  if (!option || !popup) return;
+  if (center && !placed.has(popup)) pendingCenter.set(popup, option);
+  scrollToOption(option, popup, center);
 }
