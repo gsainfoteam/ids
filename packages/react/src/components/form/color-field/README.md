@@ -26,10 +26,11 @@ import { ColorField, Field } from '@gsainfoteam/ids-react';
 <ColorField format="hex" />          // "#3B82F6"
 <ColorField format="hex" alpha />    // "#3B82F6CC", 팝업에 투명도 슬라이더가 생긴다
 <ColorField format="rgb" />          // "rgb(59, 130, 246)"
-<ColorField format="hsl" alpha />    // "hsla(217, 91%, 60%, 0.8)"
+<ColorField format="hsl" alpha />    // "hsla(217.22, 91.22%, 59.8%, 0.8)"
+<ColorField format="oklch" />        // "oklch(0.6231 0.188 259.81)"
 ```
 
-- 트리거와 제출 값은 `format` 에 맞춰 다시 적은 값입니다. `#3b82f6` 을 받아도 `#3B82F6` 으로 보이고 그렇게 제출됩니다.
+- 트리거와 제출 값은 `format` 에 맞춰 다시 적은 값입니다. `#3b82f6` 이나 `red` 를 받아도 `#3B82F6`, `#FF0000` 으로 보이고 그렇게 제출됩니다.
 - 팝업에서 조작하면 바로 `onValueChange` 가 불립니다. 닫아도 되돌리지 않습니다.
 - 바깥에서 `value` 를 바꿔도 `onValueChange` 는 불리지 않습니다. 부모가 가진 원래 문자열은 부모가 고칩니다.
 - 읽는 형식과 반올림은 [ColorPicker](../../data/color-picker/README.md) 와 같습니다.
@@ -143,7 +144,7 @@ const methods = useForm({ defaultValues: { color: '' } });
 | ------------------------ | ------------------------------------------------------------------- |
 | `value` / `defaultValue` | `string` / `''`                                                     |
 | `onValueChange`          | 팝업에서 바꾸거나 지울 때                                           |
-| `format`                 | `hex`(기본) / `rgb` / `hsl`                                         |
+| `format`                 | `hex`(기본) / `rgb` / `hsl` / `oklch`                               |
 | `alpha`                  | 투명도를 포함하고 슬라이더를 그린다                                 |
 | `swatches`               | 팝업의 팔레트                                                       |
 | `open` / `defaultOpen`   | 열림 상태                                                           |

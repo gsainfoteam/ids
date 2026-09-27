@@ -91,6 +91,9 @@ test('SSR: the value is written in the field format, and the trigger reads label
     ['rgba(255, 0, 0, 0.5)', 'hex', true, '#FF000080'],
     ['hsl(120, 100%, 50%)', 'rgb', false, 'rgb(0, 255, 0)'],
     ['#0000ff', 'hsl', false, 'hsl(240, 100%, 50%)'],
+    ['red', 'hex', false, '#FF0000'],
+    ['#FF0000', 'oklch', false, 'oklch(0.628 0.2577 29.23)'],
+    ['#3B82F680', 'oklch', true, 'oklch(0.6231 0.188 259.81 / 0.5)'],
   ]) {
     const doc = new JSDOM(
       renderToString(

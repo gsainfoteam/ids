@@ -15,7 +15,7 @@ const meta = {
   component: ColorPicker,
   tags: ['autodocs'],
   argTypes: {
-    format: { control: 'radio', options: ['hex', 'rgb', 'hsl'] },
+    format: { control: 'radio', options: ['hex', 'rgb', 'hsl', 'oklch'] },
     size: { control: 'radio', options: ['standard', 'tiny'] },
     alpha: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -87,6 +87,14 @@ export const Gallery: Story = {
           <div className="w-64">
             <ColorPicker defaultValue="#8B5CF6" swatches={palette} aria-label="팔레트만">
               <ColorPicker.Swatches />
+            </ColorPicker>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="oklch" className="items-start">
+          <div className="w-64">
+            <ColorPicker defaultValue="oklch(0.65 0.2 145)" format="oklch" aria-label="oklch">
+              <ColorPicker.HueSlider />
+              <ColorPicker.Input />
             </ColorPicker>
           </div>
         </Showcase.Row>

@@ -22,11 +22,13 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 <ColorPicker format="hex" />          // "#3B82F6"
 <ColorPicker format="hex" alpha />    // "#3B82F6CC", 투명도 슬라이더가 생긴다
 <ColorPicker format="rgb" alpha />    // "rgba(59, 130, 246, 0.8)"
-<ColorPicker format="hsl" />          // "hsl(217, 91%, 60%)"
+<ColorPicker format="hsl" />          // "hsl(217.22, 91.22%, 59.8%)"
+<ColorPicker format="oklch" />        // "oklch(0.6231 0.188 259.81)"
 ```
 
-- 읽는 값은 HEX 3/4/6/8자리, `rgb()` `rgba()` `hsl()` `hsla()` 입니다. 이름 색(`red`), `var()`, `color()` 는 읽지 않습니다.
-- 채널은 정수, 투명도는 소수 셋째 자리로 적기 때문에 형식을 오가면 반올림이 생깁니다.
+- 색을 읽고 쓰는 일은 [culori](https://culori.js.org) 가 합니다. HEX 3/4/6/8자리, `rgb()`, `hsl()`, `oklch()`, `color(srgb …)`, 이름 색(`red`) 을 읽고, `var()` 와 `currentColor` 는 읽지 않습니다.
+- 영역과 슬라이더는 sRGB 라서, sRGB 밖의 색은 가장 가까운 sRGB 색으로 잘립니다.
+- `rgb` 채널은 정수, `hsl` 과 투명도는 소수 둘째 자리, `oklch` 의 L 과 C 는 넷째 자리로 적기 때문에 형식을 오가면 반올림이 생깁니다.
 - 영역을 끌면 움직이는 동안 `onValueChange` 가 계속 불립니다.
 
 ## 키보드
@@ -96,7 +98,7 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 | ------------------------ | ------------------------------------------------- |
 | `value` / `defaultValue` | `string` / `''`                                   |
 | `onValueChange`          | 값이 바뀔 때. 끄는 동안에도                       |
-| `format`                 | `hex`(기본) / `rgb` / `hsl`                       |
+| `format`                 | `hex`(기본) / `rgb` / `hsl` / `oklch`             |
 | `alpha`                  | 투명도를 포함하고 슬라이더를 그린다               |
 | `swatches`               | 팔레트                                            |
 | `size`                   | `standard` / `tiny`. 생략하면 `Field` 크기        |

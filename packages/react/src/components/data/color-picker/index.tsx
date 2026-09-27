@@ -205,7 +205,7 @@ function ColorPickerArea({ className, style, ...props }: ColorPicker.AreaProps) 
         style={{
           left: `${color.s * 100}%`,
           top: `${(1 - color.v) * 100}%`,
-          backgroundColor: cssColor({ ...rgba, a: 1 }),
+          backgroundColor: cssColor({ ...rgba, alpha: 1 }),
         }}
       />
       <input
@@ -287,7 +287,7 @@ function ColorPickerAlphaSlider({ className, style, ...props }: ColorPicker.Slid
       className={c.styles.slider({ className })}
       style={{
         ...style,
-        backgroundImage: `linear-gradient(to right, transparent, ${cssColor({ ...rgba, a: 1 })}), ${CHECKER}`,
+        backgroundImage: `linear-gradient(to right, transparent, ${cssColor({ ...rgba, alpha: 1 })}), ${CHECKER}`,
         backgroundSize: '100% 100%, 8px 8px',
       }}
     >

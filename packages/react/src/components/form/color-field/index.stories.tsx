@@ -25,7 +25,7 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    format: { control: 'radio', options: ['hex', 'rgb', 'hsl'] },
+    format: { control: 'radio', options: ['hex', 'rgb', 'hsl', 'oklch'] },
     mobileVariant: { control: 'radio', options: ['popover', 'drawer'] },
     alpha: { control: 'boolean' },
     defaultOpen: { control: 'boolean' },
@@ -94,8 +94,13 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
         <Showcase.Row label="hsl">
-          <div className="w-64">
+          <div className="w-88">
             <ColorField aria-label="HSL" format="hsl" defaultValue="#EF4444" />
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="oklch">
+          <div className="w-88">
+            <ColorField aria-label="OKLCH" format="oklch" defaultValue="#22C55E" />
           </div>
         </Showcase.Row>
         <Showcase.Row label="invalid">

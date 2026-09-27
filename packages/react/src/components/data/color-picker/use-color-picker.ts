@@ -8,8 +8,9 @@ import {
   type PointerEvent,
 } from 'react';
 
+import { clamp, noop } from 'es-toolkit';
+
 import {
-  clamp,
   hsvaToRgba,
   parseColor,
   parseColorInput,
@@ -18,7 +19,7 @@ import {
   serializeColor,
   type ColorFormat,
   type HSVA,
-  type RGBA,
+  type Rgb,
 } from './color';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 
@@ -32,7 +33,7 @@ type EyeDropperConstructor = new () => {
 const eyeDropperOf = (view: unknown) =>
   (view as { EyeDropper?: EyeDropperConstructor } | undefined)?.EyeDropper;
 
-const noSubscription = () => () => {};
+const noSubscription = () => noop;
 
 // Read after hydration, so the server and the first client render agree on "unsupported".
 export function useEyeDropperSupport() {
@@ -97,7 +98,7 @@ export function useColorPicker({
     setValue(serializeColor(hsvaToRgba(kept), format, alpha));
   };
   const update = (patch: Partial<HSVA>) => commit({ ...color, ...patch });
-  const commitRgba = (next: RGBA) => commit(rgbaToHsva(next, color));
+  const commitRgba = (next: Rgb) => commit(rgbaToHsva(next, color));
 
   const [draft, setDraft] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -108,8 +109,8 @@ export function useColorPicker({
     const rect = event.currentTarget.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     update({
-      s: clamp((event.clientX - rect.left) / rect.width),
-      v: 1 - clamp((event.clientY - rect.top) / rect.height),
+      s: clamp((event.clientX - rect.left) / rect.width, 0, 1),
+      v: 1 - clamp((event.clientY - rect.top) / rect.height, 0, 1),
     });
   };
 
@@ -122,7 +123,7 @@ export function useColorPicker({
     const rect = event.currentTarget.getBoundingClientRect();
     const usable = rect.width - thumb;
     if (usable <= 0) return;
-    const ratio = clamp((event.clientX - rect.left - thumb / 2) / usable);
+    const ratio = clamp((event.clientX - rect.left - thumb / 2) / usable, 0, 1);
     update(channel === 'hue' ? { h: ratio * 360 } : { a: ratio });
   };
 
@@ -142,12 +143,12 @@ export function useColorPicker({
     if (blocked) return;
     const step = event.shiftKey ? 0.1 : 0.01;
     const patch: Partial<HSVA> | undefined = {
-      ArrowLeft: { s: clamp(color.s - step) },
-      ArrowRight: { s: clamp(color.s + step) },
-      ArrowUp: { v: clamp(color.v + step) },
-      ArrowDown: { v: clamp(color.v - step) },
-      PageUp: { v: clamp(color.v + 0.1) },
-      PageDown: { v: clamp(color.v - 0.1) },
+      ArrowLeft: { s: clamp(color.s - step, 0, 1) },
+      ArrowRight: { s: clamp(color.s + step, 0, 1) },
+      ArrowUp: { v: clamp(color.v + step, 0, 1) },
+      ArrowDown: { v: clamp(color.v - step, 0, 1) },
+      PageUp: { v: clamp(color.v + 0.1, 0, 1) },
+      PageDown: { v: clamp(color.v - 0.1, 0, 1) },
       Home: { s: 0 },
       End: { s: 1 },
     }[event.key];
@@ -204,7 +205,7 @@ export function useColorPicker({
     }
     const next = parseColorInput(draft);
     if (!next) return false;
-    commitRgba(alpha ? next : { ...next, a: 1 });
+    commitRgba(alpha ? next : { ...next, alpha: 1 });
     setDraft(null);
     return true;
   };
@@ -236,7 +237,7 @@ export function useColorPicker({
     try {
       const { sRGBHex } = await new EyeDropper().open();
       const picked = parseColor(sRGBHex);
-      if (picked) commitRgba({ ...picked, a: color.a });
+      if (picked) commitRgba({ ...picked, alpha: color.a });
     } catch {
       // Escape cancels the eyedropper by rejecting; there is nothing to undo.
     }
@@ -256,11 +257,13 @@ export function useColorPicker({
 
   const isCurrent = (swatch: string) => {
     const candidate = parseColor(swatch);
-    return !!candidate && !!parsed && sameColor(alpha ? candidate : { ...candidate, a: 1 }, parsed);
+    return (
+      !!candidate && !!parsed && sameColor(alpha ? candidate : { ...candidate, alpha: 1 }, parsed)
+    );
   };
   const chooseSwatch = (swatch: string) => {
     const next = parseColor(swatch);
-    if (next) commitRgba(alpha ? next : { ...next, a: 1 });
+    if (next) commitRgba(alpha ? next : { ...next, alpha: 1 });
   };
 
   // Swatches are one radio group: the arrows move to the next swatch and choose it, wrapping at

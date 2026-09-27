@@ -127,7 +127,7 @@ test('sliders: hue and alpha by key and by the input value that assistive techno
   await key(hue, 'End');
   assert.equal(hue.getAttribute('aria-valuetext'), '360도');
   await type(hue, '120');
-  assert.equal(state.changes.at(-1), 'rgba(0, 255, 0, 0.502)');
+  assert.equal(state.changes.at(-1), 'rgba(0, 255, 0, 0.5)');
   const alpha = slider('투명도');
   await key(alpha, 'Home');
   assert.equal(state.changes.at(-1), 'rgba(0, 255, 0, 0)');
@@ -179,6 +179,12 @@ test('typed text is a draft until Enter or blur; unreadable text is reverted', a
   await type(input, 'still nope');
   await act(async () => input.dispatchEvent(new FocusEvent('focusout', { bubbles: true })));
   assert.equal(input.value, '#FF0000', 'blur drops an unreadable draft');
+  await type(input, 'rebeccapurple');
+  await key(input, 'Enter');
+  assert.equal(state.changes.at(-1), '#663399', 'a named color is read');
+  await type(input, 'oklch(0.9 0.4 20)');
+  await key(input, 'Enter');
+  assert.equal(state.changes.at(-1), '#FF0061', 'a color outside sRGB is clipped into it');
   await type(input, '');
   await key(input, 'Enter');
   assert.equal(state.changes.at(-1), '', 'an emptied field clears the value');
@@ -230,7 +236,7 @@ test('copy writes the shown value and announces it', async () => {
   await render(tracked({ defaultValue: '#3B82F6', format: 'hsl' }).node);
   const button = host.querySelector('[data-color-picker-copy]');
   await act(async () => button.click());
-  assert.deepEqual(written, ['hsl(217, 91%, 60%)']);
+  assert.deepEqual(written, ['hsl(217.22, 91.22%, 59.8%)']);
   assert.equal(host.querySelector('[role=status]').textContent, '복사했습니다');
   assert.equal(button.getAttribute('aria-label'), '복사했습니다');
 });
