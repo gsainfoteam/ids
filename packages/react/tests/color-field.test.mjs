@@ -68,7 +68,7 @@ const slider = (name) =>
   host.querySelector(
     `input[type=range][aria-label="${name}"], [role=slider][aria-label="${name}"]`,
   );
-const swatch = (name) => host.querySelector(`[role=radio][aria-label="${name}"]`);
+const swatch = (name) => host.querySelector(`input[type=radio][aria-label="${name}"]`);
 const clearButton = () => host.querySelector('[data-color-field-clear]');
 function tracked(props = {}, ...children) {
   const changes = [];
@@ -357,8 +357,16 @@ test('Content holds ColorPicker parts, and focus goes to the first one given', a
   assert.equal(host.querySelector('[data-color-picker-area]'), null);
   assert.equal(editor(), null);
   assert.equal(document.activeElement, swatch('#0000FF'), 'the chosen swatch takes focus');
-  await key(swatch('#0000FF'), 'ArrowRight');
-  assert.deepEqual(state.changes, ['#FF0000'], 'arrows wrap to the next color');
+  await key(swatch('#0000FF'), 'Home');
+  assert.deepEqual(state.changes, ['#FF0000'], 'Home chooses the first color');
+  await render(
+    tracked(
+      { key: 'unlisted', defaultValue: '#123456', swatches: ['#FF0000', '#0000FF'] },
+      h(ColorField.Content, null, h(ColorPicker.Swatches)),
+    ).node,
+  );
+  await click(trigger());
+  assert.equal(document.activeElement, swatch('#FF0000'), 'with no chosen swatch, the first');
   await render(
     tracked(
       { key: 'hue', defaultValue: '#FF0000', alpha: true },

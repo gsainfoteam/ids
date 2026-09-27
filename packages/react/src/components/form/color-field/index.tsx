@@ -94,11 +94,12 @@ const isNode = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'nodeType' in value;
 
 // Focus lands on the first control of whatever the popup holds: the area, a slider, the
-// input, or the chosen swatch of a palette-only picker.
+// input, or the swatches. The swatches' group root takes it, since it hands focus on to the
+// chosen swatch, or to the first when none is chosen, where Tab would land.
 const FIRST_CONTROL = [
-  '[data-color-picker] input:not([tabindex="-1"])',
+  '[data-color-picker] input:not([type=radio]):not([tabindex="-1"])',
   '[data-color-picker] [role=slider]:not([tabindex="-1"])',
-  '[data-color-picker] [role=radio][tabindex="0"]',
+  '[data-color-picker] [role=radiogroup]',
 ].join(', ');
 
 const CHECKER =

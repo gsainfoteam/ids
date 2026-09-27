@@ -60,11 +60,11 @@ const slider = (name) =>
     `input[type=range][aria-label="${name}"], [role=slider][aria-label="${name}"]`,
   );
 const textInput = () => host.querySelector('[data-color-picker-input]');
-function tracked(props = {}) {
+function tracked(props = {}, ...children) {
   const changes = [];
   return {
     changes,
-    node: h(ColorPicker, { ...props, onValueChange: (value) => changes.push(value) }),
+    node: h(ColorPicker, { ...props, onValueChange: (value) => changes.push(value) }, ...children),
   };
 }
 
@@ -103,11 +103,18 @@ test('SSR: one group with an area of two sliders, a hue slider, a text input and
   assert.equal(input.value, '#3B82F6');
   assert.equal(input.type, 'text');
   assert.equal(input.closest('[data-text-field]').dataset.size, 'standard', 'a TextField box');
-  const radios = doc.querySelectorAll('[role=radiogroup] [role=radio]');
+  const palette = doc.querySelector('[role=radiogroup]');
+  assert.equal(palette.getAttribute('aria-label'), '팔레트');
+  const radios = palette.querySelectorAll('input[type=radio]');
   assert.equal(radios.length, 2, 'an unreadable swatch is skipped');
-  assert.equal(radios[0].getAttribute('aria-checked'), 'true');
-  assert.equal(radios[0].getAttribute('tabindex'), '0');
-  assert.equal(radios[1].getAttribute('tabindex'), '-1');
+  assert.deepEqual(
+    [...radios].map((radio) => [radio.value, radio.checked]),
+    [
+      ['#3B82F6', true],
+      ['#22C55E', false],
+    ],
+  );
+  assert.equal(radios[0].name, radios[1].name, 'one native radio group');
   assert.equal(doc.querySelector('[data-color-picker-eyedropper]'), null);
   assert.equal(doc.querySelector('[data-color-picker-copy]'), null);
 });
@@ -222,23 +229,52 @@ test('typed text is a draft until Enter or blur; unreadable text is reverted', a
   assert.equal(state.changes.at(-1), '', 'an emptied field clears the value');
 });
 
-test('swatches are one radio group: arrows choose the next color and wrap', async () => {
+// jsdom has no native radio arrow keys; the Swatches story plays them in a browser.
+test('swatches are one RadioGroup: a click or Home and End choose, and no form sees them', async () => {
   const state = tracked({
     defaultValue: '#22C55E',
     swatches: ['#EF4444', { value: '#22C55E', label: 'Green' }, '#3B82F6'],
   });
-  await render(state.node);
-  const radios = () => [...host.querySelectorAll('[role=radio]')];
+  await render(h('form', null, state.node));
+  const radios = () => [...host.querySelectorAll('input[type=radio]')];
   assert.equal(radios()[1].getAttribute('aria-label'), 'Green');
-  assert.equal(radios()[1].tabIndex, 0);
-  await act(async () => radios()[1].focus());
-  await key(radios()[1], 'ArrowRight');
+  assert.equal(radios()[1].title, 'Green');
+  assert.equal(radios()[1].checked, true);
+  assert.ok(radios().every((radio) => radio.form === null));
+  assert.deepEqual([...new window.FormData(host.querySelector('form'))], []);
+  await act(async () => radios()[2].click());
   assert.equal(state.changes.at(-1), '#3B82F6');
-  assert.equal(document.activeElement, radios()[2]);
-  await key(radios()[2], 'ArrowRight');
-  assert.equal(state.changes.at(-1), '#EF4444', 'wraps to the first');
+  assert.equal(radios()[2].checked, true);
+  await key(radios()[2], 'Home');
+  assert.equal(state.changes.at(-1), '#EF4444');
+  assert.equal(document.activeElement, radios()[0]);
   await key(radios()[0], 'End');
   assert.equal(state.changes.at(-1), '#3B82F6');
+  assert.deepEqual([...new window.FormData(host.querySelector('form'))], []);
+
+  const readOnly = tracked({
+    defaultValue: '#EF4444',
+    readOnly: true,
+    swatches: ['#EF4444', '#3B82F6'],
+  });
+  await render(h('div', { key: 'read-only' }, readOnly.node));
+  await act(async () => radios()[1].click());
+  assert.equal(radios()[0].checked, true, 'a read-only palette keeps its color');
+  assert.deepEqual(readOnly.changes, []);
+});
+
+test('a Swatch on its own is a radio checked by the color it shows', async () => {
+  const state = tracked(
+    { defaultValue: '#3B82F6' },
+    h(ColorPicker.Swatch, { value: '#3B82F6', label: 'Blue' }),
+    h(ColorPicker.Swatch, { value: '#EF4444', label: 'Red' }),
+  );
+  await render(state.node);
+  const [blue, red] = host.querySelectorAll('input[type=radio]');
+  assert.deepEqual([blue.checked, red.checked], [true, false]);
+  await act(async () => red.click());
+  assert.deepEqual(state.changes, ['#EF4444']);
+  assert.deepEqual([blue.checked, red.checked], [false, true]);
 });
 
 test('eyedropper: shown only where the API exists; a cancelled pick changes nothing', async () => {

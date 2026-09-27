@@ -13,5 +13,6 @@ The text input, a monospace TextField, reads hex (with or without `#`), `rgb()` 
 a draft until Enter or blur, reverts unreadable text, and lets the first Escape drop a draft without
 closing a surrounding popup. `ColorPicker.EyeDropper` appears only where `window.EyeDropper` exists and
 `ColorPicker.Copy` announces the copy; both are outline IconButtons whose child replaces the icon.
-`ColorPicker.Swatches` is one radio group with roving focus. Parts (`Area`, `HueSlider`,
+`ColorPicker.Swatches` is a RadioGroup of square Radios: native radios with one Tab stop, arrow
+keys, Home and End, kept out of any form around the picker. Parts (`Area`, `HueSlider`,
 `AlphaSlider`, `Input`, `EyeDropper`, `Copy`, `Swatches`, `Swatch`) compose a smaller picker.

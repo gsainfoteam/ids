@@ -235,37 +235,6 @@ export function useColorPicker({
     if (next) commitRgba(alpha ? next : { ...next, alpha: 1 });
   };
 
-  // Swatches are one radio group: the arrows move to the next swatch and choose it, wrapping at
-  // the ends, Home and End jump, and Tab leaves the group in one step.
-  const onSwatchesKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    const radios = Array.from(
-      event.currentTarget.querySelectorAll<HTMLButtonElement>('[role=radio]:not(:disabled)'),
-    );
-    const index = radios.findIndex((radio) => radio === radio.ownerDocument.activeElement);
-    if (index < 0) return;
-    const rtl =
-      event.currentTarget.ownerDocument.defaultView?.getComputedStyle(event.currentTarget)
-        .direction === 'rtl';
-    const step = {
-      ArrowRight: rtl ? -1 : 1,
-      ArrowLeft: rtl ? 1 : -1,
-      ArrowDown: 1,
-      ArrowUp: -1,
-    }[event.key];
-    const next =
-      step !== undefined
-        ? (index + step + radios.length) % radios.length
-        : event.key === 'Home'
-          ? 0
-          : event.key === 'End'
-            ? radios.length - 1
-            : undefined;
-    if (next === undefined) return;
-    event.preventDefault();
-    radios[next].focus();
-    radios[next].click();
-  };
-
   return {
     state: { value, parsed, color, rgba, text, blocked, copied },
     input,
@@ -277,14 +246,6 @@ export function useColorPicker({
       },
       onKeyDown: onAreaKeyDown,
     },
-    actions: {
-      setChannel,
-      onChannelChange,
-      pickFromScreen,
-      copy,
-      isCurrent,
-      chooseSwatch,
-      onSwatchesKeyDown,
-    },
+    actions: { setChannel, onChannelChange, pickFromScreen, copy, isCurrent, chooseSwatch },
   };
 }

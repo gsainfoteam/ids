@@ -182,14 +182,13 @@ export const Swatches: Story = {
     docs: {
       description: {
         story:
-          '팔레트는 라디오 그룹이라 Tab 한 번으로 들어가고 나옵니다. ← → 로 옆 색을 고르고, 끝에서는 반대편으로 돕니다.',
+          '팔레트는 native 라디오의 RadioGroup 이라 Tab 한 번으로 들어가고 나옵니다. ← → 로 옆 색을 고르고, 끝에서는 반대편으로 돕니다. Home 과 End 는 처음과 끝 색입니다.',
       },
     },
   },
   play: async ({ canvas, userEvent, args }) => {
     const orange = canvas.getByRole('radio', { name: '#F97316' });
-    await expect(orange).toHaveAttribute('aria-checked', 'true');
-    await expect(orange).toHaveAttribute('tabindex', '0');
+    await expect(orange).toBeChecked();
     orange.focus();
     await userEvent.keyboard('{ArrowRight}');
     await expect(args.onValueChange).toHaveBeenLastCalledWith('#EAB308');

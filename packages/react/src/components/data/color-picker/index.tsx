@@ -17,6 +17,9 @@ import { messages } from '../../../internal/messages';
 import { cn, invariant, mergeEventHandlers, mergeProps, tv } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../../form/field/context';
+import { Radio } from '../../form/radio';
+import { RadioGroup } from '../../form/radio-group';
+import { useRadioGroupContext } from '../../form/radio-group/context';
 import { Slider } from '../../form/slider';
 import { TextField } from '../../form/text-field';
 
@@ -61,7 +64,6 @@ type Context = {
 };
 
 const PickerContext = createContext<Context | null>(null);
-const SwatchesContext = createContext<{ tabStop: string | undefined } | null>(null);
 
 function usePicker(part: string) {
   const context = use(PickerContext);
@@ -379,57 +381,59 @@ function ColorPickerSwatches({ className, children, ...props }: ColorPicker.Swat
           : [],
       )
     : (c.swatches ?? []).map(swatchValue);
-  const readable = values.filter((item) => parseColor(item));
-  // One Tab stop for the whole palette: the chosen swatch, or the first.
-  const tabStop = readable.find((item) => c.picker.actions.isCurrent(item)) ?? readable[0];
   return (
-    <SwatchesContext value={{ tabStop }}>
-      <div
-        {...mergeProps(props as Record<string, unknown>, {
-          role: 'radiogroup',
-          'aria-label': props['aria-label'] ?? messages.colorPicker.swatches,
-          'aria-readonly': c.state.readOnly || undefined,
-          'data-color-picker-swatches': '',
-          className: c.styles.swatches({ className }),
-          onKeyDown: c.picker.actions.onSwatchesKeyDown,
-        })}
-      >
-        {children ??
-          (c.swatches ?? []).map((swatch, index) => (
-            <ColorPickerSwatch
-              key={`${swatchValue(swatch)}-${index}`}
-              value={swatchValue(swatch)}
-              label={typeof swatch === 'string' ? undefined : swatch.label}
-            />
-          ))}
-      </div>
-    </SwatchesContext>
+    <RadioGroup
+      {...props}
+      aria-label={props['aria-label'] ?? messages.colorPicker.swatches}
+      value={values.find((item) => c.picker.actions.isCurrent(item)) ?? null}
+      orientation="horizontal"
+      disabled={c.state.disabled}
+      readOnly={c.state.readOnly}
+      // The swatches choose the picker's color and are no value of their own, so an empty form
+      // attribute leaves them without a form owner: a form around the picker neither submits
+      // nor validates them, and they still make one native radio group.
+      form=""
+      data-color-picker-swatches=""
+      className={c.styles.swatches({ className })}
+    >
+      {children ??
+        (c.swatches ?? []).map((swatch, index) => (
+          <ColorPickerSwatch
+            key={`${swatchValue(swatch)}-${index}`}
+            value={swatchValue(swatch)}
+            label={typeof swatch === 'string' ? undefined : swatch.label}
+          />
+        ))}
+    </RadioGroup>
   );
 }
 
 function ColorPickerSwatch({ value, label, className, style, ...props }: ColorPicker.SwatchProps) {
   const c = usePicker('ColorPicker.Swatch');
-  const group = use(SwatchesContext);
+  // Inside Swatches the group checks the swatch; a swatch placed on its own checks itself.
+  const grouped = useRadioGroupContext() !== null;
   const parsed = parseColor(value);
   // An unreadable color is skipped rather than drawn as an empty square.
   if (!parsed) return null;
-  const checked = c.picker.actions.isCurrent(value);
   return (
-    <button
-      {...mergeProps(props as Record<string, unknown>, {
-        type: 'button' as const,
-        role: 'radio',
-        'aria-checked': checked,
-        'aria-label': label ?? value,
-        title: label ?? value,
-        tabIndex: group ? (group.tabStop === value ? 0 : -1) : undefined,
-        disabled: c.state.disabled,
-        'data-color-picker-swatch': '',
-        className: c.styles.swatch({ className }),
-        style: { ...style, ...overChecker(cssColor(parsed)) },
-        onClick: () => c.picker.actions.chooseSwatch(value),
-      })}
-    />
+    <Radio
+      {...props}
+      value={value}
+      checked={grouped ? undefined : c.picker.actions.isCurrent(value)}
+      onCheckedChange={(checked) => {
+        if (checked) c.picker.actions.chooseSwatch(value);
+      }}
+      aria-label={label ?? value}
+      title={label ?? value}
+      disabled={c.state.disabled}
+      readOnly={c.state.readOnly}
+      data-color-picker-swatch=""
+      className={c.styles.swatch({ className })}
+      style={{ ...style, ...overChecker(cssColor(parsed)) }}
+    >
+      {/* The chosen swatch is ringed rather than dotted. */}
+      {false}
+    </Radio>
   );
 }
 
@@ -452,10 +456,22 @@ export namespace ColorPicker {
   export type ButtonProps = Omit<ComponentProps<'button'>, 'children'> & {
     children?: ReactElement;
   };
-  export type SwatchesProps = ComponentProps<'div'>;
-  export type SwatchProps = Omit<ComponentProps<'button'>, 'value' | 'children'> & {
+  export type SwatchesProps = Omit<ComponentProps<'div'>, 'defaultValue' | 'onChange' | 'role'>;
+  export type SwatchProps = Omit<
+    Radio.Props,
+    | 'value'
+    | 'checked'
+    | 'defaultChecked'
+    | 'onCheckedChange'
+    | 'name'
+    | 'className'
+    | 'style'
+    | 'children'
+  > & {
     value: string;
     label?: string;
+    className?: string;
+    style?: CSSProperties;
   };
 
   export const Area = ColorPickerArea;
@@ -498,13 +514,13 @@ export namespace ColorPicker {
       input: 'flex-1',
       inputText: 'font-mono',
       tool: '',
-      swatches: 'flex flex-wrap gap-2',
+      swatches: 'gap-2',
       // The chosen swatch gets a ring behind a surface-colored gap, so it stays visible on a
       // swatch the same color as the ring.
       swatch: [
-        'shrink-0 cursor-pointer rounded-standard inset-ring-1 inset-ring-(--ids-color-on-surface)/10',
-        'aria-checked:ring-2 aria-checked:ring-(--ids-color-primary) aria-checked:ring-offset-2 aria-checked:ring-offset-(--ids-color-surface)',
-        'focus-ring disabled:cursor-not-allowed',
+        'rounded-standard shadow-none inset-ring-(--ids-color-on-surface)/10',
+        'data-[state=checked]:ring-2 data-[state=checked]:ring-(--radio-accent)',
+        'data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-(--ids-color-surface)',
       ],
     },
     variants: {
@@ -529,6 +545,7 @@ export namespace ColorPicker {
           slider: 'data-disabled:opacity-100',
           input: 'data-disabled:opacity-100',
           tool: 'data-disabled:opacity-100',
+          swatch: 'data-disabled:opacity-100',
         },
       },
     },
