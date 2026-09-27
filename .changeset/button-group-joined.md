@@ -11,5 +11,6 @@ siblings, `attached={false}` spaces the buttons instead of joining them, and an 
 `aria-label` or `aria-labelledby` gets a development warning.
 
 Breaking: `ButtonGroup.Separator` is now a drawn 1px line (`role="separator"`) instead of an 8px
-gap; nest ButtonGroups to split segments apart. The group no longer defaults `size` to `standard`
+gap; nest ButtonGroups to split segments apart. It is a `Divider` (with `data-divider`), as is
+`ToggleGroup.Separator`, so neither takes `role`, `aria-orientation`, `aria-hidden` or `tabIndex`. The group no longer defaults `size` to `standard`
 for its children, and a child's own `size` wins instead of throwing.

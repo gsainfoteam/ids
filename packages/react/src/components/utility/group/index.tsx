@@ -2,6 +2,7 @@ import { createContext, use, useEffect, type ComponentProps, type ReactNode } fr
 
 import { invariant, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+import { Divider } from '../../layout/divider';
 import { Slot } from '../slot';
 
 import type { IdsSize, IdsVariant } from '../../../tokens/types';
@@ -87,27 +88,25 @@ export namespace Group {
     children?: ReactNode;
   };
 
-  export type SeparatorProps = Omit<ComponentProps<'div'>, 'children'>;
+  // The Divider decides the role and orientation, so neither can be set here.
+  export type SeparatorProps = Omit<
+    ComponentProps<'div'>,
+    'children' | 'role' | 'aria-orientation' | 'aria-hidden' | 'tabIndex'
+  >;
 
   export type TextProps = ComponentProps<'div'> & { asChild?: boolean };
 
-  // A drawn line between controls. Outline controls already show a border there, so the line
+  // A Divider across the group. Outline controls already show a border there, so the line
   // overlaps it by a pixel on each side and the seam stays one pixel wide.
   export function Separator({ className, ...props }: SeparatorProps) {
     const group = useGroupContext();
     invariant(group, 'Group.Separator must be rendered inside ButtonGroup or ToggleGroup.');
-    const orientation: GroupOrientation =
-      group.orientation === 'horizontal' ? 'vertical' : 'horizontal';
-    const semantics =
-      group.separator === 'semantic'
-        ? { role: 'separator', 'aria-orientation': orientation }
-        : { 'aria-hidden': true as const };
     return (
-      <div
-        {...semantics}
-        data-group-separator=""
-        data-orientation={orientation}
+      <Divider
         {...props}
+        orientation={group.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
+        decorative={group.separator === 'decorative'}
+        data-group-separator=""
         className={Style({ orientation: group.orientation, attached: group.attached }).separator({
           className,
         })}
@@ -140,7 +139,8 @@ export namespace Group {
         // A group of groups spaces them apart, and each inner group stays joined.
         'has-[>[data-group]]:gap-2',
       ],
-      separator: 'relative z-25 shrink-0 self-stretch bg-(--ids-color-border)',
+      // The Divider draws the line; the group only lifts it over the controls' overlapping borders.
+      separator: 'relative z-25',
       text: [
         'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-standard shadow-xs',
         'bg-(--ids-color-muted) text-(--ids-color-on-surface)',
@@ -150,8 +150,8 @@ export namespace Group {
     },
     variants: {
       orientation: {
-        horizontal: { root: 'flex-row', separator: 'w-px' },
-        vertical: { root: 'flex-col', separator: 'h-px' },
+        horizontal: { root: 'flex-row' },
+        vertical: { root: 'flex-col' },
       } satisfies Record<GroupOrientation, object>,
       attached: {
         true: {},
