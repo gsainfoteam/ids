@@ -227,6 +227,8 @@ test('a closed panel stays findable: hidden="until-found", and beforematch opens
 
 test('closing: the panel is inert while it collapses, then hidden until found', async () => {
   await render(h(Accordion, { type: 'single', defaultValue: 'a' }, items()));
+  // The first frame after mount turns animation on; clicking before it closes instantly.
+  await settle();
   const [a] = triggers();
   const panel = panelOf(a);
   await act(async () => a.click());
