@@ -12,7 +12,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 
 import { IconButton } from '../../components/action/icon-button';
 import { cn, flattenFragments, invariant, mergeProps, tv } from '../../utils';
-import { fieldSurface, type FieldSurfaceVariant } from '../field-surface';
+import { fieldAction, fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 import { messages } from '../messages';
 
 import type { IdsSize } from '../../tokens/types';
@@ -199,10 +199,7 @@ export const textControlStyle = tv({
       'text-(--ids-color-on-muted) [&_svg]:shrink-0',
       insetButtons.base,
     ],
-    action: [
-      'shrink-0 text-(--ids-color-on-muted)',
-      'data-hovered:text-(--ids-color-on-surface) data-pressed:text-(--ids-color-on-surface)',
-    ],
+    action: fieldAction.base,
   },
   variants: {
     variant: {
@@ -220,7 +217,7 @@ export const textControlStyle = tv({
           insetButtons.size.standard,
           'has-[button]:first:-ms-2 has-[button]:last:-me-2',
         ],
-        action: 'size-7 first:-ms-2 last:-me-2',
+        action: fieldAction.size.standard,
       },
       tiny: {
         root: fieldSurface.size.tiny,
@@ -229,7 +226,7 @@ export const textControlStyle = tv({
           insetButtons.size.tiny,
           'has-[button]:first:-ms-1.5 has-[button]:last:-me-1.5',
         ],
-        action: 'size-6 first:-ms-1.5 last:-me-1.5',
+        action: fieldAction.size.tiny,
       },
     } satisfies Record<IdsSize, object>,
   },
