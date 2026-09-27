@@ -775,3 +775,44 @@ test('RHF value mode binds onValueChange on TextField', async () => {
   await input(control(), 'user@example.com');
   assert.equal(form.methods().getValues('profile.email'), 'user@example.com');
 });
+
+test('RHF native and value modes give the text fields no prop the DOM does not know', async () => {
+  const { TextArea, PasswordField, NumberField, TelField, Input } =
+    await import('../dist/index.js');
+  const controls = {
+    native: [
+      ['text', h(TextField), 'a'],
+      ['area', h(TextArea), 'a'],
+      ['password', h(PasswordField, { name: 'password' }), 'a'],
+      ['email', h(Input, { type: 'email' }), 'a'],
+    ],
+    value: [
+      ['text', h(TextField), 'a'],
+      ['area', h(TextArea), 'a'],
+      ['password', h(PasswordField, { name: 'password' }), 'a'],
+      ['number', h(NumberField), 1],
+      ['tel', h(TelField), '+821012345678'],
+      ['quantity', h(Input, { type: 'number' }), 2],
+    ],
+  };
+  const errors = [];
+  const original = console.error;
+  console.error = (...args) => errors.push(args.map(String).join(' '));
+  try {
+    for (const [mode, list] of Object.entries(controls))
+      for (const [name, element, value] of list) {
+        function App() {
+          const methods = useForm({ defaultValues: { [name]: value } });
+          return h(
+            FormProvider,
+            methods,
+            h(RhfField, { name, controlMode: mode }, h(RhfField.Label, null, name), element),
+          );
+        }
+        await render(h(App, { key: `${mode}-${name}` }));
+      }
+  } finally {
+    console.error = original;
+  }
+  assert.deepEqual(errors, []);
+});
