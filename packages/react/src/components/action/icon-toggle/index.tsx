@@ -19,8 +19,7 @@ export function IconToggle(props: IconToggle.Props) {
   const layout = useGroupContext();
   const {
     props: { icon, variant: ownVariant, colorScheme, size, className, style, ...rest },
-    pressed,
-    value,
+    toggleProps,
     element,
     content,
     render,
@@ -41,8 +40,7 @@ export function IconToggle(props: IconToggle.Props) {
     {
       ...rest,
       'aria-label': label ?? rest['aria-label'],
-      'aria-pressed': pressed,
-      'data-value': value,
+      ...toggleProps,
       className: IconToggle.Style({ variant, colorScheme, size: resolvedSize, className }),
       style,
       'data-variant': variant,

@@ -13,8 +13,7 @@ export function Toggle(props: Toggle.Props) {
   const layout = useGroupContext();
   const {
     props: { variant: ownVariant, colorScheme, size, className, style, ...rest },
-    pressed,
-    value,
+    toggleProps,
     render,
   } = useToggle(props, 'Toggle');
   const variant = ownVariant ?? layout?.variant ?? 'ghost';
@@ -22,8 +21,7 @@ export function Toggle(props: Toggle.Props) {
 
   return render({
     ...rest,
-    'aria-pressed': pressed,
-    'data-value': value,
+    ...toggleProps,
     className: Toggle.Style({ variant, colorScheme, size: resolvedSize, className }),
     style,
     'data-variant': variant,

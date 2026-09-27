@@ -1,152 +1,99 @@
-import { createContext, useContext, type ComponentProps, type ReactNode } from 'react';
+import { ToggleGroupContext, type ToggleGroupSelectionMode } from './context';
+import { useToggleGroup } from './use-toggle-group';
+import { FormValue } from '../../../internal/form-value';
+import { tv } from '../../../utils';
+import { Group, useGroupNameWarning } from '../../utility/group';
 
-import { useControllableState } from '../../../hooks/use-controllable-state';
-import { invariant } from '../../../utils';
-import { Group } from '../../utility/group';
-
-import type { StackDirection } from '../../../layout/types';
-import type { IdsSize } from '../../../tokens/types';
-
-type MultipleValue = Set<string> | readonly string[];
-
-type SingleProps = {
-  type?: 'single';
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-};
-
-type MultipleProps = {
-  type: 'multiple';
-  value?: MultipleValue;
-  defaultValue?: MultipleValue;
-  onValueChange?: (value: Set<string>) => void;
-};
-
-type ToggleGroupContextValue = (
-  | { type: 'single'; value: string }
-  | { type: 'multiple'; value: Set<string> }
-) & {
-  toggle: (itemValue: string) => void;
-  disabled?: boolean;
-};
-
-const ToggleGroupContext = createContext<ToggleGroupContextValue | null>(null);
-
-export function useToggleGroupContext() {
-  return useContext(ToggleGroupContext);
-}
-
-function assertValueShape(
-  type: 'single' | 'multiple',
-  name: 'value' | 'defaultValue',
-  value: unknown,
-) {
-  if (value == null) return;
-
-  if (type === 'multiple') {
-    invariant(
-      value instanceof Set || Array.isArray(value),
-      `\`<ToggleGroup type="multiple">\` expects \`${name}\` to be a \`Set<string>\` or \`string[]\`.`,
-    );
-    return;
-  }
-
-  invariant(
-    typeof value === 'string',
-    `\`<ToggleGroup type="single">\` expects \`${name}\` to be a \`string\`.`,
-  );
-}
-
-function toMultipleSet(value: MultipleValue): Set<string> {
-  if (value instanceof Set) return value;
-  return new Set(value);
-}
-
-export function ToggleGroup({
-  type = 'single',
-  orientation = 'horizontal',
-  size = 'standard',
-  disabled,
-  className,
-  children,
-  value: valueProp,
-  defaultValue,
-  onValueChange,
-  ...rest
-}: ToggleGroup.Props) {
-  const isMultiple = type === 'multiple';
-  const mode = isMultiple ? 'multiple' : 'single';
-
-  assertValueShape(mode, 'value', valueProp);
-  assertValueShape(mode, 'defaultValue', defaultValue);
-
-  const multipleValue =
-    isMultiple && valueProp != null ? toMultipleSet(valueProp as MultipleValue) : undefined;
-  const multipleDefault =
-    isMultiple && defaultValue != null
-      ? toMultipleSet(defaultValue as MultipleValue)
-      : new Set<string>();
-
-  const [value, setValue] = useControllableState<string | Set<string>>({
-    value: isMultiple ? multipleValue : (valueProp as string | undefined),
-    defaultValue: isMultiple ? multipleDefault : ((defaultValue as string | undefined) ?? ''),
-    onValueChange: onValueChange as ((value: string | Set<string>) => void) | undefined,
+export function ToggleGroup<T extends string = string>(props: ToggleGroup.Props<T>) {
+  const {
+    selectionMode,
+    value,
+    defaultValue,
+    onValueChange,
+    orientation,
+    disabled,
+    loop,
+    required,
+    name,
+    form,
+    ref,
+    className,
+    children,
+    ...rest
+  } = props;
+  useGroupNameWarning('ToggleGroup', props);
+  const { context, rootProps, formValue } = useToggleGroup({
+    selectionMode,
+    value,
+    defaultValue,
+    onValueChange,
+    orientation,
+    disabled,
+    loop,
+    required,
+    name,
+    form,
+    ref,
   });
 
-  function toggle(itemValue: string) {
-    if (disabled) return;
-
-    if (isMultiple) {
-      const current = value instanceof Set ? value : new Set<string>();
-      const next = new Set(current);
-      if (next.has(itemValue)) next.delete(itemValue);
-      else next.add(itemValue);
-      setValue(next);
-      return;
-    }
-
-    setValue(value === itemValue ? '' : itemValue);
-  }
-
-  const context: ToggleGroupContextValue = isMultiple
-    ? {
-        type: 'multiple',
-        value: value instanceof Set ? value : new Set(),
-        toggle,
-        disabled,
-      }
-    : {
-        type: 'single',
-        value: typeof value === 'string' ? value : '',
-        toggle,
-        disabled,
-      };
-
   return (
-    <ToggleGroupContext.Provider value={context}>
+    <ToggleGroupContext value={context}>
       <Group
-        orientation={orientation}
-        size={size}
-        className={className}
-        data-disabled={disabled ? '' : undefined}
         {...rest}
+        {...rootProps}
+        orientation={orientation}
+        separator={context.selectionMode === 'single' ? 'decorative' : 'semantic'}
+        className={ToggleGroup.Style({ orientation, className })}
       >
         {children}
+        <FormValue {...formValue} />
       </Group>
-    </ToggleGroupContext.Provider>
+    </ToggleGroupContext>
   );
 }
 
 export namespace ToggleGroup {
+  export type SelectionMode = ToggleGroupSelectionMode;
+
+  type CommonProps = Omit<Group.Props, 'defaultValue' | 'onChange' | 'separator' | 'role'> & {
+    disabled?: boolean;
+    // Arrow keys wrap from the last item to the first.
+    loop?: boolean;
+    // Single: an item stays checked once checked. Both: a native form refuses to submit empty.
+    required?: boolean;
+    // Submits each pressed value under this name.
+    name?: string;
+    form?: string;
+  };
+
+  export type SingleProps<T extends string = string> = CommonProps & {
+    selectionMode?: 'single';
+    value?: T | null;
+    defaultValue?: T | null;
+    onValueChange?: (value: T | null) => void;
+  };
+
+  export type MultipleProps<T extends string = string> = CommonProps & {
+    selectionMode: 'multiple';
+    value?: readonly T[];
+    defaultValue?: readonly T[];
+    onValueChange?: (value: T[]) => void;
+  };
+
+  export type Props<T extends string = string> = SingleProps<T> | MultipleProps<T>;
+  export type SeparatorProps = Group.SeparatorProps;
+
   export const Separator = Group.Separator;
 
-  export type Props = (SingleProps | MultipleProps) &
-    Omit<ComponentProps<'div'>, 'children' | 'className' | 'defaultValue' | 'onChange'> & {
-      orientation?: StackDirection;
-      size?: IdsSize;
-      disabled?: boolean;
-      className?: string;
-      children?: ReactNode;
-    };
+  // In a row stretched wider than its toggles, they share the width like a segmented control. A
+  // column must not: a zero flex basis there collapses the toggles to no height.
+  export const Style = tv({
+    variants: {
+      orientation: {
+        horizontal: '[&>[data-toggle-group-item]]:flex-1',
+        vertical: '',
+      },
+    },
+    defaultVariants: { orientation: 'horizontal' },
+  });
 }
