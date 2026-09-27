@@ -4,4 +4,7 @@ export const messages = {
   otpField: {
     label: '인증 코드',
   },
+  spinner: {
+    label: '불러오는 중',
+  },
 } as const;

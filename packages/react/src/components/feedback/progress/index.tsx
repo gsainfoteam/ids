@@ -60,7 +60,7 @@ export function Progress({
         <div {...aria} {...rootProps} className={circle({ className })}>
           <Arc
             ratio={running ? 0.25 : ratio}
-            spin={running}
+            className={running ? 'size-full animate-spin motion-reduce:animate-none' : 'size-full'}
             trackClassName="text-(--ids-color-muted)"
             indicatorClassName="text-(--progress-fill) transition-[stroke-dashoffset] duration-(--ids-motion-normal) motion-reduce:transition-none"
           />
