@@ -26,11 +26,8 @@
   --ids-motion-fast: 150ms;
   --ids-motion-normal: 250ms;
   --ids-motion-slow: 400ms;
-  --ids-radius-xs: 4px;
-  --ids-radius-sm: 6px;
-  --ids-radius-md: 8px;
-  --ids-radius-lg: 12px;
-  --ids-radius-xl: 16px;
+  --ids-radius-standard: 12px;
+  --ids-radius-indicator: 4px;
   --ids-radius-full: 9999px;
   --ids-size-control-standard: 36px;
   --ids-size-control-tiny: 32px;
@@ -39,11 +36,8 @@
 }
 
 @theme {
-  --radius-xs: var(--ids-radius-xs);
-  --radius-sm: var(--ids-radius-sm);
-  --radius-md: var(--ids-radius-md);
-  --radius-lg: var(--ids-radius-lg);
-  --radius-xl: var(--ids-radius-xl);
+  --radius-standard: var(--ids-radius-standard);
+  --radius-indicator: var(--ids-radius-indicator);
   --radius-full: var(--ids-radius-full);
 }
 
@@ -68,6 +62,359 @@
   &:has([data-text-field-input]:focus-visible),
   &:has([data-text-area-input]:focus-visible) {
     @apply ring-[3px] ring-(--ids-color-primary)/40;
+  }
+}
+
+@property --ids-concentric-pad {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --ids-concentric-nested {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@utility concentric-p-* {
+  --ids-concentric-pad: --spacing(--value(number));
+  padding: var(--ids-concentric-pad);
+  border-radius: calc(
+    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested)
+  );
+}
+
+@layer utilities {
+  [class*="concentric-p-"]:has(.concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 0.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 1);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 1.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 2);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 2.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 1);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 1.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 1.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 2);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 2);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 2);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 2.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 2.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 2.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 2.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 3.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 4.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 5.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 6.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 7.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-0\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 8.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 9);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 9);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 9);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 9);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 9);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-1:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 9);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 9.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-1\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 9.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 10);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 10);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 10);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 10);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-2:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 10);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 10.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-2\.5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 10.5);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 11);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 11);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 11);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-3:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 11);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 12);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 12);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-4:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 12);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 13);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-5:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 13);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 14);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-6:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 14);
+  }
+  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-8:not([popover], [popover] *)) {
+    --ids-concentric-nested: calc(var(--spacing) * 16);
   }
 }
 

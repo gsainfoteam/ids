@@ -40,7 +40,7 @@ export const temporalFieldStyle = tv({
     icon: 'shrink-0 text-(--ids-color-on-muted)',
     value: 'min-w-0 flex-1 truncate',
     clear: [
-      'me-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-sm',
+      'me-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
       'text-(--ids-color-on-muted) enabled:hover:bg-(--ids-color-primary)/10',
       'enabled:hover:text-(--ids-color-on-surface)',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
@@ -51,7 +51,7 @@ export const temporalFieldStyle = tv({
     popupHeader: 'mb-2 flex items-center justify-between px-1',
     popupTitle: 'text-body-b3-medium',
     popupClose: [
-      'inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-sm',
+      'inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-standard',
       'text-(--ids-color-on-muted) hover:bg-(--ids-color-primary)/10',
       'hover:text-(--ids-color-on-surface)',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
@@ -68,13 +68,13 @@ export const temporalFieldStyle = tv({
     },
     size: {
       standard: {
-        root: 'h-(--ids-size-control-standard) rounded-md text-body-b3-regular',
+        root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
         trigger: 'gap-2 px-3',
         icon: 'size-(--ids-size-icon-standard)',
         clear: 'size-7 [&_svg]:size-(--ids-size-icon-standard)',
       },
       tiny: {
-        root: 'h-(--ids-size-control-tiny) rounded-sm text-caption-c1-regular',
+        root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
         trigger: 'gap-1.5 px-2',
         icon: 'size-(--ids-size-icon-tiny)',
         clear: 'size-6 [&_svg]:size-(--ids-size-icon-tiny)',

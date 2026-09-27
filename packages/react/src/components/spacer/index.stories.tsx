@@ -17,7 +17,7 @@ type Story = StoryObj<typeof Spacer>;
 
 export const Playground: Story = {
   render: (args) => (
-    <div className="flex w-72 items-center rounded-lg border border-(--ids-color-outline) p-3">
+    <div className="flex w-72 items-center rounded-standard border border-(--ids-color-outline) p-3">
       <span>제목</span>
       <Spacer {...args} />
       <button type="button">더보기</button>

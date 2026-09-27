@@ -38,7 +38,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 function StateDump({ state }: { state: InteractiveState }) {
   return (
-    <pre className="rounded-lg bg-(--ids-color-muted) px-3 py-2 font-mono text-xs text-(--ids-color-on-muted)">
+    <pre className="rounded-standard bg-(--ids-color-muted) px-3 py-2 font-mono text-xs text-(--ids-color-on-muted)">
       {JSON.stringify(state, null, 2)}
     </pre>
   );

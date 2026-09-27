@@ -39,10 +39,10 @@ export function Card(props: Card.Props) {
 export namespace Card {
   export const Style = tv({
     slots: {
-      root: 'flex flex-col rounded-lg text-(--ids-color-on-surface)',
-      header: 'flex flex-col gap-1 p-4',
-      content: 'flex flex-1 flex-col gap-2 p-4 pt-0',
-      footer: 'flex items-center gap-2 p-4 pt-0',
+      root: 'flex flex-col gap-4 concentric-p-4 text-(--ids-color-on-surface)',
+      header: 'flex flex-col gap-1',
+      content: 'flex flex-1 flex-col gap-2',
+      footer: 'flex items-center gap-2',
       title: 'text-subtitle-s2-semibold',
       description: 'text-body-b3-regular text-(--ids-color-on-muted)',
     },

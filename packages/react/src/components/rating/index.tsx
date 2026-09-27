@@ -295,20 +295,20 @@ export namespace Rating {
   export const Style = tv({
     slots: {
       root: [
-        'relative inline-flex max-w-full flex-wrap rounded-md',
+        'relative inline-flex max-w-full flex-wrap rounded-standard',
         'text-(--ids-rating-color,var(--ids-color-primary))',
         'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-(--ids-color-primary)/40',
         'data-disabled:opacity-50',
       ],
       item: [
-        'relative inline-flex shrink-0 items-center justify-center rounded-md',
+        'relative inline-flex shrink-0 items-center justify-center rounded-standard',
         'has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-(--ids-color-primary)/40',
       ],
       graphic: 'pointer-events-none relative block [&_svg]:size-full',
       track: 'absolute inset-0 text-(--ids-color-outline)',
       fill: 'absolute inset-0',
       circle: 'block size-full rounded-full bg-current',
-      radio: 'touch-manipulation rounded-md outline-none',
+      radio: 'touch-manipulation rounded-standard outline-none',
     },
     variants: {
       size: {

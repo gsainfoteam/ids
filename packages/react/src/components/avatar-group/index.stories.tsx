@@ -109,6 +109,6 @@ export const Square: Story = {
     </AvatarGroup>
   ),
   play: async ({ canvas }) => {
-    await expect(canvas.getByText('+1')).toHaveClass('rounded-lg');
+    await expect(canvas.getByText('+1')).toHaveClass('rounded-standard');
   },
 };

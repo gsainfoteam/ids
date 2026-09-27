@@ -51,7 +51,7 @@ export namespace Alert {
   export const Style = tv({
     slots: {
       root: [
-        'grid w-full items-start gap-y-0.5 rounded-lg px-4 py-3 inset-ring-1',
+        'grid w-full items-start gap-y-0.5 concentric-p-3 px-4 inset-ring-1',
         'bg-(--alert-tint)/8 text-(--ids-color-on-surface) inset-ring-(--alert-tint)/25',
       ],
       icon: [
@@ -62,7 +62,7 @@ export namespace Alert {
       description: 'text-body-b3-regular text-(--ids-color-on-muted)',
       actions: 'mt-2 flex items-center gap-2',
       close: [
-        'inline-flex h-[1lh] w-6 shrink-0 cursor-pointer items-center justify-center rounded-sm',
+        'inline-flex h-[1lh] w-6 shrink-0 cursor-pointer items-center justify-center rounded-standard',
         'text-subtitle-s2-semibold',
         'opacity-60 transition-opacity hover:opacity-100',
         'focus-ring',

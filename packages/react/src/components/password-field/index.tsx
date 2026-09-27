@@ -388,20 +388,20 @@ export namespace PasswordField {
       } satisfies Record<PasswordFieldVariant, object>,
       size: {
         standard: {
-          root: 'h-(--ids-size-control-standard) gap-2 rounded-md px-3 text-body-b3-regular',
+          root: 'h-(--ids-size-control-standard) gap-2 rounded-standard px-3 text-body-b3-regular',
           adornment: [
             'gap-1',
             'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
           ],
-          toggle: 'size-7 rounded-sm',
+          toggle: 'size-7 rounded-standard',
         },
         tiny: {
-          root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-sm px-2 text-caption-c1-regular',
+          root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-2 text-caption-c1-regular',
           adornment: [
             'gap-0.5',
             'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',
           ],
-          toggle: 'size-6 rounded-xs',
+          toggle: 'size-6 rounded-indicator',
         },
       } satisfies Record<IdsSize, object>,
     },

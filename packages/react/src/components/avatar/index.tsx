@@ -87,8 +87,8 @@ export namespace Avatar {
       } satisfies Record<IdsSize, { root: string }>,
     },
     compoundVariants: [
-      { variant: 'square', size: 'standard', class: { root: 'rounded-md' } },
-      { variant: 'square', size: 'tiny', class: { root: 'rounded-sm' } },
+      { variant: 'square', size: 'standard', class: { root: 'rounded-standard' } },
+      { variant: 'square', size: 'tiny', class: { root: 'rounded-standard' } },
     ],
     defaultVariants: { variant: 'circle', size: 'standard' },
   });

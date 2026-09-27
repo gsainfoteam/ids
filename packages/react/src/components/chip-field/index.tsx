@@ -661,10 +661,10 @@ export namespace ChipField {
         '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
         '[&_button]:p-0',
       ],
-      chip: 'inline-flex max-w-full items-center gap-1 rounded-sm bg-(--ids-color-primary)/10',
+      chip: 'inline-flex max-w-full items-center gap-1 rounded-standard bg-(--ids-color-primary)/10',
       chipLabel: 'truncate',
       chipRemove:
-        'shrink-0 cursor-pointer rounded-xs px-0.5 focus-ring disabled:cursor-not-allowed disabled:opacity-50',
+        'shrink-0 cursor-pointer rounded-indicator px-0.5 focus-ring disabled:cursor-not-allowed disabled:opacity-50',
       chipRemoveIcon: 'mx-auto',
       input: [
         'min-w-20 flex-1 bg-transparent py-1 outline-none',

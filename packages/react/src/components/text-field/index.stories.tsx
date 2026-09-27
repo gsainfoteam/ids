@@ -190,7 +190,7 @@ export const Gallery: Story = {
           <TextField placeholder="Search...">
             <MagnifyingGlassIcon />
             <TextField.Input />
-            <kbd className="text-body-b3-regular rounded-md bg-(--ids-color-primary)/15 px-1.5 py-0.5 text-(--ids-color-on-muted)">
+            <kbd className="text-body-b3-regular rounded-standard bg-(--ids-color-primary)/15 px-1.5 py-0.5 text-(--ids-color-on-muted)">
               ⌘K
             </kbd>
           </TextField>

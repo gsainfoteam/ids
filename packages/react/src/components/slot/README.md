@@ -3,7 +3,7 @@
 ```tsx
 import { Slot } from '@gsainfoteam/ids-react';
 
-<Slot className="rounded-xl px-4 py-2" onClick={track}>
+<Slot className="rounded-standard px-4 py-2" onClick={track}>
   <a href="/dashboard">Dashboard</a>
 </Slot>;
 

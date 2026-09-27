@@ -541,7 +541,7 @@ export namespace Select {
       value: 'min-w-0 flex-1 truncate',
       icon: 'shrink-0',
       search: [
-        'mb-2 h-(--ids-size-control-standard) w-full rounded-md bg-transparent px-3 text-body-b3-regular',
+        'mb-2 h-(--ids-size-control-standard) w-full rounded-standard bg-transparent px-3 text-body-b3-regular',
         'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline) placeholder:text-(--ids-color-on-muted)',
         'focus-ring',
       ],

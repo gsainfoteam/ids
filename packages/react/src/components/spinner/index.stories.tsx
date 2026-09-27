@@ -100,7 +100,7 @@ export const Themes: Story = {
             key={`${color}-${mode}`}
             data-color={color}
             data-mode={mode}
-            className="flex items-center gap-3 rounded-xl bg-(--ids-color-surface) p-4 text-(--ids-color-primary)"
+            className="flex items-center gap-3 rounded-standard bg-(--ids-color-surface) p-4 text-(--ids-color-primary)"
           >
             <Spinner label={`${color} ${mode} 불러오는 중`} />
             <span>{`${color} / ${mode}`}</span>

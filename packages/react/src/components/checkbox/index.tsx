@@ -63,7 +63,7 @@ export namespace Checkbox {
     slots: {
       root: 'relative inline-grid shrink-0 align-middle has-disabled:opacity-50',
       box: [
-        'peer col-start-1 row-start-1 size-full appearance-none rounded-xs shadow-xs',
+        'peer col-start-1 row-start-1 size-full appearance-none rounded-indicator shadow-xs',
         'cursor-pointer transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) disabled:cursor-not-allowed',
         'inset-ring-1 inset-ring-(--ids-color-outline)',
         'enabled:hover:bg-(--ids-color-primary)/10',

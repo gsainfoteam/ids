@@ -601,22 +601,22 @@ export namespace NumberField {
       } satisfies Record<NumberFieldVariant, object>,
       size: {
         standard: {
-          root: 'h-(--ids-size-control-standard) gap-2 rounded-md px-3 text-body-b3-regular',
+          root: 'h-(--ids-size-control-standard) gap-2 rounded-standard px-3 text-body-b3-regular',
           adornment: [
             'gap-1',
             'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
           ],
-          stepButton: 'h-4 w-6 rounded-xs',
-          clear: 'size-7 rounded-sm',
+          stepButton: 'h-4 w-6 rounded-indicator',
+          clear: 'size-7 rounded-standard',
         },
         tiny: {
-          root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-sm px-2 text-caption-c1-regular',
+          root: 'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-2 text-caption-c1-regular',
           adornment: [
             'gap-0.5',
             'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',
           ],
-          stepButton: 'h-3.5 w-5 rounded-xs',
-          clear: 'size-6 rounded-xs',
+          stepButton: 'h-3.5 w-5 rounded-indicator',
+          clear: 'size-6 rounded-indicator',
         },
       } satisfies Record<IdsSize, object>,
     },

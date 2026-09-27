@@ -1,5 +1,11 @@
 import { type ClassValue, clsx } from 'clsx';
-import { extendTailwindMerge } from 'tailwind-merge';
+import {
+  type ConfigExtension,
+  type DefaultClassGroupIds,
+  type DefaultThemeGroupIds,
+  extendTailwindMerge,
+  validators,
+} from 'tailwind-merge';
 
 const idsTextSizes = [
   'text-headline-h1-bold',
@@ -48,15 +54,37 @@ const idsTextSizes = [
   'text-button-tiny',
 ] as const;
 
-export const twMergeConfig = {
+// concentric-p-* sets both padding and radius, so it replaces an earlier p-* or rounded-*.
+// The reverse is left alone on purpose: a later p-6 must not strip the concentric radius.
+const paddingGroups: DefaultClassGroupIds[] = ['p', 'px', 'py', 'ps', 'pe', 'pt', 'pr', 'pb', 'pl'];
+const roundedGroups: DefaultClassGroupIds[] = [
+  'rounded',
+  'rounded-s',
+  'rounded-e',
+  'rounded-t',
+  'rounded-r',
+  'rounded-b',
+  'rounded-l',
+];
+
+type IdsClassGroupIds = DefaultClassGroupIds | 'concentric-p';
+
+export const twMergeConfig: ConfigExtension<IdsClassGroupIds, DefaultThemeGroupIds> = {
   extend: {
+    theme: {
+      radius: ['standard', 'indicator'],
+    },
     classGroups: {
       'font-size': [...idsTextSizes],
+      'concentric-p': [{ 'concentric-p': [validators.isNumber] }],
+    },
+    conflictingClassGroups: {
+      'concentric-p': [...paddingGroups, ...roundedGroups],
     },
   },
-} as const;
+};
 
-const twMerge = extendTailwindMerge(twMergeConfig);
+const twMerge = extendTailwindMerge<IdsClassGroupIds>(twMergeConfig);
 
 export function cn(...classes: ClassValue[]) {
   return twMerge(clsx(classes));

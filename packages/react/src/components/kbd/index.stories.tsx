@@ -64,7 +64,7 @@ export const Themes: Story = {
         <div
           key={mode}
           data-mode={mode}
-          className="flex items-center gap-2 rounded-xl bg-(--ids-color-surface) p-4 text-(--ids-color-on-surface)"
+          className="flex items-center gap-2 rounded-standard bg-(--ids-color-surface) p-4 text-(--ids-color-on-surface)"
         >
           <span>{mode}</span>
           <Kbd>Ctrl</Kbd>

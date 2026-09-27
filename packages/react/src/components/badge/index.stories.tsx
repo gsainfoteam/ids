@@ -50,7 +50,7 @@ export const Placements: Story = {
     <div className="flex gap-8 p-4">
       {PLACEMENTS.map((placement) => (
         <Badge key={placement} content={9} placement={placement}>
-          <div className="size-12 rounded-lg bg-(--ids-color-muted)" />
+          <div className="size-12 rounded-standard bg-(--ids-color-muted)" />
         </Badge>
       ))}
     </div>
@@ -128,7 +128,7 @@ export const ColorSchemes: Story = {
     <div className="flex items-center gap-6 p-2">
       {(['neutral', 'primary', 'success', 'warning', 'danger', 'info'] as const).map((scheme) => (
         <Badge key={scheme} content={5} colorScheme={scheme}>
-          <div className="size-8 rounded-lg bg-(--ids-color-muted)" />
+          <div className="size-8 rounded-standard bg-(--ids-color-muted)" />
         </Badge>
       ))}
     </div>

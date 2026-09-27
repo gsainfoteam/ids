@@ -319,7 +319,7 @@ export namespace ColorField {
         'flex h-full min-w-0 flex-1 touch-manipulation items-center text-left outline-none',
         'cursor-pointer disabled:cursor-not-allowed disabled:opacity-50',
       ],
-      swatch: 'shrink-0 rounded-xs inset-ring-1 inset-ring-(--ids-color-outline)',
+      swatch: 'shrink-0 rounded-indicator inset-ring-1 inset-ring-(--ids-color-outline)',
       value: 'min-w-0 flex-1 truncate font-mono',
       clear: [
         'inline-flex shrink-0 cursor-pointer items-center justify-center text-(--ids-color-on-muted)',
@@ -328,7 +328,7 @@ export namespace ColorField {
       header: 'mb-2 flex items-center justify-between px-1',
       title: 'text-body-b3-medium',
       close: [
-        'inline-flex size-7 cursor-pointer items-center justify-center rounded-sm',
+        'inline-flex size-7 cursor-pointer items-center justify-center rounded-standard',
         'focus-ring [&_svg]:size-(--ids-size-icon-standard)',
       ],
     },
@@ -340,16 +340,16 @@ export namespace ColorField {
       },
       size: {
         standard: {
-          root: 'h-(--ids-size-control-standard) rounded-md text-body-b3-regular',
+          root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
           trigger: 'gap-2 px-3',
           swatch: 'size-5',
-          clear: 'mr-1 size-7 rounded-sm [&_svg]:size-(--ids-size-icon-standard)',
+          clear: 'mr-1 size-7 rounded-standard [&_svg]:size-(--ids-size-icon-standard)',
         },
         tiny: {
-          root: 'h-(--ids-size-control-tiny) rounded-sm text-caption-c1-regular',
+          root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
           trigger: 'gap-1.5 px-2',
           swatch: 'size-4',
-          clear: 'mr-1 size-6 rounded-xs [&_svg]:size-(--ids-size-icon-tiny)',
+          clear: 'mr-1 size-6 rounded-indicator [&_svg]:size-(--ids-size-icon-tiny)',
         },
       } satisfies Record<IdsSize, object>,
     },

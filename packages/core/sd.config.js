@@ -304,6 +304,56 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 }
 `;
 
+// Concentric radius: a padded container's corner is its content's corner plus the padding,
+// so nested corners share a centre. CSS values only flow downwards, so a container cannot
+// read its children's radius. Instead each nested padding it contains is matched with :has()
+// and summed into --ids-concentric-nested. A two-level selector has higher specificity than
+// a one-level one, and rules of equal level are emitted in ascending order, so the deepest
+// and largest sum always wins. Popovers render inside the trigger's subtree but are not
+// nested visually, so they are excluded.
+const CONCENTRIC_PADS = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8];
+
+const concentricClass = (n) => `.concentric-p-${String(n).replace(".", "\\.")}`;
+const notInPopover = (sel) => `${sel}:not([popover], [popover] *)`;
+
+const buildConcentricCSS = () => {
+  const one = CONCENTRIC_PADS.map((a) => ({ sum: a, sel: notInPopover(concentricClass(a)) }));
+  const two = CONCENTRIC_PADS.flatMap((a) =>
+    CONCENTRIC_PADS.map((b) => ({
+      sum: a + b,
+      sel: notInPopover(`${concentricClass(a)} ${concentricClass(b)}`),
+    })),
+  );
+  const rule = ({ sum, sel }) =>
+    `  [class*="concentric-p-"]:has(${sel}) {\n    --ids-concentric-nested: calc(var(--spacing) * ${sum});\n  }`;
+  const byLevel = (rules) => rules.sort((x, y) => x.sum - y.sum).map(rule);
+
+  return `@property --ids-concentric-pad {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --ids-concentric-nested {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@utility concentric-p-* {
+  --ids-concentric-pad: --spacing(--value(number));
+  padding: var(--ids-concentric-pad);
+  border-radius: calc(
+    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested)
+  );
+}
+
+@layer utilities {
+${[...byLevel(one), ...byLevel(two)].join("\n")}
+}
+`;
+};
+
 // :root { --ids-text-button-standard: ...; --ids-font-size-h1: ... }
 // @theme { --text-button-standard: var(--ids-text-button-standard); --font-weight-semibold: ... }
 const buildTypographyCSS = (dictionary) => {
@@ -356,6 +406,7 @@ const cssFormatter = ({ dictionary }) =>
     buildStaticCSS(dictionary),
     T_CSS_ANIMATIONS,
     T_CSS_UTILITIES,
+    buildConcentricCSS(),
     buildTypographyCSS(dictionary),
     ...colorPairs.map(([c, m]) =>
       buildColorThemeCSS(

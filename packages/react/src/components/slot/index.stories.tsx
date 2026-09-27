@@ -18,14 +18,14 @@ type Story = StoryObj<typeof Slot>;
 
 export const Playground: Story = {
   render: () => (
-    <Slot className="rounded-xl bg-(--ids-color-primary) px-4 py-2 text-(--ids-color-on-primary)">
+    <Slot className="rounded-standard bg-(--ids-color-primary) px-4 py-2 text-(--ids-color-on-primary)">
       <a href="#slot">Slot이 감싼 링크</a>
     </Slot>
   ),
   play: async ({ canvas }) => {
     const link = canvas.getByRole('link', { name: 'Slot이 감싼 링크' });
     await expect(link.tagName).toBe('A');
-    await expect(link).toHaveClass('rounded-xl');
+    await expect(link).toHaveClass('rounded-standard');
   },
 };
 

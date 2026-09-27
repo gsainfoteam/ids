@@ -493,15 +493,15 @@ export namespace FileField {
       value: 'min-w-0 flex-1 truncate',
       clear: [
         iconSquare.base,
-        'inline-flex cursor-pointer items-center justify-center rounded-md text-(--ids-color-on-muted)',
+        'inline-flex cursor-pointer items-center justify-center rounded-standard text-(--ids-color-on-muted)',
         'focus-ring disabled:cursor-not-allowed disabled:opacity-50',
       ],
       list: 'grid gap-1',
-      item: 'flex min-w-0 items-center gap-2 rounded-md bg-(--ids-color-primary)/5 px-3 py-1',
+      item: 'flex min-w-0 items-center gap-2 rounded-standard bg-(--ids-color-primary)/5 px-3 py-1',
       itemName: 'min-w-0 flex-1 truncate',
       itemSize: 'shrink-0 text-caption-c1-regular text-(--ids-color-on-muted)',
       itemRemove: [
-        'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-xs',
+        'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-indicator',
         'focus-ring disabled:cursor-not-allowed disabled:opacity-50',
         '[&_svg]:size-(--ids-size-icon-tiny)',
       ],
@@ -517,7 +517,7 @@ export namespace FileField {
         },
         dropzone: {
           trigger: [
-            'min-h-32 justify-center rounded-lg p-6',
+            'min-h-32 justify-center concentric-p-6',
             'border border-dashed border-(--ids-color-outline)',
             'aria-invalid:border-(--ids-color-danger)',
           ],
@@ -542,12 +542,12 @@ export namespace FileField {
       {
         variant: 'outline',
         size: 'standard',
-        class: { trigger: 'h-(--ids-size-control-standard) rounded-md px-3' },
+        class: { trigger: 'h-(--ids-size-control-standard) rounded-standard px-3' },
       },
       {
         variant: 'outline',
         size: 'tiny',
-        class: { trigger: 'h-(--ids-size-control-tiny) rounded-sm px-2' },
+        class: { trigger: 'h-(--ids-size-control-tiny) rounded-standard px-2' },
       },
     ],
     defaultVariants: { variant: 'outline', size: 'standard' },

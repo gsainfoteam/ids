@@ -65,7 +65,7 @@ const CalendarStyle = tv({
     header: 'mb-2 flex items-center justify-between gap-2',
     navigation: 'flex w-full items-center gap-2',
     navButton: [
-      'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md',
+      'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
       'enabled:hover:bg-(--ids-color-primary)/10',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
@@ -82,7 +82,7 @@ const CalendarStyle = tv({
     cell: 'relative isolate min-w-0',
     band: 'pointer-events-none absolute inset-y-0 -z-10 bg-(--ids-color-primary)/10',
     day: [
-      'flex w-full cursor-pointer items-center justify-center rounded-sm',
+      'flex w-full cursor-pointer items-center justify-center rounded-standard',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
       'focus-ring',

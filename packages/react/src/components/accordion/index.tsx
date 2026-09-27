@@ -148,11 +148,11 @@ export namespace Accordion {
     variants: {
       variant: {
         bordered: {
-          root: 'overflow-hidden rounded-lg inset-ring-1 inset-ring-(--ids-color-outline) [&>*+*]:border-t [&>*+*]:border-(--ids-color-outline)',
+          root: 'overflow-hidden rounded-[calc(var(--ids-radius-standard)+var(--spacing)*4)] inset-ring-1 inset-ring-(--ids-color-outline) [&>*+*]:border-t [&>*+*]:border-(--ids-color-outline)',
         },
         separated: {
           root: 'gap-2',
-          item: 'overflow-hidden rounded-lg inset-ring-1 inset-ring-(--ids-color-outline)',
+          item: 'overflow-hidden rounded-[calc(var(--ids-radius-standard)+var(--spacing)*4)] inset-ring-1 inset-ring-(--ids-color-outline)',
         },
         ghost: {},
       },

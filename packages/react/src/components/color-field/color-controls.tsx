@@ -201,7 +201,7 @@ export function ColorControls({
 const Style = tv({
   slots: {
     root: 'grid gap-3 p-1',
-    area: 'focus-ring relative w-full touch-none overflow-hidden rounded-md',
+    area: 'focus-ring relative w-full touch-none overflow-hidden rounded-standard',
     thumb:
       'pointer-events-none absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow',
     label: 'grid gap-1 text-caption-c1-regular',
@@ -215,7 +215,7 @@ const Style = tv({
     // The selected ring sits behind a surface-colored gap so it stays visible against a swatch of
     // the same hue as the primary color.
     swatch: [
-      'size-7 cursor-pointer rounded-sm inset-ring-1 inset-ring-(--ids-color-outline)',
+      'size-7 cursor-pointer rounded-standard inset-ring-1 inset-ring-(--ids-color-outline)',
       'aria-pressed:ring-2 aria-pressed:ring-(--ids-color-primary) aria-pressed:ring-offset-2 aria-pressed:ring-offset-(--ids-color-surface)',
       'focus-ring',
     ],
@@ -225,11 +225,11 @@ const Style = tv({
     size: {
       standard: {
         area: 'h-50',
-        input: 'h-(--ids-size-control-standard) rounded-md px-3 text-body-b3-regular',
+        input: 'h-(--ids-size-control-standard) rounded-standard px-3 text-body-b3-regular',
       },
       tiny: {
         area: 'h-35',
-        input: 'h-(--ids-size-control-tiny) rounded-sm px-2 text-caption-c1-regular',
+        input: 'h-(--ids-size-control-tiny) rounded-standard px-2 text-caption-c1-regular',
       },
     },
   },

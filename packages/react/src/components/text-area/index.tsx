@@ -232,10 +232,10 @@ export namespace TextArea {
       },
     },
     compoundVariants: [
-      { variant: 'outline', size: 'standard', class: { root: 'rounded-md' } },
-      { variant: 'outline', size: 'tiny', class: { root: 'rounded-sm' } },
-      { variant: 'filled', size: 'standard', class: { root: 'rounded-md' } },
-      { variant: 'filled', size: 'tiny', class: { root: 'rounded-sm' } },
+      { variant: 'outline', size: 'standard', class: { root: 'rounded-standard' } },
+      { variant: 'outline', size: 'tiny', class: { root: 'rounded-standard' } },
+      { variant: 'filled', size: 'standard', class: { root: 'rounded-standard' } },
+      { variant: 'filled', size: 'tiny', class: { root: 'rounded-standard' } },
     ],
     defaultVariants: {
       variant: 'outline',

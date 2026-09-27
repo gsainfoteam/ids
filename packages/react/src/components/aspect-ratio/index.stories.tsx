@@ -26,7 +26,7 @@ type Story = StoryObj<typeof AspectRatio>;
 
 export const Playground: Story = {
   render: (args) => (
-    <AspectRatio {...args} className="rounded-xl bg-(--ids-color-primary)/15">
+    <AspectRatio {...args} className="rounded-standard bg-(--ids-color-primary)/15">
       <div className="flex h-full items-center justify-center">비율을 유지하는 영역</div>
     </AspectRatio>
   ),
@@ -64,7 +64,7 @@ export const Responsive: Story = {
 
 export const IntrinsicContent: Story = {
   render: () => (
-    <AspectRatio data-testid="square" className="overflow-hidden rounded-xl bg-(--ids-color-muted)">
+    <AspectRatio data-testid="square" className="overflow-hidden rounded-standard bg-(--ids-color-muted)">
       <div className="h-96">콘텐츠가 커도 바깥 정사각형 비율은 유지됩니다.</div>
     </AspectRatio>
   ),

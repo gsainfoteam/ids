@@ -85,7 +85,7 @@ export const ContentBeforeHeader: Story = {
   render: () => (
     <Card variant="elevated">
       <Card.Content className="p-0">
-        <div className="aspect-video w-full rounded-t-xl bg-(--ids-color-muted)" />
+        <div className="aspect-video w-full rounded-t-[inherit] bg-(--ids-color-muted)" />
       </Card.Content>
       <Card.Header>
         <Card.Title>기계식 키보드</Card.Title>

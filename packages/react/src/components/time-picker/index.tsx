@@ -56,14 +56,14 @@ const TimePickerStyle = tv({
     header: 'flex w-full basis-full justify-around gap-2 text-(--ids-color-on-muted)',
     separator: 'self-center text-(--ids-color-on-muted)',
     column: [
-      'group relative min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-lg',
+      'group relative min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-standard',
       // A real border, not inset-ring: on a scroll container the inset shadow is painted
       // under the options, so a highlighted option scrolling past the edge would hide it.
       'border border-(--ids-color-outline)',
       'focus-ring',
     ],
     option: [
-      'flex shrink-0 snap-center items-center justify-center rounded-sm px-2 tabular-nums select-none',
+      'flex shrink-0 snap-center items-center justify-center rounded-standard px-2 tabular-nums select-none',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
     ],

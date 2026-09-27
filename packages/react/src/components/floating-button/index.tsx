@@ -196,7 +196,7 @@ export namespace FloatingButton {
         standard: 'min-h-14 gap-2 px-5 text-button-standard',
         tiny: 'min-h-11 gap-1.5 px-3 text-button-tiny [&_svg]:size-5',
       },
-      iconOnly: { true: 'aspect-square rounded-full p-0', false: 'rounded-lg py-3' },
+      iconOnly: { true: 'aspect-square rounded-full p-0', false: 'rounded-standard py-3' },
       placement: {
         'top-left':
           'top-[calc(1.5rem+env(safe-area-inset-top))] left-[calc(1.5rem+env(safe-area-inset-left))]',

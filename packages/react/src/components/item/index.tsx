@@ -42,7 +42,7 @@ export function Item(props: Item.Props) {
 export namespace Item {
   export const Style = tv({
     slots: {
-      root: 'flex w-full items-center rounded-lg bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+      root: 'flex w-full items-center bg-(--ids-color-surface) text-(--ids-color-on-surface)',
       media:
         'inline-flex shrink-0 items-center justify-center text-(--ids-color-on-muted) [&_svg]:size-(--ids-size-icon-standard)',
       content: 'flex min-w-0 flex-1 flex-col',
@@ -52,8 +52,8 @@ export namespace Item {
     },
     variants: {
       size: {
-        standard: { root: 'min-h-14 gap-3 p-3' },
-        tiny: { root: 'min-h-10 gap-2 p-2' },
+        standard: { root: 'min-h-14 gap-3 concentric-p-3' },
+        tiny: { root: 'min-h-10 gap-2 concentric-p-2' },
       } satisfies Record<IdsSize, { root: string }>,
       interactive: {
         true: {

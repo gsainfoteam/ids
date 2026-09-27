@@ -441,8 +441,8 @@ export namespace OTPField {
       } satisfies Record<IdsSize, object>,
     },
     compoundVariants: [
-      { variant: ['outline', 'filled'], size: 'standard', class: { slot: 'rounded-md' } },
-      { variant: ['outline', 'filled'], size: 'tiny', class: { slot: 'rounded-sm' } },
+      { variant: ['outline', 'filled'], size: 'standard', class: { slot: 'rounded-standard' } },
+      { variant: ['outline', 'filled'], size: 'tiny', class: { slot: 'rounded-standard' } },
     ],
     defaultVariants: {
       variant: 'outline',

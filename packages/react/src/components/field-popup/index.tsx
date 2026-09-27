@@ -60,8 +60,8 @@ export const fieldTrigger = {
     unstyled: 'bg-transparent',
   } satisfies Record<FieldTriggerVariant, string>,
   size: {
-    standard: 'h-(--ids-size-control-standard) rounded-md px-3 text-body-b3-regular',
-    tiny: 'h-(--ids-size-control-tiny) rounded-sm px-2 text-caption-c1-regular',
+    standard: 'h-(--ids-size-control-standard) rounded-standard px-3 text-body-b3-regular',
+    tiny: 'h-(--ids-size-control-tiny) rounded-standard px-2 text-caption-c1-regular',
   } satisfies Record<IdsSize, string>,
   icon: {
     standard: 'size-(--ids-size-icon-standard)',
@@ -71,7 +71,7 @@ export const fieldTrigger = {
 
 export const fieldListbox = {
   option:
-    'flex cursor-default items-center rounded-sm px-3 py-2 wrap-anywhere data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-50',
+    'flex cursor-default items-center rounded-standard px-3 py-2 wrap-anywhere data-active:bg-(--ids-color-primary)/15 aria-selected:font-semibold aria-disabled:opacity-50',
   heading: 'px-3 py-2 text-caption-c1-regular text-(--ids-color-on-muted)',
   empty: 'p-3 text-body-b3-regular',
 } as const;
@@ -165,7 +165,7 @@ export function FieldPopup({
       className={cn(
         // A real border, not inset-ring: on a scroll container the inset shadow is painted
         // under the content, so highlighted options scrolling past the edge would hide it.
-        'text-body-b3-regular fixed z-50 m-0 overflow-auto overscroll-contain rounded-lg border border-(--ids-color-outline) bg-(--ids-color-surface) p-2 text-(--ids-color-on-surface) shadow-lg [overflow-anchor:none]',
+        'text-body-b3-regular fixed z-50 m-0 overflow-auto overscroll-contain concentric-p-2 border border-(--ids-color-outline) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-lg [overflow-anchor:none]',
         props.className,
       )}
       style={{ ...props.style, position: 'fixed' }}

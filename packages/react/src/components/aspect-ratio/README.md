@@ -4,7 +4,7 @@
 import { AspectRatio } from '@gsainfoteam/ids-react';
 
 <div className="w-80 max-w-full">
-  <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-xl">
+  <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-standard">
     <img src="/cover.jpg" alt="표지" className="h-full w-full object-cover" />
   </AspectRatio>
 </div>
