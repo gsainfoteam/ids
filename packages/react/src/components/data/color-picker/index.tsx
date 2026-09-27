@@ -16,6 +16,7 @@ import { fieldSurface } from '../../../internal/field-surface';
 import { messages } from '../../../internal/messages';
 import { cn, invariant, mergeProps, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
+import { Slider } from '../../form/slider';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -53,7 +54,7 @@ type Context = {
   format: ColorFormat;
   alpha: boolean;
   swatches: ColorPickerSwatchOption[] | undefined;
-  thumb: number;
+  size: IdsSize;
   styles: ReturnType<typeof ColorPicker.Style>;
 };
 
@@ -75,9 +76,6 @@ const overChecker = (css: string): CSSProperties => ({
   backgroundImage: `linear-gradient(${css}, ${css}), ${CHECKER}`,
   backgroundSize: '100% 100%, 8px 8px',
 });
-// The thumb stays inside its track, so it travels the track's length minus its own width.
-const thumbLeft = (ratio: number, thumb: number) =>
-  `calc(${ratio} * (100% - ${thumb}px) + ${thumb / 2}px)`;
 const swatchValue = (swatch: ColorPickerSwatchOption) =>
   typeof swatch === 'string' ? swatch : swatch.value;
 
@@ -106,19 +104,9 @@ export function ColorPicker({
   });
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const state: ColorPickerState = { disabled, readOnly, empty: !picker.state.value, alpha };
-  const styles = ColorPicker.Style({ size: resolvedSize });
+  const styles = ColorPicker.Style({ size: resolvedSize, disabled });
   return (
-    <PickerContext
-      value={{
-        picker,
-        state,
-        format,
-        alpha,
-        swatches,
-        thumb: resolvedSize === 'tiny' ? 14 : 16,
-        styles,
-      }}
-    >
+    <PickerContext value={{ picker, state, format, alpha, swatches, size: resolvedSize, styles }}>
       <div
         role="group"
         {...props}
@@ -226,91 +214,71 @@ function ColorPickerArea({ className, style, ...props }: ColorPicker.AreaProps) 
   );
 }
 
-function ColorPickerHueSlider({ className, style, ...props }: ColorPicker.SliderProps) {
+// The gradients run left to right in any page direction, so `dir="ltr"` keeps Slider's arrow keys
+// and pointer mapping from flipping in a right-to-left page.
+function ColorPickerHueSlider({ className, ...props }: ColorPicker.SliderProps) {
   const c = usePicker('ColorPicker.HueSlider');
   const { color } = c.picker.state;
-  const hue = Math.round(color.h);
-  const handlers = c.picker.slider('hue', c.thumb);
   return (
-    <div
-      {...mergeProps(props, {
-        onPointerDown: handlers.onPointerDown,
-        onPointerMove: handlers.onPointerMove,
-      })}
+    <Slider
+      {...props}
       dir="ltr"
       data-color-picker-hue=""
-      data-disabled={c.state.disabled ? '' : undefined}
+      min={0}
+      max={360}
+      largeStep={10}
+      value={Math.round(color.h)}
+      onValueChange={(hue) => c.picker.actions.setChannel('hue', hue)}
+      formatLabel={messages.colorPicker.hueValue}
+      valueLabel="never"
+      aria-label={props['aria-label'] ?? messages.colorPicker.hue}
+      size={c.size}
+      disabled={c.state.disabled}
+      readOnly={c.state.readOnly}
       className={c.styles.slider({ className })}
-      style={{ ...style, backgroundImage: HUES }}
     >
-      <span
-        aria-hidden="true"
-        className={c.styles.sliderThumb()}
-        style={{
-          left: thumbLeft(color.h / 360, c.thumb),
-          backgroundColor: `hsl(${color.h} 100% 50%)`,
-        }}
-      />
-      <input
-        type="range"
-        min={0}
-        max={360}
-        step={1}
-        value={hue}
-        aria-label={props['aria-label'] ?? messages.colorPicker.hue}
-        aria-valuetext={messages.colorPicker.hueValue(hue)}
-        aria-readonly={c.state.readOnly || undefined}
-        disabled={c.state.disabled}
-        className={c.styles.channel()}
-        onChange={(event) => c.picker.actions.onChannelChange('hue', event)}
-        onKeyDown={handlers.onKeyDown}
-      />
-    </div>
+      <Slider.Track className={c.styles.track()} style={{ backgroundImage: HUES }}>
+        <Slider.Thumb
+          className={c.styles.sliderThumb()}
+          style={{ backgroundColor: `hsl(${color.h} 100% 50%)` }}
+        />
+      </Slider.Track>
+    </Slider>
   );
 }
 
-function ColorPickerAlphaSlider({ className, style, ...props }: ColorPicker.SliderProps) {
+function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.SliderProps) {
   const c = usePicker('ColorPicker.AlphaSlider');
   if (!c.alpha) return null;
   const { color, rgba } = c.picker.state;
-  const percent = Math.round(color.a * 100);
-  const handlers = c.picker.slider('alpha', c.thumb);
   return (
-    <div
-      {...mergeProps(props, {
-        onPointerDown: handlers.onPointerDown,
-        onPointerMove: handlers.onPointerMove,
-      })}
+    <Slider
+      {...props}
       dir="ltr"
       data-color-picker-alpha=""
-      data-disabled={c.state.disabled ? '' : undefined}
+      min={0}
+      max={100}
+      largeStep={10}
+      value={Math.round(color.a * 100)}
+      onValueChange={(percent) => c.picker.actions.setChannel('alpha', percent)}
+      formatLabel={messages.colorPicker.percent}
+      valueLabel="never"
+      aria-label={props['aria-label'] ?? messages.colorPicker.alpha}
+      size={c.size}
+      disabled={c.state.disabled}
+      readOnly={c.state.readOnly}
       className={c.styles.slider({ className })}
-      style={{
-        ...style,
-        backgroundImage: `linear-gradient(to right, transparent, ${cssColor({ ...rgba, alpha: 1 })}), ${CHECKER}`,
-        backgroundSize: '100% 100%, 8px 8px',
-      }}
     >
-      <span
-        aria-hidden="true"
-        className={c.styles.sliderThumb()}
-        style={{ left: thumbLeft(color.a, c.thumb), ...overChecker(cssColor(rgba)) }}
-      />
-      <input
-        type="range"
-        min={0}
-        max={100}
-        step={1}
-        value={percent}
-        aria-label={props['aria-label'] ?? messages.colorPicker.alpha}
-        aria-valuetext={messages.colorPicker.percent(percent)}
-        aria-readonly={c.state.readOnly || undefined}
-        disabled={c.state.disabled}
-        className={c.styles.channel()}
-        onChange={(event) => c.picker.actions.onChannelChange('alpha', event)}
-        onKeyDown={handlers.onKeyDown}
-      />
-    </div>
+      <Slider.Track
+        className={c.styles.track()}
+        style={{
+          backgroundImage: `linear-gradient(to right, transparent, ${cssColor({ ...rgba, alpha: 1 })}), ${CHECKER}`,
+          backgroundSize: '100% 100%, 8px 8px',
+        }}
+      >
+        <Slider.Thumb className={c.styles.sliderThumb()} style={overChecker(cssColor(rgba))} />
+      </Slider.Track>
+    </Slider>
   );
 }
 
@@ -464,7 +432,10 @@ export namespace ColorPicker {
   export type SwatchOption = ColorPickerSwatchOption;
 
   export type AreaProps = Omit<ComponentProps<'div'>, 'children'>;
-  export type SliderProps = Omit<ComponentProps<'div'>, 'children'>;
+  export type SliderProps = Omit<
+    ComponentProps<'div'>,
+    'children' | 'defaultValue' | 'onChange' | 'role'
+  >;
   export type InputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue' | 'type'>;
   export type ButtonProps = ComponentProps<'button'>;
   export type SwatchesProps = ComponentProps<'div'>;
@@ -482,10 +453,10 @@ export namespace ColorPicker {
   export const Swatches = ColorPickerSwatches;
   export const Swatch = ColorPickerSwatch;
 
+  // A white ring with a dark hairline reads on every color a thumb can sit on.
   const thumb = cn(
-    'pointer-events-none absolute rounded-full border-2 border-white',
+    'rounded-full border-2 border-white',
     'shadow-[0_0_0_1px_rgb(0_0_0/0.25),0_1px_3px_rgb(0_0_0/0.3)]',
-    'transition-[box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
   );
 
   export const Style = tv({
@@ -497,22 +468,19 @@ export namespace ColorPicker {
       ],
       areaThumb: [
         thumb,
-        '-translate-x-1/2 -translate-y-1/2',
+        'pointer-events-none absolute -translate-x-1/2 -translate-y-1/2',
+        'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none',
         'group-has-[input:focus-visible]/area:ring-[3px] group-has-[input:focus-visible]/area:ring-(--ids-color-primary)/50',
       ],
       // The native inputs that carry each channel for keyboards and assistive technology.
       channel: 'sr-only',
       row: 'flex min-w-0 items-center gap-2',
-      sliders: 'grid min-w-0 flex-1 gap-3',
-      slider: [
-        'group/slider relative w-full cursor-pointer touch-none rounded-full select-none',
-        'inset-ring-1 inset-ring-(--ids-color-on-surface)/10 data-disabled:cursor-not-allowed',
-      ],
-      sliderThumb: [
-        thumb,
-        'top-1/2 -translate-x-1/2 -translate-y-1/2',
-        'group-has-[input:focus-visible]/slider:ring-[3px] group-has-[input:focus-visible]/slider:ring-(--ids-color-primary)/50',
-      ],
+      sliders: 'grid min-w-0 flex-1 gap-2',
+      slider: 'cursor-pointer',
+      track: 'inset-ring-1 inset-ring-(--ids-color-on-surface)/10',
+      // The thumb is filled with its color, so Slider's primary edge and hover ring give way to
+      // the white ring.
+      sliderThumb: [thumb, 'inset-ring-0 hover:ring-0'],
       input: [
         fieldSurface.base,
         fieldSurface.variant.outline,
@@ -539,8 +507,7 @@ export namespace ColorPicker {
         standard: {
           area: 'h-40',
           areaThumb: 'size-4',
-          slider: 'h-3',
-          sliderThumb: 'size-4',
+          slider: '[--slider-track:0.75rem]',
           input: fieldSurface.size.standard,
           tool: 'size-(--ids-size-control-standard) [&_svg]:size-(--ids-size-icon-standard)',
           swatch: 'size-7',
@@ -548,13 +515,17 @@ export namespace ColorPicker {
         tiny: {
           area: 'h-32',
           areaThumb: 'size-3.5',
-          slider: 'h-2.5',
-          sliderThumb: 'size-3.5',
+          slider: '[--slider-track:0.625rem]',
           input: fieldSurface.size.tiny,
           tool: 'size-(--ids-size-control-tiny) [&_svg]:size-(--ids-size-icon-tiny)',
           swatch: 'size-6',
         },
       } satisfies Record<IdsSize, object>,
+      // A disabled picker is dimmed once, at its root. The parts that dim themselves when disabled
+      // would otherwise dim a second time over it.
+      disabled: {
+        true: { slider: 'data-disabled:opacity-100' },
+      },
     },
     defaultVariants: { size: 'standard' },
   });

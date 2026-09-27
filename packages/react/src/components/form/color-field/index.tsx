@@ -95,8 +95,11 @@ const isNode = (value: unknown): value is Node =>
 
 // Focus lands on the first control of whatever the popup holds: the area, a slider, the
 // input, or the chosen swatch of a palette-only picker.
-const FIRST_CONTROL =
-  '[data-color-picker] input:not([tabindex="-1"]), [data-color-picker] [role=radio][tabindex="0"]';
+const FIRST_CONTROL = [
+  '[data-color-picker] input:not([tabindex="-1"])',
+  '[data-color-picker] [role=slider]:not([tabindex="-1"])',
+  '[data-color-picker] [role=radio][tabindex="0"]',
+].join(', ');
 
 const CHECKER =
   'conic-gradient(var(--ids-color-muted) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-muted) 0 75%, var(--ids-color-surface) 0)';

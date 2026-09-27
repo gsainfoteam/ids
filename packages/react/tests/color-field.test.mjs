@@ -63,7 +63,11 @@ async function type(node, value) {
 const trigger = () => host.querySelector('[data-color-field] button[aria-haspopup]');
 const dialog = () => host.querySelector('[role=dialog]');
 const editor = () => host.querySelector('[data-color-picker-input]');
-const slider = (name) => host.querySelector(`input[type=range][aria-label="${name}"]`);
+// The area's two axes are native range inputs; hue and alpha are Slider thumbs.
+const slider = (name) =>
+  host.querySelector(
+    `input[type=range][aria-label="${name}"], [role=slider][aria-label="${name}"]`,
+  );
 const swatch = (name) => host.querySelector(`[role=radio][aria-label="${name}"]`);
 const clearButton = () => host.querySelector('[data-color-field-clear]');
 function tracked(props = {}, ...children) {
@@ -171,9 +175,9 @@ test('every change reaches onValueChange at once; a typed value waits for Enter'
   assert.ok(dialog(), 'choosing a swatch keeps the popup open');
   await key(slider('채도'), 'ArrowDown', { shiftKey: true });
   assert.equal(state.changes.at(-1), '#00E600FF');
-  await type(slider('투명도'), '50');
-  assert.equal(state.changes.at(-1), '#00E60080');
-  assert.equal(trigger().textContent, '#00E60080');
+  await key(slider('투명도'), 'Home');
+  assert.equal(state.changes.at(-1), '#00E60000');
+  assert.equal(trigger().textContent, '#00E60000');
   const before = state.changes.length;
   await type(editor(), 'rgb(0, 0, 255)');
   assert.equal(state.changes.length, before, 'a draft is not a value');
