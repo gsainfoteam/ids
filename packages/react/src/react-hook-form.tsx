@@ -48,6 +48,12 @@ function bind(props: Props, binding: Props) {
   return result;
 }
 
+function isEvent(value: unknown) {
+  return (
+    typeof value === 'object' && value !== null && 'target' in value && 'currentTarget' in value
+  );
+}
+
 function NativeField({
   name,
   registerOptions,
@@ -99,14 +105,28 @@ function ControlledField({
       dirty={props.dirty ?? fieldState.isDirty}
       touched={props.touched ?? fieldState.isTouched}
       errorMessage={fieldState.error?.message}
-      bindControl={(original) => {
-        const { value, ...binding } = field;
+      bindControl={(original, control) => {
+        const { value, onChange, ...binding } = field;
         // A native text input needs a string for an unset value; custom controls may use null.
         const resolvedValue =
           value === undefined ? (controlMode === 'checked' ? false : '') : value;
         const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
+        // A native element reports through its change event, which RHF reads target.value or
+        // checked from. A component reports the value itself, through onValueChange or
+        // onCheckedChange or a value-first onChange; a change event it forwards from its own
+        // input carries the text on screen, not the value, so RHF never takes it from there.
+        const report =
+          typeof control.type === 'string'
+            ? { onChange }
+            : {
+                [controlMode === 'checked' ? 'onCheckedChange' : 'onValueChange']: onChange,
+                onChange: (next: unknown) => {
+                  if (!isEvent(next)) onChange(next);
+                },
+              };
         return bind(rest, {
           ...binding,
+          ...report,
           [controlMode]: resolvedValue,
           disabled: disabled ?? original.disabled,
         });

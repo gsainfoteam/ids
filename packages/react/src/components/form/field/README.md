@@ -179,6 +179,10 @@ const methods = useForm({ defaultValues: { account: { email: '' } } });
 </Field>
 ```
 
+- `value` 모드는 컴포넌트에 `value` 와 `onValueChange` 를, `checked` 모드는 `checked` 와 `onCheckedChange` 를 연결합니다. 값을 먼저 넘기는 `onChange(value)` 도 받습니다.
+- 컴포넌트가 넘기는 change 이벤트는 값으로 쓰지 않습니다. 화면의 글자(`1,234`)와 값(`1234`)이 다를 수 있기 때문입니다.
+- native `input` 과 `select` 는 `onChange` 이벤트에서 값을 읽습니다.
+
 ## Zod
 
 ```tsx

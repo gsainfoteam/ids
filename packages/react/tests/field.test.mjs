@@ -221,8 +221,8 @@ test('RHF native setValueAs and checkbox registration preserve native semantics'
   assert.equal(check.methods().getValues('profile.email'), true);
 });
 test('RHF controlled value callback supports reset and external setValue', async () => {
-  function ValueInput({ value, onChange, ...rest }) {
-    return h('input', { ...rest, value, onChange: (event) => onChange(event.target.value) });
+  function ValueInput({ value, onValueChange, ...rest }) {
+    return h('input', { ...rest, value, onChange: (event) => onValueChange(event.target.value) });
   }
   const form = rhfHarness({
     mode: 'value',
@@ -239,12 +239,12 @@ test('RHF controlled value callback supports reset and external setValue', async
   assert.equal(control().value, 'initial');
 });
 test('RHF controlled checked callback binds booleans, disabled values omitted on submit', async () => {
-  function CheckedInput({ checked, onChange, ...rest }) {
+  function CheckedInput({ checked, onCheckedChange, ...rest }) {
     return h('input', {
       ...rest,
       type: 'checkbox',
       checked,
-      onChange: (event) => onChange(event.target.checked),
+      onChange: (event) => onCheckedChange(event.target.checked),
     });
   }
   const form = rhfHarness({
@@ -656,4 +656,65 @@ test('RHF passes its own dirty and touched state and keeps native errors reachab
   await act(async () => form.methods().reset());
   assert.equal(has(fieldRoot(), 'dirty'), false);
   assert.equal(has(fieldRoot(), 'touched'), false);
+});
+
+test('RHF value mode takes onValueChange over a forwarded change event, and a value-first onChange', async () => {
+  // Reports the change event of its own input as onChange, and the value it means as
+  // onValueChange: RHF must store the latter.
+  function Shouting({ value, onChange, onValueChange, ...rest }) {
+    return h('input', {
+      ...rest,
+      value: String(value).toLowerCase(),
+      onChange: (event) => {
+        onChange?.(event);
+        onValueChange?.(event.target.value.toUpperCase());
+      },
+    });
+  }
+  const shouting = rhfHarness({
+    mode: 'value',
+    child: h(Shouting),
+    defaultValues: { profile: { email: 'a' } },
+  });
+  await render(shouting.node);
+  await input(control(), 'hello');
+  assert.equal(shouting.methods().getValues('profile.email'), 'HELLO');
+  await act(async () => root.unmount());
+  root = undefined;
+
+  function Legacy({ value, onChange, ...rest }) {
+    const { onValueChange: _ignored, ...dom } = rest;
+    return h('input', { ...dom, value, onChange: (event) => onChange(event.target.value) });
+  }
+  const legacy = rhfHarness({
+    mode: 'value',
+    child: h(Legacy),
+    defaultValues: { profile: { email: '' } },
+  });
+  await render(legacy.node);
+  await input(control(), 'typed');
+  assert.equal(legacy.methods().getValues('profile.email'), 'typed');
+  await act(async () => root.unmount());
+  root = undefined;
+
+  const native = rhfHarness({
+    mode: 'value',
+    child: h('input'),
+    defaultValues: { profile: { email: '' } },
+  });
+  await render(native.node);
+  await input(control(), 'plain');
+  assert.equal(
+    native.methods().getValues('profile.email'),
+    'plain',
+    'a native input still reports its event',
+  );
+});
+
+test('RHF value mode binds onValueChange on TextField', async () => {
+  const form = rhfHarness({ mode: 'value', defaultValues: { profile: { email: 'x' } } });
+  await render(form.node);
+  assert.equal(control().value, 'x');
+  await input(control(), 'user@example.com');
+  assert.equal(form.methods().getValues('profile.email'), 'user@example.com');
 });
