@@ -2,7 +2,7 @@
 
 여러 줄 입력과 그 위아래의 바(메뉴바, 액션바, 글자 수)를 한 테두리 안에 담는 필드입니다.
 
-- **높이가 내용을 따라감.** 기본으로 내용에 맞춰 늘고 줄어듭니다. `maxRows` 를 넘으면 스크롤이 생기고, 폼 reset이나 폭 변화 뒤에도 다시 잽니다.
+- **높이가 내용을 따라감.** 기본으로 내용에 맞춰 늘고 줄어듭니다. `maxRows` 를 넘으면 스크롤이 생기고, 폼 reset, 창 크기 변화, 웹폰트 로딩 뒤에도 다시 잽니다.
 - **글자 수.** `TextArea.Count` 는 `maxLength` 에 대한 글자 수를 보여 주고 입력의 설명에 들어갑니다. 한도에 가까워지면 입력이 멈춘 뒤 남은 글자 수를 스크린 리더에 알립니다.
 - **바.** Input 위의 자식은 위 바, 아래의 자식은 아래 바가 됩니다. 바 안의 버튼은 필드 안쪽 크기로 줄고, 아이콘이 입력한 글자와 줄을 맞춥니다.
 - **상태는 테두리에.** 오류면 바깥 테두리만 danger 색이 되고, 바 구분선과 글자 수는 중립색을 유지합니다.
@@ -40,7 +40,8 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 <TextArea autoResize={false} resize="none" maxRows={10} /> // resize: none / vertical(기본) / horizontal / both
 ```
 
-- 자동 높이는 JS로 잽니다. Safari와 Firefox가 `field-sizing: content` 를 지원하지 않기 때문입니다.
+- 자동 높이는 `react-textarea-autosize` 가 JS로 잽니다. Safari와 Firefox가 `field-sizing: content` 를 지원하지 않기 때문입니다.
+- 비어 있으면 placeholder 길이에 맞춥니다. 자동 높이에서는 `style` 의 `height`, `minHeight`, `maxHeight` 를 쓰지 않습니다. `minRows`, `maxRows` 로 정합니다.
 
 ## 바
 
@@ -129,6 +130,8 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
   </TextArea.Input>
 </TextArea>
 ```
+
+- 자식이 `<textarea>` 면 자동 높이가 그대로 됩니다. 컴포넌트면 높이는 그 컴포넌트가 정합니다.
 
 ## 속성
 

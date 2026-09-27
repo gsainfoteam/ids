@@ -10,6 +10,9 @@ import {
   type ReactNode,
 } from 'react';
 
+import { omit } from 'es-toolkit';
+import TextareaAutosize from 'react-textarea-autosize';
+
 import {
   countState,
   useCountAnnouncement,
@@ -42,6 +45,7 @@ type TextAreaContextValue = {
   count: ReturnType<typeof useTextArea>['count'];
   countId: string;
   autoResize: boolean;
+  minRows?: number;
   maxRows?: number;
   styles: ReturnType<typeof TextArea.Style>;
 };
@@ -131,6 +135,7 @@ export function TextArea({
         count: field.count,
         countId,
         autoResize,
+        minRows,
         maxRows,
         styles,
       }}
@@ -183,16 +188,13 @@ export namespace TextArea {
   export function Input({ asChild, children, className, style }: Input.Props) {
     const context = use(TextAreaContext);
     invariant(context != null, '`<TextArea.Input>` must be used inside `<TextArea>`.');
-    const { inputProps, autoResize, maxRows, styles } = context;
+    const { inputProps, autoResize, minRows, maxRows, styles } = context;
     const props = {
       ...inputProps,
       className: styles.input({ className: cn(inputProps.className, className) }),
-      style: {
-        maxHeight: autoResize ? undefined : rowsToHeight(maxRows),
-        ...inputProps.style,
-        ...style,
-      },
+      style: { ...inputProps.style, ...style },
     };
+    const fixed = { ...props, style: { maxHeight: rowsToHeight(maxRows), ...props.style } };
 
     if (asChild === true) {
       invariant(
@@ -200,10 +202,22 @@ export namespace TextArea {
           (typeof children.type !== 'string' || children.type === 'textarea'),
         '`<TextArea.Input asChild>` requires one textarea, or a component forwarding textarea props and ref.',
       );
-      return cloneElement(children, props);
+      // A component renders its own textarea, so it also decides that textarea's height.
+      if (children.type !== 'textarea') return cloneElement(children, autoResize ? props : fixed);
+    } else {
+      invariant(children == null, '`<TextArea.Input>` takes `value`/`defaultValue`, not children.');
     }
-    invariant(children == null, '`<TextArea.Input>` takes `value`/`defaultValue`, not children.');
-    return <textarea {...props} />;
+    if (!autoResize) return <textarea {...fixed} />;
+    // Measured in JS: `field-sizing: content` would do this in CSS, but Safari and Firefox ignore
+    // it. The measured height replaces any height in style.
+    return (
+      <TextareaAutosize
+        {...props}
+        style={omit(props.style, ['height', 'minHeight', 'maxHeight'])}
+        minRows={minRows ?? props.rows}
+        maxRows={maxRows}
+      />
+    );
   }
 
   export namespace Input {

@@ -216,7 +216,7 @@ export const AutoHeight: Story = {
     docs: {
       description: {
         story:
-          '내용에 맞춰 높이가 늘고 줄어듭니다. maxRows를 넘으면 스크롤이 생깁니다. 붙여넣기, 실행 취소, 폼 reset, 폭 변화에도 다시 잽니다.',
+          '내용에 맞춰 높이가 늘고 줄어듭니다. maxRows를 넘으면 스크롤이 생깁니다. 붙여넣기, 실행 취소, 폼 reset, 창 크기 변화, 웹폰트 로딩 뒤에도 다시 잽니다.',
       },
     },
   },

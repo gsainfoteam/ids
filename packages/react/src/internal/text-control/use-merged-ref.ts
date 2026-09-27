@@ -1,4 +1,4 @@
-import { useCallback, type Ref, type RefCallback, type RefObject } from 'react';
+import { useCallback, useRef, type Ref, type RefCallback, type RefObject } from 'react';
 
 import { mergeRefs } from '../../utils';
 
@@ -12,10 +12,25 @@ export function useMergedRef<T>(
   ownRef: Ref<T> | undefined,
   check?: (node: T) => void,
 ): RefCallback<T> {
+  const detach = useRef<(() => void) | null>(null);
   return useCallback(
     (node: T | null) => {
-      if (node && check) check(node);
-      return mergeRefs(inputRef, childRef, rootRef, ownRef)(node);
+      // A wrapper written before React 19, such as react-textarea-autosize's composed ref, drops
+      // the cleanup a ref returns and detaches by passing null instead; the cleanup runs then.
+      if (node === null) {
+        detach.current?.();
+        detach.current = null;
+        return;
+      }
+      if (check) check(node);
+      const cleanup = mergeRefs(inputRef, childRef, rootRef, ownRef)(node);
+      const run = () => {
+        if (detach.current !== run) return;
+        detach.current = null;
+        cleanup?.();
+      };
+      detach.current = run;
+      return run;
     },
     [inputRef, childRef, rootRef, ownRef, check],
   );

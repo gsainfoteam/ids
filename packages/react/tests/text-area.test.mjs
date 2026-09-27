@@ -17,6 +17,9 @@ for (const name of [
   'MouseEvent',
 ])
   globalThis[name] = dom.window[name];
+// react-textarea-autosize re-measures after a form reset on the next frame.
+globalThis.requestAnimationFrame = dom.window.requestAnimationFrame.bind(dom.window);
+globalThis.cancelAnimationFrame = dom.window.cancelAnimationFrame.bind(dom.window);
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, Fragment, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
@@ -171,20 +174,23 @@ test('invalid structures and row bounds fail clearly', () => {
     assert.throws(() => renderToString(node), /\[IDS\] `<TextArea/);
 });
 
-// Synthetic layout checks the sizing arithmetic and reset timing; real browser checks cover geometry.
+// Synthetic layout checks the sizing wiring and reset timing; real browser checks cover geometry.
+// react-textarea-autosize measures a hidden copy of the textarea that takes the real one's
+// padding and border, so each line is 20px high on every textarea.
+Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', {
+  configurable: true,
+  get() {
+    return Math.max(1, this.value.split('\n').length) * 20 + 16;
+  },
+});
 function mockGeometry(node) {
   if (!node) return;
   node.style.lineHeight = '20px';
   node.style.padding = '8px';
   node.style.border = '1px solid';
   node.style.boxSizing = 'border-box';
-  node.getClientRects = () => [{ width: 200 }];
-  Object.defineProperty(node, 'scrollHeight', {
-    configurable: true,
-    get: () => Math.max(1, node.value.split('\n').length) * 20 + 16,
-  });
 }
-test('autoResize grows, caps with overflow, shrinks, follows controlled changes and restores manual styles', async () => {
+test('autoResize grows, caps at maxRows, shrinks, follows controlled changes and hands style back', async () => {
   const view = (value, autoResize = true) =>
     h(TextArea, {
       autoResize,
@@ -203,10 +209,8 @@ test('autoResize grows, caps with overflow, shrinks, follows controlled changes 
   assert.equal(control().style.height, '78px');
   await render(view('a\nb\nc\nd\ne\nf'));
   assert.equal(control().style.height, '98px');
-  assert.equal(control().style.overflowY, 'auto');
   await render(view('a'));
   assert.equal(control().style.height, '58px');
-  assert.equal(control().style.overflowY, 'hidden');
   await render(view('a', false));
   assert.equal(control().style.height, '99px');
   assert.equal(control().style.overflowY, 'scroll');
@@ -234,6 +238,30 @@ test('native form reset resizes after defaultValue is restored', async () => {
   });
   assert.equal(control().value, 'initial');
   assert.equal(control().style.height, '38px');
+});
+test('asChild with a component leaves the height to that component', async () => {
+  function Own({ ref, ...props }) {
+    return h('textarea', { ...props, ref, 'data-own': '' });
+  }
+  await render(
+    h(TextArea, {
+      minRows: 1,
+      maxRows: 3,
+      children: h(TextArea.Input, { asChild: true, ref: mockGeometry }, h(Own)),
+    }),
+  );
+  await input('1\n2\n3\n4\n5');
+  assert.ok(control().hasAttribute('data-own'));
+  assert.equal(control().style.height, '');
+  await render(
+    h(TextArea, {
+      minRows: 1,
+      maxRows: 3,
+      children: h(TextArea.Input, { asChild: true, ref: mockGeometry }, h('textarea')),
+    }),
+  );
+  await input('1\n2\n3\n4\n5');
+  assert.equal(control().style.height, '78px', 'a textarea child is still measured');
 });
 test('RHF native registration: required error/focus, value, disabled, reset resizes uncontrolled textarea', async () => {
   let methods;

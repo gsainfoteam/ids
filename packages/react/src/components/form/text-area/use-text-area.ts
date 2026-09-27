@@ -10,7 +10,6 @@ import {
   type ReactNode,
 } from 'react';
 
-import { useAutoResize } from './use-auto-resize';
 import {
   isInvalid,
   useInputValue,
@@ -102,8 +101,6 @@ export function useTextArea({
   );
   const value = native.value != null ? String(native.value) : observed;
   const control = useTextControl({ inputRef, disabled, readOnly });
-  // JS measurement rather than `field-sizing: content`, which Safari and Firefox ignore.
-  useAutoResize(inputRef, { autoResize, minRows, maxRows });
 
   const ref = useMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertTextarea);
 
