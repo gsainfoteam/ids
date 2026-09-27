@@ -208,8 +208,8 @@ export namespace TelField {
     return (
       <Select
         value={field.country}
-        onChange={(next) => {
-          if (next) field.changeCountry(next as CountryCode);
+        onValueChange={(next) => {
+          if (typeof next === 'string') field.changeCountry(next as CountryCode);
         }}
         aria-label={ariaLabel ?? messages.telField.country}
         disabled={state.disabled}
@@ -218,7 +218,7 @@ export namespace TelField {
         variant="ghost"
         className={styles.country({ className })}
       >
-        <Select.Trigger {...props} asChild={asChild}>
+        <Select.Trigger {...props} asChild={asChild} className={styles.countryTrigger()}>
           {asChild ? (
             children
           ) : (
@@ -250,10 +250,14 @@ export namespace TelField {
   export const Style = tv({
     extend: textControlStyle,
     slots: {
+      // The country Select is a field of its own inside this one. Its trigger carries
+      // data-field-input, so the TelField shell already rings while it has focus, and the Select
+      // keeps no ring or focus border of its own.
       country: [
-        'w-auto shrink-0 gap-1 rounded-standard text-(--ids-color-on-surface)',
-        'hover:bg-(--ids-color-muted)',
+        'w-auto shrink-0 rounded-standard text-(--ids-color-on-surface)',
+        'hover:bg-(--ids-color-muted) ring-0! inset-ring-transparent!',
       ],
+      countryTrigger: 'gap-1',
       countryLabel: 'inline-flex items-center gap-1 tabular-nums',
       countryIcon: 'shrink-0 text-(--ids-color-on-muted)',
       countryName: 'min-w-0 flex-1 truncate',
@@ -262,11 +266,13 @@ export namespace TelField {
     variants: {
       size: {
         standard: {
-          country: 'h-7 px-2 first:-ms-2 last:-me-2',
+          country: 'h-7 first:-ms-2 last:-me-2',
+          countryTrigger: 'px-2',
           countryIcon: 'size-(--ids-size-icon-standard)',
         },
         tiny: {
-          country: 'h-6 px-1.5 first:-ms-1.5 last:-me-1.5',
+          country: 'h-6 first:-ms-1.5 last:-me-1.5',
+          countryTrigger: 'px-1.5',
           countryIcon: 'size-(--ids-size-icon-tiny)',
         },
       } satisfies Record<IdsSize, object>,

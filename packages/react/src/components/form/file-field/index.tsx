@@ -1,25 +1,57 @@
 import {
   createContext,
   isValidElement,
-  useContext,
+  use,
   useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
   type ComponentProps,
+  type CSSProperties,
+  type DragEvent,
+  type DragEventHandler,
+  type MouseEvent,
+  type ReactNode,
 } from 'react';
 
-import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ArrowUpTrayIcon, DocumentIcon, PaperClipIcon, XMarkIcon } from '@heroicons/react/16/solid';
 
-import { flattenParts, part } from '../../../internal/field-popup';
-import { iconSquare } from '../../../internal/icon-square';
+import {
+  describeLimits,
+  fileKey,
+  formatBytes,
+  isFile,
+  isValidAccept,
+  type FileFieldRejection,
+} from './file-rules';
+import { useFileField, usePreviewUrl, type FileFieldValue } from './use-file-field';
+import { fieldTrigger, flattenParts, part, resolveState } from '../../../internal/field-popup';
+import { FormValue } from '../../../internal/form-value';
+import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
-type ButtonEvents = 'ref' | 'onClick' | 'onBlur' | 'onFocus' | 'onKeyDown';
+export type { FileFieldRejection } from './file-rules';
+
+// `field` is a text-field-like control; `dropzone` is a large area to drop files on. They are
+// different shapes, so this is `appearance`, and `variant` stays the fill intensity of either.
+export type FileFieldAppearance = 'field' | 'dropzone';
+export type FileFieldVariant = 'outline' | 'soft' | 'ghost';
+
+export type FileFieldState = {
+  appearance: FileFieldAppearance;
+  dragging: boolean;
+  disabled: boolean;
+  readOnly: boolean;
+  invalid: boolean;
+  required: boolean;
+  empty: boolean;
+  multiple: boolean;
+};
+
+export type FileFieldItemState = { file: File; index: number };
+
+type ButtonProps = 'onClick' | 'onBlur' | 'onFocus' | 'onKeyDown' | 'ref';
+
 type BaseProps = Omit<
   ComponentProps<'input'>,
   | 'type'
@@ -32,178 +64,81 @@ type BaseProps = Omit<
   | 'onDragOver'
   | 'onDragEnter'
   | 'onDragLeave'
-  | ButtonEvents
+  | 'className'
+  | 'style'
+  | 'children'
+  | 'placeholder'
+  | ButtonProps
 > &
-  Pick<ComponentProps<'button'>, ButtonEvents> & {
-    variant?: 'outline' | 'dropzone';
+  Pick<ComponentProps<'button'>, ButtonProps> & {
+    appearance?: FileFieldAppearance;
+    variant?: FileFieldVariant;
     size?: IdsSize;
     invalid?: boolean;
     maxSize?: number;
     maxCount?: number;
     onReject?: (rejections: FileFieldRejection[]) => void;
-    onDrop?: React.DragEventHandler<HTMLDivElement>;
-    onDragOver?: React.DragEventHandler<HTMLDivElement>;
+    onDrop?: DragEventHandler<HTMLDivElement>;
+    onDragOver?: DragEventHandler<HTMLDivElement>;
+    placeholder?: ReactNode;
+    className?: string | ((state: FileFieldState) => string | undefined);
+    style?: CSSProperties;
+    children?: ReactNode;
   };
-export type FileFieldRejection = { file: File; reason: 'type' | 'size' | 'count' };
+
 export type FileFieldProps = BaseProps &
   (
     | {
         multiple?: false;
         value?: File | null;
         defaultValue?: File | null;
-        onChange?: (value: File | null) => void;
+        onValueChange?: (value: File | null) => void;
       }
-    | { multiple: true; value?: File[]; defaultValue?: File[]; onChange?: (value: File[]) => void }
+    | {
+        multiple: true;
+        value?: File[];
+        defaultValue?: File[];
+        onValueChange?: (value: File[]) => void;
+      }
   );
-type BoxProps = ComponentProps<'div'> & { asChild?: boolean };
-type ContextValue = {
+
+type Context = {
+  field: Omit<ReturnType<typeof useFileField>, 'rootRef' | 'inputRef' | 'triggerRef'>;
+  state: FileFieldState;
+  placeholder: ReactNode;
+  limits: string;
+  limitsId: string;
+  triggerProps: Record<string, unknown>;
   styles: ReturnType<typeof FileField.Style>;
-  files: File[];
-  blocked: boolean;
-  hasErrors: boolean;
-  placeholder: string;
-  triggerProps: ComponentProps<'button'>;
-  remove: (file: File) => void;
-  clear: () => void;
 };
-const Context = createContext<ContextValue | null>(null);
-function useFile() {
-  const c = useContext(Context);
-  invariant(c, 'FileField parts must be inside FileField.');
-  return c;
+
+const FileContext = createContext<Context | null>(null);
+
+function useFile(part: string) {
+  const context = use(FileContext);
+  invariant(context, `${part} must be rendered inside FileField.`);
+  return context;
 }
-function FileTrigger({ asChild, children, ...props }: FileField.TriggerProps) {
-  const c = useFile();
-  invariant(
-    !flattenParts(children).some(
-      (n) =>
-        isValidElement(n) && (n.type === FileClear || n.type === FileList || n.type === FileItem),
-    ),
-    'FileField: Clear/List/Item must be siblings of Trigger.',
-  );
-  return part(
-    'button',
-    asChild,
-    children ?? (
-      <>
-        <PlusIcon aria-hidden="true" />
-        <FileValue />
-      </>
-    ),
-    mergeProps(props, { ...c.triggerProps }),
-  );
-}
-function FileValue({ asChild, children, placeholder, ...props }: FileField.ValueProps) {
-  const c = useFile();
-  return part(
-    'span',
-    asChild,
-    children ??
-      (c.files.length
-        ? `${c.files
-            .slice(0, 2)
-            .map((f) => f.name)
-            .join(', ')}${c.files.length > 2 ? `, +${c.files.length - 2}` : ''}`
-        : (placeholder ?? c.placeholder)),
-    mergeProps({ className: c.styles.value() }, props),
-  );
-}
-function FileClear({
-  asChild,
-  children = <XMarkIcon aria-hidden="true" />,
-  ...props
-}: FileField.ClearProps) {
-  const c = useFile();
-  if (!c.files.length && !c.hasErrors) return null;
-  return part(
-    'button',
-    asChild,
-    children,
-    mergeProps(props, {
-      type: 'button',
-      'aria-label': props['aria-label'] ?? '파일 모두 지우기',
-      disabled: c.blocked,
-      className: c.styles.clear(),
-      onClick: c.clear,
-    }),
-  );
-}
-function FileItem({ file, asChild, children, ...props }: FileField.ItemProps) {
-  const c = useFile();
-  return part(
-    'div',
-    asChild,
-    children ?? (
-      <>
-        <span className={c.styles.itemName()} title={file.name}>
-          {file.name}
-        </span>
-        <span className={c.styles.itemSize()}>{file.size.toLocaleString()} B</span>
-        <button
-          type="button"
-          aria-label={`${file.name} 삭제`}
-          disabled={c.blocked}
-          onClick={() => c.remove(file)}
-          className={c.styles.itemRemove()}
-        >
-          <XMarkIcon aria-hidden="true" />
-        </button>
-      </>
-    ),
-    mergeProps(
-      {
-        className: c.styles.item(),
-        role: 'listitem',
-      },
-      props,
-    ),
-  );
-}
-function FileList({ asChild, children, ...props }: BoxProps) {
-  const c = useFile();
-  if (!c.files.length) return null;
-  return part(
-    'div',
-    asChild,
-    children ?? c.files.map((file, index) => <FileItem key={index} file={file} />),
-    mergeProps({ role: 'list', 'aria-label': '선택 파일', className: c.styles.list() }, props),
-  );
-}
-const isFile = (file: unknown): file is File =>
-  !!file &&
-  typeof file === 'object' &&
-  'name' in file &&
-  typeof file.name === 'string' &&
-  'size' in file &&
-  typeof file.size === 'number' &&
-  'slice' in file &&
-  typeof file.slice === 'function';
-const sameFile = (a: File, b: File) =>
-  a.name === b.name && a.size === b.size && a.lastModified === b.lastModified && a.type === b.type;
-function accepted(file: File, tokens: string[]) {
-  return (
-    !tokens.length ||
-    tokens.some((token) =>
-      token.startsWith('.')
-        ? file.name.toLowerCase().endsWith(token)
-        : token.endsWith('/*')
-          ? file.type.toLowerCase().startsWith(token.slice(0, -1))
-          : file.type.toLowerCase() === token,
-    )
-  );
-}
+
+const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
+
+const joinIds = (...ids: Array<string | undefined | false>) =>
+  ids.filter(Boolean).join(' ') || undefined;
+
 export function FileField(props: FileFieldProps) {
   const {
     multiple = false,
     value,
     defaultValue,
-    onChange: _onChange,
+    onValueChange,
+    appearance = 'field',
     variant = 'outline',
     size,
     invalid,
     maxSize,
     maxCount,
     onReject,
+    placeholder,
     children,
     className,
     style,
@@ -211,28 +146,24 @@ export function FileField(props: FileFieldProps) {
     name,
     form,
     id: providedId,
-    required,
-    disabled,
-    readOnly,
-    placeholder = '파일 선택 또는 드래그',
+    required = false,
+    disabled = false,
+    readOnly = false,
     onClick,
     onBlur,
     onFocus,
     onKeyDown,
     onDrop,
     onDragOver,
+    autoFocus,
+    tabIndex,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledby,
+    'aria-describedby': ariaDescribedby,
+    'aria-invalid': ariaInvalid,
+    'aria-required': ariaRequired,
     ...native
   } = props;
-  const [stored, setStored] = useState<File | File[] | null>(
-    defaultValue ?? (multiple ? [] : null),
-  );
-  const current = value === undefined ? stored : value;
-  invariant(
-    multiple
-      ? Array.isArray(current) && current.every(isFile)
-      : current === null || isFile(current),
-    'FileField: single requires File | null; multiple requires File[].',
-  );
   invariant(
     maxSize === undefined || (Number.isFinite(maxSize) && maxSize >= 0),
     'FileField: maxSize must be non-negative bytes.',
@@ -241,315 +172,514 @@ export function FileField(props: FileFieldProps) {
     maxCount === undefined || (Number.isInteger(maxCount) && maxCount >= 0),
     'FileField: maxCount must be a non-negative integer.',
   );
-  const tokens = (native.accept ?? '')
-    .split(',')
-    .map((t) => t.trim().toLowerCase())
-    .filter(Boolean);
+
+  const { rootRef, inputRef, triggerRef, ...field } = useFileField({
+    multiple,
+    value,
+    defaultValue,
+    onValueChange: onValueChange as ((value: FileFieldValue) => void) | undefined,
+    accept: native.accept,
+    maxSize,
+    maxCount,
+    onReject,
+    name,
+    form,
+    disabled,
+    readOnly,
+  });
+  const { state: s, handlers } = field;
   invariant(
-    tokens.every(
-      (t) =>
-        /^\.[a-z0-9][a-z0-9._-]*$/.test(t) ||
-        /^[a-z0-9!#$&^_.+-]+\/(?:[a-z0-9!#$&^_.+-]+|\*)$/.test(t),
-    ),
-    'FileField: accept must contain MIME types or extensions.',
+    multiple
+      ? Array.isArray(s.value) && s.value.every(isFile)
+      : s.value === null || isFile(s.value),
+    'FileField: single requires File | null; multiple requires File[].',
   );
-  const files = useMemo(
-    () => (Array.isArray(current) ? current : current ? [current] : []),
-    [current],
-  );
-  const [rejections, setRejections] = useState<FileFieldRejection[]>([]),
-    [dragOver, setDragOver] = useState(false);
-  const input = useRef<HTMLInputElement>(null),
-    trigger = useRef<HTMLButtonElement>(null);
-  const uid = useId(),
-    id = providedId ?? `ids-file-${uid}`,
-    errorId = `${id}-rejections`;
-  const blocked = !!disabled || !!readOnly;
-  const resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = FileField.Style({ variant, size: resolvedSize });
-  useLayoutEffect(() => {
-    const node = input.current,
-      owner = node?.form;
-    if (!node || !owner) return;
-    let alive = true;
-    // The picker is nameless: formdata always submits the actual model, including drops,
-    // removals and controlled defaults, without attempting to assign a FileList.
-    const formdata = (event: Event) => {
-      if (name && !node.matches(':disabled'))
-        for (const file of files) (event as FormDataEvent).formData.append(name, file, file.name);
-    };
-    const reset = (event: Event) =>
-      queueMicrotask(() => {
-        if (alive && !event.defaultPrevented) {
-          if (value === undefined) setStored(defaultValue ?? (multiple ? [] : null));
-          setRejections([]);
-          setDragOver(false);
-          node.value = '';
-        }
-      });
-    owner.addEventListener('formdata', formdata);
-    owner.addEventListener('reset', reset);
-    return () => {
-      alive = false;
-      owner.removeEventListener('formdata', formdata);
-      owner.removeEventListener('reset', reset);
-    };
-  }, [files, name, form, value, defaultValue, multiple]);
-  const emit = (next: File[]) => {
-    if (value === undefined) setStored(multiple ? next : (next[0] ?? null));
-    if (props.multiple) props.onChange?.(next);
-    else props.onChange?.(next[0] ?? null);
+  invariant(isValidAccept(s.tokens), 'FileField: accept must contain MIME types or extensions.');
+
+  const uid = useId();
+  const id = providedId ?? `ids-file-${uid}`;
+  const errorId = `${id}-rejections`;
+  const limitsId = `${id}-limits`;
+  const limits = describeLimits({
+    tokens: s.tokens,
+    maxSize,
+    maxCount: multiple ? maxCount : undefined,
+  });
+  const showsInvalid =
+    s.rejections.length > 0 ? true : (ariaInvalid ?? invalid) === true || ariaInvalid === 'true';
+  const state: FileFieldState = {
+    appearance,
+    dragging: s.dragging,
+    disabled,
+    readOnly,
+    invalid: showsInvalid,
+    required,
+    empty: s.files.length === 0,
+    multiple,
   };
-  const receive = (incoming: File[]) => {
-    if (blocked || input.current?.matches(':disabled') || !incoming.length) return;
-    const next = multiple ? [...files] : [],
-      rejected: FileFieldRejection[] = [];
-    for (const file of incoming) {
-      if (!accepted(file, tokens)) {
-        rejected.push({ file, reason: 'type' });
-        continue;
-      }
-      if (maxSize !== undefined && file.size > maxSize) {
-        rejected.push({ file, reason: 'size' });
-        continue;
-      }
-      if (multiple && next.some((f) => sameFile(f, file))) continue;
-      if (next.length >= (multiple ? (maxCount ?? Infinity) : 1)) {
-        rejected.push({ file, reason: 'count' });
-        continue;
-      }
-      next.push(file);
-    }
-    setRejections(rejected);
-    if (rejected.length) onReject?.(rejected);
-    if (next.length && (next.length !== files.length || next.some((f, i) => f !== files[i])))
-      emit(next);
-  };
-  const clear = () => {
-    if (blocked) return;
-    setRejections([]);
-    if (files.length) emit([]);
-    if (input.current) input.current.value = '';
-    trigger.current?.focus({ preventScroll: true });
-  };
-  const remove = (file: File) => {
-    if (blocked) return;
-    const index = files.indexOf(file);
-    if (index < 0) return;
-    setRejections([]);
-    emit(files.filter((_, i) => i !== index));
-    trigger.current?.focus({ preventScroll: true });
-  };
-  const triggerProps: ComponentProps<'button'> & { 'data-dragover'?: string } = {
-    // mergeRefs composes callbacks without reading current during render.
+  const styles = FileField.Style({ appearance, variant, size: useFieldSize(size) ?? 'standard' });
+
+  const triggerProps = {
+    // mergeRefs only composes the refs into a callback; nothing reads them during render.
     // eslint-disable-next-line react-hooks/refs
-    ref: mergeRefs(trigger, forwardedRef),
+    ref: mergeRefs(triggerRef, forwardedRef),
     id,
     type: 'button',
     form,
     disabled,
-    autoFocus: native.autoFocus,
-    tabIndex: native.tabIndex,
-    'aria-label': native['aria-label'],
-    'aria-labelledby': native['aria-labelledby'],
-    'aria-describedby':
-      [native['aria-describedby'], rejections.length ? errorId : undefined]
-        .filter(Boolean)
-        .join(' ') || undefined,
-    'aria-invalid': rejections.length ? true : (native['aria-invalid'] ?? invalid),
-    'aria-required': native['aria-required'] ?? required,
-    'aria-disabled': blocked || undefined,
-    'data-dragover': dragOver && !blocked ? '' : undefined,
-    className: styles.trigger(),
-    onClick: (e) => {
-      onClick?.(e);
-      if (!e.defaultPrevented && !blocked) input.current?.click();
+    autoFocus,
+    tabIndex,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledby,
+    'aria-describedby': joinIds(
+      ariaDescribedby,
+      appearance === 'dropzone' && !!limits && limitsId,
+      s.rejections.length > 0 && errorId,
+    ),
+    'aria-invalid': s.rejections.length ? true : (ariaInvalid ?? (invalid || undefined)),
+    'aria-required': ariaRequired ?? (required || undefined),
+    'aria-disabled': readOnly || undefined,
+    'data-field-input': appearance === 'field' ? '' : undefined,
+    'data-dragging': s.dragging ? '' : undefined,
+    'data-placeholder': state.empty ? '' : undefined,
+    onClick: (event: MouseEvent<HTMLButtonElement>) => {
+      onClick?.(event);
+      if (!event.defaultPrevented) field.actions.openPicker();
     },
     onBlur,
     onFocus,
     onKeyDown,
   };
-  const parts = flattenParts(children);
-  const triggers = parts.filter((n) => isValidElement(n) && n.type === FileTrigger);
+
+  const nodes = flattenParts(children);
+  const triggers = nodes.filter(isType(FileTrigger));
   invariant(
-    !parts.length || triggers.length === 1,
+    !nodes.length || triggers.length === 1,
     'FileField: explicit children require exactly one Trigger.',
   );
+  const controls = nodes.filter((node) => isType(FileTrigger)(node) || isType(FileClear)(node));
+  const others = nodes.filter((node) => !controls.includes(node));
+  const composed = nodes.length
+    ? { controls, others }
+    : appearance === 'dropzone'
+      ? // Each listed file has its own remove button, so a dropzone needs no Clear.
+        { controls: [<FileTrigger key="trigger" />], others: [<FileList key="list" />] }
+      : {
+          controls: [<FileTrigger key="trigger" />, <FileClear key="clear" />],
+          others: multiple ? [<FileList key="list" />] : [],
+        };
+
   return (
-    <Context.Provider
+    <FileContext
       value={{
-        styles,
-        files,
-        blocked,
-        hasErrors: !!rejections.length,
-        placeholder,
+        field,
+        state,
+        placeholder:
+          placeholder ??
+          (appearance === 'dropzone'
+            ? messages.fileField.dropzone
+            : messages.fileField.placeholder),
+        limits,
+        limitsId,
         triggerProps,
-        clear,
-        remove,
+        styles,
       }}
     >
       <div
-        className={styles.root({ className })}
-        style={style}
+        ref={rootRef}
         data-file-field=""
-        data-dragover={dragOver && !blocked ? '' : undefined}
-        onDragEnter={(e) => {
-          if (!Array.from(e.dataTransfer.types).includes('Files')) return;
-          e.preventDefault();
-          if (!blocked) {
-            setDragOver(true);
-          }
+        data-appearance={appearance}
+        data-dragging={s.dragging ? '' : undefined}
+        data-disabled={disabled ? '' : undefined}
+        data-readonly={readOnly ? '' : undefined}
+        data-invalid={showsInvalid ? '' : undefined}
+        data-required={required ? '' : undefined}
+        data-empty={state.empty ? '' : undefined}
+        className={styles.root({ className: resolveState(className, state) })}
+        style={style}
+        onDragEnter={handlers.onDragEnter}
+        onDragLeave={handlers.onDragLeave}
+        onDragOver={(event: DragEvent<HTMLDivElement>) => {
+          onDragOver?.(event);
+          if (!event.defaultPrevented) handlers.onDragOver(event);
         }}
-        onDragLeave={(e) => {
-          if (e.currentTarget.contains(e.relatedTarget as Node)) return;
-          setDragOver(false);
+        onDrop={(event: DragEvent<HTMLDivElement>) => {
+          onDrop?.(event);
+          if (event.defaultPrevented) handlers.onDragLeave(event);
+          else handlers.onDrop(event);
         }}
-        onDragOver={(e) => {
-          onDragOver?.(e);
-          if (e.defaultPrevented) return;
-          if (Array.from(e.dataTransfer.types).includes('Files')) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = blocked ? 'none' : 'copy';
-          }
-        }}
-        onDrop={(e) => {
-          onDrop?.(e);
-          setDragOver(false);
-          if (e.defaultPrevented) return;
-          if (Array.from(e.dataTransfer.types).includes('Files')) {
-            e.preventDefault();
-            receive(Array.from(e.dataTransfer.files));
-          }
-        }}
+        onPaste={handlers.onPaste}
       >
+        {/* The bridge from react-hook-form may pass onChange; the picker's own handler wins. */}
         <input
           {...native}
-          ref={input}
+          ref={inputRef}
           type="file"
           multiple={multiple}
           disabled={disabled}
           form={form}
           hidden
           tabIndex={-1}
-          autoFocus={false}
           aria-hidden="true"
-          onChange={(e) => {
-            receive(Array.from(e.currentTarget.files ?? []));
-            e.currentTarget.value = '';
-          }}
+          onChange={handlers.onInputChange}
         />
-        {parts.length ? (
-          parts
+        {appearance === 'field' ? (
+          <div
+            data-file-field-control=""
+            data-invalid={showsInvalid ? '' : undefined}
+            data-disabled={disabled ? '' : undefined}
+            className={styles.control()}
+          >
+            {composed.controls}
+          </div>
         ) : (
-          <>
-            <div className={styles.row()}>
-              <FileTrigger />
-              <FileClear />
-            </div>
-            {multiple && <FileList />}
-          </>
+          composed.controls
         )}
-        {!!rejections.length && (
-          <div id={errorId} role="alert" className={styles.error()}>
-            {rejections.map(({ file, reason }, index) => (
-              <div key={index}>
+        {composed.others}
+        {s.rejections.length > 0 && (
+          <div id={errorId} role="alert" className={styles.rejections()}>
+            {s.rejections.map(({ file, reason }) => (
+              <div key={fileKey(file)}>
                 {file.name}:{' '}
                 {reason === 'type'
-                  ? '허용되지 않는 파일 형식입니다.'
+                  ? messages.fileField.rejectType
                   : reason === 'size'
-                    ? '파일 크기 제한을 초과했습니다.'
-                    : '파일 개수 제한을 초과했습니다.'}
+                    ? messages.fileField.rejectSize(formatBytes(maxSize ?? 0))
+                    : messages.fileField.rejectCount(multiple ? (maxCount ?? 0) : 1)}
               </div>
             ))}
           </div>
         )}
+        <FormValue
+          form={form}
+          value={s.files.map((file) => file.name)}
+          required={required && !readOnly}
+          disabled={disabled}
+          anchor={triggerRef}
+        />
       </div>
-    </Context.Provider>
+    </FileContext>
   );
 }
+
+function FileTrigger({ asChild, children, className, ...props }: FileField.TriggerProps) {
+  const c = useFile('FileField.Trigger');
+  invariant(
+    !flattenParts(children).some(
+      (node) => isType(FileClear)(node) || isType(FileList)(node) || isType(FileItem)(node),
+    ),
+    'FileField: Clear/List/Item must be siblings of Trigger.',
+  );
+  const { files } = c.field.state;
+  const content =
+    c.state.appearance === 'dropzone' ? (
+      <>
+        <ArrowUpTrayIcon aria-hidden="true" className={c.styles.dropzoneIcon()} />
+        <span className={c.styles.dropzoneTitle()}>
+          {c.state.dragging ? messages.fileField.dropzoneActive : c.placeholder}
+        </span>
+        {c.limits && (
+          <span id={c.limitsId} className={c.styles.dropzoneHint()}>
+            {c.limits}
+          </span>
+        )}
+      </>
+    ) : (
+      <>
+        {!c.state.multiple && files[0] ? (
+          <FilePreview file={files[0]} className={c.styles.thumb()} />
+        ) : (
+          <PaperClipIcon aria-hidden="true" className={c.styles.icon()} />
+        )}
+        <FileValue />
+      </>
+    );
+  return part(
+    'button',
+    asChild,
+    children ?? content,
+    mergeProps(props, {
+      ...c.triggerProps,
+      className: c.styles.trigger({ className: resolveState(className, c.state) }),
+    }),
+  );
+}
+
+function FileValue({ asChild, children, placeholder, className, ...props }: FileField.ValueProps) {
+  const c = useFile('FileField.Value');
+  const { files } = c.field.state;
+  const text =
+    files.length === 0
+      ? (placeholder ?? c.placeholder)
+      : files.length === 1
+        ? files[0].name
+        : messages.fileField.count(files.length);
+  return part(
+    'span',
+    asChild,
+    children ?? text,
+    mergeProps(props, {
+      'data-placeholder': files.length ? undefined : '',
+      title: files.length === 1 ? files[0].name : undefined,
+      className: c.styles.value({ className }),
+    }),
+  );
+}
+
+function FileClear({ asChild, children, className, ...props }: FileField.ClearProps) {
+  const c = useFile('FileField.Clear');
+  const { files, rejections } = c.field.state;
+  if ((!files.length && !rejections.length) || c.state.readOnly) return null;
+  return part(
+    'button',
+    asChild,
+    children ?? <XMarkIcon aria-hidden="true" />,
+    mergeProps(props, {
+      type: 'button',
+      'aria-label': props['aria-label'] ?? messages.fileField.clear,
+      disabled: c.state.disabled,
+      'data-file-field-clear': '',
+      className: c.styles.clear({ className }),
+      onClick: c.field.actions.clear,
+    }),
+  );
+}
+
+function FileList({ asChild, children, className, ...props }: FileField.ListProps) {
+  const c = useFile('FileField.List');
+  const { files } = c.field.state;
+  if (!files.length) return null;
+  return part(
+    'div',
+    asChild,
+    typeof children === 'function'
+      ? children(files)
+      : (children ?? files.map((file) => <FileItem key={fileKey(file)} file={file} />)),
+    mergeProps(props, {
+      role: 'list',
+      'aria-label': props['aria-label'] ?? messages.fileField.list,
+      className: c.styles.list({ className }),
+    }),
+  );
+}
+
+function FileItem({ file, asChild, children, className, ...props }: FileField.ItemProps) {
+  const c = useFile('FileField.Item');
+  const state: FileFieldItemState = { file, index: c.field.state.files.indexOf(file) };
+  const content =
+    typeof children === 'function'
+      ? children(state)
+      : (children ?? (
+          <>
+            <FilePreview file={file} />
+            <span className={c.styles.itemText()}>
+              <span className={c.styles.itemName()} title={file.name}>
+                {file.name}
+              </span>
+              <span className={c.styles.itemSize()}>{formatBytes(file.size)}</span>
+            </span>
+            <FileRemove file={file} />
+          </>
+        ));
+  return part(
+    'div',
+    asChild,
+    content,
+    mergeProps(props, {
+      role: 'listitem',
+      'data-file-field-item': '',
+      className: c.styles.item({ className }),
+    }),
+  );
+}
+
+function FileRemove({ file, asChild, children, className, ...props }: FileField.RemoveProps) {
+  const c = useFile('FileField.Remove');
+  if (c.state.readOnly) return null;
+  return part(
+    'button',
+    asChild,
+    children ?? <XMarkIcon aria-hidden="true" />,
+    mergeProps(props, {
+      type: 'button',
+      'aria-label': props['aria-label'] ?? messages.fileField.remove(file.name),
+      disabled: c.state.disabled,
+      'data-file-field-remove': '',
+      className: c.styles.itemRemove({ className }),
+      onClick: () => c.field.actions.remove(file),
+    }),
+  );
+}
+
+function FilePreview({ file, className, ...props }: FileField.PreviewProps) {
+  const c = useFile('FileField.Preview');
+  const url = usePreviewUrl(file);
+  return (
+    <span
+      {...props}
+      aria-hidden="true"
+      data-file-field-preview=""
+      className={c.styles.preview({ className })}
+    >
+      {url ? <img src={url} alt="" draggable={false} /> : <DocumentIcon />}
+    </span>
+  );
+}
+
 export namespace FileField {
   export type Props = FileFieldProps;
-  export type TriggerProps = ComponentProps<'button'> & { asChild?: boolean };
-  export type ValueProps = ComponentProps<'span'> & { asChild?: boolean; placeholder?: string };
+  export type State = FileFieldState;
+  export type ItemState = FileFieldItemState;
+  export type Appearance = FileFieldAppearance;
+  export type Variant = FileFieldVariant;
+  export type Rejection = FileFieldRejection;
+
+  export type TriggerProps = Omit<ComponentProps<'button'>, 'className'> & {
+    asChild?: boolean;
+    className?: string | ((state: FileFieldState) => string | undefined);
+  };
+  export type ValueProps = Omit<ComponentProps<'span'>, 'placeholder'> & {
+    asChild?: boolean;
+    placeholder?: ReactNode;
+  };
   export type ClearProps = ComponentProps<'button'> & { asChild?: boolean };
-  export type ItemProps = BoxProps & { file: File };
-  export const Trigger = FileTrigger,
-    Value = FileValue,
-    List = FileList,
-    Item = FileItem,
-    Clear = FileClear;
+  export type ListProps = Omit<ComponentProps<'div'>, 'children'> & {
+    asChild?: boolean;
+    children?: ReactNode | ((files: File[]) => ReactNode);
+  };
+  export type ItemProps = Omit<ComponentProps<'div'>, 'children'> & {
+    file: File;
+    asChild?: boolean;
+    children?: ReactNode | ((state: FileFieldItemState) => ReactNode);
+  };
+  export type RemoveProps = ComponentProps<'button'> & { file: File; asChild?: boolean };
+  export type PreviewProps = Omit<ComponentProps<'span'>, 'children'> & { file: File };
+
+  export const Trigger = FileTrigger;
+  export const Value = FileValue;
+  export const Clear = FileClear;
+  export const List = FileList;
+  export const Item = FileItem;
+  export const Remove = FileRemove;
+  export const Preview = FilePreview;
+
   export const Style = tv({
     slots: {
-      root: 'grid min-w-0 gap-2',
-      row: 'flex min-w-0 items-center gap-1',
+      root: 'relative grid min-w-0 gap-2',
+      // The text-field-like surface that holds the trigger and Clear in the `field` appearance.
+      control: ['relative', fieldTrigger.base],
       trigger: [
-        'flex w-full min-w-0 flex-1 touch-manipulation items-center text-left',
-        'cursor-pointer bg-transparent text-(--ids-color-on-surface)',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'focus-ring data-dragover:bg-(--ids-color-primary)/15',
-        'disabled:cursor-not-allowed disabled:opacity-50',
-        '[&_svg]:shrink-0',
+        'flex min-w-0 cursor-pointer touch-manipulation items-center text-start text-(--ids-color-on-surface)',
+        'disabled:cursor-not-allowed aria-disabled:cursor-default',
       ],
-      value: 'min-w-0 flex-1 truncate',
+      icon: 'shrink-0 text-(--ids-color-on-muted)',
+      thumb: 'size-5 rounded-indicator bg-transparent [&_svg]:size-3.5',
+      value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
       clear: [
-        iconSquare.base,
-        'inline-flex cursor-pointer items-center justify-center rounded-standard text-(--ids-color-on-muted)',
-        'focus-ring disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
+        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+        'focus-ring disabled:pointer-events-none',
       ],
+      dropzoneIcon: 'mb-1 size-6 text-(--ids-color-on-muted)',
+      // Korean wraps between words, not inside one, and the lines are balanced.
+      dropzoneTitle: 'font-medium break-keep text-balance',
+      dropzoneHint: 'text-caption-c1-regular text-(--ids-color-on-muted) break-keep text-balance',
       list: 'grid gap-1',
-      item: 'flex min-w-0 items-center gap-2 rounded-standard bg-(--ids-color-primary)/5 px-3 py-1',
-      itemName: 'min-w-0 flex-1 truncate',
-      itemSize: 'shrink-0 text-caption-c1-regular text-(--ids-color-on-muted)',
-      itemRemove: [
-        'inline-flex size-6 shrink-0 cursor-pointer items-center justify-center rounded-indicator',
-        'focus-ring disabled:cursor-not-allowed disabled:opacity-50',
-        '[&_svg]:size-(--ids-size-icon-tiny)',
+      item: [
+        'flex min-w-0 items-center gap-3 concentric-p-1.5 pe-2',
+        'bg-(--ids-color-surface) inset-ring-1 inset-ring-(--ids-color-border) dark:bg-(--ids-color-muted)/30',
       ],
-      error: 'wrap-anywhere text-(--ids-color-danger)',
+      preview: [
+        'flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-standard',
+        'bg-(--ids-color-muted) text-(--ids-color-on-muted) [&_img]:size-full [&_img]:object-cover',
+        '[&_svg]:size-(--ids-size-icon-standard)',
+      ],
+      itemText: 'grid min-w-0 flex-1',
+      itemName: 'truncate text-(--ids-color-on-surface)',
+      itemSize: 'text-caption-c1-regular text-(--ids-color-on-muted)',
+      itemRemove: [
+        'inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-standard',
+        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
+        'focus-ring disabled:pointer-events-none disabled:opacity-50',
+        '[&_svg]:size-(--ids-size-icon-standard)',
+      ],
+      rejections: 'grid gap-0.5 wrap-anywhere text-(--ids-color-danger)',
     },
     variants: {
-      variant: {
-        outline: {
-          trigger: [
-            'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
-            'aria-invalid:inset-ring-(--ids-color-danger)',
-          ],
-        },
+      appearance: {
+        field: { trigger: 'h-full flex-1 self-stretch bg-transparent outline-none' },
+        // A dashed area the size of a card. Dragging files over it recolors it, so the drop
+        // target is obvious before the drop.
         dropzone: {
           trigger: [
-            'min-h-32 justify-center concentric-p-6',
-            'border border-dashed border-(--ids-color-outline)',
+            'min-h-32 w-full flex-col justify-center gap-1 text-center concentric-p-4',
+            'border border-dashed focus-ring',
+            'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+            'data-dragging:border-(--ids-color-primary) data-dragging:bg-(--ids-color-primary)/5',
             'aria-invalid:border-(--ids-color-danger)',
+            'disabled:opacity-50',
           ],
         },
       },
+      variant: {
+        outline: {},
+        soft: {},
+        ghost: {},
+      } satisfies Record<FileFieldVariant, object>,
       size: {
         standard: {
-          trigger: 'gap-2 text-body-b3-regular [&_svg]:size-(--ids-size-icon-standard)',
-          clear: iconSquare.size.standard,
-          item: 'text-body-b3-regular',
-          error: 'text-body-b3-regular',
+          root: 'text-body-b3-regular',
+          clear: 'me-1 size-7 [&_svg]:size-(--ids-size-icon-standard)',
+          icon: fieldTrigger.icon.standard,
+          rejections: 'text-body-b3-regular',
         },
         tiny: {
-          trigger: 'gap-1.5 text-caption-c1-regular [&_svg]:size-(--ids-size-icon-tiny)',
-          clear: iconSquare.size.tiny,
-          item: 'text-caption-c1-regular',
-          error: 'text-caption-c1-regular',
+          root: 'text-caption-c1-regular',
+          clear: 'me-1 size-6 [&_svg]:size-(--ids-size-icon-tiny)',
+          icon: fieldTrigger.icon.tiny,
+          rejections: 'text-caption-c1-regular',
         },
       } satisfies Record<IdsSize, object>,
     },
     compoundVariants: [
+      { appearance: 'field', variant: 'outline', class: { control: fieldTrigger.variant.outline } },
+      { appearance: 'field', variant: 'soft', class: { control: fieldTrigger.variant.soft } },
+      { appearance: 'field', variant: 'ghost', class: { control: fieldTrigger.variant.ghost } },
       {
-        variant: 'outline',
+        appearance: 'field',
         size: 'standard',
-        class: { trigger: 'h-(--ids-size-control-standard) rounded-standard px-3' },
+        class: {
+          control: 'h-(--ids-size-control-standard) rounded-standard',
+          trigger: 'gap-2 px-3',
+        },
       },
       {
-        variant: 'outline',
+        appearance: 'field',
         size: 'tiny',
-        class: { trigger: 'h-(--ids-size-control-tiny) rounded-standard px-2' },
+        class: {
+          control: 'h-(--ids-size-control-tiny) rounded-standard',
+          trigger: 'gap-1.5 px-2.5',
+        },
+      },
+      {
+        appearance: 'dropzone',
+        variant: 'outline',
+        class: { trigger: 'border-(--ids-color-border) hover:bg-(--ids-color-muted)/50' },
+      },
+      {
+        appearance: 'dropzone',
+        variant: 'soft',
+        class: {
+          trigger: 'border-transparent bg-(--ids-color-muted) hover:bg-(--ids-color-muted)/70',
+        },
+      },
+      {
+        appearance: 'dropzone',
+        variant: 'ghost',
+        class: { trigger: 'border-transparent hover:bg-(--ids-color-muted)/50' },
       },
     ],
-    defaultVariants: { variant: 'outline', size: 'standard' },
+    defaultVariants: { appearance: 'field', variant: 'outline', size: 'standard' },
   });
 }

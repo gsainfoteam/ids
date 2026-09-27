@@ -7,6 +7,9 @@ const dom = new JSDOM('<!doctype html><html><body></body></html>', {
 });
 for (const key of [
   'window',
+  'Element',
+  'Node',
+  'getComputedStyle',
   'document',
   'HTMLElement',
   'HTMLInputElement',
@@ -124,8 +127,9 @@ test('children without an Input become leading adornments before an auto-inserte
     Array.from(shell.children, (el) =>
       'telFieldAdornment' in el.dataset ? el.textContent : el.tagName,
     ),
-    ['BUTTON', 'Tel', 'INPUT'],
+    ['DIV', 'Tel', 'INPUT'],
   );
+  assert.ok(shell.firstElementChild.matches('[data-select]'));
   assert.equal(input().getAttribute('aria-label'), 'Phone');
   await type(input(), '01012345678');
   assert.equal(input().value, '010-1234-5678');
