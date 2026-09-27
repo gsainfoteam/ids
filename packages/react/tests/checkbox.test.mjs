@@ -241,6 +241,29 @@ test('react-hook-form register(): error, click, setValue and reset all show on t
   assert.equal(input().checked, true);
 });
 
+test('react-hook-form register(): a true default written while mounting shows at once', async () => {
+  const { Field: RhfField } = await import('../dist/react-hook-form.js');
+  const { FormProvider, useForm } = await import('react-hook-form');
+  let methods;
+  function App() {
+    methods = useForm({ defaultValues: { news: true } });
+    const [, rerender] = useState(0);
+    return h(
+      FormProvider,
+      methods,
+      h(RhfField, { name: 'news' }, h(RhfField.Label, null, 'News'), h(Checkbox)),
+      h('button', { type: 'button', onClick: () => rerender((count) => count + 1) }, 'Rerender'),
+    );
+  }
+  await render(h(App));
+  assert.equal(box().dataset.state, 'checked');
+  assert.equal(input().checked, true);
+  await act(async () => host.querySelector('button').click());
+  assert.equal(input().checked, true, 'a later render does not paint the stale state over it');
+  await click();
+  assert.equal(methods.getValues('news'), false);
+});
+
 test('react-hook-form controlMode="checked" binds onCheckedChange', async () => {
   const { Field: RhfField } = await import('../dist/react-hook-form.js');
   const { FormProvider, useForm } = await import('react-hook-form');

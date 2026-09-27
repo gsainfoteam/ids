@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
+import { useCallback, useLayoutEffect, useRef, type RefObject } from 'react';
 
 function descriptorOf(node: object, key: string) {
   for (let proto: object | null = node; proto; proto = Object.getPrototypeOf(proto)) {
@@ -13,6 +13,11 @@ function descriptorOf(node: object, key: string) {
 // such a write is reported. React writes through the same setter, so the report waits until its
 // commit is done: by then the DOM agrees with the rendered state and the caller finds nothing to
 // adopt. Writes the component makes itself go through `silently` and are not reported.
+//
+// register() also writes the default value from its ref callback, during the very commit that
+// mounts the input and before any effect could wrap the setter. The wrapper is therefore installed
+// in a layout effect, which runs after the input's refs are attached, and the value found there is
+// reported once; a passive effect would let a re-render paint the stale state over it first.
 export function useCheckedWrites(
   ref: RefObject<HTMLInputElement | null>,
   onWrite: (checked: boolean) => void,
@@ -23,7 +28,7 @@ export function useCheckedWrites(
     latest.current = onWrite;
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const input = ref.current;
     if (!input) return;
     const own = Object.getOwnPropertyDescriptor(input, 'checked');
@@ -42,6 +47,7 @@ export function useCheckedWrites(
         queueMicrotask(() => latest.current(get.call(input)));
       },
     });
+    latest.current(get.call(input));
     return () => {
       if (own) Object.defineProperty(input, 'checked', own);
       else Reflect.deleteProperty(input, 'checked');
