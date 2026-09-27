@@ -108,6 +108,14 @@ import { Chip } from '@gsainfoteam/ids-react';
 
 `className`, `style`, `children` 은 `{ selected, removable, interactive, hovered, ... }` 를 받는 함수가 될 수 있습니다.
 
+- 누를 수 없는 칩은 스스로 포커스를 받지 않습니다. 삭제 버튼에 키보드 포커스가 있으면 칩에 `data-focus-visible` 이 붙고 상태의 `focusVisible` 이 `true` 가 됩니다. 칩 사이를 방향키로 오가는 필드가 포커스된 칩을 칠할 때 씁니다.
+
+```tsx
+<Chip className="data-focus-visible:bg-(--ids-color-primary)/15" onRemove={remove}>
+  react
+</Chip>
+```
+
 ## 속성
 
 | 속성                                                | 기본 / 동작                                                             |

@@ -3,6 +3,7 @@ import {
   isValidElement,
   use,
   useCallback,
+  useState,
   type ComponentProps,
   type CSSProperties,
   type HTMLAttributes,
@@ -117,6 +118,9 @@ export function Chip({
     disabled,
   });
   const rootIsButton = chip.interactive && !asChild;
+  // A static chip takes no focus itself, so keyboard focus on its Close is the chip's own: a
+  // field of chips marks the one the arrow keys are on with it.
+  const [innerFocusVisible, setInnerFocusVisible] = useState(false);
   const { state: interaction, handlers } = useInteractive<HTMLElement>({
     disabled,
     onInteractionChange,
@@ -126,8 +130,15 @@ export function Chip({
         chip.removeOnKey(event);
     },
     onKeyUp,
-    onFocus,
-    onBlur,
+    onFocus: (event) => {
+      onFocus?.(event);
+      if (event.target !== event.currentTarget)
+        setInnerFocusVisible((event.target as Element).matches(':focus-visible'));
+    },
+    onBlur: (event) => {
+      onBlur?.(event);
+      setInnerFocusVisible(false);
+    },
     onPointerEnter,
     onPointerLeave,
     onPointerDown,
@@ -141,6 +152,7 @@ export function Chip({
 
   const state: Chip.State = {
     ...interaction,
+    focusVisible: chip.interactive ? interaction.focusVisible : innerFocusVisible,
     selected: chip.selected,
     removable: chip.removable,
     interactive: chip.interactive,
@@ -183,7 +195,9 @@ export function Chip({
         data-removable={flag(chip.removable)}
         data-interactive={flag(chip.interactive)}
         data-disabled={flag(disabled)}
-        {...(chip.interactive ? interactiveDataProps(interaction) : {})}
+        {...(chip.interactive
+          ? interactiveDataProps(interaction)
+          : { 'data-focus-visible': flag(innerFocusVisible) })}
         className={styles.root({ className: resolveState(className, state) })}
         style={resolveState(style, state)}
       >

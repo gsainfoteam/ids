@@ -12,7 +12,8 @@ for the pointer only, so no button sits inside a button, and pressing the X no l
 Plain text becomes a truncating `Chip.Label`, chips can be `disabled`, hover and press lay a veil
 in the text color over any variant, and `className` / `style` / `children` take the chip state.
 The remove button is a ghost `IconButton` in the chip's color scheme, so its focus ring follows
-the scheme.
+the scheme. A chip that cannot be pressed reports keyboard focus on its remove button as its own
+`data-focus-visible` and `focusVisible` state.
 
 Breaking: `Chip.Close` no longer takes `onClose`; pass `onRemove` to the Chip, and `Chip.Close`
 only changes the glyph or label. The neutral `solid` chip is the inverted on-surface color.

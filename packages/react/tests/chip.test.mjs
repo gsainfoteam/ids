@@ -218,6 +218,24 @@ test('onRemove gets the click or key that asked, and preventDefault leaves focus
   assert.deepEqual(events, ['keydown', 'click']);
 });
 
+test('keyboard focus on the close of a static chip is the chip focus-visible state', async () => {
+  await render(
+    h(
+      Chip,
+      { onRemove: () => {}, className: (state) => (state.focusVisible ? 'lit' : 'dim') },
+      'react',
+    ),
+  );
+  const close = host.querySelector('[data-chip-close]');
+  assert.equal(chip().hasAttribute('data-focus-visible'), false);
+  await act(async () => close.focus());
+  assert.ok(chip().hasAttribute('data-focus-visible'));
+  assert.ok(chip().classList.contains('lit'));
+  await act(async () => close.blur());
+  assert.equal(chip().hasAttribute('data-focus-visible'), false);
+  assert.ok(chip().classList.contains('dim'));
+});
+
 test('disabled: nothing toggles or removes', async () => {
   let removed = 0;
   await render(h(Chip, { disabled: true, onRemove: () => removed++ }, 'locked'));
