@@ -287,7 +287,8 @@ export namespace Item {
       actions: 'ms-auto flex shrink-0 items-center gap-2',
       group: 'flex min-w-0 flex-col',
       groupItem: 'flex',
-      // Divider draws the line; an hr also brings its own border, which would thicken it.
+      // Divider fills the line with the border color, but an hr keeps the base style's 1px top
+      // border, which would cover that fill in the text color.
       separator: 'border-0',
     },
     variants: {

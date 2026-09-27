@@ -164,7 +164,7 @@ test('Group: a list with an item per row; separators are hidden and size is shar
   assert.equal(rule.id, 'rule');
   assert.ok(rule.hasAttribute('data-divider'));
   assert.equal(rule.getAttribute('role'), 'separator');
-  assert.match(rule.className, /border-0/, 'the hr border does not thicken the line');
+  assert.match(rule.className, /border-0/, 'the hr border does not paint over the line');
 });
 
 test('dense halves the padding and a group shares it with its rows', () => {
