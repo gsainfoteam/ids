@@ -316,7 +316,9 @@ export namespace Rating {
       ],
       item: 'relative inline-flex shrink-0 items-center justify-center rounded-standard focus-ring',
       graphic: 'pointer-events-none relative block [&_svg]:size-full',
-      empty: 'absolute inset-0 text-(--ids-color-border)',
+      // A required rating left empty is the common invalid case, so the empty glyphs carry it too.
+      empty:
+        'absolute inset-0 text-(--ids-color-border) in-data-invalid:text-(--ids-color-danger)/35',
       // clip-path has no logical inset, so the half that fills first swaps sides under rtl.
       fill: [
         'absolute inset-0 text-(--rating-accent)',
