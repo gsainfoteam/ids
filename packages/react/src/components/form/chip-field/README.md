@@ -147,11 +147,13 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 | 요소   | 속성                                                                                                      |
 | ------ | --------------------------------------------------------------------------------------------------------- |
 | 루트   | `data-open`, `data-disabled`, `data-readonly`, `data-invalid`, `data-required`, `data-full`, `data-empty` |
-| 칩     | `data-chip-field-chip`, 지울 수 없는 옵션이면 `data-disabled`                                             |
+| 칩     | `data-chip-field-chip`, 지울 수 없는 옵션이면 `data-disabled`, 방향키가 가리키면 `data-focus-visible`     |
 | Item   | `data-selected`, `data-highlighted`, `data-disabled`                                                      |
 | Create | `data-highlighted`, 거부된 값이면 `data-invalid`                                                          |
 
 - 루트의 `className` 은 `ChipField.State` 를 받는 함수도 됩니다.
+- 칩은 `Chip` 이고 지우기 버튼은 `Chip.Close` 입니다. `data-chip`, `data-size` 같은 Chip 의 속성도 붙습니다.
+- 지우기 버튼에 포커스가 있으면 필드 테두리에 링이 그려지고 칩은 테마 색으로 칠해집니다. 버튼 자체에는 링을 그리지 않습니다.
 
 ## 열림 상태
 

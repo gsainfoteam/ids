@@ -14,7 +14,7 @@ import {
   type RefObject,
 } from 'react';
 
-import { CheckIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/16/solid';
+import { CheckIcon, ChevronDownIcon } from '@heroicons/react/16/solid';
 import { isNotNil } from 'es-toolkit';
 
 import { CREATE, useChipField } from './use-chip-field';
@@ -33,6 +33,7 @@ import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+import { Chip } from '../../data/chip';
 import { Slot } from '../../utility/slot';
 import { useFieldSize } from '../field/context';
 import { collectOptions, slotChildren, type SelectOption } from '../select/select-options';
@@ -88,6 +89,7 @@ type Context = {
   control: InputAttributes;
   listLabel: { 'aria-label'?: string; 'aria-labelledby'?: string };
   removeLabel: (label: string) => string;
+  size: IdsSize;
   styles: ReturnType<typeof ChipField.Style>;
 };
 
@@ -242,7 +244,8 @@ export function ChipField({
     full: s.full,
     empty: s.selected.length === 0,
   };
-  const styles = ChipField.Style({ variant, size: useFieldSize(size) ?? 'standard' });
+  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = ChipField.Style({ variant, size: resolvedSize });
 
   const inputDefaults: InputAttributes = {
     placeholder: messages.chipField.placeholder,
@@ -293,6 +296,7 @@ export function ChipField({
         control,
         listLabel,
         removeLabel,
+        size: resolvedSize,
         styles,
       }}
     >
@@ -354,7 +358,8 @@ export function ChipField({
 }
 
 // A chip is focused through its remove button, which is out of the Tab order: the arrow keys
-// reach it from the input, so Tab still leaves the field in one step.
+// reach it from the input, so Tab still leaves the field in one step. The field moves focus after
+// a removal itself, to a neighbour or back to the input, so the Chip's own move is prevented.
 function Chips() {
   const c = useChip('Chips');
   return c.field.state.selected.map((item) => {
@@ -362,28 +367,33 @@ function Chips() {
     const label = option?.label ?? item;
     const removable = !c.field.state.blocked && !option?.disabled;
     return (
-      <span
+      <Chip
         key={item}
+        size={c.size}
+        disabled={option?.disabled}
         data-chip-field-chip=""
-        data-disabled={option?.disabled ? '' : undefined}
         className={c.styles.chip()}
+        onRemove={
+          removable
+            ? (event) => {
+                event.preventDefault();
+                c.field.handlers.onChipRemove(item);
+              }
+            : undefined
+        }
       >
-        <span className={c.styles.chipLabel()}>{label}</span>
+        {label}
         {removable && (
-          <button
-            type="button"
+          <Chip.Close
             tabIndex={-1}
             aria-label={c.removeLabel(label)}
             data-chip-field-remove={item}
             data-field-input=""
             className={c.styles.chipRemove()}
-            onClick={(event) => c.field.handlers.onChipClick(item, event.currentTarget)}
             onKeyDown={(event) => c.field.handlers.onChipKeyDown(event, item)}
-          >
-            <XMarkIcon aria-hidden="true" />
-          </button>
+          />
         )}
-      </span>
+      </Chip>
     );
   });
 }
@@ -749,22 +759,17 @@ export namespace ChipField {
         '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
         '[&_button]:p-0',
       ],
-      // A chip is a neutral pill like Chip; the theme color only marks the one focused from the
-      // keyboard.
+      // A chip is a neutral Chip sized to the field's rows; the theme color only marks the one the
+      // arrow keys are on, which Chip reports as data-focus-visible.
       chip: [
-        'inline-flex max-w-full min-w-0 items-center gap-0.5 rounded-full bg-(--ids-color-muted)',
-        'text-(--ids-color-on-surface) data-disabled:opacity-60',
+        'max-w-full min-w-0 gap-0.5 data-disabled:opacity-60',
         'transition-[color,background-color] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'has-[[data-chip-field-remove]:focus-visible]:bg-(--ids-color-primary)/15',
-        'has-[[data-chip-field-remove]:focus-visible]:text-(--ids-color-primary)',
+        'data-focus-visible:bg-(--ids-color-primary)/15 data-focus-visible:text-(--ids-color-primary)',
       ],
-      chipLabel: 'truncate',
-      // The glyph is small, so an invisible margin widens what a finger can hit.
-      chipRemove: [
-        'relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full outline-none',
-        'text-(--ids-color-on-muted) hover:bg-(--ids-color-on-surface)/10 hover:text-(--ids-color-on-surface)',
-        'after:absolute after:-inset-1',
-      ],
+      // The remove button carries data-field-input, so the field rings while it has focus and the
+      // chip takes the tint; like a nested field, it draws no ring of its own. The glyph is small,
+      // so an invisible margin widens what a finger can hit.
+      chipRemove: 'relative ring-0! after:absolute after:-inset-1',
       input: [
         'min-w-20 flex-1 bg-transparent py-1 outline-none',
         'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
@@ -797,8 +802,8 @@ export namespace ChipField {
             'gap-1',
             'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
           ],
-          chip: 'h-6 ps-2.5 pe-2.5 text-caption-c1-medium has-[button]:pe-1',
-          chipRemove: 'size-4 [&_svg]:size-3',
+          chip: 'h-6 px-2.5',
+          chipRemove: '[&_svg]:size-3',
           icon: fieldTrigger.icon.standard,
         },
         tiny: {
@@ -807,8 +812,8 @@ export namespace ChipField {
             'gap-0.5',
             'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',
           ],
-          chip: 'h-5 ps-2 pe-2 text-caption-c2-medium has-[button]:pe-0.5',
-          chipRemove: 'size-3.5 [&_svg]:size-2.5',
+          chip: 'h-5 px-2',
+          chipRemove: '[&_svg]:size-2.5',
           icon: fieldTrigger.icon.tiny,
         },
       } satisfies Record<IdsSize, object>,

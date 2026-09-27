@@ -345,9 +345,10 @@ export function useChipField({
     if (printable) focusInput('end');
   };
 
-  const onChipClick = (item: string, button: HTMLButtonElement) => {
+  // Pressing a remove button hands focus to the chip that moves into its place, as Delete does.
+  const onChipRemove = (item: string) => {
     const buttons = removeButtons();
-    const index = buttons.indexOf(button);
+    const index = buttons.findIndex((button) => button.dataset.chipFieldRemove === item);
     remove(item, index >= 0 && index < buttons.length - 1 ? index : 'input');
   };
 
@@ -410,7 +411,7 @@ export function useChipField({
       onPaste,
       onInputKeyDown,
       onChipKeyDown,
-      onChipClick,
+      onChipRemove,
       onCompositionStart: () => {
         composing.current = true;
       },
