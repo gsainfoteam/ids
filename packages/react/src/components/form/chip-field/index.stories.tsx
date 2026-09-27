@@ -167,7 +167,7 @@ export const KeyboardAndChips: Story = {
     docs: {
       description: {
         story:
-          '입력 맨 앞에서 ← 를 누르면 마지막 칩으로 갑니다. 칩 사이는 ← → 로 오가고, Backspace 와 Delete 는 칩을 지운 뒤 옆 칩으로 포커스를 옮깁니다. → 로 마지막 칩을 지나면 입력으로 돌아옵니다. Tab 은 칩을 거치지 않고 필드를 떠납니다.',
+          '입력 맨 앞에서 ← 를 누르면 마지막 칩으로 갑니다. 칩 사이는 ← → 로 오가고, 가리킨 칩은 테마 색으로 칠합니다. Backspace 와 Delete 는 칩을 지운 뒤 옆 칩으로 포커스를 옮깁니다. → 로 마지막 칩을 지나면 입력으로 돌아옵니다. 마지막 칩을 × 로 지우면 입력으로 돌아옵니다. Tab 은 칩을 거치지 않고 필드를 떠납니다.',
       },
     },
   },
@@ -180,7 +180,9 @@ export const KeyboardAndChips: Story = {
     await expect(chips(canvasElement)).toEqual(['React', 'Vue', 'Svelte']);
     await expect(field).toHaveValue('');
     await userEvent.keyboard('{Escape}{ArrowLeft}');
-    await expect(canvas.getByRole('button', { name: 'Svelte 삭제' })).toHaveFocus();
+    const svelte = canvas.getByRole('button', { name: 'Svelte 삭제' });
+    await expect(svelte).toHaveFocus();
+    await expect(svelte.closest('[data-chip]')).toHaveAttribute('data-focus-visible');
     await userEvent.keyboard('{ArrowLeft}');
     await expect(canvas.getByRole('button', { name: 'Vue 삭제' })).toHaveFocus();
     await userEvent.keyboard('{Backspace}');
@@ -191,6 +193,9 @@ export const KeyboardAndChips: Story = {
     await userEvent.keyboard('{ArrowRight}');
     await expect(field).toHaveFocus();
     await expect(args.onValueChange).toHaveBeenLastCalledWith(['svelte']);
+    await userEvent.click(canvas.getByRole('button', { name: 'Svelte 삭제' }));
+    await expect(chips(canvasElement)).toEqual([]);
+    await expect(input(canvasElement)).toHaveFocus();
   },
 };
 

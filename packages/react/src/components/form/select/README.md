@@ -70,6 +70,7 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 
 - 검색하면 첫 결과를 가리키고, 구분선은 숨깁니다.
 - `Select.Empty` 는 늘 마운트된 live region 이라 결과가 비는 순간 스크린 리더가 읽습니다.
+- `Select.SearchField` 는 테두리와 링 없이 아래 선만 그린 `TextField` 입니다. 돋보기나 여백을 눌러도 포커스가 입력에 남고, 받은 속성은 input 으로 갑니다.
 
 ## 여러 개 선택과 지우기
 
@@ -86,6 +87,7 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 ```
 
 - 지운 뒤에는 트리거로 포커스가 갑니다. `readOnly` 면 지우기 버튼이 보이지 않습니다.
+- `Select.Clear` 는 필드 안의 ghost `IconButton` 입니다. `Tab` 으로 따로 갈 수 있고, 포커스 링도 따로 그립니다. children 은 글리프, `asChild` 면 그릴 버튼입니다.
 - 트리거에는 두 개까지 라벨을 보이고 나머지는 `+2` 처럼 셉니다. 라벨이 잘려도 숫자는 잘리지 않습니다.
 
 ## 구성
@@ -114,6 +116,7 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 ```
 
 - `Item`, `Group` 은 `Content` 나 루트의 자식, 또는 Fragment 안에 둡니다. 다른 컴포넌트 안은 찾지 않습니다.
+- `Select.Separator` 는 `decorative` 인 `Divider` 입니다. listbox 에는 옵션과 그룹만 둘 수 있어 스크린 리더에는 숨깁니다.
 - `Trigger`, `Clear`, `Content` 는 각각 하나까지입니다. 옵션은 `Content` 안이나 루트 중 한 곳에만 둡니다.
 - 모든 part 가 `asChild` 를 받습니다. 자식은 props 와 ref 를 해당 element 에 전달해야 합니다.
 

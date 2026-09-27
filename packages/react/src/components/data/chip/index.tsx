@@ -3,6 +3,7 @@ import {
   isValidElement,
   use,
   useCallback,
+  useState,
   type ComponentProps,
   type CSSProperties,
   type HTMLAttributes,
@@ -13,7 +14,7 @@ import {
 
 import { XMarkIcon } from '@heroicons/react/16/solid';
 
-import { useChip } from './use-chip';
+import { useChip, type ChipRemoveEvent } from './use-chip';
 import {
   interactiveDataProps,
   useInteractive,
@@ -23,6 +24,7 @@ import { messages } from '../../../internal/messages';
 import { resolveState, type StateValue } from '../../../internal/state-props';
 import { useRegisteredId } from '../../../internal/surface';
 import { flattenFragments, invariant, mergeRefs, tv } from '../../../utils';
+import { IconButton } from '../../action/icon-button';
 import { Slot } from '../../utility/slot';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -35,11 +37,13 @@ type Context = {
   // A chip that is itself a button cannot hold another button, so its close glyph is drawn for
   // the pointer only and the keyboard removes the chip with Backspace or Delete.
   rootIsButton: boolean;
+  colorScheme: ChipColorScheme;
+  size: IdsSize;
   disabled: boolean;
   labelId: string | undefined;
   setLabelId: (id: string | undefined) => void;
-  remove: () => void;
-  removeOnKey: (event: KeyboardEvent) => boolean;
+  remove: (event: ChipRemoveEvent) => void;
+  removeOnKey: (event: KeyboardEvent<HTMLElement>) => boolean;
 };
 
 const ChipContext = createContext<Context | null>(null);
@@ -114,6 +118,9 @@ export function Chip({
     disabled,
   });
   const rootIsButton = chip.interactive && !asChild;
+  // A static chip takes no focus itself, so keyboard focus on its Close is the chip's own: a
+  // field of chips marks the one the arrow keys are on with it.
+  const [innerFocusVisible, setInnerFocusVisible] = useState(false);
   const { state: interaction, handlers } = useInteractive<HTMLElement>({
     disabled,
     onInteractionChange,
@@ -123,8 +130,15 @@ export function Chip({
         chip.removeOnKey(event);
     },
     onKeyUp,
-    onFocus,
-    onBlur,
+    onFocus: (event) => {
+      onFocus?.(event);
+      if (event.target !== event.currentTarget)
+        setInnerFocusVisible((event.target as Element).matches(':focus-visible'));
+    },
+    onBlur: (event) => {
+      onBlur?.(event);
+      setInnerFocusVisible(false);
+    },
     onPointerEnter,
     onPointerLeave,
     onPointerDown,
@@ -138,6 +152,7 @@ export function Chip({
 
   const state: Chip.State = {
     ...interaction,
+    focusVisible: chip.interactive ? interaction.focusVisible : innerFocusVisible,
     selected: chip.selected,
     removable: chip.removable,
     interactive: chip.interactive,
@@ -151,6 +166,8 @@ export function Chip({
       value={{
         styles,
         rootIsButton,
+        colorScheme,
+        size,
         disabled,
         labelId: chip.labelId,
         setLabelId: chip.setLabelId,
@@ -178,7 +195,9 @@ export function Chip({
         data-removable={flag(chip.removable)}
         data-interactive={flag(chip.interactive)}
         data-disabled={flag(disabled)}
-        {...(chip.interactive ? interactiveDataProps(interaction) : {})}
+        {...(chip.interactive
+          ? interactiveDataProps(interaction)
+          : { 'data-focus-visible': flag(innerFocusVisible) })}
         className={styles.root({ className: resolveState(className, state) })}
         style={resolveState(style, state)}
       >
@@ -191,6 +210,7 @@ export function Chip({
 export namespace Chip {
   export type Variant = ChipVariant;
   export type ColorScheme = ChipColorScheme;
+  export type RemoveEvent = ChipRemoveEvent;
 
   export type State = InteractiveState & {
     selected: boolean;
@@ -207,7 +227,9 @@ export namespace Chip {
     selected?: boolean;
     defaultSelected?: boolean;
     onSelectedChange?: (selected: boolean) => void;
-    onRemove?: () => void;
+    // preventDefault() on the event keeps focus where the handler puts it instead of on the
+    // neighbouring chip.
+    onRemove?: (event: RemoveEvent) => void;
     disabled?: boolean;
     asChild?: boolean;
     onInteractionChange?: (state: InteractiveState) => void;
@@ -258,7 +280,7 @@ export namespace Chip {
           className={context.styles.close({ className })}
           onClick={(event) => {
             event.stopPropagation();
-            context.remove();
+            context.remove(event);
           }}
         >
           {glyph}
@@ -266,10 +288,12 @@ export namespace Chip {
       );
 
     return (
-      <button
-        type="button"
+      <IconButton
         {...rest}
         id={closeId}
+        variant="ghost"
+        colorScheme={context.colorScheme}
+        size={context.size}
         // "frontend 삭제": the chip's own label followed by this button's label.
         aria-label={ariaLabel ?? messages.chip.remove}
         aria-labelledby={
@@ -277,20 +301,19 @@ export namespace Chip {
         }
         disabled={context.disabled}
         data-chip-close=""
+        icon={isValidElement(glyph) ? glyph : <>{glyph}</>}
         className={context.styles.close({ className })}
         onClick={(event) => {
           onClick?.(event);
           if (event.defaultPrevented) return;
           event.stopPropagation();
-          context.remove();
+          context.remove(event);
         }}
         onKeyDown={(event) => {
           onKeyDown?.(event);
           if (!event.defaultPrevented) context.removeOnKey(event);
         }}
-      >
-        {glyph}
-      </button>
+      />
     );
   }
   export namespace Close {
@@ -307,11 +330,14 @@ export namespace Chip {
       ],
       icon: 'inline-flex shrink-0 [&_svg]:size-[1.15em]',
       label: 'min-w-0 truncate',
+      // Chip.Close is a ghost IconButton turned into a small circle in the chip's own text color.
+      // Its hover is also written as hover:, which the glyph a button chip draws instead needs,
+      // since only the IconButton reports data-hovered.
       close: [
-        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full',
-        'opacity-60 hover:bg-current/15 hover:opacity-100',
-        'transition-[opacity,background-color] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'focus-ring disabled:cursor-not-allowed [&_svg]:size-[0.95em]',
+        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60',
+        'hover:bg-current/15 hover:opacity-100 data-hovered:bg-current/15 data-active:bg-current/15',
+        'transition-[opacity,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+        '[&_svg]:size-[0.95em]',
       ],
     },
     variants: {

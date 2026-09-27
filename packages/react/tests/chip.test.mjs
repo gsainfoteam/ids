@@ -113,6 +113,18 @@ test('removable: the close button is named after the chip and removes on click, 
   assert.equal(removed, 3);
 });
 
+test('the close button is a ghost IconButton in the chip color scheme and size', () => {
+  const doc = html(h(Chip, { colorScheme: 'danger', size: 'tiny', onRemove: () => {} }, 'react'));
+  const close = doc.querySelector('[data-chip-close]');
+  assert.equal(close.type, 'button');
+  assert.equal(close.dataset.variant, 'ghost');
+  assert.equal(close.dataset.size, 'tiny');
+  assert.match(close.className, /\[--control-ring:var\(--ids-color-danger\)\]/);
+  assert.match(close.className, /(^| )size-3\.5( |$)/, 'the chip keeps its own small circle');
+  assert.match(close.className, /(^| )rounded-full( |$)/);
+  assert.match(close.className, /(^| )text-current( |$)/, 'in the chip text color');
+});
+
 test('a chip that is a button draws its X for the pointer and removes on Backspace', async () => {
   const events = [];
   await render(
@@ -164,6 +176,64 @@ test('removing a focused chip hands focus to the next chip, or the previous at t
   await press(closeOf('c'), 'Delete');
   await frame();
   assert.equal(document.activeElement, closeOf('a'), 'the last one hands focus back');
+});
+
+test('onRemove gets the click or key that asked, and preventDefault leaves focus to it', async () => {
+  const events = [];
+  function Tags() {
+    const [tags, setTags] = useState(['a', 'b']);
+    const remove = (tag) => (event) => {
+      events.push(event.type);
+      event.preventDefault();
+      setTags((prev) => prev.filter((t) => t !== tag));
+      document.getElementById('entry').focus();
+    };
+    return h(
+      'div',
+      null,
+      h('input', { id: 'entry' }),
+      h(
+        'ul',
+        null,
+        tags.map((tag) => h('li', { key: tag }, h(Chip, { onRemove: remove(tag) }, tag))),
+      ),
+    );
+  }
+  await render(h(Tags));
+  const closeOf = (tag) =>
+    [...host.querySelectorAll('[data-chip]')]
+      .find((element) => element.textContent === tag)
+      ?.querySelector('[data-chip-close]');
+  await act(async () => closeOf('a').focus());
+  const backspace = new KeyboardEvent('keydown', {
+    key: 'Backspace',
+    bubbles: true,
+    cancelable: true,
+  });
+  await act(async () => closeOf('a').dispatchEvent(backspace));
+  await frame();
+  assert.equal(document.activeElement, host.querySelector('#entry'), 'not moved to the next chip');
+  assert.equal(backspace.defaultPrevented, true, 'the key still does nothing else');
+  await act(async () => closeOf('b').click());
+  assert.deepEqual(events, ['keydown', 'click']);
+});
+
+test('keyboard focus on the close of a static chip is the chip focus-visible state', async () => {
+  await render(
+    h(
+      Chip,
+      { onRemove: () => {}, className: (state) => (state.focusVisible ? 'lit' : 'dim') },
+      'react',
+    ),
+  );
+  const close = host.querySelector('[data-chip-close]');
+  assert.equal(chip().hasAttribute('data-focus-visible'), false);
+  await act(async () => close.focus());
+  assert.ok(chip().hasAttribute('data-focus-visible'));
+  assert.ok(chip().classList.contains('lit'));
+  await act(async () => close.blur());
+  assert.equal(chip().hasAttribute('data-focus-visible'), false);
+  assert.ok(chip().classList.contains('dim'));
 });
 
 test('disabled: nothing toggles or removes', async () => {

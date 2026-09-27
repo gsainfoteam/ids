@@ -20,6 +20,7 @@ for (const key of [
   'KeyboardEvent',
   'MouseEvent',
   'CompositionEvent',
+  'requestAnimationFrame',
 ])
   globalThis[key] = dom.window[key];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -128,7 +129,11 @@ test('SSR: Field labelling, one hidden input per chip, required validator, no ne
   ]);
   assert.equal(doc.querySelectorAll('[data-form-value-validator]').length, 1);
   assert.equal(doc.querySelector('button button'), null);
-  assert.equal(doc.querySelector('[data-chip-field-remove]').tabIndex, -1);
+  const remove = doc.querySelector('[data-chip-field-remove]');
+  assert.equal(remove.tabIndex, -1);
+  assert.ok(remove.closest('[data-chip-field-chip]').hasAttribute('data-chip'), 'a chip is a Chip');
+  assert.ok(remove.hasAttribute('data-chip-close'), 'removed through Chip.Close');
+  assert.equal(remove.dataset.variant, 'ghost');
   assert.throws(
     () => renderToString(h(ChipField, null, h(ChipField.Item, null, 'Bad'))),
     /`value` is required/,
@@ -172,6 +177,10 @@ test('arrow keys walk the chips; Backspace and Delete remove and keep focus near
   const left = await key(trigger(), 'ArrowLeft');
   assert.equal(left.defaultPrevented, true);
   assert.equal(document.activeElement, removeButton('y'));
+  assert.ok(
+    removeButton('y').closest('[data-chip]').hasAttribute('data-focus-visible'),
+    'the chip the arrows are on is marked',
+  );
   await key(document.activeElement, 'ArrowLeft');
   await key(document.activeElement, 'ArrowLeft');
   assert.equal(document.activeElement, removeButton('TypeScript'));
@@ -194,6 +203,8 @@ test('arrow keys walk the chips; Backspace and Delete remove and keep focus near
   await click(document.activeElement);
   assert.deepEqual(chips(), ['x']);
   assert.equal(document.activeElement, trigger(), 'clicking the last chip away returns to input');
+  await act(() => new Promise((resolve) => requestAnimationFrame(() => resolve())));
+  assert.equal(document.activeElement, trigger(), 'and Chip does not move it to the other chip');
   assert.deepEqual(state.changes.at(-1), ['x']);
   await key(trigger(), 'ArrowLeft');
   const typed = await key(document.activeElement, 'q');
@@ -365,8 +376,9 @@ test('drawer: the sheet has its own search field, and closing returns to the fie
   const state = tracked({});
   await render(state.node);
   await click(trigger());
-  const search = host.querySelector('[data-chip-field-search] input');
+  const search = host.querySelector('input[data-chip-field-search]');
   assert.ok(search);
+  assert.ok(search.closest('[data-text-field]'), 'the sheet search is a TextField');
   assert.equal(document.activeElement, search);
   assert.equal(host.querySelector('[data-field-popup]').getAttribute('aria-modal'), 'true');
   await type(search, 'Java');

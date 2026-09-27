@@ -12,15 +12,11 @@ import {
   type FocusEvent,
   type KeyboardEvent,
   type PointerEvent,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  MagnifyingGlassIcon,
-  XMarkIcon,
-} from '@heroicons/react/16/solid';
+import { CheckIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/16/solid';
 
 import { collectOptions, slotChildren, type SelectOption } from './select-options';
 import { useSelect, type SelectValue } from './use-select';
@@ -34,10 +30,14 @@ import {
   useDrawerPresentation,
   type FieldTriggerVariant,
 } from '../../../internal/field-popup';
+import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../internal/field-popup/search';
+import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+import { IconButton } from '../../action/icon-button';
+import { Divider } from '../../layout/divider';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -106,6 +106,7 @@ type Context = {
   placeholder: string;
   triggerProps: Record<string, unknown>;
   listLabel: { 'aria-label'?: string; 'aria-labelledby'?: string };
+  size: IdsSize;
   styles: ReturnType<typeof Select.Style>;
 };
 
@@ -283,6 +284,7 @@ export function Select(props: SelectProps) {
         placeholder,
         triggerProps,
         listLabel,
+        size: resolvedSize,
         styles,
       }}
     >
@@ -336,6 +338,7 @@ export function Select(props: SelectProps) {
   );
 }
 
+// A bare combobox button, since the field draws the box; a Button would add its own inside it.
 function SelectTrigger({ asChild, children, className, ...props }: Select.TriggerProps) {
   const c = useSelectContext('Select.Trigger');
   return part(
@@ -406,19 +409,26 @@ function SelectIcon({ asChild, children, className, ...props }: Select.IconProps
 function SelectClear({ asChild, children, className, ...props }: Select.ClearProps) {
   const c = useSelectContext('Select.Clear');
   if (!c.select.state.selected.length || c.state.readOnly) return null;
-  return part(
-    'button',
-    asChild,
-    children ?? <XMarkIcon aria-hidden="true" />,
-    mergeProps(props, {
-      type: 'button',
-      'aria-label': props['aria-label'] ?? messages.select.clear,
-      disabled: c.state.disabled,
-      'data-select-clear': '',
-      className: c.styles.clear({ className }),
-      onClick: c.select.actions.clear,
-    }),
-  );
+  const own = mergeProps(props as Record<string, unknown>, {
+    'aria-label': props['aria-label'] ?? messages.select.clear,
+    disabled: c.state.disabled,
+    'data-select-clear': '',
+    onClick: c.select.actions.clear,
+  }) as Omit<Select.ClearProps, 'asChild' | 'children' | 'className'>;
+  const button = {
+    ...own,
+    variant: 'ghost' as const,
+    size: c.size,
+    className: c.styles.clear({ className }),
+  };
+  if (asChild)
+    return (
+      <IconButton {...button} asChild>
+        {children as ReactElement}
+      </IconButton>
+    );
+  const glyph = children ?? <XMarkIcon aria-hidden="true" />;
+  return <IconButton {...button} icon={isValidElement(glyph) ? glyph : <>{glyph}</>} />;
 }
 
 function SelectContent({ asChild, children, className, ...props }: Select.ContentProps) {
@@ -456,48 +466,28 @@ function SelectContent({ asChild, children, className, ...props }: Select.Conten
   );
 }
 
-function SelectSearchField({
-  asChild,
-  children,
-  className,
-  placeholder,
-  ...props
-}: Select.SearchFieldProps) {
+function SelectSearchField({ placeholder, ...props }: Select.SearchFieldProps) {
   const c = useSelectContext('Select.SearchField');
   const { state: s, ids } = c.select;
+  const own = mergeProps(props as Record<string, unknown>, {
+    'aria-label': props['aria-label'] ?? messages.select.search,
+    'data-select-search': '',
+    value: s.query,
+    placeholder: placeholder ?? messages.select.searchPlaceholder,
+    onChange: (event: ChangeEvent<HTMLInputElement>) =>
+      c.select.actions.search(event.currentTarget.value),
+    onKeyDown: (event: KeyboardEvent<HTMLElement>) => c.select.onKeyDown(event, 'search'),
+  }) as Omit<FieldPopupSearchProps, 'controls' | 'activeDescendant'>;
   return (
-    <div data-select-search="" className={c.styles.searchRoot()}>
-      <MagnifyingGlassIcon aria-hidden="true" />
-      {part(
-        'input',
-        asChild,
-        children,
-        mergeProps(props as Record<string, unknown>, {
-          type: 'text',
-          role: 'combobox',
-          autoComplete: props.autoComplete ?? 'off',
-          autoCorrect: 'off',
-          autoCapitalize: 'none',
-          spellCheck: props.spellCheck ?? false,
-          'aria-label': props['aria-label'] ?? messages.select.search,
-          'aria-expanded': true,
-          'aria-controls': ids.listbox,
-          'aria-autocomplete': 'list',
-          'aria-activedescendant':
-            s.activeValue !== undefined ? ids.option(s.activeValue) : undefined,
-          'data-popup-autofocus': '',
-          value: s.query,
-          placeholder: placeholder ?? messages.select.searchPlaceholder,
-          className: c.styles.search({ className }),
-          onChange: (event: ChangeEvent<HTMLInputElement>) =>
-            c.select.actions.search(event.currentTarget.value),
-          onKeyDown: (event: KeyboardEvent<HTMLElement>) => c.select.onKeyDown(event, 'search'),
-        }),
-      )}
-    </div>
+    <FieldPopupSearch
+      {...own}
+      controls={ids.listbox}
+      activeDescendant={s.activeValue !== undefined ? ids.option(s.activeValue) : undefined}
+    />
   );
 }
 
+// An option highlighted through aria-activedescendant, not an Item row that takes focus itself.
 function SelectItem({
   value,
   label: _label,
@@ -605,20 +595,19 @@ function SelectGroup({ heading, asChild, children, className, ...props }: Select
   );
 }
 
-// A listbox may only own options and groups, so the rule is drawn but hidden from the tree. It
-// is left out while searching, where it would divide results that no longer belong together.
-function SelectSeparator({ asChild, children, className, ...props }: Select.SeparatorProps) {
+// A listbox may only own options and groups, so the rule is a decorative Divider, hidden from the
+// tree. It is left out while searching, where it would divide results that no longer belong
+// together.
+function SelectSeparator({ className, ...props }: Select.SeparatorProps) {
   const c = useSelectContext('Select.Separator');
   if (c.select.state.query) return null;
-  return part(
-    'div',
-    asChild,
-    children,
-    mergeProps(props, {
-      'aria-hidden': true,
-      'data-select-separator': '',
-      className: c.styles.separator({ className }),
-    }),
+  return (
+    <Divider
+      {...props}
+      decorative
+      data-select-separator=""
+      className={c.styles.separator({ className })}
+    />
   );
 }
 
@@ -678,7 +667,10 @@ export namespace Select {
   export type IconProps = ComponentProps<'span'> & { asChild?: boolean };
   export type ClearProps = ComponentProps<'button'> & { asChild?: boolean };
   export type ContentProps = BoxProps;
-  export type SearchFieldProps = ComponentProps<'input'> & { asChild?: boolean };
+  // A TextField underneath, whose `size` is the field size, not the input's width in characters.
+  export type SearchFieldProps = Omit<ComponentProps<'input'>, 'size' | 'color'> & {
+    asChild?: boolean;
+  };
   export type ItemProps = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
     value: string;
     // Shown in the trigger and matched by typeahead; the item's text by default.
@@ -720,15 +712,11 @@ export namespace Select {
       valueText: 'truncate',
       more: 'shrink-0 text-(--ids-color-on-muted)',
       icon: 'inline-flex shrink-0 text-(--ids-color-on-muted)',
-      clear: [
-        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
-        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'focus-ring disabled:pointer-events-none',
-      ],
+      // Clear is a ghost IconButton with fieldAction's look. The trigger holds the field's padding,
+      // not the root, so fieldAction's pull into the padding at the end would push it past the
+      // border; it keeps the same 4px inset with a margin instead.
+      clear: [fieldAction.base, 'me-1'],
       listbox: fieldListbox.list,
-      searchRoot: fieldListbox.searchRoot,
-      search: fieldListbox.search,
       item: fieldListbox.option,
       indicator: fieldListbox.indicator,
       group: 'flex flex-col',
@@ -747,13 +735,13 @@ export namespace Select {
           root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
           trigger: 'gap-2 px-3',
           icon: '[&_svg]:size-(--ids-size-icon-standard)',
-          clear: 'me-1 size-7 [&_svg]:size-(--ids-size-icon-standard)',
+          clear: 'size-7',
         },
         tiny: {
           root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
           trigger: 'gap-1.5 px-2.5',
           icon: '[&_svg]:size-(--ids-size-icon-tiny)',
-          clear: 'me-1 size-6 [&_svg]:size-(--ids-size-icon-tiny)',
+          clear: 'size-6',
         },
       } satisfies Record<IdsSize, object>,
     },

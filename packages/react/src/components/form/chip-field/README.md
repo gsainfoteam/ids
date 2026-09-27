@@ -147,11 +147,13 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 | 요소   | 속성                                                                                                      |
 | ------ | --------------------------------------------------------------------------------------------------------- |
 | 루트   | `data-open`, `data-disabled`, `data-readonly`, `data-invalid`, `data-required`, `data-full`, `data-empty` |
-| 칩     | `data-chip-field-chip`, 지울 수 없는 옵션이면 `data-disabled`                                             |
+| 칩     | `data-chip-field-chip`, 지울 수 없는 옵션이면 `data-disabled`, 방향키가 가리키면 `data-focus-visible`     |
 | Item   | `data-selected`, `data-highlighted`, `data-disabled`                                                      |
 | Create | `data-highlighted`, 거부된 값이면 `data-invalid`                                                          |
 
 - 루트의 `className` 은 `ChipField.State` 를 받는 함수도 됩니다.
+- 칩은 `Chip` 이고 지우기 버튼은 `Chip.Close` 입니다. `data-chip`, `data-size` 같은 Chip 의 속성도 붙습니다.
+- 지우기 버튼에 포커스가 있으면 필드 테두리에 링이 그려지고 칩은 테마 색으로 칠해집니다. 버튼 자체에는 링을 그리지 않습니다.
 
 ## 열림 상태
 
@@ -162,6 +164,7 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 
 - 입력을 클릭하거나 글자를 치면 열리고, 옵션을 골라도 열린 채로 남습니다.
 - 640px 보다 좁은 화면에서 `mobileVariant="drawer"`(기본) 는 모달 하단 시트로 엽니다. 필드의 입력이 시트 뒤로 가려지므로 시트 위에 같은 검색어를 쓰는 검색창이 있고, 닫으면 필드의 입력으로 포커스가 돌아옵니다.
+- 시트의 검색창은 `Select.SearchField` 와 같은 `TextField` 입니다. 테두리와 링 없이 아래 선만 그립니다.
 
 ## 폼
 

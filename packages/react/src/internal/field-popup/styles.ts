@@ -39,18 +39,19 @@ export const fieldListbox = {
     'outline-none [overflow-anchor:none]',
   ),
   heading: cn('px-2.5 pt-2 pb-1 text-caption-c1-medium text-(--ids-color-on-muted)'),
-  separator: cn('-mx-1 my-1 h-px bg-(--ids-color-border)'),
+  // Classes for a Divider, which reaches into the list's padding. Its own full width would leave
+  // the rule short at one end, so the width is left to the stretch.
+  separator: cn('-mx-1 my-1 w-auto'),
   empty: cn('px-2.5 py-6 text-center text-body-b3-regular text-(--ids-color-on-muted)'),
-  // A search box at the top of a list, like shadcn/ui's command input: no ring of its own, since
-  // the caret already shows where focus is, and a rule under it instead of a box around it.
+  // A search box at the top of a list, like shadcn/ui's command input: a ghost TextField with no
+  // ring of its own, since the caret already shows where focus is, and a rule under it instead of
+  // a box around it. focus-ring colors the ring from the input's focus, so it is forced off here.
+  // The row reaches into the popup's padding, which a fixed width would keep it from filling.
   searchRoot: cn(
-    '-mx-1 -mt-1 mb-1 flex items-center gap-2 border-b border-(--ids-color-border) px-3',
-    'text-(--ids-color-on-muted) [&_svg]:size-(--ids-size-icon-standard) [&_svg]:shrink-0',
+    '-mx-1 -mt-1 mb-1 h-auto w-auto rounded-none border-b border-(--ids-color-border)',
+    'ring-0! inset-ring-transparent!',
   ),
-  search: cn(
-    'h-10 w-full min-w-0 bg-transparent text-body-b3-regular text-(--ids-color-on-surface) outline-none',
-    'placeholder:text-(--ids-color-on-muted)',
-  ),
+  search: cn('h-10'),
 } as const;
 
 export const popupStyle = tv({
