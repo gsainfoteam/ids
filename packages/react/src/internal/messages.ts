@@ -4,6 +4,9 @@ export const messages = {
   avatarGroup: {
     overflow: (count: number) => `외 ${count}명`,
   },
+  chip: {
+    remove: '삭제',
+  },
   otpField: {
     label: '인증 코드',
   },
