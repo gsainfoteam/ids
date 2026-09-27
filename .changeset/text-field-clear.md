@@ -13,7 +13,7 @@ The shell carries `data-invalid`, `data-focused`, `data-filled`, `data-readonly`
 `style` accept a function of that state. A value written without an input event
 (react-hook-form `setValue`, a form reset) is followed too, and reaches the enclosing Field.
 
-Buttons placed next to the input shrink to a 28px (tiny 24px) inset square 4px inside the border
-instead of losing their padding. The input is marked `data-field-input` and gets a generated `id`
+Buttons placed next to the input shrink to the 28px (tiny 24px) inset height, square for icon
+buttons, and sit 4px inside the border instead of losing their padding. The input is marked `data-field-input` and gets a generated `id`
 when none is given. The unexported `textFieldSurface`, `textFieldAdornment` and
 `TextFieldContext` helpers are gone.

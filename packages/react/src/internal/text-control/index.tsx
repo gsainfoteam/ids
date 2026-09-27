@@ -168,6 +168,17 @@ export function TextControlClear({
   );
 }
 
+// A button placed inside a field shrinks to the inset height of the field's own parts (28px, tiny
+// 24px). An icon button carries its required aria-label and stays square; a text button keeps
+// some padding around its label.
+export const insetButtons = {
+  base: '[&_button]:w-auto [&_button]:gap-1 [&_button]:px-1 [&_button:not([aria-label])]:px-2.5',
+  size: {
+    standard: '[&_button]:h-7 [&_button]:min-w-7',
+    tiny: '[&_button]:h-6 [&_button]:min-w-6 [&_button:not([aria-label])]:px-2',
+  } satisfies Record<IdsSize, string>,
+} as const;
+
 export const textControlStyle = tv({
   slots: {
     root: ['inline-flex w-full min-w-0 cursor-text items-center', fieldSurface.base],
@@ -184,8 +195,7 @@ export const textControlStyle = tv({
     adornment: [
       'inline-flex shrink-0 items-center empty:hidden',
       'text-(--ids-color-on-muted) [&_svg]:shrink-0',
-      // A button dropped in as an adornment shrinks to the inset size of the field's own parts.
-      '[&_button]:w-auto [&_button]:gap-1',
+      insetButtons.base,
     ],
     action: [
       'shrink-0 text-(--ids-color-on-muted)',
@@ -205,7 +215,7 @@ export const textControlStyle = tv({
         root: fieldSurface.size.standard,
         adornment: [
           "gap-1 text-body-b3-regular [&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
-          '[&_button]:h-7 [&_button]:min-w-7 [&_button]:px-1.5',
+          insetButtons.size.standard,
           'has-[button]:first:-ms-2 has-[button]:last:-me-2',
         ],
         action: 'size-7 first:-ms-2 last:-me-2',
@@ -214,7 +224,7 @@ export const textControlStyle = tv({
         root: fieldSurface.size.tiny,
         adornment: [
           "gap-0.5 text-caption-c1-regular [&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
-          '[&_button]:h-6 [&_button]:min-w-6 [&_button]:px-1',
+          insetButtons.size.tiny,
           'has-[button]:first:-ms-1.5 has-[button]:last:-me-1.5',
         ],
         action: 'size-6 first:-ms-1.5 last:-me-1.5',
