@@ -52,7 +52,7 @@ export function RadioGroup<T extends string>({
   const [value, setValue] = useControllableState<T | undefined>({
     value: valueProp,
     defaultValue,
-    onChange: onChange as ((next: T | undefined) => void) | undefined,
+    onValueChange: onChange as ((next: T | undefined) => void) | undefined,
   });
 
   const context: RadioGroupContextValue = {

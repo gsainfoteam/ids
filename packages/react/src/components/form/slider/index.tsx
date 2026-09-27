@@ -45,7 +45,7 @@ export function Slider({
   const [value, setValue] = useControllableState<Slider.Value>({
     value: valueProp,
     defaultValue: defaultValue ?? fallback,
-    onChange: onChange as ((next: Slider.Value) => void) | undefined,
+    onValueChange: onChange as ((next: Slider.Value) => void) | undefined,
   });
 
   const inBounds = (n: unknown) =>

@@ -91,7 +91,7 @@ export function ToggleGroup({
   const [value, setValue] = useControllableState<string | Set<string>>({
     value: isMultiple ? multipleValue : (valueProp as string | undefined),
     defaultValue: isMultiple ? multipleDefault : ((defaultValue as string | undefined) ?? ''),
-    onChange: onValueChange as ((value: string | Set<string>) => void) | undefined,
+    onValueChange: onValueChange as ((value: string | Set<string>) => void) | undefined,
   });
 
   function toggle(itemValue: string) {

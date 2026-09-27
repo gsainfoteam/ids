@@ -78,7 +78,7 @@ export function Accordion<T extends string>(props: Accordion.Props<T>) {
   const [value, setValue] = useControllableState<T | null | T[]>({
     value: props.value,
     defaultValue: props.defaultValue ?? (single ? null : ([] as T[])),
-    onChange: props.onValueChange as ((next: T | null | T[]) => void) | undefined,
+    onValueChange: props.onValueChange as ((next: T | null | T[]) => void) | undefined,
   });
 
   function isOpen(item: string) {

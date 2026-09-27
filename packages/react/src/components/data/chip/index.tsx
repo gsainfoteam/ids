@@ -35,7 +35,7 @@ export function Chip(props: Chip.Props) {
   const [selected, setSelected] = useControllableState({
     value: selectedProp,
     defaultValue: defaultSelected ?? false,
-    onChange: onSelectedChange,
+    onValueChange: onSelectedChange,
   });
 
   const isToggle = selectedProp != null || defaultSelected != null || onSelectedChange != null;

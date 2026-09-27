@@ -80,7 +80,7 @@ export function CheckboxGroup<T extends string>({
   const [value, setValue] = useControllableState<readonly T[]>({
     value: valueProp,
     defaultValue: defaultValue ?? [],
-    onChange: onChange as ((next: readonly T[]) => void) | undefined,
+    onValueChange: onChange as ((next: readonly T[]) => void) | undefined,
   });
   const [registered, setRegistered] = useState<readonly string[]>([]);
 

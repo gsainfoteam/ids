@@ -39,7 +39,7 @@ export function Toggle({
   const [localPressed, setLocalPressed] = useControllableState({
     value: inGroup ? undefined : pressedProp,
     defaultValue: defaultPressed ?? false,
-    onChange: inGroup ? undefined : onPressedChange,
+    onValueChange: inGroup ? undefined : onPressedChange,
   });
 
   const pressed = inGroup
