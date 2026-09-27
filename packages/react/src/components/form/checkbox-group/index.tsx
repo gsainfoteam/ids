@@ -1,181 +1,201 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { ComponentProps, ComponentType, ReactNode } from 'react';
+import {
+  use,
+  type ComponentProps,
+  type ComponentType,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 
-import { useControllableState } from '../../../hooks/use-controllable-state';
+import { CheckboxGroupContext } from './context';
+import { useCheckboxGroup } from './use-checkbox-group';
+import { FormValue } from '../../../internal/form-value';
+import { messages } from '../../../internal/messages';
 import { invariant, tv } from '../../../utils';
 import { Checkbox } from '../checkbox';
 
 import type { IdsSize } from '../../../tokens/types';
 
-type CheckboxGroupContextValue = {
+export type CheckboxGroupOrientation = 'vertical' | 'horizontal';
+
+export type CheckboxGroupState = {
   value: readonly string[];
-  size: IdsSize;
+  orientation: CheckboxGroupOrientation;
   disabled: boolean;
-  registered: readonly string[];
-  register: (value: string) => () => void;
-  toggle: (value: string, checked: boolean) => void;
-  setAll: (checked: boolean) => void;
+  readOnly: boolean;
+  required: boolean;
+  invalid: boolean;
 };
 
-const CheckboxGroupContext = createContext<CheckboxGroupContextValue | null>(null);
+type StateProp<T> = T | ((state: CheckboxGroupState) => T);
 
-function useGroup(component: string) {
-  const context = useContext(CheckboxGroupContext);
-  invariant(
-    context != null,
-    `\`<${component}>\` must come from the \`<CheckboxGroup>\` render children.`,
-  );
-  return context;
+export type CheckboxGroupItemProps<T extends string> = Omit<
+  Checkbox.Props,
+  'value' | 'checked' | 'defaultChecked' | 'name'
+> & { value: T };
+
+export type CheckboxGroupAllProps = Omit<
+  Checkbox.Props,
+  'value' | 'checked' | 'defaultChecked' | 'name' | 'onCheckedChange'
+>;
+
+export type CheckboxGroupRenderProps<T extends string> = {
+  Item: ComponentType<CheckboxGroupItemProps<T>>;
+  All: ComponentType<CheckboxGroupAllProps>;
+};
+
+export type CheckboxGroupProps<T extends string> = Omit<
+  ComponentProps<'div'>,
+  'children' | 'defaultValue' | 'onChange' | 'role' | 'className' | 'style'
+> & {
+  value?: readonly T[];
+  defaultValue?: readonly T[];
+  onValueChange?: (value: T[]) => void;
+  name?: string;
+  form?: string;
+  orientation?: CheckboxGroupOrientation;
+  size?: IdsSize;
+  variant?: Checkbox.Variant;
+  disabled?: boolean;
+  readOnly?: boolean;
+  required?: boolean;
+  requiredMessage?: string;
+  invalid?: boolean;
+  className?: StateProp<string | undefined>;
+  style?: StateProp<CSSProperties | undefined>;
+  children: ReactNode | ((render: CheckboxGroupRenderProps<T>) => ReactNode);
+};
+
+function resolve<T>(value: StateProp<T>, state: CheckboxGroupState): T {
+  return typeof value === 'function' ? (value as (state: CheckboxGroupState) => T)(state) : value;
 }
 
-function Item({ value, disabled = false, ...rest }: CheckboxGroup.ItemProps) {
-  const group = useGroup('Item');
-  const { register } = group;
-  const isDisabled = disabled || group.disabled;
-
-  useEffect(() => (isDisabled ? undefined : register(value)), [register, value, isDisabled]);
-
+function All(props: CheckboxGroupAllProps) {
+  const group = use(CheckboxGroupContext);
+  invariant(group, 'CheckboxGroup.All must be rendered inside CheckboxGroup.');
   return (
     <Checkbox
-      {...rest}
-      value={value}
-      size={group.size}
-      checked={group.value.includes(value)}
-      disabled={isDisabled}
-      onChange={(checked) => group.toggle(value, checked)}
+      {...props}
+      checked={group.all}
+      onCheckedChange={group.setAll}
+      disabled={props.disabled || group.disabled}
+      readOnly={props.readOnly || group.readOnly}
+      size={props.size ?? group.size}
+      variant={props.variant ?? group.variant}
+      aria-controls={group.controls.join(' ') || undefined}
     />
   );
 }
 
-function All({ ...rest }: CheckboxGroup.AllProps) {
-  const group = useGroup('All');
-  const selected = group.registered.filter((item) => group.value.includes(item));
-  const all = group.registered.length > 0 && selected.length === group.registered.length;
-
-  return (
-    <Checkbox
-      {...rest}
-      size={group.size}
-      disabled={group.disabled}
-      checked={all}
-      indeterminate={selected.length > 0 && !all}
-      onChange={() => group.setAll(!all)}
-    />
-  );
-}
+const render = { Item: Checkbox, All } as unknown as CheckboxGroupRenderProps<string>;
 
 export function CheckboxGroup<T extends string>({
-  variant = 'vertical',
-  columns,
-  size = 'standard',
-  disabled = false,
   value: valueProp,
   defaultValue,
-  onChange,
+  onValueChange,
+  name,
+  form,
+  orientation = 'vertical',
+  size,
+  variant,
+  disabled = false,
+  readOnly = false,
+  required = false,
+  requiredMessage = messages.checkboxGroup.required,
+  invalid,
   className,
   style,
   children,
+  ref,
+  onFocus,
+  // role="group" takes no aria-required; the requirement is enforced by the form instead.
+  'aria-required': _ariaRequired,
   ...rest
-}: CheckboxGroup.Props<T>) {
-  const [value, setValue] = useControllableState<readonly T[]>({
-    value: valueProp,
-    defaultValue: defaultValue ?? [],
-    onValueChange: onChange as ((next: readonly T[]) => void) | undefined,
-  });
-  const [registered, setRegistered] = useState<readonly string[]>([]);
-
-  const register = useCallback((item: string) => {
-    setRegistered((prev) => (prev.includes(item) ? prev : [...prev, item]));
-    return () => setRegistered((prev) => prev.filter((entry) => entry !== item));
-  }, []);
-
-  const context: CheckboxGroupContextValue = {
+}: CheckboxGroupProps<T>) {
+  const { value, toggle, register, all, setAll, controls, anchorRef, rootRef, focusFirst } =
+    useCheckboxGroup<T>({ value: valueProp, defaultValue, onValueChange, ref });
+  const ariaInvalid = rest['aria-invalid'] ?? invalid;
+  const state: CheckboxGroupState = {
     value,
-    size,
+    orientation,
     disabled,
-    registered,
-    register,
-    toggle: (item, checked) =>
-      setValue(checked ? [...value, item as T] : value.filter((entry) => entry !== (item as T))),
-    setAll: (checked) =>
-      setValue(
-        checked
-          ? [...new Set([...value, ...(registered as readonly T[])])]
-          : value.filter((entry) => !registered.includes(entry)),
-      ),
+    readOnly,
+    required,
+    invalid: ariaInvalid === true || ariaInvalid === 'true',
   };
 
-  const render = useMemo(
-    () => ({
-      Item: Item as ComponentType<CheckboxGroup.TypedItemProps<T>>,
-      All: All as ComponentType<CheckboxGroup.AllProps>,
-    }),
-    [],
-  );
-
   return (
-    <CheckboxGroupContext.Provider value={context}>
+    <CheckboxGroupContext.Provider
+      value={{
+        value,
+        toggle,
+        register,
+        all,
+        setAll,
+        controls,
+        name,
+        form,
+        disabled,
+        readOnly,
+        invalid: state.invalid,
+        size,
+        variant,
+      }}
+    >
       <div
-        role="group"
         {...rest}
-        className={CheckboxGroup.Style({ variant, className })}
-        style={
-          variant === 'grid' && columns != null
-            ? { ...style, gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }
-            : style
-        }
+        ref={rootRef}
+        role="group"
+        tabIndex={-1}
+        aria-disabled={disabled || undefined}
+        aria-invalid={ariaInvalid}
+        data-checkbox-group=""
+        data-orientation={orientation}
+        data-disabled={disabled ? '' : undefined}
+        data-readonly={readOnly ? '' : undefined}
+        data-required={required ? '' : undefined}
+        data-invalid={state.invalid ? '' : undefined}
+        className={CheckboxGroup.Style({ orientation, className: resolve(className, state) })}
+        style={resolve(style, state)}
+        onFocus={(event) => {
+          focusFirst(event);
+          onFocus?.(event);
+        }}
       >
-        {children(render)}
+        {typeof children === 'function'
+          ? children(render as unknown as CheckboxGroupRenderProps<T>)
+          : children}
+        <FormValue
+          value={value}
+          form={form}
+          required={required && !readOnly}
+          disabled={disabled}
+          anchor={anchorRef}
+          message={requiredMessage}
+        />
       </div>
     </CheckboxGroupContext.Provider>
   );
 }
 
 export namespace CheckboxGroup {
+  export type Props<T extends string = string> = CheckboxGroupProps<T>;
+  export type State = CheckboxGroupState;
+  export type Orientation = CheckboxGroupOrientation;
+  export type ItemProps<T extends string = string> = CheckboxGroupItemProps<T>;
+  export type AllProps = CheckboxGroupAllProps;
+  export type RenderProps<T extends string = string> = CheckboxGroupRenderProps<T>;
+
+  // For plain children, where the render function's `All` is not at hand.
+  export const All = render.All;
+
   export const Style = tv({
-    base: 'flex',
+    base: 'relative flex outline-none',
     variants: {
-      variant: {
-        vertical: 'flex-col gap-2',
-        horizontal: 'flex-row flex-wrap gap-4',
-        grid: 'grid gap-2',
-      },
+      orientation: {
+        vertical: 'flex-col gap-3',
+        horizontal: 'flex-row flex-wrap gap-x-6 gap-y-3',
+      } satisfies Record<CheckboxGroupOrientation, string>,
     },
-    defaultVariants: { variant: 'vertical' },
+    defaultVariants: { orientation: 'vertical' },
   });
-
-  export type ItemProps = Omit<
-    ComponentProps<'input'>,
-    'type' | 'size' | 'checked' | 'value' | 'onChange' | 'className' | 'children'
-  > & {
-    value: string;
-    disabled?: boolean;
-  };
-
-  export type TypedItemProps<T extends string> = Omit<ItemProps, 'value'> & { value: T };
-
-  export type AllProps = Omit<
-    ComponentProps<'input'>,
-    'type' | 'size' | 'checked' | 'value' | 'onChange' | 'className' | 'children'
-  >;
-
-  export type RenderProps<T extends string> = {
-    Item: ComponentType<TypedItemProps<T>>;
-    All: ComponentType<AllProps>;
-  };
-
-  export type Props<T extends string> = Omit<
-    ComponentProps<'div'>,
-    'children' | 'className' | 'role' | 'onChange' | 'defaultValue'
-  > & {
-    variant?: 'vertical' | 'horizontal' | 'grid';
-    columns?: number;
-    size?: IdsSize;
-    disabled?: boolean;
-    value?: readonly T[];
-    defaultValue?: readonly T[];
-    onChange?: (value: readonly T[]) => void;
-    className?: string;
-    children: (render: RenderProps<T>) => ReactNode;
-  };
 }

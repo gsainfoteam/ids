@@ -83,8 +83,9 @@ function App() {
 
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `color` | `IdsColor` | `'blue'` | 색상 테마 |
-| `mode` | `IdsMode` | `'light'` | 라이트/다크 모드 |
+| `color` / `defaultColor` | `IdsColor` | 바깥 Provider, 최상위는 `'blue'` | 색상 테마 (제어 / 비제어) |
+| `mode` / `defaultMode` | `'light' \| 'dark' \| 'system'` | 바깥 Provider, 최상위는 `'light'` | 모드 (제어 / 비제어) |
+| `onColorChange` / `onModeChange` | `(value) => void` | | 값을 바꾸려 할 때 |
 
 ```tsx
 import { useTheme } from '@gsainfoteam/ids-react';
@@ -95,12 +96,14 @@ function ThemeToggle() {
 }
 ```
 
+중첩, 시스템 모드, `asChild` 는 `src/components/utility/theme-provider/README.md` 를 참고한다.
+
 ## 인터랙션 state
 
 IDS는 hover / press / focus의 **소유권을 컴포넌트 안에 둔다.**  
 외부 구독·controlled 인터랙션 API는 두지 않고, 아래 두 길로만 바깥에 노출한다.
 
-실행 예시는 Storybook `Patterns/Interactive state`를 참고한다.
+실행 예시는 Storybook `Foundations/InteractiveState`를 참고한다.
 
 ### 1. 노드 로컬 (부모 → 자식)
 
@@ -175,30 +178,29 @@ import { Button } from '@gsainfoteam/ids-react';
 
 ### Spinner
 
-부모의 글자색을 상속하는 로딩 표시다. `standard`는 20px, `tiny`는 16px이며
-모션 감소 설정에서는 회전을 멈춘다. 네이티브 span 속성과 ref를 전달할 수 있다.
+부모의 글자색을 상속하는 로딩 표시다. 크기를 주지 않으면 버튼 안에서는 버튼의 아이콘 크기,
+그 밖에서는 글자 크기를 따른다. 모션 감소 설정에서는 회전 대신 천천히 깜빡인다.
 
 ```tsx
 import { Button, Spinner } from '@gsainfoteam/ids-react';
 
-// 단독 사용: role="status"와 스크린 리더 텍스트를 제공한다.
-<Spinner label="불러오는 중" />
+// 단독 사용: 잠시 뒤 role="status"로 "불러오는 중"을 한 번 알린다.
+<Spinner aria-label="댓글을 불러오는 중" />
 
-// 이미 로딩 텍스트가 있는 버튼: Spinner의 중복 알림을 생략한다.
+// 버튼 안: 스스로 알림을 빼서 버튼 이름에 섞이지 않는다.
 <Button disabled aria-busy="true">
-  <Spinner decorative />
+  <Spinner />
   저장 중
 </Button>
 ```
 
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `size` | `'standard' \| 'tiny'` | `'standard'` | 표시 크기 |
-| `label` | `string` | `'Loading'` | 스크린 리더용 로딩 텍스트 |
-| `decorative` | `boolean` | `false` | `true`이면 접근성 트리에서 숨김 |
+| `size` | `'standard' \| 'tiny'` | 주변을 따름 | 표시 크기 |
+| `aria-label` | `string` | `'불러오는 중'` | 스크린 리더가 읽을 문장 |
+| `decorative` | `boolean` | 주변을 보고 결정 | `true`면 알리지 않고, `false`면 버튼 안에서도 알림 |
 
-단독 사용 시 비어 있지 않은 `label`을 사용한다. `decorative`는 버튼 텍스트나
-`IconButton`의 `aria-label` 등 다른 요소가 로딩 상태를 설명할 때 사용한다.
+자세한 동작은 `src/components/feedback/spinner/README.md` 를 참고한다.
 
 ## 개발
 

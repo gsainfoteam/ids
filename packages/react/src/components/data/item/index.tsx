@@ -1,115 +1,312 @@
-import type { ComponentProps, KeyboardEvent, ReactNode } from 'react';
+import {
+  Children,
+  createContext,
+  isValidElement,
+  use,
+  type ComponentProps,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 
-import { useInteractiveProps, type WithInteractiveValues } from '../../../hooks/use-interactive';
-import { tv } from '../../../utils';
+import { useItem } from './use-item';
+import { resolveState, type StateValue } from '../../../internal/state-props';
+import { useRegisteredId } from '../../../internal/surface';
+import { invariant, tv } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
+import type { InteractiveState } from '../../../hooks/use-interactive';
 import type { IdsSize } from '../../../tokens/types';
 
-export function Item(props: Item.Props) {
-  const {
-    props: { size, interactive, selected, asChild, className, children, ...rest },
-    handlers,
-    dataProps,
-  } = useInteractiveProps<HTMLDivElement, Item.Props>(props);
+export type ItemVariant = 'ghost' | 'outline' | 'soft';
 
-  const isInteractive = interactive ?? rest.onClick != null;
-  const needsButtonSemantics = isInteractive && asChild !== true;
-  const Root = asChild === true ? Slot : 'div';
+type Context = {
+  styles: ReturnType<typeof Item.Style>;
+  setTitleId: (id: string | undefined) => void;
+  setDescriptionId: (id: string | undefined) => void;
+};
 
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    handlers.onKeyDown(event);
-    if (event.defaultPrevented || (event.key !== 'Enter' && event.key !== ' ')) return;
-    event.preventDefault();
-    event.currentTarget.click();
-  }
+const ItemContext = createContext<Context | null>(null);
+const ItemGroupContext = createContext<{ size: IdsSize | undefined } | null>(null);
+
+function useItemContext(part: string) {
+  const context = use(ItemContext);
+  invariant(context, `\`<${part}>\` must be used inside \`<Item>\`.`);
+  return context;
+}
+
+function flag(on: boolean) {
+  return on ? '' : undefined;
+}
+
+function isCurrent(value: unknown) {
+  return value !== undefined && value !== false && value !== 'false';
+}
+
+export function Item({
+  variant = 'ghost',
+  size,
+  interactive: interactiveProp,
+  selected,
+  disabled = false,
+  asChild = false,
+  className,
+  style,
+  children,
+  onClick,
+  onKeyDown,
+  onKeyUp,
+  onFocus,
+  onBlur,
+  onPointerEnter,
+  onPointerLeave,
+  onPointerDown,
+  onPointerUp,
+  onPointerCancel,
+  onInteractionChange,
+  ...rest
+}: Item.Props) {
+  const group = use(ItemGroupContext);
+  const resolvedSize = size ?? group?.size ?? 'standard';
+  // A link or button passed through asChild is interactive by what it is.
+  const nativeControl =
+    asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
+  const interactive = interactiveProp ?? (onClick != null || nativeControl);
+  const { interaction, props, dataProps, labelling, register } = useItem<HTMLDivElement>({
+    interactive,
+    asChild,
+    disabled,
+    selected,
+    current: isCurrent(rest['aria-current']),
+    handlers: {
+      onClick,
+      onKeyDown,
+      onKeyUp,
+      onFocus,
+      onBlur,
+      onPointerEnter,
+      onPointerLeave,
+      onPointerDown,
+      onPointerUp,
+      onPointerCancel,
+      onInteractionChange,
+    },
+  });
+  const state: Item.State = { ...interaction, interactive, selected: selected === true };
+  const styles = Item.Style({ variant, size: resolvedSize, interactive });
+  const Root = asChild ? Slot : 'div';
 
   return (
-    <Root
-      {...(needsButtonSemantics ? { role: 'button', tabIndex: 0, 'aria-pressed': selected } : {})}
-      {...(selected === true ? { 'data-selected': '' } : {})}
-      {...dataProps}
-      {...handlers}
-      {...rest}
-      {...(needsButtonSemantics ? { onKeyDown } : {})}
-      className={Item.Style({ size, interactive: isInteractive }).root({ className })}
-    >
-      {children}
-    </Root>
+    <ItemContext value={{ styles, ...register }}>
+      <Root
+        {...rest}
+        {...props}
+        {...labelling}
+        {...(asChild && disabled
+          ? { 'aria-disabled': true, onClick: (event) => event.preventDefault() }
+          : {})}
+        data-item=""
+        data-variant={variant}
+        data-size={resolvedSize}
+        data-interactive={flag(interactive)}
+        data-selected={flag(selected === true)}
+        data-disabled={flag(disabled)}
+        {...dataProps}
+        className={styles.root({ className: resolveState(className, state) })}
+        style={resolveState(style, state)}
+      >
+        {resolveState(children, state)}
+      </Root>
+    </ItemContext>
   );
 }
 
+function Part({
+  asChild,
+  kind,
+  ...props
+}: ComponentProps<'div'> & { asChild?: boolean; kind: string }) {
+  const Root = asChild === true ? Slot : 'div';
+  return <Root {...props} {...{ [`data-item-${kind}`]: '' }} />;
+}
+
 export namespace Item {
-  export const Style = tv({
-    slots: {
-      root: 'flex w-full items-center bg-(--ids-color-surface) text-(--ids-color-on-surface)',
-      media:
-        'inline-flex shrink-0 items-center justify-center text-(--ids-color-on-muted) [&_svg]:size-(--ids-size-icon-standard)',
-      content: 'flex min-w-0 flex-1 flex-col',
-      title: 'text-body-b3-medium truncate',
-      description: 'text-caption-c1-regular truncate text-(--ids-color-on-muted)',
-      actions: 'ml-auto flex shrink-0 items-center gap-2',
-    },
-    variants: {
-      size: {
-        standard: { root: 'min-h-14 gap-3 concentric-p-3' },
-        tiny: { root: 'min-h-10 gap-2 concentric-p-2' },
-      } satisfies Record<IdsSize, { root: string }>,
-      interactive: {
-        true: {
-          root: [
-            'cursor-pointer select-none transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-            'data-hovered:bg-(--ids-color-primary)/10',
-            'data-active:bg-(--ids-color-primary)/15',
-            'data-selected:bg-(--ids-color-primary)/15',
-            'focus-ring',
-            'motion-reduce:transition-none',
-          ],
-        },
-        false: { root: 'data-selected:bg-(--ids-color-primary)/15' },
-      },
-    },
-    defaultVariants: { size: 'standard', interactive: false },
-  });
+  export type Variant = ItemVariant;
 
-  export function Media({ asChild, className, ...rest }: PartProps) {
-    const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={Style().media({ className })} />;
-  }
+  export type State = InteractiveState & { interactive: boolean; selected: boolean };
 
-  export function Content({ asChild, className, ...rest }: PartProps) {
-    const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={Style().content({ className })} />;
-  }
-
-  export function Title({ asChild, className, ...rest }: PartProps) {
-    const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={Style().title({ className })} />;
-  }
-
-  export function Description({ asChild, className, ...rest }: PartProps) {
-    const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={Style().description({ className })} />;
-  }
-
-  export function Actions({ asChild, className, ...rest }: PartProps) {
-    const Root = asChild === true ? Slot : 'div';
-    return <Root {...rest} className={Style().actions({ className })} />;
-  }
-
-  export type PartProps = Omit<ComponentProps<'div'>, 'className'> & {
-    asChild?: boolean;
-    className?: string;
-  };
-
-  type BaseProps = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
+  export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children'> & {
+    variant?: ItemVariant;
     size?: IdsSize;
     interactive?: boolean;
     selected?: boolean;
+    disabled?: boolean;
     asChild?: boolean;
-    className?: string;
-    children?: ReactNode;
+    onInteractionChange?: (state: InteractiveState) => void;
+    className?: StateValue<string | undefined, State>;
+    style?: StateValue<CSSProperties | undefined, State>;
+    children?: StateValue<ReactNode, State>;
   };
 
-  export type Props = WithInteractiveValues<BaseProps>;
+  export type PartProps = ComponentProps<'div'> & { asChild?: boolean };
+
+  export function Media({ variant = 'ghost', className, ...props }: Media.Props) {
+    const { styles } = useItemContext('Item.Media');
+    return (
+      <Part
+        {...props}
+        kind="media"
+        data-variant={variant}
+        className={styles.media({ media: variant, className })}
+      />
+    );
+  }
+  export namespace Media {
+    export type Variant = ItemVariant;
+    export type Props = PartProps & { variant?: ItemVariant };
+  }
+
+  export function Content({ className, ...props }: Content.Props) {
+    const { styles } = useItemContext('Item.Content');
+    return <Part {...props} kind="content" className={styles.content({ className })} />;
+  }
+  export namespace Content {
+    export type Props = PartProps;
+  }
+
+  export function Title({ className, id, ...props }: Title.Props) {
+    const { styles, setTitleId } = useItemContext('Item.Title');
+    const titleId = useRegisteredId(setTitleId, id);
+    return <Part {...props} id={titleId} kind="title" className={styles.title({ className })} />;
+  }
+  export namespace Title {
+    export type Props = PartProps;
+  }
+
+  export function Description({ className, id, ...props }: Description.Props) {
+    const { styles, setDescriptionId } = useItemContext('Item.Description');
+    const descriptionId = useRegisteredId(setDescriptionId, id);
+    return (
+      <Part
+        {...props}
+        id={descriptionId}
+        kind="description"
+        className={styles.description({ className })}
+      />
+    );
+  }
+  export namespace Description {
+    export type Props = PartProps;
+  }
+
+  export function Actions({ className, ...props }: Actions.Props) {
+    const { styles } = useItemContext('Item.Actions');
+    return <Part {...props} kind="actions" className={styles.actions({ className })} />;
+  }
+  export namespace Actions {
+    export type Props = PartProps;
+  }
+
+  // Safari drops the list role of a <ul> without bullets unless it is written out. Each child is
+  // placed in an <li>, so items can be dropped in as they are.
+  export function Group({ size, className, children, ...props }: Group.Props) {
+    const styles = Style();
+    return (
+      <ItemGroupContext value={{ size }}>
+        <ul role="list" {...props} data-item-group="" className={styles.group({ className })}>
+          {Children.map(children, (child) => {
+            if (child == null || typeof child === 'boolean') return child;
+            if (isValidElement(child) && (child.type === 'li' || child.type === Separator))
+              return child;
+            return <li className={styles.groupItem()}>{child}</li>;
+          })}
+        </ul>
+      </ItemGroupContext>
+    );
+  }
+  export namespace Group {
+    export type Props = ComponentProps<'ul'> & { size?: IdsSize };
+  }
+
+  export function Separator({ className, ...props }: Separator.Props) {
+    const inGroup = use(ItemGroupContext) !== null;
+    const styles = Style();
+    if (inGroup)
+      return (
+        <li aria-hidden="true" data-item-separator="" className={styles.separator({ className })} />
+      );
+    return <hr {...props} data-item-separator="" className={styles.separator({ className })} />;
+  }
+  export namespace Separator {
+    export type Props = ComponentProps<'hr'>;
+  }
+
+  export const Style = tv({
+    slots: {
+      // Hover, press and selection lay a translucent layer over whatever the variant's background
+      // is, instead of one color per variant and state.
+      root: [
+        'group/item relative isolate flex w-full items-center text-start text-(--ids-color-on-surface)',
+        'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit]',
+        'before:bg-(--ids-color-on-surface) before:opacity-0',
+        'before:transition-opacity before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
+        'data-selected:before:opacity-6',
+      ],
+      // With a description the row grows to two lines, and the media stays on the first.
+      media: [
+        'flex shrink-0 items-center justify-center gap-2 text-(--ids-color-on-muted)',
+        'group-has-[[data-item-description]]/item:self-start [&_img]:object-cover',
+        "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
+      ],
+      content: 'flex min-w-0 flex-1 flex-col gap-0.5 [&+[data-item-content]]:flex-none',
+      title: 'flex w-fit items-center gap-2',
+      description: 'line-clamp-2 text-(--ids-color-on-muted)',
+      actions: 'ms-auto flex shrink-0 items-center gap-2',
+      group: 'flex flex-col',
+      groupItem: 'flex',
+      separator: 'h-px shrink-0 border-0 bg-(--ids-color-border)',
+    },
+    variants: {
+      variant: {
+        ghost: {},
+        outline: { root: 'inset-ring-1 inset-ring-(--ids-color-border)' },
+        soft: { root: 'bg-(--ids-color-muted)' },
+      } satisfies Record<ItemVariant, object>,
+      media: {
+        ghost: {},
+        soft: { media: 'rounded-standard bg-(--ids-color-muted) text-(--ids-color-on-surface)' },
+        outline: {
+          media:
+            'rounded-standard inset-ring-1 inset-ring-(--ids-color-border) text-(--ids-color-on-surface)',
+        },
+      } satisfies Record<ItemVariant, object>,
+      size: {
+        standard: {
+          root: 'min-h-14 gap-3 concentric-p-3',
+          title: 'text-body-b3-medium',
+          description: 'text-body-b3-regular',
+        },
+        tiny: {
+          root: 'min-h-10 gap-2 concentric-p-2',
+          title: 'text-caption-c1-medium',
+          description: 'text-caption-c1-regular',
+        },
+      } satisfies Record<IdsSize, object>,
+      interactive: {
+        true: {
+          root: [
+            'cursor-pointer select-none focus-ring',
+            'data-hovered:before:opacity-4 data-active:before:opacity-8',
+            'data-selected:data-hovered:before:opacity-10',
+            'data-disabled:cursor-not-allowed data-disabled:opacity-50',
+          ],
+        },
+        false: {},
+      },
+    },
+    compoundVariants: [
+      { media: ['soft', 'outline'], size: 'standard', class: { media: 'size-8' } },
+      { media: ['soft', 'outline'], size: 'tiny', class: { media: 'size-7' } },
+    ],
+    defaultVariants: { variant: 'ghost', media: 'ghost', size: 'standard', interactive: false },
+  });
 }

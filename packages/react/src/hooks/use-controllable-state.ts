@@ -28,11 +28,13 @@ export function useControllableState<T>({
   const isControlled = !isUndefined(value);
   const current = isControlled ? value : uncontrolled;
 
-  function setValue(next: T | ((prev: T) => T)) {
+  // A native form reset changes the value without a change event, so a component restoring its
+  // default on reset passes `silent` and the consumer is not told about an edit that never happened.
+  function setValue(next: T | ((prev: T) => T), options?: { silent?: boolean }) {
     const resolved = isFunction(next) ? next(current) : next;
     if (isSameValue(resolved, current)) return;
     if (!isControlled) setUncontrolled(resolved);
-    onValueChange?.(resolved);
+    if (options?.silent !== true) onValueChange?.(resolved);
   }
 
   return [current, setValue] as const;

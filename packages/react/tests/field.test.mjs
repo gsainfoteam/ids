@@ -210,7 +210,7 @@ test('RHF native setValueAs and checkbox registration preserve native semantics'
   assert.equal(check.methods().getValues('profile.email'), true);
 });
 test('RHF controlled value callback supports reset and external setValue', async () => {
-  function ValueInput({ value, onChange, ...rest }) {
+  function ValueInput({ value, onChange, onValueChange: _onValueChange, ...rest }) {
     return h('input', { ...rest, value, onChange: (event) => onChange(event.target.value) });
   }
   const form = rhfHarness({
@@ -228,7 +228,7 @@ test('RHF controlled value callback supports reset and external setValue', async
   assert.equal(control().value, 'initial');
 });
 test('RHF controlled checked callback binds booleans, disabled values omitted on submit', async () => {
-  function CheckedInput({ checked, onChange, ...rest }) {
+  function CheckedInput({ checked, onChange, onCheckedChange: _onCheckedChange, ...rest }) {
     return h('input', {
       ...rest,
       type: 'checkbox',
@@ -260,6 +260,63 @@ test('RHF controlled checked callback binds booleans, disabled values omitted on
     })(),
   );
   assert.equal(submitted.profile?.email, undefined);
+});
+test('RHF value mode binds onValueChange and ignores change events bubbling from inner inputs', async () => {
+  function Group({ value, onValueChange, onChange, name }) {
+    return h(
+      'div',
+      { onChange },
+      ['a', 'b'].map((item) =>
+        h('input', {
+          key: item,
+          type: 'checkbox',
+          name,
+          value: item,
+          checked: value.includes(item),
+          onChange: (event) =>
+            onValueChange(
+              event.target.checked ? [...value, item] : value.filter((entry) => entry !== item),
+            ),
+        }),
+      ),
+    );
+  }
+  const form = rhfHarness({
+    mode: 'value',
+    child: h(Group),
+    defaultValues: { profile: { email: ['a'] } },
+  });
+  await render(form.node);
+  const reports = [];
+  const subscription = form.methods().watch((values) => reports.push(values.profile.email));
+  await act(async () => host.querySelectorAll('input[type=checkbox]')[1].click());
+  assert.deepEqual(form.methods().getValues('profile.email'), ['a', 'b']);
+  assert.deepEqual(reports, [['a', 'b']], 'the bubbled checkbox event is not a second report');
+  subscription.unsubscribe();
+});
+test('RHF value mode reports an edit once when a control fires onValueChange and onChange', async () => {
+  function Both({ value, onValueChange, onChange, ...rest }) {
+    return h('input', {
+      ...rest,
+      value,
+      onChange: (event) => {
+        onValueChange(event.target.value.toUpperCase());
+        onChange(event);
+      },
+    });
+  }
+  const form = rhfHarness({
+    mode: 'value',
+    child: h(Both),
+    defaultValues: { profile: { email: '' } },
+  });
+  await render(form.node);
+  const reports = [];
+  const subscription = form.methods().watch((values) => reports.push(values.profile.email));
+  await input(control(), 'ab');
+  assert.equal(form.methods().getValues('profile.email'), 'AB');
+  assert.deepEqual(reports, ['AB']);
+  subscription.unsubscribe();
 });
 test('optional adapter works without provider and with changing name/context', async () => {
   await render(h(RhfField, { 'aria-label': 'Plain' }, h(TextField)));
