@@ -601,11 +601,10 @@ test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab he
     assert.equal(document.activeElement, listbox());
     await act(() => host.querySelector('#before').focus());
     assert.equal(document.activeElement, listbox(), 'focus moved outside comes back');
-    await act(() =>
-      host
-        .querySelector('[data-field-popup-backdrop]')
-        .dispatchEvent(new MouseEvent('pointerdown', { bubbles: true })),
-    );
+    const backdrop = host.querySelector('[data-field-popup-backdrop]');
+    await act(() => backdrop.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true })));
+    assert.ok(listbox(), 'a press alone leaves the sheet, so its click cannot land on the page');
+    await click(backdrop);
     assert.equal(listbox(), null);
     assert.equal(document.activeElement, trigger(), 'the backdrop closes and returns focus');
     assert.equal(document.body.hasAttribute('data-scroll-locked'), false);

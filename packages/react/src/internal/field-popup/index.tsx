@@ -240,9 +240,12 @@ export function FieldPopup({
     // popup kept open by its owner would otherwise hear that close twice.
     let pressedOutside = false;
     const onPointerDown = (event: PointerEvent) => {
+      // A drawer closes on a click of its backdrop instead. Closed on the press, the backdrop
+      // would be gone before the click, which then lands on the page under it, and the press
+      // would move focus to the page after the trigger had taken it back.
+      if (drawer) return;
       pressedOutside = outside(event.target);
-      // A drawer held focus, and its backdrop is not focusable, so focus goes back.
-      if (pressedOutside) close.current(drawer);
+      if (pressedOutside) close.current(false);
     };
     // Focus leaving a popover closes it; a drawer's focus trap does not let it leave.
     const onFocusIn = (event: FocusEvent) => {
@@ -292,6 +295,7 @@ export function FieldPopup({
           aria-hidden="true"
           data-field-popup-backdrop=""
           className={styles.backdrop()}
+          onClick={() => close.current(true)}
         />
       )}
       {/* A drawer locks the page scroll but not pinch zoom, which people with low vision need. */}
