@@ -245,15 +245,14 @@ export namespace Item {
   // In a group the line is an li left out of the list count; on its own it is an hr.
   export function Separator({ className, ...props }: Separator.Props) {
     const inGroup = use(ItemGroupContext) !== null;
-    const separator = Style().separator({ className });
     if (inGroup)
       return (
-        <Divider asChild decorative data-item-separator="" className={separator}>
+        <Divider asChild decorative data-item-separator="" className={className}>
           <li />
         </Divider>
       );
     return (
-      <Divider asChild data-item-separator="" className={separator}>
+      <Divider asChild data-item-separator="" className={className}>
         <hr {...props} />
       </Divider>
     );
@@ -287,9 +286,6 @@ export namespace Item {
       actions: 'ms-auto flex shrink-0 items-center gap-2',
       group: 'flex min-w-0 flex-col',
       groupItem: 'flex',
-      // Divider fills the line with the border color, but an hr keeps the base style's 1px top
-      // border, which would cover that fill in the text color.
-      separator: 'border-0',
     },
     variants: {
       variant: {

@@ -97,7 +97,9 @@ export namespace Divider {
   // lines follow the writing direction and `align` only hides one of them.
   export const Style = tv({
     slots: {
-      root: 'shrink-0',
+      // An hr drawn through asChild keeps the base style's 1px top border, which would cover the
+      // line's fill in the text color.
+      root: 'shrink-0 border-0',
       label: 'min-w-0 text-center text-caption-c1-medium text-(--ids-color-on-muted)',
     },
     variants: {

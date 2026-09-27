@@ -81,6 +81,7 @@ test('asChild draws the line as the child element, without a label', () => {
   const rule = new JSDOM(renderToString(h(Divider, { asChild: true }, h('hr')))).window.document
     .body.firstElementChild;
   assert.equal(rule.tagName, 'HR');
+  assert.match(rule.className, /\bborder-0\b/, "the hr's own top border does not cover the line");
   assert.equal(rule.getAttribute('role'), 'separator');
   assert.throws(() => renderToString(h(Divider, { asChild: true }, 'or')), /asChild/);
 });
