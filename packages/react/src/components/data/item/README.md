@@ -96,7 +96,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 ```
 
 - 이미 `<li>` 로 감싼 자식은 다시 감싸지 않습니다.
-- `Item.Group` 밖의 `Item.Separator` 는 `<hr>` 입니다.
+- `Item.Separator` 는 `Divider` 입니다. 그룹 안에서는 목록 항목으로 세지 않는 `<li>`, 밖에서는 `<hr>` 로 그립니다.
 
 ## variant와 크기
 

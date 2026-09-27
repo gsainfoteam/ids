@@ -12,6 +12,7 @@ import { useItem } from './use-item';
 import { resolveState, type StateValue } from '../../../internal/state-props';
 import { useRegisteredId } from '../../../internal/surface';
 import { invariant, tv } from '../../../utils';
+import { Divider } from '../../layout/divider';
 import { Slot } from '../../utility/slot';
 
 import type { InteractiveState } from '../../../hooks/use-interactive';
@@ -227,14 +228,21 @@ export namespace Item {
     export type Props = ComponentProps<'ul'> & { size?: IdsSize };
   }
 
+  // In a group the line is an li left out of the list count; on its own it is an hr.
   export function Separator({ className, ...props }: Separator.Props) {
     const inGroup = use(ItemGroupContext) !== null;
-    const styles = Style();
+    const separator = Style().separator({ className });
     if (inGroup)
       return (
-        <li aria-hidden="true" data-item-separator="" className={styles.separator({ className })} />
+        <Divider asChild decorative data-item-separator="" className={separator}>
+          <li />
+        </Divider>
       );
-    return <hr {...props} data-item-separator="" className={styles.separator({ className })} />;
+    return (
+      <Divider asChild data-item-separator="" className={separator}>
+        <hr {...props} />
+      </Divider>
+    );
   }
   export namespace Separator {
     export type Props = ComponentProps<'hr'>;
@@ -263,7 +271,8 @@ export namespace Item {
       actions: 'ms-auto flex shrink-0 items-center gap-2',
       group: 'flex flex-col',
       groupItem: 'flex',
-      separator: 'h-px shrink-0 border-0 bg-(--ids-color-border)',
+      // Divider draws the line; an hr also brings its own border, which would thicken it.
+      separator: 'border-0',
     },
     variants: {
       variant: {

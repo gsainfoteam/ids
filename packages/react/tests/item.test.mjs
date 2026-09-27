@@ -156,9 +156,15 @@ test('Group: a list with an item per row; separators are hidden and size is shar
   );
   assert.equal(children[1].getAttribute('aria-hidden'), 'true');
   assert.ok(children[1].hasAttribute('data-item-separator'));
+  assert.ok(children[1].hasAttribute('data-divider'), 'the separator is a Divider');
+  assert.equal(children[1].hasAttribute('role'), false);
   assert.ok(children[3].classList.contains('own'), 'an li is not wrapped again');
   assert.ok([...doc.querySelectorAll('[data-item]')].every((row) => row.dataset.size === 'tiny'));
-  assert.equal(html(h(Item.Separator)).querySelector('hr').tagName, 'HR');
+  const rule = html(h(Item.Separator, { id: 'rule' })).querySelector('hr');
+  assert.equal(rule.id, 'rule');
+  assert.ok(rule.hasAttribute('data-divider'));
+  assert.equal(rule.getAttribute('role'), 'separator');
+  assert.match(rule.className, /border-0/, 'the hr border does not thicken the line');
 });
 
 test('className takes the row state', () => {
