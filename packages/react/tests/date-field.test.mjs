@@ -13,6 +13,7 @@ for (const key of [
   'HTMLInputElement',
   'Node',
   'Event',
+  'InputEvent',
   'KeyboardEvent',
   'MouseEvent',
   'FocusEvent',
@@ -470,11 +471,11 @@ test('every opening starts on the month of the chosen date', async () => {
 });
 
 const textBox = () => host.querySelector('[data-date-field] input[type=text]');
-async function typeText(value) {
+async function typeText(value, inputType = 'insertText') {
   await act(async () => {
     const input = textBox();
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, value);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType }));
   });
 }
 async function blurText() {
@@ -591,6 +592,32 @@ test('typed entry keeps unreadable or blocked text, marks it invalid and Escape 
   await typeText('');
   await blurText();
   assert.deepEqual(changes, [null], 'an emptied box clears the value');
+});
+
+test('a pasted or autofilled date is read at once; typing waits, and an IME Enter is ignored', async () => {
+  const changes = [];
+  await render(
+    h(DateField, { onValueChange: (v) => changes.push(v && keyOf(v)) }, h(DateField.Input)),
+  );
+  await typeText('2026-09-1');
+  assert.deepEqual(changes, [], 'a date typed key by key waits');
+  await typeText('2026년 9월 3일', 'insertFromPaste');
+  assert.deepEqual(changes, ['2026-09-03']);
+  assert.equal(textBox().value, '2026. 09. 03.');
+  await act(async () => {
+    const input = textBox();
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(
+      input,
+      '2000-01-31',
+    );
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  assert.deepEqual(changes, ['2026-09-03', '2000-01-31'], 'autofill fires a plain input event');
+  await typeText('2026. 9. 5');
+  await key(textBox(), 'Enter', { isComposing: true });
+  assert.equal(changes.length, 2, 'the Enter that ends an IME composition does not read');
+  await key(textBox(), 'Enter');
+  assert.equal(changes.at(-1), '2026-09-05');
 });
 
 test('typed entry and the calendar share one value; ArrowDown opens on the typed date', async () => {

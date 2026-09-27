@@ -141,11 +141,26 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
   const input = {
     value: draft ?? (isEmpty(value) ? '' : options.display(value)),
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
-      setDraft(event.currentTarget.value);
+      const text = event.currentTarget.value;
       setUnreadable(false);
+      // Paste, drop and autofill hand over a whole date at once, so it is read right away; a
+      // date typed key by key waits for Enter or blur, since 2026-09-1 already reads as a date.
+      const kind = (event.nativeEvent as InputEvent).inputType;
+      const whole =
+        kind === 'insertFromPaste' ||
+        kind === 'insertFromDrop' ||
+        kind === 'insertReplacementText' ||
+        kind === undefined;
+      const parsed = whole && text.trim() ? options.parse?.(text.trim()) : undefined;
+      if (parsed === undefined) setDraft(text);
+      else {
+        commit(parsed);
+        dropDraft();
+      }
     },
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
-      if (event.defaultPrevented) return;
+      // The Enter that confirms an IME syllable is not the user's Enter.
+      if (event.defaultPrevented || event.nativeEvent.isComposing) return;
       // Enter reads the text; unreadable text also stops the form's implicit submit.
       if (event.key === 'Enter' && !readDraft()) event.preventDefault();
       else if (event.key === 'ArrowDown' && !blocked) {
