@@ -37,7 +37,9 @@ export const fieldSurface = {
 export const fieldAction = {
   base: cn(
     'shrink-0 text-(--ids-color-on-muted)',
-    'data-hovered:text-(--ids-color-on-surface) data-pressed:text-(--ids-color-on-surface)',
+    // A control marks only one of hovered, active and pressed at a time, so each darkens it.
+    'data-hovered:text-(--ids-color-on-surface) data-active:text-(--ids-color-on-surface)',
+    'data-pressed:text-(--ids-color-on-surface)',
   ),
   size: {
     standard: cn('size-7 first:-ms-2 last:-me-2'),
