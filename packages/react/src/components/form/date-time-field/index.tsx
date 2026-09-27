@@ -1,56 +1,131 @@
 import { useState } from 'react';
 
+import { CalendarDaysIcon } from '@heroicons/react/24/outline';
+
 import {
+  dayBounds,
+  dayUnavailable,
+  onDay,
+  serializeDateTime,
+  withinLimits,
+  type DateTimeLimits,
+} from './date-time';
+import { messages } from '../../../internal/messages';
+import {
+  TemporalClear,
+  TemporalContent,
   TemporalField,
   TemporalTrigger,
   TemporalValue,
-  TemporalContent,
-  TemporalClear,
   temporalFieldStyle,
+  type ClearProps as SharedClearProps,
+  type ContentProps as SharedContentProps,
+  type TemporalChange,
   type TemporalFieldProps,
+  type TemporalFieldState,
   type TriggerProps as SharedTriggerProps,
   type ValueProps as SharedValueProps,
-  type ContentProps as SharedContentProps,
 } from '../../../internal/temporal-field';
 import { temporalFormatter } from '../../../internal/temporal-field/format';
-import { invariant, tv } from '../../../utils';
+import { invariant } from '../../../utils';
 import { Calendar, type CalendarOptions } from '../../data/calendar';
-import { dayKey, dayOnly, sameDay } from '../../data/calendar/date';
-import { TimePicker } from '../../data/time-picker';
-import {
-  nearestSlot,
-  secondsOf,
-  timeKey,
-  timeSlots,
-  validateTime,
-  withTime,
-  type TimeFormat,
-  type TimePrecision,
-} from '../../data/time-picker/time';
-export type DateTimeFieldProps = Omit<TemporalFieldProps, 'disabled'> &
-  Omit<CalendarOptions, 'autoFocus'> & {
+import { dayOnly } from '../../data/calendar/date';
+import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
+import { validateTime, type TimeFormat, type TimePrecision } from '../../data/time-picker/time';
+import { useFieldSize } from '../field/context';
+
+import type { IdsSize } from '../../../tokens/types';
+
+export type DateTimeFieldProps = Omit<TemporalFieldProps<Date | null>, 'disabled'> &
+  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'disabled'> & {
+    disabled?: boolean | ((date: Date) => boolean);
     precision?: TimePrecision;
     format?: string;
     hourCycle?: TimeFormat;
     step?: number;
-    pickerVariant?: 'grid' | 'wheel';
+    pickerVariant?: TimePickerVariant;
   };
-const Style = tv({
-  slots: {
-    layout: 'flex flex-col gap-4 sm:flex-row',
-    date: 'min-w-0 flex-1',
-    time: 'min-w-0 sm:w-52',
-    hint: 'mt-2 text-body-b3-regular text-(--ids-color-on-muted)',
-  },
-});
-function dayBounds(day: Date, min?: Date, max?: Date): { min?: Date; max?: Date } | null {
-  const key = dayKey(day);
-  if ((min && key < dayKey(min)) || (max && key > dayKey(max))) return null;
-  const lower =
-    min && sameDay(day, min) ? new Date(Math.ceil(min.getTime() / 1000) * 1000) : undefined;
-  if (lower && (!sameDay(lower, day) || (max && lower > max))) return null;
-  return { min: lower, max: max && sameDay(day, max) ? max : undefined };
+
+type PanelProps = Pick<
+  DateTimeFieldProps,
+  | 'monthsToShow'
+  | 'locale'
+  | 'weekStartsOn'
+  | 'captionLayout'
+  | 'month'
+  | 'defaultMonth'
+  | 'onMonthChange'
+  | 'pickerVariant'
+> & {
+  value: Date | null;
+  change: TemporalChange<Date | null>;
+  size: IdsSize;
+  today: Date;
+  limits: DateTimeLimits;
+  cycle: TimeFormat | undefined;
+};
+
+const sameInstant = (a: Date | null, b: Date | null) =>
+  a === b || (!!a && !!b && a.getTime() === b.getTime());
+
+// The calendar and the clock edit one Date: a day keeps the clock time and a time keeps the day.
+function Panel({
+  value,
+  change,
+  size,
+  today,
+  limits,
+  cycle,
+  pickerVariant,
+  ...calendar
+}: PanelProps) {
+  const styles = temporalFieldStyle({ size });
+  const base = value ?? dayOnly(today);
+  const unavailable = dayUnavailable(base, limits);
+  const bounds = dayBounds(base, limits.min, limits.max);
+  return (
+    <div className={styles.panel()}>
+      <Calendar
+        {...calendar}
+        value={value}
+        onValueChange={(day) => {
+          const next = day && onDay(day, base, limits);
+          if (next) change(next);
+        }}
+        min={limits.min}
+        max={limits.max}
+        disabled={(day) => dayUnavailable(day, limits)}
+        today={today}
+        size={size}
+      />
+      <div className={styles.panelTime()}>
+        <TimePicker
+          value={value}
+          referenceDate={base}
+          onValueChange={(next) => {
+            if (next === null) change(null);
+            else if (withinLimits(next, limits)) change(next);
+          }}
+          precision={limits.precision}
+          format={cycle}
+          step={limits.step}
+          min={bounds?.min}
+          max={bounds?.max}
+          locale={calendar.locale}
+          variant={pickerVariant}
+          size={size}
+          disabled={unavailable}
+          // Beside the calendar the clock shows seven rows, close to the calendar height with a middle row.
+          className="w-full sm:[--time-picker-height:calc(var(--time-option)*7)]"
+        />
+        {unavailable && (
+          <p className={styles.panelHint()}>{messages.dateTimeField.pickDateFirst}</p>
+        )}
+      </div>
+    </div>
+  );
 }
+
 export function DateTimeField({
   precision = 'minute',
   format,
@@ -58,119 +133,78 @@ export function DateTimeField({
   step = 1,
   min,
   max,
-  locale = 'en-US',
-  pickerVariant,
   disabled,
+  locale = messages.locale,
+  pickerVariant,
   monthsToShow = 1,
   weekStartsOn,
+  captionLayout,
   month,
   defaultMonth,
   onMonthChange,
   today,
   ...props
 }: DateTimeFieldProps) {
+  validateTime(props.value);
+  validateTime(props.defaultValue);
   validateTime(min);
   validateTime(max);
   invariant(!min || !max || min <= max, 'DateTimeField: min must be <= max.');
   const [mountedToday] = useState(() => new Date());
-  const anchorDay = today ?? mountedToday,
-    cycle = hourCycle ?? (format === '12h' || format === '24h' ? format : undefined);
+  const anchor = today ?? mountedToday;
+  const cycle = hourCycle ?? (format === '12h' || format === '24h' ? format : undefined);
   const display = temporalFormatter(format, locale, precision, cycle, true);
+  const limits: DateTimeLimits = { min, max, disabled, precision, step };
+  const cell = (useFieldSize(props.size) ?? 'standard') === 'tiny' ? 32 : 36;
   return (
     <TemporalField
       {...props}
       disabled={disabled === true}
-      label="날짜와 시간"
-      display={display}
-      serialize={(d) => `${dayKey(d)}T${timeKey(d, precision)}`}
-      preferredWidth={600}
-      initialFocusSelector={'[data-calendar-day][tabindex="0"]'}
-      picker={({ value, change }) => {
-        const base = value ?? dayOnly(anchorDay);
-        const cache = new Map<string, number[]>();
-        const slotsFor = (day: Date) => {
-          const key = dayKey(day);
-          if (cache.has(key)) return cache.get(key)!;
-          const bounds = dayBounds(day, min, max);
-          const slots = bounds
-            ? timeSlots(day, precision, step, bounds.min, bounds.max).filter((s) => {
-                const d = withTime(day, s)!;
-                return (!min || d >= min) && (!max || d <= max);
-              })
-            : [];
-          cache.set(key, slots);
-          return slots;
-        };
-        const dayDisabled = (day: Date) => {
-          if (typeof disabled === 'function' && disabled(day)) return true;
-          const bounds = dayBounds(day, min, max);
-          if (!bounds) return true;
-          return bounds.min || bounds.max ? slotsFor(day).length === 0 : false;
-        };
-        const bounds = dayBounds(base, min, max),
-          unavailable = dayDisabled(base);
-        const styles = Style();
-        return (
-          <div className={styles.layout()}>
-            <div className={styles.date()}>
-              <Calendar
-                value={value}
-                onValueChange={(day) => {
-                  if (!day) return;
-                  const seconds = nearestSlot(slotsFor(day), secondsOf(base));
-                  if (seconds !== undefined) change(withTime(day, seconds));
-                }}
-                min={min}
-                max={max}
-                disabled={dayDisabled}
-                monthsToShow={monthsToShow}
-                locale={locale}
-                weekStartsOn={weekStartsOn}
-                month={month}
-                defaultMonth={defaultMonth}
-                onMonthChange={onMonthChange}
-                today={anchorDay}
-                size={props.size}
-              />
-            </div>
-            <div className={styles.time()}>
-              <TimePicker
-                value={withTime(
-                  base,
-                  nearestSlot(slotsFor(base), secondsOf(base)) ?? secondsOf(base),
-                )}
-                onValueChange={(next) => {
-                  if (!next) return;
-                  if (!dayDisabled(next) && (!min || next >= min) && (!max || next <= max))
-                    change(next);
-                }}
-                precision={precision}
-                format={cycle}
-                step={step}
-                min={bounds?.min}
-                max={bounds?.max}
-                locale={locale}
-                size={props.size}
-                variant={pickerVariant}
-                disabled={unavailable}
-              />
-              {unavailable && <p className={styles.hint()}>선택 가능한 날짜를 먼저 고르세요.</p>}
-            </div>
-          </div>
-        );
+      config={{
+        kind: 'date-time',
+        empty: null,
+        isEmpty: (value) => value === null,
+        isSame: sameInstant,
+        display: (value) => display(value!),
+        serialize: (value) => serializeDateTime(value!, precision),
+        messages: messages.dateTimeField,
+        icon: CalendarDaysIcon,
+        // The calendar months, the gap, a 13rem clock column and the popup's own padding.
+        preferredWidth: cell * 7 * monthsToShow + 16 * monthsToShow + 208 + 26,
+        initialFocusSelector: '[data-calendar-day][tabindex="0"]',
+        picker: ({ value, change, size }) => (
+          <Panel
+            value={value}
+            change={change}
+            size={size}
+            today={anchor}
+            limits={limits}
+            cycle={cycle}
+            pickerVariant={pickerVariant}
+            monthsToShow={monthsToShow}
+            locale={locale}
+            weekStartsOn={weekStartsOn}
+            captionLayout={captionLayout}
+            month={month}
+            defaultMonth={defaultMonth}
+            onMonthChange={onMonthChange}
+          />
+        ),
       }}
     />
   );
 }
+
 export namespace DateTimeField {
   export type Props = DateTimeFieldProps;
+  export type State = TemporalFieldState<Date | null>;
   export type TriggerProps = SharedTriggerProps;
-  export type ClearProps = TriggerProps;
   export type ValueProps = SharedValueProps;
+  export type ClearProps = SharedClearProps;
   export type ContentProps = SharedContentProps;
-  export const Trigger = TemporalTrigger,
-    Value = TemporalValue,
-    Content = TemporalContent,
-    Clear = TemporalClear;
+  export const Trigger = TemporalTrigger;
+  export const Value = TemporalValue;
+  export const Clear = TemporalClear;
+  export const Content = TemporalContent;
   export const Style = temporalFieldStyle;
 }
