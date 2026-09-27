@@ -7,6 +7,9 @@ export const messages = {
   textField: {
     clear: '지우기',
   },
+  input: {
+    clearSearch: '검색어 지우기',
+  },
   numberField: {
     increment: '값 늘리기',
     decrement: '값 줄이기',

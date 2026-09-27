@@ -117,23 +117,43 @@ test('controlled search clear respects owner state, then accepts external update
   await act(async () => update('external'));
   assert.equal(input().value, 'external');
 });
-test('search readonly/disabled prevent clear; native input ref cleans up', async () => {
+test('search readonly/disabled have nothing to clear; native input ref cleans up', async () => {
   let cleaned = 0;
   for (const blocked of ['readOnly', 'disabled']) {
     await render(
       h(Input, {
+        key: blocked,
         type: 'search',
         defaultValue: 'keep',
         [blocked]: true,
         ref: () => () => cleaned++,
       }),
     );
-    assert.equal(host.querySelector('button').disabled, true);
-    await click('button');
+    assert.equal(host.querySelector('button'), null);
     assert.equal(input().value, 'keep');
   }
   await render(null);
   assert.ok(cleaned > 0);
+});
+
+test('search shows a search icon and a Clear only while filled; address types stay literal', async () => {
+  await render(h(Input, { type: 'search', 'aria-label': 'Find' }));
+  assert.equal(input().getAttribute('enterkeyhint'), 'search');
+  assert.ok(host.querySelector('[data-text-field-adornment] svg'), 'a leading search icon');
+  assert.equal(host.querySelector('button'), null, 'nothing to clear yet');
+  await type(input(), 'ids');
+  assert.equal(host.querySelector('button').getAttribute('aria-label'), '검색어 지우기');
+  const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+  await act(async () => input().dispatchEvent(escape));
+  assert.equal(input().value, '');
+  for (const type of ['email', 'url']) {
+    await render(h(Input, { key: type, type, 'aria-label': type }));
+    assert.equal(input().getAttribute('autocapitalize'), 'none');
+    assert.equal(input().getAttribute('autocorrect'), 'off');
+    assert.equal(input().getAttribute('spellcheck'), 'false');
+  }
+  await render(h(Input, { key: 'text', type: 'text', 'aria-label': 'text' }));
+  assert.equal(input().hasAttribute('autocapitalize'), false);
 });
 test('number compound children and numeric callback pass through Input', async () => {
   const values = [];
