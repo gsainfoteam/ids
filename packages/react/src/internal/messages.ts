@@ -4,4 +4,7 @@ export const messages = {
   otpField: {
     label: '인증 코드',
   },
+  textField: {
+    clear: '지우기',
+  },
 } as const;

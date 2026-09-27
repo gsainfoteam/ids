@@ -223,7 +223,7 @@ const form = useForm({ defaultValues: { email: '' }, onSubmit: ({ value }) => sa
       <TextField
         name={field.name}
         value={field.state.value}
-        onChange={(event) => field.handleChange(event.target.value)}
+        onValueChange={field.handleChange}
         onBlur={field.handleBlur}
       />
       <Field.Error>{field.state.meta.errors.join(', ')}</Field.Error>
