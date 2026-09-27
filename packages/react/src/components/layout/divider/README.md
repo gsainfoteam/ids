@@ -48,6 +48,21 @@ import { Divider } from '@gsainfoteam/ids-react';
 
 - 의미 없이 모양만 나누는 선은 `decorative` 로 접근성 트리에서 뺍니다. 버튼 묶음 사이의 선처럼 앞뒤 요소가 이미 구분될 때 씁니다.
 
+## 다른 요소로 그리기
+
+```tsx
+<ul>
+  <li>…</li>
+  <Divider asChild decorative>
+    <li />
+  </Divider>
+  <li>…</li>
+</ul>
+```
+
+- `asChild` 면 자식 요소 하나가 선이 됩니다. 목록 안에서는 `li`, 문서의 주제 전환에는 `hr` 을 넘깁니다.
+- 이때는 가운데 글자를 넣을 수 없습니다.
+
 ## 상태
 
 | 상태          | 뜻                 |
@@ -67,6 +82,7 @@ import { Divider } from '@gsainfoteam/ids-react';
 | `children`            | 가운데 글자                                      |
 | `align`               | `center`(기본) / `start` / `end`. 글자가 있을 때 |
 | `decorative`          | `false`. `true` 면 접근성 트리에서 뺀다          |
+| `asChild`             | 자식 요소 하나를 선으로 그린다. 글자는 넣지 않는다 |
 | `className` / `style` | 상태를 받는 함수도 된다                          |
 | 그 외 속성            | div로 간다                                       |
 

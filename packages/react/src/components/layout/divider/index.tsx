@@ -1,6 +1,13 @@
-import { useId, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
+import {
+  isValidElement,
+  useId,
+  type ComponentProps,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 
-import { tv } from '../../../utils';
+import { invariant, tv } from '../../../utils';
+import { Slot } from '../../utility/slot';
 
 function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
   return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
@@ -10,6 +17,7 @@ export function Divider({
   orientation = 'horizontal',
   align = 'center',
   decorative = false,
+  asChild = false,
   className,
   style,
   children,
@@ -18,7 +26,12 @@ export function Divider({
   ...rest
 }: Divider.Props) {
   const labelId = useId();
-  const labelled = children != null && children !== false && children !== '';
+  // With asChild the single child becomes the line itself, so it cannot also carry a label.
+  const labelled = !asChild && children != null && children !== false && children !== '';
+  invariant(
+    !asChild || isValidElement(children),
+    '`Divider asChild` requires one element to render as, such as an `li` or `hr`.',
+  );
   const state: Divider.State = { orientation, labelled, align, decorative };
   const { root, label } = Divider.Style({ orientation, labelled, align });
 
@@ -33,17 +46,20 @@ export function Divider({
         'aria-labelledby': ariaLabelledBy ?? (labelled && !ariaLabel ? labelId : undefined),
       };
 
+  const rootProps = {
+    ...rest,
+    ...naming,
+    'data-divider': '',
+    'data-orientation': orientation,
+    'data-labelled': labelled ? '' : undefined,
+    'data-align': labelled ? align : undefined,
+    className: root({ className: resolve(className, state) }),
+    style: resolve(style, state),
+  };
+
+  if (asChild) return <Slot {...rootProps}>{children}</Slot>;
   return (
-    <div
-      {...rest}
-      {...naming}
-      data-divider=""
-      data-orientation={orientation}
-      data-labelled={labelled ? '' : undefined}
-      data-align={labelled ? align : undefined}
-      className={root({ className: resolve(className, state) })}
-      style={resolve(style, state)}
-    >
+    <div {...rootProps}>
       {labelled && (
         <span id={labelId} className={label()}>
           {children}
@@ -71,6 +87,7 @@ export namespace Divider {
     orientation?: Orientation;
     align?: Align;
     decorative?: boolean;
+    asChild?: boolean;
     className?: string | ((state: State) => string | undefined);
     style?: CSSProperties | ((state: State) => CSSProperties | undefined);
     children?: ReactNode;

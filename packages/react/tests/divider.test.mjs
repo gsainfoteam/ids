@@ -68,3 +68,19 @@ test('className and style may read the state', () => {
   assert.match(divider.className, /is-vertical-false/);
   assert.equal(divider.style.opacity, '1');
 });
+
+test('asChild draws the line as the child element, without a label', () => {
+  const list = new JSDOM(
+    renderToString(h('ul', null, h(Divider, { asChild: true, decorative: true }, h('li')))),
+  ).window.document;
+  const line = list.querySelector('ul > li');
+  assert.ok(line.hasAttribute('data-divider'));
+  assert.equal(line.getAttribute('aria-hidden'), 'true');
+  assert.equal(line.children.length, 0);
+  assert.match(line.className, /h-px w-full/);
+  const rule = new JSDOM(renderToString(h(Divider, { asChild: true }, h('hr')))).window.document
+    .body.firstElementChild;
+  assert.equal(rule.tagName, 'HR');
+  assert.equal(rule.getAttribute('role'), 'separator');
+  assert.throws(() => renderToString(h(Divider, { asChild: true }, 'or')), /asChild/);
+});
