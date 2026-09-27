@@ -59,7 +59,7 @@ export namespace Toggle {
     variants: {
       variant: toggleSurface.variant,
       colorScheme: controlSurface.colorScheme,
-      size: toggleSurface.size,
+      size: controlSurface.size,
     },
     defaultVariants: {
       variant: 'ghost',

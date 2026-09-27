@@ -1,19 +1,10 @@
-import type { IdsSize, IdsVariant } from '../tokens/types';
+import type { IdsVariant } from '../tokens/types';
 
 // A toggle is quiet while off, with only outline drawing a border, and its variant describes the
 // pressed look: the neutral hover fill for ghost and outline, the scheme tint for soft, the scheme
-// fill for solid. Colors come from the control surface's scheme properties.
+// fill for solid. Colors come from the control surface's scheme properties. Sizes are the control
+// surface's own, so a Toggle with a label keeps a Button's padding; IconToggle squares itself.
 export const toggleSurface = {
-  size: {
-    standard: [
-      'h-(--ids-size-control-standard) min-w-(--ids-size-control-standard) rounded-standard px-2 text-button-standard',
-      "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
-    ],
-    tiny: [
-      'h-(--ids-size-control-tiny) min-w-(--ids-size-control-tiny) gap-1.5 rounded-standard px-1.5 text-button-tiny',
-      "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
-    ],
-  } satisfies Record<IdsSize, string[]>,
   variant: {
     ghost: [
       'bg-transparent text-(--control-quiet)',
