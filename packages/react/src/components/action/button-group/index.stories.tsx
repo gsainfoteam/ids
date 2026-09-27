@@ -15,6 +15,7 @@ import { expect, spyOn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { isDevelopment } from '../../../utils/dev';
 import { TextField } from '../../form/text-field';
 import { Button } from '../button';
 import { IconButton } from '../icon-button';
@@ -319,7 +320,7 @@ export const DevelopmentWarnings: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '이름 없는 그룹 보기' }));
     await expect(canvas.getByRole('group')).toBeVisible();
     // A production build, the static Storybook included, strips the warnings.
-    if (import.meta.env.DEV)
+    if (isDevelopment)
       await waitFor(() =>
         expect(warn).toHaveBeenCalledWith(expect.stringContaining('ButtonGroup: add aria-label')),
       );

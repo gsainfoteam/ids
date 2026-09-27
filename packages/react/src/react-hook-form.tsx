@@ -7,6 +7,7 @@ import {
   FieldRoot,
   type FieldProps as BaseProps,
 } from './components/form/field';
+import { isDevelopment } from './utils/dev';
 
 type ControlledOptions = Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>;
 export type FieldProps = BaseProps &
@@ -136,7 +137,7 @@ function ControlledField({
 function RhfField({ name, controlMode = 'native', registerOptions, ...props }: FieldProps) {
   const methods = useFormContext();
   useEffect(() => {
-    if (import.meta.env.DEV && name && !methods) {
+    if (isDevelopment && name && !methods) {
       console.warn('[IDS] Field: automatic registration requires react-hook-form FormProvider.');
     }
   }, [name, methods]);

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
+import { isDevelopment } from '../../../utils/dev';
 import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../field/context';
 import { NumberField, type NumberFieldProps } from '../number-field';
@@ -24,7 +25,7 @@ export function Input(props: InputProps) {
   const { type = 'text' } = props;
   const supported = ['text', 'email', 'url', 'search', 'number', 'password', 'tel'].includes(type);
   useEffect(() => {
-    if (import.meta.env.DEV && !supported)
+    if (isDevelopment && !supported)
       console.warn(
         `[IDS] Input: unsupported type "${type}"; using text. Use the dedicated field for dates, times, colors, files and OTP.`,
       );

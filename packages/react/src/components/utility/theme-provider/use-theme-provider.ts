@@ -9,6 +9,8 @@ import {
   useSyncExternalStore,
 } from 'react';
 
+import { noop } from 'es-toolkit';
+
 import type { IdsColor, IdsMode } from '../../../tokens/types';
 
 export type ThemeMode = IdsMode | 'system';
@@ -21,8 +23,6 @@ export type ThemeContextValue = {
   setMode: (mode: ThemeMode) => void;
   toggleMode: () => void;
 };
-
-const noop = () => {};
 
 // Outside every provider useTheme() still answers, with the values a root provider starts from.
 // A provider compares its parent against this object to know that it is the root.

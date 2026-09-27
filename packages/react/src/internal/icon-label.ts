@@ -1,5 +1,7 @@
 import { Children, isValidElement, useEffect, type ReactNode } from 'react';
 
+import { isDevelopment } from '../utils/dev';
+
 export type IconLabel = {
   label: string;
   // 'function' names are only safe in development; see FUNCTION_NAME.
@@ -107,7 +109,7 @@ export function useIconLabel(
   const fromFunction = derived?.source === 'function';
 
   useEffect(() => {
-    if (!import.meta.env.DEV || named) return;
+    if (!isDevelopment || named) return;
     if (label === undefined)
       console.warn(
         `[IDS] ${component}: no accessible name could be found for this icon. Pass aria-label, or give the icon component a displayName.`,

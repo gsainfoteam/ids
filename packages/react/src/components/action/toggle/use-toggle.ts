@@ -2,6 +2,7 @@ import { useEffect, type FocusEvent, type KeyboardEvent, type MouseEvent } from 
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { invariant } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { useButton } from '../button/use-button';
 import { useToggleGroupContext } from '../toggle-group/context';
 
@@ -44,7 +45,7 @@ export function useToggle<P extends ToggleOwnProps>(props: P, name: string) {
   const pressed = group ? group.isPressed(item) : ownPressed;
 
   useEffect(() => {
-    if (!import.meta.env.DEV || group) return;
+    if (!isDevelopment || group) return;
     if (pressedProp !== undefined && defaultPressed !== undefined)
       console.warn(
         `[IDS] ${name}: pass either pressed (controlled) or defaultPressed (uncontrolled), not both.`,

@@ -19,6 +19,7 @@ import {
   type AccordionValue,
 } from './accordion-value';
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { isDevelopment } from '../../../utils/dev';
 
 export const ROOT_ATTRIBUTE = 'data-accordion';
 export const TRIGGER_ATTRIBUTE = 'data-accordion-trigger';
@@ -75,7 +76,7 @@ export function useAccordion<T extends string>({
     const counts = registry.current;
     const count = (counts.get(item) ?? 0) + 1;
     counts.set(item, count);
-    if (import.meta.env.DEV && count > 1)
+    if (isDevelopment && count > 1)
       console.warn(`[IDS] Accordion.Item: value "${item}" is used by more than one item.`);
     return () => {
       const left = (counts.get(item) ?? 1) - 1;

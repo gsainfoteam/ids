@@ -12,6 +12,7 @@ import { expect, fn, spyOn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { isDevelopment } from '../../../utils/dev';
 import { Spinner } from '../../feedback/spinner';
 
 import { Button } from '.';
@@ -360,7 +361,7 @@ export const DevelopmentWarnings: Story = {
     const warn = spyOn(console, 'warn').mockImplementation(() => {});
     await userEvent.click(canvas.getByRole('button', { name: '잘못 쓴 예 보기' }));
     // A production build, the static Storybook included, strips the warnings.
-    if (import.meta.env.DEV) {
+    if (isDevelopment) {
       await waitFor(() =>
         expect(warn).toHaveBeenCalledWith(expect.stringContaining('shows only an icon')),
       );

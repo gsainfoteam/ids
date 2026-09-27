@@ -1,6 +1,7 @@
 import { createContext, use, useEffect, type ComponentProps, type ReactNode } from 'react';
 
 import { invariant, tv } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { Slot } from '../slot';
 
 import type { IdsSize, IdsVariant } from '../../../tokens/types';
@@ -33,7 +34,7 @@ export function useGroupNameWarning(
     (typeof props['aria-label'] === 'string' && props['aria-label'].trim() !== '') ||
     props['aria-labelledby'] != null;
   useEffect(() => {
-    if (import.meta.env.DEV && !named && !nested)
+    if (isDevelopment && !named && !nested)
       console.warn(
         `[IDS] ${component}: add aria-label or aria-labelledby so a screen reader can say what the group is for.`,
       );

@@ -7,6 +7,7 @@ import {
   type ThemeMode,
 } from './use-theme-provider';
 import { cn, mergeRefs } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { Slot } from '../slot';
 
 import type { IdsColor } from '../../../tokens/types';
@@ -41,7 +42,7 @@ export function ThemeProvider({
   );
 
   useEffect(() => {
-    if (!import.meta.env.DEV || !elementRef.current) return;
+    if (!isDevelopment || !elementRef.current) return;
     const primary = getComputedStyle(elementRef.current).getPropertyValue('--ids-color-primary');
     if (primary.trim() === '')
       console.warn(

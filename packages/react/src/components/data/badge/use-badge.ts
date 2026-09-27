@@ -9,6 +9,7 @@ import {
 } from 'react';
 
 import { badgeDisplay } from './badge-count';
+import { isDevelopment } from '../../../utils/dev';
 
 type Describable = ReactElement<{ 'aria-describedby'?: string }>;
 
@@ -31,7 +32,7 @@ export function useBadge({
 }) {
   const indicatorId = `${useId()}-badge`;
   useEffect(() => {
-    if (import.meta.env.DEV && content === undefined && !dot)
+    if (isDevelopment && content === undefined && !dot)
       console.warn('[IDS] Badge: pass content, or dot for an indicator without text.');
   }, [content, dot]);
 
