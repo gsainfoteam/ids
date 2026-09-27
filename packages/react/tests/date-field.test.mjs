@@ -549,6 +549,21 @@ test('typed entry: the text box takes the label and role, the calendar button le
     () => renderToString(h(DateField, { selectionMode: 'range' }, h(DateField.Input))),
     /reads typed text/,
   );
+  const named = new JSDOM(
+    renderToString(
+      h(
+        DateField,
+        { 'aria-label': 'Birthday' },
+        h(DateField.Input),
+        h(DateField.Trigger, { 'aria-label': 'Pick a birthday' }),
+      ),
+    ),
+  ).window.document.querySelector('button');
+  assert.equal(
+    named.getAttribute('aria-label'),
+    'Pick a birthday',
+    'a label given to the part wins',
+  );
 });
 
 test('typed entry reads the shown format, written forms, bare digits and the locale order', async () => {

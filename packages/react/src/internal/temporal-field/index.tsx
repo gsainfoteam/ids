@@ -203,6 +203,8 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
   if (c.hasInput) {
     const button = {
       ...mergeProps(props, c.trigger),
+      // The default names the button; a label given to the part names it instead.
+      'aria-label': props['aria-label'] ?? (c.trigger['aria-label'] as string),
       variant: 'ghost' as const,
       size: c.size,
       className: c.styles.button({ className }),

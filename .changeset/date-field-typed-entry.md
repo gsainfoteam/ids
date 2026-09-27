@@ -10,3 +10,5 @@ from a phone keypad and the locale's numeric order. It rewrites the text in the 
 and keeps text it cannot read or that min, max or `disabled` rule out, marked `aria-invalid` until
 it is fixed or reverted with Escape. Down Arrow opens the calendar on the typed date, and the
 calendar button leaves the tab order. The calendar button is a ghost IconButton.
+An `aria-label` given to `DateField.Trigger` beside an Input names that button instead of the
+default "달력 열기".
