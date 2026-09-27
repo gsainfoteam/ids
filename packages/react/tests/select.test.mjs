@@ -11,6 +11,8 @@ for (const key of [
   'Element',
   'Node',
   'getComputedStyle',
+  'MutationObserver',
+  'Document',
   'document',
   'HTMLElement',
   'HTMLInputElement',
@@ -57,11 +59,9 @@ const listbox = () => host.querySelector('[role=listbox]');
 const options = () => [...host.querySelectorAll('[role=option]')];
 const active = () => document.getElementById(trigger().getAttribute('aria-activedescendant'));
 async function key(node, key, init = {}) {
-  await act(() =>
-    node.dispatchEvent(
-      new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init }),
-    ),
-  );
+  const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init });
+  await act(() => node.dispatchEvent(event));
+  return event;
 }
 async function click(node) {
   await act(() => node.click());
@@ -574,36 +574,45 @@ test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab he
     addEventListener() {},
     removeEventListener() {},
   };
-  const state = tracked({ mobileVariant: 'drawer', defaultValue: 'cherry' });
-  await render(h('div', null, h('button', null, 'Before'), state.node));
-  await click(trigger());
-  const popup = host.querySelector('[data-field-popup]');
-  assert.equal(popup.dataset.presentation, 'drawer');
-  assert.ok(
-    popup.style.bottom.includes(`${window.innerHeight - 500}px`),
-    'lifted by the part the on-screen keyboard covers',
-  );
-  assert.equal(popup.getAttribute('role'), 'dialog');
-  assert.equal(popup.getAttribute('aria-modal'), 'true');
-  assert.equal(popup.getAttribute('aria-label'), 'Fruit');
-  assert.ok(host.querySelector('[data-field-popup-backdrop]'));
-  assert.equal(document.documentElement.style.overflow, 'hidden');
-  assert.equal(document.activeElement, listbox(), 'focus moves into the sheet');
-  assert.equal(listbox().getAttribute('aria-activedescendant'), options()[2].id);
-  await key(listbox(), 'ArrowUp');
-  assert.equal(listbox().getAttribute('aria-activedescendant'), options()[0].id);
-  const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
-  await act(() => listbox().dispatchEvent(tab));
-  assert.equal(tab.defaultPrevented, true, 'Tab cannot leave the sheet');
-  await act(() =>
-    host
-      .querySelector('[data-field-popup-backdrop]')
-      .dispatchEvent(new MouseEvent('pointerdown', { bubbles: true })),
-  );
-  assert.equal(listbox(), null);
-  assert.equal(document.activeElement, trigger(), 'the backdrop closes and returns focus');
-  assert.equal(document.documentElement.style.overflow, '');
-  assert.deepEqual(state.changes, []);
+  // jsdom lays nothing out, so every element would count as hidden to the focus trap.
+  const getClientRects = dom.window.Element.prototype.getClientRects;
+  dom.window.Element.prototype.getClientRects = () => [{ width: 1, height: 1 }];
+  try {
+    const state = tracked({ mobileVariant: 'drawer', defaultValue: 'cherry' });
+    await render(h('div', null, h('button', { id: 'before' }, 'Before'), state.node));
+    await click(trigger());
+    const popup = host.querySelector('[data-field-popup]');
+    assert.equal(popup.dataset.presentation, 'drawer');
+    assert.ok(
+      popup.style.bottom.includes(`${window.innerHeight - 500}px`),
+      'lifted by the part the on-screen keyboard covers',
+    );
+    assert.equal(popup.getAttribute('role'), 'dialog');
+    assert.equal(popup.getAttribute('aria-modal'), 'true');
+    assert.equal(popup.getAttribute('aria-label'), 'Fruit');
+    assert.ok(host.querySelector('[data-field-popup-backdrop]'));
+    assert.ok(document.body.hasAttribute('data-scroll-locked'), 'the page scroll is locked');
+    assert.equal(document.activeElement, listbox(), 'focus moves into the sheet');
+    assert.equal(listbox().getAttribute('aria-activedescendant'), options()[2].id);
+    await key(listbox(), 'ArrowUp');
+    assert.equal(listbox().getAttribute('aria-activedescendant'), options()[0].id);
+    const tab = await key(listbox(), 'Tab');
+    assert.equal(tab.defaultPrevented, true, 'Tab cannot leave the sheet');
+    assert.equal(document.activeElement, listbox());
+    await act(() => host.querySelector('#before').focus());
+    assert.equal(document.activeElement, listbox(), 'focus moved outside comes back');
+    await act(() =>
+      host
+        .querySelector('[data-field-popup-backdrop]')
+        .dispatchEvent(new MouseEvent('pointerdown', { bubbles: true })),
+    );
+    assert.equal(listbox(), null);
+    assert.equal(document.activeElement, trigger(), 'the backdrop closes and returns focus');
+    assert.equal(document.body.hasAttribute('data-scroll-locked'), false);
+    assert.deepEqual(state.changes, []);
+  } finally {
+    dom.window.Element.prototype.getClientRects = getClientRects;
+  }
 });
 
 test('search ignores case, width and accents; IME keys are left alone', async () => {

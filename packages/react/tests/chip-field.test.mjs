@@ -11,6 +11,8 @@ for (const key of [
   'Element',
   'Node',
   'getComputedStyle',
+  'MutationObserver',
+  'Document',
   'document',
   'HTMLElement',
   'HTMLInputElement',

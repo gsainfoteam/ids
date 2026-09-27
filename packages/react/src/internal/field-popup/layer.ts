@@ -1,12 +1,14 @@
 import { useSyncExternalStore } from 'react';
 
+import { noop } from 'es-toolkit';
+
 export type PopupPresentation = 'popover' | 'drawer';
 
 // Below this width a field that asks for a drawer gets one; above it, every popup is anchored.
 const SMALL_SCREEN = '(max-width: 639.98px)';
 
 function subscribe(callback: () => void) {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return () => {};
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return noop;
   const query = window.matchMedia(SMALL_SCREEN);
   query.addEventListener('change', callback);
   return () => query.removeEventListener('change', callback);
@@ -32,40 +34,6 @@ export function supportsPopover(node: HTMLElement) {
 export function showInTopLayer(node: HTMLElement) {
   if (!supportsPopover(node) || node.matches(':popover-open')) return;
   node.showPopover();
-}
-
-let scrollLocks = 0;
-let scrollOverflow = '';
-
-// Nested drawers share one lock, so the page scrolls again only after the last one closes.
-export function lockScroll(doc: Document) {
-  const root = doc.documentElement;
-  if (scrollLocks++ === 0) {
-    scrollOverflow = root.style.overflow;
-    root.style.overflow = 'hidden';
-  }
-  return () => {
-    if (--scrollLocks === 0) root.style.overflow = scrollOverflow;
-  };
-}
-
-const TABBABLE = [
-  'a[href]',
-  'button:not([disabled])',
-  'input:not([disabled]):not([type="hidden"])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]',
-  '[contenteditable="true"]',
-].join(',');
-
-export function tabbables(container: HTMLElement) {
-  const view = container.ownerDocument.defaultView;
-  return Array.from(container.querySelectorAll<HTMLElement>(TABBABLE)).filter((node) => {
-    if (node.tabIndex < 0 || node.closest('[hidden], [inert], [aria-hidden="true"]')) return false;
-    const style = view?.getComputedStyle(node);
-    return style?.display !== 'none' && style?.visibility !== 'hidden';
-  });
 }
 
 // Popups opened from inside another popup stack; Escape closes only the topmost one.

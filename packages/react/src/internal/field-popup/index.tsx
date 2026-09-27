@@ -8,14 +8,15 @@ import {
   shift,
   size,
 } from '@floating-ui/react-dom';
+import { createFocusTrap } from 'focus-trap';
+import { RemoveScroll } from 'react-remove-scroll';
+import { tabbable } from 'tabbable';
 
 import {
   isTopPopup,
-  lockScroll,
   registerPopup,
   showInTopLayer,
   supportsPopover,
-  tabbables,
   useDrawerPresentation,
   type PopupPresentation,
 } from './layer';
@@ -105,13 +106,38 @@ export function FieldPopup({
     showInTopLayer(node);
     if (active && node.contains(active) && doc.activeElement !== active)
       active.focus({ preventScroll: true });
-    const unregister = registerPopup(node);
-    const unlock = drawer ? lockScroll(doc) : undefined;
-    return () => {
-      unregister();
-      unlock?.();
-    };
+    return registerPopup(node);
   }, [drawer]);
+
+  // A drawer is modal, so focus stays inside it.
+  useLayoutEffect(() => {
+    const node = popup.current,
+      trigger = anchor.current;
+    if (!node || !drawer) return;
+    const trap = createFocusTrap(node, {
+      initialFocus: false,
+      delayInitialFocus: false,
+      fallbackFocus: node,
+      escapeDeactivates: false,
+      allowOutsideClick: true,
+      returnFocusOnDeactivate: false,
+      preventScroll: true,
+      document: node.ownerDocument,
+    });
+    trap.activate();
+    // A field that closes its sheet sends focus back to its own trigger, which the trap would
+    // pull back inside before the sheet unmounts. The window hears focusin before the trap's
+    // listener on the document does, so the trap lets go first.
+    const release = (event: FocusEvent) => {
+      if (isNode(event.target) && trigger?.contains(event.target)) trap.deactivate();
+    };
+    const win = node.ownerDocument.defaultView!;
+    win.addEventListener('focusin', release, true);
+    return () => {
+      win.removeEventListener('focusin', release, true);
+      trap.deactivate();
+    };
+  }, [anchor, drawer]);
 
   // A popover follows its anchor. It keeps the side it opened on while its content still fits
   // there, so a list that shrinks while it is filtered does not jump across the trigger, which is
@@ -218,33 +244,16 @@ export function FieldPopup({
       // A drawer held focus, and its backdrop is not focusable, so focus goes back.
       if (pressedOutside) close.current(drawer);
     };
+    // Focus leaving a popover closes it; a drawer's focus trap does not let it leave.
     const onFocusIn = (event: FocusEvent) => {
-      if (!outside(event.target)) return;
-      if (drawer) (tabbables(node)[0] ?? node).focus({ preventScroll: true });
-      else if (!pressedOutside) close.current(false);
+      if (!drawer && !pressedOutside && outside(event.target)) close.current(false);
     };
     const onKeyDown = (event: KeyboardEvent) => {
       pressedOutside = false;
-      if (event.key === 'Escape') {
-        if (event.defaultPrevented || event.isComposing || !isTopPopup(node)) return;
-        event.preventDefault();
-        close.current(true);
-        return;
-      }
-      if (event.key !== 'Tab' || !drawer || !isNode(event.target) || !node.contains(event.target))
-        return;
-      const items = tabbables(node);
-      const first = items[0],
-        last = items[items.length - 1];
-      const active = doc.activeElement;
-      if (!first || !last) event.preventDefault();
-      else if (event.shiftKey && (active === first || active === node)) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first.focus();
-      }
+      if (event.key !== 'Escape') return;
+      if (event.defaultPrevented || event.isComposing || !isTopPopup(node)) return;
+      event.preventDefault();
+      close.current(true);
     };
 
     doc.addEventListener('pointerdown', onPointerDown);
@@ -267,7 +276,7 @@ export function FieldPopup({
     const target =
       (initialFocusSelector ? node.querySelector<HTMLElement>(initialFocusSelector) : null) ??
       node.querySelector<HTMLElement>('[data-popup-autofocus]') ??
-      (drawer ? (tabbables(node)[0] ?? node) : null);
+      (drawer ? (tabbable(node)[0] ?? node) : null);
     target?.focus({ preventScroll: true });
   }, [drawer, initialFocusSelector]);
 
@@ -285,21 +294,23 @@ export function FieldPopup({
           className={styles.backdrop()}
         />
       )}
-      <div
-        {...props}
-        ref={popup}
-        popover="manual"
-        role={role}
-        aria-modal={drawer || undefined}
-        aria-label={props['aria-label'] ?? (role && !named ? label : undefined)}
-        tabIndex={props.tabIndex ?? (drawer ? -1 : undefined)}
-        data-field-popup=""
-        data-presentation={presentation}
-        className={styles.popup({ className })}
-        style={{ ...style, position: 'fixed' }}
-      >
-        {children}
-      </div>
+      {/* A drawer locks the page scroll but not pinch zoom, which people with low vision need. */}
+      <RemoveScroll ref={popup} enabled={drawer} allowPinchZoom forwardProps>
+        <div
+          {...props}
+          popover="manual"
+          role={role}
+          aria-modal={drawer || undefined}
+          aria-label={props['aria-label'] ?? (role && !named ? label : undefined)}
+          tabIndex={props.tabIndex ?? (drawer ? -1 : undefined)}
+          data-field-popup=""
+          data-presentation={presentation}
+          className={styles.popup({ className })}
+          style={{ ...style, position: 'fixed' }}
+        >
+          {children}
+        </div>
+      </RemoveScroll>
     </>
   );
 }
