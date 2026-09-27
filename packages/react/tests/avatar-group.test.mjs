@@ -36,6 +36,7 @@ test('max shows that many avatars and gathers the rest into a labelled +N', () =
     '+2',
     'the count keeps its sign in RTL',
   );
+  assert.equal(overflow.getAttribute('title'), 'Dan Oh, Eve Choi', 'hovering names who it hides');
   assert.deepEqual(
     [group.dataset.layout, group.dataset.stacking, group.dataset.size],
     ['stack', 'first-on-top', 'standard'],
@@ -63,6 +64,7 @@ test('total counts people that were not rendered', () => {
   assert.equal(items.length, 4);
   assert.equal(items[3].getAttribute('aria-label'), '외 39명');
   assert.equal(items[3].textContent, '+39');
+  assert.equal(items[3].hasAttribute('title'), false, 'people never rendered cannot be named');
   const { items: fewer } = render({ total: 2 }, people(3));
   assert.equal(fewer.length, 3, 'a total below the rendered count is ignored');
 });

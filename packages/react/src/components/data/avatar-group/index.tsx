@@ -21,6 +21,7 @@ export type { AvatarGroupLayout, AvatarGroupStacking } from './arrange';
 type OverflowContextValue = {
   count: number;
   label: string;
+  names: string[];
   styles: ReturnType<typeof AvatarGroup.Style>;
 };
 
@@ -39,20 +40,26 @@ export function AvatarGroup({
   children,
   ...rest
 }: AvatarGroup.Props) {
-  const { items, visibleCount, hidden } = arrangeAvatarGroup({
+  const { items, visibleCount, hidden, hiddenNames } = arrangeAvatarGroup({
     children,
     max,
     total,
     layout,
     stacking,
     isOverflow: (node) => isValidElement(node) && node.type === AvatarGroup.Overflow,
+    nameOf: (node) => {
+      if (!isValidElement<Avatar.Props>(node) || node.type !== Avatar) return undefined;
+      return node.props.name ?? node.props.alt ?? node.props['aria-label'];
+    },
   });
   const state: AvatarGroup.State = { visible: visibleCount, hidden, layout, stacking, size, shape };
   const styles = AvatarGroup.Style({ layout, size });
 
   return (
     <AvatarGroupContext value={{ size, shape }}>
-      <OverflowContext value={{ count: hidden, label: overflowLabel(hidden), styles }}>
+      <OverflowContext
+        value={{ count: hidden, label: overflowLabel(hidden), names: hiddenNames, styles }}
+      >
         <div
           role="group"
           {...rest}
@@ -118,6 +125,8 @@ export namespace AvatarGroup {
     const digits = String(overflow.count).length;
     return (
       <Avatar
+        // Hovering the +N lists who it stands for.
+        title={overflow.names.length > 0 ? overflow.names.join(', ') : undefined}
         {...rest}
         alt={ariaLabel ?? overflow.label}
         data-avatar-group-overflow=""

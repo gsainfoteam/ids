@@ -33,6 +33,7 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 ```
 
 - `+N` 은 이름이 "외 N명" 인 이미지입니다. 이름은 `overflowLabel` 로 바꿉니다.
+- 가려진 사람을 모두 렌더했다면 `+N` 에 마우스를 올렸을 때 그 이름들이 보입니다. `total` 로 센 사람까지는 알 수 없어서 이때는 보이지 않습니다.
 - 세 자리 수부터는 원 안에 들어가도록 글자가 작아집니다.
 - `max` 가 1보다 작으면 1로 봅니다.
 

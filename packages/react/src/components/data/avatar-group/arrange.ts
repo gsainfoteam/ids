@@ -16,6 +16,7 @@ export function arrangeAvatarGroup({
   layout,
   stacking,
   isOverflow,
+  nameOf,
 }: {
   children: ReactNode;
   max: number | undefined;
@@ -23,6 +24,7 @@ export function arrangeAvatarGroup({
   layout: AvatarGroupLayout;
   stacking: AvatarGroupStacking;
   isOverflow: (node: ReactNode) => boolean;
+  nameOf: (node: ReactNode) => string | undefined;
 }) {
   if (import.meta.env.DEV && max !== undefined && !(max >= 1))
     console.warn('[IDS] AvatarGroup: max must be at least 1.');
@@ -35,6 +37,10 @@ export function arrangeAvatarGroup({
   // `total` covers people the page did not render, such as a server that returns the first few
   // avatars and a count.
   const hidden = Math.max(total ?? 0, avatars.length) - visible.length;
+  // The +N can say who it stands for, but only when every one of them was rendered and named;
+  // a partial list would read as the whole.
+  const names = avatars.slice(visible.length).map(nameOf);
+  const hiddenNames = names.length === hidden && names.every(Boolean) ? (names as string[]) : [];
 
   // The overflow indicator sits where it was declared, or last when it was left out.
   const overflowFirst = overflowIndex === 0;
@@ -56,5 +62,5 @@ export function arrangeAvatarGroup({
     return { node, cutout, overflow: node === null || isOverflow(node) };
   });
 
-  return { items, visibleCount: visible.length, hidden };
+  return { items, visibleCount: visible.length, hidden, hiddenNames };
 }
