@@ -74,6 +74,9 @@ export const popupStyle = tv({
       'bg-black/50 transition-opacity duration-(--ids-motion-normal) starting:opacity-0',
       'motion-reduce:transition-none',
     ],
+    header:
+      '-mt-1 mb-2 hidden items-center justify-between ps-1 in-data-[presentation=drawer]:flex',
+    title: 'text-body-b3-medium',
   },
   variants: {
     presentation: {

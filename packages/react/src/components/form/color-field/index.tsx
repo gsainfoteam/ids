@@ -15,6 +15,7 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 import { useColorField } from './use-color-field';
 import {
   FieldPopup,
+  FieldPopupHeader,
   fieldTrigger,
   flattenParts,
   part,
@@ -271,17 +272,11 @@ export function ColorField({
           }}
         >
           {drawer && (
-            <div className={styles.popupHeader()}>
-              <span className={styles.popupTitle()}>{messages.colorField.dialog}</span>
-              <button
-                type="button"
-                aria-label={messages.colorField.close}
-                onClick={() => actions.close(true)}
-                className={styles.popupClose()}
-              >
-                <XMarkIcon aria-hidden="true" />
-              </button>
-            </div>
+            <FieldPopupHeader
+              title={messages.colorField.dialog}
+              closeLabel={messages.colorField.close}
+              onClose={() => actions.close(true)}
+            />
           )}
           {contents.length ? contents : <ColorFieldContent />}
         </FieldPopup>
@@ -438,13 +433,6 @@ export namespace ColorField {
       ],
       // Padding that keeps the popup's corner concentric with the standard-radius area inside it.
       popup: 'concentric-p-3',
-      popupHeader: '-mt-1 mb-2 flex items-center justify-between ps-1',
-      popupTitle: 'text-body-b3-medium',
-      popupClose: [
-        'inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-standard',
-        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
-        'focus-ring [&_svg]:size-(--ids-size-icon-standard)',
-      ],
     },
     variants: {
       variant: {

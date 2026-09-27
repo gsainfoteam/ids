@@ -21,7 +21,7 @@ import {
 } from './use-temporal-field';
 import { useFieldSize } from '../../components/form/field/context';
 import { cn, invariant, mergeProps, mergeRefs, tv } from '../../utils';
-import { FieldPopup, flattenParts, part } from '../field-popup';
+import { FieldPopup, FieldPopupHeader, flattenParts, part } from '../field-popup';
 import { fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 import { FormValue } from '../form-value';
 
@@ -144,15 +144,6 @@ export const temporalFieldStyle = tv({
       'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
     ],
     button: iconButton,
-    // The header only shows in the mobile drawer, where there is no field left in view to tap.
-    popupHeader: 'mb-2 hidden items-center justify-between ps-1 in-data-[presentation=drawer]:flex',
-    popupTitle: 'text-body-b3-medium',
-    popupClose: [
-      'inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-standard',
-      'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'focus-ring [&_svg]:size-(--ids-size-icon-standard)',
-    ],
     content: 'flex justify-center',
     // DateTimeField's popup: the calendar beside the clock, stacked on a phone.
     panel: 'flex flex-col gap-4 sm:flex-row',
@@ -500,18 +491,12 @@ export function TemporalField<V>({
           className="concentric-p-3"
           onBlur={handleBlur as (event: FocusEvent<HTMLDivElement>) => void}
         >
-          <div className={styles.popupHeader()}>
-            <span className={styles.popupTitle()}>{config.messages.title}</span>
-            <button
-              type="button"
-              data-popup-autofocus=""
-              aria-label={config.messages.close}
-              onClick={() => close(true)}
-              className={styles.popupClose()}
-            >
-              <XMarkIcon aria-hidden="true" />
-            </button>
-          </div>
+          <FieldPopupHeader
+            title={config.messages.title}
+            closeLabel={config.messages.close}
+            autoFocus
+            onClose={() => close(true)}
+          />
           {contents.length ? contents : <TemporalContent />}
         </FieldPopup>
       )}
