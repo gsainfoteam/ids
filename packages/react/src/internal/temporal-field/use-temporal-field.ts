@@ -45,11 +45,11 @@ export type UseTemporalFieldOptions<V> = {
 
 export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
   const { empty, isEmpty, isSame, disabled, readOnly, required } = options;
-  // The value is kept here rather than in useControllableState because a form reset must put
-  // the default back without reporting it as a change, the way a native input resets.
-  const [inner, setInner] = useState(options.defaultValue);
-  const controlled = options.value !== undefined;
-  const value = controlled ? (options.value as V) : inner;
+  const [value, setValue] = useControllableState<V>({
+    value: options.value,
+    defaultValue: options.defaultValue,
+    onValueChange: options.onValueChange,
+  });
   const [open, setOpen] = useControllableState({
     value: options.open,
     defaultValue: options.defaultOpen ?? false,
@@ -66,10 +66,9 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
   const [draft, setDraft] = useState<string | null>(null);
   const [unreadable, setUnreadable] = useState(false);
 
+  // Dates compare by calendar day, so a new Date for the day already picked is not a change.
   const commit = (next: V) => {
-    if (isSame(next, value)) return;
-    if (!controlled) setInner(next);
-    options.onValueChange?.(next);
+    if (!isSame(next, value)) setValue(next);
   };
   const dropDraft = () => {
     setDraft(null);
@@ -109,8 +108,9 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
     close(true);
   };
 
+  // A native reset puts the default back without a change event, the way an input resets.
   useFormReset(triggerRef, () => {
-    if (!controlled) setInner(options.defaultValue);
+    setValue(options.defaultValue, { silent: true });
     dropDraft();
     setOpen(false);
   });
