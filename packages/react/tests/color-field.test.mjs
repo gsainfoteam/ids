@@ -413,11 +413,17 @@ test('drawer on a small screen: modal dialog with a title and a close button', a
   assert.equal(popup.getAttribute('aria-modal'), 'true');
   assert.ok(popup.textContent.includes('색상 선택'));
   assert.equal(document.activeElement, slider('채도'));
+  assert.ok(document.body.hasAttribute('data-scroll-locked'), 'the page scroll is locked');
   const close = popup.querySelector('button[aria-label="닫기"]');
   assert.ok(close);
   await click(close);
   assert.equal(dialog(), null);
-  assert.equal(document.activeElement, trigger());
+  assert.equal(document.activeElement, trigger(), 'the close button returns focus');
+  assert.equal(document.body.hasAttribute('data-scroll-locked'), false);
+  await click(trigger());
+  await click(host.querySelector('[data-field-popup-backdrop]'));
+  assert.equal(dialog(), null);
+  assert.equal(document.activeElement, trigger(), 'a click on the backdrop returns focus');
   delete window.matchMedia;
   await render(tracked({ defaultValue: '#FF0000', mobileVariant: 'drawer', key: 'wide' }).node);
   await click(trigger());
