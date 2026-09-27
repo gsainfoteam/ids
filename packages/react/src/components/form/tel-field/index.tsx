@@ -136,11 +136,11 @@ function TelInput({ asChild, children, ref, ...rest }: TelField.InputProps) {
 function TelCountrySelect({ asChild, children, ...props }: TelField.CountrySelectProps) {
   const c = useContext(Context);
   invariant(c, '`<TelField.CountrySelect>` must be used inside `<TelField>`.');
-  const { country, countryLabel, countryIcon } = TelField.Style({ size: c.size });
+  const { country, countryTrigger, countryLabel, countryIcon } = TelField.Style({ size: c.size });
   return (
     <Select
       value={c.country}
-      onChange={(next) => {
+      onValueChange={(next) => {
         if (next) c.changeCountry(next as CountryCode);
       }}
       aria-label="국가 코드"
@@ -150,7 +150,11 @@ function TelCountrySelect({ asChild, children, ...props }: TelField.CountrySelec
       variant="ghost"
       className={country()}
     >
-      <Select.Trigger {...props} asChild={asChild}>
+      <Select.Trigger
+        {...props}
+        asChild={asChild}
+        className={countryTrigger({ className: props.className })}
+      >
         {asChild ? (
           children
         ) : (
@@ -451,7 +455,10 @@ export namespace TelField {
         '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
         '[&_button]:p-0',
       ],
-      country: 'w-auto shrink-0 px-1',
+      // The Select's trigger carries data-field-input, so this field's own surface already rings
+      // for it; the Select's surface keeps no ring of its own inside it.
+      country: 'w-auto shrink-0 ring-0! inset-ring-transparent!',
+      countryTrigger: 'px-1',
       countryLabel: 'inline-flex items-center gap-1',
       countryIcon: 'shrink-0',
     },
