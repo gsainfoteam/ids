@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 
 import { chipToFocusAfter } from './chip-focus';
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { isDevelopment } from '../../../utils/dev';
 
 export function useChip({
   selected,
@@ -26,7 +27,7 @@ export function useChip({
     onValueChange: onSelectedChange,
   });
   useEffect(() => {
-    if (import.meta.env.DEV && selected !== undefined && onSelectedChange === undefined)
+    if (isDevelopment && selected !== undefined && onSelectedChange === undefined)
       console.warn('[IDS] Chip: selected needs onSelectedChange, or use defaultSelected.');
   }, [selected, onSelectedChange]);
 

@@ -11,6 +11,7 @@ import {
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { mergeRefs } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { useRovingFocus } from '../../utility/group/use-roving-focus';
 
 import type { ToggleGroupContextValue, ToggleGroupSelectionMode } from './context';
@@ -123,7 +124,7 @@ export function useToggleGroup({
   const valueShape = shapeOf(value);
   const defaultShape = shapeOf(defaultValue);
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    if (!isDevelopment) return;
     for (const shape of [valueShape, defaultShape]) {
       if (single && shape === 'array')
         console.warn(
@@ -137,7 +138,7 @@ export function useToggleGroup({
   const itemValues = roving.items?.map((item) => item.value).join('\n');
   const selectedKey = selected.join('\n');
   useEffect(() => {
-    if (!import.meta.env.DEV || itemValues === undefined || selectedKey === '') return;
+    if (!isDevelopment || itemValues === undefined || selectedKey === '') return;
     const known = new Set(itemValues.split('\n'));
     for (const entry of selectedKey.split('\n'))
       if (!known.has(entry)) console.warn(`[IDS] ToggleGroup: no toggle has the value "${entry}".`);

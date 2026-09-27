@@ -17,6 +17,7 @@ import { clamp, closestThumb, moveThumb, ratioAlong } from './slider-math';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { mergeRefs } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 
 export type SliderValue = number | [number, number];
 
@@ -80,7 +81,7 @@ export function useSlider({
     .map((entry) => clamp(Number.isFinite(entry) ? entry : min, min, max))
     .sort((a, b) => a - b);
   useEffect(() => {
-    if (import.meta.env.DEV && !same(values, stored))
+    if (isDevelopment && !same(values, stored))
       console.warn(
         `[IDS] Slider: value ${JSON.stringify(stored)} is out of order or outside [${min}, ${max}].`,
       );

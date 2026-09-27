@@ -13,6 +13,7 @@ import { expect, fn, spyOn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { isDevelopment } from '../../../utils/dev';
 import { Button } from '../button';
 import { IconToggle } from '../icon-toggle';
 import { Toggle } from '../toggle';
@@ -446,7 +447,7 @@ export const DevelopmentWarnings: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '잘못 쓴 예 보기' }));
     await expect(canvas.getByRole('radiogroup')).toBeVisible();
     // A production build, the static Storybook included, strips the warnings.
-    if (import.meta.env.DEV)
+    if (isDevelopment)
       await waitFor(() =>
         expect(warn).toHaveBeenCalledWith(
           expect.stringContaining('no toggle has the value "justify"'),

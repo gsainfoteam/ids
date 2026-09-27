@@ -1,6 +1,7 @@
 import { Children, isValidElement, useLayoutEffect, type ReactNode, type RefObject } from 'react';
 
 import { useIconLabel } from '../../../internal/icon-label';
+import { isDevelopment } from '../../../utils/dev';
 import { useButton } from '../button/use-button';
 
 export type FloatingPlacement = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -31,7 +32,7 @@ const overlaps = (a: DOMRect, b: DOMRect) =>
 function usePlacementCheck(nodeRef: RefObject<HTMLElement | null>, placement: FloatingPlacement) {
   useLayoutEffect(() => {
     const node = nodeRef.current;
-    if (!import.meta.env.DEV || !node || node.hidden) return;
+    if (!isDevelopment || !node || node.hidden) return;
     let entries = mounted.get(node.ownerDocument);
     if (!entries) mounted.set(node.ownerDocument, (entries = new Set()));
     const rect = node.getBoundingClientRect();

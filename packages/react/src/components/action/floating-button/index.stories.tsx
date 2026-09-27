@@ -11,6 +11,7 @@ import { expect, fn, spyOn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { isDevelopment } from '../../../utils/dev';
 import { Spinner } from '../../feedback/spinner';
 
 import { FloatingButton } from '.';
@@ -273,7 +274,7 @@ export const AutomaticLabel: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('button', { name: 'Compose' })).toBeVisible();
     // heroicons has no displayName; its function name survives only in development builds.
-    if (import.meta.env.DEV)
+    if (isDevelopment)
       await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
   },
 };
@@ -382,7 +383,7 @@ export const DevelopmentWarnings: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '겹치는 버튼 보기' }));
     await expect(canvas.getByRole('button', { name: '문의' })).toBeVisible();
     // A production build, the static Storybook included, strips the warnings.
-    if (import.meta.env.DEV)
+    if (isDevelopment)
       await waitFor(() =>
         expect(warn).toHaveBeenCalledWith(expect.stringContaining('cover each other')),
       );

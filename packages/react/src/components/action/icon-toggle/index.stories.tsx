@@ -13,6 +13,8 @@ import { expect, fn } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { isDevelopment } from '../../../utils/dev';
+
 import { IconToggle } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -162,7 +164,7 @@ export const AutomaticLabel: Story = {
     );
     await expect(canvas.getByRole('button', { name: '목록 보기' })).toBeVisible();
     // heroicons has no displayName; its function name survives only in development builds.
-    if (import.meta.env.DEV)
+    if (isDevelopment)
       await expect(canvas.getByRole('button', { name: 'Bold' })).toBeVisible();
   },
 };

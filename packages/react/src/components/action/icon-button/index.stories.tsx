@@ -15,6 +15,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { isDevelopment } from '../../../utils/dev';
 import { Spinner } from '../../feedback/spinner';
 
 import { IconButton } from '.';
@@ -161,7 +162,7 @@ export const AutomaticLabel: Story = {
     await expect(canvas.getByRole('button', { name: '휴지통으로' })).toBeVisible();
     await expect(canvas.getByRole('button', { name: '닫기' })).toBeVisible();
     // heroicons has no displayName; its function name survives only in development builds.
-    if (import.meta.env.DEV)
+    if (isDevelopment)
       await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
   },
 };

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, type ComponentProps, type CSSProperties } from 'react';
 
 import { invariant, mergeRefs, tv } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 
 function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
   return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
@@ -19,7 +20,7 @@ export function Spacer({ flex = 1, className, style, ref, ...rest }: Spacer.Prop
 
   useEffect(() => {
     const parent = elementRef.current?.parentElement;
-    if (!import.meta.env.DEV || !parent) return;
+    if (!isDevelopment || !parent) return;
     if (!getComputedStyle(parent).display.includes('flex'))
       console.warn('[IDS] Spacer: its parent is not a flex container, so it takes no space.');
   }, []);

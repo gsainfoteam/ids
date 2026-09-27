@@ -18,6 +18,7 @@ import {
 
 import { useInteractiveProps } from '../../../hooks/use-interactive';
 import { cn, invariant, mergeProps, mergeRefs } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 
 // The name of the nearest enclosing button-like component. A button inside another one is invalid
 // HTML, and the browser splits the outer button apart when it parses the markup.
@@ -125,7 +126,7 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
   );
 
   useEffect(() => {
-    if (import.meta.env.DEV && parent !== null)
+    if (isDevelopment && parent !== null)
       console.warn(
         `[IDS] ${name}: a button cannot sit inside ${parent}. Place them side by side, or group them with ButtonGroup.`,
       );
@@ -134,7 +135,7 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
   const warnedContent = useRef(false);
   useEffect(() => {
     const node = nodeRef.current;
-    if (!import.meta.env.DEV || !options.checkContent || warnedContent.current || !node) return;
+    if (!isDevelopment || !options.checkContent || warnedContent.current || !node) return;
     if (node.textContent?.trim()) return;
     warnedContent.current = true;
     console.warn(
