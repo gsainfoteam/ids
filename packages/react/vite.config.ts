@@ -14,13 +14,22 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+      entry: {
+        index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+        'react-hook-form': fileURLToPath(new URL('./src/react-hook-form.tsx', import.meta.url)),
+      },
       name: 'IdsReact',
       formats: ['es', 'cjs'],
-      fileName: (format) => `index.${format === 'es' ? 'js' : 'cjs'}`,
+      fileName: (format, entry) => `${entry}.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: [/^react($|\/)/, /^react-dom($|\/)/, /^@heroicons\/react($|\/)/, 'tailwindcss'],
+      external: [
+        /^react($|\/)/,
+        /^react-dom($|\/)/,
+        /^@heroicons\/react($|\/)/,
+        'react-hook-form',
+        'tailwindcss',
+      ],
       output: {
         globals: {
           react: 'React',

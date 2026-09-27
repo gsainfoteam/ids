@@ -25,14 +25,18 @@ type ThemeProviderProps = {
   children: ReactNode;
 };
 
-export function ThemeProvider({ color: initialColor = 'blue', mode: initialMode = 'light', children }: ThemeProviderProps) {
+export function ThemeProvider({
+  color: initialColor = 'blue',
+  mode: initialMode = 'light',
+  children,
+}: ThemeProviderProps) {
   const [color, setColor] = useState<IdsColor>(initialColor);
   const [mode, setMode] = useState<IdsMode>(initialMode);
   const toggleMode = () => setMode((m) => (m === 'light' ? 'dark' : 'light'));
 
   return (
     <ThemeContext.Provider value={{ color, mode, setColor, setMode, toggleMode }}>
-      <div data-color={color} data-mode={mode}>
+      <div data-color={color} data-mode={mode} style={{ colorScheme: mode }}>
         {children}
       </div>
     </ThemeContext.Provider>
