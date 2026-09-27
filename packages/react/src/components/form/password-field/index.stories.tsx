@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { KeyIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
-import { expect, fn } from 'storybook/test';
+import { expect, fn, waitFor } from 'storybook/test';
 import { z } from 'zod';
 
 import { Showcase } from '~story-kit';
@@ -221,6 +221,8 @@ export const Visibility: Story = {
       'backward',
     ]);
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    // The glyph alone shows that the password is visible; the pressed toggle keeps no fill.
+    await waitFor(() => expect(getComputedStyle(toggle).backgroundColor).toBe('rgba(0, 0, 0, 0)'));
     await userEvent.tab();
     await expect(toggle).toHaveFocus();
     await userEvent.keyboard(' ');

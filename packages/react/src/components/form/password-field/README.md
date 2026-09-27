@@ -45,6 +45,7 @@ import { Field, PasswordField } from '@gsainfoteam/ids-react';
 | 폼 reset              | 다시 가린다                                                  |
 
 - 버튼 이름은 항상 "비밀번호 표시"이고 `aria-pressed` 가 켜짐과 꺼짐을 알립니다. 아이콘은 눈과 가린 눈으로 바뀝니다.
+- 버튼은 ghost `IconToggle` 입니다. 켜져도 배경을 채우지 않고 아이콘만 바뀝니다.
 - 읽기 전용이어도 보기는 바꿀 수 있습니다. 비활성이면 바꿀 수 없습니다.
 
 ## Caps Lock

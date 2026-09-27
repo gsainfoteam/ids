@@ -136,6 +136,20 @@ test('pointer visibility preserves DOM/value/selection/focus without onChange or
   assert.equal(changes, 0);
   assert.equal(submits, 0);
 });
+test('the toggle is a ghost IconToggle that only swaps its glyph when pressed', async () => {
+  await render(h(PasswordField, { name: 'password' }));
+  assert.equal(toggle().dataset.variant, 'ghost');
+  assert.equal(toggle().hasAttribute('data-pressed'), false);
+  await click();
+  assert.ok(toggle().hasAttribute('data-pressed'));
+  const classes = toggle().className.split(' ');
+  assert.ok(classes.includes('data-pressed:bg-transparent'));
+  assert.equal(
+    classes.some((name) => name.startsWith('data-pressed:bg-(')),
+    false,
+    'the pressed fill is dropped',
+  );
+});
 test('controlled input forwards native changes, external values, composition and readonly visibility', async () => {
   let setValue;
   const events = [];

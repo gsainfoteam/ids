@@ -3,6 +3,7 @@ import {
   createContext,
   isValidElement,
   use,
+  useRef,
   type ComponentProps,
   type CSSProperties,
   type ReactElement,
@@ -13,7 +14,7 @@ import {
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 import { usePasswordField, type PasswordFieldInputProps } from './use-password-field';
-import { type FieldSurfaceVariant } from '../../../internal/field-surface';
+import { fieldAction, type FieldSurfaceVariant } from '../../../internal/field-surface';
 import { messages } from '../../../internal/messages';
 import {
   Adornments,
@@ -27,7 +28,7 @@ import {
   type TextControlState,
 } from '../../../internal/text-control';
 import { cn, invariant, mergeProps, tv } from '../../../utils';
-import { IconButton } from '../../action/icon-button';
+import { IconToggle } from '../../action/icon-toggle';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -183,7 +184,7 @@ export namespace PasswordField {
     className?: string;
     style?: CSSProperties;
   };
-  export type VisibilityToggleProps = Omit<ComponentProps<'button'>, 'children'> & {
+  export type VisibilityToggleProps = Omit<ComponentProps<'button'>, 'children' | 'value'> & {
     asChild?: boolean;
     children?: ReactElement | ((state: PasswordFieldState) => ReactElement);
   };
@@ -225,18 +226,15 @@ export namespace PasswordField {
     ...props
   }: VisibilityToggleProps) {
     const { state, toggle, inputProps, styles } = usePasswordContext('VisibilityToggle');
-    const internal = {
-      type: 'button' as const,
+    // onPressedChange carries no event, so the click that precedes it records whether a pointer
+    // pressed the toggle.
+    const pointer = useRef(false);
+    const shared = {
       disabled: state.disabled || props.disabled,
-      'aria-pressed': state.visible,
       'aria-controls': inputProps.id,
       'data-password-field-toggle': '',
       onPointerDown: (event: { button: number; preventDefault: () => void }) => {
         if (event.button === 0) event.preventDefault();
-      },
-      onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
-        onClick?.(event);
-        if (!event.defaultPrevented && !state.disabled) toggle(event.detail > 0);
       },
     };
     if (asChild) {
@@ -246,7 +244,18 @@ export namespace PasswordField {
         '`<PasswordField.VisibilityToggle asChild>` requires one button, or a component forwarding button props and ref.',
       );
       // A child drawn with asChild names itself through its own text.
-      return cloneElement(children, mergeProps(mergeProps(children.props, props), internal));
+      return cloneElement(
+        children,
+        mergeProps(mergeProps(children.props, props), {
+          ...shared,
+          type: 'button' as const,
+          'aria-pressed': state.visible,
+          onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
+            onClick?.(event);
+            if (!event.defaultPrevented && !state.disabled) toggle(event.detail > 0);
+          },
+        }),
+      );
     }
     const icon =
       typeof children === 'function'
@@ -254,14 +263,20 @@ export namespace PasswordField {
         : (children ??
           (state.visible ? <EyeSlashIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />));
     return (
-      <IconButton
+      <IconToggle
         {...props}
-        {...internal}
+        {...shared}
         aria-label={props['aria-label'] ?? messages.passwordField.show}
         variant="ghost"
         size={state.size}
         icon={icon}
-        className={styles.action({ className })}
+        pressed={state.visible}
+        onPressedChange={() => toggle(pointer.current)}
+        onClick={(event) => {
+          onClick?.(event);
+          pointer.current = event.detail > 0;
+        }}
+        className={styles.toggle({ className })}
       />
     );
   }
@@ -296,12 +311,21 @@ export namespace PasswordField {
   export const Style = tv({
     extend: textControlStyle,
     slots: {
+      // An in-field action like Clear. The eye glyph alone says whether the password shows, so
+      // IconToggle's pressed fill is dropped.
+      toggle: [fieldAction.base, 'data-pressed:bg-transparent'],
       capsLock: 'inline-flex shrink-0 items-center text-(--ids-color-on-muted)',
     },
     variants: {
       size: {
-        standard: { capsLock: '[&_svg]:size-(--ids-size-icon-standard)' },
-        tiny: { capsLock: '[&_svg]:size-(--ids-size-icon-tiny)' },
+        standard: {
+          toggle: fieldAction.size.standard,
+          capsLock: '[&_svg]:size-(--ids-size-icon-standard)',
+        },
+        tiny: {
+          toggle: fieldAction.size.tiny,
+          capsLock: '[&_svg]:size-(--ids-size-icon-tiny)',
+        },
       } satisfies Record<IdsSize, object>,
     },
   });
