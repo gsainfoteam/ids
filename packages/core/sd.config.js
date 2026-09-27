@@ -285,8 +285,21 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
   }
 }
 
+@keyframes ids-caret-blink {
+  0%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  50% {
+    opacity: 0;
+  }
+}
+
 @theme {
   --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
+  --animate-caret-blink: ids-caret-blink 1.25s ease-out infinite;
 }
 `;
 

@@ -15,13 +15,15 @@ for (const name of [
   'InputEvent',
   'KeyboardEvent',
   'CompositionEvent',
+  'FocusEvent',
 ])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-const { createElement: h, act, useState, Fragment } = await import('react');
+const { createElement: h, act, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
 const { Field, OTPField } = await import('../dist/index.js');
+
 let root, host;
 afterEach(async () => {
   if (root) await act(async () => root.unmount());
@@ -36,57 +38,52 @@ async function render(node) {
   }
   await act(async () => root.render(node));
 }
+
+const field = () => host.querySelector('[data-otp-field] input');
 const slots = () => [...host.querySelectorAll('[data-otp-slot]')];
-const code = () =>
+const shown = () =>
   slots()
-    .map((input) => input.value)
+    .map((slot) => slot.textContent)
     .join('');
-async function key(index, key, options = {}) {
-  let event;
+
+// jsdom has no execCommand, so these drive the same fallback path an engine without it takes.
+async function type(value, data = null) {
   await act(async () => {
-    slots()[index].focus();
-    event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...options });
-    slots()[index].dispatchEvent(event);
-  });
-  return event;
-}
-async function type(index, value, options = {}) {
-  await act(async () => {
-    const node = slots()[index];
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(node, value);
-    node.dispatchEvent(new InputEvent('input', { bubbles: true, ...options }));
+    const input = field();
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, value);
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, data, inputType: 'insertText' }));
   });
 }
-async function paste(index, text) {
+async function paste(text, start, end = start) {
   let event;
   await act(async () => {
+    const input = field();
+    input.focus();
+    if (start !== undefined) input.setSelectionRange(start, end);
     event = new Event('paste', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'clipboardData', { value: { getData: () => text } });
-    slots()[index].dispatchEvent(event);
+    input.dispatchEvent(event);
   });
   return event;
 }
-function controlled(props = {}) {
-  const changes = [],
-    completions = [];
-  let current, set;
-  function App() {
-    [current, set] = useState(props.defaultValue ?? '');
-    return h(OTPField, {
+
+function tracked(props = {}) {
+  const changes = [];
+  const completions = [];
+  return {
+    changes,
+    completions,
+    node: h(OTPField, {
+      length: 6,
+      'aria-label': 'Code',
       ...props,
-      length: props.length ?? 6,
-      value: current,
-      onChange: (next) => {
-        changes.push(next);
-        set(next);
-      },
+      onValueChange: (next) => changes.push(next),
       onComplete: (next) => completions.push(next),
-    });
-  }
-  return { node: h(App), value: () => current, set: (next) => set(next), changes, completions };
+    }),
+  };
 }
 
-test('SSR: Field group/slot names, label target, description/invalid/required, one canonical FormData value', () => {
+test('SSR: one real input carries the name, label, description, validation and autofill hints', () => {
   const doc = new JSDOM(
     renderToString(
       h(
@@ -103,309 +100,326 @@ test('SSR: Field group/slot names, label target, description/invalid/required, o
       ),
     ),
   ).window.document;
-  const group = doc.querySelector('[role=group]'),
-    inputs = [...doc.querySelectorAll('[data-otp-slot]')];
-  assert.equal(inputs.length, 6);
-  assert.equal(inputs[0].autocomplete, 'one-time-code');
-  assert.equal(inputs[1].autocomplete, 'off');
-  assert.equal(inputs[0].inputMode, 'numeric');
-  assert.equal(doc.querySelector('label').htmlFor, inputs[0].id);
-  assert.equal(group.getAttribute('aria-labelledby'), doc.querySelector('label').id);
-  for (const [index, input] of inputs.entries()) {
-    const name = input
-      .getAttribute('aria-labelledby')
-      .split(' ')
-      .map((id) => doc.getElementById(id).textContent)
-      .join(' ');
-    assert.ok(name.includes('Verification'));
-    assert.ok(name.includes(`${index + 1} / 6`));
-    assert.equal(input.required, true);
-    assert.equal(input.dataset.size, 'tiny');
-    assert.equal(input.getAttribute('aria-invalid'), 'true');
-    const description = input
-      .getAttribute('aria-describedby')
-      .split(' ')
-      .map((id) => doc.getElementById(id).textContent)
-      .join(' ');
-    assert.equal(description, 'Enter six digits Expired');
-  }
+  const inputs = doc.querySelectorAll('input');
+  assert.equal(inputs.length, 1);
+  const [input] = inputs;
+  assert.equal(doc.querySelector('label').htmlFor, input.id);
+  assert.equal(input.autocomplete, 'one-time-code');
+  assert.equal(input.inputMode, 'numeric');
+  assert.equal(input.maxLength, 6);
+  assert.equal(input.getAttribute('pattern'), '.{6}');
+  assert.equal(input.required, true);
+  assert.equal(input.getAttribute('aria-invalid'), 'true');
+  assert.equal(input.hasAttribute('aria-label'), false);
+  const description = input
+    .getAttribute('aria-describedby')
+    .split(' ')
+    .map((id) => doc.getElementById(id).textContent)
+    .join(' ');
+  assert.equal(description, 'Enter six digits Expired');
+  const visual = [...doc.querySelectorAll('[data-otp-slot]')];
+  assert.equal(visual.length, 6);
+  assert.ok(visual.every((slot) => slot.getAttribute('aria-hidden') === 'true'));
+  assert.equal(doc.querySelector('[data-otp-field]').dataset.size, 'tiny');
   assert.deepEqual(
     [...new doc.defaultView.FormData(doc.querySelector('form'))],
     [['code', '123456']],
   );
-  assert.equal(inputs.filter((node) => node.tabIndex === 0).length, 1);
 });
-test('typing advances/replaces, completes once per changed complete value, ignores invalid characters', async () => {
-  const state = controlled();
+
+test('an unlabelled field gets a default accessible name; the HTML pattern only checks length', () => {
+  const html = (props) =>
+    new JSDOM(renderToString(h(OTPField, { length: 4, ...props }))).window.document.querySelector(
+      'input',
+    );
+  assert.equal(html({}).getAttribute('aria-label'), '인증 코드');
+  assert.equal(html({ id: 'x' }).hasAttribute('aria-label'), false);
+  assert.equal(html({ pattern: 'alphanumeric' }).inputMode, 'text');
+  assert.equal(html({ pattern: /[a-c]/i }).getAttribute('pattern'), '.{4}');
+});
+
+test('typed input is cleaned, complete fires once per transition to full', async () => {
+  const state = tracked();
   await render(state.node);
-  for (let i = 0; i < 6; i++) {
-    await key(i, String(i + 1));
-    assert.equal(document.activeElement, slots()[Math.min(i + 1, 5)]);
-  }
-  assert.equal(code(), '123456');
-  assert.equal(state.value(), '123456');
+  await type('12a3', 'a');
+  assert.equal(field().value, '123');
+  assert.equal(shown(), '123');
+  await type('123456', '6');
   assert.deepEqual(state.completions, ['123456']);
-  await key(5, '6');
-  assert.equal(state.completions.length, 1);
-  await key(0, '9');
-  assert.equal(code(), '923456');
-  assert.deepEqual(state.completions, ['123456', '923456']);
-  await key(1, 'x');
-  assert.equal(code(), '923456');
-  assert.equal((await key(1, 'a', { metaKey: true })).defaultPrevented, false);
+  await type('123457', '7');
+  assert.deepEqual(state.completions, ['123456'], 'editing a full code does not complete again');
+  await type('12345', null);
+  await type('123458', '8');
+  assert.deepEqual(state.completions, ['123456', '123458']);
+  assert.deepEqual(state.changes, ['123', '123456', '123457', '12345', '123458']);
 });
-test('navigation and deletion maintain a compact string, roving Tab, Home/End and late-box entry', async () => {
-  const state = controlled({ defaultValue: '1234' });
+
+test('full-width digits are folded, and an autofilled full code wins over what was typed', async () => {
+  const state = tracked();
   await render(state.node);
-  await key(2, 'Backspace');
-  assert.equal(code(), '124');
-  assert.equal(document.activeElement, slots()[1]);
-  await key(1, 'Delete');
-  assert.equal(code(), '14');
-  assert.equal(document.activeElement, slots()[1]);
-  await key(2, 'Backspace');
-  assert.equal(code(), '1');
-  assert.equal(document.activeElement, slots()[1]);
-  await key(1, 'Home');
-  assert.equal(document.activeElement, slots()[0]);
-  await key(0, 'End');
-  assert.equal(document.activeElement, slots()[5]);
-  await key(5, '7');
-  assert.equal(code(), '17');
-  assert.equal(document.activeElement, slots()[2]);
-  await key(2, 'ArrowLeft');
-  assert.equal(document.activeElement, slots()[1]);
-  await key(1, 'ArrowRight');
-  assert.equal(document.activeElement, slots()[2]);
+  await type('１２', '２');
+  assert.equal(field().value, '12');
+  await type('12987654', '987654');
+  assert.equal(field().value, '987654');
+});
+
+test('beforeinput rejects a disallowed character before it reaches the DOM', async () => {
+  await render(tracked().node);
+  const event = new InputEvent('beforeinput', {
+    bubbles: true,
+    cancelable: true,
+    data: 'x',
+    inputType: 'insertText',
+  });
+  field().dispatchEvent(event);
+  assert.equal(event.defaultPrevented, true);
+  const ok = new InputEvent('beforeinput', {
+    bubbles: true,
+    cancelable: true,
+    data: '7',
+    inputType: 'insertText',
+  });
+  field().dispatchEvent(ok);
+  assert.equal(ok.defaultPrevented, false);
+});
+
+test('paste: a full code replaces from anywhere, a partial one overwrites from the selection', async () => {
+  const state = tracked({ defaultValue: '1234' });
+  await render(state.node);
+  const event = await paste('98-76-54', 1, 2);
+  assert.equal(event.defaultPrevented, true);
+  assert.equal(field().value, '987654');
+  await paste('11', 2, 3);
+  assert.equal(field().value, '981154');
+  await paste('--');
+  assert.equal(field().value, '981154', 'nothing acceptable in the clipboard changes nothing');
+  await render(h('div', { key: 'readonly' }, tracked({ defaultValue: '12', readOnly: true }).node));
+  await paste('999999', 0);
+  assert.equal(field().value, '12');
+});
+
+test('a collapsed caret over a character selects it, and that slot shows as active', async () => {
+  await render(tracked({ defaultValue: '1234' }).node);
+  await act(async () => {
+    field().focus();
+  });
   assert.deepEqual(
-    slots().map((node) => node.tabIndex),
-    [-1, -1, 0, -1, -1, -1],
+    [field().selectionStart, field().selectionEnd],
+    [4, 4],
+    'focus goes to the next empty slot',
   );
-  assert.equal((await key(2, 'Tab')).defaultPrevented, false);
-});
-test('full paste from any box, partial overwrite, NFKC filtering and browser autofill input events', async () => {
-  const state = controlled();
-  await render(state.node);
-  await paste(3, ' １２３-４５６ ');
-  assert.equal(code(), '123456');
-  assert.equal(state.completions.length, 1);
-  await paste(5, '123456');
-  assert.equal(state.completions.length, 1);
-  await paste(2, '98');
-  assert.equal(code(), '129856');
-  await type(4, '654321', { inputType: 'insertReplacementText', data: '654321' });
-  assert.equal(code(), '654321');
-  await type(0, '67', { inputType: 'insertText', data: '7' });
-  assert.equal(code(), '754321');
-  await paste(0, 'invalid');
-  assert.equal(code(), '754321');
-});
-test('custom/global regular expressions remain stateless, alphanumeric case and dynamic configuration', async () => {
-  const expression = /[0-9a-f]/gi;
-  const state = controlled({ pattern: expression, length: 4 });
-  await render(state.node);
-  await paste(0, 'aF29');
-  assert.equal(code(), 'aF29');
-  await paste(0, 'Fa29');
-  assert.equal(code(), 'Fa29');
-  assert.equal(expression.lastIndex, 0);
-  await render(h(OTPField, { length: 6, defaultValue: 'aZ23kL', pattern: 'alphanumeric' }));
-  assert.equal(code(), 'aZ23kL');
-  await render(h(OTPField, { length: 4, defaultValue: 'unused', pattern: 'numeric' }));
-  assert.equal(code(), '23');
-  await render(h(OTPField, { length: 6, defaultValue: 'unused', pattern: 'alphanumeric' }));
-  assert.equal(code(), '23');
-});
-test('controlled external updates do not complete, and reset does not emit changes or complete', async () => {
-  const state = controlled({ defaultValue: '123456' });
-  await render(state.node);
-  assert.deepEqual(state.completions, []);
-  await act(async () => state.set('654321'));
-  assert.equal(code(), '654321');
-  assert.deepEqual(state.completions, []);
-  await act(async () => state.set(''));
-  assert.equal(code(), '');
-  await paste(0, '123456');
-  assert.deepEqual(state.completions, ['123456']);
-});
-test('mask, readonly/disabled, native cancellation and explicit aria-invalid=false', async () => {
-  await render(
-    h(
-      Field,
-      { disabled: true, invalid: false },
-      h(OTPField, { length: 4, name: 'code', defaultValue: '1234', mask: true, invalid: true }),
-    ),
+  assert.ok(slots()[4].hasAttribute('data-active'));
+  assert.ok(slots()[4].querySelector('[class*=caret]'), 'an empty active slot draws the caret');
+  await act(async () => {
+    field().setSelectionRange(1, 1);
+    document.dispatchEvent(new Event('selectionchange'));
+  });
+  assert.deepEqual([field().selectionStart, field().selectionEnd], [1, 2]);
+  assert.deepEqual(
+    slots().map((slot) => slot.hasAttribute('data-active')),
+    [false, true, false, false, false, false],
   );
-  assert.ok(slots().every((node) => node.type === 'password' && node.disabled));
-  assert.ok(slots().every((node) => node.getAttribute('aria-invalid') === 'false'));
-  assert.equal(host.querySelector('[type=hidden]').disabled, true);
-  await key(0, '9');
-  assert.equal(code(), '1234');
-  await render(h(OTPField, { length: 4, defaultValue: '1234', readOnly: true }));
-  await paste(0, '9876');
-  await key(0, 'Backspace');
-  assert.equal(code(), '1234');
-  await key(0, 'ArrowRight');
-  assert.equal(document.activeElement, slots()[1]);
-  await render(
-    h(OTPField, {
-      length: 4,
-      defaultValue: '1234',
-      onKeyDown: (event) => event.preventDefault(),
-      onPaste: (event) => event.preventDefault(),
-    }),
+  await act(async () => {
+    field().setSelectionRange(0, 4);
+    document.dispatchEvent(new Event('selectionchange'));
+  });
+  assert.deepEqual(
+    slots().map((slot) => slot.hasAttribute('data-active')),
+    [true, true, true, true, false, false],
+    'a range selection highlights every selected slot',
   );
-  await key(0, '9');
-  await paste(0, '9876');
-  assert.equal(code(), '1234');
+  await act(async () => field().blur());
+  assert.ok(slots().every((slot) => !slot.hasAttribute('data-active')));
 });
-test('composition defers callbacks/advance until completion; multiple characters normalize together', async () => {
-  const state = controlled({ length: 4 });
+
+test('focusing a full code selects the last character so typing replaces it', async () => {
+  await render(tracked({ defaultValue: '123456' }).node);
+  await act(async () => field().focus());
+  assert.deepEqual([field().selectionStart, field().selectionEnd], [5, 6]);
+});
+
+test('controlled: the parent value is the source of truth', async () => {
+  let set;
+  const changes = [];
+  function App() {
+    const [value, setValue] = useState('12');
+    set = setValue;
+    return h(OTPField, {
+      length: 6,
+      value,
+      'aria-label': 'Code',
+      onValueChange: (next) => {
+        changes.push(next);
+        setValue(next);
+      },
+    });
+  }
+  await render(h(App));
+  assert.equal(field().value, '12');
+  await act(async () => set('3x4'));
+  assert.equal(field().value, '34', 'a controlled value is cleaned too');
+  assert.deepEqual(changes, [], 'a parent update is not echoed back as a change');
+  await type('345', '5');
+  assert.deepEqual(changes, ['345']);
+});
+
+test('a direct write to input.value (react-hook-form reset/setValue) reaches state', async () => {
+  const state = tracked({ defaultValue: '123' });
   await render(state.node);
   await act(async () => {
-    slots()[0].focus();
-    slots()[0].dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }));
+    field().value = '9x87';
+    await Promise.resolve();
   });
-  await type(0, '１２', { isComposing: true });
-  assert.equal(state.value(), '');
-  assert.equal(slots()[0].value, '１２');
-  await key(0, 'ArrowRight', { isComposing: true });
-  assert.equal(document.activeElement, slots()[0]);
-  await act(async () =>
-    slots()[0].dispatchEvent(
-      new CompositionEvent('compositionend', { bubbles: true, data: '１２' }),
+  assert.equal(field().value, '987');
+  assert.equal(shown(), '987');
+  assert.deepEqual(state.changes, ['987']);
+});
+
+test('composition shows the draft and commits the cleaned value when it ends', async () => {
+  const state = tracked({ pattern: 'alphanumeric' });
+  await render(state.node);
+  await act(async () => {
+    field().dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }));
+  });
+  await type('abㄱ');
+  assert.equal(field().value, 'abㄱ');
+  assert.deepEqual(state.changes, []);
+  await act(async () => {
+    field().dispatchEvent(new CompositionEvent('compositionend', { bubbles: true }));
+  });
+  assert.equal(field().value, 'ab');
+  assert.deepEqual(state.changes, ['ab']);
+});
+
+test('native form reset restores the default, FormData holds one entry', async () => {
+  await render(
+    h(
+      'form',
+      null,
+      h(OTPField, { length: 4, name: 'pin', defaultValue: '12', 'aria-label': 'PIN' }),
     ),
   );
-  assert.equal(state.value(), '12');
-  assert.equal(code(), '12');
-  assert.equal(document.activeElement, slots()[2]);
+  const form = host.querySelector('form');
+  await type('1234', '4');
+  assert.deepEqual([...new window.FormData(form)], [['pin', '1234']]);
+  await act(async () => {
+    form.reset();
+    await Promise.resolve();
+  });
+  assert.equal(field().value, '12');
+  assert.deepEqual([...new window.FormData(form)], [['pin', '12']]);
 });
-test('Slot/asChild/ref cleanup and Separator anatomy are preserved without duplicate inputs', async () => {
-  let seen,
-    cleanups = 0;
-  const focusEvents = [];
+
+test('mask and placeholder only change what the slots draw', async () => {
+  await render(tracked({ length: 4, defaultValue: '12', mask: true, placeholder: 'abcd' }).node);
+  assert.equal(field().value, '12');
+  assert.equal(shown(), 'cd', 'the default mask is a drawn dot, not a character');
+  assert.equal(host.querySelectorAll('[data-otp-slot] span.rounded-full').length, 2);
+  await render(
+    h('div', { key: 'star' }, tracked({ length: 4, defaultValue: '12', mask: '*' }).node),
+  );
+  assert.equal(shown(), '**');
+});
+
+test('custom layout: groups, separators and slot render functions', async () => {
   await render(
     h(
       OTPField,
-      {
-        length: 2,
-        name: 'code',
-        ref: (node) => {
-          seen = node;
-          return () => cleanups++;
-        },
-        onFocus: () => focusEvents.push('root'),
-      },
-      h(
-        Fragment,
-        null,
-        h(
-          OTPField.Slot,
-          { index: 0, asChild: true, onFocus: () => focusEvents.push('slot') },
-          h('input', { onFocus: () => focusEvents.push('child') }),
-        ),
-        h(OTPField.Separator, { asChild: true }, h('span', { 'data-custom-separator': true }, '/')),
-        h(OTPField.Slot, { index: 1 }),
-      ),
+      { length: 4, defaultValue: '1', 'aria-label': 'Code' },
+      h(OTPField.Group, null, h(OTPField.Slot, { index: 0 }), h(OTPField.Slot, { index: 1 })),
+      h(OTPField.Separator),
+      h(OTPField.Slot, { index: 2, className: (s) => (s.isFilled ? 'filled' : 'empty') }),
+      h(OTPField.Slot, { index: 3 }, (s) => `#${s.index}`),
     ),
   );
-  assert.equal(seen, slots()[0]);
-  assert.equal(slots().length, 2);
-  assert.equal(host.querySelector('[data-custom-separator]').getAttribute('aria-hidden'), 'true');
-  await act(async () => slots()[0].focus());
-  assert.deepEqual(focusEvents, ['child', 'slot', 'root']);
-  await act(async () => root.unmount());
-  root = undefined;
-  assert.ok(cleanups > 0);
+  assert.equal(host.querySelectorAll('input').length, 1);
+  assert.ok(slots()[0].hasAttribute('data-grouped'));
+  assert.ok(!slots()[2].hasAttribute('data-grouped'));
+  assert.ok(slots()[2].className.includes('empty'));
+  assert.equal(slots()[3].textContent, '#3');
+  assert.equal(host.querySelector('[aria-hidden=true] svg') !== null, true);
 });
-test('native form reset, prevented reset and canonical FormData retain the whole code', async () => {
-  await render(h('form', null, h(OTPField, { name: 'code', length: 4, defaultValue: '1234' })));
-  await paste(0, '9876');
-  assert.equal(host.querySelector('[type=hidden]').value, '9876');
-  host
-    .querySelector('form')
-    .addEventListener('reset', (event) => event.preventDefault(), { once: true });
-  await act(async () => host.querySelector('form').reset());
-  assert.equal(code(), '9876');
-  await act(async () => host.querySelector('form').reset());
-  assert.equal(code(), '1234');
-  assert.deepEqual([...new dom.window.FormData(host.querySelector('form'))], [['code', '1234']]);
-});
-test('RHF + Zod value adapter: error focus, group blur, full-string submit, setValue/reset and disabled omission', async () => {
+
+test('react-hook-form register(): submit, error, and reset through the DOM value', async () => {
   const { Field: FormField } = await import('../dist/react-hook-form.js');
   const { FormProvider, useForm } = await import('react-hook-form');
   const { zodResolver } = await import('@hookform/resolvers/zod');
   const { z } = await import('zod');
   const schema = z.object({ code: z.string().length(6, 'Enter six digits') });
   let methods, result;
-  function App({ disabled = false }) {
+  function App() {
     methods = useForm({ resolver: zodResolver(schema), defaultValues: { code: '' } });
     return h(
       FormProvider,
       methods,
       h(
         'form',
-        {
-          noValidate: true,
-          onSubmit: methods.handleSubmit((value) => {
-            result = value;
-          }),
-        },
+        { noValidate: true, onSubmit: methods.handleSubmit((value) => (result = value)) },
         h(
           FormField,
-          { name: 'code', controlMode: 'value', disabled },
+          { name: 'code' },
           h(FormField.Label, null, 'Code'),
           h(OTPField, { length: 6 }),
           h(FormField.Error),
         ),
-        h('button', { type: 'button' }, 'Outside'),
       ),
     );
   }
   await render(h(App));
   const submit = () =>
-    act(async () =>
+    act(async () => {
       host
         .querySelector('form')
-        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })),
-    );
+        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
   await submit();
-  assert.equal(document.activeElement, slots()[0]);
   assert.equal(host.querySelector('[data-field-part=error]').textContent, 'Enter six digits');
-  await key(0, '1');
-  assert.equal(methods.getValues('code'), '1');
-  assert.equal(methods.getFieldState('code').isTouched, false);
-  await act(async () => host.querySelector('button').focus());
-  assert.equal(methods.getFieldState('code').isTouched, true);
-  await paste(3, '123456');
+  await type('12-3456', '6');
+  assert.equal(methods.getValues('code'), '123456');
   await submit();
   assert.deepEqual(result, { code: '123456' });
-  await act(async () => methods.setValue('code', '654321'));
-  assert.equal(code(), '654321');
-  await act(async () => methods.reset());
-  assert.equal(code(), '');
-  assert.equal(methods.getValues('code'), '');
-  await act(async () => methods.setValue('code', '123456'));
-  await render(h(App, { disabled: true }));
-  assert.ok(slots().every((input) => input.disabled));
-  await submit();
-  assert.equal(result.code, undefined);
+  await act(async () => {
+    methods.reset({ code: '654321' });
+    await Promise.resolve();
+  });
+  assert.equal(field().value, '654321');
+  assert.equal(shown(), '654321');
 });
-test('length, composition count, ordered/unique indices and asChild are validated', () => {
-  for (const length of [0, 13, 2.5, NaN])
-    assert.throws(() => renderToString(h(OTPField, { length })), /length/);
-  for (const children of [
-    [h(OTPField.Slot, { index: 0 })],
-    [h(OTPField.Slot, { index: 1 }), h(OTPField.Slot, { index: 0 })],
-    [h(OTPField.Slot, { index: 0 }), h(OTPField.Slot, { index: 0 })],
-    [h('span', null, 'unknown')],
-  ])
-    assert.throws(() => renderToString(h(OTPField, { length: 2 }, ...children)), /OTPField/);
+
+test('length is validated', () => {
+  assert.throws(() => renderToString(h(OTPField, { length: 0 })), /length/);
+  assert.throws(() => renderToString(h(OTPField, { length: 13 })), /length/);
   assert.throws(
-    () =>
-      renderToString(
-        h(OTPField, { length: 1 }, h(OTPField.Slot, { index: 0, asChild: true }, h('textarea'))),
-      ),
-    /input/,
+    () => renderToString(h(OTPField, { length: 2 }, h(OTPField.Slot, { index: 2 }))),
+    /outside the code length/,
   );
+});
+
+test('react-hook-form controlMode="value": the native change event carries the cleaned code', async () => {
+  const { Field: FormField } = await import('../dist/react-hook-form.js');
+  const { FormProvider, useForm } = await import('react-hook-form');
+  let methods;
+  function App() {
+    methods = useForm({ defaultValues: { code: '12' } });
+    return h(
+      FormProvider,
+      methods,
+      h(
+        'form',
+        null,
+        h(
+          FormField,
+          { name: 'code', controlMode: 'value' },
+          h(FormField.Label, null, 'Code'),
+          h(OTPField, { length: 6 }),
+        ),
+      ),
+    );
+  }
+  await render(h(App));
+  assert.equal(field().value, '12');
+  await type('12a3', 'a');
+  assert.equal(methods.getValues('code'), '123');
+  await act(async () => methods.setValue('code', '999999'));
+  assert.equal(shown(), '999999');
 });

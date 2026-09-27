@@ -1,452 +1,320 @@
 import {
-  Children,
-  Fragment,
-  cloneElement,
-  isValidElement,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
+  createContext,
+  use,
+  type ChangeEvent,
   type ComponentProps,
-  type ReactElement,
+  type CSSProperties,
   type ReactNode,
 } from 'react';
 
-import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { MinusIcon } from '@heroicons/react/16/solid';
+
+import { htmlPattern, type OTPFieldPattern } from './otp-code';
+import { useOTPField, type OTPSlotState } from './use-otp-field';
+import { messages } from '../../../internal/messages';
+import { cn, invariant, mergeProps, tv } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
-type NativeProps = ComponentProps<'input'>;
-export type OTPFieldVariant = 'outline' | 'filled' | 'underline';
-export type OTPFieldPattern = 'numeric' | 'alphanumeric' | RegExp;
-export type OTPFieldProps = Omit<
-  NativeProps,
+export type { OTPFieldPattern } from './otp-code';
+export type OTPFieldVariant = 'outline' | 'soft';
+
+type NativeInputProps = Omit<
+  ComponentProps<'input'>,
   | 'type'
   | 'size'
-  | 'color'
   | 'children'
   | 'value'
   | 'defaultValue'
-  | 'onChange'
   | 'pattern'
   | 'maxLength'
   | 'minLength'
-> & {
+  | 'placeholder'
+  | 'className'
+  | 'style'
+>;
+
+export type OTPFieldProps = NativeInputProps & {
   length: number;
   value?: string;
   defaultValue?: string;
-  onChange?: (value: string) => void;
+  onValueChange?: (value: string) => void;
   onComplete?: (value: string) => void;
   pattern?: OTPFieldPattern;
-  mask?: boolean;
+  mask?: boolean | string;
+  placeholder?: string;
   invalid?: boolean;
   size?: IdsSize;
   variant?: OTPFieldVariant;
+  className?: string;
+  style?: CSSProperties;
   children?: ReactNode;
 };
-function flatten(children: ReactNode, prefix = ''): ReactNode[] {
-  return Children.toArray(children).flatMap((child, index) =>
-    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
-      ? flatten(child.props.children, `${prefix}${index}:`)
-      : [isValidElement(child) ? cloneElement(child, { key: `${prefix}${child.key}` }) : child],
-  );
+
+type Context = {
+  slots: OTPSlotState[];
+  mask: boolean | string | undefined;
+  placeholder: string | undefined;
+  styles: ReturnType<typeof OTPField.Style>;
+};
+
+const OTPContext = createContext<Context | null>(null);
+const GroupContext = createContext(false);
+
+function useOTPContext(part: string) {
+  const context = use(OTPContext);
+  invariant(context, `${part} must be rendered inside OTPField.`);
+  return context;
 }
-function OTPSlot(_props: OTPField.SlotProps): ReactNode {
-  invariant(false, 'OTPField.Slot must be a direct child of OTPField (or inside a Fragment).');
-}
-function OTPSeparator({ asChild, children = '−', ...props }: OTPField.SeparatorProps) {
-  const merged = mergeProps({ className: OTPField.Style().separator() }, props);
-  if (asChild) {
-    invariant(
-      isValidElement<ComponentProps<'span'>>(children) && children.type !== Fragment,
-      'OTPField.Separator asChild requires one non-interactive element.',
-    );
-    return cloneElement(children, {
-      ...mergeProps({ ...children.props }, merged),
-      'aria-hidden': true,
-    });
-  }
-  return (
-    <span {...merged} aria-hidden="true">
-      {children}
-    </span>
-  );
-}
-function normalizeCode(raw: string, pattern: OTPFieldPattern, length: number): string {
-  const expression =
-    pattern === 'numeric'
-      ? /^[0-9]$/
-      : pattern === 'alphanumeric'
-        ? /^[a-z0-9]$/i
-        : new RegExp(`^(?:${pattern.source})$`, pattern.flags.replace(/[gy]/g, ''));
-  return Array.from(raw.normalize('NFKC'))
-    .filter((character) => expression.test(character))
-    .slice(0, length)
-    .join('');
-}
-function joinIds(...ids: Array<string | undefined>) {
-  return ids.filter(Boolean).join(' ') || undefined;
-}
+
+// Password managers draw their own badge over any text input that looks like a code field.
+const passwordManagerOptOut = {
+  'data-1p-ignore': '',
+  'data-lpignore': 'true',
+  'data-bwignore': '',
+  'data-form-type': 'other',
+};
 
 export function OTPField({
   length,
   value,
-  defaultValue = '',
-  onChange,
+  defaultValue,
+  onValueChange,
   onComplete,
   pattern = 'numeric',
-  mask = false,
+  mask,
+  placeholder,
   invalid,
   size,
   variant = 'outline',
-  children,
   className,
   style,
-  ref: forwardedRef,
-  ...rootProps
+  children,
+  ref,
+  onChange,
+  ...inputProps
 }: OTPFieldProps) {
   invariant(
     Number.isInteger(length) && length >= 1 && length <= 12,
-    'OTPField: length는 1~12 사이여야 합니다.',
-  );
-  invariant(
-    pattern === 'numeric' || pattern === 'alphanumeric' || pattern instanceof RegExp,
-    'OTPField: pattern must be numeric, alphanumeric, or RegExp.',
-  );
-  invariant(
-    typeof defaultValue === 'string' && (value === undefined || typeof value === 'string'),
-    'OTPField: value/defaultValue must be strings.',
+    'OTPField: length must be an integer from 1 to 12.',
   );
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = OTPField.Style({ variant, size: resolvedSize });
-  const generatedId = useId();
-  const id = rootProps.id ?? `ids-otp-${generatedId}`;
-  const controlled = value !== undefined;
-  const [uncontrolled, setUncontrolled] = useState(() =>
-    normalizeCode(defaultValue, pattern, length),
-  );
-  const current = normalizeCode(controlled ? value : uncontrolled, pattern, length);
-  // Persist a shorter/stricter configuration so removed characters do not reappear later.
-  if (!controlled && uncontrolled !== current) setUncontrolled(current);
-  const characters = Array.from(current);
-  const [active, setActive] = useState(0);
-  const [composition, setComposition] = useState<{ index: number; text: string } | null>(null);
-  const composing = useRef<number | null>(null);
-  const inputs = useRef<Array<HTMLInputElement | null>>([]);
-  const group = useRef<HTMLDivElement>(null);
-  const normalize = (raw: string) => normalizeCode(raw, pattern, length);
-  useLayoutEffect(() => {
-    const form = inputs.current[0]?.form;
-    if (!form) return;
-    let mounted = true;
-    const reset = (event: Event) =>
-      queueMicrotask(() => {
-        if (!mounted || event.defaultPrevented) return;
-        if (!controlled) setUncontrolled(normalizeCode(defaultValue, pattern, length));
-        setActive(0);
-        setComposition(null);
-        composing.current = null;
-      });
-    form.addEventListener('reset', reset);
-    return () => {
-      mounted = false;
-      form.removeEventListener('reset', reset);
-    };
-  }, [controlled, defaultValue, length, pattern, rootProps.form]);
-  const change = (next: string) => {
-    if (next === current) return;
-    if (!controlled) setUncontrolled(next);
-    onChange?.(next);
-    if (Array.from(next).length === length) onComplete?.(next);
-  };
-  const focus = (index: number) => {
-    const target = Math.max(0, Math.min(length - 1, index));
-    setActive(target);
-    inputs.current[target]?.focus({ preventScroll: true });
-    inputs.current[target]?.select();
-  };
-  const erase = (index: number, backward: boolean) => {
-    const target = backward && index >= characters.length ? characters.length - 1 : index;
-    if (target >= 0 && target < characters.length)
-      change(characters.filter((_, i) => i !== target).join(''));
-    if (backward) focus(Math.max(0, index - 1));
-  };
-  const accept = (index: number, text: string) => {
-    const accepted = Array.from(normalize(text));
-    if (!accepted.length) return;
-    // Full-code paste/autofill replaces the complete code from any focused box.
-    const start = accepted.length >= length ? 0 : Math.min(index, characters.length);
-    const next = [
-      ...characters.slice(0, start),
-      ...accepted,
-      ...characters.slice(start + accepted.length),
-    ]
-      .slice(0, length)
-      .join('');
-    change(next);
-    focus(Math.min(start + accepted.length, length - 1));
-  };
-  const declared = flatten(children);
-  invariant(
-    declared.every(
-      (part) => isValidElement(part) && (part.type === OTPSlot || part.type === OTPSeparator),
-    ),
-    'OTPField: children must be Slot or Separator (or a Fragment).',
-  );
-  const parts = declared.length
-    ? declared
-    : Array.from({ length }, (_, index) => <OTPSlot key={index} index={index} />);
-  const slots = parts.filter(
-    (part) => isValidElement(part) && part.type === OTPSlot,
-  ) as ReactElement<OTPField.SlotProps>[];
-  invariant(slots.length === length, 'OTPField: Slot 개수와 length가 일치해야 합니다.');
-  invariant(
-    slots.every((slot, index) => slot.props.index === index),
-    'OTPField: Slot indices must appear in order from 0 to length − 1.',
-  );
-  const ariaInvalid = rootProps['aria-invalid'] ?? invalid;
-  const groupLabel = rootProps['aria-label'] ?? '인증 코드';
-  // The map creates input callbacks; refs are read only when those callbacks run.
-  // eslint-disable-next-line react-hooks/refs
-  const rendered = parts.map((part, position) => {
-    if (!isValidElement<OTPField.SlotProps>(part) || part.type !== OTPSlot) return part;
-    const { index, asChild, children: slotChild, ...slotProps } = part.props;
-    let child: ReactElement<NativeProps> | undefined;
-    if (asChild) {
-      invariant(
-        isValidElement<NativeProps>(slotChild) && slotChild.type !== Fragment,
-        'OTPField.Slot asChild requires one input or a component forwarding input props/ref.',
-      );
-      invariant(
-        typeof slotChild.type !== 'string' || slotChild.type === 'input',
-        'OTPField.Slot asChild must render an input.',
-      );
-      child = slotChild;
-    } else invariant(slotChild == null, 'OTPField.Slot children require asChild.');
-    const native: NativeProps = mergeProps(mergeProps({ ...child?.props }, slotProps), rootProps);
-    const positionId = `${id}-position-${index}`;
-    const ref = (node: HTMLInputElement | null) => {
-      invariant(
-        !node || node.tagName === 'INPUT',
-        'OTPField.Slot asChild must forward its ref to an input.',
-      );
-      inputs.current[index] = node;
-      const cleanup = mergeRefs(native.ref, index === 0 ? forwardedRef : undefined)(node);
-      return () => {
-        inputs.current[index] = null;
-        cleanup?.();
-      };
-    };
-    const actual: NativeProps = {
-      ...native,
-      ref,
-      id: index === 0 ? id : `${id}-${index}`,
-      name: undefined,
-      type: mask ? 'password' : 'text',
-      value: composition?.index === index ? composition.text : (characters[index] ?? ''),
-      defaultValue: undefined,
-      inputMode: native.inputMode ?? (pattern === 'numeric' ? 'numeric' : 'text'),
-      autoComplete: native.autoComplete ?? (index === 0 ? 'one-time-code' : 'off'),
-      autoFocus: index === 0 && rootProps.autoFocus,
-      maxLength: undefined,
-      minLength: undefined,
-      pattern: undefined,
-      spellCheck: native.spellCheck ?? false,
-      autoCapitalize: native.autoCapitalize ?? 'none',
-      tabIndex: Math.min(active, length - 1) === index ? (rootProps.tabIndex ?? 0) : -1,
-      'aria-label': native['aria-labelledby']
-        ? undefined
-        : `${groupLabel}, ${index + 1} / ${length}`,
-      'aria-labelledby': native['aria-labelledby']
-        ? joinIds(native['aria-labelledby'], positionId)
-        : undefined,
-      'aria-invalid': ariaInvalid,
-      ...{
-        'data-otp-slot': index,
-        'data-size': resolvedSize,
-        'data-filled': characters[index] ? '' : undefined,
-      },
-      className: styles.slot({ className: native.className }),
-      onFocus: (event) => {
-        native.onFocus?.(event);
-        setActive(index);
-        if (!event.defaultPrevented) event.currentTarget.select();
-      },
-      onBlur: (event) => {
-        // RHF becomes touched when leaving the group, not while moving between boxes.
-        if (!group.current?.contains(event.relatedTarget as Node | null)) native.onBlur?.(event);
-      },
-      onChange: (event) => {
-        native.onChange?.(event);
-        if (event.defaultPrevented || native.disabled || native.readOnly) return;
-        const raw = event.currentTarget.value;
-        const inputEvent = event.nativeEvent as InputEvent;
-        if (composing.current === index || inputEvent.isComposing) {
-          setComposition({ index, text: raw });
-          return;
-        }
-        if (!raw) erase(index, false);
-        else
-          accept(
-            index,
-            inputEvent.inputType === 'insertText' && inputEvent.data ? inputEvent.data : raw,
-          );
-      },
-      onPaste: (event) => {
-        native.onPaste?.(event);
-        if (event.defaultPrevented || native.disabled || native.readOnly) return;
-        event.preventDefault();
-        accept(index, event.clipboardData.getData('text'));
-      },
-      onCompositionStart: (event) => {
-        composing.current = index;
-        setComposition({ index, text: event.currentTarget.value });
-        native.onCompositionStart?.(event);
-      },
-      onCompositionEnd: (event) => {
-        composing.current = null;
-        setComposition(null);
-        native.onCompositionEnd?.(event);
-        if (!event.defaultPrevented && !native.disabled && !native.readOnly)
-          accept(index, event.currentTarget.value);
-      },
-      onKeyDown: (event) => {
-        native.onKeyDown?.(event);
-        if (
-          event.defaultPrevented ||
-          native.disabled ||
-          composing.current != null ||
-          event.nativeEvent.isComposing ||
-          event.ctrlKey ||
-          event.metaKey ||
-          event.altKey
-        )
-          return;
-        if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
-          event.preventDefault();
-          focus(
-            event.key === 'Home'
-              ? 0
-              : event.key === 'End'
-                ? length - 1
-                : index + (event.key === 'ArrowRight' ? 1 : -1),
-          );
-        } else if (!native.readOnly && (event.key === 'Backspace' || event.key === 'Delete')) {
-          event.preventDefault();
-          erase(index, event.key === 'Backspace');
-        } else if (!native.readOnly && Array.from(event.key).length === 1) {
-          event.preventDefault();
-          accept(index, event.key);
-        }
-      },
-    };
-    const input = child ? cloneElement(child, actual) : <input {...actual} />;
-    return (
-      <Fragment key={part.key ?? position}>
-        <span id={positionId} className={styles.positionLabel()}>
-          {index + 1} / {length}
-        </span>
-        {input}
-      </Fragment>
-    );
+  const styles = OTPField.Style({ size: resolvedSize, variant });
+  const { state, handlers, rootRef, inputRef } = useOTPField({
+    length,
+    value,
+    defaultValue,
+    onValueChange,
+    onComplete,
+    pattern,
+    disabled: inputProps.disabled,
+    readOnly: inputProps.readOnly,
+    ref,
   });
+
+  const ariaInvalid = inputProps['aria-invalid'] ?? invalid;
+  const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
+  const labelled =
+    inputProps['aria-label'] !== undefined ||
+    inputProps['aria-labelledby'] !== undefined ||
+    inputProps.id !== undefined;
+
+  const input = mergeProps(
+    {
+      type: 'text',
+      autoComplete: 'one-time-code',
+      inputMode: pattern === 'numeric' ? ('numeric' as const) : ('text' as const),
+      autoCapitalize: 'none',
+      autoCorrect: 'off',
+      spellCheck: false,
+      'aria-label': labelled ? undefined : messages.otpField.label,
+      ...passwordManagerOptOut,
+      ...inputProps,
+    },
+    {
+      ...handlers,
+      // The value is cleaned before a native listener such as react-hook-form's register() reads
+      // event.target.value, so it runs ahead of the consumer's onChange.
+      onChange: (event: ChangeEvent<HTMLInputElement>) => {
+        handlers.onChange(event);
+        onChange?.(event);
+      },
+      value: state.display,
+      maxLength: length,
+      pattern: htmlPattern(length),
+      'aria-invalid': ariaInvalid,
+      className: styles.input(),
+    },
+  );
+
   return (
-    <>
+    <OTPContext.Provider value={{ slots: state.slots, mask, placeholder, styles }}>
       <div
-        ref={group}
-        id={`${id}-group`}
-        role="group"
-        dir="ltr"
+        ref={rootRef}
+        className={styles.root({ className })}
+        style={style}
         data-otp-field=""
         data-size={resolvedSize}
         data-variant={variant}
-        data-disabled={rootProps.disabled ? '' : undefined}
-        data-readonly={rootProps.readOnly ? '' : undefined}
-        data-invalid={
-          ariaInvalid != null && ariaInvalid !== false && ariaInvalid !== 'false' ? '' : undefined
-        }
-        aria-label={rootProps['aria-labelledby'] ? undefined : groupLabel}
-        aria-labelledby={rootProps['aria-labelledby']}
-        aria-describedby={rootProps['aria-describedby']}
-        className={styles.root({ className })}
-        style={style}
+        data-focused={state.focused ? '' : undefined}
+        data-complete={state.code.length === length ? '' : undefined}
+        data-invalid={isInvalid ? '' : undefined}
+        data-disabled={inputProps.disabled ? '' : undefined}
+        data-readonly={inputProps.readOnly ? '' : undefined}
       >
-        {rendered}
+        {children ?? (
+          <OTPField.Group>
+            {state.slots.map((slot) => (
+              <OTPField.Slot key={slot.index} index={slot.index} />
+            ))}
+          </OTPField.Group>
+        )}
+        <input {...input} ref={inputRef} />
       </div>
-      {rootProps.name && (
-        <input
-          type="hidden"
-          name={rootProps.name}
-          form={rootProps.form}
-          disabled={rootProps.disabled}
-          value={current}
-        />
-      )}
-    </>
+    </OTPContext.Provider>
   );
 }
+
+// A text bullet renders at a different size in every font, so the default mask is drawn.
+function Masked({
+  char,
+  mask,
+  className,
+}: {
+  char: string;
+  mask: boolean | string | undefined;
+  className: string;
+}) {
+  if (mask === true) return <span className={className} />;
+  if (typeof mask === 'string' && mask !== '') return mask;
+  return char;
+}
+
 export namespace OTPField {
   export type Props = OTPFieldProps;
-  export type SlotProps = Omit<NativeProps, 'type' | 'size' | 'value' | 'defaultValue'> & {
+  export type Variant = OTPFieldVariant;
+  export type SlotState = OTPSlotState;
+
+  export type GroupProps = ComponentProps<'div'>;
+
+  export type SlotProps = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
     index: number;
-    asChild?: boolean;
+    className?: string | ((state: SlotState) => string | undefined);
+    children?: ReactNode | ((state: SlotState) => ReactNode);
   };
-  export type SeparatorProps = ComponentProps<'span'> & { asChild?: boolean };
-  export const Slot = OTPSlot;
-  export const Separator = OTPSeparator;
+
+  export type SeparatorProps = ComponentProps<'div'>;
+
+  export type CaretProps = ComponentProps<'span'>;
+
+  // Slots inside one Group share their borders and only the outer corners are rounded, the way
+  // a single code reads as one control.
+  export function Group({ className, ...props }: GroupProps) {
+    const { styles } = useOTPContext('OTPField.Group');
+    return (
+      <GroupContext value={true}>
+        <div {...props} data-otp-group="" className={styles.group({ className })} />
+      </GroupContext>
+    );
+  }
+
+  export function Slot({ index, className, children, ...props }: SlotProps) {
+    const { slots, mask, placeholder, styles } = useOTPContext('OTPField.Slot');
+    const grouped = use(GroupContext);
+    const state = slots[index];
+    invariant(state, `OTPField.Slot: index ${index} is outside the code length.`);
+
+    const resolvedClassName = typeof className === 'function' ? className(state) : className;
+    const fallback = state.char ?? placeholder?.charAt(index) ?? '';
+    const content =
+      typeof children === 'function'
+        ? children(state)
+        : (children ?? (
+            <>
+              {state.char === undefined ? (
+                <span className={styles.placeholder()}>{fallback}</span>
+              ) : (
+                <Masked char={state.char} mask={mask} className={styles.maskDot()} />
+              )}
+              {state.hasFakeCaret && <Caret />}
+            </>
+          ));
+
+    return (
+      <div
+        {...props}
+        aria-hidden="true"
+        data-otp-slot={index}
+        data-active={state.isActive ? '' : undefined}
+        data-filled={state.isFilled ? '' : undefined}
+        data-grouped={grouped ? '' : undefined}
+        className={styles.slot({ className: resolvedClassName })}
+      >
+        {content}
+      </div>
+    );
+  }
+
+  export function Separator({ className, children, ...props }: SeparatorProps) {
+    const { styles } = useOTPContext('OTPField.Separator');
+    return (
+      <div {...props} aria-hidden="true" className={styles.separator({ className })}>
+        {children ?? <MinusIcon />}
+      </div>
+    );
+  }
+
+  export function Caret({ className, ...props }: CaretProps) {
+    const { styles } = useOTPContext('OTPField.Caret');
+    return (
+      <span {...props} className={styles.caret()}>
+        <span className={cn(styles.caretLine(), className)} />
+      </span>
+    );
+  }
+
   export const Style = tv({
     slots: {
-      root: [
-        'inline-flex max-w-full flex-wrap items-center gap-2 text-(--ids-color-on-surface)',
-        'data-disabled:opacity-50',
+      root: 'group/otp relative inline-flex items-center gap-2 data-disabled:opacity-50',
+      // The real input covers every slot so taps, long-press paste and autofill all reach it.
+      // Its text is invisible and 16px, which keeps iOS from zooming in on focus.
+      input: [
+        'absolute inset-0 z-10 size-full cursor-text appearance-none border-0 bg-transparent p-0',
+        'font-mono text-base tracking-[-0.5em] text-transparent caret-transparent outline-none',
+        'selection:bg-transparent disabled:cursor-not-allowed',
       ],
+      group: 'flex items-center',
       slot: [
-        'box-border min-w-0 shrink-0 bg-transparent text-center outline-none',
-        'caret-(--ids-color-primary) disabled:cursor-not-allowed',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+        'relative flex items-center justify-center border shadow-xs',
+        'text-(--ids-color-on-surface)',
+        'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast)',
         'motion-reduce:transition-none',
+        'rounded-standard data-grouped:rounded-none',
+        'data-grouped:-ms-px data-grouped:first:ms-0',
+        'data-grouped:first:rounded-s-standard data-grouped:last:rounded-e-standard',
+        'data-active:z-20 data-active:border-(--ids-color-primary)',
+        'data-active:ring-[3px] data-active:ring-(--ids-color-primary)/40',
+        'group-data-invalid/otp:border-(--ids-color-danger)',
+        'group-data-invalid/otp:data-active:ring-(--ids-color-danger)/40',
       ],
-      separator: 'px-0.5 text-(--ids-color-on-muted)',
-      positionLabel: 'sr-only',
+      placeholder: 'text-(--ids-color-on-muted)',
+      maskDot: 'size-2 rounded-full bg-current',
+      separator: 'flex items-center text-(--ids-color-on-muted) [&_svg]:size-4',
+      caret: 'pointer-events-none absolute inset-0 flex items-center justify-center',
+      caretLine:
+        'h-1/2 w-px animate-caret-blink bg-(--ids-color-on-surface) motion-reduce:animate-none',
     },
     variants: {
       variant: {
-        outline: {
-          slot: [
-            'shadow-xs inset-ring-1 inset-ring-(--ids-color-outline)',
-            'aria-invalid:inset-ring-(--ids-color-danger)',
-            'focus-ring aria-invalid:focus-visible:ring-(--ids-color-danger)/40',
-          ],
-        },
-        filled: {
-          slot: [
-            'bg-(--ids-color-primary)/10 inset-ring-1 inset-ring-transparent',
-            'focus-visible:bg-(--ids-color-primary)/15',
-            'aria-invalid:inset-ring-(--ids-color-danger)',
-            'focus-ring aria-invalid:focus-visible:ring-(--ids-color-danger)/40',
-          ],
-        },
-        underline: {
-          slot: [
-            'rounded-none border-b-2 border-(--ids-color-outline)',
-            'focus-visible:border-(--ids-color-primary)',
-            'aria-invalid:border-(--ids-color-danger)',
-          ],
-        },
+        outline: { slot: 'border-(--ids-color-border) bg-(--ids-color-surface)' },
+        soft: { slot: 'border-transparent bg-(--ids-color-primary)/10 shadow-none' },
       } satisfies Record<OTPFieldVariant, object>,
       size: {
-        standard: { slot: 'size-(--ids-size-control-standard) text-body-b1-medium' },
+        standard: { slot: 'size-(--ids-size-control-standard) text-body-b2-medium' },
         tiny: { slot: 'size-(--ids-size-control-tiny) text-body-b3-medium' },
       } satisfies Record<IdsSize, object>,
     },
-    compoundVariants: [
-      { variant: ['outline', 'filled'], size: 'standard', class: { slot: 'rounded-standard' } },
-      { variant: ['outline', 'filled'], size: 'tiny', class: { slot: 'rounded-standard' } },
-    ],
-    defaultVariants: {
-      variant: 'outline',
-      size: 'standard',
-    },
+    defaultVariants: { variant: 'outline', size: 'standard' },
   });
 }
