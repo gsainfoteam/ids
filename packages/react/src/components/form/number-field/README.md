@@ -6,7 +6,7 @@
 - **키보드.** ↑↓, Shift(큰 단위), Alt(작은 단위), PageUp·PageDown, Home·End(최솟값·최댓값)가 WAI-ARIA spinbutton 방식으로 동작합니다.
 - **누르고 있기.** 버튼을 누르고 있으면 0.4초 뒤부터 계속 바뀌고 점점 빨라집니다. 마우스로 누르면 포커스가 입력에 남고, 터치로 누르면 화상 키보드를 띄우지 않습니다.
 - **격자와 범위.** `step` 을 주면 입력을 마칠 때 `min` 에서 시작하는 격자에 맞추고, 범위를 넘은 값은 범위 안으로 맞춥니다. 범위 밖의 값은 native 검증에도 걸려서 폼이 제출을 막습니다.
-- **로케일 형식과 붙여넣기.** `Intl.NumberFormat` 으로 보여 주고, 붙여 넣은 `1.234,5 €`, `(123)`, `１２`, 아랍 숫자도 숫자로 읽습니다.
+- **로케일 형식과 붙여넣기.** `@internationalized/number` 로 로케일에 맞게 보여 주고 읽습니다. 보이는 글자를 그대로 고치면 되고, 붙여 넣은 `1.234,5 €`, `($123.50)`, `１２`, 아랍 숫자도 숫자로 읽습니다.
 - **모바일 키보드.** 음수가 들어갈 수 있으면 iOS에서도 마이너스가 있는 키보드를 띄우고, 정수만 받으면 숫자 키패드를 띄웁니다.
 
 ```tsx
@@ -28,12 +28,12 @@ const [seats, setSeats] = useState<number | null>(2);
 <NumberField onChange={(e) => log(e.target.value)} />  // native 이벤트. 화면의 글자가 온다
 ```
 
-| 입력 중     | `onValueChange`                                  |
-| ----------- | ------------------------------------------------ |
-| `""`        | `null`                                           |
-| `-`, `.`    | `null`. 글자는 입력을 마칠 때까지 그대로 둔다    |
-| `1.`, `1.20` | `1`, `1.2`. 글자는 blur나 Enter에서 정리한다    |
-| `1e3`, `1K` | 받지 않고 직전 값으로 돌아간다                  |
+| 입력 중                | `onValueChange`                               |
+| ---------------------- | --------------------------------------------- |
+| `""`, 숫자 없는 `%`    | `null`                                        |
+| `-`, `.`               | `null`. 글자는 입력을 마칠 때까지 그대로 둔다 |
+| `1.`, `1.20`           | `1`, `1.2`. 글자는 blur나 Enter에서 정리한다  |
+| `1e3`, `1K`, `--1`     | 입력되지 않는다. 캐럿도 제자리에 있다         |
 
 - 코드가 넣은 값은 포커스를 받았다 떠나도 고치지 않습니다. 사용자가 입력한 값만 입력을 마칠 때 정리합니다.
 
@@ -49,8 +49,8 @@ const [seats, setSeats] = useState<number | null>(2);
 | `Enter`                   | 입력한 값을 정리한다                         |
 
 - 빈 값에서 올리고 내리면 0에서 시작합니다. 0이 범위 밖이면 가까운 경계로 갑니다.
-- 숫자, 부호, 소수점, 자릿수 구분 기호가 아닌 글자는 입력되지 않습니다. `Ctrl`·`⌘` 조합은 그대로 둡니다.
-- IME 조합 중에는 정리와 키 증감을 하지 않습니다.
+- 입력이 들어가기 전(`beforeinput`)에 결과 글자를 검사해서, 이 로케일과 형식에서 숫자가 될 수 없으면 받지 않습니다. 붙여넣기와 자동 수정도 같고, `min` 이 0 이상이면 마이너스도 받지 않습니다.
+- IME 조합 중에는 검사와 키 증감을 하지 않습니다. 조합이 끝나면 전각 숫자를 반각으로 바꿔 읽습니다.
 
 ## 격자와 범위
 
@@ -97,14 +97,15 @@ const [seats, setSeats] = useState<number | null>(2);
 
 ```tsx
 <NumberField defaultValue={1234.567} locale="de-DE" formatOptions={{ style: 'currency', currency: 'EUR' }} />
-// 보일 때 "1.234,57 €", 포커스하면 "1234,567"로 편집한다. 값의 정밀도는 그대로다
+// "1.234,57 €". 포커스해도 이 글자를 그대로 고친다. 값은 1234.567 그대로다
 
 <NumberField defaultValue={0.125} formatOptions={{ style: 'percent', minimumFractionDigits: 1 }} />
-// 보일 때 "12.5%", 포커스하면 "0.125". "25%"를 붙여 넣으면 0.25
+// "12.5%". 퍼센트로 입력한다: "25" 나 "25%" 는 0.25
 ```
 
 - `locale` 기본값은 `en-US` 입니다. SSR과 브라우저가 같은 글자를 그리게 하기 위해서입니다.
-- 형식은 보일 때와 `aria-valuetext` 에만 씁니다. 반올림한 글자가 값에 들어가지 않습니다.
+- 형식의 반올림은 보이는 글자와 `aria-valuetext` 에만 씁니다. 글자를 고치지 않으면 값은 그대로입니다.
+- `notation` 은 `standard` 만 됩니다. `1.2E-6` 이나 `1.2K` 는 다시 숫자로 읽을 수 없기 때문입니다.
 
 ## 조립
 
@@ -157,7 +158,7 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { quanti
 | `min` / `max`                         | 제한 없음. `min <= max`                                       |
 | `step`                                | ↑↓ 단위. 주면 격자에 맞춘다                                   |
 | `smallStep` / `largeStep`             | `step` ÷ 10 / `step` × 10. 양수                               |
-| `locale` / `formatOptions`            | `en-US` / `Intl.NumberFormat` 옵션                            |
+| `locale` / `formatOptions`            | `en-US` / `Intl.NumberFormat` 옵션. `notation` 제외           |
 | `allowWheelScrub`                     | `false`                                                       |
 | `hideStepper`                         | `false`. 자동 버튼만 숨긴다                                   |
 | `incrementLabel` / `decrementLabel`   | "값 늘리기" / "값 줄이기"                                     |
@@ -174,4 +175,4 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { quanti
 - 실제 input은 `type="text"` 와 `role="spinbutton"` 입니다. `valueAsNumber` 나 `stepUp()` 은 쓸 수 없습니다.
 - 기본으로 `autoComplete="off"`, `autoCorrect="off"`, `spellCheck={false}` 입니다. 전에 입력한 숫자를 브라우저가 제안하지 않습니다.
 - native `form.reset()` 은 비제어 값을 `defaultValue` 로 되돌립니다.
-- `NumberField.Input` 이나 `Stepper` 를 둘 이상 두면 에러가 납니다. `min > max`, 0 이하의 단위, 유한하지 않은 숫자도 에러입니다.
+- `NumberField.Input` 이나 `Stepper` 를 둘 이상 두면 에러가 납니다. `min > max`, 0 이하의 단위, 유한하지 않은 숫자, `standard` 가 아닌 `notation` 도 에러입니다.

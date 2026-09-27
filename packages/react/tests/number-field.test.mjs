@@ -57,6 +57,20 @@ async function type(value, composing = false) {
     input().dispatchEvent(new InputEvent('input', { bubbles: true, isComposing: composing }));
   });
 }
+async function beforeInput(data, inputType = 'insertText', init = {}) {
+  let event;
+  await act(async () => {
+    event = new InputEvent('beforeinput', {
+      data,
+      inputType,
+      bubbles: true,
+      cancelable: true,
+      ...init,
+    });
+    input().dispatchEvent(event);
+  });
+  return event;
+}
 async function key(key, modifiers = {}) {
   let event;
   await act(async () => {
@@ -146,7 +160,9 @@ test('controlled partial drafts, negative/decimal values, zero, null and externa
   await act(async () => form.set(1234.5));
   assert.equal(input().value, '1,234.5');
   await focus();
-  assert.equal(input().value, '1234.5');
+  assert.equal(input().value, '1,234.5', 'the formatted text is edited in place');
+  await type('1,234.56');
+  assert.equal(form.value(), 1234.56);
   await type('');
   assert.equal(form.value(), null);
   assert.equal(input().getAttribute('aria-valuenow'), null);
@@ -159,7 +175,7 @@ test('controlled partial drafts, negative/decimal values, zero, null and externa
     ),
   );
 });
-test('currency, locale decimal/grouping, percent paste and display-only precision', async () => {
+test('currency, locale decimal/grouping, percent typing and display-only precision', async () => {
   const form = controlled({
     defaultValue: 1234.567,
     formatOptions: { style: 'currency', currency: 'EUR' },
@@ -168,12 +184,14 @@ test('currency, locale decimal/grouping, percent paste and display-only precisio
   await render(form.node);
   assert.equal(input().value, '1.234,57 €');
   await focus();
-  assert.equal(input().value, '1234,567');
+  assert.equal(input().value, '1.234,57 €');
   await type('2.345,67 €');
   assert.equal(form.value(), 2345.67);
-  assert.equal(input().value, '2345,67');
-  await blur();
   assert.equal(input().value, '2.345,67 €');
+  await type('2.345,678');
+  await blur();
+  assert.equal(input().value, '2.345,68 €');
+  assert.equal(form.value(), 2345.678, 'rounding is for display only');
   await act(async () => root.unmount());
   root = undefined;
   const percent = controlled({
@@ -186,32 +204,67 @@ test('currency, locale decimal/grouping, percent paste and display-only precisio
   await render(percent.node);
   assert.equal(input().value, '12.5%');
   await focus();
-  assert.equal(input().value, '0.125');
+  assert.equal(input().value, '12.5%');
+  await type('25');
+  assert.equal(percent.value(), 0.25, 'a percent field is typed in percent');
+  await type('%');
+  assert.equal(percent.value(), null, 'a sign without digits is no value yet');
   await type('25%');
   assert.equal(percent.value(), 0.25);
-  assert.equal(input().value, '0.25');
   await blur();
   assert.equal(input().value, '25.0%');
 });
-test('localized digits, accounting paste, and unknown/ambiguous characters are not misparsed', async () => {
-  const form = controlled({
-    locale: 'ar-EG',
-    formatOptions: { style: 'currency', currency: 'USD', currencySign: 'accounting' },
-  });
-  await render(form.node);
+test('localized digits and accounting parentheses parse; text that is no number is refused', async () => {
+  const arabic = controlled({ locale: 'ar-EG' });
+  await render(arabic.node);
   await focus();
   await type('١٬٢٣٤٫٥');
-  assert.equal(form.value(), 1234.5);
-  await type('(١٢٣٫٥)');
-  assert.equal(form.value(), -123.5);
-  await type('1e3');
-  assert.equal(form.value(), -123.5);
-  await type('1K');
-  assert.equal(form.value(), -123.5);
-  await type('--12');
-  assert.equal(form.value(), -123.5);
+  assert.equal(arabic.value(), 1234.5);
+  for (const text of ['1e3', '1K', '--12', 'abc']) {
+    await type(text);
+    assert.equal(arabic.value(), 1234.5, `${text} is refused`);
+    assert.equal(input().value, '١٬٢٣٤٫٥', `${text} leaves the text as it was`);
+  }
   await type('１２');
-  assert.equal(form.value(), 12);
+  assert.equal(arabic.value(), 12);
+  await act(async () => root.unmount());
+  root = undefined;
+  const accounting = controlled({
+    formatOptions: { style: 'currency', currency: 'USD', currencySign: 'accounting' },
+  });
+  await render(accounting.node);
+  await focus();
+  await type('(');
+  assert.equal(input().value, '(');
+  assert.equal(accounting.value(), null);
+  await type('(123.5)');
+  assert.equal(accounting.value(), -123.5);
+  await blur();
+  assert.equal(input().value, '($123.50)');
+});
+test('edits that cannot become a number are refused before they land', async () => {
+  const form = controlled({ defaultValue: 12, min: 0 });
+  await render(form.node);
+  await focus();
+  input().setSelectionRange(1, 1);
+  assert.equal((await beforeInput('x')).defaultPrevented, true);
+  assert.equal((await beforeInput('3')).defaultPrevented, false);
+  input().setSelectionRange(0, 0);
+  assert.equal((await beforeInput('-')).defaultPrevented, true, 'min 0 refuses a minus sign');
+  assert.equal((await beforeInput('abc', 'insertFromPaste')).defaultPrevented, true);
+  assert.equal((await beforeInput(' 1,000 ', 'insertFromPaste')).defaultPrevented, false);
+  input().setSelectionRange(0, 2);
+  assert.equal((await beforeInput(null, 'deleteContentBackward')).defaultPrevented, false);
+  assert.equal((await beforeInput(null, 'historyUndo')).defaultPrevented, false);
+  assert.equal(
+    (await beforeInput('x', 'insertCompositionText', { isComposing: true })).defaultPrevented,
+    false,
+    'a composition is judged when it ends',
+  );
+  await render(h(NumberField, { key: 'signed', defaultValue: 12 }));
+  await focus();
+  input().setSelectionRange(0, 0);
+  assert.equal((await beforeInput('-')).defaultPrevented, false);
 });
 test('min/max commit on blur/Enter, decimal/large steps, empty start and endpoint disabling', async () => {
   const form = controlled({ min: -1, max: 1, step: 0.1, largeStep: 0.5, defaultValue: 0.1 });
@@ -247,12 +300,8 @@ test('min/max commit on blur/Enter, decimal/large steps, empty start and endpoin
   await key('ArrowUp');
   assert.equal(positive.value(), 5);
 });
-test('default large step, very small decimal arithmetic and scientific display retain numeric values', async () => {
-  const form = controlled({
-    defaultValue: 0.0000001,
-    step: 0.0000001,
-    formatOptions: { notation: 'scientific' },
-  });
+test('default large step and very small decimal arithmetic keep exact values', async () => {
+  const form = controlled({ defaultValue: 0.0000001, step: 0.0000001 });
   await render(form.node);
   await focus();
   assert.equal(input().value, '0.0000001');
@@ -261,7 +310,7 @@ test('default large step, very small decimal arithmetic and scientific display r
   await key('ArrowUp', { shiftKey: true });
   assert.equal(form.value(), 0.0000012);
   await blur();
-  assert.equal(input().value, '1.2E-6');
+  assert.equal(input().value, '0.0000012');
 });
 test('default largeStep scales decimal 0.07 exactly, and tiny values remain visible', async () => {
   const form = controlled({ defaultValue: 0, step: 0.07 });
@@ -362,7 +411,7 @@ test('readOnly/disabled, custom key cancellation, wheel and native editing short
   await focus();
   await key('ArrowUp');
   assert.equal(input().value, '5');
-  assert.equal((await key('a')).defaultPrevented, true);
+  assert.equal((await beforeInput('a')).defaultPrevented, true);
   assert.equal((await key('a', { ctrlKey: true })).defaultPrevented, false);
   assert.equal((await key('Home')).defaultPrevented, false);
   await key('ArrowDown', { metaKey: true });
@@ -474,6 +523,7 @@ test('invalid props/structures fail clearly and hideStepper removes automatic co
     { step: -1 },
     { largeStep: Infinity },
     { value: NaN },
+    { formatOptions: { notation: 'scientific' } },
   ])
     assert.throws(() => renderToString(h(NumberField, props)), /\[IDS\] NumberField/);
   for (const node of [

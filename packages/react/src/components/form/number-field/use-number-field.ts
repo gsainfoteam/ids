@@ -18,7 +18,9 @@ import {
   type ReactNode,
 } from 'react';
 
-import { createNumberFormat } from './number-format';
+import { NumberFormatter, NumberParser } from '@internationalized/number';
+
+import { textAfterInput } from './number-input';
 import {
   addDecimal,
   clampNumber,
@@ -49,6 +51,13 @@ export type NumberFieldInputProps = Omit<
   | 'style'
 >;
 
+// NumberParser reads standard notation only: "1.2E-6" would come back as 0.6 and "1.2K" as
+// nothing, so the other notations are not offered.
+export type NumberFieldFormatOptions = Omit<
+  Intl.NumberFormatOptions,
+  'notation' | 'compactDisplay'
+>;
+
 export type UseNumberFieldOptions = {
   rootProps: NumberFieldInputProps;
   input: NumberFieldInputProps & { asChild?: boolean; children?: ReactNode };
@@ -61,14 +70,22 @@ export type UseNumberFieldOptions = {
   smallStep?: number;
   largeStep?: number;
   locale: string;
-  formatOptions?: Intl.NumberFormatOptions;
+  formatOptions?: NumberFieldFormatOptions;
   allowWheelScrub: boolean;
   disabled?: boolean;
   invalid?: boolean;
   clearable: boolean;
 };
 
-type Draft = { text: string; value: number | null; format: object };
+type Draft = { text: string; value: number | null; formatter: NumberFormatter };
+
+// Intl's default of three fraction digits would show 0.0000001 as 0; significant digits keep
+// small values visible without imposing a precision on large ones.
+const DEFAULT_FORMAT: Intl.NumberFormatOptions = { maximumSignificantDigits: 21 };
+
+// The percent parser reads a lone "%" as 0. Text without a digit, in any numbering system the
+// parser detects, holds no value yet.
+const DIGIT = /[\p{Nd}\u3007\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d]/u;
 
 const FIRST_REPEAT_DELAY = 400;
 
@@ -132,6 +149,11 @@ export function useNumberField({
     stepSize > 0 && small > 0 && large > 0,
     'NumberField: step, smallStep and largeStep must be positive.',
   );
+  invariant(
+    ((formatOptions as Intl.NumberFormatOptions | undefined)?.notation ?? 'standard') ===
+      'standard',
+    'NumberField: formatOptions.notation must be "standard"; typed text in other notations cannot be parsed.',
+  );
   // An explicit step defines a grid, anchored at min, that typed values snap to.
   const snap = step !== undefined;
   const base = min ?? 0;
@@ -151,20 +173,25 @@ export function useNumberField({
     defaultValue,
     onValueChange,
   });
-  const [focused, setFocused] = useState(false);
   const [draft, setDraft] = useState<Draft | null>(null);
   const composing = useRef(false);
+  // An inline options object must not rebuild the formatter, or a parent echoing the value would
+  // throw away the text being typed.
   const formatKey = JSON.stringify(formatOptions ?? null);
-  const format = useMemo(
-    () => createNumberFormat(locale, JSON.parse(formatKey) ?? undefined),
-    [locale, formatKey],
-  );
+  const { formatter, parser } = useMemo(() => {
+    const options: Intl.NumberFormatOptions = JSON.parse(formatKey) ?? DEFAULT_FORMAT;
+    return {
+      formatter: new NumberFormatter(locale, options),
+      parser: new NumberParser(locale, options),
+    };
+  }, [locale, formatKey]);
+  const format = (next: number | null) => (next == null ? '' : formatter.format(next));
+  // What the user typed stays on screen while it still means the current value; otherwise the
+  // value is shown formatted.
   const display =
-    focused && draft && Object.is(draft.value, current) && draft.format === format
+    draft && Object.is(draft.value, current) && draft.formatter === formatter
       ? draft.text
-      : focused
-        ? format.edit(current)
-        : format.format(current);
+      : format(current);
 
   // Held steppers and the wheel step again before React has rendered the last step, so they
   // read the value from here rather than from this render.
@@ -176,23 +203,32 @@ export function useNumberField({
   const fit = (next: number) =>
     snap ? clampToStep(next, stepSize, base, min, max) : clampNumber(next, min, max);
 
+  const read = (text: string) => {
+    if (!DIGIT.test(text)) return null;
+    const parsed = parser.parse(text);
+    return Number.isNaN(parsed) ? null : Object.is(parsed, -0) ? 0 : parsed;
+  };
+
+  // A partial number ("-", "1.", "1.234,") is kept as typed and reports what it means so far. A
+  // text that cannot become a number in this locale and format is refused, and React puts the
+  // last accepted text back.
   const accept = (text: string) => {
-    const parsed = format.parse(text);
-    if (!parsed) {
-      setDraft(null);
-      return;
-    }
-    setDraft({ ...parsed, format });
-    setCurrent(parsed.value);
+    if (!parser.isValidPartialNumber(text, min, max)) return false;
+    const next = read(text);
+    setDraft({ text, value: next, formatter });
+    setCurrent(next);
+    return true;
   };
 
   // Only a value the user typed is committed: a value set from outside is never rewritten just
   // because the field was focused and left.
   const commitDraft = () => {
     if (!draft) return;
-    const parsed = format.parse(inputRef.current?.value ?? draft.text);
-    const next = parsed ? parsed.value : current;
     setDraft(null);
+    // A composition left unfinished can hold text that is no number; the value stays as it was.
+    const text = inputRef.current?.value ?? draft.text;
+    if (!parser.isValidPartialNumber(text, min, max)) return;
+    const next = read(text);
     setCurrent(next == null ? null : fit(next));
   };
 
@@ -225,9 +261,11 @@ export function useNumberField({
     return true;
   };
 
-  const latest = useRef({ stepBy });
+  const refuses = (text: string) => locked || !parser.isValidPartialNumber(text, min, max);
+
+  const latest = useRef({ stepBy, refuses });
   useLayoutEffect(() => {
-    latest.current = { stepBy };
+    latest.current = { stepBy, refuses };
   });
 
   // Press and hold on a stepper keeps stepping. Pointer capture sends the release to the button
@@ -252,6 +290,27 @@ export function useNumberField({
     schedule(0);
   };
   useEffect(() => stopRepeat, []);
+
+  // An edit is checked before the browser applies it: refusing it there keeps the caret where it
+  // was, while undoing it after the change event would throw the caret to the end. The change
+  // handler still checks what gets past this, such as autofill.
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    const onBeforeInput = (event: InputEvent) => {
+      if (event.isComposing || !event.cancelable) return;
+      const next = textAfterInput(
+        input.value,
+        input.selectionStart ?? input.value.length,
+        input.selectionEnd ?? input.value.length,
+        event.inputType,
+        event.data ?? event.dataTransfer?.getData('text/plain') ?? null,
+      );
+      if (next != null && latest.current.refuses(next)) event.preventDefault();
+    };
+    input.addEventListener('beforeinput', onBeforeInput);
+    return () => input.removeEventListener('beforeinput', onBeforeInput);
+  }, []);
 
   useEffect(() => {
     const input = inputRef.current;
@@ -279,9 +338,9 @@ export function useNumberField({
     current == null
       ? ''
       : min !== undefined && current < min
-        ? messages.numberField.rangeUnderflow(format.format(min))
+        ? messages.numberField.rangeUnderflow(format(min))
         : max !== undefined && current > max
-          ? messages.numberField.rangeOverflow(format.format(max))
+          ? messages.numberField.rangeOverflow(format(max))
           : '';
   // Steppers, keys and the wheel change the value without an input event, so the enclosing
   // Field is told directly; its filled, dirty and error state follow.
@@ -324,26 +383,20 @@ export function useNumberField({
     'aria-valuenow': current ?? undefined,
     'aria-valuemin': min,
     'aria-valuemax': max,
-    'aria-valuetext': current == null ? undefined : format.format(current),
+    'aria-valuetext': current == null ? undefined : format(current),
     'aria-invalid': ariaInvalid,
     'data-field-input': '',
     'data-number-field-input': '',
-    onFocus: (event: FocusEvent<HTMLInputElement>) => {
-      native.onFocus?.(event);
-      setFocused(true);
-      setDraft(null);
-    },
     onBlur: (event: FocusEvent<HTMLInputElement>) => {
       composing.current = false;
       commitDraft();
-      setFocused(false);
       native.onBlur?.(event);
     },
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
       native.onChange?.(event);
       if (event.defaultPrevented || locked) return;
       if (composing.current || (event.nativeEvent as InputEvent).isComposing) {
-        setDraft({ text: event.target.value, value: current, format });
+        setDraft({ text: event.target.value, value: current, formatter });
         return;
       }
       accept(event.target.value);
@@ -354,7 +407,9 @@ export function useNumberField({
     },
     onCompositionEnd: (event: CompositionEvent<HTMLInputElement>) => {
       composing.current = false;
-      if (!locked) accept(event.currentTarget.value);
+      // An IME can leave full-width digits; NFKC turns them into the ASCII digits the formatted
+      // value uses. A composition that is not a number is dropped.
+      if (!locked && !accept(event.currentTarget.value.normalize('NFKC'))) setDraft(null);
       native.onCompositionEnd?.(event);
     },
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
@@ -378,8 +433,6 @@ export function useNumberField({
         if (jumpTo(key === 'Home' ? min : max)) event.preventDefault();
       } else if (key === 'Enter') {
         commitDraft();
-      } else if (key.length === 1 && !event.altKey && !format.allowsKey(key)) {
-        event.preventDefault();
       }
     },
   };

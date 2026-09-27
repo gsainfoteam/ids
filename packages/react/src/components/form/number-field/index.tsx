@@ -12,7 +12,11 @@ import {
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/16/solid';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 
-import { useNumberField, type NumberFieldInputProps } from './use-number-field';
+import {
+  useNumberField,
+  type NumberFieldFormatOptions,
+  type NumberFieldInputProps,
+} from './use-number-field';
 import { type FieldSurfaceVariant } from '../../../internal/field-surface';
 import { messages } from '../../../internal/messages';
 import {
@@ -32,7 +36,7 @@ import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
-export type { NumberFieldInputProps } from './use-number-field';
+export type { NumberFieldFormatOptions, NumberFieldInputProps } from './use-number-field';
 export type NumberFieldVariant = FieldSurfaceVariant;
 export type NumberFieldState = TextControlState;
 
@@ -214,7 +218,7 @@ export namespace NumberField {
     smallStep?: number;
     largeStep?: number;
     locale?: string;
-    formatOptions?: Intl.NumberFormatOptions;
+    formatOptions?: NumberFieldFormatOptions;
     allowWheelScrub?: boolean;
     hideStepper?: boolean;
     invalid?: boolean;
@@ -229,6 +233,7 @@ export namespace NumberField {
   };
   export type State = NumberFieldState;
   export type Variant = NumberFieldVariant;
+  export type FormatOptions = NumberFieldFormatOptions;
   export type InputProps = NumberFieldInputProps & {
     asChild?: boolean;
     children?: ReactNode;

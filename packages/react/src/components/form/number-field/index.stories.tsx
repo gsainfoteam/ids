@@ -292,7 +292,7 @@ function FormatsExample() {
           max={1}
           formatOptions={{ style: 'percent', minimumFractionDigits: 1 }}
         />
-        <Field.Hint>입력하는 동안은 0–1 사이 원래 숫자로 편집합니다.</Field.Hint>
+        <Field.Hint>퍼센트로 입력합니다. 25를 입력하면 25%입니다.</Field.Hint>
       </Field>
       <output aria-label="금액 숫자">{JSON.stringify(currency)}</output>
     </div>
@@ -304,19 +304,22 @@ export const LocaleFormats: Story = {
   play: async ({ canvas, userEvent }) => {
     const price = canvas.getByRole('spinbutton', { name: '금액' });
     const ratio = canvas.getByRole('spinbutton', { name: '비율' });
-    await expect(price).toHaveValue('1.234,57 €');
+    // Intl puts a no-break space before the euro sign.
+    await expect(price).toHaveValue('1.234,57\u00a0€');
     await userEvent.click(price);
-    await expect(price).toHaveValue('1234,567');
+    await expect(price).toHaveValue('1.234,57\u00a0€');
     await userEvent.clear(price);
     await userEvent.paste('2.345,67 €');
-    await expect(price).toHaveValue('2345,67');
-    await userEvent.click(ratio);
     await expect(price).toHaveValue('2.345,67 €');
+    await userEvent.type(price, 'x');
+    await expect(price).toHaveValue('2.345,67 €');
+    await userEvent.click(ratio);
+    await expect(price).toHaveValue('2.345,67\u00a0€');
     await expect(canvas.getByLabelText('금액 숫자')).toHaveTextContent('2345.67');
-    await expect(ratio).toHaveValue('0.125');
+    await expect(ratio).toHaveValue('12.5%');
     await userEvent.clear(ratio);
-    await userEvent.paste('25%');
-    await expect(ratio).toHaveValue('0.25');
+    await userEvent.type(ratio, '25');
+    await expect(ratio).toHaveValue('25');
     await userEvent.click(price);
     await expect(ratio).toHaveValue('25.0%');
   },
