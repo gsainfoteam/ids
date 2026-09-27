@@ -1,8 +1,8 @@
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 import { describeDates, isEmptyDates, sameDates, serializeDates } from './date-value';
-import { dateFormatter, type DateFieldFormat } from './format';
 import { dateInputHint, parseDateText } from './parse';
+import { resolveLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
 import {
   TemporalClear,
@@ -20,6 +20,7 @@ import {
   type TriggerProps as SharedTriggerProps,
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
+import { formatter, type TemporalFormat } from '../../../internal/temporal-field/format';
 import { Calendar, CalendarPickContext, type CalendarOptions } from '../../data/calendar';
 import {
   emptyValue,
@@ -30,14 +31,15 @@ import {
 } from '../../data/calendar/date';
 import { useFieldSize } from '../field/context';
 
+export type DateFieldFormat = TemporalFormat;
+
 export type DateFieldProps = Omit<
   TemporalFieldProps<CalendarValue>,
   'value' | 'defaultValue' | 'onValueChange' | 'disabled'
 > &
-  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'dir' | 'locale'> &
+  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'dir'> &
   DateSelection & {
     format?: DateFieldFormat;
-    locale?: string;
   };
 
 export function DateField(props: DateFieldProps) {
@@ -51,7 +53,7 @@ export function DateField(props: DateFieldProps) {
     max,
     disabled,
     monthsToShow = 1,
-    locale = messages.locale,
+    locale,
     weekStartsOn,
     captionLayout,
     month,
@@ -73,7 +75,8 @@ export function DateField(props: DateFieldProps) {
   const empty = emptyValue(selectionMode);
   if (value !== undefined) validateValue(value, selectionMode);
   if (defaultValue !== undefined) validateValue(defaultValue, selectionMode);
-  const formatDate = dateFormatter(format, locale);
+  const dateLocale = resolveLocale(locale);
+  const formatDate = formatter(format ?? 'P', dateLocale);
   const cell = (useFieldSize(rest.size) ?? 'standard') === 'tiny' ? 32 : 36;
   const shown = Math.min(monthsToShow, 2);
   const range = selectionMode === 'range';
@@ -106,11 +109,15 @@ export function DateField(props: DateFieldProps) {
         parse:
           selectionMode === 'single'
             ? (text) => {
-                const date = parseDateText(text, locale);
+                const date = parseDateText(
+                  text,
+                  dateLocale,
+                  typeof format === 'string' ? format : undefined,
+                );
                 return date && !isBlocked(date, { min, max, disabled }) ? date : undefined;
               }
             : undefined,
-        inputHint: typeof format === 'string' ? format : dateInputHint(locale),
+        inputHint: typeof format === 'string' ? format : dateInputHint(dateLocale),
         picker: ({ value: current, change, close, size }) => (
           // A single date closes the popup on every pick, including the day already chosen.
           <CalendarPickContext value={selectionMode === 'single' ? () => close(true) : null}>
@@ -120,7 +127,7 @@ export function DateField(props: DateFieldProps) {
               max={max}
               disabled={disabled === true ? undefined : disabled}
               monthsToShow={monthsToShow}
-              locale={locale}
+              locale={dateLocale}
               weekStartsOn={weekStartsOn}
               captionLayout={captionLayout}
               month={month}
@@ -161,5 +168,3 @@ export namespace DateField {
   export const Content = TemporalContent;
   export const Style = temporalFieldStyle;
 }
-
-export type { DateFieldFormat } from './format';

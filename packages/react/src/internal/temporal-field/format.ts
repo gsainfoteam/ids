@@ -1,89 +1,24 @@
-import {
-  periodLabel,
-  resolveTimeFormat,
-  type TimeFormat,
-  type TimePrecision,
-} from '../../components/data/time-picker/time';
-import { dateFormatter } from '../../components/form/date-field/format';
-import { invariant } from '../../utils';
-import { resolveLocale } from '../date-locale';
+import { format as formatDate } from 'date-fns';
 
-export function temporalFormatter(
-  format: string | undefined,
-  locale: string,
-  precision: TimePrecision,
-  hourCycle: TimeFormat | undefined,
-  withDate: boolean,
-): (date: Date) => string {
-  const dateLocale = resolveLocale(locale);
-  if (format === undefined || format === '12h' || format === '24h') {
-    const cycle = resolveTimeFormat(hourCycle ?? (format as TimeFormat | undefined), dateLocale);
-    const formatter = new Intl.DateTimeFormat(locale, {
-      ...(withDate ? ({ year: 'numeric', month: '2-digit', day: '2-digit' } as const) : {}),
-      hour: '2-digit',
-      ...(precision !== 'hour' ? ({ minute: '2-digit' } as const) : {}),
-      ...(precision === 'second' ? ({ second: '2-digit' } as const) : {}),
-      hour12: cycle === '12h',
-      calendar: 'gregory',
-    });
-    return (d) => formatter.format(d);
-  }
-  const parts: ((d: Date) => string)[] = [];
-  for (let i = 0; i < format.length; ) {
-    if (format[i] === "'") {
-      let end = i + 1;
-      if (format[end] === "'") {
-        parts.push(() => "'");
-        i += 2;
-        continue;
-      }
-      let literal = '';
-      let closed = false;
-      while (end < format.length) {
-        if (format[end] === "'") {
-          if (format[end + 1] === "'") {
-            literal += "'";
-            end += 2;
-            continue;
-          }
-          end++;
-          closed = true;
-          break;
-        }
-        literal += format[end++];
-      }
-      invariant(closed, 'TimeField: unclosed format quote.');
-      parts.push(() => literal);
-      i = end;
-      continue;
-    }
-    const token = format
-      .slice(i)
-      .match(/^(yyyy|yy|MMMM|MMM|MM|M|dd|d|EEEE|EEE|HH|H|hh|h|mm|m|ss|s|a)/)?.[0];
-    if (token) {
-      if ('yMdE'.includes(token[0])) {
-        invariant(withDate, 'TimeField: date tokens require DateTimeField.');
-        parts.push(dateFormatter(token, locale));
-      } else
-        parts.push((d) => {
-          if (token === 'a') return periodLabel(d.getHours() < 12 ? 0 : 1, dateLocale);
-          const n =
-            token[0] === 'H'
-              ? d.getHours()
-              : token[0] === 'h'
-                ? d.getHours() % 12 || 12
-                : token[0] === 'm'
-                  ? d.getMinutes()
-                  : d.getSeconds();
-          return String(n).padStart(token.length, '0');
-        });
-      i += token.length;
-    } else {
-      invariant(!/[A-Za-z]/.test(format[i]), 'TimeField: unsupported format token.');
-      const char = format[i++];
-      parts.push(() => char);
-    }
-  }
-  invariant(format.length > 0, 'TimeField: format cannot be empty.');
-  return (d) => parts.map((p) => p(d)).join('');
+import { hourCycleOf, periodFirst, type HourCycle } from '../date-locale';
+
+import type { TimePrecision } from '../../components/data/time-picker/time';
+import type { Locale } from 'date-fns';
+
+// A date-fns pattern such as "yyyy-MM-dd HH:mm", or a function for anything a pattern cannot say.
+export type TemporalFormat = string | ((date: Date) => string);
+
+// The locale's own short or medium time when it already uses the asked-for clock; otherwise the
+// clock is spelled out, with the day period on the side the locale writes it.
+export function timePattern(locale: Locale, precision: TimePrecision, cycle: HourCycle): string {
+  const seconds = precision === 'second';
+  if (cycle === hourCycleOf(locale)) return seconds ? 'pp' : 'p';
+  if (cycle === '24h') return seconds ? 'HH:mm:ss' : 'HH:mm';
+  const clock = seconds ? 'h:mm:ss' : 'h:mm';
+  return periodFirst(locale) ? `a ${clock}` : `${clock} a`;
+}
+
+export function formatter(value: TemporalFormat, locale: Locale): (date: Date) => string {
+  if (typeof value === 'function') return value;
+  return (date) => formatDate(date, value, { locale });
 }

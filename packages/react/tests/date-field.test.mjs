@@ -27,6 +27,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, StrictMode, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
+const { de } = await import('date-fns/locale/de');
 const { DateField, Field } = await import('../dist/index.js');
 
 let root, host;
@@ -63,13 +64,18 @@ const d = (day, month = 9) => new Date(2026, month - 1, day);
 const keyOf = (date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-test('SSR: format tokens, Intl formats, Field labelling and ISO local-date FormData', () => {
+const longDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+
+test('SSR: date-fns patterns, format functions, Field labelling and ISO local-date FormData', () => {
   for (const [format, locale, expected] of [
-    [undefined, undefined, '2026. 09. 15.'],
+    [undefined, undefined, '2026.09.15'],
+    [undefined, 'en-US', '09/15/2026'],
+    [undefined, de, '15.09.2026'],
     ['yyyy-MM-dd', 'ko-KR', '2026-09-15'],
-    ['yyyy년 M월 d일', 'ko-KR', '2026년 9월 15일'],
+    ['yyyy년 M월 d일 (EEE)', 'ko-KR', '2026년 9월 15일 (화)'],
     ["EEE, MMM d 'at home'", 'en-US', 'Tue, Sep 15 at home'],
-    [{ dateStyle: 'long' }, 'en-US', 'September 15, 2026'],
+    ['PPP', 'en-US', 'September 15th, 2026'],
+    [(date) => longDate.format(date), undefined, 'September 15, 2026'],
   ]) {
     const doc = new JSDOM(
       renderToString(
@@ -97,19 +103,15 @@ test('SSR: format tokens, Intl formats, Field labelling and ISO local-date FormD
   assert.equal(empty.querySelector('[role=combobox]').textContent, '날짜 선택');
   assert.ok(empty.querySelector('[data-date-field]').hasAttribute('data-empty'));
   assert.ok(empty.querySelector('[data-placeholder]'));
-  assert.throws(() => renderToString(h(DateField, { format: 'YYYY-MM-DD' })), /unsupported format/);
   assert.throws(
-    () => renderToString(h(DateField, { format: "yyyy 'unfinished" })),
-    /unclosed quote/,
+    () => renderToString(h(DateField, { defaultValue: d(15), format: 'YYYY-MM-DD' })),
+    /instead of `YYYY`/,
   );
   assert.throws(
     () => renderToString(h(DateField, { selectionMode: 'range', value: d(1) })),
     /range requires/,
   );
-  assert.throws(
-    () => renderToString(h(DateField, { format: { timeStyle: 'short' } })),
-    /local date/,
-  );
+  assert.throws(() => renderToString(h(DateField, { locale: 'de-DE' })), /no built-in/);
 });
 
 test('ArrowDown opens on the focused day, limits apply, a pick closes and Clear empties', async () => {
@@ -217,10 +219,10 @@ test('multiple toggles, repeats FormData entries, and readOnly/disabled block ed
   await click(day('2026-09-15'));
   assert.deepEqual(formData().getAll('dates'), ['2026-09-16', '2026-09-17']);
   await key(day('2026-09-16'), 'Escape');
-  assert.equal(trigger().textContent.includes('2026. 09. 16., 2026. 09. 17.'), true);
+  assert.equal(trigger().textContent.includes('2026.09.16, 2026.09.17'), true);
   await click(trigger());
   await click(day('2026-09-18'));
-  assert.equal(trigger().textContent.includes('2026. 09. 16., 2026. 09. 17., +1'), true);
+  assert.equal(trigger().textContent.includes('2026.09.16, 2026.09.17, +1'), true);
   await key(day('2026-09-18'), 'Escape');
   await render(view({ value: [d(20)], readOnly: true }));
   await click(trigger());
@@ -505,7 +507,7 @@ test('typed entry: the text box takes the label and role, the calendar button le
   assert.equal(input.getAttribute('aria-haspopup'), 'dialog');
   assert.equal(input.getAttribute('aria-required'), 'true');
   assert.equal(input.getAttribute('autocomplete'), 'off');
-  assert.equal(input.getAttribute('placeholder'), 'YYYY. MM. DD.');
+  assert.equal(input.getAttribute('placeholder'), 'YYYY.MM.DD');
   assert.equal(input.hasAttribute('name'), false, 'FormData gets the ISO value, not the text');
   const button = doc.querySelector('button');
   assert.equal(button.getAttribute('aria-label'), '달력 열기');
@@ -516,7 +518,7 @@ test('typed entry: the text box takes the label and role, the calendar button le
   );
 });
 
-test('typed entry reads ISO, Korean, bare digits and the locale order on blur or Enter', async () => {
+test('typed entry reads the shown format, written forms, bare digits and the locale order', async () => {
   const changes = [];
   const view = (props) =>
     h(
@@ -532,13 +534,14 @@ test('typed entry reads ISO, Korean, bare digits and the locale order on blur or
   await typeText('2026-09-20');
   await blurText();
   assert.deepEqual(changes, ['2026-09-20']);
-  assert.equal(textBox().value, '2026. 09. 20.', 'the text is rewritten in the display format');
+  assert.equal(textBox().value, '2026.09.20', 'the text is rewritten in the display format');
   assert.equal(formData().get('day'), '2026-09-20');
   for (const [text, expected] of [
     ['2026. 9. 21', '2026-09-21'],
     ['2026년 9월 22일', '2026-09-22'],
     ['20260923', '2026-09-23'],
     ['260924', '2026-09-24'],
+    ['2026.9.25', '2026-09-25'],
   ]) {
     await typeText(text);
     await key(textBox(), 'Enter');
@@ -549,15 +552,22 @@ test('typed entry reads ISO, Korean, bare digits and the locale order on blur or
     ['9/25/2026', '2026-09-25'],
     ['09262026', '2026-09-26'],
     ['2026-09-27', '2026-09-27'],
+    ['Sep 28, 2026', '2026-09-28'],
+    ['9/29/26', '2026-09-29'],
   ]) {
     await typeText(text);
     await key(textBox(), 'Enter');
     assert.equal(changes.at(-1), expected, text);
   }
-  await render(h('div', { key: 'de' }, view({ locale: 'de-DE' })));
-  await typeText('28.09.2026');
+  await render(h('div', { key: 'de' }, view({ locale: de })));
+  await typeText('30.09.2026');
   await key(textBox(), 'Enter');
-  assert.equal(changes.at(-1), '2026-09-28');
+  assert.equal(changes.at(-1), '2026-09-30');
+  await render(h('div', { key: 'pattern' }, view({ format: 'dd MMM yyyy', locale: 'en-US' })));
+  await typeText('01 Oct 2026');
+  await key(textBox(), 'Enter');
+  assert.equal(changes.at(-1), '2026-10-01', 'the display pattern reads back');
+  assert.equal(textBox().getAttribute('placeholder'), 'dd MMM yyyy');
 });
 
 test('typed entry keeps unreadable or blocked text, marks it invalid and Escape reverts it', async () => {
@@ -586,7 +596,7 @@ test('typed entry keeps unreadable or blocked text, marks it invalid and Escape 
   assert.equal(textBox().getAttribute('aria-invalid'), 'true');
   assert.ok(field().hasAttribute('data-invalid'));
   await key(textBox(), 'Escape');
-  assert.equal(textBox().value, '2026. 09. 15.');
+  assert.equal(textBox().value, '2026.09.15');
   assert.equal(textBox().hasAttribute('aria-invalid'), false);
   await typeText('2026-09-25');
   await blurText();
@@ -606,7 +616,7 @@ test('a pasted or autofilled date is read at once; typing waits, and an IME Ente
   assert.deepEqual(changes, [], 'a date typed key by key waits');
   await typeText('2026년 9월 3일', 'insertFromPaste');
   assert.deepEqual(changes, ['2026-09-03']);
-  assert.equal(textBox().value, '2026. 09. 03.');
+  assert.equal(textBox().value, '2026.09.03');
   await act(async () => {
     const input = textBox();
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(
@@ -641,7 +651,7 @@ test('typed entry and the calendar share one value; ArrowDown opens on the typed
   assert.equal(document.activeElement, day('2026-09-18'));
   await click(day('2026-09-21'));
   assert.equal(popup(), null);
-  assert.equal(textBox().value, '2026. 09. 21.');
+  assert.equal(textBox().value, '2026.09.21');
   assert.equal(document.activeElement, textBox(), 'focus returns to the text box');
   await click(host.querySelector('[aria-label="달력 열기"]'));
   assert.ok(popup());

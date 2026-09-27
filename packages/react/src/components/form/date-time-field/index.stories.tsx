@@ -149,7 +149,7 @@ export const Limits: Story = {
     max: at(18, 18),
     hourCycle: '24h',
     step: 30,
-    disabled: (date: Date) => date.getDay() === 0 || date.getDay() === 6,
+    disabled: { dayOfWeek: [0, 6] },
     'aria-label': '면담 일시',
   },
   parameters: {

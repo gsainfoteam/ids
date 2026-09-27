@@ -1,3 +1,5 @@
+import { isSameDay } from 'date-fns';
+
 import {
   datesOf,
   dayKey,
@@ -8,6 +10,9 @@ import {
 
 export const isEmptyDates = (value: CalendarValue) => datesOf(value).length === 0;
 
+const sameDay = (a: Date | null | undefined, b: Date | null | undefined) =>
+  a && b ? isSameDay(a, b) : !a && !b;
+
 // Values compare by calendar day, so a new Date for the same day is not a change.
 export function sameDates(a: CalendarValue, b: CalendarValue): boolean {
   if (a === b) return true;
@@ -16,12 +21,11 @@ export function sameDates(a: CalendarValue, b: CalendarValue): boolean {
       Array.isArray(a) &&
       Array.isArray(b) &&
       a.length === b.length &&
-      a.every((date, index) => dayKey(date) === dayKey(b[index]))
+      a.every((date, index) => isSameDay(date, b[index]))
     );
   if (a instanceof Date || b instanceof Date)
-    return a instanceof Date && b instanceof Date && dayKey(a) === dayKey(b);
-  const key = (date: Date | null | undefined) => (date ? dayKey(date) : '');
-  return key(a?.start) === key(b?.start) && key(a?.end) === key(b?.end);
+    return a instanceof Date && b instanceof Date && isSameDay(a, b);
+  return sameDay(a?.start, b?.start) && sameDay(a?.end, b?.end);
 }
 
 export function describeDates(

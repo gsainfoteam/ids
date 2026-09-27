@@ -37,7 +37,7 @@ import { DateTimeField, Field } from '@gsainfoteam/ids-react';
 <DateTimeField
   min={new Date(2026, 8, 15, 9, 30)} // 날짜와 시각을 합친 경계. 양 끝 포함
   max={new Date(2026, 8, 20, 18, 0)}
-  disabled={(date) => date.getDay() === 0} // 날짜별로 막는다. true 면 필드 전체
+  disabled={{ dayOfWeek: [0] }} // 날짜별로 막는 matcher. true 면 필드 전체
   step={30} // 고를 시각이 하나도 없는 날은 막힌다
 />
 ```
@@ -47,12 +47,15 @@ import { DateTimeField, Field } from '@gsainfoteam/ids-react';
 ## 표시 형식
 
 ```tsx
-<DateTimeField />                                              // ko-KR: 2026. 09. 15. 14:30
+<DateTimeField />                                              // ko-KR: 2026.09.15 14:30
+<DateTimeField hourCycle="12h" />                              // 2026.09.15 오후 2:30
+<DateTimeField locale="en-US" />                               // 09/15/2026 2:30 PM
 <DateTimeField format="yyyy년 M월 d일 HH:mm" />               // 2026년 9월 15일 14:30
 <DateTimeField format="EEE, MMM d 'at' h:mm a" hourCycle="12h" locale="en-US" />
 ```
 
-- 날짜 토큰 `yyyy` `yy` / `MMMM` `MMM` `MM` `M` / `dd` `d` / `EEEE` `EEE` 와 시각 토큰 `HH` `H` / `hh` `h` / `mm` `m` / `ss` `s` / `a` 를 씁니다.
+- 기본 글자는 locale 의 짧은 날짜(date-fns `P`)와 [TimeField](../time-field/README.md#표시-형식) 의 시각입니다.
+- 패턴은 [date-fns 토큰](https://date-fns.org/docs/format)이고, 함수도 받습니다.
 - 달력 옵션(`monthsToShow`, `captionLayout`, `weekStartsOn`, `month`, `today`)은 [Calendar](../../data/calendar/README.md), 시계 옵션(`precision`, `step`, `hourCycle`, `pickerVariant`)은 [TimePicker](../../data/time-picker/README.md) 와 같습니다.
 
 ## 폼
@@ -84,21 +87,21 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
 ## 속성
 
-| 속성                                             | 기본 / 동작                         |
-| ------------------------------------------------ | ----------------------------------- |
-| `value` / `defaultValue` / `onValueChange`       | `Date \| null`. 기본 `null`         |
-| `open` / `defaultOpen` / `onOpenChange`          | 팝업 열림                           |
-| `min` / `max`                                    | 날짜와 시각을 합친 경계             |
-| `disabled`                                       | `true` 면 필드 전체, 함수면 날짜별  |
-| `format` / `hourCycle`                           | locale 형식 / locale 시간제         |
-| `precision` / `step` / `pickerVariant`           | `minute` / `1` / `grid`             |
-| `today`                                          | 마운트한 날. 비어 있을 때의 기준 날 |
-| `locale`                                         | `ko-KR`                             |
-| `placeholder`                                    | `날짜와 시간 선택`                  |
-| `name` / `form` / `required`                     | 숨은 값 입력과 브라우저 검증        |
-| `readOnly`                                       | 열기, 고르기, Clear 를 막는다       |
-| `invalid` / `variant` / `size` / `mobileVariant` | DateField 와 같다                   |
-| 그 외 native 속성, `ref`                         | Trigger `button` 으로 간다          |
+| 속성                                             | 기본 / 동작                            |
+| ------------------------------------------------ | -------------------------------------- |
+| `value` / `defaultValue` / `onValueChange`       | `Date \| null`. 기본 `null`            |
+| `open` / `defaultOpen` / `onOpenChange`          | 팝업 열림                              |
+| `min` / `max`                                    | 날짜와 시각을 합친 경계                |
+| `disabled`                                       | `true` 면 필드 전체, matcher 면 날짜별 |
+| `format` / `hourCycle`                           | locale 형식 / locale 시간제            |
+| `precision` / `step` / `pickerVariant`           | `minute` / `1` / `grid`                |
+| `today`                                          | 마운트한 날. 비어 있을 때의 기준 날    |
+| `locale`                                         | `ko-KR`. 태그나 date-fns `Locale`      |
+| `placeholder`                                    | `날짜와 시간 선택`                     |
+| `name` / `form` / `required`                     | 숨은 값 입력과 브라우저 검증           |
+| `readOnly`                                       | 열기, 고르기, Clear 를 막는다          |
+| `invalid` / `variant` / `size` / `mobileVariant` | DateField 와 같다                      |
+| 그 외 native 속성, `ref`                         | Trigger `button` 으로 간다             |
 
 ## 알아둘 것
 

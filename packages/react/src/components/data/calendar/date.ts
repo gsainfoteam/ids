@@ -1,4 +1,4 @@
-import { formatISO, isAfter, isSameDay, isValid, startOfDay } from 'date-fns';
+import { formatISO, isAfter, isValid, startOfDay } from 'date-fns';
 import { dateMatchModifiers, type Matcher } from 'react-day-picker';
 
 import { invariant } from '../../../utils';
@@ -91,27 +91,3 @@ export function limitMatchers({ min, max, disabled }: DateLimits): Matcher[] {
 
 export const isBlocked = (date: Date, limits: DateLimits) =>
   !validDate(date) || dateMatchModifiers(startOfDay(date), limitMatchers(limits));
-
-// Still used by the time picker and the fields until their own formatting and parsing move onto
-// date-fns. new Date(year, month, day) maps years 0..99 to 1900..1999, so the year is set apart.
-export function dateAt(year: number, month: number, day: number): Date {
-  const date = new Date(0);
-  date.setFullYear(year, month, day);
-  date.setHours(0, 0, 0, 0);
-  return date;
-}
-export const dayOnly = (date: Date) => startOfDay(date);
-export const sameDay = (a: Date | null | undefined, b: Date | null | undefined) =>
-  !!a && !!b && isSameDay(a, b);
-
-const dateFormats = new Map<string, Intl.DateTimeFormat>();
-
-export function dateFormat(locale: string, options: Intl.DateTimeFormatOptions) {
-  const key = `${locale}|${JSON.stringify(options)}`;
-  let format = dateFormats.get(key);
-  if (!format) {
-    format = new Intl.DateTimeFormat(locale, { calendar: 'gregory', ...options });
-    dateFormats.set(key, format);
-  }
-  return format;
-}

@@ -2,9 +2,9 @@
 
 누르면 달력이 열리고, 고른 날짜를 필드에 보여 주는 날짜 입력입니다.
 
-- **하루, 기간, 여러 날.** `selectionMode` 로 고르고, 값은 로컬 날짜 `Date` 입니다. 날짜 라이브러리가 필요 없습니다.
+- **하루, 기간, 여러 날.** `selectionMode` 로 고르고, 값은 로컬 날짜 `Date` 입니다.
 - **키보드 그대로.** Trigger에서 `↓` 로 열면 고른 날(없으면 오늘)에 포커스가 가고, 하루를 고르면 닫히며 포커스가 Trigger로 돌아옵니다.
-- **글자로 입력.** `DateField.Input` 을 넣으면 `2026-09-15`, `2026년 9월 15일`, `20260915` 처럼 쳐서 넣을 수 있습니다.
+- **글자로 입력.** `DateField.Input` 을 넣으면 `2026.09.15`, `2026년 9월 15일`, `20260915` 처럼 쳐서 넣을 수 있습니다. 읽고 쓰는 일은 date-fns 가 합니다.
 - **폼.** `name` 을 주면 ISO 날짜가 FormData에 들어가고, `required` 인데 비어 있으면 브라우저가 제출을 막고 Trigger로 포커스를 옮깁니다. `reset` 은 `defaultValue` 로 되돌립니다.
 - **react-hook-form, TanStack Form.** `controlMode="value"` 나 `value` / `onValueChange` 로 Date 값을 그대로 주고받습니다.
 - **달력 기능 그대로.** 제한, 연월 목록, 여러 달, locale, 기간 미리 보기는 [Calendar](../../data/calendar/README.md) 와 같습니다.
@@ -33,15 +33,17 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 ## 표시 형식
 
 ```tsx
-<DateField />                                   // 2026. 09. 15. (locale 기본 연월일)
-<DateField format="yyyy-MM-dd" />               // 2026-09-15
-<DateField format="yyyy년 M월 d일 (EEE)" />     // 2026년 9월 15일 (화)
+<DateField />                                      // 2026.09.15 (locale 의 짧은 날짜, date-fns P)
+<DateField locale="en-US" />                       // 09/15/2026
+<DateField format="yyyy-MM-dd" />                  // 2026-09-15
+<DateField format="yyyy년 M월 d일 (EEE)" />        // 2026년 9월 15일 (화)
+<DateField format="PPP" locale="en-US" />          // September 15th, 2026
 <DateField format="'Due' MMM d" locale="en-US" />  // Due Sep 15. 영문은 작은따옴표로 감싼다
-<DateField format={{ dateStyle: 'long' }} />    // Intl.DateTimeFormatOptions
+<DateField format={(date) => longFormat.format(date)} />  // 함수. Intl 도 여기로
 ```
 
-- 토큰은 `yyyy` `yy` / `MMMM` `MMM` `MM` `M` / `dd` `d` / `EEEE` `EEE` 입니다. 그 밖의 영문자는 오류입니다.
-- 시간이나 `timeZone` 이 든 Intl 옵션은 오류입니다. 날짜와 시간은 [DateTimeField](../date-time-field/README.md) 를 씁니다.
+- 패턴은 [date-fns 토큰](https://date-fns.org/docs/format)입니다. 모르는 영문자나 `YYYY`, `DD` 는 date-fns 가 오류를 냅니다.
+- 날짜와 시간은 [DateTimeField](../date-time-field/README.md) 를 씁니다.
 - 비어 있으면 `placeholder`(기본 `날짜 선택`, 기간은 `기간 선택`)를 흐린 색으로 보입니다.
 
 ## 달력 옵션
@@ -54,12 +56,13 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
   captionLayout="dropdown" // 연도와 월을 목록에서 고른다. 생년월일에
   monthsToShow={2} // 기간은 두 달을 나란히
   weekStartsOn={1}
-  locale="en-US" // 달력과 표시 형식의 언어. 기본 ko-KR
+  locale="en-US" // 달력과 표시 형식의 언어. 태그나 date-fns Locale. 기본 ko-KR
   today={new Date(2026, 8, 15)}
 />
 ```
 
-- `month` / `defaultMonth` / `onMonthChange` 도 달력으로 갑니다. 팝업을 열 때마다 고른 날의 달에서 시작합니다.
+- `disabled` 는 [Calendar](../../data/calendar/README.md#제한) 의 matcher 를 그대로 받습니다.
+- `month` / `defaultMonth` / `onMonthChange`, `modifiers`, `components` 같은 react-day-picker 속성도 달력으로 갑니다. 팝업을 열 때마다 고른 날의 달에서 시작합니다.
 
 ## 열기와 닫기
 
@@ -90,20 +93,22 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 </DateField>
 ```
 
-| 치는 글자                                  | 읽는 날짜                        |
-| ------------------------------------------ | -------------------------------- |
-| `2026-09-15`, `2026. 9. 15.`, `2026/09/15` | 연도가 앞이면 locale 과 상관없이 |
-| `2026년 9월 15일`                          | 숫자 사이의 글자는 무시한다      |
-| `20260915`, `260915`                       | 숫자만 쳐도 된다. 휴대폰 숫자판  |
-| `9/15/2026`(en-US), `15.09.2026`(de-DE)    | 그 밖에는 locale 의 순서         |
+| 치는 글자                                       | 읽는 날짜                                               |
+| ----------------------------------------------- | ------------------------------------------------------- |
+| 보이는 형식 그대로                              | `format` 패턴을 date-fns `parse` 로 읽는다              |
+| `2026.09.15`, `2026년 9월 15일`, `Sep 15, 2026` | locale 이 날짜를 쓰는 형식(date-fns `P` `PP` `PPP`)     |
+| `2026-09-15`, `2026. 9. 15.`, `2026/9/15`       | 연도가 앞이면 locale 과 상관없이                        |
+| `20260915`, `260915`                            | 숫자만 쳐도 된다. 휴대폰 숫자판                         |
+| `9/15/26`(en-US), `15.09.2026`(de)              | 그 밖에는 locale 의 숫자 순서. 두 자리 연도는 가까운 해 |
 
-- 한 글자씩 친 날짜는 `Enter` 나 포커스를 떠날 때 읽고, 표시 형식으로 다시 씁니다. `2026-09-1` 도 날짜로 읽히기 때문에 치는 도중에는 읽지 않습니다. 월 이름은 읽지 않으니 `format` 은 숫자 형식이 맞습니다.
+- 한 글자씩 친 날짜는 `Enter` 나 포커스를 떠날 때 읽고, 표시 형식으로 다시 씁니다. `2026-09-1` 도 날짜로 읽히기 때문에 치는 도중에는 읽지 않습니다.
+- 없는 날짜(`2026-02-30`)는 date-fns 가 거절합니다. 요일 이름이 든 형식은 읽지 않습니다.
 - 붙여넣기, 끌어다 놓기, 브라우저 자동 완성은 날짜 전체가 한 번에 들어오므로 바로 읽습니다.
 - 한글 IME 로 글자를 조합하다 누른 `Enter` 는 조합을 끝낼 뿐 날짜를 읽지 않습니다.
 - 못 읽거나 min/max, `disabled` 로 막힌 날짜면 글자를 그대로 두고 `aria-invalid` 로 표시합니다. `Enter` 로 폼이 제출되지도 않습니다. `Esc` 는 원래 값으로 되돌립니다.
 - 글자를 다 지우면 값도 비웁니다.
 - `↓` 는 친 글자를 읽고 그 날짜에서 달력을 엽니다. 달력 버튼은 Tab 순서에서 빠집니다.
-- 비어 있으면 locale 의 순서를 보여 줍니다(`YYYY. MM. DD.`). `placeholder` 로 바꿀 수 있습니다.
+- 비어 있으면 locale 의 짧은 날짜를 글자로 보여 줍니다(`YYYY.MM.DD`, `MM/DD/YYYY`). 문자열 `format` 이 있으면 그 패턴을 보여 주고, `placeholder` 로 바꿀 수 있습니다.
 - `autoComplete` 은 기본 `off` 입니다. 생년월일은 `autoComplete="bday"` 를 줍니다.
 - 하루(`single`)에서만 씁니다.
 
@@ -190,11 +195,12 @@ const schema = z.object({ date: z.date().nullable().refine(Boolean, '날짜를 �
 | `selectionMode`                                                       | `single`(기본) / `range` / `multiple`                    |
 | `value` / `defaultValue` / `onValueChange`                            | 모드별 타입. 기본 `null`, `multiple` 은 `[]`             |
 | `open` / `defaultOpen` / `onOpenChange`                               | 팝업 열림                                                |
-| `format`                                                              | locale 숫자 연월일. 패턴이나 Intl 옵션                   |
+| `format`                                                              | locale 짧은 날짜(`P`). date-fns 패턴이나 함수            |
 | `placeholder`                                                         | `날짜 선택`, 기간은 `기간 선택`                          |
 | `min` / `max` / `disabled`                                            | 달력으로 간다. `disabled={true}` 는 필드 전체            |
 | `captionLayout` / `monthsToShow` / `weekStartsOn` / `month` / `today` | 달력으로 간다                                            |
-| `locale`                                                              | `ko-KR`. 달력과 표시 형식                                |
+| `modifiers` / `components` / `footer` 등 react-day-picker 속성        | 달력으로 간다                                            |
+| `locale`                                                              | `ko-KR`. 태그나 date-fns `Locale`. 달력과 표시 형식      |
 | `name` / `form` / `required`                                          | 숨은 값 입력과 브라우저 검증                             |
 | `readOnly`                                                            | 열리지 않고 Clear 도 막힌다                              |
 | `invalid`                                                             | danger 테두리와 링. Field 의 `aria-invalid` 가 우선      |

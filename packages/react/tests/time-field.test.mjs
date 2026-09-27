@@ -26,6 +26,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, StrictMode } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
+const { de } = await import('date-fns/locale/de');
 const { TimeField } = await import('../dist/index.js');
 
 let root, host;
@@ -55,26 +56,28 @@ const clear = () => host.querySelector('[data-temporal-clear]');
 const d = (day = 15, hour = 9, minute = 30, second = 0) =>
   new Date(2026, 8, day, hour, minute, second);
 
-test('SSR: display follows format, hourCycle and locale; FormData follows precision', () => {
+test('SSR: display follows format, hourCycle and the date-fns locale; FormData follows precision', () => {
   const html = (props) =>
     new JSDOM(renderToString(h('form', null, h(TimeField, { name: 'at', ...props })))).window
       .document;
+  const text = (props) =>
+    html({ defaultValue: at, ...props }).querySelector('[role=combobox]').textContent;
   const at = d(15, 14, 5, 9);
-  assert.match(html({ defaultValue: at, format: 'HH:mm' }).body.textContent, /14:05/);
-  assert.match(html({ defaultValue: at, format: '24h' }).body.textContent, /14:05/);
-  assert.match(
-    html({ defaultValue: at, format: 'a h:mm', hourCycle: '12h', locale: 'en-US' }).body
-      .textContent,
-    /PM 2:05/,
-  );
-  assert.match(html({ defaultValue: at, format: "HH'h' mm'm'" }).body.textContent, /14h 05m/);
-  assert.match(
-    html({ defaultValue: at, format: '24h', hourCycle: '12h', locale: 'en-US' }).body.textContent,
-    /02:05 PM/,
+  assert.equal(text({}), '14:05', 'date-fns ko writes a 24-hour clock');
+  assert.equal(text({ format: '12h' }), '오후 2:05', 'Korean puts the period first');
+  assert.equal(text({ precision: 'second' }), '14:05:09');
+  assert.equal(text({ locale: 'en-US' }), '2:05 PM');
+  assert.equal(text({ locale: 'en-US', format: '24h' }), '14:05');
+  assert.equal(text({ locale: de }), '14:05');
+  assert.equal(text({ format: 'HH:mm' }), '14:05');
+  assert.equal(text({ format: 'a h:mm', locale: 'en-US' }), 'PM 2:05');
+  assert.equal(text({ format: "HH'h' mm'm'" }), '14h 05m');
+  assert.equal(
+    text({ format: '24h', hourCycle: '12h', locale: 'en-US' }),
+    '2:05 PM',
     'hourCycle wins over the 24h shorthand',
   );
-  assert.match(html({ defaultValue: at }).body.textContent, /14:05/, 'date-fns ko is 24-hour');
-  assert.throws(() => html({ defaultValue: at, locale: 'de-DE' }), /no built-in date-fns locale/);
+  assert.equal(text({ format: (date) => `${date.getHours()}시` }), '14시');
   const form = (props) => {
     const doc = html({ defaultValue: at, ...props });
     return new doc.defaultView.FormData(doc.querySelector('form')).get('at');
@@ -85,9 +88,8 @@ test('SSR: display follows format, hourCycle and locale; FormData follows precis
   const empty = html({});
   assert.equal(empty.querySelector('[role=combobox]').textContent, '시간 선택');
   assert.equal(new empty.defaultView.FormData(empty.querySelector('form')).get('at'), null);
-  assert.throws(() => renderToString(h(TimeField, { format: 'yyyy-MM-dd' })), /date tokens/);
-  assert.throws(() => renderToString(h(TimeField, { format: "HH 'broken" })), /quote/);
-  assert.throws(() => renderToString(h(TimeField, { format: '' })), /empty/);
+  assert.throws(() => text({ format: 'HH:mm j' }), /unescaped latin alphabet/);
+  assert.throws(() => text({ locale: 'de-DE' }), /no built-in date-fns locale/);
 });
 
 test('StrictMode: ArrowDown focuses the first column, picks stay open, Escape and Clear', async () => {

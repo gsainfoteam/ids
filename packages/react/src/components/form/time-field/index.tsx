@@ -1,5 +1,6 @@
 import { ClockIcon } from '@heroicons/react/24/outline';
 
+import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
 import {
   TemporalClear,
@@ -15,9 +16,14 @@ import {
   type TriggerProps as SharedTriggerProps,
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
-import { temporalFormatter } from '../../../internal/temporal-field/format';
+import {
+  formatter,
+  timePattern,
+  type TemporalFormat,
+} from '../../../internal/temporal-field/format';
 import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
 import {
+  resolveTimeFormat,
   timeKey,
   validateTime,
   type TimeFormat,
@@ -26,12 +32,13 @@ import {
 
 export type TimeFieldProps = TemporalFieldProps<Date | null> & {
   precision?: TimePrecision;
-  format?: string;
+  // A date-fns pattern or a function for the text, or 12h / 24h for the clock of both text and picker.
+  format?: TemporalFormat | TimeFormat;
   hourCycle?: TimeFormat;
   step?: number;
   min?: Date;
   max?: Date;
-  locale?: string;
+  locale?: DateLocale;
   pickerVariant?: TimePickerVariant;
   referenceDate?: Date;
 };
@@ -46,17 +53,24 @@ export function TimeField({
   step = 1,
   min,
   max,
-  locale = messages.locale,
+  locale,
   pickerVariant,
   referenceDate,
   ...props
 }: TimeFieldProps) {
   validateTime(props.value);
   validateTime(props.defaultValue);
+  const dateLocale = resolveLocale(locale);
   // format="12h" / "24h" names the hour cycle for both the text and the picker; a pattern only
   // describes the text, so the picker then follows hourCycle or the locale.
-  const cycle = hourCycle ?? (format === '12h' || format === '24h' ? format : undefined);
-  const display = temporalFormatter(format, locale, precision, cycle, false);
+  const clock = format === '12h' || format === '24h';
+  const cycle = hourCycle ?? (clock ? format : undefined);
+  const display = formatter(
+    format === undefined || clock
+      ? timePattern(dateLocale, precision, resolveTimeFormat(cycle, dateLocale))
+      : format,
+    dateLocale,
+  );
   return (
     <TemporalField
       {...props}
@@ -80,7 +94,7 @@ export function TimeField({
             step={step}
             min={min}
             max={max}
-            locale={locale}
+            locale={dateLocale}
             variant={pickerVariant}
             size={size}
             className="w-full"

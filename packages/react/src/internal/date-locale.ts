@@ -36,3 +36,16 @@ const timeTokens = (locale: Locale, width: 'short' | 'long' | 'full') =>
 export function hourCycleOf(locale: Locale): HourCycle {
   return /[ahK]/.test(timeTokens(locale, 'short')) ? '12h' : '24h';
 }
+
+// Korean and Chinese write the day period before the hour. A 24-hour locale shown on a 12-hour
+// clock takes the order from the first of its time patterns that has a period at all.
+export function periodFirst(locale: Locale): boolean {
+  const tokens = (['short', 'long', 'full'] as const)
+    .map((width) => timeTokens(locale, width))
+    .find((pattern) => pattern.includes('a'));
+  return !!tokens && tokens.indexOf('a') < tokens.search(/[hHkK]/);
+}
+
+// The locale's numeric date: y.MM.dd in ko, MM/dd/yyyy in en-US, dd.MM.y in de.
+export const shortDatePattern = (locale: Locale) =>
+  locale.formatLong?.date({ width: 'short' }) ?? 'yyyy-MM-dd';

@@ -73,8 +73,8 @@ export const Gallery: Story = {
         <Showcase.Row label="locale · ko-KR">
           <TimeField defaultValue={at(14, 30)} className="w-44" aria-label="한국어" />
         </Showcase.Row>
-        <Showcase.Row label="24h">
-          <TimeField format="24h" defaultValue={at(14, 30)} className="w-44" aria-label="24시간" />
+        <Showcase.Row label="12h">
+          <TimeField format="12h" defaultValue={at(14, 30)} className="w-44" aria-label="12시간" />
         </Showcase.Row>
         <Showcase.Row label="a h:mm · en-US">
           <TimeField

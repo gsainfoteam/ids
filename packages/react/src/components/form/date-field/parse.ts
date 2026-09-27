@@ -1,73 +1,62 @@
-import { dateAt, dateFormat, validDate } from '../../data/calendar/date';
+import { getYear, isValid, parse } from 'date-fns';
+import { uniq } from 'es-toolkit';
 
-type Part = 'year' | 'month' | 'day';
+import { shortDatePattern, tokensOf } from '../../../internal/date-locale';
 
-// The order a locale writes a numeric date in: year-month-day for ko, month-day-year for en-US,
-// day-month-year for de.
-function localeOrder(locale: string): Part[] {
-  return dateFormat(locale, { year: 'numeric', month: '2-digit', day: '2-digit' })
-    .formatToParts(dateAt(2026, 8, 15))
-    .map((part) => part.type)
-    .filter((type): type is Part => type === 'year' || type === 'month' || type === 'day');
-}
+import type { Locale } from 'date-fns';
 
-function fromParts(parts: Record<Part, string>): Date | undefined {
-  const month = Number(parts.month);
-  const day = Number(parts.day);
-  // A two-digit year is read in this century, the way people write 26 for 2026.
-  const year = parts.year.length <= 2 ? 2000 + Number(parts.year) : Number(parts.year);
-  if (!Number.isInteger(year) || month < 1 || month > 12 || day < 1) return undefined;
-  const date = dateAt(year, month - 1, day);
-  return validDate(date) && date.getMonth() === month - 1 ? date : undefined;
-}
+type Part = 'y' | 'M' | 'd';
 
-// Reads a typed date: ISO and other year-first forms (2026-09-15, 2026. 9. 15., 2026년 9월 15일),
-// the locale's own numeric order (9/15/2026 in en-US, 15.09.2026 in de), and bare digits
-// (20260915, or 09152026 in en-US) as a phone number pad can type them. Month names are not read.
-export function parseDateText(text: string, locale: string): Date | undefined {
-  const normalized = text.normalize('NFKC').trim();
-  if (!normalized) return undefined;
-  const order = localeOrder(locale);
-  const digits = normalized.replace(/\D/g, '');
-  const groups = normalized.match(/\d+/g) ?? [];
+const orderOf = (locale: Locale) =>
+  uniq(tokensOf(shortDatePattern(locale)).match(/[yMd]/g) ?? ['y', 'M', 'd']) as Part[];
 
-  if (groups.length === 1 && (digits.length === 8 || digits.length === 6)) {
-    const yearWidth = digits.length === 8 ? 4 : 2;
-    const read = (sequence: Part[]) => {
-      const parts = {} as Record<Part, string>;
-      let at = 0;
-      for (const part of sequence) {
-        const width = part === 'year' ? yearWidth : 2;
-        parts[part] = digits.slice(at, at + width);
-        at += width;
-      }
-      return fromParts(parts);
-    };
-    // Eight digits are tried year-first before the locale order, so 20260915 reads the same in
-    // every locale while 09152026 still reads as en-US.
-    return (digits.length === 8 ? read(['year', 'month', 'day']) : undefined) ?? read(order);
+// Reads a typed date with date-fns: first as the field shows it and as the locale writes dates
+// out (2026.09.15, 2026년 9월 15일, Sep 15, 2026), then by its numbers alone. Three numbers go in
+// the locale's order unless the first is a year of three or more digits (2026. 9. 15. or
+// 2026-09-15 anywhere), and one run of eight or six digits is what a phone keypad types.
+export function parseDateText(text: string, locale: Locale, pattern?: string): Date | undefined {
+  const input = text.normalize('NFKC').trim();
+  if (!input) return undefined;
+  const reference = new Date();
+  const read = (value: string, candidate: string) => {
+    const date = parse(value, candidate, reference, { locale });
+    return isValid(date) ? date : undefined;
+  };
+
+  // A weekday name is left out: date-fns would move the date to that weekday instead of refusing
+  // a mismatch.
+  for (const candidate of [pattern, 'P', 'PP', 'PPP']) {
+    const date = candidate && read(input, candidate);
+    // Under y a two-digit year is the year 26; the numeric pass below reads it as 2026.
+    if (date && getYear(date) >= 1000) return date;
   }
 
-  if (groups.length !== 3) return undefined;
-  const sequence: Part[] = groups[0].length >= 3 ? ['year', 'month', 'day'] : order;
-  const parts = {} as Record<Part, string>;
-  sequence.forEach((part, index) => (parts[part] = groups[index]));
-  return fromParts(parts);
+  const order = orderOf(locale);
+  const groups = input.match(/\d+/g) ?? [];
+  if (groups.length === 3) {
+    const sequence: Part[] = groups[0].length >= 3 ? ['y', 'M', 'd'] : order;
+    // yy reads 26 as the nearest 2026 rather than the year 26.
+    const candidate = sequence
+      .map((part, index) => (part === 'y' && groups[index].length <= 2 ? 'yy' : part))
+      .join('-');
+    return read(groups.join('-'), candidate);
+  }
+  const digits = groups.length === 1 ? groups[0] : '';
+  if (digits.length === 8 || digits.length === 6) {
+    const year = digits.length === 8 ? 'yyyy' : 'yy';
+    const compact = order.map((part) => (part === 'y' ? year : part + part)).join('');
+    // Eight digits are tried year first, so 20260915 reads the same in every locale while
+    // 09152026 still reads as en-US.
+    return (digits.length === 8 ? read(digits, 'yyyyMMdd') : undefined) ?? read(digits, compact);
+  }
+  return undefined;
 }
 
-// What an empty date input shows: the locale's numeric order with letters for the digits,
-// YYYY. MM. DD. in ko and MM/DD/YYYY in en-US.
-export function dateInputHint(locale: string): string {
-  return dateFormat(locale, { year: 'numeric', month: '2-digit', day: '2-digit' })
-    .formatToParts(dateAt(2026, 8, 15))
-    .map((part) =>
-      part.type === 'year'
-        ? 'YYYY'
-        : part.type === 'month'
-          ? 'MM'
-          : part.type === 'day'
-            ? 'DD'
-            : part.value,
-    )
-    .join('');
-}
+// What an empty date input shows: the locale's numeric date with letters for the digits,
+// YYYY.MM.DD in ko and MM/DD/YYYY in en-US.
+export const dateInputHint = (locale: Locale) =>
+  shortDatePattern(locale).replace(
+    /'([^']*)'|y+|M+|d+/g,
+    (token, literal?: string) =>
+      literal ?? (token[0] === 'y' ? 'YYYY' : token[0] === 'M' ? 'MM' : 'DD'),
+  );

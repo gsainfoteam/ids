@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
+import { isAfter, startOfDay } from 'date-fns';
 
 import {
   dayBounds,
@@ -10,6 +11,7 @@ import {
   withinLimits,
   type DateTimeLimits,
 } from './date-time';
+import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
 import {
   TemporalClear,
@@ -26,54 +28,50 @@ import {
   type TriggerProps as SharedTriggerProps,
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
-import { temporalFormatter } from '../../../internal/temporal-field/format';
+import {
+  formatter,
+  timePattern,
+  type TemporalFormat,
+} from '../../../internal/temporal-field/format';
 import { invariant } from '../../../utils';
 import { Calendar, type CalendarOptions } from '../../data/calendar';
-import { dayOnly } from '../../data/calendar/date';
 import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
-import { validateTime, type TimeFormat, type TimePrecision } from '../../data/time-picker/time';
+import {
+  resolveTimeFormat,
+  validateTime,
+  type TimeFormat,
+  type TimePrecision,
+} from '../../data/time-picker/time';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
+import type { Locale } from 'date-fns';
 
 export type DateTimeFieldProps = Omit<TemporalFieldProps<Date | null>, 'disabled'> &
-  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'disabled' | 'dir' | 'locale'> & {
-    locale?: string;
-    disabled?: boolean | ((date: Date) => boolean);
+  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'dir' | 'locale'> & {
+    locale?: DateLocale;
     precision?: TimePrecision;
-    format?: string;
+    // A date-fns pattern or a function for the text, or 12h / 24h for the clock of both text and picker.
+    format?: TemporalFormat | TimeFormat;
     hourCycle?: TimeFormat;
     step?: number;
     pickerVariant?: TimePickerVariant;
   };
 
-type PanelProps = Pick<
-  DateTimeFieldProps,
-  | 'monthsToShow'
-  | 'locale'
-  | 'weekStartsOn'
-  | 'captionLayout'
-  | 'month'
-  | 'defaultMonth'
-  | 'onMonthChange'
-  | 'showOutsideDays'
-  | 'fixedWeeks'
-  | 'showWeekNumber'
-  | 'numerals'
-  | 'modifiers'
-  | 'modifiersClassNames'
-  | 'components'
-  | 'formatters'
-  | 'labels'
-  | 'footer'
-  | 'pickerVariant'
-> & {
+type CalendarPassThrough = Omit<
+  CalendarOptions,
+  'autoFocus' | 'size' | 'readOnly' | 'dir' | 'min' | 'max' | 'disabled' | 'today' | 'locale'
+>;
+
+type PanelProps = CalendarPassThrough & {
   value: Date | null;
   change: TemporalChange<Date | null>;
   size: IdsSize;
   today: Date;
   limits: DateTimeLimits;
   cycle: TimeFormat | undefined;
+  locale: Locale;
+  pickerVariant?: TimePickerVariant;
 };
 
 const sameInstant = (a: Date | null, b: Date | null) =>
@@ -87,17 +85,19 @@ function Panel({
   today,
   limits,
   cycle,
+  locale,
   pickerVariant,
   ...calendar
 }: PanelProps) {
   const styles = temporalFieldStyle({ size });
-  const base = value ?? dayOnly(today);
+  const base = value ?? startOfDay(today);
   const unavailable = dayUnavailable(base, limits);
   const bounds = dayBounds(base, limits.min, limits.max);
   return (
     <div className={styles.panel()}>
       <Calendar
         {...calendar}
+        locale={locale}
         value={value}
         onValueChange={(day) => {
           const next = day && onDay(day, base, limits);
@@ -122,7 +122,7 @@ function Panel({
           step={limits.step}
           min={bounds?.min}
           max={bounds?.max}
-          locale={calendar.locale}
+          locale={locale}
           variant={pickerVariant}
           size={size}
           disabled={unavailable}
@@ -145,7 +145,7 @@ export function DateTimeField({
   min,
   max,
   disabled,
-  locale = messages.locale,
+  locale,
   pickerVariant,
   monthsToShow = 1,
   weekStartsOn,
@@ -170,11 +170,18 @@ export function DateTimeField({
   validateTime(props.defaultValue);
   validateTime(min);
   validateTime(max);
-  invariant(!min || !max || min <= max, 'DateTimeField: min must be <= max.');
+  invariant(!min || !max || !isAfter(min, max), 'DateTimeField: min must be <= max.');
   const [mountedToday] = useState(() => new Date());
   const anchor = today ?? mountedToday;
-  const cycle = hourCycle ?? (format === '12h' || format === '24h' ? format : undefined);
-  const display = temporalFormatter(format, locale, precision, cycle, true);
+  const dateLocale = resolveLocale(locale);
+  const clock = format === '12h' || format === '24h';
+  const cycle = hourCycle ?? (clock ? format : undefined);
+  const display = formatter(
+    format === undefined || clock
+      ? `P ${timePattern(dateLocale, precision, resolveTimeFormat(cycle, dateLocale))}`
+      : format,
+    dateLocale,
+  );
   const limits: DateTimeLimits = { min, max, disabled, precision, step };
   const cell = (useFieldSize(props.size) ?? 'standard') === 'tiny' ? 32 : 36;
   return (
@@ -201,9 +208,9 @@ export function DateTimeField({
             today={anchor}
             limits={limits}
             cycle={cycle}
+            locale={dateLocale}
             pickerVariant={pickerVariant}
             monthsToShow={monthsToShow}
-            locale={locale}
             weekStartsOn={weekStartsOn}
             captionLayout={captionLayout}
             month={month}

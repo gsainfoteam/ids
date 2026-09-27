@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { de } from 'date-fns/locale/de';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect, fn, waitFor } from 'storybook/test';
 import { z } from 'zod';
@@ -27,6 +28,7 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     captionLayout: { control: 'radio', options: ['label', 'dropdown'] },
+    locale: { control: 'radio', options: ['ko-KR', 'en-US'] },
     mobileVariant: { control: 'radio', options: ['popover', 'drawer'] },
     invalid: { control: 'boolean' },
     required: { control: 'boolean' },
@@ -133,13 +135,27 @@ export const Gallery: Story = {
             aria-label="한국어 형식"
           />
         </Showcase.Row>
-        <Showcase.Row label="dateStyle · en-US">
+        <Showcase.Row label="en-US · de">
           <DateField
             locale="en-US"
-            format={{ dateStyle: 'medium' }}
             defaultValue={new Date(2026, 8, 15)}
             className="w-72"
             aria-label="English"
+          />
+          <DateField
+            locale={de}
+            format="PPP"
+            defaultValue={new Date(2026, 8, 15)}
+            className="w-72"
+            aria-label="Deutsch"
+          />
+        </Showcase.Row>
+        <Showcase.Row label="function">
+          <DateField
+            format={(date) => new Intl.DateTimeFormat('ko-KR', { dateStyle: 'full' }).format(date)}
+            defaultValue={new Date(2026, 8, 15)}
+            className="w-72"
+            aria-label="Intl"
           />
         </Showcase.Row>
       </Showcase.Section>
@@ -382,7 +398,7 @@ export const TypedEntry: Story = {
         <DateField.Clear />
         <DateField.Trigger />
       </DateField>
-      <Field.Hint>2000-01-31, 2000. 1. 31., 20000131 모두 됩니다.</Field.Hint>
+      <Field.Hint>2000.01.31, 2000-01-31, 2000년 1월 31일, 20000131 모두 됩니다.</Field.Hint>
     </Field>
   ),
   parameters: {
@@ -398,14 +414,14 @@ export const TypedEntry: Story = {
     await userEvent.click(input);
     await userEvent.keyboard('20000131{Enter}');
     await expect(args.onValueChange).toHaveBeenLastCalledWith(new Date(2000, 0, 31));
-    await expect(input).toHaveValue('2000. 01. 31.');
+    await expect(input).toHaveValue('2000.01.31');
     await userEvent.clear(input);
     await userEvent.type(input, '2030-01-01');
     await userEvent.tab();
     await expect(input).toHaveAttribute('aria-invalid', 'true');
     await userEvent.click(input);
     await userEvent.keyboard('{Escape}');
-    await expect(input).toHaveValue('2000. 01. 31.');
+    await expect(input).toHaveValue('2000.01.31');
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(day('2000-01-31')).toHaveFocus());
   },
