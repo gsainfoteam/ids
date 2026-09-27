@@ -2,7 +2,11 @@ import { useEffect, type Ref } from 'react';
 
 import { useController, useFormContext, type RegisterOptions } from 'react-hook-form';
 
-import { Field as BaseField, FieldRoot, type FieldProps as BaseProps } from './components/field';
+import {
+  Field as BaseField,
+  FieldRoot,
+  type FieldProps as BaseProps,
+} from './components/form/field';
 
 type ControlledOptions = Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>;
 export type FieldProps = BaseProps &

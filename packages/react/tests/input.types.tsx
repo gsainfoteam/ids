@@ -1,4 +1,4 @@
-import { Input, type InputProps } from '../src/components/input';
+import { Input, type InputProps } from '../src/components/form/input';
 export const native = <Input type="email" onChange={(event) => event.target.value} />;
 export const numeric = <Input type="number" onChange={(value) => value?.toFixed(2)} />;
 export const phone = <Input type="tel" onChange={(value) => value.trim()} />;

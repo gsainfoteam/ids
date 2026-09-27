@@ -42,6 +42,32 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 
 **flutter** — Dart package. Platform directories (android/, ios/, etc.) intentionally absent — this is a package, not an app. Published to pub.dev via OIDC — no token.
 
+## React source layout
+
+Components are grouped by the `유형` column of the Notion Components database. The folder is the
+category, and the Storybook title is `<Category>/<Component>`.
+
+```
+packages/react/src/
+  components/
+    action/      Button, ButtonGroup, IconButton, IconToggle, Toggle, ToggleGroup, FloatingButton
+    form/        Field and every *Field, Checkbox, Radio, Switch, Slider, Select, Rating, ...
+    data/        Accordion, Avatar, Badge, Calendar, Card, Chip, Item, TimePicker, ...
+    feedback/    Alert, Progress, Spinner
+    layout/      AspectRatio, Divider, Spacer
+    navigation/  (Breadcrumb, Pagination, Stepper, Tabs)
+    overlay/     (Dialog, Drawer, Menu, Popover, Tooltip)
+    typography/  Kbd, Label
+    utility/     Slot, Group, ThemeProvider
+  internal/      shared parts that are not exported: control-surface, icon-square, arc,
+                 field-popup, temporal-field
+  foundations/   token stories with no component (Typography, Radius, InteractiveState)
+  hooks/ utils/ tokens/
+```
+
+A new component goes into the category Notion gives it. Code shared by several components but not
+public goes into `internal/`, never loose at the root of `components/`.
+
 ## Component styling
 
 **Multi-part components use one `tv({ slots })`, not several `tv()` calls.** A component with a
