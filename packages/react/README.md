@@ -83,8 +83,9 @@ function App() {
 
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `color` | `IdsColor` | `'blue'` | 색상 테마 |
-| `mode` | `IdsMode` | `'light'` | 라이트/다크 모드 |
+| `color` / `defaultColor` | `IdsColor` | 바깥 Provider, 최상위는 `'blue'` | 색상 테마 (제어 / 비제어) |
+| `mode` / `defaultMode` | `'light' \| 'dark' \| 'system'` | 바깥 Provider, 최상위는 `'light'` | 모드 (제어 / 비제어) |
+| `onColorChange` / `onModeChange` | `(value) => void` | | 값을 바꾸려 할 때 |
 
 ```tsx
 import { useTheme } from '@gsainfoteam/ids-react';
@@ -94,6 +95,8 @@ function ThemeToggle() {
   return <button onClick={toggleMode}>모드 전환</button>;
 }
 ```
+
+중첩, 시스템 모드, `asChild` 는 `src/components/utility/theme-provider/README.md` 를 참고한다.
 
 ## 인터랙션 state
 
