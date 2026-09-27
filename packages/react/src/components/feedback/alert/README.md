@@ -82,6 +82,7 @@ import { Alert } from '@gsainfoteam/ids-react';
 - 닫힐 때 짧게 흐려지며 사라집니다. `prefers-reduced-motion` 이면 바로 사라집니다.
 - `onOpenChange(false)` 는 닫기를 누른 순간 불리고, 요소는 전환이 끝난 뒤에 빠집니다.
 - `Alert.Close` 가 없으면 Escape로 닫히지 않습니다.
+- 부모가 `open` 을 `false` 로 바꾸거나 Alert를 아예 빼도, 안에 있던 포커스는 다음 요소로 옮겨 갑니다. 안의 동작 버튼으로 닫는 경우에도 포커스를 잃지 않습니다.
 
 ## 역할
 

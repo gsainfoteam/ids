@@ -246,3 +246,36 @@ test('className and style read the state; parts accept asChild', () => {
 test('defaultOpen false renders nothing', () => {
   assert.equal(renderToString(h(Alert, { defaultOpen: false }, h(Alert.Title, null, 'x'))), '');
 });
+
+test('focus is handed on when the parent closes or drops the alert from an action inside it', async () => {
+  let setOpen, setShown;
+  function App() {
+    const [open, set] = useState(true);
+    const [shown, show] = useState(true);
+    setOpen = set;
+    setShown = show;
+    return h(
+      'div',
+      null,
+      shown &&
+        h(
+          Alert,
+          { open, onOpenChange: set },
+          h(Alert.Title, null, 'x'),
+          h(Alert.Actions, null, h('button', { id: 'action' }, 'Extend')),
+        ),
+      h('button', { id: 'after' }, 'After'),
+    );
+  }
+  await render(h(App));
+  host.querySelector('#action').focus();
+  await act(async () => setOpen(false));
+  assert.equal(document.activeElement.id, 'after', 'a controlled close moves focus on');
+
+  await frame();
+  await act(async () => setOpen(true));
+  host.querySelector('#action').focus();
+  await act(async () => setShown(false));
+  assert.equal(alert(), null);
+  assert.equal(document.activeElement.id, 'after', 'an unmount moves focus on');
+});

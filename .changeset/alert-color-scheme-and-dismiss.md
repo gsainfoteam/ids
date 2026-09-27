@@ -8,8 +8,8 @@ Titles and icons use the `-strong` tones so every scheme keeps 4.5:1, and each s
 default icon (`Alert.Icon hidden` removes it). With `Alert.Close` the alert dismisses itself, or
 is controlled through `open` / `defaultOpen` / `onOpenChange`; it fades out unless motion is
 reduced, Escape closes it except during IME composition, and focus inside moves on to the next
-element instead of the page top. `role` can be overridden, every part takes `asChild`, and
-`className` / `style` may read `Alert.State`.
+element instead of the page top, also when the parent closes or unmounts the alert. `role` can
+be overridden, every part takes `asChild`, and `className` / `style` may read `Alert.State`.
 
 Breaking: `variant="info" | "success" | "warning" | "danger" | "neutral"` is now `colorScheme`,
 and `variant` means intensity (default `soft`). `Alert.Close` no longer takes `onClose`; use

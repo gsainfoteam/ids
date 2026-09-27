@@ -82,10 +82,17 @@ export function Alert({
     (node) => isPart(node, Alert.Title) || isPart(node, Alert.Description),
   );
 
-  const alert = useAlert({ open, defaultOpen, onOpenChange, dismissible });
+  const {
+    setNode,
+    open: isOpen,
+    mounted,
+    ending,
+    close: requestClose,
+    onKeyDown: onAlertKeyDown,
+  } = useAlert({ open, defaultOpen, onOpenChange, dismissible });
   const mergedRef = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(alert.rootRef, ref)(node),
-    [alert.rootRef, ref],
+    (node: HTMLDivElement | null) => mergeRefs(setNode, ref)(node),
+    [setNode, ref],
   );
 
   useEffect(() => {
@@ -93,21 +100,21 @@ export function Alert({
       console.warn('[IDS] Alert: give it an Alert.Title or an Alert.Description.');
   }, [hasText]);
 
-  if (!alert.mounted) return null;
+  if (!mounted) return null;
 
   const showIcon = icon === undefined ? colorScheme !== 'neutral' : icon.props.hidden !== true;
   const state: Alert.State = {
     colorScheme,
     variant,
-    open: alert.open,
+    open: isOpen,
     dismissible,
-    ending: alert.ending,
+    ending,
   };
   const styles = Alert.Style({ colorScheme, variant, icon: showIcon, close: dismissible });
   const assertive = ASSERTIVE.has(colorScheme);
 
   return (
-    <AlertContext value={{ state, styles, close: alert.close }}>
+    <AlertContext value={{ state, styles, close: requestClose }}>
       <div
         role={role ?? (assertive ? 'alert' : 'status')}
         aria-live={
@@ -115,12 +122,12 @@ export function Alert({
         }
         {...rest}
         ref={mergedRef}
-        onKeyDown={mergeEventHandlers(onKeyDown, alert.onKeyDown)}
+        onKeyDown={mergeEventHandlers(onKeyDown, onAlertKeyDown)}
         data-alert=""
         data-color-scheme={colorScheme}
         data-variant={variant}
         data-dismissible={dismissible ? '' : undefined}
-        data-ending-style={alert.ending ? '' : undefined}
+        data-ending-style={ending ? '' : undefined}
         className={styles.root({ className: resolve(className, state) })}
         style={resolve(style, state)}
       >

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useLayoutEffect, useState, type KeyboardEvent } from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 
@@ -12,8 +12,6 @@ const TABBABLE = [
   '[contenteditable="true"]',
 ].join(',');
 
-// Focus inside a closing alert would fall back to the body, and the next Tab would start from the
-// top of the page. It moves to what comes after the alert instead, or before it at the end.
 function neighbour(root: HTMLElement) {
   const candidates = [...root.ownerDocument.querySelectorAll<HTMLElement>(TABBABLE)].filter(
     (element) =>
@@ -30,6 +28,12 @@ function neighbour(root: HTMLElement) {
   );
 }
 
+// Focus inside a closing alert would fall back to the body, and the next Tab would start from the
+// top of the page. It moves to what comes after the alert instead, or before it at the end.
+function releaseFocus(root: HTMLElement) {
+  if (root.contains(root.ownerDocument.activeElement)) neighbour(root)?.focus();
+}
+
 function animationsOf(element: HTMLElement) {
   return typeof element.getAnimations === 'function' ? element.getAnimations() : [];
 }
@@ -42,7 +46,7 @@ export type UseAlertOptions = {
 };
 
 export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAlertOptions) {
-  const rootRef = useRef<HTMLDivElement>(null);
+  const [node, setNode] = useState<HTMLDivElement | null>(null);
   const [isOpen, setOpen] = useControllableState({
     value: open,
     defaultValue: defaultOpen,
@@ -59,12 +63,12 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
   }
 
   useEffect(() => {
-    const root = rootRef.current;
-    if (!ending || !root) return;
+    if (!ending || !node) return;
+    releaseFocus(node);
     let cancelled = false;
     // The frame lets the ending style apply, so the transitions it starts can be awaited.
     const frame = requestAnimationFrame(() => {
-      Promise.allSettled(animationsOf(root).map((animation) => animation.finished)).then(() => {
+      Promise.allSettled(animationsOf(node).map((animation) => animation.finished)).then(() => {
         if (!cancelled) setEnding(false);
       });
     });
@@ -72,11 +76,17 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
       cancelled = true;
       cancelAnimationFrame(frame);
     };
-  }, [ending]);
+  }, [ending, node]);
+
+  // A parent may drop the alert outright, say from an action inside it. Layout cleanup runs while
+  // the element is still in the document, so focus can still be handed on.
+  useLayoutEffect(() => {
+    if (!node) return;
+    return () => releaseFocus(node);
+  }, [node]);
 
   const close = () => {
-    const root = rootRef.current;
-    if (root?.contains(root.ownerDocument.activeElement)) neighbour(root)?.focus();
+    if (node) releaseFocus(node);
     setOpen(false);
   };
 
@@ -89,7 +99,7 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
   };
 
   return {
-    rootRef,
+    setNode,
     open: isOpen,
     mounted: isOpen || ending,
     ending,
