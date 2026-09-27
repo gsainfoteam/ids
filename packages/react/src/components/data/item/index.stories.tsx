@@ -5,238 +5,360 @@ import {
   Cog6ToothIcon,
   DocumentIcon,
   EllipsisVerticalIcon,
+  HomeIcon,
+  InboxIcon,
   MoonIcon,
-  UserIcon,
 } from '@heroicons/react/24/outline';
-import { expect, userEvent } from 'storybook/test';
+import { expect, fn } from 'storybook/test';
+
+import { Showcase } from '~story-kit';
 
 import { IconButton } from '../../action/icon-button';
+import { Switch } from '../../form/switch';
 import { Kbd } from '../../typography/kbd';
 import { Avatar } from '../avatar';
 import { AvatarGroup } from '../avatar-group';
-import { Chip } from '../chip';
+import { Badge } from '../badge';
 
 import { Item } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const meta: Meta<typeof Item> = {
+const variants = ['ghost', 'outline', 'soft'] as const;
+const sizes = ['standard', 'tiny'] as const;
+
+const meta = {
   title: 'Data/Item',
   component: Item,
   tags: ['autodocs'],
-  args: { size: 'standard' },
   argTypes: {
-    size: { control: 'radio', options: ['standard', 'tiny'] },
+    variant: { control: 'radio', options: variants },
+    size: { control: 'radio', options: sizes },
     interactive: { control: 'boolean' },
     selected: { control: 'boolean' },
+    disabled: { control: 'boolean' },
   },
-  decorators: [
-    (Story) => (
-      <div className="w-96">
-        <Story />
-      </div>
-    ),
-  ],
-};
-
-export default meta;
-type Story = StoryObj<typeof Item>;
-
-export const Playground: Story = {
+  args: { variant: 'outline', size: 'standard' },
   render: (args) => (
-    <Item {...args}>
+    <Item {...args} className="w-96">
       <Item.Media>
-        <Avatar name="김철수" size="tiny" />
+        <Avatar name="김철수" />
       </Item.Media>
       <Item.Content>
         <Item.Title>김철수</Item.Title>
         <Item.Description>kim@example.com</Item.Description>
       </Item.Content>
       <Item.Actions>
-        <IconButton aria-label="더보기" size="tiny" icon={<EllipsisVerticalIcon />} />
+        <IconButton
+          aria-label="더보기"
+          variant="ghost"
+          size="tiny"
+          icon={<EllipsisVerticalIcon />}
+        />
       </Item.Actions>
     </Item>
   ),
-  play: async ({ canvas }) => {
-    await expect(canvas.getByText('김철수')).toBeInTheDocument();
-    await expect(canvas.queryByRole('button', { name: /kim@example/ })).not.toBeInTheDocument();
-  },
-};
+} satisfies Meta<typeof Item>;
 
-export const IconAnchor: Story = {
-  render: () => (
-    <Item>
-      <Item.Media>
-        <BellIcon />
-      </Item.Media>
-      <Item.Content>
-        <Item.Title>새 메시지가 도착했습니다</Item.Title>
-        <Item.Description>2분 전</Item.Description>
-      </Item.Content>
-    </Item>
-  ),
-};
+export default meta;
+type Story = StoryObj<typeof meta>;
 
-export const AvatarGroupAnchor: Story = {
+export const Playground: Story = {};
+
+export const Gallery: Story = {
   render: () => (
-    <Item>
-      <Item.Media>
-        <AvatarGroup size="tiny" max={3} aria-label="채팅 멤버">
-          {['Alice Kim', 'Bob Lee', 'Carol Park', '류현승'].map((name) => (
-            <Avatar key={name} name={name} />
+    <Showcase>
+      <Showcase.Section title="Variant × Size">
+        <Showcase.Matrix
+          rows={sizes}
+          columns={variants}
+          render={(size, variant) => (
+            <Item variant={variant} size={size} className="w-64">
+              <Item.Media variant="soft">
+                <BellIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>{variant}</Item.Title>
+                <Item.Description>size {size}</Item.Description>
+              </Item.Content>
+            </Item>
+          )}
+        />
+      </Showcase.Section>
+
+      <Showcase.Section title="Media">
+        <Showcase.Row label="icon">
+          {variants.map((variant) => (
+            <Item key={variant} variant="outline" className="w-56">
+              <Item.Media variant={variant}>
+                <InboxIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>media {variant}</Item.Title>
+              </Item.Content>
+            </Item>
           ))}
-        </AvatarGroup>
-      </Item.Media>
-      <Item.Content>
-        <Item.Title>디자인 시스템</Item.Title>
-        <Item.Description>토큰 정리 끝났습니다</Item.Description>
-      </Item.Content>
-      <Item.Actions>
-        <Chip colorScheme="danger" variant="solid" size="tiny">
-          3
-        </Chip>
-      </Item.Actions>
-    </Item>
+        </Showcase.Row>
+        <Showcase.Row label="avatar group">
+          <Item variant="outline" className="w-80">
+            <Item.Media>
+              <AvatarGroup size="tiny" max={3} aria-label="채팅 멤버">
+                {['Alice Kim', 'Bob Lee', 'Carol Park', '류현승'].map((name) => (
+                  <Avatar key={name} name={name} />
+                ))}
+              </AvatarGroup>
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>디자인 시스템</Item.Title>
+              <Item.Description>토큰 정리 끝났습니다</Item.Description>
+            </Item.Content>
+            <Item.Actions>
+              <Badge content={3} />
+            </Item.Actions>
+          </Item>
+        </Showcase.Row>
+        <Showcase.Row label="two lines">
+          <Item variant="outline" className="w-80">
+            <Item.Media variant="soft">
+              <DocumentIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>회의록.md</Item.Title>
+              <Item.Description>
+                설명이 두 줄을 넘으면 말줄임표로 줄고, 미디어는 첫 줄에 맞춰 위에 붙습니다. 이
+                문장은 일부러 길게 썼습니다.
+              </Item.Description>
+            </Item.Content>
+            <Item.Content className="text-caption-c1-regular items-end text-(--ids-color-on-muted)">
+              2분 전
+            </Item.Content>
+          </Item>
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section title="States">
+        <Showcase.Row label="interactive">
+          <Item onClick={() => {}} className="w-56">
+            <Item.Media>
+              <Cog6ToothIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>설정</Item.Title>
+            </Item.Content>
+            <Item.Actions>
+              <Kbd size="tiny">⌘,</Kbd>
+            </Item.Actions>
+          </Item>
+        </Showcase.Row>
+        <Showcase.Row label="selected">
+          <Item selected onClick={() => {}} className="w-56">
+            <Item.Media>
+              <HomeIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>홈</Item.Title>
+            </Item.Content>
+          </Item>
+          <Item selected variant="soft" className="w-56">
+            <Item.Content>
+              <Item.Title>soft · selected</Item.Title>
+            </Item.Content>
+          </Item>
+        </Showcase.Row>
+        <Showcase.Row label="disabled">
+          <Item disabled onClick={() => {}} className="w-56">
+            <Item.Media>
+              <MoonIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>다크 모드</Item.Title>
+            </Item.Content>
+          </Item>
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section title="Group">
+        <Showcase.Row>
+          <Item.Group className="w-80" aria-label="설정">
+            <Item>
+              <Item.Media>
+                <BellIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>알림</Item.Title>
+                <Item.Description>새 메시지 알림 받기</Item.Description>
+              </Item.Content>
+              <Item.Actions>
+                <Switch defaultChecked aria-label="알림" />
+              </Item.Actions>
+            </Item>
+            <Item.Separator />
+            <Item>
+              <Item.Media>
+                <MoonIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>다크 모드</Item.Title>
+              </Item.Content>
+              <Item.Actions>
+                <Switch aria-label="다크 모드" />
+              </Item.Actions>
+            </Item>
+          </Item.Group>
+        </Showcase.Row>
+      </Showcase.Section>
+    </Showcase>
   ),
 };
 
-export const MenuList: Story = {
-  render: () => (
-    <ul className="flex flex-col">
-      <li>
-        <Item interactive>
-          <Item.Media>
-            <UserIcon />
-          </Item.Media>
-          <Item.Content>프로필</Item.Content>
-        </Item>
-      </li>
-      <li>
-        <Item interactive>
-          <Item.Media>
-            <Cog6ToothIcon />
-          </Item.Media>
-          <Item.Content>설정</Item.Content>
-          <Item.Actions>
-            <Kbd size="tiny">⌘,</Kbd>
-          </Item.Actions>
-        </Item>
-      </li>
-      <li>
-        <Item interactive>
-          <Item.Media>
-            <MoonIcon />
-          </Item.Media>
-          <Item.Content>다크 모드</Item.Content>
-        </Item>
-      </li>
-    </ul>
-  ),
-};
+function MessageRow({ onOpen }: { onOpen: Item.Props['onClick'] }) {
+  const [archived, setArchived] = useState(0);
+  return (
+    <div className="flex w-96 flex-col gap-3">
+      <Item variant="outline" onClick={onOpen}>
+        <Item.Media>
+          <Avatar name="Alice Kim" />
+        </Item.Media>
+        <Item.Content>
+          <Item.Title>Alice Kim</Item.Title>
+          <Item.Description>오늘 회의 자료 보냈어요</Item.Description>
+        </Item.Content>
+        <Item.Actions>
+          <IconButton
+            aria-label="보관"
+            variant="ghost"
+            size="tiny"
+            icon={<InboxIcon />}
+            onClick={() => setArchived((count) => count + 1)}
+          />
+        </Item.Actions>
+      </Item>
+      <output aria-label="보관 수">{archived}</output>
+    </div>
+  );
+}
 
 export const Interactive: Story = {
-  render: function Interactive() {
-    const [clicks, setClicks] = useState(0);
-
-    return (
-      <div className="flex flex-col gap-2">
-        <Item onClick={() => setClicks((prev) => prev + 1)}>
-          <Item.Media>
-            <BellIcon />
-          </Item.Media>
-          <Item.Content>
-            <Item.Title>클릭 가능한 항목</Item.Title>
-          </Item.Content>
-        </Item>
-        <output data-testid="clicks">{clicks}</output>
-      </div>
-    );
+  args: { onClick: fn() },
+  render: (args) => <MessageRow onOpen={args.onClick} />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`onClick` 을 주면 행 전체가 버튼이 되고, 이름은 Item.Title, 설명은 Item.Description입니다. Item.Actions 안의 버튼을 눌러도 행은 열리지 않습니다.',
+      },
+    },
   },
-  play: async ({ canvas }) => {
-    const item = canvas.getByRole('button', { name: /클릭 가능한 항목/ });
-    await expect(item).toHaveAttribute('tabindex', '0');
-
-    await userEvent.click(item);
-    await expect(canvas.getByTestId('clicks')).toHaveTextContent('1');
-
-    item.focus();
+  play: async ({ canvas, userEvent, args }) => {
+    const row = canvas.getByRole('button', { name: 'Alice Kim' });
+    await expect(row).toHaveAccessibleDescription('오늘 회의 자료 보냈어요');
+    await userEvent.click(canvas.getByRole('button', { name: '보관' }));
+    await expect(canvas.getByLabelText('보관 수')).toHaveTextContent('1');
+    await expect(args.onClick).not.toHaveBeenCalled();
+    await userEvent.click(row);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    row.focus();
     await userEvent.keyboard('{Enter}');
-    await expect(canvas.getByTestId('clicks')).toHaveTextContent('2');
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
   },
 };
 
+function FileList() {
+  const files = ['보고서.pdf', '예산안.xlsx', '회의록.md'];
+  const [selected, setSelected] = useState(files[0]);
+  return (
+    <Item.Group className="w-80" aria-label="파일">
+      {files.map((file) => (
+        <Item key={file} selected={selected === file} onClick={() => setSelected(file)}>
+          <Item.Media>
+            <DocumentIcon />
+          </Item.Media>
+          <Item.Content>
+            <Item.Title>{file}</Item.Title>
+          </Item.Content>
+        </Item>
+      ))}
+    </Item.Group>
+  );
+}
+
 export const Selectable: Story = {
-  render: function Selectable() {
-    const files = ['보고서.pdf', '예산안.xlsx', '회의록.md'];
-    const [selected, setSelected] = useState<string | null>(files[0]);
-
-    return (
-      <ul className="flex flex-col">
-        {files.map((file) => (
-          <li key={file}>
-            <Item interactive selected={selected === file} onClick={() => setSelected(file)}>
-              <Item.Media>
-                <DocumentIcon />
-              </Item.Media>
-              <Item.Content>{file}</Item.Content>
-            </Item>
-          </li>
-        ))}
-      </ul>
-    );
+  render: () => <FileList />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`selected` 는 옅은 배경과 `data-selected` 를 붙이고, 버튼인 행에서는 `aria-pressed` 로 알립니다. Item.Group은 `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다.',
+      },
+    },
   },
-  play: async ({ canvas }) => {
-    await expect(canvas.getByRole('button', { name: /보고서/ })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-
-    await userEvent.click(canvas.getByRole('button', { name: /예산안/ }));
-    await expect(canvas.getByRole('button', { name: /예산안/ })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    await expect(canvas.getByRole('button', { name: /보고서/ })).toHaveAttribute(
+  play: async ({ canvas, userEvent }) => {
+    const list = canvas.getByRole('list', { name: '파일' });
+    await expect(canvas.getAllByRole('listitem')).toHaveLength(3);
+    await expect(list.tagName).toBe('UL');
+    const budget = canvas.getByRole('button', { name: '예산안.xlsx' });
+    await userEvent.click(budget);
+    await expect(budget).toHaveAttribute('aria-pressed', 'true');
+    await expect(canvas.getByRole('button', { name: '보고서.pdf' })).toHaveAttribute(
       'aria-pressed',
       'false',
     );
   },
 };
 
-export const AsChildLink: Story = {
+export const Navigation: Story = {
   render: () => (
-    <Item interactive asChild>
-      <a href="#item">
-        <Item.Media>
-          <DocumentIcon />
-        </Item.Media>
-        <Item.Content>
-          <Item.Title>링크가 된 항목</Item.Title>
-          <Item.Description>행 전체가 앵커다.</Item.Description>
-        </Item.Content>
-      </a>
-    </Item>
-  ),
-  play: async ({ canvas }) => {
-    const link = canvas.getByRole('link', { name: /링크가 된 항목/ });
-    await expect(link).not.toHaveAttribute('role', 'button');
-    await expect(link).not.toHaveAttribute('tabindex');
-  },
-};
-
-export const Sizes: Story = {
-  render: () => (
-    <div className="flex flex-col gap-2">
-      {(['standard', 'tiny'] as const).map((size) => (
-        <Item key={size} size={size}>
+    <Item.Group size="tiny" className="w-56" aria-label="메뉴">
+      <Item asChild selected aria-current="page">
+        <a href="#home">
           <Item.Media>
-            <BellIcon />
+            <HomeIcon />
           </Item.Media>
           <Item.Content>
-            <Item.Title>{size}</Item.Title>
+            <Item.Title>홈</Item.Title>
           </Item.Content>
-        </Item>
-      ))}
-    </div>
+        </a>
+      </Item>
+      <Item asChild>
+        <a href="#inbox">
+          <Item.Media>
+            <InboxIcon />
+          </Item.Media>
+          <Item.Content>
+            <Item.Title>받은 편지함</Item.Title>
+          </Item.Content>
+          <Item.Actions>
+            <Badge content={12} size="tiny" variant="soft" colorScheme="primary" />
+          </Item.Actions>
+        </a>
+      </Item>
+      <Item.Separator />
+      <Item asChild>
+        <a href="#settings">
+          <Item.Media>
+            <Cog6ToothIcon />
+          </Item.Media>
+          <Item.Content>
+            <Item.Title>설정</Item.Title>
+          </Item.Content>
+        </a>
+      </Item>
+    </Item.Group>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`asChild` 로 행이 링크가 됩니다. 현재 페이지는 `aria-current="page"` 로 알리고, 이때는 `aria-pressed` 를 붙이지 않습니다. 구분선은 목록 항목으로 세지 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const home = canvas.getByRole('link', { name: '홈' });
+    await expect(home).toHaveAttribute('aria-current', 'page');
+    await expect(home).not.toHaveAttribute('aria-pressed');
+    await expect(home).toHaveAttribute('data-selected');
+    await expect(canvas.getAllByRole('listitem')).toHaveLength(3);
+    await expect(home).toHaveAttribute('data-size', 'tiny');
+  },
 };
