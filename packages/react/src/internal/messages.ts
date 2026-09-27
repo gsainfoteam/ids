@@ -7,4 +7,8 @@ export const messages = {
   checkboxGroup: {
     required: '하나 이상 선택하세요.',
   },
+  slider: {
+    start: '시작',
+    end: '끝',
+  },
 } as const;
