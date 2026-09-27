@@ -97,6 +97,13 @@ test('without children the badge renders in place', () => {
   assert.equal(badge.className.includes('absolute'), false);
 });
 
+test('children left as false by a condition count as no anchor', () => {
+  const doc = new JSDOM(renderToString(h(Badge, { content: 3 }, false))).window.document;
+  const badge = doc.querySelector('[data-badge]');
+  assert.ok(badge.hasAttribute('data-badge-indicator'));
+  assert.equal(badge.className.includes('absolute'), false);
+});
+
 test('className takes the badge state', () => {
   const { root } = render({
     content: 120,

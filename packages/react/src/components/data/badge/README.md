@@ -70,7 +70,7 @@ import { Badge } from '@gsainfoteam/ids-react';
 </span>
 ```
 
-- children이 없으면 모서리에 붙지 않고 글 흐름 안에 그립니다.
+- children이 없으면 모서리에 붙지 않고 글 흐름 안에 그립니다. `{show && <Icon />}` 처럼 `false` 가 남아도 같습니다.
 
 ## 접근성
 

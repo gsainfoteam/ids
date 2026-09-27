@@ -41,7 +41,8 @@ export function Badge({
     label,
     children,
   });
-  const standalone = children == null;
+  // `{count > 0 && <Icon />}` leaves false behind, which is no anchor either.
+  const standalone = children == null || typeof children === 'boolean';
   const styles = Badge.Style({
     variant,
     colorScheme,
