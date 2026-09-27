@@ -19,6 +19,7 @@ import type { IdsSize } from '../../tokens/types';
 
 export { clearInput } from './clear-input';
 export { useInputValue } from './use-input-value';
+export { useMergedRef } from './use-merged-ref';
 export { useTextControl } from './use-text-control';
 
 export type TextControlState = {

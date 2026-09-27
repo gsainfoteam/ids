@@ -1,18 +1,21 @@
 import {
   isValidElement,
   use,
-  useCallback,
   useId,
   useRef,
   type ChangeEvent,
   type ComponentProps,
   type KeyboardEvent,
   type ReactNode,
-  type RefCallback,
 } from 'react';
 
-import { isInvalid, useInputValue, useTextControl } from '../../../internal/text-control';
-import { invariant, mergeProps, mergeRefs } from '../../../utils';
+import {
+  isInvalid,
+  useInputValue,
+  useMergedRef,
+  useTextControl,
+} from '../../../internal/text-control';
+import { invariant, mergeProps } from '../../../utils';
 import { FieldNotifyContext } from '../field/context';
 
 export type TextFieldInputProps = Omit<
@@ -62,11 +65,7 @@ export function useTextField({
   );
   const filled = (native.value != null ? String(native.value) : observed) !== '';
   const control = useTextControl({ inputRef, disabled, readOnly, clearable });
-  const nativeRef = native.ref;
-  const ref: RefCallback<HTMLInputElement> = useCallback(
-    (node: HTMLInputElement | null) => mergeRefs(inputRef, nativeRef)(node),
-    [nativeRef],
-  );
+  const ref = useMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref);
 
   const inputProps = {
     ...native,

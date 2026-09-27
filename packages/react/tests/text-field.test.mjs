@@ -300,3 +300,18 @@ test('className and style accept a function of the field state', async () => {
   assert.ok(shell().classList.contains('has-value'));
   assert.equal(shell().style.opacity, '1');
 });
+
+test('a ref callback is attached once, not again on every keystroke', async () => {
+  let attached = 0;
+  let detached = 0;
+  const ref = (node) => {
+    if (!node) return;
+    attached++;
+    return () => detached++;
+  };
+  await render(h(TextField, { 'aria-label': 'Name', ref }, h(TextField.Input), h(TextField.Clear)));
+  await input('a');
+  await input('ab');
+  assert.equal(attached, 1);
+  assert.equal(detached, 0);
+});
