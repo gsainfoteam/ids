@@ -103,7 +103,7 @@ function ThemeToggle() {
 IDS는 hover / press / focus의 **소유권을 컴포넌트 안에 둔다.**  
 외부 구독·controlled 인터랙션 API는 두지 않고, 아래 두 길로만 바깥에 노출한다.
 
-실행 예시는 Storybook `Patterns/Interactive state`를 참고한다.
+실행 예시는 Storybook `Foundations/InteractiveState`를 참고한다.
 
 ### 1. 노드 로컬 (부모 → 자식)
 

@@ -38,6 +38,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Foundations',
+          ['Color', 'Typography', 'Radius', 'InteractiveState'],
           'Action',
           'Form',
           'Data',
