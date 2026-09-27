@@ -17,7 +17,7 @@ import type { IdsSize, IdsVariant } from '../../../tokens/types';
 export function IconButton(props: IconButton.Props) {
   const group = useGroupContext();
   const {
-    props: { icon, variant = 'ghost', colorScheme, size, className, style, ...rest },
+    props: { icon, variant: ownVariant, colorScheme, size, className, style, ...rest },
     element,
     content,
     render,
@@ -31,6 +31,7 @@ export function IconButton(props: IconButton.Props) {
 
   const glyph = icon ?? content;
   const label = useIconLabel('IconButton', glyph, rest, element?.props as object | undefined);
+  const variant = ownVariant ?? group?.variant ?? 'ghost';
   const resolvedSize = size ?? group?.size ?? 'standard';
 
   return render(

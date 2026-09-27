@@ -2,7 +2,7 @@ import { createContext, useContext, type ComponentProps, type ReactNode } from '
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { invariant } from '../../../utils';
-import { GroupRoot, GroupSeparator } from '../../utility/group';
+import { Group } from '../../utility/group';
 
 import type { StackDirection } from '../../../layout/types';
 import type { IdsSize } from '../../../tokens/types';
@@ -125,7 +125,7 @@ export function ToggleGroup({
 
   return (
     <ToggleGroupContext.Provider value={context}>
-      <GroupRoot
+      <Group
         orientation={orientation}
         size={size}
         className={className}
@@ -133,13 +133,13 @@ export function ToggleGroup({
         {...rest}
       >
         {children}
-      </GroupRoot>
+      </Group>
     </ToggleGroupContext.Provider>
   );
 }
 
 export namespace ToggleGroup {
-  export const Separator = GroupSeparator;
+  export const Separator = Group.Separator;
 
   export type Props = (SingleProps | MultipleProps) &
     Omit<ComponentProps<'div'>, 'children' | 'className' | 'defaultValue' | 'onChange'> & {

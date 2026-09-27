@@ -18,7 +18,7 @@ import type { IdsSize, IdsVariant } from '../../../tokens/types';
 export function IconToggle(props: IconToggle.Props) {
   const layout = useGroupContext();
   const {
-    props: { icon, variant = 'ghost', colorScheme, size, className, style, ...rest },
+    props: { icon, variant: ownVariant, colorScheme, size, className, style, ...rest },
     pressed,
     value,
     element,
@@ -34,6 +34,7 @@ export function IconToggle(props: IconToggle.Props) {
 
   const glyph = icon ?? content;
   const label = useIconLabel('IconToggle', glyph, rest, element?.props as object | undefined);
+  const variant = ownVariant ?? layout?.variant ?? 'ghost';
   const resolvedSize = size ?? layout?.size ?? 'standard';
 
   return render(

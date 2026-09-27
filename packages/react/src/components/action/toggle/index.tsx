@@ -12,11 +12,12 @@ import type { IdsSize, IdsVariant } from '../../../tokens/types';
 export function Toggle(props: Toggle.Props) {
   const layout = useGroupContext();
   const {
-    props: { variant = 'ghost', colorScheme, size, className, style, ...rest },
+    props: { variant: ownVariant, colorScheme, size, className, style, ...rest },
     pressed,
     value,
     render,
   } = useToggle(props, 'Toggle');
+  const variant = ownVariant ?? layout?.variant ?? 'ghost';
   const resolvedSize = size ?? layout?.size ?? 'standard';
 
   return render({

@@ -11,9 +11,10 @@ import type { IdsSize, IdsVariant } from '../../../tokens/types';
 export function Button(props: Button.Props) {
   const group = useGroupContext();
   const {
-    props: { variant = 'solid', colorScheme, size, className, style, ...rest },
+    props: { variant: ownVariant, colorScheme, size, className, style, ...rest },
     render,
   } = useButton(props, 'Button', { checkContent: true });
+  const variant = ownVariant ?? group?.variant ?? 'solid';
   const resolvedSize = size ?? group?.size ?? 'standard';
 
   return render({
