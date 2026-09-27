@@ -4,6 +4,7 @@ import {
   use,
   type ComponentProps,
   type CSSProperties,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 
@@ -14,7 +15,8 @@ import { useClipboardSupport, useColorPicker, useEyeDropperSupport } from './use
 import { flattenParts, resolveState } from '../../../internal/field-popup';
 import { fieldSurface } from '../../../internal/field-surface';
 import { messages } from '../../../internal/messages';
-import { cn, invariant, mergeProps, tv } from '../../../utils';
+import { cn, invariant, mergeEventHandlers, mergeProps, tv } from '../../../utils';
+import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../../form/field/context';
 import { Slider } from '../../form/slider';
 
@@ -309,53 +311,54 @@ function ColorPickerInput({ className, ...props }: ColorPicker.InputProps) {
   );
 }
 
-function ColorPickerEyeDropper({ className, children, ...props }: ColorPicker.ButtonProps) {
+function ColorPickerEyeDropper({
+  className,
+  children,
+  onClick,
+  ...props
+}: ColorPicker.ButtonProps) {
   const c = usePicker('ColorPicker.EyeDropper');
   const supported = useEyeDropperSupport();
   if (!supported) return null;
   return (
-    <button
-      {...mergeProps(props as Record<string, unknown>, {
-        type: 'button' as const,
-        'aria-label': props['aria-label'] ?? messages.colorPicker.eyeDropper,
-        disabled: c.state.disabled || c.state.readOnly,
-        'data-color-picker-eyedropper': '',
-        className: c.styles.tool({ className }),
-        onClick: c.picker.actions.pickFromScreen,
-      })}
-    >
-      {children ?? <EyeDropperIcon aria-hidden="true" />}
-    </button>
+    <IconButton
+      {...props}
+      aria-label={props['aria-label'] ?? messages.colorPicker.eyeDropper}
+      disabled={c.state.disabled || c.state.readOnly}
+      data-color-picker-eyedropper=""
+      variant="outline"
+      size={c.size}
+      icon={children ?? <EyeDropperIcon aria-hidden="true" />}
+      className={c.styles.tool({ className })}
+      onClick={mergeEventHandlers(onClick, c.picker.actions.pickFromScreen)}
+    />
   );
 }
 
-function ColorPickerCopy({ className, children, ...props }: ColorPicker.ButtonProps) {
+function ColorPickerCopy({ className, children, onClick, ...props }: ColorPicker.ButtonProps) {
   const c = usePicker('ColorPicker.Copy');
   const supported = useClipboardSupport();
   if (!supported) return null;
   const { copied, parsed } = c.picker.state;
   return (
     <>
-      <button
-        {...mergeProps(props as Record<string, unknown>, {
-          type: 'button' as const,
-          'aria-label':
-            props['aria-label'] ??
-            (copied ? messages.colorPicker.copied : messages.colorPicker.copy),
-          disabled: c.state.disabled || !parsed,
-          'data-color-picker-copy': '',
-          'data-copied': copied ? '' : undefined,
-          className: c.styles.tool({ className }),
-          onClick: c.picker.actions.copy,
-        })}
-      >
-        {children ??
-          (copied ? (
-            <CheckIcon aria-hidden="true" />
-          ) : (
-            <ClipboardDocumentIcon aria-hidden="true" />
-          ))}
-      </button>
+      <IconButton
+        {...props}
+        aria-label={
+          props['aria-label'] ?? (copied ? messages.colorPicker.copied : messages.colorPicker.copy)
+        }
+        disabled={c.state.disabled || !parsed}
+        data-color-picker-copy=""
+        data-copied={copied ? '' : undefined}
+        variant="outline"
+        size={c.size}
+        icon={
+          children ??
+          (copied ? <CheckIcon aria-hidden="true" /> : <ClipboardDocumentIcon aria-hidden="true" />)
+        }
+        className={c.styles.tool({ className })}
+        onClick={mergeEventHandlers(onClick, c.picker.actions.copy)}
+      />
       <span role="status" className={c.styles.channel()}>
         {copied ? messages.colorPicker.copied : ''}
       </span>
@@ -437,7 +440,10 @@ export namespace ColorPicker {
     'children' | 'defaultValue' | 'onChange' | 'role'
   >;
   export type InputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue' | 'type'>;
-  export type ButtonProps = ComponentProps<'button'>;
+  // One element, since the child becomes the IconButton's icon.
+  export type ButtonProps = Omit<ComponentProps<'button'>, 'children'> & {
+    children?: ReactElement;
+  };
   export type SwatchesProps = ComponentProps<'div'>;
   export type SwatchProps = Omit<ComponentProps<'button'>, 'value' | 'children'> & {
     value: string;
@@ -486,13 +492,7 @@ export namespace ColorPicker {
         fieldSurface.variant.outline,
         'min-w-0 flex-1 font-mono outline-none placeholder:text-(--ids-color-on-muted)',
       ],
-      tool: [
-        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
-        'bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-xs inset-ring-1 inset-ring-(--ids-color-border)',
-        'hover:bg-(--ids-color-muted) dark:bg-(--ids-color-muted)/30',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'focus-ring disabled:pointer-events-none disabled:opacity-50',
-      ],
+      tool: '',
       swatches: 'flex flex-wrap gap-2',
       // The chosen swatch gets a ring behind a surface-colored gap, so it stays visible on a
       // swatch the same color as the ring.
@@ -509,7 +509,6 @@ export namespace ColorPicker {
           areaThumb: 'size-4',
           slider: '[--slider-track:0.75rem]',
           input: fieldSurface.size.standard,
-          tool: 'size-(--ids-size-control-standard) [&_svg]:size-(--ids-size-icon-standard)',
           swatch: 'size-7',
         },
         tiny: {
@@ -517,14 +516,13 @@ export namespace ColorPicker {
           areaThumb: 'size-3.5',
           slider: '[--slider-track:0.625rem]',
           input: fieldSurface.size.tiny,
-          tool: 'size-(--ids-size-control-tiny) [&_svg]:size-(--ids-size-icon-tiny)',
           swatch: 'size-6',
         },
       } satisfies Record<IdsSize, object>,
       // A disabled picker is dimmed once, at its root. The parts that dim themselves when disabled
       // would otherwise dim a second time over it.
       disabled: {
-        true: { slider: 'data-disabled:opacity-100' },
+        true: { slider: 'data-disabled:opacity-100', tool: 'data-disabled:opacity-100' },
       },
     },
     defaultVariants: { size: 'standard' },

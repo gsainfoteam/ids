@@ -248,6 +248,7 @@ test('eyedropper: shown only where the API exists; a cancelled pick changes noth
   await render(state.node);
   const button = host.querySelector('[data-color-picker-eyedropper]');
   assert.equal(button.getAttribute('aria-label'), '화면에서 색 고르기');
+  assert.deepEqual([button.dataset.variant, button.dataset.size], ['outline', 'standard']);
   await act(async () => button.click());
   assert.equal(state.changes.at(-1), '#12345680', 'the picked color keeps the alpha');
   next = new Error('AbortError');
@@ -261,12 +262,22 @@ test('copy writes the shown value and announces it', async () => {
     configurable: true,
     value: { writeText: async (text) => void written.push(text) },
   });
-  await render(tracked({ defaultValue: '#3B82F6', format: 'hsl' }).node);
+  let clicks = 0;
+  await render(
+    h(
+      ColorPicker,
+      { defaultValue: '#3B82F6', format: 'hsl', size: 'tiny' },
+      h(ColorPicker.Copy, { onClick: () => clicks++ }),
+    ),
+  );
   const button = host.querySelector('[data-color-picker-copy]');
+  assert.deepEqual([button.dataset.variant, button.dataset.size], ['outline', 'tiny']);
   await act(async () => button.click());
+  assert.equal(clicks, 1, "the part's own onClick runs as well");
   assert.deepEqual(written, ['hsl(217.22, 91.22%, 59.8%)']);
   assert.equal(host.querySelector('[role=status]').textContent, '복사했습니다');
   assert.equal(button.getAttribute('aria-label'), '복사했습니다');
+  assert.ok(button.hasAttribute('data-copied'));
 });
 
 test('controlled, read-only and disabled', async () => {

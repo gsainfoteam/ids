@@ -78,6 +78,11 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 
 - 자식이 없으면 영역, 스포이트와 슬라이더, 입력과 복사, 팔레트 순으로 그립니다.
 - `HueSlider` 와 `AlphaSlider` 는 채운 구간 없이 그라데이션 트랙을 쓰는 `Slider` 입니다. 받은 속성은 Slider 루트로 가고, `aria-label` 은 thumb의 이름이 됩니다.
+- `EyeDropper` 와 `Copy` 는 `IconButton variant="outline"` 입니다. 자식을 주면 기본 아이콘 대신 그 아이콘을 씁니다.
+
+```tsx
+<ColorPicker.Copy aria-label="HEX 복사"><DocumentDuplicateIcon /></ColorPicker.Copy>
+```
 - `swatches` 는 색 문자열이나 `{ value, label }` 입니다. 읽을 수 없는 색은 건너뜁니다. 이름이 없으면 값이 이름이 됩니다.
 - 반투명 색은 체크무늬 위에 그려서 투명도가 보입니다. 체크무늬는 테마의 surface 와 muted 색이라 다크 모드에서도 튀지 않습니다.
 
