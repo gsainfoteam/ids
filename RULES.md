@@ -141,9 +141,12 @@ in full rather than composing prefixes.
 **Focus is a soft ring, never an offset outline.** Add the `focus-ring` class. It is a single
 `@utility` in the CSS package that covers every trigger IDS uses — `:focus-visible` for real form
 controls, `[data-focus-visible]` for components driven by `useInteractive`, and
-`:has([data-text-field-input]:focus-visible)` / `:has([data-text-area-input]:focus-visible)` for a
-TextField or TextArea container wrapping its sentinel input. Borders stay `inset-ring`,
-so the focus ring sits outside them and composes with `shadow-xs` instead of replacing it.
+`:has([data-field-input]:focus-visible)` for a shell wrapping its own input or trigger. Mark that
+inner element with `data-field-input` rather than adding a component-specific `has-[...]:ring`.
+Borders stay `inset-ring`, so the focus ring sits outside them and composes with `shadow-xs`
+instead of replacing it. Focus also recolors that inset-ring border to primary, and an element
+with `aria-invalid="true"` or `data-invalid` gets a danger border and a danger ring; neither
+state is repeated in component styles.
 
 **Radius is 12px, and containers grow it concentrically.** The scale is `standard` (12px, every
 control at every size), `indicator` (4px, only for boxes under 24px such as the Checkbox box or

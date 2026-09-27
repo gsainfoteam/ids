@@ -304,15 +304,32 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 `;
 
 // One definition for every focus trigger IDS uses: real form controls, components
-// driven by useInteractive, and a shell that wraps a focusable field.
+// driven by useInteractive, and a shell that wraps a focusable input marked data-field-input. Focus also recolors an
+// inset-ring border when the element has one; the color alone draws nothing on an element
+// without an inset ring, so solid controls are unaffected. An invalid element keeps a danger
+// border and turns its focus ring danger too.
 const T_CSS_UTILITIES = `@utility focus-ring {
   outline: none;
 
   &:focus-visible,
   &[data-focus-visible],
+  &:has([data-field-input]:focus-visible),
   &:has([data-text-field-input]:focus-visible),
   &:has([data-text-area-input]:focus-visible) {
-    @apply ring-[3px] ring-(--ids-color-primary)/40;
+    @apply ring-[3px] ring-(--ids-color-primary)/40 inset-ring-(--ids-color-primary);
+  }
+
+  &[aria-invalid="true"],
+  &[data-invalid] {
+    @apply inset-ring-(--ids-color-danger);
+
+    &:focus-visible,
+    &[data-focus-visible],
+    &:has([data-field-input]:focus-visible),
+    &:has([data-text-field-input]:focus-visible),
+    &:has([data-text-area-input]:focus-visible) {
+      @apply ring-(--ids-color-danger)/40 inset-ring-(--ids-color-danger);
+    }
   }
 }
 `;
