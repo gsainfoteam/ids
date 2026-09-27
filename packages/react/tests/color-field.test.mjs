@@ -195,9 +195,15 @@ test('every change reaches onValueChange at once; a typed value waits for Enter'
 });
 
 test('Clear empties the value and focuses the trigger; it is hidden while read-only', async () => {
-  const state = tracked({ defaultValue: '#FF0000' });
+  const state = tracked({ defaultValue: '#FF0000', size: 'tiny' });
   await render(state.node);
   assert.equal(clearButton().getAttribute('aria-label'), '색상 지우기');
+  assert.deepEqual(
+    [clearButton().dataset.variant, clearButton().dataset.size],
+    ['ghost', 'tiny'],
+    'a ghost IconButton of the field size',
+  );
+  assert.equal(clearButton().getAttribute('tabindex'), null, 'Clear stays in the Tab order');
   await click(clearButton());
   assert.deepEqual(state.changes, ['']);
   assert.equal(document.activeElement, trigger());
@@ -206,6 +212,21 @@ test('Clear empties the value and focuses the trigger; it is hidden while read-o
   assert.equal(trigger().textContent, '색상 선택');
   await render(tracked({ defaultValue: '#FF0000', readOnly: true }).node);
   assert.equal(clearButton(), null);
+  await render(tracked({ key: 'disabled', defaultValue: '#FF0000', disabled: true }).node);
+  assert.equal(clearButton().disabled, true);
+  let own = 0;
+  const custom = tracked(
+    { key: 'custom', defaultValue: '#FF0000' },
+    h(
+      ColorField.Clear,
+      { asChild: true, onClick: () => own++ },
+      h('button', { className: 'mine' }),
+    ),
+  );
+  await render(custom.node);
+  assert.ok(clearButton().classList.contains('mine'), 'asChild draws the given button');
+  await click(clearButton());
+  assert.deepEqual([own, custom.changes], [1, ['']], "the part's own onClick runs as well");
 });
 
 test('an unreadable value is shown as it is and marks the field invalid', async () => {

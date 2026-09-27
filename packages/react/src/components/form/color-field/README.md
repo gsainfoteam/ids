@@ -73,6 +73,7 @@ import { ColorField, Field } from '@gsainfoteam/ids-react';
 
 - `Content` 는 필드 값에 묶인 `ColorPicker` 입니다. 자식은 ColorPicker part 이고, `format`, `alpha`, `swatches`, `size`, `disabled`, `readOnly` 는 필드에서 받습니다.
 - 지운 뒤에는 트리거로 포커스가 갑니다. `readOnly` 면 지우기 버튼이 보이지 않습니다.
+- `Clear` 는 필드 안 버튼 크기(28px, tiny 24px)의 `IconButton variant="ghost"` 입니다. 자식은 아이콘이고, `asChild` 면 자식 요소가 그 버튼이 됩니다. 트리거로는 지울 수 없어서 `Tab` 순서에 남습니다.
 - `Trigger`, `Clear`, `Content` 는 각각 하나까지입니다. `Clear` 를 `Trigger` 안에 넣으면 오류입니다.
 - 모든 part 가 `asChild` 를 받습니다. 자식은 props 와 ref 를 해당 element 에 전달해야 합니다.
 
