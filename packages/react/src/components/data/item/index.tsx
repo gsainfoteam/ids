@@ -27,7 +27,10 @@ type Context = {
 };
 
 const ItemContext = createContext<Context | null>(null);
-const ItemGroupContext = createContext<{ size: IdsSize | undefined } | null>(null);
+const ItemGroupContext = createContext<{
+  size: IdsSize | undefined;
+  dense: boolean | undefined;
+} | null>(null);
 
 function useItemContext(part: string) {
   const context = use(ItemContext);
@@ -46,6 +49,7 @@ function isCurrent(value: unknown) {
 export function Item({
   variant = 'ghost',
   size,
+  dense,
   interactive: interactiveProp,
   selected,
   disabled = false,
@@ -68,6 +72,7 @@ export function Item({
 }: Item.Props) {
   const group = use(ItemGroupContext);
   const resolvedSize = size ?? group?.size ?? 'standard';
+  const resolvedDense = dense ?? group?.dense ?? false;
   // A link or button passed through asChild is interactive by what it is.
   const nativeControl =
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
@@ -93,7 +98,7 @@ export function Item({
     },
   });
   const state: Item.State = { ...interaction, interactive, selected: selected === true };
-  const styles = Item.Style({ variant, size: resolvedSize, interactive });
+  const styles = Item.Style({ variant, size: resolvedSize, dense: resolvedDense, interactive });
   const Root = asChild ? Slot : 'div';
 
   return (
@@ -108,6 +113,7 @@ export function Item({
         data-item=""
         data-variant={variant}
         data-size={resolvedSize}
+        data-dense={flag(resolvedDense)}
         data-interactive={flag(interactive)}
         data-selected={flag(selected === true)}
         data-disabled={flag(disabled)}
@@ -138,6 +144,7 @@ export namespace Item {
   export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children'> & {
     variant?: ItemVariant;
     size?: IdsSize;
+    dense?: boolean;
     interactive?: boolean;
     selected?: boolean;
     disabled?: boolean;
@@ -209,10 +216,10 @@ export namespace Item {
 
   // Safari drops the list role of a <ul> without bullets unless it is written out. Each child is
   // placed in an <li>, so items can be dropped in as they are.
-  export function Group({ size, className, children, ...props }: Group.Props) {
+  export function Group({ size, dense, className, children, ...props }: Group.Props) {
     const styles = Style();
     return (
-      <ItemGroupContext value={{ size }}>
+      <ItemGroupContext value={{ size, dense }}>
         <ul role="list" {...props} data-item-group="" className={styles.group({ className })}>
           {Children.map(children, (child) => {
             if (child == null || typeof child === 'boolean') return child;
@@ -225,7 +232,7 @@ export namespace Item {
     );
   }
   export namespace Group {
-    export type Props = ComponentProps<'ul'> & { size?: IdsSize };
+    export type Props = ComponentProps<'ul'> & { size?: IdsSize; dense?: boolean };
   }
 
   // In a group the line is an li left out of the list count; on its own it is an hr.
@@ -300,6 +307,7 @@ export namespace Item {
           description: 'text-caption-c1-regular',
         },
       } satisfies Record<IdsSize, object>,
+      dense: { true: {}, false: {} },
       interactive: {
         true: {
           root: [
@@ -315,7 +323,16 @@ export namespace Item {
     compoundVariants: [
       { media: ['soft', 'outline'], size: 'standard', class: { media: 'size-8' } },
       { media: ['soft', 'outline'], size: 'tiny', class: { media: 'size-7' } },
+      // Half the padding, so a standard row holding a 36px control is 48px tall.
+      { dense: true, size: 'standard', class: { root: 'min-h-12 concentric-p-1.5' } },
+      { dense: true, size: 'tiny', class: { root: 'min-h-8 concentric-p-1' } },
     ],
-    defaultVariants: { variant: 'ghost', media: 'ghost', size: 'standard', interactive: false },
+    defaultVariants: {
+      variant: 'ghost',
+      media: 'ghost',
+      size: 'standard',
+      dense: false,
+      interactive: false,
+    },
   });
 }

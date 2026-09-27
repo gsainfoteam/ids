@@ -88,7 +88,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 ```tsx
 <Item.Group aria-label="설정" size="tiny">
   {' '}
-  {/* 안의 행이 size를 따른다 */}
+  {/* 안의 행이 size와 dense를 따른다 */}
   <Item>...</Item> {/* <li> 로 감싼다 */}
   <Item.Separator /> {/* 목록 항목으로 세지 않는 구분선 */}
   <Item>...</Item>
@@ -107,11 +107,25 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 <Item size="tiny" />        // standard(패딩 12px, 기본) / tiny(8px)
 ```
 
+## 촘촘한 행
+
+```tsx
+<Item.Group aria-label="첨부 파일" dense>  {/* 안의 행이 dense를 따른다 */}
+  <Item variant="outline">...</Item>       {/* 패딩 6px, 최소 높이 48px */}
+</Item.Group>
+
+<Item size="tiny" dense />                  // 패딩 4px, 최소 높이 32px
+```
+
+- `dense` 는 패딩을 반으로 줄입니다. 36px 컨트롤을 담은 standard 행이 48px 가 됩니다.
+- 파일 목록이나 메뉴처럼 행이 많은 목록에 씁니다.
+
 ## 상태와 data 속성
 
 | 속성                                                                | 뜻              |
 | ------------------------------------------------------------------- | --------------- |
 | `data-item`, `data-variant`, `data-size`                            | 루트            |
+| `data-dense`                                                        | 촘촘한 행       |
 | `data-interactive`                                                  | 누를 수 있는 행 |
 | `data-selected`                                                     | 선택됨          |
 | `data-disabled`                                                     | 비활성          |
@@ -122,14 +136,15 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 
 ## 속성
 
-| 속성            | 기본 / 동작                                                     |
-| --------------- | --------------------------------------------------------------- |
-| `variant`       | `ghost`(기본) / `outline` / `soft`                              |
-| `size`          | `standard`(기본) / `tiny`. `Item.Group` 안에서는 그룹을 따른다  |
-| `onClick`       | 주면 행 전체가 버튼                                             |
-| `interactive`   | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동 |
-| `selected`      | 선택 표시                                                       |
-| `disabled`      | 누를 수 없고 흐려진다                                           |
-| `asChild`       | 루트 `div` 대신 자식 요소에 속성을 합친다                       |
-| `Media.variant` | `ghost`(기본) / `soft` / `outline`                              |
-| 각 부분         | `asChild` 와 `div` 의 native 속성                               |
+| 속성            | 기본 / 동작                                                        |
+| --------------- | ------------------------------------------------------------------ |
+| `variant`       | `ghost`(기본) / `outline` / `soft`                                 |
+| `size`          | `standard`(기본) / `tiny`. `Item.Group` 안에서는 그룹을 따른다     |
+| `dense`         | `false`. 패딩을 반으로 줄인다. `Item.Group` 안에서는 그룹을 따른다 |
+| `onClick`       | 주면 행 전체가 버튼                                                |
+| `interactive`   | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동    |
+| `selected`      | 선택 표시                                                          |
+| `disabled`      | 누를 수 없고 흐려진다                                              |
+| `asChild`       | 루트 `div` 대신 자식 요소에 속성을 합친다                          |
+| `Media.variant` | `ghost`(기본) / `soft` / `outline`                                 |
+| 각 부분         | `asChild` 와 `div` 의 native 속성                                  |

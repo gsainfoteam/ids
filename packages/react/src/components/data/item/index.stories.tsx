@@ -8,6 +8,7 @@ import {
   HomeIcon,
   InboxIcon,
   MoonIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { expect, fn } from 'storybook/test';
 
@@ -34,6 +35,7 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
+    dense: { control: 'boolean' },
     interactive: { control: 'boolean' },
     selected: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -80,6 +82,24 @@ export const Gallery: Story = {
               <Item.Content>
                 <Item.Title>{variant}</Item.Title>
                 <Item.Description>size {size}</Item.Description>
+              </Item.Content>
+            </Item>
+          )}
+        />
+      </Showcase.Section>
+
+      <Showcase.Section title="Dense · Variant × Size">
+        <Showcase.Matrix
+          rows={sizes}
+          columns={variants}
+          render={(size, variant) => (
+            <Item variant={variant} size={size} dense className="w-64">
+              <Item.Media variant="soft">
+                <BellIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>{variant}</Item.Title>
+                <Item.Description>size {size} · dense</Item.Description>
               </Item.Content>
             </Item>
           )}
@@ -360,5 +380,53 @@ export const Navigation: Story = {
     await expect(home).toHaveAttribute('data-selected');
     await expect(canvas.getAllByRole('listitem')).toHaveLength(3);
     await expect(home).toHaveAttribute('data-size', 'tiny');
+  },
+};
+
+const attachments = [
+  { name: '2026 상반기 예산 집행 결과 보고서 (최종 수정본).pdf', size: '2.4 MB' },
+  { name: '예산안.xlsx', size: '84 KB' },
+  { name: '회의록.md', size: '3 KB' },
+];
+
+export const Dense: Story = {
+  render: () => (
+    <Item.Group dense aria-label="첨부 파일" className="w-80 gap-1">
+      {attachments.map((file) => (
+        <Item key={file.name} variant="outline">
+          <Item.Media variant="soft">
+            <DocumentIcon />
+          </Item.Media>
+          <Item.Content>
+            <Item.Title>{file.name}</Item.Title>
+            <Item.Description>{file.size}</Item.Description>
+          </Item.Content>
+          <Item.Actions>
+            <IconButton
+              aria-label={`${file.name} 삭제`}
+              variant="ghost"
+              size="tiny"
+              icon={<XMarkIcon />}
+            />
+          </Item.Actions>
+        </Item>
+      ))}
+    </Item.Group>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`dense` 는 패딩을 반으로 줄여 첨부 파일이나 메뉴처럼 행이 많은 목록을 촘촘하게 보여 줍니다. `Item.Group` 에 주면 안의 행이 모두 따릅니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const rows = canvas.getAllByRole('listitem').map((item) => item.firstElementChild!);
+    await expect(rows).toHaveLength(3);
+    for (const row of rows) {
+      await expect(row).toHaveAttribute('data-dense');
+      await expect(getComputedStyle(row).paddingTop).toBe('6px');
+    }
   },
 };

@@ -167,6 +167,29 @@ test('Group: a list with an item per row; separators are hidden and size is shar
   assert.match(rule.className, /border-0/, 'the hr border does not thicken the line');
 });
 
+test('dense halves the padding and a group shares it with its rows', () => {
+  const doc = html(
+    h(
+      Item.Group,
+      { dense: true, 'aria-label': 'Files' },
+      h(Item, null, 'One'),
+      h(Item, { size: 'tiny' }, 'Two'),
+      h(Item, { dense: false }, 'Three'),
+    ),
+  );
+  const [one, two, three] = doc.querySelectorAll('[data-item]');
+  assert.ok(one.hasAttribute('data-dense'));
+  assert.match(one.className, /(^| )min-h-12( |$)/);
+  assert.match(one.className, /(^| )concentric-p-1\.5( |$)/);
+  assert.doesNotMatch(one.className, /min-h-14|concentric-p-3/, 'the standard padding is replaced');
+  assert.match(two.className, /(^| )min-h-8( |$)/);
+  assert.match(two.className, /(^| )concentric-p-1( |$)/);
+  assert.equal(three.hasAttribute('data-dense'), false, 'a row can opt out of the group');
+  assert.match(three.className, /(^| )concentric-p-3( |$)/);
+  const plain = html(h(Item, null, 'x')).querySelector('[data-item]');
+  assert.equal(plain.hasAttribute('data-dense'), false, 'rows are not dense by default');
+});
+
 test('className takes the row state', () => {
   const root = html(
     h(Item, { selected: true, className: (state) => (state.selected ? 'on' : 'off') }, 'x'),

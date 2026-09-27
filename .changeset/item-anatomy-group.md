@@ -11,6 +11,8 @@ controls in `Item.Actions` stay with them, and Enter and Space behave like a nat
 already says it. `Item.Group` renders a `role="list"` `<ul>` that wraps each row in an `<li>` and
 shares its `size`, and `Item.Separator` is left out of the list count. `Item.Separator` is a
 `Divider`, drawn as an `li` inside a group and as an `hr` on its own. Rows can be `disabled`.
+`dense` on `Item` or `Item.Group` halves the padding for long lists such as attachments, so a
+standard row is 48px and a tiny one 32px, marked with `data-dense`.
 
 Breaking: the default look is `ghost` (no background) instead of a surface fill, selection and
 hover are neutral instead of primary tints, titles wrap instead of truncating, and only
