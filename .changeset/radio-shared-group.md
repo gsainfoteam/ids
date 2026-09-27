@@ -11,7 +11,8 @@ group, so choosing a groupmate updates its `data-state` and reports `onCheckedCh
 
 RadioGroup gains `readOnly`, `required` (native), `invalid`, `form`, `variant`, reset to
 `defaultValue`, and a stable root for `ref` and `id` whose `focus()` lands on the checked radio,
-which is where react-hook-form's error focus now goes. `controlMode="value"` connects it.
+which is where react-hook-form's error focus now goes. `controlMode="value"` connects it. Home and
+End, which native radios ignore, choose the group's first and last enabled radio.
 
 Breaking: RadioGroup's `onChange(value)` is now `onValueChange(value)`, and its `variant`
 (`vertical` / `horizontal`) is now `orientation`; `variant` is the items' `outline` / `soft`.

@@ -6,7 +6,15 @@ const dom = new JSDOM('<!doctype html><html><body></body></html>', {
   url: 'http://localhost',
   pretendToBeVisual: true,
 });
-for (const name of ['window', 'document', 'HTMLElement', 'HTMLInputElement', 'Event', 'MouseEvent'])
+for (const name of [
+  'window',
+  'document',
+  'HTMLElement',
+  'HTMLInputElement',
+  'Event',
+  'MouseEvent',
+  'KeyboardEvent',
+])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, useState } = await import('react');
@@ -36,6 +44,14 @@ const group = () => host.querySelector('[role=radiogroup]');
 const radio = (value) => host.querySelector(`input[value="${value}"]`);
 const stateOf = (value) => radio(value).closest('[data-radio]').dataset.state;
 const click = (value) => act(async () => radio(value).click());
+async function key(node, key, init = {}) {
+  let event;
+  await act(async () => {
+    event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init });
+    node.dispatchEvent(event);
+  });
+  return event;
+}
 
 test('SSR: a radiogroup root labelled by Field, radios sharing one name and the group settings', () => {
   const doc = new JSDOM(
@@ -168,6 +184,51 @@ test('focus on the root goes to the checked radio, else the first enabled one', 
   await click('team');
   await act(async () => ref.focus());
   assert.equal(document.activeElement, radio('team'));
+});
+
+test('Home and End choose the first and last enabled radio; read-only only moves focus', async () => {
+  const changes = [];
+  const view = (props) =>
+    h(
+      RadioGroup,
+      {
+        'aria-label': 'Plan',
+        defaultValue: 'pro',
+        onValueChange: (next) => changes.push(next),
+        ...props,
+      },
+      ({ Item }) => [
+        h(Item, { key: 'free', value: 'free', 'aria-label': 'free', disabled: true }),
+        h(Item, { key: 'pro', value: 'pro', 'aria-label': 'pro' }),
+        h(Item, { key: 'team', value: 'team', 'aria-label': 'team' }),
+      ],
+    );
+  await render(view());
+  const end = await key(radio('pro'), 'End');
+  assert.equal(end.defaultPrevented, true, 'the page does not scroll');
+  assert.equal(document.activeElement, radio('team'));
+  assert.equal(stateOf('team'), 'checked');
+  await key(radio('team'), 'Home');
+  assert.equal(document.activeElement, radio('pro'), 'a disabled radio is passed over');
+  assert.equal(stateOf('pro'), 'checked');
+  const shifted = await key(radio('pro'), 'End', { shiftKey: true });
+  assert.equal(shifted.defaultPrevented, false, 'a modified key is left alone');
+  assert.deepEqual(changes, ['team', 'pro']);
+
+  await render(h('div', { key: 'read-only' }, view({ readOnly: true })));
+  await key(radio('pro'), 'End');
+  assert.equal(document.activeElement, radio('team'));
+  assert.equal(radio('pro').checked, true, 'a read-only group only moves focus');
+  await render(
+    h(
+      'div',
+      { key: 'own' },
+      view({ onKeyDown: (event) => event.key === 'End' && event.preventDefault() }),
+    ),
+  );
+  await key(radio('pro'), 'End');
+  assert.equal(radio('pro').checked, true, "the root's own onKeyDown can keep the key");
+  assert.deepEqual(changes, ['team', 'pro']);
 });
 
 test('native form: required, FormData, and reset back to defaultValue without a report', async () => {

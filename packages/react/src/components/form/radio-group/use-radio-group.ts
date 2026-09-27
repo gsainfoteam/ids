@@ -1,4 +1,11 @@
-import { useCallback, useRef, type FocusEvent, type Ref, type RefCallback } from 'react';
+import {
+  useCallback,
+  useRef,
+  type FocusEvent,
+  type KeyboardEvent,
+  type Ref,
+  type RefCallback,
+} from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
@@ -32,14 +39,31 @@ export function useRadioGroup<T extends string>({
     if (!controlled) setValue(defaultValue, { silent: true });
   });
 
+  const enabledRadios = (root: HTMLElement) =>
+    [...root.querySelectorAll<HTMLInputElement>('input[type=radio]')].filter(
+      (radio) => radio.name === name && !radio.disabled,
+    );
+
   // The root is the stable target of `ref` and of a Field label's id, but the focus belongs on a
   // radio: the checked one, which is where Tab would land, or else the first that can take it.
   const focusChecked = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
-    const radios = [
-      ...event.currentTarget.querySelectorAll<HTMLInputElement>('input[type=radio]'),
-    ].filter((radio) => radio.name === name && !radio.disabled);
+    const radios = enabledRadios(event.currentTarget);
     (radios.find((radio) => radio.checked) ?? radios[0])?.focus();
+  };
+
+  // Native radios follow the arrow keys but ignore Home and End. Those jump to the first and last
+  // radio here and choose it through its own click, as an arrow key does, so the radio's handlers
+  // see the change and a read-only group still only moves focus.
+  const moveToEnd = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Home' && event.key !== 'End') return;
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    const radios = enabledRadios(event.currentTarget);
+    if (!radios.includes(event.target as HTMLInputElement)) return;
+    const target = event.key === 'Home' ? radios[0]! : radios[radios.length - 1]!;
+    event.preventDefault();
+    target.focus();
+    target.click();
   };
 
   const mergedRef: RefCallback<HTMLDivElement> = useCallback(
@@ -52,5 +76,6 @@ export function useRadioGroup<T extends string>({
     select: (next: string) => setValue(next as T),
     rootRef: mergedRef,
     focusChecked,
+    moveToEnd,
   };
 }

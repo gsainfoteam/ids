@@ -209,7 +209,7 @@ export const Keyboard: Story = {
     docs: {
       description: {
         story:
-          '같은 `name` 을 쓰는 native 라디오라서 Tab은 선택된 항목에 멈추고, 화살표 키는 옮기면서 바로 고릅니다. 비활성 항목은 건너뜁니다.',
+          '같은 `name` 을 쓰는 native 라디오라서 Tab은 선택된 항목에 멈추고, 화살표 키는 옮기면서 바로 고릅니다. Home 과 End 는 처음과 끝 항목을 고릅니다. 비활성 항목은 건너뜁니다.',
       },
     },
   },
@@ -230,6 +230,12 @@ export const Keyboard: Story = {
     await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
     await userEvent.keyboard('{ArrowDown}');
     await expect(canvas.getByRole('radio', { name: 'Team' })).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
+    await userEvent.keyboard('{Home}');
+    await expect(canvas.getByRole('radio', { name: '무료' })).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: '무료' })).toHaveFocus();
+    await userEvent.keyboard('{End}');
     await expect(canvas.getByRole('radio', { name: 'Team' })).toHaveFocus();
     await expect(args.onValueChange).toHaveBeenLastCalledWith('team');
   },
