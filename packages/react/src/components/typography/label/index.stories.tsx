@@ -22,6 +22,7 @@ const meta = {
     size: { control: 'radio', options: ['standard', 'tiny'] },
     required: { control: 'radio', options: [undefined, true, false] },
     disabled: { control: 'radio', options: [undefined, true, false] },
+    invalid: { control: 'boolean' },
   },
   args: { children: '이름', htmlFor: 'label-playground' },
 } satisfies Meta<typeof Label>;
@@ -61,6 +62,12 @@ export const Gallery: Story = {
                 이메일
               </Label>
               <TextField id={`gallery-${size}-disabled`} size={size} disabled />
+            </div>
+            <div className="flex w-48 flex-col gap-2">
+              <Label size={size} htmlFor={`gallery-${size}-invalid`} invalid>
+                이메일
+              </Label>
+              <TextField id={`gallery-${size}-invalid`} size={size} invalid />
             </div>
           </Showcase.Row>
         ))}

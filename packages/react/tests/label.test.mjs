@@ -186,6 +186,33 @@ test('className and style read the state', async () => {
   assert.equal(label().style.opacity, '1');
 });
 
+test('invalid is set directly, not read from the control', async () => {
+  await render(
+    h(
+      'div',
+      null,
+      h(
+        Label,
+        {
+          htmlFor: 'e',
+          invalid: true,
+          className: (state) => (state.invalid ? 'is-invalid' : 'is-valid'),
+        },
+        'E',
+      ),
+      h(Label, { htmlFor: 'f' }, 'F'),
+      h('input', { id: 'e' }),
+      h('input', { id: 'f', 'aria-invalid': true }),
+    ),
+  );
+  await flush();
+  const [explicit, mirrored] = host.querySelectorAll('label');
+  assert.ok(explicit.hasAttribute('data-invalid'));
+  assert.match(explicit.className, /is-invalid/);
+  assert.match(explicit.className, /data-invalid:text-\(--ids-color-danger\)/);
+  assert.equal(mirrored.hasAttribute('data-invalid'), false);
+});
+
 test('inside a Field it still renders', () => {
   const html = renderToString(
     h(

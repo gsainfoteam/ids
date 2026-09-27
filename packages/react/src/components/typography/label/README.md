@@ -32,7 +32,7 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 - 커스텀 위젯에는 이미 `aria-label` 이나 `aria-labelledby` 가 있으면 건드리지 않습니다. 라벨이 사라지면 붙였던 속성도 뗍니다.
 - `role="checkbox"`, `"switch"`, `"radio"` 위젯은 라벨을 누르면 native 라벨처럼 토글됩니다.
 
-## 필수와 비활성
+## 필수, 비활성, 오류
 
 ```tsx
 <Label htmlFor="name">이름</Label>
@@ -42,10 +42,13 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 <Label required={false}>이름</Label>   // 컨트롤이 required여도 * 없이
 
 <Label disabled>이름</Label>           // 직접 흐리게
+
+<Label invalid>이름</Label>            // danger 색
 ```
 
 - `*` 는 `aria-hidden` 입니다. 필수라는 사실은 컨트롤의 `required` 가 스크린 리더에 전합니다. 컨트롤에도 `required` 를 주세요.
 - 컨트롤의 `disabled`, `aria-disabled="true"`, `data-disabled` 를 비활성으로, `required`, `aria-required="true"` 를 필수로 읽습니다.
+- `invalid` 는 직접 줄 때만 켜집니다. 오류인 그룹 안 선택지의 라벨까지 붉어지지 않도록 컨트롤의 `aria-invalid` 는 따르지 않습니다.
 - 비활성일 때 라벨을 눌러도 커스텀 위젯으로 포커스를 옮기지 않습니다.
 
 ## 크기
@@ -61,12 +64,13 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 | ---------- | ----------------------------- |
 | `disabled` | 비활성이다 (직접 또는 컨트롤) |
 | `required` | 필수다 (직접 또는 컨트롤)     |
+| `invalid`  | 오류다 (직접)                 |
 
 ```tsx
 <Label className={(state) => (state.required ? 'font-semibold' : undefined)} />
 ```
 
-- 요소에는 `data-label`, `data-disabled`, `data-required` 가, `*` 에는 `data-label-required` 가 붙습니다.
+- 요소에는 `data-label`, `data-disabled`, `data-required`, `data-invalid` 가, `*` 에는 `data-label-required` 가 붙습니다.
 
 ## 속성
 
@@ -75,6 +79,7 @@ import { Label, TextField } from '@gsainfoteam/ids-react';
 | `htmlFor`             | 연결할 컨트롤의 `id`                               |
 | `required`            | 생략하면 컨트롤을 따른다. `true` / `false` 로 고정 |
 | `disabled`            | 생략하면 컨트롤을 따른다. `true` / `false` 로 고정 |
+| `invalid`             | `true` 면 danger 색. 기본 `false`                  |
 | `size`                | `standard`(기본) / `tiny`                          |
 | `id`                  | 생략하면 만들어 붙인다                             |
 | `className` / `style` | 상태를 받는 함수도 된다                            |
