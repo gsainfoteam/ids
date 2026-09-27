@@ -21,7 +21,7 @@ import { Field, Input } from '@gsainfoteam/ids-react';
 <Input type="search" aria-label="검색" />   // TextField + 검색어 지우기 버튼
 <Input type="password" name="password" />   // PasswordField. onChange는 ChangeEvent
 <Input type="number" value={quantity} onValueChange={setQuantity} min={1} /> // NumberField. number | null
-<Input type="tel" value={phone} onChange={setPhone} />                   // TelField. string
+<Input type="tel" value={phone} onValueChange={setPhone} />              // TelField. E.164 string
 ```
 
 - props, ref, `disabled`/`readOnly`, `Field` 크기와 ARIA 연결은 위임한 필드로 그대로 간다

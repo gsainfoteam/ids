@@ -15,6 +15,18 @@ function nativeValueSetter(element: TextElement) {
 // brings the text back; where it is missing (jsdom, some embedded engines) the value is written
 // through the prototype setter, which React's value tracker does not intercept, and an input
 // event is dispatched by hand.
+// Dispatched by hand where execCommand is missing; the inputType tells listeners what kind of
+// edit it was, as the browser's own event would.
+function dispatchInput(element: TextElement, inputType: string) {
+  const view = element.ownerDocument.defaultView;
+  if (!view) return;
+  const event =
+    typeof view.InputEvent === 'function'
+      ? new view.InputEvent('input', { bubbles: true, inputType })
+      : new view.Event('input', { bubbles: true });
+  element.dispatchEvent(event);
+}
+
 export function clearInput(element: TextElement) {
   element.focus({ preventScroll: true });
   if (element.value === '') return;
@@ -27,7 +39,21 @@ export function clearInput(element: TextElement) {
     doc.execCommand('delete')
   )
     return;
-  const view = doc.defaultView;
   nativeValueSetter(element)?.call(element, '');
-  if (view) element.dispatchEvent(new view.Event('input', { bubbles: true }));
+  dispatchInput(element, 'deleteContentBackward');
+}
+
+// Replaces the whole value through a real edit, for the same reasons clearInput does.
+export function replaceInput(element: TextElement, text: string) {
+  element.focus({ preventScroll: true });
+  element.select();
+  const doc = element.ownerDocument;
+  if (
+    doc.activeElement === element &&
+    typeof doc.execCommand === 'function' &&
+    doc.execCommand('insertText', false, text)
+  )
+    return;
+  nativeValueSetter(element)?.call(element, text);
+  dispatchInput(element, 'insertReplacementText');
 }

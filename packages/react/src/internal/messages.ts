@@ -13,6 +13,11 @@ export const messages = {
     rangeUnderflow: (min: string) => `값은 ${min} 이상이어야 합니다.`,
     rangeOverflow: (max: string) => `값은 ${max} 이하여야 합니다.`,
   },
+  telField: {
+    country: '국가',
+    countrySearch: '국가 또는 국가 번호 검색',
+    invalid: '올바른 전화번호를 입력하세요.',
+  },
   passwordField: {
     show: '비밀번호 표시',
     capsLock: 'Caps Lock이 켜져 있습니다.',
