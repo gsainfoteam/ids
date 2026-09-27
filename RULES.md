@@ -195,8 +195,61 @@ as buttons: render `internal/form-value.tsx` inside the component's `relative` r
 hidden input per value for FormData and, when `required`, a nameless input covering the control
 so the browser blocks the submit, anchors its message there and hands focus to the control.
 
+**`dark:` follows `data-mode`.** The CSS package defines the `dark` variant against the nearest
+`data-mode`, so it works in any app and inside a nested ThemeProvider, not only when the OS is dark.
+
+**tailwind-merge needs line height after text size.** `text-*` composites carry their own line
+height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regular leading-none`.
+
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
+
+## Component API
+
+**Callbacks.** A value callback is `onValueChange(value)`; other state callbacks are
+`onCheckedChange`, `onPressedChange`, `onOpenChange` and so on. `onChange` keeps the native event
+signature and only exists where a real input does. react-hook-form's `field.onChange` and TanStack
+Form's `field.handleChange` both accept a plain value, so either binds to `onValueChange`.
+
+- The react-hook-form bridge (`src/react-hook-form.tsx`) binds `onChange` to native elements and
+  `onValueChange` / `onCheckedChange` to components, and forwards one report per edit.
+- A component with an inner native input must not pass its own root `onChange` down to that input,
+  or value mode would report the edit twice.
+- A control whose value changes without an input event (a picker, a stepper) calls the
+  `FieldNotifyContext` callback, so `<Field>` keeps its `data-filled` / `data-dirty` state.
+
+**Parts.** Part props types are named `X.PartProps` (`OTPField.SlotProps`,
+`ButtonGroup.SeparatorProps`). Every part is optional and falls back to a default.
+
+**Group-like controls keep a stable focus target.** RadioGroup, CheckboxGroup, Rating and
+ToggleGroup put `ref` and `id` on the root, with `tabIndex={-1}`, and hand `focus()` to the
+checked or first enabled item, so a `<label htmlFor>` and react-hook-form's error focus land
+somewhere that does not move as the value changes.
+
+**Forms.** `FormValue` never submits an empty string. Form reset restores `defaultValue` without
+calling the value callback (`useControllableState`'s `{ silent: true }`), the same as a native
+input, which fires no change event on reset.
+
+**Overlays.** A modal backdrop closes on `click`, not `pointerdown`; closing earlier lets the
+same press land on the page underneath and pulls focus away from the trigger it was returned to.
+
+**Nested fields.** A field drawn inside another field's shell (TelField's country Select) turns
+its own ring off, so only the outer shell rings.
+
+## Tests
+
+`tests/*.test.mjs` run under `node:test` against the built `dist` with jsdom.
+
+- Expose `Element`, `Node` and `getComputedStyle` as globals before importing `dist`:
+  floating-ui and tabbable check for them when they load. Focus-trap tests also need
+  `MutationObserver` and `Document`.
+- jsdom has no layout, so tabbable treats every element as hidden. Stub
+  `Element.prototype.getClientRects` to return one box when a test relies on focus order.
+- Never assert a state that only lasts until a timer fires. Declare the duration the code reads
+  (for example an inline `transition-duration`) and send the ending event yourself.
+- In `play` functions, query elements again after each `await`, since the theme decorator may
+  remount the story. Inputs whose focus a play checks carry `data-1p-ignore` and
+  `data-lpignore="true"` so a password manager's inline menu does not take the focus.
 
 ## ThemeProvider
 
