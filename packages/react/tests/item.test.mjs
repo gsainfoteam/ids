@@ -206,6 +206,23 @@ test('a truncated title stays on one line within its row', () => {
   assert.equal(cut.hasAttribute('truncate'), false);
 });
 
+test('an image fills its media tile', () => {
+  const media = (variant) =>
+    html(h(Item, null, h(Item.Media, { variant }, h('img', { alt: '' })))).querySelector(
+      '[data-item-media]',
+    );
+  for (const variant of ['soft', 'outline']) {
+    const tile = media(variant);
+    assert.match(tile.className, /(^| )overflow-hidden( |$)/, variant);
+    assert.match(tile.className, /\[&>img\]:size-full/, variant);
+  }
+  assert.doesNotMatch(
+    media('ghost').className,
+    /size-full/,
+    'an image without a tile keeps its size',
+  );
+});
+
 test('className takes the row state', () => {
   const root = html(
     h(Item, { selected: true, className: (state) => (state.selected ? 'on' : 'off') }, 'x'),

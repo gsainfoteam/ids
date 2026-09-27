@@ -333,6 +333,8 @@ export namespace Item {
     compoundVariants: [
       { media: ['soft', 'outline'], size: 'standard', class: { media: 'size-8' } },
       { media: ['soft', 'outline'], size: 'tiny', class: { media: 'size-7' } },
+      // An image in a tile is a thumbnail: it fills the tile and takes its corners.
+      { media: ['soft', 'outline'], class: { media: 'overflow-hidden [&>img]:size-full' } },
       // Half the padding, so a standard row holding a 36px control is 48px tall.
       { dense: true, size: 'standard', class: { root: 'min-h-12 concentric-p-1.5' } },
       { dense: true, size: 'tiny', class: { root: 'min-h-8 concentric-p-1' } },

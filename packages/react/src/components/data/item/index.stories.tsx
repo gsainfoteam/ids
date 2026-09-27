@@ -28,6 +28,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['ghost', 'outline', 'soft'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
+// A 4:3 picture, so a tile shows it cropped to a square.
+const photo = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 48"><rect width="64" height="48" fill="#93c5fd"/><circle cx="46" cy="14" r="6" fill="#fde68a"/><path d="M0 48 22 20l14 16 8-8 20 20z" fill="#1d4ed8"/></svg>',
+)}`;
+
 const meta = {
   title: 'Data/Item',
   component: Item,
@@ -115,6 +120,18 @@ export const Gallery: Story = {
               </Item.Media>
               <Item.Content>
                 <Item.Title>media {variant}</Item.Title>
+              </Item.Content>
+            </Item>
+          ))}
+        </Showcase.Row>
+        <Showcase.Row label="image">
+          {(['soft', 'outline'] as const).map((variant) => (
+            <Item key={variant} variant="outline" className="w-56">
+              <Item.Media variant={variant}>
+                <img src={photo} alt="" />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>image {variant}</Item.Title>
               </Item.Content>
             </Item>
           ))}
@@ -396,7 +413,7 @@ export const Navigation: Story = {
 
 const attachments = [
   { name: '2026 상반기 예산 집행 결과 보고서 (최종 수정본).pdf', size: '2.4 MB' },
-  { name: '예산안.xlsx', size: '84 KB' },
+  { name: '현장 사진.jpg', size: '1.2 MB', thumbnail: photo },
   { name: '회의록.md', size: '3 KB' },
 ];
 
@@ -406,7 +423,7 @@ export const Dense: Story = {
       {attachments.map((file) => (
         <Item key={file.name} variant="outline">
           <Item.Media variant="soft">
-            <DocumentIcon />
+            {file.thumbnail ? <img src={file.thumbnail} alt="" /> : <DocumentIcon />}
           </Item.Media>
           <Item.Content>
             <Item.Title truncate title={file.name}>
@@ -430,11 +447,11 @@ export const Dense: Story = {
     docs: {
       description: {
         story:
-          '`dense` 는 패딩을 반으로 줄여 첨부 파일이나 메뉴처럼 행이 많은 목록을 촘촘하게 보여 줍니다. `Item.Group` 에 주면 안의 행이 모두 따릅니다. `Item.Title truncate` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄입니다.',
+          '`dense` 는 패딩을 반으로 줄여 첨부 파일이나 메뉴처럼 행이 많은 목록을 촘촘하게 보여 줍니다. `Item.Group` 에 주면 안의 행이 모두 따릅니다. `Item.Title truncate` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄이고, 타일 안의 이미지는 타일을 채웁니다.',
       },
     },
   },
-  play: async ({ canvas }) => {
+  play: async ({ canvas, canvasElement }) => {
     const rows = canvas.getAllByRole('listitem').map((item) => item.firstElementChild!);
     await expect(rows).toHaveLength(3);
     for (const row of rows) {
@@ -445,5 +462,9 @@ export const Dense: Story = {
     const line = parseFloat(getComputedStyle(title).lineHeight);
     await expect(title.scrollWidth).toBeGreaterThan(title.clientWidth);
     await expect(title.getBoundingClientRect().height).toBeLessThan(line * 1.5);
+    const image = canvasElement.querySelector('[data-item-media] img')!;
+    const tile = image.parentElement!.getBoundingClientRect();
+    await expect(image.getBoundingClientRect().width).toBe(tile.width);
+    await expect(image.getBoundingClientRect().height).toBe(tile.height);
   },
 };

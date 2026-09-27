@@ -31,10 +31,12 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 <Item.Media><BellIcon /></Item.Media>                  {/* 기본. 아이콘만 */}
 <Item.Media variant="soft"><InboxIcon /></Item.Media>  {/* 옅은 배경 타일 */}
 <Item.Media variant="outline"><InboxIcon /></Item.Media> {/* 테두리 타일 */}
+<Item.Media variant="soft"><img src={thumbnail} alt="" /></Item.Media> {/* 썸네일 타일 */}
 <Item.Media><Avatar name="Alice Kim" /></Item.Media>   {/* 아바타, 아바타 그룹, 이미지 */}
 ```
 
 - 크기를 정하지 않은 아이콘은 `--ids-size-icon-standard` 를 따릅니다.
+- 타일(`soft`, `outline`) 바로 안의 이미지는 타일을 채우고 모서리를 따릅니다. 비율이 달라도 잘라서 채웁니다.
 - 설명이 있으면 미디어가 첫 줄 높이에 맞춰 위로 붙습니다.
 
 ## 긴 제목
