@@ -4,6 +4,7 @@ import {
   autoUpdate,
   computePosition,
   flip,
+  limitShift,
   offset as offsetBy,
   shift,
   size,
@@ -180,8 +181,9 @@ export function FieldPopup({
               });
             },
           }),
-          // A popup too tall for either side still stays on screen, over the trigger if it must.
-          shift({ padding: VIEWPORT_MARGIN, crossAxis: true }),
+          // A popup too tall for either side still stays on screen, over the trigger if it must,
+          // but never leaves it: once the trigger scrolls away, the popup goes with it.
+          shift({ padding: VIEWPORT_MARGIN, crossAxis: true, limiter: limitShift() }),
         ],
       }).then(({ x, y, placement }) => {
         if (!active) return;

@@ -513,7 +513,7 @@ test('the list opens centered on the selection and later moves scroll only the p
   }
 });
 
-test('the popup flips above a trigger near the bottom and stays inside the viewport', async () => {
+test('the popup flips above a trigger near the bottom, stays on screen and leaves with its trigger', async () => {
   let popupHeight = 300;
   const html = document.documentElement;
   Object.defineProperties(html, {
@@ -554,6 +554,22 @@ test('the popup flips above a trigger near the bottom and stays inside the viewp
     await positioned();
     assert.equal(popup.dataset.side, 'top', 'a shorter list keeps the side it opened on');
     assert.equal(popup.style.top, `${700 - 4 - 150}px`);
+    host.querySelector('[data-select]').getBoundingClientRect = () => ({
+      top: -400,
+      bottom: -364,
+      left: 100,
+      right: 300,
+      width: 200,
+      height: 36,
+      x: 100,
+      y: -400,
+    });
+    await act(() => window.dispatchEvent(new Event('scroll')));
+    await positioned();
+    assert.ok(
+      parseFloat(popup.style.top) + popupHeight <= 0,
+      'a trigger scrolled out of view takes the popup with it instead of leaving it pinned',
+    );
   } finally {
     delete html.clientWidth;
     delete html.clientHeight;
