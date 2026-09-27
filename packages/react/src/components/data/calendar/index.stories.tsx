@@ -288,6 +288,12 @@ export const Limits: Story = {
     await userEvent.click(next);
     await expect(next).toHaveAttribute('aria-disabled', 'true');
     await expect(next).toHaveFocus();
+    // The pointer is still on the button, and a month button out of reach shows no hover fill.
+    await waitFor(() =>
+      expect(canvas.getByRole('button', { name: '다음 달' })).toHaveStyle({
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+      }),
+    );
   },
 };
 

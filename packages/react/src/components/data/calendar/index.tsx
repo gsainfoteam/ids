@@ -5,6 +5,7 @@ import {
   useRef,
   type ComponentProps,
   type CSSProperties,
+  type ReactElement,
   type ReactNode,
   type Ref,
 } from 'react';
@@ -31,6 +32,7 @@ import {
   type ModifiersClassNames,
   type MonthGridProps,
   type Numerals,
+  type PreviousMonthButtonProps,
   type RootProps,
 } from 'react-day-picker';
 
@@ -43,10 +45,10 @@ import {
   type Matcher,
 } from './date';
 import { useCalendar, type CalendarState } from './use-calendar';
-import { controlSurface } from '../../../internal/control-surface';
 import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
-import { cn, invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
+import { invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
+import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../../form/field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -279,6 +281,8 @@ export function Calendar(props: CalendarProps) {
           Chevron,
           Dropdown,
           MonthGrid,
+          PreviousMonthButton: MonthButton,
+          NextMonthButton: MonthButton,
           ...components,
         }}
         onDayMouseEnter={api.onDayMouseEnter}
@@ -336,6 +340,29 @@ function Chevron({ orientation = 'left', className, style }: ChevronProps) {
   return <Icon aria-hidden="true" className={className} style={style} />;
 }
 
+// Previous and Next. DayPicker marks the button for a month out of reach with aria-disabled and
+// tabIndex -1 instead of disabled, since a natively disabled button drops the focus of the press
+// that just reached the last month; focusableWhenDisabled keeps it the same way. Its only child is
+// DayPicker's Chevron.
+function MonthButton({
+  'aria-disabled': unavailable,
+  children,
+  ...props
+}: PreviousMonthButtonProps) {
+  const c = useCalendarContext('Calendar');
+  return (
+    <IconButton
+      {...props}
+      variant="ghost"
+      size={c.size}
+      disabled={unavailable === true || unavailable === 'true'}
+      focusableWhenDisabled
+      icon={children as ReactElement}
+    />
+  );
+}
+
+// DayPicker hands this a native select's props and change events, so it stays a select, not Select.
 // The native select stays on top, transparent, so it opens the platform picker, while the label
 // under it keeps the calendar's type and a chevron.
 function Dropdown({ options, className, ...props }: DropdownProps) {
@@ -358,6 +385,7 @@ function Dropdown({ options, className, ...props }: DropdownProps) {
   );
 }
 
+// A grid cell under DayPicker's roving focus, with aria-selected on its td, so it is not a Button.
 function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calendar.DayButtonProps) {
   const c = useCalendarContext('Calendar.DayButton');
   const own = useRef<HTMLButtonElement>(null);
@@ -394,12 +422,6 @@ function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calenda
   );
 }
 
-const navButton = cn(
-  controlSurface.base,
-  'row-start-1 size-(--calendar-cell) rounded-standard bg-transparent p-0 text-(--ids-color-on-surface)',
-  'hover:bg-(--ids-color-muted) aria-disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:hover:bg-transparent',
-);
-
 export namespace Calendar {
   export type Props = CalendarProps;
   export type State = CalendarState;
@@ -421,8 +443,16 @@ export namespace Calendar {
       // both columns, so the captions line up whether or not a button stands beside them.
       month:
         'grid grid-cols-[var(--calendar-cell)_minmax(0,1fr)_var(--calendar-cell)] content-start gap-y-2',
-      previous: [navButton, 'col-start-1'],
-      next: [navButton, 'col-start-3'],
+      // IconButton keeps its hover fill when it turns disabled under the pointer, which the press
+      // that reaches the last month does.
+      previous: [
+        'col-start-1 row-start-1 size-(--calendar-cell)',
+        'data-disabled:data-hovered:bg-transparent',
+      ],
+      next: [
+        'col-start-3 row-start-1 size-(--calendar-cell)',
+        'data-disabled:data-hovered:bg-transparent',
+      ],
       chevron: 'size-(--calendar-icon)',
       caption:
         'col-start-2 row-start-1 flex h-(--calendar-cell) min-w-0 items-center justify-center',

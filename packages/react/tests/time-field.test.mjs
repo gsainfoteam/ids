@@ -167,6 +167,8 @@ test('custom parts, readOnly, and a native onClick that prevents opening', async
   await click(trigger());
   assert.equal(popup(), null);
   assert.equal(clear().disabled, true);
+  assert.equal(clear().dataset.variant, 'ghost', 'Clear is an IconButton');
+  assert.ok(clear().hasAttribute('data-disabled'));
   await render(h(TimeField, { onClick: (e) => e.preventDefault() }));
   await click(trigger());
   assert.equal(popup(), null);
