@@ -552,7 +552,7 @@ const dartTypographyFormatter = ({ dictionary }) => {
     .find((t) => t.path[1] === "sans");
   const baseFontFamily = sansFontFamily
     ? val(sansFontFamily)[0]
-    : "Pretendard Variable";
+    : "Pretendard GOV Variable";
   const fontFamily = baseFontFamily;
   const fontPackage = "ids_flutter";
   const members = [

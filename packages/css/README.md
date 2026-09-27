@@ -68,6 +68,19 @@ Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환�
 </div>
 ```
 
+### 폰트
+
+IDS 글꼴은 Pretendard GOV Variable 이다. 패키지에 글꼴 파일은 없으니 앱이 불러온다.
+
+```css
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-gov-dynamic-subset.min.css");
+@import "tailwindcss";
+@import "@gsainfoteam/ids-css";
+```
+
+- `font-sans` 와 `--ids-font-family-sans` 는 `'Pretendard GOV Variable'`, `'Pretendard GOV'`, 일반 Pretendard, `sans-serif` 순서다. Pretendard 만 불러온 앱은 Pretendard 로 보인다.
+- dynamic subset 은 화면에 쓰인 글자 범위만 받는다. 전체 파일(`pretendardvariable-gov.min.css`)은 woff2 5.4MB 다.
+
 ## Tailwind 유틸리티
 
 `@theme` 브리지로 클래스에서 바로 쓴다:

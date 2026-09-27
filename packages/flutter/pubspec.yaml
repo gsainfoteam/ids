@@ -19,6 +19,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   fonts:
-    - family: Pretendard Variable
+    - family: Pretendard GOV Variable
       fonts:
-        - asset: fonts/PretendardVariable.ttf
+        - asset: fonts/PretendardGOVVariable.ttf
