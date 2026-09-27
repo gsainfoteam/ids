@@ -1,0 +1,16 @@
+---
+'@gsainfoteam/ids-react': minor
+---
+
+Rebuild Chip around what it does: a clickable or selectable chip is a real `<button>`
+(`aria-pressed` when it toggles), and `onRemove` adds a default remove button named after the
+chip's text ("react 삭제"). Backspace or Delete on a focused chip or its remove button removes it
+and hands focus to the neighbouring chip. A chip that is both selectable and removable draws its X
+for the pointer only, so no button sits inside a button, and pressing the X no longer toggles it.
+Plain text becomes a truncating `Chip.Label`, chips can be `disabled`, hover and press lay a veil
+in the text color over any variant, and `className` / `style` / `children` take the chip state.
+
+Breaking: `Chip.Close` no longer takes `onClose`; pass `onRemove` to the Chip, and `Chip.Close`
+only changes the glyph or label. The neutral `solid` chip is the inverted on-surface color.
+`selected` without `onSelectedChange` warns in development instead of throwing. Part prop types
+move to `Chip.Icon.Props`, `Chip.Label.Props` and `Chip.Close.Props`.

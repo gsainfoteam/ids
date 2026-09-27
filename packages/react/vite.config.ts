@@ -1,9 +1,22 @@
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
+
+const manifest = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
+  dependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+};
+
+// A library ships its dependencies as imports, not copies: the app installs them once and a
+// second copy of react-day-picker or date-fns would bloat the bundle and split module state.
+const external = [
+  ...Object.keys(manifest.dependencies ?? {}),
+  ...Object.keys(manifest.peerDependencies ?? {}),
+].map((name) => new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}($|/)`));
 
 export default defineConfig({
   plugins: [tsconfigPaths({ projects: ['./tsconfig.json'] }), tailwindcss(), react()],
@@ -23,13 +36,7 @@ export default defineConfig({
       fileName: (format, entry) => `${entry}.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      external: [
-        /^react($|\/)/,
-        /^react-dom($|\/)/,
-        /^@heroicons\/react($|\/)/,
-        'react-hook-form',
-        'tailwindcss',
-      ],
+      external,
       output: {
         globals: {
           react: 'React',

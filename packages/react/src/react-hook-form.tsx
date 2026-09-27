@@ -1,4 +1,4 @@
-import { useEffect, type Ref } from 'react';
+import { useEffect, type ReactElement, type Ref } from 'react';
 
 import { useController, useFormContext, type RegisterOptions } from 'react-hook-form';
 
@@ -52,6 +52,35 @@ function isEvent(value: unknown) {
   return (
     typeof value === 'object' && value !== null && 'target' in value && 'currentTarget' in value
   );
+}
+
+// Which callback carries a control's value in the value and checked modes. A native element
+// reports through its change event, which RHF reads target.value or checked from. A component
+// reports the value itself: through onValueChange or onCheckedChange, or a value-first onChange.
+// A change event a component passes on, from its own input or bubbling up from a group's
+// checkboxes, carries what is on screen (`1,234`, a checkbox's own value) rather than the value,
+// so it never reaches RHF. One edit reported through two callbacks reaches RHF once.
+function reportsFor(
+  control: ReactElement,
+  controlMode: 'value' | 'checked',
+  onChange: (value: unknown) => void,
+) {
+  if (typeof control.type === 'string') return { onChange };
+  let reported = false;
+  const once = (value: unknown) => {
+    if (reported) return;
+    reported = true;
+    queueMicrotask(() => {
+      reported = false;
+    });
+    onChange(value);
+  };
+  return {
+    [controlMode === 'checked' ? 'onCheckedChange' : 'onValueChange']: once,
+    onChange: (next: unknown) => {
+      if (!isEvent(next)) once(next);
+    },
+  };
 }
 
 function NativeField({
@@ -111,22 +140,9 @@ function ControlledField({
         const resolvedValue =
           value === undefined ? (controlMode === 'checked' ? false : '') : value;
         const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
-        // A native element reports through its change event, which RHF reads target.value or
-        // checked from. A component reports the value itself, through onValueChange or
-        // onCheckedChange or a value-first onChange; a change event it forwards from its own
-        // input carries the text on screen, not the value, so RHF never takes it from there.
-        const report =
-          typeof control.type === 'string'
-            ? { onChange }
-            : {
-                [controlMode === 'checked' ? 'onCheckedChange' : 'onValueChange']: onChange,
-                onChange: (next: unknown) => {
-                  if (!isEvent(next)) onChange(next);
-                },
-              };
         return bind(rest, {
           ...binding,
-          ...report,
+          ...reportsFor(control, controlMode, onChange),
           [controlMode]: resolvedValue,
           disabled: disabled ?? original.disabled,
         });

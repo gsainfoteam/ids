@@ -39,6 +39,7 @@ async function render(node) {
 }
 const radio = (score) => host.querySelector(`[data-rating-value="${score}"]`);
 const checked = () => Number(host.querySelector('[aria-checked=true]').dataset.ratingValue);
+const group = () => host.querySelector('[data-rating]');
 async function key(key) {
   await act(async () =>
     document.activeElement.dispatchEvent(
@@ -50,7 +51,7 @@ async function click(score) {
   await act(async () => radio(score).click());
 }
 
-test('half-step SSR has one selected/tabbable value and preserves Field label/error', () => {
+test('half-step SSR: one tabbable option, the Field label and id stay on the group', () => {
   const doc = new JSDOM(
     renderToString(
       h(
@@ -62,17 +63,21 @@ test('half-step SSR has one selected/tabbable value and preserves Field label/er
       ),
     ),
   ).window.document;
+  const groupNode = doc.querySelector('[role=radiogroup]');
   assert.equal(doc.querySelectorAll('[role=radio]').length, 11);
   assert.equal(doc.querySelectorAll('[tabindex="0"]').length, 1);
   const selected = doc.querySelector('[aria-checked=true]');
   assert.equal(selected.dataset.ratingValue, '2.5');
-  assert.equal(doc.querySelector('label').htmlFor, selected.id);
+  assert.equal(doc.querySelector('label').htmlFor, groupNode.id, 'the id does not move');
+  assert.equal(groupNode.getAttribute('aria-labelledby'), doc.querySelector('label').id);
   assert.equal(selected.getAttribute('aria-invalid'), 'true');
   assert.equal(doc.getElementById(selected.getAttribute('aria-describedby')).textContent, '오류');
+  assert.equal(groupNode.dataset.size, 'tiny');
 });
-test('keyboard moves by half-step, clamps boundaries, clears and retains focus', async () => {
+
+test('keyboard moves by half-step, clamps boundaries, clears and keeps focus', async () => {
   const values = [];
-  await render(h(Rating, { step: 0.5, onChange: (v) => values.push(v) }));
+  await render(h(Rating, { step: 0.5, onValueChange: (v) => values.push(v) }));
   radio(0).focus();
   await key('ArrowRight');
   assert.equal(checked(), 0.5);
@@ -91,15 +96,15 @@ test('keyboard moves by half-step, clamps boundaries, clears and retains focus',
   await key('ArrowLeft');
   assert.equal(checked(), 3.5);
 });
-test('hover previews without changing form value; half clicks commit once', async () => {
+
+test('hover previews without changing the value; half clicks commit once', async () => {
   const values = [],
     previews = [];
   await render(
     h(Rating, {
       defaultValue: 1,
       step: 0.5,
-      name: 'score',
-      onChange: (v) => values.push(v),
+      onValueChange: (v) => values.push(v),
       onHover: (v) => previews.push(v),
     }),
   );
@@ -110,20 +115,22 @@ test('hover previews without changing form value; half clicks commit once', asyn
   });
   assert.equal(host.querySelectorAll('[data-state=full]').length, 2);
   assert.equal(host.querySelector('[data-state=half]') !== null, true);
-  assert.equal(host.querySelector('input').value, '1');
+  assert.ok(group().hasAttribute('data-previewing'));
+  assert.equal(checked(), 1);
   assert.deepEqual(values, []);
   await click(2.5);
   await click(2.5);
   assert.deepEqual(values, [2.5]);
   assert.deepEqual(previews, [2.5, null]);
 });
-test('controlled changes respect owner; external updates do not echo', async () => {
+
+test('controlled changes respect the owner; outside updates do not echo', async () => {
   const values = [];
   let update;
   function Demo() {
     const [value, set] = useState(2);
     update = set;
-    return h(Rating, { value, onChange: (v) => values.push(v) });
+    return h(Rating, { value, onValueChange: (v) => values.push(v) });
   }
   await render(h(Demo));
   await click(4);
@@ -133,9 +140,12 @@ test('controlled changes respect owner; external updates do not echo', async () 
   assert.equal(checked(), 3);
   assert.deepEqual(values, [4]);
 });
-test('readonly, disabled and display-only prohibit changes; custom graphics are inert', async () => {
+
+test('readOnly, disabled and display-only block changes; display-only reads as one image', async () => {
   for (const prop of ['readOnly', 'disabled']) {
-    await render(h(Rating, { [prop]: true, value: 2, onChange: () => assert.fail('blocked') }));
+    await render(
+      h(Rating, { [prop]: true, value: 2, onValueChange: () => assert.fail('blocked') }),
+    );
     await click(4);
     radio(2).focus();
     await key('End');
@@ -144,30 +154,87 @@ test('readonly, disabled and display-only prohibit changes; custom graphics are 
   await render(h(Rating, { selectionMode: 'none', value: 3, 'aria-label': '상품' }));
   assert.equal(host.querySelectorAll('button').length, 0);
   assert.match(host.querySelector('[role=img]').getAttribute('aria-label'), /상품.*3점/);
+  assert.equal(host.querySelector('input'), null, 'nothing to submit');
+});
+
+test('Rating.Item: one template for every star, indexed items for their own, all inert', async () => {
   await render(
     h(
       Rating,
-      { max: 1, variant: 'custom' },
-      h(Rating.Item, { index: 0, asChild: true }, h('svg', { 'data-custom': '' })),
+      { max: 3, defaultValue: 2, 'aria-label': 'Glyphs' },
+      h(Rating.Item, null, h('i', { 'data-glyph': 'fire' })),
+      h(Rating.Item, {
+        index: 1,
+        className: (state) => `item-${state.fill}`,
+        children: (state) => h('i', { 'data-glyph': `face-${state.itemValue}` }),
+      }),
     ),
   );
-  assert.ok(host.querySelector('[inert] [data-custom]'));
+  const glyphs = [...host.querySelectorAll('[data-rating-item]')].map(
+    (item) => item.querySelector('[data-glyph]').dataset.glyph,
+  );
+  assert.deepEqual(glyphs, ['fire', 'face-2', 'fire']);
+  assert.ok(host.querySelector('[inert] [data-glyph]'));
+  assert.ok(host.querySelectorAll('[data-rating-item]')[1].className.includes('item-full'));
+  assert.throws(
+    () => renderToString(h(Rating, null, h(Rating.Item, null, 'a'), h(Rating.Item, null, 'b'))),
+    /one Rating.Item without an index/,
+  );
+  assert.throws(() => renderToString(h(Rating, null, h('span'))), /Rating.Item elements/);
 });
-test('native reset restores defaults, respects canceled reset, omits disabled form value', async () => {
-  await render(h('form', null, h(Rating, { name: 'score', defaultValue: 2 })));
-  await click(4);
+
+test('form: a hidden input only with a name and a score, required, reset without a report', async () => {
+  const values = [];
+  await render(
+    h(
+      'form',
+      null,
+      h(Rating, { name: 'score', defaultValue: 2, onValueChange: (v) => values.push(v) }),
+      h(Rating, { 'aria-label': 'Nameless', defaultValue: 4 }),
+    ),
+  );
   const form = host.querySelector('form');
-  assert.equal(new dom.window.FormData(form).get('score'), '4');
-  await act(async () => form.reset());
+  await click(4);
+  assert.deepEqual([...new dom.window.FormData(form)], [['score', '4']]);
+  await act(async () => {
+    form.reset();
+    await Promise.resolve();
+  });
   assert.equal(checked(), 2);
-  await click(3);
+  assert.deepEqual(values, [4]);
+  radio(0).focus();
+  await key('0');
+  assert.deepEqual([...new dom.window.FormData(form)], [], 'no rating, no entry');
   form.addEventListener('reset', (e) => e.preventDefault(), { once: true });
-  await act(async () => form.reset());
-  assert.equal(checked(), 3);
-  await render(h('form', null, h(Rating, { name: 'score', disabled: true })));
+  await click(3);
+  await act(async () => {
+    form.reset();
+    await Promise.resolve();
+  });
+  assert.equal(checked(), 3, 'a cancelled reset changes nothing');
+  await render(h('form', { key: 'required' }, h(Rating, { name: 'score', required: true })));
+  const validator = host.querySelector('[data-form-value-validator]');
+  assert.equal(validator.validationMessage, '점수를 선택하세요.');
+  await click(1);
+  assert.equal(host.querySelector('[data-form-value-validator]').checkValidity(), true);
+  await render(
+    h('form', { key: 'disabled' }, h(Rating, { name: 'score', disabled: true, defaultValue: 3 })),
+  );
   assert.equal(new dom.window.FormData(host.querySelector('form')).has('score'), false);
 });
-test('RHF stores numbers, focuses selected option on error, marks blur, and resets', async () => {
+
+test('ref and focus stay on the group, which hands focus to the checked option', async () => {
+  let ref;
+  await render(h(Rating, { defaultValue: 3, ref: (node) => (ref = node), id: 'rating' }));
+  assert.equal(ref, group());
+  assert.equal(group().id, 'rating');
+  await click(4);
+  assert.equal(group().id, 'rating', 'the id does not follow the checked option');
+  await act(async () => ref.focus());
+  assert.equal(document.activeElement, radio(4));
+});
+
+test('RHF stores numbers, focuses the checked option on error, marks blur, and resets', async () => {
   let methods;
   function Form() {
     methods = useForm({ defaultValues: { score: 0 }, mode: 'onBlur' });

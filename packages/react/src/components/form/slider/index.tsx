@@ -1,279 +1,493 @@
-import { useRef, useState } from 'react';
-import type { ComponentProps, KeyboardEvent, PointerEvent } from 'react';
+import {
+  createContext,
+  use,
+  type ComponentProps,
+  type CSSProperties,
+  type ReactNode,
+  type RefCallback,
+} from 'react';
 
-import { useControllableState } from '../../../hooks/use-controllable-state';
-import { invariant, tv } from '../../../utils';
+import { percentOf, stepMarks, thumbOffset } from './slider-math';
+import { useSlider, type SliderValue } from './use-slider';
+import { FormValue } from '../../../internal/form-value';
+import { messages } from '../../../internal/messages';
+import { invariant, mergeProps, tv } from '../../../utils';
+import { Slot } from '../../utility/slot';
+import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
-function decimalsOf(n: number) {
-  const [mantissa, exponent] = String(n).split('e');
-  const fraction = mantissa!.split('.')[1]?.length ?? 0;
-  return fraction + (exponent == null ? 0 : Math.max(0, -Number(exponent)));
+export type { SliderValue } from './use-slider';
+export type SliderOrientation = 'horizontal' | 'vertical';
+export type SliderValueLabel = 'auto' | 'always' | 'never';
+
+export type SliderState = {
+  value: SliderValue;
+  values: readonly number[];
+  dragging: boolean;
+  orientation: SliderOrientation;
+  disabled: boolean;
+  readOnly: boolean;
+  invalid: boolean;
+};
+
+export type SliderThumbState = SliderState & {
+  index: number;
+  thumbValue: number;
+  thumbDragging: boolean;
+};
+
+type StateProp<T, S = SliderState> = T | ((state: S) => T);
+
+type SingleProps = {
+  selectionMode?: 'single';
+  value?: number;
+  defaultValue?: number;
+  onValueChange?: (value: number) => void;
+  onValueCommit?: (value: number) => void;
+};
+
+type RangeProps = {
+  selectionMode: 'range';
+  value?: [number, number];
+  defaultValue?: [number, number];
+  onValueChange?: (value: [number, number]) => void;
+  onValueCommit?: (value: [number, number]) => void;
+};
+
+type SharedProps = Omit<
+  ComponentProps<'div'>,
+  'children' | 'className' | 'style' | 'defaultValue' | 'onChange' | 'role'
+> & {
+  min?: number;
+  max?: number;
+  step?: number;
+  largeStep?: number;
+  minStepsBetweenThumbs?: number;
+  orientation?: SliderOrientation;
+  size?: IdsSize;
+  disabled?: boolean;
+  readOnly?: boolean;
+  invalid?: boolean;
+  name?: string;
+  form?: string;
+  marks?: boolean | readonly number[];
+  formatLabel?: (value: number) => string;
+  valueLabel?: SliderValueLabel;
+  thumbLabels?: readonly [string, string];
+  className?: StateProp<string | undefined>;
+  style?: StateProp<CSSProperties | undefined>;
+  children?: ReactNode;
+};
+
+export type SliderProps = SharedProps & (SingleProps | RangeProps);
+
+type Context = {
+  state: SliderState;
+  styles: ReturnType<typeof Slider.Style>;
+  min: number;
+  max: number;
+  range: boolean;
+  dragging: number | null;
+  formatLabel: ((value: number) => string) | undefined;
+  valueLabel: SliderValueLabel;
+  setTrack: RefCallback<HTMLElement>;
+  thumbProps: (index: number) => Record<string, unknown>;
+};
+
+const SliderContext = createContext<Context | null>(null);
+
+function useSliderContext(part: string) {
+  const context = use(SliderContext);
+  invariant(context, `${part} must be rendered inside Slider.`);
+  return context;
 }
 
-function snap(raw: number, min: number, max: number, step: number) {
-  const stepped = Math.round((raw - min) / step) * step + min;
-  // step 의 자릿수만 쓰면 min 0.25 / step 0.5 에서 0.25 가 0.3 으로 잘린다.
-  const decimals = Math.min(100, Math.max(decimalsOf(min), decimalsOf(max), decimalsOf(step)));
-  return Number(Math.min(max, Math.max(min, stepped)).toFixed(decimals));
+function resolve<T, S>(value: StateProp<T, S>, state: S): T {
+  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
 }
 
-export function Slider({
-  selectionMode = 'single',
-  orientation = 'horizontal',
-  size = 'standard',
-  min = 0,
-  max = 100,
-  step = 1,
-  largeStep = step * 10,
-  marks = false,
-  thumbLabels = ['시작', '끝'],
-  formatLabel = String,
-  disabled = false,
-  value: valueProp,
-  defaultValue,
-  onChange,
-  className,
-  ...rest
-}: Slider.Props) {
-  invariant(min < max, '`<Slider>` `min` must be less than `max`.');
-  invariant(step > 0, '`<Slider>` `step` must be positive.');
+function position(orientation: SliderOrientation, offset: string): CSSProperties {
+  return orientation === 'vertical' ? { bottom: offset } : { insetInlineStart: offset };
+}
 
+export function Slider(props: SliderProps) {
+  const {
+    selectionMode = 'single',
+    value,
+    defaultValue,
+    onValueChange,
+    onValueCommit,
+    min = 0,
+    max = 100,
+    step = 1,
+    largeStep = step * 10,
+    minStepsBetweenThumbs = 0,
+    orientation = 'horizontal',
+    size,
+    disabled = false,
+    readOnly = false,
+    invalid,
+    name,
+    form,
+    marks = false,
+    formatLabel,
+    valueLabel = 'auto',
+    thumbLabels = [messages.slider.start, messages.slider.end],
+    className,
+    style,
+    children,
+    ref,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledby,
+    'aria-describedby': ariaDescribedby,
+    'aria-invalid': ariaInvalidProp,
+    ...rest
+  } = props;
+  // Field hands every control `required` and `aria-required`; a slider always has a value.
+  const {
+    required: _required,
+    'aria-required': _ariaRequired,
+    ...domProps
+  } = rest as typeof rest & { required?: unknown };
+
+  invariant(min < max, 'Slider: `min` must be less than `max`.');
+  invariant(step > 0, 'Slider: `step` must be positive.');
   const range = selectionMode === 'range';
-  const fallback: Slider.Value = range ? [min, max] : min;
-  const [value, setValue] = useControllableState<Slider.Value>({
-    value: valueProp,
-    defaultValue: defaultValue ?? fallback,
-    onValueChange: onChange as ((next: Slider.Value) => void) | undefined,
+  invariant(
+    [value, defaultValue].every(
+      (entry) =>
+        entry === undefined ||
+        (range ? Array.isArray(entry) && entry.length === 2 : typeof entry === 'number'),
+    ),
+    range
+      ? 'Slider: `selectionMode="range"` takes a `[start, end]` value.'
+      : 'Slider: a single slider takes a number value.',
+  );
+
+  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const slider = useSlider({
+    range,
+    value,
+    defaultValue,
+    onValueChange: onValueChange as ((value: SliderValue) => void) | undefined,
+    onValueCommit: onValueCommit as ((value: SliderValue) => void) | undefined,
+    min,
+    max,
+    step,
+    largeStep,
+    minStepsBetweenThumbs,
+    orientation,
+    disabled,
+    readOnly,
+    ref,
   });
+  const { values, dragging, anchorRef, rootRef, setTrack, setThumb, rootHandlers, thumbHandlers } =
+    slider;
 
-  const inBounds = (n: unknown) =>
-    typeof n === 'number' && Number.isFinite(n) && n >= min && n <= max;
+  const ariaInvalid = ariaInvalidProp ?? invalid;
+  const state: SliderState = {
+    value: slider.value,
+    values,
+    dragging: dragging !== null,
+    orientation,
+    disabled,
+    readOnly,
+    invalid: ariaInvalid === true || ariaInvalid === 'true',
+  };
+  const styles = Slider.Style({ orientation, size: resolvedSize });
+  const gap = minStepsBetweenThumbs * step;
 
-  invariant(
-    !range ||
-      (Array.isArray(value) &&
-        value.length === 2 &&
-        value.every(inBounds) &&
-        value[0]! <= value[1]!),
-    `\`<Slider>\` in range mode needs a \`[start, end]\` value inside [${min}, ${max}] with \`start <= end\`.`,
-  );
-  invariant(
-    range || inBounds(value),
-    `\`<Slider>\` in single mode needs a finite number inside [${min}, ${max}].`,
-  );
-
-  const values = Array.isArray(value) ? value : [value];
-  const trackRef = useRef<HTMLSpanElement>(null);
-  const [dragging, setDragging] = useState<number | null>(null);
-
-  function commit(index: number, next: number) {
-    const bounded = snap(next, min, max, step);
-    if (!range) {
-      setValue(bounded);
-      return;
-    }
-    const [start, end] = values;
-    setValue(index === 0 ? [Math.min(bounded, end), end] : [start, Math.max(bounded, start)]);
-  }
-
-  function valueAt(event: PointerEvent<HTMLSpanElement>) {
-    const rect = trackRef.current?.getBoundingClientRect();
-    if (rect == null) return min;
-    const ratio =
-      orientation === 'vertical'
-        ? (rect.bottom - event.clientY) / rect.height
-        : (event.clientX - rect.left) / rect.width;
-    return min + Math.min(1, Math.max(0, ratio)) * (max - min);
-  }
-
-  function nearestIndex(next: number) {
-    if (!range) return 0;
-    return Math.abs(next - values[0]) <= Math.abs(next - values[1]) ? 0 : 1;
-  }
-
-  function onPointerDown(event: PointerEvent<HTMLSpanElement>) {
-    if (disabled) return;
-    const next = valueAt(event);
-    const index = nearestIndex(next);
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setDragging(index);
-    commit(index, next);
-  }
-
-  function onPointerMove(event: PointerEvent<HTMLSpanElement>) {
-    if (dragging == null) return;
-    commit(dragging, valueAt(event));
-  }
-
-  function onKeyDown(index: number) {
-    return (event: KeyboardEvent<HTMLSpanElement>) => {
-      if (disabled) return;
-      const amount = event.shiftKey ? largeStep : step;
-      const forward = orientation === 'vertical' ? 'ArrowUp' : 'ArrowRight';
-      const backward = orientation === 'vertical' ? 'ArrowDown' : 'ArrowLeft';
-
-      const next = {
-        [forward]: values[index] + amount,
-        [backward]: values[index] - amount,
-        PageUp: values[index] + largeStep,
-        PageDown: values[index] - largeStep,
-        Home: min,
-        End: max,
-      }[event.key];
-
-      if (next == null) return;
-      event.preventDefault();
-      commit(index, next);
-    };
-  }
+  // A single slider is named on its thumb, where the value is; a range names its group and tells
+  // the two thumbs apart with `thumbLabels`.
+  const thumbProps = (index: number) => ({
+    ref: setThumb(index),
+    role: 'slider',
+    tabIndex: disabled ? -1 : 0,
+    'aria-label': range ? thumbLabels[index] : ariaLabel,
+    'aria-labelledby': range ? undefined : ariaLabelledby,
+    'aria-describedby': range ? undefined : ariaDescribedby,
+    'aria-orientation': orientation,
+    'aria-valuemin': range && index === 1 ? values[0]! + gap : min,
+    'aria-valuemax': range && index === 0 ? values[1]! - gap : max,
+    'aria-valuenow': values[index],
+    'aria-valuetext': formatLabel?.(values[index]!),
+    'aria-disabled': disabled || undefined,
+    'aria-readonly': readOnly || undefined,
+    'aria-invalid': ariaInvalid,
+    'data-index': index,
+    'data-dragging': dragging === index ? '' : undefined,
+    'data-disabled': disabled ? '' : undefined,
+    ...thumbHandlers(index),
+  });
 
   const markValues = Array.isArray(marks)
-    ? marks
+    ? (marks as readonly number[])
     : marks
-      ? Array.from({ length: Math.floor((max - min) / step) + 1 }, (_, i) => min + i * step)
+      ? stepMarks(min, max, step)
       : [];
 
-  const ratio = (item: number) => ((item - min) / (max - min)) * 100;
-  const offset = (percent: number) =>
-    orientation === 'vertical' ? { bottom: `${percent}%` } : { left: `${percent}%` };
-
-  const start = range ? ratio(values[0]) : 0;
-  const end = ratio(range ? values[1] : values[0]);
-
-  const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rootProps } = rest;
-
-  // 단일 모드의 래퍼는 thumb 하나만 감싸므로 group 으로 묶을 것이 없다. 이름은 thumb 으로 간다.
-  const { root, track, rangeBar, thumb, marksRoot, mark } = Slider.Style({
-    orientation,
-    size,
-    disabled,
-  });
-
   return (
-    <span
-      {...rootProps}
-      {...(range
-        ? { role: 'group' as const, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy }
-        : {})}
-      className={root({ className })}
+    <SliderContext.Provider
+      value={{
+        state,
+        styles,
+        min,
+        max,
+        range,
+        dragging,
+        formatLabel,
+        valueLabel,
+        setTrack,
+        thumbProps,
+      }}
     >
-      <span
-        ref={trackRef}
-        className={track()}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={() => setDragging(null)}
-        onPointerCancel={() => setDragging(null)}
+      <div
+        {...mergeProps(domProps, rootHandlers)}
+        ref={rootRef}
+        tabIndex={-1}
+        {...(range
+          ? {
+              role: 'group',
+              'aria-label': ariaLabel,
+              'aria-labelledby': ariaLabelledby,
+              'aria-describedby': ariaDescribedby,
+            }
+          : {})}
+        data-slider=""
+        data-orientation={orientation}
+        data-size={resolvedSize}
+        data-dragging={dragging !== null ? '' : undefined}
+        data-disabled={disabled ? '' : undefined}
+        data-readonly={readOnly ? '' : undefined}
+        data-invalid={state.invalid ? '' : undefined}
+        className={styles.root({ className: resolve(className, state) })}
+        style={resolve(style, state)}
       >
-        <span
-          className={rangeBar()}
-          style={
-            orientation === 'vertical'
-              ? { bottom: `${start}%`, height: `${end - start}%` }
-              : { left: `${start}%`, width: `${end - start}%` }
-          }
+        {children ?? <Slider.Track />}
+        {markValues.length > 0 && (
+          <div aria-hidden="true" className={styles.marks()}>
+            {markValues.map((mark) => (
+              <span
+                key={mark}
+                className={styles.mark()}
+                style={position(orientation, thumbOffset(percentOf(mark, min, max)))}
+              >
+                <span className={styles.tick()} />
+                {Array.isArray(marks) && (formatLabel?.(mark) ?? String(mark))}
+              </span>
+            ))}
+          </div>
+        )}
+        <FormValue
+          name={name}
+          form={form}
+          value={values.map(String)}
+          disabled={disabled}
+          anchor={anchorRef}
         />
-        {values.map((item, index) => (
-          <span
-            key={index}
-            role="slider"
-            tabIndex={disabled ? -1 : 0}
-            aria-orientation={orientation}
-            {...(range
-              ? { 'aria-label': thumbLabels[index] }
-              : { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy })}
-            aria-valuemin={range && index === 1 ? values[0] : min}
-            aria-valuemax={range && index === 0 ? values[1] : max}
-            aria-valuenow={item}
-            aria-valuetext={formatLabel(item)}
-            aria-disabled={disabled || undefined}
-            className={thumb()}
-            style={offset(ratio(item))}
-            onKeyDown={onKeyDown(index)}
-          />
-        ))}
-      </span>
-      {markValues.length > 0 ? (
-        <span aria-hidden className={marksRoot()}>
-          {markValues.map((item) => (
-            <span key={item} className={mark()} style={offset(ratio(item))}>
-              {formatLabel(item)}
-            </span>
-          ))}
-        </span>
-      ) : null}
-    </span>
+      </div>
+    </SliderContext.Provider>
   );
 }
 
 export namespace Slider {
+  export type Props = SliderProps;
+  export type State = SliderState;
+  export type ThumbState = SliderThumbState;
+  export type Value = SliderValue;
+  export type Orientation = SliderOrientation;
+
+  type PartProps<S = SliderState> = Omit<
+    ComponentProps<'span'>,
+    'className' | 'style' | 'children'
+  > & {
+    asChild?: boolean;
+    className?: StateProp<string | undefined, S>;
+    style?: StateProp<CSSProperties | undefined, S>;
+    children?: ReactNode | ((state: S) => ReactNode);
+  };
+
+  export type TrackProps = PartProps;
+  export type RangeProps = PartProps;
+  export type ThumbProps = PartProps<SliderThumbState> & { index?: number };
+
+  function Part({
+    asChild,
+    props,
+    children,
+  }: {
+    asChild: boolean | undefined;
+    props: Record<string, unknown>;
+    children: ReactNode;
+  }) {
+    return asChild ? <Slot {...props}>{children}</Slot> : <span {...props}>{children}</span>;
+  }
+
+  export function Track({ asChild, className, style, children, ...props }: TrackProps) {
+    const { state, styles, range, setTrack } = useSliderContext('Slider.Track');
+    const content = resolve(children, state) ?? (
+      <>
+        <Range />
+        <Thumb index={0} />
+        {range && <Thumb index={1} />}
+      </>
+    );
+    return (
+      <Part
+        asChild={asChild}
+        props={{
+          ...props,
+          ref: setTrack,
+          'data-orientation': state.orientation,
+          'data-disabled': state.disabled ? '' : undefined,
+          className: styles.track({ className: resolve(className, state) }),
+          style: resolve(style, state),
+        }}
+      >
+        {content}
+      </Part>
+    );
+  }
+
+  export namespace Track {
+    export type Props = TrackProps;
+  }
+
+  export function Range({ asChild, className, style, children, ...props }: RangeProps) {
+    const { state, styles, min, max, range } = useSliderContext('Slider.Range');
+    const [first, last] = [state.values[0]!, state.values[state.values.length - 1]!];
+    const start = range ? thumbOffset(percentOf(first, min, max)) : '0%';
+    const end = thumbOffset(percentOf(last, min, max));
+    const extent = `calc(${end} - ${start})`;
+    const placement: CSSProperties =
+      state.orientation === 'vertical'
+        ? { bottom: start, height: extent }
+        : { insetInlineStart: start, width: extent };
+    return (
+      <Part
+        asChild={asChild}
+        props={{
+          ...props,
+          'aria-hidden': true,
+          'data-orientation': state.orientation,
+          className: styles.range({ className: resolve(className, state) }),
+          style: { ...placement, ...resolve(style, state) },
+        }}
+      >
+        {resolve(children, state)}
+      </Part>
+    );
+  }
+
+  export namespace Range {
+    export type Props = RangeProps;
+  }
+
+  export function Thumb({ index = 0, asChild, className, style, children, ...props }: ThumbProps) {
+    const { state, styles, min, max, dragging, formatLabel, valueLabel, thumbProps } =
+      useSliderContext('Slider.Thumb');
+    invariant(
+      index >= 0 && index < state.values.length,
+      `Slider.Thumb: index ${index} has no value; a range slider has thumbs 0 and 1.`,
+    );
+    const thumbValue = state.values[index]!;
+    const thumbState: SliderThumbState = {
+      ...state,
+      index,
+      thumbValue,
+      thumbDragging: dragging === index,
+    };
+    const label =
+      valueLabel === 'never' ? null : (
+        <span
+          aria-hidden="true"
+          data-visible={valueLabel === 'always' ? '' : undefined}
+          className={styles.valueLabel()}
+        >
+          {formatLabel?.(thumbValue) ?? thumbValue}
+        </span>
+      );
+    const content = resolve(children, thumbState) ?? label;
+    return (
+      <Part
+        asChild={asChild}
+        props={mergeProps(
+          {
+            ...thumbProps(index),
+            className: styles.thumb(),
+            style: position(state.orientation, thumbOffset(percentOf(thumbValue, min, max))),
+          },
+          {
+            ...props,
+            className: resolve(className, thumbState),
+            style: resolve(style, thumbState),
+          },
+        )}
+      >
+        {content}
+      </Part>
+    );
+  }
+
+  export namespace Thumb {
+    export type Props = ThumbProps;
+  }
+
   export const Style = tv({
     slots: {
-      root: 'relative inline-flex touch-none select-none',
-      track: 'relative rounded-full bg-(--ids-color-muted)',
-      rangeBar: 'absolute rounded-full bg-(--ids-color-primary)',
-      thumb: [
-        'absolute rounded-full bg-(--ids-color-surface) shadow-sm',
-        'inset-ring-2 inset-ring-(--ids-color-primary)',
-        'transition-[box-shadow] motion-reduce:transition-none',
-        'focus-ring',
+      root: [
+        'group/slider relative grid select-none outline-none',
+        'data-disabled:cursor-not-allowed data-disabled:opacity-50',
       ],
-      marksRoot: 'relative',
-      mark: 'absolute text-caption-c2-regular text-(--ids-color-on-muted)',
+      track: 'relative rounded-full bg-(--ids-color-muted)',
+      range:
+        'absolute rounded-full bg-(--ids-color-primary) group-data-invalid/slider:bg-(--ids-color-danger)',
+      thumb: [
+        'group/thumb absolute block size-(--slider-thumb) rounded-full',
+        'bg-(--ids-color-surface) shadow-sm inset-ring-1 inset-ring-(--ids-color-primary)',
+        'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none',
+        'hover:ring-[3px] hover:ring-(--ids-color-primary)/40 focus-ring',
+        'data-disabled:hover:ring-0',
+      ],
+      valueLabel: [
+        'pointer-events-none absolute rounded-indicator px-1.5 py-0.5 whitespace-nowrap',
+        'bg-(--ids-color-on-surface) text-caption-c1-medium text-(--ids-color-surface) tabular-nums',
+        'opacity-0 transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',
+        'group-focus-visible/thumb:opacity-100 group-data-dragging/thumb:opacity-100 data-visible:opacity-100',
+      ],
+      marks: 'relative text-caption-c2-regular text-(--ids-color-on-muted)',
+      mark: 'absolute flex items-center gap-1 whitespace-nowrap',
+      tick: 'rounded-full bg-(--ids-color-border)',
     },
     variants: {
       orientation: {
         horizontal: {
-          root: 'w-full flex-col',
-          track: 'h-1.5 w-full',
-          rangeBar: 'h-full',
-          thumb: 'top-1/2 -translate-x-1/2 -translate-y-1/2',
-          marksRoot: 'mt-2 h-4 w-full',
-          mark: '-translate-x-1/2',
+          root: 'w-full grid-rows-(--slider-thumb) touch-pan-y items-center',
+          track: 'h-(--slider-track) w-full',
+          range: 'h-full',
+          thumb: 'top-1/2 -translate-x-1/2 -translate-y-1/2 rtl:translate-x-1/2',
+          valueLabel: 'bottom-full left-1/2 mb-2 -translate-x-1/2',
+          marks: 'mt-1 h-5 w-full',
+          mark: '-translate-x-1/2 flex-col rtl:translate-x-1/2',
+          tick: 'h-1 w-px',
         },
         vertical: {
-          root: 'h-full flex-row',
-          track: 'h-full w-1.5',
-          rangeBar: 'w-full',
-          thumb: 'left-1/2 translate-x-[-50%] translate-y-1/2',
-          marksRoot: 'ml-2 h-full w-8',
+          root: 'h-full min-h-44 grid-cols-(--slider-thumb) touch-pan-x justify-items-center',
+          track: 'h-full w-(--slider-track)',
+          range: 'w-full',
+          thumb: 'left-1/2 -translate-x-1/2 translate-y-1/2',
+          valueLabel: 'start-full top-1/2 ms-2 -translate-y-1/2',
+          marks: 'ms-1 h-full w-10',
           mark: 'translate-y-1/2',
+          tick: 'h-px w-1',
         },
-      },
+      } satisfies Record<SliderOrientation, object>,
       size: {
-        standard: { thumb: 'size-4.5' },
-        tiny: { thumb: 'size-3.5' },
-      } satisfies Record<IdsSize, { thumb: string }>,
-      disabled: {
-        true: { root: 'pointer-events-none opacity-50' },
-        false: { track: 'cursor-pointer' },
-      },
+        standard: { root: '[--slider-thumb:1rem] [--slider-track:0.375rem]' },
+        tiny: { root: '[--slider-thumb:0.875rem] [--slider-track:0.25rem]' },
+      } satisfies Record<IdsSize, object>,
     },
-    defaultVariants: { orientation: 'horizontal', size: 'standard', disabled: false },
+    defaultVariants: { orientation: 'horizontal', size: 'standard' },
   });
-
-  export type Value = number | [number, number];
-
-  export type Props = Omit<
-    ComponentProps<'span'>,
-    'children' | 'className' | 'role' | 'onChange' | 'defaultValue'
-  > & {
-    selectionMode?: 'single' | 'range';
-    orientation?: 'horizontal' | 'vertical';
-    size?: IdsSize;
-    min?: number;
-    max?: number;
-    step?: number;
-    largeStep?: number;
-    marks?: boolean | number[];
-    thumbLabels?: [string, string];
-    formatLabel?: (value: number) => string;
-    disabled?: boolean;
-    value?: Value;
-    defaultValue?: Value;
-    onChange?: (value: Value) => void;
-    className?: string;
-  };
 }
