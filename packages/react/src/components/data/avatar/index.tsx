@@ -113,9 +113,12 @@ export function Avatar({
         className={styles.root({ className: resolveState(className, state) })}
         style={resolveState(style, state)}
       >
-        {image === undefined && imageSrc ? <Avatar.Image /> : null}
-        {nodes}
-        {hasFallback ? null : <Avatar.Fallback />}
+        {/* An avatar inside this one, say in a tooltip, is not part of the stack. */}
+        <AvatarCutoutContext value={undefined}>
+          {image === undefined && imageSrc ? <Avatar.Image /> : null}
+          {nodes}
+          {hasFallback ? null : <Avatar.Fallback />}
+        </AvatarCutoutContext>
       </span>
     </AvatarContext>
   );
@@ -232,9 +235,13 @@ export namespace Avatar {
 
   export const Style = tv({
     slots: {
+      // The inner edge keeps a light photo or a muted fallback visible on a surface of the same
+      // color. It is drawn above the image, so it follows the cut-out as well.
       root: [
         'relative inline-flex shrink-0 items-center justify-center overflow-hidden align-middle',
         'bg-(--ids-color-muted) text-(--ids-color-on-muted) select-none @container',
+        'after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit]',
+        'after:inset-ring-1 after:inset-ring-(--ids-color-on-surface)/8',
       ],
       image: 'absolute inset-0 size-full object-cover',
       // Container units keep initials in proportion when a consumer resizes the avatar.
