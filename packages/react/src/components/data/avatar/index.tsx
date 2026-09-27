@@ -1,115 +1,300 @@
-import { Children, isValidElement, useState } from 'react';
-import type { ComponentProps, ReactNode } from 'react';
+import {
+  createContext,
+  isValidElement,
+  use,
+  useCallback,
+  useEffect,
+  useRef,
+  type ComponentProps,
+  type CSSProperties,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
-import { invariant, tv } from '../../../utils';
+import { UserIcon } from '@heroicons/react/24/solid';
+
+import {
+  AvatarCutoutContext,
+  AvatarGroupContext,
+  type AvatarCutout,
+  type AvatarShape,
+} from './context';
+import { initialsOf } from './initials';
+import {
+  useAvatarStatus,
+  useFallbackVisible,
+  useImageSettled,
+  type AvatarStatus,
+} from './use-avatar';
+import { resolveState, type StateValue } from '../../../internal/state-props';
+import { flattenFragments, invariant, mergeRefs, tv } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { IdsSize } from '../../../tokens/types';
 
-const HANGUL = /[ㄱ-ㆎ가-힣]/;
+export { initialsOf } from './initials';
+export type { AvatarShape } from './context';
+export type { AvatarStatus } from './use-avatar';
 
-export function initialsOf(name: string) {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return '';
-  if (HANGUL.test(words[0])) return words[0].slice(0, 1);
-  return words
-    .slice(0, 2)
-    .map((word) => word.slice(0, 1))
-    .join('')
-    .toUpperCase();
+type Context = {
+  state: Avatar.State;
+  name: string | undefined;
+  imageSrc: string | undefined;
+  report: (src: string, status: AvatarStatus) => void;
+  styles: ReturnType<typeof Avatar.Style>;
+};
+
+const AvatarContext = createContext<Context | null>(null);
+
+function useAvatarContext(part: string) {
+  const context = use(AvatarContext);
+  invariant(context, `\`<${part}>\` must be used inside \`<Avatar>\`.`);
+  return context;
 }
+
+const FALLBACK_DELAY = 600;
 
 export function Avatar({
   src,
   name,
   alt,
-  variant = 'circle',
-  size = 'standard',
+  shape,
+  size,
+  onStatusChange,
   className,
+  style,
   children,
   'aria-label': ariaLabel,
+  'aria-hidden': ariaHidden,
   ...rest
 }: Avatar.Props) {
-  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const group = use(AvatarGroupContext);
+  const cutout = use(AvatarCutoutContext);
+  const resolvedShape = shape ?? group?.shape ?? 'circle';
+  const resolvedSize = size ?? group?.size ?? 'standard';
 
-  const fallback = Children.toArray(children).find(
-    (child) => isValidElement(child) && child.type === Avatar.Fallback,
+  const nodes = flattenFragments(children);
+  const image = nodes.find(
+    (node): node is ReactElement<Avatar.Image.Props> =>
+      isValidElement(node) && node.type === Avatar.Image,
   );
-  const initials = name == null ? '' : initialsOf(name);
+  const hasFallback = nodes.some((node) => isValidElement(node) && node.type === Avatar.Fallback);
+  const imageSrc = image?.props.src ?? src;
+  const { status, report } = useAvatarStatus(imageSrc || undefined, onStatusChange);
+
+  // alt="" marks the avatar as decorative, the way it does on <img>: next to a visible name the
+  // avatar would otherwise be read twice.
+  const decorative = alt === '' || ariaHidden === true || ariaHidden === 'true';
   const label = [ariaLabel, alt, name].find((candidate) => candidate?.trim());
+  useEffect(() => {
+    if (import.meta.env.DEV && !decorative && label === undefined)
+      console.warn(
+        '[IDS] Avatar: pass name, alt or aria-label so it has an accessible name, or alt="" when it is decorative.',
+      );
+  }, [decorative, label]);
 
-  invariant(
-    src != null || fallback != null || initials !== '',
-    '`<Avatar>` requires one of `src`, `name` or `<Avatar.Fallback>`.',
-  );
-  invariant(
-    label != null,
-    '`<Avatar>` requires `name`, `alt` or `aria-label` for assistive technology.',
-  );
+  const state: Avatar.State = { status, shape: resolvedShape, size: resolvedSize };
+  const styles = Avatar.Style({
+    shape: resolvedShape,
+    size: resolvedSize,
+    cutout: cutout ?? 'none',
+  });
 
   return (
-    <span
-      role="img"
-      aria-label={label}
-      {...rest}
-      className={Avatar.Style({ variant, size }).root({ className })}
-    >
-      {src != null && failedSrc !== src ? (
-        <img
-          src={src}
-          alt=""
-          loading="lazy"
-          className={Avatar.Style().image()}
-          onError={() => setFailedSrc(src)}
-        />
-      ) : (
-        (fallback ?? <Avatar.Fallback>{initials}</Avatar.Fallback>)
-      )}
-    </span>
+    <AvatarContext value={{ state, name, imageSrc: imageSrc || undefined, report, styles }}>
+      <span
+        {...(decorative ? { 'aria-hidden': true } : { role: 'img', 'aria-label': label })}
+        {...rest}
+        data-avatar=""
+        data-status={status}
+        data-shape={resolvedShape}
+        data-size={resolvedSize}
+        data-cutout={cutout}
+        className={styles.root({ className: resolveState(className, state) })}
+        style={resolveState(style, state)}
+      >
+        {image === undefined && imageSrc ? <Avatar.Image /> : null}
+        {nodes}
+        {hasFallback ? null : <Avatar.Fallback />}
+      </span>
+    </AvatarContext>
   );
 }
 
 export namespace Avatar {
-  export const Style = tv({
-    slots: {
-      root: 'inline-flex shrink-0 items-center justify-center overflow-hidden bg-(--ids-color-muted) text-(--ids-color-on-muted) select-none',
-      image: 'size-full object-cover',
-      fallback: 'inline-flex items-center justify-center [&_svg]:size-[60%]',
-    },
-    variants: {
-      variant: {
-        circle: { root: 'rounded-full' },
-        square: {},
-      },
-      size: {
-        standard: { root: 'text-body-b3-medium size-10' },
-        tiny: { root: 'text-caption-c2-medium size-6' },
-      } satisfies Record<IdsSize, { root: string }>,
-    },
-    compoundVariants: [
-      { variant: 'square', size: 'standard', class: { root: 'rounded-standard' } },
-      { variant: 'square', size: 'tiny', class: { root: 'rounded-standard' } },
-    ],
-    defaultVariants: { variant: 'circle', size: 'standard' },
-  });
+  export type Shape = AvatarShape;
+  export type Status = AvatarStatus;
+  export type Cutout = AvatarCutout;
 
-  export function Fallback({ asChild, className, ...rest }: FallbackProps) {
-    const Root = asChild === true ? Slot : 'span';
-    return <Root aria-hidden {...rest} className={Style().fallback({ className })} />;
-  }
+  export type State = { status: AvatarStatus; shape: AvatarShape; size: IdsSize };
 
-  export type FallbackProps = Omit<ComponentProps<'span'>, 'className'> & {
-    asChild?: boolean;
-    className?: string;
-  };
-
-  export type Props = Omit<ComponentProps<'span'>, 'children' | 'className' | 'role'> & {
+  export type Props = Omit<ComponentProps<'span'>, 'className' | 'style' | 'children' | 'role'> & {
     src?: string;
     name?: string;
     alt?: string;
-    variant?: 'circle' | 'square';
+    shape?: AvatarShape;
     size?: IdsSize;
-    className?: string;
+    onStatusChange?: (status: AvatarStatus) => void;
+    className?: StateValue<string | undefined, State>;
+    style?: StateValue<CSSProperties | undefined, State>;
     children?: ReactNode;
   };
+
+  export function Image({ src, className, style, onLoad, onError, ref, ...rest }: Image.Props) {
+    const { state, imageSrc, report, styles } = useAvatarContext('Avatar.Image');
+    const current = src || imageSrc;
+    const imageRef = useRef<HTMLImageElement>(null);
+    const mergedRef = useCallback(
+      (node: HTMLImageElement | null) => mergeRefs(imageRef, ref)(node),
+      [ref],
+    );
+    useImageSettled(imageRef, current, report);
+
+    if (!current || state.status === 'error') return null;
+    return (
+      <img
+        // A new src is a new element, so the previous person's photo never stays on screen
+        // while the next one loads.
+        key={current}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        {...rest}
+        ref={mergedRef}
+        src={current}
+        data-avatar-image=""
+        data-status={state.status}
+        onLoad={(event) => {
+          report(current, 'loaded');
+          onLoad?.(event);
+        }}
+        onError={(event) => {
+          report(current, 'error');
+          onError?.(event);
+        }}
+        className={styles.image({ className: resolveState(className, state) })}
+        style={resolveState(style, state)}
+      />
+    );
+  }
+
+  export namespace Image {
+    export type Props = Omit<ComponentProps<'img'>, 'className' | 'style' | 'alt'> & {
+      className?: StateValue<string | undefined, State>;
+      style?: StateValue<CSSProperties | undefined, State>;
+    };
+  }
+
+  export function Fallback({
+    delay = FALLBACK_DELAY,
+    asChild,
+    className,
+    style,
+    children,
+    ...rest
+  }: Fallback.Props) {
+    const { state, name, imageSrc, styles } = useAvatarContext('Avatar.Fallback');
+    const visible = useFallbackVisible(state.status, imageSrc, delay);
+    if (!visible) return null;
+
+    const initials = name === undefined ? '' : initialsOf(name);
+    const content = resolveState(children, state) ?? (initials || <UserIcon />);
+    const props = {
+      'aria-hidden': true,
+      ...rest,
+      'data-avatar-fallback': '',
+      className: styles.fallback({ className: resolveState(className, state) }),
+      style: resolveState(style, state),
+    };
+    if (asChild === true) return <Slot {...props}>{content}</Slot>;
+    return <span {...props}>{content}</span>;
+  }
+
+  export namespace Fallback {
+    export type Props = Omit<ComponentProps<'span'>, 'className' | 'style' | 'children'> & {
+      delay?: number;
+      asChild?: boolean;
+      className?: StateValue<string | undefined, State>;
+      style?: StateValue<CSSProperties | undefined, State>;
+      children?: StateValue<ReactNode, State>;
+    };
+  }
+
+  // Masks cut the overlapped side out of an avatar in a stack. The gap then shows the real
+  // background, whatever it is, where a colored ring would only match one background.
+  const circleMask =
+    '[mask-image:radial-gradient(50%_50%_at_var(--avatar-hole-x)_50%,transparent_calc(100%_+_var(--ag-gap)),#000_calc(100%_+_var(--ag-gap)_+_0.5px))]';
+  const squareMask = [
+    '[mask-image:linear-gradient(to_var(--avatar-band),transparent_calc(var(--ag-overlap)_+_var(--ag-gap)),#000_0),radial-gradient(circle_calc(var(--avatar-radius)_+_var(--ag-gap))_at_var(--avatar-corner-x)_100%,transparent_100%,#000_calc(100%_+_0.5px)),radial-gradient(circle_calc(var(--avatar-radius)_+_var(--ag-gap))_at_var(--avatar-corner-x)_0%,transparent_100%,#000_calc(100%_+_0.5px))]',
+    '[mask-size:100%_100%,100%_var(--avatar-radius),100%_var(--avatar-radius)]',
+    '[mask-position:0_0,0_0,0_100%] [mask-repeat:no-repeat]',
+  ];
+
+  export const Style = tv({
+    slots: {
+      root: [
+        'relative inline-flex shrink-0 items-center justify-center overflow-hidden align-middle',
+        'bg-(--ids-color-muted) text-(--ids-color-on-muted) select-none @container',
+      ],
+      image: 'absolute inset-0 size-full object-cover',
+      // Container units keep initials in proportion when a consumer resizes the avatar.
+      fallback: [
+        'inline-flex size-full items-center justify-center leading-none font-medium',
+        'text-[length:max(10px,40cqi)] [&_svg]:size-[62%]',
+      ],
+    },
+    variants: {
+      shape: {
+        circle: { root: 'rounded-full' },
+        square: { root: 'rounded-(--avatar-radius)' },
+      } satisfies Record<AvatarShape, object>,
+      size: {
+        standard: { root: 'size-10 [--avatar-radius:var(--ids-radius-standard)]' },
+        // 12px would turn a 24px square into a circle.
+        tiny: { root: 'size-6 [--avatar-radius:var(--ids-radius-indicator)]' },
+      } satisfies Record<IdsSize, object>,
+      cutout: { start: {}, end: {}, none: {} },
+    },
+    compoundVariants: [
+      { shape: 'circle', cutout: ['start', 'end'], class: { root: circleMask } },
+      { shape: 'square', cutout: ['start', 'end'], class: { root: squareMask } },
+      {
+        shape: 'circle',
+        cutout: 'start',
+        class: {
+          root: 'ltr:[--avatar-hole-x:calc(var(--ag-overlap)_-_50%)] rtl:[--avatar-hole-x:calc(150%_-_var(--ag-overlap))]',
+        },
+      },
+      {
+        shape: 'circle',
+        cutout: 'end',
+        class: {
+          root: 'ltr:[--avatar-hole-x:calc(150%_-_var(--ag-overlap))] rtl:[--avatar-hole-x:calc(var(--ag-overlap)_-_50%)]',
+        },
+      },
+      {
+        shape: 'square',
+        cutout: 'start',
+        class: {
+          root: [
+            'ltr:[--avatar-band:right] rtl:[--avatar-band:left]',
+            'ltr:[--avatar-corner-x:calc(var(--ag-overlap)_-_var(--avatar-radius))]',
+            'rtl:[--avatar-corner-x:calc(100%_-_var(--ag-overlap)_+_var(--avatar-radius))]',
+          ],
+        },
+      },
+      {
+        shape: 'square',
+        cutout: 'end',
+        class: {
+          root: [
+            'ltr:[--avatar-band:left] rtl:[--avatar-band:right]',
+            'ltr:[--avatar-corner-x:calc(100%_-_var(--ag-overlap)_+_var(--avatar-radius))]',
+            'rtl:[--avatar-corner-x:calc(var(--ag-overlap)_-_var(--avatar-radius))]',
+          ],
+        },
+      },
+    ],
+    defaultVariants: { shape: 'circle', size: 'standard', cutout: 'none' },
+  });
 }

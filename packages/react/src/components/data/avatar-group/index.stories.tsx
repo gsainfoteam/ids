@@ -103,12 +103,12 @@ export const WithoutMax: Story = {
 export const Square: Story = {
   render: () => (
     <AvatarGroup max={2} aria-label="브랜드">
-      <Avatar name="Acme" variant="square" />
-      <Avatar name="Globex" variant="square" />
-      <Avatar name="Initech" variant="square" />
+      <Avatar name="Acme" shape="square" />
+      <Avatar name="Globex" shape="square" />
+      <Avatar name="Initech" shape="square" />
     </AvatarGroup>
   ),
   play: async ({ canvas }) => {
-    await expect(canvas.getByText('+1')).toHaveClass('rounded-standard');
+    await expect(canvas.getByText('+1')).toHaveClass('rounded-(--avatar-radius)');
   },
 };

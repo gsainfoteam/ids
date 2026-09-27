@@ -37,9 +37,7 @@ export function AvatarGroup({
         cloneElement(child, { key: child.key ?? index, size: child.props.size ?? size }),
       )}
       {overflow > 0 ? (
-        <span
-          className={Avatar.Style({ variant: visible[0]?.props.variant ?? 'circle', size }).root()}
-        >
+        <span className={Avatar.Style({ shape: visible[0]?.props.shape ?? 'circle', size }).root()}>
           +{overflow}
         </span>
       ) : null}
