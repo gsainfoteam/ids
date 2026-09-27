@@ -165,8 +165,9 @@ Do not hardcode `rounded-[10px]`, and do not pair `p-*` with a hand-computed rad
 
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
 `--ids-color-border` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
-only content and focus carry color. `--ids-color-outline` is the theme-tinted line; keep it for
-places that should read as the brand, such as an outline Button.
+only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
+the theme color, while `outline` and `ghost` stay neutral. `--ids-color-outline` is the
+theme-tinted line for the rare edge that should itself read as the brand.
 
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
