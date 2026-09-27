@@ -51,10 +51,22 @@ import { Checkbox, Label } from '@gsainfoteam/ids-react';
 />
 ```
 
-- `onCheckedChange` 는 항상 `boolean` 을 받습니다. `'indeterminate'` 는 부모만 정합니다.
+- `onCheckedChange` 는 사용자가 바꾸거나 코드가 `input.checked` 를 직접 바꿨을 때 불리고, 항상 `boolean` 을 받습니다. `'indeterminate'` 는 부모만 정합니다.
 - 제어 모드에서 부모가 값을 바꾸지 않으면 눌러도 그대로입니다. 일부 선택도 남습니다.
 - `onChange` 는 native change 이벤트입니다. `onCheckedChange` 가 먼저 불립니다.
 - `onClick` 에서 `event.preventDefault()` 를 부르면 바뀌지 않고 `onCheckedChange` 도 불리지 않습니다.
+
+## CheckboxGroup 안에서
+
+```tsx
+<CheckboxGroup value={skills} onValueChange={setSkills} aria-label="관심 기술">
+  <Checkbox value="js" />{' '}
+  {/* value가 있으면 그룹의 항목: 선택 상태, name, disabled가 그룹에서 온다 */}
+  <Checkbox value="ts" />
+</CheckboxGroup>
+```
+
+- 그룹의 항목에는 `checked` 와 `defaultChecked` 를 줄 수 없습니다. 전체 선택과 필수는 [CheckboxGroup](../checkbox-group/README.md) 에 있습니다.
 
 ## 키보드
 
@@ -157,7 +169,8 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | 속성                         | 기본 / 동작                                                     |
 | ---------------------------- | --------------------------------------------------------------- |
 | `checked` / `defaultChecked` | `boolean` 또는 `'indeterminate'`. 기본 `false`                  |
-| `onCheckedChange`            | 사용자가 바꿨을 때 `boolean`                                    |
+| `onCheckedChange`            | 사용자나 코드가 input을 바꿨을 때 `boolean`                     |
+| `value`                      | 제출되는 값. CheckboxGroup 안에서는 항목의 값                   |
 | `readOnly`                   | 바뀌지 않는다. `aria-readonly`                                  |
 | `invalid`                    | `aria-invalid` 와 danger 색. 명시한 `aria-invalid` 가 우선      |
 | `variant`                    | `outline`(기본) / `soft`                                        |

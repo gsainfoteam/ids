@@ -1,10 +1,19 @@
-import { createContext, use, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
+import {
+  createContext,
+  use,
+  useId,
+  useLayoutEffect,
+  type ComponentProps,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 
 import { CheckIcon, MinusIcon } from '@heroicons/react/16/solid';
 
 import { useCheckbox, type CheckedState } from './use-checkbox';
 import { invariant, tv } from '../../../utils';
 import { Slot } from '../../utility/slot';
+import { useCheckboxGroupContext } from '../checkbox-group/context';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -65,12 +74,17 @@ export function Checkbox({
   defaultChecked,
   onCheckedChange,
   invalid,
-  variant = 'outline',
+  variant,
   size,
   className,
   style,
   children,
   ref,
+  id,
+  value,
+  name,
+  form,
+  disabled,
   readOnly = false,
   onChange,
   onClick,
@@ -85,17 +99,38 @@ export function Checkbox({
   onPointerCancel,
   ...inputProps
 }: CheckboxProps) {
+  // A checkbox with a `value` inside a CheckboxGroup is one of its options.
+  const context = useCheckboxGroupContext();
+  const group = value === undefined ? null : context;
+  const option = String(value);
+  invariant(
+    group === null || (checkedProp === undefined && defaultChecked === undefined),
+    'A Checkbox inside CheckboxGroup is checked by the group; set `value` on CheckboxGroup instead.',
+  );
   invariant(
     checkedProp === undefined || defaultChecked === undefined,
     'Checkbox takes either `checked` or `defaultChecked`, not both.',
   );
-  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const generatedId = useId();
+  const inputId = id ?? (group ? generatedId : undefined);
+  const isDisabled = Boolean(disabled) || Boolean(group?.disabled);
+  const register = group?.register;
+  useLayoutEffect(() => {
+    if (register && inputId) return register(option, inputId, isDisabled);
+  }, [register, option, inputId, isDisabled]);
+
+  const resolvedSize = useFieldSize(size ?? group?.size) ?? 'standard';
+  const resolvedVariant = variant ?? group?.variant ?? 'outline';
+  const isReadOnly = readOnly || Boolean(group?.readOnly);
   const { checked, interaction, inputRef, handlers } = useCheckbox({
-    checked: checkedProp,
+    checked: group ? group.value.includes(option) : checkedProp,
     defaultChecked,
-    onCheckedChange,
-    readOnly,
-    disabled: inputProps.disabled,
+    onCheckedChange: (next) => {
+      group?.toggle(option, next);
+      onCheckedChange?.(next);
+    },
+    readOnly: isReadOnly,
+    disabled: isDisabled,
     ref,
     onChange,
     onClick,
@@ -110,12 +145,12 @@ export function Checkbox({
     onPointerCancel,
   });
 
-  const ariaInvalid = inputProps['aria-invalid'] ?? invalid;
+  const ariaInvalid = inputProps['aria-invalid'] ?? (invalid || group?.invalid || undefined);
   const state: CheckboxState = {
     checked: checked === true,
     indeterminate: checked === 'indeterminate',
-    disabled: Boolean(inputProps.disabled),
-    readOnly,
+    disabled: isDisabled,
+    readOnly: isReadOnly,
     required: Boolean(inputProps.required),
     invalid: ariaInvalid === true || ariaInvalid === 'true',
     hovered: interaction.hovered,
@@ -123,7 +158,7 @@ export function Checkbox({
     focused: interaction.focused,
     focusVisible: interaction.focusVisible,
   };
-  const styles = Checkbox.Style({ size: resolvedSize, variant });
+  const styles = Checkbox.Style({ size: resolvedSize, variant: resolvedVariant });
   const content = resolve(children, state);
 
   return (
@@ -132,9 +167,9 @@ export function Checkbox({
         data-checkbox=""
         data-state={dataState(state)}
         data-size={resolvedSize}
-        data-variant={variant}
+        data-variant={resolvedVariant}
         data-disabled={state.disabled ? '' : undefined}
-        data-readonly={readOnly ? '' : undefined}
+        data-readonly={isReadOnly ? '' : undefined}
         data-required={state.required ? '' : undefined}
         data-invalid={state.invalid ? '' : undefined}
         data-hovered={state.hovered ? '' : undefined}
@@ -149,9 +184,14 @@ export function Checkbox({
           {...handlers}
           ref={inputRef}
           type="checkbox"
+          id={inputId}
+          value={value}
+          name={group ? (group.name ?? name) : name}
+          form={form ?? group?.form}
+          disabled={isDisabled}
           checked={state.checked}
           aria-invalid={ariaInvalid}
-          aria-readonly={readOnly || undefined}
+          aria-readonly={isReadOnly || undefined}
           data-field-input=""
           className={styles.input()}
         />

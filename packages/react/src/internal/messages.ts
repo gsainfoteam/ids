@@ -4,4 +4,7 @@ export const messages = {
   otpField: {
     label: '인증 코드',
   },
+  checkboxGroup: {
+    required: '하나 이상 선택하세요.',
+  },
 } as const;
