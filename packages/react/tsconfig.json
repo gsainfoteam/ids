@@ -31,7 +31,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "~story-kit": ["./.storybook/story-kit.tsx"]
     }
   }
 }

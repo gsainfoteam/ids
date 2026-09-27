@@ -68,6 +68,38 @@ packages/react/src/
 A new component goes into the category Notion gives it. Code shared by several components but not
 public goes into `internal/`, never loose at the root of `components/`.
 
+## Stories
+
+Every component's `index.stories.tsx` has the same shape, in this order:
+
+1. `Playground` — args wired to controls, nothing else.
+2. `Gallery` — **required.** Every variant, size and state on one screen, built from the story kit
+   so all galleries read alike. Import it as `~story-kit`.
+3. One story per feature worth showing (keyboard, paste, form integration, composition), each with
+   a `play` function when the behaviour can be asserted.
+
+```tsx
+import { Gallery } from '~story-kit';
+
+export const Gallery: Story = {
+  render: () => (
+    <Gallery>
+      <Gallery.Section title="Variant × Size">
+        <Gallery.Matrix rows={sizes} columns={variants} render={(size, variant) => (
+          <Button size={size} variant={variant}>{variant}</Button>
+        )} />
+      </Gallery.Section>
+      <Gallery.Section title="States">
+        <Gallery.Row label="disabled">...</Gallery.Row>
+      </Gallery.Section>
+    </Gallery>
+  ),
+};
+```
+
+Declare the meta as `const meta = { ... } satisfies Meta<typeof X>`. The global decorator wraps
+every story in `ThemeProvider`, so stories do not add their own theme or page padding.
+
 ## Component styling
 
 **Multi-part components use one `tv({ slots })`, not several `tv()` calls.** A component with a
