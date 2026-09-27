@@ -67,7 +67,7 @@ export function useRadio({
     };
   });
 
-  const silently = useCheckedWrites(inputRef, (next) => adopt.current(next));
+  const silently = useCheckedWrites(inputRef, checked, (next) => adopt.current(next));
 
   // Choosing a radio unchecks its groupmates without an event of their own. An uncontrolled radio
   // leaves `checked` to the DOM and re-reads it whenever a radio of its group changes; were React

@@ -59,7 +59,7 @@ export function useCheckbox({
     if (inputRef.current) inputRef.current.indeterminate = indeterminate;
   });
 
-  const silently = useCheckedWrites(inputRef, (next) => {
+  const silently = useCheckedWrites(inputRef, checked === true, (next) => {
     if (next !== (latest.current === true)) setChecked(next);
   });
 

@@ -10,22 +10,43 @@ function descriptorOf(node: object, key: string) {
 
 // react-hook-form's register(), and any other code holding the element, writes input.checked
 // directly on reset or setValue, and React never hears about it. The instance setter is wrapped so
-// such a write is reported. React writes through the same setter, so the report waits until its
-// commit is done: by then the DOM agrees with the rendered state and the caller finds nothing to
-// adopt. Writes the component makes itself go through `silently` and are not reported.
+// such a write is reported. Writes the component makes itself go through `silently` and are not
+// reported.
 //
-// register() also writes the default value from its ref callback, during the very commit that
-// mounts the input and before any effect could wrap the setter. The wrapper is therefore installed
-// in a layout effect, which runs after the input's refs are attached, and the value found there is
+// React writes through the same setter, on every commit and with the state it rendered, and it
+// can write again before any microtask runs: register() writes from its ref callback during a
+// commit, and a layout effect elsewhere can start a synchronous re-render that paints the stale
+// state back over it. What the DOM holds afterwards therefore says nothing; each written value is
+// kept instead and weighed against the state of the commit it belongs to. A value that differs
+// from what React rendered did not come from React.
+//
+// register() also writes the default value from its ref callback during the very commit that
+// mounts the input, before any effect could wrap the setter. The wrapper is therefore installed in
+// a layout effect, which runs after the input's refs are attached, and the value found there is
 // reported once; a passive effect would let a re-render paint the stale state over it first.
 export function useCheckedWrites(
   ref: RefObject<HTMLInputElement | null>,
+  rendered: boolean,
   onWrite: (checked: boolean) => void,
 ) {
   const latest = useRef(onWrite);
+  const committed = useRef(rendered);
+  const writes = useRef<boolean[]>([]);
   const muted = useRef(false);
+
+  const settle = useCallback((state: boolean) => {
+    const pending = writes.current;
+    writes.current = [];
+    const outside = pending.reverse().find((value) => value !== state);
+    if (outside !== undefined) latest.current(outside);
+  }, []);
+
+  // Refs are attached before the layout effects of the component that renders the input, so a
+  // write from a ref callback in this commit is already queued here.
   useLayoutEffect(() => {
     latest.current = onWrite;
+    committed.current = rendered;
+    settle(rendered);
   });
 
   useLayoutEffect(() => {
@@ -44,7 +65,9 @@ export function useCheckedWrites(
       set(next: boolean) {
         set.call(this, next);
         if (muted.current) return;
-        queueMicrotask(() => latest.current(get.call(input)));
+        writes.current.push(get.call(input));
+        // A write outside any commit is weighed once the task that made it is done.
+        if (writes.current.length === 1) queueMicrotask(() => settle(committed.current));
       },
     });
     latest.current(get.call(input));
@@ -52,7 +75,7 @@ export function useCheckedWrites(
       if (own) Object.defineProperty(input, 'checked', own);
       else Reflect.deleteProperty(input, 'checked');
     };
-  }, [ref]);
+  }, [ref, settle]);
 
   return useCallback((write: () => void) => {
     muted.current = true;

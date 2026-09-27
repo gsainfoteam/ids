@@ -173,3 +173,28 @@ test('react-hook-form: register() and controlMode="checked" both drive the thumb
     assert.equal(thumb().dataset.state, 'checked', controlMode);
   }
 });
+
+test('react-hook-form register(): reset() after the user toggled shows on the thumb', async () => {
+  const { Field: RhfField } = await import('../dist/react-hook-form.js');
+  const { FormProvider, useForm } = await import('react-hook-form');
+  let methods;
+  function App() {
+    methods = useForm({ defaultValues: { autoSave: true } });
+    return h(
+      FormProvider,
+      methods,
+      h(RhfField, { name: 'autoSave' }, h(RhfField.Label, null, 'Autosave'), h(Switch)),
+    );
+  }
+  await render(h(App));
+  await click();
+  await act(async () => methods.handleSubmit(() => {})());
+  await click();
+  assert.equal(thumb().dataset.state, 'checked');
+  await act(async () => {
+    methods.reset({ autoSave: false });
+    await Promise.resolve();
+  });
+  assert.equal(input().checked, false);
+  assert.equal(thumb().dataset.state, 'unchecked');
+});
