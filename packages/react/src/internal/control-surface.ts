@@ -49,7 +49,9 @@ export const controlSurface = {
   base: [
     'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap select-none touch-manipulation',
     'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast)',
-    'cursor-pointer data-disabled:cursor-not-allowed data-disabled:opacity-50',
+    'cursor-pointer data-disabled:not-aria-busy:cursor-not-allowed data-disabled:opacity-50',
+    // Loading is composed from disabled + <Spinner />; a busy control reads as working, not refused.
+    'aria-busy:cursor-progress',
     'focus-ring',
     // focus-ring colors the ring primary; these run later in the cascade and follow the scheme.
     'focus-visible:ring-(--control-ring)/40 data-focus-visible:ring-(--control-ring)/40',
@@ -60,17 +62,23 @@ export const controlSurface = {
     schemes.primary,
   ],
   // An icon next to a label already adds visual weight at that edge, so the padding on the side
-  // holding the icon shrinks. Icons without an explicit size follow the control's icon token.
+  // holding the icon shrinks. A decorative Spinner (an aria-hidden span) or a status Spinner counts
+  // as an icon there, and anything wrapping a spinning svg takes the icon size, so swapping an icon
+  // for a Spinner while loading moves nothing. Icons without an explicit size follow the icon token.
   size: {
     standard: [
       'h-(--ids-size-control-standard) rounded-standard px-4 text-button-standard',
-      'has-[>svg:first-child]:ps-3 has-[>svg:last-child]:pe-3',
+      'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-3',
+      'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-3',
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
+      '[&>:has(>svg.animate-spin)]:size-(--ids-size-icon-standard)',
     ],
     tiny: [
       'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-3 text-button-tiny',
-      'has-[>svg:first-child]:ps-2.5 has-[>svg:last-child]:pe-2.5',
+      'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2.5',
+      'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2.5',
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
+      '[&>:has(>svg.animate-spin)]:size-(--ids-size-icon-tiny)',
     ],
   } satisfies Record<IdsSize, string[]>,
   variant: {
