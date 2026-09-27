@@ -181,13 +181,20 @@ export namespace Item {
     export type Props = PartProps;
   }
 
-  export function Title({ className, id, ...props }: Title.Props) {
+  export function Title({ truncate = false, className, id, ...props }: Title.Props) {
     const { styles, setTitleId } = useItemContext('Item.Title');
     const titleId = useRegisteredId(setTitleId, id);
-    return <Part {...props} id={titleId} kind="title" className={styles.title({ className })} />;
+    return (
+      <Part
+        {...props}
+        id={titleId}
+        kind="title"
+        className={styles.title({ truncate, className })}
+      />
+    );
   }
   export namespace Title {
-    export type Props = PartProps;
+    export type Props = PartProps & { truncate?: boolean };
   }
 
   export function Description({ className, id, ...props }: Description.Props) {
@@ -308,6 +315,9 @@ export namespace Item {
         },
       } satisfies Record<IdsSize, object>,
       dense: { true: {}, false: {} },
+      // A flex box never draws an ellipsis, so a truncated title becomes a block no wider than
+      // its row.
+      truncate: { true: { title: 'block max-w-full truncate' }, false: {} },
       interactive: {
         true: {
           root: [
@@ -332,6 +342,7 @@ export namespace Item {
       media: 'ghost',
       size: 'standard',
       dense: false,
+      truncate: false,
       interactive: false,
     },
   });

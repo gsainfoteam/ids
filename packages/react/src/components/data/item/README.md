@@ -37,6 +37,16 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 - 크기를 정하지 않은 아이콘은 `--ids-size-icon-standard` 를 따릅니다.
 - 설명이 있으면 미디어가 첫 줄 높이에 맞춰 위로 붙습니다.
 
+## 긴 제목
+
+```tsx
+<Item.Title>{name}</Item.Title>                           {/* 기본. 줄바꿈된다 */}
+<Item.Title truncate title={name}>{name}</Item.Title>     {/* 한 줄에서 말줄임표로 줄인다 */}
+```
+
+- `truncate` 는 제목을 행 폭 안의 한 줄로 자릅니다. 파일 이름처럼 끝까지 읽을 필요가 적은 제목에 씁니다.
+- 잘린 부분은 보이지 않으니 `title` 로 전체 이름을 함께 둡니다.
+
 ## 여러 칸
 
 ```tsx
@@ -136,15 +146,16 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 
 ## 속성
 
-| 속성            | 기본 / 동작                                                        |
-| --------------- | ------------------------------------------------------------------ |
-| `variant`       | `ghost`(기본) / `outline` / `soft`                                 |
-| `size`          | `standard`(기본) / `tiny`. `Item.Group` 안에서는 그룹을 따른다     |
-| `dense`         | `false`. 패딩을 반으로 줄인다. `Item.Group` 안에서는 그룹을 따른다 |
-| `onClick`       | 주면 행 전체가 버튼                                                |
-| `interactive`   | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동    |
-| `selected`      | 선택 표시                                                          |
-| `disabled`      | 누를 수 없고 흐려진다                                              |
-| `asChild`       | 루트 `div` 대신 자식 요소에 속성을 합친다                          |
-| `Media.variant` | `ghost`(기본) / `soft` / `outline`                                 |
-| 각 부분         | `asChild` 와 `div` 의 native 속성                                  |
+| 속성             | 기본 / 동작                                                        |
+| ---------------- | ------------------------------------------------------------------ |
+| `variant`        | `ghost`(기본) / `outline` / `soft`                                 |
+| `size`           | `standard`(기본) / `tiny`. `Item.Group` 안에서는 그룹을 따른다     |
+| `dense`          | `false`. 패딩을 반으로 줄인다. `Item.Group` 안에서는 그룹을 따른다 |
+| `onClick`        | 주면 행 전체가 버튼                                                |
+| `interactive`    | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동    |
+| `selected`       | 선택 표시                                                          |
+| `disabled`       | 누를 수 없고 흐려진다                                              |
+| `asChild`        | 루트 `div` 대신 자식 요소에 속성을 합친다                          |
+| `Media.variant`  | `ghost`(기본) / `soft` / `outline`                                 |
+| `Title.truncate` | `false`. 한 줄에서 말줄임표로 줄인다                               |
+| 각 부분          | `asChild` 와 `div` 의 native 속성                                  |

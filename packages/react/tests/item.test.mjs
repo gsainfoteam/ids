@@ -190,6 +190,22 @@ test('dense halves the padding and a group shares it with its rows', () => {
   assert.equal(plain.hasAttribute('data-dense'), false, 'rows are not dense by default');
 });
 
+test('a truncated title stays on one line within its row', () => {
+  const title = (props) =>
+    html(
+      h(Item, null, h(Item.Content, null, h(Item.Title, props, 'a-very-long-file-name.pdf'))),
+    ).querySelector('[data-item-title]');
+  const wrapping = title({});
+  assert.match(wrapping.className, /(^| )flex( |$)/);
+  assert.doesNotMatch(wrapping.className, /truncate/, 'titles wrap by default');
+  const cut = title({ truncate: true });
+  assert.match(cut.className, /(^| )truncate( |$)/);
+  assert.match(cut.className, /(^| )max-w-full( |$)/);
+  assert.match(cut.className, /(^| )block( |$)/);
+  assert.doesNotMatch(cut.className, /(^| )flex( |$)/, 'a flex box would clip without an ellipsis');
+  assert.equal(cut.hasAttribute('truncate'), false);
+});
+
 test('className takes the row state', () => {
   const root = html(
     h(Item, { selected: true, className: (state) => (state.selected ? 'on' : 'off') }, 'x'),

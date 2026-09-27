@@ -154,6 +154,17 @@ export const Gallery: Story = {
             </Item.Content>
           </Item>
         </Showcase.Row>
+        <Showcase.Row label="truncate">
+          <Item variant="outline" className="w-80">
+            <Item.Media variant="soft">
+              <DocumentIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title truncate>2026 상반기 예산 집행 결과 보고서 (최종 수정본).pdf</Item.Title>
+              <Item.Description>2.4 MB</Item.Description>
+            </Item.Content>
+          </Item>
+        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
@@ -398,7 +409,9 @@ export const Dense: Story = {
             <DocumentIcon />
           </Item.Media>
           <Item.Content>
-            <Item.Title>{file.name}</Item.Title>
+            <Item.Title truncate title={file.name}>
+              {file.name}
+            </Item.Title>
             <Item.Description>{file.size}</Item.Description>
           </Item.Content>
           <Item.Actions>
@@ -417,7 +430,7 @@ export const Dense: Story = {
     docs: {
       description: {
         story:
-          '`dense` 는 패딩을 반으로 줄여 첨부 파일이나 메뉴처럼 행이 많은 목록을 촘촘하게 보여 줍니다. `Item.Group` 에 주면 안의 행이 모두 따릅니다.',
+          '`dense` 는 패딩을 반으로 줄여 첨부 파일이나 메뉴처럼 행이 많은 목록을 촘촘하게 보여 줍니다. `Item.Group` 에 주면 안의 행이 모두 따릅니다. `Item.Title truncate` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄입니다.',
       },
     },
   },
@@ -428,5 +441,9 @@ export const Dense: Story = {
       await expect(row).toHaveAttribute('data-dense');
       await expect(getComputedStyle(row).paddingTop).toBe('6px');
     }
+    const title = canvas.getByText(attachments[0].name);
+    const line = parseFloat(getComputedStyle(title).lineHeight);
+    await expect(title.scrollWidth).toBeGreaterThan(title.clientWidth);
+    await expect(title.getBoundingClientRect().height).toBeLessThan(line * 1.5);
   },
 };
