@@ -58,6 +58,7 @@ export default defineConfig(
           pathGroups: [
             { pattern: 'react', group: 'external', position: 'before' },
             { pattern: '@/**', group: 'internal' },
+            { pattern: '~story-kit', group: 'internal' },
           ],
           pathGroupsExcludedImportTypes: ['react'],
           'newlines-between': 'always',
