@@ -19,6 +19,10 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
+// A password manager's inline menu takes focus from password inputs, which breaks the focus the
+// play functions check, so the stories that run one opt out of it.
+const noPasswordManager = { 'data-1p-ignore': '', 'data-lpignore': 'true' } as const;
+
 const meta = {
   title: 'Form/PasswordField',
   component: PasswordField,
@@ -170,7 +174,12 @@ function VisibilityExample() {
     <div className="grid w-72 gap-3">
       <Field>
         <Field.Label>로그인 비밀번호</Field.Label>
-        <PasswordField name="password" value={value} onValueChange={setValue}>
+        <PasswordField
+          name="password"
+          value={value}
+          onValueChange={setValue}
+          {...noPasswordManager}
+        >
           <LockClosedIcon />
           <PasswordField.Input />
           <PasswordField.VisibilityToggle />
@@ -222,7 +231,9 @@ export const Visibility: Story = {
 };
 
 export const CapsLock: Story = {
-  render: (args) => <PasswordField {...args} placeholder="Caps Lock을 켜 보세요" />,
+  render: (args) => (
+    <PasswordField {...args} {...noPasswordManager} placeholder="Caps Lock을 켜 보세요" />
+  ),
   parameters: {
     docs: {
       description: {
@@ -260,6 +271,7 @@ function ShowPasswordExample() {
           visible={visible}
           onVisibleChange={setVisible}
           hideVisibilityToggle
+          {...noPasswordManager}
         />
       </Field>
       <label className="text-body-b3-regular flex items-center gap-2">
@@ -317,13 +329,13 @@ function FormExample() {
       >
         <FormField name="password" required>
           <FormField.Label>새 비밀번호</FormField.Label>
-          <PasswordField autoComplete="new-password" />
+          <PasswordField autoComplete="new-password" {...noPasswordManager} />
           <FormField.Hint>8자 이상 입력하세요.</FormField.Hint>
           <FormField.Error />
         </FormField>
         <FormField name="confirmation" required>
           <FormField.Label>비밀번호 확인</FormField.Label>
-          <PasswordField autoComplete="new-password" />
+          <PasswordField autoComplete="new-password" {...noPasswordManager} />
           <FormField.Error />
         </FormField>
         <Button type="submit">검증</Button>
