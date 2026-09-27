@@ -84,25 +84,20 @@ export const controlSurface = {
   variant: {
     solid: [
       'bg-(--control-fill) text-(--control-on-fill) shadow-xs',
-      'data-hovered:bg-(--control-fill)/90',
-      'data-active:bg-(--control-fill)/80 data-pressed:bg-(--control-fill)/80',
+      'data-hovered:bg-(--control-fill)/90 data-active:bg-(--control-fill)/80',
     ],
     soft: [
       'bg-(--control-fill)/10 text-(--control-accent)',
-      'data-hovered:bg-(--control-fill)/15',
-      'data-active:bg-(--control-fill)/20 data-pressed:bg-(--control-fill)/20',
+      'data-hovered:bg-(--control-fill)/15 data-active:bg-(--control-fill)/20',
     ],
     outline: [
       'bg-(--ids-color-surface) text-(--control-quiet) shadow-xs',
       'inset-ring-1 inset-ring-(--ids-color-border) dark:bg-(--ids-color-muted)/30',
-      'data-hovered:bg-(--control-hover)',
-      'data-active:bg-(--control-hover) data-pressed:bg-(--control-hover)',
-      'data-pressed:inset-ring-(--ids-color-on-muted)/40',
+      'data-hovered:bg-(--control-hover) data-active:bg-(--control-hover)',
     ],
     ghost: [
       'bg-transparent text-(--control-quiet)',
-      'data-hovered:bg-(--control-hover)',
-      'data-active:bg-(--control-hover) data-pressed:bg-(--control-hover)',
+      'data-hovered:bg-(--control-hover) data-active:bg-(--control-hover)',
     ],
   } satisfies Record<IdsVariant, string[]>,
   colorScheme: schemes,

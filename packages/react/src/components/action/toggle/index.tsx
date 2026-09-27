@@ -1,119 +1,71 @@
 import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
-import { useControllableState } from '../../../hooks/use-controllable-state';
-import {
-  useInteractiveProps,
-  type InteractiveState,
-  type WithInteractiveValues,
-} from '../../../hooks/use-interactive';
-import { controlSurface } from '../../../internal/control-surface';
-import { invariant, tv, type VariantProps } from '../../../utils';
-import { useGroupedSize } from '../../utility/group';
-import { useToggleGroupContext } from '../toggle-group';
+import { useToggle } from './use-toggle';
+import { controlSurface, type ControlColorScheme } from '../../../internal/control-surface';
+import { toggleSurface } from '../../../internal/toggle-surface';
+import { tv } from '../../../utils';
+import { useGroupContext } from '../../utility/group';
 
-import type { IdsSize } from '../../../tokens/types';
+import type { InteractiveState, WithInteractiveValues } from '../../../hooks/use-interactive';
+import type { IdsSize, IdsVariant } from '../../../tokens/types';
 
-export function Toggle({
-  pressed: pressedProp,
-  defaultPressed,
-  onPressedChange,
-  onClick,
-  disabled,
-  value,
-  ...rest
-}: Toggle.Props) {
-  const group = useToggleGroupContext();
-
-  invariant(
-    group == null || value != null,
-    '`<Toggle>` inside `<ToggleGroup>` requires a `value` prop.',
-  );
-  invariant(
-    group == null || (pressedProp == null && defaultPressed == null && onPressedChange == null),
-    '`<Toggle>` inside `<ToggleGroup>` cannot use `pressed` / `defaultPressed` / `onPressedChange`. Selection is controlled by the group.',
-  );
-
-  const inGroup = group != null;
-  const itemValue = value as string;
-
-  const [localPressed, setLocalPressed] = useControllableState({
-    value: inGroup ? undefined : pressedProp,
-    defaultValue: defaultPressed ?? false,
-    onValueChange: inGroup ? undefined : onPressedChange,
-  });
-
-  const pressed = inGroup
-    ? group.type === 'multiple'
-      ? group.value.has(itemValue)
-      : group.value === itemValue
-    : localPressed;
-
-  const isDisabled = disabled || group?.disabled;
-
+export function Toggle(props: Toggle.Props) {
+  const layout = useGroupContext();
   const {
-    props: { children, className, style, variant, size, type = 'button', ...domRest },
-    handlers,
-    dataProps,
-  } = useInteractiveProps<
-    HTMLButtonElement,
-    Omit<Toggle.Props, 'onPressedChange' | 'defaultPressed' | 'value'> & { pressed: boolean }
-  >({
-    ...rest,
-    disabled: isDisabled,
+    props: { variant = 'ghost', colorScheme, size, className, style, ...rest },
     pressed,
-    onClick: (e) => {
-      if (isDisabled) return;
-      if (inGroup) {
-        group.toggle(itemValue);
-      } else {
-        setLocalPressed(!pressed);
-      }
-      onClick?.(e);
-    },
-  });
-  const groupedSize = useGroupedSize('Toggle', size as IdsSize | undefined);
+    value,
+    render,
+  } = useToggle(props, 'Toggle');
+  const resolvedSize = size ?? layout?.size ?? 'standard';
 
-  return (
-    <button
-      type={type}
-      disabled={isDisabled}
-      aria-pressed={pressed}
-      data-value={value}
-      className={Toggle.Style({ variant, size: groupedSize, className })}
-      style={style}
-      {...dataProps}
-      {...handlers}
-      {...domRest}
-    >
-      {children}
-    </button>
-  );
+  return render({
+    ...rest,
+    'aria-pressed': pressed,
+    'data-value': value,
+    className: Toggle.Style({ variant, colorScheme, size: resolvedSize, className }),
+    style,
+    'data-variant': variant,
+    'data-size': resolvedSize,
+  });
 }
 
 export namespace Toggle {
+  export type State = InteractiveState;
+  export type Variant = IdsVariant;
+  export type ColorScheme = ControlColorScheme;
+
+  type BaseProps = Omit<ComponentProps<'button'>, 'children' | 'className' | 'style' | 'value'> & {
+    variant?: Variant;
+    colorScheme?: ColorScheme;
+    size?: IdsSize;
+    pressed?: boolean;
+    defaultPressed?: boolean;
+    onPressedChange?: (pressed: boolean) => void;
+    // Identifies the toggle inside a ToggleGroup, which then owns its pressed state.
+    value?: string;
+    children?: ReactNode;
+    className?: string;
+    style?: CSSProperties;
+    onInteractionChange?: (state: State) => void;
+  };
+
+  export type Props = WithInteractiveValues<BaseProps> & {
+    asChild?: boolean;
+    focusableWhenDisabled?: boolean;
+  };
+
   export const Style = tv({
     base: controlSurface.base,
     variants: {
-      variant: controlSurface.variant,
-      size: controlSurface.size,
+      variant: toggleSurface.variant,
+      colorScheme: controlSurface.colorScheme,
+      size: toggleSurface.size,
     },
     defaultVariants: {
-      variant: 'outline',
+      variant: 'ghost',
+      colorScheme: 'primary',
       size: 'standard',
     },
   });
-
-  type BaseProps = Omit<ComponentProps<'button'>, 'children' | 'className' | 'style' | 'value'> &
-    VariantProps<typeof Style> & {
-      children?: ReactNode;
-      className?: string;
-      style?: CSSProperties;
-      pressed?: boolean;
-      defaultPressed?: boolean;
-      onPressedChange?: (pressed: boolean) => void;
-      onInteractionChange?: (state: InteractiveState) => void;
-      value?: string;
-    };
-
-  export type Props = WithInteractiveValues<BaseProps>;
 }
