@@ -283,6 +283,7 @@ export namespace PasswordField {
 
   // The glyph appears only while Caps Lock is on and the input has focus. The live region stays
   // mounted so the change is announced; a region that appears with its text is often not read.
+  // It is not a Kbd: it reports a state, where a Kbd names a key to press.
   export function CapsLock({ label, className, children, ...props }: CapsLockProps) {
     const { capsLock, styles } = usePasswordContext('CapsLock');
     const text = label ?? messages.passwordField.capsLock;
