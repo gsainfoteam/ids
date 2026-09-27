@@ -178,6 +178,46 @@ test('removing a focused chip hands focus to the next chip, or the previous at t
   assert.equal(document.activeElement, closeOf('a'), 'the last one hands focus back');
 });
 
+test('onRemove gets the click or key that asked, and preventDefault leaves focus to it', async () => {
+  const events = [];
+  function Tags() {
+    const [tags, setTags] = useState(['a', 'b']);
+    const remove = (tag) => (event) => {
+      events.push(event.type);
+      event.preventDefault();
+      setTags((prev) => prev.filter((t) => t !== tag));
+      document.getElementById('entry').focus();
+    };
+    return h(
+      'div',
+      null,
+      h('input', { id: 'entry' }),
+      h(
+        'ul',
+        null,
+        tags.map((tag) => h('li', { key: tag }, h(Chip, { onRemove: remove(tag) }, tag))),
+      ),
+    );
+  }
+  await render(h(Tags));
+  const closeOf = (tag) =>
+    [...host.querySelectorAll('[data-chip]')]
+      .find((element) => element.textContent === tag)
+      ?.querySelector('[data-chip-close]');
+  await act(async () => closeOf('a').focus());
+  const backspace = new KeyboardEvent('keydown', {
+    key: 'Backspace',
+    bubbles: true,
+    cancelable: true,
+  });
+  await act(async () => closeOf('a').dispatchEvent(backspace));
+  await frame();
+  assert.equal(document.activeElement, host.querySelector('#entry'), 'not moved to the next chip');
+  assert.equal(backspace.defaultPrevented, true, 'the key still does nothing else');
+  await act(async () => closeOf('b').click());
+  assert.deepEqual(events, ['keydown', 'click']);
+});
+
 test('disabled: nothing toggles or removes', async () => {
   let removed = 0;
   await render(h(Chip, { disabled: true, onRemove: () => removed++ }, 'locked'));

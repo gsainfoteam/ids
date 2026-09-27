@@ -55,6 +55,19 @@ import { Chip } from '@gsainfoteam/ids-react';
 - 지운 뒤 포커스는 다음 칩, 마지막 칩이었다면 앞 칩으로 갑니다. 칩이 실제로 사라졌을 때만 옮깁니다.
 - 실제로 목록에서 빼는 일은 `onRemove` 를 받은 쪽이 합니다.
 - `Chip.Close` 는 칩의 `colorScheme` 을 받은 ghost `IconButton` 입니다. 모양은 칩 글자색의 작은 원이고, 포커스 링과 hover 는 IconButton 과 같습니다.
+- `onRemove` 는 지우기를 부른 클릭이나 키 이벤트를 받습니다. `event.preventDefault()` 하면 칩은 포커스를 옮기지 않으니, 태그 입력창처럼 포커스를 직접 보낼 때 씁니다.
+
+```tsx
+<Chip
+  onRemove={(event) => {
+    event.preventDefault(); // 옆 칩 대신
+    removeTag('react');
+    inputRef.current?.focus(); // 입력창으로
+  }}
+>
+  react
+</Chip>
+```
 
 ## 구성
 
@@ -101,7 +114,7 @@ import { Chip } from '@gsainfoteam/ids-react';
 | --------------------------------------------------- | ----------------------------------------------------------------------- |
 | `selected` / `defaultSelected` / `onSelectedChange` | 켜고 끄기                                                               |
 | `onClick`                                           | 토글이 아닌 버튼                                                        |
-| `onRemove`                                          | 지우기. 기본 삭제 버튼이 붙는다                                         |
+| `onRemove`                                          | 지우기. 기본 삭제 버튼이 붙고, 지우기를 부른 이벤트를 받는다            |
 | `variant`                                           | `soft`(기본) / `solid` / `outline`                                      |
 | `colorScheme`                                       | `neutral`(기본) / `primary` / `success` / `warning` / `danger` / `info` |
 | `size`                                              | `standard`(기본) / `tiny`                                               |

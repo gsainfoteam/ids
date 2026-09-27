@@ -13,7 +13,7 @@ import {
 
 import { XMarkIcon } from '@heroicons/react/16/solid';
 
-import { useChip } from './use-chip';
+import { useChip, type ChipRemoveEvent } from './use-chip';
 import {
   interactiveDataProps,
   useInteractive,
@@ -41,8 +41,8 @@ type Context = {
   disabled: boolean;
   labelId: string | undefined;
   setLabelId: (id: string | undefined) => void;
-  remove: () => void;
-  removeOnKey: (event: KeyboardEvent) => boolean;
+  remove: (event: ChipRemoveEvent) => void;
+  removeOnKey: (event: KeyboardEvent<HTMLElement>) => boolean;
 };
 
 const ChipContext = createContext<Context | null>(null);
@@ -196,6 +196,7 @@ export function Chip({
 export namespace Chip {
   export type Variant = ChipVariant;
   export type ColorScheme = ChipColorScheme;
+  export type RemoveEvent = ChipRemoveEvent;
 
   export type State = InteractiveState & {
     selected: boolean;
@@ -212,7 +213,9 @@ export namespace Chip {
     selected?: boolean;
     defaultSelected?: boolean;
     onSelectedChange?: (selected: boolean) => void;
-    onRemove?: () => void;
+    // preventDefault() on the event keeps focus where the handler puts it instead of on the
+    // neighbouring chip.
+    onRemove?: (event: RemoveEvent) => void;
     disabled?: boolean;
     asChild?: boolean;
     onInteractionChange?: (state: InteractiveState) => void;
@@ -263,7 +266,7 @@ export namespace Chip {
           className={context.styles.close({ className })}
           onClick={(event) => {
             event.stopPropagation();
-            context.remove();
+            context.remove(event);
           }}
         >
           {glyph}
@@ -290,7 +293,7 @@ export namespace Chip {
           onClick?.(event);
           if (event.defaultPrevented) return;
           event.stopPropagation();
-          context.remove();
+          context.remove(event);
         }}
         onKeyDown={(event) => {
           onKeyDown?.(event);

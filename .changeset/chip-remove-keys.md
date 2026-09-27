@@ -5,7 +5,9 @@
 Rebuild Chip around what it does: a clickable or selectable chip is a real `<button>`
 (`aria-pressed` when it toggles), and `onRemove` adds a default remove button named after the
 chip's text ("react 삭제"). Backspace or Delete on a focused chip or its remove button removes it
-and hands focus to the neighbouring chip. A chip that is both selectable and removable draws its X
+and hands focus to the neighbouring chip. `onRemove` receives the click or key event that asked
+for the removal, and `preventDefault()` on it leaves focus to the handler instead, for a tag field
+that sends it back to its input. A chip that is both selectable and removable draws its X
 for the pointer only, so no button sits inside a button, and pressing the X no longer toggles it.
 Plain text becomes a truncating `Chip.Label`, chips can be `disabled`, hover and press lay a veil
 in the text color over any variant, and `className` / `style` / `children` take the chip state.
