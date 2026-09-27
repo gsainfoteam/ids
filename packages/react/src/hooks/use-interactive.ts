@@ -73,14 +73,7 @@ export function useInteractive<E extends Element = Element>({
       pressed: pressed ?? false,
       disabled: disabled ?? false,
     });
-  }, [
-    state.hovered,
-    state.active,
-    state.focused,
-    state.focusVisible,
-    pressed,
-    disabled,
-  ]);
+  }, [state.hovered, state.active, state.focused, state.focusVisible, pressed, disabled]);
 
   const handlers = {
     onPointerEnter(e: PointerEvent<E>) {

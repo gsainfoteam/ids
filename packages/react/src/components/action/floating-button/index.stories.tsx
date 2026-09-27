@@ -274,8 +274,7 @@ export const AutomaticLabel: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('button', { name: 'Compose' })).toBeVisible();
     // heroicons has no displayName; its function name survives only in development builds.
-    if (isDevelopment)
-      await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
+    if (isDevelopment) await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
   },
 };
 
