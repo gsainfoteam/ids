@@ -48,6 +48,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 
 - `truncate` 는 제목을 행 폭 안의 한 줄로 자릅니다. 파일 이름처럼 끝까지 읽을 필요가 적은 제목에 씁니다.
 - 잘린 부분은 보이지 않으니 `title` 로 전체 이름을 함께 둡니다.
+- 행과 `Item.Group` 은 grid 나 flex 부모를 따라 줄어듭니다. 잘린 제목의 전체 길이만큼 넓어지지 않습니다.
 
 ## 여러 칸
 

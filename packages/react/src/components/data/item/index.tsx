@@ -265,9 +265,11 @@ export namespace Item {
   export const Style = tv({
     slots: {
       // Hover, press and selection lay a translucent layer over whatever the variant's background
-      // is, instead of one color per variant and state.
+      // is, instead of one color per variant and state. min-w-0 here and on the group lets a
+      // grid or flex parent shrink them, where a truncated title would otherwise widen them to its
+      // full length.
       root: [
-        'group/item relative isolate flex w-full items-center text-start text-(--ids-color-on-surface)',
+        'group/item relative isolate flex w-full min-w-0 items-center text-start text-(--ids-color-on-surface)',
         'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit]',
         'before:bg-(--ids-color-on-surface) before:opacity-0',
         'before:transition-opacity before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
@@ -283,7 +285,7 @@ export namespace Item {
       title: 'flex w-fit items-center gap-2',
       description: 'line-clamp-2 text-(--ids-color-on-muted)',
       actions: 'ms-auto flex shrink-0 items-center gap-2',
-      group: 'flex flex-col',
+      group: 'flex min-w-0 flex-col',
       groupItem: 'flex',
       // Divider draws the line; an hr also brings its own border, which would thicken it.
       separator: 'border-0',

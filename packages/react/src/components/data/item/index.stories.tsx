@@ -419,35 +419,37 @@ const attachments = [
 
 export const Dense: Story = {
   render: () => (
-    <Item.Group dense aria-label="첨부 파일" className="w-80 gap-1">
-      {attachments.map((file) => (
-        <Item key={file.name} variant="outline">
-          <Item.Media variant="soft">
-            {file.thumbnail ? <img src={file.thumbnail} alt="" /> : <DocumentIcon />}
-          </Item.Media>
-          <Item.Content>
-            <Item.Title truncate title={file.name}>
-              {file.name}
-            </Item.Title>
-            <Item.Description>{file.size}</Item.Description>
-          </Item.Content>
-          <Item.Actions>
-            <IconButton
-              aria-label={`${file.name} 삭제`}
-              variant="ghost"
-              size="tiny"
-              icon={<XMarkIcon />}
-            />
-          </Item.Actions>
-        </Item>
-      ))}
-    </Item.Group>
+    <div className="grid w-80">
+      <Item.Group dense aria-label="첨부 파일" className="gap-1">
+        {attachments.map((file) => (
+          <Item key={file.name} variant="outline">
+            <Item.Media variant="soft">
+              {file.thumbnail ? <img src={file.thumbnail} alt="" /> : <DocumentIcon />}
+            </Item.Media>
+            <Item.Content>
+              <Item.Title truncate title={file.name}>
+                {file.name}
+              </Item.Title>
+              <Item.Description>{file.size}</Item.Description>
+            </Item.Content>
+            <Item.Actions>
+              <IconButton
+                aria-label={`${file.name} 삭제`}
+                variant="ghost"
+                size="tiny"
+                icon={<XMarkIcon />}
+              />
+            </Item.Actions>
+          </Item>
+        ))}
+      </Item.Group>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '`dense` 는 패딩을 반으로 줄여 첨부 파일이나 메뉴처럼 행이 많은 목록을 촘촘하게 보여 줍니다. `Item.Group` 에 주면 안의 행이 모두 따릅니다. `Item.Title truncate` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄이고, 타일 안의 이미지는 타일을 채웁니다.',
+          '`dense` 는 패딩을 반으로 줄여 첨부 파일이나 메뉴처럼 행이 많은 목록을 촘촘하게 보여 줍니다. `Item.Group` 에 주면 안의 행이 모두 따릅니다. `Item.Title truncate` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄이고, grid 안에서도 목록을 넓히지 않습니다. 타일 안의 이미지는 타일을 채웁니다.',
       },
     },
   },
@@ -458,6 +460,10 @@ export const Dense: Story = {
       await expect(row).toHaveAttribute('data-dense');
       await expect(getComputedStyle(row).paddingTop).toBe('6px');
     }
+    const list = canvas.getByRole('list');
+    await expect(list.getBoundingClientRect().width).toBe(
+      list.parentElement!.getBoundingClientRect().width,
+    );
     const title = canvas.getByText(attachments[0].name);
     const line = parseFloat(getComputedStyle(title).lineHeight);
     await expect(title.scrollWidth).toBeGreaterThan(title.clientWidth);

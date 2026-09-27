@@ -13,10 +13,11 @@ shares its `size`, and `Item.Separator` is left out of the list count. `Item.Sep
 `Divider`, drawn as an `li` inside a group and as an `hr` on its own. Rows can be `disabled`.
 `dense` on `Item` or `Item.Group` halves the padding for long lists such as attachments, so a
 standard row is 48px and a tiny one 32px, marked with `data-dense`. `Item.Title truncate` keeps a
-long title, such as a file name, on one line with an ellipsis. An image placed in a `soft` or
+long title, such as a file name, on one line with an ellipsis, and rows and groups shrink with a
+grid or flex parent instead of growing to the title's full width. An image placed in a `soft` or
 `outline` media tile fills the tile and takes its corners, so it works as a thumbnail.
 
 Breaking: the default look is `ghost` (no background) instead of a surface fill, selection and
 hover are neutral instead of primary tints, titles wrap instead of truncating unless
-`Item.Title` sets `truncate`, and only `className`, `style` and `children` take state functions. `Item.PartProps` now also lives as
-`Item.Media.Props` and friends.
+`Item.Title` sets `truncate`, and only `className`, `style` and `children` take state functions.
+`Item.PartProps` now also lives as `Item.Media.Props` and friends.

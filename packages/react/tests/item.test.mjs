@@ -206,6 +206,12 @@ test('a truncated title stays on one line within its row', () => {
   assert.equal(cut.hasAttribute('truncate'), false);
 });
 
+test('a group and its rows shrink with their parent, so a truncated title cannot widen them', () => {
+  const doc = html(h(Item.Group, null, h(Item, null, h(Item.Title, { truncate: true }, 'x'))));
+  assert.match(doc.querySelector('[data-item-group]').className, /(^| )min-w-0( |$)/);
+  assert.match(doc.querySelector('[data-item]').className, /(^| )min-w-0( |$)/);
+});
+
 test('an image fills its media tile', () => {
   const media = (variant) =>
     html(h(Item, null, h(Item.Media, { variant }, h('img', { alt: '' })))).querySelector(
