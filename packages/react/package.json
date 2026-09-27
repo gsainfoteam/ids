@@ -66,6 +66,7 @@
     "@eslint/js": "^10.0.1",
     "@gsainfoteam/ids-css": "workspace:*",
     "@hookform/resolvers": "^5.9.1",
+    "@storybook/addon-docs": "10.3.1",
     "@storybook/addon-themes": "10.3.1",
     "@storybook/react-vite": "10.3.1",
     "@tailwindcss/vite": "^4.1.18",

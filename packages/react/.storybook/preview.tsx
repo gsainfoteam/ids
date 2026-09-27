@@ -8,7 +8,9 @@ import '../src/styles.css';
 import './preview.css';
 
 // The toolbar owns the theme, so a story that calls useTheme().setMode moves the toolbar too.
-const withIdsTheme: Decorator = (Story) => {
+// A story fills the canvas on its own page, but on a Docs page every story is one block among
+// many, so it only takes the room it needs there.
+const withIdsTheme: Decorator = (Story, context) => {
   const [globals, updateGlobals] = useGlobals();
 
   return (
@@ -17,7 +19,11 @@ const withIdsTheme: Decorator = (Story) => {
       mode={globals['idsMode'] ?? 'light'}
       onColorChange={(color) => updateGlobals({ idsColor: color })}
       onModeChange={(mode) => updateGlobals({ idsMode: mode })}
-      className="min-h-screen w-full bg-(--ids-color-surface) p-8 text-(--ids-color-on-surface)"
+      className={
+        context.viewMode === 'docs'
+          ? 'rounded-standard w-full bg-(--ids-color-surface) p-6 text-(--ids-color-on-surface)'
+          : 'min-h-screen w-full bg-(--ids-color-surface) p-8 text-(--ids-color-on-surface)'
+      }
     >
       <Story />
     </ThemeProvider>
@@ -27,6 +33,10 @@ const withIdsTheme: Decorator = (Story) => {
 const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
+    // The code of the story on screen, beside the canvas; Docs pages keep their own Show code.
+    docs: { codePanel: true },
+    // Handlers in args are spies with generated names; a reader only needs to see one is passed.
+    jsx: { showFunctions: true, functionValue: () => '() => {}' },
     backgrounds: { disable: true },
     controls: {
       matchers: {
