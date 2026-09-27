@@ -107,12 +107,14 @@ test('child cancellation prevents root action', async () => {
   await act(async () => button().click());
 });
 test('disabled links remove href and block child/root keyboard and click actions', async () => {
-  const fail = () => assert.fail('disabled handler');
+  // Handlers record instead of throwing: React reports a throw from a handler and carries on.
+  const calls = [];
+  const record = (name) => () => calls.push(name);
   await render(
     h(
       FloatingButton,
-      { asChild: true, disabled: true, onClick: fail, onKeyDown: fail },
-      h('a', { href: '#danger', onClick: fail, onKeyDown: fail }, '비활성'),
+      { asChild: true, disabled: true, onClick: record('root'), onKeyDown: record('root') },
+      h('a', { href: '#danger', onClick: record('child'), onKeyDown: record('child') }, '비활성'),
     ),
   );
   assert.equal(button().hasAttribute('href'), false);
@@ -125,7 +127,56 @@ test('disabled links remove href and block child/root keyboard and click actions
       new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
     );
   });
+  assert.deepEqual(calls, []);
 });
+test('an icon-only button is named from the icon component; text makes it extended', async () => {
+  const { PlusIcon } = await import('@heroicons/react/24/outline');
+  const doc = new JSDOM(
+    renderToString(
+      h(
+        'div',
+        null,
+        h(FloatingButton, { id: 'icon' }, h(PlusIcon)),
+        h(FloatingButton, { id: 'extended' }, h(PlusIcon), '작성'),
+        h(FloatingButton, { id: 'forced', iconOnly: true }, h('span', null, '+')),
+      ),
+    ),
+  ).window.document;
+  const icon = doc.getElementById('icon');
+  assert.equal(icon.getAttribute('aria-label'), 'Plus');
+  assert.ok(icon.hasAttribute('data-icon-only'));
+  const extended = doc.getElementById('extended');
+  assert.equal(extended.hasAttribute('aria-label'), false);
+  assert.equal(extended.hasAttribute('data-icon-only'), false);
+  assert.ok(doc.getElementById('forced').hasAttribute('data-icon-only'));
+});
+
+test('variant, colorScheme, size and placement land on the element', () => {
+  const doc = new JSDOM(
+    renderToString(
+      h(
+        FloatingButton,
+        {
+          variant: 'soft',
+          colorScheme: 'danger',
+          size: 'tiny',
+          placement: 'top-left',
+          'aria-label': '신고',
+        },
+        h('svg'),
+      ),
+    ),
+  ).window.document;
+  const node = doc.querySelector('[data-floating-button]');
+  assert.equal(node.dataset.variant, 'soft');
+  assert.equal(node.dataset.size, 'tiny');
+  assert.equal(node.dataset.placement, 'top-left');
+  assert.match(node.className, /\[--control-fill:var\(--ids-color-danger\)\]/);
+  assert.match(node.className, /print:hidden/);
+  assert.match(node.className, /motion-safe:data-active:scale-95/);
+  assert.match(node.className, /motion-reduce:transition-none/);
+});
+
 test('render props update interaction state and keyboard focus remains visible', async () => {
   await render(h(FloatingButton, null, (state) => (state.focusVisible ? '키보드 포커스' : '실행')));
   await act(async () => {
