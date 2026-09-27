@@ -468,3 +468,156 @@ test('every opening starts on the month of the chosen date', async () => {
   await click(trigger());
   assert.equal(document.activeElement, day('2026-09-15'));
 });
+
+const textBox = () => host.querySelector('[data-date-field] input[type=text]');
+async function typeText(value) {
+  await act(async () => {
+    const input = textBox();
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, value);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
+async function blurText() {
+  await act(async () => {
+    textBox().focus();
+    textBox().blur();
+  });
+}
+
+test('typed entry: the text box takes the label and role, the calendar button leaves the tab order', () => {
+  const doc = new JSDOM(
+    renderToString(
+      h(
+        Field,
+        null,
+        h(Field.Label, null, 'Birthday'),
+        h(DateField, { name: 'birthday', required: true }, h(DateField.Input)),
+      ),
+    ),
+  ).window.document;
+  const input = doc.querySelector('input[type=text]');
+  assert.equal(doc.querySelector('label').htmlFor, input.id);
+  assert.equal(input.getAttribute('role'), 'combobox');
+  assert.equal(input.getAttribute('aria-haspopup'), 'dialog');
+  assert.equal(input.getAttribute('aria-required'), 'true');
+  assert.equal(input.getAttribute('autocomplete'), 'off');
+  assert.equal(input.getAttribute('placeholder'), 'YYYY. MM. DD.');
+  assert.equal(input.hasAttribute('name'), false, 'FormData gets the ISO value, not the text');
+  const button = doc.querySelector('button');
+  assert.equal(button.getAttribute('aria-label'), '달력 열기');
+  assert.equal(button.getAttribute('tabindex'), '-1');
+  assert.throws(
+    () => renderToString(h(DateField, { selectionMode: 'range' }, h(DateField.Input))),
+    /reads typed text/,
+  );
+});
+
+test('typed entry reads ISO, Korean, bare digits and the locale order on blur or Enter', async () => {
+  const changes = [];
+  const view = (props) =>
+    h(
+      'form',
+      null,
+      h(
+        DateField,
+        { name: 'day', onValueChange: (v) => changes.push(v && keyOf(v)), ...props },
+        h(DateField.Input),
+      ),
+    );
+  await render(view({}));
+  await typeText('2026-09-20');
+  await blurText();
+  assert.deepEqual(changes, ['2026-09-20']);
+  assert.equal(textBox().value, '2026. 09. 20.', 'the text is rewritten in the display format');
+  assert.equal(formData().get('day'), '2026-09-20');
+  for (const [text, expected] of [
+    ['2026. 9. 21', '2026-09-21'],
+    ['2026년 9월 22일', '2026-09-22'],
+    ['20260923', '2026-09-23'],
+    ['260924', '2026-09-24'],
+  ]) {
+    await typeText(text);
+    await key(textBox(), 'Enter');
+    assert.equal(changes.at(-1), expected, text);
+  }
+  await render(h('div', { key: 'en' }, view({ locale: 'en-US' })));
+  for (const [text, expected] of [
+    ['9/25/2026', '2026-09-25'],
+    ['09262026', '2026-09-26'],
+    ['2026-09-27', '2026-09-27'],
+  ]) {
+    await typeText(text);
+    await key(textBox(), 'Enter');
+    assert.equal(changes.at(-1), expected, text);
+  }
+  await render(h('div', { key: 'de' }, view({ locale: 'de-DE' })));
+  await typeText('28.09.2026');
+  await key(textBox(), 'Enter');
+  assert.equal(changes.at(-1), '2026-09-28');
+});
+
+test('typed entry keeps unreadable or blocked text, marks it invalid and Escape reverts it', async () => {
+  const changes = [];
+  await render(
+    h(
+      'form',
+      null,
+      h(
+        DateField,
+        {
+          defaultValue: d(15),
+          min: d(10),
+          max: d(20),
+          onValueChange: (v) => changes.push(v && keyOf(v)),
+        },
+        h(DateField.Input),
+      ),
+    ),
+  );
+  await typeText('2026-13-40');
+  const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+  await act(async () => textBox().dispatchEvent(enter));
+  assert.equal(enter.defaultPrevented, true, 'unreadable text does not submit the form');
+  assert.equal(textBox().value, '2026-13-40');
+  assert.equal(textBox().getAttribute('aria-invalid'), 'true');
+  assert.ok(field().hasAttribute('data-invalid'));
+  await key(textBox(), 'Escape');
+  assert.equal(textBox().value, '2026. 09. 15.');
+  assert.equal(textBox().hasAttribute('aria-invalid'), false);
+  await typeText('2026-09-25');
+  await blurText();
+  assert.equal(textBox().getAttribute('aria-invalid'), 'true', 'after max is not allowed');
+  assert.deepEqual(changes, []);
+  await typeText('');
+  await blurText();
+  assert.deepEqual(changes, [null], 'an emptied box clears the value');
+});
+
+test('typed entry and the calendar share one value; ArrowDown opens on the typed date', async () => {
+  const changes = [];
+  await render(
+    h(
+      DateField,
+      { today: d(15), onValueChange: (v) => changes.push(v && keyOf(v)) },
+      h(DateField.Input),
+      h(DateField.Clear),
+    ),
+  );
+  await act(async () => textBox().focus());
+  await typeText('2026-09-18');
+  await key(textBox(), 'ArrowDown');
+  assert.deepEqual(changes, ['2026-09-18']);
+  assert.ok(popup());
+  assert.equal(document.activeElement, day('2026-09-18'));
+  await click(day('2026-09-21'));
+  assert.equal(popup(), null);
+  assert.equal(textBox().value, '2026. 09. 21.');
+  assert.equal(document.activeElement, textBox(), 'focus returns to the text box');
+  await click(host.querySelector('[aria-label="달력 열기"]'));
+  assert.ok(popup());
+  await click(host.querySelector('[aria-label="달력 열기"]'));
+  assert.equal(popup(), null);
+  await click(clear());
+  assert.equal(textBox().value, '');
+  assert.equal(changes.at(-1), null);
+});

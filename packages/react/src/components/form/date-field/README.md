@@ -4,6 +4,7 @@
 
 - **하루, 기간, 여러 날.** `selectionMode` 로 고르고, 값은 로컬 날짜 `Date` 입니다. 날짜 라이브러리가 필요 없습니다.
 - **키보드 그대로.** Trigger에서 `↓` 로 열면 고른 날(없으면 오늘)에 포커스가 가고, 하루를 고르면 닫히며 포커스가 Trigger로 돌아옵니다.
+- **글자로 입력.** `DateField.Input` 을 넣으면 `2026-09-15`, `2026년 9월 15일`, `20260915` 처럼 쳐서 넣을 수 있습니다.
 - **폼.** `name` 을 주면 ISO 날짜가 FormData에 들어가고, `required` 인데 비어 있으면 브라우저가 제출을 막고 Trigger로 포커스를 옮깁니다. `reset` 은 `defaultValue` 로 되돌립니다.
 - **react-hook-form, TanStack Form.** `controlMode="value"` 나 `value` / `onValueChange` 로 Date 값을 그대로 주고받습니다.
 - **달력 기능 그대로.** 제한, 연월 목록, 여러 달, locale, 기간 미리 보기는 [Calendar](../../data/calendar/README.md) 와 같습니다.
@@ -79,6 +80,31 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 - `onBlur` 는 포커스가 필드와 팝업을 모두 벗어날 때만 부릅니다.
 - 판(drawer)에서는 제목과 닫기 버튼이 위에 붙습니다.
 
+## 글자로 입력
+
+```tsx
+<DateField value={birthday} onValueChange={setBirthday} autoComplete="bday">
+  <DateField.Input /> {/* 날짜를 글자로 친다. 라벨과 combobox 역할은 여기로 간다 */}
+  <DateField.Clear />
+  <DateField.Trigger /> {/* 달력 버튼. 생략해도 끝에 붙는다 */}
+</DateField>
+```
+
+| 치는 글자                                  | 읽는 날짜                        |
+| ------------------------------------------ | -------------------------------- |
+| `2026-09-15`, `2026. 9. 15.`, `2026/09/15` | 연도가 앞이면 locale 과 상관없이 |
+| `2026년 9월 15일`                          | 숫자 사이의 글자는 무시한다      |
+| `20260915`, `260915`                       | 숫자만 쳐도 된다. 휴대폰 숫자판  |
+| `9/15/2026`(en-US), `15.09.2026`(de-DE)    | 그 밖에는 locale 의 순서         |
+
+- `Enter` 나 포커스를 떠날 때 읽고, 표시 형식으로 다시 씁니다. 월 이름은 읽지 않으니 `format` 은 숫자 형식이 맞습니다.
+- 못 읽거나 min/max, `disabled` 로 막힌 날짜면 글자를 그대로 두고 `aria-invalid` 로 표시합니다. `Enter` 로 폼이 제출되지도 않습니다. `Esc` 는 원래 값으로 되돌립니다.
+- 글자를 다 지우면 값도 비웁니다.
+- `↓` 는 친 글자를 읽고 그 날짜에서 달력을 엽니다. 달력 버튼은 Tab 순서에서 빠집니다.
+- 비어 있으면 locale 의 순서를 보여 줍니다(`YYYY. MM. DD.`). `placeholder` 로 바꿀 수 있습니다.
+- `autoComplete` 은 기본 `off` 입니다. 생년월일은 `autoComplete="bday"` 를 줍니다.
+- 하루(`single`)에서만 씁니다.
+
 ## 폼
 
 ```tsx
@@ -139,7 +165,8 @@ const schema = z.object({ date: z.date().nullable().refine(Boolean, '날짜를 �
 ```
 
 - 부분을 하나도 주지 않으면 Trigger 와 Clear 를 그립니다. 하나라도 주면 준 것만 그리고, Trigger 가 없으면 Trigger 만 채웁니다.
-- `Trigger`, `Value`, `Clear`, `Content` 는 `asChild` 를 받습니다. Clear 는 Trigger 안에 둘 수 없습니다.
+- `Trigger`, `Value`, `Clear`, `Content`, `Input` 은 `asChild` 를 받습니다. Clear 는 Trigger 안에 둘 수 없습니다.
+- `Input` 이 있으면 Trigger 는 달력 아이콘 버튼이 되고, 주지 않으면 끝에 붙습니다. [글자로 입력](#글자로-입력) 을 봅니다.
 
 ## 상태
 
@@ -156,24 +183,25 @@ const schema = z.object({ date: z.date().nullable().refine(Boolean, '날짜를 �
 
 ## 속성
 
-| 속성                                                                  | 기본 / 동작                                                       |
-| --------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `selectionMode`                                                       | `single`(기본) / `range` / `multiple`                             |
-| `value` / `defaultValue` / `onValueChange`                            | 모드별 타입. 기본 `null`, `multiple` 은 `[]`                      |
-| `open` / `defaultOpen` / `onOpenChange`                               | 팝업 열림                                                         |
-| `format`                                                              | locale 숫자 연월일. 패턴이나 Intl 옵션                            |
-| `placeholder`                                                         | `날짜 선택`, 기간은 `기간 선택`                                   |
-| `min` / `max` / `disabled`                                            | 달력으로 간다. `disabled={true}` 는 필드 전체                     |
-| `captionLayout` / `monthsToShow` / `weekStartsOn` / `month` / `today` | 달력으로 간다                                                     |
-| `locale`                                                              | `ko-KR`. 달력과 표시 형식                                         |
-| `name` / `form` / `required`                                          | 숨은 값 입력과 브라우저 검증                                      |
-| `readOnly`                                                            | 열리지 않고 Clear 도 막힌다                                       |
-| `invalid`                                                             | danger 테두리와 링. Field 의 `aria-invalid` 가 우선               |
-| `variant`                                                             | `outline`(기본) / `soft` / `ghost`                                |
-| `size`                                                                | `standard` / `tiny`. 생략하면 `Field` 크기                        |
-| `mobileVariant`                                                       | `popover`(기본) / `drawer`                                        |
-| `className` / `style`                                                 | 필드 표면. 상태를 받는 함수도 된다                                |
-| 그 외 native 속성, `ref`                                              | Trigger `button` 으로 간다(`id`, `aria-*`, `onBlur`, `autoFocus`) |
+| 속성                                                                  | 기본 / 동작                                              |
+| --------------------------------------------------------------------- | -------------------------------------------------------- |
+| `selectionMode`                                                       | `single`(기본) / `range` / `multiple`                    |
+| `value` / `defaultValue` / `onValueChange`                            | 모드별 타입. 기본 `null`, `multiple` 은 `[]`             |
+| `open` / `defaultOpen` / `onOpenChange`                               | 팝업 열림                                                |
+| `format`                                                              | locale 숫자 연월일. 패턴이나 Intl 옵션                   |
+| `placeholder`                                                         | `날짜 선택`, 기간은 `기간 선택`                          |
+| `min` / `max` / `disabled`                                            | 달력으로 간다. `disabled={true}` 는 필드 전체            |
+| `captionLayout` / `monthsToShow` / `weekStartsOn` / `month` / `today` | 달력으로 간다                                            |
+| `locale`                                                              | `ko-KR`. 달력과 표시 형식                                |
+| `name` / `form` / `required`                                          | 숨은 값 입력과 브라우저 검증                             |
+| `readOnly`                                                            | 열리지 않고 Clear 도 막힌다                              |
+| `invalid`                                                             | danger 테두리와 링. Field 의 `aria-invalid` 가 우선      |
+| `variant`                                                             | `outline`(기본) / `soft` / `ghost`                       |
+| `size`                                                                | `standard` / `tiny`. 생략하면 `Field` 크기               |
+| `mobileVariant`                                                       | `popover`(기본) / `drawer`                               |
+| `className` / `style`                                                 | 필드 표면. 상태를 받는 함수도 된다                       |
+| `autoComplete`                                                        | `Input` 이 있을 때 쓴다. 기본 `off`                      |
+| 그 외 native 속성, `ref`                                              | Trigger `button`, `Input` 이 있으면 그 `input` 으로 간다 |
 
 ## 알아둘 것
 

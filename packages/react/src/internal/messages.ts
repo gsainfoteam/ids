@@ -28,6 +28,7 @@ export const messages = {
     rangeTitle: '기간 선택',
     clear: '날짜 지우기',
     close: '닫기',
+    open: '달력 열기',
   },
   timeField: {
     placeholder: '시간 선택',

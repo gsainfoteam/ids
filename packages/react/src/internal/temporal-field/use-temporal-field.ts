@@ -1,4 +1,13 @@
-import { useCallback, useId, useLayoutEffect, useRef, useState, type FocusEvent } from 'react';
+import {
+  useCallback,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FocusEvent,
+  type KeyboardEvent,
+} from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useFormReset } from '../../hooks/use-form-reset';
@@ -29,6 +38,9 @@ export type UseTemporalFieldOptions<V> = {
   readOnly: boolean;
   invalid: boolean | undefined;
   required: boolean;
+  display: (value: V) => string;
+  // Reads typed text into a value, or undefined when the text is not an allowed value.
+  parse?: (text: string) => V | undefined;
   // Typed for the trigger, but also called with the popup's blur event when focus leaves there.
   onBlur?: (event: FocusEvent<HTMLButtonElement>) => void;
 };
@@ -48,13 +60,36 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
   const blocked = disabled || readOnly;
   const expanded = open && !blocked;
   const popupId = `ids-temporal-${useId()}`;
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  // The control that owns the field's focus and label: the trigger button, or the text input
+  // when the field takes typed dates.
+  const triggerRef = useRef<HTMLButtonElement | HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  // What the user is typing, until it is read on Enter or blur. null shows the value itself.
+  const [draft, setDraft] = useState<string | null>(null);
+  const [unreadable, setUnreadable] = useState(false);
 
   const commit = (next: V) => {
     if (isSame(next, value)) return;
     if (!controlled) setInner(next);
     options.onValueChange?.(next);
+  };
+  const dropDraft = () => {
+    setDraft(null);
+    setUnreadable(false);
+  };
+  // An empty box clears the value; text that does not read as an allowed value stays as typed
+  // and marks the field invalid rather than being thrown away.
+  const readDraft = () => {
+    if (draft === null || !options.parse) return true;
+    const typed = draft.trim();
+    const next = typed ? options.parse(typed) : empty;
+    if (next === undefined) {
+      setUnreadable(true);
+      return false;
+    }
+    commit(next);
+    dropDraft();
+    return true;
   };
 
   // FieldPopup re-runs its placement and initial focus whenever onClose changes identity, so
@@ -75,17 +110,20 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
   const change: TemporalChange<V> = (next, { close: shouldClose = false } = {}) => {
     if (blocked) return;
     commit(next);
+    dropDraft();
     if (shouldClose) close(true);
   };
 
   const clear = () => {
     if (blocked) return;
     commit(empty);
+    dropDraft();
     close(true);
   };
 
   useFormReset(triggerRef, () => {
     if (!controlled) setInner(options.defaultValue);
+    dropDraft();
     setOpen(false);
   });
 
@@ -100,18 +138,44 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
       options.onBlur?.(event as unknown as FocusEvent<HTMLButtonElement>);
   };
 
+  const input = {
+    value: draft ?? (isEmpty(value) ? '' : options.display(value)),
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+      setDraft(event.currentTarget.value);
+      setUnreadable(false);
+    },
+    onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
+      if (event.defaultPrevented) return;
+      // Enter reads the text; unreadable text also stops the form's implicit submit.
+      if (event.key === 'Enter' && !readDraft()) event.preventDefault();
+      else if (event.key === 'ArrowDown' && !blocked) {
+        event.preventDefault();
+        readDraft();
+        setOpen(true);
+      } else if (event.key === 'Escape' && draft !== null && !expanded) {
+        event.preventDefault();
+        dropDraft();
+      }
+    },
+    onBlur: (event: FocusEvent<HTMLInputElement>) => {
+      readDraft();
+      onBlur(event);
+    },
+  };
+
   const state: TemporalFieldState<V> = {
     value,
     open: expanded,
     empty: isEmpty(value),
     disabled,
     readOnly,
-    invalid: options.invalid ?? false,
+    invalid: options.invalid ?? unreadable,
     required,
   };
 
   return {
     state,
+    input,
     blocked,
     popupId,
     triggerRef,

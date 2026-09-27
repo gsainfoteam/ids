@@ -366,3 +366,47 @@ export const Composition: Story = {
     await expect(canvas.getByRole('button', { name: '마감일 지우기' })).toBeVisible();
   },
 };
+
+export const TypedEntry: Story = {
+  render: (args) => (
+    <Field className="w-72">
+      <Field.Label>생년월일</Field.Label>
+      <DateField
+        today={today}
+        max={today}
+        captionLayout="dropdown"
+        autoComplete="bday"
+        onValueChange={args.onValueChange}
+      >
+        <DateField.Input />
+        <DateField.Clear />
+        <DateField.Trigger />
+      </DateField>
+      <Field.Hint>2000-01-31, 2000. 1. 31., 20000131 모두 됩니다.</Field.Hint>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'DateField.Input을 넣으면 날짜를 글자로 칠 수 있습니다. Enter나 포커스를 떠날 때 읽고 표시 형식으로 다시 씁니다. 못 읽거나 고를 수 없는 날짜는 그대로 두고 오류로 표시하며, Esc로 되돌립니다. ↓는 달력을 엽니다.',
+      },
+    },
+  },
+  play: async ({ canvas, args, userEvent }) => {
+    const input = canvas.getByRole('combobox', { name: '생년월일' });
+    await userEvent.click(input);
+    await userEvent.keyboard('20000131{Enter}');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(new Date(2000, 0, 31));
+    await expect(input).toHaveValue('2000. 01. 31.');
+    await userEvent.clear(input);
+    await userEvent.type(input, '2030-01-01');
+    await userEvent.tab();
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await userEvent.click(input);
+    await userEvent.keyboard('{Escape}');
+    await expect(input).toHaveValue('2000. 01. 31.');
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(day('2000-01-31')).toHaveFocus());
+  },
+};

@@ -2,16 +2,19 @@ import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 import { describeDates, isEmptyDates, sameDates, serializeDates } from './date-value';
 import { dateFormatter, type DateFieldFormat } from './format';
+import { dateInputHint, parseDateText } from './parse';
 import { messages } from '../../../internal/messages';
 import {
   TemporalClear,
   TemporalContent,
   TemporalField,
+  TemporalInput,
   TemporalTrigger,
   TemporalValue,
   temporalFieldStyle,
   type ClearProps as SharedClearProps,
   type ContentProps as SharedContentProps,
+  type InputProps as SharedInputProps,
   type TemporalFieldProps,
   type TemporalFieldState,
   type TriggerProps as SharedTriggerProps,
@@ -20,6 +23,7 @@ import {
 import { Calendar, CalendarPickContext, type CalendarOptions } from '../../data/calendar';
 import {
   emptyValue,
+  isBlocked,
   validateValue,
   type CalendarValue,
   type DateSelection,
@@ -87,6 +91,15 @@ export function DateField(props: DateFieldProps) {
         // Up to two months side by side plus the popup's padding and border; more months wrap.
         preferredWidth: cell * 7 * shown + 16 * (shown - 1) + 26,
         initialFocusSelector: '[data-calendar-day][tabindex="0"]',
+        // Typed entry reads one date, and only one the calendar would let the user pick.
+        parse:
+          selectionMode === 'single'
+            ? (text) => {
+                const date = parseDateText(text, locale);
+                return date && !isBlocked(date, { min, max, disabled }) ? date : undefined;
+              }
+            : undefined,
+        inputHint: typeof format === 'string' ? format : dateInputHint(locale),
         picker: ({ value: current, change, close, size }) => (
           // A single date closes the popup on every pick, including the day already chosen.
           <CalendarPickContext value={selectionMode === 'single' ? () => close(true) : null}>
@@ -119,7 +132,9 @@ export namespace DateField {
   export type ValueProps = SharedValueProps;
   export type ClearProps = SharedClearProps;
   export type ContentProps = SharedContentProps;
+  export type InputProps = SharedInputProps;
   export const Trigger = TemporalTrigger;
+  export const Input = TemporalInput;
   export const Value = TemporalValue;
   export const Clear = TemporalClear;
   export const Content = TemporalContent;
