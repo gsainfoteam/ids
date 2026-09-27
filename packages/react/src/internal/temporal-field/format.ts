@@ -6,6 +6,8 @@ import {
 } from '../../components/data/time-picker/time';
 import { dateFormatter } from '../../components/form/date-field/format';
 import { invariant } from '../../utils';
+import { resolveLocale } from '../date-locale';
+
 export function temporalFormatter(
   format: string | undefined,
   locale: string,
@@ -13,8 +15,9 @@ export function temporalFormatter(
   hourCycle: TimeFormat | undefined,
   withDate: boolean,
 ): (date: Date) => string {
+  const dateLocale = resolveLocale(locale);
   if (format === undefined || format === '12h' || format === '24h') {
-    const cycle = resolveTimeFormat(hourCycle ?? (format as TimeFormat | undefined), locale);
+    const cycle = resolveTimeFormat(hourCycle ?? (format as TimeFormat | undefined), dateLocale);
     const formatter = new Intl.DateTimeFormat(locale, {
       ...(withDate ? ({ year: 'numeric', month: '2-digit', day: '2-digit' } as const) : {}),
       hour: '2-digit',
@@ -63,7 +66,7 @@ export function temporalFormatter(
         parts.push(dateFormatter(token, locale));
       } else
         parts.push((d) => {
-          if (token === 'a') return periodLabel(d.getHours() < 12 ? 0 : 1, locale);
+          if (token === 'a') return periodLabel(d.getHours() < 12 ? 0 : 1, dateLocale);
           const n =
             token[0] === 'H'
               ? d.getHours()

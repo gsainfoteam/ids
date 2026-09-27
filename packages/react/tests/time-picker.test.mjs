@@ -18,6 +18,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
+const { de } = await import('date-fns/locale/de');
 const { TimePicker } = await import('../dist/index.js');
 
 let host, root;
@@ -44,31 +45,28 @@ const key = (el, k, init = {}) =>
     ),
   );
 const d = (h, m = 0, s = 0) => new Date(2026, 8, 15, h, m, s);
+const ssr = (props, ...children) =>
+  new JSDOM(renderToString(h(TimePicker, props, ...children))).window.document;
+const labels = (doc) =>
+  [...doc.querySelectorAll('[role=listbox]')].map((n) => n.getAttribute('aria-label'));
+const periods = (doc) =>
+  [...doc.querySelectorAll('[data-time-column=period] [role=option]')].map((n) => n.textContent);
 
-test('SSR: Korean names by default, precision, locale periods and composition diagnostics', () => {
-  const doc = new JSDOM(renderToString(h(TimePicker, { precision: 'second', step: 15 }))).window
-    .document;
+test('SSR: Korean names by default, the clock and periods from the date-fns locale, diagnostics', () => {
+  const doc = ssr({ precision: 'second', step: 15 });
   assert.equal(doc.querySelector('[role=group]').getAttribute('aria-label'), '시간');
-  assert.deepEqual(
-    [...doc.querySelectorAll('[role=listbox]')].map((n) => n.getAttribute('aria-label')),
-    ['시', '분', '초', '오전/오후'],
-    'ko-KR reads the clock in 12 hours',
-  );
+  assert.deepEqual(labels(doc), ['시', '분', '초'], 'date-fns ko reads a 24-hour clock');
+  assert.equal(doc.querySelector('[data-time-picker]').dataset.format, '24h');
   assert.equal(doc.querySelectorAll('[data-time-column=second] [role=option]').length, 4);
-  // Node and browsers ship different CLDR data for Korean (AM vs 오전), so the label is whatever
-  // Intl says in this runtime.
-  assert.equal(
-    doc.querySelector('[data-time-column=period] [role=option]').textContent,
-    new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', hour12: true })
-      .formatToParts(new Date(2000, 0, 1))
-      .find((p) => p.type === 'dayPeriod').value,
-  );
-  assert.equal(doc.querySelector('[data-time-picker]').dataset.format, '12h');
   assert.ok(doc.querySelector('[data-time-picker]').hasAttribute('data-empty'));
-  const german = new JSDOM(renderToString(h(TimePicker, { locale: 'de-DE' }))).window.document;
-  assert.equal(german.querySelector('[data-time-column=period]'), null);
+  assert.deepEqual(periods(ssr({ format: '12h' })), ['오전', '오후']);
+  const english = ssr({ locale: 'en-US' });
+  assert.equal(english.querySelector('[data-time-picker]').dataset.format, '12h');
+  assert.deepEqual(periods(english), ['AM', 'PM']);
+  assert.equal(ssr({ locale: de }).querySelector('[data-time-column=period]'), null);
+  assert.throws(() => ssr({ locale: 'de-DE' }), /no built-in date-fns locale/);
   for (const props of [{ step: 0 }, { step: 15, precision: 'hour' }, { min: d(18), max: d(9) }])
-    assert.throws(() => renderToString(h(TimePicker, props)));
+    assert.throws(() => ssr(props));
   assert.throws(
     () => renderToString(h(TimePicker, { format: '24h' }, h(TimePicker.Period))),
     /Period requires/,

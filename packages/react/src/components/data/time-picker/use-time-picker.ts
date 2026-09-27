@@ -1,5 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 
+import { parseISO, startOfDay } from 'date-fns';
+import { clamp, debounce, type DebouncedFunction } from 'es-toolkit';
+
 import {
   nearestSlot,
   resolveTimeFormat,
@@ -17,9 +20,10 @@ import {
   type TimeUnit,
 } from './time';
 import { useControllableState } from '../../../hooks/use-controllable-state';
-import { dateAt, dayKey, dayOnly } from '../calendar/date';
+import { dayKey } from '../calendar/date';
 
 import type { IdsSize } from '../../../tokens/types';
+import type { Locale } from 'date-fns';
 
 export type TimePickerState = {
   value: Date | null;
@@ -49,7 +53,7 @@ export type UseTimePickerOptions = {
   step: number;
   min?: Date;
   max?: Date;
-  locale: string;
+  locale: Locale;
   disabled: boolean;
   readOnly: boolean;
 };
@@ -65,21 +69,22 @@ export function useTimePicker(options: UseTimePickerOptions) {
     onValueChange: options.onValueChange,
   });
   // An empty picker still needs a day to build the time on, and DST makes some days shorter.
-  const [mountedDay] = useState(() => dayOnly(new Date()));
-  const base = value ?? (options.referenceDate ? dayOnly(options.referenceDate) : mountedDay);
+  const [mountedDay] = useState(() => startOfDay(new Date()));
+  const base = value ?? (options.referenceDate ? startOfDay(options.referenceDate) : mountedDay);
   const day = dayKey(base);
   const low = min?.getTime();
   const high = max?.getTime();
-  const slots = useMemo(() => {
-    const [year, month, date] = day.split('-').map(Number);
-    return timeSlots(
-      dateAt(year, month - 1, date),
-      precision,
-      step,
-      low === undefined ? undefined : new Date(low),
-      high === undefined ? undefined : new Date(high),
-    );
-  }, [day, precision, step, low, high]);
+  const slots = useMemo(
+    () =>
+      timeSlots(
+        parseISO(day),
+        precision,
+        step,
+        low === undefined ? undefined : new Date(low),
+        high === undefined ? undefined : new Date(high),
+      ),
+    [day, precision, step, low, high],
+  );
   const format = resolveTimeFormat(options.format, locale);
   // With nothing picked the columns start on the allowed time nearest to midnight.
   const current = value
@@ -125,7 +130,6 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
   const wheel = c.variant === 'wheel';
   const node = useRef<HTMLDivElement>(null);
   const scrolling = useRef(false);
-  const settleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const typed = useRef({ buffer: '', at: 0 });
 
   // Before layout (a popover not shown yet) there is no height to measure, so the control size
@@ -155,7 +159,6 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
     if (el) observer?.observe(el);
     return () => observer?.disconnect();
   }, [selectedNumber, wheel]);
-  useEffect(() => () => clearTimeout(settleTimer.current), []);
 
   const moveTo = (n: number) => {
     setActive(n);
@@ -167,10 +170,15 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
   };
   const centered = () => {
     const index = Math.round((node.current?.scrollTop ?? 0) / optionHeight());
-    return numbers[Math.max(0, Math.min(numbers.length - 1, index))];
+    return numbers[clamp(index, 0, numbers.length - 1)];
   };
+  // Safari and embedded engines can skip scrollend at an edge, so every momentum event restarts
+  // the wait and the value commits once the column has actually come to rest. The debounced call
+  // is made on the first scroll, since building it while rendering would hand it a ref to read.
+  const settleLater = useRef<DebouncedFunction<() => void> | null>(null);
+  useEffect(() => () => settleLater.current?.cancel(), []);
   const settle = () => {
-    clearTimeout(settleTimer.current);
+    settleLater.current?.cancel();
     if (!wheel || !scrolling.current) return;
     scrolling.current = false;
     const n = centered();
@@ -196,7 +204,7 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
     if (event.key in moves) {
       event.preventDefault();
       scrolling.current = false;
-      moveTo(numbers[Math.max(0, Math.min(numbers.length - 1, moves[event.key]))]);
+      moveTo(numbers[clamp(moves[event.key], 0, numbers.length - 1)]);
     } else if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       commit(activeNumber);
@@ -262,10 +270,8 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
     onScroll: () => {
       if (!wheel || !scrolling.current) return;
       setActive(centered());
-      clearTimeout(settleTimer.current);
-      // Safari and embedded engines can skip scrollend at an edge, so every momentum event
-      // restarts the timer and the value commits once the column has actually come to rest.
-      settleTimer.current = setTimeout(() => latestSettle.current(), SETTLE_DELAY);
+      settleLater.current ??= debounce(() => latestSettle.current(), SETTLE_DELAY);
+      settleLater.current();
     },
     onScrollEnd: settle,
   };

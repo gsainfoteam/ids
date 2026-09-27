@@ -70,7 +70,8 @@ test('SSR: display follows format, hourCycle and locale; FormData follows precis
     /02:05 PM/,
     'hourCycle wins over the 24h shorthand',
   );
-  assert.match(html({ defaultValue: at, locale: 'de-DE' }).body.textContent, /14:05/);
+  assert.match(html({ defaultValue: at }).body.textContent, /14:05/, 'date-fns ko is 24-hour');
+  assert.throws(() => html({ defaultValue: at, locale: 'de-DE' }), /no built-in date-fns locale/);
   const form = (props) => {
     const doc = html({ defaultValue: at, ...props });
     return new doc.defaultView.FormData(doc.querySelector('form')).get('at');

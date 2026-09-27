@@ -1,46 +1,45 @@
+import { format, getHours, getMinutes, getSeconds, isSameDay, set } from 'date-fns';
+import { minBy, range } from 'es-toolkit';
+
+import { hourCycleOf, type HourCycle } from '../../../internal/date-locale';
 import { invariant } from '../../../utils';
-import { dateFormat, dayKey, validDate } from '../calendar/date';
+import { validDate } from '../calendar/date';
+
+import type { Locale } from 'date-fns';
 
 export type TimePrecision = 'hour' | 'minute' | 'second';
-export type TimeFormat = '12h' | '24h';
+export type TimeFormat = HourCycle;
 export type TimeUnit = 'hour' | 'minute' | 'second' | 'period';
 
-export const secondsOf = (d: Date) => d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds();
-export const timeKey = (d: Date, precision: TimePrecision = 'minute') =>
-  [
-    d.getHours(),
-    ...(precision === 'hour' ? [] : [d.getMinutes()]),
-    ...(precision === 'second' ? [d.getSeconds()] : []),
-  ]
-    .map((n) => String(n).padStart(2, '0'))
-    .join(':');
+// A slot is a wall-clock time as seconds since midnight, which is what the columns pick from;
+// it only becomes a Date on a given day through withTime.
+export const secondsOf = (d: Date) => getHours(d) * 3600 + getMinutes(d) * 60 + getSeconds(d);
 
-// setHours() on a day that skips an hour for DST lands on another hour instead of failing, so
-// the result is checked against what was asked for.
+const keyPatterns = { hour: 'HH', minute: 'HH:mm', second: 'HH:mm:ss' } as const;
+export const timeKey = (d: Date, precision: TimePrecision = 'minute') =>
+  format(d, keyPatterns[precision]);
+
+// set() on a day that skips an hour for DST lands on another hour instead of failing, so the
+// result is checked against what was asked for.
 export function withTime(day: Date, seconds: number): Date | null {
-  const next = new Date(day);
-  next.setHours(Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60, 0);
-  return dayKey(next) === dayKey(day) && secondsOf(next) === seconds ? next : null;
+  const next = set(day, {
+    hours: Math.floor(seconds / 3600),
+    minutes: Math.floor(seconds / 60) % 60,
+    seconds: seconds % 60,
+    milliseconds: 0,
+  });
+  return isSameDay(next, day) && secondsOf(next) === seconds ? next : null;
 }
 
 export function validateTime(value: Date | null | undefined) {
   invariant(value == null || validDate(value), 'TimePicker: expected a valid Date or null.');
 }
 
-export function resolveTimeFormat(format: TimeFormat | undefined, locale: string): TimeFormat {
-  return (
-    format ??
-    (new Intl.DateTimeFormat(locale, { hour: 'numeric' }).resolvedOptions().hour12 ? '12h' : '24h')
-  );
-}
+export const resolveTimeFormat = (value: TimeFormat | undefined, locale: Locale): TimeFormat =>
+  value ?? hourCycleOf(locale);
 
-export function periodLabel(period: number, locale: string): string {
-  return (
-    dateFormat(locale, { hour: 'numeric', hour12: true })
-      .formatToParts(new Date(2000, 0, 1, period * 12))
-      .find((p) => p.type === 'dayPeriod')?.value ?? (period ? 'PM' : 'AM')
-  );
-}
+export const periodLabel = (period: number, locale: Locale) =>
+  format(new Date(2000, 0, 1, period * 12), 'a', { locale });
 
 /** Local clock slots; unavailable DST times are omitted, repeated times use Date's earlier offset. */
 export function timeSlots(
@@ -56,33 +55,18 @@ export function timeSlots(
     Number.isInteger(step) && step >= 1 && step <= 60 && (precision !== 'hour' || step === 1),
     'TimePicker: step must be 1..60 and precision=hour requires step=1.',
   );
-  const lo = min ? secondsOf(min) : 0,
-    hi = max ? secondsOf(max) : 86399;
+  const lo = min ? secondsOf(min) : 0;
+  const hi = max ? secondsOf(max) : 86399;
   invariant(lo <= hi, 'TimePicker: min must not be after max; overnight ranges are unsupported.');
-  const slots: number[] = [];
-  for (let hour = 0; hour < 24; hour++)
-    for (
-      let minute = 0;
-      minute < (precision === 'hour' ? 1 : 60);
-      minute += precision === 'minute' ? step : 1
-    )
-      for (
-        let second = 0;
-        second < (precision === 'second' ? 60 : 1);
-        second += precision === 'second' ? step : 1
-      ) {
-        const s = hour * 3600 + minute * 60 + second;
-        if (s >= lo && s <= hi && withTime(day, s)) slots.push(s);
-      }
-  return slots;
+  const minutes = precision === 'hour' ? [0] : range(0, 60, precision === 'minute' ? step : 1);
+  const seconds = precision === 'second' ? range(0, 60, step) : [0];
+  return range(24)
+    .flatMap((h) => minutes.flatMap((m) => seconds.map((s) => h * 3600 + m * 60 + s)))
+    .filter((slot) => slot >= lo && slot <= hi && withTime(day, slot));
 }
 
-export function nearestSlot(slots: number[], target: number): number | undefined {
-  let best: number | undefined;
-  for (const slot of slots)
-    if (best === undefined || Math.abs(slot - target) < Math.abs(best - target)) best = slot;
-  return best;
-}
+export const nearestSlot = (slots: number[], target: number): number | undefined =>
+  minBy(slots, (slot) => Math.abs(slot - target));
 
 export function unitValue(seconds: number, unit: TimeUnit, format: TimeFormat) {
   const hour = Math.floor(seconds / 3600);
@@ -100,12 +84,8 @@ export function unitNumbers(
 ) {
   if (unit === 'period') return [0, 1];
   // A 12-hour day starts at 12, so the column runs 12, 1, ... 11 like the clock reads it.
-  if (unit === 'hour')
-    return Array.from({ length: format === '12h' ? 12 : 24 }, (_, i) =>
-      format === '12h' ? i || 12 : i,
-    );
-  const interval = unit === precision ? step : 1;
-  return Array.from({ length: Math.ceil(60 / interval) }, (_, i) => i * interval);
+  if (unit === 'hour') return format === '12h' ? [12, ...range(1, 12)] : range(24);
+  return range(0, 60, unit === precision ? step : 1);
 }
 
 // Picking one unit keeps the others where they are and lands on the nearest allowed slot inside
@@ -143,16 +123,8 @@ export function unitTarget(
   return nearestSlot(matches, target);
 }
 
-const twoDigits = new Map<string, Intl.NumberFormat>();
-export function unitLabel(unit: TimeUnit, n: number, locale: string) {
-  if (unit === 'period') return periodLabel(n, locale);
-  let format = twoDigits.get(locale);
-  if (!format) {
-    format = new Intl.NumberFormat(locale, { minimumIntegerDigits: 2, useGrouping: false });
-    twoDigits.set(locale, format);
-  }
-  return format.format(n);
-}
+export const unitLabel = (unit: TimeUnit, n: number, locale: Locale) =>
+  unit === 'period' ? periodLabel(n, locale) : String(n).padStart(2, '0');
 
 // Typing a number picks the first option that starts with it, so "4" finds 04 and "45" finds 45;
 // when the buffer no longer matches anything, the last key starts a new search.

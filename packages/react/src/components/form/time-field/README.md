@@ -2,7 +2,7 @@
 
 누르면 시계가 열리고, 고른 시각을 필드에 보여 주는 시간 입력입니다.
 
-- **locale 시간제.** 한국어는 `오후 02:30`, 독일어는 `14:30` 처럼 보이고, 시계도 같은 시간제로 열립니다. `format` 과 `hourCycle` 로 바꿉니다.
+- **locale 시간제.** 한국어는 `14:30`, 미국 영어는 `02:30 PM` 처럼 보이고, 시계도 같은 시간제로 열립니다. 시간제는 date-fns locale 을 따르고 `format` 과 `hourCycle` 로 바꿉니다.
 - **간격과 범위.** `step` 으로 15분 단위처럼 끊고 `min` / `max` 밖은 고를 수 없습니다.
 - **키보드.** Trigger에서 `↓` 로 열면 첫 컬럼에 포커스가 가고, 숫자를 치거나 방향키로 옮겨 Enter로 고릅니다.
 - **폼.** `name` 을 주면 `14:30` 이 FormData에 들어가고, `required` 인데 비어 있으면 브라우저가 제출을 막습니다. `reset` 은 `defaultValue` 로 되돌립니다.
@@ -32,7 +32,7 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 ## 표시 형식
 
 ```tsx
-<TimeField />                                  // ko-KR: 오후 02:30
+<TimeField />                                  // ko-KR: 14:30
 <TimeField format="24h" />                     // 14:30. 시계도 24시간제
 <TimeField format="12h" locale="en-US" />      // 02:30 PM
 <TimeField format="a h:mm" hourCycle="12h" />  // 패턴은 글자만 바꾼다. 시계 시간제는 hourCycle

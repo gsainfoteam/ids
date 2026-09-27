@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { de } from 'date-fns/locale/de';
 import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -22,7 +23,7 @@ const meta = {
     precision: { control: 'radio', options: ['hour', 'minute', 'second'] },
     format: { control: 'radio', options: [undefined, '12h', '24h'] },
     step: { control: { type: 'number', min: 1, max: 60 } },
-    locale: { control: 'text' },
+    locale: { control: 'radio', options: ['ko-KR', 'en-US'] },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
@@ -68,7 +69,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Hour cycle × Precision"
-        description="시간제는 locale을 따르고 format으로 정합니다. 12시간제에는 오전/오후 컬럼이 붙습니다."
+        description="시간제는 date-fns locale을 따르고 format으로 정합니다. 12시간제에는 오전/오후 컬럼이 붙습니다."
       >
         <Showcase.Row label="24h minute">
           <TimePicker format="24h" defaultValue={at(14, 30)} className="w-56" aria-label="24시간" />
@@ -260,23 +261,32 @@ export const Wheel: Story = {
 export const Locale: Story = {
   render: () => (
     <div className="flex flex-wrap gap-8">
-      <TimePicker defaultValue={at(14, 30)} className="w-64" aria-label="한국어" />
+      <TimePicker defaultValue={at(14, 30)} className="w-44" aria-label="한국어" />
+      <TimePicker
+        format="12h"
+        defaultValue={at(14, 30)}
+        className="w-64"
+        aria-label="한국어 12시간"
+      />
       <TimePicker locale="en-US" defaultValue={at(14, 30)} className="w-64" aria-label="English" />
-      <TimePicker locale="de-DE" defaultValue={at(14, 30)} className="w-44" aria-label="Deutsch" />
+      <TimePicker locale={de} defaultValue={at(14, 30)} className="w-44" aria-label="Deutsch" />
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '시간제와 오전/오후 이름은 locale을 따릅니다. 한국어와 미국 영어는 12시간제, 독일어는 24시간제입니다.',
+          '시간제와 오전/오후 이름은 date-fns locale을 따릅니다. date-fns의 한국어와 독일어는 24시간제, 미국 영어는 12시간제이고 format="12h"로 바꿀 수 있습니다.',
       },
     },
   },
   play: async ({ canvas }) => {
     const korean = canvas.getByRole('group', { name: '한국어' });
+    await expect(korean.querySelector('[data-time-column=period]')).toBeNull();
+    await expect(korean).toHaveAttribute('data-format', '24h');
+    const twelve = canvas.getByRole('group', { name: '한국어 12시간' });
     await expect(
-      korean.querySelector('[data-time-column=period] [data-selected]'),
+      twelve.querySelector('[data-time-column=period] [data-selected]'),
     ).toHaveTextContent('오후');
     const english = canvas.getByRole('group', { name: 'English' });
     await expect(

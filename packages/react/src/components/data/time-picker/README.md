@@ -3,7 +3,7 @@
 시, 분, 초와 오전/오후를 세로 목록에서 골라 시각을 정하는 컴포넌트입니다.
 
 - **값은 `Date | null`.** 날짜는 두고 시각만 바꿉니다. 비어 있으면 `referenceDate`(기본 오늘)에 시각을 붙입니다.
-- **locale 시간제.** 한국어와 미국 영어는 12시간제에 오전/오후 컬럼이, 독일어는 24시간제가 기본입니다. `format` 으로 정할 수도 있습니다.
+- **date-fns locale 시간제.** date-fns 의 한국어와 독일어는 24시간제, 미국 영어는 12시간제에 오전/오후 컬럼이 기본입니다. `format` 으로 정할 수도 있습니다.
 - **간격과 범위.** `step` 으로 분이나 초를 15분 단위처럼 끊고, `min` / `max` 밖의 시각은 고를 수 없습니다. 서머타임으로 없는 시각도 빠집니다.
 - **키보드.** 방향키로 둘러보고 Enter로 고릅니다. 숫자를 치면 그 숫자로 가고, Delete로 비웁니다.
 - **휠.** `variant="wheel"` 은 iOS처럼 가운데로 스냅되는 컬럼이고, 스크롤이 멈추면 가운데 값이 선택됩니다.
@@ -56,13 +56,17 @@ const [time, setTime] = useState<Date | null>(null);
 ## 시간제와 locale
 
 ```tsx
-<TimePicker />                    // ko-KR: 12시간제, 오전/오후 컬럼
-<TimePicker locale="de-DE" />     // 24시간제
-<TimePicker format="24h" />       // 시간제를 직접 정한다
-<TimePicker locale="en-US" format="12h" />  // AM/PM
+import { de } from 'date-fns/locale';
+
+<TimePicker />                        // ko-KR: 24시간제
+<TimePicker format="12h" />           // 오전/오후 컬럼
+<TimePicker locale="en-US" />         // 12시간제, AM/PM
+<TimePicker locale={de} />            // date-fns Locale. 24시간제
 ```
 
-- 숫자와 오전/오후 이름은 `Intl` 에서 가져옵니다. 컬럼 이름(`시`, `분`, `초`, `오전/오후`)은 한국어 기본 문구이고 `aria-label` 로 바꿉니다.
+- 시간제는 locale 의 짧은 시각 형식(date-fns `p`)에 오전/오후나 12시간 표기가 있는지로 정합니다.
+- 오전/오후 이름은 date-fns locale 에서 가져옵니다(`오전`/`오후`, `AM`/`PM`). 컬럼 이름(`시`, `분`, `초`, `오전/오후`)은 IDS 메시지이고 `aria-label` 로 바꿉니다.
+- 문자열 `locale` 은 `ko`, `ko-KR`, `en`, `en-US` 만 받습니다. 다른 언어는 date-fns `Locale` 을 넘깁니다.
 
 ## 키보드
 
@@ -108,7 +112,7 @@ const [time, setTime] = useState<Date | null>(null);
 | ------------------------ | --------------------------------------- |
 | `unit`                   | `hour` / `minute` / `second` / `period` |
 | `value`                  | 숫자. `period` 는 0(오전), 1(오후)      |
-| `label`                  | locale 로 쓴 두 자리 숫자나 오전/오후   |
+| `label`                  | 두 자리 숫자나 locale 의 오전/오후      |
 | `selected`               | 현재 값                                 |
 | `active`                 | 키보드가 가리키는 옵션                  |
 | `disabled`               | 범위 밖                                 |
@@ -126,7 +130,7 @@ const [time, setTime] = useState<Date | null>(null);
 | `step`                                     | `1`. 가장 작은 단위의 간격                                  |
 | `format`                                   | locale 시간제. `12h` / `24h`                                |
 | `min` / `max`                              | 시각만 비교, 양 끝 포함                                     |
-| `locale`                                   | `ko-KR`                                                     |
+| `locale`                                   | `ko-KR`. 태그 또는 date-fns `Locale`                        |
 | `variant`                                  | `grid`(기본) / `wheel`                                      |
 | `selectionMode`                            | `single`(기본) / `none`(둘러보기만)                         |
 | `readOnly`                                 | 둘러보기만                                                  |
@@ -142,4 +146,4 @@ const [time, setTime] = useState<Date | null>(null);
 - 컬럼은 스크롤바를 숨깁니다. 마우스 휠, 트랙패드, 터치, 키보드로 움직입니다.
 - 컬럼 높이는 옵션 다섯 개입니다. `className="[--time-picker-height:calc(var(--time-option)*7)]"` 처럼 바꿀 수 있고, 위아래 여백이 반 컬럼씩이라 어느 높이에서도 고른 시각이 가운데 줄에 옵니다.
 - 12시간제의 시 컬럼은 12, 1, 2, ... 11 순서입니다.
-- 오전/오후 이름은 런타임의 CLDR 데이터를 따릅니다. 한국어는 브라우저에서 `오전`/`오후`, 일부 Node 버전에서 `AM`/`PM` 입니다.
+- 오전/오후 이름은 런타임과 상관없이 date-fns 데이터라 서버와 브라우저가 같습니다.

@@ -16,6 +16,7 @@ import {
   type TimePickerOptionState,
   type TimePickerState,
 } from './use-time-picker';
+import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
 import { flattenParts, part } from '../../../internal/field-popup';
 import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
@@ -32,7 +33,7 @@ export type TimePickerOptions = {
   step?: number;
   min?: Date;
   max?: Date;
-  locale?: string;
+  locale?: DateLocale;
   size?: IdsSize;
   disabled?: boolean;
   readOnly?: boolean;
@@ -97,7 +98,7 @@ export function TimePicker({
   step = 1,
   min,
   max,
-  locale = messages.locale,
+  locale,
   size,
   disabled = false,
   readOnly = false,
@@ -118,7 +119,7 @@ export function TimePicker({
     step,
     min,
     max,
-    locale,
+    locale: resolveLocale(locale),
     disabled,
     readOnly: readOnly || selectionMode === 'none',
   });
