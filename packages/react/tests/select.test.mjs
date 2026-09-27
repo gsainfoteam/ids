@@ -667,6 +667,25 @@ test('search ignores case, width and accents; IME keys are left alone', async ()
   assert.equal(search.getAttribute('aria-activedescendant'), before);
 });
 
+test('Separator is a decorative Divider, left out while searching', async () => {
+  await render(
+    tracked({}, [
+      h(Select.SearchField, { key: 's' }),
+      h(Select.Item, { key: 'a', value: 'a' }, 'Alpha'),
+      h(Select.Separator, { key: 'rule' }),
+      h(Select.Item, { key: 'b', value: 'b' }, 'Beta'),
+    ]).node,
+  );
+  await click(trigger());
+  const rule = host.querySelector('[data-select-separator]');
+  assert.ok(rule.hasAttribute('data-divider'));
+  assert.equal(rule.getAttribute('aria-hidden'), 'true');
+  assert.equal(rule.hasAttribute('role'), false, 'a listbox owns no separators');
+  assert.match(rule.className, /(^| )w-auto( |$)/, 'it stretches into the list padding');
+  await type(host.querySelector('input[role=combobox]'), 'a');
+  assert.equal(host.querySelector('[data-select-separator]'), null);
+});
+
 test('SearchField keeps its own props, handlers and an asChild input under the combobox wiring', async () => {
   const keys = [];
   await render(

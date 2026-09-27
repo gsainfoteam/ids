@@ -37,6 +37,7 @@ import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { IconButton } from '../../action/icon-button';
+import { Divider } from '../../layout/divider';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -592,20 +593,19 @@ function SelectGroup({ heading, asChild, children, className, ...props }: Select
   );
 }
 
-// A listbox may only own options and groups, so the rule is drawn but hidden from the tree. It
-// is left out while searching, where it would divide results that no longer belong together.
-function SelectSeparator({ asChild, children, className, ...props }: Select.SeparatorProps) {
+// A listbox may only own options and groups, so the rule is a decorative Divider, hidden from the
+// tree. It is left out while searching, where it would divide results that no longer belong
+// together.
+function SelectSeparator({ className, ...props }: Select.SeparatorProps) {
   const c = useSelectContext('Select.Separator');
   if (c.select.state.query) return null;
-  return part(
-    'div',
-    asChild,
-    children,
-    mergeProps(props, {
-      'aria-hidden': true,
-      'data-select-separator': '',
-      className: c.styles.separator({ className }),
-    }),
+  return (
+    <Divider
+      {...props}
+      decorative
+      data-select-separator=""
+      className={c.styles.separator({ className })}
+    />
   );
 }
 

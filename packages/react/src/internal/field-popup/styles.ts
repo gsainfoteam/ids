@@ -39,7 +39,9 @@ export const fieldListbox = {
     'outline-none [overflow-anchor:none]',
   ),
   heading: cn('px-2.5 pt-2 pb-1 text-caption-c1-medium text-(--ids-color-on-muted)'),
-  separator: cn('-mx-1 my-1 h-px bg-(--ids-color-border)'),
+  // Classes for a Divider, which reaches into the list's padding. Its own full width would leave
+  // the rule short at one end, so the width is left to the stretch.
+  separator: cn('-mx-1 my-1 w-auto'),
   empty: cn('px-2.5 py-6 text-center text-body-b3-regular text-(--ids-color-on-muted)'),
   // A search box at the top of a list, like shadcn/ui's command input: a ghost TextField with no
   // ring of its own, since the caret already shows where focus is, and a rule under it instead of
