@@ -70,7 +70,6 @@ export namespace IconButton {
           children?: never;
         }
       | {
-          // The child element (a link) is drawn as the square; its content, or `icon`, is the icon.
           asChild: true;
           icon?: InteractiveValue<ReactElement>;
           children: InteractiveValue<ReactElement>;

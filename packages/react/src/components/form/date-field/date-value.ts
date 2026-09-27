@@ -13,7 +13,6 @@ export const isEmptyDates = (value: CalendarValue) => datesOf(value).length === 
 const sameDay = (a: Date | null | undefined, b: Date | null | undefined) =>
   a && b ? isSameDay(a, b) : !a && !b;
 
-// Values compare by calendar day, so a new Date for the same day is not a change.
 export function sameDates(a: CalendarValue, b: CalendarValue): boolean {
   if (a === b) return true;
   if (Array.isArray(a) || Array.isArray(b))
@@ -43,8 +42,6 @@ export function describeDates(
   return format(dates[0]);
 }
 
-// ISO 8601 local dates. A range is one start/end interval and only counts once both ends are
-// picked, so a half-picked range is missing to FormData and to required.
 export function serializeDates(value: CalendarValue, mode: CalendarSelectionMode) {
   if (mode === 'multiple') return datesOf(value).map(dayKey);
   if (mode === 'range') {

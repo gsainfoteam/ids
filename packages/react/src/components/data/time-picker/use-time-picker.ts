@@ -68,7 +68,6 @@ export function useTimePicker(options: UseTimePickerOptions) {
     defaultValue: options.defaultValue,
     onValueChange: options.onValueChange,
   });
-  // An empty picker still needs a day to build the time on, and DST makes some days shorter.
   const [mountedDay] = useState(() => startOfDay(new Date()));
   const base = value ?? (options.referenceDate ? startOfDay(options.referenceDate) : mountedDay);
   const day = dayKey(base);
@@ -86,7 +85,6 @@ export function useTimePicker(options: UseTimePickerOptions) {
     [day, precision, step, low, high],
   );
   const format = resolveTimeFormat(options.format, locale);
-  // With nothing picked the columns start on the allowed time nearest to midnight.
   const current = value
     ? secondsOf(value)
     : (nearestSlot(slots, secondsOf(base)) ?? secondsOf(base));
@@ -114,8 +112,6 @@ export type TimePickerApi = ReturnType<typeof useTimePicker> & {
 const TYPEAHEAD_RESET = 1000;
 const SETTLE_DELAY = 150;
 
-// One column is a single-select listbox with aria-activedescendant: the arrows move the active
-// option and Enter commits it, so browsing the hours never changes the value by accident.
 export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
   const numbers = unitNumbers(unit, c.state.format, c.state.precision, c.state.step);
   const selected = unitValue(c.current, unit, c.state.format);
@@ -132,12 +128,9 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
   const scrolling = useRef(false);
   const typed = useRef({ buffer: '', at: 0 });
 
-  // Before layout (a popover not shown yet) there is no height to measure, so the control size
-  // tokens the options are drawn at stand in.
   const optionHeight = () =>
     node.current?.querySelector<HTMLElement>('[data-time-option]')?.offsetHeight ||
     (c.size === 'tiny' ? 32 : 36);
-  // Options and their positioned column share an offset parent, so offsetTop is enough.
   const align = (n: number) => {
     const el = node.current;
     const target = el?.querySelector<HTMLElement>(`[data-time-option="${n}"]`);
@@ -149,7 +142,6 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
   useLayoutEffect(() => {
     if (!scrolling.current) align(selectedNumber);
     const el = node.current;
-    // A column can mount inside a popover that is not laid out yet; align once it has a size.
     const observer =
       el && typeof ResizeObserver !== 'undefined'
         ? new ResizeObserver(() => {
@@ -172,9 +164,6 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
     const index = Math.round((node.current?.scrollTop ?? 0) / optionHeight());
     return numbers[clamp(index, 0, numbers.length - 1)];
   };
-  // Safari and embedded engines can skip scrollend at an edge, so every momentum event restarts
-  // the wait and the value commits once the column has actually come to rest. The debounced call
-  // is made on the first scroll, since building it while rendering would hand it a ref to read.
   const settleLater = useRef<DebouncedFunction<() => void> | null>(null);
   useEffect(() => () => settleLater.current?.cancel(), []);
   const settle = () => {

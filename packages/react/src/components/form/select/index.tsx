@@ -127,7 +127,6 @@ const isForeignComponent = (node: ReactNode): boolean =>
     ? flattenParts(slotChildren(node.props.children, node.props.asChild)).some(isForeignComponent)
     : typeof node.type === 'function' && !PARTS.has(node.type));
 
-// Duck-typed rather than `instanceof Node`, which fails across frames.
 const isNode = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'nodeType' in value;
 
@@ -239,7 +238,6 @@ export function Select(props: SelectProps) {
 
   const popupSelector = `[data-select-popup="${ids.base}"]`;
   const triggerProps = mergeProps(native as Record<string, unknown>, {
-    // mergeRefs only composes the refs into a callback; nothing reads them during render.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(select.triggerRef, forwardedRef),
     id: native.id ?? `${ids.base}-trigger`,
@@ -263,7 +261,6 @@ export function Select(props: SelectProps) {
     'data-readonly': readOnly ? '' : undefined,
     onClick: () => select.actions.toggle(),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => select.onKeyDown(event, 'trigger'),
-    // Moving into the popup is not leaving the field.
     onBlur: (event: FocusEvent<HTMLButtonElement>) => {
       const next = event.relatedTarget;
       if (isNode(next) && (next as Element).closest?.(popupSelector)) return;
@@ -338,7 +335,6 @@ export function Select(props: SelectProps) {
   );
 }
 
-// A bare combobox button, since the field draws the box; a Button would add its own inside it.
 function SelectTrigger({ asChild, children, className, ...props }: Select.TriggerProps) {
   const c = useSelectContext('Select.Trigger');
   return part(
@@ -367,7 +363,6 @@ function SelectValue({ asChild, children, placeholder, className, ...props }: Se
     labels,
     placeholder: labels.length === 0,
   };
-  // Two labels read comfortably in a trigger; the rest become a count that never truncates.
   const shown = labels.length > 2 ? labels.slice(0, 2) : labels;
   const content =
     typeof children === 'function'
@@ -487,7 +482,6 @@ function SelectSearchField({ placeholder, ...props }: Select.SearchFieldProps) {
   );
 }
 
-// An option highlighted through aria-activedescendant, not an Item row that takes focus itself.
 function SelectItem({
   value,
   label: _label,
@@ -507,7 +501,6 @@ function SelectItem({
     disabled,
   };
   const content = typeof children === 'function' ? children(state) : children;
-  // Parts are optional: an item that does not place its own indicator gets one at its end.
   const withIndicator = (nodes: ReactNode) => (
     <>
       {nodes}
@@ -531,9 +524,7 @@ function SelectItem({
           'data-highlighted': state.highlighted ? '' : undefined,
           'data-disabled': disabled ? '' : undefined,
           className: c.styles.item({ className: resolveState(className, state) }),
-          // Keeps focus on the trigger or search field while the list is clicked.
           onPointerDown: (event: PointerEvent) => event.preventDefault(),
-          // Touch moves are scrolls, so only a mouse highlights by hovering.
           onPointerMove: (event: PointerEvent) => {
             if (event.pointerType === 'mouse' && !disabled && !state.highlighted)
               c.select.actions.highlight(value);
@@ -595,9 +586,6 @@ function SelectGroup({ heading, asChild, children, className, ...props }: Select
   );
 }
 
-// A listbox may only own options and groups, so the rule is a decorative Divider, hidden from the
-// tree. It is left out while searching, where it would divide results that no longer belong
-// together.
 function SelectSeparator({ className, ...props }: Select.SeparatorProps) {
   const c = useSelectContext('Select.Separator');
   if (c.select.state.query) return null;
@@ -611,7 +599,6 @@ function SelectSeparator({ className, ...props }: Select.SeparatorProps) {
   );
 }
 
-// Stays mounted as a live region so "no results" is announced when a search empties the list.
 function SelectEmpty({ asChild, children, className, ...props }: Select.EmptyProps) {
   const c = useSelectContext('Select.Empty');
   const none = c.select.state.visible.length === 0;
@@ -667,15 +654,12 @@ export namespace Select {
   export type IconProps = ComponentProps<'span'> & { asChild?: boolean };
   export type ClearProps = ComponentProps<'button'> & { asChild?: boolean };
   export type ContentProps = BoxProps;
-  // A TextField underneath, whose `size` is the field size, not the input's width in characters.
   export type SearchFieldProps = Omit<ComponentProps<'input'>, 'size' | 'color'> & {
     asChild?: boolean;
   };
   export type ItemProps = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
     value: string;
-    // Shown in the trigger and matched by typeahead; the item's text by default.
     label?: string;
-    // Matched by the search field; the label by default.
     searchValue?: string;
     disabled?: boolean;
     asChild?: boolean;
@@ -701,8 +685,6 @@ export namespace Select {
 
   export const Style = tv({
     slots: {
-      // The trigger carries data-field-input, so focus-ring rings the whole field for it while
-      // Clear keeps a ring of its own.
       root: ['relative', fieldTrigger.base],
       trigger: [
         'flex h-full min-w-0 flex-1 cursor-pointer items-center self-stretch bg-transparent text-start outline-none',

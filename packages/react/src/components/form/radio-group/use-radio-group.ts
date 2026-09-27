@@ -34,7 +34,6 @@ export function useRadioGroup<T extends string>({
   const controlled = valueProp !== undefined;
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Each radio is written back by its own reset handler; the group only restores its value.
   useFormReset(rootRef, () => {
     if (!controlled) setValue(defaultValue, { silent: true });
   });
@@ -44,17 +43,12 @@ export function useRadioGroup<T extends string>({
       (radio) => radio.name === name && !radio.disabled,
     );
 
-  // The root is the stable target of `ref` and of a Field label's id, but the focus belongs on a
-  // radio: the checked one, which is where Tab would land, or else the first that can take it.
   const focusChecked = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
     const radios = enabledRadios(event.currentTarget);
     (radios.find((radio) => radio.checked) ?? radios[0])?.focus();
   };
 
-  // Native radios follow the arrow keys but ignore Home and End. Those jump to the first and last
-  // radio here and choose it through its own click, as an arrow key does, so the radio's handlers
-  // see the change and a read-only group still only moves focus.
   const moveToEnd = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'Home' && event.key !== 'End') return;
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;

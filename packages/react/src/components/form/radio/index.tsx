@@ -216,9 +216,6 @@ export namespace Radio {
         '[--radio-accent:var(--ids-color-primary)] data-invalid:[--radio-accent:var(--ids-color-danger)]',
         'data-disabled:opacity-50',
       ],
-      // The real input covers the circle, so a click, a tap and a wrapping <label> all reach it.
-      // It takes the root's corners instead of its own: a press only lands inside an element's
-      // rounded corners, so a Radio restyled as a square would not answer at its corners.
       input:
         'absolute inset-0 m-0 size-full cursor-pointer appearance-none rounded-[inherit] opacity-0 disabled:cursor-not-allowed',
       indicator: [

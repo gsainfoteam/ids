@@ -18,7 +18,6 @@ for (const name of [
 ])
   globalThis[name] = dom.window[name];
 globalThis.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
-// tabbable asks the browser whether an item is rendered; jsdom lays nothing out and lacks the API.
 dom.window.Element.prototype.checkVisibility ??= () => true;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, useState } = await import('react');
@@ -235,7 +234,6 @@ test('form: one entry per pressed value, a required validator, and reset to the 
   const reset = new FormData(form);
   assert.equal(reset.get('size'), null);
   assert.deepEqual(reset.getAll('tags'), ['x']);
-  // A native reset fires no change event, so the group reports none either.
   assert.deepEqual(changes, ['b']);
 });
 

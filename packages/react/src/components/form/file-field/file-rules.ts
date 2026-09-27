@@ -18,8 +18,6 @@ export function isValidAccept(tokens: string[]) {
   return tokens.every((token) => EXTENSION.test(token) || MIME.test(token));
 }
 
-// The same rule the native picker applies: an extension matches the end of the name, a MIME type
-// the file's type, and `type/*` any subtype. Contents are not inspected.
 export function acceptsFile(file: File, tokens: string[]) {
   if (!tokens.length) return true;
   const name = file.name.toLowerCase();
@@ -43,7 +41,6 @@ export const isFile = (value: unknown): value is File =>
   'slice' in value &&
   typeof value.slice === 'function';
 
-// A file picked twice arrives as two File objects, so identity is by what they describe.
 export const sameFile = (a: File, b: File) =>
   a.name === b.name && a.size === b.size && a.lastModified === b.lastModified && a.type === b.type;
 
@@ -52,8 +49,6 @@ export const isImage = (file: File) => file.type.toLowerCase().startsWith('image
 let nextKey = 0;
 const keys = new WeakMap<File, string>();
 
-// A File has no id, and its index shifts when an earlier one is removed, which would hand one
-// file's preview to the next. The key follows the object itself.
 export function fileKey(file: File) {
   let key = keys.get(file);
   if (!key) {
@@ -65,7 +60,6 @@ export function fileKey(file: File) {
 
 const UNITS = ['B', 'KB', 'MB', 'GB', 'TB'];
 
-// Binary multiples with the familiar short units, one decimal below 10: 512 B, 1.5 KB, 23 MB.
 export function formatBytes(bytes: number) {
   let value = bytes;
   let unit = 0;
@@ -85,7 +79,6 @@ function describeToken(token: string) {
   return subtype.replace(/^x-/, '').toUpperCase();
 }
 
-// "PDF, 이미지 · 파일당 최대 5 MB · 최대 3개", so the rules are read before a file is rejected.
 export function describeLimits({
   tokens,
   maxSize,
@@ -112,8 +105,6 @@ type ReceiveOptions = {
   maxCount?: number;
 };
 
-// A single field replaces its file; a multiple one appends and skips files it already has. A
-// file is rejected for its type first, then its size, then for exceeding the count.
 export function receiveFiles({
   incoming,
   current,

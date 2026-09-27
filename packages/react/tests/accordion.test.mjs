@@ -45,7 +45,6 @@ const settle = () => act(() => new Promise((resolve) => setTimeout(resolve, 20))
 const triggers = () => [...host.querySelectorAll('[data-accordion-trigger]')];
 const panelOf = (trigger) => document.getElementById(trigger.getAttribute('aria-controls'));
 const expanded = () => triggers().map((trigger) => trigger.getAttribute('aria-expanded'));
-// Closing panels settle on a zero-length timer in jsdom, which has no transitions.
 const click = (element) =>
   act(async () => {
     element.click();
@@ -229,9 +228,6 @@ test('closing: the panel is inert while it collapses, then hidden until found', 
   await render(h(Accordion, { type: 'single', defaultValue: 'a' }, items()));
   const [a] = triggers();
   const panel = panelOf(a);
-  // jsdom runs no transitions, so the collapse would end on a zero-length timer that can fire
-  // before the assertions. A declared duration holds the panel in its closing state until the
-  // transitionend sent below.
   panel.style.transitionDuration = '200ms';
   await act(async () => a.click());
   assert.equal(panel.hasAttribute('inert'), true);

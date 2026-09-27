@@ -45,9 +45,6 @@ export type UseOTPFieldOptions = {
   ref?: Ref<HTMLInputElement>;
 };
 
-// execCommand is the only way to change an input's value that stays on the browser's own undo
-// stack. It returns false where it is missing (jsdom, some embedded engines), and the caller then
-// writes the value itself.
 function insertNatively(input: HTMLInputElement, start: number, end: number, text: string) {
   input.setSelectionRange(start, end);
   return (
@@ -77,8 +74,6 @@ export function useOTPField({
     .slice(0, length)
     .join('');
 
-  // While an IME is composing, the input must show exactly what the IME wrote or composition
-  // breaks. The draft is shown instead of the code until composition ends.
   const [draft, setDraft] = useState<string | null>(null);
   const composing = useRef(false);
 
@@ -121,8 +116,6 @@ export function useOTPField({
     syncRef.current = syncSelection;
   });
 
-  // Programmatic edits (the fallback paths below) move the caret to the end when React writes the
-  // value, so the intended caret is restored once the new value is in the DOM.
   useLayoutEffect(() => {
     const input = inputRef.current;
     if (pendingCaret.current !== null && input && document.activeElement === input) {
@@ -140,8 +133,6 @@ export function useOTPField({
     return () => document.removeEventListener('selectionchange', onSelectionChange);
   }, [focused]);
 
-  // Typed characters outside the pattern are rejected before they reach the DOM, which keeps the
-  // caret where it was. Full-width characters are replaced by their NFKC form instead.
   useEffect(() => {
     const input = inputRef.current;
     if (!input) return;
@@ -157,10 +148,6 @@ export function useOTPField({
     return () => input.removeEventListener('beforeinput', onBeforeInput);
   }, [accepts]);
 
-  // react-hook-form's register(), and any other code holding the element, writes input.value
-  // directly on reset or setValue. The instance setter is wrapped so such a write reaches state;
-  // otherwise React would paint the stale code back on the next render. React writes through the
-  // same setter, so the comparison waits until its commit is done and the code ref is current.
   const latestCode = useRef(code);
   const selfWrite = useRef(false);
   const adoptExternal = useRef((_raw: string) => {});
@@ -211,8 +198,6 @@ export function useOTPField({
       setDraft(raw);
       return;
     }
-    // Autofill can ignore maxLength and append a whole code to what was already typed, so a
-    // complete code in the inserted data wins over the concatenation.
     const data = (event.nativeEvent as InputEvent).data;
     const incoming = data ? clean(data) : '';
     const next =
@@ -253,9 +238,6 @@ export function useOTPField({
     commit(next);
   };
 
-  // A click lands on the transparent input, so the slot under the pointer is found by position.
-  // Only a plain primary mouse click is taken over; touch keeps the native long-press menu, and
-  // double-click or shift-click keep native selection.
   const onPointerDown = (event: PointerEvent<HTMLInputElement>) => {
     if (event.pointerType !== 'mouse' || event.button !== 0 || event.shiftKey || event.detail > 1)
       return;
@@ -279,7 +261,6 @@ export function useOTPField({
     syncSelection();
   };
 
-  // Focus from the keyboard or a label goes to where the next character would be typed.
   const onFocus = (event: FocusEvent<HTMLInputElement>) => {
     setFocused(true);
     if (pointerFocus.current) {

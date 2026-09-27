@@ -34,8 +34,6 @@ export function Spinner({
         {...rest}
         ref={mergedRef}
         ratio={0.25}
-        // Without a size of its own the spinner is as tall as the text around it. A control's
-        // icon sizing overrides these attributes, since any CSS rule beats an SVG attribute.
         width="1em"
         height="1em"
         data-spinner=""
@@ -64,15 +62,9 @@ export namespace Spinner {
     className?: string | ((state: State) => string | undefined);
   };
 
-  // The svg must not get a size class unless one is asked for: controls size every icon that
-  // has none, and that is how a spinner in a Button or IconButton matches its icons.
   export const Style = tv({
     slots: {
-      root: [
-        // Sits on the text like an icon glyph: -0.125em centres a 1em box on the x-height.
-        'inline-block shrink-0 align-[-0.125em]',
-        'animate-spin motion-reduce:animate-pulse',
-      ],
+      root: ['inline-block shrink-0 align-[-0.125em]', 'animate-spin motion-reduce:animate-pulse'],
       track: 'opacity-20',
     },
     variants: {

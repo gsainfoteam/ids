@@ -11,8 +11,6 @@ const manifest = JSON.parse(readFileSync(new URL('./package.json', import.meta.u
   peerDependencies?: Record<string, string>;
 };
 
-// A library ships its dependencies as imports, not copies: the app installs them once and a
-// second copy of react-day-picker or date-fns would bloat the bundle and split module state.
 const external = [
   ...Object.keys(manifest.dependencies ?? {}),
   ...Object.keys(manifest.peerDependencies ?? {}),

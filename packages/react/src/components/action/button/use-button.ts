@@ -21,15 +21,10 @@ import { usePressable } from '../../../internal/pressable';
 import { cn, invariant, mergeProps, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
-// The name of the nearest enclosing button-like component. A button inside another one is invalid
-// HTML, and the browser splits the outer button apart when it parses the markup.
 export const ButtonNestingContext = createContext<string | null>(null);
 
-// 'button' is a native <button>, 'link' an <a>, 'element' any other host element and 'component'
-// a component whose rendered element is unknown until it mounts, usually a router Link.
 export type ButtonKind = 'button' | 'link' | 'element' | 'component';
 
-// Props the hook consumes; the rest are the component's own (variant, size, ...) and DOM props.
 type Consumed =
   | 'asChild'
   | 'focusableWhenDisabled'
@@ -70,7 +65,6 @@ type ChildProps = {
 };
 
 type Options = {
-  // Button warns when it holds only an icon, which is what IconButton is for.
   checkContent?: boolean;
 };
 
@@ -113,9 +107,6 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
   const kind = kindOf(element);
   const { ref: childRef, children: childContent, ...childProps }: ChildProps = element?.props ?? {};
 
-  // A native button takes the disabled attribute. Anything else, and a button that has to keep
-  // focus while it is disabled (a submit button turning into its loading state), is only marked
-  // aria-disabled and has its activation blocked here.
   const nativeDisabled = disabled && kind === 'button' && !focusableWhenDisabled;
   const softDisabled = disabled && !nativeDisabled;
 
@@ -151,9 +142,6 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
     handlers.onKeyDown(event);
   };
 
-  // A host element standing in for a button (asChild on a span or div) does what the browser does
-  // for a native one: Enter clicks on key down, Space on key up, and a press that starts on a
-  // control nested inside it stays with that control.
   const press = usePressable<HTMLElement>({
     enabled: kind === 'element',
     disabled: softDisabled,
@@ -163,8 +151,6 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
     onBlur: handlers.onBlur,
   });
 
-  // What the button shows: its children, or with asChild the child element's children. A component
-  // that draws its own content (IconButton's icon) passes it to render instead.
   const content: ReactNode = element ? childContent : children;
 
   function render(view: ButtonView, inner: ReactNode = content) {
@@ -190,20 +176,14 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
     const nested = createElement(ButtonNestingContext, { value: name }, inner);
     if (!element) return createElement('button', { ...view, ...control }, nested);
 
-    // The child's handlers run first and can cancel ours with preventDefault. Its className and
-    // style come last so that an override written on the child wins over the component's style.
     const merged: Record<string, unknown> = mergeProps(childProps, { ...view, ...control });
     merged.className = cn(view.className, childProps.className);
     merged.style = { ...view.style, ...childProps.style };
     if (softDisabled) {
-      // The child's own handlers are cut off too: a disabled link must not act on click or on
-      // Enter and Space, whoever registered the handler.
       const keyDown = merged.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined;
       merged.onClick = blockActivation;
       merged.onKeyDown = (event: KeyboardEvent<HTMLElement>) =>
         isActivationKey(event.key) ? blockActivation(event) : keyDown?.(event);
-      // A link without href is no longer a link, so its role is kept explicitly. A router
-      // component keeps its href because it may require one; the blocked click stops it instead.
       if (kind === 'link') {
         merged.href = undefined;
         merged.role = merged.role ?? 'link';

@@ -157,7 +157,6 @@ function NativeValidationExample() {
     >
       <Field>
         <Field.Label>이메일</Field.Label>
-        {/* A password manager's inline menu takes focus from email inputs mid-typing. */}
         <TextField
           type="email"
           name="email"

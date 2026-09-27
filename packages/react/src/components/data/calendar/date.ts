@@ -35,7 +35,6 @@ export type DateLimits = {
 
 export const validDate = (value: unknown): value is Date => value instanceof Date && isValid(value);
 
-// The ISO local date, which is also what DayPicker writes into data-day.
 export const dayKey = (date: Date) => formatISO(date, { representation: 'date' });
 
 export function datesOf(value: CalendarValue): Date[] {
@@ -76,7 +75,6 @@ export function validateValue(value: CalendarValue, mode: CalendarSelectionMode)
     );
 }
 
-// DayPicker compares before/after by calendar day, so min and max both stay pickable.
 export function limitMatchers({ min, max, disabled }: DateLimits): Matcher[] {
   return [
     ...(min ? [{ before: min }] : []),

@@ -44,8 +44,6 @@ export function useTextField({
   const generatedId = useId();
   const notify = use(FieldNotifyContext);
 
-  // Values: Input over root over the asChild child. Handlers run child, root, Input, so Field and
-  // react-hook-form wiring on the root still runs when the Input sets its own onChange or onBlur.
   const childProps =
     asChild && isValidElement<ComponentProps<'input'>>(children) ? children.props : undefined;
   const native: ComponentProps<'input'> = mergeProps(mergeProps({ ...childProps }, rootProps), own);

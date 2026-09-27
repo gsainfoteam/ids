@@ -1,7 +1,5 @@
 import { useRef, type FocusEvent, type KeyboardEvent, type MouseEvent } from 'react';
 
-// Anything a user operates on its own. A click or key press that starts on one of these inside a
-// pressable surface belongs to that control; without this check a row's own action runs as well.
 const NESTED_CONTROL = [
   'a[href]',
   'button',
@@ -40,9 +38,6 @@ export type UsePressableOptions<E extends HTMLElement> = {
   onBlur?: (event: FocusEvent<E>) => void;
 };
 
-// A card or a list row is a div, because a <button> may not hold headings, blocks or other
-// controls. The div then has to do what the browser does for a button: Enter activates on key
-// down and repeats, Space activates on key up and not at all if focus left in between.
 export function usePressable<E extends HTMLElement>({
   enabled,
   disabled = false,
@@ -70,7 +65,6 @@ export function usePressable<E extends HTMLElement>({
         event.preventDefault();
         event.currentTarget.click();
       } else if (event.key === ' ') {
-        // Stops the page from scrolling; the click itself waits for the key to come up.
         event.preventDefault();
         if (!event.repeat) spaceDown.current = true;
       }

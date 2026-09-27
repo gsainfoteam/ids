@@ -21,7 +21,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// The pattern every IDS part with `asChild` follows.
 function Tag({
   asChild = false,
   className,

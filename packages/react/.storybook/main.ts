@@ -11,8 +11,6 @@ const config: StorybookConfig = {
     const { default: tailwindcss } = await import('@tailwindcss/vite');
     config.plugins = config.plugins || [];
     config.plugins.push(tailwindcss());
-    // Show code prints each element by its function name, which minification would reduce to a
-    // single letter. Only the Storybook build keeps names; the published library is unaffected.
     config.esbuild = { ...config.esbuild, keepNames: true };
     return config;
   },

@@ -22,7 +22,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// A wide 3:1 picture, so a crop into a narrower box is visible.
 const picture = `data:image/svg+xml;utf8,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#2563eb"/><stop offset="1" stop-color="#ff4500"/></linearGradient></defs><rect width="600" height="200" fill="url(#g)"/><circle cx="300" cy="100" r="60" fill="#ffffff" fill-opacity="0.8"/></svg>',
 )}`;

@@ -44,7 +44,6 @@ async function render(node) {
   }
   await act(() => root.render(node));
 }
-// Placement resolves asynchronously; a macrotask lets it land.
 async function positioned() {
   await act(() => new Promise((resolve) => setTimeout(resolve)));
 }
@@ -493,7 +492,6 @@ test('asChild Content and Group still collect items; an empty string is a value'
 });
 
 test('the list opens centered on the selection and later moves scroll only the popup', async () => {
-  // Where each option sits while the popup, at 100, is scrolled to the top.
   const layout = { Cherry: 380, Apple: 160 };
   const original = dom.window.HTMLElement.prototype.getBoundingClientRect;
   dom.window.HTMLElement.prototype.getBoundingClientRect = function () {
@@ -600,7 +598,6 @@ test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab he
     addEventListener() {},
     removeEventListener() {},
   };
-  // jsdom lays nothing out, so every element would count as hidden to the focus trap.
   const getClientRects = dom.window.Element.prototype.getClientRects;
   dom.window.Element.prototype.getClientRects = () => [{ width: 1, height: 1 }];
   try {

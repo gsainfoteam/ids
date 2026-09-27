@@ -42,9 +42,7 @@ export namespace Button {
   };
 
   export type Props = WithInteractiveValues<BaseProps> & {
-    // Renders the single child element (a link, a router Link) with the button's style and behaviour.
     asChild?: boolean;
-    // Keeps a disabled button in the tab order, for a button that turns into its own loading state.
     focusableWhenDisabled?: boolean;
   };
 

@@ -28,13 +28,10 @@ export function useCheckboxGroup<T extends string>({
     defaultValue,
     onValueChange: onValueChange as ((next: readonly string[]) => void) | undefined,
   });
-  // react-hook-form hands an unset field over as '' rather than an array.
   const value: readonly string[] = Array.isArray(stored) ? stored : none;
   const controlled = valueProp !== undefined;
   const anchorRef = useRef<HTMLDivElement>(null);
 
-  // The children are free markup, so the group cannot list its options up front. Each checkbox
-  // registers itself when it mounts, and the select-all box is computed from what is registered.
   const [items, setItems] = useState<readonly Registered[]>(none);
   const register = useCallback((itemValue: string, id: string, disabled: boolean) => {
     const entry = { value: itemValue, id, disabled };
@@ -51,7 +48,6 @@ export function useCheckboxGroup<T extends string>({
         : value.filter((entry) => entry !== item),
     );
 
-  // A disabled checkbox keeps its value: select-all neither counts it nor changes it.
   const enabled = items.filter((item) => !item.disabled).map((item) => item.value);
   const selected = enabled.filter((item) => value.includes(item));
   const all: CheckedState =
@@ -71,8 +67,6 @@ export function useCheckboxGroup<T extends string>({
     if (!controlled) setValue(defaultValue, { silent: true });
   });
 
-  // `ref` and a Field label's id point at the root, but focus belongs on a checkbox: the first
-  // checked one, or else the first that can take focus.
   const focusFirst = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
     const boxes = [

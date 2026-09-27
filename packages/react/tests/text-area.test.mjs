@@ -17,7 +17,6 @@ for (const name of [
   'MouseEvent',
 ])
   globalThis[name] = dom.window[name];
-// react-textarea-autosize re-measures after a form reset on the next frame.
 globalThis.requestAnimationFrame = dom.window.requestAnimationFrame.bind(dom.window);
 globalThis.cancelAnimationFrame = dom.window.cancelAnimationFrame.bind(dom.window);
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -174,9 +173,6 @@ test('invalid structures and row bounds fail clearly', () => {
     assert.throws(() => renderToString(node), /\[IDS\] `<TextArea/);
 });
 
-// Synthetic layout checks the sizing wiring and reset timing; real browser checks cover geometry.
-// react-textarea-autosize measures a hidden copy of the textarea that takes the real one's
-// padding and border, so each line is 20px high on every textarea.
 Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', {
   configurable: true,
   get() {

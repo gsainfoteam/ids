@@ -18,7 +18,6 @@ afterEach(async () => {
   host?.remove();
 });
 
-// A control that reports its value only through onValueChange, the way IDS custom controls do.
 function Stepper({ value, onValueChange, onBlur, id, ...rest }) {
   return h(
     'button',

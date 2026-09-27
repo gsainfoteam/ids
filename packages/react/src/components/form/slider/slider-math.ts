@@ -6,9 +6,6 @@ function decimalsOf(n: number) {
   return fraction + (exponent == null ? 0 : Math.max(0, -Number(exponent)));
 }
 
-// Snaps onto the grid that starts at `min`, then rounds away floating-point noise. The precision
-// counts min and max as well as step: with min 0.25 and step 0.5, step alone would round 0.25 to
-// 0.3.
 export function snap(raw: number, min: number, max: number, step: number) {
   const stepped = Math.round((raw - min) / step) * step + min;
   const decimals = Math.min(100, Math.max(decimalsOf(min), decimalsOf(max), decimalsOf(step)));
@@ -19,9 +16,6 @@ export function percentOf(value: number, min: number, max: number) {
   return ((value - min) / (max - min)) * 100;
 }
 
-// A thumb is drawn inside the track: its centre runs from half a thumb in from one end to half a
-// thumb in from the other, so the track stays flush with the slider's box at both extremes. The
-// same line is used to turn a pointer back into a value, so grabbing a thumb never makes it jump.
 export function thumbOffset(percent: number) {
   return `calc(${percent}% + ${0.5 - percent / 100} * var(--slider-thumb))`;
 }
@@ -32,8 +26,6 @@ export function ratioAlong(distance: number, length: number, thumb: number) {
   return clamp((distance - thumb / 2) / travel, 0, 1);
 }
 
-// The thumb nearest to the pointer moves. When thumbs are stacked, which one should move depends
-// on where the pointer goes next, so the caller is told the choice is still open.
 export function closestThumb(values: readonly number[], target: number) {
   let best = 0;
   for (let index = 1; index < values.length; index++) {
@@ -48,8 +40,6 @@ export function closestThumb(values: readonly number[], target: number) {
   return { index: first, tied: true };
 }
 
-// Moves one thumb, keeping it on the grid, inside [min, max] and at least `gap` away from its
-// neighbours, so thumbs never cross.
 export function moveThumb(
   values: readonly number[],
   index: number,

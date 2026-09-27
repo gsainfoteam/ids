@@ -36,9 +36,6 @@ export type CalendarState = {
   readOnly: boolean;
 };
 
-// A field that shows the calendar in a popup needs to hear about every pick, including a click
-// on the day that is already selected, which is not a value change and so never reaches
-// onValueChange. Only DateField provides this; a standalone Calendar ignores it.
 export const CalendarPickContext = createContext<((date: Date) => void) | null>(null);
 
 export type UseCalendarOptions = DateLimits & {
@@ -105,7 +102,6 @@ export function useCalendar(options: UseCalendarOptions) {
   const allDisabled = disabled === true;
   const readOnly = options.readOnly || selectionMode === 'none';
 
-  // Read once, so the first month and the year menu do not move under a calendar left open.
   const [mountedToday] = useState(() => new Date());
   const today = options.today ?? mountedToday;
   const [month, setMonth] = useControllableState<Date>({
@@ -117,8 +113,6 @@ export function useCalendar(options: UseCalendarOptions) {
     onValueChange: options.onMonthChange,
   });
 
-  // DayPicker ends the year menu at the current year; a calendar that is not only for birthdays
-  // needs the years ahead as well.
   const startMonth = min ?? (dropdown ? startOfYear(addYears(today, -100)) : undefined);
   const endMonth = max ?? (dropdown ? endOfYear(addYears(today, 100)) : undefined);
 
@@ -131,8 +125,6 @@ export function useCalendar(options: UseCalendarOptions) {
     selectionMode === 'range'
       ? {
           mode: 'range' as const,
-          // A third click starts a new range rather than moving an end, and a range is never
-          // emptied by a click, the way the single mode keeps its day.
           required: true as const,
           resetOnSelect: true,
           selected: toDayPicker(value as DateRange | null),
@@ -148,13 +140,10 @@ export function useCalendar(options: UseCalendarOptions) {
             mode: 'single' as const,
             required: true as const,
             selected: (value as Date | null) ?? undefined,
-            // The day already picked, even at another time of day, is not a change.
             onSelect: (_: Date, day: Date) =>
               change(value instanceof Date && isSameDay(value, day) ? value : day, day),
           };
 
-  // An unfinished range previews its end at whatever the user touched last: the day under the
-  // pointer, or the focused day once the keyboard moves.
   const [hovered, setHovered] = useState<Date | null>(null);
   const [focused, setFocused] = useState<Date | null>(null);
   const range = selectionMode === 'range' ? (value as DateRange | null) : null;
@@ -174,15 +163,11 @@ export function useCalendar(options: UseCalendarOptions) {
     }),
   });
 
-  // DayPicker swaps the horizontal arrows only for an explicit dir, so the direction the calendar
-  // inherits is read once it is in the document. Until then no dir is written, which would
-  // otherwise pin a right-to-left page's calendar to left-to-right.
   const rootRef = useRef<HTMLDivElement>(null);
   const [inherited, setInherited] = useState<'rtl'>();
   useLayoutEffect(() => {
     const parent = rootRef.current?.parentElement;
     if (!parent) return;
-    // jsdom computes no direction, so the nearest dir attribute stands in there.
     const direction =
       getComputedStyle(parent).direction || parent.closest('[dir]')?.getAttribute('dir');
     setInherited(direction === 'rtl' ? 'rtl' : undefined);
@@ -210,7 +195,6 @@ export function useCalendar(options: UseCalendarOptions) {
     onGridMouseLeave: () => setHovered(null),
     onDayFocus: (day: Date) => setFocused(day),
     onDayBlur: () => setFocused(null),
-    // Once the keyboard moves, the preview follows focus rather than a pointer left behind.
     onDayKeyDown: () => setHovered(null),
   };
 }

@@ -12,10 +12,8 @@ export type GroupOrientation = 'horizontal' | 'vertical';
 export type GroupContextValue = {
   orientation: GroupOrientation;
   attached: boolean;
-  // Defaults for the controls inside; a control's own size or variant wins.
   size?: IdsSize;
   variant?: IdsVariant;
-  // Inside a radiogroup only radios belong, so a separator there is drawn but not announced.
   separator: 'semantic' | 'decorative';
 };
 
@@ -25,7 +23,6 @@ export function useGroupContext() {
   return use(GroupContext);
 }
 
-// A group is announced by its name; without one a screen reader says only "group".
 export function useGroupNameWarning(
   component: string,
   props: { 'aria-label'?: string; 'aria-labelledby'?: string },
@@ -53,7 +50,6 @@ export function Group({
   ...rest
 }: Group.Props) {
   const parent = useGroupContext();
-  // A group of groups hands its size and variant down to the inner groups' controls.
   const context: GroupContextValue = {
     orientation,
     attached,
@@ -80,7 +76,6 @@ export function Group({
 export namespace Group {
   export type Props = ComponentProps<'div'> & {
     orientation?: GroupOrientation;
-    // Joined into one control (default), or spaced apart with each control keeping its corners.
     attached?: boolean;
     size?: IdsSize;
     variant?: IdsVariant;
@@ -88,7 +83,6 @@ export namespace Group {
     children?: ReactNode;
   };
 
-  // The Divider decides the role and orientation, so neither can be set here.
   export type SeparatorProps = Omit<
     ComponentProps<'div'>,
     'children' | 'role' | 'aria-orientation' | 'aria-hidden' | 'tabIndex'
@@ -96,8 +90,6 @@ export namespace Group {
 
   export type TextProps = ComponentProps<'div'> & { asChild?: boolean };
 
-  // A Divider across the group. Outline controls already show a border there, so the line
-  // overlaps it by a pixel on each side and the seam stays one pixel wide.
   export function Separator({ className, ...props }: SeparatorProps) {
     const group = useGroupContext();
     invariant(group, 'Group.Separator must be rendered inside ButtonGroup or ToggleGroup.');
@@ -114,8 +106,6 @@ export namespace Group {
     );
   }
 
-  // A label or prefix inside the group (a unit, "https://"), drawn like an outline control so it
-  // joins its neighbours' borders.
   export function Text({ asChild, className, ...props }: TextProps) {
     const group = useGroupContext();
     const Root = asChild ? Slot : 'div';
@@ -132,14 +122,10 @@ export namespace Group {
     slots: {
       root: [
         'relative flex w-fit items-stretch',
-        // Joined controls overlap by a pixel, so the one under the pointer or focus comes to the
-        // front and its border and focus ring are drawn whole. Hidden form inputs are left alone.
         '[&>:not(input)]:relative',
         '[&>[data-hovered]]:z-10 [&>[data-active]]:z-20 [&>[data-focus-visible]]:z-30',
-        // A group of groups spaces them apart, and each inner group stays joined.
         'has-[>[data-group]]:gap-2',
       ],
-      // The Divider draws the line; the group only lifts it over the controls' overlapping borders.
       separator: 'relative z-25',
       text: [
         'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-standard shadow-xs',
@@ -166,9 +152,6 @@ export namespace Group {
         },
       } satisfies Record<IdsSize, object>,
     },
-    // Only the outer corners stay round. Every child after the first loses its start corners and
-    // every child before the last its end corners; hidden inputs a group renders for its form value
-    // come last and must not count as the last child. Logical corners keep this right in RTL.
     compoundVariants: [
       {
         orientation: 'horizontal',

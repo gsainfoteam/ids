@@ -51,9 +51,6 @@ function entryOf(control: Control) {
   return control.value;
 }
 
-// The field reads whatever its control renders: a native input, or the hidden inputs a custom
-// control writes for FormData. FormValue's nameless validator only mirrors the value it guards,
-// so it is left out.
 export function readValue(root: Element) {
   const entries = controlsIn(root)
     .filter((control) => !control.hasAttribute('data-form-value-validator'))
@@ -71,7 +68,6 @@ export function readValidity(root: Element): FieldValidity | null {
   return null;
 }
 
-// A form with noValidate asked the browser to stay out of validation, so the field does too.
 export function validatesNatively(root: Element) {
   const form = controlsIn(root)[0]?.form;
   return !form?.noValidate;

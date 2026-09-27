@@ -7,8 +7,6 @@ export function openValues<T extends string>(value: AccordionValue<T> | undefine
   return typeof value === 'string' ? [value] : value;
 }
 
-// A single accordion that is not collapsible keeps its open item open: pressing that trigger
-// again changes nothing.
 export function toggleValue<T extends string>(
   type: AccordionType,
   value: AccordionValue<T>,
@@ -22,8 +20,6 @@ export function toggleValue<T extends string>(
   return item;
 }
 
-// Opening never closes the item itself, only the other item of a single accordion. Used when the
-// browser reveals a collapsed panel for find-in-page.
 export function revealValue<T extends string>(
   type: AccordionType,
   value: AccordionValue<T>,
@@ -41,7 +37,6 @@ const MOVES: Record<string, (index: number, count: number) => number> = {
   End: (_, count) => count - 1,
 };
 
-// WAI-ARIA APG accordion: arrows move between headers and wrap, Home and End jump to the ends.
 export function nextTriggerIndex(key: string, index: number, count: number) {
   const move = MOVES[key];
   if (move === undefined || count === 0) return null;

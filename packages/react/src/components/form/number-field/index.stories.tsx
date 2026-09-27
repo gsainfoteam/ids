@@ -224,8 +224,6 @@ export const WheelScrub: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole('spinbutton', { name: '수량' });
-    // dispatchEvent returns false when the field cancelled the wheel, which is what keeps the
-    // page from scrolling. React renders a wheel's step in a later task, hence waitFor.
     const wheel = (deltaY: number) =>
       input.dispatchEvent(new WheelEvent('wheel', { deltaY, bubbles: true, cancelable: true }));
     await expect(wheel(-100)).toBe(true);
@@ -307,7 +305,6 @@ export const LocaleFormats: Story = {
   play: async ({ canvas, userEvent }) => {
     const price = canvas.getByRole('spinbutton', { name: '금액' });
     const ratio = canvas.getByRole('spinbutton', { name: '비율' });
-    // Intl puts a no-break space before the euro sign.
     await expect(price).toHaveValue('1.234,57\u00a0€');
     await userEvent.click(price);
     await expect(price).toHaveValue('1.234,57\u00a0€');

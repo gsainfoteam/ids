@@ -92,7 +92,6 @@ function controlled(props = {}) {
         changes.push(value);
         set(value);
       },
-      // An inline object must not erase a partial draft when the parent echoes a value.
       formatOptions: props.formatOptions ? { ...props.formatOptions } : undefined,
     });
   }

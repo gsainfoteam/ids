@@ -58,7 +58,6 @@ async function key(node, key, options = {}) {
     ),
   );
 }
-// React derives mouseenter and mouseleave from mouseover and mouseout.
 async function hover(node) {
   await act(async () =>
     node.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: null })),

@@ -15,8 +15,6 @@ export const KbdGroupContext = createContext<KbdGroupContextValue | null>(null);
 
 const subscribeToNothing = () => () => {};
 
-// The server cannot know the visitor's platform, so it renders the portable Ctrl form and
-// hydration swaps in ⌘ on Apple devices without a mismatch.
 export function usePlatform(override: KbdPlatform | undefined) {
   const detected = useSyncExternalStore(subscribeToNothing, detectPlatform, () => 'other' as const);
   return override ?? detected;

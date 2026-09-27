@@ -26,7 +26,6 @@ const variants = ['solid', 'soft', 'outline', 'ghost'] as const;
 const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'info'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-// An icon library that sets displayName (lucide does) keeps its name in a production build.
 function BellIcon(props: ComponentProps<'svg'>) {
   return (
     <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" {...props}>
@@ -161,7 +160,6 @@ export const AutomaticLabel: Story = {
     await expect(canvas.getByRole('button', { name: 'Bell' })).toBeVisible();
     await expect(canvas.getByRole('button', { name: '휴지통으로' })).toBeVisible();
     await expect(canvas.getByRole('button', { name: '닫기' })).toBeVisible();
-    // heroicons has no displayName; its function name survives only in development builds.
     if (isDevelopment) await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
   },
 };

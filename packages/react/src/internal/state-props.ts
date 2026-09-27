@@ -2,8 +2,6 @@ import type { CSSProperties, ReactNode } from 'react';
 
 export type StateValue<T, S> = T | ((state: S) => T);
 
-// The Base UI convention: a part's className, style and children may be functions of the part's
-// state, so a consumer can branch on state without keeping a copy of it.
 export type StateRenderProps<S> = {
   className?: StateValue<string | undefined, S>;
   style?: StateValue<CSSProperties | undefined, S>;

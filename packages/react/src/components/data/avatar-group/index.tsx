@@ -125,7 +125,6 @@ export namespace AvatarGroup {
     const digits = String(overflow.count).length;
     return (
       <Avatar
-        // Hovering the +N lists who it stands for.
         title={overflow.names.length > 0 ? overflow.names.join(', ') : undefined}
         {...rest}
         alt={ariaLabel ?? overflow.label}
@@ -137,7 +136,6 @@ export namespace AvatarGroup {
         style={resolveState(style, state)}
       >
         <Avatar.Fallback delay={0}>
-          {/* Without a direction of its own, "+2" is laid out as "2+" in right-to-left text. */}
           {resolveState(children, state) ?? <span dir="ltr">+{overflow.count}</span>}
         </Avatar.Fallback>
       </Avatar>
@@ -159,12 +157,10 @@ export namespace AvatarGroup {
 
   export const Style = tv({
     slots: {
-      // --ag-overlap and --ag-gap are read by each avatar's cut-out mask.
       root: 'inline-flex items-center [--ag-gap:2px]',
       overflow: 'text-(--ids-color-on-surface) tabular-nums',
     },
     variants: {
-      // "+125" would touch the curve of a circle at the size that suits "+2".
       digits: {
         short: { overflow: '[&_[data-avatar-fallback]]:text-[length:max(9px,36cqi)]' },
         medium: { overflow: '[&_[data-avatar-fallback]]:text-[length:max(7px,28cqi)]' },

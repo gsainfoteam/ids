@@ -58,7 +58,6 @@ export type CalendarCaptionLayout = 'label' | 'dropdown';
 export type CalendarOptions = {
   min?: Date;
   max?: Date;
-  // DayPicker matchers: true for the whole calendar, a function, dates, ranges or weekdays.
   disabled?: Matcher | Matcher[];
   readOnly?: boolean;
   monthsToShow?: number;
@@ -120,8 +119,6 @@ function useCalendarContext(part: string) {
   return context;
 }
 
-// Labels a locale from react-day-picker/locale translates stay translated; the rest follow the
-// IDS messages, so the default calendar reads entirely in Korean.
 const messageLabels: Partial<Labels> = {
   labelPrevious: () => messages.calendar.previousMonth,
   labelNext: () => messages.calendar.nextMonth,
@@ -195,8 +192,6 @@ export function Calendar(props: CalendarProps) {
   });
   const { state } = api;
   const resolved: Partial<DayPickerLocale> = resolveLocale(locale);
-  // DayPicker fills a locale without labels from its English one, which would name the grid
-  // "2월 2024"; an empty set leaves the rest to DayPicker's locale-neutral defaults.
   const dateLocale = { ...resolved, labels: resolved.labels ?? {} };
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = Calendar.Style({ size: resolvedSize });
@@ -208,7 +203,6 @@ export function Calendar(props: CalendarProps) {
         size: resolvedSize,
         styles,
         native,
-        // mergeRefs only builds a callback; no ref is read while rendering.
         // eslint-disable-next-line react-hooks/refs
         rootRef: mergeRefs(api.rootRef, ref),
         onGridMouseLeave: api.onGridMouseLeave,
@@ -228,10 +222,8 @@ export function Calendar(props: CalendarProps) {
         today={today}
         autoFocus={autoFocus}
         captionLayout={captionLayout}
-        // Previous and Next sit beside the caption, so Tab visits them in the order they are drawn.
         navLayout="around"
         fixedWeeks={fixedWeeks}
-        // With several months the neighbours' days are already on screen in their own grid.
         showOutsideDays={showOutsideDays ?? monthsToShow === 1}
         showWeekNumber={showWeekNumber}
         numerals={numerals}
@@ -340,10 +332,6 @@ function Chevron({ orientation = 'left', className, style }: ChevronProps) {
   return <Icon aria-hidden="true" className={className} style={style} />;
 }
 
-// Previous and Next. DayPicker marks the button for a month out of reach with aria-disabled and
-// tabIndex -1 instead of disabled, since a natively disabled button drops the focus of the press
-// that just reached the last month; focusableWhenDisabled keeps it the same way. Its only child is
-// DayPicker's Chevron.
 function MonthButton({
   'aria-disabled': unavailable,
   children,
@@ -362,9 +350,6 @@ function MonthButton({
   );
 }
 
-// DayPicker hands this a native select's props and change events, so it stays a select, not Select.
-// The native select stays on top, transparent, so it opens the platform picker, while the label
-// under it keeps the calendar's type and a chevron.
 function Dropdown({ options, className, ...props }: DropdownProps) {
   const c = useCalendarContext('Calendar');
   const selected = options?.find((option) => option.value === props.value);
@@ -385,11 +370,9 @@ function Dropdown({ options, className, ...props }: DropdownProps) {
   );
 }
 
-// A grid cell under DayPicker's roving focus, with aria-selected on its td, so it is not a Button.
 function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calendar.DayButtonProps) {
   const c = useCalendarContext('Calendar.DayButton');
   const own = useRef<HTMLButtonElement>(null);
-  // DayPicker moves the keyboard by marking a day focused and leaves the focusing to the button.
   useEffect(() => {
     if (modifiers.focused) own.current?.focus();
   }, [modifiers.focused]);
@@ -407,7 +390,6 @@ function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calenda
     <button
       {...props}
       ref={mergeRefs(own, ref)}
-      // DayPicker writes isoDate in the numeral system shown, so the key is formatted here.
       data-calendar-day={dayKey(day.date)}
       data-selected={flag(modifiers.selected)}
       data-today={flag(modifiers.today)}
@@ -432,15 +414,12 @@ export namespace Calendar {
   export type Components = Partial<CustomComponents>;
   export type DayButtonProps = DayPickerDayButtonProps & { ref?: Ref<HTMLButtonElement> };
 
-  // The IDS day, for a components.DayButton that only changes what a day shows.
   export const DayButton = CalendarDayButton;
 
   export const Style = tv({
     slots: {
       root: 'relative w-fit min-w-0 text-(--ids-color-on-surface)',
       months: 'flex flex-wrap gap-4',
-      // Previous and Next sit in the caption row of the first and last month. Every month keeps
-      // both columns, so the captions line up whether or not a button stands beside them.
       month:
         'grid grid-cols-[var(--calendar-cell)_minmax(0,1fr)_var(--calendar-cell)] content-start gap-y-2',
       previous: 'col-start-1 row-start-1 size-(--calendar-cell)',
@@ -462,7 +441,6 @@ export namespace Calendar {
         '[&_svg]:size-3.5 [&_svg]:text-(--ids-color-on-muted)',
       ],
       grid: 'col-span-3 row-start-2',
-      // Rows are flex boxes, so a day cell sizes like any box and its corners can round.
       weekdays: 'flex',
       weekday: [
         'flex h-(--calendar-weekday) w-(--calendar-cell) items-center justify-center p-0',
@@ -473,9 +451,6 @@ export namespace Calendar {
         'flex h-(--calendar-cell) w-(--calendar-cell) items-center justify-center p-0',
         'text-caption-c1-regular text-(--ids-color-on-muted) select-none',
       ],
-      // The range band is the cell's own background. It runs under the rounded end days and
-      // rounds off where a week wraps or a month ends beside hidden days, so a range reads as one
-      // strip per week and month.
       day: [
         'relative size-(--calendar-cell) p-0 text-center',
         'first:rounded-s-standard last:rounded-e-standard',
@@ -510,7 +485,6 @@ export namespace Calendar {
           ],
         },
       } satisfies Record<IdsSize, object>,
-      // Later variants win a conflict, so selected comes after today and outside.
       today: { true: { dayButton: 'font-semibold' } },
       outside: { true: { dayButton: 'text-(--ids-color-on-muted)' } },
       selected: {
@@ -519,7 +493,6 @@ export namespace Calendar {
             'bg-(--ids-color-primary) font-medium text-(--ids-color-on-primary) hover:bg-(--ids-color-primary)/90',
         },
       },
-      // A day inside a range already sits on the muted band, so its hover goes one step darker.
       onBand: { true: { dayButton: 'hover:bg-(--ids-color-border)' } },
       unavailable: { true: { dayButton: 'cursor-not-allowed opacity-50' } },
     },

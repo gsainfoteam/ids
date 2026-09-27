@@ -29,13 +29,11 @@ type EyeDropperConstructor = new () => {
   open: (options?: { signal?: AbortSignal }) => Promise<{ sRGBHex: string }>;
 };
 
-// Chromium only; elsewhere the button is not rendered at all.
 const eyeDropperOf = (view: unknown) =>
   (view as { EyeDropper?: EyeDropperConstructor } | undefined)?.EyeDropper;
 
 const noSubscription = () => noop;
 
-// Read after hydration, so the server and the first client render agree on "unsupported".
 export function useEyeDropperSupport() {
   return useSyncExternalStore(
     noSubscription,
@@ -52,7 +50,6 @@ export function useClipboardSupport() {
   );
 }
 
-// What the controls show before there is a value: a saturated red, so the area has color.
 const START: HSVA = { h: 0, s: 1, v: 1, a: 1 };
 const COPIED_FOR = 1500;
 
@@ -83,9 +80,6 @@ export function useColorPicker({
   const parsed = parseColor(value);
   const blocked = disabled || readOnly;
 
-  // The controls work in HSV, and the value only stores RGB. The last HSV color is held so a
-  // gray or black value keeps the hue and saturation the user dragged through; it is replaced
-  // only when the value moves to a different color from outside.
   const [held, setHeld] = useState<HSVA>(() => (parsed ? rgbaToHsva(parsed) : START));
   const color = parsed && !sameColor(hsvaToRgba(held), parsed) ? rgbaToHsva(parsed, held) : held;
   const rgba = hsvaToRgba(color);
@@ -114,8 +108,6 @@ export function useColorPicker({
     });
   };
 
-  // Dragging starts on press, captures the pointer so it continues outside the area, and moves
-  // focus to the area's input so the arrow keys pick up where the pointer left off.
   const startDrag = (event: PointerEvent<HTMLElement>, move: () => void) => {
     if (blocked || event.button !== 0) return;
     event.preventDefault();
@@ -144,7 +136,6 @@ export function useColorPicker({
     update(patch);
   };
 
-  // Every channel but hue is a percentage on its control, hue is in degrees.
   const setChannel = (channel: ColorChannel, n: number) =>
     update(
       channel === 'saturation'
@@ -156,15 +147,11 @@ export function useColorPicker({
             : { a: n / 100 },
     );
 
-  // Assistive technology changes an axis of the area through its input's own value, not through
-  // keys.
   const onChannelChange = (channel: ColorChannel, event: ChangeEvent<HTMLInputElement>) => {
     const n = Number(event.currentTarget.value);
     if (Number.isFinite(n)) setChannel(channel, n);
   };
 
-  // Typed text stays a draft until Enter or blur, so the area does not jump through "#1",
-  // "#12", "#123" while the user is still typing "#123456".
   const commitDraft = () => {
     if (draft === null) return true;
     if (draft.trim() === '') {
@@ -183,7 +170,6 @@ export function useColorPicker({
     value: draft ?? text,
     invalid: draft !== null ? draft.trim() !== '' && !parseColorInput(draft) : !!value && !parsed,
     onChange: (event: ChangeEvent<HTMLInputElement>) => setDraft(event.currentTarget.value),
-    // An unreadable draft is dropped on blur, and the field shows the color it still has.
     onBlur: () => {
       if (!commitDraft()) setDraft(null);
     },
@@ -193,7 +179,6 @@ export function useColorPicker({
         event.preventDefault();
         commitDraft();
       } else if (event.key === 'Escape' && draft !== null) {
-        // The first Escape only throws the draft away; it does not close a surrounding popup.
         event.preventDefault();
         setDraft(null);
       }
@@ -203,25 +188,21 @@ export function useColorPicker({
   const pickFromScreen = async () => {
     const EyeDropper = eyeDropperOf(window);
     if (!EyeDropper || blocked) return;
-    try {
-      const { sRGBHex } = await new EyeDropper().open();
-      const picked = parseColor(sRGBHex);
-      if (picked) commitRgba({ ...picked, alpha: color.a });
-    } catch {
-      // Escape cancels the eyedropper by rejecting; there is nothing to undo.
-    }
+    const result = await new EyeDropper().open().catch(() => null);
+    const picked = result && parseColor(result.sRGBHex);
+    if (picked) commitRgba({ ...picked, alpha: color.a });
   };
 
   const copy = async () => {
     if (!value || !parsed || typeof navigator.clipboard?.writeText !== 'function') return;
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      clearTimeout(copiedTimer.current);
-      copiedTimer.current = setTimeout(() => setCopied(false), COPIED_FOR);
-    } catch {
-      // A denied clipboard permission leaves nothing to report beyond not showing "copied".
-    }
+    const written = await navigator.clipboard.writeText(text).then(
+      () => true,
+      () => false,
+    );
+    if (!written) return;
+    setCopied(true);
+    clearTimeout(copiedTimer.current);
+    copiedTimer.current = setTimeout(() => setCopied(false), COPIED_FOR);
   };
 
   const isCurrent = (swatch: string) => {

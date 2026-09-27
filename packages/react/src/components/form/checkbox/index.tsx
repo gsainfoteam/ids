@@ -99,7 +99,6 @@ export function Checkbox({
   onPointerCancel,
   ...inputProps
 }: CheckboxProps) {
-  // A checkbox with a `value` inside a CheckboxGroup is one of its options.
   const context = useCheckboxGroupContext();
   const group = value === undefined ? null : context;
   const option = String(value);
@@ -246,7 +245,6 @@ export namespace Checkbox {
         'data-[state=indeterminate]:bg-(--checkbox-accent) data-[state=indeterminate]:text-(--checkbox-on-accent) data-[state=indeterminate]:inset-ring-(--checkbox-accent)',
         'data-disabled:opacity-50',
       ],
-      // The real input covers the box, so a click, a tap and a wrapping <label> all reach it.
       input:
         'absolute inset-0 m-0 size-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed',
       indicator: [

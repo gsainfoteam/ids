@@ -57,8 +57,6 @@ export function isInvalid(value: unknown) {
   return value != null && value !== false && value !== 'false';
 }
 
-// Children before the Input are leading, after it trailing. Without an Input every child is
-// leading and the Input goes last.
 export function splitAroundInput<P>(
   children: ReactNode,
   Input: unknown,
@@ -87,8 +85,6 @@ export function countOf(items: ReactNode[], type: unknown) {
   return items.filter((item) => isValidElement(item) && item.type === type).length;
 }
 
-// Consumer content is wrapped so icons and text pick up the muted color and the icon size. A
-// field's own parts size themselves and render bare.
 export function Adornments({
   items,
   own = [],
@@ -132,8 +128,6 @@ export function TextControlClear({
   const { state, styles } = context;
   if (!state.filled || state.disabled || state.readOnly) return null;
 
-  // Out of the tab order like a search field's clear button: Escape and select-all delete do the
-  // same from the keyboard. Pressing it must not take focus from the input either.
   const internal = {
     type: 'button' as const,
     tabIndex: -1,
@@ -168,9 +162,6 @@ export function TextControlClear({
   );
 }
 
-// A button placed inside a field shrinks to the inset height of the field's own parts (28px, tiny
-// 24px). An icon button carries its required aria-label and stays square; a text button keeps
-// some padding around its label.
 export const insetButtons = {
   base: cn(
     '[&_button]:w-auto [&_button]:gap-1 [&_button]:px-1 [&_button:not([aria-label])]:px-2.5',
@@ -189,8 +180,6 @@ export const textControlStyle = tv({
       'text-inherit placeholder:text-(--ids-color-on-muted)',
       'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
       'disabled:cursor-not-allowed',
-      // Browsers draw their own clear and reveal buttons into search and password inputs; the
-      // field's parts replace them.
       '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none',
       '[&::-ms-clear]:hidden [&::-ms-reveal]:hidden',
     ],
@@ -207,8 +196,6 @@ export const textControlStyle = tv({
       soft: { root: fieldSurface.variant.soft },
       ghost: { root: fieldSurface.variant.ghost },
     } satisfies Record<FieldSurfaceVariant, object>,
-    // Inset buttons sit 4px inside the border on every side, so a button at either end pulls
-    // into the padding by the same amount it leaves above and below.
     size: {
       standard: {
         root: fieldSurface.size.standard,

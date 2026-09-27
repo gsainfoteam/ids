@@ -144,7 +144,6 @@ export function Slider(props: SliderProps) {
     'aria-invalid': ariaInvalidProp,
     ...rest
   } = props;
-  // Field hands every control `required` and `aria-required`; a slider always has a value.
   const {
     required: _required,
     'aria-required': _ariaRequired,
@@ -198,8 +197,6 @@ export function Slider(props: SliderProps) {
   const styles = Slider.Style({ orientation, size: resolvedSize });
   const gap = minStepsBetweenThumbs * step;
 
-  // A single slider is named on its thumb, where the value is; a range names its group and tells
-  // the two thumbs apart with `thumbLabels`.
   const thumbProps = (index: number) => ({
     ref: setThumb(index),
     role: 'slider',

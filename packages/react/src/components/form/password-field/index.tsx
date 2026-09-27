@@ -62,7 +62,6 @@ function resolve<T>(value: StateValue<T>, state: PasswordFieldState): T {
   return typeof value === 'function' ? (value as (state: PasswordFieldState) => T)(state) : value;
 }
 
-// Heroicons has no Caps Lock glyph; this is the ⇪ key cap drawn on the same 24px outline grid.
 function CapsLockIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} {...props}>
@@ -216,8 +215,6 @@ export namespace PasswordField {
     return <input {...props} />;
   }
 
-  // One fixed name with aria-pressed, as a toggle button should have; the icon shows the state.
-  // Pressing it with a pointer keeps focus in the input; from the keyboard focus stays on it.
   export function VisibilityToggle({
     asChild,
     children,
@@ -226,8 +223,6 @@ export namespace PasswordField {
     ...props
   }: VisibilityToggleProps) {
     const { state, toggle, inputProps, styles } = usePasswordContext('VisibilityToggle');
-    // onPressedChange carries no event, so the click that precedes it records whether a pointer
-    // pressed the toggle.
     const pointer = useRef(false);
     const shared = {
       disabled: state.disabled || props.disabled,
@@ -243,7 +238,6 @@ export namespace PasswordField {
           (typeof children.type !== 'string' || children.type === 'button'),
         '`<PasswordField.VisibilityToggle asChild>` requires one button, or a component forwarding button props and ref.',
       );
-      // A child drawn with asChild names itself through its own text.
       return cloneElement(
         children,
         mergeProps(mergeProps(children.props, props), {
@@ -281,9 +275,6 @@ export namespace PasswordField {
     );
   }
 
-  // The glyph appears only while Caps Lock is on and the input has focus. The live region stays
-  // mounted so the change is announced; a region that appears with its text is often not read.
-  // It is not a Kbd: it reports a state, where a Kbd names a key to press.
   export function CapsLock({ label, className, children, ...props }: CapsLockProps) {
     const { capsLock, styles } = usePasswordContext('CapsLock');
     const text = label ?? messages.passwordField.capsLock;
@@ -312,8 +303,6 @@ export namespace PasswordField {
   export const Style = tv({
     extend: textControlStyle,
     slots: {
-      // An in-field action like Clear. The eye glyph alone says whether the password shows, so
-      // IconToggle's pressed fill is dropped.
       toggle: [fieldAction.base, 'data-pressed:bg-transparent'],
       capsLock: 'inline-flex shrink-0 items-center text-(--ids-color-on-muted)',
     },

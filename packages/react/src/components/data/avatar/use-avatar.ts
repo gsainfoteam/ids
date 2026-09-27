@@ -8,8 +8,6 @@ function initialStatus(src: string | undefined): AvatarStatus {
   return src ? 'loading' : 'error';
 }
 
-// The status belongs to one src. A new src starts over at "loading" without an effect, and a late
-// load or error event from a previous src is ignored instead of overwriting the current one.
 export function useAvatarStatus(
   src: string | undefined,
   onStatusChange: ((status: AvatarStatus) => void) | undefined,
@@ -39,10 +37,6 @@ export function useAvatarStatus(
   return { status, report };
 }
 
-// An image that finished before React attached onLoad (a cached image, or one the browser loaded
-// from server-rendered HTML before hydration) fires no event React can hear, so a complete image is
-// read on mount. An SVG without intrinsic size reports a zero width even when it loaded, which is
-// why decode() settles that case.
 export function useImageSettled(
   imageRef: RefObject<HTMLImageElement | null>,
   src: string | undefined,
@@ -66,8 +60,6 @@ export function useImageSettled(
   }, [imageRef, src, report]);
 }
 
-// While an image is loading the fallback waits, so an image that arrives quickly never shows
-// initials first. A missing or broken image shows the fallback at once.
 export function useFallbackVisible(status: AvatarStatus, src: string | undefined, delay: number) {
   const [elapsedFor, setElapsedFor] = useState<{ src: string | undefined } | null>(null);
   useEffect(() => {

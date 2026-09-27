@@ -35,15 +35,10 @@ export function arrangeAvatarGroup({
   const overflowIndex = nodes.findIndex(isOverflow);
   const avatars = nodes.filter((_, index) => index !== overflowIndex);
   const visible = avatars.slice(0, limit);
-  // `total` covers people the page did not render, such as a server that returns the first few
-  // avatars and a count.
   const hidden = Math.max(total ?? 0, avatars.length) - visible.length;
-  // The +N can say who it stands for, but only when every one of them was rendered and named;
-  // a partial list would read as the whole.
   const names = avatars.slice(visible.length).map(nameOf);
   const hiddenNames = names.length === hidden && names.every(Boolean) ? (names as string[]) : [];
 
-  // The overflow indicator sits where it was declared, or last when it was left out.
   const overflowFirst = overflowIndex === 0;
   const ordered: { node: ReactNode | null }[] = visible.map((node) => ({ node }));
   if (hidden > 0) {
@@ -52,8 +47,6 @@ export function arrangeAvatarGroup({
     else ordered.push(overflow);
   }
 
-  // In a stack each avatar is cut where its neighbour overlaps it: on the start side when the
-  // earlier avatar is on top, on the end side when the later one is.
   const items = ordered.map(({ node }, index): AvatarGroupItem & { overflow: boolean } => {
     let cutout: AvatarCutout | undefined;
     if (layout === 'stack') {

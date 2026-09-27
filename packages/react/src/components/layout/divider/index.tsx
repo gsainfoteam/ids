@@ -26,7 +26,6 @@ export function Divider({
   ...rest
 }: Divider.Props) {
   const labelId = useId();
-  // With asChild the single child becomes the line itself, so it cannot also carry a label.
   const labelled = !asChild && children != null && children !== false && children !== '';
   invariant(
     !asChild || isValidElement(children),
@@ -35,8 +34,6 @@ export function Divider({
   const state: Divider.State = { orientation, labelled, align, decorative };
   const { root, label } = Divider.Style({ orientation, labelled, align });
 
-  // A separator's children are presentational, so the label names it by reference instead of
-  // being read as content.
   const naming = decorative
     ? { 'aria-hidden': true }
     : {
@@ -93,12 +90,8 @@ export namespace Divider {
     children?: ReactNode;
   };
 
-  // A labelled divider draws its two lines as ::before and ::after around the label, so the
-  // lines follow the writing direction and `align` only hides one of them.
   export const Style = tv({
     slots: {
-      // An hr drawn through asChild keeps the base style's 1px top border, which would cover the
-      // line's fill in the text color.
       root: 'shrink-0 border-0',
       label: 'min-w-0 text-center text-caption-c1-medium text-(--ids-color-on-muted)',
     },
@@ -119,7 +112,6 @@ export namespace Divider {
       { labelled: true, align: 'start', class: { root: 'before:hidden' } },
       { labelled: true, align: 'end', class: { root: 'after:hidden' } },
       { orientation: 'horizontal', labelled: false, class: { root: 'h-px w-full' } },
-      // Outside a flex row nothing stretches it, so it keeps at least one line of height.
       {
         orientation: 'vertical',
         labelled: false,

@@ -34,8 +34,6 @@ export type ChipColorScheme = 'neutral' | 'primary' | 'success' | 'warning' | 'd
 
 type Context = {
   styles: ReturnType<typeof Chip.Style>;
-  // A chip that is itself a button cannot hold another button, so its close glyph is drawn for
-  // the pointer only and the keyboard removes the chip with Backspace or Delete.
   rootIsButton: boolean;
   colorScheme: ChipColorScheme;
   size: IdsSize;
@@ -58,8 +56,6 @@ function flag(on: boolean) {
   return on ? '' : undefined;
 }
 
-// Plain text becomes a Chip.Label, so it truncates and names the close button, and a removable
-// chip without its own Chip.Close gets the default one at the end.
 function arrange(content: ReactNode, removable: boolean) {
   const nodes = flattenFragments(content);
   const arranged: ReactNode[] = [];
@@ -118,8 +114,6 @@ export function Chip({
     disabled,
   });
   const rootIsButton = chip.interactive && !asChild;
-  // A static chip takes no focus itself, so keyboard focus on its Close is the chip's own: a
-  // field of chips marks the one the arrow keys are on with it.
   const [innerFocusVisible, setInnerFocusVisible] = useState(false);
   const { state: interaction, handlers } = useInteractive<HTMLElement>({
     disabled,
@@ -218,7 +212,6 @@ export namespace Chip {
     interactive: boolean;
   };
 
-  // The root is a button, a span or the asChild element, depending on what the chip can do.
   export type Props = Omit<HTMLAttributes<HTMLElement>, 'className' | 'style' | 'children'> & {
     ref?: Ref<HTMLElement>;
     variant?: ChipVariant;
@@ -227,8 +220,6 @@ export namespace Chip {
     selected?: boolean;
     defaultSelected?: boolean;
     onSelectedChange?: (selected: boolean) => void;
-    // preventDefault() on the event keeps focus where the handler puts it instead of on the
-    // neighbouring chip.
     onRemove?: (event: RemoveEvent) => void;
     disabled?: boolean;
     asChild?: boolean;
@@ -294,7 +285,6 @@ export namespace Chip {
         variant="ghost"
         colorScheme={context.colorScheme}
         size={context.size}
-        // "frontend 삭제": the chip's own label followed by this button's label.
         aria-label={ariaLabel ?? messages.chip.remove}
         aria-labelledby={
           ariaLabel === undefined && context.labelId ? `${context.labelId} ${closeId}` : undefined
@@ -322,7 +312,6 @@ export namespace Chip {
 
   export const Style = tv({
     slots: {
-      // --chip-layer is a hover and press veil in the text color, laid over any background.
       root: [
         'inline-flex shrink-0 items-center rounded-full align-middle whitespace-nowrap',
         'bg-[image:linear-gradient(var(--chip-layer),var(--chip-layer))] [--chip-layer:transparent]',
@@ -330,9 +319,6 @@ export namespace Chip {
       ],
       icon: 'inline-flex shrink-0 [&_svg]:size-[1.15em]',
       label: 'min-w-0 truncate',
-      // Chip.Close is a ghost IconButton turned into a small circle in the chip's own text color.
-      // Its hover is also written as hover:, which the glyph a button chip draws instead needs,
-      // since only the IconButton reports data-hovered.
       close: [
         'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60',
         'hover:bg-current/15 hover:opacity-100 data-hovered:bg-current/15 data-active:bg-current/15',

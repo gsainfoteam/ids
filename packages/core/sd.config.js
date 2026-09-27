@@ -1,8 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { StyleDictionary } from "style-dictionary-utils";
 
-// ─── Shared helpers ───────────────────────────────────────────────────────────
-
 const GENERATED = "// GENERATED — do not edit manually";
 
 const slug = (t) => t.path.slice(1).join("-");
@@ -33,7 +31,6 @@ const byCategory = (dictionary, cat) =>
 const byPath = (dictionary, key) =>
   dictionary.allTokens.filter((t) => t.path[0] === key);
 
-// Extracts palette (non-semantic) tokens for reference resolution
 const buildPalette = (dictionary) => {
   const p = {};
   for (const t of dictionary.allTokens.filter(
@@ -43,14 +40,12 @@ const buildPalette = (dictionary) => {
   return p;
 };
 
-// Resolves {token.path} references against palette
 const resolveRef = (value, palette) => {
   if (typeof value !== "string") return value;
   const m = value.match(/^\{([^}]+)\}$/);
   return m ? (palette[m[1]] ?? value) : value;
 };
 
-// Reads a semantic JSON file and returns color entries with resolved values
 const readColorEntries = (color, mode, palette) => {
   const json = JSON.parse(
     readFileSync(`./tokens/semantic/${color}.${mode}.json`, "utf8"),
@@ -67,7 +62,6 @@ const isTypographyToken = (node) =>
   (node.$type === "typography" ||
     (node.$value && typeof node.$value === "object" && "fontSize" in node.$value));
 
-// Flatten nested text.* typography composites → [{ name: 'headline-h1-bold', ... }]
 const flattenTypography = (node, path = []) => {
   if (isTypographyToken(node)) {
     const raw = node.$value ?? node.value;
@@ -87,7 +81,6 @@ const flattenTypography = (node, path = []) => {
   );
 };
 
-// Reads semantic/typography.json and returns resolved composite entries
 const readTypographyEntries = (palette) => {
   const json = JSON.parse(
     readFileSync("./tokens/semantic/typography.json", "utf8"),
@@ -101,7 +94,6 @@ const readTypographyEntries = (palette) => {
   }));
 };
 
-// Flutter letterSpacing is px — convert em relative to fontSize when needed
 const letterSpacingToPx = (letterSpacing, fontSize) => {
   const raw = String(letterSpacing);
   if (raw.endsWith("em")) return parseFloat(raw) * parseFloat(fontSize);
@@ -117,7 +109,6 @@ const parseEnums = (dictionary) => {
   return result;
 };
 
-// Discover color pairs from semantic/ dir — excludes neutral, status
 const colorPairs = [
   ...new Map(
     readdirSync("./tokens/semantic").flatMap((f) => {
@@ -129,7 +120,6 @@ const colorPairs = [
   ).values(),
 ];
 
-// Tailwind v4 @theme namespace — token path[0] → CSS var prefix
 const TW_NS = {
   color: "--color-",
   spacing: "--spacing-",
@@ -161,8 +151,6 @@ const TYPOGRAPHY_CATS = [
   "letter-spacing",
   "line-height",
 ];
-
-// ─── Templates ────────────────────────────────────────────────────────────────
 
 const T_CSS_THEME = `@theme {
 {{THEME}}
@@ -243,10 +231,6 @@ const T_CSS_TEXT_ROOT = `  --ids-text-{{NAME}}: {{FONT_SIZE}};
 
 const T_DART_TEXT_STYLE = `TextStyle(fontFamily: '{{FONT_FAMILY}}', package: '{{FONT_PACKAGE}}', fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
 
-// ─── CSS helpers ─────────────────────────────────────────────────────────────
-
-// @theme { --color-primary: var(--ids-color-primary); ... } — Tailwind bridge
-// deduplicates across color+mode files so each token name appears once
 const buildColorBridgeCSS = (dictionary) => {
   const seen = new Set();
   const theme = dictionary.allTokens
@@ -262,20 +246,16 @@ const buildColorBridgeCSS = (dictionary) => {
   return render(T_CSS_THEME, { THEME: theme });
 };
 
-// :root { --ids-motion-fast: 150ms; ... }
 const buildStaticCSS = (dictionary) => {
   const lines = ["motion", "radius", "size"].flatMap((cat) =>
     byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
   );
-  // rounded-* has to resolve to the IDS scale, so bridge radius into @theme too.
   const theme = byCategory(dictionary, "radius").map(
     (t) => `  --radius-${slug(t)}: var(${idsVar("radius", t)});`,
   );
   return `:root {\n${lines.join("\n")}\n}\n\n@theme {\n${theme.join("\n")}\n}\n`;
 };
 
-// Keyframes can't come from a token file, but they have to ship with the CSS
-// package so consumers get the same motion the components assume.
 const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
   from {
     transform: translateX(-100%);
@@ -303,21 +283,9 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 }
 `;
 
-// Components write dark:* for the few styles a token cannot carry, and ThemeProvider sets the
-// mode as data-mode, so the variant must follow that attribute rather than the OS media query.
-// A light region nested in a dark one is excluded explicitly; without it every descendant of
-// the dark ancestor would still match.
 const T_CSS_VARIANTS = `@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *):not(:where([data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *)));
 `;
 
-// One definition for every focus trigger IDS uses: real form controls, components
-// driven by useInteractive, and a shell that wraps a focusable input marked data-field-input. Focus also recolors an
-// inset-ring border when the element has one; the color alone draws nothing on an element
-// without an inset ring, so solid controls are unaffected. An invalid element keeps a danger
-// border and turns its focus ring danger too.
-// A shell rings for a focused field input inside it, but not for one inside a popup it holds: a
-// popup is drawn apart from the field even where the DOM nests it there, as with TelField's
-// country list, so the field would light up for focus the user sees elsewhere.
 const T_CSS_UTILITIES = `@utility focus-ring {
   outline: none;
 
@@ -344,13 +312,6 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 }
 `;
 
-// Concentric radius: a padded container's corner is its content's corner plus the padding,
-// so nested corners share a centre. CSS values only flow downwards, so a container cannot
-// read its children's radius. Instead each nested padding it contains is matched with :has()
-// and summed into --ids-concentric-nested. A two-level selector has higher specificity than
-// a one-level one, and rules of equal level are emitted in ascending order, so the deepest
-// and largest sum always wins. Popovers render inside the trigger's subtree but are not
-// nested visually, so they are excluded.
 const CONCENTRIC_PADS = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8];
 
 const concentricClass = (n) => `.concentric-p-${String(n).replace(".", "\\.")}`;
@@ -394,8 +355,6 @@ ${[...byLevel(one), ...byLevel(two)].join("\n")}
 `;
 };
 
-// :root { --ids-text-button-standard: ...; --ids-font-size-h1: ... }
-// @theme { --text-button-standard: var(--ids-text-button-standard); --font-weight-semibold: ... }
 const buildTypographyCSS = (dictionary) => {
   const palette = buildPalette(dictionary);
   const entries = readTypographyEntries(palette);
@@ -429,16 +388,12 @@ const buildTypographyCSS = (dictionary) => {
   });
 };
 
-// [data-color="blue"][data-mode="light"] { --ids-color-primary: #2563eb; ... }
-// Reads source JSON directly — bypasses SD token collision from multi-theme files
 const buildColorThemeCSS = (dictionary, color, mode, selector) => {
   const lines = readColorEntries(color, mode, buildPalette(dictionary)).map(
     ({ name, value }) => `  --ids-color-${name}: ${value};`,
   );
   return `${selector} {\n${lines.join("\n")}\n}\n`;
 };
-
-// ─── CSS formatter ────────────────────────────────────────────────────────────
 
 const cssFormatter = ({ dictionary }) =>
   [
@@ -463,8 +418,6 @@ const cssFormatter = ({ dictionary }) =>
     buildColorThemeCSS(dictionary, "status", "dark", '[data-mode="dark"]'),
   ].join("\n");
 
-// ─── TS formatters ────────────────────────────────────────────────────────────
-
 const tsTypesFormatter = ({ dictionary }) => {
   const enums = parseEnums(dictionary);
   return render(T_TS_FILE, {
@@ -476,8 +429,6 @@ const tsTypesFormatter = ({ dictionary }) => {
       .join("\n"),
   });
 };
-
-// ─── Dart formatters ──────────────────────────────────────────────────────────
 
 const dartEnumsFormatter = ({ dictionary }) => {
   const enums = parseEnums(dictionary);
@@ -497,7 +448,6 @@ const dartEnumsFormatter = ({ dictionary }) => {
   return `${GENERATED}\n\n${blocks}\n`;
 };
 
-// Reads source JSON directly — bypasses SD token collision from multi-theme files
 const dartColorTokensFormatter = ({ dictionary }) => {
   const palette = buildPalette(dictionary);
   const toColorLine = ({ name, value }) =>
@@ -579,21 +529,16 @@ const dartTypographyFormatter = ({ dictionary }) => {
   });
 };
 
-// ─── Register ─────────────────────────────────────────────────────────────────
-
 for (const [name, format] of [
   ["ids/css", cssFormatter],
   ["ids/ts-types", tsTypesFormatter],
   ["ids/dart-enums", dartEnumsFormatter],
   ["ids/dart-color-tokens", dartColorTokensFormatter],
-  // ["ids/dart-spacing", dartSpacingFormatter],
   ["ids/dart-motion", dartMotionFormatter],
   ["ids/dart-typography", dartTypographyFormatter],
 ]) {
   StyleDictionary.registerFormat({ name, format });
 }
-
-// ─── Config ───────────────────────────────────────────────────────────────────
 
 export default {
   log: { warnings: "disabled" },
@@ -616,7 +561,6 @@ export default {
           destination: "../flutter/lib/tokens/ids_color_tokens.dart",
           format: "ids/dart-color-tokens",
         },
-        // { destination: "../flutter/lib/tokens/ids_spacing.dart", format: "ids/dart-spacing" },
         { destination: "../flutter/lib/tokens/ids_motion.dart", format: "ids/dart-motion" },
         {
           destination: "../flutter/lib/tokens/ids_typography.dart",

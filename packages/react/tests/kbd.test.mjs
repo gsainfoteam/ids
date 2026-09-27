@@ -10,7 +10,6 @@ const { createRoot, hydrateRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
 const { Kbd, Field } = await import('../dist/index.js');
 
-// Node's own navigator reports the host machine, so every test that renders on the client pins it.
 function setPlatform(platform) {
   Object.defineProperty(globalThis, 'navigator', {
     value: { platform, userAgent: '' },
@@ -39,7 +38,6 @@ const visible = (element) => {
   copy.querySelectorAll('.sr-only').forEach((node) => node.remove());
   return copy.textContent;
 };
-// Every text node a screen reader reaches, skipping aria-hidden subtrees.
 const spoken = (element) => {
   const parts = [];
   const walk = (node) => {

@@ -75,15 +75,12 @@ const unitMessage: Record<TimeUnit, string> = {
   period: messages.timePicker.period,
 };
 
-// An asChild element without children of its own still gets the part's default content.
 function withDefault(children: ReactNode, fallback: ReactNode) {
   return isValidElement<{ children?: ReactNode }>(children) && children.props.children == null
     ? cloneElement(children, undefined, fallback)
     : children;
 }
 
-// The period column sits where the locale writes the day period: first in Korean ("오후 2:05"),
-// last in English ("2:05 PM").
 function defaultUnits(
   precision: TimePrecision,
   format: TimeFormat,
@@ -193,7 +190,6 @@ export function TimePicker({
   );
 }
 
-// A listbox that keeps focus and points at its active option, so the options are not Toggles.
 function ColumnView({
   unit,
   asChild,
@@ -269,7 +265,6 @@ export namespace TimePicker {
     return <ColumnView {...props} unit="period" />;
   }
 
-  // Labels for the columns above them, hidden from screen readers since each column is named.
   export function Header({ asChild, children, ...props }: BoxProps) {
     const c = useTimePickerContext('TimePicker.Header');
     const labels = defaultUnits(c.state.precision, c.state.format, c.periodLeads).map((unit) => (
@@ -285,7 +280,6 @@ export namespace TimePicker {
     );
   }
 
-  // A colon between two columns, not a rule, so it is not a Divider.
   export function Separator({ asChild, children = ':', ...props }: SeparatorProps) {
     const c = useTimePickerContext('TimePicker.Separator');
     return part(
@@ -302,9 +296,6 @@ export namespace TimePicker {
       header: 'flex w-full basis-full gap-1 text-(--ids-color-on-muted) select-none',
       headerLabel: 'min-w-12 flex-1 text-center',
       separator: 'self-center text-(--ids-color-on-muted) select-none',
-      // A column is five options tall unless --time-picker-height says otherwise, with half a
-      // column of space before the first option and after the last, so any option can sit in the
-      // middle row and the picked time reads across one line.
       column: [
         'group/column relative h-(--time-picker-height) min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-standard',
         'before:block before:h-[calc(50%-var(--time-option)/2)] after:block after:h-[calc(50%-var(--time-option)/2)]',

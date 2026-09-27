@@ -37,7 +37,6 @@ export function Label({
     !asChild || child !== undefined,
     '`Label asChild` requires one element to render as, such as a `span` or `h3`.',
   );
-  // The child element is the label, so the id and htmlFor it carries are the label's own.
   const {
     labelId,
     labelRef,
@@ -107,7 +106,6 @@ export namespace Label {
         'data-disabled:cursor-not-allowed data-disabled:opacity-50',
         'data-invalid:text-(--ids-color-danger)',
       ],
-      // The asterisk repeats what `required` on the control already tells assistive technology.
       marker: '-ms-1 text-(--ids-color-danger)',
     },
     variants: {

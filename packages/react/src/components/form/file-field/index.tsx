@@ -36,8 +36,6 @@ import type { IdsSize } from '../../../tokens/types';
 
 export type { FileFieldRejection } from './file-rules';
 
-// `field` is a text-field-like control; `dropzone` is a large area to drop files on. They are
-// different shapes, so this is `appearance`, and `variant` stays the fill intensity of either.
 export type FileFieldAppearance = 'field' | 'dropzone';
 export type FileFieldVariant = 'outline' | 'soft' | 'ghost';
 
@@ -118,7 +116,6 @@ type Context = {
 };
 
 const FileContext = createContext<Context | null>(null);
-// Set inside a FileField.Item, where a preview is the row's media rather than an inline thumbnail.
 const FileRowContext = createContext(false);
 
 function useFile(part: string) {
@@ -228,7 +225,6 @@ export function FileField(props: FileFieldProps) {
   const styles = FileField.Style({ appearance, variant, size: resolvedSize });
 
   const triggerProps = {
-    // mergeRefs only composes the refs into a callback; nothing reads them during render.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(triggerRef, forwardedRef),
     id,
@@ -270,8 +266,7 @@ export function FileField(props: FileFieldProps) {
   const composed = nodes.length
     ? { controls, others }
     : appearance === 'dropzone'
-      ? // Each listed file has its own remove button, so a dropzone needs no Clear.
-        { controls: [<FileTrigger key="trigger" />], others: [<FileList key="list" />] }
+      ? { controls: [<FileTrigger key="trigger" />], others: [<FileList key="list" />] }
       : {
           controls: [<FileTrigger key="trigger" />, <FileClear key="clear" />],
           others: multiple ? [<FileList key="list" />] : [],
@@ -319,7 +314,6 @@ export function FileField(props: FileFieldProps) {
         }}
         onPaste={handlers.onPaste}
       >
-        {/* The bridge from react-hook-form may pass onChange; the picker's own handler wins. */}
         <input
           {...native}
           ref={inputRef}
@@ -442,8 +436,6 @@ type GhostButtonProps = Omit<ComponentProps<'button'>, 'children' | 'onClick'> &
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
-// Clear and Remove are ghost IconButtons. With asChild the given button takes their look, and
-// otherwise the child is the glyph.
 function GhostButton({ asChild, children, ...props }: GhostButtonProps) {
   if (!asChild)
     return (
@@ -489,7 +481,6 @@ function FileList({ asChild, children, className, ...props }: FileField.ListProp
     'aria-label': props['aria-label'] ?? messages.fileField.list,
     className: c.styles.list({ className }),
   };
-  // With asChild the given element is the list and holds its own rows.
   if (asChild) return part('div', true, items, mergeProps(props, { ...list, role: 'list' }));
   return (
     <Item.Group {...props} {...list} size={c.size} dense>
@@ -561,8 +552,6 @@ function FilePreview({ file, className, ...props }: FileField.PreviewProps) {
   const inRow = use(FileRowContext);
   const url = usePreviewUrl(file);
   const glyph = url ? <img src={url} alt="" draggable={false} /> : <DocumentIcon />;
-  // A button may only hold phrasing content, so the trigger's thumbnail stays a span; in a row
-  // the same span becomes the row's media tile.
   if (!inRow)
     return (
       <span
@@ -630,27 +619,22 @@ export namespace FileField {
   export const Style = tv({
     slots: {
       root: 'relative grid min-w-0 gap-2',
-      // The text-field-like surface that holds the trigger and Clear in the `field` appearance.
       control: ['relative', fieldTrigger.base],
       trigger: [
         'flex min-w-0 cursor-pointer touch-manipulation items-center text-start text-(--ids-color-on-surface)',
         'disabled:cursor-not-allowed aria-disabled:cursor-default',
       ],
       icon: 'shrink-0 text-(--ids-color-on-muted)',
-      // The single file's thumbnail in the trigger, the size of a glyph.
       thumb: [
         'flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-indicator',
         'text-(--ids-color-on-muted) [&_img]:size-full [&_img]:object-cover [&_svg]:size-3.5',
       ],
       value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
-      // The control already dims as a whole when disabled, so Clear does not dim again.
       clear: [fieldAction.base, 'data-disabled:opacity-100'],
       dropzoneIcon: 'mb-1 size-6 text-(--ids-color-on-muted)',
-      // Korean wraps between words, not inside one, and the lines are balanced.
       dropzoneTitle: 'font-medium break-keep text-balance',
       dropzoneHint: 'text-caption-c1-regular text-(--ids-color-on-muted) break-keep text-balance',
       list: 'flex flex-col gap-1',
-      // Outline Items with the field's own fill, so the rows read as part of the field.
       item: 'bg-(--ids-color-surface) dark:bg-(--ids-color-muted)/30',
       preview: 'text-(--ids-color-on-muted)',
       itemSize: 'text-caption-c1-regular',
@@ -660,8 +644,6 @@ export namespace FileField {
     variants: {
       appearance: {
         field: { trigger: 'h-full flex-1 self-stretch bg-transparent outline-none' },
-        // A dashed area the size of a card. Dragging files over it recolors it, so the drop
-        // target is obvious before the drop.
         dropzone: {
           trigger: [
             'min-h-32 w-full flex-col justify-center gap-1 text-center concentric-p-4',
@@ -678,8 +660,6 @@ export namespace FileField {
         soft: {},
         ghost: {},
       } satisfies Record<FileFieldVariant, object>,
-      // The control has no padding of its own, since the trigger fills it, so Clear keeps a 4px
-      // inset from the border instead of pulling into padding.
       size: {
         standard: {
           root: 'text-body-b3-regular',

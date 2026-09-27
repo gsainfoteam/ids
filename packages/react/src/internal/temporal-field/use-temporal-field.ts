@@ -37,9 +37,7 @@ export type UseTemporalFieldOptions<V> = {
   invalid: boolean | undefined;
   required: boolean;
   display: (value: V) => string;
-  // Reads typed text into a value, or undefined when the text is not an allowed value.
   parse?: (text: string) => V | undefined;
-  // Typed for the trigger, but also called with the popup's blur event when focus leaves there.
   onBlur?: (event: FocusEvent<HTMLButtonElement>) => void;
 };
 
@@ -58,15 +56,11 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
   const blocked = disabled || readOnly;
   const expanded = open && !blocked;
   const popupId = `ids-temporal-${useId()}`;
-  // The control that owns the field's focus and label: the trigger button, or the text input
-  // when the field takes typed dates.
   const triggerRef = useRef<HTMLButtonElement | HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  // What the user is typing, until it is read on Enter or blur. null shows the value itself.
   const [draft, setDraft] = useState<string | null>(null);
   const [unreadable, setUnreadable] = useState(false);
 
-  // Dates compare by calendar day, so a new Date for the day already picked is not a change.
   const commit = (next: V) => {
     if (!isSame(next, value)) setValue(next);
   };
@@ -74,8 +68,6 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
     setDraft(null);
     setUnreadable(false);
   };
-  // An empty box clears the value; text that does not read as an allowed value stays as typed
-  // and marks the field invalid rather than being thrown away.
   const readDraft = () => {
     if (draft === null || !options.parse) return true;
     const typed = draft.trim();
@@ -108,15 +100,12 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
     close(true);
   };
 
-  // A native reset puts the default back without a change event, the way an input resets.
   useFormReset(triggerRef, () => {
     setValue(options.defaultValue, { silent: true });
     dropDraft();
     setOpen(false);
   });
 
-  // Focus moving between the trigger and its popup stays inside the field, so blur is only
-  // reported once it leaves both.
   const inside = (target: EventTarget | null) =>
     target instanceof Node &&
     (!!rootRef.current?.contains(target) ||
@@ -131,8 +120,6 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
       const text = event.currentTarget.value;
       setUnreadable(false);
-      // Paste, drop and autofill hand over a whole date at once, so it is read right away; a
-      // date typed key by key waits for Enter or blur, since 2026-09-1 already reads as a date.
       const kind = (event.nativeEvent as InputEvent).inputType;
       const whole =
         kind === 'insertFromPaste' ||
@@ -147,9 +134,7 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
       }
     },
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
-      // The Enter that confirms an IME syllable is not the user's Enter.
       if (event.defaultPrevented || event.nativeEvent.isComposing) return;
-      // Enter reads the text; unreadable text also stops the form's implicit submit.
       if (event.key === 'Enter' && !readDraft()) event.preventDefault();
       else if (event.key === 'ArrowDown' && !blocked) {
         event.preventDefault();

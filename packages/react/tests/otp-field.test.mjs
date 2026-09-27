@@ -46,7 +46,6 @@ const shown = () =>
     .map((slot) => slot.textContent)
     .join('');
 
-// jsdom has no execCommand, so these drive the same fallback path an engine without it takes.
 async function type(value, data = null) {
   await act(async () => {
     const input = field();

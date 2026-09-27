@@ -21,11 +21,8 @@ export type InputProps =
 
 const SUPPORTED = ['text', 'email', 'url', 'search', 'number', 'password', 'tel'];
 
-// Addresses are typed exactly: a capital or a "corrected" word breaks them, so the phone
-// keyboard is told to leave them alone.
 const addressHints = { autoCapitalize: 'none', autoCorrect: 'off', spellCheck: false } as const;
 
-/** Dispatches a schema's input type to the IDS field built for it, keeping that field's API. */
 export function Input(props: InputProps) {
   const { type = 'text' } = props;
   const supported = SUPPORTED.includes(type);

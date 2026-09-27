@@ -12,7 +12,6 @@ const same = (glyph: string, label: KbdLabel) => ({
   other: { glyph, label },
 });
 
-// Modifier order follows each platform's menus: ⌃⌥⇧⌘ on Apple, Win+Ctrl+Alt+Shift elsewhere.
 const KEYS: Record<string, Spec> = {
   meta: {
     apple: { glyph: '⌘', label: 'command' },
@@ -88,7 +87,6 @@ const ALIASES: Record<string, string> = {
   plus: '+',
 };
 
-// Written glyphs a reader would otherwise hear as "place of interest sign" or nothing at all.
 const GLYPHS: Record<string, KbdLabel | Record<KbdPlatform, KbdLabel>> = {
   '⌘': 'command',
   '⌃': 'control',
@@ -113,8 +111,6 @@ const GLYPHS: Record<string, KbdLabel | Record<KbdPlatform, KbdLabel>> = {
   '↘': 'end',
 };
 
-// "mod+shift+k", tinykeys' "$mod+KeyK" and arrays all read the same. A '+' at the end of a
-// string is the plus key itself, so "mod++" is mod and +.
 export function parseKeys(keys: string | readonly string[]): string[] {
   const tokens = typeof keys === 'string' ? keys.split(/\+(?!$)/) : [...keys];
   return tokens.map(normalizeKey).filter((token) => token !== '');
@@ -134,7 +130,6 @@ function normalizeKey(raw: string) {
 
 export type ResolvedKey = { id: string; glyph: string; label: KbdLabel | undefined };
 
-// `mod` is the platform's command key: ⌘ on Apple devices, Ctrl everywhere else.
 export function resolveKey(token: string, platform: KbdPlatform): ResolvedKey {
   const id = token === 'mod' ? (platform === 'apple' ? 'meta' : 'ctrl') : token;
   const spec = KEYS[id];

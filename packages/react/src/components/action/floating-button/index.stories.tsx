@@ -23,8 +23,6 @@ const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'inf
 const sizes = ['standard', 'tiny'] as const;
 const placements = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const;
 
-// A transformed box becomes the containing block of the fixed buttons inside it, so a story can
-// show a placement without covering the page.
 function Frame({ children, dir, label }: { children: ReactNode; dir?: 'rtl'; label?: string }) {
   return (
     <div
@@ -273,7 +271,6 @@ export const AutomaticLabel: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('button', { name: 'Compose' })).toBeVisible();
-    // heroicons has no displayName; its function name survives only in development builds.
     if (isDevelopment) await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
   },
 };
@@ -381,7 +378,6 @@ export const DevelopmentWarnings: Story = {
     const warn = spyOn(console, 'warn').mockImplementation(() => {});
     await userEvent.click(canvas.getByRole('button', { name: '겹치는 버튼 보기' }));
     await expect(canvas.getByRole('button', { name: '문의' })).toBeVisible();
-    // A production build, the static Storybook included, strips the warnings.
     if (isDevelopment)
       await waitFor(() =>
         expect(warn).toHaveBeenCalledWith(expect.stringContaining('cover each other')),

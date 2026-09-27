@@ -162,7 +162,6 @@ test('asChild renders the child with the button style; the child class and handl
 });
 
 test('a disabled asChild link drops href and the tab stop and blocks every activation', async () => {
-  // Handlers record instead of throwing: React reports a throw from a handler and carries on.
   const calls = [];
   const record = (name) => () => calls.push(name);
   await render(

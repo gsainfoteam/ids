@@ -49,7 +49,6 @@ export type TemporalFieldProps<V> = Omit<
   disabled?: boolean;
   placeholder?: string;
   mobileVariant?: 'popover' | 'drawer';
-  // Only read by an Input part, where it defaults to off.
   autoComplete?: ComponentProps<'input'>['autoComplete'];
   className?: string | ((state: TemporalFieldState<V>) => string | undefined);
   style?: CSSProperties | ((state: TemporalFieldState<V>) => CSSProperties | undefined);
@@ -83,7 +82,6 @@ export type TemporalConfig<V> = {
   picker: TemporalPicker<V>;
   preferredWidth?: number;
   initialFocusSelector: string;
-  // Present on fields that take typed text through an Input part.
   parse?: (text: string) => V | undefined;
   inputHint?: string;
 };
@@ -123,8 +121,6 @@ function useTemporal(part: string) {
 
 export const temporalFieldStyle = tv({
   slots: {
-    // The trigger carries data-field-input, so focus-ring rings the whole shell for it while
-    // Clear keeps a ring of its own.
     root: ['relative inline-flex w-full min-w-0 items-center', fieldSurface.base],
     trigger: [
       'flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center self-stretch',
@@ -133,14 +129,12 @@ export const temporalFieldStyle = tv({
     icon: 'shrink-0 text-(--ids-color-on-muted)',
     value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
     clear: fieldAction.base,
-    // With an Input part the text box takes the focus and the label.
     input: [
       'h-full min-w-0 flex-1 self-stretch bg-transparent outline-none',
       'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
     ],
     button: fieldAction.base,
     content: 'flex justify-center',
-    // DateTimeField's popup: the calendar beside the clock, stacked on a phone.
     panel: 'flex flex-col gap-4 sm:flex-row',
     panelTime: 'flex min-w-0 flex-col gap-2 sm:w-52',
     panelHint: 'text-caption-c1-regular text-(--ids-color-on-muted)',
@@ -199,7 +193,6 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
   if (c.hasInput) {
     const button = {
       ...mergeProps(props, c.trigger),
-      // The default names the button; a label given to the part names it instead.
       'aria-label': props['aria-label'] ?? (c.trigger['aria-label'] as string),
       variant: 'ghost' as const,
       size: c.size,
@@ -213,7 +206,6 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
       <IconButton {...button} icon={(children as ReactElement) ?? <c.icon aria-hidden="true" />} />
     );
   }
-  // The field's combobox fills the field surface and carries its label, so it is not a Button.
   return part(
     'button',
     asChild,
@@ -221,7 +213,6 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
       <>
         <c.icon aria-hidden="true" className={c.styles.icon()} />
         <TemporalValue />
-        {/* Clear takes the chevron's place once there is a value, so the end holds one icon. */}
         {(c.state.empty || !c.hasClear) && (
           <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
         )}
@@ -234,12 +225,9 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
 export function TemporalInput({ asChild, ...props }: InputProps) {
   const c = useTemporal('Input');
   invariant(c.input, 'Input must be a direct part of its field.');
-  // A bare input inside this field's surface; TextField would draw a second box around it.
   return part('input', asChild, undefined, mergeProps(props, c.input));
 }
 
-// Unlike a text field's Clear this one stays in the tab order, since a date field without an
-// Input part has no text to delete and its calendar has no key that empties it.
 export function TemporalClear({ asChild, children, className, ...props }: ClearProps) {
   const c = useTemporal('Clear');
   if (c.state.empty) return null;
@@ -346,8 +334,6 @@ export function TemporalField<V>({
       count(TemporalInput) <= 1,
     'A date or time field accepts at most one Trigger, Input, Content and Clear.',
   );
-  // With no parts of its own the field draws Trigger then Clear. Once parts are given they are
-  // drawn as given, and only a missing Trigger is filled in, since the field cannot open without it.
   const composed = shell.length > 0;
   const hasTrigger = count(TemporalTrigger) > 0;
   const hasInput = count(TemporalInput) > 0;
@@ -356,8 +342,6 @@ export function TemporalField<V>({
     'Input is only available on a field that reads typed text.',
   );
 
-  // The control that carries the field's id, label, description and combobox role: the trigger,
-  // or the text box when there is one.
   const control = {
     ...native,
     role: 'combobox',
@@ -371,15 +355,12 @@ export function TemporalField<V>({
     'aria-invalid': state.invalid || undefined,
     'aria-required': native['aria-required'] ?? (required || undefined),
     'aria-readonly': readOnly || undefined,
-    // mergeRefs only builds a callback; no ref is read while rendering.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(triggerRef, ref),
   };
   const trigger = hasInput
     ? {
         type: 'button',
-        // The text box opens the popup with Down Arrow, so the button stays out of the tab
-        // order, as in the APG date picker combobox.
         tabIndex: -1,
         'aria-label': config.messages.open,
         'aria-haspopup': 'dialog',
@@ -397,7 +378,6 @@ export function TemporalField<V>({
           native.onClick?.(event);
           if (!event.defaultPrevented) toggle();
         },
-        // APG combobox: Down Arrow opens; Enter and Space already click the button.
         onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => {
           native.onKeyDown?.(event);
           if (event.defaultPrevented || event.key !== 'ArrowDown') return;

@@ -77,8 +77,6 @@ export function useTextArea({
   const generatedId = useId();
   const notify = use(FieldNotifyContext);
 
-  // Values: Input over root over the asChild child. Handlers run child, root, Input, so Field and
-  // react-hook-form wiring on the root still runs when the Input sets its own onChange or onBlur.
   const childProps =
     asChild && isValidElement<ComponentProps<'textarea'>>(children) ? children.props : undefined;
   const native: ComponentProps<'textarea'> = mergeProps(
@@ -158,8 +156,6 @@ export function countState(length: number, maxLength: number | undefined, thresh
   } satisfies CountState;
 }
 
-// Announcing every keystroke would drown out the typing, so the live region only speaks once the
-// count is near the limit, and only after typing pauses.
 export function useCountAnnouncement(message: string, delay = 600) {
   const [spoken, setSpoken] = useState('');
   useEffect(() => {

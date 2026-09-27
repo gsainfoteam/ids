@@ -114,7 +114,6 @@ export function Rating({
   invariant(Number.isInteger(max) && max > 0, 'Rating: max must be a positive integer.');
   invariant(step === 1 || step === 0.5, 'Rating: step must be 1 or 0.5.');
 
-  // An item without `index` draws every position; one with an index draws only its own.
   let template: ReactElement<ItemProps> | undefined;
   const indexed = new Map<number, ReactElement<ItemProps>>();
   for (const child of flattenParts(children)) {
@@ -312,16 +311,13 @@ export namespace Rating {
         'relative inline-flex max-w-full flex-wrap rounded-standard outline-none',
         '[--rating-accent:var(--ids-color-primary)]',
         'data-invalid:[--rating-accent:var(--ids-color-danger)]',
-        // The zero option has no star of its own to ring, so the group draws its focus instead.
         'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-(--ids-color-primary)/40',
         'data-disabled:opacity-50',
       ],
       item: 'relative inline-flex shrink-0 items-center justify-center rounded-standard focus-ring',
       graphic: 'pointer-events-none relative block [&_svg]:size-full',
-      // A required rating left empty is the common invalid case, so the empty glyphs carry it too.
       empty:
         'absolute inset-0 text-(--ids-color-border) in-data-invalid:text-(--ids-color-danger)/35',
-      // clip-path has no logical inset, so the half that fills first swaps sides under rtl.
       fill: [
         'absolute inset-0 text-(--rating-accent)',
         '[clip-path:inset(0_calc(100%-var(--rating-fill))_0_0)]',
@@ -343,8 +339,6 @@ export namespace Rating {
           graphic: 'size-5',
         },
       } satisfies Record<IdsSize, object>,
-      // Each star is one option, or two half-width ones when step is 0.5. The zero option has no
-      // star of its own and only exists for the keyboard and screen readers.
       placement: {
         zero: { option: 'sr-only' },
         whole: { option: 'inset-x-0' },

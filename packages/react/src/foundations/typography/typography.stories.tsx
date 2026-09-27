@@ -15,7 +15,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Written out in full so Tailwind sees every class; a name assembled at runtime is never generated.
 const headline = {
   h1: {
     bold: cn('text-headline-h1-bold'),
@@ -103,7 +102,6 @@ const button = {
 
 const px = (value: string) => `${Math.round(parseFloat(value) * 10) / 10}`;
 
-// The spec line is measured from the rendered text, so it can never drift from the tokens.
 function measure(element: HTMLElement | null) {
   const sample = element?.querySelector<HTMLElement>('[data-sample]');
   const output = element?.querySelector('[data-spec]');

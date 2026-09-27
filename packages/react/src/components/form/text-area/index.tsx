@@ -67,8 +67,6 @@ function rowsToHeight(rows: number | undefined) {
   return rows == null ? undefined : `calc(${rows} * 1lh + var(--ids-text-area-pad-y) * 2)`;
 }
 
-// Children before the Input form the top bar and the ones after it the bottom bar. Without an
-// Input, the textarea comes first and every child goes to the bottom bar.
 function splitByInput(children: ReactNode) {
   const items = flattenFragments(children);
   const indexes = items.flatMap((child, index) =>
@@ -202,14 +200,11 @@ export namespace TextArea {
           (typeof children.type !== 'string' || children.type === 'textarea'),
         '`<TextArea.Input asChild>` requires one textarea, or a component forwarding textarea props and ref.',
       );
-      // A component renders its own textarea, so it also decides that textarea's height.
       if (children.type !== 'textarea') return cloneElement(children, autoResize ? props : fixed);
     } else {
       invariant(children == null, '`<TextArea.Input>` takes `value`/`defaultValue`, not children.');
     }
     if (!autoResize) return <textarea {...fixed} />;
-    // Measured in JS: `field-sizing: content` would do this in CSS, but Safari and Firefox ignore
-    // it. The measured height replaces any height in style.
     return (
       <TextareaAutosize
         {...props}
@@ -229,8 +224,6 @@ export namespace TextArea {
     };
   }
 
-  // The count is part of the textarea's description, so a screen reader hears "12 / 200" on
-  // focus. Near the limit a polite live region also speaks what is left once typing pauses.
   export function Count({
     threshold,
     announce = defaultAnnouncement,
@@ -268,14 +261,10 @@ export namespace TextArea {
 
   export const Style = tv({
     slots: {
-      // Not transition-all: the root carries the resize handle, and animating its width or
-      // height makes the field lag behind the pointer while dragging.
       root: [
         'flex w-full min-w-0 cursor-text flex-col overflow-hidden rounded-standard',
         fieldSurface.base,
       ],
-      // Bars keep the neutral border color in every state; only the outer border carries focus
-      // and error colors.
       bar: [
         'flex shrink-0 items-center empty:hidden',
         'border-(--ids-color-border)',
@@ -302,8 +291,6 @@ export namespace TextArea {
         ghost: { root: fieldSurface.variant.ghost },
       } satisfies Record<TextAreaVariant, object>,
       size: {
-        // A bar keeps the textarea's inline padding so its text lines up with the typed text, and
-        // a button group at either end pulls out by the button's own inset so its icon does too.
         standard: {
           root: 'text-body-b3-regular',
           bar: [
@@ -329,8 +316,6 @@ export namespace TextArea {
         top: { bar: 'border-b' },
         bottom: { bar: 'border-t' },
       },
-      // The handle lives on the root: resizing the textarea itself would push it past
-      // the rounded border and the bars instead of growing the whole field.
       resize: {
         none: { root: 'resize-none' },
         vertical: { root: 'resize-y' },

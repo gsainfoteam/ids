@@ -65,8 +65,6 @@ export function useFileField({
   const blocked = disabled || readOnly;
   const [rejections, setRejections] = useState<FileFieldRejection[]>([]);
   const [dragging, setDragging] = useState(false);
-  // Entering a child fires dragleave on the parent first, so a counter, not the event target,
-  // tells whether the drag is still over the field.
   const dragDepth = useRef(0);
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -99,7 +97,6 @@ export function useFileField({
     triggerRef.current?.focus({ preventScroll: true });
   };
 
-  // Focus stays in the list after a removal, on the file that took the removed one's place.
   const remove = (file: File) => {
     const index = files.indexOf(file);
     if (blocked || index < 0) return;
@@ -117,8 +114,6 @@ export function useFileField({
     (next ?? triggerRef.current)?.focus({ preventScroll: true });
   });
 
-  // The picker itself stays nameless: FormData gets the current model, which includes drops,
-  // removals and controlled values that a file input's FileList cannot hold.
   useEffect(() => {
     const input = inputRef.current;
     const owner = input?.form;
@@ -162,7 +157,6 @@ export function useFileField({
       event.preventDefault();
       receive(Array.from(event.dataTransfer.files));
     },
-    // A screenshot or a file copied in a file manager arrives as clipboard files.
     onPaste: (event: ClipboardEvent<HTMLDivElement>) => {
       const pasted = Array.from(event.clipboardData?.files ?? []);
       if (blocked || !pasted.length) return;
@@ -171,7 +165,6 @@ export function useFileField({
     },
     onInputChange: (event: ChangeEvent<HTMLInputElement>) => {
       receive(Array.from(event.currentTarget.files ?? []));
-      // Cleared so choosing the same file again still fires a change.
       event.currentTarget.value = '';
     },
   };
@@ -192,9 +185,6 @@ export function useFileField({
   };
 }
 
-// Object URLs for image previews, shared by every preview of the same File and counted, so the
-// address is revoked when the last preview of it unmounts: a long session of picking photos
-// does not keep every one of them in memory.
 const previews = new Map<File, { url: string; users: number }>();
 
 function watchPreview(file: File) {
@@ -207,7 +197,6 @@ function watchPreview(file: File) {
   current.users += 1;
   return () => {
     current.users -= 1;
-    // StrictMode unsubscribes and subscribes again at once, so the revoke waits a tick.
     queueMicrotask(() => {
       if (current.users > 0 || previews.get(file) !== current) return;
       previews.delete(file);

@@ -32,7 +32,6 @@ import {
 
 export type TimeFieldProps = TemporalFieldProps<Date | null> & {
   precision?: TimePrecision;
-  // A date-fns pattern or a function for the text, or 12h / 24h for the clock of both text and picker.
   format?: TemporalFormat | TimeFormat;
   hourCycle?: TimeFormat;
   step?: number;
@@ -61,8 +60,6 @@ export function TimeField({
   validateTime(props.value);
   validateTime(props.defaultValue);
   const dateLocale = resolveLocale(locale);
-  // format="12h" / "24h" names the hour cycle for both the text and the picker; a pattern only
-  // describes the text, so the picker then follows hourCycle or the locale.
   const clock = format === '12h' || format === '24h';
   const cycle = hourCycle ?? (clock ? format : undefined);
   const display = formatter(

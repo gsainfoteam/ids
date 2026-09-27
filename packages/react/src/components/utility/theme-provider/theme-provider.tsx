@@ -63,7 +63,6 @@ export function ThemeProvider({
           paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
           className,
         )}
-        // Native form controls, scrollbars and the canvas behind them follow color-scheme.
         style={{ colorScheme: context.resolvedMode, ...style }}
       />
     </ThemeContext>

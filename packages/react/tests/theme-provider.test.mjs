@@ -30,7 +30,6 @@ async function render(node) {
   await act(async () => root.render(node));
 }
 
-// Captures the context each consumer sees, keyed by name.
 const seen = {};
 function Probe({ name }) {
   seen[name] = useTheme();

@@ -69,9 +69,6 @@ export function useRadio({
 
   const silently = useCheckedWrites(inputRef, checked, (next) => adopt.current(next));
 
-  // Choosing a radio unchecks its groupmates without an event of their own. An uncontrolled radio
-  // leaves `checked` to the DOM and re-reads it whenever a radio of its group changes; were React
-  // holding it, React would re-check the stale radio and undo the choice.
   useEffect(() => {
     const input = inputRef.current;
     if (controlled || !input) return;
@@ -83,8 +80,6 @@ export function useRadio({
     return () => scope.removeEventListener('change', sync);
   }, [controlled]);
 
-  // The browser has already restored an uncontrolled radio; a controlled one is written back to
-  // what its parent says, since a reset changes no prop.
   useFormReset(inputRef, () => {
     const input = inputRef.current;
     if (!input) return;
@@ -108,7 +103,6 @@ export function useRadio({
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
     if (event.nativeEvent.defaultPrevented) {
-      // Some engines undo a cancelled click by toggling again, on top of React's own restore.
       queueMicrotask(() =>
         silently(() => {
           input.checked = latest.current;

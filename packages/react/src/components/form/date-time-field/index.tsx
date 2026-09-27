@@ -51,7 +51,6 @@ export type DateTimeFieldProps = Omit<TemporalFieldProps<Date | null>, 'disabled
   Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'dir' | 'locale'> & {
     locale?: DateLocale;
     precision?: TimePrecision;
-    // A date-fns pattern or a function for the text, or 12h / 24h for the clock of both text and picker.
     format?: TemporalFormat | TimeFormat;
     hourCycle?: TimeFormat;
     step?: number;
@@ -77,7 +76,6 @@ type PanelProps = CalendarPassThrough & {
 const sameInstant = (a: Date | null, b: Date | null) =>
   a === b || (!!a && !!b && a.getTime() === b.getTime());
 
-// The calendar and the clock edit one Date: a day keeps the clock time and a time keeps the day.
 function Panel({
   value,
   change,
@@ -126,7 +124,6 @@ function Panel({
           variant={pickerVariant}
           size={size}
           disabled={unavailable}
-          // Beside the calendar the clock shows seven rows, close to the calendar height with a middle row.
           className="w-full sm:[--time-picker-height:calc(var(--time-option)*7)]"
         />
         {unavailable && (
@@ -197,7 +194,6 @@ export function DateTimeField({
         serialize: (value) => serializeDateTime(value!, precision),
         messages: messages.dateTimeField,
         icon: CalendarDaysIcon,
-        // The calendar months, the gap, a 13rem clock column and the popup's own padding.
         preferredWidth: cell * 7 * monthsToShow + 16 * monthsToShow + 208 + 26,
         initialFocusSelector: '[data-calendar-day][tabindex="0"]',
         picker: ({ value, change, size }) => (

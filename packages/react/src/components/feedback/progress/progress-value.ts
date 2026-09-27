@@ -7,8 +7,6 @@ export type ResolvedProgress = {
 
 const DEFAULT_MAX = 100;
 
-// Upload byte counts overshoot their total and float sums land on 100.0000001, so a value out of
-// range is clamped instead of thrown on. Anything that cannot be drawn becomes indeterminate.
 export function resolveProgress(
   value: number | null | undefined,
   max: number,
@@ -22,7 +20,6 @@ export function resolveProgress(
   return { value: clamped, max: safeMax, percent: (clamped / safeMax) * 100 };
 }
 
-// Rounded down, so 99.6% reads 99% and 100% only ever means done.
 export function formatPercent(percent: number) {
   return `${Math.floor(percent)}%`;
 }

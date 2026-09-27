@@ -102,10 +102,8 @@ export function DateField(props: DateFieldProps) {
             }
           : messages.dateField,
         icon: CalendarDaysIcon,
-        // Up to two months side by side plus the popup's padding and border; more months wrap.
         preferredWidth: cell * 7 * shown + 16 * (shown - 1) + 26,
         initialFocusSelector: '[data-calendar-day][tabindex="0"]',
-        // Typed entry reads one date, and only one the calendar would let the user pick.
         parse:
           selectionMode === 'single'
             ? (text) => {
@@ -119,7 +117,6 @@ export function DateField(props: DateFieldProps) {
             : undefined,
         inputHint: typeof format === 'string' ? format : dateInputHint(dateLocale),
         picker: ({ value: current, change, close, size }) => (
-          // A single date closes the popup on every pick, including the day already chosen.
           <CalendarPickContext value={selectionMode === 'single' ? () => close(true) : null}>
             <Calendar
               {...({ selectionMode, value: current, onValueChange: change } as Calendar.Props)}

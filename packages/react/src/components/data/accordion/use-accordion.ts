@@ -53,8 +53,6 @@ export function useAccordion<T extends string>({
   const toggle = (item: T) => setCurrent(toggleValue(type, current, item, canCollapse));
   const reveal = (item: T) => setCurrent(revealValue(type, current, item));
 
-  // Triggers are found in the DOM, so the order is the visual order whatever the React tree
-  // looks like, and a nested accordion's triggers are left to that accordion.
   const onTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     const root = rootRef.current;
     if (!root || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
@@ -113,8 +111,6 @@ export function useAccordionItem({
   return {
     triggerId: `${id}-trigger`,
     contentId: `${id}-content`,
-    // APG: the open panel of an accordion that cannot collapse announces its header as disabled,
-    // while the header stays focusable so arrow keys still reach it.
     locked: open && !canCollapse && !disabled,
   };
 }
@@ -149,7 +145,6 @@ export function useAccordionPanel({
 }) {
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // A closed panel is hidden only once its collapse has finished, so the height can animate.
   const [settled, setSettled] = useState(!open);
   if (open && settled) setSettled(false);
   const hidden = !open && settled;
@@ -165,7 +160,6 @@ export function useAccordionPanel({
     };
     const wait = transitionTime(panel);
     panel.addEventListener('transitionend', onEnd);
-    // transitionend never fires for a panel that is not rendered or has no transition.
     const timer = window.setTimeout(finish, wait === 0 ? 0 : wait + 50);
     return () => {
       panel.removeEventListener('transitionend', onEnd);
@@ -173,23 +167,16 @@ export function useAccordionPanel({
     };
   }, [closing]);
 
-  // React writes `hidden` as a boolean attribute, so "until-found" is set by hand. A panel in that
-  // state stays searchable: find-in-page matches inside it and fires beforematch to open it.
-  // A disabled item's content stays out of reach instead.
   useLayoutEffect(() => {
     const panel = panelRef.current;
     if (panel && hidden) panel.setAttribute('hidden', disabled ? '' : 'until-found');
   }, [hidden, disabled]);
 
-  // The browser scrolls to the match right after beforematch, so the panel has to be at full
-  // height by then: it opens synchronously and skips the height animation once.
   const [instant, setInstant] = useState(false);
   const revealRef = useRef(onReveal);
   useLayoutEffect(() => {
     revealRef.current = onReveal;
   });
-  // Attached in the same layout phase that sets "until-found", so there is no moment in which the
-  // panel is searchable but nothing would open it.
   useLayoutEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
@@ -207,7 +194,6 @@ export function useAccordionPanel({
     return () => cancelAnimationFrame(frame);
   }, [instant]);
 
-  // Closing a panel that holds focus would drop focus to the page; it goes back to the header.
   useLayoutEffect(() => {
     const panel = panelRef.current;
     if (open || !panel?.contains(document.activeElement)) return;

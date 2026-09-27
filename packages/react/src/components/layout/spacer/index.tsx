@@ -7,8 +7,6 @@ function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
   return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
 }
 
-// A span, not a div: it is valid inside a Button, a link or a label, where only phrasing content
-// is allowed, and a flex container turns it into a block box anyway.
 export function Spacer({ flex = 1, className, style, ref, ...rest }: Spacer.Props) {
   invariant(Number.isFinite(flex) && flex > 0, 'Spacer: flex must be a finite positive number.');
   const state: Spacer.State = { flex };

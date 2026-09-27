@@ -302,7 +302,6 @@ export const RightToLeft: Story = {
   play: async ({ canvasElement }) => {
     const track = bar(canvasElement).getBoundingClientRect();
     const fill = canvasElement.querySelector('[data-progress-indicator]')!.getBoundingClientRect();
-    // The bar is full width and slid out of the track, so its visible part starts 70% in.
     await expect(Math.abs(fill.left - track.left - track.width * 0.7)).toBeLessThan(1);
   },
 };

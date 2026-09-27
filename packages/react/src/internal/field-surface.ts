@@ -4,9 +4,6 @@ import type { IdsSize } from '../tokens/types';
 
 export type FieldSurfaceVariant = 'outline' | 'soft' | 'ghost';
 
-// The box every text-like control draws: TextField's container, a Select or date trigger, a
-// ChipField. Only the intensity varies. Focus and invalid colors come from `focus-ring`, which
-// recolors the inset-ring border drawn here, so this file never repeats those states.
 export const fieldSurface = {
   base: cn(
     'text-(--ids-color-on-surface) focus-ring',

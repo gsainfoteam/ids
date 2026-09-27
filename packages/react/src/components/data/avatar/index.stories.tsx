@@ -14,7 +14,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const shapes = ['circle', 'square'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-// Inline SVG portraits load instantly and never depend on the network.
 function photo(hue: number) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><rect width="160" height="160" fill="hsl(${hue} 70% 78%)"/><circle cx="80" cy="66" r="30" fill="hsl(${hue} 40% 36%)"/><path d="M22 160c6-36 31-54 58-54s52 18 58 54z" fill="hsl(${hue} 40% 36%)"/></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;

@@ -37,9 +37,6 @@ export type UseSurfaceOptions<E> = {
   handlers: SurfaceHandlers<E>;
 };
 
-// A surface the user acts on as a whole: a card or a list row. A div with onClick becomes a
-// button; with asChild the child (usually a link) keeps its own semantics and only gains the
-// interaction states.
 export function useSurface<E extends HTMLElement>({
   interactive,
   asChild,
@@ -65,13 +62,10 @@ export function useSurface<E extends HTMLElement>({
   return {
     interaction: state,
     props: { ...press, ...handlers, onClick: press.onClick },
-    // A static surface is not hoverable or pressable, so it carries no interaction attributes.
     dataProps: interactive ? interactiveDataProps(state) : {},
   };
 }
 
-// The title names an interactive surface and the description describes it; otherwise its whole
-// text, buttons included, would be read out as one long name.
 export function useLabelling(interactive: boolean) {
   const [titleId, setTitleId] = useState<string>();
   const [descriptionId, setDescriptionId] = useState<string>();
@@ -81,8 +75,6 @@ export function useLabelling(interactive: boolean) {
   };
 }
 
-// A part registers its id with the surface while it is mounted, so the surface only points
-// aria-labelledby and aria-describedby at parts that exist.
 export function useRegisteredId(
   register: ((id: string | undefined) => void) | undefined,
   own?: string,

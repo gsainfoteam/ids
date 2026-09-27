@@ -7,9 +7,6 @@ import type { Decorator, Preview } from '@storybook/react-vite';
 import '../src/styles.css';
 import './preview.css';
 
-// The toolbar owns the theme, so a story that calls useTheme().setMode moves the toolbar too.
-// A story fills the canvas on its own page, but on a Docs page every story is one block among
-// many, so it only takes the room it needs there.
 const withIdsTheme: Decorator = (Story, context) => {
   const [globals, updateGlobals] = useGlobals();
 
@@ -33,9 +30,7 @@ const withIdsTheme: Decorator = (Story, context) => {
 const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
-    // The code of the story on screen, beside the canvas; Docs pages keep their own Show code.
     docs: { codePanel: true },
-    // Handlers in args are spies with generated names; a reader only needs to see one is passed.
     jsx: { showFunctions: true, functionValue: () => '() => {}' },
     backgrounds: { disable: true },
     controls: {
@@ -45,8 +40,6 @@ const preview: Preview = {
       },
     },
     options: {
-      // Components sort by name inside each category; stories keep their export order, which
-      // puts Playground and Gallery first.
       storySort: {
         method: 'alphabetical',
         order: [

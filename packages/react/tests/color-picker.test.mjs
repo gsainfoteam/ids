@@ -54,7 +54,6 @@ async function type(node, value) {
     node.dispatchEvent(new Event('input', { bubbles: true }));
   });
 }
-// The area's two axes are native range inputs; hue and alpha are Slider thumbs.
 const slider = (name) =>
   host.querySelector(
     `input[type=range][aria-label="${name}"], [role=slider][aria-label="${name}"]`,
@@ -154,7 +153,6 @@ test('hue and alpha are Sliders: keys, Shift and page steps, and a press on the 
   assert.equal(hue.getAttribute('aria-valuetext'), '20도', 'Shift moves ten degrees');
   await key(hue, 'End');
   assert.equal(hue.getAttribute('aria-valuetext'), '360도');
-  // jsdom lays nothing out, so the track is given a box one pixel per degree wide.
   const track = host.querySelector('[data-color-picker-hue] [data-orientation]:not([data-slider])');
   track.getBoundingClientRect = () => ({ left: 0, right: 360, width: 360, top: 0, bottom: 12 });
   await act(async () =>
@@ -229,7 +227,6 @@ test('typed text is a draft until Enter or blur; unreadable text is reverted', a
   assert.equal(state.changes.at(-1), '', 'an emptied field clears the value');
 });
 
-// jsdom has no native radio arrow keys; the Swatches story plays them in a browser.
 test('swatches are one RadioGroup: a click or Home and End choose, and no form sees them', async () => {
   const state = tracked({
     defaultValue: '#22C55E',

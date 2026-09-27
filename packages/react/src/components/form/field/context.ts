@@ -20,16 +20,10 @@ export const FieldSizeContext = createContext<IdsSize | undefined>(undefined);
 
 export const FieldStateContext = createContext<FieldState | null>(null);
 
-// Controls that change their own DOM value without an input event (a react-hook-form setValue
-// caught by a value observer) call this so the Field's filled and dirty state follow.
 export const FieldNotifyContext = createContext<(() => void) | null>(null);
 
-// True inside Field.Label, which draws a Label. The Field already names its control through
-// aria-labelledby, so that Label neither warns about sitting in a Field nor names a control itself:
-// for a group it would find the first option and rename it.
 export const FieldLabelContext = createContext(false);
 
-/** Explicit control sizes take priority over the containing Field. */
 export function useFieldSize(size?: IdsSize) {
   const inherited = useContext(FieldSizeContext);
   return size ?? inherited;

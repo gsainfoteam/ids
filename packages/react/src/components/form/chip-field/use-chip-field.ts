@@ -25,8 +25,6 @@ import { revealPopupOption } from '../../../internal/field-popup';
 import { messages } from '../../../internal/messages';
 import { matchesQuery, type SelectOption } from '../select/select-options';
 
-// The create row takes part in keyboard navigation like an option, under a value no option can
-// have: option values are strings.
 export const CREATE = null;
 type Candidate = string | typeof CREATE;
 
@@ -82,7 +80,6 @@ export function useChipField({
   const open = openState && !blocked;
   const [query, setQuery] = useState('');
   const [highlighted, setHighlighted] = useState<Candidate>();
-  // The highlight belongs to one opening; the next one starts from the top of the list.
   const [wasOpen, setWasOpen] = useState(open);
   if (wasOpen !== open) {
     setWasOpen(open);
@@ -103,7 +100,6 @@ export function useChipField({
     : null;
   const createRow: Candidate[] = canCreate && !createError ? [CREATE] : [];
   const candidates: Candidate[] = [...enabled.map((option) => option.value), ...createRow];
-  // Typing an option's full label lands on it rather than on the first partial match.
   const exact = trimmed
     ? enabled.find((option) => sameText(option.label, trimmed) || sameText(option.value, trimmed))
     : undefined;
@@ -170,8 +166,6 @@ export function useChipField({
     else if (candidate !== undefined) toggle(candidate);
   };
 
-  // A comma or Enter on a closed list commits what was typed: the option it names, or a new
-  // value. It never removes a chip the way choosing a selected option does.
   const commitQuery = () => {
     const { add, created, rest } = resolveTokens({
       tokens: [trimmed],
@@ -226,13 +220,11 @@ export function useChipField({
     });
     created.forEach((item) => onCreate?.(item));
     if (add.length) setValue([...selected, ...add]);
-    // What could not become a chip stays in the field to be fixed.
     setQuery(rest.join(', '));
     setHighlighted(undefined);
   };
 
   const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>, source: 'field' | 'drawer') => {
-    // keyCode 229 is a key the IME is still composing, which Safari reports without isComposing.
     if (event.defaultPrevented || composing.current) return;
     if (event.nativeEvent.isComposing || event.keyCode === 229 || blocked) return;
     const input = event.currentTarget;
@@ -261,7 +253,6 @@ export function useChipField({
         }
         return;
       case ',':
-        // A separator with nothing before it would only leave a stray comma in the query.
         if (!trimmed || commitQuery()) event.preventDefault();
         return;
       case ' ':
@@ -303,8 +294,6 @@ export function useChipField({
     }
   };
 
-  // A focused chip is its remove button. Arrows walk the chips and step back into the input;
-  // Backspace and Delete remove the chip and keep focus on a neighbour, like text.
   const onChipKeyDown = (event: KeyboardEvent<HTMLButtonElement>, item: string) => {
     const buttons = removeButtons();
     const index = buttons.indexOf(event.currentTarget);
@@ -340,12 +329,9 @@ export function useChipField({
         remove(item, index < buttons.length - 1 ? index : 'input');
         return;
     }
-    // Typing on a chip goes to the input; moving focus before the key's default action lets the
-    // browser insert the character there.
     if (printable) focusInput('end');
   };
 
-  // Pressing a remove button hands focus to the chip that moves into its place, as Delete does.
   const onChipRemove = (item: string) => {
     const buttons = removeButtons();
     const index = buttons.findIndex((button) => button.dataset.chipFieldRemove === item);
@@ -371,7 +357,6 @@ export function useChipField({
       center: !revealed.current,
     });
     revealed.current = true;
-    // optionId is derived from baseId, which never changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, activeCandidate]);
 

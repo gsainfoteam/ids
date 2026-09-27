@@ -32,7 +32,6 @@ const fruitItems = fruits.map(([value, label]) => (
   </Select.Item>
 ));
 
-// A Fragment, not a component: Select finds items only as direct children or inside Fragments.
 const groupedItems = (
   <>
     <Select.Item value="apple">사과</Select.Item>

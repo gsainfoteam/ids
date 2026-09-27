@@ -319,7 +319,6 @@ export const DevelopmentWarnings: Story = {
     const warn = spyOn(console, 'warn').mockImplementation(() => {});
     await userEvent.click(canvas.getByRole('button', { name: '이름 없는 그룹 보기' }));
     await expect(canvas.getByRole('group')).toBeVisible();
-    // A production build, the static Storybook included, strips the warnings.
     if (isDevelopment)
       await waitFor(() =>
         expect(warn).toHaveBeenCalledWith(expect.stringContaining('ButtonGroup: add aria-label')),

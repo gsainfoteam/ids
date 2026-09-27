@@ -181,8 +181,6 @@ export namespace TelField {
           (typeof children.type !== 'string' || children.type === 'input'),
         '`<TelField.Input asChild>` requires one input, or a component forwarding input props and ref.',
       );
-      // The formatter owns value, type and name, so the child is cloned with the final props
-      // instead of merged, which would keep its own name and defaultValue.
       return cloneElement(children, props);
     }
     invariant(
@@ -192,8 +190,6 @@ export namespace TelField {
     return <input {...props} />;
   }
 
-  // Built on Select: countries are listed by their name in `locale` and found by name, ISO code
-  // or calling code. Picking one keeps the national digits and swaps the calling code.
   export function CountrySelect({
     asChild,
     children,
@@ -250,9 +246,6 @@ export namespace TelField {
   export const Style = tv({
     extend: textControlStyle,
     slots: {
-      // The country Select is a field of its own inside this one. Its trigger carries
-      // data-field-input, so the TelField shell already rings while it has focus, and the Select
-      // keeps no ring or focus border of its own.
       country: [
         'w-auto shrink-0 rounded-standard text-(--ids-color-on-surface)',
         'hover:bg-(--ids-color-muted) ring-0! inset-ring-transparent!',

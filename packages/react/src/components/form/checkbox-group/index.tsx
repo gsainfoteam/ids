@@ -107,7 +107,6 @@ export function CheckboxGroup<T extends string>({
   children,
   ref,
   onFocus,
-  // role="group" takes no aria-required; the requirement is enforced by the form instead.
   'aria-required': _ariaRequired,
   ...rest
 }: CheckboxGroupProps<T>) {
@@ -185,7 +184,6 @@ export namespace CheckboxGroup {
   export type AllProps = CheckboxGroupAllProps;
   export type RenderProps<T extends string = string> = CheckboxGroupRenderProps<T>;
 
-  // For plain children, where the render function's `All` is not at hand.
   export const All = render.All;
 
   export const Style = tv({

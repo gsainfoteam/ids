@@ -360,7 +360,6 @@ export const DevelopmentWarnings: Story = {
   play: async ({ canvas, userEvent }) => {
     const warn = spyOn(console, 'warn').mockImplementation(() => {});
     await userEvent.click(canvas.getByRole('button', { name: '잘못 쓴 예 보기' }));
-    // A production build, the static Storybook included, strips the warnings.
     if (isDevelopment) {
       await waitFor(() =>
         expect(warn).toHaveBeenCalledWith(expect.stringContaining('shows only an icon')),

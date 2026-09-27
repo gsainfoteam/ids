@@ -93,13 +93,9 @@ function useColor(part: string) {
 
 const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
 
-// Duck-typed rather than `instanceof Node`, which fails across frames.
 const isNode = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'nodeType' in value;
 
-// Focus lands on the first control of whatever the popup holds: the area, a slider, the
-// input, or the swatches. The swatches' group root takes it, since it hands focus on to the
-// chosen swatch, or to the first when none is chosen, where Tab would land.
 const FIRST_CONTROL = [
   '[data-color-picker] input:not([type=radio]):not([tabindex="-1"])',
   '[data-color-picker] [role=slider]:not([tabindex="-1"])',
@@ -168,15 +164,12 @@ export function ColorField({
   const popupSelector = `[data-color-field-popup="${popupId}"]`;
   const triggerId = native.id ?? `${popupId}-trigger`;
   const valueId = `${popupId}-value`;
-  // A label on a button replaces its content as the name, which would hide the color from a
-  // screen reader. Pointing the name at the label and then the value reads both.
   const labelledBy = native['aria-labelledby']
     ? `${native['aria-labelledby']} ${valueId}`
     : native['aria-label']
       ? `${triggerId} ${valueId}`
       : undefined;
   const triggerProps = mergeProps(native as Record<string, unknown>, {
-    // mergeRefs only composes the refs into a callback; nothing reads them during render.
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(triggerRef, forwardedRef),
     id: triggerId,
@@ -195,7 +188,6 @@ export function ColorField({
     'data-readonly': readOnly ? '' : undefined,
     onClick: actions.toggle,
     onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => actions.onTriggerKeyDown(event),
-    // Moving into the popup is not leaving the field.
     onBlur: (event: FocusEvent<HTMLButtonElement>) => {
       const next = event.relatedTarget;
       if (isNode(next) && (next as Element).closest?.(popupSelector)) return;
@@ -316,7 +308,6 @@ function ColorFieldTrigger({ asChild, children, className, ...props }: ColorFiel
   );
 }
 
-// No color is drawn as a struck-through box; a translucent one over a checkerboard.
 function ColorFieldSwatch({
   asChild,
   children,
@@ -392,8 +383,6 @@ function ColorFieldClear({
   return <IconButton {...button} icon={children ?? <XMarkIcon aria-hidden="true" />} />;
 }
 
-// The popup's body: a ColorPicker bound to the field. Its children are ColorPicker parts, so a
-// field can offer only a palette, or only a hue slider and an input.
 function ColorFieldContent({ children, className, ...props }: ColorField.ContentProps) {
   const c = useColor('ColorField.Content');
   return (
@@ -413,7 +402,6 @@ export namespace ColorField {
   };
   export type SwatchProps = ComponentProps<'span'> & { asChild?: boolean };
   export type ValueProps = ComponentProps<'span'> & { asChild?: boolean };
-  // One element: the icon, or with asChild the button drawn in its place.
   export type ClearProps = Omit<ComponentProps<'button'>, 'children'> & {
     asChild?: boolean;
     children?: ReactElement;
@@ -434,8 +422,6 @@ export namespace ColorField {
 
   export const Style = tv({
     slots: {
-      // The trigger carries data-field-input, so focus-ring rings the whole field for it while
-      // Clear keeps a ring of its own.
       root: ['relative', fieldTrigger.base],
       trigger: [
         'flex h-full min-w-0 flex-1 cursor-pointer items-center self-stretch bg-transparent text-start outline-none',
@@ -450,9 +436,7 @@ export namespace ColorField {
         'min-w-0 flex-1 truncate font-mono',
         'data-placeholder:font-sans data-placeholder:text-(--ids-color-on-muted)',
       ],
-      // A disabled field is dimmed at its root already, and Clear is only disabled with it.
       clear: [fieldAction.base, 'data-disabled:opacity-100'],
-      // Padding that keeps the popup's corner concentric with the standard-radius area inside it.
       popup: 'concentric-p-3',
     },
     variants: {

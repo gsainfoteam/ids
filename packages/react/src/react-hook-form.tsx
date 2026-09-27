@@ -18,8 +18,6 @@ export type FieldProps = BaseProps &
 type Props = Record<string, unknown>;
 type Handler = (...args: unknown[]) => void;
 
-// RHF must observe changes even when a consumer handler prevents the default action, so the
-// consumer's handler runs first and RHF's always runs after it.
 function bind(props: Props, binding: Props) {
   const result = { ...props, ...binding };
   for (const key of Object.keys(binding)) {
@@ -55,12 +53,6 @@ function isEvent(value: unknown) {
   );
 }
 
-// Which callback carries a control's value in the value and checked modes. A native element
-// reports through its change event, which RHF reads target.value or checked from. A component
-// reports the value itself: through onValueChange or onCheckedChange, or a value-first onChange.
-// A change event a component passes on, from its own input or bubbling up from a group's
-// checkboxes, carries what is on screen (`1,234`, a checkbox's own value) rather than the value,
-// so it never reaches RHF. One edit reported through two callbacks reaches RHF once.
 function reportsFor(
   control: ReactElement,
   controlMode: 'value' | 'checked',
@@ -137,7 +129,6 @@ function ControlledField({
       errorMessage={fieldState.error?.message}
       bindControl={(original, control) => {
         const { value, onChange, ...binding } = field;
-        // A native text input needs a string for an unset value; custom controls may use null.
         const resolvedValue =
           value === undefined ? (controlMode === 'checked' ? false : '') : value;
         const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
@@ -172,7 +163,6 @@ function RhfField({ name, controlMode = 'native', registerOptions, ...props }: F
   );
 }
 
-/** Same anatomy as the base Field; FormProvider + name enables automatic binding. */
 export const Field = Object.assign(RhfField, {
   Label: BaseField.Label,
   Description: BaseField.Description,

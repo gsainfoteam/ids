@@ -1,6 +1,3 @@
-// The text an input would hold after a beforeinput event, so the edit can be checked before the
-// browser applies it and the caret stays put when it is refused. Undo, redo and word deletions,
-// whose extent only the browser knows, are left alone.
 export function textAfterInput(
   value: string,
   start: number,

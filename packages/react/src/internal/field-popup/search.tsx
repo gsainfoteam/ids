@@ -7,16 +7,12 @@ import { TextField } from '../../components/form/text-field';
 import { cn } from '../../utils';
 
 export type FieldPopupSearchProps = Omit<ComponentProps<'input'>, 'size' | 'color'> & {
-  // The listbox the typed text filters, and the id of the option the keyboard is on in it.
   controls: string;
   activeDescendant: string | undefined;
   asChild?: boolean;
   children?: ReactNode;
 };
 
-// The search box at the top of a field popup's list, drawn by Select.SearchField and by
-// ChipField's drawer. The combobox wiring goes on the Input, where TextField lets it win over the
-// caller's props; the caller's handlers still run first.
 export function FieldPopupSearch({
   controls,
   activeDescendant,

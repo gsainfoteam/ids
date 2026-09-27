@@ -73,7 +73,6 @@ export function Item({
   const group = use(ItemGroupContext);
   const resolvedSize = size ?? group?.size ?? 'standard';
   const resolvedDense = dense ?? group?.dense ?? false;
-  // A link or button passed through asChild is interactive by what it is.
   const nativeControl =
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
   const interactive = interactiveProp ?? (onClick != null || nativeControl);
@@ -221,8 +220,6 @@ export namespace Item {
     export type Props = PartProps;
   }
 
-  // Safari drops the list role of a <ul> without bullets unless it is written out. Each child is
-  // placed in an <li>, so items can be dropped in as they are.
   export function Group({ size, dense, className, children, ...props }: Group.Props) {
     const styles = Style();
     return (
@@ -242,7 +239,6 @@ export namespace Item {
     export type Props = ComponentProps<'ul'> & { size?: IdsSize; dense?: boolean };
   }
 
-  // In a group the line is an li left out of the list count; on its own it is an hr.
   export function Separator({ className, ...props }: Separator.Props) {
     const inGroup = use(ItemGroupContext) !== null;
     if (inGroup)
@@ -263,10 +259,6 @@ export namespace Item {
 
   export const Style = tv({
     slots: {
-      // Hover, press and selection lay a translucent layer over whatever the variant's background
-      // is, instead of one color per variant and state. min-w-0 here and on the group lets a
-      // grid or flex parent shrink them, where a truncated title would otherwise widen them to its
-      // full length.
       root: [
         'group/item relative isolate flex w-full min-w-0 items-center text-start text-(--ids-color-on-surface)',
         'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit]',
@@ -274,7 +266,6 @@ export namespace Item {
         'before:transition-opacity before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
         'data-selected:before:opacity-6',
       ],
-      // With a description the row grows to two lines, and the media stays on the first.
       media: [
         'flex shrink-0 items-center justify-center gap-2 text-(--ids-color-on-muted)',
         'group-has-[[data-item-description]]/item:self-start [&_img]:object-cover',
@@ -314,8 +305,6 @@ export namespace Item {
         },
       } satisfies Record<IdsSize, object>,
       dense: { true: {}, false: {} },
-      // A flex box never draws an ellipsis, so a truncated title becomes a block no wider than
-      // its row.
       truncate: { true: { title: 'block max-w-full truncate' }, false: {} },
       interactive: {
         true: {
@@ -332,9 +321,7 @@ export namespace Item {
     compoundVariants: [
       { media: ['soft', 'outline'], size: 'standard', class: { media: 'size-8' } },
       { media: ['soft', 'outline'], size: 'tiny', class: { media: 'size-7' } },
-      // An image in a tile is a thumbnail: it fills the tile and takes its corners.
       { media: ['soft', 'outline'], class: { media: 'overflow-hidden [&>img]:size-full' } },
-      // Half the padding, so a standard row holding a 36px control is 48px tall.
       { dense: true, size: 'standard', class: { root: 'min-h-12 concentric-p-1.5' } },
       { dense: true, size: 'tiny', class: { root: 'min-h-8 concentric-p-1' } },
     ],

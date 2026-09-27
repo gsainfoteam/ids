@@ -446,7 +446,6 @@ export const DevelopmentWarnings: Story = {
     const warn = spyOn(console, 'warn').mockImplementation(() => {});
     await userEvent.click(canvas.getByRole('button', { name: '잘못 쓴 예 보기' }));
     await expect(canvas.getByRole('radiogroup')).toBeVisible();
-    // A production build, the static Storybook included, strips the warnings.
     if (isDevelopment)
       await waitFor(() =>
         expect(warn).toHaveBeenCalledWith(

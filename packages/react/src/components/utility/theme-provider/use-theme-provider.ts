@@ -24,8 +24,6 @@ export type ThemeContextValue = {
   toggleMode: () => void;
 };
 
-// Outside every provider useTheme() still answers, with the values a root provider starts from.
-// A provider compares its parent against this object to know that it is the root.
 const DEFAULT_THEME: ThemeContextValue = {
   color: 'blue',
   mode: 'light',
@@ -47,8 +45,6 @@ function subscribeToScheme(notify: () => void) {
 
 const subscribeToNothing = () => noop;
 
-// The server cannot see the visitor's color scheme, so it renders light and hydration switches
-// to the real scheme without a mismatch.
 function usePrefersDark(enabled: boolean) {
   const supported = typeof window !== 'undefined' && typeof window.matchMedia === 'function';
   return useSyncExternalStore(
@@ -67,8 +63,6 @@ type AxisOptions<T> = {
   setInherited: (value: T) => void;
 };
 
-// An axis a provider does not set belongs to the nearest provider above that does, so both the
-// value and its setter come from there.
 function useAxis<T>({
   owned,
   value,
@@ -166,8 +160,6 @@ export function useThemeProvider({
 
   return {
     context,
-    // A nested region that switches mode would otherwise show the new text colors over the
-    // parent's background, so it paints its own surface.
     paintsSurface: !root && resolvedMode !== parent.resolvedMode,
   };
 }

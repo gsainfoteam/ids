@@ -51,8 +51,6 @@ function assertInput(node: HTMLInputElement) {
   );
 }
 
-// Only a name that says "new password" is a reliable local hint; a sign-up form that names its
-// field `password` still gets current-password, which callers override with autoComplete.
 export function inferAutoComplete(name: string | undefined) {
   const leaf = name?.replaceAll('[', '.').replaceAll(']', '.').split('.').filter(Boolean).at(-1);
   return /^new[-_]?password$/i.test(leaf ?? '') ? 'new-password' : 'current-password';
@@ -73,7 +71,6 @@ export function usePasswordField({
   const generatedId = useId();
   const notify = use(FieldNotifyContext);
 
-  // Values: Input over root over the asChild child. Handlers run child, root, Input.
   const childProps =
     asChild && isValidElement<ComponentProps<'input'>>(children) ? children.props : undefined;
   const native: ComponentProps<'input'> = mergeProps(mergeProps({ ...childProps }, rootProps), own);
@@ -97,8 +94,6 @@ export function usePasswordField({
   const control = useTextControl({ inputRef, disabled, readOnly, clearable });
   const ref = useMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
 
-  // Swapping the input's type moves the caret to the end in some engines, so the selection is
-  // put back once the new type is in the DOM.
   const selection = useRef<Selection | null>(null);
   useLayoutEffect(() => {
     const node = inputRef.current;
@@ -114,8 +109,6 @@ export function usePasswordField({
       );
   }, [native.name]);
 
-  // A form reset hides the password again. A submit does too, and at once: password managers
-  // only offer to save a field that is type="password" when the form is sent.
   const latestSetVisible = useRef(setVisible);
   useLayoutEffect(() => {
     latestSetVisible.current = setVisible;
@@ -181,7 +174,6 @@ export function usePasswordField({
       native.onChange?.(event);
       onValueChange?.(event.currentTarget.value);
     },
-    // Caps Lock can only be read from an event, so every key and press refreshes it.
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
       readCapsLock(event);
       native.onKeyDown?.(event);

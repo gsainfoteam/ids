@@ -68,7 +68,6 @@ type StepButtonProps = Omit<ComponentProps<'button'>, 'children'> & {
   stacked?: boolean;
 };
 
-// Out of the tab order: Arrow keys on the input do the same, as the spinbutton pattern expects.
 function StepButton({ direction, stacked = false, className, ...props }: StepButtonProps) {
   const { field, state, incrementLabel, decrementLabel, styles } = useNumberContext(
     direction > 0 ? 'Increment' : 'Decrement',
@@ -259,8 +258,6 @@ export namespace NumberField {
           (typeof children.type !== 'string' || children.type === 'input'),
         '`<NumberField.Input asChild>` requires one input, or a component forwarding input props and ref.',
       );
-      // The child's own props are already folded into inputProps, and cloning with them clears
-      // its own name and defaultValue, which Slot would keep.
       return cloneElement(children, props);
     }
     invariant(
@@ -278,7 +275,6 @@ export namespace NumberField {
     return <StepButton {...props} direction={-1} />;
   }
 
-  // Increase above decrease, the way a native number input stacks its spin buttons.
   export function Stepper({ asChild, children, className, ...props }: StepperProps) {
     const { styles } = useNumberContext('Stepper');
     const buttons = (

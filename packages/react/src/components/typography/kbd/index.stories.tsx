@@ -26,7 +26,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// The text a screen reader gets: glyphs are hidden, names are read.
 const spoken = (element: Element) => {
   const parts: string[] = [];
   const walk = (node: Node) => {
@@ -40,7 +39,6 @@ const spoken = (element: Element) => {
   return parts.join(' ');
 };
 
-// The text on screen: the names written for screen readers are dropped.
 const visible = (element: Element) => {
   const copy = element.cloneNode(true) as Element;
   copy.querySelectorAll('.sr-only').forEach((node) => node.remove());

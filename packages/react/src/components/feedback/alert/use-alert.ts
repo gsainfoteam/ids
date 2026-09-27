@@ -4,8 +4,6 @@ import { tabbable } from 'tabbable';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 
-// tabbable decides what is reachable by Tab (visibility, inert, disabled fieldsets, radio groups).
-// It still counts an aria-hidden subtree, which must not receive focus either.
 function neighbour(root: HTMLElement) {
   const candidates = tabbable(root.ownerDocument.body).filter(
     (element) => !root.contains(element) && !element.closest('[aria-hidden="true"]'),
@@ -21,8 +19,6 @@ function neighbour(root: HTMLElement) {
   );
 }
 
-// Focus inside a closing alert would fall back to the body, and the next Tab would start from the
-// top of the page. It moves to what comes after the alert instead, or before it at the end.
 function releaseFocus(root: HTMLElement) {
   if (root.contains(root.ownerDocument.activeElement)) neighbour(root)?.focus();
 }
@@ -46,8 +42,6 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
     onValueChange: onOpenChange,
   });
 
-  // A closed alert stays mounted until its exit transition ends, whether it was closed from
-  // inside or by the parent flipping `open`.
   const [lastOpen, setLastOpen] = useState(isOpen);
   const [ending, setEnding] = useState(false);
   if (lastOpen !== isOpen) {
@@ -59,7 +53,6 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
     if (!ending || !node) return;
     releaseFocus(node);
     let cancelled = false;
-    // The frame lets the ending style apply, so the transitions it starts can be awaited.
     const frame = requestAnimationFrame(() => {
       Promise.allSettled(animationsOf(node).map((animation) => animation.finished)).then(() => {
         if (!cancelled) setEnding(false);
@@ -71,8 +64,6 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
     };
   }, [ending, node]);
 
-  // A parent may drop the alert outright, say from an action inside it. Layout cleanup runs while
-  // the element is still in the document, so focus can still be handed on.
   useLayoutEffect(() => {
     if (!node) return;
     return () => releaseFocus(node);
@@ -84,7 +75,6 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    // Escape during IME composition cancels the composition, not the alert.
     const composing = event.nativeEvent.isComposing || event.keyCode === 229;
     if (!dismissible || event.key !== 'Escape' || event.defaultPrevented || composing) return;
     event.preventDefault();

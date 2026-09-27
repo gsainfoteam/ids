@@ -34,11 +34,8 @@ export type PopupAlign = 'start' | 'end';
 
 export type FieldPopupProps = ComponentProps<'div'> & {
   anchor: RefObject<HTMLElement | null>;
-  // true when focus should go back to the trigger: Escape, a drawer's backdrop, a presentation
-  // switch. An outside click on a popover passes false, since focus follows the click.
   onClose: (restoreFocus: boolean) => void;
   mobileVariant?: PopupPresentation;
-  // The minimum width; the popup is never narrower than its anchor unless `matchWidth`.
   preferredWidth?: number;
   matchWidth?: boolean;
   side?: PopupSide;
@@ -46,29 +43,19 @@ export type FieldPopupProps = ComponentProps<'div'> & {
   offset?: number;
   maxHeight?: number;
   initialFocusSelector?: string;
-  // Names the drawer's dialog when neither aria-label nor aria-labelledby is given.
   label?: string;
 };
 
 const VIEWPORT_MARGIN = 8;
 
-// Duck-typed rather than `instanceof Node`, which fails across frames and where the DOM
-// constructors are not globals.
 const isNode = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'nodeType' in value;
 const MIN_HEIGHT = 120;
 const DRAWER_MAX_HEIGHT = 520;
 
-// Placement is asynchronous and can still shrink a popup after it opens, so centering an option
-// on open is repeated once the first placement lands.
 const placed = new WeakSet<HTMLElement>();
 const pendingCenter = new WeakMap<HTMLElement, HTMLElement>();
 
-/**
- * Internal field popup. The native top layer keeps the inherited IDS theme and escapes clipping.
- * On small screens a `drawer` popup is a modal bottom sheet: a dimmed backdrop, focus held
- * inside, the page scroll locked.
- */
 export function FieldPopup({
   anchor,
   onClose,
@@ -102,8 +89,6 @@ export function FieldPopup({
     if (!node) return;
     const doc = node.ownerDocument;
     if (drawer && backdrop.current) showInTopLayer(backdrop.current);
-    // The top layer stacks in the order elements were shown, so a popup that was already open
-    // when it became a drawer is shown again to sit above its backdrop, keeping its focus.
     const active = doc.activeElement as HTMLElement | null;
     if (supportsPopover(node) && node.matches(':popover-open')) node.hidePopover();
     showInTopLayer(node);
@@ -112,7 +97,6 @@ export function FieldPopup({
     return registerPopup(node);
   }, [drawer]);
 
-  // A drawer is modal, so focus stays inside it.
   useLayoutEffect(() => {
     const node = popup.current,
       trigger = anchor.current;
@@ -128,9 +112,6 @@ export function FieldPopup({
       document: node.ownerDocument,
     });
     trap.activate();
-    // A field that closes its sheet sends focus back to its own trigger, which the trap would
-    // pull back inside before the sheet unmounts. The window hears focusin before the trap's
-    // listener on the document does, so the trap lets go first.
     const release = (event: FocusEvent) => {
       if (isNode(event.target) && trigger?.contains(event.target)) trap.deactivate();
     };
@@ -142,9 +123,6 @@ export function FieldPopup({
     };
   }, [anchor, drawer]);
 
-  // A popover follows its anchor. It keeps the side it opened on while its content still fits
-  // there, so a list that shrinks while it is filtered does not jump across the trigger, which is
-  // why the side it landed on is fed back in as the placement it prefers.
   useLayoutEffect(() => {
     const node = popup.current,
       reference = anchor.current;
@@ -153,9 +131,6 @@ export function FieldPopup({
     let current: PopupSide = side;
     let active = true;
     node.dataset.side = side;
-    // The UA's `inset: 0` for popovers would otherwise over-constrain the box, and in RTL the
-    // browser then drops `left` rather than `right`. The height starts at its cap so the first
-    // flip weighs the height the popup will have, not the full length of a long list.
     Object.assign(node.style, { right: 'auto', bottom: 'auto', maxHeight: `${maxHeight}px` });
     const update = () => {
       const other: PopupSide = current === 'bottom' ? 'top' : 'bottom';
@@ -182,8 +157,6 @@ export function FieldPopup({
               });
             },
           }),
-          // A popup too tall for either side still stays on screen, over the trigger if it must,
-          // but never leaves it: once the trigger scrolls away, the popup goes with it.
           shift({ padding: VIEWPORT_MARGIN, crossAxis: true, limiter: limitShift() }),
         ],
       }).then(({ x, y, placement }) => {
@@ -201,9 +174,6 @@ export function FieldPopup({
     };
   }, [anchor, drawer, side, align, offset, matchWidth, preferredWidth, maxHeight]);
 
-  // A drawer is a bottom sheet. The on-screen keyboard shrinks the visual viewport but not the
-  // layout viewport that fixed elements use, so the sheet is lifted by the part the keyboard
-  // covers.
   useLayoutEffect(() => {
     const node = popup.current;
     if (!node || !drawer) return;
@@ -240,18 +210,12 @@ export function FieldPopup({
     const doc = node.ownerDocument;
     const outside = (target: EventTarget | null) =>
       !isNode(target) || (!node.contains(target) && !trigger.contains(target));
-    // An outside press moves focus as well, and the focus it moves belongs to the same close; a
-    // popup kept open by its owner would otherwise hear that close twice.
     let pressedOutside = false;
     const onPointerDown = (event: PointerEvent) => {
-      // A drawer closes on a click of its backdrop instead. Closed on the press, the backdrop
-      // would be gone before the click, which then lands on the page under it, and the press
-      // would move focus to the page after the trigger had taken it back.
       if (drawer) return;
       pressedOutside = outside(event.target);
       if (pressedOutside) close.current(false);
     };
-    // Focus leaving a popover closes it; a drawer's focus trap does not let it leave.
     const onFocusIn = (event: FocusEvent) => {
       if (!drawer && !pressedOutside && outside(event.target)) close.current(false);
     };
@@ -273,8 +237,6 @@ export function FieldPopup({
     };
   }, [anchor, drawer]);
 
-  // Initial focus runs once, and again only if the popup turns into a drawer while focus is
-  // still outside it, since a modal sheet must hold focus.
   useLayoutEffect(() => {
     const node = popup.current;
     if (!node) return;
@@ -302,7 +264,6 @@ export function FieldPopup({
           onClick={() => close.current(true)}
         />
       )}
-      {/* A drawer locks the page scroll but not pinch zoom, which people with low vision need. */}
       <RemoveScroll ref={popup} enabled={drawer} allowPinchZoom forwardProps>
         <div
           {...props}
@@ -345,8 +306,6 @@ function scrollToOption(option: HTMLElement, popup: HTMLElement, center: boolean
   const view = scroller.clientHeight,
     from = scroller.scrollTop;
   let top: number, height: number;
-  // Layout offsets ignore the popup's opening scale, which would skew client rects by several
-  // rows in a long list. They only apply when the scroller is the option's offset parent.
   if (option.offsetParent === scroller) {
     top = option.offsetTop;
     height = option.offsetHeight;
@@ -361,10 +320,6 @@ function scrollToOption(option: HTMLElement, popup: HTMLElement, center: boolean
   else if (top + height > from + view) scroller.scrollTop = top + height - view;
 }
 
-/**
- * Reveal an option without scrolling the document behind its top-layer popup. `center` puts it in
- * the middle, which is how a list should open on its selected option.
- */
 export function revealPopupOption(
   option: HTMLElement | null | undefined,
   { center = false }: { center?: boolean } = {},

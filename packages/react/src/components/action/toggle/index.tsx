@@ -41,7 +41,6 @@ export namespace Toggle {
     pressed?: boolean;
     defaultPressed?: boolean;
     onPressedChange?: (pressed: boolean) => void;
-    // Identifies the toggle inside a ToggleGroup, which then owns its pressed state.
     value?: string;
     children?: ReactNode;
     className?: string;

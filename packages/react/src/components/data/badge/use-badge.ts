@@ -39,8 +39,6 @@ export function useBadge({
   const display = badgeDisplay(content, max, showZero);
   const hidden = invisible || (!dot && display.empty);
 
-  // An unlabelled count is read as a description of what it is attached to ("Notifications,
-  // button, 3") instead of as a stray number after it.
   const describes = label === undefined && !dot && !hidden;
   const anchor =
     describes && isValidElement(children) && children.type !== Fragment

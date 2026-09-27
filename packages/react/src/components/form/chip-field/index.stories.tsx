@@ -17,7 +17,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-// A Fragment, not a component: ChipField finds items only as direct children or inside Fragments.
 const skills = (
   <>
     <ChipField.Group heading="프론트엔드">

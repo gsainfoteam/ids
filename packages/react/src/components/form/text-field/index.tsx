@@ -148,8 +148,6 @@ export namespace TextField {
     };
   }
 
-  // Shown only while there is something to clear. It clears through a real edit, so onChange,
-  // react-hook-form and undo all see it, and it hands focus back to the input.
   export const Clear = TextControlClear;
 
   export const Style = textControlStyle;

@@ -45,8 +45,6 @@ export type NumberFieldInputProps = Omit<
   | 'style'
 >;
 
-// NumberParser reads standard notation only: "1.2E-6" would come back as 0.6 and "1.2K" as
-// nothing, so the other notations are not offered.
 export type NumberFieldFormatOptions = Omit<
   Intl.NumberFormatOptions,
   'notation' | 'compactDisplay'
@@ -73,23 +71,16 @@ export type UseNumberFieldOptions = {
 
 type Draft = { text: string; value: number | null; formatter: NumberFormatter };
 
-// Intl's default of three fraction digits would show 0.0000001 as 0; significant digits keep
-// small values visible without imposing a precision on large ones.
 const DEFAULT_FORMAT: Intl.NumberFormatOptions = { maximumSignificantDigits: 21 };
 
-// The percent parser reads a lone "%" as 0. Text without a digit, in any numbering system the
-// parser detects, holds no value yet.
 const DIGIT = /[\p{Nd}\u3007\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d]/u;
 
 const FIRST_REPEAT_DELAY = 400;
 
-// Holding a stepper steps once, waits, then repeats faster and faster down to a floor.
 function repeatDelay(count: number) {
   return count === 0 ? FIRST_REPEAT_DELAY : Math.max(30, Math.round(120 * 0.88 ** count));
 }
 
-// iOS number keyboards have no minus key, so a field that accepts negatives asks for the full
-// keyboard there. The platform is unknown on the server, so it is read after hydration.
 const subscribeToNothing = () => noop;
 function isAppleTouch() {
   const { userAgent, platform, maxTouchPoints } = navigator;
@@ -148,7 +139,6 @@ export function useNumberField({
       'standard',
     'NumberField: formatOptions.notation must be "standard"; typed text in other notations cannot be parsed.',
   );
-  // An explicit step defines a grid, anchored at min, that typed values snap to.
   const snap = step !== undefined;
   const base = min ?? 0;
   const lower = min ?? -Infinity;
@@ -171,8 +161,6 @@ export function useNumberField({
   });
   const [draft, setDraft] = useState<Draft | null>(null);
   const composing = useRef(false);
-  // An inline options object must not rebuild the formatter, or a parent echoing the value would
-  // throw away the text being typed.
   const formatKey = JSON.stringify(formatOptions ?? null);
   const { formatter, parser } = useMemo(() => {
     const options: Intl.NumberFormatOptions = JSON.parse(formatKey) ?? DEFAULT_FORMAT;
@@ -182,15 +170,11 @@ export function useNumberField({
     };
   }, [locale, formatKey]);
   const format = (next: number | null) => (next == null ? '' : formatter.format(next));
-  // What the user typed stays on screen while it still means the current value; otherwise the
-  // value is shown formatted.
   const display =
     draft && Object.is(draft.value, current) && draft.formatter === formatter
       ? draft.text
       : format(current);
 
-  // Held steppers and the wheel step again before React has rendered the last step, so they
-  // read the value from here rather than from this render.
   const latestValue = useRef(current);
   useLayoutEffect(() => {
     latestValue.current = current;
@@ -205,9 +189,6 @@ export function useNumberField({
     return Number.isNaN(parsed) ? null : Object.is(parsed, -0) ? 0 : parsed;
   };
 
-  // A partial number ("-", "1.", "1.234,") is kept as typed and reports what it means so far. A
-  // text that cannot become a number in this locale and format is refused, and React puts the
-  // last accepted text back.
   const accept = (text: string) => {
     if (!parser.isValidPartialNumber(text, min, max)) return false;
     const next = read(text);
@@ -216,21 +197,15 @@ export function useNumberField({
     return true;
   };
 
-  // Only a value the user typed is committed: a value set from outside is never rewritten just
-  // because the field was focused and left.
   const commitDraft = () => {
     if (!draft) return;
     setDraft(null);
-    // A composition left unfinished can hold text that is no number; the value stays as it was.
     const text = inputRef.current?.value ?? draft.text;
     if (!parser.isValidPartialNumber(text, min, max)) return;
     const next = read(text);
     setCurrent(next == null ? null : fit(next));
   };
 
-  // The native stepUp() rule: a value off the step grid first moves to the next grid value in
-  // that direction; a value on the grid moves by the amount. From empty, stepping starts at zero,
-  // or at the nearest bound when zero is out of range.
   const stepBy = (direction: 1 | -1, amount: number) => {
     if (locked) return false;
     const previous = latestValue.current;
@@ -264,8 +239,6 @@ export function useNumberField({
     latest.current = { stepBy, refuses };
   });
 
-  // Press and hold on a stepper keeps stepping. Pointer capture sends the release to the button
-  // even when the pointer has slid off it.
   const repeat = useRef<{ timer: number } | null>(null);
   const pointerStep = useRef(false);
   const stopRepeat = () => {
@@ -287,9 +260,6 @@ export function useNumberField({
   };
   useEffect(() => stopRepeat, []);
 
-  // An edit is checked before the browser applies it: refusing it there keeps the caret where it
-  // was, while undoing it after the change event would throw the caret to the end. The change
-  // handler still checks what gets past this, such as autofill.
   useEffect(() => {
     const input = inputRef.current;
     if (!input) return;
@@ -314,8 +284,6 @@ export function useNumberField({
     const onWheel = (event: WheelEvent) => {
       if (input.ownerDocument.activeElement !== input || event.ctrlKey || event.metaKey) return;
       if (Math.abs(event.deltaY) < Math.abs(event.deltaX) || event.deltaY === 0) return;
-      // The page would scroll under the pointer otherwise, which is why this listener is not
-      // passive and why the feature is opt-in.
       event.preventDefault();
       latest.current.stepBy(event.deltaY < 0 ? 1 : -1, event.shiftKey ? large : stepSize);
     };
@@ -328,8 +296,6 @@ export function useNumberField({
     setDraft(null);
   });
 
-  // Out of range is reported through native validity too, so a form refuses to submit it and
-  // Field.Error can show why.
   const rangeMessage =
     current == null
       ? ''
@@ -338,8 +304,6 @@ export function useNumberField({
         : max !== undefined && current > max
           ? messages.numberField.rangeOverflow(format(max))
           : '';
-  // Steppers, keys and the wheel change the value without an input event, so the enclosing
-  // Field is told directly; its filled, dirty and error state follow.
   const notify = use(FieldNotifyContext);
   useLayoutEffect(() => {
     inputRef.current?.setCustomValidity(rangeMessage);
@@ -366,8 +330,6 @@ export function useNumberField({
     ref,
     type: 'text',
     role: 'spinbutton',
-    // The hidden input carries the name, so the form gets the plain number rather than the
-    // formatted text on screen.
     name: undefined,
     value: display,
     defaultValue: undefined,
@@ -403,8 +365,6 @@ export function useNumberField({
     },
     onCompositionEnd: (event: CompositionEvent<HTMLInputElement>) => {
       composing.current = false;
-      // An IME can leave full-width digits; NFKC turns them into the ASCII digits the formatted
-      // value uses. A composition that is not a number is dropped.
       if (!locked && !accept(event.currentTarget.value.normalize('NFKC'))) setDraft(null);
       native.onCompositionEnd?.(event);
     },
@@ -425,7 +385,6 @@ export function useNumberField({
         event.preventDefault();
         stepBy(key === 'PageUp' ? 1 : -1, large);
       } else if (key === 'Home' || key === 'End') {
-        // Without a bound Home and End keep moving the caret.
         if (jumpTo(key === 'Home' ? min : max)) event.preventDefault();
       } else if (key === 'Enter') {
         commitDraft();
@@ -436,8 +395,6 @@ export function useNumberField({
   const stepperProps = (direction: 1 | -1) => ({
     onPointerDown: (event: PointerEvent<HTMLButtonElement>) => {
       if (event.button !== 0 || locked) return;
-      // A mouse press keeps focus in the input so the keyboard keeps working; a tap leaves it
-      // alone so the on-screen keyboard does not open.
       if (event.pointerType === 'mouse') {
         event.preventDefault();
         inputRef.current?.focus({ preventScroll: true });
@@ -450,8 +407,6 @@ export function useNumberField({
     onPointerCancel: stopRepeat,
     onLostPointerCapture: stopRepeat,
     onContextMenu: (event: MouseEvent<HTMLButtonElement>) => event.preventDefault(),
-    // A click that follows a press already stepped; one without a press comes from the keyboard
-    // or a screen reader and steps once.
     onClick: () => {
       if (pointerStep.current) {
         pointerStep.current = false;

@@ -2,9 +2,6 @@ import type { ReactNode } from 'react';
 
 import { cn } from '../src/utils';
 
-// Every Gallery story is built from these parts so that all components read the same way:
-// a titled section per axis, a label column on the left, and a matrix for two-axis grids.
-
 export function Showcase({ children, className }: { children: ReactNode; className?: string }) {
   return <div className={cn('flex w-full max-w-5xl flex-col gap-12', className)}>{children}</div>;
 }

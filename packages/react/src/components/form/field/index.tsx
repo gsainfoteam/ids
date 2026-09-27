@@ -49,7 +49,6 @@ type PartProps<Tag extends 'label' | 'div', S> = Omit<ComponentProps<Tag>, keyof
 export type FieldProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 'style'> & {
   children: ReactNode;
   orientation?: FieldOrientation;
-  /** @deprecated Use `orientation`. */
   variant?: FieldOrientation;
   size?: IdsSize;
   invalid?: boolean;
@@ -57,7 +56,6 @@ export type FieldProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 
   required?: boolean;
   dirty?: boolean;
   touched?: boolean;
-  /** Forwarded to the control. For automatic registration use /react-hook-form. */
   name?: string;
   className?: StateValue<FieldState, string | undefined>;
   style?: StateValue<FieldState, CSSProperties | undefined>;
@@ -109,8 +107,6 @@ function stateAttributes(state: FieldState) {
   };
 }
 
-// FieldRoot decides which errors reach aria-describedby with the same rule the part renders by,
-// so the description never points at an error that is not on screen.
 function errorShown(
   { match, children }: { match?: FieldValidityKey; children?: unknown },
   { state, errorMessage, validity }: Pick<FieldContextValue, 'state' | 'errorMessage' | 'validity'>,
@@ -150,7 +146,6 @@ function joinIds(...values: unknown[]) {
   return uniq(ids.filter(Boolean)).join(' ') || undefined;
 }
 
-/** Internal bridge shared with the optional RHF entry point. */
 export function FieldRoot({
   children,
   id,
@@ -362,7 +357,6 @@ export namespace Field {
     );
   }
 
-  // A hint is replaced by the error while the field is invalid.
   export function Hint({ asChild, className, style, children, ...rest }: HintProps) {
     const { state, styles } = usePart('Hint');
     if (state.invalid) return null;
@@ -406,8 +400,6 @@ export namespace Field {
   }
 
   export const Style = tv({
-    // No label slot: Field.Label is a Label, which draws its own size, required, disabled and
-    // invalid looks.
     slots: {
       root: 'grid min-w-0 gap-x-3 gap-y-2',
       description: 'text-(--ids-color-on-muted)',
@@ -423,13 +415,10 @@ export namespace Field {
       } satisfies Record<IdsSize, object>,
       orientation: {
         vertical: {},
-        // The label takes the first column and lines up with the control; every other part sits
-        // in the second column under the control.
         horizontal: {
           root: 'grid-cols-[auto_minmax(0,1fr)] [&>:not([data-field-part=label])]:col-start-2 [&>[data-field-part=label]]:col-start-1 [&>[data-field-part=label]]:self-center',
         },
       } satisfies Record<FieldOrientation, object>,
-      // A horizontal label lines up with the control, which sits below the description.
       described: { true: {}, false: {} },
       disabled: {
         true: {

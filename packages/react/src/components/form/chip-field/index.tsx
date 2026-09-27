@@ -55,8 +55,6 @@ export type ChipFieldState = {
 
 export type ChipFieldItemState = { selected: boolean; highlighted: boolean; disabled: boolean };
 
-// `name`, `form` and `required` describe the submitted chips, not the typed query, so they
-// stay on the root: a named query input would submit the half-typed search text.
 export type ChipFieldInputProps = Omit<
   ComponentProps<'input'>,
   | 'type'
@@ -173,9 +171,6 @@ export function ChipField({
   style,
   ...rootInputProps
 }: ChipField.Props) {
-  // react-hook-form's value binding passes a native onChange as well as onValueChange. The chips
-  // are reported through onValueChange, so an onChange here must not reach the search input,
-  // where it would record the typed text as the field's value.
   const { onChange: _nativeChange, ...inputProps } = rootInputProps as ChipFieldInputProps & {
     onChange?: unknown;
   };
@@ -194,8 +189,6 @@ export function ChipField({
   );
   const { leading, input, trailing, popup } = splitChildren(children);
 
-  // The sentinel's own props win over the root's, so container state is derived from the
-  // merged result, not from the root props alone.
   const merged = { ...inputProps, ...input.props };
   const isDisabled = !!(input.props.disabled ?? disabled);
   const isReadOnly = !!merged.readOnly;
@@ -328,8 +321,6 @@ export function ChipField({
         <Chips />
         {input}
         <Adornments items={trailing} className={styles.adornment()} />
-        {/* A field that only creates values, like a list of addresses, has nothing to open. The
-            chevron is a glyph, not an IconButton, since the input is the field's one Tab stop. */}
         {options.length > 0 && (
           <ChevronDownIcon aria-hidden="true" data-chip-field-icon="" className={styles.icon()} />
         )}
@@ -358,9 +349,6 @@ export function ChipField({
   );
 }
 
-// A chip is focused through its remove button, which is out of the Tab order: the arrow keys
-// reach it from the input, so Tab still leaves the field in one step. The field moves focus after
-// a removal itself, to a neighbour or back to the input, so the Chip's own move is prevented.
 function Chips() {
   const c = useChip('Chips');
   return c.field.state.selected.map((item) => {
@@ -399,7 +387,6 @@ function Chips() {
   });
 }
 
-// A bare input among the chips: the field draws the box, so a TextField would add a second one.
 function ChipInput({
   asChild,
   children,
@@ -414,9 +401,6 @@ function ChipInput({
   const { inputRef } = c;
 
   const props = {
-    // Input values win over the root's, and handlers compose so Field and react-hook-form
-    // wiring on the root still runs. The combobox wiring is merged last: its handlers run
-    // after the user's (skipped if they preventDefault) and its ARIA state cannot be replaced.
     ...mergeProps(mergeProps(c.inputDefaults, mergeProps(c.inputProps, rest)), c.control),
     className: c.styles.input({ className }),
     style,
@@ -437,8 +421,6 @@ function ChipInput({
   return <input {...props} ref={mergeRefs(inputRef, c.inputProps.ref, ref)} />;
 }
 
-// On a small screen the list opens as a modal sheet, which the field's own input sits behind,
-// so the sheet carries a search field of its own bound to the same query.
 function DrawerSearch() {
   const c = useChip('Content');
   const { drawerInputRef } = c;
@@ -494,7 +476,6 @@ function ChipContent({ asChild, children, className, ...props }: ChipField.Conte
   );
 }
 
-// An option highlighted through aria-activedescendant, not an Item row that takes focus itself.
 function ChipItem({
   value,
   label: _label,
@@ -627,8 +608,6 @@ function ChipCreate({ asChild, children, className, ...props }: ChipField.Create
   );
 }
 
-// These stay mounted as live regions, so the change is announced when the list empties or the
-// limit is reached.
 function ChipEmpty({ asChild, children, className, ...props }: ChipField.EmptyProps) {
   const c = useChip('Empty');
   const none = c.field.state.visible.length === 0 && !c.field.state.canCreate;
@@ -684,8 +663,6 @@ export namespace ChipField {
     onOpenChange?: (open: boolean) => void;
     creatable?: boolean;
     onCreate?: (value: string) => void;
-    // Checks a value typed or pasted as a new chip: true (or nothing) accepts it, false rejects
-    // it with the default message, a string rejects it with that message.
     validate?: (value: string) => ChipValidateResult;
     maxCount?: number;
     variant?: ChipFieldVariant;
@@ -712,9 +689,7 @@ export namespace ChipField {
   export type ContentProps = BoxProps;
   export type ItemProps = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
     value: string;
-    // Shown on the chip; the item's text by default.
     label?: string;
-    // Matched by the search text; the label by default.
     searchValue?: string;
     disabled?: boolean;
     asChild?: boolean;
@@ -740,7 +715,6 @@ export namespace ChipField {
   export const Limit = ChipLimit;
 
   export namespace Input {
-    // `onChange` here observes the typed search text; the selected chips are the root's.
     export type Props = ChipFieldInputProps & {
       onChange?: ComponentProps<'input'>['onChange'];
       onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
@@ -762,16 +736,11 @@ export namespace ChipField {
         '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
         '[&_button]:p-0',
       ],
-      // A chip is a neutral Chip sized to the field's rows; the theme color only marks the one the
-      // arrow keys are on, which Chip reports as data-focus-visible.
       chip: [
         'max-w-full min-w-0 gap-0.5 data-disabled:opacity-60',
         'transition-[color,background-color] duration-(--ids-motion-fast) motion-reduce:transition-none',
         'data-focus-visible:bg-(--ids-color-primary)/15 data-focus-visible:text-(--ids-color-primary)',
       ],
-      // The remove button carries data-field-input, so the field rings while it has focus and the
-      // chip takes the tint; like a nested field, it draws no ring of its own. The glyph is small,
-      // so an invisible margin widens what a finger can hit.
       chipRemove: 'relative ring-0! after:absolute after:-inset-1',
       input: [
         'min-w-20 flex-1 bg-transparent py-1 outline-none',
@@ -791,13 +760,11 @@ export namespace ChipField {
       ],
     },
     variants: {
-      // On the muted fill of `soft` a muted chip would vanish, so it takes the surface instead.
       variant: {
         outline: { root: fieldTrigger.variant.outline },
         soft: { root: fieldTrigger.variant.soft, chip: 'bg-(--ids-color-surface)' },
         ghost: { root: fieldTrigger.variant.ghost },
       } satisfies Record<ChipFieldVariant, object>,
-      // The shell grows with wrapped chips, so the control height is a floor, not a height.
       size: {
         standard: {
           root: [fieldTrigger.size.standard, 'h-auto min-h-(--ids-size-control-standard)'],

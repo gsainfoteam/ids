@@ -83,8 +83,6 @@ export function Avatar({
   const imageSrc = image?.props.src ?? src;
   const { status, report } = useAvatarStatus(imageSrc || undefined, onStatusChange);
 
-  // alt="" marks the avatar as decorative, the way it does on <img>: next to a visible name the
-  // avatar would otherwise be read twice.
   const decorative = alt === '' || ariaHidden === true || ariaHidden === 'true';
   const label = [ariaLabel, alt, name].find((candidate) => candidate?.trim());
   useEffect(() => {
@@ -114,7 +112,6 @@ export function Avatar({
         className={styles.root({ className: resolveState(className, state) })}
         style={resolveState(style, state)}
       >
-        {/* An avatar inside this one, say in a tooltip, is not part of the stack. */}
         <AvatarCutoutContext value={undefined}>
           {image === undefined && imageSrc ? <Avatar.Image /> : null}
           {nodes}
@@ -157,8 +154,6 @@ export namespace Avatar {
     if (!current || state.status === 'error') return null;
     return (
       <img
-        // A new src is a new element, so the previous person's photo never stays on screen
-        // while the next one loads.
         key={current}
         alt=""
         loading="lazy"
@@ -224,8 +219,6 @@ export namespace Avatar {
     };
   }
 
-  // Masks cut the overlapped side out of an avatar in a stack. The gap then shows the real
-  // background, whatever it is, where a colored ring would only match one background.
   const circleMask = cn(
     '[mask-image:radial-gradient(50%_50%_at_var(--avatar-hole-x)_50%,transparent_calc(100%_+_var(--ag-gap)),#000_calc(100%_+_var(--ag-gap)_+_0.5px))]',
   );
@@ -237,8 +230,6 @@ export namespace Avatar {
 
   export const Style = tv({
     slots: {
-      // The inner edge keeps a light photo or a muted fallback visible on a surface of the same
-      // color. It is drawn above the image, so it follows the cut-out as well.
       root: [
         'relative inline-flex shrink-0 items-center justify-center overflow-hidden align-middle',
         'bg-(--ids-color-muted) text-(--ids-color-on-muted) select-none @container',
@@ -246,7 +237,6 @@ export namespace Avatar {
         'after:inset-ring-1 after:inset-ring-(--ids-color-on-surface)/8',
       ],
       image: 'absolute inset-0 size-full object-cover',
-      // Container units keep initials in proportion when a consumer resizes the avatar.
       fallback: [
         'inline-flex size-full items-center justify-center font-medium',
         'text-[length:max(10px,40cqi)] leading-none [&_svg]:size-[62%]',
@@ -259,7 +249,6 @@ export namespace Avatar {
       } satisfies Record<AvatarShape, object>,
       size: {
         standard: { root: 'size-10 [--avatar-radius:var(--ids-radius-standard)]' },
-        // The standard radius would round a 24px square nearly into a circle.
         tiny: { root: 'size-6 [--avatar-radius:var(--ids-radius-indicator)]' },
       } satisfies Record<IdsSize, object>,
       cutout: { start: {}, end: {}, none: {} },

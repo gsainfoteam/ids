@@ -63,7 +63,6 @@ async function type(node, value) {
 const trigger = () => host.querySelector('[data-color-field] button[aria-haspopup]');
 const dialog = () => host.querySelector('[role=dialog]');
 const editor = () => host.querySelector('[data-color-picker-input]');
-// The area's two axes are native range inputs; hue and alpha are Slider thumbs.
 const slider = (name) =>
   host.querySelector(
     `input[type=range][aria-label="${name}"], [role=slider][aria-label="${name}"]`,

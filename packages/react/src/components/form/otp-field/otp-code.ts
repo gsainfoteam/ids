@@ -6,8 +6,6 @@ export type SelectionHistory = Selection & { direction: 'forward' | 'backward' |
 const NUMERIC = '[0-9]';
 const ALPHANUMERIC = '[A-Za-z0-9]';
 
-// A RegExp pattern describes one character. Anchors and global flags would make .test() stateful
-// or reject every single character, so the source is wrapped and g/y are dropped.
 function characterSource(pattern: OTPFieldPattern) {
   if (pattern === 'numeric') return NUMERIC;
   if (pattern === 'alphanumeric') return ALPHANUMERIC;
@@ -23,20 +21,14 @@ export function createCharacterTest(pattern: OTPFieldPattern) {
   return (character: string) => expression.test(character);
 }
 
-// The value only ever holds accepted characters, so native validation only has to check the
-// length: a half-filled code then fails the form's own validity check. Checking characters here
-// as well would need regex flags, which the pattern attribute cannot carry.
 export function htmlPattern(length: number) {
   return `.{${length}}`;
 }
 
-// NFKC folds full-width digits and letters that some keyboards and SMS apps produce.
 export function sanitize(raw: string, accepts: (character: string) => boolean) {
   return Array.from(raw.normalize('NFKC')).filter(accepts).join('');
 }
 
-// Text inserted over a selection replaces the selection and then overwrites as many following
-// characters as it is long, so pasting "34" onto the third slot of "12xx56" keeps "56".
 export function insertText(value: string, { start, end }: Selection, text: string, length: number) {
   if (Array.from(text).length >= length) return Array.from(text).slice(0, length).join('');
   const chars = Array.from(value);
@@ -45,10 +37,6 @@ export function insertText(value: string, { start, end }: Selection, text: strin
   return [...chars.slice(0, start), ...inserted, ...tail].slice(0, length).join('');
 }
 
-// Mirrors the browser caret onto the slots. A collapsed caret over an existing character is
-// widened to select that character, so typing overwrites it instead of shifting the code right.
-// Moving left from a one-character selection must land on the previous character rather than
-// re-select the same one, which is what the previous selection is kept for.
 export function normalizeSelection(
   valueLength: number,
   maxLength: number,

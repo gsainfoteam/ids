@@ -57,11 +57,8 @@ export namespace ToggleGroup {
 
   type CommonProps = Omit<Group.Props, 'defaultValue' | 'onChange' | 'separator' | 'role'> & {
     disabled?: boolean;
-    // Arrow keys wrap from the last item to the first.
     loop?: boolean;
-    // Single: an item stays checked once checked. Both: a native form refuses to submit empty.
     required?: boolean;
-    // Submits each pressed value under this name.
     name?: string;
     form?: string;
   };
@@ -85,8 +82,6 @@ export namespace ToggleGroup {
 
   export const Separator = Group.Separator;
 
-  // In a row stretched wider than its toggles, they share the width like a segmented control. A
-  // column must not: a zero flex basis there collapses the toggles to no height.
   export const Style = tv({
     variants: {
       orientation: {

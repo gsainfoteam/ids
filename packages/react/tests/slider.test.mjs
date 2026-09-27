@@ -57,7 +57,6 @@ async function release(target, name) {
   });
 }
 
-// jsdom lays nothing out, so the track is given a box: 200px wide at x 0, or 200px tall at y 0.
 function layout() {
   const track = slider().querySelector('[data-orientation]:not([data-slider])') ?? slider();
   track.getBoundingClientRect = () => ({

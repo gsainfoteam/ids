@@ -41,6 +41,15 @@ export type UseSliderOptions = {
 
 type Drag = { index: number; tied: boolean; from: readonly number[]; pointerId: number };
 
+function tryCapturePointer(element: Element, pointerId: number) {
+  try {
+    element.setPointerCapture?.(pointerId);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function toArray(value: SliderValue | undefined) {
   if (value === undefined) return undefined;
   return typeof value === 'number' ? [value] : [...value];
@@ -72,8 +81,6 @@ export function useSlider({
   });
   const controlled = value !== undefined;
 
-  // Out-of-range or unordered values are drawn clamped and in order rather than thrown on, since a
-  // controlled value can pass through such a state while its parent is still updating.
   const values = [...stored]
     .map((entry) => clamp(Number.isFinite(entry) ? entry : min, min, max))
     .sort((a, b) => a - b);
@@ -100,8 +107,6 @@ export function useSlider({
     if (!isEqual(from, latest.current)) onValueCommit?.(output(latest.current));
   };
 
-  // A drag reports on every pointer move. Each move is rendered at once so the next move measures
-  // from what is on screen, not from a state update still waiting to render.
   const moveTo = (next: readonly number[]) => {
     flushSync(() => setStored(next));
   };
@@ -135,18 +140,11 @@ export function useSlider({
     if (disabled || event.button !== 0) return;
     const raw = valueAt(event);
     if (raw === null) return;
-    // The root is focusable for `ref.focus()`, and the mousedown that follows would focus it and
-    // take focus away from the thumb being dragged. Cancelling here stops that mousedown.
     event.preventDefault();
     const { index, tied } = closestThumb(latest.current, raw);
     focusThumb(index);
     if (readOnly) return;
-    try {
-      event.currentTarget.setPointerCapture?.(event.pointerId);
-    } catch {
-      // A synthetic pointer (a test, a replay tool) is not an active pointer and cannot be
-      // captured; the drag still works while the pointer stays over the slider.
-    }
+    tryCapturePointer(event.currentTarget, event.pointerId);
     drag.current = { index, tied, from: latest.current, pointerId: event.pointerId };
     setDragging(index);
     if (!tied) moveTo(moveThumb(latest.current, index, raw, bounds));
@@ -157,7 +155,6 @@ export function useSlider({
     if (!active || active.pointerId !== event.pointerId) return;
     const raw = valueAt(event);
     if (raw === null) return;
-    // Stacked thumbs are told apart by the first move: the one that can go that way follows.
     if (active.tied) {
       const at = latest.current[active.index]!;
       if (raw === at) return;
@@ -199,8 +196,6 @@ export function useSlider({
     moveTo(moveThumb(latest.current, index, target, bounds));
   };
 
-  // A held key repeats, so the value is committed once the key is released, or when focus leaves
-  // before that happens.
   const settleKeys = () => {
     const from = keyFrom.current;
     if (!from) return;
@@ -212,7 +207,6 @@ export function useSlider({
     if (!controlled) setStored(initial, { silent: true });
   });
 
-  // `ref` and a Field label's id point at the root; focus belongs on a thumb.
   const focusFirstThumb = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) focusThumb(0);
   };

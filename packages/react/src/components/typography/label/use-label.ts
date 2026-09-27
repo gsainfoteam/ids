@@ -14,8 +14,6 @@ import { mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { FieldLabelContext, FieldSizeContext } from '../../form/field/context';
 
-// Anything a label can stand for. A native input, select, textarea or button is labelled by the
-// browser itself; the ARIA widgets are not, so the label does that part by hand.
 const CONTROL = [
   'input:not([type="hidden"])',
   'select',
@@ -38,7 +36,6 @@ const WATCHED = ['disabled', 'required', 'aria-disabled', 'aria-required', 'data
 const DISABLED = 1;
 const REQUIRED = 2;
 
-// The control a click and a name have to be forwarded to, when the browser will not do it.
 function customControl(label: HTMLLabelElement, htmlFor: string | undefined) {
   if (label.control) return null;
   const target = htmlFor ? label.ownerDocument.getElementById(htmlFor) : label;
@@ -83,9 +80,6 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
     [ref],
   );
 
-  // The label mirrors its control, so `disabled` or `required` set on the input shows here too,
-  // and follows it when it changes later. A label given both has nothing to mirror, so it keeps
-  // no observer on the control.
   const mirroring = disabled === undefined || required === undefined;
   const subscribe = useCallback(
     (notify: () => void) => {
@@ -105,8 +99,6 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
 
   const fieldLabel = use(FieldLabelContext);
 
-  // A div with role="slider" is not labelable, so htmlFor would name nothing. The label names it
-  // by reference instead and hands the attribute back when it goes away.
   useEffect(() => {
     if (!node || fieldLabel) return;
     const control = customControl(node, htmlFor);
@@ -123,9 +115,6 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
   useEffect(() => {
     if (!isDevelopment || !node || fieldLabel) return;
     const control = controlOf(node, htmlFor);
-    // A label wrapping its own control, such as an option of a CheckboxGroup, names that control
-    // rather than the field, so only a label standing apart from its control is taken for a
-    // misplaced Field.Label.
     if (insideField && !(control && node.contains(control)))
       console.warn('[IDS] Label: inside a Field, use Field.Label instead.');
     else if (!control)
@@ -137,8 +126,6 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
     required: required ?? (mirrored & REQUIRED) !== 0,
   };
 
-  // The browser moves focus for native controls on its own; this covers the rest the same way,
-  // and toggles a checkbox-like widget as a native label would.
   const onLabelClick = (event: MouseEvent<HTMLLabelElement>) => {
     if (event.defaultPrevented || !node || state.disabled) return;
     const control = customControl(node, htmlFor);

@@ -73,7 +73,6 @@ export function Progress({
   const state: Progress.State = { ...progress, shape, size, colorScheme };
   const styles = Progress.Style({ shape, size, colorScheme, indeterminate: state.indeterminate });
 
-  // A progressbar's children are presentational, so the name comes from the Label by reference.
   const progressbar = {
     role: 'progressbar',
     id,
@@ -127,8 +126,6 @@ export function Progress({
     );
   }
 
-  // Children before a Progress.Track sit above the bar and children after it below, so the order
-  // they are written in is the order they appear.
   const leading = trackIndex === -1 ? content : content.slice(0, contentBefore(trackIndex));
   const trailing = trackIndex === -1 ? [] : content.slice(contentBefore(trackIndex));
   const track =
@@ -199,7 +196,6 @@ export namespace Progress {
     export type Props = PartProps<'span'>;
   }
 
-  // The progressbar already reports the value, so the visible copy is hidden from screen readers.
   export function Value({ asChild, className, children, ...props }: Value.Props) {
     const { state, styles } = useProgressContext('Progress.Value');
     const Root = asChild ? Slot : 'span';
@@ -326,8 +322,6 @@ export namespace Progress {
         danger: { root: '[--progress-fill:var(--ids-color-danger)]' },
       } satisfies Record<ColorScheme, object>,
       indeterminate: {
-        // The slide runs the other way in right-to-left text. Reduced motion keeps a still,
-        // dimmed full bar rather than a moving one.
         true: {
           indicator: [
             'w-1/4 animate-progress-slide rtl:[animation-direction:reverse]',
@@ -335,8 +329,6 @@ export namespace Progress {
           ],
           svg: 'animate-spin motion-reduce:animate-none',
         },
-        // The bar is full width and slid back by what is missing, so an update moves it on the
-        // compositor instead of re-laying out a width. Right-to-left slides it the other way.
         false: {
           indicator: [
             'w-full translate-x-[calc((var(--progress-ratio)-1)*100%)]',
@@ -346,8 +338,6 @@ export namespace Progress {
         },
       },
     },
-    // Beside a bar the value matches the label and keeps to the end of the row, even alone.
-    // Inside a 40px ring it has to be caption-sized and centred.
     compoundVariants: [
       { shape: 'linear', size: 'standard', class: { value: 'ms-auto text-body-b3-regular' } },
       { shape: 'linear', size: 'tiny', class: { value: 'ms-auto text-caption-c1-regular' } },

@@ -23,7 +23,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const frame = cn('rounded-standard inset-ring-1 inset-ring-(--ids-color-border)');
-// Stretched so the space a Spacer takes shows even in a row that centers its items.
 const fill = cn('self-stretch bg-(--ids-color-primary)/15');
 
 export const Playground: Story = {

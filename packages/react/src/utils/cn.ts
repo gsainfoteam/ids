@@ -4,8 +4,6 @@ import type { CnFunction } from 'cn';
 
 const isTextStyle = (value: string) => /^(headline|subtitle|body|caption|button)-/.test(value);
 
-// concentric-p-* sets both padding and radius, so it replaces an earlier p-* or rounded-*.
-// The reverse is left alone on purpose: a later p-6 must not strip the concentric radius.
 const paddingGroups: DefaultClassGroupIds[] = ['p', 'px', 'py', 'ps', 'pe', 'pt', 'pr', 'pb', 'pl'];
 const roundedGroups: DefaultClassGroupIds[] = [
   'rounded',

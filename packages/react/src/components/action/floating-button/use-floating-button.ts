@@ -8,7 +8,6 @@ export type FloatingPlacement = 'top-left' | 'top-right' | 'bottom-left' | 'bott
 
 type Hideable = { 'aria-hidden'?: unknown; children?: ReactNode };
 
-// Visible text makes the button extended. An svg or anything aria-hidden is decoration.
 export function visibleText(node: ReactNode): string {
   return Children.toArray(node)
     .map((child) => {
@@ -27,8 +26,6 @@ const mounted = new WeakMap<Document, Set<{ node: HTMLElement; placement: Floati
 const overlaps = (a: DOMRect, b: DOMRect) =>
   a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 
-// Two buttons at one placement cover each other, unless each sits in its own containing block (a
-// transformed ancestor), so the check compares where they actually landed.
 function usePlacementCheck(nodeRef: RefObject<HTMLElement | null>, placement: FloatingPlacement) {
   useLayoutEffect(() => {
     const node = nodeRef.current;
@@ -51,7 +48,6 @@ function usePlacementCheck(nodeRef: RefObject<HTMLElement | null>, placement: Fl
 
 type FloatingOwnProps = {
   placement?: FloatingPlacement;
-  // For content whose text cannot be read from its elements (a translation component).
   iconOnly?: boolean;
 };
 

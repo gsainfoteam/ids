@@ -11,16 +11,12 @@ export type TimePrecision = 'hour' | 'minute' | 'second';
 export type TimeFormat = HourCycle;
 export type TimeUnit = 'hour' | 'minute' | 'second' | 'period';
 
-// A slot is a wall-clock time as seconds since midnight, which is what the columns pick from;
-// it only becomes a Date on a given day through withTime.
 export const secondsOf = (d: Date) => getHours(d) * 3600 + getMinutes(d) * 60 + getSeconds(d);
 
 const keyPatterns = { hour: 'HH', minute: 'HH:mm', second: 'HH:mm:ss' } as const;
 export const timeKey = (d: Date, precision: TimePrecision = 'minute') =>
   format(d, keyPatterns[precision]);
 
-// set() on a day that skips an hour for DST lands on another hour instead of failing, so the
-// result is checked against what was asked for.
 export function withTime(day: Date, seconds: number): Date | null {
   const next = set(day, {
     hours: Math.floor(seconds / 3600),
@@ -41,7 +37,6 @@ export const resolveTimeFormat = (value: TimeFormat | undefined, locale: Locale)
 export const periodLabel = (period: number, locale: Locale) =>
   format(new Date(2000, 0, 1, period * 12), 'a', { locale });
 
-/** Local clock slots; unavailable DST times are omitted, repeated times use Date's earlier offset. */
 export function timeSlots(
   day: Date,
   precision: TimePrecision,
@@ -83,13 +78,10 @@ export function unitNumbers(
   step: number,
 ) {
   if (unit === 'period') return [0, 1];
-  // A 12-hour day starts at 12, so the column runs 12, 1, ... 11 like the clock reads it.
   if (unit === 'hour') return format === '12h' ? [12, ...range(1, 12)] : range(24);
   return range(0, 60, unit === precision ? step : 1);
 }
 
-// Picking one unit keeps the others where they are and lands on the nearest allowed slot inside
-// that choice, so 10 in the hour column after 09:45 with max 10:15 gives 10:15, not a gap.
 export function unitTarget(
   unit: TimeUnit,
   n: number,
@@ -126,8 +118,6 @@ export function unitTarget(
 export const unitLabel = (unit: TimeUnit, n: number, locale: Locale) =>
   unit === 'period' ? periodLabel(n, locale) : String(n).padStart(2, '0');
 
-// Typing a number picks the first option that starts with it, so "4" finds 04 and "45" finds 45;
-// when the buffer no longer matches anything, the last key starts a new search.
 export function typeaheadMatch(labels: string[], buffer: string, from: number): number {
   const find = (query: string) => {
     const lower = query.toLocaleLowerCase();
@@ -137,7 +127,6 @@ export function typeaheadMatch(labels: string[], buffer: string, from: number): 
       return label.startsWith(lower) || label.replace(/^0+(?=\d)/, '').startsWith(lower);
     });
   };
-  // A repeated single key cycles through the matches instead of staying on the first one.
   const repeated = buffer.length > 1 && [...buffer].every((ch) => ch === buffer[0]);
   const index = repeated ? find(buffer[0]) : (find(buffer) ?? find(buffer.slice(-1)));
   return index ?? -1;

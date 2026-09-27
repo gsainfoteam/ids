@@ -37,7 +37,6 @@ export function part(
   return createElement(tag, props, tag === 'input' ? undefined : children);
 }
 
-// Resolves a part's `className` / `style` / `children` that may be a function of its state.
 export function resolveState<T, S>(value: T | ((state: S) => T), state: S): T {
   return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
 }

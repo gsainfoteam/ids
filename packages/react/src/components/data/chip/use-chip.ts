@@ -4,7 +4,6 @@ import { chipToFocusAfter } from './chip-focus';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { isDevelopment } from '../../../utils/dev';
 
-// The click or key press that asked for the chip to go.
 export type ChipRemoveEvent = MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>;
 
 export function useChip({
@@ -42,17 +41,12 @@ export function useChip({
     if (disabled || !onRemove) return;
     const next = chip?.contains(document.activeElement) ? chipToFocusAfter(chip) : null;
     onRemove(event);
-    // Focus moves only once the chip has really left the page; a parent may keep it, for
-    // example to ask for confirmation first. A parent that prevents the default sends focus
-    // somewhere of its own, such as the input of a tag field.
     if (next && !event.defaultPrevented)
       requestAnimationFrame(() => {
         if (chip && !chip.isConnected && next.isConnected) next.focus();
       });
   };
 
-  // Backspace and Delete remove the focused chip, the way they remove a tag in a tag input. The
-  // key's own default is prevented only after onRemove has had its say about focus.
   const removeOnKey = (event: KeyboardEvent<HTMLElement>) => {
     if (onRemove === undefined || (event.key !== 'Backspace' && event.key !== 'Delete'))
       return false;

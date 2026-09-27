@@ -1,12 +1,7 @@
 import { useEffect, useState, type RefObject } from 'react';
 
-// Screen readers speak changes to a live region, not a region that appears already filled, so
-// the label is written a moment after mount. A load that ends sooner is not announced at all.
 export const ANNOUNCE_DELAY = 100;
 
-// Inside these the spinner stays silent. A button, link or label takes its accessible name from
-// its content, so the spinner's text would be read as part of that name; a live region already
-// announces its own text.
 const QUIET_CONTAINERS = [
   'button',
   'a[href]',

@@ -107,7 +107,6 @@ test('child cancellation prevents root action', async () => {
   await act(async () => button().click());
 });
 test('disabled links remove href and block child/root keyboard and click actions', async () => {
-  // Handlers record instead of throwing: React reports a throw from a handler and carries on.
   const calls = [];
   const record = (name) => () => calls.push(name);
   await render(

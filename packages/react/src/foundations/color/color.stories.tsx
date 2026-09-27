@@ -62,7 +62,6 @@ const hex = (value: string) =>
     .map((channel) => Math.round(channel).toString(16).padStart(2, '0'))
     .join('')}`;
 
-// WCAG 2 relative luminance and contrast ratio.
 function luminance(value: string) {
   const [r, g, b] = channels(value).map((channel) => {
     const c = channel / 255;
@@ -79,8 +78,6 @@ function contrast(a: string, b: string) {
 const grade = (ratio: number) =>
   ratio >= 7 ? 'AAA' : ratio >= 4.5 ? 'AA' : ratio >= 3 ? 'AA Large' : 'Fail';
 
-// The swatch reads its own computed color. It is keyed by the theme around it, so a toolbar change
-// remounts it and the value is read again.
 function readSwatch(element: HTMLElement | null) {
   const chip = element?.querySelector<HTMLElement>('[data-chip]');
   const output = element?.querySelector('[data-hex]');

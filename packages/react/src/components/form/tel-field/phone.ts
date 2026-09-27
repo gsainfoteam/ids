@@ -14,8 +14,6 @@ export type TelFieldFormat = 'auto' | 'international' | 'none';
 
 export type ReadPhone = { value: string; text: string; country?: CountryCode };
 
-// Numbers arrive as tel: links, with a "(0)" trunk marker after the country code, in
-// full-width digits, or with dots, brackets and spaces.
 function tidy(raw: string) {
   return raw
     .normalize('NFKC')
@@ -27,9 +25,6 @@ export function digitsOf(raw: string) {
   return parseIncompletePhoneNumber(tidy(raw));
 }
 
-// A pasted "00 44 20 …" uses the international prefix most of the world dials. It becomes
-// "+44 20 …" only when that is a valid number, because some countries (Korea: 001, 002) put a
-// carrier code after the 00 that AsYouType already understands.
 export function normalizePasted(raw: string) {
   const digits = digitsOf(raw);
   if (digits.startsWith('00') && isValidPhoneNumber(`+${digits.slice(2)}`))
@@ -42,8 +37,6 @@ function detect(typer: AsYouType) {
   return country && isSupportedCountry(country) ? country : undefined;
 }
 
-// What the user typed, read in the selected country: national digits, or a number that starts
-// with + in any country. The value is E.164 ("+821012345678"), or what was typed of it.
 export function readPhone(
   raw: string,
   country: CountryCode,
@@ -57,8 +50,6 @@ export function readPhone(
   const number = typer.getNumber();
   const value = number?.number ?? (digits.startsWith('+') ? digits : '');
   const detected = digits.startsWith('+') ? detect(typer) : undefined;
-  // With a country select beside the input, the calling code lives in the select, so an
-  // international number reads nationally once its country is known.
   const national =
     separateCountry && detected && number && isValidPhoneNumber(number.number)
       ? number.formatNational()
@@ -70,8 +61,6 @@ export function readPhone(
   };
 }
 
-// How a stored value reads when nobody is typing it. Only a complete number is rewritten; a
-// partial one keeps the as-you-type grouping.
 export function presentPhone(
   value: string,
   country: CountryCode,
@@ -87,15 +76,11 @@ export function presentPhone(
   return home ? number.formatNational() : number.formatInternational();
 }
 
-// A value that is not E.164 yet (a national number from older data or a form default) is read
-// in the selected country.
 export function toE164(value: string, country: CountryCode) {
   if (value === '' || value.startsWith('+')) return value;
   return readPhone(value, country, 'auto', false).value;
 }
 
-// The country a value belongs to. A chosen country that shares the value's calling code (US and
-// Canada share +1) is kept rather than second-guessed.
 export function countryOf(value: string, chosen: CountryCode) {
   if (!value.startsWith('+') || value.startsWith(`+${getCountryCallingCode(chosen)}`))
     return chosen;
@@ -104,7 +89,6 @@ export function countryOf(value: string, chosen: CountryCode) {
   return detect(typer) ?? chosen;
 }
 
-// Keeps the national digits and swaps the calling code.
 export function withCountry(value: string, from: CountryCode, to: CountryCode) {
   const typer = new AsYouType(from);
   typer.input(value);
@@ -122,8 +106,6 @@ export function callingCodeOf(country: CountryCode) {
 
 export type CountryOption = { code: CountryCode; name: string; callingCode: string };
 
-// Every supported region with its name in the given locale, sorted by that name, so "미국",
-// "US" and "+1" all find the United States. Each locale's list is built once.
 export const countryOptions = memoize((locale: string): CountryOption[] => {
   let names: Intl.DisplayNames | undefined;
   try {

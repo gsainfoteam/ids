@@ -7,8 +7,6 @@ export type BadgeDisplay = {
   empty: boolean;
 };
 
-// A number is a count: capped at `max` ("99+"), and zero means nothing to show unless asked. A
-// negative or fractional count is treated as the whole number of things it can mean.
 export function badgeDisplay(content: ReactNode, max: number, showZero: boolean): BadgeDisplay {
   if (typeof content !== 'number')
     return {

@@ -33,7 +33,6 @@ export type UseToggleGroupOptions = {
   ref?: Ref<HTMLDivElement>;
 };
 
-// Both modes keep a list; single mode reads and reports its one entry, or null for none.
 function toList(value: Value | undefined, single: boolean) {
   if (value === undefined) return undefined;
   if (value === null) return [];
@@ -81,8 +80,6 @@ export function useToggleGroup({
     loop,
     radio: single,
     checked: single ? (selected[0] ?? null) : null,
-    // Arrow keys check the radio that focus lands on, through the item's own click, so the
-    // item's onClick sees it too.
     onArrive: single
       ? (element) => {
           if (element.getAttribute('aria-checked') !== 'true') element.click();
@@ -93,7 +90,6 @@ export function useToggleGroup({
   function toggle(item: string) {
     if (disabled) return;
     if (single) {
-      // A required single group behaves like radios: the checked item stays checked.
       if (selected[0] !== item) setSelected([item]);
       else if (!required) setSelected([]);
       return;
@@ -101,7 +97,6 @@ export function useToggleGroup({
     const next = selected.includes(item)
       ? selected.filter((entry) => entry !== item)
       : [...selected, item];
-    // Reported in the items' order, so the value and the form entries do not depend on click order.
     const rank = (entry: string) => {
       const index = roving.items?.findIndex((candidate) => candidate.value === entry) ?? -1;
       return index === -1 ? Number.POSITIVE_INFINITY : index;
@@ -109,7 +104,6 @@ export function useToggleGroup({
     setSelected([...next].sort((a, b) => rank(a) - rank(b)));
   }
 
-  // An item button knows its form, including a form named by the form attribute.
   const formRef = useRef<HTMLButtonElement | null>(null);
   const anchorRef = useRef<HTMLElement | null>(null);
   useLayoutEffect(() => {

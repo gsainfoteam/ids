@@ -179,8 +179,6 @@ export namespace Switch {
 
   export const Style = tv({
     slots: {
-      // The root is the track. Its padding is the gap around the thumb, so a thumb one step smaller
-      // than the track height travels exactly the width left over.
       root: [
         'relative inline-flex shrink-0 items-center rounded-full p-0.5 align-middle',
         'bg-(--ids-color-border) shadow-xs inset-ring-1 inset-ring-transparent focus-ring',

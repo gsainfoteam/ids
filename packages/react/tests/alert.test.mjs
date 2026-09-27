@@ -21,8 +21,6 @@ for (const name of [
 ])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-// jsdom has no layout, so every element reports no boxes and tabbable would treat the whole page
-// as hidden. One box per element stands in for a rendered page.
 dom.window.Element.prototype.getClientRects = function () {
   return [{ width: 1, height: 1 }];
 };
@@ -45,7 +43,6 @@ async function render(node) {
   }
   await act(async () => root.render(node));
 }
-// The exit waits one animation frame for its transitions; jsdom has none, so one frame is enough.
 const frame = () => act(() => new Promise((resolve) => requestAnimationFrame(() => resolve())));
 const alert = () => host.querySelector('[data-alert]');
 async function escape(target, init = {}) {

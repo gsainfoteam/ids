@@ -14,10 +14,6 @@ function valueDescriptor(element: TextElement) {
   return { own: undefined, base: undefined };
 }
 
-// React writes a controlled value, react-hook-form's reset() and setValue() write input.value
-// directly, and a native form reset restores the default; none of them fires an input event. The
-// element's own value setter is wrapped so every one of them is seen. React's value tracker is
-// such an own property too, so it is wrapped rather than replaced and restored on cleanup.
 export function useInputValue(
   ref: RefObject<TextElement | null>,
   initial: string,
@@ -67,7 +63,6 @@ export function useInputValue(
     }
     node.addEventListener('input', sync);
     node.addEventListener('change', sync);
-    // The browser restores defaults right after the reset event, so the value is read a tick later.
     const form = node.form;
     form?.addEventListener('reset', later);
 

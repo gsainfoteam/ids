@@ -63,8 +63,6 @@ export function useRating({
     if (interactive) setRaw(normalize(next));
   };
 
-  // Keys move from the focused option, which is also where focus follows, so a half step or a
-  // digit never leaves focus on an option that is no longer checked.
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!interactive || event.altKey || event.ctrlKey || event.metaKey) return;
     const root = event.currentTarget;
@@ -91,8 +89,6 @@ export function useRating({
       ?.focus({ preventScroll: true });
   };
 
-  // `ref` and a Field label's id point at the root; focus belongs on the checked option, which is
-  // also the one Tab stops at.
   const focusChecked = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
     event.currentTarget.querySelector<HTMLButtonElement>('[aria-checked=true]')?.focus();

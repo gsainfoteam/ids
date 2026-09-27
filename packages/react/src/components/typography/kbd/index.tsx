@@ -21,8 +21,6 @@ function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
   return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
 }
 
-// A symbol is drawn but not read: screen readers say "place of interest sign" for ⌘, or skip it.
-// The visible glyph is hidden from them and the key's name is read instead.
 function Named({ glyph, name }: { glyph: string; name: string }) {
   return (
     <>
@@ -61,7 +59,6 @@ export function Kbd({
   const styles = Kbd.Style({ size: kbd.size });
 
   if (ordered.length > 1) {
-    // Apple menus run modifiers together (⇧⌘K); elsewhere they are joined with + (Ctrl+Shift+K).
     const joiner = separator !== undefined ? separator : kbd.platform === 'apple' ? null : '+';
     return (
       <kbd
@@ -134,7 +131,6 @@ export namespace Kbd {
     className?: string | ((state: State) => string | undefined);
   };
 
-  // Several keys pressed together. Nested <kbd> elements are how HTML marks a key combination.
   export function Group({ size, platform, labels, className, children, ...rest }: Group.Props) {
     const kbd = useKbd({ size, platform, labels });
     const state: State = { size: kbd.size, platform: kbd.platform, combination: true };
@@ -161,8 +157,6 @@ export namespace Kbd {
     };
   }
 
-  // The key cap is tinted from the text color around it, so it reads the same on the page, inside
-  // a solid Button or on a dark tooltip without a variant per surface.
   export const Style = tv({
     slots: {
       root: [

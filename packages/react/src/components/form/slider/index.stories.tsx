@@ -40,10 +40,8 @@ const meta = {
 } satisfies Meta<typeof Slider>;
 
 export default meta;
-// StoryObj<typeof meta> resolves the single / range union of props to `never`.
 type Story = StoryObj<typeof Slider>;
 
-// A slider fills its container, and the value label needs room above the thumb.
 const narrow: Decorator = (Story) => (
   <div className="w-80 pt-8">
     <Story />
@@ -225,7 +223,6 @@ export const Drag: Story = {
       { keys: '[MouseLeft>]', target: track, coords: at(0.25) },
       { coords: at(0.75) },
     ]);
-    // Synthetic pointer coordinates are rounded to whole pixels, so allow one step either way.
     const dragged = valueOf(thumb(canvasElement));
     await expect(Math.abs(dragged - 75)).toBeLessThanOrEqual(1);
     await expect(canvasElement.querySelector('[data-slider]')).toHaveAttribute('data-dragging');

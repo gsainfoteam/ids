@@ -17,7 +17,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-// A landscape drawn inline, so media stories never wait on the network.
 const PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9cc9ff"/><stop offset="1" stop-color="#e8f1ff"/></linearGradient></defs><rect width="640" height="360" fill="url(#s)"/><circle cx="500" cy="90" r="42" fill="#ffd66b"/><path d="M0 260 L150 150 L260 230 L380 120 L520 240 L640 170 L640 360 L0 360Z" fill="#5a8f6b"/><path d="M0 300 L200 220 L360 290 L520 230 L640 280 L640 360 L0 360Z" fill="#3f6f50"/></svg>',
 )}`;

@@ -58,7 +58,6 @@ export function Card({
   onInteractionChange,
   ...rest
 }: Card.Props) {
-  // A link or button passed through asChild is interactive by what it is.
   const nativeControl =
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
   const interactive = interactiveProp ?? (onClick != null || nativeControl);
@@ -203,15 +202,12 @@ export namespace Card {
 
   export const Style = tv({
     slots: {
-      // --card-pad reads the padding concentric-p-* resolved on this element, so media and
-      // full-width dividers can reach the edge whatever padding a consumer picks.
       root: [
         'relative isolate flex flex-col text-(--ids-color-on-surface)',
         '[--card-pad:var(--ids-concentric-pad)]',
       ],
       header: [
         'grid auto-rows-min items-start gap-1 border-(--ids-color-border)',
-        // minmax keeps a long title from pushing the action out of the card.
         'has-[[data-card-action]]:grid-cols-[minmax(0,1fr)_auto]',
         '[.border-b]:-mx-(--card-pad) [.border-b]:px-(--card-pad) [.border-b]:pb-(--card-gap)',
       ],
@@ -223,8 +219,6 @@ export namespace Card {
         'flex items-center gap-2 border-(--ids-color-border)',
         '[.border-t]:-mx-(--card-pad) [.border-t]:px-(--card-pad) [.border-t]:pt-(--card-gap)',
       ],
-      // Media stops inside the outline's 1px ring and takes the card's corner where it touches
-      // an edge, so a photo bleeds to the edge without covering the border.
       media: [
         'relative -mx-[calc(var(--card-pad)_-_var(--card-ring))] overflow-hidden',
         'first:-mt-[calc(var(--card-pad)_-_var(--card-ring))] first:rounded-t-[inherit]',
@@ -252,8 +246,6 @@ export namespace Card {
           description: 'text-caption-c1-regular',
         },
       } satisfies Record<IdsSize, object>,
-      // Hover and press lay a translucent layer over whatever the variant's background is,
-      // instead of one hover color per variant.
       interactive: {
         true: {
           root: [

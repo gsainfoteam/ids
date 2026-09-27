@@ -11,9 +11,6 @@ export type { Locale } from 'date-fns';
 export type DateLocale = string | Locale;
 export type HourCycle = '12h' | '24h';
 
-// Only the languages IDS has messages for are looked up by tag. A table of every date-fns locale
-// would land in each app's bundle whether it is used or not, so other languages come in as a
-// Locale object the app imports itself.
 const builtIn: Record<string, Locale> = { ko, 'ko-KR': ko, en: enUS, 'en-US': enUS };
 
 export function resolveLocale(locale: DateLocale = messages.locale): Locale {
@@ -26,36 +23,29 @@ export function resolveLocale(locale: DateLocale = messages.locale): Locale {
   return resolved;
 }
 
-// Quoted text in a pattern is literal, and French writes "HH 'h' mm", so it is dropped before
-// the pattern is read for tokens.
 export const tokensOf = (pattern: string) => pattern.replace(/'[^']*'/g, '');
 
 const timeTokens = (locale: Locale, width: 'short' | 'long' | 'full') =>
   tokensOf(locale.formatLong?.time({ width }) ?? '');
 
-// The clock a locale's own time pattern is written in. `p` can only be used as is for that clock.
 export function patternHourCycle(locale: Locale): HourCycle {
   return /[ahK]/.test(timeTokens(locale, 'short')) ? '12h' : '24h';
 }
 
-// The clock people expect comes from CLDR, which the browser's Intl carries: Korean reads
-// "오후 2:30" there, while date-fns's ko pattern is "HH:mm". The pattern is only the fallback for a
-// locale code Intl cannot resolve.
-export function hourCycleOf(locale: Locale): HourCycle {
+function intlHourCycle(code: string) {
   try {
-    if (locale.code) {
-      const cycle = new Intl.DateTimeFormat(locale.code, { hour: 'numeric' }).resolvedOptions()
-        .hourCycle;
-      if (cycle) return cycle === 'h11' || cycle === 'h12' ? '12h' : '24h';
-    }
+    return new Intl.DateTimeFormat(code, { hour: 'numeric' }).resolvedOptions().hourCycle;
   } catch {
-    // An unknown code falls through to the pattern.
+    return undefined;
   }
-  return patternHourCycle(locale);
 }
 
-// Korean and Chinese write the day period before the hour. A 24-hour locale shown on a 12-hour
-// clock takes the order from the first of its time patterns that has a period at all.
+export function hourCycleOf(locale: Locale): HourCycle {
+  const cycle = locale.code ? intlHourCycle(locale.code) : undefined;
+  if (!cycle) return patternHourCycle(locale);
+  return cycle === 'h11' || cycle === 'h12' ? '12h' : '24h';
+}
+
 export function periodFirst(locale: Locale): boolean {
   const tokens = (['short', 'long', 'full'] as const)
     .map((width) => timeTokens(locale, width))
@@ -63,6 +53,5 @@ export function periodFirst(locale: Locale): boolean {
   return !!tokens && tokens.indexOf('a') < tokens.search(/[hHkK]/);
 }
 
-// The locale's numeric date: y.MM.dd in ko, MM/dd/yyyy in en-US, dd.MM.y in de.
 export const shortDatePattern = (locale: Locale) =>
   locale.formatLong?.date({ width: 'short' }) ?? 'yyyy-MM-dd';

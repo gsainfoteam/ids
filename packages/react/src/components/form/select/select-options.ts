@@ -6,9 +6,7 @@ import { flattenParts } from '../../../internal/field-popup';
 
 export type SelectOption = {
   value: string;
-  // What the trigger shows and typeahead matches.
   label: string;
-  // What the search field matches; the label unless the item gives extra keywords.
   search: string;
   disabled: boolean;
 };
@@ -22,7 +20,6 @@ type ItemProps = {
   children?: unknown;
 };
 
-// The component types are passed in because this file cannot import the view that defines them.
 export type OptionKinds = { item: unknown; group: unknown; content: unknown };
 
 export function textOf(children: unknown): string {
@@ -40,7 +37,6 @@ export function textOf(children: unknown): string {
     .join('');
 }
 
-// An `asChild` part's own children are the ones inside the element it renders into.
 export function slotChildren(children: unknown, asChild?: boolean): ReactNode {
   return asChild && isValidElement<{ children?: ReactNode }>(children)
     ? children.props.children
@@ -67,8 +63,6 @@ export function collectOptions(children: ReactNode, kinds: OptionKinds): SelectO
   });
 }
 
-// Case, width (full-width Latin from some keyboards) and accents are ignored, so "cote" finds
-// "Côte d'Ivoire". Hangul is recomposed after the accents are stripped.
 export function normalizeText(text: string) {
   return text
     .normalize('NFD')
@@ -82,9 +76,6 @@ export function matchesQuery(option: SelectOption, query: string) {
   return !needle || normalizeText(option.search).includes(needle);
 }
 
-// WAI-ARIA typeahead: a string typed quickly jumps to the first label starting with it, from the
-// current option on. Repeating one character cycles through the labels starting with it instead,
-// the way a native select does, so "aaa" walks the A's rather than looking for "aaa".
 export function typeaheadIndex(labels: string[], buffer: string, current: number) {
   const needle = normalizeText(buffer);
   if (!needle || !labels.length) return -1;
@@ -99,8 +90,6 @@ export function typeaheadIndex(labels: string[], buffer: string, current: number
   return -1;
 }
 
-// Keeps the list's order rather than the order of clicks, the way a native multiple select
-// submits. Values that are not options (yet) stay at the end.
 export function orderByOptions(values: string[], options: SelectOption[]) {
   const listed = options.map((option) => option.value);
   return [...intersection(listed, values), ...difference(values, listed)];

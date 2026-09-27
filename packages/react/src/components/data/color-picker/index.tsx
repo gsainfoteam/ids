@@ -71,8 +71,6 @@ function usePicker(part: string) {
   return context;
 }
 
-// Translucent colors are drawn over a checkerboard so their transparency shows. The squares use
-// the theme's surface and muted colors, so they read in light and dark alike.
 const CHECKER =
   'conic-gradient(var(--ids-color-muted) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-muted) 0 75%, var(--ids-color-surface) 0)';
 const HUES = 'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)';
@@ -151,10 +149,6 @@ function DefaultLayout() {
   );
 }
 
-// Drawn here rather than with Slider, which moves one value along one axis; IDS has no 2D control.
-// Two range inputs carry the area for assistive technology, one per axis, since a slider has a
-// single value. The arrow keys move either axis from whichever input has focus, and only the
-// first is in the Tab order; the second is still reachable by a screen reader's own navigation.
 function ColorPickerArea({ className, style, ...props }: ColorPicker.AreaProps) {
   const c = usePicker('ColorPicker.Area');
   const { color, rgba } = c.picker.state;
@@ -219,8 +213,6 @@ function ColorPickerArea({ className, style, ...props }: ColorPicker.AreaProps) 
   );
 }
 
-// The gradients run left to right in any page direction, so `dir="ltr"` keeps Slider's arrow keys
-// and pointer mapping from flipping in a right-to-left page.
 function ColorPickerHueSlider({ className, ...props }: ColorPicker.SliderProps) {
   const c = usePicker('ColorPicker.HueSlider');
   const { color } = c.picker.state;
@@ -390,9 +382,6 @@ function ColorPickerSwatches({ className, children, ...props }: ColorPicker.Swat
       orientation="horizontal"
       disabled={c.state.disabled}
       readOnly={c.state.readOnly}
-      // The swatches choose the picker's color and are no value of their own, so an empty form
-      // attribute leaves them without a form owner: a form around the picker neither submits
-      // nor validates them, and they still make one native radio group.
       form=""
       data-color-picker-swatches=""
       className={c.styles.swatches({ className })}
@@ -411,10 +400,8 @@ function ColorPickerSwatches({ className, children, ...props }: ColorPicker.Swat
 
 function ColorPickerSwatch({ value, label, className, style, ...props }: ColorPicker.SwatchProps) {
   const c = usePicker('ColorPicker.Swatch');
-  // Inside Swatches the group checks the swatch; a swatch placed on its own checks itself.
   const grouped = useRadioGroupContext() !== null;
   const parsed = parseColor(value);
-  // An unreadable color is skipped rather than drawn as an empty square.
   if (!parsed) return null;
   return (
     <Radio
@@ -432,7 +419,6 @@ function ColorPickerSwatch({ value, label, className, style, ...props }: ColorPi
       className={c.styles.swatch({ className })}
       style={{ ...style, ...overChecker(cssColor(parsed)) }}
     >
-      {/* The chosen swatch is ringed rather than dotted. */}
       {false}
     </Radio>
   );
@@ -448,12 +434,10 @@ export namespace ColorPicker {
     ComponentProps<'div'>,
     'children' | 'defaultValue' | 'onChange' | 'role'
   >;
-  // No native `size`: on the TextField it would be the IDS size, which the picker sets.
   export type InputProps = Omit<
     ComponentProps<'input'>,
     'value' | 'defaultValue' | 'type' | 'size'
   >;
-  // One element, since the child becomes the IconButton's icon.
   export type ButtonProps = Omit<ComponentProps<'button'>, 'children'> & {
     children?: ReactElement;
   };
@@ -484,7 +468,6 @@ export namespace ColorPicker {
   export const Swatches = ColorPickerSwatches;
   export const Swatch = ColorPickerSwatch;
 
-  // A white ring with a dark hairline reads on every color a thumb can sit on.
   const thumb = cn(
     'rounded-full border-2 border-white',
     'shadow-[0_0_0_1px_rgb(0_0_0/0.25),0_1px_3px_rgb(0_0_0/0.3)]',
@@ -503,21 +486,16 @@ export namespace ColorPicker {
         'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none',
         'group-has-[input:focus-visible]/area:ring-[3px] group-has-[input:focus-visible]/area:ring-(--ids-color-primary)/50',
       ],
-      // The native inputs that carry each channel for keyboards and assistive technology.
       channel: 'sr-only',
       row: 'flex min-w-0 items-center gap-2',
       sliders: 'grid min-w-0 flex-1 gap-2',
       slider: 'cursor-pointer',
       track: 'inset-ring-1 inset-ring-(--ids-color-on-surface)/10',
-      // The thumb is filled with its color, so Slider's primary edge and hover ring give way to
-      // the white ring.
       sliderThumb: [thumb, 'inset-ring-0 hover:ring-0'],
       input: 'flex-1',
       inputText: 'font-mono',
       tool: '',
       swatches: 'gap-2',
-      // The chosen swatch gets a ring behind a surface-colored gap, so it stays visible on a
-      // swatch the same color as the ring.
       swatch: [
         'rounded-standard shadow-none inset-ring-(--ids-color-on-surface)/10',
         'data-[state=checked]:ring-2 data-[state=checked]:ring-(--radio-accent)',
@@ -539,8 +517,6 @@ export namespace ColorPicker {
           swatch: 'size-6',
         },
       } satisfies Record<IdsSize, object>,
-      // A disabled picker is dimmed once, at its root. The parts that dim themselves when disabled
-      // would otherwise dim a second time over it.
       disabled: {
         true: {
           slider: 'data-disabled:opacity-100',

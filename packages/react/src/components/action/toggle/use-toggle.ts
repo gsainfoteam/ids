@@ -61,7 +61,6 @@ export function useToggle<P extends ToggleOwnProps>(props: P, name: string) {
       ...props,
       disabled: disabled || group?.disabled,
       pressed,
-      // The consumer's onClick runs first and can keep the state with preventDefault.
       onClick: (event: MouseEvent<HTMLButtonElement>): void => {
         onClick?.(event);
         if (event.defaultPrevented) return;
@@ -80,8 +79,6 @@ export function useToggle<P extends ToggleOwnProps>(props: P, name: string) {
     name,
   );
 
-  // Alone, or in a multiple group (a toolbar), a toggle is a button with aria-pressed. In a single
-  // group it is one radio of a radiogroup. Inside a group only the tab stop is in the tab order.
   const single = group?.selectionMode === 'single';
   const toggleProps = group
     ? {

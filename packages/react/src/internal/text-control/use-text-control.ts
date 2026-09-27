@@ -30,8 +30,6 @@ export function useTextControl({ inputRef, disabled, readOnly, clearable }: UseT
     onBlur: (event: FocusEvent<HTMLElement>) => {
       if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
     },
-    // A press on the shell's padding or on an icon reaches the input, the way a press anywhere in
-    // a plain input's box does. Anything that handles presses itself keeps them.
     onMouseDown: (event: MouseEvent<HTMLElement>) => {
       if (disabled || event.button !== 0) return;
       const target = event.target as Element;
@@ -41,8 +39,6 @@ export function useTextControl({ inputRef, disabled, readOnly, clearable }: UseT
     },
   };
 
-  // With a Clear part present, Escape clears the way a search field does. An empty field lets
-  // the key through so an enclosing dialog or popup can still close.
   const onEscape = (event: KeyboardEvent<TextElement>) => {
     if (
       !clearable ||

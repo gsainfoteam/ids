@@ -68,7 +68,6 @@ function useOTPContext(part: string) {
   return context;
 }
 
-// Password managers draw their own badge over any text input that looks like a code field.
 const passwordManagerOptOut = {
   'data-1p-ignore': '',
   'data-lpignore': 'true',
@@ -134,8 +133,6 @@ export function OTPField({
     },
     {
       ...handlers,
-      // The value is cleaned before a native listener such as react-hook-form's register() reads
-      // event.target.value, so it runs ahead of the consumer's onChange.
       onChange: (event: ChangeEvent<HTMLInputElement>) => {
         handlers.onChange(event);
         onChange?.(event);
@@ -176,7 +173,6 @@ export function OTPField({
   );
 }
 
-// A text bullet renders at a different size in every font, so the default mask is drawn.
 function Masked({
   char,
   mask,
@@ -208,8 +204,6 @@ export namespace OTPField {
 
   export type CaretProps = ComponentProps<'span'>;
 
-  // Slots inside one Group share their borders and only the outer corners are rounded, the way
-  // a single code reads as one control.
   export function Group({ className, ...props }: GroupProps) {
     const { styles } = useOTPContext('OTPField.Group');
     return (
@@ -277,8 +271,6 @@ export namespace OTPField {
   export const Style = tv({
     slots: {
       root: 'group/otp relative inline-flex items-center gap-2 data-disabled:opacity-50',
-      // The real input covers every slot so taps, long-press paste and autofill all reach it.
-      // Its text is invisible and 16px, which keeps iOS from zooming in on focus.
       input: [
         'absolute inset-0 z-10 size-full cursor-text appearance-none border-0 bg-transparent p-0',
         'font-mono text-base tracking-[-0.5em] text-transparent caret-transparent outline-none',

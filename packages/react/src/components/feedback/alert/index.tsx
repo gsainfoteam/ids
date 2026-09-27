@@ -48,10 +48,8 @@ function isPart(node: ReactNode, part: unknown): node is ReactElement<Record<str
   return isValidElement(node) && node.type === part;
 }
 
-// Warnings and errors interrupt; the rest wait until the reader is idle.
 const ASSERTIVE = new Set<Alert.ColorScheme>(['warning', 'danger']);
 
-// The glyph repeats the meaning of the color, so it does not rest on color alone.
 const ICONS = {
   neutral: InformationCircleIcon,
   info: InformationCircleIcon,
@@ -233,8 +231,6 @@ export namespace Alert {
     export type Props = PartProps<'div'>;
   }
 
-  // Calling preventDefault in onClick keeps the alert open. The alert's scheme names are
-  // IconButton's too, so the button hovers and rings in the alert's own color.
   export function Close({ className, children, onClick, ...props }: Close.Props) {
     const { state, styles, close } = useAlertContext('Alert.Close');
     return (
@@ -275,7 +271,6 @@ export namespace Alert {
       close: '-my-0.5 -me-1.5 size-6 rounded-full',
     },
     variants: {
-      // Meaning sets three colors; the variant decides where each one is painted.
       colorScheme: {
         neutral: {
           root: '[--alert-tint:var(--ids-color-on-surface)] [--alert-strong:var(--ids-color-on-surface)] [--alert-on:var(--ids-color-surface)]',
@@ -293,16 +288,12 @@ export namespace Alert {
           root: '[--alert-tint:var(--ids-color-danger)] [--alert-strong:var(--ids-color-danger-strong)] [--alert-on:var(--ids-color-on-danger)]',
         },
       } satisfies Record<ColorScheme, object>,
-      // Text on a tint uses the -strong tone, which keeps 4.5:1 where the plain status color
-      // (warning yellow above all) would not.
       variant: {
         solid: {
           root: [
             'bg-(--alert-tint) text-(--alert-on)',
             '[--alert-accent:var(--alert-on)] [--alert-title:var(--alert-on)] [--alert-body:var(--alert-on)]',
           ],
-          // On the scheme's own fill, IconButton's scheme colors would vanish, so the close button
-          // takes the color written on the fill instead.
           close: [
             '[--control-quiet:var(--alert-on)] [--control-ring:var(--alert-on)]',
             '[--control-hover:color-mix(in_oklab,var(--alert-on)_15%,transparent)]',

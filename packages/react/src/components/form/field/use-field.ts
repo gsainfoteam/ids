@@ -42,14 +42,11 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
     setValidity((prev) => (isEqual(prev, next) ? prev : next));
   }, []);
 
-  // Once an error is showing it follows every edit, so it clears the moment the value is valid.
   const notify = useCallback(() => {
     syncValue();
     if (shown.current) validate();
   }, [syncValue, validate]);
 
-  // Controlled values, react-hook-form resets and a custom control's own state reach the DOM
-  // without an input event, so the snapshot is also taken after every render.
   useLayoutEffect(() => {
     notify();
   });
@@ -64,21 +61,17 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
     const onFocusOut = (event: FocusEvent) => {
       const next = event.relatedTarget as Node | null;
       if (next && root.contains(next)) return;
-      // Switching windows blurs without moving focus: the field is still where the user left it.
       if (!next && root.contains(doc.activeElement)) return;
       setFocused(false);
       setTouched(true);
-      // A required field that was only tabbed past is reported on submit, not on blur.
       if (syncValue() || shown.current) validate();
     };
-    // autoFocus runs during commit, before this listener exists.
     if (root.contains(doc.activeElement)) onFocusIn();
 
     root.addEventListener('input', notify);
     root.addEventListener('change', notify);
     root.addEventListener('focusin', onFocusIn);
     root.addEventListener('focusout', onFocusOut);
-    // invalid does not bubble, but it does pass through ancestors in the capture phase.
     root.addEventListener('invalid', validate, true);
 
     const form = formOf(root);
@@ -90,8 +83,6 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
         setTouched(false);
         shown.current = false;
         setValidity(null);
-        // Custom controls restore their own state after the reset event, so the new baseline is
-        // read once they have rendered it.
         view.clearTimeout(timer);
         timer = view.setTimeout(() => {
           if (!mounted) return;

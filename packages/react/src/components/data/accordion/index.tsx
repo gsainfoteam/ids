@@ -53,8 +53,6 @@ type ItemContext = {
 
 const AccordionContext = createContext<RootContext | null>(null);
 const AccordionItemContext = createContext<ItemContext | null>(null);
-// Text nodes do not count for :last-child, so the trigger tells its indicator whether it closes
-// the row (and takes the free space before it) or sits inline, for example ahead of the label.
 const IndicatorPlacementContext = createContext<'end' | 'inline'>('end');
 
 function useRootContext(part: string) {
@@ -253,7 +251,6 @@ export namespace Accordion {
     });
     const state: Trigger.State = { ...interaction, ...item.state };
     const content = resolveState(children, state);
-    // A consumer's own Indicator replaces the default chevron wherever it is placed.
     const nodes = flattenFragments(content);
     const indicatorIndex = nodes.findIndex(
       (child) => isValidElement(child) && child.type === Indicator,
@@ -396,15 +393,12 @@ export namespace Accordion {
         'motion-reduce:transition-none',
         'disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-default',
       ],
-      // h-[1lh] keeps the chevron on the first line of a trigger that wraps.
       indicator: [
         'pointer-events-none inline-flex h-[1lh] shrink-0 items-center',
         'text-(--ids-color-on-muted) [&_svg]:size-4',
         'transition-transform duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
         'data-open:rotate-180',
       ],
-      // Rows animate from 0fr to 1fr, which moves the height to the content's own height without
-      // measuring it, including when the content changes size while open.
       content: [
         'grid grid-rows-[0fr] transition-[grid-template-rows] duration-(--ids-motion-normal) ease-out',
         'data-open:grid-rows-[1fr] data-instant:transition-none motion-reduce:transition-none',

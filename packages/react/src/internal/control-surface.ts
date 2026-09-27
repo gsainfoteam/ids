@@ -4,14 +4,6 @@ import type { IdsSize, IdsVariant } from '../tokens/types';
 
 export type ControlColorScheme = 'primary' | 'neutral' | 'danger' | 'success' | 'warning' | 'info';
 
-// A color scheme only sets custom properties and every variant reads them, so the four variants
-// follow any scheme without one class per variant and scheme pair:
-//   --control-fill     solid background, and the tint of soft
-//   --control-on-fill  text on the solid fill
-//   --control-accent   soft text; status schemes use their -strong shade, which stays legible on a tint
-//   --control-quiet    outline and ghost text: neutral for primary and neutral, the scheme otherwise
-//   --control-hover    outline and ghost hover fill: muted, or a tint of the status color
-//   --control-ring     focus ring and focused border
 const schemes = {
   primary: cn(
     '[--control-fill:var(--ids-color-primary)] [--control-on-fill:var(--ids-color-on-primary)]',
@@ -45,28 +37,19 @@ const schemes = {
   ),
 } satisfies Record<ControlColorScheme, string>;
 
-// Only solid and soft carry the scheme color. Outline and ghost stay neutral for primary, with the
-// brand left to focus, the way shadcn/ui keeps secondary actions quiet next to one primary action.
 export const controlSurface = {
   base: cn(
     'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap select-none touch-manipulation',
     'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast)',
     'cursor-pointer data-disabled:not-aria-busy:cursor-not-allowed data-disabled:opacity-50',
-    // Loading is composed from disabled + <Spinner />; a busy control reads as working, not refused.
     'aria-busy:cursor-progress',
     'focus-ring',
-    // focus-ring colors the ring primary; these run later in the cascade and follow the scheme.
     'focus-visible:ring-(--control-ring)/40 data-focus-visible:ring-(--control-ring)/40',
     'focus-visible:inset-ring-(--control-ring) data-focus-visible:inset-ring-(--control-ring)',
     'motion-reduce:transition-none',
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
-    // A component that exposes no colorScheme still needs every property defined.
     schemes.primary,
   ),
-  // An icon next to a label already adds visual weight at that edge, so the padding on the side
-  // holding the icon shrinks. A Spinner is an svg too, and its screen reader status span (or any
-  // aria-hidden decoration) counts as the icon at an edge, so swapping an icon for a Spinner while
-  // loading moves nothing. Icons without an explicit size follow the icon token.
   size: {
     standard: cn(
       'h-(--ids-size-control-standard) rounded-standard px-4 text-button-standard',

@@ -41,7 +41,6 @@ export function Badge({
     label,
     children,
   });
-  // `{count > 0 && <Icon />}` leaves false behind, which is no anchor either.
   const standalone = children == null || typeof children === 'boolean';
   const styles = Badge.Style({
     variant,
@@ -59,8 +58,6 @@ export function Badge({
   };
   const text = dot ? null : display.text;
 
-  // A labelled badge is a live region that reads its label when it changes, so a new count is
-  // announced as a sentence; the digits themselves are only for sight.
   const indicator = {
     id: indicatorId,
     'data-badge-indicator': '',
@@ -171,7 +168,6 @@ export namespace Badge {
             '[--badge-accent:var(--ids-color-info)] [--badge-fill:var(--ids-color-info)] [--badge-on-fill:var(--ids-color-on-info)] [--badge-text:var(--ids-color-info-strong)]',
         },
       } satisfies Record<BadgeColorScheme, object>,
-      // A badge sits on top of something, so even the tinted fill is opaque.
       variant: {
         solid: { indicator: 'bg-(--badge-fill) text-(--badge-on-fill)' },
         soft: {
@@ -185,8 +181,6 @@ export namespace Badge {
       } satisfies Record<BadgeVariant, object>,
       size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
       dot: { true: {}, false: {} },
-      // --badge-inset pulls the badge onto the edge of a round anchor: the point at 45 degrees on
-      // a circle lies 14.6% in from its bounding box. An Avatar tells its shape by itself.
       shape: {
         auto: { root: 'has-[>[data-avatar][data-shape=circle]]:[--badge-inset:14.6%]' },
         rectangular: {},
@@ -219,7 +213,6 @@ export namespace Badge {
           indicator: ['pointer-events-none absolute z-10', 'ring-2 ring-(--ids-color-surface)'],
         },
       },
-      // leading-none follows the text size: cn drops a line height set before it.
       {
         dot: false,
         size: 'standard',

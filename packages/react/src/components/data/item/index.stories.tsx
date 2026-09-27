@@ -28,7 +28,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['ghost', 'outline', 'soft'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-// A 4:3 picture, so a tile shows it cropped to a square.
 const photo = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 48"><rect width="64" height="48" fill="#93c5fd"/><circle cx="46" cy="14" r="6" fill="#fde68a"/><path d="M0 48 22 20l14 16 8-8 20 20z" fill="#1d4ed8"/></svg>',
 )}`;

@@ -14,8 +14,6 @@ export function AspectRatio({ ratio = 1, className, style, children, ...rest }: 
   const state: AspectRatio.State = { ratio };
   const { root, content } = AspectRatio.Style();
 
-  // The content sits in an absolute layer, so a tall image or a long text cannot stretch the box
-  // away from its ratio.
   return (
     <div
       {...rest}
@@ -38,8 +36,6 @@ export namespace AspectRatio {
     children?: ReactNode;
   };
 
-  // Children fill the box and media is cropped to it, both at zero specificity so any size or
-  // object-fit class on the child still wins.
   export const Style = tv({
     slots: {
       root: 'relative w-full',

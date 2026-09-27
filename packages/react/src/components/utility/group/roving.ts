@@ -4,9 +4,6 @@ export type RovingMove = 'next' | 'previous' | 'first' | 'last';
 
 export type RovingItem = { value: string; disabled: boolean };
 
-// A radio group moves on every arrow key whatever its orientation (WAI-ARIA APG radio group); a
-// toolbar only on the arrows along its orientation, so the cross axis stays free for the page.
-// Left and right swap in a right-to-left layout.
 export function rovingMove(
   key: string,
   {
@@ -25,7 +22,6 @@ export function rovingMove(
   if (vertical && key === 'ArrowUp') return 'previous';
 }
 
-// The index focus moves to, skipping disabled items, or -1 when there is nowhere to go.
 export function rovingTarget(
   items: readonly RovingItem[],
   from: number,
@@ -45,8 +41,6 @@ export function rovingTarget(
   return -1;
 }
 
-// The one item that Tab lands on: the preferred item (a checked radio, or the item last focused in
-// a toolbar) while it is enabled, otherwise the first enabled item. null when every item is disabled.
 export function rovingTabStop(
   items: readonly RovingItem[],
   preferred: readonly (string | null | undefined)[],

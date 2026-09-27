@@ -43,16 +43,11 @@ export function useColorField({
   const blocked = disabled || readOnly;
   const isOpen = openState && !blocked;
   const parsed = parseColor(current);
-  // What the trigger shows and the form submits: the value in the field's own format, however it
-  // was written. An unreadable value is shown as it is and marks the field invalid.
   const text = parsed ? serializeColor(parsed, format, alpha) : current;
 
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // A surrounding Field reads its state from the inputs in the control. The value reaches them
-  // through the hidden form value and the popup comes and goes, neither with an input event, so
-  // the Field is told to read again; otherwise it keeps what it read while the popup was open.
   const notifyField = use(FieldNotifyContext);
   useLayoutEffect(() => {
     notifyField?.();

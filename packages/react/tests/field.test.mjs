@@ -47,7 +47,6 @@ const fieldRoot = () => host.querySelector('[data-field]');
 const has = (node, name) => node.hasAttribute(`data-${name}`);
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-// Verify the published bundle, not a source alias.
 test('SSR wires generated IDs immediately, without effects', () => {
   const markup = renderToString(
     h(
@@ -777,8 +776,6 @@ test('RHF passes its own dirty and touched state and keeps native errors reachab
 });
 
 test('RHF value mode takes onValueChange over a forwarded change event, and a value-first onChange', async () => {
-  // Reports the change event of its own input as onChange, and the value it means as
-  // onValueChange: RHF must store the latter.
   function Shouting({ value, onChange, onValueChange, ...rest }) {
     return h('input', {
       ...rest,

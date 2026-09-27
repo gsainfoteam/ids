@@ -7,8 +7,6 @@ import { revealPopupOption } from '../../../internal/field-popup';
 
 export type SelectValue = string | null | string[];
 
-// Which element holds focus while the list is open: the trigger in a popover (the select-only
-// combobox pattern), the search field when there is one, the listbox itself in a modal drawer.
 export type SelectFocusOwner = 'trigger' | 'search' | 'list';
 
 export type UseSelectOptions = {
@@ -61,7 +59,6 @@ export function useSelect({
 
   const [query, setQuery] = useState('');
   const [highlighted, setHighlighted] = useState<string>();
-  // Search text and the highlight belong to one opening, however the list was closed.
   const [wasOpen, setWasOpen] = useState(open);
   if (wasOpen !== open) {
     setWasOpen(open);
@@ -73,7 +70,6 @@ export function useSelect({
 
   const visible = query ? options.filter((option) => matchesQuery(option, query)) : options;
   const enabled = visible.filter((option) => !option.disabled);
-  // Opening lands on the selected option; a search lands on its first result.
   const fallback =
     (!query && enabled.find((option) => selected.includes(option.value))) || enabled[0];
   const active = enabled.find((option) => option.value === highlighted) ?? fallback;
@@ -164,7 +160,6 @@ export function useSelect({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>, source: SelectFocusOwner) => {
-    // keyCode 229 is a key the IME is still composing, which Safari reports without isComposing.
     if (event.defaultPrevented || event.nativeEvent.isComposing || event.keyCode === 229) return;
     if (blocked) return;
     const { key } = event;
@@ -218,8 +213,6 @@ export function useSelect({
         close(true);
         return;
       case 'Tab':
-        // A drawer keeps Tab inside itself. From a popover's search field, focus is put back on
-        // the trigger first so Tab continues from the field, not from the end of the page.
         if (drawer) return;
         if (searching) triggerRef.current?.focus({ preventScroll: true });
         close(false);
@@ -244,10 +237,8 @@ export function useSelect({
     }
     if (activeValue === undefined) return;
     const node = triggerRef.current?.ownerDocument.getElementById(optionId(activeValue));
-    // The list opens centered on the selected option; later moves only scroll as far as needed.
     revealPopupOption(node, { center: !revealed.current });
     revealed.current = true;
-    // optionId is derived from baseId, which never changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, activeValue]);
 

@@ -21,9 +21,6 @@ export type DateTimeLimits = {
 export const serializeDateTime = (date: Date, precision: TimePrecision) =>
   `${dayKey(date)}T${timeKey(date, precision)}`;
 
-// The time limits that apply on one day: min only bites on its own day and max on its own, every
-// day in between is open from midnight to midnight. A min with milliseconds rounds up to the next
-// whole second, since no clock position is smaller. null means the day is outside min..max.
 export function dayBounds(day: Date, min?: Date, max?: Date): { min?: Date; max?: Date } | null {
   const start = startOfDay(day);
   if ((min && isBefore(start, startOfDay(min))) || (max && isAfter(start, max))) return null;
@@ -41,8 +38,6 @@ export function daySlots(day: Date, { min, max, precision, step }: DateTimeLimit
   });
 }
 
-// Only the days holding min or max can run out of clock positions, so the full slot list is
-// built for those two days alone; every other day in range is available as a whole.
 export function dayUnavailable(day: Date, limits: DateTimeLimits): boolean {
   if (isBlocked(day, { disabled: limits.disabled })) return true;
   const bounds = dayBounds(day, limits.min, limits.max);
@@ -50,7 +45,6 @@ export function dayUnavailable(day: Date, limits: DateTimeLimits): boolean {
   return bounds.min || bounds.max ? daySlots(day, limits).length === 0 : false;
 }
 
-// Moving to another day keeps the clock time, or the nearest time that day allows.
 export function onDay(day: Date, time: Date, limits: DateTimeLimits): Date | null {
   const seconds = nearestSlot(daySlots(day, limits), secondsOf(time));
   return seconds === undefined ? null : withTime(day, seconds);

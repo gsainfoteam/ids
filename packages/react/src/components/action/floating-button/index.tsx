@@ -44,9 +44,7 @@ export namespace FloatingButton {
     variant?: Variant;
     colorScheme?: ColorScheme;
     size?: IdsSize;
-    // left and right follow the reading direction, so the button mirrors in a right-to-left page.
     placement?: Placement;
-    // Overrides the icon-only guess for content whose text cannot be read from its elements.
     iconOnly?: boolean;
     children?: ReactNode;
     className?: string;
@@ -59,9 +57,6 @@ export namespace FloatingButton {
     focusableWhenDisabled?: boolean;
   };
 
-  // The button floats over scrolling content, so every fill is opaque: tints are mixed into the
-  // surface color instead of being laid over whatever passes underneath. env() insets have no
-  // logical form, so each side takes its own inset through ltr: and rtl:.
   export const Style = tv({
     base: [
       controlSurface.base,
@@ -116,7 +111,6 @@ export namespace FloatingButton {
     compoundVariants: [
       { size: 'standard', iconOnly: true, class: 'size-14' },
       { size: 'tiny', iconOnly: true, class: 'size-11' },
-      // An extended button keeps less padding on the side holding its icon, like Button.
       {
         size: 'standard',
         iconOnly: false,

@@ -20,8 +20,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-// A password manager's inline menu takes focus from password inputs, which breaks the focus the
-// play functions check, so the stories that run one opt out of it.
 const noPasswordManager = { 'data-1p-ignore': '', 'data-lpignore': 'true' } as const;
 
 const meta = {
@@ -208,7 +206,6 @@ export const Visibility: Story = {
     }) as HTMLInputElement;
     await expect(input).toHaveAttribute('type', 'password');
     await userEvent.click(input);
-    // An explicit range, because user-event's keyboard range selection differs by browser.
     input.setSelectionRange(1, 5, 'backward');
     const toggle = canvas.getByRole('button', { name: '비밀번호 표시' });
     await userEvent.click(toggle);
@@ -221,7 +218,6 @@ export const Visibility: Story = {
       'backward',
     ]);
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    // The glyph alone shows that the password is visible; the pressed toggle keeps no fill.
     await waitFor(() => expect(getComputedStyle(toggle).backgroundColor).toBe('rgba(0, 0, 0, 0)'));
     await userEvent.tab();
     await expect(toggle).toHaveFocus();

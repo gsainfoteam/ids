@@ -31,8 +31,6 @@ export type UseCheckboxOptions = Omit<
   onClick?: MouseEventHandler<HTMLInputElement>;
 };
 
-// Shared by Checkbox and Switch: both are a native checkbox whose checked state React owns, so
-// that `data-state` and the drawn box can never disagree with the input.
 export function useCheckbox({
   checked: checkedProp,
   defaultChecked = false,
@@ -53,7 +51,6 @@ export function useCheckbox({
   const inputRef = useRef<HTMLInputElement>(null);
   const latest = useRef(checked);
 
-  // `indeterminate` is a DOM property with no attribute, and the browser clears it on every click.
   useLayoutEffect(() => {
     latest.current = checked;
     if (inputRef.current) inputRef.current.indeterminate = indeterminate;
@@ -63,8 +60,6 @@ export function useCheckbox({
     if (next !== (latest.current === true)) setChecked(next);
   });
 
-  // A native reset puts the input back to its `checked` attribute, which is only the first render's
-  // value. An uncontrolled box returns to `defaultChecked`; a controlled one to what its parent says.
   useFormReset(inputRef, () => {
     const target = controlled ? latest.current : defaultChecked;
     if (!controlled) setChecked(defaultChecked, { silent: true });
@@ -84,14 +79,10 @@ export function useCheckbox({
     onClick?.(event);
   };
 
-  // React derives a checkbox's change from its click, so a click whose default was prevented, by
-  // readOnly or by the consumer's onClick, still arrives here. The browser reverts that toggle.
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    // A controlled parent may keep the mixed state, and then no render follows to restore it.
     input.indeterminate = indeterminate;
     if (event.nativeEvent.defaultPrevented) {
-      // Some engines undo a cancelled click by toggling again, on top of React's own restore.
       queueMicrotask(() =>
         silently(() => {
           input.checked = latest.current === true;

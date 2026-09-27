@@ -86,7 +86,6 @@ export function useTelField({
   const generatedId = useId();
   const notify = use(FieldNotifyContext);
 
-  // Values: Input over root over the asChild child. Handlers run child, root, Input.
   const childProps =
     asChild && isValidElement<ComponentProps<'input'>>(children) ? children.props : undefined;
   const native: ComponentProps<'input'> = mergeProps(mergeProps({ ...childProps }, rootProps), own);
@@ -98,10 +97,7 @@ export function useTelField({
   const [stored, setStored] = useState(() => toE164(defaultValue, defaultCountry));
   const controlled = value !== undefined;
   const current = controlled ? toE164(value, chosen) : stored;
-  // With a country select, the country follows the number; without one, national digits always
-  // mean the default country, and a number from elsewhere reads internationally.
   const country = separateCountry ? countryOf(current, chosen) : chosen;
-  // A value given in national form keeps reading that way, even while incomplete.
   const initialDraft = (): Draft | null =>
     defaultValue === '' || defaultValue.startsWith('+')
       ? null
@@ -130,7 +126,6 @@ export function useTelField({
 
   const emit = (next: ReadPhone) => {
     setDraft({ value: next.value, text: next.text });
-    // Typing or pasting "+1 …" beside a country select switches the select to that country.
     if (separateCountry && next.country) setChosen(next.country);
     commit(next.value);
   };
@@ -149,8 +144,6 @@ export function useTelField({
     composing.current = false;
   });
 
-  // An incomplete or impossible number fails native validation the way a malformed email does,
-  // so the form refuses it and Field.Error can say why. An empty field is left to `required`.
   const validity = current !== '' && !isCompletePhone(current) ? messages.telField.invalid : '';
   useLayoutEffect(() => {
     inputRef.current?.setCustomValidity(validity);
@@ -160,8 +153,6 @@ export function useTelField({
   const accept = (node: HTMLInputElement, deleting: boolean) => {
     let raw = node.value;
     let position = node.selectionStart ?? raw.length;
-    // Deleting a formatting separator must also remove a digit rather than reinserting it forever.
-    // Only a deletion counts: a paste of the same digits over a formatted entry is not one.
     if (
       deleting &&
       format !== 'none' &&
@@ -176,7 +167,6 @@ export function useTelField({
     const next = readPhone(raw, country, format, separateCountry);
     if (format === 'none') caret.current = position;
     else {
-      // The caret stays after the same number of digits it followed before formatting.
       let count = 0;
       caret.current = next.text.length;
       for (let i = 0; i < next.text.length; i++) {
@@ -207,7 +197,6 @@ export function useTelField({
     id: native.id ?? `ids-tel-${generatedId}`,
     ref,
     type: 'tel',
-    // The hidden input carries the name, so the form gets E.164 rather than the text on screen.
     name: undefined,
     value: display,
     defaultValue: undefined,
@@ -228,12 +217,9 @@ export function useTelField({
       accept(event.currentTarget, inputType === undefined || inputType.startsWith('delete'));
     },
     onBlur: (event: FocusEvent<HTMLInputElement>) => {
-      // A complete number settles into its canonical grouping once the user leaves the field.
       if (draft && isCompletePhone(draft.value)) setDraft(null);
       native.onBlur?.(event);
     },
-    // A whole international number pasted over part of an entry replaces it instead of being
-    // spliced into the middle.
     onPaste: (event: ClipboardEvent<HTMLInputElement>) => {
       native.onPaste?.(event);
       if (event.defaultPrevented || locked) return;
