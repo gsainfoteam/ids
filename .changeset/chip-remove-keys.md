@@ -9,6 +9,8 @@ and hands focus to the neighbouring chip. A chip that is both selectable and rem
 for the pointer only, so no button sits inside a button, and pressing the X no longer toggles it.
 Plain text becomes a truncating `Chip.Label`, chips can be `disabled`, hover and press lay a veil
 in the text color over any variant, and `className` / `style` / `children` take the chip state.
+The remove button is a ghost `IconButton` in the chip's color scheme, so its focus ring follows
+the scheme.
 
 Breaking: `Chip.Close` no longer takes `onClose`; pass `onRemove` to the Chip, and `Chip.Close`
 only changes the glyph or label. The neutral `solid` chip is the inverted on-surface color.

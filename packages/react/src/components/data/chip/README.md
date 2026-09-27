@@ -54,6 +54,7 @@ import { Chip } from '@gsainfoteam/ids-react';
 
 - 지운 뒤 포커스는 다음 칩, 마지막 칩이었다면 앞 칩으로 갑니다. 칩이 실제로 사라졌을 때만 옮깁니다.
 - 실제로 목록에서 빼는 일은 `onRemove` 를 받은 쪽이 합니다.
+- `Chip.Close` 는 칩의 `colorScheme` 을 받은 ghost `IconButton` 입니다. 모양은 칩 글자색의 작은 원이고, 포커스 링과 hover 는 IconButton 과 같습니다.
 
 ## 구성
 

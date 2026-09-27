@@ -113,6 +113,18 @@ test('removable: the close button is named after the chip and removes on click, 
   assert.equal(removed, 3);
 });
 
+test('the close button is a ghost IconButton in the chip color scheme and size', () => {
+  const doc = html(h(Chip, { colorScheme: 'danger', size: 'tiny', onRemove: () => {} }, 'react'));
+  const close = doc.querySelector('[data-chip-close]');
+  assert.equal(close.type, 'button');
+  assert.equal(close.dataset.variant, 'ghost');
+  assert.equal(close.dataset.size, 'tiny');
+  assert.match(close.className, /\[--control-ring:var\(--ids-color-danger\)\]/);
+  assert.match(close.className, /(^| )size-3\.5( |$)/, 'the chip keeps its own small circle');
+  assert.match(close.className, /(^| )rounded-full( |$)/);
+  assert.match(close.className, /(^| )text-current( |$)/, 'in the chip text color');
+});
+
 test('a chip that is a button draws its X for the pointer and removes on Backspace', async () => {
   const events = [];
   await render(
