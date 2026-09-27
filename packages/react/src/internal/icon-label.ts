@@ -1,4 +1,4 @@
-import { Children, isValidElement, type ReactNode } from 'react';
+import { Children, isValidElement, useEffect, type ReactNode } from 'react';
 
 export type IconLabel = {
   label: string;
@@ -75,12 +75,44 @@ let warnedAboutMinification = false;
 
 // A name read from a function works in development and silently disappears in a minified
 // production build, so the first such label on a page says so once.
-export function warnFunctionNameLabel(component: string, label: string) {
-  if (!import.meta.env.DEV || warnedAboutMinification) return;
+function warnFunctionNameLabel(component: string, label: string) {
+  if (warnedAboutMinification) return;
   warnedAboutMinification = true;
   console.warn(
     `[IDS] ${component}: the accessible name "${label}" comes from the icon's function name. ` +
       'Production minifiers rename functions, so the name is gone in a production build. ' +
       'Pass aria-label, or give the icon component a displayName.',
   );
+}
+
+type NameProps = { 'aria-label'?: unknown; 'aria-labelledby'?: unknown; title?: unknown };
+
+function hasName(props: NameProps | undefined) {
+  if (!props) return false;
+  const text = (value: unknown) => typeof value === 'string' && value.trim() !== '';
+  return text(props['aria-label']) || props['aria-labelledby'] != null || text(props.title);
+}
+
+// The aria-label an icon-only control needs: undefined when the control, or the element it renders
+// as, already has a name, otherwise the name found in its icon.
+export function useIconLabel(
+  component: string,
+  icon: ReactNode,
+  ...names: Array<NameProps | undefined>
+) {
+  const named = names.some(hasName);
+  const derived = named ? undefined : iconLabel(icon);
+  const label = derived?.label;
+  const fromFunction = derived?.source === 'function';
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || named) return;
+    if (label === undefined)
+      console.warn(
+        `[IDS] ${component}: no accessible name could be found for this icon. Pass aria-label, or give the icon component a displayName.`,
+      );
+    else if (fromFunction) warnFunctionNameLabel(component, label);
+  }, [component, named, label, fromFunction]);
+
+  return label;
 }

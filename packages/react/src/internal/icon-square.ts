@@ -5,7 +5,7 @@ import type { IdsSize } from '../tokens/types';
 // padding when the override uses the identical has-[...] condition.
 export const iconSquare = {
   base: [
-    'shrink-0 gap-0 px-0 [&_svg]:shrink-0',
+    'shrink-0 gap-0 px-0 rounded-standard [&_svg]:shrink-0',
     'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-0',
     'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-0',
   ],

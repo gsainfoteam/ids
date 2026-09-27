@@ -160,7 +160,11 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
       event.currentTarget.click();
   };
 
-  function render(view: ButtonView) {
+  // What the button shows: its children, or with asChild the child element's children. A component
+  // that draws its own content (IconButton's icon) passes it to render instead.
+  const content: ReactNode = element ? childContent : children;
+
+  function render(view: ButtonView, inner: ReactNode = content) {
     const control: Record<string, unknown> = {
       ...dataProps,
       ...handlers,
@@ -179,12 +183,8 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
     }
     if (softDisabled && !focusableWhenDisabled) control.tabIndex = -1;
 
-    const content = createElement(
-      ButtonNestingContext,
-      { value: name },
-      element ? childContent : children,
-    );
-    if (!element) return createElement('button', { ...view, ...control }, content);
+    const nested = createElement(ButtonNestingContext, { value: name }, inner);
+    if (!element) return createElement('button', { ...view, ...control }, nested);
 
     // The child's handlers run first and can cancel ours with preventDefault. Its className and
     // style come last so that an override written on the child wins over the component's style.
@@ -200,8 +200,8 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
         merged.role = merged.role ?? 'link';
       }
     }
-    return cloneElement(element, merged, content);
+    return cloneElement(element, merged, nested);
   }
 
-  return { state, props: rest as Omit<typeof resolved, Consumed>, kind, render };
+  return { state, props: rest as Omit<typeof resolved, Consumed>, kind, element, content, render };
 }
