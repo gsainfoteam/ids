@@ -56,4 +56,10 @@ export const messages = {
     hueValue: (degrees: number) => `${degrees}도`,
     percent: (value: number) => `${value}%`,
   },
+  colorField: {
+    placeholder: '색상 선택',
+    dialog: '색상 선택',
+    close: '닫기',
+    clear: '색상 지우기',
+  },
 } as const;

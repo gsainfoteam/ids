@@ -1,86 +1,299 @@
 import {
   createContext,
   isValidElement,
-  useCallback,
-  useContext,
+  use,
   useId,
-  useLayoutEffect,
-  useRef,
-  useState,
   type ComponentProps,
+  type CSSProperties,
+  type FocusEvent,
+  type KeyboardEvent,
+  type ReactNode,
 } from 'react';
 
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/16/solid';
 
-import { ColorControls, type ColorControlsProps } from './color-controls';
-import { FieldPopup, flattenParts, part } from '../../../internal/field-popup';
-import { fieldSurface, type FieldSurfaceVariant } from '../../../internal/field-surface';
+import { useColorField } from './use-color-field';
+import {
+  FieldPopup,
+  fieldTrigger,
+  flattenParts,
+  part,
+  resolveState,
+  useDrawerPresentation,
+  type FieldTriggerVariant,
+} from '../../../internal/field-popup';
+import { FormValue } from '../../../internal/form-value';
+import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
-import { parseColor, serializeColor, type ColorFormat } from '../../data/color-picker/color';
+import { ColorPicker, type ColorPickerSwatchOption } from '../../data/color-picker';
+import { cssColor, type ColorFormat } from '../../data/color-picker/color';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
+
+export type { ColorFormat } from '../../data/color-picker/color';
+export type ColorFieldVariant = FieldTriggerVariant;
+
+export type ColorFieldState = {
+  open: boolean;
+  disabled: boolean;
+  readOnly: boolean;
+  invalid: boolean;
+  required: boolean;
+  empty: boolean;
+};
+
 export type ColorFieldProps = Omit<
   ComponentProps<'button'>,
-  'value' | 'defaultValue' | 'onChange'
+  'value' | 'defaultValue' | 'onChange' | 'className' | 'style' | 'children' | 'type'
 > & {
   value?: string;
   defaultValue?: string;
-  onChange?: (value: string) => void;
+  onValueChange?: (value: string) => void;
   format?: ColorFormat;
   alpha?: boolean;
-  swatches?: string[];
-  variant?: 'default' | 'compact' | 'swatchOnly';
-  surfaceVariant?: FieldSurfaceVariant;
+  swatches?: ColorPickerSwatchOption[];
+  variant?: ColorFieldVariant;
   size?: IdsSize;
   invalid?: boolean;
   readOnly?: boolean;
   required?: boolean;
   placeholder?: string;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
   mobileVariant?: 'popover' | 'drawer';
+  className?: string | ((state: ColorFieldState) => string | undefined);
+  style?: CSSProperties;
+  children?: ReactNode;
 };
-type ContextValue = {
-  styles: ReturnType<typeof ColorField.Style>;
-  value: string;
+
+type Context = {
+  field: Omit<ReturnType<typeof useColorField>, 'rootRef' | 'triggerRef'>;
+  state: ColorFieldState;
   placeholder: string;
-  blocked: boolean;
-  trigger: ComponentProps<'button'>;
-  clear: () => void;
-  controls: ColorControlsProps;
+  triggerProps: Record<string, unknown>;
+  valueId: string;
+  picker: ComponentProps<typeof ColorPicker>;
+  styles: ReturnType<typeof ColorField.Style>;
 };
-const Context = createContext<ContextValue | null>(null);
-function useColor() {
-  const c = useContext(Context);
-  invariant(c, 'ColorField parts must be inside ColorField.');
-  return c;
+
+const FieldContext = createContext<Context | null>(null);
+
+function useColor(part: string) {
+  const context = use(FieldContext);
+  invariant(context, `${part} must be rendered inside ColorField.`);
+  return context;
 }
-function ColorSwatch({ asChild, children, ...props }: ColorField.SwatchProps) {
-  const c = useColor();
-  const color = parseColor(c.value);
-  return part(
-    'span',
-    asChild,
-    children,
-    mergeProps(props, {
-      'aria-hidden': true,
-      className: c.styles.swatch(),
-      style: { backgroundColor: color ? serializeColor(color, 'rgb', true) : 'transparent' },
-    }),
-  );
-}
-function ColorValue({ asChild, children, ...props }: ColorField.ValueProps) {
-  const c = useColor();
-  return part(
-    'span',
-    asChild,
-    children ?? (c.value || c.placeholder),
-    mergeProps({ className: c.styles.value() }, props),
-  );
-}
-function ColorTrigger({ asChild, children, ...props }: ColorField.TriggerProps) {
-  const c = useColor();
+
+const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
+
+// Duck-typed rather than `instanceof Node`, which fails across frames.
+const isNode = (value: unknown): value is Node =>
+  typeof value === 'object' && value !== null && 'nodeType' in value;
+
+// Focus lands on the first control of whatever the popup holds: the area, a slider, the
+// input, or the chosen swatch of a palette-only picker.
+const FIRST_CONTROL =
+  '[data-color-picker] input:not([tabindex="-1"]), [data-color-picker] [role=radio][tabindex="0"]';
+
+const CHECKER =
+  'conic-gradient(var(--ids-color-muted) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-muted) 0 75%, var(--ids-color-surface) 0)';
+
+export function ColorField({
+  value,
+  defaultValue,
+  onValueChange,
+  format = 'hex',
+  alpha = false,
+  swatches,
+  variant = 'outline',
+  size,
+  invalid,
+  readOnly = false,
+  required = false,
+  disabled = false,
+  placeholder = messages.colorField.placeholder,
+  open,
+  defaultOpen,
+  onOpenChange,
+  mobileVariant,
+  name,
+  form,
+  className,
+  style,
+  children,
+  ref: forwardedRef,
+  onBlur,
+  ...native
+}: ColorFieldProps) {
+  const { rootRef, triggerRef, ...field } = useColorField({
+    value,
+    defaultValue,
+    onValueChange,
+    open,
+    defaultOpen,
+    onOpenChange,
+    format,
+    alpha,
+    disabled,
+    readOnly,
+  });
+  const { state: s, actions } = field;
+  const drawer = useDrawerPresentation(mobileVariant);
+  const popupId = `ids-color-${useId()}`;
+  const resolvedSize = useFieldSize(size) ?? 'standard';
+  const styles = ColorField.Style({ variant, size: resolvedSize });
+
+  const ariaInvalid = native['aria-invalid'] ?? invalid ?? (s.invalid || undefined);
+  const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
+  const state: ColorFieldState = {
+    open: s.open,
+    disabled,
+    readOnly,
+    invalid: isInvalid,
+    required,
+    empty: !s.value,
+  };
+
+  const popupSelector = `[data-color-field-popup="${popupId}"]`;
+  const triggerId = native.id ?? `${popupId}-trigger`;
+  const valueId = `${popupId}-value`;
+  // A label on a button replaces its content as the name, which would hide the color from a
+  // screen reader. Pointing the name at the label and then the value reads both.
+  const labelledBy = native['aria-labelledby']
+    ? `${native['aria-labelledby']} ${valueId}`
+    : native['aria-label']
+      ? `${triggerId} ${valueId}`
+      : undefined;
+  const triggerProps = mergeProps(native as Record<string, unknown>, {
+    // mergeRefs only composes the refs into a callback; nothing reads them during render.
+    // eslint-disable-next-line react-hooks/refs
+    ref: mergeRefs(triggerRef, forwardedRef),
+    id: triggerId,
+    'aria-labelledby': labelledBy,
+    type: 'button',
+    form,
+    disabled,
+    'aria-haspopup': 'dialog',
+    'aria-expanded': s.open,
+    'aria-controls': s.open ? popupId : undefined,
+    'aria-invalid': ariaInvalid,
+    'aria-required': native['aria-required'] ?? (required || undefined),
+    'aria-disabled': readOnly || undefined,
+    'data-field-input': '',
+    'data-placeholder': state.empty ? '' : undefined,
+    'data-readonly': readOnly ? '' : undefined,
+    onClick: actions.toggle,
+    onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => actions.onTriggerKeyDown(event),
+    // Moving into the popup is not leaving the field.
+    onBlur: (event: FocusEvent<HTMLButtonElement>) => {
+      const next = event.relatedTarget;
+      if (isNode(next) && (next as Element).closest?.(popupSelector)) return;
+      onBlur?.(event);
+    },
+  });
+
+  const nodes = flattenParts(children);
+  const triggers = nodes.filter(isType(ColorFieldTrigger));
+  const clears = nodes.filter(isType(ColorFieldClear));
+  const contents = nodes.filter(isType(ColorFieldContent));
   invariant(
-    !flattenParts(children).some((p) => isValidElement(p) && p.type === ColorClear),
+    triggers.length <= 1 && contents.length <= 1 && clears.length <= 1,
+    'ColorField accepts one Trigger, Content and Clear.',
+  );
+
+  return (
+    <FieldContext
+      value={{
+        field,
+        state,
+        placeholder,
+        triggerProps,
+        valueId,
+        picker: {
+          value: s.text,
+          onValueChange: actions.change,
+          format,
+          alpha,
+          swatches,
+          size: resolvedSize,
+          disabled,
+          readOnly,
+        },
+        styles,
+      }}
+    >
+      <div
+        ref={rootRef}
+        data-color-field=""
+        data-size={resolvedSize}
+        data-variant={variant}
+        data-open={s.open ? '' : undefined}
+        data-disabled={disabled ? '' : undefined}
+        data-readonly={readOnly ? '' : undefined}
+        data-invalid={isInvalid ? '' : undefined}
+        data-required={required ? '' : undefined}
+        data-empty={state.empty ? '' : undefined}
+        className={styles.root({ className: resolveState(className, state) })}
+        style={style}
+      >
+        {triggers.length ? triggers : <ColorFieldTrigger />}
+        {clears.length ? clears : <ColorFieldClear />}
+        <FormValue
+          name={name}
+          form={form}
+          value={s.text}
+          required={required && !readOnly}
+          disabled={disabled}
+          anchor={triggerRef}
+        />
+      </div>
+      {s.open && (
+        <FieldPopup
+          anchor={rootRef}
+          onClose={actions.close}
+          mobileVariant={mobileVariant}
+          preferredWidth={resolvedSize === 'tiny' ? 248 : 280}
+          initialFocusSelector={FIRST_CONTROL}
+          role="dialog"
+          id={popupId}
+          {...(native['aria-labelledby']
+            ? { 'aria-labelledby': native['aria-labelledby'] }
+            : { 'aria-label': native['aria-label'] ?? messages.colorField.dialog })}
+          data-color-field-popup={popupId}
+          className={styles.popup()}
+          onBlur={(event) => {
+            const next = event.relatedTarget;
+            if (isNode(next) && (event.currentTarget.contains(next) || next === triggerRef.current))
+              return;
+            onBlur?.(event as unknown as FocusEvent<HTMLButtonElement>);
+          }}
+        >
+          {drawer && (
+            <div className={styles.popupHeader()}>
+              <span className={styles.popupTitle()}>{messages.colorField.dialog}</span>
+              <button
+                type="button"
+                aria-label={messages.colorField.close}
+                onClick={() => actions.close(true)}
+                className={styles.popupClose()}
+              >
+                <XMarkIcon aria-hidden="true" />
+              </button>
+            </div>
+          )}
+          {contents.length ? contents : <ColorFieldContent />}
+        </FieldPopup>
+      )}
+    </FieldContext>
+  );
+}
+
+function ColorFieldTrigger({ asChild, children, className, ...props }: ColorField.TriggerProps) {
+  const c = useColor('ColorField.Trigger');
+  invariant(
+    !flattenParts(children).some(isType(ColorFieldClear)),
     'ColorField.Clear must be a sibling of Trigger, not inside its button.',
   );
   return part(
@@ -88,273 +301,172 @@ function ColorTrigger({ asChild, children, ...props }: ColorField.TriggerProps) 
     asChild,
     children ?? (
       <>
-        <ColorSwatch />
-        <ColorValue />
+        <ColorFieldSwatch />
+        <ColorFieldValue />
       </>
     ),
-    mergeProps(props, { ...c.trigger }),
+    mergeProps(props, {
+      ...c.triggerProps,
+      className: c.styles.trigger({ className: resolveState(className, c.state) }),
+    }),
   );
 }
-function ColorClear({ asChild, children, ...props }: ColorField.ClearProps) {
-  const c = useColor();
-  if (!c.value) return null;
+
+// No color is drawn as a struck-through box; a translucent one over a checkerboard.
+function ColorFieldSwatch({
+  asChild,
+  children,
+  className,
+  style,
+  ...props
+}: ColorField.SwatchProps) {
+  const c = useColor('ColorField.Swatch');
+  const { parsed } = c.field.state;
+  const fill = parsed ? cssColor(parsed) : undefined;
+  return part(
+    'span',
+    asChild,
+    children,
+    mergeProps(props, {
+      'aria-hidden': true,
+      'data-color-field-swatch': '',
+      'data-empty': parsed ? undefined : '',
+      className: c.styles.swatch({ className }),
+      style: fill
+        ? {
+            ...style,
+            backgroundImage: `linear-gradient(${fill}, ${fill}), ${CHECKER}`,
+            backgroundSize: '100% 100%, 6px 6px',
+          }
+        : style,
+    }),
+  );
+}
+
+function ColorFieldValue({ asChild, children, className, ...props }: ColorField.ValueProps) {
+  const c = useColor('ColorField.Value');
+  const { text } = c.field.state;
+  return part(
+    'span',
+    asChild,
+    children ?? (text || c.placeholder),
+    mergeProps(props, {
+      id: props.id ?? c.valueId,
+      'data-placeholder': text ? undefined : '',
+      className: c.styles.value({ className }),
+    }),
+  );
+}
+
+function ColorFieldClear({ asChild, children, className, ...props }: ColorField.ClearProps) {
+  const c = useColor('ColorField.Clear');
+  if (!c.field.state.value || c.state.readOnly) return null;
   return part(
     'button',
     asChild,
     children ?? <XMarkIcon aria-hidden="true" />,
     mergeProps(props, {
       type: 'button',
-      'aria-label': props['aria-label'] ?? '색상 지우기',
-      disabled: c.blocked,
-      className: c.styles.clear(),
-      onClick: () => c.clear(),
+      'aria-label': props['aria-label'] ?? messages.colorField.clear,
+      disabled: c.state.disabled,
+      'data-color-field-clear': '',
+      className: c.styles.clear({ className }),
+      onClick: c.field.actions.clear,
     }),
   );
 }
-function ColorContent({ asChild, children, ...props }: ColorField.ContentProps) {
-  const c = useColor();
-  return part('div', asChild, children ?? <ColorControls {...c.controls} />, props);
-}
-export function ColorField({
-  value,
-  defaultValue = '',
-  onChange,
-  format = 'hex',
-  alpha = false,
-  swatches,
-  variant = 'default',
-  surfaceVariant = 'outline',
-  size,
-  invalid,
-  readOnly,
-  required,
-  placeholder = '색상 선택',
-  mobileVariant,
-  children,
-  ref: forwardedRef,
-  name,
-  form,
-  className,
-  style,
-  ...native
-}: ColorFieldProps) {
-  const [stored, setStored] = useState(defaultValue);
-  const current = value === undefined ? stored : value;
-  const parsed = parseColor(current);
-  const normalized = parsed ? serializeColor(parsed, format, alpha) : current;
-  const [open, setOpen] = useState(false);
-  const trigger = useRef<HTMLButtonElement>(null);
-  const surface = useRef<HTMLDivElement>(null);
-  const uid = useId();
-  const id = `ids-color-${uid}`;
-  const blocked = !!native.disabled || !!readOnly;
-  const resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = ColorField.Style({ surfaceVariant, size: resolvedSize });
-  const close = useCallback(
-    (restore: boolean) => {
-      setOpen(false);
-      if (restore) trigger.current?.focus({ preventScroll: true });
-    },
-    [setOpen],
-  );
-  const change = (next: string) => {
-    if (blocked) return;
-    if (value === undefined) setStored(next);
-    if (next !== normalized) onChange?.(next);
-  };
-  useLayoutEffect(() => {
-    const owner = trigger.current?.form;
-    if (!owner) return;
-    let alive = true;
-    const reset = (event: Event) =>
-      queueMicrotask(() => {
-        if (alive && !event.defaultPrevented) {
-          if (value === undefined) setStored(defaultValue);
-          close(false);
-        }
-      });
-    owner.addEventListener('reset', reset);
-    return () => {
-      alive = false;
-      owner.removeEventListener('reset', reset);
-    };
-  }, [value, defaultValue, form, close]);
-  const triggerProps: ComponentProps<'button'> = {
-    ...native,
-    form,
-    id: native.id ?? `${id}-trigger`,
-    type: 'button',
-    'aria-haspopup': 'dialog',
-    ...{ 'data-field-input': '' },
-    'aria-expanded': open && !blocked,
-    'aria-controls': open && !blocked ? id : undefined,
-    'aria-invalid': native['aria-invalid'] ?? invalid ?? (!!current && !parsed),
-    'aria-required': native['aria-required'] ?? required,
-    // mergeRefs returns a callback; it does not read ref.current here.
-    // eslint-disable-next-line react-hooks/refs
-    ref: mergeRefs(trigger, forwardedRef),
-    className: styles.trigger(),
-    onClick: (e) => {
-      native.onClick?.(e);
-      if (!e.defaultPrevented && !blocked) setOpen((previous) => !previous);
-    },
-    onKeyDown: (e) => {
-      native.onKeyDown?.(e);
-      if (!e.defaultPrevented && !blocked && e.key === 'ArrowDown') {
-        e.preventDefault();
-        setOpen(true);
-      }
-    },
-    onBlur: (e) => {
-      if (!e.relatedTarget || !(e.relatedTarget as Element).closest?.(`[data-color-owner="${id}"]`))
-        native.onBlur?.(e);
-    },
-  };
-  const parts = flattenParts(children);
-  const triggers = parts.filter((p) => isValidElement(p) && p.type === ColorTrigger);
-  const contents = parts.filter((p) => isValidElement(p) && p.type === ColorContent);
-  const clears = parts.filter((p) => isValidElement(p) && p.type === ColorClear);
-  invariant(
-    triggers.length <= 1 && contents.length <= 1 && clears.length <= 1,
-    'ColorField accepts one Trigger, Content and Clear.',
-  );
+
+// The popup's body: a ColorPicker bound to the field. Its children are ColorPicker parts, so a
+// field can offer only a palette, or only a hue slider and an input.
+function ColorFieldContent({ children, className, ...props }: ColorField.ContentProps) {
+  const c = useColor('ColorField.Content');
   return (
-    <Context.Provider
-      value={{
-        styles,
-        value: normalized,
-        placeholder,
-        blocked,
-        trigger: triggerProps,
-        clear: () => {
-          change('');
-          trigger.current?.focus({ preventScroll: true });
-        },
-        controls: {
-          value: normalized,
-          onChange: change,
-          format,
-          alpha,
-          swatches,
-          variant,
-          size: resolvedSize,
-        },
-      }}
-    >
-      <div
-        ref={surface}
-        data-color-field=""
-        data-invalid={
-          triggerProps['aria-invalid'] === true || triggerProps['aria-invalid'] === 'true'
-            ? ''
-            : undefined
-        }
-        className={styles.root({ className })}
-        style={style}
-      >
-        {triggers.length ? triggers : <ColorTrigger />}
-        {clears.length ? clears : <ColorClear />}
-      </div>
-      {open && !blocked && (
-        <FieldPopup
-          anchor={surface}
-          mobileVariant={mobileVariant}
-          onClose={close}
-          role="dialog"
-          id={id}
-          aria-label={native['aria-label'] ?? '색상 선택'}
-          data-color-owner={id}
-          onBlur={(e) => {
-            if (
-              !e.currentTarget.contains(e.relatedTarget as Node) &&
-              e.relatedTarget !== trigger.current
-            )
-              native.onBlur?.(e as unknown as React.FocusEvent<HTMLButtonElement>);
-          }}
-        >
-          <div className={styles.header()}>
-            <span className={styles.title()}>색상 선택</span>
-            <button
-              type="button"
-              data-popup-autofocus=""
-              aria-label="색상 선택 닫기"
-              onClick={() => close(true)}
-              className={styles.close()}
-            >
-              <XMarkIcon aria-hidden="true" />
-            </button>
-          </div>
-          {contents.length ? contents : <ColorContent />}
-        </FieldPopup>
-      )}
-      {name && (
-        <input
-          type="hidden"
-          name={name}
-          form={form}
-          value={normalized}
-          disabled={native.disabled}
-        />
-      )}
-    </Context.Provider>
+    <ColorPicker {...props} {...c.picker} className={className}>
+      {children}
+    </ColorPicker>
   );
 }
+
 export namespace ColorField {
   export type Props = ColorFieldProps;
-  export type TriggerProps = ComponentProps<'button'> & { asChild?: boolean };
-  export type ClearProps = TriggerProps;
+  export type State = ColorFieldState;
+  export type Variant = ColorFieldVariant;
+  export type TriggerProps = Omit<ComponentProps<'button'>, 'className'> & {
+    asChild?: boolean;
+    className?: string | ((state: ColorFieldState) => string | undefined);
+  };
+  export type SwatchProps = ComponentProps<'span'> & { asChild?: boolean };
   export type ValueProps = ComponentProps<'span'> & { asChild?: boolean };
-  export type SwatchProps = ValueProps;
-  export type ContentProps = ComponentProps<'div'> & { asChild?: boolean };
-  export const Trigger = ColorTrigger;
-  export const Value = ColorValue;
-  export const Swatch = ColorSwatch;
-  export const Content = ColorContent;
-  export const Clear = ColorClear;
+  export type ClearProps = ComponentProps<'button'> & { asChild?: boolean };
+  export type ContentProps = Omit<
+    ComponentProps<'div'>,
+    'defaultValue' | 'onChange' | 'className' | 'children'
+  > & {
+    className?: string;
+    children?: ReactNode;
+  };
+
+  export const Trigger = ColorFieldTrigger;
+  export const Swatch = ColorFieldSwatch;
+  export const Value = ColorFieldValue;
+  export const Clear = ColorFieldClear;
+  export const Content = ColorFieldContent;
+
   export const Style = tv({
     slots: {
-      // The trigger carries data-field-input, so focus-ring rings the shell for the trigger
-      // only and Clear shows its own ring.
-      root: ['flex w-full min-w-0 items-center', fieldSurface.base],
+      // The trigger carries data-field-input, so focus-ring rings the whole field for it while
+      // Clear keeps a ring of its own.
+      root: ['relative', fieldTrigger.base],
       trigger: [
-        'flex h-full min-w-0 flex-1 touch-manipulation items-center text-left outline-none',
-        'cursor-pointer disabled:cursor-not-allowed disabled:opacity-50',
+        'flex h-full min-w-0 flex-1 cursor-pointer items-center self-stretch bg-transparent text-start outline-none',
+        'disabled:cursor-not-allowed data-readonly:cursor-default',
       ],
-      swatch: 'shrink-0 rounded-indicator inset-ring-1 inset-ring-(--ids-color-border)',
-      value: 'min-w-0 flex-1 truncate font-mono',
+      swatch: [
+        'shrink-0 rounded-indicator inset-ring-1 inset-ring-(--ids-color-on-surface)/15',
+        'data-empty:bg-[linear-gradient(to_top_right,transparent_calc(50%-0.75px),var(--ids-color-danger)_50%,transparent_calc(50%+0.75px))]',
+        'data-empty:inset-ring-(--ids-color-border)',
+      ],
+      value: [
+        'min-w-0 flex-1 truncate font-mono',
+        'data-placeholder:font-sans data-placeholder:text-(--ids-color-on-muted)',
+      ],
       clear: [
-        'inline-flex shrink-0 cursor-pointer items-center justify-center text-(--ids-color-on-muted)',
-        'focus-ring disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
+        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
+        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
+        'focus-ring disabled:pointer-events-none',
       ],
-      header: 'mb-2 flex items-center justify-between px-1',
-      title: 'text-body-b3-medium',
-      close: [
-        'inline-flex size-7 cursor-pointer items-center justify-center rounded-standard',
+      // Padding that keeps the popup's corner concentric with the 12px area inside it.
+      popup: 'concentric-p-3',
+      popupHeader: '-mt-1 mb-2 flex items-center justify-between ps-1',
+      popupTitle: 'text-body-b3-medium',
+      popupClose: [
+        'inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-standard',
+        'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
         'focus-ring [&_svg]:size-(--ids-size-icon-standard)',
       ],
     },
     variants: {
-      surfaceVariant: {
-        outline: { root: fieldSurface.variant.outline },
-        soft: { root: fieldSurface.variant.soft },
-        ghost: { root: fieldSurface.variant.ghost },
-      } satisfies Record<FieldSurfaceVariant, object>,
+      variant: {
+        outline: { root: fieldTrigger.variant.outline },
+        soft: { root: fieldTrigger.variant.soft },
+        ghost: { root: fieldTrigger.variant.ghost },
+      } satisfies Record<ColorFieldVariant, object>,
       size: {
         standard: {
           root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
           trigger: 'gap-2 px-3',
           swatch: 'size-5',
-          clear: 'mr-1 size-7 rounded-standard [&_svg]:size-(--ids-size-icon-standard)',
+          clear: 'me-1 size-7 [&_svg]:size-(--ids-size-icon-standard)',
         },
         tiny: {
           root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
-          trigger: 'gap-1.5 px-2',
+          trigger: 'gap-1.5 px-2.5',
           swatch: 'size-4',
-          clear: 'mr-1 size-6 rounded-indicator [&_svg]:size-(--ids-size-icon-tiny)',
+          clear: 'me-1 size-6 [&_svg]:size-(--ids-size-icon-tiny)',
         },
       } satisfies Record<IdsSize, object>,
     },
-    defaultVariants: { surfaceVariant: 'outline', size: 'standard' },
+    defaultVariants: { variant: 'outline', size: 'standard' },
   });
 }
-export type { ColorFormat } from '../../data/color-picker/color';
