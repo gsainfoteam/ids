@@ -94,13 +94,14 @@ function hasName(props: NameProps | undefined) {
 }
 
 // The aria-label an icon-only control needs: undefined when the control, or the element it renders
-// as, already has a name, otherwise the name found in its icon.
+// as, already has a name, otherwise the name found in its icon. An undefined icon means the control
+// is not icon-only right now (a FloatingButton with a label), so there is nothing to find.
 export function useIconLabel(
   component: string,
-  icon: ReactNode,
+  icon: ReactNode | undefined,
   ...names: Array<NameProps | undefined>
 ) {
-  const named = names.some(hasName);
+  const named = icon === undefined || names.some(hasName);
   const derived = named ? undefined : iconLabel(icon);
   const label = derived?.label;
   const fromFunction = derived?.source === 'function';

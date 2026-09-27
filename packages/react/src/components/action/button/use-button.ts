@@ -208,5 +208,13 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
     return cloneElement(element, merged, nested);
   }
 
-  return { state, props: rest as Omit<typeof resolved, Consumed>, kind, element, content, render };
+  return {
+    state,
+    props: rest as Omit<typeof resolved, Consumed>,
+    kind,
+    element,
+    content,
+    nodeRef,
+    render,
+  };
 }
