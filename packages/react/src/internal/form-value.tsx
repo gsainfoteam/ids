@@ -8,6 +8,9 @@ export type FormValueProps = {
   disabled?: boolean;
   // The visible control that should take focus when the browser reports the value missing.
   anchor: RefObject<HTMLElement | null>;
+  // The browser's own message is written for a text box ("fill out this field"), which misreads
+  // for a group of checkboxes or a rating.
+  message?: string;
 };
 
 const noop = () => {};
@@ -20,9 +23,18 @@ const noop = () => {};
 // control: the browser anchors its "please fill out this field" bubble to it, and when the browser
 // focuses it to show the bubble, focus moves on to the real control. It must not be readOnly or
 // disabled, since either bars it from validation too. Render this inside a `relative` root.
-export function FormValue({ name, form, value, required, disabled, anchor }: FormValueProps) {
+export function FormValue({
+  name,
+  form,
+  value,
+  required,
+  disabled,
+  anchor,
+  message,
+}: FormValueProps) {
   const values = value == null ? [] : typeof value === 'string' ? [value] : [...value];
   const filled = values.filter((entry) => entry !== '');
+  const missing = message !== undefined && filled.length === 0 ? message : '';
 
   return (
     <>
@@ -39,6 +51,7 @@ export function FormValue({ name, form, value, required, disabled, anchor }: For
         ))}
       {required && !disabled && (
         <input
+          ref={(node) => node?.setCustomValidity(missing)}
           aria-hidden="true"
           tabIndex={-1}
           required

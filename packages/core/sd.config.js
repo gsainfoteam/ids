@@ -303,6 +303,13 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 }
 `;
 
+// Components write dark:* for the few styles a token cannot carry, and ThemeProvider sets the
+// mode as data-mode, so the variant must follow that attribute rather than the OS media query.
+// A light region nested in a dark one is excluded explicitly; without it every descendant of
+// the dark ancestor would still match.
+const T_CSS_VARIANTS = `@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *):not(:where([data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *)));
+`;
+
 // One definition for every focus trigger IDS uses: real form controls, components
 // driven by useInteractive, and a shell that wraps a focusable input marked data-field-input. Focus also recolors an
 // inset-ring border when the element has one; the color alone draws nothing on an element
@@ -435,6 +442,7 @@ const cssFormatter = ({ dictionary }) =>
     buildColorBridgeCSS(dictionary),
     buildStaticCSS(dictionary),
     T_CSS_ANIMATIONS,
+    T_CSS_VARIANTS,
     T_CSS_UTILITIES,
     buildConcentricCSS(),
     buildTypographyCSS(dictionary),
