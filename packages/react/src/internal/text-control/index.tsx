@@ -217,7 +217,7 @@ export const textControlStyle = tv({
           insetButtons.size.standard,
           'has-[button]:first:-ms-2 has-[button]:last:-me-2',
         ],
-        action: fieldAction.size.standard,
+        action: fieldAction.padded.standard,
       },
       tiny: {
         root: fieldSurface.size.tiny,
@@ -226,7 +226,7 @@ export const textControlStyle = tv({
           insetButtons.size.tiny,
           'has-[button]:first:-ms-1.5 has-[button]:last:-me-1.5',
         ],
-        action: fieldAction.size.tiny,
+        action: fieldAction.padded.tiny,
       },
     } satisfies Record<IdsSize, object>,
   },

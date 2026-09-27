@@ -320,11 +320,11 @@ export namespace PasswordField {
     variants: {
       size: {
         standard: {
-          toggle: fieldAction.size.standard,
+          toggle: fieldAction.padded.standard,
           capsLock: '[&_svg]:size-(--ids-size-icon-standard)',
         },
         tiny: {
-          toggle: fieldAction.size.tiny,
+          toggle: fieldAction.padded.tiny,
           capsLock: '[&_svg]:size-(--ids-size-icon-tiny)',
         },
       } satisfies Record<IdsSize, object>,

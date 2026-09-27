@@ -30,19 +30,18 @@ export const fieldSurface = {
   } satisfies Record<IdsSize, string>,
 } as const;
 
-// A button inside the field's box (clear, reveal, a stepper, a popup's own trigger) is a ghost
-// IconButton that takes these classes: 8px shorter than the field, with a muted glyph that darkens
-// on hover. At either end it pulls into the padding by the 4px it leaves above and below, so it
-// sits evenly inset from the border on every side.
 export const fieldAction = {
   base: cn(
     'shrink-0 text-(--ids-color-on-muted)',
-    // A control marks only one of hovered, active and pressed at a time, so each darkens it.
     'data-hovered:text-(--ids-color-on-surface) data-active:text-(--ids-color-on-surface)',
     'data-pressed:text-(--ids-color-on-surface)',
   ),
-  size: {
+  padded: {
     standard: cn('size-7 first:-ms-2 last:-me-2'),
     tiny: cn('size-6 first:-ms-1.5 last:-me-1.5'),
+  } satisfies Record<IdsSize, string>,
+  unpadded: {
+    standard: cn('size-7 me-1 first:ms-1'),
+    tiny: cn('size-6 me-1 first:ms-1'),
   } satisfies Record<IdsSize, string>,
 } as const;

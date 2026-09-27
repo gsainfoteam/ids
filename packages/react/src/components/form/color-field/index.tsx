@@ -451,7 +451,7 @@ export namespace ColorField {
         'data-placeholder:font-sans data-placeholder:text-(--ids-color-on-muted)',
       ],
       // A disabled field is dimmed at its root already, and Clear is only disabled with it.
-      clear: [fieldAction.base, 'me-1 data-disabled:opacity-100'],
+      clear: [fieldAction.base, 'data-disabled:opacity-100'],
       // Padding that keeps the popup's corner concentric with the standard-radius area inside it.
       popup: 'concentric-p-3',
     },
@@ -461,20 +461,18 @@ export namespace ColorField {
         soft: { root: fieldTrigger.variant.soft },
         ghost: { root: fieldTrigger.variant.ghost },
       } satisfies Record<ColorFieldVariant, object>,
-      // The trigger carries the field's padding, not the box, so Clear keeps 4px from the border
-      // even when it is the box's last child, where fieldAction would pull it into the padding.
       size: {
         standard: {
           root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
           trigger: 'gap-2 px-3',
           swatch: 'size-5',
-          clear: [fieldAction.size.standard, 'last:me-1'],
+          clear: fieldAction.unpadded.standard,
         },
         tiny: {
           root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
           trigger: 'gap-1.5 px-2.5',
           swatch: 'size-4',
-          clear: [fieldAction.size.tiny, 'last:me-1'],
+          clear: fieldAction.unpadded.tiny,
         },
       } satisfies Record<IdsSize, object>,
     },

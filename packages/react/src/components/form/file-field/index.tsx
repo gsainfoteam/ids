@@ -683,14 +683,14 @@ export namespace FileField {
       size: {
         standard: {
           root: 'text-body-b3-regular',
-          clear: [fieldAction.size.standard, 'first:ms-1 last:me-1'],
+          clear: fieldAction.unpadded.standard,
           itemRemove: 'size-7',
           icon: fieldTrigger.icon.standard,
           rejections: 'text-body-b3-regular',
         },
         tiny: {
           root: 'text-caption-c1-regular',
-          clear: [fieldAction.size.tiny, 'first:ms-1 last:me-1'],
+          clear: fieldAction.unpadded.tiny,
           itemRemove: 'size-6',
           icon: fieldTrigger.icon.tiny,
           rejections: 'text-caption-c1-regular',

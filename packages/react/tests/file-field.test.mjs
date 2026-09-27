@@ -332,7 +332,7 @@ test('rows are dense outline Items in a group; Clear and Remove are ghost IconBu
   const clear = host.querySelector('[data-file-field-control] [data-file-field-clear]');
   assert.equal(clear.dataset.variant, 'ghost');
   assert.match(clear.className, /(^| )size-7( |$)/);
-  assert.match(clear.className, /(^| )last:me-1( |$)/, 'Clear keeps its inset in the bare control');
+  assert.match(clear.className, /(^| )me-1( |$)/, 'Clear keeps its inset in the bare control');
   assert.doesNotMatch(clear.className, /-me-2/);
   await render(
     tracked({ multiple: true, size: 'tiny', defaultValue: [file('a.pdf')], key: 'tiny' }).node,

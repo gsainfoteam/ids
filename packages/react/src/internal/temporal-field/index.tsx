@@ -132,17 +132,13 @@ export const temporalFieldStyle = tv({
     ],
     icon: 'shrink-0 text-(--ids-color-on-muted)',
     value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
-    // Clear, and the calendar button that stands in for the trigger beside an Input part, are
-    // ghost IconButtons. The trigger runs to both edges of the box so all of it opens the popup,
-    // which leaves no padding for fieldAction to pull an end button into; each keeps 4px from the
-    // border instead, the inset it has above and below.
-    clear: [fieldAction.base, 'me-1'],
+    clear: fieldAction.base,
     // With an Input part the text box takes the focus and the label.
     input: [
       'h-full min-w-0 flex-1 self-stretch bg-transparent outline-none',
       'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
     ],
-    button: [fieldAction.base, 'me-1'],
+    button: fieldAction.base,
     content: 'flex justify-center',
     // DateTimeField's popup: the calendar beside the clock, stacked on a phone.
     panel: 'flex flex-col gap-4 sm:flex-row',
@@ -160,17 +156,17 @@ export const temporalFieldStyle = tv({
         root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
         trigger: 'gap-2 px-3',
         icon: 'size-(--ids-size-icon-standard)',
-        clear: [fieldAction.size.standard, 'first:ms-1 last:me-1'],
+        clear: fieldAction.unpadded.standard,
         input: 'ps-3',
-        button: [fieldAction.size.standard, 'first:ms-1 last:me-1'],
+        button: fieldAction.unpadded.standard,
       },
       tiny: {
         root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
         trigger: 'gap-1.5 px-2.5',
         icon: 'size-(--ids-size-icon-tiny)',
-        clear: [fieldAction.size.tiny, 'first:ms-1 last:me-1'],
+        clear: fieldAction.unpadded.tiny,
         input: 'ps-2.5',
-        button: [fieldAction.size.tiny, 'first:ms-1 last:me-1'],
+        button: fieldAction.unpadded.tiny,
       },
     } satisfies Record<IdsSize, object>,
     disabled: {

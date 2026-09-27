@@ -712,10 +712,7 @@ export namespace Select {
       valueText: 'truncate',
       more: 'shrink-0 text-(--ids-color-on-muted)',
       icon: 'inline-flex shrink-0 text-(--ids-color-on-muted)',
-      // Clear is a ghost IconButton with fieldAction's look. The trigger holds the field's padding,
-      // not the root, so fieldAction's pull into the padding at the end would push it past the
-      // border; it keeps the same 4px inset with a margin instead.
-      clear: [fieldAction.base, 'me-1'],
+      clear: fieldAction.base,
       listbox: fieldListbox.list,
       item: fieldListbox.option,
       indicator: fieldListbox.indicator,
@@ -735,13 +732,13 @@ export namespace Select {
           root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
           trigger: 'gap-2 px-3',
           icon: '[&_svg]:size-(--ids-size-icon-standard)',
-          clear: 'size-7',
+          clear: fieldAction.unpadded.standard,
         },
         tiny: {
           root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
           trigger: 'gap-1.5 px-2.5',
           icon: '[&_svg]:size-(--ids-size-icon-tiny)',
-          clear: 'size-6',
+          clear: fieldAction.unpadded.tiny,
         },
       } satisfies Record<IdsSize, object>,
     },
