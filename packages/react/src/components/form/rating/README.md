@@ -1,120 +1,158 @@
 # Rating
 
-- 아이콘 개수로 점수를 고르거나 보여주는 컨트롤
-- 값은 `number`. `step={0.5}`로 반 점을 고른다
-- `star` / `heart` / `circle` 아이콘, `custom`이면 직접 준 아이콘
-- `selectionMode="none"`이면 표시 전용 이미지
+별 같은 아이콘 개수로 점수를 고르거나 보여 주는 컨트롤입니다. 리뷰, 만족도 조사, 평균 평점에 씁니다. 연속된 값은 `Slider` 가 맞습니다.
+
+- **반 점.** `step={0.5}` 면 아이콘의 앞쪽 절반이 .5점, 뒤쪽 절반이 1점입니다. 오른쪽에서 왼쪽 문서에서는 반쪽도 뒤집힙니다.
+- **미리보기.** 마우스를 올리면 그 점수까지 채워 보여 주고 `onHover` 로 알립니다. 값은 눌러야 바뀌고, 터치는 누르는 순간 고릅니다.
+- **키보드.** 방향키는 한 칸씩, 숫자 키는 그 점수로, `Home` 과 `0` 은 0점으로, `End` 는 만점으로 갑니다. Tab은 고른 점수 하나에 멈춥니다.
+- **모양은 합성.** `Rating.Item` 에 하트, 점, 얼굴처럼 원하는 아이콘을 넣습니다. 전부 같은 모양이어도, 자리마다 달라도 됩니다.
+- **폼.** `name` 을 주면 점수가 제출되고, `required` 면 0점일 때 브라우저가 "점수를 선택하세요." 로 막습니다. react-hook-form은 `controlMode="value"` 로 연결됩니다.
+- **표시 전용.** `selectionMode="none"` 은 "5점 만점에 4.5점" 으로 읽히는 그림입니다.
 
 ```tsx
-import { Rating } from '@gsainfoteam/ids-react';
+import { Field, Rating } from '@gsainfoteam/ids-react';
 
-const [score, setScore] = useState(0);
-
-<Rating aria-label="만족도" value={score} onChange={setScore} />;
+<Field>
+  <Field.Label>만족도</Field.Label>
+  <Rating value={score} onValueChange={setScore} />
+</Field>;
 ```
 
-## 반 점과 표시 전용
+## 값
 
 ```tsx
-<Rating step={0.5} defaultValue={3.5} aria-label="만족도" /> // 아이콘 왼쪽 절반 = .5점, 오른쪽 = 1점
-<Rating max={10} aria-label="추천 지수" />                   // max는 양의 정수, 기본 5
-<Rating value={4.5} step={0.5} selectionMode="none" aria-label="평균 평점" />
-// selectionMode="none": "평균 평점: 5점 만점에 4.5점"으로 읽히는 이미지. 탭 정지점이 없다
-// 값은 0..max 범위에서 가장 가까운 step으로 맞춘다
+<Rating defaultValue={3} />                                  // 비제어
+<Rating value={score} onValueChange={setScore} />           // 제어
+<Rating step={0.5} max={10} />                              // 반 점, 10점 만점. max는 양의 정수
 ```
 
-## 아이콘
-
-```tsx
-<Rating variant="star" />   // 기본
-<Rating variant="heart" />
-<Rating variant="circle" />
-
-<Rating variant="custom" max={3} aria-label="난이도">
-  {[0, 1, 2].map((index) => (
-    <Rating.Item key={index} index={index}>
-      <FireIcon />                     {/* index마다 하나씩, 0부터 max - 1까지 */}
-    </Rating.Item>
-  ))}
-</Rating>
-
-<Rating variant="custom" max={1} aria-label="좋아요">
-  <Rating.Item index={0} asChild>
-    <MyIcon />                         {/* 장식 요소 하나. aria-hidden이 붙는다 */}
-  </Rating.Item>
-</Rating>
-
-<Rating className="[--ids-rating-color:var(--ids-color-danger)]" /> {/* 채운 색, 기본 primary */}
-```
+- 값은 `0` 부터 `max` 까지이고 가장 가까운 `step` 으로 맞춥니다. 0점은 "고르지 않음" 입니다.
+- `onValueChange` 는 값이 실제로 바뀔 때만 불립니다. 부모가 바꾼 값과 폼 초기화는 알리지 않습니다.
+- 범위를 벗어난 값은 개발 빌드에서 경고합니다.
 
 ## 키보드와 포인터
 
-```text
-← →               step만큼 이동 (RTL에서는 반대)
-↑ ↓               step만큼 증가 / 감소
-Home  0           0점
-End               max
-1-9               해당 점수
-Space  Enter      포커스된 값 선택
-마우스 hover       onHover로 미리보기만. 값은 클릭해야 바뀐다
-터치              바로 선택
-```
+| 입력            | 동작                                        |
+| --------------- | ------------------------------------------- |
+| `→` `↑`         | `step` 만큼 올린다. RTL에서는 `←` 가 올린다 |
+| `←` `↓`         | `step` 만큼 내린다                          |
+| `Home` `0`      | 0점                                         |
+| `End`           | 만점                                        |
+| `1` - `9`       | 그 점수                                     |
+| `Space` `Enter` | 포커스된 점수를 고른다                      |
+| 마우스 올리기   | 미리보기만. `onHover(score)`, 떠나면 `null` |
+| 누르기, 터치    | 그 점수를 고른다                            |
 
-## 라벨 지역화
+- 키보드는 끝에서 멈추고 돌아가지 않습니다. 포커스는 새로 고른 점수를 따라갑니다.
 
-```tsx
-<Rating getValueLabel={(value, max) => `${value} of ${max} stars`} />
-// 각 선택지의 접근성 이름. 기본 "5점 만점에 3점"
-```
-
-## React Hook Form
+## 모양
 
 ```tsx
-import { Rating } from '@gsainfoteam/ids-react';
+<Rating>                                        {/* 기본은 별 */}
+  <Rating.Item>                                 {/* index가 없으면 모든 자리에 */}
+    <HeartIcon />
+  </Rating.Item>
+</Rating>
+
+<Rating max={3}>
+  <Rating.Item><FireIcon /></Rating.Item>        {/* 나머지 자리 */}
+  <Rating.Item index={0}><FaceSmileIcon /></Rating.Item>   {/* 첫 자리만 */}
+</Rating>
+
+<Rating>
+  <Rating.Item>
+    <span className="block size-full rounded-full bg-current" />   {/* 점 */}
+  </Rating.Item>
+</Rating>
+
+<Rating className="[--rating-accent:var(--ids-color-warning)]" />   {/* 채운 색. 기본 primary */}
+```
+
+- 아이콘은 빈 층과 채운 층에 두 번 그려지고, 채운 층을 잘라서 반 점을 표시합니다. `currentColor` 로 그리는 아이콘이면 됩니다.
+- `Rating.Item` 의 `className`, `style`, `children` 은 자리 상태(`index`, `itemValue`, `fill`)를 받는 함수도 됩니다.
+- 아이콘은 `aria-hidden` 이고 `inert` 입니다. 이벤트 핸들러, `id`, 폼 컨트롤을 넣지 않습니다.
+
+## 상태와 스타일
+
+| 속성              | 붙는 곳 | 뜻                                           |
+| ----------------- | ------- | -------------------------------------------- |
+| `data-state`      | 자리    | `full` / `half` / `empty`. 미리보기를 따른다 |
+| `data-previewing` | 루트    | 마우스로 미리보는 중                         |
+| `data-disabled`   | 루트    | 비활성                                       |
+| `data-readonly`   | 루트    | 읽기 전용                                    |
+| `data-required`   | 루트    | 필수                                         |
+| `data-invalid`    | 루트    | 오류. 채운 색이 danger                       |
+
+- `Rating.State` 는 `value`, `previewValue`, `interactive`, `disabled`, `readOnly`, `required`, `invalid` 입니다. 루트의 `className` 과 `style` 은 이 상태를 받는 함수도 됩니다.
+
+## 폼
+
+```tsx
+<form>
+  <Field required>
+    <Field.Label>평점</Field.Label>
+    <Rating name="score" /> {/* 4점이면 score=4, 0점이면 항목 없음 */}
+  </Field>
+  <button type="reset">초기화</button> {/* defaultValue로 돌아간다 */}
+</form>
+```
+
+- `name` 이 없으면 hidden input을 만들지 않습니다.
+- `required` 는 0점을 막습니다. 메시지는 `requiredMessage` 로 바꿉니다. 읽기 전용이면 검사하지 않고, 비활성이면 제출도 하지 않습니다.
+
+## react-hook-form
+
+```tsx
 import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
-const methods = useForm({ defaultValues: { score: 0 } });
+<Field
+  name="score"
+  controlMode="value"
+  registerOptions={{ min: { value: 1, message: '점수를 고르세요.' } }}
+>
+  <Field.Label>만족도</Field.Label>
+  <Rating step={0.5} />
+  <Field.Error />
+</Field>;
+```
 
-<FormProvider {...methods}>
-  <form onSubmit={methods.handleSubmit(save)}>
-    <Field
-      name="score"
-      controlMode="value"
-      registerOptions={{ min: { value: 1, message: '평점을 선택하세요.' } }}
-    >
-      <Field.Label>만족도</Field.Label>
-      <Rating step={0.5} />
-      <Field.Error />                  {/* 오류 시 선택된 버튼으로 포커스 */}
-    </Field>
-  </form>
-</FormProvider>;
+- `ref` 와 `id` 는 그룹에 붙어 있고 옮겨 다니지 않습니다. `focus()` 는 고른 점수로 넘어가고, 오류가 났을 때의 포커스도 그렇습니다.
+
+## 라벨
+
+```tsx
+<Rating aria-label="만족도" />                                  // 없으면 '평점'
+<Rating getValueLabel={(value, max) => `${value} of ${max}`} />  // 각 점수의 이름. 기본 '5점 만점에 3점'
+```
+
+## 크기
+
+```tsx
+<Rating size="tiny" /> // standard(36px 칸, 28px 아이콘) / tiny(32px, 20px). 생략하면 Field를 따른다
 ```
 
 ## 속성
 
-| 속성                       | 기본 / 동작                                                  |
-| -------------------------- | ------------------------------------------------------------ |
-| `value` / `defaultValue`   | `number` / `0`                                               |
-| `onChange`                 | 값이 실제로 바뀔 때만                                        |
-| `onHover`                  | 마우스 미리보기 값, 벗어나면 `null`                          |
-| `max` / `step`             | `5` / `1`. `step`은 `1` 또는 `0.5`                           |
-| `variant`                  | `star`(기본) / `heart` / `circle` / `custom`                 |
-| `size`                     | `standard` / `tiny`. 생략하면 `Field` 크기, 없으면 `standard`          |
-| `selectionMode`            | `single`(기본) / `none`: 표시 전용                           |
-| `readOnly`                 | 변경만 막는다. 탭 정지점은 남아 점수를 읽을 수 있다          |
-| `disabled`                 | 조작, 탭 이동, 폼 제출에서 모두 빠진다                       |
-| `invalid`                  | 오류 표시. 명시한 `aria-invalid`(Field 포함)가 우선          |
-| `getValueLabel`            | `(value, max) => string`. 기본 `${max}점 만점에 ${value}점`  |
-| `name` / `form`            | hidden input으로 값 제출                                     |
-| `required`                 | ARIA 힌트만. 검증은 RHF나 앱이 한다                          |
-| `ref`                      | 현재 선택된 버튼 (0점 포함)                                  |
-| `className` / `style` 등   | 그룹 컨테이너로 간다                                         |
+| 속성                     | 기본 / 동작                                             |
+| ------------------------ | ------------------------------------------------------- |
+| `value` / `defaultValue` | `number` / `0`                                          |
+| `onValueChange`          | 값이 실제로 바뀔 때                                     |
+| `onHover`                | 마우스 미리보기 점수, 벗어나면 `null`                   |
+| `max` / `step`           | `5` / `1`. `step` 은 `1` 또는 `0.5`                     |
+| `selectionMode`          | `single`(기본) / `none`: 표시 전용                      |
+| `readOnly`               | 바꿀 수 없다. 탭 정지점은 남아 점수를 읽을 수 있다      |
+| `disabled`               | 조작, 탭 이동, 폼 제출에서 모두 빠진다                  |
+| `required`               | 0점이면 제출을 막는다                                   |
+| `requiredMessage`        | 기본 `점수를 선택하세요.`                               |
+| `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선                |
+| `name` / `form`          | hidden input으로 제출                                   |
+| `getValueLabel`          | `(value, max) => string`                                |
+| `size`                   | `standard` / `tiny`                                     |
+| `children`               | `Rating.Item` 들. 생략하면 별                           |
+| `ref`                    | 그룹. `focus()` 는 고른 점수로 넘어간다                 |
+| 그 외 속성               | 그룹으로 간다 (`id`, `aria-*`, `className`, `style` 등) |
 
 ## 알아둘 것
 
-- 탭 정지점은 선택된 값 하나다. 0점일 때는 그룹 전체에 포커스 링이 보인다.
-- 키보드 이동은 경계에서 멈추고 순환하지 않는다.
-- 외부에서 `value`를 바꿔도 `onChange`는 발생하지 않는다.
-- `form.reset()`은 uncontrolled 값을 `defaultValue`로 되돌린다. 취소된 reset은 무시한다.
-- 아이콘 그래픽은 빈 레이어와 채운 레이어에 두 번 렌더링되고 `inert`다. 이벤트 핸들러, `id`, 폼 컨트롤을 넣지 않는다.
-- 값이 0..max 밖이면 개발 빌드에서 경고한다.
+- 0점을 고를 수 있도록 화면에 보이지 않는 0점 항목이 있습니다. 여기에 포커스가 있으면 그룹 전체에 포커스 링이 그려집니다.
+- 그룹 루트는 `tabIndex={-1}` 이라 Tab 순서에는 없습니다.
