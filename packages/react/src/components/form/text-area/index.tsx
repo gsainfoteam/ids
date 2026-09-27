@@ -1,72 +1,83 @@
 import {
+  cloneElement,
   createContext,
   isValidElement,
-  useContext,
-  useRef,
+  use,
+  useId,
   type ComponentProps,
   type CSSProperties,
   type ReactElement,
   type ReactNode,
-  type RefObject,
 } from 'react';
 
-import { isNotNil } from 'es-toolkit';
-
-import { useAutoResize } from './use-auto-resize';
+import {
+  countState,
+  useCountAnnouncement,
+  useTextArea,
+  type CountState,
+  type TextAreaInputProps,
+  type TextAreaResize,
+} from './use-text-area';
 import { fieldSurface, type FieldSurfaceVariant } from '../../../internal/field-surface';
-import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
-import { Slot } from '../../utility/slot';
+import { messages } from '../../../internal/messages';
+import {
+  insetButtons,
+  stateAttributes,
+  type TextControlState,
+} from '../../../internal/text-control';
+import { cn, flattenFragments, invariant, tv } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
+export type { TextAreaInputProps, TextAreaResize } from './use-text-area';
 export type TextAreaVariant = FieldSurfaceVariant;
+export type TextAreaState = TextControlState;
+export type TextAreaCountState = CountState;
 
-export type TextAreaResize = 'none' | 'vertical' | 'horizontal' | 'both';
+type StateValue<S, T> = T | ((state: S) => T);
 
-export type TextAreaInputProps = Omit<
-  ComponentProps<'textarea'>,
-  'children' | 'className' | 'style' | 'color' | 'disabled'
->;
-
-export type TextAreaContextValue = {
-  size: IdsSize;
-  disabled?: boolean;
+type TextAreaContextValue = {
+  inputProps: ReturnType<typeof useTextArea>['inputProps'];
+  count: ReturnType<typeof useTextArea>['count'];
+  countId: string;
   autoResize: boolean;
-  minRows?: number;
   maxRows?: number;
-  invalid: boolean;
-  inputProps: TextAreaInputProps;
-  inputRef: RefObject<HTMLTextAreaElement | null>;
+  styles: ReturnType<typeof TextArea.Style>;
 };
 
 const TextAreaContext = createContext<TextAreaContextValue | null>(null);
 
-export function useTextAreaContext() {
-  return useContext(TextAreaContext);
+function resolve<S, T>(value: StateValue<S, T>, state: S): T {
+  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
+}
+
+function defaultAnnouncement(state: CountState) {
+  if (state.remaining === undefined) return '';
+  return state.atLimit
+    ? messages.textArea.limitReached
+    : messages.textArea.remaining(state.remaining);
 }
 
 function rowsToHeight(rows: number | undefined) {
   return rows == null ? undefined : `calc(${rows} * 1lh + var(--ids-text-area-pad-y) * 2)`;
 }
 
+// Children before the Input form the top bar and the ones after it the bottom bar. Without an
+// Input, the textarea comes first and every child goes to the bottom bar.
 function splitByInput(children: ReactNode) {
   const items = flattenFragments(children);
-  const inputIndexes = items
-    .map((child, index) => (isValidElement(child) && child.type === TextArea.Input ? index : null))
-    .filter(isNotNil);
-
-  invariant(inputIndexes.length <= 1, '`<TextArea>` accepts at most one `<TextArea.Input />`.');
-
-  const inputIndex = inputIndexes[0];
-  if (inputIndex == null) {
-    return { top: [] as ReactNode[], input: <TextArea.Input />, bottom: items };
-  }
-
+  const indexes = items.flatMap((child, index) =>
+    isValidElement(child) && child.type === TextArea.Input ? [index] : [],
+  );
+  invariant(indexes.length <= 1, '`<TextArea>` accepts at most one `<TextArea.Input />`.');
+  const index = indexes[0];
+  if (index === undefined) return { items, top: [], input: <TextArea.Input />, bottom: items };
   return {
-    top: items.slice(0, inputIndex),
-    input: items[inputIndex] as ReactElement<TextArea.Input.Props>,
-    bottom: items.slice(inputIndex + 1),
+    items,
+    top: items.slice(0, index),
+    input: items[index] as ReactElement<TextArea.Input.Props>,
+    bottom: items.slice(index + 1),
   };
 }
 
@@ -75,6 +86,7 @@ export function TextArea({
   size: sizeProp,
   disabled,
   invalid,
+  onValueChange,
   autoResize = true,
   resize,
   minRows,
@@ -83,91 +95,179 @@ export function TextArea({
   className,
   style,
   children,
-  ...rest
+  ...rootProps
 }: TextArea.Props) {
   const size = useFieldSize(sizeProp) ?? 'standard';
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  invariant(
-    !autoResize || resize == null || resize === 'none',
-    '`<TextArea>` cannot use `resize` together with `autoResize`.',
+  const generatedId = useId();
+  const { items, top, input, bottom } = splitByInput(children);
+  const countNode = items.find(
+    (item): item is ReactElement<TextArea.CountProps> =>
+      isValidElement(item) && item.type === TextArea.Count,
   );
-  for (const [name, value] of Object.entries({ minRows, maxRows })) {
-    invariant(
-      value == null || (Number.isInteger(value) && value > 0),
-      `\`<TextArea>\` \`${name}\` must be a positive integer.`,
-    );
-  }
-  invariant(
-    minRows == null || maxRows == null || minRows <= maxRows,
-    '`<TextArea>` `minRows` must not exceed `maxRows`.',
-  );
-  const inputProps = { ...rest, rows };
-  const { top, input, bottom } = splitByInput(children);
-  const { root, bar } = TextArea.Style({
+  const countId = countNode?.props.id ?? `ids-text-area-count-${generatedId}`;
+  const field = useTextArea({
+    rootProps: { ...rootProps, rows },
+    input: input.props,
+    disabled,
+    invalid,
+    onValueChange,
+    autoResize,
+    resize,
+    minRows,
+    maxRows,
+    countId: countNode ? countId : undefined,
+  });
+  const state: TextAreaState = { size, variant, ...field.state };
+  const styles = TextArea.Style({
     variant,
     size,
     resize: autoResize ? 'none' : (resize ?? 'vertical'),
   });
 
-  // The sentinel's own props win over the container's, so validate and derive
-  // container state from the merged result, not from the container props alone.
-  const merged = { ...inputProps, ...input.props };
-  const isDisabled = input.props.disabled ?? disabled;
-  const ariaInvalid = merged['aria-invalid'] ?? invalid;
-  const isInvalid = ariaInvalid != null && ariaInvalid !== false && ariaInvalid !== 'false';
-
-  invariant(
-    merged.value == null || merged.onChange != null || merged.readOnly === true,
-    '`<TextArea>` with `value` requires `onChange` (or `readOnly`).',
-  );
-
   return (
-    <TextAreaContext.Provider
+    <TextAreaContext
       value={{
-        size,
-        disabled: isDisabled,
+        inputProps: field.inputProps,
+        count: field.count,
+        countId,
         autoResize,
-        minRows,
         maxRows,
-        invalid: isInvalid,
-        inputProps,
-        inputRef,
+        styles,
       }}
     >
       <div
         data-text-area=""
-        data-variant={variant}
-        data-size={size}
-        data-disabled={isDisabled ? '' : undefined}
-        data-invalid={isInvalid ? '' : undefined}
-        className={root({ className })}
-        style={style}
+        {...stateAttributes(state)}
+        {...field.rootProps}
+        className={styles.root({ className: resolve(className, state) })}
+        style={resolve(style, state)}
       >
-        <div data-text-area-top="" className={bar({ position: 'top' })}>
+        <div data-text-area-top="" className={styles.bar({ position: 'top' })}>
           {top}
         </div>
         {input}
-        <div data-text-area-bottom="" className={bar({ position: 'bottom' })}>
+        <div data-text-area-bottom="" className={styles.bar({ position: 'bottom' })}>
           {bottom}
         </div>
       </div>
-    </TextAreaContext.Provider>
+    </TextAreaContext>
   );
 }
 
 export namespace TextArea {
+  export type Props = TextAreaInputProps & {
+    variant?: TextAreaVariant;
+    size?: IdsSize;
+    disabled?: boolean;
+    invalid?: boolean;
+    onValueChange?: (value: string) => void;
+    autoResize?: boolean;
+    resize?: TextAreaResize;
+    minRows?: number;
+    maxRows?: number;
+    children?: ReactNode;
+    className?: StateValue<TextAreaState, string | undefined>;
+    style?: StateValue<TextAreaState, CSSProperties | undefined>;
+  };
+  export type State = TextAreaState;
+  export type Variant = TextAreaVariant;
+  export type Resize = TextAreaResize;
+  export type CountState = TextAreaCountState;
+  export type CountProps = Omit<ComponentProps<'span'>, 'children' | 'className'> & {
+    threshold?: number;
+    announce?: (state: CountState) => string;
+    className?: StateValue<CountState, string | undefined>;
+    children?: StateValue<CountState, ReactNode>;
+  };
+
+  export function Input({ asChild, children, className, style }: Input.Props) {
+    const context = use(TextAreaContext);
+    invariant(context != null, '`<TextArea.Input>` must be used inside `<TextArea>`.');
+    const { inputProps, autoResize, maxRows, styles } = context;
+    const props = {
+      ...inputProps,
+      className: styles.input({ className: cn(inputProps.className, className) }),
+      style: {
+        maxHeight: autoResize ? undefined : rowsToHeight(maxRows),
+        ...inputProps.style,
+        ...style,
+      },
+    };
+
+    if (asChild === true) {
+      invariant(
+        isValidElement(children) &&
+          (typeof children.type !== 'string' || children.type === 'textarea'),
+        '`<TextArea.Input asChild>` requires one textarea, or a component forwarding textarea props and ref.',
+      );
+      return cloneElement(children, props);
+    }
+    invariant(children == null, '`<TextArea.Input>` takes `value`/`defaultValue`, not children.');
+    return <textarea {...props} />;
+  }
+
+  export namespace Input {
+    export type Props = TextAreaInputProps & {
+      asChild?: boolean;
+      children?: ReactNode;
+      className?: string;
+      style?: CSSProperties;
+    };
+  }
+
+  // The count is part of the textarea's description, so a screen reader hears "12 / 200" on
+  // focus. Near the limit a polite live region also speaks what is left once typing pauses.
+  export function Count({
+    threshold,
+    announce = defaultAnnouncement,
+    className,
+    children,
+    id: _id,
+    ...props
+  }: CountProps) {
+    const context = use(TextAreaContext);
+    invariant(context != null, '`<TextArea.Count>` must be used inside `<TextArea>`.');
+    const { count, countId, styles } = context;
+    const state = countState(count.length, count.maxLength, threshold);
+    const spoken = useCountAnnouncement(state.nearLimit ? announce(state) : '');
+
+    return (
+      <>
+        <span
+          {...props}
+          id={countId}
+          data-text-area-count=""
+          data-near-limit={state.nearLimit ? '' : undefined}
+          data-at-limit={state.atLimit ? '' : undefined}
+          className={styles.count({ className: resolve(className, state) })}
+        >
+          {children === undefined
+            ? messages.textArea.count(state.count, state.maxLength)
+            : resolve(children, state)}
+        </span>
+        <span role="status" className="sr-only">
+          {spoken}
+        </span>
+      </>
+    );
+  }
+
   export const Style = tv({
     slots: {
       // Not transition-all: the root carries the resize handle, and animating its width or
       // height makes the field lag behind the pointer while dragging.
-      root: ['flex w-full min-w-0 flex-col overflow-hidden rounded-standard', fieldSurface.base],
+      root: [
+        'flex w-full min-w-0 cursor-text flex-col overflow-hidden rounded-standard',
+        fieldSurface.base,
+      ],
+      // Bars keep the neutral border color in every state; only the outer border carries focus
+      // and error colors.
       bar: [
         'flex shrink-0 items-center empty:hidden',
         'border-(--ids-color-border)',
         'not-has-[button]:text-(--ids-color-on-muted)',
         '[&_svg]:shrink-0',
-        '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
+        insetButtons.base,
       ],
       input: [
         'w-full min-w-0 grow resize-none bg-transparent outline-none',
@@ -175,6 +275,10 @@ export namespace TextArea {
         'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
         'disabled:cursor-not-allowed',
         'py-(--ids-text-area-pad-y)',
+      ],
+      count: [
+        'ms-auto shrink-0 text-(--ids-color-on-muted) tabular-nums',
+        'data-near-limit:text-(--ids-color-on-surface)',
       ],
     },
     variants: {
@@ -184,17 +288,29 @@ export namespace TextArea {
         ghost: { root: fieldSurface.variant.ghost },
       } satisfies Record<TextAreaVariant, object>,
       size: {
+        // A bar keeps the textarea's inline padding so its text lines up with the typed text, and
+        // a button group at either end pulls out by the button's own inset so its icon does too.
         standard: {
           root: 'text-body-b3-regular',
-          bar: 'gap-1 px-3 py-2 [&_svg]:size-(--ids-size-icon-standard)',
+          bar: [
+            'gap-1 px-3 py-1.5 [&_svg]:size-(--ids-size-icon-standard)',
+            insetButtons.size.standard,
+            '[&>:first-child:is(button,:has(button))]:-ms-1.5 [&>:last-child:is(button,:has(button))]:-me-1.5',
+          ],
           input: 'px-3 [--ids-text-area-pad-y:0.5rem]',
+          count: 'text-caption-c1-regular',
         },
         tiny: {
           root: 'text-caption-c1-regular',
-          bar: 'gap-0.5 px-2 py-1.5 [&_svg]:size-(--ids-size-icon-tiny)',
+          bar: [
+            'gap-0.5 px-2 py-1 [&_svg]:size-(--ids-size-icon-tiny)',
+            insetButtons.size.tiny,
+            '[&>:first-child:is(button,:has(button))]:-ms-1 [&>:last-child:is(button,:has(button))]:-me-1',
+          ],
           input: 'px-2 [--ids-text-area-pad-y:0.5rem]',
+          count: 'text-caption-c2-regular',
         },
-      },
+      } satisfies Record<IdsSize, object>,
       position: {
         top: { bar: 'border-b' },
         bottom: { bar: 'border-t' },
@@ -206,7 +322,7 @@ export namespace TextArea {
         vertical: { root: 'resize-y' },
         horizontal: { root: 'resize-x' },
         both: { root: 'resize' },
-      },
+      } satisfies Record<TextAreaResize, object>,
     },
     defaultVariants: {
       variant: 'outline',
@@ -214,74 +330,6 @@ export namespace TextArea {
       resize: 'none',
     },
   });
-
-  export function Input({
-    asChild,
-    children,
-    disabled: disabledProp,
-    className,
-    style,
-    ref,
-    ...rest
-  }: Input.Props) {
-    const field = useTextAreaContext();
-    invariant(field != null, '`<TextArea.Input>` must be used inside `<TextArea>`.');
-
-    const { size, autoResize, minRows, maxRows, invalid, inputProps, inputRef } = field;
-    const { input } = Style({ size });
-    // JS measurement rather than `field-sizing: content`, which Safari and Firefox ignore.
-    useAutoResize(inputRef, { autoResize, minRows, maxRows });
-
-    const props = {
-      'data-text-area-input': '',
-      'aria-invalid': invalid || undefined,
-      // Input values win, but handlers compose so Field and react-hook-form wiring on the
-      // root still runs when the Input sets its own onChange or onBlur.
-      ...mergeProps(inputProps, rest),
-      disabled: disabledProp ?? field.disabled,
-      className: input({ className }),
-      style: { maxHeight: autoResize ? undefined : rowsToHeight(maxRows), ...style },
-    };
-
-    if (asChild === true) {
-      invariant(
-        isValidElement(children) &&
-          (typeof children.type !== 'string' || children.type === 'textarea'),
-        '`<TextArea.Input asChild>` requires one textarea, or a component forwarding textarea props and ref.',
-      );
-      return (
-        <Slot {...(props as Slot.Props)} ref={mergeRefs(inputRef, inputProps.ref, ref)}>
-          {children}
-        </Slot>
-      );
-    }
-    invariant(children == null, '`<TextArea.Input>` takes `value`/`defaultValue`, not children.');
-    return <textarea {...props} ref={mergeRefs(inputRef, inputProps.ref, ref)} />;
-  }
-
-  export namespace Input {
-    export type Props = TextAreaInputProps & {
-      asChild?: boolean;
-      children?: ReactNode;
-      disabled?: boolean;
-      className?: string;
-      style?: CSSProperties;
-    };
-  }
-
-  export type Props = TextAreaInputProps & {
-    variant?: TextAreaVariant;
-    size?: IdsSize;
-    disabled?: boolean;
-    invalid?: boolean;
-    autoResize?: boolean;
-    resize?: TextAreaResize;
-    minRows?: number;
-    maxRows?: number;
-    children?: ReactNode;
-    className?: string;
-    style?: CSSProperties;
-  };
 }
 
 export type TextAreaProps = TextArea.Props;

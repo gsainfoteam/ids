@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 
 import {
   BoldIcon,
@@ -8,11 +8,13 @@ import {
   PhotoIcon,
   UnderlineIcon,
 } from '@heroicons/react/24/outline';
-import { expect } from 'storybook/test';
+import { expect, fn, waitFor } from 'storybook/test';
+
+import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
-import { Label } from '../../typography/label';
+import { Field } from '../field';
 
 import { TextArea } from '.';
 
@@ -21,25 +23,16 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="flex flex-col gap-2">
-      <h3 className="text-xs font-semibold tracking-wide text-(--ids-color-on-muted) uppercase">
-        {title}
-      </h3>
-      {children}
-    </section>
-  );
-}
-
-const meta: Meta<typeof TextArea> = {
+const meta = {
   title: 'Form/TextArea',
   component: TextArea,
   tags: ['autodocs'],
   argTypes: {
-    variant: { control: 'radio', options: [...variants] },
-    size: { control: 'radio', options: [...sizes] },
+    variant: { control: 'radio', options: variants },
+    size: { control: 'radio', options: sizes },
     disabled: { control: 'boolean' },
+    readOnly: { control: 'boolean' },
+    invalid: { control: 'boolean' },
     autoResize: { control: 'boolean' },
     placeholder: { control: 'text' },
   },
@@ -47,88 +40,186 @@ const meta: Meta<typeof TextArea> = {
     variant: 'outline',
     size: 'standard',
     placeholder: '내용을 입력하세요',
+    'aria-label': '내용',
+    className: 'w-80',
+    onValueChange: fn(),
   },
-};
+} satisfies Meta<typeof TextArea>;
 
 export default meta;
-type Story = StoryObj<typeof TextArea>;
+type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
+function ChatComposer() {
+  const [message, setMessage] = useState('');
+  return (
+    <TextArea
+      value={message}
+      onValueChange={setMessage}
+      rows={1}
+      maxRows={6}
+      placeholder="메시지 입력..."
+      aria-label="메시지"
+      className="w-80"
+    >
+      <TextArea.Input />
+      <div className="flex w-full items-center justify-between">
+        <div className="flex gap-1">
+          <IconButton aria-label="첨부" icon={<PaperClipIcon />} />
+          <IconButton aria-label="이미지" icon={<PhotoIcon />} />
+        </div>
+        <IconButton
+          aria-label="보내기"
+          variant="solid"
+          icon={<PaperAirplaneIcon />}
+          disabled={message === ''}
+          onClick={() => setMessage('')}
+        />
+      </div>
+    </TextArea>
+  );
+}
+
 export const Gallery: Story = {
   render: () => (
-    <div className="flex max-w-md flex-col gap-8">
-      <Section title="Bare">
-        <TextArea placeholder="내용을 입력하세요" />
-      </Section>
+    <Showcase>
+      <Showcase.Section title="Variant × Size">
+        <Showcase.Matrix
+          rows={sizes}
+          columns={variants}
+          render={(size, variant) => (
+            <TextArea
+              size={size}
+              variant={variant}
+              rows={2}
+              placeholder="내용"
+              aria-label={`${variant} ${size}`}
+              className="w-56"
+            />
+          )}
+        />
+      </Showcase.Section>
 
-      <Section title="Size">
-        <div className="flex flex-col gap-3">
-          {sizes.map((size) => (
-            <TextArea key={size} size={size} placeholder={`${size} area`} />
-          ))}
-        </div>
-      </Section>
+      <Showcase.Section title="States">
+        <Showcase.Row label="filled">
+          <TextArea rows={2} defaultValue="인포팀 소개글" aria-label="채움" className="w-56" />
+        </Showcase.Row>
+        <Showcase.Row label="invalid">
+          <TextArea rows={2} defaultValue="짧음" invalid aria-label="잘못됨" className="w-56" />
+          <TextArea
+            rows={2}
+            defaultValue="짧음"
+            invalid
+            maxLength={100}
+            aria-label="잘못됨 카운터"
+            className="w-56"
+          >
+            <TextArea.Input />
+            <TextArea.Count />
+          </TextArea>
+        </Showcase.Row>
+        <Showcase.Row label="disabled">
+          <TextArea
+            rows={2}
+            defaultValue="수정 불가"
+            disabled
+            aria-label="비활성"
+            className="w-56"
+          />
+        </Showcase.Row>
+        <Showcase.Row label="readOnly">
+          <TextArea
+            rows={2}
+            defaultValue="읽기 전용"
+            readOnly
+            aria-label="읽기 전용"
+            className="w-56"
+          />
+        </Showcase.Row>
+      </Showcase.Section>
 
-      <Section title="Variant">
-        <div className="flex flex-col gap-3">
-          {variants.map((variant) => (
-            <TextArea key={variant} variant={variant} placeholder={`${variant} area`} />
-          ))}
-        </div>
-      </Section>
-
-      <Section title="Menubar (top)">
-        <TextArea placeholder="마크다운으로 작성하세요">
-          <div className="flex gap-1">
-            <IconButton variant="ghost" aria-label="굵게" icon={<BoldIcon />} />
-            <IconButton variant="ghost" aria-label="기울임" icon={<ItalicIcon />} />
-            <IconButton variant="ghost" aria-label="밑줄" icon={<UnderlineIcon />} />
-          </div>
-          <TextArea.Input />
-        </TextArea>
-      </Section>
-
-      <Section title="Actionbar (bottom)">
-        <ChatComposer />
-      </Section>
-
-      <Section title="Counter (bottom)">
-        <CountedArea />
-      </Section>
-
-      <Section title="Menubar + actionbar">
-        <TextArea placeholder="마크다운 지원">
-          <div className="flex gap-1">
-            <IconButton variant="ghost" aria-label="굵게" icon={<BoldIcon />} />
-            <IconButton variant="ghost" aria-label="기울임" icon={<ItalicIcon />} />
-          </div>
-          <TextArea.Input className="font-mono" />
-          <div className="flex w-full items-center justify-between">
-            <span className="text-body-b3-regular">마크다운 지원</span>
+      <Showcase.Section
+        title="Bars"
+        description="TextArea.Input 위의 자식은 위 바, 아래의 자식은 아래 바가 됩니다. 바의 구분선은 오류 상태에서도 중립색입니다."
+      >
+        <Showcase.Row label="menubar">
+          <TextArea placeholder="마크다운으로 작성하세요" aria-label="본문" className="w-80">
+            <div className="flex gap-1">
+              <IconButton aria-label="굵게" icon={<BoldIcon />} />
+              <IconButton aria-label="기울임" icon={<ItalicIcon />} />
+              <IconButton aria-label="밑줄" icon={<UnderlineIcon />} />
+            </div>
+            <TextArea.Input />
+          </TextArea>
+        </Showcase.Row>
+        <Showcase.Row label="actionbar">
+          <ChatComposer />
+        </Showcase.Row>
+        <Showcase.Row label="count">
+          <TextArea
+            maxLength={200}
+            defaultValue="200자 이내로 소개해 주세요."
+            aria-label="소개"
+            className="w-80"
+          >
+            <TextArea.Input />
+            <TextArea.Count />
+          </TextArea>
+        </Showcase.Row>
+        <Showcase.Row label="both">
+          <TextArea placeholder="마크다운 지원" maxLength={500} aria-label="메모" className="w-80">
+            <div className="flex gap-1">
+              <IconButton aria-label="굵게" icon={<BoldIcon />} />
+              <IconButton aria-label="기울임" icon={<ItalicIcon />} />
+            </div>
+            <TextArea.Input className="font-mono" />
+            <TextArea.Count />
             <Button size="tiny">저장</Button>
-          </div>
-        </TextArea>
-      </Section>
+          </TextArea>
+        </Showcase.Row>
+      </Showcase.Section>
 
-      <Section title="Fixed height with a resize handle">
-        <TextArea autoResize={false} resize="vertical" rows={4} placeholder="직접 늘려보세요" />
-      </Section>
-
-      <Section title="Disabled">
-        <TextArea disabled defaultValue="수정 불가" />
-      </Section>
-    </div>
+      <Showcase.Section title="Height">
+        <Showcase.Row label="auto">
+          <TextArea
+            rows={1}
+            maxRows={4}
+            placeholder="내용에 맞춰 늘어납니다"
+            aria-label="자동"
+            className="w-80"
+          />
+        </Showcase.Row>
+        <Showcase.Row label="resize">
+          <TextArea
+            autoResize={false}
+            resize="vertical"
+            rows={3}
+            placeholder="직접 늘려 보세요"
+            aria-label="크기 조절"
+            className="w-80"
+          />
+        </Showcase.Row>
+      </Showcase.Section>
+    </Showcase>
   ),
 };
 
 export const AutoHeight: Story = {
   render: () => (
-    <div className="flex max-w-xs flex-col gap-2">
-      <Label htmlFor="text-area-bio">자기소개</Label>
-      <TextArea id="text-area-bio" rows={1} maxRows={5} placeholder="자신을 소개해주세요" />
-    </div>
+    <Field className="w-80">
+      <Field.Label>자기소개</Field.Label>
+      <TextArea rows={1} maxRows={5} placeholder="자신을 소개해 주세요" />
+    </Field>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '내용에 맞춰 높이가 늘고 줄어듭니다. maxRows를 넘으면 스크롤이 생깁니다. 붙여넣기, 실행 취소, 폼 reset, 폭 변화에도 다시 잽니다.',
+      },
+    },
+  },
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole('textbox', { name: '자기소개' });
     const start = input.clientHeight;
@@ -140,13 +231,45 @@ export const AutoHeight: Story = {
 
     await userEvent.type(input, '\n네 줄\n다섯 줄\n여섯 줄\n일곱 줄');
     await expect(input.clientHeight).toBeLessThan(input.scrollHeight);
-    await expect(input.clientHeight).toBe(grown + 2 * 22);
+    const line = Number.parseFloat(getComputedStyle(input).lineHeight);
+    await expect(Math.abs(input.clientHeight - (grown + 2 * line))).toBeLessThanOrEqual(1);
+  },
+};
+
+export const CharacterCount: Story = {
+  render: (args) => (
+    <Field className="w-80">
+      <Field.Label>한 줄 소개</Field.Label>
+      <Field.Description>프로필에 보입니다.</Field.Description>
+      <TextArea {...args} maxLength={30} rows={2} aria-label={undefined}>
+        <TextArea.Input />
+        <TextArea.Count />
+      </TextArea>
+    </Field>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TextArea.Count는 maxLength에 대한 글자 수를 보여 주고 입력의 설명에 들어갑니다. 한도에 가까워지면 입력이 멈춘 뒤 남은 글자 수를 스크린 리더에 알립니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const input = canvas.getByRole('textbox', { name: '한 줄 소개' });
+    const count = canvasElement.querySelector('[data-text-area-count]')!;
+    await expect(count).toHaveTextContent('0 / 30');
+    await expect(input).toHaveAccessibleDescription('프로필에 보입니다. 0 / 30');
+    await userEvent.type(input, 'GIST 인포팀에서 서비스를 만듭니다. 반갑습니다');
+    await expect(count).toHaveAttribute('data-near-limit');
+    const status = canvas.getByRole('status');
+    await waitFor(() => expect(status.textContent).toMatch(/자 남았습니다|제한에 도달했습니다/));
   },
 };
 
 export const Sentinel: Story = {
   render: () => (
-    <TextArea className="max-w-xs" aria-label="본문" placeholder="본문">
+    <TextArea className="w-80" aria-label="본문" placeholder="본문">
       <span>위</span>
       <TextArea.Input />
       <span>아래</span>
@@ -162,66 +285,3 @@ export const Sentinel: Story = {
     await expect(input.nextElementSibling).toHaveAttribute('data-text-area-bottom');
   },
 };
-
-export const WithLabel: Story = {
-  render: () => (
-    <Label className="flex max-w-xs flex-col gap-2">
-      메모
-      <TextArea name="memo" placeholder="메모를 입력하세요" />
-    </Label>
-  ),
-  play: async ({ canvas, userEvent }) => {
-    const input = canvas.getByRole('textbox', { name: '메모' });
-    await userEvent.click(canvas.getByText('메모'));
-    await expect(input).toHaveFocus();
-  },
-};
-
-function ChatComposer() {
-  const [message, setMessage] = useState('');
-
-  return (
-    <TextArea
-      value={message}
-      onChange={(e) => setMessage(e.target.value)}
-      rows={1}
-      maxRows={6}
-      placeholder="메시지 입력..."
-      aria-label="메시지"
-    >
-      <TextArea.Input />
-      <div className="flex w-full items-center justify-between">
-        <div className="flex gap-1">
-          <IconButton variant="ghost" aria-label="첨부" icon={<PaperClipIcon />} />
-          <IconButton variant="ghost" aria-label="이미지" icon={<PhotoIcon />} />
-        </div>
-        <IconButton
-          aria-label="보내기"
-          variant="solid"
-          icon={<PaperAirplaneIcon />}
-          disabled={message === ''}
-          onClick={() => setMessage('')}
-        />
-      </div>
-    </TextArea>
-  );
-}
-
-function CountedArea() {
-  const [value, setValue] = useState('');
-
-  return (
-    <TextArea
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      maxLength={200}
-      placeholder="200자 이내로 작성하세요"
-      aria-label="소개"
-    >
-      <TextArea.Input />
-      <div className="flex w-full justify-end">
-        <span className="text-body-b3-regular">{value.length} / 200</span>
-      </div>
-    </TextArea>
-  );
-}

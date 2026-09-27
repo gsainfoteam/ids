@@ -13,10 +13,12 @@ for (const name of [
   'HTMLTextAreaElement',
   'Event',
   'CompositionEvent',
+  'FocusEvent',
+  'MouseEvent',
 ])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-const { createElement: h, act, Fragment } = await import('react');
+const { createElement: h, act, Fragment, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
 const { Field, TextArea } = await import('../dist/index.js');
@@ -38,6 +40,11 @@ async function render(node) {
   await act(async () => root.render(node));
 }
 const control = () => host.querySelector('textarea');
+const shell = () => host.querySelector('[data-text-area]');
+const counter = () => host.querySelector('[data-text-area-count]');
+const live = () => host.querySelector('[data-text-area-bottom] [role=status]');
+const has = (node, name) => node.hasAttribute(`data-${name}`);
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 async function input(value) {
   await act(async () => {
     Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(
@@ -259,4 +266,121 @@ test('RHF native registration: required error/focus, value, disabled, reset resi
   await act(async () => methods.reset());
   assert.equal(control().value, '');
   assert.equal(control().style.height, '38px');
+});
+
+test('state on the shell, the textarea marked for focus-ring, onValueChange next to onChange', async () => {
+  const events = [];
+  await render(
+    h(TextArea, {
+      'aria-label': 'Bio',
+      onChange: (event) => events.push(['change', event.target.value]),
+      onValueChange: (value) => events.push(['value', value]),
+    }),
+  );
+  assert.ok(has(control(), 'field-input'));
+  assert.equal(has(shell(), 'filled'), false);
+  await act(async () => control().focus());
+  assert.ok(has(shell(), 'focused'));
+  await input('hello');
+  assert.ok(has(shell(), 'filled'));
+  assert.deepEqual(events, [
+    ['change', 'hello'],
+    ['value', 'hello'],
+  ]);
+  await render(h(TextArea, { key: 'ro', 'aria-label': 'Bio', readOnly: true, invalid: true }));
+  assert.ok(has(shell(), 'readonly'));
+  assert.ok(has(shell(), 'invalid'));
+});
+
+test('Count shows the length against maxLength and joins the textarea description', async () => {
+  await render(
+    h(
+      Field,
+      null,
+      h(Field.Label, null, 'Bio'),
+      h(Field.Description, null, 'About you'),
+      h(TextArea, { maxLength: 20 }, h(TextArea.Input), h(TextArea.Count)),
+    ),
+  );
+  assert.equal(counter().textContent, '0 / 20');
+  const describedBy = control().getAttribute('aria-describedby').split(' ');
+  assert.deepEqual(
+    describedBy.map((id) => document.getElementById(id).textContent),
+    ['About you', '0 / 20'],
+  );
+  await input('012345678');
+  assert.equal(counter().textContent, '9 / 20');
+  assert.equal(has(counter(), 'near-limit'), false, 'eleven left is not near yet');
+  await input('01234567890123');
+  assert.ok(has(counter(), 'near-limit'), 'ten or fewer left counts as near the limit');
+  assert.equal(live().textContent, '', 'nothing is spoken while typing');
+  await act(async () => wait(700));
+  assert.equal(live().textContent, '6자 남았습니다.');
+  await input('01234567890123456789');
+  assert.ok(has(counter(), 'at-limit'));
+  await act(async () => wait(700));
+  assert.equal(live().textContent, '글자 수 제한에 도달했습니다.');
+  await input('0123');
+  await act(async () => wait(50));
+  assert.equal(live().textContent, '', 'dropping back below the threshold clears the region');
+});
+
+test('Count without maxLength, custom rendering, threshold and announcement', async () => {
+  await render(h(TextArea, { 'aria-label': 'Note' }, h(TextArea.Input), h(TextArea.Count)));
+  await input('abc');
+  assert.equal(counter().textContent, '3');
+  await render(
+    h(
+      TextArea,
+      { key: 'custom', 'aria-label': 'Note', maxLength: 100 },
+      h(TextArea.Input),
+      h(TextArea.Count, {
+        threshold: 97,
+        announce: (state) => `left ${state.remaining}`,
+        children: (state) => `${state.count}자`,
+      }),
+    ),
+  );
+  await input('abc');
+  assert.equal(counter().textContent, '3자');
+  assert.ok(has(counter(), 'near-limit'));
+  await act(async () => wait(700));
+  assert.equal(live().textContent, 'left 97');
+});
+
+test('Count follows a value written by code (react-hook-form setValue)', async () => {
+  let methods;
+  function App() {
+    methods = useForm({ defaultValues: { bio: '' } });
+    return h(
+      FormProvider,
+      methods,
+      h(
+        RhfField,
+        { name: 'bio', 'aria-label': 'Bio' },
+        h(TextArea, { maxLength: 50 }, h(TextArea.Input), h(TextArea.Count)),
+      ),
+    );
+  }
+  await render(h(App));
+  await act(async () => {
+    methods.setValue('bio', 'written by code');
+    await Promise.resolve();
+  });
+  assert.equal(counter().textContent, '15 / 50');
+  let setOuter;
+  function Controlled() {
+    const [value, setValue] = useState('ab');
+    setOuter = setValue;
+    return h(
+      TextArea,
+      { 'aria-label': 'C', value, onValueChange: setValue },
+      h(TextArea.Input),
+      h(TextArea.Count),
+    );
+  }
+  await render(h(Controlled, { key: 'controlled' }));
+  assert.equal(counter().textContent, '2');
+  await act(async () => setOuter('abcd'));
+  assert.equal(counter().textContent, '4');
 });

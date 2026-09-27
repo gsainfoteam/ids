@@ -7,4 +7,10 @@ export const messages = {
   textField: {
     clear: '지우기',
   },
+  textArea: {
+    count: (count: number, maxLength: number | undefined) =>
+      maxLength === undefined ? `${count}` : `${count} / ${maxLength}`,
+    remaining: (remaining: number) => `${remaining}자 남았습니다.`,
+    limitReached: '글자 수 제한에 도달했습니다.',
+  },
 } as const;
