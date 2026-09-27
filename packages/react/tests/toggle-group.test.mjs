@@ -208,11 +208,12 @@ test('controlled: null clears a single group', async () => {
 });
 
 test('form: one entry per pressed value, a required validator, and reset to the default', async () => {
+  const changes = [];
   await render(
     h(
       'form',
       null,
-      group({ name: 'size', required: true }),
+      group({ name: 'size', required: true, onValueChange: (next) => changes.push(next) }),
       group({ name: 'tags', selectionMode: 'multiple', defaultValue: ['x'] }, ['x', 'y', 'z']),
     ),
   );
@@ -234,6 +235,8 @@ test('form: one entry per pressed value, a required validator, and reset to the 
   const reset = new FormData(form);
   assert.equal(reset.get('size'), null);
   assert.deepEqual(reset.getAll('tags'), ['x']);
+  // A native reset fires no change event, so the group reports none either.
+  assert.deepEqual(changes, ['b']);
 });
 
 test('form names a form elsewhere in the document', async () => {

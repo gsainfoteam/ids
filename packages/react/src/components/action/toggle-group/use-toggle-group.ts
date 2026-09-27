@@ -118,7 +118,7 @@ export function useToggleGroup({
     anchorRef.current =
       items.find((item) => item.value === roving.tabStop)?.element ?? items[0]?.element ?? null;
   });
-  useFormReset(formRef, () => setSelected(defaultList));
+  useFormReset(formRef, () => setSelected(defaultList, { silent: true }));
 
   const valueShape = shapeOf(value);
   const defaultShape = shapeOf(defaultValue);
