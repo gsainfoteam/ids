@@ -80,6 +80,12 @@ import { Label, Radio, RadioGroup } from '@gsainfoteam/ids-react';
 
 `className`, `style`, `children` 은 상태를 받는 함수도 됩니다. 같은 상태가 원에 `data-*` 로 붙습니다.
 
+```tsx
+<Radio value="red" className="size-7 rounded-standard" />   // 원 대신 네모로. 네 모서리까지 눌린다
+```
+
+- 위를 덮은 input은 원의 모서리를 그대로 받습니다. `className` 으로 모양을 바꾸면 누를 수 있는 곳도 그 모양을 따릅니다.
+
 | 상태           | `data-*`                 | 뜻                                |
 | -------------- | ------------------------ | --------------------------------- |
 | `checked`      | `data-state="checked"`   | 선택됨                            |

@@ -217,8 +217,10 @@ export namespace Radio {
         'data-disabled:opacity-50',
       ],
       // The real input covers the circle, so a click, a tap and a wrapping <label> all reach it.
+      // It takes the root's corners instead of its own: a press only lands inside an element's
+      // rounded corners, so a Radio restyled as a square would not answer at its corners.
       input:
-        'absolute inset-0 m-0 size-full cursor-pointer appearance-none rounded-full opacity-0 disabled:cursor-not-allowed',
+        'absolute inset-0 m-0 size-full cursor-pointer appearance-none rounded-[inherit] opacity-0 disabled:cursor-not-allowed',
       indicator: [
         'pointer-events-none flex shrink-0 items-center justify-center text-(--radio-accent) [&>svg]:size-full',
         'transition-[opacity,scale] duration-(--ids-motion-fast) motion-reduce:transition-none',
