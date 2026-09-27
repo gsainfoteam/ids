@@ -4,8 +4,6 @@
 
 @source '../.storybook';
 
-@custom-variant dark (&:where([data-mode=dark], [data-mode=dark] *));
-
 html {
   @apply m-0;
   font-family:

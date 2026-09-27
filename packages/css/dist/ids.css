@@ -68,6 +68,8 @@
   --animate-caret-blink: ids-caret-blink 1.25s ease-out infinite;
 }
 
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *):not(:where([data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *)));
+
 @utility focus-ring {
   outline: none;
 
