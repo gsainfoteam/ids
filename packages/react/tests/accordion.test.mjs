@@ -227,15 +227,17 @@ test('a closed panel stays findable: hidden="until-found", and beforematch opens
 
 test('closing: the panel is inert while it collapses, then hidden until found', async () => {
   await render(h(Accordion, { type: 'single', defaultValue: 'a' }, items()));
-  // The first frame after mount turns animation on; clicking before it closes instantly.
-  await settle();
   const [a] = triggers();
   const panel = panelOf(a);
+  // jsdom runs no transitions, so the collapse would end on a zero-length timer that can fire
+  // before the assertions. A declared duration holds the panel in its closing state until the
+  // transitionend sent below.
+  panel.style.transitionDuration = '200ms';
   await act(async () => a.click());
   assert.equal(panel.hasAttribute('inert'), true);
   assert.equal(panel.hasAttribute('hidden'), false, 'still visible so the height can animate');
   assert.equal(panel.dataset.state, 'closed');
-  await settle();
+  await act(async () => panel.dispatchEvent(new Event('transitionend')));
   assert.equal(panel.hasAttribute('inert'), false);
   assert.equal(panel.getAttribute('hidden'), 'until-found');
 });
