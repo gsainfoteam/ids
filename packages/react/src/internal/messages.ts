@@ -11,4 +11,9 @@ export const messages = {
     start: '시작',
     end: '끝',
   },
+  rating: {
+    label: '평점',
+    required: '점수를 선택하세요.',
+    valueLabel: (value: number, max: number) => `${max}점 만점에 ${value}점`,
+  },
 } as const;
