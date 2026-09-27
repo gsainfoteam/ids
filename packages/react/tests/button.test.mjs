@@ -6,7 +6,15 @@ const dom = new JSDOM('<!doctype html><html><body></body></html>', {
   url: 'http://localhost',
   pretendToBeVisual: true,
 });
-for (const name of ['window', 'document', 'HTMLElement', 'Event', 'KeyboardEvent', 'MouseEvent'])
+for (const name of [
+  'window',
+  'document',
+  'Element',
+  'HTMLElement',
+  'Event',
+  'KeyboardEvent',
+  'MouseEvent',
+])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act } = await import('react');
@@ -226,6 +234,24 @@ test('asChild on a plain element adds button semantics and keyboard activation',
   assert.equal(clicks, 1);
   await key(span, 'keyup', ' ');
   assert.equal(clicks, 2);
+});
+
+test('an element button presses only on a Space that started on it, and not for a nested control', async () => {
+  let clicks = 0;
+  await render(
+    h(
+      Button,
+      { asChild: true, onClick: () => clicks++ },
+      h('div', null, '행', h('a', { href: '#more', id: 'more' }, '더보기')),
+    ),
+  );
+  const row = first('div');
+  await key(row, 'keyup', ' ');
+  assert.equal(clicks, 0);
+  await act(async () => first('#more').click());
+  assert.equal(clicks, 0);
+  await act(async () => row.click());
+  assert.equal(clicks, 1);
 });
 
 test('className, children and variant accept a function of the interaction state', async () => {

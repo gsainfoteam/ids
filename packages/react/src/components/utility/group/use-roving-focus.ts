@@ -1,5 +1,7 @@
 import { useLayoutEffect, useRef, useState, type KeyboardEvent, type RefObject } from 'react';
 
+import { focusable } from 'tabbable';
+
 import { rovingMove, rovingTabStop, rovingTarget, type RovingItem } from './roving';
 
 import type { GroupOrientation } from '.';
@@ -19,12 +21,17 @@ type Options = {
   onArrive?: (element: HTMLElement) => void;
 };
 
+// tabbable knows every way an item stops taking focus: disabled, inside an inert subtree or a
+// disabled fieldset, hidden by CSS. Only its container walk prunes inert subtrees, so the group is
+// walked once rather than each item checked alone. An aria-disabled item can still take focus, but
+// arrow keys pass over it too.
 function scan(root: HTMLElement | null, selector: string): RovingElement[] {
   if (!root) return [];
+  const reachable = new Set(focusable(root, { displayCheck: 'full-native' }));
   return Array.from(root.querySelectorAll<HTMLElement>(selector), (element) => ({
     element,
     value: element.dataset.value ?? '',
-    disabled: element.matches(':disabled') || element.getAttribute('aria-disabled') === 'true',
+    disabled: !reachable.has(element) || element.getAttribute('aria-disabled') === 'true',
   }));
 }
 
