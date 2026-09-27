@@ -166,11 +166,11 @@ function PlanCards({ onValueChange }: { onValueChange?: (plan: Plan) => void }) 
         plans.map((plan) => (
           <Label
             key={plan.value}
-            className={[
+            className={cn(
               'rounded-standard flex cursor-pointer items-start gap-3 p-4',
               'inset-ring-1 inset-ring-(--ids-color-border)',
               'has-data-[state=checked]:bg-(--ids-color-primary)/5 has-data-[state=checked]:inset-ring-(--ids-color-primary)',
-            ].join(' ')}
+            )}
           >
             <Item value={plan.value} className="mt-0.5" />
             <span className="flex flex-col gap-1">
