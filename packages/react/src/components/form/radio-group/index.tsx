@@ -1,4 +1,10 @@
-import { useId, type ComponentProps, type ComponentType, type ReactNode } from 'react';
+import {
+  useId,
+  type ComponentProps,
+  type ComponentType,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 
 import { RadioGroupContext } from './context';
 import { useRadioGroup } from './use-radio-group';
@@ -8,6 +14,21 @@ import { Radio } from '../radio';
 import type { IdsSize } from '../../../tokens/types';
 
 export type RadioGroupOrientation = 'vertical' | 'horizontal';
+
+export type RadioGroupState = {
+  value: string | null;
+  orientation: RadioGroupOrientation;
+  disabled: boolean;
+  readOnly: boolean;
+  required: boolean;
+  invalid: boolean;
+};
+
+type StateProp<T> = T | ((state: RadioGroupState) => T);
+
+function resolve<T>(value: StateProp<T>, state: RadioGroupState): T {
+  return typeof value === 'function' ? (value as (state: RadioGroupState) => T)(state) : value;
+}
 
 export type RadioGroupItemProps<T extends string> = Omit<
   Radio.Props,
@@ -20,7 +41,7 @@ export type RadioGroupRenderProps<T extends string> = {
 
 export type RadioGroupProps<T extends string> = Omit<
   ComponentProps<'div'>,
-  'children' | 'defaultValue' | 'onChange' | 'role'
+  'children' | 'defaultValue' | 'onChange' | 'role' | 'className' | 'style'
 > & {
   value?: T | null;
   defaultValue?: T | null;
@@ -34,6 +55,8 @@ export type RadioGroupProps<T extends string> = Omit<
   readOnly?: boolean;
   required?: boolean;
   invalid?: boolean;
+  className?: StateProp<string | undefined>;
+  style?: StateProp<CSSProperties | undefined>;
   children: ReactNode | ((render: RadioGroupRenderProps<T>) => ReactNode);
 };
 
@@ -53,6 +76,7 @@ export function RadioGroup<T extends string>({
   required = false,
   invalid,
   className,
+  style,
   children,
   ref,
   onFocus,
@@ -69,6 +93,14 @@ export function RadioGroup<T extends string>({
   });
   const ariaInvalid = rest['aria-invalid'] ?? invalid;
   const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
+  const state: RadioGroupState = {
+    value,
+    orientation,
+    disabled,
+    readOnly,
+    required,
+    invalid: isInvalid,
+  };
 
   return (
     <RadioGroupContext.Provider
@@ -101,7 +133,8 @@ export function RadioGroup<T extends string>({
         data-readonly={readOnly ? '' : undefined}
         data-required={required ? '' : undefined}
         data-invalid={isInvalid ? '' : undefined}
-        className={RadioGroup.Style({ orientation, className })}
+        className={RadioGroup.Style({ orientation, className: resolve(className, state) })}
+        style={resolve(style, state)}
         onFocus={(event) => {
           focusChecked(event);
           onFocus?.(event);
@@ -117,6 +150,7 @@ export function RadioGroup<T extends string>({
 
 export namespace RadioGroup {
   export type Props<T extends string = string> = RadioGroupProps<T>;
+  export type State = RadioGroupState;
   export type Orientation = RadioGroupOrientation;
   export type ItemProps<T extends string = string> = RadioGroupItemProps<T>;
   export type RenderProps<T extends string = string> = RadioGroupRenderProps<T>;

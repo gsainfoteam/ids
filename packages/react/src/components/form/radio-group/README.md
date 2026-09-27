@@ -93,7 +93,7 @@ type Plan = 'free' | 'pro' | 'team';
 
 ## 상태와 스타일
 
-그룹 루트에 붙는 속성입니다. 항목의 상태는 [Radio](../radio/README.md) 를 봅니다.
+그룹 루트에 붙는 속성입니다. 항목의 상태는 [Radio](../radio/README.md) 를 봅니다. `className` 과 `style` 은 `RadioGroup.State`(`value`, `orientation`, `disabled`, `readOnly`, `required`, `invalid`)를 받는 함수도 됩니다.
 
 | 속성                              | 뜻                          |
 | --------------------------------- | --------------------------- |

@@ -204,6 +204,25 @@ test('native form: required, FormData, and reset back to defaultValue without a 
   assert.deepEqual(changes, ['team']);
 });
 
+test('className and style take a function of the group state', async () => {
+  await render(
+    h(
+      RadioGroup,
+      {
+        'aria-label': 'Plan',
+        className: (state) => (state.value ? `picked-${state.value}` : 'empty'),
+        style: (state) => ({ opacity: state.invalid ? 0.5 : 1 }),
+        invalid: true,
+      },
+      items,
+    ),
+  );
+  assert.ok(group().className.includes('empty'));
+  assert.equal(group().style.opacity, '0.5');
+  await click('pro');
+  assert.ok(group().className.includes('picked-pro'));
+});
+
 test('plain Radio children join the group; size and variant fan out to them', async () => {
   const changes = [];
   await render(
