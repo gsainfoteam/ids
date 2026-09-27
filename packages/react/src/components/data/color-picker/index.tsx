@@ -13,12 +13,12 @@ import { CheckIcon, ClipboardDocumentIcon, EyeDropperIcon } from '@heroicons/rea
 import { cssColor, formatPlaceholder, parseColor, type ColorFormat } from './color';
 import { useClipboardSupport, useColorPicker, useEyeDropperSupport } from './use-color-picker';
 import { flattenParts, resolveState } from '../../../internal/field-popup';
-import { fieldSurface } from '../../../internal/field-surface';
 import { messages } from '../../../internal/messages';
 import { cn, invariant, mergeEventHandlers, mergeProps, tv } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../../form/field/context';
 import { Slider } from '../../form/slider';
+import { TextField } from '../../form/text-field';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -284,11 +284,11 @@ function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.SliderProps
   );
 }
 
-function ColorPickerInput({ className, ...props }: ColorPicker.InputProps) {
+function ColorPickerInput({ className, style, ...props }: ColorPicker.InputProps) {
   const c = usePicker('ColorPicker.Input');
   const { input } = c.picker;
   return (
-    <input
+    <TextField
       {...mergeProps(props as Record<string, unknown>, {
         type: 'text',
         'aria-label': props['aria-label'] ?? messages.colorPicker.input,
@@ -298,16 +298,20 @@ function ColorPickerInput({ className, ...props }: ColorPicker.InputProps) {
         spellCheck: false,
         value: input.value,
         placeholder: props.placeholder ?? formatPlaceholder(c.format, c.alpha),
-        disabled: c.state.disabled,
         readOnly: c.state.readOnly,
         'aria-invalid': input.invalid || undefined,
         'data-color-picker-input': '',
-        className: c.styles.input({ className }),
         onChange: input.onChange,
         onBlur: input.onBlur,
         onKeyDown: input.onKeyDown,
       })}
-    />
+      size={c.size}
+      disabled={c.state.disabled}
+      className={c.styles.input({ className })}
+      style={style}
+    >
+      <TextField.Input className={c.styles.inputText()} />
+    </TextField>
   );
 }
 
@@ -439,7 +443,11 @@ export namespace ColorPicker {
     ComponentProps<'div'>,
     'children' | 'defaultValue' | 'onChange' | 'role'
   >;
-  export type InputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue' | 'type'>;
+  // No native `size`: on the TextField it would be the IDS size, which the picker sets.
+  export type InputProps = Omit<
+    ComponentProps<'input'>,
+    'value' | 'defaultValue' | 'type' | 'size'
+  >;
   // One element, since the child becomes the IconButton's icon.
   export type ButtonProps = Omit<ComponentProps<'button'>, 'children'> & {
     children?: ReactElement;
@@ -487,11 +495,8 @@ export namespace ColorPicker {
       // The thumb is filled with its color, so Slider's primary edge and hover ring give way to
       // the white ring.
       sliderThumb: [thumb, 'inset-ring-0 hover:ring-0'],
-      input: [
-        fieldSurface.base,
-        fieldSurface.variant.outline,
-        'min-w-0 flex-1 font-mono outline-none placeholder:text-(--ids-color-on-muted)',
-      ],
+      input: 'flex-1',
+      inputText: 'font-mono',
       tool: '',
       swatches: 'flex flex-wrap gap-2',
       // The chosen swatch gets a ring behind a surface-colored gap, so it stays visible on a
@@ -508,21 +513,23 @@ export namespace ColorPicker {
           area: 'h-40',
           areaThumb: 'size-4',
           slider: '[--slider-track:0.75rem]',
-          input: fieldSurface.size.standard,
           swatch: 'size-7',
         },
         tiny: {
           area: 'h-32',
           areaThumb: 'size-3.5',
           slider: '[--slider-track:0.625rem]',
-          input: fieldSurface.size.tiny,
           swatch: 'size-6',
         },
       } satisfies Record<IdsSize, object>,
       // A disabled picker is dimmed once, at its root. The parts that dim themselves when disabled
       // would otherwise dim a second time over it.
       disabled: {
-        true: { slider: 'data-disabled:opacity-100', tool: 'data-disabled:opacity-100' },
+        true: {
+          slider: 'data-disabled:opacity-100',
+          input: 'data-disabled:opacity-100',
+          tool: 'data-disabled:opacity-100',
+        },
       },
     },
     defaultVariants: { size: 'standard' },

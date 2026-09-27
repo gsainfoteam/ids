@@ -99,7 +99,10 @@ test('SSR: one group with an area of two sliders, a hue slider, a text input and
     'the thumb is not an input',
   );
   assert.equal(doc.querySelector('[aria-label="투명도"]'), null, 'no alpha slider without alpha');
-  assert.equal(doc.querySelector('[data-color-picker-input]').value, '#3B82F6');
+  const input = doc.querySelector('[data-color-picker-input]');
+  assert.equal(input.value, '#3B82F6');
+  assert.equal(input.type, 'text');
+  assert.equal(input.closest('[data-text-field]').dataset.size, 'standard', 'a TextField box');
   const radios = doc.querySelectorAll('[role=radiogroup] [role=radio]');
   assert.equal(radios.length, 2, 'an unreadable swatch is skipped');
   assert.equal(radios[0].getAttribute('aria-checked'), 'true');
@@ -194,6 +197,7 @@ test('typed text is a draft until Enter or blur; unreadable text is reverted', a
   assert.equal(input.value, '#22C55E');
   await type(input, 'nope');
   assert.equal(input.getAttribute('aria-invalid'), 'true');
+  assert.ok(input.closest('[data-text-field]').hasAttribute('data-invalid'), 'the TextField box');
   await key(input, 'Enter');
   assert.equal(input.value, 'nope', 'Enter keeps an unreadable draft so it can be fixed');
   const escape = await key(input, 'Escape');

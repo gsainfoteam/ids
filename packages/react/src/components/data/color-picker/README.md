@@ -79,6 +79,7 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 - 자식이 없으면 영역, 스포이트와 슬라이더, 입력과 복사, 팔레트 순으로 그립니다.
 - `HueSlider` 와 `AlphaSlider` 는 채운 구간 없이 그라데이션 트랙을 쓰는 `Slider` 입니다. 받은 속성은 Slider 루트로 가고, `aria-label` 은 thumb의 이름이 됩니다.
 - `EyeDropper` 와 `Copy` 는 `IconButton variant="outline"` 입니다. 자식을 주면 기본 아이콘 대신 그 아이콘을 씁니다.
+- `Input` 은 고정폭 글꼴의 `TextField` 입니다. `className` 과 `style` 은 테두리 상자로, 그 밖의 속성은 input으로 갑니다.
 
 ```tsx
 <ColorPicker.Copy aria-label="HEX 복사"><DocumentDuplicateIcon /></ColorPicker.Copy>
