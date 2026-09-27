@@ -63,8 +63,15 @@ export { AspectRatio } from './components/layout/aspect-ratio';
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
 
 export { Field } from './components/form/field';
-export type { FieldProps } from './components/form/field';
-export { useFieldSize } from './components/form/field/context';
+export type {
+  FieldProps,
+  FieldState,
+  FieldOrientation,
+  FieldErrorState,
+  FieldValidity,
+  FieldValidityKey,
+} from './components/form/field';
+export { useFieldSize, useFieldState } from './components/form/field/context';
 
 export { PasswordField } from './components/form/password-field';
 export type { PasswordFieldProps, PasswordFieldVariant } from './components/form/password-field';
@@ -77,6 +84,13 @@ export type { SelectProps, SelectVariant } from './components/form/select';
 
 export { TelField } from './components/form/tel-field';
 export type { TelFieldProps, TelFieldFormat } from './components/form/tel-field';
+
+export { ColorPicker } from './components/data/color-picker';
+export type {
+  ColorPickerProps,
+  ColorPickerState,
+  ColorPickerSwatchOption,
+} from './components/data/color-picker';
 
 export { ColorField } from './components/form/color-field';
 export type { ColorFieldProps, ColorFormat } from './components/form/color-field';

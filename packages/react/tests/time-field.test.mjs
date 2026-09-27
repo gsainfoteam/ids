@@ -8,6 +8,9 @@ const dom = new JSDOM('<html><body></body></html>', {
 });
 for (const k of [
   'window',
+  'Element',
+  'Node',
+  'getComputedStyle',
   'document',
   'HTMLElement',
   'HTMLInputElement',

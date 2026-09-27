@@ -1,28 +1,21 @@
 import { useEffect, useLayoutEffect, useState, type KeyboardEvent } from 'react';
 
+import { tabbable } from 'tabbable';
+
 import { useControllableState } from '../../../hooks/use-controllable-state';
 
-const TABBABLE = [
-  'a[href]',
-  'button:not([disabled])',
-  'input:not([disabled]):not([type="hidden"])',
-  'select:not([disabled])',
-  'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
-  '[contenteditable="true"]',
-].join(',');
-
+// tabbable decides what is reachable by Tab (visibility, inert, disabled fieldsets, radio groups).
+// It still counts an aria-hidden subtree, which must not receive focus either.
 function neighbour(root: HTMLElement) {
-  const candidates = [...root.ownerDocument.querySelectorAll<HTMLElement>(TABBABLE)].filter(
-    (element) =>
-      !root.contains(element) && !element.closest('[hidden], [inert], [aria-hidden="true"]'),
+  const candidates = tabbable(root.ownerDocument.body).filter(
+    (element) => !root.contains(element) && !element.closest('[aria-hidden="true"]'),
   );
   const following = candidates.find(
     (element) => root.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING,
   );
   return (
     following ??
-    candidates
+    [...candidates]
       .reverse()
       .find((element) => root.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_PRECEDING)
   );

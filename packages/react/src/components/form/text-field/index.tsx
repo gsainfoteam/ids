@@ -1,129 +1,130 @@
 import {
+  cloneElement,
+  createContext,
   isValidElement,
-  useRef,
+  use,
   type CSSProperties,
-  type ReactElement,
   type ReactNode,
 } from 'react';
 
-import { isNotNil } from 'es-toolkit';
-
+import { useTextField, type TextFieldInputProps } from './use-text-field';
+import { type FieldSurfaceVariant } from '../../../internal/field-surface';
 import {
-  TextFieldContext,
-  textFieldAdornment,
-  textFieldSurface,
-  useTextFieldContext,
-  type TextFieldInputProps,
-  type TextFieldVariant,
-} from './surface';
-import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
-import { Slot } from '../../utility/slot';
+  Adornments,
+  TextControlClear,
+  TextControlContext,
+  countOf,
+  splitAroundInput,
+  stateAttributes,
+  textControlStyle,
+  type TextControlClearProps,
+  type TextControlState,
+} from '../../../internal/text-control';
+import { cn, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
-function splitByInput(children: ReactNode) {
-  const items = flattenFragments(children);
-  const inputIndexes = items
-    .map((child, index) => (isValidElement(child) && child.type === TextField.Input ? index : null))
-    .filter(isNotNil);
+export type { TextFieldInputProps } from './use-text-field';
+export type TextFieldVariant = FieldSurfaceVariant;
+export type TextFieldState = TextControlState;
 
-  invariant(inputIndexes.length <= 1, '`<TextField>` accepts at most one `<TextField.Input />`.');
+type StateValue<T> = T | ((state: TextFieldState) => T);
 
-  const inputIndex = inputIndexes[0];
-  if (inputIndex == null) {
-    return { leading: items, input: <TextField.Input />, trailing: [] as ReactNode[] };
-  }
+type TextFieldContextValue = {
+  inputProps: ReturnType<typeof useTextField>['inputProps'];
+  styles: ReturnType<typeof TextField.Style>;
+};
 
-  return {
-    leading: items.slice(0, inputIndex),
-    input: items[inputIndex] as ReactElement<TextField.Input.Props>,
-    trailing: items.slice(inputIndex + 1),
-  };
+const TextFieldContext = createContext<TextFieldContextValue | null>(null);
+
+function resolve<T>(value: StateValue<T>, state: TextFieldState): T {
+  return typeof value === 'function' ? (value as (state: TextFieldState) => T)(state) : value;
 }
 
 export function TextField({
   variant = 'outline',
   size: sizeProp,
   disabled,
+  invalid,
+  onValueChange,
   className,
   style,
   children,
-  ...inputProps
+  ...rootProps
 }: TextField.Props) {
   const size = useFieldSize(sizeProp) ?? 'standard';
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { leading, input, trailing } = splitByInput(children);
-
-  // The sentinel's own props win over the container's, so validate and derive
-  // container state from the merged result, not from the container props alone.
-  const merged = { ...inputProps, ...input.props };
-  const isDisabled = input.props.disabled ?? disabled;
-
-  invariant(
-    merged.value == null || merged.onChange != null || merged.readOnly === true,
-    '`<TextField>` with `value` requires `onChange` (or `readOnly`).',
+  const { items, leading, input, trailing } = splitAroundInput<TextField.Input.Props>(
+    children,
+    TextField.Input,
+    () => <TextField.Input />,
+    'TextField',
   );
+  const field = useTextField({
+    rootProps,
+    input: input.props,
+    disabled,
+    invalid,
+    onValueChange,
+    clearable: countOf(items, TextField.Clear) > 0,
+  });
+  const state: TextFieldState = { size, variant, ...field.state };
+  const styles = TextField.Style({ variant, size });
 
   return (
-    <TextFieldContext.Provider value={{ size, disabled: isDisabled, inputProps, inputRef }}>
-      <div
-        data-text-field=""
-        data-variant={variant}
-        data-size={size}
-        data-disabled={isDisabled ? '' : undefined}
-        className={textFieldSurface({ variant, size, className })}
-        style={style}
-        onMouseDown={(event) => {
-          if (isDisabled) return;
-          const target = event.target as HTMLElement;
-          if (target.closest('button, a, input, textarea, select, label')) return;
-          event.preventDefault();
-          inputRef.current?.focus();
-        }}
+    <TextFieldContext value={{ inputProps: field.inputProps, styles }}>
+      <TextControlContext
+        value={{ state, inputId: field.inputProps.id, clear: field.clear, styles }}
       >
-        <Adornments items={leading} size={size} />
-        {input}
-        <Adornments items={trailing} size={size} />
-      </div>
-    </TextFieldContext.Provider>
+        <div
+          data-text-field=""
+          {...stateAttributes(state)}
+          {...field.rootProps}
+          className={styles.root({ className: resolve(className, state) })}
+          style={resolve(style, state)}
+        >
+          <Adornments
+            items={leading}
+            own={[TextField.Clear]}
+            marker="text-field"
+            className={styles.adornment()}
+          />
+          {input}
+          <Adornments
+            items={trailing}
+            own={[TextField.Clear]}
+            marker="text-field"
+            className={styles.adornment()}
+          />
+        </div>
+      </TextControlContext>
+    </TextFieldContext>
   );
-}
-
-function Adornments({ items, size }: { items: ReactNode[]; size: IdsSize }) {
-  return items.map((item, index) => (
-    <span
-      key={(isValidElement(item) && item.key) || index}
-      data-text-field-adornment=""
-      className={textFieldAdornment({ size })}
-    >
-      {item}
-    </span>
-  ));
 }
 
 export namespace TextField {
-  export function Input({
-    asChild,
-    children,
-    disabled: disabledProp,
-    className,
-    style,
-    ref,
-    ...rest
-  }: Input.Props) {
-    const field = useTextFieldContext();
-    invariant(field != null, '`<TextField.Input>` must be used inside `<TextField>`.');
+  export type Props = TextFieldInputProps & {
+    variant?: TextFieldVariant;
+    size?: IdsSize;
+    disabled?: boolean;
+    invalid?: boolean;
+    onValueChange?: (value: string) => void;
+    children?: ReactNode;
+    className?: StateValue<string | undefined>;
+    style?: StateValue<CSSProperties | undefined>;
+  };
+  export type State = TextFieldState;
+  export type Variant = TextFieldVariant;
+  export type ClearProps = TextControlClearProps;
 
-    const { inputProps, inputRef } = field;
+  export function Input({ asChild, children, className, style }: Input.Props) {
+    const context = use(TextFieldContext);
+    invariant(context != null, '`<TextField.Input>` must be used inside `<TextField>`.');
     const props = {
-      'data-text-field-input': '',
-      // Input values win, but handlers compose so Field and react-hook-form wiring on the
-      // root still runs when the Input sets its own onChange or onBlur.
-      ...mergeProps(inputProps, rest),
-      disabled: disabledProp ?? field.disabled,
-      className: Input.Style({ className }),
-      style,
+      ...context.inputProps,
+      className: context.styles.input({ className: cn(context.inputProps.className, className) }),
+      style:
+        context.inputProps.style || style ? { ...context.inputProps.style, ...style } : undefined,
     };
 
     if (asChild === true) {
@@ -132,51 +133,26 @@ export namespace TextField {
           (typeof children.type !== 'string' || children.type === 'input'),
         '`<TextField.Input asChild>` requires one input, or a component forwarding input props and ref.',
       );
-      return (
-        <Slot {...(props as Slot.Props)} ref={mergeRefs(inputRef, inputProps.ref, ref)}>
-          {children}
-        </Slot>
-      );
+      return cloneElement(children, props);
     }
     invariant(children == null, '`<TextField.Input>` takes `value`/`defaultValue`, not children.');
-    return <input {...props} ref={mergeRefs(inputRef, inputProps.ref, ref)} />;
+    return <input {...props} />;
   }
 
   export namespace Input {
-    export const Style = tv({
-      base: [
-        'min-w-0 flex-1 bg-transparent outline-none',
-        'text-inherit placeholder:text-(--ids-color-on-muted)',
-        'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
-        'disabled:cursor-not-allowed',
-      ],
-    });
-
     export type Props = TextFieldInputProps & {
       asChild?: boolean;
       children?: ReactNode;
-      disabled?: boolean;
       className?: string;
       style?: CSSProperties;
     };
   }
 
-  export type Props = TextFieldInputProps & {
-    variant?: TextFieldVariant;
-    size?: IdsSize;
-    disabled?: boolean;
-    children?: ReactNode;
-    className?: string;
-    style?: CSSProperties;
-  };
+  // Shown only while there is something to clear. It clears through a real edit, so onChange,
+  // react-hook-form and undo all see it, and it hands focus back to the input.
+  export const Clear = TextControlClear;
+
+  export const Style = textControlStyle;
 }
 
-export {
-  TextFieldContext,
-  textFieldAdornment,
-  textFieldSurface,
-  useTextFieldContext,
-  type TextFieldContextValue,
-  type TextFieldInputProps,
-  type TextFieldVariant,
-} from './surface';
+export type TextFieldProps = TextField.Props;

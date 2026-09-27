@@ -8,12 +8,10 @@ export const toggleSurface = {
     standard: [
       'h-(--ids-size-control-standard) min-w-(--ids-size-control-standard) rounded-standard px-2 text-button-standard',
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
-      '[&>:has(>svg.animate-spin)]:size-(--ids-size-icon-standard)',
     ],
     tiny: [
       'h-(--ids-size-control-tiny) min-w-(--ids-size-control-tiny) gap-1.5 rounded-standard px-1.5 text-button-tiny',
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
-      '[&>:has(>svg.animate-spin)]:size-(--ids-size-icon-tiny)',
     ],
   } satisfies Record<IdsSize, string[]>,
   variant: {

@@ -38,7 +38,14 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 
 **css** — Pure CSS package. No React dependency. Consumers import `@gsainfoteam/ids-css` and add Tailwind themselves (peerDep). Do not `@import "tailwindcss"` inside this package.
 
-**react** — Component library. Library build via Vite (`dist/index.js`, `dist/index.cjs`). All components are implemented from scratch — no Radix, Base UI, or other headless deps. Storybook for development.
+**react** — Component library. Library build via Vite (`dist/index.js`, `dist/index.cjs`); every entry in `dependencies` and `peerDependencies` stays external. Storybook for development.
+
+**What we build and what we install.** Prefer a well-maintained package over hand-rolled logic:
+
+- Generic helpers come from `es-toolkit` (`clamp`, `isEqual`, `noop`, `debounce`, `uniq`, ...), never a local copy.
+- Utility engines are installed, not written: positioning `@floating-ui/react-dom`, focus `tabbable` / `focus-trap`, scroll lock `react-remove-scroll`, dates `date-fns`, numbers `@internationalized/number`, colors `culori`, textarea sizing `react-textarea-autosize`, phone numbers `libphonenumber-js`.
+- Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
+- Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation).
 
 **flutter** — Dart package. Platform directories (android/, ios/, etc.) intentionally absent — this is a package, not an app. Published to pub.dev via OIDC — no token.
 
@@ -101,6 +108,11 @@ Declare the meta as `const meta = { ... } satisfies Meta<typeof X>`. The global 
 every story in `ThemeProvider`, so stories do not add their own theme or page padding.
 
 ## Component styling
+
+**Development warnings use `isDevelopment` from `src/utils/dev.ts`, never `import.meta.env.DEV`.**
+Vite bakes `import.meta.env.DEV` into the library build as `false`, which strips every warning from
+the published package. `isDevelopment` reads `process.env.NODE_ENV`, which the app's bundler
+replaces.
 
 **Multi-part components use one `tv({ slots })`, not several `tv()` calls.** A component with a
 root plus parts (track/thumb, trigger/panel, box/indicator) declares every part as a slot in a
