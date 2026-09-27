@@ -368,6 +368,32 @@ test('onBlur waits until focus leaves both the trigger and the popup', async () 
   assert.equal(blurs, 1);
 });
 
+test('a surrounding Field follows the value once the popup closes', async () => {
+  await render(
+    h(
+      Field,
+      null,
+      h(Field.Label, null, 'Brand'),
+      h(ColorField, { name: 'color', swatches: ['#FF0000'] }),
+    ),
+  );
+  const flags = () => {
+    const field = host.querySelector('[data-field]');
+    return [field.hasAttribute('data-filled'), field.hasAttribute('data-dirty')];
+  };
+  assert.deepEqual(flags(), [false, false]);
+  await click(trigger());
+  await key(document.activeElement, 'Escape');
+  assert.equal(dialog(), null);
+  assert.deepEqual(flags(), [false, false], 'opening and closing the popup changes nothing');
+  await click(trigger());
+  await click(swatch('#FF0000'));
+  await key(swatch('#FF0000'), 'Escape');
+  assert.deepEqual(flags(), [true, true]);
+  await click(clearButton());
+  assert.deepEqual(flags(), [false, false], 'cleared back to where it started');
+});
+
 test('Content holds ColorPicker parts, and focus goes to the first one given', async () => {
   const state = tracked(
     { defaultValue: '#0000FF', swatches: ['#FF0000', '#0000FF'] },

@@ -164,5 +164,6 @@ const methods = useForm({ defaultValues: { color: '' } });
 ## 알아둘 것
 
 - 이름은 `Field.Label` 이나 `aria-label` 로 줍니다. 팝업도 같은 이름으로 읽히고, 이름이 없으면 `색상 선택` 입니다.
+- `Field` 안에서는 값이 바뀌거나 팝업이 열리고 닫힐 때마다 `Field` 가 `data-filled` 와 `data-dirty` 를 다시 읽습니다.
 - `onBlur` 는 포커스가 트리거와 팝업을 모두 벗어날 때만 불립니다.
 - 팝업 위치와 폭은 지우기 버튼을 포함한 필드 전체를 기준으로 잡습니다.

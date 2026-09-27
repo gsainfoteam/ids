@@ -9,7 +9,9 @@ and the popup is named by the field label. `required` is enforced by the browser
 which sends focus to the trigger, and a form reset restores `defaultValue` and closes the popup.
 Adds `open` / `defaultOpen` / `onOpenChange`, a function `className` and `data-*` state; on a
 small screen `mobileVariant="drawer"` opens a modal sheet with a title and a close button. Clear is
-a ghost IconButton sized like the other buttons inside a field, and it stays in the Tab order.
+a ghost IconButton sized like the other buttons inside a field, and it stays in the Tab order. A
+surrounding Field reads its filled and dirty state again whenever the value changes or the popup
+opens or closes, so closing the popup no longer leaves the Field marked filled and dirty.
 
 Breaking: `onChange(value)` is now `onValueChange(value)`. `surfaceVariant` is renamed `variant`
 (`outline`, `soft`, `ghost`). The panel `variant` (`default`, `compact`, `swatchOnly`) is removed:

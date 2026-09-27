@@ -1,8 +1,9 @@
-import { useRef, type KeyboardEvent } from 'react';
+import { use, useLayoutEffect, useRef, type KeyboardEvent } from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { parseColor, serializeColor, type ColorFormat } from '../../data/color-picker/color';
+import { FieldNotifyContext } from '../field/context';
 
 export type UseColorFieldOptions = {
   value: string | undefined;
@@ -48,6 +49,14 @@ export function useColorField({
 
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // A surrounding Field reads its state from the inputs in the control. The value reaches them
+  // through the hidden form value and the popup comes and goes, neither with an input event, so
+  // the Field is told to read again; otherwise it keeps what it read while the popup was open.
+  const notifyField = use(FieldNotifyContext);
+  useLayoutEffect(() => {
+    notifyField?.();
+  }, [notifyField, current, isOpen]);
 
   const close = (restoreFocus: boolean) => {
     setOpenState(false);
