@@ -208,6 +208,11 @@ test('search, live empty state, multiple toggles in list order, outside dismissa
   await click(trigger());
   const search = host.querySelector('input[role=combobox]');
   assert.equal(document.activeElement, search, 'the search field takes focus');
+  assert.ok(search.hasAttribute('data-select-search'));
+  const shell = search.closest('[data-text-field]');
+  assert.equal(shell?.dataset.variant, 'ghost', 'a ghost TextField');
+  assert.match(shell.className, /(^| )border-b( |$)/, 'with a rule under it');
+  assert.match(shell.className, /(^| )ring-0!( |$)/, 'and no ring of its own');
   const status = host.querySelector('[role=status]');
   assert.equal(status.textContent, '', 'the live region is mounted but silent');
   await type(search, 'xyz');
@@ -655,6 +660,35 @@ test('search ignores case, width and accents; IME keys are left alone', async ()
   await key(search, 'ArrowDown', { isComposing: true });
   await key(search, 'ArrowDown', { keyCode: 229 });
   assert.equal(search.getAttribute('aria-activedescendant'), before);
+});
+
+test('SearchField keeps its own props, handlers and an asChild input under the combobox wiring', async () => {
+  const keys = [];
+  await render(
+    tracked({}, [
+      h(
+        Select.SearchField,
+        {
+          key: 's',
+          asChild: true,
+          autoComplete: 'on',
+          'aria-label': 'Find',
+          onKeyDown: () => keys.push('own'),
+        },
+        h('input', { 'data-test': 'mine' }),
+      ),
+      ...items(),
+    ]).node,
+  );
+  await click(trigger());
+  const search = host.querySelector('input[data-test=mine]');
+  assert.equal(document.activeElement, search);
+  assert.equal(search.getAttribute('role'), 'combobox');
+  assert.equal(search.getAttribute('autocomplete'), 'on');
+  assert.equal(search.getAttribute('aria-label'), 'Find');
+  await key(search, 'ArrowDown');
+  assert.deepEqual(keys, ['own'], 'the own handler runs before the list moves');
+  assert.equal(search.getAttribute('aria-activedescendant'), options()[2].id);
 });
 
 test('the list is named by the field label; onBlur waits until focus leaves trigger and popup', async () => {

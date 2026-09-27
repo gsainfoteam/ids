@@ -12,7 +12,8 @@ Adds `validate` for created values (its message shows in the create row), `ChipF
 notice when `maxCount` is reached, `ChipField.ItemIndicator` checks on chosen options,
 `open` / `defaultOpen` / `onOpenChange`, `removeLabel`, a function `className`, and `data-*` state on
 the root, chips and options. `required` is enforced by the browser's own validation, a form reset
-also clears the typed text, and on a small screen the modal sheet carries its own search field.
+also clears the typed text, and on a small screen the modal sheet carries its own search field,
+the same borderless `TextField` as `Select.SearchField`.
 
 Breaking: `onChange(value)` is now `onValueChange(value)`, and an `onChange` on the root no longer
 reaches the input. Chip remove buttons left the Tab order and are reached with the arrow keys.

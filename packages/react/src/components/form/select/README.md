@@ -70,6 +70,7 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 
 - 검색하면 첫 결과를 가리키고, 구분선은 숨깁니다.
 - `Select.Empty` 는 늘 마운트된 live region 이라 결과가 비는 순간 스크린 리더가 읽습니다.
+- `Select.SearchField` 는 테두리와 링 없이 아래 선만 그린 `TextField` 입니다. 돋보기나 여백을 눌러도 포커스가 입력에 남고, 받은 속성은 input 으로 갑니다.
 
 ## 여러 개 선택과 지우기
 

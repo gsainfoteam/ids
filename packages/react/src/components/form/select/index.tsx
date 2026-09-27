@@ -15,12 +15,7 @@ import {
   type ReactNode,
 } from 'react';
 
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  MagnifyingGlassIcon,
-  XMarkIcon,
-} from '@heroicons/react/16/solid';
+import { CheckIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/16/solid';
 
 import { collectOptions, slotChildren, type SelectOption } from './select-options';
 import { useSelect, type SelectValue } from './use-select';
@@ -34,6 +29,7 @@ import {
   useDrawerPresentation,
   type FieldTriggerVariant,
 } from '../../../internal/field-popup';
+import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../internal/field-popup/search';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
@@ -456,45 +452,24 @@ function SelectContent({ asChild, children, className, ...props }: Select.Conten
   );
 }
 
-function SelectSearchField({
-  asChild,
-  children,
-  className,
-  placeholder,
-  ...props
-}: Select.SearchFieldProps) {
+function SelectSearchField({ placeholder, ...props }: Select.SearchFieldProps) {
   const c = useSelectContext('Select.SearchField');
   const { state: s, ids } = c.select;
+  const own = mergeProps(props as Record<string, unknown>, {
+    'aria-label': props['aria-label'] ?? messages.select.search,
+    'data-select-search': '',
+    value: s.query,
+    placeholder: placeholder ?? messages.select.searchPlaceholder,
+    onChange: (event: ChangeEvent<HTMLInputElement>) =>
+      c.select.actions.search(event.currentTarget.value),
+    onKeyDown: (event: KeyboardEvent<HTMLElement>) => c.select.onKeyDown(event, 'search'),
+  }) as Omit<FieldPopupSearchProps, 'controls' | 'activeDescendant'>;
   return (
-    <div data-select-search="" className={c.styles.searchRoot()}>
-      <MagnifyingGlassIcon aria-hidden="true" />
-      {part(
-        'input',
-        asChild,
-        children,
-        mergeProps(props as Record<string, unknown>, {
-          type: 'text',
-          role: 'combobox',
-          autoComplete: props.autoComplete ?? 'off',
-          autoCorrect: 'off',
-          autoCapitalize: 'none',
-          spellCheck: props.spellCheck ?? false,
-          'aria-label': props['aria-label'] ?? messages.select.search,
-          'aria-expanded': true,
-          'aria-controls': ids.listbox,
-          'aria-autocomplete': 'list',
-          'aria-activedescendant':
-            s.activeValue !== undefined ? ids.option(s.activeValue) : undefined,
-          'data-popup-autofocus': '',
-          value: s.query,
-          placeholder: placeholder ?? messages.select.searchPlaceholder,
-          className: c.styles.search({ className }),
-          onChange: (event: ChangeEvent<HTMLInputElement>) =>
-            c.select.actions.search(event.currentTarget.value),
-          onKeyDown: (event: KeyboardEvent<HTMLElement>) => c.select.onKeyDown(event, 'search'),
-        }),
-      )}
-    </div>
+    <FieldPopupSearch
+      {...own}
+      controls={ids.listbox}
+      activeDescendant={s.activeValue !== undefined ? ids.option(s.activeValue) : undefined}
+    />
   );
 }
 
@@ -678,7 +653,10 @@ export namespace Select {
   export type IconProps = ComponentProps<'span'> & { asChild?: boolean };
   export type ClearProps = ComponentProps<'button'> & { asChild?: boolean };
   export type ContentProps = BoxProps;
-  export type SearchFieldProps = ComponentProps<'input'> & { asChild?: boolean };
+  // A TextField underneath, whose `size` is the field size, not the input's width in characters.
+  export type SearchFieldProps = Omit<ComponentProps<'input'>, 'size' | 'color'> & {
+    asChild?: boolean;
+  };
   export type ItemProps = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
     value: string;
     // Shown in the trigger and matched by typeahead; the item's text by default.
@@ -727,8 +705,6 @@ export namespace Select {
         'focus-ring disabled:pointer-events-none',
       ],
       listbox: fieldListbox.list,
-      searchRoot: fieldListbox.searchRoot,
-      search: fieldListbox.search,
       item: fieldListbox.option,
       indicator: fieldListbox.indicator,
       group: 'flex flex-col',

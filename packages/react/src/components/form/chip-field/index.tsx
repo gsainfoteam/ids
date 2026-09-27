@@ -14,12 +14,7 @@ import {
   type RefObject,
 } from 'react';
 
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  MagnifyingGlassIcon,
-  XMarkIcon,
-} from '@heroicons/react/16/solid';
+import { CheckIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/16/solid';
 import { isNotNil } from 'es-toolkit';
 
 import { CREATE, useChipField } from './use-chip-field';
@@ -33,6 +28,7 @@ import {
   useDrawerPresentation,
   type FieldTriggerVariant,
 } from '../../../internal/field-popup';
+import { FieldPopupSearch } from '../../../internal/field-popup/search';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
@@ -436,34 +432,20 @@ function DrawerSearch() {
   const { drawerInputRef } = c;
   const { state: s, ids, handlers } = c.field;
   return (
-    <div data-chip-field-search="" className={c.styles.searchRoot()}>
-      <MagnifyingGlassIcon aria-hidden="true" />
-      <input
-        ref={drawerInputRef}
-        type="text"
-        role="combobox"
-        aria-label={messages.chipField.search}
-        aria-expanded
-        aria-controls={ids.listbox}
-        aria-autocomplete="list"
-        aria-activedescendant={
-          s.activeCandidate !== undefined ? ids.option(s.activeCandidate) : undefined
-        }
-        data-popup-autofocus=""
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="none"
-        spellCheck={false}
-        value={s.query}
-        placeholder={c.inputDefaults.placeholder}
-        className={c.styles.search()}
-        onChange={handlers.onInputChange}
-        onPaste={handlers.onPaste}
-        onCompositionStart={handlers.onCompositionStart}
-        onCompositionEnd={handlers.onCompositionEnd}
-        onKeyDown={(event) => handlers.onInputKeyDown(event, 'drawer')}
-      />
-    </div>
+    <FieldPopupSearch
+      ref={drawerInputRef}
+      aria-label={messages.chipField.search}
+      data-chip-field-search=""
+      value={s.query}
+      placeholder={c.inputDefaults.placeholder}
+      onChange={handlers.onInputChange}
+      onPaste={handlers.onPaste}
+      onCompositionStart={handlers.onCompositionStart}
+      onCompositionEnd={handlers.onCompositionEnd}
+      onKeyDown={(event) => handlers.onInputKeyDown(event, 'drawer')}
+      controls={ids.listbox}
+      activeDescendant={s.activeCandidate !== undefined ? ids.option(s.activeCandidate) : undefined}
+    />
   );
 }
 
@@ -788,8 +770,6 @@ export namespace ChipField {
         'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
       ],
       icon: 'shrink-0 cursor-pointer text-(--ids-color-on-muted)',
-      searchRoot: fieldListbox.searchRoot,
-      search: fieldListbox.search,
       listbox: fieldListbox.list,
       item: fieldListbox.option,
       indicator: fieldListbox.indicator,

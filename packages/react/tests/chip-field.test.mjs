@@ -365,8 +365,9 @@ test('drawer: the sheet has its own search field, and closing returns to the fie
   const state = tracked({});
   await render(state.node);
   await click(trigger());
-  const search = host.querySelector('[data-chip-field-search] input');
+  const search = host.querySelector('input[data-chip-field-search]');
   assert.ok(search);
+  assert.ok(search.closest('[data-text-field]'), 'the sheet search is a TextField');
   assert.equal(document.activeElement, search);
   assert.equal(host.querySelector('[data-field-popup]').getAttribute('aria-modal'), 'true');
   await type(search, 'Java');
