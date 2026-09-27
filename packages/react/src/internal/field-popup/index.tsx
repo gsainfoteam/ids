@@ -162,16 +162,21 @@ export function FieldPopup({
 
     const outside = (target: EventTarget | null) =>
       !isNode(target) || (!node.contains(target) && !trigger.contains(target));
+    // An outside press moves focus as well, and the focus it moves belongs to the same close; a
+    // popup kept open by its owner would otherwise hear that close twice.
+    let pressedOutside = false;
     const onPointerDown = (event: PointerEvent) => {
+      pressedOutside = outside(event.target);
       // A drawer held focus, and its backdrop is not focusable, so focus goes back.
-      if (outside(event.target)) close.current(drawer);
+      if (pressedOutside) close.current(drawer);
     };
     const onFocusIn = (event: FocusEvent) => {
       if (!outside(event.target)) return;
       if (drawer) (tabbables(node)[0] ?? node).focus({ preventScroll: true });
-      else close.current(false);
+      else if (!pressedOutside) close.current(false);
     };
     const onKeyDown = (event: KeyboardEvent) => {
+      pressedOutside = false;
       if (event.key === 'Escape') {
         if (event.defaultPrevented || event.isComposing || !isTopPopup(node)) return;
         event.preventDefault();

@@ -375,6 +375,29 @@ test('open, defaultOpen and onOpenChange; disabled and read-only never open', as
   assert.deepEqual(state.changes, []);
 });
 
+test('an outside press reports one close even though it also moves focus', async () => {
+  const opens = [];
+  await render(
+    h(
+      'div',
+      null,
+      h('button', { id: 'outside' }, 'Outside'),
+      h('button', { id: 'other' }, 'Other'),
+      h(Select, { 'aria-label': 'Fruit', open: true, onOpenChange: (open) => opens.push(open) }),
+    ),
+  );
+  const outside = host.querySelector('#outside');
+  await act(() => {
+    outside.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    outside.focus();
+  });
+  assert.deepEqual(opens, [false], 'the press and the focus it moved are one close');
+  assert.ok(listbox(), 'the owner kept it open');
+  await key(outside, 'Tab');
+  await act(() => host.querySelector('#other').focus());
+  assert.deepEqual(opens, [false, false], 'focus moved by keyboard still reports');
+});
+
 test('react-hook-form value mode binds onValueChange, focuses on error, resets and omits disabled', async () => {
   const { Field: F } = await import('../dist/react-hook-form.js');
   const { FormProvider, useForm } = await import('react-hook-form');
