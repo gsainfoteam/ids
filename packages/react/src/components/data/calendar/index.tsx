@@ -443,16 +443,8 @@ export namespace Calendar {
       // both columns, so the captions line up whether or not a button stands beside them.
       month:
         'grid grid-cols-[var(--calendar-cell)_minmax(0,1fr)_var(--calendar-cell)] content-start gap-y-2',
-      // IconButton keeps its hover fill when it turns disabled under the pointer, which the press
-      // that reaches the last month does.
-      previous: [
-        'col-start-1 row-start-1 size-(--calendar-cell)',
-        'data-disabled:data-hovered:bg-transparent',
-      ],
-      next: [
-        'col-start-3 row-start-1 size-(--calendar-cell)',
-        'data-disabled:data-hovered:bg-transparent',
-      ],
+      previous: 'col-start-1 row-start-1 size-(--calendar-cell)',
+      next: 'col-start-3 row-start-1 size-(--calendar-cell)',
       chevron: 'size-(--calendar-icon)',
       caption:
         'col-start-2 row-start-1 flex h-(--calendar-cell) min-w-0 items-center justify-center',

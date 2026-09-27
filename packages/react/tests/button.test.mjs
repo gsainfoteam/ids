@@ -287,3 +287,32 @@ test('a group size reaches its buttons unless a button sets its own', async () =
   assert.equal(first('#inherit').dataset.size, 'tiny');
   assert.equal(first('#own').dataset.size, 'standard');
 });
+
+test('a button disabled under the pointer or mid-press drops its hover and press state', async () => {
+  const hover = (node) => {
+    const event = new MouseEvent('pointerover', { bubbles: true });
+    Object.defineProperty(event, 'pointerType', { value: 'mouse' });
+    node.dispatchEvent(event);
+  };
+  const press = (node) => {
+    const event = new MouseEvent('pointerdown', { bubbles: true });
+    Object.defineProperty(event, 'pointerType', { value: 'mouse' });
+    node.dispatchEvent(event);
+  };
+  for (const focusableWhenDisabled of [false, true]) {
+    await render(h(Button, { focusableWhenDisabled }, 'Next'));
+    const button = first('button');
+    await act(async () => hover(button));
+    assert.ok(button.hasAttribute('data-hovered'));
+    await act(async () => press(button));
+    assert.ok(button.hasAttribute('data-active'));
+    await render(h(Button, { focusableWhenDisabled, disabled: true }, 'Next'));
+    assert.ok(button.hasAttribute('data-disabled'));
+    assert.equal(button.hasAttribute('data-hovered'), false, `${focusableWhenDisabled}`);
+    assert.equal(button.hasAttribute('data-active'), false, `${focusableWhenDisabled}`);
+    await render(h(Button, { focusableWhenDisabled }, 'Next'));
+    assert.equal(button.hasAttribute('data-hovered'), false, 'it stays calm once enabled again');
+    await act(async () => root.unmount());
+    root = undefined;
+  }
+});

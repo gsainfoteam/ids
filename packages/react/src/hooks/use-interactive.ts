@@ -52,6 +52,15 @@ export function useInteractive<E extends Element = Element>({
   onKeyUp,
 }: UseInteractiveOptions<E> = {}) {
   const [state, setState] = useState(INTERACTIVE_INIT);
+  // A control disabled under the pointer or mid-press gets no pointerleave or pointerup to end
+  // that state (a natively disabled button gets no pointer events at all), so it ends here,
+  // during render, rather than lingering as a hover fill on a control that no longer reacts.
+  const [wasDisabled, setWasDisabled] = useState(disabled);
+  if (disabled !== wasDisabled) {
+    setWasDisabled(disabled);
+    if (disabled && (state.hovered || state.active))
+      setState((s) => ({ ...s, hovered: false, active: false }));
+  }
   const interactiveState: InteractiveState = {
     ...state,
     pressed: pressed ?? false,
