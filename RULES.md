@@ -66,9 +66,14 @@ packages/react/src/
     overlay/     (Dialog, Drawer, Menu, Popover, Tooltip)
     typography/  Kbd, Label
     utility/     Slot, Group, ThemeProvider
-  internal/      shared parts that are not exported: control-surface, icon-square, arc,
-                 field-popup, temporal-field
-  foundations/   token stories with no component (Typography, Radius, InteractiveState)
+  internal/      shared parts that are not exported:
+                   surfaces     control-surface, toggle-surface, icon-square, field-surface, surface
+                   fields       text-control (shell, Clear, useMergedRef), field-popup,
+                                temporal-field, form-value, date-locale
+                   behaviour    pressable, state-props, use-checked-writes, icon-label, arc
+                   strings      messages
+  foundations/   token stories with no component, one folder each with a story and a README:
+                 Color, Typography, Radius, InteractiveState
   hooks/ utils/ tokens/
 ```
 
@@ -235,6 +240,10 @@ same press land on the page underneath and pulls focus away from the trigger it 
 
 **Nested fields.** A field drawn inside another field's shell (TelField's country Select) turns
 its own ring off, so only the outer shell rings.
+
+**Components handed to a package are declared at module level.** react-day-picker's `components`
+(and any similar slot map) remounts a component that is recreated on every render, which drops
+focus and state. Define them once outside the render function.
 
 ## Tests
 
