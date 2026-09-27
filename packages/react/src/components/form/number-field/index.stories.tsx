@@ -223,16 +223,18 @@ export const WheelScrub: Story = {
   },
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole('spinbutton', { name: '수량' });
+    // dispatchEvent returns false when the field cancelled the wheel, which is what keeps the
+    // page from scrolling. React renders a wheel's step in a later task, hence waitFor.
     const wheel = (deltaY: number) =>
       input.dispatchEvent(new WheelEvent('wheel', { deltaY, bubbles: true, cancelable: true }));
-    wheel(-100);
+    await expect(wheel(-100)).toBe(true);
     await expect(input).toHaveValue('10');
     await userEvent.click(input);
+    await expect(wheel(-100)).toBe(false);
     wheel(-100);
-    wheel(-100);
-    await expect(input).toHaveValue('12');
+    await waitFor(() => expect(input).toHaveValue('12'));
     wheel(100);
-    await expect(input).toHaveValue('11');
+    await waitFor(() => expect(input).toHaveValue('11'));
   },
 };
 
