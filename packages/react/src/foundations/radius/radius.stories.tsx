@@ -88,7 +88,7 @@ export const Concentric: Story = {
           <div className={cn('concentric-p-4', surface)}>
             <div className={cn('concentric-p-4', surface)}>
               <div className={cn('concentric-p-2', surface)}>
-                <Button>12 → 20 → 36 → 52px</Button>
+                <Button>10 → 18 → 34 → 50px</Button>
               </div>
             </div>
           </div>
