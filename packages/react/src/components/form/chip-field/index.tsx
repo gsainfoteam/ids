@@ -239,7 +239,7 @@ function ChipItem({
       role: 'option',
       'aria-selected': c.selected.includes(value),
       'aria-disabled': blocked || undefined,
-      'data-active': c.active === value ? '' : undefined,
+      'data-highlighted': c.active === value ? '' : undefined,
       className: c.styles.item(),
       onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
       onPointerMove: () => {
@@ -282,7 +282,7 @@ function ChipCreate({ asChild, children, ...props }: BoxProps) {
       id: `${c.id}-create`,
       role: 'option',
       'aria-selected': false,
-      'data-active': c.active === undefined ? '' : undefined,
+      'data-highlighted': c.active === undefined ? '' : undefined,
       className: c.styles.item(),
       onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
       onPointerMove: () => c.setActive(null),

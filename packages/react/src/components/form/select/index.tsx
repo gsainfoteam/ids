@@ -161,7 +161,7 @@ function SelectItem({
       role: 'option',
       'aria-selected': c.selected.includes(value),
       'aria-disabled': disabled || undefined,
-      'data-active': c.active === value ? '' : undefined,
+      'data-highlighted': c.active === value ? '' : undefined,
       className: c.styles.item(),
       onPointerDown: (e: React.PointerEvent) => e.preventDefault(),
       onPointerMove: () => {
