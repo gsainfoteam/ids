@@ -38,4 +38,22 @@ export const messages = {
     limitCount: (count: number) => `최대 ${count}개`,
     kinds: { image: '이미지', video: '동영상', audio: '오디오', text: '텍스트' },
   },
+  colorPicker: {
+    label: '색상 선택',
+    area: '채도와 밝기',
+    saturation: '채도',
+    brightness: '밝기',
+    twoD: '2D 슬라이더',
+    hue: '색조',
+    alpha: '투명도',
+    input: '색상 값',
+    eyeDropper: '화면에서 색 고르기',
+    copy: '색상 값 복사',
+    copied: '복사했습니다',
+    swatches: '팔레트',
+    areaValue: (saturation: number, brightness: number) =>
+      `채도 ${saturation}%, 밝기 ${brightness}%`,
+    hueValue: (degrees: number) => `${degrees}도`,
+    percent: (value: number) => `${value}%`,
+  },
 } as const;

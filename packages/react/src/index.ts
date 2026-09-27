@@ -78,6 +78,13 @@ export type { SelectProps, SelectVariant } from './components/form/select';
 export { TelField } from './components/form/tel-field';
 export type { TelFieldProps, TelFieldFormat } from './components/form/tel-field';
 
+export { ColorPicker } from './components/data/color-picker';
+export type {
+  ColorPickerProps,
+  ColorPickerState,
+  ColorPickerSwatchOption,
+} from './components/data/color-picker';
+
 export { ColorField } from './components/form/color-field';
 export type { ColorFieldProps, ColorFormat } from './components/form/color-field';
 

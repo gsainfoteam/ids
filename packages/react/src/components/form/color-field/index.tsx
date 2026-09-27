@@ -12,11 +12,11 @@ import {
 
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
-import { parseColor, serializeColor, type ColorFormat } from './color';
 import { ColorControls, type ColorControlsProps } from './color-controls';
 import { FieldPopup, flattenParts, part } from '../../../internal/field-popup';
 import { fieldSurface, type FieldSurfaceVariant } from '../../../internal/field-surface';
 import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { parseColor, serializeColor, type ColorFormat } from '../../data/color-picker/color';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -357,4 +357,4 @@ export namespace ColorField {
     defaultVariants: { surfaceVariant: 'outline', size: 'standard' },
   });
 }
-export type { ColorFormat } from './color';
+export type { ColorFormat } from '../../data/color-picker/color';

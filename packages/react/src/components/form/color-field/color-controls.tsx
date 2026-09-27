@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { tv } from '../../../utils';
 import {
   clamp,
   hsvToRgb,
@@ -8,8 +9,7 @@ import {
   serializeColor,
   type ColorFormat,
   type RGBA,
-} from './color';
-import { tv } from '../../../utils';
+} from '../../data/color-picker/color';
 export type ColorControlsProps = {
   value: string;
   onChange: (value: string) => void;

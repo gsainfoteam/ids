@@ -90,3 +90,46 @@ export function serializeColor(color: RGBA, format: ColorFormat, alpha: boolean)
   const content = `${Math.round(h)}, ${Math.round(sl * 100)}%, ${Math.round(l * 100)}%`;
   return alpha ? `hsla(${content}, ${a})` : `hsl(${content})`;
 }
+
+export type HSVA = { h: number; s: number; v: number; a: number };
+
+// Black has no saturation and a gray no hue. What the picker had for them is kept, so dragging
+// back out of black restores the color the user was on instead of jumping to red.
+export function rgbaToHsva(color: RGBA, previous?: HSVA): HSVA {
+  const { h, s, v } = rgbToHsv(color);
+  return {
+    h: s === 0 || v === 0 ? (previous?.h ?? h) : h,
+    s: v === 0 ? (previous?.s ?? s) : s,
+    v,
+    a: color.a,
+  };
+}
+
+export const hsvaToRgba = ({ h, s, v, a }: HSVA) => hsvToRgb(h, s, v, a);
+
+// A color read back from its own serialized string can be a unit off in a channel, since
+// serializing rounds; that is still the same color.
+export function sameColor(a: RGBA, b: RGBA) {
+  return (
+    Math.abs(a.r - b.r) <= 1 &&
+    Math.abs(a.g - b.g) <= 1 &&
+    Math.abs(a.b - b.b) <= 1 &&
+    Math.abs(a.a - b.a) < 0.01
+  );
+}
+
+// Hex digits typed without the leading #, the way they are often copied, still count.
+export function parseColorInput(text: string) {
+  const trimmed = text.trim();
+  return parseColor(
+    /^(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(trimmed) ? `#${trimmed}` : trimmed,
+  );
+}
+
+export const cssColor = (color: RGBA) => serializeColor(color, 'rgb', true);
+
+export function formatPlaceholder(format: ColorFormat, alpha: boolean) {
+  if (format === 'hex') return alpha ? '#RRGGBBAA' : '#RRGGBB';
+  if (format === 'rgb') return alpha ? 'rgba(0, 0, 0, 1)' : 'rgb(0, 0, 0)';
+  return alpha ? 'hsla(0, 0%, 0%, 1)' : 'hsl(0, 0%, 0%)';
+}
