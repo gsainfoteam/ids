@@ -153,13 +153,24 @@ test('asChild renders the child with the button style; the child class and handl
   assert.deepEqual(events, ['child']);
 });
 
-test('a disabled asChild link drops href and the tab stop and blocks every click', async () => {
-  const fail = () => assert.fail('disabled link was activated');
+test('a disabled asChild link drops href and the tab stop and blocks every activation', async () => {
+  // Handlers record instead of throwing: React reports a throw from a handler and carries on.
+  const calls = [];
+  const record = (name) => () => calls.push(name);
   await render(
     h(
       Button,
-      { asChild: true, disabled: true, onClick: fail },
-      h('a', { href: '#danger', onClick: fail }, '준비 중'),
+      {
+        asChild: true,
+        disabled: true,
+        onClick: record('root click'),
+        onKeyDown: record('root key'),
+      },
+      h(
+        'a',
+        { href: '#danger', onClick: record('child click'), onKeyDown: record('child key') },
+        '준비 중',
+      ),
     ),
   );
   const link = first('a');
@@ -168,6 +179,16 @@ test('a disabled asChild link drops href and the tab stop and blocks every click
   assert.equal(link.getAttribute('aria-disabled'), 'true');
   assert.equal(link.tabIndex, -1);
   await act(async () => link.click());
+  const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+  await act(async () => link.dispatchEvent(enter));
+  assert.equal(enter.defaultPrevented, true);
+  assert.deepEqual(calls, []);
+  await act(async () =>
+    link.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }),
+    ),
+  );
+  assert.deepEqual(calls, ['child key', 'root key']);
 });
 
 test('a disabled router component keeps the href it may require; its click is blocked', async () => {

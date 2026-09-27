@@ -192,7 +192,12 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
     merged.className = cn(view.className, childProps.className);
     merged.style = { ...view.style, ...childProps.style };
     if (softDisabled) {
+      // The child's own handlers are cut off too: a disabled link must not act on click or on
+      // Enter and Space, whoever registered the handler.
+      const keyDown = merged.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined;
       merged.onClick = blockActivation;
+      merged.onKeyDown = (event: KeyboardEvent<HTMLElement>) =>
+        isActivationKey(event.key) ? blockActivation(event) : keyDown?.(event);
       // A link without href is no longer a link, so its role is kept explicitly. A router
       // component keeps its href because it may require one; the blocked click stops it instead.
       if (kind === 'link') {
