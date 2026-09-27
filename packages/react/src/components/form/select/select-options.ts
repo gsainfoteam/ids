@@ -1,5 +1,7 @@
 import { isValidElement, type ReactNode } from 'react';
 
+import { difference, intersection } from 'es-toolkit';
+
 import { flattenParts } from '../../../internal/field-popup';
 
 export type SelectOption = {
@@ -100,8 +102,6 @@ export function typeaheadIndex(labels: string[], buffer: string, current: number
 // Keeps the list's order rather than the order of clicks, the way a native multiple select
 // submits. Values that are not options (yet) stay at the end.
 export function orderByOptions(values: string[], options: SelectOption[]) {
-  const wanted = new Set(values);
-  const known = options.filter((option) => wanted.has(option.value)).map((option) => option.value);
-  const knownSet = new Set(known);
-  return [...known, ...values.filter((value) => !knownSet.has(value))];
+  const listed = options.map((option) => option.value);
+  return [...intersection(listed, values), ...difference(values, listed)];
 }

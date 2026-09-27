@@ -1,3 +1,5 @@
+import { uniqBy } from 'es-toolkit';
+
 import { normalizeText, type SelectOption } from '../select/select-options';
 
 export type ChipValidateResult = boolean | string | null | undefined;
@@ -17,8 +19,10 @@ export function splitTokens(text: string) {
 }
 
 // Case, width and accents are ignored, so "react", "React" and "Ｒｅａｃｔ" are one chip.
+const textKey = (text: string) => normalizeText(text.trim());
+
 export function sameText(a: string, b: string) {
-  return normalizeText(a.trim()) === normalizeText(b.trim());
+  return textKey(a) === textKey(b);
 }
 
 export function findOption(options: SelectOption[], text: string) {
@@ -56,15 +60,16 @@ export function resolveTokens({
   const add: string[] = [];
   const created: string[] = [];
   const rest: string[] = [];
-  const taken = (text: string) => [...selected, ...add].some((value) => sameText(value, text));
-  for (const token of tokens) {
-    const option = findOption(options, token);
-    if (option ? taken(option.value) : taken(token)) continue;
-    if (add.length >= room) {
-      rest.push(token);
-      continue;
-    }
-    if (option && !option.disabled) add.push(option.value);
+  const entries = uniqBy(
+    tokens.map((token) => {
+      const option = findOption(options, token);
+      return { token, option, value: option?.value ?? token };
+    }),
+    (entry) => textKey(entry.value),
+  ).filter((entry) => !selected.some((value) => sameText(value, entry.value)));
+  for (const { token, option } of entries) {
+    if (add.length >= room) rest.push(token);
+    else if (option && !option.disabled) add.push(option.value);
     else if (!option && creatable && !validationError(validate?.(token), 'invalid')) {
       add.push(token);
       created.push(token);

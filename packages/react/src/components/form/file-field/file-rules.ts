@@ -1,3 +1,5 @@
+import { uniq } from 'es-toolkit';
+
 import { messages } from '../../../internal/messages';
 
 export type FileFieldRejection = { file: File; reason: 'type' | 'size' | 'count' };
@@ -94,7 +96,7 @@ export function describeLimits({
   maxCount?: number;
 }) {
   const parts = [
-    tokens.length ? [...new Set(tokens.map(describeToken))].join(', ') : null,
+    tokens.length ? uniq(tokens.map(describeToken)).join(', ') : null,
     maxSize !== undefined ? messages.fileField.limitSize(formatBytes(maxSize)) : null,
     maxCount !== undefined ? messages.fileField.limitCount(maxCount) : null,
   ];

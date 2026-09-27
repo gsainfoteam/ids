@@ -8,6 +8,8 @@ import {
   type KeyboardEvent,
 } from 'react';
 
+import { clamp } from 'es-toolkit';
+
 import {
   findOption,
   hasSeparator,
@@ -196,7 +198,7 @@ export function useChipField({
   const move = (step: number) => {
     if (!candidates.length) return;
     const index = active === undefined ? -1 : candidates.indexOf(active);
-    const next = Math.min(Math.max(index + step, 0), candidates.length - 1);
+    const next = clamp(index + step, 0, candidates.length - 1);
     setHighlighted(candidates[next]);
   };
 

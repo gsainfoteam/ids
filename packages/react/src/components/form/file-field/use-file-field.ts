@@ -11,6 +11,8 @@ import {
   type DragEvent,
 } from 'react';
 
+import { noop } from 'es-toolkit';
+
 import { isImage, parseAccept, receiveFiles, type FileFieldRejection } from './file-rules';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
@@ -217,7 +219,7 @@ function watchPreview(file: File) {
 export function usePreviewUrl(file: File | undefined) {
   const shown =
     file && isImage(file) && typeof URL.createObjectURL === 'function' ? file : undefined;
-  const subscribe = useCallback(() => (shown ? watchPreview(shown) : () => {}), [shown]);
+  const subscribe = useCallback(() => (shown ? watchPreview(shown) : noop), [shown]);
   return useSyncExternalStore(
     subscribe,
     () => (shown ? previews.get(shown)?.url : undefined),
