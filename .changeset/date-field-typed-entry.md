@@ -9,4 +9,4 @@ Enter that ends an IME composition): the display pattern, the locale's written d
 from a phone keypad and the locale's numeric order. It rewrites the text in the display format
 and keeps text it cannot read or that min, max or `disabled` rule out, marked `aria-invalid` until
 it is fixed or reverted with Escape. Down Arrow opens the calendar on the typed date, and the
-calendar button leaves the tab order.
+calendar button leaves the tab order. The calendar button is a ghost IconButton.

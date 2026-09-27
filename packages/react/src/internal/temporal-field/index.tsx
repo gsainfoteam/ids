@@ -8,6 +8,7 @@ import {
   type FocusEvent,
   type KeyboardEvent,
   type MouseEvent,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 
@@ -19,10 +20,11 @@ import {
   type TemporalFieldApi,
   type TemporalFieldState,
 } from './use-temporal-field';
+import { IconButton } from '../../components/action/icon-button';
 import { useFieldSize } from '../../components/form/field/context';
-import { cn, invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
 import { FieldPopup, FieldPopupHeader, flattenParts, part } from '../field-popup';
-import { fieldSurface, type FieldSurfaceVariant } from '../field-surface';
+import { fieldAction, fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 import { FormValue } from '../form-value';
 
 import type { IdsSize } from '../../tokens/types';
@@ -96,6 +98,7 @@ export type InputProps = Omit<ComponentProps<'input'>, 'value' | 'defaultValue' 
 
 type ContextValue = {
   state: TemporalFieldState<unknown>;
+  size: IdsSize;
   hasClear: boolean;
   hasInput: boolean;
   input: Record<string, unknown> | undefined;
@@ -118,13 +121,6 @@ function useTemporal(part: string) {
   return context;
 }
 
-const iconButton = cn(
-  'me-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-standard',
-  'text-(--ids-color-on-muted) hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface)',
-  'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-  'focus-ring disabled:pointer-events-none disabled:opacity-50',
-);
-
 export const temporalFieldStyle = tv({
   slots: {
     // The trigger carries data-field-input, so focus-ring rings the whole shell for it while
@@ -136,14 +132,17 @@ export const temporalFieldStyle = tv({
     ],
     icon: 'shrink-0 text-(--ids-color-on-muted)',
     value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
-    clear: iconButton,
-    // With an Input part the text box takes the focus and the label, and the trigger shrinks to
-    // an icon button that opens the popup.
+    // Clear, and the calendar button that stands in for the trigger beside an Input part, are
+    // ghost IconButtons. The trigger runs to both edges of the box so all of it opens the popup,
+    // which leaves no padding for fieldAction to pull an end button into; each keeps 4px from the
+    // border instead, the inset it has above and below.
+    clear: [fieldAction.base, 'me-1'],
+    // With an Input part the text box takes the focus and the label.
     input: [
       'h-full min-w-0 flex-1 self-stretch bg-transparent outline-none',
       'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
     ],
-    button: iconButton,
+    button: [fieldAction.base, 'me-1'],
     content: 'flex justify-center',
     // DateTimeField's popup: the calendar beside the clock, stacked on a phone.
     panel: 'flex flex-col gap-4 sm:flex-row',
@@ -161,17 +160,17 @@ export const temporalFieldStyle = tv({
         root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
         trigger: 'gap-2 px-3',
         icon: 'size-(--ids-size-icon-standard)',
-        clear: 'size-7 [&_svg]:size-(--ids-size-icon-standard)',
+        clear: [fieldAction.size.standard, 'first:ms-1 last:me-1'],
         input: 'ps-3',
-        button: 'size-7 [&_svg]:size-(--ids-size-icon-standard)',
+        button: [fieldAction.size.standard, 'first:ms-1 last:me-1'],
       },
       tiny: {
         root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
         trigger: 'gap-1.5 px-2.5',
         icon: 'size-(--ids-size-icon-tiny)',
-        clear: 'size-6 [&_svg]:size-(--ids-size-icon-tiny)',
+        clear: [fieldAction.size.tiny, 'first:ms-1 last:me-1'],
         input: 'ps-2.5',
-        button: 'size-6 [&_svg]:size-(--ids-size-icon-tiny)',
+        button: [fieldAction.size.tiny, 'first:ms-1 last:me-1'],
       },
     } satisfies Record<IdsSize, object>,
     disabled: {
@@ -195,29 +194,41 @@ export function TemporalValue({ asChild, children, ...props }: ValueProps) {
   );
 }
 
-export function TemporalTrigger({ asChild, children, ...props }: TriggerProps) {
+export function TemporalTrigger({ asChild, children, className, ...props }: TriggerProps) {
   const c = useTemporal('Trigger');
   invariant(
     !flattenParts(children).some((n) => isValidElement(n) && n.type === TemporalClear),
     'Clear must be a sibling of Trigger.',
   );
+  if (c.hasInput) {
+    const button = {
+      ...mergeProps(props, c.trigger),
+      variant: 'ghost' as const,
+      size: c.size,
+      className: c.styles.button({ className }),
+    };
+    return asChild ? (
+      <IconButton {...button} asChild>
+        {children as ReactElement}
+      </IconButton>
+    ) : (
+      <IconButton {...button} icon={(children as ReactElement) ?? <c.icon aria-hidden="true" />} />
+    );
+  }
   return part(
     'button',
     asChild,
-    children ??
-      (c.hasInput ? (
-        <c.icon aria-hidden="true" />
-      ) : (
-        <>
-          <c.icon aria-hidden="true" className={c.styles.icon()} />
-          <TemporalValue />
-          {/* Clear takes the chevron's place once there is a value, so the end holds one icon. */}
-          {(c.state.empty || !c.hasClear) && (
-            <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
-          )}
-        </>
-      )),
-    mergeProps(props, c.trigger),
+    children ?? (
+      <>
+        <c.icon aria-hidden="true" className={c.styles.icon()} />
+        <TemporalValue />
+        {/* Clear takes the chevron's place once there is a value, so the end holds one icon. */}
+        {(c.state.empty || !c.hasClear) && (
+          <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
+        )}
+      </>
+    ),
+    mergeProps({ ...props, className }, c.trigger),
   );
 }
 
@@ -227,26 +238,30 @@ export function TemporalInput({ asChild, ...props }: InputProps) {
   return part('input', asChild, undefined, mergeProps(props, c.input));
 }
 
-export function TemporalClear({
-  asChild,
-  children = <XMarkIcon aria-hidden="true" />,
-  ...props
-}: ClearProps) {
+// Unlike a text field's Clear this one stays in the tab order, since a date field without an
+// Input part has no text to delete and its calendar has no key that empties it.
+export function TemporalClear({ asChild, children, className, ...props }: ClearProps) {
   const c = useTemporal('Clear');
   if (c.state.empty) return null;
-  return part(
-    'button',
-    asChild,
-    children,
-    mergeProps(props, {
+  const button = {
+    ...mergeProps(props, {
       type: 'button',
       'aria-label': props['aria-label'] ?? c.messages.clear,
-      disabled: c.blocked,
       'data-temporal-clear': '',
-      className: c.styles.clear(),
       onClick: c.clear,
       onBlur: c.onBlur,
     }),
+    variant: 'ghost' as const,
+    size: c.size,
+    disabled: c.blocked,
+    className: c.styles.clear({ className }),
+  };
+  return asChild ? (
+    <IconButton {...button} asChild>
+      {children as ReactElement}
+    </IconButton>
+  ) : (
+    <IconButton {...button} icon={(children as ReactElement) ?? <XMarkIcon aria-hidden="true" />} />
   );
 }
 
@@ -371,7 +386,6 @@ export function TemporalField<V>({
         'aria-expanded': state.open,
         'aria-controls': state.open ? popupId : undefined,
         disabled: disabled || readOnly,
-        className: styles.button(),
         onClick: toggle,
         onBlur: handleBlur,
       }
@@ -417,6 +431,7 @@ export function TemporalField<V>({
     <TemporalContext.Provider
       value={{
         state,
+        size: resolvedSize,
         hasClear: !composed || count(TemporalClear) > 0,
         hasInput,
         input: textBox,

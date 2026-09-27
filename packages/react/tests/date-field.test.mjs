@@ -454,6 +454,36 @@ test('parts: none gives Trigger and Clear, given parts are drawn as given, Trigg
   );
 });
 
+test('Clear is a ghost IconButton in the field size that keeps its tab stop and its asChild look', async () => {
+  const changes = [];
+  await render(
+    h(DateField, { defaultValue: d(15), size: 'tiny', onValueChange: (v) => changes.push(v) }),
+  );
+  assert.equal(clear().tagName, 'BUTTON');
+  assert.equal(clear().dataset.variant, 'ghost');
+  assert.equal(clear().dataset.size, 'tiny');
+  assert.equal(clear().type, 'button');
+  assert.equal(clear().tabIndex, 0, 'a date field has no other key that empties it');
+  assert.match(clear().className, /\bsize-6\b/);
+  assert.doesNotMatch(clear().className, /-m[se]-/, 'the box has no padding to pull into');
+  await render(
+    h(
+      DateField,
+      { key: 'as-child', defaultValue: d(15), onValueChange: (v) => changes.push(v) },
+      h(DateField.Trigger),
+      h(DateField.Clear, { asChild: true }, h('button', { id: 'own' }, 'Wipe')),
+    ),
+  );
+  assert.equal(clear().id, 'own');
+  assert.equal(clear().textContent, 'Wipe');
+  assert.equal(clear().getAttribute('aria-label'), '날짜 지우기');
+  assert.equal(clear().dataset.variant, 'ghost');
+  assert.match(clear().className, /\bsize-7\b/);
+  await click(clear());
+  assert.deepEqual(changes, [null]);
+  assert.equal(document.activeElement, trigger());
+});
+
 test('the chevron gives way to Clear once there is a value', async () => {
   await render(h(DateField, { today: d(15) }));
   assert.equal(trigger().querySelectorAll('svg').length, 2, 'icon and chevron while empty');
@@ -512,6 +542,9 @@ test('typed entry: the text box takes the label and role, the calendar button le
   const button = doc.querySelector('button');
   assert.equal(button.getAttribute('aria-label'), '달력 열기');
   assert.equal(button.getAttribute('tabindex'), '-1');
+  assert.equal(button.getAttribute('data-variant'), 'ghost');
+  assert.equal(button.getAttribute('aria-haspopup'), 'dialog');
+  assert.equal(button.getAttribute('aria-expanded'), 'false');
   assert.throws(
     () => renderToString(h(DateField, { selectionMode: 'range' }, h(DateField.Input))),
     /reads typed text/,
@@ -653,11 +686,31 @@ test('typed entry and the calendar share one value; ArrowDown opens on the typed
   assert.equal(popup(), null);
   assert.equal(textBox().value, '2026.09.21');
   assert.equal(document.activeElement, textBox(), 'focus returns to the text box');
-  await click(host.querySelector('[aria-label="달력 열기"]'));
+  const button = () => host.querySelector('[aria-label="달력 열기"]');
+  await click(button());
   assert.ok(popup());
-  await click(host.querySelector('[aria-label="달력 열기"]'));
+  assert.equal(button().getAttribute('aria-expanded'), 'true');
+  assert.equal(button().getAttribute('aria-controls'), popup().id);
+  await click(button());
   assert.equal(popup(), null);
+  assert.equal(button().getAttribute('aria-expanded'), 'false');
+  assert.equal(button().hasAttribute('aria-controls'), false);
   await click(clear());
   assert.equal(textBox().value, '');
   assert.equal(changes.at(-1), null);
+});
+
+test('the calendar button beside an Input takes the field size and is disabled with the field', async () => {
+  await render(h(DateField, { size: 'tiny' }, h(DateField.Input)));
+  const button = () => host.querySelector('[aria-label="달력 열기"]');
+  assert.equal(button().dataset.size, 'tiny');
+  assert.match(button().className, /\bsize-6\b/);
+  assert.doesNotMatch(button().className, /-m[se]-/, 'the box has no padding to pull into');
+  assert.equal(button().disabled, false);
+  for (const props of [{ readOnly: true }, { disabled: true }]) {
+    await render(h(DateField, { key: Object.keys(props)[0], ...props }, h(DateField.Input)));
+    assert.equal(button().disabled, true, Object.keys(props)[0]);
+    await click(button());
+    assert.equal(popup(), null);
+  }
 });

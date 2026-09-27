@@ -174,6 +174,8 @@ const schema = z.object({ date: z.date().nullable().refine(Boolean, '날짜를 �
 - 부분을 하나도 주지 않으면 Trigger 와 Clear 를 그립니다. 하나라도 주면 준 것만 그리고, Trigger 가 없으면 Trigger 만 채웁니다.
 - `Trigger`, `Value`, `Clear`, `Content`, `Input` 은 `asChild` 를 받습니다. Clear 는 Trigger 안에 둘 수 없습니다.
 - `Input` 이 있으면 Trigger 는 달력 아이콘 버튼이 되고, 주지 않으면 끝에 붙습니다. [글자로 입력](#글자로-입력) 을 봅니다.
+- Clear 와 `Input` 옆의 달력 버튼은 ghost [IconButton](../../action/icon-button/README.md) 입니다. 필드 크기를 따르고 테두리에서 4px 안쪽에 놓입니다. `children` 에 아이콘 하나를 주면 기본 아이콘 대신 그리고, `asChild` 면 자식 요소가 IconButton 이 됩니다.
+- Clear 는 Tab 순서에 남습니다. `Input` 이 없는 필드에는 지울 글자가 없고, 달력에는 값을 비우는 키가 없습니다.
 
 ## 상태
 

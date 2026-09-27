@@ -11,7 +11,8 @@ trigger, `X.State`, function `className` / `style` on the field surface, `data-o
 `data-placeholder` on the value, a Clear button that takes the chevron's place once there is a
 value, `referenceDate` on TimeField, `captionLayout` passed through to
 the calendar, one `onOpenChange(false)` per outside click, and a DateTimeField clock that stays
-empty until a time is picked and sits beside the calendar at its height.
+empty until a time is picked and sits beside the calendar at its height. Clear is a ghost
+IconButton in the field's size that keeps its tab stop.
 
 Breaking: `onChange` is now `onValueChange` on all three fields. The default `locale` is `ko-KR`.
 An empty value, or a range without its end, is left out of FormData instead of submitted as `""`
