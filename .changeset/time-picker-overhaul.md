@@ -4,7 +4,8 @@
 
 Restyle TimePicker after shadcn/ui (borderless columns with a soft focus ring, a muted active
 option, a solid primary selection) and move its logic into `useTimePicker`. Every column is
-padded so the picked time reads across one middle row. New: typing digits jumps to an option,
+padded by half its height so the picked time reads across one middle row, its height is set by
+`--time-picker-height` (five options by default), and a 12-hour hour column runs 12, 1, ... 11. New: typing digits jumps to an option,
 `Delete` / `Backspace` clears the value to `null`, left and right arrows follow the text
 direction, `referenceDate` sets the day an empty picker builds on, `TimePicker.State` and
 `TimePicker.OptionState`, function `className` / `style` on the root, `data-selected`,

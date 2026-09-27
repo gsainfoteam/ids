@@ -181,6 +181,15 @@ test('right-to-left pickers swap the column arrows', async () => {
   assert.equal(document.activeElement === col('hour'), true);
 });
 
+test('a 12-hour column starts at 12', () => {
+  const doc = new JSDOM(renderToString(h(TimePicker, { format: '12h', precision: 'hour' }))).window
+    .document;
+  assert.deepEqual(
+    [...doc.querySelectorAll('[data-time-column=hour] [role=option]')].map((n) => n.textContent),
+    ['12', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'],
+  );
+});
+
 test('12h noon/midnight and range-aware upper-unit selection', async () => {
   let value;
   await render(

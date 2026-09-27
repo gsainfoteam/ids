@@ -99,9 +99,10 @@ export function unitNumbers(
   step: number,
 ) {
   if (unit === 'period') return [0, 1];
+  // A 12-hour day starts at 12, so the column runs 12, 1, ... 11 like the clock reads it.
   if (unit === 'hour')
     return Array.from({ length: format === '12h' ? 12 : 24 }, (_, i) =>
-      format === '12h' ? i + 1 : i,
+      format === '12h' ? i || 12 : i,
     );
   const interval = unit === precision ? step : 1;
   return Array.from({ length: Math.ceil(60 / interval) }, (_, i) => i * interval);

@@ -286,11 +286,13 @@ export namespace TimePicker {
       header: 'flex w-full basis-full gap-1 text-(--ids-color-on-muted) select-none',
       headerLabel: 'min-w-12 flex-1 text-center',
       separator: 'self-center text-(--ids-color-on-muted) select-none',
-      // A column is five options tall and padded by two above and below, so any option, even the
-      // first or the last, can sit in the middle row and the picked time reads across one line.
+      // A column is five options tall unless --time-picker-height says otherwise, with half a
+      // column of space before the first option and after the last, so any option can sit in the
+      // middle row and the picked time reads across one line.
       column: [
-        'group/column relative h-[calc(var(--time-option)*5)] min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-standard',
-        'py-[calc(var(--time-option)*2)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+        'group/column relative h-(--time-picker-height) min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-standard',
+        'before:block before:h-[calc(50%-var(--time-option)/2)] after:block after:h-[calc(50%-var(--time-option)/2)]',
+        '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         'focus-ring aria-disabled:cursor-not-allowed',
         'data-[variant=wheel]:snap-y data-[variant=wheel]:snap-mandatory data-[variant=wheel]:[overflow-anchor:none]',
       ],
@@ -308,12 +310,18 @@ export namespace TimePicker {
     variants: {
       size: {
         standard: {
-          root: '[--time-option:var(--ids-size-control-standard)] text-body-b3-regular',
+          root: [
+            '[--time-option:var(--ids-size-control-standard)] text-body-b3-regular',
+            '[--time-picker-height:calc(var(--time-option)*5)]',
+          ],
           header: 'text-caption-c1-regular',
           option: 'text-body-b3-regular',
         },
         tiny: {
-          root: '[--time-option:var(--ids-size-control-tiny)] text-caption-c1-regular',
+          root: [
+            '[--time-option:var(--ids-size-control-tiny)] text-caption-c1-regular',
+            '[--time-picker-height:calc(var(--time-option)*5)]',
+          ],
           header: 'text-caption-c2-regular',
           option: 'text-caption-c1-regular',
         },
