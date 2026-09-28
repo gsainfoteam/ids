@@ -60,10 +60,10 @@ export function TimeField({
   validateTime(props.value);
   validateTime(props.defaultValue);
   const dateLocale = resolveLocale(locale);
-  const clock = format === '12h' || format === '24h';
-  const cycle = hourCycle ?? (clock ? format : undefined);
+  const formatNamesHourCycle = format === '12h' || format === '24h';
+  const cycle = hourCycle ?? (formatNamesHourCycle ? format : undefined);
   const display = formatter(
-    format === undefined || clock
+    format === undefined || formatNamesHourCycle
       ? timePattern(dateLocale, precision, resolveTimeFormat(cycle, dateLocale))
       : format,
     dateLocale,
