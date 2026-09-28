@@ -29,6 +29,7 @@ export { Chip } from './components/data/chip';
 export { Badge } from './components/data/badge';
 export { Alert } from './components/feedback/alert';
 export { Dialog } from './components/overlay/dialog';
+export { Popover } from './components/overlay/popover';
 export {
   overlay,
   useOverlay,
