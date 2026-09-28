@@ -401,6 +401,30 @@ test('drawer: the sheet has its own search field, and closing returns to the fie
   await expect.element(input).toHaveFocus();
 });
 
+test('onBlur waits until focus leaves the field and its drawer', async () => {
+  await page.viewport(400, 700);
+  try {
+    const onBlur = vi.fn();
+    const screen = await render(
+      <div>
+        <ChipField aria-label="Skills" onBlur={onBlur}>
+          {items}
+        </ChipField>
+        <button type="button">After</button>
+      </div>,
+    );
+    await userEvent.click(screen.getByRole('combobox', { name: 'Skills' }));
+    await expect.element(screen.getByRole('combobox', { name: '항목 검색' })).toHaveFocus();
+    await userEvent.keyboard('{Escape}');
+    await expect.element(screen.getByRole('combobox', { name: 'Skills' })).toHaveFocus();
+    expect(onBlur, 'focus only moved between the field and its sheet').not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('button', { name: 'After' }));
+    expect(onBlur).toHaveBeenCalledOnce();
+  } finally {
+    await page.viewport(414, 896);
+  }
+});
+
 test('react-hook-form value mode binds onValueChange; errors focus, reset, disabled omission', async () => {
   type Values = { tags: string[] };
   const submitted = vi.fn();

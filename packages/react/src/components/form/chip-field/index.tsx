@@ -7,6 +7,7 @@ import {
   useId,
   type ComponentProps,
   type CSSProperties,
+  type FocusEvent,
   type KeyboardEvent,
   type PointerEvent,
   type ReactElement,
@@ -28,6 +29,7 @@ import { resolveState } from '../../../internal/state-props';
 import {
   flattenFragments,
   invariant,
+  isNodeFromAnyWindow,
   keepFocusWhereItIs,
   mergeProps,
   mergeRefs,
@@ -175,8 +177,11 @@ export function ChipField({
   style,
   ...rootInputProps
 }: ChipField.Props) {
-  const { onChange: _wouldRecordQueryAsValue, ...inputProps } =
-    rootInputProps as ChipFieldInputProps & { onChange?: unknown };
+  const {
+    onChange: _wouldRecordQueryAsValue,
+    onBlur: onFieldBlur,
+    ...inputProps
+  } = rootInputProps as ChipFieldInputProps & { onChange?: unknown };
   invariant(
     maxCount === undefined || (Number.isInteger(maxCount) && maxCount >= 0),
     '`<ChipField>` `maxCount` must be a non-negative integer.',
@@ -216,6 +221,10 @@ export function ChipField({
     drawer,
   });
   const { state: s, ids, handlers } = field;
+  const popupSelector = `[data-chip-field-popup="${ids.listbox}"]`;
+  const staysInField = (next: EventTarget | null) =>
+    isNodeFromAnyWindow(next) &&
+    (!!rootRef.current?.contains(next) || !!(next as Element).closest?.(popupSelector));
   invariant(
     Array.isArray(s.selected) &&
       s.selected.every((item) => typeof item === 'string') &&
@@ -271,6 +280,9 @@ export function ChipField({
     onCompositionStart: handlers.onCompositionStart,
     onCompositionEnd: handlers.onCompositionEnd,
     onKeyDown: (event) => handlers.onInputKeyDown(event, 'field'),
+    onBlur: (event) => {
+      if (!staysInField(event.relatedTarget)) onFieldBlur?.(event);
+    },
   };
   const labelledBy = merged['aria-labelledby'];
   const listLabel = labelledBy
@@ -344,6 +356,11 @@ export function ChipField({
           matchWidth
           label={merged['aria-label'] ?? messages.chipField.listbox}
           aria-labelledby={drawer ? labelledBy : undefined}
+          data-chip-field-popup={ids.listbox}
+          onBlur={(event) => {
+            if (!staysInField(event.relatedTarget))
+              onFieldBlur?.(event as unknown as FocusEvent<HTMLInputElement>);
+          }}
         >
           {popup}
         </FieldPopup>
