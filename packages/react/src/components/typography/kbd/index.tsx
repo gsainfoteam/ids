@@ -1,5 +1,6 @@
 import { Fragment, type ComponentProps, type ReactNode } from 'react';
 
+import { GLYPH_ICONS } from './glyph-icons';
 import {
   orderKeys,
   parseKeys,
@@ -21,20 +22,38 @@ function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
   return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
 }
 
-function GlyphReadAsName({ glyph, name }: { glyph: string; name: string }) {
+type GlyphProps = { glyph: string; name: string; iconClassName: string | undefined };
+
+function GlyphReadAsName({ glyph, name, iconClassName }: GlyphProps) {
+  const Icon = GLYPH_ICONS[glyph];
+
   return (
     <>
-      <span aria-hidden="true">{glyph}</span>
+      {Icon ? (
+        <Icon aria-hidden="true" data-kbd-glyph={glyph} className={iconClassName} />
+      ) : (
+        <span aria-hidden="true">{glyph}</span>
+      )}
       <span className="sr-only"> {name} </span>
     </>
   );
 }
 
-function Face({ keyInfo, name }: { keyInfo: ResolvedKey; name: (label: KbdLabel) => string }) {
+type FaceProps = {
+  keyInfo: ResolvedKey;
+  name: (label: KbdLabel) => string;
+  iconClassName: string | undefined;
+};
+
+function Face({ keyInfo, name, iconClassName }: FaceProps) {
   return keyInfo.label === undefined ? (
     keyInfo.glyph
   ) : (
-    <GlyphReadAsName glyph={keyInfo.glyph} name={name(keyInfo.label)} />
+    <GlyphReadAsName
+      glyph={keyInfo.glyph}
+      name={name(keyInfo.label)}
+      iconClassName={iconClassName}
+    />
   );
 }
 
@@ -76,7 +95,7 @@ export function Kbd({
               </span>
             )}
             <kbd data-kbd="" className={styles.root()}>
-              <Face keyInfo={keyInfo} name={name} />
+              <Face keyInfo={keyInfo} name={name} iconClassName={styles.glyph()} />
             </kbd>
           </Fragment>
         ))}
@@ -86,13 +105,18 @@ export function Kbd({
 
   const content =
     ordered.length === 1 ? (
-      <Face keyInfo={ordered[0]!} name={name} />
+      <Face keyInfo={ordered[0]!} name={name} iconClassName={styles.glyph()} />
     ) : typeof children === 'string' ? (
       splitGlyphs(children, kbd.platform).map((segment, index) =>
         segment.label === undefined ? (
           segment.text
         ) : (
-          <GlyphReadAsName key={index} glyph={segment.text} name={name(segment.label)} />
+          <GlyphReadAsName
+            key={index}
+            glyph={segment.text}
+            name={name(segment.label)}
+            iconClassName={styles.glyph()}
+          />
         ),
       )
     ) : (
@@ -164,16 +188,19 @@ export namespace Kbd {
         'rounded-indicator bg-current/10 font-sans text-current/75 select-none',
       ],
       group: 'inline-flex items-center gap-1 align-middle',
+      glyph: 'shrink-0',
       separator: 'text-current/60 select-none',
     },
     variants: {
       size: {
         standard: {
           root: 'h-5 min-w-5 px-1 text-caption-c1-medium',
+          glyph: 'size-3',
           separator: 'text-caption-c1-regular',
         },
         tiny: {
           root: 'h-4 min-w-4 px-0.5 text-caption-c2-medium',
+          glyph: 'size-2.5',
           separator: 'text-caption-c2-regular',
         },
       } satisfies Record<IdsSize, object>,

@@ -60,6 +60,7 @@
     "date-fns": "^4.4.0",
     "es-toolkit": "^1.49.0",
     "libphonenumber-js": "^1.13.13",
+    "lucide-react": "^1.48.0",
     "react-day-picker": "^10.0.1",
     "react-remove-scroll": "^2.7.2",
     "react-textarea-autosize": "^8.5.9",

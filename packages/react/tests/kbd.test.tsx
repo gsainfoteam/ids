@@ -22,6 +22,9 @@ const doc = (node: ReactNode) => new DOMParser().parseFromString(renderToString(
 const visible = (element: Element) => {
   const copy = element.cloneNode(true) as Element;
   copy.querySelectorAll('.sr-only').forEach((node) => node.remove());
+  copy
+    .querySelectorAll('[data-kbd-glyph]')
+    .forEach((icon) => icon.replaceWith(icon.getAttribute('data-kbd-glyph')!));
   return copy.textContent;
 };
 const hiddenFromReaders = (node: Node) =>
@@ -146,4 +149,34 @@ test('className may read the state', () => {
     />,
   ).querySelector('[data-kbd-group]')!;
   expect(kbd.className).toMatch(/apple-true/);
+});
+
+test('Apple key symbols are drawn as icons, so no fallback font decides where they sit', () => {
+  const apple = doc(<Kbd keys="shift+mod+enter" platform="apple" />);
+  const icons = [...apple.querySelectorAll('svg[data-kbd-glyph]')];
+  expect(icons.map((icon) => icon.getAttribute('data-kbd-glyph'))).toEqual(['⇧', '⌘', '↩']);
+  expect(icons.every((icon) => icon.getAttribute('aria-hidden') === 'true')).toBe(true);
+
+  const other = doc(<Kbd keys="mod+k" platform="other" />);
+  expect(other.querySelector('svg'), 'other platforms spell the keys out').toBeNull();
+});
+
+test('an icon sits in the middle of its keycap at both sizes', async () => {
+  const screen = await render(
+    <div>
+      <Kbd keys="shift+mod+enter" platform="apple" />
+      <Kbd keys="alt+backspace" platform="apple" size="tiny" />
+    </div>,
+  );
+  const icons = [...screen.container.querySelectorAll('svg[data-kbd-glyph]')];
+  expect(icons.length).toBe(5);
+  for (const icon of icons) {
+    const cap = icon.closest('[data-kbd]')!.getBoundingClientRect();
+    const box = icon.getBoundingClientRect();
+    const middle = (rect: DOMRect) => [rect.left + rect.width / 2, rect.top + rect.height / 2];
+    const [capX, capY] = middle(cap);
+    const [iconX, iconY] = middle(box);
+    expect(Math.abs(iconX - capX), icon.getAttribute('data-kbd-glyph')!).toBeLessThan(0.51);
+    expect(Math.abs(iconY - capY), icon.getAttribute('data-kbd-glyph')!).toBeLessThan(0.51);
+  }
 });

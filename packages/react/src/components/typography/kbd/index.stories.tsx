@@ -1,4 +1,4 @@
-import { expect, within } from 'storybook/test';
+import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
@@ -42,6 +42,9 @@ const spoken = (element: Element) => {
 const visible = (element: Element) => {
   const copy = element.cloneNode(true) as Element;
   copy.querySelectorAll('.sr-only').forEach((node) => node.remove());
+  copy
+    .querySelectorAll('[data-kbd-glyph]')
+    .forEach((icon) => icon.replaceWith(icon.getAttribute('data-kbd-glyph')!));
   return copy.textContent;
 };
 
@@ -175,7 +178,7 @@ export const SymbolNames: Story = {
     await expect(spoken(canvas.getByTestId('command'))).toBe('커맨드');
     await expect(spoken(canvas.getByTestId('combo'))).toBe('시프트 커맨드 P');
     await expect(spoken(canvas.getByTestId('arrow'))).toBe('왼쪽 화살표');
-    const glyph = within(canvas.getByTestId('command')).getByText('⌘');
+    const glyph = canvas.getByTestId('command').querySelector('[data-kbd-glyph="⌘"]');
     await expect(glyph).toHaveAttribute('aria-hidden', 'true');
   },
 };
@@ -202,6 +205,6 @@ export const Group: Story = {
     const caps = group.querySelectorAll('kbd[data-kbd]');
     await expect(caps).toHaveLength(2);
     for (const cap of caps) await expect(cap).toHaveAttribute('data-size', 'tiny');
-    await expect(caps[0]).toHaveTextContent('⌘');
+    await expect(visible(caps[0]!)).toBe('⌘');
   },
 };

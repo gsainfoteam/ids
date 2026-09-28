@@ -254,6 +254,8 @@ shrink it again with `text-[0.9em]`.
 
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
+Kbd's key symbols (`⌘` `⌥` `⇧` `↩` `⌫` and the arrows) come from `lucide-react`, the one set that
+has them all: drawn as text they fall back to a system font that sits them off center in the cap.
 
 ## Component API
 
