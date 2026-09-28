@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useLayoutEffect,
   useRef,
   useState,
@@ -17,6 +18,7 @@ import { RemoveScroll } from 'react-remove-scroll';
 
 import { elementsAbove, type Layer } from './layer-stack';
 import { raiseInTopLayer, raiseWhatStaysAboveLayers, showInTopLayer } from './top-layer';
+import { mergeRefs } from '../../utils';
 
 const SCROLLABLE_LAYERS_ABOVE = 8;
 
@@ -42,6 +44,11 @@ export function ModalLayer({
   children,
 }: ModalLayerProps) {
   const backdropRef = useRef<HTMLDivElement>(null);
+  const givenBackdropRef = backdrop === false ? undefined : backdrop.ref;
+  const setBackdrop = useCallback(
+    (node: HTMLDivElement | null) => mergeRefs(backdropRef, givenBackdropRef)(node),
+    [givenBackdropRef],
+  );
   const ownContext = useFloatingRootContext({
     open,
     onOpenChange: noop,
@@ -68,7 +75,7 @@ export function ModalLayer({
       {hasBackdrop && (
         <div
           {...backdrop}
-          ref={backdropRef}
+          ref={setBackdrop}
           popover="manual"
           aria-hidden="true"
           onClick={(event) => {

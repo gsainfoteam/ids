@@ -137,6 +137,7 @@ raiseWhatStaysAboveLayers();                   // 레이어를 올린 쪽이 부
 const { mounted, ending } = usePresence(open, {
   elements: () => [node, backdrop],     // 애니메이션을 기다릴 요소
   onExitComplete: () => overlayItem.remove(),
+  onEnterComplete: () => onOpenChangeComplete(true),   // 들어오는 애니메이션이 끝난 뒤
 });
 if (!mounted) return null;
 <div data-ending-style={ending ? '' : undefined} className="data-ending-style:opacity-0" />
@@ -147,6 +148,7 @@ if (!mounted) return null;
 - 상태는 렌더 중에 바꿉니다(`lastOpen`). `open` 이 바뀐 그 렌더에서 `ending` 이 맞춰져서, 닫힌 채로 한 번 그려지는 틈이 없습니다.
 - 한 프레임 기다린 뒤 `getAnimations()` 를 읽습니다. `data-ending-style` 이 붙은 스타일로 transition 이 시작된 뒤에 모아야 합니다. `getAnimations()` 는 스타일을 먼저 계산합니다.
 - 기다리는 effect 는 layout effect 입니다. 나가는 중에 다시 열면 transition 이 되돌아가며 취소되고 `finished` 가 settle 되는데, 그 전에 같은 commit 안에서 기다림을 끊어야 다시 연 요소를 치우지 않습니다.
+- `onEnterComplete` 도 같은 방법으로 열린 뒤 한 프레임 기다렸다가 애니메이션이 끝나면 부릅니다. 끝나기 전에 닫으면 부르지 않습니다.
 - 타이머를 쓰지 않습니다. 애니메이션이 없으면(`motion-reduce:transition-none`) 다음 프레임에 바로 끝납니다.
 - 들어오는 애니메이션은 `starting:` 변형(`@starting-style`)으로 그립니다. top layer 에 올라오는 순간 `display: none` 에서 돌아오므로 따로 속성이 필요 없습니다.
 
@@ -204,7 +206,7 @@ modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, �
   layer={layer}                         // useLayer 의 결과
   element={element}                     // state 의 content 요소
   contentRef={setElement}               // content 에 붙는 ref. RemoveScroll 이 content 로 넘긴다
-  backdrop={{ className: backdropStyle, 'data-dialog-backdrop': '' }}   // false 면 배경 없음
+  backdrop={{ className: backdropStyle, ref: setBackdrop }}   // false 면 배경 없음. ref 로 배경 요소를 받는다
   onBackdropClick={() => close('outside-press')}
 >
   <div popover="manual" role="dialog" tabIndex={-1}>...</div>
