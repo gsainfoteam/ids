@@ -229,6 +229,11 @@ so the browser blocks the submit, anchors its message there and hands focus to t
 **`cn` needs line height after text size.** `text-*` composites carry their own line
 height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regular leading-none`.
 
+**Monospace text is `font-mono`, never a hand-written `font-family`.** The CSS package extends the
+utility with `font-size-adjust: var(--ids-font-size-adjust-mono)`, which sets Monaspace Neon at 95%
+so code sits level with the body text and brings any fallback font to the same x-height. Do not
+shrink it again with `text-[0.9em]`.
+
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
 

@@ -151,6 +151,7 @@ const TYPOGRAPHY_CATS = [
   "letter-spacing",
   "line-height",
 ];
+const TYPOGRAPHY_CATS_TAILWIND_HAS_NO_THEME_FOR = ["font-size-adjust"];
 
 const T_CSS_THEME = `@theme {
 {{THEME}}
@@ -318,6 +319,10 @@ const T_CSS_UTILITIES = `@utility focus-ring {
     }
   }
 }
+
+@utility font-mono {
+  font-size-adjust: var(--ids-font-size-adjust-mono);
+}
 `;
 
 const CONCENTRIC_PADS = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8];
@@ -389,7 +394,7 @@ const buildTypographyCSS = (dictionary) => {
             LETTER_SPACING: letterSpacing,
           }),
       ),
-      ...TYPOGRAPHY_CATS.flatMap((cat) =>
+      ...[...TYPOGRAPHY_CATS, ...TYPOGRAPHY_CATS_TAILWIND_HAS_NO_THEME_FOR].flatMap((cat) =>
         byPath(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
       ),
     ].join("\n"),

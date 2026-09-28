@@ -95,6 +95,10 @@
   }
 }
 
+@utility font-mono {
+  font-size-adjust: var(--ids-font-size-adjust-mono);
+}
+
 @property --ids-concentric-pad {
   syntax: "<length>";
   inherits: false;
@@ -637,7 +641,7 @@
   --ids-font-size-h2: 40px;
   --ids-font-size-h1: 48px;
   --ids-font-family-sans: 'Pretendard GOV Variable', 'Pretendard GOV', 'Pretendard Variable', Pretendard, sans-serif;
-  --ids-font-family-mono: 'JetBrains Mono', monospace;
+  --ids-font-family-mono: 'Monaspace Neon Var', 'Monaspace Neon', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --ids-font-weight-regular: 400;
   --ids-font-weight-medium: 500;
   --ids-font-weight-semibold: 600;
@@ -650,6 +654,7 @@
   --ids-line-height-body-b1: 1.333;
   --ids-line-height-body-b2: 1.375;
   --ids-line-height-body-b3: 1.429;
+  --ids-font-size-adjust-mono: 0.487;
 }
 
 @theme {

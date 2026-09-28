@@ -27,6 +27,17 @@
 - `text-button-*` 은 행간이 1이라 컨트롤 안에서 세로 가운데에 맞습니다. Button이 이미 쓰므로 직접 붙일 일은 드뭅니다.
 - 컨트롤 안의 글자(필드 값, 라벨)는 `text-body-b3-*`, 작은 크기에서는 `text-caption-c1-*` 입니다.
 
+## 글꼴
+
+- 본문은 Pretendard GOV Variable(`font-sans`, 기본), 코드와 값은 Monaspace Neon(`font-mono`)입니다.
+- `font-mono` 는 같은 텍스트 스타일 안에서 x-height 를 95% 로 맞춥니다. 폭이 넓은 고정폭 글자가 본문 줄에서 튀지 않으니 따로 줄이지 않습니다.
+
+```tsx
+<p className="text-body-b2-regular">
+  <code className="font-mono">maxRetries</code> 를 3으로 둡니다.
+</p>
+```
+
 ## 알아둘 것
 
 - headline에 regular, caption에 bold는 없습니다. 없는 조합은 적용되지 않으니 표 안에서 고릅니다.
