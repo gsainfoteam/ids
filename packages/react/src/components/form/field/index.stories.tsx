@@ -1,12 +1,15 @@
 import { useState } from 'react';
 
+import { useForm as useTanStackForm } from '@tanstack/react-form';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
 import { Field as RhfField } from '../../../react-hook-form';
+import { Field as TanStackField } from '../../../tanstack-form';
 import { Button } from '../../action/button';
+import { Checkbox } from '../checkbox';
 import { NumberField } from '../number-field';
 import { PasswordField } from '../password-field';
 import { TextArea } from '../text-area';
@@ -370,5 +373,85 @@ export const ReactHookForm: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '초기화' }));
     await expect(input).toHaveValue('');
     await expect(canvasElement.querySelector('[data-field]')).not.toHaveAttribute('data-dirty');
+  },
+};
+
+const mustBeEmail = ({ value }: { value: string }) =>
+  value.includes('@') ? undefined : '이메일 형식을 확인하세요.';
+const mustAgree = ({ value }: { value: boolean }) => (value ? undefined : '약관에 동의해 주세요.');
+
+function TanStackExample() {
+  const [submitted, setSubmitted] = useState('');
+  const form = useTanStackForm({
+    defaultValues: { email: '', agree: false },
+    onSubmit: ({ value }) => setSubmitted(value.email),
+  });
+  return (
+    <form
+      noValidate
+      className="flex w-80 flex-col gap-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void form.handleSubmit();
+      }}
+    >
+      <form.Field name="email" validators={{ onBlur: mustBeEmail }}>
+        {(field) => (
+          <TanStackField field={field}>
+            <TanStackField.Label>이메일</TanStackField.Label>
+            <TextField type="email" {...noPasswordManager} />
+            <TanStackField.Error />
+          </TanStackField>
+        )}
+      </form.Field>
+      <form.Field name="agree" validators={{ onChange: mustAgree }}>
+        {(field) => (
+          <TanStackField field={field} controlMode="checked">
+            <TanStackField.Label>약관에 동의합니다</TanStackField.Label>
+            <Checkbox />
+            <TanStackField.Error />
+          </TanStackField>
+        )}
+      </form.Field>
+      <Button type="submit">저장</Button>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => {
+          form.reset();
+          setSubmitted('');
+        }}
+      >
+        초기화
+      </Button>
+      <output aria-label="저장 결과">{submitted}</output>
+    </form>
+  );
+}
+
+export const TanStackForm: Story = {
+  render: () => <TanStackExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '/tanstack-form 경로의 Field는 form.Field가 넘긴 필드 하나로 값, 검증, 상태를 연결합니다. 오류는 한 번 떠났거나 제출을 시도한 뒤에 보입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '저장' }));
+    await expect(await canvas.findByText('이메일 형식을 확인하세요.')).toBeVisible();
+    await expect(canvas.getByText('약관에 동의해 주세요.')).toBeVisible();
+    await userEvent.type(canvas.getByRole('textbox', { name: '이메일' }), 'user@example.com');
+    await userEvent.tab();
+    await waitFor(() => expect(canvas.queryByText('이메일 형식을 확인하세요.')).toBeNull());
+    await userEvent.click(canvas.getByRole('checkbox', { name: '약관에 동의합니다' }));
+    await waitFor(() => expect(canvas.queryByText('약관에 동의해 주세요.')).toBeNull());
+    await userEvent.click(canvas.getByRole('button', { name: '저장' }));
+    await expect(canvas.getByLabelText('저장 결과')).toHaveTextContent('user@example.com');
+    await userEvent.click(canvas.getByRole('button', { name: '초기화' }));
+    await expect(canvas.getByRole('textbox', { name: '이메일' })).toHaveValue('');
+    await expect(canvas.getByRole('checkbox', { name: '약관에 동의합니다' })).not.toBeChecked();
   },
 };

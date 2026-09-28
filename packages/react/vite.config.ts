@@ -28,6 +28,7 @@ export default defineConfig({
       entry: {
         index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         'react-hook-form': fileURLToPath(new URL('./src/react-hook-form.tsx', import.meta.url)),
+        'tanstack-form': fileURLToPath(new URL('./src/tanstack-form.tsx', import.meta.url)),
       },
       name: 'IdsReact',
       formats: ['es', 'cjs'],

@@ -6,7 +6,7 @@
 - **입력 상태.** 포커스, 값 유무, 변경 여부, 한 번 떠났는지를 루트와 모든 파트에 `data-*` 로 붙입니다. `className` · `style` · `children` 은 이 상태를 받는 함수도 됩니다.
 - **브라우저 검증 메시지.** `Field.Error` 에 내용이 없으면 입력의 `validationMessage` 를 보여 줍니다. 제출하려 할 때나 값을 바꾸고 떠날 때 나타나고, 고치는 즉시 사라집니다.
 - **상태 상속.** `size`, `disabled`, `required`, `invalid` 가 안의 입력으로 내려갑니다.
-- **react-hook-form, TanStack Form.** `/react-hook-form` 의 `Field` 는 `name` 하나로 등록까지 합니다. TanStack Form은 값과 상태를 props로 넘깁니다.
+- **react-hook-form, TanStack Form.** `/react-hook-form` 의 `Field` 는 `name` 하나로 등록까지 합니다. `/tanstack-form` 의 `Field` 는 TanStack Form 필드 하나로 값, 검증, 상태를 모두 연결합니다.
 
 ```tsx
 import { Field, TextField } from '@gsainfoteam/ids-react';
@@ -92,7 +92,7 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 | 비워 둔 채 지나갈 때         | 아무것도 보여 주지 않는다 (제출 때 보여 준다) |
 | 오류가 보이는 동안 입력할 때 | 다시 검사해서 올바르면 바로 지운다            |
 
-- 내용 우선순위는 `children` > react-hook-form 오류 > 브라우저 문구입니다.
+- 내용 우선순위는 `children` > 폼 라이브러리(react-hook-form, TanStack Form) 오류 > 브라우저 문구입니다.
 - `match` 는 `ValidityState` 항목 이름입니다. 그 항목이 참일 때만 보이고, children이 없으면 브라우저 문구를 씁니다. `Field.Error` 는 여러 개 둘 수 있습니다.
 - `setCustomValidity()` 로 건 오류도 `customError` 로 잡힙니다.
 - `<form noValidate>` 이면 브라우저 검증을 쓰지 않는다는 뜻이라 Field도 검사하지 않습니다.
@@ -207,37 +207,61 @@ const methods = useForm({ resolver: zodResolver(schema), defaultValues: { accoun
 ## TanStack Form
 
 ```tsx
-import { Field, TextField } from '@gsainfoteam/ids-react';
+import { Button, TextField } from '@gsainfoteam/ids-react';
+import { Field } from '@gsainfoteam/ids-react/tanstack-form';
 import { useForm } from '@tanstack/react-form';
 
 const form = useForm({ defaultValues: { email: '' }, onSubmit: ({ value }) => save(value) });
 
-<form.Field
-  name="email"
-  validators={{
-    onBlur: ({ value }) => (value.includes('@') ? undefined : '이메일 형식을 확인하세요.'),
+<form
+  noValidate
+  onSubmit={(event) => {
+    event.preventDefault();
+    form.handleSubmit();
   }}
 >
-  {(field) => (
-    <Field
-      invalid={!field.state.meta.isValid}
-      touched={field.state.meta.isTouched}
-      dirty={field.state.meta.isDirty}
-    >
-      <Field.Label>이메일</Field.Label>
-      <TextField
-        name={field.name}
-        value={field.state.value}
-        onValueChange={field.handleChange}
-        onBlur={field.handleBlur}
-      />
-      <Field.Error>{field.state.meta.errors.join(', ')}</Field.Error>
-    </Field>
-  )}
-</form.Field>;
+  <form.Field
+    name="email"
+    validators={{ onBlur: ({ value }) => (value.includes('@') ? undefined : '이메일 형식을 확인하세요.') }}
+  >
+    {(field) => (
+      <Field field={field}>                 {/* 값, 검증, 상태가 모두 연결된다 */}
+        <Field.Label>이메일</Field.Label>
+        <TextField type="email" />
+        <Field.Error />                     {/* children이 없으면 첫 오류 메시지 */}
+      </Field>
+    )}
+  </form.Field>
+  <Button type="submit">제출</Button>
+</form>;
 ```
 
-- 값과 검증은 TanStack Form이 갖고, Field는 라벨과 오류 연결, 상태 표시를 맡습니다.
+```tsx
+import { createFormHook, createFormHookContexts } from '@tanstack/react-form';
+
+const { fieldContext, formContext } = createFormHookContexts();
+const { useAppForm } = createFormHook({
+  fieldContext,
+  formContext,
+  fieldComponents: { Field },
+  formComponents: {},
+});
+
+<form.AppField name="agree">
+  {(field) => (
+    <field.Field controlMode="checked">     {/* AppField 안에서는 field를 넘기지 않는다 */}
+      <Field.Label>약관에 동의합니다</Field.Label>
+      <Checkbox />
+    </field.Field>
+  )}
+</form.AppField>;
+```
+
+- 값은 `value` 와 `onValueChange`(기본), 또는 `checked` 와 `onCheckedChange`(`controlMode="checked"`)로 연결됩니다. `onBlur` 는 `field.handleBlur` 로 갑니다.
+- native `input` 은 change 이벤트에서 값을 읽어 넘깁니다. 컴포넌트가 넘기는 change 이벤트는 값으로 쓰지 않습니다.
+- 오류는 한 번 떠났거나 제출을 시도한 뒤에 보입니다. 문자열 오류는 그대로, Standard Schema(Zod 등)의 오류 객체는 `message` 를 씁니다.
+- `data-dirty` 는 값이 기본값과 다를 때, `data-touched` 는 한 번 떠난 뒤에 붙습니다.
+- 자식 핸들러가 먼저 실행되고 TanStack Form 핸들러도 항상 실행됩니다.
 
 ## 속성
 
@@ -258,6 +282,8 @@ const form = useForm({ defaultValues: { email: '' }, onSubmit: ({ value }) => sa
 | 파트 `asChild`                                      | 파트 대신 자식 요소에 속성을 합친다                                  |
 | `controlMode` (RHF)                                 | `native`(기본) / `value` / `checked`                                 |
 | `registerOptions` (RHF)                             | `register` / `useController` 규칙                                    |
+| `field` (TanStack)                                  | `form.Field` 가 넘긴 필드. `form.AppField` 안에서는 생략한다         |
+| `controlMode` (TanStack)                            | `value`(기본) / `checked`                                            |
 
 ## 알아둘 것
 
@@ -270,5 +296,7 @@ const form = useForm({ defaultValues: { email: '' }, onSubmit: ({ value }) => sa
 - 자식 핸들러가 먼저 실행되고 RHF 핸들러도 항상 실행됩니다. ref는 합성됩니다. 같은 입력을 다시 `register` 하거나 `Controller` 로 감싸지 않습니다.
 - `valueAsNumber`, `valueAsDate`, `setValueAs` 는 `native` 모드에서만 됩니다. 다른 모드의 변환은 콜백이나 resolver에서 합니다.
 - `disabled` 는 `formState.disabled` > Field `disabled` > `registerOptions.disabled` 순입니다. 제출 값에서 빼려면 자식이 아닌 Field에 `disabled` 를 줍니다.
+- `@tanstack/react-form@^1.10.0` 은 optional peer입니다. `/tanstack-form` 경로를 쓸 때만 설치하고, 기본 import는 TanStack Form을 불러오지 않습니다.
+- TanStack Field는 `field` 도 `form.AppField` 도 없으면 개발 빌드에서 경고하고 일반 Field로 동작합니다.
 - `required` 는 접근성과 native 제약 표시일 뿐입니다. RHF 검증은 `registerOptions` 나 resolver에 적습니다.
 - resolver의 출력 타입이 입력과 다르면 `useForm<z.input<typeof schema>, unknown, z.output<typeof schema>>` 로 적습니다.

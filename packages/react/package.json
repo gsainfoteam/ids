@@ -26,6 +26,11 @@
       "types": "./dist/react-hook-form.d.ts",
       "import": "./dist/react-hook-form.js",
       "require": "./dist/react-hook-form.cjs"
+    },
+    "./tanstack-form": {
+      "types": "./dist/tanstack-form.d.ts",
+      "import": "./dist/tanstack-form.js",
+      "require": "./dist/tanstack-form.cjs"
     }
   },
   "scripts": {
@@ -40,6 +45,7 @@
   },
   "peerDependencies": {
     "@gsainfoteam/ids-css": "^0.1.1",
+    "@tanstack/react-form": "^1.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.62.0",
@@ -69,6 +75,7 @@
     "@storybook/addon-themes": "10.3.1",
     "@storybook/react-vite": "10.3.1",
     "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-form": "^1.33.5",
     "@types/culori": "^4.0.1",
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.0",
@@ -99,6 +106,9 @@
     "zod": "^4.4.3"
   },
   "peerDependenciesMeta": {
+    "@tanstack/react-form": {
+      "optional": true
+    },
     "react-hook-form": {
       "optional": true
     }

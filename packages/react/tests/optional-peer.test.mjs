@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 
-test('base ESM and CommonJS exports load when react-hook-form cannot resolve', () => {
+test('base ESM and CommonJS exports load when no form library can resolve', () => {
   const result = spawnSync(
     process.execPath,
     [
@@ -12,7 +12,8 @@ test('base ESM and CommonJS exports load when react-hook-form cannot resolve', (
       `
     import { registerHooks, createRequire } from 'node:module';
     registerHooks({ resolve(specifier, context, nextResolve) {
-      if (specifier === 'react-hook-form') throw new Error('Optional peer is unavailable');
+      if (specifier === 'react-hook-form' || specifier.startsWith('@tanstack/'))
+        throw new Error('Optional peer is unavailable');
       return nextResolve(specifier, context);
     }});
     const esm = await import('./dist/index.js');

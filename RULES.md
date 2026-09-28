@@ -234,8 +234,11 @@ through the matching `*.Indicator` / `*.Close` part.
 signature and only exists where a real input does. react-hook-form's `field.onChange` and TanStack
 Form's `field.handleChange` both accept a plain value, so either binds to `onValueChange`.
 
-- The react-hook-form bridge (`src/react-hook-form.tsx`) binds `onChange` to native elements and
-  `onValueChange` / `onCheckedChange` to components, and forwards one report per edit.
+- The form library bridges, `src/react-hook-form.tsx` and `src/tanstack-form.tsx`, share
+  `internal/form-bridge.ts`: a native element reports through `onChange`, a component through
+  `onValueChange` / `onCheckedChange`, and each edit reaches the library once. react-hook-form reads
+  a native change event itself; TanStack Form is handed the value. Each library is an optional peer
+  imported only by its own entry point.
 - A component with an inner native input must not pass its own root `onChange` down to that input,
   or value mode would report the edit twice.
 - A control whose value changes without an input event (a picker, a stepper) calls the
