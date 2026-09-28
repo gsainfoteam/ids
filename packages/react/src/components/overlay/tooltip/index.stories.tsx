@@ -5,6 +5,7 @@ import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { Kbd } from '../../typography/kbd';
 
 import { Tooltip, TooltipDelayGroup } from '.';
 
@@ -88,6 +89,57 @@ export const Gallery: Story = {
             content="보관한 항목은 목록에서 숨겨지고 30일 뒤에 지워집니다. 그 전에는 보관함에서 되살릴 수 있습니다."
           >
             <Button variant="outline">보관</Button>
+          </Tooltip>
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Shortcut"
+        description="말풍선 안의 Kbd 는 tiny 로 그려져 한 줄 높이에 맞고, 말풍선의 글자색으로 칠해집니다."
+      >
+        <Showcase.Row label="apple" className="gap-24 py-12">
+          <Tooltip
+            open
+            content={
+              <>
+                저장 <Kbd keys="mod+s" platform="apple" />
+              </>
+            }
+          >
+            <Button variant="outline">저장</Button>
+          </Tooltip>
+          <Tooltip
+            open
+            arrow
+            content={
+              <>
+                다시 실행 <Kbd keys="shift+mod+z" platform="apple" />
+              </>
+            }
+          >
+            <Button variant="outline">다시 실행</Button>
+          </Tooltip>
+        </Showcase.Row>
+        <Showcase.Row label="other" className="gap-24 py-12">
+          <Tooltip
+            open
+            content={
+              <>
+                저장 <Kbd keys="mod+s" platform="other" />
+              </>
+            }
+          >
+            <Button variant="outline">저장</Button>
+          </Tooltip>
+          <Tooltip
+            open
+            content={
+              <>
+                지우기 <Kbd platform="apple">⌫</Kbd>
+              </>
+            }
+          >
+            <Button variant="outline">지우기</Button>
           </Tooltip>
         </Showcase.Row>
       </Showcase.Section>

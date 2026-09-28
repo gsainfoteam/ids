@@ -5,7 +5,7 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Button, Dialog, IdsProvider } from '../src';
+import { Button, Dialog, IdsProvider, Kbd } from '../src';
 import { Tooltip, TooltipDelayGroup } from '../src/components/overlay/tooltip';
 
 function Scene({ children }: { children: ReactNode }) {
@@ -306,4 +306,37 @@ test('development warns about a disabled trigger and focusable content', async (
       ]),
     );
   warn.mockRestore();
+});
+
+test('shortcuts in the bubble are tiny keys, described by name', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Tooltip
+        open
+        content={
+          <>
+            저장 <Kbd keys="mod+s" platform="apple" />
+          </>
+        }
+      >
+        <button type="button">저장</button>
+      </Tooltip>
+      <Tooltip
+        open
+        content={
+          <>
+            열기 <Kbd keys="mod+o" platform="apple" size="standard" />
+          </>
+        }
+      >
+        <button type="button">열기</button>
+      </Tooltip>
+    </IdsProvider>,
+  );
+  const save = screen.getByRole('button', { name: '저장' });
+  await expect.element(save).toHaveAccessibleDescription('저장 커맨드 S');
+  const sizes = [...document.querySelectorAll('[data-tooltip-content] [data-kbd-group]')].map(
+    (group) => group.getAttribute('data-size'),
+  );
+  expect(sizes).toEqual(['tiny', 'standard']);
 });

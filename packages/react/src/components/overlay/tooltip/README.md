@@ -30,10 +30,10 @@ import { Tooltip } from '@gsainfoteam/ids-react';
 </Tooltip>
 ```
 
-| 파트              | 역할                                                                        |
-| ----------------- | --------------------------------------------------------------------------- |
-| `Tooltip.Trigger` | 툴팁을 여는 요소. 기본은 `button`, `asChild` 로 자식 요소에 붙인다           |
-| `Tooltip.Content` | 말풍선. 닫혀 있으면 렌더하지 않는다. `className`, `style` 을 받는다         |
+| 파트              | 역할                                                                      |
+| ----------------- | ------------------------------------------------------------------------- |
+| `Tooltip.Trigger` | 툴팁을 여는 요소. 기본은 `button`, `asChild` 로 자식 요소에 붙인다        |
+| `Tooltip.Content` | 말풍선. 닫혀 있으면 렌더하지 않는다. `className`, `style` 을 받는다       |
 | `Tooltip.Arrow`   | 말풍선의 꼬리. trigger 쪽을 가리키고, 말풍선 모서리에서 8px 안쪽에 머문다 |
 
 - `content` 를 주면 짧은 형태입니다. 자식 요소 하나가 trigger 가 되고, `arrow` 로 꼬리를 붙입니다.
@@ -50,6 +50,17 @@ import { Tooltip } from '@gsainfoteam/ids-react';
 
 - 들어갈 자리가 없으면 반대쪽으로 넘어가고, 화면 가장자리에서 8px 안쪽에 머뭅니다. 실제로 놓인 쪽은 `data-side` 로 알 수 있습니다.
 - 폭은 내용만큼이고 `max-w-xs` 에서 줄바꿈합니다. 바꾸려면 `Tooltip.Content` 에 `className` 을 줍니다.
+
+## 단축키
+
+```tsx
+<Tooltip content={<>저장 <Kbd keys="mod+s" /></>}>
+  <IconButton icon={<DocumentIcon />} aria-label="저장" />
+</Tooltip>
+```
+
+- 말풍선 안의 `Kbd` 는 `tiny` 로 그려져 한 줄 높이에 맞습니다. `size` 를 주면 그 값을 씁니다.
+- 키는 말풍선의 글자색으로 칠해지고, 스크린 리더는 "저장 커맨드 S" 처럼 기호 대신 이름을 읽습니다.
 
 ## 열고 닫기
 
@@ -105,16 +116,16 @@ import { TooltipDelayGroup } from '@gsainfoteam/ids-react';
 
 ## 속성
 
-| 속성                       | 기본 / 동작                                               |
-| -------------------------- | --------------------------------------------------------- |
-| `content`                  | 짧은 형태의 내용. 주면 자식이 trigger 가 된다             |
-| `arrow`                    | 짧은 형태에서 꼬리를 붙인다. 기본 `false`                 |
-| `open` / `defaultOpen`     | 열림 상태. 기본 `false`                                   |
-| `onOpenChange`             | 열거나 닫으려 할 때                                       |
-| `side` / `align`           | 기본 `top` / `center`                                     |
-| `sideOffset`               | 기본 6                                                    |
-| `openDelay` / `closeDelay` | 기본은 그룹의 값(600 / 0). 그룹이 없어도 같다             |
-| `disabled`                 | 열리지 않는다. `open` 이어도 숨긴다                       |
+| 속성                       | 기본 / 동작                                   |
+| -------------------------- | --------------------------------------------- |
+| `content`                  | 짧은 형태의 내용. 주면 자식이 trigger 가 된다 |
+| `arrow`                    | 짧은 형태에서 꼬리를 붙인다. 기본 `false`     |
+| `open` / `defaultOpen`     | 열림 상태. 기본 `false`                       |
+| `onOpenChange`             | 열거나 닫으려 할 때                           |
+| `side` / `align`           | 기본 `top` / `center`                         |
+| `sideOffset`               | 기본 6                                        |
+| `openDelay` / `closeDelay` | 기본은 그룹의 값(600 / 0). 그룹이 없어도 같다 |
+| `disabled`                 | 열리지 않는다. `open` 이어도 숨긴다           |
 
 ## 알아둘 것
 

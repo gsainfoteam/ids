@@ -13,6 +13,7 @@ import { createPortal } from 'react-dom';
 import { useTooltip, type UseTooltipOptions } from './use-tooltip';
 import { PortalRootContext, type AnchoredSide } from '../../../internal/overlay';
 import { invariant, mergeProps, mergeRefs, part, tv } from '../../../utils';
+import { KbdGroupContext, type KbdGroupContextValue } from '../../typography/kbd/use-kbd';
 
 export { TooltipDelayGroup } from './delay-group';
 
@@ -22,6 +23,12 @@ type Context = {
 };
 
 const TooltipContext = createContext<Context | null>(null);
+
+const shortcutsSizedToTheBubble: KbdGroupContextValue = {
+  size: 'tiny',
+  platform: undefined,
+  labels: undefined,
+};
 
 function useTooltipContext(part: string) {
   const context = use(TooltipContext);
@@ -81,7 +88,7 @@ function TooltipPopup({ className, style, ref, children, ...props }: Tooltip.Con
       className={styles.content({ className })}
       style={{ ...tooltip.floatingStyles, ...style }}
     >
-      {children}
+      <KbdGroupContext value={shortcutsSizedToTheBubble}>{children}</KbdGroupContext>
     </div>
   );
 
