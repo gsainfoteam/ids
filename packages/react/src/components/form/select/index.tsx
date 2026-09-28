@@ -127,8 +127,12 @@ const isForeignComponent = (node: ReactNode): boolean =>
     ? flattenParts(slotChildren(node.props.children, node.props.asChild)).some(isForeignComponent)
     : typeof node.type === 'function' && !PARTS.has(node.type));
 
-const isNode = (value: unknown): value is Node =>
+const isNodeFromAnyFrame = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'nodeType' in value;
+
+const keepFocusWhereItIs = (event: PointerEvent) => event.preventDefault();
+
+const MAX_LABELS_IN_TRIGGER = 2;
 
 export function Select(props: SelectProps) {
   const {
@@ -263,7 +267,9 @@ export function Select(props: SelectProps) {
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => select.onKeyDown(event, 'trigger'),
     onBlur: (event: FocusEvent<HTMLButtonElement>) => {
       const next = event.relatedTarget;
-      if (isNode(next) && (next as Element).closest?.(popupSelector)) return;
+      const movingIntoPopup =
+        isNodeFromAnyFrame(next) && (next as Element).closest?.(popupSelector);
+      if (movingIntoPopup) return;
       onBlur?.(event);
     },
   });
@@ -321,7 +327,7 @@ export function Select(props: SelectProps) {
           onBlur={(event) => {
             const next = event.relatedTarget;
             if (
-              isNode(next) &&
+              isNodeFromAnyFrame(next) &&
               (event.currentTarget.contains(next) || next === select.triggerRef.current)
             )
               return;
@@ -363,7 +369,8 @@ function SelectValue({ asChild, children, placeholder, className, ...props }: Se
     labels,
     placeholder: labels.length === 0,
   };
-  const shown = labels.length > 2 ? labels.slice(0, 2) : labels;
+  const shown =
+    labels.length > MAX_LABELS_IN_TRIGGER ? labels.slice(0, MAX_LABELS_IN_TRIGGER) : labels;
   const content =
     typeof children === 'function'
       ? children(state)
@@ -524,7 +531,7 @@ function SelectItem({
           'data-highlighted': state.highlighted ? '' : undefined,
           'data-disabled': disabled ? '' : undefined,
           className: c.styles.item({ className: resolveState(className, state) }),
-          onPointerDown: (event: PointerEvent) => event.preventDefault(),
+          onPointerDown: keepFocusWhereItIs,
           onPointerMove: (event: PointerEvent) => {
             if (event.pointerType === 'mouse' && !disabled && !state.highlighted)
               c.select.actions.highlight(value);

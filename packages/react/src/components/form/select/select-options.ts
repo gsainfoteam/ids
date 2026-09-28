@@ -63,12 +63,10 @@ export function collectOptions(children: ReactNode, kinds: OptionKinds): SelectO
   });
 }
 
+const COMBINING_ACCENTS = /[\u0300-\u036f]/g;
+
 export function normalizeText(text: string) {
-  return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .normalize('NFKC')
-    .toLocaleLowerCase();
+  return text.normalize('NFD').replace(COMBINING_ACCENTS, '').normalize('NFKC').toLocaleLowerCase();
 }
 
 export function matchesQuery(option: SelectOption, query: string) {
@@ -80,9 +78,9 @@ export function typeaheadIndex(labels: string[], buffer: string, current: number
   const needle = normalizeText(buffer);
   if (!needle || !labels.length) return -1;
   const chars = Array.from(needle);
-  const repeated = chars.every((char) => char === chars[0]);
-  const prefix = repeated ? chars[0] : needle;
-  const start = repeated ? current + 1 : Math.max(current, 0);
+  const cyclesOneLetter = chars.every((char) => char === chars[0]);
+  const prefix = cyclesOneLetter ? chars[0] : needle;
+  const start = cyclesOneLetter ? current + 1 : Math.max(current, 0);
   for (let step = 0; step < labels.length; step++) {
     const index = (start + step) % labels.length;
     if (normalizeText(labels[index]).startsWith(prefix)) return index;
