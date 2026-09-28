@@ -15,6 +15,10 @@ export const fieldTrigger = {
   } satisfies Record<IdsSize, string>,
 } as const;
 
+const offsetParentOfOptions = cn('relative');
+const ringOffSinceCaretShowsFocus = cn('ring-0! inset-ring-transparent!');
+const borderOptionsCannotCover = cn('border border-(--ids-color-border)');
+
 export const fieldListbox = {
   option: cn(
     'relative flex cursor-default items-center gap-2 rounded-standard py-1.5 ps-2.5 pe-8 outline-none select-none wrap-anywhere',
@@ -27,7 +31,8 @@ export const fieldListbox = {
     '[&_svg]:size-(--ids-size-icon-standard)',
   ),
   list: cn(
-    'relative -mx-1 flex min-h-0 flex-col overflow-x-hidden overflow-y-auto overscroll-contain px-1',
+    offsetParentOfOptions,
+    '-mx-1 flex min-h-0 flex-col overflow-x-hidden overflow-y-auto overscroll-contain px-1',
     'outline-none [overflow-anchor:none]',
   ),
   heading: cn('px-2.5 pt-2 pb-1 text-caption-c1-medium text-(--ids-color-on-muted)'),
@@ -35,7 +40,7 @@ export const fieldListbox = {
   empty: cn('px-2.5 py-6 text-center text-body-b3-regular text-(--ids-color-on-muted)'),
   searchRoot: cn(
     '-mx-1 -mt-1 mb-1 h-auto w-auto rounded-none border-b border-(--ids-color-border)',
-    'ring-0! inset-ring-transparent!',
+    ringOffSinceCaretShowsFocus,
   ),
   search: cn('h-10'),
 } as const;
@@ -44,7 +49,8 @@ export const popupStyle = tv({
   slots: {
     popup: [
       'fixed z-50 m-0 flex flex-col overflow-auto overscroll-contain concentric-p-1 [overflow-anchor:none]',
-      'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+      borderOptionsCannotCover,
+      'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
       'text-body-b3-regular shadow-md outline-none',
       'transition-[opacity,scale,translate] duration-(--ids-motion-fast) ease-out',
       'motion-reduce:transition-none',

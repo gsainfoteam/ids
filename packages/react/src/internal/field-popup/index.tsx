@@ -16,9 +16,9 @@ import { tabbable } from 'tabbable';
 
 import {
   isTopPopup,
+  moveToTopOfTopLayer,
   registerPopup,
   showInTopLayer,
-  supportsPopover,
   useDrawerPresentation,
   type PopupPresentation,
 } from './layer';
@@ -48,13 +48,13 @@ export type FieldPopupProps = ComponentProps<'div'> & {
 
 const VIEWPORT_MARGIN = 8;
 
-const isNode = (value: unknown): value is Node =>
+const isNodeFromAnyWindow = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'nodeType' in value;
 const MIN_HEIGHT = 120;
 const DRAWER_MAX_HEIGHT = 520;
 
-const placed = new WeakSet<HTMLElement>();
-const pendingCenter = new WeakMap<HTMLElement, HTMLElement>();
+const firstPlacementLanded = new WeakSet<HTMLElement>();
+const recenterAfterFirstPlacement = new WeakMap<HTMLElement, HTMLElement>();
 
 export function FieldPopup({
   anchor,
@@ -74,11 +74,11 @@ export function FieldPopup({
   ...props
 }: FieldPopupProps) {
   const popup = useRef<HTMLDivElement>(null);
-  const backdrop = useRef<HTMLDivElement>(null);
+  const clickableBackdrop = useRef<HTMLDivElement>(null);
   const drawer = useDrawerPresentation(mobileVariant);
   const presentation: PopupPresentation = drawer ? 'drawer' : 'popover';
   const close = useRef(onClose);
-  const focused = useRef(false);
+  const initialFocusDone = useRef(false);
 
   useLayoutEffect(() => {
     close.current = onClose;
@@ -87,13 +87,8 @@ export function FieldPopup({
   useLayoutEffect(() => {
     const node = popup.current;
     if (!node) return;
-    const doc = node.ownerDocument;
-    if (drawer && backdrop.current) showInTopLayer(backdrop.current);
-    const active = doc.activeElement as HTMLElement | null;
-    if (supportsPopover(node) && node.matches(':popover-open')) node.hidePopover();
-    showInTopLayer(node);
-    if (active && node.contains(active) && doc.activeElement !== active)
-      active.focus({ preventScroll: true });
+    if (drawer && clickableBackdrop.current) showInTopLayer(clickableBackdrop.current);
+    moveToTopOfTopLayer(node);
     return registerPopup(node);
   }, [drawer]);
 
@@ -112,13 +107,15 @@ export function FieldPopup({
       document: node.ownerDocument,
     });
     trap.activate();
-    const release = (event: FocusEvent) => {
-      if (isNode(event.target) && trigger?.contains(event.target)) trap.deactivate();
+    const releaseBeforeTrapPullsFocusBack = (event: FocusEvent) => {
+      const returningToTrigger =
+        isNodeFromAnyWindow(event.target) && trigger?.contains(event.target);
+      if (returningToTrigger) trap.deactivate();
     };
     const win = node.ownerDocument.defaultView!;
-    win.addEventListener('focusin', release, true);
+    win.addEventListener('focusin', releaseBeforeTrapPullsFocusBack, true);
     return () => {
-      win.removeEventListener('focusin', release, true);
+      win.removeEventListener('focusin', releaseBeforeTrapPullsFocusBack, true);
       trap.deactivate();
     };
   }, [anchor, drawer]);
@@ -128,21 +125,23 @@ export function FieldPopup({
       reference = anchor.current;
     if (!node || !reference || drawer) return;
     const doc = node.ownerDocument;
-    let current: PopupSide = side;
+    let landedSide: PopupSide = side;
     let active = true;
     node.dataset.side = side;
-    Object.assign(node.style, { right: 'auto', bottom: 'auto', maxHeight: `${maxHeight}px` });
+    const undoPopoverUaInset = { right: 'auto', bottom: 'auto' };
+    const capHeightBeforeFirstFlip = { maxHeight: `${maxHeight}px` };
+    Object.assign(node.style, undoPopoverUaInset, capHeightBeforeFirstFlip);
     const update = () => {
-      const other: PopupSide = current === 'bottom' ? 'top' : 'bottom';
+      const oppositeSide: PopupSide = landedSide === 'bottom' ? 'top' : 'bottom';
       void computePosition(reference, node, {
         strategy: 'fixed',
-        placement: `${current}-${align}`,
+        placement: `${landedSide}-${align}`,
         middleware: [
           offsetBy(offset),
           flip({
             padding: VIEWPORT_MARGIN,
             crossAxis: false,
-            fallbackPlacements: [`${other}-${align}`],
+            fallbackPlacements: [`${oppositeSide}-${align}`],
           }),
           size({
             padding: VIEWPORT_MARGIN,
@@ -161,10 +160,10 @@ export function FieldPopup({
         ],
       }).then(({ x, y, placement }) => {
         if (!active) return;
-        current = placement.startsWith('top') ? 'top' : 'bottom';
-        node.dataset.side = current;
+        landedSide = placement.startsWith('top') ? 'top' : 'bottom';
+        node.dataset.side = landedSide;
         Object.assign(node.style, { left: `${x}px`, top: `${y}px` });
-        settle(node);
+        onPlacementLanded(node);
       });
     };
     const stop = autoUpdate(reference, node, update);
@@ -180,17 +179,19 @@ export function FieldPopup({
     const win = node.ownerDocument.defaultView!;
     const place = () => {
       const visual = win.visualViewport;
-      const covered = visual ? Math.max(0, win.innerHeight - visual.height - visual.offsetTop) : 0;
+      const coveredByKeyboard = visual
+        ? Math.max(0, win.innerHeight - visual.height - visual.offsetTop)
+        : 0;
       delete node.dataset.side;
       Object.assign(node.style, {
         top: 'auto',
         left: `${VIEWPORT_MARGIN}px`,
         right: `${VIEWPORT_MARGIN}px`,
         width: 'auto',
-        bottom: `calc(max(${VIEWPORT_MARGIN}px, env(safe-area-inset-bottom)) + ${covered}px)`,
+        bottom: `calc(max(${VIEWPORT_MARGIN}px, env(safe-area-inset-bottom)) + ${coveredByKeyboard}px)`,
         maxHeight: `${Math.min(DRAWER_MAX_HEIGHT, (visual?.height ?? win.innerHeight) * 0.7)}px`,
       });
-      settle(node);
+      onPlacementLanded(node);
     };
     place();
     win.addEventListener('resize', place);
@@ -209,18 +210,19 @@ export function FieldPopup({
     if (!node || !trigger) return;
     const doc = node.ownerDocument;
     const outside = (target: EventTarget | null) =>
-      !isNode(target) || (!node.contains(target) && !trigger.contains(target));
-    let pressedOutside = false;
+      !isNodeFromAnyWindow(target) || (!node.contains(target) && !trigger.contains(target));
+    const closesOnBackdropClickInstead = drawer;
+    let closedByOutsidePress = false;
     const onPointerDown = (event: PointerEvent) => {
-      if (drawer) return;
-      pressedOutside = outside(event.target);
-      if (pressedOutside) close.current(false);
+      if (closesOnBackdropClickInstead) return;
+      closedByOutsidePress = outside(event.target);
+      if (closedByOutsidePress) close.current(false);
     };
     const onFocusIn = (event: FocusEvent) => {
-      if (!drawer && !pressedOutside && outside(event.target)) close.current(false);
+      if (!drawer && !closedByOutsidePress && outside(event.target)) close.current(false);
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      pressedOutside = false;
+      closedByOutsidePress = false;
       if (event.key !== 'Escape') return;
       if (event.defaultPrevented || event.isComposing || !isTopPopup(node)) return;
       event.preventDefault();
@@ -240,8 +242,9 @@ export function FieldPopup({
   useLayoutEffect(() => {
     const node = popup.current;
     if (!node) return;
-    if (focused.current && (!drawer || node.contains(node.ownerDocument.activeElement))) return;
-    focused.current = true;
+    const sheetMissingFocus = drawer && !node.contains(node.ownerDocument.activeElement);
+    if (initialFocusDone.current && !sheetMissingFocus) return;
+    initialFocusDone.current = true;
     const target =
       (initialFocusSelector ? node.querySelector<HTMLElement>(initialFocusSelector) : null) ??
       node.querySelector<HTMLElement>('[data-popup-autofocus]') ??
@@ -256,7 +259,7 @@ export function FieldPopup({
     <>
       {drawer && (
         <div
-          ref={backdrop}
+          ref={clickableBackdrop}
           popover="manual"
           aria-hidden="true"
           data-field-popup-backdrop=""
@@ -284,12 +287,12 @@ export function FieldPopup({
   );
 }
 
-function settle(node: HTMLElement) {
-  placed.add(node);
-  const option = pendingCenter.get(node);
+function onPlacementLanded(node: HTMLElement) {
+  firstPlacementLanded.add(node);
+  const option = recenterAfterFirstPlacement.get(node);
   if (!option) return;
-  pendingCenter.delete(node);
-  if (node.contains(option)) scrollToOption(option, node, true);
+  recenterAfterFirstPlacement.delete(node);
+  if (node.contains(option)) scrollWithinPopup(option, node, true);
 }
 
 function scrollParent(option: HTMLElement, popup: HTMLElement) {
@@ -301,12 +304,13 @@ function scrollParent(option: HTMLElement, popup: HTMLElement) {
   return popup;
 }
 
-function scrollToOption(option: HTMLElement, popup: HTMLElement, center: boolean) {
+function scrollWithinPopup(option: HTMLElement, popup: HTMLElement, center: boolean) {
   const scroller = scrollParent(option, popup);
   const view = scroller.clientHeight,
     from = scroller.scrollTop;
   let top: number, height: number;
-  if (option.offsetParent === scroller) {
+  const unscaledOffsetsApply = option.offsetParent === scroller;
+  if (unscaledOffsetsApply) {
     top = option.offsetTop;
     height = option.offsetHeight;
   } else {
@@ -326,6 +330,6 @@ export function revealPopupOption(
 ) {
   const popup = option?.closest<HTMLElement>('[data-field-popup]');
   if (!option || !popup) return;
-  if (center && !placed.has(popup)) pendingCenter.set(popup, option);
-  scrollToOption(option, popup, center);
+  if (center && !firstPlacementLanded.has(popup)) recenterAfterFirstPlacement.set(popup, option);
+  scrollWithinPopup(option, popup, center);
 }
