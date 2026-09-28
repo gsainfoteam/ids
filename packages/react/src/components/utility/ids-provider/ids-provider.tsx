@@ -9,6 +9,8 @@ import {
 import { OverlayHost, PortalRootContext } from '../../../internal/overlay/host';
 import { cn, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+import { DefaultToaster } from '../../feedback/toast';
+import { TooltipDelayGroup } from '../../overlay/tooltip/delay-group';
 import { Slot } from '../slot';
 
 import type { IdsColor } from '../../../tokens/types';
@@ -54,9 +56,14 @@ export function IdsProvider({
   }, [context.color, context.resolvedMode]);
 
   const Root = asChild ? Slot : 'div';
-  const host = outermost && <OverlayHost />;
+  const host = outermost && (
+    <>
+      <OverlayHost />
+      <DefaultToaster />
+    </>
+  );
 
-  return (
+  const themed = (
     <ThemeContext value={context}>
       <PortalRootContext value={element}>
         <Root
@@ -83,6 +90,8 @@ export function IdsProvider({
       </PortalRootContext>
     </ThemeContext>
   );
+
+  return outermost ? <TooltipDelayGroup>{themed}</TooltipDelayGroup> : themed;
 }
 
 export namespace IdsProvider {

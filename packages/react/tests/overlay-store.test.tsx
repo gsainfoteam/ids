@@ -158,7 +158,7 @@ test('unmounting the last host settles everything still open', async () => {
   await expect(pending).resolves.toBeUndefined();
 });
 
-test('the host adds nothing to server HTML or to an asChild root', async () => {
+test('the host adds nothing to server HTML, and only a silent toaster beside an asChild root', async () => {
   const server = new DOMParser().parseFromString(
     renderToString(<IdsProvider>page</IdsProvider>),
     'text/html',
@@ -170,6 +170,8 @@ test('the host adds nothing to server HTML or to an asChild root', async () => {
       <main>page</main>
     </IdsProvider>,
   );
-  expect(screen.container.children).toHaveLength(1);
   expect(screen.container.firstElementChild?.tagName).toBe('MAIN');
+  const beside = [...screen.container.children].slice(1);
+  expect(beside.every((element) => element.hasAttribute('data-toaster'))).toBe(true);
+  expect(beside.every((element) => !element.querySelector('[role]'))).toBe(true);
 });
