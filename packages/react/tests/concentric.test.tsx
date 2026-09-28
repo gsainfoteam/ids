@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 
 import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
@@ -32,8 +32,10 @@ function Box({ pad, radius, children }: BoxProps) {
   );
 }
 
+const withoutTheContainerCap = { '--ids-radius-container': '999px' } as CSSProperties;
+
 async function expectRadii(ui: ReactNode) {
-  const { container } = await render(ui);
+  const { container } = await render(<div style={withoutTheContainerCap}>{ui}</div>);
   const boxes = [...container.querySelectorAll<HTMLElement>('[data-radius]')];
   expect(boxes.length).toBeGreaterThan(0);
   const radii = boxes.map((box) => getComputedStyle(box).borderTopLeftRadius);
@@ -102,4 +104,18 @@ test('an open popover does not hide a nested container of the same padding', asy
       <Popover pad={3} radius={22} />
     </Box>,
   );
+});
+
+test('the corner stops at the container radius however deep it grows', async () => {
+  const { container } = await render(
+    <Box pad={4} radius={16}>
+      <Box pad={6} radius={16} />
+      <Box pad={1} radius={14} />
+    </Box>,
+  );
+  const radii = [...container.querySelectorAll<HTMLElement>('[data-radius]')].map((box) => [
+    getComputedStyle(box).borderTopLeftRadius,
+    `${box.dataset.radius}px`,
+  ]);
+  for (const [actual, expected] of radii) expect(actual).toBe(expected);
 });

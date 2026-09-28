@@ -2,6 +2,7 @@
   "radius": {
     "standard":  { "$value": "10px",   "$type": "dimension" },
     "indicator": { "$value": "4px",    "$type": "dimension" },
+    "container": { "$value": "16px",   "$type": "dimension" },
     "full":      { "$value": "9999px", "$type": "dimension" }
   }
 }

@@ -29,6 +29,7 @@
   --ids-motion-slow: 400ms;
   --ids-radius-standard: 10px;
   --ids-radius-indicator: 4px;
+  --ids-radius-container: 16px;
   --ids-radius-full: 9999px;
   --ids-size-control-standard: 36px;
   --ids-size-control-tiny: 32px;
@@ -39,6 +40,7 @@
 @theme {
   --radius-standard: var(--ids-radius-standard);
   --radius-indicator: var(--ids-radius-indicator);
+  --radius-container: var(--ids-radius-container);
   --radius-full: var(--ids-radius-full);
 }
 
@@ -114,8 +116,9 @@
 @utility concentric-p-* {
   --ids-concentric-pad: --spacing(--value(number));
   padding: var(--ids-concentric-pad);
-  border-radius: calc(
-    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested)
+  border-radius: min(
+    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested),
+    var(--ids-radius-container)
   );
 }
 

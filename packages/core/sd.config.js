@@ -376,8 +376,9 @@ const buildConcentricCSS = () => {
 @utility concentric-p-* {
   --ids-concentric-pad: --spacing(--value(number));
   padding: var(--ids-concentric-pad);
-  border-radius: calc(
-    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested)
+  border-radius: min(
+    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested),
+    var(--ids-radius-container)
   );
 }
 

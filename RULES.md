@@ -203,18 +203,22 @@ state is repeated in component styles.
 
 **Radius is 10px, and containers grow it concentrically.** The scale is `standard` (10px, every
 control at every size), `indicator` (4px, only for boxes under 24px such as the Checkbox box or
-Kbd, where 10px would read as a circle) and `full`. There is no `sm`/`md`/`lg` radius.
+Kbd, where 10px would read as a circle), `container` (16px, the most a padded container's corner
+grows to) and `full`. There is no `sm`/`md`/`lg` radius.
 
 A padded container (Card, Alert, Item, a popup) takes its padding from `concentric-p-*` instead of
 `p-*` plus `rounded-*`. The utility sets the padding and makes the corner the content's corner
-plus that padding, so a Card at `concentric-p-4` holding a Button is 26px around a 10px button.
+plus that padding, up to `container`: a menu at `concentric-p-1` is 14px around its 10px rows,
+and a Card at `concentric-p-4` stops at 16px instead of 26px. The formula assumes a 10px control
+fills the corner; a large container holds text or space there, and the full sum reads as too round.
 Nesting adds up: the utility detects nested `concentric-p-*` containers with `:has()` and sums
 their padding in, exact for two levels, and the thickest chain wins. A popover is left out of the
 containers around it, because the top layer draws it apart from them, but containers inside a
 popover add up as they do on the page, down to an overlay inside an overlay.
 
 ```tsx
-root: 'concentric-p-4',        // padding 16px, radius 10 + 16 (+ nested padding)
+root: 'concentric-p-1',        // padding 4px, radius 10 + 4 = 14px
+root: 'concentric-p-4',        // padding 16px, radius min(10 + 16 + nested, 16px)
 root: 'concentric-p-3 px-4',   // asymmetric: radius follows the concentric value, px overrides inline
 ```
 
