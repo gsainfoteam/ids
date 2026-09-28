@@ -46,6 +46,8 @@ function isCurrent(value: unknown) {
   return value !== undefined && value !== false && value !== 'false';
 }
 
+const keepListRoleInSafari = { role: 'list' } as const;
+
 export function Item({
   variant = 'ghost',
   size,
@@ -224,7 +226,12 @@ export namespace Item {
     const styles = Style();
     return (
       <ItemGroupContext value={{ size, dense }}>
-        <ul role="list" {...props} data-item-group="" className={styles.group({ className })}>
+        <ul
+          {...keepListRoleInSafari}
+          {...props}
+          data-item-group=""
+          className={styles.group({ className })}
+        >
           {Children.map(children, (child) => {
             if (child == null || typeof child === 'boolean') return child;
             if (isValidElement(child) && (child.type === 'li' || child.type === Separator))
