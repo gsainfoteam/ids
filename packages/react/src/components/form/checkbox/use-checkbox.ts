@@ -61,14 +61,14 @@ export function useCheckbox({
   });
 
   useFormReset(inputRef, () => {
-    const target = controlled ? latest.current : defaultChecked;
+    const checkedAfterReset = controlled ? latest.current : defaultChecked;
     if (!controlled) setChecked(defaultChecked, { silent: true });
     const input = inputRef.current;
     if (!input) return;
     silently(() => {
-      input.checked = target === true;
+      input.checked = checkedAfterReset === true;
     });
-    input.indeterminate = target === 'indeterminate';
+    input.indeterminate = checkedAfterReset === 'indeterminate';
   });
 
   const { state: interaction, handlers: interactionHandlers } =
@@ -79,15 +79,23 @@ export function useCheckbox({
     onClick?.(event);
   };
 
+  const restoreIndeterminateClearedByClick = (input: HTMLInputElement) => {
+    input.indeterminate = indeterminate;
+  };
+
+  const reassertCheckedAfterEngineRevert = (input: HTMLInputElement) =>
+    queueMicrotask(() =>
+      silently(() => {
+        input.checked = latest.current === true;
+      }),
+    );
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    input.indeterminate = indeterminate;
-    if (event.nativeEvent.defaultPrevented) {
-      queueMicrotask(() =>
-        silently(() => {
-          input.checked = latest.current === true;
-        }),
-      );
+    restoreIndeterminateClearedByClick(input);
+    const clickWasCancelled = event.nativeEvent.defaultPrevented;
+    if (clickWasCancelled) {
+      reassertCheckedAfterEngineRevert(input);
       return;
     }
     setChecked(input.checked);
