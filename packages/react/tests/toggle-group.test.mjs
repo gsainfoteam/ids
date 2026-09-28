@@ -18,7 +18,10 @@ for (const name of [
 ])
   globalThis[name] = dom.window[name];
 globalThis.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
-dom.window.Element.prototype.checkVisibility ??= () => true;
+function stubVisibilityForTabbable() {
+  dom.window.Element.prototype.checkVisibility ??= () => true;
+}
+stubVisibilityForTabbable();
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
@@ -234,7 +237,11 @@ test('form: one entry per pressed value, a required validator, and reset to the 
   const reset = new FormData(form);
   assert.equal(reset.get('size'), null);
   assert.deepEqual(reset.getAll('tags'), ['x']);
-  assert.deepEqual(changes, ['b']);
+  assert.deepEqual(
+    changes,
+    ['b'],
+    'a native reset fires no change event, so neither does the group',
+  );
 });
 
 test('form names a form elsewhere in the document', async () => {

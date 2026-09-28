@@ -56,7 +56,7 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
   const blocked = disabled || readOnly;
   const expanded = open && !blocked;
   const popupId = `ids-temporal-${useId()}`;
-  const triggerRef = useRef<HTMLButtonElement | HTMLInputElement>(null);
+  const controlRef = useRef<HTMLButtonElement | HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const [draft, setDraft] = useState<string | null>(null);
   const [unreadable, setUnreadable] = useState(false);
@@ -83,7 +83,7 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
 
   const close = (restoreFocus: boolean) => {
     setOpen(false);
-    if (restoreFocus) triggerRef.current?.focus({ preventScroll: true });
+    if (restoreFocus) controlRef.current?.focus({ preventScroll: true });
   };
 
   const change: TemporalChange<V> = (next, { close: shouldClose = false } = {}) => {
@@ -100,18 +100,18 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
     close(true);
   };
 
-  useFormReset(triggerRef, () => {
+  useFormReset(controlRef, () => {
     setValue(options.defaultValue, { silent: true });
     dropDraft();
     setOpen(false);
   });
 
-  const inside = (target: EventTarget | null) =>
+  const withinFieldOrItsPopup = (target: EventTarget | null) =>
     target instanceof Node &&
     (!!rootRef.current?.contains(target) ||
       !!(target as Element).closest?.(`[data-temporal-owner="${popupId}"]`));
   const onBlur = (event: FocusEvent<HTMLElement>) => {
-    if (!inside(event.relatedTarget))
+    if (!withinFieldOrItsPopup(event.relatedTarget))
       options.onBlur?.(event as unknown as FocusEvent<HTMLButtonElement>);
   };
 
@@ -121,12 +121,12 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
       const text = event.currentTarget.value;
       setUnreadable(false);
       const kind = (event.nativeEvent as InputEvent).inputType;
-      const whole =
+      const arrivedWhole =
         kind === 'insertFromPaste' ||
         kind === 'insertFromDrop' ||
         kind === 'insertReplacementText' ||
         kind === undefined;
-      const parsed = whole && text.trim() ? options.parse?.(text.trim()) : undefined;
+      const parsed = arrivedWhole && text.trim() ? options.parse?.(text.trim()) : undefined;
       if (parsed === undefined) setDraft(text);
       else {
         commit(parsed);
@@ -166,7 +166,7 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
     input,
     blocked,
     popupId,
-    triggerRef,
+    controlRef,
     rootRef,
     change,
     clear,

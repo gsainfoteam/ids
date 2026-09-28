@@ -44,6 +44,13 @@ async function render(node) {
   }
   await act(() => root.render(node));
 }
+function stubLayoutForFocusTrap() {
+  const original = dom.window.Element.prototype.getClientRects;
+  dom.window.Element.prototype.getClientRects = () => [{ width: 1, height: 1 }];
+  return () => {
+    dom.window.Element.prototype.getClientRects = original;
+  };
+}
 async function positioned() {
   await act(() => new Promise((resolve) => setTimeout(resolve)));
 }
@@ -492,12 +499,12 @@ test('asChild Content and Group still collect items; an empty string is a value'
 });
 
 test('the list opens centered on the selection and later moves scroll only the popup', async () => {
-  const layout = { Cherry: 380, Apple: 160 };
+  const optionTopWhileScrolledToTop = { Cherry: 380, Apple: 160 };
   const original = dom.window.HTMLElement.prototype.getBoundingClientRect;
   dom.window.HTMLElement.prototype.getBoundingClientRect = function () {
     const popup = this.closest('[data-field-popup]');
     if (popup === this) return { top: 100, bottom: 300, height: 200, left: 0, right: 0, width: 0 };
-    const top = popup ? layout[this.textContent] : undefined;
+    const top = popup ? optionTopWhileScrolledToTop[this.textContent] : undefined;
     if (top === undefined) return original.call(this);
     const at = top - popup.scrollTop;
     return { top: at, bottom: at + 40, height: 40, left: 0, right: 0, width: 0 };
@@ -598,8 +605,7 @@ test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab he
     addEventListener() {},
     removeEventListener() {},
   };
-  const getClientRects = dom.window.Element.prototype.getClientRects;
-  dom.window.Element.prototype.getClientRects = () => [{ width: 1, height: 1 }];
+  const restoreLayout = stubLayoutForFocusTrap();
   try {
     const state = tracked({ mobileVariant: 'drawer', defaultValue: 'cherry' });
     await render(h('div', null, h('button', { id: 'before' }, 'Before'), state.node));
@@ -633,7 +639,7 @@ test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab he
     assert.equal(document.body.hasAttribute('data-scroll-locked'), false);
     assert.deepEqual(state.changes, []);
   } finally {
-    dom.window.Element.prototype.getClientRects = getClientRects;
+    restoreLayout();
   }
 });
 

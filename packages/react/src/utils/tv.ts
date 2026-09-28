@@ -4,17 +4,23 @@ import { cn } from './cn';
 
 type Slot = (props?: object) => string | undefined;
 
+const mergeWithoutEmptyAttribute = (classes: string | undefined) => cn(classes) || undefined;
+
+const keepConfigForExtend = <F extends object, C extends object>(styles: F, component: C) =>
+  Object.assign(styles, component);
+
 export const tv = ((options: Parameters<TVLite>[0]) => {
   const component = joinVariants(options);
   const merged = (props?: object) => {
     const result: unknown = component(props as never);
-    if (typeof result !== 'object' || result === null) return cn(result as string) || undefined;
+    if (typeof result !== 'object' || result === null)
+      return mergeWithoutEmptyAttribute(result as string);
     const slots: Record<string, Slot> = {};
     for (const [name, slot] of Object.entries(result as Record<string, Slot>))
-      slots[name] = (slotProps) => cn(slot(slotProps)) || undefined;
+      slots[name] = (slotProps) => mergeWithoutEmptyAttribute(slot(slotProps));
     return slots;
   };
-  return Object.assign(merged, component);
+  return keepConfigForExtend(merged, component);
 }) as TVLite;
 
 export type { VariantProps } from 'tailwind-variants/lite';

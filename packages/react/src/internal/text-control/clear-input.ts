@@ -20,31 +20,28 @@ function dispatchInput(element: TextElement, inputType: string) {
   element.dispatchEvent(event);
 }
 
+function editOnUndoStack(element: TextElement, ...command: Parameters<Document['execCommand']>) {
+  const doc = element.ownerDocument;
+  const focusTook = doc.activeElement === element;
+  return focusTook && typeof doc.execCommand === 'function' && doc.execCommand(...command);
+}
+
+function editWithInputEvent(element: TextElement, text: string, inputType: string) {
+  nativeValueSetter(element)?.call(element, text);
+  dispatchInput(element, inputType);
+}
+
 export function clearInput(element: TextElement) {
   element.focus({ preventScroll: true });
   if (element.value === '') return;
   element.select();
-  const doc = element.ownerDocument;
-  if (
-    doc.activeElement === element &&
-    typeof doc.execCommand === 'function' &&
-    doc.execCommand('delete')
-  )
-    return;
-  nativeValueSetter(element)?.call(element, '');
-  dispatchInput(element, 'deleteContentBackward');
+  if (editOnUndoStack(element, 'delete')) return;
+  editWithInputEvent(element, '', 'deleteContentBackward');
 }
 
 export function replaceInput(element: TextElement, text: string) {
   element.focus({ preventScroll: true });
   element.select();
-  const doc = element.ownerDocument;
-  if (
-    doc.activeElement === element &&
-    typeof doc.execCommand === 'function' &&
-    doc.execCommand('insertText', false, text)
-  )
-    return;
-  nativeValueSetter(element)?.call(element, text);
-  dispatchInput(element, 'insertReplacementText');
+  if (editOnUndoStack(element, 'insertText', false, text)) return;
+  editWithInputEvent(element, text, 'insertReplacementText');
 }

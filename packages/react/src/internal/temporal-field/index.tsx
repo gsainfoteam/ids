@@ -206,6 +206,7 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
       <IconButton {...button} icon={(children as ReactElement) ?? <c.icon aria-hidden="true" />} />
     );
   }
+  const clearInChevronsPlace = c.hasClear && !c.state.empty;
   return part(
     'button',
     asChild,
@@ -213,7 +214,7 @@ export function TemporalTrigger({ asChild, children, className, ...props }: Trig
       <>
         <c.icon aria-hidden="true" className={c.styles.icon()} />
         <TemporalValue />
-        {(c.state.empty || !c.hasClear) && (
+        {!clearInChevronsPlace && (
           <ChevronDownIcon aria-hidden="true" className={c.styles.icon()} />
         )}
       </>
@@ -294,7 +295,7 @@ export function TemporalField<V>({
     input,
     blocked,
     popupId,
-    triggerRef,
+    controlRef,
     rootRef,
     change,
     clear,
@@ -356,7 +357,7 @@ export function TemporalField<V>({
     'aria-required': native['aria-required'] ?? (required || undefined),
     'aria-readonly': readOnly || undefined,
     // eslint-disable-next-line react-hooks/refs
-    ref: mergeRefs(triggerRef, ref),
+    ref: mergeRefs(controlRef, ref),
   };
   const trigger = hasInput
     ? {
@@ -469,7 +470,7 @@ export function TemporalField<V>({
           value={state.empty ? null : config.serialize(state.value)}
           required={required}
           disabled={disabled}
-          anchor={triggerRef}
+          anchor={controlRef}
         />
       </div>
       {state.open && (

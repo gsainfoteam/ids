@@ -9,7 +9,8 @@ export type TemporalFormat = string | ((date: Date) => string);
 
 export function timePattern(locale: Locale, precision: TimePrecision, cycle: HourCycle): string {
   const seconds = precision === 'second';
-  if (cycle === patternHourCycle(locale)) return seconds ? 'pp' : 'p';
+  const localesOwnTime = seconds ? 'pp' : 'p';
+  if (cycle === patternHourCycle(locale)) return localesOwnTime;
   if (cycle === '24h') return seconds ? 'HH:mm:ss' : 'HH:mm';
   const clock = seconds ? 'h:mm:ss' : 'h:mm';
   return periodFirst(locale) ? `a ${clock}` : `${clock} a`;

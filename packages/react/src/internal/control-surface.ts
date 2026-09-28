@@ -37,6 +37,24 @@ const schemes = {
   ),
 } satisfies Record<ControlColorScheme, string>;
 
+const fallbackScheme = schemes.primary;
+
+const ringFollowsScheme = cn(
+  'focus-visible:ring-(--control-ring)/40 data-focus-visible:ring-(--control-ring)/40',
+  'focus-visible:inset-ring-(--control-ring) data-focus-visible:inset-ring-(--control-ring)',
+);
+
+const trimBesideIconOrSpinner = {
+  standard: cn(
+    'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-3',
+    'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-3',
+  ),
+  tiny: cn(
+    'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2.5',
+    'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2.5',
+  ),
+} satisfies Record<IdsSize, string>;
+
 export const controlSurface = {
   base: cn(
     'inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap select-none touch-manipulation',
@@ -44,23 +62,20 @@ export const controlSurface = {
     'cursor-pointer data-disabled:not-aria-busy:cursor-not-allowed data-disabled:opacity-50',
     'aria-busy:cursor-progress',
     'focus-ring',
-    'focus-visible:ring-(--control-ring)/40 data-focus-visible:ring-(--control-ring)/40',
-    'focus-visible:inset-ring-(--control-ring) data-focus-visible:inset-ring-(--control-ring)',
+    ringFollowsScheme,
     'motion-reduce:transition-none',
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
-    schemes.primary,
+    fallbackScheme,
   ),
   size: {
     standard: cn(
       'h-(--ids-size-control-standard) rounded-standard px-4 text-button-standard',
-      'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-3',
-      'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-3',
+      trimBesideIconOrSpinner.standard,
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
     ),
     tiny: cn(
       'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-3 text-button-tiny',
-      'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2.5',
-      'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2.5',
+      trimBesideIconOrSpinner.tiny,
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
     ),
   } satisfies Record<IdsSize, string>,

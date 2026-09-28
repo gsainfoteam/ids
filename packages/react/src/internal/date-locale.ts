@@ -23,7 +23,9 @@ export function resolveLocale(locale: DateLocale = messages.locale): Locale {
   return resolved;
 }
 
-export const tokensOf = (pattern: string) => pattern.replace(/'[^']*'/g, '');
+const QUOTED_LITERAL = /'[^']*'/g;
+
+export const tokensOf = (pattern: string) => pattern.replace(QUOTED_LITERAL, '');
 
 const timeTokens = (locale: Locale, width: 'short' | 'long' | 'full') =>
   tokensOf(locale.formatLong?.time({ width }) ?? '');
@@ -47,10 +49,10 @@ export function hourCycleOf(locale: Locale): HourCycle {
 }
 
 export function periodFirst(locale: Locale): boolean {
-  const tokens = (['short', 'long', 'full'] as const)
+  const patternWithPeriod = (['short', 'long', 'full'] as const)
     .map((width) => timeTokens(locale, width))
     .find((pattern) => pattern.includes('a'));
-  return !!tokens && tokens.indexOf('a') < tokens.search(/[hHkK]/);
+  return !!patternWithPeriod && patternWithPeriod.indexOf('a') < patternWithPeriod.search(/[hHkK]/);
 }
 
 export const shortDatePattern = (locale: Locale) =>

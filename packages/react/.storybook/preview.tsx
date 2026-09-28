@@ -9,6 +9,7 @@ import './preview.css';
 
 const withIdsTheme: Decorator = (Story, context) => {
   const [globals, updateGlobals] = useGlobals();
+  const oneBlockAmongMany = context.viewMode === 'docs';
 
   return (
     <ThemeProvider
@@ -17,7 +18,7 @@ const withIdsTheme: Decorator = (Story, context) => {
       onColorChange={(color) => updateGlobals({ idsColor: color })}
       onModeChange={(mode) => updateGlobals({ idsMode: mode })}
       className={
-        context.viewMode === 'docs'
+        oneBlockAmongMany
           ? 'rounded-standard w-full bg-(--ids-color-surface) p-6 text-(--ids-color-on-surface)'
           : 'min-h-screen w-full bg-(--ids-color-surface) p-8 text-(--ids-color-on-surface)'
       }
@@ -27,11 +28,13 @@ const withIdsTheme: Decorator = (Story, context) => {
   );
 };
 
+const hideSpyNames = () => '() => {}';
+
 const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
     docs: { codePanel: true },
-    jsx: { showFunctions: true, functionValue: () => '() => {}' },
+    jsx: { showFunctions: true, functionValue: hideSpyNames },
     backgrounds: { disable: true },
     controls: {
       matchers: {

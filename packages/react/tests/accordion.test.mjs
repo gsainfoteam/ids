@@ -45,10 +45,14 @@ const settle = () => act(() => new Promise((resolve) => setTimeout(resolve, 20))
 const triggers = () => [...host.querySelectorAll('[data-accordion-trigger]')];
 const panelOf = (trigger) => document.getElementById(trigger.getAttribute('aria-controls'));
 const expanded = () => triggers().map((trigger) => trigger.getAttribute('aria-expanded'));
+const zeroLengthCloseTimerFires = () => new Promise((resolve) => setTimeout(resolve, 5));
+const holdClosingUntilTransitionEnd = (panel) => {
+  panel.style.transitionDuration = '200ms';
+};
 const click = (element) =>
   act(async () => {
     element.click();
-    await new Promise((resolve) => setTimeout(resolve, 5));
+    await zeroLengthCloseTimerFires();
   });
 const key = (element, key, init = {}) =>
   act(async () => {
@@ -228,7 +232,7 @@ test('closing: the panel is inert while it collapses, then hidden until found', 
   await render(h(Accordion, { type: 'single', defaultValue: 'a' }, items()));
   const [a] = triggers();
   const panel = panelOf(a);
-  panel.style.transitionDuration = '200ms';
+  holdClosingUntilTransitionEnd(panel);
   await act(async () => a.click());
   assert.equal(panel.hasAttribute('inert'), true);
   assert.equal(panel.hasAttribute('hidden'), false, 'still visible so the height can animate');

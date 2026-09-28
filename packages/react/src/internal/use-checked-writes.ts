@@ -14,21 +14,21 @@ export function useCheckedWrites(
   onWrite: (checked: boolean) => void,
 ) {
   const latest = useRef(onWrite);
-  const committed = useRef(rendered);
-  const writes = useRef<boolean[]>([]);
-  const muted = useRef(false);
+  const renderedAtCommit = useRef(rendered);
+  const writesToWeigh = useRef<boolean[]>([]);
+  const writingSilently = useRef(false);
 
-  const settle = useCallback((state: boolean) => {
-    const pending = writes.current;
-    writes.current = [];
-    const outside = pending.reverse().find((value) => value !== state);
-    if (outside !== undefined) latest.current(outside);
+  const weighWritesAgainst = useCallback((renderedState: boolean) => {
+    const pending = writesToWeigh.current;
+    writesToWeigh.current = [];
+    const lastWriteNotFromReact = pending.reverse().find((value) => value !== renderedState);
+    if (lastWriteNotFromReact !== undefined) latest.current(lastWriteNotFromReact);
   }, []);
 
   useLayoutEffect(() => {
     latest.current = onWrite;
-    committed.current = rendered;
-    settle(rendered);
+    renderedAtCommit.current = rendered;
+    weighWritesAgainst(rendered);
   });
 
   useLayoutEffect(() => {
@@ -46,24 +46,27 @@ export function useCheckedWrites(
       },
       set(next: boolean) {
         set.call(this, next);
-        if (muted.current) return;
-        writes.current.push(get.call(input));
-        if (writes.current.length === 1) queueMicrotask(() => settle(committed.current));
+        if (writingSilently.current) return;
+        writesToWeigh.current.push(get.call(input));
+        const firstSinceLastWeighing = writesToWeigh.current.length === 1;
+        if (firstSinceLastWeighing)
+          queueMicrotask(() => weighWritesAgainst(renderedAtCommit.current));
       },
     });
-    latest.current(get.call(input));
+    const writtenBeforeWrapping = get.call(input);
+    latest.current(writtenBeforeWrapping);
     return () => {
       if (own) Object.defineProperty(input, 'checked', own);
       else Reflect.deleteProperty(input, 'checked');
     };
-  }, [ref, settle]);
+  }, [ref, weighWritesAgainst]);
 
   return useCallback((write: () => void) => {
-    muted.current = true;
+    writingSilently.current = true;
     try {
       write();
     } finally {
-      muted.current = false;
+      writingSilently.current = false;
     }
   }, []);
 }

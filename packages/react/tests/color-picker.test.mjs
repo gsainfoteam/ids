@@ -54,10 +54,11 @@ async function type(node, value) {
     node.dispatchEvent(new Event('input', { bubbles: true }));
   });
 }
-const slider = (name) =>
-  host.querySelector(
-    `input[type=range][aria-label="${name}"], [role=slider][aria-label="${name}"]`,
-  );
+const slider = (name) => {
+  const areaAxis = `input[type=range][aria-label="${name}"]`;
+  const sliderThumb = `[role=slider][aria-label="${name}"]`;
+  return host.querySelector(`${areaAxis}, ${sliderThumb}`);
+};
 const textInput = () => host.querySelector('[data-color-picker-input]');
 function tracked(props = {}, ...children) {
   const changes = [];
@@ -154,7 +155,8 @@ test('hue and alpha are Sliders: keys, Shift and page steps, and a press on the 
   await key(hue, 'End');
   assert.equal(hue.getAttribute('aria-valuetext'), '360도');
   const track = host.querySelector('[data-color-picker-hue] [data-orientation]:not([data-slider])');
-  track.getBoundingClientRect = () => ({ left: 0, right: 360, width: 360, top: 0, bottom: 12 });
+  const onePixelPerDegree = () => ({ left: 0, right: 360, width: 360, top: 0, bottom: 12 });
+  track.getBoundingClientRect = onePixelPerDegree;
   await act(async () =>
     track.dispatchEvent(
       new MouseEvent('pointerdown', { bubbles: true, cancelable: true, clientX: 120 }),

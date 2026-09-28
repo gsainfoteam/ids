@@ -18,14 +18,18 @@ export type FieldProps = BaseProps &
 type Props = Record<string, unknown>;
 type Handler = (...args: unknown[]) => void;
 
+function rhfRunsEvenIfPrevented(props: Props, binding: Props, key: string) {
+  return (...args: unknown[]) => {
+    (props[key] as Handler | undefined)?.(...args);
+    (binding[key] as Handler | undefined)?.(...args);
+  };
+}
+
 function bind(props: Props, binding: Props) {
   const result = { ...props, ...binding };
   for (const key of Object.keys(binding)) {
     if (!/^on[A-Z]/.test(key)) continue;
-    result[key] = (...args: unknown[]) => {
-      (props[key] as Handler | undefined)?.(...args);
-      (binding[key] as Handler | undefined)?.(...args);
-    };
+    result[key] = rhfRunsEvenIfPrevented(props, binding, key);
   }
   result.ref = (node: HTMLElement | null) => {
     const refs = [props.ref, binding.ref] as Array<Ref<HTMLElement> | undefined>;
@@ -58,21 +62,23 @@ function reportsFor(
   controlMode: 'value' | 'checked',
   onChange: (value: unknown) => void,
 ) {
-  if (typeof control.type === 'string') return { onChange };
-  let reported = false;
-  const once = (value: unknown) => {
-    if (reported) return;
-    reported = true;
+  const rhfReadsNativeEvent = typeof control.type === 'string';
+  if (rhfReadsNativeEvent) return { onChange };
+  let reportedThisEdit = false;
+  const reportOncePerEdit = (value: unknown) => {
+    if (reportedThisEdit) return;
+    reportedThisEdit = true;
     queueMicrotask(() => {
-      reported = false;
+      reportedThisEdit = false;
     });
     onChange(value);
   };
+  const reportValueNotForwardedEvent = (next: unknown) => {
+    if (!isEvent(next)) reportOncePerEdit(next);
+  };
   return {
-    [controlMode === 'checked' ? 'onCheckedChange' : 'onValueChange']: once,
-    onChange: (next: unknown) => {
-      if (!isEvent(next)) once(next);
-    },
+    [controlMode === 'checked' ? 'onCheckedChange' : 'onValueChange']: reportOncePerEdit,
+    onChange: reportValueNotForwardedEvent,
   };
 }
 
@@ -129,13 +135,13 @@ function ControlledField({
       errorMessage={fieldState.error?.message}
       bindControl={(original, control) => {
         const { value, onChange, ...binding } = field;
-        const resolvedValue =
+        const valueKeepingInputControlled =
           value === undefined ? (controlMode === 'checked' ? false : '') : value;
         const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
         return bind(rest, {
           ...binding,
           ...reportsFor(control, controlMode, onChange),
-          [controlMode]: resolvedValue,
+          [controlMode]: valueKeepingInputControlled,
           disabled: disabled ?? original.disabled,
         });
       }}

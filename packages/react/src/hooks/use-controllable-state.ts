@@ -19,7 +19,8 @@ export function useControllableState<T>({
 
   function setValue(next: T | ((prev: T) => T), options?: { silent?: boolean }) {
     const resolved = isFunction(next) ? next(current) : next;
-    if (isEqual(resolved, current)) return;
+    const sameEvenIfRebuilt = isEqual(resolved, current);
+    if (sameEvenIfRebuilt) return;
     if (!isControlled) setUncontrolled(resolved);
     if (options?.silent !== true) onValueChange?.(resolved);
   }

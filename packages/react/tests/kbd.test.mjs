@@ -10,7 +10,7 @@ const { createRoot, hydrateRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
 const { Kbd, Field } = await import('../dist/index.js');
 
-function setPlatform(platform) {
+function overrideHostPlatform(platform) {
   Object.defineProperty(globalThis, 'navigator', {
     value: { platform, userAgent: '' },
     configurable: true,
@@ -70,7 +70,7 @@ test('mod is ⌘ on Apple and Ctrl elsewhere, with platform order and joiners', 
 test('the server renders the portable form, the client switches to ⌘ on Apple', async () => {
   const markup = renderToString(h(Kbd, { keys: 'mod+k' }));
   assert.match(markup, /Ctrl/);
-  setPlatform('MacIntel');
+  overrideHostPlatform('MacIntel');
   host = document.createElement('div');
   host.innerHTML = markup;
   document.body.append(host);
@@ -85,10 +85,10 @@ test('the server renders the portable form, the client switches to ⌘ on Apple'
 });
 
 test('client rendering detects the platform', async () => {
-  setPlatform('Win32');
+  overrideHostPlatform('Win32');
   await render(h(Kbd, { keys: 'mod' }));
   assert.equal(visible(host.querySelector('[data-kbd]')), 'Ctrl');
-  setPlatform('iPhone');
+  overrideHostPlatform('iPhone');
   await render(h(Kbd, { key: 'b', keys: 'mod' }));
   assert.equal(visible(host.querySelector('[data-kbd]')), '⌘');
 });

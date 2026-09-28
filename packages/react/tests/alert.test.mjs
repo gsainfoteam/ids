@@ -21,9 +21,12 @@ for (const name of [
 ])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-dom.window.Element.prototype.getClientRects = function () {
-  return [{ width: 1, height: 1 }];
-};
+function stubLayoutForTabbable() {
+  dom.window.Element.prototype.getClientRects = function () {
+    return [{ width: 1, height: 1 }];
+  };
+}
+stubLayoutForTabbable();
 const { createElement: h, act, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
@@ -43,7 +46,7 @@ async function render(node) {
   }
   await act(async () => root.render(node));
 }
-const frame = () => act(() => new Promise((resolve) => requestAnimationFrame(() => resolve())));
+const exitFrame = () => act(() => new Promise((resolve) => requestAnimationFrame(() => resolve())));
 const alert = () => host.querySelector('[data-alert]');
 async function escape(target, init = {}) {
   let event;
@@ -159,7 +162,7 @@ test('uncontrolled: Close hides it, focus moves on to the next element', async (
   assert.deepEqual(changes, [false]);
   assert.equal(document.activeElement.id, 'after');
   assert.ok(alert()?.hasAttribute('data-ending-style'), 'stays mounted while it fades');
-  await frame();
+  await exitFrame();
   assert.equal(alert(), null);
 });
 
@@ -199,7 +202,7 @@ test('Escape inside closes, except while composing or when already handled', asy
   await render(h(Alert, { key: 'c' }, h(Alert.Title, null, 'x'), h(Alert.Close)));
   const event = await escape(host.querySelector('[data-alert-close]'));
   assert.equal(event.defaultPrevented, true);
-  await frame();
+  await exitFrame();
   assert.equal(alert(), null);
 });
 
@@ -207,7 +210,7 @@ test('without Alert.Close, Escape does nothing', async () => {
   await render(h(Alert, null, h(Alert.Title, null, 'x'), h('button', null, 'Action')));
   const event = await escape(host.querySelector('button'));
   assert.equal(event.defaultPrevented, false);
-  await frame();
+  await exitFrame();
   assert.ok(alert());
 });
 
@@ -220,7 +223,7 @@ test('controlled: the parent decides, and reopening works', async () => {
   }
   await render(h(App));
   await act(async () => host.querySelector('[data-alert-close]').click());
-  await frame();
+  await exitFrame();
   assert.equal(alert(), null);
   await act(async () => setOpen(true));
   assert.ok(alert());
@@ -293,7 +296,7 @@ test('focus is handed on when the parent closes or drops the alert from an actio
   await act(async () => setOpen(false));
   assert.equal(document.activeElement.id, 'after', 'a controlled close moves focus on');
 
-  await frame();
+  await exitFrame();
   await act(async () => setOpen(true));
   host.querySelector('#action').focus();
   await act(async () => setShown(false));

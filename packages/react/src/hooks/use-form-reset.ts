@@ -21,14 +21,14 @@ export function useFormReset(ref: RefObject<Element | null>, onReset: () => void
     const form = ownerForm(ref.current);
     if (!form) return;
     let mounted = true;
-    const handle = (event: Event) =>
+    const afterResetUnlessCancelled = (event: Event) =>
       queueMicrotask(() => {
         if (mounted && !event.defaultPrevented) latest.current();
       });
-    form.addEventListener('reset', handle);
+    form.addEventListener('reset', afterResetUnlessCancelled);
     return () => {
       mounted = false;
-      form.removeEventListener('reset', handle);
+      form.removeEventListener('reset', afterResetUnlessCancelled);
     };
   }, [ref]);
 }

@@ -46,7 +46,7 @@ const resolveRef = (value, palette) => {
   return m ? (palette[m[1]] ?? value) : value;
 };
 
-const readColorEntries = (color, mode, palette) => {
+const readColorEntriesWithoutCollision = (color, mode, palette) => {
   const json = JSON.parse(
     readFileSync(`./tokens/semantic/${color}.${mode}.json`, "utf8"),
   );
@@ -250,10 +250,10 @@ const buildStaticCSS = (dictionary) => {
   const lines = ["motion", "radius", "size"].flatMap((cat) =>
     byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
   );
-  const theme = byCategory(dictionary, "radius").map(
+  const roundedUsesIdsRadius = byCategory(dictionary, "radius").map(
     (t) => `  --radius-${slug(t)}: var(${idsVar("radius", t)});`,
   );
-  return `:root {\n${lines.join("\n")}\n}\n\n@theme {\n${theme.join("\n")}\n}\n`;
+  return `:root {\n${lines.join("\n")}\n}\n\n@theme {\n${roundedUsesIdsRadius.join("\n")}\n}\n`;
 };
 
 const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
@@ -283,17 +283,29 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 }
 `;
 
-const T_CSS_VARIANTS = `@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *):not(:where([data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *)));
+const darkModeRegion = `[data-mode="dark"], [data-mode="dark"] *`;
+const lightRegionInsideDark = `[data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *`;
+
+const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:where(${lightRegionInsideDark})));
 `;
+
+const fieldInputInPopupDrawnApart = "[popover] [data-field-input]:focus-visible";
+
+const FOCUS_RING_TRIGGERS = {
+  formControl: "&:focus-visible",
+  useInteractive: "&[data-focus-visible]",
+  shellAroundFieldInput: `&:has([data-field-input]:focus-visible):not(:has(${fieldInputInPopupDrawnApart}))`,
+  textField: "&:has([data-text-field-input]:focus-visible)",
+  textArea: "&:has([data-text-area-input]:focus-visible)",
+};
+
+const focusRingTriggers = (indent) =>
+  Object.values(FOCUS_RING_TRIGGERS).join(`,\n${indent}`);
 
 const T_CSS_UTILITIES = `@utility focus-ring {
   outline: none;
 
-  &:focus-visible,
-  &[data-focus-visible],
-  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
-  &:has([data-text-field-input]:focus-visible),
-  &:has([data-text-area-input]:focus-visible) {
+  ${focusRingTriggers("  ")} {
     @apply ring-[3px] ring-(--ids-color-primary)/40 inset-ring-(--ids-color-primary);
   }
 
@@ -301,11 +313,7 @@ const T_CSS_UTILITIES = `@utility focus-ring {
   &[data-invalid] {
     @apply inset-ring-(--ids-color-danger);
 
-    &:focus-visible,
-    &[data-focus-visible],
-    &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
-    &:has([data-text-field-input]:focus-visible),
-    &:has([data-text-area-input]:focus-visible) {
+    ${focusRingTriggers("    ")} {
       @apply ring-(--ids-color-danger)/40 inset-ring-(--ids-color-danger);
     }
   }
@@ -315,19 +323,19 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 const CONCENTRIC_PADS = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8];
 
 const concentricClass = (n) => `.concentric-p-${String(n).replace(".", "\\.")}`;
-const notInPopover = (sel) => `${sel}:not([popover], [popover] *)`;
+const visuallyNested = (sel) => `${sel}:not([popover], [popover] *)`;
 
 const buildConcentricCSS = () => {
-  const one = CONCENTRIC_PADS.map((a) => ({ sum: a, sel: notInPopover(concentricClass(a)) }));
-  const two = CONCENTRIC_PADS.flatMap((a) =>
+  const oneLevelDeep = CONCENTRIC_PADS.map((a) => ({ sum: a, sel: visuallyNested(concentricClass(a)) }));
+  const twoLevelsDeep = CONCENTRIC_PADS.flatMap((a) =>
     CONCENTRIC_PADS.map((b) => ({
       sum: a + b,
-      sel: notInPopover(`${concentricClass(a)} ${concentricClass(b)}`),
+      sel: visuallyNested(`${concentricClass(a)} ${concentricClass(b)}`),
     })),
   );
   const rule = ({ sum, sel }) =>
     `  [class*="concentric-p-"]:has(${sel}) {\n    --ids-concentric-nested: calc(var(--spacing) * ${sum});\n  }`;
-  const byLevel = (rules) => rules.sort((x, y) => x.sum - y.sum).map(rule);
+  const largestSumWins = (rules) => rules.sort((x, y) => x.sum - y.sum).map(rule);
 
   return `@property --ids-concentric-pad {
   syntax: "<length>";
@@ -350,7 +358,7 @@ const buildConcentricCSS = () => {
 }
 
 @layer utilities {
-${[...byLevel(one), ...byLevel(two)].join("\n")}
+${[...largestSumWins(oneLevelDeep), ...largestSumWins(twoLevelsDeep)].join("\n")}
 }
 `;
 };
@@ -389,7 +397,7 @@ const buildTypographyCSS = (dictionary) => {
 };
 
 const buildColorThemeCSS = (dictionary, color, mode, selector) => {
-  const lines = readColorEntries(color, mode, buildPalette(dictionary)).map(
+  const lines = readColorEntriesWithoutCollision(color, mode, buildPalette(dictionary)).map(
     ({ name, value }) => `  --ids-color-${name}: ${value};`,
   );
   return `${selector} {\n${lines.join("\n")}\n}\n`;
@@ -465,8 +473,8 @@ const dartColorTokensFormatter = ({ dictionary }) => {
       render(T_DART_COLOR_MAP, {
         NAME: mapName(c, m),
         ENTRIES: [
-          ...readColorEntries(c, m, palette),
-          ...readColorEntries("status", m, palette),
+          ...readColorEntriesWithoutCollision(c, m, palette),
+          ...readColorEntriesWithoutCollision("status", m, palette),
         ]
           .map(toColorLine)
           .join("\n"),

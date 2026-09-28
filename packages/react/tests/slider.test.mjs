@@ -57,7 +57,7 @@ async function release(target, name) {
   });
 }
 
-function layout() {
+function giveTrackA200pxBox() {
   const track = slider().querySelector('[data-orientation]:not([data-slider])') ?? slider();
   track.getBoundingClientRect = () => ({
     left: 0,
@@ -236,7 +236,7 @@ test('pointer: a press moves the nearest thumb, a drag follows, the release comm
       onValueCommit: (value) => commits.push(value),
     }),
   );
-  layout();
+  giveTrackA200pxBox();
   await pointer('pointerdown', { x: 100 });
   assert.deepEqual(now(), [50]);
   assert.equal(document.activeElement, thumbs()[0], 'the moved thumb takes focus');
@@ -257,7 +257,7 @@ test('pointer: stacked range thumbs split by the direction of the first move', a
   await render(
     h(Slider, { selectionMode: 'range', 'aria-label': 'Stack', defaultValue: [50, 50] }),
   );
-  layout();
+  giveTrackA200pxBox();
   await pointer('pointerdown', { x: 100 });
   await pointer('pointermove', { x: 60 });
   assert.deepEqual(now(), [30, 50], 'moving down takes the lower thumb');
@@ -272,7 +272,7 @@ test('pointer: the thumb width, right-to-left and vertical tracks map to the dra
   await render(
     h(Slider, { 'aria-label': 'Inset', defaultValue: 0, style: { '--slider-thumb': '20px' } }),
   );
-  layout();
+  giveTrackA200pxBox();
   await pointer('pointerdown', { x: 10 });
   assert.deepEqual(now(), [0], 'half a thumb in from the start is the minimum');
   await pointer('pointermove', { x: 100 });
@@ -283,14 +283,14 @@ test('pointer: the thumb width, right-to-left and vertical tracks map to the dra
   await render(
     h('div', { key: 'rtl' }, h(Slider, { 'aria-label': 'RTL', style: { direction: 'rtl' } })),
   );
-  layout();
+  giveTrackA200pxBox();
   await pointer('pointerdown', { x: 50 });
   assert.deepEqual(now(), [75]);
   await pointer('pointerup', { x: 50 });
   await render(
     h('div', { key: 'vertical' }, h(Slider, { 'aria-label': 'V', orientation: 'vertical' })),
   );
-  layout();
+  giveTrackA200pxBox();
   await pointer('pointerdown', { y: 40 });
   assert.deepEqual(now(), [80]);
 });
@@ -305,7 +305,7 @@ test('readOnly and disabled keep the value; readOnly still takes focus', async (
       onValueChange: (value) => changes.push(value),
     }),
   );
-  layout();
+  giveTrackA200pxBox();
   assert.equal(thumbs()[0].getAttribute('aria-readonly'), 'true');
   await key(thumbs()[0], 'ArrowRight');
   await pointer('pointerdown', { x: 180 });
@@ -318,7 +318,7 @@ test('readOnly and disabled keep the value; readOnly still takes focus', async (
       h(Slider, { 'aria-label': 'Off', name: 'off', disabled: true, defaultValue: 30 }),
     ),
   );
-  layout();
+  giveTrackA200pxBox();
   assert.equal(thumbs()[0].tabIndex, -1);
   assert.equal(thumbs()[0].getAttribute('aria-disabled'), 'true');
   await pointer('pointerdown', { x: 180 });

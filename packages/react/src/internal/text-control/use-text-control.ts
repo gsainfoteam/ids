@@ -10,6 +10,8 @@ import { clearInput } from './clear-input';
 
 type TextElement = HTMLInputElement | HTMLTextAreaElement;
 
+const HANDLES_ITS_OWN_PRESS = 'button, a, input, textarea, select, label, [role=button]';
+
 export type UseTextControlOptions = {
   inputRef: RefObject<TextElement | null>;
   disabled: boolean;
@@ -25,18 +27,20 @@ export function useTextControl({ inputRef, disabled, readOnly, clearable }: UseT
     if (input && !disabled && !readOnly) clearInput(input);
   };
 
+  const pressAnywhereFocusesInput = (event: MouseEvent<HTMLElement>) => {
+    if (disabled || event.button !== 0) return;
+    const target = event.target as Element;
+    if (target.closest(HANDLES_ITS_OWN_PRESS)) return;
+    event.preventDefault();
+    inputRef.current?.focus();
+  };
+
   const rootProps = {
     onFocus: () => setFocused(true),
     onBlur: (event: FocusEvent<HTMLElement>) => {
       if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
     },
-    onMouseDown: (event: MouseEvent<HTMLElement>) => {
-      if (disabled || event.button !== 0) return;
-      const target = event.target as Element;
-      if (target.closest('button, a, input, textarea, select, label, [role=button]')) return;
-      event.preventDefault();
-      inputRef.current?.focus();
-    },
+    onMouseDown: pressAnywhereFocusesInput,
   };
 
   const onEscape = (event: KeyboardEvent<TextElement>) => {
@@ -44,12 +48,11 @@ export function useTextControl({ inputRef, disabled, readOnly, clearable }: UseT
       !clearable ||
       event.key !== 'Escape' ||
       event.defaultPrevented ||
-      event.nativeEvent.isComposing ||
-      event.currentTarget.value === '' ||
-      disabled ||
-      readOnly
+      event.nativeEvent.isComposing
     )
       return;
+    const escapeLeftForEnclosingPopup = event.currentTarget.value === '';
+    if (escapeLeftForEnclosingPopup || disabled || readOnly) return;
     event.preventDefault();
     clearInput(event.currentTarget);
   };

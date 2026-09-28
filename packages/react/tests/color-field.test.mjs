@@ -63,10 +63,11 @@ async function type(node, value) {
 const trigger = () => host.querySelector('[data-color-field] button[aria-haspopup]');
 const dialog = () => host.querySelector('[role=dialog]');
 const editor = () => host.querySelector('[data-color-picker-input]');
-const slider = (name) =>
-  host.querySelector(
-    `input[type=range][aria-label="${name}"], [role=slider][aria-label="${name}"]`,
-  );
+const slider = (name) => {
+  const areaAxis = `input[type=range][aria-label="${name}"]`;
+  const sliderThumb = `[role=slider][aria-label="${name}"]`;
+  return host.querySelector(`${areaAxis}, ${sliderThumb}`);
+};
 const swatch = (name) => host.querySelector(`input[type=radio][aria-label="${name}"]`);
 const clearButton = () => host.querySelector('[data-color-field-clear]');
 function tracked(props = {}, ...children) {
