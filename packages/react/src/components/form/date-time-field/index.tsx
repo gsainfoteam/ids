@@ -76,6 +76,10 @@ type PanelProps = CalendarPassThrough & {
 const sameInstant = (a: Date | null, b: Date | null) =>
   a === b || (!!a && !!b && a.getTime() === b.getTime());
 
+const MONTH_GAP = 16;
+const CLOCK_COLUMN = 208;
+const POPUP_PADDING_AND_BORDER = 26;
+
 function Panel({
   value,
   change,
@@ -171,10 +175,10 @@ export function DateTimeField({
   const [mountedToday] = useState(() => new Date());
   const anchor = today ?? mountedToday;
   const dateLocale = resolveLocale(locale);
-  const clock = format === '12h' || format === '24h';
-  const cycle = hourCycle ?? (clock ? format : undefined);
+  const formatNamesHourCycle = format === '12h' || format === '24h';
+  const cycle = hourCycle ?? (formatNamesHourCycle ? format : undefined);
   const display = formatter(
-    format === undefined || clock
+    format === undefined || formatNamesHourCycle
       ? `P ${timePattern(dateLocale, precision, resolveTimeFormat(cycle, dateLocale))}`
       : format,
     dateLocale,
@@ -194,7 +198,11 @@ export function DateTimeField({
         serialize: (value) => serializeDateTime(value!, precision),
         messages: messages.dateTimeField,
         icon: CalendarDaysIcon,
-        preferredWidth: cell * 7 * monthsToShow + 16 * monthsToShow + 208 + 26,
+        preferredWidth:
+          cell * 7 * monthsToShow +
+          MONTH_GAP * monthsToShow +
+          CLOCK_COLUMN +
+          POPUP_PADDING_AND_BORDER,
         initialFocusSelector: '[data-calendar-day][tabindex="0"]',
         picker: ({ value, change, size }) => (
           <Panel

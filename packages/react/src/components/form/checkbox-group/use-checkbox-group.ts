@@ -28,7 +28,8 @@ export function useCheckboxGroup<T extends string>({
     defaultValue,
     onValueChange: onValueChange as ((next: readonly string[]) => void) | undefined,
   });
-  const value: readonly string[] = Array.isArray(stored) ? stored : none;
+  const blankFromReactHookForm = !Array.isArray(stored);
+  const value: readonly string[] = blankFromReactHookForm ? none : stored;
   const controlled = valueProp !== undefined;
   const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -67,7 +68,7 @@ export function useCheckboxGroup<T extends string>({
     if (!controlled) setValue(defaultValue, { silent: true });
   });
 
-  const focusFirst = (event: FocusEvent<HTMLDivElement>) => {
+  const forwardRootFocusToBox = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
     const boxes = [
       ...event.currentTarget.querySelectorAll<HTMLInputElement>('input[type=checkbox]'),
@@ -89,6 +90,6 @@ export function useCheckboxGroup<T extends string>({
     controls: items.filter((item) => !item.disabled).map((item) => item.id),
     anchorRef,
     rootRef,
-    focusFirst,
+    forwardRootFocusToBox,
   };
 }

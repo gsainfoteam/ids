@@ -85,7 +85,7 @@ export function RadioGroup<T extends string>({
 }: RadioGroupProps<T>) {
   const generatedName = useId();
   const groupName = name ?? generatedName;
-  const { value, select, rootRef, focusChecked, moveToEnd } = useRadioGroup<T>({
+  const { value, select, rootRef, forwardRootFocusToRadio, moveToEnd } = useRadioGroup<T>({
     value: valueProp,
     defaultValue,
     onValueChange,
@@ -137,7 +137,7 @@ export function RadioGroup<T extends string>({
         className={RadioGroup.Style({ orientation, className: resolve(className, state) })}
         style={resolve(style, state)}
         onFocus={(event) => {
-          focusChecked(event);
+          forwardRootFocusToRadio(event);
           onFocus?.(event);
         }}
         onKeyDown={(event) => {

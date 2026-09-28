@@ -147,7 +147,16 @@ export function Rating({
     interactive,
     ref,
   });
-  const { current, hover, displayed, anchorRef, rootRef, preview, choose, focusChecked } = rating;
+  const {
+    current,
+    hover,
+    displayed,
+    anchorRef,
+    rootRef,
+    preview,
+    choose,
+    forwardRootFocusToChecked,
+  } = rating;
   const ariaInvalid = ariaInvalidProp ?? invalid;
   const state: RatingState = {
     value: current,
@@ -228,7 +237,7 @@ export function Rating({
         onBlur?.(event);
       }}
       onFocus={(event) => {
-        focusChecked(event);
+        forwardRootFocusToChecked(event);
         onFocus?.(event);
       }}
       onKeyDown={(event) => {

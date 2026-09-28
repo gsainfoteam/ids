@@ -41,7 +41,7 @@ export const isFile = (value: unknown): value is File =>
   'slice' in value &&
   typeof value.slice === 'function';
 
-export const sameFile = (a: File, b: File) =>
+export const describeSameFile = (a: File, b: File) =>
   a.name === b.name && a.size === b.size && a.lastModified === b.lastModified && a.type === b.type;
 
 export const isImage = (file: File) => file.type.toLowerCase().startsWith('image/');
@@ -119,7 +119,7 @@ export function receiveFiles({
   for (const file of incoming) {
     if (!acceptsFile(file, tokens)) rejected.push({ file, reason: 'type' });
     else if (maxSize !== undefined && file.size > maxSize) rejected.push({ file, reason: 'size' });
-    else if (multiple && next.some((kept) => sameFile(kept, file))) continue;
+    else if (multiple && next.some((kept) => describeSameFile(kept, file))) continue;
     else if (next.length >= limit) rejected.push({ file, reason: 'count' });
     else next.push(file);
   }

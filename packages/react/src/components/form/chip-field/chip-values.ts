@@ -52,7 +52,7 @@ export function resolveTokens({
 }: ResolveOptions) {
   const add: string[] = [];
   const created: string[] = [];
-  const rest: string[] = [];
+  const leftToFix: string[] = [];
   const entries = uniqBy(
     tokens.map((token) => {
       const option = findOption(options, token);
@@ -61,12 +61,12 @@ export function resolveTokens({
     (entry) => textKey(entry.value),
   ).filter((entry) => !selected.some((value) => sameText(value, entry.value)));
   for (const { token, option } of entries) {
-    if (add.length >= room) rest.push(token);
+    if (add.length >= room) leftToFix.push(token);
     else if (option && !option.disabled) add.push(option.value);
     else if (!option && creatable && !validationError(validate?.(token), 'invalid')) {
       add.push(token);
       created.push(token);
-    } else rest.push(token);
+    } else leftToFix.push(token);
   }
-  return { add, created, rest };
+  return { add, created, leftToFix };
 }

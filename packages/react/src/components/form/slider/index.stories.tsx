@@ -42,7 +42,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Slider>;
 
-const narrow: Decorator = (Story) => (
+const narrowWithLabelRoom: Decorator = (Story) => (
   <div className="w-80 pt-8">
     <Story />
   </div>
@@ -52,7 +52,7 @@ const thumb = (canvasElement: HTMLElement, index = 0) =>
   canvasElement.querySelectorAll<HTMLElement>('[role=slider]')[index]!;
 const valueOf = (element: HTMLElement) => Number(element.getAttribute('aria-valuenow'));
 
-export const Playground: Story = { decorators: [narrow] };
+export const Playground: Story = { decorators: [narrowWithLabelRoom] };
 
 export const Gallery: Story = {
   render: () => (
@@ -175,7 +175,7 @@ function HueSlider() {
 }
 
 export const Keyboard: Story = {
-  decorators: [narrow],
+  decorators: [narrowWithLabelRoom],
   parameters: {
     docs: {
       description: {
@@ -203,7 +203,7 @@ export const Keyboard: Story = {
 };
 
 export const Drag: Story = {
-  decorators: [narrow],
+  decorators: [narrowWithLabelRoom],
   parameters: {
     docs: {
       description: {
@@ -224,7 +224,8 @@ export const Drag: Story = {
       { coords: at(0.75) },
     ]);
     const dragged = valueOf(thumb(canvasElement));
-    await expect(Math.abs(dragged - 75)).toBeLessThanOrEqual(1);
+    const stepsLostToPixelRounding = 1;
+    await expect(Math.abs(dragged - 75)).toBeLessThanOrEqual(stepsLostToPixelRounding);
     await expect(canvasElement.querySelector('[data-slider]')).toHaveAttribute('data-dragging');
     await expect(args.onValueCommit).not.toHaveBeenCalled();
     await userEvent.pointer({ keys: '[/MouseLeft]', coords: at(0.75) });
@@ -235,7 +236,7 @@ export const Drag: Story = {
 };
 
 export const Range: Story = {
-  decorators: [narrow],
+  decorators: [narrowWithLabelRoom],
   args: {
     selectionMode: 'range',
     defaultValue: [40, 60],
@@ -336,7 +337,7 @@ function NativeFormExample() {
 }
 
 export const NativeForm: Story = {
-  decorators: [narrow],
+  decorators: [narrowWithLabelRoom],
   render: () => <NativeFormExample />,
   parameters: {
     docs: {
@@ -385,7 +386,7 @@ function ReactHookFormExample() {
 }
 
 export const ReactHookForm: Story = {
-  decorators: [narrow],
+  decorators: [narrowWithLabelRoom],
   render: () => <ReactHookFormExample />,
   parameters: {
     docs: {
@@ -406,7 +407,7 @@ export const ReactHookForm: Story = {
 };
 
 export const ValueLabel: Story = {
-  decorators: [narrow],
+  decorators: [narrowWithLabelRoom],
   args: { valueLabel: 'auto', formatLabel: (value: number) => `${value}%` },
   parameters: {
     docs: {

@@ -26,6 +26,7 @@ export type UseSelectOptions = {
 
 const PAGE_SIZE = 10;
 const TYPEAHEAD_TIMEOUT = 500;
+const SAFARI_COMPOSING_KEY_CODE = 229;
 
 export function useSelect({
   multiple,
@@ -88,6 +89,8 @@ export function useSelect({
     setOpenState(false);
     if (restoreFocus) triggerRef.current?.focus({ preventScroll: true });
   };
+
+  const continueTabFromTrigger = () => triggerRef.current?.focus({ preventScroll: true });
 
   const openAt = (target: 'selected' | 'first' | 'last') => {
     if (blocked) return;
@@ -160,7 +163,8 @@ export function useSelect({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>, source: SelectFocusOwner) => {
-    if (event.defaultPrevented || event.nativeEvent.isComposing || event.keyCode === 229) return;
+    if (event.defaultPrevented) return;
+    if (event.nativeEvent.isComposing || event.keyCode === SAFARI_COMPOSING_KEY_CODE) return;
     if (blocked) return;
     const { key } = event;
     const printable = key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
@@ -214,7 +218,7 @@ export function useSelect({
         return;
       case 'Tab':
         if (drawer) return;
-        if (searching) triggerRef.current?.focus({ preventScroll: true });
+        if (searching) continueTabFromTrigger();
         close(false);
         return;
       case ' ':

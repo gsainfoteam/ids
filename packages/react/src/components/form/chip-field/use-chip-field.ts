@@ -46,6 +46,7 @@ export type UseChipFieldOptions = {
 };
 
 const PAGE_SIZE = 10;
+const SAFARI_COMPOSING_KEY_CODE = 229;
 
 const isRtl = (node: Element | null) =>
   !!node && node.ownerDocument.defaultView?.getComputedStyle(node).direction === 'rtl';
@@ -130,6 +131,7 @@ export function useChipField({
       input.setSelectionRange(at, at);
     }
   };
+  const sendTypingToInput = () => focusInput('end');
   const removeButtons = () =>
     Array.from(
       rootRef.current?.querySelectorAll<HTMLButtonElement>('[data-chip-field-remove]') ?? [],
@@ -166,8 +168,8 @@ export function useChipField({
     else if (candidate !== undefined) toggle(candidate);
   };
 
-  const commitQuery = () => {
-    const { add, created, rest } = resolveTokens({
+  const addQueryAsChip = () => {
+    const { add, created, leftToFix } = resolveTokens({
       tokens: [trimmed],
       options,
       selected,
@@ -175,7 +177,7 @@ export function useChipField({
       validate,
       room: maxCount === undefined ? Infinity : maxCount - selected.length,
     });
-    if (!add.length || rest.length) return false;
+    if (!add.length || leftToFix.length) return false;
     created.forEach((item) => onCreate?.(item));
     setValue([...selected, ...add]);
     setQuery('');
@@ -210,7 +212,7 @@ export function useChipField({
     const input = event.currentTarget;
     const before = input.value.slice(0, input.selectionStart ?? input.value.length);
     const after = input.value.slice(input.selectionEnd ?? input.value.length);
-    const { add, created, rest } = resolveTokens({
+    const { add, created, leftToFix } = resolveTokens({
       tokens: splitTokens(before + text + after),
       options,
       selected,
@@ -220,13 +222,14 @@ export function useChipField({
     });
     created.forEach((item) => onCreate?.(item));
     if (add.length) setValue([...selected, ...add]);
-    setQuery(rest.join(', '));
+    setQuery(leftToFix.join(', '));
     setHighlighted(undefined);
   };
 
   const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>, source: 'field' | 'drawer') => {
     if (event.defaultPrevented || composing.current) return;
-    if (event.nativeEvent.isComposing || event.keyCode === 229 || blocked) return;
+    if (event.nativeEvent.isComposing || event.keyCode === SAFARI_COMPOSING_KEY_CODE) return;
+    if (blocked) return;
     const input = event.currentTarget;
     const atStart = input.selectionStart === 0 && input.selectionEnd === 0;
     const back = isRtl(rootRef.current) ? 'ArrowRight' : 'ArrowLeft';
@@ -249,11 +252,11 @@ export function useChipField({
           choose(active);
         } else if (trimmed) {
           event.preventDefault();
-          if (!commitQuery()) setOpen(true);
+          if (!addQueryAsChip()) setOpen(true);
         }
         return;
       case ',':
-        if (!trimmed || commitQuery()) event.preventDefault();
+        if (!trimmed || addQueryAsChip()) event.preventDefault();
         return;
       case ' ':
         if (!query && !open) {
@@ -329,7 +332,7 @@ export function useChipField({
         remove(item, index < buttons.length - 1 ? index : 'input');
         return;
     }
-    if (printable) focusInput('end');
+    if (printable) sendTypingToInput();
   };
 
   const onChipRemove = (item: string) => {
@@ -347,18 +350,18 @@ export function useChipField({
     else buttons[Math.min(target, buttons.length - 1)].focus({ preventScroll: true });
   });
 
+  const activeOptionId = activeCandidate === undefined ? undefined : optionId(activeCandidate);
   useLayoutEffect(() => {
     if (!open) {
       revealed.current = false;
       return;
     }
-    if (activeCandidate === undefined) return;
-    revealPopupOption(inputRef.current?.ownerDocument.getElementById(optionId(activeCandidate)), {
+    if (activeOptionId === undefined) return;
+    revealPopupOption(inputRef.current?.ownerDocument.getElementById(activeOptionId), {
       center: !revealed.current,
     });
     revealed.current = true;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, activeCandidate]);
+  }, [open, activeOptionId]);
 
   useFormReset(inputRef, () => {
     setValue(defaultValue ?? []);

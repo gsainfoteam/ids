@@ -33,6 +33,10 @@ import { useFieldSize } from '../field/context';
 
 export type DateFieldFormat = TemporalFormat;
 
+const MONTHS_SIDE_BY_SIDE = 2;
+const MONTH_GAP = 16;
+const POPUP_PADDING_AND_BORDER = 26;
+
 export type DateFieldProps = Omit<
   TemporalFieldProps<CalendarValue>,
   'value' | 'defaultValue' | 'onValueChange' | 'disabled'
@@ -78,7 +82,7 @@ export function DateField(props: DateFieldProps) {
   const dateLocale = resolveLocale(locale);
   const formatDate = formatter(format ?? 'P', dateLocale);
   const cell = (useFieldSize(rest.size) ?? 'standard') === 'tiny' ? 32 : 36;
-  const shown = Math.min(monthsToShow, 2);
+  const shown = Math.min(monthsToShow, MONTHS_SIDE_BY_SIDE);
   const range = selectionMode === 'range';
   return (
     <TemporalField<CalendarValue>
@@ -102,7 +106,7 @@ export function DateField(props: DateFieldProps) {
             }
           : messages.dateField,
         icon: CalendarDaysIcon,
-        preferredWidth: cell * 7 * shown + 16 * (shown - 1) + 26,
+        preferredWidth: cell * 7 * shown + MONTH_GAP * (shown - 1) + POPUP_PADDING_AND_BORDER,
         initialFocusSelector: '[data-calendar-day][tabindex="0"]',
         parse:
           selectionMode === 'single'

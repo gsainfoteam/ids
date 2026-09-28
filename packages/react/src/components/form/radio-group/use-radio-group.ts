@@ -43,10 +43,15 @@ export function useRadioGroup<T extends string>({
       (radio) => radio.name === name && !radio.disabled,
     );
 
-  const focusChecked = (event: FocusEvent<HTMLDivElement>) => {
+  const forwardRootFocusToRadio = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
     const radios = enabledRadios(event.currentTarget);
     (radios.find((radio) => radio.checked) ?? radios[0])?.focus();
+  };
+
+  const chooseLikeArrowKey = (radio: HTMLInputElement) => {
+    radio.focus();
+    radio.click();
   };
 
   const moveToEnd = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -56,8 +61,7 @@ export function useRadioGroup<T extends string>({
     if (!radios.includes(event.target as HTMLInputElement)) return;
     const target = event.key === 'Home' ? radios[0]! : radios[radios.length - 1]!;
     event.preventDefault();
-    target.focus();
-    target.click();
+    chooseLikeArrowKey(target);
   };
 
   const mergedRef: RefCallback<HTMLDivElement> = useCallback(
@@ -69,7 +73,7 @@ export function useRadioGroup<T extends string>({
     value,
     select: (next: string) => setValue(next as T),
     rootRef: mergedRef,
-    focusChecked,
+    forwardRootFocusToRadio,
     moveToEnd,
   };
 }

@@ -99,8 +99,8 @@ export function Checkbox({
   onPointerCancel,
   ...inputProps
 }: CheckboxProps) {
-  const context = useCheckboxGroupContext();
-  const group = value === undefined ? null : context;
+  const enclosingGroup = useCheckboxGroupContext();
+  const group = value === undefined ? null : enclosingGroup;
   const option = String(value);
   invariant(
     group === null || (checkedProp === undefined && defaultChecked === undefined),

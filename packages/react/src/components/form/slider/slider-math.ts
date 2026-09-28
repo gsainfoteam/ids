@@ -17,7 +17,8 @@ export function percentOf(value: number, min: number, max: number) {
 }
 
 export function thumbOffset(percent: number) {
-  return `calc(${percent}% + ${0.5 - percent / 100} * var(--slider-thumb))`;
+  const pullInsideTrack = 0.5 - percent / 100;
+  return `calc(${percent}% + ${pullInsideTrack} * var(--slider-thumb))`;
 }
 
 export function ratioAlong(distance: number, length: number, thumb: number) {

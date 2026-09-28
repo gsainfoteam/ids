@@ -66,13 +66,15 @@ export function useRating({
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!interactive || event.altKey || event.ctrlKey || event.metaKey) return;
     const root = event.currentTarget;
-    const at = Number((event.target as HTMLElement).getAttribute('data-rating-value') ?? current);
+    const focusedScore = Number(
+      (event.target as HTMLElement).getAttribute('data-rating-value') ?? current,
+    );
     const rtl = getComputedStyle(root).direction === 'rtl';
     const targets: Record<string, number> = {
-      ArrowRight: at + (rtl ? -step : step),
-      ArrowLeft: at + (rtl ? step : -step),
-      ArrowUp: at + step,
-      ArrowDown: at - step,
+      ArrowRight: focusedScore + (rtl ? -step : step),
+      ArrowLeft: focusedScore + (rtl ? step : -step),
+      ArrowUp: focusedScore + step,
+      ArrowDown: focusedScore - step,
       Home: 0,
       '0': 0,
       End: max,
@@ -89,7 +91,7 @@ export function useRating({
       ?.focus({ preventScroll: true });
   };
 
-  const focusChecked = (event: FocusEvent<HTMLDivElement>) => {
+  const forwardRootFocusToChecked = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
     event.currentTarget.querySelector<HTMLButtonElement>('[aria-checked=true]')?.focus();
   };
@@ -108,6 +110,6 @@ export function useRating({
     preview,
     choose,
     onKeyDown,
-    focusChecked,
+    forwardRootFocusToChecked,
   };
 }

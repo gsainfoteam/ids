@@ -7,6 +7,9 @@ import type { Locale } from 'date-fns';
 
 type Part = 'y' | 'M' | 'd';
 
+const LOCALIZED_FORMATS_WITHOUT_WEEKDAY = ['P', 'PP', 'PPP'];
+const FIRST_FOUR_DIGIT_YEAR = 1000;
+
 const orderOf = (locale: Locale) =>
   uniq(tokensOf(shortDatePattern(locale)).match(/[yMd]/g) ?? ['y', 'M', 'd']) as Part[];
 
@@ -19,15 +22,16 @@ export function parseDateText(text: string, locale: Locale, pattern?: string): D
     return isValid(date) ? date : undefined;
   };
 
-  for (const candidate of [pattern, 'P', 'PP', 'PPP']) {
+  for (const candidate of [pattern, ...LOCALIZED_FORMATS_WITHOUT_WEEKDAY]) {
     const date = candidate && read(input, candidate);
-    if (date && getYear(date) >= 1000) return date;
+    if (date && getYear(date) >= FIRST_FOUR_DIGIT_YEAR) return date;
   }
 
   const order = orderOf(locale);
   const groups = input.match(/\d+/g) ?? [];
   if (groups.length === 3) {
-    const sequence: Part[] = groups[0].length >= 3 ? ['y', 'M', 'd'] : order;
+    const startsWithYear = groups[0].length >= 3;
+    const sequence: Part[] = startsWithYear ? ['y', 'M', 'd'] : order;
     const candidate = sequence
       .map((part, index) => (part === 'y' && groups[index].length <= 2 ? 'yy' : part))
       .join('-');
@@ -37,7 +41,8 @@ export function parseDateText(text: string, locale: Locale, pattern?: string): D
   if (digits.length === 8 || digits.length === 6) {
     const year = digits.length === 8 ? 'yyyy' : 'yy';
     const compact = order.map((part) => (part === 'y' ? year : part + part)).join('');
-    return (digits.length === 8 ? read(digits, 'yyyyMMdd') : undefined) ?? read(digits, compact);
+    const yearFirst = digits.length === 8 ? read(digits, 'yyyyMMdd') : undefined;
+    return yearFirst ?? read(digits, compact);
   }
   return undefined;
 }

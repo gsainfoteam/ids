@@ -50,6 +50,10 @@ function tryCapturePointer(element: Element, pointerId: number) {
   }
 }
 
+function keepFocusOnThumb(event: PointerEvent<HTMLDivElement>) {
+  event.preventDefault();
+}
+
 function toArray(value: SliderValue | undefined) {
   if (value === undefined) return undefined;
   return typeof value === 'number' ? [value] : [...value];
@@ -100,14 +104,14 @@ export function useSlider({
     latest.current = values;
   });
   const drag = useRef<Drag | null>(null);
-  const keyFrom = useRef<readonly number[] | null>(null);
+  const valuesBeforeHeldKey = useRef<readonly number[] | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
 
   const commit = (from: readonly number[]) => {
     if (!isEqual(from, latest.current)) onValueCommit?.(output(latest.current));
   };
 
-  const moveTo = (next: readonly number[]) => {
+  const renderBeforeNextMove = (next: readonly number[]) => {
     flushSync(() => setStored(next));
   };
 
@@ -140,14 +144,14 @@ export function useSlider({
     if (disabled || event.button !== 0) return;
     const raw = valueAt(event);
     if (raw === null) return;
-    event.preventDefault();
+    keepFocusOnThumb(event);
     const { index, tied } = closestThumb(latest.current, raw);
     focusThumb(index);
     if (readOnly) return;
     tryCapturePointer(event.currentTarget, event.pointerId);
     drag.current = { index, tied, from: latest.current, pointerId: event.pointerId };
     setDragging(index);
-    if (!tied) moveTo(moveThumb(latest.current, index, raw, bounds));
+    if (!tied) renderBeforeNextMove(moveThumb(latest.current, index, raw, bounds));
   };
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
@@ -156,14 +160,15 @@ export function useSlider({
     const raw = valueAt(event);
     if (raw === null) return;
     if (active.tied) {
-      const at = latest.current[active.index]!;
-      if (raw === at) return;
-      active.index = raw < at ? latest.current.indexOf(at) : latest.current.lastIndexOf(at);
+      const stackedAt = latest.current[active.index]!;
+      if (raw === stackedAt) return;
+      active.index =
+        raw < stackedAt ? latest.current.indexOf(stackedAt) : latest.current.lastIndexOf(stackedAt);
       active.tied = false;
       setDragging(active.index);
       focusThumb(active.index);
     }
-    moveTo(moveThumb(latest.current, active.index, raw, bounds));
+    renderBeforeNextMove(moveThumb(latest.current, active.index, raw, bounds));
   };
 
   const onPointerEnd = (event: PointerEvent<HTMLDivElement>) => {
@@ -192,14 +197,14 @@ export function useSlider({
     const target = targets[event.key];
     if (target === undefined) return;
     event.preventDefault();
-    keyFrom.current ??= latest.current;
-    moveTo(moveThumb(latest.current, index, target, bounds));
+    valuesBeforeHeldKey.current ??= latest.current;
+    renderBeforeNextMove(moveThumb(latest.current, index, target, bounds));
   };
 
-  const settleKeys = () => {
-    const from = keyFrom.current;
+  const commitHeldKey = () => {
+    const from = valuesBeforeHeldKey.current;
     if (!from) return;
-    keyFrom.current = null;
+    valuesBeforeHeldKey.current = null;
     commit(from);
   };
 
@@ -207,7 +212,7 @@ export function useSlider({
     if (!controlled) setStored(initial, { silent: true });
   });
 
-  const focusFirstThumb = (event: FocusEvent<HTMLDivElement>) => {
+  const forwardRootFocusToThumb = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) focusThumb(0);
   };
 
@@ -239,12 +244,12 @@ export function useSlider({
       onPointerUp: onPointerEnd,
       onPointerCancel: onPointerEnd,
       onLostPointerCapture: onPointerEnd,
-      onFocus: focusFirstThumb,
+      onFocus: forwardRootFocusToThumb,
     },
     thumbHandlers: (index: number) => ({
       onKeyDown: onThumbKeyDown(index),
-      onKeyUp: settleKeys,
-      onBlur: settleKeys,
+      onKeyUp: commitHeldKey,
+      onBlur: commitHeldKey,
     }),
   };
 }

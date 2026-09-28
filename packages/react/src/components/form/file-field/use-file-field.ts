@@ -37,6 +37,10 @@ export type UseFileFieldOptions = {
 const carriesFiles = (event: DragEvent) =>
   Array.from(event.dataTransfer?.types ?? []).includes('Files');
 
+const allowRepickingSameFile = (picker: HTMLInputElement) => {
+  picker.value = '';
+};
+
 export function useFileField({
   multiple,
   value,
@@ -68,7 +72,7 @@ export function useFileField({
   const dragDepth = useRef(0);
 
   const rootRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const pickerRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const pendingFocus = useRef<number | 'trigger' | null>(null);
 
@@ -93,7 +97,7 @@ export function useFileField({
     if (blocked) return;
     setRejections([]);
     emit([]);
-    if (inputRef.current) inputRef.current.value = '';
+    if (pickerRef.current) pickerRef.current.value = '';
     triggerRef.current?.focus({ preventScroll: true });
   };
 
@@ -115,18 +119,18 @@ export function useFileField({
   });
 
   useEffect(() => {
-    const input = inputRef.current;
+    const input = pickerRef.current;
     const owner = input?.form;
     if (!input || !owner || !name) return;
-    const append = (event: Event) => {
+    const appendCurrentFiles = (event: Event) => {
       if (input.matches(':disabled')) return;
       for (const file of files) (event as FormDataEvent).formData.append(name, file, file.name);
     };
-    owner.addEventListener('formdata', append);
-    return () => owner.removeEventListener('formdata', append);
+    owner.addEventListener('formdata', appendCurrentFiles);
+    return () => owner.removeEventListener('formdata', appendCurrentFiles);
   }, [files, name, form]);
 
-  useFormReset(inputRef, () => {
+  useFormReset(pickerRef, () => {
     setValue(defaultValue ?? empty);
     setRejections([]);
     setDragging(false);
@@ -165,20 +169,20 @@ export function useFileField({
     },
     onInputChange: (event: ChangeEvent<HTMLInputElement>) => {
       receive(Array.from(event.currentTarget.files ?? []));
-      event.currentTarget.value = '';
+      allowRepickingSameFile(event.currentTarget);
     },
   };
 
   return {
     state: { value: current, files, rejections, dragging, blocked, tokens },
     rootRef,
-    inputRef,
+    pickerRef,
     triggerRef,
     actions: {
       clear,
       remove,
       openPicker: () => {
-        if (!blocked) inputRef.current?.click();
+        if (!blocked) pickerRef.current?.click();
       },
     },
     handlers,
@@ -195,13 +199,14 @@ function watchPreview(file: File) {
   }
   const current = entry;
   current.users += 1;
+  const revokeUnlessResubscribed = () => {
+    if (current.users > 0 || previews.get(file) !== current) return;
+    previews.delete(file);
+    URL.revokeObjectURL(current.url);
+  };
   return () => {
     current.users -= 1;
-    queueMicrotask(() => {
-      if (current.users > 0 || previews.get(file) !== current) return;
-      previews.delete(file);
-      URL.revokeObjectURL(current.url);
-    });
+    queueMicrotask(revokeUnlessResubscribed);
   };
 }
 
