@@ -1,7 +1,6 @@
 import { Fragment, StrictMode, useState } from 'react';
 
 import { format as formatDate } from 'date-fns';
-import { de } from 'date-fns/locale/de';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { expect, test, vi } from 'vitest';
@@ -42,17 +41,23 @@ function autofill(input: HTMLInputElement, value: string) {
   input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-test('SSR: date-fns patterns, format functions, Field labelling and ISO local-date FormData', () => {
-  for (const [format, locale, expected] of [
-    [undefined, undefined, '2026.09.15'],
+test('SSR: Intl options, format functions, Field labelling and ISO local-date FormData', () => {
+  const formats: [DateField.Props['format'], string | undefined, string][] = [
+    [undefined, undefined, '2026. 09. 15.'],
     [undefined, 'en-US', '09/15/2026'],
-    [undefined, de, '15.09.2026'],
-    ['yyyy-MM-dd', 'ko-KR', '2026-09-15'],
-    ['yyyy년 M월 d일 (EEE)', 'ko-KR', '2026년 9월 15일 (화)'],
-    ["EEE, MMM d 'at home'", 'en-US', 'Tue, Sep 15 at home'],
-    ['PPP', 'en-US', 'September 15th, 2026'],
-    [(date: Date) => longDate.format(date), undefined, 'September 15, 2026'],
-  ] as const) {
+    [undefined, 'de-DE', '15.09.2026'],
+    [undefined, 'ja-JP', '2026/09/15'],
+    [undefined, 'fr-FR', '15/09/2026'],
+    [{ dateStyle: 'long' }, 'en-US', 'September 15, 2026'],
+    [
+      { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' },
+      'ko-KR',
+      '2026년 9월 15일 화요일',
+    ],
+    [(date) => longDate.format(date), undefined, 'September 15, 2026'],
+    [(date, locale) => `${locale} ${date.getDate()}`, 'de-DE', 'de-DE 15'],
+  ];
+  for (const [format, locale, expected] of formats) {
     const doc = parse(
       renderToString(
         <form>
@@ -75,14 +80,24 @@ test('SSR: date-fns patterns, format functions, Field labelling and ISO local-da
   expect(empty.querySelector('[role=combobox]')!.textContent).toBe('날짜 선택');
   expect(empty.querySelector('[data-date-field]')!.hasAttribute('data-empty')).toBe(true);
   expect(empty.querySelector('[data-placeholder]')).not.toBeNull();
-  expect(() => renderToString(<DateField defaultValue={d(15)} format="YYYY-MM-DD" />)).toThrow(
-    /instead of `YYYY`/,
-  );
   expect(() =>
     // @ts-expect-error A range takes { start, end }, not a date.
     renderToString(<DateField selectionMode="range" value={d(1)} />),
   ).toThrow(/range requires/);
-  expect(() => renderToString(<DateField locale="de-DE" />)).toThrow(/no built-in/);
+});
+
+test('any BCP 47 tag works without an import, and anything else throws', () => {
+  const shown = (locale: string) =>
+    parse(renderToString(<DateField defaultValue={d(15)} locale={locale} />)).querySelector(
+      '[role=combobox]',
+    )!.textContent;
+  expect(shown('ko')).toContain('2026. 09. 15.');
+  expect(shown('en-GB')).toContain('15/09/2026');
+  expect(shown('zh-CN')).toContain('2026/09/15');
+  expect(() => renderToString(<DateField locale="not a locale" />)).toThrow(/BCP 47/);
+  expect(() => renderToString(<DateField locale="" />)).toThrow(/BCP 47/);
+  // @ts-expect-error A date-fns Locale object is no longer taken.
+  expect(() => renderToString(<DateField locale={{ code: 'de' }} />)).toThrow(/BCP 47/);
 });
 
 test('ArrowDown opens on the focused day, limits apply, a pick closes and Clear empties', async () => {
@@ -90,7 +105,6 @@ test('ArrowDown opens on the focused day, limits apply, a pick closes and Clear 
   const screen = await render(
     <DateField
       today={d(15)}
-      format="yyyy-MM-dd"
       min={d(10)}
       max={d(20)}
       disabled={(date) => date.getDate() === 16}
@@ -110,7 +124,7 @@ test('ArrowDown opens on the focused day, limits apply, a pick closes and Clear 
   expect(changes.map(keyOf)).toEqual(['2026-09-18']);
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
   await expect.element(trigger).toHaveFocus();
-  await expect.element(trigger).toMatchTextContent('2026-09-18');
+  await expect.element(trigger).toMatchTextContent('2026. 09. 18.');
   await userEvent.click(screen.getByRole('button', { name: '날짜 지우기' }));
   expect(changes.slice(1)).toEqual([null]);
   await expect.element(trigger).toHaveFocus();
@@ -163,7 +177,6 @@ test('range stays open, a half-picked range is missing from FormData and fails r
         today={d(15)}
         name="trip"
         required
-        format="yyyy-MM-dd"
         monthsToShow={2}
         onValueChange={(next) => (value = next)}
       />
@@ -175,14 +188,14 @@ test('range stays open, a half-picked range is missing from FormData and fails r
   await expect.element(screen.getByRole('dialog')).toHaveAttribute('aria-label', '기간 선택');
   await userEvent.click(day('2026-09-18'));
   expect(value?.end).toBeNull();
-  await expect.element(trigger).toMatchTextContent('2026-09-18 – …');
+  await expect.element(trigger).toMatchTextContent('2026. 09. 18. – …');
   expect(formData().get('trip')).toBeNull();
   expect(validator().validity.valueMissing).toBe(true);
   await userEvent.click(day('2026-09-10'));
   expect(keyOf(value?.start)).toBe('2026-09-10');
   expect(keyOf(value?.end)).toBe('2026-09-18');
   await expect.element(screen.getByRole('dialog')).toBeVisible();
-  await expect.element(trigger).toMatchTextContent('2026-09-10 – 2026-09-18');
+  await expect.element(trigger).toMatchTextContent('2026. 09. 10. – 2026. 09. 18.');
   await userEvent.keyboard('{Escape}');
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
   expect(formData().get('trip')).toBe('2026-09-10/2026-09-18');
@@ -204,10 +217,10 @@ test('multiple toggles, repeats FormData entries, and readOnly/disabled block ed
   await userEvent.click(day('2026-09-15'));
   expect(formData().getAll('dates')).toEqual(['2026-09-16', '2026-09-17']);
   await userEvent.keyboard('{Escape}');
-  await expect.element(trigger).toMatchTextContent('2026.09.16, 2026.09.17');
+  await expect.element(trigger).toMatchTextContent('2026. 09. 16., 2026. 09. 17.');
   await userEvent.click(trigger);
   await userEvent.click(day('2026-09-18'));
-  await expect.element(trigger).toMatchTextContent('2026.09.16, 2026.09.17, +1');
+  await expect.element(trigger).toMatchTextContent('2026. 09. 16., 2026. 09. 17., +1');
   await userEvent.keyboard('{Escape}');
   await screen.rerender(view({ value: [d(20)], readOnly: true }));
   await userEvent.click(trigger);
@@ -225,12 +238,7 @@ test('native reset restores the default without reporting it, and a cancelled re
   const changes: (Date | null)[] = [];
   const screen = await render(
     <form>
-      <DateField
-        name="day"
-        defaultValue={d(15)}
-        format="yyyy-MM-dd"
-        onValueChange={(next) => changes.push(next)}
-      >
+      <DateField name="day" defaultValue={d(15)} onValueChange={(next) => changes.push(next)}>
         <DateField.Trigger asChild>
           <button>
             <DateField.Value />
@@ -252,7 +260,7 @@ test('native reset restores the default without reporting it, and a cancelled re
   expect(formData().get('day')).toBe('2026-09-18');
   await userEvent.click(screen.getByRole('button', { name: '초기화' }));
   await expect.poll(() => formData().get('day')).toBe('2026-09-15');
-  await expect.element(trigger).toMatchTextContent('2026-09-15');
+  await expect.element(trigger).toMatchTextContent('2026. 09. 15.');
   expect(changes).toHaveLength(1);
 });
 
@@ -359,7 +367,7 @@ test('react-hook-form value mode: required error focus, Date value, reset and di
             registerOptions={{ required: 'Required' }}
           >
             <RHFField.Label>Date</RHFField.Label>
-            <DateField today={d(15)} format="yyyy-MM-dd" />
+            <DateField today={d(15)} />
             <RHFField.Error />
           </RHFField>
           <button type="submit">제출</button>
@@ -381,7 +389,7 @@ test('react-hook-form value mode: required error focus, Date value, reset and di
   methods.reset();
   await expect.element(trigger).toMatchTextContent('날짜 선택');
   methods.setValue('date', d(20));
-  await expect.element(trigger).toMatchTextContent('2026-09-20');
+  await expect.element(trigger).toMatchTextContent('2026. 09. 20.');
   await screen.rerender(<App disabled />);
   submitted.mockClear();
   await userEvent.click(submit);
@@ -521,7 +529,7 @@ test('typed entry: the text box takes the label and role, the calendar button le
   expect(input.getAttribute('aria-haspopup')).toBe('dialog');
   expect(input.getAttribute('aria-required')).toBe('true');
   expect(input.getAttribute('autocomplete')).toBe('off');
-  expect(input.getAttribute('placeholder')).toBe('YYYY.MM.DD');
+  expect(input.getAttribute('placeholder')).toBe('YYYY. MM. DD.');
   expect(input.hasAttribute('name')).toBe(false);
   const button = doc.querySelector('button')!;
   expect(button.getAttribute('aria-label')).toBe('달력 열기');
@@ -545,6 +553,20 @@ test('typed entry: the text box takes the label and role, the calendar button le
     ),
   ).querySelector('button')!;
   expect(named.getAttribute('aria-label')).toBe('Pick a birthday');
+  const hint = (locale: string, format?: DateField.Props['format']) =>
+    parse(
+      renderToString(
+        <DateField locale={locale} format={format}>
+          <DateField.Input />
+        </DateField>,
+      ),
+    )
+      .querySelector('input')!
+      .getAttribute('placeholder');
+  expect(hint('en-US')).toBe('MM/DD/YYYY');
+  expect(hint('de-DE')).toBe('DD.MM.YYYY');
+  expect(hint('ja-JP')).toBe('YYYY/MM/DD');
+  expect(hint('en-US', { dateStyle: 'long' })).toBe('MM/DD/YYYY');
 });
 
 test('typed entry reads the shown format, written forms, bare digits and the locale order', async () => {
@@ -560,7 +582,7 @@ test('typed entry reads the shown format, written forms, bare digits and the loc
   await userEvent.fill(textBox(), '2026-09-20');
   textBox().blur();
   expect(changes).toEqual(['2026-09-20']);
-  await expect.element(textBox()).toHaveValue('2026.09.20');
+  await expect.element(textBox()).toHaveValue('2026. 09. 20.');
   expect(formData().get('day')).toBe('2026-09-20');
   const enter = async (text: string) => {
     await userEvent.fill(textBox(), text);
@@ -572,19 +594,31 @@ test('typed entry reads the shown format, written forms, bare digits and the loc
   expect(await enter('20260923')).toBe('2026-09-23');
   expect(await enter('260924')).toBe('2026-09-24');
   expect(await enter('2026.9.25')).toBe('2026-09-25');
+  expect(await enter('２０２６．９．２６')).toBe('2026-09-26');
+  expect(await enter('Sep 27, 2026')).toBe('2026-09-27');
   await screen.rerender(<div key="en">{view({ locale: 'en-US' })}</div>);
   expect(await enter('9/25/2026')).toBe('2026-09-25');
   expect(await enter('09262026')).toBe('2026-09-26');
   expect(await enter('2026-09-27')).toBe('2026-09-27');
   expect(await enter('Sep 28, 2026')).toBe('2026-09-28');
   expect(await enter('9/29/26')).toBe('2026-09-29');
-  await screen.rerender(<div key="de">{view({ locale: de })}</div>);
+  await screen.rerender(<div key="de">{view({ locale: 'de-DE' })}</div>);
   expect(await enter('30.09.2026')).toBe('2026-09-30');
+  expect(await enter('1. Oktober 2026')).toBe('2026-10-01');
+  await screen.rerender(<div key="fr">{view({ locale: 'fr-FR' })}</div>);
+  expect(await enter('2 oct. 2026')).toBe('2026-10-02');
+  expect(await enter('03/10/2026')).toBe('2026-10-03');
+  await screen.rerender(<div key="ja">{view({ locale: 'ja-JP' })}</div>);
+  expect(await enter('2026年10月4日')).toBe('2026-10-04');
+  await screen.rerender(<div key="ar">{view({ locale: 'ar-EG' })}</div>);
+  expect(await enter('٥‏/١٠‏/٢٠٢٦')).toBe('2026-10-05');
   await screen.rerender(
-    <div key="pattern">{view({ format: 'dd MMM yyyy', locale: 'en-US' })}</div>,
+    <div key="options">{view({ format: { dateStyle: 'medium' }, locale: 'en-US' })}</div>,
   );
-  expect(await enter('01 Oct 2026')).toBe('2026-10-01');
-  await expect.element(textBox()).toHaveAttribute('placeholder', 'dd MMM yyyy');
+  expect(await enter('06 Oct 2026')).toBe('2026-10-06');
+  await expect.element(textBox()).toHaveValue('Oct 6, 2026');
+  await expect.element(textBox()).toHaveAttribute('placeholder', 'MM/DD/YYYY');
+  expect(await enter('October 7, 2026')).toBe('2026-10-07');
 });
 
 test('typed entry keeps unreadable or blocked text, marks it invalid and Escape reverts it', async () => {
@@ -614,8 +648,14 @@ test('typed entry keeps unreadable or blocked text, marks it invalid and Escape 
   await expect.element(textBox()).toHaveAttribute('aria-invalid', 'true');
   await expect.element(field()).toHaveAttribute('data-invalid');
   await userEvent.keyboard('{Escape}');
-  await expect.element(textBox()).toHaveValue('2026.09.15');
+  await expect.element(textBox()).toHaveValue('2026. 09. 15.');
   await expect.element(textBox()).not.toHaveAttribute('aria-invalid');
+  for (const impossible of ['2026-02-30', '2026. 2. 30.', '20260230', '2026-9-15-1', '202-09-15']) {
+    await userEvent.fill(textBox(), impossible);
+    await userEvent.keyboard('{Enter}');
+    await expect.element(textBox()).toHaveAttribute('aria-invalid', 'true');
+    await userEvent.keyboard('{Escape}');
+  }
   await userEvent.fill(textBox(), '2026-09-25');
   textBox().blur();
   await expect.element(textBox()).toHaveAttribute('aria-invalid', 'true');
@@ -638,7 +678,7 @@ test('a pasted or autofilled date is read at once; typing waits, and an IME Ente
   textBox().select();
   await userEvent.paste();
   expect(changes).toEqual(['2026-09-03']);
-  await expect.element(textBox()).toHaveValue('2026.09.03');
+  await expect.element(textBox()).toHaveValue('2026. 09. 03.');
   autofill(textBox(), '2000-01-31');
   expect(changes).toEqual(['2026-09-03', '2000-01-31']);
   await userEvent.fill(textBox(), '2026. 9. 5');
@@ -670,7 +710,7 @@ test('typed entry and the calendar share one value; ArrowDown opens on the typed
   await expect.element(day('2026-09-18')).toHaveFocus();
   await userEvent.click(day('2026-09-21'));
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
-  await expect.element(textBox()).toHaveValue('2026.09.21');
+  await expect.element(textBox()).toHaveValue('2026. 09. 21.');
   await expect.element(textBox()).toHaveFocus();
   const button = screen.getByRole('button', { name: '달력 열기' });
   await userEvent.click(button);

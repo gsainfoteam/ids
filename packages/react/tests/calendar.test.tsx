@@ -1,7 +1,4 @@
 import { format } from 'date-fns';
-import { arEG } from 'date-fns/locale/ar-EG';
-import { de } from 'date-fns/locale/de';
-import { es } from 'react-day-picker/locale';
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
@@ -22,7 +19,7 @@ test('SSR: Korean by default, two months without duplicate dates, one tab stop',
   expect(grids).toHaveLength(2);
   expect(grids[0].getAttribute('aria-label')).toBe('2024년 2월');
   expect(doc.querySelector('[data-calendar]')!.getAttribute('aria-label')).toBe('달력');
-  expect(doc.querySelector('[data-calendar]')!.getAttribute('lang')).toBe('ko');
+  expect(doc.querySelector('[data-calendar]')!.getAttribute('lang')).toBe('ko-KR');
   expect(doc.querySelector('th')!.textContent).toBe('일');
   expect(doc.querySelector('th')!.getAttribute('aria-label')).toBe('일요일');
   const today = doc.querySelector('[data-calendar-day][data-today]')!;
@@ -41,26 +38,65 @@ test('SSR: Korean by default, two months without duplicate dates, one tab stop',
   ]);
 });
 
-test('a tag or a date-fns Locale drives names, the first weekday and the day labels', () => {
+test('any BCP 47 tag drives names, the first weekday and the day labels without an import', () => {
   const first = (props: Calendar.Props) =>
     ssr({ today: d(2026, 9, 15), ...props }).querySelector('th')!;
-  expect(first({ locale: 'en-US' }).textContent).toBe('Su');
-  expect(first({ locale: de }).getAttribute('aria-label')).toBe('Montag');
+  expect(first({ locale: 'en-US' }).textContent).toBe('S');
+  expect(first({ locale: 'en-US' }).getAttribute('aria-label')).toBe('Sunday');
+  expect(first({ locale: 'de-DE' }).getAttribute('aria-label')).toBe('Montag');
+  expect(first({ locale: 'fr-FR' }).getAttribute('aria-label')).toBe('lundi');
+  expect(first({ locale: 'en-US-u-fw-mon' }).getAttribute('aria-label')).toBe('Monday');
+  expect(first({ locale: 'de-DE', weekStartsOn: 0 }).getAttribute('aria-label')).toBe('Sonntag');
   expect(first({ weekStartsOn: 1 }).getAttribute('aria-label')).toBe('월요일');
-  const arabic = ssr({ locale: arEG, numerals: 'arab', today: d(2026, 9, 15) });
-  expect(arabic.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('١٥');
-  expect(
-    ssr({ locale: 'en-US', today: d(2026, 9, 14) })
-      .querySelector('[data-calendar-day="2026-09-15"]')!
-      .getAttribute('aria-label'),
-  ).toBe('Tuesday, September 15th, 2026');
-  expect(() => ssr({ locale: 'de-DE' })).toThrow(/no built-in date-fns locale/);
+  const labelOf = (props: Calendar.Props, key = '2026-09-15') =>
+    ssr({ today: d(2026, 9, 14), ...props })
+      .querySelector(`[data-calendar-day="${key}"]`)!
+      .getAttribute('aria-label');
+  expect(labelOf({ locale: 'en-US' })).toBe('Tuesday, September 15, 2026');
+  expect(labelOf({ locale: 'en-US' }, '2026-09-14')).toBe('오늘, Monday, September 14, 2026');
+  expect(labelOf({ locale: 'fr-FR' })).toBe('mardi 15 septembre 2026');
+  const japanese = ssr({ locale: 'ja-JP', today: d(2026, 9, 15) });
+  expect(japanese.querySelector('[data-calendar]')!.getAttribute('lang')).toBe('ja-JP');
+  expect(japanese.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('2026年9月');
+  expect(japanese.querySelector('[role=status]')!.textContent).toBe('2026年9月');
+  expect(japanese.querySelector('th')!.getAttribute('aria-label')).toBe('日曜日');
+  expect(japanese.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('15');
+  const french = ssr({ locale: 'fr-FR', today: d(2026, 9, 15) });
+  expect(french.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('septembre 2026');
+  expect(() => ssr({ locale: 'not a tag' })).toThrow(/BCP 47/);
 });
 
-test('a locale from react-day-picker/locale keeps its own translated labels', () => {
-  const doc = ssr({ locale: es, today: d(2026, 9, 15) });
-  expect(doc.querySelector('[aria-label="Ir al mes anterior"]')).not.toBeNull();
-  expect(doc.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('septiembre 2026');
+test('numerals draw every number in the chosen system', () => {
+  const arabic = ssr({
+    locale: 'ar-EG',
+    numerals: 'arab',
+    showWeekNumber: true,
+    today: d(2026, 9, 15),
+  });
+  expect(arabic.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('١٥');
+  expect(arabic.querySelector('[role=status]')!.textContent).toBe('سبتمبر ٢٠٢٦');
+  expect(arabic.querySelector('[role=rowheader]')!.textContent).toMatch(/^[٠-٩]{2}$/);
+  const latin = ssr({ locale: 'ar-EG', numerals: 'latn', today: d(2026, 9, 15) });
+  expect(latin.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('15');
+  const devanagari = ssr({ numerals: 'deva', today: d(2026, 9, 15) });
+  expect(devanagari.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('१५');
+});
+
+test('grid, weekday and week number labels are Korean by default, and given ones override them', () => {
+  const doc = ssr({ today: d(2026, 9, 15), showWeekNumber: true });
+  expect(doc.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('2026년 9월');
+  expect(
+    [...doc.querySelectorAll('th[scope=col]')].map((th) => th.getAttribute('aria-label')),
+  ).toEqual(['주차', '일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']);
+  expect(doc.querySelector('[role=rowheader]')!.getAttribute('aria-label')).toMatch(/^\d+주차$/);
+  const own = ssr({
+    today: d(2026, 9, 15),
+    labels: { labelGrid: () => 'September grid' },
+    formatters: { formatWeekdayName: (weekday) => `w${weekday.getDay()}` },
+  });
+  expect(own.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('September grid');
+  expect(own.querySelector('th')!.textContent).toBe('w0');
+  expect(own.querySelector('th')!.getAttribute('aria-label')).toBe('일요일');
 });
 
 test('diagnostics for mismatched values, limits and parts outside the calendar', () => {

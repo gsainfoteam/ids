@@ -40,6 +40,9 @@ importers:
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.2.6)
+      '@internationalized/date':
+        specifier: ^3.12.4
+        version: 3.12.4
       '@internationalized/number':
         specifier: ^3.6.8
         version: 3.6.8
@@ -730,6 +733,9 @@ packages:
     peerDependenciesMeta:
       '@types/node':
         optional: true
+
+  '@internationalized/date@3.12.4':
+    resolution: {integrity: sha512-M1dEn4c1U1HsSlaVR8upZtSqvXrTkHDfv18H01uCSJyjVLDxnBR38v/fMxecmlwXKR4i9HeZcmgQAPE6A+aGJQ==}
 
   '@internationalized/number@3.6.8':
     resolution: {integrity: sha512-8UmMFia46DUt+k97zKd9fKWXcWHR+k8ae3eYzILETuT2KbIvLyOfac7zesw+sJdRAAZ7Q9pM1Mk22aXp2LD0Ig==}
@@ -3966,6 +3972,10 @@ snapshots:
       iconv-lite: 0.7.2
     optionalDependencies:
       '@types/node': 22.19.19
+
+  '@internationalized/date@3.12.4':
+    dependencies:
+      '@swc/helpers': 0.5.23
 
   '@internationalized/number@3.6.8':
     dependencies:

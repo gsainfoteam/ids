@@ -1,6 +1,6 @@
 import { ClockIcon } from '@heroicons/react/24/outline';
 
-import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
+import { resolveLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
 import {
   TemporalClear,
@@ -18,7 +18,7 @@ import {
 } from '../../../internal/temporal-field';
 import {
   formatter,
-  timePattern,
+  timeOptions,
   type TemporalFormat,
 } from '../../../internal/temporal-field/format';
 import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
@@ -32,12 +32,12 @@ import {
 
 export type TimeFieldProps = TemporalFieldProps<Date | null> & {
   precision?: TimePrecision;
-  format?: TemporalFormat | TimeFormat;
+  format?: TemporalFormat;
   hourCycle?: TimeFormat;
   step?: number;
   min?: Date;
   max?: Date;
-  locale?: DateLocale;
+  locale?: string;
   pickerVariant?: TimePickerVariant;
   referenceDate?: Date;
 };
@@ -60,14 +60,13 @@ export function TimeField({
   validateTime(props.value);
   validateTime(props.defaultValue);
   const dateLocale = resolveLocale(locale);
-  const formatNamesHourCycle = format === '12h' || format === '24h';
-  const cycle = hourCycle ?? (formatNamesHourCycle ? format : undefined);
   const display = formatter(
-    format === undefined || formatNamesHourCycle
-      ? timePattern(dateLocale, precision, resolveTimeFormat(cycle, dateLocale))
-      : format,
+    format,
     dateLocale,
+    timeOptions(precision),
+    resolveTimeFormat(hourCycle, dateLocale),
   );
+
   return (
     <TemporalField
       {...props}
@@ -87,7 +86,7 @@ export function TimeField({
             onValueChange={change}
             referenceDate={referenceDate}
             precision={precision}
-            format={cycle}
+            format={hourCycle}
             step={step}
             min={min}
             max={max}

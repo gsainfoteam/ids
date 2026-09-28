@@ -20,7 +20,11 @@ import {
   type TriggerProps as SharedTriggerProps,
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
-import { formatter, type TemporalFormat } from '../../../internal/temporal-field/format';
+import {
+  dateOptions,
+  formatter,
+  type TemporalFormat,
+} from '../../../internal/temporal-field/format';
 import { Calendar, CalendarPickContext, type CalendarOptions } from '../../data/calendar';
 import {
   emptyValue,
@@ -80,7 +84,7 @@ export function DateField(props: DateFieldProps) {
   if (value !== undefined) validateValue(value, selectionMode);
   if (defaultValue !== undefined) validateValue(defaultValue, selectionMode);
   const dateLocale = resolveLocale(locale);
-  const formatDate = formatter(format ?? 'P', dateLocale);
+  const formatDate = formatter(format, dateLocale, dateOptions);
   const cell = (useFieldSize(rest.size) ?? 'standard') === 'tiny' ? 32 : 36;
   const shown = Math.min(monthsToShow, MONTHS_SIDE_BY_SIDE);
   const range = selectionMode === 'range';
@@ -111,15 +115,11 @@ export function DateField(props: DateFieldProps) {
         parse:
           selectionMode === 'single'
             ? (text) => {
-                const date = parseDateText(
-                  text,
-                  dateLocale,
-                  typeof format === 'string' ? format : undefined,
-                );
+                const date = parseDateText(text, dateLocale);
                 return date && !isBlocked(date, { min, max, disabled }) ? date : undefined;
               }
             : undefined,
-        inputHint: typeof format === 'string' ? format : dateInputHint(dateLocale),
+        inputHint: dateInputHint(dateLocale),
         picker: ({ value: current, change, close, size }) => (
           <CalendarPickContext value={selectionMode === 'single' ? () => close(true) : null}>
             <Calendar

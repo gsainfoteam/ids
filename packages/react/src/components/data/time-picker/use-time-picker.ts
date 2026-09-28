@@ -23,7 +23,6 @@ import { useControllableState } from '../../../hooks/use-controllable-state';
 import { dayKey } from '../calendar/date';
 
 import type { IdsSize } from '../../../tokens/types';
-import type { Locale } from 'date-fns';
 
 export type TimePickerState = {
   value: Date | null;
@@ -53,7 +52,7 @@ export type UseTimePickerOptions = {
   step: number;
   min?: Date;
   max?: Date;
-  locale: Locale;
+  locale: string;
   disabled: boolean;
   readOnly: boolean;
 };

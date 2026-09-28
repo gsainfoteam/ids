@@ -12,7 +12,7 @@
 | ------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                  | Spinner, Progress                                                                                              |
 | [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                      | Button, IconButton, Toggle, IconToggle, FloatingButton                                                         |
-| [`date-locale.ts`](#date-localets)               | 문자열 locale 해석, locale 의 시간제와 날짜 순서                     | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                   |
+| [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작 | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                   |
 | [`decimal.ts`](#decimalts) | step 계산에 쓰는 정확한 십진수(decimal.js) | NumberField, Slider |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자               | Select, ChipField, ColorField, Menu, `temporal-field/`                                                         |
 | [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각     | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea          |
@@ -151,51 +151,59 @@ export const Style = tv({
 
 ## date-locale.ts
 
-문자열 locale 을 date-fns `Locale` 로 바꾸고, locale 의 시간제와 날짜 순서를 읽는 함수입니다.
+BCP 47 locale 태그를 풀이하고, 날짜와 시각의 locale 데이터를 브라우저의 `Intl` 에서 읽는 함수입니다. 날짜 컴포넌트는 locale 데이터를 이 모듈에서만 가져옵니다.
 
 ### 쓰는 곳
 
 - `resolveLocale`: Calendar, TimePicker, DateField, TimeField, DateTimeField
+- `dateFormatter`: [temporal-field](./temporal-field/README.md#formatts) 의 `format.ts`, Calendar 의 `day-picker-locale.ts`
+- `formatPart`, `numberFormatter`: Calendar 의 `day-picker-locale.ts`
 - `hourCycleOf`: TimePicker 의 `time.ts` (`resolveTimeFormat`)
-- `periodFirst`: TimePicker, [temporal-field](./temporal-field/README.md#formatts) 의 `format.ts`
-- `patternHourCycle`: temporal-field 의 `format.ts`
-- `tokensOf`, `shortDatePattern`: DateField 의 `parse.ts`
+- `periodFirst`, `periodLabel`: TimePicker
+- `numericDate`, `numericDateParts`, `dateOrder`, `monthNamed`, `nativeDigits`: DateField 의 `parse.ts`, temporal-field 의 `format.ts`
+- `weekStartOf`: Calendar
 
 ### 쓰는 법
 
 ```ts
 // components/form/time-field/index.tsx
-const dateLocale = resolveLocale(locale);        // 'ko-KR' 같은 문자열 또는 date-fns Locale
-const display = formatter(
-  format === undefined || formatNamesHourCycle
-    ? timePattern(dateLocale, precision, resolveTimeFormat(cycle, dateLocale))
-    : format,
-  dateLocale,
-);
+const dateLocale = resolveLocale(locale); // 'ko-KR' 같은 BCP 47 태그. 생략하면 messages.locale
 
-// components/data/time-picker/time.ts
-export const resolveTimeFormat = (value: TimeFormat | undefined, locale: Locale): TimeFormat =>
-  value ?? hourCycleOf(locale);
+// components/data/calendar/index.tsx
+weekStartsOn={weekStartsOn ?? weekStartOf(resolvedLocale)}
+
+// components/data/calendar/day-picker-locale.ts
+formatDay: (date) => formatPart(date, 'day', locale, { day: 'numeric', numberingSystem }),
 
 // components/form/date-field/parse.ts
-const orderOf = (locale: Locale) =>
-  uniq(tokensOf(shortDatePattern(locale)).match(/[yMd]/g) ?? ['y', 'M', 'd']) as Part[];
+const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE);
 ```
+
+| 함수                   | 돌려주는 것                                                            | ko-KR       | en-US        | de-DE        |
+| ---------------------- | ---------------------------------------------------------------------- | ----------- | ------------ | ------------ |
+| `hourCycleOf`          | `resolvedOptions().hourCycle` 의 `12h` / `24h`                         | `12h`       | `12h`        | `24h`        |
+| `periodFirst`          | 12시간제 `formatToParts` 에서 `dayPeriod` 가 `hour` 앞인가              | `true`      | `false`      | `false`      |
+| `periodLabel(n)`       | `n * 12` 시의 `dayPeriod` 글자                                         | `오전` `오후` | `AM` `PM`  | `AM` `PM`    |
+| `dateOrder`            | `numericDate` 의 `formatToParts` 에서 연, 월, 일 순서                  | `y M d`     | `M d y`      | `d M y`      |
+| `numericDateParts`     | 그 부분들. 입력 힌트(`YYYY. MM. DD.`)가 된다                          |             |              |              |
+| `monthNames`           | 월 이름(긴, 짧은, 날짜 안의 꼴과 홀로 쓰는 꼴)을 소문자로 → 월 번호    | `9월` → 9   | `sep` → 9    | `sept` → 9   |
+| `nativeDigits`         | locale 의 기본 숫자 글자 → 0 ~ 9                                       |             |              |              |
+| `weekStartOf`          | 주 시작 요일. `0`(일) ~ `6`(토)                                        | `0`         | `0`          | `1`          |
 
 ### 왜 이렇게
 
-- `resolveLocale` 은 `ko`, `ko-KR`, `en`, `en-US` 네 태그만 문자열로 찾습니다(`builtIn`). date-fns locale 전체를 표로 두면 쓰지 않는 locale 까지 모든 앱 번들에 들어갑니다. 다른 언어는 앱이 `Locale` 객체를 직접 import 해서 넘깁니다.
+- `resolveLocale` 은 `Intl.getCanonicalLocales` 로 태그를 검사하고 정규형(`ko-kr` → `ko-KR`)을 돌려줍니다. 어떤 태그든 import 없이 됩니다. locale 데이터는 런타임의 ICU 에 이미 있습니다.
 - 인자를 생략하면 `messages.locale`(`'ko-KR'`)을 씁니다.
-- `hourCycleOf` 는 사람들이 기대하는 시간제를 CLDR, 곧 브라우저의 `Intl` 에서 읽습니다(`intlHourCycle`). `ko` 는 `Intl` 에서 12시간제(`h12`)인데 date-fns `ko` 의 짧은 시간 패턴은 `HH:mm` 입니다. 패턴(`patternHourCycle`)은 `Intl` 이 모르는 locale 코드일 때만 씁니다.
-- `patternHourCycle` 은 locale 자신의 짧은 시간 패턴이 쓰는 시간제입니다. date-fns 의 `p` 는 이 시간제일 때만 그대로 쓸 수 있습니다.
-- `periodFirst`: 한국어와 중국어는 오전/오후를 시 앞에 씁니다. 24시간제 locale 을 12시간제로 보여 줄 때는 오전/오후가 들어 있는 첫 시간 패턴(`patternWithPeriod`, short, long, full 순)에서 순서를 가져옵니다. `ko` 는 short 가 `HH:mm` 이라 long 인 `a H:mm:ss z` 에서 읽습니다.
-- `tokensOf` 는 작은따옴표로 감싼 글자(`QUOTED_LITERAL`)를 지우고 패턴을 읽습니다. 따옴표 안은 토큰이 아니라 글자 그대로입니다. 예를 들어 `sv`, `nb` 의 full 시간 패턴 `'kl'. HH:mm:ss zzzz` 에서 `kl` 의 `k` 는 시 토큰과 같은 글자입니다.
-- `shortDatePattern` 은 locale 의 숫자 날짜입니다. `ko` 는 `y.MM.dd`, `en-US` 는 `MM/dd/yyyy`, `de` 는 `dd.MM.y` 입니다.
+- `dateFormatter` 는 `@internationalized/date` 의 `DateFormatter` 입니다. 같은 locale 과 옵션의 `Intl.DateTimeFormat` 을 캐시하고, Chrome 의 `hour12` 버그를 피합니다.
+- `periodFirst`, `dateOrder`, `monthNames`, `nativeDigits` 는 locale 마다 한 번 계산합니다(`memoize`).
+- `weekStartOf` 는 알려진 일요일(`A_SUNDAY`)이 그 locale 의 주에서 몇 번째 날인지(`getDayOfWeek`)로 주 시작을 거꾸로 구합니다. `getDayOfWeek` 은 `Intl.Locale` 의 주 정보와 `-u-fw-` 확장을 따릅니다.
+- `monthNames` 는 날짜 안의 꼴(`{ day, month }` 의 `month` 부분)과 홀로 쓰는 꼴(`{ month }`)을 모두 담습니다. 러시아어처럼 두 꼴이 다른 언어가 있습니다. 끝의 `.`(`oct.`, `Sept.`)은 떼고 비교합니다.
 
 ### 알아둘 것
 
-- `builtIn` 에 없는 문자열을 넘기면 `resolveLocale` 이 `IdsError` 를 던집니다(`invariant`). 개발 빌드에서만 알리는 경고가 아닙니다.
-- `formatLong` 이 없는 `Locale` 에서는 패턴이 빈 문자열이라 `patternHourCycle` 은 `'24h'`, `periodFirst` 는 `false` 를 돌려줍니다.
+- BCP 47 태그가 아닌 값(`'de_DE'`, 빈 문자열, date-fns `Locale` 객체)은 `IdsError` 입니다(`invariant`). 개발 빌드에서만 알리는 경고가 아닙니다.
+- 결과는 런타임의 ICU 데이터입니다. 서버(Node)와 브라우저의 ICU 버전이 다르면 글자가 조금 다를 수 있습니다.
+- `dayPeriod` 부분이 없는 locale 이면 `periodLabel` 은 `AM` / `PM` 입니다.
 
 ## decimal.ts
 
@@ -539,7 +547,7 @@ messages.numberField.rangeUnderflow(format(min))
 
 - 컴포넌트가 스스로 그리는 문자열은 모두 여기 둡니다. 나중에 locale provider 를 붙일 때 이 객체만 바꾸면 됩니다.
 - 대부분의 문구는 prop(`aria-label`, `requiredMessage`, `incrementLabel` 등)이 대신할 수 있습니다. prop 이 없는 문구(`numberField.rangeUnderflow`, `telField.invalid`, `colorPicker.saturation` 등)는 이 객체에서만 바뀝니다.
-- `locale`(`'ko-KR'`)은 date-fns locale 의 기본값입니다. 컴포넌트에 `locale` 을 따로 주지 않으면 월, 요일, 오전/오후 이름이 이 locale 에서 오므로, 나머지 문구와 같은 언어로 읽힙니다.
+- `locale`(`'ko-KR'`)은 날짜, 시간 컴포넌트 locale 의 기본값입니다. 컴포넌트에 `locale` 을 따로 주지 않으면 월, 요일, 오전/오후 이름이 이 locale 에서 오므로, 나머지 문구와 같은 언어로 읽힙니다.
 
 ### 알아둘 것
 

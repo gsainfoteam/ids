@@ -27,7 +27,7 @@ const meta = {
     hourCycle: { control: 'radio', options: [undefined, '12h', '24h'] },
     pickerVariant: { control: 'radio', options: ['grid', 'wheel'] },
     step: { control: { type: 'number', min: 1, max: 60 } },
-    format: { control: 'text' },
+    format: { control: 'object' },
     invalid: { control: 'boolean' },
     required: { control: 'boolean' },
     readOnly: { control: 'boolean' },
@@ -74,14 +74,18 @@ export const Gallery: Story = {
         <Showcase.Row label="locale · ko-KR">
           <TimeField defaultValue={at(14, 30)} className="w-44" aria-label="한국어" />
         </Showcase.Row>
-        <Showcase.Row label="12h">
-          <TimeField format="12h" defaultValue={at(14, 30)} className="w-44" aria-label="12시간" />
+        <Showcase.Row label="hourCycle 24h">
+          <TimeField
+            hourCycle="24h"
+            defaultValue={at(14, 30)}
+            className="w-44"
+            aria-label="24시간"
+          />
         </Showcase.Row>
-        <Showcase.Row label="a h:mm · en-US">
+        <Showcase.Row label="Intl options · en-US">
           <TimeField
             locale="en-US"
-            format="a h:mm"
-            hourCycle="12h"
+            format={{ hour: '2-digit', minute: '2-digit' }}
             defaultValue={at(14, 30)}
             className="w-44"
             aria-label="English"
@@ -90,7 +94,7 @@ export const Gallery: Story = {
         <Showcase.Row label="second">
           <TimeField
             precision="second"
-            format="HH:mm:ss"
+            hourCycle="24h"
             defaultValue={at(14, 30)}
             className="w-44"
             aria-label="초 단위"
@@ -117,7 +121,7 @@ export const Gallery: Story = {
 };
 
 export const SelectAndClear: Story = {
-  args: { defaultValue: at(9, 30), format: 'HH:mm', hourCycle: '24h', step: 15 },
+  args: { defaultValue: at(9, 30), hourCycle: '24h', step: 15 },
   parameters: {
     docs: {
       description: {

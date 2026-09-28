@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { de } from 'date-fns/locale/de';
 import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -25,7 +24,7 @@ const meta = {
     precision: { control: 'radio', options: ['hour', 'minute', 'second'] },
     format: { control: 'radio', options: [undefined, '12h', '24h'] },
     step: { control: { type: 'number', min: 1, max: 60 } },
-    locale: { control: 'radio', options: ['ko-KR', 'en-US'] },
+    locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP'] },
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
@@ -271,14 +270,21 @@ export const Locale: Story = {
         aria-label="한국어 24시간"
       />
       <TimePicker locale="en-US" defaultValue={at(14, 30)} className="w-64" aria-label="English" />
-      <TimePicker locale={de} defaultValue={at(14, 30)} className="w-44" aria-label="Deutsch" />
+      <TimePicker locale="de-DE" defaultValue={at(14, 30)} className="w-44" aria-label="Deutsch" />
+      <TimePicker
+        locale="ja-JP"
+        format="12h"
+        defaultValue={at(14, 30)}
+        className="w-64"
+        aria-label="日本語"
+      />
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '시간제는 브라우저의 CLDR 데이터를, 오전/오후 이름은 date-fns locale을 따릅니다. 한국어와 미국 영어는 12시간제, 독일어는 24시간제이고 format으로 바꿀 수 있습니다. 한국어는 오전/오후 컬럼이 앞에 옵니다.',
+          'locale은 BCP 47 태그이고, 시간제와 오전/오후 이름과 자리는 브라우저의 Intl(CLDR)을 따릅니다. 한국어와 미국 영어는 12시간제, 독일어와 일본어는 24시간제이고 format으로 바꿀 수 있습니다. 한국어와 일본어는 오전/오후 컬럼이 앞에 옵니다.',
       },
     },
   },
@@ -297,6 +303,14 @@ export const Locale: Story = {
     ).toHaveTextContent('PM');
     const german = canvas.getByRole('group', { name: 'Deutsch' });
     await expect(german.querySelector('[data-time-column=period]')).toBeNull();
+    const japanese = canvas.getByRole('group', { name: '日本語' });
+    await expect(japanese.querySelector('[data-time-column]')).toHaveAttribute(
+      'data-time-column',
+      'period',
+    );
+    await expect(
+      japanese.querySelector('[data-time-column=period] [data-selected]'),
+    ).toHaveTextContent('午後');
   },
 };
 

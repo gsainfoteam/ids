@@ -11,7 +11,7 @@ import {
   withinLimits,
   type DateTimeLimits,
 } from './date-time';
-import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
+import { resolveLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
 import {
   TemporalClear,
@@ -29,8 +29,9 @@ import {
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
 import {
+  dateOptions,
   formatter,
-  timePattern,
+  timeOptions,
   type TemporalFormat,
 } from '../../../internal/temporal-field/format';
 import { invariant } from '../../../utils';
@@ -45,13 +46,11 @@ import {
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
-import type { Locale } from 'date-fns';
 
 export type DateTimeFieldProps = Omit<TemporalFieldProps<Date | null>, 'disabled'> &
-  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'dir' | 'locale'> & {
-    locale?: DateLocale;
+  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'dir'> & {
     precision?: TimePrecision;
-    format?: TemporalFormat | TimeFormat;
+    format?: TemporalFormat;
     hourCycle?: TimeFormat;
     step?: number;
     pickerVariant?: TimePickerVariant;
@@ -69,7 +68,7 @@ type PanelProps = CalendarPassThrough & {
   today: Date;
   limits: DateTimeLimits;
   cycle: TimeFormat | undefined;
-  locale: Locale;
+  locale: string;
   pickerVariant?: TimePickerVariant;
 };
 
@@ -175,13 +174,11 @@ export function DateTimeField({
   const [mountedToday] = useState(() => new Date());
   const anchor = today ?? mountedToday;
   const dateLocale = resolveLocale(locale);
-  const formatNamesHourCycle = format === '12h' || format === '24h';
-  const cycle = hourCycle ?? (formatNamesHourCycle ? format : undefined);
   const display = formatter(
-    format === undefined || formatNamesHourCycle
-      ? `P ${timePattern(dateLocale, precision, resolveTimeFormat(cycle, dateLocale))}`
-      : format,
+    format,
     dateLocale,
+    { ...dateOptions, ...timeOptions(precision) },
+    resolveTimeFormat(hourCycle, dateLocale),
   );
   const limits: DateTimeLimits = { min, max, disabled, precision, step };
   const cell = (useFieldSize(props.size) ?? 'standard') === 'tiny' ? 32 : 36;
@@ -211,7 +208,7 @@ export function DateTimeField({
             size={size}
             today={anchor}
             limits={limits}
-            cycle={cycle}
+            cycle={hourCycle}
             locale={dateLocale}
             pickerVariant={pickerVariant}
             monthsToShow={monthsToShow}

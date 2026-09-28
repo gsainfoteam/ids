@@ -1,8 +1,5 @@
 import { useState } from 'react';
 
-import { de } from 'date-fns/locale/de';
-import { arEG } from 'react-day-picker/locale/ar-EG';
-import { ja } from 'react-day-picker/locale/ja';
 import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -27,7 +24,7 @@ const meta = {
     captionLayout: { control: 'radio', options: ['label', 'dropdown'] },
     monthsToShow: { control: { type: 'number', min: 1, max: 3 } },
     weekStartsOn: { control: { type: 'number', min: 0, max: 6 } },
-    locale: { control: 'radio', options: ['ko-KR', 'en-US'] },
+    locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP', 'ar-EG'] },
     readOnly: { control: 'boolean' },
     showWeekNumber: { control: 'boolean' },
   },
@@ -134,12 +131,12 @@ export const Gallery: Story = {
         <Showcase.Row label="en-US">
           <Calendar locale="en-US" today={today} aria-label="English" />
         </Showcase.Row>
-        <Showcase.Row label="de (date-fns)">
-          <Calendar locale={de} today={today} aria-label="Deutsch" />
+        <Showcase.Row label="de-DE">
+          <Calendar locale="de-DE" today={today} aria-label="Deutsch" />
         </Showcase.Row>
         <Showcase.Row label="ar-EG · rtl">
           <div dir="rtl">
-            <Calendar locale={arEG} numerals="arab" today={today} aria-label="العربية" />
+            <Calendar locale="ar-EG" numerals="arab" today={today} aria-label="العربية" />
           </div>
         </Showcase.Row>
       </Showcase.Section>
@@ -300,9 +297,10 @@ export const Locale: Story = {
     <div className="flex flex-wrap gap-8">
       <Calendar locale="en-US" today={today} aria-label="English" />
       <Calendar weekStartsOn={1} today={today} aria-label="월요일 시작" />
-      <Calendar locale={ja} today={today} aria-label="日本語" />
+      <Calendar locale="ja-JP" today={today} aria-label="日本語" />
+      <Calendar locale="de-DE" today={today} aria-label="Deutsch" />
       <div dir="rtl">
-        <Calendar locale={arEG} numerals="arab" today={today} aria-label="العربية" />
+        <Calendar locale="ar-EG" numerals="arab" today={today} aria-label="العربية" />
       </div>
     </div>
   ),
@@ -310,17 +308,20 @@ export const Locale: Story = {
     docs: {
       description: {
         story:
-          'locale은 ko-KR, en-US 태그나 date-fns Locale을 받습니다. react-day-picker/locale의 Locale은 버튼 이름까지 번역되어 있습니다. 주 시작은 locale을 따르고 weekStartsOn으로 바꿉니다. 오른쪽에서 왼쪽으로 쓰는 문서에서는 방향키 좌우가 뒤집힙니다.',
+          'locale은 BCP 47 태그이고, 달 이름, 요일, 날짜 이름은 브라우저의 Intl로 그립니다. import할 locale 데이터가 없습니다. 버튼 이름은 IDS 메시지를 씁니다. 주 시작은 locale을 따르고(-u-fw- 확장도 따름) weekStartsOn으로 바꿉니다. numerals는 숫자 체계를 바꿉니다. 오른쪽에서 왼쪽으로 쓰는 문서에서는 방향키 좌우가 뒤집힙니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
     const english = canvas.getByRole('group', { name: 'English' });
-    await expect(english.querySelector('th')).toHaveTextContent('Su');
+    await expect(english.querySelector('th')).toHaveTextContent('S');
+    await expect(english.querySelector('th')).toHaveAttribute('aria-label', 'Sunday');
     const monday = canvas.getByRole('group', { name: '월요일 시작' });
     await expect(monday.querySelector('th')).toHaveAttribute('aria-label', '월요일');
     const japanese = canvas.getByRole('group', { name: '日本語' });
     await expect(japanese.querySelector('[role=grid]')).toHaveAccessibleName('2026年9月');
+    const german = canvas.getByRole('group', { name: 'Deutsch' });
+    await expect(german.querySelector('th')).toHaveAttribute('aria-label', 'Montag');
     const arabic = canvas.getByRole('group', { name: 'العربية' });
     await expect(arabic).toHaveAttribute('dir', 'rtl');
     arabic.querySelector<HTMLButtonElement>('[data-calendar-day="2026-09-15"]')!.focus();

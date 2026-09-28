@@ -16,7 +16,7 @@ import {
   type TimePickerOptionState,
   type TimePickerState,
 } from './use-time-picker';
-import { periodFirst, resolveLocale, type DateLocale } from '../../../internal/date-locale';
+import { periodFirst, resolveLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
 import { flattenFragments, invariant, mergeProps, part, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
@@ -33,7 +33,7 @@ export type TimePickerOptions = {
   step?: number;
   min?: Date;
   max?: Date;
-  locale?: DateLocale;
+  locale?: string;
   size?: IdsSize;
   disabled?: boolean;
   readOnly?: boolean;
@@ -116,6 +116,7 @@ export function TimePicker({
   children,
   ...props
 }: TimePickerProps) {
+  const resolvedLocale = resolveLocale(locale);
   const api = useTimePicker({
     value,
     defaultValue,
@@ -126,12 +127,12 @@ export function TimePicker({
     step,
     min,
     max,
-    locale: resolveLocale(locale),
+    locale: resolvedLocale,
     disabled,
     readOnly: readOnly || selectionMode === 'none',
   });
   const { state } = api;
-  const periodLeads = periodFirst(resolveLocale(locale));
+  const periodLeads = periodFirst(resolvedLocale);
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = TimePicker.Style({ size: resolvedSize });
 

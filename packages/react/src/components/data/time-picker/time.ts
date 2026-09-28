@@ -1,11 +1,9 @@
 import { format, getHours, getMinutes, getSeconds, isSameDay, set } from 'date-fns';
 import { minBy, range } from 'es-toolkit';
 
-import { hourCycleOf, type HourCycle } from '../../../internal/date-locale';
+import { hourCycleOf, periodLabel, type HourCycle } from '../../../internal/date-locale';
 import { invariant } from '../../../utils';
 import { validDate } from '../calendar/date';
-
-import type { Locale } from 'date-fns';
 
 export type TimePrecision = 'hour' | 'minute' | 'second';
 export type TimeFormat = HourCycle;
@@ -32,11 +30,8 @@ export function validateTime(value: Date | null | undefined) {
   invariant(value == null || validDate(value), 'TimePicker: expected a valid Date or null.');
 }
 
-export const resolveTimeFormat = (value: TimeFormat | undefined, locale: Locale): TimeFormat =>
+export const resolveTimeFormat = (value: TimeFormat | undefined, locale: string): TimeFormat =>
   value ?? hourCycleOf(locale);
-
-export const periodLabel = (period: number, locale: Locale) =>
-  format(new Date(2000, 0, 1, period * 12), 'a', { locale });
 
 export function timeSlots(
   day: Date,
@@ -116,7 +111,7 @@ export function unitTarget(
   return nearestSlot(matches, target);
 }
 
-export const unitLabel = (unit: TimeUnit, n: number, locale: Locale) =>
+export const unitLabel = (unit: TimeUnit, n: number, locale: string) =>
   unit === 'period' ? periodLabel(n, locale) : String(n).padStart(2, '0');
 
 export function typeaheadMatch(labels: string[], buffer: string, from: number): number {

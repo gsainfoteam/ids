@@ -6,7 +6,7 @@
 - **기간 미리 보기.** 시작을 고른 뒤에는 포인터나 키보드 포커스가 있는 날까지 기간이 미리 그려집니다.
 - **빠른 이동.** `captionLayout="dropdown"` 이면 연도와 월을 목록에서 바로 고릅니다. 생년월일처럼 먼 날짜도 몇 번 만에 갑니다.
 - **WAI-ARIA 격자 키보드.** react-day-picker 의 키보드 그대로입니다. 막힌 날은 건너뛰고, 오른쪽에서 왼쪽으로 쓰는 문서에서는 좌우가 뒤집힙니다.
-- **date-fns locale.** 월, 요일 이름과 주 시작 요일을 date-fns `Locale` 에서 가져옵니다. 기본은 한국어입니다.
+- **Intl locale.** 월, 요일 이름, 날짜 숫자, 주 시작 요일을 브라우저의 `Intl` 로 그립니다. `locale` 은 BCP 47 태그이고, 어떤 언어든 import 없이 됩니다. 기본은 한국어입니다.
 - **react-day-picker 확장.** `components`, `modifiers`, `formatters`, `labels`, `footer` 를 그대로 받습니다.
 
 ```tsx
@@ -102,22 +102,32 @@ const [range, setRange] = useState<DateRange | null>(null);
 ## locale
 
 ```tsx
-import { de } from 'date-fns/locale';
-import { arEG, ja } from 'react-day-picker/locale';
-
-<Calendar />                                  // 한국어: 2026년 9월, 일 월 화 ...
-<Calendar locale="en-US" />                   // September 2026, Su Mo Tu ...
-<Calendar locale={de} />                      // date-fns Locale. 월요일부터 시작
-<Calendar locale={ja} />                      // 버튼 이름까지 번역된 react-day-picker Locale
-<Calendar weekStartsOn={1} />                 // 주 시작을 직접 정한다. 0 = 일요일
+<Calendar />                                   // 한국어: 2026년 9월, 일 월 화 ...
+<Calendar locale="en-US" />                    // September 2026, S M T ...
+<Calendar locale="de-DE" />                    // 월요일부터 시작
+<Calendar locale="en-US-u-fw-mon" />           // -u-fw- 확장으로 주 시작을 바꾼 태그
+<Calendar locale="ja-JP" />                    // 2026年9月
+<Calendar weekStartsOn={1} />                  // 주 시작을 직접 정한다. 0 = 일요일
 <div dir="rtl">
-  <Calendar locale={arEG} numerals="arab" />  // 아라비아 숫자, 좌우 반전
+  <Calendar locale="ar-EG" numerals="arab" />  // 아랍 숫자(١٥), 좌우 반전
 </div>
 ```
 
-- 문자열은 `ko`, `ko-KR`, `en`, `en-US` 만 받고, 다른 태그는 오류입니다. 모든 locale 을 이름으로 찾게 하면 쓰지 않는 locale 까지 번들에 들어가서, 다른 언어는 앱이 `Locale` 을 가져와 넘깁니다. 가져오려면 `date-fns` 나 `react-day-picker` 를 앱 의존성에 더합니다.
-- 버튼, 목록, 날짜 이름은 IDS 메시지(한국어)를 씁니다. `react-day-picker/locale` 의 `Locale` 은 자기 번역을 쓰고, `labels` 로 하나씩 바꿀 수도 있습니다.
+| 그리는 것                    | Intl                                                        |
+| ---------------------------- | ----------------------------------------------------------- |
+| 제목, 격자 이름              | `{ year: 'numeric', month: 'long' }`                        |
+| 요일 머리글 / 요일 이름      | `{ weekday: 'narrow' }` / `{ weekday: 'long' }`             |
+| 날짜 숫자, 연도 목록         | `day` / `year` 부분만(`formatToParts`)                      |
+| 월 목록                      | `{ month: 'long' }`                                         |
+| 날짜 버튼 이름               | `{ dateStyle: 'full' }` 에 IDS 메시지(`오늘`, `선택됨`)     |
+| 주차                         | 두 자리 숫자                                                |
+
+- 잘못된 태그(`'de_DE'`, date-fns `Locale` 객체)는 오류입니다.
+- `numerals` 는 Intl 의 `numberingSystem` 입니다. 날짜, 제목, 주차, 이름 모두 그 숫자로 그립니다.
+- 주 시작은 locale 에서 구합니다(`@internationalized/date` 의 `getDayOfWeek`). `weekStartsOn` 이 있으면 그쪽이 먼저입니다.
+- 이전/다음 달 버튼, 연도/월 목록, 주차 이름은 IDS 메시지(한국어)입니다. 날짜, 격자, 요일 이름은 locale 을 따르고 영어로 새지 않습니다.
 - 날짜 버튼 이름은 `오늘, 2026년 9월 15일 화요일, 선택됨` 처럼 오늘과 선택 여부를 함께 읽습니다.
+- `formatters` 와 `labels` 로 넘긴 것은 Intl 로 만든 것 위에 덮입니다.
 
 ## 부분 바꾸기
 
@@ -172,14 +182,15 @@ function EventDay(props: Calendar.DayButtonProps) {
 | `monthsToShow`                                                                          | `1`. 1~12                                                 |
 | `month` / `defaultMonth` / `onMonthChange`                                              | 보이는 첫 달                                              |
 | `today`                                                                                 | 오늘 표시와 첫 달의 기준                                  |
-| `locale`                                                                                | `ko-KR`. 태그 또는 date-fns `Locale`                      |
+| `locale`                                                                                | `ko-KR`. BCP 47 태그. 루트의 `lang` 이 된다               |
 | `weekStartsOn`                                                                          | locale 의 주 시작. `0`(일) ~ `6`(토)                      |
 | `dir`                                                                                   | 부모 방향                                                 |
 | `size`                                                                                  | `standard`(칸 36px) / `tiny`(32px). 생략하면 `Field` 크기 |
 | `autoFocus`                                                                             | 선택한 날, 없으면 오늘에 포커스                           |
 | `showOutsideDays`                                                                       | 한 달이면 `true`, 여러 달이면 `false`                     |
 | `fixedWeeks`                                                                            | `true`. 어느 달이든 6주라 높이가 그대로다                 |
-| `showWeekNumber` / `numerals`                                                           | react-day-picker 그대로                                   |
+| `showWeekNumber`                                                                        | react-day-picker 그대로                                   |
+| `numerals`                                                                              | locale 의 숫자. Intl `numberingSystem`                    |
 | `modifiers` / `modifiersClassNames` / `components` / `formatters` / `labels` / `footer` | react-day-picker 그대로                                   |
 | `className` / `style`                                                                   | 루트. 상태를 받는 함수도 된다                             |
 | 그 외 native 속성, `ref`                                                                | 루트 `div`. 기본 `role="group"`, 이름 `달력`              |
@@ -191,3 +202,4 @@ function EventDay(props: Calendar.DayButtonProps) {
 - 서버 렌더링 결과를 클라이언트와 맞추려면 `today` 를 고정합니다.
 - 앞뒤 달의 날을 누르면 그 날을 고르지만 보이는 달은 그대로입니다.
 - `prefers-reduced-motion` 이면 색 전환도 하지 않습니다.
+- 이름과 숫자는 런타임의 `Intl` 데이터입니다. 서버(Node)와 브라우저의 ICU 가 다르면 글자가 조금 다를 수 있습니다.

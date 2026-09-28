@@ -27,7 +27,7 @@ const meta = {
     precision: { control: 'radio', options: ['hour', 'minute', 'second'] },
     hourCycle: { control: 'radio', options: [undefined, '12h', '24h'] },
     step: { control: { type: 'number', min: 1, max: 60 } },
-    format: { control: 'text' },
+    format: { control: 'object' },
     invalid: { control: 'boolean' },
     required: { control: 'boolean' },
     readOnly: { control: 'boolean' },
@@ -77,18 +77,24 @@ export const Gallery: Story = {
         <Showcase.Row label="locale · ko-KR">
           <DateTimeField defaultValue={at(15, 14, 30)} className="w-72" aria-label="한국어" />
         </Showcase.Row>
-        <Showcase.Row label="pattern">
+        <Showcase.Row label="Intl options">
           <DateTimeField
-            format="yyyy년 M월 d일 HH:mm"
+            format={{ dateStyle: 'long', timeStyle: 'short', hourCycle: 'h23' }}
             defaultValue={at(15, 14, 30)}
             className="w-72"
-            aria-label="패턴"
+            aria-label="Intl 옵션"
           />
         </Showcase.Row>
         <Showcase.Row label="en-US · 12h">
           <DateTimeField
             locale="en-US"
-            format="EEE, MMM d 'at' h:mm a"
+            format={{
+              weekday: 'short',
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+            }}
             hourCycle="12h"
             defaultValue={at(15, 14, 30)}
             className="w-72"
@@ -121,7 +127,7 @@ export const Gallery: Story = {
 };
 
 export const PreserveDateAndTime: Story = {
-  args: { defaultValue: at(15, 9, 30), format: 'yyyy-MM-dd HH:mm', hourCycle: '24h', step: 15 },
+  args: { defaultValue: at(15, 9, 30), hourCycle: '24h', step: 15 },
   parameters: {
     docs: {
       description: {
@@ -139,7 +145,7 @@ export const PreserveDateAndTime: Story = {
     await userEvent.click(option('hour', 14));
     await expect(args.onValueChange).toHaveBeenLastCalledWith(at(16, 14, 30));
     await userEvent.keyboard('{Escape}');
-    await expect(trigger).toHaveTextContent('2026-09-16 14:30');
+    await expect(trigger).toHaveTextContent('2026. 09. 16. 14:30');
     await expect(trigger).toHaveFocus();
   },
 };

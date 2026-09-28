@@ -1,22 +1,41 @@
-import { format as formatDate } from 'date-fns';
-
-import { patternHourCycle, periodFirst, type HourCycle } from '../date-locale';
+import { dateFormatter, numericDate, type HourCycle } from '../date-locale';
 
 import type { TimePrecision } from '../../components/data/time-picker/time';
-import type { Locale } from 'date-fns';
 
-export type TemporalFormat = string | ((date: Date) => string);
+export type TemporalFormat<V = Date> =
+  | Intl.DateTimeFormatOptions
+  | ((value: V, locale: string) => string);
 
-export function timePattern(locale: Locale, precision: TimePrecision, cycle: HourCycle): string {
-  const seconds = precision === 'second';
-  const localesOwnTime = seconds ? 'pp' : 'p';
-  if (cycle === patternHourCycle(locale)) return localesOwnTime;
-  if (cycle === '24h') return seconds ? 'HH:mm:ss' : 'HH:mm';
-  const clock = seconds ? 'h:mm:ss' : 'h:mm';
-  return periodFirst(locale) ? `a ${clock}` : `${clock} a`;
-}
+export const dateOptions = numericDate;
 
-export function formatter(value: TemporalFormat, locale: Locale): (date: Date) => string {
-  if (typeof value === 'function') return value;
-  return (date) => formatDate(date, value, { locale });
+export const timeOptions = (precision: TimePrecision): Intl.DateTimeFormatOptions => ({
+  hour: 'numeric',
+  ...(precision !== 'hour' && { minute: '2-digit' }),
+  ...(precision === 'second' && { second: '2-digit' }),
+});
+
+const showsHour = (options: Intl.DateTimeFormatOptions) =>
+  options.hour !== undefined || options.timeStyle !== undefined;
+
+const choosesItsOwnCycle = (options: Intl.DateTimeFormatOptions) =>
+  options.hour12 !== undefined || options.hourCycle !== undefined;
+
+const withHourCycle = (
+  options: Intl.DateTimeFormatOptions,
+  cycle: HourCycle | undefined,
+): Intl.DateTimeFormatOptions =>
+  cycle && showsHour(options) && !choosesItsOwnCycle(options)
+    ? { ...options, hour12: cycle === '12h' }
+    : options;
+
+export function formatter(
+  format: TemporalFormat | undefined,
+  locale: string,
+  defaults: Intl.DateTimeFormatOptions,
+  cycle?: HourCycle,
+): (date: Date) => string {
+  if (typeof format === 'function') return (date) => format(date, locale);
+
+  const intl = dateFormatter(locale, withHourCycle(format ?? defaults, cycle));
+  return (date) => intl.format(date);
 }

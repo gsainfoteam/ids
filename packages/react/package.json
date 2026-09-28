@@ -54,6 +54,7 @@
   "dependencies": {
     "@floating-ui/react": "~0.27.20",
     "@heroicons/react": "^2.2.0",
+    "@internationalized/date": "^3.12.4",
     "@internationalized/number": "^3.6.8",
     "cn": "^0.4.0",
     "culori": "^4.0.2",

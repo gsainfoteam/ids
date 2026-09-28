@@ -6,14 +6,14 @@ DateField, TimeField, DateTimeField 가 함께 쓰는 필드 본체입니다. �
 | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
 | [`index.tsx`](#indextsx)                         | `TemporalField`, 파트(`TemporalTrigger`, `TemporalInput`, `TemporalValue`, `TemporalClear`, `TemporalContent`), `temporalFieldStyle` |
 | [`use-temporal-field.ts`](#use-temporal-fieldts) | 값, 열림, 입력 중인 글자, blur, 폼 reset 을 다루는 hook                                                                              |
-| [`format.ts`](#formatts)                         | 표시 형식(`TemporalFormat`, `formatter`, `timePattern`)                                                                              |
+| [`format.ts`](#formatts)                         | 표시 형식(`TemporalFormat`, `formatter`, `dateOptions`, `timeOptions`)                                                               |
 
 ## 쓰는 곳
 
 | 필드          | 가져가는 것                                                                                             |
 | ------------- | ------------------------------------------------------------------------------------------------------- |
 | DateField     | `TemporalField`, 파트 다섯 개, `temporalFieldStyle`, `formatter`                                        |
-| TimeField     | `TemporalField`, `TemporalInput` 을 뺀 파트 네 개, `temporalFieldStyle`, `formatter`, `timePattern`     |
+| TimeField     | `TemporalField`, `TemporalInput` 을 뺀 파트 네 개, `temporalFieldStyle`, `formatter`, `timeOptions`     |
 | DateTimeField | TimeField 와 같은 것, 팝업 내용을 그리는 `temporalFieldStyle` 의 `panel`, `panelTime`, `panelHint` 슬롯 |
 
 - 각 필드는 파트를 그대로 내보냅니다(`DateField.Trigger = TemporalTrigger`). `Style` 도 `temporalFieldStyle` 입니다.
@@ -45,11 +45,11 @@ DateField, TimeField, DateTimeField 가 함께 쓰는 필드 본체입니다. �
     parse:
       selectionMode === 'single'
         ? (text) => {
-            const date = parseDateText(text, dateLocale, typeof format === 'string' ? format : undefined);
+            const date = parseDateText(text, dateLocale);
             return date && !isBlocked(date, { min, max, disabled }) ? date : undefined;
           }
         : undefined,
-    inputHint: typeof format === 'string' ? format : dateInputHint(dateLocale),
+    inputHint: dateInputHint(dateLocale),
     picker: ({ value: current, change, close, size }) => <Calendar /* ... */ />,
   }}
 />
@@ -154,24 +154,44 @@ const { state, input, blocked, popupId, controlRef, rootRef, change, clear, clos
 ### 쓰는 법
 
 ```ts
+// components/form/date-field/index.tsx
+const formatDate = formatter(format, dateLocale, dateOptions);
+
 // components/form/time-field/index.tsx
 const display = formatter(
-  format === undefined || formatNamesHourCycle
-    ? timePattern(dateLocale, precision, resolveTimeFormat(cycle, dateLocale))
-    : format,
+  format,
   dateLocale,
+  timeOptions(precision),
+  resolveTimeFormat(hourCycle, dateLocale),
+);
+
+// components/form/date-time-field/index.tsx
+const display = formatter(
+  format,
+  dateLocale,
+  { ...dateOptions, ...timeOptions(precision) },
+  resolveTimeFormat(hourCycle, dateLocale),
 );
 ```
 
 ### 왜 이렇게
 
-- `TemporalFormat` 은 date-fns 패턴(`'yyyy-MM-dd HH:mm'`)이거나, 패턴으로 쓸 수 없는 형식을 위한 함수입니다. `formatter` 는 둘 다 `(date) => string` 으로 바꿉니다.
-- `timePattern` 은 locale 이 이미 그 시간제를 쓰면 locale 자신의 짧은 시각(`p`, 초까지면 `pp`)을 씁니다(`localesOwnTime`). 아니면 시각을 직접 적고, 12시간제의 오전/오후는 locale 이 쓰는 쪽에 둡니다([`periodFirst`](../README.md#date-localets)).
+- `TemporalFormat<V>` 는 `Intl.DateTimeFormatOptions` 이거나 `(value, locale) => string` 입니다. 값 타입 `V` 는 지금 `Date` 이고, 필드가 다른 값 타입을 받게 되면 `V` 만 바꿉니다.
+- `formatter` 는 둘 다 `(date) => string` 으로 바꿉니다. 옵션은 [date-locale](../README.md#date-localets) 의 `dateFormatter` 로 그리고, 함수에는 풀이한 locale 태그를 함께 넘깁니다.
+- 기본 옵션:
 
-| locale, 시간제 | 패턴     | 14:30 의 표시 |
-| -------------- | -------- | ------------- |
-| `ko`, `12h`    | `a h:mm` | 오후 2:30     |
-| `ko`, `24h`    | `p`      | 14:30         |
-| `en-US`, `12h` | `p`      | 2:30 PM       |
+| 이름                     | 옵션                                                                  | ko-KR 14:30 의 표시 |
+| ------------------------ | --------------------------------------------------------------------- | ------------------- |
+| `dateOptions`            | `{ year: 'numeric', month: '2-digit', day: '2-digit' }`               | `2026. 09. 15.`     |
+| `timeOptions('hour')`    | `{ hour: 'numeric' }`                                                 | `오후 2시`          |
+| `timeOptions('minute')`  | `{ hour: 'numeric', minute: '2-digit' }`                              | `오후 2:30`         |
+| `timeOptions('second')`  | `{ hour: 'numeric', minute: '2-digit', second: '2-digit' }`           | `오후 2:30:00`      |
 
-- `ko` 의 기본 시간제는 `Intl` 에서 12시간제지만 date-fns `ko` 의 `p` 는 `HH:mm` 입니다. 그래서 `ko` 의 12시간제는 `p` 를 쓰지 않고 직접 적습니다.
+- 시간제(`cycle`)는 `hour12` 로 옵션에 더합니다(`withHourCycle`). 시를 보여 주는 옵션(`hour` 나 `timeStyle`)에만 더하고, 옵션이 `hour12` 나 `hourCycle` 을 이미 정했으면 그쪽을 둡니다.
+- 날짜와 시각은 한 옵션으로 합쳐 한 번에 그립니다. 둘을 잇는 글자(`, `)와 순서를 locale 이 정합니다.
+- 오전/오후의 자리는 Intl 이 locale 대로 둡니다. 따로 패턴을 만들지 않습니다.
+
+### 알아둘 것
+
+- date-fns 패턴 문자열은 받지 않습니다. 문자열 `format` 은 타입 오류입니다.
+- `hour12` 는 `@internationalized/date` 의 `DateFormatter` 가 Chrome 의 `hour12` 버그를 피해 `hourCycle` 로 바꿔 넘깁니다.

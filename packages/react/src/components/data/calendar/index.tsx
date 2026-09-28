@@ -16,14 +16,11 @@ import {
   ChevronRightIcon,
   ChevronUpIcon,
 } from '@heroicons/react/24/outline';
-import { omit } from 'es-toolkit';
 import {
-  DateLib,
   DayPicker,
   type ChevronProps,
   type CustomComponents,
   type DayButtonProps as DayPickerDayButtonProps,
-  type DayPickerLocale,
   type DayPickerProps,
   type DropdownProps,
   type Formatters,
@@ -44,8 +41,9 @@ import {
   type DateSelection,
   type Matcher,
 } from './date';
+import { dayPickerFormatters, dayPickerLabels } from './day-picker-locale';
 import { useCalendar, type CalendarState } from './use-calendar';
-import { resolveLocale, type DateLocale } from '../../../internal/date-locale';
+import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
 import { invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
@@ -61,8 +59,8 @@ export type CalendarOptions = {
   disabled?: Matcher | Matcher[];
   readOnly?: boolean;
   monthsToShow?: number;
-  locale?: DateLocale;
-  weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  locale?: string;
+  weekStartsOn?: WeekDay;
   captionLayout?: CalendarCaptionLayout;
   size?: IdsSize;
   month?: Date;
@@ -119,23 +117,6 @@ function useCalendarContext(part: string) {
   return context;
 }
 
-const messageLabels: Partial<Labels> = {
-  labelPrevious: () => messages.calendar.previousMonth,
-  labelNext: () => messages.calendar.nextMonth,
-  labelMonthDropdown: () => messages.calendar.month,
-  labelYearDropdown: () => messages.calendar.year,
-  labelWeekNumber: (week) => messages.calendar.weekNumber(week),
-  labelWeekNumberHeader: () => messages.calendar.weekNumberHeader,
-  labelDayButton: (date, modifiers, options, dateLib) =>
-    [
-      modifiers.today && messages.calendar.today,
-      (dateLib ?? new DateLib(options)).format(date, 'PPPP'),
-      modifiers.selected && messages.calendar.selected,
-    ]
-      .filter(Boolean)
-      .join(', '),
-};
-
 export function Calendar(props: CalendarProps) {
   const {
     selectionMode = 'single',
@@ -191,8 +172,7 @@ export function Calendar(props: CalendarProps) {
     dir,
   });
   const { state } = api;
-  const resolved: Partial<DayPickerLocale> = resolveLocale(locale);
-  const localeWithoutEnglishFallback = { ...resolved, labels: resolved.labels ?? {} };
+  const resolvedLocale = resolveLocale(locale);
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = Calendar.Style({ size: resolvedSize });
 
@@ -210,8 +190,9 @@ export function Calendar(props: CalendarProps) {
     >
       <DayPicker
         {...(api.selection as DayPickerProps)}
-        locale={localeWithoutEnglishFallback}
-        weekStartsOn={weekStartsOn}
+        lang={resolvedLocale}
+        locale={{ code: resolvedLocale, labels: {} }}
+        weekStartsOn={weekStartsOn ?? weekStartOf(resolvedLocale)}
         numberOfMonths={monthsToShow}
         month={state.month}
         onMonthChange={api.setMonth}
@@ -262,14 +243,8 @@ export function Calendar(props: CalendarProps) {
           hidden: styles.hidden(),
           footer: styles.footer(),
         }}
-        labels={{
-          ...omit(
-            messageLabels,
-            Object.keys(localeWithoutEnglishFallback.labels) as (keyof Labels)[],
-          ),
-          ...labels,
-        }}
-        formatters={formatters}
+        labels={{ ...dayPickerLabels(resolvedLocale, numerals), ...labels }}
+        formatters={{ ...dayPickerFormatters(resolvedLocale, numerals), ...formatters }}
         components={{
           Root,
           DayButton: CalendarDayButton,

@@ -1,6 +1,5 @@
 import { StrictMode } from 'react';
 
-import { de } from 'date-fns/locale/de';
 import { renderToString } from 'react-dom/server';
 import { expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
@@ -16,7 +15,7 @@ const option = (unit: string, n: number) =>
 const d = (day = 15, hour = 9, minute = 30, second = 0) =>
   new Date(2026, 8, day, hour, minute, second);
 
-test('SSR: display follows format, hourCycle and the date-fns locale; FormData follows precision', () => {
+test('SSR: display follows format, hourCycle and the locale tag; FormData follows precision', () => {
   const at = d(15, 14, 5, 9);
   const html = (props: TimeField.Props) =>
     parse(
@@ -29,16 +28,21 @@ test('SSR: display follows format, hourCycle and the date-fns locale; FormData f
   const text = (props: TimeField.Props) =>
     html({ defaultValue: at, ...props }).querySelector('[role=combobox]')!.textContent;
   expect(text({})).toBe('오후 2:05');
-  expect(text({ format: '12h' })).toBe('오후 2:05');
+  expect(text({ hourCycle: '12h' })).toBe('오후 2:05');
+  expect(text({ hourCycle: '24h' })).toBe('14:05');
   expect(text({ precision: 'second' })).toBe('오후 2:05:09');
+  expect(text({ precision: 'hour' })).toBe('오후 2시');
   expect(text({ locale: 'en-US' })).toBe('2:05 PM');
-  expect(text({ locale: 'en-US', format: '24h' })).toBe('14:05');
-  expect(text({ locale: de })).toBe('14:05');
-  expect(text({ format: 'HH:mm' })).toBe('14:05');
-  expect(text({ format: 'a h:mm', locale: 'en-US' })).toBe('PM 2:05');
-  expect(text({ format: "HH'h' mm'm'" })).toBe('14h 05m');
-  expect(text({ format: '24h', hourCycle: '12h', locale: 'en-US' })).toBe('2:05 PM');
+  expect(text({ locale: 'en-US', hourCycle: '24h' })).toBe('14:05');
+  expect(text({ locale: 'de-DE' })).toBe('14:05');
+  expect(text({ locale: 'de-DE', hourCycle: '12h' })).toMatch(/^2:05\s?PM$/);
+  expect(text({ locale: 'ja-JP' })).toBe('14:05');
+  expect(text({ locale: 'ja-JP', hourCycle: '12h' })).toBe('午後2:05');
+  expect(text({ format: { hour: '2-digit', minute: '2-digit' }, hourCycle: '24h' })).toBe('14:05');
+  expect(text({ format: { hour: 'numeric', hourCycle: 'h23' }, hourCycle: '12h' })).toBe('14시');
+  expect(text({ format: { timeStyle: 'short' }, locale: 'en-US', hourCycle: '24h' })).toBe('14:05');
   expect(text({ format: (date) => `${date.getHours()}시` })).toBe('14시');
+  expect(text({ format: (date, locale) => `${locale} ${date.getHours()}` })).toBe('ko-KR 14');
   const form = (props: TimeField.Props) =>
     new FormData(html({ defaultValue: at, ...props }).querySelector('form')!).get('at');
   expect(form({ precision: 'hour' })).toBe('14');
@@ -47,20 +51,14 @@ test('SSR: display follows format, hourCycle and the date-fns locale; FormData f
   const empty = html({});
   expect(empty.querySelector('[role=combobox]')!.textContent).toBe('시간 선택');
   expect(new FormData(empty.querySelector('form')!).get('at')).toBeNull();
-  expect(() => text({ format: 'HH:mm j' })).toThrow(/unescaped latin alphabet/);
-  expect(() => text({ locale: 'de-DE' })).toThrow(/no built-in date-fns locale/);
+  expect(() => text({ locale: 'de_DE' })).toThrow(/BCP 47/);
 });
 
 test('StrictMode: ArrowDown focuses the first column, picks stay open, Escape and Clear', async () => {
   const changes: (Date | null)[] = [];
   const screen = await render(
     <StrictMode>
-      <TimeField
-        defaultValue={d()}
-        format="HH:mm"
-        hourCycle="24h"
-        onValueChange={(next) => changes.push(next)}
-      />
+      <TimeField defaultValue={d()} hourCycle="24h" onValueChange={(next) => changes.push(next)} />
     </StrictMode>,
   );
   const trigger = screen.getByRole('combobox');

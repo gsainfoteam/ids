@@ -32,9 +32,14 @@ const clockFields = [
 
 test('SSR formatting, local serialization, Field ARIA and diagnostics for both clock fields', () => {
   for (const [field, expected, model] of [
-    [<TimeField name="when" defaultValue={d()} format="HH:mm" />, '09:30', '09:30'],
+    [<TimeField name="when" defaultValue={d()} hourCycle="24h" />, '09:30', '09:30'],
     [
-      <DateTimeField name="when" defaultValue={d()} format="yyyy년 M월 d일 HH:mm" />,
+      <DateTimeField
+        name="when"
+        defaultValue={d()}
+        format={{ dateStyle: 'long', timeStyle: 'short' }}
+        hourCycle="24h"
+      />,
       '2026년 9월 15일 09:30',
       '2026-09-15T09:30',
     ],
@@ -60,9 +65,13 @@ test('SSR formatting, local serialization, Field ARIA and diagnostics for both c
     parse(renderToString(<DateTimeField defaultValue={d(15, 14, 5)} {...props} />)).querySelector(
       '[role=combobox]',
     )!.textContent;
-  expect(shown({})).toBe('2026.09.15 오후 2:05');
-  expect(shown({ locale: 'en-US' })).toBe('09/15/2026 2:05 PM');
-  expect(shown({ hourCycle: '12h' })).toBe('2026.09.15 오후 2:05');
+  expect(shown({})).toBe('2026. 09. 15. 오후 2:05');
+  expect(shown({ locale: 'en-US' })).toBe('09/15/2026, 2:05 PM');
+  expect(shown({ hourCycle: '24h' })).toBe('2026. 09. 15. 14:05');
+  expect(shown({ locale: 'de-DE' })).toBe('15.09.2026, 14:05');
+  expect(shown({ precision: 'second', locale: 'ja-JP' })).toBe('2026/09/15 14:05:00');
+  expect(shown({ format: (date, locale) => `${locale} ${date.getDate()}` })).toBe('ko-KR 15');
+  expect(() => shown({ locale: '-' })).toThrow(/BCP 47/);
   const empty = parse(renderToString(<DateTimeField />));
   expect(empty.querySelector('[role=combobox]')!.textContent).toBe('날짜와 시간 선택');
   expect(() => renderToString(<DateTimeField min={d(16)} max={d(15)} />)).toThrow(/min/);
@@ -111,7 +120,6 @@ test('the calendar keeps the clock time and the clock keeps the day', async () =
       <DateTimeField
         defaultValue={d()}
         today={d()}
-        format="yyyy-MM-dd HH:mm"
         hourCycle="24h"
         step={15}
         onValueChange={(next) => (value = next)}
@@ -126,7 +134,7 @@ test('the calendar keeps the clock time and the clock keeps the day', async () =
   expect([value?.getDate(), value?.getHours(), value?.getMinutes()]).toEqual([18, 14, 30]);
   await expect.element(screen.getByRole('dialog')).toBeVisible();
   await userEvent.keyboard('{Escape}');
-  await expect.element(screen.getByRole('combobox')).toMatchTextContent('2026-09-18 14:30');
+  await expect.element(screen.getByRole('combobox')).toMatchTextContent('2026. 09. 18. 14:30');
 });
 
 test('limits cover the whole moment: first and last day clamp the clock, blocked days skip', async () => {

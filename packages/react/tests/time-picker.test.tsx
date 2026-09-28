@@ -1,4 +1,3 @@
-import { de } from 'date-fns/locale/de';
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
@@ -21,7 +20,7 @@ const periods = (doc: Document) =>
 const OPTION_HEIGHT = 36;
 const scrollSettles = () => new Promise((resolve) => setTimeout(resolve, 200));
 
-test('SSR: Korean names by default, the clock and periods from the date-fns locale, diagnostics', () => {
+test('SSR: Korean names by default, the clock and periods from the locale tag, diagnostics', () => {
   const doc = ssr({ precision: 'second', step: 15 });
   expect(doc.querySelector('[role=group]')!.getAttribute('aria-label')).toBe('시간');
   expect(labels(doc)).toEqual(['오전/오후', '시', '분', '초']);
@@ -32,8 +31,13 @@ test('SSR: Korean names by default, the clock and periods from the date-fns loca
   const english = ssr({ locale: 'en-US' });
   expect(english.querySelector('[data-time-picker]')!.getAttribute('data-format')).toBe('12h');
   expect(periods(english)).toEqual(['AM', 'PM']);
-  expect(ssr({ locale: de }).querySelector('[data-time-column=period]')).toBeNull();
-  expect(() => ssr({ locale: 'de-DE' })).toThrow(/no built-in date-fns locale/);
+  expect(ssr({ locale: 'de-DE' }).querySelector('[data-time-column=period]')).toBeNull();
+  const japanese = ssr({ locale: 'ja-JP', format: '12h' });
+  expect(periods(japanese)).toEqual(['午前', '午後']);
+  expect(labels(japanese)[0]).toBe('오전/오후');
+  expect(labels(ssr({ locale: 'en-US' }))).toEqual(['시', '분', '오전/오후']);
+  expect(periods(ssr({ locale: 'ar-EG' }))).toEqual(['ص', 'م']);
+  expect(() => ssr({ locale: 'en US' })).toThrow(/BCP 47/);
   for (const props of [
     { step: 0 },
     { step: 15, precision: 'hour' },

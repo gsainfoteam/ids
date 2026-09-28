@@ -47,15 +47,16 @@ import { DateTimeField, Field } from '@gsainfoteam/ids-react';
 ## 표시 형식
 
 ```tsx
-<DateTimeField />                                              // ko-KR: 2026.09.15 오후 2:30
-<DateTimeField hourCycle="24h" />                              // 2026.09.15 14:30
-<DateTimeField locale="en-US" />                               // 09/15/2026 2:30 PM
-<DateTimeField format="yyyy년 M월 d일 HH:mm" />               // 2026년 9월 15일 14:30
-<DateTimeField format="EEE, MMM d 'at' h:mm a" hourCycle="12h" locale="en-US" />
+<DateTimeField />                                    // ko-KR: 2026. 09. 15. 오후 2:30
+<DateTimeField hourCycle="24h" />                    // 2026. 09. 15. 14:30
+<DateTimeField locale="en-US" />                     // 09/15/2026, 2:30 PM
+<DateTimeField locale="de-DE" />                     // 15.09.2026, 14:30
+<DateTimeField format={{ dateStyle: 'long', timeStyle: 'short' }} hourCycle="24h" />  // 2026년 9월 15일 14:30
+<DateTimeField format={(date, locale) => date.toLocaleString(locale)} />             // 함수
 ```
 
-- 기본 글자는 locale 의 짧은 날짜(date-fns `P`)와 [TimeField](../time-field/README.md#표시-형식) 의 시각입니다.
-- 패턴은 [date-fns 토큰](https://date-fns.org/docs/format)이고, 함수도 받습니다.
+- 기본 글자는 [DateField](../date-field/README.md#표시-형식) 의 날짜 옵션과 [TimeField](../time-field/README.md#표시-형식) 의 시각 옵션을 합친 한 Intl 형식입니다. 날짜와 시각을 잇는 글자(`, `)도 locale 이 정합니다.
+- `format` 은 Intl 옵션이나 `(date, locale) => string` 입니다. date-fns 패턴 문자열과 `format="12h"` / `"24h"` 는 받지 않습니다. 시간제는 `hourCycle` 입니다.
 - 달력 옵션(`monthsToShow`, `captionLayout`, `weekStartsOn`, `month`, `today`)은 [Calendar](../../data/calendar/README.md), 시계 옵션(`precision`, `step`, `hourCycle`, `pickerVariant`)은 [TimePicker](../../data/time-picker/README.md) 와 같습니다.
 
 ## 폼
@@ -93,10 +94,11 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `open` / `defaultOpen` / `onOpenChange`          | 팝업 열림                              |
 | `min` / `max`                                    | 날짜와 시각을 합친 경계                |
 | `disabled`                                       | `true` 면 필드 전체, matcher 면 날짜별 |
-| `format` / `hourCycle`                           | locale 형식 / locale 시간제            |
+| `format`                                         | locale 날짜와 시각. Intl 옵션이나 함수 |
+| `hourCycle`                                      | locale 시간제. `12h` / `24h`           |
 | `precision` / `step` / `pickerVariant`           | `minute` / `1` / `grid`                |
 | `today`                                          | 마운트한 날. 비어 있을 때의 기준 날    |
-| `locale`                                         | `ko-KR`. 태그나 date-fns `Locale`      |
+| `locale`                                         | `ko-KR`. BCP 47 태그                   |
 | `placeholder`                                    | `날짜와 시간 선택`                     |
 | `name` / `form` / `required`                     | 숨은 값 입력과 브라우저 검증           |
 | `readOnly`                                       | 열기, 고르기, Clear 를 막는다          |

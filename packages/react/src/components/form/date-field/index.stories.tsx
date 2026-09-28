@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { de } from 'date-fns/locale/de';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect, fn, waitFor } from 'storybook/test';
 import { z } from 'zod';
@@ -29,7 +28,7 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     captionLayout: { control: 'radio', options: ['label', 'dropdown'] },
-    locale: { control: 'radio', options: ['ko-KR', 'en-US'] },
+    locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP', 'ar-EG'] },
     mobileVariant: { control: 'radio', options: ['popover', 'drawer'] },
     invalid: { control: 'boolean' },
     required: { control: 'boolean' },
@@ -128,15 +127,15 @@ export const Gallery: Story = {
         <Showcase.Row label="default · ko-KR">
           <DateField defaultValue={new Date(2026, 8, 15)} className="w-72" aria-label="기본" />
         </Showcase.Row>
-        <Showcase.Row label="yyyy년 M월 d일">
+        <Showcase.Row label="Intl options">
           <DateField
-            format="yyyy년 M월 d일 (EEE)"
+            format={{ year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }}
             defaultValue={new Date(2026, 8, 15)}
             className="w-72"
             aria-label="한국어 형식"
           />
         </Showcase.Row>
-        <Showcase.Row label="en-US · de">
+        <Showcase.Row label="en-US · de-DE">
           <DateField
             locale="en-US"
             defaultValue={new Date(2026, 8, 15)}
@@ -144,8 +143,8 @@ export const Gallery: Story = {
             aria-label="English"
           />
           <DateField
-            locale={de}
-            format="PPP"
+            locale="de-DE"
+            format={{ dateStyle: 'long' }}
             defaultValue={new Date(2026, 8, 15)}
             className="w-72"
             aria-label="Deutsch"
@@ -153,10 +152,10 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="function">
           <DateField
-            format={(date) => new Intl.DateTimeFormat('ko-KR', { dateStyle: 'full' }).format(date)}
+            format={(date) => `${date.getMonth() + 1}/${date.getDate()}`}
             defaultValue={new Date(2026, 8, 15)}
             className="w-72"
-            aria-label="Intl"
+            aria-label="함수"
           />
         </Showcase.Row>
       </Showcase.Section>
@@ -165,7 +164,7 @@ export const Gallery: Story = {
 };
 
 export const SelectAndClear: Story = {
-  args: { format: 'yyyy-MM-dd', min: new Date(2026, 8, 1), max: new Date(2026, 8, 30) },
+  args: { min: new Date(2026, 8, 1), max: new Date(2026, 8, 30) },
   parameters: {
     docs: {
       description: {
@@ -181,7 +180,7 @@ export const SelectAndClear: Story = {
     await waitFor(() => expect(day('2026-09-15')).toHaveFocus());
     await userEvent.keyboard('{ArrowRight}{Enter}');
     await expect(args.onValueChange).toHaveBeenLastCalledWith(new Date(2026, 8, 16));
-    await expect(trigger).toHaveTextContent('2026-09-16');
+    await expect(trigger).toHaveTextContent('2026. 09. 16.');
     await expect(trigger).toHaveFocus();
     await expect(document.querySelector('[role=dialog]')).toBeNull();
     await userEvent.click(canvas.getByRole('button', { name: '날짜 지우기' }));
@@ -191,7 +190,7 @@ export const SelectAndClear: Story = {
 };
 
 export const Range: Story = {
-  args: { selectionMode: 'range', monthsToShow: 2, format: 'yyyy-MM-dd', className: cn('w-80') },
+  args: { selectionMode: 'range', monthsToShow: 2, className: cn('w-80') },
   parameters: {
     docs: {
       description: {
@@ -211,7 +210,7 @@ export const Range: Story = {
     await expect(document.querySelector('[role=dialog]')).not.toBeNull();
     await userEvent.keyboard('{Escape}');
     await expect(canvas.getByRole('combobox', { name: '날짜' })).toHaveTextContent(
-      '2026-09-24 – 2026-10-02',
+      '2026. 09. 24. – 2026. 10. 02.',
     );
   },
 };
@@ -222,7 +221,7 @@ export const Birthday: Story = {
     min: new Date(1920, 0, 1),
     max: today,
     defaultMonth: new Date(2000, 0, 1),
-    format: 'yyyy년 M월 d일',
+    format: { dateStyle: 'long' },
     'aria-label': '생년월일',
   },
   parameters: {
@@ -325,7 +324,7 @@ function ReactHookFormExample() {
       >
         <FormField name="date" controlMode="value" required className="w-full">
           <FormField.Label>예약 날짜</FormField.Label>
-          <DateField today={today} format="yyyy-MM-dd" />
+          <DateField today={today} />
           <FormField.Error />
         </FormField>
         <Button type="submit">예약</Button>
@@ -360,7 +359,12 @@ export const ReactHookForm: Story = {
 
 export const Composition: Story = {
   render: () => (
-    <DateField today={today} format="M월 d일 EEEE" aria-label="마감일" className="w-72">
+    <DateField
+      today={today}
+      format={{ month: 'long', day: 'numeric', weekday: 'long' }}
+      aria-label="마감일"
+      className="w-72"
+    >
       <DateField.Trigger>
         <DateField.Value className="font-medium" />
       </DateField.Trigger>
@@ -399,7 +403,9 @@ export const TypedEntry: Story = {
         <DateField.Clear />
         <DateField.Trigger />
       </DateField>
-      <Field.Hint>2000.01.31, 2000-01-31, 2000년 1월 31일, 20000131 모두 됩니다.</Field.Hint>
+      <Field.Hint>
+        2000. 01. 31., 2000-01-31, 2000년 1월 31일, Jan 31 2000, 20000131 모두 됩니다.
+      </Field.Hint>
     </Field>
   ),
   parameters: {
@@ -415,14 +421,14 @@ export const TypedEntry: Story = {
     await userEvent.click(input);
     await userEvent.keyboard('20000131{Enter}');
     await expect(args.onValueChange).toHaveBeenLastCalledWith(new Date(2000, 0, 31));
-    await expect(input).toHaveValue('2000.01.31');
+    await expect(input).toHaveValue('2000. 01. 31.');
     await userEvent.clear(input);
     await userEvent.type(input, '2030-01-01');
     await userEvent.tab();
     await expect(input).toHaveAttribute('aria-invalid', 'true');
     await userEvent.click(input);
     await userEvent.keyboard('{Escape}');
-    await expect(input).toHaveValue('2000.01.31');
+    await expect(input).toHaveValue('2000. 01. 31.');
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(day('2000-01-31')).toHaveFocus());
   },
