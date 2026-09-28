@@ -12,6 +12,12 @@
 | [`sheet-viewport.ts`](#sheet-viewportts) | 좁은 화면의 drawer 판정과 화면 키보드 높이                               |
 | [`focus.ts`](#focusts)                   | 초기 포커스, 포커스 되돌리기, 늘 안으로 치는 요소                        |
 
+## 쓰는 곳
+
+| 쓰는 곳 | 가져가는 것   |
+| ------- | ------------- |
+| Alert   | `usePresence` |
+
 ## 조립하는 법
 
 레이어 하나는 이 순서로 조립합니다.
@@ -115,6 +121,10 @@ raiseWhatStaysAboveLayers();                   // 레이어를 올린 쪽이 부
 ## use-presence.ts
 
 `open` 이 `false` 가 된 뒤에도 나가는 애니메이션이 끝날 때까지 `mounted` 를 `true` 로 둡니다.
+
+### 쓰는 곳
+
+- Alert(`use-alert.ts`)
 
 ### 쓰는 법
 

@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useState, type KeyboardEvent } from 'react'
 import { tabbable } from 'tabbable';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { usePresence } from '../../../internal/overlay/use-presence';
 
 function neighbour(root: HTMLElement) {
   const candidates = tabbable(root.ownerDocument.body).filter(
@@ -21,10 +22,6 @@ function neighbour(root: HTMLElement) {
 
 function releaseFocus(root: HTMLElement) {
   if (root.contains(root.ownerDocument.activeElement)) neighbour(root)?.focus();
-}
-
-function animationsOf(element: HTMLElement) {
-  return typeof element.getAnimations === 'function' ? element.getAnimations() : [];
 }
 
 function useReleaseFocusBeforeRemoval(node: HTMLElement | null) {
@@ -49,26 +46,10 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
     onValueChange: onOpenChange,
   });
 
-  const [lastOpen, setLastOpen] = useState(isOpen);
-  const [ending, setEnding] = useState(false);
-  if (lastOpen !== isOpen) {
-    setLastOpen(isOpen);
-    setEnding(!isOpen);
-  }
+  const { mounted, ending } = usePresence(isOpen, { elements: () => [node] });
 
   useEffect(() => {
-    if (!ending || !node) return;
-    releaseFocus(node);
-    let cancelled = false;
-    const endingStyleFrame = requestAnimationFrame(() => {
-      Promise.allSettled(animationsOf(node).map((animation) => animation.finished)).then(() => {
-        if (!cancelled) setEnding(false);
-      });
-    });
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(endingStyleFrame);
-    };
+    if (ending && node) releaseFocus(node);
   }, [ending, node]);
 
   useReleaseFocusBeforeRemoval(node);
@@ -88,7 +69,7 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
   return {
     setNode,
     open: isOpen,
-    mounted: isOpen || ending,
+    mounted,
     ending,
     close,
     onKeyDown,
