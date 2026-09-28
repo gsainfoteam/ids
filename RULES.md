@@ -268,6 +268,8 @@ input, which fires no change event on reset.
 
 **Overlays.** A modal backdrop closes on `click`, not `pointerdown`; closing earlier lets the
 same press land on the page underneath and pulls focus away from the trigger it was returned to.
+A press outside a field popup blurs the element focused inside it before closing: React ignores
+the blur fired while it removes that element, so the field would never report `onBlur`.
 
 **Nested fields.** A field drawn inside another field's shell (TelField's country Select) turns
 its own ring off, so only the outer shell rings.

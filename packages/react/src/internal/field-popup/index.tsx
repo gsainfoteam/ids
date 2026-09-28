@@ -50,6 +50,12 @@ const VIEWPORT_MARGIN = 8;
 
 const isNodeFromAnyWindow = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'nodeType' in value;
+
+function blurWhileReactStillListens(popup: HTMLElement) {
+  const focused = popup.ownerDocument.activeElement;
+  const view = popup.ownerDocument.defaultView;
+  if (view && focused instanceof view.HTMLElement && popup.contains(focused)) focused.blur();
+}
 const MIN_HEIGHT = 120;
 const DRAWER_MAX_HEIGHT = 520;
 
@@ -216,7 +222,9 @@ export function FieldPopup({
     const onPointerDown = (event: PointerEvent) => {
       if (closesOnBackdropClickInstead) return;
       closedByOutsidePress = outside(event.target);
-      if (closedByOutsidePress) close.current(false);
+      if (!closedByOutsidePress) return;
+      blurWhileReactStillListens(node);
+      close.current(false);
     };
     const onFocusIn = (event: FocusEvent) => {
       if (!drawer && !closedByOutsidePress && outside(event.target)) close.current(false);
