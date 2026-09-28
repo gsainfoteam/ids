@@ -12,6 +12,8 @@ export type FormValueProps = {
   message?: string;
 };
 
+const readOnlyWouldBarValidation = noop;
+
 export function FormValue({
   name,
   form,
@@ -24,6 +26,7 @@ export function FormValue({
   const values = value == null ? [] : typeof value === 'string' ? [value] : [...value];
   const filled = values.filter((entry) => entry !== '');
   const missing = message !== undefined && filled.length === 0 ? message : '';
+  const passFocusToControl = () => anchor.current?.focus();
 
   return (
     <>
@@ -46,8 +49,8 @@ export function FormValue({
           required
           form={form}
           value={filled.join(',')}
-          onChange={noop}
-          onFocus={() => anchor.current?.focus()}
+          onChange={readOnlyWouldBarValidation}
+          onFocus={passFocusToControl}
           data-form-value-validator=""
           className="pointer-events-none absolute inset-0 size-full opacity-0"
         />
