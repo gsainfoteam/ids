@@ -34,6 +34,16 @@ export { Menu } from './components/overlay/menu';
 export { Popover } from './components/overlay/popover';
 export { Tooltip, TooltipDelayGroup } from './components/overlay/tooltip';
 export {
+  Toaster,
+  toast,
+  type ToastAction,
+  type ToastId,
+  type ToastOptions,
+  type ToastPromiseMessages,
+  type ToastRecord,
+  type ToasterHotkey,
+} from './components/feedback/toast';
+export {
   overlay,
   useOverlay,
   type OverlayControls,
