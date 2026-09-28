@@ -19,6 +19,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const orientations = ['vertical', 'horizontal'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
+const noPasswordManager = { 'data-1p-ignore': '', 'data-lpignore': 'true' } as const;
+
 const meta = {
   title: 'Form/Field',
   component: Field,
@@ -162,8 +164,7 @@ function NativeValidationExample() {
           name="email"
           required
           placeholder="name@example.com"
-          data-1p-ignore=""
-          data-lpignore="true"
+          {...noPasswordManager}
         />
         <Field.Hint>브라우저의 기본 검증을 그대로 씁니다.</Field.Hint>
         <Field.Error />
@@ -326,7 +327,7 @@ function RhfExample() {
       >
         <RhfField name="email" required registerOptions={{ required: '이메일을 입력하세요.' }}>
           <RhfField.Label>이메일</RhfField.Label>
-          <TextField type="email" data-1p-ignore="" data-lpignore="true" />
+          <TextField type="email" {...noPasswordManager} />
           <RhfField.Hint>회사 이메일을 권장합니다.</RhfField.Hint>
           <RhfField.Error />
         </RhfField>
