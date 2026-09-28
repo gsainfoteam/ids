@@ -122,8 +122,8 @@ export function usePasswordField({
     const form = inputRef.current?.form;
     if (!form) return;
     let active = true;
-    const onReset = (event: Event) =>
-      queueMicrotask(() => {
+    const hideOnceResetCannotBeCancelled = (event: Event) =>
+      setTimeout(() => {
         if (active && !event.defaultPrevented) latestSetVisible.current(false);
       });
     const hideBeforePasswordManagersRead = () => {
@@ -131,11 +131,11 @@ export function usePasswordField({
       if (node && node.type !== 'password') node.type = 'password';
       latestSetVisible.current(false);
     };
-    form.addEventListener('reset', onReset);
+    form.addEventListener('reset', hideOnceResetCannotBeCancelled);
     form.addEventListener('submit', hideBeforePasswordManagersRead, true);
     return () => {
       active = false;
-      form.removeEventListener('reset', onReset);
+      form.removeEventListener('reset', hideOnceResetCannotBeCancelled);
       form.removeEventListener('submit', hideBeforePasswordManagersRead, true);
     };
   }, [native.form]);
