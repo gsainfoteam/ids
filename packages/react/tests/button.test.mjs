@@ -163,19 +163,23 @@ test('asChild renders the child with the button style; the child class and handl
 
 test('a disabled asChild link drops href and the tab stop and blocks every activation', async () => {
   const calls = [];
-  const record = (name) => () => calls.push(name);
+  const recordInsteadOfThrow = (name) => () => calls.push(name);
   await render(
     h(
       Button,
       {
         asChild: true,
         disabled: true,
-        onClick: record('root click'),
-        onKeyDown: record('root key'),
+        onClick: recordInsteadOfThrow('root click'),
+        onKeyDown: recordInsteadOfThrow('root key'),
       },
       h(
         'a',
-        { href: '#danger', onClick: record('child click'), onKeyDown: record('child key') },
+        {
+          href: '#danger',
+          onClick: recordInsteadOfThrow('child click'),
+          onKeyDown: recordInsteadOfThrow('child key'),
+        },
         '준비 중',
       ),
     ),

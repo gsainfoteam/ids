@@ -98,16 +98,16 @@ test('asChild forwards both refs with cleanup and composes child/root handlers',
 });
 test('child cancellation prevents root action', async () => {
   const calls = [];
-  const record = (name) => () => calls.push(name);
+  const recordInsteadOfThrow = (name) => () => calls.push(name);
   await render(
     h(
       FloatingButton,
-      { asChild: true, onClick: record('root') },
+      { asChild: true, onClick: recordInsteadOfThrow('root') },
       h(
         'button',
         {
           onClick: (e) => {
-            record('child')();
+            recordInsteadOfThrow('child')();
             e.preventDefault();
           },
         },
@@ -120,12 +120,25 @@ test('child cancellation prevents root action', async () => {
 });
 test('disabled links remove href and block child/root keyboard and click actions', async () => {
   const calls = [];
-  const record = (name) => () => calls.push(name);
+  const recordInsteadOfThrow = (name) => () => calls.push(name);
   await render(
     h(
       FloatingButton,
-      { asChild: true, disabled: true, onClick: record('root'), onKeyDown: record('root') },
-      h('a', { href: '#danger', onClick: record('child'), onKeyDown: record('child') }, '비활성'),
+      {
+        asChild: true,
+        disabled: true,
+        onClick: recordInsteadOfThrow('root'),
+        onKeyDown: recordInsteadOfThrow('root'),
+      },
+      h(
+        'a',
+        {
+          href: '#danger',
+          onClick: recordInsteadOfThrow('child'),
+          onKeyDown: recordInsteadOfThrow('child'),
+        },
+        '비활성',
+      ),
     ),
   );
   assert.equal(button().hasAttribute('href'), false);
