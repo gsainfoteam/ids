@@ -51,11 +51,11 @@ export function useInteractive<E extends Element = Element>({
   onKeyUp,
 }: UseInteractiveOptions<E> = {}) {
   const [state, setState] = useState(INTERACTIVE_INIT);
-  const [wasDisabled, setWasDisabled] = useState(disabled);
-  if (disabled !== wasDisabled) {
-    setWasDisabled(disabled);
-    if (disabled && (state.hovered || state.active))
-      setState((s) => ({ ...s, hovered: false, active: false }));
+  const [disabledBefore, setDisabledBefore] = useState(disabled);
+  if (disabled !== disabledBefore) {
+    setDisabledBefore(disabled);
+    const stuckWithoutPointerEvents = disabled && (state.hovered || state.active);
+    if (stuckWithoutPointerEvents) setState((s) => ({ ...s, hovered: false, active: false }));
   }
   const interactiveState: InteractiveState = {
     ...state,
@@ -152,7 +152,7 @@ function kebabCase(key: string) {
 
 export function interactiveDataProps(state: Record<string, boolean>) {
   const { hovered, active, pressed, ...rest } = state;
-  const forDom = {
+  const pressedOverActiveOverHovered = {
     ...rest,
     pressed: Boolean(pressed),
     active: Boolean(active && !pressed),
@@ -160,7 +160,9 @@ export function interactiveDataProps(state: Record<string, boolean>) {
   };
 
   return Object.fromEntries(
-    Object.keys(pickBy(forDom, Boolean)).map((key) => [`data-${kebabCase(key)}`, ''] as const),
+    Object.keys(pickBy(pressedOverActiveOverHovered, Boolean)).map(
+      (key) => [`data-${kebabCase(key)}`, ''] as const,
+    ),
   ) as Record<`data-${string}`, ''>;
 }
 
@@ -201,7 +203,7 @@ export function resolveInteractiveValue<T>(
   return isFunction(value) ? (value as (state: InteractiveState) => T)(state) : value;
 }
 
-const SKIP_RESOLVE = /^(on[A-Z].*|formAction|ref)$/;
+const CALLBACK_PROPS = /^(on[A-Z].*|formAction|ref)$/;
 
 export function resolveInteractiveProps<P extends Record<string, unknown>>(
   props: P,
@@ -211,7 +213,7 @@ export function resolveInteractiveProps<P extends Record<string, unknown>>(
 
   for (const key of Object.keys(props)) {
     const value = props[key];
-    if (isFunction(value) && SKIP_RESOLVE.test(key)) continue;
+    if (isFunction(value) && CALLBACK_PROPS.test(key)) continue;
     if (isFunction(value)) {
       (resolved as Record<string, unknown>)[key] = value(state);
     }
