@@ -115,7 +115,8 @@ export function useLabel({ id, htmlFor, disabled, required, ref }: UseLabelOptio
   useEffect(() => {
     if (!isDevelopment || !node || fieldLabel) return;
     const control = controlOf(node, htmlFor);
-    if (insideField && !(control && node.contains(control)))
+    const wrapsItsControl = control !== null && node.contains(control);
+    if (insideField && !wrapsItsControl)
       console.warn('[IDS] Label: inside a Field, use Field.Label instead.');
     else if (!control)
       console.warn('[IDS] Label: it is not linked to a control. Wrap the control or set htmlFor.');
