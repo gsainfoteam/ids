@@ -55,6 +55,8 @@ export type ChipFieldState = {
 
 export type ChipFieldItemState = { selected: boolean; highlighted: boolean; disabled: boolean };
 
+type ChipSubmissionProps = 'name' | 'form' | 'required';
+
 export type ChipFieldInputProps = Omit<
   ComponentProps<'input'>,
   | 'type'
@@ -62,9 +64,7 @@ export type ChipFieldInputProps = Omit<
   | 'value'
   | 'defaultValue'
   | 'onChange'
-  | 'name'
-  | 'form'
-  | 'required'
+  | ChipSubmissionProps
   | 'children'
   | 'className'
   | 'style'
@@ -84,7 +84,7 @@ type Context = {
   drawer: boolean;
   inputProps: ChipFieldInputProps;
   inputDefaults: InputAttributes;
-  control: InputAttributes;
+  comboboxWiring: InputAttributes;
   listLabel: { 'aria-label'?: string; 'aria-labelledby'?: string };
   removeLabel: (label: string) => string;
   size: IdsSize;
@@ -101,6 +101,10 @@ function useChip(name: string) {
 }
 
 const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
+
+const keepFocusWhereItIs = (event: PointerEvent) => event.preventDefault();
+
+const cancelChipFocusMove = (event: Chip.RemoveEvent) => event.preventDefault();
 
 function isPopupPart(node: ReactNode) {
   return POPUP_PARTS.some((type) => isType(type)(node));
@@ -171,9 +175,8 @@ export function ChipField({
   style,
   ...rootInputProps
 }: ChipField.Props) {
-  const { onChange: _nativeChange, ...inputProps } = rootInputProps as ChipFieldInputProps & {
-    onChange?: unknown;
-  };
+  const { onChange: _wouldRecordQueryAsValue, ...inputProps } =
+    rootInputProps as ChipFieldInputProps & { onChange?: unknown };
   invariant(
     maxCount === undefined || (Number.isInteger(maxCount) && maxCount >= 0),
     '`<ChipField>` `maxCount` must be a non-negative integer.',
@@ -246,7 +249,7 @@ export function ChipField({
     'aria-invalid': isInvalid || undefined,
     'aria-required': required || undefined,
   };
-  const control: InputAttributes & Record<`data-${string}`, string> = {
+  const comboboxWiring: InputAttributes & Record<`data-${string}`, string> = {
     'data-chip-field-input': '',
     'data-field-input': '',
     id: typeof merged.id === 'string' ? merged.id : `ids-chip-${fallbackId}-input`,
@@ -286,7 +289,7 @@ export function ChipField({
         drawer,
         inputProps,
         inputDefaults,
-        control,
+        comboboxWiring,
         listLabel,
         removeLabel,
         size: resolvedSize,
@@ -365,7 +368,7 @@ function Chips() {
         onRemove={
           removable
             ? (event) => {
-                event.preventDefault();
+                cancelChipFocusMove(event);
                 c.field.handlers.onChipRemove(item);
               }
             : undefined
@@ -401,7 +404,7 @@ function ChipInput({
   const { inputRef } = c;
 
   const props = {
-    ...mergeProps(mergeProps(c.inputDefaults, mergeProps(c.inputProps, rest)), c.control),
+    ...mergeProps(mergeProps(c.inputDefaults, mergeProps(c.inputProps, rest)), c.comboboxWiring),
     className: c.styles.input({ className }),
     style,
   };
@@ -519,7 +522,7 @@ function ChipItem({
           'data-highlighted': state.highlighted ? '' : undefined,
           'data-disabled': state.disabled ? '' : undefined,
           className: c.styles.item({ className: resolveState(className, state) }),
-          onPointerDown: (event: PointerEvent) => event.preventDefault(),
+          onPointerDown: keepFocusWhereItIs,
           onPointerMove: (event: PointerEvent) => {
             if (event.pointerType === 'mouse' && !state.disabled && !state.highlighted)
               actions.highlight(value);
@@ -599,7 +602,7 @@ function ChipCreate({ asChild, children, className, ...props }: ChipField.Create
       'data-highlighted': s.activeCandidate === CREATE ? '' : undefined,
       'data-invalid': error ? '' : undefined,
       className: c.styles.create({ className }),
-      onPointerDown: (event: PointerEvent) => event.preventDefault(),
+      onPointerDown: keepFocusWhereItIs,
       onPointerMove: (event: PointerEvent) => {
         if (event.pointerType === 'mouse' && !error) actions.highlight(CREATE);
       },
