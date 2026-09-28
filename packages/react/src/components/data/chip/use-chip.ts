@@ -41,7 +41,8 @@ export function useChip({
     if (disabled || !onRemove) return;
     const next = chip?.contains(document.activeElement) ? chipToFocusAfter(chip) : null;
     onRemove(event);
-    if (next && !event.defaultPrevented)
+    const parentMovesFocus = event.defaultPrevented;
+    if (next && !parentMovesFocus)
       requestAnimationFrame(() => {
         if (chip && !chip.isConnected && next.isConnected) next.focus();
       });

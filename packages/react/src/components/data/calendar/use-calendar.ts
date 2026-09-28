@@ -84,6 +84,8 @@ function validateOptions({
   );
 }
 
+const YEAR_MENU_REACH = 100;
+
 const toDayPicker = (range: DateRange | null): DayPickerRange | undefined =>
   range?.start ? { from: range.start, to: range.end ?? undefined } : undefined;
 const fromDayPicker = (range: DayPickerRange | undefined): DateRange | null =>
@@ -113,8 +115,8 @@ export function useCalendar(options: UseCalendarOptions) {
     onValueChange: options.onMonthChange,
   });
 
-  const startMonth = min ?? (dropdown ? startOfYear(addYears(today, -100)) : undefined);
-  const endMonth = max ?? (dropdown ? endOfYear(addYears(today, 100)) : undefined);
+  const startMonth = min ?? (dropdown ? startOfYear(addYears(today, -YEAR_MENU_REACH)) : undefined);
+  const endMonth = max ?? (dropdown ? endOfYear(addYears(today, YEAR_MENU_REACH)) : undefined);
 
   const change = (next: CalendarValue, day: Date) => {
     if (readOnly || allDisabled) return;
@@ -147,13 +149,14 @@ export function useCalendar(options: UseCalendarOptions) {
   const [hovered, setHovered] = useState<Date | null>(null);
   const [focused, setFocused] = useState<Date | null>(null);
   const range = selectionMode === 'range' ? (value as DateRange | null) : null;
-  const target = range?.start && !range.end && !readOnly ? (hovered ?? focused) : null;
+  const previewEnd = range?.start && !range.end && !readOnly ? (hovered ?? focused) : null;
   const preview =
-    range?.start && target && !isSameDay(range.start, target)
-      ? isBefore(target, range.start)
-        ? { from: target, to: range.start }
-        : { from: range.start, to: target }
+    range?.start && previewEnd && !isSameDay(range.start, previewEnd)
+      ? isBefore(previewEnd, range.start)
+        ? { from: previewEnd, to: range.start }
+        : { from: range.start, to: previewEnd }
       : undefined;
+  const letPreviewFollowFocus = () => setHovered(null);
   const modifiers = (own?: Record<string, Matcher | Matcher[] | undefined>) => ({
     ...own,
     ...(preview && {
@@ -195,7 +198,7 @@ export function useCalendar(options: UseCalendarOptions) {
     onGridMouseLeave: () => setHovered(null),
     onDayFocus: (day: Date) => setFocused(day),
     onDayBlur: () => setFocused(null),
-    onDayKeyDown: () => setHovered(null),
+    onDayKeyDown: letPreviewFollowFocus,
   };
 }
 

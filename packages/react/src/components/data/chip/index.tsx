@@ -23,7 +23,7 @@ import {
 import { messages } from '../../../internal/messages';
 import { resolveState, type StateValue } from '../../../internal/state-props';
 import { useRegisteredId } from '../../../internal/surface';
-import { flattenFragments, invariant, mergeRefs, tv } from '../../../utils';
+import { cn, flattenFragments, invariant, mergeRefs, tv } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { Slot } from '../../utility/slot';
 
@@ -262,6 +262,8 @@ export namespace Chip {
     const context = useChipContext('Chip.Close');
     const closeId = useRegisteredId(undefined, id);
     const glyph = children ?? <XMarkIcon />;
+    const chipLabelThenOwnLabel =
+      ariaLabel === undefined && context.labelId ? `${context.labelId} ${closeId}` : undefined;
 
     if (context.rootIsButton)
       return (
@@ -286,9 +288,7 @@ export namespace Chip {
         colorScheme={context.colorScheme}
         size={context.size}
         aria-label={ariaLabel ?? messages.chip.remove}
-        aria-labelledby={
-          ariaLabel === undefined && context.labelId ? `${context.labelId} ${closeId}` : undefined
-        }
+        aria-labelledby={chipLabelThenOwnLabel}
         disabled={context.disabled}
         data-chip-close=""
         icon={isValidElement(glyph) ? glyph : <>{glyph}</>}
@@ -310,6 +310,9 @@ export namespace Chip {
     export type Props = Omit<ComponentProps<'button'>, 'type'>;
   }
 
+  const pointerHover = cn('hover:bg-current/15 hover:opacity-100');
+  const replacesIconButtonFill = cn('data-hovered:bg-current/15 data-active:bg-current/15');
+
   export const Style = tv({
     slots: {
       root: [
@@ -321,7 +324,8 @@ export namespace Chip {
       label: 'min-w-0 truncate',
       close: [
         'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60',
-        'hover:bg-current/15 hover:opacity-100 data-hovered:bg-current/15 data-active:bg-current/15',
+        pointerHover,
+        replacesIconButtonFill,
         'transition-[opacity,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
         '[&_svg]:size-[0.95em]',
       ],

@@ -13,7 +13,7 @@ export function Button(props: Button.Props) {
   const {
     props: { variant: ownVariant, colorScheme, size, className, style, ...rest },
     render,
-  } = useButton(props, 'Button', { checkContent: true });
+  } = useButton(props, 'Button', { warnWithoutText: true });
   const variant = ownVariant ?? group?.variant ?? 'solid';
   const resolvedSize = size ?? group?.size ?? 'standard';
 

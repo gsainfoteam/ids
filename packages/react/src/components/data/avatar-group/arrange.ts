@@ -37,7 +37,8 @@ export function arrangeAvatarGroup({
   const visible = avatars.slice(0, limit);
   const hidden = Math.max(total ?? 0, avatars.length) - visible.length;
   const names = avatars.slice(visible.length).map(nameOf);
-  const hiddenNames = names.length === hidden && names.every(Boolean) ? (names as string[]) : [];
+  const namesCoverAllHidden = names.length === hidden && names.every(Boolean);
+  const hiddenNames = namesCoverAllHidden ? (names as string[]) : [];
 
   const overflowFirst = overflowIndex === 0;
   const ordered: { node: ReactNode | null }[] = visible.map((node) => ({ node }));

@@ -10,7 +10,7 @@ export type RovingElement = RovingItem & { element: HTMLElement };
 
 type Options = {
   rootRef: RefObject<HTMLElement | null>;
-  itemSelector: string;
+  ownItemSelector: string;
   orientation: GroupOrientation;
   loop: boolean;
   radio: boolean;
@@ -46,7 +46,7 @@ function isRtl(element: HTMLElement) {
 
 export function useRovingFocus({
   rootRef,
-  itemSelector,
+  ownItemSelector,
   orientation,
   loop,
   radio,
@@ -59,7 +59,7 @@ export function useRovingFocus({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
-    const scanned = scan(rootRef.current, itemSelector);
+    const scanned = scan(rootRef.current, ownItemSelector);
     elements.current = scanned;
     setItems((previous) =>
       sameItems(previous, scanned)
@@ -80,7 +80,7 @@ export function useRovingFocus({
     if (!root) return;
     const move = rovingMove(event.key, { orientation, rtl: isRtl(root), anyArrow: radio });
     if (!move) return;
-    const scanned = scan(root, itemSelector);
+    const scanned = scan(root, ownItemSelector);
     const from = scanned.findIndex(({ element }) => element === event.currentTarget);
     if (from === -1) return;
     event.preventDefault();

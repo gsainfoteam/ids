@@ -27,6 +27,13 @@ function animationsOf(element: HTMLElement) {
   return typeof element.getAnimations === 'function' ? element.getAnimations() : [];
 }
 
+function useReleaseFocusBeforeRemoval(node: HTMLElement | null) {
+  useLayoutEffect(() => {
+    if (!node) return;
+    return () => releaseFocus(node);
+  }, [node]);
+}
+
 export type UseAlertOptions = {
   open?: boolean;
   defaultOpen: boolean;
@@ -53,21 +60,18 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
     if (!ending || !node) return;
     releaseFocus(node);
     let cancelled = false;
-    const frame = requestAnimationFrame(() => {
+    const endingStyleFrame = requestAnimationFrame(() => {
       Promise.allSettled(animationsOf(node).map((animation) => animation.finished)).then(() => {
         if (!cancelled) setEnding(false);
       });
     });
     return () => {
       cancelled = true;
-      cancelAnimationFrame(frame);
+      cancelAnimationFrame(endingStyleFrame);
     };
   }, [ending, node]);
 
-  useLayoutEffect(() => {
-    if (!node) return;
-    return () => releaseFocus(node);
-  }, [node]);
+  useReleaseFocusBeforeRemoval(node);
 
   const close = () => {
     if (node) releaseFocus(node);

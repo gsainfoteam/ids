@@ -65,7 +65,7 @@ type ChildProps = {
 };
 
 type Options = {
-  checkContent?: boolean;
+  warnWithoutText?: boolean;
 };
 
 function kindOf(element: ReactElement | undefined): ButtonKind {
@@ -79,6 +79,18 @@ const isActivationKey = (key: string) => key === 'Enter' || key === ' ';
 function blockActivation(event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) {
   event.preventDefault();
   event.stopPropagation();
+}
+
+function blockChildActivation(merged: Record<string, unknown>) {
+  const keyDown = merged.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined;
+  merged.onClick = blockActivation;
+  merged.onKeyDown = (event: KeyboardEvent<HTMLElement>) =>
+    isActivationKey(event.key) ? blockActivation(event) : keyDown?.(event);
+}
+
+function removeHrefKeepingLinkRole(merged: Record<string, unknown>) {
+  merged.href = undefined;
+  merged.role = merged.role ?? 'link';
 }
 
 export function useButton<P extends object>(props: P, name: string, options: Options = {}) {
@@ -110,7 +122,7 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
   const nativeDisabled = disabled && kind === 'button' && !focusableWhenDisabled;
   const softDisabled = disabled && !nativeDisabled;
 
-  const parent = use(ButtonNestingContext);
+  const enclosingButton = use(ButtonNestingContext);
   const nodeRef = useRef<HTMLElement>(null);
   const mergedRef = useCallback(
     (node: HTMLElement | null) => mergeRefs<HTMLElement>(nodeRef, ref, childRef)(node),
@@ -118,16 +130,16 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
   );
 
   useEffect(() => {
-    if (isDevelopment && parent !== null)
+    if (isDevelopment && enclosingButton !== null)
       console.warn(
-        `[IDS] ${name}: a button cannot sit inside ${parent}. Place them side by side, or group them with ButtonGroup.`,
+        `[IDS] ${name}: a button cannot sit inside ${enclosingButton}. Place them side by side, or group them with ButtonGroup.`,
       );
-  }, [name, parent]);
+  }, [name, enclosingButton]);
 
   const warnedContent = useRef(false);
   useEffect(() => {
     const node = nodeRef.current;
-    if (!isDevelopment || !options.checkContent || warnedContent.current || !node) return;
+    if (!isDevelopment || !options.warnWithoutText || warnedContent.current || !node) return;
     if (node.textContent?.trim()) return;
     warnedContent.current = true;
     console.warn(
@@ -180,14 +192,8 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
     merged.className = cn(view.className, childProps.className);
     merged.style = { ...view.style, ...childProps.style };
     if (softDisabled) {
-      const keyDown = merged.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined;
-      merged.onClick = blockActivation;
-      merged.onKeyDown = (event: KeyboardEvent<HTMLElement>) =>
-        isActivationKey(event.key) ? blockActivation(event) : keyDown?.(event);
-      if (kind === 'link') {
-        merged.href = undefined;
-        merged.role = merged.role ?? 'link';
-      }
+      blockChildActivation(merged);
+      if (kind === 'link') removeHrefKeepingLinkRole(merged);
     }
     return cloneElement(element, merged, nested);
   }

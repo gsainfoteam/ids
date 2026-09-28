@@ -23,7 +23,7 @@ import { initialsOf } from './initials';
 import {
   useAvatarStatus,
   useFallbackVisible,
-  useImageSettled,
+  useImageSettledBeforeMount,
   type AvatarStatus,
 } from './use-avatar';
 import { resolveState, type StateValue } from '../../../internal/state-props';
@@ -54,6 +54,7 @@ function useAvatarContext(part: string) {
 }
 
 const FALLBACK_DELAY = 600;
+const NOT_IN_STACK = undefined;
 
 export function Avatar({
   src,
@@ -112,7 +113,7 @@ export function Avatar({
         className={styles.root({ className: resolveState(className, state) })}
         style={resolveState(style, state)}
       >
-        <AvatarCutoutContext value={undefined}>
+        <AvatarCutoutContext value={NOT_IN_STACK}>
           {image === undefined && imageSrc ? <Avatar.Image /> : null}
           {nodes}
           {hasFallback ? null : <Avatar.Fallback />}
@@ -149,7 +150,7 @@ export namespace Avatar {
       (node: HTMLImageElement | null) => mergeRefs(imageRef, ref)(node),
       [ref],
     );
-    useImageSettled(imageRef, current, report);
+    useImageSettledBeforeMount(imageRef, current, report);
 
     if (!current || state.status === 'error') return null;
     return (

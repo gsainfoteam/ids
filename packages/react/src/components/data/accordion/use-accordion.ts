@@ -115,6 +115,8 @@ export function useAccordionItem({
   };
 }
 
+const TRANSITION_END_GRACE = 50;
+
 function toMilliseconds(time: string) {
   const amount = Number.parseFloat(time);
   if (Number.isNaN(amount)) return 0;
@@ -160,10 +162,13 @@ export function useAccordionPanel({
     };
     const wait = transitionTime(panel);
     panel.addEventListener('transitionend', onEnd);
-    const timer = window.setTimeout(finish, wait === 0 ? 0 : wait + 50);
+    const transitionEndFallback = window.setTimeout(
+      finish,
+      wait === 0 ? 0 : wait + TRANSITION_END_GRACE,
+    );
     return () => {
       panel.removeEventListener('transitionend', onEnd);
-      window.clearTimeout(timer);
+      window.clearTimeout(transitionEndFallback);
     };
   }, [closing]);
 
@@ -180,13 +185,13 @@ export function useAccordionPanel({
   useLayoutEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
-    const onBeforeMatch = () =>
+    const expandBeforeBrowserScrolls = () =>
       flushSync(() => {
         setInstant(true);
         revealRef.current();
       });
-    panel.addEventListener('beforematch', onBeforeMatch);
-    return () => panel.removeEventListener('beforematch', onBeforeMatch);
+    panel.addEventListener('beforematch', expandBeforeBrowserScrolls);
+    return () => panel.removeEventListener('beforematch', expandBeforeBrowserScrolls);
   }, []);
   useEffect(() => {
     if (!instant) return;

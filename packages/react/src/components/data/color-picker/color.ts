@@ -31,6 +31,8 @@ const toHsv = converter('hsv');
 const toOklch = converter('oklch');
 const withAlpha = (color: Rgb): Rgb => ({ ...color, alpha: color.alpha ?? 1 });
 const distance = differenceEuclidean('rgb', [1, 1, 1, 1]);
+const ROUND_TRIP_TOLERANCE = 0.01;
+const HEX_WITHOUT_HASH = /^(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const fine = round(4);
 const coarse = round(2);
 
@@ -41,9 +43,7 @@ export function parseColor(value: string): Rgb | undefined {
 
 export function parseColorInput(text: string) {
   const trimmed = text.trim();
-  return parseColor(
-    /^(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(trimmed) ? `#${trimmed}` : trimmed,
-  );
+  return parseColor(HEX_WITHOUT_HASH.test(trimmed) ? `#${trimmed}` : trimmed);
 }
 
 export function serializeColor(color: Rgb, format: ColorFormat, alpha: boolean): string {
@@ -73,7 +73,8 @@ export function rgbaToHsva(color: Rgb, previous?: HSVA): HSVA {
 
 export const hsvaToRgba = ({ h, s, v, a }: HSVA): Rgb => toRgb({ mode: 'hsv', h, s, v, alpha: a });
 
-export const sameColor = (a: Rgb, b: Rgb) => distance(withAlpha(a), withAlpha(b)) < 0.01;
+export const sameColor = (a: Rgb, b: Rgb) =>
+  distance(withAlpha(a), withAlpha(b)) < ROUND_TRIP_TOLERANCE;
 
 export const cssColor = (color: Rgb) => formatRgb(color);
 

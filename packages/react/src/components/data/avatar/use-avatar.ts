@@ -37,7 +37,18 @@ export function useAvatarStatus(
   return { status, report };
 }
 
-export function useImageSettled(
+function settleSizelessImage(image: HTMLImageElement, settle: (status: AvatarStatus) => void) {
+  if (typeof image.decode !== 'function') {
+    settle('error');
+    return;
+  }
+  image.decode().then(
+    () => settle('loaded'),
+    () => settle('error'),
+  );
+}
+
+export function useImageSettledBeforeMount(
   imageRef: RefObject<HTMLImageElement | null>,
   src: string | undefined,
   report: (src: string, status: AvatarStatus) => void,
@@ -49,14 +60,7 @@ export function useImageSettled(
       report(src, 'loaded');
       return;
     }
-    if (typeof image.decode !== 'function') {
-      report(src, 'error');
-      return;
-    }
-    image.decode().then(
-      () => report(src, 'loaded'),
-      () => report(src, 'error'),
-    );
+    settleSizelessImage(image, (status) => report(src, status));
   }, [imageRef, src, report]);
 }
 

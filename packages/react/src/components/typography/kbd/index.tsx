@@ -21,7 +21,7 @@ function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
   return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
 }
 
-function Named({ glyph, name }: { glyph: string; name: string }) {
+function GlyphReadAsName({ glyph, name }: { glyph: string; name: string }) {
   return (
     <>
       <span aria-hidden="true">{glyph}</span>
@@ -34,7 +34,7 @@ function Face({ keyInfo, name }: { keyInfo: ResolvedKey; name: (label: KbdLabel)
   return keyInfo.label === undefined ? (
     keyInfo.glyph
   ) : (
-    <Named glyph={keyInfo.glyph} name={name(keyInfo.label)} />
+    <GlyphReadAsName glyph={keyInfo.glyph} name={name(keyInfo.label)} />
   );
 }
 
@@ -92,7 +92,7 @@ export function Kbd({
         segment.label === undefined ? (
           segment.text
         ) : (
-          <Named key={index} glyph={segment.text} name={name(segment.label)} />
+          <GlyphReadAsName key={index} glyph={segment.text} name={name(segment.label)} />
         ),
       )
     ) : (

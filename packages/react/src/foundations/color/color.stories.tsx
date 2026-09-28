@@ -62,7 +62,7 @@ const hex = (value: string) =>
     .map((channel) => Math.round(channel).toString(16).padStart(2, '0'))
     .join('')}`;
 
-function luminance(value: string) {
+function relativeLuminance(value: string) {
   const [r, g, b] = channels(value).map((channel) => {
     const c = channel / 255;
     return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
@@ -70,8 +70,8 @@ function luminance(value: string) {
   return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
 }
 
-function contrast(a: string, b: string) {
-  const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+function contrastRatio(a: string, b: string) {
+  const [light, dark] = [relativeLuminance(a), relativeLuminance(b)].sort((x, y) => y - x);
   return (light! + 0.05) / (dark! + 0.05);
 }
 
@@ -86,9 +86,10 @@ function readSwatch(element: HTMLElement | null) {
 
 function Swatch({ token }: { token: string }) {
   const { color, resolvedMode } = useTheme();
+  const rereadWhenThemeChanges = `${color}:${resolvedMode}`;
   return (
     <div
-      key={`${color}:${resolvedMode}`}
+      key={rereadWhenThemeChanges}
       ref={readSwatch}
       data-token={token}
       className="flex items-center gap-2"
@@ -108,15 +109,16 @@ function readPair(element: HTMLElement | null) {
   const output = element?.querySelector('[data-ratio]');
   if (!sample || !output) return;
   const style = getComputedStyle(sample);
-  const ratio = contrast(style.color, style.backgroundColor);
+  const ratio = contrastRatio(style.color, style.backgroundColor);
   output.textContent = `${ratio.toFixed(2)}:1 ${grade(ratio)}`;
 }
 
 function Pair({ background, foreground }: { background: string; foreground: string }) {
   const { color, resolvedMode } = useTheme();
+  const rereadWhenThemeChanges = `${color}:${resolvedMode}`;
   return (
     <div
-      key={`${color}:${resolvedMode}`}
+      key={rereadWhenThemeChanges}
       ref={readPair}
       data-pair={`${foreground} on ${background}`}
       className="flex items-center gap-2"
