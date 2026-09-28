@@ -22,8 +22,17 @@ const variants = ['solid', 'soft', 'outline'] as const;
 const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'info'] as const;
 const sizes = ['standard', 'tiny'] as const;
 const placements = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const;
+const functionNamesSurviveBuild = isDevelopment;
 
-function Frame({ children, dir, label }: { children: ReactNode; dir?: 'rtl'; label?: string }) {
+function ContainingBlock({
+  children,
+  dir,
+  label,
+}: {
+  children: ReactNode;
+  dir?: 'rtl';
+  label?: string;
+}) {
   return (
     <div
       dir={dir}
@@ -66,15 +75,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const inFrame: NonNullable<Story['decorators']> = [
+const inContainingBlock: NonNullable<Story['decorators']> = [
   (Story) => (
-    <Frame>
+    <ContainingBlock>
       <Story />
-    </Frame>
+    </ContainingBlock>
   ),
 ];
 
-export const Playground: Story = { decorators: inFrame };
+export const Playground: Story = { decorators: inContainingBlock };
 
 export const Gallery: Story = {
   render: () => (
@@ -140,7 +149,7 @@ export const Gallery: Story = {
       </Showcase.Section>
 
       <Showcase.Section title="Placement">
-        <Frame label="네 모서리">
+        <ContainingBlock label="네 모서리">
           {placements.map((placement) => (
             <FloatingButton
               key={placement}
@@ -151,7 +160,7 @@ export const Gallery: Story = {
               <PlusIcon />
             </FloatingButton>
           ))}
-        </Frame>
+        </ContainingBlock>
       </Showcase.Section>
     </Showcase>
   ),
@@ -159,13 +168,13 @@ export const Gallery: Story = {
 
 export const Placement: Story = {
   render: () => (
-    <Frame label="네 모서리">
+    <ContainingBlock label="네 모서리">
       {placements.map((placement) => (
         <FloatingButton key={placement} placement={placement} size="tiny" aria-label={placement}>
           <PlusIcon />
         </FloatingButton>
       ))}
-    </Frame>
+    </ContainingBlock>
   ),
   parameters: {
     docs: {
@@ -192,11 +201,11 @@ export const Placement: Story = {
 
 export const RightToLeft: Story = {
   render: () => (
-    <Frame dir="rtl" label="오른쪽에서 왼쪽">
+    <ContainingBlock dir="rtl" label="오른쪽에서 왼쪽">
       <FloatingButton aria-label="작성">
         <PlusIcon />
       </FloatingButton>
-    </Frame>
+    </ContainingBlock>
   ),
   parameters: {
     docs: {
@@ -216,7 +225,7 @@ export const RightToLeft: Story = {
 };
 
 export const Shape: Story = {
-  decorators: inFrame,
+  decorators: inContainingBlock,
   render: () => (
     <>
       <FloatingButton placement="bottom-left" aria-label="작성">
@@ -250,7 +259,7 @@ export const Shape: Story = {
 };
 
 export const AutomaticLabel: Story = {
-  decorators: inFrame,
+  decorators: inContainingBlock,
   render: () => (
     <>
       <FloatingButton placement="bottom-left">
@@ -271,7 +280,8 @@ export const AutomaticLabel: Story = {
   },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('button', { name: 'Compose' })).toBeVisible();
-    if (isDevelopment) await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
+    if (functionNamesSurviveBuild)
+      await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
   },
 };
 
@@ -295,7 +305,7 @@ function UploadButton({ onUpload }: { onUpload: () => void }) {
 }
 
 export const Loading: Story = {
-  decorators: inFrame,
+  decorators: inContainingBlock,
   render: (args) => <UploadButton onUpload={() => args.onClick?.(undefined as never)} />,
   parameters: {
     docs: {
@@ -318,7 +328,7 @@ export const Loading: Story = {
 };
 
 export const DisabledLink: Story = {
-  decorators: inFrame,
+  decorators: inContainingBlock,
   render: () => (
     <FloatingButton asChild disabled>
       <a href="#compose">
@@ -364,7 +374,7 @@ function Crowded() {
 }
 
 export const DevelopmentWarnings: Story = {
-  decorators: inFrame,
+  decorators: inContainingBlock,
   render: () => <Crowded />,
   parameters: {
     docs: {

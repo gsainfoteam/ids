@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties, ReactNode, Ref } from 'react';
 
 import { useFloatingButton, type FloatingPlacement } from './use-floating-button';
 import { controlSurface, type ControlColorScheme } from '../../../internal/control-surface';
-import { tv } from '../../../utils';
+import { cn, tv } from '../../../utils';
 
 import type { InteractiveState, WithInteractiveValues } from '../../../hooks/use-interactive';
 import type { IdsSize } from '../../../tokens/types';
@@ -57,6 +57,23 @@ export namespace FloatingButton {
     focusableWhenDisabled?: boolean;
   };
 
+  const opaqueFills = {
+    solid: cn(
+      'bg-(--control-fill) text-(--control-on-fill)',
+      'data-hovered:bg-[color-mix(in_oklab,var(--control-fill)_90%,var(--ids-color-surface))]',
+      'data-active:bg-[color-mix(in_oklab,var(--control-fill)_80%,var(--ids-color-surface))]',
+    ),
+    soft: cn(
+      'bg-[color-mix(in_oklab,var(--control-fill)_12%,var(--ids-color-surface))] text-(--control-accent)',
+      'data-hovered:bg-[color-mix(in_oklab,var(--control-fill)_18%,var(--ids-color-surface))]',
+      'data-active:bg-[color-mix(in_oklab,var(--control-fill)_24%,var(--ids-color-surface))]',
+    ),
+    outline: cn(
+      'bg-(--ids-color-surface) text-(--control-quiet) inset-ring-1 inset-ring-(--ids-color-border)',
+      'data-hovered:bg-(--ids-color-muted) data-active:bg-(--ids-color-muted)',
+    ),
+  } satisfies Record<Variant, string>;
+
   export const Style = tv({
     base: [
       controlSurface.base,
@@ -64,22 +81,7 @@ export namespace FloatingButton {
       'transition-[color,background-color,box-shadow,scale] motion-safe:data-active:scale-95',
     ],
     variants: {
-      variant: {
-        solid: [
-          'bg-(--control-fill) text-(--control-on-fill)',
-          'data-hovered:bg-[color-mix(in_oklab,var(--control-fill)_90%,var(--ids-color-surface))]',
-          'data-active:bg-[color-mix(in_oklab,var(--control-fill)_80%,var(--ids-color-surface))]',
-        ],
-        soft: [
-          'bg-[color-mix(in_oklab,var(--control-fill)_12%,var(--ids-color-surface))] text-(--control-accent)',
-          'data-hovered:bg-[color-mix(in_oklab,var(--control-fill)_18%,var(--ids-color-surface))]',
-          'data-active:bg-[color-mix(in_oklab,var(--control-fill)_24%,var(--ids-color-surface))]',
-        ],
-        outline: [
-          'bg-(--ids-color-surface) text-(--control-quiet) inset-ring-1 inset-ring-(--ids-color-border)',
-          'data-hovered:bg-(--ids-color-muted) data-active:bg-(--ids-color-muted)',
-        ],
-      } satisfies Record<Variant, string[]>,
+      variant: opaqueFills,
       colorScheme: controlSurface.colorScheme,
       size: {
         standard: ['text-button-standard', "[&_svg:not([class*='size-'])]:size-6"],
