@@ -15,10 +15,7 @@ export const listStyles = {
     '[&_svg]:size-(--ids-size-icon-standard)',
   ),
   listArea: cn('-mx-1 rounded-[inherit]'),
-  list: cn(
-    offsetParentOfOptions,
-    'flex flex-col px-1 outline-none [overflow-anchor:none]',
-  ),
+  list: cn(offsetParentOfOptions, 'flex flex-col px-1 outline-none [overflow-anchor:none]'),
   heading: cn('px-2.5 pt-2 pb-1 text-caption-c1-medium text-(--ids-color-on-muted)'),
   separator: cn('-mx-1 my-1 w-auto'),
   empty: cn('px-2.5 py-6 text-center text-body-b3-regular text-(--ids-color-on-muted)'),
