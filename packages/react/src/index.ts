@@ -30,6 +30,7 @@ export { Badge } from './components/data/badge';
 export { Alert } from './components/feedback/alert';
 export { Dialog } from './components/overlay/dialog';
 export { Popover } from './components/overlay/popover';
+export { Tooltip, TooltipDelayGroup } from './components/overlay/tooltip';
 export {
   overlay,
   useOverlay,
