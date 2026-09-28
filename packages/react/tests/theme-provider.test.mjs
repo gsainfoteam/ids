@@ -30,9 +30,9 @@ async function render(node) {
   await act(async () => root.render(node));
 }
 
-const seen = {};
+const themeSeenBy = {};
 function Probe({ name }) {
-  seen[name] = useTheme();
+  themeSeenBy[name] = useTheme();
   return h('span', { 'data-probe': name });
 }
 const region = (testId) => host.querySelector(`[data-testid="${testId}"]`);
@@ -79,14 +79,14 @@ test('uncontrolled: setters change the provider, equal values do not notify', as
     ),
   );
   assert.equal(region('root').dataset.color, 'orange');
-  await act(async () => seen.a.setColor('orange'));
+  await act(async () => themeSeenBy.a.setColor('orange'));
   assert.deepEqual(colors, []);
-  await act(async () => seen.a.setColor('green'));
+  await act(async () => themeSeenBy.a.setColor('green'));
   assert.equal(region('root').dataset.color, 'green');
   assert.deepEqual(colors, ['green']);
-  await act(async () => seen.a.toggleMode());
+  await act(async () => themeSeenBy.a.toggleMode());
   assert.equal(region('root').dataset.mode, 'dark');
-  assert.equal(seen.a.mode, 'dark');
+  assert.equal(themeSeenBy.a.mode, 'dark');
 });
 
 test('controlled: setters only report, the parent value decides', async () => {
@@ -102,7 +102,7 @@ test('controlled: setters only report, the parent value decides', async () => {
     );
   }
   await render(h(App));
-  await act(async () => seen.a.setMode('dark'));
+  await act(async () => themeSeenBy.a.setMode('dark'));
   assert.deepEqual(modes, ['dark']);
   assert.equal(region('root').dataset.mode, 'light', 'no change until the parent updates');
   await act(async () => setParent('dark'));
@@ -128,12 +128,12 @@ test('nested providers inherit the axis they do not set, and its setter reaches 
   assert.doesNotMatch(region('orange').className, /bg-/, 'a color switch does not');
   assert.doesNotMatch(region('outer').className, /bg-/, 'the root never paints');
 
-  await act(async () => seen.dark.setColor('green'));
+  await act(async () => themeSeenBy.dark.setColor('green'));
   assert.equal(region('outer').dataset.color, 'green');
   assert.equal(region('dark').dataset.color, 'green');
   assert.equal(region('orange').dataset.color, 'orange', 'an owned axis keeps its own value');
 
-  await act(async () => seen.orange.setMode('dark'));
+  await act(async () => themeSeenBy.orange.setMode('dark'));
   assert.equal(region('outer').dataset.mode, 'dark');
   assert.equal(region('orange').dataset.mode, 'dark');
   assert.doesNotMatch(region('dark').className, /bg-/, 'same mode as the parent now');
@@ -148,10 +148,10 @@ test('system mode follows prefers-color-scheme live and toggles to an explicit m
   assert.equal(scheme.listeners.size, 1);
   await act(async () => scheme.set(true));
   assert.equal(region('root').dataset.mode, 'dark');
-  assert.equal(seen.a.mode, 'system');
-  assert.equal(seen.a.resolvedMode, 'dark');
-  await act(async () => seen.a.toggleMode());
-  assert.equal(seen.a.mode, 'light');
+  assert.equal(themeSeenBy.a.mode, 'system');
+  assert.equal(themeSeenBy.a.resolvedMode, 'dark');
+  await act(async () => themeSeenBy.a.toggleMode());
+  assert.equal(themeSeenBy.a.mode, 'light');
   assert.equal(scheme.listeners.size, 0, 'an explicit mode stops listening');
 });
 
@@ -165,7 +165,7 @@ test('a nested provider inherits a system mode already resolved by its parent', 
     ),
   );
   assert.equal(region('inner').dataset.mode, 'dark');
-  assert.equal(seen.inner.mode, 'system');
+  assert.equal(themeSeenBy.inner.mode, 'system');
 });
 
 test('asChild puts the attributes on the child element', async () => {
@@ -185,7 +185,7 @@ test('asChild puts the attributes on the child element', async () => {
 
 test('useTheme outside a provider answers with defaults', async () => {
   await render(h(Probe, { name: 'bare' }));
-  assert.equal(seen.bare.color, 'blue');
-  assert.equal(seen.bare.resolvedMode, 'light');
-  assert.doesNotThrow(() => seen.bare.setMode('dark'));
+  assert.equal(themeSeenBy.bare.color, 'blue');
+  assert.equal(themeSeenBy.bare.resolvedMode, 'light');
+  assert.doesNotThrow(() => themeSeenBy.bare.setMode('dark'));
 });
