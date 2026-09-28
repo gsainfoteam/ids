@@ -12,9 +12,16 @@ import { CheckIcon, ClipboardDocumentIcon, EyeDropperIcon } from '@heroicons/rea
 
 import { cssColor, formatPlaceholder, parseColor, type ColorFormat } from './color';
 import { useClipboardSupport, useColorPicker, useEyeDropperSupport } from './use-color-picker';
-import { flattenParts, resolveState } from '../../../internal/field-popup';
+import { resolveState } from '../../../internal/field-popup';
 import { messages } from '../../../internal/messages';
-import { cn, invariant, mergeEventHandlers, mergeProps, tv } from '../../../utils';
+import {
+  cn,
+  flattenFragments,
+  invariant,
+  mergeEventHandlers,
+  mergeProps,
+  tv,
+} from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../../form/field/context';
 import { Radio } from '../../form/radio';
@@ -371,7 +378,7 @@ function ColorPickerCopy({ className, children, onClick, ...props }: ColorPicker
 function ColorPickerSwatches({ className, children, ...props }: ColorPicker.SwatchesProps) {
   const c = usePicker('ColorPicker.Swatches');
   const values = children
-    ? flattenParts(children).flatMap((node) =>
+    ? flattenFragments(children).flatMap((node) =>
         isValidElement<ColorPicker.SwatchProps>(node) && node.type === ColorPickerSwatch
           ? [node.props.value]
           : [],

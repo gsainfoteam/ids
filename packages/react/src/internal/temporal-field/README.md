@@ -100,7 +100,7 @@ export namespace DateField {
 - Input 은 `config.parse` 가 있는 필드(DateField 의 single 모드)에서만 됩니다.
 - `aria-invalid` prop 이 `invalid` 보다 우선합니다. 둘 다 없으면 읽을 수 없는 글자(`unreadable`)가 invalid 를 정합니다.
 - ref 는 `mergeRefs(controlRef, ref)` 로 렌더마다 새로 만듭니다. 이 줄은 `react-hooks/refs` lint 를 끕니다: `mergeRefs` 는 callback 을 만들 뿐 렌더 중에 ref 를 읽지 않습니다. 렌더마다 새 함수라서 소비자의 callback ref 도 렌더마다 다시 불립니다.
-- 파트 목록(`shell`)은 `flattenParts` 의 결과를 그대로 렌더합니다. 파트를 여러 Fragment 에 나눠 담으면 key 가 겹칠 수 있습니다([field-popup](../field-popup/README.md#partsts)).
+- 파트 목록(`shell`)은 `flattenFragments` 의 결과를 그대로 렌더합니다. key 에 Fragment 경로가 붙어서, 파트를 여러 Fragment 에 나눠 담아도 겹치지 않습니다.
 
 ## use-temporal-field.ts
 

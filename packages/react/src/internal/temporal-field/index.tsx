@@ -22,8 +22,8 @@ import {
 } from './use-temporal-field';
 import { IconButton } from '../../components/action/icon-button';
 import { useFieldSize } from '../../components/form/field/context';
-import { invariant, mergeProps, mergeRefs, tv } from '../../utils';
-import { FieldPopup, FieldPopupHeader, flattenParts, part } from '../field-popup';
+import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../utils';
+import { FieldPopup, FieldPopupHeader, part } from '../field-popup';
 import { fieldAction, fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 import { FormValue } from '../form-value';
 
@@ -187,7 +187,7 @@ export function TemporalValue({ asChild, children, ...props }: ValueProps) {
 export function TemporalTrigger({ asChild, children, className, ...props }: TriggerProps) {
   const c = useTemporal('Trigger');
   invariant(
-    !flattenParts(children).some((n) => isValidElement(n) && n.type === TemporalClear),
+    !flattenFragments(children).some((n) => isValidElement(n) && n.type === TemporalClear),
     'Clear must be a sibling of Trigger.',
   );
   if (c.hasInput) {
@@ -324,7 +324,7 @@ export function TemporalField<V>({
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = temporalFieldStyle({ variant, size: resolvedSize, disabled });
 
-  const parts = flattenParts(children);
+  const parts = flattenFragments(children);
   const contents = parts.filter((n) => isValidElement(n) && n.type === TemporalContent);
   const shell = parts.filter((n) => !(isValidElement(n) && n.type === TemporalContent));
   const count = (type: unknown) => parts.filter((n) => isValidElement(n) && n.type === type).length;

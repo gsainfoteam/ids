@@ -168,7 +168,7 @@ const indexes = items.flatMap((child, index) =>
 ### 알아둘 것
 
 - 앱이 파트를 자기 컴포넌트로 감싸면 파트로 찾지 못합니다.
-- [field-popup](../internal/field-popup/README.md#partsts) 의 `flattenParts` 는 같은 일을 하지만 key 를 다시 매기지 않습니다.
+- 파트를 찾는 컴포넌트(TextField, Select, ChipField, FileField, ColorField, ColorPicker, TimePicker, Rating, 날짜와 시간 필드)는 모두 이 함수로 Fragment 를 풉니다.
 
 ## invariant.ts
 

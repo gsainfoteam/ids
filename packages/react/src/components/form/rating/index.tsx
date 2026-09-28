@@ -10,10 +10,9 @@ import {
 import { StarIcon } from '@heroicons/react/24/solid';
 
 import { useRating } from './use-rating';
-import { flattenParts } from '../../../internal/field-popup';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
-import { invariant, tv } from '../../../utils';
+import { flattenFragments, invariant, tv } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -116,7 +115,7 @@ export function Rating({
 
   let template: ReactElement<ItemProps> | undefined;
   const indexed = new Map<number, ReactElement<ItemProps>>();
-  for (const child of flattenParts(children)) {
+  for (const child of flattenFragments(children)) {
     invariant(
       isValidElement<ItemProps>(child) && child.type === RatingItem,
       'Rating children must be Rating.Item elements.',

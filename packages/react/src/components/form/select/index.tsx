@@ -24,7 +24,6 @@ import {
   FieldPopup,
   fieldListbox,
   fieldTrigger,
-  flattenParts,
   part,
   resolveState,
   useDrawerPresentation,
@@ -34,7 +33,7 @@ import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../internal/
 import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
-import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { IconButton } from '../../action/icon-button';
 import { Divider } from '../../layout/divider';
@@ -124,7 +123,9 @@ const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && n
 const isForeignComponent = (node: ReactNode): boolean =>
   isValidElement<Select.ContentProps>(node) &&
   (node.type === SelectContent
-    ? flattenParts(slotChildren(node.props.children, node.props.asChild)).some(isForeignComponent)
+    ? flattenFragments(slotChildren(node.props.children, node.props.asChild)).some(
+        isForeignComponent,
+      )
     : typeof node.type === 'function' && !PARTS.has(node.type));
 
 const isNodeFromAnyFrame = (value: unknown): value is Node =>
@@ -162,7 +163,7 @@ export function Select(props: SelectProps) {
   } = props;
   const multiple = selectionMode === 'multiple';
 
-  const nodes = flattenParts(children);
+  const nodes = flattenFragments(children);
   const triggers = nodes.filter(isType(SelectTrigger));
   const clears = nodes.filter(isType(SelectClear));
   const contents = nodes.filter(isType(SelectContent));
@@ -198,7 +199,7 @@ export function Select(props: SelectProps) {
   }, [hidesItems]);
   const searchable = popupNodes.some((node) =>
     isValidElement<Select.ContentProps>(node) && node.type === SelectContent
-      ? flattenParts(slotChildren(node.props.children, node.props.asChild)).some(
+      ? flattenFragments(slotChildren(node.props.children, node.props.asChild)).some(
           isType(SelectSearchField),
         )
       : isType(SelectSearchField)(node),
@@ -436,7 +437,7 @@ function SelectClear({ asChild, children, className, ...props }: Select.ClearPro
 function SelectContent({ asChild, children, className, ...props }: Select.ContentProps) {
   const c = useSelectContext('Select.Content');
   const { state: s, ids } = c.select;
-  const nodes = flattenParts(slotChildren(children, asChild));
+  const nodes = flattenFragments(slotChildren(children, asChild));
   const search = nodes.filter(isType(SelectSearchField));
   const empty = nodes.filter(isType(SelectEmpty));
   const items = nodes.filter((node) => !search.includes(node) && !empty.includes(node));
@@ -511,7 +512,7 @@ function SelectItem({
   const withIndicator = (nodes: ReactNode) => (
     <>
       {nodes}
-      {!flattenParts(nodes).some(isType(SelectItemIndicator)) && <SelectItemIndicator />}
+      {!flattenFragments(nodes).some(isType(SelectItemIndicator)) && <SelectItemIndicator />}
     </>
   );
   return (

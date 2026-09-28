@@ -23,11 +23,11 @@ import {
   type FileFieldRejection,
 } from './file-rules';
 import { useFileField, usePreviewUrl, type FileFieldValue } from './use-file-field';
-import { fieldTrigger, flattenParts, part, resolveState } from '../../../internal/field-popup';
+import { fieldTrigger, part, resolveState } from '../../../internal/field-popup';
 import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
-import { cn, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { cn, flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { Item } from '../../data/item';
 import { useFieldSize } from '../field/context';
@@ -257,7 +257,7 @@ export function FileField(props: FileFieldProps) {
     onKeyDown,
   };
 
-  const nodes = flattenParts(children);
+  const nodes = flattenFragments(children);
   const triggers = nodes.filter(isType(FileTrigger));
   invariant(
     !nodes.length || triggers.length === 1,
@@ -370,7 +370,7 @@ export function FileField(props: FileFieldProps) {
 function FileTrigger({ asChild, children, className, ...props }: FileField.TriggerProps) {
   const c = useFile('FileField.Trigger');
   invariant(
-    !flattenParts(children).some(
+    !flattenFragments(children).some(
       (node) => isType(FileClear)(node) || isType(FileList)(node) || isType(FileItem)(node),
     ),
     'FileField: Clear/List/Item must be siblings of Trigger.',

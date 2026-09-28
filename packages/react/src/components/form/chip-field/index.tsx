@@ -22,7 +22,6 @@ import {
   FieldPopup,
   fieldListbox,
   fieldTrigger,
-  flattenParts,
   part,
   resolveState,
   useDrawerPresentation,
@@ -448,7 +447,7 @@ function DrawerSearch() {
 
 function ChipContent({ asChild, children, className, ...props }: ChipField.ContentProps) {
   const c = useChip('Content');
-  const nodes = flattenParts(slotChildren(children, asChild));
+  const nodes = flattenFragments(slotChildren(children, asChild));
   const empties = nodes.filter(isType(ChipEmpty));
   const limits = nodes.filter(isType(ChipLimit));
   const items = nodes.filter((node) => !empties.includes(node) && !limits.includes(node));
@@ -502,7 +501,7 @@ function ChipItem({
   const withIndicator = (nodes: ReactNode) => (
     <>
       {nodes}
-      {!flattenParts(nodes).some(isType(ChipItemIndicator)) && <ChipItemIndicator />}
+      {!flattenFragments(nodes).some(isType(ChipItemIndicator)) && <ChipItemIndicator />}
     </>
   );
   return (
@@ -647,7 +646,7 @@ const OPTION_KINDS = { item: ChipItem, group: ChipGroup, content: ChipContent };
 const POPUP_PARTS: unknown[] = [ChipContent, ChipItem, ChipGroup, ChipCreate, ChipEmpty, ChipLimit];
 
 function isForeignComponent(node: ReactNode): boolean {
-  return flattenParts(node).some(
+  return flattenFragments(node).some(
     (child) =>
       isValidElement<ChipField.ContentProps>(child) &&
       (child.type === ChipContent

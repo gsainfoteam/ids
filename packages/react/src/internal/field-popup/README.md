@@ -9,20 +9,19 @@
 | [`styles.ts`](#stylests)   | `popupStyle`, `fieldTrigger`, `fieldListbox`                      |
 | [`header.tsx`](#headertsx) | drawer 머리의 제목과 닫기 버튼(`FieldPopupHeader`)                |
 | [`search.tsx`](#searchtsx) | 목록 위의 검색 상자(`FieldPopupSearch`)                           |
-| [`parts.ts`](#partsts)     | 파트 헬퍼 `part`, `flattenParts`, `resolveState`                  |
+| [`parts.ts`](#partsts)     | 파트 헬퍼 `part`, `resolveState`                                  |
 
 ## 쓰는 곳
 
-| 컴포넌트                                      | 가져가는 것                                                                                                                                            |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Select                                        | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch`, `fieldTrigger`, `fieldListbox`, `part`, `flattenParts`, `resolveState` |
-| ChipField                                     | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch`, `fieldTrigger`, `fieldListbox`, `part`, `flattenParts`, `resolveState` |
-| ColorField                                    | `FieldPopup`, `FieldPopupHeader`, `useDrawerPresentation`, `fieldTrigger`, `part`, `flattenParts`, `resolveState`                                      |
-| [temporal-field](../temporal-field/README.md) | `FieldPopup`, `FieldPopupHeader`, `part`, `flattenParts`                                                                                               |
-| FileField                                     | `fieldTrigger`, `part`, `flattenParts`, `resolveState`                                                                                                 |
-| TimePicker                                    | `part`, `flattenParts`                                                                                                                                 |
-| ColorPicker                                   | `flattenParts`, `resolveState`                                                                                                                         |
-| Rating                                        | `flattenParts`                                                                                                                                         |
+| 컴포넌트                                      | 가져가는 것                                                                                                                            |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Select                                        | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch`, `fieldTrigger`, `fieldListbox`, `part`, `resolveState` |
+| ChipField                                     | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch`, `fieldTrigger`, `fieldListbox`, `part`, `resolveState` |
+| ColorField                                    | `FieldPopup`, `FieldPopupHeader`, `useDrawerPresentation`, `fieldTrigger`, `part`, `resolveState`                                      |
+| [temporal-field](../temporal-field/README.md) | `FieldPopup`, `FieldPopupHeader`, `part`                                                                                               |
+| FileField                                     | `fieldTrigger`, `part`, `resolveState`                                                                                                 |
+| TimePicker                                    | `part`                                                                                                                                 |
+| ColorPicker                                   | `resolveState`                                                                                                                         |
 
 - `search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/search` 에서 직접 가져옵니다.
 
@@ -245,7 +244,7 @@ return part(
 );
 
 // internal/temporal-field/index.tsx
-const parts = flattenParts(children);
+const parts = flattenFragments(children);
 const count = (type: unknown) => parts.filter((n) => isValidElement(n) && n.type === type).length;
 ```
 
@@ -254,10 +253,9 @@ const count = (type: unknown) => parts.filter((n) => isValidElement(n) && n.type
 - `part(tag, asChild, children, props)` 는 파트 하나를 그립니다. `asChild` 가 아니면 `tag` 요소를 만들고, `asChild` 면 자식 요소 하나를 `mergeProps(자식 props, props)` 로 복제합니다. 파트의 wiring 이 이기고 자식의 핸들러가 먼저 돕니다.
 - `asChild` 자식은 Fragment 가 아닌 요소 하나여야 합니다. HTML 요소 자식은 `tag` 와 같아야 하고(`span`, `div` 파트는 아무 요소나 됩니다), 컴포넌트 자식은 props 와 ref 를 넘긴다고 봅니다.
 - `input` 파트는 children 을 받지 않습니다.
-- `flattenParts` 는 Fragment 를 풀어 파트를 셉니다. `resolveState` 는 state 를 받는 `className`, `style`, `children` 을 풉니다.
+- 파트를 셀 때는 `utils` 의 [`flattenFragments`](../../utils/README.md#childrents) 로 Fragment 를 풉니다. `resolveState` 는 state 를 받는 `className`, `style`, `children` 을 풉니다.
 
 ### 알아둘 것
 
-- `flattenParts` 는 key 를 다시 매기지 않습니다. 서로 다른 Fragment 에서 온 형제가 같은 key(`.0`)를 가질 수 있습니다. key 에 Fragment 경로를 붙이는 것은 `utils` 의 [`flattenFragments`](../../utils/README.md#childrents) 입니다.
-- temporal-field 의 `shell`, Select 의 `triggers` 처럼 결과를 그대로 렌더하는 곳이 있습니다. 파트를 여러 Fragment 에 나눠 담으면 이런 목록에서 key 가 겹칠 수 있습니다.
+- temporal-field 의 `shell`, Select 의 `triggers` 처럼 풀어 낸 파트를 그대로 렌더하는 곳이 있습니다. `flattenFragments` 가 key 에 Fragment 경로를 붙이므로 파트를 여러 Fragment 에 나눠 담아도 key 가 겹치지 않습니다.
 - `resolveState` 는 [`internal/state-props.ts`](../README.md#state-propsts) 의 `resolveState` 와 같은 동작입니다.

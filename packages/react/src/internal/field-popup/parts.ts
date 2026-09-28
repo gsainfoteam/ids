@@ -1,21 +1,6 @@
-import {
-  Children,
-  Fragment,
-  cloneElement,
-  createElement,
-  isValidElement,
-  type ReactNode,
-} from 'react';
+import { Fragment, cloneElement, createElement, isValidElement, type ReactNode } from 'react';
 
 import { invariant, mergeProps } from '../../utils';
-
-export function flattenParts(children: ReactNode): ReactNode[] {
-  return Children.toArray(children).flatMap((child) =>
-    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
-      ? flattenParts(child.props.children)
-      : [child],
-  );
-}
 
 export function part(
   tag: 'button' | 'span' | 'div' | 'input',

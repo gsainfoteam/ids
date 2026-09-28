@@ -24,7 +24,7 @@ for (const key of [
 ])
   globalThis[key] = dom.window[key];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-const { createElement: h, act, StrictMode, useState } = await import('react');
+const { createElement: h, act, Fragment, StrictMode, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');
 const { de } = await import('date-fns/locale/de');
@@ -733,5 +733,28 @@ test('the calendar button beside an Input takes the field size and is disabled w
     assert.equal(button().disabled, true, Object.keys(props)[0]);
     await click(button());
     assert.equal(popup(), null);
+  }
+});
+
+test('parts split across Fragments render without duplicate keys', async () => {
+  const errors = [];
+  const original = console.error;
+  console.error = (...args) => errors.push(args.join(' '));
+  try {
+    await render(
+      h(
+        DateField,
+        { 'aria-label': 'Day', defaultValue: new Date(2026, 8, 15) },
+        h(Fragment, null, h(DateField.Trigger)),
+        h(Fragment, null, h(DateField.Clear)),
+      ),
+    );
+    assert.ok(host.querySelector('[data-temporal-clear]'));
+    assert.deepEqual(
+      errors.filter((message) => message.includes('same key')),
+      [],
+    );
+  } finally {
+    console.error = original;
   }
 });

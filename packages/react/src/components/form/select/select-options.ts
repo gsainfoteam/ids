@@ -2,7 +2,7 @@ import { isValidElement, type ReactNode } from 'react';
 
 import { difference, intersection } from 'es-toolkit';
 
-import { flattenParts } from '../../../internal/field-popup';
+import { flattenFragments } from '../../../utils';
 
 export type SelectOption = {
   value: string;
@@ -26,7 +26,7 @@ export function textOf(children: unknown): string {
   if (typeof children === 'string' || typeof children === 'number') return String(children);
   if (typeof children === 'function' || children == null || typeof children === 'boolean')
     return '';
-  return flattenParts(children as ReactNode)
+  return flattenFragments(children as ReactNode)
     .map((child) =>
       typeof child === 'string' || typeof child === 'number'
         ? String(child)
@@ -44,7 +44,7 @@ export function slotChildren(children: unknown, asChild?: boolean): ReactNode {
 }
 
 export function collectOptions(children: ReactNode, kinds: OptionKinds): SelectOption[] {
-  return flattenParts(children).flatMap((child) => {
+  return flattenFragments(children).flatMap((child) => {
     if (!isValidElement<ItemProps>(child)) return [];
     if (child.type === kinds.item) {
       const label = child.props.label ?? textOf(child.props.children).trim();

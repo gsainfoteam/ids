@@ -17,9 +17,9 @@ import {
   type TimePickerState,
 } from './use-time-picker';
 import { periodFirst, resolveLocale, type DateLocale } from '../../../internal/date-locale';
-import { flattenParts, part } from '../../../internal/field-popup';
+import { part } from '../../../internal/field-popup';
 import { messages } from '../../../internal/messages';
-import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { TimeFormat, TimePrecision, TimeUnit } from './time';
@@ -136,7 +136,7 @@ export function TimePicker({
   const styles = TimePicker.Style({ size: resolvedSize });
 
   const units: string[] = [];
-  for (const child of flattenParts(children)) {
+  for (const child of flattenFragments(children)) {
     if (!isValidElement<{ unit?: TimeUnit }>(child)) continue;
     if (child.type !== TimePicker.Column && child.type !== TimePicker.Period) continue;
     const unit = child.type === TimePicker.Period ? 'period' : child.props.unit!;

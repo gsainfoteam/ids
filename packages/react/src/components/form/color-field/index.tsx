@@ -18,7 +18,6 @@ import {
   FieldPopup,
   FieldPopupHeader,
   fieldTrigger,
-  flattenParts,
   part,
   resolveState,
   useDrawerPresentation,
@@ -27,7 +26,15 @@ import {
 import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
-import { cn, invariant, mergeEventHandlers, mergeProps, mergeRefs, tv } from '../../../utils';
+import {
+  cn,
+  flattenFragments,
+  invariant,
+  mergeEventHandlers,
+  mergeProps,
+  mergeRefs,
+  tv,
+} from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { ColorPicker, type ColorPickerSwatchOption } from '../../data/color-picker';
 import { cssColor, type ColorFormat } from '../../data/color-picker/color';
@@ -199,7 +206,7 @@ export function ColorField({
     },
   });
 
-  const nodes = flattenParts(children);
+  const nodes = flattenFragments(children);
   const triggers = nodes.filter(isType(ColorFieldTrigger));
   const clears = nodes.filter(isType(ColorFieldClear));
   const contents = nodes.filter(isType(ColorFieldContent));
@@ -296,7 +303,7 @@ export function ColorField({
 function ColorFieldTrigger({ asChild, children, className, ...props }: ColorField.TriggerProps) {
   const c = useColor('ColorField.Trigger');
   invariant(
-    !flattenParts(children).some(isType(ColorFieldClear)),
+    !flattenFragments(children).some(isType(ColorFieldClear)),
     'ColorField.Clear must be a sibling of Trigger, not inside its button.',
   );
   return part(

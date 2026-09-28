@@ -25,7 +25,7 @@ import {
 import { popupStyle } from './styles';
 
 export { FieldPopupHeader } from './header';
-export { flattenParts, part, resolveState } from './parts';
+export { part, resolveState } from './parts';
 export { fieldListbox, fieldTrigger, type FieldTriggerVariant } from './styles';
 export { useDrawerPresentation, type PopupPresentation } from './layer';
 
