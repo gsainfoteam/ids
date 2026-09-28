@@ -6,7 +6,7 @@ import { expect, test } from 'vitest';
 const coldNodeStartOnABusyRunner = 30_000;
 
 test(
-  'base ESM and CommonJS exports load when no form library can resolve',
+  'the ESM entry loads when no form library can resolve',
   () => {
     const result = spawnSync(
       process.execPath,
@@ -14,15 +14,14 @@ test(
         '--input-type=module',
         '-e',
         `
-    import { registerHooks, createRequire } from 'node:module';
+    import { registerHooks } from 'node:module';
     registerHooks({ resolve(specifier, context, nextResolve) {
-      if (specifier === 'react-hook-form' || specifier.startsWith('@tanstack/'))
+      if (specifier === 'react-hook-form' || specifier === '@tanstack/react-form')
         throw new Error('Optional peer is unavailable');
       return nextResolve(specifier, context);
     }});
-    const esm = await import('./dist/index.js');
-    const cjs = createRequire(import.meta.url)('./dist/index.cjs');
-    if (!esm.Field || !cjs.Field || !esm.TextField || !cjs.TextField) process.exit(1);
+    const ids = await import('./dist/index.js');
+    if (!ids.Field || !ids.TextField) process.exit(1);
   `,
       ],
       { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' },

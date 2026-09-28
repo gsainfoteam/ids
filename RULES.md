@@ -39,7 +39,7 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 
 **css** — Pure CSS package. No React dependency. Consumers import `@gsainfoteam/ids-css` and add Tailwind themselves (peerDep). Do not `@import "tailwindcss"` inside this package.
 
-**react** — Component library. Library build via Vite (`dist/index.js`, `dist/index.cjs`); every entry in `dependencies` and `peerDependencies` stays external. Storybook for development.
+**react** — Component library. Library build via Vite, ESM only (`dist/index.js`; `@tanstack/hotkeys` ships no CommonJS); every entry in `dependencies` and `peerDependencies` stays external. Storybook for development.
 
 **What we build and what we install.** Prefer a well-maintained package over hand-rolled logic:
 

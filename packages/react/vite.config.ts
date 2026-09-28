@@ -30,18 +30,9 @@ export default defineConfig({
         'react-hook-form': fileURLToPath(new URL('./src/react-hook-form.tsx', import.meta.url)),
         'tanstack-form': fileURLToPath(new URL('./src/tanstack-form.tsx', import.meta.url)),
       },
-      name: 'IdsReact',
-      formats: ['es', 'cjs'],
-      fileName: (format, entry) => `${entry}.${format === 'es' ? 'js' : 'cjs'}`,
+      formats: ['es'],
+      fileName: (_format, entry) => `${entry}.js`,
     },
-    rollupOptions: {
-      external,
-      output: {
-        globals: {
-          react: 'React',
-          'react-dom': 'ReactDOM',
-        },
-      },
-    },
+    rollupOptions: { external },
   },
 });
