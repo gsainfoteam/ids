@@ -128,7 +128,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 ## 크기
 
 ```tsx
-<Rating size="tiny" /> // standard(36px 칸, 28px 아이콘) / tiny(32px, 20px). 생략하면 Field를 따른다
+<Rating size="tiny" /> // standard(28px 아이콘) / tiny(22px). 줄 높이는 컨트롤 높이(36px / 32px). 생략하면 Field를 따른다
 ```
 
 ## 속성

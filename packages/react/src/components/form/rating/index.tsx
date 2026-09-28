@@ -316,14 +316,14 @@ export namespace Rating {
   export const Style = tv({
     slots: {
       root: [
-        'relative inline-flex max-w-full flex-wrap rounded-standard outline-none',
+        'relative inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-standard outline-none',
         '[--rating-accent:var(--ids-color-primary)]',
         'data-invalid:[--rating-accent:var(--ids-color-danger)]',
         'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-(--ids-color-primary)/40',
         'data-disabled:opacity-50',
       ],
       item: 'relative inline-flex shrink-0 items-center justify-center rounded-standard focus-ring',
-      graphic: 'pointer-events-none relative block [&_svg]:size-full',
+      graphic: 'pointer-events-none relative block size-full [&_svg]:size-full',
       empty:
         'absolute inset-0 text-(--ids-color-border) in-data-invalid:text-(--ids-color-danger)/35',
       fill: [
@@ -337,14 +337,12 @@ export namespace Rating {
     variants: {
       size: {
         standard: {
-          root: 'gap-1',
-          item: 'size-(--ids-size-control-standard)',
-          graphic: 'size-7',
+          root: 'min-h-(--ids-size-control-standard)',
+          item: 'size-7',
         },
         tiny: {
-          root: 'gap-0.5',
-          item: 'size-(--ids-size-control-tiny)',
-          graphic: 'size-5',
+          root: 'min-h-(--ids-size-control-tiny)',
+          item: 'size-5.5',
         },
       } satisfies Record<IdsSize, object>,
       placement: {
