@@ -42,7 +42,7 @@ export function ToggleGroup<T extends string = string>(props: ToggleGroup.Props<
         {...rest}
         {...rootProps}
         orientation={orientation}
-        separator={context.selectionMode === 'single' ? 'decorative' : 'semantic'}
+        separator={rootProps.role === 'radiogroup' ? 'decorative' : 'semantic'}
         className={ToggleGroup.Style({ orientation, className })}
       >
         {children}

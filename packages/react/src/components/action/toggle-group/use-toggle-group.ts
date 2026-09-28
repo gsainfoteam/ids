@@ -44,6 +44,10 @@ function shapeOf(value: Value | undefined) {
   return Array.isArray(value) ? 'array' : typeof value;
 }
 
+function checkWithItsOwnClick(item: HTMLElement) {
+  if (item.getAttribute('aria-checked') !== 'true') item.click();
+}
+
 export function useToggleGroup({
   selectionMode = 'single',
   value,
@@ -80,11 +84,7 @@ export function useToggleGroup({
     loop,
     radio: single,
     checked: single ? (selected[0] ?? null) : null,
-    onArrive: single
-      ? (element) => {
-          if (element.getAttribute('aria-checked') !== 'true') element.click();
-        }
-      : undefined,
+    onArrive: single ? checkWithItsOwnClick : undefined,
   });
 
   function toggle(item: string) {
@@ -104,16 +104,16 @@ export function useToggleGroup({
     setSelected([...next].sort((a, b) => rank(a) - rank(b)));
   }
 
-  const formRef = useRef<HTMLButtonElement | null>(null);
+  const formAssociatedItemRef = useRef<HTMLButtonElement | null>(null);
   const anchorRef = useRef<HTMLElement | null>(null);
   useLayoutEffect(() => {
     const items = roving.elements.current;
     const button = items.find(({ element }) => element instanceof HTMLButtonElement);
-    formRef.current = (button?.element as HTMLButtonElement | undefined) ?? null;
+    formAssociatedItemRef.current = (button?.element as HTMLButtonElement | undefined) ?? null;
     anchorRef.current =
       items.find((item) => item.value === roving.tabStop)?.element ?? items[0]?.element ?? null;
   });
-  useFormReset(formRef, () => setSelected(defaultList, { silent: true }));
+  useFormReset(formAssociatedItemRef, () => setSelected(defaultList, { silent: true }));
 
   const valueShape = shapeOf(value);
   const defaultShape = shapeOf(defaultValue);
