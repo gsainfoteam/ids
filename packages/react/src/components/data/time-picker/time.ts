@@ -24,7 +24,8 @@ export function withTime(day: Date, seconds: number): Date | null {
     seconds: seconds % 60,
     milliseconds: 0,
   });
-  return isSameDay(next, day) && secondsOf(next) === seconds ? next : null;
+  const timeExistsThatDay = isSameDay(next, day) && secondsOf(next) === seconds;
+  return timeExistsThatDay ? next : null;
 }
 
 export function validateTime(value: Date | null | undefined) {

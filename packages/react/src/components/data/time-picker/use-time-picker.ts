@@ -111,6 +111,8 @@ export type TimePickerApi = ReturnType<typeof useTimePicker> & {
 
 const TYPEAHEAD_RESET = 1000;
 const SETTLE_DELAY = 150;
+const CONTROL_HEIGHT_STANDARD = 36;
+const CONTROL_HEIGHT_TINY = 32;
 
 export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
   const numbers = unitNumbers(unit, c.state.format, c.state.precision, c.state.step);
@@ -130,7 +132,7 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
 
   const optionHeight = () =>
     node.current?.querySelector<HTMLElement>('[data-time-option]')?.offsetHeight ||
-    (c.size === 'tiny' ? 32 : 36);
+    (c.size === 'tiny' ? CONTROL_HEIGHT_TINY : CONTROL_HEIGHT_STANDARD);
   const align = (n: number) => {
     const el = node.current;
     const target = el?.querySelector<HTMLElement>(`[data-time-option="${n}"]`);
@@ -142,14 +144,14 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
   useLayoutEffect(() => {
     if (!scrolling.current) align(selectedNumber);
     const el = node.current;
-    const observer =
+    const alignWhenSized =
       el && typeof ResizeObserver !== 'undefined'
         ? new ResizeObserver(() => {
             if (!scrolling.current) align(selectedNumber);
           })
         : null;
-    if (el) observer?.observe(el);
-    return () => observer?.disconnect();
+    if (el) alignWhenSized?.observe(el);
+    return () => alignWhenSized?.disconnect();
   }, [selectedNumber, wheel]);
 
   const moveTo = (n: number) => {
@@ -164,10 +166,10 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
     const index = Math.round((node.current?.scrollTop ?? 0) / optionHeight());
     return numbers[clamp(index, 0, numbers.length - 1)];
   };
-  const settleLater = useRef<DebouncedFunction<() => void> | null>(null);
-  useEffect(() => () => settleLater.current?.cancel(), []);
+  const scrollEndFallback = useRef<DebouncedFunction<() => void> | null>(null);
+  useEffect(() => () => scrollEndFallback.current?.cancel(), []);
   const settle = () => {
-    settleLater.current?.cancel();
+    scrollEndFallback.current?.cancel();
     if (!wheel || !scrolling.current) return;
     scrolling.current = false;
     const n = centered();
@@ -259,8 +261,8 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
     onScroll: () => {
       if (!wheel || !scrolling.current) return;
       setActive(centered());
-      settleLater.current ??= debounce(() => latestSettle.current(), SETTLE_DELAY);
-      settleLater.current();
+      scrollEndFallback.current ??= debounce(() => latestSettle.current(), SETTLE_DELAY);
+      scrollEndFallback.current();
     },
     onScrollEnd: settle,
   };
