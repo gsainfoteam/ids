@@ -96,6 +96,10 @@ test('uncontrolled radios sharing a name: choosing one un-marks its groupmate', 
   assert.equal(stateOf('a'), 'checked');
   assert.equal(stateOf('b'), 'unchecked');
   assert.deepEqual(changes, ['b:true', 'a:false'], 'a reset reports nothing');
+  await click('b');
+  assert.equal(stateOf('b'), 'checked', 'the radio checked before the reset can be chosen again');
+  assert.equal(stateOf('a'), 'unchecked');
+  assert.deepEqual(changes, ['b:true', 'a:false', 'b:true', 'a:false']);
 });
 
 test('controlled: the parent decides, and readOnly never selects', async () => {

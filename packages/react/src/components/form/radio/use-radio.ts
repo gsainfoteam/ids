@@ -80,11 +80,17 @@ export function useRadio({
     return () => scope.removeEventListener('change', noticeUncheckByGroupmate);
   }, [controlled]);
 
+  const letReactSeeRestoredValue = (input: HTMLInputElement, restored: boolean) =>
+    silently(() => {
+      input.checked = restored;
+    });
+
   useFormReset(inputRef, () => {
     const input = inputRef.current;
     if (!input) return;
     if (!controlled) {
       const restoredByBrowser = input.checked;
+      letReactSeeRestoredValue(input, restoredByBrowser);
       setChecked(restoredByBrowser, { silent: true });
       return;
     }
