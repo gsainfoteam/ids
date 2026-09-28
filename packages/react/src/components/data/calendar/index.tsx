@@ -192,7 +192,7 @@ export function Calendar(props: CalendarProps) {
   });
   const { state } = api;
   const resolved: Partial<DayPickerLocale> = resolveLocale(locale);
-  const dateLocale = { ...resolved, labels: resolved.labels ?? {} };
+  const localeWithoutEnglishFallback = { ...resolved, labels: resolved.labels ?? {} };
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = Calendar.Style({ size: resolvedSize });
 
@@ -210,7 +210,7 @@ export function Calendar(props: CalendarProps) {
     >
       <DayPicker
         {...(api.selection as DayPickerProps)}
-        locale={dateLocale}
+        locale={localeWithoutEnglishFallback}
         weekStartsOn={weekStartsOn}
         numberOfMonths={monthsToShow}
         month={state.month}
@@ -263,7 +263,10 @@ export function Calendar(props: CalendarProps) {
           footer: styles.footer(),
         }}
         labels={{
-          ...omit(messageLabels, Object.keys(dateLocale.labels) as (keyof Labels)[]),
+          ...omit(
+            messageLabels,
+            Object.keys(localeWithoutEnglishFallback.labels) as (keyof Labels)[],
+          ),
           ...labels,
         }}
         formatters={formatters}
@@ -386,11 +389,12 @@ function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calenda
     unavailable: !!modifiers.disabled,
   });
   const flag = (on: boolean | undefined) => (on ? '' : undefined);
+  const keyInLatinDigits = dayKey(day.date);
   return (
     <button
       {...props}
       ref={mergeRefs(own, ref)}
-      data-calendar-day={dayKey(day.date)}
+      data-calendar-day={keyInLatinDigits}
       data-selected={flag(modifiers.selected)}
       data-today={flag(modifiers.today)}
       data-disabled={flag(modifiers.disabled)}
