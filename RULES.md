@@ -87,7 +87,7 @@ packages/react/src/
     feedback/    Alert, Progress, Spinner
     layout/      AspectRatio, Divider, Spacer
     navigation/  (Breadcrumb, Pagination, Stepper, Tabs)
-    overlay/     (Dialog, Drawer, Menu, Popover, Tooltip)
+    overlay/     Dialog, (Drawer, Menu, Popover, Tooltip)
     typography/  Kbd, Label
     utility/     Slot, Group, IdsProvider
   internal/      shared parts that are not exported:

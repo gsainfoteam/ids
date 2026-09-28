@@ -17,11 +17,12 @@
 
 ## 쓰는 곳
 
-| 쓰는 곳                                 | 가져가는 것                                                                                                                       |
-| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| IdsProvider                             | `OverlayHost`, `PortalRootContext`                                                                                                |
-| Alert                                   | `usePresence`                                                                                                                     |
-| [field-popup](../field-popup/README.md) | `useLayer`, `useAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts` |
+| 쓰는 곳                                 | 가져가는 것                                                                                                                                 |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| IdsProvider                             | `OverlayHost`, `PortalRootContext`                                                                                                          |
+| Alert                                   | `usePresence`                                                                                                                               |
+| Dialog                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget` |
+| [field-popup](../field-popup/README.md) | `useLayer`, `useAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`           |
 
 ## 조립하는 법
 

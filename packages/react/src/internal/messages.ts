@@ -140,6 +140,9 @@ export const messages = {
   alert: {
     close: '닫기',
   },
+  dialog: {
+    close: '닫기',
+  },
   kbd: {
     command: '커맨드',
     windows: '윈도우',

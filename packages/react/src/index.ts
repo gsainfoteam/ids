@@ -28,6 +28,14 @@ export { Card } from './components/data/card';
 export { Chip } from './components/data/chip';
 export { Badge } from './components/data/badge';
 export { Alert } from './components/feedback/alert';
+export { Dialog } from './components/overlay/dialog';
+export {
+  overlay,
+  useOverlay,
+  type OverlayControls,
+  type OverlayOptions,
+  type OverlayRender,
+} from './internal/overlay';
 export { Avatar, initialsOf } from './components/data/avatar';
 export { AvatarGroup } from './components/data/avatar-group';
 export { Item } from './components/data/item';
