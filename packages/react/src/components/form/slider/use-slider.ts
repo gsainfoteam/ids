@@ -122,13 +122,18 @@ export function useSlider({
     );
   };
 
+  const drawnThumbLength = (vertical: boolean) => {
+    const box = thumbRefs.current[0]?.getBoundingClientRect();
+    return (vertical ? box?.height : box?.width) ?? 0;
+  };
+
   const valueAt = (event: PointerEvent<HTMLElement>) => {
     const root = rootRef.current;
     const track = trackRef.current ?? root;
     if (!root || !track) return null;
     const rect = track.getBoundingClientRect();
-    const thumb = parseFloat(getComputedStyle(root).getPropertyValue('--slider-thumb')) || 0;
     const vertical = orientation === 'vertical';
+    const thumb = drawnThumbLength(vertical);
     const length = vertical ? rect.height : rect.width;
     const distance = vertical
       ? rect.bottom - event.clientY
