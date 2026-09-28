@@ -47,6 +47,8 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
     if (errorShowing.current) validate();
   }, [syncValue, validate]);
 
+  const rereadInOnChangeBatch = { onInput: notify, onChange: notify };
+
   useLayoutEffect(function catchValuesSetWithoutInputEvents() {
     notify();
   });
@@ -71,8 +73,6 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
     const focusedBeforeListening = root.contains(doc.activeElement);
     if (focusedBeforeListening) onFocusIn();
 
-    root.addEventListener('input', notify);
-    root.addEventListener('change', notify);
     root.addEventListener('focusin', onFocusIn);
     root.addEventListener('focusout', onFocusOut);
     root.addEventListener('invalid', validate, true);
@@ -101,17 +101,16 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
     return () => {
       mounted = false;
       view.clearTimeout(initialTimer);
-      root.removeEventListener('input', notify);
-      root.removeEventListener('change', notify);
       root.removeEventListener('focusin', onFocusIn);
       root.removeEventListener('focusout', onFocusOut);
       root.removeEventListener('invalid', validate, true);
       form?.removeEventListener('reset', onReset);
     };
-  }, [notify, syncValue, validate]);
+  }, [syncValue, validate]);
 
   return {
     controlRef,
+    rereadInOnChangeBatch,
     notify,
     validity,
     state: {

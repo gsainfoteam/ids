@@ -288,6 +288,7 @@ export function FieldRoot({
                 <div
                   key={node.key ?? index}
                   ref={field.controlRef}
+                  {...field.rereadInOnChangeBatch}
                   className={context.styles.control()}
                   data-field-control=""
                 >

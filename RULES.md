@@ -247,6 +247,13 @@ Form's `field.handleChange` both accept a plain value, so either binds to `onVal
 - A control whose value changes without an input event (a picker, a stepper) calls the
   `FieldNotifyContext` callback, so `<Field>` keeps its `data-filled` / `data-dirty` state.
 
+**Read typing in React's `onChange`, never in a native listener.** A native `input` or `change`
+listener on an element inside the React root runs before React's own, and for real input the
+browser runs microtasks between listeners. A `setState` there renders first, the controlled input
+is drawn again with its old `value`, React sees no change and the keystroke is lost. Field and the
+text controls reread the DOM inside the `onChange` batch (`rereadInOnChangeBatch`); native
+listeners stay for what React does not report, such as a form `reset` or a value written by script.
+
 **Parts.** Part props types are named `X.PartProps` (`OTPField.SlotProps`,
 `ButtonGroup.SeparatorProps`). Every part is optional and falls back to a default.
 
