@@ -287,17 +287,44 @@ somewhere that does not move as the value changes.
 calling the value callback (`useControllableState`'s `{ silent: true }`), the same as a native
 input, which fires no change event on reset.
 
-**Overlays.** A modal backdrop closes on `click`, not `pointerdown`; closing earlier lets the
-same press land on the page underneath and pulls focus away from the trigger it was returned to.
-A press outside a field popup blurs the element focused inside it before closing: React ignores
-the blur fired while it removes that element, so the field would never report `onBlur`.
-
 **Nested fields.** A field drawn inside another field's shell (TelField's country Select) turns
 its own ring off, so only the outer shell rings.
 
 **Components handed to a package are declared at module level.** react-day-picker's `components`
 (and any similar slot map) remounts a component that is recreated on every render, which drops
 focus and state. Define them once outside the render function.
+
+## Overlays
+
+Dialog, Drawer, Popover, Menu, Tooltip, Toast and the field popups are all assembled from
+`internal/overlay`. Read its README before writing one.
+
+- **Rendered in place, lifted into the top layer.** A layer renders where its JSX is written and
+  shows itself with `popover="manual"`. It keeps that spot's theme, Field focus containment, form
+  and Tab order, and still escapes the `overflow`, `transform` and `opacity` of its ancestors. No
+  portal and no `<dialog>.showModal()`, which makes every other top-layer element inert (toasts
+  included) and has no scroll lock. Tooltip is the one portal: it goes to the nearest IdsProvider
+  root so an in-place hint does not shift sibling selectors (`space-*`, `divide-*`, Group seams).
+- **One dismissal engine.** `useLayer` puts every open layer on one stack, ordered by open time.
+  Escape closes only the top layer, after inner handlers had their say through `preventDefault`;
+  a press outside closes non-modal layers from the top until it reaches one that holds it; focus
+  leaving closes non-modal layers and is pulled back into the top modal. Do not add floating-ui's
+  `useDismiss`: it stops Escape's propagation and ignores `defaultPrevented`.
+- **A modal backdrop closes on `click`, not `pointerdown`.** Closing earlier lets the same press
+  land on the page underneath and pulls focus away from the trigger it was returned to.
+- **A press outside blurs first.** A press outside a non-modal layer blurs the element focused
+  inside it before closing: React ignores the blur fired while it removes that element, so a
+  field would never report `onBlur`.
+- **Modal layers** go through `ModalLayer`: floating-ui's `FloatingFocusManager` holds focus and
+  hides the page with `aria-hidden` (never `inert`, which would block the toaster),
+  react-remove-scroll locks the scroll.
+- **Exit animations** go through `usePresence`: `data-ending-style` while leaving, the `starting:`
+  variant for entering, no timers.
+- **`overlay.open`.** A layer without an `open` prop binds to the `overlay.open` item it is
+  rendered in, and hands `null` to its children so an inner layer does not bind to the same item.
+- **Focus goes back where it came from** (`focusReturnTarget`), or to the trigger of the layer
+  that held it when that element is gone. Escape and close buttons return it; a press outside
+  leaves it where the press put it.
 
 ## Tests
 
