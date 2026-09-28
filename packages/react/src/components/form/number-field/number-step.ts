@@ -3,7 +3,7 @@ import { clamp } from 'es-toolkit';
 import { Decimal } from '../../../internal/decimal';
 
 export function shiftDecimal(value: number, places: number): number {
-  return new Decimal(value).shiftedBy(places).toNumber();
+  return new Decimal(value).times(Decimal.pow(10, places)).toNumber();
 }
 
 export function addDecimal(left: number, right: number): number {
@@ -14,36 +14,21 @@ export function isOnStep(value: number, step: number, base: number) {
   return new Decimal(value).minus(base).mod(step).isZero();
 }
 
-function stepsBelow(value: number, step: number, base: number) {
-  const offset = new Decimal(value).minus(base);
-  const size = new Decimal(step);
-
-  const signedRest = offset.mod(size);
-  const rest = signedRest.lt(0) ? signedRest.plus(size) : signedRest;
-
-  return { floor: offset.minus(rest).div(size), rest, size };
-}
-
 export type SnapMode = 'nearest' | 'up' | 'down';
 
+function offsetOnGrid(offset: Decimal, step: number, mode: SnapMode) {
+  if (mode === 'nearest') return offset.toNearest(step, Decimal.ROUND_HALF_CEIL);
+
+  const onGrid = offset.mod(step).isZero();
+
+  if (mode === 'up') return onGrid ? offset.plus(step) : offset.toNearest(step, Decimal.ROUND_CEIL);
+  return onGrid ? offset.minus(step) : offset.toNearest(step, Decimal.ROUND_FLOOR);
+}
+
 export function snapToStep(value: number, step: number, base: number, mode: SnapMode) {
-  const { floor, rest, size } = stepsBelow(value, step, base);
+  const offset = new Decimal(value).minus(base);
 
-  const onGrid = rest.isZero();
-  const pastHalf = rest.times(2).gte(size);
-
-  const count =
-    mode === 'up'
-      ? floor.plus(1)
-      : mode === 'down'
-        ? onGrid
-          ? floor.minus(1)
-          : floor
-        : pastHalf
-          ? floor.plus(1)
-          : floor;
-
-  return new Decimal(base).plus(count.times(size)).toNumber();
+  return offsetOnGrid(offset, step, mode).plus(base).toNumber();
 }
 
 function gridValueAtOrBelow(bound: number, step: number, base: number) {

@@ -13,7 +13,7 @@
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                  | Spinner, Progress                                                                                              |
 | [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                      | Button, IconButton, Toggle, IconToggle, FloatingButton                                                         |
 | [`date-locale.ts`](#date-localets)               | 문자열 locale 해석, locale 의 시간제와 날짜 순서                     | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                   |
-| [`decimal.ts`](#decimalts) | step 계산에 쓰는 정확한 십진수(bignumber.js) | NumberField, Slider |
+| [`decimal.ts`](#decimalts) | step 계산에 쓰는 정확한 십진수(decimal.js) | NumberField, Slider |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자               | Select, ChipField, ColorField, Menu, `temporal-field/`                                                         |
 | [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각     | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea          |
 | [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수        | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                     |
@@ -199,7 +199,7 @@ const orderOf = (locale: Locale) =>
 
 ## decimal.ts
 
-step 계산에 쓰는 정확한 십진수 `Decimal` 입니다. bignumber.js 의 `BigNumber.clone()` 으로 만든 생성자입니다.
+step 계산에 쓰는 정확한 십진수 `Decimal` 입니다. decimal.js 의 `Decimal.clone()` 으로 만든 생성자입니다.
 
 ### 쓰는 곳
 
@@ -210,20 +210,21 @@ step 계산에 쓰는 정확한 십진수 `Decimal` 입니다. bignumber.js 의 
 
 ```ts
 // components/form/slider/slider-math.ts
-const steps = new Decimal(raw).minus(min).div(step).integerValue(Decimal.ROUND_HALF_UP);
-return clamp(steps.times(step).plus(min).toNumber(), min, max);
+const offset = new Decimal(raw).minus(min).toNearest(step, Decimal.ROUND_HALF_CEIL);
+return clamp(offset.plus(min).toNumber(), min, max);
 ```
 
 ### 왜 이렇게
 
-- `0.1 + 0.2` 가 `0.30000000000000004` 가 되는 부동소수점 오차 없이 step 에 맞춥니다. step 에 맞추는 규칙(가장 가까운 칸, 다음 칸, 이전 칸)만 IDS 코드이고, 연산은 패키지가 합니다.
-- 전역 `BigNumber` 가 아니라 `clone()` 한 생성자입니다. 앱이 `BigNumber.config()` 로 반올림이나 나머지 규칙을 바꿔도 IDS 의 계산은 그대로입니다.
-- `MODULO_MODE` 는 `ROUND_DOWN` 입니다. 나머지의 부호가 나눠지는 수를 따르므로, 음수 나머지는 `number-step.ts` 가 step 을 더해 바닥 칸을 구합니다.
+- `0.1 + 0.2` 가 `0.30000000000000004` 가 되는 부동소수점 오차 없이 step 에 맞춥니다. step 에 맞추는 규칙만 IDS 코드이고, 연산은 패키지가 합니다.
+- 칸은 `toNearest(step, 반올림)` 하나로 구합니다. 가장 가까운 칸은 `ROUND_HALF_CEIL`(절반이면 위로, `Math.round` 와 같음), 위 칸은 `ROUND_CEIL`, 아래 칸은 `ROUND_FLOOR` 입니다.
+- 전역 `Decimal` 이 아니라 `clone()` 한 생성자입니다. 앱이 `Decimal.set()` 으로 정밀도나 반올림을 바꿔도 IDS 의 계산은 그대로입니다.
+- 정밀도는 700 자리입니다. decimal.js 는 덧셈 결과도 정밀도에서 자르는데, 두 number 의 합은 가장 큰 자리(10^308)부터 가장 작은 자리(10^-324)까지 약 650 자리가 필요합니다.
 
 ### 알아둘 것
 
-- 설정(`DECIMAL_PLACES`, `ROUNDING_MODE`, `MODULO_MODE`)을 바꾸면 NumberField 와 Slider 의 모든 칸 계산이 함께 바뀝니다.
-- `-0` 은 `isNegative()` 가 참입니다. 부호는 `lt(0)` 으로 봅니다.
+- 설정을 바꾸면 NumberField 와 Slider 의 모든 칸 계산이 함께 바뀝니다.
+- `div` 는 나누어떨어지지 않으면 700 자리까지 계산합니다. 스크롤이나 드래그처럼 자주 도는 곳에서는 `toNearest` 를 쓰고 `div` 를 피합니다.
 
 ## field-surface.ts
 

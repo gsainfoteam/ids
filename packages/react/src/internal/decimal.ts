@@ -1,9 +1,10 @@
-import BigNumber from 'bignumber.js';
+import DecimalJs from 'decimal.js';
 
-export const Decimal = BigNumber.clone({
-  DECIMAL_PLACES: 20,
-  ROUNDING_MODE: BigNumber.ROUND_HALF_UP,
-  MODULO_MODE: BigNumber.ROUND_DOWN,
+const DIGITS_THAT_KEEP_A_SUM_OF_ANY_TWO_NUMBERS_EXACT = 700;
+
+export const Decimal = DecimalJs.clone({
+  precision: DIGITS_THAT_KEEP_A_SUM_OF_ANY_TWO_NUMBERS_EXACT,
+  rounding: DecimalJs.ROUND_HALF_UP,
 });
 
-export type Decimal = BigNumber;
+export type Decimal = DecimalJs;

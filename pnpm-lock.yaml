@@ -43,9 +43,6 @@ importers:
       '@internationalized/number':
         specifier: ^3.6.8
         version: 3.6.8
-      bignumber.js:
-        specifier: ^11.1.5
-        version: 11.1.5
       cn:
         specifier: ^0.4.0
         version: 0.4.0
@@ -55,6 +52,9 @@ importers:
       date-fns:
         specifier: ^4.4.0
         version: 4.4.0
+      decimal.js:
+        specifier: ^10.6.0
+        version: 10.6.0
       es-toolkit:
         specifier: ^1.49.0
         version: 1.49.0
@@ -1662,9 +1662,6 @@ packages:
   better-path-resolve@1.0.0:
     resolution: {integrity: sha512-pbnl5XzGBdrFU/wT4jqmJVPn2B6UHPBOhzMQkY/SPUPB6QtUXtmBHBIwCbXJol93mOpGMnQyP/+BB19q04xj7g==}
     engines: {node: '>=4'}
-
-  bignumber.js@11.1.5:
-    resolution: {integrity: sha512-6WmzCNtUnfKpbozq+hOgWaZMMzORmYBwF1xZScyoIX3QRYWeKTtxxwDOW5tIz7C9BdjkIYHGTcelCLkXg0mndw==}
 
   brace-expansion@5.0.6:
     resolution: {integrity: sha512-kLpxurY4Z4r9sgMsyG0Z9uzsBlgiU/EFKhj/h91/8yHu0edo7XuixOIH3VcJ8kkxs6/jPzoI6U9Vj3WqbMQ94g==}
@@ -4883,8 +4880,6 @@ snapshots:
   better-path-resolve@1.0.0:
     dependencies:
       is-windows: 1.0.2
-
-  bignumber.js@11.1.5: {}
 
   brace-expansion@5.0.6:
     dependencies:

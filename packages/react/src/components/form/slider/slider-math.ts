@@ -3,8 +3,8 @@ import { clamp } from 'es-toolkit';
 import { Decimal } from '../../../internal/decimal';
 
 export function snap(raw: number, min: number, max: number, step: number) {
-  const steps = new Decimal(raw).minus(min).div(step).integerValue(Decimal.ROUND_HALF_UP);
-  const stepped = steps.times(step).plus(min).toNumber();
+  const offset = new Decimal(raw).minus(min).toNearest(step, Decimal.ROUND_HALF_CEIL);
+  const stepped = offset.plus(min).toNumber();
 
   return clamp(stepped, min, max);
 }
@@ -51,7 +51,7 @@ export function moveThumb(
 }
 
 export function stepMarks(min: number, max: number, step: number) {
-  const gaps = new Decimal(max).minus(min).div(step).integerValue(Decimal.ROUND_FLOOR).toNumber();
+  const gaps = new Decimal(max).minus(min).div(step).floor().toNumber();
 
   return Array.from({ length: gaps + 1 }, (_, index) =>
     new Decimal(step).times(index).plus(min).toNumber(),
