@@ -286,6 +286,23 @@ test('CountrySelect emits international values, searches country, disables and r
   await expect.element(country).toBeDisabled();
 });
 
+test('the country search draws its own focus ring, not the phone field around it', async () => {
+  const screen = await render(
+    <TelField defaultCountry="KR">
+      <TelField.CountrySelect />
+      <TelField.Input />
+    </TelField>,
+  );
+  const shell = screen.container.querySelector<HTMLElement>('[data-tel-field]')!;
+  const ringed = () => getComputedStyle(shell).boxShadow.includes('3px');
+  await userEvent.click(screen.getByRole('textbox'));
+  await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+  await expect.poll(ringed, { message: 'the country trigger is part of the field' }).toBe(true);
+  await userEvent.keyboard('{Enter}');
+  await expect.element(screen.getByRole('combobox', { name: '옵션 검색' })).toHaveFocus();
+  await expect.poll(ringed).toBe(false);
+});
+
 test('RHF controlled value, validation/focus, setValue/reset and disabled omission', async () => {
   type Values = { phone: string };
   const handle: { methods?: UseFormReturn<Values> } = {};

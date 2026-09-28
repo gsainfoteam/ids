@@ -290,14 +290,15 @@ const lightRegionInsideDark = `[data-mode="dark"] [data-mode="light"], [data-mod
 const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:where(${lightRegionInsideDark})));
 `;
 
-const fieldInputInPopupDrawnApart = "[popover] [data-field-input]:focus-visible";
+const focusedInsideButNotInItsPopups = (marker) =>
+  `&:has([${marker}]:focus-visible):not(:has([popover] [${marker}]:focus-visible))`;
 
 const FOCUS_RING_TRIGGERS = {
   formControl: "&:focus-visible",
   useInteractive: "&[data-focus-visible]",
-  shellAroundFieldInput: `&:has([data-field-input]:focus-visible):not(:has(${fieldInputInPopupDrawnApart}))`,
-  textField: "&:has([data-text-field-input]:focus-visible)",
-  textArea: "&:has([data-text-area-input]:focus-visible)",
+  shellAroundFieldInput: focusedInsideButNotInItsPopups("data-field-input"),
+  textField: focusedInsideButNotInItsPopups("data-text-field-input"),
+  textArea: focusedInsideButNotInItsPopups("data-text-area-input"),
 };
 
 const focusRingTriggers = (indent) =>
