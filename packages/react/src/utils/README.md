@@ -135,10 +135,12 @@ const mergedRef = useCallback(
 
 - 그래서 `asChild` 파트는 `mergeProps(사용자나 자식의 props, 내부 props)` 순서로 부릅니다. 내부 wiring(`role`, `aria-*`)이 이기고, 사용자 핸들러가 먼저 돌며 `preventDefault()` 로 내부 동작을 막을 수 있습니다.
 - `mergeRefs` 는 React 19 의 ref cleanup 을 돌려줍니다. cleanup 을 돌려주지 않는 callback ref 는 cleanup 때 `ref(null)` 로, object ref 는 `current = null` 로 뗍니다.
+- `mergeRefs` 는 같은 ref 들에 같은 함수를 돌려줍니다. ref 하나마다 `WeakMap` 을 한 단계 내려가 합친 함수를 찾습니다(`callbacksByRefs`, 없는 ref 는 `NO_REF`). 그래서 렌더 중에 `mergeRefs(...)` 나 ref 가 든 `mergeProps(...)` 를 그대로 넘겨도 React 가 렌더마다 ref 를 떼었다 붙이지 않습니다. `asChild` 파트와 Slot 이 hover 로 다시 렌더될 때 ref cleanup 이 돌던 것이 이 때문이었습니다.
 
 ### 알아둘 것
 
-- `mergeRefs(...)` 와 ref 가 든 `mergeProps(...)` 는 부를 때마다 새 ref 함수를 만듭니다. 렌더 중에 그대로 `ref` 로 넘기면 React 가 렌더마다 ref 를 떼었다 붙입니다. `useCallback` 으로 감싸거나(Spinner, Button) text-control 의 [`useMergedRef`](../internal/text-control/README.md#use-merged-refts) 를 씁니다.
+- 합칠 ref 가운데 하나가 렌더마다 새로 만들어지면(인라인 화살표 함수) 합친 함수도 매번 새것입니다. 그 ref 를 만드는 쪽에서 고정합니다.
+- 컴포넌트와 hook 이 `useRef` 로 만든 ref 를 합칠 때는 그래도 `useCallback` 으로 감쌉니다(Spinner, Button). React Compiler 의 `react-hooks/refs` 규칙이 렌더 중에 ref 객체를 함수에 넘기는 것을 막습니다.
 - `next ?? base` 라서 next 의 `undefined`, `null` 은 base 를 지우지 못합니다. `false` 와 `''` 는 base 를 덮습니다.
 
 ## children.ts

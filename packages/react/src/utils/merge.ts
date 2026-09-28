@@ -19,7 +19,7 @@ export function mergeEventHandlers<E extends SyntheticEvent>(
   };
 }
 
-export function mergeRefs<T>(...refs: Array<Ref<T> | null | undefined>): RefCallback<T> {
+function attachAll<T>(refs: Array<Ref<T> | null | undefined>): RefCallback<T> {
   return (value) => {
     const cleanups = refs.map((ref) => {
       if (isFunction(ref)) {
@@ -36,6 +36,24 @@ export function mergeRefs<T>(...refs: Array<Ref<T> | null | undefined>): RefCall
     });
     return () => cleanups.forEach((cleanup) => cleanup?.());
   };
+}
+
+type RefPath = { next: WeakMap<object, RefPath>; callback?: RefCallback<unknown> };
+
+const NO_REF: object = {};
+const callbacksByRefs: RefPath = { next: new WeakMap() };
+
+export function mergeRefs<T>(...refs: Array<Ref<T> | null | undefined>): RefCallback<T> {
+  const path = refs.reduce<RefPath>((parent, ref) => {
+    const key = ref ?? NO_REF;
+    const known = parent.next.get(key);
+    if (known) return known;
+    const created: RefPath = { next: new WeakMap() };
+    parent.next.set(key, created);
+    return created;
+  }, callbacksByRefs);
+  path.callback ??= attachAll(refs);
+  return path.callback;
 }
 
 function mergeObject<A extends object | undefined, B extends object | undefined>(
