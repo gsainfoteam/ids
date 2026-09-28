@@ -24,6 +24,7 @@ const chromium = () => ({
 
 export default defineConfig({
   plugins: [tsconfigPaths({ projects: ['./tsconfig.json'] }), tailwindcss(), react()],
+  optimizeDeps: { include: ['@floating-ui/react'] },
   test: {
     projects: [
       {
