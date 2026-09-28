@@ -1,4 +1,6 @@
-export function textAfterInput(
+const UNPREDICTABLE = null;
+
+export function predictTextAfterInput(
   value: string,
   start: number,
   end: number,
@@ -9,7 +11,7 @@ export function textAfterInput(
   switch (inputType) {
     case 'historyUndo':
     case 'historyRedo':
-      return null;
+      return UNPREDICTABLE;
     case 'deleteContent':
     case 'deleteByCut':
     case 'deleteByDrag':
@@ -26,6 +28,6 @@ export function textAfterInput(
     case 'deleteHardLineBackward':
       return value.slice(end);
     default:
-      return data == null ? null : value.slice(0, start) + data + value.slice(end);
+      return data == null ? UNPREDICTABLE : value.slice(0, start) + data + value.slice(end);
   }
 }

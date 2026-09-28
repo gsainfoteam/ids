@@ -40,6 +40,8 @@ export type TextAreaCountState = CountState;
 
 type StateValue<S, T> = T | ((state: S) => T);
 
+const MEASURED_HEIGHTS = ['height', 'minHeight', 'maxHeight'] as const;
+
 type TextAreaContextValue = {
   inputProps: ReturnType<typeof useTextArea>['inputProps'];
   count: ReturnType<typeof useTextArea>['count'];
@@ -200,7 +202,8 @@ export namespace TextArea {
           (typeof children.type !== 'string' || children.type === 'textarea'),
         '`<TextArea.Input asChild>` requires one textarea, or a component forwarding textarea props and ref.',
       );
-      if (children.type !== 'textarea') return cloneElement(children, autoResize ? props : fixed);
+      const rendersOwnTextarea = children.type !== 'textarea';
+      if (rendersOwnTextarea) return cloneElement(children, autoResize ? props : fixed);
     } else {
       invariant(children == null, '`<TextArea.Input>` takes `value`/`defaultValue`, not children.');
     }
@@ -208,7 +211,7 @@ export namespace TextArea {
     return (
       <TextareaAutosize
         {...props}
-        style={omit(props.style, ['height', 'minHeight', 'maxHeight'])}
+        style={omit(props.style, MEASURED_HEIGHTS)}
         minRows={minRows ?? props.rows}
         maxRows={maxRows}
       />

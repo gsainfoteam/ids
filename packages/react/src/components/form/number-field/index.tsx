@@ -192,10 +192,10 @@ export function NumberField({
           />
           {!hideStepper && !placesSteps && <NumberField.Stepper />}
         </div>
-        {field.name && (
+        {field.hiddenInputName && (
           <input
             type="hidden"
-            name={field.name}
+            name={field.hiddenInputName}
             form={field.form}
             disabled={state.disabled}
             value={field.value ?? ''}
@@ -246,7 +246,7 @@ export namespace NumberField {
   export function Input({ asChild, children, className, style }: InputProps) {
     const { field, styles } = useNumberContext('Input');
     const { inputProps } = field;
-    const props = {
+    const finalProps = {
       ...inputProps,
       className: styles.input({ className: cn(inputProps.className, className) }),
       style: inputProps.style || style ? { ...inputProps.style, ...style } : undefined,
@@ -258,13 +258,13 @@ export namespace NumberField {
           (typeof children.type !== 'string' || children.type === 'input'),
         '`<NumberField.Input asChild>` requires one input, or a component forwarding input props and ref.',
       );
-      return cloneElement(children, props);
+      return cloneElement(children, finalProps);
     }
     invariant(
       children == null,
       '`<NumberField.Input>` takes its value from `<NumberField>`, not children.',
     );
-    return <input {...props} />;
+    return <input {...finalProps} />;
   }
 
   export function Increment(props: StepProps) {

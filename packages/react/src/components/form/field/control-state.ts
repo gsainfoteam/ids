@@ -51,9 +51,13 @@ function entryOf(control: Control) {
   return control.value;
 }
 
+function mirrorsGuardedValue(control: Control) {
+  return control.hasAttribute('data-form-value-validator');
+}
+
 export function readValue(root: Element) {
   const entries = controlsIn(root)
-    .filter((control) => !control.hasAttribute('data-form-value-validator'))
+    .filter((control) => !mirrorsGuardedValue(control))
     .map(entryOf);
   return { signature: entries.join('\u0000'), filled: entries.some((entry) => entry !== '') };
 }

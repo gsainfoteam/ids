@@ -9,7 +9,7 @@ import {
 
 import { MinusIcon } from '@heroicons/react/16/solid';
 
-import { htmlPattern, type OTPFieldPattern } from './otp-code';
+import { lengthOnlyPattern, type OTPFieldPattern } from './otp-code';
 import { useOTPField, type OTPSlotState } from './use-otp-field';
 import { messages } from '../../../internal/messages';
 import { cn, invariant, mergeProps, tv } from '../../../utils';
@@ -75,6 +75,8 @@ const passwordManagerOptOut = {
   'data-form-type': 'other',
 };
 
+const noIosFocusZoom = cn('text-base');
+
 export function OTPField({
   length,
   value,
@@ -119,6 +121,11 @@ export function OTPField({
     inputProps['aria-labelledby'] !== undefined ||
     inputProps.id !== undefined;
 
+  const cleanBeforeOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    handlers.onChange(event);
+    onChange?.(event);
+  };
+
   const input = mergeProps(
     {
       type: 'text',
@@ -133,13 +140,10 @@ export function OTPField({
     },
     {
       ...handlers,
-      onChange: (event: ChangeEvent<HTMLInputElement>) => {
-        handlers.onChange(event);
-        onChange?.(event);
-      },
+      onChange: cleanBeforeOnChange,
       value: state.display,
       maxLength: length,
-      pattern: htmlPattern(length),
+      pattern: lengthOnlyPattern(length),
       'aria-invalid': ariaInvalid,
       className: styles.input(),
     },
@@ -273,7 +277,9 @@ export namespace OTPField {
       root: 'group/otp relative inline-flex items-center gap-2 data-disabled:opacity-50',
       input: [
         'absolute inset-0 z-10 size-full cursor-text appearance-none border-0 bg-transparent p-0',
-        'font-mono text-base tracking-[-0.5em] text-transparent caret-transparent outline-none',
+        'font-mono',
+        noIosFocusZoom,
+        'tracking-[-0.5em] text-transparent caret-transparent outline-none',
         'selection:bg-transparent disabled:cursor-not-allowed',
       ],
       group: 'flex items-center',

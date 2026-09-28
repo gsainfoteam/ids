@@ -21,7 +21,11 @@ export type InputProps =
 
 const SUPPORTED = ['text', 'email', 'url', 'search', 'number', 'password', 'tel'];
 
-const addressHints = { autoCapitalize: 'none', autoCorrect: 'off', spellCheck: false } as const;
+const leaveAddressesAsTyped = {
+  autoCapitalize: 'none',
+  autoCorrect: 'off',
+  spellCheck: false,
+} as const;
 
 export function Input(props: InputProps) {
   const { type = 'text' } = props;
@@ -58,7 +62,7 @@ export function Input(props: InputProps) {
         )}
       </TextField>
     );
-  const hints = type === 'email' || type === 'url' ? addressHints : undefined;
+  const hints = type === 'email' || type === 'url' ? leaveAddressesAsTyped : undefined;
   return (
     <TextField {...hints} {...rest} type={supported ? type : 'text'}>
       {children}

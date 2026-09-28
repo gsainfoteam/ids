@@ -5,6 +5,8 @@ export type SelectionHistory = Selection & { direction: 'forward' | 'backward' |
 
 const NUMERIC = '[0-9]';
 const ALPHANUMERIC = '[A-Za-z0-9]';
+const STATEFUL_TEST_FLAGS = /[gy]/g;
+const FOLD_FULL_WIDTH = 'NFKC';
 
 function characterSource(pattern: OTPFieldPattern) {
   if (pattern === 'numeric') return NUMERIC;
@@ -13,7 +15,7 @@ function characterSource(pattern: OTPFieldPattern) {
 }
 
 function characterFlags(pattern: OTPFieldPattern) {
-  return pattern instanceof RegExp ? pattern.flags.replace(/[gy]/g, '') : '';
+  return pattern instanceof RegExp ? pattern.flags.replace(STATEFUL_TEST_FLAGS, '') : '';
 }
 
 export function createCharacterTest(pattern: OTPFieldPattern) {
@@ -21,15 +23,20 @@ export function createCharacterTest(pattern: OTPFieldPattern) {
   return (character: string) => expression.test(character);
 }
 
-export function htmlPattern(length: number) {
+export function lengthOnlyPattern(length: number) {
   return `.{${length}}`;
 }
 
 export function sanitize(raw: string, accepts: (character: string) => boolean) {
-  return Array.from(raw.normalize('NFKC')).filter(accepts).join('');
+  return Array.from(raw.normalize(FOLD_FULL_WIDTH)).filter(accepts).join('');
 }
 
-export function insertText(value: string, { start, end }: Selection, text: string, length: number) {
+export function overwriteText(
+  value: string,
+  { start, end }: Selection,
+  text: string,
+  length: number,
+) {
   if (Array.from(text).length >= length) return Array.from(text).slice(0, length).join('');
   const chars = Array.from(value);
   const inserted = Array.from(text);
@@ -37,7 +44,7 @@ export function insertText(value: string, { start, end }: Selection, text: strin
   return [...chars.slice(0, start), ...inserted, ...tail].slice(0, length).join('');
 }
 
-export function normalizeSelection(
+export function selectCharacterUnderCaret(
   valueLength: number,
   maxLength: number,
   current: SelectionHistory,
@@ -56,7 +63,8 @@ export function normalizeSelection(
   if (previous) {
     direction = start < previous.end ? 'backward' : 'forward';
     const wasInserting = previous.start === previous.end && previous.start < maxLength;
-    if (direction === 'backward' && !wasInserting) offset = -1;
+    const movedLeftOffSelectedCharacter = direction === 'backward' && !wasInserting;
+    if (movedLeftOffSelectedCharacter) offset = -1;
   }
   const from = Math.max(0, Math.min(start + offset, valueLength - 1));
   return { start: from, end: from + 1, direction };

@@ -19,6 +19,7 @@ import { isSupportedCountry } from 'libphonenumber-js/min';
 import {
   countryOf,
   digitsOf,
+  inNationalForm,
   isCompletePhone,
   normalizePasted,
   presentPhone,
@@ -61,8 +62,19 @@ export type UseTelFieldOptions = {
 
 type Draft = { value: string; text: string };
 
+const SHORTEST_INTERNATIONAL_NUMBER = 8;
+
 function assertInput(node: HTMLInputElement) {
   invariant(node.tagName === 'INPUT', '`<TelField.Input>` must forward its ref to an input.');
+}
+
+function caretAfterDigits(text: string, digits: number) {
+  let count = 0;
+  for (let i = 0; i < text.length; i++) {
+    if (/[+\d]/.test(text[i]!)) count++;
+    if (count >= digits) return i + 1;
+  }
+  return text.length;
 }
 
 export function useTelField({
@@ -99,18 +111,16 @@ export function useTelField({
   const current = controlled ? toE164(value, chosen) : stored;
   const country = separateCountry ? countryOf(current, chosen) : chosen;
   const initialDraft = (): Draft | null =>
-    defaultValue === '' || defaultValue.startsWith('+')
-      ? null
-      : readPhone(defaultValue, defaultCountry, format, separateCountry);
+    inNationalForm(defaultValue)
+      ? readPhone(defaultValue, defaultCountry, format, separateCountry)
+      : null;
   const [draft, setDraft] = useState<Draft | null>(initialDraft);
   const [composition, setComposition] = useState<string | null>(null);
   const composing = useRef(false);
   const caret = useRef<number | null>(null);
 
   const given =
-    controlled && value !== '' && !value.startsWith('+')
-      ? readPhone(value, country, format, separateCountry)
-      : null;
+    controlled && inNationalForm(value) ? readPhone(value, country, format, separateCountry) : null;
   const display =
     composition ??
     (draft && draft.value === current
@@ -144,7 +154,8 @@ export function useTelField({
     composing.current = false;
   });
 
-  const validity = current !== '' && !isCompletePhone(current) ? messages.telField.invalid : '';
+  const holdsIncompleteNumber = current !== '' && !isCompletePhone(current);
+  const validity = holdsIncompleteNumber ? messages.telField.invalid : '';
   useLayoutEffect(() => {
     inputRef.current?.setCustomValidity(validity);
     notify?.();
@@ -153,30 +164,19 @@ export function useTelField({
   const accept = (node: HTMLInputElement, deleting: boolean) => {
     let raw = node.value;
     let position = node.selectionStart ?? raw.length;
-    if (
+    const deletedOnlySeparator =
       deleting &&
       format !== 'none' &&
       raw.length < display.length &&
       digitsOf(raw) === digitsOf(display) &&
-      position > 0
-    ) {
+      position > 0;
+    if (deletedOnlySeparator) {
       raw = raw.slice(0, position - 1) + raw.slice(position);
       position--;
     }
-    const significant = digitsOf(raw.slice(0, position)).length;
+    const digitsBeforeCaret = digitsOf(raw.slice(0, position)).length;
     const next = readPhone(raw, country, format, separateCountry);
-    if (format === 'none') caret.current = position;
-    else {
-      let count = 0;
-      caret.current = next.text.length;
-      for (let i = 0; i < next.text.length; i++) {
-        if (/[+\d]/.test(next.text[i]!)) count++;
-        if (count >= significant) {
-          caret.current = i + 1;
-          break;
-        }
-      }
-    }
+    caret.current = format === 'none' ? position : caretAfterDigits(next.text, digitsBeforeCaret);
     emit(next);
   };
 
@@ -224,7 +224,9 @@ export function useTelField({
       native.onPaste?.(event);
       if (event.defaultPrevented || locked) return;
       const pasted = normalizePasted(event.clipboardData.getData('text'));
-      if (!pasted.startsWith('+') || pasted.length < 8) return;
+      const wholeInternationalNumber =
+        pasted.startsWith('+') && pasted.length >= SHORTEST_INTERNATIONAL_NUMBER;
+      if (!wholeInternationalNumber) return;
       event.preventDefault();
       replaceInput(event.currentTarget, pasted);
     },
@@ -252,7 +254,7 @@ export function useTelField({
     changeCountry,
     country,
     value: current,
-    name: native.name,
+    hiddenInputName: native.name,
     form: native.form,
     state: {
       disabled,

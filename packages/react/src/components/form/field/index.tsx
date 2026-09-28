@@ -146,13 +146,18 @@ function joinIds(...values: unknown[]) {
   return uniq(ids.filter(Boolean)).join(' ') || undefined;
 }
 
+type ReactHookFormBridge = {
+  bindControl?: (props: ControlProps, control: ReactElement<ControlProps>) => ControlProps;
+  errorMessage?: ReactNode;
+};
+
 export function FieldRoot({
   children,
   id,
   name,
   size = 'standard',
   orientation: orientationProp,
-  variant,
+  variant: deprecatedOrientation,
   invalid: invalidProp,
   disabled: disabledProp,
   required: requiredProp,
@@ -166,11 +171,8 @@ export function FieldRoot({
   bindControl,
   errorMessage,
   ...rest
-}: FieldProps & {
-  bindControl?: (props: ControlProps, control: ReactElement<ControlProps>) => ControlProps;
-  errorMessage?: ReactNode;
-}) {
-  const orientation = orientationProp ?? variant ?? 'vertical';
+}: FieldProps & ReactHookFormBridge) {
+  const orientation = orientationProp ?? deprecatedOrientation ?? 'vertical';
   const generatedId = useId();
   const field = useField({ dirty, touched });
   const nodes = flatten(children);

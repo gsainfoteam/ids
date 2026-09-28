@@ -18,7 +18,7 @@ export type UseFieldOptions = {
 export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOptions) {
   const controlRef = useRef<HTMLDivElement>(null);
   const initial = useRef<string | null>(null);
-  const shown = useRef(false);
+  const errorShowing = useRef(false);
   const [focused, setFocused] = useState(false);
   const [touched, setTouched] = useState(false);
   const [value, setValue] = useState({ filled: false, dirty: false });
@@ -38,16 +38,16 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
     const root = controlRef.current;
     if (!root) return;
     const next = validatesNatively(root) ? readValidity(root) : null;
-    shown.current = next !== null;
+    errorShowing.current = next !== null;
     setValidity((prev) => (isEqual(prev, next) ? prev : next));
   }, []);
 
   const notify = useCallback(() => {
     syncValue();
-    if (shown.current) validate();
+    if (errorShowing.current) validate();
   }, [syncValue, validate]);
 
-  useLayoutEffect(() => {
+  useLayoutEffect(function catchValuesSetWithoutInputEvents() {
     notify();
   });
 
@@ -61,12 +61,15 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
     const onFocusOut = (event: FocusEvent) => {
       const next = event.relatedTarget as Node | null;
       if (next && root.contains(next)) return;
-      if (!next && root.contains(doc.activeElement)) return;
+      const windowLostFocus = !next && root.contains(doc.activeElement);
+      if (windowLostFocus) return;
       setFocused(false);
       setTouched(true);
-      if (syncValue() || shown.current) validate();
+      const edited = syncValue();
+      if (edited || errorShowing.current) validate();
     };
-    if (root.contains(doc.activeElement)) onFocusIn();
+    const focusedBeforeListening = root.contains(doc.activeElement);
+    if (focusedBeforeListening) onFocusIn();
 
     root.addEventListener('input', notify);
     root.addEventListener('change', notify);
@@ -75,26 +78,29 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
     root.addEventListener('invalid', validate, true);
 
     const form = formOf(root);
-    let timer = 0;
+    let initialTimer = 0;
     let mounted = true;
+    const rereadInitialOnceControlsRestore = () => {
+      view.clearTimeout(initialTimer);
+      initialTimer = view.setTimeout(() => {
+        if (!mounted) return;
+        initial.current = null;
+        syncValue();
+      }, 0);
+    };
     const onReset = (event: Event) =>
       queueMicrotask(() => {
         if (!mounted || event.defaultPrevented) return;
         setTouched(false);
-        shown.current = false;
+        errorShowing.current = false;
         setValidity(null);
-        view.clearTimeout(timer);
-        timer = view.setTimeout(() => {
-          if (!mounted) return;
-          initial.current = null;
-          syncValue();
-        }, 0);
+        rereadInitialOnceControlsRestore();
       });
     form?.addEventListener('reset', onReset);
 
     return () => {
       mounted = false;
-      view.clearTimeout(timer);
+      view.clearTimeout(initialTimer);
       root.removeEventListener('input', notify);
       root.removeEventListener('change', notify);
       root.removeEventListener('focusin', onFocusIn);

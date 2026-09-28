@@ -20,7 +20,9 @@ export const FieldSizeContext = createContext<IdsSize | undefined>(undefined);
 
 export const FieldStateContext = createContext<FieldState | null>(null);
 
-export const FieldNotifyContext = createContext<(() => void) | null>(null);
+type NotifyValueChangedWithoutInputEvent = () => void;
+
+export const FieldNotifyContext = createContext<NotifyValueChangedWithoutInputEvent | null>(null);
 
 export const FieldLabelContext = createContext(false);
 
