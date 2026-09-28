@@ -147,7 +147,7 @@ function joinIds(...values: unknown[]) {
   return uniq(ids.filter(Boolean)).join(' ') || undefined;
 }
 
-type ReactHookFormBridge = {
+type FormLibraryBridge = {
   bindControl?: (props: ControlProps, control: ReactElement<ControlProps>) => ControlProps;
   errorMessage?: ReactNode;
 };
@@ -172,7 +172,7 @@ export function FieldRoot({
   bindControl,
   errorMessage,
   ...rest
-}: FieldProps & ReactHookFormBridge) {
+}: FieldProps & FormLibraryBridge) {
   const orientation = orientationProp ?? deprecatedOrientation ?? 'vertical';
   const generatedId = useId();
   const field = useField({ dirty, touched });

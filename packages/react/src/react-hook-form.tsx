@@ -1,4 +1,4 @@
-import { useEffect, type ReactElement, type Ref } from 'react';
+import { useEffect } from 'react';
 
 import { useController, useFormContext, type RegisterOptions } from 'react-hook-form';
 
@@ -7,6 +7,12 @@ import {
   FieldRoot,
   type FieldProps as BaseProps,
 } from './components/form/field';
+import {
+  keepInputControlled,
+  mergeBinding,
+  valueReports,
+  withoutDefaults,
+} from './internal/form-bridge';
 import { isDevelopment } from './utils/dev';
 
 type ControlledOptions = Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>;
@@ -15,72 +21,6 @@ export type FieldProps = BaseProps &
     | { controlMode?: 'native'; registerOptions?: RegisterOptions }
     | { controlMode: 'value' | 'checked'; registerOptions?: ControlledOptions }
   );
-type Props = Record<string, unknown>;
-type Handler = (...args: unknown[]) => void;
-
-function rhfRunsEvenIfPrevented(props: Props, binding: Props, key: string) {
-  return (...args: unknown[]) => {
-    (props[key] as Handler | undefined)?.(...args);
-    (binding[key] as Handler | undefined)?.(...args);
-  };
-}
-
-function bind(props: Props, binding: Props) {
-  const result = { ...props, ...binding };
-  for (const key of Object.keys(binding)) {
-    if (!/^on[A-Z]/.test(key)) continue;
-    result[key] = rhfRunsEvenIfPrevented(props, binding, key);
-  }
-  result.ref = (node: HTMLElement | null) => {
-    const refs = [props.ref, binding.ref] as Array<Ref<HTMLElement> | undefined>;
-    const cleanups = refs.map((ref) => {
-      if (typeof ref === 'function') {
-        const cleanup = ref(node);
-        return typeof cleanup === 'function' ? cleanup : () => ref(null);
-      }
-      if (ref) {
-        ref.current = node;
-        return () => {
-          ref.current = null;
-        };
-      }
-      return undefined;
-    });
-    return () => cleanups.forEach((cleanup) => cleanup?.());
-  };
-  return result;
-}
-
-function isEvent(value: unknown) {
-  return (
-    typeof value === 'object' && value !== null && 'target' in value && 'currentTarget' in value
-  );
-}
-
-function reportsFor(
-  control: ReactElement,
-  controlMode: 'value' | 'checked',
-  onChange: (value: unknown) => void,
-) {
-  const rhfReadsNativeEvent = typeof control.type === 'string';
-  if (rhfReadsNativeEvent) return { onChange };
-  let reportedThisEdit = false;
-  const reportOncePerEdit = (value: unknown) => {
-    if (reportedThisEdit) return;
-    reportedThisEdit = true;
-    queueMicrotask(() => {
-      reportedThisEdit = false;
-    });
-    onChange(value);
-  };
-  const reportValueNotForwardedEvent = (next: unknown) => {
-    if (!isEvent(next)) reportOncePerEdit(next);
-  };
-  return {
-    [controlMode === 'checked' ? 'onCheckedChange' : 'onValueChange']: reportOncePerEdit,
-    onChange: reportValueNotForwardedEvent,
-  };
-}
 
 function NativeField({
   name,
@@ -101,7 +41,7 @@ function NativeField({
       touched={props.touched ?? state.isTouched}
       errorMessage={state.error?.message}
       bindControl={(original) =>
-        bind(original, { ...registration, disabled: disabled ?? original.disabled })
+        mergeBinding(original, { ...registration, disabled: disabled ?? original.disabled })
       }
     />
   );
@@ -135,13 +75,10 @@ function ControlledField({
       errorMessage={fieldState.error?.message}
       bindControl={(original, control) => {
         const { value, onChange, ...binding } = field;
-        const valueKeepingInputControlled =
-          value === undefined ? (controlMode === 'checked' ? false : '') : value;
-        const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
-        return bind(rest, {
+        return mergeBinding(withoutDefaults(original), {
           ...binding,
-          ...reportsFor(control, controlMode, onChange),
-          [controlMode]: valueKeepingInputControlled,
+          ...valueReports(control, controlMode, onChange, { readsNativeEvents: true }),
+          [controlMode]: keepInputControlled(value, controlMode),
           disabled: disabled ?? original.disabled,
         });
       }}
