@@ -5,13 +5,15 @@ import { expect, test } from 'vitest';
 
 const coldNodeStartOnABusyRunner = 30_000;
 
-test('base ESM and CommonJS exports load when no form library can resolve', () => {
-  const result = spawnSync(
-    process.execPath,
-    [
-      '--input-type=module',
-      '-e',
-      `
+test(
+  'base ESM and CommonJS exports load when no form library can resolve',
+  () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        '--input-type=module',
+        '-e',
+        `
     import { registerHooks, createRequire } from 'node:module';
     registerHooks({ resolve(specifier, context, nextResolve) {
       if (specifier === 'react-hook-form' || specifier.startsWith('@tanstack/'))
@@ -22,8 +24,10 @@ test('base ESM and CommonJS exports load when no form library can resolve', () =
     const cjs = createRequire(import.meta.url)('./dist/index.cjs');
     if (!esm.Field || !cjs.Field || !esm.TextField || !cjs.TextField) process.exit(1);
   `,
-    ],
-    { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' },
-  );
-  expect(result.status, result.stderr).toBe(0);
-}, coldNodeStartOnABusyRunner);
+      ],
+      { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' },
+    );
+    expect(result.status, result.stderr).toBe(0);
+  },
+  coldNodeStartOnABusyRunner,
+);
