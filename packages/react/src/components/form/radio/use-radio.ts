@@ -73,18 +73,19 @@ export function useRadio({
     const input = inputRef.current;
     if (controlled || !input) return;
     const scope = input.form ?? input.ownerDocument;
-    const sync = (event: Event) => {
+    const noticeUncheckByGroupmate = (event: Event) => {
       if (isGroupmate(event.target, input)) adopt.current(input.checked);
     };
-    scope.addEventListener('change', sync);
-    return () => scope.removeEventListener('change', sync);
+    scope.addEventListener('change', noticeUncheckByGroupmate);
+    return () => scope.removeEventListener('change', noticeUncheckByGroupmate);
   }, [controlled]);
 
   useFormReset(inputRef, () => {
     const input = inputRef.current;
     if (!input) return;
     if (!controlled) {
-      setChecked(input.checked, { silent: true });
+      const restoredByBrowser = input.checked;
+      setChecked(restoredByBrowser, { silent: true });
       return;
     }
     silently(() => {
@@ -100,14 +101,18 @@ export function useRadio({
     onClick?.(event);
   };
 
+  const reassertCheckedAfterEngineRevert = (input: HTMLInputElement) =>
+    queueMicrotask(() =>
+      silently(() => {
+        input.checked = latest.current;
+      }),
+    );
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    if (event.nativeEvent.defaultPrevented) {
-      queueMicrotask(() =>
-        silently(() => {
-          input.checked = latest.current;
-        }),
-      );
+    const clickWasCancelled = event.nativeEvent.defaultPrevented;
+    if (clickWasCancelled) {
+      reassertCheckedAfterEngineRevert(input);
       return;
     }
     setChecked(input.checked);
