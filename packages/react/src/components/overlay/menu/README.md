@@ -6,7 +6,7 @@
 - **움직이는 법.** ↑ ↓ 는 끝에서 반대편 끝으로 돌아갑니다. Home, End 는 처음과 끝으로 갑니다. disabled 항목은 건너뜁니다. 글자를 치면 그 글자로 시작하는 항목으로 갑니다.
 - **고르는 법.** 클릭, Enter, Space. 고르면 하위 메뉴까지 모두 닫히고 포커스는 trigger 로 돌아갑니다. `onSelect` 에서 `event.preventDefault()` 하면 열린 채로 둡니다.
 - **닫는 법.** Escape 는 맨 위 메뉴 하나만 닫습니다(하위 메뉴가 열려 있으면 하위 메뉴만). 바깥을 누르면 전부 닫히고 포커스는 누른 곳에 남습니다. Tab 은 전부 닫고 trigger 로 돌아갑니다.
-- **하위 메뉴.** 올려 두거나 → 키, Enter, Space 로 열고, ← 키나 Escape 로 닫습니다. 하위 메뉴로 가는 대각선 길에서는 다른 항목이 반응하지 않습니다. 몇 단계든 겹칠 수 있습니다.
+- **하위 메뉴.** `Menu.Content` 안에 `Menu` 를 하나 더 두면 하위 메뉴가 됩니다. 올려 두거나 → 키, Enter, Space 로 열고, ← 키나 Escape 로 닫습니다. 하위 메뉴로 가는 대각선 길에서는 다른 항목이 반응하지 않습니다. 몇 단계든 겹칠 수 있습니다.
 - **우클릭 메뉴.** `triggerType="contextmenu"` 면 trigger 영역을 우클릭한 자리에 뜹니다.
 
 ```tsx
@@ -24,37 +24,56 @@ import { Menu } from '@gsainfoteam/ids-react';
     </Menu.Item>
     <Menu.Item disabled>붙여넣기</Menu.Item>
     <Menu.Separator />
-    <Menu.Sub>
-      <Menu.SubTrigger>공유</Menu.SubTrigger>
-      <Menu.SubContent>
+    <Menu>
+      <Menu.Trigger>공유</Menu.Trigger>
+      <Menu.Content>
         <Menu.Item>메일로 보내기</Menu.Item>
         <Menu.Item>링크 복사</Menu.Item>
-      </Menu.SubContent>
-    </Menu.Sub>
+      </Menu.Content>
+    </Menu>
   </Menu.Content>
 </Menu>;
 ```
 
 ## 구조
 
-| 파트                 | 역할                                                                              |
-| -------------------- | --------------------------------------------------------------------------------- |
-| `Menu.Trigger`       | 여는 버튼. `asChild` 로 다른 버튼에 붙인다. `contextmenu` 면 우클릭을 받는 영역   |
-| `Menu.Content`       | 메뉴 본체(`role="menu"`). 닫혀 있으면 렌더하지 않는다                             |
-| `Menu.Item`          | 명령 하나(`menuitem`). `asChild` 로 링크(`<a>`)에 붙일 수 있다                    |
-| `Menu.CheckboxItem`  | 켜고 끄는 항목(`menuitemcheckbox`)                                                |
-| `Menu.RadioGroup`    | 하나만 고르는 묶음. 안에 `Menu.RadioItem`(`menuitemradio`)을 둔다                 |
-| `Menu.ItemIndicator` | 고른 항목 끝의 표시. 체크(체크박스), 점(라디오) 대신 다른 모양을 넣을 때만 적는다 |
-| `Menu.Group`         | 항목 묶음(`role="group"`). 안의 `Menu.Label` 이 이름이 된다                       |
-| `Menu.Label`         | 묶음의 제목. 고를 수 없다                                                         |
-| `Menu.Separator`     | 구분선                                                                            |
-| `Menu.Shortcut`      | 항목 끝의 단축키 표시. `Kbd` 라서 `keys="mod+c"` 가 운영체제에 맞게 그려진다      |
-| `Menu.Sub`           | 하위 메뉴. 안에 `Menu.SubTrigger` 와 `Menu.SubContent` 를 둔다                    |
-| `Menu.Search`        | 명령 팔레트의 검색 상자(`combobox`). 적지 않으면 기본 검색 상자가 들어간다        |
-| `Menu.Empty`         | 명령 팔레트에서 맞는 항목이 없을 때의 문구. 기본 "결과가 없습니다."               |
+| 파트                 | 역할                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------- |
+| `Menu.Trigger`       | 여는 버튼. `asChild` 로 다른 버튼에 붙인다. `contextmenu` 면 우클릭을 받는 영역, 하위 메뉴면 항목 |
+| `Menu.Content`       | 메뉴 본체(`role="menu"`). 닫혀 있으면 렌더하지 않는다                                             |
+| `Menu.Item`          | 명령 하나(`menuitem`). `asChild` 로 링크(`<a>`)에 붙일 수 있다                                    |
+| `Menu.CheckboxItem`  | 켜고 끄는 항목(`menuitemcheckbox`)                                                                |
+| `Menu.RadioGroup`    | 하나만 고르는 묶음. 안에 `Menu.RadioItem`(`menuitemradio`)을 둔다                                 |
+| `Menu.ItemIndicator` | 고른 항목 끝의 표시. 체크(체크박스), 점(라디오) 대신 다른 모양을 넣을 때만 적는다                 |
+| `Menu.Group`         | 항목 묶음(`role="group"`). 안의 `Menu.Label` 이 이름이 된다                                       |
+| `Menu.Label`         | 묶음의 제목. 고를 수 없다                                                                         |
+| `Menu.Separator`     | 구분선                                                                                            |
+| `Menu.Shortcut`      | 항목 끝의 단축키 표시. `Kbd` 라서 `keys="mod+c"` 가 운영체제에 맞게 그려진다                      |
+| `Menu.Search`        | 명령 팔레트의 검색 상자(`combobox`). 적지 않으면 기본 검색 상자가 들어간다                        |
+| `Menu.Empty`         | 명령 팔레트에서 맞는 항목이 없을 때의 문구. 기본 "결과가 없습니다."                               |
 
 - `Menu.Content` 는 trigger 의 글자를 이름으로 씁니다(`aria-labelledby`). 우클릭 메뉴는 이름을 붙일 trigger 가 없으므로 `aria-label` 을 줍니다.
 - 하위 메뉴의 이름은 "〇〇 하위 메뉴" 입니다.
+
+## 하위 메뉴
+
+```tsx
+<Menu.Content>
+  <Menu.Item>새 문서</Menu.Item>
+  <Menu>
+    <Menu.Trigger>내보내기</Menu.Trigger>
+    <Menu.Content>
+      <Menu.Item>PDF</Menu.Item>
+    </Menu.Content>
+  </Menu>
+</Menu.Content>
+```
+
+- `Menu.Content` 안에 둔 `Menu` 는 따로 적지 않아도 하위 메뉴입니다.
+- 그 `Menu.Trigger` 는 버튼이 아니라 끝에 화살표가 붙은 항목(`menuitem`, `aria-haspopup="menu"`)입니다. 부모 메뉴의 방향키 이동과 글자 검색에 다른 항목처럼 들어갑니다.
+- 그 `Menu.Trigger` 는 `disabled`, `textValue`, `asChild` 를 `Menu.Item` 처럼 받습니다.
+- 그 `Menu.Content` 는 trigger 옆에 열립니다. 위치 속성은 [위치](#위치)를 봅니다.
+- `triggerType`, `hotkey` 는 가장 바깥 `Menu` 에만 씁니다. 하위 메뉴에 주면 무시하고 개발 중에는 경고합니다.
 
 ## 항목
 
@@ -90,7 +109,7 @@ const [zoom, setZoom] = useState('100');
 ```tsx
 <Menu.Content side="bottom" align="start" sideOffset={4} />   // 기본
 <Menu.Content align="end" />                                   // trigger 의 끝에 맞춘다
-<Menu.SubContent side="right" sideOffset={2} alignOffset={-5} /> // 하위 메뉴 기본
+<Menu.Content side="right" sideOffset={2} alignOffset={-5} />   // 하위 메뉴 기본
 ```
 
 - 자리가 모자라면 반대쪽으로 뒤집히고, 화면 가장자리에서 8px 안쪽에 머뭅니다.
@@ -113,25 +132,25 @@ const [zoom, setZoom] = useState('100');
 ## 여러 단계의 하위 메뉴
 
 ```tsx
-<Menu.Sub>
-  <Menu.SubTrigger>내보내기</Menu.SubTrigger>
-  <Menu.SubContent>
-    <Menu.Sub>
-      <Menu.SubTrigger>이미지</Menu.SubTrigger>
-      <Menu.SubContent>
-        <Menu.Sub>
-          <Menu.SubTrigger>JPEG</Menu.SubTrigger>
-          <Menu.SubContent>
+<Menu>
+  <Menu.Trigger>내보내기</Menu.Trigger>
+  <Menu.Content>
+    <Menu>
+      <Menu.Trigger>이미지</Menu.Trigger>
+      <Menu.Content>
+        <Menu>
+          <Menu.Trigger>JPEG</Menu.Trigger>
+          <Menu.Content>
             <Menu.Item>고화질</Menu.Item>
-          </Menu.SubContent>
-        </Menu.Sub>
-      </Menu.SubContent>
-    </Menu.Sub>
-  </Menu.SubContent>
-</Menu.Sub>
+          </Menu.Content>
+        </Menu>
+      </Menu.Content>
+    </Menu>
+  </Menu.Content>
+</Menu>
 ```
 
-- 깊이에 제한은 없습니다. 단계마다 레이어가 하나씩 쌓여서 Escape 와 ← 는 가장 깊은 하위 메뉴 하나만 닫고, 포커스는 그 메뉴를 연 `Menu.SubTrigger` 로 돌아갑니다.
+- 깊이에 제한은 없습니다. 단계마다 레이어가 하나씩 쌓여서 Escape 와 ← 는 가장 깊은 하위 메뉴 하나만 닫고, 포커스는 그 메뉴를 연 `Menu.Trigger` 로 돌아갑니다.
 - 바깥을 누르면 모든 단계가 한 번에 닫히고 `onOpenChange(false)` 는 단계마다 한 번씩만 불립니다.
 - 좁은 화면에서는 세 단계부터 서로 겹칩니다. 네 단계 넘게 겹치는 메뉴는 `Menu.Group` 이나 Dialog 로 나누는 편이 읽기 쉽습니다.
 
@@ -155,7 +174,9 @@ const [zoom, setZoom] = useState('100');
     <Menu.Separator />
     <Menu.Group>
       <Menu.Label>보기</Menu.Label>
-      <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>어두운 화면</Menu.CheckboxItem>
+      <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>
+        어두운 화면
+      </Menu.CheckboxItem>
     </Menu.Group>
     <Menu.Empty>일치하는 명령이 없습니다.</Menu.Empty>
   </Menu.Content>
@@ -169,7 +190,7 @@ const [zoom, setZoom] = useState('100');
 - **고르는 법.** Enter 나 클릭. 고르면 닫히고 포커스는 연 곳으로 돌아갑니다. `onSelect` 에서 `preventDefault()` 하면 열린 채로 둡니다. 조합 중의 Enter 는 고르지 않습니다.
 - **닫는 법.** Escape, 배경 클릭, `hotkey`. 포커스는 열기 전에 있던 곳으로 돌아갑니다.
 - **접근성.** 팔레트는 `role="dialog"`(이름 기본 "명령", `aria-label` 로 바꿈), 검색 상자는 `combobox`(`aria-activedescendant` 로 강조된 항목을 가리킴), 목록은 `listbox`, 항목은 `option` 입니다. 체크박스, 라디오 항목은 `aria-checked` 도 가집니다.
-- `Menu.Sub` 는 명령 팔레트에서 쓸 수 없습니다. 개발 중에는 경고하고 아무것도 그리지 않습니다. 대신 `Menu.Group` 으로 나눕니다.
+- 하위 메뉴는 명령 팔레트에서 쓸 수 없습니다. 팔레트 안에 둔 `Menu` 는 개발 중에 경고하고 아무것도 그리지 않습니다. 대신 `Menu.Group` 으로 나눕니다.
 
 ```tsx
 const route = await overlay.open<string>(({ close }) => (
@@ -199,15 +220,16 @@ const route = await overlay.open<string>(({ close }) => (
 
 ## 상태
 
-| 속성                      | 붙는 곳                                                    |
-| ------------------------- | ---------------------------------------------------------- |
-| `data-popup-open`         | 열려 있는 동안의 `Menu.Trigger`, `Menu.SubTrigger`         |
-| `data-open`               | 열린 `Menu.Content`, `Menu.SubContent`                     |
-| `data-ending-style`       | 닫히는 애니메이션 동안의 `Menu.Content`, `Menu.SubContent` |
-| `data-side`, `data-align` | 실제로 놓인 쪽과 정렬                                      |
-| `data-highlighted`        | 포커스된 항목, 명령 팔레트에서 강조된 항목                 |
-| `data-disabled`           | disabled 항목                                              |
-| `data-checked`            | 켜진 `Menu.CheckboxItem`, 고른 `Menu.RadioItem`            |
+| 속성                      | 붙는 곳                                         |
+| ------------------------- | ----------------------------------------------- |
+| `data-popup-open`         | 열려 있는 동안의 `Menu.Trigger`                 |
+| `data-open`               | 열린 `Menu.Content`                             |
+| `data-ending-style`       | 닫히는 애니메이션 동안의 `Menu.Content`         |
+| `data-nested`             | 하위 메뉴의 `Menu.Content`                      |
+| `data-side`, `data-align` | 실제로 놓인 쪽과 정렬                           |
+| `data-highlighted`        | 포커스된 항목, 명령 팔레트에서 강조된 항목      |
+| `data-disabled`           | disabled 항목                                   |
+| `data-checked`            | 켜진 `Menu.CheckboxItem`, 고른 `Menu.RadioItem` |
 
 ## 속성
 
@@ -218,7 +240,8 @@ const route = await overlay.open<string>(({ close }) => (
 | `triggerType`          | `click`(기본) / `contextmenu` / `command`   |
 | `hotkey`               | `command` 에서 여닫는 단축키. 예: `"mod+k"` |
 
-`Menu.Sub` 도 `open`, `defaultOpen`, `onOpenChange` 를 받습니다. 부모 메뉴와 함께 닫힐 때는 하위 메뉴의 `onOpenChange` 를 부르지 않습니다.
+- 하위 메뉴의 `Menu` 도 `open`, `defaultOpen`, `onOpenChange` 를 받습니다. 부모 메뉴와 함께 닫힐 때는 하위 메뉴의 `onOpenChange` 를 부르지 않습니다.
+- `triggerType`, `hotkey` 는 가장 바깥 `Menu` 에만 씁니다.
 
 ## 알아둘 것
 

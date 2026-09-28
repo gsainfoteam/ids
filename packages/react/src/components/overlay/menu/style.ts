@@ -36,7 +36,7 @@ export const menuStyle = tv({
     ],
     indicator: listStyles.indicator,
     dot: 'size-1.5 rounded-full bg-current',
-    subIcon: '-me-0.5 ms-auto text-(--ids-color-on-muted)',
+    chevron: '-me-0.5 ms-auto text-(--ids-color-on-muted)',
     group: 'flex flex-col',
     label: listStyles.heading,
     separator: listStyles.separator,

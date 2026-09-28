@@ -37,7 +37,7 @@ export type UseMenuLevelOptions = {
   triggerType: MenuTriggerType;
 };
 
-const SUBMENU_HOVER_INTENT_MS = 75;
+const NESTED_HOVER_INTENT_MS = 75;
 
 const OPEN_CHANGE_REASON: Record<DismissReason, OpenChangeReason> = {
   'escape-key': 'escape-key',
@@ -120,7 +120,7 @@ export function useMenuLevel({
 
   const hover = useHover(anchored.context, {
     enabled: nested,
-    delay: { open: SUBMENU_HOVER_INTENT_MS },
+    delay: { open: NESTED_HOVER_INTENT_MS },
     handleClose: safePolygon({ blockPointerEvents: true }),
   });
   const click = useClick(anchored.context, {

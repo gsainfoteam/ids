@@ -33,7 +33,12 @@ export function CommandMenu({
   return <CommandContext value={palette}>{children}</CommandContext>;
 }
 
-export function CommandTrigger({ asChild, children, ...props }: Menu.TriggerProps) {
+export function CommandTrigger({
+  asChild,
+  textValue: _textValue,
+  children,
+  ...props
+}: Menu.TriggerProps) {
   const palette = useCommandContext('Menu.Trigger');
 
   return part(
@@ -294,11 +299,11 @@ export function CommandRadioItem({
   );
 }
 
-export function CommandSub() {
+export function CommandNestedMenu() {
   useEffect(() => {
     if (isDevelopment)
       console.warn(
-        '[IDS] Menu: Menu.Sub is not supported with triggerType="command" and renders nothing. Put its items in a Menu.Group instead.',
+        '[IDS] Menu: a Menu nested in a triggerType="command" palette is not supported and renders nothing. Put its items in a Menu.Group instead.',
       );
   }, []);
 

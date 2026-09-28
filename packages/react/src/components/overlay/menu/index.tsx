@@ -2,6 +2,7 @@ import {
   cloneElement,
   isValidElement,
   use,
+  useEffect,
   useId,
   useLayoutEffect,
   useState,
@@ -20,23 +21,21 @@ import {
   CommandEmpty,
   CommandItem,
   CommandMenu,
+  CommandNestedMenu,
   CommandRadioItem,
   CommandSearch,
-  CommandSub,
   CommandTrigger,
 } from './command';
 import {
   CommandContext,
+  ContentContext,
   GroupContext,
   ItemContext,
-  LevelContext,
+  MenuContext,
   RadioContext,
-  RootContext,
-  SubContext,
-  useLevelContext,
+  useContentContext,
+  useMenuContext,
   useRadioContext,
-  useRootContext,
-  useSubContext,
 } from './context';
 import { MenuItemIndicator, withIndicator, type MenuItemIndicatorProps } from './indicator';
 import { menuStyle } from './style';
@@ -54,6 +53,7 @@ import {
   type AnchoredSide,
 } from '../../../internal/overlay';
 import { mergeProps, mergeRefs, part } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 import { Divider } from '../../layout/divider';
 import { Kbd } from '../../typography/kbd';
 
@@ -73,40 +73,93 @@ function awayFromParent(parent: MenuLevel): AnchoredSide {
   return parent.nested && continuesSideways(parentSide) ? parentSide : 'right';
 }
 
-export function Menu({ triggerType = 'click', ...props }: Menu.Props) {
+export function Menu({ triggerType, ...props }: Menu.Props) {
+  const parent = use(ContentContext);
+  const palette = use(CommandContext);
+
+  if (palette) return <CommandNestedMenu />;
+  if (parent) return <NestedMenu {...props} triggerType={triggerType} parent={parent} />;
   if (triggerType === 'command') return <CommandMenu {...props} />;
 
   return (
     <FloatingTree>
-      <MenuRoot {...props} triggerType={triggerType} />
+      <RootMenu {...props} triggerType={triggerType ?? 'click'} />
     </FloatingTree>
   );
 }
 
-function MenuRoot({
+type RootMenuProps = Omit<Menu.Props, 'triggerType'> & { triggerType: MenuTriggerType };
+
+function RootMenu({
   open,
   defaultOpen = false,
   onOpenChange,
   triggerType,
   children,
-}: Omit<Menu.Props, 'triggerType'> & { triggerType: MenuTriggerType }) {
+}: RootMenuProps) {
   const root = useMenuLevel({ open, defaultOpen, onOpenChange, parentOpen: null, triggerType });
 
   return (
-    <RootContext value={{ root, triggerType }}>
+    <MenuContext value={{ level: root, root, triggerType }}>
       <FloatingNode id={root.nodeId}>{children}</FloatingNode>
-    </RootContext>
+    </MenuContext>
+  );
+}
+
+type NestedMenuProps = Menu.Props & { parent: MenuLevel };
+
+function NestedMenu({
+  open,
+  defaultOpen = false,
+  onOpenChange,
+  triggerType: ignoredTriggerType,
+  hotkey: ignoredHotkey,
+  parent,
+  children,
+}: NestedMenuProps) {
+  const { root, triggerType } = useMenuContext('Menu');
+  const level = useMenuLevel({
+    open,
+    defaultOpen,
+    onOpenChange,
+    parentOpen: parent.open,
+    triggerType,
+  });
+
+  const setsRootOnlyProps = ignoredTriggerType !== undefined || ignoredHotkey !== undefined;
+
+  useEffect(() => {
+    if (isDevelopment && setsRootOnlyProps)
+      console.warn(
+        '[IDS] Menu: triggerType and hotkey apply only to the outermost Menu. A Menu inside Menu.Content is a submenu and ignores them.',
+      );
+  }, [setsRootOnlyProps]);
+
+  return (
+    <MenuContext value={{ level, root, triggerType }}>
+      <FloatingNode id={level.nodeId}>{children}</FloatingNode>
+    </MenuContext>
   );
 }
 
 function MenuTrigger(props: Menu.TriggerProps) {
-  if (use(CommandContext)) return <CommandTrigger {...props} />;
+  const palette = use(CommandContext);
+  const menu = use(MenuContext);
 
-  return <PopupMenuTrigger {...props} />;
+  if (palette) return <CommandTrigger {...props} />;
+  if (menu?.level.nested) return <NestedMenuTrigger {...props} />;
+
+  return <RootMenuTrigger {...props} />;
 }
 
-function PopupMenuTrigger({ asChild, children, ...props }: Menu.TriggerProps) {
-  const { root, triggerType } = useRootContext('Menu.Trigger');
+function RootMenuTrigger({
+  asChild,
+  textValue: _textValue,
+  children,
+  ...props
+}: Menu.TriggerProps) {
+  const { root, triggerType } = useMenuContext('Menu.Trigger');
+
   const state = {
     ref: root.setTrigger,
     'data-popup-open': root.open ? '' : undefined,
@@ -148,10 +201,56 @@ function PopupMenuTrigger({ asChild, children, ...props }: Menu.TriggerProps) {
   );
 }
 
+function NestedMenuTrigger({
+  disabled = false,
+  textValue,
+  asChild,
+  className,
+  children,
+  ...props
+}: Menu.TriggerProps) {
+  const { level } = useMenuContext('Menu.Trigger');
+  const parent = useContentContext('Menu.Trigger');
+  const item = useMenuItem(parent, {
+    disabled,
+    textValue,
+    activatesOnKeys: false,
+    keepsHighlightOnLeave: level.open,
+  });
+
+  const styles = menuStyle();
+  const withChevron = (nodes: ReactNode) => (
+    <>
+      {nodes}
+      <ChevronRightIcon aria-hidden="true" className={styles.chevron()} />
+    </>
+  );
+
+  return part(
+    'div',
+    asChild,
+    asChild && isValidElement<{ children?: ReactNode }>(children)
+      ? cloneElement(children, {}, withChevron(children.props.children))
+      : withChevron(children),
+    mergeProps(mergeProps(props, disabled ? {} : level.getReferenceProps()), {
+      ...item.props,
+      ref: mergeRefs(item.props.ref, level.setTrigger),
+      id: props.id ?? level.ids.trigger,
+      role: 'menuitem',
+      'aria-haspopup': 'menu',
+      'aria-expanded': level.open,
+      'aria-controls': level.open ? level.ids.content : undefined,
+      'data-popup-open': level.open ? '' : undefined,
+      'data-menu-nested-trigger': '',
+      className: styles.item({ className }),
+    }),
+  );
+}
+
 type PopupProps = Menu.ContentProps & { level: MenuLevel; name: ComponentProps<'div'> };
 
 function MenuPopup({ level, name, className, style, children, ...props }: PopupProps) {
-  const { root } = useRootContext('Menu.Content');
+  const { root } = useMenuContext('Menu.Content');
   const { content } = level;
 
   useLayoutEffect(() => {
@@ -198,30 +297,34 @@ function MenuPopup({ level, name, className, style, children, ...props }: PopupP
       style={{ ...style, ...level.anchored.floatingStyles }}
     >
       <OverlayItemContext value={null}>
-        <LevelContext value={level}>
+        <ContentContext value={level}>
           <FloatingList elementsRef={level.elementsRef} labelsRef={level.labelsRef}>
             {children}
           </FloatingList>
-        </LevelContext>
+        </ContentContext>
       </OverlayItemContext>
     </div>
   );
 }
 
 function MenuContent(props: Menu.ContentProps) {
-  if (use(CommandContext)) return <CommandContent {...props} />;
+  const palette = use(CommandContext);
+  const menu = use(MenuContext);
 
-  return <PopupMenuContent {...props} />;
+  if (palette) return <CommandContent {...props} />;
+  if (menu?.level.nested) return <NestedMenuContent {...props} />;
+
+  return <RootMenuContent {...props} />;
 }
 
-function PopupMenuContent({
+function RootMenuContent({
   side,
   align = 'start',
   sideOffset,
   alignOffset = 0,
   ...props
 }: Menu.ContentProps) {
-  const { root, triggerType } = useRootContext('Menu.Content');
+  const { root, triggerType } = useMenuContext('Menu.Content');
   const atPointer = triggerType === 'contextmenu';
 
   usePlacement(root, {
@@ -242,6 +345,27 @@ function PopupMenuContent({
   );
 }
 
+function NestedMenuContent({
+  side,
+  align = 'start',
+  sideOffset = 2,
+  alignOffset = -5,
+  ...props
+}: Menu.ContentProps) {
+  const { level } = useMenuContext('Menu.Content');
+  const parent = useContentContext('Menu.Content');
+
+  usePlacement(level, { side: side ?? awayFromParent(parent), align, sideOffset, alignOffset });
+
+  if (!level.mounted) return null;
+
+  const label = level.trigger?.textContent?.trim() ?? '';
+
+  return (
+    <MenuPopup {...props} level={level} name={{ 'aria-label': messages.menu.submenu(label) }} />
+  );
+}
+
 function MenuItem(props: Menu.ItemProps) {
   if (use(CommandContext)) return <CommandItem {...props} />;
 
@@ -257,8 +381,8 @@ function PopupMenuItem({
   children,
   ...props
 }: Menu.ItemProps) {
-  const { root } = useRootContext('Menu.Item');
-  const level = useLevelContext('Menu.Item');
+  const { root } = useMenuContext('Menu.Item');
+  const level = useContentContext('Menu.Item');
   const item = useMenuItem(level, {
     disabled,
     textValue,
@@ -297,8 +421,8 @@ function PopupMenuCheckboxItem({
   children,
   ...props
 }: Menu.CheckboxItemProps) {
-  const { root } = useRootContext('Menu.CheckboxItem');
-  const level = useLevelContext('Menu.CheckboxItem');
+  const { root } = useMenuContext('Menu.CheckboxItem');
+  const level = useContentContext('Menu.CheckboxItem');
   const item = useMenuItem(level, {
     disabled,
     textValue,
@@ -355,8 +479,8 @@ function PopupMenuRadioItem({
   children,
   ...props
 }: Menu.RadioItemProps) {
-  const { root } = useRootContext('Menu.RadioItem');
-  const level = useLevelContext('Menu.RadioItem');
+  const { root } = useMenuContext('Menu.RadioItem');
+  const level = useContentContext('Menu.RadioItem');
   const group = useRadioContext('Menu.RadioItem');
 
   const checked = group.value === value;
@@ -466,95 +590,6 @@ function MenuShortcut({ className, ...props }: Menu.ShortcutProps) {
   );
 }
 
-function MenuSub(props: Menu.SubProps) {
-  if (use(CommandContext)) return <CommandSub />;
-
-  return <PopupMenuSub {...props} />;
-}
-
-function PopupMenuSub({ open, defaultOpen = false, onOpenChange, children }: Menu.SubProps) {
-  const { triggerType } = useRootContext('Menu.Sub');
-  const parent = useLevelContext('Menu.Sub');
-  const sub = useMenuLevel({
-    open,
-    defaultOpen,
-    onOpenChange,
-    parentOpen: parent.open,
-    triggerType,
-  });
-
-  return (
-    <SubContext value={sub}>
-      <FloatingNode id={sub.nodeId}>{children}</FloatingNode>
-    </SubContext>
-  );
-}
-
-function MenuSubTrigger({
-  disabled = false,
-  textValue,
-  asChild,
-  className,
-  children,
-  ...props
-}: Menu.SubTriggerProps) {
-  const parent = useLevelContext('Menu.SubTrigger');
-  const sub = useSubContext('Menu.SubTrigger');
-  const item = useMenuItem(parent, {
-    disabled,
-    textValue,
-    activatesOnKeys: false,
-    keepsHighlightOnLeave: sub.open,
-  });
-
-  const styles = menuStyle();
-  const content = (nodes: ReactNode) => (
-    <>
-      {nodes}
-      <ChevronRightIcon aria-hidden="true" className={styles.subIcon()} />
-    </>
-  );
-
-  return part(
-    'div',
-    asChild,
-    asChild && isValidElement<{ children?: ReactNode }>(children)
-      ? cloneElement(children, {}, content(children.props.children))
-      : content(children),
-    mergeProps(mergeProps(props, disabled ? {} : sub.getReferenceProps()), {
-      ...item.props,
-      ref: mergeRefs(item.props.ref, sub.setTrigger),
-      id: props.id ?? sub.ids.trigger,
-      role: 'menuitem',
-      'aria-haspopup': 'menu',
-      'aria-expanded': sub.open,
-      'aria-controls': sub.open ? sub.ids.content : undefined,
-      'data-popup-open': sub.open ? '' : undefined,
-      'data-menu-sub-trigger': '',
-      className: styles.item({ className }),
-    }),
-  );
-}
-
-function MenuSubContent({
-  side,
-  align = 'start',
-  sideOffset = 2,
-  alignOffset = -5,
-  ...props
-}: Menu.SubContentProps) {
-  const parent = useLevelContext('Menu.SubContent');
-  const sub = useSubContext('Menu.SubContent');
-
-  usePlacement(sub, { side: side ?? awayFromParent(parent), align, sideOffset, alignOffset });
-
-  if (!sub.mounted) return null;
-
-  const label = sub.trigger?.textContent?.trim() ?? '';
-
-  return <MenuPopup {...props} level={sub} name={{ 'aria-label': messages.menu.submenu(label) }} />;
-}
-
 export namespace Menu {
   export type TriggerType = MenuTriggerType | 'command';
   export type Side = AnchoredSide;
@@ -577,7 +612,7 @@ export namespace Menu {
     onSelect?: (event: SelectEvent) => void;
   };
 
-  export type TriggerProps = ComponentProps<'button'> & { asChild?: boolean };
+  export type TriggerProps = ComponentProps<'button'> & { asChild?: boolean; textValue?: string };
   export type ContentProps = ComponentProps<'div'> & {
     side?: Side;
     align?: Align;
@@ -603,14 +638,6 @@ export namespace Menu {
     'orientation' | 'align' | 'decorative' | 'asChild' | 'children' | 'className'
   > & { className?: string };
   export type ShortcutProps = Omit<Kbd.Props, 'className'> & { className?: string };
-  export type SubProps = {
-    open?: boolean;
-    defaultOpen?: boolean;
-    onOpenChange?: (open: boolean) => void;
-    children?: ReactNode;
-  };
-  export type SubTriggerProps = Omit<ItemBaseProps, 'onSelect'>;
-  export type SubContentProps = ContentProps;
   export type SearchProps = Omit<
     ComponentProps<'input'>,
     'size' | 'color' | 'value' | 'defaultValue'
@@ -628,9 +655,6 @@ export namespace Menu {
   export const Label = MenuLabel;
   export const Separator = MenuSeparator;
   export const Shortcut = MenuShortcut;
-  export const Sub = MenuSub;
-  export const SubTrigger = MenuSubTrigger;
-  export const SubContent = MenuSubContent;
   export const Search = CommandSearch;
   export const Empty = CommandEmpty;
 

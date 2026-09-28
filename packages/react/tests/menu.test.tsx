@@ -24,13 +24,13 @@ function Actions({ onCopy, onEmail, ...props }: ActionsProps) {
         <Menu.Item disabled>Cut</Menu.Item>
         <Menu.Item>Paste</Menu.Item>
         <Menu.Separator />
-        <Menu.Sub>
-          <Menu.SubTrigger>Share</Menu.SubTrigger>
-          <Menu.SubContent>
+        <Menu>
+          <Menu.Trigger>Share</Menu.Trigger>
+          <Menu.Content>
             <Menu.Item onSelect={onEmail}>Email</Menu.Item>
             <Menu.Item>Link</Menu.Item>
-          </Menu.SubContent>
-        </Menu.Sub>
+          </Menu.Content>
+        </Menu>
         <Menu.Item>Delete</Menu.Item>
       </Menu.Content>
     </Menu>
@@ -226,7 +226,7 @@ test('checkbox and radio items report their state', async () => {
   expect(onValueChange.mock.calls).toEqual([['large']]);
 });
 
-test('hovering a sub trigger opens its menu, and selecting inside closes the whole tree', async () => {
+test('hovering a nested trigger opens its submenu, and selecting inside closes the whole tree', async () => {
   const onEmail = vi.fn();
   const onOpenChange = vi.fn();
   const { screen, trigger, item } = await renderActions({ onEmail, onOpenChange });
@@ -276,6 +276,106 @@ test('ArrowRight enters a submenu, ArrowLeft and Escape leave only the submenu',
   await userEvent.keyboard('{Escape}');
   await expect.element(screen.getByRole('menu', { name: 'Actions' })).not.toBeInTheDocument();
   await expect.element(trigger).toHaveFocus();
+});
+
+test('a nested trigger is a menuitem of its parent, reached by arrows and typing without opening', async () => {
+  const { screen, trigger, item } = await renderActions();
+  await userEvent.click(trigger);
+  const share = item('Share');
+  await expect.element(share).toHaveAttribute('aria-haspopup', 'menu');
+  await expect.element(share).toHaveAttribute('aria-expanded', 'false');
+  await expect.element(share).not.toHaveAttribute('aria-controls');
+
+  await userEvent.keyboard('sh');
+  await expect.element(share).toHaveFocus();
+  await expect.element(share).toHaveAttribute('data-highlighted');
+  await expect
+    .element(screen.getByRole('menu', { name: 'Share 하위 메뉴' }))
+    .not.toBeInTheDocument();
+
+  await userEvent.keyboard('{ArrowDown}');
+  await expect.element(item('Delete')).toHaveFocus();
+  await userEvent.keyboard('{ArrowUp}{ArrowUp}');
+  await expect.element(item('Paste')).toHaveFocus();
+});
+
+test('a nested trigger matches typing by textValue, and a disabled one is skipped and never opens', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Menu>
+        <Menu.Trigger>Library</Menu.Trigger>
+        <Menu.Content>
+          <Menu.Item>Recent</Menu.Item>
+          <Menu>
+            <Menu.Trigger textValue="Favorites">
+              <span aria-hidden="true">★</span> Favorites
+            </Menu.Trigger>
+            <Menu.Content>
+              <Menu.Item>Report</Menu.Item>
+            </Menu.Content>
+          </Menu>
+          <Menu>
+            <Menu.Trigger disabled>Archive</Menu.Trigger>
+            <Menu.Content>
+              <Menu.Item>2024</Menu.Item>
+            </Menu.Content>
+          </Menu>
+          <Menu.Item>Trash</Menu.Item>
+        </Menu.Content>
+      </Menu>
+    </IdsProvider>,
+  );
+  const item = (name: string) => screen.getByRole('menuitem', { name });
+  screen.getByRole('button', { name: 'Library' }).element().focus();
+  await userEvent.keyboard('{Enter}');
+  await expect.element(item('Recent')).toHaveFocus();
+
+  await userEvent.keyboard('f');
+  await expect.element(item('Favorites')).toHaveFocus();
+  await userEvent.keyboard('{ArrowDown}');
+  await expect.element(item('Trash')).toHaveFocus();
+
+  await expect.element(item('Archive')).toHaveAttribute('aria-disabled', 'true');
+  await userEvent.hover(item('Archive'));
+  await userEvent.click(item('Archive'), { force: true });
+  await expect.element(item('Archive')).toHaveAttribute('aria-expanded', 'false');
+  await expect
+    .element(screen.getByRole('menu', { name: 'Archive 하위 메뉴' }))
+    .not.toBeInTheDocument();
+});
+
+test('a nested Menu warns that triggerType belongs to the outermost Menu, and still opens as a submenu', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  const screen = await render(
+    <IdsProvider>
+      <Menu>
+        <Menu.Trigger>File</Menu.Trigger>
+        <Menu.Content>
+          <Menu triggerType="contextmenu">
+            <Menu.Trigger>Export</Menu.Trigger>
+            <Menu.Content>
+              <Menu.Item>PDF</Menu.Item>
+            </Menu.Content>
+          </Menu>
+          <Menu>
+            <Menu.Trigger>Share</Menu.Trigger>
+            <Menu.Content>
+              <Menu.Item>Email</Menu.Item>
+            </Menu.Content>
+          </Menu>
+        </Menu.Content>
+      </Menu>
+    </IdsProvider>,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'File' }));
+  await userEvent.hover(screen.getByRole('menuitem', { name: 'Export' }));
+  await expect.element(screen.getByRole('menu', { name: 'Export 하위 메뉴' })).toBeVisible();
+
+  const rootOnly = warn.mock.calls.filter(([message]) =>
+    String(message).includes('triggerType and hotkey apply only to the outermost Menu'),
+  );
+  expect(rootOnly).toHaveLength(1);
+  warn.mockRestore();
 });
 
 test('a press outside closes the whole tree once and leaves focus where it landed', async () => {
@@ -404,33 +504,33 @@ test('the menu opens below its trigger, aligned to its start', async () => {
     .toEqual([0, 4]);
 });
 
-function DeepMenu(props: Partial<Menu.Props> & { onSubOpenChange?: (open: boolean) => void }) {
-  const { onSubOpenChange, ...menuProps } = props;
+function DeepMenu(props: Partial<Menu.Props> & { onNestedOpenChange?: (open: boolean) => void }) {
+  const { onNestedOpenChange, ...menuProps } = props;
 
   return (
     <Menu {...menuProps}>
       <Menu.Trigger>File</Menu.Trigger>
       <Menu.Content>
         <Menu.Item>New</Menu.Item>
-        <Menu.Sub onOpenChange={onSubOpenChange}>
-          <Menu.SubTrigger>Export</Menu.SubTrigger>
-          <Menu.SubContent>
+        <Menu onOpenChange={onNestedOpenChange}>
+          <Menu.Trigger>Export</Menu.Trigger>
+          <Menu.Content>
             <Menu.Item>PDF</Menu.Item>
-            <Menu.Sub>
-              <Menu.SubTrigger>Image</Menu.SubTrigger>
-              <Menu.SubContent>
+            <Menu>
+              <Menu.Trigger>Image</Menu.Trigger>
+              <Menu.Content>
                 <Menu.Item>PNG</Menu.Item>
-                <Menu.Sub>
-                  <Menu.SubTrigger>JPEG</Menu.SubTrigger>
-                  <Menu.SubContent>
+                <Menu>
+                  <Menu.Trigger>JPEG</Menu.Trigger>
+                  <Menu.Content>
                     <Menu.Item>High quality</Menu.Item>
                     <Menu.Item>Low quality</Menu.Item>
-                  </Menu.SubContent>
-                </Menu.Sub>
-              </Menu.SubContent>
-            </Menu.Sub>
-          </Menu.SubContent>
-        </Menu.Sub>
+                  </Menu.Content>
+                </Menu>
+              </Menu.Content>
+            </Menu>
+          </Menu.Content>
+        </Menu>
       </Menu.Content>
     </Menu>
   );
@@ -497,8 +597,8 @@ test('four levels open with ArrowRight, and ArrowLeft or Escape close only the d
 
 test('a press outside a four-level tree closes every level once', async () => {
   const onOpenChange = vi.fn();
-  const onSubOpenChange = vi.fn();
-  const { screen, openByKeyboard } = await renderDeep({ onOpenChange, onSubOpenChange });
+  const onNestedOpenChange = vi.fn();
+  const { screen, openByKeyboard } = await renderDeep({ onOpenChange, onNestedOpenChange });
   await openByKeyboard();
 
   const outside = screen.getByRole('button', { name: 'Outside' });
@@ -507,7 +607,7 @@ test('a press outside a four-level tree closes every level once', async () => {
   expect(screen.container.ownerDocument.querySelectorAll('[data-menu-content]')).toHaveLength(0);
   await expect.element(outside).toHaveFocus();
   expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
-  expect(onSubOpenChange.mock.calls).toEqual([[true], [false]]);
+  expect(onNestedOpenChange.mock.calls).toEqual([[true], [false]]);
 });
 
 test('hovering down four levels and choosing the deepest item closes the whole tree', async () => {
@@ -839,25 +939,27 @@ test('a palette opened with overlay.open binds to the item and resolves through 
   await expect.element(dialog).not.toBeInTheDocument();
 });
 
-test('Menu.Sub inside a command palette warns and renders nothing', async () => {
+test('a nested Menu inside a command palette warns and renders nothing', async () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   const screen = await render(
     <IdsProvider>
       <Menu triggerType="command" defaultOpen>
         <Menu.Content>
           <Menu.Item>Copy</Menu.Item>
-          <Menu.Sub>
-            <Menu.SubTrigger>Share</Menu.SubTrigger>
-            <Menu.SubContent>
+          <Menu>
+            <Menu.Trigger>Share</Menu.Trigger>
+            <Menu.Content>
               <Menu.Item>Email</Menu.Item>
-            </Menu.SubContent>
-          </Menu.Sub>
+            </Menu.Content>
+          </Menu>
         </Menu.Content>
       </Menu>
     </IdsProvider>,
   );
   await expect.element(screen.getByRole('option', { name: 'Copy' })).toBeVisible();
   expect(screen.container.ownerDocument.querySelectorAll('[role="option"]')).toHaveLength(1);
-  expect(warn).toHaveBeenCalledWith(expect.stringContaining('Menu.Sub is not supported'));
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining('a Menu nested in a triggerType="command" palette'),
+  );
   warn.mockRestore();
 });

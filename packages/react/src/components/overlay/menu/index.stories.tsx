@@ -86,14 +86,14 @@ function EditItems() {
   );
 }
 
-function ShareSub() {
+function ShareMenu() {
   return (
-    <Menu.Sub>
-      <Menu.SubTrigger>
+    <Menu>
+      <Menu.Trigger>
         <ShareIcon />
         공유
-      </Menu.SubTrigger>
-      <Menu.SubContent>
+      </Menu.Trigger>
+      <Menu.Content>
         <Menu.Item>
           <EnvelopeIcon />
           메일로 보내기
@@ -102,47 +102,47 @@ function ShareSub() {
           <LinkIcon />
           링크 복사
         </Menu.Item>
-      </Menu.SubContent>
-    </Menu.Sub>
+      </Menu.Content>
+    </Menu>
   );
 }
 
-function ExportSub() {
+function ExportMenu() {
   return (
-    <Menu.Sub>
-      <Menu.SubTrigger>
+    <Menu>
+      <Menu.Trigger>
         <ArrowDownTrayIcon />
         내보내기
-      </Menu.SubTrigger>
-      <Menu.SubContent>
+      </Menu.Trigger>
+      <Menu.Content>
         <Menu.Item>PDF 문서</Menu.Item>
-        <Menu.Sub>
-          <Menu.SubTrigger>
+        <Menu>
+          <Menu.Trigger>
             <PhotoIcon />
             이미지
-          </Menu.SubTrigger>
-          <Menu.SubContent>
+          </Menu.Trigger>
+          <Menu.Content>
             <Menu.Item>PNG</Menu.Item>
-            <Menu.Sub>
-              <Menu.SubTrigger>JPEG</Menu.SubTrigger>
-              <Menu.SubContent>
+            <Menu>
+              <Menu.Trigger>JPEG</Menu.Trigger>
+              <Menu.Content>
                 <Menu.Item>고화질</Menu.Item>
                 <Menu.Item>보통</Menu.Item>
-                <Menu.Sub>
-                  <Menu.SubTrigger>저화질</Menu.SubTrigger>
-                  <Menu.SubContent>
+                <Menu>
+                  <Menu.Trigger>저화질</Menu.Trigger>
+                  <Menu.Content>
                     <Menu.Item>메일 첨부용 (1MB 이하)</Menu.Item>
                     <Menu.Item>메신저용 (300KB 이하)</Menu.Item>
-                  </Menu.SubContent>
-                </Menu.Sub>
-              </Menu.SubContent>
-            </Menu.Sub>
+                  </Menu.Content>
+                </Menu>
+              </Menu.Content>
+            </Menu>
             <Menu.Item>WebP</Menu.Item>
-          </Menu.SubContent>
-        </Menu.Sub>
+          </Menu.Content>
+        </Menu>
         <Menu.Item>HTML 웹 페이지</Menu.Item>
-      </Menu.SubContent>
-    </Menu.Sub>
+      </Menu.Content>
+    </Menu>
   );
 }
 
@@ -156,7 +156,7 @@ function DocumentMenu() {
         <Menu.Item>
           <DocumentPlusIcon />새 문서
         </Menu.Item>
-        <ExportSub />
+        <ExportMenu />
         <Menu.Item>
           <PrinterIcon />
           인쇄
@@ -268,7 +268,7 @@ export const Playground: Story = {
         <Menu.Content aria-label={args.triggerType === 'contextmenu' ? '편집' : undefined}>
           <EditItems />
           <Menu.Separator />
-          <ShareSub />
+          <ShareMenu />
         </Menu.Content>
       )}
     </Menu>
@@ -391,7 +391,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Submenu"
-        description="Menu.Sub 로 하위 메뉴를 겁니다. 올려 두거나 → 키로 열고, ← 키나 Escape 로 하위 메뉴만 닫습니다."
+        description="Menu.Content 안에 Menu 를 두면 하위 메뉴가 됩니다. 그 Menu.Trigger 는 화살표가 붙은 항목으로 그려집니다. 올려 두거나 → 키로 열고, ← 키나 Escape 로 하위 메뉴만 닫습니다."
       >
         <Showcase.Row label="공유">
           <Menu>
@@ -403,13 +403,13 @@ export const Gallery: Story = {
                 <PencilIcon />
                 이름 바꾸기
               </Menu.Item>
-              <ShareSub />
-              <Menu.Sub>
-                <Menu.SubTrigger disabled>내보내기</Menu.SubTrigger>
-                <Menu.SubContent>
+              <ShareMenu />
+              <Menu>
+                <Menu.Trigger disabled>내보내기</Menu.Trigger>
+                <Menu.Content>
                   <Menu.Item>PDF</Menu.Item>
-                </Menu.SubContent>
-              </Menu.Sub>
+                </Menu.Content>
+              </Menu>
             </Menu.Content>
           </Menu>
         </Showcase.Row>
@@ -482,7 +482,7 @@ export const Submenu: Story = {
           <PencilIcon />
           이름 바꾸기
         </Menu.Item>
-        <ShareSub />
+        <ShareMenu />
       </Menu.Content>
     </Menu>
   ),
@@ -490,6 +490,7 @@ export const Submenu: Story = {
     canvas.getByRole('button', { name: '파일' }).focus();
     await userEvent.keyboard('{ArrowUp}');
     await waitFor(() => expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveFocus());
+    expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveAttribute('aria-haspopup', 'menu');
     await userEvent.keyboard('{ArrowRight}');
     await waitFor(() =>
       expect(canvas.getByRole('menuitem', { name: '메일로 보내기' })).toHaveFocus(),
