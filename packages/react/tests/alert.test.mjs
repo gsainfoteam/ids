@@ -21,9 +21,12 @@ for (const name of [
 ])
   globalThis[name] = dom.window[name];
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-dom.window.Element.prototype.getClientRects = function () {
-  return [{ width: 1, height: 1 }];
-};
+function stubLayoutForTabbable() {
+  dom.window.Element.prototype.getClientRects = function () {
+    return [{ width: 1, height: 1 }];
+  };
+}
+stubLayoutForTabbable();
 const { createElement: h, act, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
 const { renderToString } = await import('react-dom/server');

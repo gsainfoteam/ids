@@ -18,7 +18,10 @@ for (const name of [
 ])
   globalThis[name] = dom.window[name];
 globalThis.getComputedStyle = dom.window.getComputedStyle.bind(dom.window);
-dom.window.Element.prototype.checkVisibility ??= () => true;
+function stubVisibilityForTabbable() {
+  dom.window.Element.prototype.checkVisibility ??= () => true;
+}
+stubVisibilityForTabbable();
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');

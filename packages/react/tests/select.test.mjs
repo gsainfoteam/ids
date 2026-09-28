@@ -44,6 +44,13 @@ async function render(node) {
   }
   await act(() => root.render(node));
 }
+function stubLayoutForFocusTrap() {
+  const original = dom.window.Element.prototype.getClientRects;
+  dom.window.Element.prototype.getClientRects = () => [{ width: 1, height: 1 }];
+  return () => {
+    dom.window.Element.prototype.getClientRects = original;
+  };
+}
 async function positioned() {
   await act(() => new Promise((resolve) => setTimeout(resolve)));
 }
@@ -598,8 +605,7 @@ test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab he
     addEventListener() {},
     removeEventListener() {},
   };
-  const getClientRects = dom.window.Element.prototype.getClientRects;
-  dom.window.Element.prototype.getClientRects = () => [{ width: 1, height: 1 }];
+  const restoreLayout = stubLayoutForFocusTrap();
   try {
     const state = tracked({ mobileVariant: 'drawer', defaultValue: 'cherry' });
     await render(h('div', null, h('button', { id: 'before' }, 'Before'), state.node));
@@ -633,7 +639,7 @@ test('drawer on a small screen is a modal dialog: backdrop, focus inside, Tab he
     assert.equal(document.body.hasAttribute('data-scroll-locked'), false);
     assert.deepEqual(state.changes, []);
   } finally {
-    dom.window.Element.prototype.getClientRects = getClientRects;
+    restoreLayout();
   }
 });
 
