@@ -485,17 +485,6 @@ const dartColorTokensFormatter = ({ dictionary }) => {
   return render(T_DART_IDS_TOKENS, { CASES: cases, MAPS: maps });
 };
 
-const dartSpacingFormatter = ({ dictionary }) =>
-  render(T_DART_CLASS, {
-    NAME: "IdsSpacing",
-    MEMBERS: byCategory(dictionary, "spacing")
-      .map(
-        (t) =>
-          `  static const double ${toCamel(t.path[1])} = ${parseFloat(val(t))};`,
-      )
-      .join("\n"),
-  });
-
 const dartMotionFormatter = ({ dictionary }) =>
   render(T_DART_CLASS, {
     NAME: "IdsMotion",

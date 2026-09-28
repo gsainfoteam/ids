@@ -32,7 +32,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
   - 그룹 size: 코드는 불일치 시 항상 throw, `variant`는 전파 안 함. 문서는 자식 명시값 우선
   - `Ids` prefix: codegen과 `IdsScope`·`IdsTheme`에 있음. 문서는 prefix 없음
   - size / variant: `enums.json`의 `standard` `tiny` / `solid` `soft` `outline` `ghost`. 문서의 `sm`/`md`/`lg`, `link`는 코드에 없음
-  - spacing: `IdsSpacing`·`ids_spacing.dart`·`--spacing-*`는 없다. `sd.config.js`에서 `ids/dart-spacing`이 주석 처리. 문서는 있다고 적음
+  - spacing: `IdsSpacing`·`ids_spacing.dart`·`--spacing-*`는 없다. `sd.config.js`에 spacing formatter가 없다. 문서는 있다고 적음
 
 이전 기록에서 참조하는 것: 컴포넌트 목록, 서브컴포넌트 조립 구조, 다뤘던 기능·상태.
 참조하지 않는 것: 로컬 enum, 치수, 상태 처리 방식.
