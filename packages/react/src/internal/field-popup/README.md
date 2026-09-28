@@ -5,13 +5,15 @@
 - 팝업 안 목록의 클래스는 [`list-styles.ts`](../README.md#list-stylests), 팝업을 여는 trigger 상자는 [`field-surface.ts`](../README.md#field-surfacets) 의 `fieldTrigger` 입니다.
 - 파트 헬퍼 `part` 는 [`utils/part.ts`](../../utils/README.md#partts) 입니다.
 
-| 파일                       | 내용                                                                                 |
-| -------------------------- | ------------------------------------------------------------------------------------ |
-| [`index.tsx`](#indextsx)   | `FieldPopup`, `revealPopupOption`, `FieldPopupHeader` 와 `layer.ts` 의 다시 내보내기 |
-| [`layer.ts`](#layerts)     | drawer 판정(`useDrawerPresentation`), top layer, 열린 팝업의 스택                    |
-| [`styles.ts`](#stylests)   | `popupStyle`                                                                         |
-| [`header.tsx`](#headertsx) | drawer 머리의 제목과 닫기 버튼(`FieldPopupHeader`)                                   |
-| [`search.tsx`](#searchtsx) | 목록 위의 검색 상자(`FieldPopupSearch`)                                              |
+| 파일                       | 내용                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------- |
+| [`index.tsx`](#indextsx)   | `FieldPopup`, `revealPopupOption`, `FieldPopupHeader` 와 `useDrawerPresentation` 의 다시 내보내기 |
+| [`layer.ts`](#layerts)     | 열린 팝업의 스택(`registerPopup`, `isTopPopup`)                                                   |
+| [`styles.ts`](#stylests)   | `popupStyle`                                                                                      |
+| [`header.tsx`](#headertsx) | drawer 머리의 제목과 닫기 버튼(`FieldPopupHeader`)                                                |
+| [`search.tsx`](#searchtsx) | 목록 위의 검색 상자(`FieldPopupSearch`)                                                           |
+
+- drawer 판정(`useDrawerPresentation`)과 top layer 에 올리는 함수는 [`internal/overlay`](../overlay/README.md) 에 있습니다.
 
 ## 쓰는 곳
 
@@ -79,7 +81,7 @@ revealed.current = true;
 - 스크롤은 잠그지만 pinch zoom 은 막지 않습니다(`allowPinchZoom`). 저시력 사용자에게 필요합니다.
 - focus trap 은 초기 포커스, Escape, 포커스 되돌리기를 하지 않습니다(`initialFocus: false`, `escapeDeactivates: false`, `returnFocusOnDeactivate: false`). 셋 다 `FieldPopup` 이 직접 합니다.
 - 필드는 sheet 를 닫으면서 포커스를 자기 trigger 로 돌려보내는데, sheet 가 unmount 되기 전이라 trap 이 포커스를 다시 안으로 당깁니다. window 의 capture `focusin` 은 document 에 있는 trap 의 리스너보다 먼저 들리므로, trigger 로 가는 포커스를 보면 trap 을 먼저 풉니다(`releaseBeforeTrapPullsFocusBack`).
-- 열린 팝업이 drawer 로 바뀌면 배경(`clickableBackdrop`)을 먼저 top layer 에 올리고 팝업을 다시 올립니다([`moveToTopOfTopLayer`](#layerts)). top layer 는 올린 순서로 쌓입니다.
+- 열린 팝업이 drawer 로 바뀌면 배경(`clickableBackdrop`)을 먼저 top layer 에 올리고 팝업을 다시 올립니다([`raiseInTopLayer`](../overlay/README.md#top-layerts)). top layer 는 올린 순서로 쌓입니다.
 
 #### 닫기
 
@@ -118,28 +120,20 @@ revealed.current = true;
 ### 쓰는 법
 
 ```ts
-// components/form/select/index.tsx: 렌더 중에 묻는다
-const drawer = useDrawerPresentation(mobileVariant);
-
 // internal/field-popup/index.tsx
 useLayoutEffect(() => {
   const node = popup.current;
   if (!node) return;
   if (drawer && clickableBackdrop.current) showInTopLayer(clickableBackdrop.current);
-  moveToTopOfTopLayer(node);
+  raiseInTopLayer(node);
   return registerPopup(node);          // cleanup 이 스택에서 지운다
 }, [drawer]);
 ```
 
 ### 왜 이렇게
 
-- `useDrawerPresentation` 은 `mobileVariant === 'drawer'` 이고 화면 폭이 `DRAWER_BELOW`(640px) 미만일 때 `true` 입니다. 그 밖의 팝업은 모두 anchor 에 붙습니다.
-- 컴포넌트는 팝업의 위치 계산과 별개로 이 값을 렌더 중에 묻습니다. popover 와 drawer 는 포커스 모델이 다르기 때문입니다: drawer 는 modal 이라 포커스를 안으로 가져가고, popover 는 trigger 에 둡니다. ChipField 는 drawer 일 때 sheet 안에 검색 상자를 따로 그립니다.
-- `max-width` 는 경계값을 포함하므로 media query 는 `DRAWER_BELOW - 0.02`(`639.98px`)로 적어 640px 을 뺍니다. `matchMedia` 가 없으면 `innerWidth < DRAWER_BELOW` 로 봅니다.
-- 서버 렌더 값은 `false` 입니다(`useSyncExternalStore` 의 server snapshot). 서버 HTML 은 늘 popover 입니다.
-- `showInTopLayer` 는 Popover API 가 없거나 이미 열려 있으면 아무것도 하지 않습니다.
-- `moveToTopOfTopLayer` 는 열린 팝업을 닫았다 다시 열어 top layer 맨 위로 올립니다. `hidePopover()` 가 포커스를 잃게 했으면 원래 요소로 되돌립니다.
 - `registerPopup`, `isTopPopup` 은 열린 팝업의 스택입니다. 팝업 안에서 연 팝업은 그 위에 쌓이고, Escape 는 맨 위 하나만 닫습니다.
+- `useDrawerPresentation` 은 [`overlay/sheet-viewport.ts`](../overlay/README.md#sheet-viewportts), `showInTopLayer` 와 `raiseInTopLayer` 는 [`overlay/top-layer.ts`](../overlay/README.md#top-layerts) 입니다.
 
 ## styles.ts
 

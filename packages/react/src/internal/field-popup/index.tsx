@@ -14,19 +14,14 @@ import { createFocusTrap } from 'focus-trap';
 import { RemoveScroll } from 'react-remove-scroll';
 import { tabbable } from 'tabbable';
 
-import {
-  isTopPopup,
-  moveToTopOfTopLayer,
-  registerPopup,
-  showInTopLayer,
-  useDrawerPresentation,
-  type PopupPresentation,
-} from './layer';
+import { isTopPopup, registerPopup } from './layer';
 import { popupStyle } from './styles';
 import { isNodeFromAnyWindow } from '../../utils';
+import { useDrawerPresentation, type PopupPresentation } from '../overlay/sheet-viewport';
+import { raiseInTopLayer, showInTopLayer } from '../overlay/top-layer';
 
 export { FieldPopupHeader } from './header';
-export { useDrawerPresentation, type PopupPresentation } from './layer';
+export { useDrawerPresentation, type PopupPresentation } from '../overlay/sheet-viewport';
 
 export type PopupSide = 'top' | 'bottom';
 export type PopupAlign = 'start' | 'end';
@@ -90,7 +85,7 @@ export function FieldPopup({
     const node = popup.current;
     if (!node) return;
     if (drawer && clickableBackdrop.current) showInTopLayer(clickableBackdrop.current);
-    moveToTopOfTopLayer(node);
+    raiseInTopLayer(node);
     return registerPopup(node);
   }, [drawer]);
 

@@ -14,9 +14,10 @@
 
 ## 쓰는 곳
 
-| 쓰는 곳 | 가져가는 것   |
-| ------- | ------------- |
-| Alert   | `usePresence` |
+| 쓰는 곳                                 | 가져가는 것                                                  |
+| --------------------------------------- | ------------------------------------------------------------ |
+| Alert                                   | `usePresence`                                                |
+| [field-popup](../field-popup/README.md) | `useDrawerPresentation`, `showInTopLayer`, `raiseInTopLayer` |
 
 ## 조립하는 법
 
@@ -219,6 +220,10 @@ modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, �
 - `context` 를 넘기지 않으면 reference 없는 root context 를 만듭니다. anchor 에 붙는 modal(modal Popover)은 [`useAnchored`](#use-anchoredts) 의 `context` 를 넘깁니다.
 
 ## sheet-viewport.ts
+
+### 쓰는 곳
+
+- [field-popup](../field-popup/README.md) 과 Select, ChipField, ColorField 의 `useDrawerPresentation`
 
 ### 쓰는 법
 
