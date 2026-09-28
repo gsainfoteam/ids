@@ -60,7 +60,7 @@ test('keyboard moves by half-step, clamps boundaries, clears and keeps focus', a
   await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '3.5');
 });
 
-test('hover previews without changing the value; half clicks commit once', async () => {
+test('hover previews, drawn translucent, without changing the value; half clicks commit once', async () => {
   const away = await render(<p>Away</p>);
   await userEvent.hover(away.getByText('Away'));
   const values: number[] = [];
@@ -77,15 +77,21 @@ test('hover previews without changing the value; half clicks commit once', async
     [...screen.container.querySelectorAll<HTMLElement>('[data-rating-item]')].map(
       (item) => item.dataset.state,
     );
+  const firstFillOpacity = () =>
+    getComputedStyle(
+      screen.container.querySelector('[data-rating-item] > [aria-hidden] > :last-child')!,
+    ).opacity;
   await userEvent.hover(option(2.5));
   await expect.poll(fills).toEqual(['full', 'full', 'half', 'empty', 'empty']);
   await expect.element(screen.getByRole('radiogroup')).toHaveAttribute('data-previewing');
   await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '1');
+  await expect.poll(firstFillOpacity, { message: 'the preview is translucent' }).toBe('0.5');
   expect(values).toEqual([]);
   await userEvent.click(option(2.5));
   await userEvent.click(option(2.5));
   expect(values).toEqual([2.5]);
   expect(previews).toEqual([2.5, null]);
+  await expect.poll(firstFillOpacity, { message: 'the chosen score is solid' }).toBe('1');
 });
 
 test('controlled changes respect the owner; outside updates do not echo', async () => {

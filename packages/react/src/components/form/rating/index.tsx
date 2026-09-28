@@ -327,7 +327,7 @@ export namespace Rating {
       empty:
         'absolute inset-0 text-(--ids-color-border) in-data-invalid:text-(--ids-color-danger)/35',
       fill: [
-        'absolute inset-0 text-(--rating-accent)',
+        'absolute inset-0 text-(--rating-accent) in-data-previewing:opacity-50',
         '[clip-path:inset(0_calc(100%-var(--rating-fill))_0_0)]',
         'rtl:[clip-path:inset(0_0_0_calc(100%-var(--rating-fill)))]',
       ],
