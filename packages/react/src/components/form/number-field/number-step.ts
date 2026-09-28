@@ -1,21 +1,22 @@
-import Big from 'big.js';
 import { clamp } from 'es-toolkit';
 
+import { Decimal } from '../../../internal/decimal';
+
 export function shiftDecimal(value: number, places: number): number {
-  return new Big(value).times(new Big(10).pow(places)).toNumber();
+  return new Decimal(value).shiftedBy(places).toNumber();
 }
 
 export function addDecimal(left: number, right: number): number {
-  return new Big(left).plus(right).toNumber();
+  return new Decimal(left).plus(right).toNumber();
 }
 
 export function isOnStep(value: number, step: number, base: number) {
-  return new Big(value).minus(base).mod(step).eq(0);
+  return new Decimal(value).minus(base).mod(step).isZero();
 }
 
 function stepsBelow(value: number, step: number, base: number) {
-  const offset = new Big(value).minus(base);
-  const size = new Big(step);
+  const offset = new Decimal(value).minus(base);
+  const size = new Decimal(step);
 
   const signedRest = offset.mod(size);
   const rest = signedRest.lt(0) ? signedRest.plus(size) : signedRest;
@@ -28,7 +29,7 @@ export type SnapMode = 'nearest' | 'up' | 'down';
 export function snapToStep(value: number, step: number, base: number, mode: SnapMode) {
   const { floor, rest, size } = stepsBelow(value, step, base);
 
-  const onGrid = rest.eq(0);
+  const onGrid = rest.isZero();
   const pastHalf = rest.times(2).gte(size);
 
   const count =
@@ -42,7 +43,7 @@ export function snapToStep(value: number, step: number, base: number, mode: Snap
           ? floor.plus(1)
           : floor;
 
-  return new Big(base).plus(count.times(size)).toNumber();
+  return new Decimal(base).plus(count.times(size)).toNumber();
 }
 
 function gridValueAtOrBelow(bound: number, step: number, base: number) {

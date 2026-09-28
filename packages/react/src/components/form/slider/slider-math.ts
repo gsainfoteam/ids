@@ -1,8 +1,9 @@
-import Big from 'big.js';
 import { clamp } from 'es-toolkit';
 
+import { Decimal } from '../../../internal/decimal';
+
 export function snap(raw: number, min: number, max: number, step: number) {
-  const steps = new Big(raw).minus(min).div(step).round(0, Big.roundHalfUp);
+  const steps = new Decimal(raw).minus(min).div(step).integerValue(Decimal.ROUND_HALF_UP);
   const stepped = steps.times(step).plus(min).toNumber();
 
   return clamp(stepped, min, max);
@@ -50,9 +51,9 @@ export function moveThumb(
 }
 
 export function stepMarks(min: number, max: number, step: number) {
-  const gaps = new Big(max).minus(min).div(step).round(0, Big.roundDown).toNumber();
+  const gaps = new Decimal(max).minus(min).div(step).integerValue(Decimal.ROUND_FLOOR).toNumber();
 
   return Array.from({ length: gaps + 1 }, (_, index) =>
-    new Big(step).times(index).plus(min).toNumber(),
+    new Decimal(step).times(index).plus(min).toNumber(),
   );
 }
