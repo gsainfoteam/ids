@@ -201,7 +201,7 @@ const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE
 
 ### 알아둘 것
 
-- BCP 47 태그가 아닌 값(`'de_DE'`, 빈 문자열, date-fns `Locale` 객체)은 `IdsError` 입니다(`invariant`). 개발 빌드에서만 알리는 경고가 아닙니다.
+- BCP 47 태그가 아닌 값(`'de_DE'`, 빈 문자열, 문자열이 아닌 객체)은 `IdsError` 입니다(`invariant`). 개발 빌드에서만 알리는 경고가 아닙니다.
 - 결과는 런타임의 ICU 데이터입니다. 서버(Node)와 브라우저의 ICU 버전이 다르면 글자가 조금 다를 수 있습니다.
 - `dayPeriod` 부분이 없는 locale 이면 `periodLabel` 은 `AM` / `PM` 입니다.
 

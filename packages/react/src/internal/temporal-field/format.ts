@@ -35,8 +35,6 @@ export type FormatterOptions<V> = {
   timeZone?: string;
 };
 
-export const asDate = (date: Date) => date;
-
 export function formatter<V>(
   format: TemporalFormat<V> | undefined,
   locale: string,

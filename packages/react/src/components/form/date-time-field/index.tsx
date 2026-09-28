@@ -1,21 +1,28 @@
 import { useState } from 'react';
 
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
-import { isAfter, startOfDay } from 'date-fns';
-import { mapValues } from 'es-toolkit';
+import {
+  getLocalTimeZone,
+  Time,
+  today as todayIn,
+  type CalendarDate,
+  type CalendarDateTime,
+} from '@internationalized/date';
 
 import {
+  atSeconds,
+  compareDateTimes,
   dayBounds,
+  dayOf,
   dayUnavailable,
-  matchesDay,
   onDay,
+  sameInstant,
   serializeDateTime,
-  timeOf,
+  timeOfDay,
+  toUtcDateTime,
   validateDateTime,
-  withTime,
   withinLimits,
   type DateTimeLimits,
-  type DateTimeMatcher,
 } from './date-time';
 import { resolveLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
@@ -35,7 +42,6 @@ import {
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
 import {
-  asDate,
   dateOptions,
   formatter,
   timeOptions,
@@ -43,7 +49,6 @@ import {
 } from '../../../internal/temporal-field/format';
 import { invariant } from '../../../utils';
 import { Calendar, type CalendarOptions } from '../../data/calendar';
-import { fromLocalDate, toLocalDate } from '../../data/calendar/day-picker-bridge';
 import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
 import {
   resolveHourCycle,
@@ -54,59 +59,38 @@ import {
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
-import type { CalendarDate, Time } from '@internationalized/date';
 
-type DateBoundOptions =
-  | 'autoFocus'
-  | 'size'
-  | 'readOnly'
-  | 'dir'
-  | 'min'
-  | 'max'
-  | 'disabled'
-  | 'today'
-  | 'month'
-  | 'defaultMonth'
-  | 'onMonthChange'
-  | 'modifiers';
+type DateTimeCalendarOptions = Omit<
+  CalendarOptions,
+  'autoFocus' | 'size' | 'readOnly' | 'dir' | 'min' | 'max'
+>;
 
-type DateTimeCalendarOptions = Omit<CalendarOptions, DateBoundOptions> & {
-  month?: Date;
-  defaultMonth?: Date;
-  onMonthChange?: (month: Date) => void;
-  modifiers?: Record<string, DateTimeMatcher | DateTimeMatcher[] | undefined>;
-};
-
-export type DateTimeFieldProps = Omit<TemporalFieldProps<Date | null>, 'disabled'> &
+export type DateTimeFieldProps = Omit<TemporalFieldProps<CalendarDateTime | null>, 'disabled'> &
   DateTimeCalendarOptions & {
-    min?: Date;
-    max?: Date;
-    today?: Date;
-    disabled?: DateTimeMatcher | DateTimeMatcher[];
+    min?: CalendarDateTime;
+    max?: CalendarDateTime;
     precision?: TimePrecision;
-    format?: TemporalFormat<Date>;
+    format?: TemporalFormat<CalendarDateTime>;
     hourCycle?: HourCycle;
     step?: number;
     pickerVariant?: TimePickerVariant;
   };
 
-type PanelProps = Omit<DateTimeCalendarOptions, 'locale'> & {
-  value: Date | null;
-  change: TemporalChange<Date | null>;
+type PanelProps = Omit<DateTimeCalendarOptions, 'locale' | 'disabled' | 'today'> & {
+  value: CalendarDateTime | null;
+  change: TemporalChange<CalendarDateTime | null>;
   size: IdsSize;
-  today: Date;
+  today: CalendarDate;
   limits: DateTimeLimits;
   cycle: HourCycle | undefined;
   locale: string;
   pickerVariant?: TimePickerVariant;
 };
 
-const sameInstant = (a: Date | null, b: Date | null) =>
-  a === b || (!!a && !!b && a.getTime() === b.getTime());
-
 const MONTH_GAP = 16;
 const CLOCK_COLUMN = 208;
 const POPUP_PADDING_AND_BORDER = 26;
+const MIDNIGHT = new Time();
 
 function Panel({
   value,
@@ -117,35 +101,24 @@ function Panel({
   cycle,
   locale,
   pickerVariant,
-  month,
-  defaultMonth,
-  onMonthChange,
-  modifiers,
   ...calendar
 }: PanelProps) {
   const styles = temporalFieldStyle({ size });
-  const base = value ?? startOfDay(today);
-  const unavailable = dayUnavailable(base, limits);
-  const bounds = dayBounds(base, limits.min, limits.max);
+  const day = value ? dayOf(value) : today;
+  const clock = value ? timeOfDay(value) : MIDNIGHT;
+  const unavailable = dayUnavailable(day, limits);
+  const bounds = dayBounds(day, limits.min, limits.max);
 
-  const dayOf = (date: Date | undefined) => date && fromLocalDate(date);
-  const dayModifiers =
-    modifiers &&
-    mapValues(
-      modifiers,
-      (matchers) => (day: CalendarDate) => matchesDay(toLocalDate(day), matchers),
-    );
-
-  const pickDay = (day: CalendarDate | null) => {
-    const next = day && onDay(toLocalDate(day), base, limits);
-    if (next) change(next);
+  const pickDay = (next: CalendarDate | null) => {
+    const moved = next && onDay(next, clock, limits);
+    if (moved) change(moved);
   };
 
   const pickTime = (next: Time | null) => {
     if (next === null) return change(null);
 
-    const date = withTime(base, secondsOf(next));
-    if (date && withinLimits(date, limits)) change(date);
+    const moved = atSeconds(day, secondsOf(next));
+    if (withinLimits(moved, limits)) change(moved);
   };
 
   return (
@@ -153,27 +126,23 @@ function Panel({
       <Calendar
         {...calendar}
         locale={locale}
-        value={value && fromLocalDate(value)}
+        value={value && dayOf(value)}
         onValueChange={pickDay}
-        min={dayOf(limits.min)}
-        max={dayOf(limits.max)}
-        disabled={(day) => dayUnavailable(toLocalDate(day), limits)}
-        today={fromLocalDate(today)}
-        month={dayOf(month)}
-        defaultMonth={dayOf(defaultMonth)}
-        onMonthChange={onMonthChange && ((next) => onMonthChange(toLocalDate(next)))}
-        modifiers={dayModifiers}
+        min={limits.min && dayOf(limits.min)}
+        max={limits.max && dayOf(limits.max)}
+        disabled={(candidate) => dayUnavailable(candidate, limits)}
+        today={today}
         size={size}
       />
       <div className={styles.panelTime()}>
         <TimePicker
-          value={value && timeOf(value)}
+          value={value && timeOfDay(value)}
           onValueChange={pickTime}
           precision={limits.precision}
           hourCycle={cycle}
           step={limits.step}
-          min={bounds?.min && timeOf(bounds.min)}
-          max={bounds?.max && timeOf(bounds.max)}
+          min={bounds?.min}
+          max={bounds?.max}
           locale={locale}
           variant={pickerVariant}
           size={size}
@@ -215,21 +184,24 @@ export function DateTimeField({
   footer,
   ...props
 }: DateTimeFieldProps) {
-  validateDateTime(props.value);
-  validateDateTime(props.defaultValue);
-  validateDateTime(min);
-  validateDateTime(max);
-  invariant(!min || !max || !isAfter(min, max), 'DateTimeField: min must be <= max.');
-  const [mountedToday] = useState(() => new Date());
+  [props.value, props.defaultValue, min, max].forEach(validateDateTime);
+  invariant(
+    !min || !max || compareDateTimes(min, max) <= 0,
+    'DateTimeField: min must not be after max (min <= max).',
+  );
+
+  const [mountedToday] = useState(() => todayIn(getLocalTimeZone()));
   const anchor = today ?? mountedToday;
   const dateLocale = resolveLocale(locale);
   const display = formatter(format, dateLocale, {
     defaults: { ...dateOptions, ...timeOptions(precision) },
-    toDate: asDate,
+    toDate: toUtcDateTime,
     cycle: resolveHourCycle(hourCycle, dateLocale),
+    timeZone: 'UTC',
   });
   const limits: DateTimeLimits = { min, max, disabled, precision, step };
   const cell = (useFieldSize(props.size) ?? 'standard') === 'tiny' ? 32 : 36;
+
   return (
     <TemporalField
       {...props}
@@ -282,7 +254,7 @@ export function DateTimeField({
 
 export namespace DateTimeField {
   export type Props = DateTimeFieldProps;
-  export type State = TemporalFieldState<Date | null>;
+  export type State = TemporalFieldState<CalendarDateTime | null>;
   export type TriggerProps = SharedTriggerProps;
   export type ValueProps = SharedValueProps;
   export type ClearProps = SharedClearProps;

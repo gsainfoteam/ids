@@ -49,7 +49,7 @@ pnpm storybook        # Storybook for ids-react (port 6006)
   - overlay positioning and interactions `@floating-ui/react` (hover intent, list navigation,
     typeahead, menu trees, modal focus, delay groups), used only through `internal/overlay`;
   - focus order `tabbable`, scroll lock `react-remove-scroll`;
-  - dates `date-fns`, numbers `@internationalized/number`, colors `culori`;
+  - dates `@internationalized/date`, numbers `@internationalized/number`, colors `culori`;
   - decimal arithmetic `decimal.js`, so a step of `0.1` lands on `0.3` and not `0.30000000000000004`;
     only the step rules themselves (snap up, down or to the nearest grid value) are IDS's code;
   - textarea sizing `react-textarea-autosize`, phone numbers `libphonenumber-js`.

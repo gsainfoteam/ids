@@ -1,6 +1,6 @@
 import { Fragment, StrictMode, useState } from 'react';
 
-import { CalendarDate } from '@internationalized/date';
+import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { expect, onTestFinished, test, vi } from 'vitest';
@@ -411,8 +411,8 @@ test('popup width is anchored to the whole field and ignores descendant scrolls'
         style={{ width: 700 }}
       />,
       <DateTimeField
-        today={new Date(2026, 8, 15)}
-        defaultValue={new Date(2026, 8, 15)}
+        today={d(15)}
+        defaultValue={new CalendarDateTime(2026, 9, 15, 0, 0)}
         style={{ width: 700 }}
       />,
     ]) {

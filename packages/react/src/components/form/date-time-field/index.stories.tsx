@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -12,8 +13,9 @@ import { DateTimeField } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const today = new Date(2026, 8, 15);
-const at = (day: number, hour: number, minute = 0) => new Date(2026, 8, day, hour, minute);
+const today = new CalendarDate(2026, 9, 15);
+const at = (day: number, hour: number, minute = 0) =>
+  new CalendarDateTime(2026, 9, day, hour, minute);
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
