@@ -227,3 +227,13 @@ test('a key sits level with the Hangul around it, in running text and in a flex 
     expect(Math.abs(offset), line.dataset.line).toBeLessThan(0.5);
   }
 });
+
+test('a key icon keeps its size inside a row that sizes every icon', async () => {
+  const screen = await render(
+    <div className="[&_svg]:size-(--ids-size-icon-standard)">
+      <Kbd keys="mod" platform="apple" size="tiny" />
+    </div>,
+  );
+  const icon = screen.container.querySelector('svg[data-kbd-glyph]')!;
+  expect(icon.getBoundingClientRect().width).toBe(10);
+});
