@@ -27,7 +27,7 @@ import {
 import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
-import { invariant, mergeEventHandlers, mergeProps, mergeRefs, tv } from '../../../utils';
+import { cn, invariant, mergeEventHandlers, mergeProps, mergeRefs, tv } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { ColorPicker, type ColorPickerSwatchOption } from '../../data/color-picker';
 import { cssColor, type ColorFormat } from '../../data/color-picker/color';
@@ -93,7 +93,7 @@ function useColor(part: string) {
 
 const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
 
-const isNode = (value: unknown): value is Node =>
+const isNodeFromAnyFrame = (value: unknown): value is Node =>
   typeof value === 'object' && value !== null && 'nodeType' in value;
 
 const FIRST_CONTROL = [
@@ -104,6 +104,8 @@ const FIRST_CONTROL = [
 
 const CHECKER =
   'conic-gradient(var(--ids-color-muted) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-muted) 0 75%, var(--ids-color-surface) 0)';
+
+const alreadyDimmedByField = cn('data-disabled:opacity-100');
 
 export function ColorField({
   value,
@@ -164,7 +166,7 @@ export function ColorField({
   const popupSelector = `[data-color-field-popup="${popupId}"]`;
   const triggerId = native.id ?? `${popupId}-trigger`;
   const valueId = `${popupId}-value`;
-  const labelledBy = native['aria-labelledby']
+  const labelThenValue = native['aria-labelledby']
     ? `${native['aria-labelledby']} ${valueId}`
     : native['aria-label']
       ? `${triggerId} ${valueId}`
@@ -173,7 +175,7 @@ export function ColorField({
     // eslint-disable-next-line react-hooks/refs
     ref: mergeRefs(triggerRef, forwardedRef),
     id: triggerId,
-    'aria-labelledby': labelledBy,
+    'aria-labelledby': labelThenValue,
     type: 'button',
     form,
     disabled,
@@ -190,7 +192,9 @@ export function ColorField({
     onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => actions.onTriggerKeyDown(event),
     onBlur: (event: FocusEvent<HTMLButtonElement>) => {
       const next = event.relatedTarget;
-      if (isNode(next) && (next as Element).closest?.(popupSelector)) return;
+      const movingIntoPopup =
+        isNodeFromAnyFrame(next) && (next as Element).closest?.(popupSelector);
+      if (movingIntoPopup) return;
       onBlur?.(event);
     },
   });
@@ -267,7 +271,10 @@ export function ColorField({
           className={styles.popup()}
           onBlur={(event) => {
             const next = event.relatedTarget;
-            if (isNode(next) && (event.currentTarget.contains(next) || next === triggerRef.current))
+            if (
+              isNodeFromAnyFrame(next) &&
+              (event.currentTarget.contains(next) || next === triggerRef.current)
+            )
               return;
             onBlur?.(event as unknown as FocusEvent<HTMLButtonElement>);
           }}
@@ -436,7 +443,7 @@ export namespace ColorField {
         'min-w-0 flex-1 truncate font-mono',
         'data-placeholder:font-sans data-placeholder:text-(--ids-color-on-muted)',
       ],
-      clear: [fieldAction.base, 'data-disabled:opacity-100'],
+      clear: [fieldAction.base, alreadyDimmedByField],
       popup: 'concentric-p-3',
     },
     variants: {
