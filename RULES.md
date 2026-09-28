@@ -308,6 +308,10 @@ Every IDS component relies on `data-color` and `data-mode` attributes injected b
 only reads npm manifests. `pnpm version:packages` bumps that file and then mirrors the version into
 `pubspec.yaml`; pub.dev OIDC publishing requires it to match the release tag.
 
+pub.dev takes an OIDC publish only from a workflow that a tag push started, so `release.yml` runs on
+`v*` tags and nothing else. Its `dart-lang/setup-dart` step hands the pub.dev token to every step
+after it, so it comes after the last third-party action (`flutter-action` does not authenticate).
+
 ```bash
 pnpm changeset          # Describe a change → creates .changeset/*.md
 # → open PR, merge it
