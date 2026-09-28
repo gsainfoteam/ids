@@ -41,7 +41,6 @@ export {
   type ToastOptions,
   type ToastPromiseMessages,
   type ToastRecord,
-  type ToasterHotkey,
 } from './components/feedback/toast';
 export {
   overlay,

@@ -9,7 +9,6 @@ import {
   type PointerEvent,
 } from 'react';
 
-import { useHotkey } from './hotkey';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import {
   focusReturnTarget,
@@ -26,7 +25,6 @@ export type UseCommandPaletteOptions = {
   open?: boolean;
   defaultOpen: boolean;
   onOpenChange?: (open: boolean) => void;
-  hotkey?: string;
 };
 
 type Move = 'next' | 'previous' | 'first' | 'last';
@@ -86,7 +84,6 @@ export function useCommandPalette({
   open: openProp,
   defaultOpen,
   onOpenChange,
-  hotkey,
 }: UseCommandPaletteOptions) {
   const item = useOverlayItem(openProp);
   const [ownOpen, setOwnOpen] = useControllableState({
@@ -107,8 +104,6 @@ export function useCommandPalette({
     onOpenChange?.(next);
     if (!next) item.close(undefined);
   };
-
-  useHotkey(hotkey, () => setOpen(!open));
 
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
   const [content, setContent] = useState<HTMLElement | null>(null);

@@ -58,6 +58,8 @@ import { Divider } from '../../layout/divider';
 import { ScrollArea } from '../../layout/scroll-area';
 import { Kbd } from '../../typography/kbd';
 
+import type { Hotkey } from '@tanstack/react-hotkeys';
+
 function usePlacement(level: MenuLevel, { side, align, sideOffset, alignOffset }: MenuPlacement) {
   const { setPlacement } = level;
 
@@ -608,7 +610,7 @@ export namespace Menu {
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
     triggerType?: TriggerType;
-    hotkey?: string;
+    hotkey?: Hotkey;
     children?: ReactNode;
   };
 

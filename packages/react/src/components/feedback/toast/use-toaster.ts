@@ -29,10 +29,6 @@ import {
   withoutTransitions,
 } from '../../../internal/overlay';
 
-export type ToasterModifier = 'altKey' | 'ctrlKey' | 'metaKey' | 'shiftKey';
-
-export type ToasterHotkey = ReadonlyArray<ToasterModifier | (string & {})>;
-
 export type ToastPosition = {
   index: number;
   offset: number;
@@ -47,13 +43,10 @@ export type UseToasterOptions = {
   max: number;
   gap: number;
   expand: boolean;
-  hotkey: ToasterHotkey;
 };
 
 const NO_TOASTS: readonly ToastRecord[] = [];
 const NO_HEIGHTS: ReadonlyMap<ToastId, number> = new Map();
-const MODIFIERS: ReadonlySet<string> = new Set(['altKey', 'ctrlKey', 'metaKey', 'shiftKey']);
-const REGION_KEY = 'F6';
 
 function subscribeToVisibility(listener: () => void) {
   document.addEventListener('visibilitychange', listener);
@@ -62,23 +55,6 @@ function subscribeToVisibility(listener: () => void) {
 
 const tabIsHidden = () => document.visibilityState === 'hidden';
 const tabIsShownOnTheServer = () => false;
-
-function pressedRegionKey(event: KeyboardEvent, hotkey: ToasterHotkey) {
-  const bareRegionKey =
-    event.key === REGION_KEY &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey &&
-    !event.shiftKey;
-
-  const hotkeyHeld =
-    hotkey.length > 0 &&
-    hotkey.every((key) =>
-      MODIFIERS.has(key) ? event[key as ToasterModifier] : event.code === key,
-    );
-
-  return bareRegionKey || hotkeyHeld;
-}
 
 function naturalHeight(node: HTMLElement) {
   const assigned = node.style.height;
@@ -115,7 +91,7 @@ function positionsOf(
   return positions;
 }
 
-export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOptions) {
+export function useToaster({ explicit, max, gap, expand }: UseToasterOptions) {
   const [host] = useState(() => Symbol('toaster'));
 
   useLayoutEffect(() => registerToaster(host, explicit), [host, explicit]);
@@ -196,27 +172,13 @@ export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOpt
   }, [region, shown, measure]);
 
   const hasLive = live.length > 0;
-  const latest = useRef({ hotkey, hasLive, releaseFocus });
 
-  useLayoutEffect(() => {
-    latest.current = { hotkey, hasLive, releaseFocus };
-  });
-
-  useEffect(() => {
+  const toggleRegionFocus = () => {
     if (!region) return;
 
-    const doc = region.ownerDocument;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (!latest.current.hasLive || !pressedRegionKey(event, latest.current.hotkey)) return;
-
-      event.preventDefault();
-      if (region.contains(doc.activeElement)) latest.current.releaseFocus({ stayInRegion: false });
-      else region.focus({ preventScroll: true });
-    };
-
-    doc.addEventListener('keydown', onKeyDown);
-    return () => doc.removeEventListener('keydown', onKeyDown);
-  }, [region]);
+    if (region.contains(region.ownerDocument.activeElement)) releaseFocus({ stayInRegion: false });
+    else region.focus({ preventScroll: true });
+  };
 
   useEffect(() => {
     if (!hasLive && region?.contains(region.ownerDocument.activeElement))
@@ -278,6 +240,7 @@ export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOpt
     elected,
     toasts,
     shown,
+    hasLive,
     positions,
     frontHeight,
     expanded: expand || hovered || pressing || focusWithin,
@@ -285,5 +248,6 @@ export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOpt
     regionProps,
     registerToast,
     releaseFocus,
+    toggleRegionFocus,
   };
 }

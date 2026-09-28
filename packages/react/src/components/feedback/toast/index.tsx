@@ -1,10 +1,11 @@
 import type { CSSProperties, MouseEvent } from 'react';
 
 import { XMarkIcon } from '@heroicons/react/16/solid';
+import { parseHotkey, useHotkey, type Hotkey } from '@tanstack/react-hotkeys';
 
 import { dismissToast, type ToastRecord } from './toast-store';
 import { useToast, type SwipeDirections } from './use-toast';
-import { useToaster, type ToasterHotkey, type ToastPosition } from './use-toaster';
+import { useToaster, type ToastPosition } from './use-toaster';
 import { messages } from '../../../internal/messages';
 import {
   announcedAssertively,
@@ -14,7 +15,10 @@ import {
 import { tv } from '../../../utils';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { usePlatform } from '../../typography/kbd/use-kbd';
 import { Spinner } from '../spinner';
+
+import type { KbdPlatform } from '../../typography/kbd/keys';
 
 export {
   toast,
@@ -24,20 +28,29 @@ export {
   type ToastPromiseMessages,
   type ToastRecord,
 } from './toast-store';
-export type { ToasterHotkey, ToasterModifier } from './use-toaster';
 
-const DEFAULT_HOTKEY: ToasterHotkey = ['altKey', 'KeyT'];
+const REGION_KEY = 'F6';
+const DEFAULT_HOTKEY: Hotkey = 'Alt+T';
+const ONCE_PER_PRESS_EVEN_IN_INPUTS = {
+  requireReset: true,
+  ignoreInputs: false,
+  stopPropagation: false,
+} as const;
 
-const KEY_NAMES: Record<string, string> = {
-  altKey: 'Alt',
-  ctrlKey: 'Control',
-  metaKey: 'Meta',
-  shiftKey: 'Shift',
-};
+function ariaShortcutOf(hotkey: Hotkey, platform: KbdPlatform) {
+  const parsed = parseHotkey(hotkey, platform);
+  return [...parsed.modifiers, parsed.key ?? parsed.code].join('+');
+}
 
-function shortcutsOf(hotkey: ToasterHotkey) {
-  const named = hotkey.map((key) => KEY_NAMES[key] ?? key.replace(/^(Key|Digit)/, ''));
-  return named.length > 0 ? `F6 ${named.join('+')}` : 'F6';
+type ToasterShortcutsProps = { hotkey: Hotkey; enabled: boolean; onPress: () => void };
+
+function ToasterShortcuts({ hotkey, enabled, onPress }: ToasterShortcutsProps) {
+  const options = { ...ONCE_PER_PRESS_EVEN_IN_INPUTS, enabled };
+
+  useHotkey(REGION_KEY, onPress, options);
+  useHotkey(hotkey, onPress, options);
+
+  return null;
 }
 
 function swipeDirectionsOf(placement: Toaster.Placement): SwipeDirections {
@@ -177,7 +190,8 @@ function ToasterRegion({
   style,
   'aria-label': ariaLabel = messages.toast.region,
 }: Toaster.Props & { explicit: boolean }) {
-  const toaster = useToaster({ explicit, max, gap, expand, hotkey });
+  const toaster = useToaster({ explicit, max, gap, expand });
+  const platform = usePlatform(undefined);
 
   if (!toaster.elected) return null;
 
@@ -185,13 +199,20 @@ function ToasterRegion({
 
   return (
     <div data-toaster="" aria-live="polite" aria-relevant="additions text" aria-atomic="false">
+      <ToasterShortcuts
+        hotkey={hotkey}
+        enabled={toaster.hasLive}
+        onPress={toaster.toggleRegionFocus}
+      />
       <div
         {...toaster.regionProps}
         popover="manual"
         tabIndex={-1}
         role={toaster.shown ? 'region' : undefined}
         aria-label={toaster.shown ? ariaLabel : undefined}
-        aria-keyshortcuts={toaster.shown ? shortcutsOf(hotkey) : undefined}
+        aria-keyshortcuts={
+          toaster.shown ? `${REGION_KEY} ${ariaShortcutOf(hotkey, platform)}` : undefined
+        }
         data-toaster-region=""
         data-placement={placement}
         data-expanded={toaster.expanded ? '' : undefined}
@@ -248,7 +269,7 @@ export namespace Toaster {
     gap?: number;
     offset?: number;
     expand?: boolean;
-    hotkey?: ToasterHotkey;
+    hotkey?: Hotkey;
     className?: string;
     style?: CSSProperties;
     'aria-label'?: string;

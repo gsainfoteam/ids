@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { detectPlatform } from '@tanstack/react-hotkeys';
 import { renderToString } from 'react-dom/server';
 import { afterEach, expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
@@ -235,6 +236,47 @@ test('F6 and Alt+T move focus into the region and back, which pauses the clock',
   await userEvent.keyboard('{Escape}');
   await expect.element(pageButton).toHaveFocus();
   await expect.element(screen.getByRole('status')).not.toBeInTheDocument();
+});
+
+async function holdF6({ repeats }: { repeats: number }) {
+  const press = { key: 'F6', code: 'F6', windowsVirtualKeyCode: 117 };
+
+  await cdp().send('Input.dispatchKeyEvent', { type: 'rawKeyDown', ...press });
+  for (let repeat = 0; repeat < repeats; repeat++)
+    await cdp().send('Input.dispatchKeyEvent', { type: 'rawKeyDown', autoRepeat: true, ...press });
+  await cdp().send('Input.dispatchKeyEvent', { type: 'keyUp', ...press });
+}
+
+test('Alt+T needs exactly Alt, and a held F6 moves focus once', async () => {
+  const screen = await mount();
+  const pageButton = screen.getByRole('button', { name: 'page' });
+  pageButton.element().focus();
+  toast('Exact', { duration: Infinity });
+  const region = screen.getByRole('region', { name: '알림' });
+
+  await userEvent.keyboard('{Control>}{Alt>}t{/Alt}{/Control}');
+  await userEvent.keyboard('{Alt>}{Shift>}t{/Shift}{/Alt}');
+  await expect.element(pageButton, { message: 'extra modifiers do not match' }).toHaveFocus();
+
+  await holdF6({ repeats: 3 });
+  await expect.element(region).toHaveFocus();
+});
+
+test('a custom hotkey replaces Alt+T and is announced with Mod resolved', async () => {
+  const screen = await mount({ hotkey: 'Mod+Shift+Y' });
+  const pageButton = screen.getByRole('button', { name: 'page' });
+  pageButton.element().focus();
+  toast('Custom', { duration: Infinity });
+  const region = screen.getByRole('region', { name: '알림' });
+  const resolved = detectPlatform() === 'mac' ? 'Shift+Meta+Y' : 'Control+Shift+Y';
+
+  await expect.element(region).toHaveAttribute('aria-keyshortcuts', `F6 ${resolved}`);
+
+  await userEvent.keyboard('{Alt>}t{/Alt}');
+  await expect.element(pageButton).toHaveFocus();
+
+  await userEvent.keyboard('{ControlOrMeta>}{Shift>}y{/Shift}{/ControlOrMeta}');
+  await expect.element(region).toHaveFocus();
 });
 
 test('a hidden tab pauses the clock', async () => {

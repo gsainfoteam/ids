@@ -6,6 +6,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { useHotkey, type Hotkey } from '@tanstack/react-hotkeys';
+
 import { CommandContext, ItemContext, useCommandContext, useRadioContext } from './context';
 import { withIndicator } from './indicator';
 import { menuStyle } from './style';
@@ -22,6 +24,18 @@ import type { Menu } from '.';
 
 const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
 
+const ONCE_PER_PRESS_EVEN_IN_INPUTS = {
+  requireReset: true,
+  ignoreInputs: false,
+  stopPropagation: false,
+} as const;
+
+function CommandHotkey({ hotkey, onPress }: { hotkey: Hotkey; onPress: () => void }) {
+  useHotkey(hotkey, onPress, ONCE_PER_PRESS_EVEN_IN_INPUTS);
+
+  return null;
+}
+
 export function CommandMenu({
   open,
   defaultOpen = false,
@@ -29,9 +43,14 @@ export function CommandMenu({
   hotkey,
   children,
 }: Menu.Props) {
-  const palette = useCommandPalette({ open, defaultOpen, onOpenChange, hotkey });
+  const palette = useCommandPalette({ open, defaultOpen, onOpenChange });
 
-  return <CommandContext value={palette}>{children}</CommandContext>;
+  return (
+    <CommandContext value={palette}>
+      {hotkey && <CommandHotkey hotkey={hotkey} onPress={() => palette.setOpen(!palette.open)} />}
+      {children}
+    </CommandContext>
+  );
 }
 
 export function CommandTrigger({

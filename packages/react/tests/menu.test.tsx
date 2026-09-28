@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { detectPlatform } from '@tanstack/react-hotkeys';
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
@@ -735,6 +736,38 @@ test('the hotkey toggles the palette, focuses the search and returns focus where
   await userEvent.keyboard('{Alt>}{ControlOrMeta>}k{/ControlOrMeta}{/Alt}');
   await expect.element(palette).not.toBeInTheDocument();
   expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
+});
+
+const CDP_META = 4;
+const CDP_CONTROL = 2;
+
+async function pressModK(key: string, { repeats = 0 } = {}) {
+  const modifiers = detectPlatform() === 'mac' ? CDP_META : CDP_CONTROL;
+  const press = { key, code: 'KeyK', windowsVirtualKeyCode: 75, modifiers };
+
+  await cdp().send('Input.dispatchKeyEvent', { type: 'rawKeyDown', ...press });
+  for (let repeat = 0; repeat < repeats; repeat++)
+    await cdp().send('Input.dispatchKeyEvent', { type: 'rawKeyDown', autoRepeat: true, ...press });
+  await cdp().send('Input.dispatchKeyEvent', { type: 'keyUp', ...press });
+}
+
+test('the hotkey reads the key position, so a Korean layout opens the palette too', async () => {
+  const { screen, palette, search } = await renderPalette();
+  screen.getByRole('button', { name: 'Before' }).element().focus();
+
+  await pressModK('ㅏ');
+  await expect.element(palette).toBeVisible();
+  await expect.element(search).toHaveFocus();
+});
+
+test('holding the hotkey toggles the palette once', async () => {
+  const onOpenChange = vi.fn();
+  const { screen, palette } = await renderPalette({ onOpenChange });
+  screen.getByRole('button', { name: 'Before' }).element().focus();
+
+  await pressModK('k', { repeats: 5 });
+  await expect.element(palette).toBeVisible();
+  expect(onOpenChange.mock.calls).toEqual([[true]]);
 });
 
 test('the palette is a modal dialog around a combobox and a listbox of options', async () => {

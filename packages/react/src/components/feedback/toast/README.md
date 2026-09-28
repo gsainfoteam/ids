@@ -93,16 +93,16 @@ import { Toaster } from '@gsainfoteam/ids-react';
 - `Toaster` 를 두지 않아도 가장 바깥 `IdsProvider` 가 기본값으로 그립니다. 앱에 `Toaster` 를 두면 그쪽이 기본을 대신하고, 빼면 기본이 돌아옵니다.
 - 여러 개를 두면 먼저 그린 하나만 알림을 그립니다.
 
-| 속성          | 기본 / 동작                                                                                     |
-| ------------- | ----------------------------------------------------------------------------------------------- |
-| `placement`   | `bottom-right`. `top-left` / `top-center` / `top-right` / `bottom-left` / `bottom-center`       |
-| `max`         | `3`. 넘는 알림은 뒤에 숨어 기다리고, 기다리는 동안은 시간이 흐르지 않는다                       |
-| `gap`         | `14`(px). 펼쳤을 때 알림 사이, 접었을 때 뒤 알림이 보이는 폭                                    |
-| `offset`      | `24`(px). 화면 가장자리에서 떨어진 거리. 640px 미만에서는 16px                                  |
-| `expand`      | `false`. `true` 면 늘 펼쳐 둔다                                                                 |
-| `hotkey`      | `['altKey', 'KeyT']`. 영역으로 들어가는 키. 수정 키 이름과 `event.code` 를 섞는다. F6 은 늘 된다 |
-| `className`   | 알림 영역으로 간다                                                                              |
-| `aria-label`  | 알림 영역의 이름. 기본 "알림"                                                                   |
+| 속성         | 기본 / 동작                                                                               |
+| ------------ | ----------------------------------------------------------------------------------------- |
+| `placement`  | `bottom-right`. `top-left` / `top-center` / `top-right` / `bottom-left` / `bottom-center` |
+| `max`        | `3`. 넘는 알림은 뒤에 숨어 기다리고, 기다리는 동안은 시간이 흐르지 않는다                 |
+| `gap`        | `14`(px). 펼쳤을 때 알림 사이, 접었을 때 뒤 알림이 보이는 폭                              |
+| `offset`     | `24`(px). 화면 가장자리에서 떨어진 거리. 640px 미만에서는 16px                            |
+| `expand`     | `false`. `true` 면 늘 펼쳐 둔다                                                           |
+| `hotkey`     | `'Alt+T'`. 영역으로 들어가는 단축키(`Hotkey` 문자열). F6 은 늘 된다                       |
+| `className`  | 알림 영역으로 간다                                                                        |
+| `aria-label` | 알림 영역의 이름. 기본 "알림"                                                             |
 
 - 640px 미만에서는 좌우 16px 을 남기고 화면 폭을 채웁니다. 그 이상에서는 356px 폭입니다.
 
@@ -128,6 +128,15 @@ import { Toaster } from '@gsainfoteam/ids-react';
 | Escape            | 원래 자리로 돌아간다. 열린 대화상자는 닫지 않는다               |
 
 - 포커스가 있던 알림이 닫히면 포커스는 원래 자리로, 그곳이 없으면 알림 영역으로 갑니다.
+- F6 과 `hotkey` 는 `@tanstack/react-hotkeys` 의 `useHotkey` 로 듣습니다.
+  - 수식 키는 정확히 맞아야 합니다. `Alt+T` 는 Ctrl+Alt+T 에 반응하지 않습니다.
+  - 누르고 있어도 한 번만 움직입니다. 입력칸 안에서도 반응합니다.
+  - 입력칸이 먼저 `preventDefault` 해도 단축키가 반응합니다.
+  - `aria-keyshortcuts` 는 `Mod` 를 기기에 맞게 푼 이름입니다(`F6 Alt+T`, `hotkey="Mod+Shift+Y"` 면 Mac 에서 `F6 Shift+Meta+Y`).
+
+```tsx
+<Toaster hotkey="Mod+Shift+Y" />
+```
 
 ## 상태
 
