@@ -279,10 +279,11 @@ export const Sentinel: Story = {
   play: async ({ canvas }) => {
     const input = canvas.getByRole('textbox', { name: '본문' });
     const root = input.closest('[data-text-area]')!;
+    const scrollArea = input.closest('[data-scroll-area]')!;
 
     await expect(root.querySelector('[data-text-area-top]')).toHaveTextContent('위');
     await expect(root.querySelector('[data-text-area-bottom]')).toHaveTextContent('아래');
-    await expect(input.previousElementSibling).toHaveAttribute('data-text-area-top');
-    await expect(input.nextElementSibling).toHaveAttribute('data-text-area-bottom');
+    await expect(scrollArea.previousElementSibling).toHaveAttribute('data-text-area-top');
+    await expect(scrollArea.nextElementSibling).toHaveAttribute('data-text-area-bottom');
   },
 };

@@ -235,8 +235,9 @@ popup list, a menu, a dialog body) never shows the OS scrollbar: make the scroll
 `ScrollArea` root with `asChild`. A padded root keeps its corner from `concentric-p-*` and hands
 the padding to the viewport (`concentric-p-1 p-0` on the root, `p-1` on the viewport), and a
 scroll area sitting in a rounded container's corner takes that corner with `rounded-[inherit]`,
-since the bar ends are inset from the root's own computed radius. The native `<textarea>` is the
-one exception.
+since the bar ends are inset from the root's own computed radius. A `<textarea>` is a viewport
+too (`ScrollArea.Viewport asChild`): it scrolls itself, and ScrollArea remeasures it on `input`.
+Popover keeps its arrow outside the ScrollArea, since the viewport clips what overflows.
 
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
 `--ids-color-border` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets

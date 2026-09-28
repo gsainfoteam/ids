@@ -29,6 +29,7 @@ import {
   type TextControlState,
 } from '../../../internal/text-control';
 import { cn, flattenFragments, invariant, tv } from '../../../utils';
+import { ScrollArea } from '../../layout/scroll-area';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -196,6 +197,12 @@ export namespace TextArea {
     };
     const fixed = { ...props, style: { maxHeight: rowsToHeight(maxRows), ...props.style } };
 
+    const scrolled = (textarea: ReactElement) => (
+      <ScrollArea className={styles.scrollArea()}>
+        <ScrollArea.Viewport asChild>{textarea}</ScrollArea.Viewport>
+      </ScrollArea>
+    );
+
     if (asChild === true) {
       invariant(
         isValidElement(children) &&
@@ -203,18 +210,20 @@ export namespace TextArea {
         '`<TextArea.Input asChild>` requires one textarea, or a component forwarding textarea props and ref.',
       );
       const rendersOwnTextarea = children.type !== 'textarea';
-      if (rendersOwnTextarea) return cloneElement(children, autoResize ? props : fixed);
+      if (rendersOwnTextarea) return scrolled(cloneElement(children, autoResize ? props : fixed));
     } else {
       invariant(children == null, '`<TextArea.Input>` takes `value`/`defaultValue`, not children.');
     }
-    if (!autoResize) return <textarea {...fixed} />;
-    return (
+
+    if (!autoResize) return scrolled(<textarea {...fixed} />);
+
+    return scrolled(
       <TextareaAutosize
         {...props}
         style={omit(props.style, MEASURED_HEIGHTS)}
         minRows={minRows ?? props.rows}
         maxRows={maxRows}
-      />
+      />,
     );
   }
 
@@ -274,6 +283,10 @@ export namespace TextArea {
         'not-has-[button]:text-(--ids-color-on-muted)',
         '[&_svg]:shrink-0',
         insetButtons.base,
+      ],
+      scrollArea: [
+        'grow rounded-[inherit]',
+        '[:not(:empty)+&]:rounded-t-none [&:has(+:not(:empty))]:rounded-b-none',
       ],
       input: [
         'w-full min-w-0 grow resize-none bg-transparent outline-none',

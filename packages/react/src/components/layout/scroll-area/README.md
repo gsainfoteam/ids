@@ -159,12 +159,14 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 
 - Select, ChipField 의 옵션 목록(팝업과 하단 시트), 필드 팝업 자체(달력, 색 선택기가 넘칠 때)
 - Menu 의 내용, 명령 팔레트의 목록
-- Dialog, Drawer 의 본문
+- Dialog, Drawer, Popover 의 본문. Popover 의 화살표는 ScrollArea 밖에 둡니다
+- TextArea 의 textarea(`Viewport asChild`)
+- TimePicker 의 컬럼(`size="tiny"`, listbox 가 `Viewport asChild`)
 
 ## 알아둘 것
 
-- **TextArea 는 감싸지 못합니다.** 스크롤이 네이티브 `<textarea>` 안에서 일어나고, 그 안에 막대를 겹칠 요소를 둘 수 없습니다. TextArea 는 OS 막대를 그대로 씁니다.
-- TimePicker 의 컬럼은 막대를 아예 그리지 않습니다. 가운데에 선 값이 위치를 알려 주는 선택기이고, 48px 컬럼에는 막대를 둘 폭이 없습니다.
+- **`<textarea>` 도 viewport 가 됩니다.** `Viewport asChild` 로 textarea 자신이 스크롤하고, 막대는 그 위에 겹칩니다. 입력은 자식 크기를 바꾸지 않으므로 `input` 이벤트마다 한 프레임에 한 번 다시 잽니다. 스스로 포커스를 받는 요소(textarea, contenteditable)는 Tab 멈춤을 따로 받지 않습니다.
+- 스크립트가 바꾼 값(`value` prop)은 `input` 을 내지 않습니다. 높이가 그대로인 채 내용만 늘면 다음 스크롤이나 크기 변화 때 넘침을 다시 봅니다.
 - root 는 `relative flex flex-col` 이고 viewport 는 남은 높이를 받습니다(`grow`, `min-h-0`). 높이는 root 에 줍니다(`h-*`, `max-h-*`).
 - 내용 크기는 viewport 의 직접 자식마다 `ResizeObserver` 로 봅니다. 자식이 절대 위치로 viewport 밖까지 뻗는 경우는 다음 스크롤이나 크기 변화 때 맞춰집니다.
 - 스크롤 중에는 한 프레임에 한 번(`requestAnimationFrame`) viewport 의 스크롤 값만 읽고 막대 요소의 CSS 변수(`--scroll-area-thumb-offset`)만 씁니다. root 의 모양은 다시 읽지 않고, 바뀐 값만 쓰며, thumb 은 `translate` 로 움직입니다.

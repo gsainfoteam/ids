@@ -144,7 +144,8 @@ import { de } from 'date-fns/locale';
 
 - 바깥에서 준 `value` 를 범위나 간격에 맞춰 고치지 않습니다.
 - 서머타임으로 없는 시각은 고를 수 없고, 두 번 있는 시각은 `Date` 의 이른 오프셋을 씁니다. 시간대 변환은 없습니다.
-- 컬럼은 스크롤바를 숨깁니다. 마우스 휠, 트랙패드, 터치, 키보드로 움직입니다.
+- 컬럼은 `size="tiny"`(6px) [ScrollArea](../../layout/scroll-area/README.md) 이고, listbox 자신이 스크롤 요소입니다(`Viewport asChild`). OS 막대 대신 가리키거나 스크롤할 때만 얇은 IDS 막대가 보입니다. 마우스 휠, 트랙패드, 터치, 키보드로 움직입니다.
+- 컬럼의 폭(`min-w-12 flex-1`)은 ScrollArea root 에 있습니다. `TimePicker.Column` 의 `className` 은 listbox 에 붙습니다.
 - 컬럼 높이는 옵션 다섯 개입니다. `className="[--time-picker-height:calc(var(--time-option)*7)]"` 처럼 바꿀 수 있고, 위아래 여백이 반 컬럼씩이라 어느 높이에서도 고른 시각이 가운데 줄에 옵니다.
 - 12시간제의 시 컬럼은 12, 1, 2, ... 11 순서입니다.
 - 오전/오후 이름은 런타임과 상관없이 date-fns 데이터라 서버와 브라우저가 같습니다.

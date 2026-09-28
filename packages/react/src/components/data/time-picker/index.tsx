@@ -20,6 +20,7 @@ import { periodFirst, resolveLocale, type DateLocale } from '../../../internal/d
 import { messages } from '../../../internal/messages';
 import { flattenFragments, invariant, mergeProps, part, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
+import { ScrollArea } from '../../layout/scroll-area';
 
 import type { TimeFormat, TimePrecision, TimeUnit } from './time';
 import type { IdsSize } from '../../../tokens/types';
@@ -217,7 +218,7 @@ function ColumnView({
       {typeof children === 'function' ? children(option) : option.label}
     </div>
   ));
-  return part(
+  const listbox = part(
     'div',
     asChild,
     asChild && typeof children !== 'function' ? withDefault(children, options) : options,
@@ -240,6 +241,12 @@ function ColumnView({
       onScrollEnd: column.onScrollEnd,
       onKeyDown: column.onKeyDown,
     }),
+  );
+
+  return (
+    <ScrollArea size="tiny" className={c.styles.columnArea()}>
+      <ScrollArea.Viewport asChild>{listbox}</ScrollArea.Viewport>
+    </ScrollArea>
   );
 }
 
@@ -295,10 +302,10 @@ export namespace TimePicker {
       header: 'flex w-full basis-full gap-1 text-(--ids-color-on-muted) select-none',
       headerLabel: 'min-w-12 flex-1 text-center',
       separator: 'self-center text-(--ids-color-on-muted) select-none',
+      columnArea: 'min-w-12 flex-1 rounded-standard',
       column: [
-        'group/column relative h-(--time-picker-height) min-w-12 flex-1 overflow-y-auto overscroll-contain rounded-standard',
+        'group/column relative h-(--time-picker-height) rounded-standard',
         'before:block before:h-[calc(50%-var(--time-option)/2)] after:block after:h-[calc(50%-var(--time-option)/2)]',
-        '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         'focus-ring aria-disabled:cursor-not-allowed',
         'data-[variant=wheel]:snap-y data-[variant=wheel]:snap-mandatory data-[variant=wheel]:[overflow-anchor:none]',
       ],

@@ -16,9 +16,11 @@ left, and a viewport with no focusable content becomes a tab stop when it overfl
 `data-overflow-x/y`, `data-hovering`, `data-scrolling`, `data-dragging` and `data-visible`.
 
 Select and ChipField option lists, the field popups (DateField, TimeField, DateTimeField,
-ColorField pickers), Menu content, the command palette list, and Dialog and Drawer bodies now
-scroll through ScrollArea. Dialog and Drawer keep their padding and gap on an inner viewport, so a
-`p-*` or `gap-*` given to `Dialog.Content` / `Drawer.Content` no longer spaces the content.
+ColorField pickers), Menu content, the command palette list, Dialog, Drawer and Popover bodies,
+TextArea and the TimePicker columns now scroll through ScrollArea. Popover now caps its height at
+the space left on screen and scrolls past it. Dialog, Drawer and Popover keep their padding and
+gap on an inner viewport, so a
+`p-*` or `gap-*` given to `Dialog.Content`, `Drawer.Content` or `Popover.Content` no longer spaces the content.
 
 The CSS package adds the neutral tokens `--ids-color-scrollbar-track`, `-scrollbar-thumb`,
 `-scrollbar-thumb-hover` and `-scrollbar-thumb-active`.

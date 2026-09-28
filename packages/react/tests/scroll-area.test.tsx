@@ -5,7 +5,16 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Drawer, IdsProvider, Menu, ScrollArea, Select } from '../src';
+import {
+  Drawer,
+  IdsProvider,
+  Menu,
+  Popover,
+  ScrollArea,
+  Select,
+  TextArea,
+  TimePicker,
+} from '../src';
 import {
   clearOfCurve,
   MIN_THUMB_LENGTH,
@@ -644,4 +653,85 @@ test('adopted: dragging the scrollbar of a Drawer body scrolls it instead of mov
   expect(sheet.style.transform).toBe('');
   expect(body.scrollTop).toBeGreaterThan(0);
   await expect.element(sheet).toBeVisible();
+});
+
+test('adopted: a TextArea past its max rows scrolls the textarea itself under an IDS bar', async () => {
+  const screen = await render(<TextArea aria-label="메모" maxRows={3} />);
+  const textarea = screen.getByRole('textbox', { name: '메모' });
+  const input = textarea.element() as HTMLTextAreaElement;
+  const area = input.closest<HTMLElement>('[data-scroll-area]')!;
+
+  expect(input.hasAttribute('data-scroll-area-viewport')).toBe(true);
+  expect(getComputedStyle(input).scrollbarWidth).toBe('none');
+  expect(area.hasAttribute('data-overflow-y')).toBe(false);
+
+  await userEvent.click(textarea);
+  await userEvent.keyboard('1{Enter}2{Enter}3{Enter}4{Enter}5{Enter}6');
+
+  await expect.element(area).toHaveAttribute('data-overflow-y');
+  await expect.element(q('[data-scroll-area-scrollbar]', area)).toHaveAttribute('data-visible');
+  expect(input.scrollTop).toBeGreaterThan(0);
+  expect(input.hasAttribute('tabindex')).toBe(false);
+  expect(input.hasAttribute('data-tab-stop')).toBe(false);
+});
+
+test('adopted: a TextArea keeps its rounded corner only where no bar sits above or below', async () => {
+  const screen = await render(
+    <div className="flex flex-col gap-4">
+      <TextArea aria-label="단독" />
+      <TextArea aria-label="막대">
+        <span>위</span>
+        <TextArea.Input />
+      </TextArea>
+    </div>,
+  );
+  const areaOf = (name: string) =>
+    screen.getByRole('textbox', { name }).element().closest<HTMLElement>('[data-scroll-area]')!;
+
+  expect(getComputedStyle(areaOf('단독')).borderTopLeftRadius).not.toBe('0px');
+  expect(getComputedStyle(areaOf('단독')).borderBottomLeftRadius).not.toBe('0px');
+  expect(getComputedStyle(areaOf('막대')).borderTopLeftRadius).toBe('0px');
+  expect(getComputedStyle(areaOf('막대')).borderBottomLeftRadius).not.toBe('0px');
+});
+
+test('adopted: a TimePicker column is its own tiny viewport and still centers the picked time', async () => {
+  const screen = await render(
+    <TimePicker defaultValue={new Date(2026, 0, 1, 9, 0)} format="24h" precision="hour" />,
+  );
+  const column = screen.getByRole('listbox').element() as HTMLElement;
+  const area = column.closest<HTMLElement>('[data-scroll-area]')!;
+
+  expect(column.hasAttribute('data-scroll-area-viewport')).toBe(true);
+  expect(area.getAttribute('data-size')).toBe('tiny');
+  expect(getComputedStyle(column).scrollbarWidth).toBe('none');
+  await expect.element(area).toHaveAttribute('data-overflow-y');
+
+  await userEvent.hover(column);
+  await expect.element(q('[data-scroll-area-scrollbar]', area)).toHaveAttribute('data-visible');
+  expect(column.getAttribute('tabindex')).toBe('0');
+});
+
+test('adopted: a long Popover scrolls inside while its arrow still sticks out', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Popover defaultOpen>
+        <Popover.Trigger>열기</Popover.Trigger>
+        <Popover.Content aria-label="안내" style={{ maxHeight: 160 }}>
+          <Popover.Arrow />
+          <div className="h-[600px] shrink-0" />
+        </Popover.Content>
+      </Popover>
+    </IdsProvider>,
+  );
+  const content = screen.getByRole('dialog', { name: '안내' }).element() as HTMLElement;
+  const area = q('[data-scroll-area]', content);
+  const arrow = q<SVGElement>('[data-popover-arrow]', content);
+
+  await expect.element(area).toHaveAttribute('data-overflow-y');
+  expect(arrow.closest('[data-scroll-area]')).toBeNull();
+  expect(getComputedStyle(q('[data-scroll-area-viewport]', area)).paddingTop).toBe('12px');
+
+  const box = content.getBoundingClientRect();
+  const tip = arrow.getBoundingClientRect();
+  expect(tip.bottom <= box.top + 1 || tip.top >= box.bottom - 1).toBe(true);
 });

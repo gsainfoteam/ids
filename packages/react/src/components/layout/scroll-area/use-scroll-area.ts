@@ -72,8 +72,13 @@ function measureThumb(viewport: HTMLElement, axis: Axis, track: number) {
     : thumbAlong(track, viewport.clientWidth, viewport.scrollWidth, Math.abs(viewport.scrollLeft));
 }
 
+const takesFocusItself = (viewport: HTMLElement) =>
+  viewport instanceof viewport.ownerDocument.defaultView!.HTMLTextAreaElement ||
+  viewport.isContentEditable;
+
 function needsTabStop(viewport: HTMLElement, overflow: Overflow) {
   if (!overflow.x && !overflow.y) return false;
+  if (takesFocusItself(viewport)) return false;
   if (WIDGETS_THAT_MANAGE_THEIR_OWN_FOCUS.has(viewport.getAttribute('role') ?? '')) return false;
 
   return focusable(viewport, { displayCheck: 'none' }).length === 0;
@@ -171,6 +176,16 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
       placeBars();
     };
 
+    let typingFrame = 0;
+
+    const onTypingResizesContent = () => {
+      if (!typingFrame)
+        typingFrame = win.requestAnimationFrame(() => {
+          typingFrame = 0;
+          measure();
+        });
+    };
+
     const settle = debounce(() => setScrolling(false), SCROLL_SETTLE_MS);
 
     const onScroll = () => {
@@ -190,6 +205,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
 
     remeasure.current = measure;
     viewport.addEventListener('scroll', onScroll, { passive: true });
+    viewport.addEventListener('input', onTypingResizesContent);
     children.observe(viewport, { childList: true });
     observeContent();
     measure();
@@ -197,10 +213,12 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
     return () => {
       remeasure.current = noop;
       viewport.removeEventListener('scroll', onScroll);
+      viewport.removeEventListener('input', onTypingResizesContent);
       children.disconnect();
       resize.disconnect();
       settle.cancel();
       win.cancelAnimationFrame(frame);
+      win.cancelAnimationFrame(typingFrame);
     };
   }, [root, viewport, scrollsX, scrollsY]);
 

@@ -320,7 +320,7 @@ test('column positioning ignores its page offset and keeps clicked time visible'
     </div>,
   );
   const column = col('hour');
-  expect(column.offsetTop).toBeGreaterThanOrEqual(900);
+  expect(column.getBoundingClientRect().top + window.scrollY).toBeGreaterThanOrEqual(900);
   await userEvent.click(option('hour', 10));
   const middle = (node: HTMLElement) => {
     const rect = node.getBoundingClientRect();

@@ -1,5 +1,6 @@
 import {
   createContext,
+  isValidElement,
   use,
   useEffect,
   useLayoutEffect,
@@ -25,10 +26,13 @@ import {
   type AnchoredAlign,
   type AnchoredSide,
 } from '../../../internal/overlay';
-import { invariant, mergeProps, part, tv } from '../../../utils';
+import { cn, flattenFragments, invariant, mergeProps, part, tv } from '../../../utils';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { ScrollArea } from '../../layout/scroll-area';
 import { Slot } from '../../utility/slot';
+
+const cornerOfThePaddedViewport = cn('concentric-p-3 p-0');
 
 type Context = {
   popover: ReturnType<typeof usePopover>;
@@ -88,6 +92,8 @@ export function Popover({
   );
 }
 
+const isArrow = (node: ReactNode) => isValidElement(node) && node.type === Popover.Arrow;
+
 type PopupProps = Omit<
   Popover.Content.Props,
   'side' | 'align' | 'sideOffset' | 'alignOffset' | 'anchor' | 'initialFocus'
@@ -101,6 +107,10 @@ function PopoverPopup({ className, style, children, ...props }: PopupProps) {
   const labelledBy =
     props['aria-labelledby'] ??
     (props['aria-label'] === undefined && c.titled ? ids.title : undefined);
+
+  const parts = flattenFragments(children);
+  const arrowsThatStickOut = parts.filter(isArrow);
+  const content = parts.filter((node) => !isArrow(node));
 
   return (
     <ModalLayer
@@ -135,7 +145,12 @@ function PopoverPopup({ className, style, children, ...props }: PopupProps) {
         className={styles.content({ className })}
         style={{ ...style, ...anchored.floatingStyles }}
       >
-        <OverlayItemContext value={null}>{children}</OverlayItemContext>
+        <OverlayItemContext value={null}>
+          {arrowsThatStickOut}
+          <ScrollArea className={styles.scrollArea()}>
+            <ScrollArea.Viewport className={styles.viewport()}>{content}</ScrollArea.Viewport>
+          </ScrollArea>
+        </OverlayItemContext>
       </div>
     </ModalLayer>
   );
@@ -326,7 +341,8 @@ export namespace Popover {
       backdrop:
         'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none border-0 bg-transparent p-0',
       content: [
-        'fixed z-50 m-0 flex w-72 max-w-[calc(100vw-1rem)] flex-col gap-2 overflow-visible concentric-p-3 outline-none',
+        'fixed z-50 m-0 flex max-h-(--available-height) w-72 max-w-[calc(100vw-1rem)] flex-col overflow-visible outline-none',
+        cornerOfThePaddedViewport,
         'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface)',
         'text-body-b3-regular shadow-md',
         'transition-[opacity,scale] duration-(--ids-motion-fast) ease-out',
@@ -334,6 +350,8 @@ export namespace Popover {
         'data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom',
         'motion-reduce:transition-none',
       ],
+      scrollArea: 'min-h-0 rounded-[inherit]',
+      viewport: 'flex flex-col gap-2 p-3',
       title: 'text-body-b3-semibold [overflow-wrap:anywhere]',
       description: 'text-body-b3-regular text-(--ids-color-on-muted)',
     },

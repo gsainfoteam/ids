@@ -85,6 +85,7 @@ test('sentinel/Fragment order, root native props, asChild handlers and React 19 
     Array.from(shell.children, (element) => {
       if (!(element instanceof HTMLElement)) return element.tagName;
       if ('textAreaTop' in element.dataset) return 'top';
+      if ('scrollArea' in element.dataset) return element.firstElementChild!.tagName;
       return 'textAreaBottom' in element.dataset ? 'bottom' : element.tagName;
     }),
   ).toEqual(['top', 'TEXTAREA', 'bottom']);
