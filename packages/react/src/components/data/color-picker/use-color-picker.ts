@@ -32,6 +32,11 @@ type EyeDropperConstructor = new () => {
 const eyeDropperOf = (view: unknown) =>
   (view as { EyeDropper?: EyeDropperConstructor } | undefined)?.EyeDropper;
 
+async function readScreenColor(EyeDropper: EyeDropperConstructor) {
+  const { sRGBHex } = await new EyeDropper().open();
+  return parseColor(sRGBHex);
+}
+
 const noSubscription = () => noop;
 
 export function useEyeDropperSupport() {
@@ -193,8 +198,7 @@ export function useColorPicker({
   const pickFromScreen = async () => {
     const EyeDropper = eyeDropperOf(window);
     if (!EyeDropper || blocked) return;
-    const result = await new EyeDropper().open().catch(() => null);
-    const picked = result && parseColor(result.sRGBHex);
+    const picked = await readScreenColor(EyeDropper).catch(() => null);
     if (picked) commitRgba({ ...picked, alpha: color.a });
   };
 
