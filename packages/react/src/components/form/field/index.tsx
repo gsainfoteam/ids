@@ -49,6 +49,7 @@ type PartProps<Tag extends 'label' | 'div', S> = Omit<ComponentProps<Tag>, keyof
 export type FieldProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 'style'> & {
   children: ReactNode;
   orientation?: FieldOrientation;
+  /** @deprecated Use `orientation`. */
   variant?: FieldOrientation;
   size?: IdsSize;
   invalid?: boolean;

@@ -55,7 +55,7 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 **No comments.** Code carries no comments. When a line seems to need one, rename or restructure it
 until it does not: a helper named for its reason (`tryCapturePointer`), a constant named for what
 its value means, a condition split into named parts. Tool directives (`eslint-disable`,
-`@ts-expect-error`) are the only exception. Explanations for users belong in the README and the
+`@ts-expect-error`, a `@deprecated` tag that editors strike through) are the only exception. Explanations for users belong in the README and the
 story descriptions.
 
 ## React source layout
