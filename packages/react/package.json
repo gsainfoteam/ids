@@ -41,7 +41,7 @@
     "lint": "eslint",
     "format": "prettier --check .",
     "check": "prettier --write . && eslint --fix",
-    "test": "pnpm build && node --test tests/*.test.mjs"
+    "test": "vitest run"
   },
   "peerDependencies": {
     "@gsainfoteam/ids-css": "^0.1.1",
@@ -81,6 +81,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.1.4",
+    "@vitest/browser-playwright": "^5.0.2",
     "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -92,6 +93,7 @@
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.4.0",
     "jsdom": "^26.1.0",
+    "playwright": "^1.63.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "react": "^19.2.0",
@@ -103,6 +105,8 @@
     "typescript-eslint": "^8.57.1",
     "vite": "^7.3.1",
     "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^5.0.2",
+    "vitest-browser-react": "^2.3.0",
     "zod": "^4.4.3"
   },
   "peerDependenciesMeta": {

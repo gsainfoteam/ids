@@ -29,6 +29,7 @@ pnpm codegen          # Run Style Dictionary: core → css/react/flutter
 pnpm build            # Build all packages (turbo, css before react)
 pnpm typecheck        # TypeScript check all packages
 pnpm lint             # ESLint all packages
+pnpm test             # Build, then Vitest: browser tests, every story's play, dist checks
 pnpm storybook        # Storybook for ids-react (port 6006)
 ```
 
@@ -280,18 +281,52 @@ focus and state. Define them once outside the render function.
 
 ## Tests
 
-`tests/*.test.mjs` run under `node:test` against the built `dist` with jsdom.
+`pnpm test` builds the packages, then runs Vitest in `packages/react` (`vitest.config.ts`) as three
+projects:
 
-- Expose `Element`, `Node` and `getComputedStyle` as globals before importing `dist`:
-  floating-ui and tabbable check for them when they load. Focus-trap tests also need
-  `MutationObserver` and `Document`.
-- jsdom has no layout, so tabbable treats every element as hidden. Stub
-  `Element.prototype.getClientRects` to return one box when a test relies on focus order.
+- `browser`: `tests/**/*.test.tsx` render from `src` in headless Chromium through Playwright, with
+  Tailwind and the IDS CSS loaded and reduced motion on. `tests/stories.test.tsx` renders every
+  story and runs its `play` through portable stories (`composeStories` + `run()`); a story tagged
+  `'!test'` is skipped.
+- `clipboard`: the browser files that call `userEvent.copy` / `cut` / `paste` or
+  `navigator.clipboard`, one file at a time. Every browser context shares one system clipboard, so
+  two such files in parallel paste each other's text. The config finds them by those calls.
+- `node`: `tests/**/*.test.ts` check the built `dist`, such as the entry points loading without
+  the optional form peers.
+
+One file: `pnpm --filter @gsainfoteam/ids-react exec vitest run tests/select.test.tsx`. Install
+Chromium once per machine:
+`pnpm --filter @gsainfoteam/ids-react exec playwright install chromium`.
+
+**Drive components the way a user does.**
+
+- Render with `render` from `vitest-browser-react` and act with `userEvent` from `vitest/browser`.
+  Clicks, keys, `fill`, `type`, `upload`, hover and `copy` / `paste` are real input.
+- Press Tab with `userEvent.keyboard('{Tab}')`. `userEvent.tab()` presses it on the runner page
+  without focusing the test frame, so focus lands outside the test.
+- What `userEvent` cannot do goes through CDP (`cdp()` from `vitest/browser`): a held mouse button
+  (`Input.dispatchMouseEvent`), IME composition (`Input.imeSetComposition`), a response held back
+  (`Fetch.enable`), a color scheme (`Emulation.setEmulatedMedia`). Await one `send` before the
+  first `cdp().on()`.
+- A synthetic event is only for input the browser cannot produce from a test: files dropped or
+  pasted from the OS, autofill, IME keydowns without CDP.
+- The viewport is 414x896, below the 640px drawer breakpoint. Set it with `page.viewport(w, h)`.
+
+**Assert what settles.**
+
+- `await expect.element(locator)` retries until React and the browser settle. Plain `expect` is
+  for spies and values.
+- `toHaveTextContent` matches the whole text; `toMatchTextContent` takes part of it or a RegExp.
+- `toBeDisabled` and `toBeEnabled` count `aria-disabled`. When the native attribute is the point
+  (`focusableWhenDisabled`), assert `disabled` itself.
 - Never assert a state that only lasts until a timer fires. Declare the duration the code reads
-  (for example an inline `transition-duration`) and send the ending event yourself.
-- In `play` functions, query elements again after each `await`, since the theme decorator may
-  remount the story. Inputs whose focus a play checks carry `data-1p-ignore` and
-  `data-lpignore="true"` so a password manager's inline menu does not take the focus.
+  (an inline `transition-duration`) and end it with `getAnimations().forEach((a) => a.finish())`,
+  or fake only the clock involved: `vi.useFakeTimers({ toFake: ['Date'] })`.
+- Console output of passing tests is hidden. Run with `--silent=false` to see React warnings.
+
+**Stories.** In `play` functions, query elements again after each `await`, since the theme decorator
+may remount the story. Inputs whose focus a play checks carry `data-1p-ignore` and
+`data-lpignore="true"` so a password manager's inline menu does not take the focus.
 
 ## ThemeProvider
 
