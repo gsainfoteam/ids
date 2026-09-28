@@ -122,7 +122,7 @@ export namespace Group {
     slots: {
       root: [
         'relative flex w-fit items-stretch',
-        '[&>:not(input)]:relative',
+        '[&>:not(input,[popover],[data-floating-ui-focus-guard])]:relative',
         '[&>[data-hovered]]:z-10 [&>[data-active]]:z-20 [&>[data-focus-visible]]:z-30',
         'has-[>[data-group]]:gap-2',
       ],
@@ -158,8 +158,10 @@ export namespace Group {
         attached: true,
         class: {
           root: [
-            '[&>:not(input)~*]:rounded-s-none [&>*:has(~:not(input))]:rounded-e-none',
+            '[&>:not(input,[popover],[data-floating-ui-focus-guard])~:not(input,[popover],[data-floating-ui-focus-guard])]:rounded-s-none',
+            '[&>:not(input,[popover],[data-floating-ui-focus-guard]):has(~:not(input,[popover],[data-floating-ui-focus-guard]))]:rounded-e-none',
             '[&>[data-variant=outline]+[data-variant=outline]]:-ms-px',
+            '[&>[data-variant=outline]+[popover]+[data-variant=outline]]:-ms-px',
           ],
           separator: '-mx-px',
         },
@@ -169,8 +171,10 @@ export namespace Group {
         attached: true,
         class: {
           root: [
-            '[&>:not(input)~*]:rounded-t-none [&>*:has(~:not(input))]:rounded-b-none',
+            '[&>:not(input,[popover],[data-floating-ui-focus-guard])~:not(input,[popover],[data-floating-ui-focus-guard])]:rounded-t-none',
+            '[&>:not(input,[popover],[data-floating-ui-focus-guard]):has(~:not(input,[popover],[data-floating-ui-focus-guard]))]:rounded-b-none',
             '[&>[data-variant=outline]+[data-variant=outline]]:-mt-px',
+            '[&>[data-variant=outline]+[popover]+[data-variant=outline]]:-mt-px',
           ],
           separator: '-my-px',
         },

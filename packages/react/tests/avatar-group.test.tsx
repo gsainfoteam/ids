@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
+import { render } from 'vitest-browser-react';
 
 import { Avatar, AvatarGroup } from '../src';
 
@@ -128,4 +129,30 @@ test('an invalid max is clamped instead of throwing', () => {
 
 test('Overflow outside a group throws', () => {
   expect(() => renderToString(<AvatarGroup.Overflow />)).toThrow(/inside `<AvatarGroup>`/);
+});
+
+function AvatarWithOpenPopover({ name }: { name: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => ref.current?.showPopover(), []);
+  return (
+    <>
+      <Avatar name={name} />
+      <div ref={ref} popover="manual" data-testid="popover" className="fixed m-0">
+        {name}
+      </div>
+    </>
+  );
+}
+
+test('an open popover beside the stacked avatars is not pulled into the overlap', async () => {
+  const screen = await render(
+    <AvatarGroup>
+      <Avatar name="Alice Kim" />
+      <AvatarWithOpenPopover name="Bob Lee" />
+    </AvatarGroup>,
+  );
+  const popover = screen.getByTestId('popover').element() as HTMLElement;
+  const avatars = screen.container.querySelectorAll<HTMLElement>('[data-avatar]');
+  expect(getComputedStyle(avatars[1]!).marginInlineStart).toBe('-10px');
+  expect(getComputedStyle(popover).marginInlineStart).toBe('0px');
 });

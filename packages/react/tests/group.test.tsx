@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, test } from 'vitest';
+import { render } from 'vitest-browser-react';
 
 import { Button, ButtonGroup, Toggle, ToggleGroup } from '../src';
 
@@ -52,4 +53,48 @@ test('inside a single-select ToggleGroup the separator only draws a line', () =>
   expect(line.hasAttribute('data-divider')).toBe(true);
   expect(line.getAttribute('aria-hidden')).toBe('true');
   expect(line.hasAttribute('role')).toBe(false);
+});
+
+function OpenPopover() {
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => ref.current?.showPopover(), []);
+  return (
+    <div ref={ref} popover="manual" data-testid="popover" className="rounded-standard fixed m-0">
+      메뉴
+    </div>
+  );
+}
+
+test('an open popover and its focus guards beside the joined items stay apart from them', async () => {
+  const screen = await render(
+    <ButtonGroup aria-label="저장">
+      <Button variant="outline">저장</Button>
+      <Button variant="outline">더보기</Button>
+      <span data-floating-ui-focus-guard="" tabIndex={0} />
+      <OpenPopover />
+      <span data-floating-ui-focus-guard="" tabIndex={0} />
+    </ButtonGroup>,
+  );
+  const [save, more] = screen.container.querySelectorAll('button');
+  const popover = screen.getByTestId('popover').element() as HTMLElement;
+  expect(getComputedStyle(save).borderEndEndRadius).toBe('0px');
+  expect(getComputedStyle(more).borderStartStartRadius).toBe('0px');
+  expect(getComputedStyle(more).borderEndEndRadius, 'the last item keeps its corner').toBe('10px');
+  expect(getComputedStyle(popover).borderStartStartRadius).toBe('10px');
+  expect(getComputedStyle(popover).borderEndEndRadius).toBe('10px');
+  expect(getComputedStyle(popover).position, 'the top layer box stays fixed').toBe('fixed');
+});
+
+test('outline items either side of an open popover still share one border', async () => {
+  const screen = await render(
+    <ButtonGroup aria-label="저장">
+      <Button variant="outline">저장</Button>
+      <OpenPopover />
+      <Button variant="outline">더보기</Button>
+    </ButtonGroup>,
+  );
+  const [save, more] = screen.container.querySelectorAll('button');
+  expect(getComputedStyle(save).borderEndEndRadius).toBe('0px');
+  expect(getComputedStyle(more).borderStartStartRadius).toBe('0px');
+  expect(getComputedStyle(more).marginInlineStart).toBe('-1px');
 });

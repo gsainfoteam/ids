@@ -167,7 +167,9 @@ export namespace AvatarGroup {
         long: { overflow: '[&_[data-avatar-fallback]]:text-[length:max(6px,22cqi)]' },
       },
       layout: {
-        stack: { root: '[&>*:not(:first-child)]:-ms-(--ag-overlap)' },
+        stack: {
+          root: '[&>*:not(:first-child,[popover],[data-floating-ui-focus-guard])]:-ms-(--ag-overlap)',
+        },
         inline: {},
       } satisfies Record<AvatarGroupLayout, object>,
       size: {

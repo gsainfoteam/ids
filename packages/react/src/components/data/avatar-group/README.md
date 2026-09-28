@@ -85,3 +85,4 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 
 - 자식 하나가 한 사람입니다. `<a href>` 나 툴팁으로 감싼 아바타도 한 사람으로 세고, 안쪽 아바타가 오려집니다.
 - 겹침 간격은 `size` 에 맞춰져 있습니다. 아바타 크기를 `className` 으로 따로 바꾸면 겹침이 맞지 않습니다.
+- 아바타 옆에 제자리로 렌더된 팝오버(`[popover]`)와 그 focus guard 는 겹치게 당기지 않습니다.
