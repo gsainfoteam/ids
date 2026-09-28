@@ -19,7 +19,7 @@ import {
 import { periodFirst, resolveLocale, type DateLocale } from '../../../internal/date-locale';
 import { part } from '../../../internal/field-popup';
 import { messages } from '../../../internal/messages';
-import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { flattenFragments, invariant, mergeProps, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { TimeFormat, TimePrecision, TimeUnit } from './time';
@@ -223,7 +223,7 @@ function ColumnView({
     asChild,
     asChild && typeof children !== 'function' ? withDefault(children, options) : options,
     mergeProps(props, {
-      ref: mergeRefs(column.node, props.ref),
+      ref: column.node,
       role: 'listbox',
       'aria-label': props['aria-label'] ?? unitMessage[unit],
       'aria-orientation': 'vertical',
