@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Time } from '@internationalized/date';
 import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -12,7 +13,7 @@ import { TimeField } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const at = (hour: number, minute = 0) => new Date(2026, 8, 15, hour, minute);
+const at = (hour: number, minute = 0) => new Time(hour, minute);
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 

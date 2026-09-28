@@ -1,12 +1,21 @@
-import { addMilliseconds, isAfter, isBefore, isSameDay, startOfDay, startOfSecond } from 'date-fns';
+import { Time } from '@internationalized/date';
+import {
+  addMilliseconds,
+  isAfter,
+  isBefore,
+  isSameDay,
+  set,
+  startOfDay,
+  startOfSecond,
+} from 'date-fns';
 
-import { dayKey, isBlocked, type Matcher } from '../../data/calendar/date';
+import { invariant } from '../../../utils';
+import { dayKey, isBlocked, validDate, type Matcher } from '../../data/calendar/date';
 import {
   nearestSlot,
   secondsOf,
   timeKey,
   timeSlots,
-  withTime,
   type TimePrecision,
 } from '../../data/time-picker/time';
 
@@ -18,8 +27,26 @@ export type DateTimeLimits = {
   step: number;
 };
 
+export function validateDateTime(value: Date | null | undefined) {
+  invariant(value == null || validDate(value), 'DateTimeField: expected a valid Date or null.');
+}
+
+export const timeOf = (date: Date) =>
+  new Time(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
+
+export function withTime(day: Date, seconds: number): Date | null {
+  const next = set(day, {
+    hours: Math.floor(seconds / 3600),
+    minutes: Math.floor(seconds / 60) % 60,
+    seconds: seconds % 60,
+    milliseconds: 0,
+  });
+  const timeExistsThatDay = isSameDay(next, day) && secondsOf(timeOf(next)) === seconds;
+  return timeExistsThatDay ? next : null;
+}
+
 export const serializeDateTime = (date: Date, precision: TimePrecision) =>
-  `${dayKey(date)}T${timeKey(date, precision)}`;
+  `${dayKey(date)}T${timeKey(timeOf(date), precision)}`;
 
 const ceilToWholeSecond = (date: Date) => startOfSecond(addMilliseconds(date, 999));
 
@@ -34,9 +61,11 @@ export function dayBounds(day: Date, min?: Date, max?: Date): { min?: Date; max?
 export function daySlots(day: Date, { min, max, precision, step }: DateTimeLimits): number[] {
   const bounds = dayBounds(day, min, max);
   if (!bounds) return [];
-  return timeSlots(day, precision, step, bounds.min, bounds.max).filter((seconds) => {
-    const date = withTime(day, seconds)!;
-    return (!min || !isBefore(date, min)) && (!max || !isAfter(date, max));
+  const lower = bounds.min && timeOf(bounds.min);
+  const upper = bounds.max && timeOf(bounds.max);
+  return timeSlots(precision, step, lower, upper).filter((seconds) => {
+    const date = withTime(day, seconds);
+    return !!date && (!min || !isBefore(date, min)) && (!max || !isAfter(date, max));
   });
 }
 
@@ -49,7 +78,7 @@ export function dayUnavailable(day: Date, limits: DateTimeLimits): boolean {
 }
 
 export function onDay(day: Date, time: Date, limits: DateTimeLimits): Date | null {
-  const seconds = nearestSlot(daySlots(day, limits), secondsOf(time));
+  const seconds = nearestSlot(daySlots(day, limits), secondsOf(timeOf(time)));
   return seconds === undefined ? null : withTime(day, seconds);
 }
 

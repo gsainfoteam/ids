@@ -8,6 +8,9 @@ import {
   dayUnavailable,
   onDay,
   serializeDateTime,
+  timeOf,
+  validateDateTime,
+  withTime,
   withinLimits,
   type DateTimeLimits,
 } from './date-time';
@@ -29,6 +32,7 @@ import {
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
 import {
+  asDate,
   dateOptions,
   formatter,
   timeOptions,
@@ -38,20 +42,21 @@ import { invariant } from '../../../utils';
 import { Calendar, type CalendarOptions } from '../../data/calendar';
 import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
 import {
-  resolveTimeFormat,
-  validateTime,
-  type TimeFormat,
+  resolveHourCycle,
+  secondsOf,
+  type HourCycle,
   type TimePrecision,
 } from '../../data/time-picker/time';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
+import type { Time } from '@internationalized/date';
 
 export type DateTimeFieldProps = Omit<TemporalFieldProps<Date | null>, 'disabled'> &
   Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'dir'> & {
     precision?: TimePrecision;
-    format?: TemporalFormat;
-    hourCycle?: TimeFormat;
+    format?: TemporalFormat<Date>;
+    hourCycle?: HourCycle;
     step?: number;
     pickerVariant?: TimePickerVariant;
   };
@@ -67,7 +72,7 @@ type PanelProps = CalendarPassThrough & {
   size: IdsSize;
   today: Date;
   limits: DateTimeLimits;
-  cycle: TimeFormat | undefined;
+  cycle: HourCycle | undefined;
   locale: string;
   pickerVariant?: TimePickerVariant;
 };
@@ -94,6 +99,14 @@ function Panel({
   const base = value ?? startOfDay(today);
   const unavailable = dayUnavailable(base, limits);
   const bounds = dayBounds(base, limits.min, limits.max);
+
+  const pickTime = (next: Time | null) => {
+    if (next === null) return change(null);
+
+    const date = withTime(base, secondsOf(next));
+    if (date && withinLimits(date, limits)) change(date);
+  };
+
   return (
     <div className={styles.panel()}>
       <Calendar
@@ -112,17 +125,13 @@ function Panel({
       />
       <div className={styles.panelTime()}>
         <TimePicker
-          value={value}
-          referenceDate={base}
-          onValueChange={(next) => {
-            if (next === null) change(null);
-            else if (withinLimits(next, limits)) change(next);
-          }}
+          value={value && timeOf(value)}
+          onValueChange={pickTime}
           precision={limits.precision}
-          format={cycle}
+          hourCycle={cycle}
           step={limits.step}
-          min={bounds?.min}
-          max={bounds?.max}
+          min={bounds?.min && timeOf(bounds.min)}
+          max={bounds?.max && timeOf(bounds.max)}
           locale={locale}
           variant={pickerVariant}
           size={size}
@@ -166,20 +175,19 @@ export function DateTimeField({
   footer,
   ...props
 }: DateTimeFieldProps) {
-  validateTime(props.value);
-  validateTime(props.defaultValue);
-  validateTime(min);
-  validateTime(max);
+  validateDateTime(props.value);
+  validateDateTime(props.defaultValue);
+  validateDateTime(min);
+  validateDateTime(max);
   invariant(!min || !max || !isAfter(min, max), 'DateTimeField: min must be <= max.');
   const [mountedToday] = useState(() => new Date());
   const anchor = today ?? mountedToday;
   const dateLocale = resolveLocale(locale);
-  const display = formatter(
-    format,
-    dateLocale,
-    { ...dateOptions, ...timeOptions(precision) },
-    resolveTimeFormat(hourCycle, dateLocale),
-  );
+  const display = formatter(format, dateLocale, {
+    defaults: { ...dateOptions, ...timeOptions(precision) },
+    toDate: asDate,
+    cycle: resolveHourCycle(hourCycle, dateLocale),
+  });
   const limits: DateTimeLimits = { min, max, disabled, precision, step };
   const cell = (useFieldSize(props.size) ?? 'standard') === 'tiny' ? 32 : 36;
   return (

@@ -6,9 +6,10 @@
 - **간격과 범위.** `step` 으로 15분 단위처럼 끊고 `min` / `max` 밖은 고를 수 없습니다.
 - **키보드.** Trigger에서 `↓` 로 열면 첫 컬럼에 포커스가 가고, 숫자를 치거나 방향키로 옮겨 Enter로 고릅니다.
 - **폼.** `name` 을 주면 `14:30` 이 FormData에 들어가고, `required` 인데 비어 있으면 브라우저가 제출을 막습니다. `reset` 은 `defaultValue` 로 되돌립니다.
-- **react-hook-form, TanStack Form.** `controlMode="value"` 나 `value` / `onValueChange` 로 Date 값을 그대로 주고받습니다.
+- **react-hook-form, TanStack Form.** `controlMode="value"` 나 `value` / `onValueChange` 로 `Time` 값을 그대로 주고받습니다.
 
 ```tsx
+import { Time } from '@internationalized/date';
 import { Field, TimeField } from '@gsainfoteam/ids-react';
 
 <Field>
@@ -20,12 +21,12 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 ## 값
 
 ```tsx
-<TimeField value={time} onValueChange={setTime} />
-// 날짜는 그대로 두고 시각만 바꾼다. Clear 나 시계의 Delete 는 null
-
-<TimeField referenceDate={meetingDay} />   // 비어 있을 때 시각을 붙일 날. 기본 오늘
-<TimeField defaultValue={new Date(2026, 8, 15, 9, 30)} />   // 비제어
+<TimeField value={time} onValueChange={setTime} />   // Time | null. Clear 나 시계의 Delete 는 null
+<TimeField defaultValue={new Time(9, 30)} />         // 비제어
 ```
+
+- 값은 [`@internationalized/date`](https://react-spectrum.adobe.com/internationalized/date/Time.html) 의 `Time` 입니다. 앱도 이 패키지를 설치해 값을 만듭니다. IDS 는 다시 내보내지 않습니다.
+- 값은 모양(`hour`, `minute`, `second`, `millisecond`, `compare`)으로 검사합니다. 다른 버전의 패키지여도 되고, `Date` 는 오류입니다.
 
 - 시각을 골라도 팝업은 열려 있습니다. 시와 분을 이어서 고르고 `Esc` 나 바깥 클릭으로 닫습니다.
 
@@ -39,11 +40,11 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 <TimeField precision="hour" />                  // 오후 2시
 <TimeField format={{ hour: '2-digit', minute: '2-digit' }} />   // Intl 옵션. 오후 02:30
 <TimeField format={{ timeStyle: 'short' }} hourCycle="24h" />   // hourCycle 이 옵션에도 간다
-<TimeField format={(date, locale) => `${date.getHours()}시`} />  // 함수
+<TimeField format={(time, locale) => `${time.hour}시`} />       // 함수
 ```
 
 - 기본 글자는 precision 에 맞춘 `{ hour: 'numeric', minute: '2-digit', second: '2-digit' }` 에 시간제를 더한 Intl 형식입니다.
-- `format` 은 [`Intl.DateTimeFormatOptions`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#options) 나 `(date, locale) => string` 입니다. date-fns 패턴 문자열과 `format="12h"` / `"24h"` 는 받지 않습니다.
+- `format` 은 [`Intl.DateTimeFormatOptions`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#options) 나 `(time, locale) => string` 입니다. date-fns 패턴 문자열과 `format="12h"` / `"24h"` 는 받지 않습니다.
 - 시간제는 `hourCycle` 하나로 정합니다. 없으면 locale 의 CLDR 시간제입니다.
 - `hourCycle` 은 시(`hour`, `timeStyle`)를 보여 주면서 `hour12` / `hourCycle` 을 정하지 않은 `format` 옵션에도 들어갑니다.
 
@@ -51,7 +52,7 @@ import { Field, TimeField } from '@gsainfoteam/ids-react';
 
 ```tsx
 <TimeField precision="second" step={10} />                    // 시·분·초, 초는 10초 간격
-<TimeField min={new Date(0, 0, 1, 9)} max={new Date(0, 0, 1, 18)} />   // 시각만 비교
+<TimeField min={new Time(9)} max={new Time(18)} />           // 양 끝 포함
 <TimeField pickerVariant="wheel" />                          // 스크롤해서 멈춘 자리를 고르는 휠
 ```
 
@@ -82,7 +83,13 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
   <TimeField hourCycle="24h" />
   <Field.Error /> {/* 오류가 나면 Trigger 로 포커스가 간다 */}
 </Field>;
+
+const schema = z.object({
+  alarm: z.custom<Time>((value) => value instanceof Time, '시간을 고르세요'),
+});
 ```
+
+- 제출 값은 `Time` 입니다. FormData 문자열(`14:30`)은 `name` 을 준 숨은 입력에만 들어갑니다.
 
 ## 합성
 
@@ -108,12 +115,11 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
 | 속성                                       | 기본 / 동작                                             |
 | ------------------------------------------ | ------------------------------------------------------- |
-| `value` / `defaultValue` / `onValueChange` | `Date \| null`. 기본 `null`                             |
+| `value` / `defaultValue` / `onValueChange` | `Time \| null`. 기본 `null`                             |
 | `open` / `defaultOpen` / `onOpenChange`    | 팝업 열림                                               |
-| `format`                                   | locale 시각. Intl 옵션이나 `(date, locale) => string`   |
+| `format`                                   | locale 시각. Intl 옵션이나 `(time, locale) => string`   |
 | `hourCycle`                                | locale 시간제. `12h` / `24h`. 표시와 시계 모두          |
-| `precision` / `step` / `min` / `max`       | `minute` / `1`. 시계로 간다                             |
-| `referenceDate`                            | 오늘. 비어 있을 때 시각을 붙일 날                       |
+| `precision` / `step` / `min` / `max`       | `minute` / `1`. `min` / `max` 는 `Time`. 시계로 간다    |
 | `pickerVariant`                            | `grid`(기본) / `wheel`                                  |
 | `locale`                                   | `ko-KR`. BCP 47 태그                                    |
 | `placeholder`                              | `시간 선택`                                             |
@@ -126,7 +132,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
 ## 알아둘 것
 
-- 시간대 변환은 없습니다. 값은 로컬 시각입니다.
+- 시간대 변환은 없습니다. 값은 날짜 없는 벽시계 시각이고, 표시는 UTC 의 한 날에 놓고 `timeZone: 'UTC'` 로 그려서 로컬 시간대가 글자를 바꾸지 못합니다.
 - 오전/오후 이름과 표시 글자는 런타임의 `Intl` 데이터입니다. 서버(Node)와 브라우저의 ICU 가 다르면 글자가 조금 다를 수 있습니다.
 - BCP 47 태그가 아닌 `locale`(date-fns `Locale` 객체, `'de_DE'`)은 오류입니다.
 - `drawer` 는 modal 입니다. 뒤 화면을 어둡게 가리고 스크롤을 잠그며, 포커스를 sheet 안에 둡니다. 배경을 누르거나 Escape 로 닫으면 포커스가 필드로 돌아갑니다.

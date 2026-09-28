@@ -158,7 +158,7 @@ BCP 47 locale 태그를 풀이하고, 날짜와 시각의 locale 데이터를 �
 - `resolveLocale`: Calendar, TimePicker, DateField, TimeField, DateTimeField
 - `dateFormatter`: [temporal-field](./temporal-field/README.md#formatts) 의 `format.ts`, Calendar 의 `day-picker-locale.ts`
 - `formatPart`, `numberFormatter`: Calendar 의 `day-picker-locale.ts`
-- `hourCycleOf`: TimePicker 의 `time.ts` (`resolveTimeFormat`)
+- `hourCycleOf`: TimePicker 의 `time.ts` (`resolveHourCycle`)
 - `periodFirst`, `periodLabel`: TimePicker
 - `numericDate`, `numericDateParts`, `dateOrder`, `monthNamed`, `nativeDigits`: DateField 의 `parse.ts`, temporal-field 의 `format.ts`
 - `weekStartOf`: Calendar

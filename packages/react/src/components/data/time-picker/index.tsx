@@ -22,17 +22,18 @@ import { flattenFragments, invariant, mergeProps, part, tv } from '../../../util
 import { useFieldSize } from '../../form/field/context';
 import { ScrollArea } from '../../layout/scroll-area';
 
-import type { TimeFormat, TimePrecision, TimeUnit } from './time';
+import type { HourCycle, TimePrecision, TimeUnit } from './time';
 import type { IdsSize } from '../../../tokens/types';
+import type { Time } from '@internationalized/date';
 
 export type TimePickerVariant = 'grid' | 'wheel';
 
 export type TimePickerOptions = {
   precision?: TimePrecision;
-  format?: TimeFormat;
+  hourCycle?: HourCycle;
   step?: number;
-  min?: Date;
-  max?: Date;
+  min?: Time;
+  max?: Time;
   locale?: string;
   size?: IdsSize;
   disabled?: boolean;
@@ -46,10 +47,9 @@ export type TimePickerProps = Omit<
   'defaultValue' | 'onChange' | 'className' | 'style'
 > &
   TimePickerOptions & {
-    value?: Date | null;
-    defaultValue?: Date | null;
-    onValueChange?: (value: Date | null) => void;
-    referenceDate?: Date;
+    value?: Time | null;
+    defaultValue?: Time | null;
+    onValueChange?: (value: Time | null) => void;
     className?: string | ((state: TimePickerState) => string | undefined);
     style?: CSSProperties | ((state: TimePickerState) => CSSProperties | undefined);
   };
@@ -83,7 +83,7 @@ function withDefault(children: ReactNode, fallback: ReactNode) {
 
 function defaultUnits(
   precision: TimePrecision,
-  format: TimeFormat,
+  hourCycle: HourCycle,
   periodLeads: boolean,
 ): TimeUnit[] {
   const clock: TimeUnit[] = [
@@ -91,7 +91,7 @@ function defaultUnits(
     ...(precision !== 'hour' ? (['minute'] as const) : []),
     ...(precision === 'second' ? (['second'] as const) : []),
   ];
-  if (format !== '12h') return clock;
+  if (hourCycle !== '12h') return clock;
   return periodLeads ? ['period', ...clock] : [...clock, 'period'];
 }
 
@@ -99,9 +99,8 @@ export function TimePicker({
   value,
   defaultValue = null,
   onValueChange,
-  referenceDate,
   precision = 'minute',
-  format,
+  hourCycle,
   step = 1,
   min,
   max,
@@ -121,9 +120,8 @@ export function TimePicker({
     value,
     defaultValue,
     onValueChange,
-    referenceDate,
     precision,
-    format,
+    hourCycle,
     step,
     min,
     max,
@@ -143,8 +141,8 @@ export function TimePicker({
     const unit = child.type === TimePicker.Period ? 'period' : child.props.unit!;
     invariant(!units.includes(unit), 'TimePicker: duplicate Column unit.');
     invariant(
-      unit !== 'period' || state.format === '12h',
-      'TimePicker: Period requires 12h format.',
+      unit !== 'period' || state.hourCycle === '12h',
+      'TimePicker: Period requires the 12h hour cycle.',
     );
     invariant(
       unit !== 'second' || precision === 'second',
@@ -169,7 +167,7 @@ export function TimePicker({
         data-time-picker=""
         data-variant={variant}
         data-size={resolvedSize}
-        data-format={state.format}
+        data-hour-cycle={state.hourCycle}
         data-disabled={disabled ? '' : undefined}
         data-readonly={state.readOnly ? '' : undefined}
         data-empty={state.value ? undefined : ''}
@@ -179,7 +177,7 @@ export function TimePicker({
         style={typeof style === 'function' ? style(state) : style}
       >
         {children ??
-          defaultUnits(precision, state.format, periodLeads).map((unit) =>
+          defaultUnits(precision, state.hourCycle, periodLeads).map((unit) =>
             unit === 'period' ? (
               <TimePicker.Period key={unit} />
             ) : (
@@ -274,7 +272,7 @@ export namespace TimePicker {
 
   export function Header({ asChild, children, ...props }: BoxProps) {
     const c = useTimePickerContext('TimePicker.Header');
-    const labels = defaultUnits(c.state.precision, c.state.format, c.periodLeads).map((unit) => (
+    const labels = defaultUnits(c.state.precision, c.state.hourCycle, c.periodLeads).map((unit) => (
       <span key={unit} className={c.styles.headerLabel()}>
         {unitMessage[unit]}
       </span>
@@ -345,5 +343,5 @@ export namespace TimePicker {
   });
 }
 
-export type { TimePrecision, TimeFormat } from './time';
+export type { TimePrecision, HourCycle } from './time';
 export type { TimePickerOptionState, TimePickerState } from './use-time-picker';

@@ -21,6 +21,7 @@ import {
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
 import {
+  asDate,
   dateOptions,
   formatter,
   type TemporalFormat,
@@ -84,7 +85,7 @@ export function DateField(props: DateFieldProps) {
   if (value !== undefined) validateValue(value, selectionMode);
   if (defaultValue !== undefined) validateValue(defaultValue, selectionMode);
   const dateLocale = resolveLocale(locale);
-  const formatDate = formatter(format, dateLocale, dateOptions);
+  const formatDate = formatter(format, dateLocale, { defaults: dateOptions, toDate: asDate });
   const cell = (useFieldSize(rest.size) ?? 'standard') === 'tiny' ? 32 : 36;
   const shown = Math.min(monthsToShow, MONTHS_SIDE_BY_SIDE);
   const range = selectionMode === 'range';

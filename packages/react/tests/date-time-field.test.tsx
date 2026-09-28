@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 
+import { Time } from '@internationalized/date';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { expect, test, vi } from 'vitest';
@@ -9,10 +10,11 @@ import { render } from 'vitest-browser-react';
 import { DateTimeField, Field, TimeField } from '../src';
 import { Field as RHFField } from '../src/react-hook-form';
 
-type ClockProps = Pick<
-  TimeField.Props,
-  'name' | 'value' | 'defaultValue' | 'hourCycle' | 'disabled'
->;
+type ClockValue = Date | Time;
+type ClockProps = Pick<TimeField.Props, 'name' | 'hourCycle' | 'disabled'> & {
+  value?: ClockValue | null;
+  defaultValue?: ClockValue | null;
+};
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 const col = (unit: string) =>
@@ -26,13 +28,23 @@ const d = (day = 15, hour = 9, minute = 30, second = 0) =>
 const hiddenValue = () => document.querySelector<HTMLInputElement>('input[type=hidden]')?.value;
 const resetSettles = () => new Promise((resolve) => setTimeout(resolve, 50));
 const clockFields = [
-  (props: ClockProps) => <TimeField {...props} />,
-  (props: ClockProps) => <DateTimeField today={d()} {...props} />,
+  {
+    nineThirty: new Time(9, 30),
+    valueType: Time,
+    hourOf: (value: ClockValue) => (value as Time).hour,
+    field: (props: ClockProps) => <TimeField {...(props as TimeField.Props)} />,
+  },
+  {
+    nineThirty: d(),
+    valueType: Date,
+    hourOf: (value: ClockValue) => (value as Date).getHours(),
+    field: (props: ClockProps) => <DateTimeField today={d()} {...(props as DateTimeField.Props)} />,
+  },
 ];
 
 test('SSR formatting, local serialization, Field ARIA and diagnostics for both clock fields', () => {
   for (const [field, expected, model] of [
-    [<TimeField name="when" defaultValue={d()} hourCycle="24h" />, '09:30', '09:30'],
+    [<TimeField name="when" defaultValue={new Time(9, 30)} hourCycle="24h" />, '09:30', '09:30'],
     [
       <DateTimeField
         name="when"
@@ -88,10 +100,10 @@ test('SSR formatting, local serialization, Field ARIA and diagnostics for both c
 });
 
 test('both clock fields: prevented and real native reset, controlled empty, disabled omission', async () => {
-  for (const field of clockFields) {
+  for (const { field, nineThirty } of clockFields) {
     const screen = await render(
       <form>
-        {field({ name: 'when', defaultValue: d(), hourCycle: '24h' })}
+        {field({ name: 'when', defaultValue: nineThirty, hourCycle: '24h' })}
         <button type="reset">초기화</button>
       </form>,
     );
@@ -105,7 +117,9 @@ test('both clock fields: prevented and real native reset, controlled empty, disa
     expect(hiddenValue()).toMatch(/10:30/);
     await userEvent.click(screen.getByRole('button', { name: '초기화' }));
     await expect.poll(hiddenValue).toMatch(/09:30/);
-    await screen.rerender(<form>{field({ name: 'when', value: d(), disabled: true })}</form>);
+    await screen.rerender(
+      <form>{field({ name: 'when', value: nineThirty, disabled: true })}</form>,
+    );
     expect(new FormData(screen.container.querySelector('form')!).has('when')).toBe(false);
     await screen.rerender(field({ value: null }));
     await expect.element(screen.getByRole('combobox')).toMatchTextContent('선택');
@@ -191,9 +205,9 @@ test('an empty field shows no time until one is picked, then builds it on today'
   }
 });
 
-test('react-hook-form value mode for both clock fields: required focus, Date model, reset', async () => {
-  for (const field of clockFields) {
-    type Values = { when: Date | null };
+test('react-hook-form value mode for both clock fields: required focus, value model, reset', async () => {
+  for (const { field, valueType, hourOf } of clockFields) {
+    type Values = { when: ClockValue | null };
     const submitted = vi.fn();
     let methods!: UseFormReturn<Values>;
     function App() {
@@ -220,8 +234,8 @@ test('react-hook-form value mode for both clock fields: required focus, Date mod
     await userEvent.click(option('hour', 10));
     await userEvent.keyboard('{Escape}');
     await userEvent.click(screen.getByRole('button', { name: '제출' }));
-    await expect.poll(() => submitted.mock.lastCall?.[0].when).toBeInstanceOf(Date);
-    expect(submitted.mock.lastCall?.[0].when.getHours()).toBe(10);
+    await expect.poll(() => submitted.mock.lastCall?.[0].when).toBeInstanceOf(valueType);
+    expect(hourOf(submitted.mock.lastCall?.[0].when)).toBe(10);
     methods.reset();
     await expect.poll(hiddenValue).toBeUndefined();
     await expect.element(trigger).toMatchTextContent('선택');

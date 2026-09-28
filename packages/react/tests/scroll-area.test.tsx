@@ -1,5 +1,6 @@
 import { type ReactElement } from 'react';
 
+import { Time } from '@internationalized/date';
 import { renderToString } from 'react-dom/server';
 import { afterEach, expect, test, vi } from 'vitest';
 import { cdp, userEvent } from 'vitest/browser';
@@ -696,7 +697,7 @@ test('adopted: a TextArea keeps its rounded corner only where no bar sits above 
 
 test('adopted: a TimePicker column is its own tiny viewport and still centers the picked time', async () => {
   const screen = await render(
-    <TimePicker defaultValue={new Date(2026, 0, 1, 9, 0)} format="24h" precision="hour" />,
+    <TimePicker defaultValue={new Time(9)} hourCycle="24h" precision="hour" />,
   );
   const column = screen.getByRole('listbox').element() as HTMLElement;
   const area = column.closest<HTMLElement>('[data-scroll-area]')!;

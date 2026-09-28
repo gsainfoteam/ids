@@ -2,16 +2,17 @@
 
 시, 분, 초와 오전/오후를 세로 목록에서 골라 시각을 정하는 컴포넌트입니다.
 
-- **값은 `Date | null`.** 날짜는 두고 시각만 바꿉니다. 비어 있으면 `referenceDate`(기본 오늘)에 시각을 붙입니다.
-- **locale 시간제.** 브라우저의 `Intl`(CLDR)을 따라 한국어와 미국 영어는 12시간제에 오전/오후 컬럼, 독일어와 일본어는 24시간제가 기본입니다. `format` 으로 정할 수도 있습니다. `locale` 은 BCP 47 태그라 어떤 언어든 import 없이 됩니다.
-- **간격과 범위.** `step` 으로 분이나 초를 15분 단위처럼 끊고, `min` / `max` 밖의 시각은 고를 수 없습니다. 서머타임으로 없는 시각도 빠집니다.
+- **값은 `Time | null`.** [`@internationalized/date`](https://react-spectrum.adobe.com/internationalized/date/Time.html) 의 `Time` 입니다. 날짜와 시간대가 없는 벽시계 시각이라, 로컬 시간대나 서머타임이 값을 흔들지 않습니다.
+- **locale 시간제.** 브라우저의 `Intl`(CLDR)을 따라 한국어와 미국 영어는 12시간제에 오전/오후 컬럼, 독일어와 일본어는 24시간제가 기본입니다. `hourCycle` 로 정할 수도 있습니다. `locale` 은 BCP 47 태그라 어떤 언어든 import 없이 됩니다.
+- **간격과 범위.** `step` 으로 분이나 초를 15분 단위처럼 끊고, `min` / `max` 밖의 시각은 고를 수 없습니다.
 - **키보드.** 방향키로 둘러보고 Enter로 고릅니다. 숫자를 치면 그 숫자로 가고, Delete로 비웁니다.
 - **휠.** `variant="wheel"` 은 iOS처럼 가운데로 스냅되는 컬럼이고, 스크롤이 멈추면 가운데 값이 선택됩니다.
 
 ```tsx
+import { Time } from '@internationalized/date';
 import { TimePicker } from '@gsainfoteam/ids-react';
 
-const [time, setTime] = useState<Date | null>(null);
+const [time, setTime] = useState<Time | null>(null);
 
 <TimePicker value={time} onValueChange={setTime} step={15} />;
 ```
@@ -19,15 +20,15 @@ const [time, setTime] = useState<Date | null>(null);
 ## 값
 
 ```tsx
-<TimePicker value={new Date(2026, 8, 15, 9, 30)} onValueChange={setTime} />
-// 10시를 고르면 2026-09-15 10:30. 날짜는 그대로
+<TimePicker value={new Time(9, 30)} onValueChange={setTime} />
+// 10시를 고르면 new Time(10, 30)
 
 <TimePicker value={null} onValueChange={setTime} />
-// 아무것도 선택 표시하지 않는다. 고르면 오늘 날짜에 그 시각
-
-<TimePicker value={null} referenceDate={meetingDay} onValueChange={setTime} />
-// 비어 있을 때 시각을 붙일 날
+// 아무것도 선택 표시하지 않는다. 자정에 가장 가까운 허용 시각에서 둘러보기를 시작한다
 ```
+
+- 값을 만들려면 앱도 `@internationalized/date` 를 설치합니다. IDS 는 이 패키지를 다시 내보내지 않습니다.
+- 값은 `instanceof` 가 아니라 모양(`hour`, `minute`, `second`, `millisecond` 와 `compare`)으로 검사합니다. 앱이 다른 버전의 `@internationalized/date` 를 써도 됩니다. `Date` 나 문자열을 넘기면 오류입니다.
 
 - `onValueChange` 는 값이 바뀔 때만 부릅니다. 이미 고른 시각을 다시 골라도 부르지 않습니다.
 - 컬럼에서 `Delete` 나 `Backspace` 를 누르면 `null` 이 됩니다.
@@ -46,8 +47,8 @@ const [time, setTime] = useState<Date | null>(null);
 ## 범위
 
 ```tsx
-<TimePicker min={new Date(0, 0, 1, 9, 30)} max={new Date(0, 0, 1, 18)} step={15} />
-// 날짜는 빼고 시각만 비교한다. 양 끝 포함. 자정을 넘는 범위(min > max)는 오류
+<TimePicker min={new Time(9, 30)} max={new Time(18)} step={15} />
+// 양 끝 포함. 자정을 넘는 범위(min > max)는 오류
 ```
 
 - 시를 고르면 그 시간 안에서 가장 가까운 허용 시각으로 갑니다. 09:45 에서 10시를 고르면 `max` 가 10:15 일 때 10:15 입니다.
@@ -57,10 +58,10 @@ const [time, setTime] = useState<Date | null>(null);
 
 ```tsx
 <TimePicker />                             // ko-KR: 오전/오후 컬럼이 앞에 오는 12시간제
-<TimePicker format="24h" />                // 24시간제, 오전/오후 컬럼 없음
+<TimePicker hourCycle="24h" />             // 24시간제, 오전/오후 컬럼 없음
 <TimePicker locale="en-US" />              // 12시간제, AM/PM 이 뒤에
 <TimePicker locale="de-DE" />              // 24시간제
-<TimePicker locale="ja-JP" format="12h" /> // 午前/午後 가 앞에
+<TimePicker locale="ja-JP" hourCycle="12h" /> // 午前/午後 가 앞에
 ```
 
 - 시간제는 브라우저의 `Intl` 이 그 locale 에 쓰는 시간제(CLDR)를 따릅니다.
@@ -93,7 +94,7 @@ const [time, setTime] = useState<Date | null>(null);
 ## 합성
 
 ```tsx
-<TimePicker format="12h" value={time} onValueChange={setTime}>
+<TimePicker hourCycle="12h" value={time} onValueChange={setTime}>
   <TimePicker.Header /> {/* 컬럼 이름. 스크린 리더에서는 숨긴다 */}
   <TimePicker.Period /> {/* 12시간제 전용. 앞에 둘 수도 있다 */}
   <TimePicker.Column unit="hour" />
@@ -118,18 +119,17 @@ const [time, setTime] = useState<Date | null>(null);
 | `disabled`               | 범위 밖                                 |
 
 - 옵션에는 같은 상태가 `data-selected`, `data-active`, `data-disabled` 로 붙고, 컬럼에는 `data-time-column` 이 붙습니다.
-- 루트에는 `data-format`, `data-variant`, `data-size`, `data-empty`, `data-disabled`, `data-readonly` 가 붙고, `className` 과 `style` 은 `TimePicker.State`(`value`, `format`, `precision`, `step`, `disabled`, `readOnly`)를 받는 함수도 됩니다.
+- 루트에는 `data-hour-cycle`, `data-variant`, `data-size`, `data-empty`, `data-disabled`, `data-readonly` 가 붙고, `className` 과 `style` 은 `TimePicker.State`(`value`, `hourCycle`, `precision`, `step`, `disabled`, `readOnly`)를 받는 함수도 됩니다. `hourCycle` 은 locale 에서 풀이한 시간제입니다.
 
 ## 속성
 
 | 속성                                       | 기본 / 동작                                                 |
 | ------------------------------------------ | ----------------------------------------------------------- |
-| `value` / `defaultValue` / `onValueChange` | `Date \| null`. 기본 `null`                                 |
-| `referenceDate`                            | 오늘. 비어 있을 때 시각을 붙일 날                           |
+| `value` / `defaultValue` / `onValueChange` | `Time \| null`. 기본 `null`                                 |
 | `precision`                                | `minute`. `hour` / `minute` / `second`                      |
 | `step`                                     | `1`. 가장 작은 단위의 간격                                  |
-| `format`                                   | locale 시간제. `12h` / `24h`                                |
-| `min` / `max`                              | 시각만 비교, 양 끝 포함                                     |
+| `hourCycle`                                | locale 시간제. `12h` / `24h`                                |
+| `min` / `max`                              | `Time`. 양 끝 포함                                          |
 | `locale`                                   | `ko-KR`. BCP 47 태그                                        |
 | `variant`                                  | `grid`(기본) / `wheel`                                      |
 | `selectionMode`                            | `single`(기본) / `none`(둘러보기만)                         |
@@ -142,7 +142,7 @@ const [time, setTime] = useState<Date | null>(null);
 ## 알아둘 것
 
 - 바깥에서 준 `value` 를 범위나 간격에 맞춰 고치지 않습니다.
-- 서머타임으로 없는 시각은 고를 수 없고, 두 번 있는 시각은 `Date` 의 이른 오프셋을 씁니다. 시간대 변환은 없습니다.
+- 값은 벽시계 시각이라 시간대 변환도, 서머타임으로 빠지는 시각도 없습니다. 특정 날의 순간이 필요하면 앱에서 `toCalendarDateTime(day, time)` 처럼 합칩니다.
 - 컬럼은 `size="tiny"`(6px) [ScrollArea](../../layout/scroll-area/README.md) 이고, listbox 자신이 스크롤 요소입니다(`Viewport asChild`). OS 막대 대신 가리키거나 스크롤할 때만 얇은 IDS 막대가 보입니다. 마우스 휠, 트랙패드, 터치, 키보드로 움직입니다.
 - 컬럼의 폭(`min-w-12 flex-1`)은 ScrollArea root 에 있습니다. `TimePicker.Column` 의 `className` 은 listbox 에 붙습니다.
 - 컬럼 높이는 옵션 다섯 개입니다. `className="[--time-picker-height:calc(var(--time-option)*7)]"` 처럼 바꿀 수 있고, 위아래 여백이 반 컬럼씩이라 어느 높이에서도 고른 시각이 가운데 줄에 옵니다.

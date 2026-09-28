@@ -28,14 +28,23 @@ const withHourCycle = (
     ? { ...options, hour12: cycle === '12h' }
     : options;
 
-export function formatter(
-  format: TemporalFormat | undefined,
-  locale: string,
-  defaults: Intl.DateTimeFormatOptions,
-  cycle?: HourCycle,
-): (date: Date) => string {
-  if (typeof format === 'function') return (date) => format(date, locale);
+export type FormatterOptions<V> = {
+  defaults: Intl.DateTimeFormatOptions;
+  toDate: (value: V) => Date;
+  cycle?: HourCycle;
+  timeZone?: string;
+};
 
-  const intl = dateFormatter(locale, withHourCycle(format ?? defaults, cycle));
-  return (date) => intl.format(date);
+export const asDate = (date: Date) => date;
+
+export function formatter<V>(
+  format: TemporalFormat<V> | undefined,
+  locale: string,
+  { defaults, toDate, cycle, timeZone }: FormatterOptions<V>,
+): (value: V) => string {
+  if (typeof format === 'function') return (value) => format(value, locale);
+
+  const options = withHourCycle(format ?? defaults, cycle);
+  const intl = dateFormatter(locale, timeZone ? { ...options, timeZone } : options);
+  return (value) => intl.format(toDate(value));
 }

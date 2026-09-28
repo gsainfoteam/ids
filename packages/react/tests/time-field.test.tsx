@@ -1,22 +1,24 @@
 import { StrictMode } from 'react';
 
+import { Time } from '@internationalized/date';
 import { renderToString } from 'react-dom/server';
-import { expect, test } from 'vitest';
+import { FormProvider, useForm } from 'react-hook-form';
+import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { TimeField } from '../src';
+import { Field as RHFField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 const col = (unit: string) =>
   document.querySelector<HTMLElement>(`[role=dialog] [data-time-column="${unit}"]`)!;
 const option = (unit: string, n: number) =>
   col(unit).querySelector<HTMLElement>(`[data-time-option="${n}"]`)!;
-const d = (day = 15, hour = 9, minute = 30, second = 0) =>
-  new Date(2026, 8, day, hour, minute, second);
+const d = (hour = 9, minute = 30, second = 0) => new Time(hour, minute, second);
 
 test('SSR: display follows format, hourCycle and the locale tag; FormData follows precision', () => {
-  const at = d(15, 14, 5, 9);
+  const at = d(14, 5, 9);
   const html = (props: TimeField.Props) =>
     parse(
       renderToString(
@@ -41,8 +43,10 @@ test('SSR: display follows format, hourCycle and the locale tag; FormData follow
   expect(text({ format: { hour: '2-digit', minute: '2-digit' }, hourCycle: '24h' })).toBe('14:05');
   expect(text({ format: { hour: 'numeric', hourCycle: 'h23' }, hourCycle: '12h' })).toBe('14시');
   expect(text({ format: { timeStyle: 'short' }, locale: 'en-US', hourCycle: '24h' })).toBe('14:05');
-  expect(text({ format: (date) => `${date.getHours()}시` })).toBe('14시');
-  expect(text({ format: (date, locale) => `${locale} ${date.getHours()}` })).toBe('ko-KR 14');
+  expect(text({ format: (time) => `${time.hour}시` })).toBe('14시');
+  expect(text({ format: (time, locale) => `${locale} ${time.hour}` })).toBe('ko-KR 14');
+  expect(text({ defaultValue: d(23, 59), hourCycle: '24h' })).toBe('23:59');
+  expect(text({ defaultValue: d(0, 0), hourCycle: '24h' })).toBe('00:00');
   const form = (props: TimeField.Props) =>
     new FormData(html({ defaultValue: at, ...props }).querySelector('form')!).get('at');
   expect(form({ precision: 'hour' })).toBe('14');
@@ -52,10 +56,16 @@ test('SSR: display follows format, hourCycle and the locale tag; FormData follow
   expect(empty.querySelector('[role=combobox]')!.textContent).toBe('시간 선택');
   expect(new FormData(empty.querySelector('form')!).get('at')).toBeNull();
   expect(() => text({ locale: 'de_DE' })).toThrow(/BCP 47/);
+  // @ts-expect-error A Date is no longer a time value.
+  expect(() => text({ defaultValue: new Date(2026, 8, 15, 9) })).toThrow(
+    /TimeField: expected a Time/,
+  );
+  // @ts-expect-error max takes a Time.
+  expect(() => text({ max: new Date() })).toThrow(/TimeField: expected a Time/);
 });
 
 test('StrictMode: ArrowDown focuses the first column, picks stay open, Escape and Clear', async () => {
-  const changes: (Date | null)[] = [];
+  const changes: (Time | null)[] = [];
   const screen = await render(
     <StrictMode>
       <TimeField defaultValue={d()} hourCycle="24h" onValueChange={(next) => changes.push(next)} />
@@ -67,10 +77,7 @@ test('StrictMode: ArrowDown focuses the first column, picks stay open, Escape an
   await expect.element(col('hour')).toHaveFocus();
   await userEvent.click(option('hour', 14));
   await userEvent.click(option('minute', 45));
-  expect(changes.map((value) => [value?.getHours(), value?.getMinutes()])).toEqual([
-    [14, 30],
-    [14, 45],
-  ]);
+  expect(changes.map((value) => value?.toString())).toEqual(['14:30:00', '14:45:00']);
   await expect.element(screen.getByRole('dialog')).toBeVisible();
   await userEvent.keyboard('{Escape}');
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
@@ -82,7 +89,7 @@ test('StrictMode: ArrowDown focuses the first column, picks stay open, Escape an
 });
 
 test('Delete inside the picker clears the field too', async () => {
-  const changes: (Date | null)[] = [];
+  const changes: (Time | null)[] = [];
   const screen = await render(
     <TimeField defaultValue={d()} hourCycle="24h" onValueChange={(next) => changes.push(next)} />,
   );
@@ -91,22 +98,6 @@ test('Delete inside the picker clears the field too', async () => {
   await userEvent.keyboard('{Delete}');
   expect(changes).toEqual([null]);
   expect(document.querySelector('[aria-selected=true]')).toBeNull();
-});
-
-test('an empty field builds the picked time on referenceDate', async () => {
-  let value = null as Date | null;
-  const screen = await render(
-    <TimeField
-      hourCycle="24h"
-      referenceDate={new Date(2030, 0, 2)}
-      onValueChange={(next) => (value = next)}
-    />,
-  );
-  await userEvent.click(screen.getByRole('combobox'));
-  await userEvent.click(option('hour', 8));
-  expect([value?.getFullYear(), value?.getMonth(), value?.getDate(), value?.getHours()]).toEqual([
-    2030, 0, 2, 8,
-  ]);
 });
 
 test('custom parts, readOnly, and a native onClick that prevents opening', async () => {
@@ -141,7 +132,7 @@ test('custom parts, readOnly, and a native onClick that prevents opening', async
 });
 
 test('required and native reset go through the hidden form value', async () => {
-  const changes: (Date | null)[] = [];
+  const changes: (Time | null)[] = [];
   const screen = await render(
     <form>
       <TimeField name="at" required hourCycle="24h" onValueChange={(next) => changes.push(next)} />
@@ -158,4 +149,36 @@ test('required and native reset go through the hidden form value', async () => {
   await expect.poll(() => new FormData(form).get('at')).toBeNull();
   await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
   expect(changes).toHaveLength(1);
+});
+
+test('react-hook-form value mode submits a Time and FormData keeps the precision string', async () => {
+  type Values = { at: Time | null };
+  const submitted = vi.fn();
+  function App() {
+    const form = useForm<Values>({ defaultValues: { at: null } });
+    return (
+      <FormProvider {...form}>
+        <form noValidate onSubmit={form.handleSubmit(submitted)}>
+          <RHFField name="at" controlMode="value" registerOptions={{ required: 'Required' }}>
+            <RHFField.Label>At</RHFField.Label>
+            <TimeField name="at" precision="second" hourCycle="24h" />
+            <RHFField.Error />
+          </RHFField>
+          <button type="submit">제출</button>
+        </form>
+      </FormProvider>
+    );
+  }
+  const screen = await render(<App />);
+  const trigger = screen.getByRole('combobox', { name: 'At' });
+  await userEvent.click(screen.getByRole('button', { name: '제출' }));
+  await expect.element(trigger).toHaveFocus();
+  await userEvent.click(trigger);
+  await userEvent.click(option('hour', 14));
+  await userEvent.click(option('second', 9));
+  await userEvent.keyboard('{Escape}');
+  await userEvent.click(screen.getByRole('button', { name: '제출' }));
+  await expect.poll(() => submitted.mock.lastCall?.[0].at).toBeInstanceOf(Time);
+  expect(submitted.mock.lastCall?.[0].at.toString()).toBe('14:00:09');
+  expect(new FormData(screen.container.querySelector('form')!).get('at')).toBe('14:00:09');
 });

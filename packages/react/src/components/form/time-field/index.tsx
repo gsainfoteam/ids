@@ -23,27 +23,27 @@ import {
 } from '../../../internal/temporal-field/format';
 import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
 import {
-  resolveTimeFormat,
+  onUtcSampleDay,
+  resolveHourCycle,
+  sameTime,
   timeKey,
   validateTime,
-  type TimeFormat,
+  type HourCycle,
   type TimePrecision,
 } from '../../data/time-picker/time';
 
-export type TimeFieldProps = TemporalFieldProps<Date | null> & {
+import type { Time } from '@internationalized/date';
+
+export type TimeFieldProps = TemporalFieldProps<Time | null> & {
   precision?: TimePrecision;
-  format?: TemporalFormat;
-  hourCycle?: TimeFormat;
+  format?: TemporalFormat<Time>;
+  hourCycle?: HourCycle;
   step?: number;
-  min?: Date;
-  max?: Date;
+  min?: Time;
+  max?: Time;
   locale?: string;
   pickerVariant?: TimePickerVariant;
-  referenceDate?: Date;
 };
-
-const sameInstant = (a: Date | null, b: Date | null) =>
-  a === b || (!!a && !!b && a.getTime() === b.getTime());
 
 export function TimeField({
   precision = 'minute',
@@ -54,18 +54,20 @@ export function TimeField({
   max,
   locale,
   pickerVariant,
-  referenceDate,
   ...props
 }: TimeFieldProps) {
-  validateTime(props.value);
-  validateTime(props.defaultValue);
+  validateTime(props.value, 'TimeField');
+  validateTime(props.defaultValue, 'TimeField');
+  validateTime(min, 'TimeField');
+  validateTime(max, 'TimeField');
+
   const dateLocale = resolveLocale(locale);
-  const display = formatter(
-    format,
-    dateLocale,
-    timeOptions(precision),
-    resolveTimeFormat(hourCycle, dateLocale),
-  );
+  const display = formatter(format, dateLocale, {
+    defaults: timeOptions(precision),
+    toDate: onUtcSampleDay,
+    cycle: resolveHourCycle(hourCycle, dateLocale),
+    timeZone: 'UTC',
+  });
 
   return (
     <TemporalField
@@ -74,7 +76,7 @@ export function TimeField({
         kind: 'time',
         empty: null,
         isEmpty: (value) => value === null,
-        isSame: sameInstant,
+        isSame: sameTime,
         display: (value) => display(value!),
         serialize: (value) => timeKey(value!, precision),
         messages: messages.timeField,
@@ -84,9 +86,8 @@ export function TimeField({
           <TimePicker
             value={value}
             onValueChange={change}
-            referenceDate={referenceDate}
             precision={precision}
-            format={hourCycle}
+            hourCycle={hourCycle}
             step={step}
             min={min}
             max={max}
@@ -103,7 +104,7 @@ export function TimeField({
 
 export namespace TimeField {
   export type Props = TimeFieldProps;
-  export type State = TemporalFieldState<Date | null>;
+  export type State = TemporalFieldState<Time | null>;
   export type TriggerProps = SharedTriggerProps;
   export type ValueProps = SharedValueProps;
   export type ClearProps = SharedClearProps;

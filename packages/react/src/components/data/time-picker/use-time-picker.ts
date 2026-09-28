@@ -1,12 +1,13 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 
-import { parseISO, startOfDay } from 'date-fns';
 import { clamp, debounce, type DebouncedFunction } from 'es-toolkit';
 
 import {
   nearestSlot,
-  resolveTimeFormat,
+  resolveHourCycle,
+  sameTime,
   secondsOf,
+  timeOfSeconds,
   timeSlots,
   typeaheadMatch,
   unitLabel,
@@ -14,19 +15,18 @@ import {
   unitTarget,
   unitValue,
   validateTime,
-  withTime,
-  type TimeFormat,
+  type HourCycle,
   type TimePrecision,
   type TimeUnit,
 } from './time';
 import { useControllableState } from '../../../hooks/use-controllable-state';
-import { dayKey } from '../calendar/date';
 
 import type { IdsSize } from '../../../tokens/types';
+import type { Time } from '@internationalized/date';
 
 export type TimePickerState = {
-  value: Date | null;
-  format: TimeFormat;
+  value: Time | null;
+  hourCycle: HourCycle;
   precision: TimePrecision;
   step: number;
   disabled: boolean;
@@ -43,15 +43,14 @@ export type TimePickerOptionState = {
 };
 
 export type UseTimePickerOptions = {
-  value: Date | null | undefined;
-  defaultValue: Date | null;
-  onValueChange?: (value: Date | null) => void;
-  referenceDate?: Date;
+  value: Time | null | undefined;
+  defaultValue: Time | null;
+  onValueChange?: (value: Time | null) => void;
   precision: TimePrecision;
-  format?: TimeFormat;
+  hourCycle?: HourCycle;
   step: number;
-  min?: Date;
-  max?: Date;
+  min?: Time;
+  max?: Time;
   locale: string;
   disabled: boolean;
   readOnly: boolean;
@@ -61,45 +60,40 @@ export function useTimePicker(options: UseTimePickerOptions) {
   const { precision, step, min, max, locale, disabled, readOnly } = options;
   validateTime(options.value);
   validateTime(options.defaultValue);
-  validateTime(options.referenceDate);
-  const [value, setValue] = useControllableState<Date | null>({
+  const [value, setValue] = useControllableState<Time | null>({
     value: options.value,
     defaultValue: options.defaultValue,
     onValueChange: options.onValueChange,
   });
-  const [mountedDay] = useState(() => startOfDay(new Date()));
-  const base = value ?? (options.referenceDate ? startOfDay(options.referenceDate) : mountedDay);
-  const day = dayKey(base);
-  const low = min?.getTime();
-  const high = max?.getTime();
+
+  const low = min && secondsOf(min);
+  const high = max && secondsOf(max);
   const slots = useMemo(
     () =>
       timeSlots(
-        parseISO(day),
         precision,
         step,
-        low === undefined ? undefined : new Date(low),
-        high === undefined ? undefined : new Date(high),
+        low === undefined ? undefined : timeOfSeconds(low),
+        high === undefined ? undefined : timeOfSeconds(high),
       ),
-    [day, precision, step, low, high],
+    [precision, step, low, high],
   );
-  const format = resolveTimeFormat(options.format, locale);
-  const current = value
-    ? secondsOf(value)
-    : (nearestSlot(slots, secondsOf(base)) ?? secondsOf(base));
+  const hourCycle = resolveHourCycle(options.hourCycle, locale);
+  const current = value ? secondsOf(value) : (nearestSlot(slots, 0) ?? 0);
   const blocked = disabled || readOnly;
 
   const choose = (seconds: number) => {
     if (blocked) return;
-    const next = withTime(base, seconds);
-    if (!next || (value && next.getTime() === value.getTime())) return;
-    setValue(next);
+
+    const next = timeOfSeconds(seconds);
+    if (!sameTime(next, value)) setValue(next);
   };
+
   const clear = () => {
     if (!blocked && value) setValue(null);
   };
 
-  const state: TimePickerState = { value, format, precision, step, disabled, readOnly };
+  const state: TimePickerState = { value, hourCycle, precision, step, disabled, readOnly };
   return { state, slots, current, locale, choose, clear };
 }
 
@@ -114,12 +108,12 @@ const CONTROL_HEIGHT_STANDARD = 36;
 const CONTROL_HEIGHT_TINY = 32;
 
 export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
-  const numbers = unitNumbers(unit, c.state.format, c.state.precision, c.state.step);
-  const selected = unitValue(c.current, unit, c.state.format);
+  const numbers = unitNumbers(unit, c.state.hourCycle, c.state.precision, c.state.step);
+  const selected = unitValue(c.current, unit, c.state.hourCycle);
   const selectedNumber = numbers.includes(selected) ? selected : numbers[0];
   const options = numbers.map((n) => ({
     n,
-    seconds: unitTarget(unit, n, c.current, c.slots, c.state.format),
+    seconds: unitTarget(unit, n, c.current, c.slots, c.state.hourCycle),
     label: unitLabel(unit, n, c.locale),
   }));
   const [active, setActive] = useState(selectedNumber);

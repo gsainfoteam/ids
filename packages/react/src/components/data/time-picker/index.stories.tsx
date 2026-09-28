@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Time } from '@internationalized/date';
 import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -10,7 +11,7 @@ import { TimePicker } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const at = (hour: number, minute = 0, second = 0) => new Date(2026, 8, 15, hour, minute, second);
+const at = (hour: number, minute = 0, second = 0) => new Time(hour, minute, second);
 const sizes = ['standard', 'tiny'] as const;
 const variants = ['grid', 'wheel'] as const;
 
@@ -22,7 +23,7 @@ const meta = {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
     precision: { control: 'radio', options: ['hour', 'minute', 'second'] },
-    format: { control: 'radio', options: [undefined, '12h', '24h'] },
+    hourCycle: { control: 'radio', options: [undefined, '12h', '24h'] },
     step: { control: { type: 'number', min: 1, max: 60 } },
     locale: { control: 'radio', options: ['ko-KR', 'en-US', 'de-DE', 'ja-JP'] },
     disabled: { control: 'boolean' },
@@ -59,7 +60,7 @@ export const Gallery: Story = {
             <TimePicker
               variant={variant}
               size={size}
-              format="24h"
+              hourCycle="24h"
               defaultValue={at(9, 30)}
               className="w-56"
               aria-label={`${variant} ${size}`}
@@ -70,14 +71,19 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Hour cycle × Precision"
-        description="시간제는 locale의 CLDR 시간제를 따르고 format으로 정합니다. 12시간제에는 오전/오후 컬럼이 locale이 쓰는 자리에 붙습니다."
+        description="시간제는 locale의 CLDR 시간제를 따르고 hourCycle로 정합니다. 12시간제에는 오전/오후 컬럼이 locale이 쓰는 자리에 붙습니다."
       >
         <Showcase.Row label="24h minute">
-          <TimePicker format="24h" defaultValue={at(14, 30)} className="w-56" aria-label="24시간" />
+          <TimePicker
+            hourCycle="24h"
+            defaultValue={at(14, 30)}
+            className="w-56"
+            aria-label="24시간"
+          />
         </Showcase.Row>
         <Showcase.Row label="12h second">
           <TimePicker
-            format="12h"
+            hourCycle="12h"
             precision="second"
             step={15}
             defaultValue={at(14, 30, 45)}
@@ -98,11 +104,11 @@ export const Gallery: Story = {
 
       <Showcase.Section title="States">
         <Showcase.Row label="empty">
-          <TimePicker format="24h" className="w-56" aria-label="비어 있음" />
+          <TimePicker hourCycle="24h" className="w-56" aria-label="비어 있음" />
         </Showcase.Row>
         <Showcase.Row label="limits">
           <TimePicker
-            format="24h"
+            hourCycle="24h"
             step={15}
             min={at(9, 30)}
             max={at(18)}
@@ -113,7 +119,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="readOnly">
           <TimePicker
-            format="24h"
+            hourCycle="24h"
             readOnly
             defaultValue={at(9, 30)}
             className="w-56"
@@ -122,7 +128,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="disabled">
           <TimePicker
-            format="24h"
+            hourCycle="24h"
             disabled
             defaultValue={at(9, 30)}
             className="w-56"
@@ -133,7 +139,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Composition">
         <Showcase.Row label="header · separator">
-          <TimePicker format="24h" defaultValue={at(9, 30)} className="w-56" aria-label="머리글">
+          <TimePicker hourCycle="24h" defaultValue={at(9, 30)} className="w-56" aria-label="머리글">
             <TimePicker.Header />
             <TimePicker.Column unit="hour" />
             <TimePicker.Separator />
@@ -142,7 +148,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="period first">
           <TimePicker
-            format="12h"
+            hourCycle="12h"
             defaultValue={at(21, 15)}
             className="w-64"
             aria-label="오전 오후 먼저"
@@ -158,7 +164,7 @@ export const Gallery: Story = {
 };
 
 export const Keyboard: Story = {
-  args: { format: '24h', step: 15, defaultValue: at(9, 15) },
+  args: { hourCycle: '24h', step: 15, defaultValue: at(9, 15) },
   parameters: {
     docs: {
       description: {
@@ -185,12 +191,12 @@ export const Keyboard: Story = {
 };
 
 function ClearExample() {
-  const [value, setValue] = useState<Date | null>(at(8, 30));
+  const [value, setValue] = useState<Time | null>(at(8, 30));
   return (
     <div className="flex w-56 flex-col gap-3">
-      <TimePicker format="24h" value={value} onValueChange={setValue} />
+      <TimePicker hourCycle="24h" value={value} onValueChange={setValue} />
       <output aria-label="값" className="text-body-b3-regular">
-        {value ? `${value.getHours()}:${value.getMinutes()}` : 'null'}
+        {value ? `${value.hour}:${value.minute}` : 'null'}
       </output>
     </div>
   );
@@ -202,7 +208,7 @@ export const Clear: Story = {
     docs: {
       description: {
         story:
-          '값은 Date | null입니다. 컬럼에서 Delete나 Backspace를 누르면 null이 되고, 선택 표시가 사라집니다.',
+          '값은 Time | null입니다. 컬럼에서 Delete나 Backspace를 누르면 null이 되고, 선택 표시가 사라집니다.',
       },
     },
   },
@@ -217,12 +223,12 @@ export const Clear: Story = {
 };
 
 export const Limits: Story = {
-  args: { format: '24h', step: 15, min: at(9, 30), max: at(10, 15), defaultValue: at(9, 45) },
+  args: { hourCycle: '24h', step: 15, min: at(9, 30), max: at(10, 15), defaultValue: at(9, 45) },
   parameters: {
     docs: {
       description: {
         story:
-          '날짜는 빼고 시각만 비교합니다. 범위 밖 옵션은 고를 수 없고, 시를 고르면 그 시간 안에서 가장 가까운 허용 시각으로 갑니다.',
+          'min과 max도 Time입니다. 범위 밖 옵션은 고를 수 없고, 시를 고르면 그 시간 안에서 가장 가까운 허용 시각으로 갑니다.',
       },
     },
   },
@@ -237,7 +243,7 @@ export const Limits: Story = {
 export const Wheel: Story = {
   args: {
     variant: 'wheel',
-    format: '12h',
+    hourCycle: '12h',
     locale: 'en-US',
     defaultValue: at(14, 30),
     className: cn('w-64'),
@@ -264,7 +270,7 @@ export const Locale: Story = {
     <div className="flex flex-wrap gap-8">
       <TimePicker defaultValue={at(14, 30)} className="w-64" aria-label="한국어" />
       <TimePicker
-        format="24h"
+        hourCycle="24h"
         defaultValue={at(14, 30)}
         className="w-44"
         aria-label="한국어 24시간"
@@ -273,7 +279,7 @@ export const Locale: Story = {
       <TimePicker locale="de-DE" defaultValue={at(14, 30)} className="w-44" aria-label="Deutsch" />
       <TimePicker
         locale="ja-JP"
-        format="12h"
+        hourCycle="12h"
         defaultValue={at(14, 30)}
         className="w-64"
         aria-label="日本語"
@@ -284,13 +290,13 @@ export const Locale: Story = {
     docs: {
       description: {
         story:
-          'locale은 BCP 47 태그이고, 시간제와 오전/오후 이름과 자리는 브라우저의 Intl(CLDR)을 따릅니다. 한국어와 미국 영어는 12시간제, 독일어와 일본어는 24시간제이고 format으로 바꿀 수 있습니다. 한국어와 일본어는 오전/오후 컬럼이 앞에 옵니다.',
+          'locale은 BCP 47 태그이고, 시간제와 오전/오후 이름과 자리는 브라우저의 Intl(CLDR)을 따릅니다. 한국어와 미국 영어는 12시간제, 독일어와 일본어는 24시간제이고 hourCycle로 바꿀 수 있습니다. 한국어와 일본어는 오전/오후 컬럼이 앞에 옵니다.',
       },
     },
   },
   play: async ({ canvas }) => {
     const korean = canvas.getByRole('group', { name: '한국어' });
-    await expect(korean).toHaveAttribute('data-format', '12h');
+    await expect(korean).toHaveAttribute('data-hour-cycle', '12h');
     await expect(
       korean.querySelector('[data-time-column=period] [data-selected]'),
     ).toHaveTextContent('오후');
@@ -317,7 +323,7 @@ export const Locale: Story = {
 export const CustomOption: Story = {
   render: () => (
     <TimePicker
-      format="24h"
+      hourCycle="24h"
       step={30}
       defaultValue={at(9, 30)}
       className="w-64"

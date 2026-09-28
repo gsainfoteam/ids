@@ -140,7 +140,7 @@ export type {
   TimePickerProps,
   TimePickerOptions,
   TimePrecision,
-  TimeFormat,
+  HourCycle,
 } from './components/data/time-picker';
 
 export { TimeField } from './components/form/time-field';

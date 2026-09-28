@@ -1,44 +1,58 @@
-import { format, getHours, getMinutes, getSeconds, isSameDay, set } from 'date-fns';
-import { minBy, range } from 'es-toolkit';
+import { Time } from '@internationalized/date';
+import { isFunction, minBy, range } from 'es-toolkit';
 
 import { hourCycleOf, periodLabel, type HourCycle } from '../../../internal/date-locale';
 import { invariant } from '../../../utils';
-import { validDate } from '../calendar/date';
 
+export type { HourCycle } from '../../../internal/date-locale';
 export type TimePrecision = 'hour' | 'minute' | 'second';
-export type TimeFormat = HourCycle;
 export type TimeUnit = 'hour' | 'minute' | 'second' | 'period';
 
-export const secondsOf = (d: Date) => getHours(d) * 3600 + getMinutes(d) * 60 + getSeconds(d);
+const SECONDS_IN_HOUR = 3600;
+const LAST_SECOND_OF_DAY = 86399;
+const SAMPLE_YEAR = 2000;
+const TIME_FIELDS = ['hour', 'minute', 'second', 'millisecond'] as const;
 
-const keyPatterns = { hour: 'HH', minute: 'HH:mm', second: 'HH:mm:ss' } as const;
-export const timeKey = (d: Date, precision: TimePrecision = 'minute') =>
-  format(d, keyPatterns[precision]);
+export const isTime = (value: unknown): value is Time =>
+  typeof value === 'object' &&
+  value !== null &&
+  TIME_FIELDS.every((field) => Number.isInteger((value as Record<string, unknown>)[field])) &&
+  isFunction((value as { compare?: unknown }).compare);
 
-export function withTime(day: Date, seconds: number): Date | null {
-  const next = set(day, {
-    hours: Math.floor(seconds / 3600),
-    minutes: Math.floor(seconds / 60) % 60,
-    seconds: seconds % 60,
-    milliseconds: 0,
-  });
-  const timeExistsThatDay = isSameDay(next, day) && secondsOf(next) === seconds;
-  return timeExistsThatDay ? next : null;
+export function validateTime(value: unknown, owner = 'TimePicker') {
+  invariant(
+    value == null || isTime(value),
+    `${owner}: expected a Time from @internationalized/date (new Time(14, 30)) or null.`,
+  );
 }
 
-export function validateTime(value: Date | null | undefined) {
-  invariant(value == null || validDate(value), 'TimePicker: expected a valid Date or null.');
-}
+export const sameTime = (a: Time | null, b: Time | null) =>
+  a === b || (!!a && !!b && a.compare(b) === 0);
 
-export const resolveTimeFormat = (value: TimeFormat | undefined, locale: string): TimeFormat =>
+export const secondsOf = (time: Time) =>
+  time.hour * SECONDS_IN_HOUR + time.minute * 60 + time.second;
+
+export const timeOfSeconds = (seconds: number) =>
+  new Time(Math.floor(seconds / SECONDS_IN_HOUR), Math.floor(seconds / 60) % 60, seconds % 60);
+
+const twoDigits = (n: number) => String(n).padStart(2, '0');
+
+const keyParts = { hour: 1, minute: 2, second: 3 } as const;
+
+export const timeKey = (time: Time, precision: TimePrecision = 'minute') =>
+  [time.hour, time.minute, time.second].slice(0, keyParts[precision]).map(twoDigits).join(':');
+
+export const onUtcSampleDay = (time: Time) =>
+  new Date(Date.UTC(SAMPLE_YEAR, 0, 1, time.hour, time.minute, time.second, time.millisecond));
+
+export const resolveHourCycle = (value: HourCycle | undefined, locale: string): HourCycle =>
   value ?? hourCycleOf(locale);
 
 export function timeSlots(
-  day: Date,
   precision: TimePrecision,
   step: number,
-  min?: Date,
-  max?: Date,
+  min?: Time,
+  max?: Time,
 ): number[] {
   validateTime(min);
   validateTime(max);
@@ -46,22 +60,24 @@ export function timeSlots(
     Number.isInteger(step) && step >= 1 && step <= 60 && (precision !== 'hour' || step === 1),
     'TimePicker: step must be 1..60 and precision=hour requires step=1.',
   );
+
   const lo = min ? secondsOf(min) : 0;
-  const hi = max ? secondsOf(max) : 86399;
+  const hi = max ? secondsOf(max) : LAST_SECOND_OF_DAY;
   invariant(lo <= hi, 'TimePicker: min must not be after max; overnight ranges are unsupported.');
+
   const minutes = precision === 'hour' ? [0] : range(0, 60, precision === 'minute' ? step : 1);
   const seconds = precision === 'second' ? range(0, 60, step) : [0];
   return range(24)
-    .flatMap((h) => minutes.flatMap((m) => seconds.map((s) => h * 3600 + m * 60 + s)))
-    .filter((slot) => slot >= lo && slot <= hi && withTime(day, slot));
+    .flatMap((h) => minutes.flatMap((m) => seconds.map((s) => h * SECONDS_IN_HOUR + m * 60 + s)))
+    .filter((slot) => slot >= lo && slot <= hi);
 }
 
 export const nearestSlot = (slots: number[], target: number): number | undefined =>
   minBy(slots, (slot) => Math.abs(slot - target));
 
-export function unitValue(seconds: number, unit: TimeUnit, format: TimeFormat) {
+export function unitValue(seconds: number, unit: TimeUnit, hourCycle: HourCycle) {
   const hour = Math.floor(seconds / 3600);
-  if (unit === 'hour') return format === '12h' ? hour % 12 || 12 : hour;
+  if (unit === 'hour') return hourCycle === '12h' ? hour % 12 || 12 : hour;
   if (unit === 'minute') return Math.floor(seconds / 60) % 60;
   if (unit === 'second') return seconds % 60;
   return Math.floor(hour / 12);
@@ -69,12 +85,12 @@ export function unitValue(seconds: number, unit: TimeUnit, format: TimeFormat) {
 
 export function unitNumbers(
   unit: TimeUnit,
-  format: TimeFormat,
+  hourCycle: HourCycle,
   precision: TimePrecision,
   step: number,
 ) {
   if (unit === 'period') return [0, 1];
-  if (unit === 'hour') return format === '12h' ? [12, ...range(1, 12)] : range(24);
+  if (unit === 'hour') return hourCycle === '12h' ? [12, ...range(1, 12)] : range(24);
   return range(0, 60, unit === precision ? step : 1);
 }
 
@@ -83,7 +99,7 @@ export function unitTarget(
   n: number,
   current: number,
   slots: number[],
-  format: TimeFormat,
+  hourCycle: HourCycle,
 ): number | undefined {
   const hour = Math.floor(current / 3600);
   const minute = Math.floor(current / 60) % 60;
@@ -91,7 +107,7 @@ export function unitTarget(
     unit === 'period'
       ? (hour % 12) + n * 12
       : unit === 'hour'
-        ? format === '12h'
+        ? hourCycle === '12h'
           ? (n % 12) + Math.floor(hour / 12) * 12
           : n
         : hour;
