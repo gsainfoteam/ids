@@ -94,12 +94,12 @@ export function usePasswordField({
   const control = useTextControl({ inputRef, disabled, readOnly, clearable });
   const ref = useMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
 
-  const selection = useRef<Selection | null>(null);
+  const selectionBeforeTypeSwap = useRef<Selection | null>(null);
   useLayoutEffect(() => {
     const node = inputRef.current;
-    const saved = selection.current;
+    const saved = selectionBeforeTypeSwap.current;
     if (node && saved) node.setSelectionRange(saved.start, saved.end, saved.direction);
-    selection.current = null;
+    selectionBeforeTypeSwap.current = null;
   }, [visible]);
 
   useEffect(() => {
@@ -121,17 +121,17 @@ export function usePasswordField({
       queueMicrotask(() => {
         if (active && !event.defaultPrevented) latestSetVisible.current(false);
       });
-    const onSubmit = () => {
+    const hideBeforePasswordManagersRead = () => {
       const node = inputRef.current;
       if (node && node.type !== 'password') node.type = 'password';
       latestSetVisible.current(false);
     };
     form.addEventListener('reset', onReset);
-    form.addEventListener('submit', onSubmit, true);
+    form.addEventListener('submit', hideBeforePasswordManagersRead, true);
     return () => {
       active = false;
       form.removeEventListener('reset', onReset);
-      form.removeEventListener('submit', onSubmit, true);
+      form.removeEventListener('submit', hideBeforePasswordManagersRead, true);
     };
   }, [native.form]);
 
@@ -142,11 +142,11 @@ export function usePasswordField({
       setCapsLock(event.getModifierState('CapsLock'));
   };
 
-  const toggle = (pointer: boolean) => {
+  const toggle = (byPointer: boolean) => {
     const node = inputRef.current;
     if (!node || disabled) return;
-    if (pointer) node.focus({ preventScroll: true });
-    selection.current =
+    if (byPointer) node.focus({ preventScroll: true });
+    selectionBeforeTypeSwap.current =
       node.selectionStart == null || node.selectionEnd == null
         ? null
         : {

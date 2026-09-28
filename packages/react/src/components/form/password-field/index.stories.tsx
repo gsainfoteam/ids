@@ -22,6 +22,8 @@ const sizes = ['standard', 'tiny'] as const;
 
 const noPasswordManager = { 'data-1p-ignore': '', 'data-lpignore': 'true' } as const;
 
+const NO_FILL = 'rgba(0, 0, 0, 0)';
+
 const meta = {
   title: 'Form/PasswordField',
   component: PasswordField,
@@ -218,7 +220,7 @@ export const Visibility: Story = {
       'backward',
     ]);
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    await waitFor(() => expect(getComputedStyle(toggle).backgroundColor).toBe('rgba(0, 0, 0, 0)'));
+    await waitFor(() => expect(getComputedStyle(toggle).backgroundColor).toBe(NO_FILL));
     await userEvent.tab();
     await expect(toggle).toHaveFocus();
     await userEvent.keyboard(' ');

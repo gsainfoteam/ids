@@ -43,7 +43,7 @@ type PasswordFieldContextValue = {
   inputProps: ReturnType<typeof usePasswordField>['inputProps'];
   state: PasswordFieldState;
   capsLock: boolean;
-  toggle: (pointer: boolean) => void;
+  toggle: (byPointer: boolean) => void;
   styles: ReturnType<typeof PasswordField.Style>;
 };
 
@@ -69,6 +69,18 @@ function CapsLockIcon(props: SVGProps<SVGSVGElement>) {
       <path strokeLinecap="round" d="M8.25 19.5h7.5" />
     </svg>
   );
+}
+
+function AlwaysMountedStatus({ children }: { children: string }) {
+  return (
+    <span role="status" className="sr-only">
+      {children}
+    </span>
+  );
+}
+
+function isPointerClick(event: { detail: number }) {
+  return event.detail > 0;
 }
 
 export function PasswordField({
@@ -223,7 +235,7 @@ export namespace PasswordField {
     ...props
   }: VisibilityToggleProps) {
     const { state, toggle, inputProps, styles } = usePasswordContext('VisibilityToggle');
-    const pointer = useRef(false);
+    const pressedByPointer = useRef(false);
     const shared = {
       disabled: state.disabled || props.disabled,
       'aria-controls': inputProps.id,
@@ -246,11 +258,12 @@ export namespace PasswordField {
           'aria-pressed': state.visible,
           onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
             onClick?.(event);
-            if (!event.defaultPrevented && !state.disabled) toggle(event.detail > 0);
+            if (!event.defaultPrevented && !state.disabled) toggle(isPointerClick(event));
           },
         }),
       );
     }
+    const iconOnlyName = props['aria-label'] ?? messages.passwordField.show;
     const icon =
       typeof children === 'function'
         ? children(state)
@@ -260,15 +273,15 @@ export namespace PasswordField {
       <IconToggle
         {...props}
         {...shared}
-        aria-label={props['aria-label'] ?? messages.passwordField.show}
+        aria-label={iconOnlyName}
         variant="ghost"
         size={state.size}
         icon={icon}
         pressed={state.visible}
-        onPressedChange={() => toggle(pointer.current)}
+        onPressedChange={() => toggle(pressedByPointer.current)}
         onClick={(event) => {
           onClick?.(event);
-          pointer.current = event.detail > 0;
+          pressedByPointer.current = isPointerClick(event);
         }}
         className={styles.toggle({ className })}
       />
@@ -291,9 +304,7 @@ export namespace PasswordField {
             {children ?? <CapsLockIcon />}
           </span>
         )}
-        <span role="status" className="sr-only">
-          {capsLock ? text : ''}
-        </span>
+        <AlwaysMountedStatus>{capsLock ? text : ''}</AlwaysMountedStatus>
       </>
     );
   }
