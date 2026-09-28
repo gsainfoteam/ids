@@ -38,6 +38,7 @@ import {
 } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Chip } from '../../data/chip';
+import { ScrollArea } from '../../layout/scroll-area';
 import { Slot } from '../../utility/slot';
 import { useFieldSize } from '../field/context';
 import { collectOptions, slotChildren, type SelectOption } from '../select/select-options';
@@ -479,18 +480,22 @@ function ChipContent({ asChild, children, className, ...props }: ChipField.Conte
     <>
       {c.drawer && <DrawerSearch />}
       {limits.length ? limits : <ChipLimit />}
-      {part(
-        'div',
-        asChild,
-        asChild && isValidElement(children) ? cloneElement(children, {}, list) : list,
-        mergeProps(props, {
-          ...c.listLabel,
-          id: c.field.ids.listbox,
-          role: 'listbox',
-          'aria-multiselectable': true,
-          className: c.styles.listbox({ className }),
-        }),
-      )}
+      <ScrollArea className={c.styles.listArea()}>
+        <ScrollArea.Viewport asChild>
+          {part(
+            'div',
+            asChild,
+            asChild && isValidElement(children) ? cloneElement(children, {}, list) : list,
+            mergeProps(props, {
+              ...c.listLabel,
+              id: c.field.ids.listbox,
+              role: 'listbox',
+              'aria-multiselectable': true,
+              className: c.styles.listbox({ className }),
+            }),
+          )}
+        </ScrollArea.Viewport>
+      </ScrollArea>
       {empties.length ? empties : <ChipEmpty />}
     </>
   );
@@ -767,6 +772,7 @@ export namespace ChipField {
         'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
       ],
       icon: 'shrink-0 cursor-pointer text-(--ids-color-on-muted)',
+      listArea: listStyles.listArea,
       listbox: listStyles.list,
       item: listStyles.option,
       indicator: listStyles.indicator,

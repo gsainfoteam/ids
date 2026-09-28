@@ -442,13 +442,13 @@ export const Style = tv({
 
 ## list-styles.ts
 
-팝업 안 목록(listbox)의 클래스 조각 `listStyles` 입니다. 옵션, 선택 체크, 스크롤 목록, 그룹 머리, 구분선, 빈 목록 문구, 목록 위 검색 줄이 있습니다.
+팝업 안 목록(listbox)의 클래스 조각 `listStyles` 입니다. 옵션, 선택 체크, 스크롤 목록과 그 ScrollArea, 그룹 머리, 구분선, 빈 목록 문구, 목록 위 검색 줄이 있습니다.
 
 ### 쓰는 곳
 
-- Select 의 `listbox`, `item`, `indicator`, `groupHeading`, `separator`, `empty` 슬롯
-- ChipField 의 제안 목록
-- Menu 의 `item`, `indicator`, `label`, `separator` 슬롯과 명령 팔레트의 `list`, `empty` 슬롯
+- Select 의 `listArea`, `listbox`, `item`, `indicator`, `groupHeading`, `separator`, `empty` 슬롯
+- ChipField 의 제안 목록(`listArea`, `listbox`, ...)
+- Menu 의 `item`, `indicator`, `label`, `separator` 슬롯과 명령 팔레트의 `listArea`, `list`, `empty` 슬롯
 - [field-popup](./field-popup/README.md) 의 `FieldPopupSearch`(`searchRoot`, `search`)
 
 ### 쓰는 법
@@ -456,6 +456,7 @@ export const Style = tv({
 ```ts
 // components/form/select/index.tsx
 slots: {
+  listArea: listStyles.listArea,
   listbox: listStyles.list,
   item: listStyles.option,
   indicator: listStyles.indicator,
@@ -469,14 +470,18 @@ slots: {
 
 - 옵션 강조는 메뉴처럼 neutral muted 배경(`data-highlighted`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
 - 옵션은 체크가 없어도 끝 padding(`pe-8`)을 비워 둡니다. 체크가 나타날 때 라벨이 밀리지 않습니다.
-- `list` 는 옵션의 스크롤 컨테이너입니다. 키보드 이동이 팝업이 아니라 이 목록을 스크롤합니다. 팝업 padding 안으로 들어가서(`-mx-1 px-1`) 전체 폭 구분선이 잘리지 않고, `relative` 라 옵션의 offset parent 입니다(`offsetParentOfOptions`). field-popup 의 `revealPopupOption` 이 옵션 위치를 `offsetTop` 으로 읽습니다.
+- `list` 는 옵션의 스크롤 컨테이너입니다. 키보드 이동이 팝업이 아니라 이 목록을 스크롤합니다. `relative` 라 옵션의 offset parent 입니다(`offsetParentOfOptions`). field-popup 의 `revealPopupOption` 이 옵션 위치를 `offsetTop` 으로 읽습니다.
+- `listArea` 는 목록을 감싸는 `ScrollArea` 의 root 이고, `list` 는 `ScrollArea.Viewport asChild` 로 listbox 자신이 스크롤 요소가 됩니다. 옵션과 listbox 사이에 요소가 끼지 않아 위의 offset parent 와 `scrollTop` 이 그대로입니다.
+- `listArea` 가 팝업 padding 안으로 들어가서(`-mx-1`, `list` 의 `px-1`) 전체 폭 구분선이 잘리지 않고, 막대가 팝업 테두리 쪽 가장자리에 섭니다.
+- `listArea` 는 `rounded-[inherit]` 로 팝업의 모서리(14px)를 받습니다. ScrollArea 는 root 의 반지름으로 막대 끝을 물리므로, 이것이 없으면 목록이 팝업 맨 위에 붙을 때 막대 끝이 팝업 모서리 곡선에 걸칩니다.
 - `separator` 는 Divider 에 주는 클래스입니다. 목록 padding 안으로 들어가므로 Divider 자신의 전체 폭을 쓰면 한쪽 끝이 모자랍니다. 폭은 stretch 에 맡깁니다(`w-auto`).
 - `searchRoot` 는 shadcn/ui 의 command input 같은 검색 줄입니다. ghost TextField 에 상자 대신 아래 선을 긋고, 캐럿이 포커스를 보여 주므로 ring 을 끕니다(`ringOffSinceCaretShowsFocus`). `focus-ring` 이 input 의 포커스로 ring 을 칠하므로 `!` 로 강제합니다. 팝업 padding 까지 채우도록 폭을 고정하지 않습니다.
 
 ### 알아둘 것
 
 - `cn('...')` 값의 객체일 뿐입니다. 각 컴포넌트가 자기 `tv({ slots })` 에 넣으므로, 키를 더하면 쓰는 쪽의 슬롯에도 더합니다.
-- `list` 의 `-mx-1` 과 `separator` 의 `-mx-1` 은 팝업의 `concentric-p-1` 에 맞춘 값입니다. 팝업 padding 을 바꾸면 함께 바꿉니다.
+- `listArea` 의 `-mx-1` 과 `separator` 의 `-mx-1` 은 팝업의 `concentric-p-1` 에 맞춘 값입니다. 팝업 padding 을 바꾸면 함께 바꿉니다.
+- listbox 는 스스로 포커스를 다루는 역할이라 ScrollArea 가 Tab 멈춤을 주지 않습니다. `role` 을 바꾸면 목록이 Tab 순서에 들어올 수 있습니다.
 
 ## messages.ts
 

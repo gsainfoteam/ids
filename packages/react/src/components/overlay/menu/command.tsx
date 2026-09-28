@@ -16,6 +16,7 @@ import { messages } from '../../../internal/messages';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
 import { flattenFragments, mergeProps, part } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+import { ScrollArea } from '../../layout/scroll-area';
 
 import type { Menu } from '.';
 
@@ -132,16 +133,20 @@ function CommandPopup({
       >
         <OverlayItemContext value={null}>
           {searches.length ? searches : <CommandSearch />}
-          <div
-            ref={setList}
-            id={ids.list}
-            role="listbox"
-            aria-label={props['aria-label'] ?? messages.menu.command}
-            data-menu-list=""
-            className={styles.list()}
-          >
-            {options}
-          </div>
+          <ScrollArea className={styles.listArea()}>
+            <ScrollArea.Viewport asChild>
+              <div
+                ref={setList}
+                id={ids.list}
+                role="listbox"
+                aria-label={props['aria-label'] ?? messages.menu.command}
+                data-menu-list=""
+                className={styles.list()}
+              >
+                {options}
+              </div>
+            </ScrollArea.Viewport>
+          </ScrollArea>
           {empties.length ? empties : <CommandEmpty />}
         </OverlayItemContext>
       </div>

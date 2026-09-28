@@ -18,6 +18,7 @@ import { useDrawer } from './use-drawer';
 import { messages } from '../../../internal/messages';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
 import {
+  cn,
   flattenFragments,
   invariant,
   mergeEventHandlers,
@@ -29,9 +30,12 @@ import {
 import { isDevelopment } from '../../../utils/dev';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { ScrollArea } from '../../layout/scroll-area';
 import { Slot } from '../../utility/slot';
 
 import type { DrawerSide, SnapPoint as DrawerSnapPoint } from './drawer-gesture';
+
+const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');
 
 type Context = {
   drawer: ReturnType<typeof useDrawer>;
@@ -158,30 +162,34 @@ function DrawerPopup({
   );
 
   const sheet = (
-    <div
-      {...props}
-      ref={c.modal ? undefined : contentRef}
-      popover="manual"
-      id={ids.content}
-      role={c.role}
-      aria-modal={c.modal ? 'true' : undefined}
-      aria-labelledby={labelledBy}
-      aria-describedby={props['aria-describedby'] ?? (c.described ? ids.description : undefined)}
-      tabIndex={-1}
-      data-drawer-content=""
-      data-side={c.side}
-      data-open={open ? '' : undefined}
-      data-ending-style={ending ? '' : undefined}
-      data-nested-open={position.covered ? '' : undefined}
-      className={styles.content({ className })}
-      style={style}
-      onPointerDown={mergeEventHandlers(onPointerDown, drawer.drag.onPointerDown)}
-    >
-      <OverlayItemContext value={null}>
-        {children}
-        {!c.hideClose && <Drawer.Close className={styles.close()} />}
-      </OverlayItemContext>
-    </div>
+    <ScrollArea asChild>
+      <div
+        {...props}
+        ref={c.modal ? undefined : contentRef}
+        popover="manual"
+        id={ids.content}
+        role={c.role}
+        aria-modal={c.modal ? 'true' : undefined}
+        aria-labelledby={labelledBy}
+        aria-describedby={props['aria-describedby'] ?? (c.described ? ids.description : undefined)}
+        tabIndex={-1}
+        data-drawer-content=""
+        data-side={c.side}
+        data-open={open ? '' : undefined}
+        data-ending-style={ending ? '' : undefined}
+        data-nested-open={position.covered ? '' : undefined}
+        className={styles.content({ className })}
+        style={style}
+        onPointerDown={mergeEventHandlers(onPointerDown, drawer.drag.onPointerDown)}
+      >
+        <ScrollArea.Viewport className={styles.viewport()}>
+          <OverlayItemContext value={null}>
+            {children}
+            {!c.hideClose && <Drawer.Close className={styles.close()} />}
+          </OverlayItemContext>
+        </ScrollArea.Viewport>
+      </div>
+    </ScrollArea>
   );
 
   if (!c.modal) return sheet;
@@ -412,12 +420,14 @@ export namespace Drawer {
         'data-dragging:transition-none motion-reduce:transition-none',
       ],
       content: [
-        'fixed z-50 m-0 flex flex-col gap-4 overflow-y-auto overscroll-contain concentric-p-6 outline-none',
+        'fixed z-50 m-0 flex flex-col outline-none',
+        cornerOfThePaddedViewport,
         'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-lg',
         'transition-[translate,transform,scale] duration-(--ids-motion-slow) ease-[cubic-bezier(0.32,0.72,0,1)]',
         'data-nested-open:scale-(--drawer-nested-scale)',
         'data-dragging:transition-none data-dragging:select-none motion-reduce:transition-none',
       ],
+      viewport: 'relative flex flex-col gap-4 overscroll-contain p-6',
       handle: [
         'relative shrink-0 cursor-grab touch-none rounded-full bg-(--ids-color-border) outline-none focus-ring',
         'before:absolute before:-inset-3',
@@ -434,18 +444,18 @@ export namespace Drawer {
           content: [
             'inset-x-0 top-auto bottom-0 h-fit max-h-[calc(100%-2rem)] w-full max-w-none',
             'data-[side=bottom]:rounded-b-none data-[side=bottom]:border-b-0',
-            'data-[side=bottom]:pb-[calc(var(--ids-concentric-pad)+env(safe-area-inset-bottom))]',
             'starting:translate-y-full data-ending-style:translate-y-full data-nested-open:-translate-y-4',
           ],
+          viewport: 'pb-[calc(--spacing(6)+env(safe-area-inset-bottom))]',
           handle: 'order-first mx-auto -mt-2 h-1.5 w-12',
         },
         top: {
           content: [
             'inset-x-0 top-0 bottom-auto h-fit max-h-[calc(100%-2rem)] w-full max-w-none',
             'data-[side=top]:rounded-t-none data-[side=top]:border-t-0',
-            'data-[side=top]:pt-[calc(var(--ids-concentric-pad)+env(safe-area-inset-top))]',
             'starting:-translate-y-full data-ending-style:-translate-y-full data-nested-open:translate-y-4',
           ],
+          viewport: 'pt-[calc(--spacing(6)+env(safe-area-inset-top))]',
           handle: 'order-last mx-auto -mb-2 h-1.5 w-12',
         },
         right: {

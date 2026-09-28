@@ -1,11 +1,13 @@
 import { listStyles } from '../../../internal/list-styles';
-import { tv } from '../../../utils';
+import { cn, tv } from '../../../utils';
+
+const cornerOfThePaddedViewport = cn('concentric-p-1 p-0');
 
 export const menuStyle = tv({
   slots: {
     content: [
-      'fixed z-50 m-0 flex max-h-(--available-height) max-w-(--available-width) flex-col',
-      'overflow-x-hidden overflow-y-auto overscroll-contain concentric-p-1 outline-none',
+      'fixed z-50 m-0 flex max-h-(--available-height) max-w-(--available-width) flex-col outline-none',
+      cornerOfThePaddedViewport,
       'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface)',
       'text-body-b3-regular shadow-md',
       'transition-[opacity,scale] duration-(--ids-motion-fast) ease-out',
@@ -13,6 +15,7 @@ export const menuStyle = tv({
       'data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom',
       'motion-reduce:transition-none',
     ],
+    viewport: 'flex flex-col overscroll-contain p-1',
     palette: [
       'fixed inset-x-0 top-[15vh] bottom-auto z-50 mx-auto my-0 flex h-fit flex-col',
       'max-h-[min(28rem,calc(85dvh-1rem))] w-[min(36rem,calc(100%-2rem))] max-w-none',
@@ -28,6 +31,7 @@ export const menuStyle = tv({
       'bg-black/50 transition-opacity duration-(--ids-motion-fast) ease-out',
       'starting:opacity-0 data-ending-style:opacity-0 motion-reduce:transition-none',
     ],
+    listArea: listStyles.listArea,
     list: listStyles.list,
     empty: [listStyles.empty, 'not-data-empty:sr-only'],
     item: [

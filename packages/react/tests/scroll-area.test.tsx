@@ -3,7 +3,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { ScrollArea } from '../src';
+import { Drawer, IdsProvider, Menu, ScrollArea, Select } from '../src';
 import {
   clearOfCurve,
   MIN_THUMB_LENGTH,
@@ -502,4 +502,99 @@ test('dev warnings: parts outside ScrollArea, two bars for one orientation, mixe
       </ScrollArea>,
     ),
   ).toThrow(/either inside/);
+});
+
+test('adopted: a Select listbox is its own viewport inside the popup, both clear of the 14px corner', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Select aria-label="도시" defaultValue="도시 20">
+        {Array.from({ length: 40 }, (_, index) => (
+          <Select.Item key={index} value={`도시 ${index + 1}`}>
+            도시 {index + 1}
+          </Select.Item>
+        ))}
+      </Select>
+    </IdsProvider>,
+  );
+  await userEvent.click(screen.getByRole('combobox', { name: '도시' }));
+  const listbox = screen.getByRole('listbox').element() as HTMLElement;
+  const popup = listbox.closest<HTMLElement>('[data-field-popup]')!;
+
+  expect(listbox.hasAttribute('data-scroll-area-viewport')).toBe(true);
+  expect(popup.hasAttribute('data-scroll-area')).toBe(true);
+  expect(getComputedStyle(popup).borderTopRightRadius).toBe('14px');
+  expect(getComputedStyle(popup).paddingTop).toBe('0px');
+  expect(listbox.hasAttribute('tabindex')).toBe(false);
+
+  const area = listbox.closest<HTMLElement>('[data-scroll-area]')!;
+  await expect.element(area).toHaveAttribute('data-overflow-y');
+  await userEvent.hover(screen.getByRole('option', { name: '도시 20' }));
+  const listBar = q('[data-scroll-area-scrollbar]', area);
+  await expect.element(listBar).toHaveAttribute('data-visible');
+
+  const box = popup.getBoundingClientRect();
+  const radius = 13;
+  const center = { x: box.right - 1 - radius, y: box.bottom - 1 - radius };
+  const track = listBar.getBoundingClientRect();
+  expect(
+    Math.hypot(track.right - center.x, Math.max(track.bottom, center.y) - center.y),
+  ).toBeLessThan(radius);
+});
+
+test('adopted: Menu content scrolls in its viewport and keeps its padding', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Menu>
+        <Menu.Trigger>열기</Menu.Trigger>
+        <Menu.Content style={{ maxHeight: 160 }}>
+          {Array.from({ length: 20 }, (_, index) => (
+            <Menu.Item key={index}>항목 {index + 1}</Menu.Item>
+          ))}
+        </Menu.Content>
+      </Menu>
+    </IdsProvider>,
+  );
+  await userEvent.click(screen.getByRole('button', { name: '열기' }));
+  const menu = screen.getByRole('menu').element() as HTMLElement;
+  const viewportOfMenu = q('[data-scroll-area-viewport]', menu);
+
+  expect(menu.hasAttribute('data-scroll-area')).toBe(true);
+  expect(getComputedStyle(viewportOfMenu).paddingTop).toBe('4px');
+  await expect.element(menu).toHaveAttribute('data-overflow-y');
+  expect(viewportOfMenu.hasAttribute('tabindex')).toBe(false);
+
+  await userEvent.keyboard('{End}');
+  await expect.element(screen.getByRole('menuitem', { name: '항목 20' })).toHaveFocus();
+  const last = screen.getByRole('menuitem', { name: '항목 20' }).element().getBoundingClientRect();
+  expect(viewportOfMenu.scrollTop).toBeGreaterThan(0);
+  expect(last.bottom).toBeLessThanOrEqual(viewportOfMenu.getBoundingClientRect().bottom);
+});
+
+test('adopted: dragging the scrollbar of a Drawer body scrolls it instead of moving the sheet', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Drawer side="bottom" defaultOpen>
+        <Drawer.Content aria-label="필터">
+          <div className="h-[2000px] shrink-0" />
+        </Drawer.Content>
+      </Drawer>
+    </IdsProvider>,
+  );
+  const sheet = screen.getByRole('dialog', { name: '필터' }).element() as HTMLElement;
+  const body = q('[data-scroll-area-viewport]', sheet);
+  await expect.element(sheet).toHaveAttribute('data-overflow-y');
+
+  await mouse('mouseMoved', centerOf(body));
+  const drawerBar = q('[data-scroll-area-scrollbar]', sheet);
+  await expect.element(drawerBar).toHaveAttribute('data-visible');
+
+  const start = centerOf(q('[data-scroll-area-thumb]', drawerBar));
+  await mouse('mousePressed', start);
+  await mouse('mouseMoved', { x: start.x, y: start.y + 20 });
+  await mouse('mouseMoved', { x: start.x, y: start.y + 60 });
+  await mouse('mouseReleased', { x: start.x, y: start.y + 60 });
+
+  expect(sheet.style.transform).toBe('');
+  expect(body.scrollTop).toBeGreaterThan(0);
+  await expect.element(sheet).toBeVisible();
 });

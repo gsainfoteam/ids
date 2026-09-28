@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ComponentProps, type RefObject } from 'react';
 
 import { popupStyle } from './styles';
+import { ScrollArea } from '../../components/layout/scroll-area';
 import {
   coveredByKeyboard,
   initialFocusTarget,
@@ -139,21 +140,23 @@ export function FieldPopup({
       backdrop={drawer && { 'data-field-popup-backdrop': '', className: styles.backdrop() }}
       onBackdropClick={() => onClose(true)}
     >
-      <div
-        {...props}
-        popover="manual"
-        role={role}
-        aria-modal={drawer || undefined}
-        aria-label={props['aria-label'] ?? (role && !named ? label : undefined)}
-        tabIndex={props.tabIndex ?? (drawer ? -1 : undefined)}
-        data-field-popup=""
-        data-presentation={presentation}
-        data-side={drawer ? undefined : anchored.side}
-        className={styles.popup({ className })}
-        style={{ ...style, ...(drawer ? undefined : anchored.floatingStyles), position: 'fixed' }}
-      >
-        {children}
-      </div>
+      <ScrollArea asChild>
+        <div
+          {...props}
+          popover="manual"
+          role={role}
+          aria-modal={drawer || undefined}
+          aria-label={props['aria-label'] ?? (role && !named ? label : undefined)}
+          tabIndex={props.tabIndex ?? (drawer ? -1 : undefined)}
+          data-field-popup=""
+          data-presentation={presentation}
+          data-side={drawer ? undefined : anchored.side}
+          className={styles.popup({ className })}
+          style={{ ...style, ...(drawer ? undefined : anchored.floatingStyles), position: 'fixed' }}
+        >
+          <ScrollArea.Viewport className={styles.viewport()}>{children}</ScrollArea.Viewport>
+        </div>
+      </ScrollArea>
     </ModalLayer>
   );
 }

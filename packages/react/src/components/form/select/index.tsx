@@ -41,6 +41,7 @@ import {
 import { isDevelopment } from '../../../utils/dev';
 import { IconButton } from '../../action/icon-button';
 import { Divider } from '../../layout/divider';
+import { ScrollArea } from '../../layout/scroll-area';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -444,25 +445,29 @@ function SelectContent({ asChild, children, className, ...props }: Select.Conten
   return (
     <>
       {search}
-      {part(
-        'div',
-        asChild,
-        asChild && isValidElement(children) ? cloneElement(children, {}, items) : items,
-        mergeProps(props, {
-          ...c.listLabel,
-          id: ids.listbox,
-          role: 'listbox',
-          'aria-multiselectable': c.state.multiple || undefined,
-          'aria-activedescendant':
-            owner && s.activeValue !== undefined ? ids.option(s.activeValue) : undefined,
-          tabIndex: owner ? 0 : undefined,
-          'data-popup-autofocus': owner ? '' : undefined,
-          onKeyDown: owner
-            ? (event: KeyboardEvent<HTMLElement>) => c.select.onKeyDown(event, 'list')
-            : undefined,
-          className: c.styles.listbox({ className }),
-        }),
-      )}
+      <ScrollArea className={c.styles.listArea()}>
+        <ScrollArea.Viewport asChild>
+          {part(
+            'div',
+            asChild,
+            asChild && isValidElement(children) ? cloneElement(children, {}, items) : items,
+            mergeProps(props, {
+              ...c.listLabel,
+              id: ids.listbox,
+              role: 'listbox',
+              'aria-multiselectable': c.state.multiple || undefined,
+              'aria-activedescendant':
+                owner && s.activeValue !== undefined ? ids.option(s.activeValue) : undefined,
+              tabIndex: owner ? 0 : undefined,
+              'data-popup-autofocus': owner ? '' : undefined,
+              onKeyDown: owner
+                ? (event: KeyboardEvent<HTMLElement>) => c.select.onKeyDown(event, 'list')
+                : undefined,
+              className: c.styles.listbox({ className }),
+            }),
+          )}
+        </ScrollArea.Viewport>
+      </ScrollArea>
       {empty.length ? empty : <SelectEmpty />}
     </>
   );
@@ -702,6 +707,7 @@ export namespace Select {
       more: 'shrink-0 text-(--ids-color-on-muted)',
       icon: 'inline-flex shrink-0 text-(--ids-color-on-muted)',
       clear: fieldAction.base,
+      listArea: listStyles.listArea,
       listbox: listStyles.list,
       item: listStyles.option,
       indicator: listStyles.indicator,

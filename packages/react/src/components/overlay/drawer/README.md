@@ -59,7 +59,8 @@ import { Drawer } from '@gsainfoteam/ids-react';
 <Drawer.Content className="w-[min(40rem,calc(100%-2rem))]" /> // 크기는 className 으로
 ```
 
-- 크기 prop 은 없습니다. 내용이 길면 패널 안에서 스크롤합니다.
+- 크기 prop 은 없습니다. 내용이 길면 패널 안에서 스크롤합니다. 막대는 OS 막대가 아니라 [ScrollArea](../../layout/scroll-area/README.md) 의 `hover` 막대라 둥근 모서리 안쪽에 섭니다.
+- `Drawer.Content` 가 ScrollArea root 이고 padding 과 `gap` 은 안쪽 viewport 가 가집니다. `className` 의 `p-*`, `gap-*` 는 root 에 붙으므로, 여백을 바꾸려면 안쪽에 요소를 두고 거기에 줍니다.
 - `bottom` 패널은 화면 키보드가 덮는 만큼 올라갑니다. 필드의 시트와 같은 `sheet-viewport.ts` 를 씁니다.
 - 여백은 `concentric-p-6` 입니다. `bottom`, `top` 은 그 여백에 safe area(`env(safe-area-inset-*)`)를 더합니다. `className` 으로 `concentric-p-4` 를 줘도 화면 쪽 모서리는 각진 채로 남습니다.
 
@@ -73,6 +74,7 @@ import { Drawer } from '@gsainfoteam/ids-react';
   - 입력 요소(`input`, `textarea`, `select`, `contenteditable`)에서 시작했을 때
   - 글자를 선택해 둔 채로 눌렀을 때
   - `data-drawer-no-drag` 가 붙은 요소 안에서 시작했을 때(지도, 캔버스, 슬라이더 영역)
+  - ScrollArea 의 막대(`data-scroll-area-scrollbar`)에서 시작했을 때. 막대를 끌면 내용이 스크롤됩니다.
   - 안에 뜬 다른 레이어(Select 시트, Popover)에서 시작했을 때
 - 터치가 취소되면(`pointercancel`) 제자리로 돌아갑니다.
 - `dismissible={false}` 면 끌어도 닫히지 않고 돌아옵니다.

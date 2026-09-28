@@ -16,11 +16,14 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 import { useDialog } from './use-dialog';
 import { messages } from '../../../internal/messages';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
-import { flattenFragments, invariant, mergeProps, part, tv } from '../../../utils';
+import { cn, flattenFragments, invariant, mergeProps, part, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { ScrollArea } from '../../layout/scroll-area';
 import { Slot } from '../../utility/slot';
+
+const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');
 
 type Context = {
   dialog: ReturnType<typeof useDialog>;
@@ -125,27 +128,33 @@ function DialogPopup({ className, style, children, ...props }: Dialog.Content.Pr
         if (c.dismissible) dialog.setOpen(false);
       }}
     >
-      <div
-        {...props}
-        popover="manual"
-        id={ids.content}
-        role={c.role}
-        aria-modal="true"
-        aria-labelledby={labelledBy}
-        aria-describedby={props['aria-describedby'] ?? (c.described ? ids.description : undefined)}
-        tabIndex={-1}
-        data-dialog-content=""
-        data-open={open ? '' : undefined}
-        data-ending-style={ending ? '' : undefined}
-        data-nested-open={position.covered ? '' : undefined}
-        className={styles.content({ className })}
-        style={style}
-      >
-        <OverlayItemContext value={null}>
-          {children}
-          {!c.hideClose && <Dialog.Close className={styles.close()} />}
-        </OverlayItemContext>
-      </div>
+      <ScrollArea asChild>
+        <div
+          {...props}
+          popover="manual"
+          id={ids.content}
+          role={c.role}
+          aria-modal="true"
+          aria-labelledby={labelledBy}
+          aria-describedby={
+            props['aria-describedby'] ?? (c.described ? ids.description : undefined)
+          }
+          tabIndex={-1}
+          data-dialog-content=""
+          data-open={open ? '' : undefined}
+          data-ending-style={ending ? '' : undefined}
+          data-nested-open={position.covered ? '' : undefined}
+          className={styles.content({ className })}
+          style={style}
+        >
+          <ScrollArea.Viewport className={styles.viewport()}>
+            <OverlayItemContext value={null}>
+              {children}
+              {!c.hideClose && <Dialog.Close className={styles.close()} />}
+            </OverlayItemContext>
+          </ScrollArea.Viewport>
+        </div>
+      </ScrollArea>
     </ModalLayer>
   );
 }
@@ -313,13 +322,14 @@ export namespace Dialog {
         'motion-reduce:transition-none',
       ],
       content: [
-        'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm flex-col gap-4',
-        'overflow-y-auto overscroll-contain concentric-p-6 outline-none',
+        'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm flex-col outline-none',
+        cornerOfThePaddedViewport,
         'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-lg',
         'transition-[opacity,scale] duration-(--ids-motion-normal) ease-out',
         'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
         'data-nested-open:scale-[0.96] motion-reduce:transition-none',
       ],
+      viewport: 'relative flex flex-col gap-4 overscroll-contain p-6',
       header: 'flex flex-col gap-1.5 pe-8 text-start',
       title: 'text-subtitle-s1-semibold [overflow-wrap:anywhere]',
       description: 'text-body-b3-regular text-(--ids-color-on-muted)',

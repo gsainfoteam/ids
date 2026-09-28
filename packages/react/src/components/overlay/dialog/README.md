@@ -55,7 +55,8 @@ import { Dialog } from '@gsainfoteam/ids-react';
 <Dialog.Content className="max-w-2xl" /> // 폭과 높이는 className 으로
 ```
 
-- 크기 prop 은 없습니다. 본문이 화면보다 길면 대화상자 안에서 스크롤합니다.
+- 크기 prop 은 없습니다. 본문이 화면보다 길면 대화상자 안에서 스크롤합니다. 막대는 OS 막대가 아니라 [ScrollArea](../../layout/scroll-area/README.md) 의 `hover` 막대라 둥근 모서리 안쪽에 섭니다.
+- `Dialog.Content` 가 ScrollArea root 이고 padding 과 `gap` 은 안쪽 viewport 가 가집니다. `className` 의 `p-*`, `gap-*` 는 root 에 붙으므로, 여백을 바꾸려면 안쪽에 요소를 두고 거기에 줍니다.
 
 ## 열고 닫기
 

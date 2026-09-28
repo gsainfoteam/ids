@@ -229,6 +229,15 @@ root: 'concentric-p-3 px-4',   // asymmetric: radius follows the concentric valu
 
 Do not hardcode `rounded-[14px]`, and do not pair `p-*` with a hand-computed radius.
 
+**Anything that scrolls goes through `ScrollArea`.** A component that scrolls inside itself (a
+popup list, a menu, a dialog body) never shows the OS scrollbar: make the scrolling element a
+`ScrollArea.Viewport` (with `asChild` when it is a listbox) or the rounded container itself the
+`ScrollArea` root with `asChild`. A padded root keeps its corner from `concentric-p-*` and hands
+the padding to the viewport (`concentric-p-1 p-0` on the root, `p-1` on the viewport), and a
+scroll area sitting in a rounded container's corner takes that corner with `rounded-[inherit]`,
+since the bar ends are inset from the root's own computed radius. The native `<textarea>` is the
+one exception.
+
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
 `--ids-color-border` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry

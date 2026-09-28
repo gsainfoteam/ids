@@ -154,5 +154,5 @@ const color = await overlay.open<string>(({ close }) => (
 ## 알아둘 것
 
 - 패널은 제자리에 렌더하고 브라우저의 top layer 에 올립니다. 부모의 `overflow`, `transform` 에 잘리지 않고, 가까운 `IdsProvider` 의 theme 과 form 을 그대로 씁니다.
-- `Popover.Content` 는 넘치는 내용을 자르지 않습니다(화살표가 밖으로 나와야 합니다). 긴 목록은 안쪽 요소에 `max-h-*` 와 `overflow-y-auto` 를 줍니다.
+- `Popover.Content` 는 넘치는 내용을 자르지 않습니다(화살표가 밖으로 나와야 합니다). 긴 목록은 안쪽에 `max-h-*` 를 준 [ScrollArea](../../layout/scroll-area/README.md) 를 둡니다. 막대가 OS 막대 대신 IDS 막대로 그려집니다.
 - 역할은 `dialog` 입니다. modal 일 때만 `aria-modal="true"` 가 붙습니다.

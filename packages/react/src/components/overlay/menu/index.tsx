@@ -55,6 +55,7 @@ import {
 import { mergeProps, mergeRefs, part } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Divider } from '../../layout/divider';
+import { ScrollArea } from '../../layout/scroll-area';
 import { Kbd } from '../../typography/kbd';
 
 function usePlacement(level: MenuLevel, { side, align, sideOffset, alignOffset }: MenuPlacement) {
@@ -264,46 +265,52 @@ function MenuPopup({ level, name, className, style, children, ...props }: PopupP
   const navigate = floating.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined;
   const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined;
 
+  const styles = menuStyle({ nested: level.nested });
+
   return (
-    <div
-      {...mergeProps(props, {
-        ...floating,
-        ...(named ? {} : name),
-        ref: level.setContent,
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-          const ownMenu = (event.target as Element).closest('[data-menu-content]');
-          if (ownMenu !== event.currentTarget) return;
+    <ScrollArea asChild>
+      <div
+        {...mergeProps(props, {
+          ...floating,
+          ...(named ? {} : name),
+          ref: level.setContent,
+          onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
+            const ownMenu = (event.target as Element).closest('[data-menu-content]');
+            if (ownMenu !== event.currentTarget) return;
 
-          if (event.key === 'Tab') {
-            event.preventDefault();
-            root.closeTree({ returnFocus: true });
-            return;
-          }
+            if (event.key === 'Tab') {
+              event.preventDefault();
+              root.closeTree({ returnFocus: true });
+              return;
+            }
 
-          navigate?.(event);
-        },
-      })}
-      popover="manual"
-      id={level.ids.content}
-      role="menu"
-      tabIndex={-1}
-      data-menu-content=""
-      data-nested={level.nested ? '' : undefined}
-      data-side={level.anchored.side}
-      data-align={level.anchored.align}
-      data-open={level.open ? '' : undefined}
-      data-ending-style={level.ending ? '' : undefined}
-      className={menuStyle({ nested: level.nested }).content({ className })}
-      style={{ ...style, ...level.anchored.floatingStyles }}
-    >
-      <OverlayItemContext value={null}>
-        <ContentContext value={level}>
-          <FloatingList elementsRef={level.elementsRef} labelsRef={level.labelsRef}>
-            {children}
-          </FloatingList>
-        </ContentContext>
-      </OverlayItemContext>
-    </div>
+            navigate?.(event);
+          },
+        })}
+        popover="manual"
+        id={level.ids.content}
+        role="menu"
+        tabIndex={-1}
+        data-menu-content=""
+        data-nested={level.nested ? '' : undefined}
+        data-side={level.anchored.side}
+        data-align={level.anchored.align}
+        data-open={level.open ? '' : undefined}
+        data-ending-style={level.ending ? '' : undefined}
+        className={styles.content({ className })}
+        style={{ ...style, ...level.anchored.floatingStyles }}
+      >
+        <ScrollArea.Viewport className={styles.viewport()}>
+          <OverlayItemContext value={null}>
+            <ContentContext value={level}>
+              <FloatingList elementsRef={level.elementsRef} labelsRef={level.labelsRef}>
+                {children}
+              </FloatingList>
+            </ContentContext>
+          </OverlayItemContext>
+        </ScrollArea.Viewport>
+      </div>
+    </ScrollArea>
   );
 }
 

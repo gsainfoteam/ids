@@ -14,10 +14,10 @@ export const listStyles = {
     'pointer-events-none absolute end-2.5 flex items-center justify-center',
     '[&_svg]:size-(--ids-size-icon-standard)',
   ),
+  listArea: cn('-mx-1 rounded-[inherit]'),
   list: cn(
     offsetParentOfOptions,
-    '-mx-1 flex min-h-0 flex-col overflow-x-hidden overflow-y-auto overscroll-contain px-1',
-    'outline-none [overflow-anchor:none]',
+    'flex flex-col overscroll-contain px-1 outline-none [overflow-anchor:none]',
   ),
   heading: cn('px-2.5 pt-2 pb-1 text-caption-c1-medium text-(--ids-color-on-muted)'),
   separator: cn('-mx-1 my-1 w-auto'),
