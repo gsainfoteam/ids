@@ -120,10 +120,10 @@ export function TelField({
             className={styles.adornment()}
           />
         </div>
-        {field.name && (
+        {field.hiddenInputName && (
           <input
             type="hidden"
-            name={field.name}
+            name={field.hiddenInputName}
             form={field.form}
             value={field.value}
             disabled={state.disabled}
@@ -169,7 +169,7 @@ export namespace TelField {
   export function Input({ asChild, children, className, style }: InputProps) {
     const { field, styles } = useTelContext('Input');
     const { inputProps } = field;
-    const props = {
+    const finalProps = {
       ...inputProps,
       className: styles.input({ className: cn(inputProps.className, className) }),
       style: inputProps.style || style ? { ...inputProps.style, ...style } : undefined,
@@ -181,13 +181,13 @@ export namespace TelField {
           (typeof children.type !== 'string' || children.type === 'input'),
         '`<TelField.Input asChild>` requires one input, or a component forwarding input props and ref.',
       );
-      return cloneElement(children, props);
+      return cloneElement(children, finalProps);
     }
     invariant(
       children == null,
       '`<TelField.Input>` takes no children; set `value`/`defaultValue` on `<TelField>`.',
     );
-    return <input {...props} />;
+    return <input {...finalProps} />;
   }
 
   export function CountrySelect({
