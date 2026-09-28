@@ -1,68 +1,48 @@
+import Big from 'big.js';
 import { clamp } from 'es-toolkit';
 
-type Decimal = { digits: bigint; scale: number };
-
-function toDecimal(value: number): Decimal {
-  const [mantissa, exponent = '0'] = value.toString().split('e');
-  const fraction = mantissa.split('.')[1]?.length ?? 0;
-  return { digits: BigInt(mantissa.replace('.', '')), scale: fraction - Number(exponent) };
-}
-
-function atScale({ digits, scale }: Decimal, target: number) {
-  return digits * 10n ** BigInt(target - scale);
-}
-
-function fromDigits(digits: bigint, scale: number) {
-  return Number(`${digits}e${-scale}`);
-}
-
-function floorDiv(a: bigint, b: bigint) {
-  const quotient = a / b;
-  return a % b !== 0n && a < 0n !== b < 0n ? quotient - 1n : quotient;
-}
-
 export function shiftDecimal(value: number, places: number): number {
-  const [mantissa, exponent = '0'] = value.toString().split('e');
-  return Number(`${mantissa}e${Number(exponent) + places}`);
+  return new Big(value).times(new Big(10).pow(places)).toNumber();
 }
 
 export function addDecimal(left: number, right: number): number {
-  const a = toDecimal(left);
-  const b = toDecimal(right);
-  const scale = Math.max(a.scale, b.scale);
-  return fromDigits(atScale(a, scale) + atScale(b, scale), scale);
+  return new Big(left).plus(right).toNumber();
 }
 
 export function isOnStep(value: number, step: number, base: number) {
-  const v = toDecimal(value);
-  const s = toDecimal(step);
-  const b = toDecimal(base);
-  const scale = Math.max(v.scale, s.scale, b.scale);
-  return (atScale(v, scale) - atScale(b, scale)) % atScale(s, scale) === 0n;
+  return new Big(value).minus(base).mod(step).eq(0);
+}
+
+function stepsBelow(value: number, step: number, base: number) {
+  const offset = new Big(value).minus(base);
+  const size = new Big(step);
+
+  const signedRest = offset.mod(size);
+  const rest = signedRest.lt(0) ? signedRest.plus(size) : signedRest;
+
+  return { floor: offset.minus(rest).div(size), rest, size };
 }
 
 export type SnapMode = 'nearest' | 'up' | 'down';
 
 export function snapToStep(value: number, step: number, base: number, mode: SnapMode) {
-  const v = toDecimal(value);
-  const s = toDecimal(step);
-  const b = toDecimal(base);
-  const scale = Math.max(v.scale, s.scale, b.scale);
-  const offset = atScale(v, scale) - atScale(b, scale);
-  const size = atScale(s, scale);
-  const floor = floorDiv(offset, size);
-  const rest = offset - floor * size;
-  const k =
+  const { floor, rest, size } = stepsBelow(value, step, base);
+
+  const onGrid = rest.eq(0);
+  const pastHalf = rest.times(2).gte(size);
+
+  const count =
     mode === 'up'
-      ? floor + 1n
+      ? floor.plus(1)
       : mode === 'down'
-        ? rest === 0n
-          ? floor - 1n
+        ? onGrid
+          ? floor.minus(1)
           : floor
-        : rest * 2n >= size
-          ? floor + 1n
+        : pastHalf
+          ? floor.plus(1)
           : floor;
-  return fromDigits(atScale(b, scale) + k * size, scale);
+
+  return new Big(base).plus(count.times(size)).toNumber();
 }
 
 function gridValueAtOrBelow(bound: number, step: number, base: number) {

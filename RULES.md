@@ -50,6 +50,8 @@ pnpm storybook        # Storybook for ids-react (port 6006)
     typeahead, menu trees, modal focus, delay groups), used only through `internal/overlay`;
   - focus order `tabbable`, scroll lock `react-remove-scroll`;
   - dates `date-fns`, numbers `@internationalized/number`, colors `culori`;
+  - decimal arithmetic `big.js`, so a step of `0.1` lands on `0.3` and not `0.30000000000000004`;
+    only the step rules themselves (snap up, down or to the nearest grid value) are IDS's code;
   - textarea sizing `react-textarea-autosize`, phone numbers `libphonenumber-js`.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:

@@ -472,3 +472,20 @@ test('react-hook-form controlMode="value": numbers in, error focus on the thumb'
   methods.reset({ volume: 70 });
   await expect.poll(now).toEqual([70]);
 });
+
+test('a decimal step lands on exact values and draws one mark per step', async () => {
+  const screen = await render(
+    <Slider aria-label="투명도" min={0} max={1} step={0.1} defaultValue={0} marks />,
+  );
+  const thumb = screen.getByRole('slider', { name: '투명도' });
+
+  await userEvent.click(thumb);
+  await userEvent.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}');
+  await expect.element(thumb).toHaveAttribute('aria-valuenow', '0.3');
+
+  await userEvent.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}{ArrowRight}');
+  await expect.element(thumb).toHaveAttribute('aria-valuenow', '0.7');
+
+  const root = rootOf(thumb);
+  expect(root.querySelectorAll('[aria-hidden="true"] > span')).toHaveLength(11);
+});

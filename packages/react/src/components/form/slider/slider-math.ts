@@ -1,15 +1,11 @@
+import Big from 'big.js';
 import { clamp } from 'es-toolkit';
 
-function decimalsOf(n: number) {
-  const [mantissa, exponent] = String(n).split('e');
-  const fraction = mantissa!.split('.')[1]?.length ?? 0;
-  return fraction + (exponent == null ? 0 : Math.max(0, -Number(exponent)));
-}
-
 export function snap(raw: number, min: number, max: number, step: number) {
-  const stepped = Math.round((raw - min) / step) * step + min;
-  const decimals = Math.min(100, Math.max(decimalsOf(min), decimalsOf(max), decimalsOf(step)));
-  return Number(clamp(stepped, min, max).toFixed(decimals));
+  const steps = new Big(raw).minus(min).div(step).round(0, Big.roundHalfUp);
+  const stepped = steps.times(step).plus(min).toNumber();
+
+  return clamp(stepped, min, max);
 }
 
 export function percentOf(value: number, min: number, max: number) {
@@ -54,6 +50,9 @@ export function moveThumb(
 }
 
 export function stepMarks(min: number, max: number, step: number) {
-  const count = Math.floor((max - min) / step + 1e-9) + 1;
-  return Array.from({ length: count }, (_, index) => snap(min + index * step, min, max, step));
+  const gaps = new Big(max).minus(min).div(step).round(0, Big.roundDown).toNumber();
+
+  return Array.from({ length: gaps + 1 }, (_, index) =>
+    new Big(step).times(index).plus(min).toNumber(),
+  );
 }
