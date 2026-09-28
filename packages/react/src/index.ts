@@ -129,6 +129,8 @@ export type {
   CalendarProps,
   CalendarOptions,
   CalendarState,
+  CalendarDayState,
+  DateMatcher,
   DateRange,
 } from './components/data/calendar';
 

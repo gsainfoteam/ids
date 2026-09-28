@@ -2,17 +2,18 @@
 
 날짜를 한 달 단위 격자로 보여 주고 하루, 기간, 여러 날을 고르게 하는 달력입니다. [react-day-picker](https://daypicker.dev) 위에 IDS 모양과 값 규칙을 얹었습니다.
 
-- **세 가지 선택.** `single`, `range`, `multiple` 에 탐색만 하는 `none` 까지. 값은 native `Date` 입니다.
+- **세 가지 선택.** `single`, `range`, `multiple` 에 탐색만 하는 `none` 까지. 값은 [`@internationalized/date`](https://react-spectrum.adobe.com/internationalized/date/CalendarDate.html) 의 `CalendarDate` 입니다. 시간과 시간대가 없어서 로컬 시간대가 날짜를 하루 밀지 못합니다.
 - **기간 미리 보기.** 시작을 고른 뒤에는 포인터나 키보드 포커스가 있는 날까지 기간이 미리 그려집니다.
 - **빠른 이동.** `captionLayout="dropdown"` 이면 연도와 월을 목록에서 바로 고릅니다. 생년월일처럼 먼 날짜도 몇 번 만에 갑니다.
 - **WAI-ARIA 격자 키보드.** react-day-picker 의 키보드 그대로입니다. 막힌 날은 건너뛰고, 오른쪽에서 왼쪽으로 쓰는 문서에서는 좌우가 뒤집힙니다.
 - **Intl locale.** 월, 요일 이름, 날짜 숫자, 주 시작 요일을 브라우저의 `Intl` 로 그립니다. `locale` 은 BCP 47 태그이고, 어떤 언어든 import 없이 됩니다. 기본은 한국어입니다.
-- **react-day-picker 확장.** `components`, `modifiers`, `formatters`, `labels`, `footer` 를 그대로 받습니다.
+- **날짜 칸 꾸미기.** `modifiers` 로 날짜에 이름을 붙이고 `renderDay` 로 칸의 내용을 바꿉니다. 모양, 포커스, 상태 속성은 IDS 가 그립니다.
 
 ```tsx
+import { CalendarDate } from '@internationalized/date';
 import { Calendar } from '@gsainfoteam/ids-react';
 
-const [date, setDate] = useState<Date | null>(null);
+const [date, setDate] = useState<CalendarDate | null>(null);
 
 <Calendar value={date} onValueChange={setDate} />;
 ```
@@ -20,16 +21,18 @@ const [date, setDate] = useState<Date | null>(null);
 ## 선택
 
 ```tsx
-<Calendar value={date} onValueChange={setDate} />                              // single(기본): Date | null
+<Calendar value={date} onValueChange={setDate} />                              // single(기본): CalendarDate | null
 <Calendar selectionMode="range" value={range} onValueChange={setRange} />      // DateRange | null
-<Calendar selectionMode="multiple" value={dates} onValueChange={setDates} />   // Date[]
+<Calendar selectionMode="multiple" value={dates} onValueChange={setDates} />   // CalendarDate[]
 <Calendar selectionMode="none" value={meeting} />                              // 표시만. 고를 수 없다
 
-<Calendar defaultValue={new Date(2026, 8, 15)} />                              // 비제어
+<Calendar defaultValue={new CalendarDate(2026, 9, 15)} />                      // 비제어. 월은 1부터
 ```
 
+- 값을 만들려면 앱도 `@internationalized/date` 를 설치합니다. IDS 는 다시 내보내지 않습니다. 오늘은 `today(getLocalTimeZone())` 입니다.
+- 값은 `instanceof` 가 아니라 모양(`year`, `month`, `day`, `calendar.identifier`, `compare`)으로 검사합니다. 다른 버전의 패키지여도 되고, `Date` 나 문자열은 오류입니다.
+- 그레고리력(`gregory`)만 받습니다. 다른 달력의 날짜는 `toCalendar(date, new GregorianCalendar())` 로 바꿔 넘깁니다. 다른 달력으로 보여 주기만 하려면 `locale="ja-JP-u-ca-japanese"` 처럼 태그에 적습니다.
 - `onValueChange` 는 값이 바뀔 때만 부릅니다. 이미 고른 날을 다시 눌러도 부르지 않습니다.
-- 새로 고른 날은 로컬 자정 `Date` 입니다. 넘겨받은 `Date` 를 고치거나 UTC로 바꾸지 않습니다.
 - `multiple` 에서 고른 날을 다시 누르면 빠집니다.
 
 ## 기간
@@ -52,10 +55,10 @@ const [range, setRange] = useState<DateRange | null>(null);
 
 ```tsx
 <Calendar captionLayout="dropdown" />                               // 제목 대신 연도, 월 목록
-<Calendar captionLayout="dropdown" min={new Date(1920, 0, 1)} max={new Date()} />
+<Calendar captionLayout="dropdown" min={new CalendarDate(1920, 1, 1)} max={today(getLocalTimeZone())} />
 <Calendar monthsToShow={2} />                                       // 1~12. 이전은 첫 달, 다음은 마지막 달에만
-<Calendar defaultMonth={new Date(2026, 8, 1)} />                    // 처음 보일 달
-<Calendar month={month} onMonthChange={setMonth} />                 // 보이는 달을 제어. 그 달 1일을 준다
+<Calendar defaultMonth={new CalendarDate(2026, 9, 1)} />            // 처음 보일 달
+<Calendar month={month} onMonthChange={setMonth} />                 // 보이는 달을 제어. 그 달 1일의 CalendarDate
 ```
 
 - 처음 보이는 달은 `defaultMonth`, 첫 선택 날, 오늘 순서이고 min/max 안으로 들어옵니다.
@@ -69,17 +72,27 @@ const [range, setRange] = useState<DateRange | null>(null);
 
 ```tsx
 <Calendar
-  min={new Date(2026, 0, 1)}                   // 양 끝 포함. min === max 도 된다
-  max={new Date(2026, 11, 31)}
-  disabled={{ dayOfWeek: [0, 6] }}             // react-day-picker matcher
+  min={new CalendarDate(2026, 1, 1)}           // 양 끝 포함. min === max 도 된다
+  max={new CalendarDate(2026, 12, 31)}
+  disabled={{ dayOfWeek: [0, 6] }}             // DateMatcher
 />
 <Calendar disabled={(date) => isHoliday(date)} />
-<Calendar disabled={[new Date(2026, 8, 17), { from: start, to: end }]} />
+<Calendar disabled={[new CalendarDate(2026, 9, 17), { start, end }]} />
 <Calendar disabled />                          // 전체를 막는다. 이동, 선택, Tab 진입 모두
 <Calendar readOnly value={date} />             // 이동은 되고 선택은 안 된다
 ```
 
-- `disabled` 는 [matcher](https://daypicker.dev/api/type-aliases/Matcher) 하나나 배열입니다. 함수, 날짜, 날짜 배열, `{ from, to }`, `{ before }`, `{ after }`, `{ dayOfWeek }` 를 받습니다.
+| `DateMatcher`                               | 막는 날                                     |
+| ------------------------------------------- | ------------------------------------------- |
+| `CalendarDate` / `CalendarDate[]`           | 그 날 / 그 날들                             |
+| `{ start, end }`                            | 양 끝을 포함한 기간                         |
+| `{ before }` / `{ after }`                  | 그 날보다 앞 / 뒤. 그 날은 빠진다           |
+| `{ after, before }`                         | 둘 사이. 두 조건을 모두 채우는 날           |
+| `{ dayOfWeek: 0 }` / `{ dayOfWeek: [0, 6] }` | 요일. `0` 이 일요일                         |
+| `(date: CalendarDate) => boolean`           | `true` 를 돌려준 날                         |
+| `true` / `false`                            | 모두 / 없음                                 |
+
+- `disabled` 는 `DateMatcher` 하나나 배열입니다. 배열이면 하나라도 맞는 날을 막습니다.
 - 막힌 날은 native `disabled` 버튼이라 클릭도 키보드도 닿지 않습니다. 날짜 버튼에 `data-disabled` 가 붙습니다.
 
 ## 키보드
@@ -127,32 +140,34 @@ const [range, setRange] = useState<DateRange | null>(null);
 - 주 시작은 locale 에서 구합니다(`@internationalized/date` 의 `getDayOfWeek`). `weekStartsOn` 이 있으면 그쪽이 먼저입니다.
 - 이전/다음 달 버튼, 연도/월 목록, 주차 이름은 IDS 메시지(한국어)입니다. 날짜, 격자, 요일 이름은 locale 을 따르고 영어로 새지 않습니다.
 - 날짜 버튼 이름은 `오늘, 2026년 9월 15일 화요일, 선택됨` 처럼 오늘과 선택 여부를 함께 읽습니다.
-- `formatters` 와 `labels` 로 넘긴 것은 Intl 로 만든 것 위에 덮입니다.
 
-## 부분 바꾸기
+## 날짜 칸 꾸미기
 
 ```tsx
-function EventDay(props: Calendar.DayButtonProps) {
-  return (
-    <Calendar.DayButton {...props}>
-      {props.children}
-      {props.modifiers.event && <span className="size-1 rounded-full bg-current" />}
-    </Calendar.DayButton>
-  );
-}
-
 <Calendar
-  modifiers={{ event: eventDates }} // 날짜에 이름을 붙인다
-  modifiersClassNames={{ event: 'font-bold' }} // 그 이름의 칸에 클래스
-  components={{ DayButton: EventDay }} // react-day-picker 부분 교체
-  formatters={{ formatDay: (date) => `${date.getDate()}` }}
+  modifiers={{ event: eventDates, weekend: { dayOfWeek: [0, 6] } }} // 이름: DateMatcher
+  modifiersClassNames={{ event: 'font-bold' }} // 그 이름의 칸(td)에 클래스
+  renderDay={(day, state) => (
+    <>
+      {day.day}
+      {state.modifiers.event && <span className="size-1 rounded-full bg-current" />}
+    </>
+  )}
   footer="일정 3개" // role="status" 알림 영역
-/>;
+/>
 ```
 
-- `components` 는 [react-day-picker 의 부분](https://daypicker.dev/guides/custom-components)을 바꿉니다. IDS 는 `Root`, `DayButton`, `Chevron`, `Dropdown`, `MonthGrid`, `PreviousMonthButton`, `NextMonthButton` 을 채워 두고, 넘긴 것이 그 위에 덮입니다.
-- `Calendar.DayButton` 을 감싸면 IDS 날짜 모양, 상태 속성, 포커스 이동은 그대로 두고 내용만 바꿉니다.
-- 부분 컴포넌트는 모듈 최상단에 선언합니다. 렌더 안에서 만들면 매번 새 컴포넌트라 날짜가 다시 마운트됩니다.
+- `renderDay` 는 날짜 버튼의 내용만 바꿉니다. 버튼 모양, 포커스 이동, `data-*` 상태, 이름(`aria-label`)은 IDS 가 그대로 그립니다.
+- `renderDay` 를 주면 날짜 숫자도 직접 그립니다. `numerals` 를 따르려면 `Intl.NumberFormat(locale, { numberingSystem })` 로 씁니다.
+
+| `Calendar.DayState`                        | 뜻                                               |
+| ------------------------------------------ | ------------------------------------------------ |
+| `selected`                                 | 선택됨. 기간의 가운데 날도 포함                  |
+| `today` / `outside` / `disabled`           | 오늘 / 앞뒤 달의 날 / 고를 수 없음               |
+| `rangeStart` / `rangeMiddle` / `rangeEnd`  | 기간의 시작 / 가운데 / 끝                        |
+| `modifiers`                                | `modifiers` 로 준 이름마다 그 날이 맞는지(`boolean`) |
+
+- 이름, 요일, 제목 글자는 Intl 로 그립니다([locale](#locale)). react-day-picker 의 `components`, `formatters`, `labels` 는 받지 않습니다.
 
 ## 상태
 
@@ -175,13 +190,13 @@ function EventDay(props: Calendar.DayButtonProps) {
 | --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | `selectionMode`                                                                         | `single`(기본) / `range` / `multiple` / `none`            |
 | `value` / `defaultValue` / `onValueChange`                                              | 모드별 타입. 기본 `null`, `multiple` 은 `[]`              |
-| `min` / `max`                                                                           | 양 끝 포함                                                |
-| `disabled`                                                                              | `true` 면 전체, matcher 면 날짜별                         |
+| `min` / `max`                                                                           | `CalendarDate`. 양 끝 포함                                |
+| `disabled`                                                                              | `true` 면 전체, `DateMatcher` 면 날짜별                   |
 | `readOnly`                                                                              | 이동만                                                    |
 | `captionLayout`                                                                         | `label`(기본) / `dropdown`                                |
 | `monthsToShow`                                                                          | `1`. 1~12                                                 |
-| `month` / `defaultMonth` / `onMonthChange`                                              | 보이는 첫 달                                              |
-| `today`                                                                                 | 오늘 표시와 첫 달의 기준                                  |
+| `month` / `defaultMonth` / `onMonthChange`                                              | 보이는 첫 달. 그 달 1일의 `CalendarDate`                  |
+| `today`                                                                                 | `today(getLocalTimeZone())`. 오늘 표시와 첫 달의 기준     |
 | `locale`                                                                                | `ko-KR`. BCP 47 태그. 루트의 `lang` 이 된다               |
 | `weekStartsOn`                                                                          | locale 의 주 시작. `0`(일) ~ `6`(토)                      |
 | `dir`                                                                                   | 부모 방향                                                 |
@@ -191,13 +206,15 @@ function EventDay(props: Calendar.DayButtonProps) {
 | `fixedWeeks`                                                                            | `true`. 어느 달이든 6주라 높이가 그대로다                 |
 | `showWeekNumber`                                                                        | react-day-picker 그대로                                   |
 | `numerals`                                                                              | locale 의 숫자. Intl `numberingSystem`                    |
-| `modifiers` / `modifiersClassNames` / `components` / `formatters` / `labels` / `footer` | react-day-picker 그대로                                   |
+| `modifiers` / `modifiersClassNames`                                                     | 이름별 `DateMatcher` / 이름별 칸 클래스                   |
+| `renderDay`                                                                             | 날짜 버튼의 내용. `(day, state) => ReactNode`             |
+| `footer`                                                                                | 달력 아래 `role="status"` 알림 영역                       |
 | `className` / `style`                                                                   | 루트. 상태를 받는 함수도 된다                             |
 | 그 외 native 속성, `ref`                                                                | 루트 `div`. 기본 `role="group"`, 이름 `달력`              |
 
 ## 알아둘 것
 
-- 날짜는 로컬 연월일이고 시간은 비교에서 빠집니다. 로컬 날짜는 `new Date(2026, 8, 15)` 로 만듭니다. `new Date('2026-09-15')` 는 UTC 자정이라 시간대에 따라 하루 전날이 됩니다.
+- 값은 시간대가 없는 달력 날짜입니다. react-day-picker 에는 `day-picker-bridge.ts` 에서만 로컬 자정 `Date` 로 바꿔 넘기고, 받는 즉시 되돌립니다. 로컬 시간대를 바꿔도 고른 날은 그대로입니다.
 - 바깥에서 준 `value` 는 min/max 로 자르지 않고, 바뀌어도 보이는 달을 옮기지 않습니다. 필요하면 `month` 도 함께 제어합니다.
 - 서버 렌더링 결과를 클라이언트와 맞추려면 `today` 를 고정합니다.
 - 앞뒤 달의 날을 누르면 그 날을 고르지만 보이는 달은 그대로입니다.

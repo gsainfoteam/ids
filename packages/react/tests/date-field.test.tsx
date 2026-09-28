@@ -1,10 +1,10 @@
 import { Fragment, StrictMode, useState } from 'react';
 
-import { format as formatDate } from 'date-fns';
+import { CalendarDate } from '@internationalized/date';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
-import { expect, test, vi } from 'vitest';
-import { page, userEvent } from 'vitest/browser';
+import { expect, onTestFinished, test, vi } from 'vitest';
+import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { DateField, DateTimeField, Field, type Calendar } from '../src';
@@ -20,9 +20,9 @@ const textBox = () =>
   document.querySelector<HTMLInputElement>('[data-date-field] input[type=text]')!;
 const formData = () => new FormData(document.querySelector('form')!);
 const validator = () => document.querySelector<HTMLInputElement>('[data-form-value-validator]')!;
-const d = (day: number, month = 9) => new Date(2026, month - 1, day);
-const keyOf = (date: Date | null | undefined) => date && formatDate(date, 'yyyy-MM-dd');
-const longDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
+const d = (day: number, month = 9) => new CalendarDate(2026, month, day);
+const keyOf = (date: CalendarDate | null | undefined) => date && date.toString();
+const longDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
 const resetSettles = () => new Promise((resolve) => setTimeout(resolve, 50));
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
@@ -54,8 +54,8 @@ test('SSR: Intl options, format functions, Field labelling and ISO local-date Fo
       'ko-KR',
       '2026년 9월 15일 화요일',
     ],
-    [(date) => longDate.format(date), undefined, 'September 15, 2026'],
-    [(date, locale) => `${locale} ${date.getDate()}`, 'de-DE', 'de-DE 15'],
+    [(date) => longDate.format(date.toDate('UTC')), undefined, 'September 15, 2026'],
+    [(date, locale) => `${locale} ${date.day}`, 'de-DE', 'de-DE 15'],
   ];
   for (const [format, locale, expected] of formats) {
     const doc = parse(
@@ -101,13 +101,13 @@ test('any BCP 47 tag works without an import, and anything else throws', () => {
 });
 
 test('ArrowDown opens on the focused day, limits apply, a pick closes and Clear empties', async () => {
-  const changes: (Date | null)[] = [];
+  const changes: (CalendarDate | null)[] = [];
   const screen = await render(
     <DateField
       today={d(15)}
       min={d(10)}
       max={d(20)}
-      disabled={(date) => date.getDate() === 16}
+      disabled={(date) => date.day === 16}
       onValueChange={(next) => changes.push(next)}
     />,
   );
@@ -203,7 +203,7 @@ test('range stays open, a half-picked range is missing from FormData and fails r
 });
 
 test('multiple toggles, repeats FormData entries, and readOnly/disabled block editing', async () => {
-  const view = (props: { value?: Date[]; readOnly?: boolean; disabled?: boolean }) => (
+  const view = (props: { value?: CalendarDate[]; readOnly?: boolean; disabled?: boolean }) => (
     <form>
       <DateField selectionMode="multiple" today={d(15)} name="dates" {...props} />
     </form>
@@ -235,7 +235,7 @@ test('multiple toggles, repeats FormData entries, and readOnly/disabled block ed
 });
 
 test('native reset restores the default without reporting it, and a cancelled reset does nothing', async () => {
-  const changes: (Date | null)[] = [];
+  const changes: (CalendarDate | null)[] = [];
   const screen = await render(
     <form>
       <DateField name="day" defaultValue={d(15)} onValueChange={(next) => changes.push(next)}>
@@ -351,7 +351,7 @@ test('state reaches className/style functions and data attributes', async () => 
 });
 
 test('react-hook-form value mode: required error focus, Date value, reset and disabled omission', async () => {
-  type Values = { date: Date | null };
+  type Values = { date: CalendarDate | null };
   const submitted = vi.fn();
   let methods!: UseFormReturn<Values>;
   function App({ disabled = false }: { disabled?: boolean }) {
@@ -367,7 +367,7 @@ test('react-hook-form value mode: required error focus, Date value, reset and di
             registerOptions={{ required: 'Required' }}
           >
             <RHFField.Label>Date</RHFField.Label>
-            <DateField today={d(15)} />
+            <DateField name="date" today={d(15)} />
             <RHFField.Error />
           </RHFField>
           <button type="submit">제출</button>
@@ -385,7 +385,9 @@ test('react-hook-form value mode: required error focus, Date value, reset and di
   await userEvent.click(trigger);
   await userEvent.click(day('2026-09-18'));
   await userEvent.click(submit);
-  await expect.poll(() => keyOf(submitted.mock.lastCall?.[0].date)).toBe('2026-09-18');
+  await expect.poll(() => submitted.mock.lastCall?.[0].date).toBeInstanceOf(CalendarDate);
+  expect(keyOf(submitted.mock.lastCall?.[0].date)).toBe('2026-09-18');
+  expect(formData().get('date')).toBe('2026-09-18');
   methods.reset();
   await expect.element(trigger).toMatchTextContent('날짜 선택');
   methods.setValue('date', d(20));
@@ -408,7 +410,11 @@ test('popup width is anchored to the whole field and ignores descendant scrolls'
         defaultValue={[d(15)]}
         style={{ width: 700 }}
       />,
-      <DateTimeField today={d(15)} defaultValue={d(15)} style={{ width: 700 }} />,
+      <DateTimeField
+        today={new Date(2026, 8, 15)}
+        defaultValue={new Date(2026, 8, 15)}
+        style={{ width: 700 }}
+      />,
     ]) {
       const screen = await render(component);
       const trigger = screen.getByRole('combobox');
@@ -457,7 +463,7 @@ test('parts: none gives Trigger and Clear, given parts are drawn as given, Trigg
 });
 
 test('Clear is a ghost IconButton in the field size that keeps its tab stop and its asChild look', async () => {
-  const changes: (Date | null)[] = [];
+  const changes: (CalendarDate | null)[] = [];
   const screen = await render(
     <DateField defaultValue={d(15)} size="tiny" onValueChange={(next) => changes.push(next)} />,
   );
@@ -753,7 +759,7 @@ test('parts split across Fragments render without duplicate keys', async () => {
   const error = vi.spyOn(console, 'error').mockImplementation(() => {});
   try {
     await render(
-      <DateField aria-label="Day" defaultValue={new Date(2026, 8, 15)}>
+      <DateField aria-label="Day" defaultValue={d(15)}>
         <Fragment>
           <DateField.Trigger />
         </Fragment>
@@ -768,5 +774,37 @@ test('parts split across Fragments render without duplicate keys', async () => {
     ).toEqual([]);
   } finally {
     error.mockRestore();
+  }
+});
+
+test('the local time zone shifts neither the shown day nor the day the calendar selects', async () => {
+  onTestFinished(async () => {
+    await cdp().send('Emulation.setTimezoneOverride', { timezoneId: '' });
+  });
+  for (const timezoneId of ['Pacific/Kiritimati', 'Pacific/Pago_Pago']) {
+    await cdp().send('Emulation.setTimezoneOverride', { timezoneId });
+    expect(Intl.DateTimeFormat().resolvedOptions().timeZone).toBe(timezoneId);
+    const changes: (string | null | undefined)[] = [];
+    const screen = await render(
+      <form>
+        <DateField
+          name="day"
+          defaultValue={d(15)}
+          today={d(15)}
+          format={{ dateStyle: 'full' }}
+          onValueChange={(next) => changes.push(keyOf(next))}
+        />
+      </form>,
+    );
+    const trigger = screen.getByRole('combobox');
+    await expect.element(trigger).toMatchTextContent('2026년 9월 15일 화요일');
+    await userEvent.click(trigger);
+    await expect.element(day('2026-09-15')).toHaveAttribute('data-selected');
+    await expect.element(day('2026-09-15')).toHaveAttribute('data-today');
+    await userEvent.click(day('2026-09-20'));
+    expect(changes).toEqual(['2026-09-20']);
+    await expect.element(trigger).toMatchTextContent('2026년 9월 20일 일요일');
+    expect(formData().get('day')).toBe('2026-09-20');
+    await screen.unmount();
   }
 });

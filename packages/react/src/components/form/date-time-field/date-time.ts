@@ -4,13 +4,16 @@ import {
   isAfter,
   isBefore,
   isSameDay,
+  isValid,
   set,
   startOfDay,
   startOfSecond,
 } from 'date-fns';
+import { dateMatchModifiers, type Matcher } from 'react-day-picker';
 
 import { invariant } from '../../../utils';
-import { dayKey, isBlocked, validDate, type Matcher } from '../../data/calendar/date';
+import { dayKey } from '../../data/calendar/date';
+import { fromLocalDate } from '../../data/calendar/day-picker-bridge';
 import {
   nearestSlot,
   secondsOf,
@@ -19,17 +22,31 @@ import {
   type TimePrecision,
 } from '../../data/time-picker/time';
 
+export type DateTimeMatcher = Matcher;
+
 export type DateTimeLimits = {
   min?: Date;
   max?: Date;
-  disabled?: Matcher | Matcher[];
+  disabled?: DateTimeMatcher | DateTimeMatcher[];
   precision: TimePrecision;
   step: number;
 };
 
+const validDate = (value: unknown): value is Date => value instanceof Date && isValid(value);
+
 export function validateDateTime(value: Date | null | undefined) {
   invariant(value == null || validDate(value), 'DateTimeField: expected a valid Date or null.');
 }
+
+const matcherList = (matchers: DateTimeMatcher | DateTimeMatcher[] | undefined) =>
+  matchers === undefined || matchers === false
+    ? []
+    : Array.isArray(matchers)
+      ? matchers
+      : [matchers];
+
+export const matchesDay = (day: Date, matchers: DateTimeMatcher | DateTimeMatcher[] | undefined) =>
+  dateMatchModifiers(startOfDay(day), matcherList(matchers));
 
 export const timeOf = (date: Date) =>
   new Time(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
@@ -46,7 +63,7 @@ export function withTime(day: Date, seconds: number): Date | null {
 }
 
 export const serializeDateTime = (date: Date, precision: TimePrecision) =>
-  `${dayKey(date)}T${timeKey(timeOf(date), precision)}`;
+  `${dayKey(fromLocalDate(date))}T${timeKey(timeOf(date), precision)}`;
 
 const ceilToWholeSecond = (date: Date) => startOfSecond(addMilliseconds(date, 999));
 
@@ -70,7 +87,7 @@ export function daySlots(day: Date, { min, max, precision, step }: DateTimeLimit
 }
 
 export function dayUnavailable(day: Date, limits: DateTimeLimits): boolean {
-  if (isBlocked(day, { disabled: limits.disabled })) return true;
+  if (!validDate(day) || matchesDay(day, limits.disabled)) return true;
   const bounds = dayBounds(day, limits.min, limits.max);
   if (!bounds) return true;
   const canRunOutOfSlots = !!(bounds.min || bounds.max);

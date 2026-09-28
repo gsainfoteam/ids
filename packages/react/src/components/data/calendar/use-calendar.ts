@@ -1,28 +1,38 @@
 import { createContext, use, useLayoutEffect, useRef, useState } from 'react';
 
 import {
-  addYears,
-  clamp,
   endOfYear,
-  isBefore,
-  isSameDay,
+  getLocalTimeZone,
   startOfMonth,
   startOfYear,
-} from 'date-fns';
-import { maxTime, minTime } from 'date-fns/constants';
+  today as todayIn,
+  type CalendarDate,
+} from '@internationalized/date';
+import { mapValues } from 'es-toolkit';
 
 import {
+  compareDays,
   datesOf,
   emptyValue,
+  isCalendarDate,
   limitMatchers,
-  validDate,
+  ownDate,
+  sameDay,
+  validateDate,
   validateValue,
   type CalendarSelectionMode,
   type CalendarValue,
   type DateLimits,
+  type DateMatcher,
   type DateRange,
-  type Matcher,
 } from './date';
+import {
+  fromDayPickerRange,
+  fromLocalDate,
+  toDayPickerMatcher,
+  toDayPickerRange,
+  toLocalDate,
+} from './day-picker-bridge';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { invariant } from '../../../utils';
 
@@ -31,12 +41,14 @@ import type { DateRange as DayPickerRange } from 'react-day-picker';
 export type CalendarState = {
   value: CalendarValue;
   selectionMode: CalendarSelectionMode;
-  month: Date;
+  month: CalendarDate;
   disabled: boolean;
   readOnly: boolean;
 };
 
-export const CalendarPickContext = createContext<((date: Date) => void) | null>(null);
+export type CalendarModifiers = Record<string, DateMatcher | DateMatcher[] | undefined>;
+
+export const CalendarPickContext = createContext<((date: CalendarDate) => void) | null>(null);
 
 export type UseCalendarOptions = DateLimits & {
   selectionMode: CalendarSelectionMode;
@@ -46,10 +58,10 @@ export type UseCalendarOptions = DateLimits & {
   readOnly: boolean;
   monthsToShow: number;
   weekStartsOn?: number;
-  month?: Date;
-  defaultMonth?: Date;
-  onMonthChange?: (month: Date) => void;
-  today?: Date;
+  month?: CalendarDate;
+  defaultMonth?: CalendarDate;
+  onMonthChange?: (month: CalendarDate) => void;
+  today?: CalendarDate;
   dropdown: boolean;
   dir?: 'ltr' | 'rtl';
 };
@@ -63,19 +75,14 @@ function validateOptions({
   today,
   weekStartsOn,
 }: UseCalendarOptions) {
+  [min, max, month, defaultMonth, today].forEach((date) => validateDate(date));
   invariant(
-    (!min || validDate(min)) && (!max || validDate(max)) && (!min || !max || !isBefore(max, min)),
-    'Calendar: min/max must be valid dates with min <= max.',
+    !min || !max || compareDays(min, max) <= 0,
+    'Calendar: min must not be after max (min <= max).',
   );
   invariant(
     Number.isInteger(monthsToShow) && monthsToShow >= 1 && monthsToShow <= 12,
     'Calendar: monthsToShow must be 1..12.',
-  );
-  invariant(
-    (!month || validDate(month)) &&
-      (!defaultMonth || validDate(defaultMonth)) &&
-      (!today || validDate(today)),
-    'Calendar: month/defaultMonth/today must be valid dates.',
   );
   invariant(
     weekStartsOn === undefined ||
@@ -86,13 +93,17 @@ function validateOptions({
 
 const YEAR_MENU_REACH = 100;
 
-const toDayPicker = (range: DateRange | null): DayPickerRange | undefined =>
-  range?.start ? { from: range.start, to: range.end ?? undefined } : undefined;
-const fromDayPicker = (range: DayPickerRange | undefined): DateRange | null =>
-  range?.from ? { start: range.from, end: range.to ?? null } : null;
+function clampDay(date: CalendarDate, min?: CalendarDate, max?: CalendarDate) {
+  if (min && compareDays(date, min) < 0) return min;
+  if (max && compareDays(date, max) > 0) return max;
+  return date;
+}
+
+const firstOfMonth = (date: CalendarDate) => startOfMonth(ownDate(date));
 
 export function useCalendar(options: UseCalendarOptions) {
   validateOptions(options);
+
   const { selectionMode, min, max, disabled, dropdown } = options;
   const [value, setValue] = useControllableState<CalendarValue>({
     value: options.value,
@@ -100,65 +111,76 @@ export function useCalendar(options: UseCalendarOptions) {
     onValueChange: options.onValueChange,
   });
   validateValue(value, selectionMode);
+
   const pick = use(CalendarPickContext);
   const allDisabled = disabled === true;
   const readOnly = options.readOnly || selectionMode === 'none';
 
-  const [mountedToday] = useState(() => new Date());
+  const [mountedToday] = useState(() => todayIn(getLocalTimeZone()));
   const today = options.today ?? mountedToday;
-  const [month, setMonth] = useControllableState<Date>({
-    value: options.month && startOfMonth(options.month),
-    defaultValue: startOfMonth(
-      options.defaultMonth ??
-        clamp(datesOf(value)[0] ?? today, { start: min ?? minTime, end: max ?? maxTime }),
+  const [month, setMonth] = useControllableState<CalendarDate>({
+    value: options.month && firstOfMonth(options.month),
+    defaultValue: firstOfMonth(
+      options.defaultMonth ?? clampDay(datesOf(value)[0] ?? today, min, max),
     ),
     onValueChange: options.onMonthChange,
   });
 
-  const startMonth = min ?? (dropdown ? startOfYear(addYears(today, -YEAR_MENU_REACH)) : undefined);
-  const endMonth = max ?? (dropdown ? endOfYear(addYears(today, YEAR_MENU_REACH)) : undefined);
+  const menuStart = startOfYear(ownDate(today).subtract({ years: YEAR_MENU_REACH }));
+  const menuEnd = endOfYear(ownDate(today).add({ years: YEAR_MENU_REACH }));
+  const startMonth = min ?? (dropdown ? menuStart : undefined);
+  const endMonth = max ?? (dropdown ? menuEnd : undefined);
 
-  const change = (next: CalendarValue, day: Date) => {
+  const change = (next: CalendarValue, day: CalendarDate) => {
     if (readOnly || allDisabled) return;
+
     setValue(next);
     pick?.(day);
   };
+
   const selection =
     selectionMode === 'range'
       ? {
           mode: 'range' as const,
           required: true as const,
           resetOnSelect: true,
-          selected: toDayPicker(value as DateRange | null),
-          onSelect: (range: DayPickerRange, day: Date) => change(fromDayPicker(range), day),
+          selected: toDayPickerRange(value as DateRange | null),
+          onSelect: (range: DayPickerRange, day: Date) =>
+            change(fromDayPickerRange(range), fromLocalDate(day)),
         }
       : selectionMode === 'multiple'
         ? {
             mode: 'multiple' as const,
-            selected: value as Date[],
-            onSelect: (dates: Date[] | undefined, day: Date) => change(dates ?? [], day),
+            selected: (value as CalendarDate[]).map(toLocalDate),
+            onSelect: (dates: Date[] | undefined, day: Date) =>
+              change((dates ?? []).map(fromLocalDate), fromLocalDate(day)),
           }
         : {
             mode: 'single' as const,
             required: true as const,
-            selected: (value as Date | null) ?? undefined,
-            onSelect: (_: Date, day: Date) =>
-              change(value instanceof Date && isSameDay(value, day) ? value : day, day),
+            selected: isCalendarDate(value) ? toLocalDate(value) : undefined,
+            onSelect: (_: Date, day: Date) => {
+              const picked = fromLocalDate(day);
+              change(isCalendarDate(value) && sameDay(value, picked) ? value : picked, picked);
+            },
           };
 
-  const [hovered, setHovered] = useState<Date | null>(null);
-  const [focused, setFocused] = useState<Date | null>(null);
+  const [hovered, setHovered] = useState<CalendarDate | null>(null);
+  const [focused, setFocused] = useState<CalendarDate | null>(null);
   const range = selectionMode === 'range' ? (value as DateRange | null) : null;
   const previewEnd = range?.start && !range.end && !readOnly ? (hovered ?? focused) : null;
   const preview =
-    range?.start && previewEnd && !isSameDay(range.start, previewEnd)
-      ? isBefore(previewEnd, range.start)
-        ? { from: previewEnd, to: range.start }
-        : { from: range.start, to: previewEnd }
+    range?.start && previewEnd && !sameDay(range.start, previewEnd)
+      ? compareDays(previewEnd, range.start) < 0
+        ? { from: toLocalDate(previewEnd), to: toLocalDate(range.start) }
+        : { from: toLocalDate(range.start), to: toLocalDate(previewEnd) }
       : undefined;
   const letPreviewFollowFocus = () => setHovered(null);
-  const modifiers = (own?: Record<string, Matcher | Matcher[] | undefined>) => ({
-    ...own,
+
+  const modifiers = (own: CalendarModifiers = {}) => ({
+    ...mapValues(own, (matchers) =>
+      matchers === undefined ? false : toDayPickerMatcher(matchers),
+    ),
     ...(preview && {
       range_preview: preview,
       range_preview_start: preview.from,
@@ -171,6 +193,7 @@ export function useCalendar(options: UseCalendarOptions) {
   useLayoutEffect(() => {
     const parent = rootRef.current?.parentElement;
     if (!parent) return;
+
     const direction =
       getComputedStyle(parent).direction || parent.closest('[dir]')?.getAttribute('dir');
     setInherited(direction === 'rtl' ? 'rtl' : undefined);
@@ -189,14 +212,16 @@ export function useCalendar(options: UseCalendarOptions) {
     rootRef,
     dir: options.dir ?? inherited,
     selection,
-    setMonth,
-    startMonth,
-    endMonth,
-    disabled: limitMatchers({ min, max, disabled }),
+    today: toLocalDate(today),
+    month: toLocalDate(month),
+    setMonth: (next: Date) => setMonth(fromLocalDate(next)),
+    startMonth: startMonth && toLocalDate(startMonth),
+    endMonth: endMonth && toLocalDate(endMonth),
+    disabled: toDayPickerMatcher(limitMatchers({ min, max, disabled })),
     modifiers,
-    onDayMouseEnter: (day: Date) => setHovered(day),
+    onDayMouseEnter: (day: Date) => setHovered(fromLocalDate(day)),
     onGridMouseLeave: () => setHovered(null),
-    onDayFocus: (day: Date) => setFocused(day),
+    onDayFocus: (day: Date) => setFocused(fromLocalDate(day)),
     onDayBlur: () => setFocused(null),
     onDayKeyDown: letPreviewFollowFocus,
   };

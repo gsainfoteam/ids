@@ -43,6 +43,8 @@ import { DateTimeField, Field } from '@gsainfoteam/ids-react';
 ```
 
 - 막힌 날을 보고 있으면 시계가 막히고 `고를 수 있는 날짜를 먼저 고르세요.` 가 나옵니다.
+- DateTimeField 는 아직 `Date` 값입니다. `disabled` 와 `modifiers` 도 `Date` 를 받는 matcher(`(date: Date) => boolean`, `Date`, `{ from, to }`, `{ before }`, `{ after }`, `{ dayOfWeek }`)이고, 달력 옵션 중 `month`, `defaultMonth`, `onMonthChange`, `today` 도 `Date` 입니다. 달력에는 `CalendarDate` 로 바꿔 넘깁니다.
+- `renderDay` 는 [Calendar](../../data/calendar/README.md#날짜-칸-꾸미기) 와 같아서 `CalendarDate` 를 받습니다.
 
 ## 표시 형식
 

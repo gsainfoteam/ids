@@ -2,15 +2,16 @@
 
 누르면 달력이 열리고, 고른 날짜를 필드에 보여 주는 날짜 입력입니다.
 
-- **하루, 기간, 여러 날.** `selectionMode` 로 고르고, 값은 로컬 날짜 `Date` 입니다.
+- **하루, 기간, 여러 날.** `selectionMode` 로 고르고, 값은 `@internationalized/date` 의 `CalendarDate` 입니다. 시간대가 없어서 로컬 시간대가 날짜를 밀지 못합니다.
 - **키보드 그대로.** Trigger에서 `↓` 로 열면 고른 날(없으면 오늘)에 포커스가 가고, 하루를 고르면 닫히며 포커스가 Trigger로 돌아옵니다.
 - **글자로 입력.** `DateField.Input` 을 넣으면 `2026. 09. 15.`, `2026년 9월 15일`, `20260915` 처럼 쳐서 넣을 수 있습니다. 읽고 쓰는 일은 브라우저의 `Intl` 이 합니다.
 - **어떤 locale 이든.** `locale` 은 BCP 47 태그(`'ja-JP'`, `'de-DE'`)이고 import 할 locale 데이터가 없습니다.
 - **폼.** `name` 을 주면 ISO 날짜가 FormData에 들어가고, `required` 인데 비어 있으면 브라우저가 제출을 막고 Trigger로 포커스를 옮깁니다. `reset` 은 `defaultValue` 로 되돌립니다.
-- **react-hook-form, TanStack Form.** `controlMode="value"` 나 `value` / `onValueChange` 로 Date 값을 그대로 주고받습니다.
+- **react-hook-form, TanStack Form.** `controlMode="value"` 나 `value` / `onValueChange` 로 `CalendarDate` 값을 그대로 주고받습니다.
 - **달력 기능 그대로.** 제한, 연월 목록, 여러 달, locale, 기간 미리 보기는 [Calendar](../../data/calendar/README.md) 와 같습니다.
 
 ```tsx
+import { CalendarDate } from '@internationalized/date';
 import { DateField, Field } from '@gsainfoteam/ids-react';
 
 <Field>
@@ -24,8 +25,8 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 ```tsx
 <DateField value={date} onValueChange={setDate} />                              // single(기본): 고르면 닫힌다
 <DateField selectionMode="range" value={range} onValueChange={setRange} />      // DateRange | null. 열린 채 고른다
-<DateField selectionMode="multiple" value={dates} onValueChange={setDates} />   // Date[]. 열린 채 고른다
-<DateField defaultValue={new Date(2026, 8, 15)} />                              // 비제어
+<DateField selectionMode="multiple" value={dates} onValueChange={setDates} />   // CalendarDate[]. 열린 채 고른다
+<DateField defaultValue={new CalendarDate(2026, 9, 15)} />                      // 비제어
 ```
 
 - 이미 고른 날을 다시 눌러도 닫힙니다. 값이 그대로라 `onValueChange` 는 부르지 않습니다.
@@ -39,7 +40,7 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 <DateField locale="de-DE" />                          // 15.09.2026
 <DateField format={{ dateStyle: 'long' }} />          // 2026년 9월 15일
 <DateField format={{ month: 'long', day: 'numeric', weekday: 'long' }} />  // 9월 15일 화요일
-<DateField format={(date, locale) => `${date.getMonth() + 1}/${date.getDate()}`} />  // 9/15. 함수
+<DateField format={(date, locale) => `${date.month}/${date.day}`} />  // 9/15. 함수는 CalendarDate 를 받는다
 ```
 
 - `format` 은 [`Intl.DateTimeFormatOptions`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#options) 나 `(date, locale) => string` 입니다. date-fns 패턴 문자열은 받지 않습니다.
@@ -51,19 +52,19 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 
 ```tsx
 <DateField
-  min={new Date(2026, 0, 1)}
-  max={new Date(2026, 11, 31)}
-  disabled={(date) => date.getDay() === 0} // 날짜별로 막는다. true 면 필드 전체를 막는다
+  min={new CalendarDate(2026, 1, 1)}
+  max={new CalendarDate(2026, 12, 31)}
+  disabled={{ dayOfWeek: 0 }} // 날짜별로 막는다. true 면 필드 전체를 막는다
   captionLayout="dropdown" // 연도와 월을 목록에서 고른다. 생년월일에
   monthsToShow={2} // 기간은 두 달을 나란히
   weekStartsOn={1}
   locale="en-US" // 달력과 표시 형식의 언어. BCP 47 태그. 기본 ko-KR
-  today={new Date(2026, 8, 15)}
+  today={new CalendarDate(2026, 9, 15)}
 />
 ```
 
-- `disabled` 는 [Calendar](../../data/calendar/README.md#제한) 의 matcher 를 그대로 받습니다.
-- `month` / `defaultMonth` / `onMonthChange`, `modifiers`, `components` 같은 react-day-picker 속성도 달력으로 갑니다. 팝업을 열 때마다 고른 날의 달에서 시작합니다.
+- `disabled` 는 [Calendar](../../data/calendar/README.md#제한) 의 `DateMatcher` 를 그대로 받습니다.
+- `month` / `defaultMonth` / `onMonthChange`, `modifiers`, `renderDay` 같은 달력 속성도 달력으로 갑니다. 팝업을 열 때마다 고른 날의 달에서 시작합니다.
 
 ## 열기와 닫기
 
@@ -126,7 +127,7 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 </form>
 ```
 
-- 제출 값은 UTC로 바꾸지 않은 로컬 날짜입니다. 비어 있으면 FormData에 항목이 없습니다.
+- 제출 값은 `CalendarDate` 의 `toString()` 인 `YYYY-MM-DD` 입니다. 비어 있으면 FormData에 항목이 없습니다.
 - 끝을 고르지 않은 기간은 비어 있는 것으로 칩니다. FormData에 없고 `required` 를 통과하지 못합니다.
 - `required` 인데 비어 있으면 브라우저가 제출을 막고 말풍선을 필드에 띄운 뒤 Trigger로 포커스를 옮깁니다.
 - reset은 `onValueChange` 를 부르지 않습니다. native input 과 같습니다.
@@ -137,7 +138,12 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 ```tsx
 import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
-const schema = z.object({ date: z.date().nullable().refine(Boolean, '날짜를 고르세요.') });
+const schema = z.object({
+  date: z
+    .custom<CalendarDate>((value) => value instanceof CalendarDate)
+    .nullable()
+    .refine(Boolean, '날짜를 고르세요.'),
+});
 
 <Field name="date" controlMode="value" required>
   <Field.Label>예약 날짜</Field.Label>
@@ -204,7 +210,7 @@ const schema = z.object({ date: z.date().nullable().refine(Boolean, '날짜를 �
 | `placeholder`                                                         | `날짜 선택`, 기간은 `기간 선택`                          |
 | `min` / `max` / `disabled`                                            | 달력으로 간다. `disabled={true}` 는 필드 전체            |
 | `captionLayout` / `monthsToShow` / `weekStartsOn` / `month` / `today` | 달력으로 간다                                            |
-| `modifiers` / `components` / `footer` 등 react-day-picker 속성        | 달력으로 간다                                            |
+| `modifiers` / `modifiersClassNames` / `renderDay` / `footer`          | 달력으로 간다                                            |
 | `locale`                                                              | `ko-KR`. BCP 47 태그. 달력과 표시 형식, 입력 해석        |
 | `name` / `form` / `required`                                          | 숨은 값 입력과 브라우저 검증                             |
 | `readOnly`                                                            | 열리지 않고 Clear 도 막힌다                              |
@@ -219,7 +225,9 @@ const schema = z.object({ date: z.date().nullable().refine(Boolean, '날짜를 �
 ## 알아둘 것
 
 - Trigger 는 `role="combobox"`, `aria-haspopup="dialog"` 이고 팝업은 `role="dialog"` 입니다. Field 의 라벨과 설명이 Trigger 에 붙습니다.
-- 값은 로컬 날짜이고 `format` 은 표시에만 씁니다. 바깥에서 준 값을 min/max 로 자르지 않습니다.
+- 값은 시간대 없는 날짜이고 `format` 은 표시에만 씁니다. 표시는 그 날의 UTC 자정을 `timeZone: 'UTC'` 로 그려서 로컬 시간대가 하루를 밀지 못합니다(`format` 옵션의 `timeZone` 보다 먼저입니다).
+- 바깥에서 준 값을 min/max 로 자르지 않습니다.
+- 글자로 친 날짜도 `CalendarDate` 로 읽습니다.
 - BCP 47 태그가 아닌 `locale`(date-fns `Locale` 객체, `'de_DE'`)은 오류입니다.
 - 표시 글자는 런타임의 `Intl` 데이터입니다. 서버(Node)와 브라우저의 ICU 가 다르면 글자가 조금 다를 수 있습니다.
 - 팝업은 필드 전체 너비 이상으로 열리고, 화면 밖으로 나가지 않게 위아래를 고릅니다.

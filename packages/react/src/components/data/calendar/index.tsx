@@ -19,14 +19,9 @@ import {
 import {
   DayPicker,
   type ChevronProps,
-  type CustomComponents,
-  type DayButtonProps as DayPickerDayButtonProps,
+  type DayButtonProps,
   type DayPickerProps,
   type DropdownProps,
-  type Formatters,
-  type Labels,
-  type Modifiers,
-  type ModifiersClassNames,
   type MonthGridProps,
   type Numerals,
   type PreviousMonthButtonProps,
@@ -37,12 +32,13 @@ import {
   dayKey,
   type CalendarSelectionMode,
   type CalendarValue,
+  type DateMatcher as CalendarDateMatcher,
   type DateRange,
   type DateSelection,
-  type Matcher,
 } from './date';
+import { fromLocalDate } from './day-picker-bridge';
 import { dayPickerFormatters, dayPickerLabels } from './day-picker-locale';
-import { useCalendar, type CalendarState } from './use-calendar';
+import { useCalendar, type CalendarModifiers, type CalendarState } from './use-calendar';
 import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
 import { invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
@@ -50,41 +46,51 @@ import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../../form/field/context';
 
 import type { IdsSize } from '../../../tokens/types';
+import type { CalendarDate } from '@internationalized/date';
 
 export type CalendarCaptionLayout = 'label' | 'dropdown';
 
+export type CalendarDayState = {
+  selected: boolean;
+  today: boolean;
+  outside: boolean;
+  disabled: boolean;
+  rangeStart: boolean;
+  rangeMiddle: boolean;
+  rangeEnd: boolean;
+  modifiers: Record<string, boolean>;
+};
+
 export type CalendarOptions = {
-  min?: Date;
-  max?: Date;
-  disabled?: Matcher | Matcher[];
+  min?: CalendarDate;
+  max?: CalendarDate;
+  disabled?: CalendarDateMatcher | CalendarDateMatcher[];
   readOnly?: boolean;
   monthsToShow?: number;
   locale?: string;
   weekStartsOn?: WeekDay;
   captionLayout?: CalendarCaptionLayout;
   size?: IdsSize;
-  month?: Date;
-  defaultMonth?: Date;
-  onMonthChange?: (month: Date) => void;
-  today?: Date;
+  month?: CalendarDate;
+  defaultMonth?: CalendarDate;
+  onMonthChange?: (month: CalendarDate) => void;
+  today?: CalendarDate;
   autoFocus?: boolean;
   dir?: 'ltr' | 'rtl';
   showOutsideDays?: boolean;
   fixedWeeks?: boolean;
   showWeekNumber?: boolean;
   numerals?: Numerals;
-  modifiers?: Record<string, Matcher | Matcher[] | undefined>;
-  modifiersClassNames?: ModifiersClassNames;
-  components?: Partial<CustomComponents>;
-  formatters?: Partial<Formatters>;
-  labels?: Partial<Labels>;
+  modifiers?: CalendarModifiers;
+  modifiersClassNames?: Record<string, string>;
+  renderDay?: (day: CalendarDate, state: CalendarDayState) => ReactNode;
   footer?: ReactNode;
 };
 
 type NoneSelection = {
   selectionMode: 'none';
-  value?: Date | null;
-  defaultValue?: Date | null;
+  value?: CalendarDate | null;
+  defaultValue?: CalendarDate | null;
   onValueChange?: never;
 };
 
@@ -107,6 +113,8 @@ type ContextValue = {
   native: Omit<NativeProps, 'ref'>;
   rootRef: Ref<HTMLDivElement>;
   onGridMouseLeave: () => void;
+  modifierNames: string[];
+  renderDay?: CalendarOptions['renderDay'];
 };
 
 const CalendarContext = createContext<ContextValue | null>(null);
@@ -144,9 +152,7 @@ export function Calendar(props: CalendarProps) {
     numerals,
     modifiers,
     modifiersClassNames,
-    components,
-    formatters,
-    labels,
+    renderDay,
     footer,
     className,
     style,
@@ -186,6 +192,8 @@ export function Calendar(props: CalendarProps) {
         // eslint-disable-next-line react-hooks/refs
         rootRef: mergeRefs(api.rootRef, ref),
         onGridMouseLeave: api.onGridMouseLeave,
+        modifierNames: Object.keys(modifiers ?? {}),
+        renderDay,
       }}
     >
       <DayPicker
@@ -194,13 +202,13 @@ export function Calendar(props: CalendarProps) {
         locale={{ code: resolvedLocale, labels: {} }}
         weekStartsOn={weekStartsOn ?? weekStartOf(resolvedLocale)}
         numberOfMonths={monthsToShow}
-        month={state.month}
+        month={api.month}
         onMonthChange={api.setMonth}
         startMonth={api.startMonth}
         endMonth={api.endMonth}
         disabled={api.disabled}
         disableNavigation={state.disabled}
-        today={today}
+        today={api.today}
         autoFocus={autoFocus}
         captionLayout={captionLayout}
         navLayout="around"
@@ -243,18 +251,9 @@ export function Calendar(props: CalendarProps) {
           hidden: styles.hidden(),
           footer: styles.footer(),
         }}
-        labels={{ ...dayPickerLabels(resolvedLocale, numerals), ...labels }}
-        formatters={{ ...dayPickerFormatters(resolvedLocale, numerals), ...formatters }}
-        components={{
-          Root,
-          DayButton: CalendarDayButton,
-          Chevron,
-          Dropdown,
-          MonthGrid,
-          PreviousMonthButton: MonthButton,
-          NextMonthButton: MonthButton,
-          ...components,
-        }}
+        labels={dayPickerLabels(resolvedLocale, numerals)}
+        formatters={dayPickerFormatters(resolvedLocale, numerals)}
+        components={dayPickerParts}
         onDayMouseEnter={api.onDayMouseEnter}
         onDayFocus={api.onDayFocus}
         onDayBlur={api.onDayBlur}
@@ -348,12 +347,14 @@ function Dropdown({ options, className, ...props }: DropdownProps) {
   );
 }
 
-function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calendar.DayButtonProps) {
-  const c = useCalendarContext('Calendar.DayButton');
+function CalendarDayButton({ day, modifiers, className, children, ...props }: DayButtonProps) {
+  const c = useCalendarContext('Calendar');
   const own = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     if (modifiers.focused) own.current?.focus();
   }, [modifiers.focused]);
+
   const preview = !!modifiers.range_preview && !modifiers.selected;
   const styles = Calendar.Style({
     size: c.size,
@@ -364,12 +365,24 @@ function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calenda
     unavailable: !!modifiers.disabled,
   });
   const flag = (on: boolean | undefined) => (on ? '' : undefined);
-  const keyInLatinDigits = dayKey(day.date);
+  const date = fromLocalDate(day.date);
+
+  const dayState: CalendarDayState = {
+    selected: !!modifiers.selected,
+    today: !!modifiers.today,
+    outside: !!modifiers.outside,
+    disabled: !!modifiers.disabled,
+    rangeStart: !!modifiers.range_start,
+    rangeMiddle: !!modifiers.range_middle,
+    rangeEnd: !!modifiers.range_end,
+    modifiers: Object.fromEntries(c.modifierNames.map((name) => [name, !!modifiers[name]])),
+  };
+
   return (
     <button
       {...props}
-      ref={mergeRefs(own, ref)}
-      data-calendar-day={keyInLatinDigits}
+      ref={own}
+      data-calendar-day={dayKey(date)}
       data-selected={flag(modifiers.selected)}
       data-today={flag(modifiers.today)}
       data-disabled={flag(modifiers.disabled)}
@@ -379,9 +392,21 @@ function CalendarDayButton({ day, modifiers, className, ref, ...props }: Calenda
       data-range-end={flag(modifiers.range_end)}
       data-range-preview={flag(preview)}
       className={styles.dayButton({ className })}
-    />
+    >
+      {c.renderDay ? c.renderDay(date, dayState) : children}
+    </button>
   );
 }
+
+const dayPickerParts = {
+  Root,
+  DayButton: CalendarDayButton,
+  Chevron,
+  Dropdown,
+  MonthGrid,
+  PreviousMonthButton: MonthButton,
+  NextMonthButton: MonthButton,
+};
 
 export namespace Calendar {
   export type Props = CalendarProps;
@@ -389,11 +414,8 @@ export namespace Calendar {
   export type Range = DateRange;
   export type SelectionMode = CalendarSelectionMode;
   export type CaptionLayout = CalendarCaptionLayout;
-  export type DayModifiers = Modifiers;
-  export type Components = Partial<CustomComponents>;
-  export type DayButtonProps = DayPickerDayButtonProps & { ref?: Ref<HTMLButtonElement> };
-
-  export const DayButton = CalendarDayButton;
+  export type DateMatcher = CalendarDateMatcher;
+  export type DayState = CalendarDayState;
 
   export const Style = tv({
     slots: {
@@ -504,4 +526,4 @@ export namespace Calendar {
 
 export { CalendarPickContext } from './use-calendar';
 export type { CalendarState } from './use-calendar';
-export type { DateRange, CalendarSelectionMode, CalendarValue, Matcher } from './date';
+export type { DateRange, CalendarSelectionMode, CalendarValue, DateMatcher } from './date';

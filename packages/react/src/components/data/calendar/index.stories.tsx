@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { CalendarDate } from '@internationalized/date';
 import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -10,7 +11,7 @@ import { Calendar, type DateRange } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const today = new Date(2026, 8, 15);
+const today = new CalendarDate(2026, 9, 15);
 const sizes = ['standard', 'tiny'] as const;
 const modes = ['single', 'range', 'multiple'] as const;
 
@@ -49,9 +50,17 @@ const grid = (canvasElement: HTMLElement) => canvasElement.querySelector('[role=
 export const Playground: Story = {};
 
 const valueFor = {
-  single: { defaultValue: new Date(2026, 8, 18) },
-  range: { defaultValue: { start: new Date(2026, 8, 10), end: new Date(2026, 8, 17) } },
-  multiple: { defaultValue: [new Date(2026, 8, 3), new Date(2026, 8, 4), new Date(2026, 8, 24)] },
+  single: { defaultValue: new CalendarDate(2026, 9, 18) },
+  range: {
+    defaultValue: { start: new CalendarDate(2026, 9, 10), end: new CalendarDate(2026, 9, 17) },
+  },
+  multiple: {
+    defaultValue: [
+      new CalendarDate(2026, 9, 3),
+      new CalendarDate(2026, 9, 4),
+      new CalendarDate(2026, 9, 24),
+    ],
+  },
 } as const;
 
 export const Gallery: Story = {
@@ -82,7 +91,10 @@ export const Gallery: Story = {
         <Showcase.Row label="two months">
           <Calendar
             selectionMode="range"
-            defaultValue={{ start: new Date(2026, 8, 24), end: new Date(2026, 9, 6) }}
+            defaultValue={{
+              start: new CalendarDate(2026, 9, 24),
+              end: new CalendarDate(2026, 10, 6),
+            }}
             monthsToShow={2}
             today={today}
             aria-label="두 달"
@@ -94,8 +106,8 @@ export const Gallery: Story = {
         <Showcase.Row label="limits">
           <Calendar
             today={today}
-            min={new Date(2026, 8, 7)}
-            max={new Date(2026, 8, 25)}
+            min={new CalendarDate(2026, 9, 7)}
+            max={new CalendarDate(2026, 9, 25)}
             disabled={{ dayOfWeek: [0, 6] }}
             aria-label="제한"
           />
@@ -103,13 +115,13 @@ export const Gallery: Story = {
         <Showcase.Row label="readOnly · none">
           <Calendar
             readOnly
-            defaultValue={new Date(2026, 8, 18)}
+            defaultValue={new CalendarDate(2026, 9, 18)}
             today={today}
             aria-label="읽기 전용"
           />
           <Calendar
             selectionMode="none"
-            value={new Date(2026, 8, 18)}
+            value={new CalendarDate(2026, 9, 18)}
             today={today}
             aria-label="선택 없음"
           />
@@ -117,7 +129,7 @@ export const Gallery: Story = {
         <Showcase.Row label="disabled">
           <Calendar
             disabled
-            defaultValue={new Date(2026, 8, 18)}
+            defaultValue={new CalendarDate(2026, 9, 18)}
             today={today}
             aria-label="비활성"
           />
@@ -145,7 +157,11 @@ export const Gallery: Story = {
 };
 
 export const Keyboard: Story = {
-  args: { autoFocus: true, defaultValue: new Date(2026, 0, 31), today: new Date(2026, 0, 31) },
+  args: {
+    autoFocus: true,
+    defaultValue: new CalendarDate(2026, 1, 31),
+    today: new CalendarDate(2026, 1, 31),
+  },
   parameters: {
     docs: {
       description: {
@@ -167,7 +183,7 @@ export const Keyboard: Story = {
     await userEvent.keyboard('{ArrowLeft}{ArrowUp}');
     await waitFor(() => expect(focusedDay()).toBe('2027-02-26'));
     await userEvent.keyboard('{Enter}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(new Date(2027, 1, 26));
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(new CalendarDate(2027, 2, 26));
     await expect(day(canvasElement, '2027-02-26')).toHaveAttribute('data-selected');
     await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
     await waitFor(() => expect(focusedDay()).toBe('2027-03-26'));
@@ -186,7 +202,7 @@ function RangeExample() {
         today={today}
       />
       <output aria-label="기간" className="text-body-b3-regular">
-        {range?.start?.getDate() ?? '–'} ~ {range?.end?.getDate() ?? '–'}
+        {range?.start?.day ?? '–'} ~ {range?.end?.day ?? '–'}
       </output>
     </div>
   );
@@ -224,11 +240,11 @@ export const Range: Story = {
 };
 
 export const Multiple: Story = {
-  args: { selectionMode: 'multiple', defaultValue: [new Date(2026, 8, 3)] },
+  args: { selectionMode: 'multiple', defaultValue: [new CalendarDate(2026, 9, 3)] },
   play: async ({ canvasElement, args, userEvent }) => {
     await userEvent.click(day(canvasElement, '2026-09-10'));
     await userEvent.click(day(canvasElement, '2026-09-03'));
-    await expect(args.onValueChange).toHaveBeenLastCalledWith([new Date(2026, 8, 10)]);
+    await expect(args.onValueChange).toHaveBeenLastCalledWith([new CalendarDate(2026, 9, 10)]);
     await expect(grid(canvasElement)).toHaveAttribute('aria-multiselectable', 'true');
   },
 };
@@ -236,9 +252,9 @@ export const Multiple: Story = {
 export const DropdownCaption: Story = {
   args: {
     captionLayout: 'dropdown',
-    min: new Date(1990, 0, 1),
-    max: new Date(2026, 11, 31),
-    defaultMonth: new Date(2026, 8, 1),
+    min: new CalendarDate(1990, 1, 1),
+    max: new CalendarDate(2026, 12, 31),
+    defaultMonth: new CalendarDate(2026, 9, 1),
   },
   parameters: {
     docs: {
@@ -250,7 +266,7 @@ export const DropdownCaption: Story = {
   },
   play: async ({ canvas, canvasElement, args, userEvent }) => {
     await userEvent.selectOptions(canvas.getByRole('combobox', { name: '연도' }), '1995');
-    await expect(args.onMonthChange).toHaveBeenLastCalledWith(new Date(1995, 8, 1));
+    await expect(args.onMonthChange).toHaveBeenLastCalledWith(new CalendarDate(1995, 9, 1));
     await userEvent.selectOptions(canvas.getByRole('combobox', { name: '월' }), '0');
     await expect(grid(canvasElement)).toHaveAccessibleName('1995년 1월');
     await userEvent.click(canvas.getByRole('button', { name: '이전 달' }));
@@ -260,8 +276,8 @@ export const DropdownCaption: Story = {
 
 export const Limits: Story = {
   args: {
-    min: new Date(2026, 8, 10),
-    max: new Date(2026, 9, 20),
+    min: new CalendarDate(2026, 9, 10),
+    max: new CalendarDate(2026, 10, 20),
     disabled: { dayOfWeek: [0] },
   },
   parameters: {
@@ -331,44 +347,41 @@ export const Locale: Story = {
 };
 
 const events = [
-  new Date(2026, 8, 4),
-  new Date(2026, 8, 15),
-  new Date(2026, 8, 22),
-  new Date(2026, 9, 2),
+  new CalendarDate(2026, 9, 4),
+  new CalendarDate(2026, 9, 15),
+  new CalendarDate(2026, 9, 22),
+  new CalendarDate(2026, 10, 2),
 ];
 
-function EventDayButton({ children, ...props }: Calendar.DayButtonProps) {
-  const { event, selected } = props.modifiers;
+function renderEventDay(day: CalendarDate, state: Calendar.DayState) {
   return (
-    <Calendar.DayButton {...props}>
-      <span className="flex flex-col items-center leading-none">
-        {children}
-        <span
-          aria-hidden="true"
-          className={
-            event
-              ? selected
-                ? 'mt-0.5 size-1 rounded-full bg-current'
-                : 'mt-0.5 size-1 rounded-full bg-(--ids-color-primary)'
-              : 'mt-0.5 size-1'
-          }
-        />
-      </span>
-    </Calendar.DayButton>
+    <span className="flex flex-col items-center leading-none">
+      {day.day}
+      <span
+        aria-hidden="true"
+        className={
+          state.modifiers.event
+            ? state.selected
+              ? 'mt-0.5 size-1 rounded-full bg-current'
+              : 'mt-0.5 size-1 rounded-full bg-(--ids-color-primary)'
+            : 'mt-0.5 size-1'
+        }
+      />
+    </span>
   );
 }
 
 function PartsExample() {
-  const [date, setDate] = useState<Date | null>(null);
-  const [month, setMonth] = useState(new Date(2026, 8, 1));
-  const busy = !!date && events.some((event) => event.toDateString() === date.toDateString());
+  const [date, setDate] = useState<CalendarDate | null>(null);
+  const [month, setMonth] = useState(new CalendarDate(2026, 9, 1));
+  const busy = !!date && events.some((event) => event.compare(date) === 0);
   return (
     <div className="flex flex-col items-start gap-3">
       <Button
         size="tiny"
         variant="outline"
         onClick={() => {
-          setMonth(new Date(2026, 8, 1));
+          setMonth(new CalendarDate(2026, 9, 1));
           setDate(today);
         }}
       >
@@ -381,7 +394,7 @@ function PartsExample() {
         onMonthChange={setMonth}
         today={today}
         modifiers={{ event: events }}
-        components={{ DayButton: EventDayButton }}
+        renderDay={renderEventDay}
         footer={date ? (busy ? '일정이 있는 날입니다.' : '일정이 없습니다.') : '날짜를 고르세요.'}
       />
     </div>
@@ -394,7 +407,7 @@ export const Parts: Story = {
     docs: {
       description: {
         story:
-          'components로 react-day-picker의 부분을 바꿉니다. Calendar.DayButton을 감싸면 IDS 날짜 모양과 포커스를 그대로 두고 내용만 더합니다. modifiers는 날짜에 이름을 붙이고, footer는 화면 읽기 프로그램이 읽는 알림 영역입니다.',
+          'renderDay는 날짜 칸의 내용만 바꿉니다. 버튼 모양, 포커스, 상태 속성은 IDS가 그대로 그리고, 두 번째 인자로 선택, 오늘, 기간, modifiers 상태를 받습니다. modifiers는 날짜에 이름을 붙이고, footer는 화면 읽기 프로그램이 읽는 알림 영역입니다.',
       },
     },
   },
@@ -407,5 +420,6 @@ export const Parts: Story = {
     await userEvent.click(canvas.getByRole('button', { name: '오늘' }));
     await expect(grid(canvasElement)).toHaveAccessibleName('2026년 9월');
     await expect(day(canvasElement, '2026-09-15')).toHaveAttribute('data-selected');
+    await expect(day(canvasElement, '2026-09-22')).toHaveTextContent('22');
   },
 };

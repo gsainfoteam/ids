@@ -155,7 +155,11 @@ const { state, input, blocked, popupId, controlRef, rootRef, change, clear, clos
 
 ```ts
 // components/form/date-field/index.tsx
-const formatDate = formatter(format, dateLocale, { defaults: dateOptions, toDate: asDate });
+const formatDate = formatter(format, dateLocale, {
+  defaults: dateOptions,
+  toDate: toUtcDate,
+  timeZone: 'UTC',
+});
 
 // components/form/time-field/index.tsx
 const display = formatter(format, dateLocale, {
@@ -175,9 +179,10 @@ const display = formatter(format, dateLocale, {
 
 ### 왜 이렇게
 
-- `TemporalFormat<V>` 는 `Intl.DateTimeFormatOptions` 이거나 `(value, locale) => string` 입니다. `V` 는 필드의 값 타입입니다. TimeField 는 `Time`, DateField 와 DateTimeField 는 아직 `Date` 입니다.
+- `TemporalFormat<V>` 는 `Intl.DateTimeFormatOptions` 이거나 `(value, locale) => string` 입니다. `V` 는 필드의 값 타입입니다. TimeField 는 `Time`, DateField 는 `CalendarDate`, DateTimeField 는 아직 `Date` 입니다.
 - `formatter` 는 둘 다 `(value) => string` 으로 바꿉니다. 옵션은 [date-locale](../README.md#date-localets) 의 `dateFormatter` 로 그리고, 함수에는 값과 풀이한 locale 태그를 그대로 넘깁니다.
 - Intl 은 `Date` 만 그리므로 `toDate` 가 값을 `Date` 로 바꿉니다. `Date` 값은 `asDate` 로 그대로 둡니다.
+- `CalendarDate` 는 Calendar 의 `day-picker-bridge.ts` 에 있는 `toUtcDate` 로 그 날의 UTC 자정에 놓고 `timeZone: 'UTC'` 로 그립니다. 로컬 시간대로 그리면 UTC 보다 늦은 시간대에서 하루 전날로 보입니다.
 - `Time` 은 날짜와 시간대가 없어서 `onUtcSampleDay` 로 UTC 의 한 날(2000-01-01)에 놓고 `timeZone: 'UTC'` 로 그립니다. 로컬 시간대를 쓰면 서머타임이 바뀌는 날에 없는 시각이 밀려 보입니다. `timeZone` 은 사용자 `format` 옵션보다 먼저입니다.
 - 기본 옵션:
 

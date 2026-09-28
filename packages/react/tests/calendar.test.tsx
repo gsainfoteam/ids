@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { BuddhistCalendar, CalendarDate, toCalendar } from '@internationalized/date';
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
@@ -8,8 +8,8 @@ import { Calendar } from '../src';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 const ssr = (props: Calendar.Props) => parse(renderToString(<Calendar {...props} />));
-const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
-const dateKey = (date: Date | null | undefined) => date && format(date, 'yyyy-MM-dd');
+const d = (y: number, m: number, day: number) => new CalendarDate(y, m, day);
+const dateKey = (date: CalendarDate | null | undefined) => date && date.toString();
 const day = (key: string) =>
   document.querySelector<HTMLButtonElement>(`[data-calendar-day="${key}"]`)!;
 
@@ -82,21 +82,13 @@ test('numerals draw every number in the chosen system', () => {
   expect(devanagari.querySelector('[data-calendar-day="2026-09-15"]')!.textContent).toBe('१५');
 });
 
-test('grid, weekday and week number labels are Korean by default, and given ones override them', () => {
+test('grid, weekday and week number labels are Korean by default', () => {
   const doc = ssr({ today: d(2026, 9, 15), showWeekNumber: true });
   expect(doc.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('2026년 9월');
   expect(
     [...doc.querySelectorAll('th[scope=col]')].map((th) => th.getAttribute('aria-label')),
   ).toEqual(['주차', '일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']);
   expect(doc.querySelector('[role=rowheader]')!.getAttribute('aria-label')).toMatch(/^\d+주차$/);
-  const own = ssr({
-    today: d(2026, 9, 15),
-    labels: { labelGrid: () => 'September grid' },
-    formatters: { formatWeekdayName: (weekday) => `w${weekday.getDay()}` },
-  });
-  expect(own.querySelector('[role=grid]')!.getAttribute('aria-label')).toBe('September grid');
-  expect(own.querySelector('th')!.textContent).toBe('w0');
-  expect(own.querySelector('th')!.getAttribute('aria-label')).toBe('일요일');
 });
 
 test('diagnostics for mismatched values, limits and parts outside the calendar', () => {
@@ -106,8 +98,8 @@ test('diagnostics for mismatched values, limits and parts outside the calendar',
   expect(() => ssr({ monthsToShow: 0 })).toThrow(/monthsToShow/);
   // @ts-expect-error A week starts on 0 to 6.
   expect(() => ssr({ weekStartsOn: 7 })).toThrow(/weekStartsOn/);
-  // @ts-expect-error A DayButton gets its day and modifiers from the calendar.
-  expect(() => renderToString(<Calendar.DayButton />)).toThrow(/inside Calendar/);
+  // @ts-expect-error The react-day-picker parts are no longer public.
+  expect(Calendar.DayButton).toBeUndefined();
 });
 
 test('keyboard: month ends clamp, Home and End follow the week start, Shift jumps', async () => {
@@ -149,14 +141,14 @@ test('an inherited right-to-left direction swaps the horizontal arrows', async (
   await expect.element(day('2026-09-14')).toHaveFocus();
 });
 
-test('single: blocked days refuse, the value is local midnight, a re-click is no change', async () => {
-  const changes: (Date | null)[] = [];
+test('single: blocked days refuse, the value is a CalendarDate, a re-click is no change', async () => {
+  const changes: (CalendarDate | null)[] = [];
   await render(
     <Calendar
       today={d(2026, 9, 15)}
       min={d(2026, 9, 10)}
       max={d(2026, 9, 20)}
-      disabled={(date) => date.getDate() === 16}
+      disabled={(date) => date.day === 16}
       onValueChange={(next) => changes.push(next)}
     />,
   );
@@ -168,7 +160,7 @@ test('single: blocked days refuse, the value is local midnight, a re-click is no
   expect(changes).toEqual([]);
   await userEvent.click(day('2026-09-18'));
   expect(changes.map(dateKey)).toEqual(['2026-09-18']);
-  expect(changes[0]?.getHours()).toBe(0);
+  expect(changes[0]).toBeInstanceOf(CalendarDate);
   await userEvent.click(day('2026-09-18'));
   expect(changes).toHaveLength(1);
   await expect.element(day('2026-09-18')).toHaveFocus();
@@ -182,7 +174,7 @@ test('single: blocked days refuse, the value is local midnight, a re-click is no
 });
 
 test('a DayPicker matcher blocks days, and equal min and max leave one day and no months', async () => {
-  let value = null as Date | null;
+  let value = null as CalendarDate | null;
   const screen = await render(
     <Calendar
       today={d(2026, 9, 15)}
@@ -251,7 +243,7 @@ test('range: a partial value, ordered ends, restart, and a preview under the poi
 });
 
 test('multiple toggles by day and marks the grid multiselectable', async () => {
-  let value: Date[] = [];
+  let value: CalendarDate[] = [];
   const screen = await render(
     <Calendar
       selectionMode="multiple"
@@ -298,7 +290,7 @@ test('readOnly and none browse without changes; disabled blocks navigation and s
 });
 
 test('caption dropdowns jump by year and month within min and max', async () => {
-  const months: Date[] = [];
+  const months: CalendarDate[] = [];
   const screen = await render(
     <Calendar
       captionLayout="dropdown"
@@ -340,7 +332,7 @@ test('without limits the year menu spans a century either side of today', async 
 });
 
 test('a month picked in the second caption lands in the second grid', async () => {
-  const months: Date[] = [];
+  const months: CalendarDate[] = [];
   const screen = await render(
     <Calendar
       captionLayout="dropdown"
@@ -357,7 +349,7 @@ test('a month picked in the second caption lands in the second grid', async () =
 });
 
 test('Previous and Next are ghost IconButtons that keep focus once the last month is reached', async () => {
-  const months: Date[] = [];
+  const months: CalendarDate[] = [];
   const screen = await render(
     <Calendar
       today={d(2026, 9, 15)}
@@ -411,7 +403,7 @@ test('several months: Previous before the first grid only, Next after the last o
 });
 
 test('a controlled month waits for the parent', async () => {
-  let month = null as Date | null;
+  let month = null as CalendarDate | null;
   const screen = await render(
     <Calendar
       today={d(2026, 9, 15)}
@@ -424,32 +416,118 @@ test('a controlled month waits for the parent', async () => {
   await expect.element(day('2026-09-15')).toBeInTheDocument();
 });
 
-function EventDay(props: Calendar.DayButtonProps) {
-  return (
-    <Calendar.DayButton {...props}>
-      {props.children}
-      {props.modifiers.event && <span data-event-dot="" />}
-    </Calendar.DayButton>
-  );
-}
-
-test('parts: a DayButton built on Calendar.DayButton, modifiers, formatters and a footer', async () => {
+test('renderDay replaces only the content and gets the day state; modifiers and a footer', async () => {
+  const states: Record<string, Calendar.DayState> = {};
   const screen = await render(
     <Calendar
+      selectionMode="range"
       today={d(2026, 9, 15)}
-      modifiers={{ event: [d(2026, 9, 4), d(2026, 9, 22)] }}
+      defaultValue={{ start: d(2026, 9, 21), end: d(2026, 9, 23) }}
+      disabled={d(2026, 9, 5)}
+      modifiers={{ event: [d(2026, 9, 4), d(2026, 9, 22)], weekend: { dayOfWeek: [0, 6] } }}
       modifiersClassNames={{ event: 'has-event' }}
-      components={{ DayButton: EventDay }}
-      formatters={{ formatDay: (date) => `${date.getDate()}일` }}
+      renderDay={(date, state) => {
+        states[date.toString()] = state;
+        return (
+          <>
+            {`${date.day}일`}
+            {state.modifiers.event && <span data-event-dot="" />}
+          </>
+        );
+      }}
       footer="일정 2개"
     />,
   );
   expect(day('2026-09-04').querySelector('[data-event-dot]')).toBeInTheDocument();
-  expect(day('2026-09-05').querySelector('[data-event-dot]')).toBeNull();
+  expect(day('2026-09-06').querySelector('[data-event-dot]')).toBeNull();
   expect(day('2026-09-22').parentElement).toHaveClass('has-event');
-  expect(day('2026-09-05').firstChild?.textContent).toBe('5일');
-  expect(day('2026-09-05')).toHaveClass('rounded-standard');
+  expect(day('2026-09-06').textContent).toBe('6일');
+  expect(day('2026-09-06')).toHaveClass('rounded-standard');
+  expect(day('2026-09-22')).toHaveAttribute('data-range-middle');
+  expect(day('2026-09-22')).toHaveAttribute('aria-label', '2026년 9월 22일 화요일, 선택됨');
+  expect(states['2026-09-04'].modifiers).toEqual({ event: true, weekend: false });
+  expect(states['2026-09-05']).toMatchObject({ disabled: true, modifiers: { weekend: true } });
+  expect(states['2026-09-15']).toMatchObject({ today: true, selected: false });
+  expect(states['2026-09-21']).toMatchObject({ selected: true, rangeStart: true });
+  expect(states['2026-09-22']).toMatchObject({ rangeMiddle: true, modifiers: { event: true } });
+  expect(states['2026-09-23']).toMatchObject({ rangeEnd: true, rangeStart: false });
+  expect(states['2026-08-30']).toMatchObject({ outside: true });
   expect(screen.getByRole('status').last().element().textContent).toBe('일정 2개');
+  await userEvent.click(day('2026-09-10'));
+  await expect.element(day('2026-09-10')).toHaveAttribute('data-selected');
+  expect(states['2026-09-10'].selected).toBe(true);
+});
+
+test('every DateMatcher form blocks the days it names', () => {
+  const blocked = (disabled: Calendar.Props['disabled']) =>
+    [...ssr({ today: d(2026, 9, 15), disabled }).querySelectorAll('[data-calendar-day][disabled]')]
+      .map((node) => node.getAttribute('data-calendar-day'))
+      .filter((key) => key!.startsWith('2026-09'));
+  expect(blocked(d(2026, 9, 9))).toEqual(['2026-09-09']);
+  expect(blocked([d(2026, 9, 9), d(2026, 9, 11)])).toEqual(['2026-09-09', '2026-09-11']);
+  expect(blocked({ start: d(2026, 9, 28), end: d(2026, 9, 30) })).toEqual([
+    '2026-09-28',
+    '2026-09-29',
+    '2026-09-30',
+  ]);
+  expect(blocked({ before: d(2026, 9, 3) })).toEqual(['2026-09-01', '2026-09-02']);
+  expect(blocked({ after: d(2026, 9, 28) })).toEqual(['2026-09-29', '2026-09-30']);
+  expect(blocked({ after: d(2026, 9, 9), before: d(2026, 9, 12) })).toEqual([
+    '2026-09-10',
+    '2026-09-11',
+  ]);
+  expect(blocked({ dayOfWeek: 0 })).toEqual([
+    '2026-09-06',
+    '2026-09-13',
+    '2026-09-20',
+    '2026-09-27',
+  ]);
+  expect(blocked({ dayOfWeek: [2] })).toEqual([
+    '2026-09-01',
+    '2026-09-08',
+    '2026-09-15',
+    '2026-09-22',
+    '2026-09-29',
+  ]);
+  expect(blocked((date) => date.day % 10 === 0)).toEqual([
+    '2026-09-10',
+    '2026-09-20',
+    '2026-09-30',
+  ]);
+  expect(blocked(false)).toEqual([]);
+  expect(blocked(true)).toHaveLength(30);
+  expect(blocked([{ before: d(2026, 9, 2) }, d(2026, 9, 30), [d(2026, 9, 15)]])).toEqual([
+    '2026-09-01',
+    '2026-09-15',
+    '2026-09-30',
+  ]);
+});
+
+test('values are checked by shape: a lookalike passes, a Date or another calendar throws', () => {
+  const lookalike = {
+    calendar: { identifier: 'gregory' },
+    era: 'AD',
+    year: 2026,
+    month: 9,
+    day: 18,
+    compare: () => 0,
+  } as unknown as CalendarDate;
+  const doc = ssr({ today: d(2026, 9, 15), value: lookalike, min: lookalike });
+  expect(doc.querySelector('[data-calendar-day="2026-09-18"]')!.hasAttribute('data-selected')).toBe(
+    true,
+  );
+  expect(doc.querySelector('[data-calendar-day="2026-09-17"]')!.hasAttribute('disabled')).toBe(
+    true,
+  );
+  // @ts-expect-error A Date is no longer a calendar value.
+  expect(() => ssr({ value: new Date(2026, 8, 18) })).toThrow(/expected a CalendarDate/);
+  // @ts-expect-error today takes a CalendarDate.
+  expect(() => ssr({ today: '2026-09-15' })).toThrow(/expected a CalendarDate/);
+  const buddhist = toCalendar(d(2026, 9, 18), new BuddhistCalendar());
+  expect(() => ssr({ value: buddhist })).toThrow(/toCalendar\(date, new GregorianCalendar\(\)\)/);
+  expect(() => ssr({ selectionMode: 'multiple', value: [d(2026, 9, 1), buddhist] })).toThrow(
+    /only gregorian/,
+  );
 });
 
 test('root className and style accept a function of the calendar state; native props reach it', async () => {
@@ -461,12 +539,12 @@ test('root className and style accept a function of the calendar state; native p
       id="schedule"
       aria-label="일정"
       onKeyDown={(event) => (pressed = event.key)}
-      className={(state) => `month-${state.month.getMonth()}`}
+      className={(state) => `month-${state.month.month}`}
       style={(state) => ({ outline: state.disabled ? '1px solid red' : undefined })}
     />,
   );
   const root = screen.getByRole('group', { name: '일정' });
-  await expect.element(root).toHaveClass('month-8');
+  await expect.element(root).toHaveClass('month-9');
   expect(root.element().style.outline).toBe('');
   await expect.element(root).toHaveAttribute('id', 'schedule');
   day('2026-09-18').focus();

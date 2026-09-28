@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { CalendarDate } from '@internationalized/date';
 import { FormProvider, useForm } from 'react-hook-form';
 import { expect, fn, waitFor } from 'storybook/test';
 import { z } from 'zod';
@@ -16,7 +17,7 @@ import { DateField } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const today = new Date(2026, 8, 15);
+const today = new CalendarDate(2026, 9, 15);
 const variants = ['outline', 'soft', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
@@ -64,7 +65,7 @@ export const Gallery: Story = {
             <DateField
               size={size}
               variant={variant}
-              defaultValue={new Date(2026, 8, 15)}
+              defaultValue={new CalendarDate(2026, 9, 15)}
               className="w-56"
               aria-label={`${variant} ${size}`}
             />
@@ -75,13 +76,20 @@ export const Gallery: Story = {
       <Showcase.Section title="Selection mode">
         <Showcase.Row label="single">
           <DateField className="w-72" aria-label="하루" />
-          <DateField defaultValue={new Date(2026, 8, 15)} className="w-72" aria-label="하루 값" />
+          <DateField
+            defaultValue={new CalendarDate(2026, 9, 15)}
+            className="w-72"
+            aria-label="하루 값"
+          />
         </Showcase.Row>
         <Showcase.Row label="range">
           <DateField selectionMode="range" className="w-72" aria-label="기간" />
           <DateField
             selectionMode="range"
-            defaultValue={{ start: new Date(2026, 8, 15), end: new Date(2026, 8, 19) }}
+            defaultValue={{
+              start: new CalendarDate(2026, 9, 15),
+              end: new CalendarDate(2026, 9, 19),
+            }}
             className="w-72"
             aria-label="기간 값"
           />
@@ -89,7 +97,11 @@ export const Gallery: Story = {
         <Showcase.Row label="multiple">
           <DateField
             selectionMode="multiple"
-            defaultValue={[new Date(2026, 8, 3), new Date(2026, 8, 10), new Date(2026, 8, 17)]}
+            defaultValue={[
+              new CalendarDate(2026, 9, 3),
+              new CalendarDate(2026, 9, 10),
+              new CalendarDate(2026, 9, 17),
+            ]}
             className="w-72"
             aria-label="여러 날"
           />
@@ -100,7 +112,7 @@ export const Gallery: Story = {
         <Showcase.Row label="invalid">
           <DateField
             invalid
-            defaultValue={new Date(2026, 8, 15)}
+            defaultValue={new CalendarDate(2026, 9, 15)}
             className="w-72"
             aria-label="잘못됨"
           />
@@ -108,7 +120,7 @@ export const Gallery: Story = {
         <Showcase.Row label="readOnly">
           <DateField
             readOnly
-            defaultValue={new Date(2026, 8, 15)}
+            defaultValue={new CalendarDate(2026, 9, 15)}
             className="w-72"
             aria-label="읽기 전용"
           />
@@ -116,7 +128,7 @@ export const Gallery: Story = {
         <Showcase.Row label="disabled">
           <DateField
             disabled
-            defaultValue={new Date(2026, 8, 15)}
+            defaultValue={new CalendarDate(2026, 9, 15)}
             className="w-72"
             aria-label="비활성"
           />
@@ -125,12 +137,16 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Format">
         <Showcase.Row label="default · ko-KR">
-          <DateField defaultValue={new Date(2026, 8, 15)} className="w-72" aria-label="기본" />
+          <DateField
+            defaultValue={new CalendarDate(2026, 9, 15)}
+            className="w-72"
+            aria-label="기본"
+          />
         </Showcase.Row>
         <Showcase.Row label="Intl options">
           <DateField
             format={{ year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }}
-            defaultValue={new Date(2026, 8, 15)}
+            defaultValue={new CalendarDate(2026, 9, 15)}
             className="w-72"
             aria-label="한국어 형식"
           />
@@ -138,22 +154,22 @@ export const Gallery: Story = {
         <Showcase.Row label="en-US · de-DE">
           <DateField
             locale="en-US"
-            defaultValue={new Date(2026, 8, 15)}
+            defaultValue={new CalendarDate(2026, 9, 15)}
             className="w-72"
             aria-label="English"
           />
           <DateField
             locale="de-DE"
             format={{ dateStyle: 'long' }}
-            defaultValue={new Date(2026, 8, 15)}
+            defaultValue={new CalendarDate(2026, 9, 15)}
             className="w-72"
             aria-label="Deutsch"
           />
         </Showcase.Row>
         <Showcase.Row label="function">
           <DateField
-            format={(date) => `${date.getMonth() + 1}/${date.getDate()}`}
-            defaultValue={new Date(2026, 8, 15)}
+            format={(date) => `${date.month}/${date.day}`}
+            defaultValue={new CalendarDate(2026, 9, 15)}
             className="w-72"
             aria-label="함수"
           />
@@ -164,7 +180,7 @@ export const Gallery: Story = {
 };
 
 export const SelectAndClear: Story = {
-  args: { min: new Date(2026, 8, 1), max: new Date(2026, 8, 30) },
+  args: { min: new CalendarDate(2026, 9, 1), max: new CalendarDate(2026, 9, 30) },
   parameters: {
     docs: {
       description: {
@@ -179,7 +195,7 @@ export const SelectAndClear: Story = {
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() => expect(day('2026-09-15')).toHaveFocus());
     await userEvent.keyboard('{ArrowRight}{Enter}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(new Date(2026, 8, 16));
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(new CalendarDate(2026, 9, 16));
     await expect(trigger).toHaveTextContent('2026. 09. 16.');
     await expect(trigger).toHaveFocus();
     await expect(document.querySelector('[role=dialog]')).toBeNull();
@@ -204,8 +220,8 @@ export const Range: Story = {
     await userEvent.click(day('2026-09-24'));
     await userEvent.click(day('2026-10-02'));
     await expect(args.onValueChange).toHaveBeenLastCalledWith({
-      start: new Date(2026, 8, 24),
-      end: new Date(2026, 9, 2),
+      start: new CalendarDate(2026, 9, 24),
+      end: new CalendarDate(2026, 10, 2),
     });
     await expect(document.querySelector('[role=dialog]')).not.toBeNull();
     await userEvent.keyboard('{Escape}');
@@ -218,9 +234,9 @@ export const Range: Story = {
 export const Birthday: Story = {
   args: {
     captionLayout: 'dropdown',
-    min: new Date(1920, 0, 1),
+    min: new CalendarDate(1920, 1, 1),
     max: today,
-    defaultMonth: new Date(2000, 0, 1),
+    defaultMonth: new CalendarDate(2000, 1, 1),
     format: { dateStyle: 'long' },
     'aria-label': '생년월일',
   },
@@ -238,7 +254,7 @@ export const Birthday: Story = {
     await userEvent.selectOptions(dialog.querySelector('select[aria-label="연도"]')!, '1995');
     await userEvent.selectOptions(dialog.querySelector('select[aria-label="월"]')!, '4');
     await userEvent.click(day('1995-05-20'));
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(new Date(1995, 4, 20));
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(new CalendarDate(1995, 5, 20));
     await expect(canvas.getByRole('combobox', { name: '생년월일' })).toHaveTextContent(
       '1995년 5월 20일',
     );
@@ -265,7 +281,10 @@ function NativeFormExample() {
         <DateField
           name="stay"
           selectionMode="range"
-          defaultValue={{ start: new Date(2026, 8, 20), end: new Date(2026, 8, 22) }}
+          defaultValue={{
+            start: new CalendarDate(2026, 9, 20),
+            end: new CalendarDate(2026, 9, 22),
+          }}
           today={today}
         />
       </Field>
@@ -309,7 +328,10 @@ export const NativeForm: Story = {
 };
 
 const schema = z.object({
-  date: z.date({ error: '날짜를 고르세요.' }).nullable().refine(Boolean, '날짜를 고르세요.'),
+  date: z
+    .custom<CalendarDate>((value) => value instanceof CalendarDate, { error: '날짜를 고르세요.' })
+    .nullable()
+    .refine(Boolean, '날짜를 고르세요.'),
 });
 
 function ReactHookFormExample() {
@@ -320,7 +342,7 @@ function ReactHookFormExample() {
       <form
         className="flex w-80 flex-col items-start gap-4"
         noValidate
-        onSubmit={methods.handleSubmit((data) => setResult(data.date?.toDateString() ?? ''))}
+        onSubmit={methods.handleSubmit((data) => setResult(data.date?.toString() ?? ''))}
       >
         <FormField name="date" controlMode="value" required className="w-full">
           <FormField.Label>예약 날짜</FormField.Label>
@@ -340,7 +362,7 @@ export const ReactHookForm: Story = {
     docs: {
       description: {
         story:
-          'controlMode="value"로 Date 값을 그대로 연결합니다. 오류가 나면 Trigger로 포커스가 가고 테두리가 danger 색이 됩니다.',
+          'controlMode="value"로 CalendarDate 값을 그대로 연결합니다. 오류가 나면 Trigger로 포커스가 가고 테두리가 danger 색이 됩니다.',
       },
     },
   },
@@ -353,7 +375,7 @@ export const ReactHookForm: Story = {
     await userEvent.click(trigger);
     await userEvent.click(day('2026-09-18'));
     await userEvent.click(canvas.getByRole('button', { name: '예약' }));
-    await expect(canvas.getByLabelText('예약 결과')).toHaveTextContent('Fri Sep 18 2026');
+    await expect(canvas.getByLabelText('예약 결과')).toHaveTextContent('2026-09-18');
   },
 };
 
@@ -420,7 +442,7 @@ export const TypedEntry: Story = {
     const input = canvas.getByRole('combobox', { name: '생년월일' });
     await userEvent.click(input);
     await userEvent.keyboard('20000131{Enter}');
-    await expect(args.onValueChange).toHaveBeenLastCalledWith(new Date(2000, 0, 31));
+    await expect(args.onValueChange).toHaveBeenLastCalledWith(new CalendarDate(2000, 1, 31));
     await expect(input).toHaveValue('2000. 01. 31.');
     await userEvent.clear(input);
     await userEvent.type(input, '2030-01-01');

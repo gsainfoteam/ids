@@ -1,3 +1,4 @@
+import { CalendarDate } from '@internationalized/date';
 import { minBy, sum } from 'es-toolkit';
 
 import {
@@ -37,19 +38,16 @@ function nearestYear(twoDigits: number) {
   return minBy(candidates, (year) => Math.abs(year - thisYear))!;
 }
 
-function dateOf({ y, M, d }: Fields): Date | undefined {
+function dateOf({ y, M, d }: Fields): CalendarDate | undefined {
   const readableYear = y.length <= 2 || y.length === 4;
   if (M.length > 2 || d.length > 2 || !readableYear) return undefined;
 
   const year = y.length <= 2 ? nearestYear(Number(y)) : Number(y);
   const month = Number(M);
   const day = Number(d);
-  const date = new Date(0);
-  date.setFullYear(year, month - 1, day);
-  date.setHours(0, 0, 0, 0);
+  const date = new CalendarDate(year, month, day);
 
-  const sameFields =
-    date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+  const sameFields = date.year === year && date.month === month && date.day === day;
   return sameFields ? date : undefined;
 }
 
@@ -91,7 +89,7 @@ function compact(digits: string, locale: string) {
   return undefined;
 }
 
-export function parseDateText(text: string, locale: string): Date | undefined {
+export function parseDateText(text: string, locale: string): CalendarDate | undefined {
   const input = withLatinDigits(text.normalize('NFKC').trim(), locale);
   if (!input) return undefined;
 

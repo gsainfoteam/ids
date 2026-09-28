@@ -2,10 +2,12 @@ import { useState } from 'react';
 
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { isAfter, startOfDay } from 'date-fns';
+import { mapValues } from 'es-toolkit';
 
 import {
   dayBounds,
   dayUnavailable,
+  matchesDay,
   onDay,
   serializeDateTime,
   timeOf,
@@ -13,6 +15,7 @@ import {
   withTime,
   withinLimits,
   type DateTimeLimits,
+  type DateTimeMatcher,
 } from './date-time';
 import { resolveLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
@@ -40,6 +43,7 @@ import {
 } from '../../../internal/temporal-field/format';
 import { invariant } from '../../../utils';
 import { Calendar, type CalendarOptions } from '../../data/calendar';
+import { fromLocalDate, toLocalDate } from '../../data/calendar/day-picker-bridge';
 import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
 import {
   resolveHourCycle,
@@ -50,10 +54,35 @@ import {
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
-import type { Time } from '@internationalized/date';
+import type { CalendarDate, Time } from '@internationalized/date';
+
+type DateBoundOptions =
+  | 'autoFocus'
+  | 'size'
+  | 'readOnly'
+  | 'dir'
+  | 'min'
+  | 'max'
+  | 'disabled'
+  | 'today'
+  | 'month'
+  | 'defaultMonth'
+  | 'onMonthChange'
+  | 'modifiers';
+
+type DateTimeCalendarOptions = Omit<CalendarOptions, DateBoundOptions> & {
+  month?: Date;
+  defaultMonth?: Date;
+  onMonthChange?: (month: Date) => void;
+  modifiers?: Record<string, DateTimeMatcher | DateTimeMatcher[] | undefined>;
+};
 
 export type DateTimeFieldProps = Omit<TemporalFieldProps<Date | null>, 'disabled'> &
-  Omit<CalendarOptions, 'autoFocus' | 'size' | 'readOnly' | 'dir'> & {
+  DateTimeCalendarOptions & {
+    min?: Date;
+    max?: Date;
+    today?: Date;
+    disabled?: DateTimeMatcher | DateTimeMatcher[];
     precision?: TimePrecision;
     format?: TemporalFormat<Date>;
     hourCycle?: HourCycle;
@@ -61,12 +90,7 @@ export type DateTimeFieldProps = Omit<TemporalFieldProps<Date | null>, 'disabled
     pickerVariant?: TimePickerVariant;
   };
 
-type CalendarPassThrough = Omit<
-  CalendarOptions,
-  'autoFocus' | 'size' | 'readOnly' | 'dir' | 'min' | 'max' | 'disabled' | 'today' | 'locale'
->;
-
-type PanelProps = CalendarPassThrough & {
+type PanelProps = Omit<DateTimeCalendarOptions, 'locale'> & {
   value: Date | null;
   change: TemporalChange<Date | null>;
   size: IdsSize;
@@ -93,12 +117,29 @@ function Panel({
   cycle,
   locale,
   pickerVariant,
+  month,
+  defaultMonth,
+  onMonthChange,
+  modifiers,
   ...calendar
 }: PanelProps) {
   const styles = temporalFieldStyle({ size });
   const base = value ?? startOfDay(today);
   const unavailable = dayUnavailable(base, limits);
   const bounds = dayBounds(base, limits.min, limits.max);
+
+  const dayOf = (date: Date | undefined) => date && fromLocalDate(date);
+  const dayModifiers =
+    modifiers &&
+    mapValues(
+      modifiers,
+      (matchers) => (day: CalendarDate) => matchesDay(toLocalDate(day), matchers),
+    );
+
+  const pickDay = (day: CalendarDate | null) => {
+    const next = day && onDay(toLocalDate(day), base, limits);
+    if (next) change(next);
+  };
 
   const pickTime = (next: Time | null) => {
     if (next === null) return change(null);
@@ -112,15 +153,16 @@ function Panel({
       <Calendar
         {...calendar}
         locale={locale}
-        value={value}
-        onValueChange={(day) => {
-          const next = day && onDay(day, base, limits);
-          if (next) change(next);
-        }}
-        min={limits.min}
-        max={limits.max}
-        disabled={(day) => dayUnavailable(day, limits)}
-        today={today}
+        value={value && fromLocalDate(value)}
+        onValueChange={pickDay}
+        min={dayOf(limits.min)}
+        max={dayOf(limits.max)}
+        disabled={(day) => dayUnavailable(toLocalDate(day), limits)}
+        today={fromLocalDate(today)}
+        month={dayOf(month)}
+        defaultMonth={dayOf(defaultMonth)}
+        onMonthChange={onMonthChange && ((next) => onMonthChange(toLocalDate(next)))}
+        modifiers={dayModifiers}
         size={size}
       />
       <div className={styles.panelTime()}>
@@ -169,9 +211,7 @@ export function DateTimeField({
   numerals,
   modifiers,
   modifiersClassNames,
-  components,
-  formatters,
-  labels,
+  renderDay,
   footer,
   ...props
 }: DateTimeFieldProps) {
@@ -231,9 +271,7 @@ export function DateTimeField({
             numerals={numerals}
             modifiers={modifiers}
             modifiersClassNames={modifiersClassNames}
-            components={components}
-            formatters={formatters}
-            labels={labels}
+            renderDay={renderDay}
             footer={footer}
           />
         ),

@@ -21,7 +21,6 @@ import {
   type ValueProps as SharedValueProps,
 } from '../../../internal/temporal-field';
 import {
-  asDate,
   dateOptions,
   formatter,
   type TemporalFormat,
@@ -34,9 +33,12 @@ import {
   type CalendarValue,
   type DateSelection,
 } from '../../data/calendar/date';
+import { toUtcDate } from '../../data/calendar/day-picker-bridge';
 import { useFieldSize } from '../field/context';
 
-export type DateFieldFormat = TemporalFormat;
+import type { CalendarDate } from '@internationalized/date';
+
+export type DateFieldFormat = TemporalFormat<CalendarDate>;
 
 const MONTHS_SIDE_BY_SIDE = 2;
 const MONTH_GAP = 16;
@@ -75,17 +77,21 @@ export function DateField(props: DateFieldProps) {
     numerals,
     modifiers,
     modifiersClassNames,
-    components,
-    formatters,
-    labels,
+    renderDay,
     footer,
     ...rest
   } = props;
+
   const empty = emptyValue(selectionMode);
   if (value !== undefined) validateValue(value, selectionMode);
   if (defaultValue !== undefined) validateValue(defaultValue, selectionMode);
+
   const dateLocale = resolveLocale(locale);
-  const formatDate = formatter(format, dateLocale, { defaults: dateOptions, toDate: asDate });
+  const formatDate = formatter(format, dateLocale, {
+    defaults: dateOptions,
+    toDate: toUtcDate,
+    timeZone: 'UTC',
+  });
   const cell = (useFieldSize(rest.size) ?? 'standard') === 'tiny' ? 32 : 36;
   const shown = Math.min(monthsToShow, MONTHS_SIDE_BY_SIDE);
   const range = selectionMode === 'range';
@@ -142,9 +148,7 @@ export function DateField(props: DateFieldProps) {
               numerals={numerals}
               modifiers={modifiers}
               modifiersClassNames={modifiersClassNames}
-              components={components}
-              formatters={formatters}
-              labels={labels}
+              renderDay={renderDay}
               footer={footer}
               size={size}
             />
