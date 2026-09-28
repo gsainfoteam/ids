@@ -106,7 +106,7 @@ test('glyphs written as children are hidden and named', () => {
   expect(visible(kbd)).toBe('⇧⌘P');
   expect(spoken(kbd)).toBe('시프트 커맨드 P');
   const plain = doc(<Kbd>Ctrl+C</Kbd>).querySelector('kbd')!;
-  expect(plain.innerHTML, 'text without glyphs stays as it is').toBe('Ctrl+C');
+  expect(plain.firstElementChild!.innerHTML, 'text without glyphs stays as it is').toBe('Ctrl+C');
 });
 
 test('labels override the spoken names, separator overrides the joiner', () => {
@@ -178,5 +178,52 @@ test('an icon sits in the middle of its keycap at both sizes', async () => {
     const [iconX, iconY] = middle(box);
     expect(Math.abs(iconX - capX), icon.getAttribute('data-kbd-glyph')!).toBeLessThan(0.51);
     expect(Math.abs(iconY - capY), icon.getAttribute('data-kbd-glyph')!).toBeLessThan(0.51);
+  }
+});
+
+function hangulInkCenter(line: HTMLElement) {
+  const text = [...line.childNodes].find(
+    (node) => node.nodeType === 3 && node.textContent!.trim(),
+  )!;
+  const range = document.createRange();
+  range.selectNodeContents(text);
+  const box = range.getClientRects()[0]!;
+  const style = getComputedStyle(line);
+  const context = document.createElement('canvas').getContext('2d')!;
+  context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+  const ink = context.measureText('저장');
+  const baseline = box.top + ink.fontBoundingBoxAscent;
+  return baseline - (ink.actualBoundingBoxAscent - ink.actualBoundingBoxDescent) / 2;
+}
+
+test('a key sits level with the Hangul around it, in running text and in a flex row', async () => {
+  const lines: Array<[string, string, ReactNode]> = [
+    ['caption', 'text-caption-c1-medium', <Kbd keys="mod+s" platform="apple" size="tiny" />],
+    ['body', 'text-body-b3-regular', <Kbd keys="mod+s" platform="other" />],
+    ['lone key', 'text-body-b3-regular', <Kbd keys="k" />],
+    ['lone icon', 'text-body-b3-regular', <Kbd platform="apple">⌘</Kbd>],
+  ];
+  const screen = await render(
+    <div>
+      {lines.map(([label, className, kbd]) => (
+        <div key={label}>
+          <p data-line={label} className={className}>
+            저장 {kbd}
+          </p>
+          <p
+            data-line={`${label} in a flex row`}
+            className={`flex items-center gap-1 ${className}`}
+          >
+            저장 {kbd}
+          </p>
+        </div>
+      ))}
+    </div>,
+  );
+  await document.fonts.ready;
+  for (const line of screen.container.querySelectorAll<HTMLElement>('[data-line]')) {
+    const cap = line.querySelector('[data-kbd]')!.getBoundingClientRect();
+    const offset = cap.top + cap.height / 2 - hangulInkCenter(line);
+    expect(Math.abs(offset), line.dataset.line).toBeLessThan(0.5);
   }
 });

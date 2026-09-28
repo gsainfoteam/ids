@@ -95,7 +95,9 @@ export function Kbd({
               </span>
             )}
             <kbd data-kbd="" className={styles.root()}>
-              <Face keyInfo={keyInfo} name={name} iconClassName={styles.glyph()} />
+              <span className={styles.face()}>
+                <Face keyInfo={keyInfo} name={name} iconClassName={styles.glyph()} />
+              </span>
             </kbd>
           </Fragment>
         ))}
@@ -131,7 +133,7 @@ export function Kbd({
       data-platform={kbd.platform}
       className={styles.root({ className: resolve(className, state) })}
     >
-      {content}
+      <span className={styles.face()}>{content}</span>
     </kbd>
   );
 }
@@ -184,22 +186,27 @@ export namespace Kbd {
   export const Style = tv({
     slots: {
       root: [
-        'relative inline-flex w-fit shrink-0 items-center justify-center gap-0.5 align-middle',
+        'relative inline-flex w-fit shrink-0 items-center justify-center before:self-end',
         'rounded-indicator bg-current/10 font-sans text-current/75 select-none',
       ],
-      group: 'inline-flex items-center gap-1 align-middle',
+      face: 'inline-flex items-center gap-0.5',
+      group: 'inline-flex items-center gap-1',
       glyph: 'shrink-0',
       separator: 'text-current/60 select-none',
     },
     variants: {
       size: {
         standard: {
-          root: 'h-5 min-w-5 px-1 text-caption-c1-medium',
+          root: 'h-5 min-w-5 px-1 align-[calc(0.5cap-10px)]',
+          face: 'text-caption-c1-medium',
+          group: 'align-[calc(0.5cap-10px)]',
           glyph: 'size-3',
           separator: 'text-caption-c1-regular',
         },
         tiny: {
-          root: 'h-4 min-w-4 px-0.5 text-caption-c2-medium',
+          root: 'h-4 min-w-4 px-0.5 align-[calc(0.5cap-8px)]',
+          face: 'text-caption-c2-medium',
+          group: 'align-[calc(0.5cap-8px)]',
           glyph: 'size-2.5',
           separator: 'text-caption-c2-regular',
         },
