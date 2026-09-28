@@ -134,14 +134,14 @@ onChange: (event: ChangeEvent<HTMLInputElement>) => {
 
 - React 가 제어 값을 쓸 때, react-hook-form 의 `reset()` 과 `setValue()` 가 `input.value` 를 직접 쓸 때, native 폼 reset 이 기본값을 되돌릴 때 모두 input 이벤트가 없습니다. 그래서 input 인스턴스의 `value` setter 를 감싸 모든 쓰기를 봅니다.
 - React 의 value tracker 도 인스턴스의 `value` 속성입니다. 그래서 바꿔치지 않고 감싸며(`reactValueTracker`), cleanup 에서 되돌립니다.
-- setter 쓰기와 폼 reset 은 microtask 뒤에 읽고(`syncOnceSettled`) `onExternalChange` 를 부릅니다. 매 렌더 뒤(layout effect)에도 읽습니다.
+- setter 쓰기는 microtask 뒤에(`syncOnceSettled`), 폼 reset 은 한 task 뒤에(`syncAfterBrowserRestoresValues`) 읽고 `onExternalChange` 를 부릅니다. 매 렌더 뒤(layout effect)에도 읽습니다.
 - 타이핑은 input 의 React `onChange` 에서 읽습니다(`rereadInOnChangeBatch`). input 에 native `input` 리스너를 달아 거기서 setState 하면, 브라우저가 보낸 이벤트에서는 리스너마다 microtask 가 돌아 React 의 리스너보다 먼저 렌더됩니다. 제어 input 은 옛 `value` 로 다시 그려지고, React 는 값이 그대로라고 보아 `onChange` 를 부르지 않습니다. 타이핑이 사라집니다.
 - `onExternalChange` 는 이벤트 없이 바뀐 값을 Field 에 알립니다. Field 가 `data-filled`, `data-dirty` 를 유지합니다(RULES.md 의 Callbacks).
 
 ### 알아둘 것
 
 - 브라우저의 폼 reset 은 JS setter 를 거치지 않습니다. reset 은 `reset` 이벤트로만 압니다.
-- 스크립트가 부른 reset(`form.reset()`, 테스트)에서는 microtask 가 복원된 값을 읽습니다. 사용자가 reset 버튼을 누르면 Chromium 은 이 microtask 를 값 복원 전에 돌립니다([`useFormReset`](../../hooks/README.md#use-form-resetts)).
+- 폼 reset 을 한 task 미루는 이유는 [`useFormReset`](../../hooks/README.md#use-form-resetts) 과 같습니다. 사용자가 누른 reset 버튼에서는 microtask 가 값 복원 전에 돕니다.
 - NumberField 와 TelField 는 이 hook 을 쓰지 않고 값을 자기 state 로 가집니다.
 
 ## use-merged-ref.ts

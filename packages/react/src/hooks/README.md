@@ -72,21 +72,13 @@ useFormReset(controlRef, () => {
 
 - native reset 은 각 컨트롤의 DOM 값을 되돌리지만, 자기 state 를 가진 컴포넌트는 옛 값을 다시 렌더합니다. 그래서 reset 을 듣고 state 를 되돌립니다.
 - 폼은 `ownerForm` 으로 찾습니다. `form` 속성이 있는 요소(input, select, textarea, button)는 `element.form` 을, 폼 요소가 아닌 것(Slider 나 RadioGroup 의 `div` 루트)은 가장 가까운 `<form>` 을 씁니다.
-- 핸들러는 리스너 안에서 바로 돌지 않고 `queueMicrotask` 로 한 번 미룹니다(`afterResetUnlessCancelled`). microtask 에서 `event.defaultPrevented` 를 보고 취소된 reset 은 건너뜁니다.
+- 핸들러는 리스너 안에서 바로 돌지 않고 `setTimeout` 으로 한 task 미룹니다(`afterBrowserRestoresValues`). 그때는 브라우저가 컨트롤 값을 되돌렸고 뒤에 등록된 리스너도 모두 돌았으므로, `event.defaultPrevented` 로 취소된 reset 을 건너뜁니다.
 - 최신 `onReset` 은 ref 에 두므로 리스너는 다시 붙지 않습니다.
 
 ### 알아둘 것
 
-- microtask 가 도는 시점은 reset 을 일으킨 쪽에 따라 다릅니다. Chromium 에서 확인한 결과입니다.
-
-| reset 을 일으킨 것                                                          | microtask 가 도는 시점                |
-| --------------------------------------------------------------------------- | ------------------------------------- |
-| 스크립트의 `form.reset()`, `button.click()` (jsdom 테스트, 스토리의 `play`) | 브라우저가 컨트롤 값을 되돌린 뒤      |
-| 사용자가 직접 누른 `<button type="reset">`                                  | 되돌리기 전. 리스너가 끝나자마자 돈다 |
-
-- 그래서 핸들러는 DOM 값을 읽지 않고 prop(`defaultValue` 등)에서 되돌릴 값을 가져와야 합니다. 사용자가 누른 reset 에서는 DOM 이 아직 옛 값입니다.
-- Radio 는 지금 이 경우에 걸립니다. reset 핸들러가 `input.checked` 를 읽어서(`restoredByBrowser`), 사용자가 reset 버튼을 누르면 `data-state` 가 복원 전 값으로 남습니다(Storybook `Form/Radio` 의 NativeGroup 에서 재현됩니다).
-- 같은 이유로 사용자가 누른 reset 에서는 이 hook 보다 뒤에 등록된 리스너의 `preventDefault()` 를 보지 못합니다.
+- microtask 로는 부족합니다. 사용자가 직접 누른 `<button type="reset">` 에서 Chromium 은 리스너가 끝나자마자 microtask 를 돌리는데, 그때는 컨트롤 값을 되돌리기 전이고 뒤의 리스너가 아직 `preventDefault()` 를 부르지 않았습니다. 스크립트의 `form.reset()` 에서는 microtask 도 복원 뒤에 돌아서 차이가 보이지 않습니다. 그래서 테스트는 진짜 reset 버튼을 누릅니다.
+- 되돌릴 값은 보통 prop(`defaultValue` 등)에서 가져옵니다. 비제어 Radio 는 브라우저가 되돌린 `input.checked` 를 읽고(`restoredByBrowser`), React 의 value tracker 에도 그 값을 알립니다(`letReactSeeRestoredValue`).
 - `div` 루트는 가장 가까운 `<form>` 조상으로 찾으므로, `form="id"` 속성으로 바깥 폼에 묶인 그룹은 그 폼의 reset 을 듣지 못합니다.
 
 ## use-interactive.ts
