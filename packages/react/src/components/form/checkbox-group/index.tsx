@@ -107,11 +107,20 @@ export function CheckboxGroup<T extends string>({
   children,
   ref,
   onFocus,
-  'aria-required': _ariaRequired,
+  'aria-required': _unsupportedByRoleGroup,
   ...rest
 }: CheckboxGroupProps<T>) {
-  const { value, toggle, register, all, setAll, controls, anchorRef, rootRef, focusFirst } =
-    useCheckboxGroup<T>({ value: valueProp, defaultValue, onValueChange, ref });
+  const {
+    value,
+    toggle,
+    register,
+    all,
+    setAll,
+    controls,
+    anchorRef,
+    rootRef,
+    forwardRootFocusToBox,
+  } = useCheckboxGroup<T>({ value: valueProp, defaultValue, onValueChange, ref });
   const ariaInvalid = rest['aria-invalid'] ?? invalid;
   const state: CheckboxGroupState = {
     value,
@@ -156,7 +165,7 @@ export function CheckboxGroup<T extends string>({
         className={CheckboxGroup.Style({ orientation, className: resolve(className, state) })}
         style={resolve(style, state)}
         onFocus={(event) => {
-          focusFirst(event);
+          forwardRootFocusToBox(event);
           onFocus?.(event);
         }}
       >
