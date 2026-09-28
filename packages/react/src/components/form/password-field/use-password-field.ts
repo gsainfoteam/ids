@@ -90,7 +90,7 @@ export function usePasswordField({
     String(native.value ?? native.defaultValue ?? ''),
     notify ?? undefined,
   );
-  const filled = (native.value != null ? String(native.value) : observed) !== '';
+  const filled = (native.value != null ? String(native.value) : observed.value) !== '';
   const control = useTextControl({ inputRef, disabled, readOnly, clearable });
   const ref = useMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
 
@@ -171,6 +171,7 @@ export function usePasswordField({
     'data-password-field-input': '',
     ref,
     onChange: (event: ChangeEvent<HTMLInputElement>) => {
+      observed.rereadInOnChangeBatch();
       native.onChange?.(event);
       onValueChange?.(event.currentTarget.value);
     },

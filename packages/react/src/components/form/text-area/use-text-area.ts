@@ -97,7 +97,7 @@ export function useTextArea({
     String(native.value ?? native.defaultValue ?? ''),
     notify ?? undefined,
   );
-  const value = native.value != null ? String(native.value) : observed;
+  const value = native.value != null ? String(native.value) : observed.value;
   const control = useTextControl({ inputRef, disabled, readOnly });
 
   const ref = useMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertTextarea);
@@ -113,6 +113,7 @@ export function useTextArea({
     'data-text-area-input': '',
     ref,
     onChange: (event: ChangeEvent<HTMLTextAreaElement>) => {
+      observed.rereadInOnChangeBatch();
       native.onChange?.(event);
       onValueChange?.(event.currentTarget.value);
     },

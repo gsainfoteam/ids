@@ -62,15 +62,11 @@ export function useInputValue(
         },
       });
     }
-    node.addEventListener('input', sync);
-    node.addEventListener('change', sync);
     const form = node.form;
     form?.addEventListener('reset', syncAfterBrowserRestoresValues);
 
     return () => {
       alive = false;
-      node.removeEventListener('input', sync);
-      node.removeEventListener('change', sync);
       form?.removeEventListener('reset', syncAfterBrowserRestoresValues);
       if (!wrapped) return;
       if (reactValueTracker) Object.defineProperty(node, 'value', reactValueTracker);
@@ -78,5 +74,5 @@ export function useInputValue(
     };
   }, [ref, sync]);
 
-  return value;
+  return { value, rereadInOnChangeBatch: sync };
 }

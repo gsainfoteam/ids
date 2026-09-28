@@ -122,14 +122,20 @@ const observed = useInputValue(
   String(native.value ?? native.defaultValue ?? ''),
   notify ?? undefined,                     // FieldNotifyContext: Field 가 값을 다시 읽는다
 );
-const filled = (native.value != null ? String(native.value) : observed) !== '';
+const filled = (native.value != null ? String(native.value) : observed.value) !== '';
+
+onChange: (event: ChangeEvent<HTMLInputElement>) => {
+  observed.rereadInOnChangeBatch();
+  native.onChange?.(event);
+},
 ```
 
 ### 왜 이렇게
 
 - React 가 제어 값을 쓸 때, react-hook-form 의 `reset()` 과 `setValue()` 가 `input.value` 를 직접 쓸 때, native 폼 reset 이 기본값을 되돌릴 때 모두 input 이벤트가 없습니다. 그래서 input 인스턴스의 `value` setter 를 감싸 모든 쓰기를 봅니다.
 - React 의 value tracker 도 인스턴스의 `value` 속성입니다. 그래서 바꿔치지 않고 감싸며(`reactValueTracker`), cleanup 에서 되돌립니다.
-- setter 쓰기와 폼 reset 은 microtask 뒤에 읽고(`syncOnceSettled`) `onExternalChange` 를 부릅니다. input, change 이벤트는 바로 읽고, 매 렌더 뒤(layout effect)에도 읽습니다.
+- setter 쓰기와 폼 reset 은 microtask 뒤에 읽고(`syncOnceSettled`) `onExternalChange` 를 부릅니다. 매 렌더 뒤(layout effect)에도 읽습니다.
+- 타이핑은 input 의 React `onChange` 에서 읽습니다(`rereadInOnChangeBatch`). input 에 native `input` 리스너를 달아 거기서 setState 하면, 브라우저가 보낸 이벤트에서는 리스너마다 microtask 가 돌아 React 의 리스너보다 먼저 렌더됩니다. 제어 input 은 옛 `value` 로 다시 그려지고, React 는 값이 그대로라고 보아 `onChange` 를 부르지 않습니다. 타이핑이 사라집니다.
 - `onExternalChange` 는 이벤트 없이 바뀐 값을 Field 에 알립니다. Field 가 `data-filled`, `data-dirty` 를 유지합니다(RULES.md 의 Callbacks).
 
 ### 알아둘 것
