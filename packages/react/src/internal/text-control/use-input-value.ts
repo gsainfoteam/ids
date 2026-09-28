@@ -38,14 +38,14 @@ export function useInputValue(
     const node = ref.current;
     if (!node) return;
     let alive = true;
-    const later = () =>
+    const syncOnceSettled = () =>
       queueMicrotask(() => {
         if (!alive) return;
         sync();
         external.current?.();
       });
 
-    const { own, base } = valueDescriptor(node);
+    const { own: reactValueTracker, base } = valueDescriptor(node);
     const wrapped = Boolean(base?.get && base.set);
     if (base?.get && base.set) {
       const { get, set } = base;
@@ -57,22 +57,22 @@ export function useInputValue(
         },
         set(next: string) {
           set.call(this, next);
-          later();
+          syncOnceSettled();
         },
       });
     }
     node.addEventListener('input', sync);
     node.addEventListener('change', sync);
     const form = node.form;
-    form?.addEventListener('reset', later);
+    form?.addEventListener('reset', syncOnceSettled);
 
     return () => {
       alive = false;
       node.removeEventListener('input', sync);
       node.removeEventListener('change', sync);
-      form?.removeEventListener('reset', later);
+      form?.removeEventListener('reset', syncOnceSettled);
       if (!wrapped) return;
-      if (own) Object.defineProperty(node, 'value', own);
+      if (reactValueTracker) Object.defineProperty(node, 'value', reactValueTracker);
       else Reflect.deleteProperty(node, 'value');
     };
   }, [ref, sync]);

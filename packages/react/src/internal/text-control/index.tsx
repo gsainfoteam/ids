@@ -128,15 +128,16 @@ export function TextControlClear({
   const { state, styles } = context;
   if (!state.filled || state.disabled || state.readOnly) return null;
 
+  const keepFocusInInput = (event: { button: number; preventDefault: () => void }) => {
+    if (event.button === 0) event.preventDefault();
+  };
   const internal = {
     type: 'button' as const,
     tabIndex: -1,
     'aria-label': props['aria-label'] ?? messages.textField.clear,
     'aria-controls': context.inputId,
     'data-text-control-clear': '',
-    onPointerDown: (event: { button: number; preventDefault: () => void }) => {
-      if (event.button === 0) event.preventDefault();
-    },
+    onPointerDown: keepFocusInInput,
     onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
       onClick?.(event);
       if (!event.defaultPrevented) context.clear();

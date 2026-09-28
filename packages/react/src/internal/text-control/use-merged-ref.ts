@@ -12,7 +12,8 @@ export function useMergedRef<T>(
   const detach = useRef<(() => void) | null>(null);
   return useCallback(
     (node: T | null) => {
-      if (node === null) {
+      const wrapperIgnoredCleanup = node === null;
+      if (wrapperIgnoredCleanup) {
         detach.current?.();
         detach.current = null;
         return;
