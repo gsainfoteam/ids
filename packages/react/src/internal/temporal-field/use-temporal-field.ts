@@ -9,6 +9,7 @@ import {
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useFormReset } from '../../hooks/use-form-reset';
+import { isNodeFromAnyWindow } from '../../utils';
 
 export type TemporalFieldState<V> = {
   value: V;
@@ -107,7 +108,7 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
   });
 
   const withinFieldOrItsPopup = (target: EventTarget | null) =>
-    target instanceof Node &&
+    isNodeFromAnyWindow(target) &&
     (!!rootRef.current?.contains(target) ||
       !!(target as Element).closest?.(`[data-temporal-owner="${popupId}"]`));
   const onBlur = (event: FocusEvent<HTMLElement>) => {

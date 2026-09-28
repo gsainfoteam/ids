@@ -17,9 +17,8 @@ import {
   type TimePickerState,
 } from './use-time-picker';
 import { periodFirst, resolveLocale, type DateLocale } from '../../../internal/date-locale';
-import { part } from '../../../internal/field-popup';
 import { messages } from '../../../internal/messages';
-import { flattenFragments, invariant, mergeProps, tv } from '../../../utils';
+import { flattenFragments, invariant, mergeProps, part, tv } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { TimeFormat, TimePrecision, TimeUnit } from './time';

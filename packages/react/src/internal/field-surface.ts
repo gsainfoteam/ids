@@ -42,3 +42,15 @@ export const fieldAction = {
     tiny: cn('size-6 me-1 first:ms-1'),
   } satisfies Record<IdsSize, string>,
 } as const;
+
+export type FieldTriggerVariant = FieldSurfaceVariant;
+
+export const fieldTrigger = {
+  base: cn('flex w-full min-w-0 touch-manipulation items-center text-start', fieldSurface.base),
+  variant: fieldSurface.variant,
+  size: fieldSurface.size,
+  icon: {
+    standard: cn('size-(--ids-size-icon-standard)'),
+    tiny: cn('size-(--ids-size-icon-tiny)'),
+  } satisfies Record<IdsSize, string>,
+} as const;

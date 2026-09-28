@@ -1,26 +1,26 @@
 # field-popup
 
-필드가 여는 팝업과 그 안의 목록을 그리는 공용 코드입니다. 보통은 trigger 에 붙는 popover 이고, `mobileVariant="drawer"` 인 필드는 640px 보다 좁은 화면에서 아래에서 올라오는 modal drawer 가 됩니다.
+필드가 여는 팝업을 그리는 공용 코드입니다. 보통은 trigger 에 붙는 popover 이고, `mobileVariant="drawer"` 인 필드는 640px 보다 좁은 화면에서 아래에서 올라오는 modal drawer 가 됩니다.
 
-| 파일                       | 내용                                                              |
-| -------------------------- | ----------------------------------------------------------------- |
-| [`index.tsx`](#indextsx)   | `FieldPopup`, `revealPopupOption`, 다른 파일의 다시 내보내기      |
-| [`layer.ts`](#layerts)     | drawer 판정(`useDrawerPresentation`), top layer, 열린 팝업의 스택 |
-| [`styles.ts`](#stylests)   | `popupStyle`, `fieldTrigger`, `fieldListbox`                      |
-| [`header.tsx`](#headertsx) | drawer 머리의 제목과 닫기 버튼(`FieldPopupHeader`)                |
-| [`search.tsx`](#searchtsx) | 목록 위의 검색 상자(`FieldPopupSearch`)                           |
-| [`parts.ts`](#partsts)     | 파트 헬퍼 `part`                                                  |
+- 팝업 안 목록의 클래스는 [`list-styles.ts`](../README.md#list-stylests), 팝업을 여는 trigger 상자는 [`field-surface.ts`](../README.md#field-surfacets) 의 `fieldTrigger` 입니다.
+- 파트 헬퍼 `part` 는 [`utils/part.ts`](../../utils/README.md#partts) 입니다.
+
+| 파일                       | 내용                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------ |
+| [`index.tsx`](#indextsx)   | `FieldPopup`, `revealPopupOption`, `FieldPopupHeader` 와 `layer.ts` 의 다시 내보내기 |
+| [`layer.ts`](#layerts)     | drawer 판정(`useDrawerPresentation`), top layer, 열린 팝업의 스택                    |
+| [`styles.ts`](#stylests)   | `popupStyle`                                                                         |
+| [`header.tsx`](#headertsx) | drawer 머리의 제목과 닫기 버튼(`FieldPopupHeader`)                                   |
+| [`search.tsx`](#searchtsx) | 목록 위의 검색 상자(`FieldPopupSearch`)                                              |
 
 ## 쓰는 곳
 
-| 컴포넌트                                      | 가져가는 것                                                                                                            |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Select                                        | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch`, `fieldTrigger`, `fieldListbox`, `part` |
-| ChipField                                     | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch`, `fieldTrigger`, `fieldListbox`, `part` |
-| ColorField                                    | `FieldPopup`, `FieldPopupHeader`, `useDrawerPresentation`, `fieldTrigger`, `part`                                      |
-| [temporal-field](../temporal-field/README.md) | `FieldPopup`, `FieldPopupHeader`, `part`                                                                               |
-| FileField                                     | `fieldTrigger`, `part`                                                                                                 |
-| TimePicker                                    | `part`                                                                                                                 |
+| 컴포넌트                                      | 가져가는 것                                                                    |
+| --------------------------------------------- | ------------------------------------------------------------------------------ |
+| Select                                        | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch` |
+| ChipField                                     | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch` |
+| ColorField                                    | `FieldPopup`, `FieldPopupHeader`, `useDrawerPresentation`                      |
+| [temporal-field](../temporal-field/README.md) | `FieldPopup`, `FieldPopupHeader`                                               |
 
 - `search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/search` 에서 직접 가져옵니다.
 
@@ -103,12 +103,12 @@ revealed.current = true;
 - 팝업 안 스크롤 부모의 `scrollTop` 을 직접 바꿉니다(`scrollWithinPopup`). top layer 뒤의 문서는 스크롤하지 않습니다.
 - `center` 는 옵션을 가운데에 둡니다. 목록은 선택한 옵션을 가운데에 두고 열려야 합니다.
 - 위치 계산은 비동기라 열린 뒤에도 팝업이 줄어들 수 있습니다. 첫 배치 전의 가운데 맞추기는 기억했다가 배치가 끝나면 다시 합니다(`firstPlacementLanded`, `recenterAfterFirstPlacement`, `onPlacementLanded`).
-- 옵션 위치는 가능하면 `offsetTop` 으로 읽습니다(`unscaledOffsetsApply`). `getBoundingClientRect` 는 열릴 때의 scale 애니메이션(`starting:scale-95`)을 받아 긴 목록에서 몇 줄씩 어긋납니다. `offsetTop` 은 스크롤 부모가 옵션의 offset parent 일 때만 맞으므로 `fieldListbox.list` 가 `relative` 입니다.
+- 옵션 위치는 가능하면 `offsetTop` 으로 읽습니다(`unscaledOffsetsApply`). `getBoundingClientRect` 는 열릴 때의 scale 애니메이션(`starting:scale-95`)을 받아 긴 목록에서 몇 줄씩 어긋납니다. `offsetTop` 은 스크롤 부모가 옵션의 offset parent 일 때만 맞으므로 [`listStyles.list`](../README.md#list-stylests) 가 `relative` 입니다.
 
 ### 알아둘 것
 
 - `onClose` 는 최신 값을 ref 에 둡니다. 렌더마다 새 함수를 넘겨도 리스너를 다시 붙이지 않습니다.
-- 이벤트 target 이 Node 인지는 `instanceof Node` 가 아니라 `nodeType` 으로 봅니다(`isNodeFromAnyWindow`). `instanceof` 는 다른 frame 의 노드나 DOM 생성자가 전역에 없는 환경에서 틀립니다.
+- 이벤트 target 이 Node 인지는 `utils` 의 [`isNodeFromAnyWindow`](../../utils/README.md#domts) 로 봅니다.
 - 팝업의 `data-field-popup` 은 Field 가 읽습니다. Field 는 이 안의 input(검색 상자)을 필드의 값으로 세지 않습니다(`components/form/field/control-state.ts` 의 `isInPopupOf`). `revealPopupOption` 도 이 속성으로 팝업을 찾습니다.
 - 팝업은 `[popover]` 라서, 다른 필드의 셸 안에 렌더돼도(TelField 안의 국가 Select) 그 셸의 `focus-ring` 이 팝업 안 input 의 포커스로 켜지지 않습니다. CSS 패키지의 `focus-ring` 이 `[popover] [data-field-input]` 을 뺍니다.
 - `data-presentation`, `data-side` 는 Select, ColorField README 에 적힌 공개 상태 속성입니다. 이름을 바꾸면 그 README 도 고칩니다.
@@ -146,45 +146,22 @@ useLayoutEffect(() => {
 ### 쓰는 법
 
 ```ts
-// components/form/select/index.tsx
-export const Style = tv({
-  slots: {
-    root: ['relative', fieldTrigger.base],
-    listbox: fieldListbox.list,
-    item: fieldListbox.option,
-    indicator: fieldListbox.indicator,
-    groupHeading: fieldListbox.heading,
-    separator: fieldListbox.separator,
-    empty: [fieldListbox.empty, 'not-data-empty:sr-only'],
-  },
-  variants: {
-    variant: {
-      outline: { root: fieldTrigger.variant.outline },
-      soft: { root: fieldTrigger.variant.soft },
-      ghost: { root: fieldTrigger.variant.ghost },
-    },
-  },
-});
+// internal/field-popup/index.tsx
+const styles = popupStyle({ presentation });   // 'popover' | 'drawer'
+<div className={styles.popup({ className })} />
+{drawer && <div className={styles.backdrop()} />}
+
+// internal/field-popup/header.tsx
+const styles = popupStyle();
+<div className={styles.header()}><span className={styles.title()}>{title}</span></div>
 ```
 
 ### 왜 이렇게
 
-- `fieldTrigger` 는 Select, ChipField, ColorField, FileField 의 상자입니다. [`fieldSurface`](../README.md#field-surfacets) 의 `base` 에 flex layout 을 더하고, `variant`, `size` 는 `fieldSurface` 를 그대로 씁니다. `icon` 은 trigger 안 아이콘의 크기입니다.
-- Select 와 ColorField 는 `fieldTrigger.size` 대신 padding 을 trigger 에 둡니다. trigger 가 상자를 채워야 어디를 눌러도 열리고, 그래서 상자 안의 Clear 는 `fieldAction.unpadded` 입니다. ChipField 는 상자가 padding 을 가지므로 `fieldTrigger.size` 를 씁니다.
 - `popupStyle.popup` 은 `inset-ring` 이 아니라 진짜 테두리입니다(`borderOptionsCannotCover`). 스크롤 컨테이너에서 inset shadow 는 내용 아래에 칠해지므로, 강조된 옵션이 가장자리를 지날 때 테두리를 가립니다.
 - `popup` 은 세로 flex 입니다. 안의 목록이 남은 높이를 받아, 고정된 검색 상자나 머리 아래에서 따로 스크롤합니다.
 - `backdrop` 은 drawer 뒤의 페이지를 어둡게 하고 클릭을 받는 별도 top layer 요소입니다. popover 자신의 `::backdrop` 은 UA 가 `pointer-events: none` 을 강제해서 클릭을 받지 못합니다.
 - `header` 는 drawer 안(`in-data-[presentation=drawer]:flex`)에서만 보입니다.
-- 옵션 강조는 메뉴처럼 neutral muted 배경(`data-highlighted`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
-- 옵션은 체크가 없어도 끝 padding(`pe-8`)을 비워 둡니다. 체크가 나타날 때 라벨이 밀리지 않습니다.
-- `list` 는 옵션의 스크롤 컨테이너입니다. 키보드 이동이 팝업이 아니라 이 목록을 스크롤합니다. 팝업 padding 안으로 들어가서(`-mx-1 px-1`) 전체 폭 구분선이 잘리지 않고, `relative` 라 옵션의 offset parent 입니다(`offsetParentOfOptions`).
-- `separator` 는 Divider 에 주는 클래스입니다. 목록 padding 안으로 들어가므로 Divider 자신의 전체 폭을 쓰면 한쪽 끝이 모자랍니다. 폭은 stretch 에 맡깁니다(`w-auto`).
-- `searchRoot` 는 shadcn/ui 의 command input 같은 검색 줄입니다. ghost TextField 에 상자 대신 아래 선을 긋고, 캐럿이 포커스를 보여 주므로 ring 을 끕니다(`ringOffSinceCaretShowsFocus`). `focus-ring` 이 input 의 포커스로 ring 을 칠하므로 `!` 로 강제합니다. 팝업 padding 까지 채우도록 폭을 고정하지 않습니다.
-
-### 알아둘 것
-
-- `fieldTrigger`, `fieldListbox` 는 각 컴포넌트가 자기 `tv({ slots })` 에 넣는 `cn('...')` 값의 객체일 뿐입니다. `FieldSurfaceVariant` 에 값을 더하면 가져가는 컴포넌트의 `variants` 에도 각각 더해야 적용됩니다.
-- Select, ChipField, ColorField 는 variant 타입이 `FieldTriggerVariant` 라서, 빠뜨리면 `satisfies Record<..., object>` 가 타입 오류를 냅니다. FileField 는 자기 `FileFieldVariant` 와 `compoundVariants` 를 따로 고칩니다.
 
 ## header.tsx
 
@@ -227,33 +204,4 @@ export const Style = tv({
 
 ### 알아둘 것
 
-- `className`, `style` 은 input 으로 갑니다. 루트의 클래스는 `fieldListbox.searchRoot` 로 고정입니다.
-
-## parts.ts
-
-### 쓰는 법
-
-```tsx
-// components/form/select/index.tsx (Select.Icon)
-return part(
-  'span',
-  asChild,
-  children ?? <ChevronDownIcon />,
-  mergeProps(props, { 'aria-hidden': true, className: c.styles.icon({ className }) }),
-);
-
-// internal/temporal-field/index.tsx
-const parts = flattenFragments(children);
-const count = (type: unknown) => parts.filter((n) => isValidElement(n) && n.type === type).length;
-```
-
-### 왜 이렇게
-
-- `part(tag, asChild, children, props)` 는 파트 하나를 그립니다. `asChild` 가 아니면 `tag` 요소를 만들고, `asChild` 면 자식 요소 하나를 `mergeProps(자식 props, props)` 로 복제합니다. 파트의 wiring 이 이기고 자식의 핸들러가 먼저 돕니다.
-- `asChild` 자식은 Fragment 가 아닌 요소 하나여야 합니다. HTML 요소 자식은 `tag` 와 같아야 하고(`span`, `div` 파트는 아무 요소나 됩니다), 컴포넌트 자식은 props 와 ref 를 넘긴다고 봅니다.
-- `input` 파트는 children 을 받지 않습니다.
-- 파트를 셀 때는 `utils` 의 [`flattenFragments`](../../utils/README.md#childrents) 로 Fragment 를 풉니다.
-
-### 알아둘 것
-
-- temporal-field 의 `shell`, Select 의 `triggers` 처럼 풀어 낸 파트를 그대로 렌더하는 곳이 있습니다. `flattenFragments` 가 key 에 Fragment 경로를 붙이므로 파트를 여러 Fragment 에 나눠 담아도 key 가 겹치지 않습니다.
+- `className`, `style` 은 input 으로 갑니다. 루트의 클래스는 [`listStyles.searchRoot`](../README.md#list-stylests) 로 고정입니다.

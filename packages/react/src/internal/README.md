@@ -13,12 +13,13 @@
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                 | Spinner, Progress                                                                                              |
 | [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                     | Button, IconButton, Toggle, IconToggle, FloatingButton                                                         |
 | [`date-locale.ts`](#date-localets)               | 문자열 locale 해석, locale 의 시간제와 날짜 순서                    | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                   |
-| [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer), 목록 스타일, 파트 헬퍼           | Select, ChipField, ColorField, `temporal-field/`, FileField, TimePicker                                        |
-| [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드의 상자와 상자 안 버튼의 클래스 조각                   | `text-control/`, `temporal-field/`, `field-popup/`, Select, ColorField, FileField, PasswordField, TextArea     |
+| [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자              | Select, ChipField, ColorField, `temporal-field/`                                                               |
+| [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각    | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea          |
 | [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수       | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                     |
 | [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트 | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`        |
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                  | IconButton, IconToggle, FloatingButton                                                                         |
 | [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                | IconButton, IconToggle                                                                                         |
+| [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각              | Select, ChipField, `field-popup/`                                                                              |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구 전부와 기본 locale                    | 문구를 그리는 모든 컴포넌트, `date-locale.ts`                                                                  |
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                             | Button, `surface.ts`                                                                                           |
 | [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                               | Slider, ColorPicker                                                                                            |
@@ -194,14 +195,15 @@ const orderOf = (locale: Locale) =>
 
 ## field-surface.ts
 
-텍스트류 필드의 상자(`fieldSurface`)와, 그 상자 안에 놓이는 ghost IconButton(`fieldAction`)의 클래스 조각입니다.
+텍스트류 필드의 상자(`fieldSurface`), 팝업을 여는 필드의 상자(`fieldTrigger`), 그 상자 안에 놓이는 ghost IconButton(`fieldAction`)의 클래스 조각입니다.
 
 ### 쓰는 곳
 
-- `fieldSurface`: [text-control](./text-control/README.md) 의 `textControlStyle`, [temporal-field](./temporal-field/README.md), [field-popup](./field-popup/README.md) 의 `fieldTrigger`(Select, ChipField, ColorField, FileField 가 가져감), TextArea
+- `fieldSurface`: [text-control](./text-control/README.md) 의 `textControlStyle`, [temporal-field](./temporal-field/README.md), TextArea, 이 파일의 `fieldTrigger`
+- `fieldTrigger`: Select, ChipField, ColorField, FileField
 - `fieldAction.padded`: text-control 의 `action` 슬롯(각 필드의 Clear, NumberField 의 `Increment`, `Decrement`), PasswordField 의 보기 버튼
 - `fieldAction.unpadded`: Select, ColorField, FileField 의 Clear, temporal-field 의 Clear 와 달력 버튼
-- `FieldSurfaceVariant`: TextField, NumberField, TelField, PasswordField, TextArea, field-popup 의 `FieldTriggerVariant`
+- `FieldSurfaceVariant`: TextField, NumberField, TelField, PasswordField, TextArea, 이 파일의 `FieldTriggerVariant`(Select, ChipField, ColorField)
 
 ### 쓰는 법
 
@@ -226,6 +228,12 @@ export const textControlStyle = tv({
 });
 
 // components/form/select/index.tsx: trigger 가 상자를 채우고 padding 을 가진다
+root: ['relative', fieldTrigger.base],
+variant: {
+  outline: { root: fieldTrigger.variant.outline },
+  soft: { root: fieldTrigger.variant.soft },
+  ghost: { root: fieldTrigger.variant.ghost },
+},
 size: {
   standard: { root: 'h-(--ids-size-control-standard) ...', trigger: 'gap-2 px-3', clear: fieldAction.unpadded.standard },
   tiny: { root: 'h-(--ids-size-control-tiny) ...', trigger: 'gap-1.5 px-2.5', clear: fieldAction.unpadded.tiny },
@@ -245,6 +253,8 @@ size: {
 | `unpadded` | trigger 가 상자 끝까지 차서 상자에 padding 이 없다 (Select 등) | 들어갈 padding 이 없으므로 `me-1`, `first:ms-1` 로 4px 를 둔다                                         |
 
 - trigger 가 상자 끝까지 차는 것은 상자 어디를 눌러도 팝업이 열리게 하기 위해서입니다.
+- `fieldTrigger` 는 `fieldSurface.base` 에 flex layout 을 더하고, `variant`, `size` 는 `fieldSurface` 를 그대로 씁니다. `icon` 은 trigger 안 아이콘의 크기입니다.
+- Select 와 ColorField 는 `fieldTrigger.size` 대신 padding 을 trigger 에 둡니다. trigger 가 상자를 채워야 어디를 눌러도 열리고, 그래서 상자 안의 Clear 는 `fieldAction.unpadded` 입니다. ChipField 는 상자가 padding 을 가지므로 `fieldTrigger.size` 를 씁니다.
 - `fieldAction.base` 는 hovered, active, pressed 를 각각 적습니다. `interactiveDataProps` 가 셋 중 하나만 붙이기 때문입니다(pressed > active > hovered).
 
 ### 알아둘 것
@@ -252,6 +262,7 @@ size: {
 - padding 을 가진 상자에는 `padded`, trigger 가 채우는 상자에는 `unpadded` 를 씁니다. 바꿔 쓰면 `padded` 는 테두리 너머로 밀리고, `unpadded` 는 padding 만큼 안쪽에 떠 보입니다.
 - `size-7`, `size-6` 과 음수 margin 은 control 높이 토큰(36px, 32px)과 상자 padding 에 맞춘 값입니다. 둘 중 하나를 바꾸면 이 값도 다시 계산합니다.
 - disabled 필드는 루트에서 이미 흐려집니다(`data-disabled:opacity-50`). ColorField 와 FileField 는 disabled Clear 가 한 번 더 흐려지지 않도록 `alreadyDimmedByField`(`data-disabled:opacity-100`)를 더합니다.
+- `FieldSurfaceVariant` 에 값을 더하면 가져가는 컴포넌트의 `variants` 에도 각각 더해야 적용됩니다. Select, ChipField, ColorField 는 variant 타입이 `FieldTriggerVariant` 라서, 빠뜨리면 `satisfies Record<..., object>` 가 타입 오류를 냅니다. FileField 는 자기 `FileFieldVariant` 와 `compoundVariants` 를 따로 고칩니다.
 
 ## form-bridge.ts
 
@@ -425,6 +436,43 @@ export const Style = tv({
 ### 알아둘 것
 
 - `[&_svg]` 는 svg 에 붙은 `size-*` 클래스보다 우선합니다. 생성된 선택자(`.cls svg`)의 specificity 가 더 높습니다. control surface 의 `[&_svg:not([class*='size-'])]` 와 달리 아이콘의 크기 클래스를 따르지 않습니다.
+
+## list-styles.ts
+
+팝업 안 목록(listbox)의 클래스 조각 `listStyles` 입니다. 옵션, 선택 체크, 스크롤 목록, 그룹 머리, 구분선, 빈 목록 문구, 목록 위 검색 줄이 있습니다.
+
+### 쓰는 곳
+
+- Select 의 `listbox`, `item`, `indicator`, `groupHeading`, `separator`, `empty` 슬롯
+- ChipField 의 제안 목록
+- [field-popup](./field-popup/README.md) 의 `FieldPopupSearch`(`searchRoot`, `search`)
+
+### 쓰는 법
+
+```ts
+// components/form/select/index.tsx
+slots: {
+  listbox: listStyles.list,
+  item: listStyles.option,
+  indicator: listStyles.indicator,
+  groupHeading: listStyles.heading,
+  separator: listStyles.separator,
+  empty: [listStyles.empty, 'not-data-empty:sr-only'],
+},
+```
+
+### 왜 이렇게
+
+- 옵션 강조는 메뉴처럼 neutral muted 배경(`data-highlighted`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
+- 옵션은 체크가 없어도 끝 padding(`pe-8`)을 비워 둡니다. 체크가 나타날 때 라벨이 밀리지 않습니다.
+- `list` 는 옵션의 스크롤 컨테이너입니다. 키보드 이동이 팝업이 아니라 이 목록을 스크롤합니다. 팝업 padding 안으로 들어가서(`-mx-1 px-1`) 전체 폭 구분선이 잘리지 않고, `relative` 라 옵션의 offset parent 입니다(`offsetParentOfOptions`). field-popup 의 `revealPopupOption` 이 옵션 위치를 `offsetTop` 으로 읽습니다.
+- `separator` 는 Divider 에 주는 클래스입니다. 목록 padding 안으로 들어가므로 Divider 자신의 전체 폭을 쓰면 한쪽 끝이 모자랍니다. 폭은 stretch 에 맡깁니다(`w-auto`).
+- `searchRoot` 는 shadcn/ui 의 command input 같은 검색 줄입니다. ghost TextField 에 상자 대신 아래 선을 긋고, 캐럿이 포커스를 보여 주므로 ring 을 끕니다(`ringOffSinceCaretShowsFocus`). `focus-ring` 이 input 의 포커스로 ring 을 칠하므로 `!` 로 강제합니다. 팝업 padding 까지 채우도록 폭을 고정하지 않습니다.
+
+### 알아둘 것
+
+- `cn('...')` 값의 객체일 뿐입니다. 각 컴포넌트가 자기 `tv({ slots })` 에 넣으므로, 키를 더하면 쓰는 쪽의 슬롯에도 더합니다.
+- `list` 의 `-mx-1` 과 `separator` 의 `-mx-1` 은 팝업의 `concentric-p-1` 에 맞춘 값입니다. 팝업 padding 을 바꾸면 함께 바꿉니다.
 
 ## messages.ts
 

@@ -1,6 +1,7 @@
 import { Fragment, cloneElement, createElement, isValidElement, type ReactNode } from 'react';
 
-import { invariant, mergeProps } from '../../utils';
+import { invariant } from './invariant';
+import { mergeProps } from './merge';
 
 export function part(
   tag: 'button' | 'span' | 'div' | 'input',

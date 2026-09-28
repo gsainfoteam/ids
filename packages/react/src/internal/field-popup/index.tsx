@@ -23,10 +23,9 @@ import {
   type PopupPresentation,
 } from './layer';
 import { popupStyle } from './styles';
+import { isNodeFromAnyWindow } from '../../utils';
 
 export { FieldPopupHeader } from './header';
-export { part } from './parts';
-export { fieldListbox, fieldTrigger, type FieldTriggerVariant } from './styles';
 export { useDrawerPresentation, type PopupPresentation } from './layer';
 
 export type PopupSide = 'top' | 'bottom';
@@ -47,9 +46,6 @@ export type FieldPopupProps = ComponentProps<'div'> & {
 };
 
 const VIEWPORT_MARGIN = 8;
-
-const isNodeFromAnyWindow = (value: unknown): value is Node =>
-  typeof value === 'object' && value !== null && 'nodeType' in value;
 
 function blurWhileReactStillListens(popup: HTMLElement) {
   const focused = popup.ownerDocument.activeElement;

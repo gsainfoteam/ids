@@ -20,20 +20,24 @@ import { CheckIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/16/solid
 
 import { collectOptions, slotChildren, type SelectOption } from './select-options';
 import { useSelect, type SelectValue } from './use-select';
-import {
-  FieldPopup,
-  fieldListbox,
-  fieldTrigger,
-  part,
-  useDrawerPresentation,
-  type FieldTriggerVariant,
-} from '../../../internal/field-popup';
+import { FieldPopup, useDrawerPresentation } from '../../../internal/field-popup';
 import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../internal/field-popup/search';
+import { fieldTrigger, type FieldTriggerVariant } from '../../../internal/field-surface';
 import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
+import { listStyles } from '../../../internal/list-styles';
 import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
-import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import {
+  flattenFragments,
+  invariant,
+  isNodeFromAnyWindow,
+  keepFocusWhereItIs,
+  mergeProps,
+  mergeRefs,
+  part,
+  tv,
+} from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { IconButton } from '../../action/icon-button';
 import { Divider } from '../../layout/divider';
@@ -127,11 +131,6 @@ const isForeignComponent = (node: ReactNode): boolean =>
         isForeignComponent,
       )
     : typeof node.type === 'function' && !PARTS.has(node.type));
-
-const isNodeFromAnyFrame = (value: unknown): value is Node =>
-  typeof value === 'object' && value !== null && 'nodeType' in value;
-
-const keepFocusWhereItIs = (event: PointerEvent) => event.preventDefault();
 
 const MAX_LABELS_IN_TRIGGER = 2;
 
@@ -269,7 +268,7 @@ export function Select(props: SelectProps) {
     onBlur: (event: FocusEvent<HTMLButtonElement>) => {
       const next = event.relatedTarget;
       const movingIntoPopup =
-        isNodeFromAnyFrame(next) && (next as Element).closest?.(popupSelector);
+        isNodeFromAnyWindow(next) && (next as Element).closest?.(popupSelector);
       if (movingIntoPopup) return;
       onBlur?.(event);
     },
@@ -328,7 +327,7 @@ export function Select(props: SelectProps) {
           onBlur={(event) => {
             const next = event.relatedTarget;
             if (
-              isNodeFromAnyFrame(next) &&
+              isNodeFromAnyWindow(next) &&
               (event.currentTarget.contains(next) || next === select.triggerRef.current)
             )
               return;
@@ -703,13 +702,13 @@ export namespace Select {
       more: 'shrink-0 text-(--ids-color-on-muted)',
       icon: 'inline-flex shrink-0 text-(--ids-color-on-muted)',
       clear: fieldAction.base,
-      listbox: fieldListbox.list,
-      item: fieldListbox.option,
-      indicator: fieldListbox.indicator,
+      listbox: listStyles.list,
+      item: listStyles.option,
+      indicator: listStyles.indicator,
       group: 'flex flex-col',
-      groupHeading: fieldListbox.heading,
-      separator: fieldListbox.separator,
-      empty: [fieldListbox.empty, 'not-data-empty:sr-only'],
+      groupHeading: listStyles.heading,
+      separator: listStyles.separator,
+      empty: [listStyles.empty, 'not-data-empty:sr-only'],
     },
     variants: {
       variant: {

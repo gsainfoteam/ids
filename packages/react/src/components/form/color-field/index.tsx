@@ -14,14 +14,8 @@ import {
 import { XMarkIcon } from '@heroicons/react/16/solid';
 
 import { useColorField } from './use-color-field';
-import {
-  FieldPopup,
-  FieldPopupHeader,
-  fieldTrigger,
-  part,
-  useDrawerPresentation,
-  type FieldTriggerVariant,
-} from '../../../internal/field-popup';
+import { FieldPopup, FieldPopupHeader, useDrawerPresentation } from '../../../internal/field-popup';
+import { fieldTrigger, type FieldTriggerVariant } from '../../../internal/field-surface';
 import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
@@ -30,9 +24,11 @@ import {
   cn,
   flattenFragments,
   invariant,
+  isNodeFromAnyWindow,
   mergeEventHandlers,
   mergeProps,
   mergeRefs,
+  part,
   tv,
 } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
@@ -99,9 +95,6 @@ function useColor(part: string) {
 }
 
 const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
-
-const isNodeFromAnyFrame = (value: unknown): value is Node =>
-  typeof value === 'object' && value !== null && 'nodeType' in value;
 
 const FIRST_CONTROL = [
   '[data-color-picker] input:not([type=radio]):not([tabindex="-1"])',
@@ -200,7 +193,7 @@ export function ColorField({
     onBlur: (event: FocusEvent<HTMLButtonElement>) => {
       const next = event.relatedTarget;
       const movingIntoPopup =
-        isNodeFromAnyFrame(next) && (next as Element).closest?.(popupSelector);
+        isNodeFromAnyWindow(next) && (next as Element).closest?.(popupSelector);
       if (movingIntoPopup) return;
       onBlur?.(event);
     },
@@ -279,7 +272,7 @@ export function ColorField({
           onBlur={(event) => {
             const next = event.relatedTarget;
             if (
-              isNodeFromAnyFrame(next) &&
+              isNodeFromAnyWindow(next) &&
               (event.currentTarget.contains(next) || next === triggerRef.current)
             )
               return;

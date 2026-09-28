@@ -23,12 +23,11 @@ import {
   type FileFieldRejection,
 } from './file-rules';
 import { useFileField, usePreviewUrl, type FileFieldValue } from './use-file-field';
-import { fieldTrigger, part } from '../../../internal/field-popup';
-import { fieldAction } from '../../../internal/field-surface';
+import { fieldTrigger, fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
-import { cn, flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { cn, flattenFragments, invariant, mergeProps, mergeRefs, part, tv } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { Item } from '../../data/item';
 import { useFieldSize } from '../field/context';

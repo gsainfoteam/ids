@@ -2,9 +2,9 @@ import type { ComponentProps, ReactNode } from 'react';
 
 import { MagnifyingGlassIcon } from '@heroicons/react/16/solid';
 
-import { fieldListbox } from './styles';
 import { TextField } from '../../components/form/text-field';
 import { cn } from '../../utils';
+import { listStyles } from '../list-styles';
 
 export type FieldPopupSearchProps = Omit<ComponentProps<'input'>, 'size' | 'color'> & {
   controls: string;
@@ -29,7 +29,7 @@ export function FieldPopupSearch({
       autoComplete="off"
       spellCheck={false}
       {...props}
-      className={fieldListbox.searchRoot}
+      className={listStyles.searchRoot}
     >
       <MagnifyingGlassIcon aria-hidden="true" />
       <TextField.Input
@@ -43,7 +43,7 @@ export function FieldPopupSearch({
         aria-autocomplete="list"
         aria-activedescendant={activeDescendant}
         data-popup-autofocus=""
-        className={cn(fieldListbox.search, className)}
+        className={cn(listStyles.search, className)}
         style={style}
       >
         {asChild ? children : undefined}

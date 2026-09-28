@@ -18,19 +18,22 @@ import { CheckIcon, ChevronDownIcon } from '@heroicons/react/16/solid';
 import { isNotNil } from 'es-toolkit';
 
 import { CREATE, useChipField } from './use-chip-field';
-import {
-  FieldPopup,
-  fieldListbox,
-  fieldTrigger,
-  part,
-  useDrawerPresentation,
-  type FieldTriggerVariant,
-} from '../../../internal/field-popup';
+import { FieldPopup, useDrawerPresentation } from '../../../internal/field-popup';
 import { FieldPopupSearch } from '../../../internal/field-popup/search';
+import { fieldTrigger, type FieldTriggerVariant } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
+import { listStyles } from '../../../internal/list-styles';
 import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
-import { flattenFragments, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import {
+  flattenFragments,
+  invariant,
+  keepFocusWhereItIs,
+  mergeProps,
+  mergeRefs,
+  part,
+  tv,
+} from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Chip } from '../../data/chip';
 import { Slot } from '../../utility/slot';
@@ -100,8 +103,6 @@ function useChip(name: string) {
 }
 
 const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
-
-const keepFocusWhereItIs = (event: PointerEvent) => event.preventDefault();
 
 const cancelChipFocusMove = (event: Chip.RemoveEvent) => event.preventDefault();
 
@@ -749,13 +750,13 @@ export namespace ChipField {
         'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
       ],
       icon: 'shrink-0 cursor-pointer text-(--ids-color-on-muted)',
-      listbox: fieldListbox.list,
-      item: fieldListbox.option,
-      indicator: fieldListbox.indicator,
+      listbox: listStyles.list,
+      item: listStyles.option,
+      indicator: listStyles.indicator,
       group: 'flex flex-col',
-      groupHeading: fieldListbox.heading,
-      create: [fieldListbox.option, 'data-invalid:text-(--ids-color-danger)'],
-      empty: [fieldListbox.empty, 'not-data-empty:sr-only'],
+      groupHeading: listStyles.heading,
+      create: [listStyles.option, 'data-invalid:text-(--ids-color-danger)'],
+      empty: [listStyles.empty, 'not-data-empty:sr-only'],
       limit: [
         'px-2.5 pt-1.5 pb-1 text-caption-c1-regular text-(--ids-color-on-muted)',
         'not-data-full:sr-only',

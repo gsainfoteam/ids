@@ -2,7 +2,7 @@
 
 컴포넌트와 `internal/` 이 함께 쓰는 함수입니다. 범용 helper 는 여기에 만들지 않고 `es-toolkit` 에서 가져옵니다(RULES.md).
 
-- `utils/index.ts` 는 `children`, `cn`, `invariant`, `merge`, `tv` 를 다시 내보냅니다. `dev.ts` 는 barrel 에 없어서 `utils/dev` 에서 직접 가져옵니다.
+- `utils/index.ts` 는 `children`, `cn`, `dom`, `invariant`, `merge`, `part`, `tv` 를 다시 내보냅니다. `dev.ts` 는 barrel 에 없어서 `utils/dev` 에서 직접 가져옵니다.
 - `invariant` 와 `IdsError` 는 `src/index.ts` 도 내보내는 공개 API 입니다.
 - `cn` 패키지와 `tailwind-variants` 는 이 폴더만 import 합니다. 컴포넌트는 `utils` 의 `cn`, `tv`, `VariantProps` 를 씁니다.
 
@@ -12,6 +12,8 @@
 | [`tv.ts`](#tvts)               | 결과를 `cn` 으로 다시 합치는 `tailwind-variants/lite` | 모든 컴포넌트의 `Style`                                |
 | [`merge.ts`](#mergets)         | props, 이벤트 핸들러, ref, style 합치기               | Slot, `asChild` 파트, 필드 hook, ref 를 합치는 모든 곳 |
 | [`children.ts`](#childrents)   | Fragment 를 풀어 자식을 평평하게 만드는 함수          | 자식에서 파트를 찾는 컴포넌트                          |
+| [`part.ts`](#partts)           | 요소나 `asChild` 자식으로 파트 하나를 그리는 함수     | 파트가 많은 필드(Select, ChipField 등)                 |
+| [`dom.ts`](#domts)             | 이벤트 target 판별과 포커스를 두는 pointer 핸들러     | 팝업을 여는 필드, `internal/field-popup`               |
 | [`invariant.ts`](#invariantts) | 잘못된 사용에 `IdsError` 를 던지는 assert             | 거의 모든 컴포넌트와 `internal/`                       |
 | [`dev.ts`](#devts)             | 개발 빌드인지 알려 주는 `isDevelopment`               | 개발 경고를 내는 모든 곳                               |
 
@@ -103,7 +105,7 @@ props 를 합치는 함수입니다: `mergeProps`, `mergeEventHandlers`, `mergeR
 
 ### 쓰는 곳
 
-- `mergeProps`: Slot, 각 컴포넌트의 `asChild` 파트, field-popup 의 `part()`, text-control 의 Clear, 필드 hook(`use-text-field.ts` 등)
+- `mergeProps`: Slot, 각 컴포넌트의 `asChild` 파트, [`part()`](#partts), text-control 의 Clear, 필드 hook(`use-text-field.ts` 등)
 - `mergeRefs`: ref 를 둘 이상 붙이는 곳(Spinner, Button, 그룹 컴포넌트, 필드 hook, text-control 의 `useMergedRef`)
 - `mergeEventHandlers`: Alert, Calendar, ColorField, ColorPicker, Label
 - `mergeObjects`: `mergeProps` 의 `style`
@@ -170,6 +172,64 @@ const indexes = items.flatMap((child, index) =>
 
 - 앱이 파트를 자기 컴포넌트로 감싸면 파트로 찾지 못합니다.
 - 파트를 찾는 컴포넌트(TextField, Select, ChipField, FileField, ColorField, ColorPicker, TimePicker, Rating, 날짜와 시간 필드)는 모두 이 함수로 Fragment 를 풉니다.
+
+## part.ts
+
+파트 하나를 그리는 `part(tag, asChild, children, props)` 입니다. `asChild` 가 아니면 `tag` 요소를 만들고, `asChild` 면 자식 요소 하나를 복제합니다.
+
+### 쓰는 곳
+
+- Select, ChipField, ColorField, FileField, TimePicker, [`internal/temporal-field`](../internal/temporal-field/README.md) 의 파트
+
+### 쓰는 법
+
+```tsx
+// components/form/select/index.tsx (Select.Icon)
+return part(
+  'span',
+  asChild,
+  children ?? <ChevronDownIcon />,
+  mergeProps(props, { 'aria-hidden': true, className: c.styles.icon({ className }) }),
+);
+```
+
+### 왜 이렇게
+
+- `asChild` 면 자식을 `mergeProps(자식 props, props)` 로 복제합니다. 파트의 wiring 이 이기고 자식의 핸들러가 먼저 돕니다.
+- `asChild` 자식은 Fragment 가 아닌 요소 하나여야 합니다. HTML 요소 자식은 `tag` 와 같아야 하고(`span`, `div` 파트는 아무 요소나 됩니다), 컴포넌트 자식은 props 와 ref 를 넘긴다고 봅니다.
+- `input` 파트는 children 을 받지 않습니다.
+
+### 알아둘 것
+
+- 파트를 셀 때는 [`flattenFragments`](#childrents) 로 Fragment 를 풉니다. temporal-field 의 `shell`, Select 의 `triggers` 처럼 풀어 낸 파트를 그대로 렌더하는 곳이 있는데, `flattenFragments` 가 key 에 Fragment 경로를 붙이므로 파트를 여러 Fragment 에 나눠 담아도 key 가 겹치지 않습니다.
+
+## dom.ts
+
+DOM 이벤트를 다루는 작은 함수입니다: `isNodeFromAnyWindow`, `keepFocusWhereItIs`.
+
+### 쓰는 곳
+
+- `isNodeFromAnyWindow`: [`internal/field-popup`](../internal/field-popup/README.md) 의 바깥 누르기와 포커스 판정, Select 와 ColorField 의 blur 판정, temporal-field 의 `use-temporal-field.ts`
+- `keepFocusWhereItIs`: Select 와 ChipField 의 옵션, ChipField 의 만들기 옵션(`onPointerDown`)
+
+### 쓰는 법
+
+```ts
+// components/form/select/index.tsx: 포커스가 자기 팝업 안으로 갔는지
+const inPopup = isNodeFromAnyWindow(next) && (next as Element).closest?.(popupSelector);
+
+// components/form/chip-field/index.tsx: 옵션을 눌러도 포커스가 input 에 남는다
+{ onPointerDown: keepFocusWhereItIs }
+```
+
+### 왜 이렇게
+
+- 이벤트 target 과 `relatedTarget` 이 Node 인지는 `instanceof Node` 가 아니라 `nodeType` 으로 봅니다. `instanceof` 는 다른 frame(Storybook 의 iframe, 테스트 frame)의 노드나 DOM 생성자가 전역에 없는 환경에서 틀립니다.
+- `keepFocusWhereItIs` 는 `pointerdown` 의 기본 동작을 막아 포커스가 누른 곳으로 옮겨 가지 않게 합니다. 옵션은 포커스를 받지 않고 `aria-activedescendant` 로 가리켜지므로, 포커스는 trigger 나 검색 상자에 남아야 키보드로 이어서 고를 수 있습니다.
+
+### 알아둘 것
+
+- `isNodeFromAnyWindow` 는 Node 인지만 봅니다. `closest` 같은 Element 메서드가 필요하면 `?.` 로 부르거나 따로 좁힙니다(Text 노드도 Node 입니다).
 
 ## invariant.ts
 

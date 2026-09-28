@@ -94,7 +94,7 @@ packages/react/src/
   internal/      shared parts that are not exported:
                    surfaces     control-surface, toggle-surface, icon-square, field-surface, surface,
                                 slider-surface
-                   fields       text-control (shell, Clear, useMergedRef), field-popup,
+                   fields       text-control (shell, Clear, useMergedRef), field-popup, list-styles,
                                 temporal-field, form-value, date-locale
                    behaviour    pressable, state-props, use-checked-writes, icon-label, arc
                    strings      messages
