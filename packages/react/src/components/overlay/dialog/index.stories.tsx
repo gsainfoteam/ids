@@ -133,7 +133,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Size"
-        description="크기 prop 은 없습니다. 기본은 max-w-lg 이고, 폭과 높이는 className 으로 바꿉니다. 화면보다 긴 본문은 대화상자 안에서 스크롤합니다."
+        description="크기 prop 은 없습니다. 기본은 max-w-md(448px) 이고, 폭과 높이는 className 으로 바꿉니다. 화면보다 긴 본문은 대화상자 안에서 스크롤합니다."
       >
         <Showcase.Row label="className">
           <Dialog>
