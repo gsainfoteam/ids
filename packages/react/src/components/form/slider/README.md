@@ -96,7 +96,7 @@ import { Field, Slider } from '@gsainfoteam/ids-react';
 
 - 자식이 없으면 `Track` 안에 `Range` 와 thumb이 들어갑니다. `Track` 만 두면 그 안이 기본으로 채워집니다.
 - 모든 부분이 `asChild`, 상태를 받는 `className` `style` `children` 을 받습니다.
-- thumb 크기를 바꿀 때는 `[--slider-thumb:20px]` 처럼 변수도 맞춥니다. thumb 위치와 포인터 계산이 이 값을 씁니다.
+- thumb 크기는 `[--slider-thumb:20px]` 처럼 변수로 바꿉니다. thumb 의 크기와 트랙 안 위치가 모두 이 값을 따릅니다.
 
 ## 상태와 스타일
 
