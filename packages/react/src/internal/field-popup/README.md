@@ -22,6 +22,7 @@
 | ChipField                                     | `FieldPopup`, `useDrawerPresentation`, `revealPopupOption`, `FieldPopupSearch` |
 | ColorField                                    | `FieldPopup`, `FieldPopupHeader`, `useDrawerPresentation`                      |
 | [temporal-field](../temporal-field/README.md) | `FieldPopup`, `FieldPopupHeader`                                               |
+| Menu                                          | `FieldPopupSearch`(명령 팔레트의 `Menu.Search`)                                |
 
 - `search.tsx` 는 `index.tsx` 가 다시 내보내지 않습니다. `internal/field-popup/search` 에서 직접 가져옵니다.
 
@@ -167,7 +168,7 @@ const styles = popupStyle();
 
 ### 왜 이렇게
 
-- Select.SearchField 와 ChipField 의 drawer 가 그리는, 목록 위의 검색 상자입니다.
+- Select.SearchField, ChipField 의 drawer, Menu 명령 팔레트의 `Menu.Search` 가 그리는, 목록 위의 검색 상자입니다.
 - combobox wiring(`role="combobox"`, `aria-controls`, `aria-activedescendant`, `aria-autocomplete="list"`, `aria-expanded`)은 `TextField.Input` 에 둡니다. TextField 는 Input 파트의 props 를 루트 props 보다 나중에 합치므로 wiring 이 호출한 쪽의 props 를 이깁니다. 호출한 쪽의 핸들러는 그래도 먼저 돕니다.
 - `data-popup-autofocus` 라서 팝업이 열리면 검색 상자가 포커스를 받습니다.
 

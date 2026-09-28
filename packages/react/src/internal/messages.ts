@@ -152,6 +152,10 @@ export const messages = {
   },
   menu: {
     submenu: (label: string) => `${label} 하위 메뉴`,
+    command: '명령',
+    search: '명령 검색',
+    searchPlaceholder: '명령 검색…',
+    empty: '결과가 없습니다.',
   },
   toast: {
     close: '알림 닫기',

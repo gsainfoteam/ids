@@ -4,13 +4,20 @@ import {
   ArrowRightStartOnRectangleIcon,
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
+  ArrowDownTrayIcon,
   ClipboardIcon,
   Cog6ToothIcon,
   DocumentDuplicateIcon,
+  DocumentPlusIcon,
   EllipsisHorizontalIcon,
   EnvelopeIcon,
+  FolderOpenIcon,
   LinkIcon,
+  MagnifyingGlassIcon,
+  MoonIcon,
   PencilIcon,
+  PhotoIcon,
+  PrinterIcon,
   ScissorsIcon,
   ShareIcon,
   TrashIcon,
@@ -23,6 +30,7 @@ import { Showcase } from '~story-kit';
 import { overlay } from '../../../internal/overlay';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
+import { Kbd } from '../../typography/kbd';
 import { Dialog } from '../dialog';
 
 import { Menu } from '.';
@@ -34,7 +42,7 @@ const meta = {
   component: Menu,
   tags: ['autodocs'],
   argTypes: {
-    triggerType: { control: 'radio', options: ['click', 'contextmenu'] },
+    triggerType: { control: 'radio', options: ['click', 'contextmenu', 'command'] },
   },
   args: {
     triggerType: 'click',
@@ -99,12 +107,152 @@ function ShareSub() {
   );
 }
 
+function ExportSub() {
+  return (
+    <Menu.Sub>
+      <Menu.SubTrigger>
+        <ArrowDownTrayIcon />
+        내보내기
+      </Menu.SubTrigger>
+      <Menu.SubContent>
+        <Menu.Item>PDF 문서</Menu.Item>
+        <Menu.Sub>
+          <Menu.SubTrigger>
+            <PhotoIcon />
+            이미지
+          </Menu.SubTrigger>
+          <Menu.SubContent>
+            <Menu.Item>PNG</Menu.Item>
+            <Menu.Sub>
+              <Menu.SubTrigger>JPEG</Menu.SubTrigger>
+              <Menu.SubContent>
+                <Menu.Item>고화질</Menu.Item>
+                <Menu.Item>보통</Menu.Item>
+                <Menu.Sub>
+                  <Menu.SubTrigger>저화질</Menu.SubTrigger>
+                  <Menu.SubContent>
+                    <Menu.Item>메일 첨부용 (1MB 이하)</Menu.Item>
+                    <Menu.Item>메신저용 (300KB 이하)</Menu.Item>
+                  </Menu.SubContent>
+                </Menu.Sub>
+              </Menu.SubContent>
+            </Menu.Sub>
+            <Menu.Item>WebP</Menu.Item>
+          </Menu.SubContent>
+        </Menu.Sub>
+        <Menu.Item>HTML 웹 페이지</Menu.Item>
+      </Menu.SubContent>
+    </Menu.Sub>
+  );
+}
+
+function DocumentMenu() {
+  return (
+    <Menu>
+      <Menu.Trigger asChild>
+        <Button variant="outline">문서</Button>
+      </Menu.Trigger>
+      <Menu.Content>
+        <Menu.Item>
+          <DocumentPlusIcon />새 문서
+        </Menu.Item>
+        <ExportSub />
+        <Menu.Item>
+          <PrinterIcon />
+          인쇄
+          <Menu.Shortcut keys="mod+p" />
+        </Menu.Item>
+      </Menu.Content>
+    </Menu>
+  );
+}
+
+function CommandPaletteDemo() {
+  const [last, setLast] = useState('없음');
+  const [dark, setDark] = useState(false);
+
+  const run = (name: string) => () => setLast(name);
+
+  return (
+    <div className="flex items-center gap-3">
+      <Menu triggerType="command" hotkey="mod+k">
+        <Menu.Trigger asChild>
+          <Button variant="outline">
+            <MagnifyingGlassIcon />
+            명령 찾기
+            <Kbd keys="mod+k" size="tiny" />
+          </Button>
+        </Menu.Trigger>
+        <Menu.Content>
+          <Menu.Search data-1p-ignore data-lpignore="true" />
+          <Menu.Group>
+            <Menu.Label>문서</Menu.Label>
+            <Menu.Item onSelect={run('새 문서')}>
+              <DocumentPlusIcon />새 문서
+              <Menu.Shortcut keys="mod+n" />
+            </Menu.Item>
+            <Menu.Item onSelect={run('열기')}>
+              <FolderOpenIcon />
+              열기…
+              <Menu.Shortcut keys="mod+o" />
+            </Menu.Item>
+            <Menu.Item onSelect={run('인쇄')}>
+              <PrinterIcon />
+              인쇄
+              <Menu.Shortcut keys="mod+p" />
+            </Menu.Item>
+            <Menu.Item disabled>
+              <ClipboardIcon />
+              붙여넣기
+            </Menu.Item>
+          </Menu.Group>
+          <Menu.Separator />
+          <Menu.Group>
+            <Menu.Label>보기</Menu.Label>
+            <Menu.CheckboxItem checked={dark} onCheckedChange={setDark}>
+              <MoonIcon />
+              어두운 화면
+            </Menu.CheckboxItem>
+          </Menu.Group>
+          <Menu.Separator />
+          <Menu.Group>
+            <Menu.Label>계정</Menu.Label>
+            <Menu.Item onSelect={run('설정')}>
+              <Cog6ToothIcon />
+              설정
+              <Menu.Shortcut keys="mod+," />
+            </Menu.Item>
+            <Menu.Item onSelect={run('로그아웃')}>
+              <ArrowRightStartOnRectangleIcon />
+              로그아웃
+            </Menu.Item>
+          </Menu.Group>
+          <Menu.Empty>일치하는 명령이 없습니다.</Menu.Empty>
+        </Menu.Content>
+      </Menu>
+      <span className="text-body-b3-regular">
+        마지막 명령: {last}, 어두운 화면 {dark ? '켜짐' : '꺼짐'}
+      </span>
+    </div>
+  );
+}
+
 const contextArea = 'context-area';
 
 export const Playground: Story = {
   render: (args) => (
     <Menu {...args}>
-      {args.triggerType === 'contextmenu' ? (
+      {args.triggerType === 'command' ? (
+        <>
+          <Menu.Trigger asChild>
+            <Button variant="outline">명령 찾기</Button>
+          </Menu.Trigger>
+          <Menu.Content>
+            <Menu.Search />
+            <EditItems />
+          </Menu.Content>
+        </>
+      ) : args.triggerType === 'contextmenu' ? (
         <Menu.Trigger
           data-testid={contextArea}
           className="rounded-standard text-body-b3-regular flex h-40 w-80 items-center justify-center border border-dashed border-(--ids-color-border) text-(--ids-color-on-muted)"
@@ -116,11 +264,13 @@ export const Playground: Story = {
           <Button variant="outline">편집</Button>
         </Menu.Trigger>
       )}
-      <Menu.Content aria-label={args.triggerType === 'contextmenu' ? '편집' : undefined}>
-        <EditItems />
-        <Menu.Separator />
-        <ShareSub />
-      </Menu.Content>
+      {args.triggerType !== 'command' && (
+        <Menu.Content aria-label={args.triggerType === 'contextmenu' ? '편집' : undefined}>
+          <EditItems />
+          <Menu.Separator />
+          <ShareSub />
+        </Menu.Content>
+      )}
     </Menu>
   ),
 };
@@ -262,6 +412,18 @@ export const Gallery: Story = {
               </Menu.Sub>
             </Menu.Content>
           </Menu>
+        </Showcase.Row>
+        <Showcase.Row label="여러 단계">
+          <DocumentMenu />
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Command palette"
+        description="triggerType='command' 는 화면 위쪽 가운데의 modal 명령 팔레트입니다. 검색 상자에 글자를 치면 항목이 걸러지고, ↑ ↓ 로 고르고 Enter 로 실행합니다. hotkey 로 어디서든 엽니다."
+      >
+        <Showcase.Row label="mod+k">
+          <CommandPaletteDemo />
         </Showcase.Row>
       </Showcase.Section>
 
@@ -447,5 +609,83 @@ export const OpenDialogFromItem: Story = {
     await userEvent.click(await canvas.findByRole('button', { name: '바꾸기' }));
     await waitFor(() => expect(canvas.getByText('최종 보고서.pdf')).toBeInTheDocument());
     await waitFor(() => expect(canvas.getByRole('button', { name: '파일 메뉴' })).toHaveFocus());
+  },
+};
+
+export const NestedSubmenus: Story = {
+  render: () => <DocumentMenu />,
+  play: async ({ canvas, userEvent }) => {
+    const focused = (name: string) =>
+      waitFor(() => expect(canvas.getByRole('menuitem', { name })).toHaveFocus());
+
+    canvas.getByRole('button', { name: '문서' }).focus();
+    await userEvent.keyboard('{Enter}');
+    await focused('새 문서');
+
+    for (const [trigger, first] of [
+      ['내보내기', 'PDF 문서'],
+      ['이미지', 'PNG'],
+    ] as const) {
+      await userEvent.keyboard('{ArrowDown}');
+      await focused(trigger);
+      await userEvent.keyboard('{ArrowRight}');
+      await focused(first);
+    }
+
+    await userEvent.keyboard('{ArrowDown}');
+    await focused('JPEG');
+    await userEvent.keyboard('{ArrowRight}');
+    await focused('고화질');
+    await userEvent.keyboard('{End}');
+    await focused('저화질');
+    await userEvent.keyboard('{ArrowRight}');
+    await focused('메일 첨부용 (1MB 이하)');
+    expect(canvas.getAllByRole('menu')).toHaveLength(5);
+
+    await userEvent.keyboard('{ArrowLeft}');
+    await focused('저화질');
+    expect(canvas.queryByRole('menu', { name: '저화질 하위 메뉴' })).not.toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    await focused('JPEG');
+    expect(canvas.queryByRole('menu', { name: 'JPEG 하위 메뉴' })).not.toBeInTheDocument();
+    await userEvent.keyboard('{ArrowLeft}');
+    await focused('이미지');
+    await userEvent.keyboard('{Escape}');
+    await focused('내보내기');
+    expect(canvas.getAllByRole('menu')).toHaveLength(1);
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(canvas.getByRole('button', { name: '문서' })).toHaveFocus());
+    expect(canvas.queryByRole('menu')).not.toBeInTheDocument();
+  },
+};
+
+export const CommandPalette: Story = {
+  render: () => <CommandPaletteDemo />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: /^명령 찾기/ }));
+    const search = await canvas.findByRole('combobox', { name: '명령 검색' });
+    await waitFor(() => expect(search).toHaveFocus());
+
+    await userEvent.type(search, 'zzz');
+    await waitFor(() =>
+      expect(canvas.getByRole('status')).toHaveTextContent('일치하는 명령이 없습니다.'),
+    );
+    expect(canvas.queryAllByRole('option')).toHaveLength(0);
+
+    await userEvent.clear(search);
+    await userEvent.type(search, '설정');
+    await waitFor(() =>
+      expect(canvas.getByRole('option', { name: /^설정/ })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      ),
+    );
+    expect(canvas.getAllByRole('option')).toHaveLength(1);
+    expect(canvas.queryByRole('group', { name: '문서' })).not.toBeInTheDocument();
+
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(canvas.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(canvas.getByText('마지막 명령: 설정, 어두운 화면 꺼짐')).toBeInTheDocument();
+    await waitFor(() => expect(canvas.getByRole('button', { name: /^명령 찾기/ })).toHaveFocus());
   },
 };

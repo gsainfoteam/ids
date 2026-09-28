@@ -1,6 +1,5 @@
 import {
   cloneElement,
-  createContext,
   isValidElement,
   use,
   useId,
@@ -13,11 +12,36 @@ import {
   type ReactNode,
 } from 'react';
 
-import { CheckIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
+import { ChevronRightIcon } from '@heroicons/react/16/solid';
 
+import {
+  CommandCheckboxItem,
+  CommandContent,
+  CommandEmpty,
+  CommandItem,
+  CommandMenu,
+  CommandRadioItem,
+  CommandSearch,
+  CommandSub,
+  CommandTrigger,
+} from './command';
+import {
+  CommandContext,
+  GroupContext,
+  ItemContext,
+  LevelContext,
+  RadioContext,
+  RootContext,
+  SubContext,
+  useLevelContext,
+  useRadioContext,
+  useRootContext,
+  useSubContext,
+} from './context';
+import { MenuItemIndicator, withIndicator, type MenuItemIndicatorProps } from './indicator';
+import { menuStyle } from './style';
 import { useMenuLevel, type MenuLevel, type MenuPlacement, type MenuTriggerType } from './use-menu';
 import { selectItem, useMenuItem } from './use-menu-item';
-import { listStyles } from '../../../internal/list-styles';
 import { messages } from '../../../internal/messages';
 import {
   FloatingList,
@@ -29,39 +53,9 @@ import {
   type AnchoredAlign,
   type AnchoredSide,
 } from '../../../internal/overlay';
-import { flattenFragments, invariant, mergeProps, mergeRefs, part, tv } from '../../../utils';
+import { mergeProps, mergeRefs, part } from '../../../utils';
 import { Divider } from '../../layout/divider';
 import { Kbd } from '../../typography/kbd';
-
-type RootContextValue = { root: MenuLevel; triggerType: MenuTriggerType };
-type ItemState = { checked: boolean; kind: 'checkbox' | 'radio' };
-type GroupContextValue = { labelId: string; setLabelled: (labelled: boolean) => void };
-type RadioContextValue = { value: string | undefined; setValue: (value: string) => void };
-
-const RootContext = createContext<RootContextValue | null>(null);
-const LevelContext = createContext<MenuLevel | null>(null);
-const SubContext = createContext<MenuLevel | null>(null);
-const GroupContext = createContext<GroupContextValue | null>(null);
-const RadioContext = createContext<RadioContextValue | null>(null);
-const ItemContext = createContext<ItemState | null>(null);
-
-function useRootContext(part: string) {
-  const context = use(RootContext);
-  invariant(context, `${part} must be rendered inside Menu.`);
-  return context;
-}
-
-function useLevelContext(part: string) {
-  const context = use(LevelContext);
-  invariant(context, `${part} must be rendered inside Menu.Content or Menu.SubContent.`);
-  return context;
-}
-
-function useSubContext(part: string) {
-  const context = use(SubContext);
-  invariant(context, `${part} must be rendered inside Menu.Sub.`);
-  return context;
-}
 
 function usePlacement(level: MenuLevel, { side, align, sideOffset, alignOffset }: MenuPlacement) {
   const { setPlacement } = level;
@@ -71,25 +65,12 @@ function usePlacement(level: MenuLevel, { side, align, sideOffset, alignOffset }
   }, [setPlacement, side, align, sideOffset, alignOffset]);
 }
 
-const isIndicator = (node: ReactNode) => isValidElement(node) && node.type === MenuItemIndicator;
+export function Menu({ triggerType = 'click', ...props }: Menu.Props) {
+  if (triggerType === 'command') return <CommandMenu {...props} />;
 
-function withIndicator(children: ReactNode, asChild: boolean | undefined) {
-  const append = (nodes: ReactNode) => (
-    <>
-      {nodes}
-      {!flattenFragments(nodes).some(isIndicator) && <MenuItemIndicator />}
-    </>
-  );
-
-  if (asChild && isValidElement<{ children?: ReactNode }>(children))
-    return cloneElement(children, {}, append(children.props.children));
-  return append(children);
-}
-
-export function Menu(props: Menu.Props) {
   return (
     <FloatingTree>
-      <MenuRoot {...props} />
+      <MenuRoot {...props} triggerType={triggerType} />
     </FloatingTree>
   );
 }
@@ -98,9 +79,9 @@ function MenuRoot({
   open,
   defaultOpen = false,
   onOpenChange,
-  triggerType = 'click',
+  triggerType,
   children,
-}: Menu.Props) {
+}: Omit<Menu.Props, 'triggerType'> & { triggerType: MenuTriggerType }) {
   const root = useMenuLevel({ open, defaultOpen, onOpenChange, parentOpen: null, triggerType });
 
   return (
@@ -110,7 +91,13 @@ function MenuRoot({
   );
 }
 
-function MenuTrigger({ asChild, children, ...props }: Menu.TriggerProps) {
+function MenuTrigger(props: Menu.TriggerProps) {
+  if (use(CommandContext)) return <CommandTrigger {...props} />;
+
+  return <PopupMenuTrigger {...props} />;
+}
+
+function PopupMenuTrigger({ asChild, children, ...props }: Menu.TriggerProps) {
   const { root, triggerType } = useRootContext('Menu.Trigger');
   const state = {
     ref: root.setTrigger,
@@ -136,6 +123,7 @@ function MenuTrigger({ asChild, children, ...props }: Menu.TriggerProps) {
         },
       }),
     );
+
   return part(
     'button',
     asChild,
@@ -198,7 +186,7 @@ function MenuPopup({ level, name, className, style, children, ...props }: PopupP
       data-align={level.anchored.align}
       data-open={level.open ? '' : undefined}
       data-ending-style={level.ending ? '' : undefined}
-      className={Menu.Style({ nested: level.nested }).content({ className })}
+      className={menuStyle({ nested: level.nested }).content({ className })}
       style={{ ...style, ...level.anchored.floatingStyles }}
     >
       <OverlayItemContext value={null}>
@@ -212,7 +200,13 @@ function MenuPopup({ level, name, className, style, children, ...props }: PopupP
   );
 }
 
-function MenuContent({
+function MenuContent(props: Menu.ContentProps) {
+  if (use(CommandContext)) return <CommandContent {...props} />;
+
+  return <PopupMenuContent {...props} />;
+}
+
+function PopupMenuContent({
   side,
   align = 'start',
   sideOffset,
@@ -240,7 +234,13 @@ function MenuContent({
   );
 }
 
-function MenuItem({
+function MenuItem(props: Menu.ItemProps) {
+  if (use(CommandContext)) return <CommandItem {...props} />;
+
+  return <PopupMenuItem {...props} />;
+}
+
+function PopupMenuItem({
   disabled = false,
   textValue,
   onSelect,
@@ -267,12 +267,18 @@ function MenuItem({
       ...item.props,
       role: 'menuitem',
       'data-menu-item': '',
-      className: Menu.Style().item({ className }),
+      className: menuStyle().item({ className }),
     }),
   );
 }
 
-function MenuCheckboxItem({
+function MenuCheckboxItem(props: Menu.CheckboxItemProps) {
+  if (use(CommandContext)) return <CommandCheckboxItem {...props} />;
+
+  return <PopupMenuCheckboxItem {...props} />;
+}
+
+function PopupMenuCheckboxItem({
   checked = false,
   onCheckedChange,
   disabled = false,
@@ -306,7 +312,7 @@ function MenuCheckboxItem({
           'aria-checked': checked,
           'data-checked': checked ? '' : undefined,
           'data-menu-item': '',
-          className: Menu.Style().item({ checkable: true, className }),
+          className: menuStyle().item({ checkable: true, className }),
         }),
       )}
     </ItemContext>
@@ -325,7 +331,13 @@ function MenuRadioGroup({ value, onValueChange, children, ...props }: Menu.Radio
   );
 }
 
-function MenuRadioItem({
+function MenuRadioItem(props: Menu.RadioItemProps) {
+  if (use(CommandContext)) return <CommandRadioItem {...props} />;
+
+  return <PopupMenuRadioItem {...props} />;
+}
+
+function PopupMenuRadioItem({
   value,
   disabled = false,
   textValue,
@@ -337,8 +349,7 @@ function MenuRadioItem({
 }: Menu.RadioItemProps) {
   const { root } = useRootContext('Menu.RadioItem');
   const level = useLevelContext('Menu.RadioItem');
-  const group = use(RadioContext);
-  invariant(group, 'Menu.RadioItem must be rendered inside Menu.RadioGroup.');
+  const group = useRadioContext('Menu.RadioItem');
 
   const checked = group.value === value;
   const item = useMenuItem(level, {
@@ -362,40 +373,20 @@ function MenuRadioItem({
           'aria-checked': checked,
           'data-checked': checked ? '' : undefined,
           'data-menu-item': '',
-          className: Menu.Style().item({ checkable: true, className }),
+          className: menuStyle().item({ checkable: true, className }),
         }),
       )}
     </ItemContext>
   );
 }
 
-function MenuItemIndicator({ asChild, children, className, ...props }: Menu.ItemIndicatorProps) {
-  const item = use(ItemContext);
-  invariant(
-    item,
-    'Menu.ItemIndicator must be rendered inside Menu.CheckboxItem or Menu.RadioItem.',
-  );
-
-  if (!item.checked) return null;
-
-  const styles = Menu.Style();
-  const glyph = item.kind === 'radio' ? <span className={styles.dot()} /> : <CheckIcon />;
-
-  return part(
-    'span',
-    asChild,
-    children ?? glyph,
-    mergeProps(props, {
-      'aria-hidden': true,
-      'data-menu-item-indicator': '',
-      className: styles.indicator({ className }),
-    }),
-  );
-}
-
 function MenuGroup({ asChild, className, children, ...props }: Menu.GroupProps) {
+  const palette = use(CommandContext);
   const labelId = useId();
   const [labelled, setLabelled] = useState(false);
+  const [element, setElement] = useState<HTMLElement | null>(null);
+
+  const hidden = !!element && !!palette?.hiddenSections.has(element);
 
   return (
     <GroupContext value={{ labelId, setLabelled }}>
@@ -404,10 +395,12 @@ function MenuGroup({ asChild, className, children, ...props }: Menu.GroupProps) 
         asChild,
         children,
         mergeProps(props, {
+          ref: palette ? setElement : undefined,
           role: 'group',
+          hidden: hidden || undefined,
           'aria-labelledby': props['aria-labelledby'] ?? (labelled ? labelId : undefined),
           'data-menu-group': '',
-          className: Menu.Style().group({ className }),
+          className: menuStyle().group({ className }),
         }),
       )}
     </GroupContext>
@@ -432,14 +425,25 @@ function MenuLabel({ asChild, className, children, ...props }: Menu.LabelProps) 
     mergeProps(props, {
       id: props.id ?? group?.labelId,
       'data-menu-label': '',
-      className: Menu.Style().label({ className }),
+      className: menuStyle().label({ className }),
     }),
   );
 }
 
 function MenuSeparator({ className, ...props }: Menu.SeparatorProps) {
+  const palette = use(CommandContext);
+  const [element, setElement] = useState<HTMLElement | null>(null);
+
+  const hidden = !!element && !!palette?.hiddenSections.has(element);
+
   return (
-    <Divider {...props} data-menu-separator="" className={Menu.Style().separator({ className })} />
+    <Divider
+      {...mergeProps(props, { ref: palette ? setElement : undefined })}
+      decorative={!!palette}
+      hidden={hidden || undefined}
+      data-menu-separator=""
+      className={menuStyle().separator({ className })}
+    />
   );
 }
 
@@ -449,12 +453,18 @@ function MenuShortcut({ className, ...props }: Menu.ShortcutProps) {
       size="tiny"
       {...props}
       data-menu-shortcut=""
-      className={Menu.Style().shortcut({ className })}
+      className={menuStyle().shortcut({ className })}
     />
   );
 }
 
-function MenuSub({ open, defaultOpen = false, onOpenChange, children }: Menu.SubProps) {
+function MenuSub(props: Menu.SubProps) {
+  if (use(CommandContext)) return <CommandSub />;
+
+  return <PopupMenuSub {...props} />;
+}
+
+function PopupMenuSub({ open, defaultOpen = false, onOpenChange, children }: Menu.SubProps) {
   const { triggerType } = useRootContext('Menu.Sub');
   const parent = useLevelContext('Menu.Sub');
   const sub = useMenuLevel({
@@ -489,7 +499,7 @@ function MenuSubTrigger({
     keepsHighlightOnLeave: sub.open,
   });
 
-  const styles = Menu.Style();
+  const styles = menuStyle();
   const content = (nodes: ReactNode) => (
     <>
       {nodes}
@@ -526,6 +536,7 @@ function MenuSubContent({
   ...props
 }: Menu.SubContentProps) {
   const sub = useSubContext('Menu.SubContent');
+
   usePlacement(sub, { side, align, sideOffset, alignOffset });
 
   if (!sub.mounted) return null;
@@ -536,7 +547,7 @@ function MenuSubContent({
 }
 
 export namespace Menu {
-  export type TriggerType = MenuTriggerType;
+  export type TriggerType = MenuTriggerType | 'command';
   export type Side = AnchoredSide;
   export type Align = AnchoredAlign;
   export type SelectEvent = Event;
@@ -546,6 +557,7 @@ export namespace Menu {
     defaultOpen?: boolean;
     onOpenChange?: (open: boolean) => void;
     triggerType?: TriggerType;
+    hotkey?: string;
     children?: ReactNode;
   };
 
@@ -574,7 +586,7 @@ export namespace Menu {
     asChild?: boolean;
   };
   export type RadioItemProps = ItemBaseProps & { value: string };
-  export type ItemIndicatorProps = ComponentProps<'span'> & { asChild?: boolean };
+  export type ItemIndicatorProps = MenuItemIndicatorProps;
   export type GroupProps = ComponentProps<'div'> & { asChild?: boolean };
   export type LabelProps = ComponentProps<'div'> & { asChild?: boolean };
   export type SeparatorProps = Omit<
@@ -590,6 +602,11 @@ export namespace Menu {
   };
   export type SubTriggerProps = Omit<ItemBaseProps, 'onSelect'>;
   export type SubContentProps = ContentProps;
+  export type SearchProps = Omit<
+    ComponentProps<'input'>,
+    'size' | 'color' | 'value' | 'defaultValue'
+  >;
+  export type EmptyProps = ComponentProps<'div'> & { asChild?: boolean };
 
   export const Trigger = MenuTrigger;
   export const Content = MenuContent;
@@ -605,40 +622,8 @@ export namespace Menu {
   export const Sub = MenuSub;
   export const SubTrigger = MenuSubTrigger;
   export const SubContent = MenuSubContent;
+  export const Search = CommandSearch;
+  export const Empty = CommandEmpty;
 
-  export const Style = tv({
-    slots: {
-      content: [
-        'fixed z-50 m-0 flex max-h-(--available-height) max-w-(--available-width) flex-col',
-        'overflow-x-hidden overflow-y-auto overscroll-contain concentric-p-1 outline-none',
-        'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface)',
-        'text-body-b3-regular shadow-md',
-        'transition-[opacity,scale] duration-(--ids-motion-fast) ease-out',
-        'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
-        'data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom',
-        'motion-reduce:transition-none',
-      ],
-      item: [
-        listStyles.option,
-        'pe-2.5 data-popup-open:bg-(--ids-color-muted) [&_svg]:size-(--ids-size-icon-standard)',
-      ],
-      indicator: listStyles.indicator,
-      dot: 'size-1.5 rounded-full bg-current',
-      subIcon: '-me-0.5 ms-auto text-(--ids-color-on-muted)',
-      group: 'flex flex-col',
-      label: listStyles.heading,
-      separator: listStyles.separator,
-      shortcut: 'ms-auto ps-3',
-    },
-    variants: {
-      nested: {
-        false: { content: 'min-w-[max(var(--anchor-width),8rem)]' },
-        true: { content: 'min-w-32' },
-      },
-      checkable: {
-        true: { item: 'pe-8' },
-      },
-    },
-    defaultVariants: { nested: false },
-  });
+  export const Style = menuStyle;
 }

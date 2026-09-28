@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, Dialog, IdsProvider, overlay } from '../src';
@@ -402,4 +402,443 @@ test('the menu opens below its trigger, aligned to its start', async () => {
       return [Math.round(rect.left - anchor.left), Math.round(rect.top - anchor.bottom)];
     })
     .toEqual([0, 4]);
+});
+
+function DeepMenu(props: Partial<Menu.Props> & { onSubOpenChange?: (open: boolean) => void }) {
+  const { onSubOpenChange, ...menuProps } = props;
+
+  return (
+    <Menu {...menuProps}>
+      <Menu.Trigger>File</Menu.Trigger>
+      <Menu.Content>
+        <Menu.Item>New</Menu.Item>
+        <Menu.Sub onOpenChange={onSubOpenChange}>
+          <Menu.SubTrigger>Export</Menu.SubTrigger>
+          <Menu.SubContent>
+            <Menu.Item>PDF</Menu.Item>
+            <Menu.Sub>
+              <Menu.SubTrigger>Image</Menu.SubTrigger>
+              <Menu.SubContent>
+                <Menu.Item>PNG</Menu.Item>
+                <Menu.Sub>
+                  <Menu.SubTrigger>JPEG</Menu.SubTrigger>
+                  <Menu.SubContent>
+                    <Menu.Item>High quality</Menu.Item>
+                    <Menu.Item>Low quality</Menu.Item>
+                  </Menu.SubContent>
+                </Menu.Sub>
+              </Menu.SubContent>
+            </Menu.Sub>
+          </Menu.SubContent>
+        </Menu.Sub>
+      </Menu.Content>
+    </Menu>
+  );
+}
+
+async function renderDeep(props: Parameters<typeof DeepMenu>[0] = {}, justify = 'flex-start') {
+  const screen = await render(
+    <IdsProvider>
+      <div style={{ display: 'flex', justifyContent: justify }}>
+        <DeepMenu {...props} />
+      </div>
+      <button type="button" style={{ position: 'fixed', bottom: 16, left: 16 }}>
+        Outside
+      </button>
+    </IdsProvider>,
+  );
+  const trigger = screen.getByRole('button', { name: 'File' });
+  const item = (name: string) => screen.getByRole('menuitem', { name });
+  const submenu = (name: string) => screen.getByRole('menu', { name: `${name} 하위 메뉴` });
+
+  const openByKeyboard = async () => {
+    trigger.element().focus();
+    await userEvent.keyboard('{Enter}');
+    await expect.element(item('New')).toHaveFocus();
+    for (const [sub, first] of [
+      ['Export', 'PDF'],
+      ['Image', 'PNG'],
+      ['JPEG', 'High quality'],
+    ] as const) {
+      await userEvent.keyboard('{ArrowDown}');
+      await expect.element(item(sub)).toHaveFocus();
+      await userEvent.keyboard('{ArrowRight}');
+      await expect.element(item(first)).toHaveFocus();
+    }
+  };
+
+  return { screen, trigger, item, submenu, openByKeyboard };
+}
+
+test('four levels open with ArrowRight, and ArrowLeft or Escape close only the deepest one', async () => {
+  const { screen, trigger, item, submenu, openByKeyboard } = await renderDeep();
+  await openByKeyboard();
+  await expect.element(submenu('JPEG')).toBeVisible();
+
+  await userEvent.keyboard('{ArrowLeft}');
+  await expect.element(submenu('JPEG')).not.toBeInTheDocument();
+  await expect.element(item('JPEG')).toHaveFocus();
+  await expect.element(submenu('Image')).toBeVisible();
+
+  await userEvent.keyboard('{ArrowRight}');
+  await expect.element(item('High quality')).toHaveFocus();
+  await userEvent.keyboard('{Escape}');
+  await expect.element(item('JPEG')).toHaveFocus();
+  await userEvent.keyboard('{Escape}');
+  await expect.element(submenu('Image')).not.toBeInTheDocument();
+  await expect.element(item('Image')).toHaveFocus();
+  await userEvent.keyboard('{ArrowLeft}');
+  await expect.element(submenu('Export')).not.toBeInTheDocument();
+  await expect.element(item('Export')).toHaveFocus();
+  await userEvent.keyboard('{Escape}');
+  await expect.element(screen.getByRole('menu', { name: 'File' })).not.toBeInTheDocument();
+  await expect.element(trigger).toHaveFocus();
+});
+
+test('a press outside a four-level tree closes every level once', async () => {
+  const onOpenChange = vi.fn();
+  const onSubOpenChange = vi.fn();
+  const { screen, openByKeyboard } = await renderDeep({ onOpenChange, onSubOpenChange });
+  await openByKeyboard();
+
+  const outside = screen.getByRole('button', { name: 'Outside' });
+  await userEvent.click(outside);
+  await expect.element(screen.getByRole('menu', { name: 'File' })).not.toBeInTheDocument();
+  expect(screen.container.ownerDocument.querySelectorAll('[data-menu-content]')).toHaveLength(0);
+  await expect.element(outside).toHaveFocus();
+  expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
+  expect(onSubOpenChange.mock.calls).toEqual([[true], [false]]);
+});
+
+test('hovering down four levels and choosing the deepest item closes the whole tree', async () => {
+  const onOpenChange = vi.fn();
+  const { screen, trigger, item, submenu } = await renderDeep({ onOpenChange });
+  await userEvent.click(trigger);
+  for (const name of ['Export', 'Image', 'JPEG']) {
+    await userEvent.hover(item(name));
+    await expect.element(submenu(name)).toBeVisible();
+  }
+
+  await userEvent.hover(item('Low quality'));
+  await expect.element(item('Low quality')).toHaveFocus();
+  await userEvent.click(item('Low quality'));
+  await expect.element(screen.getByRole('menu', { name: 'File' })).not.toBeInTheDocument();
+  await expect.element(trigger).toHaveFocus();
+  expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
+});
+
+type PaletteProps = Partial<Menu.Props> & {
+  onNewFile?: (event: Event) => void;
+  onGrid?: (checked: boolean) => void;
+};
+
+function Palette({ onNewFile, onGrid, ...props }: PaletteProps) {
+  const [grid, setGrid] = useState(false);
+
+  return (
+    <Menu triggerType="command" hotkey="mod+k" {...props}>
+      <Menu.Trigger>Commands</Menu.Trigger>
+      <Menu.Content>
+        <Menu.Search data-1p-ignore data-lpignore="true" />
+        <Menu.Group>
+          <Menu.Label>Files</Menu.Label>
+          <Menu.Item onSelect={onNewFile}>
+            New file <Menu.Shortcut keys="mod+n" />
+          </Menu.Item>
+          <Menu.Item disabled>Open recent</Menu.Item>
+          <Menu.Item>Résumé template</Menu.Item>
+        </Menu.Group>
+        <Menu.Separator />
+        <Menu.Group>
+          <Menu.Label>View</Menu.Label>
+          <Menu.CheckboxItem
+            checked={grid}
+            onCheckedChange={(checked) => {
+              setGrid(checked);
+              onGrid?.(checked);
+            }}
+          >
+            Show grid
+          </Menu.CheckboxItem>
+          <Menu.Item textValue="Full width">ＦＵＬＬ ＷＩＤＴＨ</Menu.Item>
+        </Menu.Group>
+        <Menu.Separator />
+        <Menu.Group>
+          <Menu.Label>설정</Menu.Label>
+          <Menu.Item>설정 열기</Menu.Item>
+        </Menu.Group>
+      </Menu.Content>
+    </Menu>
+  );
+}
+
+async function renderPalette(props: PaletteProps = {}) {
+  const screen = await render(
+    <IdsProvider>
+      <button type="button">Before</button>
+      <Palette {...props} />
+    </IdsProvider>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Commands' });
+  const palette = screen.getByRole('dialog', { name: '명령' });
+  const search = screen.getByRole('combobox', { name: '명령 검색' });
+  const listbox = screen.getByRole('listbox');
+  const option = (name: string | RegExp) => screen.getByRole('option', { name });
+  const shown = () =>
+    [...listbox.element().querySelectorAll('[role="option"]')].map((node) =>
+      node.textContent?.replace(/\s+/g, ' ').trim(),
+    );
+
+  const expectActive = async (name: string | RegExp) => {
+    const target = option(name);
+    await expect.element(target).toHaveAttribute('aria-selected', 'true');
+    await expect.element(search).toHaveAttribute('aria-activedescendant', target.element().id);
+  };
+
+  return { screen, trigger, palette, search, listbox, option, shown, expectActive };
+}
+
+test('the hotkey toggles the palette, focuses the search and returns focus where it was', async () => {
+  const onOpenChange = vi.fn();
+  const { screen, palette, search } = await renderPalette({ onOpenChange });
+  const before = screen.getByRole('button', { name: 'Before' });
+  before.element().focus();
+
+  await userEvent.keyboard('{ControlOrMeta>}k{/ControlOrMeta}');
+  await expect.element(palette).toBeVisible();
+  await expect.element(search).toHaveFocus();
+
+  await userEvent.keyboard('{ControlOrMeta>}k{/ControlOrMeta}');
+  await expect.element(palette).not.toBeInTheDocument();
+  await expect.element(before).toHaveFocus();
+
+  await userEvent.keyboard('k');
+  await userEvent.keyboard('{Alt>}{ControlOrMeta>}k{/ControlOrMeta}{/Alt}');
+  await expect.element(palette).not.toBeInTheDocument();
+  expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
+});
+
+test('the palette is a modal dialog around a combobox and a listbox of options', async () => {
+  const { screen, trigger, palette, search, listbox, option, expectActive } = await renderPalette();
+  await expect.element(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+  await expect.element(trigger).toHaveAttribute('aria-expanded', 'false');
+  await userEvent.click(trigger);
+
+  await expect.element(palette).toBeVisible();
+  await expect.element(palette).toHaveAttribute('aria-modal', 'true');
+  await expect
+    .element(screen.getByText('Commands'), { message: 'the page behind is aria-hidden' })
+    .toHaveAttribute('aria-expanded', 'true');
+  await expect.element(search).toHaveFocus();
+  await expect.element(search).toHaveAttribute('aria-expanded', 'true');
+  await expect.element(search).toHaveAttribute('aria-autocomplete', 'list');
+  await expect.element(search).toHaveAttribute('aria-controls', listbox.element().id);
+  await expect.element(search).toHaveAttribute('placeholder', '명령 검색…');
+  await expect.element(screen.getByRole('group', { name: 'Files' })).toBeVisible();
+  await expectActive(/^New file/);
+  await expect.element(option('Open recent')).toHaveAttribute('aria-disabled', 'true');
+  await expect.element(option('Show grid')).toHaveAttribute('aria-checked', 'false');
+  await expect
+    .element(screen.getByRole('status'), { message: 'the empty region stays empty' })
+    .toHaveTextContent('');
+  expect(document.body.hasAttribute('data-scroll-locked')).toBe(true);
+});
+
+test('typing filters options ignoring case, accents and width, and hides groups left empty', async () => {
+  const { screen, search, option, shown, expectActive } = await renderPalette();
+  await userEvent.click(screen.getByRole('button', { name: 'Commands' }));
+
+  await userEvent.fill(search, 'RESUME');
+  expect(shown()).toEqual(['Résumé template']);
+  await expectActive('Résumé template');
+  await expect.element(screen.getByRole('group', { name: 'Files' })).toBeVisible();
+  await expect.element(screen.getByRole('group', { name: 'View' })).not.toBeInTheDocument();
+  await expect.element(screen.getByRole('group', { name: '설정' })).not.toBeInTheDocument();
+  expect(
+    [...document.querySelectorAll('[data-menu-separator]')].every((node) =>
+      node.hasAttribute('hidden'),
+    ),
+  ).toBe(true);
+
+  await userEvent.fill(search, 'full w');
+  expect(shown()).toEqual(['ＦＵＬＬ ＷＩＤＴＨ']);
+  await userEvent.fill(search, 'ｆｕｌｌ');
+  expect(shown()).toEqual(['ＦＵＬＬ ＷＩＤＴＨ']);
+
+  await userEvent.fill(search, '설정');
+  expect(shown()).toEqual(['설정 열기']);
+  await expect.element(screen.getByRole('group', { name: '설정' })).toBeVisible();
+
+  await userEvent.fill(search, 'e');
+  expect(shown()).toEqual([expect.stringMatching(/^New file/), 'Open recent', 'Résumé template']);
+  await expectActive(/^New file/);
+  const [between] = [...document.querySelectorAll('[data-menu-separator]')];
+  expect(between?.hasAttribute('hidden')).toBe(true);
+
+  await userEvent.fill(search, 'i');
+  expect(shown()).toHaveLength(3);
+  await expect.element(option('Show grid')).toBeVisible();
+  const separators = [...document.querySelectorAll('[data-menu-separator]')];
+  expect(separators.map((node) => node.hasAttribute('hidden'))).toEqual([false, true]);
+});
+
+test('an empty result shows the empty text, and clearing the query brings every option back', async () => {
+  const { screen, search, shown, expectActive } = await renderPalette();
+  await userEvent.click(screen.getByRole('button', { name: 'Commands' }));
+
+  await userEvent.fill(search, 'zzz');
+  expect(shown()).toEqual([]);
+  await expect.element(screen.getByRole('status')).toHaveTextContent('결과가 없습니다.');
+  await expect.element(search).not.toHaveAttribute('aria-activedescendant');
+  await userEvent.keyboard('{Enter}');
+  await expect.element(screen.getByRole('dialog')).toBeVisible();
+
+  await userEvent.fill(search, '');
+  expect(shown()).toHaveLength(6);
+  await expect.element(screen.getByRole('status')).toHaveTextContent('');
+  await expectActive(/^New file/);
+});
+
+test('arrows, Home and End move the highlight through enabled options and loop', async () => {
+  const { screen, search, expectActive } = await renderPalette();
+  await userEvent.click(screen.getByRole('button', { name: 'Commands' }));
+  await expectActive(/^New file/);
+
+  await userEvent.keyboard('{ArrowDown}');
+  await expectActive('Résumé template');
+  await userEvent.keyboard('{ArrowUp}');
+  await expectActive(/^New file/);
+  await userEvent.keyboard('{ArrowUp}');
+  await expectActive('설정 열기');
+  await userEvent.keyboard('{ArrowDown}');
+  await expectActive(/^New file/);
+  await userEvent.keyboard('{End}');
+  await expectActive('설정 열기');
+  await userEvent.keyboard('{Home}');
+  await expectActive(/^New file/);
+  await expect.element(search).toHaveFocus();
+  await expect.element(search).toHaveValue('');
+});
+
+test('hovering an option highlights it, and a click selects it without moving focus first', async () => {
+  const onGrid = vi.fn();
+  const { screen, trigger, search, option, expectActive } = await renderPalette({ onGrid });
+  await userEvent.click(trigger);
+
+  await userEvent.hover(option('Show grid'));
+  await expectActive('Show grid');
+  await expect.element(search).toHaveFocus();
+  await userEvent.click(option('Show grid'));
+  await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
+  await expect.element(trigger).toHaveFocus();
+  expect(onGrid.mock.calls).toEqual([[true]]);
+
+  await userEvent.click(trigger);
+  await expect.element(option('Show grid')).toHaveAttribute('aria-checked', 'true');
+});
+
+test('Enter selects the highlighted option and closes, unless onSelect prevents it', async () => {
+  const onNewFile = vi.fn();
+  const { screen, trigger, search } = await renderPalette({ onNewFile });
+  await userEvent.click(trigger);
+  await userEvent.fill(search, 'new');
+  await userEvent.keyboard('{Enter}');
+  await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
+  await expect.element(trigger).toHaveFocus();
+  expect(onNewFile).toHaveBeenCalledTimes(1);
+  expect(onNewFile.mock.calls[0]![0]).toBeInstanceOf(Event);
+
+  onNewFile.mockImplementation((event: Event) => event.preventDefault());
+  await userEvent.click(trigger);
+  await expect.element(search).toHaveValue('');
+  await userEvent.keyboard('{Enter}');
+  await expect.element(screen.getByRole('dialog')).toBeVisible();
+  await expect.element(search).toHaveFocus();
+  expect(onNewFile).toHaveBeenCalledTimes(2);
+});
+
+test('Escape and a backdrop click close the palette and return focus', async () => {
+  const onOpenChange = vi.fn();
+  const { screen, trigger, search } = await renderPalette({ onOpenChange });
+  await userEvent.click(trigger);
+  await expect.element(search).toHaveFocus();
+  await userEvent.keyboard('{Escape}');
+  await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
+  await expect.element(trigger).toHaveFocus();
+
+  await userEvent.click(trigger);
+  const backdrop = document.querySelector<HTMLElement>('[data-menu-backdrop]')!;
+  await userEvent.click(backdrop, { position: { x: 10, y: 850 } });
+  await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
+  await expect.element(trigger).toHaveFocus();
+  expect(onOpenChange.mock.calls).toEqual([[true], [false], [true], [false]]);
+});
+
+test('Enter and Escape while an IME composes neither select nor close', async () => {
+  const onNewFile = vi.fn();
+  const { screen, trigger, search, shown } = await renderPalette({ onNewFile });
+  await userEvent.click(trigger);
+  await expect.element(search).toHaveFocus();
+
+  const ime = cdp();
+  await ime.send('Input.imeSetComposition', { text: '설', selectionStart: 1, selectionEnd: 1 });
+  await expect.element(search).toHaveValue('설');
+  expect(shown()).toEqual(['설정 열기']);
+  for (const key of ['Enter', 'Escape'])
+    await ime.send('Input.dispatchKeyEvent', {
+      type: 'rawKeyDown',
+      key,
+      code: key,
+      windowsVirtualKeyCode: 229,
+    });
+  await expect.element(screen.getByRole('dialog')).toBeVisible();
+  await expect.element(search).toHaveValue('설');
+
+  await ime.send('Input.insertText', { text: '설' });
+  await expect.element(search).toHaveValue('설');
+  await userEvent.keyboard('{Escape}');
+  await expect.element(screen.getByRole('dialog')).not.toBeInTheDocument();
+  expect(onNewFile).not.toHaveBeenCalled();
+});
+
+test('a palette opened with overlay.open binds to the item and resolves through an option', async () => {
+  await render(<IdsProvider />);
+  const picked = overlay.open<string>(({ close }) => (
+    <Menu triggerType="command">
+      <Menu.Content aria-label="Go to">
+        <Menu.Item onSelect={() => close('home')}>Home</Menu.Item>
+        <Menu.Item onSelect={() => close('settings')}>Settings</Menu.Item>
+      </Menu.Content>
+    </Menu>
+  ));
+
+  const dialog = page.getByRole('dialog', { name: 'Go to' });
+  await expect.element(dialog).toBeVisible();
+  await expect.element(page.getByRole('combobox')).toHaveFocus();
+  await userEvent.keyboard('set{Enter}');
+  await expect(picked).resolves.toBe('settings');
+  await expect.element(dialog).not.toBeInTheDocument();
+});
+
+test('Menu.Sub inside a command palette warns and renders nothing', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  const screen = await render(
+    <IdsProvider>
+      <Menu triggerType="command" defaultOpen>
+        <Menu.Content>
+          <Menu.Item>Copy</Menu.Item>
+          <Menu.Sub>
+            <Menu.SubTrigger>Share</Menu.SubTrigger>
+            <Menu.SubContent>
+              <Menu.Item>Email</Menu.Item>
+            </Menu.SubContent>
+          </Menu.Sub>
+        </Menu.Content>
+      </Menu>
+    </IdsProvider>,
+  );
+  await expect.element(screen.getByRole('option', { name: 'Copy' })).toBeVisible();
+  expect(screen.container.ownerDocument.querySelectorAll('[role="option"]')).toHaveLength(1);
+  expect(warn).toHaveBeenCalledWith(expect.stringContaining('Menu.Sub is not supported'));
+  warn.mockRestore();
 });

@@ -13,17 +13,17 @@
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                  | Spinner, Progress                                                                                              |
 | [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                      | Button, IconButton, Toggle, IconToggle, FloatingButton                                                         |
 | [`date-locale.ts`](#date-localets)               | 문자열 locale 해석, locale 의 시간제와 날짜 순서                     | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                   |
-| [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자               | Select, ChipField, ColorField, `temporal-field/`                                                               |
+| [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자               | Select, ChipField, ColorField, Menu, `temporal-field/`                                                         |
 | [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각     | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea          |
 | [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수        | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                     |
 | [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트  | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`        |
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                   | IconButton, IconToggle, FloatingButton                                                                         |
 | [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                 | IconButton, IconToggle                                                                                         |
-| [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각               | Select, ChipField, `field-popup/`                                                                              |
+| [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각               | Select, ChipField, Menu, `field-popup/`                                                                        |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구 전부와 기본 locale                     | 문구를 그리는 모든 컴포넌트, `date-locale.ts`                                                                  |
 | [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어 | Alert, `field-popup/`                                                                                          |
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                              | Button, `surface.ts`                                                                                           |
-| [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)          | Select, ChipField                                                                                              |
+| [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)          | Select, ChipField, Menu                                                                                        |
 | [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                                | Slider, ColorPicker                                                                                            |
 | [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수   | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField |
 | [`status-palette.ts`](#status-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                   | Alert                                                                                                          |
@@ -562,10 +562,14 @@ const press = usePressable<HTMLElement>({
 
 - Select: `select-options.ts` 의 `collectOptions`(`textOf`), `matchesQuery`, `typeaheadIndex`
 - ChipField: `chip-values.ts` 의 같은 값 판정(`normalizeText`), 제안 거르기(Select 의 `matchesQuery`)
+- Menu: 명령 팔레트 항목의 거르기(`use-command.ts` 의 `useCommandOption`)
 
 ### 쓰는 법
 
 ```ts
+// components/overlay/menu/use-command.ts
+const visible = matchesSearch(textValue ?? textOf(children), palette.query);
+
 // components/form/select/select-options.ts
 export const matchesQuery = (option, query) => matchesSearch(option.search, query);
 ```
@@ -578,9 +582,9 @@ export const matchesQuery = (option, query) => matchesSearch(option.search, quer
 
 ### 알아둘 것
 
-- `textOf` 는 React 트리의 문자열 자식만 읽습니다. 글자를 스스로 그리는 컴포넌트 안의 글자는 보지 못하므로, 그런 항목은 `label`/`searchValue`(Select)를 받습니다.
+- `textOf` 는 React 트리의 문자열 자식만 읽습니다. 글자를 스스로 그리는 컴포넌트 안의 글자는 보지 못하므로, 그런 항목은 `textValue`(Menu), `label`/`searchValue`(Select)를 받습니다.
 - 한글 자모 하나(`ㅅ`)는 음절(`설`)의 일부로 맞지 않습니다. 초성 검색은 하지 않습니다.
-- 비교를 바꾸면 Select, ChipField 의 거르기와 ChipField 의 중복 판정이 함께 바뀝니다.
+- 비교를 바꾸면 Select, ChipField, Menu 의 거르기와 ChipField 의 중복 판정이 함께 바뀝니다.
 
 ## slider-surface.ts
 
