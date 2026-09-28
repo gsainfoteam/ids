@@ -457,3 +457,32 @@ test('below 640px the stack spans the screen, wider screens get a fixed column',
   await expect.poll(() => regionOf().getBoundingClientRect().width).toBe(356);
   expect(window.innerWidth - regionOf().getBoundingClientRect().right).toBe(24);
 });
+
+test('the icon, text, action and close button of a toast share one vertical center', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Toaster />
+    </IdsProvider>,
+  );
+  toast.success('저장했습니다', {
+    duration: Infinity,
+    action: { label: '되돌리기', onClick: () => {} },
+  });
+  toast.info('점검이 예정돼 있습니다', {
+    duration: Infinity,
+    description: '자세한 내용은 설정에서 확인하세요.',
+  });
+  await expect.element(screen.getByText('저장했습니다')).toBeVisible();
+  await expect.element(screen.getByText('점검이 예정돼 있습니다')).toBeVisible();
+
+  const middle = (element: Element) => {
+    const rect = element.getBoundingClientRect();
+    return rect.top + rect.height / 2;
+  };
+  for (const toastElement of document.querySelectorAll('[data-toaster] [data-toast-title]')) {
+    const body = toastElement.closest('[data-toast-title]')!.parentElement!.parentElement!;
+    const center = middle(body);
+    const parts = [...body.children].filter((child) => child.getBoundingClientRect().height > 0);
+    for (const part of parts) expect(Math.abs(middle(part) - center)).toBeLessThan(1);
+  }
+});

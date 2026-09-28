@@ -280,18 +280,18 @@ export namespace Toaster {
         'data-swiping:transition-none data-swiping:select-none motion-reduce:transition-none',
       ],
       body: [
-        'flex items-start gap-3 transition-opacity duration-(--ids-motion-fast) ease-out',
+        'flex items-center gap-3 transition-opacity duration-(--ids-motion-fast) ease-out',
         'motion-reduce:transition-none',
       ],
       icon: [
-        'flex h-[1lh] shrink-0 items-center text-(--toast-accent)',
+        'flex shrink-0 items-center text-(--toast-accent)',
         '[&_svg]:size-(--ids-size-icon-standard)',
       ],
       content: 'flex min-w-0 flex-1 flex-col gap-0.5',
       title: 'text-body-b3-semibold [overflow-wrap:anywhere]',
       description: 'text-(--ids-color-on-muted) [overflow-wrap:anywhere]',
-      action: 'shrink-0 self-center',
-      close: '-my-0.5 -me-1.5 size-6 shrink-0 rounded-full',
+      action: 'shrink-0',
+      close: '-me-1.5 size-6 shrink-0 rounded-full',
     },
     variants: {
       placement: {
