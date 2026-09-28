@@ -97,6 +97,7 @@ packages/react/src/
                    fields       text-control (shell, Clear, useMergedRef), field-popup, list-styles,
                                 temporal-field, form-value, date-locale
                    behaviour    pressable, state-props, use-checked-writes, icon-label, arc
+                   feedback     status-palette
                    strings      messages
   foundations/   token stories with no component, one folder each with a story and a README:
                  Color, Typography, Radius, InteractiveState

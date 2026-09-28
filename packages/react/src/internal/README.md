@@ -24,6 +24,7 @@
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                             | Button, `surface.ts`                                                                                           |
 | [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                               | Slider, ColorPicker                                                                                            |
 | [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수  | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField |
+| [`status-palette.ts`](#status-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                  | Alert                                                                                                          |
 | [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                 | Card, Item, Chip                                                                                               |
 | [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                              | DateField, TimeField, DateTimeField                                                                            |
 | [`text-control/`](./text-control/README.md)      | 글자 입력 필드의 셸, Clear, 값 추적 hook                            | TextField, PasswordField, NumberField, TelField, TextArea                                                      |
@@ -613,6 +614,34 @@ style?: StateValue<CSSProperties | undefined, State>;
 ### 알아둘 것
 
 - `resolveState` 는 함수면 무조건 state 를 넣어 부릅니다. 함수 자체가 값인 prop 에는 쓰지 않습니다.
+
+## status-palette.ts
+
+상태를 알리는 컴포넌트가 함께 쓰는 color scheme(`StatusColorScheme`), 기본 아이콘(`statusIcons`), 알리는 강도(`announcedAssertively`)입니다.
+
+### 쓰는 곳
+
+- Alert: `Alert.ColorScheme` 이 `StatusColorScheme` 이고, `Alert.Icon` 의 기본 아이콘과 `role`, `aria-live` 를 여기서 정합니다.
+
+### 쓰는 법
+
+```tsx
+// components/feedback/alert/index.tsx
+const assertive = announcedAssertively.has(colorScheme);
+<div role={role ?? (assertive ? 'alert' : 'status')} />
+
+const Glyph = statusIcons[state.colorScheme];
+```
+
+### 왜 이렇게
+
+- warning, danger 만 `assertive` 입니다. 읽던 내용을 끊고 알릴 만큼 급한 것은 이 둘이고, 나머지는 읽기가 끝난 뒤에 알립니다(`polite`).
+- `neutral` 도 아이콘을 가집니다. Alert 는 `neutral` 에서 `Alert.Icon` 을 적었을 때만 그리지만, 적으면 ⓘ 가 기본입니다.
+
+### 알아둘 것
+
+- 색은 여기 없습니다. Alert 의 `--alert-*` 변수가 scheme 마다 색을 정하고, 테스트가 그 변수 이름을 봅니다.
+- scheme 을 더하면 `statusIcons` 가 `satisfies Record<StatusColorScheme, unknown>` 로 빠진 아이콘을 알려 줍니다. 쓰는 컴포넌트의 `colorScheme` variant 도 함께 더합니다.
 
 ## surface.ts
 

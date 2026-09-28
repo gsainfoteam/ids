@@ -11,16 +11,15 @@ import {
   type ReactNode,
 } from 'react';
 
-import {
-  CheckCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  XCircleIcon,
-  XMarkIcon,
-} from '@heroicons/react/16/solid';
+import { XMarkIcon } from '@heroicons/react/16/solid';
 
 import { useAlert } from './use-alert';
 import { messages } from '../../../internal/messages';
+import {
+  announcedAssertively,
+  statusIcons,
+  type StatusColorScheme,
+} from '../../../internal/status-palette';
 import { flattenFragments, invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { IconButton } from '../../action/icon-button';
@@ -47,16 +46,6 @@ function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
 function isPart(node: ReactNode, part: unknown): node is ReactElement<Record<string, unknown>> {
   return isValidElement(node) && node.type === part;
 }
-
-const ASSERTIVE = new Set<Alert.ColorScheme>(['warning', 'danger']);
-
-const ICONS = {
-  neutral: InformationCircleIcon,
-  info: InformationCircleIcon,
-  success: CheckCircleIcon,
-  warning: ExclamationTriangleIcon,
-  danger: XCircleIcon,
-} satisfies Record<Alert.ColorScheme, unknown>;
 
 export function Alert({
   colorScheme = 'info',
@@ -111,7 +100,7 @@ export function Alert({
     ending,
   };
   const styles = Alert.Style({ colorScheme, variant, icon: showIcon, close: dismissible });
-  const assertive = ASSERTIVE.has(colorScheme);
+  const assertive = announcedAssertively.has(colorScheme);
 
   return (
     <AlertContext value={{ state, styles, close: requestClose }}>
@@ -140,7 +129,7 @@ export function Alert({
 }
 
 export namespace Alert {
-  export type ColorScheme = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+  export type ColorScheme = StatusColorScheme;
   export type Variant = 'solid' | 'soft' | 'outline' | 'ghost';
 
   export type State = {
@@ -169,7 +158,7 @@ export namespace Alert {
 
   export function Icon({ asChild, className, children, hidden: _hidden, ...props }: Icon.Props) {
     const { state, styles } = useAlertContext('Alert.Icon');
-    const Glyph = ICONS[state.colorScheme];
+    const Glyph = statusIcons[state.colorScheme];
     const Root = asChild ? Slot : 'span';
     return (
       <Root
