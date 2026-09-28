@@ -160,6 +160,7 @@ export function useIdsProvider({
 
   return {
     context,
+    outermost: root,
     paintsSurface: !root && resolvedMode !== parent.resolvedMode,
   };
 }

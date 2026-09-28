@@ -11,11 +11,15 @@
 | [`modal-layer.tsx`](#modal-layertsx)     | modal 의 배경, 포커스 가두기, 나머지 페이지 숨기기, 스크롤 잠금          |
 | [`sheet-viewport.ts`](#sheet-viewportts) | 좁은 화면의 drawer 판정과 화면 키보드 높이                               |
 | [`focus.ts`](#focusts)                   | 초기 포커스, 포커스 되돌리기, 늘 안으로 치는 요소                        |
+| [`store.ts`](#storets)                   | `overlay.open` 의 항목 스토어와 host 선출                                |
+| [`host.tsx`](#hosttsx)                   | 항목을 그리는 `OverlayHost`, 항목에 붙는 binding, portal root            |
+| [`external-store.ts`](#external-storets) | `useSyncExternalStore` 가 읽는 작은 스토어                               |
 
 ## 쓰는 곳
 
 | 쓰는 곳                                 | 가져가는 것                                                                                                                       |
 | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| IdsProvider                             | `OverlayHost`, `PortalRootContext`                                                                                                |
 | Alert                                   | `usePresence`                                                                                                                     |
 | [field-popup](../field-popup/README.md) | `useLayer`, `useAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts` |
 
@@ -260,3 +264,68 @@ blurWithin(layerElement);                                    // 치우기 전에
 - `holdsFocus` 가 `false` 면(popover) 앞의 둘이 없을 때 포커스를 옮기지 않습니다. trigger 에 남습니다.
 - 되돌린 포커스는 그 요소가 포커스를 잃을 때까지 표시됩니다. 키보드 Escape 로 닫은 뒤 돌아온 trigger 는 `:focus-visible` 이라 tooltip 이 다시 열리려 하므로, Tooltip 은 `focusWasReturned` 를 보고 열지 않습니다.
 - 브라우저는 포커스된 요소가 DOM 에서 빠질 때 `blur` 를 보내지 않습니다. 레이어를 치우기 전에 `blurWithin` 으로 먼저 blur 해야 Field 의 `onBlur`(검증, touched)가 돕니다.
+
+## store.ts
+
+`overlay.open` 으로 연 오버레이의 목록입니다. 컴포넌트 밖에서도 부를 수 있고, 닫을 때 넘긴 값으로 Promise 가 풀립니다.
+
+### 쓰는 법
+
+```tsx
+const confirmed = await overlay.open<boolean>(({ close }) => (
+  <Dialog>
+    <Button onClick={() => close(true)}>확인</Button>
+  </Dialog>
+));                                          // 닫기만 하면 undefined
+
+overlay.open(render, { id: 'settings' });    // 같은 id 를 다시 열면 그 항목을 바꾼다
+overlay.close('settings', value);
+overlay.closeAll();
+overlay.unmount('settings');                 // 나가는 애니메이션 없이 치운다
+```
+
+### 왜 이렇게
+
+- 항목은 `{ id, open, render, theme }` 입니다. 닫으면 `open` 만 `false` 가 되고, 나가는 애니메이션이 끝난 뒤에 목록에서 빠집니다.
+- 열린 id 를 다시 열면 render 를 바꾸고 이전 Promise 를 `undefined` 로 풉니다. 같은 key 라서 다시 mount 되지 않습니다.
+- 닫히는 중인 id 를 다시 열면 그대로 다시 열립니다. 나가던 요소가 남습니다.
+- 닫힌 항목은 붙은 레이어가 없으면 바로(`removeIfNothingExits`), 있으면 그 레이어의 나가기가 끝날 때(`exited`) 빠집니다. 붙은 레이어 수는 `bindLayer` 가 셉니다.
+- host 는 여러 개 등록될 수 있고(Storybook Docs 는 Provider 를 여러 개 그림), 먼저 등록된 하나가 그립니다(`overlayHosts`).
+- 마지막 host 가 빠지면 열린 Promise 를 모두 `undefined` 로 풀고 목록을 비웁니다. 같은 task 안에서 다시 등록되면(StrictMode 의 effect 재실행) 비우지 않습니다.
+- overlay-kit 을 감싸지 않은 이유는 RULES.md 의 What we build 에 있습니다.
+
+### 알아둘 것
+
+- `render` 는 컴포넌트가 아니라 host 가 렌더 중에 부르는 함수입니다. 안에서 hook 을 부르지 않습니다.
+- 스토어는 모듈 상태라 문서(iframe)마다 따로입니다.
+
+## host.tsx
+
+### 쓰는 법
+
+```tsx
+// components/utility/ids-provider/ids-provider.tsx: 가장 바깥 Provider 만
+{outermost && <OverlayHost />}
+
+// Dialog 같은 레이어: open 을 받지 않았으면 항목에 붙는다
+const item = useOverlayItem(openProp);          // { open, close, exited } | null
+const open = item?.open ?? ownOpen;
+usePresence(open, { onExitComplete: () => item?.exited() });
+<OverlayItemContext value={null}>{children}</OverlayItemContext>   // 안쪽 레이어는 붙지 않게
+
+const scoped = useOverlay();                    // 부른 곳의 theme 으로 연다
+```
+
+### 왜 이렇게
+
+- 항목마다 `display: contents` 인 wrapper 가 `data-color`, `data-mode` 를 가집니다. 항목은 host 의 theme 을 따르고, `useOverlay()` 로 열면 부른 곳의 theme 을 씁니다.
+- host 는 IdsProvider 의 요소 안, children 뒤에 그립니다. `asChild` 면 자식 요소 하나를 지켜야 하므로 요소 옆에 그립니다. 항목이 없으면 아무것도 그리지 않아서 서버 HTML 이 그대로입니다.
+- 레이어는 `open` prop 이 없을 때만 항목에 붙습니다(`useOverlayItem`). 붙은 레이어는 자식에게 `OverlayItemContext` 를 `null` 로 넘겨서, 안에 든 다른 레이어가 같은 항목에 붙지 않게 합니다.
+- `PortalRootContext` 는 가장 가까운 IdsProvider 의 요소입니다. Tooltip 이 그 안에 portal 합니다.
+
+## external-store.ts
+
+`get`, `set`, `subscribe` 만 있는 스토어입니다. `useSyncExternalStore(store.subscribe, store.get)` 로 읽습니다.
+
+- `set` 은 같은 값(`Object.is`)이면 알리지 않습니다. 목록을 바꿀 때는 새 배열을 넘깁니다.
+- zustand 를 쓰지 않는 이유는 RULES.md 의 What we build 에 있습니다.

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, type ComponentProps } from 'react';
+import { useCallback, useEffect, useRef, useState, type ComponentProps } from 'react';
 
 import {
   ThemeContext,
@@ -6,6 +6,7 @@ import {
   type ThemeContextValue,
   type ThemeMode,
 } from './use-ids-provider';
+import { OverlayHost, PortalRootContext } from '../../../internal/overlay/host';
 import { cn, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Slot } from '../slot';
@@ -25,9 +26,10 @@ export function IdsProvider({
   className,
   style,
   ref,
+  children,
   ...rest
 }: IdsProvider.Props) {
-  const { context, paintsSurface } = useIdsProvider({
+  const { context, outermost, paintsSurface } = useIdsProvider({
     color,
     defaultColor,
     onColorChange,
@@ -36,8 +38,9 @@ export function IdsProvider({
     onModeChange,
   });
   const elementRef = useRef<HTMLElement>(null);
+  const [element, setElement] = useState<HTMLElement | null>(null);
   const mergedRef = useCallback(
-    (node: HTMLElement | null) => mergeRefs(elementRef, ref)(node),
+    (node: HTMLElement | null) => mergeRefs(elementRef, setElement, ref)(node),
     [ref],
   );
 
@@ -51,20 +54,33 @@ export function IdsProvider({
   }, [context.color, context.resolvedMode]);
 
   const Root = asChild ? Slot : 'div';
+  const host = outermost && <OverlayHost />;
 
   return (
     <ThemeContext value={context}>
-      <Root
-        {...rest}
-        ref={mergedRef}
-        data-color={context.color}
-        data-mode={context.resolvedMode}
-        className={cn(
-          paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
-          className,
-        )}
-        style={{ colorScheme: context.resolvedMode, ...style }}
-      />
+      <PortalRootContext value={element}>
+        <Root
+          {...rest}
+          ref={mergedRef}
+          data-color={context.color}
+          data-mode={context.resolvedMode}
+          className={cn(
+            paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+            className,
+          )}
+          style={{ colorScheme: context.resolvedMode, ...style }}
+        >
+          {asChild ? (
+            children
+          ) : (
+            <>
+              {children}
+              {host}
+            </>
+          )}
+        </Root>
+        {asChild && host}
+      </PortalRootContext>
     </ThemeContext>
   );
 }

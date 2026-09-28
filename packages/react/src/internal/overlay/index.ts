@@ -18,6 +18,15 @@ export {
   type LayerOptions,
   type LayerPosition,
 } from './layer-stack';
+export { createExternalStore, type ExternalStore } from './external-store';
+export {
+  OverlayHost,
+  OverlayItemContext,
+  PortalRootContext,
+  useOverlay,
+  useOverlayItem,
+  type OverlayItemBinding,
+} from './host';
 export { ModalLayer, type ModalLayerProps } from './modal-layer';
 export {
   coveredByKeyboard,
@@ -44,3 +53,4 @@ export {
   type UseAnchoredOptions,
 } from './use-anchored';
 export { usePresence, type PresenceOptions } from './use-presence';
+export { overlay, type OverlayControls, type OverlayOptions, type OverlayRender } from './store';
