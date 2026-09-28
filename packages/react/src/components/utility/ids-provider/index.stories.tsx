@@ -7,7 +7,7 @@ import { Showcase } from '~story-kit';
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
 
-import { ThemeProvider, useTheme } from '.';
+import { IdsProvider, useTheme } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -15,8 +15,8 @@ const colors = ['blue', 'orange', 'green'] as const;
 const modes = ['light', 'dark'] as const;
 
 const meta = {
-  title: 'Utility/ThemeProvider',
-  component: ThemeProvider,
+  title: 'Utility/IdsProvider',
+  component: IdsProvider,
   tags: ['autodocs'],
   argTypes: {
     color: { control: 'radio', options: colors },
@@ -24,7 +24,7 @@ const meta = {
     asChild: { control: false },
   },
   args: { color: 'orange', mode: 'dark' },
-} satisfies Meta<typeof ThemeProvider>;
+} satisfies Meta<typeof IdsProvider>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -63,9 +63,9 @@ const region = cn('concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)')
 
 export const Playground: Story = {
   render: (args) => (
-    <ThemeProvider {...args} className={region}>
+    <IdsProvider {...args} className={region}>
       <Sample />
-    </ThemeProvider>
+    </IdsProvider>
   ),
 };
 
@@ -80,9 +80,9 @@ export const Gallery: Story = {
           rows={modes}
           columns={colors}
           render={(mode, color) => (
-            <ThemeProvider color={color} mode={mode} className={region}>
+            <IdsProvider color={color} mode={mode} className={region}>
               <Sample />
-            </ThemeProvider>
+            </IdsProvider>
           )}
         />
       </Showcase.Section>
@@ -91,14 +91,14 @@ export const Gallery: Story = {
         description="안쪽 Provider는 지정하지 않은 축을 바깥에서 물려받습니다. 모드가 바뀌는 영역은 스스로 배경을 칠합니다."
       >
         <Showcase.Row label="mode만">
-          <ThemeProvider mode="dark" className={region}>
+          <IdsProvider mode="dark" className={region}>
             <Sample />
-          </ThemeProvider>
+          </IdsProvider>
         </Showcase.Row>
         <Showcase.Row label="color만">
-          <ThemeProvider color="green" className={region}>
+          <IdsProvider color="green" className={region}>
             <Sample />
-          </ThemeProvider>
+          </IdsProvider>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -128,10 +128,10 @@ function ModeSwitcher() {
 }
 
 function ControlledExample() {
-  const [mode, setMode] = useState<ThemeProvider.Mode>('light');
+  const [mode, setMode] = useState<IdsProvider.Mode>('light');
   return (
     <div className="flex flex-col gap-3">
-      <ThemeProvider
+      <IdsProvider
         defaultColor="blue"
         mode={mode}
         onModeChange={setMode}
@@ -141,7 +141,7 @@ function ControlledExample() {
         <Sample>
           <ModeSwitcher />
         </Sample>
-      </ThemeProvider>
+      </IdsProvider>
       <output aria-label="부모 상태" className="text-caption-c1-regular font-mono">
         {mode}
       </output>
@@ -172,16 +172,11 @@ export const Controlled: Story = {
 
 export const SystemMode: Story = {
   render: () => (
-    <ThemeProvider
-      defaultColor="blue"
-      defaultMode="system"
-      className={region}
-      data-testid="provider"
-    >
+    <IdsProvider defaultColor="blue" defaultMode="system" className={region} data-testid="provider">
       <Sample>
         <ModeSwitcher />
       </Sample>
-    </ThemeProvider>
+    </IdsProvider>
   ),
   parameters: {
     docs: {
@@ -202,19 +197,19 @@ export const SystemMode: Story = {
 
 function NestedExample() {
   return (
-    <ThemeProvider defaultColor="blue" defaultMode="light" className={region} data-testid="outer">
+    <IdsProvider defaultColor="blue" defaultMode="light" className={region} data-testid="outer">
       <div className="flex flex-col gap-4">
         <Readout />
-        <ThemeProvider mode="dark" className={region} data-testid="dark">
+        <IdsProvider mode="dark" className={region} data-testid="dark">
           <Sample>
             <SetColor />
           </Sample>
-        </ThemeProvider>
-        <ThemeProvider color="orange" className={region} data-testid="orange">
+        </IdsProvider>
+        <IdsProvider color="orange" className={region} data-testid="orange">
           <Sample />
-        </ThemeProvider>
+        </IdsProvider>
       </div>
-    </ThemeProvider>
+    </IdsProvider>
   );
 }
 
@@ -256,11 +251,11 @@ export const Nested: Story = {
 
 export const AsChild: Story = {
   render: () => (
-    <ThemeProvider asChild color="green" mode="dark">
+    <IdsProvider asChild color="green" mode="dark">
       <section aria-label="녹색 영역" className={region}>
         <Sample />
       </section>
-    </ThemeProvider>
+    </IdsProvider>
   ),
   parameters: {
     docs: {

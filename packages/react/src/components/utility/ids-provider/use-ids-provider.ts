@@ -90,7 +90,7 @@ function useAxis<T>({
   return [current, owned ? setOwn : setInherited] as const;
 }
 
-export type UseThemeProviderOptions = {
+export type UseIdsProviderOptions = {
   color?: IdsColor;
   defaultColor?: IdsColor;
   onColorChange?: (color: IdsColor) => void;
@@ -99,14 +99,14 @@ export type UseThemeProviderOptions = {
   onModeChange?: (mode: ThemeMode) => void;
 };
 
-export function useThemeProvider({
+export function useIdsProvider({
   color,
   defaultColor,
   onColorChange,
   mode,
   defaultMode,
   onModeChange,
-}: UseThemeProviderOptions) {
+}: UseIdsProviderOptions) {
   const parent = use(ThemeContext);
   const root = parent === DEFAULT_THEME;
   const ownsMode = root || mode !== undefined || defaultMode !== undefined;

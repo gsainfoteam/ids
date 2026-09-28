@@ -208,7 +208,7 @@ function useTemporal(part: string) {
 
 ### 쓰는 곳
 
-- 개발 경고를 내는 모든 곳: [`internal/icon-label.ts`](../internal/README.md#icon-labelts), `react-hook-form.tsx`, Button, FloatingButton, Toggle, ToggleGroup, Accordion, Avatar, AvatarGroup, Badge, Chip, Alert, Progress, ChipField, Field, Input, PasswordField, Rating, Select, Slider, Spacer, Label, Group, ThemeProvider
+- 개발 경고를 내는 모든 곳: [`internal/icon-label.ts`](../internal/README.md#icon-labelts), `react-hook-form.tsx`, Button, FloatingButton, Toggle, ToggleGroup, Accordion, Avatar, AvatarGroup, Badge, Chip, Alert, Progress, ChipField, Field, Input, PasswordField, Rating, Select, Slider, Spacer, Label, Group, IdsProvider
 - 개발 경고를 확인하는 스토리(Button, IconButton, IconToggle 등)
 
 ### 쓰는 법

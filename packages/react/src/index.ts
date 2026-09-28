@@ -1,4 +1,4 @@
-export { ThemeProvider, ThemeContext, useTheme } from './components/utility/theme-provider';
+export { IdsProvider, ThemeContext, useTheme } from './components/utility/ids-provider';
 
 export {
   useInteractive,

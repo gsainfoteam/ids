@@ -8,7 +8,7 @@ Monorepo (`gsainfoteam/ids`). pnpm workspace + Turborepo.
 packages/
   core/     tokens + Style Dictionary codegen. Private — not published.
   css/      @gsainfoteam/ids-css GitHub Packages npm package. CSS variables + Tailwind @theme.
-  react/    @gsainfoteam/ids-react GitHub Packages npm package. React components + ThemeProvider.
+  react/    @gsainfoteam/ids-react GitHub Packages npm package. React components + IdsProvider.
   flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + ThemeProvider.
 ```
 
@@ -90,7 +90,7 @@ packages/react/src/
     navigation/  (Breadcrumb, Pagination, Stepper, Tabs)
     overlay/     (Dialog, Drawer, Menu, Popover, Tooltip)
     typography/  Kbd, Label
-    utility/     Slot, Group, ThemeProvider
+    utility/     Slot, Group, IdsProvider
   internal/      shared parts that are not exported:
                    surfaces     control-surface, toggle-surface, icon-square, field-surface, surface,
                                 slider-surface
@@ -138,7 +138,7 @@ export const Gallery: Story = {
 Declare the meta as `const meta = { ... } satisfies Meta<typeof X>` with `tags: ['autodocs']`, which
 gives each component a Docs page (every story with Show code, plus the props table); foundation
 stories opt out with `'!autodocs'`. Every story also has a Code tab beside the canvas. The global
-decorator wraps every story in `ThemeProvider`, so stories do not add their own theme or page
+decorator wraps every story in `IdsProvider`, so stories do not add their own theme or page
 padding.
 
 ## Component styling
@@ -236,7 +236,7 @@ hidden input per value for FormData and, when `required`, a nameless input cover
 so the browser blocks the submit, anchors its message there and hands focus to the control.
 
 **`dark:` follows `data-mode`.** The CSS package defines the `dark` variant against the nearest
-`data-mode`, so it works in any app and inside a nested ThemeProvider, not only when the OS is dark.
+`data-mode`, so it works in any app and inside a nested IdsProvider, not only when the OS is dark.
 
 **`cn` needs line height after text size.** `text-*` composites carry their own line
 height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regular leading-none`.
@@ -346,14 +346,15 @@ Chromium once per machine:
 may remount the story. Inputs whose focus a play checks carry `data-1p-ignore` and
 `data-lpignore="true"` so a password manager's inline menu does not take the focus.
 
-## ThemeProvider
+## IdsProvider
 
-Every IDS component relies on `data-color` and `data-mode` attributes injected by `ThemeProvider`. Without it, CSS variables are undefined and colors will not render.
+Every IDS component relies on `data-color` and `data-mode` attributes injected by `IdsProvider`
+(`ThemeProvider` in Flutter). Without it, CSS variables are undefined and colors will not render.
 
 ```tsx
-<ThemeProvider color="blue" mode="light">
+<IdsProvider color="blue" mode="light">
   <App />
-</ThemeProvider>
+</IdsProvider>
 ```
 
 ## Adding a new color

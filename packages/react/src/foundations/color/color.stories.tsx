@@ -2,7 +2,7 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
-import { ThemeProvider, useTheme } from '../../components/utility/theme-provider';
+import { IdsProvider, useTheme } from '../../components/utility/ids-provider';
 import { cn } from '../../utils';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -157,7 +157,7 @@ function TokenTable({
   return (
     <div className="flex flex-wrap gap-4">
       {columns.map(({ label, color, mode }) => (
-        <ThemeProvider key={label} color={color} mode={mode} className={panel}>
+        <IdsProvider key={label} color={color} mode={mode} className={panel}>
           <div className="flex flex-col gap-2">
             <span className="text-caption-c1-medium text-(--ids-color-on-muted)">{label}</span>
             {tokens.map((token) => (
@@ -167,7 +167,7 @@ function TokenTable({
               </div>
             ))}
           </div>
-        </ThemeProvider>
+        </IdsProvider>
       ))}
     </div>
   );
@@ -218,7 +218,7 @@ export const Contrast: Story = {
       >
         <div className="flex flex-wrap gap-4">
           {modes.map((mode) => (
-            <ThemeProvider key={mode} mode={mode} className={panel}>
+            <IdsProvider key={mode} mode={mode} className={panel}>
               <div className="flex flex-col gap-2">
                 <span className="text-caption-c1-medium text-(--ids-color-on-muted)">{mode}</span>
                 {pairs.map(([background, foreground]) => (
@@ -233,7 +233,7 @@ export const Contrast: Story = {
                   </div>
                 ))}
               </div>
-            </ThemeProvider>
+            </IdsProvider>
           ))}
         </div>
       </Showcase.Section>

@@ -28,7 +28,7 @@ function Tag({ asChild = false, className, ...props }: Tag.Props) {
 </Tag>
 ```
 
-- IDS에서 `asChild` 를 받는 파트(`Alert.Title`, `Progress.Label`, `ThemeProvider` 등)는 모두 이 방식입니다.
+- IDS에서 `asChild` 를 받는 파트(`Alert.Title`, `Progress.Label`, `IdsProvider` 등)는 모두 이 방식입니다.
 
 ## 합치는 규칙
 

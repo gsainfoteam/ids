@@ -91,13 +91,13 @@ pnpm lint
 
 컴포넌트는 외부 headless 라이브러리(Radix, Base UI 등)에 의존하지 않고 전부 직접 구현한다.
 
-모든 IDS 컴포넌트는 `ThemeProvider` 없이 동작하지 않는다:
+모든 IDS 컴포넌트는 `IdsProvider` 없이 동작하지 않는다:
 
 ```tsx
 // Storybook decorator나 App 최상단에 반드시 추가
-<ThemeProvider color="blue" mode="light">
+<IdsProvider color="blue" mode="light">
   <App />
-</ThemeProvider>
+</IdsProvider>
 ```
 
 ### Flutter 컴포넌트 개발

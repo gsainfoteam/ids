@@ -1,6 +1,6 @@
 # Color
 
-IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `ThemeProvider` 가 붙이는 `data-color` 와 `data-mode` 에 따라 CSS가 바꿉니다.
+IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsProvider` 가 붙이는 `data-color` 와 `data-mode` 에 따라 CSS가 바꿉니다.
 
 ```tsx
 <div className="bg-(--ids-color-surface) text-(--ids-color-on-surface)">
@@ -9,7 +9,7 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `Them
 ```
 
 - 이름은 `--ids-color-{역할}` 이고, Tailwind에서는 `bg-(--ids-color-primary)` 처럼 씁니다. `bg-primary` 같은 `@theme` 이름도 있습니다.
-- 값은 `ThemeProvider` 안에서만 정의됩니다.
+- 값은 `IdsProvider` 안에서만 정의됩니다.
 
 ## 브랜드
 

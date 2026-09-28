@@ -1,6 +1,6 @@
 import { useGlobals } from 'storybook/preview-api';
 
-import { ThemeProvider } from '../src/components/utility/theme-provider';
+import { IdsProvider } from '../src/components/utility/ids-provider';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
@@ -12,7 +12,7 @@ const withIdsTheme: Decorator = (Story, context) => {
   const oneBlockAmongMany = context.viewMode === 'docs';
 
   return (
-    <ThemeProvider
+    <IdsProvider
       color={globals['idsColor'] ?? 'blue'}
       mode={globals['idsMode'] ?? 'light'}
       onColorChange={(color) => updateGlobals({ idsColor: color })}
@@ -24,7 +24,7 @@ const withIdsTheme: Decorator = (Story, context) => {
       }
     >
       <Story />
-    </ThemeProvider>
+    </IdsProvider>
   );
 };
 

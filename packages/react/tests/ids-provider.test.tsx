@@ -5,7 +5,7 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { ThemeProvider, useTheme } from '../src';
+import { IdsProvider, useTheme } from '../src';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -40,9 +40,9 @@ function countSchemeListeners() {
 test('SSR: the root renders blue and light with a matching color-scheme', () => {
   const element = parse(
     renderToString(
-      <ThemeProvider>
+      <IdsProvider>
         <p>x</p>
-      </ThemeProvider>,
+      </IdsProvider>,
     ),
   ).querySelector<HTMLElement>('[data-color]')!;
   expect(element.dataset.color).toBe('blue');
@@ -51,15 +51,15 @@ test('SSR: the root renders blue and light with a matching color-scheme', () => 
 });
 
 test('SSR: system mode renders light because the server cannot see the scheme', () => {
-  expect(renderToString(<ThemeProvider defaultMode="system" />)).toMatch(/data-mode="light"/);
+  expect(renderToString(<IdsProvider defaultMode="system" />)).toMatch(/data-mode="light"/);
 });
 
 test('uncontrolled: setters change the provider, equal values do not notify', async () => {
   const onColorChange = vi.fn();
   const screen = await render(
-    <ThemeProvider defaultColor="orange" onColorChange={onColorChange} data-testid="root">
+    <IdsProvider defaultColor="orange" onColorChange={onColorChange} data-testid="root">
       <Probe name="a" />
-    </ThemeProvider>,
+    </IdsProvider>,
   );
   const root = screen.getByTestId('root');
   await expect.element(root).toHaveAttribute('data-color', 'orange');
@@ -76,12 +76,12 @@ test('uncontrolled: setters change the provider, equal values do not notify', as
 test('controlled: setters only report, the parent value decides', async () => {
   const onModeChange = vi.fn();
   function App() {
-    const [mode, setMode] = useState<ThemeProvider.Mode>('light');
+    const [mode, setMode] = useState<IdsProvider.Mode>('light');
     return (
       <>
-        <ThemeProvider mode={mode} onModeChange={onModeChange} data-testid="root">
+        <IdsProvider mode={mode} onModeChange={onModeChange} data-testid="root">
           <Probe name="a" />
-        </ThemeProvider>
+        </IdsProvider>
         <button onClick={() => setMode('dark')}>parent</button>
       </>
     );
@@ -100,14 +100,14 @@ test('controlled: setters only report, the parent value decides', async () => {
 
 test('nested providers inherit the axis they do not set, and its setter reaches the owner', async () => {
   const screen = await render(
-    <ThemeProvider defaultColor="blue" defaultMode="light" data-testid="outer">
-      <ThemeProvider mode="dark" data-testid="dark">
+    <IdsProvider defaultColor="blue" defaultMode="light" data-testid="outer">
+      <IdsProvider mode="dark" data-testid="dark">
         <Probe name="dark" />
-      </ThemeProvider>
-      <ThemeProvider color="orange" data-testid="orange">
+      </IdsProvider>
+      <IdsProvider color="orange" data-testid="orange">
         <Probe name="orange" />
-      </ThemeProvider>
-    </ThemeProvider>,
+      </IdsProvider>
+    </IdsProvider>,
   );
   const outer = screen.getByTestId('outer');
   const dark = screen.getByTestId('dark');
@@ -140,9 +140,9 @@ test('system mode follows prefers-color-scheme live and toggles to an explicit m
   await preferColorScheme('light');
   const listening = countSchemeListeners();
   const screen = await render(
-    <ThemeProvider defaultMode="system" data-testid="root">
+    <IdsProvider defaultMode="system" data-testid="root">
       <Probe name="a" />
-    </ThemeProvider>,
+    </IdsProvider>,
   );
   const root = screen.getByTestId('root');
   await expect.element(root).toHaveAttribute('data-mode', 'light');
@@ -159,11 +159,11 @@ test('system mode follows prefers-color-scheme live and toggles to an explicit m
 test('a nested provider inherits a system mode already resolved by its parent', async () => {
   await preferColorScheme('dark');
   const screen = await render(
-    <ThemeProvider defaultMode="system">
-      <ThemeProvider color="orange" data-testid="inner">
+    <IdsProvider defaultMode="system">
+      <IdsProvider color="orange" data-testid="inner">
         <Probe name="inner" />
-      </ThemeProvider>
-    </ThemeProvider>,
+      </IdsProvider>
+    </IdsProvider>,
   );
   await expect.element(screen.getByTestId('inner')).toHaveAttribute('data-mode', 'dark');
   expect(themeSeenBy.inner.mode).toBe('system');
@@ -171,9 +171,9 @@ test('a nested provider inherits a system mode already resolved by its parent', 
 
 test('asChild puts the attributes on the child element', async () => {
   const screen = await render(
-    <ThemeProvider asChild color="green">
+    <IdsProvider asChild color="green">
       <section id="area" className="x" />
-    </ThemeProvider>,
+    </IdsProvider>,
   );
   const section = screen.container.querySelector<HTMLElement>('#area')!;
   expect(section.dataset.color).toBe('green');

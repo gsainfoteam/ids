@@ -2,7 +2,7 @@
 '@gsainfoteam/ids-react': minor
 ---
 
-ThemeProvider takes `color` / `mode` as controlled props with `defaultColor` / `defaultMode` and
+IdsProvider takes `color` / `mode` as controlled props with `defaultColor` / `defaultMode` and
 `onColorChange` / `onModeChange`. `mode="system"` follows `prefers-color-scheme` live and renders
 light on the server without a hydration mismatch. A nested provider inherits whichever axis it
 does not set, its setters reach the provider that owns that axis, and a region that switches mode

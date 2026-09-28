@@ -63,23 +63,23 @@ CSS 엔트리포인트에서 import:
 @import "tailwindcss";
 ```
 
-앱 최상단에 `ThemeProvider` 추가:
+앱 최상단에 `IdsProvider` 추가:
 
 ```tsx
-import { ThemeProvider } from '@gsainfoteam/ids-react';
+import { IdsProvider } from '@gsainfoteam/ids-react';
 
 function App() {
   return (
-    <ThemeProvider color="blue" mode="light">
+    <IdsProvider color="blue" mode="light">
       {/* 앱 전체 */}
-    </ThemeProvider>
+    </IdsProvider>
   );
 }
 ```
 
-`ThemeProvider` 없이는 CSS 변수가 정의되지 않아 색상이 렌더링되지 않는다.
+`IdsProvider` 없이는 CSS 변수가 정의되지 않아 색상이 렌더링되지 않는다.
 
-## ThemeProvider
+## IdsProvider
 
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
@@ -96,7 +96,7 @@ function ThemeToggle() {
 }
 ```
 
-중첩, 시스템 모드, `asChild` 는 `src/components/utility/theme-provider/README.md` 를 참고한다.
+중첩, 시스템 모드, `asChild` 는 `src/components/utility/ids-provider/README.md` 를 참고한다.
 
 ## 인터랙션 state
 
@@ -283,7 +283,7 @@ Calendar와 TimePicker로 일시를 선택합니다. [DateTimeField API](./src/c
 
 ## Interaction feedback
 
-Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만 150ms로 전환합니다. 키보드 포커스에서는 전환과 누름 배율을 적용하지 않으며 reduced-motion도 지원합니다. TextField 계열은 색상만 전환하고 포커스 표시는 즉시 반영합니다. ThemeProvider는 `color-scheme`도 모드에 맞춰 네이티브 폼 컨트롤과 스크롤바에 전달합니다.
+Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만 150ms로 전환합니다. 키보드 포커스에서는 전환과 누름 배율을 적용하지 않으며 reduced-motion도 지원합니다. TextField 계열은 색상만 전환하고 포커스 표시는 즉시 반영합니다. IdsProvider는 `color-scheme`도 모드에 맞춰 네이티브 폼 컨트롤과 스크롤바에 전달합니다.
 
 ## Rating
 

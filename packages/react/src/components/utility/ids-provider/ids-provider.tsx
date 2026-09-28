@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, type ComponentProps } from 'react';
 
 import {
   ThemeContext,
-  useThemeProvider,
+  useIdsProvider,
   type ThemeContextValue,
   type ThemeMode,
-} from './use-theme-provider';
+} from './use-ids-provider';
 import { cn, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Slot } from '../slot';
@@ -14,7 +14,7 @@ import type { IdsColor } from '../../../tokens/types';
 
 export { ThemeContext };
 
-export function ThemeProvider({
+export function IdsProvider({
   color,
   defaultColor,
   onColorChange,
@@ -26,8 +26,8 @@ export function ThemeProvider({
   style,
   ref,
   ...rest
-}: ThemeProvider.Props) {
-  const { context, paintsSurface } = useThemeProvider({
+}: IdsProvider.Props) {
+  const { context, paintsSurface } = useIdsProvider({
     color,
     defaultColor,
     onColorChange,
@@ -46,7 +46,7 @@ export function ThemeProvider({
     const primary = getComputedStyle(elementRef.current).getPropertyValue('--ids-color-primary');
     if (primary.trim() === '')
       console.warn(
-        `[IDS] ThemeProvider: no color tokens for data-color="${context.color}" data-mode="${context.resolvedMode}". Import @gsainfoteam/ids-css and use a color it defines.`,
+        `[IDS] IdsProvider: no color tokens for data-color="${context.color}" data-mode="${context.resolvedMode}". Import @gsainfoteam/ids-css and use a color it defines.`,
       );
   }, [context.color, context.resolvedMode]);
 
@@ -69,7 +69,7 @@ export function ThemeProvider({
   );
 }
 
-export namespace ThemeProvider {
+export namespace IdsProvider {
   export type Mode = ThemeMode;
 
   export type State = ThemeContextValue;

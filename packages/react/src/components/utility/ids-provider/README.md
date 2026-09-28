@@ -1,4 +1,4 @@
-# ThemeProvider
+# IdsProvider
 
 IDS 색 테마(`color`)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
 
@@ -10,22 +10,22 @@ IDS 색 테마(`color`)와 라이트/다크 모드(`mode`)를 정하는 컨텍�
 - **네이티브 컨트롤.** `color-scheme` 을 함께 설정해 스크롤바, 날짜 입력, 체크박스 같은 브라우저 기본 UI도 모드를 따릅니다.
 
 ```tsx
-import { ThemeProvider } from '@gsainfoteam/ids-react';
+import { IdsProvider } from '@gsainfoteam/ids-react';
 
-<ThemeProvider defaultColor="blue" defaultMode="system">
+<IdsProvider defaultColor="blue" defaultMode="system">
   <App />
-</ThemeProvider>;
+</IdsProvider>;
 ```
 
 ## 제어와 비제어
 
 ```tsx
-<ThemeProvider />                                        // blue, light로 시작
+<IdsProvider />                                        // blue, light로 시작
 
-<ThemeProvider defaultColor="orange" defaultMode="dark" /> // 비제어: Provider가 값을 가진다
+<IdsProvider defaultColor="orange" defaultMode="dark" /> // 비제어: Provider가 값을 가진다
 
-const [mode, setMode] = useState<ThemeProvider.Mode>('light');
-<ThemeProvider mode={mode} onModeChange={setMode} />      // 제어: 부모가 값을 가진다
+const [mode, setMode] = useState<IdsProvider.Mode>('light');
+<IdsProvider mode={mode} onModeChange={setMode} />      // 제어: 부모가 값을 가진다
 ```
 
 - 제어 모드에서 `setMode` 는 `onModeChange` 만 부릅니다. 화면은 부모가 `mode` 를 바꿀 때 바뀝니다.
@@ -34,9 +34,9 @@ const [mode, setMode] = useState<ThemeProvider.Mode>('light');
 ## 시스템 모드
 
 ```tsx
-<ThemeProvider defaultMode="system">
+<IdsProvider defaultMode="system">
   <App />
-</ThemeProvider>;
+</IdsProvider>;
 
 const { mode, resolvedMode } = useTheme();
 // mode: 'system'        사용자가 고른 값
@@ -49,21 +49,21 @@ const { mode, resolvedMode } = useTheme();
 ## 중첩
 
 ```tsx
-<ThemeProvider defaultColor="blue" defaultMode="light">
+<IdsProvider defaultColor="blue" defaultMode="light">
   <Header />
 
-  <ThemeProvider mode="dark">
+  <IdsProvider mode="dark">
     {' '}
     {/* color는 바깥(blue)을 물려받는다 */}
     <Sidebar />
-  </ThemeProvider>
+  </IdsProvider>
 
-  <ThemeProvider color="orange">
+  <IdsProvider color="orange">
     {' '}
     {/* mode는 바깥(light)을 물려받는다 */}
     <PromoBanner />
-  </ThemeProvider>
-</ThemeProvider>
+  </IdsProvider>
+</IdsProvider>
 ```
 
 - 안쪽 Provider에서 부르는 setter는 그 축을 가진 Provider로 갑니다. 위 `Sidebar` 에서 `setColor('green')` 을 부르면 바깥 Provider의 색이 바뀝니다.
@@ -101,9 +101,9 @@ function ThemeMenu() {
 ## asChild
 
 ```tsx
-<ThemeProvider asChild color="green" mode="dark">
+<IdsProvider asChild color="green" mode="dark">
   <section>…</section> {/* 감싸는 div 없이 section에 data-color, data-mode가 붙는다 */}
-</ThemeProvider>
+</IdsProvider>
 ```
 
 - 레이아웃 때문에 요소를 하나 더 두기 어려울 때 씁니다. 자식은 요소 하나여야 합니다.
@@ -124,7 +124,7 @@ function ThemeMenu() {
 
 ## 알아둘 것
 
-- IDS 컴포넌트는 `ThemeProvider` 안에 있어야 색이 칠해집니다. 밖에 두면 CSS 변수가 정의되지 않습니다.
+- IDS 컴포넌트는 `IdsProvider` 안에 있어야 색이 칠해집니다. 밖에 두면 CSS 변수가 정의되지 않습니다.
 - `@gsainfoteam/ids-css` 를 불러오지 않아 색 변수가 비어 있으면 개발 모드에서 경고가 나옵니다.
 - 최상위 Provider는 배경을 칠하지 않습니다. 페이지 배경은 앱이 `bg-(--ids-color-surface)` 로 칠합니다.
 - `dark:` 변형은 두 단계 중첩까지 정확합니다. 다크 안의 라이트 안에 다시 다크를 두면 가장 안쪽은 `dark:` 에 걸리지 않습니다. 이때는 토큰 변수로 칠하면 모든 깊이에서 맞습니다.

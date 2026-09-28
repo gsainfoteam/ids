@@ -45,16 +45,16 @@
 
 ### Color prop
 
-서비스는 IDS 팔레트에서 색상을 고른다. `ThemeProvider`와 개별 컴포넌트 모두 `color` prop을 지원하며, 명시하지 않으면 가장 가까운 부모의 color를 상속한다.
+서비스는 IDS 팔레트에서 색상을 고른다. `IdsProvider`(Flutter는 `ThemeProvider`)와 개별 컴포넌트 모두 `color` prop을 지원하며, 명시하지 않으면 가장 가까운 부모의 color를 상속한다.
 
 ```tsx
 // 앱 전체
-<ThemeProvider color="blue" mode="light">
+<IdsProvider color="blue" mode="light">
 
 // 특정 섹션만 교체
-<ThemeProvider color="orange">
+<IdsProvider color="orange">
   <PromoBanner />
-</ThemeProvider>
+</IdsProvider>
 
 // 개별 컴포넌트도 독립적으로
 <Button color="orange" variant="solid">특별한 버튼</Button>
@@ -385,16 +385,16 @@ packages/react/
       types.ts
       keys.ts
     theme/
-      theme-provider.tsx
+      ids-provider.tsx
       use-theme.ts
     components/
   package.json                   # peerDependencies: @gsainfoteam/ids-css, tailwindcss, react
 ```
 
-### ThemeProvider
+### IdsProvider
 
 ```tsx
-export function ThemeProvider({ color = 'blue', mode = 'light', children }) {
+export function IdsProvider({ color = 'blue', mode = 'light', children }) {
   const [color, setColor] = useState(initialColor)
   const [mode, setMode] = useState(initialMode)
   const toggleMode = () => setMode(m => m === 'light' ? 'dark' : 'light')
@@ -413,18 +413,18 @@ export function ThemeProvider({ color = 'blue', mode = 'light', children }) {
 
 ```tsx
 // App.tsx — 반드시 최상단 엔트리포인트에
-import { ThemeProvider } from '@gsainfoteam/ids-react'
+import { IdsProvider } from '@gsainfoteam/ids-react'
 
 export function App() {
   return (
-    <ThemeProvider color="blue" mode="light">
+    <IdsProvider color="blue" mode="light">
       <Router>...</Router>
-    </ThemeProvider>
+    </IdsProvider>
   )
 }
 ```
 
-> **주의:** `ThemeProvider` 없이 IDS 컴포넌트를 사용하면 CSS 변수가 주입되지 않아 색상이 전혀 동작하지 않는다.
+> **주의:** `IdsProvider` 없이 IDS 컴포넌트를 사용하면 CSS 변수가 주입되지 않아 색상이 전혀 동작하지 않는다.
 > 
 
 SSR 대응: CSR 구현 완료 후 대응 예정. `data-color`와 `data-mode`를 서버에서 HTML에 미리 주입하면 FOUC 없이 동작한다.
@@ -474,7 +474,7 @@ void main() {
 - [ ]  모노레포 세팅 (pnpm workspace, Changesets, `.github/workflows/`)
 - [ ]  `packages/core` 세팅 (tokens/, sd.config.js, codegen.yml)
 - [ ]  `packages/css` 세팅
-- [ ]  `packages/react` ThemeProvider, useTheme, 레이아웃 프리미티브, 전체 컴포넌트 직접 구현
+- [ ]  `packages/react` IdsProvider, useTheme, 레이아웃 프리미티브, 전체 컴포넌트 직접 구현
 - [ ]  `packages/flutter` ThemeProvider, IdsScope, 레이아웃 프리미티브, 전체 컴포넌트 직접 구현
 
 > 컴포넌트는 Base UI, Radix 등 외부 headless 라이브러리에 의존하지 않고 전부 직접 구현한다.
@@ -488,7 +488,7 @@ void main() {
 
 ### Phase 3 — 템플릿 세팅
 
-- [ ]  `gsainfoteam/template-csr-fe` — `@gsainfoteam/ids-css`, `@gsainfoteam/ids-react` 삽입, ThemeProvider 엔트리포인트 적용
+- [ ]  `gsainfoteam/template-csr-fe` — `@gsainfoteam/ids-css`, `@gsainfoteam/ids-react` 삽입, IdsProvider 엔트리포인트 적용
 - [ ]  `gsainfoteam/template-ssr-fe` — 동일 + SSR FOUC 대응
 - [ ]  `gsainfoteam/template-flutter` — 신규 생성, ids_flutter 삽입, ThemeProvider 적용
 
