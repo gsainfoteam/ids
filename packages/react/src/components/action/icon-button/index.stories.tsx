@@ -25,6 +25,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['solid', 'soft', 'outline', 'ghost'] as const;
 const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'info'] as const;
 const sizes = ['standard', 'tiny'] as const;
+const functionNamesSurviveBuild = isDevelopment;
 
 function BellIcon(props: ComponentProps<'svg'>) {
   return (
@@ -160,7 +161,8 @@ export const AutomaticLabel: Story = {
     await expect(canvas.getByRole('button', { name: 'Bell' })).toBeVisible();
     await expect(canvas.getByRole('button', { name: '휴지통으로' })).toBeVisible();
     await expect(canvas.getByRole('button', { name: '닫기' })).toBeVisible();
-    if (isDevelopment) await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
+    if (functionNamesSurviveBuild)
+      await expect(canvas.getByRole('button', { name: 'Plus' })).toBeVisible();
   },
 };
 
