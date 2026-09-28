@@ -8,24 +8,25 @@
 
 ## 모듈 목록
 
-| 모듈                                             | 내용                                                                | 쓰는 곳                                                                                                    |
-| ------------------------------------------------ | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                 | Spinner, Progress                                                                                          |
-| [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                     | Button, IconButton, Toggle, IconToggle, FloatingButton                                                     |
-| [`date-locale.ts`](#date-localets)               | 문자열 locale 해석, locale 의 시간제와 날짜 순서                    | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                               |
-| [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer), 목록 스타일, 파트 헬퍼           | Select, ChipField, ColorField, `temporal-field/`, FileField, TimePicker, ColorPicker, Rating               |
-| [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드의 상자와 상자 안 버튼의 클래스 조각                   | `text-control/`, `temporal-field/`, `field-popup/`, Select, ColorField, FileField, PasswordField, TextArea |
-| [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트 | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`    |
-| [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                  | IconButton, IconToggle, FloatingButton                                                                     |
-| [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                | IconButton, IconToggle                                                                                     |
-| [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구 전부와 기본 locale                    | 문구를 그리는 모든 컴포넌트, `date-locale.ts`                                                              |
-| [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                             | Button, `surface.ts`                                                                                       |
-| [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수  | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item                                                    |
-| [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                 | Card, Item, Chip                                                                                           |
-| [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                              | DateField, TimeField, DateTimeField                                                                        |
-| [`text-control/`](./text-control/README.md)      | 글자 입력 필드의 셸, Clear, 값 추적 hook                            | TextField, PasswordField, NumberField, TelField, TextArea                                                  |
-| [`toggle-surface.ts`](#toggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                   | Toggle, IconToggle                                                                                         |
-| [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook           | Checkbox, Radio                                                                                            |
+| 모듈                                             | 내용                                                                | 쓰는 곳                                                                                                        |
+| ------------------------------------------------ | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                 | Spinner, Progress                                                                                              |
+| [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                     | Button, IconButton, Toggle, IconToggle, FloatingButton                                                         |
+| [`date-locale.ts`](#date-localets)               | 문자열 locale 해석, locale 의 시간제와 날짜 순서                    | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                   |
+| [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer), 목록 스타일, 파트 헬퍼           | Select, ChipField, ColorField, `temporal-field/`, FileField, TimePicker                                        |
+| [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드의 상자와 상자 안 버튼의 클래스 조각                   | `text-control/`, `temporal-field/`, `field-popup/`, Select, ColorField, FileField, PasswordField, TextArea     |
+| [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수       | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                     |
+| [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트 | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`        |
+| [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                  | IconButton, IconToggle, FloatingButton                                                                         |
+| [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                | IconButton, IconToggle                                                                                         |
+| [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구 전부와 기본 locale                    | 문구를 그리는 모든 컴포넌트, `date-locale.ts`                                                                  |
+| [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                             | Button, `surface.ts`                                                                                           |
+| [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수  | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField |
+| [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                 | Card, Item, Chip                                                                                               |
+| [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                              | DateField, TimeField, DateTimeField                                                                            |
+| [`text-control/`](./text-control/README.md)      | 글자 입력 필드의 셸, Clear, 값 추적 hook                            | TextField, PasswordField, NumberField, TelField, TextArea                                                      |
+| [`toggle-surface.ts`](#toggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                   | Toggle, IconToggle                                                                                             |
+| [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook           | Checkbox, Radio                                                                                                |
 
 ## arc.tsx
 
@@ -250,6 +251,46 @@ size: {
 - padding 을 가진 상자에는 `padded`, trigger 가 채우는 상자에는 `unpadded` 를 씁니다. 바꿔 쓰면 `padded` 는 테두리 너머로 밀리고, `unpadded` 는 padding 만큼 안쪽에 떠 보입니다.
 - `size-7`, `size-6` 과 음수 margin 은 control 높이 토큰(36px, 32px)과 상자 padding 에 맞춘 값입니다. 둘 중 하나를 바꾸면 이 값도 다시 계산합니다.
 - disabled 필드는 루트에서 이미 흐려집니다(`data-disabled:opacity-50`). ColorField 와 FileField 는 disabled Clear 가 한 번 더 흐려지지 않도록 `alreadyDimmedByField`(`data-disabled:opacity-100`)를 더합니다.
+
+## form-bridge.ts
+
+폼 라이브러리 bridge(react-hook-form, TanStack Form)가 `Field` 의 컨트롤에 값을 잇는 공용 함수입니다.
+
+### 쓰는 곳
+
+- `src/react-hook-form.tsx`: `NativeField`(`register()` 를 잇는 `mergeBinding`)와 `ControlledField`(`value`, `checked` 모드).
+- `src/tanstack-form.tsx`: 모든 모드.
+
+### 쓰는 법
+
+```tsx
+// src/tanstack-form.tsx
+bindControl={(original, control) =>
+  mergeBinding(withoutDefaults(original), {
+    name: field.name,
+    [controlMode]: keepInputControlled(value, controlMode),
+    onBlur: field.handleBlur,
+    ...valueReports(control, controlMode, (next) => field.handleChange(next), {
+      readsNativeEvents: false,
+    }),
+  })
+}
+```
+
+### 왜 이렇게
+
+- `mergeBinding`: 자식(소비자)의 핸들러가 먼저 돌고 라이브러리의 핸들러가 뒤에 항상 돕니다(`consumerFirstLibraryAlways`). 소비자가 `preventDefault` 해도 라이브러리는 값을 놓치지 않습니다. ref 는 `mergeRefs` 로 합칩니다.
+- `withoutDefaults`: 값의 주인이 라이브러리라서 자식의 `defaultValue`, `defaultChecked` 를 뺍니다. 남기면 React 가 controlled 와 uncontrolled 를 섞었다고 경고합니다.
+- `keepInputControlled`: 값이 `undefined` 면 `''`(checked 모드는 `false`)를 넘깁니다. `undefined` 를 넘기면 입력이 uncontrolled 로 바뀝니다.
+- `valueReports`:
+  - native `input`, `select` 는 `onChange` 로 알립니다. react-hook-form 은 change 이벤트를 직접 읽고(`readsNativeEvents: true`), TanStack Form 은 이벤트에서 꺼낸 `value` 나 `checked` 를 받습니다(`false`).
+  - 컴포넌트는 `onValueChange`(checked 모드는 `onCheckedChange`)로 알립니다. 컴포넌트가 함께 넘기는 change 이벤트는 화면의 글자(`1,234`)를 담을 수 있어 값으로 쓰지 않습니다(`reportValueNotForwardedEvent`).
+  - 한 편집이 두 콜백으로 와도 라이브러리에는 한 번만 갑니다(`reportOncePerEdit`).
+
+### 알아둘 것
+
+- 새 폼 라이브러리 bridge 도 이 네 함수로 `bindControl` 을 짭니다. 라이브러리마다 다른 것은 상태(`invalid`, `dirty`, `touched`, 오류 메시지)를 읽는 곳과 `readsNativeEvents` 뿐입니다.
+- 이 파일은 폼 라이브러리를 import 하지 않습니다. 라이브러리는 각 entry(`/react-hook-form`, `/tanstack-form`)만 불러오는 optional peer 입니다.
 
 ## form-value.tsx
 

@@ -56,7 +56,9 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 until it does not: a helper named for its reason (`tryCapturePointer`), a constant named for what
 its value means, a condition split into named parts. Tool directives (`eslint-disable`,
 `@ts-expect-error`, a `@deprecated` tag that editors strike through) are the only exception. Explanations for users belong in the README and the
-story descriptions.
+story descriptions. Internal code (`src/internal`, `src/hooks`, `src/utils`) explains itself to
+maintainers in a README.md in its folder: what each module is, who uses it, how, and what breaks if
+it changes. A new internal module adds its section there.
 
 ## React source layout
 
