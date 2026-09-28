@@ -237,7 +237,11 @@ test('form: one entry per pressed value, a required validator, and reset to the 
   const reset = new FormData(form);
   assert.equal(reset.get('size'), null);
   assert.deepEqual(reset.getAll('tags'), ['x']);
-  assert.deepEqual(changes, ['b']);
+  assert.deepEqual(
+    changes,
+    ['b'],
+    'a native reset fires no change event, so neither does the group',
+  );
 });
 
 test('form names a form elsewhere in the document', async () => {
