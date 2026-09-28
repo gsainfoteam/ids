@@ -70,11 +70,13 @@ function pressedRegionKey(event: KeyboardEvent, hotkey: ToasterHotkey) {
     !event.ctrlKey &&
     !event.metaKey &&
     !event.shiftKey;
+
   const hotkeyHeld =
     hotkey.length > 0 &&
     hotkey.every((key) =>
       MODIFIERS.has(key) ? event[key as ToasterModifier] : event.code === key,
     );
+
   return bareRegionKey || hotkeyHeld;
 }
 
@@ -83,6 +85,7 @@ function naturalHeight(node: HTMLElement) {
   node.style.height = 'auto';
   const height = node.offsetHeight;
   node.style.height = assigned;
+
   return height;
 }
 
@@ -94,6 +97,7 @@ function positionsOf(
 ) {
   const positions = new Map<ToastId, ToastPosition>();
   let offset = 0;
+
   live.forEach((record, index) => {
     const height = heights.get(record.id);
     positions.set(record.id, {
@@ -104,14 +108,18 @@ function positionsOf(
       visible: index < max,
       stackOrder: live.length - index,
     });
+
     offset += (height ?? 0) + gap;
   });
+
   return positions;
 }
 
 export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOptions) {
   const [host] = useState(() => Symbol('toaster'));
+
   useLayoutEffect(() => registerToaster(host, explicit), [host, explicit]);
+
   const elected = useSyncExternalStore(
     toasterHosts.subscribe,
     () => electedToaster(toasterHosts.get()) === host,
@@ -140,9 +148,11 @@ export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOpt
   const releaseFocus = useCallback(
     ({ stayInRegion }: { stayInRegion: boolean }) => {
       if (!region) return;
+
       const back = cameFrom.current;
       cameFrom.current = null;
       if (back && !region.contains(back) && returnFocusTo(back)) return;
+
       const othersRemain = toastRecords.get().some((record) => !record.dismissed);
       if (stayInRegion && othersRemain) region.focus({ preventScroll: true });
       else blurWithin(region);
@@ -152,10 +162,12 @@ export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOpt
 
   useLayoutEffect(() => {
     if (!region || !shown) return;
+
     showInTopLayer(region);
     const stopRaising = keepAboveLayers(() =>
       withoutTransitions(region, () => raiseInTopLayer(region)),
     );
+
     return () => {
       stopRaising();
       if (supportsPopover(region) && region.matches(':popover-open')) region.hidePopover();
@@ -165,6 +177,7 @@ export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOpt
   const measure = useCallback(() => {
     const next = new Map<ToastId, number>();
     for (const [id, node] of toastElements.current) next.set(id, naturalHeight(node));
+
     setHeights((previous) => (isEqual(previous, next) ? previous : next));
   }, []);
 
@@ -175,26 +188,32 @@ export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOpt
 
   useEffect(() => {
     if (!region || !shown || typeof ResizeObserver === 'undefined') return;
+
     const observer = new ResizeObserver(() => measure());
     observer.observe(region);
+
     return () => observer.disconnect();
   }, [region, shown, measure]);
 
   const hasLive = live.length > 0;
   const latest = useRef({ hotkey, hasLive, releaseFocus });
+
   useLayoutEffect(() => {
     latest.current = { hotkey, hasLive, releaseFocus };
   });
 
   useEffect(() => {
     if (!region) return;
+
     const doc = region.ownerDocument;
     const onKeyDown = (event: KeyboardEvent) => {
       if (!latest.current.hasLive || !pressedRegionKey(event, latest.current.hotkey)) return;
+
       event.preventDefault();
       if (region.contains(doc.activeElement)) latest.current.releaseFocus({ stayInRegion: false });
       else region.focus({ preventScroll: true });
     };
+
     doc.addEventListener('keydown', onKeyDown);
     return () => doc.removeEventListener('keydown', onKeyDown);
   }, [region]);
@@ -206,10 +225,12 @@ export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOpt
 
   useEffect(() => {
     if (!pressing || !region) return;
+
     const doc = region.ownerDocument;
     const release = () => setPressing(false);
     doc.addEventListener('pointerup', release);
     doc.addEventListener('pointercancel', release);
+
     return () => {
       doc.removeEventListener('pointerup', release);
       doc.removeEventListener('pointercancel', release);
@@ -235,16 +256,19 @@ export function useToaster({ explicit, max, gap, expand, hotkey }: UseToasterOpt
       const from = event.relatedTarget;
       if (from instanceof HTMLElement && !event.currentTarget.contains(from))
         cameFrom.current = from;
+
       setFocusWithin(true);
     },
     onBlur: (event: FocusEvent<HTMLDivElement>) => {
       if (event.currentTarget.contains(event.relatedTarget)) return;
+
       setFocusWithin(false);
       cameFrom.current = null;
     },
     onKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => {
       const composing = event.nativeEvent.isComposing || event.keyCode === 229;
       if (event.key !== 'Escape' || event.defaultPrevented || composing) return;
+
       event.preventDefault();
       releaseFocus({ stayInRegion: false });
     },

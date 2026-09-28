@@ -42,11 +42,14 @@ function keep(matches: (item: OverlayItem) => boolean) {
 
 function open<T>(render: OverlayRender<T>, { id, theme }: OverlayOptions = {}) {
   const key = id ?? `ids-overlay-${++opened}`;
+
   return new Promise<T | undefined>((resolve) => {
     settle(key, undefined);
     resolvers.set(key, resolve as (value: unknown) => void);
+
     const items = overlayItems.get();
     const reopened = { id: key, open: true, render: render as OverlayRender<unknown> };
+
     overlayItems.set(
       items.some((item) => item.id === key)
         ? items.map((item) =>
@@ -59,6 +62,7 @@ function open<T>(render: OverlayRender<T>, { id, theme }: OverlayOptions = {}) {
 
 function close(id: string, value?: unknown) {
   settle(id, value);
+
   const items = overlayItems.get();
   if (items.some((item) => item.id === id && item.open))
     overlayItems.set(items.map((item) => (item.id === id ? { ...item, open: false } : item)));
@@ -81,6 +85,7 @@ const layersBoundToItem = new Map<string, number>();
 
 export function bindLayer(id: string) {
   layersBoundToItem.set(id, (layersBoundToItem.get(id) ?? 0) + 1);
+
   return () => {
     const remaining = (layersBoundToItem.get(id) ?? 1) - 1;
     if (remaining > 0) layersBoundToItem.set(id, remaining);
@@ -99,8 +104,10 @@ function dropEverything() {
 
 export function registerOverlayHost(host: symbol) {
   overlayHosts.set([...overlayHosts.get(), host]);
+
   return () => {
     overlayHosts.set(overlayHosts.get().filter((registered) => registered !== host));
+
     queueMicrotask(() => {
       const remountedInTheSameTask = overlayHosts.get().length > 0;
       if (!remountedInTheSameTask) dropEverything();

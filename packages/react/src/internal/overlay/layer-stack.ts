@@ -43,8 +43,10 @@ function targetOf(event: Event) {
 
 function isInside(stack: Entry[], index: number, target: Node) {
   const { layer } = stack[index]!;
+
   if (layer.element()?.contains(target) || layer.anchor()?.contains(target)) return true;
   if (isAlwaysInside(target)) return true;
+
   return stack
     .slice(index + 1)
     .some(({ layer: higher }) => higher.kind !== 'tooltip' && !!higher.element()?.contains(target));
@@ -52,6 +54,7 @@ function isInside(stack: Entry[], index: number, target: Node) {
 
 function lastIndexWhere(stack: Entry[], matches: (entry: Entry) => boolean) {
   for (let index = stack.length - 1; index >= 0; index--) if (matches(stack[index]!)) return index;
+
   return -1;
 }
 
@@ -69,7 +72,9 @@ export function focusReturnTarget(layer: Layer) {
 export function elementsAbove(layer: Layer) {
   const stack = stacks.get(layer.element()?.ownerDocument ?? document) ?? [];
   const index = stack.findIndex((entry) => entry.layer === layer);
+
   if (index < 0) return [];
+
   return stack
     .slice(index + 1)
     .map((entry) => entry.layer.element())
@@ -79,24 +84,30 @@ export function elementsAbove(layer: Layer) {
 function pullFocusBack(entry: Entry) {
   const content = entry.layer.element();
   if (!content) return;
+
   const last = entry.lastFocused;
   const target =
     last?.isConnected && content.contains(last) ? last : (tabbable(content)[0] ?? content);
+
   target.focus({ preventScroll: true });
 }
 
 function updatePositions(stack: Entry[]) {
   let modalsAbove = 0;
   const modalsBelow = stack.filter((entry) => entry.layer.kind === 'modal').length;
+
   for (let index = stack.length - 1; index >= 0; index--) {
     const entry = stack[index]!;
     if (entry.layer.kind !== 'modal') continue;
+
     const position = { covered: modalsAbove > 0, modalsBelow: modalsBelow - modalsAbove - 1 };
     modalsAbove++;
+
     const unchanged =
       entry.position?.covered === position.covered &&
       entry.position.modalsBelow === position.modalsBelow;
     if (unchanged) continue;
+
     entry.position = position;
     entry.layer.positionChanged(position);
   }
@@ -105,27 +116,34 @@ function updatePositions(stack: Entry[]) {
 function listen(doc: Document, stack: Entry[]) {
   const onKeyDown = (event: KeyboardEvent) => {
     pressedOutside.clear();
+
     const composing = event.isComposing || event.keyCode === 229;
     if (event.key !== 'Escape' || event.defaultPrevented || composing) return;
+
     const top = stack.at(-1)?.layer;
     if (!top?.dismissible()) return;
+
     event.preventDefault();
     top.dismiss('escape-key', event);
   };
 
   const onPointerDown = (event: PointerEvent) => {
     pressedOutside.clear();
+
     const target = targetOf(event);
     if (!target) return;
     const snapshot = [...stack];
+
     for (const { layer } of snapshot)
       if (layer.kind === 'tooltip' && !layer.element()?.contains(target))
         layer.dismiss('outside-press', event);
+
     for (let index = snapshot.length - 1; index >= 0; index--) {
       const { layer } = snapshot[index]!;
       if (layer.kind === 'tooltip') continue;
       if (layer.kind === 'modal' || !layer.dismissible()) return;
       if (isInside(snapshot, index, target)) return;
+
       blurWithin(layer.element());
       pressedOutside.add(layer);
       layer.dismiss('outside-press', event);
@@ -135,21 +153,27 @@ function listen(doc: Document, stack: Entry[]) {
   const onFocusIn = (event: FocusEvent) => {
     const target = targetOf(event);
     if (!target) return;
+
     const snapshot = [...stack];
     const topModal = lastIndexWhere(snapshot, (entry) => entry.layer.kind === 'modal');
+
     for (let index = snapshot.length - 1; index > topModal; index--) {
       const { layer } = snapshot[index]!;
       if (layer.kind === 'tooltip') continue;
       if (isInside(snapshot, index, target)) break;
       if (pressedOutside.has(layer) || !layer.dismissible()) continue;
+
       layer.dismiss('focus-out', event);
     }
+
     const modal = snapshot[topModal];
     if (!modal) return;
+
     if (modal.layer.element()?.contains(target)) {
       modal.lastFocused = target as HTMLElement;
       return;
     }
+
     const returning = focusReturnTarget(modal.layer)?.contains(target);
     if (!returning && !isInside(snapshot, topModal, target)) pullFocusBack(modal);
   };
@@ -157,6 +181,7 @@ function listen(doc: Document, stack: Entry[]) {
   doc.addEventListener('keydown', onKeyDown);
   doc.addEventListener('pointerdown', onPointerDown);
   doc.addEventListener('focusin', onFocusIn);
+
   stopListening.set(doc, () => {
     doc.removeEventListener('keydown', onKeyDown);
     doc.removeEventListener('pointerdown', onPointerDown);
@@ -171,6 +196,7 @@ export function registerLayer(doc: Document, layer: Layer) {
     stacks.set(doc, stack);
     listen(doc, stack);
   }
+
   const focused = doc.activeElement;
   const owner = lastIndexWhere(
     stack,
@@ -183,10 +209,13 @@ export function registerLayer(doc: Document, layer: Layer) {
   const openedInTheSameCommitInside = stack.findIndex(
     (open) => !!element && !!open.layer.element() && element.contains(open.layer.element()),
   );
+
   if (openedInTheSameCommitInside >= 0) stack.splice(openedInTheSameCommitInside, 0, entry);
   else stack.push(entry);
+
   if (layer.kind === 'modal')
     for (const { layer: open } of [...stack]) if (open.kind === 'tooltip') open.dismiss('covered');
+
   updatePositions(stack);
 
   return () => {
@@ -194,6 +223,7 @@ export function registerLayer(doc: Document, layer: Layer) {
     if (index >= 0) stack.splice(index, 1);
     pressedOutside.delete(layer);
     updatePositions(stack);
+
     if (stack.length > 0) return;
     stacks.delete(doc);
     stopListening.get(doc)?.();
@@ -203,9 +233,11 @@ export function registerLayer(doc: Document, layer: Layer) {
 
 export function useLayer(active: boolean, options: LayerOptions) {
   const latest = useRef(options);
+
   useLayoutEffect(() => {
     latest.current = options;
   });
+
   const [layer] = useState<Layer>(() => ({
     get kind() {
       return latest.current.kind;
@@ -216,10 +248,12 @@ export function useLayer(active: boolean, options: LayerOptions) {
     dismiss: (reason, event) => latest.current.onDismiss(reason, event),
     positionChanged: (position) => latest.current.onPositionChange?.(position),
   }));
+
   const { kind } = options;
 
   useLayoutEffect(() => {
     if (!active) return;
+
     const doc = layer.element()?.ownerDocument ?? document;
     return registerLayer(doc, layer);
   }, [active, kind, layer]);

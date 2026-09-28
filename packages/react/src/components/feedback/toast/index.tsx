@@ -42,6 +42,7 @@ function shortcutsOf(hotkey: ToasterHotkey) {
 
 function swipeDirectionsOf(placement: Toaster.Placement): SwipeDirections {
   const [side, align] = placement.split('-');
+
   return {
     y: side === 'top' ? -1 : 1,
     x: align === 'left' ? -1 : align === 'right' ? 1 : 0,
@@ -83,11 +84,13 @@ function ToastView({
     register,
     releaseFocus,
   });
+
   if (!mounted) return null;
 
   const styles = Toaster.Style({ placement, colorScheme: record.colorScheme });
   const icon = toastIcon(record);
   const { action } = record;
+
   const onAction = (event: MouseEvent<HTMLButtonElement>) => {
     action?.onClick(event);
     if (!event.defaultPrevented) dismissToast(record.id, 'user');
@@ -175,9 +178,11 @@ function ToasterRegion({
   'aria-label': ariaLabel = messages.toast.region,
 }: Toaster.Props & { explicit: boolean }) {
   const toaster = useToaster({ explicit, max, gap, expand, hotkey });
+
   if (!toaster.elected) return null;
 
   const styles = Toaster.Style({ placement });
+
   return (
     <div data-toaster="" aria-live="polite" aria-relevant="additions text" aria-atomic="false">
       <div

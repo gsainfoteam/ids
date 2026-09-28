@@ -65,6 +65,7 @@ function useSubContext(part: string) {
 
 function usePlacement(level: MenuLevel, { side, align, sideOffset, alignOffset }: MenuPlacement) {
   const { setPlacement } = level;
+
   useLayoutEffect(() => {
     setPlacement({ side, align, sideOffset, alignOffset });
   }, [setPlacement, side, align, sideOffset, alignOffset]);
@@ -79,6 +80,7 @@ function withIndicator(children: ReactNode, asChild: boolean | undefined) {
       {!flattenFragments(nodes).some(isIndicator) && <MenuItemIndicator />}
     </>
   );
+
   if (asChild && isValidElement<{ children?: ReactNode }>(children))
     return cloneElement(children, {}, append(children.props.children));
   return append(children);
@@ -100,6 +102,7 @@ function MenuRoot({
   children,
 }: Menu.Props) {
   const root = useMenuLevel({ open, defaultOpen, onOpenChange, parentOpen: null, triggerType });
+
   return (
     <RootContext value={{ root, triggerType }}>
       <FloatingNode id={root.nodeId}>{children}</FloatingNode>
@@ -113,6 +116,7 @@ function MenuTrigger({ asChild, children, ...props }: Menu.TriggerProps) {
     ref: root.setTrigger,
     'data-popup-open': root.open ? '' : undefined,
   };
+
   if (triggerType === 'contextmenu')
     return part(
       'div',
@@ -127,6 +131,7 @@ function MenuTrigger({ asChild, children, ...props }: Menu.TriggerProps) {
         onPointerDown: (event: PointerEvent<HTMLElement>) => {
           const plainPress = event.button === 0 && !event.ctrlKey;
           const pressedInMenu = !!root.content?.contains(event.target as Node);
+
           if (root.open && plainPress && !pressedInMenu) root.setOpen(false, event.nativeEvent);
         },
       }),
@@ -155,6 +160,7 @@ function MenuPopup({ level, name, className, style, children, ...props }: PopupP
 
   useLayoutEffect(() => {
     if (!content) return;
+
     showInTopLayer(content);
     raiseWhatStaysAboveLayers();
   }, [content]);
@@ -162,6 +168,7 @@ function MenuPopup({ level, name, className, style, children, ...props }: PopupP
   const floating = level.getFloatingProps();
   const navigate = floating.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined;
   const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined;
+
   return (
     <div
       {...mergeProps(props, {
@@ -171,11 +178,13 @@ function MenuPopup({ level, name, className, style, children, ...props }: PopupP
         onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
           const ownMenu = (event.target as Element).closest('[data-menu-content]');
           if (ownMenu !== event.currentTarget) return;
+
           if (event.key === 'Tab') {
             event.preventDefault();
             root.closeTree({ returnFocus: true });
             return;
           }
+
           navigate?.(event);
         },
       })}
@@ -212,13 +221,16 @@ function MenuContent({
 }: Menu.ContentProps) {
   const { root, triggerType } = useRootContext('Menu.Content');
   const atPointer = triggerType === 'contextmenu';
+
   usePlacement(root, {
     side: side ?? (atPointer ? 'right' : 'bottom'),
     align,
     sideOffset: sideOffset ?? (atPointer ? 2 : 4),
     alignOffset,
   });
+
   if (!root.mounted) return null;
+
   return (
     <MenuPopup
       {...props}
@@ -246,6 +258,7 @@ function MenuItem({
       if (selectItem(element, onSelect)) root.closeTree({ returnFocus: true });
     },
   });
+
   return part(
     'div',
     asChild,
@@ -280,6 +293,7 @@ function MenuCheckboxItem({
       if (selectItem(element, onSelect)) root.closeTree({ returnFocus: true });
     },
   });
+
   return (
     <ItemContext value={{ checked, kind: 'checkbox' }}>
       {part(
@@ -303,6 +317,7 @@ function MenuRadioGroup({ value, onValueChange, children, ...props }: Menu.Radio
   const choose = (next: string) => {
     if (next !== value) onValueChange?.(next);
   };
+
   return (
     <RadioContext value={{ value, setValue: choose }}>
       <MenuGroup {...props}>{children}</MenuGroup>
@@ -324,6 +339,7 @@ function MenuRadioItem({
   const level = useLevelContext('Menu.RadioItem');
   const group = use(RadioContext);
   invariant(group, 'Menu.RadioItem must be rendered inside Menu.RadioGroup.');
+
   const checked = group.value === value;
   const item = useMenuItem(level, {
     disabled,
@@ -333,6 +349,7 @@ function MenuRadioItem({
       if (selectItem(element, onSelect)) root.closeTree({ returnFocus: true });
     },
   });
+
   return (
     <ItemContext value={{ checked, kind: 'radio' }}>
       {part(
@@ -358,9 +375,12 @@ function MenuItemIndicator({ asChild, children, className, ...props }: Menu.Item
     item,
     'Menu.ItemIndicator must be rendered inside Menu.CheckboxItem or Menu.RadioItem.',
   );
+
   if (!item.checked) return null;
+
   const styles = Menu.Style();
   const glyph = item.kind === 'radio' ? <span className={styles.dot()} /> : <CheckIcon />;
+
   return part(
     'span',
     asChild,
@@ -376,6 +396,7 @@ function MenuItemIndicator({ asChild, children, className, ...props }: Menu.Item
 function MenuGroup({ asChild, className, children, ...props }: Menu.GroupProps) {
   const labelId = useId();
   const [labelled, setLabelled] = useState(false);
+
   return (
     <GroupContext value={{ labelId, setLabelled }}>
       {part(
@@ -396,11 +417,14 @@ function MenuGroup({ asChild, className, children, ...props }: Menu.GroupProps) 
 function MenuLabel({ asChild, className, children, ...props }: Menu.LabelProps) {
   const group = use(GroupContext);
   const setLabelled = group?.setLabelled;
+
   useLayoutEffect(() => {
     if (!setLabelled) return;
+
     setLabelled(true);
     return () => setLabelled(false);
   }, [setLabelled]);
+
   return part(
     'div',
     asChild,
@@ -440,6 +464,7 @@ function MenuSub({ open, defaultOpen = false, onOpenChange, children }: Menu.Sub
     parentOpen: parent.open,
     triggerType,
   });
+
   return (
     <SubContext value={sub}>
       <FloatingNode id={sub.nodeId}>{children}</FloatingNode>
@@ -463,6 +488,7 @@ function MenuSubTrigger({
     activatesOnKeys: false,
     keepsHighlightOnLeave: sub.open,
   });
+
   const styles = Menu.Style();
   const content = (nodes: ReactNode) => (
     <>
@@ -470,6 +496,7 @@ function MenuSubTrigger({
       <ChevronRightIcon aria-hidden="true" className={styles.subIcon()} />
     </>
   );
+
   return part(
     'div',
     asChild,
@@ -500,8 +527,11 @@ function MenuSubContent({
 }: Menu.SubContentProps) {
   const sub = useSubContext('Menu.SubContent');
   usePlacement(sub, { side, align, sideOffset, alignOffset });
+
   if (!sub.mounted) return null;
+
   const label = sub.trigger?.textContent?.trim() ?? '';
+
   return <MenuPopup {...props} level={sub} name={{ 'aria-label': messages.menu.submenu(label) }} />;
 }
 

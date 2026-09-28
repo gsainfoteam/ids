@@ -44,6 +44,7 @@ const joinIds = (...ids: Array<unknown>) =>
 export function Tooltip({ content, arrow = false, children, ...options }: Tooltip.Props) {
   const tooltip = useTooltip(options);
   const shorthand = content !== undefined;
+
   return (
     <TooltipContext value={{ tooltip, styles: Tooltip.Style() }}>
       {shorthand ? (
@@ -64,6 +65,7 @@ export function Tooltip({ content, arrow = false, children, ...options }: Toolti
 function TooltipPopup({ className, style, ref, children, ...props }: Tooltip.Content.Props) {
   const { tooltip, styles } = useTooltipContext('Tooltip.Content');
   const portalRoot = use(PortalRootContext);
+
   const popup = (
     <div
       {...tooltip.floatingProps}
@@ -82,6 +84,7 @@ function TooltipPopup({ className, style, ref, children, ...props }: Tooltip.Con
       {children}
     </div>
   );
+
   return portalRoot ? createPortal(popup, portalRoot) : popup;
 }
 
@@ -96,14 +99,17 @@ export namespace Tooltip {
 
   export function Trigger({ asChild, children, ...props }: Trigger.Props) {
     const { tooltip } = useTooltipContext('Tooltip.Trigger');
+
     const reference = tooltip.getReferenceProps({
       onPointerDown: (event: PointerEvent<HTMLElement>) =>
         tooltip.closeByTriggerPress(event.nativeEvent),
     });
+
     const ownDescription =
       asChild && isValidElement<ComponentProps<'button'>>(children)
         ? children.props['aria-describedby']
         : props['aria-describedby'];
+
     return part(
       asChild ? 'span' : 'button',
       asChild,
@@ -133,11 +139,13 @@ export namespace Tooltip {
   export function Arrow({ className, style, ...props }: Arrow.Props) {
     const { tooltip, styles } = useTooltipContext('Tooltip.Arrow');
     const { arrowPosition, side, setArrow } = tooltip;
+
     const placed: CSSProperties = {
       left: arrowPosition?.x,
       top: arrowPosition?.y,
       [ARROW_EDGE[side]]: -ARROW_HALF,
     };
+
     return (
       <span
         aria-hidden="true"

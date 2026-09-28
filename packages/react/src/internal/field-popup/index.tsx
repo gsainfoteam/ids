@@ -84,6 +84,7 @@ export function FieldPopup({
 
   useLayoutEffect(() => {
     if (!popup || drawer) return;
+
     showInTopLayer(popup);
     raiseWhatStaysAboveLayers();
   }, [popup, drawer]);
@@ -94,6 +95,7 @@ export function FieldPopup({
 
   useLayoutEffect(() => {
     if (!popup || !drawer) return;
+
     const win = popup.ownerDocument.defaultView!;
     const place = () => {
       Object.assign(popup.style, {
@@ -104,16 +106,20 @@ export function FieldPopup({
         bottom: `calc(max(${VIEWPORT_MARGIN}px, env(safe-area-inset-bottom)) + ${coveredByKeyboard(win)}px)`,
         maxHeight: `${Math.min(DRAWER_MAX_HEIGHT, visibleHeight(win) * 0.7)}px`,
       });
+
       onPlacementLanded(popup);
     };
+
     place();
     return onViewportChange(win, place);
   }, [popup, drawer]);
 
   useLayoutEffect(() => {
     if (!popup) return;
+
     const sheetMissingFocus = drawer && !popup.contains(popup.ownerDocument.activeElement);
     if (initialFocusDone.current && !sheetMissingFocus) return;
+
     initialFocusDone.current = true;
     initialFocusTarget(popup, { selector: initialFocusSelector, holdsFocus: drawer })?.focus({
       preventScroll: true,
@@ -123,6 +129,7 @@ export function FieldPopup({
   const styles = popupStyle({ presentation });
   const role = props.role ?? (drawer ? 'dialog' : undefined);
   const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined;
+
   return (
     <ModalLayer
       open={drawer}
@@ -153,18 +160,22 @@ export function FieldPopup({
 
 function onPlacementLanded(node: HTMLElement) {
   firstPlacementLanded.add(node);
+
   const option = recenterAfterFirstPlacement.get(node);
   if (!option) return;
+
   recenterAfterFirstPlacement.delete(node);
   if (node.contains(option)) scrollWithinPopup(option, node, true);
 }
 
 function scrollParent(option: HTMLElement, popup: HTMLElement) {
   const view = popup.ownerDocument.defaultView;
+
   for (let node = option.parentElement; node && node !== popup; node = node.parentElement) {
     const overflow = view?.getComputedStyle(node).overflowY;
     if (overflow === 'auto' || overflow === 'scroll') return node;
   }
+
   return popup;
 }
 
@@ -172,6 +183,7 @@ function scrollWithinPopup(option: HTMLElement, popup: HTMLElement, center: bool
   const scroller = scrollParent(option, popup);
   const view = scroller.clientHeight,
     from = scroller.scrollTop;
+
   let top: number, height: number;
   const unscaledOffsetsApply = option.offsetParent === scroller;
   if (unscaledOffsetsApply) {
@@ -183,6 +195,7 @@ function scrollWithinPopup(option: HTMLElement, popup: HTMLElement, center: bool
     top = from + rect.top - bounds.top - scroller.clientTop;
     height = rect.bottom - rect.top;
   }
+
   if (center) scroller.scrollTop = top - (view - height) / 2;
   else if (top < from) scroller.scrollTop = top;
   else if (top + height > from + view) scroller.scrollTop = top + height - view;
@@ -194,6 +207,7 @@ export function revealPopupOption(
 ) {
   const popup = option?.closest<HTMLElement>('[data-field-popup]');
   if (!option || !popup) return;
+
   if (center && !firstPlacementLanded.has(popup)) recenterAfterFirstPlacement.set(popup, option);
   scrollWithinPopup(option, popup, center);
 }

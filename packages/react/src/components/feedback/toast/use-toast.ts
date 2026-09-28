@@ -54,6 +54,7 @@ function startsOnAControl(event: PointerEvent<HTMLElement>) {
 
 function towardTheEdge(axis: SwipeAxis, amount: number, directions: SwipeDirections) {
   if (amount === 0) return false;
+
   const allowed = directions[axis];
   return allowed === 0 || Math.sign(amount) === allowed;
 }
@@ -83,6 +84,7 @@ export function useToast({
 }: UseToastOptions) {
   const [node, setNode] = useState<HTMLDivElement | null>(null);
   const { id } = record;
+
   const ref = useCallback(
     (element: HTMLDivElement | null) => {
       setNode(element);
@@ -93,6 +95,7 @@ export function useToast({
 
   const [lastPosition, setLastPosition] = useState(position ?? POSITION_BEFORE_MEASURING);
   if (position && !isEqual(position, lastPosition)) setLastPosition(position);
+
   const place = position ?? lastPosition;
 
   const { mounted, ending } = usePresence(!record.dismissed, {
@@ -111,16 +114,21 @@ export function useToast({
     Number.isFinite(record.duration) &&
     place.visible &&
     !paused;
+
   const remaining = useRef(record.duration);
   const timedVersion = useRef(record.version);
+
   useEffect(() => {
     if (timedVersion.current !== record.version) {
       timedVersion.current = record.version;
       remaining.current = record.duration;
     }
+
     if (!timed) return;
+
     const startedAt = performance.now();
     const timer = setTimeout(() => dismissToast(id, 'auto'), Math.max(0, remaining.current));
+
     return () => {
       clearTimeout(timer);
       remaining.current -= performance.now() - startedAt;
@@ -130,6 +138,7 @@ export function useToast({
   const drag = useRef<Drag | null>(null);
   const [swiping, setSwiping] = useState(false);
   const [lastSwipeOut, setLastSwipeOut] = useState<SwipeAxis | null>(null);
+
   const swipedOut = record.dismissed ? lastSwipeOut : null;
 
   const settle = (axis: SwipeAxis, value: string) => {
@@ -138,6 +147,7 @@ export function useToast({
 
   useLayoutEffect(() => {
     if (record.dismissed || !node) return;
+
     node.style.removeProperty(swipeVariable('x'));
     node.style.removeProperty(swipeVariable('y'));
   }, [record.dismissed, node]);
@@ -145,6 +155,7 @@ export function useToast({
   const swipeHandlers = {
     onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
       if (event.button !== 0 || record.dismissed || startsOnAControl(event)) return;
+
       tryCapturePointer(event.currentTarget, event.pointerId);
       drag.current = {
         pointerId: event.pointerId,
@@ -158,13 +169,16 @@ export function useToast({
     onPointerMove: (event: PointerEvent<HTMLDivElement>) => {
       const current = drag.current;
       if (!current || current.pointerId !== event.pointerId) return;
+
       const dx = event.clientX - current.x;
       const dy = event.clientY - current.y;
+
       if (!current.axis) {
         if (Math.max(Math.abs(dx), Math.abs(dy)) < MOVEMENT_THAT_PICKS_AN_AXIS) return;
         current.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
         setSwiping(true);
       }
+
       const delta = current.axis === 'x' ? dx : dy;
       current.amount = towardTheEdge(current.axis, delta, directions) ? delta : resisted(delta);
       settle(current.axis, `${current.amount}px`);
@@ -173,11 +187,13 @@ export function useToast({
       const current = drag.current;
       drag.current = null;
       if (!current?.axis || current.pointerId !== event.pointerId) return;
+
       setSwiping(false);
       const speed = Math.abs(current.amount) / Math.max(1, event.timeStamp - current.startedAt);
       const farOrFast =
         Math.abs(current.amount) >= SWIPE_DISTANCE_THAT_DISMISSES ||
         speed > SWIPE_SPEED_THAT_DISMISSES;
+
       if (towardTheEdge(current.axis, current.amount, directions) && farOrFast) {
         settle(current.axis, `calc(${current.amount}px + ${Math.sign(current.amount) * 100}%)`);
         setLastSwipeOut(current.axis);
@@ -188,6 +204,7 @@ export function useToast({
       const current = drag.current;
       drag.current = null;
       if (!current?.axis) return;
+
       setSwiping(false);
       settle(current.axis, '0px');
     },

@@ -57,10 +57,13 @@ export function Dialog({
   children,
 }: Dialog.Props) {
   const dialog = useDialog({ open, defaultOpen, onOpenChange, onOpenChangeComplete, dismissible });
+
   const [titled, setTitled] = useState(false);
   const [described, setDescribed] = useState(false);
+
   const parts = flattenFragments(children);
   const overlay = parts.find(isOverlay);
+
   return (
     <DialogContext
       value={{
@@ -88,10 +91,12 @@ function DialogPopup({ className, style, children, ...props }: Dialog.Content.Pr
 
   useEffect(() => {
     if (!isDevelopment || !content) return;
+
     const named =
       content.hasAttribute('aria-label') ||
       !!props['aria-labelledby'] ||
       !!content.querySelector('[data-dialog-title]');
+
     if (!named)
       console.warn(
         '[IDS] Dialog: add Dialog.Title, or aria-label on Dialog.Content, so screen readers can name the dialog.',
@@ -101,6 +106,7 @@ function DialogPopup({ className, style, children, ...props }: Dialog.Content.Pr
   const labelledBy =
     props['aria-labelledby'] ??
     (props['aria-label'] === undefined && c.titled ? ids.title : undefined);
+
   return (
     <ModalLayer
       open={open}
@@ -162,6 +168,7 @@ export namespace Dialog {
 
   export function Trigger({ asChild, children, ...props }: Trigger.Props) {
     const { dialog } = useDialogContext('Dialog.Trigger');
+
     return part(
       'button',
       asChild,
@@ -191,6 +198,7 @@ export namespace Dialog {
 
   export function Content(props: Content.Props) {
     const { dialog } = useDialogContext('Dialog.Content');
+
     if (!dialog.mounted) return null;
     return <DialogPopup {...props} />;
   }
@@ -201,6 +209,7 @@ export namespace Dialog {
   export function Header({ asChild, className, ...props }: Header.Props) {
     const { styles } = useDialogContext('Dialog.Header');
     const Root = asChild ? Slot : 'div';
+
     return <Root {...props} data-dialog-header="" className={styles.header({ className })} />;
   }
   export namespace Header {
@@ -209,11 +218,14 @@ export namespace Dialog {
 
   export function Title({ asChild, className, ...props }: Title.Props) {
     const { styles, dialog, setTitled } = useDialogContext('Dialog.Title');
+
     useLayoutEffect(() => {
       setTitled(true);
       return () => setTitled(false);
     }, [setTitled]);
+
     const Root = asChild ? Slot : 'h2';
+
     return (
       <Root
         id={dialog.ids.title}
@@ -229,11 +241,14 @@ export namespace Dialog {
 
   export function Description({ asChild, className, ...props }: Description.Props) {
     const { styles, dialog, setDescribed } = useDialogContext('Dialog.Description');
+
     useLayoutEffect(() => {
       setDescribed(true);
       return () => setDescribed(false);
     }, [setDescribed]);
+
     const Root = asChild ? Slot : 'p';
+
     return (
       <Root
         id={dialog.ids.description}
@@ -250,6 +265,7 @@ export namespace Dialog {
   export function Footer({ asChild, className, ...props }: Footer.Props) {
     const { styles } = useDialogContext('Dialog.Footer');
     const Root = asChild ? Slot : 'div';
+
     return <Root {...props} data-dialog-footer="" className={styles.footer({ className })} />;
   }
   export namespace Footer {
@@ -258,10 +274,12 @@ export namespace Dialog {
 
   export function Close({ asChild, children, onClick, ...props }: Close.Props) {
     const { dialog } = useDialogContext('Dialog.Close');
+
     const close = (event: MouseEvent<HTMLButtonElement>) => {
       onClick?.(event);
       if (!event.defaultPrevented) dialog.setOpen(false);
     };
+
     if (asChild)
       return part('button', true, children, { ...props, onClick: close, 'data-dialog-close': '' });
     if (children == null)

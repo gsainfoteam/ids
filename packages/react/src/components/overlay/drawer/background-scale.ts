@@ -18,10 +18,12 @@ const claims = new WeakMap<HTMLElement, Claim>();
 export function outermostProviderRoot(from: Element) {
   const doc = from.ownerDocument;
   let root: HTMLElement | null = null;
+
   for (let node = from.parentElement; node; node = node.parentElement) {
     const paintsABox = getComputedStyle(node).display !== 'contents';
     if (node.hasAttribute('data-color') && paintsABox) root = node;
   }
+
   return root === doc.body || root === doc.documentElement ? null : root;
 }
 
@@ -31,6 +33,7 @@ const firstTimingFunction = (list: string) =>
 export function transitionTimingOf(element: Element): Timing {
   const style = getComputedStyle(element);
   const transitionsOff = style.transitionProperty === 'none';
+
   return {
     duration: transitionsOff ? '0s' : (style.transitionDuration.split(',')[0]?.trim() ?? '0s'),
     easing: firstTimingFunction(style.transitionTimingFunction),
@@ -45,6 +48,7 @@ function pageBackground(root: HTMLElement) {
     const color = getComputedStyle(node).backgroundColor;
     if (!isTransparent(color)) return color;
   }
+
   return 'Canvas';
 }
 
@@ -52,6 +56,7 @@ function splitTopLevel(value: string) {
   const parts: string[] = [];
   let depth = 0;
   let current = '';
+
   for (const char of value) {
     if (char === '(') depth++;
     if (char === ')') depth--;
@@ -60,12 +65,14 @@ function splitTopLevel(value: string) {
       current = '';
     } else current += char;
   }
+
   if (current) parts.push(current);
   return parts;
 }
 
 function shiftTranslate(current: string, dx: number, dy: number) {
   if (current === 'none' || current === '') return `${dx}px ${dy}px`;
+
   const [x = '0px', y = '0px', z] = splitTopLevel(current);
   return `calc(${x} + ${dx}px) calc(${y} + ${dy}px)${z ? ` ${z}` : ''}`;
 }
@@ -78,17 +85,21 @@ function fixedOutsideLayers(root: HTMLElement) {
       const element = node as HTMLElement;
       if (element.hasAttribute('popover')) return NodeFilter.FILTER_REJECT;
       if (view.getComputedStyle(element).position !== 'fixed') return NodeFilter.FILTER_SKIP;
+
       fixed.push(element);
       return NodeFilter.FILTER_REJECT;
     },
   });
+
   while (walker.nextNode());
+
   return fixed;
 }
 
 function styleKeeper() {
   const saved: Array<{ element: HTMLElement; property: string; value: string; priority: string }> =
     [];
+
   return {
     write(element: HTMLElement, property: string, value: string) {
       if (!saved.some((entry) => entry.element === element && entry.property === property))
@@ -98,12 +109,14 @@ function styleKeeper() {
           value: element.style.getPropertyValue(property),
           priority: element.style.getPropertyPriority(property),
         });
+
       element.style.setProperty(property, value);
     },
     restore() {
       for (const { element, property, value, priority } of saved.reverse())
         if (value) element.style.setProperty(property, value, priority);
         else element.style.removeProperty(property);
+
       saved.length = 0;
     },
   };
@@ -118,10 +131,12 @@ function keepFixedDescendantsOnScreen(
   const before = fixed.map((element) => element.getBoundingClientRect());
   becomeContainingBlock();
   const after = fixed.map((element) => element.getBoundingClientRect());
+
   fixed.forEach((element, index) => {
     const dx = before[index]!.left - after[index]!.left;
     const dy = before[index]!.top - after[index]!.top;
     if (dx === 0 && dy === 0) return;
+
     const current = getComputedStyle(element).translate;
     styles.write(element, 'translate', shiftTranslate(current, dx, dy));
   });
@@ -130,6 +145,7 @@ function keepFixedDescendantsOnScreen(
 export function scaleBackground(from: Element, timing: Timing): BackgroundScale | null {
   const root = outermostProviderRoot(from);
   if (!root) return null;
+
   const existing = claims.get(root);
   if (existing) {
     if (!existing.releasing) return null;
@@ -166,6 +182,7 @@ export function scaleBackground(from: Element, timing: Timing): BackgroundScale 
   styles.write(root, 'transform-origin', `${originX}px ${scrolledPast}px`);
   styles.write(root, 'overflow', 'clip');
   styles.write(root, 'transition', 'none');
+
   keepFixedDescendantsOnScreen(root, styles, () => paint(0));
   styles.write(doc.body, 'background', BEHIND_THE_PAGE);
 
@@ -174,6 +191,7 @@ export function scaleBackground(from: Element, timing: Timing): BackgroundScale 
     .join(', ');
 
   let releases = 0;
+
   const restore = () => {
     styles.restore();
     if (claims.get(root) === claim) claims.delete(root);
@@ -189,17 +207,21 @@ export function scaleBackground(from: Element, timing: Timing): BackgroundScale 
       claim.releasing = true;
       const thisRelease = ++releases;
       claim.set(0, true);
+
       const moving = root.getAnimations().filter((animation) => 'transitionProperty' in animation);
       if (moving.length === 0) {
         restore();
         return;
       }
+
       void Promise.allSettled(moving.map((animation) => animation.finished)).then(() => {
         if (claim.releasing && thisRelease === releases) restore();
       });
     },
     dispose: restore,
   };
+
   claims.set(root, claim);
+
   return claim;
 }

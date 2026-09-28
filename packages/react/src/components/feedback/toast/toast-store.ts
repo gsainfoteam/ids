@@ -75,16 +75,20 @@ function create(kind: Kind, message: ReactNode, { id, ...options }: ToastOptions
     dismissed: false,
     version: (existing?.version ?? 0) + 1,
   };
+
   toastRecords.set(
     existing ? records.map((record) => (record.id === key ? next : record)) : [next, ...records],
   );
+
   return key;
 }
 
 export function dismissToast(id: ToastId, cause: DismissCause) {
   const records = toastRecords.get();
   const record = records.find((candidate) => candidate.id === id);
+
   if (!record || record.dismissed) return;
+
   if (!someToasterIsMounted())
     toastRecords.set(records.filter((candidate) => candidate !== record));
   else
@@ -93,6 +97,7 @@ export function dismissToast(id: ToastId, cause: DismissCause) {
         candidate === record ? { ...record, dismissed: true } : candidate,
       ),
     );
+
   if (cause === 'auto') record.onAutoClose?.(record);
   else record.onDismiss?.(record);
 }
@@ -122,6 +127,7 @@ function promise<T>(
 ) {
   const id = create(kinds.loading, loading ?? messages.toast.loading, options);
   const settleOptions = { ...options, id };
+
   void (typeof task === 'function' ? task() : task).then(
     (value) => {
       if (success === undefined) dismiss(id);
@@ -132,6 +138,7 @@ function promise<T>(
       else create(kinds.error, resolveMessage(error, reason), settleOptions);
     },
   );
+
   return id;
 }
 
@@ -174,12 +181,14 @@ export function electedToaster(hosts: readonly ToasterHost[]) {
 
 export function registerToaster(host: symbol, explicit: boolean) {
   toasterHosts.set([...toasterHosts.get(), { host, explicit }]);
+
   return () => {
     toasterHosts.set(toasterHosts.get().filter((entry) => entry.host !== host));
     queueMicrotask(() => {
       const remountedInTheSameTask = someToasterIsMounted();
       const records = toastRecords.get();
       const nothingLeftToAnimateThem = !remountedInTheSameTask && records.some((r) => r.dismissed);
+
       if (nothingLeftToAnimateThem) toastRecords.set(records.filter((record) => !record.dismissed));
     });
   };

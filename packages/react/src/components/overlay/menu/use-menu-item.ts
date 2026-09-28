@@ -19,6 +19,7 @@ export function selectItem(item: HTMLElement, onSelect: ((event: Event) => void)
   const event = new Event(MENU_SELECT_EVENT, { cancelable: true });
   if (onSelect) item.addEventListener(MENU_SELECT_EVENT, onSelect, { once: true });
   item.dispatchEvent(event);
+
   return !event.defaultPrevented;
 }
 
@@ -52,12 +53,15 @@ export function useMenuItem(
       },
       onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
         if (!activatesOnKeys || event.target !== event.currentTarget) return;
+
         const space = event.key === ' ' && !level.typing.current;
         if (event.key !== 'Enter' && !space) return;
+
         event.preventDefault();
         if (!disabled) event.currentTarget.click();
       },
     },
   );
+
   return { highlighted, props };
 }

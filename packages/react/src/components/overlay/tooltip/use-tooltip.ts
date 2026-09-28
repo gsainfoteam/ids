@@ -114,6 +114,7 @@ export function useTooltip({
   useEffect(() => {
     if (!isDevelopment || !trigger || warnedAboutDisabledTrigger.current) return;
     if (!trigger.matches(':disabled')) return;
+
     warnedAboutDisabledTrigger.current = true;
     console.warn(
       '[IDS] Tooltip: the trigger is disabled, and a disabled element gets no hover or focus, so the tooltip never opens. Wrap it in <span tabIndex={0}>, or give an IDS Button focusableWhenDisabled.',

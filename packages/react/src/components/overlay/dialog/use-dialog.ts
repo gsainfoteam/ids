@@ -35,6 +35,7 @@ export function useDialog({
     defaultValue: defaultOpen,
     onValueChange: onOpenChange,
   });
+
   const open = item ? item.open : ownOpen;
 
   const setOpen = (next: boolean) => {
@@ -42,6 +43,7 @@ export function useDialog({
       setOwnOpen(next);
       return;
     }
+
     if (next === item.open) return;
     onOpenChange?.(next);
     if (!next) item.close(undefined);
@@ -81,7 +83,9 @@ export function useDialog({
   useLayoutEffect(() => {
     const closing = wasOpen.current && !open;
     wasOpen.current = open;
+
     if (!closing || !content) return;
+
     const focused = content.ownerDocument.activeElement;
     const focusWasInside =
       !focused || focused === content.ownerDocument.body || content.contains(focused);
@@ -96,6 +100,7 @@ export function useDialog({
   }, [position.modalsBelow]);
 
   const baseId = useId();
+
   return {
     open,
     setOpen,

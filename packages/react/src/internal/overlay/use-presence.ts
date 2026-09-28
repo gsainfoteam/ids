@@ -12,12 +12,14 @@ function animationsOf(element: Element | null | undefined) {
 
 export function usePresence(open: boolean, options: PresenceOptions) {
   const latest = useRef(options);
+
   useLayoutEffect(() => {
     latest.current = options;
   });
 
   const [lastOpen, setLastOpen] = useState(open);
   const [ending, setEnding] = useState(false);
+
   if (lastOpen !== open) {
     setLastOpen(open);
     setEnding(!open);
@@ -25,6 +27,7 @@ export function usePresence(open: boolean, options: PresenceOptions) {
 
   useLayoutEffect(() => {
     if (!ending) return;
+
     let cancelled = false;
     const endingStyleFrame = requestAnimationFrame(() => {
       const animations = latest.current.elements().flatMap(animationsOf);
@@ -34,6 +37,7 @@ export function usePresence(open: boolean, options: PresenceOptions) {
         latest.current.onExitComplete?.();
       });
     });
+
     return () => {
       cancelled = true;
       cancelAnimationFrame(endingStyleFrame);
@@ -42,6 +46,7 @@ export function usePresence(open: boolean, options: PresenceOptions) {
 
   useLayoutEffect(() => {
     if (!open) return;
+
     let cancelled = false;
     const startingStyleFrame = requestAnimationFrame(() => {
       const animations = latest.current.elements().flatMap(animationsOf);
@@ -49,6 +54,7 @@ export function usePresence(open: boolean, options: PresenceOptions) {
         if (!cancelled) latest.current.onEnterComplete?.();
       });
     });
+
     return () => {
       cancelled = true;
       cancelAnimationFrame(startingStyleFrame);

@@ -79,6 +79,7 @@ export function useDrawer({
       setOwnOpen(next);
       return;
     }
+
     if (next === item.open) return;
     onOpenChange?.(next);
     if (!next) item.close(undefined);
@@ -135,6 +136,7 @@ export function useDrawer({
     const closing = wasOpen.current && !open;
     wasOpen.current = open;
     if (!closing || !content) return;
+
     const focused = content.ownerDocument.activeElement;
     const focusWasInside =
       !focused || focused === content.ownerDocument.body || content.contains(focused);
@@ -143,6 +145,7 @@ export function useDrawer({
 
   useLayoutEffect(() => {
     if (!open || !content || side !== 'bottom') return;
+
     const view = content.ownerDocument.defaultView!;
     liftAboveKeyboard(content, view);
     return onViewportChange(view, () => liftAboveKeyboard(content, view));
@@ -151,8 +154,10 @@ export function useDrawer({
   const background = useRef<BackgroundScale | null>(null);
   useLayoutEffect(() => {
     if (!open || !modal || !scaleBackground || !content) return;
+
     const claimed = scalePageBehind(content, transitionTimingOf(content));
     background.current = claimed;
+
     return () => {
       background.current = null;
       claimed?.release();
@@ -181,6 +186,7 @@ export function useDrawer({
   }, [position.modalsBelow]);
 
   const baseId = useId();
+
   return {
     open,
     setOpen,

@@ -9,6 +9,7 @@ const SMALL_SCREEN = `(max-width: ${DRAWER_BELOW - 0.02}px)`;
 
 function subscribe(callback: () => void) {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return noop;
+
   const query = window.matchMedia(SMALL_SCREEN);
   query.addEventListener('change', callback);
   return () => query.removeEventListener('change', callback);
@@ -37,6 +38,7 @@ export function onViewportChange(win: Window, change: () => void) {
   win.addEventListener('resize', change);
   win.visualViewport?.addEventListener('resize', change);
   win.visualViewport?.addEventListener('scroll', change);
+
   return () => {
     win.removeEventListener('resize', change);
     win.visualViewport?.removeEventListener('resize', change);

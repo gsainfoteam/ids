@@ -16,6 +16,7 @@ export function TooltipDelayGroup({
   children,
 }: TooltipDelayGroup.Props) {
   const delays = { open: openDelay, close: closeDelay };
+
   return (
     <TooltipDelayGroupContext value={delays}>
       <FloatingDelayGroup delay={delays} timeoutMs={STAYS_WARM_AFTER_CLOSING_MS}>

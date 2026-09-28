@@ -6,6 +6,7 @@ export const POPUP_AUTOFOCUS = '[data-popup-autofocus]';
 
 export function elementOf(node: Node | null | undefined) {
   if (!node) return null;
+
   return node.nodeType === 1 ? (node as Element) : node.parentElement;
 }
 
@@ -16,6 +17,7 @@ export function isAlwaysInside(node: Node) {
 export function blurWithin(root: Element | null | undefined) {
   const focused = root?.ownerDocument.activeElement;
   const view = root?.ownerDocument.defaultView;
+
   if (view && focused instanceof view.HTMLElement && root!.contains(focused)) focused.blur();
 }
 
@@ -39,12 +41,15 @@ const returnedFocus = new WeakSet<Element>();
 
 export function returnFocusTo(target: HTMLElement | null | undefined) {
   if (!target?.isConnected) return false;
+
   returnedFocus.add(target);
   target.focus({ preventScroll: true });
+
   if (target.ownerDocument.activeElement !== target) {
     returnedFocus.delete(target);
     return false;
   }
+
   target.addEventListener('focusout', () => returnedFocus.delete(target), { once: true });
   return true;
 }

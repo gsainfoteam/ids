@@ -37,12 +37,15 @@ const NO_ITEMS: readonly OverlayItem[] = [];
 export function useOverlayItem(controlledOpen: boolean | undefined) {
   const item = use(OverlayItemContext);
   const bound = controlledOpen === undefined ? item : null;
+
   useLayoutEffect(() => bound?.bind(), [bound]);
+
   return bound;
 }
 
 export function useOverlay() {
   const theme = use(ThemeContext);
+
   return useMemo(
     () => ({
       ...overlay,
@@ -95,13 +98,16 @@ function OverlayItemView({ item }: { item: OverlayItem }) {
 
 export function OverlayHost() {
   const [host] = useState(() => Symbol('overlay host'));
+
   useLayoutEffect(() => registerOverlayHost(host), [host]);
+
   const elected = useSyncExternalStore(
     overlayHosts.subscribe,
     () => overlayHosts.get()[0] === host,
     () => false,
   );
   const items = useSyncExternalStore(overlayItems.subscribe, overlayItems.get, () => NO_ITEMS);
+
   if (!elected) return null;
   return items.map((item) => <OverlayItemView key={item.id} item={item} />);
 }

@@ -69,6 +69,7 @@ function tryCapturePointer(element: Element, pointerId: number) {
 function selectingTextIn(content: Element) {
   const selection = content.ownerDocument.getSelection();
   if (!selection || selection.isCollapsed || selection.rangeCount === 0) return false;
+
   return content.contains(selection.getRangeAt(0).commonAncestorContainer);
 }
 
@@ -110,29 +111,36 @@ function markDragging(elements: ReadonlyArray<HTMLElement | null>, dragging: boo
 
 export function useDrawerDrag(options: UseDrawerDragOptions) {
   const { content, backdrop, side, open, snapPoints, activeIndex, fadeFromIndex } = options;
+
   const [metrics, setMetrics] = useState<Metrics>({ size: 0, viewport: 0 });
   const [settled, setSettled] = useState(0);
+
   const gesture = useRef<Gesture | null>(null);
   const stopListening = useRef<(() => void) | null>(null);
 
   useLayoutEffect(() => {
     if (!content) return;
+
     const view = content.ownerDocument.defaultView!;
     const measure = () => {
       fitNestedPushBack(content, view.innerWidth);
+
       const vertical = axisOf(side) === 'y';
       const next = {
         size: vertical ? content.offsetHeight : content.offsetWidth,
         viewport: vertical ? view.innerHeight : view.innerWidth,
       };
+
       setMetrics((previous) =>
         previous.size === next.size && previous.viewport === next.viewport ? previous : next,
       );
     };
+
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(content);
     view.addEventListener('resize', measure);
+
     return () => {
       observer.disconnect();
       view.removeEventListener('resize', measure);
@@ -161,19 +169,23 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
 
   useLayoutEffect(() => {
     if (!content) return;
+
     if (!open) {
       letTheExitSlideFromRest(content, backdrop);
       return;
     }
+
     if (gesture.current?.latch === 'drag') return;
     latest.current.paint(restOffset, true);
   }, [content, backdrop, open, restOffset, settled, metrics]);
 
   useEffect(() => {
     if (!content) return;
+
     const holdTheSheetInsteadOfScrolling = (event: TouchEvent) => {
       if (gesture.current?.latch === 'drag' && event.cancelable) event.preventDefault();
     };
+
     content.addEventListener('touchmove', holdTheSheetInsteadOfScrolling, { passive: false });
     return () => content.removeEventListener('touchmove', holdTheSheetInsteadOfScrolling);
   }, [content]);
@@ -183,9 +195,11 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
   const end = () => {
     stopListening.current?.();
     stopListening.current = null;
+
     const wasDragging = gesture.current?.latch === 'drag';
     gesture.current = null;
     if (!wasDragging) return;
+
     markDragging([content, backdrop], false);
     setSettled((count) => count + 1);
   };
@@ -193,7 +207,9 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
   const release = (event: PointerEvent) => {
     const current = gesture.current;
     if (current?.latch !== 'drag') return;
+
     current.samples.push({ time: event.timeStamp, position: current.displacement });
+
     const {
       options: now,
       offsets: currentOffsets,
@@ -208,6 +224,7 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
       dismissible: now.dismissible,
       snap: currentOffsets && index !== null ? { offsets: currentOffsets, index } : undefined,
     });
+
     if (outcome.type === 'close') now.close();
     else if (outcome.index !== null && outcome.index !== index) now.onSnap(outcome.index);
   };
@@ -216,25 +233,31 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
     const current = gesture.current;
     const element = latest.current.options.content;
     if (!current || !element || event.pointerId !== current.pointerId) return;
+
     const point = { x: event.clientX, y: event.clientY };
     const { side: towards } = latest.current.options;
+
     if (current.latch === 'pending') {
       const delta = minus(point, current.origin);
       const latch = latchAxis(towards, delta);
       if (latch === 'pending') return;
+
       if (latch === 'cross-axis' || scrollsInstead(current.target, element, towards, delta)) {
         end();
         return;
       }
+
       current.latch = 'drag';
       current.dragFrom = point;
       tryCapturePointer(element, event.pointerId);
       element.ownerDocument.getSelection()?.removeAllRanges();
       markDragging([element, latest.current.options.backdrop], true);
     }
+
     const displacement = towardClose(towards, minus(point, current.dragFrom));
     current.displacement = displacement;
     current.samples.push({ time: event.timeStamp, position: displacement });
+
     const { restOffset: rest, openLimit: limit, metrics: sized } = latest.current;
     latest.current.paint(resistedOffset(rest + displacement, limit, sized.size), false);
   };
@@ -243,6 +266,7 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
     if (!open || !content || !event.isPrimary || event.button !== 0 || gesture.current) return;
     const target = event.target as Element;
     if (!mayStartDrag({ target, content, selectingText: selectingTextIn(content) })) return;
+
     const origin = { x: event.clientX, y: event.clientY };
     gesture.current = {
       pointerId: event.pointerId,
@@ -253,6 +277,7 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
       displacement: 0,
       samples: [],
     };
+
     const doc = content.ownerDocument;
     const onUp = (up: PointerEvent) => {
       if (up.pointerId !== gesture.current?.pointerId) return;
@@ -262,6 +287,7 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
     const onCancel = (cancel: PointerEvent) => {
       if (cancel.pointerId === gesture.current?.pointerId) end();
     };
+
     doc.addEventListener('pointermove', move);
     doc.addEventListener('pointerup', onUp);
     doc.addEventListener('pointercancel', onCancel);

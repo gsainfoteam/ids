@@ -83,6 +83,7 @@ export function useAnchored({
   const preferred = placementOf(side, align);
   const [landed, setLanded] = useState<Placement>(preferred);
   const [landedFor, setLandedFor] = useState({ preferred, open });
+
   if (landedFor.preferred !== preferred || landedFor.open !== open) {
     setLandedFor({ preferred, open });
     setLanded(preferred);
@@ -90,8 +91,10 @@ export function useAnchored({
 
   useLayoutEffect(() => {
     if (!floating || !positioned) return;
+
     const undoPopoverUaInset = { right: 'auto', bottom: 'auto' };
     Object.assign(floating.style, undoPopoverUaInset);
+
     const capHeightBeforeFirstFlip = maxHeight;
     if (capHeightBeforeFirstFlip !== undefined)
       floating.style.setProperty('max-height', `${capHeightBeforeFirstFlip}px`);
@@ -123,15 +126,18 @@ export function useAnchored({
           const node = elements.floating;
           const doc = node.ownerDocument;
           const anchorWidth = rects.reference.width;
+
           node.style.setProperty('--anchor-width', `${anchorWidth}px`);
           node.style.setProperty('--anchor-height', `${rects.reference.height}px`);
           node.style.setProperty('--available-width', `${Math.max(0, availableWidth)}px`);
           node.style.setProperty('--available-height', `${Math.max(0, availableHeight)}px`);
+
           if (width !== undefined) {
             const viewport = doc.documentElement.clientWidth || doc.defaultView!.innerWidth;
             const wanted = width === 'anchor' ? anchorWidth : Math.max(anchorWidth, width);
             node.style.width = `${Math.min(wanted, viewport - VIEWPORT_MARGIN * 2)}px`;
           }
+
           if (maxHeight !== undefined) {
             const floor = Math.min(MIN_HEIGHT, maxHeight);
             node.style.maxHeight = `${clamp(availableHeight, floor, maxHeight)}px`;
@@ -144,6 +150,7 @@ export function useAnchored({
   });
 
   const { setReference } = floatingState.refs;
+
   useLayoutEffect(() => {
     if (referenceRef) setReference(positioned ? referenceRef.current : null);
   }, [referenceRef, positioned, setReference]);

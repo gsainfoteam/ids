@@ -59,7 +59,9 @@ export function useMenuLevel({
 }: UseMenuLevelOptions) {
   const nested = parentOpen !== null;
   const parentStaysOpen = parentOpen ?? true;
+
   const nodeId = useFloatingNodeId();
+
   const [ownOpen, setOwnOpen] = useControllableState({
     value: openProp,
     defaultValue: defaultOpen,
@@ -106,6 +108,7 @@ export function useMenuLevel({
 
   useLayoutEffect(() => {
     if (nested || !open || !content) return;
+
     if (!content.contains(content.ownerDocument.activeElement))
       content.focus({ preventScroll: true });
   }, [nested, open, content]);
@@ -141,11 +144,13 @@ export function useMenuLevel({
       typing.current = value;
     },
   });
+
   const { getReferenceProps } = useInteractions([hover, click, navigation]);
   const { getFloatingProps, getItemProps } = useInteractions([hover, click, navigation, typeahead]);
 
   const clearHighlight = () => {
     if (activeIndex === null) return;
+
     setActiveIndex(null);
     content?.focus({ preventScroll: true });
   };
@@ -154,6 +159,7 @@ export function useMenuLevel({
     const doc = content?.ownerDocument ?? document;
     const focused = doc.activeElement;
     const focusWasInside = !focused || focused === doc.body || !!content?.contains(focused);
+
     changeOpen(false, undefined, 'click');
     if (returnFocus && focusWasInside) returnFocusTo(focusReturnTarget(layer));
   };
@@ -164,6 +170,7 @@ export function useMenuLevel({
   };
 
   const baseId = useId();
+
   return {
     nested,
     nodeId,

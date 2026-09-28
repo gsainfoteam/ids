@@ -7,10 +7,12 @@ export type ExternalStore<T> = {
 export function createExternalStore<T>(initial: T): ExternalStore<T> {
   let snapshot = initial;
   const listeners = new Set<() => void>();
+
   return {
     get: () => snapshot,
     set(next) {
       if (Object.is(next, snapshot)) return;
+
       snapshot = next;
       for (const listener of listeners) listener();
     },

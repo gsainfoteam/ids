@@ -68,8 +68,10 @@ export function Popover({
     openDelay,
     closeDelay,
   });
+
   const [titled, setTitled] = useState(false);
   const [described, setDescribed] = useState(false);
+
   return (
     <PopoverContext
       value={{
@@ -95,9 +97,11 @@ function PopoverPopup({ className, style, children, ...props }: PopupProps) {
   const c = usePopoverContext('Popover.Content');
   const { popover, styles } = c;
   const { ids, anchored, open, ending, modal } = popover;
+
   const labelledBy =
     props['aria-labelledby'] ??
     (props['aria-label'] === undefined && c.titled ? ids.title : undefined);
+
   return (
     <ModalLayer
       open={modal && open}
@@ -159,6 +163,7 @@ export namespace Popover {
 
   export function Trigger({ asChild, children, ...props }: Trigger.Props) {
     const { popover } = usePopoverContext('Popover.Trigger');
+
     return part(
       'button',
       asChild,
@@ -198,6 +203,7 @@ export namespace Popover {
     useEffect(() => mountContent(anchored), [mountContent, anchored]);
 
     if (!popover.mounted) return null;
+
     return <PopoverPopup {...props} />;
   }
   export namespace Content {
@@ -213,6 +219,7 @@ export namespace Popover {
 
   export function Arrow(props: Arrow.Props) {
     const { setArrow, anchored } = usePopoverContext('Popover.Arrow').popover;
+
     return (
       <FloatingArrow
         width={14}
@@ -238,11 +245,14 @@ export namespace Popover {
 
   export function Title({ asChild, className, ...props }: Title.Props) {
     const { styles, popover, setTitled } = usePopoverContext('Popover.Title');
+
     useLayoutEffect(() => {
       setTitled(true);
       return () => setTitled(false);
     }, [setTitled]);
+
     const Root = asChild ? Slot : 'h2';
+
     return (
       <Root
         id={popover.ids.title}
@@ -258,11 +268,14 @@ export namespace Popover {
 
   export function Description({ asChild, className, ...props }: Description.Props) {
     const { styles, popover, setDescribed } = usePopoverContext('Popover.Description');
+
     useLayoutEffect(() => {
       setDescribed(true);
       return () => setDescribed(false);
     }, [setDescribed]);
+
     const Root = asChild ? Slot : 'p';
+
     return (
       <Root
         id={popover.ids.description}
@@ -278,10 +291,12 @@ export namespace Popover {
 
   export function Close({ asChild, children, onClick, ...props }: Close.Props) {
     const { popover } = usePopoverContext('Popover.Close');
+
     const close = (event: MouseEvent<HTMLButtonElement>) => {
       onClick?.(event);
       if (!event.defaultPrevented) popover.setOpen(false);
     };
+
     if (asChild)
       return part('button', true, children, { ...props, onClick: close, 'data-popover-close': '' });
     if (children == null)

@@ -92,10 +92,13 @@ export function Drawer({
     onActiveSnapPointChange,
     fadeFromIndex,
   });
+
   const [titled, setTitled] = useState(false);
   const [described, setDescribed] = useState(false);
+
   const parts = flattenFragments(children);
   const overlay = parts.find(isOverlay);
+
   return (
     <DrawerContext
       value={{
@@ -132,10 +135,12 @@ function DrawerPopup({
 
   useEffect(() => {
     if (!isDevelopment || !content) return;
+
     const named =
       content.hasAttribute('aria-label') ||
       !!props['aria-labelledby'] ||
       !!content.querySelector('[data-drawer-title]');
+
     if (!named)
       console.warn(
         '[IDS] Drawer: add Drawer.Title, or aria-label on Drawer.Content, so screen readers can name the drawer.',
@@ -145,11 +150,13 @@ function DrawerPopup({
   const labelledBy =
     props['aria-labelledby'] ??
     (props['aria-label'] === undefined && c.titled ? ids.title : undefined);
+
   const { setContent } = drawer;
   const contentRef = useCallback(
     (node: HTMLDivElement | null) => mergeRefs(ref, setContent)(node),
     [ref, setContent],
   );
+
   const sheet = (
     <div
       {...props}
@@ -176,6 +183,7 @@ function DrawerPopup({
       </OverlayItemContext>
     </div>
   );
+
   if (!c.modal) return sheet;
   return (
     <ModalLayer
@@ -229,6 +237,7 @@ export namespace Drawer {
 
   export function Trigger({ asChild, children, ...props }: Trigger.Props) {
     const { drawer } = useDrawerContext('Drawer.Trigger');
+
     return part(
       'button',
       asChild,
@@ -267,6 +276,7 @@ export namespace Drawer {
 
   export function Handle({ className, onClick, ...props }: Handle.Props) {
     const { drawer, styles } = useDrawerContext('Drawer.Handle');
+
     if (!drawer.drag.cycles)
       return (
         <div
@@ -276,6 +286,7 @@ export namespace Drawer {
           className={styles.handle({ className })}
         />
       );
+
     return (
       <button
         type="button"
@@ -306,11 +317,14 @@ export namespace Drawer {
 
   export function Title({ asChild, className, ...props }: Title.Props) {
     const { styles, drawer, setTitled } = useDrawerContext('Drawer.Title');
+
     useLayoutEffect(() => {
       setTitled(true);
       return () => setTitled(false);
     }, [setTitled]);
+
     const Root = asChild ? Slot : 'h2';
+
     return (
       <Root
         id={drawer.ids.title}
@@ -326,11 +340,14 @@ export namespace Drawer {
 
   export function Description({ asChild, className, ...props }: Description.Props) {
     const { styles, drawer, setDescribed } = useDrawerContext('Drawer.Description');
+
     useLayoutEffect(() => {
       setDescribed(true);
       return () => setDescribed(false);
     }, [setDescribed]);
+
     const Root = asChild ? Slot : 'p';
+
     return (
       <Root
         id={drawer.ids.description}
@@ -355,10 +372,12 @@ export namespace Drawer {
 
   export function Close({ asChild, children, onClick, ...props }: Close.Props) {
     const { drawer } = useDrawerContext('Drawer.Close');
+
     const close = (event: MouseEvent<HTMLButtonElement>) => {
       onClick?.(event);
       if (!event.defaultPrevented) drawer.setOpen(false);
     };
+
     if (asChild)
       return part('button', true, children, { ...props, onClick: close, 'data-drawer-close': '' });
     if (children == null)

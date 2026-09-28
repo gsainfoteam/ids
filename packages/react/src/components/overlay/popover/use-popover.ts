@@ -83,10 +83,12 @@ export function usePopover({
   const pressedOutside = useRef(false);
   const setOpen = (next: boolean, { byPressingOutside = false } = {}) => {
     pressedOutside.current = byPressingOutside;
+
     if (!item) {
       setOwnOpen(next);
       return;
     }
+
     if (next === item.open) return;
     onOpenChange?.(next);
     if (next) return;
@@ -99,18 +101,22 @@ export function usePopover({
     triggerRef.current = node;
     setTriggerElement(node);
   }, []);
+
   const [content, setContent] = useState<HTMLElement | null>(null);
   const [backdrop, setBackdrop] = useState<HTMLElement | null>(null);
   const [arrow, setArrow] = useState<Element | null>(null);
+
   const [placement, setPlacementState] = useState(DEFAULT_PLACEMENT);
   const setPlacement = useCallback(
     (next: PopoverPlacement) =>
       setPlacementState((previous) => (samePlacement(previous, next) ? previous : next)),
     [],
   );
+
   const contentCountRef = useRef(0);
   const mountContent = useCallback((anchored: boolean) => {
     contentCountRef.current += 1;
+
     if (isDevelopment && contentCountRef.current > 1)
       console.warn(
         '[IDS] Popover: render one Popover.Content per Popover. Put a second panel in its own Popover.',
@@ -119,6 +125,7 @@ export function usePopover({
       console.warn(
         '[IDS] Popover: add Popover.Trigger, or pass anchor to Popover.Content, so the popover has something to sit next to.',
       );
+
     return () => {
       contentCountRef.current -= 1;
     };
@@ -170,6 +177,7 @@ export function usePopover({
 
   useLayoutEffect(() => {
     if (!content || modal) return;
+
     showInTopLayer(content);
     raiseWhatStaysAboveLayers();
   }, [content, modal]);
@@ -183,17 +191,22 @@ export function usePopover({
   }, [open, content, modal, placement.initialFocus]);
 
   const wasOpen = useRef(open);
+
   useLayoutEffect(() => {
     const closing = wasOpen.current && !open;
     wasOpen.current = open;
+
     if (!closing || !content || pressedOutside.current) return;
+
     const focused = content.ownerDocument.activeElement;
     const focusWasInside =
       !focused || focused === content.ownerDocument.body || content.contains(focused);
+
     if (focusWasInside) returnFocusTo(focusReturnTarget(layer));
   }, [open, content, layer]);
 
   const baseId = useId();
+
   return {
     open,
     setOpen,

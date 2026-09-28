@@ -37,6 +37,7 @@ export const towardClose = (side: DrawerSide, delta: Point) =>
 
 export function latchAxis(side: DrawerSide, delta: Point): Latch {
   if (Math.hypot(delta.x, delta.y) < DRAG_THRESHOLD) return 'pending';
+
   const along = Math.abs(alongAxis(side, delta));
   const across = Math.abs(axisOf(side) === 'y' ? delta.x : delta.y);
   return along >= across ? 'drag' : 'cross-axis';
@@ -52,6 +53,7 @@ export function resistedOffset(offset: number, openLimit: number, closedLimit: n
 export function velocityOf(samples: readonly Sample[]) {
   const last = samples.at(-1);
   if (!last) return 0;
+
   const recent = samples.filter((sample) => last.time - sample.time <= VELOCITY_WINDOW);
   const first = recent[0]!;
   const elapsed = last.time - first.time;
@@ -80,6 +82,7 @@ export function releaseTarget(input: ReleaseInput): Release {
 function releaseWhole({ displacement, velocity, size, dismissible }: ReleaseInput): Release {
   const rest: Release = { type: 'rest', index: null };
   if (displacement <= 0 || !dismissible) return rest;
+
   const flicked = velocity > CLOSE_VELOCITY;
   const pulledFarEnough = displacement >= size * CLOSE_FRACTION;
   return flicked || pulledFarEnough ? { type: 'close' } : rest;
@@ -109,6 +112,7 @@ function releaseBetweenSnapPoints(
   const nearest = candidates.reduce((best, candidate) =>
     candidate.distance < best.distance ? candidate : best,
   );
+
   return nearest.at < 0 ? { type: 'close' } : restAt(nearest.at);
 }
 
@@ -119,9 +123,11 @@ export type Presence = {
 
 export function presenceAt(offset: number, { size, snap }: Presence) {
   if (!snap) return size > 0 ? clamp(1 - offset / size, 0, 1) : 1;
+
   const { offsets, fadeFromIndex } = snap;
   const opaque = offsets[clamp(fadeFromIndex, 0, offsets.length - 1)]!;
   const clear = fadeFromIndex > 0 ? offsets[fadeFromIndex - 1]! : size;
+
   if (clear <= opaque) return offset <= opaque ? 1 : 0;
   return clamp((clear - offset) / (clear - opaque), 0, 1);
 }
@@ -137,13 +143,16 @@ function canScrollBy(element: Element, axis: DragAxis, direction: number) {
   const style = getComputedStyle(element);
   const overflow = axis === 'y' ? style.overflowY : style.overflowX;
   if (overflow !== 'auto' && overflow !== 'scroll') return false;
+
   if (axis === 'y') {
     const max = element.scrollHeight - element.clientHeight;
     if (max <= 1) return false;
     return direction < 0 ? element.scrollTop > 0 : element.scrollTop < max - 1;
   }
+
   const max = element.scrollWidth - element.clientWidth;
   if (max <= 1) return false;
+
   const fromStart = Math.abs(element.scrollLeft);
   const rtl = style.direction === 'rtl';
   const towardStart = rtl ? direction > 0 : direction < 0;
@@ -159,6 +168,7 @@ export type DragStart = {
 export function mayStartDrag({ target, content, selectingText }: DragStart) {
   if (selectingText) return false;
   if (target.closest(NO_DRAG) || target.closest(EDITABLE)) return false;
+
   const nearestLayer = target.closest('[popover]');
   return nearestLayer === content || nearestLayer === null;
 }
@@ -166,9 +176,11 @@ export function mayStartDrag({ target, content, selectingText }: DragStart) {
 export function scrollsInstead(target: Element, content: Element, side: DrawerSide, delta: Point) {
   const axis = axisOf(side);
   const contentScrollDirection = -Math.sign(alongAxis(side, delta));
+
   for (let node: Element | null = target; node; node = node.parentElement) {
     if (canScrollBy(node, axis, contentScrollDirection)) return true;
     if (node === content) break;
   }
+
   return false;
 }

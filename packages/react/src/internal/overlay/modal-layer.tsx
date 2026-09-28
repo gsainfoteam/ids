@@ -49,11 +49,13 @@ export function ModalLayer({
     (node: HTMLDivElement | null) => mergeRefs(backdropRef, givenBackdropRef)(node),
     [givenBackdropRef],
   );
+
   const ownContext = useFloatingRootContext({
     open,
     onOpenChange: noop,
     elements: { reference: null, floating: element },
   });
+
   const [layersAboveScroll] = useState(() =>
     Array.from({ length: SCROLLABLE_LAYERS_ABOVE }, (_, index) => ({
       get current() {
@@ -61,10 +63,12 @@ export function ModalLayer({
       },
     })),
   );
+
   const hasBackdrop = backdrop !== false;
 
   useLayoutEffect(() => {
     if (!open || !element) return;
+
     if (hasBackdrop && backdropRef.current) showInTopLayer(backdropRef.current);
     raiseInTopLayer(element);
     raiseWhatStaysAboveLayers();
