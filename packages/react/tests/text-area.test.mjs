@@ -17,8 +17,11 @@ for (const name of [
   'MouseEvent',
 ])
   globalThis[name] = dom.window[name];
-globalThis.requestAnimationFrame = dom.window.requestAnimationFrame.bind(dom.window);
-globalThis.cancelAnimationFrame = dom.window.cancelAnimationFrame.bind(dom.window);
+function exposeFramesForAutosizeResetRemeasure() {
+  globalThis.requestAnimationFrame = dom.window.requestAnimationFrame.bind(dom.window);
+  globalThis.cancelAnimationFrame = dom.window.cancelAnimationFrame.bind(dom.window);
+}
+exposeFramesForAutosizeResetRemeasure();
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { createElement: h, act, Fragment, useState } = await import('react');
 const { createRoot } = await import('react-dom/client');
@@ -173,16 +176,18 @@ test('invalid structures and row bounds fail clearly', () => {
     assert.throws(() => renderToString(node), /\[IDS\] `<TextArea/);
 });
 
+const LINE_PX = 20;
+const PADDING_PX = 8;
 Object.defineProperty(HTMLTextAreaElement.prototype, 'scrollHeight', {
   configurable: true,
   get() {
-    return Math.max(1, this.value.split('\n').length) * 20 + 16;
+    return Math.max(1, this.value.split('\n').length) * LINE_PX + 2 * PADDING_PX;
   },
 });
 function mockGeometry(node) {
   if (!node) return;
-  node.style.lineHeight = '20px';
-  node.style.padding = '8px';
+  node.style.lineHeight = `${LINE_PX}px`;
+  node.style.padding = `${PADDING_PX}px`;
   node.style.border = '1px solid';
   node.style.boxSizing = 'border-box';
 }
