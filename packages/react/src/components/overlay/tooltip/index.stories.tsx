@@ -97,12 +97,12 @@ export const Gallery: Story = {
         title="Shortcut"
         description="말풍선 안의 Kbd 는 tiny 로 그려져 한 줄 높이에 맞고, 말풍선의 글자색으로 칠해집니다."
       >
-        <Showcase.Row label="apple" className="gap-24 py-12">
+        <Showcase.Row label="mac" className="gap-24 py-12">
           <Tooltip
             open
             content={
               <>
-                저장 <Kbd keys="mod+s" platform="apple" />
+                저장 <Kbd keys="Mod+S" platform="mac" />
               </>
             }
           >
@@ -113,19 +113,19 @@ export const Gallery: Story = {
             arrow
             content={
               <>
-                다시 실행 <Kbd keys="shift+mod+z" platform="apple" />
+                다시 실행 <Kbd keys="Mod+Shift+Z" platform="mac" />
               </>
             }
           >
             <Button variant="outline">다시 실행</Button>
           </Tooltip>
         </Showcase.Row>
-        <Showcase.Row label="other" className="gap-24 py-12">
+        <Showcase.Row label="windows" className="gap-24 py-12">
           <Tooltip
             open
             content={
               <>
-                저장 <Kbd keys="mod+s" platform="other" />
+                저장 <Kbd keys="Mod+S" platform="windows" />
               </>
             }
           >
@@ -135,7 +135,7 @@ export const Gallery: Story = {
             open
             content={
               <>
-                지우기 <Kbd platform="apple">⌫</Kbd>
+                지우기 <Kbd platform="mac">⌫</Kbd>
               </>
             }
           >

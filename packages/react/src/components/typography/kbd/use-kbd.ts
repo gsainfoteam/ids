@@ -1,8 +1,10 @@
 import { createContext, use, useSyncExternalStore } from 'react';
 
-import { detectPlatform, type KbdLabels, type KbdPlatform } from './keys';
+import { detectPlatform } from '@tanstack/react-hotkeys';
+
 import { useFieldSize } from '../../form/field/context';
 
+import type { KbdLabels, KbdPlatform } from './keys';
 import type { IdsSize } from '../../../tokens/types';
 
 export type KbdGroupContextValue = {
@@ -14,9 +16,14 @@ export type KbdGroupContextValue = {
 export const KbdGroupContext = createContext<KbdGroupContextValue | null>(null);
 
 const subscribeToNothing = () => () => {};
+const platformBeforeHydration = (): KbdPlatform => 'windows';
 
 export function usePlatform(override: KbdPlatform | undefined) {
-  const detected = useSyncExternalStore(subscribeToNothing, detectPlatform, () => 'other' as const);
+  const detected = useSyncExternalStore(
+    subscribeToNothing,
+    detectPlatform,
+    platformBeforeHydration,
+  );
   return override ?? detected;
 }
 

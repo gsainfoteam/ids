@@ -46,6 +46,9 @@ importers:
       '@internationalized/number':
         specifier: ^3.6.8
         version: 3.6.8
+      '@tanstack/react-hotkeys':
+        specifier: ~0.12.1
+        version: 0.12.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       cn:
         specifier: ^0.4.0
         version: 0.4.0
@@ -1234,6 +1237,10 @@ packages:
   '@tanstack/form-core@1.33.5':
     resolution: {integrity: sha512-3dfx9MBP0aq5sXKteikG629X9oviptrQj0IFRk9YGcb+lB7Kv5x8S17oOSk1wUWgjQZ4xVJEMbKwOAODymocgA==}
 
+  '@tanstack/hotkeys@0.10.1':
+    resolution: {integrity: sha512-Rp4OGFrelk9O67PtLr0I1fs5lO+c1OByN0ZkHOvmhdYsKfzMejAbxrBzbJlXJ1eVVmwrGJC11bHCaG2XD+M8xw==}
+    engines: {node: '>=20'}
+
   '@tanstack/pacer-lite@0.1.1':
     resolution: {integrity: sha512-y/xtNPNt/YeyoVxE/JCx+T7yjEzpezmbb+toK8DDD1P4m7Kzs5YR956+7OKexG3f8aXgC3rLZl7b1V+yNUSy5w==}
     engines: {node: '>=18'}
@@ -1246,6 +1253,13 @@ packages:
     peerDependenciesMeta:
       '@tanstack/react-start':
         optional: true
+
+  '@tanstack/react-hotkeys@0.12.1':
+    resolution: {integrity: sha512-issViMdI2eW4PXm/LjsWBzuujfUmqBvp8Fj/LZ2FlP8KtalT4Isn+3CrlmBm6zAo9xpo9WqEkZAGh2t//k4few==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
 
   '@tanstack/react-store@0.11.1':
     resolution: {integrity: sha512-HaIGKI3YLmjBYIvy5DFDY23oNaYZIsTZfngey07Uh5iLVJgM3bIGCnZeOFOqzjFld9JHWcaHJnasD/bKoGKwJQ==}
@@ -4440,6 +4454,10 @@ snapshots:
       '@tanstack/pacer-lite': 0.1.1
       '@tanstack/store': 0.11.1
 
+  '@tanstack/hotkeys@0.10.1':
+    dependencies:
+      '@tanstack/store': 0.11.1
+
   '@tanstack/pacer-lite@0.1.1': {}
 
   '@tanstack/react-form@1.33.5(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
@@ -4449,6 +4467,13 @@ snapshots:
       react: 19.2.6
     transitivePeerDependencies:
       - react-dom
+
+  '@tanstack/react-hotkeys@0.12.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
+      '@tanstack/hotkeys': 0.10.1
+      '@tanstack/react-store': 0.11.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
 
   '@tanstack/react-store@0.11.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:

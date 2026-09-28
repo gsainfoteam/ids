@@ -1,3 +1,4 @@
+import { detectPlatform } from '@tanstack/react-hotkeys';
 import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -9,7 +10,7 @@ import { Kbd } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const sizes = ['standard', 'tiny'] as const;
-const platforms = ['apple', 'other'] as const;
+const platforms = ['mac', 'windows', 'linux'] as const;
 
 const meta = {
   title: 'Typography/Kbd',
@@ -20,7 +21,7 @@ const meta = {
     size: { control: 'radio', options: sizes },
     platform: { control: 'radio', options: [undefined, ...platforms] },
   },
-  args: { keys: 'mod+shift+k', size: 'standard' },
+  args: { keys: 'Mod+Shift+K', size: 'standard' },
 } satisfies Meta<typeof Kbd>;
 
 export default meta;
@@ -50,14 +51,14 @@ const visible = (element: Element) => {
 
 export const Playground: Story = {};
 
-const shortcuts = ['mod+k', 'shift+mod+p', 'alt+enter', 'ctrl+alt+delete'] as const;
+const shortcuts = ['Mod+K', 'Mod+Shift+P', 'Alt+Enter', 'Control+Alt+Delete', 'Meta+E'] as const;
 
 export const Gallery: Story = {
   render: () => (
     <Showcase>
       <Showcase.Section
         title="Platform × Shortcut"
-        description="mod는 Apple 기기에서 ⌘, 그 밖에서는 Ctrl입니다. 수식 키 순서와 + 표시도 플랫폼을 따릅니다."
+        description="Mod는 Mac에서 ⌘, 그 밖에서는 Ctrl입니다. Meta는 Mac에서 ⌘, Windows에서 Win, Linux에서 Super입니다. 수식 키 순서와 + 표시도 플랫폼을 따릅니다."
       >
         <Showcase.Matrix
           rows={platforms}
@@ -70,10 +71,10 @@ export const Gallery: Story = {
         {sizes.map((size) => (
           <Showcase.Row key={size} label={size}>
             <Kbd size={size}>K</Kbd>
-            <Kbd size={size} keys="enter" platform="apple" />
-            <Kbd size={size} keys="escape" />
-            <Kbd size={size} keys="mod+k" platform="apple" />
-            <Kbd size={size} keys="mod+k" platform="other" />
+            <Kbd size={size} keys="Enter" platform="mac" />
+            <Kbd size={size} keys="Escape" />
+            <Kbd size={size} keys="Mod+K" platform="mac" />
+            <Kbd size={size} keys="Mod+K" platform="windows" />
           </Showcase.Row>
         ))}
       </Showcase.Section>
@@ -84,18 +85,18 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="text">
           <p className="text-body-b3-regular">
-            검색을 열려면 <Kbd keys="mod+k" platform="apple" /> 를 누르세요.
+            검색을 열려면 <Kbd keys="Mod+K" platform="mac" /> 를 누르세요.
           </p>
         </Showcase.Row>
         <Showcase.Row label="button">
           <Button>
-            저장 <Kbd keys="mod+s" platform="apple" />
+            저장 <Kbd keys="Mod+S" platform="mac" />
           </Button>
           <Button variant="outline">
-            검색 <Kbd keys="mod+k" platform="other" />
+            검색 <Kbd keys="Mod+K" platform="windows" />
           </Button>
           <Button size="tiny" variant="soft">
-            보내기 <Kbd keys="enter" platform="apple" size="tiny" />
+            보내기 <Kbd keys="Enter" platform="mac" size="tiny" />
           </Button>
         </Showcase.Row>
         <Showcase.Row label="glyph text">
@@ -111,50 +112,51 @@ export const Gallery: Story = {
 export const PlatformAware: Story = {
   render: () => (
     <div className="flex items-center gap-6">
-      <Kbd keys="mod+k" platform="apple" data-testid="apple" />
-      <Kbd keys="mod+k" platform="other" data-testid="other" />
-      <Kbd keys="mod+k" data-testid="auto" />
+      <Kbd keys="Mod+K" platform="mac" data-testid="mac" />
+      <Kbd keys="Mod+K" platform="windows" data-testid="windows" />
+      <Kbd keys="Mod+K" data-testid="auto" />
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '단축키를 핫키 라이브러리와 같은 문자열(mod+k)로 적으면 방문자의 플랫폼에 맞춰 그립니다. platform으로 고정할 수도 있습니다.',
+          '단축키를 TanStack Hotkeys와 같은 문자열(Mod+K)로 적으면 방문자의 플랫폼에 맞춰 그립니다. platform으로 고정할 수도 있습니다.',
       },
     },
   },
   play: async ({ canvas }) => {
-    const apple = canvas.getByTestId('apple');
-    await expect(visible(apple)).toBe('⌘K');
-    await expect(spoken(apple)).toBe('커맨드 K');
-    const other = canvas.getByTestId('other');
-    await expect(visible(other)).toBe('Ctrl+K');
-    await expect(spoken(other)).toBe('컨트롤 + K');
+    const mac = canvas.getByTestId('mac');
+    await expect(visible(mac)).toBe('⌘K');
+    await expect(spoken(mac)).toBe('커맨드 K');
+    const windows = canvas.getByTestId('windows');
+    await expect(visible(windows)).toBe('Ctrl+K');
+    await expect(spoken(windows)).toBe('컨트롤 + K');
     const auto = canvas.getByTestId('auto');
-    const isApple = /mac|iphone|ipad|ipod/i.test(navigator.platform);
-    await expect(auto).toHaveAttribute('data-platform', isApple ? 'apple' : 'other');
+    await expect(auto).toHaveAttribute('data-platform', detectPlatform());
   },
 };
 
 export const ModifierOrder: Story = {
   render: () => (
     <div className="flex items-center gap-6">
-      <Kbd keys="k+shift+mod" platform="apple" data-testid="apple" />
-      <Kbd keys="k+shift+mod" platform="other" data-testid="other" />
+      <Kbd keys="Control+Alt+Shift+Meta+K" platform="mac" data-testid="mac" />
+      <Kbd keys="Control+Alt+Shift+Meta+K" platform="windows" data-testid="windows" />
+      <Kbd keys="Control+Alt+Shift+Meta+K" platform="linux" data-testid="linux" />
     </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '수식 키는 어떤 순서로 적어도 플랫폼 메뉴 순서로 정렬됩니다. Apple은 ⌃⌥⇧⌘, 그 밖은 Win Ctrl Alt Shift입니다.',
+          '수식 키는 플랫폼 메뉴 순서로 그립니다. Mac은 ⌃⌥⇧⌘, 그 밖은 Win(Super) Ctrl Alt Shift입니다.',
       },
     },
   },
   play: async ({ canvas }) => {
-    await expect(visible(canvas.getByTestId('apple'))).toBe('⇧⌘K');
-    await expect(visible(canvas.getByTestId('other'))).toBe('Ctrl+Shift+K');
+    await expect(visible(canvas.getByTestId('mac'))).toBe('⌃⌥⇧⌘K');
+    await expect(visible(canvas.getByTestId('windows'))).toBe('Win+Ctrl+Alt+Shift+K');
+    await expect(visible(canvas.getByTestId('linux'))).toBe('Super+Ctrl+Alt+Shift+K');
   },
 };
 
@@ -163,7 +165,7 @@ export const SymbolNames: Story = {
     <div className="flex items-center gap-3">
       <Kbd data-testid="command">⌘</Kbd>
       <Kbd data-testid="combo">⇧⌘P</Kbd>
-      <Kbd keys="left" data-testid="arrow" />
+      <Kbd keys="ArrowLeft" data-testid="arrow" />
     </div>
   ),
   parameters: {
@@ -185,8 +187,8 @@ export const SymbolNames: Story = {
 
 export const Group: Story = {
   render: () => (
-    <Kbd.Group size="tiny" platform="apple" data-testid="group">
-      <Kbd keys="mod" />
+    <Kbd.Group size="tiny" platform="mac" data-testid="group">
+      <Kbd keys="Mod" />
       <span>then</span>
       <Kbd>G</Kbd>
     </Kbd.Group>

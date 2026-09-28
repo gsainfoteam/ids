@@ -19,7 +19,7 @@ function Actions({ onCopy, onEmail, ...props }: ActionsProps) {
       <Menu.Trigger>Actions</Menu.Trigger>
       <Menu.Content>
         <Menu.Item onSelect={onCopy}>
-          Copy <Menu.Shortcut keys="mod+c" />
+          Copy <Menu.Shortcut keys="Mod+C" />
         </Menu.Item>
         <Menu.Item disabled>Cut</Menu.Item>
         <Menu.Item>Paste</Menu.Item>
@@ -655,14 +655,14 @@ function Palette({ onNewFile, onGrid, ...props }: PaletteProps) {
   const [grid, setGrid] = useState(false);
 
   return (
-    <Menu triggerType="command" hotkey="mod+k" {...props}>
+    <Menu triggerType="command" hotkey="Mod+K" {...props}>
       <Menu.Trigger>Commands</Menu.Trigger>
       <Menu.Content>
         <Menu.Search data-1p-ignore data-lpignore="true" />
         <Menu.Group>
           <Menu.Label>Files</Menu.Label>
           <Menu.Item onSelect={onNewFile}>
-            New file <Menu.Shortcut keys="mod+n" />
+            New file <Menu.Shortcut keys="Mod+N" />
           </Menu.Item>
           <Menu.Item disabled>Open recent</Menu.Item>
           <Menu.Item>Résumé template</Menu.Item>

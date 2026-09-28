@@ -165,6 +165,7 @@ export const messages = {
   kbd: {
     command: '커맨드',
     windows: '윈도우',
+    super: '슈퍼',
     control: '컨트롤',
     option: '옵션',
     alt: '알트',

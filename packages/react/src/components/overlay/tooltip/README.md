@@ -54,7 +54,7 @@ import { Tooltip } from '@gsainfoteam/ids-react';
 ## 단축키
 
 ```tsx
-<Tooltip content={<>저장 <Kbd keys="mod+s" /></>}>
+<Tooltip content={<>저장 <Kbd keys="Mod+S" /></>}>
   <IconButton icon={<DocumentIcon />} aria-label="저장" />
 </Tooltip>
 ```

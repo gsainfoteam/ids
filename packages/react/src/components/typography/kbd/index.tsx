@@ -2,9 +2,9 @@ import { Fragment, type ComponentProps, type ReactNode } from 'react';
 
 import { GLYPH_ICONS } from './glyph-icons';
 import {
-  orderKeys,
-  parseKeys,
+  orderedKeys,
   splitGlyphs,
+  type KbdKeys,
   type KbdLabel,
   type KbdLabels,
   type KbdPlatform,
@@ -16,7 +16,7 @@ import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
 
-export type { KbdLabel, KbdLabels, KbdPlatform } from './keys';
+export type { KbdKeys, KbdLabel, KbdLabels, KbdPlatform } from './keys';
 
 function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
   return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
@@ -69,7 +69,7 @@ export function Kbd({
 }: Kbd.Props) {
   const kbd = useKbd({ size, platform, labels });
   const name = (label: KbdLabel) => kbd.labels[label] ?? messages.kbd[label];
-  const ordered = keys === undefined ? [] : orderKeys(parseKeys(keys), kbd.platform);
+  const ordered = keys ? orderedKeys(keys, kbd.platform) : [];
   const state: Kbd.State = {
     size: kbd.size,
     platform: kbd.platform,
@@ -78,7 +78,7 @@ export function Kbd({
   const styles = Kbd.Style({ size: kbd.size });
 
   if (ordered.length > 1) {
-    const joiner = separator !== undefined ? separator : kbd.platform === 'apple' ? null : '+';
+    const joiner = separator !== undefined ? separator : kbd.platform === 'mac' ? null : '+';
     return (
       <kbd
         {...rest}
@@ -140,6 +140,7 @@ export function Kbd({
 
 export namespace Kbd {
   export type Platform = KbdPlatform;
+  export type Keys = KbdKeys;
   export type Labels = KbdLabels;
 
   export type State = {
@@ -149,7 +150,7 @@ export namespace Kbd {
   };
 
   export type Props = Omit<ComponentProps<'kbd'>, 'className'> & {
-    keys?: string | readonly string[];
+    keys?: Keys;
     size?: IdsSize;
     platform?: Platform;
     labels?: Labels;

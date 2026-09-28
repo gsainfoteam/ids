@@ -315,7 +315,7 @@ test('shortcuts in the bubble are tiny keys, described by name', async () => {
         open
         content={
           <>
-            저장 <Kbd keys="mod+s" platform="apple" />
+            저장 <Kbd keys="Mod+S" platform="mac" />
           </>
         }
       >
@@ -325,7 +325,7 @@ test('shortcuts in the bubble are tiny keys, described by name', async () => {
         open
         content={
           <>
-            열기 <Kbd keys="mod+o" platform="apple" size="standard" />
+            열기 <Kbd keys="Mod+O" platform="mac" size="standard" />
           </>
         }
       >

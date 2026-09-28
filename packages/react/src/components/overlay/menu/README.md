@@ -20,7 +20,7 @@ import { Menu } from '@gsainfoteam/ids-react';
     <Menu.Item onSelect={copy}>
       <DocumentDuplicateIcon />
       복사
-      <Menu.Shortcut keys="mod+c" />
+      <Menu.Shortcut keys="Mod+C" />
     </Menu.Item>
     <Menu.Item disabled>붙여넣기</Menu.Item>
     <Menu.Separator />
@@ -48,7 +48,7 @@ import { Menu } from '@gsainfoteam/ids-react';
 | `Menu.Group`         | 항목 묶음(`role="group"`). 안의 `Menu.Label` 이 이름이 된다                                       |
 | `Menu.Label`         | 묶음의 제목. 고를 수 없다                                                                         |
 | `Menu.Separator`     | 구분선                                                                                            |
-| `Menu.Shortcut`      | 항목 끝의 단축키 표시. `Kbd` 라서 `keys="mod+c"` 가 운영체제에 맞게 그려진다                      |
+| `Menu.Shortcut`      | 항목 끝의 단축키 표시. `Kbd` 라서 `keys="Mod+C"` 가 운영체제에 맞게 그려진다                      |
 | `Menu.Search`        | 명령 팔레트의 검색 상자(`combobox`). 적지 않으면 기본 검색 상자가 들어간다                        |
 | `Menu.Empty`         | 명령 팔레트에서 맞는 항목이 없을 때의 문구. 기본 "결과가 없습니다."                               |
 
@@ -157,10 +157,10 @@ const [zoom, setZoom] = useState('100');
 ## 명령 팔레트
 
 ```tsx
-<Menu triggerType="command" hotkey="mod+k">
+<Menu triggerType="command" hotkey="Mod+K">
   <Menu.Trigger asChild>
     <Button variant="outline">
-      명령 찾기 <Kbd keys="mod+k" size="tiny" />
+      명령 찾기 <Kbd keys="Mod+K" size="tiny" />
     </Button>
   </Menu.Trigger>
   <Menu.Content>
@@ -168,7 +168,7 @@ const [zoom, setZoom] = useState('100');
     <Menu.Group>
       <Menu.Label>문서</Menu.Label>
       <Menu.Item onSelect={createDocument}>
-        새 문서 <Menu.Shortcut keys="mod+n" />
+        새 문서 <Menu.Shortcut keys="Mod+N" />
       </Menu.Item>
     </Menu.Group>
     <Menu.Separator />
@@ -184,7 +184,7 @@ const [zoom, setZoom] = useState('100');
 ```
 
 - **모양.** trigger 에 붙지 않고 화면 위쪽(15vh) 가운데에 뜨는 modal 입니다. 배경을 누르면 닫히고, 포커스는 팔레트 안에 갇히고, 페이지는 스크롤되지 않고 스크린 리더에게 숨겨집니다.
-- **여는 법.** `hotkey`(예: `"mod+k"`, `mod` 는 macOS 에서 ⌘, 그 밖에서 Ctrl)를 문서 어디서든 누르면 열고 닫습니다. IME 로 글자를 조합하는 중에는 반응하지 않습니다. `Menu.Trigger` 는 없어도 되고, `open` / `defaultOpen` / `onOpenChange` 도 그대로 씁니다.
+- **여는 법.** `hotkey`(예: `"Mod+K"`, `Mod` 는 macOS 에서 ⌘, 그 밖에서 Ctrl)를 문서 어디서든 누르면 열고 닫습니다. IME 로 글자를 조합하는 중에는 반응하지 않습니다. `Menu.Trigger` 는 없어도 되고, `open` / `defaultOpen` / `onOpenChange` 도 그대로 씁니다.
 - **거르기.** 검색어가 항목의 `textValue`, 없으면 글자에 들어 있으면 보입니다. 대소문자, 전각/반각, 악센트(`é` = `e`)는 가리지 않고 한글도 그대로 찾습니다. 보이는 항목이 없는 `Menu.Group` 은 `Menu.Label` 과 함께 숨고, 숨은 그룹 옆의 `Menu.Separator` 도 숨습니다.
 - **움직이는 법.** 포커스는 늘 검색 상자에 있습니다. ↑ ↓ 는 끝에서 반대편 끝으로 돌아가고, Home, End 는 처음과 끝으로 갑니다. 검색어가 바뀌면 첫 항목이 강조됩니다. 마우스를 올려도 강조됩니다.
 - **고르는 법.** Enter 나 클릭. 고르면 닫히고 포커스는 연 곳으로 돌아갑니다. `onSelect` 에서 `preventDefault()` 하면 열린 채로 둡니다. 조합 중의 Enter 는 고르지 않습니다.
@@ -238,7 +238,7 @@ const route = await overlay.open<string>(({ close }) => (
 | `open` / `defaultOpen` | 열림 상태. 기본 `false`                     |
 | `onOpenChange`         | 열거나 닫으려 할 때                         |
 | `triggerType`          | `click`(기본) / `contextmenu` / `command`   |
-| `hotkey`               | `command` 에서 여닫는 단축키. 예: `"mod+k"` |
+| `hotkey`               | `command` 에서 여닫는 단축키. 예: `"Mod+K"` |
 
 - 하위 메뉴의 `Menu` 도 `open`, `defaultOpen`, `onOpenChange` 를 받습니다. 부모 메뉴와 함께 닫힐 때는 하위 메뉴의 `onOpenChange` 를 부르지 않습니다.
 - `triggerType`, `hotkey` 는 가장 바깥 `Menu` 에만 씁니다.

@@ -59,28 +59,28 @@ function EditItems() {
       <Menu.Item>
         <ArrowUturnLeftIcon />
         실행 취소
-        <Menu.Shortcut keys="mod+z" />
+        <Menu.Shortcut keys="Mod+Z" />
       </Menu.Item>
       <Menu.Item>
         <ArrowUturnRightIcon />
         다시 실행
-        <Menu.Shortcut keys="mod+shift+z" />
+        <Menu.Shortcut keys="Mod+Shift+Z" />
       </Menu.Item>
       <Menu.Separator />
       <Menu.Item>
         <ScissorsIcon />
         잘라내기
-        <Menu.Shortcut keys="mod+x" />
+        <Menu.Shortcut keys="Mod+X" />
       </Menu.Item>
       <Menu.Item>
         <DocumentDuplicateIcon />
         복사
-        <Menu.Shortcut keys="mod+c" />
+        <Menu.Shortcut keys="Mod+C" />
       </Menu.Item>
       <Menu.Item disabled>
         <ClipboardIcon />
         붙여넣기
-        <Menu.Shortcut keys="mod+v" />
+        <Menu.Shortcut keys="Mod+V" />
       </Menu.Item>
     </>
   );
@@ -160,7 +160,7 @@ function DocumentMenu() {
         <Menu.Item>
           <PrinterIcon />
           인쇄
-          <Menu.Shortcut keys="mod+p" />
+          <Menu.Shortcut keys="Mod+P" />
         </Menu.Item>
       </Menu.Content>
     </Menu>
@@ -175,12 +175,12 @@ function CommandPaletteDemo() {
 
   return (
     <div className="flex items-center gap-3">
-      <Menu triggerType="command" hotkey="mod+k">
+      <Menu triggerType="command" hotkey="Mod+K">
         <Menu.Trigger asChild>
           <Button variant="outline">
             <MagnifyingGlassIcon />
             명령 찾기
-            <Kbd keys="mod+k" size="tiny" />
+            <Kbd keys="Mod+K" size="tiny" />
           </Button>
         </Menu.Trigger>
         <Menu.Content>
@@ -189,17 +189,17 @@ function CommandPaletteDemo() {
             <Menu.Label>문서</Menu.Label>
             <Menu.Item onSelect={run('새 문서')}>
               <DocumentPlusIcon />새 문서
-              <Menu.Shortcut keys="mod+n" />
+              <Menu.Shortcut keys="Mod+N" />
             </Menu.Item>
             <Menu.Item onSelect={run('열기')}>
               <FolderOpenIcon />
               열기…
-              <Menu.Shortcut keys="mod+o" />
+              <Menu.Shortcut keys="Mod+O" />
             </Menu.Item>
             <Menu.Item onSelect={run('인쇄')}>
               <PrinterIcon />
               인쇄
-              <Menu.Shortcut keys="mod+p" />
+              <Menu.Shortcut keys="Mod+P" />
             </Menu.Item>
             <Menu.Item disabled>
               <ClipboardIcon />
@@ -220,7 +220,7 @@ function CommandPaletteDemo() {
             <Menu.Item onSelect={run('설정')}>
               <Cog6ToothIcon />
               설정
-              <Menu.Shortcut keys="mod+," />
+              <Menu.Shortcut keys="Mod+," />
             </Menu.Item>
             <Menu.Item onSelect={run('로그아웃')}>
               <ArrowRightStartOnRectangleIcon />
@@ -376,7 +376,7 @@ export const Gallery: Story = {
                 <Menu.Item>
                   <Cog6ToothIcon />
                   설정
-                  <Menu.Shortcut keys="mod+," />
+                  <Menu.Shortcut keys="Mod+," />
                 </Menu.Item>
               </Menu.Group>
               <Menu.Separator />
@@ -422,7 +422,7 @@ export const Gallery: Story = {
         title="Command palette"
         description="triggerType='command' 는 화면 위쪽 가운데의 modal 명령 팔레트입니다. 검색 상자에 글자를 치면 항목이 걸러지고, ↑ ↓ 로 고르고 Enter 로 실행합니다. hotkey 로 어디서든 엽니다."
       >
-        <Showcase.Row label="mod+k">
+        <Showcase.Row label="Mod+K">
           <CommandPaletteDemo />
         </Showcase.Row>
       </Showcase.Section>

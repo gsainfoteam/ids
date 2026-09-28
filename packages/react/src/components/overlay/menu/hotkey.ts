@@ -1,32 +1,12 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 
-import { detectPlatform, parseKeys, resolveKey } from '../../typography/kbd/keys';
+import { detectPlatform, parseHotkey } from '@tanstack/react-hotkeys';
 
-const MODIFIERS = ['meta', 'ctrl', 'alt', 'shift'] as const;
 const SAFARI_COMPOSING_KEY_CODE = 229;
 const LETTER = /^[A-Z]$/;
 const DIGIT = /^[0-9]$/;
 
-type Modifier = (typeof MODIFIERS)[number];
-
-const EVENT_KEY: Record<string, string> = {
-  enter: 'Enter',
-  escape: 'Escape',
-  tab: 'Tab',
-  space: ' ',
-  backspace: 'Backspace',
-  delete: 'Delete',
-  up: 'ArrowUp',
-  down: 'ArrowDown',
-  left: 'ArrowLeft',
-  right: 'ArrowRight',
-  pageup: 'PageUp',
-  pagedown: 'PageDown',
-  home: 'Home',
-  end: 'End',
-};
-
-const isModifier = (id: string): id is Modifier => (MODIFIERS as readonly string[]).includes(id);
+const EVENT_KEY: Record<string, string> = { Space: ' ' };
 
 function pressedKey(key: string, event: KeyboardEvent) {
   if (LETTER.test(key)) return event.code === `Key${key}` || event.key.toUpperCase() === key;
@@ -36,24 +16,17 @@ function pressedKey(key: string, event: KeyboardEvent) {
 }
 
 export function matchesHotkey(event: KeyboardEvent, hotkey: string) {
-  const platform = detectPlatform();
-  const ids = parseKeys(hotkey).map((token) => resolveKey(token, platform).id);
-  const modifiers = ids.filter(isModifier);
-  const keys = ids.filter((id) => !isModifier(id));
+  const parsed = parseHotkey(hotkey, detectPlatform());
 
-  if (keys.length !== 1) return false;
+  if (parsed.key === undefined) return false;
 
-  const held: Record<Modifier, boolean> = {
-    meta: event.metaKey,
-    ctrl: event.ctrlKey,
-    alt: event.altKey,
-    shift: event.shiftKey,
-  };
-  const sameModifiers = MODIFIERS.every(
-    (modifier) => held[modifier] === modifiers.includes(modifier),
-  );
+  const sameModifiers =
+    parsed.meta === event.metaKey &&
+    parsed.ctrl === event.ctrlKey &&
+    parsed.alt === event.altKey &&
+    parsed.shift === event.shiftKey;
 
-  return sameModifiers && pressedKey(keys[0]!, event);
+  return sameModifiers && pressedKey(parsed.key, event);
 }
 
 export function useHotkey(hotkey: string | undefined, onPress: () => void) {
