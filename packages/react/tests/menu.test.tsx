@@ -527,6 +527,25 @@ test('hovering down four levels and choosing the deepest item closes the whole t
   expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
 });
 
+test('a submenu keeps going the way its parent submenu flipped, and flips back only when out of room', async () => {
+  const { submenu, openByKeyboard } = await renderDeep({}, 'flex-end');
+  await openByKeyboard();
+
+  const rect = (name: string) => submenu(name).element().getBoundingClientRect();
+  const viewport = document.documentElement.clientWidth;
+
+  await expect.element(submenu('Export')).toHaveAttribute('data-side', 'left');
+  await expect
+    .element(submenu('Image'), { message: 'continues left instead of covering the root menu' })
+    .toHaveAttribute('data-side', 'left');
+  await expect.element(submenu('JPEG')).toHaveAttribute('data-side', 'right');
+  expect(rect('Image').left).toBeLessThan(rect('Export').left);
+  for (const name of ['Export', 'Image', 'JPEG']) {
+    expect(rect(name).left).toBeGreaterThanOrEqual(8);
+    expect(rect(name).right).toBeLessThanOrEqual(viewport - 8);
+  }
+});
+
 type PaletteProps = Partial<Menu.Props> & {
   onNewFile?: (event: Event) => void;
   onGrid?: (checked: boolean) => void;

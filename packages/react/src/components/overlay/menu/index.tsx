@@ -65,6 +65,14 @@ function usePlacement(level: MenuLevel, { side, align, sideOffset, alignOffset }
   }, [setPlacement, side, align, sideOffset, alignOffset]);
 }
 
+const continuesSideways = (side: AnchoredSide) => side === 'left' || side === 'right';
+
+function awayFromParent(parent: MenuLevel): AnchoredSide {
+  const parentSide = parent.anchored.side;
+
+  return parent.nested && continuesSideways(parentSide) ? parentSide : 'right';
+}
+
 export function Menu({ triggerType = 'click', ...props }: Menu.Props) {
   if (triggerType === 'command') return <CommandMenu {...props} />;
 
@@ -529,15 +537,16 @@ function MenuSubTrigger({
 }
 
 function MenuSubContent({
-  side = 'right',
+  side,
   align = 'start',
   sideOffset = 2,
   alignOffset = -5,
   ...props
 }: Menu.SubContentProps) {
+  const parent = useLevelContext('Menu.SubContent');
   const sub = useSubContext('Menu.SubContent');
 
-  usePlacement(sub, { side, align, sideOffset, alignOffset });
+  usePlacement(sub, { side: side ?? awayFromParent(parent), align, sideOffset, alignOffset });
 
   if (!sub.mounted) return null;
 
