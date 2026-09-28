@@ -23,6 +23,7 @@
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구 전부와 기본 locale                     | 문구를 그리는 모든 컴포넌트, `date-locale.ts`                                                                  |
 | [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어 | Alert, `field-popup/`                                                                                          |
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                              | Button, `surface.ts`                                                                                           |
+| [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)          | Select, ChipField                                                                                              |
 | [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                                | Slider, ColorPicker                                                                                            |
 | [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수   | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField |
 | [`status-palette.ts`](#status-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                   | Alert                                                                                                          |
@@ -447,6 +448,7 @@ export const Style = tv({
 
 - Select 의 `listbox`, `item`, `indicator`, `groupHeading`, `separator`, `empty` 슬롯
 - ChipField 의 제안 목록
+- Menu 의 `item`, `indicator`, `label`, `separator` 슬롯과 명령 팔레트의 `list`, `empty` 슬롯
 - [field-popup](./field-popup/README.md) 의 `FieldPopupSearch`(`searchRoot`, `search`)
 
 ### 쓰는 법
@@ -482,7 +484,7 @@ slots: {
 
 ### 쓰는 곳
 
-- Alert, AvatarGroup, Calendar, CheckboxGroup, Chip, ChipField, ColorField, ColorPicker, DateField, DateTimeField, FileField, Input, Kbd, NumberField, OTPField, PasswordField, Rating, Select, Slider, Spinner, TelField, TextArea, TimeField, TimePicker, [text-control](./text-control/README.md)
+- Alert, AvatarGroup, Calendar, CheckboxGroup, Chip, ChipField, ColorField, ColorPicker, DateField, DateTimeField, FileField, Input, Kbd, Menu, NumberField, OTPField, PasswordField, Rating, Select, Slider, Spinner, TelField, TextArea, TimeField, TimePicker, [text-control](./text-control/README.md)
 - `messages.locale`: [date-locale.ts](#date-localets) 의 `resolveLocale` 기본값
 
 ### 쓰는 법
@@ -551,6 +553,34 @@ const press = usePressable<HTMLElement>({
 
 - `enabled` 가 `false` 면 받은 핸들러를 그대로 돌려주고 `role` 도 붙이지 않습니다. `asChild` 로 링크를 그리는 Card 는 링크의 동작을 그대로 씁니다.
 - `NESTED_CONTROL` 에 없는 역할의 요소는 행의 클릭을 막지 못합니다. 새 역할의 컨트롤을 행 안에 두면 목록에 더합니다.
+
+## search-text.ts
+
+검색어로 항목을 거르는 글자 비교입니다. React 자식에서 글자를 뽑는 `textOf`, 비교용으로 글자를 고르는 `normalizeText`, 들어 있는지 보는 `matchesSearch` 가 있습니다.
+
+### 쓰는 곳
+
+- Select: `select-options.ts` 의 `collectOptions`(`textOf`), `matchesQuery`, `typeaheadIndex`
+- ChipField: `chip-values.ts` 의 같은 값 판정(`normalizeText`), 제안 거르기(Select 의 `matchesQuery`)
+
+### 쓰는 법
+
+```ts
+// components/form/select/select-options.ts
+export const matchesQuery = (option, query) => matchesSearch(option.search, query);
+```
+
+### 왜 이렇게
+
+- `NFD` 로 나눠 결합 악센트(`U+0300`–`U+036F`)를 지운 뒤 `NFKC` 로 다시 묶습니다. `é` 는 `e` 가 되고, 전각 `Ａ` 는 `A` 가 되고, 한글 음절은 다시 음절로 돌아와 그대로 비교됩니다.
+- 대소문자는 `toLocaleLowerCase` 로 맞춥니다.
+- 빈 검색어(공백만 포함)는 모두와 맞습니다.
+
+### 알아둘 것
+
+- `textOf` 는 React 트리의 문자열 자식만 읽습니다. 글자를 스스로 그리는 컴포넌트 안의 글자는 보지 못하므로, 그런 항목은 `label`/`searchValue`(Select)를 받습니다.
+- 한글 자모 하나(`ㅅ`)는 음절(`설`)의 일부로 맞지 않습니다. 초성 검색은 하지 않습니다.
+- 비교를 바꾸면 Select, ChipField 의 거르기와 ChipField 의 중복 판정이 함께 바뀝니다.
 
 ## slider-surface.ts
 

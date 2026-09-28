@@ -1,6 +1,8 @@
 import { uniqBy } from 'es-toolkit';
 
-import { normalizeText, type SelectOption } from '../select/select-options';
+import { normalizeText } from '../../../internal/search-text';
+
+import type { SelectOption } from '../select/select-options';
 
 export type ChipValidateResult = boolean | string | null | undefined;
 

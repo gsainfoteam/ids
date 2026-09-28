@@ -2,6 +2,7 @@ import { isValidElement, type ReactNode } from 'react';
 
 import { difference, intersection } from 'es-toolkit';
 
+import { matchesSearch, normalizeText, textOf } from '../../../internal/search-text';
 import { flattenFragments } from '../../../utils';
 
 export type SelectOption = {
@@ -21,21 +22,6 @@ type ItemProps = {
 };
 
 export type OptionKinds = { item: unknown; group: unknown; content: unknown };
-
-export function textOf(children: unknown): string {
-  if (typeof children === 'string' || typeof children === 'number') return String(children);
-  if (typeof children === 'function' || children == null || typeof children === 'boolean')
-    return '';
-  return flattenFragments(children as ReactNode)
-    .map((child) =>
-      typeof child === 'string' || typeof child === 'number'
-        ? String(child)
-        : isValidElement<{ children?: unknown }>(child)
-          ? textOf(child.props.children)
-          : '',
-    )
-    .join('');
-}
 
 export function slotChildren(children: unknown, asChild?: boolean): ReactNode {
   return asChild && isValidElement<{ children?: ReactNode }>(children)
@@ -63,15 +49,8 @@ export function collectOptions(children: ReactNode, kinds: OptionKinds): SelectO
   });
 }
 
-const COMBINING_ACCENTS = /[\u0300-\u036f]/g;
-
-export function normalizeText(text: string) {
-  return text.normalize('NFD').replace(COMBINING_ACCENTS, '').normalize('NFKC').toLocaleLowerCase();
-}
-
 export function matchesQuery(option: SelectOption, query: string) {
-  const needle = normalizeText(query.trim());
-  return !needle || normalizeText(option.search).includes(needle);
+  return matchesSearch(option.search, query);
 }
 
 export function typeaheadIndex(labels: string[], buffer: string, current: number) {
