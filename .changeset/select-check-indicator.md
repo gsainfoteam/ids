@@ -23,3 +23,4 @@ element that draws the field, not to the trigger button; `ref` and the other nat
 to the trigger. `searchValue` only affects search and no longer changes the label in the trigger.
 Arrow keys no longer wrap around the list. An empty-string value is no longer submitted.
 `Select.SearchField` no longer takes the input's `size` and `color` attributes.
+A form reset restores `defaultValue` without calling `onValueChange`, like a native select.

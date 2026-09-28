@@ -46,7 +46,7 @@ useFormReset(rootRef, () => {
 
 - updater 함수(`setValue((prev) => ...)`)는 React 의 state 큐가 아니라 이번 렌더의 `current` 로 계산됩니다. 한 이벤트에서 두 번 부르면 두 번째도 같은 `current` 를 봅니다.
 - 비제어일 때 `defaultValue` 는 첫 렌더에서만 읽습니다. 나중에 바뀐 `defaultValue` 는 reset 핸들러가 직접 넘길 때만 반영됩니다.
-- Select 와 ChipField 는 reset 때 `silent` 없이 부릅니다. `tests/select.test.mjs` 가 Select 의 reset 이 복원된 값을 알리는지 확인합니다.
+- 폼 reset 으로 값을 되돌리는 컴포넌트는 모두 `silent` 로 부릅니다(Select 와 ChipField 포함). `tests/select.test.mjs` 와 `tests/chip-field.test.mjs` 가 reset 이 값을 알리지 않는지 확인합니다.
 
 ## use-form-reset.ts
 

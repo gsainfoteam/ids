@@ -247,7 +247,7 @@ export function useSelect({
   }, [open, activeValue]);
 
   useFormReset(triggerRef, () => {
-    setValue(defaultValue ?? empty);
+    setValue(defaultValue ?? empty, { silent: true });
     close(false);
   });
 

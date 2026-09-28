@@ -240,6 +240,7 @@ test('search, live empty state, multiple toggles in list order, outside dismissa
   assert.deepEqual(state.changes.at(-1), ['apple', 'cherry'], 'values follow the list order');
   await key(search, 'Tab');
   assert.equal(listbox(), null);
+  const reportedBeforeReset = state.changes.length;
   await act(async () => {
     host.querySelector('form').reset();
     await resetSettles();
@@ -249,7 +250,11 @@ test('search, live empty state, multiple toggles in list order, outside dismissa
     [...host.querySelectorAll('input[type=hidden]')].map((node) => node.value),
     ['apple'],
   );
-  assert.deepEqual(state.changes.at(-1), ['apple'], 'reset reports the restored value');
+  assert.equal(
+    state.changes.length,
+    reportedBeforeReset,
+    'a reset restores the default without reporting it, like a native select',
+  );
   await click(trigger());
   await act(() => document.body.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true })));
   assert.equal(listbox(), null);

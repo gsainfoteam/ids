@@ -21,3 +21,4 @@ Breaking: `onChange(value)` is now `onValueChange(value)`, and an `onChange` on 
 reaches the input. Chip remove buttons left the Tab order and are reached with the arrow keys.
 `onCreate` is optional with `creatable`. A read-only field hides the remove buttons instead of
 disabling them, the list is as wide as the field, and a field without options has no chevron.
+A form reset restores `defaultValue` without calling `onValueChange`, like a native input.

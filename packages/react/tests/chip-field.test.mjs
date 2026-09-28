@@ -310,13 +310,20 @@ test('creatable: trims, dedupes, ignores IME, validates, and commits on comma or
 });
 
 test('required is enforced natively; reset, prevented reset, read-only and disabled', async () => {
+  const reported = [];
   const view = (props) =>
     h(
       'form',
       null,
       h(
         ChipField,
-        { 'aria-label': 'Skills', name: 'skills', defaultValue: ['js'], ...props },
+        {
+          'aria-label': 'Skills',
+          name: 'skills',
+          defaultValue: ['js'],
+          onValueChange: (next) => reported.push(next),
+          ...props,
+        },
         h(ChipField.Input, { asChild: true }, h('input', { 'data-test': 'search' })),
         h(ChipField.Content, null, ...items()),
       ),
@@ -342,6 +349,7 @@ test('required is enforced natively; reset, prevented reset, read-only and disab
   });
   assert.equal(host.querySelector('[type=hidden]').value, 'js');
   assert.equal(trigger().value, '', 'reset also clears the typed text');
+  assert.deepEqual(reported, [[]], 'only the Backspace was reported; a reset reports nothing');
   assert.equal(form.checkValidity(), true);
   await render(view({ readOnly: true, required: true }));
   await key(trigger(), 'Backspace');

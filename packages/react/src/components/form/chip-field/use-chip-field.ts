@@ -364,7 +364,7 @@ export function useChipField({
   }, [open, activeOptionId]);
 
   useFormReset(inputRef, () => {
-    setValue(defaultValue ?? []);
+    setValue(defaultValue ?? [], { silent: true });
     setQuery('');
     setOpenState(false);
   });
