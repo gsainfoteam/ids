@@ -97,14 +97,26 @@ test('asChild forwards both refs with cleanup and composes child/root handlers',
   assert.equal(cleanups, 2);
 });
 test('child cancellation prevents root action', async () => {
+  const calls = [];
+  const record = (name) => () => calls.push(name);
   await render(
     h(
       FloatingButton,
-      { asChild: true, onClick: () => assert.fail('canceled') },
-      h('button', { onClick: (e) => e.preventDefault() }, '취소'),
+      { asChild: true, onClick: record('root') },
+      h(
+        'button',
+        {
+          onClick: (e) => {
+            record('child')();
+            e.preventDefault();
+          },
+        },
+        '취소',
+      ),
     ),
   );
   await act(async () => button().click());
+  assert.deepEqual(calls, ['child']);
 });
 test('disabled links remove href and block child/root keyboard and click actions', async () => {
   const calls = [];
