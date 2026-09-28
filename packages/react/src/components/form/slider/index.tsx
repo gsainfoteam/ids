@@ -145,8 +145,8 @@ export function Slider(props: SliderProps) {
     ...rest
   } = props;
   const {
-    required: _required,
-    'aria-required': _ariaRequired,
+    required: _alwaysHasValue,
+    'aria-required': _ariaAlwaysHasValue,
     ...domProps
   } = rest as typeof rest & { required?: unknown };
 
