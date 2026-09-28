@@ -75,7 +75,7 @@ export function useToggleGroup({
 
   const roving = useRovingFocus({
     rootRef,
-    itemSelector: `[data-toggle-group-item="${id}"]`,
+    ownItemSelector: `[data-toggle-group-item="${id}"]`,
     orientation,
     loop,
     radio: single,
