@@ -126,4 +126,4 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 
 - 시간대 변환은 없습니다. 값은 로컬 시각입니다.
 - 오전/오후 이름은 date-fns locale 데이터라 서버와 브라우저가 같습니다.
-- `drawer` 는 비모달입니다. 뒤 화면 스크롤을 잠그거나 포커스를 가두지 않습니다.
+- `drawer` 는 modal 입니다. 뒤 화면을 어둡게 가리고 스크롤을 잠그며, 포커스를 sheet 안에 둡니다. 배경을 누르거나 Escape 로 닫으면 포커스가 필드로 돌아갑니다.

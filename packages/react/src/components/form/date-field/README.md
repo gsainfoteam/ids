@@ -218,4 +218,4 @@ const schema = z.object({ date: z.date().nullable().refine(Boolean, '날짜를 �
 - Trigger 는 `role="combobox"`, `aria-haspopup="dialog"` 이고 팝업은 `role="dialog"` 입니다. Field 의 라벨과 설명이 Trigger 에 붙습니다.
 - 값은 로컬 날짜이고 `format` 은 표시에만 씁니다. 바깥에서 준 값을 min/max 로 자르지 않습니다.
 - 팝업은 필드 전체 너비 이상으로 열리고, 화면 밖으로 나가지 않게 위아래를 고릅니다.
-- `drawer` 는 비모달입니다. 뒤 화면 스크롤을 잠그거나 포커스를 가두지 않습니다.
+- `drawer` 는 modal 입니다. 뒤 화면을 어둡게 가리고 스크롤을 잠그며, 포커스를 sheet 안에 둡니다. 배경을 누르거나 Escape 로 닫으면 포커스가 필드로 돌아갑니다.

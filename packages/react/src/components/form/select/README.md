@@ -197,7 +197,7 @@ import { Field, Select } from '@gsainfoteam/ids-react';
 
 - `required` 인데 비어 있으면 브라우저가 제출을 막고, 검증 메시지를 필드에 붙인 뒤 트리거로 포커스를 보냅니다.
 - `disabled` 면 제출되지 않고, `readOnly` 면 제출되지만 검증하지 않습니다.
-- 초기화는 값을 `defaultValue` 로 되돌리고 `onValueChange` 도 부릅니다.
+- 초기화는 값을 `defaultValue` 로 되돌리고 `onValueChange` 는 부르지 않습니다. native input 도 reset 에 change 이벤트를 보내지 않습니다.
 - `form` 속성으로 바깥 form 에 연결할 수 있습니다.
 
 ## react-hook-form, TanStack Form
@@ -232,7 +232,7 @@ const methods = useForm({ defaultValues: { fruit: null, tags: [] } }); // 하나
 | ------------------------ | ------------------------------------------------------------------- |
 | `selectionMode`          | `single`(기본): `string \| null` / `multiple`: `string[]`           |
 | `value` / `defaultValue` | 생략하면 비제어. 기본 `null` / `[]`                                 |
-| `onValueChange`          | 고르거나 지울 때, 초기화할 때                                       |
+| `onValueChange`          | 고르거나 지울 때. 폼 초기화에는 부르지 않는다                       |
 | `open` / `defaultOpen`   | 열림 상태                                                           |
 | `onOpenChange`           | 열리고 닫힐 때                                                      |
 | `placeholder`            | `선택하세요`                                                        |
