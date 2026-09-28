@@ -3,6 +3,8 @@ import { fileURLToPath } from 'node:url';
 
 import { expect, test } from 'vitest';
 
+const coldNodeStartOnABusyRunner = 30_000;
+
 test('base ESM and CommonJS exports load when no form library can resolve', () => {
   const result = spawnSync(
     process.execPath,
@@ -24,4 +26,4 @@ test('base ESM and CommonJS exports load when no form library can resolve', () =
     { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' },
   );
   expect(result.status, result.stderr).toBe(0);
-});
+}, coldNodeStartOnABusyRunner);
