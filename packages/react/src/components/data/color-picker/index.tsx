@@ -13,6 +13,7 @@ import { CheckIcon, ClipboardDocumentIcon, EyeDropperIcon } from '@heroicons/rea
 import { cssColor, formatPlaceholder, parseColor, type ColorFormat } from './color';
 import { useClipboardSupport, useColorPicker, useEyeDropperSupport } from './use-color-picker';
 import { messages } from '../../../internal/messages';
+import { sliderSurface } from '../../../internal/slider-surface';
 import { resolveState } from '../../../internal/state-props';
 import {
   cn,
@@ -244,11 +245,8 @@ function ColorPickerHueSlider({ className, ...props }: ColorPicker.SliderProps) 
       readOnly={c.state.readOnly}
       className={c.styles.slider({ className })}
     >
-      <Slider.Track className={c.styles.track()} style={{ backgroundImage: HUES }}>
-        <Slider.Thumb
-          className={c.styles.sliderThumb()}
-          style={{ backgroundColor: `hsl(${color.h} 100% 50%)` }}
-        />
+      <Slider.Track style={{ backgroundImage: HUES }}>
+        <Slider.Thumb style={{ backgroundColor: `hsl(${color.h} 100% 50%)` }} />
       </Slider.Track>
     </Slider>
   );
@@ -277,13 +275,12 @@ function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.SliderProps
       className={c.styles.slider({ className })}
     >
       <Slider.Track
-        className={c.styles.track()}
         style={{
           backgroundImage: `linear-gradient(to right, transparent, ${cssColor({ ...rgba, alpha: 1 })}), ${CHECKER}`,
           backgroundSize: '100% 100%, 8px 8px',
         }}
       >
-        <Slider.Thumb className={c.styles.sliderThumb()} style={overChecker(cssColor(rgba))} />
+        <Slider.Thumb style={overChecker(cssColor(rgba))} />
       </Slider.Track>
     </Slider>
   );
@@ -478,11 +475,6 @@ export namespace ColorPicker {
   export const Swatches = ColorPickerSwatches;
   export const Swatch = ColorPickerSwatch;
 
-  const thumb = cn(
-    'rounded-full border-2 border-white',
-    'shadow-[0_0_0_1px_rgb(0_0_0/0.25),0_1px_3px_rgb(0_0_0/0.3)]',
-  );
-
   const dimOnceAtRoot = {
     slider: cn('data-disabled:opacity-100'),
     input: cn('data-disabled:opacity-100'),
@@ -494,11 +486,12 @@ export namespace ColorPicker {
     slots: {
       root: 'grid w-full min-w-0 gap-3 text-(--ids-color-on-surface) data-disabled:opacity-50',
       area: [
+        sliderSurface.edge,
         'group/area relative w-full cursor-crosshair touch-none rounded-standard select-none',
-        'inset-ring-1 inset-ring-(--ids-color-on-surface)/10 data-disabled:cursor-not-allowed',
+        'data-disabled:cursor-not-allowed',
       ],
       areaThumb: [
-        thumb,
+        sliderSurface.thumb,
         'pointer-events-none absolute -translate-x-1/2 -translate-y-1/2',
         'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none',
         'group-has-[input:focus-visible]/area:ring-[3px] group-has-[input:focus-visible]/area:ring-(--ids-color-primary)/50',
@@ -507,8 +500,6 @@ export namespace ColorPicker {
       row: 'flex min-w-0 items-center gap-2',
       sliders: 'grid min-w-0 flex-1 gap-2',
       slider: 'cursor-pointer',
-      track: 'inset-ring-1 inset-ring-(--ids-color-on-surface)/10',
-      sliderThumb: [thumb, 'inset-ring-0 hover:ring-0'],
       input: 'flex-1',
       inputText: 'font-mono',
       tool: '',
@@ -524,13 +515,11 @@ export namespace ColorPicker {
         standard: {
           area: 'h-40',
           areaThumb: 'size-4',
-          slider: '[--slider-track:0.75rem]',
           swatch: 'size-7',
         },
         tiny: {
           area: 'h-32',
           areaThumb: 'size-3.5',
-          slider: '[--slider-track:0.625rem]',
           swatch: 'size-6',
         },
       } satisfies Record<IdsSize, object>,

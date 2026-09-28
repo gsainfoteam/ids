@@ -11,6 +11,7 @@ import { percentOf, stepMarks, thumbOffset } from './slider-math';
 import { useSlider, type SliderValue } from './use-slider';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
+import { sliderSurface } from '../../../internal/slider-surface';
 import { invariant, mergeProps, tv } from '../../../utils';
 import { Slot } from '../../utility/slot';
 import { useFieldSize } from '../field/context';
@@ -437,15 +438,16 @@ export namespace Slider {
         'group/slider relative grid select-none outline-none',
         'data-disabled:cursor-not-allowed data-disabled:opacity-50',
       ],
-      track: 'relative rounded-full bg-(--ids-color-muted)',
-      range:
+      track: [sliderSurface.edge, 'relative rounded-full bg-(--ids-color-muted)'],
+      range: [
+        sliderSurface.edge,
         'absolute rounded-full bg-(--ids-color-primary) group-data-invalid/slider:bg-(--ids-color-danger)',
+      ],
       thumb: [
-        'group/thumb absolute block size-(--slider-thumb) rounded-full',
-        'bg-(--ids-color-surface) shadow-sm inset-ring-1 inset-ring-(--ids-color-primary)',
-        'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'hover:ring-[3px] hover:ring-(--ids-color-primary)/40 focus-ring',
-        'data-disabled:hover:ring-0',
+        sliderSurface.thumb,
+        'group/thumb absolute block size-(--slider-thumb)',
+        'bg-(--ids-color-primary) group-data-invalid/slider:bg-(--ids-color-danger)',
+        'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none focus-ring',
       ],
       valueLabel: [
         'pointer-events-none absolute rounded-indicator px-1.5 py-0.5 whitespace-nowrap',
@@ -481,8 +483,8 @@ export namespace Slider {
         },
       } satisfies Record<SliderOrientation, object>,
       size: {
-        standard: { root: '[--slider-thumb:1rem] [--slider-track:0.375rem]' },
-        tiny: { root: '[--slider-thumb:0.875rem] [--slider-track:0.25rem]' },
+        standard: { root: '[--slider-thumb:1rem] [--slider-track:0.75rem]' },
+        tiny: { root: '[--slider-thumb:0.875rem] [--slider-track:0.625rem]' },
       } satisfies Record<IdsSize, object>,
     },
     defaultVariants: { orientation: 'horizontal', size: 'standard' },

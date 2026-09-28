@@ -21,6 +21,7 @@
 | [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                | IconButton, IconToggle                                                                                         |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구 전부와 기본 locale                    | 문구를 그리는 모든 컴포넌트, `date-locale.ts`                                                                  |
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                             | Button, `surface.ts`                                                                                           |
+| [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                               | Slider, ColorPicker                                                                                            |
 | [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수  | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField |
 | [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                 | Card, Item, Chip                                                                                               |
 | [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                              | DateField, TimeField, DateTimeField                                                                            |
@@ -500,6 +501,37 @@ const press = usePressable<HTMLElement>({
 
 - `enabled` 가 `false` 면 받은 핸들러를 그대로 돌려주고 `role` 도 붙이지 않습니다. `asChild` 로 링크를 그리는 Card 는 링크의 동작을 그대로 씁니다.
 - `NESTED_CONTROL` 에 없는 역할의 요소는 행의 클릭을 막지 못합니다. 새 역할의 컨트롤을 행 안에 두면 목록에 더합니다.
+
+## slider-surface.ts
+
+슬라이더 트랙의 가장자리와 thumb 모양을 정하는 클래스 조각입니다. ColorPicker 의 색 영역은 두 방향으로 움직이는 슬라이더라서 같은 모양을 씁니다.
+
+### 쓰는 곳
+
+- Slider: 트랙과 채운 구간에 `edge`, thumb 에 `thumb`
+- ColorPicker: 색 영역에 `edge`, 영역의 thumb 에 `thumb`. 색조와 투명도 슬라이더는 Slider 그대로입니다.
+
+### 쓰는 법
+
+```tsx
+// components/form/slider/index.tsx
+track: [sliderSurface.edge, 'relative rounded-full bg-(--ids-color-muted)'],
+thumb: [
+  sliderSurface.thumb,
+  'group/thumb absolute block size-(--slider-thumb)',
+  'bg-(--ids-color-primary) group-data-invalid/slider:bg-(--ids-color-danger)',
+],
+```
+
+### 왜 이렇게
+
+- `thumb` 은 채움색을 정하지 않습니다. Slider 는 primary(invalid 면 danger)로, ColorPicker 는 고른 색으로 채웁니다(inline `backgroundColor`).
+- 흰 2px 테두리와 어두운 1px 그림자 테두리가 thumb 을 어떤 트랙 위에서도 떼어 보이게 합니다. 무지개, 체커보드, 채운 구간 위에서 모두 보여야 해서 light 와 dark 모드 모두 흰색입니다.
+- `edge` 는 `inset-ring` 이라 크기를 바꾸지 않고 트랙의 그라데이션 위에 그려집니다. 채운 구간은 트랙의 가장자리를 덮으므로 Slider 는 채운 구간에도 `edge` 를 줍니다.
+
+### 알아둘 것
+
+- thumb 의 포커스 링(`focus-ring`)은 이 그림자와 함께 그려집니다. thumb 에 `shadow-*` 를 따로 주면 이 그림자를 덮어 테두리가 사라집니다.
 
 ## state-props.ts
 

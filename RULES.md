@@ -80,7 +80,8 @@ packages/react/src/
     typography/  Kbd, Label
     utility/     Slot, Group, ThemeProvider
   internal/      shared parts that are not exported:
-                   surfaces     control-surface, toggle-surface, icon-square, field-surface, surface
+                   surfaces     control-surface, toggle-surface, icon-square, field-surface, surface,
+                                slider-surface
                    fields       text-control (shell, Clear, useMergedRef), field-popup,
                                 temporal-field, form-value, date-locale
                    behaviour    pressable, state-props, use-checked-writes, icon-label, arc

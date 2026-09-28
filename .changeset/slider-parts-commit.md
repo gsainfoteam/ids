@@ -17,4 +17,6 @@ direction of the first move. `value` and callbacks are typed by `selectionMode`.
 Breaking: `onChange(value)` is now `onValueChange(value)`, typed `number` or `[number, number]`
 by `selectionMode`. `marks={true}` draws a tick per step without labels; labels come with a
 `marks` array. Values outside `[min, max]` are clamped with a development warning instead of
-throwing. The thumb is 16px (`standard`) and 14px (`tiny`).
+throwing. The slider takes the look of ColorPicker's sliders: a 12px (`standard`) or 10px
+(`tiny`) track with a faint inner edge, and a 16px or 14px primary thumb with a white ring and a
+soft shadow, without the hover ring.
