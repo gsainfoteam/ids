@@ -120,334 +120,646 @@
 }
 
 @layer utilities {
-  [class*="concentric-p-"]:has(.concentric-p-0\.5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 0.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    .concentric-p-1:not([popover], [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 1);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    .concentric-p-1\.5:not([popover], [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-1:not([popover], [popover] *),
+    :where(.concentric-p-1) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 1.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-2:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    .concentric-p-2:not([popover], [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-1\.5:not([popover], [popover] *),
+    :where(.concentric-p-1) .concentric-p-1:not([popover], [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 2);
   }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-2:not([popover], [popover] *),
+    :where(.concentric-p-1) .concentric-p-1\.5:not([popover], [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-1:not([popover], [popover] *),
+    :where(.concentric-p-2) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 2.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-3:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-1) .concentric-p-2:not([popover], [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-1\.5:not([popover], [popover] *),
+    :where(.concentric-p-2) .concentric-p-1:not([popover], [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 3);
   }
-  [class*="concentric-p-"]:has(.concentric-p-4:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-0\.5) .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-1) .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-2:not([popover], [popover] *),
+    :where(.concentric-p-2) .concentric-p-1\.5:not([popover], [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-1:not([popover], [popover] *),
+    :where(.concentric-p-3) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 3.5);
+  }
+  [class*="concentric-p-"]:has(
+    .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-1) .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-2) .concentric-p-2:not([popover], [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-1\.5:not([popover], [popover] *),
+    :where(.concentric-p-3) .concentric-p-1:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 4);
   }
-  [class*="concentric-p-"]:has(.concentric-p-5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-0\.5) .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-2) .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-2:not([popover], [popover] *),
+    :where(.concentric-p-3) .concentric-p-1\.5:not([popover], [popover] *),
+    :where(.concentric-p-4) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 4.5);
+  }
+  [class*="concentric-p-"]:has(
+    .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-1) .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-2) .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-3) .concentric-p-2:not([popover], [popover] *),
+    :where(.concentric-p-4) .concentric-p-1:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-6:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-0\.5) .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-3) .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-4) .concentric-p-1\.5:not([popover], [popover] *),
+    :where(.concentric-p-5) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 5.5);
+  }
+  [class*="concentric-p-"]:has(
+    .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-1) .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-2) .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-3) .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-4) .concentric-p-2:not([popover], [popover] *),
+    :where(.concentric-p-5) .concentric-p-1:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 6);
   }
-  [class*="concentric-p-"]:has(.concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-0\.5) .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-4) .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-5) .concentric-p-1\.5:not([popover], [popover] *),
+    :where(.concentric-p-6) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 6.5);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-1) .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-2) .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-3) .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-4) .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-5) .concentric-p-2:not([popover], [popover] *),
+    :where(.concentric-p-6) .concentric-p-1:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 7);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-1\.5) .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-5) .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-6) .concentric-p-1\.5:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 7.5);
+  }
+  [class*="concentric-p-"]:has(
+    .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-2) .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-3) .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-4) .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-5) .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-6) .concentric-p-2:not([popover], [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 8);
   }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-0\.5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-0\.5) .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-6) .concentric-p-2\.5:not([popover], [popover] *),
+    :where(.concentric-p-8) .concentric-p-0\.5:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 8.5);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-1) .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-3) .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-4) .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-5) .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-6) .concentric-p-3:not([popover], [popover] *),
+    :where(.concentric-p-8) .concentric-p-1:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 9);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-1\.5) .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-8) .concentric-p-1\.5:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 9.5);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-2) .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-4) .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-5) .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-6) .concentric-p-4:not([popover], [popover] *),
+    :where(.concentric-p-8) .concentric-p-2:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 10);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-2\.5) .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-8) .concentric-p-2\.5:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 10.5);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-3) .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-5) .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-6) .concentric-p-5:not([popover], [popover] *),
+    :where(.concentric-p-8) .concentric-p-3:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 11);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-4) .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-6) .concentric-p-6:not([popover], [popover] *),
+    :where(.concentric-p-8) .concentric-p-4:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 12);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-5) .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-8) .concentric-p-5:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 13);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-6) .concentric-p-8:not([popover], [popover] *),
+    :where(.concentric-p-8) .concentric-p-6:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 14);
+  }
+  [class*="concentric-p-"]:has(
+    :where(.concentric-p-8) .concentric-p-8:not([popover], [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 16);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 0.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 1);
   }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-1:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 1.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-0\.5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 2);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 2.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 3);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-1:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 3.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 4);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 4.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 5.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 6);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 6.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-1) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-2:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 7);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-1\.5) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 7.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-2:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 8);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-0\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 8.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-1) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-3:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-1:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 9);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-1\.5) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-1\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 9.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-2) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-4:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-2:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 10);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-2\.5) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-2\.5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 10.5);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-3) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-5:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-3:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 11);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-4) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-6:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-4:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 12);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-5) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-5:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 13);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-6) .concentric-p-8:not([popover] [popover], [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-6:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 14);
+  }
+  [class*="concentric-p-"]:is([popover], [popover] *):has(
+    :where(.concentric-p-8) .concentric-p-8:not([popover] [popover], [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 16);
+  }
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 0.5);
+  }
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
+    --ids-concentric-nested: calc(var(--spacing) * 1);
+  }
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 1.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-1\.5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 2);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-1:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 2);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-0\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 2);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-2:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 2.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-1\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 2.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-1:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 2.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-0\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 2.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-2\.5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-0\.5) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 3);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-2:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 3);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-1\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 3);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-1:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 3);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-0\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 3);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-3:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 3.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-2\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 3.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-2:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 3.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-1\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 3.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-1:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 3.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-0\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 3.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-3:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 4);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-2\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 4);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-2:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 4);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-1\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 4);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-1:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 4);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-4:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 4.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-3:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 4.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-2\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 4.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-2:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 4.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-1\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 4.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-0\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 4.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-4:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-3:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-2\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-2:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-1:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 5.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-4:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 5.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-3:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 5.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-2\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 5.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-1\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 5.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-0\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 5.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-5:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 6);
   }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-4:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 6);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-3:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 6);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-2:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 6);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-1:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 6);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-6:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-1\.5) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 6.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 6.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-4:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 6.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-2\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 6.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-1\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 6.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-0\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 6.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-6:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-1) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 7);
   }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 7);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-4:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 7);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-3:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 7);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-2:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 7);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-1:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 7);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-6:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-1\.5) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 7.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 7.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-2\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 7.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-1\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 7.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-6:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 8);
   }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 8);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-4:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 8);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-3:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 8);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-2:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 8);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-0\.5 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-0\.5) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-2\.5) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-0\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 8.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-6:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 8.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-2\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 8.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-0\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 8.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-1) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-3) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-1:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 9);
   }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-6:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 9);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 9);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-4:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 9);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-3:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 9);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-1:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 9);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-1\.5 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-1\.5) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-1\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 9.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-1\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 9.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-2) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-4) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-2:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 10);
   }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-6:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 10);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 10);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-4:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 10);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-2:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 10);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-2\.5 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-2\.5) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-2\.5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 10.5);
   }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-2\.5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 10.5);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-3 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-3) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-5) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-3:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 11);
   }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-6:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 11);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 11);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-3:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 11);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-4 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-4) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-6) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-4:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 12);
   }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-6:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 12);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-4:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 12);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-5 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-5) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-5:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 13);
   }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-5:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 13);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-6 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-6) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *),
+    :where(.concentric-p-8) .concentric-p-6:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 14);
   }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-6:not([popover], [popover] *)) {
-    --ids-concentric-nested: calc(var(--spacing) * 14);
-  }
-  [class*="concentric-p-"]:has(.concentric-p-8 .concentric-p-8:not([popover], [popover] *)) {
+  [class*="concentric-p-"]:is([popover] [popover], [popover] [popover] *):has(
+    :where(.concentric-p-8) .concentric-p-8:not([popover] [popover] [popover], [popover] [popover] [popover] *)
+  ) {
     --ids-concentric-nested: calc(var(--spacing) * 16);
   }
 }

@@ -209,8 +209,9 @@ A padded container (Card, Alert, Item, a popup) takes its padding from `concentr
 `p-*` plus `rounded-*`. The utility sets the padding and makes the corner the content's corner
 plus that padding, so a Card at `concentric-p-4` holding a Button is 26px around a 10px button.
 Nesting adds up: the utility detects nested `concentric-p-*` containers with `:has()` and sums
-their padding in, exact for two levels. Popovers are excluded because they are not visually
-nested in the element that contains them in the DOM.
+their padding in, exact for two levels, and the thickest chain wins. A popover is left out of the
+containers around it, because the top layer draws it apart from them, but containers inside a
+popover add up as they do on the page, down to an overlay inside an overlay.
 
 ```tsx
 root: 'concentric-p-4',        // padding 16px, radius 10 + 16 (+ nested padding)

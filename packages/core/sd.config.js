@@ -327,20 +327,38 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 
 const CONCENTRIC_PADS = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8];
 
-const concentricClass = (n) => `.concentric-p-${String(n).replace(".", "\\.")}`;
-const visuallyNested = (sel) => `${sel}:not([popover], [popover] *)`;
+const PAGE_OVERLAY_AND_OVERLAY_IN_OVERLAY = [0, 1, 2];
 
-const buildConcentricCSS = () => {
-  const oneLevelDeep = CONCENTRIC_PADS.map((a) => ({ sum: a, sel: visuallyNested(concentricClass(a)) }));
-  const twoLevelsDeep = CONCENTRIC_PADS.flatMap((a) =>
+const concentricClass = (n) => `.concentric-p-${String(n).replace(".", "\\.")}`;
+
+const withinPopovers = (depth) => {
+  const path = Array(depth).fill("[popover]").join(" ");
+  return `${path}, ${path} *`;
+};
+
+const nestedChains = [
+  ...CONCENTRIC_PADS.map((a) => ({ sum: a, sel: concentricClass(a) })),
+  ...CONCENTRIC_PADS.flatMap((a) =>
     CONCENTRIC_PADS.map((b) => ({
       sum: a + b,
-      sel: visuallyNested(`${concentricClass(a)} ${concentricClass(b)}`),
+      sel: `:where(${concentricClass(a)}) ${concentricClass(b)}`,
     })),
-  );
-  const rule = ({ sum, sel }) =>
-    `  [class*="concentric-p-"]:has(${sel}) {\n    --ids-concentric-nested: calc(var(--spacing) * ${sum});\n  }`;
-  const largestSumWins = (rules) => rules.sort((x, y) => x.sum - y.sum).map(rule);
+  ),
+];
+
+const nestedRulesAt = (depth) => {
+  const containerDepth = depth === 0 ? "" : `:is(${withinPopovers(depth)})`;
+  const notBehindAnotherPopover = `:not(${withinPopovers(depth + 1)})`;
+  const sums = [...new Set(nestedChains.map((c) => c.sum))].sort((x, y) => x - y);
+  return sums.map((sum) => {
+    const chains = nestedChains
+      .filter((c) => c.sum === sum)
+      .map((c) => `${c.sel}${notBehindAnotherPopover}`);
+    return `  [class*="concentric-p-"]${containerDepth}:has(\n    ${chains.join(",\n    ")}\n  ) {\n    --ids-concentric-nested: calc(var(--spacing) * ${sum});\n  }`;
+  });
+};
+
+const buildConcentricCSS = () => {
 
   return `@property --ids-concentric-pad {
   syntax: "<length>";
@@ -363,7 +381,7 @@ const buildConcentricCSS = () => {
 }
 
 @layer utilities {
-${[...largestSumWins(oneLevelDeep), ...largestSumWins(twoLevelsDeep)].join("\n")}
+${PAGE_OVERLAY_AND_OVERLAY_IN_OVERLAY.flatMap(nestedRulesAt).join("\n")}
 }
 `;
 };
