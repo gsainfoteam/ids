@@ -5,7 +5,16 @@ export type KbdLabel = keyof typeof messages.kbd;
 export type KbdLabels = Partial<Record<KbdLabel, string>>;
 
 type Face = { glyph: string; label: KbdLabel };
-type Spec = { apple: Face; other: Face; order?: Record<KbdPlatform, number> };
+type Spec = { apple: Face; other: Face };
+
+const MODIFIERS_IN_MENU_ORDER: Record<KbdPlatform, readonly string[]> = {
+  apple: ['ctrl', 'alt', 'shift', 'meta'],
+  other: ['meta', 'ctrl', 'alt', 'shift'],
+};
+
+const PLUS_BETWEEN_KEYS = /\+(?!$)/;
+const TINYKEYS_PREFIX = /^\$/;
+const EVENT_CODE = /^(?:Key([A-Z])|Digit([0-9]))$/;
 
 const same = (glyph: string, label: KbdLabel) => ({
   apple: { glyph, label },
@@ -16,22 +25,18 @@ const KEYS: Record<string, Spec> = {
   meta: {
     apple: { glyph: '⌘', label: 'command' },
     other: { glyph: 'Win', label: 'windows' },
-    order: { apple: 3, other: 0 },
   },
   ctrl: {
     apple: { glyph: '⌃', label: 'control' },
     other: { glyph: 'Ctrl', label: 'control' },
-    order: { apple: 0, other: 1 },
   },
   alt: {
     apple: { glyph: '⌥', label: 'option' },
     other: { glyph: 'Alt', label: 'alt' },
-    order: { apple: 1, other: 2 },
   },
   shift: {
     apple: { glyph: '⇧', label: 'shift' },
     other: { glyph: 'Shift', label: 'shift' },
-    order: { apple: 2, other: 3 },
   },
   enter: { apple: { glyph: '↩', label: 'return' }, other: { glyph: 'Enter', label: 'enter' } },
   backspace: {
@@ -112,14 +117,14 @@ const GLYPHS: Record<string, KbdLabel | Record<KbdPlatform, KbdLabel>> = {
 };
 
 export function parseKeys(keys: string | readonly string[]): string[] {
-  const tokens = typeof keys === 'string' ? keys.split(/\+(?!$)/) : [...keys];
+  const tokens = typeof keys === 'string' ? keys.split(PLUS_BETWEEN_KEYS) : [...keys];
   return tokens.map(normalizeKey).filter((token) => token !== '');
 }
 
 function normalizeKey(raw: string) {
-  const token = raw.trim().replace(/^\$/, '');
+  const token = raw.trim().replace(TINYKEYS_PREFIX, '');
   if (token === '') return raw === ' ' ? 'space' : '';
-  const code = /^(?:Key([A-Z])|Digit([0-9]))$/.exec(token);
+  const code = EVENT_CODE.exec(token);
   if (code) return code[1] ?? code[2] ?? token;
   const lower = token.toLowerCase();
   const name = ALIASES[lower] ?? lower;
@@ -139,7 +144,10 @@ export function resolveKey(token: string, platform: KbdPlatform): ResolvedKey {
 
 export function orderKeys(tokens: readonly string[], platform: KbdPlatform): ResolvedKey[] {
   const keys = tokens.map((token) => resolveKey(token, platform));
-  const rank = (key: ResolvedKey) => KEYS[key.id]?.order?.[platform] ?? Infinity;
+  const rank = (key: ResolvedKey) => {
+    const position = MODIFIERS_IN_MENU_ORDER[platform].indexOf(key.id);
+    return position === -1 ? Infinity : position;
+  };
   return keys
     .map((key, index) => ({ key, index }))
     .sort((a, b) => rank(a.key) - rank(b.key) || a.index - b.index)
