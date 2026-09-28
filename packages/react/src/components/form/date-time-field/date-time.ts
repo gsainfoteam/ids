@@ -21,10 +21,12 @@ export type DateTimeLimits = {
 export const serializeDateTime = (date: Date, precision: TimePrecision) =>
   `${dayKey(date)}T${timeKey(date, precision)}`;
 
+const ceilToWholeSecond = (date: Date) => startOfSecond(addMilliseconds(date, 999));
+
 export function dayBounds(day: Date, min?: Date, max?: Date): { min?: Date; max?: Date } | null {
   const start = startOfDay(day);
   if ((min && isBefore(start, startOfDay(min))) || (max && isAfter(start, max))) return null;
-  const lower = min && isSameDay(day, min) ? startOfSecond(addMilliseconds(min, 999)) : undefined;
+  const lower = min && isSameDay(day, min) ? ceilToWholeSecond(min) : undefined;
   if (lower && (!isSameDay(lower, day) || (max && isAfter(lower, max)))) return null;
   return { min: lower, max: max && isSameDay(day, max) ? max : undefined };
 }
@@ -42,7 +44,8 @@ export function dayUnavailable(day: Date, limits: DateTimeLimits): boolean {
   if (isBlocked(day, { disabled: limits.disabled })) return true;
   const bounds = dayBounds(day, limits.min, limits.max);
   if (!bounds) return true;
-  return bounds.min || bounds.max ? daySlots(day, limits).length === 0 : false;
+  const canRunOutOfSlots = !!(bounds.min || bounds.max);
+  return canRunOutOfSlots ? daySlots(day, limits).length === 0 : false;
 }
 
 export function onDay(day: Date, time: Date, limits: DateTimeLimits): Date | null {
