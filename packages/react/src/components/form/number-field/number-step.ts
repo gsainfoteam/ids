@@ -65,11 +65,19 @@ export function snapToStep(value: number, step: number, base: number, mode: Snap
   return fromDigits(atScale(b, scale) + k * size, scale);
 }
 
+function gridValueAtOrBelow(bound: number, step: number, base: number) {
+  const nearest = snapToStep(bound, step, base, 'nearest');
+  return nearest > bound ? snapToStep(bound, step, base, 'down') : nearest;
+}
+
+function gridValueAtOrAbove(bound: number, step: number, base: number) {
+  const nearest = snapToStep(bound, step, base, 'nearest');
+  return nearest < bound ? snapToStep(bound, step, base, 'up') : nearest;
+}
+
 export function clampToStep(value: number, step: number, base: number, min?: number, max?: number) {
   let next = snapToStep(value, step, base, 'nearest');
-  if (max !== undefined && next > max) next = snapToStep(max, step, base, 'nearest');
-  if (max !== undefined && next > max) next = snapToStep(max, step, base, 'down');
-  if (min !== undefined && next < min) next = snapToStep(min, step, base, 'nearest');
-  if (min !== undefined && next < min) next = snapToStep(min, step, base, 'up');
+  if (max !== undefined && next > max) next = gridValueAtOrBelow(max, step, base);
+  if (min !== undefined && next < min) next = gridValueAtOrAbove(min, step, base);
   return clamp(next, min ?? -Infinity, max ?? Infinity);
 }

@@ -225,11 +225,13 @@ export const WheelScrub: Story = {
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole('spinbutton', { name: '수량' });
     const wheel = (deltaY: number) =>
-      input.dispatchEvent(new WheelEvent('wheel', { deltaY, bubbles: true, cancelable: true }));
-    await expect(wheel(-100)).toBe(true);
+      input.dispatchEvent(new WheelEvent('wheel', { deltaY, bubbles: true, cancelable: true }))
+        ? 'page scrolls'
+        : 'field keeps the wheel';
+    await expect(wheel(-100)).toBe('page scrolls');
     await expect(input).toHaveValue('10');
     await userEvent.click(input);
-    await expect(wheel(-100)).toBe(false);
+    await expect(wheel(-100)).toBe('field keeps the wheel');
     wheel(-100);
     await waitFor(() => expect(input).toHaveValue('12'));
     wheel(100);
@@ -272,6 +274,8 @@ export const RangeValidity: Story = {
   },
 };
 
+const NO_BREAK_SPACE = '\u00a0';
+
 function FormatsExample() {
   const [currency, setCurrency] = useState<number | null>(1234.567);
   return (
@@ -305,16 +309,16 @@ export const LocaleFormats: Story = {
   play: async ({ canvas, userEvent }) => {
     const price = canvas.getByRole('spinbutton', { name: '금액' });
     const ratio = canvas.getByRole('spinbutton', { name: '비율' });
-    await expect(price).toHaveValue('1.234,57\u00a0€');
+    await expect(price).toHaveValue(`1.234,57${NO_BREAK_SPACE}€`);
     await userEvent.click(price);
-    await expect(price).toHaveValue('1.234,57\u00a0€');
+    await expect(price).toHaveValue(`1.234,57${NO_BREAK_SPACE}€`);
     await userEvent.clear(price);
     await userEvent.paste('2.345,67 €');
     await expect(price).toHaveValue('2.345,67 €');
     await userEvent.type(price, 'x');
     await expect(price).toHaveValue('2.345,67 €');
     await userEvent.click(ratio);
-    await expect(price).toHaveValue('2.345,67\u00a0€');
+    await expect(price).toHaveValue(`2.345,67${NO_BREAK_SPACE}€`);
     await expect(canvas.getByLabelText('금액 숫자')).toHaveTextContent('2345.67');
     await expect(ratio).toHaveValue('12.5%');
     await userEvent.clear(ratio);

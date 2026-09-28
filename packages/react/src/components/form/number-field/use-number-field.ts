@@ -21,7 +21,7 @@ import {
 import { NumberFormatter, NumberParser } from '@internationalized/number';
 import { clamp, noop } from 'es-toolkit';
 
-import { textAfterInput } from './number-input';
+import { predictTextAfterInput } from './number-input';
 import { addDecimal, clampToStep, isOnStep, shiftDecimal, snapToStep } from './number-step';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
@@ -45,9 +45,11 @@ export type NumberFieldInputProps = Omit<
   | 'style'
 >;
 
+type NotationsNumberParserCannotRead = 'notation' | 'compactDisplay';
+
 export type NumberFieldFormatOptions = Omit<
   Intl.NumberFormatOptions,
-  'notation' | 'compactDisplay'
+  NotationsNumberParserCannotRead
 >;
 
 export type UseNumberFieldOptions = {
@@ -71,17 +73,30 @@ export type UseNumberFieldOptions = {
 
 type Draft = { text: string; value: number | null; formatter: NumberFormatter };
 
-const DEFAULT_FORMAT: Intl.NumberFormatOptions = { maximumSignificantDigits: 21 };
+const UNROUNDED_FORMAT: Intl.NumberFormatOptions = { maximumSignificantDigits: 21 };
 
-const DIGIT = /[\p{Nd}\u3007\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d]/u;
+const DIGIT_IN_ANY_NUMBERING_SYSTEM =
+  /[\p{Nd}\u3007\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d]/u;
+
+const FOLD_FULL_WIDTH = 'NFKC';
 
 const FIRST_REPEAT_DELAY = 400;
+const REPEAT_DELAY = 120;
+const REPEAT_DELAY_SHRINK = 0.88;
+const MIN_REPEAT_DELAY = 30;
 
 function repeatDelay(count: number) {
-  return count === 0 ? FIRST_REPEAT_DELAY : Math.max(30, Math.round(120 * 0.88 ** count));
+  return count === 0
+    ? FIRST_REPEAT_DELAY
+    : Math.max(MIN_REPEAT_DELAY, Math.round(REPEAT_DELAY * REPEAT_DELAY_SHRINK ** count));
+}
+
+function captureReleaseOffButton(event: PointerEvent<HTMLButtonElement>) {
+  event.currentTarget.setPointerCapture?.(event.pointerId);
 }
 
 const subscribeToNothing = () => noop;
+const platformUnknownOnServer = () => false;
 function isAppleTouch() {
   const { userAgent, platform, maxTouchPoints } = navigator;
   return /iPad|iPhone|iPod/.test(userAgent) || (platform === 'MacIntel' && maxTouchPoints > 1);
@@ -139,8 +154,8 @@ export function useNumberField({
       'standard',
     'NumberField: formatOptions.notation must be "standard"; typed text in other notations cannot be parsed.',
   );
-  const snap = step !== undefined;
-  const base = min ?? 0;
+  const snapsToStepGrid = step !== undefined;
+  const stepGridBase = min ?? 0;
   const lower = min ?? -Infinity;
   const upper = max ?? Infinity;
 
@@ -161,35 +176,37 @@ export function useNumberField({
   });
   const [draft, setDraft] = useState<Draft | null>(null);
   const composing = useRef(false);
-  const formatKey = JSON.stringify(formatOptions ?? null);
+  const formatOptionsByValue = JSON.stringify(formatOptions ?? null);
   const { formatter, parser } = useMemo(() => {
-    const options: Intl.NumberFormatOptions = JSON.parse(formatKey) ?? DEFAULT_FORMAT;
+    const options: Intl.NumberFormatOptions = JSON.parse(formatOptionsByValue) ?? UNROUNDED_FORMAT;
     return {
       formatter: new NumberFormatter(locale, options),
       parser: new NumberParser(locale, options),
     };
-  }, [locale, formatKey]);
+  }, [locale, formatOptionsByValue]);
   const format = (next: number | null) => (next == null ? '' : formatter.format(next));
-  const display =
-    draft && Object.is(draft.value, current) && draft.formatter === formatter
-      ? draft.text
-      : format(current);
+  const draftStillMeansValue =
+    draft !== null && Object.is(draft.value, current) && draft.formatter === formatter;
+  const display = draftStillMeansValue ? draft.text : format(current);
 
-  const latestValue = useRef(current);
+  const valueAheadOfRender = useRef(current);
   useLayoutEffect(() => {
-    latestValue.current = current;
+    valueAheadOfRender.current = current;
   });
 
   const fit = (next: number) =>
-    snap ? clampToStep(next, stepSize, base, min, max) : clamp(next, lower, upper);
+    snapsToStepGrid
+      ? clampToStep(next, stepSize, stepGridBase, min, max)
+      : clamp(next, lower, upper);
 
   const read = (text: string) => {
-    if (!DIGIT.test(text)) return null;
+    const noDigitYet = !DIGIT_IN_ANY_NUMBERING_SYSTEM.test(text);
+    if (noDigitYet) return null;
     const parsed = parser.parse(text);
     return Number.isNaN(parsed) ? null : Object.is(parsed, -0) ? 0 : parsed;
   };
 
-  const accept = (text: string) => {
+  const acceptPartialNumber = (text: string) => {
     if (!parser.isValidPartialNumber(text, min, max)) return false;
     const next = read(text);
     setDraft({ text, value: next, formatter });
@@ -201,31 +218,35 @@ export function useNumberField({
     if (!draft) return;
     setDraft(null);
     const text = inputRef.current?.value ?? draft.text;
-    if (!parser.isValidPartialNumber(text, min, max)) return;
+    const unfinishedComposition = !parser.isValidPartialNumber(text, min, max);
+    if (unfinishedComposition) return;
     const next = read(text);
     setCurrent(next == null ? null : fit(next));
   };
 
   const stepBy = (direction: 1 | -1, amount: number) => {
     if (locked) return false;
-    const previous = latestValue.current;
+    const previous = valueAheadOfRender.current;
     const from = previous ?? clamp(0, lower, upper);
-    let next =
-      previous == null && from !== 0
-        ? from
-        : snap && !isOnStep(from, stepSize, base)
-          ? snapToStep(from, stepSize, base, direction > 0 ? 'up' : 'down')
-          : addDecimal(from, direction * amount);
+    const startsAtNearestBound = previous == null && from !== 0;
+    const offStepGrid = snapsToStepGrid && !isOnStep(from, stepSize, stepGridBase);
+    let next = startsAtNearestBound
+      ? from
+      : offStepGrid
+        ? snapToStep(from, stepSize, stepGridBase, direction > 0 ? 'up' : 'down')
+        : addDecimal(from, direction * amount);
     if ((min !== undefined && next < min) || (max !== undefined && next > max))
-      next = snap ? clampToStep(next, stepSize, base, min, max) : clamp(next, lower, upper);
+      next = snapsToStepGrid
+        ? clampToStep(next, stepSize, stepGridBase, min, max)
+        : clamp(next, lower, upper);
     if (!Number.isFinite(next)) return false;
     setDraft(null);
     setCurrent(next);
-    latestValue.current = next;
+    valueAheadOfRender.current = next;
     return !Object.is(next, previous);
   };
 
-  const jumpTo = (bound: number | undefined) => {
+  const jumpToBound = (bound: number | undefined) => {
     if (locked || bound === undefined) return false;
     setDraft(null);
     setCurrent(bound);
@@ -240,7 +261,7 @@ export function useNumberField({
   });
 
   const repeat = useRef<{ timer: number } | null>(null);
-  const pointerStep = useRef(false);
+  const pressAlreadyStepped = useRef(false);
   const stopRepeat = () => {
     if (repeat.current) window.clearTimeout(repeat.current.timer);
     repeat.current = null;
@@ -263,32 +284,32 @@ export function useNumberField({
   useEffect(() => {
     const input = inputRef.current;
     if (!input) return;
-    const onBeforeInput = (event: InputEvent) => {
+    const refuseWithCaretInPlace = (event: InputEvent) => {
       if (event.isComposing || !event.cancelable) return;
-      const next = textAfterInput(
+      const predicted = predictTextAfterInput(
         input.value,
         input.selectionStart ?? input.value.length,
         input.selectionEnd ?? input.value.length,
         event.inputType,
         event.data ?? event.dataTransfer?.getData('text/plain') ?? null,
       );
-      if (next != null && latest.current.refuses(next)) event.preventDefault();
+      if (predicted != null && latest.current.refuses(predicted)) event.preventDefault();
     };
-    input.addEventListener('beforeinput', onBeforeInput);
-    return () => input.removeEventListener('beforeinput', onBeforeInput);
+    input.addEventListener('beforeinput', refuseWithCaretInPlace);
+    return () => input.removeEventListener('beforeinput', refuseWithCaretInPlace);
   }, []);
 
   useEffect(() => {
     const input = inputRef.current;
     if (!input || !allowWheelScrub) return;
-    const onWheel = (event: WheelEvent) => {
+    const scrubInsteadOfScrolling = (event: WheelEvent) => {
       if (input.ownerDocument.activeElement !== input || event.ctrlKey || event.metaKey) return;
       if (Math.abs(event.deltaY) < Math.abs(event.deltaX) || event.deltaY === 0) return;
       event.preventDefault();
       latest.current.stepBy(event.deltaY < 0 ? 1 : -1, event.shiftKey ? large : stepSize);
     };
-    input.addEventListener('wheel', onWheel, { passive: false });
-    return () => input.removeEventListener('wheel', onWheel);
+    input.addEventListener('wheel', scrubInsteadOfScrolling, { passive: false });
+    return () => input.removeEventListener('wheel', scrubInsteadOfScrolling);
   }, [allowWheelScrub, large, stepSize]);
 
   useFormReset(inputRef, () => {
@@ -310,14 +331,18 @@ export function useNumberField({
     notify?.();
   }, [rangeMessage, current, notify]);
 
-  const appleTouch = useSyncExternalStore(subscribeToNothing, isAppleTouch, () => false);
+  const numericKeypadLacksMinus = useSyncExternalStore(
+    subscribeToNothing,
+    isAppleTouch,
+    platformUnknownOnServer,
+  );
   const acceptsNegative = min === undefined || min < 0;
   const acceptsFraction =
     formatOptions?.maximumFractionDigits !== 0 &&
-    !(snap && Number.isInteger(stepSize) && Number.isInteger(base));
+    !(snapsToStepGrid && Number.isInteger(stepSize) && Number.isInteger(stepGridBase));
   const inputMode =
     native.inputMode ??
-    (acceptsNegative && appleTouch ? 'text' : acceptsFraction ? 'decimal' : 'numeric');
+    (acceptsNegative && numericKeypadLacksMinus ? 'text' : acceptsFraction ? 'decimal' : 'numeric');
 
   const control = useTextControl({ inputRef, disabled, readOnly, clearable });
   const ref = useMergedRef(inputRef, childProps?.ref, rootProps.ref, own.ref, assertInput);
@@ -357,7 +382,7 @@ export function useNumberField({
         setDraft({ text: event.target.value, value: current, formatter });
         return;
       }
-      accept(event.target.value);
+      acceptPartialNumber(event.target.value);
     },
     onCompositionStart: (event: CompositionEvent<HTMLInputElement>) => {
       composing.current = true;
@@ -365,7 +390,8 @@ export function useNumberField({
     },
     onCompositionEnd: (event: CompositionEvent<HTMLInputElement>) => {
       composing.current = false;
-      if (!locked && !accept(event.currentTarget.value.normalize('NFKC'))) setDraft(null);
+      if (!locked && !acceptPartialNumber(event.currentTarget.value.normalize(FOLD_FULL_WIDTH)))
+        setDraft(null);
       native.onCompositionEnd?.(event);
     },
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
@@ -385,7 +411,7 @@ export function useNumberField({
         event.preventDefault();
         stepBy(key === 'PageUp' ? 1 : -1, large);
       } else if (key === 'Home' || key === 'End') {
-        if (jumpTo(key === 'Home' ? min : max)) event.preventDefault();
+        if (jumpToBound(key === 'Home' ? min : max)) event.preventDefault();
       } else if (key === 'Enter') {
         commitDraft();
       }
@@ -395,12 +421,13 @@ export function useNumberField({
   const stepperProps = (direction: 1 | -1) => ({
     onPointerDown: (event: PointerEvent<HTMLButtonElement>) => {
       if (event.button !== 0 || locked) return;
-      if (event.pointerType === 'mouse') {
+      const focusWouldOpenOnScreenKeyboard = event.pointerType !== 'mouse';
+      if (!focusWouldOpenOnScreenKeyboard) {
         event.preventDefault();
         inputRef.current?.focus({ preventScroll: true });
       }
-      event.currentTarget.setPointerCapture?.(event.pointerId);
-      pointerStep.current = true;
+      captureReleaseOffButton(event);
+      pressAlreadyStepped.current = true;
       startRepeat(direction);
     },
     onPointerUp: stopRepeat,
@@ -408,8 +435,8 @@ export function useNumberField({
     onLostPointerCapture: stopRepeat,
     onContextMenu: (event: MouseEvent<HTMLButtonElement>) => event.preventDefault(),
     onClick: () => {
-      if (pointerStep.current) {
-        pointerStep.current = false;
+      if (pressAlreadyStepped.current) {
+        pressAlreadyStepped.current = false;
         return;
       }
       stepBy(direction, stepSize);
@@ -422,7 +449,7 @@ export function useNumberField({
     clear: control.clear,
     stepperProps,
     value: current,
-    name: native.name,
+    hiddenInputName: native.name,
     form: native.form,
     canIncrease: current == null || current < upper,
     canDecrease: current == null || current > lower,
