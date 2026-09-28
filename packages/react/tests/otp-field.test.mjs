@@ -82,6 +82,8 @@ function tracked(props = {}) {
   };
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: one real input carries the name, label, description, validation and autofill hints', () => {
   const doc = new JSDOM(
     renderToString(
@@ -303,6 +305,7 @@ test('native form reset restores the default, FormData holds one entry', async (
   assert.deepEqual([...new window.FormData(form)], [['pin', '1234']]);
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(field().value, '12');

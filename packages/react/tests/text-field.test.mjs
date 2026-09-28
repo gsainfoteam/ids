@@ -50,6 +50,8 @@ async function input(value) {
   });
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('Input values win over root values, but root and Input handlers both run', async () => {
   const changes = [];
   await render(
@@ -254,6 +256,7 @@ test('native form reset hides Clear again', async () => {
   assert.ok(clearButton());
   await act(async () => {
     host.querySelector('form').reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(control().value, '');

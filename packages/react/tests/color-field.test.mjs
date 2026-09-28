@@ -89,6 +89,8 @@ function tracked(props = {}, ...children) {
   };
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: the value is written in the field format, and the trigger reads label and value', () => {
   for (const [value, format, alpha, expected] of [
     ['#f00', 'hex', true, '#FF0000FF'],
@@ -284,9 +286,15 @@ test('required is enforced natively, empty is not submitted, reset restores the 
   assert.equal(form.checkValidity(), true);
   assert.deepEqual([...new window.FormData(form)], [['color', '#00FF00']]);
   form.addEventListener('reset', (event) => event.preventDefault(), { once: true });
-  await act(async () => form.reset());
+  await act(async () => {
+    form.reset();
+    await resetSettles();
+  });
   assert.deepEqual([...new window.FormData(form)], [['color', '#00FF00']], 'a prevented reset');
-  await act(async () => form.reset());
+  await act(async () => {
+    form.reset();
+    await resetSettles();
+  });
   assert.deepEqual([...new window.FormData(form)], []);
   assert.equal(dialog(), null, 'reset closes the popup');
 });

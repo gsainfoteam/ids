@@ -51,6 +51,8 @@ async function click(score) {
   await act(async () => radio(score).click());
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('half-step SSR: one tabbable option, the Field label and id stay on the group', () => {
   const doc = new JSDOM(
     renderToString(
@@ -198,6 +200,7 @@ test('form: a hidden input only with a name and a score, required, reset without
   assert.deepEqual([...new dom.window.FormData(form)], [['score', '4']]);
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(checked(), 2);
@@ -209,6 +212,7 @@ test('form: a hidden input only with a name and a score, required, reset without
   await click(3);
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(checked(), 3, 'a cancelled reset changes nothing');

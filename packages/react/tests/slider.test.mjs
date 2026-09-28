@@ -85,6 +85,8 @@ async function pointer(type, { x = 0, y = 0, id = 1, button = 0 } = {}) {
   });
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: a single thumb carries the name and value, the root carries the Field id', () => {
   const doc = new JSDOM(
     renderToString(
@@ -368,6 +370,7 @@ test('controlled value, silent form reset and focus handed from the root to a th
   await key(thumbs()[0], 'End');
   await act(async () => {
     host.querySelector('form').reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.deepEqual(now(), [40]);

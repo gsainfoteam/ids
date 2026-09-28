@@ -55,6 +55,8 @@ const day = (n) => host.querySelector(`[data-calendar-day="2026-09-${n}"]`);
 const d = (day = 15, hour = 9, minute = 30, second = 0) =>
   new Date(2026, 8, day, hour, minute, second);
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR formatting, local serialization, Field ARIA and diagnostics for both clock fields', () => {
   for (const [Component, format, expected, model] of [
     [TimeField, 'HH:mm', '09:30', '09:30'],
@@ -124,10 +126,14 @@ test('both clock fields: prevented and real native reset, controlled empty, disa
     await key(column('hour'), 'Escape');
     const form = host.querySelector('form');
     form.addEventListener('reset', (e) => e.preventDefault(), { once: true });
-    await act(async () => form.reset());
+    await act(async () => {
+      form.reset();
+      await resetSettles();
+    });
     assert.match(host.querySelector('input[type=hidden]').value, /10:30/);
     await act(async () => {
       form.reset();
+      await resetSettles();
       await Promise.resolve();
     });
     assert.match(host.querySelector('input[type=hidden]').value, /09:30/);

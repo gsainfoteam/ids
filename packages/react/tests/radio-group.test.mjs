@@ -53,6 +53,8 @@ async function key(node, key, init = {}) {
   return event;
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: a radiogroup root labelled by Field, radios sharing one name and the group settings', () => {
   const doc = new JSDOM(
     renderToString(
@@ -256,6 +258,7 @@ test('native form: required, FormData, and reset back to defaultValue without a 
   assert.deepEqual([...new window.FormData(form)], [['plan', 'team']]);
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(stateOf('free'), 'checked');

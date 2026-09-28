@@ -60,6 +60,8 @@ async function input(value) {
   });
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: Field labels/descriptions target the native textarea, not the surface', () => {
   const markup = renderToString(
     h(
@@ -235,6 +237,7 @@ test('native form reset resizes after defaultValue is restored', async () => {
   assert.equal(control().style.height, '98px');
   await act(async () => {
     host.querySelector('form').reset();
+    await resetSettles();
     await new Promise((resolve) => setTimeout(resolve, 30));
   });
   assert.equal(control().value, 'initial');

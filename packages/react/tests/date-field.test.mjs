@@ -66,6 +66,8 @@ const keyOf = (date) =>
 
 const longDate = new Intl.DateTimeFormat('en-US', { dateStyle: 'long' });
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: date-fns patterns, format functions, Field labelling and ISO local-date FormData', () => {
   for (const [format, locale, expected] of [
     [undefined, undefined, '2026.09.15'],
@@ -260,10 +262,14 @@ test('native reset restores the default without reporting it, and a cancelled re
   assert.deepEqual(changes.map(keyOf), ['2026-09-18']);
   const form = host.querySelector('form');
   form.addEventListener('reset', (e) => e.preventDefault(), { once: true });
-  await act(async () => form.reset());
+  await act(async () => {
+    form.reset();
+    await resetSettles();
+  });
   assert.equal(formData().get('day'), '2026-09-18');
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(formData().get('day'), '2026-09-15');

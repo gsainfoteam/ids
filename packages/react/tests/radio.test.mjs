@@ -33,6 +33,8 @@ const radio = (value) => host.querySelector(`input[value="${value}"]`);
 const stateOf = (value) => radio(value).closest('[data-radio]').dataset.state;
 const click = (value) => act(async () => radio(value).click());
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: a native radio in a drawn circle, labelled by Field', () => {
   const doc = new JSDOM(
     renderToString(
@@ -88,6 +90,7 @@ test('uncontrolled radios sharing a name: choosing one un-marks its groupmate', 
   );
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(stateOf('a'), 'checked');

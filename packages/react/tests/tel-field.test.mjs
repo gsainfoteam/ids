@@ -46,6 +46,8 @@ async function type(node, value) {
   });
 }
 const input = () => host.querySelector('[type=tel]');
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR native input, Field label/ARIA and canonical FormData', () => {
   const doc = new JSDOM(
     renderToString(
@@ -236,7 +238,10 @@ test('CountrySelect emits international values, searches country, disables and r
   await act(() => host.querySelector('[role=option]').click());
   assert.equal(last, '+11012345678');
   assert.ok(host.querySelector('button').textContent.includes('US +1'));
-  await act(async () => host.querySelector('form').reset());
+  await act(async () => {
+    host.querySelector('form').reset();
+    await resetSettles();
+  });
   assert.equal(input().value, '');
   assert.ok(host.querySelector('button').textContent.includes('KR +82'));
   await render(view(true));

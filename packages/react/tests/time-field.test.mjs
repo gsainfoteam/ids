@@ -56,6 +56,8 @@ const clear = () => host.querySelector('[data-temporal-clear]');
 const d = (day = 15, hour = 9, minute = 30, second = 0) =>
   new Date(2026, 8, day, hour, minute, second);
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: display follows format, hourCycle and the date-fns locale; FormData follows precision', () => {
   const html = (props) =>
     new JSDOM(renderToString(h('form', null, h(TimeField, { name: 'at', ...props })))).window
@@ -201,6 +203,7 @@ test('required and native reset go through the hidden form value', async () => {
   assert.equal(new window.FormData(form).get('at'), '07:00');
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(new window.FormData(form).get('at'), null);

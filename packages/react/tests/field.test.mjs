@@ -47,6 +47,8 @@ const fieldRoot = () => host.querySelector('[data-field]');
 const has = (node, name) => node.hasAttribute(`data-${name}`);
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR wires generated IDs immediately, without effects', () => {
   const markup = renderToString(
     h(
@@ -715,6 +717,7 @@ test('native form reset clears touched, dirty and the shown error', async () => 
   assert.ok(has(fieldRoot(), 'dirty') && has(fieldRoot(), 'touched'));
   await act(async () => {
     host.querySelector('form').reset();
+    await resetSettles();
     await settle();
   });
   assert.equal(control().value, '');

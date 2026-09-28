@@ -33,6 +33,8 @@ const input = (index = 0) => host.querySelectorAll('input[type=checkbox]')[index
 const box = (index = 0) => input(index).closest('[data-checkbox]');
 const click = (node = input()) => act(async () => node.click());
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: one native checkbox carries the form and ARIA props, the box carries the state', () => {
   const doc = new JSDOM(
     renderToString(
@@ -193,6 +195,7 @@ test('form reset: uncontrolled returns to defaultChecked, controlled keeps its p
   );
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(box(0).dataset.state, 'indeterminate');

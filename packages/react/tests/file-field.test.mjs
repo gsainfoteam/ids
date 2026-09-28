@@ -107,6 +107,8 @@ function stubObjectUrls() {
   return { created, revoked };
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: labels, native picker attributes, button semantics, validator and diagnostics', () => {
   const doc = new JSDOM(
     renderToString(
@@ -407,11 +409,13 @@ test('required is enforced natively; reset, prevented reset, read-only and disab
   host.querySelector('form').addEventListener('reset', (e) => e.preventDefault(), { once: true });
   await act(async () => {
     host.querySelector('form').reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(formData().get('resume').name, 'other.pdf');
   await act(async () => {
     host.querySelector('form').reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(formData().get('resume').name, 'initial.pdf');

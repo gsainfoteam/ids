@@ -36,6 +36,8 @@ const box = (value) => host.querySelector(`input[value="${value}"]`);
 const all = () => host.querySelector('input:not([value])');
 const click = (node) => act(async () => node.click());
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: a labelled group of native checkboxes sharing one name', () => {
   const doc = new JSDOM(
     renderToString(
@@ -177,6 +179,7 @@ test('required means at least one, with its own message, and reset restores the 
   assert.equal(host.querySelector('form').checkValidity(), false);
   await act(async () => {
     host.querySelector('form').reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(box('ts').checked, true);

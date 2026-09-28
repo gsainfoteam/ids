@@ -97,6 +97,8 @@ function tracked(props = {}, children = items()) {
   };
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: Field labelling, size, invalid, one hidden input per value and diagnostics', () => {
   const doc = new JSDOM(
     renderToString(
@@ -240,6 +242,7 @@ test('search, live empty state, multiple toggles in list order, outside dismissa
   assert.equal(listbox(), null);
   await act(async () => {
     host.querySelector('form').reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.deepEqual(

@@ -104,6 +104,8 @@ function tracked(props = {}, children = items()) {
   };
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: Field labelling, one hidden input per chip, required validator, no nested buttons', () => {
   const doc = new JSDOM(
     renderToString(
@@ -328,12 +330,14 @@ test('required is enforced natively; reset, prevented reset, read-only and disab
   form.addEventListener('reset', (event) => event.preventDefault(), { once: true });
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(host.querySelector('[type=hidden]'), null, 'a prevented reset changes nothing');
   await type(trigger(), 'half typed');
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(host.querySelector('[type=hidden]').value, 'js');

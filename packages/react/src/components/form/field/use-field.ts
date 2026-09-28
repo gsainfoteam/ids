@@ -89,7 +89,7 @@ export function useField({ dirty: dirtyProp, touched: touchedProp }: UseFieldOpt
       }, 0);
     };
     const onReset = (event: Event) =>
-      queueMicrotask(() => {
+      view.setTimeout(() => {
         if (!mounted || event.defaultPrevented) return;
         setTouched(false);
         errorShowing.current = false;

@@ -61,6 +61,8 @@ function group(props, values = ['a', 'b', 'c'], itemProps = {}) {
   );
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: a single group is a named radiogroup; every item stays tabbable until measured', () => {
   const doc = new JSDOM(renderToString(group({ defaultValue: 'b', name: 'pick' }))).window.document;
   const radiogroup = doc.querySelector('[role="radiogroup"]');
@@ -232,6 +234,7 @@ test('form: one entry per pressed value, a required validator, and reset to the 
   assert.equal(host.querySelector('[data-form-value-validator]').checkValidity(), true);
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   const reset = new FormData(form);

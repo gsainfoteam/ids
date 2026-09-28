@@ -99,6 +99,8 @@ function controlled(props = {}) {
   return { node: h(App), value: () => current, set: (value) => set(value), changes };
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR Field wiring, formatted ARIA, and canonical native FormData', () => {
   const markup = renderToString(
     h(
@@ -445,14 +447,20 @@ test('native reset restores uncontrolled value and FormData, canceled reset pres
   await focus();
   await type('8');
   assert.equal(hidden().value, '8');
-  await act(async () => host.querySelector('form').reset());
+  await act(async () => {
+    host.querySelector('form').reset();
+    await resetSettles();
+  });
   assert.equal(input().value, '5');
   assert.equal(hidden().value, '5');
   await type('9');
   host
     .querySelector('form')
     .addEventListener('reset', (event) => event.preventDefault(), { once: true });
-  await act(async () => host.querySelector('form').reset());
+  await act(async () => {
+    host.querySelector('form').reset();
+    await resetSettles();
+  });
   assert.equal(input().value, '9');
 });
 test('Zod + RHF value adapter: number/null validation, focus, numeric submit, setValue/reset and disabled omission', async () => {

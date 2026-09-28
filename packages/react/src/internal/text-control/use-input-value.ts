@@ -38,12 +38,13 @@ export function useInputValue(
     const node = ref.current;
     if (!node) return;
     let alive = true;
-    const syncOnceSettled = () =>
-      queueMicrotask(() => {
-        if (!alive) return;
-        sync();
-        external.current?.();
-      });
+    const syncAndReport = () => {
+      if (!alive) return;
+      sync();
+      external.current?.();
+    };
+    const syncOnceSettled = () => queueMicrotask(syncAndReport);
+    const syncAfterBrowserRestoresValues = () => setTimeout(syncAndReport);
 
     const { own: reactValueTracker, base } = valueDescriptor(node);
     const wrapped = Boolean(base?.get && base.set);
@@ -64,13 +65,13 @@ export function useInputValue(
     node.addEventListener('input', sync);
     node.addEventListener('change', sync);
     const form = node.form;
-    form?.addEventListener('reset', syncOnceSettled);
+    form?.addEventListener('reset', syncAfterBrowserRestoresValues);
 
     return () => {
       alive = false;
       node.removeEventListener('input', sync);
       node.removeEventListener('change', sync);
-      form?.removeEventListener('reset', syncOnceSettled);
+      form?.removeEventListener('reset', syncAfterBrowserRestoresValues);
       if (!wrapped) return;
       if (reactValueTracker) Object.defineProperty(node, 'value', reactValueTracker);
       else Reflect.deleteProperty(node, 'value');

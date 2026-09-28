@@ -34,6 +34,8 @@ const track = () => host.querySelector('[data-switch]');
 const thumb = () => track().querySelector('[aria-hidden=true]');
 const click = () => act(async () => input().click());
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR: a native checkbox with role="switch", labelled by Field, className on the track', () => {
   const doc = new JSDOM(
     renderToString(
@@ -114,6 +116,7 @@ test('native form: name/value submit only when on, reset returns to defaultCheck
   assert.deepEqual([...new window.FormData(form)], []);
   await act(async () => {
     form.reset();
+    await resetSettles();
     await Promise.resolve();
   });
   assert.equal(track().dataset.state, 'checked');

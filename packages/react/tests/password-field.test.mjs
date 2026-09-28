@@ -54,6 +54,8 @@ async function click(pointer = true) {
   );
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR native password, inferred/explicit autocomplete, Field label/ARIA and successful FormData', () => {
   const doc = new JSDOM(
     renderToString(
@@ -258,10 +260,16 @@ test('native reset restores uncontrolled value and masks it; canceled reset pres
   await type('edited');
   await click();
   host.querySelector('form').addEventListener('reset', (e) => e.preventDefault(), { once: true });
-  await act(async () => host.querySelector('form').reset());
+  await act(async () => {
+    host.querySelector('form').reset();
+    await resetSettles();
+  });
   assert.equal(input().value, 'edited');
   assert.equal(input().type, 'text');
-  await act(async () => host.querySelector('form').reset());
+  await act(async () => {
+    host.querySelector('form').reset();
+    await resetSettles();
+  });
   assert.equal(input().value, 'initial');
   assert.equal(input().type, 'password');
 });

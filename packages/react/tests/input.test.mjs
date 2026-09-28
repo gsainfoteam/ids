@@ -46,6 +46,8 @@ async function click(selector) {
   await act(async () => host.querySelector(selector).click());
 }
 
+const resetSettles = () => new Promise((resolve) => setTimeout(resolve));
+
 test('SSR dispatch preserves native types, Field labels, sizes, invalid state and number semantics', () => {
   for (const type of ['text', 'email', 'url', 'search', 'number', 'password', 'tel']) {
     const markup = renderToString(
@@ -90,7 +92,10 @@ test('uncontrolled search clear emits one native change, retains focus and suppo
   assert.equal(input().value, '');
   assert.deepEqual(values, [['', 'q', 'change']]);
   assert.equal(document.activeElement, input());
-  await act(async () => host.querySelector('form').reset());
+  await act(async () => {
+    host.querySelector('form').reset();
+    await resetSettles();
+  });
   assert.equal(input().value, 'IDS');
   await type(input(), 'again');
   assert.equal(input().value, 'again');
