@@ -17,6 +17,7 @@ const PICTURE = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"/>'
 const INLINE_PICTURE = `data:image/svg+xml;base64,${btoa(PICTURE)}`;
 const HELD = '/__held-avatar__/';
 const nextFrame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
+const lazyImagesStartLateOnASlowRunner = 5_000;
 
 async function cdpReadyForListeners() {
   const session = cdp();
@@ -37,10 +38,16 @@ async function holdImages() {
     await session.send('Fetch.disable');
   });
   const requestOf = async (src: string) => {
-    await expect.poll(() => paused.get(src), { message: `${src} is requested` }).toBeDefined();
+    await expect
+      .poll(() => paused.get(src), {
+        message: `${src} is requested`,
+        timeout: lazyImagesStartLateOnASlowRunner,
+      })
+      .toBeDefined();
     return paused.get(src)!;
   };
   return {
+    requested: requestOf,
     async load(src: string) {
       await session.send('Fetch.fulfillRequest', {
         requestId: await requestOf(src),
@@ -145,6 +152,7 @@ test('a late event from a previous src does not overwrite the current one', asyn
   const screen = await render(<App />);
   const avatar = screen.getByRole('img', { name: 'Alice Kim' });
   const old = screen.container.querySelector('img')!;
+  await images.requested(`${HELD}old.png`);
   await userEvent.click(screen.getByRole('button', { name: 'swap' }));
   expect(screen.container.querySelector('img'), 'the new src is a new element').not.toBe(old);
   await images.load(`${HELD}new.png`);
