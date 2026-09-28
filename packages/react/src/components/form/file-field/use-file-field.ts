@@ -131,7 +131,7 @@ export function useFileField({
   }, [files, name, form]);
 
   useFormReset(pickerRef, () => {
-    setValue(defaultValue ?? empty);
+    setValue(defaultValue ?? empty, { silent: true });
     setRejections([]);
     setDragging(false);
     dragDepth.current = 0;
