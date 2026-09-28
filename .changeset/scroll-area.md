@@ -1,6 +1,6 @@
 ---
-'@gsainfoteam/ids-react': minor
-'@gsainfoteam/ids-css': minor
+"@gsainfoteam/ids-react": minor
+"@gsainfoteam/ids-css": minor
 ---
 
 Adds `ScrollArea`, an overlay scrollbar over native scrolling. The OS bar is hidden and an IDS bar
@@ -8,8 +8,9 @@ is drawn over the content without taking width: `variant` `hover` (default, whil
 scrolled or dragged) / `auto` (on overflow) / `always` (with its track), `size` `standard` (8px) /
 `tiny` (6px), `orientation` `vertical` / `horizontal` / `both`, and `asChild`. Parts
 `ScrollArea.Viewport` (`asChild` lets a listbox be the scroller), `Scrollbar`, `Thumb` and
-`Corner`; a Scrollbar declared before the content sits on the opposite edge, and an orientation
-not declared gets a default bar. Dragging the thumb scrolls, pressing the track pages toward the
+`Corner`; a Scrollbar declared before the content sits on the opposite edge. Without
+`orientation` the declared Scrollbars decide the directions; with it, an orientation not declared
+gets a default bar. Dragging the thumb scrolls, pressing the track pages toward the
 pointer, the bar ends stay clear of the root's rounded corners, RTL puts the vertical bar on the
 left, and a viewport with no focusable content becomes a tab stop when it overflows. States are
 `data-overflow-x/y`, `data-hovering`, `data-scrolling`, `data-dragging` and `data-visible`.

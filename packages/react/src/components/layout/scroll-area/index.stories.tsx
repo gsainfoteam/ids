@@ -145,14 +145,14 @@ export const Gallery: Story = {
         description="내용 뒤에 선언한 막대는 기본 자리(끝, 아래), 앞에 선언한 막대는 반대편(시작, 위)에 섭니다."
       >
         <Showcase.Row label="after">
-          <ScrollArea variant="always" orientation="both" className={frame}>
+          <ScrollArea variant="always" className={frame}>
             <Grid />
             <ScrollArea.Scrollbar orientation="vertical" />
             <ScrollArea.Scrollbar orientation="horizontal" />
           </ScrollArea>
         </Showcase.Row>
         <Showcase.Row label="before">
-          <ScrollArea variant="always" orientation="both" className={frame}>
+          <ScrollArea variant="always" className={frame}>
             <ScrollArea.Scrollbar orientation="vertical" />
             <ScrollArea.Scrollbar orientation="horizontal" />
             <Grid />
@@ -231,7 +231,7 @@ export const KeyboardScrolling: Story = {
 
 export const DeclarationOrder: Story = {
   render: () => (
-    <ScrollArea variant="always" orientation="both" className={frame}>
+    <ScrollArea variant="always" className={frame}>
       <ScrollArea.Scrollbar orientation="vertical" />
       <Grid />
       <ScrollArea.Scrollbar orientation="horizontal" />
@@ -241,7 +241,7 @@ export const DeclarationOrder: Story = {
     docs: {
       description: {
         story:
-          '세로 막대를 내용 앞에 선언해 시작 쪽(왼쪽)에 두고, 가로 막대는 뒤에 선언해 아래에 둡니다. 선언하지 않은 방향은 기본 막대가 붙습니다.',
+          '세로 막대를 내용 앞에 선언해 시작 쪽(왼쪽)에 두고, 가로 막대는 뒤에 선언해 아래에 둡니다. 두 막대를 선언했으니 root 에 orientation 을 주지 않아도 두 방향으로 스크롤합니다.',
       },
     },
   },

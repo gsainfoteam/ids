@@ -60,7 +60,7 @@ const isType =
   (node: ReactNode): node is ReactElement<P> =>
     isValidElement(node) && node.type === type;
 
-function arrange(children: ReactNode, orientation: ScrollArea.Orientation) {
+function arrange(children: ReactNode, orientation: ScrollArea.Orientation | undefined) {
   const nodes = flattenFragments(children);
   const isBar = isType<ScrollArea.ScrollbarProps>(ScrollAreaScrollbar);
   const isCorner = isType<ScrollArea.CornerProps>(ScrollAreaCorner);
@@ -79,7 +79,10 @@ function arrange(children: ReactNode, orientation: ScrollArea.Orientation) {
     axis: axisOf(node.props.orientation),
     placement: nodes.indexOf(node) < contentAt ? 'start' : 'end',
   }));
-  const missing: DeclaredBar[] = AXES[orientation]
+  const barsDeclaredOnly = orientation === undefined && declared.length > 0;
+  const wanted = barsDeclaredOnly ? [] : AXES[orientation ?? 'vertical'];
+
+  const missing: DeclaredBar[] = wanted
     .filter((axis) => !declared.some((bar) => bar.axis === axis))
     .map((axis) => ({
       node: <ScrollAreaScrollbar key={`scrollbar-${axis}`} orientation={orientationOf(axis)} />,
@@ -108,7 +111,7 @@ function arrange(children: ReactNode, orientation: ScrollArea.Orientation) {
 export function ScrollArea({
   variant = 'hover',
   size = 'standard',
-  orientation = 'vertical',
+  orientation,
   asChild = false,
   className,
   style,
@@ -134,17 +137,18 @@ export function ScrollArea({
       );
   }, [repeated]);
 
+  const scrolls = scrollsAlong(layout.axes);
+
   const state: ScrollArea.State = {
     variant,
     size,
-    orientation,
+    orientation: scrolls,
     overflowX: area.overflow.x,
     overflowY: area.overflow.y,
     hovering: area.hovering,
     scrolling: area.scrolling,
     dragging: area.dragging !== null,
   };
-  const scrolls = scrollsAlong(layout.axes);
   const styles = ScrollArea.Style({ size });
 
   const placeBar = (bar: DeclaredBar) => (
@@ -169,7 +173,7 @@ export function ScrollArea({
     'data-scroll-area': '',
     'data-variant': variant,
     'data-size': size,
-    'data-orientation': orientation,
+    'data-orientation': scrolls,
     'data-overflow-x': state.overflowX ? '' : undefined,
     'data-overflow-y': state.overflowY ? '' : undefined,
     'data-hovering': state.hovering ? '' : undefined,

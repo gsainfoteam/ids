@@ -36,18 +36,20 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 <ScrollArea size="standard" />          // 8px (기본)
 <ScrollArea size="tiny" />              // 6px
 
-<ScrollArea orientation="vertical" />   // 기본
+<ScrollArea orientation="vertical" />   // 막대를 선언하지 않았을 때의 기본
 <ScrollArea orientation="horizontal" />
 <ScrollArea orientation="both" />       // 두 막대와 Corner
 ```
 
+- `Scrollbar` 를 선언했으면 `orientation` 은 적지 않아도 됩니다. 선언한 막대의 방향이 곧 스크롤 방향입니다. 가로 막대만 선언하면 `horizontal`, 둘 다 선언하면 `both` 입니다.
+- `orientation` 을 적으면 선언하지 않은 방향에 기본 막대를 채웁니다. `orientation="both"` 에 세로 막대만 선언하면 가로는 기본 막대입니다.
 - 두께는 root 의 `--scroll-area-thickness`, 옆 간격은 `--scroll-area-gap` 입니다. `className="[--scroll-area-thickness:4px]"` 로 바꿀 수 있습니다.
 - `orientation` 은 viewport 의 `overflow` 도 정합니다. `vertical` 은 가로를 잘라 냅니다(`overflow-x: hidden`).
 
 ## 파트와 자리
 
 ```tsx
-<ScrollArea orientation="both">
+<ScrollArea>
   <ScrollArea.Scrollbar orientation="vertical" />   {/* 내용 앞: 시작 쪽(LTR 왼쪽) */}
   <ScrollArea.Viewport>...</ScrollArea.Viewport>
   <ScrollArea.Scrollbar orientation="horizontal">   {/* 내용 뒤: 아래 */}
@@ -60,7 +62,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 | 파트        | 기본 / 동작                                                                  |
 | ----------- | ---------------------------------------------------------------------------- |
 | `Viewport`  | 스크롤하는 요소. 없으면 파트가 아닌 자식을 감싸 만든다                       |
-| `Scrollbar` | 막대(트랙). `orientation` 마다 하나. 선언하지 않은 방향은 기본 막대가 붙는다 |
+| `Scrollbar` | 막대(트랙). `orientation` 마다 하나. 선언한 방향으로 스크롤한다 |
 | `Thumb`     | 막대 안의 손잡이. 없으면 기본 thumb                                          |
 | `Corner`    | 두 막대가 만나는 칸. `both` 면 자동으로 붙는다                               |
 
@@ -148,7 +150,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 | --------------------- | ---------------------------------------- |
 | `variant`             | `hover`(기본) / `auto` / `always`        |
 | `size`                | `standard`(기본, 8px) / `tiny`(6px)      |
-| `orientation`         | `vertical`(기본) / `horizontal` / `both` |
+| `orientation`         | 선언한 막대의 방향, 없으면 `vertical` |
 | `asChild`             | 자식 요소 하나를 root 로 쓴다            |
 | `className` / `style` | 상태를 받는 함수도 된다                  |
 | 그 외 속성            | root 로 간다                             |

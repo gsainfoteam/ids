@@ -1,3 +1,5 @@
+import { type ReactElement } from 'react';
+
 import { renderToString } from 'react-dom/server';
 import { afterEach, expect, test, vi } from 'vitest';
 import { cdp, userEvent } from 'vitest/browser';
@@ -89,6 +91,51 @@ test('SSR: the viewport scrolls natively, with one default bar per orientation a
     ['horizontal', 'end', 'true'],
   ]);
   expect(root.querySelector('[data-scroll-area-corner]')!.hasAttribute('hidden')).toBe(true);
+});
+
+test('SSR: without orientation the declared bars decide the directions, with orientation the rest get default bars', () => {
+  const layoutOf = (area: ReactElement) => {
+    const root = new DOMParser()
+      .parseFromString(renderToString(area), 'text/html')
+      .querySelector('[data-scroll-area]')!;
+
+    return {
+      orientation: root.getAttribute('data-orientation'),
+      viewport: root.querySelector('[data-scroll-area-viewport]')!.className,
+      bars: [...root.querySelectorAll('[data-scroll-area-scrollbar]')].map((node) =>
+        node.getAttribute('data-orientation'),
+      ),
+    };
+  };
+
+  const horizontalOnly = layoutOf(
+    <ScrollArea>
+      <Lines />
+      <ScrollArea.Scrollbar orientation="horizontal" />
+    </ScrollArea>,
+  );
+  expect(horizontalOnly.orientation).toBe('horizontal');
+  expect(horizontalOnly.viewport).toMatch(/overflow-y-hidden/);
+  expect(horizontalOnly.bars).toEqual(['horizontal']);
+
+  const bothDeclared = layoutOf(
+    <ScrollArea>
+      <ScrollArea.Scrollbar orientation="vertical" />
+      <Lines />
+      <ScrollArea.Scrollbar orientation="horizontal" />
+    </ScrollArea>,
+  );
+  expect(bothDeclared.orientation).toBe('both');
+  expect(bothDeclared.bars).toEqual(['vertical', 'horizontal']);
+
+  const verticalDeclaredScrollingBoth = layoutOf(
+    <ScrollArea orientation="both">
+      <Lines />
+      <ScrollArea.Scrollbar orientation="vertical" />
+    </ScrollArea>,
+  );
+  expect(verticalDeclaredScrollingBoth.orientation).toBe('both');
+  expect(verticalDeclaredScrollingBoth.bars).toEqual(['vertical', 'horizontal']);
 });
 
 test('the native bar takes no width and the thumb is sized by the visible share of the content', async () => {
@@ -275,7 +322,7 @@ test('declaration order places a bar: after the content at the default edge, bef
         <Lines />
         <ScrollArea.Scrollbar />
       </ScrollArea>
-      <ScrollArea variant="always" orientation="both" className="h-40 w-40" data-testid="before">
+      <ScrollArea variant="always" className="h-40 w-40" data-testid="before">
         <ScrollArea.Scrollbar orientation="vertical" />
         <ScrollArea.Scrollbar orientation="horizontal" />
         <div className="w-96">
