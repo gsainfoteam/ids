@@ -468,7 +468,7 @@ const press = usePressable<HTMLElement>({
 
 - `resolveState`, `StateValue`: Avatar, AvatarGroup, Badge, Card, Chip, Item
 - `resolveState`, `StateRenderProps`: Accordion
-- `resolveStateProps`: 지금 부르는 곳이 없습니다.
+- `resolveState`: Select, ChipField, ColorField, FileField, ColorPicker
 
 ### 쓰는 법
 
@@ -492,7 +492,6 @@ style?: StateValue<CSSProperties | undefined, State>;
 ### 알아둘 것
 
 - `resolveState` 는 함수면 무조건 state 를 넣어 부릅니다. 함수 자체가 값인 prop 에는 쓰지 않습니다.
-- [field-popup](./field-popup/README.md#partsts) 의 `parts.ts` 에도 같은 동작의 `resolveState` 가 있습니다. Select, ChipField, ColorField, FileField, ColorPicker 는 그쪽을 씁니다.
 
 ## surface.ts
 

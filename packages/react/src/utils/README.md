@@ -99,7 +99,7 @@ export const Style = tv({
 
 ## merge.ts
 
-props 를 합치는 함수입니다: `mergeProps`, `mergeEventHandlers`, `mergeRefs`, `mergeObjects`, `mergeChildren`.
+props 를 합치는 함수입니다: `mergeProps`, `mergeEventHandlers`, `mergeRefs`, `mergeObjects`.
 
 ### 쓰는 곳
 
@@ -107,7 +107,6 @@ props 를 합치는 함수입니다: `mergeProps`, `mergeEventHandlers`, `mergeR
 - `mergeRefs`: ref 를 둘 이상 붙이는 곳(Spinner, Button, 그룹 컴포넌트, 필드 hook, text-control 의 `useMergedRef`)
 - `mergeEventHandlers`: Alert, Calendar, ColorField, ColorPicker, Label
 - `mergeObjects`: `mergeProps` 의 `style`
-- `mergeChildren`: 지금 부르는 곳이 없습니다.
 
 ### 쓰는 법
 

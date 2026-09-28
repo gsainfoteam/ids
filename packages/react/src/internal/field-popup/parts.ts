@@ -21,7 +21,3 @@ export function part(
   }
   return createElement(tag, props, tag === 'input' ? undefined : children);
 }
-
-export function resolveState<T, S>(value: T | ((state: S) => T), state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}

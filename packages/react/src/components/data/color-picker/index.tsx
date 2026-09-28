@@ -12,8 +12,8 @@ import { CheckIcon, ClipboardDocumentIcon, EyeDropperIcon } from '@heroicons/rea
 
 import { cssColor, formatPlaceholder, parseColor, type ColorFormat } from './color';
 import { useClipboardSupport, useColorPicker, useEyeDropperSupport } from './use-color-picker';
-import { resolveState } from '../../../internal/field-popup';
 import { messages } from '../../../internal/messages';
+import { resolveState } from '../../../internal/state-props';
 import {
   cn,
   flattenFragments,

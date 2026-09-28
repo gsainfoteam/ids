@@ -19,13 +19,13 @@ import {
   FieldPopupHeader,
   fieldTrigger,
   part,
-  resolveState,
   useDrawerPresentation,
   type FieldTriggerVariant,
 } from '../../../internal/field-popup';
 import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
+import { resolveState } from '../../../internal/state-props';
 import {
   cn,
   flattenFragments,

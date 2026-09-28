@@ -1,7 +1,6 @@
-import type { CSSProperties, ReactNode, Ref, RefCallback, SyntheticEvent } from 'react';
+import type { CSSProperties, Ref, RefCallback, SyntheticEvent } from 'react';
 
 import { isFunction, isNotNil, isPlainObject, isString, union } from 'es-toolkit';
-import { castArray } from 'es-toolkit/compat';
 
 import { cn } from './cn';
 
@@ -104,9 +103,4 @@ export function mergeProps<P extends Record<string, unknown>, Q extends Record<s
   }
 
   return merged as P & Q;
-}
-
-export function mergeChildren(existing: ReactNode, ...extra: ReactNode[]): ReactNode {
-  if (extra.length === 0) return existing;
-  return [...castArray(existing), ...extra];
 }
