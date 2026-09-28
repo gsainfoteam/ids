@@ -11,11 +11,11 @@ export function part(
   if (asChild) {
     invariant(
       isValidElement<Record<string, unknown>>(children) && children.type !== Fragment,
-      'IDS: asChild requires one element forwarding props/ref.',
+      'asChild requires one element forwarding props/ref.',
     );
     invariant(
       typeof children.type !== 'string' || tag === 'span' || tag === 'div' || children.type === tag,
-      `IDS: asChild must render a ${tag}.`,
+      `asChild must render a ${tag}.`,
     );
     return cloneElement(children, mergeProps(children.props, props));
   }
