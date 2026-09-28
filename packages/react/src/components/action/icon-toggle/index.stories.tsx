@@ -23,6 +23,7 @@ const variants = ['ghost', 'outline', 'soft', 'solid'] as const;
 const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'info'] as const;
 const sizes = ['standard', 'tiny'] as const;
 const pressedStates = ['off', 'on'] as const;
+const functionNamesSurviveBuild = isDevelopment;
 
 function PinIcon(props: ComponentProps<'svg'>) {
   return (
@@ -163,7 +164,8 @@ export const AutomaticLabel: Story = {
       'false',
     );
     await expect(canvas.getByRole('button', { name: '목록 보기' })).toBeVisible();
-    if (isDevelopment) await expect(canvas.getByRole('button', { name: 'Bold' })).toBeVisible();
+    if (functionNamesSurviveBuild)
+      await expect(canvas.getByRole('button', { name: 'Bold' })).toBeVisible();
   },
 };
 
