@@ -51,6 +51,11 @@ function assertInput(node: HTMLInputElement) {
   );
 }
 
+function selectOnceLaidOut(node: HTMLInputElement, { start, end, direction }: Selection) {
+  node.getBoundingClientRect();
+  node.setSelectionRange(start, end, direction);
+}
+
 export function inferAutoComplete(name: string | undefined) {
   const leaf = name?.replaceAll('[', '.').replaceAll(']', '.').split('.').filter(Boolean).at(-1);
   return /^new[-_]?password$/i.test(leaf ?? '') ? 'new-password' : 'current-password';
@@ -98,7 +103,7 @@ export function usePasswordField({
   useLayoutEffect(() => {
     const node = inputRef.current;
     const saved = selectionBeforeTypeSwap.current;
-    if (node && saved) node.setSelectionRange(saved.start, saved.end, saved.direction);
+    if (node && saved) selectOnceLaidOut(node, saved);
     selectionBeforeTypeSwap.current = null;
   }, [visible]);
 
