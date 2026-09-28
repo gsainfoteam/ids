@@ -81,7 +81,8 @@ export function useColorPicker({
   const blocked = disabled || readOnly;
 
   const [held, setHeld] = useState<HSVA>(() => (parsed ? rgbaToHsva(parsed) : START));
-  const color = parsed && !sameColor(hsvaToRgba(held), parsed) ? rgbaToHsva(parsed, held) : held;
+  const changedFromOutside = parsed && !sameColor(hsvaToRgba(held), parsed);
+  const color = changedFromOutside ? rgbaToHsva(parsed, held) : held;
   const rgba = hsvaToRgba(color);
   const text = parsed ? serializeColor(parsed, format, alpha) : value;
 
@@ -152,7 +153,7 @@ export function useColorPicker({
     if (Number.isFinite(n)) setChannel(channel, n);
   };
 
-  const commitDraft = () => {
+  const tryCommitDraft = () => {
     if (draft === null) return true;
     if (draft.trim() === '') {
       if (!blocked) setValue('');
@@ -166,21 +167,25 @@ export function useColorPicker({
     return true;
   };
 
+  const discardDraftKeepingPopupOpen = (event: KeyboardEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    setDraft(null);
+  };
+
   const input = {
     value: draft ?? text,
     invalid: draft !== null ? draft.trim() !== '' && !parseColorInput(draft) : !!value && !parsed,
     onChange: (event: ChangeEvent<HTMLInputElement>) => setDraft(event.currentTarget.value),
     onBlur: () => {
-      if (!commitDraft()) setDraft(null);
+      if (!tryCommitDraft()) setDraft(null);
     },
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
       if (event.nativeEvent.isComposing) return;
       if (event.key === 'Enter') {
         event.preventDefault();
-        commitDraft();
+        tryCommitDraft();
       } else if (event.key === 'Escape' && draft !== null) {
-        event.preventDefault();
-        setDraft(null);
+        discardDraftKeepingPopupOpen(event);
       }
     },
   };

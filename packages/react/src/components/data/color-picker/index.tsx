@@ -74,6 +74,9 @@ function usePicker(part: string) {
 const CHECKER =
   'conic-gradient(var(--ids-color-muted) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-muted) 0 75%, var(--ids-color-surface) 0)';
 const HUES = 'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)';
+const GRADIENT_DIRECTION = 'ltr';
+const NO_FORM_OWNER = '';
+const NO_DOT = false;
 const overChecker = (css: string): CSSProperties => ({
   backgroundImage: `linear-gradient(${css}, ${css}), ${CHECKER}`,
   backgroundSize: '100% 100%, 8px 8px',
@@ -175,7 +178,7 @@ function ColorPickerArea({ className, style, ...props }: ColorPicker.AreaProps) 
       })}
       role="group"
       aria-label={props['aria-label'] ?? messages.colorPicker.area}
-      dir="ltr"
+      dir={GRADIENT_DIRECTION}
       data-color-picker-area=""
       data-disabled={c.state.disabled ? '' : undefined}
       className={c.styles.area({ className })}
@@ -219,7 +222,7 @@ function ColorPickerHueSlider({ className, ...props }: ColorPicker.SliderProps) 
   return (
     <Slider
       {...props}
-      dir="ltr"
+      dir={GRADIENT_DIRECTION}
       data-color-picker-hue=""
       min={0}
       max={360}
@@ -251,7 +254,7 @@ function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.SliderProps
   return (
     <Slider
       {...props}
-      dir="ltr"
+      dir={GRADIENT_DIRECTION}
       data-color-picker-alpha=""
       min={0}
       max={100}
@@ -382,7 +385,7 @@ function ColorPickerSwatches({ className, children, ...props }: ColorPicker.Swat
       orientation="horizontal"
       disabled={c.state.disabled}
       readOnly={c.state.readOnly}
-      form=""
+      form={NO_FORM_OWNER}
       data-color-picker-swatches=""
       className={c.styles.swatches({ className })}
     >
@@ -419,7 +422,7 @@ function ColorPickerSwatch({ value, label, className, style, ...props }: ColorPi
       className={c.styles.swatch({ className })}
       style={{ ...style, ...overChecker(cssColor(parsed)) }}
     >
-      {false}
+      {NO_DOT}
     </Radio>
   );
 }
@@ -473,6 +476,13 @@ export namespace ColorPicker {
     'shadow-[0_0_0_1px_rgb(0_0_0/0.25),0_1px_3px_rgb(0_0_0/0.3)]',
   );
 
+  const dimOnceAtRoot = {
+    slider: cn('data-disabled:opacity-100'),
+    input: cn('data-disabled:opacity-100'),
+    tool: cn('data-disabled:opacity-100'),
+    swatch: cn('data-disabled:opacity-100'),
+  };
+
   export const Style = tv({
     slots: {
       root: 'grid w-full min-w-0 gap-3 text-(--ids-color-on-surface) data-disabled:opacity-50',
@@ -517,14 +527,7 @@ export namespace ColorPicker {
           swatch: 'size-6',
         },
       } satisfies Record<IdsSize, object>,
-      disabled: {
-        true: {
-          slider: 'data-disabled:opacity-100',
-          input: 'data-disabled:opacity-100',
-          tool: 'data-disabled:opacity-100',
-          swatch: 'data-disabled:opacity-100',
-        },
-      },
+      disabled: { true: dimOnceAtRoot },
     },
     defaultVariants: { size: 'standard' },
   });
