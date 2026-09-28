@@ -54,10 +54,11 @@ async function type(node, value) {
     node.dispatchEvent(new Event('input', { bubbles: true }));
   });
 }
-const slider = (name) =>
-  host.querySelector(
-    `input[type=range][aria-label="${name}"], [role=slider][aria-label="${name}"]`,
-  );
+const slider = (name) => {
+  const areaAxis = `input[type=range][aria-label="${name}"]`;
+  const sliderThumb = `[role=slider][aria-label="${name}"]`;
+  return host.querySelector(`${areaAxis}, ${sliderThumb}`);
+};
 const textInput = () => host.querySelector('[data-color-picker-input]');
 function tracked(props = {}, ...children) {
   const changes = [];
