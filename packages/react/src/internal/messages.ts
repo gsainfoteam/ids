@@ -143,6 +143,21 @@ export const messages = {
   dialog: {
     close: '닫기',
   },
+  popover: {
+    close: '닫기',
+  },
+  drawer: {
+    close: '닫기',
+    handle: '끌어서 크기 조절',
+  },
+  menu: {
+    submenu: (label: string) => `${label} 하위 메뉴`,
+  },
+  toast: {
+    close: '알림 닫기',
+    region: '알림',
+    loading: '처리하는 중',
+  },
   kbd: {
     command: '커맨드',
     windows: '윈도우',
