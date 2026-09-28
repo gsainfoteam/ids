@@ -361,7 +361,7 @@ export namespace ScrollArea {
     slots: {
       root: 'relative flex min-h-0 min-w-0 flex-col [--scroll-area-gap:2px]',
       viewport: [
-        'min-h-0 min-w-0 grow rounded-[inherit] outline-none',
+        'min-h-0 min-w-0 grow overscroll-none rounded-[inherit] outline-none',
         '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         'data-tab-stop:focus-ring',
       ],

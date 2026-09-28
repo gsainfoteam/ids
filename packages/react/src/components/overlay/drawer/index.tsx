@@ -427,7 +427,7 @@ export namespace Drawer {
         'data-nested-open:scale-(--drawer-nested-scale)',
         'data-dragging:transition-none data-dragging:select-none motion-reduce:transition-none',
       ],
-      viewport: 'relative flex flex-col gap-4 overscroll-contain p-6',
+      viewport: 'relative flex flex-col gap-4 p-6',
       handle: [
         'relative shrink-0 cursor-grab touch-none rounded-full bg-(--ids-color-border) outline-none focus-ring',
         'before:absolute before:-inset-3',

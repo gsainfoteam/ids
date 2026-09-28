@@ -15,7 +15,7 @@ export const menuStyle = tv({
       'data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom',
       'motion-reduce:transition-none',
     ],
-    viewport: 'flex flex-col overscroll-contain p-1',
+    viewport: 'flex flex-col p-1',
     palette: [
       'fixed inset-x-0 top-[15vh] bottom-auto z-50 mx-auto my-0 flex h-fit flex-col',
       'max-h-[min(28rem,calc(85dvh-1rem))] w-[min(36rem,calc(100%-2rem))] max-w-none',

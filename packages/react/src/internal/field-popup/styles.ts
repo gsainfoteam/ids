@@ -14,7 +14,7 @@ export const popupStyle = tv({
       'transition-[opacity,scale,translate] duration-(--ids-motion-fast) ease-out',
       'motion-reduce:transition-none',
     ],
-    viewport: 'flex flex-col overscroll-contain p-1 [overflow-anchor:none]',
+    viewport: 'flex flex-col p-1 [overflow-anchor:none]',
     backdrop: [
       'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none touch-none overflow-hidden border-0 p-0',
       'bg-black/50 transition-opacity duration-(--ids-motion-normal) starting:opacity-0',

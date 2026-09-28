@@ -17,7 +17,7 @@ export const listStyles = {
   listArea: cn('-mx-1 rounded-[inherit]'),
   list: cn(
     offsetParentOfOptions,
-    'flex flex-col overscroll-contain px-1 outline-none [overflow-anchor:none]',
+    'flex flex-col px-1 outline-none [overflow-anchor:none]',
   ),
   heading: cn('px-2.5 pt-2 pb-1 text-caption-c1-medium text-(--ids-color-on-muted)'),
   separator: cn('-mx-1 my-1 w-auto'),

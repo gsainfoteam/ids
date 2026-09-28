@@ -329,7 +329,7 @@ export namespace Dialog {
         'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
         'data-nested-open:scale-[0.96] motion-reduce:transition-none',
       ],
-      viewport: 'relative flex flex-col gap-4 overscroll-contain p-6',
+      viewport: 'relative flex flex-col gap-4 p-6',
       header: 'flex flex-col gap-1.5 pe-8 text-start',
       title: 'text-subtitle-s1-semibold [overflow-wrap:anywhere]',
       description: 'text-body-b3-regular text-(--ids-color-on-muted)',
