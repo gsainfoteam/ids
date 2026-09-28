@@ -52,6 +52,7 @@
     "tailwindcss": "^4.0.0"
   },
   "dependencies": {
+    "@floating-ui/react": "~0.27.20",
     "@floating-ui/react-dom": "^2.1.9",
     "@heroicons/react": "^2.2.0",
     "@internationalized/number": "^3.6.8",

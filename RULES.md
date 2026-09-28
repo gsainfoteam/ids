@@ -45,9 +45,21 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 
 - Generic helpers come from `es-toolkit` (`clamp`, `isEqual`, `noop`, `debounce`, `uniq`, ...), never a local copy.
 - Classes are merged by `cn` (the package, in place of `clsx` + `tailwind-merge`). `utils/cn.ts` only adds the IDS config, and `utils/tv.ts` runs the lite build of `tailwind-variants` through the same `cn`, so one engine resolves every conflict.
-- Utility engines are installed, not written: positioning `@floating-ui/react-dom`, focus `tabbable` / `focus-trap`, scroll lock `react-remove-scroll`, dates `date-fns`, numbers `@internationalized/number`, colors `culori`, textarea sizing `react-textarea-autosize`, phone numbers `libphonenumber-js`.
+- Utility engines are installed, not written:
+  - overlay positioning and interactions `@floating-ui/react` (hover intent, list navigation,
+    typeahead, menu trees, modal focus, delay groups); field-popup still calls
+    `@floating-ui/react-dom` and `focus-trap` directly until it moves onto the overlay core;
+  - focus order `tabbable`, scroll lock `react-remove-scroll`;
+  - dates `date-fns`, numbers `@internationalized/number`, colors `culori`;
+  - textarea sizing `react-textarea-autosize`, phone numbers `libphonenumber-js`.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
-- Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation).
+- Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:
+  - the `overlay` and `toast` stores, on React's `useSyncExternalStore`. overlay-kit leaves a
+    promise pending on unmount and throws on reopening an id, and zustand would replace only the
+    subscribe glue;
+  - Drawer gestures, ported from vaul, which is unmaintained and needs Radix Dialog;
+  - toasts, ported from sonner, whose unlayered CSS beats Tailwind utilities and which sits outside
+    the top layer.
 
 **flutter** — Dart package. Platform directories (android/, ios/, etc.) intentionally absent — this is a package, not an app. Published to pub.dev via OIDC — no token.
 
