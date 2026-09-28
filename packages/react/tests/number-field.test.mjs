@@ -85,6 +85,7 @@ function controlled(props = {}) {
   const changes = [];
   function App() {
     [current, set] = useState(props.defaultValue ?? null);
+    const inlineObjectEachRender = props.formatOptions ? { ...props.formatOptions } : undefined;
     return h(NumberField, {
       ...props,
       value: current,
@@ -92,7 +93,7 @@ function controlled(props = {}) {
         changes.push(value);
         set(value);
       },
-      formatOptions: props.formatOptions ? { ...props.formatOptions } : undefined,
+      formatOptions: inlineObjectEachRender,
     });
   }
   return { node: h(App), value: () => current, set: (value) => set(value), changes };
