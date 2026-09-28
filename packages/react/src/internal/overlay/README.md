@@ -14,15 +14,21 @@
 | [`store.ts`](#storets)                   | `overlay.open` 의 항목 스토어와 host 선출                                |
 | [`host.tsx`](#hosttsx)                   | 항목을 그리는 `OverlayHost`, 항목에 붙는 binding, portal root            |
 | [`external-store.ts`](#external-storets) | `useSyncExternalStore` 가 읽는 작은 스토어                               |
+| [`interactions.ts`](#interactionsts)     | 컴포넌트가 쓰는 `@floating-ui/react` 의 상호작용 hook 과 파트            |
 
 ## 쓰는 곳
 
-| 쓰는 곳                                 | 가져가는 것                                                                                                                                 |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| IdsProvider                             | `OverlayHost`, `PortalRootContext`                                                                                                          |
-| Alert                                   | `usePresence`                                                                                                                               |
-| Dialog                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget` |
-| [field-popup](../field-popup/README.md) | `useLayer`, `useAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`           |
+| 쓰는 곳                                 | 가져가는 것                                                                                                                                                                                                                  |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IdsProvider                             | `OverlayHost`, `PortalRootContext`                                                                                                                                                                                           |
+| Alert                                   | `usePresence`                                                                                                                                                                                                                |
+| Dialog                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`                                                                                  |
+| Popover                                 | `useLayer`, `useAnchored`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `interactions.ts` |
+| Tooltip                                 | `useLayer`, `useAnchored`, `usePresence`, `showInTopLayer`, `focusWasReturned`, `PortalRootContext`, `interactions.ts`                                                                                                       |
+| Menu                                    | `useLayer`, `useAnchored`, `usePresence`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `returnFocusTo`, `focusReturnTarget`, `OverlayItemContext`, `interactions.ts`                                                       |
+| Drawer                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`              |
+| Toast                                   | `createExternalStore`, `keepAboveLayers`, `withoutTransitions`, `raiseInTopLayer`, `showInTopLayer`, `supportsPopover`, `usePresence`, `returnFocusTo`, `blurWithin`                                                         |
+| [field-popup](../field-popup/README.md) | `useLayer`, `useAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`                                                                                            |
 
 ## 조립하는 법
 
@@ -233,6 +239,7 @@ modal 레이어의 배경, 포커스 가두기, 나머지 페이지 숨기기, �
 ### 쓰는 곳
 
 - [field-popup](../field-popup/README.md) 과 Select, ChipField, ColorField 의 `useDrawerPresentation`
+- Drawer 의 화면 키보드 올리기(`coveredByKeyboard`, `onViewportChange`)
 
 ### 쓰는 법
 
@@ -332,3 +339,16 @@ const scoped = useOverlay();                    // 부른 곳의 theme 으로 �
 
 - `set` 은 같은 값(`Object.is`)이면 알리지 않습니다. 목록을 바꿀 때는 새 배열을 넘깁니다.
 - zustand 를 쓰지 않는 이유는 RULES.md 의 What we build 에 있습니다.
+
+## interactions.ts
+
+컴포넌트가 쓰는 `@floating-ui/react` 의 상호작용 hook 과 파트를 다시 내보냅니다. 컴포넌트는 `@floating-ui/react` 를 직접 import 하지 않고 `internal/overlay` 에서 가져옵니다(RULES.md 의 What we build).
+
+| 가져가는 곳 | 쓰는 것                                                                                                                                                                           |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Popover     | `useHover`, `safePolygon`, `useInteractions`, `FloatingArrow`                                                                                                                     |
+| Tooltip     | `useHover`, `useFocus`, `useRole`, `useDelayGroup`, `useInteractions`, `FloatingDelayGroup`                                                                                       |
+| Menu        | `FloatingTree`, `FloatingNode`, `FloatingList`, `useListItem`, `useListNavigation`, `useTypeahead`, `useHover`, `safePolygon`, `useClick`, `useFloatingNodeId`, `useInteractions` |
+
+- `useDismiss` 는 내보내지 않습니다. 닫기는 [`layer-stack.ts`](#layer-stackts) 의 일입니다.
+- 새 hook 이 필요하면 여기에 더합니다. 버전을 올릴 때 바뀐 API 를 이 파일 하나에서 찾습니다.

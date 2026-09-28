@@ -84,10 +84,10 @@ packages/react/src/
     action/      Button, ButtonGroup, IconButton, IconToggle, Toggle, ToggleGroup, FloatingButton
     form/        Field and every *Field, Checkbox, Radio, Switch, Slider, Select, Rating, ...
     data/        Accordion, Avatar, Badge, Calendar, Card, Chip, Item, TimePicker, ...
-    feedback/    Alert, Progress, Spinner
+    feedback/    Alert, Progress, Spinner, Toast
     layout/      AspectRatio, Divider, Spacer
     navigation/  (Breadcrumb, Pagination, Stepper, Tabs)
-    overlay/     Dialog, (Drawer, Menu, Popover, Tooltip)
+    overlay/     Dialog, Drawer, Menu, Popover, Tooltip
     typography/  Kbd, Label
     utility/     Slot, Group, IdsProvider
   internal/      shared parts that are not exported:
@@ -325,6 +325,11 @@ Dialog, Drawer, Popover, Menu, Tooltip, Toast and the field popups are all assem
 - **Focus goes back where it came from** (`focusReturnTarget`), or to the trigger of the layer
   that held it when that element is gone. Escape and close buttons return it; a press outside
   leaves it where the press put it.
+- **The outermost IdsProvider hosts** the `overlay.open` items, the default `Toaster` (replaced by
+  an app-placed `<Toaster />`) and `TooltipDelayGroup`. Nested providers only change the theme.
+- **A modal Drawer scales the page behind it**: only the lowest drawer transforms the outermost
+  IdsProvider element, and pins that element's `position: fixed` descendants with `translate` so
+  they stay where they were on screen. `scaleBackground={false}` turns it off.
 
 ## Tests
 
