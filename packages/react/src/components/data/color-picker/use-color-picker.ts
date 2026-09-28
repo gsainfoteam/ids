@@ -22,6 +22,7 @@ import {
   type Rgb,
 } from './color';
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 
 export type ColorChannel = 'saturation' | 'brightness' | 'hue' | 'alpha';
 
@@ -126,20 +127,22 @@ export function useColorPicker({
 
   const onAreaKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (blocked) return;
+
     const step = event.shiftKey ? 0.1 : 0.01;
-    const patch: Partial<HSVA> | undefined = {
-      ArrowLeft: { s: clamp(color.s - step, 0, 1) },
-      ArrowRight: { s: clamp(color.s + step, 0, 1) },
-      ArrowUp: { v: clamp(color.v + step, 0, 1) },
-      ArrowDown: { v: clamp(color.v - step, 0, 1) },
-      PageUp: { v: clamp(color.v + 0.1, 0, 1) },
-      PageDown: { v: clamp(color.v - 0.1, 0, 1) },
-      Home: { s: 0 },
-      End: { s: 1 },
-    }[event.key];
-    if (!patch) return;
-    event.preventDefault();
-    update(patch);
+    const change = (patch: Partial<HSVA>) => () => update(patch);
+
+    keyHandler(
+      withModifiers({
+        ArrowLeft: change({ s: clamp(color.s - step, 0, 1) }),
+        ArrowRight: change({ s: clamp(color.s + step, 0, 1) }),
+        ArrowUp: change({ v: clamp(color.v + step, 0, 1) }),
+        ArrowDown: change({ v: clamp(color.v - step, 0, 1) }),
+        PageUp: change({ v: clamp(color.v + 0.1, 0, 1) }),
+        PageDown: change({ v: clamp(color.v - 0.1, 0, 1) }),
+        Home: change({ s: 0 }),
+        End: change({ s: 1 }),
+      }),
+    )(event);
   };
 
   const setChannel = (channel: ColorChannel, n: number) =>
@@ -172,11 +175,6 @@ export function useColorPicker({
     return true;
   };
 
-  const discardDraftKeepingPopupOpen = (event: KeyboardEvent<HTMLInputElement>) => {
-    event.preventDefault();
-    setDraft(null);
-  };
-
   const input = {
     value: draft ?? text,
     invalid: draft !== null ? draft.trim() !== '' && !parseColorInput(draft) : !!value && !parsed,
@@ -184,15 +182,17 @@ export function useColorPicker({
     onBlur: () => {
       if (!tryCommitDraft()) setDraft(null);
     },
-    onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
-      if (event.nativeEvent.isComposing) return;
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        tryCommitDraft();
-      } else if (event.key === 'Escape' && draft !== null) {
-        discardDraftKeepingPopupOpen(event);
-      }
-    },
+    onKeyDown: keyHandler(
+      withModifiers({
+        Enter: () => {
+          tryCommitDraft();
+        },
+        Escape: () => {
+          if (draft === null) return false;
+          setDraft(null);
+        },
+      }),
+    ),
   };
 
   const pickFromScreen = async () => {

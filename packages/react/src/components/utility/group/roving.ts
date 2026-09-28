@@ -1,25 +1,26 @@
 import type { GroupOrientation } from '.';
+import type { Key } from '@tanstack/react-hotkeys';
 
 export type RovingMove = 'next' | 'previous' | 'first' | 'last';
 
 export type RovingItem = { value: string; disabled: boolean };
 
-export function rovingMove(
-  key: string,
-  {
-    orientation,
-    rtl,
-    anyArrow,
-  }: { orientation: GroupOrientation; rtl: boolean; anyArrow: boolean },
-): RovingMove | undefined {
-  if (key === 'Home') return 'first';
-  if (key === 'End') return 'last';
+export function rovingKeys({
+  orientation,
+  anyArrow,
+}: {
+  orientation: GroupOrientation;
+  anyArrow: boolean;
+}): Partial<Record<Key, RovingMove>> {
   const horizontal = anyArrow || orientation === 'horizontal';
   const vertical = anyArrow || orientation === 'vertical';
-  if (horizontal && key === 'ArrowRight') return rtl ? 'previous' : 'next';
-  if (horizontal && key === 'ArrowLeft') return rtl ? 'next' : 'previous';
-  if (vertical && key === 'ArrowDown') return 'next';
-  if (vertical && key === 'ArrowUp') return 'previous';
+
+  return {
+    Home: 'first',
+    End: 'last',
+    ...(horizontal && { ArrowRight: 'next', ArrowLeft: 'previous' }),
+    ...(vertical && { ArrowDown: 'next', ArrowUp: 'previous' }),
+  };
 }
 
 export function rovingTarget(

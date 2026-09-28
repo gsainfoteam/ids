@@ -4,6 +4,7 @@ import { matchesQuery, orderByOptions, typeaheadIndex, type SelectOption } from 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { revealPopupOption } from '../../../internal/field-popup';
+import { isComposingKey, keyHandler, withModifiers } from '../../../internal/keys';
 
 export type SelectValue = string | null | string[];
 
@@ -26,7 +27,6 @@ export type UseSelectOptions = {
 
 const PAGE_SIZE = 10;
 const TYPEAHEAD_TIMEOUT = 500;
-const SAFARI_COMPOSING_KEY_CODE = 229;
 
 export function useSelect({
   multiple,
@@ -163,75 +163,89 @@ export function useSelect({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>, source: SelectFocusOwner) => {
-    if (event.defaultPrevented) return;
-    if (event.nativeEvent.isComposing || event.keyCode === SAFARI_COMPOSING_KEY_CODE) return;
-    if (blocked) return;
+    if (event.defaultPrevented || isComposingKey(event.nativeEvent) || blocked) return;
+
     const { key } = event;
     const printable = key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
     const searching = source === 'search';
 
     if (!open) {
       if (source !== 'trigger') return;
-      if (key === 'ArrowDown' || key === 'ArrowUp' || key === 'Enter' || key === ' ') {
-        event.preventDefault();
+
+      const openAtSelected = () => {
         openAt('selected');
-      } else if (key === 'Home' || key === 'End') {
-        event.preventDefault();
-        openAt(key === 'Home' ? 'first' : 'last');
-      } else if (printable) {
-        event.preventDefault();
-        openAt('selected');
-        typeTo(key);
-      }
+      };
+      const opened = keyHandler(
+        withModifiers({
+          ArrowDown: openAtSelected,
+          ArrowUp: openAtSelected,
+          Enter: openAtSelected,
+          Space: openAtSelected,
+          Home: () => {
+            openAt('first');
+          },
+          End: () => {
+            openAt('last');
+          },
+        }),
+      )(event);
+
+      if (opened || !printable) return;
+
+      event.preventDefault();
+      openAt('selected');
+      typeTo(key);
       return;
     }
 
-    switch (key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        if (!event.altKey) move('next');
-        return;
-      case 'ArrowUp':
-        event.preventDefault();
-        if (!event.altKey) move('previous');
-        else if (!multiple && active) choose(active.value);
-        else close(true);
-        return;
-      case 'Home':
-      case 'End':
-        if (searching) return;
-        event.preventDefault();
-        move(key === 'Home' ? 'first' : 'last');
-        return;
-      case 'PageDown':
-      case 'PageUp':
-        event.preventDefault();
-        move(key === 'PageDown' ? 'pageDown' : 'pageUp');
-        return;
-      case 'Enter':
-        event.preventDefault();
-        if (active) choose(active.value);
-        return;
-      case 'Escape':
-        event.preventDefault();
-        close(true);
-        return;
-      case 'Tab':
-        if (drawer) return;
-        if (searching) continueTabFromTrigger();
-        close(false);
-        return;
-      case ' ':
-        if (searching) return;
-        event.preventDefault();
-        if (typeaheadActive()) typeTo(' ');
-        else if (active) choose(active.value);
-        return;
-    }
-    if (!searching && printable) {
-      event.preventDefault();
-      typeTo(key);
-    }
+    const handled = keyHandler(
+      withModifiers({
+        ArrowDown: () => {
+          if (!event.altKey) move('next');
+        },
+        ArrowUp: () => {
+          if (!event.altKey) move('previous');
+          else if (!multiple && active) choose(active.value);
+          else close(true);
+        },
+        Home: () => {
+          if (searching) return false;
+          move('first');
+        },
+        End: () => {
+          if (searching) return false;
+          move('last');
+        },
+        PageDown: () => {
+          move('pageDown');
+        },
+        PageUp: () => {
+          move('pageUp');
+        },
+        Enter: () => {
+          if (active) choose(active.value);
+        },
+        Escape: () => {
+          close(true);
+        },
+        Tab: () => {
+          if (drawer) return false;
+          if (searching) continueTabFromTrigger();
+          close(false);
+          return false;
+        },
+        Space: () => {
+          if (searching) return false;
+          if (typeaheadActive()) typeTo(' ');
+          else if (active) choose(active.value);
+        },
+      }),
+    )(event);
+
+    if (handled || searching || !printable) return;
+
+    event.preventDefault();
+    typeTo(key);
   };
 
   useLayoutEffect(() => {

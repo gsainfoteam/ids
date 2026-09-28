@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from
 
 import { chipToFocusAfter } from './chip-focus';
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import { isDevelopment } from '../../../utils/dev';
 
 export type ChipRemoveEvent = MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>;
@@ -49,11 +50,9 @@ export function useChip({
   };
 
   const removeOnKey = (event: KeyboardEvent<HTMLElement>) => {
-    if (onRemove === undefined || (event.key !== 'Backspace' && event.key !== 'Delete'))
-      return false;
-    remove(event);
-    event.preventDefault();
-    return true;
+    if (onRemove === undefined) return false;
+
+    return keyHandler(withModifiers({ Backspace: remove, Delete: remove }))(event);
   };
 
   return {

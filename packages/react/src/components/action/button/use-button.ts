@@ -17,6 +17,7 @@ import {
 } from 'react';
 
 import { useInteractiveProps } from '../../../hooks/use-interactive';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import { usePressable } from '../../../internal/pressable';
 import { cn, invariant, mergeProps, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
@@ -74,18 +75,22 @@ function kindOf(element: ReactElement | undefined): ButtonKind {
   return typeof element.type === 'string' ? 'element' : 'component';
 }
 
-const isActivationKey = (key: string) => key === 'Enter' || key === ' ';
-
 function blockActivation(event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) {
   event.preventDefault();
   event.stopPropagation();
 }
 
+const blockActivationKeys = keyHandler<HTMLElement>(
+  withModifiers({ Enter: blockActivation, Space: blockActivation }),
+  { evenIfPrevented: true, evenWhileComposing: true },
+);
+
 function blockChildActivation(merged: Record<string, unknown>) {
   const keyDown = merged.onKeyDown as ((event: KeyboardEvent<HTMLElement>) => void) | undefined;
   merged.onClick = blockActivation;
-  merged.onKeyDown = (event: KeyboardEvent<HTMLElement>) =>
-    isActivationKey(event.key) ? blockActivation(event) : keyDown?.(event);
+  merged.onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (!blockActivationKeys(event)) keyDown?.(event);
+  };
 }
 
 function removeHrefKeepingLinkRole(merged: Record<string, unknown>) {
@@ -150,7 +155,7 @@ export function useButton<P extends object>(props: P, name: string, options: Opt
   });
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (softDisabled && isActivationKey(event.key)) return blockActivation(event);
+    if (softDisabled && blockActivationKeys(event)) return;
     handlers.onKeyDown(event);
   };
 

@@ -2,6 +2,7 @@ import { use, useLayoutEffect, useRef, type KeyboardEvent } from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import { parseColor, serializeColor, type ColorFormat } from '../../data/color-picker/color';
 import { FieldNotifyContext } from '../field/context';
 
@@ -85,11 +86,15 @@ export function useColorField({
         if (!blocked) setOpenState(!isOpen);
       },
       onTriggerKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => {
-        if (event.defaultPrevented || blocked) return;
-        if (event.key === 'ArrowDown') {
-          event.preventDefault();
-          setOpenState(true);
-        }
+        if (blocked) return;
+
+        keyHandler(
+          withModifiers({
+            ArrowDown: () => {
+              setOpenState(true);
+            },
+          }),
+        )(event);
       },
     },
   };

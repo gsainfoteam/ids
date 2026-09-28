@@ -1,3 +1,5 @@
+import type { Key } from '@tanstack/react-hotkeys';
+
 export type AccordionType = 'single' | 'multiple';
 
 export type AccordionValue<T extends string = string> = T | null | readonly T[];
@@ -30,15 +32,9 @@ export function revealValue<T extends string>(
   return type === 'multiple' ? [...open, item] : item;
 }
 
-const MOVES: Record<string, (index: number, count: number) => number> = {
+export const TRIGGER_MOVES = {
   ArrowDown: (index, count) => (index + 1) % count,
   ArrowUp: (index, count) => (index - 1 + count) % count,
   Home: () => 0,
   End: (_, count) => count - 1,
-};
-
-export function nextTriggerIndex(key: string, index: number, count: number) {
-  const move = MOVES[key];
-  if (move === undefined || count === 0) return null;
-  return move(index, count);
-}
+} satisfies Partial<Record<Key, (index: number, count: number) => number>>;

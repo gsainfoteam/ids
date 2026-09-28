@@ -1,5 +1,6 @@
 import type { KeyboardEvent, MouseEvent, PointerEvent } from 'react';
 
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import { useListItem } from '../../../internal/overlay';
 import { mergeProps } from '../../../utils';
 
@@ -54,11 +55,20 @@ export function useMenuItem(
       onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
         if (!activatesOnKeys || event.target !== event.currentTarget) return;
 
-        const space = event.key === ' ' && !level.typing.current;
-        if (event.key !== 'Enter' && !space) return;
+        const item = event.currentTarget;
+        const clickUnlessDisabled = () => {
+          if (!disabled) item.click();
+        };
 
-        event.preventDefault();
-        if (!disabled) event.currentTarget.click();
+        keyHandler(
+          withModifiers({
+            Enter: clickUnlessDisabled,
+            Space: () => {
+              if (level.typing.current) return false;
+              clickUnlessDisabled();
+            },
+          }),
+        )(event);
       },
     },
   );

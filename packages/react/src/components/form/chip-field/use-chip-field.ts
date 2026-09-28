@@ -22,6 +22,7 @@ import {
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { revealPopupOption } from '../../../internal/field-popup';
+import { isComposingKey, keyHandler, withModifiers } from '../../../internal/keys';
 import { messages } from '../../../internal/messages';
 import { matchesQuery, type SelectOption } from '../select/select-options';
 
@@ -46,7 +47,6 @@ export type UseChipFieldOptions = {
 };
 
 const PAGE_SIZE = 10;
-const SAFARI_COMPOSING_KEY_CODE = 229;
 
 const isRtl = (node: Element | null) =>
   !!node && node.ownerDocument.defaultView?.getComputedStyle(node).direction === 'rtl';
@@ -227,112 +227,113 @@ export function useChipField({
   };
 
   const onInputKeyDown = (event: KeyboardEvent<HTMLInputElement>, source: 'field' | 'drawer') => {
-    if (event.defaultPrevented || composing.current) return;
-    if (event.nativeEvent.isComposing || event.keyCode === SAFARI_COMPOSING_KEY_CODE) return;
-    if (blocked) return;
+    if (composing.current || blocked) return;
+
     const input = event.currentTarget;
     const atStart = input.selectionStart === 0 && input.selectionEnd === 0;
-    const back = isRtl(rootRef.current) ? 'ArrowRight' : 'ArrowLeft';
-    switch (event.key) {
-      case 'ArrowDown':
-      case 'ArrowUp':
-        event.preventDefault();
-        if (!open) setOpen(true);
-        else move(event.key === 'ArrowDown' ? 1 : -1);
-        return;
-      case 'PageDown':
-      case 'PageUp':
-        if (!open) return;
-        event.preventDefault();
-        move(event.key === 'PageDown' ? PAGE_SIZE : -PAGE_SIZE);
-        return;
-      case 'Enter':
-        if (open && active !== undefined) {
-          event.preventDefault();
-          choose(active);
-        } else if (trimmed) {
-          event.preventDefault();
-          if (!addQueryAsChip()) setOpen(true);
-        }
-        return;
-      case ',':
-        if (!trimmed || addQueryAsChip()) event.preventDefault();
-        return;
-      case ' ':
-        if (!query && !open) {
-          event.preventDefault();
-          setOpen(true);
-        }
-        return;
-      case 'Escape':
-        if (open) {
-          event.preventDefault();
-          close(source === 'drawer');
-        } else if (query) {
-          event.preventDefault();
-          setQuery('');
-        }
-        return;
-      case 'Tab':
-        if (open && !drawer) close(false);
-        return;
-      case 'Backspace':
-        if (!query && atStart && selected.length) {
-          const last = removeButtons().at(-1);
-          const item = last?.dataset.chipFieldRemove;
-          if (item === undefined) return;
-          event.preventDefault();
-          remove(item, 'input');
-        }
-        return;
-      case back:
-        if (source === 'field' && atStart && !event.shiftKey) {
-          const last = removeButtons().at(-1);
-          if (!last) return;
-          event.preventDefault();
-          close(false);
-          last.focus();
-        }
-        return;
+    const dir = isRtl(rootRef.current) ? 'rtl' : 'ltr';
+
+    const commaTyped = event.key === ',';
+    if (commaTyped && !event.defaultPrevented && !isComposingKey(event.nativeEvent)) {
+      if (!trimmed || addQueryAsChip()) event.preventDefault();
+      return;
     }
+
+    keyHandler(
+      {
+        ...withModifiers({
+          ArrowDown: () => {
+            if (!open) setOpen(true);
+            else move(1);
+          },
+          ArrowUp: () => {
+            if (!open) setOpen(true);
+            else move(-1);
+          },
+          PageDown: () => {
+            if (!open) return false;
+            move(PAGE_SIZE);
+          },
+          PageUp: () => {
+            if (!open) return false;
+            move(-PAGE_SIZE);
+          },
+          Enter: () => {
+            if (open && active !== undefined) choose(active);
+            else if (!trimmed) return false;
+            else if (!addQueryAsChip()) setOpen(true);
+          },
+          Space: () => {
+            if (query || open) return false;
+            setOpen(true);
+          },
+          Escape: () => {
+            if (open) close(source === 'drawer');
+            else if (query) setQuery('');
+            else return false;
+          },
+          Tab: () => {
+            if (open && !drawer) close(false);
+            return false;
+          },
+          Backspace: () => {
+            if (query || !atStart || !selected.length) return false;
+            const item = removeButtons().at(-1)?.dataset.chipFieldRemove;
+            if (item === undefined) return false;
+            remove(item, 'input');
+          },
+        }),
+        ...withModifiers(
+          {
+            ArrowLeft: () => {
+              const last = removeButtons().at(-1);
+              if (source !== 'field' || !atStart || !last) return false;
+              close(false);
+              last.focus();
+            },
+          },
+          ['Control', 'Alt', 'Meta'],
+        ),
+      },
+      { dir },
+    )(event);
   };
 
   const onChipKeyDown = (event: KeyboardEvent<HTMLButtonElement>, item: string) => {
     const buttons = removeButtons();
     const index = buttons.indexOf(event.currentTarget);
-    const rtl = isRtl(rootRef.current);
-    const backKey = rtl ? 'ArrowRight' : 'ArrowLeft';
-    const forwardKey = rtl ? 'ArrowLeft' : 'ArrowRight';
+    const dir = isRtl(rootRef.current) ? 'rtl' : 'ltr';
+
+    const handled = keyHandler(
+      withModifiers({
+        ArrowLeft: () => {
+          buttons[Math.max(index - 1, 0)]?.focus();
+        },
+        ArrowRight: () => {
+          if (index + 1 < buttons.length) buttons[index + 1].focus();
+          else focusInput('start');
+        },
+        Home: () => {
+          buttons[0]?.focus();
+        },
+        End: () => {
+          focusInput('end');
+        },
+        Escape: () => {
+          focusInput('end');
+        },
+        Backspace: () => {
+          remove(item, index > 0 ? index - 1 : buttons.length > 1 ? 0 : 'input');
+        },
+        Delete: () => {
+          remove(item, index < buttons.length - 1 ? index : 'input');
+        },
+      }),
+      { dir },
+    )(event);
+
     const printable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
-    switch (event.key) {
-      case backKey:
-        event.preventDefault();
-        buttons[Math.max(index - 1, 0)]?.focus();
-        return;
-      case forwardKey:
-        event.preventDefault();
-        if (index + 1 < buttons.length) buttons[index + 1].focus();
-        else focusInput('start');
-        return;
-      case 'Home':
-        event.preventDefault();
-        buttons[0]?.focus();
-        return;
-      case 'End':
-      case 'Escape':
-        event.preventDefault();
-        focusInput('end');
-        return;
-      case 'Backspace':
-        event.preventDefault();
-        remove(item, index > 0 ? index - 1 : buttons.length > 1 ? 0 : 'input');
-        return;
-      case 'Delete':
-        event.preventDefault();
-        remove(item, index < buttons.length - 1 ? index : 'input');
-        return;
-    }
-    if (printable) sendTypingToInput();
+    if (!handled && printable) sendTypingToInput();
   };
 
   const onChipRemove = (item: string) => {

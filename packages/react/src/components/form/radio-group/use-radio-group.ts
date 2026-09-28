@@ -9,6 +9,7 @@ import {
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
+import { keyHandler } from '../../../internal/keys';
 import { mergeRefs } from '../../../utils';
 
 export type UseRadioGroupOptions<T extends string> = {
@@ -55,13 +56,15 @@ export function useRadioGroup<T extends string>({
   };
 
   const moveToEnd = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'Home' && event.key !== 'End') return;
-    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     const radios = enabledRadios(event.currentTarget);
-    if (!radios.includes(event.target as HTMLInputElement)) return;
-    const target = event.key === 'Home' ? radios[0]! : radios[radios.length - 1]!;
-    event.preventDefault();
-    chooseLikeArrowKey(target);
+    const chooseFromFocused = (target: HTMLInputElement | undefined) => () => {
+      if (!target || !radios.includes(event.target as HTMLInputElement)) return false;
+      chooseLikeArrowKey(target);
+    };
+
+    keyHandler({ Home: chooseFromFocused(radios[0]), End: chooseFromFocused(radios.at(-1)) })(
+      event,
+    );
   };
 
   const mergedRef: RefCallback<HTMLDivElement> = useCallback(

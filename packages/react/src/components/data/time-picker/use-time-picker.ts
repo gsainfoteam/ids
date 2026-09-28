@@ -20,6 +20,7 @@ import {
   type TimeUnit,
 } from './time';
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 
 import type { IdsSize } from '../../../tokens/types';
 import type { Time } from '@internationalized/date';
@@ -175,48 +176,66 @@ export function useTimeColumn(c: TimePickerApi, unit: TimeUnit) {
   });
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.defaultPrevented || c.state.disabled) return;
+    if (c.state.disabled) return;
+
     const index = numbers.indexOf(activeNumber);
-    const moves: Record<string, number> = {
-      ArrowUp: index - 1,
-      ArrowDown: index + 1,
-      PageUp: index - 5,
-      PageDown: index + 5,
-      Home: 0,
-      End: numbers.length - 1,
+    const column = event.currentTarget;
+    const rtl =
+      (getComputedStyle(column).direction || column.closest('[dir]')?.getAttribute('dir')) ===
+      'rtl';
+
+    const moveToIndex = (target: number) => () => {
+      scrolling.current = false;
+      moveTo(numbers[clamp(target, 0, numbers.length - 1)]);
     };
-    if (event.key in moves) {
+
+    const focusColumn = (offset: 1 | -1) => () => {
+      const columns = Array.from(
+        column.closest('[data-time-picker]')?.querySelectorAll<HTMLElement>('[data-time-column]') ??
+          [],
+      );
+      columns[columns.indexOf(column) + offset]?.focus({ preventScroll: true });
+    };
+
+    const handled = keyHandler(
+      withModifiers({
+        ArrowUp: moveToIndex(index - 1),
+        ArrowDown: moveToIndex(index + 1),
+        PageUp: moveToIndex(index - 5),
+        PageDown: moveToIndex(index + 5),
+        Home: moveToIndex(0),
+        End: moveToIndex(numbers.length - 1),
+        Enter: () => {
+          commit(activeNumber);
+        },
+        Space: () => {
+          commit(activeNumber);
+        },
+        Delete: () => {
+          c.clear();
+        },
+        Backspace: () => {
+          c.clear();
+        },
+        ArrowRight: focusColumn(1),
+        ArrowLeft: focusColumn(-1),
+      }),
+      { dir: rtl ? 'rtl' : 'ltr' },
+    )(event);
+
+    const printable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
+    if (handled || event.defaultPrevented || !printable) return;
+
+    const now = event.timeStamp;
+    const buffer =
+      (now - typed.current.at < TYPEAHEAD_RESET ? typed.current.buffer : '') + event.key;
+    typed.current = { buffer, at: now };
+    const labels = options.map((o) => o.label);
+    const match = typeaheadMatch(labels, buffer, buffer.length > 1 ? index - 1 : index);
+    if (match >= 0) {
       event.preventDefault();
       scrolling.current = false;
-      moveTo(numbers[clamp(moves[event.key], 0, numbers.length - 1)]);
-    } else if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      commit(activeNumber);
-    } else if (event.key === 'Delete' || event.key === 'Backspace') {
-      event.preventDefault();
-      c.clear();
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-      event.preventDefault();
-      const el = event.currentTarget;
-      const rtl =
-        (getComputedStyle(el).direction || el.closest('[dir]')?.getAttribute('dir')) === 'rtl';
-      const columns = Array.from(
-        el.closest('[data-time-picker]')?.querySelectorAll<HTMLElement>('[data-time-column]') ?? [],
-      );
-      const forward = (event.key === 'ArrowRight') !== rtl;
-      columns[columns.indexOf(el) + (forward ? 1 : -1)]?.focus({ preventScroll: true });
-    } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
-      const now = event.timeStamp;
-      const buffer =
-        (now - typed.current.at < TYPEAHEAD_RESET ? typed.current.buffer : '') + event.key;
-      typed.current = { buffer, at: now };
-      const labels = options.map((o) => o.label);
-      const match = typeaheadMatch(labels, buffer, buffer.length > 1 ? index - 1 : index);
-      if (match >= 0) {
-        event.preventDefault();
-        scrolling.current = false;
-        moveTo(numbers[match]);
-      }
+      moveTo(numbers[match]);
     }
   };
 

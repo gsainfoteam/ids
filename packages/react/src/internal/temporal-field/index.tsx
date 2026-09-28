@@ -26,6 +26,7 @@ import { flattenFragments, invariant, mergeProps, mergeRefs, part, tv } from '..
 import { FieldPopup, FieldPopupHeader } from '../field-popup';
 import { fieldAction, fieldSurface, type FieldSurfaceVariant } from '../field-surface';
 import { FormValue } from '../form-value';
+import { keyHandler, withModifiers } from '../keys';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -381,9 +382,13 @@ export function TemporalField<V>({
         },
         onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => {
           native.onKeyDown?.(event);
-          if (event.defaultPrevented || event.key !== 'ArrowDown') return;
-          event.preventDefault();
-          show();
+          keyHandler(
+            withModifiers({
+              ArrowDown: () => {
+                show();
+              },
+            }),
+          )(event);
         },
         onBlur: handleBlur,
       };

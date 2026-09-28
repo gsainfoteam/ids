@@ -1,9 +1,13 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 
+import { matchesKeyboardEvent } from '@tanstack/react-hotkeys';
 import { tabbable } from 'tabbable';
 
 import { blurWithin, isAlwaysInside } from './focus';
 import { isNodeFromAnyWindow } from '../../utils';
+import { isComposingKey, keyWithModifiers } from '../keys';
+
+const ESCAPE_WITH_ANY_MODIFIERS = keyWithModifiers('Escape');
 
 export type LayerKind = 'modal' | 'popup' | 'tooltip';
 
@@ -117,8 +121,8 @@ function listen(doc: Document, stack: Entry[]) {
   const onKeyDown = (event: KeyboardEvent) => {
     pressedOutside.clear();
 
-    const composing = event.isComposing || event.keyCode === 229;
-    if (event.key !== 'Escape' || event.defaultPrevented || composing) return;
+    const escape = ESCAPE_WITH_ANY_MODIFIERS.some((hotkey) => matchesKeyboardEvent(event, hotkey));
+    if (!escape || event.defaultPrevented || isComposingKey(event)) return;
 
     const top = stack.at(-1)?.layer;
     if (!top?.dismissible()) return;

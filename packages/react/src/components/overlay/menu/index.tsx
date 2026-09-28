@@ -41,6 +41,7 @@ import { MenuItemIndicator, withIndicator, type MenuItemIndicatorProps } from '.
 import { menuStyle } from './style';
 import { useMenuLevel, type MenuLevel, type MenuPlacement, type MenuTriggerType } from './use-menu';
 import { selectItem, useMenuItem } from './use-menu-item';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import { messages } from '../../../internal/messages';
 import {
   FloatingList,
@@ -280,13 +281,16 @@ function MenuPopup({ level, name, className, style, children, ...props }: PopupP
             const ownMenu = (event.target as Element).closest('[data-menu-content]');
             if (ownMenu !== event.currentTarget) return;
 
-            if (event.key === 'Tab') {
-              event.preventDefault();
-              root.closeTree({ returnFocus: true });
-              return;
-            }
+            const closedOnTab = keyHandler(
+              withModifiers({
+                Tab: () => {
+                  root.closeTree({ returnFocus: true });
+                },
+              }),
+              { evenIfPrevented: true, evenWhileComposing: true },
+            )(event);
 
-            navigate?.(event);
+            if (!closedOnTab) navigate?.(event);
           },
         })}
         popover="manual"

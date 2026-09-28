@@ -8,10 +8,11 @@ import {
   type KeyboardEvent,
 } from 'react';
 
+import { mapValues } from 'es-toolkit';
 import { flushSync } from 'react-dom';
 
 import {
-  nextTriggerIndex,
+  TRIGGER_MOVES,
   openValues,
   revealValue,
   toggleValue,
@@ -19,6 +20,7 @@ import {
   type AccordionValue,
 } from './accordion-value';
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { keyHandler } from '../../../internal/keys';
 import { isDevelopment } from '../../../utils/dev';
 
 export const ROOT_ATTRIBUTE = 'data-accordion';
@@ -55,18 +57,19 @@ export function useAccordion<T extends string>({
 
   const onTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     const root = rootRef.current;
-    if (!root || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    if (!root) return;
+
     const triggers = Array.from(
       root.querySelectorAll<HTMLButtonElement>(`[${TRIGGER_ATTRIBUTE}]`),
     ).filter((trigger) => !trigger.disabled && trigger.closest(`[${ROOT_ATTRIBUTE}]`) === root);
-    const next = nextTriggerIndex(
-      event.key,
-      triggers.indexOf(event.currentTarget),
-      triggers.length,
-    );
-    if (next === null) return;
-    event.preventDefault();
-    triggers[next]?.focus();
+    const index = triggers.indexOf(event.currentTarget);
+
+    const focusTrigger = (target: (index: number, count: number) => number) => () => {
+      if (triggers.length === 0) return false;
+      triggers[target(index, triggers.length)]?.focus();
+    };
+
+    keyHandler(mapValues(TRIGGER_MOVES, focusTrigger))(event);
   };
 
   const registry = useRef(new Map<string, number>());

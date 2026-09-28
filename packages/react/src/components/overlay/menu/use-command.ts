@@ -4,12 +4,12 @@ import {
   useLayoutEffect,
   useRef,
   useState,
-  type KeyboardEvent,
   type MouseEvent,
   type PointerEvent,
 } from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import {
   focusReturnTarget,
   initialFocusTarget,
@@ -33,15 +33,7 @@ const OPTION = '[data-menu-option]';
 const ENABLED_OPTION = '[data-menu-option]:not([aria-disabled="true"])';
 const OPTION_OR_SEPARATOR = '[data-menu-option], [data-menu-separator]';
 const GROUP = '[data-menu-group]';
-const SAFARI_COMPOSING_KEY_CODE = 229;
 const NO_SECTIONS: ReadonlySet<Element> = new Set();
-
-const MOVE_KEYS: Partial<Record<string, Move>> = {
-  ArrowDown: 'next',
-  ArrowUp: 'previous',
-  Home: 'first',
-  End: 'last',
-};
 
 function sectionsWithoutOptions(list: HTMLElement) {
   const hidden = new Set<Element>();
@@ -200,23 +192,19 @@ export function useCommandPalette({
     reveal(list, options[target]!, target);
   };
 
-  const onSearchKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.nativeEvent.isComposing || event.keyCode === SAFARI_COMPOSING_KEY_CODE) return;
-
-    const to = MOVE_KEYS[event.key];
-    if (to) {
-      event.preventDefault();
-      move(to);
-      return;
-    }
-
-    if (event.key !== 'Enter') return;
-
-    event.preventDefault();
-    optionsIn(list)
-      .find((option) => option.id === activeId)
-      ?.click();
-  };
+  const onSearchKeyDown = keyHandler(
+    withModifiers({
+      ArrowDown: () => move('next'),
+      ArrowUp: () => move('previous'),
+      Home: () => move('first'),
+      End: () => move('last'),
+      Enter: () => {
+        optionsIn(list)
+          .find((option) => option.id === activeId)
+          ?.click();
+      },
+    }),
+  );
 
   const baseId = useId();
 

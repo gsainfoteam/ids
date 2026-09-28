@@ -1,8 +1,16 @@
 import { useLayoutEffect, useRef, useState, type KeyboardEvent, type RefObject } from 'react';
 
+import { mapValues } from 'es-toolkit';
 import { focusable } from 'tabbable';
 
-import { rovingMove, rovingTabStop, rovingTarget, type RovingItem } from './roving';
+import {
+  rovingKeys,
+  rovingTabStop,
+  rovingTarget,
+  type RovingItem,
+  type RovingMove,
+} from './roving';
+import { keyHandler } from '../../../internal/keys';
 
 import type { GroupOrientation } from '.';
 
@@ -74,21 +82,26 @@ export function useRovingFocus({
   const onItemFocus = (value: string) => setLastFocused(value);
 
   const onItemKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
-      return;
     const root = rootRef.current;
     if (!root) return;
-    const move = rovingMove(event.key, { orientation, rtl: isRtl(root), anyArrow: radio });
-    if (!move) return;
-    const scanned = scan(root, ownItemSelector);
-    const from = scanned.findIndex(({ element }) => element === event.currentTarget);
-    if (from === -1) return;
-    event.preventDefault();
-    const to = rovingTarget(scanned, from, move, loop);
-    if (to === -1 || to === from) return;
-    const target = scanned[to]!.element;
-    target.focus();
-    onArrive?.(target);
+
+    const moveFocus = (move: RovingMove) => () => {
+      const scanned = scan(root, ownItemSelector);
+      const from = scanned.findIndex(({ element }) => element === event.currentTarget);
+      if (from === -1) return false;
+
+      const to = rovingTarget(scanned, from, move, loop);
+      if (to === -1 || to === from) return;
+
+      const target = scanned[to]!.element;
+      target.focus();
+      onArrive?.(target);
+    };
+
+    const keys = mapValues(rovingKeys({ orientation, anyArrow: radio }), (move) =>
+      moveFocus(move!),
+    );
+    keyHandler(keys, { dir: isRtl(root) ? 'rtl' : 'ltr' })(event);
   };
 
   return { items, elements, tabStop, onItemFocus, onItemKeyDown };

@@ -1,15 +1,9 @@
-import {
-  useId,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type FocusEvent,
-  type KeyboardEvent,
-} from 'react';
+import { useId, useRef, useState, type ChangeEvent, type FocusEvent } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useFormReset } from '../../hooks/use-form-reset';
 import { isNodeFromAnyWindow } from '../../utils';
+import { keyHandler, withModifiers } from '../keys';
 
 export type TemporalFieldState<V> = {
   value: V;
@@ -134,18 +128,20 @@ export function useTemporalField<V>(options: UseTemporalFieldOptions<V>) {
         dropDraft();
       }
     },
-    onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
-      if (event.defaultPrevented || event.nativeEvent.isComposing) return;
-      if (event.key === 'Enter' && !readDraft()) event.preventDefault();
-      else if (event.key === 'ArrowDown' && !blocked) {
-        event.preventDefault();
-        readDraft();
-        setOpen(true);
-      } else if (event.key === 'Escape' && draft !== null && !expanded) {
-        event.preventDefault();
-        dropDraft();
-      }
-    },
+    onKeyDown: keyHandler<HTMLInputElement>(
+      withModifiers({
+        Enter: () => !readDraft(),
+        ArrowDown: () => {
+          if (blocked) return false;
+          readDraft();
+          setOpen(true);
+        },
+        Escape: () => {
+          if (draft === null || expanded) return false;
+          dropDraft();
+        },
+      }),
+    ),
     onBlur: (event: FocusEvent<HTMLInputElement>) => {
       readDraft();
       onBlur(event);

@@ -299,6 +299,14 @@ is drawn again with its old `value`, React sees no change and the keystroke is l
 text controls reread the DOM inside the `onChange` batch (`rereadInOnChangeBatch`); native
 listeners stay for what React does not report, such as a form `reset` or a value written by script.
 
+**Keys.** Widget keys go through `keyHandler` from `internal/keys.ts`: one map from `Hotkey`
+strings to actions, with the `defaultPrevented`, IME composition and right-to-left checks done
+once. An action that returns `false` leaves the key to the browser; otherwise the key is
+`preventDefault`ed and never stopped. TanStack matches modifiers exactly, so a key that should
+work with any modifier is listed through `withModifiers`. Shortcut strings, in props and maps
+alike, are the `Hotkey` type (`'Mod+K'`, `'Alt+T'`). Printable keys (typeahead, `,`, digits) are
+read from `event.key`, since TanStack falls back to the key's position.
+
 **Parts.** Part props types are named `X.PartProps` (`OTPField.SlotProps`,
 `ButtonGroup.SeparatorProps`). Every part is optional and falls back to a default.
 
@@ -330,7 +338,8 @@ Dialog, Drawer, Popover, Menu, Tooltip, Toast and the field popups are all assem
   included) and has no scroll lock. Tooltip is the one portal: it goes to the nearest IdsProvider
   root so an in-place hint does not shift sibling selectors (`space-*`, `divide-*`, Group seams).
 - **One dismissal engine.** `useLayer` puts every open layer on one stack, ordered by open time.
-  Escape closes only the top layer, after inner handlers had their say through `preventDefault`;
+  Escape (recognised with TanStack's `matchesKeyboardEvent`, skipped during IME composition) closes
+  only the top layer, after inner handlers had their say through `preventDefault`;
   a press outside closes non-modal layers from the top until it reaches one that holds it; focus
   leaving closes non-modal layers and is pulled back into the top modal. Do not add floating-ui's
   `useDismiss`: it stops Escape's propagation and ignores `defaultPrevented`.

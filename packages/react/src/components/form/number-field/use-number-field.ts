@@ -25,6 +25,7 @@ import { predictTextAfterInput } from './number-input';
 import { addDecimal, clampToStep, isOnStep, shiftDecimal, snapToStep } from './number-step';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import { messages } from '../../../internal/messages';
 import { isInvalid, useMergedRef, useTextControl } from '../../../internal/text-control';
 import { invariant, mergeProps } from '../../../utils';
@@ -396,25 +397,36 @@ export function useNumberField({
     },
     onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
       native.onKeyDown?.(event);
-      if (event.defaultPrevented || locked || composing.current || event.nativeEvent.isComposing)
-        return;
+      if (locked || composing.current) return;
+
       control.onEscape(event);
-      if (event.defaultPrevented || event.ctrlKey || event.metaKey) return;
-      const { key } = event;
-      if (key === 'ArrowUp' || key === 'ArrowDown') {
-        event.preventDefault();
-        stepBy(
-          key === 'ArrowUp' ? 1 : -1,
-          event.shiftKey ? large : event.altKey ? small : stepSize,
-        );
-      } else if (key === 'PageUp' || key === 'PageDown') {
-        event.preventDefault();
-        stepBy(key === 'PageUp' ? 1 : -1, large);
-      } else if (key === 'Home' || key === 'End') {
-        if (jumpToBound(key === 'Home' ? min : max)) event.preventDefault();
-      } else if (key === 'Enter') {
-        commitDraft();
-      }
+
+      const arrowStep = event.shiftKey ? large : event.altKey ? small : stepSize;
+      keyHandler(
+        withModifiers(
+          {
+            ArrowUp: () => {
+              stepBy(1, arrowStep);
+            },
+            ArrowDown: () => {
+              stepBy(-1, arrowStep);
+            },
+            PageUp: () => {
+              stepBy(1, large);
+            },
+            PageDown: () => {
+              stepBy(-1, large);
+            },
+            Home: () => jumpToBound(min),
+            End: () => jumpToBound(max),
+            Enter: () => {
+              commitDraft();
+              return false;
+            },
+          },
+          ['Alt', 'Shift'],
+        ),
+      )(event);
     },
   };
 

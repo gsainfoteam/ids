@@ -20,6 +20,7 @@
 | [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트  | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`        |
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                   | IconButton, IconToggle, FloatingButton                                                                         |
 | [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                 | IconButton, IconToggle                                                                                         |
+| [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `temporal-field/`, `text-control/` |
 | [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각               | Select, ChipField, Menu, `field-popup/`                                                                        |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구 전부와 기본 locale                     | 문구를 그리는 모든 컴포넌트, `date-locale.ts`                                                                  |
 | [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어 | Alert, `field-popup/`                                                                                          |
@@ -477,6 +478,66 @@ export const Style = tv({
 ### 알아둘 것
 
 - `[&_svg]` 는 svg 에 붙은 `size-*` 클래스보다 우선합니다. 생성된 선택자(`.cls svg`)의 specificity 가 더 높습니다. control surface 의 `[&_svg:not([class*='size-'])]` 와 달리 아이콘의 크기 클래스를 따르지 않습니다.
+
+## keys.ts
+
+위젯의 키 조작을 `@tanstack/react-hotkeys` 의 단축키 문자열(`Hotkey`)로 적은 키→동작 표 하나로 처리합니다.
+
+- `keyHandler(map, options)`: React `onKeyDown` 에 넣는 `(event) => boolean` 을 돌려줍니다. 동작한 키면 `preventDefault()` 하고 `true` 입니다.
+- `withModifiers(map, modifiers?)`: 표의 키마다 수식 키 조합을 모두 더합니다. 기본은 Control, Alt, Shift, Meta 전부입니다.
+- `keyWithModifiers(key, modifiers?)`: 한 키의 수식 키 조합 목록(`Hotkey[]`)입니다.
+- `isComposingKey(event)`: IME 로 글자를 조합하는 중의 키인지(`isComposing`, Safari 의 `keyCode 229`) 봅니다.
+
+### 쓰는 곳
+
+- 위젯의 키: Group 의 roving focus, RadioGroup, Rating, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape
+- [pressable.ts](#pressablets) 와 Button 의 Enter, Space
+- [text-control](./text-control/README.md) 의 Escape, [temporal-field](./temporal-field/README.md) 의 입력과 trigger
+- [overlay](./overlay/README.md) 의 레이어 스택: `keyWithModifiers('Escape')`, `isComposingKey`
+
+### 쓰는 법
+
+```ts
+// components/form/slider/use-slider.ts
+keyHandler(
+  withModifiers({                       // Shift 는 큰 걸음, 다른 수식 키는 무시한다
+    ArrowRight: moveTo(at + small),
+    ArrowLeft: moveTo(at - small),
+    Home: moveTo(min),
+    End: moveTo(max),
+  }),
+  { dir: isRtl() ? 'rtl' : 'ltr' },     // rtl 이면 ArrowLeft 와 ArrowRight 의 동작을 바꾼다
+)(event);
+
+// components/data/accordion/use-accordion.ts: 수식 키가 눌리면 반응하지 않는다
+keyHandler(mapValues(TRIGGER_MOVES, focusTrigger))(event);
+
+// internal/temporal-field/use-temporal-field.ts: false 면 키를 브라우저에 남긴다
+Escape: () => {
+  if (draft === null || expanded) return false;
+  dropDraft();
+},
+```
+
+| 옵션                 | 동작                                                         |
+| -------------------- | ------------------------------------------------------------ |
+| `dir`                | `'rtl'` 이면 ArrowLeft 와 ArrowRight 의 동작을 맞바꾼다       |
+| `evenIfPrevented`    | `defaultPrevented` 인 키도 처리한다. 기본은 건너뛴다          |
+| `evenWhileComposing` | 조합 중의 키도 처리한다. 기본은 건너뛴다                      |
+
+### 왜 이렇게
+
+- 위젯마다 `event.key === …` 분기를 쓰면 조합 중 입력, `defaultPrevented`, RTL 검사가 곳마다 달라집니다. 앞단 검사를 한곳에 두고, 표는 키와 동작만 적습니다.
+- 매칭은 `createMultiHotkeyHandler` 에 맡깁니다. 앱이 쓰는 단축키 문자열과 같은 문법이라 `Hotkey` 타입이 오타를 막습니다.
+- `createMultiHotkeyHandler` 는 `preventDefault: false`, `stopPropagation: false` 로 씁니다. IDS 는 전파를 막지 않고, `preventDefault()` 는 동작한 때만 합니다. 동작이 `false` 를 돌려주면 동작하지 않은 것입니다.
+- TanStack 은 수식 키를 정확히 맞춥니다. 수식 키와 상관없이 반응하던 키는 `withModifiers` 로 조합을 모두 적고, 수식 키가 눌리면 건너뛰던 키(roving, Accordion)는 맨 키만 적습니다.
+- 단축키 문자열은 키를 누를 때 파싱합니다. 렌더마다 표를 새로 만들어도 파싱 비용이 들지 않습니다.
+
+### 알아둘 것
+
+- 글자 키(`,`, 숫자, typeahead)는 표에 넣지 않고 `event.key` 로 봅니다. TanStack 은 `event.key` 가 맞지 않으면 `event.code` 자리로도 맞춰서, 러시아어 자판의 `б`(Comma 자리)가 `,` 로, AZERTY 의 `&`(Digit1 자리)가 `1` 로 읽힙니다.
+- 표의 첫 번째로 맞은 키 하나만 돕니다. 같은 키를 두 번 적지 않습니다.
+- 조합 중 Escape 를 건너뛰어야 IME 가 조합을 취소하는 Escape 로 필드가 지워지거나 레이어가 닫히지 않습니다. `evenWhileComposing` 은 Button 의 비활성 차단, 메뉴의 Tab 처럼 전에도 검사하지 않던 곳에만 씁니다.
 
 ## list-styles.ts
 

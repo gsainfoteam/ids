@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useState, type KeyboardEvent } from 'react'
 import { tabbable } from 'tabbable';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import { usePresence } from '../../../internal/overlay/use-presence';
 
 function neighbour(root: HTMLElement) {
@@ -60,10 +61,15 @@ export function useAlert({ open, defaultOpen, onOpenChange, dismissible }: UseAl
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const composing = event.nativeEvent.isComposing || event.keyCode === 229;
-    if (!dismissible || event.key !== 'Escape' || event.defaultPrevented || composing) return;
-    event.preventDefault();
-    close();
+    if (!dismissible) return;
+
+    keyHandler(
+      withModifiers({
+        Escape: () => {
+          close();
+        },
+      }),
+    )(event);
   };
 
   return {

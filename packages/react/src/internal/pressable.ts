@@ -1,5 +1,7 @@
 import { useRef, type FocusEvent, type KeyboardEvent, type MouseEvent } from 'react';
 
+import { keyHandler, withModifiers } from './keys';
+
 const NESTED_CONTROL = [
   'a[href]',
   'button',
@@ -60,14 +62,20 @@ export function usePressable<E extends HTMLElement>({
     },
     onKeyDown(event: KeyboardEvent<E>) {
       onKeyDown?.(event);
-      if (event.defaultPrevented || disabled || event.target !== event.currentTarget) return;
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        event.currentTarget.click();
-      } else if (event.key === ' ') {
-        event.preventDefault();
-        if (!event.repeat) spaceDown.current = true;
-      }
+      if (disabled || event.target !== event.currentTarget) return;
+
+      const surface = event.currentTarget;
+
+      keyHandler(
+        withModifiers({
+          Enter: () => {
+            surface.click();
+          },
+          Space: () => {
+            if (!event.repeat) spaceDown.current = true;
+          },
+        }),
+      )(event);
     },
     onKeyUp(event: KeyboardEvent<E>) {
       onKeyUp?.(event);

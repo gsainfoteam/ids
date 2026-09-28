@@ -17,6 +17,7 @@ import { flushSync } from 'react-dom';
 import { closestThumb, moveThumb, ratioAlong } from './slider-math';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import { mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
@@ -186,24 +187,27 @@ export function useSlider({
 
   const onThumbKeyDown = (index: number) => (event: KeyboardEvent<HTMLElement>) => {
     if (disabled || readOnly) return;
+
     const at = latest.current[index]!;
     const small = event.shiftKey ? largeStep : step;
-    const forward = isRtl() ? -small : small;
-    const targets: Record<string, number> = {
-      ArrowUp: at + small,
-      ArrowDown: at - small,
-      ArrowRight: at + forward,
-      ArrowLeft: at - forward,
-      PageUp: at + largeStep,
-      PageDown: at - largeStep,
-      Home: min,
-      End: max,
+    const moveTo = (target: number) => () => {
+      valuesBeforeHeldKey.current ??= latest.current;
+      renderBeforeNextMove(moveThumb(latest.current, index, target, bounds));
     };
-    const target = targets[event.key];
-    if (target === undefined) return;
-    event.preventDefault();
-    valuesBeforeHeldKey.current ??= latest.current;
-    renderBeforeNextMove(moveThumb(latest.current, index, target, bounds));
+
+    keyHandler(
+      withModifiers({
+        ArrowUp: moveTo(at + small),
+        ArrowDown: moveTo(at - small),
+        ArrowRight: moveTo(at + small),
+        ArrowLeft: moveTo(at - small),
+        PageUp: moveTo(at + largeStep),
+        PageDown: moveTo(at - largeStep),
+        Home: moveTo(min),
+        End: moveTo(max),
+      }),
+      { dir: isRtl() ? 'rtl' : 'ltr' },
+    )(event);
   };
 
   const commitHeldKey = () => {

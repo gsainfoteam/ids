@@ -7,6 +7,7 @@ import {
 } from 'react';
 
 import { clearInput } from './clear-input';
+import { keyHandler, withModifiers } from '../keys';
 
 type TextElement = HTMLInputElement | HTMLTextAreaElement;
 
@@ -44,17 +45,19 @@ export function useTextControl({ inputRef, disabled, readOnly, clearable }: UseT
   };
 
   const onEscape = (event: KeyboardEvent<TextElement>) => {
-    if (
-      !clearable ||
-      event.key !== 'Escape' ||
-      event.defaultPrevented ||
-      event.nativeEvent.isComposing
-    )
-      return;
-    const escapeLeftForEnclosingPopup = event.currentTarget.value === '';
-    if (escapeLeftForEnclosingPopup || disabled || readOnly) return;
-    event.preventDefault();
-    clearInput(event.currentTarget);
+    if (!clearable) return;
+
+    const input = event.currentTarget;
+    const escapeLeftForEnclosingPopup = input.value === '';
+
+    keyHandler(
+      withModifiers({
+        Escape: () => {
+          if (escapeLeftForEnclosingPopup || disabled || readOnly) return false;
+          clearInput(input);
+        },
+      }),
+    )(event);
   };
 
   return { focused, rootProps, clear, onEscape };

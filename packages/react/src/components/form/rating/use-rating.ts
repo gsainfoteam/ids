@@ -11,8 +11,11 @@ import {
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import { mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+
+const DIGIT = /^[0-9]$/;
 
 export type UseRatingOptions = {
   value?: number;
@@ -64,31 +67,45 @@ export function useRating({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!interactive || event.altKey || event.ctrlKey || event.metaKey) return;
+    if (!interactive) return;
+
     const root = event.currentTarget;
     const focusedScore = Number(
       (event.target as HTMLElement).getAttribute('data-rating-value') ?? current,
     );
     const rtl = getComputedStyle(root).direction === 'rtl';
-    const targets: Record<string, number> = {
-      ArrowRight: focusedScore + (rtl ? -step : step),
-      ArrowLeft: focusedScore + (rtl ? step : -step),
-      ArrowUp: focusedScore + step,
-      ArrowDown: focusedScore - step,
-      Home: 0,
-      '0': 0,
-      End: max,
+
+    const rateAndFocus = (score: number) => {
+      const next = normalize(score);
+      choose(next);
+      preview(null);
+      root
+        .querySelector<HTMLButtonElement>(`[data-rating-value="${next}"]`)
+        ?.focus({ preventScroll: true });
     };
-    let next = targets[event.key];
-    if (next === undefined && /^[1-9]$/.test(event.key)) next = Number(event.key);
-    if (next === undefined) return;
+
+    const rateBy = (score: number) => () => rateAndFocus(score);
+
+    const moved = keyHandler(
+      withModifiers(
+        {
+          ArrowRight: rateBy(focusedScore + step),
+          ArrowLeft: rateBy(focusedScore - step),
+          ArrowUp: rateBy(focusedScore + step),
+          ArrowDown: rateBy(focusedScore - step),
+          Home: rateBy(0),
+          End: rateBy(max),
+        },
+        ['Shift'],
+      ),
+      { dir: rtl ? 'rtl' : 'ltr' },
+    )(event);
+
+    const typedScore = DIGIT.test(event.key) && !event.altKey && !event.ctrlKey && !event.metaKey;
+    if (moved || !typedScore) return;
+
     event.preventDefault();
-    next = normalize(next);
-    choose(next);
-    preview(null);
-    root
-      .querySelector<HTMLButtonElement>(`[data-rating-value="${next}"]`)
-      ?.focus({ preventScroll: true });
+    rateAndFocus(Number(event.key));
   };
 
   const forwardRootFocusToChecked = (event: FocusEvent<HTMLDivElement>) => {

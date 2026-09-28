@@ -6,7 +6,7 @@ import {
   useState,
   useSyncExternalStore,
   type FocusEvent,
-  type KeyboardEvent as ReactKeyboardEvent,
+  type KeyboardEvent,
 } from 'react';
 
 import { isEqual } from 'es-toolkit';
@@ -19,6 +19,7 @@ import {
   type ToastId,
   type ToastRecord,
 } from './toast-store';
+import { keyHandler, withModifiers } from '../../../internal/keys';
 import {
   blurWithin,
   keepAboveLayers,
@@ -227,12 +228,14 @@ export function useToaster({ explicit, max, gap, expand }: UseToasterOptions) {
       setFocusWithin(false);
       cameFrom.current = null;
     },
-    onKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => {
-      const composing = event.nativeEvent.isComposing || event.keyCode === 229;
-      if (event.key !== 'Escape' || event.defaultPrevented || composing) return;
-
-      event.preventDefault();
-      releaseFocus({ stayInRegion: false });
+    onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+      keyHandler(
+        withModifiers({
+          Escape: () => {
+            releaseFocus({ stayInRegion: false });
+          },
+        }),
+      )(event);
     },
   };
 
