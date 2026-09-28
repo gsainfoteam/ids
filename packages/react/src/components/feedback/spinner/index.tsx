@@ -8,6 +8,8 @@ import { useFieldSize } from '../../form/field/context';
 
 import type { IdsSize } from '../../../tokens/types';
 
+const SIZE_WHEN_UNSTYLED = '1em';
+
 export function Spinner({
   size,
   decorative,
@@ -34,8 +36,8 @@ export function Spinner({
         {...rest}
         ref={mergedRef}
         ratio={0.25}
-        width="1em"
-        height="1em"
+        width={SIZE_WHEN_UNSTYLED}
+        height={SIZE_WHEN_UNSTYLED}
         data-spinner=""
         data-size={resolvedSize}
         className={root({ className: resolvedClassName })}
