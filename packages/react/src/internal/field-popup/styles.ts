@@ -23,7 +23,7 @@ export const fieldListbox = {
   option: cn(
     'relative flex cursor-default items-center gap-2 rounded-standard py-1.5 ps-2.5 pe-8 outline-none select-none wrap-anywhere',
     'data-highlighted:bg-(--ids-color-muted)',
-    'aria-disabled:pointer-events-none aria-disabled:opacity-50',
+    'aria-disabled:opacity-50',
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
   ),
   indicator: cn(
