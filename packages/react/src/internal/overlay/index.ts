@@ -38,6 +38,7 @@ export {
 export {
   useAnchored,
   VIEWPORT_MARGIN,
+  type Anchored,
   type AnchoredAlign,
   type AnchoredSide,
   type UseAnchoredOptions,

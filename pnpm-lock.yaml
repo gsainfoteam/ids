@@ -37,9 +37,6 @@ importers:
       '@floating-ui/react':
         specifier: ~0.27.20
         version: 0.27.20(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@floating-ui/react-dom':
-        specifier: ^2.1.9
-        version: 2.1.9(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@heroicons/react':
         specifier: ^2.2.0
         version: 2.2.0(react@19.2.6)
@@ -58,9 +55,6 @@ importers:
       es-toolkit:
         specifier: ^1.49.0
         version: 1.49.0
-      focus-trap:
-        specifier: ^8.2.2
-        version: 8.2.2
       libphonenumber-js:
         specifier: ^1.13.13
         version: 1.13.14
@@ -2087,9 +2081,6 @@ packages:
 
   flatted@3.4.4:
     resolution: {integrity: sha512-5+ybhBZANEJxaH3X5evAFatUxLfEHSr7n6kYJ+1Qd0mUqr4eu9gIf6GDbWHf8RJijHrjjO8G+la14SlL2SeS1Q==}
-
-  focus-trap@8.2.2:
-    resolution: {integrity: sha512-qV0g8hRYBqgACcFOH3f9wXc4zPKhr/0z9RI2a6ZijZ72EeBi4g8oBy8zAWuUR1TsMpOzwpUMFvjdasrC41Joug==}
 
   for-each@0.3.5:
     resolution: {integrity: sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg==}
@@ -5313,10 +5304,6 @@ snapshots:
   flatted@3.4.2: {}
 
   flatted@3.4.4: {}
-
-  focus-trap@8.2.2:
-    dependencies:
-      tabbable: 6.5.0
 
   for-each@0.3.5:
     dependencies:

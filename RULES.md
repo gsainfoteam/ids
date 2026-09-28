@@ -47,8 +47,7 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 - Classes are merged by `cn` (the package, in place of `clsx` + `tailwind-merge`). `utils/cn.ts` only adds the IDS config, and `utils/tv.ts` runs the lite build of `tailwind-variants` through the same `cn`, so one engine resolves every conflict.
 - Utility engines are installed, not written:
   - overlay positioning and interactions `@floating-ui/react` (hover intent, list navigation,
-    typeahead, menu trees, modal focus, delay groups); field-popup still calls
-    `@floating-ui/react-dom` and `focus-trap` directly until it moves onto the overlay core;
+    typeahead, menu trees, modal focus, delay groups), used only through `internal/overlay`;
   - focus order `tabbable`, scroll lock `react-remove-scroll`;
   - dates `date-fns`, numbers `@internationalized/number`, colors `culori`;
   - textarea sizing `react-textarea-autosize`, phone numbers `libphonenumber-js`.

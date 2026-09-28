@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, type CSSProperties, type RefObject } from 'react';
 
 import {
   arrow as arrowPosition,
@@ -11,8 +11,11 @@ import {
   useFloating,
   type OpenChangeReason,
   type Placement,
+  type UseFloatingReturn,
 } from '@floating-ui/react';
 import { clamp } from 'es-toolkit';
+
+import { isNodeFromAnyWindow } from '../../utils';
 
 export type AnchoredSide = 'top' | 'right' | 'bottom' | 'left';
 export type AnchoredAlign = 'start' | 'center' | 'end';
@@ -36,7 +39,7 @@ const alignOf = (placement: Placement) =>
 export type UseAnchoredOptions = {
   open: boolean;
   onOpenChange?: (open: boolean, event?: Event, reason?: OpenChangeReason) => void;
-  reference: Element | null;
+  reference: Element | RefObject<Element | null> | null;
   floating: HTMLElement | null;
   positioned?: boolean;
   side?: AnchoredSide;
@@ -48,6 +51,17 @@ export type UseAnchoredOptions = {
   arrow?: HTMLElement | null;
   arrowPadding?: number;
   nodeId?: string;
+};
+
+export type Anchored = {
+  context: UseFloatingReturn['context'];
+  refs: UseFloatingReturn['refs'];
+  floatingStyles: CSSProperties;
+  middlewareData: UseFloatingReturn['middlewareData'];
+  side: AnchoredSide;
+  align: AnchoredAlign;
+  isPositioned: boolean;
+  update: () => void;
 };
 
 export function useAnchored({
@@ -65,7 +79,7 @@ export function useAnchored({
   arrow,
   arrowPadding = 8,
   nodeId,
-}: UseAnchoredOptions) {
+}: UseAnchoredOptions): Anchored {
   const preferred = placementOf(side, align);
   const [landed, setLanded] = useState<Placement>(preferred);
   const [landedFor, setLandedFor] = useState({ preferred, open });
@@ -83,11 +97,15 @@ export function useAnchored({
       floating.style.setProperty('max-height', `${capHeightBeforeFirstFlip}px`);
   }, [floating, positioned, maxHeight]);
 
+  const referenceElement = isNodeFromAnyWindow(reference) ? (reference as Element) : null;
+  const referenceRef =
+    reference && !referenceElement ? (reference as RefObject<Element | null>) : null;
+
   const floatingState = useFloating({
     open,
     onOpenChange,
     nodeId,
-    elements: { reference: positioned ? reference : null, floating },
+    elements: { reference: positioned ? referenceElement : null, floating },
     strategy: 'fixed',
     placement: landed,
     transform: false,
@@ -124,6 +142,11 @@ export function useAnchored({
       arrow ? arrowPosition({ element: arrow, padding: arrowPadding }) : null,
     ],
   });
+
+  const { setReference } = floatingState.refs;
+  useLayoutEffect(() => {
+    if (referenceRef) setReference(positioned ? referenceRef.current : null);
+  }, [referenceRef, positioned, setReference]);
 
   const { placement, isPositioned } = floatingState;
   if (isPositioned && placement !== landed && landedFor.open === open) setLanded(placement);
