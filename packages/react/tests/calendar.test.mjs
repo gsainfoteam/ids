@@ -58,14 +58,20 @@ async function key(node, key, options = {}) {
     ),
   );
 }
+const REACT_DERIVES_ENTER_FROM = 'mouseover';
+const REACT_DERIVES_LEAVE_FROM = 'mouseout';
 async function hover(node) {
   await act(async () =>
-    node.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, relatedTarget: null })),
+    node.dispatchEvent(
+      new MouseEvent(REACT_DERIVES_ENTER_FROM, { bubbles: true, relatedTarget: null }),
+    ),
   );
 }
 async function leave(node) {
   await act(async () =>
-    node.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget: document.body })),
+    node.dispatchEvent(
+      new MouseEvent(REACT_DERIVES_LEAVE_FROM, { bubbles: true, relatedTarget: document.body }),
+    ),
   );
 }
 async function select(node, value) {
