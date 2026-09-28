@@ -6,7 +6,7 @@ on:
 
 jobs:
   js:
-    name: JS (lint / typecheck / build)
+    name: JS (lint / typecheck / build / test)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +37,11 @@ jobs:
 
       - name: Check react ships type declarations
         run: test -f packages/react/dist/index.d.ts
+
+      - name: Install Chromium for browser tests
+        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium
+
+      - run: pnpm test
 
   flutter:
     name: Flutter (test)
