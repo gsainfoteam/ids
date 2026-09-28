@@ -48,7 +48,7 @@ export type UseAnchoredOptions = {
   alignOffset?: number;
   width?: 'anchor' | number;
   maxHeight?: number;
-  arrow?: HTMLElement | null;
+  arrow?: Element | null;
   arrowPadding?: number;
   nodeId?: string;
 };

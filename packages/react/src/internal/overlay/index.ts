@@ -27,6 +27,7 @@ export {
   useOverlayItem,
   type OverlayItemBinding,
 } from './host';
+export * from './interactions';
 export { ModalLayer, type ModalLayerProps } from './modal-layer';
 export {
   coveredByKeyboard,
