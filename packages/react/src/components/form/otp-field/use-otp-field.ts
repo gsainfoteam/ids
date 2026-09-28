@@ -16,9 +16,9 @@ import {
 
 import {
   createCharacterTest,
-  insertText,
-  normalizeSelection,
+  overwriteText,
   sanitize,
+  selectCharacterUnderCaret,
   type OTPFieldPattern,
   type SelectionHistory,
 } from './otp-code';
@@ -45,7 +45,7 @@ export type UseOTPFieldOptions = {
   ref?: Ref<HTMLInputElement>;
 };
 
-function insertNatively(input: HTMLInputElement, start: number, end: number, text: string) {
+function tryInsertKeepingUndo(input: HTMLInputElement, start: number, end: number, text: string) {
   input.setSelectionRange(start, end);
   return (
     typeof document.execCommand === 'function' && document.execCommand('insertText', false, text)
@@ -74,14 +74,14 @@ export function useOTPField({
     .slice(0, length)
     .join('');
 
-  const [draft, setDraft] = useState<string | null>(null);
+  const [composition, setComposition] = useState<string | null>(null);
   const composing = useRef(false);
 
   const [focused, setFocused] = useState(false);
   const [selection, setSelection] = useState<SelectionHistory | null>(null);
   const previousSelection = useRef<SelectionHistory | null>(null);
-  const pendingCaret = useRef<number | null>(null);
-  const pointerFocus = useRef(false);
+  const caretToRestoreAfterRender = useRef<number | null>(null);
+  const focusedByPointer = useRef(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -101,7 +101,12 @@ export function useOTPField({
       end: input.selectionEnd ?? 0,
       direction: input.selectionDirection ?? 'none',
     };
-    const next = normalizeSelection(input.value.length, length, current, previousSelection.current);
+    const next = selectCharacterUnderCaret(
+      input.value.length,
+      length,
+      current,
+      previousSelection.current,
+    );
     if (next.start !== current.start || next.end !== current.end)
       input.setSelectionRange(next.start, next.end, next.direction);
     previousSelection.current = next;
@@ -118,11 +123,11 @@ export function useOTPField({
 
   useLayoutEffect(() => {
     const input = inputRef.current;
-    if (pendingCaret.current !== null && input && document.activeElement === input) {
-      const caret = Math.min(pendingCaret.current, input.value.length);
+    if (caretToRestoreAfterRender.current !== null && input && document.activeElement === input) {
+      const caret = Math.min(caretToRestoreAfterRender.current, input.value.length);
       input.setSelectionRange(caret, caret);
     }
-    pendingCaret.current = null;
+    caretToRestoreAfterRender.current = null;
     syncSelection();
   });
 
@@ -136,27 +141,27 @@ export function useOTPField({
   useEffect(() => {
     const input = inputRef.current;
     if (!input) return;
-    const onBeforeInput = (event: InputEvent) => {
+    const filterWithCaretInPlace = (event: InputEvent) => {
       if (event.inputType !== 'insertText' || !event.data || event.isComposing) return;
       const accepted = sanitize(event.data, accepts);
       if (accepted === event.data) return;
       event.preventDefault();
       if (accepted)
-        insertNatively(input, input.selectionStart ?? 0, input.selectionEnd ?? 0, accepted);
+        tryInsertKeepingUndo(input, input.selectionStart ?? 0, input.selectionEnd ?? 0, accepted);
     };
-    input.addEventListener('beforeinput', onBeforeInput);
-    return () => input.removeEventListener('beforeinput', onBeforeInput);
+    input.addEventListener('beforeinput', filterWithCaretInPlace);
+    return () => input.removeEventListener('beforeinput', filterWithCaretInPlace);
   }, [accepts]);
 
-  const latestCode = useRef(code);
-  const selfWrite = useRef(false);
-  const adoptExternal = useRef((_raw: string) => {});
+  const committedCode = useRef(code);
+  const writingOurselves = useRef(false);
+  const adoptOutsideWrite = useRef((_raw: string) => {});
   useLayoutEffect(() => {
-    latestCode.current = code;
-    adoptExternal.current = (raw) => {
+    committedCode.current = code;
+    adoptOutsideWrite.current = (raw) => {
       if (composing.current) return;
       const next = Array.from(clean(raw)).slice(0, length).join('');
-      if (next !== latestCode.current) commit(next);
+      if (next !== committedCode.current) commit(next);
     };
   });
 
@@ -175,8 +180,8 @@ export function useOTPField({
       },
       set(next: string) {
         set.call(this, next);
-        if (selfWrite.current) return;
-        queueMicrotask(() => adoptExternal.current(get.call(input)));
+        if (writingOurselves.current) return;
+        queueMicrotask(() => adoptOutsideWrite.current(get.call(input)));
       },
     });
     return () => {
@@ -187,7 +192,7 @@ export function useOTPField({
 
   useFormReset(inputRef, () => {
     if (!controlled) setInner(Array.from(clean(defaultValue)).slice(0, length).join(''));
-    setDraft(null);
+    setComposition(null);
     previousSelection.current = null;
   });
 
@@ -195,22 +200,22 @@ export function useOTPField({
     const input = event.currentTarget;
     const raw = input.value;
     if (composing.current || (event.nativeEvent as InputEvent).isComposing) {
-      setDraft(raw);
+      setComposition(raw);
       return;
     }
     const data = (event.nativeEvent as InputEvent).data;
     const incoming = data ? clean(data) : '';
-    const next =
-      incoming.length >= length
-        ? incoming.slice(0, length)
-        : Array.from(clean(raw)).slice(0, length).join('');
+    const insertedWholeCode = incoming.length >= length;
+    const next = insertedWholeCode
+      ? incoming.slice(0, length)
+      : Array.from(clean(raw)).slice(0, length).join('');
     if (next !== raw) {
       const caret = Math.min(input.selectionStart ?? next.length, next.length);
-      selfWrite.current = true;
+      writingOurselves.current = true;
       input.value = next;
-      selfWrite.current = false;
+      writingOurselves.current = false;
       input.setSelectionRange(caret, caret);
-      pendingCaret.current = caret;
+      caretToRestoreAfterRender.current = caret;
     }
     commit(next);
   };
@@ -231,16 +236,17 @@ export function useOTPField({
     const to = full
       ? current.length
       : Math.min(Math.max(end, start + piece.length), current.length);
-    if (insertNatively(input, from, to, piece)) return;
+    if (tryInsertKeepingUndo(input, from, to, piece)) return;
 
-    const next = insertText(current, { start: from, end: to }, piece, length);
-    pendingCaret.current = Math.min(from + piece.length, next.length);
+    const next = overwriteText(current, { start: from, end: to }, piece, length);
+    caretToRestoreAfterRender.current = Math.min(from + piece.length, next.length);
     commit(next);
   };
 
   const onPointerDown = (event: PointerEvent<HTMLInputElement>) => {
-    if (event.pointerType !== 'mouse' || event.button !== 0 || event.shiftKey || event.detail > 1)
-      return;
+    const plainMouseClick =
+      event.pointerType === 'mouse' && event.button === 0 && !event.shiftKey && event.detail <= 1;
+    if (!plainMouseClick) return;
     const slots = rootRef.current?.querySelectorAll<HTMLElement>('[data-otp-slot]');
     if (!slots?.length || disabled) return;
     event.preventDefault();
@@ -251,7 +257,7 @@ export function useOTPField({
       (slots[hit === -1 ? slots.length - 1 : hit] as HTMLElement).dataset.otpSlot,
     );
     const input = event.currentTarget;
-    pointerFocus.current = true;
+    focusedByPointer.current = true;
     input.focus({ preventScroll: true });
     const valueLength = input.value.length;
     const caret = Math.min(index, valueLength, length - 1);
@@ -263,15 +269,15 @@ export function useOTPField({
 
   const onFocus = (event: FocusEvent<HTMLInputElement>) => {
     setFocused(true);
-    if (pointerFocus.current) {
-      pointerFocus.current = false;
+    if (focusedByPointer.current) {
+      focusedByPointer.current = false;
       return;
     }
     const input = event.currentTarget;
     const valueLength = input.value.length;
-    const start = Math.min(valueLength, length - 1);
+    const nextSlot = Math.min(valueLength, length - 1);
     previousSelection.current = null;
-    input.setSelectionRange(start, valueLength);
+    input.setSelectionRange(nextSlot, valueLength);
   };
 
   const onBlur = () => {
@@ -286,13 +292,13 @@ export function useOTPField({
 
   const onCompositionEnd = (event: CompositionEvent<HTMLInputElement>) => {
     composing.current = false;
-    setDraft(null);
+    setComposition(null);
     const next = Array.from(clean(event.currentTarget.value)).slice(0, length).join('');
-    pendingCaret.current = next.length;
+    caretToRestoreAfterRender.current = next.length;
     commit(next);
   };
 
-  const display = draft ?? code;
+  const display = composition ?? code;
   const chars = Array.from(display);
   const slots: OTPSlotState[] = Array.from({ length }, (_, index) => {
     const collapsed = selection !== null && selection.start === selection.end;
