@@ -59,6 +59,11 @@ pnpm storybook        # Storybook for ids-react (port 6006)
   - Drawer gestures, ported from vaul, which is unmaintained and needs Radix Dialog;
   - toasts, ported from sonner, whose unlayered CSS beats Tailwind utilities and which sits outside
     the top layer.
+  - ScrollArea, the overlay scrollbar. Radix ScrollArea (and shadcn's, built on it) is ruled out
+    with Radix. OverlayScrollbars wraps the content in elements of its own, so it cannot make a
+    `role="listbox"` element the scroller (the options' offset parent and `scrollTop` must stay on
+    the listbox), cannot place a bar by where it is declared, and does not inset the bar ends from
+    a rounded corner. What is left over native scrolling is a ResizeObserver and a thumb drag.
 
 **flutter** — Dart package. Platform directories (android/, ios/, etc.) intentionally absent — this is a package, not an app. Published to pub.dev via OIDC — no token.
 
@@ -85,7 +90,7 @@ packages/react/src/
     form/        Field and every *Field, Checkbox, Radio, Switch, Slider, Select, Rating, ...
     data/        Accordion, Avatar, Badge, Calendar, Card, Chip, Item, TimePicker, ...
     feedback/    Alert, Progress, Spinner, Toast
-    layout/      AspectRatio, Divider, Spacer
+    layout/      AspectRatio, Divider, Spacer, ScrollArea
     navigation/  (Breadcrumb, Pagination, Stepper, Tabs)
     overlay/     Dialog, Drawer, Menu, Popover, Tooltip
     typography/  Kbd, Label

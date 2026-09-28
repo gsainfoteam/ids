@@ -81,6 +81,7 @@ export { Kbd } from './components/typography/kbd';
 export { Divider } from './components/layout/divider';
 export { Spacer } from './components/layout/spacer';
 export { AspectRatio } from './components/layout/aspect-ratio';
+export { ScrollArea } from './components/layout/scroll-area';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
 
