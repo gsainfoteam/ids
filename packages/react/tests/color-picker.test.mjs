@@ -154,7 +154,8 @@ test('hue and alpha are Sliders: keys, Shift and page steps, and a press on the 
   await key(hue, 'End');
   assert.equal(hue.getAttribute('aria-valuetext'), '360도');
   const track = host.querySelector('[data-color-picker-hue] [data-orientation]:not([data-slider])');
-  track.getBoundingClientRect = () => ({ left: 0, right: 360, width: 360, top: 0, bottom: 12 });
+  const onePixelPerDegree = () => ({ left: 0, right: 360, width: 360, top: 0, bottom: 12 });
+  track.getBoundingClientRect = onePixelPerDegree;
   await act(async () =>
     track.dispatchEvent(
       new MouseEvent('pointerdown', { bubbles: true, cancelable: true, clientX: 120 }),
