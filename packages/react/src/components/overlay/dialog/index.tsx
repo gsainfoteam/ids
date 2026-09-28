@@ -313,7 +313,7 @@ export namespace Dialog {
         'motion-reduce:transition-none',
       ],
       content: [
-        'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md flex-col gap-4',
+        'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm flex-col gap-4',
         'overflow-y-auto overscroll-contain concentric-p-6 outline-none',
         'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-lg',
         'transition-[opacity,scale] duration-(--ids-motion-normal) ease-out',

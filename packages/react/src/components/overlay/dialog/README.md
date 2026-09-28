@@ -51,7 +51,7 @@ import { Dialog } from '@gsainfoteam/ids-react';
 ## 크기
 
 ```tsx
-<Dialog.Content />                       // 기본: 최대 폭 max-w-md(448px), 화면 높이 - 2rem 까지
+<Dialog.Content />                       // 기본: 최대 폭 max-w-sm(384px), 화면 높이 - 2rem 까지
 <Dialog.Content className="max-w-2xl" /> // 폭과 높이는 className 으로
 ```
 
