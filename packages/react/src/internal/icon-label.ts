@@ -7,7 +7,7 @@ export type IconLabel = {
   source: 'element' | 'displayName' | 'function';
 };
 
-const FUNCTION_NAME = /^[A-Z][A-Za-z0-9]*Icon$/;
+const UNMINIFIED_ICON_NAME = /^[A-Z][A-Za-z0-9]*Icon$/;
 
 type ComponentLike = { displayName?: unknown; name?: unknown; render?: unknown; type?: unknown };
 
@@ -20,9 +20,11 @@ function componentName(
   const component = type as ComponentLike;
   if (typeof component.displayName === 'string' && component.displayName.trim() !== '')
     return { name: component.displayName.trim(), source: 'displayName' };
-  if (typeof component.name === 'string' && FUNCTION_NAME.test(component.name))
+  if (typeof component.name === 'string' && UNMINIFIED_ICON_NAME.test(component.name))
     return { name: component.name, source: 'function' };
-  return componentName(component.render, depth + 1) ?? componentName(component.type, depth + 1);
+  const forwardRefRender = component.render;
+  const memoWrapped = component.type;
+  return componentName(forwardRefRender, depth + 1) ?? componentName(memoWrapped, depth + 1);
 }
 
 export function humanizeIconName(name: string) {
@@ -89,19 +91,20 @@ export function useIconLabel(
   icon: ReactNode | undefined,
   ...names: Array<NameProps | undefined>
 ) {
-  const named = icon === undefined || names.some(hasName);
-  const derived = named ? undefined : iconLabel(icon);
+  const notIconOnlyRightNow = icon === undefined;
+  const needsNoLabel = notIconOnlyRightNow || names.some(hasName);
+  const derived = needsNoLabel ? undefined : iconLabel(icon);
   const label = derived?.label;
   const fromFunction = derived?.source === 'function';
 
   useEffect(() => {
-    if (!isDevelopment || named) return;
+    if (!isDevelopment || needsNoLabel) return;
     if (label === undefined)
       console.warn(
         `[IDS] ${component}: no accessible name could be found for this icon. Pass aria-label, or give the icon component a displayName.`,
       );
     else if (fromFunction) warnFunctionNameLabel(component, label);
-  }, [component, named, label, fromFunction]);
+  }, [component, needsNoLabel, label, fromFunction]);
 
   return label;
 }
