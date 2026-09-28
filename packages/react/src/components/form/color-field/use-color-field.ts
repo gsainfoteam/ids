@@ -69,7 +69,7 @@ export function useColorField({
   };
 
   useFormReset(triggerRef, () => {
-    setValue(defaultValue ?? '');
+    setValue(defaultValue ?? '', { silent: true });
     setOpenState(false);
   });
 
