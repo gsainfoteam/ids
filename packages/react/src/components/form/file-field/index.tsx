@@ -27,7 +27,7 @@ import { fieldTrigger, flattenParts, part, resolveState } from '../../../interna
 import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
-import { invariant, mergeProps, mergeRefs, tv } from '../../../utils';
+import { cn, invariant, mergeProps, mergeRefs, tv } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 import { Item } from '../../data/item';
 import { useFieldSize } from '../field/context';
@@ -105,7 +105,7 @@ export type FileFieldProps = BaseProps &
   );
 
 type Context = {
-  field: Omit<ReturnType<typeof useFileField>, 'rootRef' | 'inputRef' | 'triggerRef'>;
+  field: Omit<ReturnType<typeof useFileField>, 'rootRef' | 'pickerRef' | 'triggerRef'>;
   state: FileFieldState;
   size: IdsSize;
   placeholder: ReactNode;
@@ -128,6 +128,8 @@ const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && n
 
 const joinIds = (...ids: Array<string | undefined | false>) =>
   ids.filter(Boolean).join(' ') || undefined;
+
+const alreadyDimmedByField = cn('data-disabled:opacity-100');
 
 export function FileField(props: FileFieldProps) {
   const {
@@ -177,7 +179,7 @@ export function FileField(props: FileFieldProps) {
     'FileField: maxCount must be a non-negative integer.',
   );
 
-  const { rootRef, inputRef, triggerRef, ...field } = useFileField({
+  const { rootRef, pickerRef, triggerRef, ...field } = useFileField({
     multiple,
     value,
     defaultValue,
@@ -316,7 +318,7 @@ export function FileField(props: FileFieldProps) {
       >
         <input
           {...native}
-          ref={inputRef}
+          ref={pickerRef}
           type="file"
           multiple={multiple}
           disabled={disabled}
@@ -630,7 +632,7 @@ export namespace FileField {
         'text-(--ids-color-on-muted) [&_img]:size-full [&_img]:object-cover [&_svg]:size-3.5',
       ],
       value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
-      clear: [fieldAction.base, 'data-disabled:opacity-100'],
+      clear: [fieldAction.base, alreadyDimmedByField],
       dropzoneIcon: 'mb-1 size-6 text-(--ids-color-on-muted)',
       dropzoneTitle: 'font-medium break-keep text-balance',
       dropzoneHint: 'text-caption-c1-regular text-(--ids-color-on-muted) break-keep text-balance',
