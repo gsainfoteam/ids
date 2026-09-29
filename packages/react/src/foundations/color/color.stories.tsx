@@ -24,8 +24,13 @@ const neutral = [
   'surface',
   'on-surface',
   'muted',
+  'muted-hover',
+  'muted-active',
   'on-muted',
   'border',
+  'handle',
+  'handle-hover',
+  'handle-active',
   'scrollbar-track',
   'scrollbar-thumb',
   'scrollbar-thumb-hover',
@@ -199,7 +204,7 @@ export const Tokens: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Neutral"
-        description="data-mode에만 따릅니다. 배경(surface, muted), 글자(on-surface, on-muted), 구조선(border), ScrollArea의 막대(scrollbar-*)입니다."
+        description="data-mode에만 따릅니다. 배경(surface, muted), 글자(on-surface, on-muted), 구조선(border), 손잡이(handle), ScrollArea의 막대(scrollbar-*)입니다. 상태는 한 단계씩 오릅니다. muted 다음은 muted-hover, muted-active이고, handle 다음은 handle-hover, handle-active입니다."
       >
         <TokenTable tokens={neutral} columns={modes.map((mode) => ({ label: mode, mode }))} />
       </Showcase.Section>

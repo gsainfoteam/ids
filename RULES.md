@@ -248,6 +248,13 @@ only content and focus carry color. Buttons follow the same rule: only `solid` a
 the theme color, while `outline` and `ghost` stay neutral. `--ids-color-outline` is the
 theme-tinted line for the rare edge that should itself read as the brand.
 
+**Neutral states climb one step at a time.** A transparent control goes rest → hover `muted` →
+press `muted-hover`; a filled control goes `muted` → `muted-hover` → `muted-active`; a handle (a
+ScrollArea thumb, the Drawer handle) goes `handle` → `handle-hover` → `handle-active` while
+dragged. A pressed toggle takes the press step. The ladder leaves alone translucent layers over a
+background it does not know (Item and Card `on-surface` overlays, Chip's `currentColor` layer,
+Kbd), brand states (`/90`, `/80`, `/10`–`/20`), edge rings, disabled opacity and backdrops.
+
 **Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
 TelField, ChipField, Select and the date, time and color triggers draw their box from
 `internal/field-surface.ts`. Their `variant` is intensity only: `outline` (default), `soft` (muted
