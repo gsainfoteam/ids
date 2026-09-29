@@ -13,14 +13,14 @@ export const timePickerStyle = tv({
     column: [
       'group/column relative h-(--time-picker-height) rounded-standard',
       'before:block before:h-[calc(50%-var(--time-option)/2)] after:block after:h-[calc(50%-var(--time-option)/2)]',
-      'focus-ring aria-disabled:cursor-not-allowed',
+      'focus-ring aria-disabled:cursor-not-allowed aria-disabled:overflow-y-hidden',
       'data-[variant=wheel]:snap-y data-[variant=wheel]:snap-mandatory data-[variant=wheel]:[overflow-anchor:none]',
     ],
     option: [
       'flex h-(--time-option) shrink-0 snap-center items-center justify-center rounded-standard px-2 tabular-nums select-none',
       'cursor-pointer transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
       'hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)',
-      'group-focus-visible/column:data-active:bg-(--ids-color-muted)',
+      'group-focus-visible/column:data-active:not-data-selected:bg-(--ids-color-muted)',
       primaryFill,
       'data-selected:bg-(--control-fill) data-selected:font-medium data-selected:text-(--control-on-fill)',
       'data-selected:hover:bg-(--control-fill-hover)',
