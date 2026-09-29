@@ -98,6 +98,7 @@
 | Chip | [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/) (누르거나 켜는 칩) | `Enter` `Space`, `Backspace` `Delete` 지우기 | 라벨이면 `span`, 누르는 칩은 `button` + `aria-pressed`. 지우기는 `Chip.Close` 버튼 | Chip.Close 가 24px 보다 작다 |
 | ColorPicker | [Slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), [Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) (팔레트) | 영역: `←` `→` 채도, `↑` `↓` `PageUp` `PageDown` 밝기, `Shift`+방향키 10%, `Home` `End`. 값 입력은 `Enter` 로 반영 | 영역은 채도와 밝기 두 `slider`(`aria-valuetext` 에 두 값), 색조와 투명도는 `slider`, 팔레트는 `radiogroup` | 2차원 영역은 APG 패턴이 없어 슬라이더 둘로 읽힌다 |
 | Empty | 없음 | 없음. `Empty.Actions` 의 버튼마다 Tab 이 멈춘다 | 역할이 없는 `div`, live region 없음. 기본 아이콘은 `aria-hidden`. 제목은 `Empty.Title asChild` 로 heading 이 된다 | 제목의 heading 수준과 결과 수 알림은 앱이 맡는다 |
+| QRCode | 없음 | 없음 | `role="img"`, 이름은 `aria-label` 이나 `aria-labelledby`, 없으면 "QR 코드". 값은 이름에 넣지 않는다. SVG 와 로고는 이름 안에 숨는다 | 스캔할 수 없는 사람을 위한 주소 글자나 링크는 앱이 함께 보여 준다. 다크 모드의 기본 색은 반전되어 오래된 스캐너가 못 읽을 수 있다(`inverted={false}`) |
 | TimePicker | [Listbox](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) | 컬럼마다 Tab 한 번. `↑` `↓` 한 칸, `PageUp` `PageDown` 다섯 칸, `Home` `End`, `Enter` `Space` 선택, `←` `→` 옆 컬럼, 숫자 입력, `Delete` 비우기 | `role="group"`(이름 "시간") 안에 컬럼마다 `listbox` + `option` `aria-selected`, `aria-activedescendant` | `wheel` 은 스크롤이 멈춘 자리를 고른다. 키보드로는 `Enter` 로 고른다 |
 
 ### feedback
@@ -233,6 +234,7 @@
 | Card, Item (누르는 행) | 제목이 버튼으로 읽히고 설명이 뒤따른다. 카드 안의 다른 버튼에도 따로 갈 수 있다 |  |  |  |  |
 | Chip | 켜는 칩이 "눌림" 을 읽고, 지우기 버튼이 이름을 읽는다 |  |  |  |  |
 | Avatar, AvatarGroup | 사람 이름과 "외 N명" 을 읽는다 |  |  |  |  |
+| QRCode | 그림으로 한 번, 준 이름만 읽고 URL 을 읽지 않는다 |  |  |  |  |
 | Badge | `aria-label` 문장을 읽고 값이 바뀌면 다시 알린다 |  |  |  |  |
 | Empty | 제목(heading 이면 heading 으로)과 설명을 차례로 읽고, 나타날 때 끼어들어 알리지 않는다 |  |  |  |  |
 | Alert | danger 는 즉시, info 는 기다렸다 알린다 |  |  |  |  |

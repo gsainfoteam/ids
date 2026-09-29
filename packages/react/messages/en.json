@@ -163,6 +163,9 @@
   "popover": {
     "close": "Close"
   },
+  "qrCode": {
+    "label": "QR code"
+  },
   "rating": {
     "label": "Rating",
     "required": "Select a rating.",

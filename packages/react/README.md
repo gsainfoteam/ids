@@ -608,3 +608,7 @@ Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만
 ## FloatingButton
 
 화면 모서리에 떠 있는 아이콘/확장형 주 동작 버튼입니다. safe area, 읽는 방향, 링크 합성과 비활성 상태를 챙깁니다. [FloatingButton API](./src/components/action/floating-button/README.md).
+
+## QRCode
+
+값을 토큰 색의 SVG QR 코드로 그립니다. 둥근 모듈과 점, 파인더 모양, 가운데 로고, 다크 모드 반전을 지원합니다. [QRCode API](./src/components/data/qr-code/README.md).

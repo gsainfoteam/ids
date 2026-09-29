@@ -54,6 +54,7 @@ export { AvatarGroup } from './components/data/avatar-group';
 export { Item } from './components/data/item';
 export { Accordion } from './components/data/accordion';
 export { Empty } from './components/data/empty';
+export { QRCode } from './components/data/qr-code';
 
 export { Button } from './components/action/button';
 export { IconButton } from './components/action/icon-button';

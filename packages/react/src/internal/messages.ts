@@ -165,6 +165,9 @@ export const messages = {
   popover: {
     close: '닫기',
   },
+  qrCode: {
+    label: 'QR 코드',
+  },
   rating: {
     label: '평점',
     required: '점수를 선택하세요.',
