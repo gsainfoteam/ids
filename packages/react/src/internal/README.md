@@ -11,6 +11,7 @@
 | 모듈                                             | 내용                                                                                  | 쓰는 곳                                                                                                                                                                                                               |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, Progress                                                                                                                                                                                                     |
+| [`brand-fill.ts`](#brand-fillts)                 | 브랜드 채움의 hover, press 색. 글자색에서 멀어지는 쪽으로 섞는다                      | `control-surface.ts`(solid), Calendar, TimePicker                                                                                                                                                                     |
 | [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                                       | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
 | [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
@@ -83,6 +84,37 @@ Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
 - `ARC_RADIUS`, `strokeWidth`(3), `viewBox`(`0 0 24 24`)를 바꾸면 Progress 도 같이 고칩니다. Progress 는 `strokeWidth` 와 `viewBox` 를 따로 적습니다.
 - `Arc` 에 `size-*` 나 `animate-*` 클래스를 넣지 않습니다. 둘 다 `Spinner.Style` 이 정합니다.
 
+## brand-fill.ts
+
+브랜드 채움(흰 글자나 검은 글자가 올라간 테마 색 면)의 hover 와 press 색입니다. `brandFillStates` 는 `--control-fill` 과 `--control-on-fill` 에서 `--control-fill-hover`, `--control-fill-press` 를 만들고, `primaryFill` 은 두 변수를 `primary` 와 `on-primary` 로 정한 뒤 같은 상태를 더합니다.
+
+### 쓰는 곳
+
+- [control-surface.ts](#control-surfacets) 의 solid variant: Button, IconButton, FloatingButton
+- Calendar 의 선택한 날, TimePicker 의 선택한 옵션: `primaryFill`
+
+### 쓰는 법
+
+```ts
+// components/data/time-picker/style.ts
+option: [
+  primaryFill,
+  'data-selected:bg-(--control-fill) data-selected:text-(--control-on-fill)',
+  'data-selected:hover:bg-(--control-fill-hover)',
+],
+```
+
+### 왜 이렇게
+
+- hover 는 채움을 글자색의 반대쪽으로 10%, press 는 20% 섞습니다. 흰 글자 아래에서는 검정 쪽, 어두운 글자 아래에서는 흰색 쪽입니다. 그래서 쉬는 때 4.5:1 인 팔레트는 hover 와 press 에서도 4.5:1 이상입니다.
+- 반대쪽 색은 relative color syntax 로 글자색의 밝기에서 고릅니다(`oklch(from var(--control-on-fill) clamp(0, (0.5 - l) * 1000, 1) 0 0)`). 밝기 0.5 를 넘는 글자면 검정, 아니면 흰색입니다.
+- relative color syntax 가 없는 브라우저(Chrome 119, Safari 18, Firefox 128 이전)는 `@supports` 에 걸려 예전처럼 90%, 80% 로 흐려집니다. 변수가 풀리지 않아 배경이 사라지는 일은 없습니다.
+- `/90` 으로 흐리면 흰 페이지 위에서 채움이 밝아집니다. 파랑 위 흰 글자가 4.46:1 로 떨어졌고 axe 가 잡았습니다.
+
+### 알아둘 것
+
+- 섞는 비율을 줄이면 hover 가 눈에 띄지 않고, 반대 방향으로 섞으면 `tests/button.test.tsx` 의 hover 대비 테스트가 17색 x 두 모드에서 실패합니다.
+
 ## control-surface.ts
 
 버튼류 컨트롤이 자기 `tv` 에 넣는 클래스 조각입니다. `base`, `size`, `variant`, `colorScheme` 네 묶음입니다.
@@ -140,7 +172,7 @@ export const iconToggleStyle = tv({
 | `--control-press`      | outline, ghost 의 press 배경과 켜진 ghost, outline toggle. `muted-hover`, 또는 status 색 16%       |
 | `--control-ring`       | focus ring 과 focus 때의 테두리. neutral 도 primary                                                |
 
-- outline 과 ghost 는 중립 상태 사다리를 따릅니다. hover 는 `--control-hover`, press 는 한 단계 진한 `--control-press` 입니다. solid 는 브랜드 상태(`/90`, `/80`)라 사다리 밖이고, glossy 는 색 대신 광택과 그림자로 상태를 보입니다.
+- outline 과 ghost 는 중립 상태 사다리를 따릅니다. hover 는 `--control-hover`, press 는 한 단계 진한 `--control-press` 입니다. solid 는 [brand-fill.ts](#brand-fillts) 의 `--control-fill-hover`, `--control-fill-press` 라 사다리 밖이고, glossy 는 색 대신 광택과 그림자로 상태를 보입니다.
 - soft 는 `secondary` 위 `on-secondary` 짝입니다. hover 와 press 는 배경에 채움 색을 6%, 12% 섞어 한 단계씩 진해집니다. `on-secondary` 는 이 두 배경에서도 4.5:1 을 지키는 단계라, 섞는 비율을 올리면 `tests/tokens-contrast.test.ts` 가 실패합니다. 테스트는 이 파일에서 비율을 읽습니다.
 - soft 의 hover, press 변수는 `base` 에서 정합니다. custom property 안의 `var()` 는 그 요소에서 풀리므로, 같은 요소에 붙는 scheme 의 `--control-soft` 를 따라갑니다.
 - `glossy` 는 solid 의 채움(`--control-fill`) 위에 층을 얹습니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택(`background-image` 라 채움 색 위에 그려진다), 안쪽 위 1px 하이라이트(`inset-shadow`), 채움보다 20% 진한 가장자리(`inset-ring` 의 `color-mix`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다. focus 때는 `ringFollowsScheme` 이 가장자리를 `--control-ring` 으로 바꿉니다. outline 과 같은 방식입니다.

@@ -1,4 +1,5 @@
-import { tv } from '../../../utils';
+import { primaryFill } from '../../../internal/brand-fill';
+import { cn, tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -74,8 +75,10 @@ export const calendarStyle = tv({
     outside: { true: { dayButton: 'text-(--ids-color-on-muted)' } },
     selected: {
       true: {
-        dayButton:
-          'bg-(--ids-color-primary) font-medium text-(--ids-color-on-primary) hover:bg-(--ids-color-primary)/90',
+        dayButton: cn(
+          primaryFill,
+          'bg-(--control-fill) font-medium text-(--control-on-fill) hover:bg-(--control-fill-hover)',
+        ),
       },
     },
     onBand: {

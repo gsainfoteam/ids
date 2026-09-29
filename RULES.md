@@ -352,7 +352,13 @@ press `muted-hover`; a filled control goes `muted` → `muted-hover` → `muted-
 ScrollArea thumb, the Drawer handle) goes `handle` → `handle-hover` → `handle-active` while
 dragged. A pressed toggle takes the press step. The ladder leaves alone translucent layers over a
 background it does not know (Item and Card `on-surface` overlays, Chip's `currentColor` layer,
-Kbd), brand states (`/90`, `/80`, `/10`–`/20`), edge rings, disabled opacity and backdrops.
+Kbd), brand states, edge rings, disabled opacity and backdrops.
+
+**A brand fill's states move away from its text.** Hover and press on a solid brand fill (solid
+Button, a selected Calendar day or TimePicker option) take `--control-fill-hover` and
+`--control-fill-press` from `internal/brand-fill.ts`: 10% and 20% toward black under white text,
+toward white under dark text, so no palette drops below the 4.5:1 it has at rest. Do not fade a
+filled brand color with `/90`: over a white page it lightens blue under white text to 4.46:1.
 
 **Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
 TelField, ChipField, Select and the date, time and color triggers draw their box from

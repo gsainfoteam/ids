@@ -1,3 +1,4 @@
+import { brandFillStates } from './brand-fill';
 import { cn } from '../utils/cn';
 
 import type { IdsSize, IdsVariant } from '../tokens/types';
@@ -104,7 +105,8 @@ export const controlSurface = {
   variant: {
     solid: cn(
       'bg-(--control-fill) text-(--control-on-fill) shadow-xs',
-      'data-hovered:bg-(--control-fill)/90 data-active:bg-(--control-fill)/80',
+      brandFillStates,
+      'data-hovered:bg-(--control-fill-hover) data-active:bg-(--control-fill-press)',
     ),
     soft: cn(
       'bg-(--control-soft) text-(--control-on-soft)',
