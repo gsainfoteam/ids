@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 
 import { chipToFocusAfter } from './chip-focus';

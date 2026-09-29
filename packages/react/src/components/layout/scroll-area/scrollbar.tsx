@@ -1,3 +1,5 @@
+'use client';
+
 import { use, useCallback, type ComponentProps, type ReactNode } from 'react';
 
 import { PlacementContext, ScrollbarContext, useAreaContext } from './context';

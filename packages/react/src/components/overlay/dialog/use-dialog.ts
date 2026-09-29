@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';

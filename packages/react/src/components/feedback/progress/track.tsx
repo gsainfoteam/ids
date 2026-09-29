@@ -1,3 +1,5 @@
+'use client';
+
 import { useProgressContext } from './context';
 import { ProgressIndicator } from './indicator';
 import { resolve, type PartProps } from './part-props';

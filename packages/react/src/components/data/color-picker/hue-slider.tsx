@@ -1,3 +1,5 @@
+'use client';
+
 import { usePicker } from './context';
 import { GRADIENT_DIRECTION } from './gradient';
 import { messages } from '../../../internal/messages';

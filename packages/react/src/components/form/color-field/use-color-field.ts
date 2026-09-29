@@ -1,3 +1,5 @@
+'use client';
+
 import { use, useLayoutEffect, useRef, type KeyboardEvent } from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';

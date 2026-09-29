@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useLayoutEffect, useRef, type RefObject } from 'react';
 
 function descriptorOf(node: object, key: string) {

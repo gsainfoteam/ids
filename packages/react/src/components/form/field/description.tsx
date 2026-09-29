@@ -1,3 +1,5 @@
+'use client';
+
 import { useFieldContext, type FieldState } from './context';
 import { renderPart, type FieldPartProps } from './part';
 import { resolve, stateAttributes } from './state-value';

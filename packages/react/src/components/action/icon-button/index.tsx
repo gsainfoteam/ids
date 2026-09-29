@@ -1,3 +1,5 @@
+'use client';
+
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 
 import { controlSurface, type ControlColorScheme } from '../../../internal/control-surface';

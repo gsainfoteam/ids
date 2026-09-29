@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type PointerEvent, type ReactNode } from 'react';
 
 import { useChip } from './context';

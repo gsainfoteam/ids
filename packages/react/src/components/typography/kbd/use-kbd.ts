@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, use, useSyncExternalStore } from 'react';
 
 import { detectPlatform } from '@tanstack/react-hotkeys';

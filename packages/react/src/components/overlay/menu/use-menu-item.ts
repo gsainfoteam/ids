@@ -1,3 +1,5 @@
+'use client';
+
 import type { KeyboardEvent, MouseEvent, PointerEvent } from 'react';
 
 import { keyHandler, withModifiers } from '../../../internal/keys';

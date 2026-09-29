@@ -1,3 +1,5 @@
+'use client';
+
 import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
 
 import { matchesQuery, orderByOptions, typeaheadIndex, type SelectOption } from './select-options';

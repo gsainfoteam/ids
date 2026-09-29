@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type ReactElement } from 'react';
 
 import { useFile } from './context';

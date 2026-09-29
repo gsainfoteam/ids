@@ -1,3 +1,5 @@
+'use client';
+
 import type { CSSProperties } from 'react';
 
 import { parseHotkey, useHotkey, type Hotkey } from '@tanstack/react-hotkeys';

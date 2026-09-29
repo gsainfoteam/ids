@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useRef, type ComponentProps, type CSSProperties } from 'react';
 
 import { invariant, mergeRefs, tv } from '../../../utils';

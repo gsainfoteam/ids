@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, use, useContext, type ReactNode } from 'react';
 
 import { invariant } from '../../../utils';

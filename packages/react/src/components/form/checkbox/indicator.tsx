@@ -1,3 +1,5 @@
+'use client';
+
 import { use, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { CheckIcon, MinusIcon } from '@heroicons/react/16/solid';

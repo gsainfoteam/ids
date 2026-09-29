@@ -1,3 +1,5 @@
+'use client';
+
 import { useSelectContext } from './context';
 import { messages } from '../../../internal/messages';
 import { mergeProps, part } from '../../../utils';

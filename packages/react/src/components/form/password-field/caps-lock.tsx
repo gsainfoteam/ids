@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type ReactNode, type SVGProps } from 'react';
 
 import { usePasswordContext } from './context';

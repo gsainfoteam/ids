@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type CSSProperties } from 'react';
 
 import { useTooltipContext } from './context';

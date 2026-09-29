@@ -1,3 +1,5 @@
+'use client';
+
 import { cloneElement, isValidElement, type KeyboardEvent } from 'react';
 
 import { useSelectContext } from './context';

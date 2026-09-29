@@ -1,3 +1,5 @@
+'use client';
+
 import { isValidElement, type ComponentProps, type CSSProperties } from 'react';
 
 import { TimePickerColumn, type TimePickerColumnProps } from './column';

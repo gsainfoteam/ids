@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, useRef, useState, type ComponentProps } from 'react';
 
 import {

@@ -1,3 +1,5 @@
+'use client';
+
 import { Children, isValidElement, type ComponentProps } from 'react';
 
 import { ItemGroupContext } from './context';

@@ -1,3 +1,5 @@
+'use client';
+
 import { RadioContext } from './context';
 import { MenuGroup } from './group';
 

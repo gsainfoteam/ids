@@ -1,3 +1,5 @@
+'use client';
+
 import { Children, isValidElement, useEffect, type ReactNode } from 'react';
 
 import { isDevelopment } from '../utils/dev';

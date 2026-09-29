@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, type FocusEvent, type KeyboardEvent, type MouseEvent } from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';

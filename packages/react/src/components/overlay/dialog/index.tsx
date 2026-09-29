@@ -1,3 +1,5 @@
+'use client';
+
 import { isValidElement, useState, type ReactElement, type ReactNode } from 'react';
 
 import { DialogClose, type DialogCloseProps } from './close';

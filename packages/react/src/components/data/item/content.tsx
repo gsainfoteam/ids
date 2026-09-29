@@ -1,3 +1,5 @@
+'use client';
+
 import { useItemContext } from './context';
 import { Part, type ItemPartProps } from './part';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { useId, useRef, useState, type ChangeEvent, type FocusEvent } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';

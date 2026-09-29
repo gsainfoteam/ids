@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect, useRef, useState, type KeyboardEvent, type RefObject } from 'react';
 
 import { mapValues } from 'es-toolkit';

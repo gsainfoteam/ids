@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps } from 'react';
 
 import { GroupContext, useOTPContext } from './context';

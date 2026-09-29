@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { UserIcon } from '@heroicons/react/24/solid';

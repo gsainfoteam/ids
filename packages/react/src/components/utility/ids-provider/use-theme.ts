@@ -1,3 +1,5 @@
+'use client';
+
 import { use } from 'react';
 
 import { ThemeContext, type ThemeContextValue } from './use-ids-provider';

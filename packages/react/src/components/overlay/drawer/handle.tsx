@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, type ComponentProps } from 'react';
 
 import { useDrawerContext } from './context';

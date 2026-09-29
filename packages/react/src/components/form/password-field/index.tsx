@@ -1,3 +1,5 @@
+'use client';
+
 import { type CSSProperties, type ReactNode } from 'react';
 
 import { PasswordFieldCapsLock, type PasswordFieldCapsLockProps } from './caps-lock';

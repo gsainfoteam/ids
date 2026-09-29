@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from 'react';
 
 import { describeProblem, formatPercent, resolveProgress } from './progress-value';

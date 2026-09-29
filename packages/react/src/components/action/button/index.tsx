@@ -1,3 +1,5 @@
+'use client';
+
 import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
 import { useButton } from './use-button';

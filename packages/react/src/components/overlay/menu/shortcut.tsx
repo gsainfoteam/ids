@@ -1,3 +1,5 @@
+'use client';
+
 import { menuStyle } from './style';
 import { Kbd } from '../../typography/kbd';
 

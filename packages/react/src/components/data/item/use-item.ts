@@ -1,3 +1,5 @@
+'use client';
+
 import { useLabelling, useSurface, type UseSurfaceOptions } from '../../../internal/surface';
 
 export function useItem<E extends HTMLElement>({

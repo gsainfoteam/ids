@@ -1,3 +1,5 @@
+'use client';
+
 import { type ChangeEvent, type ComponentProps, type KeyboardEvent } from 'react';
 
 import { useSelectContext } from './context';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect, useRef, useState, type ComponentProps, type RefObject } from 'react';
 
 import { popupStyle } from './styles';

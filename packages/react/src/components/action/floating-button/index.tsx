@@ -1,3 +1,5 @@
+'use client';
+
 import type { ComponentProps, CSSProperties, ReactNode, Ref } from 'react';
 
 import { useFloatingButton, type FloatingPlacement } from './use-floating-button';

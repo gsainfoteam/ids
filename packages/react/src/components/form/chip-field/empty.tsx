@@ -1,3 +1,5 @@
+'use client';
+
 import { useChip } from './context';
 import { messages } from '../../../internal/messages';
 import { mergeProps, part } from '../../../utils';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from 'react';
 
 import { useController, useFormContext, type RegisterOptions } from 'react-hook-form';

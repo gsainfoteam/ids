@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type MouseEvent } from 'react';
 
 import { XMarkIcon } from '@heroicons/react/16/solid';

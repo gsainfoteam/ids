@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, use, useEffect } from 'react';
 
 import { isDevelopment } from '../../../utils/dev';

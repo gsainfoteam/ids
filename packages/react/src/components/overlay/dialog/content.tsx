@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, type ComponentProps } from 'react';
 
 import { DialogClose } from './close';

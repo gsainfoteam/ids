@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, use, type KeyboardEvent } from 'react';
 
 export type ToggleGroupSelectionMode = 'single' | 'multiple';

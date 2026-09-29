@@ -1,3 +1,5 @@
+'use client';
+
 import { use, type ComponentProps } from 'react';
 
 import { DocumentIcon } from '@heroicons/react/16/solid';

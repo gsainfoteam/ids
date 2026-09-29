@@ -1,3 +1,5 @@
+'use client';
+
 import { type RootProps } from 'react-day-picker';
 
 import { useCalendarContext } from './context';

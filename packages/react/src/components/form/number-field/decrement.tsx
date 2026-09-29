@@ -1,3 +1,5 @@
+'use client';
+
 import { StepButton, type NumberFieldStepProps } from './step-button';
 
 export function NumberFieldDecrement(props: NumberFieldStepProps) {

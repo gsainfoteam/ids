@@ -1,3 +1,5 @@
+'use client';
+
 import { type CSSProperties, type ReactNode } from 'react';
 
 import { TelFieldContext } from './context';

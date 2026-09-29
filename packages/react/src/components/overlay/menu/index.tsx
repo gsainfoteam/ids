@@ -1,3 +1,5 @@
+'use client';
+
 import { use, useEffect, type ComponentProps, type ReactNode } from 'react';
 
 import { MenuCheckboxItem } from './checkbox-item';

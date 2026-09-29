@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, type ComponentProps, type Ref } from 'react';
 
 import { useItemContext, useRootContext } from './context';

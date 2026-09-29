@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect, useRef, useState } from 'react';
 
 import { matchesKeyboardEvent } from '@tanstack/react-hotkeys';

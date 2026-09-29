@@ -1,3 +1,5 @@
+'use client';
+
 import { Fragment, type ComponentProps, type ReactNode } from 'react';
 
 import { GLYPH_ICONS } from './glyph-icons';

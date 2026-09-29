@@ -1,3 +1,5 @@
+'use client';
+
 import { use, useLayoutEffect, type ComponentProps, type KeyboardEvent } from 'react';
 
 import { CommandContent } from './command';

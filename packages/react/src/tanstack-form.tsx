@@ -1,3 +1,5 @@
+'use client';
+
 import { use, useEffect } from 'react';
 
 import { createFormHookContexts, type AnyFieldApi } from '@tanstack/react-form';

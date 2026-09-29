@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 
 import { clamp, debounce, type DebouncedFunction } from 'es-toolkit';

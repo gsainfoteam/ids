@@ -1,3 +1,5 @@
+'use client';
+
 import { ColumnView } from './column-view';
 
 import type { TimePickerColumnProps } from './column';

@@ -1,3 +1,5 @@
+'use client';
+
 import { use, type ComponentProps } from 'react';
 
 import { CheckIcon } from '@heroicons/react/16/solid';

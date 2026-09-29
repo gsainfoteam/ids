@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from 'react';
 
 import { isEqual, isFunction, isUndefined } from 'es-toolkit';

@@ -1,3 +1,5 @@
+'use client';
+
 import { cloneElement, isValidElement, use, type ComponentProps, type ReactNode } from 'react';
 
 import { CheckIcon } from '@heroicons/react/16/solid';

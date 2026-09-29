@@ -1,3 +1,5 @@
+'use client';
+
 import { useSelectContext } from './context';
 import { Divider } from '../../layout/divider';
 

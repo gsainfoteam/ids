@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';

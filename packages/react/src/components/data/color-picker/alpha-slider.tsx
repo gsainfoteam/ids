@@ -1,3 +1,5 @@
+'use client';
+
 import { cssColor } from './color';
 import { usePicker } from './context';
 import { CHECKER, GRADIENT_DIRECTION, overChecker } from './gradient';

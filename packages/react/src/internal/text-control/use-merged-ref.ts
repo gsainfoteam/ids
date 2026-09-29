@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useRef, type Ref, type RefCallback, type RefObject } from 'react';
 
 import { mergeRefs } from '../../utils';

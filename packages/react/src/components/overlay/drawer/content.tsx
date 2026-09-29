@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useEffect, type ComponentProps } from 'react';
 
 import { DrawerClose } from './close';

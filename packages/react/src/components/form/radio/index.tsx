@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, use, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { useRadio } from './use-radio';

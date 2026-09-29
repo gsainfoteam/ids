@@ -1,3 +1,5 @@
+'use client';
+
 import { use } from 'react';
 
 import { CommandRadioItem } from './command';

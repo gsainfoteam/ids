@@ -1,3 +1,5 @@
+'use client';
+
 import { use, useEffect, type ComponentProps } from 'react';
 
 import { ScrollAreaContext, ScrollbarContext } from './context';

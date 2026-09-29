@@ -1,3 +1,5 @@
+'use client';
+
 import { use, type ComponentProps, type ReactNode } from 'react';
 
 import { OTPFieldCaret } from './caret';

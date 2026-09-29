@@ -1,3 +1,5 @@
+'use client';
+
 import { type ReactNode, type CSSProperties } from 'react';
 
 import { DayPicker, type DayPickerProps, type Numerals } from 'react-day-picker';

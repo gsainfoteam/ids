@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useRef, type ComponentProps } from 'react';
 
 import { useSpinner } from './use-spinner';

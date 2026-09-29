@@ -1,3 +1,5 @@
+'use client';
+
 import { useAlertContext } from './context';
 import { resolve, type PartProps } from './part-props';
 import { statusIcons } from '../../../internal/status-palette';

@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps } from 'react';
 
 import { MinusIcon } from '@heroicons/react/16/solid';

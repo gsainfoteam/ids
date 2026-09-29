@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, use, useEffect, type ComponentProps, type ReactNode } from 'react';
 
 import { invariant, tv } from '../../../utils';

@@ -1,3 +1,5 @@
+'use client';
+
 import { cloneElement, Fragment, isValidElement, type ComponentProps } from 'react';
 
 import { useNumberContext } from './context';

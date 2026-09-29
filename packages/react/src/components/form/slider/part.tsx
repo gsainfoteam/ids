@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { Slot } from '../../utility/slot';

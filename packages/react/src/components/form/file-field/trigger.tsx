@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps } from 'react';
 
 import { ArrowUpTrayIcon, PaperClipIcon } from '@heroicons/react/16/solid';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
 
 import { debounce, noop } from 'es-toolkit';

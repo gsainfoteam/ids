@@ -1,3 +1,5 @@
+'use client';
+
 import { use, useId, useState } from 'react';
 
 import { CommandContext, GroupContext } from './context';

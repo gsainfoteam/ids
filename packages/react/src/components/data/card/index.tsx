@@ -1,3 +1,5 @@
+'use client';
+
 import { isValidElement, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { CardAction, type CardActionProps } from './action';

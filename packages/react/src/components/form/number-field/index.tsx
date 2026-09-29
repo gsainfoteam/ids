@@ -1,3 +1,5 @@
+'use client';
+
 import { type CSSProperties, type ReactNode } from 'react';
 
 import { NumberFieldContext } from './context';

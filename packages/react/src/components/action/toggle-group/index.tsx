@@ -1,3 +1,5 @@
+'use client';
+
 import { ToggleGroupContext, type ToggleGroupSelectionMode } from './context';
 import { useToggleGroup } from './use-toggle-group';
 import { FormValue } from '../../../internal/form-value';

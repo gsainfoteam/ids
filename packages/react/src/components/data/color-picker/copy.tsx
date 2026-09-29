@@ -1,3 +1,5 @@
+'use client';
+
 import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/16/solid';
 
 import { usePicker } from './context';

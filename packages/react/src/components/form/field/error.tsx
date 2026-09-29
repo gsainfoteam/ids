@@ -1,3 +1,5 @@
+'use client';
+
 import { useFieldContext } from './context';
 import { errorShown, present } from './error-shown';
 import { renderPart, type FieldPartProps } from './part';

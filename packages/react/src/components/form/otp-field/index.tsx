@@ -1,3 +1,5 @@
+'use client';
+
 import { type ChangeEvent, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { OTPFieldCaret, type OTPFieldCaretProps } from './caret';

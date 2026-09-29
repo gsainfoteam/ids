@@ -1,3 +1,5 @@
+'use client';
+
 import { FieldLabelContext, useFieldContext, type FieldState } from './context';
 import { resolve, stateAttributes } from './state-value';
 import { Label as BaseLabel } from '../../typography/label';

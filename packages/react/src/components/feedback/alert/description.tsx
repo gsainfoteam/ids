@@ -1,3 +1,5 @@
+'use client';
+
 import { useAlertContext } from './context';
 import { resolve, type PartProps } from './part-props';
 import { Slot } from '../../utility/slot';

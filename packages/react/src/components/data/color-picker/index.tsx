@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type ReactElement, type ReactNode } from 'react';
 
 import { ColorPickerAlphaSlider } from './alpha-slider';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useCallback, useRef, type ComponentProps, type CSSProperties } from 'react';
 
 import { useAvatarContext } from './context';

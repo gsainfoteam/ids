@@ -1,3 +1,5 @@
+'use client';
+
 import { Children, isValidElement, useLayoutEffect, type ReactNode, type RefObject } from 'react';
 
 import { useIconLabel } from '../../../internal/icon-label';

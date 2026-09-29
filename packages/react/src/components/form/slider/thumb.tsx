@@ -1,3 +1,5 @@
+'use client';
+
 import { useSliderContext } from './context';
 import { Part, type SliderPartProps } from './part';
 import { percentOf, position, thumbOffset } from './slider-math';

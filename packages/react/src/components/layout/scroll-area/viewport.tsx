@@ -1,3 +1,5 @@
+'use client';
+
 import { cloneElement, Fragment, isValidElement, use, type ComponentProps } from 'react';
 
 import { ScrollAreaContext } from './context';

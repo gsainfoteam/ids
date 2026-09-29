@@ -1,3 +1,5 @@
+'use client';
+
 import { useCardContext } from './context';
 import { Part, type CardPartProps } from './part';
 

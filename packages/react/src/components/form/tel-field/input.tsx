@@ -1,3 +1,5 @@
+'use client';
+
 import { cloneElement, Fragment, isValidElement } from 'react';
 
 import { useTelContext } from './context';

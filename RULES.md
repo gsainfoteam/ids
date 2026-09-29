@@ -39,7 +39,14 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 
 **css** — Pure CSS package. No React dependency. Consumers import `@gsainfoteam/ids-css` and add Tailwind themselves (peerDep). Do not `@import "tailwindcss"` inside this package.
 
-**react** — Component library. Library build via Vite, ESM only (`dist/index.js`; `@tanstack/hotkeys` ships no CommonJS); every entry in `dependencies` and `peerDependencies` stays external. Storybook for development.
+**react** — Component library. Library build via Vite, ESM only (`dist/index.js`; `@tanstack/hotkeys` ships no CommonJS), one module per source file (`preserveModules`, `sideEffects: false`); every entry in `dependencies` and `peerDependencies` stays external. Storybook for development.
+
+**`'use client'` marks the modules that run on the client.** The build keeps one module per source
+file, so each file's directive reaches `dist` (`rollup-preserve-directives`). A module that calls a
+hook, creates a context or renders a component starts with `'use client'`; pure modules (`style.ts`,
+logic such as `date.ts` or `number-step.ts`, types, DOM helpers and stores that client modules
+call) and re-export-only `index.ts` files do not. This is what lets a Server Component import IDS
+and render it without a boundary of its own. `tests/use-client.test.ts` checks both directions.
 
 **What we build and what we install.** Prefer a well-maintained package over hand-rolled logic:
 

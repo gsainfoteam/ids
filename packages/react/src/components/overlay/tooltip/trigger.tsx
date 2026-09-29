@@ -1,3 +1,5 @@
+'use client';
+
 import { isValidElement, type ComponentProps, type PointerEvent } from 'react';
 
 import { useTooltipContext } from './context';

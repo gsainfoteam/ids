@@ -1,3 +1,5 @@
+'use client';
+
 import { isValidElement, type ComponentProps } from 'react';
 
 import { XMarkIcon } from '@heroicons/react/16/solid';

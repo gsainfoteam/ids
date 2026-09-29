@@ -1,3 +1,5 @@
+'use client';
+
 import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 import { describeDates, isEmptyDates, sameDates, serializeDates } from './date-value';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef, type FocusEvent, type KeyboardEvent, type MouseEvent } from 'react';
 
 import { keyHandler, withModifiers } from './keys';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState, type RefObject } from 'react';
 
 export const ANNOUNCE_DELAY = 100;

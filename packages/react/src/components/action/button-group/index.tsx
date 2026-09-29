@@ -1,3 +1,5 @@
+'use client';
+
 import { Group, useGroupNameWarning } from '../../utility/group';
 
 export function ButtonGroup(props: ButtonGroup.Props) {

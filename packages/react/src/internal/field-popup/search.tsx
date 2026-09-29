@@ -1,3 +1,5 @@
+'use client';
+
 import type { ComponentProps, ReactNode } from 'react';
 
 import { MagnifyingGlassIcon } from '@heroicons/react/16/solid';

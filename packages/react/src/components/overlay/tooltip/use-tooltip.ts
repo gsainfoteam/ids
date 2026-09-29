@@ -1,3 +1,5 @@
+'use client';
+
 import { use, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { omit } from 'es-toolkit';

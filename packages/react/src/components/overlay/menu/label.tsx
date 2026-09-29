@@ -1,3 +1,5 @@
+'use client';
+
 import { use, useLayoutEffect } from 'react';
 
 import { GroupContext } from './context';

@@ -1,3 +1,5 @@
+'use client';
+
 import { isValidElement, type ComponentProps } from 'react';
 
 import { usePicker } from './context';

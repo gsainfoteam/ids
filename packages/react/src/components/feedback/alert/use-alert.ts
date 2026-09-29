@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useLayoutEffect, useState, type KeyboardEvent } from 'react';
 
 import { tabbable } from 'tabbable';

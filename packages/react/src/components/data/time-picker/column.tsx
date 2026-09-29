@@ -1,3 +1,5 @@
+'use client';
+
 import { type ComponentProps, type ReactNode } from 'react';
 
 import { ColumnView } from './column-view';
