@@ -1,48 +1,26 @@
-import {
-  createContext,
-  use,
-  useEffect,
-  useRef,
-  type ComponentProps,
-  type CSSProperties,
-  type ReactElement,
-  type ReactNode,
-  type Ref,
-} from 'react';
+import { type ReactNode, type CSSProperties } from 'react';
 
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-} from '@heroicons/react/24/outline';
-import {
-  DayPicker,
-  type ChevronProps,
-  type DayButtonProps,
-  type DayPickerProps,
-  type DropdownProps,
-  type MonthGridProps,
-  type Numerals,
-  type PreviousMonthButtonProps,
-  type RootProps,
-} from 'react-day-picker';
+import { DayPicker, type DayPickerProps, type Numerals } from 'react-day-picker';
 
+import { Chevron } from './chevron';
+import { CalendarContext, type NativeProps } from './context';
 import {
-  dayKey,
   type CalendarSelectionMode,
   type CalendarValue,
   type DateMatcher as CalendarDateMatcher,
   type DateRange,
   type DateSelection,
 } from './date';
-import { fromLocalDate } from './day-picker-bridge';
+import { CalendarDayButton } from './day-button';
 import { dayPickerFormatters, dayPickerLabels } from './day-picker-locale';
+import { Dropdown } from './dropdown';
+import { MonthButton } from './month-button';
+import { MonthGrid } from './month-grid';
+import { Root } from './root';
+import { calendarStyle } from './style';
 import { useCalendar, type CalendarModifiers, type CalendarState } from './use-calendar';
 import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
-import { messages } from '../../../internal/messages';
-import { invariant, mergeEventHandlers, mergeRefs, tv } from '../../../utils';
-import { IconButton } from '../../action/icon-button';
+import { mergeRefs } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -94,11 +72,6 @@ type NoneSelection = {
   onValueChange?: never;
 };
 
-type NativeProps = Omit<
-  ComponentProps<'div'>,
-  'defaultValue' | 'onChange' | 'onSelect' | 'children' | 'className' | 'style' | 'dir'
->;
-
 export type CalendarProps = NativeProps &
   CalendarOptions &
   (DateSelection | NoneSelection) & {
@@ -106,24 +79,15 @@ export type CalendarProps = NativeProps &
     style?: CSSProperties | ((state: CalendarState) => CSSProperties | undefined);
   };
 
-type ContextValue = {
-  state: CalendarState;
-  size: IdsSize;
-  styles: ReturnType<typeof Calendar.Style>;
-  native: Omit<NativeProps, 'ref'>;
-  rootRef: Ref<HTMLDivElement>;
-  onGridMouseLeave: () => void;
-  modifierNames: string[];
-  renderDay?: CalendarOptions['renderDay'];
+const dayPickerParts = {
+  Root,
+  DayButton: CalendarDayButton,
+  Chevron,
+  Dropdown,
+  MonthGrid,
+  PreviousMonthButton: MonthButton,
+  NextMonthButton: MonthButton,
 };
-
-const CalendarContext = createContext<ContextValue | null>(null);
-
-function useCalendarContext(part: string) {
-  const context = use(CalendarContext);
-  invariant(context, `${part} must be inside Calendar.`);
-  return context;
-}
 
 export function Calendar(props: CalendarProps) {
   const {
@@ -180,7 +144,7 @@ export function Calendar(props: CalendarProps) {
   const { state } = api;
   const resolvedLocale = resolveLocale(locale);
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = Calendar.Style({ size: resolvedSize });
+  const styles = calendarStyle({ size: resolvedSize });
 
   return (
     <CalendarContext
@@ -263,151 +227,6 @@ export function Calendar(props: CalendarProps) {
   );
 }
 
-function Root({ rootRef, ...props }: RootProps) {
-  const c = useCalendarContext('Calendar');
-  const { native, state } = c;
-  return (
-    <div
-      {...props}
-      {...native}
-      ref={mergeRefs(rootRef, c.rootRef)}
-      role={native.role ?? 'group'}
-      aria-label={
-        native['aria-label'] ?? (native['aria-labelledby'] ? undefined : messages.calendar.label)
-      }
-      aria-disabled={state.disabled || undefined}
-      data-calendar=""
-      data-size={c.size}
-      data-selection-mode={state.selectionMode}
-      data-disabled={state.disabled ? '' : undefined}
-      data-readonly={state.readOnly ? '' : undefined}
-    />
-  );
-}
-
-function MonthGrid({ onMouseLeave, ...props }: MonthGridProps) {
-  const c = useCalendarContext('Calendar');
-  return (
-    <table
-      {...props}
-      aria-readonly={c.state.readOnly || undefined}
-      aria-disabled={c.state.disabled || undefined}
-      onMouseLeave={mergeEventHandlers(onMouseLeave, c.onGridMouseLeave)}
-    />
-  );
-}
-
-const chevrons = {
-  left: ChevronLeftIcon,
-  right: ChevronRightIcon,
-  up: ChevronUpIcon,
-  down: ChevronDownIcon,
-};
-
-function Chevron({ orientation = 'left', className, style }: ChevronProps) {
-  const Icon = chevrons[orientation];
-  return <Icon aria-hidden="true" className={className} style={style} />;
-}
-
-function MonthButton({
-  'aria-disabled': unavailable,
-  children,
-  ...props
-}: PreviousMonthButtonProps) {
-  const c = useCalendarContext('Calendar');
-  return (
-    <IconButton
-      {...props}
-      variant="ghost"
-      size={c.size}
-      disabled={unavailable === true || unavailable === 'true'}
-      focusableWhenDisabled
-      icon={children as ReactElement}
-    />
-  );
-}
-
-function Dropdown({ options, className, ...props }: DropdownProps) {
-  const c = useCalendarContext('Calendar');
-  const selected = options?.find((option) => option.value === props.value);
-  return (
-    <span data-disabled={props.disabled ? '' : undefined} className={c.styles.dropdownRoot()}>
-      <select {...props} data-field-input="" className={c.styles.dropdown({ className })}>
-        {options?.map((option) => (
-          <option key={option.value} value={option.value} disabled={option.disabled}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <span aria-hidden="true" className={c.styles.dropdownLabel()}>
-        {selected?.label}
-        <ChevronDownIcon />
-      </span>
-    </span>
-  );
-}
-
-function CalendarDayButton({ day, modifiers, className, children, ...props }: DayButtonProps) {
-  const c = useCalendarContext('Calendar');
-  const own = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (modifiers.focused) own.current?.focus();
-  }, [modifiers.focused]);
-
-  const preview = !!modifiers.range_preview && !modifiers.selected;
-  const styles = Calendar.Style({
-    size: c.size,
-    selected: !!modifiers.selected && !modifiers.range_middle,
-    onBand: !!modifiers.range_middle || preview,
-    today: !!modifiers.today,
-    outside: !!modifiers.outside,
-    unavailable: !!modifiers.disabled,
-  });
-  const flag = (on: boolean | undefined) => (on ? '' : undefined);
-  const date = fromLocalDate(day.date);
-
-  const dayState: CalendarDayState = {
-    selected: !!modifiers.selected,
-    today: !!modifiers.today,
-    outside: !!modifiers.outside,
-    disabled: !!modifiers.disabled,
-    rangeStart: !!modifiers.range_start,
-    rangeMiddle: !!modifiers.range_middle,
-    rangeEnd: !!modifiers.range_end,
-    modifiers: Object.fromEntries(c.modifierNames.map((name) => [name, !!modifiers[name]])),
-  };
-
-  return (
-    <button
-      {...props}
-      ref={own}
-      data-calendar-day={dayKey(date)}
-      data-selected={flag(modifiers.selected)}
-      data-today={flag(modifiers.today)}
-      data-disabled={flag(modifiers.disabled)}
-      data-outside={flag(modifiers.outside)}
-      data-range-start={flag(modifiers.range_start)}
-      data-range-middle={flag(modifiers.range_middle)}
-      data-range-end={flag(modifiers.range_end)}
-      data-range-preview={flag(preview)}
-      className={styles.dayButton({ className })}
-    >
-      {c.renderDay ? c.renderDay(date, dayState) : children}
-    </button>
-  );
-}
-
-const dayPickerParts = {
-  Root,
-  DayButton: CalendarDayButton,
-  Chevron,
-  Dropdown,
-  MonthGrid,
-  PreviousMonthButton: MonthButton,
-  NextMonthButton: MonthButton,
-};
-
 export namespace Calendar {
   export type Props = CalendarProps;
   export type State = CalendarState;
@@ -417,128 +236,7 @@ export namespace Calendar {
   export type DateMatcher = CalendarDateMatcher;
   export type DayState = CalendarDayState;
 
-  export const Style = tv({
-    slots: {
-      root: 'relative w-fit min-w-0 text-(--ids-color-on-surface)',
-      months: 'flex flex-wrap gap-4',
-      month:
-        'grid grid-cols-[var(--calendar-cell)_minmax(0,1fr)_var(--calendar-cell)] content-start gap-y-2',
-      previous: 'col-start-1 row-start-1 size-(--calendar-cell)',
-      next: 'col-start-3 row-start-1 size-(--calendar-cell)',
-      chevron: 'size-(--calendar-icon)',
-      caption:
-        'col-start-2 row-start-1 flex h-(--calendar-cell) min-w-0 items-center justify-center',
-      captionLabel: 'truncate font-medium select-none',
-      dropdowns: 'flex min-w-0 items-center justify-center gap-1.5',
-      dropdownRoot: [
-        'relative inline-flex min-w-0 items-center rounded-standard shadow-xs',
-        'inset-ring-1 inset-ring-(--ids-color-border) focus-ring',
-        'data-disabled:opacity-50',
-      ],
-      dropdown:
-        'absolute inset-0 size-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed',
-      dropdownLabel: [
-        'pointer-events-none flex h-(--calendar-dropdown) items-center gap-1 ps-2 pe-1 font-medium whitespace-nowrap',
-        '[&_svg]:size-3.5 [&_svg]:text-(--ids-color-on-muted)',
-      ],
-      grid: 'col-span-3 row-start-2',
-      weekdays: 'flex',
-      weekday: [
-        'flex h-(--calendar-weekday) w-(--calendar-cell) items-center justify-center p-0',
-        'font-normal text-(--ids-color-on-muted) select-none',
-      ],
-      week: 'flex not-first:mt-1',
-      weekNumber: [
-        'flex h-(--calendar-cell) w-(--calendar-cell) items-center justify-center p-0',
-        'text-caption-c1-regular text-(--ids-color-on-muted) select-none',
-      ],
-      day: [
-        'relative size-(--calendar-cell) p-0 text-center',
-        'first:rounded-s-standard last:rounded-e-standard',
-        '[[data-hidden]+&]:rounded-s-standard [&:has(+[data-hidden])]:rounded-e-standard',
-      ],
-      rangeStart: 'rounded-s-standard bg-(--ids-color-muted)',
-      rangeMiddle: 'bg-(--ids-color-muted)',
-      rangeEnd: 'rounded-e-standard bg-(--ids-color-muted)',
-      hidden: 'invisible',
-      dayButton: [
-        'relative inline-flex size-full cursor-pointer items-center justify-center rounded-standard',
-        'tabular-nums select-none focus-ring focus-visible:z-10',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-        'motion-reduce:transition-none',
-      ],
-      footer: 'mt-3 text-caption-c1-regular text-(--ids-color-on-muted)',
-    },
-    variants: {
-      size: {
-        standard: {
-          root: [
-            'text-body-b3-regular',
-            '[--calendar-cell:var(--ids-size-control-standard)] [--calendar-dropdown:--spacing(8)] [--calendar-weekday:--spacing(8)]',
-            '[--calendar-icon:var(--ids-size-icon-standard)]',
-          ],
-        },
-        tiny: {
-          root: [
-            'text-caption-c1-regular',
-            '[--calendar-cell:var(--ids-size-control-tiny)] [--calendar-dropdown:--spacing(7)] [--calendar-weekday:--spacing(7)]',
-            '[--calendar-icon:var(--ids-size-icon-tiny)]',
-          ],
-        },
-      } satisfies Record<IdsSize, object>,
-      today: { true: { dayButton: 'font-semibold' } },
-      outside: { true: { dayButton: 'text-(--ids-color-on-muted)' } },
-      selected: {
-        true: {
-          dayButton:
-            'bg-(--ids-color-primary) font-medium text-(--ids-color-on-primary) hover:bg-(--ids-color-primary)/90',
-        },
-      },
-      onBand: {
-        true: {
-          dayButton: 'hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)',
-        },
-      },
-      unavailable: { true: { dayButton: 'cursor-not-allowed opacity-50' } },
-    },
-    compoundVariants: [
-      {
-        selected: false,
-        onBand: false,
-        today: true,
-        class: { dayButton: 'bg-(--ids-color-muted)' },
-      },
-      {
-        selected: false,
-        onBand: false,
-        unavailable: false,
-        class: { dayButton: 'hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)' },
-      },
-      {
-        selected: false,
-        onBand: false,
-        unavailable: false,
-        today: true,
-        class: {
-          dayButton: 'hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)',
-        },
-      },
-      { selected: true, unavailable: true, class: { dayButton: 'hover:bg-(--ids-color-primary)' } },
-      {
-        onBand: true,
-        unavailable: true,
-        class: { dayButton: 'hover:bg-transparent active:bg-transparent' },
-      },
-    ],
-    defaultVariants: {
-      size: 'standard',
-      selected: false,
-      onBand: false,
-      today: false,
-      outside: false,
-      unavailable: false,
-    },
-  });
+  export const Style = calendarStyle;
 }
 
 export { CalendarPickContext } from './use-calendar';

@@ -1,79 +1,33 @@
-import {
-  createContext,
-  isValidElement,
-  use,
-  useCallback,
-  type ComponentProps,
-  type KeyboardEvent,
-  type Ref,
-} from 'react';
-
-import { ChevronDownIcon } from '@heroicons/react/16/solid';
+import { useCallback, type ComponentProps } from 'react';
 
 import {
-  ROOT_ATTRIBUTE,
-  TRIGGER_ATTRIBUTE,
-  useAccordion,
-  useAccordionItem,
-  useAccordionPanel,
-} from './use-accordion';
+  AccordionContent,
+  type AccordionContentProps,
+  type AccordionContentState,
+} from './content';
+import { AccordionContext } from './context';
 import {
-  interactiveDataProps,
-  useInteractive,
-  type InteractiveState,
-} from '../../../hooks/use-interactive';
+  AccordionIndicator,
+  type AccordionIndicatorProps,
+  type AccordionIndicatorState,
+} from './indicator';
+import { AccordionItem, type AccordionItemProps, type AccordionItemState } from './item';
+import { flag } from './open-state';
+import { accordionStyle } from './style';
+import {
+  AccordionTrigger,
+  type AccordionTriggerProps,
+  type AccordionTriggerState,
+} from './trigger';
+import { ROOT_ATTRIBUTE, useAccordion } from './use-accordion';
 import { resolveState, type StateRenderProps } from '../../../internal/state-props';
-import { flattenFragments, invariant, mergeRefs, tv } from '../../../utils';
-import { Slot } from '../../utility/slot';
+import { mergeRefs } from '../../../utils';
 
 import type { AccordionValue } from './accordion-value';
 import type { IdsSize } from '../../../tokens/types';
 
 export type AccordionVariant = 'outline' | 'soft' | 'ghost';
 export type AccordionHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
-
-type RootContext = {
-  open: readonly string[];
-  disabled: boolean;
-  canCollapse: boolean;
-  headingLevel: AccordionHeadingLevel;
-  styles: ReturnType<typeof Accordion.Style>;
-  toggle: (value: string) => void;
-  reveal: (value: string) => void;
-  register: (value: string) => () => void;
-  onTriggerKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
-};
-
-type ItemContext = {
-  state: Accordion.Item.State;
-  locked: boolean;
-  triggerId: string;
-  contentId: string;
-};
-
-const AccordionContext = createContext<RootContext | null>(null);
-const AccordionItemContext = createContext<ItemContext | null>(null);
-const IndicatorPlacementContext = createContext<'end' | 'inline'>('end');
-
-function useRootContext(part: string) {
-  const context = use(AccordionContext);
-  invariant(context, `\`<${part}>\` must be used inside \`<Accordion>\`.`);
-  return context;
-}
-
-function useItemContext(part: string) {
-  const context = use(AccordionItemContext);
-  invariant(context, `\`<${part}>\` must be used inside \`<Accordion.Item>\`.`);
-  return context;
-}
-
-function flag(on: boolean) {
-  return on ? '' : undefined;
-}
-
-function openState(open: boolean) {
-  return { 'data-state': open ? 'open' : 'closed', 'data-open': flag(open) } as const;
-}
 
 export function Accordion<T extends string = string>(props: Accordion.Props<T>) {
   const {
@@ -106,7 +60,7 @@ export function Accordion<T extends string = string>(props: Accordion.Props<T>) 
     [rootRef, ref],
   );
 
-  const styles = Accordion.Style({ variant, size });
+  const styles = accordionStyle({ variant, size });
   const rootState: Accordion.State<T> = { value: state.value, disabled };
 
   return (
@@ -177,276 +131,29 @@ export namespace Accordion {
 
   export type Props<T extends string = string> = SingleProps<T> | MultipleProps<T>;
 
-  export function Item({ value, disabled, className, style, children, ...rest }: Item.Props) {
-    const root = useRootContext('Accordion.Item');
-    const open = root.open.includes(value);
-    const isDisabled = root.disabled || disabled === true;
-    const { triggerId, contentId, locked } = useAccordionItem({
-      value,
-      open,
-      disabled: isDisabled,
-      canCollapse: root.canCollapse,
-      register: root.register,
-    });
-    const state: Item.State = { value, open, disabled: isDisabled };
-
-    return (
-      <AccordionItemContext value={{ state, locked, triggerId, contentId }}>
-        <div
-          {...rest}
-          data-accordion-item=""
-          {...openState(open)}
-          data-disabled={flag(isDisabled)}
-          className={root.styles.item({ className: resolveState(className, state) })}
-          style={resolveState(style, state)}
-        >
-          {resolveState(children, state)}
-        </div>
-      </AccordionItemContext>
-    );
-  }
-
+  export const Item = AccordionItem;
   export namespace Item {
-    export type State = { value: string; open: boolean; disabled: boolean };
-
-    export type Props = Omit<ComponentProps<'div'>, 'children' | 'className' | 'style'> &
-      StateRenderProps<State> & {
-        value: string;
-        disabled?: boolean;
-      };
+    export type State = AccordionItemState;
+    export type Props = AccordionItemProps;
   }
 
-  export function Trigger({
-    className,
-    style,
-    children,
-    onClick,
-    onKeyDown,
-    onKeyUp,
-    onFocus,
-    onBlur,
-    onPointerEnter,
-    onPointerLeave,
-    onPointerDown,
-    onPointerUp,
-    onPointerCancel,
-    ...rest
-  }: Trigger.Props) {
-    const root = useRootContext('Accordion.Trigger');
-    const item = useItemContext('Accordion.Trigger');
-    const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
-      disabled: item.state.disabled,
-      onKeyDown: (event) => {
-        onKeyDown?.(event);
-        if (!event.defaultPrevented) root.onTriggerKeyDown(event);
-      },
-      onKeyUp,
-      onFocus,
-      onBlur,
-      onPointerEnter,
-      onPointerLeave,
-      onPointerDown,
-      onPointerUp,
-      onPointerCancel,
-    });
-    const state: Trigger.State = { ...interaction, ...item.state };
-    const content = resolveState(children, state);
-    const nodes = flattenFragments(content);
-    const indicatorIndex = nodes.findIndex(
-      (child) => isValidElement(child) && child.type === Indicator,
-    );
-    const Heading = `h${root.headingLevel}` as const;
-
-    return (
-      <Heading className={root.styles.heading()}>
-        <button
-          type="button"
-          {...rest}
-          {...handlers}
-          id={item.triggerId}
-          aria-expanded={item.state.open}
-          aria-controls={item.contentId}
-          aria-disabled={item.locked ? true : undefined}
-          disabled={item.state.disabled}
-          {...{ [TRIGGER_ATTRIBUTE]: '' }}
-          {...interactiveDataProps(interaction)}
-          {...openState(item.state.open)}
-          onClick={(event) => {
-            onClick?.(event);
-            if (event.defaultPrevented || item.locked) return;
-            root.toggle(item.state.value);
-          }}
-          className={root.styles.trigger({ className: resolveState(className, state) })}
-          style={resolveState(style, state)}
-        >
-          <IndicatorPlacementContext
-            value={indicatorIndex === -1 || indicatorIndex === nodes.length - 1 ? 'end' : 'inline'}
-          >
-            {content}
-            {indicatorIndex === -1 && <Indicator />}
-          </IndicatorPlacementContext>
-        </button>
-      </Heading>
-    );
-  }
-
+  export const Trigger = AccordionTrigger;
   export namespace Trigger {
-    export type State = InteractiveState & Item.State;
-
-    export type Props = Omit<
-      ComponentProps<'button'>,
-      'children' | 'className' | 'style' | 'type' | 'disabled' | 'id'
-    > &
-      StateRenderProps<State>;
+    export type State = AccordionTriggerState;
+    export type Props = AccordionTriggerProps;
   }
 
-  export function Indicator({ asChild, className, style, children, ...rest }: Indicator.Props) {
-    const root = useRootContext('Accordion.Indicator');
-    const { state } = useItemContext('Accordion.Indicator');
-    const placement = use(IndicatorPlacementContext);
-    const props = {
-      'aria-hidden': true,
-      ...rest,
-      'data-accordion-indicator': '',
-      ...openState(state.open),
-      className: root.styles.indicator({ placement, className: resolveState(className, state) }),
-      style: resolveState(style, state),
-    };
-    const content = resolveState(children, state);
-
-    if (asChild === true) return <Slot {...props}>{content}</Slot>;
-    return <span {...props}>{content ?? <ChevronDownIcon />}</span>;
-  }
-
+  export const Indicator = AccordionIndicator;
   export namespace Indicator {
-    export type State = Item.State;
-
-    export type Props = Omit<ComponentProps<'span'>, 'children' | 'className' | 'style'> &
-      StateRenderProps<State> & {
-        asChild?: boolean;
-      };
+    export type State = AccordionIndicatorState;
+    export type Props = AccordionIndicatorProps;
   }
 
-  export function Content({ className, style, children, ref, ...rest }: Content.Props) {
-    const root = useRootContext('Accordion.Content');
-    const item = useItemContext('Accordion.Content');
-    const { state } = item;
-    const { panelRef, hidden, closing, instant } = useAccordionPanel({
-      open: state.open,
-      disabled: state.disabled,
-      triggerId: item.triggerId,
-      onReveal: () => root.reveal(state.value),
-    });
-    const mergedRef = useCallback(
-      (node: HTMLDivElement | null) => mergeRefs(panelRef, ref)(node),
-      [panelRef, ref],
-    );
-
-    return (
-      <div
-        {...rest}
-        ref={mergedRef}
-        id={item.contentId}
-        role="region"
-        aria-labelledby={item.triggerId}
-        hidden={hidden}
-        inert={closing}
-        data-accordion-content=""
-        {...openState(state.open)}
-        data-disabled={flag(state.disabled)}
-        data-instant={flag(instant)}
-        className={root.styles.content()}
-      >
-        <div className={root.styles.clip()}>
-          <div
-            className={root.styles.body({ className: resolveState(className, state) })}
-            style={resolveState(style, state)}
-          >
-            {resolveState(children, state)}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  export const Content = AccordionContent;
   export namespace Content {
-    export type State = Item.State;
-
-    export type Props = Omit<
-      ComponentProps<'div'>,
-      'children' | 'className' | 'style' | 'id' | 'role' | 'hidden' | 'inert'
-    > &
-      StateRenderProps<State> & {
-        ref?: Ref<HTMLDivElement>;
-      };
+    export type State = AccordionContentState;
+    export type Props = AccordionContentProps;
   }
 
-  export const Style = tv({
-    slots: {
-      root: 'flex w-full flex-col',
-      item: '',
-      heading: 'flex',
-      trigger: [
-        'flex w-full flex-1 cursor-pointer items-start gap-2 rounded-standard text-start',
-        'text-(--ids-color-on-surface) focus-ring',
-        'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-        'motion-reduce:transition-none',
-        'disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-default',
-      ],
-      indicator: [
-        'pointer-events-none inline-flex h-[1lh] shrink-0 items-center',
-        'text-(--ids-color-on-muted) [&_svg]:size-4',
-        'transition-transform duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
-        'data-open:rotate-180',
-      ],
-      content: [
-        'grid grid-rows-[0fr] transition-[grid-template-rows] duration-(--ids-motion-normal) ease-out',
-        'data-open:grid-rows-[1fr] data-instant:transition-none motion-reduce:transition-none',
-      ],
-      clip: 'min-h-0 overflow-hidden',
-      body: 'text-(--ids-color-on-surface)',
-    },
-    variants: {
-      variant: {
-        outline: {
-          item: 'border-b border-(--ids-color-border) last:border-b-0',
-          trigger: 'underline-offset-4 data-hovered:underline',
-        },
-        soft: {
-          root: 'gap-2',
-          item: 'bg-(--ids-color-muted) concentric-p-1',
-          trigger:
-            'px-3 data-hovered:bg-(--ids-color-muted-hover) data-active:bg-(--ids-color-muted-active)',
-          body: 'px-3',
-        },
-        ghost: {
-          root: 'gap-1',
-          trigger:
-            'px-3 data-hovered:bg-(--ids-color-muted) data-active:bg-(--ids-color-muted-hover)',
-          body: 'px-3',
-        },
-      } satisfies Record<AccordionVariant, object>,
-      size: {
-        standard: {
-          trigger: 'py-4 text-body-b3-medium',
-          body: 'pb-4 text-body-b3-regular',
-        },
-        tiny: {
-          trigger: 'py-3 text-caption-c1-medium',
-          body: 'pb-3 text-caption-c1-regular',
-        },
-      } satisfies Record<IdsSize, object>,
-      placement: {
-        end: { indicator: 'ms-auto' },
-        inline: {},
-      },
-    },
-    compoundVariants: [
-      { variant: 'soft', size: 'standard', class: { trigger: 'py-3', body: 'pb-3' } },
-      { variant: 'soft', size: 'tiny', class: { trigger: 'py-2', body: 'pb-2' } },
-      { variant: 'ghost', size: 'standard', class: { trigger: 'py-2.5', body: 'pb-3' } },
-      { variant: 'ghost', size: 'tiny', class: { trigger: 'py-1.5', body: 'pb-2' } },
-    ],
-    defaultVariants: { variant: 'outline', size: 'standard', placement: 'end' },
-  });
+  export const Style = accordionStyle;
 }

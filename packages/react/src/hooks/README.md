@@ -101,7 +101,7 @@ useFormReset(controlRef, () => {
 // components/action/button/use-button.ts: prop 을 풀고, 핸들러와 data-* 를 한 번에 받는다
 const { state, handlers, dataProps, props: resolved } = useInteractiveProps<HTMLElement, P>(props);
 
-// components/data/accordion/index.tsx: 상태만 필요하면 useInteractive
+// components/data/accordion/trigger.tsx: 상태만 필요하면 useInteractive
 const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
   disabled: item.state.disabled,
   onKeyDown: (event) => {

@@ -1,56 +1,32 @@
 import {
-  createContext,
   isValidElement,
-  use,
   useCallback,
   useState,
-  type ComponentProps,
   type CSSProperties,
   type HTMLAttributes,
-  type KeyboardEvent,
   type ReactNode,
   type Ref,
 } from 'react';
 
-import { XMarkIcon } from '@heroicons/react/16/solid';
-
+import { ChipClose, type ChipCloseProps } from './close';
+import { ChipContext } from './context';
+import { ChipIcon, type ChipIconProps } from './icon';
+import { ChipLabel, type ChipLabelProps } from './label';
+import { chipStyle } from './style';
 import { useChip, type ChipRemoveEvent } from './use-chip';
 import {
   interactiveDataProps,
   useInteractive,
   type InteractiveState,
 } from '../../../hooks/use-interactive';
-import { messages } from '../../../internal/messages';
 import { resolveState, type StateValue } from '../../../internal/state-props';
-import { useRegisteredId } from '../../../internal/surface';
-import { cn, flattenFragments, invariant, mergeRefs, tv } from '../../../utils';
-import { IconButton } from '../../action/icon-button';
+import { flattenFragments, mergeRefs } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { IdsSize } from '../../../tokens/types';
 
 export type ChipVariant = 'solid' | 'soft' | 'outline';
 export type ChipColorScheme = 'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
-
-type Context = {
-  styles: ReturnType<typeof Chip.Style>;
-  rootIsButton: boolean;
-  colorScheme: ChipColorScheme;
-  size: IdsSize;
-  disabled: boolean;
-  labelId: string | undefined;
-  setLabelId: (id: string | undefined) => void;
-  remove: (event: ChipRemoveEvent) => void;
-  removeOnKey: (event: KeyboardEvent<HTMLElement>) => boolean;
-};
-
-const ChipContext = createContext<Context | null>(null);
-
-function useChipContext(part: string) {
-  const context = use(ChipContext);
-  invariant(context, `\`<${part}>\` must be used inside \`<Chip>\`.`);
-  return context;
-}
 
 function flag(on: boolean) {
   return on ? '' : undefined;
@@ -62,7 +38,7 @@ function arrange(content: ReactNode, removable: boolean) {
   let text: ReactNode[] = [];
   const flush = () => {
     if (text.length === 0) return;
-    arranged.push(<Chip.Label key={`label-${arranged.length}`}>{text}</Chip.Label>);
+    arranged.push(<ChipLabel key={`label-${arranged.length}`}>{text}</ChipLabel>);
     text = [];
   };
   for (const node of nodes) {
@@ -73,8 +49,8 @@ function arrange(content: ReactNode, removable: boolean) {
     }
   }
   flush();
-  if (removable && !nodes.some((node) => isValidElement(node) && node.type === Chip.Close))
-    arranged.push(<Chip.Close key="close" />);
+  if (removable && !nodes.some((node) => isValidElement(node) && node.type === ChipClose))
+    arranged.push(<ChipClose key="close" />);
   return arranged;
 }
 
@@ -151,7 +127,7 @@ export function Chip({
     removable: chip.removable,
     interactive: chip.interactive,
   };
-  const styles = Chip.Style({ variant, colorScheme, size, interactive: chip.interactive });
+  const styles = chipStyle({ variant, colorScheme, size, interactive: chip.interactive });
   const content = resolveState(children, state);
   const Root = asChild ? Slot : rootIsButton ? 'button' : 'span';
 
@@ -229,165 +205,20 @@ export namespace Chip {
     children?: StateValue<ReactNode, State>;
   };
 
-  export function Icon({ asChild, className, ...props }: Icon.Props) {
-    const { styles } = useChipContext('Chip.Icon');
-    const Root = asChild === true ? Slot : 'span';
-    return <Root aria-hidden {...props} data-chip-icon="" className={styles.icon({ className })} />;
-  }
+  export const Icon = ChipIcon;
   export namespace Icon {
-    export type Props = ComponentProps<'span'> & { asChild?: boolean };
+    export type Props = ChipIconProps;
   }
 
-  export function Label({ asChild, className, id, ...props }: Label.Props) {
-    const { styles, setLabelId } = useChipContext('Chip.Label');
-    const labelId = useRegisteredId(setLabelId, id);
-    const Root = asChild === true ? Slot : 'span';
-    return (
-      <Root {...props} id={labelId} data-chip-label="" className={styles.label({ className })} />
-    );
-  }
+  export const Label = ChipLabel;
   export namespace Label {
-    export type Props = ComponentProps<'span'> & { asChild?: boolean };
+    export type Props = ChipLabelProps;
   }
 
-  export function Close({
-    className,
-    children,
-    id,
-    onClick,
-    onKeyDown,
-    'aria-label': ariaLabel,
-    ...rest
-  }: Close.Props) {
-    const context = useChipContext('Chip.Close');
-    const closeId = useRegisteredId(undefined, id);
-    const glyph = children ?? <XMarkIcon />;
-    const chipLabelThenOwnLabel =
-      ariaLabel === undefined && context.labelId ? `${context.labelId} ${closeId}` : undefined;
-
-    if (context.rootIsButton)
-      return (
-        <span
-          aria-hidden="true"
-          data-chip-close=""
-          className={context.styles.close({ className })}
-          onClick={(event) => {
-            event.stopPropagation();
-            context.remove(event);
-          }}
-        >
-          {glyph}
-        </span>
-      );
-
-    return (
-      <IconButton
-        {...rest}
-        id={closeId}
-        variant="ghost"
-        colorScheme={context.colorScheme}
-        size={context.size}
-        aria-label={ariaLabel ?? messages.chip.remove}
-        aria-labelledby={chipLabelThenOwnLabel}
-        disabled={context.disabled}
-        data-chip-close=""
-        icon={isValidElement(glyph) ? glyph : <>{glyph}</>}
-        className={context.styles.close({ className })}
-        onClick={(event) => {
-          onClick?.(event);
-          if (event.defaultPrevented) return;
-          event.stopPropagation();
-          context.remove(event);
-        }}
-        onKeyDown={(event) => {
-          onKeyDown?.(event);
-          if (!event.defaultPrevented) context.removeOnKey(event);
-        }}
-      />
-    );
-  }
+  export const Close = ChipClose;
   export namespace Close {
-    export type Props = Omit<ComponentProps<'button'>, 'type'>;
+    export type Props = ChipCloseProps;
   }
 
-  const pointerHover = cn('hover:bg-current/15 hover:opacity-100');
-  const replacesIconButtonFill = cn('data-hovered:bg-current/15 data-active:bg-current/15');
-
-  export const Style = tv({
-    slots: {
-      root: [
-        'inline-flex shrink-0 items-center rounded-full align-middle whitespace-nowrap',
-        'bg-[image:linear-gradient(var(--chip-layer),var(--chip-layer))] [--chip-layer:transparent]',
-        'data-disabled:opacity-50',
-      ],
-      icon: 'inline-flex shrink-0 [&_svg]:size-[1.15em]',
-      label: 'min-w-0 truncate',
-      close: [
-        'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full text-current opacity-60',
-        pointerHover,
-        replacesIconButtonFill,
-        'transition-[opacity,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-        '[&_svg]:size-[0.95em]',
-      ],
-    },
-    variants: {
-      colorScheme: {
-        neutral: {
-          root: '[--chip-fill:var(--ids-color-on-surface)] [--chip-on-fill:var(--ids-color-surface)] [--chip-tint:var(--ids-color-muted)] [--chip-text:var(--ids-color-on-surface)] [--chip-line:var(--ids-color-border)]',
-        },
-        primary: {
-          root: '[--chip-fill:var(--ids-color-primary)] [--chip-on-fill:var(--ids-color-on-primary)] [--chip-tint:color-mix(in_oklab,var(--ids-color-primary)_12%,transparent)] [--chip-text:var(--ids-color-primary)] [--chip-line:color-mix(in_oklab,var(--ids-color-primary)_40%,transparent)]',
-        },
-        success: {
-          root: '[--chip-fill:var(--ids-color-success)] [--chip-on-fill:var(--ids-color-on-success)] [--chip-tint:color-mix(in_oklab,var(--ids-color-success)_15%,transparent)] [--chip-text:var(--ids-color-success-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-success)_40%,transparent)]',
-        },
-        warning: {
-          root: '[--chip-fill:var(--ids-color-warning)] [--chip-on-fill:var(--ids-color-on-warning)] [--chip-tint:color-mix(in_oklab,var(--ids-color-warning)_18%,transparent)] [--chip-text:var(--ids-color-warning-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-warning)_50%,transparent)]',
-        },
-        danger: {
-          root: '[--chip-fill:var(--ids-color-danger)] [--chip-on-fill:var(--ids-color-on-danger)] [--chip-tint:color-mix(in_oklab,var(--ids-color-danger)_12%,transparent)] [--chip-text:var(--ids-color-danger-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-danger)_40%,transparent)]',
-        },
-        info: {
-          root: '[--chip-fill:var(--ids-color-info)] [--chip-on-fill:var(--ids-color-on-info)] [--chip-tint:color-mix(in_oklab,var(--ids-color-info)_12%,transparent)] [--chip-text:var(--ids-color-info-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-info)_40%,transparent)]',
-        },
-      } satisfies Record<ChipColorScheme, object>,
-      variant: {
-        solid: { root: 'bg-(--chip-fill) text-(--chip-on-fill)' },
-        soft: { root: 'bg-(--chip-tint) text-(--chip-text)' },
-        outline: {
-          root: 'bg-transparent text-(--chip-text) inset-ring-1 inset-ring-(--chip-line)',
-        },
-      } satisfies Record<ChipVariant, object>,
-      size: {
-        standard: {
-          root: 'h-5.5 gap-1 px-2 text-caption-c1-medium has-[>[data-chip-close]:last-child]:pe-1',
-          close: 'size-4',
-        },
-        tiny: {
-          root: 'h-4.5 gap-0.5 px-1.5 text-caption-c2-medium has-[>[data-chip-close]:last-child]:pe-0.5',
-          close: 'size-3.5',
-        },
-      } satisfies Record<IdsSize, object>,
-      interactive: {
-        true: {
-          root: [
-            'cursor-pointer select-none focus-ring',
-            'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
-            'motion-reduce:transition-none',
-            'data-hovered:[--chip-layer:color-mix(in_oklab,currentColor_10%,transparent)]',
-            'data-active:[--chip-layer:color-mix(in_oklab,currentColor_16%,transparent)]',
-            'data-selected:bg-(--chip-fill) data-selected:text-(--chip-on-fill)',
-            'disabled:cursor-not-allowed disabled:opacity-50',
-          ],
-        },
-        false: {},
-      },
-    },
-    defaultVariants: {
-      variant: 'soft',
-      colorScheme: 'neutral',
-      size: 'standard',
-      interactive: false,
-    },
-  });
+  export const Style = chipStyle;
 }

@@ -1,36 +1,21 @@
-import {
-  createContext,
-  isValidElement,
-  use,
-  type ComponentProps,
-  type CSSProperties,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { type ComponentProps, type ReactElement, type ReactNode } from 'react';
 
-import { CheckIcon, ClipboardDocumentIcon, EyeDropperIcon } from '@heroicons/react/16/solid';
-
-import { cssColor, formatPlaceholder, parseColor, type ColorFormat } from './color';
-import { useClipboardSupport, useColorPicker, useEyeDropperSupport } from './use-color-picker';
+import { ColorPickerAlphaSlider } from './alpha-slider';
+import { ColorPickerArea, type ColorPickerAreaProps } from './area';
+import { PickerContext, usePicker } from './context';
+import { ColorPickerCopy } from './copy';
+import { ColorPickerEyeDropper } from './eye-dropper';
+import { ColorPickerHueSlider } from './hue-slider';
+import { ColorPickerInput, type ColorPickerInputProps } from './input';
+import { colorPickerStyle } from './style';
+import { ColorPickerSwatch, type ColorPickerSwatchProps } from './swatch';
+import { ColorPickerSwatches, type ColorPickerSwatchesProps } from './swatches';
+import { useColorPicker } from './use-color-picker';
 import { messages } from '../../../internal/messages';
-import { sliderSurface } from '../../../internal/slider-surface';
 import { resolveState } from '../../../internal/state-props';
-import {
-  cn,
-  flattenFragments,
-  invariant,
-  mergeEventHandlers,
-  mergeProps,
-  tv,
-} from '../../../utils';
-import { IconButton } from '../../action/icon-button';
 import { useFieldSize } from '../../form/field/context';
-import { Radio } from '../../form/radio';
-import { RadioGroup } from '../../form/radio-group';
-import { useRadioGroupContext } from '../../form/radio-group/context';
-import { Slider } from '../../form/slider';
-import { TextField } from '../../form/text-field';
 
+import type { ColorFormat } from './color';
 import type { IdsSize } from '../../../tokens/types';
 
 export type { ColorFormat } from './color';
@@ -61,37 +46,6 @@ export type ColorPickerProps = Omit<
   children?: ReactNode;
 };
 
-type Context = {
-  picker: ReturnType<typeof useColorPicker>;
-  state: ColorPickerState;
-  format: ColorFormat;
-  alpha: boolean;
-  swatches: ColorPickerSwatchOption[] | undefined;
-  size: IdsSize;
-  styles: ReturnType<typeof ColorPicker.Style>;
-};
-
-const PickerContext = createContext<Context | null>(null);
-
-function usePicker(part: string) {
-  const context = use(PickerContext);
-  invariant(context, `${part} must be rendered inside ColorPicker.`);
-  return context;
-}
-
-const CHECKER =
-  'conic-gradient(var(--ids-color-muted) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-muted) 0 75%, var(--ids-color-surface) 0)';
-const HUES = 'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)';
-const GRADIENT_DIRECTION = 'ltr';
-const NO_FORM_OWNER = '';
-const NO_DOT = false;
-const overChecker = (css: string): CSSProperties => ({
-  backgroundImage: `linear-gradient(${css}, ${css}), ${CHECKER}`,
-  backgroundSize: '100% 100%, 8px 8px',
-});
-const swatchValue = (swatch: ColorPickerSwatchOption) =>
-  typeof swatch === 'string' ? swatch : swatch.value;
-
 export function ColorPicker({
   value,
   defaultValue,
@@ -117,7 +71,7 @@ export function ColorPicker({
   });
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const state: ColorPickerState = { disabled, readOnly, empty: !picker.state.value, alpha };
-  const styles = ColorPicker.Style({ size: resolvedSize, disabled });
+  const styles = colorPickerStyle({ size: resolvedSize, disabled });
   return (
     <PickerContext value={{ picker, state, format, alpha, swatches, size: resolvedSize, styles }}>
       <div
@@ -160,311 +114,22 @@ function DefaultLayout() {
   );
 }
 
-function ColorPickerArea({ className, style, ...props }: ColorPicker.AreaProps) {
-  const c = usePicker('ColorPicker.Area');
-  const { color, rgba } = c.picker.state;
-  const saturation = Math.round(color.s * 100);
-  const brightness = Math.round(color.v * 100);
-  const valueText = messages.colorPicker.areaValue(saturation, brightness);
-  const channel = {
-    type: 'range',
-    min: 0,
-    max: 100,
-    step: 1,
-    'aria-valuetext': valueText,
-    'aria-roledescription': messages.colorPicker.twoD,
-    'aria-readonly': c.state.readOnly || undefined,
-    disabled: c.state.disabled,
-    className: c.styles.channel(),
-    onKeyDown: c.picker.area.onKeyDown,
-  } as const;
-  return (
-    <div
-      {...mergeProps(props, {
-        onPointerDown: c.picker.area.onPointerDown,
-        onPointerMove: c.picker.area.onPointerMove,
-      })}
-      role="group"
-      aria-label={props['aria-label'] ?? messages.colorPicker.area}
-      dir={GRADIENT_DIRECTION}
-      data-color-picker-area=""
-      data-disabled={c.state.disabled ? '' : undefined}
-      className={c.styles.area({ className })}
-      style={{
-        ...style,
-        backgroundColor: `hsl(${color.h} 100% 50%)`,
-        backgroundImage:
-          'linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, transparent)',
-      }}
-    >
-      <span
-        aria-hidden="true"
-        className={c.styles.areaThumb()}
-        style={{
-          left: `${color.s * 100}%`,
-          top: `${(1 - color.v) * 100}%`,
-          backgroundColor: cssColor({ ...rgba, alpha: 1 }),
-        }}
-      />
-      <input
-        {...channel}
-        aria-label={messages.colorPicker.saturation}
-        value={saturation}
-        onChange={(event) => c.picker.actions.onChannelChange('saturation', event)}
-      />
-      <input
-        {...channel}
-        aria-label={messages.colorPicker.brightness}
-        aria-orientation="vertical"
-        tabIndex={-1}
-        value={brightness}
-        onChange={(event) => c.picker.actions.onChannelChange('brightness', event)}
-      />
-    </div>
-  );
-}
-
-function ColorPickerHueSlider({ className, ...props }: ColorPicker.SliderProps) {
-  const c = usePicker('ColorPicker.HueSlider');
-  const { color } = c.picker.state;
-  return (
-    <Slider
-      {...props}
-      dir={GRADIENT_DIRECTION}
-      data-color-picker-hue=""
-      min={0}
-      max={360}
-      largeStep={10}
-      value={Math.round(color.h)}
-      onValueChange={(hue) => c.picker.actions.setChannel('hue', hue)}
-      formatLabel={messages.colorPicker.hueValue}
-      valueLabel="never"
-      aria-label={props['aria-label'] ?? messages.colorPicker.hue}
-      size={c.size}
-      disabled={c.state.disabled}
-      readOnly={c.state.readOnly}
-      className={c.styles.slider({ className })}
-    >
-      <Slider.Track style={{ backgroundImage: HUES }}>
-        <Slider.Thumb style={{ backgroundColor: `hsl(${color.h} 100% 50%)` }} />
-      </Slider.Track>
-    </Slider>
-  );
-}
-
-function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.SliderProps) {
-  const c = usePicker('ColorPicker.AlphaSlider');
-  if (!c.alpha) return null;
-  const { color, rgba } = c.picker.state;
-  return (
-    <Slider
-      {...props}
-      dir={GRADIENT_DIRECTION}
-      data-color-picker-alpha=""
-      min={0}
-      max={100}
-      largeStep={10}
-      value={Math.round(color.a * 100)}
-      onValueChange={(percent) => c.picker.actions.setChannel('alpha', percent)}
-      formatLabel={messages.colorPicker.percent}
-      valueLabel="never"
-      aria-label={props['aria-label'] ?? messages.colorPicker.alpha}
-      size={c.size}
-      disabled={c.state.disabled}
-      readOnly={c.state.readOnly}
-      className={c.styles.slider({ className })}
-    >
-      <Slider.Track
-        style={{
-          backgroundImage: `linear-gradient(to right, transparent, ${cssColor({ ...rgba, alpha: 1 })}), ${CHECKER}`,
-          backgroundSize: '100% 100%, 8px 8px',
-        }}
-      >
-        <Slider.Thumb style={overChecker(cssColor(rgba))} />
-      </Slider.Track>
-    </Slider>
-  );
-}
-
-function ColorPickerInput({ className, style, ...props }: ColorPicker.InputProps) {
-  const c = usePicker('ColorPicker.Input');
-  const { input } = c.picker;
-  return (
-    <TextField
-      {...mergeProps(props as Record<string, unknown>, {
-        type: 'text',
-        'aria-label': props['aria-label'] ?? messages.colorPicker.input,
-        autoComplete: 'off',
-        autoCorrect: 'off',
-        autoCapitalize: 'none',
-        spellCheck: false,
-        value: input.value,
-        placeholder: props.placeholder ?? formatPlaceholder(c.format, c.alpha),
-        readOnly: c.state.readOnly,
-        'aria-invalid': input.invalid || undefined,
-        'data-color-picker-input': '',
-        onChange: input.onChange,
-        onBlur: input.onBlur,
-        onKeyDown: input.onKeyDown,
-      })}
-      size={c.size}
-      disabled={c.state.disabled}
-      className={c.styles.input({ className })}
-      style={style}
-    >
-      <TextField.Input className={c.styles.inputText()} />
-    </TextField>
-  );
-}
-
-function ColorPickerEyeDropper({
-  className,
-  children,
-  onClick,
-  ...props
-}: ColorPicker.ButtonProps) {
-  const c = usePicker('ColorPicker.EyeDropper');
-  const supported = useEyeDropperSupport();
-  if (!supported) return null;
-  return (
-    <IconButton
-      {...props}
-      aria-label={props['aria-label'] ?? messages.colorPicker.eyeDropper}
-      disabled={c.state.disabled || c.state.readOnly}
-      data-color-picker-eyedropper=""
-      variant="outline"
-      size={c.size}
-      icon={children ?? <EyeDropperIcon aria-hidden="true" />}
-      className={c.styles.tool({ className })}
-      onClick={mergeEventHandlers(onClick, c.picker.actions.pickFromScreen)}
-    />
-  );
-}
-
-function ColorPickerCopy({ className, children, onClick, ...props }: ColorPicker.ButtonProps) {
-  const c = usePicker('ColorPicker.Copy');
-  const supported = useClipboardSupport();
-  if (!supported) return null;
-  const { copied, parsed } = c.picker.state;
-  return (
-    <>
-      <IconButton
-        {...props}
-        aria-label={
-          props['aria-label'] ?? (copied ? messages.colorPicker.copied : messages.colorPicker.copy)
-        }
-        disabled={c.state.disabled || !parsed}
-        data-color-picker-copy=""
-        data-copied={copied ? '' : undefined}
-        variant="outline"
-        size={c.size}
-        icon={
-          children ??
-          (copied ? <CheckIcon aria-hidden="true" /> : <ClipboardDocumentIcon aria-hidden="true" />)
-        }
-        className={c.styles.tool({ className })}
-        onClick={mergeEventHandlers(onClick, c.picker.actions.copy)}
-      />
-      <span role="status" className={c.styles.channel()}>
-        {copied ? messages.colorPicker.copied : ''}
-      </span>
-    </>
-  );
-}
-
-function ColorPickerSwatches({ className, children, ...props }: ColorPicker.SwatchesProps) {
-  const c = usePicker('ColorPicker.Swatches');
-  const values = children
-    ? flattenFragments(children).flatMap((node) =>
-        isValidElement<ColorPicker.SwatchProps>(node) && node.type === ColorPickerSwatch
-          ? [node.props.value]
-          : [],
-      )
-    : (c.swatches ?? []).map(swatchValue);
-  return (
-    <RadioGroup
-      {...props}
-      aria-label={props['aria-label'] ?? messages.colorPicker.swatches}
-      value={values.find((item) => c.picker.actions.isCurrent(item)) ?? null}
-      orientation="horizontal"
-      disabled={c.state.disabled}
-      readOnly={c.state.readOnly}
-      form={NO_FORM_OWNER}
-      data-color-picker-swatches=""
-      className={c.styles.swatches({ className })}
-    >
-      {children ??
-        (c.swatches ?? []).map((swatch, index) => (
-          <ColorPickerSwatch
-            key={`${swatchValue(swatch)}-${index}`}
-            value={swatchValue(swatch)}
-            label={typeof swatch === 'string' ? undefined : swatch.label}
-          />
-        ))}
-    </RadioGroup>
-  );
-}
-
-function ColorPickerSwatch({ value, label, className, style, ...props }: ColorPicker.SwatchProps) {
-  const c = usePicker('ColorPicker.Swatch');
-  const grouped = useRadioGroupContext() !== null;
-  const parsed = parseColor(value);
-  if (!parsed) return null;
-  return (
-    <Radio
-      {...props}
-      value={value}
-      checked={grouped ? undefined : c.picker.actions.isCurrent(value)}
-      onCheckedChange={(checked) => {
-        if (checked) c.picker.actions.chooseSwatch(value);
-      }}
-      aria-label={label ?? value}
-      title={label ?? value}
-      disabled={c.state.disabled}
-      readOnly={c.state.readOnly}
-      data-color-picker-swatch=""
-      className={c.styles.swatch({ className })}
-      style={{ ...style, ...overChecker(cssColor(parsed)) }}
-    >
-      {NO_DOT}
-    </Radio>
-  );
-}
-
 export namespace ColorPicker {
   export type Props = ColorPickerProps;
   export type State = ColorPickerState;
   export type SwatchOption = ColorPickerSwatchOption;
 
-  export type AreaProps = Omit<ComponentProps<'div'>, 'children'>;
+  export type AreaProps = ColorPickerAreaProps;
   export type SliderProps = Omit<
     ComponentProps<'div'>,
     'children' | 'defaultValue' | 'onChange' | 'role'
   >;
-  export type InputProps = Omit<
-    ComponentProps<'input'>,
-    'value' | 'defaultValue' | 'type' | 'size'
-  >;
+  export type InputProps = ColorPickerInputProps;
   export type ButtonProps = Omit<ComponentProps<'button'>, 'children'> & {
     children?: ReactElement;
   };
-  export type SwatchesProps = Omit<ComponentProps<'div'>, 'defaultValue' | 'onChange' | 'role'>;
-  export type SwatchProps = Omit<
-    Radio.Props,
-    | 'value'
-    | 'checked'
-    | 'defaultChecked'
-    | 'onCheckedChange'
-    | 'name'
-    | 'className'
-    | 'style'
-    | 'children'
-  > & {
-    value: string;
-    label?: string;
-    className?: string;
-    style?: CSSProperties;
-  };
+  export type SwatchesProps = ColorPickerSwatchesProps;
+  export type SwatchProps = ColorPickerSwatchProps;
 
   export const Area = ColorPickerArea;
   export const HueSlider = ColorPickerHueSlider;
@@ -475,56 +140,5 @@ export namespace ColorPicker {
   export const Swatches = ColorPickerSwatches;
   export const Swatch = ColorPickerSwatch;
 
-  const dimOnceAtRoot = {
-    slider: cn('data-disabled:opacity-100'),
-    input: cn('data-disabled:opacity-100'),
-    tool: cn('data-disabled:opacity-100'),
-    swatch: cn('data-disabled:opacity-100'),
-  };
-
-  export const Style = tv({
-    slots: {
-      root: 'grid w-full min-w-0 gap-3 text-(--ids-color-on-surface) data-disabled:opacity-50',
-      area: [
-        sliderSurface.edge,
-        'group/area relative w-full cursor-crosshair touch-none rounded-standard select-none',
-        'data-disabled:cursor-not-allowed',
-      ],
-      areaThumb: [
-        sliderSurface.thumb,
-        'pointer-events-none absolute -translate-x-1/2 -translate-y-1/2',
-        'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'group-has-[input:focus-visible]/area:ring-[3px] group-has-[input:focus-visible]/area:ring-(--ids-color-primary)/50',
-      ],
-      channel: 'sr-only',
-      row: 'flex min-w-0 items-center gap-2',
-      sliders: 'grid min-w-0 flex-1 gap-2',
-      slider: 'cursor-pointer',
-      input: 'flex-1',
-      inputText: 'font-mono',
-      tool: '',
-      swatches: 'gap-2',
-      swatch: [
-        'rounded-standard shadow-none inset-ring-(--ids-color-on-surface)/10',
-        'data-[state=checked]:ring-2 data-[state=checked]:ring-(--radio-accent)',
-        'data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-(--ids-color-surface)',
-      ],
-    },
-    variants: {
-      size: {
-        standard: {
-          area: 'h-40',
-          areaThumb: 'size-4',
-          swatch: 'size-7',
-        },
-        tiny: {
-          area: 'h-32',
-          areaThumb: 'size-3.5',
-          swatch: 'size-6',
-        },
-      } satisfies Record<IdsSize, object>,
-      disabled: { true: dimOnceAtRoot },
-    },
-    defaultVariants: { size: 'standard' },
-  });
+  export const Style = colorPickerStyle;
 }
