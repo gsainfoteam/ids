@@ -167,28 +167,27 @@ export const FollowsField: Story = {
   },
 };
 
-function LoadingExample() {
-  const [loading, setLoading] = useState(false);
-  return (
-    <div className="flex flex-col items-start gap-4">
-      <Button variant="outline" onClick={() => setLoading((value) => !value)}>
-        {loading ? '멈추기' : '불러오기'}
-      </Button>
-      {loading ? (
-        <div className="flex items-center gap-2 text-(--ids-color-on-muted)">
-          <Spinner aria-label="댓글을 불러오는 중" />
-        </div>
-      ) : (
-        <p className="flex items-center gap-2">
-          <CheckIcon className="size-4" /> 준비됨
-        </p>
-      )}
-    </div>
-  );
-}
-
 export const Announcement: Story = {
-  render: () => <LoadingExample />,
+  render: function Render() {
+    const [loading, setLoading] = useState(false);
+
+    return (
+      <div className="flex flex-col items-start gap-4">
+        <Button variant="outline" onClick={() => setLoading((value) => !value)}>
+          {loading ? '멈추기' : '불러오기'}
+        </Button>
+        {loading ? (
+          <div className="flex items-center gap-2 text-(--ids-color-on-muted)">
+            <Spinner aria-label="댓글을 불러오는 중" />
+          </div>
+        ) : (
+          <p className="flex items-center gap-2">
+            <CheckIcon className="size-4" /> 준비됨
+          </p>
+        )}
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

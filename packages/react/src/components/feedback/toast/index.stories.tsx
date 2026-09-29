@@ -89,52 +89,53 @@ function optionsFor(content: (typeof contents)[number], id?: string): ToastOptio
   return { id };
 }
 
-function GalleryStack() {
-  useEffect(() => {
-    kinds.forEach((kind, index) =>
-      kind.show({
-        ...optionsFor(contents[index % contents.length]!, `gallery-${kind.key}`),
-        duration: Infinity,
-      }),
-    );
-    return () => {
-      for (const kind of kinds) toast.dismiss(`gallery-${kind.key}`);
-    };
-  }, []);
-  return <Toaster expand max={kinds.length} />;
-}
-
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section
-        title="Color scheme × Content"
-        description="의미는 Alert 와 같은 색과 아이콘을 씁니다. warning 과 error 는 role=alert 로 바로 알리고, 나머지는 role=status 로 기다렸다 알립니다. 오른쪽 아래에 한 벌이 펼쳐져 있습니다."
-      >
-        <Showcase.Matrix
-          rows={kinds.map((kind) => kind.label)}
-          columns={contents}
-          render={(label, content) => (
-            <Button
-              size="tiny"
-              variant="outline"
-              onClick={() => kinds.find((kind) => kind.label === label)!.show(optionsFor(content))}
-            >
-              {content}
-            </Button>
-          )}
-        />
-      </Showcase.Section>
-      <Showcase.Section
-        title="Stack"
-        description="새 알림이 앞에 오고, 뒤의 알림은 5% 씩 작아진 채 가장자리만 보입니다. 올려 두거나 포커스하면 펼쳐지고 시간이 멈춥니다. expand 는 늘 펼쳐 둡니다."
-      >
-        <Showcase.Row label="expand">
-          <GalleryStack />
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+  render: function Render() {
+    useEffect(() => {
+      kinds.forEach((kind, index) =>
+        kind.show({
+          ...optionsFor(contents[index % contents.length]!, `gallery-${kind.key}`),
+          duration: Infinity,
+        }),
+      );
+      return () => {
+        for (const kind of kinds) toast.dismiss(`gallery-${kind.key}`);
+      };
+    }, []);
+
+    return (
+      <Showcase>
+        <Showcase.Section
+          title="Color scheme × Content"
+          description="의미는 Alert 와 같은 색과 아이콘을 씁니다. warning 과 error 는 role=alert 로 바로 알리고, 나머지는 role=status 로 기다렸다 알립니다. 오른쪽 아래에 한 벌이 펼쳐져 있습니다."
+        >
+          <Showcase.Matrix
+            rows={kinds.map((kind) => kind.label)}
+            columns={contents}
+            render={(label, content) => (
+              <Button
+                size="tiny"
+                variant="outline"
+                onClick={() =>
+                  kinds.find((kind) => kind.label === label)!.show(optionsFor(content))
+                }
+              >
+                {content}
+              </Button>
+            )}
+          />
+        </Showcase.Section>
+        <Showcase.Section
+          title="Stack"
+          description="새 알림이 앞에 오고, 뒤의 알림은 5% 씩 작아진 채 가장자리만 보입니다. 올려 두거나 포커스하면 펼쳐지고 시간이 멈춥니다. expand 는 늘 펼쳐 둡니다."
+        >
+          <Showcase.Row label="expand">
+            <Toaster expand max={kinds.length} />
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
   play: async ({ canvas }) => {
     await waitFor(() => expect(canvas.getAllByRole('alert')).toHaveLength(2));
     expect(canvas.getAllByRole('status')).toHaveLength(4);
@@ -201,6 +202,7 @@ export const UpdateById: Story = {
 export const Action: Story = {
   render: function Render() {
     const [restored, setRestored] = useState(0);
+
     return (
       <>
         <p className="text-body-b3-regular">되돌린 횟수 {restored}</p>
@@ -240,6 +242,7 @@ const placements = [
 export const Placement: Story = {
   render: function Render() {
     const [placement, setPlacement] = useState<Toaster.Placement>('bottom-right');
+
     return (
       <>
         <ToggleGroup<Toaster.Placement>

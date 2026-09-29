@@ -274,43 +274,42 @@ export const Nested: Story = {
   },
 };
 
-function QuickPickDemo() {
-  const [color, setColor] = useState('없음');
-  const anchor = useRef<HTMLSpanElement>(null);
-  return (
-    <div className="flex items-center gap-3">
-      <Button
-        variant="outline"
-        onClick={async () => {
-          const picked = await overlay.open<string>(({ close }) => (
-            <Popover>
-              <Popover.Content aria-label="색 고르기" anchor={anchor} className="w-auto">
-                <div className="flex gap-2">
-                  <Button size="tiny" onClick={() => close('빨강')}>
-                    빨강
-                  </Button>
-                  <Button size="tiny" onClick={() => close('파랑')}>
-                    파랑
-                  </Button>
-                </div>
-              </Popover.Content>
-            </Popover>
-          ));
-          setColor(picked ?? '닫음');
-        }}
-      >
-        색 고르기
-      </Button>
-      <span ref={anchor} className="text-body-b3-regular">
-        고른 색: {color}
-      </span>
-    </div>
-  );
-}
-
 export const OpenFromAnywhere: Story = {
   name: 'overlay.open',
-  render: () => <QuickPickDemo />,
+  render: function Render() {
+    const [color, setColor] = useState('없음');
+    const anchor = useRef<HTMLSpanElement>(null);
+
+    return (
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          onClick={async () => {
+            const picked = await overlay.open<string>(({ close }) => (
+              <Popover>
+                <Popover.Content aria-label="색 고르기" anchor={anchor} className="w-auto">
+                  <div className="flex gap-2">
+                    <Button size="tiny" onClick={() => close('빨강')}>
+                      빨강
+                    </Button>
+                    <Button size="tiny" onClick={() => close('파랑')}>
+                      파랑
+                    </Button>
+                  </div>
+                </Popover.Content>
+              </Popover>
+            ));
+            setColor(picked ?? '닫음');
+          }}
+        >
+          색 고르기
+        </Button>
+        <span ref={anchor} className="text-body-b3-regular">
+          고른 색: {color}
+        </span>
+      </div>
+    );
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '색 고르기' }));
     await userEvent.click(await canvas.findByRole('button', { name: '파랑' }));

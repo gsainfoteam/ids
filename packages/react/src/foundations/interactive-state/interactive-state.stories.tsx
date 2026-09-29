@@ -60,37 +60,36 @@ export const NodeLocal: Story = {
   },
 };
 
-function MirrorExample() {
-  const [interaction, setInteraction] = useState<InteractiveState>(INTERACTIVE_STATE_DEFAULTS);
-  return (
-    <Showcase>
-      <Showcase.Section
-        title="형제에게 알리기"
-        description="옆 요소가 스크립트로 반응해야 하면 onInteractionChange로 상태의 사본을 받습니다. 상태의 주인은 여전히 Button입니다."
-      >
-        <Showcase.Row label="mirror">
-          <Button variant="outline" onInteractionChange={setInteraction}>
-            올려 보세요
-          </Button>
-          {interaction.hovered ? (
-            <span className="text-body-b3-regular flex items-center gap-1 text-(--ids-color-primary)">
-              <InformationCircleIcon className="size-4" />
-              형제가 반응합니다
-            </span>
-          ) : (
-            <span className="text-body-b3-regular text-(--ids-color-on-muted)">대기 중</span>
-          )}
-        </Showcase.Row>
-        <Showcase.Row label="사본">
-          <StateDump state={interaction} />
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  );
-}
-
 export const Mirror: Story = {
-  render: () => <MirrorExample />,
+  render: function Render() {
+    const [interaction, setInteraction] = useState<InteractiveState>(INTERACTIVE_STATE_DEFAULTS);
+
+    return (
+      <Showcase>
+        <Showcase.Section
+          title="형제에게 알리기"
+          description="옆 요소가 스크립트로 반응해야 하면 onInteractionChange로 상태의 사본을 받습니다. 상태의 주인은 여전히 Button입니다."
+        >
+          <Showcase.Row label="mirror">
+            <Button variant="outline" onInteractionChange={setInteraction}>
+              올려 보세요
+            </Button>
+            {interaction.hovered ? (
+              <span className="text-body-b3-regular flex items-center gap-1 text-(--ids-color-primary)">
+                <InformationCircleIcon className="size-4" />
+                형제가 반응합니다
+              </span>
+            ) : (
+              <span className="text-body-b3-regular text-(--ids-color-on-muted)">대기 중</span>
+            )}
+          </Showcase.Row>
+          <Showcase.Row label="사본">
+            <StateDump state={interaction} />
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.hover(canvas.getByRole('button', { name: '올려 보세요' }));
     await waitFor(() => expect(canvas.getByText('형제가 반응합니다')).toBeInTheDocument());

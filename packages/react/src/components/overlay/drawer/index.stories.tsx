@@ -193,31 +193,30 @@ export const KeyboardAndFocus: Story = {
   },
 };
 
-function SnapDemo() {
-  const [snap, setSnap] = useState<Drawer.SnapPoint>(0.3);
-  return (
-    <Drawer
-      side="bottom"
-      snapPoints={[0.3, '420px', 1]}
-      activeSnapPoint={snap}
-      onActiveSnapPointChange={setSnap}
-    >
-      <Drawer.Trigger asChild>
-        <Button variant="outline">경로 보기</Button>
-      </Drawer.Trigger>
-      <Drawer.Content>
-        <Drawer.Handle />
-        <Drawer.Header>
-          <Drawer.Title>경로</Drawer.Title>
-          <Drawer.Description>지금 높이: {String(snap)}</Drawer.Description>
-        </Drawer.Header>
-      </Drawer.Content>
-    </Drawer>
-  );
-}
-
 export const SnapPoints: Story = {
-  render: () => <SnapDemo />,
+  render: function Render() {
+    const [snap, setSnap] = useState<Drawer.SnapPoint>(0.3);
+
+    return (
+      <Drawer
+        side="bottom"
+        snapPoints={[0.3, '420px', 1]}
+        activeSnapPoint={snap}
+        onActiveSnapPointChange={setSnap}
+      >
+        <Drawer.Trigger asChild>
+          <Button variant="outline">경로 보기</Button>
+        </Drawer.Trigger>
+        <Drawer.Content>
+          <Drawer.Handle />
+          <Drawer.Header>
+            <Drawer.Title>경로</Drawer.Title>
+            <Drawer.Description>지금 높이: {String(snap)}</Drawer.Description>
+          </Drawer.Header>
+        </Drawer.Content>
+      </Drawer>
+    );
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '경로 보기' }));
     const handle = await canvas.findByRole('button', { name: '끌어서 크기 조절' });
@@ -279,29 +278,28 @@ export const Nested: Story = {
   },
 };
 
-function NonModalDemo() {
-  const [count, setCount] = useState(0);
-  return (
-    <div className="flex flex-col items-end gap-3">
-      <Button variant="outline" onClick={() => setCount((value) => value + 1)}>
-        페이지 버튼 {count}
-      </Button>
-      <Drawer side="left" modal={false}>
-        <Drawer.Trigger asChild>
-          <Button variant="outline">목차 열기</Button>
-        </Drawer.Trigger>
-        <Drawer.Content className="w-60">
-          <Drawer.Header>
-            <Drawer.Title>목차</Drawer.Title>
-          </Drawer.Header>
-        </Drawer.Content>
-      </Drawer>
-    </div>
-  );
-}
-
 export const NonModal: Story = {
-  render: () => <NonModalDemo />,
+  render: function Render() {
+    const [count, setCount] = useState(0);
+
+    return (
+      <div className="flex flex-col items-end gap-3">
+        <Button variant="outline" onClick={() => setCount((value) => value + 1)}>
+          페이지 버튼 {count}
+        </Button>
+        <Drawer side="left" modal={false}>
+          <Drawer.Trigger asChild>
+            <Button variant="outline">목차 열기</Button>
+          </Drawer.Trigger>
+          <Drawer.Content className="w-60">
+            <Drawer.Header>
+              <Drawer.Title>목차</Drawer.Title>
+            </Drawer.Header>
+          </Drawer.Content>
+        </Drawer>
+      </div>
+    );
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '목차 열기' }));
     await canvas.findByRole('dialog', { name: '목차' });

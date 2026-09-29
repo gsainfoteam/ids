@@ -157,29 +157,28 @@ export const WrapsControl: Story = {
   },
 };
 
-function MirrorExample() {
-  const [disabled, setDisabled] = useState(false);
-  const [required, setRequired] = useState(false);
-  return (
-    <div className="flex max-w-xs flex-col gap-3">
-      <div className="flex gap-2">
-        <Button size="tiny" variant="outline" onClick={() => setDisabled((value) => !value)}>
-          disabled 바꾸기
-        </Button>
-        <Button size="tiny" variant="outline" onClick={() => setRequired((value) => !value)}>
-          required 바꾸기
-        </Button>
-      </div>
-      <Label htmlFor="label-mirror" data-testid="label">
-        닉네임
-      </Label>
-      <TextField id="label-mirror" disabled={disabled} required={required} />
-    </div>
-  );
-}
-
 export const MirrorsControl: Story = {
-  render: () => <MirrorExample />,
+  render: function Render() {
+    const [disabled, setDisabled] = useState(false);
+    const [required, setRequired] = useState(false);
+
+    return (
+      <div className="flex max-w-xs flex-col gap-3">
+        <div className="flex gap-2">
+          <Button size="tiny" variant="outline" onClick={() => setDisabled((value) => !value)}>
+            disabled 바꾸기
+          </Button>
+          <Button size="tiny" variant="outline" onClick={() => setRequired((value) => !value)}>
+            required 바꾸기
+          </Button>
+        </div>
+        <Label htmlFor="label-mirror" data-testid="label">
+          닉네임
+        </Label>
+        <TextField id="label-mirror" disabled={disabled} required={required} />
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

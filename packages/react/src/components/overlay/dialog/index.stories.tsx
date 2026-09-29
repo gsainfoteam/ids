@@ -200,41 +200,40 @@ export const KeyboardAndFocus: Story = {
   },
 };
 
-function ConfirmDemo() {
-  const [result, setResult] = useState('아직 묻지 않음');
-  return (
-    <div className="flex items-center gap-3">
-      <Button
-        variant="outline"
-        onClick={async () => {
-          const confirmed = await overlay.open<boolean>(({ close }) => (
-            <Dialog role="alertdialog">
-              <Dialog.Content>
-                <Dialog.Header>
-                  <Dialog.Title>변경 사항을 버릴까요?</Dialog.Title>
-                </Dialog.Header>
-                <Dialog.Footer>
-                  <Button variant="outline" onClick={() => close(false)}>
-                    계속 편집
-                  </Button>
-                  <Button onClick={() => close(true)}>버리기</Button>
-                </Dialog.Footer>
-              </Dialog.Content>
-            </Dialog>
-          ));
-          setResult(confirmed === undefined ? '닫음' : confirmed ? '버림' : '계속 편집');
-        }}
-      >
-        편집 취소
-      </Button>
-      <span className="text-body-b3-regular">결과: {result}</span>
-    </div>
-  );
-}
-
 export const OpenFromAnywhere: Story = {
   name: 'overlay.open',
-  render: () => <ConfirmDemo />,
+  render: function Render() {
+    const [result, setResult] = useState('아직 묻지 않음');
+
+    return (
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          onClick={async () => {
+            const confirmed = await overlay.open<boolean>(({ close }) => (
+              <Dialog role="alertdialog">
+                <Dialog.Content>
+                  <Dialog.Header>
+                    <Dialog.Title>변경 사항을 버릴까요?</Dialog.Title>
+                  </Dialog.Header>
+                  <Dialog.Footer>
+                    <Button variant="outline" onClick={() => close(false)}>
+                      계속 편집
+                    </Button>
+                    <Button onClick={() => close(true)}>버리기</Button>
+                  </Dialog.Footer>
+                </Dialog.Content>
+              </Dialog>
+            ));
+            setResult(confirmed === undefined ? '닫음' : confirmed ? '버림' : '계속 편집');
+          }}
+        >
+          편집 취소
+        </Button>
+        <span className="text-body-b3-regular">결과: {result}</span>
+      </div>
+    );
+  },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '편집 취소' }));
     await userEvent.click(await canvas.findByRole('button', { name: '버리기' }));

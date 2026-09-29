@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 
 import { expect, within } from 'storybook/test';
 
@@ -43,28 +43,19 @@ function Readout() {
   );
 }
 
-function Sample({ children }: { children?: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <Button>저장</Button>
-        <Button variant="soft">임시 저장</Button>
-        <Button variant="outline">취소</Button>
-      </div>
-      <Readout />
-      {children !== undefined && (
-        <div className="flex flex-wrap items-center gap-2">{children}</div>
-      )}
-    </div>
-  );
-}
-
 const region = cn('concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)');
 
 export const Playground: Story = {
   render: (args) => (
     <IdsProvider {...args} className={region}>
-      <Sample />
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button>저장</Button>
+          <Button variant="soft">임시 저장</Button>
+          <Button variant="outline">취소</Button>
+        </div>
+        <Readout />
+      </div>
     </IdsProvider>
   ),
 };
@@ -81,7 +72,14 @@ export const Gallery: Story = {
           columns={colors}
           render={(mode, color) => (
             <IdsProvider color={color} mode={mode} className={region}>
-              <Sample />
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button>저장</Button>
+                  <Button variant="soft">임시 저장</Button>
+                  <Button variant="outline">취소</Button>
+                </div>
+                <Readout />
+              </div>
             </IdsProvider>
           )}
         />
@@ -92,12 +90,26 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="mode만">
           <IdsProvider mode="dark" className={region}>
-            <Sample />
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <Button>저장</Button>
+                <Button variant="soft">임시 저장</Button>
+                <Button variant="outline">취소</Button>
+              </div>
+              <Readout />
+            </div>
           </IdsProvider>
         </Showcase.Row>
         <Showcase.Row label="color만">
           <IdsProvider color="green" className={region}>
-            <Sample />
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <Button>저장</Button>
+                <Button variant="soft">임시 저장</Button>
+                <Button variant="outline">취소</Button>
+              </div>
+              <Readout />
+            </div>
           </IdsProvider>
         </Showcase.Row>
       </Showcase.Section>
@@ -127,30 +139,37 @@ function ModeSwitcher() {
   );
 }
 
-function ControlledExample() {
-  const [mode, setMode] = useState<IdsProvider.Mode>('light');
-  return (
-    <div className="flex flex-col gap-3">
-      <IdsProvider
-        defaultColor="blue"
-        mode={mode}
-        onModeChange={setMode}
-        className={region}
-        data-testid="provider"
-      >
-        <Sample>
-          <ModeSwitcher />
-        </Sample>
-      </IdsProvider>
-      <output aria-label="부모 상태" className="text-caption-c1-regular font-mono">
-        {mode}
-      </output>
-    </div>
-  );
-}
-
 export const Controlled: Story = {
-  render: () => <ControlledExample />,
+  render: function Render() {
+    const [mode, setMode] = useState<IdsProvider.Mode>('light');
+
+    return (
+      <div className="flex flex-col gap-3">
+        <IdsProvider
+          defaultColor="blue"
+          mode={mode}
+          onModeChange={setMode}
+          className={region}
+          data-testid="provider"
+        >
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button>저장</Button>
+              <Button variant="soft">임시 저장</Button>
+              <Button variant="outline">취소</Button>
+            </div>
+            <Readout />
+            <div className="flex flex-wrap items-center gap-2">
+              <ModeSwitcher />
+            </div>
+          </div>
+        </IdsProvider>
+        <output aria-label="부모 상태" className="text-caption-c1-regular font-mono">
+          {mode}
+        </output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -173,9 +192,17 @@ export const Controlled: Story = {
 export const SystemMode: Story = {
   render: () => (
     <IdsProvider defaultColor="blue" defaultMode="system" className={region} data-testid="provider">
-      <Sample>
-        <ModeSwitcher />
-      </Sample>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button>저장</Button>
+          <Button variant="soft">임시 저장</Button>
+          <Button variant="outline">취소</Button>
+        </div>
+        <Readout />
+        <div className="flex flex-wrap items-center gap-2">
+          <ModeSwitcher />
+        </div>
+      </div>
     </IdsProvider>
   ),
   parameters: {
@@ -195,24 +222,6 @@ export const SystemMode: Story = {
   },
 };
 
-function NestedExample() {
-  return (
-    <IdsProvider defaultColor="blue" defaultMode="light" className={region} data-testid="outer">
-      <div className="flex flex-col gap-4">
-        <Readout />
-        <IdsProvider mode="dark" className={region} data-testid="dark">
-          <Sample>
-            <SetColor />
-          </Sample>
-        </IdsProvider>
-        <IdsProvider color="orange" className={region} data-testid="orange">
-          <Sample />
-        </IdsProvider>
-      </div>
-    </IdsProvider>
-  );
-}
-
 function SetColor() {
   const { setColor } = useTheme();
   return (
@@ -223,7 +232,36 @@ function SetColor() {
 }
 
 export const Nested: Story = {
-  render: () => <NestedExample />,
+  render: () => (
+    <IdsProvider defaultColor="blue" defaultMode="light" className={region} data-testid="outer">
+      <div className="flex flex-col gap-4">
+        <Readout />
+        <IdsProvider mode="dark" className={region} data-testid="dark">
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button>저장</Button>
+              <Button variant="soft">임시 저장</Button>
+              <Button variant="outline">취소</Button>
+            </div>
+            <Readout />
+            <div className="flex flex-wrap items-center gap-2">
+              <SetColor />
+            </div>
+          </div>
+        </IdsProvider>
+        <IdsProvider color="orange" className={region} data-testid="orange">
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button>저장</Button>
+              <Button variant="soft">임시 저장</Button>
+              <Button variant="outline">취소</Button>
+            </div>
+            <Readout />
+          </div>
+        </IdsProvider>
+      </div>
+    </IdsProvider>
+  ),
   parameters: {
     docs: {
       description: {
@@ -253,7 +291,14 @@ export const AsChild: Story = {
   render: () => (
     <IdsProvider asChild color="green" mode="dark">
       <section aria-label="녹색 영역" className={region}>
-        <Sample />
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button>저장</Button>
+            <Button variant="soft">임시 저장</Button>
+            <Button variant="outline">취소</Button>
+          </div>
+          <Readout />
+        </div>
       </section>
     </IdsProvider>
   ),

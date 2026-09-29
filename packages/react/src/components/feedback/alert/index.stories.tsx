@@ -215,23 +215,22 @@ export const EscapeCloses: Story = {
   },
 };
 
-function ControlledExample() {
-  const [open, setOpen] = useState(true);
-  return (
-    <div className="flex max-w-md flex-col items-start gap-3">
-      <Alert colorScheme="success" open={open} onOpenChange={setOpen}>
-        <Alert.Title>업로드 완료</Alert.Title>
-        <Alert.Close />
-      </Alert>
-      <Button variant="outline" onClick={() => setOpen(true)} disabled={open}>
-        다시 보이기
-      </Button>
-    </div>
-  );
-}
-
 export const Controlled: Story = {
-  render: () => <ControlledExample />,
+  render: function Render() {
+    const [open, setOpen] = useState(true);
+
+    return (
+      <div className="flex max-w-md flex-col items-start gap-3">
+        <Alert colorScheme="success" open={open} onOpenChange={setOpen}>
+          <Alert.Title>업로드 완료</Alert.Title>
+          <Alert.Close />
+        </Alert>
+        <Button variant="outline" onClick={() => setOpen(true)} disabled={open}>
+          다시 보이기
+        </Button>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

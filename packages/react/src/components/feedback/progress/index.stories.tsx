@@ -251,27 +251,27 @@ export const Indeterminate: Story = {
   },
 };
 
-function LiveExample() {
-  const [value, setValue] = useState(10);
-  useEffect(() => {
-    const id = setInterval(() => setValue((prev) => (prev >= 100 ? 10 : prev + 15)), 900);
-    return () => clearInterval(id);
-  }, []);
-  return (
-    <div className="flex items-center gap-6">
-      <Progress value={value} colorScheme={value >= 100 ? 'success' : 'primary'} className="w-64">
-        <Progress.Label>동기화</Progress.Label>
-        <Progress.Value />
-      </Progress>
-      <Progress shape="circular" value={value} aria-label="동기화">
-        <Progress.Value />
-      </Progress>
-    </div>
-  );
-}
-
 export const Live: Story = {
-  render: () => <LiveExample />,
+  render: function Render() {
+    const [value, setValue] = useState(10);
+
+    useEffect(() => {
+      const id = setInterval(() => setValue((prev) => (prev >= 100 ? 10 : prev + 15)), 900);
+      return () => clearInterval(id);
+    }, []);
+
+    return (
+      <div className="flex items-center gap-6">
+        <Progress value={value} colorScheme={value >= 100 ? 'success' : 'primary'} className="w-64">
+          <Progress.Label>동기화</Progress.Label>
+          <Progress.Value />
+        </Progress>
+        <Progress shape="circular" value={value} aria-label="동기화">
+          <Progress.Value />
+        </Progress>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

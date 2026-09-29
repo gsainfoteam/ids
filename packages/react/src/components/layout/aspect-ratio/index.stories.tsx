@@ -85,24 +85,23 @@ export const Gallery: Story = {
   ),
 };
 
-function ResponsiveExample() {
-  const [compact, setCompact] = useState(false);
-  return (
-    <div className="flex flex-col items-start gap-4">
-      <Button variant="outline" onClick={() => setCompact((value) => !value)}>
-        폭 바꾸기
-      </Button>
-      <div style={{ width: compact ? 160 : 320 }}>
-        <AspectRatio ratio={16 / 9} data-testid="frame">
-          <div className={tile}>16:9</div>
-        </AspectRatio>
-      </div>
-    </div>
-  );
-}
-
 export const Responsive: Story = {
-  render: () => <ResponsiveExample />,
+  render: function Render() {
+    const [compact, setCompact] = useState(false);
+
+    return (
+      <div className="flex flex-col items-start gap-4">
+        <Button variant="outline" onClick={() => setCompact((value) => !value)}>
+          폭 바꾸기
+        </Button>
+        <div style={{ width: compact ? 160 : 320 }}>
+          <AspectRatio ratio={16 / 9} data-testid="frame">
+            <div className={tile}>16:9</div>
+          </AspectRatio>
+        </div>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

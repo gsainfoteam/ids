@@ -150,6 +150,25 @@ stories opt out with `'!autodocs'`. Every story also has a Code tab beside the c
 decorator wraps every story in `IdsProvider`, so stories do not add their own theme or page
 padding.
 
+**Write the demo inline in `render`.** Show code and the Code tab are how a reader learns to
+compose IDS, so a story file declares no demo component of its own: the IDS tree goes straight
+into `render`, and a demo shared by several stories or Gallery rows is written out at each one.
+A demo that needs state is `render: function Render() { ... }`, which holds the hooks and returns
+the tree, named in PascalCase so the hooks lint accepts it. A `render` without `args` shows its own
+source, hooks included. A `render` that takes `args` to forward a spy (`args.onValueChange`, or
+`function Render(args)` when it also needs state) shows the rendered element tree instead: the
+IDS elements appear, the hook code does not. The exceptions, which stay components:
+
+- IdsProvider's `Readout`, `ModeSwitcher` and `SetColor`, which call `useTheme` and must render
+  under a nested `IdsProvider`;
+- Slot's `Tag`, since building an `asChild` component is that demo;
+- custom SVG icons whose name automatic labelling reads (`BellIcon`, `PinIcon`, `ComposeIcon`);
+- filler with no IDS in it (ScrollArea's `Text`, `Wide` and `Grid`, FloatingButton's
+  `ContainingBlock`, Badge's `Box`, the foundation tables and specimens);
+- the `Showcase` kit and decorators.
+
+Plain helpers (play queries, data factories, formatters) stay at module level.
+
 ## Component styling
 
 **Development warnings use `isDevelopment` from `src/utils/dev.ts`, never `import.meta.env.DEV`.**

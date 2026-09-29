@@ -127,27 +127,26 @@ export const MergesStyle: Story = {
   },
 };
 
-function HandlersExample() {
-  const [log, setLog] = useState<string[]>([]);
-  return (
-    <div className="flex flex-col gap-2">
-      <Slot onClick={() => setLog((prev) => [...prev, 'slot'])}>
-        <button type="button" onClick={() => setLog((prev) => [...prev, 'child'])}>
-          둘 다 실행
-        </button>
-      </Slot>
-      <Slot onClick={() => setLog((prev) => [...prev, 'skipped'])}>
-        <button type="button" onClick={(event) => event.preventDefault()}>
-          Slot 핸들러 막기
-        </button>
-      </Slot>
-      <output data-testid="log">{log.join(' ')}</output>
-    </div>
-  );
-}
-
 export const Handlers: Story = {
-  render: () => <HandlersExample />,
+  render: function Render() {
+    const [log, setLog] = useState<string[]>([]);
+
+    return (
+      <div className="flex flex-col gap-2">
+        <Slot onClick={() => setLog((prev) => [...prev, 'slot'])}>
+          <button type="button" onClick={() => setLog((prev) => [...prev, 'child'])}>
+            둘 다 실행
+          </button>
+        </Slot>
+        <Slot onClick={() => setLog((prev) => [...prev, 'skipped'])}>
+          <button type="button" onClick={(event) => event.preventDefault()}>
+            Slot 핸들러 막기
+          </button>
+        </Slot>
+        <output data-testid="log">{log.join(' ')}</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
