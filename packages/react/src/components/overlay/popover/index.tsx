@@ -1,55 +1,16 @@
-import {
-  createContext,
-  isValidElement,
-  use,
-  useEffect,
-  useLayoutEffect,
-  useState,
-  type ComponentProps,
-  type MouseEvent,
-  type ReactNode,
-} from 'react';
+import { useState, type ReactNode } from 'react';
 
-import { XMarkIcon } from '@heroicons/react/16/solid';
+import { PopoverArrow, type PopoverArrowProps } from './arrow';
+import { PopoverClose, type PopoverCloseProps } from './close';
+import { PopoverContent, type PopoverContentProps } from './content';
+import { PopoverContext } from './context';
+import { PopoverDescription, type PopoverDescriptionProps } from './description';
+import { popoverStyle } from './style';
+import { PopoverTitle, type PopoverTitleProps } from './title';
+import { PopoverTrigger, type PopoverTriggerProps } from './trigger';
+import { usePopover, type PopoverAnchor, type PopoverTriggerType } from './use-popover';
 
-import {
-  DEFAULT_PLACEMENT,
-  usePopover,
-  type PopoverAnchor,
-  type PopoverTriggerType,
-} from './use-popover';
-import { messages } from '../../../internal/messages';
-import {
-  FloatingArrow,
-  ModalLayer,
-  OverlayItemContext,
-  type AnchoredAlign,
-  type AnchoredSide,
-} from '../../../internal/overlay';
-import { cn, flattenFragments, invariant, mergeProps, part, tv } from '../../../utils';
-import { Button } from '../../action/button';
-import { IconButton } from '../../action/icon-button';
-import { ScrollArea } from '../../layout/scroll-area';
-import { Slot } from '../../utility/slot';
-
-const cornerOfThePaddedViewport = cn('concentric-p-3 p-0');
-
-type Context = {
-  popover: ReturnType<typeof usePopover>;
-  titled: boolean;
-  setTitled: (titled: boolean) => void;
-  described: boolean;
-  setDescribed: (described: boolean) => void;
-  styles: ReturnType<typeof Popover.Style>;
-};
-
-const PopoverContext = createContext<Context | null>(null);
-
-function usePopoverContext(part: string) {
-  const context = use(PopoverContext);
-  invariant(context, `${part} must be rendered inside Popover.`);
-  return context;
-}
+import type { AnchoredAlign, AnchoredSide } from '../../../internal/overlay';
 
 export function Popover({
   open,
@@ -84,75 +45,11 @@ export function Popover({
         setTitled,
         described,
         setDescribed,
-        styles: Popover.Style(),
+        styles: popoverStyle(),
       }}
     >
       {children}
     </PopoverContext>
-  );
-}
-
-const isArrow = (node: ReactNode) => isValidElement(node) && node.type === Popover.Arrow;
-
-type PopupProps = Omit<
-  Popover.Content.Props,
-  'side' | 'align' | 'sideOffset' | 'alignOffset' | 'anchor' | 'initialFocus'
->;
-
-function PopoverPopup({ className, style, children, ...props }: PopupProps) {
-  const c = usePopoverContext('Popover.Content');
-  const { popover, styles } = c;
-  const { ids, anchored, open, ending, modal } = popover;
-
-  const labelledBy =
-    props['aria-labelledby'] ??
-    (props['aria-label'] === undefined && c.titled ? ids.title : undefined);
-
-  const parts = flattenFragments(children);
-  const arrowsThatStickOut = parts.filter(isArrow);
-  const content = parts.filter((node) => !isArrow(node));
-
-  return (
-    <ModalLayer
-      open={modal && open}
-      layer={popover.layer}
-      element={popover.content}
-      contentRef={popover.setContent}
-      context={anchored.context}
-      backdrop={
-        modal && {
-          ref: popover.setBackdrop,
-          'data-popover-backdrop': '',
-          className: styles.backdrop(),
-        }
-      }
-      onBackdropClick={() => popover.setOpen(false)}
-    >
-      <div
-        {...props}
-        popover="manual"
-        id={ids.content}
-        role="dialog"
-        aria-modal={modal || undefined}
-        aria-labelledby={labelledBy}
-        aria-describedby={props['aria-describedby'] ?? (c.described ? ids.description : undefined)}
-        tabIndex={-1}
-        data-popover-content=""
-        data-open={open ? '' : undefined}
-        data-ending-style={ending ? '' : undefined}
-        data-side={anchored.side}
-        data-align={anchored.align}
-        className={styles.content({ className })}
-        style={{ ...style, ...anchored.floatingStyles }}
-      >
-        <OverlayItemContext value={null}>
-          {arrowsThatStickOut}
-          <ScrollArea className={styles.scrollArea()}>
-            <ScrollArea.Viewport className={styles.viewport()}>{content}</ScrollArea.Viewport>
-          </ScrollArea>
-        </OverlayItemContext>
-      </div>
-    </ModalLayer>
   );
 }
 
@@ -174,186 +71,35 @@ export namespace Popover {
     children?: ReactNode;
   };
 
-  type PartProps<T extends 'h2' | 'p'> = ComponentProps<T> & { asChild?: boolean };
-
-  export function Trigger({ asChild, children, ...props }: Trigger.Props) {
-    const { popover } = usePopoverContext('Popover.Trigger');
-
-    return part(
-      'button',
-      asChild,
-      children,
-      mergeProps(mergeProps(props, popover.getReferenceProps()), {
-        ref: popover.setTrigger,
-        type: asChild ? undefined : 'button',
-        'aria-haspopup': 'dialog',
-        'aria-expanded': popover.open,
-        'aria-controls': popover.open ? popover.ids.content : undefined,
-        'data-popup-open': popover.open ? '' : undefined,
-        onClick: (event: MouseEvent<HTMLElement>) => popover.requestFromTrigger(event.nativeEvent),
-      }),
-    );
-  }
+  export const Trigger = PopoverTrigger;
   export namespace Trigger {
-    export type Props = ComponentProps<'button'> & { asChild?: boolean };
+    export type Props = PopoverTriggerProps;
   }
 
-  export function Content({
-    side = DEFAULT_PLACEMENT.side,
-    align = DEFAULT_PLACEMENT.align,
-    sideOffset = DEFAULT_PLACEMENT.sideOffset,
-    alignOffset = DEFAULT_PLACEMENT.alignOffset,
-    anchor,
-    initialFocus,
-    ...props
-  }: Content.Props) {
-    const { popover } = usePopoverContext('Popover.Content');
-    const { setPlacement, mountContent } = popover;
-    const anchored = anchor !== undefined;
-
-    useLayoutEffect(() => {
-      setPlacement({ side, align, sideOffset, alignOffset, anchor, initialFocus });
-    }, [setPlacement, side, align, sideOffset, alignOffset, anchor, initialFocus]);
-
-    useEffect(() => mountContent(anchored), [mountContent, anchored]);
-
-    if (!popover.mounted) return null;
-
-    return <PopoverPopup {...props} />;
-  }
+  export const Content = PopoverContent;
   export namespace Content {
-    export type Props = ComponentProps<'div'> & {
-      side?: Side;
-      align?: Align;
-      sideOffset?: number;
-      alignOffset?: number;
-      anchor?: Anchor;
-      initialFocus?: string;
-    };
+    export type Props = PopoverContentProps;
   }
 
-  export function Arrow(props: Arrow.Props) {
-    const { setArrow, anchored } = usePopoverContext('Popover.Arrow').popover;
-
-    return (
-      <FloatingArrow
-        width={14}
-        height={7}
-        fill="var(--ids-color-surface)"
-        stroke="var(--ids-color-border)"
-        strokeWidth={1}
-        {...props}
-        ref={setArrow}
-        context={anchored.context}
-        data-popover-arrow=""
-      />
-    );
-  }
+  export const Arrow = PopoverArrow;
   export namespace Arrow {
-    export type Props = Omit<ComponentProps<'svg'>, 'ref' | 'width' | 'height' | 'strokeWidth'> & {
-      width?: number;
-      height?: number;
-      strokeWidth?: number;
-      tipRadius?: number;
-    };
+    export type Props = PopoverArrowProps;
   }
 
-  export function Title({ asChild, className, ...props }: Title.Props) {
-    const { styles, popover, setTitled } = usePopoverContext('Popover.Title');
-
-    useLayoutEffect(() => {
-      setTitled(true);
-      return () => setTitled(false);
-    }, [setTitled]);
-
-    const Root = asChild ? Slot : 'h2';
-
-    return (
-      <Root
-        id={popover.ids.title}
-        {...props}
-        data-popover-title=""
-        className={styles.title({ className })}
-      />
-    );
-  }
+  export const Title = PopoverTitle;
   export namespace Title {
-    export type Props = PartProps<'h2'>;
+    export type Props = PopoverTitleProps;
   }
 
-  export function Description({ asChild, className, ...props }: Description.Props) {
-    const { styles, popover, setDescribed } = usePopoverContext('Popover.Description');
-
-    useLayoutEffect(() => {
-      setDescribed(true);
-      return () => setDescribed(false);
-    }, [setDescribed]);
-
-    const Root = asChild ? Slot : 'p';
-
-    return (
-      <Root
-        id={popover.ids.description}
-        {...props}
-        data-popover-description=""
-        className={styles.description({ className })}
-      />
-    );
-  }
+  export const Description = PopoverDescription;
   export namespace Description {
-    export type Props = PartProps<'p'>;
+    export type Props = PopoverDescriptionProps;
   }
 
-  export function Close({ asChild, children, onClick, ...props }: Close.Props) {
-    const { popover } = usePopoverContext('Popover.Close');
-
-    const close = (event: MouseEvent<HTMLButtonElement>) => {
-      onClick?.(event);
-      if (!event.defaultPrevented) popover.setOpen(false);
-    };
-
-    if (asChild)
-      return part('button', true, children, { ...props, onClick: close, 'data-popover-close': '' });
-    if (children == null)
-      return (
-        <IconButton
-          aria-label={messages.popover.close}
-          {...props}
-          variant="ghost"
-          size="tiny"
-          icon={<XMarkIcon />}
-          onClick={close}
-          data-popover-close=""
-        />
-      );
-    return (
-      <Button variant="outline" {...props} onClick={close} data-popover-close="">
-        {children}
-      </Button>
-    );
-  }
+  export const Close = PopoverClose;
   export namespace Close {
-    export type Props = Omit<ComponentProps<'button'>, 'type'> & { asChild?: boolean };
+    export type Props = PopoverCloseProps;
   }
 
-  export const Style = tv({
-    slots: {
-      backdrop:
-        'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none border-0 bg-transparent p-0',
-      content: [
-        'fixed z-50 m-0 flex max-h-(--available-height) w-72 max-w-[calc(100vw-1rem)] flex-col overflow-visible outline-none',
-        cornerOfThePaddedViewport,
-        'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface)',
-        'text-body-b3-regular shadow-md',
-        'transition-[opacity,scale] duration-(--ids-motion-fast) ease-out',
-        'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
-        'data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom',
-        'motion-reduce:transition-none',
-      ],
-      scrollArea: 'min-h-0 rounded-[inherit]',
-      viewport: 'flex flex-col gap-2 p-3',
-      title: 'text-body-b3-semibold [overflow-wrap:anywhere]',
-      description: 'text-body-b3-regular text-(--ids-color-on-muted)',
-    },
-  });
+  export const Style = popoverStyle;
 }

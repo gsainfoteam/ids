@@ -1,67 +1,23 @@
-import {
-  createContext,
-  isValidElement,
-  use,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useState,
-  type ComponentProps,
-  type MouseEvent,
-  type ReactElement,
-  type ReactNode,
-} from 'react';
+import { isValidElement, useState, type ReactElement, type ReactNode } from 'react';
 
-import { XMarkIcon } from '@heroicons/react/16/solid';
-
+import { DrawerClose, type DrawerCloseProps } from './close';
+import { DrawerContent, type DrawerContentProps } from './content';
+import { DrawerContext } from './context';
+import { DrawerDescription, type DrawerDescriptionProps } from './description';
+import { DrawerFooter, type DrawerFooterProps } from './footer';
+import { DrawerHandle, type DrawerHandleProps } from './handle';
+import { DrawerHeader, type DrawerHeaderProps } from './header';
+import { DrawerOverlay, type DrawerOverlayProps } from './overlay';
+import { drawerStyle } from './style';
+import { DrawerTitle, type DrawerTitleProps } from './title';
+import { DrawerTrigger, type DrawerTriggerProps } from './trigger';
 import { useDrawer } from './use-drawer';
-import { messages } from '../../../internal/messages';
-import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
-import {
-  cn,
-  flattenFragments,
-  invariant,
-  mergeEventHandlers,
-  mergeProps,
-  mergeRefs,
-  part,
-  tv,
-} from '../../../utils';
-import { isDevelopment } from '../../../utils/dev';
-import { Button } from '../../action/button';
-import { IconButton } from '../../action/icon-button';
-import { ScrollArea } from '../../layout/scroll-area';
-import { Slot } from '../../utility/slot';
+import { flattenFragments } from '../../../utils';
 
 import type { DrawerSide, SnapPoint as DrawerSnapPoint } from './drawer-gesture';
 
-const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');
-
-type Context = {
-  drawer: ReturnType<typeof useDrawer>;
-  role: Drawer.Role;
-  side: Drawer.Side;
-  modal: boolean;
-  dismissible: boolean;
-  hideClose: boolean;
-  overlay: Drawer.Overlay.Props | undefined;
-  titled: boolean;
-  setTitled: (titled: boolean) => void;
-  described: boolean;
-  setDescribed: (described: boolean) => void;
-  styles: ReturnType<typeof Drawer.Style>;
-};
-
-const DrawerContext = createContext<Context | null>(null);
-
-function useDrawerContext(part: string) {
-  const context = use(DrawerContext);
-  invariant(context, `${part} must be rendered inside Drawer.`);
-  return context;
-}
-
-const isOverlay = (node: ReactNode): node is ReactElement<Drawer.Overlay.Props> =>
-  isValidElement(node) && node.type === Drawer.Overlay;
+const isOverlay = (node: ReactNode): node is ReactElement<DrawerOverlayProps> =>
+  isValidElement(node) && node.type === DrawerOverlay;
 
 export function Drawer({
   open,
@@ -117,103 +73,11 @@ export function Drawer({
         setTitled,
         described,
         setDescribed,
-        styles: Drawer.Style({ side, snapping: !!snapPoints && snapPoints.length > 0 }),
+        styles: drawerStyle({ side, snapping: !!snapPoints && snapPoints.length > 0 }),
       }}
     >
       {parts.filter((node) => node !== overlay)}
     </DrawerContext>
-  );
-}
-
-function DrawerPopup({
-  className,
-  style,
-  ref,
-  onPointerDown,
-  children,
-  ...props
-}: Drawer.Content.Props) {
-  const c = useDrawerContext('Drawer.Content');
-  const { drawer, styles, overlay } = c;
-  const { ids, position, ending, open, content } = drawer;
-
-  useEffect(() => {
-    if (!isDevelopment || !content) return;
-
-    const named =
-      content.hasAttribute('aria-label') ||
-      !!props['aria-labelledby'] ||
-      !!content.querySelector('[data-drawer-title]');
-
-    if (!named)
-      console.warn(
-        '[IDS] Drawer: add Drawer.Title, or aria-label on Drawer.Content, so screen readers can name the drawer.',
-      );
-  }, [content, props]);
-
-  const labelledBy =
-    props['aria-labelledby'] ??
-    (props['aria-label'] === undefined && c.titled ? ids.title : undefined);
-
-  const { setContent } = drawer;
-  const contentRef = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(ref, setContent)(node),
-    [ref, setContent],
-  );
-
-  const sheet = (
-    <ScrollArea asChild>
-      <div
-        {...props}
-        ref={c.modal ? undefined : contentRef}
-        popover="manual"
-        id={ids.content}
-        role={c.role}
-        aria-modal={c.modal ? 'true' : undefined}
-        aria-labelledby={labelledBy}
-        aria-describedby={props['aria-describedby'] ?? (c.described ? ids.description : undefined)}
-        tabIndex={-1}
-        data-drawer-content=""
-        data-side={c.side}
-        data-open={open ? '' : undefined}
-        data-ending-style={ending ? '' : undefined}
-        data-nested-open={position.covered ? '' : undefined}
-        className={styles.content({ className })}
-        style={style}
-        onPointerDown={mergeEventHandlers(onPointerDown, drawer.drag.onPointerDown)}
-      >
-        <ScrollArea.Viewport className={styles.viewport()}>
-          <OverlayItemContext value={null}>
-            {children}
-            {!c.hideClose && <Drawer.Close className={styles.close()} />}
-          </OverlayItemContext>
-        </ScrollArea.Viewport>
-      </div>
-    </ScrollArea>
-  );
-
-  if (!c.modal) return sheet;
-  return (
-    <ModalLayer
-      open={open}
-      layer={drawer.layer}
-      element={content}
-      contentRef={contentRef}
-      backdrop={{
-        ...overlay,
-        ref: drawer.setBackdrop,
-        'data-drawer-backdrop': '',
-        'data-side': c.side,
-        'data-stacked': position.modalsBelow > 0 ? '' : undefined,
-        'data-ending-style': ending ? '' : undefined,
-        className: styles.backdrop({ className: overlay?.className }),
-      }}
-      onBackdropClick={() => {
-        if (c.dismissible) drawer.setOpen(false);
-      }}
-    >
-      {sheet}
-    </ModalLayer>
   );
 }
 
@@ -241,260 +105,50 @@ export namespace Drawer {
     children?: ReactNode;
   };
 
-  type PartProps<T extends 'div' | 'h2' | 'p'> = ComponentProps<T> & { asChild?: boolean };
-
-  export function Trigger({ asChild, children, ...props }: Trigger.Props) {
-    const { drawer } = useDrawerContext('Drawer.Trigger');
-
-    return part(
-      'button',
-      asChild,
-      children,
-      mergeProps(props, {
-        ref: drawer.setTrigger,
-        type: asChild ? undefined : 'button',
-        'aria-haspopup': 'dialog',
-        'aria-expanded': drawer.open,
-        'aria-controls': drawer.open ? drawer.ids.content : undefined,
-        'data-popup-open': drawer.open ? '' : undefined,
-        onClick: () => drawer.setOpen(!drawer.open),
-      }),
-    );
-  }
+  export const Trigger = DrawerTrigger;
   export namespace Trigger {
-    export type Props = ComponentProps<'button'> & { asChild?: boolean };
+    export type Props = DrawerTriggerProps;
   }
 
-  export function Overlay(_props: Overlay.Props) {
-    useDrawerContext('Drawer.Overlay');
-    return null;
-  }
+  export const Overlay = DrawerOverlay;
   export namespace Overlay {
-    export type Props = Omit<ComponentProps<'div'>, 'children'>;
+    export type Props = DrawerOverlayProps;
   }
 
-  export function Content(props: Content.Props) {
-    const { drawer } = useDrawerContext('Drawer.Content');
-    if (!drawer.mounted) return null;
-    return <DrawerPopup {...props} />;
-  }
+  export const Content = DrawerContent;
   export namespace Content {
-    export type Props = ComponentProps<'div'>;
+    export type Props = DrawerContentProps;
   }
 
-  export function Handle({ ref, className, onClick, ...props }: Handle.Props) {
-    const { drawer, styles } = useDrawerContext('Drawer.Handle');
-
-    const { setHandle } = drawer;
-    const handleRef = useCallback(
-      (node: HTMLElement | null) => mergeRefs(ref, setHandle)(node),
-      [ref, setHandle],
-    );
-
-    if (!drawer.drag.cycles)
-      return (
-        <div
-          {...(props as ComponentProps<'div'>)}
-          ref={handleRef}
-          aria-hidden="true"
-          data-drawer-handle=""
-          className={styles.handle({ className })}
-        />
-      );
-
-    return (
-      <button
-        type="button"
-        aria-label={messages.drawer.handle}
-        aria-controls={drawer.ids.content}
-        {...props}
-        ref={handleRef}
-        data-drawer-handle=""
-        className={styles.handle({ className })}
-        onClick={(event) => {
-          onClick?.(event);
-          if (!event.defaultPrevented) drawer.drag.cycleSnapPoint();
-        }}
-      />
-    );
-  }
+  export const Handle = DrawerHandle;
   export namespace Handle {
-    export type Props = Omit<ComponentProps<'button'>, 'type' | 'children'>;
+    export type Props = DrawerHandleProps;
   }
 
-  export function Header({ asChild, className, ...props }: Header.Props) {
-    const { styles } = useDrawerContext('Drawer.Header');
-    const Root = asChild ? Slot : 'div';
-    return <Root {...props} data-drawer-header="" className={styles.header({ className })} />;
-  }
+  export const Header = DrawerHeader;
   export namespace Header {
-    export type Props = PartProps<'div'>;
+    export type Props = DrawerHeaderProps;
   }
 
-  export function Title({ asChild, className, ...props }: Title.Props) {
-    const { styles, drawer, setTitled } = useDrawerContext('Drawer.Title');
-
-    useLayoutEffect(() => {
-      setTitled(true);
-      return () => setTitled(false);
-    }, [setTitled]);
-
-    const Root = asChild ? Slot : 'h2';
-
-    return (
-      <Root
-        id={drawer.ids.title}
-        {...props}
-        data-drawer-title=""
-        className={styles.title({ className })}
-      />
-    );
-  }
+  export const Title = DrawerTitle;
   export namespace Title {
-    export type Props = PartProps<'h2'>;
+    export type Props = DrawerTitleProps;
   }
 
-  export function Description({ asChild, className, ...props }: Description.Props) {
-    const { styles, drawer, setDescribed } = useDrawerContext('Drawer.Description');
-
-    useLayoutEffect(() => {
-      setDescribed(true);
-      return () => setDescribed(false);
-    }, [setDescribed]);
-
-    const Root = asChild ? Slot : 'p';
-
-    return (
-      <Root
-        id={drawer.ids.description}
-        {...props}
-        data-drawer-description=""
-        className={styles.description({ className })}
-      />
-    );
-  }
+  export const Description = DrawerDescription;
   export namespace Description {
-    export type Props = PartProps<'p'>;
+    export type Props = DrawerDescriptionProps;
   }
 
-  export function Footer({ asChild, className, ...props }: Footer.Props) {
-    const { styles } = useDrawerContext('Drawer.Footer');
-    const Root = asChild ? Slot : 'div';
-    return <Root {...props} data-drawer-footer="" className={styles.footer({ className })} />;
-  }
+  export const Footer = DrawerFooter;
   export namespace Footer {
-    export type Props = PartProps<'div'>;
+    export type Props = DrawerFooterProps;
   }
 
-  export function Close({ asChild, children, onClick, ...props }: Close.Props) {
-    const { drawer } = useDrawerContext('Drawer.Close');
-
-    const close = (event: MouseEvent<HTMLButtonElement>) => {
-      onClick?.(event);
-      if (!event.defaultPrevented) drawer.setOpen(false);
-    };
-
-    if (asChild)
-      return part('button', true, children, { ...props, onClick: close, 'data-drawer-close': '' });
-    if (children == null)
-      return (
-        <IconButton
-          aria-label={messages.drawer.close}
-          {...props}
-          variant="ghost"
-          size="tiny"
-          icon={<XMarkIcon />}
-          onClick={close}
-          data-drawer-close=""
-        />
-      );
-    return (
-      <Button variant="outline" {...props} onClick={close} data-drawer-close="">
-        {children}
-      </Button>
-    );
-  }
+  export const Close = DrawerClose;
   export namespace Close {
-    export type Props = Omit<ComponentProps<'button'>, 'type'> & { asChild?: boolean };
+    export type Props = DrawerCloseProps;
   }
 
-  export const Style = tv({
-    slots: {
-      backdrop: [
-        'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none touch-none border-0 p-0',
-        'bg-black/50 opacity-[var(--drawer-fade,1)]',
-        'transition-opacity duration-(--ids-motion-slow) ease-[cubic-bezier(0.32,0.72,0,1)]',
-        'starting:opacity-0 data-ending-style:opacity-0 data-stacked:bg-transparent',
-        'data-dragging:transition-none motion-reduce:transition-none',
-      ],
-      content: [
-        'fixed z-50 m-0 flex flex-col outline-none',
-        cornerOfThePaddedViewport,
-        'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-lg',
-        'transition-[translate,transform,scale] duration-(--ids-motion-slow) ease-[cubic-bezier(0.32,0.72,0,1)]',
-        'data-nested-open:scale-(--drawer-nested-scale)',
-        'data-dragging:transition-none data-dragging:select-none motion-reduce:transition-none',
-      ],
-      viewport: 'relative flex flex-col gap-4 p-6',
-      handle: [
-        'relative shrink-0 cursor-grab touch-none rounded-full outline-none focus-ring',
-        'before:absolute before:-inset-3',
-        'bg-(--ids-color-handle) transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'hover:bg-(--ids-color-handle-hover) data-dragging:bg-(--ids-color-handle-active)',
-      ],
-      header: 'flex flex-col gap-1.5 pe-8 text-start',
-      title: 'text-subtitle-s1-semibold [overflow-wrap:anywhere]',
-      description: 'text-body-b3-regular text-(--ids-color-on-muted)',
-      footer: 'mt-auto flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
-      close: 'absolute end-4 top-4',
-    },
-    variants: {
-      side: {
-        bottom: {
-          content: [
-            'inset-x-0 top-auto bottom-0 h-fit max-h-[calc(100%-2rem)] w-full max-w-none',
-            'data-[side=bottom]:rounded-b-none data-[side=bottom]:border-b-0',
-            'starting:translate-y-full data-ending-style:translate-y-full data-nested-open:-translate-y-4',
-          ],
-          viewport: 'pb-[calc(--spacing(6)+env(safe-area-inset-bottom))]',
-          handle: 'order-first mx-auto -mt-2 h-1.5 w-12',
-        },
-        top: {
-          content: [
-            'inset-x-0 top-0 bottom-auto h-fit max-h-[calc(100%-2rem)] w-full max-w-none',
-            'data-[side=top]:rounded-t-none data-[side=top]:border-t-0',
-            'starting:-translate-y-full data-ending-style:-translate-y-full data-nested-open:translate-y-4',
-          ],
-          viewport: 'pt-[calc(--spacing(6)+env(safe-area-inset-top))]',
-          handle: 'order-last mx-auto -mb-2 h-1.5 w-12',
-        },
-        right: {
-          content: [
-            'inset-y-0 right-0 left-auto h-full max-h-none w-[min(24rem,calc(100%-2rem))]',
-            'data-[side=right]:rounded-r-none data-[side=right]:border-r-0',
-            'starting:translate-x-full data-ending-style:translate-x-full data-nested-open:-translate-x-4',
-          ],
-          handle: 'absolute top-1/2 left-2 h-12 w-1.5 -translate-y-1/2',
-        },
-        left: {
-          content: [
-            'inset-y-0 right-auto left-0 h-full max-h-none w-[min(24rem,calc(100%-2rem))]',
-            'data-[side=left]:rounded-l-none data-[side=left]:border-l-0',
-            'starting:-translate-x-full data-ending-style:-translate-x-full data-nested-open:translate-x-4',
-          ],
-          handle: 'absolute top-1/2 right-2 h-12 w-1.5 -translate-y-1/2',
-        },
-      },
-      snapping: { true: {}, false: {} },
-    },
-    compoundVariants: [
-      { side: ['top', 'bottom'], snapping: true, class: { content: 'h-[calc(100%-2rem)]' } },
-      {
-        side: ['left', 'right'],
-        snapping: true,
-        class: { content: 'w-[calc(100%-2rem)]' },
-      },
-    ],
-    defaultVariants: { side: 'right', snapping: false },
-  });
+  export const Style = drawerStyle;
 }

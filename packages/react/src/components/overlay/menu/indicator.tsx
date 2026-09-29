@@ -37,6 +37,8 @@ export function MenuItemIndicator({
   );
 }
 
+MenuItemIndicator.displayName = 'Menu.ItemIndicator';
+
 const isIndicator = (node: ReactNode) => isValidElement(node) && node.type === MenuItemIndicator;
 
 export function withIndicator(children: ReactNode, asChild: boolean | undefined) {

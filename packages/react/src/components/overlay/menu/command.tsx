@@ -194,6 +194,8 @@ export function CommandSearch({ placeholder, ...props }: Menu.SearchProps) {
   );
 }
 
+CommandSearch.displayName = 'Menu.Search';
+
 export function CommandEmpty({ asChild, children, className, ...props }: Menu.EmptyProps) {
   const palette = useCommandContext('Menu.Empty');
 
@@ -209,6 +211,8 @@ export function CommandEmpty({ asChild, children, className, ...props }: Menu.Em
     }),
   );
 }
+
+CommandEmpty.displayName = 'Menu.Empty';
 
 export function CommandItem({
   disabled = false,
