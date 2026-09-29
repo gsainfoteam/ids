@@ -4,7 +4,7 @@
 
 - **팝업은 ColorPicker.** 채도와 밝기 영역, 색조와 투명도 슬라이더, 값 입력, 스포이트, 복사, 팔레트를 그대로 씁니다. `ColorField.Content` 에 ColorPicker part 를 골라 넣으면 팔레트만 두는 식으로 줄일 수 있습니다.
 - **키보드.** 트리거에서 `↓` 나 `Enter` 로 열면 포커스가 첫 컨트롤로 갑니다. `Esc` 는 닫고 트리거로 돌아옵니다.
-- **스크린 리더.** 트리거는 `브랜드 색상 #3B82F6` 처럼 이름과 값을 함께 읽힙니다. 읽을 수 없는 값은 그대로 보이고 `aria-invalid` 가 됩니다.
+- **스크린 리더.** 트리거는 DateField 처럼 `role="combobox"`, `aria-haspopup="dialog"` 이고, `브랜드 색상 #3B82F6` 처럼 이름과 값을 함께 읽힙니다. `required` 는 `aria-required`, `readOnly` 는 `aria-readonly` 로 알립니다. 읽을 수 없는 값은 그대로 보이고 `aria-invalid` 가 됩니다.
 - **폼.** `name` 으로 형식에 맞춘 값 하나가 제출되고, `required` 는 브라우저 검증이 막습니다. `<button type="reset">` 은 `defaultValue` 로 되돌립니다.
 - **팝업.** 아래 공간이 모자라면 위로 열리고, 트리거가 보이는 동안은 화면 밖으로 나가지 않습니다. 좁은 화면에서는 모달 하단 시트로 열 수 있습니다.
 

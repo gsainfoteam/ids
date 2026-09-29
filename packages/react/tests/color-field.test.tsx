@@ -72,6 +72,7 @@ test('SSR: the value is written in the field format, and the trigger reads label
     expect(button.id).toBe(label.htmlFor);
     expect(button.getAttribute('aria-labelledby')).toBe(`${label.id} ${shown.id}`);
     expect(shown.textContent).toBe(expected);
+    expect(button.getAttribute('role')).toBe('combobox');
     expect(button.getAttribute('aria-required')).toBe('true');
     expect(button.getAttribute('aria-expanded')).toBe('false');
     expect(new FormData(doc.querySelector('form')!).get('color')).toBe(expected);
@@ -292,7 +293,7 @@ test('disabled is not submitted and never opens; read-only is submitted, not val
   await expect.element(trigger()).toHaveFocus();
   await userEvent.keyboard('{ArrowDown}');
   await expect.element(dialog()).not.toBeInTheDocument();
-  await expect.element(trigger()).toHaveAttribute('aria-disabled', 'true');
+  await expect.element(trigger()).toHaveAttribute('aria-readonly', 'true');
   expect(form().checkValidity(), 'read-only is not validated').toBe(true);
   await screen.rerender(<Fragment key="read-only">{view({ readOnly: true })}</Fragment>);
   expect([...new FormData(form())]).toEqual([['color', '#FF0000']]);

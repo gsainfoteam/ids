@@ -147,7 +147,7 @@ export const PickAndClear: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const trigger = canvas.getByRole('button', { name: '브랜드 색상 #3B82F6FF' });
+    const trigger = canvas.getByRole('combobox', { name: '브랜드 색상 #3B82F6FF' });
     await userEvent.click(trigger);
     const dialog = await canvas.findByRole('dialog', { name: '브랜드 색상' });
     await waitFor(() => expect(dialog).toBeVisible());
@@ -192,10 +192,10 @@ export const Composition: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    await userEvent.click(canvas.getByRole('button', { name: /^팔레트만/ }));
+    await userEvent.click(canvas.getByRole('combobox', { name: /^팔레트만/ }));
     await waitFor(() => expect(canvas.getByRole('radio', { name: '#22C55E' })).toHaveFocus());
     await userEvent.keyboard('{ArrowRight}');
-    await expect(canvas.getByRole('button', { name: /^팔레트만/ })).toHaveTextContent('#3B82F6');
+    await expect(canvas.getByRole('combobox', { name: /^팔레트만/ })).toHaveTextContent('#3B82F6');
   },
 };
 
@@ -236,12 +236,12 @@ export const NativeForm: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const field = () => canvas.getByRole('button', { name: /^테마 색/ }).closest('[data-field]');
-    await userEvent.click(canvas.getByRole('button', { name: /^테마 색/ }));
+    const field = () => canvas.getByRole('combobox', { name: /^테마 색/ }).closest('[data-field]');
+    await userEvent.click(canvas.getByRole('combobox', { name: /^테마 색/ }));
     await userEvent.keyboard('{Escape}');
     await expect(field()).not.toHaveAttribute('data-filled');
     await expect(field()).not.toHaveAttribute('data-dirty');
-    const trigger = canvas.getByRole('button', { name: /^테마 색/ });
+    const trigger = canvas.getByRole('combobox', { name: /^테마 색/ });
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toBeEmptyDOMElement();
     await expect(trigger).toHaveFocus();
@@ -293,7 +293,7 @@ export const ReactHookForm: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '저장' }));
     await waitFor(() => expect(canvas.getByText('색을 고르세요.')).toBeVisible());
-    const trigger = canvas.getByRole('button', { name: /^포인트 색/ });
+    const trigger = canvas.getByRole('combobox', { name: /^포인트 색/ });
     await expect(trigger).toHaveFocus();
     await userEvent.click(trigger);
     await userEvent.click(await canvas.findByRole('radio', { name: '#8B5CF6' }));
