@@ -120,9 +120,12 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Monaspace Neon 이다. �
 
 | `data-color` | 설명 |
 |---|---|
-| `blue` | 기본 블루 |
-| `orange` | 오렌지 (지글) |
-| `green` | 그린 (팟쥐) |
+| `blue` | 기본 |
+| `orange` | 지글. IDS 고유 팔레트 |
+| `green` | 팟쥐. IDS 고유 팔레트 |
+| `red` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` `indigo` `violet` `purple` `fuchsia` `pink` `rose` | Tailwind CSS v4 기본 팔레트 |
+
+- `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` 는 `--ids-color-on-primary` 가 검은 글자다. 흰 글자로는 대비 4.5:1 이 안 된다.
 
 `data-mode`는 `light` / `dark`.
 

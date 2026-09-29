@@ -3,7 +3,7 @@
     "primary": { "$value": "{green.600}", "$type": "color" },
     "on-primary": { "$value": "{neutral.0}", "$type": "color" },
     "secondary": { "$value": "{green.100}", "$type": "color" },
-    "on-secondary": { "$value": "{green.600}", "$type": "color" },
+    "on-secondary": { "$value": "{green.700}", "$type": "color" },
     "outline": { "$value": "{green.200}", "$type": "color" }
   }
 }

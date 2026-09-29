@@ -42,6 +42,9 @@ void main() {
 | `color` | `IdsColor` | `IdsColor.blue` |
 | `mode` | `IdsMode` | `IdsMode.light` |
 
+- `IdsColor` 는 17색이다: `red` `orange` `amber` `yellow` `lime` `green` `emerald` `teal` `cyan` `sky` `blue` `indigo` `violet` `purple` `fuchsia` `pink` `rose`.
+- `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` 는 `onPrimary` 가 검은색이다.
+
 테마 접근:
 
 ```dart

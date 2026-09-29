@@ -1,0 +1,9 @@
+{
+  "color": {
+    "primary": { "$value": "{violet.600}", "$type": "color" },
+    "on-primary": { "$value": "{neutral.0}", "$type": "color" },
+    "secondary": { "$value": "{violet.100}", "$type": "color" },
+    "on-secondary": { "$value": "{violet.700}", "$type": "color" },
+    "outline": { "$value": "{violet.200}", "$type": "color" }
+  }
+}

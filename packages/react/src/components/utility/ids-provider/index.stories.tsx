@@ -9,9 +9,28 @@ import { Button } from '../../action/button';
 
 import { IdsProvider, useTheme } from '.';
 
+import type { IdsColor } from '../../../tokens/types';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const colors = ['blue', 'orange', 'green'] as const;
+const colors = [
+  'red',
+  'orange',
+  'amber',
+  'yellow',
+  'lime',
+  'green',
+  'emerald',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose',
+] as const satisfies readonly IdsColor[];
 const modes = ['light', 'dark'] as const;
 
 const meta = {
@@ -19,7 +38,7 @@ const meta = {
   component: IdsProvider,
   tags: ['autodocs'],
   argTypes: {
-    color: { control: 'radio', options: colors },
+    color: { control: 'select', options: colors },
     mode: { control: 'radio', options: [...modes, 'system'] },
     asChild: { control: false },
   },
@@ -65,20 +84,17 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Color × Mode"
-        description="같은 컴포넌트가 data-color와 data-mode만 바꿔 다시 칠해집니다."
+        description="같은 컴포넌트가 data-color와 data-mode만 바꿔 다시 칠해집니다. 밝은 색은 채움 위 글자가 검은색입니다."
       >
         <Showcase.Matrix
-          rows={modes}
-          columns={colors}
-          render={(mode, color) => (
+          rows={colors}
+          columns={modes}
+          render={(color, mode) => (
             <IdsProvider color={color} mode={mode} className={region}>
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button>저장</Button>
-                  <Button variant="soft">임시 저장</Button>
-                  <Button variant="outline">취소</Button>
-                </div>
-                <Readout />
+              <div className="flex flex-wrap items-center gap-2">
+                <Button>저장</Button>
+                <Button variant="soft">임시 저장</Button>
+                <Button variant="outline">취소</Button>
               </div>
             </IdsProvider>
           )}

@@ -13,13 +13,38 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 
 ## 브랜드
 
-`data-color`(blue, orange, green)와 `data-mode` 둘 다에 따라 바뀝니다.
+`data-color` 와 `data-mode` 둘 다에 따라 바뀝니다.
 
 | 토큰                         | 쓰임                                     |
 | ---------------------------- | ---------------------------------------- |
 | `primary` / `on-primary`     | 주요 동작의 채움과 그 위 글자. 포커스 링 |
 | `secondary` / `on-secondary` | 옅은 브랜드 채움과 그 위 글자            |
 | `outline`                    | 브랜드 색을 띠어야 하는 드문 선          |
+
+### 17색
+
+```tsx
+<IdsProvider color="emerald">
+  <App />
+</IdsProvider>
+```
+
+- `red` `orange` `amber` `yellow` `lime` `green` `emerald` `teal` `cyan` `sky` `blue` `indigo` `violet` `purple` `fuchsia` `pink` `rose`.
+- 팔레트는 Tailwind CSS v4 기본 색을 hex 로 옮긴 값입니다. `orange` 와 `green` 은 IDS 고유 값입니다.
+- 모든 색이 같은 단계를 씁니다.
+
+| 토큰           | light | dark  |
+| -------------- | ----- | ----- |
+| `primary`      | 600   | 600   |
+| `secondary`    | 100   | 950   |
+| `on-secondary` | 700   | 400   |
+| `outline`      | 200   | 800   |
+
+- `on-secondary` 는 `secondary` 위 글자로 4.5:1 을 넘는 단계입니다. `orange` 만 light 에서 800 을 씁니다.
+- `on-primary` 는 흰 글자(`neutral.0`)가 기본입니다. 흰 글자로 4.5:1 이 안 되는 밝은 색은 검은 글자(`neutral.950`)입니다.
+  - 검은 글자: `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky`.
+  - 흰 글자: 나머지 9색.
+- 채움 위 글자와 아이콘은 색을 직접 고르지 말고 `on-primary` 로 칠합니다. 그래야 밝은 색에서도 읽힙니다.
 
 ## 중립
 
@@ -76,3 +101,4 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 - 구조선과 테두리는 중립입니다. 테마 색은 주요 동작과 포커스에만 씁니다.
 - 색만으로 의미를 전하지 않습니다. 아이콘이나 글자를 함께 둡니다.
 - 대비는 Storybook `Foundations/Color` 의 Contrast에서 모드와 테마마다 확인합니다.
+- `tests/tokens-contrast.test.ts` 가 17색 × 두 모드의 `on-primary` / `primary`, `on-secondary` / `secondary` 와 상태 짝이 4.5:1 을 넘는지 검사합니다.

@@ -1,7 +1,14 @@
 {
   "ids": {
     "color": {
-      "values": { "$value": ["blue", "orange", "green"], "$type": "other" }
+      "values": {
+        "$value": [
+          "red", "orange", "amber", "yellow", "lime", "green",
+          "emerald", "teal", "cyan", "sky", "blue", "indigo",
+          "violet", "purple", "fuchsia", "pink", "rose"
+        ],
+        "$type": "other"
+      }
     },
     "mode": {
       "values": { "$value": ["light", "dark"], "$type": "other" }

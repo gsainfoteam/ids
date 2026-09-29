@@ -112,7 +112,7 @@ function ThemeMenu() {
 
 | 속성                                  | 기본 / 동작                                                                                          |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `color` / `defaultColor`              | `blue` / `orange` / `green`. 둘 다 없으면 바깥을 물려받는다                                          |
+| `color` / `defaultColor`              | `IdsColor` 17색(`red` … `rose`). 둘 다 없으면 바깥을 물려받는다                                      |
 | `onColorChange`                       | 색 테마를 바꾸려 할 때                                                                               |
 | `mode` / `defaultMode`                | `light` / `dark` / `system`. 둘 다 없으면 바깥을 물려받는다                                          |
 | `onModeChange`                        | 모드를 바꾸려 할 때                                                                                  |
@@ -122,6 +122,7 @@ function ThemeMenu() {
 | `className` / `style` / `ref` / 그 외 | 감싸는 요소(또는 자식)로 간다                                                                        |
 
 - 최상위 Provider는 둘 다 없으면 `blue`, `light` 로 시작합니다.
+- 색 목록과 밝은 색의 검은 `on-primary` 는 [Color](../../../foundations/color/README.md#17색) 를 참고합니다.
 - 요소에는 `data-color`, `data-mode`(항상 `light` / `dark`), `style.colorScheme` 이 붙습니다.
 - `translate` 와 `locale` 은 패키지 README 의 [문구와 언어](../../../../README.md#문구와-언어) 를 참고합니다.
 
