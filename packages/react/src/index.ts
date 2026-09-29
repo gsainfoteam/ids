@@ -63,6 +63,13 @@ export type {
   TableSection,
   TableVariant,
 } from './components/data/table';
+export { DataTable } from './components/data/data-table';
+export type {
+  DataTableProps,
+  DataTableColumnDef,
+  DataTableColumnMeta,
+  DataTableFeatures,
+} from './components/data/data-table';
 
 export { Button } from './components/action/button';
 export { IconButton } from './components/action/icon-button';

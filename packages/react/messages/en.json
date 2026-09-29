@@ -59,6 +59,20 @@
     "swatches": "Swatches",
     "twoD": "2D slider"
   },
+  "dataTable": {
+    "empty": "No data.",
+    "firstPage": "First page",
+    "lastPage": "Last page",
+    "nextPage": "Next page",
+    "page": "Page {page} of {count}",
+    "pagination": "Pagination",
+    "previousPage": "Previous page",
+    "resize": "{column} column width",
+    "selectAll": "Select all rows",
+    "selectRow": "Select {label}",
+    "selectRowNumber": "Select row {number}",
+    "selected": "{count, plural, one {# row selected} other {# rows selected}}"
+  },
   "dateField": {
     "clear": "Clear date",
     "close": "Close",

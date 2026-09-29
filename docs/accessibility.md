@@ -99,6 +99,7 @@
 | ColorPicker | [Slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), [Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) (팔레트) | 영역: `←` `→` 채도, `↑` `↓` `PageUp` `PageDown` 밝기, `Shift`+방향키 10%, `Home` `End`. 값 입력은 `Enter` 로 반영 | 영역은 채도와 밝기 두 `slider`(`aria-valuetext` 에 두 값), 색조와 투명도는 `slider`, 팔레트는 `radiogroup` | 2차원 영역은 APG 패턴이 없어 슬라이더 둘로 읽힌다 |
 | Empty | 없음 | 없음. `Empty.Actions` 의 버튼마다 Tab 이 멈춘다 | 역할이 없는 `div`, live region 없음. 기본 아이콘은 `aria-hidden`. 제목은 `Empty.Title asChild` 로 heading 이 된다 | 제목의 heading 수준과 결과 수 알림은 앱이 맡는다 |
 | QRCode | 없음 | 없음 | `role="img"`, 이름은 `aria-label` 이나 `aria-labelledby`, 없으면 "QR 코드". 값은 이름에 넣지 않는다. SVG 와 로고는 이름 안에 숨는다 | 스캔할 수 없는 사람을 위한 주소 글자나 링크는 앱이 함께 보여 준다. 다크 모드의 기본 색은 반전되어 오래된 스캐너가 못 읽을 수 있다(`inverted={false}`) |
+| DataTable | [Table](https://www.w3.org/WAI/ARIA/apg/patterns/table/) ([Sortable Table 예제](https://www.w3.org/WAI/ARIA/apg/patterns/table/examples/sortable-table/)) | 정렬 머리글 버튼 `Enter` `Space`(`Shift`+누르기는 여러 열), 체크박스 `Space`(`Shift`+누르기는 범위), 너비 핸들 `←` `→`(`Shift` 64px) `Home` `End` `Enter`(되돌리기), 페이지 버튼 `Enter` `Space` | native `table`, 정렬된 열의 `th` 에 `aria-sort`, 체크박스 이름 "{행} 선택"과 "모든 행 선택"(일부면 mixed), 핸들 `separator` + `aria-valuenow` `aria-valuemin` `aria-valuemax`, 페이지는 `nav`(이름 "페이지 이동") + `aria-live` 글자, 로딩은 `aria-busy` | `grid` 가 아니라 셀 사이 방향키 이동이 없다. 끝 페이지 버튼은 `aria-disabled` 로 탭 순서에 남는다 |
 | Table | [Table](https://www.w3.org/WAI/ARIA/apg/patterns/table/) | 없음. 넘치는데 안에 포커스 받을 요소가 없으면 스크롤 영역이 Tab 에 멈춘다 | native `table`, `th` 는 머리글 행에서 `scope="col"`, 몸통과 바닥글에서 `scope="row"`, `caption` | 선택된 행(`selected`)은 모양만 바뀐다. `aria-selected` 는 grid 전용이라 행 안의 체크박스나 버튼이 알린다. `onClick` 행은 `role="button"` 이 아니어서 키보드 경로는 행 안의 버튼이다 |
 | TimePicker | [Listbox](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) | 컬럼마다 Tab 한 번. `↑` `↓` 한 칸, `PageUp` `PageDown` 다섯 칸, `Home` `End`, `Enter` `Space` 선택, `←` `→` 옆 컬럼, 숫자 입력, `Delete` 비우기 | `role="group"`(이름 "시간") 안에 컬럼마다 `listbox` + `option` `aria-selected`, `aria-activedescendant` | `wheel` 은 스크롤이 멈춘 자리를 고른다. 키보드로는 `Enter` 로 고른다 |
 
@@ -233,6 +234,7 @@
 | Calendar | 달을 바꾸면 새 달 이름을 읽는다 |  |  |  |  |
 | TimePicker | 컬럼마다 이름과 선택된 값을 읽는다 |  |  |  |  |
 | Table | 표 이름, 행과 열 수를 읽고, 표 탐색 키로 셀을 오가면 열 머리글과 행 머리글을 함께 읽는다 |  |  |  |  |
+| DataTable | 정렬 버튼을 누르면 "오름차순 / 내림차순" 을 읽고, 체크박스가 행 이름과 "일부 선택" 을, 페이지를 넘기면 새 페이지 번호를 읽는다 |  |  |  |  |
 | Card, Item (누르는 행) | 제목이 버튼으로 읽히고 설명이 뒤따른다. 카드 안의 다른 버튼에도 따로 갈 수 있다 |  |  |  |  |
 | Chip | 켜는 칩이 "눌림" 을 읽고, 지우기 버튼이 이름을 읽는다 |  |  |  |  |
 | Avatar, AvatarGroup | 사람 이름과 "외 N명" 을 읽는다 |  |  |  |  |
