@@ -248,7 +248,7 @@ export namespace TelField {
     slots: {
       country: [
         'w-auto shrink-0 rounded-standard text-(--ids-color-on-surface)',
-        'hover:bg-(--ids-color-muted) ring-0! inset-ring-transparent!',
+        'hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover) ring-0! inset-ring-transparent!',
       ],
       countryTrigger: 'gap-1',
       countryValue: 'tabular-nums',

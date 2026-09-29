@@ -36,7 +36,7 @@ export const menuStyle = tv({
     empty: [listStyles.empty, 'not-data-empty:sr-only'],
     item: [
       listStyles.option,
-      'pe-2.5 data-popup-open:bg-(--ids-color-muted) [&_svg]:size-(--ids-size-icon-standard)',
+      'pe-2.5 data-popup-open:bg-(--ids-color-muted-hover) [&_svg]:size-(--ids-size-icon-standard)',
     ],
     indicator: listStyles.indicator,
     dot: 'size-1.5 rounded-full bg-current',

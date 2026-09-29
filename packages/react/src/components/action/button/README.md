@@ -35,6 +35,7 @@ import { Button } from '@gsainfoteam/ids-react';
 
 - 상태 색에서는 포커스 링과 포커스된 테두리도 그 색입니다. `primary` 와 `neutral` 은 테마 색 링입니다.
 - 옅은 배경 위의 글자는 상태 색의 진한 단계(`*-strong`)라 밝은 노랑 `warning` 도 읽힙니다.
+- `outline` 과 `ghost` 는 올리면 `muted`, 누르면 한 단계 진한 `muted-hover` 입니다. 상태 색에서는 그 색 10% 와 16% 입니다.
 
 ## 아이콘
 

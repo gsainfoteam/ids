@@ -88,8 +88,8 @@ type FaqId = 'shipping' | 'returns';
 
 ```tsx
 <Accordion variant="outline" />  // 기본. 섹션 사이에 구분선
-<Accordion variant="soft" />      // 섹션마다 옅은 배경의 블록
-<Accordion variant="ghost" />     // 구분선 없음. 헤더에 hover 배경
+<Accordion variant="soft" />      // 섹션마다 옅은 배경의 블록. 헤더는 올리고 누를 때 한 단계씩 진해진다
+<Accordion variant="ghost" />     // 구분선 없음. 헤더에 hover 와 press 배경
 <Accordion size="tiny" />         // standard(기본) / tiny
 <Accordion disabled />            // 모든 섹션 비활성
 <Accordion.Item disabled />       // 섹션 하나만 비활성
@@ -97,13 +97,13 @@ type FaqId = 'shipping' | 'returns';
 
 ## 상태와 data 속성
 
-| 요소        | 속성                                                                             |
-| ----------- | -------------------------------------------------------------------------------- |
-| 루트        | `data-accordion`, `data-variant`, `data-size`, `data-disabled`                   |
-| `Item`      | `data-state="open \| closed"`, `data-open`, `data-disabled`                      |
-| `Trigger`   | `data-state`, `data-open`, `data-disabled`, `data-hovered`, `data-focus-visible` |
-| `Content`   | `data-state`, `data-open`                                                        |
-| `Indicator` | `data-state`, `data-open`                                                        |
+| 요소        | 속성                                                                                            |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| 루트        | `data-accordion`, `data-variant`, `data-size`, `data-disabled`                                  |
+| `Item`      | `data-state="open \| closed"`, `data-open`, `data-disabled`                                     |
+| `Trigger`   | `data-state`, `data-open`, `data-disabled`, `data-hovered`, `data-active`, `data-focus-visible` |
+| `Content`   | `data-state`, `data-open`                                                                       |
+| `Indicator` | `data-state`, `data-open`                                                                       |
 
 함수로 받는 상태는 `{ value, open, disabled }` 이고, `Trigger` 는 `hovered`, `focusVisible` 같은 인터랙션 상태도 함께 받습니다.
 

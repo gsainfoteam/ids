@@ -415,12 +415,14 @@ export namespace Accordion {
         soft: {
           root: 'gap-2',
           item: 'bg-(--ids-color-muted) concentric-p-1',
-          trigger: 'px-3 data-hovered:bg-(--ids-color-on-surface)/5',
+          trigger:
+            'px-3 data-hovered:bg-(--ids-color-muted-hover) data-active:bg-(--ids-color-muted-active)',
           body: 'px-3',
         },
         ghost: {
           root: 'gap-1',
-          trigger: 'px-3 data-hovered:bg-(--ids-color-muted)',
+          trigger:
+            'px-3 data-hovered:bg-(--ids-color-muted) data-active:bg-(--ids-color-muted-hover)',
           body: 'px-3',
         },
       } satisfies Record<AccordionVariant, object>,

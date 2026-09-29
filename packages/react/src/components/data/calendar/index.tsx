@@ -494,7 +494,11 @@ export namespace Calendar {
             'bg-(--ids-color-primary) font-medium text-(--ids-color-on-primary) hover:bg-(--ids-color-primary)/90',
         },
       },
-      onBand: { true: { dayButton: 'hover:bg-(--ids-color-border)' } },
+      onBand: {
+        true: {
+          dayButton: 'hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)',
+        },
+      },
       unavailable: { true: { dayButton: 'cursor-not-allowed opacity-50' } },
     },
     compoundVariants: [
@@ -508,10 +512,23 @@ export namespace Calendar {
         selected: false,
         onBand: false,
         unavailable: false,
-        class: { dayButton: 'hover:bg-(--ids-color-muted)' },
+        class: { dayButton: 'hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)' },
+      },
+      {
+        selected: false,
+        onBand: false,
+        unavailable: false,
+        today: true,
+        class: {
+          dayButton: 'hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)',
+        },
       },
       { selected: true, unavailable: true, class: { dayButton: 'hover:bg-(--ids-color-primary)' } },
-      { onBand: true, unavailable: true, class: { dayButton: 'hover:bg-transparent' } },
+      {
+        onBand: true,
+        unavailable: true,
+        class: { dayButton: 'hover:bg-transparent active:bg-transparent' },
+      },
     ],
     defaultVariants: {
       size: 'standard',

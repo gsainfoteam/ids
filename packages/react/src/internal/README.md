@@ -126,17 +126,19 @@ export const Style = tv({
 
 - color scheme 은 CSS 변수만 정하고 variant 는 그 변수만 읽습니다. variant 4 개와 scheme 6 개의 조합마다 클래스를 따로 쓰지 않아도 모든 조합이 맞습니다.
 
-| 변수                | 쓰는 곳                                                                        |
-| ------------------- | ------------------------------------------------------------------------------ |
-| `--control-fill`    | solid 배경, soft 의 옅은 배경                                                  |
-| `--control-on-fill` | solid 배경 위의 글자                                                           |
-| `--control-accent`  | soft 글자. status scheme 은 옅은 배경에서도 읽히는 `-strong` 색                |
-| `--control-quiet`   | outline, ghost 글자. primary 와 neutral 은 `on-surface`, 나머지는 `-strong` 색 |
-| `--control-hover`   | outline, ghost 의 hover 배경. muted, 또는 status 색 10%                        |
-| `--control-ring`    | focus ring 과 focus 때의 테두리. neutral 도 primary                            |
+| 변수                | 쓰는 곳                                                                                      |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| `--control-fill`    | solid 배경, soft 의 옅은 배경                                                                |
+| `--control-on-fill` | solid 배경 위의 글자                                                                         |
+| `--control-accent`  | soft 글자. status scheme 은 옅은 배경에서도 읽히는 `-strong` 색                              |
+| `--control-quiet`   | outline, ghost 글자. primary 와 neutral 은 `on-surface`, 나머지는 `-strong` 색               |
+| `--control-hover`   | outline, ghost 의 hover 배경. `muted`, 또는 status 색 10%                                    |
+| `--control-press`   | outline, ghost 의 press 배경과 켜진 ghost, outline toggle. `muted-hover`, 또는 status 색 16% |
+| `--control-ring`    | focus ring 과 focus 때의 테두리. neutral 도 primary                                          |
 
+- outline 과 ghost 는 중립 상태 사다리를 따릅니다. hover 는 `--control-hover`, press 는 한 단계 진한 `--control-press` 입니다. solid 와 soft 는 브랜드 상태(`/90`, `/80`, `/15`, `/20`)라 사다리 밖입니다.
 - scheme 색은 solid 와 soft 만 씁니다. outline 과 ghost 는 primary 에서도 neutral 이고, 브랜드 색은 focus 에 남깁니다. shadcn/ui 가 primary 버튼 옆의 보조 버튼을 조용하게 두는 방식입니다.
-- `base` 에는 primary 의 변수를 담은 `fallbackScheme` 이 들어 있습니다. `colorScheme` 을 받지 않는 컴포넌트도 여섯 변수가 모두 정의돼야 하기 때문입니다. `colorScheme` 을 주면 `cn` 이 같은 변수의 뒤쪽 값만 남깁니다.
+- `base` 에는 primary 의 변수를 담은 `fallbackScheme` 이 들어 있습니다. `colorScheme` 을 받지 않는 컴포넌트도 일곱 변수가 모두 정의돼야 하기 때문입니다. `colorScheme` 을 주면 `cn` 이 같은 변수의 뒤쪽 값만 남깁니다.
 - `focus-ring` 은 ring 을 primary 로 칠합니다. `ringFollowsScheme` 이 cascade 에서 뒤에 와서 ring 과 focus 테두리를 `--control-ring` 으로 바꿉니다.
 - `trimBesideIconOrSpinner`: 라벨 옆의 아이콘은 그쪽 가장자리에 이미 시각적 무게를 더하므로, 아이콘이 있는 쪽의 padding 을 줄입니다. standard 는 `px-4` 에서 `ps-3`/`pe-3`, tiny 는 `px-3` 에서 `ps-2.5`/`pe-2.5` 입니다.
 - Spinner 도 svg 이고, Spinner 가 함께 그리는 `role="status"` span 과 `aria-hidden` 장식도 가장자리의 아이콘으로 칩니다. 그래서 로딩 중에 아이콘을 Spinner 로 바꿔도 라벨이 움직이지 않습니다.
@@ -146,7 +148,7 @@ export const Style = tv({
 ### 알아둘 것
 
 - 클래스는 모두 `cn('...')` 안의 리터럴입니다. 접두사와 크기를 조합해 만든 클래스는 Tailwind 가 생성하지 않고, 경고 없이 적용되지 않습니다. `trimBesideIconOrSpinner` 가 standard 와 tiny 를 따로 적는 이유입니다.
-- scheme 을 더하면 여섯 변수를 모두 정의합니다. 빠진 변수는 `fallbackScheme` 의 primary 값으로 남습니다.
+- scheme 을 더하면 일곱 변수를 모두 정의합니다. 빠진 변수는 `fallbackScheme` 의 primary 값으로 남습니다.
 - `schemes` 는 `satisfies Record<ControlColorScheme, string>` 이라 `ControlColorScheme` 과 `schemes` 중 한쪽만 고치면 타입 검사가 실패합니다.
 - 아이콘만 있는 컨트롤은 `size` 대신 `iconSquare.size` 를 씁니다. `size` 의 padding 과 trim 이 정사각형을 깹니다.
 
@@ -567,7 +569,8 @@ slots: {
 
 ### 왜 이렇게
 
-- 옵션 강조는 메뉴처럼 neutral muted 배경(`data-highlighted`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
+- 옵션 강조는 메뉴처럼 neutral hover 단계인 `muted` 배경(`data-highlighted`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
+- 옵션에는 누르는 상태가 없어 강조가 한 단계뿐입니다. Menu 에서 하위 메뉴가 열린 항목(`data-popup-open`)은 켜진 toggle 처럼 press 단계(`muted-hover`)라, 포인터가 하위 메뉴로 옮겨 가도 강조된 항목과 구별됩니다.
 - 옵션은 체크가 없어도 끝 padding(`pe-8`)을 비워 둡니다. 체크가 나타날 때 라벨이 밀리지 않습니다.
 - `list` 는 옵션의 스크롤 컨테이너입니다. 키보드 이동이 팝업이 아니라 이 목록을 스크롤합니다. `relative` 라 옵션의 offset parent 입니다(`offsetParentOfOptions`). field-popup 의 `revealPopupOption` 이 옵션 위치를 `offsetTop` 으로 읽습니다.
 - `listArea` 는 목록을 감싸는 `ScrollArea` 의 root 이고, `list` 는 `ScrollArea.Viewport asChild` 로 listbox 자신이 스크롤 요소가 됩니다. 옵션과 listbox 사이에 요소가 끼지 않아 위의 offset parent 와 `scrollTop` 이 그대로입니다.
@@ -861,13 +864,14 @@ export const Style = tv({
 
 | variant            | 켜짐(`data-pressed`)                                |
 | ------------------ | --------------------------------------------------- |
-| `ghost`, `outline` | neutral hover 배경(`--control-hover`)               |
+| `ghost`, `outline` | neutral press 배경(`--control-press`)               |
 | `soft`             | scheme 의 옅은 배경과 `--control-accent` 글자       |
 | `solid`            | scheme 배경과 `--control-on-fill` 글자, `shadow-xs` |
 
 - 색은 [control-surface.ts](#control-surfacets) 의 scheme 변수에서 옵니다.
 - 크기는 따로 두지 않습니다. 라벨이 있는 Toggle 은 Button 과 같은 padding 을 갖고, IconToggle 은 icon-square 로 정사각형이 됩니다.
 - hovered, active, pressed 를 각각 적습니다. `interactiveDataProps` 가 셋 중 하나만 붙이므로(pressed > active > hovered), 켜진 toggle 에 마우스를 올려도 켜진 모양이 유지됩니다.
+- 켜진 ghost, outline 과 누르는 동안(`data-active`)은 press 단계(`--control-press`)이고, hover(`--control-hover`)보다 한 단계 진합니다. 그래서 켜진 toggle 이 hover 한 꺼진 toggle 과 구별됩니다.
 
 ### 알아둘 것
 

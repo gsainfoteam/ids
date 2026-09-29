@@ -702,19 +702,28 @@ export namespace FileField {
       {
         appearance: 'dropzone',
         variant: 'outline',
-        class: { trigger: 'border-(--ids-color-border) hover:bg-(--ids-color-muted)/50' },
+        class: {
+          trigger:
+            'border-(--ids-color-border) hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)',
+        },
       },
       {
         appearance: 'dropzone',
         variant: 'soft',
         class: {
-          trigger: 'border-transparent bg-(--ids-color-muted) hover:bg-(--ids-color-muted)/70',
+          trigger: [
+            'border-transparent bg-(--ids-color-muted)',
+            'hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)',
+          ],
         },
       },
       {
         appearance: 'dropzone',
         variant: 'ghost',
-        class: { trigger: 'border-transparent hover:bg-(--ids-color-muted)/50' },
+        class: {
+          trigger:
+            'border-transparent hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)',
+        },
       },
     ],
     defaultVariants: { appearance: 'field', variant: 'outline', size: 'standard' },

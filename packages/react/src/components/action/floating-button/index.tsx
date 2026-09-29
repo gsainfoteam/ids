@@ -70,7 +70,7 @@ export namespace FloatingButton {
     ),
     outline: cn(
       'bg-(--ids-color-surface) text-(--control-quiet) inset-ring-1 inset-ring-(--ids-color-border)',
-      'data-hovered:bg-(--ids-color-muted) data-active:bg-(--ids-color-muted)',
+      'data-hovered:bg-(--ids-color-muted) data-active:bg-(--ids-color-muted-hover)',
     ),
   } satisfies Record<Variant, string>;
 
