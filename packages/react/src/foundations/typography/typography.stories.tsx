@@ -1,7 +1,11 @@
+import type { CSSProperties } from 'react';
+
 import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import composites from '../../../../core/tokens/semantic/typography.json';
+import primitives from '../../../../core/tokens/typography.json';
 import { cn } from '../../utils';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -100,6 +104,41 @@ const button = {
   tiny: { medium: cn('text-button-tiny') },
 };
 
+type TokenTree = { [key: string]: TokenTree | string | number | object };
+
+const compositeNames = (node: TokenTree, path: string[] = []): string[] =>
+  node.$type === 'typography'
+    ? [path.join('-')]
+    : Object.entries(node).flatMap(([key, child]) =>
+        typeof child === 'object' && child !== null
+          ? compositeNames(child as TokenTree, [...path, key])
+          : [],
+      );
+
+const compositeClasses = compositeNames(composites.text).map((name) => `text-${name}`);
+
+const primitiveTokens = Object.entries(primitives).flatMap(([category, tokens]) =>
+  Object.keys(tokens).map((name) => ({ category, variable: `--ids-${category}-${name}` })),
+);
+
+const primitiveSample = (category: string, value: string): CSSProperties =>
+  ({
+    'font-size': { fontSize: value },
+    'font-weight': { fontWeight: value },
+    'line-height': { lineHeight: value },
+    'letter-spacing': { letterSpacing: value },
+    'font-family': { fontFamily: value },
+    'font-size-adjust': { fontFamily: 'var(--ids-font-family-mono)', fontSizeAdjust: value },
+  })[category] ?? {};
+
+function readPrimitives(element: HTMLElement | null) {
+  for (const row of element?.querySelectorAll<HTMLElement>('[data-primitive]') ?? []) {
+    const output = row.querySelector('[data-resolved]');
+    if (output)
+      output.textContent = getComputedStyle(row).getPropertyValue(row.dataset.primitive!).trim();
+  }
+}
+
 const px = (value: string) => `${Math.round(parseFloat(value) * 10) / 10}`;
 
 function measure(element: HTMLElement | null) {
@@ -181,12 +220,54 @@ export const Scales: Story = {
   ),
   play: async ({ canvasElement }) => {
     const specimens = [...canvasElement.querySelectorAll<HTMLElement>('[data-style]')];
-    await expect(specimens).toHaveLength(44);
+    await expect(specimens.map((specimen) => specimen.dataset.style).sort()).toEqual(
+      [...compositeClasses].sort(),
+    );
     for (const specimen of specimens)
       await expect(specimen.querySelector('[data-spec]')?.textContent).toMatch(/^\d+(\.\d)?px/);
     const h1 = canvasElement.querySelector('[data-style="text-headline-h1-bold"] [data-sample]')!;
     await expect(getComputedStyle(h1).fontSize).toBe('48px');
     const b3 = canvasElement.querySelector('[data-style="text-body-b3-regular"] [data-sample]')!;
     await expect(getComputedStyle(b3).fontSize).toBe('14px');
+  },
+};
+
+export const Primitives: Story = {
+  render: () => (
+    <Showcase>
+      <Showcase.Section
+        title="원시값"
+        description="typography.json 의 크기, 굵기, 행간, 자간, 글꼴입니다. 텍스트 스타일이 이 값을 묶어 쓰므로 직접 쓸 일은 드뭅니다. 오른쪽 값은 --ids-* 변수에서 읽은 것입니다."
+      >
+        <div ref={readPrimitives} className="flex flex-col gap-2">
+          {primitiveTokens.map(({ category, variable }) => (
+            <div
+              key={variable}
+              data-primitive={variable}
+              className="grid grid-cols-[14rem_minmax(0,1fr)_6rem] items-center gap-4"
+            >
+              <code className="text-caption-c1-regular truncate font-mono">{variable}</code>
+              <code
+                data-resolved=""
+                className="text-caption-c1-regular truncate font-mono text-(--ids-color-on-muted)"
+              />
+              <span
+                className="text-body-b3-regular whitespace-nowrap"
+                style={primitiveSample(category, `var(${variable})`)}
+              >
+                가 Aa
+              </span>
+            </div>
+          ))}
+        </div>
+      </Showcase.Section>
+    </Showcase>
+  ),
+  play: async ({ canvasElement }) => {
+    const rows = [...canvasElement.querySelectorAll<HTMLElement>('[data-primitive]')];
+
+    await expect(rows).toHaveLength(primitiveTokens.length);
+    for (const row of rows)
+      await expect(row.querySelector('[data-resolved]')?.textContent).not.toBe('');
   },
 };

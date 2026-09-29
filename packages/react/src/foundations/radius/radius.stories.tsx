@@ -2,6 +2,7 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import tokens from '../../../../core/tokens/radius.json';
 import { Button } from '../../components/action/button';
 import { cn } from '../../utils';
 
@@ -18,16 +19,24 @@ type Story = StoryObj<typeof meta>;
 
 const surface = cn('bg-(--ids-color-muted)/60 inset-ring-1 inset-ring-(--ids-color-border)');
 
-function Measured({ className, label }: { className: string; label: string }) {
+const radii: { [token: string]: string } = Object.fromEntries(
+  Object.entries(tokens.radius).map(([token, { $value }]) => [token, $value]),
+);
+
+function Measured({ token, className }: { token: string; className: string }) {
+  const value = radii[token];
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div data-radius-token={token} className="flex flex-col items-center gap-2">
       <div
+        data-box=""
         className={cn(
           className,
           'size-16 bg-(--ids-color-primary)/15 inset-ring-1 inset-ring-(--ids-color-primary)/40',
         )}
       />
-      <span className="text-caption-c1-medium text-(--ids-color-on-muted)">{label}</span>
+      <span className="text-caption-c1-medium text-(--ids-color-on-muted)">
+        {token} · {value}
+      </span>
     </div>
   );
 }
@@ -40,10 +49,10 @@ export const Scale: Story = {
         description="컨트롤은 크기와 상관없이 standard(10px)를 씁니다. 24px 미만 표시 요소만 indicator를 씁니다. container(16px)는 여백이 있는 상자가 커질 수 있는 최대값입니다."
       >
         <Showcase.Row>
-          <Measured className="rounded-standard" label="standard · 10px" />
-          <Measured className="rounded-indicator" label="indicator · 4px" />
-          <Measured className="rounded-container" label="container · 16px" />
-          <Measured className="rounded-full" label="full" />
+          <Measured token="standard" className="rounded-standard" />
+          <Measured token="indicator" className="rounded-indicator" />
+          <Measured token="container" className="rounded-container" />
+          <Measured token="full" className="rounded-full" />
         </Showcase.Row>
         <Showcase.Row label="standard">
           <Button>저장</Button>
@@ -58,6 +67,15 @@ export const Scale: Story = {
       </Showcase.Section>
     </Showcase>
   ),
+  play: async ({ canvasElement }) => {
+    const boxes = [...canvasElement.querySelectorAll<HTMLElement>('[data-radius-token]')];
+
+    await expect(boxes.map((box) => box.dataset.radiusToken)).toEqual(Object.keys(radii));
+    for (const box of boxes)
+      await expect(getComputedStyle(box.querySelector('[data-box]')!).borderTopLeftRadius).toBe(
+        radii[box.dataset.radiusToken!],
+      );
+  },
 };
 
 export const Concentric: Story = {

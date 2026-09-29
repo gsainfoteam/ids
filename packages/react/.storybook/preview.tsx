@@ -1,5 +1,6 @@
 import { useGlobals } from 'storybook/preview-api';
 
+import enums from '../../core/tokens/enums.json';
 import { IdsProvider } from '../src/components/utility/ids-provider';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
@@ -47,7 +48,16 @@ const preview: Preview = {
         method: 'alphabetical',
         order: [
           'Foundations',
-          ['Color', 'Typography', 'Radius', 'InteractiveState'],
+          [
+            'Color',
+            'Palette',
+            'Typography',
+            'Spacing',
+            'Size',
+            'Radius',
+            'Motion',
+            'InteractiveState',
+          ],
           'Action',
           'Form',
           'Data',
@@ -68,7 +78,7 @@ const preview: Preview = {
       toolbar: {
         title: 'Color',
         icon: 'paintbrush',
-        items: ['blue', 'orange', 'green'],
+        items: enums.ids.color.values.$value,
         dynamicTitle: true,
       },
     },

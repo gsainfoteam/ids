@@ -101,4 +101,5 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 - 구조선과 테두리는 중립입니다. 테마 색은 주요 동작과 포커스에만 씁니다.
 - 색만으로 의미를 전하지 않습니다. 아이콘이나 글자를 함께 둡니다.
 - 대비는 Storybook `Foundations/Color` 의 Contrast에서 모드와 테마마다 확인합니다.
+- Tokens 스토리는 `semantic/*.json` 과 `enums.json` 을 읽어 그리므로 토큰이나 색을 더하면 저절로 나타납니다. 원시 단계는 [Palette](../palette/README.md) 에 있습니다.
 - `tests/tokens-contrast.test.ts` 가 17색 × 두 모드의 `on-primary` / `primary`, `on-secondary` / `secondary` 와 상태 짝이 4.5:1 을 넘는지 검사합니다.

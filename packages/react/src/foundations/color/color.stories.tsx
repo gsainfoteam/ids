@@ -2,6 +2,10 @@ import { expect } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import enums from '../../../../core/tokens/enums.json';
+import brandTokens from '../../../../core/tokens/semantic/blue.light.json';
+import neutralTokens from '../../../../core/tokens/semantic/neutral.light.json';
+import statusTokens from '../../../../core/tokens/semantic/status.light.json';
 import { IdsProvider, useTheme } from '../../components/utility/ids-provider';
 import { cn } from '../../utils';
 
@@ -17,54 +21,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const colors = [
-  'red',
-  'orange',
-  'amber',
-  'yellow',
-  'lime',
-  'green',
-  'emerald',
-  'teal',
-  'cyan',
-  'sky',
-  'blue',
-  'indigo',
-  'violet',
-  'purple',
-  'fuchsia',
-  'pink',
-  'rose',
-] as const satisfies readonly IdsColor[];
+const colors = enums.ids.color.values.$value as IdsColor[];
 const modes = ['light', 'dark'] as const;
 
-const brand = ['primary', 'on-primary', 'secondary', 'on-secondary', 'outline'] as const;
-const neutral = [
-  'surface',
-  'on-surface',
-  'muted',
-  'muted-hover',
-  'muted-active',
-  'on-muted',
-  'border',
-  'handle',
-  'handle-hover',
-  'handle-active',
-] as const;
-const status = [
-  'success',
-  'on-success',
-  'success-strong',
-  'warning',
-  'on-warning',
-  'warning-strong',
-  'danger',
-  'on-danger',
-  'danger-strong',
-  'info',
-  'on-info',
-  'info-strong',
-] as const;
+const brand = Object.keys(brandTokens.color);
+const neutral = Object.keys(neutralTokens.color);
+const status = Object.keys(statusTokens.color);
 
 const brandPairs = [
   ['primary', 'on-primary'],
@@ -115,7 +77,11 @@ const grade = (ratio: number) =>
 function readSwatch(element: HTMLElement | null) {
   const chip = element?.querySelector<HTMLElement>('[data-chip]');
   const output = element?.querySelector('[data-hex]');
-  if (chip && output) output.textContent = hex(getComputedStyle(chip).backgroundColor);
+  if (!chip || !output) return;
+
+  const style = getComputedStyle(chip);
+  const isDefined = style.getPropertyValue(`--ids-color-${element!.dataset.token}`).trim() !== '';
+  output.textContent = isDefined ? hex(style.backgroundColor) : '';
 }
 
 function Swatch({ token }: { token: string }) {
@@ -199,7 +165,8 @@ function TokenTable({ tokens }: { tokens: readonly string[] }) {
   );
 }
 
-const brandTokenRow = cn('grid grid-cols-[4.5rem_repeat(5,6.5rem)] items-center gap-x-4');
+const brandTokenRow = cn('grid items-center gap-x-4');
+const brandTokenColumns = { gridTemplateColumns: `4.5rem repeat(${brand.length}, 6.5rem)` };
 
 function BrandTokenTable() {
   return (
@@ -207,7 +174,7 @@ function BrandTokenTable() {
       {modes.map((mode) => (
         <IdsProvider key={mode} mode={mode} className={panel}>
           <div className="flex flex-col gap-2">
-            <div className={brandTokenRow}>
+            <div className={brandTokenRow} style={brandTokenColumns}>
               <span className={columnLabel}>{mode}</span>
               {brand.map((token) => (
                 <span key={token} className={columnLabel}>
@@ -217,7 +184,7 @@ function BrandTokenTable() {
             </div>
             {colors.map((color) => (
               <IdsProvider key={color} asChild color={color}>
-                <div className={brandTokenRow}>
+                <div className={brandTokenRow} style={brandTokenColumns}>
                   <span className="text-body-b3-regular">{color}</span>
                   {brand.map((token) => (
                     <Swatch key={token} token={token} />

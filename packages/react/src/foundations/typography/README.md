@@ -43,3 +43,5 @@
 - headline에 regular, caption에 bold는 없습니다. 없는 조합은 적용되지 않으니 표 안에서 고릅니다.
 - 크기를 조금 바꾸려고 `text-[17px]` 같은 값을 섞지 않습니다. 표의 단계에서 고릅니다.
 - Storybook `Foundations/Typography` 의 수치는 렌더된 글자에서 재므로 토큰과 어긋나지 않습니다.
+- Scales 스토리는 `semantic/typography.json` 의 스타일이 모두 그려졌는지 검사합니다. 스타일을 더하면 스토리의 표에도 클래스를 더합니다. Tailwind 는 소스에 글자 그대로 적힌 클래스만 만듭니다.
+- Primitives 스토리는 `typography.json` 의 크기, 굵기, 행간, 자간, 글꼴 원시값을 `--ids-*` 변수에서 읽어 보여 줍니다.
