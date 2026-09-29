@@ -441,6 +441,7 @@ const label = useIconLabel(
 - 컴포넌트 이름은 읽을 수 있는 말로 바꿉니다(`humanizeIconName`). `ChevronDownIcon` 은 "Chevron down", `XMarkIcon` 은 "X mark", tabler 의 `IconPlus` 는 "Plus" 입니다.
 - 함수 이름은 `UNMINIFIED_ICON_NAME`(`Icon` 으로 끝나는 PascalCase)에 맞을 때만 믿습니다. production minifier 는 함수 이름을 바꿉니다(Vite 기본 빌드에서 heroicons 의 `PlusIcon` 은 `jt` 같은 이름이 됩니다). 그래서 minify 된 빌드에서는 틀린 이름을 붙이는 대신 이름을 비워 둡니다.
 - `displayName` 은 문자열 리터럴이라 minify 뒤에도 남습니다(lucide 는 `'Plus'` 를 넣습니다).
+- 점이 든 `displayName` 은 아이콘 이름으로 쓰지 않습니다(`isIdsPartName`). IDS 파트는 Storybook 의 Show code 에 `<Avatar.Image>` 로 보이도록 `'Avatar.Image'` 같은 `displayName` 을 가집니다. 이 이름은 건너뛰고 함수 이름 규칙과 자식으로 넘어갑니다. 건너뛰지 않으면 `icon` 에 넣은 파트가 "Avatar.Image" 라는 이름을 붙입니다.
 - `forwardRef` 는 함수를 `render` 에, `memo` 는 감싼 컴포넌트를 `type` 에 둡니다. `componentName` 은 둘을 두 단계까지 따라갑니다(`forwardRefRender`, `memoWrapped`).
 - 함수 이름에서 얻은 이름은 개발 빌드에서는 되지만 minify 된 production 빌드에서는 조용히 사라집니다. 그래서 페이지에서 처음 한 번 경고합니다(`warnFunctionNameLabel`). 이름을 전혀 못 찾아도 개발 빌드에서 경고합니다.
 - `needsNoLabel`: 컨트롤이나 `asChild` 로 그리는 요소가 이미 이름(`aria-label`, `aria-labelledby`, `title`)을 가지면 찾지 않습니다. `icon` 이 `undefined` 면 지금은 아이콘만 있는 컨트롤이 아니라는 뜻(`notIconOnlyRightNow`)이라 찾지 않습니다.

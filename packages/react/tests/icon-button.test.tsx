@@ -2,7 +2,7 @@ import { forwardRef, memo, type ComponentProps } from 'react';
 
 import { ChevronDownIcon, PlusIcon, Squares2X2Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { renderToString } from 'react-dom/server';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 
 import { ButtonGroup, IconButton } from '../src';
@@ -42,6 +42,29 @@ test('a displayName is used through memo and forwardRef; a minified name is not'
   const Tabler = (props: ComponentProps<'svg'>) => <svg {...props} />;
   Tabler.displayName = 'IconSettings';
   expect(labelOf({ icon: <Tabler /> })).toBe('Settings');
+});
+
+test('an IDS part name (X.Part) is not an icon name; the lookup falls through', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  const Part = (props: ComponentProps<'span'>) => <span {...props} />;
+  Part.displayName = 'Avatar.Image';
+
+  expect(labelOf({ icon: <Part /> })).toBeNull();
+  expect(
+    labelOf({
+      icon: (
+        <Part>
+          <PlusIcon />
+        </Part>
+      ),
+    }),
+  ).toBe('Plus');
+
+  const screen = await render(<IconButton icon={<Part />} />);
+
+  await expect.element(screen.getByRole('button')).not.toHaveAttribute('aria-label');
+  expect(warn).toHaveBeenCalledWith(expect.stringMatching(/no accessible name could be found/));
+  warn.mockRestore();
 });
 
 test('the square carries the icon, a ghost variant and the group size', async () => {

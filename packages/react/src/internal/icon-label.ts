@@ -11,6 +11,14 @@ const UNMINIFIED_ICON_NAME = /^[A-Z][A-Za-z0-9]*Icon$/;
 
 type ComponentLike = { displayName?: unknown; name?: unknown; render?: unknown; type?: unknown };
 
+const isIdsPartName = (displayName: string) => displayName.includes('.');
+
+function iconDisplayName(component: ComponentLike) {
+  if (typeof component.displayName !== 'string') return undefined;
+  const displayName = component.displayName.trim();
+  return displayName === '' || isIdsPartName(displayName) ? undefined : displayName;
+}
+
 function componentName(
   type: unknown,
   depth = 0,
@@ -18,8 +26,8 @@ function componentName(
   if (depth > 2 || type == null || (typeof type !== 'function' && typeof type !== 'object'))
     return undefined;
   const component = type as ComponentLike;
-  if (typeof component.displayName === 'string' && component.displayName.trim() !== '')
-    return { name: component.displayName.trim(), source: 'displayName' };
+  const displayName = iconDisplayName(component);
+  if (displayName) return { name: displayName, source: 'displayName' };
   if (typeof component.name === 'string' && UNMINIFIED_ICON_NAME.test(component.name))
     return { name: component.name, source: 'function' };
   const forwardRefRender = component.render;
