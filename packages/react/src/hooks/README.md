@@ -40,11 +40,12 @@ useFormReset(rootRef, () => {
 - `value !== undefined` 면 제어입니다. `null` 은 제어된 빈 값입니다(RadioGroup, TimeField 의 빈 값).
 - 제어일 때 `setValue` 는 `onValueChange` 만 부릅니다. 화면은 부모가 `value` 를 바꿔야 바뀝니다.
 - 새 값이 지금 값과 같으면(`isEqual`, 깊은 비교) 아무것도 하지 않습니다(`sameEvenIfRebuilt`). Slider 와 그룹은 움직이거나 누를 때마다 배열이나 Set 을 새로 만드므로, 참조만 비교하면 바뀌지 않은 값도 바뀌었다고 알립니다.
+- 비교하는 "지금 값" 은 렌더된 `current` 가 아니라, 다음 렌더 전에 이미 알린 값이 있으면 그 값입니다(`reportedBeforeRender`). 한 편집이 두 길로 들어올 때 값을 두 번 알리지 않기 위해서입니다. Firefox 는 IME 로 친 글자를 compositionend 와 input 에서 차례로 알리고, NumberField 는 두 곳에서 모두 값을 정합니다. 렌더가 끝나거나(layout effect) 지금 하던 일(task)이 끝나면 이 기록을 지웁니다. 같은 입력이 한 task 안에서 두 번 들어온 것만 한 번으로 칩니다. 제어 컴포넌트의 부모가 값을 받아들이지 않아 렌더가 없어도, 다음 편집은 다시 알립니다(Select 의 바깥 누르기 뒤 Tab).
 - `{ silent: true }` 는 값만 바꾸고 `onValueChange` 를 부르지 않습니다. native 폼 reset 은 change 이벤트 없이 값을 되돌리므로, 기본값을 되돌리는 컴포넌트가 일어나지 않은 편집을 알리지 않게 합니다.
 
 ### 알아둘 것
 
-- updater 함수(`setValue((prev) => ...)`)는 React 의 state 큐가 아니라 이번 렌더의 `current` 로 계산됩니다. 한 이벤트에서 두 번 부르면 두 번째도 같은 `current` 를 봅니다.
+- updater 함수(`setValue((prev) => ...)`)는 React 의 state 큐가 아니라 이번 렌더 뒤에 알린 마지막 값(없으면 `current`)으로 계산됩니다. 한 이벤트에서 두 번 부르면 두 번째는 첫 번째 결과를 봅니다(`tests/use-controllable-state.test.tsx`).
 - 비제어일 때 `defaultValue` 는 첫 렌더에서만 읽습니다. 나중에 바뀐 `defaultValue` 는 reset 핸들러가 직접 넘길 때만 반영됩니다.
 - 폼 reset 으로 값을 되돌리는 컴포넌트는 모두 `silent` 로 부릅니다(Select 와 ChipField 포함). `tests/select.test.tsx` 와 `tests/chip-field.test.tsx` 가 reset 이 값을 알리지 않는지 확인합니다.
 

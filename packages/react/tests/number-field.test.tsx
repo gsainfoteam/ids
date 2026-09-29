@@ -631,12 +631,14 @@ test('Input values win over root values, but root and Input handlers both run', 
   await expect.element(input).toHaveAttribute('placeholder', 'input');
   await userEvent.fill(input, '4');
   node(input).blur();
-  expect(events).toEqual([
+  expect(events.filter((event) => typeof event === 'string')).toEqual([
     'root-change',
     'input-change',
-    ['root-value', 4],
     'root-blur',
     'input-blur',
+  ]);
+  expect(events.filter(Array.isArray), 'reported once, wherever the edit lands first').toEqual([
+    ['root-value', 4],
   ]);
 });
 
@@ -727,7 +729,8 @@ test('asChild merges Input and root props over the child and keeps the numeric m
   expect(node(input).name).toBe('');
   await expect.element(input).toHaveAttribute('data-number-field-input');
   await userEvent.fill(input, '3');
-  expect(events).toEqual(['child', ['root', 3]]);
+  expect(events.filter((event) => event === 'child')).toEqual(['child']);
+  expect(events.filter(Array.isArray)).toEqual([['root', 3]]);
   await expect.element(screen.getByRole('form')).toHaveFormValues({ amount: '3' });
 });
 
