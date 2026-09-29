@@ -128,10 +128,13 @@ test('a glossy toggle is quiet while off and takes the glossy layers once presse
   const screen = await render(
     <IdsProvider>
       <Toggle variant="glossy">굵게</Toggle>
+      <p>Elsewhere</p>
     </IdsProvider>,
   );
   const toggle = screen.getByRole('button', { name: '굵게' });
   await expect.element(toggle).toHaveAttribute('data-variant', 'glossy');
+  await userEvent.hover(screen.getByText('Elsewhere'));
+  await expect.element(toggle).not.toHaveAttribute('data-hovered');
   const element = toggle.element();
 
   expect(getComputedStyle(element).backgroundImage).toBe('none');

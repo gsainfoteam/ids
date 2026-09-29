@@ -202,13 +202,21 @@ test('toast.promise goes from loading to the settled message', async () => {
 
 test('hovering pauses the clock and expands the stack', async () => {
   const screen = await mount();
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  onTestFinished(() => {
+    vi.useRealTimers();
+  });
   toast('Hold me', { duration: 300 });
   const status = screen.getByRole('status');
   await userEvent.hover(status);
   await expect.element(page.elementLocator(regionOf())).toHaveAttribute('data-expanded');
-  await wait(500);
+  await expect.poll(() => vi.getTimerCount(), { message: 'the clock stops' }).toBe(0);
+  vi.advanceTimersByTime(500);
   await expect.element(status).toBeInTheDocument();
+
   await userEvent.hover(screen.getByRole('button', { name: 'page' }));
+  await expect.poll(() => vi.getTimerCount(), { message: 'the clock runs again' }).toBe(1);
+  vi.advanceTimersByTime(300);
   await expect.element(status).not.toBeInTheDocument();
 });
 
@@ -219,12 +227,17 @@ test('F6 and Alt+T move focus into the region and back, which pauses the clock',
   await userEvent.keyboard('{F6}');
   await expect.element(pageButton, { message: 'no toasts, no hotkey' }).toHaveFocus();
 
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  onTestFinished(() => {
+    vi.useRealTimers();
+  });
   toast('Focus me', { duration: 300 });
   const region = screen.getByRole('region', { name: '알림' });
   await expect.element(region).toHaveAttribute('aria-keyshortcuts', 'F6 Alt+T');
   await userEvent.keyboard('{F6}');
   await expect.element(region).toHaveFocus();
-  await wait(500);
+  await expect.poll(() => vi.getTimerCount(), { message: 'the clock stops' }).toBe(0);
+  vi.advanceTimersByTime(500);
   await expect.element(screen.getByRole('status')).toBeInTheDocument();
   await userEvent.keyboard('{Tab}');
   await expect.element(screen.getByRole('button', { name: '알림 닫기' })).toHaveFocus();

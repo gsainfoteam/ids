@@ -27,6 +27,18 @@ const frameOffset = (point: Point) => {
   return { x: frame.left + point.x * scale, y: frame.top + point.y * scale };
 };
 
+const FRAME_MS = 16;
+let inputClock = Date.now();
+
+const inputTimestamp = ({ startsGesture }: { startsGesture: boolean }) => {
+  inputClock = startsGesture ? Math.max(Date.now(), inputClock + FRAME_MS) : inputClock + FRAME_MS;
+  return inputClock / 1000;
+};
+
+const holdStill = (ms: number) => {
+  inputClock += ms;
+};
+
 async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', point: Point) {
   await cdp().send('Input.dispatchMouseEvent', {
     type,
@@ -34,6 +46,7 @@ async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', poin
     button: 'left',
     buttons: type === 'mouseReleased' ? 0 : 1,
     clickCount: 1,
+    timestamp: inputTimestamp({ startsGesture: type === 'mousePressed' }),
   });
 }
 
@@ -41,6 +54,7 @@ async function touch(type: 'touchStart' | 'touchMove' | 'touchEnd' | 'touchCance
   await cdp().send('Input.dispatchTouchEvent', {
     type,
     touchPoints: point ? [frameOffset(point)] : [],
+    timestamp: inputTimestamp({ startsGesture: type === 'touchStart' }),
   });
 }
 
@@ -51,7 +65,7 @@ async function mouseDrag(
 ) {
   await mouse('mousePressed', from);
   for (const point of path) await mouse('mouseMoved', point);
-  if (options.pauseBeforeRelease) await new Promise((resolve) => setTimeout(resolve, 150));
+  if (options.pauseBeforeRelease) holdStill(150);
   await mouse('mouseReleased', path.at(-1) ?? from);
 }
 
@@ -375,7 +389,7 @@ describe('dragging with a mouse', () => {
     await mouse('mouseMoved', { x: start.x, y: start.y + 55 });
     expect(translateY(sheetOf())).toBe(40);
     expect(sheetOf().hasAttribute('data-dragging')).toBe(true);
-    await new Promise((resolve) => setTimeout(resolve, 150));
+    holdStill(150);
     await mouse('mouseReleased', { x: start.x, y: start.y + 55 });
     await expect.poll(() => sheetOf().style.transform).toBe('');
     expect(sheetOf().hasAttribute('data-dragging')).toBe(false);
@@ -431,7 +445,7 @@ describe('dragging with a mouse', () => {
     expect(handle.hasAttribute('data-dragging')).toBe(true);
     expect(getComputedStyle(handle).backgroundColor).not.toBe(rest);
 
-    await new Promise((resolve) => setTimeout(resolve, 150));
+    holdStill(150);
     await mouse('mouseReleased', { x: start.x, y: start.y + 55 });
     await expect.poll(() => handle.hasAttribute('data-dragging')).toBe(false);
     await expect.element(sheetOf()).toBeVisible();
