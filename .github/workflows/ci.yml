@@ -38,6 +38,14 @@ jobs:
       - name: Check react ships type declarations
         run: test -f packages/react/dist/index.d.ts
 
+      - name: Build the Next.js, TanStack Start and Astro examples
+        run: pnpm examples:build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Check the examples server-render IDS
+        run: pnpm examples:check
+
       - name: Install Chromium for browser tests
         run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium
 

@@ -54,30 +54,224 @@ steps:
 
 Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환경변수로 넣는다.
 
-## 설정
+## 프레임워크별 설치
 
-CSS 엔트리포인트에서 import:
+모든 프레임워크에서 할 일은 세 가지다.
+
+- CSS 엔트리에서 `tailwindcss`, `@gsainfoteam/ids-css` 순서로 가져온다.
+- `@source` 로 `@gsainfoteam/ids-react` 의 `dist` 를 스캔하게 한다. Tailwind 는 `node_modules` 를 스스로 스캔하지 않아서, 이 줄이 없으면 컴포넌트의 클래스가 CSS 에 생기지 않는다. 경로는 그 CSS 파일에서 본 상대 경로다.
+- 앱 최상단을 `IdsProvider` 로 감싼다. `IdsProvider` 가 없으면 CSS 변수가 정의되지 않아 색이 보이지 않는다.
 
 ```css
-@import "@gsainfoteam/ids-css";
-@import "tailwindcss";
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../node_modules/@gsainfoteam/ids-react/dist';
 ```
 
-앱 최상단에 `IdsProvider` 추가:
+- 글꼴은 [`@gsainfoteam/ids-css` README](../css/README.md#폰트) 를 따른다.
+- Next.js, TanStack Start, Astro 설정은 `examples/` 의 앱과 같다. CI 가 세 앱을 빌드하고, 서버가 그린 HTML 에 IDS 가 들어 있는지와 CSS 에 IDS 클래스가 생겼는지 확인한다(`pnpm examples:check`).
+
+### Next.js (App Router)
+
+예제: [`examples/next-app-router`](../../examples/next-app-router)
+
+```bash
+npm install next react react-dom @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install -D tailwindcss @tailwindcss/postcss
+```
+
+```js
+// postcss.config.mjs
+export default {
+  plugins: { '@tailwindcss/postcss': {} },
+};
+```
+
+```css
+/* app/globals.css */
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../node_modules/@gsainfoteam/ids-react/dist';
+```
 
 ```tsx
+// app/layout.tsx
 import { IdsProvider } from '@gsainfoteam/ids-react';
 
-function App() {
+import './globals.css';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <IdsProvider color="blue" mode="light">
-      {/* 앱 전체 */}
-    </IdsProvider>
+    <html lang="ko">
+      <body>
+        <IdsProvider color="blue" mode="light">{children}</IdsProvider>
+      </body>
+    </html>
   );
 }
 ```
 
-`IdsProvider` 없이는 CSS 변수가 정의되지 않아 색상이 렌더링되지 않는다.
+- 페이지와 레이아웃은 서버 컴포넌트 그대로 둔다. `'use client'` 없이 `<Dialog.Trigger>`, `<Select.Item>`, `Button.Style()` 을 쓸 수 있다.
+- 이벤트 핸들러를 넘기는 곳만 클라이언트 컴포넌트로 뺀다. 예: `onClick={() => toast.success(...)}` 을 가진 버튼(`examples/next-app-router/app/toast-button.tsx`).
+
+```tsx
+// app/page.tsx: 서버 컴포넌트
+import { Button, Dialog } from '@gsainfoteam/ids-react';
+
+export default function Page() {
+  return (
+    <Dialog>
+      <Dialog.Trigger asChild>
+        <Button variant="outline">프로필 수정</Button>
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <Dialog.Title>프로필 수정</Dialog.Title>
+      </Dialog.Content>
+    </Dialog>
+  );
+}
+```
+
+### TanStack Start
+
+예제: [`examples/tanstack-start`](../../examples/tanstack-start)
+
+```bash
+npm install @tanstack/react-start @tanstack/react-router react react-dom @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install -D vite @vitejs/plugin-react tailwindcss @tailwindcss/vite
+```
+
+```ts
+// vite.config.ts
+import tailwindcss from '@tailwindcss/vite';
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  plugins: [tailwindcss(), tanstackStart(), react()],
+});
+```
+
+```css
+/* src/styles.css */
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../node_modules/@gsainfoteam/ids-react/dist';
+```
+
+```tsx
+// src/routes/__root.tsx
+import { IdsProvider } from '@gsainfoteam/ids-react';
+import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router';
+
+import styles from '../styles.css?url';
+
+export const Route = createRootRoute({
+  head: () => ({ links: [{ rel: 'stylesheet', href: styles }] }),
+  shellComponent: ({ children }) => (
+    <html lang="ko">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <IdsProvider color="blue" mode="light">{children}</IdsProvider>
+        <Scripts />
+      </body>
+    </html>
+  ),
+});
+```
+
+- 라우트는 서버에서 그린 뒤 hydrate 된다. 컴포넌트를 평소처럼 쓰면 된다.
+
+### Astro
+
+예제: [`examples/astro`](../../examples/astro)
+
+```bash
+npm install astro @astrojs/react react react-dom @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install -D tailwindcss @tailwindcss/vite
+```
+
+```js
+// astro.config.mjs
+import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  integrations: [react()],
+  vite: { plugins: [tailwindcss()] },
+});
+```
+
+```css
+/* src/styles/global.css */
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../../node_modules/@gsainfoteam/ids-react/dist';
+```
+
+```astro
+---
+// src/pages/index.astro
+import { Button, IdsProvider } from '@gsainfoteam/ids-react';
+import { Demo } from '../components/demo';
+import '../styles/global.css';
+---
+<IdsProvider color="blue" mode="light">
+  <Button variant="outline">정적 버튼</Button>
+</IdsProvider>
+<Demo client:load />
+```
+
+- 움직이는 부분(Dialog, Select, Menu, toast)은 `client:load` 같은 지시어를 단 React island 에 둔다.
+- island 는 저마다 따로 React 루트라서, `IdsProvider` 도 island 안에 둔다. 바깥의 `IdsProvider` 는 island 에 닿지 않는다.
+- 지시어 없는 React 컴포넌트는 빌드 때 HTML 만 그린다. 보이기만 하는 버튼, 배지에 쓴다.
+
+### Vite (SPA)
+
+```bash
+npm install react react-dom @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install -D vite @vitejs/plugin-react tailwindcss @tailwindcss/vite
+```
+
+```ts
+// vite.config.ts
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+export default defineConfig({ plugins: [tailwindcss(), react()] });
+```
+
+```css
+/* src/index.css */
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../node_modules/@gsainfoteam/ids-react/dist';
+```
+
+```tsx
+// src/main.tsx
+import { IdsProvider } from '@gsainfoteam/ids-react';
+import { createRoot } from 'react-dom/client';
+
+import { App } from './app';
+import './index.css';
+
+createRoot(document.getElementById('root')!).render(
+  <IdsProvider color="blue" mode="light">
+    <App />
+  </IdsProvider>,
+);
+```
 
 ## IdsProvider
 

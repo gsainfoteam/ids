@@ -3,3 +3,4 @@ packages:
   - 'packages/css'
   - 'packages/react'
   - 'packages/flutter'
+  - 'examples/*'

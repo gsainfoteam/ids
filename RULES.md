@@ -10,7 +10,13 @@ packages/
   css/      @gsainfoteam/ids-css GitHub Packages npm package. CSS variables + Tailwind @theme.
   react/    @gsainfoteam/ids-react GitHub Packages npm package. React components + IdsProvider.
   flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + ThemeProvider.
+examples/
+  next-app-router/  tanstack-start/  astro/   private apps that install IDS the way a consumer does.
 ```
+
+The examples are the install guide the React README points to. CI builds them and
+`scripts/check-examples.mjs` checks that the server-rendered HTML holds IDS markup and that the
+stylesheet holds a class only `@source` on `ids-react/dist` produces. Changesets ignores them.
 
 ## Generated files — do not edit manually
 
@@ -30,6 +36,8 @@ pnpm build            # Build all packages (turbo, css before react)
 pnpm typecheck        # TypeScript check all packages
 pnpm lint             # ESLint all packages
 pnpm test             # Build, then Vitest: browser tests, every story's play, dist checks
+pnpm examples:build   # Build the Next.js, TanStack Start and Astro examples
+pnpm examples:check   # Check their server-rendered HTML and CSS for IDS
 pnpm storybook        # Storybook for ids-react (port 6006)
 ```
 

@@ -35,7 +35,7 @@ mise install   # .mise.toml에 명시된 Flutter 버전 설치
 
 PR을 열면 자동으로 아래 체크가 실행된다.
 
-- **JS**: `pnpm codegen` → 생성 파일 동기화 확인 → `typecheck` → `lint` → `build`
+- **JS**: `pnpm codegen` → 생성 파일 동기화 확인 → `typecheck` → `lint` → `build` → 예제 앱 빌드(`examples:build`) → 예제가 서버에서 IDS 를 그렸는지 확인(`examples:check`) → `test`
 - **Flutter**: `flutter test`
 
 토큰 파일(`packages/core/tokens/`)을 수정했는데 `pnpm codegen`을 실행하지 않으면 CI가 실패한다.
@@ -157,10 +157,12 @@ graph LR
 ## 자주 쓰는 명령어
 
 ```bash
-pnpm codegen      # 토큰 → css / react / flutter 생성
-pnpm build        # 전체 빌드 (turbo, css → react 순서 자동)
-pnpm typecheck    # TypeScript 검사
-pnpm lint         # ESLint
-pnpm storybook    # Storybook (포트 6006)
-pnpm changeset    # 변경 내용 기록
+pnpm codegen         # 토큰 → css / react / flutter 생성
+pnpm build           # 패키지 빌드 (turbo, css → react 순서 자동)
+pnpm examples:build  # examples/ 의 Next.js, TanStack Start, Astro 앱 빌드
+pnpm examples:check  # 예제 빌드 결과에 서버에서 그린 IDS 가 있는지 확인
+pnpm typecheck       # TypeScript 검사
+pnpm lint            # ESLint
+pnpm storybook       # Storybook (포트 6006)
+pnpm changeset       # 변경 내용 기록
 ```

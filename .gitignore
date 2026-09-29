@@ -6,6 +6,11 @@ node_modules/
 dist/
 !packages/css/dist/
 storybook-static/
+.next/
+next-env.d.ts
+.output/
+.astro/
+.tanstack/
 
 # Turbo
 .turbo/

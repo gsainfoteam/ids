@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../node_modules/@gsainfoteam/ids-react/dist';

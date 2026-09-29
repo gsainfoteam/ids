@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "./dev.sh",
-    "build": "turbo run build",
+    "build": "turbo run build --filter=./packages/*",
+    "examples:build": "turbo run build --filter=./examples/*",
+    "examples:check": "node scripts/check-examples.mjs",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
