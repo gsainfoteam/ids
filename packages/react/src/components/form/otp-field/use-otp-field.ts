@@ -47,6 +47,18 @@ export type UseOTPFieldOptions = {
   ref?: Ref<HTMLInputElement>;
 };
 
+type CaretRange = { start: number; end: number };
+
+function undoSafarisSelectAllOnFocus(input: HTMLInputElement, chosen: CaretRange | null) {
+  if (!chosen || chosen.start === 0) return false;
+  const stillFocused = input.ownerDocument.activeElement === input;
+  const everythingSelected =
+    input.selectionStart === 0 && input.selectionEnd === input.value.length;
+  if (!stillFocused || !everythingSelected) return false;
+  input.setSelectionRange(chosen.start, chosen.end);
+  return true;
+}
+
 function tryInsertKeepingUndo(input: HTMLInputElement, start: number, end: number, text: string) {
   input.setSelectionRange(start, end);
   return (
@@ -78,6 +90,7 @@ export function useOTPField({
 
   const [composition, setComposition] = useState<string | null>(null);
   const composing = useRef(false);
+  const selectionTheFocusChose = useRef<CaretRange | null>(null);
 
   const [focused, setFocused] = useState(false);
   const [selection, setSelection] = useState<SelectionHistory | null>(null);
@@ -143,16 +156,18 @@ export function useOTPField({
   useEffect(() => {
     const input = inputRef.current;
     if (!input) return;
-    const filterWithCaretInPlace = (event: InputEvent) => {
+    const insertWhereTheCaretBelongs = (event: InputEvent) => {
+      const caretWasPutBack = undoSafarisSelectAllOnFocus(input, selectionTheFocusChose.current);
+      selectionTheFocusChose.current = null;
       if (event.inputType !== 'insertText' || !event.data || event.isComposing) return;
       const accepted = sanitize(event.data, accepts);
-      if (accepted === event.data) return;
+      if (accepted === event.data && !caretWasPutBack) return;
       event.preventDefault();
       if (accepted)
         tryInsertKeepingUndo(input, input.selectionStart ?? 0, input.selectionEnd ?? 0, accepted);
     };
-    input.addEventListener('beforeinput', filterWithCaretInPlace);
-    return () => input.removeEventListener('beforeinput', filterWithCaretInPlace);
+    input.addEventListener('beforeinput', insertWhereTheCaretBelongs);
+    return () => input.removeEventListener('beforeinput', insertWhereTheCaretBelongs);
   }, [accepts]);
 
   const committedCode = useRef(code);
@@ -280,6 +295,11 @@ export function useOTPField({
     const nextSlot = Math.min(valueLength, length - 1);
     previousSelection.current = null;
     input.setSelectionRange(nextSlot, valueLength);
+    selectionTheFocusChose.current = { start: nextSlot, end: valueLength };
+    requestAnimationFrame(() => {
+      undoSafarisSelectAllOnFocus(input, selectionTheFocusChose.current);
+      selectionTheFocusChose.current = null;
+    });
   };
 
   const onBlur = () => {
