@@ -84,6 +84,15 @@ export { AspectRatio } from './components/layout/aspect-ratio';
 export { ScrollArea } from './components/layout/scroll-area';
 
 export { Breadcrumb } from './components/navigation/breadcrumb';
+export { Tabs } from './components/navigation/tabs';
+export type {
+  TabsProps,
+  TabsState,
+  TabsRenderProps,
+  TabsAppearance,
+  TabsOrientation,
+  TabsActivationMode,
+} from './components/navigation/tabs';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';

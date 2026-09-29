@@ -534,7 +534,7 @@ export const iconButtonStyle = tv({
 
 ### 쓰는 곳
 
-- 위젯의 키: Group 의 roving focus, RadioGroup, Rating, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape
+- 위젯의 키: Group 의 roving focus(ToggleGroup, Tabs), RadioGroup, Rating, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape
 - [pressable.ts](#pressablets) 와 Button 의 Enter, Space
 - [text-control](./text-control/README.md) 의 Escape, [temporal-field](./temporal-field/README.md) 의 입력과 trigger
 - [overlay](./overlay/README.md) 의 레이어 스택: `keyWithModifiers('Escape')`, `isComposingKey`

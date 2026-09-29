@@ -25,6 +25,7 @@ type Options = {
   loop: boolean;
   radio: boolean;
   checked: string | null;
+  anyArrow?: boolean;
   onArrive?: (element: HTMLElement) => void;
 };
 
@@ -61,6 +62,7 @@ export function useRovingFocus({
   loop,
   radio,
   checked,
+  anyArrow = radio,
   onArrive,
 }: Options) {
   const [items, setItems] = useState<RovingItem[] | null>(null);
@@ -100,9 +102,7 @@ export function useRovingFocus({
       onArrive?.(target);
     };
 
-    const keys = mapValues(rovingKeys({ orientation, anyArrow: radio }), (move) =>
-      moveFocus(move!),
-    );
+    const keys = mapValues(rovingKeys({ orientation, anyArrow }), (move) => moveFocus(move!));
     keyHandler(keys, { dir: isRtl(root) ? 'rtl' : 'ltr' })(event);
   };
 

@@ -146,6 +146,7 @@
 | 컴포넌트 | APG 패턴 | 키보드 | 역할과 ARIA | 알려진 한계 |
 | --- | --- | --- | --- | --- |
 | Breadcrumb | [Breadcrumb](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/) | 링크마다 Tab 이 멈춘다. 접힌 항목은 Menu 와 같다(`Enter` `Space` `↓` 열기, `↑` `↓`, `Escape`) | `nav` 랜드마크("이동 경로") 안의 `ol` `li`. 현재 페이지는 `aria-current="page"`, 구분자는 `aria-hidden`. 접기 버튼은 "숨은 경로 보기" + `aria-haspopup="menu"`, 접힌 링크는 `menuitem` | 한 페이지에 둘 이상 두면 `aria-label` 로 이름을 나눠야 한다. 구분자 자동 삽입은 `Breadcrumb` 이나 `Breadcrumb.List` 의 바로 아래 Item 만 센다 |
+| Tabs | [Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) | 탭 목록 전체가 Tab 한 칸이고 고른 탭에 멈춘다. `←` `→`(세로면 `↑` `↓`), `Home` `End`, 끝에서 처음으로 돈다. `automatic`(기본)은 옮기면 고르고, `manual` 은 `Enter` `Space` 로 고른다. 다음 Tab 은 내용(`tabpanel`)으로 | `tablist` + `aria-orientation`, 탭은 `tab` + `aria-selected` `aria-controls`, 내용은 `tabpanel` + `aria-labelledby` + `tabIndex=0`. 비활성 탭은 native `disabled` | 비활성 탭은 포커스를 받지 않고 건너뛴다(APG 는 포커스를 허용). 탭이 넘쳐도 목록이 스크롤하지 않는다. 목록 이름(`aria-label`)은 앱이 준다 |
 
 ### overlay
 
@@ -224,6 +225,7 @@
 | 점검 항목 | 기대 결과 | VO + Safari (macOS) | VO + Safari (iOS) | NVDA + Firefox | TalkBack + Chrome |
 | --- | --- | --- | --- | --- | --- |
 | Accordion | 헤더가 "펼침 / 접힘" 을 읽고 내용이 영역으로 읽힌다 |  |  |  |  |
+| Tabs | "탭, N 중 M, 선택됨" 을 읽고, 방향키로 옮기면 새 탭 이름을 읽는다. 내용은 탭 이름을 가진 탭 패널로 읽힌다 |  |  |  |  |
 | Calendar | 달을 바꾸면 새 달 이름을 읽는다 |  |  |  |  |
 | TimePicker | 컬럼마다 이름과 선택된 값을 읽는다 |  |  |  |  |
 | Card, Item (누르는 행) | 제목이 버튼으로 읽히고 설명이 뒤따른다. 카드 안의 다른 버튼에도 따로 갈 수 있다 |  |  |  |  |
