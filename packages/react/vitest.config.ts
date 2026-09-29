@@ -7,12 +7,16 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import { configDefaults, defineConfig } from 'vitest/config';
 
 const TESTS = new URL('./tests/', import.meta.url);
+const SERVER_RENDER_SUITES = 'tests/**/*.ssr.test.tsx';
 const usesTheSharedClipboard = (file: string) =>
   /userEvent\.(copy|cut|paste)\(|navigator\.clipboard/.test(
     readFileSync(new URL(file, TESTS), 'utf8'),
   );
 const clipboardSuites = readdirSync(TESTS)
-  .filter((file) => file.endsWith('.test.tsx') && usesTheSharedClipboard(file))
+  .filter(
+    (file) =>
+      file.endsWith('.test.tsx') && !file.endsWith('.ssr.test.tsx') && usesTheSharedClipboard(file),
+  )
   .map((file) => `tests/${file}`);
 
 const chromium = () => ({
@@ -32,7 +36,7 @@ export default defineConfig({
         test: {
           name: 'browser',
           include: ['tests/**/*.test.tsx'],
-          exclude: [...configDefaults.exclude, ...clipboardSuites],
+          exclude: [...configDefaults.exclude, ...clipboardSuites, SERVER_RENDER_SUITES],
           setupFiles: ['tests/setup.ts'],
           browser: chromium(),
         },
@@ -45,6 +49,14 @@ export default defineConfig({
           setupFiles: ['tests/setup.ts'],
           fileParallelism: false,
           browser: chromium(),
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'ssr',
+          include: [SERVER_RENDER_SUITES],
+          environment: 'node',
         },
       },
       {

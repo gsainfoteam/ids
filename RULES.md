@@ -35,7 +35,7 @@ pnpm codegen          # Run Style Dictionary: core → css/react/flutter
 pnpm build            # Build all packages (turbo, css before react)
 pnpm typecheck        # TypeScript check all packages
 pnpm lint             # ESLint all packages
-pnpm test             # Build, then Vitest: browser tests, every story's play, dist checks
+pnpm test             # Build, then Vitest: browser tests, every story's play, SSR and hydration of every story, dist checks
 pnpm examples:build   # Build the Next.js, TanStack Start and Astro examples
 pnpm examples:check   # Check their server-rendered HTML and CSS for IDS
 pnpm storybook        # Storybook for ids-react (port 6006)
@@ -456,16 +456,21 @@ Dialog, Drawer, Popover, Menu, Tooltip, Toast and the field popups are all assem
 
 ## Tests
 
-`pnpm test` builds the packages, then runs Vitest in `packages/react` (`vitest.config.ts`) as three
+`pnpm test` builds the packages, then runs Vitest in `packages/react` (`vitest.config.ts`) as four
 projects:
 
 - `browser`: `tests/**/*.test.tsx` render from `src` in headless Chromium through Playwright, with
   Tailwind and the IDS CSS loaded and reduced motion on. `tests/stories.test.tsx` renders every
   story and runs its `play` through portable stories (`composeStories` + `run()`); a story tagged
-  `'!test'` is skipped.
+  `'!test'` is skipped. `tests/hydration.test.tsx` renders every story with `renderToString`,
+  hydrates that HTML with `hydrateRoot` and fails on a recoverable error or any `console.error`.
 - `clipboard`: the browser files that call `userEvent.copy` / `cut` / `paste` or
   `navigator.clipboard`, one file at a time. Every browser context shares one system clipboard, so
   two such files in parallel paste each other's text. The config finds them by those calls.
+- `ssr`: `tests/**/*.ssr.test.tsx` run in Node with no DOM. `tests/stories.ssr.test.tsx` renders
+  every story with `renderToString` and fails on a throw or any `console.error` / `console.warn`,
+  so a module that touches `window` or `document` at import or during render fails here. Code that
+  needs the DOM runs in effects and handlers. No story is skipped.
 - `node`: `tests/**/*.test.ts` check the built `dist`, such as the entry points loading without
   the optional form peers.
 
