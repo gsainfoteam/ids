@@ -131,26 +131,25 @@ export const Selectable: Story = {
   },
 };
 
-function TagList() {
-  const [tags, setTags] = useState(['frontend', 'react', 'design']);
-  return (
-    <div className="flex flex-col items-start gap-3">
-      <ul className="flex flex-wrap gap-2" aria-label="태그">
-        {tags.map((tag) => (
-          <li key={tag}>
-            <Chip onRemove={() => setTags((prev) => prev.filter((item) => item !== tag))}>
-              {tag}
-            </Chip>
-          </li>
-        ))}
-      </ul>
-      <output aria-label="남은 태그">{tags.join(',')}</output>
-    </div>
-  );
-}
-
 export const Removable: Story = {
-  render: () => <TagList />,
+  render: function Render() {
+    const [tags, setTags] = useState(['frontend', 'react', 'design']);
+
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <ul className="flex flex-wrap gap-2" aria-label="태그">
+          {tags.map((tag) => (
+            <li key={tag}>
+              <Chip onRemove={() => setTags((prev) => prev.filter((item) => item !== tag))}>
+                {tag}
+              </Chip>
+            </li>
+          ))}
+        </ul>
+        <output aria-label="남은 태그">{tags.join(',')}</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -174,34 +173,33 @@ export const Removable: Story = {
   },
 };
 
-function FilterList() {
-  const [filters, setFilters] = useState([
-    { id: 'open', label: '열림', on: true },
-    { id: 'mine', label: '내 것', on: false },
-  ]);
-  return (
-    <div className="flex gap-2">
-      {filters.map((filter) => (
-        <Chip
-          key={filter.id}
-          colorScheme="primary"
-          selected={filter.on}
-          onSelectedChange={(on) =>
-            setFilters((prev) =>
-              prev.map((item) => (item.id === filter.id ? { ...item, on } : item)),
-            )
-          }
-          onRemove={() => setFilters((prev) => prev.filter((item) => item.id !== filter.id))}
-        >
-          {filter.label}
-        </Chip>
-      ))}
-    </div>
-  );
-}
-
 export const SelectableAndRemovable: Story = {
-  render: () => <FilterList />,
+  render: function Render() {
+    const [filters, setFilters] = useState([
+      { id: 'open', label: '열림', on: true },
+      { id: 'mine', label: '내 것', on: false },
+    ]);
+
+    return (
+      <div className="flex gap-2">
+        {filters.map((filter) => (
+          <Chip
+            key={filter.id}
+            colorScheme="primary"
+            selected={filter.on}
+            onSelectedChange={(on) =>
+              setFilters((prev) =>
+                prev.map((item) => (item.id === filter.id ? { ...item, on } : item)),
+              )
+            }
+            onRemove={() => setFilters((prev) => prev.filter((item) => item.id !== filter.id))}
+          >
+            {filter.label}
+          </Chip>
+        ))}
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

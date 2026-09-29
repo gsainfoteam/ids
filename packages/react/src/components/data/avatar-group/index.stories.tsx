@@ -24,11 +24,6 @@ const MEMBERS = [
   { name: 'Eve Choi' },
 ];
 
-const people = (count = MEMBERS.length) =>
-  MEMBERS.slice(0, count).map((member) => (
-    <Avatar key={member.name} src={member.src} name={member.name} />
-  ));
-
 const meta = {
   title: 'Data/AvatarGroup',
   component: AvatarGroup,
@@ -49,7 +44,13 @@ const meta = {
     size: 'standard',
     shape: 'circle',
   },
-  render: (args) => <AvatarGroup {...args}>{people()}</AvatarGroup>,
+  render: (args) => (
+    <AvatarGroup {...args}>
+      {MEMBERS.map((member) => (
+        <Avatar key={member.name} src={member.src} name={member.name} />
+      ))}
+    </AvatarGroup>
+  ),
 } satisfies Meta<typeof AvatarGroup>;
 
 export default meta;
@@ -66,7 +67,9 @@ export const Gallery: Story = {
           columns={layouts}
           render={(size, layout) => (
             <AvatarGroup layout={layout} size={size} max={3} aria-label={`${layout} ${size}`}>
-              {people()}
+              {MEMBERS.map((member) => (
+                <Avatar key={member.name} src={member.src} name={member.name} />
+              ))}
             </AvatarGroup>
           )}
         />
@@ -74,28 +77,42 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Stacking" description="어느 쪽 아바타가 위에 오는지 정합니다.">
         <Showcase.Row label="first-on-top">
-          <AvatarGroup aria-label="first-on-top">{people(4)}</AvatarGroup>
+          <AvatarGroup aria-label="first-on-top">
+            {MEMBERS.slice(0, 4).map((member) => (
+              <Avatar key={member.name} src={member.src} name={member.name} />
+            ))}
+          </AvatarGroup>
         </Showcase.Row>
         <Showcase.Row label="last-on-top">
           <AvatarGroup stacking="last-on-top" aria-label="last-on-top">
-            {people(4)}
+            {MEMBERS.slice(0, 4).map((member) => (
+              <Avatar key={member.name} src={member.src} name={member.name} />
+            ))}
           </AvatarGroup>
         </Showcase.Row>
         <Showcase.Row label="square">
           <AvatarGroup shape="square" aria-label="square">
-            {people(4)}
+            {MEMBERS.slice(0, 4).map((member) => (
+              <Avatar key={member.name} src={member.src} name={member.name} />
+            ))}
           </AvatarGroup>
           <AvatarGroup shape="square" size="tiny" aria-label="square tiny">
-            {people(4)}
+            {MEMBERS.slice(0, 4).map((member) => (
+              <Avatar key={member.name} src={member.src} name={member.name} />
+            ))}
           </AvatarGroup>
         </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl" className="flex gap-6">
             <AvatarGroup max={3} aria-label="rtl">
-              {people()}
+              {MEMBERS.map((member) => (
+                <Avatar key={member.name} src={member.src} name={member.name} />
+              ))}
             </AvatarGroup>
             <AvatarGroup shape="square" stacking="last-on-top" aria-label="rtl square">
-              {people(3)}
+              {MEMBERS.slice(0, 3).map((member) => (
+                <Avatar key={member.name} src={member.src} name={member.name} />
+              ))}
             </AvatarGroup>
           </div>
         </Showcase.Row>
@@ -108,21 +125,27 @@ export const Gallery: Story = {
         <Showcase.Row label="muted">
           <div className="rounded-standard bg-(--ids-color-muted) p-3">
             <AvatarGroup max={4} aria-label="muted">
-              {people()}
+              {MEMBERS.map((member) => (
+                <Avatar key={member.name} src={member.src} name={member.name} />
+              ))}
             </AvatarGroup>
           </div>
         </Showcase.Row>
         <Showcase.Row label="primary">
           <div className="rounded-standard bg-(--ids-color-primary) p-3">
             <AvatarGroup max={4} aria-label="primary">
-              {people()}
+              {MEMBERS.map((member) => (
+                <Avatar key={member.name} src={member.src} name={member.name} />
+              ))}
             </AvatarGroup>
           </div>
         </Showcase.Row>
         <Showcase.Row label="gradient">
           <div className="rounded-standard bg-linear-to-r from-fuchsia-500 via-amber-300 to-emerald-400 p-3">
             <AvatarGroup max={4} aria-label="gradient">
-              {people()}
+              {MEMBERS.map((member) => (
+                <Avatar key={member.name} src={member.src} name={member.name} />
+              ))}
             </AvatarGroup>
           </div>
         </Showcase.Row>
@@ -131,12 +154,16 @@ export const Gallery: Story = {
       <Showcase.Section title="Overflow">
         <Showcase.Row label="max 2">
           <AvatarGroup max={2} aria-label="max 2">
-            {people()}
+            {MEMBERS.map((member) => (
+              <Avatar key={member.name} src={member.src} name={member.name} />
+            ))}
           </AvatarGroup>
         </Showcase.Row>
         <Showcase.Row label="total 128">
           <AvatarGroup total={128} aria-label="total 128">
-            {people(3)}
+            {MEMBERS.slice(0, 3).map((member) => (
+              <Avatar key={member.name} src={member.src} name={member.name} />
+            ))}
           </AvatarGroup>
         </Showcase.Row>
         <Showcase.Row label="custom">
@@ -144,7 +171,9 @@ export const Gallery: Story = {
             <AvatarGroup.Overflow className="bg-(--ids-color-primary) text-(--ids-color-on-primary)">
               {({ count }) => `${count}+`}
             </AvatarGroup.Overflow>
-            {people()}
+            {MEMBERS.map((member) => (
+              <Avatar key={member.name} src={member.src} name={member.name} />
+            ))}
           </AvatarGroup>
         </Showcase.Row>
       </Showcase.Section>
@@ -175,7 +204,13 @@ export const Overflow: Story = {
 
 export const Total: Story = {
   args: { max: undefined, total: 128 },
-  render: (args) => <AvatarGroup {...args}>{people(3)}</AvatarGroup>,
+  render: (args) => (
+    <AvatarGroup {...args}>
+      {MEMBERS.slice(0, 3).map((member) => (
+        <Avatar key={member.name} src={member.src} name={member.name} />
+      ))}
+    </AvatarGroup>
+  ),
   parameters: {
     docs: {
       description: {
@@ -245,7 +280,9 @@ export const CustomOverflow: Story = {
   render: () => (
     <AvatarGroup max={2} overflowLabel={(count) => `and ${count} more`} aria-label="Reviewers">
       <AvatarGroup.Overflow>{({ count }) => `${count}+`}</AvatarGroup.Overflow>
-      {people()}
+      {MEMBERS.map((member) => (
+        <Avatar key={member.name} src={member.src} name={member.name} />
+      ))}
     </AvatarGroup>
   ),
   parameters: {

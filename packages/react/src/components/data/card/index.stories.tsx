@@ -52,23 +52,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-function ProductCard(props: Partial<Card.Props>) {
-  return (
-    <Card {...props} className="w-64">
-      <Card.Media className="aspect-video">
-        <img src={PHOTO} alt="" />
-      </Card.Media>
-      <Card.Header>
-        <Card.Title>산책로 사진집</Card.Title>
-        <Card.Description>₩24,000</Card.Description>
-      </Card.Header>
-      <Card.Footer>
-        <Button className="w-full">장바구니</Button>
-      </Card.Footer>
-    </Card>
-  );
-}
-
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -104,8 +87,30 @@ export const Gallery: Story = {
         description="Card.Media는 가장자리까지 채우고, 닿는 모서리는 카드의 둥근 모서리를 따릅니다. outline의 테두리는 가리지 않습니다."
       >
         <Showcase.Row label="first">
-          <ProductCard />
-          <ProductCard variant="soft" />
+          <Card className="w-64">
+            <Card.Media className="aspect-video">
+              <img src={PHOTO} alt="" />
+            </Card.Media>
+            <Card.Header>
+              <Card.Title>산책로 사진집</Card.Title>
+              <Card.Description>₩24,000</Card.Description>
+            </Card.Header>
+            <Card.Footer>
+              <Button className="w-full">장바구니</Button>
+            </Card.Footer>
+          </Card>
+          <Card variant="soft" className="w-64">
+            <Card.Media className="aspect-video">
+              <img src={PHOTO} alt="" />
+            </Card.Media>
+            <Card.Header>
+              <Card.Title>산책로 사진집</Card.Title>
+              <Card.Description>₩24,000</Card.Description>
+            </Card.Header>
+            <Card.Footer>
+              <Button className="w-full">장바구니</Button>
+            </Card.Footer>
+          </Card>
         </Showcase.Row>
         <Showcase.Row label="middle · last">
           <Card className="w-64">
@@ -167,8 +172,30 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Interactive">
         <Showcase.Row label="onClick">
-          <ProductCard onClick={() => {}} />
-          <ProductCard onClick={() => {}} disabled />
+          <Card onClick={() => {}} className="w-64">
+            <Card.Media className="aspect-video">
+              <img src={PHOTO} alt="" />
+            </Card.Media>
+            <Card.Header>
+              <Card.Title>산책로 사진집</Card.Title>
+              <Card.Description>₩24,000</Card.Description>
+            </Card.Header>
+            <Card.Footer>
+              <Button className="w-full">장바구니</Button>
+            </Card.Footer>
+          </Card>
+          <Card onClick={() => {}} disabled className="w-64">
+            <Card.Media className="aspect-video">
+              <img src={PHOTO} alt="" />
+            </Card.Media>
+            <Card.Header>
+              <Card.Title>산책로 사진집</Card.Title>
+              <Card.Description>₩24,000</Card.Description>
+            </Card.Header>
+            <Card.Footer>
+              <Button className="w-full">장바구니</Button>
+            </Card.Footer>
+          </Card>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -215,8 +242,30 @@ export const Anatomy: Story = {
 export const MediaBleed: Story = {
   render: () => (
     <div className="flex gap-4">
-      <ProductCard />
-      <ProductCard variant="soft" />
+      <Card className="w-64">
+        <Card.Media className="aspect-video">
+          <img src={PHOTO} alt="" />
+        </Card.Media>
+        <Card.Header>
+          <Card.Title>산책로 사진집</Card.Title>
+          <Card.Description>₩24,000</Card.Description>
+        </Card.Header>
+        <Card.Footer>
+          <Button className="w-full">장바구니</Button>
+        </Card.Footer>
+      </Card>
+      <Card variant="soft" className="w-64">
+        <Card.Media className="aspect-video">
+          <img src={PHOTO} alt="" />
+        </Card.Media>
+        <Card.Header>
+          <Card.Title>산책로 사진집</Card.Title>
+          <Card.Description>₩24,000</Card.Description>
+        </Card.Header>
+        <Card.Footer>
+          <Button className="w-full">장바구니</Button>
+        </Card.Footer>
+      </Card>
     </div>
   ),
   parameters: {
@@ -239,30 +288,29 @@ export const MediaBleed: Story = {
   },
 };
 
-function InteractiveExample({ onClick }: Pick<Card.Props, 'onClick'>) {
-  const [liked, setLiked] = useState(0);
-  return (
-    <div className="flex flex-col items-start gap-3">
-      <Card className="w-72" onClick={onClick}>
-        <Card.Header>
-          <Card.Title>디자인 리뷰</Card.Title>
-          <Card.Description>오늘 오후 3시, 회의실 B</Card.Description>
-        </Card.Header>
-        <Card.Footer>
-          <Button variant="outline" size="tiny" onClick={() => setLiked((count) => count + 1)}>
-            <HeartIcon />
-            관심
-          </Button>
-        </Card.Footer>
-      </Card>
-      <output aria-label="관심 수">{liked}</output>
-    </div>
-  );
-}
-
 export const Interactive: Story = {
   args: { onClick: fn() },
-  render: (args) => <InteractiveExample onClick={args.onClick} />,
+  render: function Render(args) {
+    const [liked, setLiked] = useState(0);
+
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <Card className="w-72" onClick={args.onClick}>
+          <Card.Header>
+            <Card.Title>디자인 리뷰</Card.Title>
+            <Card.Description>오늘 오후 3시, 회의실 B</Card.Description>
+          </Card.Header>
+          <Card.Footer>
+            <Button variant="outline" size="tiny" onClick={() => setLiked((count) => count + 1)}>
+              <HeartIcon />
+              관심
+            </Button>
+          </Card.Footer>
+        </Card>
+        <output aria-label="관심 수">{liked}</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

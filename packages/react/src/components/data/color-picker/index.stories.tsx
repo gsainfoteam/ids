@@ -198,17 +198,16 @@ export const Swatches: Story = {
   },
 };
 
-function CopyExample() {
-  const [value, setValue] = useState('#8B5CF6');
-  return (
-    <div className="w-72">
-      <ColorPicker value={value} onValueChange={setValue} />
-    </div>
-  );
-}
-
 export const Copy: Story = {
-  render: () => <CopyExample />,
+  render: function Render() {
+    const [value, setValue] = useState('#8B5CF6');
+
+    return (
+      <div className="w-72">
+        <ColorPicker value={value} onValueChange={setValue} />
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

@@ -102,36 +102,35 @@ export const Gallery: Story = {
   ),
 };
 
-function StatusExample() {
-  const [src, setSrc] = useState(PHOTO);
-  const [log, setLog] = useState<string[]>([]);
-  return (
-    <div className="flex flex-col items-start gap-4">
-      <Avatar
-        src={src}
-        name="Alice Kim"
-        className={(state) =>
-          state.status === 'loaded' ? 'ring-2 ring-(--ids-color-success)' : undefined
-        }
-        onStatusChange={(status) => setLog((prev) => [...prev, status])}
-      />
-      <div className="flex gap-2">
-        <Button size="tiny" variant="outline" onClick={() => setSrc(BROKEN)}>
-          깨진 이미지로
-        </Button>
-        <Button size="tiny" variant="outline" onClick={() => setSrc(photo(140))}>
-          다른 사진으로
-        </Button>
-      </div>
-      <output aria-label="상태 기록" className="text-body-b3-regular font-mono">
-        {log.join(' → ')}
-      </output>
-    </div>
-  );
-}
-
 export const LoadingStatus: Story = {
-  render: () => <StatusExample />,
+  render: function Render() {
+    const [src, setSrc] = useState(PHOTO);
+    const [log, setLog] = useState<string[]>([]);
+
+    return (
+      <div className="flex flex-col items-start gap-4">
+        <Avatar
+          src={src}
+          name="Alice Kim"
+          className={(state) =>
+            state.status === 'loaded' ? 'ring-2 ring-(--ids-color-success)' : undefined
+          }
+          onStatusChange={(status) => setLog((prev) => [...prev, status])}
+        />
+        <div className="flex gap-2">
+          <Button size="tiny" variant="outline" onClick={() => setSrc(BROKEN)}>
+            깨진 이미지로
+          </Button>
+          <Button size="tiny" variant="outline" onClick={() => setSrc(photo(140))}>
+            다른 사진으로
+          </Button>
+        </div>
+        <output aria-label="상태 기록" className="text-body-b3-regular font-mono">
+          {log.join(' → ')}
+        </output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

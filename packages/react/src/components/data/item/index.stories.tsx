@@ -258,36 +258,35 @@ export const Gallery: Story = {
   ),
 };
 
-function MessageRow({ onOpen }: { onOpen: Item.Props['onClick'] }) {
-  const [archived, setArchived] = useState(0);
-  return (
-    <div className="flex w-96 flex-col gap-3">
-      <Item variant="outline" onClick={onOpen}>
-        <Item.Media>
-          <Avatar name="Alice Kim" />
-        </Item.Media>
-        <Item.Content>
-          <Item.Title>Alice Kim</Item.Title>
-          <Item.Description>오늘 회의 자료 보냈어요</Item.Description>
-        </Item.Content>
-        <Item.Actions>
-          <IconButton
-            aria-label="보관"
-            variant="ghost"
-            size="tiny"
-            icon={<InboxIcon />}
-            onClick={() => setArchived((count) => count + 1)}
-          />
-        </Item.Actions>
-      </Item>
-      <output aria-label="보관 수">{archived}</output>
-    </div>
-  );
-}
-
 export const Interactive: Story = {
   args: { onClick: fn() },
-  render: (args) => <MessageRow onOpen={args.onClick} />,
+  render: function Render(args) {
+    const [archived, setArchived] = useState(0);
+
+    return (
+      <div className="flex w-96 flex-col gap-3">
+        <Item variant="outline" onClick={args.onClick}>
+          <Item.Media>
+            <Avatar name="Alice Kim" />
+          </Item.Media>
+          <Item.Content>
+            <Item.Title>Alice Kim</Item.Title>
+            <Item.Description>오늘 회의 자료 보냈어요</Item.Description>
+          </Item.Content>
+          <Item.Actions>
+            <IconButton
+              aria-label="보관"
+              variant="ghost"
+              size="tiny"
+              icon={<InboxIcon />}
+              onClick={() => setArchived((count) => count + 1)}
+            />
+          </Item.Actions>
+        </Item>
+        <output aria-label="보관 수">{archived}</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -310,27 +309,26 @@ export const Interactive: Story = {
   },
 };
 
-function FileList() {
-  const files = ['보고서.pdf', '예산안.xlsx', '회의록.md'];
-  const [selected, setSelected] = useState(files[0]);
-  return (
-    <Item.Group className="w-80" aria-label="파일">
-      {files.map((file) => (
-        <Item key={file} selected={selected === file} onClick={() => setSelected(file)}>
-          <Item.Media>
-            <DocumentIcon />
-          </Item.Media>
-          <Item.Content>
-            <Item.Title>{file}</Item.Title>
-          </Item.Content>
-        </Item>
-      ))}
-    </Item.Group>
-  );
-}
-
 export const Selectable: Story = {
-  render: () => <FileList />,
+  render: function Render() {
+    const files = ['보고서.pdf', '예산안.xlsx', '회의록.md'];
+    const [selected, setSelected] = useState(files[0]);
+
+    return (
+      <Item.Group className="w-80" aria-label="파일">
+        {files.map((file) => (
+          <Item key={file} selected={selected === file} onClick={() => setSelected(file)}>
+            <Item.Media>
+              <DocumentIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>{file}</Item.Title>
+            </Item.Content>
+          </Item>
+        ))}
+      </Item.Group>
+    );
+  },
   parameters: {
     docs: {
       description: {

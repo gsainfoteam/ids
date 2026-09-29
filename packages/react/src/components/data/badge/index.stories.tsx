@@ -195,31 +195,30 @@ export const Count: Story = {
   },
 };
 
-function InboxExample() {
-  const [unread, setUnread] = useState(3);
-  return (
-    <div className="flex items-center gap-6">
-      <Badge content={unread} aria-label={`읽지 않은 메일 ${unread}통`}>
-        <Button variant="outline">
-          <EnvelopeIcon />
-          받은 편지함
-        </Button>
-      </Badge>
-      <Badge content={unread} size="tiny">
-        <IconButton aria-label="알림" variant="ghost" icon={<BellIcon />} />
-      </Badge>
-      <Button size="tiny" onClick={() => setUnread((count) => count + 1)}>
-        새 메일
-      </Button>
-      <Button size="tiny" variant="outline" onClick={() => setUnread(0)}>
-        모두 읽음
-      </Button>
-    </div>
-  );
-}
-
 export const Accessibility: Story = {
-  render: () => <InboxExample />,
+  render: function Render() {
+    const [unread, setUnread] = useState(3);
+
+    return (
+      <div className="flex items-center gap-6">
+        <Badge content={unread} aria-label={`읽지 않은 메일 ${unread}통`}>
+          <Button variant="outline">
+            <EnvelopeIcon />
+            받은 편지함
+          </Button>
+        </Badge>
+        <Badge content={unread} size="tiny">
+          <IconButton aria-label="알림" variant="ghost" icon={<BellIcon />} />
+        </Badge>
+        <Button size="tiny" onClick={() => setUnread((count) => count + 1)}>
+          새 메일
+        </Button>
+        <Button size="tiny" variant="outline" onClick={() => setUnread(0)}>
+          모두 읽음
+        </Button>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -268,28 +267,27 @@ export const OnAvatar: Story = {
   },
 };
 
-function PresenceExample() {
-  const [online, setOnline] = useState(true);
-  return (
-    <div className="flex items-center gap-4">
-      <Badge
-        dot
-        invisible={!online}
-        colorScheme="success"
-        placement="bottom-end"
-        aria-label={online ? '온라인' : '오프라인'}
-      >
-        <Avatar name="Alice Kim" />
-      </Badge>
-      <Button size="tiny" variant="outline" onClick={() => setOnline((value) => !value)}>
-        {online ? '오프라인으로' : '온라인으로'}
-      </Button>
-    </div>
-  );
-}
-
 export const Invisible: Story = {
-  render: () => <PresenceExample />,
+  render: function Render() {
+    const [online, setOnline] = useState(true);
+
+    return (
+      <div className="flex items-center gap-4">
+        <Badge
+          dot
+          invisible={!online}
+          colorScheme="success"
+          placement="bottom-end"
+          aria-label={online ? '온라인' : '오프라인'}
+        >
+          <Avatar name="Alice Kim" />
+        </Badge>
+        <Button size="tiny" variant="outline" onClick={() => setOnline((value) => !value)}>
+          {online ? '오프라인으로' : '온라인으로'}
+        </Button>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

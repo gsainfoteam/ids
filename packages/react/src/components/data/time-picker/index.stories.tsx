@@ -190,20 +190,19 @@ export const Keyboard: Story = {
   },
 };
 
-function ClearExample() {
-  const [value, setValue] = useState<Time | null>(at(8, 30));
-  return (
-    <div className="flex w-56 flex-col gap-3">
-      <TimePicker hourCycle="24h" value={value} onValueChange={setValue} />
-      <output aria-label="값" className="text-body-b3-regular">
-        {value ? `${value.hour}:${value.minute}` : 'null'}
-      </output>
-    </div>
-  );
-}
-
 export const Clear: Story = {
-  render: () => <ClearExample />,
+  render: function Render() {
+    const [value, setValue] = useState<Time | null>(at(8, 30));
+
+    return (
+      <div className="flex w-56 flex-col gap-3">
+        <TimePicker hourCycle="24h" value={value} onValueChange={setValue} />
+        <output aria-label="값" className="text-body-b3-regular">
+          {value ? `${value.hour}:${value.minute}` : 'null'}
+        </output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

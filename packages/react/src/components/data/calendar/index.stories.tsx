@@ -190,26 +190,25 @@ export const Keyboard: Story = {
   },
 };
 
-function RangeExample() {
-  const [range, setRange] = useState<DateRange | null>(null);
-  return (
-    <div className="flex flex-col gap-3">
-      <Calendar
-        selectionMode="range"
-        value={range}
-        onValueChange={setRange}
-        monthsToShow={2}
-        today={today}
-      />
-      <output aria-label="기간" className="text-body-b3-regular">
-        {range?.start?.day ?? '–'} ~ {range?.end?.day ?? '–'}
-      </output>
-    </div>
-  );
-}
-
 export const Range: Story = {
-  render: () => <RangeExample />,
+  render: function Render() {
+    const [range, setRange] = useState<DateRange | null>(null);
+
+    return (
+      <div className="flex flex-col gap-3">
+        <Calendar
+          selectionMode="range"
+          value={range}
+          onValueChange={setRange}
+          monthsToShow={2}
+          today={today}
+        />
+        <output aria-label="기간" className="text-body-b3-regular">
+          {range?.start?.day ?? '–'} ~ {range?.end?.day ?? '–'}
+        </output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -353,56 +352,52 @@ const events = [
   new CalendarDate(2026, 10, 2),
 ];
 
-function renderEventDay(day: CalendarDate, state: Calendar.DayState) {
-  return (
-    <span className="flex flex-col items-center leading-none">
-      {day.day}
-      <span
-        aria-hidden="true"
-        className={
-          state.modifiers.event
-            ? state.selected
-              ? 'mt-0.5 size-1 rounded-full bg-current'
-              : 'mt-0.5 size-1 rounded-full bg-(--ids-color-primary)'
-            : 'mt-0.5 size-1'
-        }
-      />
-    </span>
-  );
-}
-
-function PartsExample() {
-  const [date, setDate] = useState<CalendarDate | null>(null);
-  const [month, setMonth] = useState(new CalendarDate(2026, 9, 1));
-  const busy = !!date && events.some((event) => event.compare(date) === 0);
-  return (
-    <div className="flex flex-col items-start gap-3">
-      <Button
-        size="tiny"
-        variant="outline"
-        onClick={() => {
-          setMonth(new CalendarDate(2026, 9, 1));
-          setDate(today);
-        }}
-      >
-        오늘
-      </Button>
-      <Calendar
-        value={date}
-        onValueChange={setDate}
-        month={month}
-        onMonthChange={setMonth}
-        today={today}
-        modifiers={{ event: events }}
-        renderDay={renderEventDay}
-        footer={date ? (busy ? '일정이 있는 날입니다.' : '일정이 없습니다.') : '날짜를 고르세요.'}
-      />
-    </div>
-  );
-}
-
 export const Parts: Story = {
-  render: () => <PartsExample />,
+  render: function Render() {
+    const [date, setDate] = useState<CalendarDate | null>(null);
+    const [month, setMonth] = useState(new CalendarDate(2026, 9, 1));
+
+    const busy = !!date && events.some((event) => event.compare(date) === 0);
+
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <Button
+          size="tiny"
+          variant="outline"
+          onClick={() => {
+            setMonth(new CalendarDate(2026, 9, 1));
+            setDate(today);
+          }}
+        >
+          오늘
+        </Button>
+        <Calendar
+          value={date}
+          onValueChange={setDate}
+          month={month}
+          onMonthChange={setMonth}
+          today={today}
+          modifiers={{ event: events }}
+          renderDay={(day, state) => (
+            <span className="flex flex-col items-center leading-none">
+              {day.day}
+              <span
+                aria-hidden="true"
+                className={
+                  state.modifiers.event
+                    ? state.selected
+                      ? 'mt-0.5 size-1 rounded-full bg-current'
+                      : 'mt-0.5 size-1 rounded-full bg-(--ids-color-primary)'
+                    : 'mt-0.5 size-1'
+                }
+              />
+            </span>
+          )}
+          footer={date ? (busy ? '일정이 있는 날입니다.' : '일정이 없습니다.') : '날짜를 고르세요.'}
+        />
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

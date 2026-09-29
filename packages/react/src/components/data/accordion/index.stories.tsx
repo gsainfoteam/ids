@@ -34,15 +34,6 @@ const FAQS = [
   },
 ];
 
-function Faqs() {
-  return FAQS.map((faq) => (
-    <Accordion.Item key={faq.id} value={faq.id}>
-      <Accordion.Trigger>{faq.question}</Accordion.Trigger>
-      <Accordion.Content>{faq.answer}</Accordion.Content>
-    </Accordion.Item>
-  ));
-}
-
 const meta = {
   title: 'Data/Accordion',
   component: Accordion,
@@ -66,7 +57,12 @@ const meta = {
   render: (args) => (
     <div className="w-full max-w-md">
       <Accordion {...args}>
-        <Faqs />
+        {FAQS.map((faq) => (
+          <Accordion.Item key={faq.id} value={faq.id}>
+            <Accordion.Trigger>{faq.question}</Accordion.Trigger>
+            <Accordion.Content>{faq.answer}</Accordion.Content>
+          </Accordion.Item>
+        ))}
       </Accordion>
     </div>
   ),
@@ -190,31 +186,27 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="plus / minus">
           <div className="w-72">
-            <PlusMinus />
+            <Accordion type="single" variant="soft" defaultValue="a">
+              {['a', 'b'].map((value) => (
+                <Accordion.Item key={value} value={value}>
+                  <Accordion.Trigger>
+                    {value === 'a' ? '회원 혜택' : '포인트 적립'}
+                    <Accordion.Indicator className="rotate-0! transition-none">
+                      {(state) => (state.open ? <MinusIcon /> : <PlusIcon />)}
+                    </Accordion.Indicator>
+                  </Accordion.Trigger>
+                  <Accordion.Content>
+                    Indicator의 children은 상태를 받는 함수도 됩니다.
+                  </Accordion.Content>
+                </Accordion.Item>
+              ))}
+            </Accordion>
           </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
-
-function PlusMinus() {
-  return (
-    <Accordion type="single" variant="soft" defaultValue="a">
-      {['a', 'b'].map((value) => (
-        <Accordion.Item key={value} value={value}>
-          <Accordion.Trigger>
-            {value === 'a' ? '회원 혜택' : '포인트 적립'}
-            <Accordion.Indicator className="rotate-0! transition-none">
-              {(state) => (state.open ? <MinusIcon /> : <PlusIcon />)}
-            </Accordion.Indicator>
-          </Accordion.Trigger>
-          <Accordion.Content>Indicator의 children은 상태를 받는 함수도 됩니다.</Accordion.Content>
-        </Accordion.Item>
-      ))}
-    </Accordion>
-  );
-}
 
 export const Single: Story = {
   args: { defaultValue: undefined },
@@ -262,49 +254,46 @@ export const NotCollapsible: Story = {
   },
 };
 
-function MultipleExample() {
-  const [opened, setOpened] = useState<string[]>(['general']);
-  return (
-    <div className="flex flex-col gap-4">
-      <Accordion type="multiple" value={opened} onValueChange={setOpened}>
-        <Accordion.Item value="general">
-          <Accordion.Trigger>일반 설정</Accordion.Trigger>
-          <Accordion.Content>언어와 시간대를 바꿉니다.</Accordion.Content>
-        </Accordion.Item>
-        <Accordion.Item value="notifications">
-          <Accordion.Trigger>알림 설정</Accordion.Trigger>
-          <Accordion.Content>메일과 푸시 알림을 켜고 끕니다.</Accordion.Content>
-        </Accordion.Item>
-        <Accordion.Item value="security">
-          <Accordion.Trigger>보안 설정</Accordion.Trigger>
-          <Accordion.Content>비밀번호와 2단계 인증을 관리합니다.</Accordion.Content>
-        </Accordion.Item>
-      </Accordion>
-      <div className="flex gap-2">
-        <Button size="tiny" variant="outline" onClick={() => setOpened([])}>
-          모두 닫기
-        </Button>
-        <Button
-          size="tiny"
-          variant="outline"
-          onClick={() => setOpened(['general', 'notifications', 'security'])}
-        >
-          모두 열기
-        </Button>
-      </div>
-      <output aria-label="열린 섹션" className="text-body-b3-regular font-mono">
-        {JSON.stringify(opened)}
-      </output>
-    </div>
-  );
-}
-
 export const Multiple: Story = {
-  render: () => (
-    <div className="w-full max-w-md">
-      <MultipleExample />
-    </div>
-  ),
+  render: function Render() {
+    const [opened, setOpened] = useState<string[]>(['general']);
+
+    return (
+      <div className="w-full max-w-md">
+        <div className="flex flex-col gap-4">
+          <Accordion type="multiple" value={opened} onValueChange={setOpened}>
+            <Accordion.Item value="general">
+              <Accordion.Trigger>일반 설정</Accordion.Trigger>
+              <Accordion.Content>언어와 시간대를 바꿉니다.</Accordion.Content>
+            </Accordion.Item>
+            <Accordion.Item value="notifications">
+              <Accordion.Trigger>알림 설정</Accordion.Trigger>
+              <Accordion.Content>메일과 푸시 알림을 켜고 끕니다.</Accordion.Content>
+            </Accordion.Item>
+            <Accordion.Item value="security">
+              <Accordion.Trigger>보안 설정</Accordion.Trigger>
+              <Accordion.Content>비밀번호와 2단계 인증을 관리합니다.</Accordion.Content>
+            </Accordion.Item>
+          </Accordion>
+          <div className="flex gap-2">
+            <Button size="tiny" variant="outline" onClick={() => setOpened([])}>
+              모두 닫기
+            </Button>
+            <Button
+              size="tiny"
+              variant="outline"
+              onClick={() => setOpened(['general', 'notifications', 'security'])}
+            >
+              모두 열기
+            </Button>
+          </div>
+          <output aria-label="열린 섹션" className="text-body-b3-regular font-mono">
+            {JSON.stringify(opened)}
+          </output>
+        </div>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -332,7 +321,12 @@ export const Keyboard: Story = {
   render: (args) => (
     <div className="w-full max-w-md">
       <Accordion {...args}>
-        <Faqs />
+        {FAQS.map((faq) => (
+          <Accordion.Item key={faq.id} value={faq.id}>
+            <Accordion.Trigger>{faq.question}</Accordion.Trigger>
+            <Accordion.Content>{faq.answer}</Accordion.Content>
+          </Accordion.Item>
+        ))}
         <Accordion.Item value="closed" disabled>
           <Accordion.Trigger>준비 중인 질문</Accordion.Trigger>
           <Accordion.Content>비활성</Accordion.Content>
@@ -396,7 +390,19 @@ export const FindInPage: Story = {
 export const CustomIndicator: Story = {
   render: () => (
     <div className="w-full max-w-md">
-      <PlusMinus />
+      <Accordion type="single" variant="soft" defaultValue="a">
+        {['a', 'b'].map((value) => (
+          <Accordion.Item key={value} value={value}>
+            <Accordion.Trigger>
+              {value === 'a' ? '회원 혜택' : '포인트 적립'}
+              <Accordion.Indicator className="rotate-0! transition-none">
+                {(state) => (state.open ? <MinusIcon /> : <PlusIcon />)}
+              </Accordion.Indicator>
+            </Accordion.Trigger>
+            <Accordion.Content>Indicator의 children은 상태를 받는 함수도 됩니다.</Accordion.Content>
+          </Accordion.Item>
+        ))}
+      </Accordion>
     </div>
   ),
   parameters: {
