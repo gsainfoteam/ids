@@ -51,9 +51,12 @@ reason: a Server Component cannot read a property of a client reference, so `<Di
 `Button.Style()` work only when `Dialog` and `Button` themselves are plain server functions. Each
 `components/<category>/<name>/index.tsx` holds no directive, no hook and no context; `Dialog` there
 only renders `DialogRoot` from `root.tsx`, `Style` comes from a pure `style.ts`, and the namespace
-aliases parts imported from their own client files. A root that recognises another component by
-`child.type` also accepts that component's root (`[Avatar, AvatarRoot]`), since a Server Component
-hands over `<Avatar>` already rendered to `<AvatarRoot>`. Storybook reads the props table from the
+aliases parts imported from their own client files. A part is recognised by
+`elementTypeOf(child) === SelectItem`, never `child.type`: an element a Server Component hands over
+arrives with a `react.lazy` wrapper as its type, which `elementTypeOf` (`utils/children.ts`) unwraps.
+A root that recognises another component also accepts that component's root
+(`[Avatar, AvatarRoot]`), since a Server Component hands over `<Avatar>` already rendered to
+`<AvatarRoot>`. Storybook reads the props table from the
 root (`docsReadFromTheRoot` in `.storybook/main.ts`), because the wrapper has no destructured
 defaults to read. `tests/use-client.test.ts` checks both directions, and
 `tests/server-components.test.ts` renders components, parts and `Style` from a Server Component.
@@ -163,8 +166,8 @@ drawer/
   IconButton's `icon` never becomes its label.
 - Parts and `root.tsx` import `./context`, `./style` and sibling parts directly. They import `'.'`
   only with `import type`, so no runtime cycle runs through `index.tsx`. The root recognises its parts
-  (`child.type === DrawerOverlay`, a set of part functions) by importing them, never through
-  `Drawer.Overlay`.
+  (`elementTypeOf(child) === DrawerOverlay`, a set of part functions) by importing them, never
+  through `Drawer.Overlay`.
 - Paths imported from outside the folder (`field/context`, `select/select-options`,
   `calendar/date`, `drawer/drawer-gesture`) stay where they are.
 

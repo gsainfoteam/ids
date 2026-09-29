@@ -12,7 +12,7 @@ import { PopoverArrow } from './arrow';
 import { usePopoverContext } from './context';
 import { DEFAULT_PLACEMENT } from './use-popover';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
-import { flattenFragments } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 import { ScrollArea } from '../../layout/scroll-area';
 
 import type { Popover } from '.';
@@ -52,7 +52,7 @@ export function PopoverContent({
 
 PopoverContent.displayName = 'Popover.Content';
 
-const isArrow = (node: ReactNode) => isValidElement(node) && node.type === PopoverArrow;
+const isArrow = (node: ReactNode) => isValidElement(node) && elementTypeOf(node) === PopoverArrow;
 
 type PopupProps = Omit<
   PopoverContentProps,

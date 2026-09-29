@@ -33,6 +33,7 @@ import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
 import {
+  elementTypeOf,
   flattenFragments,
   invariant,
   isNodeFromAnyWindow,
@@ -117,11 +118,11 @@ const PARTS = new Set<unknown>([
 
 const isForeignComponent = (node: ReactNode): boolean =>
   isValidElement<SelectContentProps>(node) &&
-  (node.type === SelectContent
+  (elementTypeOf(node) === SelectContent
     ? flattenFragments(slotChildren(node.props.children, node.props.asChild)).some(
         isForeignComponent,
       )
-    : typeof node.type === 'function' && !PARTS.has(node.type));
+    : typeof elementTypeOf(node) === 'function' && !PARTS.has(elementTypeOf(node)));
 
 export function SelectRoot(props: SelectProps) {
   const {
@@ -186,7 +187,7 @@ export function SelectRoot(props: SelectProps) {
       );
   }, [hidesItems]);
   const searchable = popupNodes.some((node) =>
-    isValidElement<SelectContentProps>(node) && node.type === SelectContent
+    isValidElement<SelectContentProps>(node) && elementTypeOf(node) === SelectContent
       ? flattenFragments(slotChildren(node.props.children, node.props.asChild)).some(
           isType(SelectSearchField),
         )

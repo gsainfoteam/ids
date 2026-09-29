@@ -9,12 +9,12 @@ import { resolve } from './part-props';
 import { progressStyle } from './style';
 import { ProgressTrack } from './track';
 import { useProgress } from './use-progress';
-import { flattenFragments } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Progress } from '.';
 
 function isPart(node: ReactNode, part: unknown): node is ReactElement<Record<string, unknown>> {
-  return isValidElement(node) && node.type === part;
+  return isValidElement(node) && elementTypeOf(node) === part;
 }
 
 export function ProgressRoot({

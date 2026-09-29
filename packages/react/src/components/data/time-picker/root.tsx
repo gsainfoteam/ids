@@ -10,7 +10,7 @@ import { defaultUnits } from './units';
 import { useTimePicker, type TimePickerState } from './use-time-picker';
 import { periodFirst, resolveLocale } from '../../../internal/date-locale';
 import { messages } from '../../../internal/messages';
-import { flattenFragments, invariant } from '../../../utils';
+import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
 import type { HourCycle, TimePrecision, TimeUnit } from './time';
@@ -87,8 +87,9 @@ export function TimePickerRoot({
   const units: string[] = [];
   for (const child of flattenFragments(children)) {
     if (!isValidElement<{ unit?: TimeUnit }>(child)) continue;
-    if (child.type !== TimePickerColumn && child.type !== TimePickerPeriod) continue;
-    const unit = child.type === TimePickerPeriod ? 'period' : child.props.unit!;
+    if (elementTypeOf(child) !== TimePickerColumn && elementTypeOf(child) !== TimePickerPeriod)
+      continue;
+    const unit = elementTypeOf(child) === TimePickerPeriod ? 'period' : child.props.unit!;
     invariant(!units.includes(unit), 'TimePicker: duplicate Column unit.');
     invariant(
       unit !== 'period' || state.hourCycle === '12h',

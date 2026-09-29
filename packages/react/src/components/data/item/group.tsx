@@ -5,6 +5,7 @@ import { Children, isValidElement, type ComponentProps } from 'react';
 import { ItemGroupContext } from './context';
 import { ItemSeparator } from './separator';
 import { itemStyle } from './style';
+import { elementTypeOf } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -24,7 +25,10 @@ export function ItemGroup({ size, dense, className, children, ...props }: ItemGr
       >
         {Children.map(children, (child) => {
           if (child == null || typeof child === 'boolean') return child;
-          if (isValidElement(child) && (child.type === 'li' || child.type === ItemSeparator))
+          if (
+            isValidElement(child) &&
+            (child.type === 'li' || elementTypeOf(child) === ItemSeparator)
+          )
             return child;
           return <li className={styles.groupItem()}>{child}</li>;
         })}

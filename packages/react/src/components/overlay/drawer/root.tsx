@@ -6,12 +6,12 @@ import { DrawerContext } from './context';
 import { DrawerOverlay, type DrawerOverlayProps } from './overlay';
 import { drawerStyle } from './style';
 import { useDrawer } from './use-drawer';
-import { flattenFragments } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Drawer } from '.';
 
 const isOverlay = (node: ReactNode): node is ReactElement<DrawerOverlayProps> =>
-  isValidElement(node) && node.type === DrawerOverlay;
+  isValidElement(node) && elementTypeOf(node) === DrawerOverlay;
 
 export function DrawerRoot({
   open,

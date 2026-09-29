@@ -91,7 +91,7 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     IdsProvider,
     { color: 'blue', mode: 'light' },
     h('a', { href: '/', className: Button.Style({ variant: 'outline' }) }, 'A link styled as a button'),
-    h(Badge, { count: 3 }, h(Button, null, 'Inbox')),
+    h(Badge, { content: 3 }, h(Button, null, 'Inbox')),
     h(Divider),
     h(Card, null, h(Card.Header, null, h(Card.Title, null, 'Card'))),
     h(

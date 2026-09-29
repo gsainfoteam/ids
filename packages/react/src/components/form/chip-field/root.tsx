@@ -29,7 +29,7 @@ import { type FieldTriggerVariant } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
-import { flattenFragments, invariant, isNodeFromAnyWindow } from '../../../utils';
+import { elementTypeOf, flattenFragments, invariant, isNodeFromAnyWindow } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Chip } from '../../data/chip';
 import { useFieldSize } from '../field/context';
@@ -74,9 +74,10 @@ function isForeignComponent(node: ReactNode): boolean {
   return flattenFragments(node).some(
     (child) =>
       isValidElement<ChipContentProps>(child) &&
-      (child.type === ChipContent
+      (elementTypeOf(child) === ChipContent
         ? isForeignComponent(slotChildren(child.props.children, child.props.asChild))
-        : typeof child.type === 'function' && !POPUP_PARTS.includes(child.type)),
+        : typeof elementTypeOf(child) === 'function' &&
+          !POPUP_PARTS.includes(elementTypeOf(child))),
   );
 }
 

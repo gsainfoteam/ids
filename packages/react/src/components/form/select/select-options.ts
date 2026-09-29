@@ -3,7 +3,7 @@ import { isValidElement, type ReactNode } from 'react';
 import { difference, intersection } from 'es-toolkit';
 
 import { matchesSearch, normalizeText, textOf } from '../../../internal/search-text';
-import { flattenFragments } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 
 export type SelectOption = {
   value: string;
@@ -32,7 +32,7 @@ export function slotChildren(children: unknown, asChild?: boolean): ReactNode {
 export function collectOptions(children: ReactNode, kinds: OptionKinds): SelectOption[] {
   return flattenFragments(children).flatMap((child) => {
     if (!isValidElement<ItemProps>(child)) return [];
-    if (child.type === kinds.item) {
+    if (elementTypeOf(child) === kinds.item) {
       const label = child.props.label ?? textOf(child.props.children).trim();
       return [
         {
@@ -43,7 +43,7 @@ export function collectOptions(children: ReactNode, kinds: OptionKinds): SelectO
         },
       ];
     }
-    if (child.type === kinds.group || child.type === kinds.content)
+    if (elementTypeOf(child) === kinds.group || elementTypeOf(child) === kinds.content)
       return collectOptions(slotChildren(child.props.children, child.props.asChild), kinds);
     return [];
   });

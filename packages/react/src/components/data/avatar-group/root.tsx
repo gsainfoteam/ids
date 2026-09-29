@@ -6,7 +6,7 @@ import { arrangeAvatarGroup } from './arrange';
 import { avatarGroupStyle } from './style';
 import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
-import { invariant } from '../../../utils';
+import { elementTypeOf, invariant } from '../../../utils';
 import { Avatar } from '../avatar';
 import { AvatarCutoutContext, AvatarGroupContext } from '../avatar/context';
 import { AvatarRoot } from '../avatar/root';
@@ -43,11 +43,11 @@ export function AvatarGroupRoot({
     total,
     layout,
     stacking,
-    isOverflow: (node) => isValidElement(node) && node.type === AvatarGroupOverflow,
+    isOverflow: (node) => isValidElement(node) && elementTypeOf(node) === AvatarGroupOverflow,
     nameOf: (node) => {
       if (
         !isValidElement<Avatar.Props>(node) ||
-        !avatarAsWrittenOrServerRendered.includes(node.type)
+        !avatarAsWrittenOrServerRendered.includes(elementTypeOf(node))
       )
         return undefined;
       return node.props.name ?? node.props.alt ?? node.props['aria-label'];

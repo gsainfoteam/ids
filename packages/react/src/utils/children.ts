@@ -11,3 +11,18 @@ export function flattenFragments(children: ReactNode, fragmentPath = ''): ReactN
         ],
   );
 }
+
+const LAZY_TYPE = Symbol.for('react.lazy');
+
+type LazyType = { $$typeof: symbol; _payload: unknown; _init: (payload: unknown) => unknown };
+
+const isLazyType = (type: unknown): type is LazyType =>
+  typeof type === 'object' &&
+  type !== null &&
+  (type as { $$typeof?: unknown }).$$typeof === LAZY_TYPE;
+
+export function elementTypeOf(element: { type: unknown }): unknown {
+  let type = element.type;
+  while (isLazyType(type)) type = type._init(type._payload);
+  return type;
+}

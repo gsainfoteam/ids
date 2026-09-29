@@ -6,12 +6,12 @@ import { DialogContext } from './context';
 import { DialogOverlay, type DialogOverlayProps } from './overlay';
 import { dialogStyle } from './style';
 import { useDialog } from './use-dialog';
-import { flattenFragments } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { Dialog } from '.';
 
 const isOverlay = (node: ReactNode): node is ReactElement<DialogOverlayProps> =>
-  isValidElement(node) && node.type === DialogOverlay;
+  isValidElement(node) && elementTypeOf(node) === DialogOverlay;
 
 export function DialogRoot({
   open,

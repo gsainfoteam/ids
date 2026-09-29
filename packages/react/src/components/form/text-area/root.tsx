@@ -9,7 +9,7 @@ import { resolve } from './state-value';
 import { textAreaStyle } from './style';
 import { useTextArea, type CountState } from './use-text-area';
 import { stateAttributes, type TextControlState } from '../../../internal/text-control';
-import { flattenFragments, invariant } from '../../../utils';
+import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { TextArea } from '.';
@@ -22,7 +22,7 @@ export type TextAreaCountState = CountState;
 function splitByInput(children: ReactNode) {
   const items = flattenFragments(children);
   const indexes = items.flatMap((child, index) =>
-    isValidElement(child) && child.type === TextAreaInput ? [index] : [],
+    isValidElement(child) && elementTypeOf(child) === TextAreaInput ? [index] : [],
   );
   invariant(indexes.length <= 1, '`<TextArea>` accepts at most one `<TextArea.Input />`.');
   const index = indexes[0];
@@ -56,7 +56,7 @@ export function TextAreaRoot({
   const { items, top, input, bottom } = splitByInput(children);
   const countNode = items.find(
     (item): item is ReactElement<TextAreaCountProps> =>
-      isValidElement(item) && item.type === TextAreaCount,
+      isValidElement(item) && elementTypeOf(item) === TextAreaCount,
   );
   const countId = countNode?.props.id ?? `ids-text-area-count-${generatedId}`;
   const field = useTextArea({

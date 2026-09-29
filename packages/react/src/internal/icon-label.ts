@@ -2,6 +2,7 @@
 
 import { Children, isValidElement, useEffect, type ReactNode } from 'react';
 
+import { elementTypeOf } from '../utils';
 import { isDevelopment } from '../utils/dev';
 
 export type IconLabel = {
@@ -66,7 +67,7 @@ export function iconLabel(node: ReactNode): IconLabel | undefined {
     if (!isValidElement<LabelProps>(child)) continue;
     const own = ownLabel(child.props);
     if (own) return { label: own, source: 'element' };
-    const named = componentName(child.type);
+    const named = componentName(elementTypeOf(child));
     if (named) {
       const label = humanizeIconName(named.name);
       if (label) return { label, source: named.source };

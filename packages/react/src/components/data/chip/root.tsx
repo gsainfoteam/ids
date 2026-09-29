@@ -9,7 +9,7 @@ import { chipStyle } from './style';
 import { useChip } from './use-chip';
 import { interactiveDataProps, useInteractive } from '../../../hooks/use-interactive';
 import { resolveState } from '../../../internal/state-props';
-import { flattenFragments, mergeRefs } from '../../../utils';
+import { elementTypeOf, flattenFragments, mergeRefs } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { Chip } from '.';
@@ -38,7 +38,7 @@ function arrange(content: ReactNode, removable: boolean) {
     }
   }
   flush();
-  if (removable && !nodes.some((node) => isValidElement(node) && node.type === ChipClose))
+  if (removable && !nodes.some((node) => isValidElement(node) && elementTypeOf(node) === ChipClose))
     arranged.push(<ChipClose key="close" />);
   return arranged;
 }

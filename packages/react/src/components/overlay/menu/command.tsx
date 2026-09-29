@@ -18,13 +18,14 @@ import { selectItem } from './use-menu-item';
 import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../internal/field-popup/search';
 import { messages } from '../../../internal/messages';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
-import { flattenFragments, mergeProps, part } from '../../../utils';
+import { elementTypeOf, flattenFragments, mergeProps, part } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { ScrollArea } from '../../layout/scroll-area';
 
 import type { Menu } from '.';
 
-const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
+const isType = (type: unknown) => (node: ReactNode) =>
+  isValidElement(node) && elementTypeOf(node) === type;
 
 const ONCE_PER_PRESS_EVEN_IN_INPUTS = {
   requireReset: true,

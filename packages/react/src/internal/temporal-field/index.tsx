@@ -16,6 +16,7 @@ import {
 
 import { ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
+import { temporalFieldStyle } from './style';
 import {
   useTemporalField,
   type TemporalChange,
@@ -24,12 +25,18 @@ import {
 } from './use-temporal-field';
 import { IconButton } from '../../components/action/icon-button';
 import { useFieldSize } from '../../components/form/field/context';
-import { flattenFragments, invariant, mergeProps, mergeRefs, part } from '../../utils';
+import {
+  elementTypeOf,
+  flattenFragments,
+  invariant,
+  mergeProps,
+  mergeRefs,
+  part,
+} from '../../utils';
 import { FieldPopup, FieldPopupHeader } from '../field-popup';
 import { type FieldSurfaceVariant } from '../field-surface';
 import { FormValue } from '../form-value';
 import { keyHandler, withModifiers } from '../keys';
-import { temporalFieldStyle } from './style';
 
 import type { IdsSize } from '../../tokens/types';
 
@@ -138,7 +145,9 @@ export function TemporalValue({ asChild, children, ...props }: ValueProps) {
 export function TemporalTrigger({ asChild, children, className, ...props }: TriggerProps) {
   const c = useTemporal('Trigger');
   invariant(
-    !flattenFragments(children).some((n) => isValidElement(n) && n.type === TemporalClear),
+    !flattenFragments(children).some(
+      (n) => isValidElement(n) && elementTypeOf(n) === TemporalClear,
+    ),
     'Clear must be a sibling of Trigger.',
   );
   if (c.hasInput) {
@@ -276,9 +285,10 @@ export function TemporalField<V>({
   const styles = temporalFieldStyle({ variant, size: resolvedSize, disabled });
 
   const parts = flattenFragments(children);
-  const contents = parts.filter((n) => isValidElement(n) && n.type === TemporalContent);
-  const shell = parts.filter((n) => !(isValidElement(n) && n.type === TemporalContent));
-  const count = (type: unknown) => parts.filter((n) => isValidElement(n) && n.type === type).length;
+  const contents = parts.filter((n) => isValidElement(n) && elementTypeOf(n) === TemporalContent);
+  const shell = parts.filter((n) => !(isValidElement(n) && elementTypeOf(n) === TemporalContent));
+  const count = (type: unknown) =>
+    parts.filter((n) => isValidElement(n) && elementTypeOf(n) === type).length;
   invariant(
     count(TemporalTrigger) <= 1 &&
       contents.length <= 1 &&

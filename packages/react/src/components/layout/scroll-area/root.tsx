@@ -17,7 +17,7 @@ import { scrollAreaStyle } from './style';
 import { useScrollArea } from './use-scroll-area';
 import { ScrollAreaViewport } from './viewport';
 import { resolveState } from '../../../internal/state-props';
-import { flattenFragments, invariant, mergeProps, mergeRefs } from '../../../utils';
+import { elementTypeOf, flattenFragments, invariant, mergeProps, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
 import type { ScrollArea } from '.';
@@ -43,7 +43,7 @@ const scrollsAlong = (axes: Record<Axis, boolean>): ScrollArea.Orientation => {
 const isType =
   <P,>(type: unknown) =>
   (node: ReactNode): node is ReactElement<P> =>
-    isValidElement(node) && node.type === type;
+    isValidElement(node) && elementTypeOf(node) === type;
 
 function arrange(children: ReactNode, orientation: ScrollArea.Orientation | undefined) {
   const nodes = flattenFragments(children);

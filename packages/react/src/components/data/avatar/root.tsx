@@ -8,7 +8,7 @@ import { AvatarImage, type AvatarImageProps } from './image';
 import { avatarStyle } from './style';
 import { useAvatarStatus } from './use-avatar';
 import { resolveState } from '../../../internal/state-props';
-import { flattenFragments } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
 import type { Avatar } from '.';
@@ -37,9 +37,11 @@ export function AvatarRoot({
   const nodes = flattenFragments(children);
   const image = nodes.find(
     (node): node is ReactElement<AvatarImageProps> =>
-      isValidElement(node) && node.type === AvatarImage,
+      isValidElement(node) && elementTypeOf(node) === AvatarImage,
   );
-  const hasFallback = nodes.some((node) => isValidElement(node) && node.type === AvatarFallback);
+  const hasFallback = nodes.some(
+    (node) => isValidElement(node) && elementTypeOf(node) === AvatarFallback,
+  );
   const imageSrc = image?.props.src ?? src;
   const { status, report } = useAvatarStatus(imageSrc || undefined, onStatusChange);
 

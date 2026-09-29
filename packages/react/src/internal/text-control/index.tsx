@@ -13,7 +13,7 @@ import {
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 import { IconButton } from '../../components/action/icon-button';
-import { flattenFragments, invariant, mergeProps } from '../../utils';
+import { elementTypeOf, flattenFragments, invariant, mergeProps } from '../../utils';
 import { type FieldSurfaceVariant } from '../field-surface';
 import { messages } from '../messages';
 import { type textControlStyle } from './style';
@@ -69,7 +69,7 @@ export function splitAroundInput<P>(
 ) {
   const items = flattenFragments(children);
   const indexes = items.flatMap((child, index) =>
-    isValidElement(child) && child.type === Input ? [index] : [],
+    isValidElement(child) && elementTypeOf(child) === Input ? [index] : [],
   );
   invariant(
     indexes.length <= 1,
@@ -86,7 +86,7 @@ export function splitAroundInput<P>(
 }
 
 export function countOf(items: ReactNode[], type: unknown) {
-  return items.filter((item) => isValidElement(item) && item.type === type).length;
+  return items.filter((item) => isValidElement(item) && elementTypeOf(item) === type).length;
 }
 
 export function Adornments({
@@ -101,7 +101,7 @@ export function Adornments({
   className: string;
 }) {
   return items.map((item, index) =>
-    isValidElement(item) && own.includes(item.type) ? (
+    isValidElement(item) && own.includes(elementTypeOf(item)) ? (
       item
     ) : (
       <span

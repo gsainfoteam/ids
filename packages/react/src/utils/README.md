@@ -11,7 +11,7 @@
 | [`cn.ts`](#cnts)               | IDS 설정을 더한 class merge 함수                      | 모든 `tv` 결과, `mergeProps`, 클래스 조각, 스토리      |
 | [`tv.ts`](#tvts)               | 결과를 `cn` 으로 다시 합치는 `tailwind-variants/lite` | 모든 컴포넌트의 `Style`                                |
 | [`merge.ts`](#mergets)         | props, 이벤트 핸들러, ref, style 합치기               | Slot, `asChild` 파트, 필드 hook, ref 를 합치는 모든 곳 |
-| [`children.ts`](#childrents)   | Fragment 를 풀어 자식을 평평하게 만드는 함수          | 자식에서 파트를 찾는 컴포넌트                          |
+| [`children.ts`](#childrents)   | Fragment 를 풀어 자식을 평평하게 만드는 함수, 요소의 실제 타입 | 자식에서 파트를 찾는 컴포넌트                          |
 | [`part.ts`](#partts)           | 요소나 `asChild` 자식으로 파트 하나를 그리는 함수     | 파트가 많은 필드(Select, ChipField 등)                 |
 | [`dom.ts`](#domts)             | 이벤트 target 판별과 포커스를 두는 pointer 핸들러     | 팝업을 여는 필드, `internal/field-popup`               |
 | [`invariant.ts`](#invariantts) | 잘못된 사용에 `IdsError` 를 던지는 assert             | 거의 모든 컴포넌트와 `internal/`                       |
@@ -147,7 +147,7 @@ const mergedRef = useCallback(
 
 ## children.ts
 
-자식 목록에서 Fragment 를 풀어 평평한 배열로 만드는 `flattenFragments` 입니다.
+자식 목록에서 Fragment 를 풀어 평평한 배열로 만드는 `flattenFragments` 와, 요소의 실제 컴포넌트를 돌려주는 `elementTypeOf` 입니다.
 
 ### 쓰는 곳
 
@@ -159,7 +159,7 @@ const mergedRef = useCallback(
 // internal/text-control/index.tsx
 const items = flattenFragments(children);
 const indexes = items.flatMap((child, index) =>
-  isValidElement(child) && child.type === Input ? [index] : [],
+  isValidElement(child) && elementTypeOf(child) === Input ? [index] : [],
 );
 ```
 
@@ -172,6 +172,8 @@ const indexes = items.flatMap((child, index) =>
 
 - 앱이 파트를 자기 컴포넌트로 감싸면 파트로 찾지 못합니다.
 - 파트를 찾는 컴포넌트(TextField, Select, ChipField, FileField, ColorField, ColorPicker, TimePicker, Rating, 날짜와 시간 필드)는 모두 이 함수로 Fragment 를 풉니다.
+- 파트를 `child.type === SelectItem` 처럼 직접 비교하지 않고 `elementTypeOf(child) === SelectItem` 으로 비교합니다. Server Component 가 넘긴 `<Select.Item>` 은 클라이언트에서 `type` 이 `react.lazy` 래퍼로 도착합니다(Flight 가 client reference 를 그렇게 풉니다). `elementTypeOf` 는 그 래퍼를 `_init(_payload)` 로 풀어 실제 함수를 돌려주고, 모듈이 아직 오지 않았으면 React 의 lazy 와 똑같이 thenable 을 던져 렌더를 잠시 멈춥니다. 직접 비교하면 Next.js 의 서버 컴포넌트 페이지에서 Select 옵션, Field 라벨, Dialog.Overlay 가 파트로 보이지 않습니다(`tests/server-reference-types.test.tsx`).
+- 문자열 태그(`'input'`, `'svg'`)와 `Fragment` 비교에는 쓰지 않아도 됩니다. host 요소와 Fragment 는 lazy 로 오지 않습니다.
 
 ## part.ts
 

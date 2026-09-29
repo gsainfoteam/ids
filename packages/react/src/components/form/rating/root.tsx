@@ -17,7 +17,7 @@ import { ratingStyle, type RatingOptionPlacement } from './style';
 import { useRating } from './use-rating';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
-import { flattenFragments, invariant } from '../../../utils';
+import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -103,7 +103,7 @@ export function RatingRoot({
   const indexed = new Map<number, ReactElement<RatingItemProps>>();
   for (const child of flattenFragments(children)) {
     invariant(
-      isValidElement<RatingItemProps>(child) && child.type === RatingItem,
+      isValidElement<RatingItemProps>(child) && elementTypeOf(child) === RatingItem,
       'Rating children must be Rating.Item elements.',
     );
     const { index } = child.props;

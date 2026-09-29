@@ -5,7 +5,7 @@ import { isValidElement, type ComponentProps } from 'react';
 import { usePicker } from './context';
 import { ColorPickerSwatch, type ColorPickerSwatchProps } from './swatch';
 import { messages } from '../../../internal/messages';
-import { flattenFragments } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 import { RadioGroup } from '../../form/radio-group';
 
 import type { ColorPickerSwatchOption } from '.';
@@ -23,7 +23,7 @@ export function ColorPickerSwatches({ className, children, ...props }: ColorPick
   const c = usePicker('ColorPicker.Swatches');
   const values = children
     ? flattenFragments(children).flatMap((node) =>
-        isValidElement<ColorPickerSwatchProps>(node) && node.type === ColorPickerSwatch
+        isValidElement<ColorPickerSwatchProps>(node) && elementTypeOf(node) === ColorPickerSwatch
           ? [node.props.value]
           : [],
       )

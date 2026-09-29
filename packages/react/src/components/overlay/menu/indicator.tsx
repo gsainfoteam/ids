@@ -6,7 +6,7 @@ import { CheckIcon } from '@heroicons/react/16/solid';
 
 import { ItemContext } from './context';
 import { menuStyle } from './style';
-import { flattenFragments, invariant, mergeProps, part } from '../../../utils';
+import { elementTypeOf, flattenFragments, invariant, mergeProps, part } from '../../../utils';
 
 export type MenuItemIndicatorProps = ComponentProps<'span'> & { asChild?: boolean };
 
@@ -41,7 +41,8 @@ export function MenuItemIndicator({
 
 MenuItemIndicator.displayName = 'Menu.ItemIndicator';
 
-const isIndicator = (node: ReactNode) => isValidElement(node) && node.type === MenuItemIndicator;
+const isIndicator = (node: ReactNode) =>
+  isValidElement(node) && elementTypeOf(node) === MenuItemIndicator;
 
 export function withIndicator(children: ReactNode, asChild: boolean | undefined) {
   const append = (nodes: ReactNode) => (

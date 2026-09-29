@@ -12,7 +12,7 @@ import {
   type InteractiveState,
 } from '../../../hooks/use-interactive';
 import { resolveState, type StateRenderProps } from '../../../internal/state-props';
-import { flattenFragments } from '../../../utils';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 
 import type { AccordionItemState } from './item';
 
@@ -61,7 +61,7 @@ export function AccordionTrigger({
   const content = resolveState(children, state);
   const nodes = flattenFragments(content);
   const indicatorIndex = nodes.findIndex(
-    (child) => isValidElement(child) && child.type === AccordionIndicator,
+    (child) => isValidElement(child) && elementTypeOf(child) === AccordionIndicator,
   );
   const Heading = `h${root.headingLevel}` as const;
 

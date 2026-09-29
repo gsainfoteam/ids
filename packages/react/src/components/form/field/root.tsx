@@ -32,6 +32,7 @@ import { FieldLabel } from './label';
 import { resolve, stateAttributes, type StateValue } from './state-value';
 import { fieldStyle } from './style';
 import { useField } from './use-field';
+import { elementTypeOf } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
 import type { FieldValidity, FieldValidityKey } from './control-state';
@@ -105,7 +106,7 @@ export function FieldRoot({
   const nodes = flatten(children);
   const controls = nodes.filter(
     (node) =>
-      !parts.has(node.type) &&
+      !parts.has(elementTypeOf(node)) &&
       (typeof node.type !== 'string' || ['input', 'select', 'textarea'].includes(node.type)),
   );
   const control = controls[0];
@@ -122,7 +123,7 @@ export function FieldRoot({
   const partIds = new Map<ReactElement, string>();
   const counts: Record<PartName, number> = { label: 0, description: 0, hint: 0, error: 0 };
   for (const node of nodes) {
-    const part = parts.get(node.type);
+    const part = parts.get(elementTypeOf(node));
     if (!part) continue;
     const index = counts[part]++;
     const childId = isValidElement<ControlProps>(node.props.children)
@@ -155,7 +156,7 @@ export function FieldRoot({
     shown: (node: ReactElement<ControlProps>) => boolean = () => true,
   ) =>
     nodes
-      .filter((node) => parts.get(node.type) === part && shown(node))
+      .filter((node) => parts.get(elementTypeOf(node)) === part && shown(node))
       .map((node) => partIds.get(node));
   const labelIds = idsOf('label');
   const statusIds = invalid
@@ -208,7 +209,7 @@ export function FieldRoot({
             style={resolve(style, state)}
           >
             {nodes.map((node, index) =>
-              parts.has(node.type) ? (
+              parts.has(elementTypeOf(node)) ? (
                 cloneElement(node, { key: node.key ?? index, id: partIds.get(node) })
               ) : node === control ? (
                 <div

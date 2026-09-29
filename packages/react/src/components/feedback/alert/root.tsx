@@ -11,13 +11,13 @@ import { alertStyle } from './style';
 import { AlertTitle } from './title';
 import { useAlert } from './use-alert';
 import { announcedAssertively } from '../../../internal/status-palette';
-import { flattenFragments, mergeEventHandlers, mergeRefs } from '../../../utils';
+import { elementTypeOf, flattenFragments, mergeEventHandlers, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
 import type { Alert } from '.';
 
 function isPart(node: ReactNode, part: unknown): node is ReactElement<Record<string, unknown>> {
-  return isValidElement(node) && node.type === part;
+  return isValidElement(node) && elementTypeOf(node) === part;
 }
 
 export function AlertRoot({
