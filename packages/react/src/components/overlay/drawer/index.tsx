@@ -282,13 +282,20 @@ export namespace Drawer {
     export type Props = ComponentProps<'div'>;
   }
 
-  export function Handle({ className, onClick, ...props }: Handle.Props) {
+  export function Handle({ ref, className, onClick, ...props }: Handle.Props) {
     const { drawer, styles } = useDrawerContext('Drawer.Handle');
+
+    const { setHandle } = drawer;
+    const handleRef = useCallback(
+      (node: HTMLElement | null) => mergeRefs(ref, setHandle)(node),
+      [ref, setHandle],
+    );
 
     if (!drawer.drag.cycles)
       return (
         <div
           {...(props as ComponentProps<'div'>)}
+          ref={handleRef}
           aria-hidden="true"
           data-drawer-handle=""
           className={styles.handle({ className })}
@@ -301,6 +308,7 @@ export namespace Drawer {
         aria-label={messages.drawer.handle}
         aria-controls={drawer.ids.content}
         {...props}
+        ref={handleRef}
         data-drawer-handle=""
         className={styles.handle({ className })}
         onClick={(event) => {
@@ -429,8 +437,10 @@ export namespace Drawer {
       ],
       viewport: 'relative flex flex-col gap-4 p-6',
       handle: [
-        'relative shrink-0 cursor-grab touch-none rounded-full bg-(--ids-color-border) outline-none focus-ring',
+        'relative shrink-0 cursor-grab touch-none rounded-full outline-none focus-ring',
         'before:absolute before:-inset-3',
+        'bg-(--ids-color-handle) transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
+        'hover:bg-(--ids-color-handle-hover) data-dragging:bg-(--ids-color-handle-active)',
       ],
       header: 'flex flex-col gap-1.5 pe-8 text-start',
       title: 'text-subtitle-s1-semibold [overflow-wrap:anywhere]',

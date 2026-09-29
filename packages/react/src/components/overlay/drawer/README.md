@@ -154,14 +154,14 @@ const choice = await overlay.open<string>(({ close }) => (
 
 ## 상태
 
-| 속성                | 붙는 곳                                        |
-| ------------------- | ---------------------------------------------- |
-| `data-side`         | `Drawer.Content`, 배경                         |
-| `data-open`         | `Drawer.Content`                               |
-| `data-ending-style` | `Drawer.Content`, 배경. 닫히는 애니메이션 동안 |
-| `data-nested-open`  | 위에 다른 modal 이 열린 `Drawer.Content`       |
-| `data-dragging`     | 끄는 동안의 `Drawer.Content`, 배경             |
-| `data-popup-open`   | 열려 있는 동안의 `Drawer.Trigger`              |
+| 속성                | 붙는 곳                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `data-side`         | `Drawer.Content`, 배경                                     |
+| `data-open`         | `Drawer.Content`                                           |
+| `data-ending-style` | `Drawer.Content`, 배경. 닫히는 애니메이션 동안             |
+| `data-nested-open`  | 위에 다른 modal 이 열린 `Drawer.Content`                   |
+| `data-dragging`     | 시트를 끄는 동안의 `Drawer.Content`, `Drawer.Handle`, 배경 |
+| `data-popup-open`   | 열려 있는 동안의 `Drawer.Trigger`                          |
 
 ## 속성
 

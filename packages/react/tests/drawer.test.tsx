@@ -419,6 +419,54 @@ describe('dragging with a mouse', () => {
     await expect.element(screen.getByRole('dialog', { name: 'Filters' })).toBeInTheDocument();
   });
 
+  test('dragging the sheet marks the handle while it moves and clears it on release', async () => {
+    await renderBottom();
+    const handle = document.querySelector<HTMLElement>('[data-drawer-handle]')!;
+    const start = pointIn(handle, handle.offsetHeight / 2);
+    const rest = getComputedStyle(handle).backgroundColor;
+
+    await mouse('mousePressed', start);
+    await mouse('mouseMoved', { x: start.x, y: start.y + 15 });
+    await mouse('mouseMoved', { x: start.x, y: start.y + 55 });
+    expect(handle.hasAttribute('data-dragging')).toBe(true);
+    expect(getComputedStyle(handle).backgroundColor).not.toBe(rest);
+
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    await mouse('mouseReleased', { x: start.x, y: start.y + 55 });
+    await expect.poll(() => handle.hasAttribute('data-dragging')).toBe(false);
+    await expect.element(sheetOf()).toBeVisible();
+    expect(getComputedStyle(handle).backgroundColor).toBe(rest);
+  });
+
+  test('dragging the scrollbar thumb inside the sheet leaves the handle alone', async () => {
+    await renderBottom(<div className="h-500 shrink-0" />);
+    const handle = document.querySelector<HTMLElement>('[data-drawer-handle]')!;
+    const rest = getComputedStyle(handle).backgroundColor;
+    const body = sheetOf().querySelector<HTMLElement>('[data-scroll-area-viewport]')!;
+    await expect.element(sheetOf()).toHaveAttribute('data-overflow-y');
+
+    const bodyRect = body.getBoundingClientRect();
+    await mouse('mouseMoved', {
+      x: bodyRect.left + bodyRect.width / 2,
+      y: bodyRect.top + bodyRect.height / 2,
+    });
+    const bar = sheetOf().querySelector<HTMLElement>('[data-scroll-area-scrollbar]')!;
+    await expect.element(bar).toHaveAttribute('data-visible');
+
+    const thumbRect = bar.querySelector('[data-scroll-area-thumb]')!.getBoundingClientRect();
+    const start = { x: thumbRect.left + thumbRect.width / 2, y: thumbRect.top + 4 };
+    await mouse('mousePressed', start);
+    await mouse('mouseMoved', { x: start.x, y: start.y + 20 });
+    await mouse('mouseMoved', { x: start.x, y: start.y + 60 });
+    await expect.element(bar).toHaveAttribute('data-dragging');
+    expect(body.scrollTop).toBeGreaterThan(0);
+    expect(handle.hasAttribute('data-dragging')).toBe(false);
+    expect(getComputedStyle(handle).backgroundColor).toBe(rest);
+
+    await mouse('mouseReleased', { x: start.x, y: start.y + 60 });
+    await expect.element(bar).not.toHaveAttribute('data-dragging');
+  });
+
   test('a drag inside a scrolled list scrolls instead of moving the drawer', async () => {
     const { screen } = await renderBottom(
       <div className="h-40 shrink-0 overflow-y-auto" data-testid="list">

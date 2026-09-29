@@ -376,26 +376,24 @@ export namespace ScrollArea {
         'not-data-visible:delay-300 motion-reduce:transition-none',
       ],
       thumb: [
-        'absolute rounded-full bg-(--ids-color-scrollbar-thumb)',
+        'absolute rounded-full bg-(--ids-color-handle)',
         'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-        'hover:bg-(--ids-color-scrollbar-thumb-hover)',
-        'group-data-dragging/scrollbar:bg-(--ids-color-scrollbar-thumb-active)',
+        'hover:bg-(--ids-color-handle-hover)',
+        'group-data-dragging/scrollbar:bg-(--ids-color-handle-active)',
       ],
       corner: 'absolute size-(--scroll-area-thickness) rounded-full',
     },
     variants: {
       variant: {
         auto: {
-          scrollbar:
-            'hover:bg-(--ids-color-scrollbar-track) data-dragging:bg-(--ids-color-scrollbar-track)',
+          scrollbar: 'hover:bg-(--ids-color-muted) data-dragging:bg-(--ids-color-muted)',
         },
         hover: {
-          scrollbar:
-            'hover:bg-(--ids-color-scrollbar-track) data-dragging:bg-(--ids-color-scrollbar-track)',
+          scrollbar: 'hover:bg-(--ids-color-muted) data-dragging:bg-(--ids-color-muted)',
         },
         always: {
-          scrollbar: 'bg-(--ids-color-scrollbar-track)',
-          corner: 'bg-(--ids-color-scrollbar-track)',
+          scrollbar: 'bg-(--ids-color-muted)',
+          corner: 'bg-(--ids-color-muted)',
         },
       } satisfies Record<Variant, object>,
       size: {

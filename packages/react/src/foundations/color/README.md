@@ -25,22 +25,18 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 
 `data-mode` 에만 따릅니다.
 
-| 토큰                     | 쓰임                                               |
-| ------------------------ | -------------------------------------------------- |
-| `surface`                | 페이지와 카드 배경                                 |
-| `on-surface`             | 본문 글자                                          |
-| `muted`                  | 옅은 채움 (soft 필드, 투명 컨트롤의 hover, 트랙)   |
-| `muted-hover`            | 채운 컨트롤의 hover, 투명 컨트롤을 누를 때         |
-| `muted-active`           | 채운 컨트롤을 누를 때                              |
-| `on-muted`               | 보조 글자 (설명, 힌트, 자리 표시)                  |
-| `border`                 | 필드 테두리, 카드 가장자리, 구분선                 |
-| `handle`                 | 잡아 끄는 손잡이 (ScrollArea thumb, Drawer 손잡이) |
-| `handle-hover`           | 손잡이에 올렸을 때                                 |
-| `handle-active`          | 손잡이를 끄는 동안                                 |
-| `scrollbar-track`        | ScrollArea 트랙 (`always`, 막대에 올렸을 때)       |
-| `scrollbar-thumb`        | ScrollArea thumb                                   |
-| `scrollbar-thumb-hover`  | thumb 에 올렸을 때                                 |
-| `scrollbar-thumb-active` | thumb 을 끌 때                                     |
+| 토큰            | 쓰임                                               |
+| --------------- | -------------------------------------------------- |
+| `surface`       | 페이지와 카드 배경                                 |
+| `on-surface`    | 본문 글자                                          |
+| `muted`         | 옅은 채움 (soft 필드, 투명 컨트롤의 hover, 트랙)   |
+| `muted-hover`   | 채운 컨트롤의 hover, 투명 컨트롤을 누를 때         |
+| `muted-active`  | 채운 컨트롤을 누를 때                              |
+| `on-muted`      | 보조 글자 (설명, 힌트, 자리 표시)                  |
+| `border`        | 필드 테두리, 카드 가장자리, 구분선                 |
+| `handle`        | 잡아 끄는 손잡이 (ScrollArea thumb, Drawer 손잡이) |
+| `handle-hover`  | 손잡이에 올렸을 때                                 |
+| `handle-active` | 손잡이를 끄는 동안                                 |
 
 ### 상태 사다리
 

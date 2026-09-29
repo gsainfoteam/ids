@@ -135,12 +135,12 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 
 ## 색
 
-| 토큰                                 | 쓰임                                    |
-| ------------------------------------ | --------------------------------------- |
-| `--ids-color-scrollbar-thumb`        | thumb                                   |
-| `--ids-color-scrollbar-thumb-hover`  | thumb 에 올렸을 때                      |
-| `--ids-color-scrollbar-thumb-active` | thumb 을 끌 때                          |
-| `--ids-color-scrollbar-track`        | `always` 트랙, 막대에 올렸을 때, Corner |
+| 토큰                        | 쓰임                                    |
+| --------------------------- | --------------------------------------- |
+| `--ids-color-handle`        | thumb                                   |
+| `--ids-color-handle-hover`  | thumb 에 올렸을 때                      |
+| `--ids-color-handle-active` | thumb 을 끌 때                          |
+| `--ids-color-muted`         | `always` 트랙, 막대에 올렸을 때, Corner |
 
 - 중립 토큰이라 `data-mode` 에만 따릅니다. 다크 모드는 토큰이 바꿉니다.
 

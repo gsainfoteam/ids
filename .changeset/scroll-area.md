@@ -21,6 +21,3 @@ TextArea and the TimePicker columns now scroll through ScrollArea. Popover now c
 the space left on screen and scrolls past it. Dialog, Drawer and Popover keep their padding and
 gap on an inner viewport, so a
 `p-*` or `gap-*` given to `Dialog.Content`, `Drawer.Content` or `Popover.Content` no longer spaces the content.
-
-The CSS package adds the neutral tokens `--ids-color-scrollbar-track`, `-scrollbar-thumb`,
-`-scrollbar-thumb-hover` and `-scrollbar-thumb-active`.

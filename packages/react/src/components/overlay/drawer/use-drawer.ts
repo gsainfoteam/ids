@@ -99,6 +99,7 @@ export function useDrawer({
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
   const [content, setContent] = useState<HTMLElement | null>(null);
   const [backdrop, setBackdrop] = useState<HTMLElement | null>(null);
+  const [handle, setHandle] = useState<HTMLElement | null>(null);
   const [position, setPosition] = useState<LayerPosition>({ covered: false, modalsBelow: 0 });
 
   const presence = usePresence(open, {
@@ -167,6 +168,7 @@ export function useDrawer({
   const drag = useDrawerDrag({
     content,
     backdrop,
+    handle,
     side,
     open,
     dismissible,
@@ -198,6 +200,7 @@ export function useDrawer({
     setTrigger,
     setContent,
     setBackdrop,
+    setHandle,
     drag,
     ids: {
       content: `${baseId}-content`,

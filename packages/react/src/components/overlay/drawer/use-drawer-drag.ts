@@ -32,6 +32,7 @@ import type { BackgroundScale } from './background-scale';
 export type UseDrawerDragOptions = {
   content: HTMLElement | null;
   backdrop: HTMLElement | null;
+  handle: HTMLElement | null;
   side: DrawerSide;
   open: boolean;
   dismissible: boolean;
@@ -110,7 +111,7 @@ function markDragging(elements: ReadonlyArray<HTMLElement | null>, dragging: boo
 }
 
 export function useDrawerDrag(options: UseDrawerDragOptions) {
-  const { content, backdrop, side, open, snapPoints, activeIndex, fadeFromIndex } = options;
+  const { content, backdrop, handle, side, open, snapPoints, activeIndex, fadeFromIndex } = options;
 
   const [metrics, setMetrics] = useState<Metrics>({ size: 0, viewport: 0 });
   const [settled, setSettled] = useState(0);
@@ -200,7 +201,7 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
     gesture.current = null;
     if (!wasDragging) return;
 
-    markDragging([content, backdrop], false);
+    markDragging([content, backdrop, handle], false);
     setSettled((count) => count + 1);
   };
 
@@ -251,7 +252,7 @@ export function useDrawerDrag(options: UseDrawerDragOptions) {
       current.dragFrom = point;
       tryCapturePointer(element, event.pointerId);
       element.ownerDocument.getSelection()?.removeAllRanges();
-      markDragging([element, latest.current.options.backdrop], true);
+      markDragging([element, latest.current.options.backdrop, latest.current.options.handle], true);
     }
 
     const displacement = towardClose(towards, minus(point, current.dragFrom));
