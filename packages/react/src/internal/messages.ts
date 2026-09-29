@@ -7,6 +7,10 @@ export const messages = {
   avatarGroup: {
     overflow: '외 {count}명',
   },
+  breadcrumb: {
+    label: '이동 경로',
+    more: '숨은 경로 보기',
+  },
   calendar: {
     label: '달력',
     month: '월',

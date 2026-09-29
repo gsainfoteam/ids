@@ -141,6 +141,12 @@
 | Group | 없음 | 안의 컨트롤마다 Tab 이 멈춘다 | `role="group"`. 이름은 `aria-label` | 이름을 주지 않으면 무엇을 묶었는지 읽지 않는다 |
 | IdsProvider, Slot | 없음 | 없음 | 없음 | 없음 |
 
+### navigation
+
+| 컴포넌트 | APG 패턴 | 키보드 | 역할과 ARIA | 알려진 한계 |
+| --- | --- | --- | --- | --- |
+| Breadcrumb | [Breadcrumb](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/) | 링크마다 Tab 이 멈춘다. 접힌 항목은 Menu 와 같다(`Enter` `Space` `↓` 열기, `↑` `↓`, `Escape`) | `nav` 랜드마크("이동 경로") 안의 `ol` `li`. 현재 페이지는 `aria-current="page"`, 구분자는 `aria-hidden`. 접기 버튼은 "숨은 경로 보기" + `aria-haspopup="menu"`, 접힌 링크는 `menuitem` | 한 페이지에 둘 이상 두면 `aria-label` 로 이름을 나눠야 한다. 구분자 자동 삽입은 `Breadcrumb` 이나 `Breadcrumb.List` 의 바로 아래 Item 만 센다 |
+
 ### overlay
 
 | 컴포넌트 | APG 패턴 | 키보드 | 역할과 ARIA | 알려진 한계 |

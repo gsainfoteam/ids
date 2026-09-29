@@ -83,6 +83,8 @@ export { Spacer } from './components/layout/spacer';
 export { AspectRatio } from './components/layout/aspect-ratio';
 export { ScrollArea } from './components/layout/scroll-area';
 
+export { Breadcrumb } from './components/navigation/breadcrumb';
+
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
 export type { IdsTranslate } from './internal/translate';

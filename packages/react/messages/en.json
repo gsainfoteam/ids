@@ -5,6 +5,10 @@
   "avatarGroup": {
     "overflow": "{count} more"
   },
+  "breadcrumb": {
+    "label": "Breadcrumb",
+    "more": "Show hidden path"
+  },
   "calendar": {
     "label": "Calendar",
     "month": "Month",
