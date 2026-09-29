@@ -897,6 +897,7 @@ const { interaction, props, dataProps, labelling, descriptionId, register } = us
 
 - `asChild` 면 자식 요소(`<h3>`)는 그대로 두고 그 안의 내용을 버튼으로 감쌉니다. 제목 안에 버튼이 있는 모양이 Accordion 헤더와 같습니다.
 - 버튼은 native 라서 Enter 는 누를 때, Space 는 뗄 때 누르고, `disabled` 면 Tab 에서 빠집니다.
+- 다만 Firefox 와 WebKit 은 다른 곳에서 누른 Space 를 이 버튼 위에서 떼도 클릭합니다. 버튼은 Space 가 자기 위에서 눌렸는지 기억하고(`spaceWentDownHere`), 아니면 keyup 을 막아 Chromium 처럼 누르지 않습니다(`tests/card.test.tsx`).
 - `data-field-input` 이 있어서 루트의 `focus-ring` 이 `:has([data-field-input]:focus-visible)` 로 카드 전체에 링을 그립니다. 버튼 자체에는 링을 그리지 않습니다.
 - 버튼은 제목의 배치를 이어받습니다(`inline-flex items-center gap-[inherit]`). Item.Title 처럼 아이콘과 글자를 나란히 두는 제목도 모양이 바뀌지 않습니다.
 - 설명(`describedBy`)과 눌림(`pressed`)은 루트가 정한 `trigger` 객체로 받습니다.

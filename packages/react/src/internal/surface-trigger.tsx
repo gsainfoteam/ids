@@ -1,6 +1,13 @@
 'use client';
 
-import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react';
+import {
+  cloneElement,
+  isValidElement,
+  useRef,
+  type KeyboardEvent,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
 import { cn } from '../utils/cn';
 
@@ -23,6 +30,8 @@ function TriggerButton({
   className?: string;
   children: ReactNode;
 }) {
+  const spaceWentDownHere = useRef(false);
+
   return (
     <button
       type="button"
@@ -32,6 +41,17 @@ function TriggerButton({
       aria-describedby={trigger.describedBy}
       aria-pressed={trigger.pressed}
       className={cn(triggerReset, className)}
+      onKeyDown={(event: KeyboardEvent<HTMLButtonElement>) => {
+        if (event.key === ' ') spaceWentDownHere.current = true;
+      }}
+      onKeyUp={(event: KeyboardEvent<HTMLButtonElement>) => {
+        if (event.key !== ' ') return;
+        if (!spaceWentDownHere.current) event.preventDefault();
+        spaceWentDownHere.current = false;
+      }}
+      onBlur={() => {
+        spaceWentDownHere.current = false;
+      }}
     >
       {children}
     </button>
