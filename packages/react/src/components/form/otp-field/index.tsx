@@ -1,18 +1,15 @@
-import {
-  createContext,
-  use,
-  type ChangeEvent,
-  type ComponentProps,
-  type CSSProperties,
-  type ReactNode,
-} from 'react';
+import { type ChangeEvent, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import { MinusIcon } from '@heroicons/react/16/solid';
-
+import { OTPFieldCaret, type OTPFieldCaretProps } from './caret';
+import { OTPContext } from './context';
+import { OTPFieldGroup, type OTPFieldGroupProps } from './group';
 import { lengthOnlyPattern, type OTPFieldPattern } from './otp-code';
+import { OTPFieldSeparator, type OTPFieldSeparatorProps } from './separator';
+import { OTPFieldSlot, type OTPFieldSlotProps } from './slot';
+import { otpFieldStyle } from './style';
 import { useOTPField, type OTPSlotState } from './use-otp-field';
 import { messages } from '../../../internal/messages';
-import { cn, invariant, mergeProps, tv } from '../../../utils';
+import { invariant, mergeProps } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -52,30 +49,12 @@ export type OTPFieldProps = NativeInputProps & {
   children?: ReactNode;
 };
 
-type Context = {
-  slots: OTPSlotState[];
-  mask: boolean | string | undefined;
-  placeholder: string | undefined;
-  styles: ReturnType<typeof OTPField.Style>;
-};
-
-const OTPContext = createContext<Context | null>(null);
-const GroupContext = createContext(false);
-
-function useOTPContext(part: string) {
-  const context = use(OTPContext);
-  invariant(context, `${part} must be rendered inside OTPField.`);
-  return context;
-}
-
 const passwordManagerOptOut = {
   'data-1p-ignore': '',
   'data-lpignore': 'true',
   'data-bwignore': '',
   'data-form-type': 'other',
 };
-
-const noIosFocusZoom = cn('text-base');
 
 export function OTPField({
   length,
@@ -101,7 +80,7 @@ export function OTPField({
     'OTPField: length must be an integer from 1 to 12.',
   );
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = OTPField.Style({ size: resolvedSize, variant });
+  const styles = otpFieldStyle({ size: resolvedSize, variant });
   const { state, handlers, rootRef, inputRef } = useOTPField({
     length,
     value,
@@ -165,11 +144,11 @@ export function OTPField({
         data-readonly={inputProps.readOnly ? '' : undefined}
       >
         {children ?? (
-          <OTPField.Group>
+          <OTPFieldGroup>
             {state.slots.map((slot) => (
-              <OTPField.Slot key={slot.index} index={slot.index} />
+              <OTPFieldSlot key={slot.index} index={slot.index} />
             ))}
-          </OTPField.Group>
+          </OTPFieldGroup>
         )}
         <input {...input} ref={inputRef} />
       </div>
@@ -177,142 +156,23 @@ export function OTPField({
   );
 }
 
-function Masked({
-  char,
-  mask,
-  className,
-}: {
-  char: string;
-  mask: boolean | string | undefined;
-  className: string;
-}) {
-  if (mask === true) return <span className={className} />;
-  if (typeof mask === 'string' && mask !== '') return mask;
-  return char;
-}
-
 export namespace OTPField {
   export type Props = OTPFieldProps;
   export type Variant = OTPFieldVariant;
   export type SlotState = OTPSlotState;
 
-  export type GroupProps = ComponentProps<'div'>;
+  export type GroupProps = OTPFieldGroupProps;
 
-  export type SlotProps = Omit<ComponentProps<'div'>, 'children' | 'className'> & {
-    index: number;
-    className?: string | ((state: SlotState) => string | undefined);
-    children?: ReactNode | ((state: SlotState) => ReactNode);
-  };
+  export type SlotProps = OTPFieldSlotProps;
 
-  export type SeparatorProps = ComponentProps<'div'>;
+  export type SeparatorProps = OTPFieldSeparatorProps;
 
-  export type CaretProps = ComponentProps<'span'>;
+  export type CaretProps = OTPFieldCaretProps;
 
-  export function Group({ className, ...props }: GroupProps) {
-    const { styles } = useOTPContext('OTPField.Group');
-    return (
-      <GroupContext value={true}>
-        <div {...props} data-otp-group="" className={styles.group({ className })} />
-      </GroupContext>
-    );
-  }
+  export const Group = OTPFieldGroup;
+  export const Slot = OTPFieldSlot;
+  export const Separator = OTPFieldSeparator;
+  export const Caret = OTPFieldCaret;
 
-  export function Slot({ index, className, children, ...props }: SlotProps) {
-    const { slots, mask, placeholder, styles } = useOTPContext('OTPField.Slot');
-    const grouped = use(GroupContext);
-    const state = slots[index];
-    invariant(state, `OTPField.Slot: index ${index} is outside the code length.`);
-
-    const resolvedClassName = typeof className === 'function' ? className(state) : className;
-    const fallback = state.char ?? placeholder?.charAt(index) ?? '';
-    const content =
-      typeof children === 'function'
-        ? children(state)
-        : (children ?? (
-            <>
-              {state.char === undefined ? (
-                <span className={styles.placeholder()}>{fallback}</span>
-              ) : (
-                <Masked char={state.char} mask={mask} className={styles.maskDot()} />
-              )}
-              {state.hasFakeCaret && <Caret />}
-            </>
-          ));
-
-    return (
-      <div
-        {...props}
-        aria-hidden="true"
-        data-otp-slot={index}
-        data-active={state.isActive ? '' : undefined}
-        data-filled={state.isFilled ? '' : undefined}
-        data-grouped={grouped ? '' : undefined}
-        className={styles.slot({ className: resolvedClassName })}
-      >
-        {content}
-      </div>
-    );
-  }
-
-  export function Separator({ className, children, ...props }: SeparatorProps) {
-    const { styles } = useOTPContext('OTPField.Separator');
-    return (
-      <div {...props} aria-hidden="true" className={styles.separator({ className })}>
-        {children ?? <MinusIcon />}
-      </div>
-    );
-  }
-
-  export function Caret({ className, ...props }: CaretProps) {
-    const { styles } = useOTPContext('OTPField.Caret');
-    return (
-      <span {...props} className={styles.caret()}>
-        <span className={cn(styles.caretLine(), className)} />
-      </span>
-    );
-  }
-
-  export const Style = tv({
-    slots: {
-      root: 'group/otp relative inline-flex items-center gap-2 data-disabled:opacity-50',
-      input: [
-        'absolute inset-0 z-10 size-full cursor-text appearance-none border-0 bg-transparent p-0',
-        'font-mono',
-        noIosFocusZoom,
-        'tracking-[-0.5em] text-transparent caret-transparent outline-none',
-        'selection:bg-transparent disabled:cursor-not-allowed',
-      ],
-      group: 'flex items-center',
-      slot: [
-        'relative flex items-center justify-center border shadow-xs',
-        'text-(--ids-color-on-surface)',
-        'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast)',
-        'motion-reduce:transition-none',
-        'rounded-standard data-grouped:rounded-none',
-        'data-grouped:-ms-px data-grouped:first:ms-0',
-        'data-grouped:first:rounded-s-standard data-grouped:last:rounded-e-standard',
-        'data-active:z-20 data-active:border-(--ids-color-primary)',
-        'data-active:ring-[3px] data-active:ring-(--ids-color-primary)/40',
-        'group-data-invalid/otp:border-(--ids-color-danger)',
-        'group-data-invalid/otp:data-active:ring-(--ids-color-danger)/40',
-      ],
-      placeholder: 'text-(--ids-color-on-muted)',
-      maskDot: 'size-2 rounded-full bg-current',
-      separator: 'flex items-center text-(--ids-color-on-muted) [&_svg]:size-4',
-      caret: 'pointer-events-none absolute inset-0 flex items-center justify-center',
-      caretLine:
-        'h-1/2 w-px animate-caret-blink bg-(--ids-color-on-surface) motion-reduce:animate-none',
-    },
-    variants: {
-      variant: {
-        outline: { slot: 'border-(--ids-color-border) bg-(--ids-color-surface)' },
-        soft: { slot: 'border-transparent bg-(--ids-color-primary)/10 shadow-none' },
-      } satisfies Record<OTPFieldVariant, object>,
-      size: {
-        standard: { slot: 'size-(--ids-size-control-standard) text-body-b2-medium' },
-        tiny: { slot: 'size-(--ids-size-control-tiny) text-body-b3-medium' },
-      } satisfies Record<IdsSize, object>,
-    },
-    defaultVariants: { variant: 'outline', size: 'standard' },
-  });
+  export const Style = otpFieldStyle;
 }

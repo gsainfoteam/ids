@@ -2,10 +2,7 @@ import {
   Children,
   Fragment,
   cloneElement,
-  createContext,
-  createElement,
   isValidElement,
-  use,
   useEffect,
   useId,
   type ComponentProps,
@@ -17,34 +14,29 @@ import {
 import { isString, uniq } from 'es-toolkit';
 
 import {
-  FieldLabelContext,
+  FieldContext,
   FieldNotifyContext,
   FieldSizeContext,
   FieldStateContext,
+  type FieldContextValue,
   type FieldOrientation,
   type FieldState,
 } from './context';
+import { FieldDescription, type FieldDescriptionProps } from './description';
+import { FieldError, type FieldErrorProps } from './error';
+import { errorShown } from './error-shown';
+import { FieldHint, type FieldHintProps } from './hint';
+import { FieldLabel, type FieldLabelProps } from './label';
+import { resolve, stateAttributes, type StateValue } from './state-value';
+import { fieldStyle } from './style';
 import { useField } from './use-field';
-import { invariant, mergeProps, tv } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
-import { Label as BaseLabel } from '../../typography/label';
 
 import type { FieldValidity, FieldValidityKey } from './control-state';
 import type { IdsSize } from '../../../tokens/types';
 
 export type { FieldOrientation, FieldState } from './context';
 export type { FieldValidity, FieldValidityKey } from './control-state';
-
-type StateValue<S, T> = T | ((state: S) => T);
-
-type PartOwnProps<S> = {
-  asChild?: boolean;
-  className?: StateValue<S, string | undefined>;
-  style?: StateValue<S, CSSProperties | undefined>;
-  children?: StateValue<S, ReactNode>;
-};
-type PartProps<Tag extends 'label' | 'div', S> = Omit<ComponentProps<Tag>, keyof PartOwnProps<S>> &
-  PartOwnProps<S>;
 
 export type FieldProps = Omit<ComponentProps<'div'>, 'children' | 'className' | 'style'> & {
   children: ReactNode;
@@ -69,71 +61,6 @@ export type FieldErrorState = FieldState & {
 
 type ControlProps = Record<string, unknown>;
 type PartName = 'label' | 'description' | 'hint' | 'error';
-
-type FieldContextValue = {
-  controlId: string;
-  state: FieldState;
-  errorMessage: ReactNode;
-  validity: FieldValidity | null;
-  styles: ReturnType<typeof Field.Style>;
-};
-
-const FieldContext = createContext<FieldContextValue | null>(null);
-
-function usePart(name: string) {
-  const context = use(FieldContext);
-  invariant(context, `Field.${name} must be inside Field.`);
-  return context;
-}
-
-function resolve<S, T>(value: StateValue<S, T>, state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}
-
-function present(value: ReactNode) {
-  return value != null && value !== false && value !== '';
-}
-
-function stateAttributes(state: FieldState) {
-  return {
-    'data-orientation': state.orientation,
-    'data-size': state.size,
-    'data-invalid': state.invalid ? '' : undefined,
-    'data-disabled': state.disabled ? '' : undefined,
-    'data-required': state.required ? '' : undefined,
-    'data-filled': state.filled ? '' : undefined,
-    'data-focused': state.focused ? '' : undefined,
-    'data-touched': state.touched ? '' : undefined,
-    'data-dirty': state.dirty ? '' : undefined,
-  };
-}
-
-function errorShown(
-  { match, children }: { match?: FieldValidityKey; children?: unknown },
-  { state, errorMessage, validity }: Pick<FieldContextValue, 'state' | 'errorMessage' | 'validity'>,
-) {
-  if (!state.invalid) return false;
-  if (match !== undefined) return validity?.flags[match] === true;
-  return (
-    typeof children === 'function' ||
-    present(children as ReactNode) ||
-    present(errorMessage) ||
-    present(validity?.message)
-  );
-}
-
-function renderPart(
-  name: string,
-  asChild: boolean | undefined,
-  props: Record<string, unknown>,
-  content: ReactNode,
-) {
-  if (asChild) {
-    invariant(isValidElement(content), `Field.${name} asChild requires one element.`);
-    return cloneElement(content, mergeProps(content.props as Record<string, unknown>, props));
-  }
-  return createElement('div', props, content);
-}
 
 function flatten(children: ReactNode): ReactElement<ControlProps>[] {
   return Children.toArray(children).flatMap((child) => {
@@ -217,7 +144,7 @@ export function FieldRoot({
     state,
     errorMessage,
     validity: field.validity,
-    styles: Field.Style({
+    styles: fieldStyle({
       size,
       orientation,
       disabled,
@@ -318,139 +245,22 @@ export namespace Field {
   export type ErrorState = FieldErrorState;
   export type ValidityKey = FieldValidityKey;
 
-  export type LabelProps = PartProps<'label', FieldState>;
-  export type DescriptionProps = PartProps<'div', FieldState>;
-  export type HintProps = PartProps<'div', FieldState>;
-  export type ErrorProps = PartProps<'div', FieldErrorState> & { match?: FieldValidityKey };
+  export type LabelProps = FieldLabelProps;
+  export type DescriptionProps = FieldDescriptionProps;
+  export type HintProps = FieldHintProps;
+  export type ErrorProps = FieldErrorProps;
 
-  export function Label({ className, style, children, ...rest }: LabelProps) {
-    const { controlId, state } = usePart('Label');
-    return (
-      <FieldLabelContext value>
-        <BaseLabel
-          {...rest}
-          htmlFor={controlId}
-          size={state.size}
-          required={state.required}
-          disabled={state.disabled}
-          invalid={state.invalid}
-          data-field-part="label"
-          {...stateAttributes(state)}
-          className={resolve(className, state)}
-          style={resolve(style, state)}
-        >
-          {resolve(children, state)}
-        </BaseLabel>
-      </FieldLabelContext>
-    );
-  }
+  export const Label = FieldLabel;
+  export const Description = FieldDescription;
+  export const Hint = FieldHint;
+  export const Error = FieldError;
 
-  export function Description({ asChild, className, style, children, ...rest }: DescriptionProps) {
-    const { state, styles } = usePart('Description');
-    return renderPart(
-      'Description',
-      asChild,
-      {
-        ...rest,
-        'data-field-part': 'description',
-        ...stateAttributes(state),
-        className: styles.description({ className: resolve(className, state) }),
-        style: resolve(style, state),
-      },
-      resolve(children, state),
-    );
-  }
-
-  export function Hint({ asChild, className, style, children, ...rest }: HintProps) {
-    const { state, styles } = usePart('Hint');
-    if (state.invalid) return null;
-    return renderPart(
-      'Hint',
-      asChild,
-      {
-        ...rest,
-        'data-field-part': 'hint',
-        ...stateAttributes(state),
-        className: styles.hint({ className: resolve(className, state) }),
-        style: resolve(style, state),
-      },
-      resolve(children, state),
-    );
-  }
-
-  export function Error({ asChild, match, className, style, children, ...rest }: ErrorProps) {
-    const context = usePart('Error');
-    if (!errorShown({ match, children }, context)) return null;
-    const { state, errorMessage, validity, styles } = context;
-    const fallback = match === undefined ? (errorMessage ?? validity?.message) : validity?.message;
-    const errorState: FieldErrorState = {
-      ...state,
-      message: present(fallback) ? fallback : undefined,
-      validity: validity?.flags ?? null,
-    };
-    return renderPart(
-      'Error',
-      asChild,
-      {
-        ...rest,
-        'data-field-part': 'error',
-        'data-match': match,
-        ...stateAttributes(state),
-        className: styles.error({ className: resolve(className, errorState) }),
-        style: resolve(style, errorState),
-      },
-      typeof children === 'function' ? children(errorState) : (children ?? errorState.message),
-    );
-  }
-
-  export const Style = tv({
-    slots: {
-      root: 'grid min-w-0 gap-x-3 gap-y-2',
-      description: 'text-(--ids-color-on-muted)',
-      hint: 'text-(--ids-color-on-muted)',
-      error: 'text-(--ids-color-danger)',
-      control:
-        'min-w-0 [&>input:not([type=checkbox]):not([type=radio])]:w-full [&>textarea]:w-full',
-    },
-    variants: {
-      size: {
-        standard: { root: 'text-body-b3-regular' },
-        tiny: { root: 'text-caption-c1-regular' },
-      } satisfies Record<IdsSize, object>,
-      orientation: {
-        vertical: {},
-        horizontal: {
-          root: 'grid-cols-[auto_minmax(0,1fr)] [&>:not([data-field-part=label])]:col-start-2 [&>[data-field-part=label]]:col-start-1 [&>[data-field-part=label]]:self-center',
-        },
-      } satisfies Record<FieldOrientation, object>,
-      described: { true: {}, false: {} },
-      disabled: {
-        true: {
-          description: 'opacity-50',
-          hint: 'opacity-50',
-          error: 'opacity-50',
-        },
-      },
-    },
-    compoundVariants: [
-      {
-        orientation: 'horizontal',
-        described: true,
-        class: { root: '[&>[data-field-part=label]]:row-start-2' },
-      },
-      {
-        orientation: 'horizontal',
-        described: false,
-        class: { root: '[&>[data-field-part=label]]:row-start-1' },
-      },
-    ],
-    defaultVariants: { size: 'standard', orientation: 'vertical' },
-  });
+  export const Style = fieldStyle;
 }
 
 const parts = new Map<unknown, PartName>([
-  [Field.Label, 'label'],
-  [Field.Description, 'description'],
-  [Field.Hint, 'hint'],
-  [Field.Error, 'error'],
+  [FieldLabel, 'label'],
+  [FieldDescription, 'description'],
+  [FieldHint, 'hint'],
+  [FieldError, 'error'],
 ]);

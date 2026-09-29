@@ -73,8 +73,8 @@ className={cn('origin-center -rotate-90', indicatorClassName)}
 ### 쓰는 법
 
 ```ts
-// components/form/password-field/index.tsx
-export const Style = tv({
+// components/form/password-field/style.ts
+export const passwordFieldStyle = tv({
   extend: textControlStyle,
   slots: {
     toggle: [fieldAction.base, 'data-pressed:bg-transparent'],
@@ -184,7 +184,7 @@ const indexes = items.flatMap((child, index) =>
 ### 쓰는 법
 
 ```tsx
-// components/form/select/index.tsx (Select.Icon)
+// components/form/select/icon.tsx (Select.Icon)
 return part(
   'span',
   asChild,
@@ -218,7 +218,7 @@ DOM 이벤트를 다루는 작은 함수입니다: `isNodeFromAnyWindow`, `keepF
 // components/form/select/index.tsx: 포커스가 자기 팝업 안으로 갔는지
 const inPopup = isNodeFromAnyWindow(next) && (next as Element).closest?.(popupSelector);
 
-// components/form/chip-field/index.tsx: 옵션을 눌러도 포커스가 input 에 남는다
+// components/form/chip-field/item.tsx: 옵션을 눌러도 포커스가 input 에 남는다
 { onPointerDown: keepFocusWhereItIs }
 ```
 

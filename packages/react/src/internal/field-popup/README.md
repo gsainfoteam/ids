@@ -164,7 +164,7 @@ const styles = popupStyle();
 ### 쓰는 법
 
 ```tsx
-// components/form/select/index.tsx (Select.SearchField)
+// components/form/select/search-field.tsx (Select.SearchField)
 <FieldPopupSearch
   {...own}
   controls={ids.listbox}                 // 검색어가 거르는 listbox 의 id

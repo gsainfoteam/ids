@@ -115,6 +115,38 @@ packages/react/src/
 A new component goes into the category Notion gives it. Code shared by several components but not
 public goes into `internal/`, never loose at the root of `components/`.
 
+**Component folder.** A component with parts, or an `index.tsx` past about 250 lines, is split
+into one file per part. Menu and Drawer show the shape:
+
+```
+drawer/
+  index.tsx      Drawer and `export namespace Drawer`: types, part aliases, Style
+  context.ts     createContext and the guard hook (useDrawerContext)
+  style.ts       drawerStyle = tv({ slots, variants })
+  trigger.tsx    DrawerTrigger, DrawerTriggerProps
+  content.tsx    DrawerContent and the private popup it renders
+  use-drawer.ts  logic hooks and pure helpers keep their own files
+```
+
+- `index.tsx` holds the root component and the namespace only. A part is an alias with its props
+  type beside it, so `Drawer.Trigger` and `Drawer.Trigger.Props` stay the public names:
+  `export const Trigger = DrawerTrigger;` and
+  `export namespace Trigger { export type Props = DrawerTriggerProps; }`. `Style` is
+  `export const Style = drawerStyle;`.
+- A part file is kebab-case (`item.tsx`, `item-indicator.tsx`) and exports `XPart` and
+  `XPartProps`. A helper used by one part lives in that part's file; one shared by several parts
+  gets a small file named for what it holds.
+- Each public part sets its public name right after the function,
+  `DrawerTrigger.displayName = 'Drawer.Trigger';`, so Show code prints `<Drawer.Trigger>` and not
+  the function name. The icon-name lookup skips a `displayName` with a dot, so a part placed in an
+  IconButton's `icon` never becomes its label.
+- Parts import `./context`, `./style` and sibling parts directly. They import `'.'` only with
+  `import type`, so no runtime cycle runs through `index.tsx`. The root recognises its parts
+  (`child.type === DrawerOverlay`, a set of part functions) by importing them, never through
+  `Drawer.Overlay`.
+- Paths imported from outside the folder (`field/context`, `select/select-options`,
+  `calendar/date`, `drawer/drawer-gesture`) stay where they are.
+
 ## Stories
 
 Every component's `index.stories.tsx` has the same shape, in this order:

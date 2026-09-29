@@ -9,10 +9,13 @@ import {
 
 import { StarIcon } from '@heroicons/react/24/solid';
 
+import { RatingItem, type RatingItemProps } from './item';
+import { resolve, type StateProp } from './state-prop';
+import { ratingStyle, type RatingOptionPlacement } from './style';
 import { useRating } from './use-rating';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
-import { flattenFragments, invariant, tv } from '../../../utils';
+import { flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -32,10 +35,6 @@ export type RatingItemState = RatingState & {
   itemValue: number;
   fill: 'full' | 'half' | 'empty';
 };
-
-type StateProp<T, S> = T | ((state: S) => T);
-
-type RatingOptionPlacement = 'zero' | 'whole' | 'start' | 'end';
 
 export type RatingProps = Omit<
   ComponentProps<'div'>,
@@ -61,21 +60,6 @@ export type RatingProps = Omit<
   style?: StateProp<CSSProperties | undefined, RatingState>;
   children?: ReactNode;
 };
-
-type ItemProps = {
-  index?: number;
-  className?: StateProp<string | undefined, RatingItemState>;
-  style?: StateProp<CSSProperties | undefined, RatingItemState>;
-  children?: ReactNode | ((state: RatingItemState) => ReactNode);
-};
-
-function RatingItem(_props: ItemProps): ReactNode {
-  invariant(false, 'Rating.Item must be a direct child of Rating (or inside a Fragment).');
-}
-
-function resolve<T, S>(value: StateProp<T, S>, state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}
 
 export function Rating({
   value,
@@ -113,11 +97,11 @@ export function Rating({
   invariant(Number.isInteger(max) && max > 0, 'Rating: max must be a positive integer.');
   invariant(step === 1 || step === 0.5, 'Rating: step must be 1 or 0.5.');
 
-  let template: ReactElement<ItemProps> | undefined;
-  const indexed = new Map<number, ReactElement<ItemProps>>();
+  let template: ReactElement<RatingItemProps> | undefined;
+  const indexed = new Map<number, ReactElement<RatingItemProps>>();
   for (const child of flattenFragments(children)) {
     invariant(
-      isValidElement<ItemProps>(child) && child.type === RatingItem,
+      isValidElement<RatingItemProps>(child) && child.type === RatingItem,
       'Rating children must be Rating.Item elements.',
     );
     const { index } = child.props;
@@ -166,7 +150,7 @@ export function Rating({
     required,
     invalid: ariaInvalid === true || ariaInvalid === 'true',
   };
-  const styles = Rating.Style({ size: resolvedSize });
+  const styles = ratingStyle({ size: resolvedSize });
   const scoreLabel = getValueLabel(current, max);
   const generatedId = useId();
   const scoreId = `${id ?? generatedId}-score`;
@@ -310,48 +294,8 @@ export namespace Rating {
   export const Item = RatingItem;
 
   export namespace Item {
-    export type Props = ItemProps;
+    export type Props = RatingItemProps;
   }
 
-  export const Style = tv({
-    slots: {
-      root: [
-        'relative inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-standard outline-none',
-        '[--rating-accent:var(--ids-color-primary)]',
-        'data-invalid:[--rating-accent:var(--ids-color-danger)]',
-        'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-(--ids-color-primary)/40',
-        'data-disabled:opacity-50',
-      ],
-      item: 'relative inline-flex shrink-0 items-center justify-center rounded-standard focus-ring',
-      graphic: 'pointer-events-none relative block size-full [&_svg]:size-full',
-      empty:
-        'absolute inset-0 text-(--ids-color-border) in-data-invalid:text-(--ids-color-danger)/35',
-      fill: [
-        'absolute inset-0 text-(--rating-accent) in-data-previewing:opacity-50',
-        '[clip-path:inset(0_calc(100%-var(--rating-fill))_0_0)]',
-        'rtl:[clip-path:inset(0_0_0_calc(100%-var(--rating-fill)))]',
-      ],
-      option:
-        'absolute inset-y-0 cursor-pointer touch-manipulation rounded-standard outline-none disabled:cursor-not-allowed',
-    },
-    variants: {
-      size: {
-        standard: {
-          root: 'min-h-(--ids-size-control-standard)',
-          item: 'size-7',
-        },
-        tiny: {
-          root: 'min-h-(--ids-size-control-tiny)',
-          item: 'size-5.5',
-        },
-      } satisfies Record<IdsSize, object>,
-      placement: {
-        zero: { option: 'sr-only' },
-        whole: { option: 'inset-x-0' },
-        start: { option: 'start-0 w-1/2' },
-        end: { option: 'end-0 w-1/2' },
-      } satisfies Record<RatingOptionPlacement, object>,
-    },
-    defaultVariants: { size: 'standard' },
-  });
+  export const Style = ratingStyle;
 }

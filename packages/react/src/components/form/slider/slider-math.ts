@@ -1,6 +1,10 @@
+import { type CSSProperties } from 'react';
+
 import { clamp } from 'es-toolkit';
 
 import { Decimal } from '../../../internal/decimal';
+
+import type { SliderOrientation } from '.';
 
 export function snap(raw: number, min: number, max: number, step: number) {
   const offset = new Decimal(raw).minus(min).toNearest(step, Decimal.ROUND_HALF_CEIL);
@@ -16,6 +20,10 @@ export function percentOf(value: number, min: number, max: number) {
 export function thumbOffset(percent: number) {
   const pullInsideTrack = 0.5 - percent / 100;
   return `calc(${percent}% + ${pullInsideTrack} * var(--slider-thumb))`;
+}
+
+export function position(orientation: SliderOrientation, offset: string): CSSProperties {
+  return orientation === 'vertical' ? { bottom: offset } : { insetInlineStart: offset };
 }
 
 export function ratioAlong(distance: number, length: number, thumb: number) {

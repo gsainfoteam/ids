@@ -1,42 +1,38 @@
 import {
-  createContext,
-  isValidElement,
-  use,
   useId,
   type ComponentProps,
   type CSSProperties,
   type FocusEvent,
   type KeyboardEvent,
-  type ReactElement,
   type ReactNode,
 } from 'react';
 
-import { XMarkIcon } from '@heroicons/react/16/solid';
-
+import { ColorFieldClear, type ColorFieldClearProps } from './clear';
+import { ColorFieldContent, type ColorFieldContentProps } from './content';
+import { ColorFieldContext } from './context';
+import { isType } from './is-type';
+import { colorFieldStyle } from './style';
+import { ColorFieldSwatch, type ColorFieldSwatchProps } from './swatch';
+import { ColorFieldTrigger, type ColorFieldTriggerProps } from './trigger';
 import { useColorField } from './use-color-field';
+import { ColorFieldValue, type ColorFieldValueProps } from './value';
 import { FieldPopup, FieldPopupHeader, useDrawerPresentation } from '../../../internal/field-popup';
-import { fieldTrigger, type FieldTriggerVariant } from '../../../internal/field-surface';
-import { fieldAction } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
 import {
-  cn,
   flattenFragments,
   invariant,
   isNodeFromAnyWindow,
-  mergeEventHandlers,
   mergeProps,
   mergeRefs,
-  part,
-  tv,
 } from '../../../utils';
-import { IconButton } from '../../action/icon-button';
-import { ColorPicker, type ColorPickerSwatchOption } from '../../data/color-picker';
-import { cssColor, type ColorFormat } from '../../data/color-picker/color';
 import { useFieldSize } from '../field/context';
 
+import type { FieldTriggerVariant } from '../../../internal/field-surface';
 import type { IdsSize } from '../../../tokens/types';
+import type { ColorPickerSwatchOption } from '../../data/color-picker';
+import type { ColorFormat } from '../../data/color-picker/color';
 
 export type { ColorFormat } from '../../data/color-picker/color';
 export type ColorFieldVariant = FieldTriggerVariant;
@@ -75,37 +71,11 @@ export type ColorFieldProps = Omit<
   children?: ReactNode;
 };
 
-type Context = {
-  field: Omit<ReturnType<typeof useColorField>, 'rootRef' | 'triggerRef'>;
-  state: ColorFieldState;
-  placeholder: string;
-  triggerProps: Record<string, unknown>;
-  valueId: string;
-  picker: ComponentProps<typeof ColorPicker>;
-  size: IdsSize;
-  styles: ReturnType<typeof ColorField.Style>;
-};
-
-const FieldContext = createContext<Context | null>(null);
-
-function useColor(part: string) {
-  const context = use(FieldContext);
-  invariant(context, `${part} must be rendered inside ColorField.`);
-  return context;
-}
-
-const isType = (type: unknown) => (node: ReactNode) => isValidElement(node) && node.type === type;
-
 const FIRST_CONTROL = [
   '[data-color-picker] input:not([type=radio]):not([tabindex="-1"])',
   '[data-color-picker] [role=slider]:not([tabindex="-1"])',
   '[data-color-picker] [role=radiogroup]',
 ].join(', ');
-
-const CHECKER =
-  'conic-gradient(var(--ids-color-muted) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-muted) 0 75%, var(--ids-color-surface) 0)';
-
-const alreadyDimmedByField = cn('data-disabled:opacity-100');
 
 export function ColorField({
   value,
@@ -150,7 +120,7 @@ export function ColorField({
   const drawer = useDrawerPresentation(mobileVariant);
   const popupId = `ids-color-${useId()}`;
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = ColorField.Style({ variant, size: resolvedSize });
+  const styles = colorFieldStyle({ variant, size: resolvedSize });
 
   const ariaInvalid = native['aria-invalid'] ?? invalid ?? (s.invalid || undefined);
   const isInvalid = ariaInvalid === true || ariaInvalid === 'true';
@@ -209,7 +179,7 @@ export function ColorField({
   );
 
   return (
-    <FieldContext
+    <ColorFieldContext
       value={{
         field,
         state,
@@ -289,113 +259,7 @@ export function ColorField({
           {contents.length ? contents : <ColorFieldContent />}
         </FieldPopup>
       )}
-    </FieldContext>
-  );
-}
-
-function ColorFieldTrigger({ asChild, children, className, ...props }: ColorField.TriggerProps) {
-  const c = useColor('ColorField.Trigger');
-  invariant(
-    !flattenFragments(children).some(isType(ColorFieldClear)),
-    'ColorField.Clear must be a sibling of Trigger, not inside its button.',
-  );
-  return part(
-    'button',
-    asChild,
-    children ?? (
-      <>
-        <ColorFieldSwatch />
-        <ColorFieldValue />
-      </>
-    ),
-    mergeProps(props, {
-      ...c.triggerProps,
-      className: c.styles.trigger({ className: resolveState(className, c.state) }),
-    }),
-  );
-}
-
-function ColorFieldSwatch({
-  asChild,
-  children,
-  className,
-  style,
-  ...props
-}: ColorField.SwatchProps) {
-  const c = useColor('ColorField.Swatch');
-  const { parsed } = c.field.state;
-  const fill = parsed ? cssColor(parsed) : undefined;
-  return part(
-    'span',
-    asChild,
-    children,
-    mergeProps(props, {
-      'aria-hidden': true,
-      'data-color-field-swatch': '',
-      'data-empty': parsed ? undefined : '',
-      className: c.styles.swatch({ className }),
-      style: fill
-        ? {
-            ...style,
-            backgroundImage: `linear-gradient(${fill}, ${fill}), ${CHECKER}`,
-            backgroundSize: '100% 100%, 6px 6px',
-          }
-        : style,
-    }),
-  );
-}
-
-function ColorFieldValue({ asChild, children, className, ...props }: ColorField.ValueProps) {
-  const c = useColor('ColorField.Value');
-  const { text } = c.field.state;
-  return part(
-    'span',
-    asChild,
-    children ?? (text || c.placeholder),
-    mergeProps(props, {
-      id: props.id ?? c.valueId,
-      'data-placeholder': text ? undefined : '',
-      className: c.styles.value({ className }),
-    }),
-  );
-}
-
-function ColorFieldClear({
-  asChild,
-  children,
-  className,
-  onClick,
-  ...props
-}: ColorField.ClearProps) {
-  const c = useColor('ColorField.Clear');
-  if (!c.field.state.value || c.state.readOnly) return null;
-  const button = {
-    ...props,
-    'aria-label': props['aria-label'] ?? messages.colorField.clear,
-    disabled: c.state.disabled,
-    'data-color-field-clear': '',
-    variant: 'ghost' as const,
-    size: c.size,
-    className: c.styles.clear({ className }),
-    onClick: mergeEventHandlers(onClick, c.field.actions.clear),
-  };
-  if (asChild) {
-    invariant(isValidElement(children), '`ColorField.Clear asChild` requires one element.');
-    return (
-      <IconButton {...button} asChild>
-        {children}
-      </IconButton>
-    );
-  }
-  return <IconButton {...button} icon={children ?? <XMarkIcon aria-hidden="true" />} />;
-}
-
-function ColorFieldContent({ children, className, ...props }: ColorField.ContentProps) {
-  const c = useColor('ColorField.Content');
-  return (
-    <ColorPicker {...props} {...c.picker} className={className}>
-      {children}
-    </ColorPicker>
+    </ColorFieldContext>
   );
 }
 
@@ -403,23 +267,11 @@ export namespace ColorField {
   export type Props = ColorFieldProps;
   export type State = ColorFieldState;
   export type Variant = ColorFieldVariant;
-  export type TriggerProps = Omit<ComponentProps<'button'>, 'className'> & {
-    asChild?: boolean;
-    className?: string | ((state: ColorFieldState) => string | undefined);
-  };
-  export type SwatchProps = ComponentProps<'span'> & { asChild?: boolean };
-  export type ValueProps = ComponentProps<'span'> & { asChild?: boolean };
-  export type ClearProps = Omit<ComponentProps<'button'>, 'children'> & {
-    asChild?: boolean;
-    children?: ReactElement;
-  };
-  export type ContentProps = Omit<
-    ComponentProps<'div'>,
-    'defaultValue' | 'onChange' | 'className' | 'children'
-  > & {
-    className?: string;
-    children?: ReactNode;
-  };
+  export type TriggerProps = ColorFieldTriggerProps;
+  export type SwatchProps = ColorFieldSwatchProps;
+  export type ValueProps = ColorFieldValueProps;
+  export type ClearProps = ColorFieldClearProps;
+  export type ContentProps = ColorFieldContentProps;
 
   export const Trigger = ColorFieldTrigger;
   export const Swatch = ColorFieldSwatch;
@@ -427,46 +279,5 @@ export namespace ColorField {
   export const Clear = ColorFieldClear;
   export const Content = ColorFieldContent;
 
-  export const Style = tv({
-    slots: {
-      root: ['relative', fieldTrigger.base],
-      trigger: [
-        'flex h-full min-w-0 flex-1 cursor-pointer items-center self-stretch bg-transparent text-start outline-none',
-        'disabled:cursor-not-allowed data-readonly:cursor-default',
-      ],
-      swatch: [
-        'shrink-0 rounded-indicator inset-ring-1 inset-ring-(--ids-color-on-surface)/15',
-        'data-empty:bg-[linear-gradient(to_top_right,transparent_calc(50%-0.75px),var(--ids-color-danger)_50%,transparent_calc(50%+0.75px))]',
-        'data-empty:inset-ring-(--ids-color-border)',
-      ],
-      value: [
-        'min-w-0 flex-1 truncate font-mono',
-        'data-placeholder:font-sans data-placeholder:text-(--ids-color-on-muted)',
-      ],
-      clear: [fieldAction.base, alreadyDimmedByField],
-      popup: 'concentric-p-3',
-    },
-    variants: {
-      variant: {
-        outline: { root: fieldTrigger.variant.outline },
-        soft: { root: fieldTrigger.variant.soft },
-        ghost: { root: fieldTrigger.variant.ghost },
-      } satisfies Record<ColorFieldVariant, object>,
-      size: {
-        standard: {
-          root: 'h-(--ids-size-control-standard) rounded-standard text-body-b3-regular',
-          trigger: 'gap-2 px-3',
-          swatch: 'size-5',
-          clear: fieldAction.unpadded.standard,
-        },
-        tiny: {
-          root: 'h-(--ids-size-control-tiny) rounded-standard text-caption-c1-regular',
-          trigger: 'gap-1.5 px-2.5',
-          swatch: 'size-4',
-          clear: fieldAction.unpadded.tiny,
-        },
-      } satisfies Record<IdsSize, object>,
-    },
-    defaultVariants: { variant: 'outline', size: 'standard' },
-  });
+  export const Style = colorFieldStyle;
 }

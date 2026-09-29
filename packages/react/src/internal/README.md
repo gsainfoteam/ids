@@ -272,7 +272,7 @@ export const textControlStyle = tv({
   },
 });
 
-// components/form/select/index.tsx: trigger 가 상자를 채우고 padding 을 가진다
+// components/form/select/style.ts: trigger 가 상자를 채우고 padding 을 가진다
 root: ['relative', fieldTrigger.base],
 variant: {
   outline: { root: fieldTrigger.variant.outline },
@@ -363,7 +363,7 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 ### 쓰는 법
 
 ```tsx
-// components/form/select/index.tsx: Select.Style 의 root 슬롯은 ['relative', fieldTrigger.base]
+// components/form/select/index.tsx: selectStyle 의 root 슬롯은 ['relative', fieldTrigger.base]
 <div ref={rootRef} data-select="" className={styles.root({ className: resolveState(className, state) })}>
   {triggers.length ? triggers : <SelectTrigger />}
   {clears}
@@ -599,7 +599,7 @@ slots: {
 ### 쓰는 법
 
 ```ts
-// components/form/select/index.tsx: prop 이 없을 때의 기본값
+// components/form/select/clear.tsx: prop 이 없을 때의 기본값
 'aria-label': props['aria-label'] ?? messages.select.clear,
 
 // components/form/rating/index.tsx
@@ -707,7 +707,7 @@ export const matchesQuery = (option, query) => matchesSearch(option.search, quer
 ### 쓰는 법
 
 ```tsx
-// components/form/slider/index.tsx
+// components/form/slider/style.ts
 track: [sliderSurface.edge, 'relative rounded-full bg-(--ids-color-muted)'],
 thumb: [
   sliderSurface.thumb,
@@ -774,6 +774,7 @@ style?: StateValue<CSSProperties | undefined, State>;
 const assertive = announcedAssertively.has(colorScheme);
 <div role={role ?? (assertive ? 'alert' : 'status')} />
 
+// components/feedback/alert/icon.tsx
 const Glyph = statusIcons[state.colorScheme];
 ```
 
