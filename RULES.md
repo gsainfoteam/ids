@@ -92,7 +92,8 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
     only the step rules themselves (snap up, down or to the nearest grid value) are IDS's code;
   - textarea sizing `react-textarea-autosize`, phone numbers `libphonenumber-js`;
   - QR code matrices `uqr`, which QRCode draws as its own SVG;
-  - keyboard shortcuts `@tanstack/react-hotkeys`.
+  - keyboard shortcuts `@tanstack/react-hotkeys`;
+  - table state (sorting, row selection, pagination, column sizing) `@tanstack/react-table`.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:
   - the `overlay` and `toast` stores, on React's `useSyncExternalStore`. overlay-kit leaves a
