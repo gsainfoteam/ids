@@ -1,0 +1,66 @@
+[
+  {
+    "name": "import { Button }",
+    "path": "dist/index.js",
+    "import": "{ Button }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "29 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Dialog }",
+    "path": "dist/index.js",
+    "import": "{ Dialog }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "55 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Select }",
+    "path": "dist/index.js",
+    "import": "{ Select }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "74 kB",
+    "gzip": true
+  },
+  {
+    "name": "import * (every export)",
+    "path": "dist/index.js",
+    "import": "*",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "310 kB",
+    "gzip": true
+  }
+]

@@ -38,6 +38,7 @@ pnpm lint             # ESLint all packages
 pnpm test             # Build, then Vitest: browser tests, every story's play, SSR and hydration of every story, dist checks
 pnpm examples:build   # Build the Next.js, TanStack Start and Astro examples
 pnpm examples:check   # Check their server-rendered HTML and CSS for IDS
+pnpm size             # Gzip size of Button, Dialog, Select and the whole ids-react entry against .size-limit.json
 pnpm storybook        # Storybook for ids-react (port 6006)
 ```
 
@@ -48,6 +49,13 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 **css** — Pure CSS package. No React dependency. Consumers import `@gsainfoteam/ids-css` and add Tailwind themselves (peerDep). Do not `@import "tailwindcss"` inside this package.
 
 **react** — Component library. Library build via Vite, ESM only (`dist/index.js`; `@tanstack/hotkeys` ships no CommonJS), one module per source file (`preserveModules`, `sideEffects: false`); every entry in `dependencies` and `peerDependencies` stays external. Storybook for development.
+
+**Bundle budget.** `packages/react/.size-limit.json` holds the gzip size an app pays for
+`import { Button }`, `{ Dialog }`, `{ Select }` and every export, with React and the peers left
+out, and CI fails past it (`pnpm size`). A limit sits 10 to 15% above the size measured when it was
+set. When a change grows a size for a reason, raise that limit in the same commit and say why; a
+single import growing towards the whole package means tree-shaking broke (a module with a side
+effect at the top, or a part pulled in through a barrel).
 
 **`'use client'` marks the modules that run on the client.** The build keeps one module per source
 file, so each file's directive reaches `dist` (`rollup-preserve-directives`). A module that calls a

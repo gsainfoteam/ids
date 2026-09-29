@@ -38,6 +38,9 @@ jobs:
       - name: Check react ships type declarations
         run: test -f packages/react/dist/index.d.ts
 
+      - name: Check the bundle size budget
+        run: pnpm size
+
       - name: Build the Next.js, TanStack Start and Astro examples
         run: pnpm examples:build
         env:
