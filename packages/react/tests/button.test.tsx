@@ -1,9 +1,9 @@
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
-import { page, userEvent } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Button, ButtonGroup } from '../src';
+import { Button, ButtonGroup, IdsProvider } from '../src';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -274,3 +274,60 @@ test.each([false, true])(
     await userEvent.unhover(button);
   },
 );
+
+async function holdMouseOn(element: Element) {
+  const frame = window.frameElement!.getBoundingClientRect();
+  const scale = frame.width / window.innerWidth;
+  const rect = element.getBoundingClientRect();
+  const point = {
+    x: frame.left + (rect.left + rect.width / 2) * scale,
+    y: frame.top + (rect.top + rect.height / 2) * scale,
+  };
+  await cdp().send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point });
+  await cdp().send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    ...point,
+    button: 'left',
+    buttons: 1,
+    clickCount: 1,
+  });
+  return () =>
+    cdp().send('Input.dispatchMouseEvent', {
+      type: 'mouseReleased',
+      ...point,
+      button: 'left',
+      buttons: 0,
+      clickCount: 1,
+    });
+}
+
+test('glossy lays a highlight over the fill with a darker edge and a shadow, still rings on focus and sinks on press', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Button variant="glossy">저장</Button>
+    </IdsProvider>,
+  );
+  const button = screen.getByRole('button', { name: '저장' });
+  await expect.element(button).toHaveAttribute('data-variant', 'glossy');
+  const element = button.element();
+
+  const rest = getComputedStyle(element);
+  expect(rest.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+  expect(rest.backgroundImage).toMatch(/^linear-gradient\(/);
+  expect(rest.boxShadow).toMatch(/rgba\(255, 255, 255, 0\.35\) 0px 1px 0px 0px inset/);
+  expect(rest.boxShadow).toMatch(/0px 0px 0px 1px inset/);
+  expect(rest.boxShadow).toMatch(/0px 1px 3px 0px/);
+
+  await userEvent.keyboard('{Tab}');
+  await expect.element(button).toHaveFocus();
+  expect(getComputedStyle(element).boxShadow).toMatch(/0px 0px 0px 3px/);
+  (element as HTMLElement).blur();
+
+  const release = await holdMouseOn(element);
+  await expect.element(button).toHaveAttribute('data-active');
+  const pressed = getComputedStyle(element);
+  expect(pressed.boxShadow).toMatch(/rgba\(0, 0, 0, 0\.2\) 0px 1px 2px 0px inset/);
+  expect(pressed.boxShadow).not.toMatch(/0px 1px 3px 0px/);
+  await release();
+  await expect.element(button).not.toHaveAttribute('data-active');
+});

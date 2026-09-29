@@ -48,6 +48,7 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 <FloatingButton />                                   // solid, primary (기본)
 <FloatingButton variant="soft" />                     // 옅은 테마 색. 불투명하다
 <FloatingButton variant="outline" />                  // 바탕색과 테두리
+<FloatingButton variant="glossy" />                   // solid 채움에 광택과 진한 가장자리. 그림자는 그대로
 <FloatingButton colorScheme="neutral" />              // 검은 버튼. 다크 모드에서는 흰 버튼
 <FloatingButton colorScheme="danger" variant="soft" />
 ```
@@ -91,18 +92,18 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 
 ## 속성
 
-| 속성                    | 기본 / 동작                                                         |
-| ----------------------- | ------------------------------------------------------------------- |
-| `placement`             | `bottom-right`(기본) / `bottom-left` / `top-left` / `top-right`     |
-| `variant`               | `solid`(기본) / `soft` / `outline`                                  |
+| 속성                    | 기본 / 동작                                                             |
+| ----------------------- | ----------------------------------------------------------------------- |
+| `placement`             | `bottom-right`(기본) / `bottom-left` / `top-left` / `top-right`         |
+| `variant`               | `solid`(기본) / `soft` / `outline` / `glossy`                           |
 | `colorScheme`           | `primary`(기본) / `neutral` / `danger` / `success` / `warning` / `info` |
-| `size`                  | `standard`(56px, 기본) / `tiny`(44px)                               |
-| `iconOnly`              | 보이는 글자가 있는지로 자동으로 정한다                              |
-| `type`                  | `button`. 폼을 제출하지 않는다                                      |
-| `asChild`               | 자식 요소 하나(링크)를 버튼으로 그린다                              |
-| `focusableWhenDisabled` | 비활성이어도 포커스와 탭 순서를 지킨다                              |
-| `ref`                   | 실제 `button`, `asChild` 면 자식 요소                               |
-| 그 외                   | Button 과 같다 (상태 함수 prop, `data-*`, `onInteractionChange`)    |
+| `size`                  | `standard`(56px, 기본) / `tiny`(44px)                                   |
+| `iconOnly`              | 보이는 글자가 있는지로 자동으로 정한다                                  |
+| `type`                  | `button`. 폼을 제출하지 않는다                                          |
+| `asChild`               | 자식 요소 하나(링크)를 버튼으로 그린다                                  |
+| `focusableWhenDisabled` | 비활성이어도 포커스와 탭 순서를 지킨다                                  |
+| `ref`                   | 실제 `button`, `asChild` 면 자식 요소                                   |
+| 그 외                   | Button 과 같다 (상태 함수 prop, `data-*`, `onInteractionChange`)        |
 
 ## 알아둘 것
 

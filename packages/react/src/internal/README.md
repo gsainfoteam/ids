@@ -124,7 +124,7 @@ export const Style = tv({
 
 ### 왜 이렇게
 
-- color scheme 은 CSS 변수만 정하고 variant 는 그 변수만 읽습니다. variant 4 개와 scheme 6 개의 조합마다 클래스를 따로 쓰지 않아도 모든 조합이 맞습니다.
+- color scheme 은 CSS 변수만 정하고 variant 는 그 변수만 읽습니다. variant 5 개와 scheme 6 개의 조합마다 클래스를 따로 쓰지 않아도 모든 조합이 맞습니다.
 
 | 변수                | 쓰는 곳                                                                                      |
 | ------------------- | -------------------------------------------------------------------------------------------- |
@@ -136,8 +136,9 @@ export const Style = tv({
 | `--control-press`   | outline, ghost 의 press 배경과 켜진 ghost, outline toggle. `muted-hover`, 또는 status 색 16% |
 | `--control-ring`    | focus ring 과 focus 때의 테두리. neutral 도 primary                                          |
 
-- outline 과 ghost 는 중립 상태 사다리를 따릅니다. hover 는 `--control-hover`, press 는 한 단계 진한 `--control-press` 입니다. solid 와 soft 는 브랜드 상태(`/90`, `/80`, `/15`, `/20`)라 사다리 밖입니다.
-- scheme 색은 solid 와 soft 만 씁니다. outline 과 ghost 는 primary 에서도 neutral 이고, 브랜드 색은 focus 에 남깁니다. shadcn/ui 가 primary 버튼 옆의 보조 버튼을 조용하게 두는 방식입니다.
+- outline 과 ghost 는 중립 상태 사다리를 따릅니다. hover 는 `--control-hover`, press 는 한 단계 진한 `--control-press` 입니다. solid 와 soft 는 브랜드 상태(`/90`, `/80`, `/15`, `/20`)라 사다리 밖이고, glossy 는 색 대신 광택과 그림자로 상태를 보입니다.
+- `glossy` 는 solid 의 채움(`--control-fill`) 위에 층을 얹습니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택(`background-image` 라 채움 색 위에 그려진다), 안쪽 위 1px 하이라이트(`inset-shadow`), 채움보다 20% 진한 가장자리(`inset-ring` 의 `color-mix`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다. focus 때는 `ringFollowsScheme` 이 가장자리를 `--control-ring` 으로 바꿉니다. outline 과 같은 방식입니다.
+- scheme 색은 solid, soft, glossy 만 씁니다. outline 과 ghost 는 primary 에서도 neutral 이고, 브랜드 색은 focus 에 남깁니다. shadcn/ui 가 primary 버튼 옆의 보조 버튼을 조용하게 두는 방식입니다.
 - `base` 에는 primary 의 변수를 담은 `fallbackScheme` 이 들어 있습니다. `colorScheme` 을 받지 않는 컴포넌트도 일곱 변수가 모두 정의돼야 하기 때문입니다. `colorScheme` 을 주면 `cn` 이 같은 변수의 뒤쪽 값만 남깁니다.
 - `focus-ring` 은 ring 을 primary 로 칠합니다. `ringFollowsScheme` 이 cascade 에서 뒤에 와서 ring 과 focus 테두리를 `--control-ring` 으로 바꿉니다.
 - `trimBesideIconOrSpinner`: 라벨 옆의 아이콘은 그쪽 가장자리에 이미 시각적 무게를 더하므로, 아이콘이 있는 쪽의 padding 을 줄입니다. standard 는 `px-4` 에서 `ps-3`/`pe-3`, tiny 는 `px-3` 에서 `ps-2.5`/`pe-2.5` 입니다.
@@ -862,13 +863,15 @@ export const Style = tv({
 
 - toggle 은 꺼져 있을 때 조용합니다. 꺼진 상태의 배경은 모두 투명하고 outline 만 테두리를 그립니다.
 
-| variant            | 켜짐(`data-pressed`)                                |
-| ------------------ | --------------------------------------------------- |
-| `ghost`, `outline` | neutral press 배경(`--control-press`)               |
-| `soft`             | scheme 의 옅은 배경과 `--control-accent` 글자       |
-| `solid`            | scheme 배경과 `--control-on-fill` 글자, `shadow-xs` |
+| variant            | 켜짐(`data-pressed`)                                                     |
+| ------------------ | ------------------------------------------------------------------------ |
+| `ghost`, `outline` | neutral press 배경(`--control-press`)                                    |
+| `soft`             | scheme 의 옅은 배경과 `--control-accent` 글자                            |
+| `solid`            | scheme 배경과 `--control-on-fill` 글자, `shadow-xs`                      |
+| `glossy`           | scheme 배경과 `--control-on-fill` 글자, 광택, 진한 가장자리, `shadow-sm` |
 
 - 색은 [control-surface.ts](#control-surfacets) 의 scheme 변수에서 옵니다.
+- 켜진 `glossy` 는 control-surface 의 `glossy` 층을 `data-pressed:` 로 하나씩 풀어 적습니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 접두사를 붙여 조합할 수 없습니다.
 - 크기는 따로 두지 않습니다. 라벨이 있는 Toggle 은 Button 과 같은 padding 을 갖고, IconToggle 은 icon-square 로 정사각형이 됩니다.
 - hovered, active, pressed 를 각각 적습니다. `interactiveDataProps` 가 셋 중 하나만 붙이므로(pressed > active > hovered), 켜진 toggle 에 마우스를 올려도 켜진 모양이 유지됩니다.
 - 켜진 ghost, outline 과 누르는 동안(`data-active`)은 press 단계(`--control-press`)이고, hover(`--control-hover`)보다 한 단계 진합니다. 그래서 켜진 toggle 이 hover 한 꺼진 toggle 과 구별됩니다.

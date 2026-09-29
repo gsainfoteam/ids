@@ -18,7 +18,7 @@ import { FloatingButton } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['solid', 'soft', 'outline'] as const;
+const variants = ['solid', 'soft', 'outline', 'glossy'] as const;
 const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'info'] as const;
 const sizes = ['standard', 'tiny'] as const;
 const placements = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const;

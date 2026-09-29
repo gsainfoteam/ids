@@ -24,5 +24,13 @@ export const toggleSurface = {
       'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
       'data-pressed:bg-(--control-fill) data-pressed:text-(--control-on-fill) data-pressed:shadow-xs',
     ),
+    glossy: cn(
+      'bg-transparent text-(--control-quiet)',
+      'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
+      'data-pressed:bg-(--control-fill) data-pressed:text-(--control-on-fill) data-pressed:shadow-sm',
+      'data-pressed:bg-linear-to-b data-pressed:from-white/20 data-pressed:to-transparent',
+      'data-pressed:inset-shadow-[0_1px_0_rgb(255_255_255/0.35)]',
+      'data-pressed:inset-ring-1 data-pressed:inset-ring-[color-mix(in_oklab,var(--control-fill),black_20%)]',
+    ),
   } satisfies Record<IdsVariant, string>,
 } as const;

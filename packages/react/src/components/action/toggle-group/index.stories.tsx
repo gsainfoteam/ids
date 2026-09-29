@@ -22,7 +22,7 @@ import { ToggleGroup } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['ghost', 'outline', 'soft', 'solid'] as const;
+const variants = ['ghost', 'outline', 'soft', 'solid', 'glossy'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const meta = {

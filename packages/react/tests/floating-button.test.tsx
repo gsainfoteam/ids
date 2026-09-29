@@ -195,3 +195,17 @@ test('render props update interaction state and keyboard focus remains visible',
   await expect.element(button).toHaveTextContent('키보드 포커스');
   await expect.element(button).toHaveAttribute('data-focus-visible');
 });
+
+test('SSR: glossy keeps the floating shadow and layers the highlight over its fill', () => {
+  const node = parse(
+    renderToString(
+      <FloatingButton variant="glossy" aria-label="작성">
+        <svg />
+      </FloatingButton>,
+    ),
+  ).querySelector<HTMLElement>('[data-floating-button]')!;
+  expect(node.dataset.variant).toBe('glossy');
+  expect(node.className).toMatch(/(^| )shadow-lg( |$)/);
+  expect(node.className).toMatch(/(^| )bg-linear-to-b( |$)/);
+  expect(node.className).toMatch(/(^| )bg-\(--control-fill\)( |$)/);
+});

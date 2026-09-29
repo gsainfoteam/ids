@@ -90,3 +90,14 @@ test('children and a missing icon are rejected', () => {
   // @ts-expect-error The icon prop is required.
   expect(() => renderToString(<IconButton />)).toThrow(/`icon` prop is required/);
 });
+
+test('SSR: glossy is a variant of its own', () => {
+  const button = new DOMParser()
+    .parseFromString(
+      renderToString(<IconButton variant="glossy" icon={<PlusIcon />} />),
+      'text/html',
+    )
+    .querySelector('button')!;
+  expect(button.dataset.variant).toBe('glossy');
+  expect(button.className).toMatch(/bg-linear-to-b/);
+});

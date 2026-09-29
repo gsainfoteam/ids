@@ -4,7 +4,7 @@ import { renderToString } from 'react-dom/server';
 import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
 
-import { Button, ButtonGroup, Toggle, ToggleGroup } from '../src';
+import { Button, ButtonGroup, IdsProvider, Toggle, ToggleGroup } from '../src';
 
 const separator = (node: ReactNode) =>
   new DOMParser()
@@ -97,4 +97,60 @@ test('outline items either side of an open popover still share one border', asyn
   expect(getComputedStyle(save).borderEndEndRadius).toBe('0px');
   expect(getComputedStyle(more).borderStartStartRadius).toBe('0px');
   expect(getComputedStyle(more).marginInlineStart).toBe('-1px');
+});
+
+const dropShadow = /0px 1px 3px 0px/;
+
+test('joined glossy buttons share one edge and one shadow drawn by the group', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <ButtonGroup aria-label="저장" variant="glossy">
+        <Button>저장</Button>
+        <Button>더보기</Button>
+      </ButtonGroup>
+    </IdsProvider>,
+  );
+  const group = screen.getByRole('group', { name: '저장' }).element();
+  const [save, more] = group.querySelectorAll('button');
+  await expect.element(save!).toHaveAttribute('data-variant', 'glossy');
+
+  expect(getComputedStyle(more!).marginInlineStart).toBe('-1px');
+  expect(getComputedStyle(save!).boxShadow).not.toMatch(dropShadow);
+  expect(getComputedStyle(more!).boxShadow).not.toMatch(dropShadow);
+  expect(getComputedStyle(group).boxShadow).toMatch(dropShadow);
+  expect(getComputedStyle(group).borderStartStartRadius).toBe('10px');
+});
+
+test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its own', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <ToggleGroup aria-label="정렬" variant="glossy" defaultValue="left">
+        <Toggle value="left">왼쪽</Toggle>
+        <Toggle value="right">오른쪽</Toggle>
+      </ToggleGroup>
+    </IdsProvider>,
+  );
+  const group = screen.getByRole('radiogroup', { name: '정렬' }).element();
+  const [left, right] = group.querySelectorAll('button');
+  await expect.element(left!).toHaveAttribute('data-pressed');
+
+  expect(getComputedStyle(group).boxShadow).not.toMatch(dropShadow);
+  expect(getComputedStyle(left!).boxShadow).toMatch(dropShadow);
+  expect(getComputedStyle(right!).backgroundImage).toBe('none');
+  expect(getComputedStyle(right!).marginInlineStart).toBe('-1px');
+});
+
+test('spaced glossy buttons keep their own shadows', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <ButtonGroup aria-label="저장" variant="glossy" attached={false}>
+        <Button>저장</Button>
+        <Button>더보기</Button>
+      </ButtonGroup>
+    </IdsProvider>,
+  );
+  const group = screen.getByRole('group', { name: '저장' }).element();
+  for (const button of group.querySelectorAll('button'))
+    expect(getComputedStyle(button).boxShadow).toMatch(dropShadow);
+  expect(getComputedStyle(group).boxShadow).not.toMatch(dropShadow);
 });

@@ -140,7 +140,13 @@ export namespace Group {
         vertical: { root: 'flex-col' },
       } satisfies Record<GroupOrientation, object>,
       attached: {
-        true: {},
+        true: {
+          root: [
+            'has-[>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:rounded-standard',
+            'has-[>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:shadow-sm',
+            '[&>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:shadow-none',
+          ],
+        },
         false: { root: 'gap-2' },
       },
       size: {
@@ -162,6 +168,8 @@ export namespace Group {
             '[&>:not(input,[popover],[data-floating-ui-focus-guard]):has(~:not(input,[popover],[data-floating-ui-focus-guard]))]:rounded-e-none',
             '[&>[data-variant=outline]+[data-variant=outline]]:-ms-px',
             '[&>[data-variant=outline]+[popover]+[data-variant=outline]]:-ms-px',
+            '[&>[data-variant=glossy]+[data-variant=glossy]]:-ms-px',
+            '[&>[data-variant=glossy]+[popover]+[data-variant=glossy]]:-ms-px',
           ],
           separator: '-mx-px',
         },
@@ -175,6 +183,8 @@ export namespace Group {
             '[&>:not(input,[popover],[data-floating-ui-focus-guard]):has(~:not(input,[popover],[data-floating-ui-focus-guard]))]:rounded-b-none',
             '[&>[data-variant=outline]+[data-variant=outline]]:-mt-px',
             '[&>[data-variant=outline]+[popover]+[data-variant=outline]]:-mt-px',
+            '[&>[data-variant=glossy]+[data-variant=glossy]]:-mt-px',
+            '[&>[data-variant=glossy]+[popover]+[data-variant=glossy]]:-mt-px',
           ],
           separator: '-my-px',
         },

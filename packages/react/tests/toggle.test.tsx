@@ -5,7 +5,7 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { ButtonGroup, Toggle, ToggleGroup } from '../src';
+import { ButtonGroup, IdsProvider, Toggle, ToggleGroup } from '../src';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -122,4 +122,26 @@ test('inside ToggleGroup a value is required and the group owns the state', () =
       </ToggleGroup>,
     ),
   ).toThrow(/owns the pressed state/);
+});
+
+test('a glossy toggle is quiet while off and takes the glossy layers once pressed', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Toggle variant="glossy">굵게</Toggle>
+    </IdsProvider>,
+  );
+  const toggle = screen.getByRole('button', { name: '굵게' });
+  await expect.element(toggle).toHaveAttribute('data-variant', 'glossy');
+  const element = toggle.element();
+
+  expect(getComputedStyle(element).backgroundImage).toBe('none');
+  expect(getComputedStyle(element).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+
+  await userEvent.click(toggle);
+  await expect.element(toggle).toHaveAttribute('data-pressed');
+  const on = getComputedStyle(element);
+  expect(on.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+  expect(on.backgroundImage).toMatch(/^linear-gradient\(/);
+  expect(on.boxShadow).toMatch(/rgba\(255, 255, 255, 0\.35\) 0px 1px 0px 0px inset/);
+  expect(on.boxShadow).toMatch(/0px 1px 3px 0px/);
 });

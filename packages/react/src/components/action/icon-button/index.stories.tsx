@@ -22,7 +22,7 @@ import { IconButton } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['solid', 'soft', 'outline', 'ghost'] as const;
+const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
 const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'info'] as const;
 const sizes = ['standard', 'tiny'] as const;
 const functionNamesSurviveBuild = isDevelopment;

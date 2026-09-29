@@ -24,7 +24,7 @@ import { ButtonGroup } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['solid', 'soft', 'outline', 'ghost'] as const;
+const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
 const sizes = ['standard', 'tiny'] as const;
 const orientations = ['horizontal', 'vertical'] as const;
 

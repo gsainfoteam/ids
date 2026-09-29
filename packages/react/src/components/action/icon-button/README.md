@@ -83,7 +83,7 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 | ----------------------- | ----------------------------------------------------------------------- |
 | `icon`                  | 필수. `asChild` 면 생략하고 자식 안에 둘 수 있다                        |
 | `aria-label`            | 생략하면 아이콘에서 찾는다                                              |
-| `variant`               | `ghost`(기본) / `solid` / `soft` / `outline`                            |
+| `variant`               | `ghost`(기본) / `solid` / `soft` / `outline` / `glossy`                 |
 | `colorScheme`           | `primary`(기본) / `neutral` / `danger` / `success` / `warning` / `info` |
 | `size`                  | `standard`(36px, 기본) / `tiny`(32px). 그룹 안에서는 그룹 크기          |
 | `asChild`               | 자식 요소 하나를 정사각형 버튼으로 그린다                               |

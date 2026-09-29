@@ -23,7 +23,7 @@ import { BoldIcon } from '@heroicons/react/16/solid';
 ```
 
 - 이름은 상태에 따라 바꾸지 않습니다. 켜짐 여부는 `aria-pressed` 가 알려 줍니다. 이름을 "좋아요 취소" 로 바꾸면 "좋아요 취소, 눌림" 처럼 이름과 상태가 서로 부딪칩니다.
-- `variant` 는 Toggle 과 같습니다. `ghost`(기본)와 `outline` 은 켜지면 옅은 회색, `soft` 와 `solid` 는 테마 색입니다.
+- `variant` 는 Toggle 과 같습니다. `ghost`(기본)와 `outline` 은 켜지면 옅은 회색, `soft` 와 `solid` 는 테마 색, `glossy` 는 테마 색 채움에 광택입니다.
 
 ## 이름
 
@@ -43,7 +43,7 @@ import { BoldIcon } from '@heroicons/react/16/solid';
 | `aria-label`                 | 생략하면 아이콘에서 찾는다                                     |
 | `pressed` / `defaultPressed` | 켜짐 여부. 기본 `false`                                        |
 | `onPressedChange`            | 켜짐 여부가 바뀔 때                                            |
-| `variant`                    | `ghost`(기본) / `outline` / `soft` / `solid`                   |
+| `variant`                    | `ghost`(기본) / `outline` / `soft` / `solid` / `glossy`        |
 | `size`                       | `standard`(36px, 기본) / `tiny`(32px). 그룹 안에서는 그룹 크기 |
 | `value`                      | `ToggleGroup` 안에서 필수                                      |
 | 그 외                        | Toggle 과 같다                                                 |

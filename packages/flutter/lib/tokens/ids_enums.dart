@@ -21,4 +21,5 @@ enum IdsVariant {
   soft,
   outline,
   ghost,
+  glossy,
 }

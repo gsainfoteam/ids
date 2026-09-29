@@ -10,7 +10,7 @@
       "values": { "$value": ["standard", "tiny"], "$type": "other" }
     },
     "variant": {
-      "values": { "$value": ["solid", "soft", "outline", "ghost"], "$type": "other" }
+      "values": { "$value": ["solid", "soft", "outline", "ghost", "glossy"], "$type": "other" }
     }
   }
 }

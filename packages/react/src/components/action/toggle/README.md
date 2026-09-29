@@ -40,10 +40,12 @@ import { Toggle } from '@gsainfoteam/ids-react';
 <Toggle variant="outline">굵게</Toggle>  // 테두리. 켜지면 옅은 회색
 <Toggle variant="soft">굵게</Toggle>     // 켜지면 옅은 테마 색
 <Toggle variant="solid">굵게</Toggle>    // 켜지면 테마 색으로 채움
+<Toggle variant="glossy">굵게</Toggle>   // 켜지면 테마 색 채움에 광택, 진한 가장자리, 그림자
 ```
 
 - 꺼진 모습은 모두 같고 `outline` 만 테두리가 있습니다. variant 는 켜진 모습의 강도입니다.
-- `colorScheme` 을 주면 `soft` 와 `solid` 가 그 색으로 켜지고, 상태 색에서는 꺼진 글자도 그 색입니다.
+- `glossy` 는 켜진 모습이 Button 의 `glossy` 와 같습니다. 꺼져 있을 때는 다른 variant 처럼 배경이 없습니다.
+- `colorScheme` 을 주면 `soft`, `solid`, `glossy` 가 그 색으로 켜지고, 상태 색에서는 꺼진 글자도 그 색입니다.
 
 ## 아이콘
 
@@ -90,7 +92,7 @@ import { Toggle } from '@gsainfoteam/ids-react';
 | ------------------------------ | ----------------------------------------------------------------------- |
 | `pressed` / `defaultPressed`   | 켜짐 여부. 기본 `false`                                                 |
 | `onPressedChange`              | 켜짐 여부가 바뀔 때                                                     |
-| `variant`                      | `ghost`(기본) / `outline` / `soft` / `solid`                            |
+| `variant`                      | `ghost`(기본) / `outline` / `soft` / `solid` / `glossy`                 |
 | `colorScheme`                  | `primary`(기본) / `neutral` / `danger` / `success` / `warning` / `info` |
 | `size`                         | `standard`(36px, 기본) / `tiny`(32px). 그룹 안에서는 그룹 크기          |
 | `value`                        | `ToggleGroup` 안에서 필수                                               |

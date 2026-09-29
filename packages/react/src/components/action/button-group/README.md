@@ -95,5 +95,6 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 
 - `aria-label` 도 `aria-labelledby` 도 없으면 개발 모드에서 콘솔에 경고합니다. 그룹 안의 그룹은 경고하지 않습니다.
 - 버튼 하나하나가 Tab 순서에 들어갑니다. 화살표 키로 옮겨 다니며 하나를 고르는 묶음은 `ToggleGroup` 을 씁니다.
-- 테두리를 겹치는 기준은 `data-variant="outline"` 입니다. 직접 만든 컨트롤도 이 속성을 붙이면 이어 붙습니다.
+- 테두리를 겹치는 기준은 `data-variant="outline"` 과 `data-variant="glossy"` 입니다. 직접 만든 컨트롤도 이 속성을 붙이면 이어 붙습니다.
+- 이어 붙인 `glossy` 버튼은 각자의 그림자를 빼고, 그룹이 그림자 하나를 둘레에 그립니다. 켜질 때만 채워지는 `glossy` 토글(`aria-pressed`, `aria-checked`)은 그룹 그림자를 만들지 않고 켜진 토글이 제 그림자를 갖습니다. `attached={false}` 면 버튼마다 그림자를 갖습니다.
 - 그룹 안에 제자리로 렌더된 팝오버(`[popover]`)와 그 focus guard 는 이어 붙이는 칸에서 빠집니다. 팝오버를 여는 마지막 버튼도 바깥 모서리를 지키고, 팝오버 양옆의 outline 테두리도 한 줄로 겹칩니다.

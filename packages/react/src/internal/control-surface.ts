@@ -107,6 +107,14 @@ export const controlSurface = {
       'bg-transparent text-(--control-quiet)',
       'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
     ),
+    glossy: cn(
+      'bg-(--control-fill) text-(--control-on-fill) shadow-sm',
+      'bg-linear-to-b from-white/20 to-transparent',
+      'inset-shadow-[0_1px_0_rgb(255_255_255/0.35)]',
+      'inset-ring-1 inset-ring-[color-mix(in_oklab,var(--control-fill),black_20%)]',
+      'data-hovered:from-white/30',
+      'data-active:from-transparent data-active:shadow-none data-active:inset-shadow-[0_1px_2px_rgb(0_0_0/0.2)]',
+    ),
   } satisfies Record<IdsVariant, string>,
   colorScheme: schemes,
 } as const;

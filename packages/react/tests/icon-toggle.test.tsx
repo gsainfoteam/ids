@@ -50,3 +50,12 @@ test('children and a missing icon are rejected', () => {
   // @ts-expect-error The icon prop is required.
   expect(() => renderToString(<IconToggle />)).toThrow(/`icon` prop is required/);
 });
+
+test('SSR: a glossy icon toggle spells the glossy layers out for its pressed state', () => {
+  const toggle = parse(
+    renderToString(<IconToggle variant="glossy" icon={<BoldIcon />} defaultPressed />),
+  ).querySelector('button')!;
+  expect(toggle.dataset.variant).toBe('glossy');
+  expect(toggle.className).toMatch(/data-pressed:bg-linear-to-b/);
+  expect(toggle.className).not.toMatch(/(^| )bg-linear-to-b/);
+});
