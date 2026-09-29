@@ -55,6 +55,14 @@ export { Item } from './components/data/item';
 export { Accordion } from './components/data/accordion';
 export { Empty } from './components/data/empty';
 export { QRCode } from './components/data/qr-code';
+export { Table } from './components/data/table';
+export type {
+  TableProps,
+  TableAlign,
+  TableLayout,
+  TableSection,
+  TableVariant,
+} from './components/data/table';
 
 export { Button } from './components/action/button';
 export { IconButton } from './components/action/icon-button';
