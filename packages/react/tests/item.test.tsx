@@ -45,7 +45,7 @@ test('SSR: a static row has no role, and every part marks itself', () => {
   expect(media.className).toContain('group-has-[[data-item-description]]/item:self-start');
 });
 
-test('onClick: a button named by its title that ignores presses on its own actions', async () => {
+test('onClick: the title is the button, described by the description, and the row presses around its actions', async () => {
   const opened = vi.fn();
   const archived = vi.fn();
   const screen = await render(
@@ -61,22 +61,40 @@ test('onClick: a button named by its title that ignores presses on its own actio
       </Item.Actions>
     </Item>,
   );
-  const item = screen.getByRole('button', { name: 'Alice Kim' });
-  await expect.element(item).toHaveAttribute('tabindex', '0');
-  await expect
-    .element(item)
-    .toHaveAttribute('aria-labelledby', screen.container.querySelector('[data-item-title]')!.id);
-  await expect
-    .element(item)
-    .toHaveAttribute(
-      'aria-describedby',
-      screen.container.querySelector('[data-item-description]')!.id,
-    );
+  const row = screen.container.querySelector<HTMLElement>('[data-item]')!;
+  const title = screen.getByRole('button', { name: 'Alice Kim' });
+  expect(row).not.toHaveAttribute('role');
+  expect(row).not.toHaveAttribute('tabindex');
+  expect(title.element().closest('[data-item-title]')).not.toBeNull();
+  await expect.element(title).toHaveAccessibleDescription('Hi');
   await userEvent.click(screen.getByRole('button', { name: 'Archive' }));
   expect([opened.mock.calls.length, archived.mock.calls.length]).toEqual([0, 1]);
-  item.element().focus();
+  await userEvent.click(screen.getByText('Hi'));
+  expect(opened, 'a press anywhere on the row').toHaveBeenCalledOnce();
+  title.element().focus();
   await userEvent.keyboard('{Enter}');
-  expect(opened).toHaveBeenCalledOnce();
+  expect(opened).toHaveBeenCalledTimes(2);
+});
+
+test('selected on a titled row is reported by the title button', async () => {
+  const screen = await render(
+    <Item onClick={() => {}} selected>
+      <Item.Content>
+        <Item.Title>Inbox</Item.Title>
+      </Item.Content>
+    </Item>,
+  );
+  await expect
+    .element(screen.getByRole('button', { name: 'Inbox' }))
+    .toHaveAttribute('aria-pressed', 'true');
+  expect(screen.container.querySelector('[data-item]')).not.toHaveAttribute('aria-pressed');
+});
+
+test('a pressable row without a title stays a button itself', async () => {
+  const screen = await render(<Item onClick={() => {}}>Home</Item>);
+  const row = screen.getByRole('button', { name: 'Home' });
+  await expect.element(row).toHaveAttribute('data-item');
+  await expect.element(row).toHaveAttribute('tabindex', '0');
 });
 
 test('selected: aria-pressed on a button row, left out when aria-current says it', async () => {

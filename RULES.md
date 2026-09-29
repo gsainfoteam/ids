@@ -439,6 +439,14 @@ ToggleGroup put `ref` and `id` on the root, with `tabIndex={-1}`, and hand `focu
 checked or first enabled item, so a `<label htmlFor>` and react-hook-form's error focus land
 somewhere that does not move as the value changes.
 
+**A pressable surface never nests buttons.** A Card or Item with `onClick` presses anywhere on
+its root, but the button keyboards and screen readers reach is its Title (`internal/surface-trigger.tsx`
+renders the title's content in a `<button data-surface-trigger>`, inside the heading when the
+Title is `asChild`). The root stays a plain `div`, so the buttons in `Card.Action`, `Card.Footer`
+and `Item.Actions` are not inside another button. Only a surface with no Title in its JSX
+becomes `role="button"` itself. The root finds the Title statically (`containsElementOfType`), so
+the server HTML already has the right roles.
+
 **Forms.** `FormValue` never submits an empty string. Form reset restores `defaultValue` without
 calling the value callback (`useControllableState`'s `{ silent: true }`), the same as a native
 input, which fires no change event on reset.

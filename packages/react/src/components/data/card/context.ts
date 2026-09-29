@@ -5,9 +5,11 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { cardStyle } from './style';
+import type { SurfaceTrigger } from '../../../internal/surface-trigger';
 
 type Context = {
   styles: ReturnType<typeof cardStyle>;
+  trigger: SurfaceTrigger | null;
   setTitleId: (id: string | undefined) => void;
   setDescriptionId: (id: string | undefined) => void;
 };

@@ -291,7 +291,7 @@ export const Interactive: Story = {
     docs: {
       description: {
         story:
-          '`onClick` 을 주면 행 전체가 버튼이 되고, 이름은 Item.Title, 설명은 Item.Description입니다. Item.Actions 안의 버튼을 눌러도 행은 열리지 않습니다.',
+          '`onClick` 을 주면 행 어디를 눌러도 열리고, 키보드와 스크린 리더에는 Item.Title이 버튼이 됩니다. 설명은 Item.Description입니다. Item.Actions 안의 버튼을 눌러도 행은 열리지 않습니다.',
       },
     },
   },

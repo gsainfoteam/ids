@@ -40,16 +40,34 @@ test('SSR: a static card has no role and every part marks itself', () => {
   );
 });
 
-test('onClick makes it a button named by its title and described by its description', async () => {
+test('SSR: a pressable card already renders its title as the button, inside a heading given by asChild', () => {
+  const doc = parse(
+    renderToString(
+      <Card onClick={() => {}}>
+        <Card.Header>
+          <Card.Title asChild>
+            <h3>Design review</h3>
+          </Card.Title>
+        </Card.Header>
+      </Card>,
+    ),
+  );
+  expect(doc.querySelector('[data-card]')!.hasAttribute('role')).toBe(false);
+  const button = doc.querySelector('h3[data-card-title] > button[data-surface-trigger]')!;
+  expect(button.textContent).toBe('Design review');
+  expect(button.getAttribute('type')).toBe('button');
+});
+
+test('onClick makes the title the button, described by the description, inside a plain card', async () => {
   const screen = await render(anatomy({ onClick: () => {} }));
-  const card = screen.getByRole('button', { name: 'Design review' });
-  const title = screen.container.querySelector('[data-card-title]')!;
-  const description = screen.container.querySelector('[data-card-description]')!;
-  await expect.element(card).toHaveAttribute('tabindex', '0');
-  await expect.element(card).toHaveAttribute('aria-labelledby', title.id);
-  await expect.element(card).toHaveAttribute('aria-describedby', description.id);
-  await expect.element(card).toHaveAccessibleDescription('Today at 3pm');
-  await expect.element(card).toHaveAttribute('data-interactive');
+  const title = screen.getByRole('button', { name: 'Design review' });
+  const root = screen.container.querySelector<HTMLElement>('[data-card]')!;
+  expect(title.element().closest('[data-card-title]')).not.toBeNull();
+  expect(root).not.toHaveAttribute('role');
+  expect(root).not.toHaveAttribute('aria-labelledby');
+  expect(root).toHaveAttribute('data-interactive');
+  await expect.element(title).toHaveAccessibleDescription('Today at 3pm');
+  expect(title.element()).toHaveAttribute('data-field-input');
 });
 
 test('Enter presses on key down; Space presses on key up, and not after focus leaves', async () => {
@@ -88,14 +106,16 @@ test('clicks and keys that start on a control inside the card stay with that con
   expect(onClick, 'text inside the card still opens it').toHaveBeenCalledOnce();
 });
 
-test('disabled: aria-disabled, out of the tab order, and no press', async () => {
+test('disabled: the title button is disabled, out of the tab order, and nothing presses', async () => {
   const onClick = vi.fn();
   const screen = await render(anatomy({ onClick, disabled: true }));
-  const card = screen.getByRole('button', { name: 'Design review' });
-  await expect.element(card).toHaveAttribute('aria-disabled', 'true');
-  await expect.element(card).not.toHaveAttribute('tabindex');
-  await expect.element(card).toHaveAttribute('data-disabled');
-  await userEvent.click(card, { force: true });
+  const title = screen.getByRole('button', { name: 'Design review' });
+  await expect.element(title).toBeDisabled();
+  await expect.element(title).toHaveAttribute('disabled');
+  const root = screen.container.querySelector('[data-card]');
+  expect(root).toHaveAttribute('data-disabled');
+  expect(root, 'the whole card reads as inactive').toHaveAttribute('aria-disabled', 'true');
+  await userEvent.click(screen.getByText('Today at 3pm'));
   await userEvent.keyboard('{Tab}');
   await expect.element(screen.getByRole('button', { name: 'Copy' })).toHaveFocus();
   await userEvent.keyboard('{Enter}');

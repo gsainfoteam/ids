@@ -31,6 +31,7 @@
 | [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                        |
 | [`status-palette.ts`](#status-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                                    | Alert                                                                                                                                                                                                                 |
 | [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                                   | Card, Item, Chip                                                                                                                                                                                                      |
+| [`surface-trigger.tsx`](#surface-triggertsx)     | 누르는 표면의 Title 안에 그리는 버튼                                                  | Card.Title, Item.Title                                                                                                                                                                                                |
 | [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                                                | DateField, TimeField, DateTimeField                                                                                                                                                                                   |
 | [`text-control/`](./text-control/README.md)      | 글자 입력 필드의 셸, Clear, 값 추적 hook                                              | TextField, PasswordField, NumberField, TelField, TextArea                                                                                                                                                             |
 | [`toggle-surface.ts`](#toggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                                     | Toggle, IconToggle                                                                                                                                                                                                    |
@@ -697,6 +698,7 @@ const press = usePressable<HTMLElement>({
 | 안쪽 컨트롤에서 시작한 클릭 | `onClick` 을 부르지 않는다                           |
 
 - `NESTED_CONTROL` 은 사용자가 따로 조작하는 요소입니다(링크, 버튼, 폼 요소, `role="checkbox"` 같은 위젯 역할, `tabindex` 가 -1 이 아닌 요소). 여기서 시작한 클릭은 그 요소의 것입니다. 이 검사가 없으면 행 안의 버튼을 눌렀을 때 행의 동작도 같이 돕니다.
+- 표면의 Title 버튼(`data-surface-trigger`, [surface-trigger.tsx](#surface-triggertsx))은 안쪽 컨트롤로 치지 않습니다. 그 버튼의 클릭이 곧 표면을 누른 것입니다.
 - 키는 `event.target === event.currentTarget` 일 때만 처리합니다. 안쪽 컨트롤에 포커스가 있을 때 누른 키는 그 컨트롤의 것입니다.
 - 호출한 쪽의 `onKeyDown` 을 먼저 부르고, 거기서 `preventDefault()` 하면 누르지 않습니다.
 
@@ -844,41 +846,60 @@ const Glyph = statusIcons[state.colorScheme];
 ### 쓰는 법
 
 ```tsx
-// components/data/card/use-card.ts
-export function useCard<E extends HTMLElement>(options: UseSurfaceOptions<E>) {
-  return { ...useSurface<E>(options), ...useLabelling(options.interactive) };
-}
-
 // components/data/card/root.tsx
-const { interaction, props, dataProps, labelling, register } = useCard<HTMLDivElement>({
+const titleIsTheButton = interactive && !asChild && containsElementOfType(children, CARD_TITLE);
+const { interaction, props, dataProps, labelling, descriptionId, register } = useCard({
   interactive,
   asChild,
   disabled,
+  titleIsTheButton,
   handlers: { onClick, onKeyDown, onKeyUp, onFocus, onBlur, onPointerEnter /* ... */ },
 });
 
-<CardContext value={{ styles, ...register }}>
+<CardContext
+  value={{ styles, trigger: titleIsTheButton ? { disabled, describedBy: descriptionId } : null, ...register }}
+>
   <Root {...rest} {...props} {...labelling} {...dataProps}>...</Root>
 </CardContext>
 
-export function Title({ className, id, ...props }: Title.Props) {
-  const { styles, setTitleId } = useCardContext('Card.Title');
-  const titleId = useRegisteredId(setTitleId, id);
-  return <Part {...props} id={titleId} kind="title" className={styles.title({ className })} />;
-}
+// components/data/card/title.tsx
+<Part {...props} asChild={asChild} id={titleId} kind="title" className={styles.title({ className })}>
+  {titleContent({ trigger, asChild, children })}
+</Part>
 ```
 
 ### 왜 이렇게
 
-- `onClick` 이 있는 `div` 는 [pressable.ts](#pressablets) 로 button 이 됩니다. `asChild` 면 자식(보통 링크)이 자기 의미를 그대로 갖고 인터랙션 상태만 얻습니다(`enabled: interactive && !asChild`).
+- 누를 수 있는 표면은 세 가지입니다.
+  - Title 이 있으면(`titleIsTheButton`) 루트는 평범한 `div` 로 남고 Title 이 버튼이 됩니다([surface-trigger.tsx](#surface-triggertsx)). 루트의 `onClick` 은 안쪽 컨트롤이 아닌 곳을 누를 때와 Title 버튼이 눌릴 때 불립니다. 그래서 `Card.Action`, `Item.Actions` 의 버튼이 버튼 안에 들어가지 않습니다(axe `nested-interactive`).
+  - Title 이 없으면 루트가 [pressable.ts](#pressablets) 로 button 이 됩니다. 이때 안에 다른 버튼을 두지 않습니다.
+  - `asChild` 면 자식(보통 링크)이 자기 의미를 그대로 갖고 인터랙션 상태만 얻습니다.
+- Title 을 찾는 일은 `containsElementOfType`(utils/children.ts)이 JSX 를 훑어 합니다. layout effect 로 등록된 id 를 기다리지 않으므로 서버 HTML 부터 역할이 맞습니다. 자식이 함수이거나 Title 이 직접 만든 컴포넌트 안에 있으면 찾지 못하고 루트가 버튼이 됩니다.
+- disabled 인 Title 모드 표면은 루트에 `aria-disabled` 를 붙입니다. 흐려진 카드 글자가 비활성 컴포넌트의 일부로 읽히고, axe 도 그 글자의 대비를 재지 않습니다.
 - 누를 수 없는 표면은 hover 나 press 가 없으므로 `data-hovered` 같은 속성을 붙이지 않습니다(`dataProps` 가 빈 객체).
-- 누를 수 있는 표면은 Title 을 이름으로, Description 을 설명으로 씁니다(`aria-labelledby`, `aria-describedby`). 연결하지 않으면 안의 버튼 글자까지 모든 글자가 하나의 긴 이름으로 읽힙니다.
+- 루트가 버튼일 때는 Title 을 이름으로, Description 을 설명으로 씁니다(`aria-labelledby`, `aria-describedby`). 연결하지 않으면 안의 글자가 모두 하나의 긴 이름으로 읽힙니다. Title 모드에서는 버튼의 글자가 곧 이름이고 설명만 `aria-describedby` 로 잇습니다(`useLabelling` 이 돌려주는 `descriptionId`).
 - 파트는 마운트돼 있는 동안만 id 를 등록합니다(layout effect 에서 등록, cleanup 에서 `undefined`). 그래서 표면은 실제로 있는 파트만 가리킵니다.
 
 ### 알아둘 것
 
-- 누를 수 없는 표면은 `labelling` 이 빈 객체라 Title 이 있어도 `aria-labelledby` 를 붙이지 않습니다.
-- Item 은 `useSurface` 결과에 `aria-pressed` 를 더합니다(`selected` 가 있고 `current` 가 아닐 때).
+- 누를 수 없는 표면과 Title 모드 표면은 `labelling` 이 빈 객체라 루트에 `aria-labelledby` 를 붙이지 않습니다.
+- Item 은 `selected` 를 `aria-pressed` 로 알립니다(`current` 가 아닐 때). Title 모드면 Title 버튼에, 아니면 루트에 붙습니다.
+
+## surface-trigger.tsx
+
+누를 수 있는 Card, Item 의 Title 이 그리는 버튼입니다. `titleContent({ trigger, asChild, children })` 은 `trigger` 가 있으면 Title 의 내용을 `<button type="button" data-surface-trigger data-field-input>` 으로 감쌉니다.
+
+### 쓰는 곳
+
+- Card.Title, Item.Title. Item 은 `truncate` 면 버튼에 `block truncate` 를 줍니다.
+
+### 왜 이렇게
+
+- `asChild` 면 자식 요소(`<h3>`)는 그대로 두고 그 안의 내용을 버튼으로 감쌉니다. 제목 안에 버튼이 있는 모양이 Accordion 헤더와 같습니다.
+- 버튼은 native 라서 Enter 는 누를 때, Space 는 뗄 때 누르고, `disabled` 면 Tab 에서 빠집니다.
+- `data-field-input` 이 있어서 루트의 `focus-ring` 이 `:has([data-field-input]:focus-visible)` 로 카드 전체에 링을 그립니다. 버튼 자체에는 링을 그리지 않습니다.
+- 버튼은 제목의 배치를 이어받습니다(`inline-flex items-center gap-[inherit]`). Item.Title 처럼 아이콘과 글자를 나란히 두는 제목도 모양이 바뀌지 않습니다.
+- 설명(`describedBy`)과 눌림(`pressed`)은 루트가 정한 `trigger` 객체로 받습니다.
 
 ## toggle-surface.ts
 

@@ -4,13 +4,17 @@ import { isValidElement } from 'react';
 
 import { CardContext } from './context';
 import { cardStyle } from './style';
+import { CardTitle } from './title';
 import { useCard } from './use-card';
 import { resolveState } from '../../../internal/state-props';
+import { containsElementOfType } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { Card } from '.';
 
 export type CardVariant = 'outline' | 'soft' | 'ghost';
+
+const CARD_TITLE = new Set<unknown>([CardTitle]);
 
 function flag(on: boolean) {
   return on ? '' : undefined;
@@ -41,30 +45,39 @@ export function CardRoot({
   const nativeControl =
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
   const interactive = interactiveProp ?? (onClick != null || nativeControl);
-  const { interaction, props, dataProps, labelling, register } = useCard<HTMLDivElement>({
-    interactive,
-    asChild,
-    disabled,
-    handlers: {
-      onClick,
-      onKeyDown,
-      onKeyUp,
-      onFocus,
-      onBlur,
-      onPointerEnter,
-      onPointerLeave,
-      onPointerDown,
-      onPointerUp,
-      onPointerCancel,
-      onInteractionChange,
-    },
-  });
+  const titleIsTheButton = interactive && !asChild && containsElementOfType(children, CARD_TITLE);
+  const { interaction, props, dataProps, labelling, descriptionId, register } =
+    useCard<HTMLDivElement>({
+      interactive,
+      asChild,
+      disabled,
+      titleIsTheButton,
+      handlers: {
+        onClick,
+        onKeyDown,
+        onKeyUp,
+        onFocus,
+        onBlur,
+        onPointerEnter,
+        onPointerLeave,
+        onPointerDown,
+        onPointerUp,
+        onPointerCancel,
+        onInteractionChange,
+      },
+    });
   const state: Card.State = { ...interaction, interactive };
   const styles = cardStyle({ variant, size, interactive });
   const Root = asChild ? Slot : 'div';
 
   return (
-    <CardContext value={{ styles, ...register }}>
+    <CardContext
+      value={{
+        styles,
+        trigger: titleIsTheButton ? { disabled, describedBy: descriptionId } : null,
+        ...register,
+      }}
+    >
       <Root
         {...rest}
         {...props}

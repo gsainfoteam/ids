@@ -11,7 +11,7 @@ import {
   type PointerEvent,
 } from 'react';
 
-import { usePressable } from './pressable';
+import { isFromNestedControl, usePressable } from './pressable';
 import {
   interactiveDataProps,
   useInteractive,
@@ -36,6 +36,7 @@ export type UseSurfaceOptions<E> = {
   interactive: boolean;
   asChild: boolean;
   disabled: boolean;
+  titleIsTheButton?: boolean;
   handlers: SurfaceHandlers<E>;
 };
 
@@ -43,16 +44,22 @@ export function useSurface<E extends HTMLElement>({
   interactive,
   asChild,
   disabled,
+  titleIsTheButton = false,
   handlers: { onClick, onKeyDown, onKeyUp, onBlur, onInteractionChange, ...pointer },
 }: UseSurfaceOptions<E>) {
+  const pressesThroughTheTitle = interactive && !asChild && titleIsTheButton;
   const press = usePressable<E>({
-    enabled: interactive && !asChild,
+    enabled: interactive && !asChild && !titleIsTheButton,
     disabled,
     onClick,
     onKeyDown,
     onKeyUp,
     onBlur,
   });
+  const clickAnywhereButNestedControls = (event: MouseEvent<E>) => {
+    if (disabled || isFromNestedControl(event)) return;
+    onClick?.(event);
+  };
   const { state, handlers } = useInteractive<E>({
     disabled,
     onInteractionChange,
@@ -63,16 +70,24 @@ export function useSurface<E extends HTMLElement>({
   });
   return {
     interaction: state,
-    props: { ...press, ...handlers, onClick: press.onClick },
+    props: {
+      ...press,
+      ...handlers,
+      onClick: pressesThroughTheTitle ? clickAnywhereButNestedControls : press.onClick,
+      ...(pressesThroughTheTitle && disabled ? { 'aria-disabled': true as const } : {}),
+    },
     dataProps: interactive ? interactiveDataProps(state) : {},
   };
 }
 
-export function useLabelling(interactive: boolean) {
+export function useLabelling(surfaceIsTheButton: boolean) {
   const [titleId, setTitleId] = useState<string>();
   const [descriptionId, setDescriptionId] = useState<string>();
   return {
-    labelling: interactive ? { 'aria-labelledby': titleId, 'aria-describedby': descriptionId } : {},
+    labelling: surfaceIsTheButton
+      ? { 'aria-labelledby': titleId, 'aria-describedby': descriptionId }
+      : {},
+    descriptionId,
     register: { setTitleId, setDescriptionId },
   };
 }

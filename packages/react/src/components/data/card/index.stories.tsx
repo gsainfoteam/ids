@@ -315,7 +315,7 @@ export const Interactive: Story = {
     docs: {
       description: {
         story:
-          '`onClick` 만 주면 카드 전체가 버튼이 됩니다. 이름은 제목, 설명은 Card.Description이라 스크린 리더가 카드 글 전체를 한 줄로 읽지 않습니다. Enter는 누를 때, Space는 뗄 때 동작하고, 카드 안의 버튼을 눌러도 카드가 함께 열리지 않습니다.',
+          '`onClick` 만 주면 카드 어디를 눌러도 열리고, 키보드와 스크린 리더에는 Card.Title이 버튼이 됩니다. 설명은 Card.Description입니다. Enter는 누를 때, Space는 뗄 때 동작하고, 카드 안의 버튼을 눌러도 카드가 함께 열리지 않습니다.',
       },
     },
   },
@@ -366,10 +366,10 @@ export const LinkCard: Story = {
 export const Disabled: Story = {
   args: { onClick: fn(), disabled: true },
   play: async ({ canvas, userEvent, args }) => {
-    const card = canvas.getByRole('button', { name: '새 프로젝트 만들기' });
-    await expect(card).toHaveAttribute('aria-disabled', 'true');
-    await expect(card).not.toHaveAttribute('tabindex');
-    await userEvent.click(card);
+    const title = canvas.getByRole('button', { name: '새 프로젝트 만들기' });
+    await expect(title).toBeDisabled();
+    await expect(title.closest('[data-card]')).toHaveAttribute('aria-disabled', 'true');
+    await userEvent.click(canvas.getByText('프로젝트 정보를 입력해주세요.'));
     await expect(args.onClick).not.toHaveBeenCalled();
   },
 };

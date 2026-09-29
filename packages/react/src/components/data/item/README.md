@@ -4,7 +4,7 @@
 
 - **shadcn/ui 구성.** `Item.Media`, `Item.Content` 안의 `Item.Title` 과 `Item.Description`, 그리고 `Item.Actions` 입니다. 전부 선택입니다.
 - **두 줄이 되면.** 설명은 두 줄에서 말줄임표로 줄고, 미디어는 행 가운데가 아니라 첫 줄에 맞춰 위에 붙습니다.
-- **행 전체가 버튼.** `onClick` 만 주면 키보드로도 누를 수 있는 버튼이 되고, 이름은 제목, 설명은 `Item.Description` 입니다. `Item.Actions` 의 버튼을 눌러도 행은 눌리지 않습니다.
+- **행 어디를 눌러도 열린다.** `onClick` 만 주면 행 어디를 눌러도 열리고, 키보드와 스크린 리더에는 `Item.Title` 이 버튼이 됩니다. 설명은 `Item.Description` 입니다. `Item.Actions` 의 버튼을 눌러도 행은 눌리지 않고, 버튼이 버튼 안에 들어가지 않습니다.
 - **선택.** `selected` 는 옅은 층을 깔고, 버튼인 행에서는 `aria-pressed` 로 알립니다. `aria-current` 를 주면 그쪽이 선택을 말합니다.
 - **목록.** `Item.Group` 은 `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다. Safari가 목록 의미를 잃지 않습니다.
 
@@ -62,9 +62,9 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 ## 누를 수 있는 행
 
 ```tsx
-<Item onClick={() => openChat(chat.id)}>        {/* role="button", Tab으로 간다 */}
+<Item onClick={() => openChat(chat.id)}>        {/* 어디를 눌러도 열린다 */}
   <Item.Content>
-    <Item.Title>{chat.name}</Item.Title>        {/* 행의 이름 */}
+    <Item.Title>{chat.name}</Item.Title>        {/* 이 제목이 버튼. Tab으로 간다 */}
     <Item.Description>{chat.last}</Item.Description>
   </Item.Content>
   <Item.Actions>
@@ -76,7 +76,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
   <a href="/inbox">...</a>                      {/* 링크 행 */}
 </Item>
 
-<Item onClick={open} disabled />                {/* aria-disabled, Tab에서 빠진다 */}
+<Item onClick={open} disabled />                {/* 제목 버튼이 disabled, 행은 aria-disabled */}
 ```
 
 | 키      | 동작                                       |
@@ -84,10 +84,12 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 | `Enter` | 누르는 순간 실행                           |
 | `Space` | 뗄 때 실행. 떼기 전에 포커스가 떠나면 취소 |
 
+- `Item.Title` 이 없거나 다른 컴포넌트 안에 숨어 있으면 행 자신이 `role="button"` 이 됩니다. 이때는 안에 다른 버튼을 두지 않습니다.
+
 ## 선택과 현재 위치
 
 ```tsx
-<Item selected={file.id === selectedId} onClick={() => select(file.id)}>  {/* aria-pressed */}
+<Item selected={file.id === selectedId} onClick={() => select(file.id)}>  {/* 제목 버튼의 aria-pressed */}
 
 <Item asChild selected aria-current="page">                               {/* aria-current만 */}
   <a href="/home">홈</a>
@@ -154,7 +156,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 | `variant`        | `ghost`(기본) / `outline` / `soft`                                 |
 | `size`           | `standard`(기본) / `tiny`. `Item.Group` 안에서는 그룹을 따른다     |
 | `dense`          | `false`. 패딩을 반으로 줄인다. `Item.Group` 안에서는 그룹을 따른다 |
-| `onClick`        | 주면 행 전체가 버튼                                                |
+| `onClick`        | 주면 행 어디를 눌러도 불린다. 제목이 버튼이 된다                   |
 | `interactive`    | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동    |
 | `selected`       | 선택 표시                                                          |
 | `disabled`       | 누를 수 없고 흐려진다                                              |

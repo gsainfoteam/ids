@@ -147,11 +147,12 @@ const mergedRef = useCallback(
 
 ## children.ts
 
-자식 목록에서 Fragment 를 풀어 평평한 배열로 만드는 `flattenFragments` 와, 요소의 실제 컴포넌트를 돌려주는 `elementTypeOf` 입니다.
+자식 목록에서 Fragment 를 풀어 평평한 배열로 만드는 `flattenFragments`, 요소의 실제 컴포넌트를 돌려주는 `elementTypeOf`, JSX 안 어디에든 어떤 파트가 적혀 있는지 보는 `containsElementOfType` 입니다.
 
 ### 쓰는 곳
 
 - [text-control](../internal/text-control/README.md) 의 `splitAroundInput`, Accordion, Alert, Avatar, AvatarGroup(`arrange.ts`), Chip, ChipField, Progress, TextArea
+- `containsElementOfType`: Card, Item 이 Title 이 있는지 보고 Title 을 버튼으로 만들지 정할 때([surface.ts](../internal/README.md#surfacets))
 
 ### 쓰는 법
 
@@ -174,6 +175,7 @@ const indexes = items.flatMap((child, index) =>
 - 파트를 찾는 컴포넌트(TextField, Select, ChipField, FileField, ColorField, ColorPicker, TimePicker, Rating, 날짜와 시간 필드)는 모두 이 함수로 Fragment 를 풉니다.
 - 파트를 `child.type === SelectItem` 처럼 직접 비교하지 않고 `elementTypeOf(child) === SelectItem` 으로 비교합니다. Server Component 가 넘긴 `<Select.Item>` 은 클라이언트에서 `type` 이 `react.lazy` 래퍼로 도착합니다(Flight 가 client reference 를 그렇게 풉니다). `elementTypeOf` 는 그 래퍼를 `_init(_payload)` 로 풀어 실제 함수를 돌려주고, 모듈이 아직 오지 않았으면 React 의 lazy 와 똑같이 thenable 을 던져 렌더를 잠시 멈춥니다. 직접 비교하면 Next.js 의 서버 컴포넌트 페이지에서 Select 옵션, Field 라벨, Dialog.Overlay 가 파트로 보이지 않습니다(`tests/server-reference-types.test.tsx`).
 - 문자열 태그(`'input'`, `'svg'`)와 `Fragment` 비교에는 쓰지 않아도 됩니다. host 요소와 Fragment 는 lazy 로 오지 않습니다.
+- `containsElementOfType` 은 요소의 `props.children` 만 따라 내려갑니다. 컴포넌트를 실행하지 않으므로 앱이 만든 컴포넌트 안의 파트와 함수 자식 안의 파트는 찾지 못하고 `false` 입니다. 서버 렌더에서도 같은 답이 나와 역할이 hydration 뒤에 바뀌지 않습니다.
 
 ## part.ts
 

@@ -4,13 +4,17 @@ import { isValidElement, use } from 'react';
 
 import { ItemContext, ItemGroupContext } from './context';
 import { itemStyle } from './style';
+import { ItemTitle } from './title';
 import { useItem } from './use-item';
 import { resolveState } from '../../../internal/state-props';
+import { containsElementOfType } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { Item } from '.';
 
 export type ItemVariant = 'ghost' | 'outline' | 'soft';
+
+const ITEM_TITLE = new Set<unknown>([ItemTitle]);
 
 function flag(on: boolean) {
   return on ? '' : undefined;
@@ -50,10 +54,12 @@ export function ItemRoot({
   const nativeControl =
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
   const interactive = interactiveProp ?? (onClick != null || nativeControl);
-  const { interaction, props, dataProps, labelling, register } = useItem<HTMLDivElement>({
+  const titleIsTheButton = interactive && !asChild && containsElementOfType(children, ITEM_TITLE);
+  const { interaction, props, dataProps, labelling, trigger, register } = useItem<HTMLDivElement>({
     interactive,
     asChild,
     disabled,
+    titleIsTheButton,
     selected,
     current: isCurrent(rest['aria-current']),
     handlers: {
@@ -75,7 +81,7 @@ export function ItemRoot({
   const Root = asChild ? Slot : 'div';
 
   return (
-    <ItemContext value={{ styles, ...register }}>
+    <ItemContext value={{ styles, trigger, ...register }}>
       <Root
         {...rest}
         {...props}

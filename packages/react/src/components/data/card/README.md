@@ -4,7 +4,7 @@
 
 - **shadcn/ui 구성.** `Card.Header` 안에 `Card.Title`, `Card.Description`, 끝 모서리의 `Card.Action`, 그리고 `Card.Content`, `Card.Footer` 입니다. 전부 선택이고 선언한 순서가 곧 화면 순서입니다.
 - **가장자리까지 채우는 미디어.** `Card.Media` 는 카드의 패딩을 뚫고 가장자리까지 나가고, 닿는 모서리는 카드의 둥근 모서리를 따릅니다. outline 테두리는 가리지 않습니다.
-- **카드 전체가 버튼.** `onClick` 만 주면 키보드로도 누를 수 있는 버튼이 됩니다. 이름은 제목, 설명은 `Card.Description` 이라 카드 글 전체를 한 줄로 읽지 않습니다.
+- **카드 어디를 눌러도 열린다.** `onClick` 만 주면 카드 어디를 눌러도 열리고, 키보드와 스크린 리더에는 `Card.Title` 이 버튼이 됩니다. 설명은 `Card.Description` 입니다. 카드 안에 다른 버튼을 둬도 버튼이 버튼 안에 들어가지 않습니다.
 - **안쪽 버튼은 따로.** 카드 안의 버튼이나 링크를 눌러도 카드의 `onClick` 은 불리지 않습니다.
 - **링크 카드.** `asChild` 로 `<a>` 나 라우터 링크가 카드가 됩니다.
 
@@ -61,9 +61,9 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 ## 누를 수 있는 카드
 
 ```tsx
-<Card onClick={() => navigate(`/posts/${post.id}`)}>   {/* role="button", Tab으로 간다 */}
+<Card onClick={() => navigate(`/posts/${post.id}`)}>   {/* 어디를 눌러도 열린다 */}
   <Card.Header>
-    <Card.Title>{post.title}</Card.Title>              {/* 카드의 이름 */}
+    <Card.Title>{post.title}</Card.Title>              {/* 이 제목이 버튼. Tab으로 간다 */}
     <Card.Description>{post.excerpt}</Card.Description> {/* 카드의 설명 */}
   </Card.Header>
   <Card.Footer>
@@ -79,7 +79,7 @@ import { Button, Card } from '@gsainfoteam/ids-react';
   <Link to="/posts/1">...</Link>                       {/* 라우터 링크는 interactive로 알린다 */}
 </Card>
 
-<Card onClick={open} disabled />                       {/* aria-disabled, Tab에서 빠진다 */}
+<Card onClick={open} disabled />                       {/* 제목 버튼이 disabled, 카드는 aria-disabled */}
 ```
 
 | 키      | 동작                                       |
@@ -87,8 +87,10 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 | `Enter` | 누르는 순간 실행. 누르고 있으면 반복한다   |
 | `Space` | 뗄 때 실행. 떼기 전에 포커스가 떠나면 취소 |
 
+- 제목 버튼은 `data-surface-trigger` 로 표시되고, 제목의 글자 모양을 그대로 씁니다. `<Card.Title asChild><h3>...</h3></Card.Title>` 면 `h3` 안에 버튼이 들어갑니다.
+- `Card.Title` 이 없거나 다른 컴포넌트 안에 숨어 있으면(자식이 함수이거나 직접 만든 컴포넌트 안) 카드 자신이 `role="button"` 이 됩니다. 이때는 안에 다른 버튼을 두지 않습니다.
 - hover와 누름은 배경 위에 반투명 층을 얹어 표시하므로 어느 variant에서나 같게 보입니다.
-- 포커스는 `focus-ring` 입니다. outline 카드는 테두리도 primary 색으로 바뀝니다.
+- 포커스는 `focus-ring` 입니다. 제목 버튼에 포커스가 가면 카드 전체에 링이 그려지고, outline 카드는 테두리도 primary 색으로 바뀝니다.
 
 ## variant와 크기
 
@@ -118,7 +120,7 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 | ------------- | --------------------------------------------------------------- |
 | `variant`     | `outline`(기본) / `soft` / `ghost`                              |
 | `size`        | `standard`(기본) / `tiny`                                       |
-| `onClick`     | 주면 카드 전체가 버튼                                           |
+| `onClick`     | 주면 카드 어디를 눌러도 불린다. 제목이 버튼이 된다              |
 | `interactive` | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동 |
 | `disabled`    | 누를 수 없고 흐려진다                                           |
 | `asChild`     | 루트 `div` 대신 자식 요소에 속성을 합친다                       |

@@ -30,7 +30,8 @@ export function isFromNestedControl(event: { target: EventTarget; currentTarget:
   const target = event.target as Node;
   const start = target instanceof Element ? target : target.parentElement;
   const control = start?.closest(NESTED_CONTROL);
-  return control != null && control !== surface && surface.contains(control);
+  const isTheSurfaceTitle = control?.hasAttribute('data-surface-trigger') === true;
+  return control != null && control !== surface && !isTheSurfaceTitle && surface.contains(control);
 }
 
 export type UsePressableOptions<E extends HTMLElement> = {

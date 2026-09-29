@@ -26,3 +26,13 @@ export function elementTypeOf(element: { type: unknown }): unknown {
   while (isLazyType(type)) type = type._init(type._payload);
   return type;
 }
+
+export function containsElementOfType(children: unknown, types: ReadonlySet<unknown>): boolean {
+  if (typeof children === 'function') return false;
+
+  return Children.toArray(children as ReactNode).some(
+    (child) =>
+      isValidElement<{ children?: ReactNode }>(child) &&
+      (types.has(elementTypeOf(child)) || containsElementOfType(child.props.children, types)),
+  );
+}
