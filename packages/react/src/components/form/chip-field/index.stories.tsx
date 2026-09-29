@@ -429,7 +429,7 @@ export const NativeForm: Story = {
     const field = canvas.getByRole('combobox', { name: '기술' });
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toBeEmptyDOMElement();
-    await expect(field).toHaveFocus();
+    await waitFor(() => expect(field).toHaveFocus());
     await userEvent.keyboard('flu{Enter}swi{Enter}{Escape}');
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toHaveTextContent('["flutter","swift"]');

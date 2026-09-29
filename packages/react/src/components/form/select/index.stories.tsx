@@ -426,7 +426,7 @@ export const NativeForm: Story = {
     await expect(form.checkValidity()).toBe(false);
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toBeEmptyDOMElement();
-    await expect(fruit).toHaveFocus();
+    await waitFor(() => expect(fruit).toHaveFocus());
     await userEvent.keyboard('{ArrowDown}{ArrowDown}{Enter}');
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toHaveTextContent(

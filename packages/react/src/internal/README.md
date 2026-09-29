@@ -432,7 +432,8 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 - 값은 숨은 input(`type="hidden"`)이 FormData 로 보냅니다. 값이 여럿이면 값마다 하나씩 그립니다.
 - 숨은 input 은 제약 검증을 받지 않습니다. 그래서 `required` 는 이름 없는 두 번째 input(`data-form-value-validator`)이 맡습니다.
 - 이 input 은 컨트롤을 투명하게 덮습니다(`absolute inset-0`). 브라우저는 필수 입력 말풍선을 이 input 에 붙이므로 말풍선이 컨트롤 위에 뜹니다.
-- 브라우저가 말풍선을 보여 주려고 이 input 에 포커스를 주면 `passFocusToControl` 이 포커스를 `anchor` 로 넘깁니다.
+- 브라우저가 말풍선을 보여 주려고 이 input 에 포커스를 주면 `passFocusToControlOnceTheBrowserHasReported` 가 다음 프레임에 포커스를 `anchor` 로 넘깁니다.
+- 한 프레임 기다리는 까닭은 Firefox 입니다. Firefox 는 포커스를 준 뒤에 말풍선을 띄우고, 이 input 의 blur 로 말풍선을 닫습니다. 포커스 이벤트 안에서 바로 넘기면 blur 가 말풍선보다 먼저 일어나서 말풍선이 닫히지 않고 화면에 남습니다. 남은 말풍선은 그 자리의 클릭을 삼킵니다(`tests/date-field.test.tsx` 의 "after a blocked submit the page under the browser message still takes clicks"). 그래서 포커스는 제출 뒤 한 프레임 늦게 컨트롤에 옵니다. 테스트와 스토리는 `expect.element` 나 `waitFor` 로 기다립니다.
 - `readOnly` 와 `disabled` 도 검증을 막습니다. 그래서 React 가 제어 input 에 요구하는 `onChange` 는 `readOnly` 대신 빈 함수(`readOnlyWouldBarValidation`)로 줍니다.
 - `message` 를 주면 `setCustomValidity` 로 브라우저 문구를 바꿉니다. 브라우저 문구는 글 상자를 위한 말이라 체크박스 묶음이나 평점에는 맞지 않습니다.
 - 빈 문자열은 값으로 치지 않습니다(`filled`). RULES.md 의 Forms 규칙대로 `FormValue` 는 빈 문자열을 제출하지 않습니다.

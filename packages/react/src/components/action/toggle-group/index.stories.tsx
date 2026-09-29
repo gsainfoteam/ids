@@ -383,7 +383,7 @@ export const NativeForm: Story = {
     const result = canvas.getByLabelText('주문 결과');
     await userEvent.click(submit);
     await expect(result).toHaveTextContent('');
-    await expect(canvas.getByRole('radio', { name: 'S' })).toHaveFocus();
+    await waitFor(() => expect(canvas.getByRole('radio', { name: 'S' })).toHaveFocus());
     await userEvent.click(canvas.getByRole('radio', { name: 'M' }));
     await userEvent.click(canvas.getByRole('radio', { name: 'M' }));
     await expect(canvas.getByRole('radio', { name: 'M' })).toHaveAttribute('aria-checked', 'true');

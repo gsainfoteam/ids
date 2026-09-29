@@ -295,7 +295,7 @@ export const NativeForm: Story = {
     const trigger = canvas.getByRole('button', { name: '이력서' });
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toBeEmptyDOMElement();
-    await expect(trigger).toHaveFocus();
+    await waitFor(() => expect(trigger).toHaveFocus());
     await userEvent.upload(picker(canvasElement), pdf('resume.pdf'));
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toHaveTextContent('resume.pdf');

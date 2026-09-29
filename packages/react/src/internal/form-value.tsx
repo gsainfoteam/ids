@@ -28,7 +28,8 @@ export function FormValue({
   const values = value == null ? [] : typeof value === 'string' ? [value] : [...value];
   const filled = values.filter((entry) => entry !== '');
   const missing = message !== undefined && filled.length === 0 ? message : '';
-  const passFocusToControl = () => anchor.current?.focus();
+  const passFocusToControlOnceTheBrowserHasReported = () =>
+    requestAnimationFrame(() => anchor.current?.focus());
 
   return (
     <>
@@ -52,7 +53,7 @@ export function FormValue({
           form={form}
           value={filled.join(',')}
           onChange={readOnlyWouldBarValidation}
-          onFocus={passFocusToControl}
+          onFocus={passFocusToControlOnceTheBrowserHasReported}
           data-form-value-validator=""
           className="pointer-events-none absolute inset-0 size-full opacity-0"
         />

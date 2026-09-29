@@ -244,7 +244,7 @@ export const NativeForm: Story = {
     const trigger = canvas.getByRole('combobox', { name: /^테마 색/ });
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toBeEmptyDOMElement();
-    await expect(trigger).toHaveFocus();
+    await waitFor(() => expect(trigger).toHaveFocus());
     await userEvent.click(trigger);
     await userEvent.click(await canvas.findByRole('radio', { name: '#22C55E' }));
     await userEvent.keyboard('{Escape}');

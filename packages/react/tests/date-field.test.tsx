@@ -296,6 +296,23 @@ test('required blocks the submit until a date is picked and hands the browser fo
   expect(screen.container.querySelector('form')!.checkValidity()).toBe(true);
 });
 
+test('after a blocked submit the page under the browser message still takes clicks', async () => {
+  const onNext = vi.fn();
+  const screen = await render(
+    <form onSubmit={(event) => event.preventDefault()}>
+      <DateField name="day" required today={d(15)} />
+      <button type="button" onClick={onNext}>
+        다음
+      </button>
+      <button>제출</button>
+    </form>,
+  );
+  await userEvent.click(screen.getByRole('button', { name: '제출' }));
+  await expect.element(screen.getByRole('combobox')).toHaveFocus();
+  await userEvent.click(screen.getByRole('button', { name: '다음' }));
+  expect(onNext).toHaveBeenCalledOnce();
+});
+
 test('open is controllable and onBlur waits until focus leaves the field and its popup', async () => {
   const opens: boolean[] = [];
   const onBlur = vi.fn();
