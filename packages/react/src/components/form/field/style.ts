@@ -23,13 +23,6 @@ export const fieldStyle = tv({
       },
     } satisfies Record<FieldOrientation, object>,
     described: { true: {}, false: {} },
-    disabled: {
-      true: {
-        description: 'opacity-50',
-        hint: 'opacity-50',
-        error: 'opacity-50',
-      },
-    },
   },
   compoundVariants: [
     {

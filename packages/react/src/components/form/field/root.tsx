@@ -147,7 +147,6 @@ export function FieldRoot({
     styles: fieldStyle({
       size,
       orientation,
-      disabled,
       described: counts.description > 0,
     }),
   };
