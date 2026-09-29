@@ -4,6 +4,7 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
+import type { ItemVariant } from './root';
 import type { itemStyle } from './style';
 import type { SurfaceTrigger } from '../../../internal/surface-trigger';
 import type { IdsSize } from '../../../tokens/types';
@@ -19,6 +20,7 @@ export const ItemContext = createContext<Context | null>(null);
 export const ItemGroupContext = createContext<{
   size: IdsSize | undefined;
   dense: boolean | undefined;
+  variant: ItemVariant | undefined;
 } | null>(null);
 
 export function useItemContext(part: string) {

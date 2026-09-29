@@ -25,7 +25,7 @@ function isCurrent(value: unknown) {
 }
 
 export function ItemRoot({
-  variant = 'ghost',
+  variant: variantProp,
   size,
   dense,
   interactive: interactiveProp,
@@ -49,6 +49,7 @@ export function ItemRoot({
   ...rest
 }: Item.Props) {
   const group = use(ItemGroupContext);
+  const variant = variantProp ?? group?.variant ?? 'ghost';
   const resolvedSize = size ?? group?.size ?? 'standard';
   const resolvedDense = dense ?? group?.dense ?? false;
   const nativeControl =

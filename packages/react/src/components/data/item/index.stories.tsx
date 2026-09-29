@@ -26,6 +26,7 @@ import { Item } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['ghost', 'outline', 'soft'] as const;
+const groupVariants = ['bordered', 'separated', 'ghost'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const photo = `data:image/svg+xml,${encodeURIComponent(
@@ -254,8 +255,112 @@ export const Gallery: Story = {
           </Item.Group>
         </Showcase.Row>
       </Showcase.Section>
+
+      <Showcase.Section title="Group variant">
+        {groupVariants.map((variant) => (
+          <Showcase.Row key={variant} label={variant}>
+            <Item.Group variant={variant} size="tiny" className="w-72" aria-label={variant}>
+              {['보고서.pdf', '예산안.xlsx', '회의록.md'].map((file) => (
+                <Item key={file}>
+                  <Item.Media>
+                    <DocumentIcon />
+                  </Item.Media>
+                  <Item.Content>
+                    <Item.Title>{file}</Item.Title>
+                  </Item.Content>
+                </Item>
+              ))}
+            </Item.Group>
+          </Showcase.Row>
+        ))}
+      </Showcase.Section>
     </Showcase>
   ),
+};
+
+export const GroupVariant: Story = {
+  render: () => (
+    <div className="flex w-80 flex-col gap-6">
+      <Item.Group variant="bordered" aria-label="멤버">
+        {['김철수', '이영희', '박민수'].map((name) => (
+          <Item key={name}>
+            <Item.Media>
+              <Avatar name={name} />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>{name}</Item.Title>
+            </Item.Content>
+          </Item>
+        ))}
+      </Item.Group>
+
+      <Item.Group variant="separated" dense aria-label="첨부 파일">
+        {['보고서.pdf', '예산안.xlsx'].map((file) => (
+          <Item key={file}>
+            <Item.Media variant="soft">
+              <DocumentIcon />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>{file}</Item.Title>
+            </Item.Content>
+            <Item.Actions>
+              <IconButton
+                aria-label={`${file} 지우기`}
+                variant="ghost"
+                size="tiny"
+                icon={<XMarkIcon />}
+              />
+            </Item.Actions>
+          </Item>
+        ))}
+      </Item.Group>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`bordered` 는 행 사이에 구분선을 긋고 행 모서리를 편다. `separated` 는 행마다 테두리 카드(`Item` 의 `outline`)로 8px 띄운다. 기본 `ghost` 는 구분선도 간격도 없다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const members = canvas.getByRole('list', { name: '멤버' });
+    await expect(members).toHaveAttribute('data-variant', 'bordered');
+    const files = canvas.getByRole('list', { name: '첨부 파일' });
+    for (const row of files.querySelectorAll('[data-item]'))
+      await expect(row).toHaveAttribute('data-variant', 'outline');
+  },
+};
+
+export const Ordered: Story = {
+  render: () => (
+    <Item.Group ordered variant="separated" className="w-80" aria-label="가입 절차">
+      {['이메일 인증', '이름 정하기', '약관 동의'].map((step, index) => (
+        <Item key={step}>
+          <Item.Media variant="soft" aria-hidden>
+            {index + 1}
+          </Item.Media>
+          <Item.Content>
+            <Item.Title>{step}</Item.Title>
+          </Item.Content>
+        </Item>
+      ))}
+    </Item.Group>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`ordered` 는 `<ol>` 로 그려 스크린 리더가 순서를 읽는다. 번호는 그리지 않으니 보여야 하면 `Item.Media` 에 둔다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const steps = canvas.getByRole('list', { name: '가입 절차' });
+    await expect(steps.tagName).toBe('OL');
+    await expect(canvas.getAllByRole('listitem')).toHaveLength(3);
+  },
 };
 
 export const Interactive: Story = {

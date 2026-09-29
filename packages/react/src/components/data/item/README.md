@@ -113,6 +113,32 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 - 이미 `<li>` 로 감싼 자식은 다시 감싸지 않습니다.
 - `Item.Separator` 는 `Divider` 입니다. 그룹 안에서는 목록 항목으로 세지 않는 `<li>`, 밖에서는 `<hr>` 로 그립니다.
 
+### 구분선과 간격
+
+```tsx
+<Item.Group variant="ghost" />      // 기본. 구분선도 간격도 없다
+<Item.Group variant="bordered" />   // 행 사이 구분선. 행 모서리는 각지게 편다
+<Item.Group variant="separated" />  // 행마다 테두리 카드(Item outline), 8px 간격
+```
+
+- 구분선은 `--ids-color-border` 입니다. 목록 바깥 테두리는 그리지 않으니, 필요하면 `Card` 안에 둡니다.
+- `bordered` 는 구분선을 스스로 긋습니다. `Item.Separator` 는 `ghost` 에서 쓰는 것입니다.
+- `separated` 에서도 `Item` 에 `variant` 를 주면 그 값이 이깁니다.
+
+### 순서 있는 목록
+
+```tsx
+<Item.Group ordered aria-label="가입 절차">
+  <Item>
+    <Item.Media variant="soft" aria-hidden>1</Item.Media>
+    <Item.Content>이메일 인증</Item.Content>
+  </Item>
+</Item.Group>
+```
+
+- `<ol>` 로 그려 스크린 리더가 순서를 읽습니다. 번호는 그리지 않으니 보여야 하면 `Item.Media` 에 둡니다.
+- 여러 행 중 하나를 고르는 목록(방향키, 폼 값)은 아직 없습니다. 페이지 안의 고르기는 `RadioGroup`, 팝업은 `Select` 를 씁니다.
+
 ## variant와 크기
 
 ```tsx
@@ -153,7 +179,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 
 | 속성             | 기본 / 동작                                                        |
 | ---------------- | ------------------------------------------------------------------ |
-| `variant`        | `ghost`(기본) / `outline` / `soft`                                 |
+| `variant`        | `ghost`(기본) / `outline` / `soft`. `Item.Group variant="separated"` 안에서는 `outline` |
 | `size`           | `standard`(기본) / `tiny`. `Item.Group` 안에서는 그룹을 따른다     |
 | `dense`          | `false`. 패딩을 반으로 줄인다. `Item.Group` 안에서는 그룹을 따른다 |
 | `onClick`        | 주면 행 어디를 눌러도 불린다. 제목이 버튼이 된다                   |

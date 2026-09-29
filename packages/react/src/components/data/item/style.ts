@@ -1,6 +1,6 @@
 import { tv } from '../../../utils';
 
-import type { ItemVariant } from '.';
+import type { ItemGroupVariant, ItemVariant } from '.';
 import type { IdsSize } from '../../../tokens/types';
 
 export const itemStyle = tv({
@@ -25,6 +25,13 @@ export const itemStyle = tv({
     groupItem: 'flex',
   },
   variants: {
+    groupVariant: {
+      bordered: {
+        group: 'divide-y divide-(--ids-color-border) [&>li>[data-item]]:rounded-none',
+      },
+      separated: { group: 'gap-2' },
+      ghost: {},
+    } satisfies Record<ItemGroupVariant, object>,
     variant: {
       ghost: {},
       outline: { root: 'inset-ring-1 inset-ring-(--ids-color-border)' },
@@ -72,6 +79,7 @@ export const itemStyle = tv({
     { dense: true, size: 'tiny', class: { root: 'min-h-8 concentric-p-1' } },
   ],
   defaultVariants: {
+    groupVariant: 'ghost',
     variant: 'ghost',
     media: 'ghost',
     size: 'standard',

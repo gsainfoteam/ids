@@ -190,6 +190,70 @@ test('Group: a list with an item per row; separators are hidden and size is shar
   expect(rule.className, 'the hr border does not paint over the line').toMatch(/border-0/);
 });
 
+test('Group variant: bordered draws seams between square rows, separated spaces outlined rows', async () => {
+  const group = (variant: Item.Group.Variant) => (
+    <Item.Group variant={variant} aria-label={variant}>
+      <Item>One</Item>
+      <Item>Two</Item>
+      <Item variant="soft">Three</Item>
+    </Item.Group>
+  );
+  const screen = await render(
+    <>
+      {group('bordered')}
+      {group('separated')}
+      {group('ghost')}
+    </>,
+  );
+  const rows = (name: string) =>
+    Array.from(
+      screen.getByRole('list', { name }).element().querySelectorAll<HTMLElement>('[data-item]'),
+    );
+  const seams = (name: string) =>
+    Array.from(screen.getByRole('list', { name }).element().children).map(
+      (li) => getComputedStyle(li).borderBottomWidth,
+    );
+
+  expect(seams('bordered')).toEqual(['1px', '1px', '0px']);
+  expect(rows('bordered').map((row) => getComputedStyle(row).borderRadius)).toEqual([
+    '0px',
+    '0px',
+    '0px',
+  ]);
+
+  const separated = screen.getByRole('list', { name: 'separated' }).element();
+  expect(getComputedStyle(separated).rowGap).toBe('8px');
+  expect(seams('separated')).toEqual(['0px', '0px', '0px']);
+  expect(rows('separated').map((row) => row.dataset.variant)).toEqual([
+    'outline',
+    'outline',
+    'soft',
+  ]);
+
+  expect(rows('ghost').map((row) => row.dataset.variant)).toEqual(['ghost', 'ghost', 'soft']);
+  expect(getComputedStyle(screen.getByRole('list', { name: 'ghost' }).element()).rowGap).toBe(
+    'normal',
+  );
+});
+
+test('Group ordered: an ol a screen reader counts, still a list in Safari', async () => {
+  const ref = vi.fn();
+  const screen = await render(
+    <Item.Group ordered ref={ref} aria-label="Steps">
+      <Item>Verify email</Item>
+      <Item.Separator />
+      <Item>Choose a name</Item>
+    </Item.Group>,
+  );
+  const list = screen.getByRole('list', { name: 'Steps' });
+
+  await expect.element(list).toBeInTheDocument();
+  expect(list.element().tagName).toBe('OL');
+  expect(ref).toHaveBeenCalledWith(list.element());
+  expect(screen.getByRole('listitem').all()).toHaveLength(2);
+  expect(html(<Item.Group aria-label="x" />).querySelector('ul')).not.toBeNull();
+});
+
 test('dense halves the padding and a group shares it with its rows', () => {
   const doc = html(
     <Item.Group dense aria-label="Files">
