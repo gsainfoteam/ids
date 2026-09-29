@@ -42,7 +42,7 @@
     "test": "vitest run"
   },
   "peerDependencies": {
-    "@gsainfoteam/ids-css": "^0.1.1",
+    "@gsainfoteam/ids-css": ">=0.1.1 <1",
     "@tanstack/react-form": "^1.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -43,6 +43,7 @@ pnpm test          # 빌드 후 브라우저 테스트, 모든 스토리의 play
   - minor 는 breaking 변경을 담을 수 있습니다. 해당 changeset 은 "Breaking:" 으로 시작하고 옮기는 법을 적습니다.
   - patch 는 동작을 바꾸지 않는 수정만 담습니다.
 - **1.0:** Flutter 컴포넌트가 React 를 따라오고 API 를 동결할 때 올립니다. 그 뒤로는 semver 를 따르며, breaking 은 major 에서만 합니다.
+- **0.x 의 peer 범위:** `ids-react` 는 `ids-css` 를 `>=0.1.1 <1` 로 받습니다. Changesets 는 peer 가 범위를 벗어나면 그 패키지를 major 로 올리고, fixed 묶음이 그 major 를 세 패키지 모두에 퍼뜨립니다. `^0.1.1` 은 0.2.0 을 벗어나므로 0.x 동안에는 범위를 1 미만으로 둡니다(`.changeset/config.json` 의 `onlyUpdatePeerDependentsWhenOutOfRange` 와 짝). 두 패키지는 늘 같은 버전으로 나가므로 같은 버전을 설치합니다.
 - 배포 절차는 [README 의 배포](./README.md#배포) 에 있습니다.
 
 ## 보안
