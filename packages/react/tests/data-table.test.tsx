@@ -8,6 +8,7 @@ import { render } from 'vitest-browser-react';
 
 import englishCatalog from '../messages/en.json';
 import { DataTable, IdsProvider, type IdsTranslate } from '../src';
+import { skipWithoutCdp } from './engines';
 
 type Person = { id: string; name: string; age: number };
 
@@ -226,7 +227,8 @@ test('server pagination draws the rows it is given and counts pages from rowCoun
   expect(namesInOrder(screen.container)).toEqual(['Linus', 'Ken']);
 });
 
-test('column resizing: a focusable separator per column, sized by keys and by dragging', async () => {
+test('column resizing: a focusable separator per column, sized by keys and by dragging', async (context) => {
+  skipWithoutCdp(context);
   const screen = await render(table({ enableColumnResizing: true }));
   const handle = () => screen.getByRole('separator', { name: 'Name 열 너비' });
   const width = () => Number(handle().element().getAttribute('aria-valuenow'));

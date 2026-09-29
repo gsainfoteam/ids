@@ -132,10 +132,11 @@ packages/react/src/
   components/
     action/      Button, ButtonGroup, IconButton, IconToggle, Toggle, ToggleGroup, FloatingButton
     form/        Field and every *Field, Checkbox, Radio, Switch, Slider, Select, Rating, ...
-    data/        Accordion, Avatar, Badge, Calendar, Card, Chip, Item, TimePicker, ...
+    data/        Accordion, Avatar, Badge, Calendar, Card, Chip, DataTable, Empty, Item, QRCode,
+                 Table, TimePicker, ...
     feedback/    Alert, Progress, Spinner, Toast
     layout/      AspectRatio, Divider, Spacer, ScrollArea
-    navigation/  (Breadcrumb, Pagination, Stepper, Tabs)
+    navigation/  Breadcrumb, Pagination, Stepper, Tabs
     overlay/     Dialog, Drawer, Menu, Popover, Tooltip
     typography/  Kbd, Label
     utility/     Slot, Group, IdsProvider
