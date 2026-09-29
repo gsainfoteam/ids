@@ -1,3 +1,5 @@
+import 'pretendard-gov/dist/web/variable/pretendardvariable-gov.css';
+
 import type { ReactNode } from 'react';
 
 import { hydrateRoot } from 'react-dom/client';
@@ -220,6 +222,8 @@ test('an icon sits in the middle of its keycap at both sizes', async () => {
   }
 });
 
+const LESS_THAN_A_PIXEL_OFF = 1;
+
 function hangulInkCenter(line: HTMLElement) {
   const text = [...line.childNodes].find(
     (node) => node.nodeType === 3 && node.textContent!.trim(),
@@ -263,7 +267,7 @@ test('a key sits level with the Hangul around it, in running text and in a flex 
   for (const line of screen.container.querySelectorAll<HTMLElement>('[data-line]')) {
     const cap = line.querySelector('[data-kbd]')!.getBoundingClientRect();
     const offset = cap.top + cap.height / 2 - hangulInkCenter(line);
-    expect(Math.abs(offset), line.dataset.line).toBeLessThan(0.5);
+    expect(Math.abs(offset), line.dataset.line).toBeLessThan(LESS_THAN_A_PIXEL_OFF);
   }
 });
 

@@ -6,6 +6,7 @@ import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Alert } from '../src';
+import { skipWithoutCdp } from './engines';
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html');
@@ -134,7 +135,8 @@ test('focus falls back to the element before when nothing follows', async () => 
   await expect.element(screen.getByRole('button', { name: 'Before' })).toHaveFocus();
 });
 
-test('Escape inside closes, except while composing or when already handled', async () => {
+test('Escape inside closes, except while composing or when already handled', async (context) => {
+  skipWithoutCdp(context);
   const screen = await render(
     <Alert>
       <Alert.Title>x</Alert.Title>

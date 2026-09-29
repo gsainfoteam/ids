@@ -5,6 +5,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Field, FileField } from '../src';
+import { FIREFOX_DROPS_SYNTHETIC_CLIPBOARD_DATA, skipInFirefox } from './engines';
 import { Field as RHFField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -198,7 +199,8 @@ test('FormData carries the exact File objects and leaves other fields alone', as
   expect(await Promise.all(sent.map((entry) => (entry as File).text()))).toEqual(['aaa', 'bb']);
 });
 
-test('paste takes files from the clipboard; text pastes are left alone', async () => {
+test('paste takes files from the clipboard; text pastes are left alone', async (context) => {
+  skipInFirefox(context, FIREFOX_DROPS_SYNTHETIC_CLIPBOARD_DATA);
   const onValueChange = vi.fn();
   const screen = await render(
     <FileField aria-label="Files" multiple onValueChange={onValueChange} />,

@@ -7,6 +7,7 @@ import { cdp, page, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Field, Slider } from '../src';
+import { skipWithoutCdp } from './engines';
 import { Field as RHFField } from '../src/react-hook-form';
 
 type Point = { x: number; y: number };
@@ -215,7 +216,8 @@ test('range thumbs never cross and keep minStepsBetweenThumbs apart', async () =
   expect(Array.isArray(changes[0]), 'a range reports a [start, end] tuple').toBe(true);
 });
 
-test('pointer: a press moves the nearest thumb, a drag follows, the release commits once', async () => {
+test('pointer: a press moves the nearest thumb, a drag follows, the release commits once', async (context) => {
+  skipWithoutCdp(context);
   const changes: number[] = [];
   const commits: number[] = [];
   const screen = await render(
@@ -247,7 +249,8 @@ test('pointer: a press moves the nearest thumb, a drag follows, the release comm
   expect(now(), 'a secondary button does nothing').toEqual([100]);
 });
 
-test('pointer: stacked range thumbs split by the direction of the first move', async () => {
+test('pointer: stacked range thumbs split by the direction of the first move', async (context) => {
+  skipWithoutCdp(context);
   const screen = await render(
     <Slider selectionMode="range" aria-label="Stack" defaultValue={[50, 50]} />,
   );
@@ -265,7 +268,8 @@ test('pointer: stacked range thumbs split by the direction of the first move', a
   await release(drawnAt(thumb, 0.9));
 });
 
-test('pointer: the thumb width, right-to-left and vertical tracks map to the drawn position', async () => {
+test('pointer: the thumb width, right-to-left and vertical tracks map to the drawn position', async (context) => {
+  skipWithoutCdp(context);
   const screen = await render(
     <Slider
       aria-label="Inset"
@@ -301,7 +305,8 @@ test('pointer: the thumb width, right-to-left and vertical tracks map to the dra
   await release(drawnAt(vertical, 0.8));
 });
 
-test('readOnly and disabled keep the value; readOnly still takes focus', async () => {
+test('readOnly and disabled keep the value; readOnly still takes focus', async (context) => {
+  skipWithoutCdp(context);
   const changes: number[] = [];
   const screen = await render(
     <Slider

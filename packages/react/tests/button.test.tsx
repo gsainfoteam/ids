@@ -6,6 +6,7 @@ import { render } from 'vitest-browser-react';
 
 import enums from '../../core/tokens/enums.json';
 import { Button, ButtonGroup, IdsProvider, type IdsColor } from '../src';
+import { skipWithoutCdp } from './engines';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -212,7 +213,7 @@ test('an element button presses only on a Space that started on it, and not for 
   expect(onClick).not.toHaveBeenCalled();
   await userEvent.click(page.getByRole('link', { name: '더보기' }));
   expect(onClick).not.toHaveBeenCalled();
-  await userEvent.click(row, { position: { x: 2, y: 2 } });
+  await userEvent.click(row, { position: { x: 8, y: 18 } });
   expect(onClick).toHaveBeenCalledOnce();
 });
 
@@ -303,7 +304,8 @@ async function holdMouseOn(element: Element) {
     });
 }
 
-test('glossy lays a highlight over the fill with a darker edge and a shadow, still rings on focus and sinks on press', async () => {
+test('glossy lays a highlight over the fill with a darker edge and a shadow, still rings on focus and sinks on press', async (context) => {
+  skipWithoutCdp(context);
   const screen = await render(
     <IdsProvider>
       <Button variant="glossy">저장</Button>
@@ -336,41 +338,44 @@ test('glossy lays a highlight over the fill with a darker edge and a shadow, sti
 
 const brandColors = enums.ids.color.values.$value as IdsColor[];
 const statusSchemes = ['danger', 'success', 'warning', 'info'] as const;
+const FORTY_TWO_HOVERS = 45_000;
 
-test('hovering a solid fill moves it away from its text, keeping 4.5:1 in every color and mode', async () => {
-  const cases = (['light', 'dark'] as const).flatMap((mode) => [
-    ...brandColors.map((color) => ({ mode, color, scheme: 'primary' as const })),
-    ...statusSchemes.map((scheme) => ({ mode, color: 'blue' as const, scheme })),
-  ]);
-  const name = ({ mode, color, scheme }: (typeof cases)[number]) => `${mode} ${color} ${scheme}`;
-  const screen = await render(
-    <div>
-      {cases.map((entry) => (
-        <IdsProvider
-          key={name(entry)}
-          color={entry.color}
-          mode={entry.mode}
-          className="bg-(--ids-color-surface)"
-        >
-          <Button colorScheme={entry.scheme}>{name(entry)}</Button>
-        </IdsProvider>
-      ))}
-      <p>Elsewhere</p>
-    </div>,
-  );
-  const failing: string[] = [];
+test(
+  'hovering a solid fill moves it away from its text, keeping 4.5:1 in every color and mode',
+  { timeout: FORTY_TWO_HOVERS },
+  async () => {
+    const cases = (['light', 'dark'] as const).flatMap((mode) => [
+      ...brandColors.map((color) => ({ mode, color, scheme: 'primary' as const })),
+      ...statusSchemes.map((scheme) => ({ mode, color: 'blue' as const, scheme })),
+    ]);
+    const name = ({ mode, color, scheme }: (typeof cases)[number]) => `${mode} ${color} ${scheme}`;
+    const screen = await render(
+      <div>
+        {cases.map((entry) => (
+          <IdsProvider
+            key={name(entry)}
+            color={entry.color}
+            mode={entry.mode}
+            className="bg-(--ids-color-surface)"
+          >
+            <Button colorScheme={entry.scheme}>{name(entry)}</Button>
+          </IdsProvider>
+        ))}
+      </div>,
+    );
+    const failing: string[] = [];
 
-  for (const entry of cases) {
-    const button = screen.getByRole('button', { name: name(entry) });
-    await userEvent.hover(button);
-    await expect.element(button).toHaveAttribute('data-hovered');
-    const style = getComputedStyle(button.element());
-    const page = getComputedStyle(button.element().parentElement!).backgroundColor;
-    const shown = blend([page, style.backgroundColor], 'normal', 'rgb');
-    const ratio = wcagContrast(style.color, shown);
-    if (ratio < 4.5) failing.push(`${name(entry)}: ${ratio.toFixed(2)}`);
-    await userEvent.hover(screen.getByText('Elsewhere'));
-  }
+    for (const entry of cases) {
+      const button = screen.getByRole('button', { name: name(entry) });
+      await userEvent.hover(button);
+      await expect.element(button).toHaveAttribute('data-hovered');
+      const style = getComputedStyle(button.element());
+      const page = getComputedStyle(button.element().parentElement!).backgroundColor;
+      const shown = blend([page, style.backgroundColor], 'normal', 'rgb');
+      const ratio = wcagContrast(style.color, shown);
+      if (ratio < 4.5) failing.push(`${name(entry)}: ${ratio.toFixed(2)}`);
+    }
 
-  expect(failing).toEqual([]);
-});
+    expect(failing).toEqual([]);
+  },
+);

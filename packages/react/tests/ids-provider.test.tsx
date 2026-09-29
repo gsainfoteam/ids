@@ -6,6 +6,7 @@ import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, useTheme } from '../src';
+import { skipWithoutCdp } from './engines';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -136,7 +137,8 @@ test('nested providers inherit the axis they do not set, and its setter reaches 
   await expect.element(dark, { message: 'same mode as the parent now' }).not.toHaveClass(/bg-/);
 });
 
-test('system mode follows prefers-color-scheme live and toggles to an explicit mode', async () => {
+test('system mode follows prefers-color-scheme live and toggles to an explicit mode', async (context) => {
+  skipWithoutCdp(context);
   await preferColorScheme('light');
   const listening = countSchemeListeners();
   const screen = await render(
@@ -156,7 +158,8 @@ test('system mode follows prefers-color-scheme live and toggles to an explicit m
   expect(listening(), 'an explicit mode stops listening').toBe(0);
 });
 
-test('a nested provider inherits a system mode already resolved by its parent', async () => {
+test('a nested provider inherits a system mode already resolved by its parent', async (context) => {
+  skipWithoutCdp(context);
   await preferColorScheme('dark');
   const screen = await render(
     <IdsProvider defaultMode="system">

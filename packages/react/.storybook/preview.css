@@ -5,7 +5,3 @@
 #storybook-root {
   min-height: 100vh;
 }
-
-body {
-  background-color: var(--ids-color-surface);
-}

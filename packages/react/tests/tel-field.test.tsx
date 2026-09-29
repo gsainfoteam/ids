@@ -7,6 +7,7 @@ import { cdp, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Field, TelField } from '../src';
+import { skipWithoutCdp } from './engines';
 import { Field as FormField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -78,7 +79,7 @@ test('SSR native input, Field label/ARIA and canonical FormData', () => {
   );
   const input = doc.querySelector<HTMLInputElement>('[type=tel]')!;
   expect(input.id).toBe(doc.querySelector('label')!.htmlFor);
-  expect(input.autocomplete).toBe('tel');
+  expect(input.getAttribute('autocomplete')).toBe('tel');
   expect(input.inputMode).toBe('tel');
   expect(input.getAttribute('aria-invalid')).toBe('true');
   expect([...new FormData(doc.querySelector('form')!)]).toEqual([['phone', '+821012345678']]);
@@ -212,7 +213,8 @@ test('asChild merges props and ref into the child input and keeps formatting', a
   expect(changes).toEqual(['child', 'child-blur', 'root']);
 });
 
-test('progressive formatting, separator deletion, caret, raw mode and IME', async () => {
+test('progressive formatting, separator deletion, caret, raw mode and IME', async (context) => {
+  skipWithoutCdp(context);
   const changes: string[] = [];
   const report = (value: string) => {
     changes.push(value);

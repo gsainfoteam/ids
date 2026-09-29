@@ -20,8 +20,8 @@
 ## 검증 방법
 
 - **자동 검사.** `pnpm test` 가 매 커밋마다 돌립니다.
-  - `packages/react/tests/*.test.tsx` 는 Chromium 에서 실제 클릭과 키 입력으로 역할, 접근 가능한 이름, `aria-*` 상태, 포커스 이동을 확인합니다.
-  - `tests/stories.test.tsx` 는 모든 스토리를 렌더하고 `play` 에 적은 키보드와 스크린 리더 관련 단언을 실행합니다.
+  - `packages/react/tests/*.test.tsx` 는 Chromium, Firefox, WebKit 에서 실제 클릭과 키 입력으로 역할, 접근 가능한 이름, `aria-*` 상태, 포커스 이동을 확인합니다.
+  - `tests/stories-<분류>.test.tsx` 는 모든 스토리를 렌더하고 `play` 에 적은 키보드와 스크린 리더 관련 단언을 실행합니다.
   - 같은 테스트가 모든 스토리를 라이트와 다크 모드에서 한 번씩 그리고, `play` 뒤에 [axe-core](https://github.com/dequelabs/axe-core) 로 WCAG 2.0, 2.1, 2.2 의 A, AA 규칙을 검사합니다. 위반이 하나라도 있으면 실패합니다. 같은 설정을 Storybook 의 Accessibility 패널(`@storybook/addon-a11y`)도 씁니다.
   - axe 는 사람이 판단해야 하는 항목(경계선 대비, 누를 대상 크기, 툴팁 위로 마우스 옮기기, 읽는 순서)을 잡지 못합니다. 아래 공통 한계와 수동 점검이 그 몫입니다.
   - `tests/hydration.test.tsx` 와 `tests/stories.ssr.test.tsx` 는 서버 HTML 에 라벨 연결(`id`, `aria-labelledby`, `aria-describedby`)이 처음부터 들어 있는지 확인합니다.
@@ -60,6 +60,10 @@
 - **시간 제한(2.2.1).** Toast 는 정해진 시간 뒤에 사라집니다.
   - 마우스를 올린 동안, 포커스가 안에 있는 동안, 탭이 가려진 동안은 멈춥니다.
   - 동작 버튼이 있는 알림이나 놓치면 안 되는 알림은 `duration: Infinity` 로 둡니다.
+- **Safari 의 포커스 가드.** 모달(Dialog, Drawer, 하단 시트)은 floating-ui 의 포커스 가드로 Tab 을 가둡니다.
+  - Safari 에서는 VoiceOver 의 가상 커서가 가드에 닿아야 포커스 이벤트가 나므로, floating-ui 가 가드를 이름 없는 `role="button"` 으로 둡니다.
+  - VoiceOver 가 모달 가장자리에서 이름 없는 버튼을 읽을 수 있습니다. axe 검사는 이 가드를 빼고 봅니다.
+- **Firefox 의 스크롤 영역.** Firefox 는 스크롤되는 영역을 모두 Tab 에 넣습니다. 안에 버튼이 있는 ScrollArea 도 버튼 앞에서 한 번 멈춥니다.
 - **자동 이름(4.1.2).** IconButton, IconToggle, FloatingButton 은 `aria-label` 이 없으면 아이콘에서 이름을 찾습니다.
   - 찾은 이름은 영어입니다.
   - 함수 이름에서 찾은 이름은 production 빌드의 이름 축약으로 사라질 수 있습니다.

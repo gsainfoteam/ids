@@ -275,9 +275,13 @@ test('the exit keeps the content until its animation ends', async () => {
   for (const animation of tooltip.element().getAnimations()) animation.finish();
   await userEvent.keyboard('{Escape}');
   await expect.element(tooltip).toHaveAttribute('data-ending-style');
-  await new Promise(requestAnimationFrame);
-  for (const animation of tooltip.element().getAnimations()) animation.finish();
-  await expect.element(tooltip).not.toBeInTheDocument();
+  const content = tooltip.element();
+  await expect
+    .poll(() => {
+      for (const animation of content.getAnimations()) animation.finish();
+      return content.isConnected;
+    })
+    .toBe(false);
 });
 
 test('development warns about a disabled trigger and focusable content', async () => {

@@ -503,16 +503,24 @@ Dialog, Drawer, Popover, Menu, Tooltip, Toast and the field popups are all assem
 `pnpm test` builds the packages, then runs Vitest in `packages/react` (`vitest.config.ts`) as five
 projects:
 
-- `browser`: `tests/**/*.test.tsx` render from `src` in headless Chromium through Playwright, with
-  Tailwind and the IDS CSS loaded and reduced motion on. `tests/stories.test.tsx` renders every
-  story and runs its `play` through portable stories (`composeStories` + `run()`), once in light
-  and once in dark mode, then runs axe-core over the page with the WCAG 2.0, 2.1 and 2.2 A and AA
-  tags and fails with one line per rule, node and fix; a story tagged `'!test'` is skipped.
+- `browser`: `tests/**/*.test.tsx` render from `src` in headless Chromium, Firefox and WebKit through
+  Playwright (Chromium only outside Linux, see Engines below), with Tailwind and the IDS CSS loaded
+  and reduced motion on. They keep the system fonts: WebKit caches Pretendard's variable font per
+  size and weight and grows past several gigabytes over a story file. `tests/kbd.test.tsx`, which
+  measures text, imports Pretendard for itself. `tests/stories-<category>.test.tsx` (one file per
+  component category and one for the foundations, all through `checkEveryStory` in
+  `tests/story-checks.ts`) render every story and run its `play` through portable stories
+  (`composeStories` + `run()`), every story in light and then every story in dark mode, then run
+  axe-core over the page with the WCAG 2.0, 2.1 and 2.2 A and AA tags and fail with one line per
+  rule, node and fix; a story tagged `'!test'` is skipped. The stories are split by category so
+  no single page renders all of them.
   `tests/hydration.test.tsx` renders every story with `renderToString`, hydrates that HTML with
   `hydrateRoot` and fails on a recoverable error or any `console.error`.
 - `clipboard`: the browser files that call `userEvent.copy` / `cut` / `paste` or
-  `navigator.clipboard`, one file at a time. Every browser context shares one system clipboard, so
-  two such files in parallel paste each other's text. The config finds them by those calls.
+  `navigator.clipboard`, one file at a time, in Chromium. Every browser context shares
+  one system clipboard, so two such files in parallel paste each other's text. The config finds them
+  by those calls. Firefox and WebKit run them in their `browser` instances, which already take one
+  file at a time.
 - `visual`: `tests/gallery.visual.test.tsx` renders every story named `Gallery` in light and dark at
   1440px wide, grows the viewport to the story's height and compares it with `toMatchScreenshot`
   against `tests/__screenshots__/gallery.visual.test.tsx/<category>-<component>-<mode>-chromium-linux.png`.
@@ -533,8 +541,30 @@ projects:
   the optional form peers.
 
 One file: `pnpm --filter @gsainfoteam/ids-react exec vitest run tests/select.test.tsx`. Install
-Chromium once per machine:
-`pnpm --filter @gsainfoteam/ids-react exec playwright install chromium`.
+the browsers once per machine:
+`pnpm --filter @gsainfoteam/ids-react exec playwright install chromium firefox webkit`.
+
+**Engines.** The keyboard model the tests are written against is Linux's, where all three engines
+put buttons and links in the Tab order and focus a clicked button. Safari on macOS does neither by
+default, so on macOS `pnpm test` runs Chromium only; CI (ubuntu) runs all three, and
+`pnpm test:browsers` runs all three in the Playwright Linux image through Docker.
+`IDS_BROWSERS=firefox,webkit` picks engines by hand.
+
+- A test that needs CDP starts with `skipWithoutCdp(context)` from `tests/engines.ts`, which skips it
+  outside Chromium with the reason. A test that relies on something another engine cannot do
+  from a test skips with `skipInFirefox(context, reason)` and a named reason.
+- Firefox and WebKit run one file at a time (`fileParallelism: false` on their instances), and the
+  clipboard files run inside that. In Firefox parallel pages share one focus, so one file's focus
+  moves blur the fields in another; in WebKit animations and frames stall in parallel pages and
+  presence exits time out.
+- Hotkeys the app resolves through TanStack's `detectPlatform` are pressed with
+  `MOD_AS_THE_APP_READS_IT` from `tests/hotkeys.ts`. Playwright's WebKit reports a Mac user agent
+  on Linux, so `Mod` is Meta there while Playwright's `ControlOrMeta` presses Control. Native
+  editing shortcuts (select all, undo) keep `ControlOrMeta`.
+- A test that leaves browser state behind undoes it: a Ctrl+wheel that proves IDS lets the browser
+  zoom zooms Firefox, so the test wheels back.
+- Pointer positions in Firefox and WebKit land on whole pixels, so a value read from a pointer
+  position is compared within a pixel, not exactly.
 
 **Drive components the way a user does.**
 
@@ -568,8 +598,10 @@ same rules. A violation is fixed in the component, with a test, or in the story 
 scaffolding is wrong. A rule is never turned off for the project. A story that shows a misuse on
 purpose (Button's `DevelopmentWarnings` nests a button in a button) turns off that one rule with
 `parameters: { a11y: { options: { rules: { 'nested-interactive': { enabled: false } } } } }` and
-says why in its description. The decorator gives `<html>` the story's `data-mode`, so a gallery
-wider than the 414px viewport sits on the theme's surface and not on a white page.
+says why in its description. The decorator paints `<body>` with the story's surface color, so a
+gallery wider than the 414px viewport sits on the theme's surface and not on a white page.
+floating-ui's focus guards are left out of the axe context: in Safari they are
+unnamed `role="button"` spans that VoiceOver needs to fire focus, a choice of the library.
 
 **Stories.** In `play` functions, query elements again after each `await`, since the theme decorator
 may remount the story. Inputs whose focus a play checks carry `data-1p-ignore` and

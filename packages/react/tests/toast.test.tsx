@@ -7,6 +7,8 @@ import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, Dialog, IdsProvider } from '../src';
+import { skipWithoutCdp } from './engines';
+import { MOD_AS_THE_APP_READS_IT } from './hotkeys';
 import { DefaultToaster, Toaster, toast } from '../src/components/feedback/toast';
 
 type Point = { x: number; y: number };
@@ -54,8 +56,15 @@ async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', { x,
   });
 }
 
+const GRIP_BELOW_THE_TOP_EDGE = 4;
+
+function gripOf(node: Element): Point {
+  const box = node.getBoundingClientRect();
+  return { x: box.left + box.width / 2, y: box.top + GRIP_BELOW_THE_TOP_EDGE };
+}
+
 async function drag(node: Element, by: Point, { holdFor = 0 } = {}) {
-  const start = centerOf(node);
+  const start = gripOf(node);
   await mouse('mousePressed', start);
   const steps = 4;
   for (let step = 1; step <= steps; step++)
@@ -224,8 +233,14 @@ test('F6 and Alt+T move focus into the region and back, which pauses the clock',
   const screen = await mount();
   const pageButton = screen.getByRole('button', { name: 'page' });
   pageButton.element().focus();
+  const f6LeftToTheBrowser = new Promise<boolean>((resolve) =>
+    window.addEventListener('keydown', (event) => resolve(!event.defaultPrevented), {
+      once: true,
+    }),
+  );
   await userEvent.keyboard('{F6}');
-  await expect.element(pageButton, { message: 'no toasts, no hotkey' }).toHaveFocus();
+  expect(await f6LeftToTheBrowser, 'no toasts, no hotkey').toBe(true);
+  pageButton.element().focus();
 
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
   onTestFinished(() => {
@@ -260,7 +275,8 @@ async function holdF6({ repeats }: { repeats: number }) {
   await cdp().send('Input.dispatchKeyEvent', { type: 'keyUp', ...press });
 }
 
-test('Alt+T needs exactly Alt, and a held F6 moves focus once', async () => {
+test('Alt+T needs exactly Alt, and a held F6 moves focus once', async (context) => {
+  skipWithoutCdp(context);
   const screen = await mount();
   const pageButton = screen.getByRole('button', { name: 'page' });
   pageButton.element().focus();
@@ -288,7 +304,9 @@ test('a custom hotkey replaces Alt+T and is announced with Mod resolved', async 
   await userEvent.keyboard('{Alt>}t{/Alt}');
   await expect.element(pageButton).toHaveFocus();
 
-  await userEvent.keyboard('{ControlOrMeta>}{Shift>}y{/Shift}{/ControlOrMeta}');
+  await userEvent.keyboard(
+    `{${MOD_AS_THE_APP_READS_IT}>}{Shift>}y{/Shift}{/${MOD_AS_THE_APP_READS_IT}}`,
+  );
   await expect.element(region).toHaveFocus();
 });
 
@@ -362,7 +380,8 @@ test('past max, older toasts hide and wait with their clock stopped', async () =
   await expect.poll(() => oldest.isConnected).toBe(false);
 });
 
-test('a swipe toward the edge dismisses, a short slow one springs back', async () => {
+test('a swipe toward the edge dismisses, a short slow one springs back', async (context) => {
+  skipWithoutCdp(context);
   const onDismiss = vi.fn();
   const screen = await mount();
   toast('Swipe me', { duration: Infinity, onDismiss });

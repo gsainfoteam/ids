@@ -318,6 +318,17 @@ test('column positioning ignores its page offset and keeps clicked time visible'
   await expect.poll(() => Math.abs(middle(option('hour', 10)) - middle(column))).toBeLessThan(1);
 });
 
+const TICKS_FIREFOX_NEEDS_FOR_A_LONG_WHEEL = 30;
+
+async function wheelToTheEnd(scroller: HTMLElement, direction: 1 | -1) {
+  const atTheEnd = () =>
+    direction > 0
+      ? scroller.scrollTop >= scroller.scrollHeight - scroller.clientHeight - 1
+      : scroller.scrollTop <= 0;
+  for (let tick = 0; tick < TICKS_FIREFOX_NEEDS_FOR_A_LONG_WHEEL && !atTheEnd(); tick++)
+    await userEvent.wheel(scroller, { delta: { y: direction * 30 * OPTION_HEIGHT } });
+}
+
 test('wheel commits at both edges without requiring another scroll event', async () => {
   let value = undefined as Time | null | undefined;
   await render(
@@ -328,9 +339,9 @@ test('wheel commits at both edges without requiring another scroll event', async
       onValueChange={(next) => (value = next)}
     />,
   );
-  await userEvent.wheel(col('hour'), { delta: { y: 30 * OPTION_HEIGHT } });
+  await wheelToTheEnd(col('hour'), 1);
   await expect.poll(() => value?.hour).toBe(23);
-  await userEvent.wheel(col('hour'), { delta: { y: -30 * OPTION_HEIGHT } });
+  await wheelToTheEnd(col('hour'), -1);
   await expect.poll(() => value?.hour).toBe(0);
 });
 

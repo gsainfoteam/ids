@@ -6,6 +6,7 @@ import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, FloatingButton, IdsProvider, Select, overlay } from '../src';
+import { skipWithoutCdp } from './engines';
 import { Drawer } from '../src/components/overlay/drawer';
 import {
   DRAG_THRESHOLD,
@@ -306,7 +307,8 @@ test('a backdrop click closes and the drawer does not', async () => {
   expect(onOpenChange.mock.calls).toEqual([[false]]);
 });
 
-test('a drawer that cannot be dismissed ignores Escape, the backdrop and a flick', async () => {
+test('a drawer that cannot be dismissed ignores Escape, the backdrop and a flick', async (context) => {
+  skipWithoutCdp(context);
   const screen = await render(
     <IdsProvider>
       <Sheet side="bottom" defaultOpen dismissible={false} role="alertdialog">
@@ -361,7 +363,8 @@ describe('dragging with a mouse', () => {
     return { screen, onOpenChange };
   };
 
-  test('a move below the threshold leaves the drawer where it is', async () => {
+  test('a move below the threshold leaves the drawer where it is', async (context) => {
+    skipWithoutCdp(context);
     const { screen, onOpenChange } = await renderBottom();
     const start = pointIn(sheetOf());
     await mouse('mousePressed', start);
@@ -373,7 +376,8 @@ describe('dragging with a mouse', () => {
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 
-  test('a fast flick closes', async () => {
+  test('a fast flick closes', async (context) => {
+    skipWithoutCdp(context);
     const { screen, onOpenChange } = await renderBottom();
     const start = pointIn(sheetOf());
     await mouseDrag(start, down(start, 15, 45, 75, 105));
@@ -381,7 +385,8 @@ describe('dragging with a mouse', () => {
     expect(onOpenChange.mock.calls).toEqual([[false]]);
   });
 
-  test('a slow short drag follows the pointer and springs back', async () => {
+  test('a slow short drag follows the pointer and springs back', async (context) => {
+    skipWithoutCdp(context);
     const { screen, onOpenChange } = await renderBottom();
     const start = pointIn(sheetOf());
     await mouse('mousePressed', start);
@@ -397,7 +402,8 @@ describe('dragging with a mouse', () => {
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 
-  test('a slow drag past a quarter of the height closes', async () => {
+  test('a slow drag past a quarter of the height closes', async (context) => {
+    skipWithoutCdp(context);
     const { screen } = await renderBottom();
     const height = sheetOf().offsetHeight;
     const start = pointIn(sheetOf());
@@ -405,7 +411,8 @@ describe('dragging with a mouse', () => {
     await expect.element(screen.getByRole('dialog', { name: 'Filters' })).not.toBeInTheDocument();
   });
 
-  test('pulling past the open position stretches a rubber band and comes back', async () => {
+  test('pulling past the open position stretches a rubber band and comes back', async (context) => {
+    skipWithoutCdp(context);
     await renderBottom();
     const start = pointIn(sheetOf());
     await mouse('mousePressed', start);
@@ -416,7 +423,8 @@ describe('dragging with a mouse', () => {
     await expect.poll(() => sheetOf().style.transform).toBe('');
   });
 
-  test('a drag starting on a field or a no-drag region is left to that element', async () => {
+  test('a drag starting on a field or a no-drag region is left to that element', async (context) => {
+    skipWithoutCdp(context);
     const { screen } = await renderBottom(
       <div data-drawer-no-drag className="h-20 shrink-0" data-testid="map" />,
     );
@@ -433,7 +441,8 @@ describe('dragging with a mouse', () => {
     await expect.element(screen.getByRole('dialog', { name: 'Filters' })).toBeInTheDocument();
   });
 
-  test('dragging the sheet marks the handle while it moves and clears it on release', async () => {
+  test('dragging the sheet marks the handle while it moves and clears it on release', async (context) => {
+    skipWithoutCdp(context);
     await renderBottom();
     const handle = document.querySelector<HTMLElement>('[data-drawer-handle]')!;
     const start = pointIn(handle, handle.offsetHeight / 2);
@@ -452,7 +461,8 @@ describe('dragging with a mouse', () => {
     expect(getComputedStyle(handle).backgroundColor).toBe(rest);
   });
 
-  test('dragging the scrollbar thumb inside the sheet leaves the handle alone', async () => {
+  test('dragging the scrollbar thumb inside the sheet leaves the handle alone', async (context) => {
+    skipWithoutCdp(context);
     await renderBottom(<div className="h-500 shrink-0" />);
     const handle = document.querySelector<HTMLElement>('[data-drawer-handle]')!;
     const rest = getComputedStyle(handle).backgroundColor;
@@ -481,7 +491,8 @@ describe('dragging with a mouse', () => {
     await expect.element(bar).not.toHaveAttribute('data-dragging');
   });
 
-  test('a drag inside a scrolled list scrolls instead of moving the drawer', async () => {
+  test('a drag inside a scrolled list scrolls instead of moving the drawer', async (context) => {
+    skipWithoutCdp(context);
     const { screen } = await renderBottom(
       <div className="h-40 shrink-0 overflow-y-auto" data-testid="list">
         <div className="h-[600px]" />
@@ -497,7 +508,8 @@ describe('dragging with a mouse', () => {
   });
 });
 
-test('with motion on, a release springs back and the page animates out before it is restored', async () => {
+test('with motion on, a release springs back and the page animates out before it is restored', async (context) => {
+  skipWithoutCdp(context);
   await cdp().send('Emulation.setEmulatedMedia', {
     features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }],
   });
@@ -539,7 +551,8 @@ test('with motion on, a release springs back and the page animates out before it
 });
 
 describe('dragging with touch', () => {
-  test('a touch below the threshold does nothing and a flick closes', async () => {
+  test('a touch below the threshold does nothing and a flick closes', async (context) => {
+    skipWithoutCdp(context);
     const onOpenChange = vi.fn();
     const screen = await render(
       <IdsProvider>
@@ -562,7 +575,8 @@ describe('dragging with touch', () => {
     expect(onOpenChange.mock.calls).toEqual([[false]]);
   });
 
-  test('a cancelled touch puts the drawer back', async () => {
+  test('a cancelled touch puts the drawer back', async (context) => {
+    skipWithoutCdp(context);
     const screen = await render(
       <IdsProvider>
         <Sheet side="bottom" defaultOpen>
@@ -580,7 +594,8 @@ describe('dragging with touch', () => {
     await expect.element(screen.getByRole('dialog', { name: 'Filters' })).toBeInTheDocument();
   });
 
-  test('a right drawer follows a horizontal swipe and closes on a flick', async () => {
+  test('a right drawer follows a horizontal swipe and closes on a flick', async (context) => {
+    skipWithoutCdp(context);
     const screen = await render(
       <IdsProvider>
         <Sheet defaultOpen />
@@ -601,7 +616,8 @@ describe('dragging with touch', () => {
 describe('snap points', () => {
   const snapPoints = [0.25, 0.5, 1] as const;
 
-  test('opens at the first point and a release snaps to the nearest one', async () => {
+  test('opens at the first point and a release snaps to the nearest one', async (context) => {
+    skipWithoutCdp(context);
     const onActiveSnapPointChange = vi.fn();
     await render(
       <IdsProvider>

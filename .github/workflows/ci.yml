@@ -49,8 +49,8 @@ jobs:
       - name: Check the examples server-render IDS
         run: pnpm examples:check
 
-      - name: Install Chromium for browser tests
-        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium
+      - name: Install Chromium, Firefox and WebKit for browser tests
+        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium firefox webkit
 
       - run: pnpm test
 

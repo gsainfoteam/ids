@@ -9,6 +9,7 @@ import { render } from 'vitest-browser-react';
 import { z } from 'zod';
 
 import { Field, NumberField } from '../src';
+import { skipWithoutCdp } from './engines';
 import { Field as FormField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -237,7 +238,8 @@ test('localized digits and accounting parentheses parse; text that is no number 
   await expect.element(field).toHaveValue('($123.50)');
 });
 
-test('edits that cannot become a number are refused before they land', async () => {
+test('edits that cannot become a number are refused before they land', async (context) => {
+  skipWithoutCdp(context);
   const form = controlled({ defaultValue: 12, min: 0 });
   const screen = await render(form.node);
   const input = screen.getByRole('spinbutton');
@@ -457,7 +459,8 @@ test('readOnly/disabled, custom key cancellation, wheel and native editing short
   await expect.element(input).toHaveFocus();
 });
 
-test('IME composition defers conversion and stepping until composition ends', async () => {
+test('IME composition defers conversion and stepping until composition ends', async (context) => {
+  skipWithoutCdp(context);
   const form = controlled({ defaultValue: 1 });
   const screen = await render(form.node);
   const input = screen.getByRole('spinbutton');
@@ -844,6 +847,7 @@ test('the wheel steps only when allowed and the input has focus', async () => {
   await expect.poll(() => form.value()).toBe(-8);
   await userEvent.keyboard('{Control>}');
   expect(await wheelWasPrevented(input, -100), 'ctrl+wheel stays the browser zoom').toBe(false);
+  expect(await wheelWasPrevented(input, 100), 'and zooms Firefox back out').toBe(false);
   await userEvent.keyboard('{/Control}');
   expect(form.changes).toEqual([2, -8]);
 });
@@ -932,7 +936,8 @@ test('input hints: inputmode follows the range and grid, autocomplete is off', (
   expect(hints({ autoComplete: 'on' }).getAttribute('autocomplete')).toBe('on');
 });
 
-test('a tap on a stepper steps without focusing the input, and a cancelled press stops', async () => {
+test('a tap on a stepper steps without focusing the input, and a cancelled press stops', async (context) => {
+  skipWithoutCdp(context);
   const form = controlled({ defaultValue: 0 });
   const screen = await render(form.node);
   const input = screen.getByRole('spinbutton');

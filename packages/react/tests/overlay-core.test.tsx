@@ -5,6 +5,7 @@ import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider } from '../src';
+import { skipWithoutCdp } from './engines';
 import {
   focusReturnTarget,
   keepAboveLayers,
@@ -112,7 +113,8 @@ test('a top layer box escapes a scaled ancestor and still takes its theme from t
   expect(primary(lifted)).not.toBe(primary(document.body));
 });
 
-test('Escape closes only the top layer, after inner claims, never while composing', async () => {
+test('Escape closes only the top layer, after inner claims, never while composing', async (context) => {
+  skipWithoutCdp(context);
   const reasons: string[] = [];
   const screen = await render(
     <>

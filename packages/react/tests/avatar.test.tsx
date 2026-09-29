@@ -7,6 +7,7 @@ import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Avatar, initialsOf } from '../src';
+import { skipWithoutCdp } from './engines';
 
 const avatarOf = (node: ReactNode) =>
   new DOMParser()
@@ -93,7 +94,8 @@ test('without an image the fallback shows at once: initials, or an icon without 
   expect(anonymous.querySelector('[data-avatar-fallback] svg')).not.toBeNull();
 });
 
-test('load and error move the status; a broken image leaves the DOM for the initials', async () => {
+test('load and error move the status; a broken image leaves the DOM for the initials', async (context) => {
+  skipWithoutCdp(context);
   const images = await holdImages();
   const statuses: Avatar.Status[] = [];
   const screen = await render(
@@ -117,7 +119,8 @@ test('load and error move the status; a broken image leaves the DOM for the init
   await expect.poll(() => statuses).toEqual(['loading', 'loaded', 'loading', 'error']);
 });
 
-test('the fallback waits for its delay while the image loads', async () => {
+test('the fallback waits for its delay while the image loads', async (context) => {
+  skipWithoutCdp(context);
   const images = await holdImages();
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
   onTestFinished(() => {
@@ -136,7 +139,8 @@ test('the fallback waits for its delay while the image loads', async () => {
   await expect.poll(fallback).toBeNull();
 });
 
-test('a late event from a previous src does not overwrite the current one', async () => {
+test('a late event from a previous src does not overwrite the current one', async (context) => {
+  skipWithoutCdp(context);
   const images = await holdImages();
   function App() {
     const [src, setSrc] = useState(`${HELD}old.png`);
@@ -203,7 +207,8 @@ test('alt="" makes it decorative; state reaches className and fallback children'
   await expect.element(avatar).toHaveAttribute('data-shape', 'square');
 });
 
-test('Avatar.Image takes its own src and native attributes', async () => {
+test('Avatar.Image takes its own src and native attributes', async (context) => {
+  skipWithoutCdp(context);
   await holdImages();
   const screen = await render(
     <Avatar name="Alice Kim">

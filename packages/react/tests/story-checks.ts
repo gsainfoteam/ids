@@ -5,6 +5,7 @@ import {
   type StoryObj,
 } from '@storybook/react-vite';
 import axe, { type AxeResults, type RunOptions } from 'axe-core';
+import { configure } from 'storybook/test';
 import { beforeAll, describe, expect, test } from 'vitest';
 
 import * as preview from '../.storybook/preview';
@@ -13,12 +14,17 @@ type StoryFile = Record<string, StoryObj> & { default: Meta };
 
 type A11yParameters = { options?: RunOptions; disable?: boolean };
 
-const project = setProjectAnnotations([preview]);
-beforeAll(project.beforeAll);
-
-const storyFiles = import.meta.glob<StoryFile>('../src/**/*.stories.tsx', { eager: true });
+export type StoryFiles = Record<string, StoryFile>;
 
 const projectA11y = preview.default.parameters?.a11y as A11yParameters;
+
+const PLAYS_WAIT_LONGER_WHILE_THREE_ENGINES_SHARE_THE_MACHINE = 5000;
+
+configure({ asyncUtilTimeout: PLAYS_WAIT_LONGER_WHILE_THREE_ENGINES_SHARE_THE_MACHINE });
+
+const MODES_ONE_AFTER_THE_OTHER = ['light', 'dark'] as const;
+
+const FLOATING_UI_FOCUS_GUARDS = '[data-floating-ui-focus-guard]';
 
 function describeViolations(violations: AxeResults['violations']) {
   return violations
@@ -42,23 +48,27 @@ async function checkAccessibility(storyA11y: A11yParameters | undefined) {
     ...storyA11y?.options,
     rules: { ...projectA11y.options?.rules, ...storyA11y?.options?.rules },
   };
-  const { violations } = await axe.run(document.body, options);
+  const { violations } = await axe.run(
+    { include: [document.body], exclude: [[FLOATING_UI_FOCUS_GUARDS]] },
+    options,
+  );
 
   expect(violations, `axe found violations:\n${describeViolations(violations)}`).toEqual([]);
 }
 
-for (const [path, module] of Object.entries(storyFiles)) {
-  describe(path.replace('../src/', ''), () => {
-    for (const [name, Story] of Object.entries(composeStories(module))) {
-      test.skipIf(!Story.tags.includes('test'))(name, async () => {
-        await Story.run();
-        await checkAccessibility(Story.parameters.a11y as A11yParameters | undefined);
-      });
+export function checkEveryStory(storyFiles: StoryFiles) {
+  const project = setProjectAnnotations([preview]);
+  beforeAll(project.beforeAll);
 
-      test.skipIf(!Story.tags.includes('test'))(`${name} in dark mode`, async () => {
-        await Story.run({ globals: { ...Story.globals, idsMode: 'dark' } });
-        await checkAccessibility(Story.parameters.a11y as A11yParameters | undefined);
-      });
-    }
-  });
+  for (const mode of MODES_ONE_AFTER_THE_OTHER)
+    describe(mode, () => {
+      for (const [path, module] of Object.entries(storyFiles))
+        describe(path.replace('../src/', ''), () => {
+          for (const [name, Story] of Object.entries(composeStories(module)))
+            test.skipIf(!Story.tags.includes('test'))(name, async () => {
+              await Story.run({ globals: { ...Story.globals, idsMode: mode } });
+              await checkAccessibility(Story.parameters.a11y as A11yParameters | undefined);
+            });
+        });
+    });
 }

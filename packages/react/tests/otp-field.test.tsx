@@ -9,6 +9,7 @@ import { render } from 'vitest-browser-react';
 import { z } from 'zod';
 
 import { Field, OTPField } from '../src';
+import { skipWithoutCdp } from './engines';
 import { Field as RHFField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -71,7 +72,7 @@ test('SSR: one real input carries the name, label, description, validation and a
   expect(inputs).toHaveLength(1);
   const [code] = inputs;
   expect(doc.querySelector('label')!.htmlFor).toBe(code!.id);
-  expect(code!.autocomplete).toBe('one-time-code');
+  expect(code!.getAttribute('autocomplete')).toBe('one-time-code');
   expect(code!.inputMode).toBe('numeric');
   expect(code!.maxLength).toBe(6);
   expect(code!.getAttribute('pattern')).toBe('.{6}');
@@ -267,7 +268,8 @@ test('a direct write to input.value (react-hook-form reset/setValue) reaches sta
   expect(state.changes).toEqual(['987']);
 });
 
-test('composition shows the draft and commits the cleaned value when it ends', async () => {
+test('composition shows the draft and commits the cleaned value when it ends', async (context) => {
+  skipWithoutCdp(context);
   const state = tracked({ pattern: 'alphanumeric' });
   await render(state.node);
   await userEvent.keyboard('{Tab}');

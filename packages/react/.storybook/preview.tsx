@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { use, useEffect } from 'react';
 
 import { useGlobals } from 'storybook/preview-api';
 
 import enums from '../../core/tokens/enums.json';
 import { IdsProvider, useTheme } from '../src/components/utility/ids-provider';
+import { PortalRootContext } from '../src/internal/overlay';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
 
@@ -12,10 +13,11 @@ import './preview.css';
 
 function PaintThePageBehindWideStories() {
   const { resolvedMode } = useTheme();
+  const provider = use(PortalRootContext);
 
   useEffect(() => {
-    document.documentElement.dataset.mode = resolvedMode;
-  }, [resolvedMode]);
+    if (provider) document.body.style.backgroundColor = getComputedStyle(provider).backgroundColor;
+  }, [provider, resolvedMode]);
 
   return null;
 }

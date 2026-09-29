@@ -3,7 +3,7 @@ import { type ReactElement } from 'react';
 import { Time } from '@internationalized/date';
 import { renderToString } from 'react-dom/server';
 import { afterEach, expect, test, vi } from 'vitest';
-import { cdp, userEvent } from 'vitest/browser';
+import { cdp, userEvent, server } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import {
@@ -16,6 +16,7 @@ import {
   TextArea,
   TimePicker,
 } from '../src';
+import { skipWithoutCdp } from './engines';
 import {
   clearOfCurve,
   MIN_THUMB_LENGTH,
@@ -240,7 +241,8 @@ test('variants: hover shows the bar only while the pointer is over, auto on over
   expect(q('[data-scroll-area-thumb]', barOf('always-short')).hidden).toBe(true);
 });
 
-test('dragging the thumb scrolls by the content-to-track ratio and holds the pointer', async () => {
+test('dragging the thumb scrolls by the content-to-track ratio and holds the pointer', async (context) => {
+  skipWithoutCdp(context);
   const screen = await render(
     <ScrollArea variant="auto" className="h-40 w-48" data-testid="area">
       <Lines count={60} />
@@ -267,7 +269,8 @@ test('dragging the thumb scrolls by the content-to-track ratio and holds the poi
   expect(document.activeElement).toBe(document.body);
 });
 
-test('pressing the track pages toward the pointer', async () => {
+test('pressing the track pages toward the pointer', async (context) => {
+  skipWithoutCdp(context);
   await render(
     <ScrollArea variant="auto" className="h-40 w-48">
       <Lines count={60} />
@@ -286,6 +289,9 @@ test('pressing the track pages toward the pointer', async () => {
   await mouse('mouseReleased', { x: track.left + track.width / 2, y: track.top + 2 });
   await expect.poll(() => view.scrollTop).toBe(0);
 });
+
+const FIREFOX_STOPS_ON_EVERY_SCROLLER = server.browser === 'firefox';
+const A_SUBPIXEL_SCROLL = 1;
 
 test('a plain text area becomes a tab stop that scrolls by keyboard, a focusable content does not', async () => {
   const screen = await render(
@@ -319,9 +325,15 @@ test('a plain text area becomes a tab stop that scrolls by keyboard, a focusable
   await userEvent.keyboard('{End}');
   await expect
     .poll(() => viewportOf('text').scrollTop)
-    .toBe(viewportOf('text').scrollHeight - viewportOf('text').clientHeight);
+    .toBeGreaterThanOrEqual(
+      viewportOf('text').scrollHeight - viewportOf('text').clientHeight - A_SUBPIXEL_SCROLL,
+    );
 
   await userEvent.keyboard('{Tab}');
+  if (FIREFOX_STOPS_ON_EVERY_SCROLLER) {
+    expect(document.activeElement).toBe(viewportOf('buttons'));
+    await userEvent.keyboard('{Tab}');
+  }
   expect(document.activeElement).toBe(screen.getByRole('button', { name: '안' }).element());
 });
 
@@ -627,7 +639,8 @@ test('adopted: Menu content scrolls in its viewport and keeps its padding', asyn
   expect(last.bottom).toBeLessThanOrEqual(viewportOfMenu.getBoundingClientRect().bottom);
 });
 
-test('adopted: dragging the scrollbar of a Drawer body scrolls it instead of moving the sheet', async () => {
+test('adopted: dragging the scrollbar of a Drawer body scrolls it instead of moving the sheet', async (context) => {
+  skipWithoutCdp(context);
   const screen = await render(
     <IdsProvider>
       <Drawer side="bottom" defaultOpen>

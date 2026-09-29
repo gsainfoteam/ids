@@ -14,6 +14,7 @@ import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { DateTimeField, Field, TimeField } from '../src';
+import { skipWithoutCdp } from './engines';
 import { Field as RHFField } from '../src/react-hook-form';
 
 type ClockValue = CalendarDateTime | Time;
@@ -295,7 +296,8 @@ test('a min with milliseconds starts the clock at the next whole second, only on
   expect(value?.toString()).toBe('2026-09-15T09:30:20');
 });
 
-test('every wall-clock time can be picked, and the local time zone shifts nothing', async () => {
+test('every wall-clock time can be picked, and the local time zone shifts nothing', async (context) => {
+  skipWithoutCdp(context);
   onTestFinished(async () => {
     await cdp().send('Emulation.setTimezoneOverride', { timezoneId: '' });
   });

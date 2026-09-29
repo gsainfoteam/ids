@@ -24,11 +24,37 @@ const clipboardSuites = readdirSync(TESTS)
   )
   .map((file) => `tests/${file}`);
 
-const chromium = (viewport?: { width: number; height: number }) => ({
+type BrowserName = 'chromium' | 'firefox' | 'webkit';
+
+const EVERY_ENGINE: BrowserName[] = ['chromium', 'firefox', 'webkit'];
+const chosenEngines = process.env.IDS_BROWSERS?.split(',') as BrowserName[] | undefined;
+const LINUX_KEYBOARD_MODEL = process.platform === 'linux';
+const ENGINES = chosenEngines ?? (LINUX_KEYBOARD_MODEL ? EVERY_ENGINE : ['chromium']);
+
+const FIREFOX_SHARES_FOCUS_ACROSS_PARALLEL_PAGES: BrowserName = 'firefox';
+const WEBKIT_STALLS_ANIMATIONS_IN_PARALLEL_PAGES: BrowserName = 'webkit';
+const ONE_FILE_AT_A_TIME: BrowserName[] = [
+  FIREFOX_SHARES_FOCUS_ACROSS_PARALLEL_PAGES,
+  WEBKIT_STALLS_ANIMATIONS_IN_PARALLEL_PAGES,
+];
+const everyFileOneAtATime = {
+  fileParallelism: false,
+  include: ['tests/**/*.test.tsx'],
+  exclude: [...configDefaults.exclude, SERVER_RENDER_SUITES, VISUAL_SUITES],
+};
+
+const playwrightIn = (browsers: BrowserName[], viewport?: { width: number; height: number }) => ({
   enabled: true,
   headless: true,
-  provider: playwright({ contextOptions: { reducedMotion: 'reduce' } }),
-  instances: [{ browser: 'chromium' as const }],
+  provider: playwright({
+    contextOptions: {
+      reducedMotion: 'reduce',
+    },
+  }),
+  instances: browsers.map((browser) => ({
+    browser,
+    ...(ONE_FILE_AT_A_TIME.includes(browser) && everyFileOneAtATime),
+  })),
   ...(viewport && { viewport }),
 });
 
@@ -49,7 +75,7 @@ export default defineConfig({
             VISUAL_SUITES,
           ],
           setupFiles: ['tests/setup.ts'],
-          browser: chromium(),
+          browser: playwrightIn(ENGINES),
         },
       },
       {
@@ -59,7 +85,7 @@ export default defineConfig({
           include: clipboardSuites,
           setupFiles: ['tests/setup.ts'],
           fileParallelism: false,
-          browser: chromium(),
+          browser: playwrightIn(ENGINES.filter((engine) => !ONE_FILE_AT_A_TIME.includes(engine))),
         },
       },
       {
@@ -69,7 +95,7 @@ export default defineConfig({
           include: [VISUAL_SUITES],
           setupFiles: ['tests/visual-setup.ts'],
           provide: { visualReference: RENDERS_THE_VISUAL_REFERENCE },
-          browser: chromium({ width: 1440, height: 900 }),
+          browser: playwrightIn(['chromium'], { width: 1440, height: 900 }),
         },
       },
       {

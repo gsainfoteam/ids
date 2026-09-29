@@ -9,6 +9,7 @@ import { render } from 'vitest-browser-react';
 import { z } from 'zod';
 
 import { Field, PasswordField } from '../src';
+import { skipWithoutCdp } from './engines';
 import { Field as FormField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -58,7 +59,7 @@ test('SSR native password, inferred/explicit autocomplete, Field label/ARIA and 
   );
   const input = doc.querySelector('input')!;
   expect(input.type).toBe('password');
-  expect(input.autocomplete).toBe('new-password');
+  expect(input.getAttribute('autocomplete')).toBe('new-password');
   expect(doc.querySelector<HTMLElement>('[data-password-field]')!.dataset.size).toBe('tiny');
   expect(input.required).toBe(true);
   expect(doc.querySelector('label')!.htmlFor).toBe(input.id);
@@ -80,7 +81,7 @@ test('SSR native password, inferred/explicit autocomplete, Field label/ARIA and 
     [{ name: 'confirmation', autoComplete: 'new-password' }, 'new-password'],
   ] as const) {
     const markup = parse(renderToString(<PasswordField {...props} />));
-    expect(markup.querySelector('input')!.autocomplete).toBe(expected);
+    expect(markup.querySelector('input')!.getAttribute('autocomplete')).toBe(expected);
   }
 });
 
@@ -148,7 +149,8 @@ test('the toggle is a ghost IconToggle that only swaps its glyph when pressed', 
     .toBe('rgba(0, 0, 0, 0)');
 });
 
-test('controlled input forwards native changes, external values, composition and readonly visibility', async () => {
+test('controlled input forwards native changes, external values, composition and readonly visibility', async (context) => {
+  skipWithoutCdp(context);
   const events: string[] = [];
   const external = { set: (_value: string) => {} };
   function App() {

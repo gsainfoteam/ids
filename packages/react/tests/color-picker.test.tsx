@@ -1,11 +1,13 @@
 import { useState } from 'react';
 
+import { converter } from 'culori';
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { ColorPicker } from '../src';
+import { skipWithoutCdp } from './engines';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -23,6 +25,18 @@ function recordKeys(target: HTMLElement) {
   target.addEventListener('keydown', (event) => keys.push([event.key, event.defaultPrevented]));
   return keys;
 }
+
+const ONE_HUE_STEP = 1;
+
+function degreesInAPixelAndAStep(track: Element, thumb: Element) {
+  return (
+    360 / (track.getBoundingClientRect().width - thumb.getBoundingClientRect().width) + ONE_HUE_STEP
+  );
+}
+
+const A_PIXEL_AND_A_HEX_STEP = (length: number) => 1 / length + 1 / 255;
+
+const hsv = converter('hsv');
 
 function whereTheThumbSits(track: HTMLElement, thumb: HTMLElement, value: number, max: number) {
   const { width, height } = track.getBoundingClientRect();
@@ -138,15 +152,18 @@ test('hue and alpha are Sliders: keys, Shift and page steps, and a press on the 
   await userEvent.click(track, {
     position: whereTheThumbSits(track, hue.element() as HTMLElement, 120, 360),
   });
-  expect(state.changes.at(-1)).toBe('rgba(0, 255, 0, 0.5)');
+  const pressedHue = Number(hue.element().getAttribute('aria-valuenow'));
+  expect(Math.abs(pressedHue - 120)).toBeLessThanOrEqual(
+    degreesInAPixelAndAStep(track, hue.element()),
+  );
   await expect.element(hue, { message: 'a press focuses the thumb' }).toHaveFocus();
   const alpha = slider('투명도');
   alpha.element().focus();
   await userEvent.keyboard('{Home}');
-  expect(state.changes.at(-1)).toBe('rgba(0, 255, 0, 0)');
+  expect(state.changes.at(-1)).toMatch(/^rgba\(\d+, 255, \d+, 0\)$/);
   await expect.element(alpha).toHaveAttribute('aria-valuetext', '0%');
   await userEvent.keyboard('{PageUp}');
-  expect(state.changes.at(-1)).toBe('rgba(0, 255, 0, 0.1)');
+  expect(state.changes.at(-1)).toMatch(/^rgba\(\d+, 255, \d+, 0\.1\)$/);
 });
 
 test('pressing on the area sets both axes from the pointer and focuses the area', async () => {
@@ -156,14 +173,21 @@ test('pressing on the area sets both axes from the pointer and focuses the area'
   const { width, height } = area.getBoundingClientRect();
   const quarterIn = { x: width / 4, y: height / 4 };
   await userEvent.click(area, { position: quarterIn });
-  expect(state.changes, 'saturation 25%, brightness 75%').toEqual(['#BF8F8F']);
+  expect(state.changes).toHaveLength(1);
+  const pressed = hsv(state.changes[0]!)!;
+  expect(Math.abs(pressed.s - 0.25), 'saturation 25%').toBeLessThanOrEqual(
+    A_PIXEL_AND_A_HEX_STEP(width),
+  );
+  expect(Math.abs(pressed.v - 0.75), 'brightness 75%').toBeLessThanOrEqual(
+    A_PIXEL_AND_A_HEX_STEP(height),
+  );
   await expect.element(slider('채도')).toHaveFocus();
   await userEvent.dragAndDrop(area, area, {
     sourcePosition: quarterIn,
     targetPosition: { x: width + 16, y: -16 },
     force: true,
   });
-  expect(state.changes, 'a captured drag keeps updating').toEqual(['#BF8F8F', '#FF0000']);
+  expect(state.changes.at(-1), 'a captured drag keeps updating').toBe('#FF0000');
 });
 
 test('typed text is a draft until Enter or blur; unreadable text is reverted', async () => {
@@ -304,7 +328,8 @@ test('eyedropper: shown only where the API exists; a cancelled pick changes noth
   }
 });
 
-test('copy writes the shown value and announces it', async () => {
+test('copy writes the shown value and announces it', async (context) => {
+  skipWithoutCdp(context);
   const revokeClipboardWrite = await acceptClipboardWritePrompt();
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
   try {

@@ -8,6 +8,7 @@ import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { DateField, DateTimeField, Field, type Calendar } from '../src';
+import { skipWithoutCdp } from './engines';
 import { Field as RHFField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -794,7 +795,8 @@ test('parts split across Fragments render without duplicate keys', async () => {
   }
 });
 
-test('the local time zone shifts neither the shown day nor the day the calendar selects', async () => {
+test('the local time zone shifts neither the shown day nor the day the calendar selects', async (context) => {
+  skipWithoutCdp(context);
   onTestFinished(async () => {
     await cdp().send('Emulation.setTimezoneOverride', { timezoneId: '' });
   });

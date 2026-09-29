@@ -144,6 +144,8 @@ export const Gallery: Story = {
   ),
 };
 
+const A_SAVE_TAKES = 2000;
+
 export const Loading: Story = {
   render: function Render(args) {
     const [saving, setSaving] = useState(false);
@@ -156,7 +158,7 @@ export const Loading: Story = {
         onClick={(event) => {
           args.onClick?.(event);
           setSaving(true);
-          setTimeout(() => setSaving(false), 800);
+          setTimeout(() => setSaving(false), A_SAVE_TAKES);
         }}
       >
         {saving && <Spinner decorative />}
@@ -183,7 +185,9 @@ export const Loading: Story = {
     await userEvent.click(button);
     await userEvent.keyboard('{Enter}');
     await expect(args.onClick).toHaveBeenCalledOnce();
-    await waitFor(() => expect(button).toHaveAccessibleName('저장'));
+    await waitFor(() => expect(button).toHaveAccessibleName('저장'), {
+      timeout: A_SAVE_TAKES * 2,
+    });
     await expect(button).not.toHaveAttribute('aria-disabled');
     await expect(button).toHaveFocus();
   },

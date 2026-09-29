@@ -7,6 +7,8 @@ import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, Dialog, IdsProvider, overlay } from '../src';
+import { skipWithoutCdp } from './engines';
+import { MOD_AS_THE_APP_READS_IT } from './hotkeys';
 import { Menu } from '../src/components/overlay/menu';
 
 type ActionsProps = Partial<Menu.Props> & {
@@ -729,16 +731,18 @@ test('the hotkey toggles the palette, focuses the search and returns focus where
   const before = screen.getByRole('button', { name: 'Before' });
   before.element().focus();
 
-  await userEvent.keyboard('{ControlOrMeta>}k{/ControlOrMeta}');
+  await userEvent.keyboard(`{${MOD_AS_THE_APP_READS_IT}>}k{/${MOD_AS_THE_APP_READS_IT}}`);
   await expect.element(palette).toBeVisible();
   await expect.element(search).toHaveFocus();
 
-  await userEvent.keyboard('{ControlOrMeta>}k{/ControlOrMeta}');
+  await userEvent.keyboard(`{${MOD_AS_THE_APP_READS_IT}>}k{/${MOD_AS_THE_APP_READS_IT}}`);
   await expect.element(palette).not.toBeInTheDocument();
   await expect.element(before).toHaveFocus();
 
   await userEvent.keyboard('k');
-  await userEvent.keyboard('{Alt>}{ControlOrMeta>}k{/ControlOrMeta}{/Alt}');
+  await userEvent.keyboard(
+    `{Alt>}{${MOD_AS_THE_APP_READS_IT}>}k{/${MOD_AS_THE_APP_READS_IT}}{/Alt}`,
+  );
   await expect.element(palette).not.toBeInTheDocument();
   expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
 });
@@ -756,7 +760,8 @@ async function pressModK(key: string, { repeats = 0 } = {}) {
   await cdp().send('Input.dispatchKeyEvent', { type: 'keyUp', ...press });
 }
 
-test('the hotkey reads the key position, so a Korean layout opens the palette too', async () => {
+test('the hotkey reads the key position, so a Korean layout opens the palette too', async (context) => {
+  skipWithoutCdp(context);
   const { screen, palette, search } = await renderPalette();
   screen.getByRole('button', { name: 'Before' }).element().focus();
 
@@ -765,7 +770,8 @@ test('the hotkey reads the key position, so a Korean layout opens the palette to
   await expect.element(search).toHaveFocus();
 });
 
-test('holding the hotkey toggles the palette once', async () => {
+test('holding the hotkey toggles the palette once', async (context) => {
+  skipWithoutCdp(context);
   const onOpenChange = vi.fn();
   const { screen, palette } = await renderPalette({ onOpenChange });
   screen.getByRole('button', { name: 'Before' }).element().focus();
@@ -931,7 +937,8 @@ test('Escape and a backdrop click close the palette and return focus', async () 
   expect(onOpenChange.mock.calls).toEqual([[true], [false], [true], [false]]);
 });
 
-test('Enter and Escape while an IME composes neither select nor close', async () => {
+test('Enter and Escape while an IME composes neither select nor close', async (context) => {
+  skipWithoutCdp(context);
   const onNewFile = vi.fn();
   const { screen, trigger, search, shown } = await renderPalette({ onNewFile });
   await userEvent.click(trigger);
