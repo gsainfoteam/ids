@@ -2,6 +2,8 @@
 
 import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
 
+import { tabbable } from 'tabbable';
+
 import { matchesQuery, orderByOptions, typeaheadIndex, type SelectOption } from './select-options';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
@@ -92,7 +94,22 @@ export function useSelect({
     if (restoreFocus) triggerRef.current?.focus({ preventScroll: true });
   };
 
-  const continueTabFromTrigger = () => triggerRef.current?.focus({ preventScroll: true });
+  const tabOnFromTrigger = (backward: boolean) => {
+    const trigger = triggerRef.current;
+    if (!trigger) return false;
+
+    const outsideThePopup = tabbable(trigger.ownerDocument.body).filter(
+      (node) => !node.closest('[data-field-popup]'),
+    );
+    const next = outsideThePopup[outsideThePopup.indexOf(trigger) + (backward ? -1 : 1)];
+    if (!next) {
+      trigger.focus({ preventScroll: true });
+      return false;
+    }
+
+    next.focus();
+    return true;
+  };
 
   const openAt = (target: 'selected' | 'first' | 'last') => {
     if (blocked) return;
@@ -230,11 +247,11 @@ export function useSelect({
         Escape: () => {
           close(true);
         },
-        Tab: () => {
+        Tab: (event) => {
           if (drawer) return false;
-          if (searching) continueTabFromTrigger();
+          const movedPastTheTrigger = searching && tabOnFromTrigger(event.shiftKey);
           close(false);
-          return false;
+          if (!movedPastTheTrigger) return false;
         },
         Space: () => {
           if (searching) return false;
