@@ -123,22 +123,21 @@ export const Gallery: Story = {
   ),
 };
 
-function PickExample() {
-  const [value, setValue] = useState('#3B82F6');
-  return (
-    <div className="grid w-72 gap-3">
-      <Field>
-        <Field.Label>브랜드 색상</Field.Label>
-        <ColorField value={value} onValueChange={setValue} alpha swatches={palette} />
-        <Field.Hint>방향키로 채도와 밝기를 조절하세요.</Field.Hint>
-      </Field>
-      <output aria-label="색상 결과">{value}</output>
-    </div>
-  );
-}
-
 export const PickAndClear: Story = {
-  render: () => <PickExample />,
+  render: function Render() {
+    const [value, setValue] = useState('#3B82F6');
+
+    return (
+      <div className="grid w-72 gap-3">
+        <Field>
+          <Field.Label>브랜드 색상</Field.Label>
+          <ColorField value={value} onValueChange={setValue} alpha swatches={palette} />
+          <Field.Hint>방향키로 채도와 밝기를 조절하세요.</Field.Hint>
+        </Field>
+        <output aria-label="색상 결과">{value}</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -200,35 +199,34 @@ export const Composition: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex w-72 flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(String(new FormData(event.currentTarget).get('color')));
-      }}
-    >
-      <Field className="w-full">
-        <Field.Label>테마 색</Field.Label>
-        <ColorField name="color" required swatches={palette} />
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">제출</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex w-72 flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(String(new FormData(event.currentTarget).get('color')));
+        }}
+      >
+        <Field className="w-full">
+          <Field.Label>테마 색</Field.Label>
+          <ColorField name="color" required swatches={palette} />
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">제출</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -257,35 +255,34 @@ export const NativeForm: Story = {
   },
 };
 
-function ReactHookFormExample() {
-  const methods = useForm<{ color: string }>({ defaultValues: { color: '' } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="flex w-72 flex-col items-start gap-4"
-        noValidate
-        onSubmit={methods.handleSubmit((data) => setResult(data.color))}
-      >
-        <FormField
-          name="color"
-          controlMode="value"
-          registerOptions={{ required: '색을 고르세요.' }}
-          className="w-full"
-        >
-          <FormField.Label>포인트 색</FormField.Label>
-          <ColorField swatches={palette} />
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">저장</Button>
-        <output aria-label="저장 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm<{ color: string }>({ defaultValues: { color: '' } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          className="flex w-72 flex-col items-start gap-4"
+          noValidate
+          onSubmit={methods.handleSubmit((data) => setResult(data.color))}
+        >
+          <FormField
+            name="color"
+            controlMode="value"
+            registerOptions={{ required: '색을 고르세요.' }}
+            className="w-full"
+          >
+            <FormField.Label>포인트 색</FormField.Label>
+            <ColorField swatches={palette} />
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">저장</Button>
+          <output aria-label="저장 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

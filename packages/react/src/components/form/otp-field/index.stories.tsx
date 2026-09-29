@@ -50,24 +50,6 @@ const input = (canvasElement: HTMLElement) =>
 
 export const Playground: Story = {};
 
-function ThreeThree(props: Partial<OTPField.Props>) {
-  return (
-    <OTPField length={6} {...props}>
-      <OTPField.Group>
-        <OTPField.Slot index={0} />
-        <OTPField.Slot index={1} />
-        <OTPField.Slot index={2} />
-      </OTPField.Group>
-      <OTPField.Separator />
-      <OTPField.Group>
-        <OTPField.Slot index={3} />
-        <OTPField.Slot index={4} />
-        <OTPField.Slot index={5} />
-      </OTPField.Group>
-    </OTPField>
-  );
-}
-
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -116,7 +98,19 @@ export const Gallery: Story = {
           <OTPField length={6} aria-label="기본" />
         </Showcase.Row>
         <Showcase.Row label="3 · 3">
-          <ThreeThree aria-label="3 3" />
+          <OTPField length={6} aria-label="3 3">
+            <OTPField.Group>
+              <OTPField.Slot index={0} />
+              <OTPField.Slot index={1} />
+              <OTPField.Slot index={2} />
+            </OTPField.Group>
+            <OTPField.Separator />
+            <OTPField.Group>
+              <OTPField.Slot index={3} />
+              <OTPField.Slot index={4} />
+              <OTPField.Slot index={5} />
+            </OTPField.Group>
+          </OTPField>
         </Showcase.Row>
         <Showcase.Row label="separate">
           <OTPField length={4} aria-label="분리">
@@ -191,36 +185,35 @@ export const Paste: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
-      }}
-    >
-      <Field>
-        <Field.Label>인증 코드</Field.Label>
-        <OTPField length={6} name="code" required />
-        <Field.Hint>문자로 받은 6자리 숫자</Field.Hint>
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">제출</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
+        }}
+      >
+        <Field>
+          <Field.Label>인증 코드</Field.Label>
+          <OTPField length={6} name="code" required />
+          <Field.Hint>문자로 받은 6자리 숫자</Field.Hint>
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">제출</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -245,31 +238,30 @@ export const NativeForm: Story = {
 
 const schema = z.object({ code: z.string().length(6, '6자리 코드를 입력하세요.') });
 
-function ReactHookFormExample() {
-  const methods = useForm({ resolver: zodResolver(schema), defaultValues: { code: '' } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="flex flex-col items-start gap-4"
-        noValidate
-        onSubmit={methods.handleSubmit((data) => setResult(`검증 완료: ${data.code}`))}
-      >
-        <FormField name="code" required>
-          <FormField.Label>이메일 코드</FormField.Label>
-          <OTPField length={6} />
-          <FormField.Hint>이메일로 받은 6자리 코드</FormField.Hint>
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">검증</Button>
-        <output aria-label="검증 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm({ resolver: zodResolver(schema), defaultValues: { code: '' } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          className="flex flex-col items-start gap-4"
+          noValidate
+          onSubmit={methods.handleSubmit((data) => setResult(`검증 완료: ${data.code}`))}
+        >
+          <FormField name="code" required>
+            <FormField.Label>이메일 코드</FormField.Label>
+            <OTPField length={6} />
+            <FormField.Hint>이메일로 받은 6자리 코드</FormField.Hint>
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">검증</Button>
+          <output aria-label="검증 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

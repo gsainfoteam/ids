@@ -57,158 +57,155 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-function CopyField() {
-  const [copied, setCopied] = useState(false);
-  return (
-    <TextField
-      defaultValue="https://gistory.me/ids"
-      readOnly
-      aria-label="공유 링크"
-      className="w-72"
-    >
-      <TextField.Input />
-      <IconButton
-        aria-label={copied ? '복사됨' : '복사'}
-        icon={copied ? <CheckIcon /> : <DocumentDuplicateIcon />}
-        onClick={() => {
-          void navigator.clipboard?.writeText('https://gistory.me/ids');
-          setCopied(true);
-          window.setTimeout(() => setCopied(false), 1500);
-        }}
-      />
-    </TextField>
-  );
-}
-
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section title="Variant × Size">
-        <Showcase.Matrix
-          rows={sizes}
-          columns={variants}
-          render={(size, variant) => (
+  render: function Render() {
+    const [copied, setCopied] = useState(false);
+
+    return (
+      <Showcase>
+        <Showcase.Section title="Variant × Size">
+          <Showcase.Matrix
+            rows={sizes}
+            columns={variants}
+            render={(size, variant) => (
+              <TextField
+                size={size}
+                variant={variant}
+                placeholder="이름"
+                aria-label={`${variant} ${size}`}
+                className="w-56"
+              />
+            )}
+          />
+        </Showcase.Section>
+
+        <Showcase.Section title="States">
+          <Showcase.Row label="empty">
+            <TextField placeholder="이름" aria-label="비어 있음" className="w-56" />
+          </Showcase.Row>
+          <Showcase.Row label="filled">
+            <TextField defaultValue="인포팀" aria-label="채움" className="w-56" />
+          </Showcase.Row>
+          <Showcase.Row label="invalid">
+            <TextField defaultValue="인포팀!" invalid aria-label="잘못됨" className="w-56" />
             <TextField
-              size={size}
-              variant={variant}
-              placeholder="이름"
-              aria-label={`${variant} ${size}`}
+              defaultValue="인포팀!"
+              invalid
+              variant="soft"
+              aria-label="잘못됨 soft"
               className="w-56"
             />
-          )}
-        />
-      </Showcase.Section>
+          </Showcase.Row>
+          <Showcase.Row label="disabled">
+            <TextField defaultValue="인포팀" disabled aria-label="비활성" className="w-56" />
+          </Showcase.Row>
+          <Showcase.Row label="readOnly">
+            <TextField defaultValue="인포팀" readOnly aria-label="읽기 전용" className="w-56" />
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section title="States">
-        <Showcase.Row label="empty">
-          <TextField placeholder="이름" aria-label="비어 있음" className="w-56" />
-        </Showcase.Row>
-        <Showcase.Row label="filled">
-          <TextField defaultValue="인포팀" aria-label="채움" className="w-56" />
-        </Showcase.Row>
-        <Showcase.Row label="invalid">
-          <TextField defaultValue="인포팀!" invalid aria-label="잘못됨" className="w-56" />
-          <TextField
-            defaultValue="인포팀!"
-            invalid
-            variant="soft"
-            aria-label="잘못됨 soft"
-            className="w-56"
-          />
-        </Showcase.Row>
-        <Showcase.Row label="disabled">
-          <TextField defaultValue="인포팀" disabled aria-label="비활성" className="w-56" />
-        </Showcase.Row>
-        <Showcase.Row label="readOnly">
-          <TextField defaultValue="인포팀" readOnly aria-label="읽기 전용" className="w-56" />
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Composition"
-        description="TextField.Input 앞의 자식은 앞쪽, 뒤의 자식은 뒤쪽에 놓입니다. 아이콘과 글자는 흐린 색이 되고, 버튼은 안쪽 크기로 줄어듭니다."
-      >
-        <Showcase.Row label="leading icon">
-          <TextField placeholder="검색" aria-label="검색" className="w-72">
-            <MagnifyingGlassIcon />
-            <TextField.Input />
-          </TextField>
-          <TextField size="tiny" placeholder="검색" aria-label="검색 tiny" className="w-56">
-            <MagnifyingGlassIcon />
-            <TextField.Input />
-          </TextField>
-        </Showcase.Row>
-        <Showcase.Row label="Clear">
-          <TextField defaultValue="인포팀" aria-label="지우기 예시" className="w-72">
-            <MagnifyingGlassIcon />
-            <TextField.Input />
-            <TextField.Clear />
-          </TextField>
-          <TextField size="tiny" defaultValue="인포팀" aria-label="지우기 tiny" className="w-56">
-            <TextField.Input />
-            <TextField.Clear />
-          </TextField>
-        </Showcase.Row>
-        <Showcase.Row label="prefix · suffix">
-          <TextField defaultValue="gistory" aria-label="주소" className="w-72">
-            <span>https://</span>
-            <TextField.Input />
-            <span>.me</span>
-          </TextField>
-          <TextField placeholder="아이디" aria-label="아이디" className="w-72">
-            <TextField.Input />
-            <span>@gm.gist.ac.kr</span>
-          </TextField>
-        </Showcase.Row>
-        <Showcase.Row label="buttons">
-          <CopyField />
-          <TextField placeholder="북마크 이름" aria-label="북마크" className="w-72">
-            <TextField.Input />
-            <IconToggle
-              aria-label="즐겨찾기"
-              icon={(state) => (state.pressed ? <StarIconSolid /> : <StarIcon />)}
-            />
-          </TextField>
-        </Showcase.Row>
-        <Showcase.Row label="text button">
-          <TextField placeholder="검색어" aria-label="범위 검색" className="w-72">
-            <TextField.Input />
-            <Button variant="ghost">
-              전체
-              <ChevronDownIcon />
-            </Button>
-          </TextField>
-        </Showcase.Row>
-        <Showcase.Row label="shortcut">
-          <TextField placeholder="빠른 검색" aria-label="빠른 검색" className="w-72">
-            <MagnifyingGlassIcon />
-            <TextField.Input />
-            <Kbd>⌘K</Kbd>
-          </TextField>
-        </Showcase.Row>
-        <Showcase.Row label="email">
-          <TextField
-            type="email"
-            placeholder="name@example.com"
-            aria-label="이메일"
-            className="w-72"
-          >
-            <EnvelopeIcon />
-            <TextField.Input />
-          </TextField>
-          <TextField
-            variant="soft"
-            placeholder="username"
-            aria-label="사용자 이름"
-            className="w-72"
-          >
-            <AtSymbolIcon />
-            <TextField.Input />
-          </TextField>
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+        <Showcase.Section
+          title="Composition"
+          description="TextField.Input 앞의 자식은 앞쪽, 뒤의 자식은 뒤쪽에 놓입니다. 아이콘과 글자는 흐린 색이 되고, 버튼은 안쪽 크기로 줄어듭니다."
+        >
+          <Showcase.Row label="leading icon">
+            <TextField placeholder="검색" aria-label="검색" className="w-72">
+              <MagnifyingGlassIcon />
+              <TextField.Input />
+            </TextField>
+            <TextField size="tiny" placeholder="검색" aria-label="검색 tiny" className="w-56">
+              <MagnifyingGlassIcon />
+              <TextField.Input />
+            </TextField>
+          </Showcase.Row>
+          <Showcase.Row label="Clear">
+            <TextField defaultValue="인포팀" aria-label="지우기 예시" className="w-72">
+              <MagnifyingGlassIcon />
+              <TextField.Input />
+              <TextField.Clear />
+            </TextField>
+            <TextField size="tiny" defaultValue="인포팀" aria-label="지우기 tiny" className="w-56">
+              <TextField.Input />
+              <TextField.Clear />
+            </TextField>
+          </Showcase.Row>
+          <Showcase.Row label="prefix · suffix">
+            <TextField defaultValue="gistory" aria-label="주소" className="w-72">
+              <span>https://</span>
+              <TextField.Input />
+              <span>.me</span>
+            </TextField>
+            <TextField placeholder="아이디" aria-label="아이디" className="w-72">
+              <TextField.Input />
+              <span>@gm.gist.ac.kr</span>
+            </TextField>
+          </Showcase.Row>
+          <Showcase.Row label="buttons">
+            <TextField
+              defaultValue="https://gistory.me/ids"
+              readOnly
+              aria-label="공유 링크"
+              className="w-72"
+            >
+              <TextField.Input />
+              <IconButton
+                aria-label={copied ? '복사됨' : '복사'}
+                icon={copied ? <CheckIcon /> : <DocumentDuplicateIcon />}
+                onClick={() => {
+                  void navigator.clipboard?.writeText('https://gistory.me/ids');
+                  setCopied(true);
+                  window.setTimeout(() => setCopied(false), 1500);
+                }}
+              />
+            </TextField>
+            <TextField placeholder="북마크 이름" aria-label="북마크" className="w-72">
+              <TextField.Input />
+              <IconToggle
+                aria-label="즐겨찾기"
+                icon={(state) => (state.pressed ? <StarIconSolid /> : <StarIcon />)}
+              />
+            </TextField>
+          </Showcase.Row>
+          <Showcase.Row label="text button">
+            <TextField placeholder="검색어" aria-label="범위 검색" className="w-72">
+              <TextField.Input />
+              <Button variant="ghost">
+                전체
+                <ChevronDownIcon />
+              </Button>
+            </TextField>
+          </Showcase.Row>
+          <Showcase.Row label="shortcut">
+            <TextField placeholder="빠른 검색" aria-label="빠른 검색" className="w-72">
+              <MagnifyingGlassIcon />
+              <TextField.Input />
+              <Kbd>⌘K</Kbd>
+            </TextField>
+          </Showcase.Row>
+          <Showcase.Row label="email">
+            <TextField
+              type="email"
+              placeholder="name@example.com"
+              aria-label="이메일"
+              className="w-72"
+            >
+              <EnvelopeIcon />
+              <TextField.Input />
+            </TextField>
+            <TextField
+              variant="soft"
+              placeholder="username"
+              aria-label="사용자 이름"
+              className="w-72"
+            >
+              <AtSymbolIcon />
+              <TextField.Input />
+            </TextField>
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
 };
 
 export const Clearable: Story = {
@@ -265,31 +262,34 @@ export const InvalidState: Story = {
   },
 };
 
-function RhfExample() {
-  const methods = useForm({ defaultValues: { query: '' } });
-  const query = useWatch({ control: methods.control, name: 'query' });
-  return (
-    <FormProvider {...methods}>
-      <form className="flex w-72 flex-col gap-3" onSubmit={(event) => event.preventDefault()}>
-        <RhfField name="query">
-          <RhfField.Label>검색어</RhfField.Label>
-          <TextField>
-            <MagnifyingGlassIcon />
-            <TextField.Input />
-            <TextField.Clear />
-          </TextField>
-        </RhfField>
-        <Button type="button" variant="outline" onClick={() => methods.setValue('query', '인포팀')}>
-          코드로 값 넣기
-        </Button>
-        <output aria-label="RHF 값">{JSON.stringify(query)}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <RhfExample />,
+  render: function Render() {
+    const methods = useForm({ defaultValues: { query: '' } });
+    const query = useWatch({ control: methods.control, name: 'query' });
+
+    return (
+      <FormProvider {...methods}>
+        <form className="flex w-72 flex-col gap-3" onSubmit={(event) => event.preventDefault()}>
+          <RhfField name="query">
+            <RhfField.Label>검색어</RhfField.Label>
+            <TextField>
+              <MagnifyingGlassIcon />
+              <TextField.Input />
+              <TextField.Clear />
+            </TextField>
+          </RhfField>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => methods.setValue('query', '인포팀')}
+          >
+            코드로 값 넣기
+          </Button>
+          <output aria-label="RHF 값">{JSON.stringify(query)}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

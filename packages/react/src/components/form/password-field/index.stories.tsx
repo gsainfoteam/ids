@@ -169,31 +169,30 @@ export const Gallery: Story = {
   ),
 };
 
-function VisibilityExample() {
-  const [value, setValue] = useState('demo-password');
-  return (
-    <div className="grid w-72 gap-3">
-      <Field>
-        <Field.Label>로그인 비밀번호</Field.Label>
-        <PasswordField
-          name="password"
-          value={value}
-          onValueChange={setValue}
-          {...noPasswordManager}
-        >
-          <LockClosedIcon />
-          <PasswordField.Input />
-          <PasswordField.VisibilityToggle />
-        </PasswordField>
-        <Field.Hint>보기를 바꿔도 입력과 선택 범위는 그대로입니다.</Field.Hint>
-      </Field>
-      <output aria-label="입력 길이">{value.length}자</output>
-    </div>
-  );
-}
-
 export const Visibility: Story = {
-  render: () => <VisibilityExample />,
+  render: function Render() {
+    const [value, setValue] = useState('demo-password');
+
+    return (
+      <div className="grid w-72 gap-3">
+        <Field>
+          <Field.Label>로그인 비밀번호</Field.Label>
+          <PasswordField
+            name="password"
+            value={value}
+            onValueChange={setValue}
+            {...noPasswordManager}
+          >
+            <LockClosedIcon />
+            <PasswordField.Input />
+            <PasswordField.VisibilityToggle />
+          </PasswordField>
+          <Field.Hint>보기를 바꿔도 입력과 선택 범위는 그대로입니다.</Field.Hint>
+        </Field>
+        <output aria-label="입력 길이">{value.length}자</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -255,41 +254,40 @@ export const CapsLock: Story = {
   },
 };
 
-function ShowPasswordExample() {
-  const [visible, setVisible] = useState(false);
-  return (
-    <form
-      className="grid w-72 gap-3"
-      onSubmit={(event) => {
-        event.preventDefault();
-      }}
-    >
-      <Field>
-        <Field.Label>비밀번호</Field.Label>
-        <PasswordField
-          name="password"
-          defaultValue="infoteam"
-          visible={visible}
-          onVisibleChange={setVisible}
-          hideVisibilityToggle
-          {...noPasswordManager}
-        />
-      </Field>
-      <label className="text-body-b3-regular flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={visible}
-          onChange={(event) => setVisible(event.target.checked)}
-        />
-        비밀번호 보기
-      </label>
-      <Button type="submit">로그인</Button>
-    </form>
-  );
-}
-
 export const ControlledVisibility: Story = {
-  render: () => <ShowPasswordExample />,
+  render: function Render() {
+    const [visible, setVisible] = useState(false);
+
+    return (
+      <form
+        className="grid w-72 gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+        }}
+      >
+        <Field>
+          <Field.Label>비밀번호</Field.Label>
+          <PasswordField
+            name="password"
+            defaultValue="infoteam"
+            visible={visible}
+            onVisibleChange={setVisible}
+            hideVisibilityToggle
+            {...noPasswordManager}
+          />
+        </Field>
+        <label className="text-body-b3-regular flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={visible}
+            onChange={(event) => setVisible(event.target.checked)}
+          />
+          비밀번호 보기
+        </label>
+        <Button type="submit">로그인</Button>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -315,49 +313,48 @@ const schema = z
     message: '비밀번호가 일치하지 않습니다.',
   });
 
-function FormExample() {
-  const methods = useForm({
-    resolver: zodResolver(schema),
-    defaultValues: { password: '', confirmation: '' },
-  });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="grid w-72 gap-3"
-        noValidate
-        onSubmit={methods.handleSubmit(() => setResult('검증 완료'))}
-      >
-        <FormField name="password" required>
-          <FormField.Label>새 비밀번호</FormField.Label>
-          <PasswordField autoComplete="new-password" {...noPasswordManager} />
-          <FormField.Hint>8자 이상 입력하세요.</FormField.Hint>
-          <FormField.Error />
-        </FormField>
-        <FormField name="confirmation" required>
-          <FormField.Label>비밀번호 확인</FormField.Label>
-          <PasswordField autoComplete="new-password" {...noPasswordManager} />
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">검증</Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            methods.reset();
-            setResult('');
-          }}
-        >
-          초기화
-        </Button>
-        <output aria-label="검증 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ZodForm: Story = {
-  render: () => <FormExample />,
+  render: function Render() {
+    const methods = useForm({
+      resolver: zodResolver(schema),
+      defaultValues: { password: '', confirmation: '' },
+    });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          className="grid w-72 gap-3"
+          noValidate
+          onSubmit={methods.handleSubmit(() => setResult('검증 완료'))}
+        >
+          <FormField name="password" required>
+            <FormField.Label>새 비밀번호</FormField.Label>
+            <PasswordField autoComplete="new-password" {...noPasswordManager} />
+            <FormField.Hint>8자 이상 입력하세요.</FormField.Hint>
+            <FormField.Error />
+          </FormField>
+          <FormField name="confirmation" required>
+            <FormField.Label>비밀번호 확인</FormField.Label>
+            <PasswordField autoComplete="new-password" {...noPasswordManager} />
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">검증</Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              methods.reset();
+              setResult('');
+            }}
+          >
+            초기화
+          </Button>
+          <output aria-label="검증 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   play: async ({ canvas, userEvent }) => {
     const password = canvas.getByLabelText('새 비밀번호', { selector: 'input', exact: false });
     const confirmation = canvas.getByLabelText('비밀번호 확인', {

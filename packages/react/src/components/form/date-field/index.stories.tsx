@@ -261,48 +261,47 @@ export const Birthday: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex w-80 flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
-      }}
-    >
-      <Field className="w-full">
-        <Field.Label>체크인</Field.Label>
-        <DateField name="checkin" required today={today} />
-        <Field.Hint>비워 두면 제출되지 않습니다.</Field.Hint>
-      </Field>
-      <Field className="w-full">
-        <Field.Label>숙박 기간</Field.Label>
-        <DateField
-          name="stay"
-          selectionMode="range"
-          defaultValue={{
-            start: new CalendarDate(2026, 9, 20),
-            end: new CalendarDate(2026, 9, 22),
-          }}
-          today={today}
-        />
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">제출</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex w-80 flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
+        }}
+      >
+        <Field className="w-full">
+          <Field.Label>체크인</Field.Label>
+          <DateField name="checkin" required today={today} />
+          <Field.Hint>비워 두면 제출되지 않습니다.</Field.Hint>
+        </Field>
+        <Field className="w-full">
+          <Field.Label>숙박 기간</Field.Label>
+          <DateField
+            name="stay"
+            selectionMode="range"
+            defaultValue={{
+              start: new CalendarDate(2026, 9, 20),
+              end: new CalendarDate(2026, 9, 22),
+            }}
+            today={today}
+          />
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">제출</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -334,30 +333,29 @@ const schema = z.object({
     .refine(Boolean, '날짜를 고르세요.'),
 });
 
-function ReactHookFormExample() {
-  const methods = useForm({ resolver: zodResolver(schema), defaultValues: { date: null } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="flex w-80 flex-col items-start gap-4"
-        noValidate
-        onSubmit={methods.handleSubmit((data) => setResult(data.date?.toString() ?? ''))}
-      >
-        <FormField name="date" controlMode="value" required className="w-full">
-          <FormField.Label>예약 날짜</FormField.Label>
-          <DateField today={today} />
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">예약</Button>
-        <output aria-label="예약 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm({ resolver: zodResolver(schema), defaultValues: { date: null } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          className="flex w-80 flex-col items-start gap-4"
+          noValidate
+          onSubmit={methods.handleSubmit((data) => setResult(data.date?.toString() ?? ''))}
+        >
+          <FormField name="date" controlMode="value" required className="w-full">
+            <FormField.Label>예약 날짜</FormField.Label>
+            <DateField today={today} />
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">예약</Button>
+          <output aria-label="예약 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

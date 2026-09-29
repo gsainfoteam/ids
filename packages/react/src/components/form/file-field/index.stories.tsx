@@ -169,32 +169,31 @@ export const Gallery: Story = {
   ),
 };
 
-function MultipleExample() {
-  const [files, setFiles] = useState<File[]>([]);
-  return (
-    <form className="grid w-96 gap-3">
-      <Field>
-        <Field.Label>첨부 파일</Field.Label>
-        <FileField
-          multiple
-          value={files}
-          onValueChange={setFiles}
-          accept=".txt"
-          maxSize={20}
-          maxCount={2}
-          name="attachments"
-          appearance="dropzone"
-          data-testid="file-picker"
-        />
-        <Field.Hint>실제 업로드는 하지 않습니다.</Field.Hint>
-      </Field>
-      <output aria-label="파일 결과">{files.map((file) => file.name).join(', ')}</output>
-    </form>
-  );
-}
-
 export const MultipleAndLimits: Story = {
-  render: () => <MultipleExample />,
+  render: function Render() {
+    const [files, setFiles] = useState<File[]>([]);
+
+    return (
+      <form className="grid w-96 gap-3">
+        <Field>
+          <Field.Label>첨부 파일</Field.Label>
+          <FileField
+            multiple
+            value={files}
+            onValueChange={setFiles}
+            accept=".txt"
+            maxSize={20}
+            maxCount={2}
+            name="attachments"
+            appearance="dropzone"
+            data-testid="file-picker"
+          />
+          <Field.Hint>실제 업로드는 하지 않습니다.</Field.Hint>
+        </Field>
+        <output aria-label="파일 결과">{files.map((file) => file.name).join(', ')}</output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -255,36 +254,35 @@ export const PasteAndDrop: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex w-80 flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        const file = new FormData(event.currentTarget).get('resume');
-        setSubmitted(file instanceof File ? file.name : String(file));
-      }}
-    >
-      <Field className="w-full">
-        <Field.Label>이력서</Field.Label>
-        <FileField name="resume" accept=".pdf" required />
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">제출</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex w-80 flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const file = new FormData(event.currentTarget).get('resume');
+          setSubmitted(file instanceof File ? file.name : String(file));
+        }}
+      >
+        <Field className="w-full">
+          <Field.Label>이력서</Field.Label>
+          <FileField name="resume" accept=".pdf" required />
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">제출</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -306,35 +304,34 @@ export const NativeForm: Story = {
   },
 };
 
-function ReactHookFormExample() {
-  const methods = useForm<{ resume: File | null }>({ defaultValues: { resume: null } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="flex w-80 flex-col items-start gap-4"
-        noValidate
-        onSubmit={methods.handleSubmit((data) => setResult(data.resume?.name ?? ''))}
-      >
-        <FormField
-          name="resume"
-          controlMode="value"
-          registerOptions={{ required: '파일을 첨부하세요.' }}
-          className="w-full"
-        >
-          <FormField.Label>이력서</FormField.Label>
-          <FileField accept=".pdf" />
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">저장</Button>
-        <output aria-label="저장 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm<{ resume: File | null }>({ defaultValues: { resume: null } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          className="flex w-80 flex-col items-start gap-4"
+          noValidate
+          onSubmit={methods.handleSubmit((data) => setResult(data.resume?.name ?? ''))}
+        >
+          <FormField
+            name="resume"
+            controlMode="value"
+            registerOptions={{ required: '파일을 첨부하세요.' }}
+            className="w-full"
+          >
+            <FormField.Label>이력서</FormField.Label>
+            <FileField accept=".pdf" />
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">저장</Button>
+          <output aria-label="저장 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

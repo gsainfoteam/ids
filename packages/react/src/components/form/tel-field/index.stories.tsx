@@ -131,25 +131,24 @@ export const Gallery: Story = {
   ),
 };
 
-function ValueExample() {
-  const [value, setValue] = useState('');
-  return (
-    <div className="grid w-72 gap-3">
-      <Field>
-        <Field.Label>전화번호</Field.Label>
-        <TelField value={value} onValueChange={setValue} name="tel" defaultCountry="KR">
-          <TelField.CountrySelect />
-          <TelField.Input />
-        </TelField>
-        <Field.Hint>국가와 번호를 입력하세요.</Field.Hint>
-      </Field>
-      <output aria-label="전화번호 값">{value}</output>
-    </div>
-  );
-}
-
 export const CountryAndValue: Story = {
-  render: () => <ValueExample />,
+  render: function Render() {
+    const [value, setValue] = useState('');
+
+    return (
+      <div className="grid w-72 gap-3">
+        <Field>
+          <Field.Label>전화번호</Field.Label>
+          <TelField value={value} onValueChange={setValue} name="tel" defaultCountry="KR">
+            <TelField.CountrySelect />
+            <TelField.Input />
+          </TelField>
+          <Field.Hint>국가와 번호를 입력하세요.</Field.Hint>
+        </Field>
+        <output aria-label="전화번호 값">{value}</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -215,29 +214,28 @@ export const Paste: Story = {
   },
 };
 
-function ValidationExample() {
-  const [sent, setSent] = useState('');
-  return (
-    <form
-      className="flex w-72 flex-col gap-3"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSent(String(new FormData(event.currentTarget).get('tel')));
-      }}
-    >
-      <Field>
-        <Field.Label>연락처</Field.Label>
-        <TelField name="tel" required />
-        <Field.Error />
-      </Field>
-      <Button type="submit">보내기</Button>
-      <output aria-label="보낸 값">{sent}</output>
-    </form>
-  );
-}
-
 export const Validation: Story = {
-  render: () => <ValidationExample />,
+  render: function Render() {
+    const [sent, setSent] = useState('');
+
+    return (
+      <form
+        className="flex w-72 flex-col gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSent(String(new FormData(event.currentTarget).get('tel')));
+        }}
+      >
+        <Field>
+          <Field.Label>연락처</Field.Label>
+          <TelField name="tel" required />
+          <Field.Error />
+        </Field>
+        <Button type="submit">보내기</Button>
+        <output aria-label="보낸 값">{sent}</output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {

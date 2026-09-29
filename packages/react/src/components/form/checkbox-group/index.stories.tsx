@@ -60,21 +60,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function Skills(props: Partial<CheckboxGroup.Props<Skill>>) {
-  return (
-    <CheckboxGroup<Skill> aria-label="관심 기술" {...props}>
-      {({ Item }) =>
-        skills.map((skill) => (
-          <Label key={skill.value} className={row}>
-            <Item value={skill.value} />
-            {skill.label}
-          </Label>
-        ))
-      }
-    </CheckboxGroup>
-  );
-}
-
 export const Playground: Story = {};
 
 export const Gallery: Story = {
@@ -85,7 +70,21 @@ export const Gallery: Story = {
           rows={sizes}
           columns={orientations}
           render={(size, orientation) => (
-            <Skills size={size} orientation={orientation} defaultValue={['js', 'rs']} />
+            <CheckboxGroup<Skill>
+              aria-label="관심 기술"
+              size={size}
+              orientation={orientation}
+              defaultValue={['js', 'rs']}
+            >
+              {({ Item }) =>
+                skills.map((skill) => (
+                  <Label key={skill.value} className={row}>
+                    <Item value={skill.value} />
+                    {skill.label}
+                  </Label>
+                ))
+              }
+            </CheckboxGroup>
           )}
         />
       </Showcase.Section>
@@ -100,23 +99,77 @@ export const Gallery: Story = {
           ] as const
         ).map(([label, props]) => (
           <Showcase.Row key={label} label={label}>
-            <Skills {...props} orientation="horizontal" defaultValue={['ts']} />
+            <CheckboxGroup<Skill>
+              aria-label="관심 기술"
+              {...props}
+              orientation="horizontal"
+              defaultValue={['ts']}
+            >
+              {({ Item }) =>
+                skills.map((skill) => (
+                  <Label key={skill.value} className={row}>
+                    <Item value={skill.value} />
+                    {skill.label}
+                  </Label>
+                ))
+              }
+            </CheckboxGroup>
           </Showcase.Row>
         ))}
       </Showcase.Section>
 
       <Showcase.Section title="Composition">
         <Showcase.Row label="select all">
-          <SelectAllSkills />
+          <CheckboxGroup<Skill> aria-label="관심 기술" defaultValue={['js']}>
+            {({ All, Item }) => (
+              <>
+                <Label className={row}>
+                  <All />
+                  전체 선택
+                </Label>
+                <div className="flex flex-col gap-3 ps-6">
+                  {skills.map((skill) => (
+                    <Label key={skill.value} className={row}>
+                      <Item value={skill.value} disabled={skill.value === 'rs'} />
+                      {skill.label}
+                      {skill.value === 'rs' && ' (준비 중)'}
+                    </Label>
+                  ))}
+                </div>
+              </>
+            )}
+          </CheckboxGroup>
         </Showcase.Row>
         <Showcase.Row label="grid">
-          <Skills className="grid w-80 grid-cols-2" defaultValue={['py']} />
+          <CheckboxGroup<Skill>
+            aria-label="관심 기술"
+            className="grid w-80 grid-cols-2"
+            defaultValue={['py']}
+          >
+            {({ Item }) =>
+              skills.map((skill) => (
+                <Label key={skill.value} className={row}>
+                  <Item value={skill.value} />
+                  {skill.label}
+                </Label>
+              ))
+            }
+          </CheckboxGroup>
         </Showcase.Row>
         <Showcase.Row label="Field">
           <Field>
             <Field.Label>관심 기술</Field.Label>
             <Field.Description>여러 개 고를 수 있습니다.</Field.Description>
-            <Skills defaultValue={['js']} />
+            <CheckboxGroup<Skill> aria-label="관심 기술" defaultValue={['js']}>
+              {({ Item }) =>
+                skills.map((skill) => (
+                  <Label key={skill.value} className={row}>
+                    <Item value={skill.value} />
+                    {skill.label}
+                  </Label>
+                ))
+              }
+            </CheckboxGroup>
           </Field>
         </Showcase.Row>
       </Showcase.Section>
@@ -124,12 +177,13 @@ export const Gallery: Story = {
   ),
 };
 
-function SelectAllSkills({ onValueChange }: { onValueChange?: (value: Skill[]) => void }) {
-  return (
+export const SelectAll: Story = {
+  args: { onValueChange: fn() },
+  render: (args) => (
     <CheckboxGroup<Skill>
       aria-label="관심 기술"
       defaultValue={['js']}
-      onValueChange={onValueChange}
+      onValueChange={args.onValueChange}
     >
       {({ All, Item }) => (
         <>
@@ -149,12 +203,7 @@ function SelectAllSkills({ onValueChange }: { onValueChange?: (value: Skill[]) =
         </>
       )}
     </CheckboxGroup>
-  );
-}
-
-export const SelectAll: Story = {
-  args: { onValueChange: fn() },
-  render: (args) => <SelectAllSkills onValueChange={args.onValueChange} />,
+  ),
   parameters: {
     docs: {
       description: {
@@ -212,35 +261,43 @@ export const ReadOnly: Story = {
   },
 };
 
-function RequiredExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
-      }}
-    >
-      <Field required>
-        <Field.Label>관심 기술</Field.Label>
-        <Skills name="skills" />
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">제출</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <RequiredExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
+        }}
+      >
+        <Field required>
+          <Field.Label>관심 기술</Field.Label>
+          <CheckboxGroup<Skill> aria-label="관심 기술" name="skills">
+            {({ Item }) =>
+              skills.map((skill) => (
+                <Label key={skill.value} className={row}>
+                  <Item value={skill.value} />
+                  {skill.label}
+                </Label>
+              ))
+            }
+          </CheckboxGroup>
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">제출</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -264,36 +321,44 @@ export const NativeForm: Story = {
   },
 };
 
-function ReactHookFormExample() {
-  const methods = useForm<{ skills: Skill[] }>({ defaultValues: { skills: [] } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        noValidate
-        className="flex flex-col items-start gap-4"
-        onSubmit={methods.handleSubmit((values) => setResult(values.skills.join(', ')))}
-      >
-        <FormField
-          name="skills"
-          controlMode="value"
-          registerOptions={{
-            validate: (value: Skill[]) => value.length > 0 || '하나 이상 고르세요.',
-          }}
-        >
-          <FormField.Label>관심 기술</FormField.Label>
-          <Skills />
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">저장</Button>
-        <output aria-label="저장 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm<{ skills: Skill[] }>({ defaultValues: { skills: [] } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          noValidate
+          className="flex flex-col items-start gap-4"
+          onSubmit={methods.handleSubmit((values) => setResult(values.skills.join(', ')))}
+        >
+          <FormField
+            name="skills"
+            controlMode="value"
+            registerOptions={{
+              validate: (value: Skill[]) => value.length > 0 || '하나 이상 고르세요.',
+            }}
+          >
+            <FormField.Label>관심 기술</FormField.Label>
+            <CheckboxGroup<Skill> aria-label="관심 기술">
+              {({ Item }) =>
+                skills.map((skill) => (
+                  <Label key={skill.value} className={row}>
+                    <Item value={skill.value} />
+                    {skill.label}
+                  </Label>
+                ))
+              }
+            </CheckboxGroup>
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">저장</Button>
+          <output aria-label="저장 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

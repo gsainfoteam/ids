@@ -162,38 +162,38 @@ export const Keyboard: Story = {
 
 const languages = ['JavaScript', 'TypeScript', 'Rust'];
 
-function SelectAllExample() {
-  const [checked, setChecked] = useState([true, false, false]);
-  const all = checked.every(Boolean);
-  const some = checked.some(Boolean);
-  return (
-    <div className="flex flex-col gap-2">
-      <Label className={row}>
-        <Checkbox
-          checked={all ? true : some ? 'indeterminate' : false}
-          onCheckedChange={(next) => setChecked(checked.map(() => next))}
-        />
-        전체 선택
-      </Label>
-      <div className="flex flex-col gap-2 ps-6">
-        {languages.map((name, index) => (
-          <Label key={name} className={row}>
-            <Checkbox
-              checked={checked[index]}
-              onCheckedChange={(next) =>
-                setChecked(checked.map((value, i) => (i === index ? next : value)))
-              }
-            />
-            {name}
-          </Label>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export const Indeterminate: Story = {
-  render: () => <SelectAllExample />,
+  render: function Render() {
+    const [checked, setChecked] = useState([true, false, false]);
+
+    const all = checked.every(Boolean);
+    const some = checked.some(Boolean);
+
+    return (
+      <div className="flex flex-col gap-2">
+        <Label className={row}>
+          <Checkbox
+            checked={all ? true : some ? 'indeterminate' : false}
+            onCheckedChange={(next) => setChecked(checked.map(() => next))}
+          />
+          전체 선택
+        </Label>
+        <div className="flex flex-col gap-2 ps-6">
+          {languages.map((name, index) => (
+            <Label key={name} className={row}>
+              <Checkbox
+                checked={checked[index]}
+                onCheckedChange={(next) =>
+                  setChecked(checked.map((value, i) => (i === index ? next : value)))
+                }
+              />
+              {name}
+            </Label>
+          ))}
+        </div>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -251,39 +251,38 @@ export const ReadOnly: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
-      }}
-    >
-      <Label className={row}>
-        <Checkbox name="terms" value="agreed" required />
-        약관에 동의합니다 (필수)
-      </Label>
-      <Label className={row}>
-        <Checkbox name="news" defaultChecked />
-        소식 받기
-      </Label>
-      <div className="flex gap-2">
-        <Button type="submit">제출</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
+        }}
+      >
+        <Label className={row}>
+          <Checkbox name="terms" value="agreed" required />
+          약관에 동의합니다 (필수)
+        </Label>
+        <Label className={row}>
+          <Checkbox name="news" defaultChecked />
+          소식 받기
+        </Label>
+        <div className="flex gap-2">
+          <Button type="submit">제출</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -311,35 +310,34 @@ const schema = z.object({
   terms: z.boolean().refine((agreed) => agreed, { error: '약관에 동의해야 합니다.' }),
 });
 
-function ReactHookFormExample() {
-  const methods = useForm({ resolver: zodResolver(schema), defaultValues: { terms: false } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        noValidate
-        className="flex flex-col items-start gap-4"
-        onSubmit={methods.handleSubmit(() => setResult('가입 완료'))}
-      >
-        <FormField name="terms" variant="horizontal">
-          <FormField.Label>약관 동의</FormField.Label>
-          <Checkbox />
-          <FormField.Error />
-        </FormField>
-        <div className="flex gap-2">
-          <Button type="submit">가입</Button>
-          <Button variant="outline" onClick={() => methods.setValue('terms', true)}>
-            모두 동의
-          </Button>
-        </div>
-        <output aria-label="가입 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm({ resolver: zodResolver(schema), defaultValues: { terms: false } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          noValidate
+          className="flex flex-col items-start gap-4"
+          onSubmit={methods.handleSubmit(() => setResult('가입 완료'))}
+        >
+          <FormField name="terms" variant="horizontal">
+            <FormField.Label>약관 동의</FormField.Label>
+            <Checkbox />
+            <FormField.Error />
+          </FormField>
+          <div className="flex gap-2">
+            <Button type="submit">가입</Button>
+            <Button variant="outline" onClick={() => methods.setValue('terms', true)}>
+              모두 동의
+            </Button>
+          </div>
+          <output aria-label="가입 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

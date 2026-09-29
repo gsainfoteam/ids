@@ -103,46 +103,45 @@ export const Gallery: Story = {
   ),
 };
 
-function NativeGroupExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
-      }}
-    >
-      <fieldset className="flex flex-col gap-3">
-        <legend className="text-body-b3-medium mb-3">배송</legend>
-        <Label className={row}>
-          <Radio name="shipping" value="standard" defaultChecked />
-          일반 배송
-        </Label>
-        <Label className={row}>
-          <Radio name="shipping" value="express" />
-          빠른 배송
-        </Label>
-        <Label className={row}>
-          <Radio name="shipping" value="pickup" />
-          매장 수령
-        </Label>
-      </fieldset>
-      <div className="flex gap-2">
-        <Button type="submit">주문</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeGroup: Story = {
-  render: () => <NativeGroupExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
+        }}
+      >
+        <fieldset className="flex flex-col gap-3">
+          <legend className="text-body-b3-medium mb-3">배송</legend>
+          <Label className={row}>
+            <Radio name="shipping" value="standard" defaultChecked />
+            일반 배송
+          </Label>
+          <Label className={row}>
+            <Radio name="shipping" value="express" />
+            빠른 배송
+          </Label>
+          <Label className={row}>
+            <Radio name="shipping" value="pickup" />
+            매장 수령
+          </Label>
+        </fieldset>
+        <div className="flex gap-2">
+          <Button type="submit">주문</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -168,29 +167,28 @@ export const NativeGroup: Story = {
   },
 };
 
-function ReactHookFormExample() {
-  const { register, setValue } = useForm({ defaultValues: { plan: 'free' } });
-  return (
-    <div className="flex flex-col items-start gap-4">
-      <div role="radiogroup" aria-label="플랜" className="flex flex-col gap-3">
-        <Label className={row}>
-          <Radio {...register('plan')} value="free" />
-          무료
-        </Label>
-        <Label className={row}>
-          <Radio {...register('plan')} value="pro" />
-          Pro
-        </Label>
-      </div>
-      <Button variant="outline" onClick={() => setValue('plan', 'pro')}>
-        Pro로 바꾸기
-      </Button>
-    </div>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const { register, setValue } = useForm({ defaultValues: { plan: 'free' } });
+
+    return (
+      <div className="flex flex-col items-start gap-4">
+        <div role="radiogroup" aria-label="플랜" className="flex flex-col gap-3">
+          <Label className={row}>
+            <Radio {...register('plan')} value="free" />
+            무료
+          </Label>
+          <Label className={row}>
+            <Radio {...register('plan')} value="pro" />
+            Pro
+          </Label>
+        </div>
+        <Button variant="outline" onClick={() => setValue('plan', 'pro')}>
+          Pro로 바꾸기
+        </Button>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

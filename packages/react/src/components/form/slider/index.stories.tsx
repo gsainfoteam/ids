@@ -154,25 +154,24 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="custom track">
           <div className="w-64">
-            <HueSlider />
+            <Slider
+              defaultValue={200}
+              max={360}
+              aria-label="색상"
+              formatLabel={(value) => `${value}°`}
+            >
+              <Slider.Track className="bg-[linear-gradient(to_right,red,yellow,lime,cyan,blue,magenta,red)]">
+                <Slider.Thumb
+                  style={(state) => ({ backgroundColor: `hsl(${state.thumbValue} 90% 55%)` })}
+                />
+              </Slider.Track>
+            </Slider>
           </div>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
-
-function HueSlider() {
-  return (
-    <Slider defaultValue={200} max={360} aria-label="색상" formatLabel={(value) => `${value}°`}>
-      <Slider.Track className="bg-[linear-gradient(to_right,red,yellow,lime,cyan,blue,magenta,red)]">
-        <Slider.Thumb
-          style={(state) => ({ backgroundColor: `hsl(${state.thumbValue} 90% 55%)` })}
-        />
-      </Slider.Track>
-    </Slider>
-  );
-}
 
 export const Keyboard: Story = {
   decorators: [narrowWithLabelRoom],
@@ -309,36 +308,35 @@ export const Vertical: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex flex-col gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
-      }}
-    >
-      <Field>
-        <Field.Label>가격</Field.Label>
-        <Slider name="price" selectionMode="range" defaultValue={[10, 90]} />
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">검색</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
   decorators: [narrowWithLabelRoom],
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex flex-col gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
+        }}
+      >
+        <Field>
+          <Field.Label>가격</Field.Label>
+          <Slider name="price" selectionMode="range" defaultValue={[10, 90]} />
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">검색</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -359,35 +357,34 @@ export const NativeForm: Story = {
   },
 };
 
-function ReactHookFormExample() {
-  const methods = useForm({ defaultValues: { volume: 20 } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        noValidate
-        className="flex flex-col gap-4"
-        onSubmit={methods.handleSubmit((values) => setResult(`저장: ${values.volume}`))}
-      >
-        <FormField
-          name="volume"
-          controlMode="value"
-          registerOptions={{ min: { value: 30, message: '30 이상으로 올리세요.' } }}
-        >
-          <FormField.Label>알림 볼륨</FormField.Label>
-          <Slider />
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">저장</Button>
-        <output aria-label="저장 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
   decorators: [narrowWithLabelRoom],
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm({ defaultValues: { volume: 20 } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          noValidate
+          className="flex flex-col gap-4"
+          onSubmit={methods.handleSubmit((values) => setResult(`저장: ${values.volume}`))}
+        >
+          <FormField
+            name="volume"
+            controlMode="value"
+            registerOptions={{ min: { value: 30, message: '30 이상으로 올리세요.' } }}
+          >
+            <FormField.Label>알림 볼륨</FormField.Label>
+            <Slider />
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">저장</Button>
+          <output aria-label="저장 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

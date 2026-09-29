@@ -172,35 +172,34 @@ export const Limits: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex w-64 flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
-      }}
-    >
-      <Field className="w-full">
-        <Field.Label>알람</Field.Label>
-        <TimeField name="alarm" required hourCycle="24h" defaultValue={at(7)} />
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">저장</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="저장 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex w-64 flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
+        }}
+      >
+        <Field className="w-full">
+          <Field.Label>알람</Field.Label>
+          <TimeField name="alarm" required hourCycle="24h" defaultValue={at(7)} />
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">저장</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="저장 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {

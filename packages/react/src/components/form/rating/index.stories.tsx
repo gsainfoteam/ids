@@ -174,35 +174,34 @@ export const HoverPreview: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
-      }}
-    >
-      <Field required>
-        <Field.Label>평점</Field.Label>
-        <Rating name="score" />
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">제출</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
+        }}
+      >
+        <Field required>
+          <Field.Label>평점</Field.Label>
+          <Rating name="score" />
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">제출</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -224,34 +223,33 @@ export const NativeForm: Story = {
   },
 };
 
-function ReactHookFormExample() {
-  const methods = useForm({ defaultValues: { score: 0 } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        noValidate
-        className="flex flex-col items-start gap-4"
-        onSubmit={methods.handleSubmit((values) => setResult(`점수: ${values.score}`))}
-      >
-        <FormField
-          name="score"
-          controlMode="value"
-          registerOptions={{ min: { value: 1, message: '점수를 고르세요.' } }}
-        >
-          <FormField.Label>만족도</FormField.Label>
-          <Rating step={0.5} />
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">보내기</Button>
-        <output aria-label="보낸 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm({ defaultValues: { score: 0 } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          noValidate
+          className="flex flex-col items-start gap-4"
+          onSubmit={methods.handleSubmit((values) => setResult(`점수: ${values.score}`))}
+        >
+          <FormField
+            name="score"
+            controlMode="value"
+            registerOptions={{ min: { value: 1, message: '점수를 고르세요.' } }}
+          >
+            <FormField.Label>만족도</FormField.Label>
+            <Rating step={0.5} />
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">보내기</Button>
+          <output aria-label="보낸 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

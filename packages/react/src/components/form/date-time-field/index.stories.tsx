@@ -181,30 +181,29 @@ export const Limits: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex w-80 flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
-      }}
-    >
-      <Field className="w-full">
-        <Field.Label>회의 일시</Field.Label>
-        <DateTimeField name="meeting" required hourCycle="24h" today={today} />
-      </Field>
-      <Button type="submit">예약</Button>
-      <output aria-label="예약 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex w-80 flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify(Object.fromEntries(new FormData(event.currentTarget))));
+        }}
+      >
+        <Field className="w-full">
+          <Field.Label>회의 일시</Field.Label>
+          <DateTimeField name="meeting" required hourCycle="24h" today={today} />
+        </Field>
+        <Button type="submit">예약</Button>
+        <output aria-label="예약 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {

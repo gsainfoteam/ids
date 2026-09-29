@@ -52,158 +52,160 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-function ChatComposer() {
-  const [message, setMessage] = useState('');
-  return (
-    <TextArea
-      value={message}
-      onValueChange={setMessage}
-      rows={1}
-      maxRows={6}
-      placeholder="메시지 입력..."
-      aria-label="메시지"
-      className="w-80"
-    >
-      <TextArea.Input />
-      <div className="flex w-full items-center justify-between">
-        <div className="flex gap-1">
-          <IconButton aria-label="첨부" icon={<PaperClipIcon />} />
-          <IconButton aria-label="이미지" icon={<PhotoIcon />} />
-        </div>
-        <IconButton
-          aria-label="보내기"
-          variant="solid"
-          icon={<PaperAirplaneIcon />}
-          disabled={message === ''}
-          onClick={() => setMessage('')}
-        />
-      </div>
-    </TextArea>
-  );
-}
-
 export const Gallery: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section title="Variant × Size">
-        <Showcase.Matrix
-          rows={sizes}
-          columns={variants}
-          render={(size, variant) => (
+  render: function Render() {
+    const [message, setMessage] = useState('');
+
+    return (
+      <Showcase>
+        <Showcase.Section title="Variant × Size">
+          <Showcase.Matrix
+            rows={sizes}
+            columns={variants}
+            render={(size, variant) => (
+              <TextArea
+                size={size}
+                variant={variant}
+                rows={2}
+                placeholder="내용"
+                aria-label={`${variant} ${size}`}
+                className="w-56"
+              />
+            )}
+          />
+        </Showcase.Section>
+
+        <Showcase.Section title="States">
+          <Showcase.Row label="filled">
+            <TextArea rows={2} defaultValue="인포팀 소개글" aria-label="채움" className="w-56" />
+          </Showcase.Row>
+          <Showcase.Row label="invalid">
+            <TextArea rows={2} defaultValue="짧음" invalid aria-label="잘못됨" className="w-56" />
             <TextArea
-              size={size}
-              variant={variant}
               rows={2}
-              placeholder="내용"
-              aria-label={`${variant} ${size}`}
+              defaultValue="짧음"
+              invalid
+              maxLength={100}
+              aria-label="잘못됨 카운터"
+              className="w-56"
+            >
+              <TextArea.Input />
+              <TextArea.Count />
+            </TextArea>
+          </Showcase.Row>
+          <Showcase.Row label="disabled">
+            <TextArea
+              rows={2}
+              defaultValue="수정 불가"
+              disabled
+              aria-label="비활성"
               className="w-56"
             />
-          )}
-        />
-      </Showcase.Section>
+          </Showcase.Row>
+          <Showcase.Row label="readOnly">
+            <TextArea
+              rows={2}
+              defaultValue="읽기 전용"
+              readOnly
+              aria-label="읽기 전용"
+              className="w-56"
+            />
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section title="States">
-        <Showcase.Row label="filled">
-          <TextArea rows={2} defaultValue="인포팀 소개글" aria-label="채움" className="w-56" />
-        </Showcase.Row>
-        <Showcase.Row label="invalid">
-          <TextArea rows={2} defaultValue="짧음" invalid aria-label="잘못됨" className="w-56" />
-          <TextArea
-            rows={2}
-            defaultValue="짧음"
-            invalid
-            maxLength={100}
-            aria-label="잘못됨 카운터"
-            className="w-56"
-          >
-            <TextArea.Input />
-            <TextArea.Count />
-          </TextArea>
-        </Showcase.Row>
-        <Showcase.Row label="disabled">
-          <TextArea
-            rows={2}
-            defaultValue="수정 불가"
-            disabled
-            aria-label="비활성"
-            className="w-56"
-          />
-        </Showcase.Row>
-        <Showcase.Row label="readOnly">
-          <TextArea
-            rows={2}
-            defaultValue="읽기 전용"
-            readOnly
-            aria-label="읽기 전용"
-            className="w-56"
-          />
-        </Showcase.Row>
-      </Showcase.Section>
+        <Showcase.Section
+          title="Bars"
+          description="TextArea.Input 위의 자식은 위 바, 아래의 자식은 아래 바가 됩니다. 바의 구분선은 오류 상태에서도 중립색입니다."
+        >
+          <Showcase.Row label="menubar">
+            <TextArea placeholder="마크다운으로 작성하세요" aria-label="본문" className="w-80">
+              <div className="flex gap-1">
+                <IconButton aria-label="굵게" icon={<BoldIcon />} />
+                <IconButton aria-label="기울임" icon={<ItalicIcon />} />
+                <IconButton aria-label="밑줄" icon={<UnderlineIcon />} />
+              </div>
+              <TextArea.Input />
+            </TextArea>
+          </Showcase.Row>
+          <Showcase.Row label="actionbar">
+            <TextArea
+              value={message}
+              onValueChange={setMessage}
+              rows={1}
+              maxRows={6}
+              placeholder="메시지 입력..."
+              aria-label="메시지"
+              className="w-80"
+            >
+              <TextArea.Input />
+              <div className="flex w-full items-center justify-between">
+                <div className="flex gap-1">
+                  <IconButton aria-label="첨부" icon={<PaperClipIcon />} />
+                  <IconButton aria-label="이미지" icon={<PhotoIcon />} />
+                </div>
+                <IconButton
+                  aria-label="보내기"
+                  variant="solid"
+                  icon={<PaperAirplaneIcon />}
+                  disabled={message === ''}
+                  onClick={() => setMessage('')}
+                />
+              </div>
+            </TextArea>
+          </Showcase.Row>
+          <Showcase.Row label="count">
+            <TextArea
+              maxLength={200}
+              defaultValue="200자 이내로 소개해 주세요."
+              aria-label="소개"
+              className="w-80"
+            >
+              <TextArea.Input />
+              <TextArea.Count />
+            </TextArea>
+          </Showcase.Row>
+          <Showcase.Row label="both">
+            <TextArea
+              placeholder="마크다운 지원"
+              maxLength={500}
+              aria-label="메모"
+              className="w-80"
+            >
+              <div className="flex gap-1">
+                <IconButton aria-label="굵게" icon={<BoldIcon />} />
+                <IconButton aria-label="기울임" icon={<ItalicIcon />} />
+              </div>
+              <TextArea.Input className="font-mono" />
+              <TextArea.Count />
+              <Button size="tiny">저장</Button>
+            </TextArea>
+          </Showcase.Row>
+        </Showcase.Section>
 
-      <Showcase.Section
-        title="Bars"
-        description="TextArea.Input 위의 자식은 위 바, 아래의 자식은 아래 바가 됩니다. 바의 구분선은 오류 상태에서도 중립색입니다."
-      >
-        <Showcase.Row label="menubar">
-          <TextArea placeholder="마크다운으로 작성하세요" aria-label="본문" className="w-80">
-            <div className="flex gap-1">
-              <IconButton aria-label="굵게" icon={<BoldIcon />} />
-              <IconButton aria-label="기울임" icon={<ItalicIcon />} />
-              <IconButton aria-label="밑줄" icon={<UnderlineIcon />} />
-            </div>
-            <TextArea.Input />
-          </TextArea>
-        </Showcase.Row>
-        <Showcase.Row label="actionbar">
-          <ChatComposer />
-        </Showcase.Row>
-        <Showcase.Row label="count">
-          <TextArea
-            maxLength={200}
-            defaultValue="200자 이내로 소개해 주세요."
-            aria-label="소개"
-            className="w-80"
-          >
-            <TextArea.Input />
-            <TextArea.Count />
-          </TextArea>
-        </Showcase.Row>
-        <Showcase.Row label="both">
-          <TextArea placeholder="마크다운 지원" maxLength={500} aria-label="메모" className="w-80">
-            <div className="flex gap-1">
-              <IconButton aria-label="굵게" icon={<BoldIcon />} />
-              <IconButton aria-label="기울임" icon={<ItalicIcon />} />
-            </div>
-            <TextArea.Input className="font-mono" />
-            <TextArea.Count />
-            <Button size="tiny">저장</Button>
-          </TextArea>
-        </Showcase.Row>
-      </Showcase.Section>
-
-      <Showcase.Section title="Height">
-        <Showcase.Row label="auto">
-          <TextArea
-            rows={1}
-            maxRows={4}
-            placeholder="내용에 맞춰 늘어납니다"
-            aria-label="자동"
-            className="w-80"
-          />
-        </Showcase.Row>
-        <Showcase.Row label="resize">
-          <TextArea
-            autoResize={false}
-            resize="vertical"
-            rows={3}
-            placeholder="직접 늘려 보세요"
-            aria-label="크기 조절"
-            className="w-80"
-          />
-        </Showcase.Row>
-      </Showcase.Section>
-    </Showcase>
-  ),
+        <Showcase.Section title="Height">
+          <Showcase.Row label="auto">
+            <TextArea
+              rows={1}
+              maxRows={4}
+              placeholder="내용에 맞춰 늘어납니다"
+              aria-label="자동"
+              className="w-80"
+            />
+          </Showcase.Row>
+          <Showcase.Row label="resize">
+            <TextArea
+              autoResize={false}
+              resize="vertical"
+              rows={3}
+              placeholder="직접 늘려 보세요"
+              aria-label="크기 조절"
+              className="w-80"
+            />
+          </Showcase.Row>
+        </Showcase.Section>
+      </Showcase>
+    );
+  },
 };
 
 export const AutoHeight: Story = {

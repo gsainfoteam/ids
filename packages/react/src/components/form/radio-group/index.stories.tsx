@@ -147,18 +147,44 @@ export const Gallery: Story = {
           </Field>
         </Showcase.Row>
         <Showcase.Row label="cards">
-          <PlanCards />
+          <RadioGroup<Plan>
+            defaultValue="pro"
+            aria-label="플랜 카드"
+            className="grid w-full max-w-md gap-3"
+          >
+            {({ Item }) =>
+              plans.map((plan) => (
+                <Label
+                  key={plan.value}
+                  className={cn(
+                    'rounded-standard flex cursor-pointer items-start gap-3 p-4',
+                    'inset-ring-1 inset-ring-(--ids-color-border)',
+                    'has-data-[state=checked]:bg-(--ids-color-primary)/5 has-data-[state=checked]:inset-ring-(--ids-color-primary)',
+                  )}
+                >
+                  <Item value={plan.value} className="mt-0.5" />
+                  <span className="flex flex-col gap-1">
+                    <span className="text-body-b3-medium">{plan.label}</span>
+                    <span className="text-caption-c1-regular text-(--ids-color-on-muted)">
+                      {plan.description}
+                    </span>
+                  </span>
+                </Label>
+              ))
+            }
+          </RadioGroup>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
 };
 
-function PlanCards({ onValueChange }: { onValueChange?: (plan: Plan) => void }) {
-  return (
+export const Cards: Story = {
+  args: { onValueChange: fn() },
+  render: (args) => (
     <RadioGroup<Plan>
       defaultValue="pro"
-      onValueChange={onValueChange}
+      onValueChange={args.onValueChange}
       aria-label="플랜 카드"
       className="grid w-full max-w-md gap-3"
     >
@@ -183,12 +209,7 @@ function PlanCards({ onValueChange }: { onValueChange?: (plan: Plan) => void }) 
         ))
       }
     </RadioGroup>
-  );
-}
-
-export const Cards: Story = {
-  args: { onValueChange: fn() },
-  render: (args) => <PlanCards onValueChange={args.onValueChange} />,
+  ),
   parameters: {
     docs: {
       description: {
@@ -262,44 +283,43 @@ export const ReadOnly: Story = {
   },
 };
 
-function RequiredExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
-      }}
-    >
-      <Field required>
-        <Field.Label>플랜</Field.Label>
-        <RadioGroup<Plan> name="plan">
-          {({ Item }) =>
-            plans.map((plan) => (
-              <Label key={plan.value} className={row}>
-                <Item value={plan.value} />
-                {plan.label}
-              </Label>
-            ))
-          }
-        </RadioGroup>
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">가입</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <RequiredExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
+        }}
+      >
+        <Field required>
+          <Field.Label>플랜</Field.Label>
+          <RadioGroup<Plan> name="plan">
+            {({ Item }) =>
+              plans.map((plan) => (
+                <Label key={plan.value} className={row}>
+                  <Item value={plan.value} />
+                  {plan.label}
+                </Label>
+              ))
+            }
+          </RadioGroup>
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">가입</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -319,43 +339,42 @@ export const NativeForm: Story = {
   },
 };
 
-function ReactHookFormExample() {
-  const methods = useForm<{ plan: Plan | '' }>({ defaultValues: { plan: '' } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        noValidate
-        className="flex flex-col items-start gap-4"
-        onSubmit={methods.handleSubmit((values) => setResult(`선택: ${values.plan}`))}
-      >
-        <FormField
-          name="plan"
-          controlMode="value"
-          registerOptions={{ required: '플랜을 고르세요.' }}
-        >
-          <FormField.Label>플랜</FormField.Label>
-          <RadioGroup<Plan>>
-            {({ Item }) =>
-              plans.map((plan) => (
-                <Label key={plan.value} className={row}>
-                  <Item value={plan.value} />
-                  {plan.label}
-                </Label>
-              ))
-            }
-          </RadioGroup>
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">가입</Button>
-        <output aria-label="가입 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm<{ plan: Plan | '' }>({ defaultValues: { plan: '' } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          noValidate
+          className="flex flex-col items-start gap-4"
+          onSubmit={methods.handleSubmit((values) => setResult(`선택: ${values.plan}`))}
+        >
+          <FormField
+            name="plan"
+            controlMode="value"
+            registerOptions={{ required: '플랜을 고르세요.' }}
+          >
+            <FormField.Label>플랜</FormField.Label>
+            <RadioGroup<Plan>>
+              {({ Item }) =>
+                plans.map((plan) => (
+                  <Label key={plan.value} className={row}>
+                    <Item value={plan.value} />
+                    {plan.label}
+                  </Label>
+                ))
+              }
+            </RadioGroup>
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">가입</Button>
+          <output aria-label="가입 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

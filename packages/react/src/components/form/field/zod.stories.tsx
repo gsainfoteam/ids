@@ -29,61 +29,62 @@ const schema = z
     message: '두 이메일 주소가 일치하지 않습니다.',
   });
 
-function ZodExample() {
-  const methods = useForm({
-    resolver: zodResolver(schema),
-    defaultValues: { account: { email: '' }, confirmation: '', agreed: false },
-  });
-  const [submitted, setSubmitted] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        noValidate
-        className="flex w-80 flex-col gap-3"
-        onSubmit={methods.handleSubmit((values) => setSubmitted(values.account.email))}
-      >
-        <Field name="account.email" required>
-          <Field.Label>가입 이메일</Field.Label>
-          <TextField inputMode="email" />
-          <Field.Hint>공백 제거와 소문자 변환은 제출 값에 적용됩니다.</Field.Hint>
-          <Field.Error />
-        </Field>
-        <Field name="confirmation" controlMode="value" required>
-          <Field.Label>이메일 확인</Field.Label>
-          <TextField inputMode="email" />
-          <Field.Hint>위 주소와 같아야 합니다.</Field.Hint>
-          <Field.Error />
-        </Field>
-        <Field name="agreed" required orientation="horizontal">
-          <Field.Label>이용 약관 동의</Field.Label>
-          <input type="checkbox" />
-          <Field.Error />
-        </Field>
-        <Button type="submit">검증 후 제출</Button>
-        <Button
-          type="button"
-          onClick={() => {
-            methods.reset();
-            setSubmitted('');
-          }}
-        >
-          초기화
-        </Button>
-        <output aria-label="정규화된 제출 값">{submitted}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 const meta = {
   title: 'Form/Field/Zod',
-  component: ZodExample,
+  component: Field,
   tags: ['autodocs'],
-} satisfies Meta<typeof ZodExample>;
+  args: { children: null },
+} satisfies Meta<typeof Field>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const SchemaValidation: Story = {
+  render: function Render() {
+    const methods = useForm({
+      resolver: zodResolver(schema),
+      defaultValues: { account: { email: '' }, confirmation: '', agreed: false },
+    });
+    const [submitted, setSubmitted] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          noValidate
+          className="flex w-80 flex-col gap-3"
+          onSubmit={methods.handleSubmit((values) => setSubmitted(values.account.email))}
+        >
+          <Field name="account.email" required>
+            <Field.Label>가입 이메일</Field.Label>
+            <TextField inputMode="email" />
+            <Field.Hint>공백 제거와 소문자 변환은 제출 값에 적용됩니다.</Field.Hint>
+            <Field.Error />
+          </Field>
+          <Field name="confirmation" controlMode="value" required>
+            <Field.Label>이메일 확인</Field.Label>
+            <TextField inputMode="email" />
+            <Field.Hint>위 주소와 같아야 합니다.</Field.Hint>
+            <Field.Error />
+          </Field>
+          <Field name="agreed" required orientation="horizontal">
+            <Field.Label>이용 약관 동의</Field.Label>
+            <input type="checkbox" />
+            <Field.Error />
+          </Field>
+          <Button type="submit">검증 후 제출</Button>
+          <Button
+            type="button"
+            onClick={() => {
+              methods.reset();
+              setSubmitted('');
+            }}
+          >
+            초기화
+          </Button>
+          <output aria-label="정규화된 제출 값">{submitted}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   play: async ({ canvas, userEvent }) => {
     const email = canvas.getByRole('textbox', { name: '가입 이메일' });
     const confirmation = canvas.getByRole('textbox', { name: '이메일 확인' });

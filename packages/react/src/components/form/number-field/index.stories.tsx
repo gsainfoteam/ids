@@ -239,8 +239,8 @@ export const WheelScrub: Story = {
   },
 };
 
-function RangeExample() {
-  return (
+export const RangeValidity: Story = {
+  render: () => (
     <form className="flex w-64 flex-col gap-3" onSubmit={(event) => event.preventDefault()}>
       <Field>
         <Field.Label>좌석 수</Field.Label>
@@ -250,11 +250,7 @@ function RangeExample() {
       </Field>
       <Button type="submit">예약</Button>
     </form>
-  );
-}
-
-export const RangeValidity: Story = {
-  render: () => <RangeExample />,
+  ),
   parameters: {
     docs: {
       description: {
@@ -276,36 +272,35 @@ export const RangeValidity: Story = {
 
 const NO_BREAK_SPACE = '\u00a0';
 
-function FormatsExample() {
-  const [currency, setCurrency] = useState<number | null>(1234.567);
-  return (
-    <div className="grid w-72 gap-4">
-      <Field>
-        <Field.Label>금액</Field.Label>
-        <NumberField
-          value={currency}
-          onValueChange={setCurrency}
-          locale="de-DE"
-          formatOptions={{ style: 'currency', currency: 'EUR' }}
-        />
-      </Field>
-      <Field>
-        <Field.Label>비율</Field.Label>
-        <NumberField
-          defaultValue={0.125}
-          min={0}
-          max={1}
-          formatOptions={{ style: 'percent', minimumFractionDigits: 1 }}
-        />
-        <Field.Hint>퍼센트로 입력합니다. 25를 입력하면 25%입니다.</Field.Hint>
-      </Field>
-      <output aria-label="금액 숫자">{JSON.stringify(currency)}</output>
-    </div>
-  );
-}
-
 export const LocaleFormats: Story = {
-  render: () => <FormatsExample />,
+  render: function Render() {
+    const [currency, setCurrency] = useState<number | null>(1234.567);
+
+    return (
+      <div className="grid w-72 gap-4">
+        <Field>
+          <Field.Label>금액</Field.Label>
+          <NumberField
+            value={currency}
+            onValueChange={setCurrency}
+            locale="de-DE"
+            formatOptions={{ style: 'currency', currency: 'EUR' }}
+          />
+        </Field>
+        <Field>
+          <Field.Label>비율</Field.Label>
+          <NumberField
+            defaultValue={0.125}
+            min={0}
+            max={1}
+            formatOptions={{ style: 'percent', minimumFractionDigits: 1 }}
+          />
+          <Field.Hint>퍼센트로 입력합니다. 25를 입력하면 25%입니다.</Field.Hint>
+        </Field>
+        <output aria-label="금액 숫자">{JSON.stringify(currency)}</output>
+      </div>
+    );
+  },
   play: async ({ canvas, userEvent }) => {
     const price = canvas.getByRole('spinbutton', { name: '금액' });
     const ratio = canvas.getByRole('spinbutton', { name: '비율' });
@@ -339,44 +334,43 @@ const schema = z.object({
     ),
 });
 
-function FormExample() {
-  const methods = useForm({
-    resolver: zodResolver(schema),
-    defaultValues: { quantity: null as number | null },
-  });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="grid w-72 gap-3"
-        noValidate
-        onSubmit={methods.handleSubmit((values) => setResult(JSON.stringify(values)))}
-      >
-        <FormField name="quantity" controlMode="value" required>
-          <FormField.Label>수량</FormField.Label>
-          <NumberField min={1} max={20} />
-          <FormField.Hint>숫자 타입으로 제출합니다.</FormField.Hint>
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">제출</Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            methods.reset();
-            setResult('');
-          }}
-        >
-          초기화
-        </Button>
-        <output aria-label="제출 값">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ZodForm: Story = {
-  render: () => <FormExample />,
+  render: function Render() {
+    const methods = useForm({
+      resolver: zodResolver(schema),
+      defaultValues: { quantity: null as number | null },
+    });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          className="grid w-72 gap-3"
+          noValidate
+          onSubmit={methods.handleSubmit((values) => setResult(JSON.stringify(values)))}
+        >
+          <FormField name="quantity" controlMode="value" required>
+            <FormField.Label>수량</FormField.Label>
+            <NumberField min={1} max={20} />
+            <FormField.Hint>숫자 타입으로 제출합니다.</FormField.Hint>
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">제출</Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              methods.reset();
+              setResult('');
+            }}
+          >
+            초기화
+          </Button>
+          <output aria-label="제출 값">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

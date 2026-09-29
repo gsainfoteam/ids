@@ -128,33 +128,33 @@ export const Keyboard: Story = {
   },
 };
 
-function SettingsExample() {
-  const [settings, setSettings] = useState({ email: true, push: false, sms: false });
-  const rows = [
-    ['email', '이메일 알림'],
-    ['push', '푸시 알림'],
-    ['sms', 'SMS 알림'],
-  ] as const;
-  return (
-    <div className="flex w-80 flex-col gap-4">
-      {rows.map(([key, label]) => (
-        <Field key={key} variant="horizontal" className="grid-cols-[minmax(0,1fr)_auto]">
-          <Field.Label>{label}</Field.Label>
-          <Switch
-            checked={settings[key]}
-            onCheckedChange={(next) => setSettings((prev) => ({ ...prev, [key]: next }))}
-          />
-        </Field>
-      ))}
-      <output aria-label="설정" className="text-body-b3-regular font-mono">
-        {JSON.stringify(settings)}
-      </output>
-    </div>
-  );
-}
-
 export const Settings: Story = {
-  render: () => <SettingsExample />,
+  render: function Render() {
+    const [settings, setSettings] = useState({ email: true, push: false, sms: false });
+
+    const rows = [
+      ['email', '이메일 알림'],
+      ['push', '푸시 알림'],
+      ['sms', 'SMS 알림'],
+    ] as const;
+
+    return (
+      <div className="flex w-80 flex-col gap-4">
+        {rows.map(([key, label]) => (
+          <Field key={key} variant="horizontal" className="grid-cols-[minmax(0,1fr)_auto]">
+            <Field.Label>{label}</Field.Label>
+            <Switch
+              checked={settings[key]}
+              onCheckedChange={(next) => setSettings((prev) => ({ ...prev, [key]: next }))}
+            />
+          </Field>
+        ))}
+        <output aria-label="설정" className="text-body-b3-regular font-mono">
+          {JSON.stringify(settings)}
+        </output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -216,35 +216,34 @@ export const RightToLeft: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
-      }}
-    >
-      <Label className="text-body-b3-medium inline-flex items-center gap-2">
-        <Switch name="autosave" value="yes" defaultChecked />
-        자동 저장
-      </Label>
-      <div className="flex gap-2">
-        <Button type="submit">저장</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]));
+        }}
+      >
+        <Label className="text-body-b3-medium inline-flex items-center gap-2">
+          <Switch name="autosave" value="yes" defaultChecked />
+          자동 저장
+        </Label>
+        <div className="flex gap-2">
+          <Button type="submit">저장</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -265,35 +264,34 @@ export const NativeForm: Story = {
   },
 };
 
-function ReactHookFormExample() {
-  const methods = useForm({ defaultValues: { autoSave: true } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="flex flex-col items-start gap-4"
-        onSubmit={methods.handleSubmit((values) => setResult(JSON.stringify(values)))}
-      >
-        <FormField name="autoSave" variant="horizontal">
-          <FormField.Label>자동 저장</FormField.Label>
-          <Switch />
-        </FormField>
-        <div className="flex gap-2">
-          <Button type="submit">저장</Button>
-          <Button variant="outline" onClick={() => methods.reset({ autoSave: false })}>
-            끄고 초기화
-          </Button>
-        </div>
-        <output aria-label="저장 결과" className="text-body-b3-regular font-mono">
-          {result}
-        </output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm({ defaultValues: { autoSave: true } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          className="flex flex-col items-start gap-4"
+          onSubmit={methods.handleSubmit((values) => setResult(JSON.stringify(values)))}
+        >
+          <FormField name="autoSave" variant="horizontal">
+            <FormField.Label>자동 저장</FormField.Label>
+            <Switch />
+          </FormField>
+          <div className="flex gap-2">
+            <Button type="submit">저장</Button>
+            <Button variant="outline" onClick={() => methods.reset({ autoSave: false })}>
+              끄고 초기화
+            </Button>
+          </div>
+          <output aria-label="저장 결과" className="text-body-b3-regular font-mono">
+            {result}
+          </output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {

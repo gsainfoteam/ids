@@ -26,24 +26,6 @@ const fruits = [
   ['mango', '망고'],
 ] as const;
 
-const fruitItems = fruits.map(([value, label]) => (
-  <Select.Item key={value} value={value}>
-    {label}
-  </Select.Item>
-));
-
-const groupedItems = (
-  <>
-    <Select.Item value="apple">사과</Select.Item>
-    <Select.Item value="banana" disabled>
-      바나나
-    </Select.Item>
-    <Select.Item value="cherry">체리</Select.Item>
-    <Select.Item value="grape">포도</Select.Item>
-    <Select.Item value="mango">망고</Select.Item>
-  </>
-);
-
 const meta = {
   title: 'Form/Select',
   component: Select,
@@ -64,7 +46,11 @@ const meta = {
     size: 'standard',
     onValueChange: fn(),
     onOpenChange: fn(),
-    children: fruitItems,
+    children: fruits.map(([value, label]) => (
+      <Select.Item key={value} value={value}>
+        {label}
+      </Select.Item>
+    )),
   },
   render: (args) => (
     <div className="w-64">
@@ -90,7 +76,19 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="groups" className="h-64 items-start">
           <div className="w-56">
-            <GroupedSelect defaultOpen />
+            <Select aria-label="음식" defaultValue="kimchi" defaultOpen>
+              <Select.Group heading="한식">
+                <Select.Item value="bibimbap">비빔밥</Select.Item>
+                <Select.Item value="kimchi">김치찌개</Select.Item>
+              </Select.Group>
+              <Select.Separator />
+              <Select.Group heading="양식">
+                <Select.Item value="pasta">파스타</Select.Item>
+                <Select.Item value="risotto" disabled>
+                  리소토 (품절)
+                </Select.Item>
+              </Select.Group>
+            </Select>
           </div>
         </Showcase.Row>
       </Showcase.Section>
@@ -107,7 +105,11 @@ export const Gallery: Story = {
                 defaultValue="cherry"
                 aria-label={`${variant} ${size}`}
               >
-                {fruitItems}
+                {fruits.map(([value, label]) => (
+                  <Select.Item key={value} value={value}>
+                    {label}
+                  </Select.Item>
+                ))}
               </Select>
             </div>
           )}
@@ -118,7 +120,11 @@ export const Gallery: Story = {
         <Showcase.Row label="placeholder">
           <div className="w-56">
             <Select aria-label="비어 있음" placeholder="과일 선택">
-              {fruitItems}
+              {fruits.map(([value, label]) => (
+                <Select.Item key={value} value={value}>
+                  {label}
+                </Select.Item>
+              ))}
             </Select>
           </div>
         </Showcase.Row>
@@ -129,7 +135,11 @@ export const Gallery: Story = {
               defaultValue={['apple', 'cherry', 'grape', 'mango']}
               aria-label="여럿"
             >
-              {fruitItems}
+              {fruits.map(([value, label]) => (
+                <Select.Item key={value} value={value}>
+                  {label}
+                </Select.Item>
+              ))}
             </Select>
           </div>
         </Showcase.Row>
@@ -137,28 +147,44 @@ export const Gallery: Story = {
           <div className="w-56">
             <Select defaultValue="banana" aria-label="지우기">
               <Select.Clear />
-              {fruitItems}
+              {fruits.map(([value, label]) => (
+                <Select.Item key={value} value={value}>
+                  {label}
+                </Select.Item>
+              ))}
             </Select>
           </div>
         </Showcase.Row>
         <Showcase.Row label="invalid">
           <div className="w-56">
             <Select invalid aria-label="잘못됨">
-              {fruitItems}
+              {fruits.map(([value, label]) => (
+                <Select.Item key={value} value={value}>
+                  {label}
+                </Select.Item>
+              ))}
             </Select>
           </div>
         </Showcase.Row>
         <Showcase.Row label="disabled">
           <div className="w-56">
             <Select disabled defaultValue="apple" aria-label="비활성">
-              {fruitItems}
+              {fruits.map(([value, label]) => (
+                <Select.Item key={value} value={value}>
+                  {label}
+                </Select.Item>
+              ))}
             </Select>
           </div>
         </Showcase.Row>
         <Showcase.Row label="readOnly">
           <div className="w-56">
             <Select readOnly defaultValue="apple" aria-label="읽기 전용">
-              {fruitItems}
+              {fruits.map(([value, label]) => (
+                <Select.Item key={value} value={value}>
+                  {label}
+                </Select.Item>
+              ))}
             </Select>
           </div>
         </Showcase.Row>
@@ -167,26 +193,20 @@ export const Gallery: Story = {
   ),
 };
 
-function GroupedSelect(props: Partial<Select.Props>) {
-  return (
-    <Select aria-label="음식" defaultValue="kimchi" {...(props as object)}>
-      <Select.Group heading="한식">
-        <Select.Item value="bibimbap">비빔밥</Select.Item>
-        <Select.Item value="kimchi">김치찌개</Select.Item>
-      </Select.Group>
-      <Select.Separator />
-      <Select.Group heading="양식">
-        <Select.Item value="pasta">파스타</Select.Item>
-        <Select.Item value="risotto" disabled>
-          리소토 (품절)
-        </Select.Item>
-      </Select.Group>
-    </Select>
-  );
-}
-
 export const Keyboard: Story = {
-  args: { children: groupedItems },
+  args: {
+    children: (
+      <>
+        <Select.Item value="apple">사과</Select.Item>
+        <Select.Item value="banana" disabled>
+          바나나
+        </Select.Item>
+        <Select.Item value="cherry">체리</Select.Item>
+        <Select.Item value="grape">포도</Select.Item>
+        <Select.Item value="mango">망고</Select.Item>
+      </>
+    ),
+  },
   parameters: {
     docs: {
       description: {
@@ -221,37 +241,36 @@ export const Keyboard: Story = {
   },
 };
 
-function SearchExample() {
-  const [value, setValue] = useState<string[]>([]);
-  return (
-    <div className="grid w-72 gap-3">
-      <Field>
-        <Field.Label>관심 분야</Field.Label>
-        <Select selectionMode="multiple" value={value} onValueChange={setValue}>
-          <Select.SearchField placeholder="분야 검색" />
-          <Select.Group heading="개발">
-            <Select.Item value="react">React</Select.Item>
-            <Select.Item value="flutter" searchValue="Flutter Dart">
-              Flutter
-            </Select.Item>
-            <Select.Item value="rust" disabled>
-              Rust
-            </Select.Item>
-          </Select.Group>
-          <Select.Separator />
-          <Select.Item value="design">Design</Select.Item>
-          <Select.Empty>결과 없음</Select.Empty>
-        </Select>
-        <Field.Hint>여러 개를 고를 수 있습니다.</Field.Hint>
-      </Field>
-      <output aria-label="선택 값">{value.join(',')}</output>
-      <button type="button">다음</button>
-    </div>
-  );
-}
-
 export const SearchAndMultiple: Story = {
-  render: () => <SearchExample />,
+  render: function Render() {
+    const [value, setValue] = useState<string[]>([]);
+
+    return (
+      <div className="grid w-72 gap-3">
+        <Field>
+          <Field.Label>관심 분야</Field.Label>
+          <Select selectionMode="multiple" value={value} onValueChange={setValue}>
+            <Select.SearchField placeholder="분야 검색" />
+            <Select.Group heading="개발">
+              <Select.Item value="react">React</Select.Item>
+              <Select.Item value="flutter" searchValue="Flutter Dart">
+                Flutter
+              </Select.Item>
+              <Select.Item value="rust" disabled>
+                Rust
+              </Select.Item>
+            </Select.Group>
+            <Select.Separator />
+            <Select.Item value="design">Design</Select.Item>
+            <Select.Empty>결과 없음</Select.Empty>
+          </Select>
+          <Field.Hint>여러 개를 고를 수 있습니다.</Field.Hint>
+        </Field>
+        <output aria-label="선택 값">{value.join(',')}</output>
+        <button type="button">다음</button>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -283,7 +302,17 @@ export const SearchAndMultiple: Story = {
 };
 
 export const Clearable: Story = {
-  args: { defaultValue: 'cherry', children: [<Select.Clear key="clear" />, ...fruitItems] },
+  args: {
+    defaultValue: 'cherry',
+    children: [
+      <Select.Clear key="clear" />,
+      ...fruits.map(([value, label]) => (
+        <Select.Item key={value} value={value}>
+          {label}
+        </Select.Item>
+      )),
+    ],
+  },
   parameters: {
     docs: {
       description: {
@@ -338,44 +367,51 @@ export const LongList: Story = {
   },
 };
 
-function NativeFormExample() {
-  const [submitted, setSubmitted] = useState<string | null>(null);
-  return (
-    <form
-      className="flex w-72 flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        setSubmitted(JSON.stringify({ fruit: data.get('fruit'), tags: data.getAll('tags') }));
-      }}
-    >
-      <Field className="w-full">
-        <Field.Label>과일</Field.Label>
-        <Select name="fruit" required>
-          {fruitItems}
-        </Select>
-      </Field>
-      <Field className="w-full">
-        <Field.Label>태그</Field.Label>
-        <Select name="tags" selectionMode="multiple" defaultValue={['apple']}>
-          {fruitItems}
-        </Select>
-      </Field>
-      <div className="flex gap-2">
-        <Button type="submit">제출</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
-        {submitted}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <NativeFormExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState<string | null>(null);
+
+    return (
+      <form
+        className="flex w-72 flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const data = new FormData(event.currentTarget);
+          setSubmitted(JSON.stringify({ fruit: data.get('fruit'), tags: data.getAll('tags') }));
+        }}
+      >
+        <Field className="w-full">
+          <Field.Label>과일</Field.Label>
+          <Select name="fruit" required>
+            {fruits.map(([value, label]) => (
+              <Select.Item key={value} value={value}>
+                {label}
+              </Select.Item>
+            ))}
+          </Select>
+        </Field>
+        <Field className="w-full">
+          <Field.Label>태그</Field.Label>
+          <Select name="tags" selectionMode="multiple" defaultValue={['apple']}>
+            {fruits.map(([value, label]) => (
+              <Select.Item key={value} value={value}>
+                {label}
+              </Select.Item>
+            ))}
+          </Select>
+        </Field>
+        <div className="flex gap-2">
+          <Button type="submit">제출</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="제출 결과" className="text-body-b3-regular font-mono">
+          {submitted}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -402,35 +438,40 @@ export const NativeForm: Story = {
   },
 };
 
-function ReactHookFormExample() {
-  const methods = useForm<{ fruit: string | null }>({ defaultValues: { fruit: null } });
-  const [result, setResult] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        className="flex w-72 flex-col items-start gap-4"
-        noValidate
-        onSubmit={methods.handleSubmit((data) => setResult(`저장: ${data.fruit}`))}
-      >
-        <FormField
-          name="fruit"
-          controlMode="value"
-          registerOptions={{ required: '과일을 고르세요.' }}
-          className="w-full"
-        >
-          <FormField.Label>과일</FormField.Label>
-          <Select>{fruitItems}</Select>
-          <FormField.Error />
-        </FormField>
-        <Button type="submit">저장</Button>
-        <output aria-label="저장 결과">{result}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <ReactHookFormExample />,
+  render: function Render() {
+    const methods = useForm<{ fruit: string | null }>({ defaultValues: { fruit: null } });
+    const [result, setResult] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          className="flex w-72 flex-col items-start gap-4"
+          noValidate
+          onSubmit={methods.handleSubmit((data) => setResult(`저장: ${data.fruit}`))}
+        >
+          <FormField
+            name="fruit"
+            controlMode="value"
+            registerOptions={{ required: '과일을 고르세요.' }}
+            className="w-full"
+          >
+            <FormField.Label>과일</FormField.Label>
+            <Select>
+              {fruits.map(([value, label]) => (
+                <Select.Item key={value} value={value}>
+                  {label}
+                </Select.Item>
+              ))}
+            </Select>
+            <FormField.Error />
+          </FormField>
+          <Button type="submit">저장</Button>
+          <output aria-label="저장 결과">{result}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -451,25 +492,28 @@ export const ReactHookForm: Story = {
   },
 };
 
-function ControlledOpenExample() {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="flex w-72 flex-col items-start gap-3">
-      <Button variant="outline" onClick={() => setOpen(true)}>
-        바깥에서 열기
-      </Button>
-      <div className="w-full">
-        <Select aria-label="과일" open={open} onOpenChange={setOpen}>
-          {fruitItems}
-        </Select>
-      </div>
-      <output aria-label="열림 상태">{open ? '열림' : '닫힘'}</output>
-    </div>
-  );
-}
-
 export const ControlledOpen: Story = {
-  render: () => <ControlledOpenExample />,
+  render: function Render() {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <div className="flex w-72 flex-col items-start gap-3">
+        <Button variant="outline" onClick={() => setOpen(true)}>
+          바깥에서 열기
+        </Button>
+        <div className="w-full">
+          <Select aria-label="과일" open={open} onOpenChange={setOpen}>
+            {fruits.map(([value, label]) => (
+              <Select.Item key={value} value={value}>
+                {label}
+              </Select.Item>
+            ))}
+          </Select>
+        </div>
+        <output aria-label="열림 상태">{open ? '열림' : '닫힘'}</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -530,7 +574,20 @@ export const CustomItems: Story = {
 };
 
 export const Drawer: Story = {
-  args: { mobileVariant: 'drawer', children: groupedItems },
+  args: {
+    mobileVariant: 'drawer',
+    children: (
+      <>
+        <Select.Item value="apple">사과</Select.Item>
+        <Select.Item value="banana" disabled>
+          바나나
+        </Select.Item>
+        <Select.Item value="cherry">체리</Select.Item>
+        <Select.Item value="grape">포도</Select.Item>
+        <Select.Item value="mango">망고</Select.Item>
+      </>
+    ),
+  },
   parameters: {
     docs: {
       description: {

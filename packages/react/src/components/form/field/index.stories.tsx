@@ -150,36 +150,35 @@ export const Gallery: Story = {
   ),
 };
 
-function NativeValidationExample() {
-  const [submitted, setSubmitted] = useState('');
-  return (
-    <form
-      className="flex w-80 flex-col gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setSubmitted(String(new FormData(event.currentTarget).get('email')));
-      }}
-    >
-      <Field>
-        <Field.Label>이메일</Field.Label>
-        <TextField
-          type="email"
-          name="email"
-          required
-          placeholder="name@example.com"
-          {...noPasswordManager}
-        />
-        <Field.Hint>브라우저의 기본 검증을 그대로 씁니다.</Field.Hint>
-        <Field.Error />
-      </Field>
-      <Button type="submit">가입</Button>
-      <output aria-label="제출 결과">{submitted}</output>
-    </form>
-  );
-}
-
 export const NativeValidation: Story = {
-  render: () => <NativeValidationExample />,
+  render: function Render() {
+    const [submitted, setSubmitted] = useState('');
+
+    return (
+      <form
+        className="flex w-80 flex-col gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setSubmitted(String(new FormData(event.currentTarget).get('email')));
+        }}
+      >
+        <Field>
+          <Field.Label>이메일</Field.Label>
+          <TextField
+            type="email"
+            name="email"
+            required
+            placeholder="name@example.com"
+            {...noPasswordManager}
+          />
+          <Field.Hint>브라우저의 기본 검증을 그대로 씁니다.</Field.Hint>
+          <Field.Error />
+        </Field>
+        <Button type="submit">가입</Button>
+        <output aria-label="제출 결과">{submitted}</output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -207,8 +206,8 @@ export const NativeValidation: Story = {
   },
 };
 
-function MatchExample() {
-  return (
+export const MatchValidity: Story = {
+  render: () => (
     <form className="flex w-80 flex-col gap-4" onSubmit={(event) => event.preventDefault()}>
       <Field>
         <Field.Label>이메일</Field.Label>
@@ -218,11 +217,7 @@ function MatchExample() {
       </Field>
       <Button type="submit">확인</Button>
     </form>
-  );
-}
-
-export const MatchValidity: Story = {
-  render: () => <MatchExample />,
+  ),
   parameters: {
     docs: {
       description: {
@@ -318,41 +313,40 @@ export const CustomLabel: Story = {
   },
 };
 
-function RhfExample() {
-  const methods = useForm({ defaultValues: { email: '' } });
-  const [submitted, setSubmitted] = useState('');
-  return (
-    <FormProvider {...methods}>
-      <form
-        noValidate
-        className="flex w-80 flex-col gap-3"
-        onSubmit={methods.handleSubmit((values) => setSubmitted(values.email))}
-      >
-        <RhfField name="email" required registerOptions={{ required: '이메일을 입력하세요.' }}>
-          <RhfField.Label>이메일</RhfField.Label>
-          <TextField type="email" {...noPasswordManager} />
-          <RhfField.Hint>회사 이메일을 권장합니다.</RhfField.Hint>
-          <RhfField.Error />
-        </RhfField>
-        <Button type="submit">저장</Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => {
-            methods.reset();
-            setSubmitted('');
-          }}
-        >
-          초기화
-        </Button>
-        <output aria-label="저장 결과">{submitted}</output>
-      </form>
-    </FormProvider>
-  );
-}
-
 export const ReactHookForm: Story = {
-  render: () => <RhfExample />,
+  render: function Render() {
+    const methods = useForm({ defaultValues: { email: '' } });
+    const [submitted, setSubmitted] = useState('');
+
+    return (
+      <FormProvider {...methods}>
+        <form
+          noValidate
+          className="flex w-80 flex-col gap-3"
+          onSubmit={methods.handleSubmit((values) => setSubmitted(values.email))}
+        >
+          <RhfField name="email" required registerOptions={{ required: '이메일을 입력하세요.' }}>
+            <RhfField.Label>이메일</RhfField.Label>
+            <TextField type="email" {...noPasswordManager} />
+            <RhfField.Hint>회사 이메일을 권장합니다.</RhfField.Hint>
+            <RhfField.Error />
+          </RhfField>
+          <Button type="submit">저장</Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              methods.reset();
+              setSubmitted('');
+            }}
+          >
+            초기화
+          </Button>
+          <output aria-label="저장 결과">{submitted}</output>
+        </form>
+      </FormProvider>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -380,57 +374,56 @@ const mustBeEmail = ({ value }: { value: string }) =>
   value.includes('@') ? undefined : '이메일 형식을 확인하세요.';
 const mustAgree = ({ value }: { value: boolean }) => (value ? undefined : '약관에 동의해 주세요.');
 
-function TanStackExample() {
-  const [submitted, setSubmitted] = useState('');
-  const form = useTanStackForm({
-    defaultValues: { email: '', agree: false },
-    onSubmit: ({ value }) => setSubmitted(value.email),
-  });
-  return (
-    <form
-      noValidate
-      className="flex w-80 flex-col gap-3"
-      onSubmit={(event) => {
-        event.preventDefault();
-        void form.handleSubmit();
-      }}
-    >
-      <form.Field name="email" validators={{ onBlur: mustBeEmail }}>
-        {(field) => (
-          <TanStackField field={field}>
-            <TanStackField.Label>이메일</TanStackField.Label>
-            <TextField type="email" {...noPasswordManager} />
-            <TanStackField.Error />
-          </TanStackField>
-        )}
-      </form.Field>
-      <form.Field name="agree" validators={{ onChange: mustAgree }}>
-        {(field) => (
-          <TanStackField field={field} controlMode="checked">
-            <TanStackField.Label>약관에 동의합니다</TanStackField.Label>
-            <Checkbox />
-            <TanStackField.Error />
-          </TanStackField>
-        )}
-      </form.Field>
-      <Button type="submit">저장</Button>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => {
-          form.reset();
-          setSubmitted('');
+export const TanStackForm: Story = {
+  render: function Render() {
+    const [submitted, setSubmitted] = useState('');
+    const form = useTanStackForm({
+      defaultValues: { email: '', agree: false },
+      onSubmit: ({ value }) => setSubmitted(value.email),
+    });
+
+    return (
+      <form
+        noValidate
+        className="flex w-80 flex-col gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void form.handleSubmit();
         }}
       >
-        초기화
-      </Button>
-      <output aria-label="저장 결과">{submitted}</output>
-    </form>
-  );
-}
-
-export const TanStackForm: Story = {
-  render: () => <TanStackExample />,
+        <form.Field name="email" validators={{ onBlur: mustBeEmail }}>
+          {(field) => (
+            <TanStackField field={field}>
+              <TanStackField.Label>이메일</TanStackField.Label>
+              <TextField type="email" {...noPasswordManager} />
+              <TanStackField.Error />
+            </TanStackField>
+          )}
+        </form.Field>
+        <form.Field name="agree" validators={{ onChange: mustAgree }}>
+          {(field) => (
+            <TanStackField field={field} controlMode="checked">
+              <TanStackField.Label>약관에 동의합니다</TanStackField.Label>
+              <Checkbox />
+              <TanStackField.Error />
+            </TanStackField>
+          )}
+        </form.Field>
+        <Button type="submit">저장</Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            form.reset();
+            setSubmitted('');
+          }}
+        >
+          초기화
+        </Button>
+        <output aria-label="저장 결과">{submitted}</output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
