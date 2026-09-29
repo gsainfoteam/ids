@@ -1,7 +1,5 @@
 import {
-  createContext,
   isValidElement,
-  use,
   useId,
   type ComponentProps,
   type CSSProperties,
@@ -9,31 +7,17 @@ import {
   type ReactNode,
 } from 'react';
 
+import { ProgressContext } from './context';
+import { ProgressIndicator, type ProgressIndicatorProps } from './indicator';
+import { ProgressLabel, type ProgressLabelProps } from './label';
+import { resolve } from './part-props';
+import { progressStyle } from './style';
+import { ProgressTrack, type ProgressTrackProps } from './track';
 import { useProgress } from './use-progress';
-import { ARC_CIRCUMFERENCE, ARC_RADIUS } from '../../../internal/arc';
-import { flattenFragments, invariant, tv } from '../../../utils';
-import { Slot } from '../../utility/slot';
+import { ProgressValue, type ProgressValueProps } from './value';
+import { flattenFragments } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
-
-type Context = {
-  state: Progress.State;
-  styles: ReturnType<typeof Progress.Style>;
-  labelId: string;
-  progressbar: Record<string, unknown>;
-};
-
-const ProgressContext = createContext<Context | null>(null);
-
-function useProgressContext(part: string) {
-  const context = use(ProgressContext);
-  invariant(context, `${part} must be rendered inside Progress.`);
-  return context;
-}
-
-function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}
 
 function isPart(node: ReactNode, part: unknown): node is ReactElement<Record<string, unknown>> {
   return isValidElement(node) && node.type === part;
@@ -59,7 +43,7 @@ export function Progress({
 }: Progress.Props) {
   const generatedId = useId();
   const nodes = flattenFragments(children);
-  const label = nodes.find((node) => isPart(node, Progress.Label));
+  const label = nodes.find((node) => isPart(node, ProgressLabel));
   const labelId =
     (isValidElement<{ id?: string }>(label) ? label.props.id : undefined) ?? `${generatedId}-label`;
 
@@ -71,7 +55,7 @@ export function Progress({
     labelled: ariaLabel !== undefined || ariaLabelledBy !== undefined || label !== undefined,
   });
   const state: Progress.State = { ...progress, shape, size, colorScheme };
-  const styles = Progress.Style({ shape, size, colorScheme, indeterminate: state.indeterminate });
+  const styles = progressStyle({ shape, size, colorScheme, indeterminate: state.indeterminate });
 
   const progressbar = {
     role: 'progressbar',
@@ -97,10 +81,10 @@ export function Progress({
     style: resolve(style, state),
   };
 
-  const trackIndex = nodes.findIndex((node) => isPart(node, Progress.Track));
-  const indicator = nodes.find((node) => isPart(node, Progress.Indicator));
+  const trackIndex = nodes.findIndex((node) => isPart(node, ProgressTrack));
+  const indicator = nodes.find((node) => isPart(node, ProgressIndicator));
   const content = nodes.filter(
-    (node) => !isPart(node, Progress.Track) && !isPart(node, Progress.Indicator),
+    (node) => !isPart(node, ProgressTrack) && !isPart(node, ProgressIndicator),
   );
   const contentBefore = (index: number) =>
     nodes.slice(0, index).filter((node) => content.includes(node)).length;
@@ -108,15 +92,15 @@ export function Progress({
   const context = { state, styles, labelId, progressbar };
 
   if (shape === 'circular') {
-    const center = content.filter((node) => !isPart(node, Progress.Label));
-    const labels = content.filter((node) => isPart(node, Progress.Label));
+    const center = content.filter((node) => !isPart(node, ProgressLabel));
+    const labels = content.filter((node) => isPart(node, ProgressLabel));
     return (
       <ProgressContext value={context}>
         <div {...root}>
           <div {...progressbar} className={styles.circle()}>
             <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" className={styles.svg()}>
-              {trackIndex === -1 ? <Progress.Track /> : nodes[trackIndex]}
-              {indicator ?? <Progress.Indicator />}
+              {trackIndex === -1 ? <ProgressTrack /> : nodes[trackIndex]}
+              {indicator ?? <ProgressIndicator />}
             </svg>
             {center.length > 0 && <span className={styles.center()}>{center}</span>}
           </div>
@@ -128,8 +112,7 @@ export function Progress({
 
   const leading = trackIndex === -1 ? content : content.slice(0, contentBefore(trackIndex));
   const trailing = trackIndex === -1 ? [] : content.slice(contentBefore(trackIndex));
-  const track =
-    trackIndex === -1 ? <Progress.Track>{indicator}</Progress.Track> : nodes[trackIndex];
+  const track = trackIndex === -1 ? <ProgressTrack>{indicator}</ProgressTrack> : nodes[trackIndex];
 
   return (
     <ProgressContext value={context}>
@@ -174,180 +157,25 @@ export namespace Progress {
     children?: ReactNode;
   };
 
-  type PartProps<E extends 'span' | 'div'> = Omit<ComponentProps<E>, 'className' | 'children'> & {
-    asChild?: boolean;
-    className?: string | ((state: State) => string | undefined);
-    children?: ReactNode;
-  };
-
-  export function Label({ asChild, className, id, ...props }: Label.Props) {
-    const { state, styles, labelId } = useProgressContext('Progress.Label');
-    const Root = asChild ? Slot : 'span';
-    return (
-      <Root
-        {...props}
-        id={id ?? labelId}
-        data-progress-label=""
-        className={styles.label({ className: resolve(className, state) })}
-      />
-    );
-  }
+  export const Label = ProgressLabel;
   export namespace Label {
-    export type Props = PartProps<'span'>;
+    export type Props = ProgressLabelProps;
   }
 
-  export function Value({ asChild, className, children, ...props }: Value.Props) {
-    const { state, styles } = useProgressContext('Progress.Value');
-    const Root = asChild ? Slot : 'span';
-    const content =
-      typeof children === 'function' ? children(state) : (children ?? state.valueLabel ?? '');
-    return (
-      <Root
-        aria-hidden="true"
-        {...props}
-        data-progress-value=""
-        className={styles.value({ className: resolve(className, state) })}
-      >
-        {content}
-      </Root>
-    );
-  }
+  export const Value = ProgressValue;
   export namespace Value {
-    export type Props = Omit<PartProps<'span'>, 'children'> & {
-      children?: ReactNode | ((state: State) => ReactNode);
-    };
+    export type Props = ProgressValueProps;
   }
 
-  export function Track({ className, children, ...props }: Track.Props) {
-    const { state, styles, progressbar } = useProgressContext('Progress.Track');
-    const resolvedClassName = resolve(className, state);
-    if (state.shape === 'circular')
-      return (
-        <circle
-          cx="12"
-          cy="12"
-          r={ARC_RADIUS}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          data-progress-track=""
-          className={styles.trackCircle({ className: resolvedClassName })}
-        />
-      );
-    return (
-      <div
-        {...props}
-        {...progressbar}
-        data-progress-track=""
-        className={styles.track({ className: resolvedClassName })}
-      >
-        {children ?? <Indicator />}
-      </div>
-    );
-  }
+  export const Track = ProgressTrack;
   export namespace Track {
-    export type Props = Omit<PartProps<'div'>, 'asChild'>;
+    export type Props = ProgressTrackProps;
   }
 
-  export function Indicator({ asChild, className, style, children, ...props }: Indicator.Props) {
-    const { state, styles } = useProgressContext('Progress.Indicator');
-    const resolvedClassName = resolve(className, state);
-    const ratio = state.percent === null ? null : state.percent / 100;
-    if (state.shape === 'circular')
-      return (
-        <circle
-          cx="12"
-          cy="12"
-          r={ARC_RADIUS}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeDasharray={ARC_CIRCUMFERENCE}
-          strokeDashoffset={ARC_CIRCUMFERENCE * (1 - (ratio ?? 0.25))}
-          data-progress-indicator=""
-          className={styles.indicatorCircle({ className: resolvedClassName })}
-        />
-      );
-    const Root = asChild ? Slot : 'div';
-    return (
-      <Root
-        {...props}
-        data-progress-indicator=""
-        className={styles.indicator({ className: resolvedClassName })}
-        style={
-          { ...(ratio === null ? {} : { '--progress-ratio': ratio }), ...style } as CSSProperties
-        }
-      >
-        {children}
-      </Root>
-    );
-  }
+  export const Indicator = ProgressIndicator;
   export namespace Indicator {
-    export type Props = PartProps<'div'>;
+    export type Props = ProgressIndicatorProps;
   }
 
-  export const Style = tv({
-    slots: {
-      root: '',
-      header: 'flex items-baseline gap-2',
-      track: 'relative w-full overflow-hidden rounded-full bg-(--ids-color-muted)',
-      indicator: 'h-full rounded-full bg-(--progress-fill)',
-      circle: 'relative inline-flex shrink-0 items-center justify-center',
-      svg: 'size-full',
-      trackCircle: 'text-(--ids-color-muted)',
-      indicatorCircle: [
-        'origin-center -rotate-90 text-(--progress-fill)',
-        'transition-[stroke-dashoffset] duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
-      ],
-      center: 'absolute inset-0 flex items-center justify-center [&_svg]:size-[40%]',
-      label: 'min-w-0 truncate text-(--ids-color-on-surface)',
-      value: 'shrink-0 text-(--ids-color-on-muted) tabular-nums',
-    },
-    variants: {
-      shape: {
-        linear: { root: 'flex w-full flex-col gap-2' },
-        circular: { root: 'inline-flex items-center gap-2' },
-      } satisfies Record<Shape, object>,
-      size: {
-        standard: { track: 'h-2', circle: 'size-10', label: 'text-body-b3-medium' },
-        tiny: { track: 'h-1', circle: 'size-6', label: 'text-caption-c1-medium' },
-      } satisfies Record<IdsSize, object>,
-      colorScheme: {
-        primary: { root: '[--progress-fill:var(--ids-color-primary)]' },
-        neutral: { root: '[--progress-fill:var(--ids-color-on-surface)]' },
-        info: { root: '[--progress-fill:var(--ids-color-info)]' },
-        success: { root: '[--progress-fill:var(--ids-color-success)]' },
-        warning: { root: '[--progress-fill:var(--ids-color-warning)]' },
-        danger: { root: '[--progress-fill:var(--ids-color-danger)]' },
-      } satisfies Record<ColorScheme, object>,
-      indeterminate: {
-        true: {
-          indicator: [
-            'w-1/4 animate-progress-slide rtl:[animation-direction:reverse]',
-            'motion-reduce:w-full motion-reduce:animate-none motion-reduce:opacity-40',
-          ],
-          svg: 'animate-spin motion-reduce:animate-none',
-        },
-        false: {
-          indicator: [
-            'w-full translate-x-[calc((var(--progress-ratio)-1)*100%)]',
-            'rtl:translate-x-[calc((1-var(--progress-ratio))*100%)]',
-            'transition-[translate] duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
-          ],
-        },
-      },
-    },
-    compoundVariants: [
-      { shape: 'linear', size: 'standard', class: { value: 'ms-auto text-body-b3-regular' } },
-      { shape: 'linear', size: 'tiny', class: { value: 'ms-auto text-caption-c1-regular' } },
-      { shape: 'circular', class: { value: 'text-caption-c2-medium' } },
-    ],
-    defaultVariants: {
-      shape: 'linear',
-      size: 'standard',
-      colorScheme: 'primary',
-      indeterminate: false,
-    },
-  });
+  export const Style = progressStyle;
 }

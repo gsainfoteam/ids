@@ -58,7 +58,7 @@ Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
   trackClassName={track()}
 />
 
-// components/feedback/progress/index.tsx (Progress.Indicator, circular)
+// components/feedback/progress/indicator.tsx (Progress.Indicator, circular)
 <circle
   cx="12"
   cy="12"
@@ -557,7 +557,7 @@ Escape: () => {
 ### 쓰는 법
 
 ```ts
-// components/form/select/index.tsx
+// components/form/select/style.ts
 slots: {
   listArea: listStyles.listArea,
   listbox: listStyles.list,
