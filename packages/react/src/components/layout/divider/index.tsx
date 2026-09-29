@@ -1,71 +1,10 @@
-'use client';
+import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
-import {
-  isValidElement,
-  useId,
-  type ComponentProps,
-  type CSSProperties,
-  type ReactNode,
-} from 'react';
+import { DividerRoot } from './root';
+import { dividerStyle } from './style';
 
-import { invariant, tv } from '../../../utils';
-import { Slot } from '../../utility/slot';
-
-function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}
-
-export function Divider({
-  orientation = 'horizontal',
-  align = 'center',
-  decorative = false,
-  asChild = false,
-  className,
-  style,
-  children,
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy,
-  ...rest
-}: Divider.Props) {
-  const labelId = useId();
-  const labelled = !asChild && children != null && children !== false && children !== '';
-  invariant(
-    !asChild || isValidElement(children),
-    '`Divider asChild` requires one element to render as, such as an `li` or `hr`.',
-  );
-  const state: Divider.State = { orientation, labelled, align, decorative };
-  const { root, label } = Divider.Style({ orientation, labelled, align });
-
-  const naming = decorative
-    ? { 'aria-hidden': true }
-    : {
-        role: 'separator',
-        'aria-orientation': orientation,
-        'aria-label': ariaLabel,
-        'aria-labelledby': ariaLabelledBy ?? (labelled && !ariaLabel ? labelId : undefined),
-      };
-
-  const rootProps = {
-    ...rest,
-    ...naming,
-    'data-divider': '',
-    'data-orientation': orientation,
-    'data-labelled': labelled ? '' : undefined,
-    'data-align': labelled ? align : undefined,
-    className: root({ className: resolve(className, state) }),
-    style: resolve(style, state),
-  };
-
-  if (asChild) return <Slot {...rootProps}>{children}</Slot>;
-  return (
-    <div {...rootProps}>
-      {labelled && (
-        <span id={labelId} className={label()}>
-          {children}
-        </span>
-      )}
-    </div>
-  );
+export function Divider(props: Divider.Props) {
+  return <DividerRoot {...props} />;
 }
 
 export namespace Divider {
@@ -92,48 +31,5 @@ export namespace Divider {
     children?: ReactNode;
   };
 
-  export const Style = tv({
-    slots: {
-      root: 'shrink-0 border-0',
-      label: 'min-w-0 text-center text-caption-c1-medium text-(--ids-color-on-muted)',
-    },
-    variants: {
-      orientation: { horizontal: {}, vertical: {} } satisfies Record<Orientation, object>,
-      labelled: {
-        false: { root: 'bg-(--ids-color-border)' },
-        true: {
-          root: [
-            'flex items-center',
-            'before:shrink before:bg-(--ids-color-border) after:shrink after:bg-(--ids-color-border)',
-          ],
-        },
-      },
-      align: { start: {}, center: {}, end: {} } satisfies Record<Align, object>,
-    },
-    compoundVariants: [
-      { labelled: true, align: 'start', class: { root: 'before:hidden' } },
-      { labelled: true, align: 'end', class: { root: 'after:hidden' } },
-      { orientation: 'horizontal', labelled: false, class: { root: 'h-px w-full' } },
-      {
-        orientation: 'vertical',
-        labelled: false,
-        class: { root: 'min-h-[1lh] w-px self-stretch' },
-      },
-      {
-        orientation: 'horizontal',
-        labelled: true,
-        class: {
-          root: 'w-full gap-3 before:h-px before:min-w-4 before:flex-1 after:h-px after:min-w-4 after:flex-1',
-        },
-      },
-      {
-        orientation: 'vertical',
-        labelled: true,
-        class: {
-          root: 'flex-col gap-2 self-stretch before:min-h-2 before:w-px before:flex-1 after:min-h-2 after:w-px after:flex-1',
-        },
-      },
-    ],
-    defaultVariants: { orientation: 'horizontal', labelled: false, align: 'center' },
-  });
+  export const Style = dividerStyle;
 }

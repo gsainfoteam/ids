@@ -115,3 +115,5 @@ export function TextFieldInput({ asChild, children, className, style }: TextFiel
   invariant(children == null, '`<TextField.Input>` takes `value`/`defaultValue`, not children.');
   return <input {...props} />;
 }
+
+TextFieldInput.displayName = 'TextField.Input';

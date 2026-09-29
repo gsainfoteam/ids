@@ -165,3 +165,5 @@ export function SwitchThumb({ asChild, className, style, children, ...props }: S
   const content = resolve(children, state);
   return asChild ? <Slot {...shared}>{content}</Slot> : <span {...shared}>{content}</span>;
 }
+
+SwitchThumb.displayName = 'Switch.Thumb';

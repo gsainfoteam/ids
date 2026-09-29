@@ -1,31 +1,10 @@
-'use client';
-
 import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
-import { invariant, tv } from '../../../utils';
+import { AspectRatioRoot } from './root';
+import { aspectRatioStyle } from './style';
 
-function resolve<T, S>(value: T | ((state: S) => T), state: S): T {
-  return typeof value === 'function' ? (value as (state: S) => T)(state) : value;
-}
-
-export function AspectRatio({ ratio = 1, className, style, children, ...rest }: AspectRatio.Props) {
-  invariant(
-    Number.isFinite(ratio) && ratio > 0,
-    'AspectRatio: ratio must be a finite positive number.',
-  );
-  const state: AspectRatio.State = { ratio };
-  const { root, content } = AspectRatio.Style();
-
-  return (
-    <div
-      {...rest}
-      data-aspect-ratio=""
-      className={root({ className: resolve(className, state) })}
-      style={{ aspectRatio: ratio, ...resolve(style, state) }}
-    >
-      <div className={content()}>{children}</div>
-    </div>
-  );
+export function AspectRatio(props: AspectRatio.Props) {
+  return <AspectRatioRoot {...props} />;
 }
 
 export namespace AspectRatio {
@@ -38,13 +17,5 @@ export namespace AspectRatio {
     children?: ReactNode;
   };
 
-  export const Style = tv({
-    slots: {
-      root: 'relative w-full',
-      content: [
-        'absolute inset-0 min-h-0 min-w-0',
-        '[:where(&>*)]:size-full [:where(&>img,&>video)]:object-cover',
-      ],
-    },
-  });
+  export const Style = aspectRatioStyle;
 }

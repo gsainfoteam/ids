@@ -46,15 +46,17 @@ file, so each file's directive reaches `dist` (`rollup-preserve-directives`). A 
 hook, creates a context or renders a component starts with `'use client'`; pure modules (`style.ts`,
 logic such as `date.ts` or `number-step.ts`, types, DOM helpers and stores that client modules
 call) and re-export-only `index.ts` files do not. This is what lets a Server Component import IDS
-and render it without a boundary of its own. A component with parts keeps its `index.tsx`
-server-safe for the same reason: a Server Component cannot read a property of a client reference,
-so `<Dialog.Trigger>` works only when `Dialog` itself is a plain server function. The index holds
-no directive, no hook and no context; `Dialog` there only renders `DialogRoot` from `root.tsx`,
-and the namespace aliases parts imported from their own client files. A root that recognises
-another component by `child.type` also accepts that component's root (`[Avatar, AvatarRoot]`),
-since a Server Component hands over `<Avatar>` already rendered to `<AvatarRoot>`.
-`tests/use-client.test.ts` checks both directions, and `tests/server-components.test.ts` renders
-parts from a Server Component.
+and render it without a boundary of its own. Every component index is server-safe for the same
+reason: a Server Component cannot read a property of a client reference, so `<Dialog.Trigger>` and
+`Button.Style()` work only when `Dialog` and `Button` themselves are plain server functions. Each
+`components/<category>/<name>/index.tsx` holds no directive, no hook and no context; `Dialog` there
+only renders `DialogRoot` from `root.tsx`, `Style` comes from a pure `style.ts`, and the namespace
+aliases parts imported from their own client files. A root that recognises another component by
+`child.type` also accepts that component's root (`[Avatar, AvatarRoot]`), since a Server Component
+hands over `<Avatar>` already rendered to `<AvatarRoot>`. Storybook reads the props table from the
+root (`docsReadFromTheRoot` in `.storybook/main.ts`), because the wrapper has no destructured
+defaults to read. `tests/use-client.test.ts` checks both directions, and
+`tests/server-components.test.ts` renders components, parts and `Style` from a Server Component.
 
 **What we build and what we install.** Prefer a well-maintained package over hand-rolled logic:
 
@@ -130,8 +132,9 @@ packages/react/src/
 A new component goes into the category Notion gives it. Code shared by several components but not
 public goes into `internal/`, never loose at the root of `components/`.
 
-**Component folder.** A component with parts, or an `index.tsx` past about 250 lines, is split
-into one file per part. Menu and Drawer show the shape:
+**Component folder.** Every component keeps `index.tsx`, `root.tsx` and, when it has a `tv` Style,
+`style.ts`. A component with parts, or a `root.tsx` past about 250 lines, is split further into one
+file per part. Menu and Drawer show the shape:
 
 ```
 drawer/

@@ -95,6 +95,8 @@ export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
   );
 }
 
+GroupSeparator.displayName = 'Group.Separator';
+
 export function GroupText({ asChild, className, ...props }: Group.TextProps) {
   const group = useGroupContext();
   const Root = asChild ? Slot : 'div';
@@ -106,3 +108,5 @@ export function GroupText({ asChild, className, ...props }: Group.TextProps) {
     />
   );
 }
+
+GroupText.displayName = 'Group.Text';

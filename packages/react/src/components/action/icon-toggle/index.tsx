@@ -1,14 +1,8 @@
-'use client';
-
 import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 
-import { controlSurface, type ControlColorScheme } from '../../../internal/control-surface';
-import { useIconLabel } from '../../../internal/icon-label';
-import { iconSquare } from '../../../internal/icon-square';
-import { toggleSurface } from '../../../internal/toggle-surface';
-import { invariant, tv } from '../../../utils';
-import { useGroupContext } from '../../utility/group';
-import { useToggle } from '../toggle/use-toggle';
+import { IconToggleRoot } from './root';
+import { iconToggleStyle } from './style';
+import { type ControlColorScheme } from '../../../internal/control-surface';
 
 import type {
   InteractiveState,
@@ -18,38 +12,7 @@ import type {
 import type { IdsSize, IdsVariant } from '../../../tokens/types';
 
 export function IconToggle(props: IconToggle.Props) {
-  const layout = useGroupContext();
-  const {
-    props: { icon, variant: ownVariant, colorScheme, size, className, style, ...rest },
-    toggleProps,
-    element,
-    content,
-    render,
-  } = useToggle(props, 'IconToggle');
-
-  invariant(
-    props.asChild || content == null,
-    'IconToggle: pass the icon through the `icon` prop, not as children.',
-  );
-  invariant(icon != null || props.asChild, 'IconToggle: the `icon` prop is required.');
-
-  const glyph = icon ?? content;
-  const label = useIconLabel('IconToggle', glyph, rest, element?.props as object | undefined);
-  const variant = ownVariant ?? layout?.variant ?? 'ghost';
-  const resolvedSize = size ?? layout?.size ?? 'standard';
-
-  return render(
-    {
-      ...rest,
-      'aria-label': label ?? rest['aria-label'],
-      ...toggleProps,
-      className: IconToggle.Style({ variant, colorScheme, size: resolvedSize, className }),
-      style,
-      'data-variant': variant,
-      'data-size': resolvedSize,
-    },
-    glyph,
-  );
+  return <IconToggleRoot {...props} />;
 }
 
 export namespace IconToggle {
@@ -85,17 +48,5 @@ export namespace IconToggle {
         }
     );
 
-  export const Style = tv({
-    base: [controlSurface.base, iconSquare.base],
-    variants: {
-      variant: toggleSurface.variant,
-      colorScheme: controlSurface.colorScheme,
-      size: iconSquare.size,
-    },
-    defaultVariants: {
-      variant: 'ghost',
-      colorScheme: 'primary',
-      size: 'standard',
-    },
-  });
+  export const Style = iconToggleStyle;
 }

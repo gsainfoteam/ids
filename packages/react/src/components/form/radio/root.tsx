@@ -200,3 +200,5 @@ export function RadioIndicator({
   };
   return asChild ? <Slot {...shared}>{content}</Slot> : <span {...shared}>{content}</span>;
 }
+
+RadioIndicator.displayName = 'Radio.Indicator';

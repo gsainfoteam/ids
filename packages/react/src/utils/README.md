@@ -113,10 +113,10 @@ props 를 합치는 함수입니다: `mergeProps`, `mergeEventHandlers`, `mergeR
 ### 쓰는 법
 
 ```tsx
-// components/utility/slot/index.tsx: 자식의 props 가 base, Slot 의 props 가 next
+// components/utility/slot/root.tsx: 자식의 props 가 base, Slot 의 props 가 next
 return cloneElement(children, mergeProps(children.props as Record<string, unknown>, slotProps));
 
-// components/feedback/spinner/index.tsx: 렌더마다 새 ref 함수가 생기지 않게 감싼다
+// components/feedback/spinner/root.tsx: 렌더마다 새 ref 함수가 생기지 않게 감싼다
 const mergedRef = useCallback(
   (node: SVGSVGElement | null) => mergeRefs(svgRef, ref)(node),
   [ref],
@@ -215,7 +215,7 @@ DOM 이벤트를 다루는 작은 함수입니다: `isNodeFromAnyWindow`, `keepF
 ### 쓰는 법
 
 ```ts
-// components/form/select/index.tsx: 포커스가 자기 팝업 안으로 갔는지
+// components/form/select/root.tsx: 포커스가 자기 팝업 안으로 갔는지
 const inPopup = isNodeFromAnyWindow(next) && (next as Element).closest?.(popupSelector);
 
 // components/form/chip-field/item.tsx: 옵션을 눌러도 포커스가 input 에 남는다

@@ -89,6 +89,8 @@ function All(props: CheckboxGroupAllProps) {
   );
 }
 
+All.displayName = 'CheckboxGroup.All';
+
 const render = { Item: Checkbox, All } as unknown as CheckboxGroupRenderProps<string>;
 
 export const CheckboxGroupAll = render.All;

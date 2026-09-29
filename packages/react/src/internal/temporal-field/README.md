@@ -25,7 +25,7 @@ DateField, TimeField, DateTimeField 가 함께 쓰는 필드 본체입니다. �
 ### 쓰는 법
 
 ```tsx
-// components/form/date-field/index.tsx
+// components/form/date-field/root.tsx
 <TemporalField<CalendarValue>
   {...rest}
   value={value}
@@ -55,6 +55,7 @@ DateField, TimeField, DateTimeField 가 함께 쓰는 필드 본체입니다. �
   }}
 />
 
+// components/form/date-field/index.tsx
 export namespace DateField {
   export const Trigger = TemporalTrigger;
   export const Input = TemporalInput;
@@ -163,14 +164,14 @@ const { state, input, blocked, popupId, controlRef, rootRef, change, clear, clos
 ### 쓰는 법
 
 ```ts
-// components/form/date-field/index.tsx
+// components/form/date-field/root.tsx
 const formatDate = formatter(format, dateLocale, {
   defaults: dateOptions,
   toDate: toUtcDate,
   timeZone: 'UTC',
 });
 
-// components/form/time-field/index.tsx
+// components/form/time-field/root.tsx
 const display = formatter(format, dateLocale, {
   defaults: timeOptions(precision),
   toDate: onUtcSampleDay,
@@ -178,7 +179,7 @@ const display = formatter(format, dateLocale, {
   timeZone: 'UTC',
 });
 
-// components/form/date-time-field/index.tsx
+// components/form/date-time-field/root.tsx
 const display = formatter(format, dateLocale, {
   defaults: { ...dateOptions, ...timeOptions(precision) },
   toDate: toUtcDateTime,

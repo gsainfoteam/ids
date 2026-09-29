@@ -47,7 +47,7 @@ Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
 ### 쓰는 법
 
 ```tsx
-// components/feedback/spinner/index.tsx
+// components/feedback/spinner/root.tsx
 <Arc
   {...rest}
   ref={mergedRef}
@@ -99,8 +99,8 @@ Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
 ### 쓰는 법
 
 ```tsx
-// components/action/button/index.tsx
-export const Style = tv({
+// components/action/button/style.ts
+export const buttonStyle = tv({
   base: controlSurface.base,
   variants: {
     variant: controlSurface.variant,
@@ -110,8 +110,8 @@ export const Style = tv({
   defaultVariants: { variant: 'solid', colorScheme: 'primary', size: 'standard' },
 });
 
-// components/action/icon-toggle/index.tsx
-export const Style = tv({
+// components/action/icon-toggle/style.ts
+export const iconToggleStyle = tv({
   base: [controlSurface.base, iconSquare.base],
   variants: {
     variant: toggleSurface.variant,
@@ -173,7 +173,7 @@ BCP 47 locale 태그를 풀이하고, 날짜와 시각의 locale 데이터를 �
 // components/form/time-field/root.tsx
 const dateLocale = resolveLocale(locale); // 'ko-KR' 같은 BCP 47 태그. 생략하면 messages.locale
 
-// components/data/calendar/index.tsx
+// components/data/calendar/root.tsx
 weekStartsOn={weekStartsOn ?? weekStartOf(resolvedLocale)}
 
 // components/data/calendar/day-picker-locale.ts
@@ -417,7 +417,7 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 ### 쓰는 법
 
 ```tsx
-// components/action/icon-button/index.tsx
+// components/action/icon-button/root.tsx
 const glyph = icon ?? content;
 const label = useIconLabel('IconButton', glyph, rest, element?.props as object | undefined);
 
@@ -463,8 +463,8 @@ const label = useIconLabel(
 ### 쓰는 법
 
 ```tsx
-// components/action/icon-button/index.tsx
-export const Style = tv({
+// components/action/icon-button/style.ts
+export const iconButtonStyle = tv({
   base: [controlSurface.base, iconSquare.base],
   variants: {
     variant: controlSurface.variant,
@@ -743,6 +743,7 @@ thumb: [
 className?: StateValue<string | undefined, State>;
 style?: StateValue<CSSProperties | undefined, State>;
 
+// components/data/badge/root.tsx
 <span
   {...rest}
   data-badge=""
@@ -849,8 +850,8 @@ export function Title({ className, id, ...props }: Title.Props) {
 ### 쓰는 법
 
 ```tsx
-// components/action/toggle/index.tsx
-export const Style = tv({
+// components/action/toggle/style.ts
+export const toggleStyle = tv({
   base: controlSurface.base,
   variants: {
     variant: toggleSurface.variant,

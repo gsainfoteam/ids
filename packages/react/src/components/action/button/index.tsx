@@ -1,31 +1,14 @@
-'use client';
-
 import type { ComponentProps, CSSProperties, ReactNode } from 'react';
 
-import { useButton } from './use-button';
-import { controlSurface, type ControlColorScheme } from '../../../internal/control-surface';
-import { tv } from '../../../utils';
-import { useGroupContext } from '../../utility/group';
+import { ButtonRoot } from './root';
+import { buttonStyle } from './style';
+import { type ControlColorScheme } from '../../../internal/control-surface';
 
 import type { InteractiveState, WithInteractiveValues } from '../../../hooks/use-interactive';
 import type { IdsSize, IdsVariant } from '../../../tokens/types';
 
 export function Button(props: Button.Props) {
-  const group = useGroupContext();
-  const {
-    props: { variant: ownVariant, colorScheme, size, className, style, ...rest },
-    render,
-  } = useButton(props, 'Button', { warnWithoutText: true });
-  const variant = ownVariant ?? group?.variant ?? 'solid';
-  const resolvedSize = size ?? group?.size ?? 'standard';
-
-  return render({
-    ...rest,
-    className: Button.Style({ variant, colorScheme, size: resolvedSize, className }),
-    style,
-    'data-variant': variant,
-    'data-size': resolvedSize,
-  });
+  return <ButtonRoot {...props} />;
 }
 
 export namespace Button {
@@ -48,17 +31,5 @@ export namespace Button {
     focusableWhenDisabled?: boolean;
   };
 
-  export const Style = tv({
-    base: controlSurface.base,
-    variants: {
-      variant: controlSurface.variant,
-      colorScheme: controlSurface.colorScheme,
-      size: controlSurface.size,
-    },
-    defaultVariants: {
-      variant: 'solid',
-      colorScheme: 'primary',
-      size: 'standard',
-    },
-  });
+  export const Style = buttonStyle;
 }

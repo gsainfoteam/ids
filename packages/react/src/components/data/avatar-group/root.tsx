@@ -116,3 +116,5 @@ export function AvatarGroupOverflow({
     </Avatar>
   );
 }
+
+AvatarGroupOverflow.displayName = 'AvatarGroup.Overflow';

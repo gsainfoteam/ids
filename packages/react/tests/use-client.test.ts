@@ -9,7 +9,7 @@ const DIST = fileURLToPath(new URL('../dist/', import.meta.url));
 const CALLS_A_HOOK = /\buse(?:[A-Z]\w*)?\s*(?:<[^>]*>)?\s*\(/;
 const CREATES_A_CONTEXT = /\bcreateContext\b/;
 const USE_CLIENT = /^['"]use client['"];/;
-const ALIASES_A_PART = /^ {2}export const (?!Style\b)[A-Z]\w* = [A-Z][\w.]*;$/m;
+const COMPONENT_INDEX = /^components\/[^/]+\/[^/]+\/index\.tsx$/;
 
 const sourceModules = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
   .filter((file) => /\.tsx?$/.test(file) && !/\.stories\.tsx?$/.test(file))
@@ -26,17 +26,16 @@ const isReexportOnly = (code: string) =>
         line.trim() === '' || /^(import |export (type )?\{|export \* from |\}|\s)/.test(line),
     );
 
-const isCompoundIndex = (file: string) =>
-  file.endsWith('/index.tsx') && ALIASES_A_PART.test(source(file));
+const isComponentIndex = (file: string) => COMPONENT_INDEX.test(file);
 const rootOf = (file: string) => file.replace(/index\.tsx$/, 'root.tsx');
 
 const runsOnTheClient = (file: string, code: string) =>
   CALLS_A_HOOK.test(code) ||
   CREATES_A_CONTEXT.test(code) ||
-  (file.endsWith('.tsx') && !isReexportOnly(code) && !isCompoundIndex(file));
+  (file.endsWith('.tsx') && !isReexportOnly(code) && !isComponentIndex(file));
 
 const clientModules = sourceModules.filter((file) => runsOnTheClient(file, source(file)));
-const compoundIndexes = sourceModules.filter(isCompoundIndex);
+const componentIndexes = sourceModules.filter(isComponentIndex);
 
 test('a source module starts with use client exactly when it runs on the client', () => {
   const marked = sourceModules.filter((file) => USE_CLIENT.test(source(file)));
@@ -44,16 +43,16 @@ test('a source module starts with use client exactly when it runs on the client'
   expect(marked).toEqual(clientModules);
 });
 
-test('a component with parts keeps its index server-safe and its root in root.tsx', () => {
-  const indexesRunningClientCode = compoundIndexes.filter((file) => {
+test('every component keeps its index server-safe and its root in root.tsx', () => {
+  const indexesRunningClientCode = componentIndexes.filter((file) => {
     const code = source(file);
     return USE_CLIENT.test(code) || CALLS_A_HOOK.test(code) || CREATES_A_CONTEXT.test(code);
   });
-  const rootsMissingOrServerSide = compoundIndexes.filter(
+  const rootsMissingOrServerSide = componentIndexes.filter(
     (file) => !existsSync(SRC + rootOf(file)) || !USE_CLIENT.test(source(rootOf(file))),
   );
 
-  expect(compoundIndexes.length).toBeGreaterThan(30);
+  expect(componentIndexes.length).toBeGreaterThan(50);
   expect(indexesRunningClientCode).toEqual([]);
   expect(rootsMissingOrServerSide).toEqual([]);
 });
@@ -62,12 +61,12 @@ test('dist keeps use client exactly where the source has it', () => {
   const clientBuiltWithoutDirective = clientModules.filter(
     (file) => !existsSync(built(file)) || !USE_CLIENT.test(readFileSync(built(file), 'utf8')),
   );
-  const compoundIndexesBuiltAsClient = compoundIndexes.filter(
+  const componentIndexesBuiltAsClient = componentIndexes.filter(
     (file) => !existsSync(built(file)) || USE_CLIENT.test(readFileSync(built(file), 'utf8')),
   );
 
   expect(clientBuiltWithoutDirective).toEqual([]);
-  expect(compoundIndexesBuiltAsClient).toEqual([]);
+  expect(componentIndexesBuiltAsClient).toEqual([]);
 });
 
 test('dist keeps one module per source file behind the same entry paths', () => {

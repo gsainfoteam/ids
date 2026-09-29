@@ -154,3 +154,5 @@ export function KbdGroup({
     </KbdGroupContext>
   );
 }
+
+KbdGroup.displayName = 'Kbd.Group';

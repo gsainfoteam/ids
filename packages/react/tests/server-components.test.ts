@@ -13,15 +13,16 @@ const runNode = (conditions: string[], script: string) =>
     { cwd: PACKAGE, encoding: 'utf8' },
   );
 
-const listCompoundExports = `
+const listNamespacedExports = `
   const ids = await import('./dist/index.js');
-  const compound = {};
+  const namespaced = {};
   for (const [name, value] of Object.entries(ids)) {
-    const members = typeof value === 'function' ? Object.keys(value) : [];
-    const parts = members.filter((key) => key !== 'displayName' && key !== 'Style');
-    if (parts.length) compound[name] = members.filter((key) => key !== 'displayName');
+    const members = typeof value === 'function'
+      ? Object.keys(value).filter((key) => key !== 'displayName')
+      : [];
+    if (members.length) namespaced[name] = members;
   }
-  console.log(JSON.stringify(compound));
+  console.log(JSON.stringify(namespaced));
 `;
 
 const clientModulesAsReferences = `
@@ -55,7 +56,7 @@ const clientModulesAsReferences = `
   });
 `;
 
-const renderFromAServerComponent = (compound: Record<string, string[]>) => `
+const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
   ${clientModulesAsReferences}
 
   const { createElement: h } = await import('react');
@@ -64,9 +65,9 @@ const renderFromAServerComponent = (compound: Record<string, string[]>) => `
   const ids = await import('./dist/index.js');
 
   const clientReference = Symbol.for('react.client.reference');
-  const compound = ${JSON.stringify(compound)};
+  const namespaced = ${JSON.stringify(namespaced)};
   const unreachable = [];
-  for (const [name, members] of Object.entries(compound)) {
+  for (const [name, members] of Object.entries(namespaced)) {
     if (ids[name].$$typeof === clientReference) {
       unreachable.push(name);
       continue;
@@ -81,10 +82,17 @@ const renderFromAServerComponent = (compound: Record<string, string[]>) => `
     process.exit(1);
   }
 
-  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button } = ids;
+  const clientComponents = Object.keys(ids).filter(
+    (name) => /^[A-Z][a-z]/.test(name) && ids[name].$$typeof === clientReference,
+  );
+
+  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Divider } = ids;
   const page = h(
     IdsProvider,
     { color: 'blue', mode: 'light' },
+    h('a', { href: '/', className: Button.Style({ variant: 'outline' }) }, 'A link styled as a button'),
+    h(Badge, { count: 3 }, h(Button, null, 'Inbox')),
+    h(Divider),
     h(Card, null, h(Card.Header, null, h(Card.Title, null, 'Card'))),
     h(
       Dialog,
@@ -125,27 +133,36 @@ const renderFromAServerComponent = (compound: Record<string, string[]>) => `
     console.error(errors.join('\\n'));
     process.exit(1);
   }
-  console.log(payload);
+  console.log(JSON.stringify({ clientComponents, payload }));
 `;
 
 test(
-  'a Server Component renders compound parts as client references',
+  'a Server Component renders every component, its parts and its Style',
   () => {
-    const listed = runNode([], listCompoundExports);
+    const listed = runNode([], listNamespacedExports);
     expect(listed.status, listed.stderr).toBe(0);
-    const compound = JSON.parse(listed.stdout) as Record<string, string[]>;
-    expect(Object.keys(compound)).toEqual(expect.arrayContaining(['Dialog', 'Select', 'Card']));
+    const namespaced = JSON.parse(listed.stdout) as Record<string, string[]>;
+    expect(Object.keys(namespaced)).toEqual(
+      expect.arrayContaining(['Button', 'Dialog', 'Divider', 'Select', 'Spinner']),
+    );
 
-    const rendered = runNode(['react-server'], renderFromAServerComponent(compound));
+    const rendered = runNode(['react-server'], renderFromAServerComponent(namespaced));
     expect(rendered.status, rendered.stderr).toBe(0);
+    const { clientComponents, payload } = JSON.parse(rendered.stdout) as {
+      clientComponents: string[];
+      payload: string;
+    };
+
+    expect(clientComponents).toEqual(['IdsProvider', 'ThemeContext', 'TooltipDelayGroup']);
     for (const reference of [
+      'ButtonRoot',
       'DialogRoot',
       'DialogTrigger',
       'SelectRoot',
       'SelectItem',
       'FieldLabel',
     ])
-      expect(rendered.stdout).toContain(`"${reference}"`);
+      expect(payload).toContain(`"${reference}"`);
   },
   coldNodeStartOnABusyRunner * 2,
 );
