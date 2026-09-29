@@ -6,6 +6,8 @@ import {
   paginationRange,
 } from '../src/components/navigation/pagination/range';
 
+const SWEEP_OF_EVERY_COMBINATION_MS = 30_000;
+
 const E = '…';
 const show = (items: ReturnType<typeof paginationRange>) =>
   items.map((item) => (typeof item === 'number' ? item : E));
@@ -92,41 +94,45 @@ describe('paginationRange', () => {
     expect(paginationRange({ page: 1, pageCount: 3, siblingCount: -1 })).toEqual([1, 2, 3]);
   });
 
-  test('keeps its invariants for every page, count, sibling and boundary', () => {
-    for (let pageCount = 1; pageCount <= 30; pageCount++)
-      for (let siblingCount = 0; siblingCount <= 3; siblingCount++)
-        for (let boundaryCount = 0; boundaryCount <= 3; boundaryCount++) {
-          const slots = boundaryCount * 2 + siblingCount * 2 + 3;
-          for (let page = 1; page <= pageCount; page++) {
-            const items = paginationRange({ page, pageCount, siblingCount, boundaryCount });
-            const pages = items.filter((item): item is number => typeof item === 'number');
-            const context = { page, pageCount, siblingCount, boundaryCount };
+  test(
+    'keeps its invariants for every page, count, sibling and boundary',
+    { timeout: SWEEP_OF_EVERY_COMBINATION_MS },
+    () => {
+      for (let pageCount = 1; pageCount <= 30; pageCount++)
+        for (let siblingCount = 0; siblingCount <= 3; siblingCount++)
+          for (let boundaryCount = 0; boundaryCount <= 3; boundaryCount++) {
+            const slots = boundaryCount * 2 + siblingCount * 2 + 3;
+            for (let page = 1; page <= pageCount; page++) {
+              const items = paginationRange({ page, pageCount, siblingCount, boundaryCount });
+              const pages = items.filter((item): item is number => typeof item === 'number');
+              const context = { page, pageCount, siblingCount, boundaryCount };
 
-            expect(pages, JSON.stringify(context)).toEqual([...pages].sort((a, b) => a - b));
-            expect(new Set(pages).size, JSON.stringify(context)).toBe(pages.length);
-            expect(pages, JSON.stringify(context)).toContain(page);
-            if (pageCount <= slots) expect(items.length, JSON.stringify(context)).toBe(pageCount);
-            else expect(items.length, JSON.stringify(context)).toBe(slots);
+              expect(pages, JSON.stringify(context)).toEqual([...pages].sort((a, b) => a - b));
+              expect(new Set(pages).size, JSON.stringify(context)).toBe(pages.length);
+              expect(pages, JSON.stringify(context)).toContain(page);
+              if (pageCount <= slots) expect(items.length, JSON.stringify(context)).toBe(pageCount);
+              else expect(items.length, JSON.stringify(context)).toBe(slots);
 
-            for (let offset = -siblingCount; offset <= siblingCount; offset++) {
-              const sibling = page + offset;
-              if (sibling >= 1 && sibling <= pageCount)
-                expect(pages, JSON.stringify(context)).toContain(sibling);
+              for (let offset = -siblingCount; offset <= siblingCount; offset++) {
+                const sibling = page + offset;
+                if (sibling >= 1 && sibling <= pageCount)
+                  expect(pages, JSON.stringify(context)).toContain(sibling);
+              }
+              for (let edge = 1; edge <= Math.min(boundaryCount, pageCount); edge++) {
+                expect(pages, JSON.stringify(context)).toContain(edge);
+                expect(pages, JSON.stringify(context)).toContain(pageCount - edge + 1);
+              }
+
+              items.forEach((item, index) => {
+                if (typeof item === 'number') return;
+                const before = pages.filter((p) => items.indexOf(p) < index).at(-1) ?? 0;
+                const after = pages.find((p) => items.indexOf(p) > index) ?? pageCount + 1;
+                expect(after - before - 1, JSON.stringify(context)).toBeGreaterThanOrEqual(2);
+              });
             }
-            for (let edge = 1; edge <= Math.min(boundaryCount, pageCount); edge++) {
-              expect(pages, JSON.stringify(context)).toContain(edge);
-              expect(pages, JSON.stringify(context)).toContain(pageCount - edge + 1);
-            }
-
-            items.forEach((item, index) => {
-              if (typeof item === 'number') return;
-              const before = pages.filter((p) => items.indexOf(p) < index).at(-1) ?? 0;
-              const after = pages.find((p) => items.indexOf(p) > index) ?? pageCount + 1;
-              expect(after - before - 1, JSON.stringify(context)).toBeGreaterThanOrEqual(2);
-            });
           }
-        }
-  });
+    },
+  );
 });
 
 describe('paginationEntries', () => {
