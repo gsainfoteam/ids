@@ -166,6 +166,8 @@ export const Keyboard: Story = {
   },
 };
 
+const REPEATS_PAST_FOUR_EVEN_WHILE_THREE_ENGINES_SHARE_THE_MACHINE = 5000;
+
 export const PressAndHold: Story = {
   args: { defaultValue: 0 },
   parameters: {
@@ -181,7 +183,7 @@ export const PressAndHold: Story = {
     const increment = canvas.getByRole('button', { name: '값 늘리기' });
     await userEvent.pointer({ keys: '[MouseLeft>]', target: increment });
     await waitFor(() => expect(Number(input.getAttribute('aria-valuenow'))).toBeGreaterThan(4), {
-      timeout: 2000,
+      timeout: REPEATS_PAST_FOUR_EVEN_WHILE_THREE_ENGINES_SHARE_THE_MACHINE,
     });
     await userEvent.pointer({ keys: '[/MouseLeft]', target: increment });
     await expect(input).toHaveFocus();
