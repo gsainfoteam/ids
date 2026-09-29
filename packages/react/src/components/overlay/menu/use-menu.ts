@@ -86,9 +86,14 @@ export function useMenuLevel({
     alignOffset: 0,
   });
 
+  const triggerIsDisabled = () => trigger?.getAttribute('aria-disabled') === 'true';
+
   const anchored = useAnchored({
     open,
-    onOpenChange: (next) => setOwnOpen(next),
+    onOpenChange: (next) => {
+      if (next && triggerIsDisabled()) return;
+      setOwnOpen(next);
+    },
     reference: trigger,
     floating: content,
     nodeId,

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { detectPlatform } from '@tanstack/react-hotkeys';
 import { renderToString } from 'react-dom/server';
-import { expect, test, vi } from 'vitest';
+import { expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
@@ -337,7 +337,12 @@ test('a nested trigger matches typing by textValue, and a disabled one is skippe
   await expect.element(item('Trash')).toHaveFocus();
 
   await expect.element(item('Archive')).toHaveAttribute('aria-disabled', 'true');
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  onTestFinished(() => {
+    vi.useRealTimers();
+  });
   await userEvent.hover(item('Archive'));
+  vi.runOnlyPendingTimers();
   await userEvent.click(item('Archive'), { force: true });
   await expect.element(item('Archive')).toHaveAttribute('aria-expanded', 'false');
   await expect
