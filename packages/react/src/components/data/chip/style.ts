@@ -26,27 +26,31 @@ export const chipStyle = tv({
   variants: {
     colorScheme: {
       neutral: {
-        root: '[--chip-fill:var(--ids-color-on-surface)] [--chip-on-fill:var(--ids-color-surface)] [--chip-tint:var(--ids-color-muted)] [--chip-text:var(--ids-color-on-surface)] [--chip-line:var(--ids-color-border)]',
+        root: '[--chip-fill:var(--ids-color-on-surface)] [--chip-on-fill:var(--ids-color-surface)] [--chip-tint:var(--ids-color-muted)] [--chip-on-tint:var(--ids-color-on-surface)] [--chip-text:var(--ids-color-on-surface)] [--chip-line:var(--ids-color-border)]',
       },
       primary: {
-        root: '[--chip-fill:var(--ids-color-primary)] [--chip-on-fill:var(--ids-color-on-primary)] [--chip-tint:color-mix(in_oklab,var(--ids-color-primary)_12%,transparent)] [--chip-text:var(--ids-color-primary)] [--chip-line:color-mix(in_oklab,var(--ids-color-primary)_40%,transparent)]',
+        root: [
+          '[--chip-fill:var(--ids-color-primary)] [--chip-on-fill:var(--ids-color-on-primary)]',
+          '[--chip-tint:var(--ids-color-secondary)] [--chip-on-tint:var(--ids-color-on-secondary)]',
+          '[--chip-text:var(--ids-color-accent)] [--chip-line:color-mix(in_oklab,var(--ids-color-primary)_40%,transparent)]',
+        ],
       },
       success: {
-        root: '[--chip-fill:var(--ids-color-success)] [--chip-on-fill:var(--ids-color-on-success)] [--chip-tint:color-mix(in_oklab,var(--ids-color-success)_15%,transparent)] [--chip-text:var(--ids-color-success-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-success)_40%,transparent)]',
+        root: '[--chip-fill:var(--ids-color-success)] [--chip-on-fill:var(--ids-color-on-success)] [--chip-tint:color-mix(in_oklab,var(--ids-color-success)_15%,transparent)] [--chip-on-tint:var(--ids-color-success-strong)] [--chip-text:var(--ids-color-success-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-success)_40%,transparent)]',
       },
       warning: {
-        root: '[--chip-fill:var(--ids-color-warning)] [--chip-on-fill:var(--ids-color-on-warning)] [--chip-tint:color-mix(in_oklab,var(--ids-color-warning)_18%,transparent)] [--chip-text:var(--ids-color-warning-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-warning)_50%,transparent)]',
+        root: '[--chip-fill:var(--ids-color-warning)] [--chip-on-fill:var(--ids-color-on-warning)] [--chip-tint:color-mix(in_oklab,var(--ids-color-warning)_18%,transparent)] [--chip-on-tint:var(--ids-color-warning-strong)] [--chip-text:var(--ids-color-warning-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-warning)_50%,transparent)]',
       },
       danger: {
-        root: '[--chip-fill:var(--ids-color-danger)] [--chip-on-fill:var(--ids-color-on-danger)] [--chip-tint:color-mix(in_oklab,var(--ids-color-danger)_12%,transparent)] [--chip-text:var(--ids-color-danger-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-danger)_40%,transparent)]',
+        root: '[--chip-fill:var(--ids-color-danger)] [--chip-on-fill:var(--ids-color-on-danger)] [--chip-tint:color-mix(in_oklab,var(--ids-color-danger)_12%,transparent)] [--chip-on-tint:var(--ids-color-danger-strong)] [--chip-text:var(--ids-color-danger-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-danger)_40%,transparent)]',
       },
       info: {
-        root: '[--chip-fill:var(--ids-color-info)] [--chip-on-fill:var(--ids-color-on-info)] [--chip-tint:color-mix(in_oklab,var(--ids-color-info)_12%,transparent)] [--chip-text:var(--ids-color-info-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-info)_40%,transparent)]',
+        root: '[--chip-fill:var(--ids-color-info)] [--chip-on-fill:var(--ids-color-on-info)] [--chip-tint:color-mix(in_oklab,var(--ids-color-info)_12%,transparent)] [--chip-on-tint:var(--ids-color-info-strong)] [--chip-text:var(--ids-color-info-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-info)_40%,transparent)]',
       },
     } satisfies Record<ChipColorScheme, object>,
     variant: {
       solid: { root: 'bg-(--chip-fill) text-(--chip-on-fill)' },
-      soft: { root: 'bg-(--chip-tint) text-(--chip-text)' },
+      soft: { root: 'bg-(--chip-tint) text-(--chip-on-tint)' },
       outline: {
         root: 'bg-transparent text-(--chip-text) inset-ring-1 inset-ring-(--chip-line)',
       },

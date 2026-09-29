@@ -16,36 +16,45 @@ export const badgeStyle = tv({
   variants: {
     colorScheme: {
       neutral: {
-        indicator:
+        indicator: [
           '[--badge-accent:var(--ids-color-on-surface)] [--badge-fill:var(--ids-color-on-surface)] [--badge-on-fill:var(--ids-color-surface)] [--badge-text:var(--ids-color-on-surface)]',
+          '[--badge-tint:color-mix(in_oklab,var(--ids-color-on-surface)_16%,var(--ids-color-surface))] [--badge-on-tint:var(--ids-color-on-surface)]',
+        ],
       },
       primary: {
-        indicator:
-          '[--badge-accent:var(--ids-color-primary)] [--badge-fill:var(--ids-color-primary)] [--badge-on-fill:var(--ids-color-on-primary)] [--badge-text:var(--ids-color-primary)]',
+        indicator: [
+          '[--badge-accent:var(--ids-color-primary)] [--badge-fill:var(--ids-color-primary)] [--badge-on-fill:var(--ids-color-on-primary)] [--badge-text:var(--ids-color-accent)]',
+          '[--badge-tint:var(--ids-color-secondary)] [--badge-on-tint:var(--ids-color-on-secondary)]',
+        ],
       },
       success: {
-        indicator:
+        indicator: [
           '[--badge-accent:var(--ids-color-success)] [--badge-fill:var(--ids-color-success)] [--badge-on-fill:var(--ids-color-on-success)] [--badge-text:var(--ids-color-success-strong)]',
+          '[--badge-tint:color-mix(in_oklab,var(--ids-color-success)_16%,var(--ids-color-surface))] [--badge-on-tint:var(--ids-color-success-strong)]',
+        ],
       },
       warning: {
-        indicator:
+        indicator: [
           '[--badge-accent:var(--ids-color-warning)] [--badge-fill:var(--ids-color-warning)] [--badge-on-fill:var(--ids-color-on-warning)] [--badge-text:var(--ids-color-warning-strong)]',
+          '[--badge-tint:color-mix(in_oklab,var(--ids-color-warning)_16%,var(--ids-color-surface))] [--badge-on-tint:var(--ids-color-warning-strong)]',
+        ],
       },
       danger: {
-        indicator:
+        indicator: [
           '[--badge-accent:var(--ids-color-danger)] [--badge-fill:var(--ids-color-danger)] [--badge-on-fill:var(--ids-color-on-danger)] [--badge-text:var(--ids-color-danger-strong)]',
+          '[--badge-tint:color-mix(in_oklab,var(--ids-color-danger)_16%,var(--ids-color-surface))] [--badge-on-tint:var(--ids-color-danger-strong)]',
+        ],
       },
       info: {
-        indicator:
+        indicator: [
           '[--badge-accent:var(--ids-color-info)] [--badge-fill:var(--ids-color-info)] [--badge-on-fill:var(--ids-color-on-info)] [--badge-text:var(--ids-color-info-strong)]',
+          '[--badge-tint:color-mix(in_oklab,var(--ids-color-info)_16%,var(--ids-color-surface))] [--badge-on-tint:var(--ids-color-info-strong)]',
+        ],
       },
     } satisfies Record<BadgeColorScheme, object>,
     variant: {
       solid: { indicator: 'bg-(--badge-fill) text-(--badge-on-fill)' },
-      soft: {
-        indicator:
-          'bg-[color-mix(in_oklab,var(--badge-accent)_16%,var(--ids-color-surface))] text-(--badge-text)',
-      },
+      soft: { indicator: 'bg-(--badge-tint) text-(--badge-on-tint)' },
       outline: {
         indicator:
           'bg-(--ids-color-surface) text-(--badge-text) inset-ring-1 inset-ring-(--badge-accent)/45',

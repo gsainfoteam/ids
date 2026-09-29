@@ -18,7 +18,7 @@ export const chipFieldStyle = tv({
     chip: [
       'max-w-full min-w-0 gap-0.5 data-disabled:opacity-60',
       'transition-[color,background-color] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'data-focus-visible:bg-(--ids-color-primary)/15 data-focus-visible:text-(--ids-color-primary)',
+      'data-focus-visible:bg-(--ids-color-secondary) data-focus-visible:text-(--ids-color-on-secondary)',
     ],
     chipRemove: 'relative ring-0! after:absolute after:-inset-1',
     input: [

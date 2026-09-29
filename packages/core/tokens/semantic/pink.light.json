@@ -3,7 +3,8 @@
     "primary": { "$value": "{pink.600}", "$type": "color" },
     "on-primary": { "$value": "{neutral.0}", "$type": "color" },
     "secondary": { "$value": "{pink.100}", "$type": "color" },
-    "on-secondary": { "$value": "{pink.700}", "$type": "color" },
+    "on-secondary": { "$value": "{pink.800}", "$type": "color" },
+    "accent": { "$value": "{pink.700}", "$type": "color" },
     "outline": { "$value": "{pink.200}", "$type": "color" }
   }
 }

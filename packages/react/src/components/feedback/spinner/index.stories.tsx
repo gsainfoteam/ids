@@ -100,7 +100,7 @@ export const Gallery: Story = {
           <Spinner size="standard" />
         </Showcase.Row>
         <Showcase.Row label="primary">
-          <Spinner size="standard" className="text-(--ids-color-primary)" />
+          <Spinner size="standard" className="text-(--ids-color-accent)" />
         </Showcase.Row>
         <Showcase.Row label="on-muted">
           <Spinner size="standard" className="text-(--ids-color-on-muted)" />

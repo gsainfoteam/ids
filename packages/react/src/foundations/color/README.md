@@ -15,11 +15,22 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 
 `data-color` 와 `data-mode` 둘 다에 따라 바뀝니다.
 
-| 토큰                         | 쓰임                                     |
-| ---------------------------- | ---------------------------------------- |
-| `primary` / `on-primary`     | 주요 동작의 채움과 그 위 글자. 포커스 링 |
-| `secondary` / `on-secondary` | 옅은 브랜드 채움과 그 위 글자            |
-| `outline`                    | 브랜드 색을 띠어야 하는 드문 선          |
+| 토큰                         | 쓰임                                                                   |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| `primary` / `on-primary`     | 주요 동작의 채움과 그 위 글자. 포커스 링                               |
+| `secondary` / `on-secondary` | 옅은 브랜드 채움과 그 위 글자. 모든 soft variant                       |
+| `accent`                     | 채움 없이 페이지 위에 놓이는 브랜드 글자와 아이콘                      |
+| `outline`                    | 브랜드 색을 띠어야 하는 드문 선                                        |
+
+```tsx
+<button className="bg-(--ids-color-primary) text-(--ids-color-on-primary)">저장</button>
+<span className="bg-(--ids-color-secondary) text-(--ids-color-on-secondary)">새 글</span>
+<a className="text-(--ids-color-accent)">자세히 보기</a>
+```
+
+- `primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않습니다. yellow, cyan 처럼 밝은 색은 흰 배경 위에서 4.5:1 이 안 됩니다.
+- soft 컨트롤의 hover 와 press 는 `secondary` 에 `primary` 를 6%, 12% 섞습니다. `on-secondary` 는 이 배경에서도 4.5:1 을 지킵니다.
+- `accent` 를 쓰는 곳: outline Badge 와 Chip 의 글자, Rating 별, Radio 점.
 
 ### 17색
 
@@ -31,16 +42,22 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 
 - `red` `orange` `amber` `yellow` `lime` `green` `emerald` `teal` `cyan` `sky` `blue` `indigo` `violet` `purple` `fuchsia` `pink` `rose`.
 - 팔레트는 Tailwind CSS v4 기본 색을 hex 로 옮긴 값입니다. `orange` 와 `green` 은 IDS 고유 값입니다.
-- 모든 색이 같은 단계를 씁니다.
+- 채움과 선은 모든 색이 같은 단계를 씁니다. 글자 단계는 대비로 정합니다.
 
-| 토큰           | light | dark  |
-| -------------- | ----- | ----- |
-| `primary`      | 600   | 600   |
-| `secondary`    | 100   | 950   |
-| `on-secondary` | 700   | 400   |
-| `outline`      | 200   | 800   |
+| 토큰           | light      | dark       |
+| -------------- | ---------- | ---------- |
+| `primary`      | 600        | 600        |
+| `secondary`    | 100        | 950        |
+| `on-secondary` | 700 또는 800 | 400        |
+| `accent`       | 600 ~ 800  | 400 또는 500 |
+| `outline`      | 200        | 800        |
 
-- `on-secondary` 는 `secondary` 위 글자로 4.5:1 을 넘는 단계입니다. `orange` 만 light 에서 800 을 씁니다.
+- `on-secondary`: light 는 700 과 800 중 soft 의 hover, press 배경까지 4.5:1 을 지키는 밝은 쪽입니다.
+  - 800: `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` `pink` `rose`.
+  - 700: 나머지 7색.
+- `accent`: light 는 600, 700, 800 중 흰 배경과 `secondary` 위에서 4.5:1 을 넘는 가장 밝은 단계, dark 는 500, 400, 300 중 `neutral.950` 과 `secondary` 위에서 4.5:1 을 넘는 가장 진한 단계입니다.
+  - light 600: `indigo` `violet` `purple`. 800: `orange`. 나머지는 700.
+  - dark 500: `orange` `amber` `yellow` `lime` `green` `emerald` `teal` `cyan` `sky`. 나머지는 400.
 - `on-primary` 는 흰 글자(`neutral.0`)가 기본입니다. 흰 글자로 4.5:1 이 안 되는 밝은 색은 검은 글자(`neutral.950`)입니다.
   - 검은 글자: `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky`.
   - 흰 글자: 나머지 9색.
@@ -102,4 +119,4 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 - 색만으로 의미를 전하지 않습니다. 아이콘이나 글자를 함께 둡니다.
 - 대비는 Storybook `Foundations/Color` 의 Contrast에서 모드와 테마마다 확인합니다.
 - Tokens 스토리는 `semantic/*.json` 과 `enums.json` 을 읽어 그리므로 토큰이나 색을 더하면 저절로 나타납니다. 원시 단계는 [Palette](../palette/README.md) 에 있습니다.
-- `tests/tokens-contrast.test.ts` 가 17색 × 두 모드의 `on-primary` / `primary`, `on-secondary` / `secondary` 와 상태 짝이 4.5:1 을 넘는지 검사합니다.
+- `tests/tokens-contrast.test.ts` 가 17색 × 두 모드의 `on-primary` / `primary`, `on-secondary` / `secondary` 와 그 hover, press 배경, `accent` / `surface`, `accent` / `secondary`, 상태 짝이 4.5:1 을 넘는지 검사합니다.

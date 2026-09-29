@@ -9,7 +9,7 @@ export const radioStyle = tv({
       'relative inline-flex shrink-0 items-center justify-center align-middle',
       'rounded-full focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      '[--radio-accent:var(--ids-color-primary)] data-invalid:[--radio-accent:var(--ids-color-danger)]',
+      '[--radio-accent:var(--ids-color-accent)] data-invalid:[--radio-accent:var(--ids-color-danger)]',
       'data-disabled:opacity-50',
     ],
     input:

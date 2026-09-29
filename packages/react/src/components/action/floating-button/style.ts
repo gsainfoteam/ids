@@ -11,9 +11,10 @@ const opaqueFills = {
     'data-active:bg-[color-mix(in_oklab,var(--control-fill)_80%,var(--ids-color-surface))]',
   ),
   soft: cn(
-    'bg-[color-mix(in_oklab,var(--control-fill)_12%,var(--ids-color-surface))] text-(--control-accent)',
-    'data-hovered:bg-[color-mix(in_oklab,var(--control-fill)_18%,var(--ids-color-surface))]',
-    'data-active:bg-[color-mix(in_oklab,var(--control-fill)_24%,var(--ids-color-surface))]',
+    'bg-(--ids-color-surface) text-(--control-on-soft)',
+    'bg-[image:linear-gradient(var(--control-soft),var(--control-soft))]',
+    'data-hovered:bg-[image:linear-gradient(var(--control-soft-hover),var(--control-soft-hover))]',
+    'data-active:bg-[image:linear-gradient(var(--control-soft-press),var(--control-soft-press))]',
   ),
   outline: cn(
     'bg-(--ids-color-surface) text-(--control-quiet) inset-ring-1 inset-ring-(--ids-color-border)',

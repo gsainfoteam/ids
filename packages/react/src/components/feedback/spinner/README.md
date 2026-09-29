@@ -70,7 +70,7 @@ import { Button, Spinner } from '@gsainfoteam/ids-react';
 | `announced` | 스크린 리더에 이름을 적었다                            |
 
 ```tsx
-<Spinner className={(state) => (state.announced ? 'text-(--ids-color-primary)' : undefined)} />
+<Spinner className={(state) => (state.announced ? 'text-(--ids-color-accent)' : undefined)} />
 ```
 
 - svg에는 `data-spinner` 와, 크기가 정해졌으면 `data-size` 가 붙습니다.

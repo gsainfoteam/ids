@@ -94,6 +94,8 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Monaspace Neon 이다. �
 ```html
 <!-- 색상 -->
 <button class="bg-primary text-on-primary">확인</button>
+<span class="bg-secondary text-on-secondary">새 글</span>
+<a class="text-accent">자세히 보기</a>
 
 <!-- 타이포 (피그마 Text style = 크기+weight+leading+tracking 묶음) -->
 <p class="text-headline-h5-semibold">제목</p>
@@ -126,6 +128,7 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Monaspace Neon 이다. �
 | `red` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` `indigo` `violet` `purple` `fuchsia` `pink` `rose` | Tailwind CSS v4 기본 팔레트 |
 
 - `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` 는 `--ids-color-on-primary` 가 검은 글자다. 흰 글자로는 대비 4.5:1 이 안 된다.
+- 브랜드 색 글자는 배경에 따라 고른다. `primary` 채움 위는 `on-primary`, `secondary` 위는 `on-secondary`, 채움 없는 페이지 위는 `accent` 다. 셋 다 두 모드에서 4.5:1 을 넘는다.
 
 `data-mode`는 `light` / `dark`.
 

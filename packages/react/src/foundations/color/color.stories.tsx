@@ -31,6 +31,8 @@ const status = Object.keys(statusTokens.color);
 const brandPairs = [
   ['primary', 'on-primary'],
   ['secondary', 'on-secondary'],
+  ['surface', 'accent'],
+  ['secondary', 'accent'],
 ] as const;
 
 const pairs = [
@@ -199,7 +201,8 @@ function BrandTokenTable() {
   );
 }
 
-const brandContrastRow = cn('grid grid-cols-[4.5rem_repeat(2,10rem)] items-center gap-x-4');
+const brandContrastRow = cn('grid items-center gap-x-4');
+const brandContrastColumns = { gridTemplateColumns: `4.5rem repeat(${brandPairs.length}, 10rem)` };
 
 function BrandContrastTable() {
   return (
@@ -207,20 +210,24 @@ function BrandContrastTable() {
       {modes.map((mode) => (
         <IdsProvider key={mode} mode={mode} className={panel}>
           <div className="flex flex-col gap-2">
-            <div className={brandContrastRow}>
+            <div className={brandContrastRow} style={brandContrastColumns}>
               <span className={columnLabel}>{mode}</span>
               {brandPairs.map(([background, foreground]) => (
-                <span key={foreground} className={columnLabel}>
+                <span key={`${foreground}:${background}`} className={columnLabel}>
                   {foreground} / {background}
                 </span>
               ))}
             </div>
             {colors.map((color) => (
               <IdsProvider key={color} asChild color={color}>
-                <div className={brandContrastRow}>
+                <div className={brandContrastRow} style={brandContrastColumns}>
                   <span className="text-body-b3-regular">{color}</span>
                   {brandPairs.map(([background, foreground]) => (
-                    <Pair key={foreground} background={background} foreground={foreground} />
+                    <Pair
+                      key={`${foreground}:${background}`}
+                      background={background}
+                      foreground={foreground}
+                    />
                   ))}
                 </div>
               </IdsProvider>
@@ -237,7 +244,7 @@ export const Tokens: Story = {
     <Showcase>
       <Showcase.Section
         title="Brand"
-        description="data-color 17색과 data-mode 둘 다에 따라 바뀝니다. 테마 색을 쓰는 요소는 primary와 secondary뿐이고, outline은 브랜드 색을 띠어야 하는 드문 선에 씁니다."
+        description="data-color 17색과 data-mode 둘 다에 따라 바뀝니다. 채움은 primary, soft 는 secondary 와 on-secondary, 채움 없이 페이지 위에 놓이는 브랜드 글자와 아이콘은 accent 입니다. outline은 브랜드 색을 띠어야 하는 드문 선에 씁니다."
       >
         <BrandTokenTable />
       </Showcase.Section>
@@ -295,7 +302,7 @@ export const Contrast: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="브랜드 17색"
-        description="색마다 채움과 그 위 글자의 대비입니다. 모든 색이 두 모드에서 4.5:1(AA)을 넘습니다. 흰 글자로 AA가 안 되는 밝은 색(orange, amber, yellow, lime, emerald, teal, cyan, sky)은 on-primary가 검은 글자입니다."
+        description="색마다 채움과 그 위 글자, 페이지와 secondary 위 accent 의 대비입니다. 모든 색이 두 모드에서 4.5:1(AA)을 넘습니다. 흰 글자로 AA가 안 되는 밝은 색(orange, amber, yellow, lime, emerald, teal, cyan, sky)은 on-primary가 검은 글자입니다."
       >
         <BrandContrastTable />
       </Showcase.Section>

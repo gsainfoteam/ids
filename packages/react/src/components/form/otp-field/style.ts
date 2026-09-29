@@ -39,7 +39,7 @@ export const otpFieldStyle = tv({
   variants: {
     variant: {
       outline: { slot: 'border-(--ids-color-border) bg-(--ids-color-surface)' },
-      soft: { slot: 'border-transparent bg-(--ids-color-primary)/10 shadow-none' },
+      soft: { slot: 'border-transparent bg-(--ids-color-secondary) shadow-none' },
     } satisfies Record<OTPFieldVariant, object>,
     size: {
       standard: { slot: 'size-(--ids-size-control-standard) text-body-b2-medium' },

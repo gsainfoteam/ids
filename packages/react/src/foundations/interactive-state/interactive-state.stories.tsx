@@ -75,7 +75,7 @@ export const Mirror: Story = {
               올려 보세요
             </Button>
             {interaction.hovered ? (
-              <span className="text-body-b3-regular flex items-center gap-1 text-(--ids-color-primary)">
+              <span className="text-body-b3-regular flex items-center gap-1 text-(--ids-color-accent)">
                 <InformationCircleIcon className="size-4" />
                 형제가 반응합니다
               </span>

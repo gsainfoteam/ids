@@ -127,20 +127,25 @@ export const iconToggleStyle = tv({
 
 - color scheme 은 CSS 변수만 정하고 variant 는 그 변수만 읽습니다. variant 5 개와 scheme 6 개의 조합마다 클래스를 따로 쓰지 않아도 모든 조합이 맞습니다.
 
-| 변수                | 쓰는 곳                                                                                      |
-| ------------------- | -------------------------------------------------------------------------------------------- |
-| `--control-fill`    | solid 배경, soft 의 옅은 배경                                                                |
-| `--control-on-fill` | solid 배경 위의 글자                                                                         |
-| `--control-accent`  | soft 글자. status scheme 은 옅은 배경에서도 읽히는 `-strong` 색                              |
-| `--control-quiet`   | outline, ghost 글자. primary 와 neutral 은 `on-surface`, 나머지는 `-strong` 색               |
-| `--control-hover`   | outline, ghost 의 hover 배경. `muted`, 또는 status 색 10%                                    |
-| `--control-press`   | outline, ghost 의 press 배경과 켜진 ghost, outline toggle. `muted-hover`, 또는 status 색 16% |
-| `--control-ring`    | focus ring 과 focus 때의 테두리. neutral 도 primary                                          |
+| 변수                   | 쓰는 곳                                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
+| `--control-fill`       | solid, glossy 배경. soft 의 hover, press 가 섞어 드는 색                                           |
+| `--control-on-fill`    | solid, glossy 배경 위의 글자                                                                       |
+| `--control-soft`       | soft 배경과 켜진 soft toggle. primary 는 `secondary`, 나머지는 scheme 색 10% (투명)                |
+| `--control-on-soft`    | soft 글자. primary 는 `on-secondary`, neutral 은 `on-surface`, status 는 `-strong` 색              |
+| `--control-soft-hover` | soft 의 hover 배경. `--control-soft` 에 `--control-fill` 6% 를 섞는다. `base` 가 정한다            |
+| `--control-soft-press` | soft 의 press 배경. `--control-fill` 12%. `base` 가 정한다                                         |
+| `--control-quiet`      | outline, ghost 글자. primary 와 neutral 은 `on-surface`, 나머지는 `-strong` 색                     |
+| `--control-hover`      | outline, ghost 의 hover 배경. `muted`, 또는 status 색 10%                                          |
+| `--control-press`      | outline, ghost 의 press 배경과 켜진 ghost, outline toggle. `muted-hover`, 또는 status 색 16%       |
+| `--control-ring`       | focus ring 과 focus 때의 테두리. neutral 도 primary                                                |
 
-- outline 과 ghost 는 중립 상태 사다리를 따릅니다. hover 는 `--control-hover`, press 는 한 단계 진한 `--control-press` 입니다. solid 와 soft 는 브랜드 상태(`/90`, `/80`, `/15`, `/20`)라 사다리 밖이고, glossy 는 색 대신 광택과 그림자로 상태를 보입니다.
+- outline 과 ghost 는 중립 상태 사다리를 따릅니다. hover 는 `--control-hover`, press 는 한 단계 진한 `--control-press` 입니다. solid 는 브랜드 상태(`/90`, `/80`)라 사다리 밖이고, glossy 는 색 대신 광택과 그림자로 상태를 보입니다.
+- soft 는 `secondary` 위 `on-secondary` 짝입니다. hover 와 press 는 배경에 채움 색을 6%, 12% 섞어 한 단계씩 진해집니다. `on-secondary` 는 이 두 배경에서도 4.5:1 을 지키는 단계라, 섞는 비율을 올리면 `tests/tokens-contrast.test.ts` 가 실패합니다. 테스트는 이 파일에서 비율을 읽습니다.
+- soft 의 hover, press 변수는 `base` 에서 정합니다. custom property 안의 `var()` 는 그 요소에서 풀리므로, 같은 요소에 붙는 scheme 의 `--control-soft` 를 따라갑니다.
 - `glossy` 는 solid 의 채움(`--control-fill`) 위에 층을 얹습니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택(`background-image` 라 채움 색 위에 그려진다), 안쪽 위 1px 하이라이트(`inset-shadow`), 채움보다 20% 진한 가장자리(`inset-ring` 의 `color-mix`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다. focus 때는 `ringFollowsScheme` 이 가장자리를 `--control-ring` 으로 바꿉니다. outline 과 같은 방식입니다.
 - scheme 색은 solid, soft, glossy 만 씁니다. outline 과 ghost 는 primary 에서도 neutral 이고, 브랜드 색은 focus 에 남깁니다. shadcn/ui 가 primary 버튼 옆의 보조 버튼을 조용하게 두는 방식입니다.
-- `base` 에는 primary 의 변수를 담은 `fallbackScheme` 이 들어 있습니다. `colorScheme` 을 받지 않는 컴포넌트도 일곱 변수가 모두 정의돼야 하기 때문입니다. `colorScheme` 을 주면 `cn` 이 같은 변수의 뒤쪽 값만 남깁니다.
+- `base` 에는 primary 의 변수를 담은 `fallbackScheme` 이 들어 있습니다. `colorScheme` 을 받지 않는 컴포넌트도 scheme 변수가 모두 정의돼야 하기 때문입니다. `colorScheme` 을 주면 `cn` 이 같은 변수의 뒤쪽 값만 남깁니다.
 - `focus-ring` 은 ring 을 primary 로 칠합니다. `ringFollowsScheme` 이 cascade 에서 뒤에 와서 ring 과 focus 테두리를 `--control-ring` 으로 바꿉니다.
 - `trimBesideIconOrSpinner`: 라벨 옆의 아이콘은 그쪽 가장자리에 이미 시각적 무게를 더하므로, 아이콘이 있는 쪽의 padding 을 줄입니다. standard 는 `px-4` 에서 `ps-3`/`pe-3`, tiny 는 `px-3` 에서 `ps-2.5`/`pe-2.5` 입니다.
 - Spinner 도 svg 이고, Spinner 가 함께 그리는 `role="status"` span 과 `aria-hidden` 장식도 가장자리의 아이콘으로 칩니다. 그래서 로딩 중에 아이콘을 Spinner 로 바꿔도 라벨이 움직이지 않습니다.
@@ -874,7 +879,7 @@ export const toggleStyle = tv({
 | variant            | 켜짐(`data-pressed`)                                                     |
 | ------------------ | ------------------------------------------------------------------------ |
 | `ghost`, `outline` | neutral press 배경(`--control-press`)                                    |
-| `soft`             | scheme 의 옅은 배경과 `--control-accent` 글자                            |
+| `soft`             | `--control-soft` 배경과 `--control-on-soft` 글자                         |
 | `solid`            | scheme 배경과 `--control-on-fill` 글자, `shadow-xs`                      |
 | `glossy`           | scheme 배경과 `--control-on-fill` 글자, 광택, 진한 가장자리, `shadow-sm` |
 

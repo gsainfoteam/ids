@@ -95,6 +95,9 @@ import { Chip } from '@gsainfoteam/ids-react';
 <Chip disabled />             // 누를 수도, 지울 수도 없다
 ```
 
+- `primary` 의 `soft` 는 `secondary` 배경에 `on-secondary` 글자, `outline` 은 `accent` 글자입니다. 밝은 테마 색에서도 4.5:1 을 지킵니다.
+- 상태 색의 `soft` 와 `outline` 글자는 `*-strong` 입니다.
+
 ## 상태와 data 속성
 
 | 속성                                                          | 뜻                       |

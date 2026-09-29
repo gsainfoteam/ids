@@ -27,7 +27,7 @@ const picture = `data:image/svg+xml;utf8,${encodeURIComponent(
 )}`;
 
 const tile = cn(
-  'flex items-center justify-center rounded-standard bg-(--ids-color-primary)/15 text-body-b3-medium text-(--ids-color-primary)',
+  'flex items-center justify-center rounded-standard bg-(--ids-color-secondary) text-body-b3-medium text-(--ids-color-on-secondary)',
 );
 
 export const Playground: Story = {

@@ -17,7 +17,7 @@ export const toggleSurface = {
     soft: cn(
       'bg-transparent text-(--control-quiet)',
       'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
-      'data-pressed:bg-(--control-fill)/10 data-pressed:text-(--control-accent)',
+      'data-pressed:bg-(--control-soft) data-pressed:text-(--control-on-soft)',
     ),
     solid: cn(
       'bg-transparent text-(--control-quiet)',

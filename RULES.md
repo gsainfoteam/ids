@@ -339,6 +339,14 @@ only content and focus carry color. Buttons follow the same rule: only `solid` a
 the theme color, while `outline` and `ghost` stay neutral. `--ids-color-outline` is the
 theme-tinted line for the rare edge that should itself read as the brand.
 
+**Brand color has one role per background.** A brand fill (`primary`) carries `on-primary`; a soft
+brand surface is `secondary` with `on-secondary` text, and its hover and press mix 6% and 12% of
+`primary` in; brand-colored text or an icon sitting on the page with no brand fill behind it (an
+outline Badge or Chip, a Rating star, a Radio dot) is `accent`. Never write `primary` as a text
+color or `primary/10` as a soft fill: light hues such as yellow and cyan fall under 4.5:1 there.
+Every pair reaches 4.5:1 in both modes, which `tests/tokens-contrast.test.ts` checks. Status
+schemes keep their own ladder: `-strong` for text, the status color at 10% to 20% for tints.
+
 **Neutral states climb one step at a time.** A transparent control goes rest → hover `muted` →
 press `muted-hover`; a filled control goes `muted` → `muted-hover` → `muted-active`; a handle (a
 ScrollArea thumb, the Drawer handle) goes `handle` → `handle-hover` → `handle-active` while

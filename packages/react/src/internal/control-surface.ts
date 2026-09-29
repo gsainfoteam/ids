@@ -7,40 +7,46 @@ export type ControlColorScheme = 'primary' | 'neutral' | 'danger' | 'success' | 
 const schemes = {
   primary: cn(
     '[--control-fill:var(--ids-color-primary)] [--control-on-fill:var(--ids-color-on-primary)]',
-    '[--control-accent:var(--ids-color-primary)] [--control-quiet:var(--ids-color-on-surface)]',
+    '[--control-soft:var(--ids-color-secondary)] [--control-on-soft:var(--ids-color-on-secondary)]',
+    '[--control-quiet:var(--ids-color-on-surface)]',
     '[--control-hover:var(--ids-color-muted)] [--control-press:var(--ids-color-muted-hover)]',
     '[--control-ring:var(--ids-color-primary)]',
   ),
   neutral: cn(
     '[--control-fill:var(--ids-color-on-surface)] [--control-on-fill:var(--ids-color-surface)]',
-    '[--control-accent:var(--ids-color-on-surface)] [--control-quiet:var(--ids-color-on-surface)]',
+    '[--control-soft:color-mix(in_oklab,var(--ids-color-on-surface)_10%,transparent)] [--control-on-soft:var(--ids-color-on-surface)]',
+    '[--control-quiet:var(--ids-color-on-surface)]',
     '[--control-hover:var(--ids-color-muted)] [--control-press:var(--ids-color-muted-hover)]',
     '[--control-ring:var(--ids-color-primary)]',
   ),
   danger: cn(
     '[--control-fill:var(--ids-color-danger)] [--control-on-fill:var(--ids-color-on-danger)]',
-    '[--control-accent:var(--ids-color-danger-strong)] [--control-quiet:var(--ids-color-danger-strong)]',
+    '[--control-soft:color-mix(in_oklab,var(--ids-color-danger)_10%,transparent)] [--control-on-soft:var(--ids-color-danger-strong)]',
+    '[--control-quiet:var(--ids-color-danger-strong)]',
     '[--control-hover:color-mix(in_oklab,var(--ids-color-danger)_10%,transparent)]',
     '[--control-press:color-mix(in_oklab,var(--ids-color-danger)_16%,transparent)]',
     '[--control-ring:var(--ids-color-danger)]',
   ),
   success: cn(
     '[--control-fill:var(--ids-color-success)] [--control-on-fill:var(--ids-color-on-success)]',
-    '[--control-accent:var(--ids-color-success-strong)] [--control-quiet:var(--ids-color-success-strong)]',
+    '[--control-soft:color-mix(in_oklab,var(--ids-color-success)_10%,transparent)] [--control-on-soft:var(--ids-color-success-strong)]',
+    '[--control-quiet:var(--ids-color-success-strong)]',
     '[--control-hover:color-mix(in_oklab,var(--ids-color-success)_10%,transparent)]',
     '[--control-press:color-mix(in_oklab,var(--ids-color-success)_16%,transparent)]',
     '[--control-ring:var(--ids-color-success)]',
   ),
   warning: cn(
     '[--control-fill:var(--ids-color-warning)] [--control-on-fill:var(--ids-color-on-warning)]',
-    '[--control-accent:var(--ids-color-warning-strong)] [--control-quiet:var(--ids-color-warning-strong)]',
+    '[--control-soft:color-mix(in_oklab,var(--ids-color-warning)_10%,transparent)] [--control-on-soft:var(--ids-color-warning-strong)]',
+    '[--control-quiet:var(--ids-color-warning-strong)]',
     '[--control-hover:color-mix(in_oklab,var(--ids-color-warning)_10%,transparent)]',
     '[--control-press:color-mix(in_oklab,var(--ids-color-warning)_16%,transparent)]',
     '[--control-ring:var(--ids-color-warning)]',
   ),
   info: cn(
     '[--control-fill:var(--ids-color-info)] [--control-on-fill:var(--ids-color-on-info)]',
-    '[--control-accent:var(--ids-color-info-strong)] [--control-quiet:var(--ids-color-info-strong)]',
+    '[--control-soft:color-mix(in_oklab,var(--ids-color-info)_10%,transparent)] [--control-on-soft:var(--ids-color-info-strong)]',
+    '[--control-quiet:var(--ids-color-info-strong)]',
     '[--control-hover:color-mix(in_oklab,var(--ids-color-info)_10%,transparent)]',
     '[--control-press:color-mix(in_oklab,var(--ids-color-info)_16%,transparent)]',
     '[--control-ring:var(--ids-color-info)]',
@@ -48,6 +54,11 @@ const schemes = {
 } satisfies Record<ControlColorScheme, string>;
 
 const fallbackScheme = schemes.primary;
+
+const softTintsTowardFill = cn(
+  '[--control-soft-hover:color-mix(in_oklab,var(--control-soft),var(--control-fill)_6%)]',
+  '[--control-soft-press:color-mix(in_oklab,var(--control-soft),var(--control-fill)_12%)]',
+);
 
 const ringFollowsScheme = cn(
   'focus-visible:ring-(--control-ring)/40 data-focus-visible:ring-(--control-ring)/40',
@@ -76,6 +87,7 @@ export const controlSurface = {
     'motion-reduce:transition-none',
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
     fallbackScheme,
+    softTintsTowardFill,
   ),
   size: {
     standard: cn(
@@ -95,8 +107,8 @@ export const controlSurface = {
       'data-hovered:bg-(--control-fill)/90 data-active:bg-(--control-fill)/80',
     ),
     soft: cn(
-      'bg-(--control-fill)/10 text-(--control-accent)',
-      'data-hovered:bg-(--control-fill)/15 data-active:bg-(--control-fill)/20',
+      'bg-(--control-soft) text-(--control-on-soft)',
+      'data-hovered:bg-(--control-soft-hover) data-active:bg-(--control-soft-press)',
     ),
     outline: cn(
       'bg-(--ids-color-surface) text-(--control-quiet) shadow-xs',

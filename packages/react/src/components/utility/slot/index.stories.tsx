@@ -32,7 +32,7 @@ function Tag({
       {...props}
       data-tag=""
       className={cn(
-        'text-caption-c1-medium inline-flex h-6 items-center rounded-full bg-(--ids-color-primary)/10 px-2.5 text-(--ids-color-primary)',
+        'text-caption-c1-medium inline-flex h-6 items-center rounded-full bg-(--ids-color-secondary) px-2.5 text-(--ids-color-on-secondary)',
         className,
       )}
     />
@@ -91,7 +91,7 @@ export const Gallery: Story = {
 
 export const MergesClassName: Story = {
   render: () => (
-    <Slot className="px-2 text-(--ids-color-primary)">
+    <Slot className="px-2 text-(--ids-color-accent)">
       <span className="px-4 underline">양쪽 className이 합쳐진다</span>
     </Slot>
   ),
@@ -105,7 +105,7 @@ export const MergesClassName: Story = {
   play: async ({ canvas }) => {
     const span = canvas.getByText('양쪽 className이 합쳐진다');
     await expect(span).toHaveClass('underline');
-    await expect(span).toHaveClass('text-(--ids-color-primary)');
+    await expect(span).toHaveClass('text-(--ids-color-accent)');
     await expect(span).toHaveClass('px-2');
     await expect(span).not.toHaveClass('px-4');
   },

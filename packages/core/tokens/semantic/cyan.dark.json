@@ -4,6 +4,7 @@
     "on-primary": { "$value": "{neutral.950}", "$type": "color" },
     "secondary": { "$value": "{cyan.950}", "$type": "color" },
     "on-secondary": { "$value": "{cyan.400}", "$type": "color" },
+    "accent": { "$value": "{cyan.500}", "$type": "color" },
     "outline": { "$value": "{cyan.800}", "$type": "color" }
   }
 }

@@ -8,7 +8,7 @@ export const ratingStyle = tv({
   slots: {
     root: [
       'relative inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-standard outline-none',
-      '[--rating-accent:var(--ids-color-primary)]',
+      '[--rating-accent:var(--ids-color-accent)]',
       'data-invalid:[--rating-accent:var(--ids-color-danger)]',
       'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-(--ids-color-primary)/40',
       'data-disabled:opacity-50',
