@@ -175,6 +175,9 @@ importers:
       '@tanstack/react-table':
         specifier: ^9.2.4
         version: 9.2.4(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@tanstack/table-core':
+        specifier: ^9.2.4
+        version: 9.2.4
       cn:
         specifier: ^0.4.0
         version: 0.4.0
