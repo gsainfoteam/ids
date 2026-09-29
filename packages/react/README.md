@@ -500,6 +500,17 @@ pnpm lint
 
 외부 headless 라이브러리(Radix, Base UI 등)에 의존하지 않고 전부 직접 구현한다.
 
+### 시각 회귀
+
+- 모든 `Gallery` 스토리를 라이트와 다크로 찍어 `tests/__screenshots__` 의 기준 이미지와 비교합니다.
+- 기준 이미지는 Playwright Linux 이미지(`mcr.microsoft.com/playwright`, `linux/amd64`) 안에서만 만듭니다. 글꼴, 래스터라이저, Chromium 빌드가 같아야 픽셀이 같기 때문입니다. macOS 나 일반 CI 러너에서는 이 테스트를 건너뜁니다.
+- Docker 가 필요합니다.
+
+```bash
+pnpm test:visual          # 기준 이미지와 비교. 다르면 packages/react/.vitest/visual 에 실제와 차이 이미지를 남긴다
+pnpm test:visual:update   # 의도한 변화라면 기준 이미지를 다시 만든다. 새 PNG 를 변경과 같은 커밋에 넣는다
+```
+
 ## Field
 
 `Field`는 Label/Description/Hint/Error를 입력에 자동 연결합니다.

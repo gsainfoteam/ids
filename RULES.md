@@ -36,6 +36,8 @@ pnpm build            # Build all packages (turbo, css before react)
 pnpm typecheck        # TypeScript check all packages
 pnpm lint             # ESLint all packages
 pnpm test             # Build, then Vitest: browser tests, every story's play, SSR and hydration of every story, dist checks
+pnpm test:visual      # Compare every Gallery, light and dark, with the baselines, in the Playwright Linux image (Docker)
+pnpm test:visual:update  # Render the Gallery baselines again in that image and write them to tests/__screenshots__
 pnpm examples:build   # Build the Next.js, TanStack Start and Astro examples
 pnpm examples:check   # Check their server-rendered HTML and CSS for IDS
 pnpm size             # Gzip size of Button, Dialog, Select and the whole ids-react entry against .size-limit.json
@@ -498,7 +500,7 @@ Dialog, Drawer, Popover, Menu, Tooltip, Toast and the field popups are all assem
 
 ## Tests
 
-`pnpm test` builds the packages, then runs Vitest in `packages/react` (`vitest.config.ts`) as four
+`pnpm test` builds the packages, then runs Vitest in `packages/react` (`vitest.config.ts`) as five
 projects:
 
 - `browser`: `tests/**/*.test.tsx` render from `src` in headless Chromium through Playwright, with
@@ -511,6 +513,18 @@ projects:
 - `clipboard`: the browser files that call `userEvent.copy` / `cut` / `paste` or
   `navigator.clipboard`, one file at a time. Every browser context shares one system clipboard, so
   two such files in parallel paste each other's text. The config finds them by those calls.
+- `visual`: `tests/gallery.visual.test.tsx` renders every story named `Gallery` in light and dark at
+  1440px wide, grows the viewport to the story's height and compares it with `toMatchScreenshot`
+  against `tests/__screenshots__/gallery.visual.test.tsx/<category>-<component>-<mode>-chromium-linux.png`.
+  The fonts come from npm (`pretendard-gov`, `@fontsource/monaspace-neon`, pinned in
+  `tests/visual.css`), `Date` is fixed and animations are stopped, so nothing but the code and the
+  image changes a pixel. The baselines are rendered only in `mcr.microsoft.com/playwright:v<playwright
+  version>-noble` on `linux/amd64`, through `scripts/visual.mjs`, which `pnpm test:visual`, its
+  `:update` and the CI `visual` job all run. Anywhere else (macOS, the plain CI runner) the tests
+  skip with that reason, because the fonts, the rasterizer and the Chromium build differ; never
+  commit a baseline rendered outside the image. After an intended visual change, run
+  `pnpm test:visual:update` and commit the new PNGs with the change; a failing run leaves the
+  actual and diff images in `packages/react/.vitest/visual` (a CI artifact on failure).
 - `ssr`: `tests/**/*.ssr.test.tsx` run in Node with no DOM. `tests/stories.ssr.test.tsx` renders
   every story with `renderToString` and fails on a throw or any `console.error` / `console.warn`,
   so a module that touches `window` or `document` at import or during render fails here. Code that
