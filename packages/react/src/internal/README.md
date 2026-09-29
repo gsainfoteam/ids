@@ -92,7 +92,7 @@ Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
 ### 쓰는 곳
 
 - [control-surface.ts](#control-surfacets) 의 solid variant: Button, IconButton, FloatingButton
-- Calendar 의 선택한 날, TimePicker 의 선택한 옵션: `primaryFill`
+- Calendar 의 선택한 날, TimePicker 의 선택한 옵션, Stepper 의 완료와 현재 단계 표시: `primaryFill`
 
 ### 쓰는 법
 

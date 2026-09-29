@@ -147,6 +147,7 @@
 | --- | --- | --- | --- | --- |
 | Breadcrumb | [Breadcrumb](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/) | 링크마다 Tab 이 멈춘다. 접힌 항목은 Menu 와 같다(`Enter` `Space` `↓` 열기, `↑` `↓`, `Escape`) | `nav` 랜드마크("이동 경로") 안의 `ol` `li`. 현재 페이지는 `aria-current="page"`, 구분자는 `aria-hidden`. 접기 버튼은 "숨은 경로 보기" + `aria-haspopup="menu"`, 접힌 링크는 `menuitem` | 한 페이지에 둘 이상 두면 `aria-label` 로 이름을 나눠야 한다. 구분자 자동 삽입은 `Breadcrumb` 이나 `Breadcrumb.List` 의 바로 아래 Item 만 센다 |
 | Tabs | [Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/) | 탭 목록 전체가 Tab 한 칸이고 고른 탭에 멈춘다. `←` `→`(세로면 `↑` `↓`), `Home` `End`, 끝에서 처음으로 돈다. `automatic`(기본)은 옮기면 고르고, `manual` 은 `Enter` `Space` 로 고른다. 다음 Tab 은 내용(`tabpanel`)으로 | `tablist` + `aria-orientation`, 탭은 `tab` + `aria-selected` `aria-controls`, 내용은 `tabpanel` + `aria-labelledby` + `tabIndex=0`. 비활성 탭은 native `disabled` | 비활성 탭은 포커스를 받지 않고 건너뛴다(APG 는 포커스를 허용). 탭이 넘쳐도 목록이 스크롤하지 않는다. 목록 이름(`aria-label`)은 앱이 준다 |
+| Stepper | 없음 (`ol` 목록 + [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/), roving tabindex) | 목록 전체가 Tab 한 칸이고 현재 단계에서 멈춘다. 방향키 다음과 이전 단계(끝에서 멈춤), `Home` `End`, `Enter` `Space` 로 옮기기 | 단계는 `ol` 의 `li`(이름 "진행 단계"), 누를 수 있으면 `button` + `aria-current="step"`, 이름은 제목과 "완료", "오류", 설명은 `aria-describedby`. 번호와 아이콘은 `aria-hidden`. 표시 전용이면 현재 `li` 에 `aria-current` | linear 에서 먼 단계는 `disabled` 라 키보드로 들르지 않는다. 가로 방향에서도 `↑` `↓` 가 단계를 옮긴다 |
 
 ### overlay
 

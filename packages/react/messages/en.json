@@ -178,6 +178,11 @@
   "spinner": {
     "label": "Loading"
   },
+  "stepper": {
+    "completed": "Completed",
+    "error": "Error",
+    "label": "Progress"
+  },
   "telField": {
     "country": "Country",
     "countrySearch": "Search countries or calling codes",

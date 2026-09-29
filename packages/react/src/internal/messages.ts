@@ -180,6 +180,11 @@ export const messages = {
   spinner: {
     label: '불러오는 중',
   },
+  stepper: {
+    completed: '완료',
+    error: '오류',
+    label: '진행 단계',
+  },
   telField: {
     country: '국가',
     countrySearch: '국가 또는 국가 번호 검색',

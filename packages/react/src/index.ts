@@ -93,6 +93,8 @@ export type {
   TabsOrientation,
   TabsActivationMode,
 } from './components/navigation/tabs';
+export { Stepper } from './components/navigation/stepper';
+export type { StepperOrientation, StepperStatus } from './components/navigation/stepper';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
