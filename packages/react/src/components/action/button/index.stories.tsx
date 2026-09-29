@@ -347,9 +347,10 @@ export const DevelopmentWarnings: Story = {
     docs: {
       description: {
         story:
-          '개발 빌드에서는 잘못 쓴 버튼을 콘솔에 알립니다. 아이콘만 든 Button은 IconButton을 권하고, 버튼 안의 버튼은 ButtonGroup을 권합니다.',
+          '개발 빌드에서는 잘못 쓴 버튼을 콘솔에 알립니다. 아이콘만 든 Button은 IconButton을 권하고, 버튼 안의 버튼은 ButtonGroup을 권합니다. 버튼 안의 버튼은 일부러 보여 주는 잘못된 예라 이 스토리만 axe 의 nested-interactive 검사를 끕니다.',
       },
     },
+    a11y: { options: { rules: { 'nested-interactive': { enabled: false } } } },
   },
   play: async ({ canvas, userEvent }) => {
     const warn = spyOn(console, 'warn').mockImplementation(() => {});

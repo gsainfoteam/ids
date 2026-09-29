@@ -113,7 +113,7 @@ export const MergesClassName: Story = {
 
 export const MergesStyle: Story = {
   render: () => (
-    <Slot style={{ color: 'var(--ids-color-primary)' }}>
+    <Slot style={{ color: 'var(--ids-color-accent)' }}>
       <span style={{ color: 'red', fontWeight: 600 }}>style 합치기</span>
     </Slot>
   ),
@@ -123,7 +123,7 @@ export const MergesStyle: Story = {
   play: async ({ canvas }) => {
     const span = canvas.getByText('style 합치기');
     await expect(span.style.fontWeight).toBe('600');
-    await expect(span.style.color).toBe('var(--ids-color-primary)');
+    await expect(span.style.color).toBe('var(--ids-color-accent)');
   },
 };
 

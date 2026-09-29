@@ -299,7 +299,8 @@ export const ListboxAsViewport: Story = {
               key={index}
               role="option"
               aria-selected={index === 0}
-              className="rounded-standard px-2.5 py-1.5 aria-selected:bg-(--ids-color-muted)"
+              tabIndex={index === 0 ? 0 : -1}
+              className="focus-ring rounded-standard px-2.5 py-1.5 aria-selected:bg-(--ids-color-muted)"
             >
               도시 {index + 1}
             </div>

@@ -143,7 +143,7 @@ function Pair({ background, foreground }: { background: string; foreground: stri
   );
 }
 
-const panel = cn('concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)');
+const panel = cn('w-max concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)');
 
 const columnLabel = cn('text-caption-c1-medium text-(--ids-color-on-muted)');
 

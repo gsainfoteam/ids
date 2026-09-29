@@ -22,6 +22,8 @@
 - **자동 검사.** `pnpm test` 가 매 커밋마다 돌립니다.
   - `packages/react/tests/*.test.tsx` 는 Chromium 에서 실제 클릭과 키 입력으로 역할, 접근 가능한 이름, `aria-*` 상태, 포커스 이동을 확인합니다.
   - `tests/stories.test.tsx` 는 모든 스토리를 렌더하고 `play` 에 적은 키보드와 스크린 리더 관련 단언을 실행합니다.
+  - 같은 테스트가 모든 스토리를 라이트와 다크 모드에서 한 번씩 그리고, `play` 뒤에 [axe-core](https://github.com/dequelabs/axe-core) 로 WCAG 2.0, 2.1, 2.2 의 A, AA 규칙을 검사합니다. 위반이 하나라도 있으면 실패합니다. 같은 설정을 Storybook 의 Accessibility 패널(`@storybook/addon-a11y`)도 씁니다.
+  - axe 는 사람이 판단해야 하는 항목(경계선 대비, 누를 대상 크기, 툴팁 위로 마우스 옮기기, 읽는 순서)을 잡지 못합니다. 아래 공통 한계와 수동 점검이 그 몫입니다.
   - `tests/hydration.test.tsx` 와 `tests/stories.ssr.test.tsx` 는 서버 HTML 에 라벨 연결(`id`, `aria-labelledby`, `aria-describedby`)이 처음부터 들어 있는지 확인합니다.
 - **수동 점검.** 자동 검사로 알 수 없는 것(실제 스크린 리더가 읽는 순서와 문장, 모바일 제스처)은 [수동 점검 체크리스트](#수동-점검-체크리스트) 로 사람이 확인합니다.
 

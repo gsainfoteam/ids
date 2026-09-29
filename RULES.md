@@ -503,9 +503,11 @@ projects:
 
 - `browser`: `tests/**/*.test.tsx` render from `src` in headless Chromium through Playwright, with
   Tailwind and the IDS CSS loaded and reduced motion on. `tests/stories.test.tsx` renders every
-  story and runs its `play` through portable stories (`composeStories` + `run()`); a story tagged
-  `'!test'` is skipped. `tests/hydration.test.tsx` renders every story with `renderToString`,
-  hydrates that HTML with `hydrateRoot` and fails on a recoverable error or any `console.error`.
+  story and runs its `play` through portable stories (`composeStories` + `run()`), once in light
+  and once in dark mode, then runs axe-core over the page with the WCAG 2.0, 2.1 and 2.2 A and AA
+  tags and fails with one line per rule, node and fix; a story tagged `'!test'` is skipped.
+  `tests/hydration.test.tsx` renders every story with `renderToString`, hydrates that HTML with
+  `hydrateRoot` and fails on a recoverable error or any `console.error`.
 - `clipboard`: the browser files that call `userEvent.copy` / `cut` / `paste` or
   `navigator.clipboard`, one file at a time. Every browser context shares one system clipboard, so
   two such files in parallel paste each other's text. The config finds them by those calls.
@@ -545,6 +547,15 @@ Chromium once per machine:
   (an inline `transition-duration`) and end it with `getAnimations().forEach((a) => a.finish())`,
   or fake only the clock involved: `vi.useFakeTimers({ toFake: ['Date'] })`.
 - Console output of passing tests is hidden. Run with `--silent=false` to see React warnings.
+
+**Accessibility.** The axe options live in `parameters.a11y` of `.storybook/preview.tsx`, which
+`@storybook/addon-a11y` reads for the Accessibility panel too, so the panel and the test check the
+same rules. A violation is fixed in the component, with a test, or in the story when only its
+scaffolding is wrong. A rule is never turned off for the project. A story that shows a misuse on
+purpose (Button's `DevelopmentWarnings` nests a button in a button) turns off that one rule with
+`parameters: { a11y: { options: { rules: { 'nested-interactive': { enabled: false } } } } }` and
+says why in its description. The decorator gives `<html>` the story's `data-mode`, so a gallery
+wider than the 414px viewport sits on the theme's surface and not on a white page.
 
 **Stories.** In `play` functions, query elements again after each `await`, since the theme decorator
 may remount the story. Inputs whose focus a play checks carry `data-1p-ignore` and
