@@ -5,24 +5,26 @@ import { type ComponentProps } from 'react';
 import { cssColor } from './color';
 import { usePicker } from './context';
 import { GRADIENT_DIRECTION } from './gradient';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { mergeProps } from '../../../utils';
 
 export type ColorPickerAreaProps = Omit<ComponentProps<'div'>, 'children'>;
 
 export function ColorPickerArea({ className, style, ...props }: ColorPickerAreaProps) {
+  const t = useTranslate();
+
   const c = usePicker('ColorPicker.Area');
   const { color, rgba } = c.picker.state;
   const saturation = Math.round(color.s * 100);
   const brightness = Math.round(color.v * 100);
-  const valueText = messages.colorPicker.areaValue(saturation, brightness);
+  const valueText = t('colorPicker.areaValue', { saturation, brightness });
   const channel = {
     type: 'range',
     min: 0,
     max: 100,
     step: 1,
     'aria-valuetext': valueText,
-    'aria-roledescription': messages.colorPicker.twoD,
+    'aria-roledescription': t('colorPicker.twoD'),
     'aria-readonly': c.state.readOnly || undefined,
     disabled: c.state.disabled,
     className: c.styles.channel(),
@@ -35,7 +37,7 @@ export function ColorPickerArea({ className, style, ...props }: ColorPickerAreaP
         onPointerMove: c.picker.area.onPointerMove,
       })}
       role="group"
-      aria-label={props['aria-label'] ?? messages.colorPicker.area}
+      aria-label={props['aria-label'] ?? t('colorPicker.area')}
       dir={GRADIENT_DIRECTION}
       data-color-picker-area=""
       data-disabled={c.state.disabled ? '' : undefined}
@@ -58,13 +60,13 @@ export function ColorPickerArea({ className, style, ...props }: ColorPickerAreaP
       />
       <input
         {...channel}
-        aria-label={messages.colorPicker.saturation}
+        aria-label={t('colorPicker.saturation')}
         value={saturation}
         onChange={(event) => c.picker.actions.onChannelChange('saturation', event)}
       />
       <input
         {...channel}
-        aria-label={messages.colorPicker.brightness}
+        aria-label={t('colorPicker.brightness')}
         aria-orientation="vertical"
         tabIndex={-1}
         value={brightness}

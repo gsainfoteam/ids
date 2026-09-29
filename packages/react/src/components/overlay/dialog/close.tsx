@@ -5,7 +5,7 @@ import { type ComponentProps, type MouseEvent } from 'react';
 import { XMarkIcon } from '@heroicons/react/16/solid';
 
 import { useDialogContext } from './context';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { part } from '../../../utils';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
@@ -13,6 +13,8 @@ import { IconButton } from '../../action/icon-button';
 export type DialogCloseProps = Omit<ComponentProps<'button'>, 'type'> & { asChild?: boolean };
 
 export function DialogClose({ asChild, children, onClick, ...props }: DialogCloseProps) {
+  const t = useTranslate();
+
   const { dialog } = useDialogContext('Dialog.Close');
 
   const close = (event: MouseEvent<HTMLButtonElement>) => {
@@ -25,7 +27,7 @@ export function DialogClose({ asChild, children, onClick, ...props }: DialogClos
   if (children == null)
     return (
       <IconButton
-        aria-label={messages.dialog.close}
+        aria-label={t('dialog.close')}
         {...props}
         variant="ghost"
         size="tiny"

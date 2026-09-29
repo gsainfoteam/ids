@@ -20,6 +20,7 @@ import { Root } from './picker-root';
 import { calendarStyle } from './style';
 import { useCalendar, type CalendarModifiers, type CalendarState } from './use-calendar';
 import { resolveLocale, weekStartOf, type WeekDay } from '../../../internal/date-locale';
+import { useProviderLocale, useTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
@@ -90,6 +91,8 @@ const dayPickerParts = {
 };
 
 export function CalendarRoot(props: CalendarProps) {
+  const t = useTranslate();
+  const providerLocale = useProviderLocale();
   const {
     selectionMode = 'single',
     value,
@@ -142,7 +145,7 @@ export function CalendarRoot(props: CalendarProps) {
     dir,
   });
   const { state } = api;
-  const resolvedLocale = resolveLocale(locale);
+  const resolvedLocale = resolveLocale(locale ?? providerLocale);
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const styles = calendarStyle({ size: resolvedSize });
 
@@ -215,7 +218,7 @@ export function CalendarRoot(props: CalendarProps) {
           hidden: styles.hidden(),
           footer: styles.footer(),
         }}
-        labels={dayPickerLabels(resolvedLocale, numerals)}
+        labels={dayPickerLabels(resolvedLocale, numerals, t)}
         formatters={dayPickerFormatters(resolvedLocale, numerals)}
         components={dayPickerParts}
         onDayMouseEnter={api.onDayMouseEnter}

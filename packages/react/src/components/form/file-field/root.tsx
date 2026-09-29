@@ -26,8 +26,8 @@ import { fileFieldStyle } from './style';
 import { FileTrigger } from './trigger';
 import { useFileField, type FileFieldValue } from './use-file-field';
 import { FormValue } from '../../../internal/form-value';
-import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
+import { useTranslate } from '../../../internal/translate';
 import { flattenFragments, invariant, mergeRefs } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -105,6 +105,8 @@ const joinIds = (...ids: Array<string | undefined | false>) =>
   ids.filter(Boolean).join(' ') || undefined;
 
 export function FileFieldRoot(props: FileFieldProps) {
+  const t = useTranslate();
+
   const {
     multiple = false,
     value,
@@ -179,11 +181,14 @@ export function FileFieldRoot(props: FileFieldProps) {
   const id = providedId ?? `ids-file-${uid}`;
   const errorId = `${id}-rejections`;
   const limitsId = `${id}-limits`;
-  const limits = describeLimits({
-    tokens: s.tokens,
-    maxSize,
-    maxCount: multiple ? maxCount : undefined,
-  });
+  const limits = describeLimits(
+    {
+      tokens: s.tokens,
+      maxSize,
+      maxCount: multiple ? maxCount : undefined,
+    },
+    t,
+  );
   const showsInvalid =
     s.rejections.length > 0 ? true : (ariaInvalid ?? invalid) === true || ariaInvalid === 'true';
   const state: FileFieldState = {
@@ -255,9 +260,7 @@ export function FileFieldRoot(props: FileFieldProps) {
         size: resolvedSize,
         placeholder:
           placeholder ??
-          (appearance === 'dropzone'
-            ? messages.fileField.dropzone
-            : messages.fileField.placeholder),
+          (appearance === 'dropzone' ? t('fileField.dropzone') : t('fileField.placeholder')),
         limits,
         limitsId,
         triggerProps,
@@ -320,10 +323,10 @@ export function FileFieldRoot(props: FileFieldProps) {
               <div key={fileKey(file)}>
                 {file.name}:{' '}
                 {reason === 'type'
-                  ? messages.fileField.rejectType
+                  ? t('fileField.rejectType')
                   : reason === 'size'
-                    ? messages.fileField.rejectSize(formatBytes(maxSize ?? 0))
-                    : messages.fileField.rejectCount(multiple ? (maxCount ?? 0) : 1)}
+                    ? t('fileField.rejectSize', { max: formatBytes(maxSize ?? 0) })
+                    : t('fileField.rejectCount', { max: multiple ? (maxCount ?? 0) : 1 })}
               </div>
             ))}
           </div>

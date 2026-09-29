@@ -18,8 +18,8 @@ import { ColorFieldTrigger } from './trigger';
 import { useColorField } from './use-color-field';
 import { FieldPopup, FieldPopupHeader, useDrawerPresentation } from '../../../internal/field-popup';
 import { FormValue } from '../../../internal/form-value';
-import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
+import { useTranslate } from '../../../internal/translate';
 import {
   flattenFragments,
   invariant,
@@ -89,7 +89,7 @@ export function ColorFieldRoot({
   readOnly = false,
   required = false,
   disabled = false,
-  placeholder = messages.colorField.placeholder,
+  placeholder: placeholderProp,
   open,
   defaultOpen,
   onOpenChange,
@@ -103,6 +103,9 @@ export function ColorFieldRoot({
   onBlur,
   ...native
 }: ColorFieldProps) {
+  const t = useTranslate();
+  const placeholder = placeholderProp ?? t('colorField.placeholder');
+
   const { rootRef, triggerRef, ...field } = useColorField({
     value,
     defaultValue,
@@ -235,7 +238,7 @@ export function ColorFieldRoot({
           id={popupId}
           {...(native['aria-labelledby']
             ? { 'aria-labelledby': native['aria-labelledby'] }
-            : { 'aria-label': native['aria-label'] ?? messages.colorField.dialog })}
+            : { 'aria-label': native['aria-label'] ?? t('colorField.dialog') })}
           data-color-field-popup={popupId}
           className={styles.popup()}
           onBlur={(event) => {
@@ -250,8 +253,8 @@ export function ColorFieldRoot({
         >
           {drawer && (
             <FieldPopupHeader
-              title={messages.colorField.dialog}
-              closeLabel={messages.colorField.close}
+              title={t('colorField.dialog')}
+              closeLabel={t('colorField.close')}
               onClose={() => actions.close(true)}
             />
           )}

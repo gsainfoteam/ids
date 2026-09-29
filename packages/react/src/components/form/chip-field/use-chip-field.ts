@@ -25,7 +25,7 @@ import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { revealPopupOption } from '../../../internal/field-popup';
 import { isComposingKey, keyHandler, withModifiers } from '../../../internal/keys';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { matchesQuery, type SelectOption } from '../select/select-options';
 
 export const CREATE = null;
@@ -69,6 +69,8 @@ export function useChipField({
   readOnly,
   drawer,
 }: UseChipFieldOptions) {
+  const t = useTranslate();
+
   const [selected, setValue] = useControllableState<string[]>({
     value,
     defaultValue: defaultValue ?? [],
@@ -99,7 +101,7 @@ export function useChipField({
   const exists = !!findOption(options, trimmed) || selected.some((item) => sameText(item, trimmed));
   const canCreate = creatable && !!trimmed && !full && !exists;
   const createError = canCreate
-    ? validationError(validate?.(trimmed), messages.chipField.invalid)
+    ? validationError(validate?.(trimmed), t('chipField.invalid'))
     : null;
   const createRow: Candidate[] = canCreate && !createError ? [CREATE] : [];
   const candidates: Candidate[] = [...enabled.map((option) => option.value), ...createRow];

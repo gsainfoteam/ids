@@ -13,7 +13,6 @@ import {
 import { menuStyle } from './style';
 import { type MenuLevel, type MenuPlacement } from './use-menu';
 import { keyHandler, withModifiers } from '../../../internal/keys';
-import { messages } from '../../../internal/messages';
 import {
   FloatingList,
   OverlayItemContext,
@@ -21,6 +20,7 @@ import {
   showInTopLayer,
   type AnchoredSide,
 } from '../../../internal/overlay';
+import { useTranslate } from '../../../internal/translate';
 import { mergeProps } from '../../../utils';
 import { ScrollArea } from '../../layout/scroll-area';
 
@@ -158,6 +158,8 @@ function NestedMenuContent({
   alignOffset = -5,
   ...props
 }: Menu.ContentProps) {
+  const t = useTranslate();
+
   const { level } = useMenuContext('Menu.Content');
   const parent = useContentContext('Menu.Content');
 
@@ -168,6 +170,6 @@ function NestedMenuContent({
   const label = level.trigger?.textContent?.trim() ?? '';
 
   return (
-    <MenuPopup {...props} level={level} name={{ 'aria-label': messages.menu.submenu(label) }} />
+    <MenuPopup {...props} level={level} name={{ 'aria-label': t('menu.submenu', { label }) }} />
   );
 }

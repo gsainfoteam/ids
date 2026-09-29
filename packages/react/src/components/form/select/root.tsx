@@ -30,8 +30,8 @@ import { SelectValue } from './value';
 import { FieldPopup, useDrawerPresentation } from '../../../internal/field-popup';
 import { type FieldTriggerVariant } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
-import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
+import { useTranslate } from '../../../internal/translate';
 import {
   elementTypeOf,
   flattenFragments,
@@ -125,6 +125,8 @@ const isForeignComponent = (node: ReactNode): boolean =>
     : typeof elementTypeOf(node) === 'function' && !PARTS.has(elementTypeOf(node)));
 
 export function SelectRoot(props: SelectProps) {
+  const t = useTranslate();
+
   const {
     selectionMode = 'single',
     value,
@@ -133,7 +135,7 @@ export function SelectRoot(props: SelectProps) {
     open,
     defaultOpen,
     onOpenChange,
-    placeholder = messages.select.placeholder,
+    placeholder = t('select.placeholder'),
     variant = 'outline',
     size,
     invalid,
@@ -266,7 +268,7 @@ export function SelectRoot(props: SelectProps) {
 
   const listLabel = native['aria-labelledby']
     ? { 'aria-labelledby': native['aria-labelledby'] }
-    : { 'aria-label': native['aria-label'] ?? messages.select.listbox };
+    : { 'aria-label': native['aria-label'] ?? t('select.listbox') };
 
   return (
     <SelectContext
@@ -311,7 +313,7 @@ export function SelectRoot(props: SelectProps) {
           anchor={rootRef}
           onClose={select.actions.close}
           mobileVariant={mobileVariant}
-          label={native['aria-label'] ?? messages.select.listbox}
+          label={native['aria-label'] ?? t('select.listbox')}
           aria-labelledby={drawer ? native['aria-labelledby'] : undefined}
           data-select-popup={ids.base}
           onBlur={(event) => {

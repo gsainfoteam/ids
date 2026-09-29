@@ -4,7 +4,7 @@ import { type ComponentProps, type ReactNode } from 'react';
 
 import { useTelContext } from './context';
 import { callingCodeOf, countryOptions, type CountryCode } from './phone';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { Select } from '../select';
 
 export type TelFieldCountrySelectProps = Omit<ComponentProps<'button'>, 'children'> & {
@@ -21,6 +21,8 @@ export function TelFieldCountrySelect({
   'aria-label': ariaLabel,
   ...props
 }: TelFieldCountrySelectProps) {
+  const t = useTranslate();
+
   const { field, state, locale, styles } = useTelContext('CountrySelect');
   return (
     <Select
@@ -28,7 +30,7 @@ export function TelFieldCountrySelect({
       onValueChange={(next) => {
         if (typeof next === 'string') field.changeCountry(next as CountryCode);
       }}
-      aria-label={ariaLabel ?? messages.telField.country}
+      aria-label={ariaLabel ?? t('telField.country')}
       disabled={state.disabled}
       readOnly={state.readOnly}
       size={state.size}
@@ -48,7 +50,7 @@ export function TelFieldCountrySelect({
         )}
       </Select.Trigger>
       <Select.Content>
-        <Select.SearchField placeholder={searchPlaceholder ?? messages.telField.countrySearch} />
+        <Select.SearchField placeholder={searchPlaceholder ?? t('telField.countrySearch')} />
         {countryOptions(locale).map((option) => (
           <Select.Item
             key={option.code}

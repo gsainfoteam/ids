@@ -30,7 +30,9 @@
     "./tanstack-form": {
       "types": "./dist/tanstack-form.d.ts",
       "default": "./dist/tanstack-form.js"
-    }
+    },
+    "./messages/ko.json": "./dist/messages/ko.json",
+    "./messages/en.json": "./dist/messages/en.json"
   },
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json",
@@ -95,6 +97,7 @@
     "eslint-plugin-storybook": "10.3.1",
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.4.0",
+    "intl-messageformat": "^12.1.2",
     "jsdom": "^26.1.0",
     "playwright": "^1.63.0",
     "prettier": "^3.8.1",

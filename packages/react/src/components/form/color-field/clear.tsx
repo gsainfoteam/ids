@@ -5,7 +5,7 @@ import { isValidElement, type ComponentProps, type ReactElement } from 'react';
 import { XMarkIcon } from '@heroicons/react/16/solid';
 
 import { useColorFieldContext } from './context';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { invariant, mergeEventHandlers } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 
@@ -21,13 +21,15 @@ export function ColorFieldClear({
   onClick,
   ...props
 }: ColorFieldClearProps) {
+  const t = useTranslate();
+
   const c = useColorFieldContext('ColorField.Clear');
 
   if (!c.field.state.value || c.state.readOnly) return null;
 
   const button = {
     ...props,
-    'aria-label': props['aria-label'] ?? messages.colorField.clear,
+    'aria-label': props['aria-label'] ?? t('colorField.clear'),
     disabled: c.state.disabled,
     'data-color-field-clear': '',
     variant: 'ghost' as const,

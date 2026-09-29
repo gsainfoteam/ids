@@ -4,7 +4,7 @@ import { type ComponentProps, type PointerEvent, type ReactNode } from 'react';
 
 import { useChip } from './context';
 import { CREATE } from './use-chip-field';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { keepFocusWhereItIs, mergeProps, part } from '../../../utils';
 
 export type ChipCreateProps = Omit<ComponentProps<'div'>, 'children'> & {
@@ -13,6 +13,8 @@ export type ChipCreateProps = Omit<ComponentProps<'div'>, 'children'> & {
 };
 
 export function ChipCreate({ asChild, children, className, ...props }: ChipCreateProps) {
+  const t = useTranslate();
+
   const c = useChip('Create');
   const { state: s, ids, actions } = c.field;
   if (!s.canCreate) return null;
@@ -22,7 +24,7 @@ export function ChipCreate({ asChild, children, className, ...props }: ChipCreat
     error ??
     (typeof children === 'function'
       ? children(s.trimmed)
-      : (children ?? messages.chipField.create(s.trimmed)));
+      : (children ?? t('chipField.create', { text: s.trimmed })));
 
   return part(
     'div',

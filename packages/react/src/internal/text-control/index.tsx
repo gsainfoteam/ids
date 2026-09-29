@@ -15,7 +15,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { IconButton } from '../../components/action/icon-button';
 import { elementTypeOf, flattenFragments, invariant, mergeProps } from '../../utils';
 import { type FieldSurfaceVariant } from '../field-surface';
-import { messages } from '../messages';
+import { useTranslate } from '../translate';
 import { type textControlStyle } from './style';
 
 import type { IdsSize } from '../../tokens/types';
@@ -127,6 +127,8 @@ export function TextControlClear({
   onClick,
   ...props
 }: TextControlClearProps) {
+  const t = useTranslate();
+
   const context = use(TextControlContext);
   invariant(context, '`Clear` must be used inside a text field.');
   const { state, styles } = context;
@@ -138,7 +140,7 @@ export function TextControlClear({
   const internal = {
     type: 'button' as const,
     tabIndex: -1,
-    'aria-label': props['aria-label'] ?? messages.textField.clear,
+    'aria-label': props['aria-label'] ?? t('textField.clear'),
     'aria-controls': context.inputId,
     'data-text-control-clear': '',
     onPointerDown: keepFocusInInput,

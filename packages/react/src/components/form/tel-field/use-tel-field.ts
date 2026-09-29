@@ -33,13 +33,13 @@ import {
   type TelFieldFormat,
 } from './phone';
 import { useFormReset } from '../../../hooks/use-form-reset';
-import { messages } from '../../../internal/messages';
 import {
   isInvalid,
   replaceInput,
   useMergedRef,
   useTextControl,
 } from '../../../internal/text-control';
+import { useTranslate } from '../../../internal/translate';
 import { invariant, mergeProps } from '../../../utils';
 import { FieldNotifyContext } from '../field/context';
 
@@ -92,6 +92,8 @@ export function useTelField({
   invalid,
   clearable,
 }: UseTelFieldOptions) {
+  const t = useTranslate();
+
   invariant(
     isSupportedCountry(defaultCountry),
     '`<TelField>` `defaultCountry` must be a supported ISO alpha-2 code.',
@@ -157,7 +159,7 @@ export function useTelField({
   });
 
   const holdsIncompleteNumber = current !== '' && !isCompletePhone(current);
-  const validity = holdsIncompleteNumber ? messages.telField.invalid : '';
+  const validity = holdsIncompleteNumber ? t('telField.invalid') : '';
   useLayoutEffect(() => {
     inputRef.current?.setCustomValidity(validity);
     notify?.();

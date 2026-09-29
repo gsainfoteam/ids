@@ -5,7 +5,7 @@ import { useCallback, useRef } from 'react';
 import { spinnerStyle } from './style';
 import { useSpinner } from './use-spinner';
 import { Arc } from '../../../internal/arc';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
@@ -21,6 +21,8 @@ export function SpinnerRoot({
   ref,
   ...rest
 }: Spinner.Props) {
+  const t = useTranslate();
+
   const resolvedSize = useFieldSize(size);
   const svgRef = useRef<SVGSVGElement>(null);
   const mergedRef = useCallback(
@@ -48,7 +50,7 @@ export function SpinnerRoot({
       />
       {announcement !== 'silent' && (
         <span role="status" className="sr-only">
-          {announcement === 'announced' ? (ariaLabel ?? messages.spinner.label) : null}
+          {announcement === 'announced' ? (ariaLabel ?? t('spinner.label')) : null}
         </span>
       )}
     </>

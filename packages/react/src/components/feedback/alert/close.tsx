@@ -6,7 +6,7 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 
 import { useAlertContext } from './context';
 import { resolve } from './part-props';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { mergeEventHandlers } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 
@@ -18,10 +18,12 @@ export type AlertCloseProps = Omit<ComponentProps<'button'>, 'className' | 'type
 };
 
 export function AlertClose({ className, children, onClick, ...props }: AlertCloseProps) {
+  const t = useTranslate();
+
   const { state, styles, close } = useAlertContext('Alert.Close');
   return (
     <IconButton
-      aria-label={messages.alert.close}
+      aria-label={t('alert.close')}
       {...props}
       variant="ghost"
       colorScheme={state.colorScheme}

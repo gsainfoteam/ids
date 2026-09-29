@@ -4,7 +4,7 @@ import { type ComponentProps, type ReactElement } from 'react';
 
 import { useFile } from './context';
 import { GhostButton } from './ghost-button';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 
 export type FileClearProps = Omit<ComponentProps<'button'>, 'children'> & {
   asChild?: boolean;
@@ -12,6 +12,8 @@ export type FileClearProps = Omit<ComponentProps<'button'>, 'children'> & {
 };
 
 export function FileClear({ className, onClick, ...props }: FileClearProps) {
+  const t = useTranslate();
+
   const c = useFile('FileField.Clear');
   const { files, rejections } = c.field.state;
   if ((!files.length && !rejections.length) || c.state.readOnly) return null;
@@ -19,7 +21,7 @@ export function FileClear({ className, onClick, ...props }: FileClearProps) {
   return (
     <GhostButton
       {...props}
-      aria-label={props['aria-label'] ?? messages.fileField.clear}
+      aria-label={props['aria-label'] ?? t('fileField.clear')}
       disabled={c.state.disabled}
       data-file-field-clear=""
       size={c.size}

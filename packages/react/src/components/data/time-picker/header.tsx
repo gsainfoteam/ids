@@ -3,17 +3,19 @@
 import { type ComponentProps } from 'react';
 
 import { useTimePickerContext } from './context';
-import { defaultUnits, unitMessage } from './units';
+import { defaultUnits, unitMessageKey } from './units';
 import { withDefault } from './with-default';
+import { useTranslate } from '../../../internal/translate';
 import { mergeProps, part } from '../../../utils';
 
 export type TimePickerHeaderProps = ComponentProps<'div'> & { asChild?: boolean };
 
 export function TimePickerHeader({ asChild, children, ...props }: TimePickerHeaderProps) {
+  const t = useTranslate();
   const c = useTimePickerContext('TimePicker.Header');
   const labels = defaultUnits(c.state.precision, c.state.hourCycle, c.periodLeads).map((unit) => (
     <span key={unit} className={c.styles.headerLabel()}>
-      {unitMessage[unit]}
+      {t(unitMessageKey[unit])}
     </span>
   ));
   return part(

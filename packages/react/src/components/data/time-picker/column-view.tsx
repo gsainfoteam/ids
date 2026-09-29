@@ -3,9 +3,10 @@
 import { useId } from 'react';
 
 import { useTimePickerContext } from './context';
-import { unitMessage } from './units';
+import { unitMessageKey } from './units';
 import { useTimeColumn } from './use-time-picker';
 import { withDefault } from './with-default';
+import { useTranslate } from '../../../internal/translate';
 import { mergeProps, part } from '../../../utils';
 import { ScrollArea } from '../../layout/scroll-area';
 
@@ -18,6 +19,7 @@ export function ColumnView({
   children,
   ...props
 }: Omit<TimePickerColumnProps, 'unit'> & { unit: TimeUnit }) {
+  const t = useTranslate();
   const c = useTimePickerContext(unit === 'period' ? 'TimePicker.Period' : 'TimePicker.Column');
   const id = useId();
   const column = useTimeColumn(c, unit);
@@ -47,7 +49,7 @@ export function ColumnView({
     mergeProps(props, {
       ref: column.node,
       role: 'listbox',
-      'aria-label': props['aria-label'] ?? unitMessage[unit],
+      'aria-label': props['aria-label'] ?? t(unitMessageKey[unit]),
       'aria-orientation': 'vertical',
       'aria-disabled': c.state.disabled || undefined,
       'aria-readonly': c.state.readOnly || undefined,

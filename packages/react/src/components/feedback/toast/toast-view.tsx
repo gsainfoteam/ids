@@ -7,8 +7,8 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 import { toasterStyle } from './style';
 import { dismissToast, type ToastRecord } from './toast-store';
 import { useToast, type SwipeDirections } from './use-toast';
-import { messages } from '../../../internal/messages';
 import { announcedAssertively, statusIcons } from '../../../internal/status-palette';
+import { useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
 import { Spinner } from '../spinner';
@@ -52,6 +52,8 @@ export function ToastView({
   register,
   releaseFocus,
 }: ToastViewProps) {
+  const t = useTranslate();
+
   const { ref, place, mounted, ending, swiping, swipedOut, swipeHandlers } = useToast({
     record,
     position,
@@ -108,7 +110,7 @@ export function ToastView({
         )}
         <div className={styles.content()}>
           <div data-toast-title="" className={styles.title()}>
-            {record.message}
+            {record.message ?? (record.loading ? t('toast.loading') : null)}
           </div>
           {record.description != null && (
             <div data-toast-description="" className={styles.description()}>
@@ -128,7 +130,7 @@ export function ToastView({
           </Button>
         )}
         <IconButton
-          aria-label={messages.toast.close}
+          aria-label={t('toast.close')}
           variant="ghost"
           colorScheme="neutral"
           icon={<XMarkIcon />}

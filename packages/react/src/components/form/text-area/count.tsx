@@ -5,7 +5,7 @@ import { type ComponentProps, type ReactNode } from 'react';
 import { useTextAreaContext } from './context';
 import { resolve, type StateValue } from './state-value';
 import { countState, useCountAnnouncement, type CountState } from './use-text-area';
-import { messages } from '../../../internal/messages';
+import { useTranslate, type Translate } from '../../../internal/translate';
 
 export type TextAreaCountProps = Omit<ComponentProps<'span'>, 'children' | 'className'> & {
   threshold?: number;
@@ -14,25 +14,28 @@ export type TextAreaCountProps = Omit<ComponentProps<'span'>, 'children' | 'clas
   children?: StateValue<CountState, ReactNode>;
 };
 
-function defaultAnnouncement(state: CountState) {
+function defaultAnnouncement(state: CountState, t: Translate) {
   if (state.remaining === undefined) return '';
   return state.atLimit
-    ? messages.textArea.limitReached
-    : messages.textArea.remaining(state.remaining);
+    ? t('textArea.limitReached')
+    : t('textArea.remaining', { remaining: state.remaining });
 }
 
 export function TextAreaCount({
   threshold,
-  announce = defaultAnnouncement,
+  announce,
   className,
   children,
   id: _id,
   ...props
 }: TextAreaCountProps) {
+  const t = useTranslate();
   const { count, countId, styles } = useTextAreaContext('TextArea.Count');
 
   const state = countState(count.length, count.maxLength, threshold);
-  const spoken = useCountAnnouncement(state.nearLimit ? announce(state) : '');
+  const spoken = useCountAnnouncement(
+    state.nearLimit ? (announce?.(state) ?? defaultAnnouncement(state, t)) : '',
+  );
 
   return (
     <>
@@ -45,7 +48,9 @@ export function TextAreaCount({
         className={styles.count({ className: resolve(className, state) })}
       >
         {children === undefined
-          ? messages.textArea.count(state.count, state.maxLength)
+          ? state.maxLength === undefined
+            ? t('textArea.count', { count: state.count })
+            : t('textArea.countOfMax', { count: state.count, maxLength: state.maxLength })
           : resolve(children, state)}
       </span>
       <span role="status" className="sr-only">

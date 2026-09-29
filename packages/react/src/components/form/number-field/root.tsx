@@ -8,7 +8,6 @@ import { NumberFieldStepper } from './stepper';
 import { numberFieldStyle } from './style';
 import { useNumberField } from './use-number-field';
 import { type FieldSurfaceVariant } from '../../../internal/field-surface';
-import { messages } from '../../../internal/messages';
 import {
   Adornments,
   TextControlClear,
@@ -18,6 +17,7 @@ import {
   stateAttributes,
   type TextControlState,
 } from '../../../internal/text-control';
+import { useProviderLocale, useTranslate } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -41,7 +41,7 @@ export function NumberFieldRoot({
   step,
   smallStep,
   largeStep,
-  locale = 'en-US',
+  locale: localeProp,
   formatOptions,
   allowWheelScrub = false,
   hideStepper = false,
@@ -49,13 +49,19 @@ export function NumberFieldRoot({
   disabled,
   size,
   variant = 'outline',
-  incrementLabel = messages.numberField.increment,
-  decrementLabel = messages.numberField.decrement,
+  incrementLabel: incrementLabelProp,
+  decrementLabel: decrementLabelProp,
   className,
   style,
   children,
   ...rootProps
 }: NumberField.Props) {
+  const t = useTranslate();
+  const providerLocale = useProviderLocale();
+  const locale = localeProp ?? providerLocale ?? 'en-US';
+  const decrementLabel = decrementLabelProp ?? t('numberField.decrement');
+  const incrementLabel = incrementLabelProp ?? t('numberField.increment');
+
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const { items, leading, input, trailing } = splitAroundInput<NumberField.InputProps>(
     children,

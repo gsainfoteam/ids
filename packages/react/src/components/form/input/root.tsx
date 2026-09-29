@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { isDevelopment } from '../../../utils/dev';
 import { NumberField, type NumberFieldProps } from '../number-field';
 import { PasswordField, type PasswordFieldProps } from '../password-field';
@@ -30,6 +30,8 @@ const leaveAddressesAsTyped = {
 } as const;
 
 export function InputRoot(props: InputProps) {
+  const t = useTranslate();
+
   const { type = 'text' } = props;
   const supported = SUPPORTED.includes(type);
   useEffect(() => {
@@ -59,7 +61,7 @@ export function InputRoot(props: InputProps) {
           <>
             <MagnifyingGlassIcon />
             <TextField.Input />
-            <TextField.Clear aria-label={messages.input.clearSearch} />
+            <TextField.Clear aria-label={t('input.clearSearch')} />
           </>
         )}
       </TextField>

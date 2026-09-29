@@ -4,7 +4,7 @@ import { type ChangeEvent, type ComponentProps, type KeyboardEvent } from 'react
 
 import { useSelectContext } from './context';
 import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../internal/field-popup/search';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { mergeProps } from '../../../utils';
 
 export type SelectSearchFieldProps = Omit<ComponentProps<'input'>, 'size' | 'color'> & {
@@ -12,14 +12,16 @@ export type SelectSearchFieldProps = Omit<ComponentProps<'input'>, 'size' | 'col
 };
 
 export function SelectSearchField({ placeholder, ...props }: SelectSearchFieldProps) {
+  const t = useTranslate();
+
   const c = useSelectContext('Select.SearchField');
   const { state: s, ids } = c.select;
 
   const own = mergeProps(props as Record<string, unknown>, {
-    'aria-label': props['aria-label'] ?? messages.select.search,
+    'aria-label': props['aria-label'] ?? t('select.search'),
     'data-select-search': '',
     value: s.query,
-    placeholder: placeholder ?? messages.select.searchPlaceholder,
+    placeholder: placeholder ?? t('select.searchPlaceholder'),
     onChange: (event: ChangeEvent<HTMLInputElement>) =>
       c.select.actions.search(event.currentTarget.value),
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => c.select.onKeyDown(event, 'search'),

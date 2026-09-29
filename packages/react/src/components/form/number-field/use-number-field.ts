@@ -28,8 +28,8 @@ import { addDecimal, clampToStep, isOnStep, shiftDecimal, snapToStep } from './n
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { keyHandler, withModifiers } from '../../../internal/keys';
-import { messages } from '../../../internal/messages';
 import { isInvalid, useMergedRef, useTextControl } from '../../../internal/text-control';
+import { useTranslate } from '../../../internal/translate';
 import { invariant, mergeProps } from '../../../utils';
 import { FieldNotifyContext } from '../field/context';
 
@@ -130,6 +130,8 @@ export function useNumberField({
   invalid,
   clearable,
 }: UseNumberFieldOptions) {
+  const t = useTranslate();
+
   const stepSize = step ?? 1;
   const large = largeStep ?? shiftDecimal(stepSize, 1);
   const small = smallStep ?? shiftDecimal(stepSize, -1);
@@ -324,9 +326,9 @@ export function useNumberField({
     current == null
       ? ''
       : min !== undefined && current < min
-        ? messages.numberField.rangeUnderflow(format(min))
+        ? t('numberField.rangeUnderflow', { min: format(min) })
         : max !== undefined && current > max
-          ? messages.numberField.rangeOverflow(format(max))
+          ? t('numberField.rangeOverflow', { max: format(max) })
           : '';
   const notify = use(FieldNotifyContext);
   useLayoutEffect(() => {

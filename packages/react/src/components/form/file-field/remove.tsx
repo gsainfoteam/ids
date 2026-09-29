@@ -4,7 +4,7 @@ import { type ComponentProps, type ReactElement } from 'react';
 
 import { useFile } from './context';
 import { GhostButton } from './ghost-button';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 
 export type FileRemoveProps = Omit<ComponentProps<'button'>, 'children'> & {
   file: File;
@@ -13,13 +13,15 @@ export type FileRemoveProps = Omit<ComponentProps<'button'>, 'children'> & {
 };
 
 export function FileRemove({ file, className, onClick, ...props }: FileRemoveProps) {
+  const t = useTranslate();
+
   const c = useFile('FileField.Remove');
   if (c.state.readOnly) return null;
 
   return (
     <GhostButton
       {...props}
-      aria-label={props['aria-label'] ?? messages.fileField.remove(file.name)}
+      aria-label={props['aria-label'] ?? t('fileField.remove', { name: file.name })}
       disabled={c.state.disabled}
       data-file-field-remove=""
       size={c.size}

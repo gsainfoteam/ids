@@ -2,7 +2,7 @@ import { CalendarDate, DateFormatter, getDayOfWeek } from '@internationalized/da
 import { NumberFormatter } from '@internationalized/number';
 import { memoize, range } from 'es-toolkit';
 
-import { messages } from './messages';
+import { DEFAULT_LOCALE } from './messages';
 import { invariant } from '../utils';
 
 export type HourCycle = '12h' | '24h';
@@ -21,7 +21,7 @@ const canonicalTag = memoize((tag: string) => {
   }
 });
 
-export function resolveLocale(locale: string = messages.locale): string {
+export function resolveLocale(locale: string = DEFAULT_LOCALE): string {
   const canonical = typeof locale === 'string' ? canonicalTag(locale) : undefined;
   const shown = typeof locale === 'string' ? `"${locale}"` : `of type ${typeof locale}`;
   invariant(

@@ -8,7 +8,7 @@ import { ChipEmpty } from './empty';
 import { isType } from './is-type';
 import { ChipLimit } from './limit';
 import { FieldPopupSearch } from '../../../internal/field-popup/search';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { flattenFragments, mergeProps, part } from '../../../utils';
 import { ScrollArea } from '../../layout/scroll-area';
 import { slotChildren } from '../select/select-options';
@@ -18,6 +18,8 @@ import type { BoxProps } from './box-props';
 export type ChipContentProps = BoxProps;
 
 function DrawerSearch() {
+  const t = useTranslate();
+
   const c = useChip('Content');
   const { drawerInputRef } = c;
   const { state: s, ids, handlers } = c.field;
@@ -25,7 +27,7 @@ function DrawerSearch() {
   return (
     <FieldPopupSearch
       ref={drawerInputRef}
-      aria-label={messages.chipField.search}
+      aria-label={t('chipField.search')}
       data-chip-field-search=""
       value={s.query}
       placeholder={c.inputDefaults.placeholder}

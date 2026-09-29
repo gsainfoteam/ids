@@ -16,8 +16,8 @@ import { menuStyle } from './style';
 import { useCommandOption, useCommandPalette } from './use-command';
 import { selectItem } from './use-menu-item';
 import { FieldPopupSearch, type FieldPopupSearchProps } from '../../../internal/field-popup/search';
-import { messages } from '../../../internal/messages';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
+import { useTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, mergeProps, part } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { ScrollArea } from '../../layout/scroll-area';
@@ -97,6 +97,8 @@ function CommandPopup({
   children,
   ...props
 }: Menu.ContentProps) {
+  const t = useTranslate();
+
   const {
     open,
     ending,
@@ -122,7 +124,7 @@ function CommandPopup({
   const options = nodes.filter((node) => !searches.includes(node) && !empties.includes(node));
 
   const named = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined;
-  const name = named ? {} : { 'aria-label': messages.menu.command };
+  const name = named ? {} : { 'aria-label': t('menu.command') };
   const styles = menuStyle();
 
   return (
@@ -161,7 +163,7 @@ function CommandPopup({
                 ref={setList}
                 id={ids.list}
                 role="listbox"
-                aria-label={props['aria-label'] ?? messages.menu.command}
+                aria-label={props['aria-label'] ?? t('menu.command')}
                 data-menu-list=""
                 className={styles.list()}
               >
@@ -177,13 +179,15 @@ function CommandPopup({
 }
 
 export function CommandSearch({ placeholder, ...props }: Menu.SearchProps) {
+  const t = useTranslate();
+
   const palette = useCommandContext('Menu.Search');
 
   const own = mergeProps(props as Record<string, unknown>, {
-    'aria-label': props['aria-label'] ?? messages.menu.search,
+    'aria-label': props['aria-label'] ?? t('menu.search'),
     'data-menu-search': '',
     value: palette.query,
-    placeholder: placeholder ?? messages.menu.searchPlaceholder,
+    placeholder: placeholder ?? t('menu.searchPlaceholder'),
     onChange: (event: ChangeEvent<HTMLInputElement>) => palette.search(event.currentTarget.value),
     onKeyDown: palette.onSearchKeyDown,
   }) as Omit<FieldPopupSearchProps, 'controls' | 'activeDescendant'>;
@@ -200,12 +204,14 @@ export function CommandSearch({ placeholder, ...props }: Menu.SearchProps) {
 CommandSearch.displayName = 'Menu.Search';
 
 export function CommandEmpty({ asChild, children, className, ...props }: Menu.EmptyProps) {
+  const t = useTranslate();
+
   const palette = useCommandContext('Menu.Empty');
 
   return part(
     'div',
     asChild,
-    palette.empty ? (children ?? messages.menu.empty) : null,
+    palette.empty ? (children ?? t('menu.empty')) : null,
     mergeProps(props, {
       role: 'status',
       'data-menu-empty': '',

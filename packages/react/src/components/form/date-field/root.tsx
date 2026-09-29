@@ -5,13 +5,13 @@ import { CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { describeDates, isEmptyDates, sameDates, serializeDates } from './date-value';
 import { dateInputHint, parseDateText } from './parse';
 import { resolveLocale } from '../../../internal/date-locale';
-import { messages } from '../../../internal/messages';
 import { TemporalField, type TemporalFieldProps } from '../../../internal/temporal-field';
 import {
   dateOptions,
   formatter,
   type TemporalFormat,
 } from '../../../internal/temporal-field/format';
+import { useProviderLocale, useTranslate } from '../../../internal/translate';
 import { Calendar, CalendarPickContext, type CalendarOptions } from '../../data/calendar';
 import {
   emptyValue,
@@ -41,6 +41,9 @@ export type DateFieldProps = Omit<
   };
 
 export function DateFieldRoot(props: DateFieldProps) {
+  const t = useTranslate();
+  const providerLocale = useProviderLocale();
+
   const {
     selectionMode = 'single',
     value,
@@ -73,7 +76,7 @@ export function DateFieldRoot(props: DateFieldProps) {
   if (value !== undefined) validateValue(value, selectionMode);
   if (defaultValue !== undefined) validateValue(defaultValue, selectionMode);
 
-  const dateLocale = resolveLocale(locale);
+  const dateLocale = resolveLocale(locale ?? providerLocale);
   const formatDate = formatter(format, dateLocale, {
     defaults: dateOptions,
     toDate: toUtcDate,
@@ -96,13 +99,13 @@ export function DateFieldRoot(props: DateFieldProps) {
         isSame: sameDates,
         display: (next) => describeDates(next, selectionMode, formatDate),
         serialize: (next) => serializeDates(next, selectionMode),
-        messages: range
-          ? {
-              ...messages.dateField,
-              placeholder: messages.dateField.rangePlaceholder,
-              title: messages.dateField.rangeTitle,
-            }
-          : messages.dateField,
+        messages: {
+          placeholder: t(range ? 'dateField.rangePlaceholder' : 'dateField.placeholder'),
+          title: t(range ? 'dateField.rangeTitle' : 'dateField.title'),
+          clear: t('dateField.clear'),
+          close: t('dateField.close'),
+          open: t('dateField.open'),
+        },
         icon: CalendarDaysIcon,
         preferredWidth: cell * 7 * shown + MONTH_GAP * (shown - 1) + POPUP_PADDING_AND_BORDER,
         initialFocusSelector: '[data-calendar-day][tabindex="0"]',

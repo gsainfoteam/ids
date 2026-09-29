@@ -9,7 +9,7 @@ import { timePickerStyle } from './style';
 import { defaultUnits } from './units';
 import { useTimePicker, type TimePickerState } from './use-time-picker';
 import { periodFirst, resolveLocale } from '../../../internal/date-locale';
-import { messages } from '../../../internal/messages';
+import { useProviderLocale, useTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../../form/field/context';
 
@@ -65,7 +65,10 @@ export function TimePickerRoot({
   children,
   ...props
 }: TimePickerProps) {
-  const resolvedLocale = resolveLocale(locale);
+  const t = useTranslate();
+  const providerLocale = useProviderLocale();
+
+  const resolvedLocale = resolveLocale(locale ?? providerLocale);
   const api = useTimePicker({
     value,
     defaultValue,
@@ -113,7 +116,7 @@ export function TimePickerRoot({
       <div
         {...props}
         role="group"
-        aria-label={props['aria-label'] ?? messages.timePicker.label}
+        aria-label={props['aria-label'] ?? t('timePicker.label')}
         aria-disabled={disabled || undefined}
         data-time-picker=""
         data-variant={variant}

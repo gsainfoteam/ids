@@ -12,8 +12,8 @@ import { ColorPickerInput } from './input';
 import { colorPickerStyle } from './style';
 import { ColorPickerSwatches } from './swatches';
 import { useColorPicker } from './use-color-picker';
-import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
+import { useTranslate } from '../../../internal/translate';
 import { useFieldSize } from '../../form/field/context';
 
 import type { ColorFormat } from './color';
@@ -59,6 +59,8 @@ export function ColorPickerRoot({
   children,
   ...props
 }: ColorPickerProps) {
+  const t = useTranslate();
+
   const picker = useColorPicker({
     value,
     defaultValue,
@@ -77,7 +79,7 @@ export function ColorPickerRoot({
         role="group"
         {...props}
         aria-label={
-          props['aria-label'] ?? (props['aria-labelledby'] ? undefined : messages.colorPicker.label)
+          props['aria-label'] ?? (props['aria-labelledby'] ? undefined : t('colorPicker.label'))
         }
         data-color-picker=""
         data-size={resolvedSize}

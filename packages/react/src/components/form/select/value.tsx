@@ -3,7 +3,7 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
 import { useSelectContext } from './context';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { mergeProps, part } from '../../../utils';
 
 import type { SelectValueState } from '.';
@@ -23,6 +23,8 @@ export function SelectValue({
   className,
   ...props
 }: SelectValueProps) {
+  const t = useTranslate();
+
   const c = useSelectContext('Select.Value');
 
   const labels = c.select.state.selected.map(
@@ -45,7 +47,7 @@ export function SelectValue({
             </span>
             {labels.length > shown.length && (
               <span className={c.styles.more()}>
-                {messages.select.more(labels.length - shown.length)}
+                {t('select.more', { count: labels.length - shown.length })}
               </span>
             )}
           </>

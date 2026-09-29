@@ -5,7 +5,7 @@ import { type ComponentProps, type ReactNode } from 'react';
 import { useFile } from './context';
 import { fileKey } from './file-rules';
 import { FileItem } from './item';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { mergeProps, part } from '../../../utils';
 import { Item } from '../../data/item';
 
@@ -15,6 +15,8 @@ export type FileListProps = Omit<ComponentProps<'ul'>, 'children'> & {
 };
 
 export function FileList({ asChild, children, className, ...props }: FileListProps) {
+  const t = useTranslate();
+
   const c = useFile('FileField.List');
   const { files } = c.field.state;
   if (!files.length) return null;
@@ -24,7 +26,7 @@ export function FileList({ asChild, children, className, ...props }: FileListPro
       ? children(files)
       : (children ?? files.map((file) => <FileItem key={fileKey(file)} file={file} />));
   const list = {
-    'aria-label': props['aria-label'] ?? messages.fileField.list,
+    'aria-label': props['aria-label'] ?? t('fileField.list'),
     className: c.styles.list({ className }),
   };
 

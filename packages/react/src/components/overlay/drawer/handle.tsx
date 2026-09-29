@@ -3,12 +3,14 @@
 import { useCallback, type ComponentProps } from 'react';
 
 import { useDrawerContext } from './context';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { mergeRefs } from '../../../utils';
 
 export type DrawerHandleProps = Omit<ComponentProps<'button'>, 'type' | 'children'>;
 
 export function DrawerHandle({ ref, className, onClick, ...props }: DrawerHandleProps) {
+  const t = useTranslate();
+
   const { drawer, styles } = useDrawerContext('Drawer.Handle');
 
   const { setHandle } = drawer;
@@ -31,7 +33,7 @@ export function DrawerHandle({ ref, className, onClick, ...props }: DrawerHandle
   return (
     <button
       type="button"
-      aria-label={messages.drawer.handle}
+      aria-label={t('drawer.handle')}
       aria-controls={drawer.ids.content}
       {...props}
       ref={handleRef}

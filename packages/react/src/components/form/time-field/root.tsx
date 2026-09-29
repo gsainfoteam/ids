@@ -3,13 +3,13 @@
 import { ClockIcon } from '@heroicons/react/24/outline';
 
 import { resolveLocale } from '../../../internal/date-locale';
-import { messages } from '../../../internal/messages';
 import { TemporalField, type TemporalFieldProps } from '../../../internal/temporal-field';
 import {
   formatter,
   timeOptions,
   type TemporalFormat,
 } from '../../../internal/temporal-field/format';
+import { useProviderLocale, useTranslate } from '../../../internal/translate';
 import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
 import {
   onUtcSampleDay,
@@ -45,12 +45,14 @@ export function TimeFieldRoot({
   pickerVariant,
   ...props
 }: TimeFieldProps) {
+  const t = useTranslate();
+  const providerLocale = useProviderLocale();
   validateTime(props.value, 'TimeField');
   validateTime(props.defaultValue, 'TimeField');
   validateTime(min, 'TimeField');
   validateTime(max, 'TimeField');
 
-  const dateLocale = resolveLocale(locale);
+  const dateLocale = resolveLocale(locale ?? providerLocale);
   const display = formatter(format, dateLocale, {
     defaults: timeOptions(precision),
     toDate: onUtcSampleDay,
@@ -68,7 +70,12 @@ export function TimeFieldRoot({
         isSame: sameTime,
         display: (value) => display(value!),
         serialize: (value) => timeKey(value!, precision),
-        messages: messages.timeField,
+        messages: {
+          placeholder: t('timeField.placeholder'),
+          title: t('timeField.title'),
+          clear: t('timeField.clear'),
+          close: t('timeField.close'),
+        },
         icon: ClockIcon,
         initialFocusSelector: '[data-time-column]',
         picker: ({ value, change, size }) => (

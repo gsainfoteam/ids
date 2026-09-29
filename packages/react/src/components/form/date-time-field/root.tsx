@@ -27,7 +27,6 @@ import {
   type DateTimeLimits,
 } from './date-time';
 import { resolveLocale } from '../../../internal/date-locale';
-import { messages } from '../../../internal/messages';
 import {
   TemporalField,
   temporalFieldStyle,
@@ -40,6 +39,7 @@ import {
   timeOptions,
   type TemporalFormat,
 } from '../../../internal/temporal-field/format';
+import { useProviderLocale, useTranslate } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { Calendar, type CalendarOptions } from '../../data/calendar';
 import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
@@ -96,6 +96,8 @@ function Panel({
   pickerVariant,
   ...calendar
 }: PanelProps) {
+  const t = useTranslate();
+
   const styles = temporalFieldStyle({ size });
   const day = value ? dayOf(value) : today;
   const clock = value ? timeOfDay(value) : MIDNIGHT;
@@ -142,9 +144,7 @@ function Panel({
           disabled={unavailable}
           className="w-full sm:[--time-picker-height:calc(var(--time-option)*7)]"
         />
-        {unavailable && (
-          <p className={styles.panelHint()}>{messages.dateTimeField.pickDateFirst}</p>
-        )}
+        {unavailable && <p className={styles.panelHint()}>{t('dateTimeField.pickDateFirst')}</p>}
       </div>
     </div>
   );
@@ -177,6 +177,8 @@ export function DateTimeFieldRoot({
   footer,
   ...props
 }: DateTimeFieldProps) {
+  const t = useTranslate();
+  const providerLocale = useProviderLocale();
   [props.value, props.defaultValue, min, max].forEach(validateDateTime);
   invariant(
     !min || !max || compareDateTimes(min, max) <= 0,
@@ -185,7 +187,7 @@ export function DateTimeFieldRoot({
 
   const [mountedToday] = useState(() => todayIn(getLocalTimeZone()));
   const anchor = today ?? mountedToday;
-  const dateLocale = resolveLocale(locale);
+  const dateLocale = resolveLocale(locale ?? providerLocale);
   const display = formatter(format, dateLocale, {
     defaults: { ...dateOptions, ...timeOptions(precision) },
     toDate: toUtcDateTime,
@@ -206,7 +208,12 @@ export function DateTimeFieldRoot({
         isSame: sameInstant,
         display: (value) => display(value!),
         serialize: (value) => serializeDateTime(value!, precision),
-        messages: messages.dateTimeField,
+        messages: {
+          placeholder: t('dateTimeField.placeholder'),
+          title: t('dateTimeField.title'),
+          clear: t('dateTimeField.clear'),
+          close: t('dateTimeField.close'),
+        },
         icon: CalendarDaysIcon,
         preferredWidth:
           cell * 7 * monthsToShow +

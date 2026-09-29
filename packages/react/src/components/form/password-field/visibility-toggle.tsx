@@ -11,7 +11,7 @@ import {
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 import { usePasswordContext } from './context';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { invariant, mergeProps } from '../../../utils';
 import { IconToggle } from '../../action/icon-toggle';
 
@@ -36,6 +36,8 @@ export function PasswordFieldVisibilityToggle({
   onClick,
   ...props
 }: PasswordFieldVisibilityToggleProps) {
+  const t = useTranslate();
+
   const { state, toggle, inputProps, styles } = usePasswordContext('VisibilityToggle');
   const pressedByPointer = useRef(false);
   const shared = {
@@ -65,7 +67,7 @@ export function PasswordFieldVisibilityToggle({
       }),
     );
   }
-  const iconOnlyName = props['aria-label'] ?? messages.passwordField.show;
+  const iconOnlyName = props['aria-label'] ?? t('passwordField.show');
   const icon =
     typeof children === 'function'
       ? children(state)

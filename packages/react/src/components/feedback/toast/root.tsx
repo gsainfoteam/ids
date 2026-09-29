@@ -7,7 +7,7 @@ import { parseHotkey, useHotkey, type Hotkey } from '@tanstack/react-hotkeys';
 import { toasterStyle } from './style';
 import { ToastView } from './toast-view';
 import { useToaster } from './use-toaster';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { usePlatform } from '../../typography/kbd/use-kbd';
 
 import type { Toaster } from '.';
@@ -47,8 +47,11 @@ function ToasterRegion({
   hotkey = DEFAULT_HOTKEY,
   className,
   style,
-  'aria-label': ariaLabel = messages.toast.region,
+  'aria-label': ariaLabelProp,
 }: Toaster.Props & { explicit: boolean }) {
+  const t = useTranslate();
+  const ariaLabel = ariaLabelProp ?? t('toast.region');
+
   const toaster = useToaster({ explicit, max, gap, expand });
   const platform = usePlatform(undefined);
 

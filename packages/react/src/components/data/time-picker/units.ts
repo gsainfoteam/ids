@@ -1,13 +1,12 @@
-import { messages } from '../../../internal/messages';
-
 import type { HourCycle, TimePrecision, TimeUnit } from './time';
+import type { IdsMessageKey } from '../../../internal/messages';
 
-export const unitMessage: Record<TimeUnit, string> = {
-  hour: messages.timePicker.hour,
-  minute: messages.timePicker.minute,
-  second: messages.timePicker.second,
-  period: messages.timePicker.period,
-};
+export const unitMessageKey = {
+  hour: 'timePicker.hour',
+  minute: 'timePicker.minute',
+  second: 'timePicker.second',
+  period: 'timePicker.period',
+} as const satisfies Record<TimeUnit, IdsMessageKey>;
 
 export function defaultUnits(
   precision: TimePrecision,

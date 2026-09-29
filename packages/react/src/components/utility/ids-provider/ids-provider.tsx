@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type ComponentProps } from 'react';
+import { use, useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 
 import {
   ThemeContext,
@@ -9,6 +9,7 @@ import {
   type ThemeMode,
 } from './use-ids-provider';
 import { OverlayHost, PortalRootContext } from '../../../internal/overlay/host';
+import { LanguageContext, type IdsTranslate } from '../../../internal/translate';
 import { cn, mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { DefaultToaster } from '../../feedback/toast';
@@ -26,6 +27,8 @@ export function IdsProvider({
   mode,
   defaultMode,
   onModeChange,
+  translate,
+  locale,
   asChild = false,
   className,
   style,
@@ -41,6 +44,14 @@ export function IdsProvider({
     defaultMode,
     onModeChange,
   });
+  const inherited = use(LanguageContext);
+  const language = useMemo(
+    () => ({
+      translate: translate ?? inherited.translate,
+      locale: locale ?? inherited.locale,
+    }),
+    [translate, locale, inherited.translate, inherited.locale],
+  );
   const elementRef = useRef<HTMLElement>(null);
   const [element, setElement] = useState<HTMLElement | null>(null);
   const mergedRef = useCallback(
@@ -66,31 +77,33 @@ export function IdsProvider({
   );
 
   const themed = (
-    <ThemeContext value={context}>
-      <PortalRootContext value={element}>
-        <Root
-          {...rest}
-          ref={mergedRef}
-          data-color={context.color}
-          data-mode={context.resolvedMode}
-          className={cn(
-            paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
-            className,
-          )}
-          style={{ colorScheme: context.resolvedMode, ...style }}
-        >
-          {asChild ? (
-            children
-          ) : (
-            <>
-              {children}
-              {host}
-            </>
-          )}
-        </Root>
-        {asChild && host}
-      </PortalRootContext>
-    </ThemeContext>
+    <LanguageContext value={language}>
+      <ThemeContext value={context}>
+        <PortalRootContext value={element}>
+          <Root
+            {...rest}
+            ref={mergedRef}
+            data-color={context.color}
+            data-mode={context.resolvedMode}
+            className={cn(
+              paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+              className,
+            )}
+            style={{ colorScheme: context.resolvedMode, ...style }}
+          >
+            {asChild ? (
+              children
+            ) : (
+              <>
+                {children}
+                {host}
+              </>
+            )}
+          </Root>
+          {asChild && host}
+        </PortalRootContext>
+      </ThemeContext>
+    </LanguageContext>
   );
 
   return outermost ? <TooltipDelayGroup>{themed}</TooltipDelayGroup> : themed;
@@ -101,13 +114,15 @@ export namespace IdsProvider {
 
   export type State = ThemeContextValue;
 
-  export type Props = Omit<ComponentProps<'div'>, 'color'> & {
+  export type Props = Omit<ComponentProps<'div'>, 'color' | 'translate'> & {
     color?: IdsColor;
     defaultColor?: IdsColor;
     onColorChange?: (color: IdsColor) => void;
     mode?: Mode;
     defaultMode?: Mode;
     onModeChange?: (mode: Mode) => void;
+    translate?: IdsTranslate;
+    locale?: string;
     asChild?: boolean;
   };
 }

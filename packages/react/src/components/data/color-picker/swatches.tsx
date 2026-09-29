@@ -4,7 +4,7 @@ import { isValidElement, type ComponentProps } from 'react';
 
 import { usePicker } from './context';
 import { ColorPickerSwatch, type ColorPickerSwatchProps } from './swatch';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments } from '../../../utils';
 import { RadioGroup } from '../../form/radio-group';
 
@@ -20,6 +20,8 @@ const swatchValue = (swatch: ColorPickerSwatchOption) =>
   typeof swatch === 'string' ? swatch : swatch.value;
 
 export function ColorPickerSwatches({ className, children, ...props }: ColorPickerSwatchesProps) {
+  const t = useTranslate();
+
   const c = usePicker('ColorPicker.Swatches');
   const values = children
     ? flattenFragments(children).flatMap((node) =>
@@ -31,7 +33,7 @@ export function ColorPickerSwatches({ className, children, ...props }: ColorPick
   return (
     <RadioGroup
       {...props}
-      aria-label={props['aria-label'] ?? messages.colorPicker.swatches}
+      aria-label={props['aria-label'] ?? t('colorPicker.swatches')}
       value={values.find((item) => c.picker.actions.isCurrent(item)) ?? null}
       orientation="horizontal"
       disabled={c.state.disabled}

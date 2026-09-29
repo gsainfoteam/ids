@@ -9,11 +9,15 @@ import {
   type ParsedHotkey,
 } from '@tanstack/react-hotkeys';
 
-import type { messages } from '../../../internal/messages';
+import type { IdsMessageKey } from '../../../internal/messages';
 
 export type KbdPlatform = 'mac' | 'windows' | 'linux';
 export type KbdKeys = Hotkey | CanonicalModifier | 'Mod';
-export type KbdLabel = keyof typeof messages.kbd;
+export type KbdLabel = IdsMessageKey extends infer Key
+  ? Key extends `kbd.${infer Label}`
+    ? Label
+    : never
+  : never;
 export type KbdLabels = Partial<Record<KbdLabel, string>>;
 
 type Face = { glyph: string; label: KbdLabel };

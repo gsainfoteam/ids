@@ -5,8 +5,8 @@ import { isValidElement, type ComponentProps } from 'react';
 import { XMarkIcon } from '@heroicons/react/16/solid';
 
 import { useChipContext } from './context';
-import { messages } from '../../../internal/messages';
 import { useRegisteredId } from '../../../internal/surface';
+import { useTranslate } from '../../../internal/translate';
 import { IconButton } from '../../action/icon-button';
 
 export type ChipCloseProps = Omit<ComponentProps<'button'>, 'type'>;
@@ -20,6 +20,8 @@ export function ChipClose({
   'aria-label': ariaLabel,
   ...rest
 }: ChipCloseProps) {
+  const t = useTranslate();
+
   const context = useChipContext('Chip.Close');
   const closeId = useRegisteredId(undefined, id);
   const glyph = children ?? <XMarkIcon />;
@@ -48,7 +50,7 @@ export function ChipClose({
       variant="ghost"
       colorScheme={context.colorScheme}
       size={context.size}
-      aria-label={ariaLabel ?? messages.chip.remove}
+      aria-label={ariaLabel ?? t('chip.remove')}
       aria-labelledby={chipLabelThenOwnLabel}
       disabled={context.disabled}
       data-chip-close=""

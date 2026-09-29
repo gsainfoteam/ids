@@ -15,6 +15,7 @@ import {
   stateAttributes,
   type TextControlState,
 } from '../../../internal/text-control';
+import { useProviderLocale } from '../../../internal/translate';
 import { invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -35,7 +36,7 @@ export function TelFieldRoot({
   onValueChange,
   defaultCountry = 'KR',
   format = 'auto',
-  locale = 'ko-KR',
+  locale: localeProp,
   variant = 'outline',
   size,
   invalid,
@@ -45,6 +46,8 @@ export function TelFieldRoot({
   children,
   ...rootProps
 }: TelField.Props) {
+  const providerLocale = useProviderLocale();
+  const locale = localeProp ?? providerLocale ?? 'ko-KR';
   const resolvedSize = useFieldSize(size) ?? 'standard';
   const { items, leading, input, trailing } = splitAroundInput<TelField.InputProps>(
     children,

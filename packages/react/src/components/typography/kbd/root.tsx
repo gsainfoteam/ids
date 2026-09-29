@@ -6,7 +6,7 @@ import { GLYPH_ICONS } from './glyph-icons';
 import { orderedKeys, splitGlyphs, type KbdLabel, type ResolvedKey } from './keys';
 import { kbdStyle } from './style';
 import { KbdGroupContext, useKbd } from './use-kbd';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 
 import type { Kbd } from '.';
 
@@ -59,8 +59,9 @@ export function KbdRoot({
   children,
   ...rest
 }: Kbd.Props) {
+  const t = useTranslate();
   const kbd = useKbd({ size, platform, labels });
-  const name = (label: KbdLabel) => kbd.labels[label] ?? messages.kbd[label];
+  const name = (label: KbdLabel) => kbd.labels[label] ?? t(`kbd.${label}`);
   const ordered = keys ? orderedKeys(keys, kbd.platform) : [];
   const state: Kbd.State = {
     size: kbd.size,

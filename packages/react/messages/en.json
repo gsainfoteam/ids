@@ -1,0 +1,208 @@
+{
+  "alert": {
+    "close": "Close"
+  },
+  "avatarGroup": {
+    "overflow": "{count} more"
+  },
+  "calendar": {
+    "label": "Calendar",
+    "month": "Month",
+    "nextMonth": "Next month",
+    "previousMonth": "Previous month",
+    "selected": "Selected",
+    "today": "Today",
+    "weekNumber": "Week {week}",
+    "weekNumberHeader": "Week",
+    "year": "Year"
+  },
+  "checkboxGroup": {
+    "required": "Select at least one option."
+  },
+  "chip": {
+    "remove": "Remove"
+  },
+  "chipField": {
+    "create": "Add “{text}”",
+    "empty": "No results found.",
+    "invalid": "This value cannot be added.",
+    "limit": "{count, plural, one {You can pick up to # item.} other {You can pick up to # items.}}",
+    "listbox": "Options",
+    "placeholder": "Add an item…",
+    "remove": "Remove {label}",
+    "search": "Search items"
+  },
+  "colorField": {
+    "clear": "Clear color",
+    "close": "Close",
+    "dialog": "Pick a color",
+    "placeholder": "Pick a color"
+  },
+  "colorPicker": {
+    "alpha": "Opacity",
+    "area": "Saturation and brightness",
+    "areaValue": "Saturation {saturation}%, brightness {brightness}%",
+    "brightness": "Brightness",
+    "copied": "Copied",
+    "copy": "Copy color value",
+    "eyeDropper": "Pick a color from the screen",
+    "hue": "Hue",
+    "hueValue": "{degrees} degrees",
+    "input": "Color value",
+    "label": "Color picker",
+    "percent": "{value}%",
+    "saturation": "Saturation",
+    "swatches": "Swatches",
+    "twoD": "2D slider"
+  },
+  "dateField": {
+    "clear": "Clear date",
+    "close": "Close",
+    "open": "Open calendar",
+    "placeholder": "Pick a date",
+    "rangePlaceholder": "Pick a date range",
+    "rangeTitle": "Pick a date range",
+    "title": "Pick a date"
+  },
+  "dateTimeField": {
+    "clear": "Clear date and time",
+    "close": "Close",
+    "pickDateFirst": "Pick an available date first.",
+    "placeholder": "Pick a date and time",
+    "title": "Pick a date and time"
+  },
+  "dialog": {
+    "close": "Close"
+  },
+  "drawer": {
+    "close": "Close",
+    "handle": "Drag to resize"
+  },
+  "fileField": {
+    "clear": "Remove all files",
+    "count": "{count, plural, one {# file} other {# files}}",
+    "dropzone": "Drag files here or click to choose",
+    "dropzoneActive": "Drop here",
+    "kinds": {
+      "audio": "Audio",
+      "image": "Images",
+      "text": "Text",
+      "video": "Videos"
+    },
+    "limitCount": "{count, plural, one {Up to # file} other {Up to # files}}",
+    "limitSize": "Up to {max} per file",
+    "list": "Chosen files",
+    "placeholder": "Choose or drop files",
+    "rejectCount": "{max, plural, one {You can pick up to # file.} other {You can pick up to # files.}}",
+    "rejectSize": "Larger than {max}.",
+    "rejectType": "This file type is not allowed.",
+    "remove": "Remove {name}"
+  },
+  "input": {
+    "clearSearch": "Clear search"
+  },
+  "kbd": {
+    "alt": "Alt",
+    "backspace": "Backspace",
+    "capsLock": "Caps Lock",
+    "command": "Command",
+    "control": "Control",
+    "delete": "Delete",
+    "down": "Down Arrow",
+    "end": "End",
+    "enter": "Enter",
+    "escape": "Escape",
+    "fn": "Function",
+    "forwardDelete": "Forward Delete",
+    "home": "Home",
+    "left": "Left Arrow",
+    "macDelete": "Delete",
+    "option": "Option",
+    "pageDown": "Page Down",
+    "pageUp": "Page Up",
+    "return": "Return",
+    "right": "Right Arrow",
+    "shift": "Shift",
+    "space": "Space",
+    "super": "Super",
+    "tab": "Tab",
+    "up": "Up Arrow",
+    "windows": "Windows"
+  },
+  "menu": {
+    "command": "Commands",
+    "empty": "No results found.",
+    "search": "Search commands",
+    "searchPlaceholder": "Search commands…",
+    "submenu": "{label} submenu"
+  },
+  "numberField": {
+    "decrement": "Decrease",
+    "increment": "Increase",
+    "rangeOverflow": "The value must be {max} or less.",
+    "rangeUnderflow": "The value must be {min} or more."
+  },
+  "otpField": {
+    "label": "Verification code"
+  },
+  "passwordField": {
+    "capsLock": "Caps Lock is on.",
+    "show": "Show password"
+  },
+  "popover": {
+    "close": "Close"
+  },
+  "rating": {
+    "label": "Rating",
+    "required": "Select a rating.",
+    "valueLabel": "{value} out of {max}"
+  },
+  "select": {
+    "clear": "Clear selection",
+    "empty": "No results found.",
+    "listbox": "Options",
+    "more": "+{count}",
+    "placeholder": "Select an option",
+    "search": "Search options",
+    "searchPlaceholder": "Search…"
+  },
+  "slider": {
+    "end": "End",
+    "start": "Start"
+  },
+  "spinner": {
+    "label": "Loading"
+  },
+  "telField": {
+    "country": "Country",
+    "countrySearch": "Search countries or calling codes",
+    "invalid": "Enter a valid phone number."
+  },
+  "textArea": {
+    "count": "{count}",
+    "countOfMax": "{count} / {maxLength}",
+    "limitReached": "Character limit reached.",
+    "remaining": "{remaining, plural, one {# character left.} other {# characters left.}}"
+  },
+  "textField": {
+    "clear": "Clear"
+  },
+  "timeField": {
+    "clear": "Clear time",
+    "close": "Close",
+    "placeholder": "Pick a time",
+    "title": "Pick a time"
+  },
+  "timePicker": {
+    "hour": "Hour",
+    "label": "Time",
+    "minute": "Minute",
+    "period": "AM/PM",
+    "second": "Second"
+  },
+  "toast": {
+    "close": "Close notification",
+    "loading": "Working on it",
+    "region": "Notifications"
+  }
+}

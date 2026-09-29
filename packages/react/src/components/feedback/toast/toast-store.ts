@@ -1,6 +1,5 @@
 import type { CSSProperties, MouseEvent, ReactNode } from 'react';
 
-import { messages } from '../../../internal/messages';
 import { createExternalStore } from '../../../internal/overlay/external-store';
 
 import type { StatusColorScheme } from '../../../internal/status-palette';
@@ -125,7 +124,7 @@ function promise<T>(
   task: Promise<T> | (() => Promise<T>),
   { loading, success, error, ...options }: ToastPromiseMessages<T>,
 ) {
-  const id = create(kinds.loading, loading ?? messages.toast.loading, options);
+  const id = create(kinds.loading, loading, options);
   const settleOptions = { ...options, id };
 
   void (typeof task === 'function' ? task() : task).then(
@@ -157,8 +156,7 @@ export const toast = Object.assign(show, {
   success: creatorOf(kinds.success),
   warning: creatorOf(kinds.warning),
   error: creatorOf(kinds.error),
-  loading: ((message = messages.toast.loading, options) =>
-    create(kinds.loading, message, options)) as (
+  loading: ((message, options) => create(kinds.loading, message, options)) as (
     message?: ReactNode,
     options?: ToastOptions,
   ) => ToastId,

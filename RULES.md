@@ -375,6 +375,18 @@ has them all: drawn as text they fall back to a system font that sits them off c
 
 ## Component API
 
+**Strings.** User-facing strings go through `useTranslate()` with a stable dotted key
+(`t('dialog.close')`, `t('textArea.remaining', { remaining })`), never a Korean literal and never
+a module-level read of `messages`, so the nearest `IdsProvider translate` decides the language on
+the server and the client alike. The Korean defaults live nested in `internal/messages.ts`, sorted
+by group and key, as ICU strings with plain `{name}` arguments; a new key also goes into
+`messages/en.json` at the same place. `IdsMessageKey` is the union of their dotted leaf paths.
+Developer warnings stay English and out of the catalog. A default that has to be a function
+(`getValueLabel`) is built in the body from `t`, not in the parameter list. Dates, times and numbers
+take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
+keys and that no Korean literal sits in component code; `tests/translate.test.tsx` renders every
+story in English.
+
 **Callbacks.** A value callback is `onValueChange(value)`; other state callbacks are
 `onCheckedChange`, `onPressedChange`, `onOpenChange` and so on. `onChange` keeps the native event
 signature and only exists where a real input does. react-hook-form's `field.onChange` and TanStack

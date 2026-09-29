@@ -9,7 +9,7 @@ import { sliderStyle } from './style';
 import { SliderTrack } from './track';
 import { useSlider, type SliderValue } from './use-slider';
 import { FormValue } from '../../../internal/form-value';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { invariant, mergeProps } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -78,6 +78,8 @@ type SharedProps = Omit<
 export type SliderProps = SharedProps & (SingleProps | RangeProps);
 
 export function SliderRoot(props: SliderProps) {
+  const t = useTranslate();
+
   const {
     selectionMode = 'single',
     value,
@@ -99,7 +101,7 @@ export function SliderRoot(props: SliderProps) {
     marks = false,
     formatLabel,
     valueLabel = 'auto',
-    thumbLabels = [messages.slider.start, messages.slider.end],
+    thumbLabels = [t('slider.start'), t('slider.end')],
     className,
     style,
     children,

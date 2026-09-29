@@ -292,6 +292,94 @@ function ThemeToggle() {
 
 중첩, 시스템 모드, `asChild` 는 `src/components/utility/ids-provider/README.md` 를 참고한다.
 
+## 문구와 언어
+
+IDS 가 스스로 그리는 문구(닫기 버튼 이름, 달력 버튼, placeholder, 검증 문구, 스크린 리더 안내)는 기본이 한국어다. 앱의 i18n 라이브러리를 `IdsProvider` 에 한 번 꽂으면 그 언어로 바뀐다.
+
+```tsx
+<IdsProvider translate={(key, values) => myT(`ids.${key}`, values)} locale="en-US">
+  <App />
+</IdsProvider>
+```
+
+- `translate(key, values)` 는 문구 하나를 돌려준다. `undefined` 나 키 그대로를 돌려주면 그 문구는 한국어 기본값으로 돌아간다.
+- `key` 는 점으로 이은 경로(`'dialog.close'`, `'textArea.remaining'`)다. 타입은 `IdsMessageKey` 로 가져온다.
+- `values` 는 문구에 끼울 값(`{ count: 3 }`)이다. 문구는 ICU 메시지 문법이라 `{count, plural, one {…} other {…}}` 를 앱의 라이브러리가 포맷한다.
+- `locale` 은 날짜, 시간, 숫자, 국가 이름 형식에만 쓴다. 컴포넌트에 준 `locale` 이 이긴다.
+- 안쪽 `IdsProvider` 는 `translate`, `locale` 을 주지 않으면 바깥 것을 물려받고, 주면 그 안에서 바꾼다.
+- `translate` 는 함수라서, Next.js App Router 에서는 `IdsProvider` 를 감싼 클라이언트 컴포넌트에서 넘긴다.
+
+### 카탈로그
+
+패키지가 중첩 JSON 카탈로그 두 개를 내보낸다. 앱 번역 파일의 시작점이다.
+
+```ts
+import ko from '@gsainfoteam/ids-react/messages/ko.json'; // 한국어 기본값과 같다
+import en from '@gsainfoteam/ids-react/messages/en.json';
+```
+
+```json
+{ "calendar": { "previousMonth": "Previous month", "weekNumber": "Week {week}" }, "dialog": { "close": "Close" } }
+```
+
+- 앱 카탈로그의 `ids` 아래에 그대로 붙이면 `ids.dialog.close` 로 읽힌다. 바꾸고 싶은 문구만 고친다.
+- 빠진 키는 한국어 기본값으로 나온다. 새 버전에서 문구가 늘어도 깨지지 않는다.
+
+### next-intl
+
+```tsx
+'use client';
+
+export function IdsWithIntl({ children }: { children: React.ReactNode }) {
+  const t = useTranslations('ids');
+  const locale = useLocale();
+  return (
+    <IdsProvider translate={(key, values) => (t.has(key) ? t(key, values) : undefined)} locale={locale}>
+      {children}
+    </IdsProvider>
+  );
+}
+```
+
+- `messages/en.json` 을 앱 카탈로그의 `"ids"` 아래에 둔다.
+
+### i18next
+
+```tsx
+export function IdsWithI18next({ children }: { children: React.ReactNode }) {
+  const { t, i18n } = useTranslation();
+  const translate: IdsTranslate = (key, values) =>
+    i18n.exists(`ids.${key}`) ? t(`ids.${key}`, values) : undefined;
+  return <IdsProvider translate={translate} locale={i18n.language}>{children}</IdsProvider>;
+}
+```
+
+- 리소스의 `ids` 아래에 카탈로그를 둔다. ICU 문법(`{count}`, plural)을 읽으려면 [`i18next-icu`](https://github.com/i18next/i18next-icu) 를 쓴다.
+
+### react-intl
+
+FormatJS 는 평평한 id 를 쓰므로 카탈로그를 한 번 펼친다.
+
+```tsx
+const flatten = (tree: object, prefix = ''): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(tree).flatMap(([key, value]) =>
+      typeof value === 'string' ? [[prefix + key, value]] : Object.entries(flatten(value, `${prefix}${key}.`)),
+    ),
+  );
+
+<IntlProvider locale="en" messages={{ ...flatten(en, 'ids.'), ...appMessages }}>
+  <IdsWithIntl>{children}</IdsWithIntl>
+</IntlProvider>;
+
+function IdsWithIntl({ children }: { children: React.ReactNode }) {
+  const intl = useIntl();
+  const translate: IdsTranslate = (key, values) =>
+    intl.messages[`ids.${key}`] ? intl.formatMessage({ id: `ids.${key}` }, values) : undefined;
+  return <IdsProvider translate={translate} locale={intl.locale}>{children}</IdsProvider>;
+}
+```
+
 ## 인터랙션 state
 
 IDS는 hover / press / focus의 **소유권을 컴포넌트 안에 둔다.**  

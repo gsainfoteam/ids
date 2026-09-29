@@ -3,7 +3,7 @@
 import { type ComponentProps, type ReactNode, type SVGProps } from 'react';
 
 import { usePasswordContext } from './context';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 
 export type PasswordFieldCapsLockProps = Omit<ComponentProps<'span'>, 'children'> & {
   label?: string;
@@ -33,8 +33,10 @@ export function PasswordFieldCapsLock({
   children,
   ...props
 }: PasswordFieldCapsLockProps) {
+  const t = useTranslate();
+
   const { capsLock, styles } = usePasswordContext('CapsLock');
-  const text = label ?? messages.passwordField.capsLock;
+  const text = label ?? t('passwordField.capsLock');
   return (
     <>
       {capsLock && (

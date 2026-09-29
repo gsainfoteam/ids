@@ -3,12 +3,14 @@
 import { cssColor } from './color';
 import { usePicker } from './context';
 import { CHECKER, GRADIENT_DIRECTION, overChecker } from './gradient';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { Slider } from '../../form/slider';
 
 import type { ColorPicker } from '.';
 
 export function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.SliderProps) {
+  const t = useTranslate();
+
   const c = usePicker('ColorPicker.AlphaSlider');
   if (!c.alpha) return null;
   const { color, rgba } = c.picker.state;
@@ -22,9 +24,9 @@ export function ColorPickerAlphaSlider({ className, ...props }: ColorPicker.Slid
       largeStep={10}
       value={Math.round(color.a * 100)}
       onValueChange={(percent) => c.picker.actions.setChannel('alpha', percent)}
-      formatLabel={messages.colorPicker.percent}
+      formatLabel={(value: number) => t('colorPicker.percent', { value })}
       valueLabel="never"
-      aria-label={props['aria-label'] ?? messages.colorPicker.alpha}
+      aria-label={props['aria-label'] ?? t('colorPicker.alpha')}
       size={c.size}
       disabled={c.state.disabled}
       readOnly={c.state.readOnly}

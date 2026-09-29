@@ -110,17 +110,20 @@ function ThemeMenu() {
 
 ## 속성
 
-| 속성                                  | 기본 / 동작                                                 |
-| ------------------------------------- | ----------------------------------------------------------- |
-| `color` / `defaultColor`              | `blue` / `orange` / `green`. 둘 다 없으면 바깥을 물려받는다 |
-| `onColorChange`                       | 색 테마를 바꾸려 할 때                                      |
-| `mode` / `defaultMode`                | `light` / `dark` / `system`. 둘 다 없으면 바깥을 물려받는다 |
-| `onModeChange`                        | 모드를 바꾸려 할 때                                         |
-| `asChild`                             | 자식 요소에 속성을 붙인다                                   |
-| `className` / `style` / `ref` / 그 외 | 감싸는 요소(또는 자식)로 간다                               |
+| 속성                                  | 기본 / 동작                                                                                          |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `color` / `defaultColor`              | `blue` / `orange` / `green`. 둘 다 없으면 바깥을 물려받는다                                          |
+| `onColorChange`                       | 색 테마를 바꾸려 할 때                                                                               |
+| `mode` / `defaultMode`                | `light` / `dark` / `system`. 둘 다 없으면 바깥을 물려받는다                                          |
+| `onModeChange`                        | 모드를 바꾸려 할 때                                                                                  |
+| `translate`                           | `(key, values) => string \| undefined`. IDS 문구를 앱의 i18n 으로 바꾼다. 없으면 바깥을 물려받는다   |
+| `locale`                              | 날짜, 시간, 숫자, 국가 이름의 BCP 47 locale. 없으면 바깥을 물려받는다. 컴포넌트의 `locale` 이 이긴다 |
+| `asChild`                             | 자식 요소에 속성을 붙인다                                                                            |
+| `className` / `style` / `ref` / 그 외 | 감싸는 요소(또는 자식)로 간다                                                                        |
 
 - 최상위 Provider는 둘 다 없으면 `blue`, `light` 로 시작합니다.
 - 요소에는 `data-color`, `data-mode`(항상 `light` / `dark`), `style.colorScheme` 이 붙습니다.
+- `translate` 와 `locale` 은 패키지 README 의 [문구와 언어](../../../../README.md#문구와-언어) 를 참고합니다.
 
 ## 알아둘 것
 

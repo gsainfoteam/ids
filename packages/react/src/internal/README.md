@@ -8,32 +8,33 @@
 
 ## 모듈 목록
 
-| 모듈                                             | 내용                                                                 | 쓰는 곳                                                                                                        |
-| ------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                  | Spinner, Progress                                                                                              |
-| [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                      | Button, IconButton, Toggle, IconToggle, FloatingButton                                                         |
-| [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작 | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                   |
-| [`decimal.ts`](#decimalts) | step 계산에 쓰는 정확한 십진수(decimal.js) | NumberField, Slider |
-| [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자               | Select, ChipField, ColorField, Menu, `temporal-field/`                                                         |
-| [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각     | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea          |
-| [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수        | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                     |
-| [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트  | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`        |
-| [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                   | IconButton, IconToggle, FloatingButton                                                                         |
-| [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                 | IconButton, IconToggle                                                                                         |
-| [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `temporal-field/`, `text-control/` |
-| [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각               | Select, ChipField, Menu, `field-popup/`                                                                        |
-| [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구 전부와 기본 locale                     | 문구를 그리는 모든 컴포넌트, `date-locale.ts`                                                                  |
-| [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어 | Alert, `field-popup/`                                                                                          |
-| [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                              | Button, `surface.ts`                                                                                           |
-| [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)          | Select, ChipField, Menu                                                                                        |
-| [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                                | Slider, ColorPicker                                                                                            |
-| [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수   | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField |
-| [`status-palette.ts`](#status-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                   | Alert                                                                                                          |
-| [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                  | Card, Item, Chip                                                                                               |
-| [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                               | DateField, TimeField, DateTimeField                                                                            |
-| [`text-control/`](./text-control/README.md)      | 글자 입력 필드의 셸, Clear, 값 추적 hook                             | TextField, PasswordField, NumberField, TelField, TextArea                                                      |
-| [`toggle-surface.ts`](#toggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                    | Toggle, IconToggle                                                                                             |
-| [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook            | Checkbox, Radio                                                                                                |
+| 모듈                                             | 내용                                                                                  | 쓰는 곳                                                                                                                                                                                                               |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, Progress                                                                                                                                                                                                     |
+| [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                                       | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
+| [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
+| [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
+| [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
+| [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각                      | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea                                                                                                                 |
+| [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수                         | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                                                                                                                            |
+| [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                               |
+| [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
+| [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                                  | IconButton, IconToggle                                                                                                                                                                                                |
+| [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `temporal-field/`, `text-control/` |
+| [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
+| [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
+| [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어                  | Alert, `field-popup/`                                                                                                                                                                                                 |
+| [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `surface.ts`                                                                                                                                                                                                  |
+| [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)                           | Select, ChipField, Menu                                                                                                                                                                                               |
+| [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                                                 | Slider, ColorPicker                                                                                                                                                                                                   |
+| [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                        |
+| [`status-palette.ts`](#status-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                                    | Alert                                                                                                                                                                                                                 |
+| [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                                   | Card, Item, Chip                                                                                                                                                                                                      |
+| [`temporal-field/`](./temporal-field/README.md)  | 날짜, 시간 필드의 본체                                                                | DateField, TimeField, DateTimeField                                                                                                                                                                                   |
+| [`text-control/`](./text-control/README.md)      | 글자 입력 필드의 셸, Clear, 값 추적 hook                                              | TextField, PasswordField, NumberField, TelField, TextArea                                                                                                                                                             |
+| [`toggle-surface.ts`](#toggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                                     | Toggle, IconToggle                                                                                                                                                                                                    |
+| [`translate.ts`](#translatets)                   | `IdsProvider` 의 `translate`, `locale` context 와 `useTranslate`, `useProviderLocale` | `IdsProvider`, 문구를 그리는 모든 컴포넌트                                                                                                                                                                            |
+| [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook                             | Checkbox, Radio                                                                                                                                                                                                       |
 
 ## arc.tsx
 
@@ -171,7 +172,7 @@ BCP 47 locale 태그를 풀이하고, 날짜와 시각의 locale 데이터를 �
 
 ```ts
 // components/form/time-field/root.tsx
-const dateLocale = resolveLocale(locale); // 'ko-KR' 같은 BCP 47 태그. 생략하면 messages.locale
+const dateLocale = resolveLocale(locale ?? providerLocale); // 'ko-KR' 같은 BCP 47 태그. 둘 다 없으면 DEFAULT_LOCALE
 
 // components/data/calendar/root.tsx
 weekStartsOn={weekStartsOn ?? weekStartOf(resolvedLocale)}
@@ -197,7 +198,7 @@ const month = monthNamed(word, locale) ?? monthNamed(word, FALLBACK_MONTH_LOCALE
 ### 왜 이렇게
 
 - `resolveLocale` 은 `Intl.getCanonicalLocales` 로 태그를 검사하고 정규형(`ko-kr` → `ko-KR`)을 돌려줍니다. 어떤 태그든 import 없이 됩니다. locale 데이터는 런타임의 ICU 에 이미 있습니다.
-- 인자를 생략하면 `messages.locale`(`'ko-KR'`)을 씁니다.
+- 인자를 생략하면 `DEFAULT_LOCALE`(`'ko-KR'`)을 씁니다. 컴포넌트는 자기 `locale` prop, 가장 가까운 `IdsProvider` 의 `locale`([translate.ts](#translatets) 의 `useProviderLocale`) 순서로 넘깁니다.
 - `dateFormatter` 는 `@internationalized/date` 의 `DateFormatter` 입니다. 같은 locale 과 옵션의 `Intl.DateTimeFormat` 을 캐시하고, Chrome 의 `hour12` 버그를 피합니다.
 - `periodFirst`, `dateOrder`, `monthNames`, `nativeDigits` 는 locale 마다 한 번 계산합니다(`memoize`).
 - `weekStartOf` 는 알려진 일요일(`A_SUNDAY`)이 그 locale 의 주에서 몇 번째 날인지(`getDayOfWeek`)로 주 시작을 거꾸로 구합니다. `getDayOfWeek` 은 `Intl.Locale` 의 주 정보와 `-u-fw-` 확장을 따릅니다.
@@ -384,7 +385,7 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
   required={required && !readOnly}
   disabled={disabled}
   anchor={anchorRef}
-  message={requiredMessage}         // 기본값 messages.checkboxGroup.required
+  message={requiredMessage}         // 기본값 t('checkboxGroup.required')
 />
 ```
 
@@ -589,36 +590,40 @@ slots: {
 
 ## messages.ts
 
-컴포넌트가 스스로 그리는 문구(라벨, placeholder, 검증 문구, 스크린 리더 안내)와 기본 locale 을 모은 객체입니다.
+컴포넌트가 스스로 그리는 문구(라벨, placeholder, 검증 문구, 스크린 리더 안내)의 한국어 기본값, 그 키의 타입, 기본값을 채우는 함수입니다.
 
 ### 쓰는 곳
 
-- Alert, AvatarGroup, Calendar, CheckboxGroup, Chip, ChipField, ColorField, ColorPicker, DateField, DateTimeField, FileField, Input, Kbd, Menu, NumberField, OTPField, PasswordField, Rating, Select, Slider, Spinner, TelField, TextArea, TimeField, TimePicker, [text-control](./text-control/README.md)
-- `messages.locale`: [date-locale.ts](#date-localets) 의 `resolveLocale` 기본값
+- [translate.ts](#translatets): 앱의 `translate` 가 답하지 않을 때 `formatDefaultMessage` 로 기본값을 채웁니다.
+- [date-locale.ts](#date-localets): `DEFAULT_LOCALE`(`'ko-KR'`).
+- `vite.config.ts`: 빌드 때 `messages` 를 `dist/messages/ko.json` 으로 씁니다. `messages/en.json` 은 손으로 쓴 영어 카탈로그이고 같은 곳으로 복사됩니다.
+- `src/index.ts`: 앱이 쓰는 `IdsMessageKey`, `IdsMessageValues` 타입.
 
 ### 쓰는 법
 
 ```ts
-// components/form/select/clear.tsx: prop 이 없을 때의 기본값
-'aria-label': props['aria-label'] ?? messages.select.clear,
+export const messages = {
+  calendar: { nextMonth: '다음 달', previousMonth: '이전 달', weekNumber: '{week}주차' },
+  dialog: { close: '닫기' },
+} as const;
 
-// components/form/rating/root.tsx
-requiredMessage = messages.rating.required,
+type IdsMessageKey = 'calendar.nextMonth' | 'calendar.previousMonth' | 'calendar.weekNumber' | 'dialog.close';
 
-// components/form/number-field/use-number-field.ts: 값을 끼우는 문구는 함수
-messages.numberField.rangeUnderflow(format(min))
+formatDefaultMessage('calendar.weekNumber', { week: 3 }); // '3주차'
 ```
 
 ### 왜 이렇게
 
-- 컴포넌트가 스스로 그리는 문자열은 모두 여기 둡니다. 나중에 locale provider 를 붙일 때 이 객체만 바꾸면 됩니다.
-- 대부분의 문구는 prop(`aria-label`, `requiredMessage`, `incrementLabel` 등)이 대신할 수 있습니다. prop 이 없는 문구(`numberField.rangeUnderflow`, `telField.invalid`, `colorPicker.saturation` 등)는 이 객체에서만 바뀝니다.
-- `locale`(`'ko-KR'`)은 날짜, 시간 컴포넌트 locale 의 기본값입니다. 컴포넌트에 `locale` 을 따로 주지 않으면 월, 요일, 오전/오후 이름이 이 locale 에서 오므로, 나머지 문구와 같은 언어로 읽힙니다.
+- 기본값은 컴포넌트 이름 아래에 중첩한 객체입니다. 키는 점으로 이은 경로(`'calendar.previousMonth'`)이고, `IdsMessageKey` 는 그 잎 경로들의 union 타입입니다. next-intl, i18next 가 중첩 카탈로그를 같은 점 경로로 읽어서, 앱은 `ko.json`, `en.json` 을 `ids` 아래에 그대로 붙일 수 있습니다.
+- 그룹과 키는 알파벳 순서입니다. 두 카탈로그도 같은 순서라 diff 가 읽기 쉽습니다(`tests/messages.test.ts` 가 확인).
+- 값은 ICU 메시지 문자열입니다. 번역(`en.json`)은 `{count, plural, one {…} other {…}}` 같은 복수형을 쓰고, 그것을 포맷하는 것은 앱의 i18n 라이브러리입니다.
+- 한국어 기본값은 복수형이 필요 없어서 `{name}` 자리만 씁니다. 그래서 IDS 는 ICU 포맷터(`@internationalized/message`, gzip 12.7 kB)를 싣지 않고, `formatDefaultMessage` 가 `{name}` 을 값으로 바꿉니다. 숫자는 `ko-KR` 로 자릿수를 묶습니다(`1,200`). 이 약속은 `tests/messages.test.ts` 가 ICU 파서로 확인합니다.
 
 ### 알아둘 것
 
-- 새 문구는 컴포넌트 이름의 키 아래에 둡니다(`messages.select.clear`). 값을 끼워야 하면 함수로 둡니다(`messages.select.more`).
-- 문구를 컴포넌트 안에 문자열로 직접 쓰지 않습니다. 이 객체를 바꾸는 것만으로 모든 문구가 바뀌어야 합니다.
+- 새 문구는 컴포넌트 이름의 그룹 아래, 알파벳 자리에 넣고, `messages/en.json` 의 같은 자리에 영어를 씁니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
+- 문구를 컴포넌트 안에 한국어 문자열로 직접 쓰지 않습니다. 컴포넌트 코드에 한국어 문자열이 있으면 `tests/messages.test.ts` 가 실패합니다.
+- 개발 경고(`[IDS] ...`)는 영어로 두고 여기에 넣지 않습니다. 사용자가 보는 문구만 넣습니다.
 
 ## pressable.ts
 
@@ -882,6 +887,39 @@ export const toggleStyle = tv({
 ### 알아둘 것
 
 - 꺼진 outline 은 `bg-transparent` 입니다. Button 의 outline(`bg-(--ids-color-surface)`)과 다릅니다.
+
+## translate.ts
+
+`IdsProvider` 의 `translate`, `locale` 을 내려보내는 context 와, 컴포넌트가 문구를 읽는 hook 입니다.
+
+### 쓰는 곳
+
+- `IdsProvider`: `LanguageContext` 를 제공합니다. `translate`, `locale` 을 주지 않은 provider 는 바깥 것을 물려받습니다.
+- 문구를 그리는 모든 컴포넌트와 hook: `useTranslate()`.
+- 날짜, 시간, 숫자, 전화번호 컴포넌트: `useProviderLocale()`.
+
+### 쓰는 법
+
+```tsx
+const t = useTranslate();
+<button aria-label={t('dialog.close')} />;
+t('chipField.remove', { label }); // 값을 끼우는 문구
+
+// 기본값이 함수인 prop 은 본문에서 만든다
+const getValueLabel = getValueLabelProp ?? ((value: number, max: number) => t('rating.valueLabel', { value, max }));
+```
+
+### 왜 이렇게
+
+- `t(key, values)` 는 앱의 `translate(key, values)` 를 먼저 부르고, `undefined` 이거나 키 그대로가 오면 한국어 기본값을 씁니다. i18n 라이브러리 대부분이 빠진 키에 키를 돌려주기 때문입니다.
+- 문구는 렌더 중에 hook 으로 읽습니다. 모듈 최상위에서 읽으면 앱의 언어를 알 수 없고, 서버에서 요청마다 언어가 다를 때 섞입니다. 그래서 `messages` 를 직접 읽는 곳은 이 모듈뿐입니다.
+- 컴포넌트 밖에서 만들어지는 문구(toast 의 기본 loading 문구)는 저장해 두지 않고, 그 toast 를 그리는 `ToastView` 가 렌더할 때 `t` 로 채웁니다.
+- 순수 함수(`describeLimits`, `dayPickerLabels`)는 `Translate` 를 인자로 받습니다.
+
+### 알아둘 것
+
+- `overlay.open` 항목과 toast 는 가장 바깥 `IdsProvider` 에서 그려지므로 그 provider 의 `translate` 를 씁니다.
+- prop 기본값에 `t(...)` 를 쓸 수 없습니다(`t` 는 본문에서 생김). `placeholder: placeholderProp` 으로 받고 본문에서 `placeholderProp ?? t(...)` 로 씁니다.
 
 ## use-checked-writes.ts
 

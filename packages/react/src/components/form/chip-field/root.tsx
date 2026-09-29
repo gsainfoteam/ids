@@ -27,8 +27,8 @@ import { useChipField } from './use-chip-field';
 import { FieldPopup, useDrawerPresentation } from '../../../internal/field-popup';
 import { type FieldTriggerVariant } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
-import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
+import { useTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant, isNodeFromAnyWindow } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Chip } from '../../data/chip';
@@ -146,12 +146,15 @@ export function ChipFieldRoot({
   required = false,
   name,
   form,
-  removeLabel = messages.chipField.remove,
+  removeLabel: removeLabelProp,
   children,
   className,
   style,
   ...rootInputProps
 }: ChipField.Props) {
+  const t = useTranslate();
+  const removeLabel = removeLabelProp ?? ((label: string) => t('chipField.remove', { label }));
+
   const {
     onChange: _wouldRecordQueryAsValue,
     onBlur: onFieldBlur,
@@ -228,7 +231,7 @@ export function ChipFieldRoot({
   const styles = chipFieldStyle({ variant, size: resolvedSize });
 
   const inputDefaults: InputAttributes = {
-    placeholder: messages.chipField.placeholder,
+    placeholder: t('chipField.placeholder'),
     autoComplete: 'off',
     'aria-invalid': isInvalid || undefined,
     'aria-required': required || undefined,
@@ -262,7 +265,7 @@ export function ChipFieldRoot({
   const labelledBy = merged['aria-labelledby'];
   const listLabel = labelledBy
     ? { 'aria-labelledby': labelledBy }
-    : { 'aria-label': merged['aria-label'] ?? messages.chipField.listbox };
+    : { 'aria-label': merged['aria-label'] ?? t('chipField.listbox') };
 
   return (
     <ChipContext
@@ -329,7 +332,7 @@ export function ChipFieldRoot({
           onClose={field.actions.close}
           mobileVariant={mobileVariant}
           matchWidth
-          label={merged['aria-label'] ?? messages.chipField.listbox}
+          label={merged['aria-label'] ?? t('chipField.listbox')}
           aria-labelledby={drawer ? labelledBy : undefined}
           data-chip-field-popup={ids.listbox}
           onBlur={(event) => {

@@ -4,7 +4,7 @@ import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/16/solid';
 
 import { usePicker } from './context';
 import { useClipboardSupport } from './use-color-picker';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { mergeEventHandlers } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 
@@ -16,6 +16,8 @@ export function ColorPickerCopy({
   onClick,
   ...props
 }: ColorPicker.ButtonProps) {
+  const t = useTranslate();
+
   const c = usePicker('ColorPicker.Copy');
   const supported = useClipboardSupport();
   if (!supported) return null;
@@ -25,7 +27,7 @@ export function ColorPickerCopy({
       <IconButton
         {...props}
         aria-label={
-          props['aria-label'] ?? (copied ? messages.colorPicker.copied : messages.colorPicker.copy)
+          props['aria-label'] ?? (copied ? t('colorPicker.copied') : t('colorPicker.copy'))
         }
         disabled={c.state.disabled || !parsed}
         data-color-picker-copy=""
@@ -40,7 +42,7 @@ export function ColorPickerCopy({
         onClick={mergeEventHandlers(onClick, c.picker.actions.copy)}
       />
       <span role="status" className={c.styles.channel()}>
-        {copied ? messages.colorPicker.copied : ''}
+        {copied ? t('colorPicker.copied') : ''}
       </span>
     </>
   );

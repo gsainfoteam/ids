@@ -16,7 +16,7 @@ import { resolve, type StateProp } from './state-prop';
 import { ratingStyle, type RatingOptionPlacement } from './style';
 import { useRating } from './use-rating';
 import { FormValue } from '../../../internal/form-value';
-import { messages } from '../../../internal/messages';
+import { useTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
@@ -76,10 +76,10 @@ export function RatingRoot({
   readOnly = false,
   invalid,
   required = false,
-  requiredMessage = messages.rating.required,
+  requiredMessage: requiredMessageProp,
   name,
   form,
-  getValueLabel = messages.rating.valueLabel,
+  getValueLabel: getValueLabelProp,
   className,
   style,
   children,
@@ -96,6 +96,11 @@ export function RatingRoot({
   'aria-required': ariaRequired,
   ...rest
 }: RatingProps) {
+  const t = useTranslate();
+  const getValueLabel =
+    getValueLabelProp ?? ((value: number, max: number) => t('rating.valueLabel', { value, max }));
+  const requiredMessage = requiredMessageProp ?? t('rating.required');
+
   invariant(Number.isInteger(max) && max > 0, 'Rating: max must be a positive integer.');
   invariant(step === 1 || step === 0.5, 'Rating: step must be 1 or 0.5.');
 
@@ -194,7 +199,7 @@ export function RatingRoot({
           ? ariaLabel
             ? `${ariaLabel}: ${scoreLabel}`
             : scoreLabel
-          : (ariaLabel ?? (ariaLabelledby ? undefined : messages.rating.label))
+          : (ariaLabel ?? (ariaLabelledby ? undefined : t('rating.label')))
       }
       aria-labelledby={
         displayOnly && ariaLabelledby ? `${ariaLabelledby} ${scoreId}` : ariaLabelledby

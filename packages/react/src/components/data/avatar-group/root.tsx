@@ -4,8 +4,8 @@ import { createContext, isValidElement, use } from 'react';
 
 import { arrangeAvatarGroup } from './arrange';
 import { avatarGroupStyle } from './style';
-import { messages } from '../../../internal/messages';
 import { resolveState } from '../../../internal/state-props';
+import { useTranslate } from '../../../internal/translate';
 import { elementTypeOf, invariant } from '../../../utils';
 import { Avatar } from '../avatar';
 import { AvatarCutoutContext, AvatarGroupContext } from '../avatar/context';
@@ -31,12 +31,16 @@ export function AvatarGroupRoot({
   stacking = 'first-on-top',
   size = 'standard',
   shape = 'circle',
-  overflowLabel = messages.avatarGroup.overflow,
+  overflowLabel: overflowLabelProp,
   className,
   style,
   children,
   ...rest
 }: AvatarGroup.Props) {
+  const t = useTranslate();
+  const overflowLabel =
+    overflowLabelProp ?? ((count: number) => t('avatarGroup.overflow', { count }));
+
   const { items, visibleCount, hidden, hiddenNames } = arrangeAvatarGroup({
     children,
     max,
