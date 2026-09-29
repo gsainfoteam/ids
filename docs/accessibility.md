@@ -104,6 +104,7 @@
 | 컴포넌트 | APG 패턴 | 키보드 | 역할과 ARIA | 알려진 한계 |
 | --- | --- | --- | --- | --- |
 | Alert | [Alert](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) | 안에 포커스가 있을 때 `Escape` 로 닫기 | warning, danger 는 `role="alert"`, 나머지는 `role="status"`. `Alert.Close` 는 이름 "닫기" | 늘 있는 안내에는 `role` 을 직접 바꾼다(`note` 등) |
+| Empty | 없음 | 없음. `Empty.Actions` 의 버튼마다 Tab 이 멈춘다 | 역할이 없는 `div`, live region 없음. 기본 아이콘은 `aria-hidden`. 제목은 `Empty.Title asChild` 로 heading 이 된다 | 제목의 heading 수준과 결과 수 알림은 앱이 맡는다 |
 | Progress | [ARIA progressbar](https://www.w3.org/TR/wai-aria-1.2/#progressbar) (APG 패턴 없음) | 없음 | `progressbar` + `aria-valuenow` `aria-valuemax` `aria-valuetext`, 이름은 `Progress.Label` | 이름이 없으면 개발 모드 경고만 한다 |
 | Spinner | 없음 | 없음 | 그림은 `aria-hidden`, 나타나고 100ms 뒤 `role="status"` 에 문장을 적는다 | 100ms 안에 끝나는 로딩은 알리지 않는다. 버튼 안에서는 알리지 않는다 |
 | Toast | [Alert](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) | `F6` 이나 `Alt+T` 로 영역 들어가기와 나오기, `Tab` 영역 안 버튼, `Escape` 원래 자리로 | 영역은 이름 "알림" + `aria-keyshortcuts`, warning, error 는 `role="alert"`, 나머지는 `role="status"` | 시간이 지나면 사라진다(2.2.1). 스와이프로 닫기는 닫기 버튼이 대신한다 |
@@ -225,6 +226,7 @@
 | Badge | `aria-label` 문장을 읽고 값이 바뀌면 다시 알린다 |  |  |  |  |
 | Alert | danger 는 즉시, info 는 기다렸다 알린다 |  |  |  |  |
 | Toast | 나타나면 한 번 알리고, `F6` 으로 들어가 버튼을 쓰고 나온다 |  |  |  |  |
+| Empty | 제목(heading 이면 heading 으로)과 설명을 차례로 읽고, 나타날 때 끼어들어 알리지 않는다 |  |  |  |  |
 | Progress | 이름과 값 문장을 읽는다 |  |  |  |  |
 | Spinner | "불러오는 중" 을 한 번만 읽는다 |  |  |  |  |
 
