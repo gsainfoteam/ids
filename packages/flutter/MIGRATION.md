@@ -4,10 +4,18 @@
 
 ## 원칙
 
-- Flutter는 FE(`packages/react`)를 보고 짠다. FE보다 앞서 만들지 않는다.
+- FE(`packages/react`)에 없는 컴포넌트를 먼저 만들지 않는다. 컴포넌트의 존재 여부와 조립 구조는 FE를 따른다.
 - `lib/src/components/`는 전부 지우고 컴포넌트 단위로 다시 만든다.
 - `lib/theme/`, `lib/tokens/`, `lib/src/layout/ids_axis.dart`는 지우지 않는다.
-- 컴포넌트 하나마다 PR 하나, widgetbook usecase 동반.
+- 컴포넌트 하나마다 커밋 하나, widgetbook usecase 동반. 여러 컴포넌트를 한 브랜치에 모아 PR 하나로 올린다. `example/lib/components/`는 비어 있으니 usecase도 새로 쓴다.
+
+### 무엇을 어디서 가져오는가
+
+| 무엇              | 기준        | 예                                                      |
+| ----------------- | ----------- | ------------------------------------------------------- |
+| 시각값            | **Figma**   | 높이, padding, radius, 색, 상태별 알파, 모션 duration    |
+| 구조 · API · 상태 | **React**   | prop 이름, 서브컴포넌트 조립, 상태 집합, 그룹 전파 규칙  |
+| 플랫폼 대응       | **이 문서** | `focusVisible` 판정, `strokeAlignInside`, Semantics 주입 |
 
 ## 기준 커밋
 
@@ -22,13 +30,22 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 ## 결정 사항
 
 - **StateMask는 만들지 않는다.** 상태는 배경색 알파로 표현한다. 상태 감지는 `useInteractive`의 Flutter 대응물 `IdsInteractive`.
+- **`IdsInteractive`는 그리지 않는다.** 상태만 내보내고 배경 알파·scale·focus ring·disabled는 control surface 값 파일이 정한다. React의 `useInteractive` / `control-surface.ts` 분리와 같다. 그래서 Figma를 보지 않는다.
+- **`IdsTextField`도 `IdsInteractive`를 쓴다.** React는 `Button`·`Toggle`만 쓰고 `TextField`는 네이티브 `:focus-visible`로 처리한다. Flutter엔 의사클래스가 없다.
 - **로컬 enum은 만들지 않는다.** `IdsSize`/`IdsVariant`로 안 되는 축은 `packages/core/tokens/enums.json`에 추가한다. 추가는 FE가 그 컴포넌트를 만들 때 한다.
-- **치수·상태 알파는 React가 기준.** [control-surface.ts](../react/src/components/control-surface.ts) 하드코딩 값을 쓴다. core에는 없다(`--ids-state-*`, radius·height 토큰 없음, spacing은 아래 미결 참고). Flutter도 이 값을 파일 한 곳에만 둔다. 값이 굳으면 core로 올린다.
+- **치수·상태 알파는 Figma가 기준.** core에는 없다(`--ids-state-*`, radius·height 토큰 없음, spacing은 아래 미결 참고). Flutter는 이 값을 파일 한 곳에만 둔다. 값이 굳으면 core로 올린다.
 - **`dragged`는 지금 넣지 않는다.** FE `useInteractive`에 들어올 때 따라간다.
 - **컴포넌트 `color` prop도 지금 넣지 않는다.** FE 컴포넌트에 아직 없다. 들어올 때 따라간다.
-- **설계 문서(Notion, `IDS Architecture.md`)와 다른 곳은 코드를 따른다.** 어느 쪽이 맞는지는 미결.
+- **설계 문서(Notion, `IDS Architecture.md`)와 다른 곳.** 시각값은 Figma를 보고 닫는다. 나머지는 코드를 따르고 미결로 둔다.
+
+  시각값 — 그 컴포넌트를 만들 때 Figma에서 확인하고 아래 control surface 절에 값을 적는다.
+
   - soft: 코드는 `primary`/15 + 전경 `primary`. 문서는 `primary-weak` + `on-primary-weak` (core에 없는 토큰)
   - disabled: 코드는 opacity 0.40. 문서는 opacity-50 또는 disabled 토큰 (core에 없음)
+  - 치수: 코드는 `standard` h44 / px18 / r12. 문서와 어긋나는지 미확인
+
+  코드 규약 — Figma로 닫히지 않는다. 미결.
+
   - 그룹 size: 코드는 불일치 시 항상 throw, `variant`는 전파 안 함. 문서는 자식 명시값 우선
   - `Ids` prefix: codegen과 `IdsScope`·`IdsTheme`에 있음. 문서는 prefix 없음
   - size / variant: `enums.json`의 `standard` `tiny` / `solid` `soft` `outline` `ghost`. 문서의 `sm`/`md`/`lg`, `link`는 코드에 없음
@@ -41,7 +58,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
 ## 분류
 
-**A — FE 구현됨. 지금 옮긴다.** React 구현과 README가 스펙. 이전 기록 참조 안 함.
+**A — FE 구현됨. 지금 옮긴다.** 구조는 React 구현과 README, 시각값은 Figma. 이전 기록 참조 안 함. C도 같다.
 
 `button` `icon_button` `divider` `spacer`
 
@@ -52,6 +69,8 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 **C — FE에만 있음. 지금 옮긴다.**
 
 `Toggle` `IconToggle` `ToggleGroup` `TextField` `TextFieldGroup` `ButtonGroup` `Spinner` `Label` `Kbd` `AspectRatio`
+
+`Group`은 컴포넌트가 아니다. React에서도 `index.ts` export가 없는 내부 파일이라 `ButtonGroup`·`ToggleGroup`이 공유한다. 분류에 넣지 않는다.
 
 **예외.** `bottom_navigation`은 FE 목록에 없다. Flutter 단독, 이전 기록이 출발점.
 FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 수 있다. 차례에 판단.
@@ -67,13 +86,13 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 ```
 
 - `active`(누르는 중)와 `pressed`(외부 주입, Toggle의 on)는 별개
-- 시각 효과는 `focusVisible`에만
+- `focused`에는 시각 효과가 없다. 포커스 링은 `focusVisible`에만
 - hover는 마우스일 때만
 - Enter / Space로도 `active`
 - `onPointerCancel`에서 `active`, `hovered` 복구
 - 스타일 적용은 `pressed > active > hovered` 우선순위로 하나만. state 객체는 원시값 그대로
 - `onInteractionChange`로 부모에 미러링. controlled 아님
-- `T | (state) => T`: `Button` `Toggle`의 `children` `variant` `size`와 스타일 prop. 이벤트 핸들러, `disabled`, `pressed`, `value`는 제외
+- `T | (state) => T`: 제외 목록 빼고 전 prop. 제외는 `on*` `ref` `key` `formAction` `disabled` `pressed` `defaultPressed` `onPressedChange` `value`. `IconButton`은 `icon` `aria-label`에도 쓴다
 
 | React                             | Flutter                                         |
 | --------------------------------- | ----------------------------------------------- |
@@ -103,9 +122,11 @@ focusVisible = focused
 
 위 표가 `IdsInteractive` 위젯 테스트의 계약이다.
 
-### control surface — Button / IconButton / Toggle 공통
+### control surface — Button / IconButton / Toggle / IconToggle 공통
 
-[control-surface.ts](../react/src/components/control-surface.ts) 그대로. 배경 알파(`primary` 기준):
+> 아래 값은 [control-surface.ts](../react/src/components/control-surface.ts)에서 옮겨온 임시값이다. `IdsButton` 때 Figma로 덮어쓴다.
+
+배경 알파(`primary` 기준):
 
 |           | default | hover | active / pressed |
 | --------- | ------- | ----- | ---------------- |
@@ -134,13 +155,6 @@ focusVisible = focused
 3. `IdsIconButton`
 4. 나머지 A, 그다음 C
 5. B는 FE 순서대로. `bottom_navigation`은 Flutter 단독
-
-## 삭제 시 같이 손보는 것
-
-- `lib/ids.dart` — `src/components/**` export 제거
-- `example/lib/components/*_usecase.dart` — 삭제. 새 컴포넌트마다 다시 작성
-- `example/lib/main.dart` — usecase import 정리
-- `test/widget_test.dart` — enum만 확인하므로 그대로
 
 ## 이전 구조 (B와 `bottom_navigation`만)
 
