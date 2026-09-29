@@ -97,6 +97,7 @@
 | Card, Item | [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/) (`onClick` 이 있을 때) | 제목 버튼에서 `Enter` 누를 때 실행, `Space` 뗄 때 실행. 포인터는 표면 어디를 눌러도 된다 | 제목이 `button`, 설명은 Description(`aria-describedby`), Item 의 선택은 `aria-pressed`. 루트는 평범한 `div` 라 안의 버튼과 겹치지 않는다. `Item.Group` 은 `role="list"` | 제목이 없거나 직접 만든 컴포넌트 안에 있으면 루트가 `role="button"` 이 되고, 이때는 안에 다른 버튼을 둘 수 없다 |
 | Chip | [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/) (누르거나 켜는 칩) | `Enter` `Space`, `Backspace` `Delete` 지우기 | 라벨이면 `span`, 누르는 칩은 `button` + `aria-pressed`. 지우기는 `Chip.Close` 버튼 | Chip.Close 가 24px 보다 작다 |
 | ColorPicker | [Slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), [Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) (팔레트) | 영역: `←` `→` 채도, `↑` `↓` `PageUp` `PageDown` 밝기, `Shift`+방향키 10%, `Home` `End`. 값 입력은 `Enter` 로 반영 | 영역은 채도와 밝기 두 `slider`(`aria-valuetext` 에 두 값), 색조와 투명도는 `slider`, 팔레트는 `radiogroup` | 2차원 영역은 APG 패턴이 없어 슬라이더 둘로 읽힌다 |
+| Empty | 없음 | 없음. `Empty.Actions` 의 버튼마다 Tab 이 멈춘다 | 역할이 없는 `div`, live region 없음. 기본 아이콘은 `aria-hidden`. 제목은 `Empty.Title asChild` 로 heading 이 된다 | 제목의 heading 수준과 결과 수 알림은 앱이 맡는다 |
 | TimePicker | [Listbox](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/) | 컬럼마다 Tab 한 번. `↑` `↓` 한 칸, `PageUp` `PageDown` 다섯 칸, `Home` `End`, `Enter` `Space` 선택, `←` `→` 옆 컬럼, 숫자 입력, `Delete` 비우기 | `role="group"`(이름 "시간") 안에 컬럼마다 `listbox` + `option` `aria-selected`, `aria-activedescendant` | `wheel` 은 스크롤이 멈춘 자리를 고른다. 키보드로는 `Enter` 로 고른다 |
 
 ### feedback
@@ -104,7 +105,6 @@
 | 컴포넌트 | APG 패턴 | 키보드 | 역할과 ARIA | 알려진 한계 |
 | --- | --- | --- | --- | --- |
 | Alert | [Alert](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) | 안에 포커스가 있을 때 `Escape` 로 닫기 | warning, danger 는 `role="alert"`, 나머지는 `role="status"`. `Alert.Close` 는 이름 "닫기" | 늘 있는 안내에는 `role` 을 직접 바꾼다(`note` 등) |
-| Empty | 없음 | 없음. `Empty.Actions` 의 버튼마다 Tab 이 멈춘다 | 역할이 없는 `div`, live region 없음. 기본 아이콘은 `aria-hidden`. 제목은 `Empty.Title asChild` 로 heading 이 된다 | 제목의 heading 수준과 결과 수 알림은 앱이 맡는다 |
 | Progress | [ARIA progressbar](https://www.w3.org/TR/wai-aria-1.2/#progressbar) (APG 패턴 없음) | 없음 | `progressbar` + `aria-valuenow` `aria-valuemax` `aria-valuetext`, 이름은 `Progress.Label` | 이름이 없으면 개발 모드 경고만 한다 |
 | Spinner | 없음 | 없음 | 그림은 `aria-hidden`, 나타나고 100ms 뒤 `role="status"` 에 문장을 적는다 | 100ms 안에 끝나는 로딩은 알리지 않는다. 버튼 안에서는 알리지 않는다 |
 | Toast | [Alert](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) | `F6` 이나 `Alt+T` 로 영역 들어가기와 나오기, `Tab` 영역 안 버튼, `Escape` 원래 자리로 | 영역은 이름 "알림" + `aria-keyshortcuts`, warning, error 는 `role="alert"`, 나머지는 `role="status"` | 시간이 지나면 사라진다(2.2.1). 스와이프로 닫기는 닫기 버튼이 대신한다 |
@@ -224,9 +224,9 @@
 | Chip | 켜는 칩이 "눌림" 을 읽고, 지우기 버튼이 이름을 읽는다 |  |  |  |  |
 | Avatar, AvatarGroup | 사람 이름과 "외 N명" 을 읽는다 |  |  |  |  |
 | Badge | `aria-label` 문장을 읽고 값이 바뀌면 다시 알린다 |  |  |  |  |
+| Empty | 제목(heading 이면 heading 으로)과 설명을 차례로 읽고, 나타날 때 끼어들어 알리지 않는다 |  |  |  |  |
 | Alert | danger 는 즉시, info 는 기다렸다 알린다 |  |  |  |  |
 | Toast | 나타나면 한 번 알리고, `F6` 으로 들어가 버튼을 쓰고 나온다 |  |  |  |  |
-| Empty | 제목(heading 이면 heading 으로)과 설명을 차례로 읽고, 나타날 때 끼어들어 알리지 않는다 |  |  |  |  |
 | Progress | 이름과 값 문장을 읽는다 |  |  |  |  |
 | Spinner | "불러오는 중" 을 한 번만 읽는다 |  |  |  |  |
 

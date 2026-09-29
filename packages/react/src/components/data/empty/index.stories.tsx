@@ -12,9 +12,9 @@ import { expect } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
-import { Card } from '../../data/card';
-import { Item } from '../../data/item';
 import { TextField } from '../../form/text-field';
+import { Card } from '../card';
+import { Item } from '../item';
 
 import { Empty } from '.';
 
@@ -32,7 +32,7 @@ const ILLUSTRATION = `data:image/svg+xml;utf8,${encodeURIComponent(
 )}`;
 
 const meta = {
-  title: 'Feedback/Empty',
+  title: 'Data/Empty',
   component: Empty,
   tags: ['autodocs'],
   argTypes: {

@@ -53,6 +53,7 @@ export { Avatar, initialsOf } from './components/data/avatar';
 export { AvatarGroup } from './components/data/avatar-group';
 export { Item } from './components/data/item';
 export { Accordion } from './components/data/accordion';
+export { Empty } from './components/data/empty';
 
 export { Button } from './components/action/button';
 export { IconButton } from './components/action/icon-button';
@@ -74,7 +75,6 @@ export type { TextAreaProps, TextAreaVariant } from './components/form/text-area
 
 export { Spinner } from './components/feedback/spinner';
 export { Progress } from './components/feedback/progress';
-export { Empty } from './components/feedback/empty';
 export { Label } from './components/typography/label';
 export { Kbd } from './components/typography/kbd';
 
