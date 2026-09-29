@@ -202,24 +202,23 @@ export const StateIcon: Story = {
   },
 };
 
-function LayoutSwitch() {
-  const [grid, setGrid] = useState(false);
-  return (
-    <div className="flex items-center gap-3">
-      <IconToggle
-        variant="outline"
-        pressed={grid}
-        onPressedChange={setGrid}
-        icon={grid ? <Squares2X2Icon /> : <ListBulletIcon />}
-        aria-label="격자로 보기"
-      />
-      <span className="text-body-b3-regular">{grid ? '격자' : '목록'}</span>
-    </div>
-  );
-}
-
 export const Controlled: Story = {
-  render: () => <LayoutSwitch />,
+  render: function Render() {
+    const [grid, setGrid] = useState(false);
+
+    return (
+      <div className="flex items-center gap-3">
+        <IconToggle
+          variant="outline"
+          pressed={grid}
+          onPressedChange={setGrid}
+          icon={grid ? <Squares2X2Icon /> : <ListBulletIcon />}
+          aria-label="격자로 보기"
+        />
+        <span className="text-body-b3-regular">{grid ? '격자' : '목록'}</span>
+      </div>
+    );
+  },
   parameters: {
     docs: { description: { story: 'pressed와 onPressedChange로 제어합니다.' } },
   },

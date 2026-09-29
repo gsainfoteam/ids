@@ -136,25 +136,24 @@ export const Keyboard: Story = {
   },
 };
 
-function ControlledExample() {
-  const [visible, setVisible] = useState(false);
-  return (
-    <div className="flex items-center gap-3">
-      <Toggle
-        variant="outline"
-        pressed={visible}
-        onPressedChange={setVisible}
-        aria-label="비밀번호 보기"
-      >
-        {visible ? <EyeSlashIcon /> : <EyeIcon />}
-      </Toggle>
-      <span className="text-body-b3-regular font-mono">{visible ? 'hunter2' : '•••••••'}</span>
-    </div>
-  );
-}
-
 export const Controlled: Story = {
-  render: () => <ControlledExample />,
+  render: function Render() {
+    const [visible, setVisible] = useState(false);
+
+    return (
+      <div className="flex items-center gap-3">
+        <Toggle
+          variant="outline"
+          pressed={visible}
+          onPressedChange={setVisible}
+          aria-label="비밀번호 보기"
+        >
+          {visible ? <EyeSlashIcon /> : <EyeIcon />}
+        </Toggle>
+        <span className="text-body-b3-regular font-mono">{visible ? 'hunter2' : '•••••••'}</span>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -170,30 +169,29 @@ export const Controlled: Story = {
   },
 };
 
-function ConfirmExample() {
-  const [muted, setMuted] = useState(true);
-  const [asked, setAsked] = useState(0);
-  return (
-    <div className="flex items-center gap-3">
-      <Toggle
-        variant="soft"
-        pressed={muted}
-        onPressedChange={setMuted}
-        onClick={(event) => {
-          if (!muted) return;
-          event.preventDefault();
-          setAsked((count) => count + 1);
-        }}
-      >
-        알림 끄기
-      </Toggle>
-      <output aria-label="확인 요청">{asked}</output>
-    </div>
-  );
-}
-
 export const CancelFromOnClick: Story = {
-  render: () => <ConfirmExample />,
+  render: function Render() {
+    const [muted, setMuted] = useState(true);
+    const [asked, setAsked] = useState(0);
+
+    return (
+      <div className="flex items-center gap-3">
+        <Toggle
+          variant="soft"
+          pressed={muted}
+          onPressedChange={setMuted}
+          onClick={(event) => {
+            if (!muted) return;
+            event.preventDefault();
+            setAsked((count) => count + 1);
+          }}
+        >
+          알림 끄기
+        </Toggle>
+        <output aria-label="확인 요청">{asked}</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -227,20 +225,19 @@ export const StateChildren: Story = {
   },
 };
 
-function Misuse() {
-  const [shown, setShown] = useState(false);
-  return (
-    <div className="flex flex-col items-start gap-3">
-      <Toggle variant="outline" onPressedChange={() => setShown(true)}>
-        잘못 쓴 예 보기
-      </Toggle>
-      {shown && <Toggle pressed>고정된 토글</Toggle>}
-    </div>
-  );
-}
-
 export const DevelopmentWarnings: Story = {
-  render: () => <Misuse />,
+  render: function Render() {
+    const [shown, setShown] = useState(false);
+
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <Toggle variant="outline" onPressedChange={() => setShown(true)}>
+          잘못 쓴 예 보기
+        </Toggle>
+        {shown && <Toggle pressed>고정된 토글</Toggle>}
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

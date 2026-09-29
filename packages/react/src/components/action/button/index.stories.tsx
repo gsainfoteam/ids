@@ -49,15 +49,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-function Busy({ size, variant }: { size?: Button.Props['size']; variant?: Button.Variant }) {
-  return (
-    <Button size={size} variant={variant} disabled aria-busy>
-      <Spinner decorative />
-      저장 중
-    </Button>
-  );
-}
-
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -124,9 +115,15 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="loading">
           {variants.map((variant) => (
-            <Busy key={variant} variant={variant} />
+            <Button key={variant} variant={variant} disabled aria-busy>
+              <Spinner decorative />
+              저장 중
+            </Button>
           ))}
-          <Busy size="tiny" />
+          <Button size="tiny" disabled aria-busy>
+            <Spinner decorative />
+            저장 중
+          </Button>
         </Showcase.Row>
         <Showcase.Row label="asChild">
           <Button asChild>
@@ -147,27 +144,26 @@ export const Gallery: Story = {
   ),
 };
 
-function SaveButton({ onSave }: { onSave: () => void }) {
-  const [saving, setSaving] = useState(false);
-  return (
-    <Button
-      disabled={saving}
-      focusableWhenDisabled
-      aria-busy={saving}
-      onClick={() => {
-        onSave();
-        setSaving(true);
-        setTimeout(() => setSaving(false), 800);
-      }}
-    >
-      {saving && <Spinner decorative />}
-      {saving ? '저장 중' : '저장'}
-    </Button>
-  );
-}
-
 export const Loading: Story = {
-  render: (args) => <SaveButton onSave={() => args.onClick?.(undefined as never)} />,
+  render: function Render(args) {
+    const [saving, setSaving] = useState(false);
+
+    return (
+      <Button
+        disabled={saving}
+        focusableWhenDisabled
+        aria-busy={saving}
+        onClick={(event) => {
+          args.onClick?.(event);
+          setSaving(true);
+          setTimeout(() => setSaving(false), 800);
+        }}
+      >
+        {saving && <Spinner decorative />}
+        {saving ? '저장 중' : '저장'}
+      </Button>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -253,30 +249,29 @@ export const ColorScheme: Story = {
   },
 };
 
-function FormExample() {
-  const [result, setResult] = useState('');
-  return (
-    <form
-      className="flex flex-col items-start gap-3"
-      onSubmit={(event) => {
-        event.preventDefault();
-        setResult(String(new FormData(event.currentTarget).get('title')));
-      }}
-    >
-      <input name="title" defaultValue="회의록" aria-label="제목" className="sr-only" />
-      <div className="flex gap-2">
-        <Button variant="outline" onClick={() => setResult('미리보기')}>
-          미리보기
-        </Button>
-        <Button type="submit">제출</Button>
-      </div>
-      <output aria-label="결과">{result}</output>
-    </form>
-  );
-}
-
 export const FormSubmit: Story = {
-  render: () => <FormExample />,
+  render: function Render() {
+    const [result, setResult] = useState('');
+
+    return (
+      <form
+        className="flex flex-col items-start gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setResult(String(new FormData(event.currentTarget).get('title')));
+        }}
+      >
+        <input name="title" defaultValue="회의록" aria-label="제목" className="sr-only" />
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setResult('미리보기')}>
+            미리보기
+          </Button>
+          <Button type="submit">제출</Button>
+        </div>
+        <output aria-label="결과">{result}</output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -323,32 +318,31 @@ export const StateProps: Story = {
   },
 };
 
-function Misuse() {
-  const [shown, setShown] = useState(false);
-  return (
-    <div className="flex flex-col items-start gap-3">
-      <Button variant="outline" onClick={() => setShown(true)}>
-        잘못 쓴 예 보기
-      </Button>
-      {shown && (
-        <div className="flex gap-2">
-          <Button aria-label="추가">
-            <PlusIcon />
-          </Button>
-          <Button asChild variant="soft">
-            <span>
-              바깥
-              <Button size="tiny">안쪽</Button>
-            </span>
-          </Button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export const DevelopmentWarnings: Story = {
-  render: () => <Misuse />,
+  render: function Render() {
+    const [shown, setShown] = useState(false);
+
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <Button variant="outline" onClick={() => setShown(true)}>
+          잘못 쓴 예 보기
+        </Button>
+        {shown && (
+          <div className="flex gap-2">
+            <Button aria-label="추가">
+              <PlusIcon />
+            </Button>
+            <Button asChild variant="soft">
+              <span>
+                바깥
+                <Button size="tiny">안쪽</Button>
+              </span>
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

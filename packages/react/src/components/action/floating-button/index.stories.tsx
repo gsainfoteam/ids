@@ -285,28 +285,27 @@ export const AutomaticLabel: Story = {
   },
 };
 
-function UploadButton({ onUpload }: { onUpload: () => void }) {
-  const [uploading, setUploading] = useState(false);
-  return (
-    <FloatingButton
-      disabled={uploading}
-      focusableWhenDisabled
-      aria-busy={uploading}
-      onClick={() => {
-        onUpload();
-        setUploading(true);
-        setTimeout(() => setUploading(false), 800);
-      }}
-    >
-      {uploading ? <Spinner decorative /> : <CheckIcon />}
-      {uploading ? '업로드 중' : '업로드'}
-    </FloatingButton>
-  );
-}
-
 export const Loading: Story = {
   decorators: inContainingBlock,
-  render: (args) => <UploadButton onUpload={() => args.onClick?.(undefined as never)} />,
+  render: function Render(args) {
+    const [uploading, setUploading] = useState(false);
+
+    return (
+      <FloatingButton
+        disabled={uploading}
+        focusableWhenDisabled
+        aria-busy={uploading}
+        onClick={(event) => {
+          args.onClick?.(event);
+          setUploading(true);
+          setTimeout(() => setUploading(false), 800);
+        }}
+      >
+        {uploading ? <Spinner decorative /> : <CheckIcon />}
+        {uploading ? '업로드 중' : '업로드'}
+      </FloatingButton>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -352,30 +351,29 @@ export const DisabledLink: Story = {
   },
 };
 
-function Crowded() {
-  const [shown, setShown] = useState(false);
-  return (
-    <>
-      <button type="button" className="m-4 underline" onClick={() => setShown(true)}>
-        겹치는 버튼 보기
-      </button>
-      {shown && (
-        <>
-          <FloatingButton aria-label="작성">
-            <PlusIcon />
-          </FloatingButton>
-          <FloatingButton aria-label="문의">
-            <ChatBubbleLeftIcon />
-          </FloatingButton>
-        </>
-      )}
-    </>
-  );
-}
-
 export const DevelopmentWarnings: Story = {
   decorators: inContainingBlock,
-  render: () => <Crowded />,
+  render: function Render() {
+    const [shown, setShown] = useState(false);
+
+    return (
+      <>
+        <button type="button" className="m-4 underline" onClick={() => setShown(true)}>
+          겹치는 버튼 보기
+        </button>
+        {shown && (
+          <>
+            <FloatingButton aria-label="작성">
+              <PlusIcon />
+            </FloatingButton>
+            <FloatingButton aria-label="문의">
+              <ChatBubbleLeftIcon />
+            </FloatingButton>
+          </>
+        )}
+      </>
+    );
+  },
   parameters: {
     docs: {
       description: {

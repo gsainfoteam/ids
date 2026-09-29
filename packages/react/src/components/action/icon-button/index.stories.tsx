@@ -166,27 +166,26 @@ export const AutomaticLabel: Story = {
   },
 };
 
-function SaveIconButton({ onSave }: { onSave: () => void }) {
-  const [saving, setSaving] = useState(false);
-  return (
-    <IconButton
-      variant="outline"
-      disabled={saving}
-      focusableWhenDisabled
-      aria-busy={saving}
-      aria-label={saving ? '저장 중' : '저장'}
-      icon={saving ? <Spinner decorative /> : <CheckIcon />}
-      onClick={() => {
-        onSave();
-        setSaving(true);
-        setTimeout(() => setSaving(false), 800);
-      }}
-    />
-  );
-}
-
 export const Loading: Story = {
-  render: (args) => <SaveIconButton onSave={() => args.onClick?.(undefined as never)} />,
+  render: function Render(args) {
+    const [saving, setSaving] = useState(false);
+
+    return (
+      <IconButton
+        variant="outline"
+        disabled={saving}
+        focusableWhenDisabled
+        aria-busy={saving}
+        aria-label={saving ? '저장 중' : '저장'}
+        icon={saving ? <Spinner decorative /> : <CheckIcon />}
+        onClick={(event) => {
+          args.onClick?.(event);
+          setSaving(true);
+          setTimeout(() => setSaving(false), 800);
+        }}
+      />
+    );
+  },
   parameters: {
     docs: {
       description: {

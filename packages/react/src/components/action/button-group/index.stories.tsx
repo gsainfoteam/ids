@@ -59,16 +59,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-function SplitButton({ variant }: { variant: Button.Variant }) {
-  return (
-    <ButtonGroup variant={variant} aria-label="저장">
-      <Button>저장</Button>
-      <ButtonGroup.Separator />
-      <IconButton icon={<ChevronDownIcon />} aria-label="저장 옵션" />
-    </ButtonGroup>
-  );
-}
-
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -83,7 +73,11 @@ export const Gallery: Story = {
               <Button>신고</Button>
               <Button>미루기</Button>
             </ButtonGroup>
-            <SplitButton variant={variant} />
+            <ButtonGroup variant={variant} aria-label="저장">
+              <Button>저장</Button>
+              <ButtonGroup.Separator />
+              <IconButton icon={<ChevronDownIcon />} aria-label="저장 옵션" />
+            </ButtonGroup>
           </Showcase.Row>
         ))}
       </Showcase.Section>
@@ -245,7 +239,13 @@ export const SizeAndVariant: Story = {
 };
 
 export const Separator: Story = {
-  render: () => <SplitButton variant="solid" />,
+  render: () => (
+    <ButtonGroup variant="solid" aria-label="저장">
+      <Button>저장</Button>
+      <ButtonGroup.Separator />
+      <IconButton icon={<ChevronDownIcon />} aria-label="저장 옵션" />
+    </ButtonGroup>
+  ),
   parameters: {
     docs: {
       description: {
@@ -288,25 +288,24 @@ export const RightToLeft: Story = {
   },
 };
 
-function Unnamed() {
-  const [shown, setShown] = useState(false);
-  return (
-    <div className="flex flex-col items-start gap-3">
-      <Button variant="outline" onClick={() => setShown(true)}>
-        이름 없는 그룹 보기
-      </Button>
-      {shown && (
-        <ButtonGroup variant="outline">
-          <Button>가</Button>
-          <Button>나</Button>
-        </ButtonGroup>
-      )}
-    </div>
-  );
-}
-
 export const DevelopmentWarnings: Story = {
-  render: () => <Unnamed />,
+  render: function Render() {
+    const [shown, setShown] = useState(false);
+
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <Button variant="outline" onClick={() => setShown(true)}>
+          이름 없는 그룹 보기
+        </Button>
+        {shown && (
+          <ButtonGroup variant="outline">
+            <Button>가</Button>
+            <Button>나</Button>
+          </ButtonGroup>
+        )}
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {

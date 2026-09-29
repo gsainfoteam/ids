@@ -61,28 +61,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {};
 
-function Alignment(props: Partial<ToggleGroup.SingleProps>) {
-  return (
-    <ToggleGroup aria-label="정렬" defaultValue="center" {...props}>
-      <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
-      <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
-      <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
-    </ToggleGroup>
-  );
-}
-
-function Formatting(props: Partial<ToggleGroup.MultipleProps>) {
-  return (
-    <ToggleGroup selectionMode="multiple" aria-label="서식" defaultValue={['bold']} {...props}>
-      <IconToggle value="bold" icon={<BoldIcon />} aria-label="굵게" />
-      <IconToggle value="italic" icon={<ItalicIcon />} aria-label="기울임" />
-      <IconToggle value="underline" icon={<UnderlineIcon />} aria-label="밑줄" />
-      <ToggleGroup.Separator />
-      <IconToggle value="strike" icon={<StrikethroughIcon />} aria-label="취소선" />
-    </ToggleGroup>
-  );
-}
-
 export const Gallery: Story = {
   render: () => (
     <Showcase>
@@ -93,7 +71,13 @@ export const Gallery: Story = {
         <Showcase.Matrix
           rows={sizes}
           columns={variants}
-          render={(size, variant) => <Alignment size={size} variant={variant} />}
+          render={(size, variant) => (
+            <ToggleGroup aria-label="정렬" defaultValue="center" size={size} variant={variant}>
+              <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
+              <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
+              <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
+            </ToggleGroup>
+          )}
         />
       </Showcase.Section>
 
@@ -104,11 +88,32 @@ export const Gallery: Story = {
             <Toggle value="week">주</Toggle>
             <Toggle value="month">월</Toggle>
           </ToggleGroup>
-          <Alignment variant="soft" />
+          <ToggleGroup aria-label="정렬" defaultValue="center" variant="soft">
+            <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
+            <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
+            <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
+          </ToggleGroup>
         </Showcase.Row>
         <Showcase.Row label="multiple">
-          <Formatting variant="outline" />
-          <Formatting />
+          <ToggleGroup
+            selectionMode="multiple"
+            aria-label="서식"
+            defaultValue={['bold']}
+            variant="outline"
+          >
+            <IconToggle value="bold" icon={<BoldIcon />} aria-label="굵게" />
+            <IconToggle value="italic" icon={<ItalicIcon />} aria-label="기울임" />
+            <IconToggle value="underline" icon={<UnderlineIcon />} aria-label="밑줄" />
+            <ToggleGroup.Separator />
+            <IconToggle value="strike" icon={<StrikethroughIcon />} aria-label="취소선" />
+          </ToggleGroup>
+          <ToggleGroup selectionMode="multiple" aria-label="서식" defaultValue={['bold']}>
+            <IconToggle value="bold" icon={<BoldIcon />} aria-label="굵게" />
+            <IconToggle value="italic" icon={<ItalicIcon />} aria-label="기울임" />
+            <IconToggle value="underline" icon={<UnderlineIcon />} aria-label="밑줄" />
+            <ToggleGroup.Separator />
+            <IconToggle value="strike" icon={<StrikethroughIcon />} aria-label="취소선" />
+          </ToggleGroup>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -154,7 +159,11 @@ export const Gallery: Story = {
 
       <Showcase.Section title="States">
         <Showcase.Row label="disabled group">
-          <Alignment variant="outline" disabled />
+          <ToggleGroup aria-label="정렬" defaultValue="center" variant="outline" disabled>
+            <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
+            <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
+            <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
+          </ToggleGroup>
         </Showcase.Row>
         <Showcase.Row label="disabled item">
           <ToggleGroup aria-label="기간" variant="outline" defaultValue="day">
@@ -217,7 +226,20 @@ export const RadioKeyboard: Story = {
 };
 
 export const ToolbarKeyboard: Story = {
-  render: () => <Formatting variant="outline" />,
+  render: () => (
+    <ToggleGroup
+      selectionMode="multiple"
+      aria-label="서식"
+      defaultValue={['bold']}
+      variant="outline"
+    >
+      <IconToggle value="bold" icon={<BoldIcon />} aria-label="굵게" />
+      <IconToggle value="italic" icon={<ItalicIcon />} aria-label="기울임" />
+      <IconToggle value="underline" icon={<UnderlineIcon />} aria-label="밑줄" />
+      <ToggleGroup.Separator />
+      <IconToggle value="strike" icon={<StrikethroughIcon />} aria-label="취소선" />
+    </ToggleGroup>
+  ),
   parameters: {
     docs: {
       description: {
@@ -285,7 +307,11 @@ export const Vertical: Story = {
 export const RightToLeft: Story = {
   render: () => (
     <div dir="rtl">
-      <Alignment variant="outline" />
+      <ToggleGroup aria-label="정렬" defaultValue="center" variant="outline">
+        <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
+        <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
+        <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
+      </ToggleGroup>
     </div>
   ),
   parameters: {
@@ -303,48 +329,47 @@ export const RightToLeft: Story = {
   },
 };
 
-function FormExample() {
-  const [result, setResult] = useState('');
-  return (
-    <form
-      className="flex flex-col items-start gap-4"
-      onSubmit={(event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        setResult(JSON.stringify({ size: data.get('size'), toppings: data.getAll('toppings') }));
-      }}
-    >
-      <ToggleGroup aria-label="크기" name="size" required variant="outline">
-        <Toggle value="s">S</Toggle>
-        <Toggle value="m">M</Toggle>
-        <Toggle value="l">L</Toggle>
-      </ToggleGroup>
-      <ToggleGroup
-        aria-label="토핑"
-        name="toppings"
-        selectionMode="multiple"
-        variant="outline"
-        defaultValue={['cheese']}
-      >
-        <Toggle value="cheese">치즈</Toggle>
-        <Toggle value="olive">올리브</Toggle>
-        <Toggle value="onion">양파</Toggle>
-      </ToggleGroup>
-      <div className="flex gap-2">
-        <Button type="submit">주문</Button>
-        <Button type="reset" variant="outline">
-          초기화
-        </Button>
-      </div>
-      <output aria-label="주문 결과" className="text-body-b3-regular font-mono">
-        {result}
-      </output>
-    </form>
-  );
-}
-
 export const NativeForm: Story = {
-  render: () => <FormExample />,
+  render: function Render() {
+    const [result, setResult] = useState('');
+
+    return (
+      <form
+        className="flex flex-col items-start gap-4"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const data = new FormData(event.currentTarget);
+          setResult(JSON.stringify({ size: data.get('size'), toppings: data.getAll('toppings') }));
+        }}
+      >
+        <ToggleGroup aria-label="크기" name="size" required variant="outline">
+          <Toggle value="s">S</Toggle>
+          <Toggle value="m">M</Toggle>
+          <Toggle value="l">L</Toggle>
+        </ToggleGroup>
+        <ToggleGroup
+          aria-label="토핑"
+          name="toppings"
+          selectionMode="multiple"
+          variant="outline"
+          defaultValue={['cheese']}
+        >
+          <Toggle value="cheese">치즈</Toggle>
+          <Toggle value="olive">올리브</Toggle>
+          <Toggle value="onion">양파</Toggle>
+        </ToggleGroup>
+        <div className="flex gap-2">
+          <Button type="submit">주문</Button>
+          <Button type="reset" variant="outline">
+            초기화
+          </Button>
+        </div>
+        <output aria-label="주문 결과" className="text-body-b3-regular font-mono">
+          {result}
+        </output>
+      </form>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -377,24 +402,23 @@ export const NativeForm: Story = {
   },
 };
 
-function ControlledExample() {
-  const [view, setView] = useState<'list' | 'grid' | null>('list');
-  return (
-    <div className="flex items-center gap-3">
-      <ToggleGroup aria-label="보기" variant="outline" value={view} onValueChange={setView}>
-        <Toggle value="list">목록</Toggle>
-        <Toggle value="grid">격자</Toggle>
-      </ToggleGroup>
-      <Button variant="ghost" onClick={() => setView(null)}>
-        선택 해제
-      </Button>
-      <output aria-label="보기 값">{String(view)}</output>
-    </div>
-  );
-}
-
 export const Controlled: Story = {
-  render: () => <ControlledExample />,
+  render: function Render() {
+    const [view, setView] = useState<'list' | 'grid' | null>('list');
+
+    return (
+      <div className="flex items-center gap-3">
+        <ToggleGroup aria-label="보기" variant="outline" value={view} onValueChange={setView}>
+          <Toggle value="list">목록</Toggle>
+          <Toggle value="grid">격자</Toggle>
+        </ToggleGroup>
+        <Button variant="ghost" onClick={() => setView(null)}>
+          선택 해제
+        </Button>
+        <output aria-label="보기 값">{String(view)}</output>
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
@@ -415,25 +439,24 @@ export const Controlled: Story = {
   },
 };
 
-function Misuse() {
-  const [shown, setShown] = useState(false);
-  return (
-    <div className="flex flex-col items-start gap-3">
-      <Button variant="outline" onClick={() => setShown(true)}>
-        잘못 쓴 예 보기
-      </Button>
-      {shown && (
-        <ToggleGroup aria-label="정렬" defaultValue="justify">
-          <Toggle value="left">왼쪽</Toggle>
-          <Toggle value="right">오른쪽</Toggle>
-        </ToggleGroup>
-      )}
-    </div>
-  );
-}
-
 export const DevelopmentWarnings: Story = {
-  render: () => <Misuse />,
+  render: function Render() {
+    const [shown, setShown] = useState(false);
+
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <Button variant="outline" onClick={() => setShown(true)}>
+          잘못 쓴 예 보기
+        </Button>
+        {shown && (
+          <ToggleGroup aria-label="정렬" defaultValue="justify">
+            <Toggle value="left">왼쪽</Toggle>
+            <Toggle value="right">오른쪽</Toggle>
+          </ToggleGroup>
+        )}
+      </div>
+    );
+  },
   parameters: {
     docs: {
       description: {
