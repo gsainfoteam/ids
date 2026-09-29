@@ -78,6 +78,8 @@ export { Progress } from './components/feedback/progress';
 export { Label } from './components/typography/label';
 export { Kbd } from './components/typography/kbd';
 
+export { Pagination } from './components/navigation/pagination';
+
 export { Divider } from './components/layout/divider';
 export { Spacer } from './components/layout/spacer';
 export { AspectRatio } from './components/layout/aspect-ratio';

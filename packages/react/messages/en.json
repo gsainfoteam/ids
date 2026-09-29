@@ -150,6 +150,12 @@
   "otpField": {
     "label": "Verification code"
   },
+  "pagination": {
+    "label": "Pagination",
+    "next": "Next page",
+    "page": "Page {page}",
+    "previous": "Previous page"
+  },
   "passwordField": {
     "capsLock": "Caps Lock is on.",
     "show": "Show password"

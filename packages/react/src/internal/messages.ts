@@ -152,6 +152,12 @@ export const messages = {
   otpField: {
     label: '인증 코드',
   },
+  pagination: {
+    label: '페이지 탐색',
+    next: '다음 페이지',
+    page: '{page}페이지',
+    previous: '이전 페이지',
+  },
   passwordField: {
     capsLock: 'Caps Lock이 켜져 있습니다.',
     show: '비밀번호 표시',
