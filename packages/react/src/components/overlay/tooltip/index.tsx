@@ -1,37 +1,16 @@
-'use client';
-
 import { type ReactNode } from 'react';
 
 import { TooltipArrow, type TooltipArrowProps } from './arrow';
 import { TooltipContent, type TooltipContentProps } from './content';
-import { TooltipContext } from './context';
+import { TooltipRoot } from './root';
 import { tooltipStyle } from './style';
 import { TooltipTrigger, type TooltipTriggerProps } from './trigger';
-import { useTooltip, type UseTooltipOptions } from './use-tooltip';
+import { type UseTooltipOptions } from './use-tooltip';
 
 import type { AnchoredSide } from '../../../internal/overlay';
 
-export { TooltipDelayGroup } from './delay-group';
-
-export function Tooltip({ content, arrow = false, children, ...options }: Tooltip.Props) {
-  const tooltip = useTooltip(options);
-  const shorthand = content !== undefined;
-
-  return (
-    <TooltipContext value={{ tooltip, styles: tooltipStyle() }}>
-      {shorthand ? (
-        <>
-          <TooltipTrigger asChild>{children}</TooltipTrigger>
-          <TooltipContent>
-            {content}
-            {arrow && <TooltipArrow />}
-          </TooltipContent>
-        </>
-      ) : (
-        children
-      )}
-    </TooltipContext>
-  );
+export function Tooltip(props: Tooltip.Props) {
+  return <TooltipRoot {...props} />;
 }
 
 export namespace Tooltip {
@@ -60,3 +39,4 @@ export namespace Tooltip {
 
   export const Style = tooltipStyle;
 }
+export { TooltipDelayGroup } from './delay-group';

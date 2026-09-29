@@ -1,10 +1,8 @@
-'use client';
-
-import { Group, useGroupNameWarning } from '../../utility/group';
+import { ButtonGroupRoot } from './root';
+import { Group } from '../../utility/group';
 
 export function ButtonGroup(props: ButtonGroup.Props) {
-  useGroupNameWarning('ButtonGroup', props);
-  return <Group {...props} />;
+  return <ButtonGroupRoot {...props} />;
 }
 
 export namespace ButtonGroup {

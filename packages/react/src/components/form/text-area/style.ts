@@ -1,5 +1,5 @@
 import { fieldSurface } from '../../../internal/field-surface';
-import { insetButtons } from '../../../internal/text-control';
+import { insetButtons } from '../../../internal/text-control/style';
 import { tv } from '../../../utils';
 
 import type { TextAreaVariant } from '.';

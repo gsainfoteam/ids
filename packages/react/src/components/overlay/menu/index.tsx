@@ -1,101 +1,28 @@
-'use client';
-
-import { use, useEffect, type ComponentProps, type ReactNode } from 'react';
+import { type ComponentProps, type ReactNode } from 'react';
 
 import { MenuCheckboxItem } from './checkbox-item';
-import { CommandEmpty, CommandMenu, CommandNestedMenu, CommandSearch } from './command';
+import { CommandEmpty, CommandSearch } from './command';
 import { MenuContent } from './content';
-import { CommandContext, ContentContext, MenuContext, useMenuContext } from './context';
 import { MenuGroup } from './group';
 import { MenuItemIndicator, type MenuItemIndicatorProps } from './indicator';
 import { MenuItem } from './item';
 import { MenuLabel } from './label';
 import { MenuRadioGroup } from './radio-group';
 import { MenuRadioItem } from './radio-item';
+import { MenuRoot } from './root';
 import { MenuSeparator } from './separator';
 import { MenuShortcut } from './shortcut';
 import { menuStyle } from './style';
 import { MenuTrigger } from './trigger';
-import { useMenuLevel, type MenuLevel, type MenuTriggerType } from './use-menu';
-import {
-  FloatingNode,
-  FloatingTree,
-  type AnchoredAlign,
-  type AnchoredSide,
-} from '../../../internal/overlay';
-import { isDevelopment } from '../../../utils/dev';
+import { type MenuTriggerType } from './use-menu';
+import { type AnchoredAlign, type AnchoredSide } from '../../../internal/overlay';
 
 import type { Divider } from '../../layout/divider';
 import type { Kbd } from '../../typography/kbd';
 import type { Hotkey } from '@tanstack/react-hotkeys';
 
-export function Menu({ triggerType, ...props }: Menu.Props) {
-  const parent = use(ContentContext);
-  const palette = use(CommandContext);
-
-  if (palette) return <CommandNestedMenu />;
-  if (parent) return <NestedMenu {...props} triggerType={triggerType} parent={parent} />;
-  if (triggerType === 'command') return <CommandMenu {...props} />;
-
-  return (
-    <FloatingTree>
-      <RootMenu {...props} triggerType={triggerType ?? 'click'} />
-    </FloatingTree>
-  );
-}
-
-type RootMenuProps = Omit<Menu.Props, 'triggerType'> & { triggerType: MenuTriggerType };
-
-function RootMenu({
-  open,
-  defaultOpen = false,
-  onOpenChange,
-  triggerType,
-  children,
-}: RootMenuProps) {
-  const root = useMenuLevel({ open, defaultOpen, onOpenChange, parentOpen: null, triggerType });
-
-  return (
-    <MenuContext value={{ level: root, root, triggerType }}>
-      <FloatingNode id={root.nodeId}>{children}</FloatingNode>
-    </MenuContext>
-  );
-}
-
-type NestedMenuProps = Menu.Props & { parent: MenuLevel };
-
-function NestedMenu({
-  open,
-  defaultOpen = false,
-  onOpenChange,
-  triggerType: ignoredTriggerType,
-  hotkey: ignoredHotkey,
-  parent,
-  children,
-}: NestedMenuProps) {
-  const { root, triggerType } = useMenuContext('Menu');
-  const level = useMenuLevel({
-    open,
-    defaultOpen,
-    onOpenChange,
-    parentOpen: parent.open,
-    triggerType,
-  });
-
-  const setsRootOnlyProps = ignoredTriggerType !== undefined || ignoredHotkey !== undefined;
-
-  useEffect(() => {
-    if (isDevelopment && setsRootOnlyProps)
-      console.warn(
-        '[IDS] Menu: triggerType and hotkey apply only to the outermost Menu. A Menu inside Menu.Content is a submenu and ignores them.',
-      );
-  }, [setsRootOnlyProps]);
-
-  return (
-    <MenuContext value={{ level, root, triggerType }}>
-      <FloatingNode id={level.nodeId}>{children}</FloatingNode>
-    </MenuContext>
-  );
+export function Menu(props: Menu.Props) {
+  return <MenuRoot {...props} />;
 }
 
 export namespace Menu {

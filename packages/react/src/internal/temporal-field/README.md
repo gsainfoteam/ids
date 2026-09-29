@@ -2,11 +2,12 @@
 
 DateField, TimeField, DateTimeField 가 함께 쓰는 필드 본체입니다. 각 필드는 `config` 로 값의 종류, 표시, 파싱, 팝업 내용만 정하고 나머지는 여기서 합니다.
 
-| 파일                                             | 내용                                                                                                                                 |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| [`index.tsx`](#indextsx)                         | `TemporalField`, 파트(`TemporalTrigger`, `TemporalInput`, `TemporalValue`, `TemporalClear`, `TemporalContent`), `temporalFieldStyle` |
-| [`use-temporal-field.ts`](#use-temporal-fieldts) | 값, 열림, 입력 중인 글자, blur, 폼 reset 을 다루는 hook                                                                              |
-| [`format.ts`](#formatts)                         | 표시 형식(`TemporalFormat`, `formatter`, `dateOptions`, `timeOptions`)                                                               |
+| 파일                                             | 내용                                                                                                                                                  |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`index.tsx`](#indextsx)                         | `TemporalField`, 파트(`TemporalTrigger`, `TemporalInput`, `TemporalValue`, `TemporalClear`, `TemporalContent`), `temporalFieldStyle` 의 다시 내보내기 |
+| [`style.ts`](#stylets)                           | `temporalFieldStyle`                                                                                                                                  |
+| [`use-temporal-field.ts`](#use-temporal-fieldts) | 값, 열림, 입력 중인 글자, blur, 폼 reset 을 다루는 hook                                                                                               |
+| [`format.ts`](#formatts)                         | 표시 형식(`TemporalFormat`, `formatter`, `dateOptions`, `timeOptions`)                                                                                |
 
 ## 쓰는 곳
 
@@ -101,6 +102,14 @@ export namespace DateField {
 - `aria-invalid` prop 이 `invalid` 보다 우선합니다. 둘 다 없으면 읽을 수 없는 글자(`unreadable`)가 invalid 를 정합니다.
 - ref 는 `mergeRefs(controlRef, ref)` 로 렌더마다 새로 만듭니다. 이 줄은 `react-hooks/refs` lint 를 끕니다: `mergeRefs` 는 callback 을 만들 뿐 렌더 중에 ref 를 읽지 않습니다. 렌더마다 새 함수라서 소비자의 callback ref 도 렌더마다 다시 불립니다.
 - 파트 목록(`shell`)은 `flattenFragments` 의 결과를 그대로 렌더합니다. key 에 Fragment 경로가 붙어서, 파트를 여러 Fragment 에 나눠 담아도 겹치지 않습니다.
+
+## style.ts
+
+`temporalFieldStyle` 입니다. `'use client'` 가 없는 모듈이라, 서버 컴포넌트에서 도는 DateField, TimeField, DateTimeField 의 index 가 `Style` 로 여기서 바로 가져갑니다. `index.tsx` 는 같은 이름을 다시 내보냅니다.
+
+### 알아둘 것
+
+- 여기에 hook 이나 컴포넌트를 두지 않습니다. 클라이언트 모듈에 두면 서버 컴포넌트의 `DateField.Style` 이 client reference 가 되어 부를 수 없습니다.
 
 ## use-temporal-field.ts
 

@@ -1,57 +1,10 @@
-'use client';
-
-import { ToggleGroupContext, type ToggleGroupSelectionMode } from './context';
-import { useToggleGroup } from './use-toggle-group';
-import { FormValue } from '../../../internal/form-value';
-import { tv } from '../../../utils';
-import { Group, useGroupNameWarning } from '../../utility/group';
+import { type ToggleGroupSelectionMode } from './context';
+import { ToggleGroupRoot } from './root';
+import { toggleGroupStyle } from './style';
+import { Group } from '../../utility/group';
 
 export function ToggleGroup<T extends string = string>(props: ToggleGroup.Props<T>) {
-  const {
-    selectionMode,
-    value,
-    defaultValue,
-    onValueChange,
-    orientation,
-    disabled,
-    loop,
-    required,
-    name,
-    form,
-    ref,
-    className,
-    children,
-    ...rest
-  } = props;
-  useGroupNameWarning('ToggleGroup', props);
-  const { context, rootProps, formValue } = useToggleGroup({
-    selectionMode,
-    value,
-    defaultValue,
-    onValueChange,
-    orientation,
-    disabled,
-    loop,
-    required,
-    name,
-    form,
-    ref,
-  });
-
-  return (
-    <ToggleGroupContext value={context}>
-      <Group
-        {...rest}
-        {...rootProps}
-        orientation={orientation}
-        separator={rootProps.role === 'radiogroup' ? 'decorative' : 'semantic'}
-        className={ToggleGroup.Style({ orientation, className })}
-      >
-        {children}
-        <FormValue {...formValue} />
-      </Group>
-    </ToggleGroupContext>
-  );
+  return <ToggleGroupRoot {...props} />;
 }
 
 export namespace ToggleGroup {
@@ -84,13 +37,5 @@ export namespace ToggleGroup {
 
   export const Separator = Group.Separator;
 
-  export const Style = tv({
-    variants: {
-      orientation: {
-        horizontal: '[&>[data-toggle-group-item]]:flex-1',
-        vertical: '',
-      },
-    },
-    defaultVariants: { orientation: 'horizontal' },
-  });
+  export const Style = toggleGroupStyle;
 }

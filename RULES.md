@@ -46,7 +46,15 @@ file, so each file's directive reaches `dist` (`rollup-preserve-directives`). A 
 hook, creates a context or renders a component starts with `'use client'`; pure modules (`style.ts`,
 logic such as `date.ts` or `number-step.ts`, types, DOM helpers and stores that client modules
 call) and re-export-only `index.ts` files do not. This is what lets a Server Component import IDS
-and render it without a boundary of its own. `tests/use-client.test.ts` checks both directions.
+and render it without a boundary of its own. A component with parts keeps its `index.tsx`
+server-safe for the same reason: a Server Component cannot read a property of a client reference,
+so `<Dialog.Trigger>` works only when `Dialog` itself is a plain server function. The index holds
+no directive, no hook and no context; `Dialog` there only renders `DialogRoot` from `root.tsx`,
+and the namespace aliases parts imported from their own client files. A root that recognises
+another component by `child.type` also accepts that component's root (`[Avatar, AvatarRoot]`),
+since a Server Component hands over `<Avatar>` already rendered to `<AvatarRoot>`.
+`tests/use-client.test.ts` checks both directions, and `tests/server-components.test.ts` renders
+parts from a Server Component.
 
 **What we build and what we install.** Prefer a well-maintained package over hand-rolled logic:
 
@@ -127,7 +135,8 @@ into one file per part. Menu and Drawer show the shape:
 
 ```
 drawer/
-  index.tsx      Drawer and `export namespace Drawer`: types, part aliases, Style
+  index.tsx      Drawer and `export namespace Drawer`: types, part aliases, Style (server-safe)
+  root.tsx       DrawerRoot: the root's state, context provider and markup ('use client')
   context.ts     createContext and the guard hook (useDrawerContext)
   style.ts       drawerStyle = tv({ slots, variants })
   trigger.tsx    DrawerTrigger, DrawerTriggerProps
@@ -135,7 +144,9 @@ drawer/
   use-drawer.ts  logic hooks and pure helpers keep their own files
 ```
 
-- `index.tsx` holds the root component and the namespace only. A part is an alias with its props
+- `index.tsx` holds a hook-free root, `return <DrawerRoot {...props} />`, and the namespace only.
+  The root's code, its helpers and any part the namespace used to define inline live in
+  `root.tsx`; a `tv` Style lives in `style.ts`. A part is an alias with its props
   type beside it, so `Drawer.Trigger` and `Drawer.Trigger.Props` stay the public names:
   `export const Trigger = DrawerTrigger;` and
   `export namespace Trigger { export type Props = DrawerTriggerProps; }`. `Style` is
@@ -147,8 +158,8 @@ drawer/
   `DrawerTrigger.displayName = 'Drawer.Trigger';`, so Show code prints `<Drawer.Trigger>` and not
   the function name. The icon-name lookup skips a `displayName` with a dot, so a part placed in an
   IconButton's `icon` never becomes its label.
-- Parts import `./context`, `./style` and sibling parts directly. They import `'.'` only with
-  `import type`, so no runtime cycle runs through `index.tsx`. The root recognises its parts
+- Parts and `root.tsx` import `./context`, `./style` and sibling parts directly. They import `'.'`
+  only with `import type`, so no runtime cycle runs through `index.tsx`. The root recognises its parts
   (`child.type === DrawerOverlay`, a set of part functions) by importing them, never through
   `Drawer.Overlay`.
 - Paths imported from outside the folder (`field/context`, `select/select-options`,

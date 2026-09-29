@@ -1,4 +1,4 @@
-import { textControlStyle } from '../../../internal/text-control';
+import { textControlStyle } from '../../../internal/text-control/style';
 import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';

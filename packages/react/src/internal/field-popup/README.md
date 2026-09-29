@@ -31,7 +31,7 @@
 ### 쓰는 법
 
 ```tsx
-// components/form/chip-field/index.tsx
+// components/form/chip-field/root.tsx
 {s.open && (
   <FieldPopup
     anchor={rootRef}

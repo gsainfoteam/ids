@@ -1,86 +1,21 @@
-'use client';
-
-import { isValidElement, useState, type ReactElement, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { DrawerClose, type DrawerCloseProps } from './close';
 import { DrawerContent, type DrawerContentProps } from './content';
-import { DrawerContext } from './context';
 import { DrawerDescription, type DrawerDescriptionProps } from './description';
 import { DrawerFooter, type DrawerFooterProps } from './footer';
 import { DrawerHandle, type DrawerHandleProps } from './handle';
 import { DrawerHeader, type DrawerHeaderProps } from './header';
 import { DrawerOverlay, type DrawerOverlayProps } from './overlay';
+import { DrawerRoot } from './root';
 import { drawerStyle } from './style';
 import { DrawerTitle, type DrawerTitleProps } from './title';
 import { DrawerTrigger, type DrawerTriggerProps } from './trigger';
-import { useDrawer } from './use-drawer';
-import { flattenFragments } from '../../../utils';
 
 import type { DrawerSide, SnapPoint as DrawerSnapPoint } from './drawer-gesture';
 
-const isOverlay = (node: ReactNode): node is ReactElement<DrawerOverlayProps> =>
-  isValidElement(node) && node.type === DrawerOverlay;
-
-export function Drawer({
-  open,
-  defaultOpen = false,
-  onOpenChange,
-  onOpenChangeComplete,
-  dismissible = true,
-  role = 'dialog',
-  hideClose = false,
-  side = 'right',
-  modal = true,
-  scaleBackground = true,
-  snapPoints,
-  activeSnapPoint,
-  defaultActiveSnapPoint,
-  onActiveSnapPointChange,
-  fadeFromIndex,
-  children,
-}: Drawer.Props) {
-  const drawer = useDrawer({
-    open,
-    defaultOpen,
-    onOpenChange,
-    onOpenChangeComplete,
-    dismissible,
-    side,
-    modal,
-    scaleBackground,
-    snapPoints,
-    activeSnapPoint,
-    defaultActiveSnapPoint,
-    onActiveSnapPointChange,
-    fadeFromIndex,
-  });
-
-  const [titled, setTitled] = useState(false);
-  const [described, setDescribed] = useState(false);
-
-  const parts = flattenFragments(children);
-  const overlay = parts.find(isOverlay);
-
-  return (
-    <DrawerContext
-      value={{
-        drawer,
-        role,
-        side,
-        modal,
-        dismissible,
-        hideClose,
-        overlay: overlay?.props,
-        titled,
-        setTitled,
-        described,
-        setDescribed,
-        styles: drawerStyle({ side, snapping: !!snapPoints && snapPoints.length > 0 }),
-      }}
-    >
-      {parts.filter((node) => node !== overlay)}
-    </DrawerContext>
-  );
+export function Drawer(props: Drawer.Props) {
+  return <DrawerRoot {...props} />;
 }
 
 export namespace Drawer {

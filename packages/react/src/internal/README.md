@@ -170,7 +170,7 @@ BCP 47 locale 태그를 풀이하고, 날짜와 시각의 locale 데이터를 �
 ### 쓰는 법
 
 ```ts
-// components/form/time-field/index.tsx
+// components/form/time-field/root.tsx
 const dateLocale = resolveLocale(locale); // 'ko-KR' 같은 BCP 47 태그. 생략하면 messages.locale
 
 // components/data/calendar/index.tsx
@@ -363,7 +363,7 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 ### 쓰는 법
 
 ```tsx
-// components/form/select/index.tsx: selectStyle 의 root 슬롯은 ['relative', fieldTrigger.base]
+// components/form/select/root.tsx: selectStyle 의 root 슬롯은 ['relative', fieldTrigger.base]
 <div ref={rootRef} data-select="" className={styles.root({ className: resolveState(className, state) })}>
   {triggers.length ? triggers : <SelectTrigger />}
   {clears}
@@ -377,7 +377,7 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
   />
 </div>
 
-// components/form/checkbox-group/index.tsx: name 없이 required 와 문구만
+// components/form/checkbox-group/root.tsx: name 없이 required 와 문구만
 <FormValue
   value={value}
   form={form}
@@ -602,7 +602,7 @@ slots: {
 // components/form/select/clear.tsx: prop 이 없을 때의 기본값
 'aria-label': props['aria-label'] ?? messages.select.clear,
 
-// components/form/rating/index.tsx
+// components/form/rating/root.tsx
 requiredMessage = messages.rating.required,
 
 // components/form/number-field/use-number-field.ts: 값을 끼우는 문구는 함수
@@ -770,7 +770,7 @@ style?: StateValue<CSSProperties | undefined, State>;
 ### 쓰는 법
 
 ```tsx
-// components/feedback/alert/index.tsx
+// components/feedback/alert/root.tsx
 const assertive = announcedAssertively.has(colorScheme);
 <div role={role ?? (assertive ? 'alert' : 'status')} />
 
@@ -806,7 +806,7 @@ export function useCard<E extends HTMLElement>(options: UseSurfaceOptions<E>) {
   return { ...useSurface<E>(options), ...useLabelling(options.interactive) };
 }
 
-// components/data/card/index.tsx
+// components/data/card/root.tsx
 const { interaction, props, dataProps, labelling, register } = useCard<HTMLDivElement>({
   interactive,
   asChild,

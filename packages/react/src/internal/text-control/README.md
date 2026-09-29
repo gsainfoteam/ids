@@ -2,13 +2,14 @@
 
 글자를 입력받는 필드(TextField, PasswordField, NumberField, TelField, TextArea)가 함께 쓰는 셸, Clear, hook 입니다.
 
-| 파일                                         | 내용                                                                                                                             |
-| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| [`index.tsx`](#indextsx)                     | context, 상태 속성, 자식 나누기, `Adornments`, `TextControlClear`, `insetButtons`, `textControlStyle`, 다른 파일의 다시 내보내기 |
-| [`use-text-control.ts`](#use-text-controlts) | 셸의 포커스, 셸 누르기, Escape 로 지우기                                                                                         |
-| [`use-input-value.ts`](#use-input-valuets)   | input 의 DOM 값을 따라가는 hook                                                                                                  |
-| [`use-merged-ref.ts`](#use-merged-refts)     | ref 를 렌더마다 새로 만들지 않고 합치는 hook                                                                                     |
-| [`clear-input.ts`](#clear-inputts)           | 진짜 편집으로 값을 지우고 바꾸는 함수                                                                                            |
+| 파일                                         | 내용                                                                                         |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [`index.tsx`](#indextsx)                     | context, 상태 속성, 자식 나누기, `Adornments`, `TextControlClear`, 다른 파일의 다시 내보내기 |
+| [`style.ts`](#stylets)                       | `insetButtons`, `textControlStyle`                                                           |
+| [`use-text-control.ts`](#use-text-controlts) | 셸의 포커스, 셸 누르기, Escape 로 지우기                                                     |
+| [`use-input-value.ts`](#use-input-valuets)   | input 의 DOM 값을 따라가는 hook                                                              |
+| [`use-merged-ref.ts`](#use-merged-refts)     | ref 를 렌더마다 새로 만들지 않고 합치는 hook                                                 |
+| [`clear-input.ts`](#clear-inputts)           | 진짜 편집으로 값을 지우고 바꾸는 함수                                                        |
 
 ## 쓰는 곳
 
@@ -29,11 +30,11 @@
 ### 쓰는 법
 
 ```tsx
-// components/form/text-field/index.tsx
+// components/form/text-field/root.tsx
 const { items, leading, input, trailing } = splitAroundInput<TextField.Input.Props>(
   children,
-  TextField.Input,
-  () => <TextField.Input />,
+  TextFieldInput,
+  () => <TextFieldInput />,
   'TextField',
 );
 const field = useTextField({
@@ -42,16 +43,16 @@ const field = useTextField({
   disabled,
   invalid,
   onValueChange,
-  clearable: countOf(items, TextField.Clear) > 0,
+  clearable: countOf(items, TextControlClear) > 0,
 });
 const state: TextFieldState = { size, variant, ...field.state };
-const styles = TextField.Style({ variant, size });
+const styles = textControlStyle({ variant, size });
 
 <TextControlContext value={{ state, inputId: field.inputProps.id, clear: field.clear, styles }}>
   <div data-text-field="" {...stateAttributes(state)} {...field.rootProps} className={styles.root(/* ... */)}>
-    <Adornments items={leading} own={[TextField.Clear]} marker="text-field" className={styles.adornment()} />
+    <Adornments items={leading} own={[TextControlClear]} marker="text-field" className={styles.adornment()} />
     {input}
-    <Adornments items={trailing} own={[TextField.Clear]} marker="text-field" className={styles.adornment()} />
+    <Adornments items={trailing} own={[TextControlClear]} marker="text-field" className={styles.adornment()} />
   </div>
 </TextControlContext>
 ```
@@ -63,9 +64,6 @@ const styles = TextField.Style({ variant, size });
 - `TextControlClear` 는 값이 있고 disabled, readOnly 가 아닐 때만 그립니다.
 - Clear 는 검색 필드의 지우기 버튼처럼 Tab 순서에서 빠집니다(`tabIndex: -1`). 키보드로는 Escape 와 전체 선택 뒤 지우기가 같은 일을 합니다.
 - Clear 를 눌러도 포커스는 input 에 남습니다(`keepFocusInInput`: 주 버튼 `pointerdown` 의 `preventDefault()`).
-- `insetButtons`: 장식에 둔 `button` 을 필드 파트의 높이(standard 28px, tiny 24px)로 줄입니다. 아이콘 버튼은 필수인 `aria-label` 을 가지므로 거의 정사각형으로 두고(`px-1`, `min-w-7`), 글자 버튼(`aria-label` 없음)은 라벨 둘레에 padding(`px-2.5`, tiny 는 `px-2`)을 둡니다.
-- `textControlStyle` 의 `size` 는 버튼이 든 장식을 양 끝에서 padding 안으로 당깁니다(`has-[button]:first:-ms-2` 등). 버튼이 위아래에 남긴 만큼 좌우에서도 테두리와 4px 떨어집니다.
-- input 에서는 브라우저가 search, password input 에 그리는 자체 지우기, 보기 버튼(`::-webkit-search-cancel-button`, `::-ms-clear`, `::-ms-reveal`)을 숨깁니다. 필드의 파트가 대신합니다.
 - `isInvalid`: `aria-invalid` 는 `'grammar'`, `'spelling'` 도 받습니다. `null`, `undefined`, `false`, `'false'` 가 아니면 invalid 입니다.
 
 ### 알아둘 것
@@ -74,6 +72,20 @@ const styles = TextField.Style({ variant, size });
 - `data-field-input` 은 셸이 아니라 input 에 붙습니다(각 필드의 hook). 셸의 `focus-ring` 이 이 input 의 포커스를 보고 ring 을 그립니다.
 - `stateAttributes` 의 `data-*` 는 필드 README 에 적힌 공개 상태 속성입니다. 이름을 바꾸면 그 README 도 고칩니다.
 - `data-text-control-clear` 로 테스트가 Clear 를 찾습니다.
+
+## style.ts
+
+`insetButtons` 와 `textControlStyle` 입니다. `'use client'` 가 없는 모듈이라, 서버 컴포넌트에서 도는 `TextField` 의 index 와 다른 필드의 `style.ts` 가 여기서 바로 가져갑니다. `index.tsx` 는 같은 이름을 다시 내보냅니다.
+
+### 왜 이렇게
+
+- `insetButtons`: 장식에 둔 `button` 을 필드 파트의 높이(standard 28px, tiny 24px)로 줄입니다. 아이콘 버튼은 필수인 `aria-label` 을 가지므로 거의 정사각형으로 두고(`px-1`, `min-w-7`), 글자 버튼(`aria-label` 없음)은 라벨 둘레에 padding(`px-2.5`, tiny 는 `px-2`)을 둡니다.
+- `textControlStyle` 의 `size` 는 버튼이 든 장식을 양 끝에서 padding 안으로 당깁니다(`has-[button]:first:-ms-2` 등). 버튼이 위아래에 남긴 만큼 좌우에서도 테두리와 4px 떨어집니다.
+- input 에서는 브라우저가 search, password input 에 그리는 자체 지우기, 보기 버튼(`::-webkit-search-cancel-button`, `::-ms-clear`, `::-ms-reveal`)을 숨깁니다. 필드의 파트가 대신합니다.
+
+### 알아둘 것
+
+- 여기에 hook 이나 컴포넌트를 두지 않습니다. 클라이언트 모듈로 옮기면 서버 컴포넌트에서 `TextField.Style` 과 `NumberField` 등의 `style.ts` 가 client reference 를 받아 `tv({ extend })` 에서 깨집니다(`tests/server-components.test.ts`).
 
 ## use-text-control.ts
 

@@ -1,58 +1,19 @@
-'use client';
-
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 import { PopoverArrow, type PopoverArrowProps } from './arrow';
 import { PopoverClose, type PopoverCloseProps } from './close';
 import { PopoverContent, type PopoverContentProps } from './content';
-import { PopoverContext } from './context';
 import { PopoverDescription, type PopoverDescriptionProps } from './description';
+import { PopoverRoot } from './root';
 import { popoverStyle } from './style';
 import { PopoverTitle, type PopoverTitleProps } from './title';
 import { PopoverTrigger, type PopoverTriggerProps } from './trigger';
-import { usePopover, type PopoverAnchor, type PopoverTriggerType } from './use-popover';
+import { type PopoverAnchor, type PopoverTriggerType } from './use-popover';
 
 import type { AnchoredAlign, AnchoredSide } from '../../../internal/overlay';
 
-export function Popover({
-  open,
-  defaultOpen = false,
-  onOpenChange,
-  onOpenChangeComplete,
-  modal = false,
-  triggerType = 'click',
-  openDelay = 200,
-  closeDelay = 100,
-  children,
-}: Popover.Props) {
-  const popover = usePopover({
-    open,
-    defaultOpen,
-    onOpenChange,
-    onOpenChangeComplete,
-    modal,
-    triggerType,
-    openDelay,
-    closeDelay,
-  });
-
-  const [titled, setTitled] = useState(false);
-  const [described, setDescribed] = useState(false);
-
-  return (
-    <PopoverContext
-      value={{
-        popover,
-        titled,
-        setTitled,
-        described,
-        setDescribed,
-        styles: popoverStyle(),
-      }}
-    >
-      {children}
-    </PopoverContext>
-  );
+export function Popover(props: Popover.Props) {
+  return <PopoverRoot {...props} />;
 }
 
 export namespace Popover {

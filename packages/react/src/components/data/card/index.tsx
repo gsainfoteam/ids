@@ -1,99 +1,22 @@
-'use client';
-
-import { isValidElement, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
+import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { CardAction, type CardActionProps } from './action';
 import { CardContent, type CardContentProps } from './content';
-import { CardContext } from './context';
 import { CardDescription, type CardDescriptionProps } from './description';
 import { CardFooter, type CardFooterProps } from './footer';
 import { CardHeader, type CardHeaderProps } from './header';
 import { CardMedia, type CardMediaProps } from './media';
 import { type CardPartProps } from './part';
+import { CardRoot, type CardVariant } from './root';
 import { cardStyle } from './style';
 import { CardTitle, type CardTitleProps } from './title';
-import { useCard } from './use-card';
-import { resolveState, type StateValue } from '../../../internal/state-props';
-import { Slot } from '../../utility/slot';
+import { type StateValue } from '../../../internal/state-props';
 
 import type { InteractiveState } from '../../../hooks/use-interactive';
 import type { IdsSize } from '../../../tokens/types';
 
-export type CardVariant = 'outline' | 'soft' | 'ghost';
-
-function flag(on: boolean) {
-  return on ? '' : undefined;
-}
-
-export function Card({
-  variant = 'outline',
-  size = 'standard',
-  interactive: interactiveProp,
-  disabled = false,
-  asChild = false,
-  className,
-  style,
-  children,
-  onClick,
-  onKeyDown,
-  onKeyUp,
-  onFocus,
-  onBlur,
-  onPointerEnter,
-  onPointerLeave,
-  onPointerDown,
-  onPointerUp,
-  onPointerCancel,
-  onInteractionChange,
-  ...rest
-}: Card.Props) {
-  const nativeControl =
-    asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
-  const interactive = interactiveProp ?? (onClick != null || nativeControl);
-  const { interaction, props, dataProps, labelling, register } = useCard<HTMLDivElement>({
-    interactive,
-    asChild,
-    disabled,
-    handlers: {
-      onClick,
-      onKeyDown,
-      onKeyUp,
-      onFocus,
-      onBlur,
-      onPointerEnter,
-      onPointerLeave,
-      onPointerDown,
-      onPointerUp,
-      onPointerCancel,
-      onInteractionChange,
-    },
-  });
-  const state: Card.State = { ...interaction, interactive };
-  const styles = cardStyle({ variant, size, interactive });
-  const Root = asChild ? Slot : 'div';
-
-  return (
-    <CardContext value={{ styles, ...register }}>
-      <Root
-        {...rest}
-        {...props}
-        {...labelling}
-        {...(asChild && disabled
-          ? { 'aria-disabled': true, onClick: (event) => event.preventDefault() }
-          : {})}
-        data-card=""
-        data-variant={variant}
-        data-size={size}
-        data-interactive={flag(interactive)}
-        data-disabled={flag(disabled)}
-        {...dataProps}
-        className={styles.root({ className: resolveState(className, state) })}
-        style={resolveState(style, state)}
-      >
-        {resolveState(children, state)}
-      </Root>
-    </CardContext>
-  );
+export function Card(props: Card.Props) {
+  return <CardRoot {...props} />;
 }
 
 export namespace Card {
@@ -152,3 +75,5 @@ export namespace Card {
 
   export const Style = cardStyle;
 }
+
+export type { CardVariant } from './root';
