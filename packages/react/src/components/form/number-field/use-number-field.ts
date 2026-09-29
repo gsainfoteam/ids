@@ -94,8 +94,12 @@ function repeatDelay(count: number) {
     : Math.max(MIN_REPEAT_DELAY, Math.round(REPEAT_DELAY * REPEAT_DELAY_SHRINK ** count));
 }
 
-function captureReleaseOffButton(event: PointerEvent<HTMLButtonElement>) {
-  event.currentTarget.setPointerCapture?.(event.pointerId);
+function tryCaptureReleaseOffButton(event: PointerEvent<HTMLButtonElement>) {
+  try {
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  } catch {
+    return;
+  }
 }
 
 const subscribeToNothing = () => noop;
@@ -442,7 +446,7 @@ export function useNumberField({
         event.preventDefault();
         inputRef.current?.focus({ preventScroll: true });
       }
-      captureReleaseOffButton(event);
+      tryCaptureReleaseOffButton(event);
       pressAlreadyStepped.current = true;
       startRepeat(direction);
     },

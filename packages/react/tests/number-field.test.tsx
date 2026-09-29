@@ -880,6 +880,20 @@ test('holding a stepper repeats and speeds up; releasing stops it', async () => 
   await expect.element(input).toHaveFocus();
 });
 
+test('a stepper press steps even when its pointer cannot be captured', async () => {
+  const form = controlled({ defaultValue: 0 });
+  const screen = await render(form.node);
+  const increment = screen.getByRole('button', { name: '값 늘리기', exact: true }).element();
+  const aPointerTheBrowserDoesNotTrack = { pointerId: 987, pointerType: 'mouse', button: 0 };
+  increment.dispatchEvent(
+    new PointerEvent('pointerdown', { ...aPointerTheBrowserDoesNotTrack, bubbles: true }),
+  );
+  increment.dispatchEvent(
+    new PointerEvent('pointerup', { ...aPointerTheBrowserDoesNotTrack, bubbles: true }),
+  );
+  await expect.poll(() => form.value()).toBe(1);
+});
+
 test('Increment and Decrement lay out beside the input; Escape clears with a Clear part', async () => {
   const form = controlled({
     defaultValue: 2,
