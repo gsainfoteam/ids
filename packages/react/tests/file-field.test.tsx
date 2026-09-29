@@ -76,7 +76,9 @@ test('SSR: labels, native picker attributes, button semantics, validator and dia
   );
   const button = doc.querySelector<HTMLButtonElement>('[data-file-field] button')!;
   expect(doc.querySelector('label')!.htmlFor).toBe(button.id);
-  expect(button.getAttribute('aria-required')).toBe('true');
+  expect(button.hasAttribute('aria-required'), 'a button takes no aria-required').toBe(false);
+  const described = button.getAttribute('aria-describedby')!.split(' ');
+  expect(described.map((id) => doc.getElementById(id)?.textContent)).toContain('필수 항목');
   expect(button.hasAttribute('data-field-input')).toBe(true);
   const native = doc.querySelector<HTMLInputElement>('[type=file]')!;
   expect(native.getAttribute('capture')).toBe('environment');
@@ -429,6 +431,7 @@ test('required is enforced natively; reset, prevented reset, read-only and disab
   const sentName = () => (new FormData(form()).get('resume') as File | null)?.name;
   const trigger = screen.getByRole('button', { name: 'Resume', exact: true });
   const reset = screen.getByRole('button', { name: 'Reset' });
+  await expect.element(trigger).toHaveAccessibleDescription(/필수 항목/);
   expect(form().checkValidity()).toBe(false);
   await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
   await expect.element(trigger).toHaveFocus();

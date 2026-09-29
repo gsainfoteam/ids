@@ -96,7 +96,8 @@
     "rejectCount": "{max, plural, one {You can pick up to # file.} other {You can pick up to # files.}}",
     "rejectSize": "Larger than {max}.",
     "rejectType": "This file type is not allowed.",
-    "remove": "Remove {name}"
+    "remove": "Remove {name}",
+    "required": "Required"
   },
   "input": {
     "clearSearch": "Clear search"

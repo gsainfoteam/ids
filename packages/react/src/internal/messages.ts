@@ -99,6 +99,7 @@ export const messages = {
     rejectSize: '{max}보다 큽니다.',
     rejectType: '허용되지 않는 파일 형식입니다.',
     remove: '{name} 삭제',
+    required: '필수 항목',
   },
   input: {
     clearSearch: '검색어 지우기',

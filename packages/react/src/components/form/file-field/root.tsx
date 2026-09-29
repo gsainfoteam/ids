@@ -181,6 +181,9 @@ export function FileFieldRoot(props: FileFieldProps) {
   const id = providedId ?? `ids-file-${uid}`;
   const errorId = `${id}-rejections`;
   const limitsId = `${id}-limits`;
+  const requiredId = `${id}-required`;
+  const announcesRequired =
+    ariaRequired === undefined ? required : ariaRequired === true || ariaRequired === 'true';
   const limits = describeLimits(
     {
       tokens: s.tokens,
@@ -219,9 +222,9 @@ export function FileFieldRoot(props: FileFieldProps) {
       ariaDescribedby,
       appearance === 'dropzone' && !!limits && limitsId,
       s.rejections.length > 0 && errorId,
+      announcesRequired && requiredId,
     ),
     'aria-invalid': s.rejections.length ? true : (ariaInvalid ?? (invalid || undefined)),
-    'aria-required': ariaRequired ?? (required || undefined),
     'aria-disabled': readOnly || undefined,
     'data-field-input': appearance === 'field' ? '' : undefined,
     'data-dragging': s.dragging ? '' : undefined,
@@ -317,6 +320,11 @@ export function FileFieldRoot(props: FileFieldProps) {
           composed.controls
         )}
         {composed.others}
+        {announcesRequired && (
+          <span id={requiredId} hidden>
+            {t('fileField.required')}
+          </span>
+        )}
         {s.rejections.length > 0 && (
           <div id={errorId} role="alert" className={styles.rejections()}>
             {s.rejections.map(({ file, reason }) => (
