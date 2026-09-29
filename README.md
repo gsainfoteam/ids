@@ -15,6 +15,9 @@ React (Web)과 Flutter (Mobile)을 동시 지원하며, 토큰 파이프라인�
 
 설치법은 각 패키지 README 에 있다. npm 패키지는 GitHub Packages 라 인증이 필요하다.
 
+접근성 기준(WCAG 2.2 AA), 컴포넌트별 키보드와 ARIA, 알려진 한계, 스크린 리더 수동 점검표는
+[docs/accessibility.md](docs/accessibility.md) 에 있다.
+
 ## 환경 세팅
 
 ```bash

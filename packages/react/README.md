@@ -437,6 +437,11 @@ function Row() {
 
 Tabs·Menu처럼 **진짜 compound**가 생기면 그때 Root Context(또는 store)를 도입한다.
 
+## 접근성
+
+- 목표 기준은 WCAG 2.2 AA 이고, 키보드와 역할은 WAI-ARIA APG 패턴을 따릅니다.
+- 컴포넌트별 키보드, 역할과 ARIA, 알려진 한계, 스크린 리더 수동 점검표는 [접근성 준수 안내](../../docs/accessibility.md) 에 있습니다.
+
 ## 컴포넌트
 
 ### Button
