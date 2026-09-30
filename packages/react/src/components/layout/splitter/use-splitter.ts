@@ -15,7 +15,15 @@ import {
   moveHandle,
   type PanelConstraints,
 } from './layout';
-import { keyHandler, withModifiers, type KeyAction } from '../../../internal/keys';
+import { keyHandler } from '../../../internal/keys';
+import {
+  readingDirection,
+  resizeKeyMap,
+  separatorOrientation,
+  separatorProps,
+  type ResizeDelta,
+  type UseResizeDragOptions,
+} from '../../../internal/resize-handle';
 import { useTranslate } from '../../../internal/translate';
 
 export type SplitterOrientation = 'horizontal' | 'vertical';
@@ -42,8 +50,7 @@ export type UseSplitterOptions = {
 
 type Gesture = { from: readonly number[]; reported: number[] | null };
 
-const KEY_STEP_PX = 16;
-const KEY_STEP_LARGE_PX = 64;
+type Drag = { from: readonly number[]; length: number };
 
 const constraintsOf = (spec: SplitterPanelSpec): PanelConstraints => ({
   minSize: spec.minSize ?? 0,
@@ -110,9 +117,11 @@ export function useSplitter({
   const baseId = id ?? `splitter-${generatedId}`;
   const rootRef = useRef<HTMLDivElement | null>(null);
   const gesture = useRef<Gesture | null>(null);
-  const dragFrom = useRef<readonly number[]>([]);
+  const drag = useRef<Drag | null>(null);
   const [dragging, setDragging] = useState<number | null>(null);
 
+  const horizontal = orientation === 'horizontal';
+  const handleLine = separatorOrientation(horizontal ? 'width' : 'height');
   const constraints = panels.map(constraintsOf);
   const layout = useLayout(value, defaultValue, panels, onValueChange);
   const { sizes } = layout;
@@ -158,19 +167,27 @@ export function useSplitter({
     queueMicrotask(endGesture);
   };
 
-  const measure = () => {
+  const lengthThePanelsShare = () => {
     const root = rootRef.current;
-    if (!root) return null;
-    const panelsShareWhatTheHandlesLeave = [
-      ...root.querySelectorAll<HTMLElement>(':scope > [data-splitter-panel]'),
-    ].reduce((total, element) => {
-      const box = element.getBoundingClientRect();
-      return total + (orientation === 'horizontal' ? box.width : box.height);
-    }, 0);
-    return {
-      length: panelsShareWhatTheHandlesLeave,
-      rtl: getComputedStyle(root).direction === 'rtl',
-    };
+    if (!root) return 0;
+    return [...root.querySelectorAll<HTMLElement>(':scope > [data-splitter-panel]')].reduce(
+      (total, element) => {
+        const box = element.getBoundingClientRect();
+        return total + (horizontal ? box.width : box.height);
+      },
+      0,
+    );
+  };
+
+  const endDrag = () => {
+    drag.current = null;
+    setDragging(null);
+  };
+
+  const putBack = (from: readonly number[]) => {
+    const current = api.getSizes();
+    const samePanels = current.length === from.length;
+    if (samePanels && !isEqual(current, from)) api.setSizes([...from]);
   };
 
   const collapsibleAround = (handle: number) => {
@@ -193,36 +210,29 @@ export function useSplitter({
   };
 
   const onHandleKeyDown = (handle: number) => (event: KeyboardEvent<HTMLElement>) => {
-    const group = measure();
-    if (!group || group.length <= 0) return;
+    const length = lengthThePanelsShare();
+    if (length <= 0) return;
 
-    const resizeBy =
-      (direction: 1 | -1): KeyAction<HTMLElement> =>
-      (keyEvent) => {
-        const px = keyEvent.shiftKey ? KEY_STEP_LARGE_PX : KEY_STEP_PX;
-        const delta = (direction * px * 100) / group.length;
-        moveHandleTo(handle, sizes, keyTarget(sizes, constraints, handle, delta));
-      };
-    const moveTo = (edge: 'min' | 'max') => () =>
-      moveHandleTo(handle, sizes, handleRange(sizes, constraints, handle)[edge]);
+    const range = handleRange(sizes, constraints, handle);
+    const stepBy = (px: number) =>
+      moveHandleTo(handle, sizes, keyTarget(sizes, constraints, handle, (px * 100) / length));
     const toggleNearest = () => {
       const panel = collapsibleAround(handle);
       if (panel === null) return false;
       togglePanel(panel);
     };
-    const arrows =
-      orientation === 'horizontal'
-        ? { ArrowLeft: resizeBy(-1), ArrowRight: resizeBy(1) }
-        : { ArrowUp: resizeBy(-1), ArrowDown: resizeBy(1) };
 
     const acted = keyHandler(
       {
-        ...withModifiers(arrows, ['Shift']),
-        Home: moveTo('min'),
-        End: moveTo('max'),
+        ...resizeKeyMap<HTMLElement>(
+          handleLine,
+          { value: range.now, min: range.min, max: range.max },
+          (size) => moveHandleTo(handle, sizes, size),
+          stepBy,
+        ),
         Enter: toggleNearest,
       },
-      { dir: group.rtl ? 'rtl' : 'ltr' },
+      readingDirection(event.currentTarget),
     )(event);
     if (acted) beginGesture();
   };
@@ -243,28 +253,56 @@ export function useSplitter({
     const now = Math.round(range.now);
     const target = collapsibleAround(index);
 
+    const moveBy = ({ inline, block }: ResizeDelta) => {
+      const started = drag.current;
+      if (!started || started.length <= 0) return;
+      const px = horizontal ? inline : block;
+      moveHandleTo(index, started.from, started.from[index]! + (px * 100) / started.length);
+    };
+
+    const dragOptions: UseResizeDragOptions = {
+      axes: horizontal ? 'inline' : 'block',
+      onStart: (element) => {
+        element.focus({ preventScroll: true });
+        drag.current = { from: sizes, length: lengthThePanelsShare() };
+        setDragging(index);
+        beginGesture();
+      },
+      onMove: moveBy,
+      onEnd: (delta) => {
+        settle(() => moveBy(delta));
+        endDrag();
+      },
+      onCancel: () => {
+        if (drag.current) putBack(drag.current.from);
+        gesture.current = null;
+        endDrag();
+      },
+      onReset: () => settle(resetLayout),
+    };
+
     return {
       props: {
         ...attributes,
-        'aria-orientation': orientation === 'horizontal' ? 'vertical' : 'horizontal',
-        'aria-valuenow': now,
-        'aria-valuemin': Math.round(range.min),
-        'aria-valuemax': Math.round(range.max),
-        'aria-valuetext': collapsed[index]
-          ? t('splitter.collapsed')
-          : t('splitter.value', { value: now }),
-        'aria-controls': panelProps[index]?.id,
+        ...separatorProps({
+          orientation: handleLine,
+          value: now,
+          min: Math.round(range.min),
+          max: Math.round(range.max),
+          valueText: collapsed[index]
+            ? t('splitter.collapsed')
+            : t('splitter.value', { value: now }),
+          controls: panelProps[index]?.id,
+        }),
+        'aria-label': t('splitter.handle'),
         'data-splitter-handle': '',
-        'data-dragging': dragging === index ? '' : undefined,
         onKeyDown: onHandleKeyDown(index),
         onKeyUp: endGesture,
         onBlur: (event: FocusEvent<HTMLElement>) => {
           zagBlur?.(event);
           endGesture();
         },
-        onDoubleClick: () => settle(resetLayout),
       },
-      label: t('splitter.handle'),
       toggle:
         target === null
           ? null
@@ -275,21 +313,7 @@ export function useSplitter({
               controls: panelProps[target]?.id,
               onClick: () => settle(() => togglePanel(target)),
             },
-      drag: {
-        orientation,
-        measure,
-        onStart: () => {
-          dragFrom.current = sizes;
-          setDragging(index);
-          beginGesture();
-        },
-        onMove: (percent: number) =>
-          moveHandleTo(index, dragFrom.current, dragFrom.current[index]! + percent),
-        onEnd: () => {
-          setDragging(null);
-          endGesture();
-        },
-      },
+      drag: dragOptions,
     };
   };
 

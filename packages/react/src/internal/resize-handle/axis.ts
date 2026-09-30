@@ -30,25 +30,27 @@ export function resizeKeyMap<E extends Element>(
   orientation: ResizeOrientation,
   { value, min, max }: ResizeRange,
   resizeTo: (size: number) => void,
+  resizeBy: (step: number) => void = (step) => resizeTo(clamp(value + step, min, max)),
 ): KeyMap<E> {
   const to = (size: number) => () => resizeTo(clamp(size, min, max));
+  const by = (step: number) => () => resizeBy(step);
   const toTheEnd = Number.isFinite(max) ? to(max) : undefined;
 
   if (orientation === 'vertical')
     return {
-      ArrowLeft: to(value - RESIZE_STEP),
-      ArrowRight: to(value + RESIZE_STEP),
-      'Shift+ArrowLeft': to(value - RESIZE_STEP_LARGE),
-      'Shift+ArrowRight': to(value + RESIZE_STEP_LARGE),
+      ArrowLeft: by(-RESIZE_STEP),
+      ArrowRight: by(RESIZE_STEP),
+      'Shift+ArrowLeft': by(-RESIZE_STEP_LARGE),
+      'Shift+ArrowRight': by(RESIZE_STEP_LARGE),
       Home: to(min),
       End: toTheEnd,
     };
 
   return {
-    ArrowUp: to(value - RESIZE_STEP),
-    ArrowDown: to(value + RESIZE_STEP),
-    'Shift+ArrowUp': to(value - RESIZE_STEP_LARGE),
-    'Shift+ArrowDown': to(value + RESIZE_STEP_LARGE),
+    ArrowUp: by(-RESIZE_STEP),
+    ArrowDown: by(RESIZE_STEP),
+    'Shift+ArrowUp': by(-RESIZE_STEP_LARGE),
+    'Shift+ArrowDown': by(RESIZE_STEP_LARGE),
     Home: to(min),
     End: toTheEnd,
   };

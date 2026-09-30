@@ -15,7 +15,7 @@ export type ResizeDelta = { inline: number; block: number };
 export type UseResizeDragOptions = {
   axes: ResizeDragAxes;
   disabled?: boolean;
-  onStart: () => void;
+  onStart: (handle: HTMLElement) => void;
   onMove: (delta: ResizeDelta) => void;
   onEnd: (delta: ResizeDelta) => void;
   onCancel: () => void;
@@ -130,7 +130,7 @@ export function useResizeDrag(options: UseResizeDragOptions) {
           },
         };
         drag.current = active;
-        latest.current.onStart();
+        latest.current.onStart(element);
         setDragging(true);
         latest.current.onDraggingChange?.(true);
       },

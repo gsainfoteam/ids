@@ -1,3 +1,4 @@
+import { resizeHandle } from '../../../internal/resize-handle';
 import { tv } from '../../../utils';
 
 import type { SplitterOrientation } from './use-splitter';
@@ -9,10 +10,11 @@ export const splitterStyle = tv({
     root: 'flex size-full min-h-0 min-w-0',
     panel: 'min-h-0 min-w-0 basis-0 overflow-hidden data-dragging:pointer-events-none',
     handle: [
-      'relative z-10 shrink-0 self-stretch touch-none select-none',
-      'bg-(--ids-color-border) transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'hover:bg-(--ids-color-handle-hover) data-dragging:bg-(--ids-color-handle-active)',
-      'focus-ring after:absolute',
+      resizeHandle.base,
+      resizeHandle.focus,
+      resizeHandle.ladder.line,
+      'relative z-10 shrink-0 self-stretch',
+      'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
     ],
     group: 'relative z-10 flex shrink-0',
     toggle: [
@@ -28,20 +30,14 @@ export const splitterStyle = tv({
     orientation: {
       horizontal: {
         root: 'flex-row',
-        handle: [
-          'w-px cursor-col-resize',
-          'after:inset-y-0 after:left-1/2 after:w-6 after:-translate-x-1/2',
-        ],
+        handle: [resizeHandle.hitArea.vertical, resizeHandle.cursor.vertical, 'w-px'],
         group: 'flex-row',
         toggle: 'top-2',
         toggleIcon: 'rtl:-scale-x-100',
       },
       vertical: {
         root: 'flex-col',
-        handle: [
-          'h-px cursor-row-resize',
-          'after:inset-x-0 after:top-1/2 after:h-6 after:-translate-y-1/2',
-        ],
+        handle: [resizeHandle.hitArea.horizontal, resizeHandle.cursor.horizontal, 'h-px'],
         group: 'flex-col',
         toggle: 'start-2',
       },

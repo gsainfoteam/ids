@@ -10,7 +10,7 @@ when a drag, a key, the collapse button or a double click ends, and `Splitter.Pa
 `Splitter.Handle` goes between panels that have none. Handles are `separator`s with the APG Window
 Splitter keys: arrows move 16px (64px with Shift, flipped in right-to-left), Home and End take the
 panel before the handle to its smallest and largest size, Enter folds and unfolds a collapsible
-panel, and a double click restores the default layout. A collapsible panel's handle carries a
-collapse button, so folding needs no drag. Default sizes render as `flex-grow` on the server, so
-nothing moves on hydration, and a layout saved from `onValueCommit` in a cookie comes back through
-`defaultValue`.
+panel, and a double click restores the default layout. Escape during a drag puts the panels back
+without a commit. A collapsible panel's handle carries a collapse button, so folding needs no drag.
+Default sizes render as `flex-grow` on the server, so nothing moves on hydration, and a layout saved
+from `onValueCommit` in a cookie comes back through `defaultValue`.

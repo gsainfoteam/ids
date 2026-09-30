@@ -11,7 +11,7 @@ import {
 
 import { HandleIndexContext, useSplitterPart } from './context';
 import { splitterStyle, type SplitterToggleSide } from './style';
-import { useHandleDrag } from './use-handle-drag';
+import { useResizeDrag } from '../../../internal/resize-handle';
 import { mergeProps, part } from '../../../utils';
 
 export type SplitterHandleProps = ComponentProps<'div'> & { asChild?: boolean };
@@ -32,7 +32,8 @@ export function SplitterHandle({ asChild, className, children, ...props }: Split
     HandleIndexContext,
   );
   const handle = splitter.handle(index);
-  const dragHandlers = useHandleDrag(handle.drag);
+  const { dragProps } = useResizeDrag(handle.drag);
+  const defaultLabel = props['aria-labelledby'] ? undefined : handle.props['aria-label'];
 
   const separator = part(
     'div',
@@ -40,8 +41,8 @@ export function SplitterHandle({ asChild, className, children, ...props }: Split
     children,
     mergeProps(props, {
       ...handle.props,
-      ...dragHandlers,
-      'aria-label': props['aria-label'] ?? (props['aria-labelledby'] ? undefined : handle.label),
+      ...dragProps,
+      'aria-label': props['aria-label'] ?? defaultLabel,
       className: styles.handle({ className }),
     }),
   );

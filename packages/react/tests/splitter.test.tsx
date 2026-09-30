@@ -5,14 +5,17 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IdsProvider, Menu, Splitter } from '../src';
+import { Dialog, Drawer, IdsProvider, Menu, Splitter } from '../src';
 import { skipWithoutCdp } from './engines';
 
 type Point = { x: number; y: number };
 
 const PANELS_SHARE_400PX_BESIDE_ONE_HANDLE = { width: 401, height: 160 };
 const PANELS_SHARE_400PX_BESIDE_TWO_HANDLES = { width: 402, height: 160 };
+const PANELS_SHARE_200PX_BESIDE_ONE_HANDLE = { width: 201, height: 120 };
 const TALL = { width: 160, height: 401 };
+
+const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -654,4 +657,214 @@ test('development warnings: one panel, defaults past 100 and handles outside a g
       '[IDS] Splitter: 1 Splitter.Handle not drawn. A handle goes between two panels, one per gap.',
       '[IDS] Splitter: the default sizes add up to 130%, past 100%. They are scaled down to fit.',
     ]);
+});
+
+test('keyboard: an arrow pushes past a panel already at its minimum, Home stops at that panel', async () => {
+  const screen = await render(
+    <Sized size={PANELS_SHARE_400PX_BESIDE_TWO_HANDLES}>
+      <Splitter defaultValue={[30, 10, 60]}>
+        <Splitter.Panel>A</Splitter.Panel>
+        <Splitter.Panel minSize={10}>B</Splitter.Panel>
+        <Splitter.Panel>C</Splitter.Panel>
+      </Splitter>
+    </Sized>,
+  );
+  const [, second] = screen.getByRole('separator').all();
+  second!.element().focus();
+
+  await userEvent.keyboard('{ArrowLeft}');
+  await expect.poll(() => growOf(rootOf(second!))).toEqual([26, 10, 64]);
+  expect(valueNow(second!), 'the panel before the handle stays at its minimum').toBe(10);
+  await userEvent.keyboard('{Home}');
+  expect(growOf(rootOf(second!)), 'Home moves only the panel before the handle').toEqual([
+    26, 10, 64,
+  ]);
+});
+
+test('pointer: Escape during a drag puts the layout back, reports it and commits nothing', async (context) => {
+  skipWithoutCdp(context);
+  const changes: number[][] = [];
+  const commits: number[][] = [];
+  const screen = await render(
+    <Sized size={PANELS_SHARE_400PX_BESIDE_ONE_HANDLE}>
+      <Splitter
+        onValueChange={(value) => changes.push(value)}
+        onValueCommit={(value) => commits.push(value)}
+      >
+        <Splitter.Panel defaultSize={50}>A</Splitter.Panel>
+        <Splitter.Panel>B</Splitter.Panel>
+      </Splitter>
+    </Sized>,
+  );
+  const handle = screen.getByRole('separator');
+  const start = centerOf(handle.element());
+
+  await press(start);
+  await drag(shifted(start, 40));
+  await expect.element(handle).toHaveAttribute('aria-valuenow', '60');
+  await userEvent.keyboard('{Escape}');
+  await expect.element(handle).toHaveAttribute('aria-valuenow', '50');
+  expect(changes).toEqual([
+    [60, 40],
+    [50, 50],
+  ]);
+  await expect.element(handle).not.toHaveAttribute('data-dragging');
+  await expect.element(rootOf(handle)).not.toHaveAttribute('data-dragging');
+
+  await drag(shifted(start, 80));
+  await release(shifted(start, 80));
+  await nextFrame();
+  expect(valueNow(handle), 'the rest of the press moves nothing').toBe(50);
+  expect(commits).toEqual([]);
+});
+
+test('pointer: Escape during a drag inside a Dialog cancels the drag and leaves the Dialog open', async (context) => {
+  skipWithoutCdp(context);
+  const screen = await render(
+    <IdsProvider>
+      <Dialog defaultOpen>
+        <Dialog.Content>
+          <Dialog.Title>Layout</Dialog.Title>
+          <Sized size={PANELS_SHARE_200PX_BESIDE_ONE_HANDLE}>
+            <Splitter>
+              <Splitter.Panel defaultSize={50}>A</Splitter.Panel>
+              <Splitter.Panel>B</Splitter.Panel>
+            </Splitter>
+          </Sized>
+        </Dialog.Content>
+      </Dialog>
+    </IdsProvider>,
+  );
+  const dialog = screen.getByRole('dialog', { name: 'Layout' });
+  await expect.element(dialog).toBeVisible();
+  const handle = screen.getByRole('separator');
+  const start = centerOf(handle.element());
+
+  await press(start);
+  await drag(shifted(start, 20));
+  await expect.element(handle).toHaveAttribute('aria-valuenow', '60');
+  await userEvent.keyboard('{Escape}');
+  await expect.element(handle).toHaveAttribute('aria-valuenow', '50');
+  await release(shifted(start, 20));
+  await expect.element(dialog).toBeInTheDocument();
+
+  await userEvent.keyboard('{Escape}');
+  await expect.element(dialog).not.toBeInTheDocument();
+});
+
+test('pointer: handles show a resize cursor, which the page keeps with no text selection while dragging', async (context) => {
+  skipWithoutCdp(context);
+  const screen = await render(
+    <>
+      <Sized size={PANELS_SHARE_400PX_BESIDE_ONE_HANDLE}>
+        <Splitter>
+          <Splitter.Panel defaultSize={50}>A</Splitter.Panel>
+          <Splitter.Panel>B</Splitter.Panel>
+        </Splitter>
+      </Sized>
+      <Sized size={TALL}>
+        <Splitter orientation="vertical">
+          <Splitter.Panel defaultSize={50}>Top</Splitter.Panel>
+          <Splitter.Panel>Bottom</Splitter.Panel>
+        </Splitter>
+      </Sized>
+    </>,
+  );
+  const [across, down] = screen.getByRole('separator').all();
+  const drags = [
+    { handle: across!, cursor: 'ew-resize', by: (point: Point) => shifted(point, 40) },
+    { handle: down!, cursor: 'ns-resize', by: (point: Point) => shifted(point, 0, 40) },
+  ];
+
+  for (const { handle, cursor, by } of drags) {
+    expect(getComputedStyle(handle.element()).cursor).toBe(cursor);
+    const start = centerOf(handle.element());
+    await press(start);
+    await drag(by(start));
+    await expect.element(handle).toHaveAttribute('data-dragging');
+    expect(document.documentElement.style.cursor).toBe(cursor);
+    expect(document.documentElement.style.userSelect).toBe('none');
+    await release(by(start));
+    expect(document.documentElement.style.cursor).toBe('');
+    expect(document.documentElement.style.userSelect).toBe('');
+  }
+});
+
+test('pointer: the handle ends where the pointer is released and commits that once', async (context) => {
+  skipWithoutCdp(context);
+  const commits: number[][] = [];
+  const screen = await render(
+    <Sized size={PANELS_SHARE_400PX_BESIDE_ONE_HANDLE}>
+      <Splitter onValueCommit={(value) => commits.push(value)}>
+        <Splitter.Panel defaultSize={50}>A</Splitter.Panel>
+        <Splitter.Panel>B</Splitter.Panel>
+      </Splitter>
+    </Sized>,
+  );
+  const handle = screen.getByRole('separator');
+  const start = centerOf(handle.element());
+
+  await press(start);
+  await release(shifted(start, -40));
+  await expect.element(handle).toHaveAttribute('aria-valuenow', '40');
+  expect(commits).toEqual([[40, 60]]);
+});
+
+test('pointer: a handle removed during its drag ends the drag and commits nothing', async (context) => {
+  skipWithoutCdp(context);
+  const commits: number[][] = [];
+  const layout = (names: string[]) => (
+    <Sized size={PANELS_SHARE_400PX_BESIDE_TWO_HANDLES}>
+      <Splitter onValueCommit={(value) => commits.push(value)}>
+        {names.map((name) => (
+          <Splitter.Panel key={name}>{name}</Splitter.Panel>
+        ))}
+      </Splitter>
+    </Sized>
+  );
+  const screen = await render(layout(['A', 'B', 'C']));
+  const [, second] = screen.getByRole('separator').all();
+  const root = rootOf(second!);
+  const start = centerOf(second!.element());
+
+  await press(start);
+  await drag(shifted(start, 20));
+  await expect.element(root).toHaveAttribute('data-dragging');
+  await screen.rerender(layout(['A', 'B']));
+  await expect.element(root).not.toHaveAttribute('data-dragging');
+  expect(panelsOf(root).filter((panel) => panel.hasAttribute('data-dragging'))).toEqual([]);
+  await release(shifted(start, 20));
+  expect(commits).toEqual([]);
+});
+
+test('a Splitter inside a bottom Drawer resizes its panels without dragging the Drawer', async (context) => {
+  skipWithoutCdp(context);
+  const screen = await render(
+    <IdsProvider>
+      <Drawer side="bottom" defaultOpen>
+        <Drawer.Content>
+          <Drawer.Title>Panels</Drawer.Title>
+          <Sized size={TALL}>
+            <Splitter orientation="vertical">
+              <Splitter.Panel defaultSize={50}>Top</Splitter.Panel>
+              <Splitter.Panel>Bottom</Splitter.Panel>
+            </Splitter>
+          </Sized>
+        </Drawer.Content>
+      </Drawer>
+    </IdsProvider>,
+  );
+  const drawer = screen.getByRole('dialog', { name: 'Panels' });
+  await expect.element(drawer).toBeVisible();
+  const sheet = document.querySelector<HTMLElement>('[data-drawer-content]')!;
+  const handle = screen.getByRole('separator');
+  const start = centerOf(handle.element());
+
+  await press(start);
+  await drag(shifted(start, 0, 20));
+  await drag(shifted(start, 0, 60));
+  await expect.element(handle).toHaveAttribute('aria-valuenow', '65');
+  expect(sheet.style.transform, 'the sheet stays where it opened').toBe('');
+  await release(shifted(start, 0, 60));
+  await expect.element(drawer).toBeInTheDocument();
 });

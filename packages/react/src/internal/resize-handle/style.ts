@@ -23,6 +23,10 @@ export const resizeHandle = {
       'before:bg-(--ids-color-handle) hover:before:bg-(--ids-color-handle-hover)',
       'data-dragging:before:bg-(--ids-color-handle-active)',
     ),
+    line: cn(
+      'bg-(--ids-color-border) hover:bg-(--ids-color-handle-hover)',
+      'data-dragging:bg-(--ids-color-handle-active)',
+    ),
   },
   motion: cn(
     'transition-[color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
