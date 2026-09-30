@@ -218,6 +218,13 @@ export const messages = {
   spinner: {
     label: '불러오는 중',
   },
+  splitter: {
+    collapse: '패널 접기',
+    collapsed: '접힘',
+    expand: '패널 펼치기',
+    handle: '패널 크기 조절',
+    value: '{value}%',
+  },
   stepper: {
     completed: '완료',
     error: '오류',

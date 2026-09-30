@@ -216,6 +216,13 @@
   "spinner": {
     "label": "Loading"
   },
+  "splitter": {
+    "collapse": "Collapse panel",
+    "collapsed": "Collapsed",
+    "expand": "Expand panel",
+    "handle": "Resize panels",
+    "value": "{value}%"
+  },
   "stepper": {
     "completed": "Completed",
     "error": "Error",

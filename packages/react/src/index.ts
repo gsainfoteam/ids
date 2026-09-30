@@ -105,6 +105,13 @@ export { Divider } from './components/layout/divider';
 export { Spacer } from './components/layout/spacer';
 export { AspectRatio } from './components/layout/aspect-ratio';
 export { ScrollArea } from './components/layout/scroll-area';
+export { Splitter } from './components/layout/splitter';
+export type {
+  SplitterProps,
+  SplitterPanelProps,
+  SplitterHandleProps,
+  SplitterOrientation,
+} from './components/layout/splitter';
 
 export { Breadcrumb } from './components/navigation/breadcrumb';
 export { Tabs } from './components/navigation/tabs';

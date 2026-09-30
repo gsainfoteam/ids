@@ -139,7 +139,7 @@ packages/react/src/
     data/        Accordion, Avatar, Badge, Calendar, Card, Carousel, Chip, DataTable, Empty, Item,
                  Marquee, QRCode, Table, TimePicker, ...
     feedback/    Alert, Progress, Skeleton, Spinner, Toast
-    layout/      AspectRatio, Divider, Spacer, ScrollArea
+    layout/      AspectRatio, Divider, Spacer, ScrollArea, Splitter
     navigation/  Breadcrumb, Pagination, Stepper, Tabs
     overlay/     Dialog, Drawer, Menu, Popover, Tooltip
     typography/  Kbd, Label

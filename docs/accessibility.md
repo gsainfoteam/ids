@@ -36,7 +36,7 @@
   - Escape 는 맨 위 레이어 하나만 닫습니다.
 - **가려지지 않는 포커스(2.4.11).** 레이어는 top layer 에 올라가므로 부모의 `overflow` 에 잘리지 않습니다.
 - **한글 입력.** IME 조합 중에 누른 Escape 와 Enter 는 조합만 끝내고, 레이어를 닫거나 값을 확정하지 않습니다.
-- **오른쪽에서 왼쪽 문서.** `dir="rtl"` 에서는 가로 방향키가 뒤집힙니다(Slider, Rating, Calendar, TimePicker, ChipField, 하위 메뉴).
+- **오른쪽에서 왼쪽 문서.** `dir="rtl"` 에서는 가로 방향키가 뒤집힙니다(Slider, Rating, Calendar, TimePicker, ChipField, Splitter, 하위 메뉴).
 - **모션 감소.** `prefers-reduced-motion: reduce` 면 전환 애니메이션을 끄고, Spinner 는 회전 대신 천천히 깜빡이고, Skeleton 은 움직이지 않는 muted 바탕으로 남습니다. Marquee 는 흐르지 않고 항목을 모두 보여 줍니다.
 - **비활성이지만 포커스 가능.** 버튼류의 `focusableWhenDisabled` 는 `disabled` 대신 `aria-disabled` 를 붙여 탭 순서와 툴팁을 지킵니다.
 - **문구.** 닫기, 지우기, 불러오는 중 같은 기본 문구는 한국어이고, `IdsProvider translate` 로 앱의 i18n 을 거칩니다. 개발 경고만 영어입니다.
@@ -141,6 +141,7 @@
 | --- | --- | --- | --- | --- |
 | Divider | [ARIA separator](https://www.w3.org/TR/wai-aria-1.2/#separator) | 없음 | `separator` + `aria-orientation`, 가운데 글자는 `aria-labelledby` | 크기 조절 핸들이 아니다(포커스를 받지 않는다) |
 | ScrollArea | 없음 (native 스크롤) | 브라우저의 스크롤 키. 넘치는데 포커스 받을 요소가 없으면 viewport 가 Tab 에 멈춘다 | 막대는 `aria-hidden` | 막대는 포인터 전용이다. 키보드와 보조 기술은 native 스크롤을 쓴다 |
+| Splitter | [Window Splitter](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/) | 핸들마다 Tab 이 멈춘다. `←` `→`(세로 분할은 `↑` `↓`) 16px, `Shift`+방향키 64px, `Home` `End` 앞 패널의 가장 작은 크기와 가장 큰 크기, `Enter` 접기와 펼치기 | 핸들은 `separator` + `aria-orientation`(선의 방향) `aria-valuenow` `aria-valuemin` `aria-valuemax` `aria-valuetext`("30%", "접힘"), `aria-controls` 는 앞 패널 하나, 이름 "패널 크기 조절". 접기 버튼은 `aria-expanded` `aria-controls`. 크기가 0 인 패널은 `inert` | 끌기(2.5.7)는 방향키와 접기 버튼이 대신한다. 접기 버튼은 탭 순서에 없다(`Enter` 가 대신한다). APG 의 선택 키인 `F6` 패널 이동은 없다 |
 | AspectRatio, Spacer | 없음 | 없음 | Spacer 는 `aria-hidden` | AspectRatio 에 `overflow-hidden` 을 주면 안의 포커스 링이 잘릴 수 있다 |
 | Kbd | 없음 | 없음 | 기호는 숨기고 "커맨드", "왼쪽 화살표" 처럼 이름을 읽는다 | 없음 |
 | Label | 없음 | 없음 | native 연결이 안 되는 위젯(`slider` 등)에는 `aria-labelledby` 를 붙이고 누르면 포커스를 옮긴다. `*` 는 `aria-hidden` | 필수라는 사실은 컨트롤의 `required` 가 전한다 |
@@ -251,6 +252,12 @@
 | Progress | 이름과 값 문장을 읽는다 |  |  |  |  |
 | Skeleton | 불러오는 동안 모양과 감싼 내용을 읽지 않고 Tab 이 들어가지 않는다. 끝나면 같은 자리의 내용을 읽는다 |  |  |  |  |
 | Spinner | "불러오는 중" 을 한 번만 읽는다 |  |  |  |  |
+
+### 레이아웃
+
+| 점검 항목 | 기대 결과 | VO + Safari (macOS) | VO + Safari (iOS) | NVDA + Firefox | TalkBack + Chrome |
+| --- | --- | --- | --- | --- | --- |
+| Splitter | 핸들이 이름, "구분선", 값("30%")을 읽고, 방향키로 바뀐 값과 접었을 때 "접힘" 을 읽는다. 접기 버튼이 "펼침 / 접힘" 을 읽는다 |  |  |  |  |
 
 ### 탐색
 
