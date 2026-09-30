@@ -57,7 +57,9 @@ pnpm storybook        # Storybook for ids-react (port 6006)
 out, and CI fails past it (`pnpm size`). A limit sits 10 to 15% above the size measured when it was
 set. When a change grows a size for a reason, raise that limit in the same commit and say why; a
 single import growing towards the whole package means tree-shaking broke (a module with a side
-effect at the top, or a part pulled in through a barrel).
+effect at the top, or a part pulled in through a barrel). Code a component loads with `import()`
+(Image's viewer) is budgeted twice: the import with `"entry": ["index"]`, which counts the entry
+chunk and its static imports but not the chunk `import()` loads, and the import with that chunk.
 
 **`'use client'` marks the modules that run on the client.** The build keeps one module per source
 file, so each file's directive reaches `dist` (`rollup-preserve-directives`). A module that calls a
