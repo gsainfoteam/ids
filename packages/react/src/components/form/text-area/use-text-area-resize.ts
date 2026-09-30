@@ -64,6 +64,7 @@ export function useTextAreaResize({
   return {
     axes: dimensions.map(axisOf),
     disabled,
+    shell,
     shellId: resizesWidth ? shellId : undefined,
     width: resizesWidth ? width : undefined,
     height: resizesHeight ? height : undefined,

@@ -165,7 +165,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - 막대가 하나만 보여도, 넘치지 않아도 늘 보입니다. `aria-hidden` 이 붙지 않고, `data-occupied` 가 붙습니다.
 - Corner 는 root 의 모서리에 딱 붙습니다(두 가장자리에서 0). 크기는 내용이 정하고, 내용의 크기가 바뀌면 막대를 다시 놓습니다.
 - 그 모서리에서 끝나는 막대는 Corner 앞에서 간격(`--scroll-area-gap`)만큼 떨어져 멈춥니다.
-- 둥근 모서리의 곡선 밖으로 나가지 않게 그리는 것은 내용의 몫입니다. TextArea 의 손잡이는 root 의 모서리 반지름을 읽어 같은 중심의 호로 그립니다.
+- 둥근 모서리의 곡선 밖으로 나가지 않게 그리는 것은 내용의 몫입니다.
 
 ## 키보드
 
@@ -229,7 +229,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - Select, ChipField 의 옵션 목록(팝업과 하단 시트), 필드 팝업 자체(달력, 색 선택기가 넘칠 때). 모두 `fade="y"`
 - Menu 의 내용, 명령 팔레트의 목록. 모두 `fade="y"`
 - Dialog, Drawer, Popover 의 본문. Popover 의 화살표는 ScrollArea 밖에 둡니다
-- TextArea 의 textarea(`Viewport asChild`)와 크기 조절 손잡이(내용을 담은 `Corner`)
+- TextArea 의 textarea(`Viewport asChild`). 크기 조절 손잡이는 ScrollArea 밖, 필드의 테두리 위에 있어 막대는 멈추지 않고 둥근 모서리까지 갑니다
 - TimePicker 의 컬럼(`size="tiny"`, listbox 가 `Viewport asChild`, `fade="y"`)
 - Table 과 DataTable 의 표(`orientation="both"`, `fade="x"`). 붙는 머리글이 viewport 안에 있어 위아래는 흐리지 않습니다
 

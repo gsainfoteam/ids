@@ -9,6 +9,7 @@ import { resolve } from './state-value';
 import { textAreaStyle } from './style';
 import { useTextArea, type CountState } from './use-text-area';
 import { useTextAreaResize } from './use-text-area-resize';
+import { ResizeEdge, ResizeGrip, type ResizeAxis } from '../../../internal/resize-handle';
 import { stateAttributes, type TextControlState } from '../../../internal/text-control';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
@@ -34,6 +35,19 @@ function splitByInput(children: ReactNode) {
     input: items[index] as ReactElement<TextAreaInputPartProps>,
     bottom: items.slice(index + 1),
   };
+}
+
+type ResizeHandleProps = {
+  axes: readonly ResizeAxis[];
+  corner: HTMLElement | null;
+  disabled: boolean;
+};
+
+function ResizeHandle({ axes: [first, second], corner, disabled }: ResizeHandleProps) {
+  if (first && second)
+    return <ResizeGrip axes={[first, second]} corner={corner} band="outward" disabled={disabled} />;
+
+  return first ? <ResizeEdge axis={first} band="outward" disabled={disabled} /> : null;
 }
 
 export function TextAreaRoot({
@@ -74,7 +88,7 @@ export function TextAreaRoot({
   });
   const state: TextAreaState = { size, variant, ...field.state };
   const resizeMode = autoResize ? 'none' : (resize ?? 'vertical');
-  const { setShell, ...resizing } = useTextAreaResize({
+  const { setShell, shell, axes, ...resizing } = useTextAreaResize({
     resize: resizeMode,
     disabled: field.state.disabled,
     shellId: `ids-text-area-shell-${generatedId}`,
@@ -92,7 +106,7 @@ export function TextAreaRoot({
         autoResize,
         minRows,
         maxRows,
-        resize: resizing,
+        resize: { height: resizing.height, setInput: resizing.setInput },
         styles,
       }}
     >
@@ -112,6 +126,7 @@ export function TextAreaRoot({
         <div data-text-area-bottom="" className={styles.bar({ position: 'bottom' })}>
           {bottom}
         </div>
+        <ResizeHandle axes={axes} corner={shell} disabled={resizing.disabled} />
       </div>
     </TextAreaContext>
   );

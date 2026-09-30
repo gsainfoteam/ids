@@ -14,52 +14,27 @@ import {
 
 import { flushSync } from 'react-dom';
 
-import {
-  GRIP_HALO,
-  GRIP_STROKE,
-  GRIP_TARGET,
-  gripArc,
-  type GripArc,
-  type GripPlacement,
-} from './arc';
+import { GRIP_HALO, GRIP_STROKE, GRIP_TARGET, gripArc, type GripArc, type ResizeBand } from './arc';
 import { axisSeparatorProps, type ResizeAxis, type ResizeDimension } from './axis';
 import { resizeGripStyle } from './style';
-import {
-  axisKeyMap,
-  readingDirection,
-  useAxesDrag,
-  useAxisSeparator,
-  useCornerRadius,
-  type AxesDragOptions,
-} from './use-resize-axes';
-import { invariant, mergeProps, part } from '../../utils';
+import { axisKeyMap, readingDirection, useAxesDrag, useCornerRadius } from './use-resize-axes';
+import { invariant, mergeProps } from '../../utils';
 import { keyHandler, type KeyMap } from '../keys';
 import { useTranslate } from '../translate';
 
 export type ResizeGripProps = Omit<ComponentProps<'div'>, 'children'> & {
-  axes: readonly ResizeAxis[];
+  axes: readonly [ResizeAxis, ResizeAxis];
   corner: HTMLElement | null;
-  placement: GripPlacement;
+  band?: ResizeBand;
   disabled?: boolean;
   onDraggingChange?: (dragging: boolean) => void;
   asChild?: boolean;
   children?: ReactNode;
 };
 
-type GripProps = Omit<
-  ResizeGripProps,
-  'axes' | 'corner' | 'placement' | 'disabled' | 'onDraggingChange'
-> & {
-  drag: AxesDragOptions;
-  arc: GripArc | null;
-};
-
 type Styles = ReturnType<typeof resizeGripStyle>;
 
 const HALO_WIDTH = GRIP_STROKE + 2 * GRIP_HALO;
-
-const isCustom = ({ asChild, children }: Pick<GripProps, 'asChild' | 'children'>) =>
-  asChild === true || children != null;
 
 function sized(style: CSSProperties | undefined, arc: GripArc | null) {
   return arc ? { ...style, width: arc.size, height: arc.size } : style;
@@ -104,52 +79,26 @@ function Arc({ arc, styles }: { arc: GripArc; styles: Styles }) {
   );
 }
 
-function OneAxisGrip({
-  axis,
-  drag,
-  arc,
-  asChild = false,
-  className,
-  style,
-  children,
-  ...props
-}: GripProps & { axis: ResizeAxis }) {
-  const separator = useAxisSeparator(axis, drag);
-  const styles = resizeGripStyle({
-    axes: axis.dimension === 'width' ? 'inline' : 'block',
-    custom: isCustom({ asChild, children }),
-  });
-
-  return part(
-    'div',
-    asChild,
-    children ?? (arc && <Arc arc={arc} styles={styles} />),
-    mergeProps(props, {
-      ...separator,
-      'aria-label': props['aria-label'] ?? separator['aria-label'],
-      'data-resize-grip': '',
-      className: styles.grip({ className }),
-      style: sized(style, arc),
-    }),
-  );
-}
-
-function TwoAxisGrip({
+export function ResizeGrip({
   axes,
-  drag: options,
-  arc,
+  corner,
+  band = 'centered',
+  disabled = false,
+  onDraggingChange,
   asChild = false,
   className,
   style,
   children,
   ...props
-}: GripProps & { axes: readonly ResizeAxis[] }) {
+}: ResizeGripProps) {
   const t = useTranslate();
-  const drag = useAxesDrag(axes, options);
-  const [focusedAxis, setFocusedAxis] = useState<ResizeDimension>(axes[0]!.dimension);
+  const custom = asChild || children != null;
+  const radius = useCornerRadius(corner);
+  const arc = radius === null || custom ? null : gripArc(radius, band);
+  const drag = useAxesDrag(axes, { disabled, onDraggingChange });
+  const [focusedAxis, setFocusedAxis] = useState<ResizeDimension>(axes[0].dimension);
   const separators = useRef(new Map<ResizeDimension, HTMLElement>());
-  const styles = resizeGripStyle({ axes: 'both', custom: isCustom({ asChild, children }) });
-  const { disabled } = options;
+  const styles = resizeGripStyle({ custom });
 
   const resizeAndFocus = (axis: ResizeAxis) => (size: number) => {
     flushSync(() => {
@@ -221,23 +170,4 @@ function TwoAxisGrip({
     drawn.props.children,
     ...hiddenSeparators,
   );
-}
-
-export function ResizeGrip({
-  axes,
-  corner,
-  placement,
-  disabled = false,
-  onDraggingChange,
-  ...props
-}: ResizeGripProps) {
-  const [first] = axes;
-  invariant(first, 'A resize grip needs at least one axis to resize.');
-
-  const radius = useCornerRadius(corner);
-  const arc = radius === null || isCustom(props) ? null : gripArc(radius, placement);
-  const drag = { disabled, onDraggingChange };
-
-  if (axes.length === 1) return <OneAxisGrip {...props} axis={first} drag={drag} arc={arc} />;
-  return <TwoAxisGrip {...props} axes={axes} drag={drag} arc={arc} />;
 }

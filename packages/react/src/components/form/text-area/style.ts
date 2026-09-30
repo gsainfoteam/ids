@@ -69,10 +69,13 @@ export const textAreaStyle = tv({
     },
     resize: {
       none: {},
-      vertical: { input: 'min-h-[calc(1lh+var(--ids-text-area-pad-y)*2)]' },
-      horizontal: { root: 'min-w-24' },
+      vertical: {
+        root: 'relative overflow-visible',
+        input: 'min-h-[calc(1lh+var(--ids-text-area-pad-y)*2)]',
+      },
+      horizontal: { root: 'relative min-w-24 overflow-visible' },
       both: {
-        root: 'min-w-24',
+        root: 'relative min-w-24 overflow-visible',
         input: 'min-h-[calc(1lh+var(--ids-text-area-pad-y)*2)]',
       },
     } satisfies Record<TextAreaResize, object>,

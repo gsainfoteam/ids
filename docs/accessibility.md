@@ -131,7 +131,7 @@
 | --- | --- | --- | --- | --- |
 | Field | 없음 ([Forms 튜토리얼](https://www.w3.org/WAI/tutorials/forms/)) | 없음 | `Field.Label` 을 `htmlFor` 와 `aria-labelledby` 로, 설명, 힌트, 오류를 `aria-describedby` 로 잇고 `aria-invalid` `aria-required` 를 붙인다 | 오류 문구의 내용은 앱이 쓴다 |
 | TextField, Input, PasswordField, TelField | 없음 (native `input`) | 브라우저 기본. Clear 가 있으면 `Escape` 로 지운다 | native `input`. PasswordField 보기 버튼은 이름 고정 + `aria-pressed`, CapsLock 은 `role="status"`. TelField 국가 선택은 Select | Clear 는 탭 순서에 없다(`Escape` 가 대신한다) |
-| TextArea | 없음 (native `textarea`), 크기 조절 손잡이는 [Window Splitter](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/) | 브라우저 기본. `autoResize={false}` 면 textarea 다음의 손잡이에서 `↑` `↓` 높이, `←` `→` 너비 16px, `Shift` 64px, `Home` `End`, `Enter` 처음 크기 | 글자 수는 `aria-describedby`, 한도에 가까우면 0.6초 멈춘 뒤 `role="status"` 로 알린다. 손잡이는 `separator`("높이", "너비") + `aria-valuenow` `aria-valuetext` `aria-controls`, `both` 면 `group`("크기 조절") 안의 separator 둘 | 손잡이 끌기(2.5.7)를 한 번 누르기로 대신할 방법이 없다(키보드는 있다) |
+| TextArea | 없음 (native `textarea`), 크기 조절 손잡이는 [Window Splitter](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/) | 브라우저 기본. `autoResize={false}` 면 필드의 마지막 Tab 멈춤(textarea 와 아래 바의 버튼 다음)인 손잡이에서 `↑` `↓` 높이, `←` `→` 너비 16px, `Shift` 64px, `Home` `End`, `Enter` 처음 크기 | 글자 수는 `aria-describedby`, 한도에 가까우면 0.6초 멈춘 뒤 `role="status"` 로 알린다. 손잡이는 Resizable 과 같다: `separator`("높이", "너비") + `aria-valuenow` `aria-valuetext` `aria-controls`, `both` 면 `group`("크기 조절") 안의 separator 둘. 누를 영역 24px 은 선의 안쪽 끝에서 바깥으로 두어 아래 바의 버튼과 스크롤 막대를 덮지 않는다 | 손잡이 끌기(2.5.7)를 한 번 누르기로 대신할 방법이 없다(키보드는 있다). 누를 영역이 필드 밖 22px 까지라 그 안에 둔 요소는 손잡이가 받는다 |
 | NumberField | [Spinbutton](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/) | `↑` `↓` 한 단계, `Shift` 큰 단계, `Alt` 작은 단계, `PageUp` `PageDown`, `Home` `End` 최솟값과 최댓값, `Enter` 정리 | `spinbutton` + `aria-valuenow` `aria-valuemin` `aria-valuemax` `aria-valuetext`. 증감 버튼은 `aria-controls` | 증감 버튼은 탭 순서에 없다(방향키가 대신한다) |
 | OTPField | 없음 (native `input` 하나) | `←` `→` 칸 이동, `Shift+←` `Shift+→` 선택 | 칸은 `aria-hidden`, input 하나가 이름과 값을 가진다. 이름이 없으면 "인증 코드" | 없음 |
 | Checkbox, CheckboxGroup | [Checkbox](https://www.w3.org/WAI/ARIA/apg/patterns/checkbox/) | `Space`. 항목마다 Tab 이 멈춘다 | native `checkbox`, 일부 선택은 `indeterminate`(mixed). 그룹은 `role="group"`, 전체 선택은 `aria-controls` | 꺼진 상자 테두리 대비와 16px 크기(공통 한계) |
@@ -230,7 +230,7 @@
 | OTPField | 입력 하나로 읽고 칸을 따로 읽지 않는다 |  |  |  |  |
 | PasswordField | 보기 버튼이 "비밀번호 표시, 눌림" 을 읽는다. CapsLock 이 켜지면 알린다 |  |  |  |  |
 | TextArea 글자 수 | 한도에 가까워지면 남은 글자 수를 한 번 알린다 |  |  |  |  |
-| TextArea 크기 조절 | textarea 다음 Tab 에서 손잡이가 "높이", "분리자", 값("120px")을 읽고, 방향키로 바뀐 값을 읽는다 |  |  |  |  |
+| TextArea 크기 조절 | textarea 와 아래 바 다음 Tab 에서 손잡이가 "높이", "분리자", 값("120px")을 읽고, 방향키로 바뀐 값을 읽는다 |  |  |  |  |
 | Select | 열고 옵션을 오가면 옵션 이름과 "선택됨" 을 읽고, 고르면 새 값을 읽는다 |  |  |  |  |
 | Select 검색 | 결과가 비면 "결과가 없습니다" 를 읽는다 |  |  |  |  |
 | ChipField | 옵션을 가리키면 이름과 선택 상태를 읽고, 칩 사이를 방향키로 오간다. 한도 안내를 읽는다 |  |  |  |  |

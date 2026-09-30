@@ -1,6 +1,6 @@
 # resize-handle
 
-끌거나 키로 크기를 바꾸는 손잡이의 공용 부품입니다. 키 표, `role="separator"` 의 ARIA, 포인터 끌기, 손잡이 클래스 조각, 모서리를 따라 휜 호로 그리는 모서리 손잡이(`ResizeGrip`)가 있습니다.
+끌거나 키로 크기를 바꾸는 손잡이의 공용 부품입니다. 키 표, `role="separator"` 의 ARIA, 포인터 끌기, 손잡이 클래스 조각, 가장자리 위의 막대로 그리는 가장자리 손잡이(`ResizeEdge`), 모서리를 따라 휜 호로 그리는 모서리 손잡이(`ResizeGrip`)가 있습니다.
 
 | 파일                                       | 내용                                                                                 |
 | ------------------------------------------ | ------------------------------------------------------------------------------------ |
@@ -8,21 +8,23 @@
 | [`measure.ts`](#measurets)                 | 그려진 크기와 CSS 의 px 한계, 모서리 반지름 재기, 쓰는 방향, 끄는 동안 문서의 커서  |
 | [`use-resize-drag.ts`](#use-resize-dragts) | 포인터 끌기 hook. 한 프레임에 한 번 움직임을 알리고 Escape 로 되돌린다               |
 | [`use-resize-axes.ts`](#use-resize-axests) | `ResizeAxis` 를 끌기, 키, separator 에 잇는 hook, 크기와 모서리 반지름을 지켜보는 hook |
+| [`edge.tsx`](#edgetsx)                     | 가장자리 손잡이 `ResizeEdge`. 한 축의 separator 이고 가장자리 위의 막대로 그린다     |
 | [`arc.ts`](#arcts)                         | 모서리 손잡이의 호와 누를 띠의 SVG path, 손잡이 상자의 크기(순수 함수)               |
-| [`grip.tsx`](#griptsx)                     | 모서리 손잡이 `ResizeGrip`. 한 축이면 separator, 두 축이면 separator 둘을 담은 group |
-| [`style.ts`](#stylets)                     | 손잡이 클래스 조각 `resizeHandle`, 모서리 손잡이의 `resizeGripStyle`                 |
+| [`grip.tsx`](#griptsx)                     | 모서리 손잡이 `ResizeGrip`. 숨은 separator 둘(너비, 높이)을 담은 group               |
+| [`style.ts`](#stylets)                     | 손잡이 클래스 조각 `resizeHandle`, `resizeEdgeStyle`, `resizeGripStyle`              |
 
 ## 쓰는 곳
 
 | 가져가는 것                                                           | 쓰는 곳                                             |
 | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `resizeKeyMap`, `separatorProps`, `resizeHandle`                      | DataTable 의 열 너비 핸들                           |
-| `useMeasuredAxes`, `useAxisSeparator`, `ResizeGrip`, `resizeHandle`   | Resizable(가장자리 손잡이와 모서리 손잡이)          |
-| `useMeasuredAxes`, `ResizeGrip`(`placement="inside"`), `ResizeAxis`   | TextArea 의 크기 조절 손잡이                        |
+| `useMeasuredAxes`, `ResizeEdge`, `ResizeGrip`                         | Resizable(가장자리 손잡이와 모서리 손잡이)          |
+| `useMeasuredAxes`, `ResizeEdge`, `ResizeGrip`(`band="outward"`)       | TextArea 의 크기 조절 손잡이                        |
 | `useResizeDrag`, `resizeKeyMap`, `separatorProps`, `resizeHandle`     | Splitter 의 패널 사이 핸들                          |
 | `data-resize-handle` 속성                                             | Drawer 의 끌기 제외, `pressable.ts` 의 안쪽 컨트롤 |
 
 - 크기를 가진 상태(열 너비, 요소 크기, 패널 크기)는 쓰는 쪽이 가집니다. 이 모듈은 값을 받아 다음 값을 계산하고 알려 줄 뿐입니다.
+- Resizable 과 TextArea 는 같은 `ResizeEdge`, `ResizeGrip` 을 그립니다. 모양과 자리는 이 모듈의 스타일이 정하므로 두 컴포넌트의 손잡이는 늘 같습니다. 다른 것은 누를 띠(`band`) 하나입니다([누를 띠](#누를-띠)).
 - DataTable 은 끌기를 TanStack Table 의 `getResizeHandler()` 에 맡기고 키, ARIA, 클래스만 가져갑니다. 열 너비는 TanStack 의 상태라서, 끄는 동안의 너비를 `<col>` 에 그리는 일도 TanStack 이 합니다.
 - Splitter 는 끌기, 키 표, separator ARIA, 클래스 조각을 가져가고, 퍼센트 계산(`layout.ts`), 방향키 한 걸음의 뜻(`resizeBy`), `Enter`(접기), 누른 핸들의 포커스는 자기 것으로 둡니다. 끌기의 px 는 패널들이 나눠 쓰는 길이(핸들 선을 뺀 길이)로 나눠 퍼센트로 바꿉니다.
 
@@ -137,7 +139,7 @@ type ResizeAxis = {
 ```
 
 ```tsx
-// components/layout/resizable/handle.tsx: 한 축의 가장자리 손잡이
+// edge.tsx: 한 축의 가장자리 손잡이
 const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
 <div {...separator} aria-label={props['aria-label'] ?? separator['aria-label']} />
 ```
@@ -153,107 +155,145 @@ const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
 - 끄는 동안 CSS 변수가 아니라 크기 속성 자체를 씁니다. 인라인 `width: var(--x)` 는 변수가 비어 있으면 `auto` 가 되어 요소의 `w-full`, `w-80` 같은 클래스 너비를 지웁니다. 크기를 바꾼 적 없는 요소는 클래스 너비를 그대로 써야 합니다.
 - 계산은 늘 **그려진 크기**에서 시작합니다. CSS 한계에 막혀 state 와 그려진 크기가 달라져도, 다음 끌기와 키가 막힌 곳에서 이어집니다.
 - 끝에 되돌리고 확정하는 것은 한 이벤트 안이라 화면에는 되돌린 크기가 그려지지 않습니다.
-- 반지름은 크기가 그대로인 채 클래스만 바뀌어도(`rounded-*` 교체, 아래 바가 생겨 TextArea 의 모서리가 각짐) 달라지는데, `ResizeObserver` 는 이것을 알리지 않습니다. 그래서 렌더마다 다시 읽고, 같은 값이면 state 가 그대로라 다시 렌더하지 않습니다.
+- 반지름은 크기가 그대로인 채 클래스만 바뀌어도(`rounded-*` 교체) 달라지는데, `ResizeObserver` 는 이것을 알리지 않습니다. 그래서 렌더마다 다시 읽고, 같은 값이면 state 가 그대로라 다시 렌더하지 않습니다.
+
+## edge.tsx
+
+가장자리 손잡이입니다. 손잡이 자신이 `role="separator"`(이름 "너비" 또는 "높이")이고 Tab 에 멈춥니다.
+
+```tsx
+// components/layout/resizable/handle.tsx
+<ResizeEdge
+  axis={direction === 'horizontal' ? axes.width : axes.height}
+  disabled={disabled}
+  onDraggingChange={onDraggingChange}
+  data-resizable-handle=""
+/>
+
+// components/form/text-area/root.tsx: 필드의 마지막 자식. 누를 띠는 바깥으로만
+<ResizeEdge axis={height} band="outward" disabled={disabled} />
+```
+
+| 축의 `dimension` | 가장자리                      | 손잡이 요소                 | 보이는 막대(`before:`) | 커서        |
+| ---------------- | ----------------------------- | --------------------------- | ---------------------- | ----------- |
+| `width`          | 끝(LTR 오른쪽, RTL 왼쪽)      | `inset-y-0 -end-px w-0.5`   | 4x32px                 | `ew-resize` |
+| `height`         | 아래                          | `inset-x-0 -bottom-px h-0.5` | 32x4px                 | `ns-resize` |
+
+- 손잡이 요소는 가장 가까운 positioned 조상(Resizable 의 root, TextArea 의 필드)의 padding 상자 가장자리를 가운데에 둔 2px 띠이고, 막대는 그 가운데에 그립니다. 막대는 요소 밖으로 2px 나옵니다.
+- ARIA, 끌기, 키, `Enter` 되돌리기는 `useAxisSeparator` 입니다. `data-resize-edge` 가 붙습니다.
+- `className` 은 `resizeEdgeStyle` 에 합쳐 겹치는 클래스(위치, 크기, `before:hidden`)를 이깁니다. `asChild` 면 자식 요소가 손잡이가 됩니다.
+- 포커스는 손잡이 요소의 `focus-ring` 입니다. 가장자리 전체를 따라 3px 링이 생깁니다.
+
+### 알아둘 것
+
+- 부르는 쪽은 조상을 `relative` 로 두고, `overflow` 로 자르지 않습니다. 자르면 막대의 바깥 2px 과 누를 띠의 바깥 부분이 잘립니다.
+
+## 누를 띠
+
+`ResizeEdge` 와 `ResizeGrip` 은 `band` 로 누를 띠의 자리를 고릅니다. 띠의 폭은 둘 다 24px 입니다(2.5.8).
+
+| `band`           | 누를 띠                                                          | 쓰는 곳   |
+| ---------------- | ---------------------------------------------------------------- | --------- |
+| `centered`(기본) | 선을 가운데에 둔다. 요소 안쪽 12px, 바깥 12px                    | Resizable |
+| `outward`        | 선의 안쪽 끝에서 바깥으로. 요소 안쪽 2px(보이는 선), 바깥 22px   | TextArea  |
+
+```ts
+// style.ts: 가장자리 손잡이의 띠(after:)
+{ dimension: 'height', band: 'centered', class: 'after:inset-x-0 after:top-1/2 after:h-6 after:-translate-y-1/2' }
+{ dimension: 'height', band: 'outward', class: 'after:inset-x-0 after:-top-px after:h-6' } // 2px 요소의 1px 위 = 막대의 위 끝
+```
+
+### 왜 이렇게
+
+- TextArea 는 가장자리 가까이에 누를 것이 있습니다. 가운데 띠의 안쪽 12px 은 그것을 덮습니다.
+  - 아래 바의 버튼: 아래와 끝 가장자리에서 6px(tiny 4px) 안쪽에서 끝납니다.
+  - 세로 스크롤 막대: 끝 가장자리에서 2px 안쪽부터 8px 입니다. `horizontal` 의 띠가 막대 전체를, `vertical` 의 띠가 막대의 아래 끝을 덮습니다.
+- `outward` 의 띠는 보이는 선의 안쪽 끝(2px)에서 멈춥니다. 보이는 선은 어디를 눌러도 손잡이이고, 스크롤 막대(2px 안쪽부터)와 버튼은 덮지 않습니다.
+- 대신 요소 밖 22px 을 덮습니다. 절대 위치 요소는 흐름 안의 다음 형제보다 위에 그려지므로, 필드 아래(`Field` 의 설명과 오류는 8px 아래)나 끝 쪽 22px 안의 것은 손잡이가 받습니다.
+- Resizable 은 안쪽 내용을 모르므로 가운데 띠를 두고, 끝에 붙은 안쪽 컨트롤이 있으면 `Resizable.Handle` 의 `className` 으로 영역을 바꾸게 합니다.
 
 ## arc.ts
 
-`gripArc(cornerRadius, placement)` 는 모서리 손잡이를 그릴 값을 돌려줍니다. 순수 함수입니다.
+`gripArc(cornerRadius, band)` 는 모서리 손잡이를 그릴 값을 돌려줍니다. 순수 함수입니다.
 
-| 값       | 뜻                                                                                 |
-| -------- | ---------------------------------------------------------------------------------- |
-| `size`   | 손잡이 상자의 한 변. 상자의 끝 아래 꼭짓점이 요소의 padding 상자 꼭짓점에 놓인다    |
-| `bleed`  | SVG 가 상자 밖으로 나가는 거리. `edge` 는 12px(띠의 바깥 절반), `inside` 는 0       |
-| `view`   | SVG 의 한 변(`size + 2 * bleed`), `viewBox` 와 같은 px                              |
-| `arc`    | 선(4px)과 포커스 띠(10px)가 따라가는 path                                          |
-| `target` | 누를 띠(24px, 끝은 자른 모양)의 path                                               |
+| 값       | 뜻                                                                                     |
+| -------- | -------------------------------------------------------------------------------------- |
+| `size`   | 손잡이 상자의 한 변. 상자의 끝 아래 꼭짓점이 요소의 padding 상자 꼭짓점에 놓인다        |
+| `bleed`  | SVG 가 상자 밖으로 나가는 거리. 누를 띠의 바깥 끝까지: `centered` 12px, `outward` 22px  |
+| `view`   | SVG 의 한 변(`size + 2 * bleed`), `viewBox` 와 같은 px                                  |
+| `arc`    | 선(4px)과 포커스 띠(10px)가 따라가는 path. padding 상자의 가장자리 위                    |
+| `target` | 누를 띠(24px, 끝은 자른 모양)의 path. `outward` 는 선에서 10px 바깥의 같은 중심 path    |
 
 ```ts
-gripArc(15, 'edge');   // Resizable 의 16px 모서리(테두리 1px): 반지름 15 의 호, 선은 테두리 안쪽 선 위
-gripArc(10, 'inside'); // TextArea 의 10px 모서리: 5px 안쪽에 반지름 5 의 호, 24px 정사각형 누를 영역
-gripArc(0, 'inside');  // 아래 바가 모서리를 각지게 하면: 반지름 2 로 끝이 살짝 둥근 ㄴ 자
+gripArc(15, 'centered'); // Resizable 의 16px 모서리(테두리 1px): 반지름 15 의 호, 선은 테두리 안쪽 선 위
+gripArc(10, 'outward');  // TextArea 의 10px 모서리(테두리는 inset ring): 반지름 10 의 호, 띠는 반지름 20 의 path
+gripArc(0, 'centered');  // 각진 모서리: 반지름 2 로 끝이 살짝 둥근 ㄴ 자
 ```
 
 - path 는 LTR 의 끝 아래 모서리 모양입니다. 아래 가장자리를 따라 오다가(`H`) 모서리와 같은 중심의 4분의 1 원을 돌고(`A`) 끝 가장자리를 따라 올라갑니다(`V`). RTL 은 SVG 를 `rtl:-scale-x-100` 으로 뒤집어 왼쪽 아래 모서리가 됩니다.
 
-| `placement` | 선의 자리                                   | 누를 띠                                     | 쓰는 곳   |
-| ----------- | ------------------------------------------- | ------------------------------------------- | --------- |
-| `edge`      | padding 상자의 가장자리 위(가장자리 막대와 같다) | 선을 가운데에 둔 24px. 바깥 12px 은 요소 밖 | Resizable |
-| `inside`    | 가장자리에서 5px 안쪽(포커스 띠의 바깥이 가장자리에 닿는다) | 가장자리부터 안쪽 24px. 요소 밖으로 나가지 않는다 | TextArea  |
-
 ### 왜 이렇게
 
-- 선의 반지름은 모서리 반지름에서 선이 들어간 거리를 뺀 값입니다. 중심이 같아서 선과 모서리 사이 거리가 곧은 부분과 휜 부분에서 같습니다. 반지름이 2px(선 두께의 절반)보다 작으면 2px 로 둡니다. 각진 모서리에서 끝이 살짝 둥근 ㄴ 자가 되는 까닭입니다.
-- 직선은 호와 두 직선의 길이가 가장자리 막대와 같은 32px 이 되게 정하고, 적어도 4px 입니다. `inside` 는 선이 24px 누를 영역의 끝까지 가도록 더 늘립니다. 그래야 ScrollArea 가 멈춰 세운 막대와 선 사이가 간격(2px) 하나입니다.
-- 누를 띠는 끝을 자른 선(`butt`)이라 선의 둥근 끝을 덮는 만큼만 나갑니다. 둥근 끝(12px)이면 TextArea 에서 스크롤 막대의 아래 끝을 덮습니다.
-- `inside` 의 띠가 가장자리 밖으로 나가지 않는 것은 필드 아래나 옆에 붙은 다른 컨트롤을 덮지 않기 위해서입니다. 절대 위치 요소는 흐름 안의 다음 형제보다 위에 그려집니다.
+- 선은 가장자리 막대처럼 padding 상자의 가장자리 위에 섭니다. 그래서 선의 반지름은 모서리 반지름이고, 선과 모서리의 중심이 같습니다. 반지름이 2px(선 두께의 절반)보다 작으면 2px 로 둡니다. 각진 모서리에서 끝이 살짝 둥근 ㄴ 자가 되는 까닭입니다.
+- 직선은 호와 두 직선의 길이가 가장자리 막대와 같은 32px 이 되게 정하고, 적어도 4px 입니다.
+- 누를 띠는 끝을 자른 선(`butt`)이라 손잡이 상자 밖으로 가장자리를 따라 더 나가지 않습니다.
+- `outward` 의 띠는 선보다 10px 바깥에 반지름이 10px 큰 같은 중심 path 입니다. 24px 띠의 안쪽 끝이 선의 안쪽 끝과 겹칩니다([누를 띠](#누를-띠)).
 - 좌표는 0.01px 로 반올림해 path 문자열을 짧게 둡니다.
 
 ## grip.tsx
 
-모서리 손잡이입니다. 축 수에 따라 모양이 둘입니다.
-
-| 축          | 구조                                                                                                   |
-| ----------- | ------------------------------------------------------------------------------------------------------ |
-| 하나        | 손잡이 자신이 `role="separator"`(이름 "너비" 또는 "높이")이고 Tab 에 멈춘다                            |
-| 너비와 높이 | 손잡이는 `role="group"`(이름 "크기 조절"), 안에 숨은 separator 둘이 roving tabindex 로 Tab 한 칸이다 |
+모서리 손잡이입니다. 손잡이는 `role="group"`(이름 "크기 조절")이고, 안에 숨은 separator 둘(너비, 높이)이 roving tabindex 로 Tab 한 칸을 나눠 씁니다.
 
 ```tsx
-// components/layout/resizable/handle.tsx: 손잡이 상자를 root 의 padding 상자 꼭짓점에 둔다
+// components/layout/resizable/handle.tsx
 <ResizeGrip
   axes={[axes.width, axes.height]}
-  corner={element}                       // 호가 따라갈 모서리의 요소. Resizable 의 root
-  placement="edge"
+  corner={element}                       // 호가 따라갈 모서리의 요소. 손잡이의 positioned 조상
   disabled={disabled}
   onDraggingChange={onDraggingChange}
-  className={styles.grip({ className })} // absolute end-0 bottom-0
 />
 
-// components/form/text-area/input.tsx: 입력 칸(ScrollArea)의 끝 아래 모서리를 차지한다.
-// 높이 축은 textarea, 너비 축은 테두리 컨테이너를 바꾼다
-<ScrollArea ref={setInputArea}>
-  ...
-  <ScrollArea.Corner>
-    <ResizeGrip axes={resize.axes} corner={inputArea} placement="inside" disabled={resize.disabled} />
-  </ScrollArea.Corner>
-</ScrollArea>
+// components/form/text-area/root.tsx: 높이 축은 textarea, 너비 축은 필드 전체를 바꾼다
+<ResizeGrip axes={[width, height]} corner={shell} band="outward" disabled={disabled} />
 ```
 
+- 손잡이는 가장 가까운 positioned 조상의 끝 아래 꼭짓점에 스스로 섭니다(`absolute end-0 bottom-0`). `corner` 는 그 조상이어야 호가 모서리와 같은 중심이 됩니다.
 - 두 축의 요소가 달라도 됩니다. 축마다 `target` 이 있어, TextArea 는 높이를 textarea 에, 너비를 필드 전체에 씁니다.
-- 손잡이 상자의 끝 아래 꼭짓점은 `corner` 요소의 padding 상자 꼭짓점에 놓여야 합니다. 부르는 쪽이 상자를 거기에 둡니다(Resizable 은 `absolute end-0 bottom-0`, TextArea 는 모서리에 붙은 `ScrollArea.Corner`).
 - 반지름은 `useCornerRadius(corner)` 로 읽습니다. 읽기 전에는(서버 렌더, 첫 렌더) 호를 그리지 않고 separator 만 둡니다.
-- 두 축이면 `←` `→` 가 너비를 바꾸고 너비 separator 로, `↑` `↓` 가 높이를 바꾸고 높이 separator 로 포커스를 옮깁니다. 값을 바꾼 뒤(`flushSync`) 포커스를 옮기므로, 포커스는 늘 값이 이미 바뀐 separator 에 있어 스크린 리더가 바뀐 값을 읽습니다. `Home` `End` 는 포커스한 축, `Enter` 와 두 번 누르기는 두 축 모두를 되돌립니다.
+- `←` `→` 가 너비를 바꾸고 너비 separator 로, `↑` `↓` 가 높이를 바꾸고 높이 separator 로 포커스를 옮깁니다. 값을 바꾼 뒤(`flushSync`) 포커스를 옮기므로, 포커스는 늘 값이 이미 바뀐 separator 에 있어 스크린 리더가 바뀐 값을 읽습니다. `Home` `End` 는 포커스한 축, `Enter` 와 두 번 누르기는 두 축 모두를 되돌립니다.
 - 포인터로는 두 축을 함께 끕니다.
 
 ### 왜 이렇게
 
 - SVG 한 장에 path 셋을 겹칩니다. 아래부터 포커스 띠, 선, 누를 띠입니다.
   - 선은 `stroke: currentColor` 라 손잡이 상자의 글자색 사다리(`handle` → `handle-hover` → `data-dragging` 의 `handle-active`)를 그대로 따릅니다.
-  - 포커스 띠는 선보다 양쪽 3px 넓은 `primary` 40% 선이고, 포커스가 있을 때(한 축은 `:focus-visible`, 두 축은 `:has(:focus-visible)`)만 보입니다. 그때 선은 `primary` 가 됩니다. `focus-ring` 의 3px 링과 테두리 색을 호에 옮긴 것입니다.
+  - 포커스 띠는 선보다 양쪽 3px 넓은 `primary` 40% 선이고, 안의 separator 에 포커스가 있을 때(`:has(:focus-visible)`)만 보입니다. 그때 선은 `primary` 가 됩니다. `focus-ring` 의 3px 링과 테두리 색을 호에 옮긴 것입니다.
   - 누를 띠는 투명한 24px 선에 `pointer-events="stroke"` 를 줍니다. 손잡이 상자와 SVG 는 `pointer-events: none` 이라, 누를 곳은 호를 따라가는 띠뿐이고 상자의 나머지(호 안쪽의 내용)는 그대로 눌립니다.
 - 띠에서 시작한 `pointerdown` 은 손잡이 상자의 React 핸들러로 올라가고, 끌기는 상자에 pointer capture 를 겁니다. capture 는 `pointer-events` 와 상관없이 걸립니다.
 - 띠 위에 올리면 상자도 `:hover` 가 됩니다(자손을 가리키면 조상도 hover 입니다). 그래서 사다리가 띠 위에서만 한 단계 오릅니다. 커서는 띠에 걸고, `disabled` 면 띠가 포인터를 받지 않습니다(`group-data-disabled`).
-- `children` 이나 `asChild` 를 받으면(`custom`) 호 대신 그 표시를 16px 상자에 그립니다. 이때는 상자 자신이 포인터를 받고, 누를 영역은 상자 둘레 24px(`after:`), 포커스는 상자 둘레의 링입니다.
+- `children` 이나 `asChild` 를 받으면(`custom`) 호 대신 그 표시를 모서리 안쪽 16px 상자에 그립니다. 이때는 상자 자신이 포인터를 받고, 누를 영역은 상자 둘레 24px(`after:`), 포커스는 상자 둘레의 링입니다.
 
 ### 알아둘 것
 
 - Storybook 의 `userEvent` 는 `pointer-events: none` 인 요소를 누르지 못합니다. play 에서는 `[data-resize-grip-target]` path 를 누릅니다. 테스트는 `[data-resize-grip-arc]` path 의 `getPointAtLength` 와 `getScreenCTM` 으로 호 위의 점을 구합니다(`tests/resize-grip.ts`).
-- 부모에 `overflow: hidden` 이 있으면 `edge` 의 바깥 절반(선 2px, 띠 12px)이 잘립니다. Resizable 의 가장자리 막대와 같습니다.
+- 부모에 `overflow: hidden` 이 있으면 선의 바깥 2px 과 띠의 바깥 부분(`centered` 12px, `outward` 22px)이 잘립니다. 가장자리 손잡이와 같습니다.
 
 ## style.ts
 
 | 조각                           | 내용                                                                                         |
 | ------------------------------ | -------------------------------------------------------------------------------------------- |
 | `resizeHandle.base`            | `touch-none select-none outline-none` 과 누를 영역이 될 `after:absolute`                     |
-| `resizeHandle.hitArea.*`       | `after:` 로 24px 누를 영역(2.5.8). `vertical` 은 폭, `horizontal` 은 높이, `corner` 는 24x24 |
+| `resizeHandle.hitArea.*`       | `after:` 로 가운데에 둔 24px 누를 영역(2.5.8). `vertical` 은 폭, `horizontal` 은 높이, `corner` 는 24x24 |
 | `resizeHandle.cursor.*`        | `ew-resize`, `ns-resize`, `nwse-resize`(RTL `nesw-resize`)                                   |
 | `resizeHandle.focus`           | `focus-ring`                                                                                 |
 | `resizeHandle.focusWithin`     | 안의 separator 가 `:focus-visible` 일 때 그리는 링                                           |
 | `resizeHandle.ladder.ink/pill` | 손잡이 사다리: `handle` → hover `handle-hover` → `data-dragging` `handle-active`             |
 | `resizeHandle.ladder.line`     | 배경으로 그린 선: `border` → hover `handle-hover` → `data-dragging` `handle-active`          |
 | `resizeHandle.disabled`        | `data-disabled` 면 포인터를 받지 않고 흐리게                                                 |
-| `resizeGripStyle`              | 모서리 손잡이의 `grip`, `drawing`(SVG), `halo`, `arc`, `target`, `separator` 슬롯. `custom` 변형은 표시를 담는 16px 상자 |
+| `resizeEdgeStyle`              | 가장자리 손잡이. `dimension` 이 자리와 막대, `band` 가 누를 띠를 정한다                      |
+| `resizeGripStyle`              | 모서리 손잡이의 `grip`(모서리에 서는 상자), `drawing`(SVG), `halo`, `arc`, `target`, `separator` 슬롯. `custom` 변형은 표시를 담는 16px 상자 |
 
-- 보이는 선이나 표시가 얇아도 누를 영역은 24px 입니다. 영역은 가운데 정렬이라 손잡이 요소의 두께와 상관없습니다.
+- 보이는 선이나 표시가 얇아도 누를 영역은 24px 입니다. `hitArea.*` 는 가운데 정렬이라 손잡이 요소의 두께와 상관없습니다.
 - DataTable 은 선을 `before:` 로 그리고 쉬는 때 투명하게 둡니다. 열 경계마다 선이 보이지 않게 하려는 것입니다. 커서는 `col-resize` 로 바꿔 씁니다.
 - Splitter 의 핸들은 1px 요소 자신이 선이라 `ladder.line` 을 씁니다. 쉬는 때는 패널 사이의 구분선이고 올리거나 끌 때만 손잡이 색이 됩니다. 배경이 바뀌므로 전환은 `motion` 대신 `transition-colors` 입니다. `className="bg-..."` 로 쉬는 색만 바꿔도 hover 와 끄는 동안의 색은 남습니다.
 - DataTable 의 누를 영역은 경계 양쪽 12px 이라, 옆 열의 정렬 버튼 가장자리 4px(tiny 8px)은 핸들이 받습니다.

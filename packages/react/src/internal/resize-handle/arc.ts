@@ -1,4 +1,4 @@
-export type GripPlacement = 'edge' | 'inside';
+export type ResizeBand = 'centered' | 'outward';
 
 export type GripArc = {
   size: number;
@@ -18,24 +18,9 @@ const EDGE_PILL_LENGTH = 32;
 const SHORTEST_RUN = 4;
 const TIGHTEST_BEND = GRIP_STROKE / 2;
 
-const ARC_INSET: Record<GripPlacement, number> = {
-  edge: 0,
-  inside: GRIP_HALO + GRIP_STROKE / 2,
-};
-
-const TARGET_INSET: Record<GripPlacement, number> = {
-  edge: ARC_INSET.edge,
-  inside: GRIP_TARGET / 2,
-};
-
-const SHORTEST_REACH: Record<GripPlacement, number> = {
-  edge: 0,
-  inside: GRIP_TARGET,
-};
-
-const TARGET_OUTSIDE: Record<GripPlacement, number> = {
-  edge: GRIP_TARGET / 2,
-  inside: 0,
+const TARGET_OUTSIDE_THE_LINE: Record<ResizeBand, number> = {
+  centered: 0,
+  outward: GRIP_TARGET / 2 - GRIP_STROKE / 2,
 };
 
 const hundredths = (value: number) => Math.round(value * 100) / 100;
@@ -48,28 +33,21 @@ function bend(vertex: number, { inset, radius, reach }: Bend) {
   return `M${end} ${line}H${turn}A${r} ${r} 0 0 0 ${line} ${turn}V${end}`;
 }
 
-export function gripArc(cornerRadius: number, placement: GripPlacement): GripArc {
-  const inset = ARC_INSET[placement];
-  const radius = Math.max(cornerRadius - inset, TIGHTEST_BEND);
-  const runForTheEdgePillLength = (EDGE_PILL_LENGTH - GRIP_STROKE - (Math.PI * radius) / 2) / 2;
-  const runToFillTheTarget = SHORTEST_REACH[placement] - GRIP_STROKE / 2 - inset - radius;
-  const run = Math.max(runForTheEdgePillLength, runToFillTheTarget, SHORTEST_RUN);
+export function gripArc(cornerRadius: number, band: ResizeBand): GripArc {
+  const radius = Math.max(cornerRadius, TIGHTEST_BEND);
+  const run = Math.max((EDGE_PILL_LENGTH - GRIP_STROKE - (Math.PI * radius) / 2) / 2, SHORTEST_RUN);
 
-  const reach = inset + radius + run;
+  const reach = radius + run;
   const size = hundredths(reach + GRIP_STROKE / 2);
-  const bleed = TARGET_OUTSIDE[placement];
+  const outside = TARGET_OUTSIDE_THE_LINE[band];
+  const bleed = GRIP_TARGET / 2 + outside;
   const vertex = size + bleed;
-  const targetInset = TARGET_INSET[placement];
 
   return {
     size,
     bleed,
     view: hundredths(size + 2 * bleed),
-    arc: bend(vertex, { inset, radius, reach }),
-    target: bend(vertex, {
-      inset: targetInset,
-      radius: Math.max(cornerRadius - targetInset, TIGHTEST_BEND),
-      reach: size,
-    }),
+    arc: bend(vertex, { inset: 0, radius, reach }),
+    target: bend(vertex, { inset: -outside, radius: radius + outside, reach: size }),
   };
 }

@@ -15,7 +15,7 @@ type TextAreaContextValue = {
   autoResize: boolean;
   minRows?: number;
   maxRows?: number;
-  resize: Omit<ReturnType<typeof useTextAreaResize>, 'setShell'>;
+  resize: Pick<ReturnType<typeof useTextAreaResize>, 'height' | 'setInput'>;
   styles: ReturnType<typeof textAreaStyle>;
 };
 

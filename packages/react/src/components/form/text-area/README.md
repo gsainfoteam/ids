@@ -46,21 +46,29 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 ## 크기 조절 손잡이
 
 ```tsx
-<TextArea autoResize={false} />                     // vertical(기본): 높이
-<TextArea autoResize={false} resize="horizontal" /> // 너비
-<TextArea autoResize={false} resize="both" />       // 너비와 높이
+<TextArea autoResize={false} />                     // vertical(기본): 아래 테두리의 막대. 높이
+<TextArea autoResize={false} resize="horizontal" /> // 끝 테두리의 막대. 너비
+<TextArea autoResize={false} resize="both" />       // 끝 아래 모서리의 호. 너비와 높이
 <TextArea autoResize={false} resize="none" />       // 손잡이 없음
 ```
 
-- `autoResize={false}` 면 입력 칸의 끝 아래 모서리(LTR 오른쪽 아래, RTL 왼쪽 아래)에 IDS 손잡이가 생깁니다. 브라우저의 CSS `resize` 손잡이는 쓰지 않습니다.
+- `autoResize={false}` 면 필드의 테두리 위에 [Resizable](../../layout/resizable/README.md) 과 같은 손잡이가 생깁니다. 모양과 자리가 Resizable 의 같은 방향과 같습니다.
+
+| `resize`     | 손잡이                                                                    |
+| ------------ | ------------------------------------------------------------------------- |
+| `vertical`   | 아래 테두리 가운데의 가로 막대                                             |
+| `horizontal` | 끝 테두리(LTR 오른쪽, RTL 왼쪽) 가운데의 세로 막대                        |
+| `both`       | 끝 아래 모서리(RTL 왼쪽 아래)를 따라 휜 호. 필드의 바깥 모서리와 같은 중심 |
+
+- 브라우저의 CSS `resize` 손잡이는 쓰지 않습니다.
   - 키보드로 조작됩니다. native 손잡이는 Tab 이 닿지 않습니다.
   - iOS 에서도 손가락으로 끌립니다.
   - 브라우저마다 모양이 같습니다.
-  - 스크롤 막대는 손잡이 위에서 멈춥니다. 손잡이는 ScrollArea 의 모서리를 차지합니다(`ScrollArea.Corner`).
-- 손잡이는 Resizable 의 모서리 손잡이와 같은 호입니다. 입력 칸의 모서리 반지름을 읽어, 가장자리에서 5px 안쪽에 같은 중심의 호로 그립니다. 모든 `resize` 모드에서 모양이 같습니다.
-  - 기본 10px 모서리에서는 반지름 5px 의 호입니다.
-  - 아래 바가 있어 입력 칸의 아래 모서리가 각지면 끝이 살짝 둥근 ㄴ 자가 됩니다.
-  - 포커스는 호를 따라 그리고, 누를 영역은 입력 칸 모서리의 24px 정사각형입니다. 필드 밖으로 나가지 않습니다.
+- 막대와 호는 테두리를 가운데에 두고 필드 밖으로 2px 나옵니다. 손잡이가 있으면 필드는 `overflow: visible` 이라 손잡이를 자르지 않습니다.
+- 호는 필드의 모서리 반지름(기본 10px)을 읽어 같은 중심으로 그립니다. 아래 바가 있어도 필드의 모서리는 그대로라 호도 같습니다.
+- 누를 영역은 24px 입니다. 선의 안쪽 끝(필드 안 2px)에서 바깥으로 22px 까지라, 아래 바의 버튼(가장자리에서 6px, tiny 4px)과 스크롤 막대(2px)를 덮지 않습니다. Resizable 은 선을 가운데에 둔 24px 입니다.
+- 스크롤 막대는 손잡이 앞에서 멈추지 않고 필드의 둥근 모서리까지 갑니다.
+- 포커스는 막대면 막대 둘레의 링, 호면 호를 따라 그립니다. 손잡이에 포커스가 있을 때 필드는 포커스 링을 그리지 않습니다.
 - 높이는 textarea 에, 너비는 테두리 컨테이너 전체에 들어갑니다. 위아래 바의 높이는 그대로입니다.
 - 높이는 한 줄 이상, `maxRows` 가 있으면 그 이하입니다. 너비는 96px 이상입니다.
 - `Enter` 나 손잡이 두 번 누르기는 `rows` 와 `className` 으로 정한 크기로 돌아갑니다. 끄는 동안 `Escape` 는 끌기를 취소합니다.
@@ -75,7 +83,7 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 | `Home` / `End`    | 가장 작게 / 가장 크게. 너비와 `maxRows` 없는 높이는 최댓값이 없어 `End` 가 동작하지 않는다 |
 | `Enter`           | 처음 크기                                                |
 
-- 손잡이는 textarea 다음, 아래 바 앞에서 Tab 에 멈춥니다. `both` 면 Tab 한 칸에서 `←` `→` 가 너비, `↑` `↓` 가 높이를 바꿉니다.
+- 손잡이는 필드의 마지막 Tab 멈춤입니다. textarea 와 아래 바의 버튼 다음에 멈춥니다. `both` 면 Tab 한 칸에서 `←` `→` 가 너비, `↑` `↓` 가 높이를 바꿉니다.
 - 스크린 리더는 separator "높이", "너비"(값은 "120px")로 읽습니다. `both` 면 group "크기 조절" 안의 separator 둘이고, 포커스가 값이 바뀐 쪽으로 옮겨 갑니다. `aria-controls` 는 높이면 textarea, 너비면 테두리 컨테이너입니다.
 
 ## 바
@@ -180,7 +188,7 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 | `autoResize`             | `true`. 내용에 맞춰 높이 조절                                         |
 | `rows`                   | `3`. `minRows` 를 생략하면 최소 높이                                  |
 | `minRows` / `maxRows`    | 양의 정수. `maxRows` 를 넘으면 스크롤                                 |
-| `resize`                 | `autoResize={false}` 일 때만. `vertical`(기본). 모서리 손잡이로 바꾼다 |
+| `resize`                 | `autoResize={false}` 일 때만. `vertical`(기본). Resizable 과 같은 손잡이로 바꾼다 |
 | `className` / `style`    | 컨테이너로 간다. 상태를 받는 함수도 된다. Input에 주면 textarea로 간다 |
 | 그 외 native 속성, ref    | 실제 textarea로 간다                                                  |
 | `TextArea.Count`         | `threshold`, `announce`, 상태를 받는 `children` · `className`          |
@@ -191,6 +199,8 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 - `minRows` 가 `maxRows` 보다 크거나 양의 정수가 아니면 에러가 납니다.
 - `autoResize={false}` 에서 세로 패딩을 바꾸려면 `--ids-text-area-pad-y` 를 씁니다. `maxRows` 높이 계산에 이 값이 들어갑니다.
 - 손잡이로 바꾼 크기는 컴포넌트 안에만 있습니다. 새로 마운트하면(`key` 가 바뀌거나 `autoResize` 를 켜고 끄면) 처음 크기로 돌아갑니다.
+- 손잡이의 누를 영역은 필드 밖 22px 까지입니다. 그 안에 둔 요소는 손잡이가 받습니다. `Field` 의 설명과 오류는 필드 8px 아래라서 첫 줄의 위쪽이 여기에 듭니다.
+- `overflow: hidden` 인 부모 안에 두면 손잡이의 바깥 부분(선의 2px 과 누를 영역)이 잘립니다.
 - `value` 를 주고 `onChange`, `onValueChange`, `readOnly` 가 모두 없으면 에러가 납니다.
 - `TextArea.Input` 을 둘 이상 두거나, Input에 children을 주거나, `asChild` 자식이 textarea가 아니면 에러가 납니다.
 - `id` 가 없으면 만들어 붙입니다.

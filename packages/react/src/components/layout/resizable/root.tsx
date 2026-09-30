@@ -83,7 +83,7 @@ export function ResizableRoot({
     dragging,
     disabled,
   };
-  const styles = resizableStyle({ direction });
+  const styles = resizableStyle();
   const size: CSSProperties = {
     ...(resizable.width !== undefined && { width: pixels(resizable.width) }),
     ...(resizable.height !== undefined && { height: pixels(resizable.height) }),
@@ -108,7 +108,6 @@ export function ResizableRoot({
         disabled,
         element: resizable.element,
         axes: resizable.axes,
-        styles,
         onDraggingChange: setDragging,
       }}
     >

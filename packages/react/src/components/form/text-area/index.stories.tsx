@@ -192,59 +192,137 @@ export const Gallery: Story = {
               className="w-80"
             />
           </Showcase.Row>
-          <Showcase.Row label="resize vertical">
+        </Showcase.Section>
+
+        <Showcase.Section
+          title="Resize"
+          description="autoResize={false} 면 Resizable 과 같은 손잡이를 필드의 테두리 위에 그립니다. vertical 은 아래 가장자리, horizontal 은 끝 가장자리의 막대, both 는 필드의 모서리와 같은 중심으로 휜 호입니다. 누를 영역은 선의 안쪽 끝에서 바깥으로 24px 라서 바의 버튼과 스크롤 막대를 덮지 않습니다."
+        >
+          <Showcase.Row label="vertical" className="gap-8 py-3">
             <TextArea
               autoResize={false}
               resize="vertical"
               rows={3}
-              placeholder="모서리를 끌어 높이를 바꿉니다"
+              placeholder="아래 가장자리를 끌어 높이를 바꿉니다"
               aria-label="세로 조절"
-              className="w-80"
+              className="w-72"
             />
+            <TextArea
+              autoResize={false}
+              resize="vertical"
+              rows={2}
+              maxLength={100}
+              placeholder="아래 바가 있어도 손잡이는 테두리 위에 섭니다"
+              aria-label="바 있는 세로 조절"
+              className="w-72"
+            >
+              <TextArea.Input />
+              <TextArea.Count />
+              <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} />
+            </TextArea>
           </Showcase.Row>
-          <Showcase.Row label="resize horizontal">
+          <Showcase.Row label="horizontal" className="gap-8 py-3">
+            <TextArea
+              autoResize={false}
+              resize="horizontal"
+              rows={3}
+              placeholder="끝 가장자리를 끌어 너비를 바꿉니다"
+              aria-label="가로 조절"
+              className="w-72"
+            />
             <TextArea
               autoResize={false}
               resize="horizontal"
               rows={2}
-              placeholder="모서리를 끌어 너비를 바꿉니다"
-              aria-label="가로 조절"
-              className="w-80"
-            />
-          </Showcase.Row>
-          <Showcase.Row label="resize both">
-            <TextArea
-              autoResize={false}
-              resize="both"
-              rows={3}
-              placeholder="너비와 높이를 함께 바꿉니다"
-              aria-label="양방향 조절"
-              className="w-80"
-            />
-          </Showcase.Row>
-          <Showcase.Row label="with a bottom bar">
-            <TextArea
-              autoResize={false}
-              resize="both"
-              rows={3}
-              maxLength={200}
-              placeholder="아래 바가 입력 칸의 모서리를 각지게 하면 손잡이도 ㄴ 자가 됩니다"
-              aria-label="바 위 조절"
-              className="w-80"
+              maxLength={100}
+              placeholder="끝 가장자리 전체가 손잡이입니다"
+              aria-label="바 있는 가로 조절"
+              className="w-72"
             >
               <TextArea.Input />
               <TextArea.Count />
+              <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} />
             </TextArea>
           </Showcase.Row>
-          <Showcase.Row label="resize rtl">
-            <div dir="rtl">
+          <Showcase.Row label="both" className="gap-8 py-3">
+            <TextArea
+              autoResize={false}
+              resize="both"
+              rows={3}
+              placeholder="모서리를 끌어 너비와 높이를 함께 바꿉니다"
+              aria-label="양방향 조절"
+              className="w-72"
+            />
+            <TextArea
+              autoResize={false}
+              resize="both"
+              rows={2}
+              maxLength={100}
+              placeholder="호는 필드의 바깥 모서리를 따라 휩니다"
+              aria-label="바 있는 양방향 조절"
+              className="w-72"
+            >
+              <TextArea.Input />
+              <TextArea.Count />
+              <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} />
+            </TextArea>
+          </Showcase.Row>
+          <Showcase.Row label="tiny" className="gap-8 py-3">
+            {(['vertical', 'horizontal', 'both'] as const).map((resize) => (
+              <TextArea
+                key={resize}
+                size="tiny"
+                autoResize={false}
+                resize={resize}
+                rows={2}
+                maxLength={100}
+                placeholder={resize}
+                aria-label={`작은 ${resize}`}
+                className="w-60"
+              >
+                <TextArea.Input />
+                <TextArea.Count />
+                <IconButton aria-label="보내기" icon={<PaperAirplaneIcon />} />
+              </TextArea>
+            ))}
+          </Showcase.Row>
+          <Showcase.Row label="disabled" className="gap-8 py-3">
+            <TextArea
+              autoResize={false}
+              resize="vertical"
+              rows={2}
+              disabled
+              defaultValue="손잡이도 흐려집니다"
+              aria-label="비활성 세로 조절"
+              className="w-72"
+            />
+            <TextArea
+              autoResize={false}
+              resize="both"
+              rows={2}
+              disabled
+              defaultValue="손잡이도 흐려집니다"
+              aria-label="비활성 양방향 조절"
+              className="w-72"
+            />
+          </Showcase.Row>
+          <Showcase.Row label="rtl" className="gap-8 py-3">
+            <div dir="rtl" className="flex flex-wrap gap-8">
+              <TextArea
+                autoResize={false}
+                resize="horizontal"
+                rows={3}
+                placeholder="끝 가장자리는 왼쪽입니다"
+                aria-label="오른쪽에서 왼쪽 가로"
+                className="w-72"
+              />
               <TextArea
                 autoResize={false}
                 resize="both"
                 rows={3}
-                placeholder="손잡이가 왼쪽 아래 모서리로 옮겨 갑니다"
-                aria-label="오른쪽에서 왼쪽"
-                className="w-80"
+                placeholder="호가 왼쪽 아래 모서리로 옮겨 갑니다"
+                aria-label="오른쪽에서 왼쪽 양방향"
+                className="w-72"
               />
             </div>
           </Showcase.Row>
@@ -349,7 +427,7 @@ export const ResizeHandle: Story = {
     docs: {
       description: {
         story:
-          '`autoResize={false}` 면 입력 칸의 끝 아래 모서리를 따라 휜 크기 조절 손잡이가 생깁니다. 모서리와 같은 중심의 호라서 모든 모드에서 같은 모양입니다. 브라우저의 CSS 손잡이와 달리 Tab 으로 가서 방향키로 바꿀 수 있고, 터치로 끌리고, 스크롤 막대는 손잡이 위에서 멈춥니다. 높이는 textarea 에, 너비는 필드 전체에 들어갑니다. Enter 나 두 번 누르기는 rows 로 정한 크기로 돌아갑니다.',
+          '`autoResize={false}` 면 Resizable 과 같은 손잡이가 필드의 테두리 위에 생깁니다. `vertical` 은 아래 가장자리, `horizontal` 은 끝 가장자리의 막대이고, `both` 는 필드의 모서리와 같은 중심으로 휜 호입니다. 브라우저의 CSS 손잡이와 달리 Tab 으로 가서 방향키로 바꿀 수 있고, 터치로 끌립니다. 높이는 textarea 에, 너비는 필드 전체에 들어갑니다. Enter 나 두 번 누르기는 rows 로 정한 크기로 돌아갑니다.',
       },
     },
   },

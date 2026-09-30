@@ -5,7 +5,6 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { Resizable } from '.';
-import type { resizableStyle } from './style';
 import type { ResizeAxis } from '../../../internal/resize-handle';
 
 type ResizableContextValue = {
@@ -13,7 +12,6 @@ type ResizableContextValue = {
   disabled: boolean;
   element: HTMLElement | null;
   axes: Record<'width' | 'height', ResizeAxis>;
-  styles: ReturnType<typeof resizableStyle>;
   onDraggingChange: (dragging: boolean) => void;
 };
 

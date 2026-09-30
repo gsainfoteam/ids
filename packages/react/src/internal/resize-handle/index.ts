@@ -11,17 +11,11 @@ export {
   type ResizeRange,
   type SeparatorOptions,
 } from './axis';
-export {
-  GRIP_HALO,
-  GRIP_STROKE,
-  GRIP_TARGET,
-  gripArc,
-  type GripArc,
-  type GripPlacement,
-} from './arc';
+export { GRIP_HALO, GRIP_STROKE, GRIP_TARGET, gripArc, type GripArc, type ResizeBand } from './arc';
+export { ResizeEdge, type ResizeEdgeProps } from './edge';
 export { ResizeGrip, type ResizeGripProps } from './grip';
 export { innerEndEndRadius, isRightToLeft, measureAxis, type MeasuredAxis } from './measure';
-export { resizeGripStyle, resizeHandle } from './style';
+export { resizeEdgeStyle, resizeGripStyle, resizeHandle } from './style';
 export {
   axisKeyMap,
   currentRange,

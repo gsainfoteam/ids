@@ -3,7 +3,6 @@
 import {
   cloneElement,
   isValidElement,
-  useState,
   type CSSProperties,
   type ReactElement,
   type ReactNode,
@@ -13,7 +12,6 @@ import { omit } from 'es-toolkit';
 import TextareaAutosize from 'react-textarea-autosize';
 
 import { useTextAreaContext } from './context';
-import { ResizeGrip } from '../../../internal/resize-handle';
 import { cn, invariant, mergeRefs } from '../../../utils';
 import { ScrollArea } from '../../layout/scroll-area';
 
@@ -35,7 +33,6 @@ function rowsToHeight(rows: number | undefined) {
 export function TextAreaInput({ asChild, children, className, style }: TextAreaInputPartProps) {
   const { inputProps, autoResize, minRows, maxRows, resize, styles } =
     useTextAreaContext('TextArea.Input');
-  const [inputArea, setInputArea] = useState<HTMLElement | null>(null);
 
   const props = {
     ...inputProps,
@@ -50,18 +47,8 @@ export function TextAreaInput({ asChild, children, className, style }: TextAreaI
   };
 
   const scrolled = (textarea: ReactElement) => (
-    <ScrollArea ref={setInputArea} className={styles.scrollArea()}>
+    <ScrollArea className={styles.scrollArea()}>
       <ScrollArea.Viewport asChild>{textarea}</ScrollArea.Viewport>
-      {resize.axes.length > 0 && (
-        <ScrollArea.Corner>
-          <ResizeGrip
-            axes={resize.axes}
-            corner={inputArea}
-            placement="inside"
-            disabled={resize.disabled}
-          />
-        </ScrollArea.Corner>
-      )}
     </ScrollArea>
   );
 
