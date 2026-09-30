@@ -362,15 +362,15 @@ export const ComposedViewer: Story = {
           <Image key={photo.id} src={photo.src} alt={photo.alt} caption={photo.caption} ratio={1} />
         ))}
         <Image.Viewer aria-label="풍경 사진 보기">
-          <Image.Toolbar>
-            <Image.Counter />
-            <Image.Share />
-            <Image.Download />
-            <Image.Close />
-          </Image.Toolbar>
-          <Image.Prev />
-          <Image.Next />
-          <Image.Caption />
+          <Image.Viewer.Toolbar>
+            <Image.Viewer.Counter />
+            <Image.Viewer.Share />
+            <Image.Viewer.Download />
+            <Image.Viewer.Close />
+          </Image.Viewer.Toolbar>
+          <Image.Viewer.Prev />
+          <Image.Viewer.Next />
+          <Image.Viewer.Caption />
         </Image.Viewer>
       </Image.Group>
     </div>
@@ -379,7 +379,7 @@ export const ComposedViewer: Story = {
     docs: {
       description: {
         story:
-          'Image.Group 안에 Image.Viewer 를 두고 부품을 고르면 그 부품만 그립니다. 도구 막대는 Image.Toolbar 안에 Counter, ZoomIn, ZoomOut, Download, Share, Close 를 원하는 순서로 담습니다. Share 는 브라우저가 공유를 지원할 때만 보입니다. `loop` 을 주면 끝에서 처음으로 넘어갑니다.',
+          'Image.Group 안에 Image.Viewer 를 두고 그 부품(Image.Viewer.Toolbar, Image.Viewer.Prev 등)을 고르면 그 부품만 그립니다. 도구 막대는 Image.Viewer.Toolbar 안에 Counter, ZoomIn, ZoomOut, Download, Share, Close 를 원하는 순서로 담습니다. Share 는 브라우저가 공유를 지원할 때만 보입니다. `loop` 을 주면 끝에서 처음으로 넘어갑니다.',
       },
     },
   },

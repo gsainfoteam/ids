@@ -862,7 +862,7 @@ thumb: [
 ### 쓰는 곳
 
 - Carousel: 모두. `root.tsx` 가 `useSlides`, `moveWithKeys`, `SlidesAnnouncer` 를, `style.ts` 가 `slidesLayout` 을 씁니다.
-- Image 의 뷰어(`components/data/image/viewer-layer.tsx`): 전체 화면 레이어 안에서 `useSlides`, `SlidesAnnouncer`, `slidesLayout`. "2 / 6" 은 `Image.Counter` 가 그리므로 `counter` 를 켜지 않습니다. 확대 중에는 방향키가 사진을 옮기므로 키는 자기 `keyHandler` 로 받고 `moveWithKeys` 를 싣지 않습니다. 확대 중에는 `watchDrag` 가 끌기를 막고, 두 번째 손가락이 닿거나 아래로 쓸기 시작하면 `cancelDrag()` 로 끌던 트랙을 돌려놓습니다.
+- Image 의 뷰어(`components/data/image/viewer-layer.tsx`): 전체 화면 레이어 안에서 `useSlides`, `SlidesAnnouncer`, `slidesLayout`. "2 / 6" 은 `Image.Viewer.Counter` 가 그리므로 `counter` 를 켜지 않습니다. 확대 중에는 방향키가 사진을 옮기므로 키는 자기 `keyHandler` 로 받고 `moveWithKeys` 를 싣지 않습니다. 확대 중에는 `watchDrag` 가 끌기를 막고, 두 번째 손가락이 닿거나 아래로 쓸기 시작하면 `cancelDrag()` 로 끌던 트랙을 돌려놓습니다.
 
 ### 쓰는 법
 

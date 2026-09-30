@@ -194,5 +194,3 @@ export function ImageViewer(props: ImageViewerProps) {
   if (group) return <GroupViewer group={group} props={props} />;
   return <StandaloneViewer props={props} />;
 }
-
-ImageViewer.displayName = 'Image.Viewer';

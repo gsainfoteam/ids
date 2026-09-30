@@ -120,29 +120,30 @@ const [index, setIndex] = useState(0);
 <Image.Group aria-label="풍경 사진">
   {photos.map((photo) => <Image key={photo.id} ... />)}
   <Image.Viewer aria-label="풍경 사진 보기">          {/* 적은 부품만 그린다 */}
-    <Image.Toolbar>
-      <Image.Counter />
-      <Image.ZoomIn />
-      <Image.ZoomOut />
-      <Image.Share />
-      <Image.Download />
-      <Image.Close />
-    </Image.Toolbar>
-    <Image.Prev />
-    <Image.Next />
-    <Image.Caption />
-    <Image.Thumbnails />
+    <Image.Viewer.Toolbar>
+      <Image.Viewer.Counter />
+      <Image.Viewer.ZoomIn />
+      <Image.Viewer.ZoomOut />
+      <Image.Viewer.Share />
+      <Image.Viewer.Download />
+      <Image.Viewer.Close />
+    </Image.Viewer.Toolbar>
+    <Image.Viewer.Prev />
+    <Image.Viewer.Next />
+    <Image.Viewer.Caption />
+    <Image.Viewer.Thumbnails />
   </Image.Viewer>
 </Image.Group>
 ```
 
 - 기본 뷰어는 도구 막대(번호, 확대, 축소, 내려받기, 닫기), 이전과 다음 버튼, 설명, 아래 썸네일 줄입니다.
-- `Image.Viewer` 에 자식을 주면 그 부품만 그립니다. `Image.Toolbar` 에 자식을 주지 않으면 기본 도구 막대입니다.
+- 뷰어 부품은 `Image.Viewer` 아래에 있습니다(`Image.Viewer.Close`). 모두 뷰어의 상태를 읽으므로 `Image.Viewer` 안이면 도구 막대 밖에 두어도 됩니다.
+- `Image.Viewer` 에 자식을 주면 그 부품만 그립니다. `Image.Viewer.Toolbar` 에 자식을 주지 않으면 기본 도구 막대입니다.
 - 한 장뿐이면 번호, 이전과 다음, 썸네일은 그리지 않습니다.
 - 이전과 다음은 끝에서 `aria-disabled` 가 되고, `loop` 이면 넘어갑니다. 확대와 축소도 끝에서 `aria-disabled` 입니다.
 - 넘기면 배율이 1 로 돌아갑니다.
-- `Image.Share` 는 브라우저에 `navigator.share` 가 있을 때만 보이고, 지금 장의 주소와 `alt` 를 공유합니다.
-- `Image.Download` 는 지금 장의 `src`(`previewSrc`) 로 가는 `<a download>` 입니다.
+- `Image.Viewer.Share` 는 브라우저에 `navigator.share` 가 있을 때만 보이고, 지금 장의 주소와 `alt` 를 공유합니다.
+- `Image.Viewer.Download` 는 지금 장의 `src`(`previewSrc`) 로 가는 `<a download>` 입니다.
 
 ### 키보드
 
@@ -224,26 +225,26 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 
 - 함수로 받는 상태는 `{ status, preview }` 입니다. 루트의 `className`, `style` 이 받습니다.
 
-| 뷰어 속성                      | 붙는 곳                    | 뜻                                        |
-| ------------------------------ | -------------------------- | ----------------------------------------- |
-| `data-image-viewer`            | 대화상자                   |                                           |
-| `data-open`                    | 대화상자                   | 열려 있다                                 |
-| `data-ending-style`            | 대화상자, 뒤 배경          | 닫히는 중                                 |
-| `data-swiping`                 | 대화상자, 뒤 배경          | 아래로 쓸어내리는 중                      |
-| `--image-viewer-presence`      | 대화상자, 뒤 배경          | 쓸어내리는 동안 1 에서 0 으로 줄어드는 값 |
-| `data-image-viewer-backdrop`   | 뒤 배경                    |                                           |
-| `data-image-viewer-stage`      | 사진들이 넘어가는 영역     |                                           |
-| `data-slide`, `data-selected`  | 한 장, 지금 장             |                                           |
-| `data-image-viewer-box`        | 확대되는 사진 상자         |                                           |
-| `data-image-viewer-picture`    | 큰 그림 `<img>`            |                                           |
-| `data-image-viewer-notice`     | 깨진 큰 그림의 알림        |                                           |
-| `data-image-viewer-toolbar`    | `Image.Toolbar`            |                                           |
-| `data-image-viewer-counter`    | `Image.Counter`            |                                           |
-| `data-image-viewer-step`       | `Image.Prev`, `Image.Next` | `prev` / `next`                           |
-| `data-image-viewer-caption`    | `Image.Caption`            |                                           |
-| `data-image-viewer-thumbnails` | `Image.Thumbnails`         |                                           |
-| `data-current`                 | 썸네일                     | 지금 장. `aria-current="true"`            |
-| `data-image-viewer-download`   | `Image.Download`           |                                           |
+| 뷰어 속성                      | 붙는 곳                                  | 뜻                                        |
+| ------------------------------ | ---------------------------------------- | ----------------------------------------- |
+| `data-image-viewer`            | 대화상자                                 |                                           |
+| `data-open`                    | 대화상자                                 | 열려 있다                                 |
+| `data-ending-style`            | 대화상자, 뒤 배경                        | 닫히는 중                                 |
+| `data-swiping`                 | 대화상자, 뒤 배경                        | 아래로 쓸어내리는 중                      |
+| `--image-viewer-presence`      | 대화상자, 뒤 배경                        | 쓸어내리는 동안 1 에서 0 으로 줄어드는 값 |
+| `data-image-viewer-backdrop`   | 뒤 배경                                  |                                           |
+| `data-image-viewer-stage`      | 사진들이 넘어가는 영역                   |                                           |
+| `data-slide`, `data-selected`  | 한 장, 지금 장                           |                                           |
+| `data-image-viewer-box`        | 확대되는 사진 상자                       |                                           |
+| `data-image-viewer-picture`    | 큰 그림 `<img>`                          |                                           |
+| `data-image-viewer-notice`     | 깨진 큰 그림의 알림                      |                                           |
+| `data-image-viewer-toolbar`    | `Image.Viewer.Toolbar`                   |                                           |
+| `data-image-viewer-counter`    | `Image.Viewer.Counter`                   |                                           |
+| `data-image-viewer-step`       | `Image.Viewer.Prev`, `Image.Viewer.Next` | `prev` / `next`                           |
+| `data-image-viewer-caption`    | `Image.Viewer.Caption`                   |                                           |
+| `data-image-viewer-thumbnails` | `Image.Viewer.Thumbnails`                |                                           |
+| `data-current`                 | 썸네일                                   | 지금 장. `aria-current="true"`            |
+| `data-image-viewer-download`   | `Image.Viewer.Download`                  |                                           |
 
 ## 속성
 
@@ -287,24 +288,24 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | `items` 의 한 장                | 뜻                                            |
 | ------------------------------- | --------------------------------------------- |
 | `src`, `alt`                    | 필수. 큰 그림과 그 이름                       |
-| `caption`                       | `Image.Caption` 이 보여 줄 설명               |
+| `caption`                       | `Image.Viewer.Caption` 이 보여 줄 설명        |
 | `thumbnail`                     | 큰 그림을 받는 동안 깔 그림, 썸네일 줄의 그림 |
 | `srcSet`, `sizes`               | 큰 그림 `<img>` 로 간다                       |
 | `crossOrigin`, `referrerPolicy` | 큰 그림 `<img>` 로 간다                       |
 
 ### 뷰어 부품
 
-| 부품                             | 기본 / 동작                                                               |
-| -------------------------------- | ------------------------------------------------------------------------- |
-| `Image.Toolbar`                  | 위 오른쪽의 막대. 자식이 없으면 Counter, ZoomIn, ZoomOut, Download, Close |
-| `Image.Counter`                  | "2 / 6". 스크린 리더에게 숨긴다                                           |
-| `Image.ZoomIn` / `Image.ZoomOut` | `IconButton` 속성. 이름 "확대" / "축소"                                   |
-| `Image.Share`                    | `IconButton` 속성. 이름 "공유하기". `navigator.share` 가 있을 때만        |
-| `Image.Download`                 | `IconButton` 속성과 `<a>` 속성. 이름 "내려받기"                           |
-| `Image.Close`                    | `IconButton` 속성. 이름 "닫기"                                            |
-| `Image.Prev` / `Image.Next`      | `IconButton` 속성. 이름 "이전 사진" / "다음 사진". 양옆 가운데            |
-| `Image.Caption`                  | 지금 장의 `caption`. 없으면 그리지 않는다                                 |
-| `Image.Thumbnails`               | 아래 썸네일 줄. 넘치면 가로로 스크롤한다                                  |
+| 부품                                           | 기본 / 동작                                                               |
+| ---------------------------------------------- | ------------------------------------------------------------------------- |
+| `Image.Viewer.Toolbar`                         | 위 오른쪽의 막대. 자식이 없으면 Counter, ZoomIn, ZoomOut, Download, Close |
+| `Image.Viewer.Counter`                         | "2 / 6". 스크린 리더에게 숨긴다                                           |
+| `Image.Viewer.ZoomIn` / `Image.Viewer.ZoomOut` | `IconButton` 속성. 이름 "확대" / "축소"                                   |
+| `Image.Viewer.Share`                           | `IconButton` 속성. 이름 "공유하기". `navigator.share` 가 있을 때만        |
+| `Image.Viewer.Download`                        | `IconButton` 속성과 `<a>` 속성. 이름 "내려받기"                           |
+| `Image.Viewer.Close`                           | `IconButton` 속성. 이름 "닫기"                                            |
+| `Image.Viewer.Prev` / `Image.Viewer.Next`      | `IconButton` 속성. 이름 "이전 사진" / "다음 사진". 양옆 가운데            |
+| `Image.Viewer.Caption`                         | 지금 장의 `caption`. 없으면 그리지 않는다                                 |
+| `Image.Viewer.Thumbnails`                      | 아래 썸네일 줄. 넘치면 가로로 스크롤한다                                  |
 
 ## 알아둘 것
 

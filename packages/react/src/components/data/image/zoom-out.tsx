@@ -6,10 +6,10 @@ import { useImageViewerContext } from './context';
 import { ViewerButton, type ImageViewerButtonProps } from './viewer-button';
 import { useTranslate } from '../../../internal/translate';
 
-export type ImageZoomOutProps = ImageViewerButtonProps;
+export type ImageViewerZoomOutProps = ImageViewerButtonProps;
 
-export function ImageZoomOut(props: ImageZoomOutProps) {
-  const viewer = useImageViewerContext('Image.ZoomOut');
+export function ImageViewerZoomOut(props: ImageViewerZoomOutProps) {
+  const viewer = useImageViewerContext('Image.Viewer.ZoomOut');
   const t = useTranslate();
 
   return (
@@ -24,4 +24,4 @@ export function ImageZoomOut(props: ImageZoomOutProps) {
   );
 }
 
-ImageZoomOut.displayName = 'Image.ZoomOut';
+ImageViewerZoomOut.displayName = 'Image.Viewer.ZoomOut';

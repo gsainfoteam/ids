@@ -5,10 +5,10 @@ import { type ComponentProps } from 'react';
 import { useImageViewerContext } from './context';
 import { useTranslate } from '../../../internal/translate';
 
-export type ImageCounterProps = Omit<ComponentProps<'span'>, 'children'>;
+export type ImageViewerCounterProps = Omit<ComponentProps<'span'>, 'children'>;
 
-export function ImageCounter({ className, ...rest }: ImageCounterProps) {
-  const viewer = useImageViewerContext('Image.Counter');
+export function ImageViewerCounter({ className, ...rest }: ImageViewerCounterProps) {
+  const viewer = useImageViewerContext('Image.Viewer.Counter');
   const t = useTranslate();
   if (viewer.count <= 1) return null;
 
@@ -24,4 +24,4 @@ export function ImageCounter({ className, ...rest }: ImageCounterProps) {
   );
 }
 
-ImageCounter.displayName = 'Image.Counter';
+ImageViewerCounter.displayName = 'Image.Viewer.Counter';

@@ -15,11 +15,18 @@ const runNode = (conditions: string[], script: string) =>
 
 const listNamespacedExports = `
   const ids = await import('./dist/index.js');
+  const holdsParts = (value) =>
+    typeof value === 'function' && Object.keys(value).some((key) => /^[A-Z]/.test(key));
+  const membersOf = (value, path = '') =>
+    Object.keys(value)
+      .filter((key) => key !== 'displayName')
+      .flatMap((key) => [
+        path + key,
+        ...(holdsParts(value[key]) ? membersOf(value[key], path + key + '.') : []),
+      ]);
   const namespaced = {};
   for (const [name, value] of Object.entries(ids)) {
-    const members = typeof value === 'function'
-      ? Object.keys(value).filter((key) => key !== 'displayName')
-      : [];
+    const members = typeof value === 'function' ? membersOf(value) : [];
     if (members.length) namespaced[name] = members;
   }
   console.log(JSON.stringify(namespaced));
@@ -66,13 +73,18 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
 
   const clientReference = Symbol.for('react.client.reference');
   const namespaced = ${JSON.stringify(namespaced)};
+  const reach = (value, path) =>
+    path.split('.').reduce(
+      (parent, key) => (parent === undefined || parent.$$typeof === clientReference ? undefined : parent[key]),
+      value,
+    );
   const unreachable = [];
   for (const [name, members] of Object.entries(namespaced)) {
     if (ids[name].$$typeof === clientReference) {
       unreachable.push(name);
       continue;
     }
-    for (const member of members) if (ids[name][member] === undefined) unreachable.push(name + '.' + member);
+    for (const member of members) if (reach(ids[name], member) === undefined) unreachable.push(name + '.' + member);
     if (!members.includes('Style')) continue;
     if (ids[name].Style.$$typeof === clientReference) unreachable.push(name + '.Style');
     else ids[name].Style();
@@ -86,7 +98,7 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     (name) => /^[A-Z][a-z]/.test(name) && ids[name].$$typeof === clientReference,
   );
 
-  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Divider } = ids;
+  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Divider, Image } = ids;
   const page = h(
     IdsProvider,
     { color: 'blue', mode: 'light' },
@@ -112,6 +124,17 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
       ),
     ),
     h(TextField, { name: 'note' }, h(TextField.Clear)),
+    h(
+      Image.Group,
+      { 'aria-label': 'Photos' },
+      h(Image, { src: '/lake.png', alt: 'Lake' }),
+      h(
+        Image.Viewer,
+        { 'aria-label': 'Photo viewer' },
+        h(Image.Viewer.Toolbar, null, h(Image.Viewer.Counter), h(Image.Viewer.Close)),
+        h(Image.Viewer.Caption),
+      ),
+    ),
   );
 
   const manifest = new Proxy({}, {
@@ -154,6 +177,9 @@ test(
     };
 
     expect(clientComponents).toEqual(['IdsProvider', 'ThemeContext', 'TooltipDelayGroup']);
+    expect(namespaced.Image).toEqual(
+      expect.arrayContaining(['Group', 'Viewer', 'Viewer.Toolbar', 'Viewer.Close']),
+    );
     for (const reference of [
       'ButtonRoot',
       'DialogRoot',
@@ -161,6 +187,10 @@ test(
       'SelectRoot',
       'SelectItem',
       'FieldLabel',
+      'ImageGroup',
+      'ImageViewer',
+      'ImageViewerToolbar',
+      'ImageViewerClose',
     ])
       expect(payload).toContain(`"${reference}"`);
   },

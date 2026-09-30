@@ -4,10 +4,10 @@ import { type ComponentProps } from 'react';
 
 import { useImageViewerContext } from './context';
 
-export type ImageCaptionProps = Omit<ComponentProps<'div'>, 'children'>;
+export type ImageViewerCaptionProps = Omit<ComponentProps<'div'>, 'children'>;
 
-export function ImageCaption({ className, ...rest }: ImageCaptionProps) {
-  const viewer = useImageViewerContext('Image.Caption');
+export function ImageViewerCaption({ className, ...rest }: ImageViewerCaptionProps) {
+  const viewer = useImageViewerContext('Image.Viewer.Caption');
   const caption = viewer.item?.caption;
   if (caption === undefined || caption === null || caption === false || caption === '') return null;
 
@@ -18,4 +18,4 @@ export function ImageCaption({ className, ...rest }: ImageCaptionProps) {
   );
 }
 
-ImageCaption.displayName = 'Image.Caption';
+ImageViewerCaption.displayName = 'Image.Viewer.Caption';

@@ -7,12 +7,12 @@ import { useImageViewerContext } from './context';
 import { ViewerButton, type ImageViewerButtonProps } from './viewer-button';
 import { useTranslate } from '../../../internal/translate';
 
-export type ImageShareProps = ImageViewerButtonProps;
+export type ImageViewerShareProps = ImageViewerButtonProps;
 
 const canShare = () => typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
-export function ImageShare(props: ImageShareProps) {
-  const viewer = useImageViewerContext('Image.Share');
+export function ImageViewerShare(props: ImageViewerShareProps) {
+  const viewer = useImageViewerContext('Image.Viewer.Share');
   const t = useTranslate();
   const item = viewer.item;
   if (!item || !canShare()) return null;
@@ -33,4 +33,4 @@ export function ImageShare(props: ImageShareProps) {
   );
 }
 
-ImageShare.displayName = 'Image.Share';
+ImageViewerShare.displayName = 'Image.Viewer.Share';

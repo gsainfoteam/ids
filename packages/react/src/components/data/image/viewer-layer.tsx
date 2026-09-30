@@ -10,14 +10,14 @@ import {
   type PointerEvent,
 } from 'react';
 
-import { ImageCaption } from './caption';
+import { ImageViewerCaption } from './caption';
 import { ImageViewerContext, type ImageViewerContextValue } from './context';
 import { enterFrom, exitTo } from './flip';
-import { ImageNext } from './next';
-import { ImagePrev } from './prev';
+import { ImageViewerNext } from './next';
+import { ImageViewerPrev } from './prev';
 import { imageStyle } from './style';
-import { ImageThumbnails } from './thumbnails';
-import { ImageToolbar } from './toolbar';
+import { ImageViewerThumbnails } from './thumbnails';
+import { ImageViewerToolbar } from './toolbar';
 import { ImageViewerSlide } from './viewer-slide';
 import { keyHandler } from '../../../internal/keys';
 import {
@@ -50,11 +50,11 @@ const WHAT_IS_NOT_EMPTY = '[data-image-viewer-box], [data-image-viewer-notice]';
 
 const DEFAULT_PARTS = (
   <>
-    <ImageToolbar />
-    <ImagePrev />
-    <ImageNext />
-    <ImageCaption />
-    <ImageThumbnails />
+    <ImageViewerToolbar />
+    <ImageViewerPrev />
+    <ImageViewerNext />
+    <ImageViewerCaption />
+    <ImageViewerThumbnails />
   </>
 );
 

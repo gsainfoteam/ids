@@ -6,10 +6,10 @@ import { useImageViewerContext } from './context';
 import { ViewerButton, type ImageViewerButtonProps } from './viewer-button';
 import { useTranslate } from '../../../internal/translate';
 
-export type ImagePrevProps = ImageViewerButtonProps;
+export type ImageViewerPrevProps = ImageViewerButtonProps;
 
-export function ImagePrev({ className, ...props }: ImagePrevProps) {
-  const viewer = useImageViewerContext('Image.Prev');
+export function ImageViewerPrev({ className, ...props }: ImageViewerPrevProps) {
+  const viewer = useImageViewerContext('Image.Viewer.Prev');
   const t = useTranslate();
   if (viewer.count <= 1) return null;
 
@@ -27,4 +27,4 @@ export function ImagePrev({ className, ...props }: ImagePrevProps) {
   );
 }
 
-ImagePrev.displayName = 'Image.Prev';
+ImageViewerPrev.displayName = 'Image.Viewer.Prev';

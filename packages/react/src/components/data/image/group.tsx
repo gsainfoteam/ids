@@ -14,19 +14,19 @@ import { ImageGroupContext } from './context';
 import { imageStyle } from './style';
 import { useImageGroup, type UseImageGroupOptions } from './use-image-group';
 import { ImageViewer } from './viewer';
-import { elementTypeOf, flattenFragments, invariant, mergeRefs } from '../../../utils';
+import { flattenFragments, invariant, mergeRefs } from '../../../utils';
 
 export type ImageGroupLayout = 'row' | 'column' | 'grid';
 
 const keepListRoleInSafari = { role: 'list' } as const;
-
-const isViewer = (node: ReactNode) => isValidElement(node) && elementTypeOf(node) === ImageViewer;
 
 export type ImageGroupProps = Omit<ComponentProps<'ul'>, 'defaultValue' | 'onChange'> &
   UseImageGroupOptions & {
     layout?: ImageGroupLayout;
     columns?: number;
   };
+
+type ImageGroupRootProps = ImageGroupProps & { viewer?: ReactNode };
 
 export function ImageGroup({
   layout = 'row',
@@ -44,8 +44,9 @@ export function ImageGroup({
   style,
   children,
   ref,
+  viewer,
   ...rest
-}: ImageGroupProps) {
+}: ImageGroupRootProps) {
   invariant(
     Number.isInteger(columns) && columns > 0,
     'Image.Group: columns must be a positive whole number.',
@@ -81,9 +82,7 @@ export function ImageGroup({
   const styles = imageStyle({ layout });
   const columnCount = layout === 'grid' ? ({ '--image-columns': columns } as CSSProperties) : null;
 
-  const nodes = flattenFragments(children);
-  const viewer = nodes.find(isViewer);
-  const images = nodes.filter((node) => node !== viewer);
+  const images = flattenFragments(children);
 
   return (
     <ImageGroupContext value={group}>
@@ -111,5 +110,3 @@ export function ImageGroup({
     </ImageGroupContext>
   );
 }
-
-ImageGroup.displayName = 'Image.Group';

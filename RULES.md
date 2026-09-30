@@ -195,6 +195,14 @@ drawer/
   `DrawerTrigger.displayName = 'Drawer.Trigger';`, so Show code prints `<Drawer.Trigger>` and not
   the function name. The icon-name lookup skips a `displayName` with a dot, so a part placed in an
   IconButton's `icon` never becomes its label.
+- A sub-component with parts of its own keeps them under its own namespace (`Image.Viewer.Close`,
+  not `Image.Close`). It is then a server-safe function in `index.tsx` that renders its client root
+  (`Viewer.displayName = 'Image.Viewer'`), merged with a namespace of part aliases and types: a
+  `const` alias cannot merge with a namespace that holds values, and a Server Component cannot
+  read a part off a client reference. Its parts are `ImageViewerClose` with `displayName`
+  `'Image.Viewer.Close'`. A client file cannot import that function without a cycle through
+  `index.tsx`, so a sibling that picks the sub-component out of its children does so there too:
+  `Image.Group` finds `[Image.Viewer, ImageViewer]` and hands it to the client `ImageGroup`.
 - Parts and `root.tsx` import `./context`, `./style` and sibling parts directly. They import `'.'`
   only with `import type`, so no runtime cycle runs through `index.tsx`. The root recognises its parts
   (`elementTypeOf(child) === DrawerOverlay`, a set of part functions) by importing them, never
@@ -447,7 +455,8 @@ alike, are the `Hotkey` type (`'Mod+K'`, `'Alt+T'`). Printable keys (typeahead, 
 read from `event.key`, since TanStack falls back to the key's position.
 
 **Parts.** Part props types are named `X.PartProps` (`OTPField.SlotProps`,
-`ButtonGroup.SeparatorProps`). Every part is optional and falls back to a default.
+`ButtonGroup.SeparatorProps`), one level down for a sub-component's parts
+(`Image.Viewer.CloseProps`). Every part is optional and falls back to a default.
 
 **Group-like controls keep a stable focus target.** RadioGroup, CheckboxGroup, Rating and
 ToggleGroup put `ref` and `id` on the root, with `tabIndex={-1}`, and hand `focus()` to the

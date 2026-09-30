@@ -10,20 +10,20 @@ import { IconButton } from '../../action/icon-button';
 
 import type { IdsSize, IdsVariant } from '../../../tokens/types';
 
-export type ImageDownloadProps = Omit<ComponentProps<'a'>, 'children' | 'href' | 'color'> & {
+export type ImageViewerDownloadProps = Omit<ComponentProps<'a'>, 'children' | 'href' | 'color'> & {
   variant?: IdsVariant;
   size?: IdsSize;
   icon?: ReactElement;
 };
 
-export function ImageDownload({
+export function ImageViewerDownload({
   variant = 'ghost',
   size,
   icon,
   download = '',
   ...rest
-}: ImageDownloadProps) {
-  const viewer = useImageViewerContext('Image.Download');
+}: ImageViewerDownloadProps) {
+  const viewer = useImageViewerContext('Image.Viewer.Download');
   const t = useTranslate();
   const src = viewer.item?.src;
   if (!src) return null;
@@ -46,4 +46,4 @@ export function ImageDownload({
   );
 }
 
-ImageDownload.displayName = 'Image.Download';
+ImageViewerDownload.displayName = 'Image.Viewer.Download';

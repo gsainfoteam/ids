@@ -295,10 +295,10 @@ test('share shows only where the browser can share, and shares the image shown',
   });
   const viewer = (
     <Image.Viewer>
-      <Image.Toolbar>
-        <Image.Share />
-        <Image.Close />
-      </Image.Toolbar>
+      <Image.Viewer.Toolbar>
+        <Image.Viewer.Share />
+        <Image.Viewer.Close />
+      </Image.Viewer.Toolbar>
     </Image.Viewer>
   );
 
@@ -321,11 +321,11 @@ test('a composed viewer draws only the parts it lists', async () => {
     <Gallery
       viewer={
         <Image.Viewer aria-label="Gallery viewer">
-          <Image.Toolbar>
-            <Image.Counter />
-            <Image.Close />
-          </Image.Toolbar>
-          <Image.Caption />
+          <Image.Viewer.Toolbar>
+            <Image.Viewer.Counter />
+            <Image.Viewer.Close />
+          </Image.Viewer.Toolbar>
+          <Image.Viewer.Caption />
         </Image.Viewer>
       }
     />,

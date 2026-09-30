@@ -6,10 +6,10 @@ import { useImageViewerContext } from './context';
 import { ViewerButton, type ImageViewerButtonProps } from './viewer-button';
 import { useTranslate } from '../../../internal/translate';
 
-export type ImageZoomInProps = ImageViewerButtonProps;
+export type ImageViewerZoomInProps = ImageViewerButtonProps;
 
-export function ImageZoomIn(props: ImageZoomInProps) {
-  const viewer = useImageViewerContext('Image.ZoomIn');
+export function ImageViewerZoomIn(props: ImageViewerZoomInProps) {
+  const viewer = useImageViewerContext('Image.Viewer.ZoomIn');
   const t = useTranslate();
 
   return (
@@ -24,4 +24,4 @@ export function ImageZoomIn(props: ImageZoomInProps) {
   );
 }
 
-ImageZoomIn.displayName = 'Image.ZoomIn';
+ImageViewerZoomIn.displayName = 'Image.Viewer.ZoomIn';

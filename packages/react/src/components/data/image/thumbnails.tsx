@@ -6,10 +6,10 @@ import { useImageViewerContext } from './context';
 import { useTranslate } from '../../../internal/translate';
 import { ScrollArea } from '../../layout/scroll-area';
 
-export type ImageThumbnailsProps = Omit<ComponentProps<'div'>, 'children'>;
+export type ImageViewerThumbnailsProps = Omit<ComponentProps<'div'>, 'children'>;
 
-export function ImageThumbnails({ className, ...rest }: ImageThumbnailsProps) {
-  const viewer = useImageViewerContext('Image.Thumbnails');
+export function ImageViewerThumbnails({ className, ...rest }: ImageViewerThumbnailsProps) {
+  const viewer = useImageViewerContext('Image.Viewer.Thumbnails');
   const t = useTranslate();
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -65,4 +65,4 @@ export function ImageThumbnails({ className, ...rest }: ImageThumbnailsProps) {
   );
 }
 
-ImageThumbnails.displayName = 'Image.Thumbnails';
+ImageViewerThumbnails.displayName = 'Image.Viewer.Thumbnails';
