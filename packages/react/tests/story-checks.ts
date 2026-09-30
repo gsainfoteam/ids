@@ -24,6 +24,8 @@ configure({ asyncUtilTimeout: PLAYS_WAIT_LONGER_WHILE_THREE_ENGINES_SHARE_THE_MA
 
 const MODES_ONE_AFTER_THE_OTHER = ['light', 'dark'] as const;
 
+const A_GALLERY_RENDERS_AND_SCANS_EVERY_VARIANT_MS = 30_000;
+
 const FLOATING_UI_FOCUS_GUARDS = '[data-floating-ui-focus-guard]';
 
 function describeViolations(violations: AxeResults['violations']) {
@@ -65,10 +67,17 @@ export function checkEveryStory(storyFiles: StoryFiles) {
       for (const [path, module] of Object.entries(storyFiles))
         describe(path.replace('../src/', ''), () => {
           for (const [name, Story] of Object.entries(composeStories(module)))
-            test.skipIf(!Story.tags.includes('test'))(name, async () => {
-              await Story.run({ globals: { ...Story.globals, idsMode: mode } });
-              await checkAccessibility(Story.parameters.a11y as A11yParameters | undefined);
-            });
+            test.skipIf(!Story.tags.includes('test'))(
+              name,
+              {
+                timeout:
+                  name === 'Gallery' ? A_GALLERY_RENDERS_AND_SCANS_EVERY_VARIANT_MS : undefined,
+              },
+              async () => {
+                await Story.run({ globals: { ...Story.globals, idsMode: mode } });
+                await checkAccessibility(Story.parameters.a11y as A11yParameters | undefined);
+              },
+            );
         });
     });
 }
