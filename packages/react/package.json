@@ -61,6 +61,8 @@
     "@tanstack/react-hotkeys": "~0.12.1",
     "@tanstack/react-table": "^9.2.4",
     "@tanstack/table-core": "^9.2.4",
+    "@zag-js/react": "1.44.0",
+    "@zag-js/splitter": "1.44.0",
     "cn": "^0.4.0",
     "culori": "^4.0.2",
     "decimal.js": "^10.6.0",

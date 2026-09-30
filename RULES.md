@@ -93,6 +93,8 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
   - textarea sizing `react-textarea-autosize`, phone numbers `libphonenumber-js`;
   - QR code matrices `uqr`, which QRCode draws as its own SVG;
   - keyboard shortcuts `@tanstack/react-hotkeys`;
+  - split panel layout (sizes, limits, collapse) `@zag-js/splitter` through `@zag-js/react`, headless
+    prop getters on elements Splitter renders itself;
   - table state (sorting, row selection, pagination, column sizing) `@tanstack/react-table`, with
     its server-safe helpers imported from `@tanstack/table-core`;
   - slide dragging, snapping and auto-advance `embla-carousel` 8.6 (`embla-carousel-react`,
