@@ -144,6 +144,22 @@ const centerOf = (element: Element): Point => {
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 };
 
+const POINTERS_LAND_ON_WHOLE_PIXELS_OUTSIDE_CHROMIUM = 1;
+
+function expectWithinAPixel(actual: Point, expected: Point) {
+  expect(Math.abs(actual.x - expected.x)).toBeLessThanOrEqual(
+    POINTERS_LAND_ON_WHOLE_PIXELS_OUTSIDE_CHROMIUM,
+  );
+  expect(Math.abs(actual.y - expected.y)).toBeLessThanOrEqual(
+    POINTERS_LAND_ON_WHOLE_PIXELS_OUTSIDE_CHROMIUM,
+  );
+}
+
+const userSelectOf = (element: Element) => {
+  const style = getComputedStyle(element);
+  return style.getPropertyValue('user-select') || style.getPropertyValue('-webkit-user-select');
+};
+
 const frameOffset = (point: Point) => {
   const frame = window.frameElement!.getBoundingClientRect();
   const scale = frame.width / window.innerWidth;
@@ -261,7 +277,7 @@ test('the area stops the browser from panning, zooming and selecting while it li
   const screen = await render(<Harness />);
   const { area } = parts(screen);
   await expect.poll(() => getComputedStyle(area).touchAction).toBe('none');
-  expect(getComputedStyle(area).userSelect).toBe('none');
+  expect(userSelectOf(area)).toBe('none');
 
   const safariPinch = new Event('gesturestart', { cancelable: true });
   area.dispatchEvent(safariPinch);
@@ -286,9 +302,7 @@ test('the wheel zooms around the cursor and reports the settled scale', async ()
 
   expect(event.defaultPrevented).toBe(true);
   await expect.poll(() => viewOf(content).scale).toBeCloseTo(factor, 3);
-  const after = centerOf(spot.element());
-  expect(after.x).toBeCloseTo(before.x, 0);
-  expect(after.y).toBeCloseTo(before.y, 0);
+  expectWithinAPixel(centerOf(spot.element()), before);
   await expect.element(scale).toHaveTextContent(String(Math.round(factor * 1000) / 1000));
   expect(onScaleChange).toHaveBeenLastCalledWith(Math.round(factor * 1000) / 1000);
 
@@ -341,9 +355,7 @@ test('a double click zooms in at the pointer and the next one zooms back out', a
 
   await userEvent.dblClick(spot);
   await expect.element(scale).toHaveTextContent('2');
-  const after = centerOf(spot.element());
-  expect(after.x).toBeCloseTo(before.x, 0);
-  expect(after.y).toBeCloseTo(before.y, 0);
+  expectWithinAPixel(centerOf(spot.element()), before);
 
   await userEvent.dblClick(area);
   await expect.element(scale).toHaveTextContent('1');
