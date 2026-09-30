@@ -65,6 +65,14 @@ const centerOf = (element: Element): Point => {
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 };
 
+const FRAME_MS = 16;
+let inputClock = Date.now();
+
+const inputTimestamp = ({ startsGesture }: { startsGesture: boolean }) => {
+  inputClock = startsGesture ? Math.max(Date.now(), inputClock + FRAME_MS) : inputClock + FRAME_MS;
+  return inputClock / 1000;
+};
+
 async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', point: Point) {
   await cdp().send('Input.dispatchMouseEvent', {
     type,
@@ -72,6 +80,7 @@ async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', poin
     button: 'left',
     buttons: type === 'mouseReleased' ? 0 : 1,
     clickCount: 1,
+    timestamp: inputTimestamp({ startsGesture: type === 'mousePressed' }),
   });
 }
 
@@ -79,6 +88,7 @@ async function touch(type: 'touchStart' | 'touchMove' | 'touchEnd', fingers: Poi
   await cdp().send('Input.dispatchTouchEvent', {
     type,
     touchPoints: fingers.map((point, finger) => ({ ...frameOffset(point), id: finger })),
+    timestamp: inputTimestamp({ startsGesture: type === 'touchStart' && fingers.length === 1 }),
   });
 }
 
