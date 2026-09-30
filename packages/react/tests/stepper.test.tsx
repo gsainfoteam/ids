@@ -9,6 +9,16 @@ const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html
 
 const step = (name: string) => page.getByRole('button', { name: new RegExp(`^${name}`) });
 
+const rectOf = (element: Element | null) => element!.getBoundingClientRect();
+
+const middleOf = (rect: DOMRect) => rect.top + rect.height / 2;
+
+function linesOf(element: Element) {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  return Array.from(range.getClientRects());
+}
+
 function steps(names = ['Account', 'Profile', 'Review'], marks: Stepper.Item.Props[] = []) {
   return names.map((name, index) => (
     <Stepper.Item key={name} {...marks[index]}>
@@ -221,4 +231,32 @@ test('development warnings: a value past the steps and a child that is not a par
   expect(warn).toHaveBeenCalledWith(
     expect.stringContaining('only Stepper.Item and Stepper.Content'),
   );
+});
+
+test('a vertical title keeps its first line level with the indicator, also when it wraps', async () => {
+  for (const size of ['standard', 'tiny'] as const) {
+    const screen = await render(
+      <div className="w-48">
+        <Stepper orientation="vertical" size={size} value={0}>
+          <Stepper.Item>
+            <Stepper.Title>A title long enough to wrap onto another line</Stepper.Title>
+            <Stepper.Description>Details</Stepper.Description>
+          </Stepper.Item>
+          <Stepper.Item>
+            <Stepper.Title>Short</Stepper.Title>
+          </Stepper.Item>
+        </Stepper>
+      </div>,
+    );
+
+    const items = Array.from(document.querySelectorAll('[data-stepper-item]'));
+    expect(linesOf(items[0]!.querySelector('[data-stepper-title]')!).length).toBeGreaterThan(1);
+    for (const item of items) {
+      const firstLine = linesOf(item.querySelector('[data-stepper-title]')!)[0]!;
+      const indicator = rectOf(item.querySelector('[data-stepper-indicator]'));
+      expect(Math.abs(middleOf(indicator) - middleOf(firstLine))).toBeLessThanOrEqual(1);
+    }
+
+    await screen.unmount();
+  }
 });

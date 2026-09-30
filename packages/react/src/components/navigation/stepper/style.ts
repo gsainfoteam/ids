@@ -85,12 +85,18 @@ export const stepperStyle = tv({
     {
       orientation: 'vertical',
       size: 'standard',
-      class: { title: 'min-h-8', separator: 'start-[calc(1rem-0.5px)] top-10' },
+      class: {
+        title: 'py-[calc((--spacing(8)-1lh)/2)]',
+        separator: 'start-[calc(1rem-0.5px)] top-10',
+      },
     },
     {
       orientation: 'vertical',
       size: 'tiny',
-      class: { title: 'min-h-6', separator: 'start-[calc(0.75rem-0.5px)] top-8' },
+      class: {
+        title: 'py-[calc((--spacing(6)-1lh)/2)]',
+        separator: 'start-[calc(0.75rem-0.5px)] top-8',
+      },
     },
   ],
   defaultVariants: { orientation: 'horizontal', size: 'standard', interactive: false },

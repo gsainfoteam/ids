@@ -133,6 +133,8 @@ const [step, setStep] = useState(0);
 <Stepper size="tiny" />               // standard(기본) / tiny
 ```
 
+- 세로에서 제목의 첫 줄은 표시의 가운데에 맞춥니다. 제목이 여러 줄이어도 첫 줄이 표시 옆에 옵니다.
+
 ## 상태와 data 속성
 
 | 요소                                                   | 속성                                                                                               |
