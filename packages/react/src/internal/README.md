@@ -25,6 +25,7 @@
 | [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/` |
 | [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
+| [`motion.ts`](#motionts)                         | 움직임 줄이기 설정 읽기, `--ids-motion-*` 토큰의 ms, 시트의 easing                    | `zoom-pan/`                                                                                                                                                                                                           |
 | [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어                  | Alert, `field-popup/`                                                                                                                                                                                                 |
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `surface.ts`                                                                                                                                                                                                  |
 | [`resize-handle/`](./resize-handle/README.md)    | 크기 조절 손잡이의 키 표, separator ARIA, 포인터 끌기, 클래스 조각, 모서리 손잡이     | DataTable, Resizable, Splitter, TextArea                                                                                                                                                                                                   |
@@ -40,6 +41,7 @@
 | [`toggle-surface.ts`](#toggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                                     | Toggle, IconToggle                                                                                                                                                                                                    |
 | [`translate.ts`](#translatets)                   | `IdsProvider` 의 `translate`, `locale` context 와 `useTranslate`, `useProviderLocale` | `IdsProvider`, 문구를 그리는 모든 컴포넌트                                                                                                                                                                            |
 | [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook                             | Checkbox, Radio                                                                                                                                                                                                       |
+| [`zoom-pan/`](./zoom-pan/README.md)              | 그림의 확대, 이동, 관성, 아래로 쓸어 닫기 제스처                                      | Image 의 뷰어(만드는 중)                                                                                                                                                                                              |
 
 ## arc.tsx
 
@@ -708,6 +710,32 @@ formatDefaultMessage('calendar.weekNumber', { week: 3 }); // '3주차'
 - 새 문구는 컴포넌트 이름의 그룹 아래, 알파벳 자리에 넣고, `messages/en.json` 의 같은 자리에 영어를 씁니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
 - 문구를 컴포넌트 안에 한국어 문자열로 직접 쓰지 않습니다. 컴포넌트 코드에 한국어 문자열이 있으면 `tests/messages.test.ts` 가 실패합니다.
 - 개발 경고(`[IDS] ...`)는 영어로 두고 여기에 넣지 않습니다. 사용자가 보는 문구만 넣습니다.
+
+## motion.ts
+
+JS 로 움직임을 재생하는 코드(Web Animations)가 CSS 의 움직임 규칙을 따르게 하는 함수와 상수입니다.
+
+- `prefersReducedMotion(element)`: 그 요소의 창에서 `(prefers-reduced-motion: reduce)` 가 켜졌는가
+- `motionDuration(element, 'fast' | 'normal' | 'slow')`: `--ids-motion-*` 토큰을 ms 숫자로 읽는다
+- `SHEET_EASING`: Drawer 의 시트가 쓰는 곡선(`cubic-bezier(0.32, 0.72, 0, 1)`)
+
+### 쓰는 곳
+
+- [zoom-pan](./zoom-pan/README.md): 확대와 이동의 애니메이션, 관성
+
+### 쓰는 법
+
+```ts
+// internal/zoom-pan/engine.ts
+if (prefersReducedMotion(content)) return; // 목표에 바로 둔다
+content.animate(keyframes, { duration: motionDuration(content, 'normal'), easing: SHEET_EASING });
+```
+
+### 왜 이렇게
+
+- CSS transition 은 `motion-reduce:` 변형과 `duration-(--ids-motion-*)` 로 규칙을 따르지만, `element.animate()` 는 CSS 를 거치지 않습니다. 그래서 같은 설정과 같은 토큰을 JS 에서 읽습니다.
+- 토큰은 요소의 계산된 스타일에서 읽습니다. 앱이 `--ids-motion-*` 를 바꾸면 JS 애니메이션도 따라갑니다. CSS 패키지를 불러오지 않은 곳에서는 토큰의 기본값(150, 250, 400ms)을 씁니다.
+- 설정은 부를 때마다 읽습니다. 열려 있는 동안 사용자가 설정을 바꿔도 다음 움직임부터 따릅니다.
 
 ## pressable.ts
 
