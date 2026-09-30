@@ -22,6 +22,13 @@ export const messages = {
     weekNumberHeader: '주차',
     year: '연도',
   },
+  carousel: {
+    indicator: '{index}번째 슬라이드로',
+    next: '다음 슬라이드',
+    pause: '자동 넘김 멈춤',
+    previous: '이전 슬라이드',
+    roleDescription: '캐러셀',
+  },
   checkboxGroup: {
     required: '하나 이상 선택하세요.',
   },
@@ -202,6 +209,11 @@ export const messages = {
   slider: {
     end: '끝',
     start: '시작',
+  },
+  slides: {
+    counter: '{index} / {count}',
+    roleDescription: '슬라이드',
+    slide: '{count}장 중 {index}번째',
   },
   spinner: {
     label: '불러오는 중',

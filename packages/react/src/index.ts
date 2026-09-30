@@ -72,6 +72,8 @@ export type {
   DataTableColumnMeta,
   DataTableFeatures,
 } from './components/data/data-table';
+export { Carousel } from './components/data/carousel';
+export type { CarouselProps, CarouselState } from './components/data/carousel';
 
 export { Button } from './components/action/button';
 export { IconButton } from './components/action/icon-button';

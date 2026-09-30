@@ -28,6 +28,7 @@
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `surface.ts`                                                                                                                                                                                                  |
 | [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)                           | Select, ChipField, Menu                                                                                                                                                                                               |
 | [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                                                 | Slider, ColorPicker                                                                                                                                                                                                   |
+| [`slides/`](#slides)                             | Embla Carousel 을 감싼 슬라이드 엔진, 장마다의 ARIA, 키, 넘김 알림                    | Carousel, (예정) Image.Viewer                                                                                                                                                                                         |
 | [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                        |
 | [`status-palette.ts`](#status-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                                    | Alert                                                                                                                                                                                                                 |
 | [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                                   | Card, Item, Chip                                                                                                                                                                                                      |
@@ -534,7 +535,7 @@ export const iconButtonStyle = tv({
 
 ### 쓰는 곳
 
-- 위젯의 키: Group 의 roving focus(ToggleGroup, Tabs), RadioGroup, Rating, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape
+- 위젯의 키: Group 의 roving focus(ToggleGroup, Tabs), RadioGroup, Rating, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape, Carousel([slides/](#slides) 의 `moveWithKeys`)
 - [pressable.ts](#pressablets) 와 Button 의 Enter, Space
 - [text-control](./text-control/README.md) 의 Escape, [temporal-field](./temporal-field/README.md) 의 입력과 trigger
 - [overlay](./overlay/README.md) 의 레이어 스택: `keyWithModifiers('Escape')`, `isComposingKey`
@@ -770,6 +771,95 @@ thumb: [
 ### 알아둘 것
 
 - thumb 의 포커스 링(`focus-ring`)은 이 그림자와 함께 그려집니다. thumb 에 `shadow-*` 를 따로 주면 이 그림자를 덮어 테두리가 사라집니다.
+
+## slides/
+
+여러 장을 한 줄에 놓고 넘기는 엔진입니다. [Embla Carousel](https://www.embla-carousel.com/) 8.6 을 이 폴더 한곳에서 감싸고, 모양과 문구와 접근성은 IDS 가 씁니다.
+
+| 파일            | 내용                                                                                  |
+| --------------- | ------------------------------------------------------------------------------------- |
+| `use-slides.ts` | `useSlides`: Embla 설정, 멈춘 자리(`value`), 트랙과 장의 props, 끌기 허락과 취소      |
+| `slide-keys.ts` | `moveWithKeys`: 방향키, `Home`, `End` 로 자리를 옮긴다. 쓰는 쪽이 붙일 때만 동작한다  |
+| `announcer.tsx` | `SlidesAnnouncer`: "5장 중 2번째" 알림 영역과, 원하면 보이는 "2 / 5" 카운터           |
+| `layout.ts`     | 뷰포트, 트랙, 장의 클래스(`slidesLayout`)와 엔진이 붙기 전의 추정(`estimateSlides`)   |
+
+### 쓰는 곳
+
+- Carousel: 모두. `root.tsx` 가 `useSlides`, `moveWithKeys`, `SlidesAnnouncer` 를, `style.ts` 가 `slidesLayout` 을 씁니다.
+- Image.Viewer(예정): 전체 화면 레이어 안에서 `useSlides`, `SlidesAnnouncer`(`counter`), `slidesLayout`. 키는 자기 `keyHandler` 로 받으므로 `moveWithKeys` 를 싣지 않습니다.
+
+### 쓰는 법
+
+```tsx
+const slides = useSlides({
+  slideCount: images.length,                     // 서버와 첫 렌더의 장 수. 엔진이 붙으면 트랙의 자식 수
+  value, defaultValue, onValueChange,            // 멈춘 자리(스냅) 번호. 0부터
+  orientation: 'horizontal',                     // 'vertical'
+  direction,                                     // 'ltr' | 'rtl'. 생략하면 뷰포트의 CSS direction
+  align: 'start', loop, dragFree, slidesPerView: 1, slidesToScroll: 1,
+  watchDrag: (api, event) => !isZoomed(),        // mousedown, touchstart 때 끌기를 허락할지
+  plugins,                                       // Embla 플러그인. Carousel 의 autoplay, autoScroll
+});
+
+<div ref={slides.viewportRef} className={slidesLayout.viewport}>
+  <Toolbar />                                    {/* 트랙 앞뒤에 다른 요소를 둘 수 있다 */}
+  <div {...slides.trackProps} className={slidesLayout.track.horizontal}>
+    {images.map((image, index) => (
+      <div key={image.id} {...slides.slideProps(index)} className={slidesLayout.slide}>
+        <ZoomArea className="touch-none">...</ZoomArea>
+      </div>
+    ))}
+  </div>
+</div>
+<SlidesAnnouncer slides={slides} rotating={false} counter />
+
+// 키를 받을 요소에서. Carousel 은 루트의 onKeyDown 에 둔다
+onKeyDown={(event) => moveWithKeys(slides, event)}
+```
+
+| `useSlides` 가 돌려주는 것                           | 뜻                                                                                        |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `api`                                                | Embla 의 `EmblaCarouselType`. 엔진이 붙기 전(서버, hydration)에는 `undefined`             |
+| `selected`                                           | 멈춘 자리. 자리 수에 맞춘 값                                                              |
+| `snapCount`, `slideCount`                            | 멈출 자리 수, 장 수. 엔진이 붙기 전에는 `estimateSlides` 의 값                            |
+| `canScrollPrev`, `canScrollNext`                     | 끝에 닿지 않았는지. `loop` 면 늘 `true`                                                   |
+| `dragging`                                           | 누르거나 끄는 중                                                                          |
+| `orientation`, `direction`, `reducedMotion`          | 쓰는 방향, 읽은 글 방향, `prefers-reduced-motion`                                         |
+| `scrollTo(snap, jump?)`                              | 자리를 옮긴다. `onValueChange` 를 거친다. `jump` 를 생략하면 줄인 동작일 때만 바로 옮긴다 |
+| `scrollPrev(jump?)`, `scrollNext(jump?)`             | 한 자리 앞, 뒤. 끝이면 아무것도 하지 않는다                                               |
+| `cancelDrag()`                                       | 끄는 중이면 끌기를 버리고 지금 자리로 돌아간다. 아니면 아무것도 하지 않는다               |
+| `firstSlideOf(snap)`                                 | 그 자리의 첫 장 번호                                                                      |
+| `viewportRef`                                        | Embla 의 root 가 될 요소에 단다                                                           |
+| `trackProps`                                         | 트랙에 펼친다. `data-slides-track` 과 CSS 변수(`--slides-per-view` 등)                    |
+| `slideProps(index)`                                  | 장마다 펼친다. `role="group"`, `aria-roledescription`, "N장 중 M번째", `inert`, `data-*`  |
+| `slideState(index)`                                  | `{ index, selected, inView }`                                                             |
+
+- `moveWithKeys(slides, event)` 는 키를 처리했으면 `true` 입니다. 입력 칸, 선택 상자, 편집 영역에서 누른 키와 이미 `preventDefault` 된 키는 건너뜁니다.
+- `SlidesAnnouncer` 는 `rotating` 이면 `aria-live="off"`, 아니면 `polite` 입니다. `counter` 면 "2 / 5" 를 보이고, 알림 문장은 화면에서 숨깁니다.
+
+### 왜 이렇게
+
+- **값이 먼저.** 버튼, 키, `scrollTo` 는 상태를 바꾸고 layout effect 가 엔진을 그 자리로 옮깁니다. 제어 컴포넌트의 부모가 값을 바꾸지 않으면 트랙은 움직이지 않습니다. 끌기와 자동 넘김처럼 엔진이 먼저 움직인 것은 `select` 이벤트로 값에 알리고, 부모가 받지 않으면 되돌아갑니다(`engineSnap` 이 effect 를 다시 돌린다).
+- **서버 렌더링.** 장의 폭, 간격, 첫 자리가 CSS 변수(`--slides-per-view`, `--slides-gap`, `--slides-offset`)라서 엔진 없이도 줄을 섭니다. 엔진은 effect 에서 붙고 인라인 `transform` 으로 CSS 의 `transform` 을 덮습니다. `useSyncExternalStore` 의 서버 값이 `null` 이라 hydration 도 같은 추정으로 그립니다. 간격은 엔진이 붙기 전에 트랙에서 재서 `--slides-gap` 에 씁니다.
+- **보이는 장.** 뷰포트와 1px 넘게 겹치는 장입니다(`getBoundingClientRect`). IntersectionObserver 는 가장자리에 닿기만 한 장도 겹친다고 보므로, Embla 의 `slidesInView`, `settle`, `select` 이벤트 때마다 다시 잽니다. 고른 장은 움직이기 전부터 `inert` 가 아니어서 바로 포커스를 받습니다.
+- **끌기 허락.** `watchDrag` 는 ref 로 최신 함수를 읽어서, 바뀌어도 엔진을 다시 만들지 않습니다. 마우스(`mousedown`)와 터치(`touchstart`) 모두 이 함수를 거칩니다. 손가락이 둘이면 끌기를 시작하지 않습니다.
+- **`cancelDrag`.** Embla 8 에는 진행 중인 끌기를 멈추는 공개 API 가 없습니다. `reInit()` 이 드래그 핸들러를 새로 만들어 끌기의 리스너와 상태를 버리고, 끌기 전 자리(`selectedScrollSnap`)에서 다시 그립니다. 그래서 끄는 중일 때만 부르고, `pointerUp` 이 오지 않으므로 `dragging` 은 `reInit` 때 엔진에서 다시 읽습니다.
+- **두 번째 손가락.** 뷰포트의 `touchstart` 에 손가락이 둘이면 `cancelDrag` 를 부릅니다. Embla 는 두 손가락의 `touchmove` 에서야 놓고, 그때 튕긴 속도로 다음 장으로 넘어갈 수 있습니다. 확대를 시작하는 순간 지금 장으로 돌아가야 합니다.
+- **Tab 과 포커스.** Embla 의 `watchFocus` 는 Tab 으로 들어간 장을 그 자리로 옮깁니다. 다 보이는 장까지 옮기면 보이던 장이 밀려나 Tab 이 화면 밖으로 이어지므로, 잘려 보이는 장일 때만 옮깁니다(`cutOffByTheViewport`). 옮기지 않으면 브라우저가 뷰포트의 `scrollLeft` 를 바꿔 트랙이 어긋납니다.
+- **키는 따로.** 엔진은 키 리스너를 달지 않고 전파도 막지 않습니다. `moveWithKeys` 를 붙이는 쪽만 방향키를 받습니다. 장 안에서 누른 키는 `flushSync` 로 새 장을 그린 뒤 그 장에 포커스를 옮깁니다. 떠난 장이 `inert` 가 되면서 포커스를 잃지 않게 하려는 것입니다.
+- **움직임.** Embla 의 `duration` 은 ms 가 아니라 물리 값입니다. 14 에서 1% 안쪽에 드는 데 약 270ms 로 `--ids-motion-normal`(250ms)에 가장 가깝습니다. 줄인 동작이면 버튼, 키, `scrollTo` 는 `jump` 로 바로 옮깁니다.
+- **`touch-action`.** 트랙에만 둡니다(가로 `pan-y pinch-zoom`, 세로 `pan-x pinch-zoom`). 장과 그 안에는 두지 않으므로 확대 영역이 `touch-none` 을 가질 수 있습니다. 브라우저는 조상과의 교집합으로 동작합니다.
+- **트랙 찾기.** Embla 의 `container` 를 `[data-slides-track]` 로 찾습니다. 그래서 트랙 앞뒤에 버튼을 둘 수 있습니다(Carousel 의 이전, 다음 버튼이 트랙 앞에 있어 Tab 순서가 화면과 같다).
+- **플러그인은 밖에서.** 이 폴더는 `embla-carousel-autoplay`, `embla-carousel-auto-scroll` 을 import 하지 않습니다. Carousel 의 `use-carousel-motion.ts` 가 불러 `plugins` 로 넘기므로, 이 엔진만 쓰는 번들은 두 플러그인을 싣지 않습니다. 모듈 최상위에는 부수 효과가 없습니다.
+
+### 알아둘 것
+
+- 트랙의 자식이 곧 장입니다(Embla 는 `container.children` 을 씁니다). 장이 아닌 요소를 트랙에 넣지 않고, 트랙은 뷰포트의 직계 자식으로 둡니다. IntersectionObserver 의 root 가 트랙의 부모입니다.
+- `direction` 을 주면 뷰포트의 CSS `direction` 과 같아야 합니다. 다르면 트랙이 반대로 움직입니다.
+- `reInit`(크기 변화, 장 수 변화, `cancelDrag`)은 플러그인을 새로 만듭니다. 재생 상태를 가진 쪽은 `reInit` 이벤트 때 다시 맞춥니다(Carousel 의 `use-carousel-motion.ts`).
+- 세로는 뷰포트에 높이가 있어야 합니다. 높이가 없으면 모든 장이 늘어섭니다.
+- 이 폴더를 바꾸면 Carousel 과 Image.Viewer 가 함께 바뀝니다. `tests/carousel.test.tsx` 의 `engine:` 테스트가 Image.Viewer 가 기대는 동작(끌기 거절, `cancelDrag`, 두 번째 손가락, 키 없음, `touch-action`)을 확인합니다.
+- Embla 9(정식)가 나오면 이 폴더만 옮깁니다. 장 이름과 알림은 Embla 의 접근성 플러그인 대신 `useTranslate` 로 씁니다.
 
 ## state-props.ts
 

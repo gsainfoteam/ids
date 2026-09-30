@@ -94,7 +94,9 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
   - QR code matrices `uqr`, which QRCode draws as its own SVG;
   - keyboard shortcuts `@tanstack/react-hotkeys`;
   - table state (sorting, row selection, pagination, column sizing) `@tanstack/react-table`, with
-    its server-safe helpers imported from `@tanstack/table-core`.
+    its server-safe helpers imported from `@tanstack/table-core`;
+  - slide dragging, snapping and auto-advance `embla-carousel` 8.6 (`embla-carousel-react`,
+    `-autoplay`, `-auto-scroll`), wrapped only by `internal/slides`; Carousel adds the plugins.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:
   - the `overlay` and `toast` stores, on React's `useSyncExternalStore`. overlay-kit leaves a
@@ -132,8 +134,8 @@ packages/react/src/
   components/
     action/      Button, ButtonGroup, IconButton, IconToggle, Toggle, ToggleGroup, FloatingButton
     form/        Field and every *Field, Checkbox, Radio, Switch, Slider, Select, Rating, ...
-    data/        Accordion, Avatar, Badge, Calendar, Card, Chip, DataTable, Empty, Item, Marquee,
-                 QRCode, Table, TimePicker, ...
+    data/        Accordion, Avatar, Badge, Calendar, Card, Carousel, Chip, DataTable, Empty, Item,
+                 Marquee, QRCode, Table, TimePicker, ...
     feedback/    Alert, Progress, Skeleton, Spinner, Toast
     layout/      AspectRatio, Divider, Spacer, ScrollArea
     navigation/  Breadcrumb, Pagination, Stepper, Tabs
@@ -148,6 +150,7 @@ packages/react/src/
                    behaviour    pressable, state-props, use-checked-writes, icon-label, arc
                    feedback     status-palette
                    overlays     overlay (layer stack, top layer, presence, anchoring, modal layer)
+                   slides       slides (Embla track, slide ARIA, drag cancel, keys, announcer)
                    strings      messages
   foundations/   token stories with no component, one folder each with a story and a README:
                  Color, Typography, Radius, InteractiveState

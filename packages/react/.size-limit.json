@@ -62,5 +62,21 @@
     ],
     "limit": "350 kB",
     "gzip": true
+  },
+  {
+    "name": "import { Carousel }",
+    "path": "dist/index.js",
+    "import": "{ Carousel }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "53 kB",
+    "gzip": true
   }
 ]

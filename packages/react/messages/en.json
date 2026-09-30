@@ -20,6 +20,13 @@
     "weekNumberHeader": "Week",
     "year": "Year"
   },
+  "carousel": {
+    "indicator": "Go to slide {index}",
+    "next": "Next slide",
+    "pause": "Pause autoplay",
+    "previous": "Previous slide",
+    "roleDescription": "carousel"
+  },
   "checkboxGroup": {
     "required": "Select at least one option."
   },
@@ -200,6 +207,11 @@
   "slider": {
     "end": "End",
     "start": "Start"
+  },
+  "slides": {
+    "counter": "{index} / {count}",
+    "roleDescription": "slide",
+    "slide": "{index} of {count}"
   },
   "spinner": {
     "label": "Loading"

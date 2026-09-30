@@ -95,6 +95,7 @@
 | Badge | 없음 | 없음 | `aria-label` 이 있으면 숨긴 `role="status"` 가 문장을 읽고, 없으면 감싼 요소의 `aria-describedby` | 점(`dot`)만 있고 이름이 없으면 읽히지 않는다 |
 | Calendar | [Grid](https://www.w3.org/WAI/ARIA/apg/patterns/grid/), [Date Picker Dialog 예제](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/) | 방향키 하루와 한 주, `Home` `End` 주의 처음과 끝, `PageUp` `PageDown` 한 달, `Shift+PageUp` `Shift+PageDown` 한 해, `Enter` `Space` 선택 | `grid`(이름은 달 제목), 여러 날이면 `aria-multiselectable`. 달 제목은 `role="status"` | 날짜 격자는 `react-day-picker` 가 그린다 |
 | Card, Item | [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/) (`onClick` 이 있을 때) | 제목 버튼에서 `Enter` 누를 때 실행, `Space` 뗄 때 실행. 포인터는 표면 어디를 눌러도 된다 | 제목이 `button`, 설명은 Description(`aria-describedby`), Item 의 선택은 `aria-pressed`. 루트는 평범한 `div` 라 안의 버튼과 겹치지 않는다. `Item.Group` 은 `role="list"`, `ordered` 면 `<ol>` | 제목이 없거나 직접 만든 컴포넌트 안에 있으면 루트가 `role="button"` 이 되고, 이때는 안에 다른 버튼을 둘 수 없다 |
+| Carousel | [Carousel](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/) (기본 캐러셀: 이전, 다음 버튼과 점) | 이전, 다음 버튼, 보이는 슬라이드 안의 요소, 점, 멈춤 버튼 순서로 Tab. 안에서 `←` `→`(세로 `↑` `↓`, 오른쪽에서 왼쪽이면 `←` `→` 반대) 이전과 다음 자리, `Home` `End` 처음과 끝. 점에서 누르면 포커스가 새 현재 점으로, 슬라이드 안에서 누르면 새 슬라이드로 옮겨 간다 | 루트 `region` + `aria-roledescription="캐러셀"` + 이름(`aria-label` 필수, 없으면 개발 경고). 슬라이드 `group` + `aria-roledescription="슬라이드"` + "N장 중 M번째", 화면 밖 슬라이드는 `inert`. 이전과 다음은 끝에서 `aria-disabled`(포커스 유지). 점은 "N번째 슬라이드로", 현재 점은 `aria-current="true"`. 멈춤은 `aria-pressed` 토글 "자동 넘김 멈춤". 넘길 때 live region 이 "N장 중 M번째" 를 알린다(자동 넘김 중 `off`, 아니면 `polite`) | 점은 `tablist` 가 아니라 버튼이다(APG 의 탭 캐러셀 대신 기본 캐러셀). 쉬는 점의 색(`handle`)은 바탕과 3:1 에 못 미쳐, 현재 점은 primary 색과 긴 모양으로 구별한다. 방향키는 APG 에 없는 IDS 의 편의다 |
 | Chip | [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/) (누르거나 켜는 칩) | `Enter` `Space`, `Backspace` `Delete` 지우기 | 라벨이면 `span`, 누르는 칩은 `button` + `aria-pressed`. 지우기는 `Chip.Close` 버튼 | Chip.Close 가 24px 보다 작다 |
 | ColorPicker | [Slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), [Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) (팔레트) | 영역: `←` `→` 채도, `↑` `↓` `PageUp` `PageDown` 밝기, `Shift`+방향키 10%, `Home` `End`. 값 입력은 `Enter` 로 반영 | 영역은 채도와 밝기 두 `slider`(`aria-valuetext` 에 두 값), 색조와 투명도는 `slider`, 팔레트는 `radiogroup` | 2차원 영역은 APG 패턴이 없어 슬라이더 둘로 읽힌다 |
 | Empty | 없음 | 없음. `Empty.Actions` 의 버튼마다 Tab 이 멈춘다 | 역할이 없는 `div`, live region 없음. 기본 아이콘은 `aria-hidden`. 제목은 `Empty.Title asChild` 로 heading 이 된다 | 제목의 heading 수준과 결과 수 알림은 앱이 맡는다 |
@@ -238,6 +239,7 @@
 | Table | 표 이름, 행과 열 수를 읽고, 표 탐색 키로 셀을 오가면 열 머리글과 행 머리글을 함께 읽는다 |  |  |  |  |
 | DataTable | 정렬 버튼을 누르면 "오름차순 / 내림차순" 을 읽고, 체크박스가 행 이름과 "일부 선택" 을, 페이지를 넘기면 새 페이지 번호를 읽는다 |  |  |  |  |
 | Card, Item (누르는 행) | 제목이 버튼으로 읽히고 설명이 뒤따른다. 카드 안의 다른 버튼에도 따로 갈 수 있다 |  |  |  |  |
+| Carousel | 이름과 "캐러셀" 을 읽고, 슬라이드마다 "슬라이드, 5장 중 2번째" 를 읽는다. 다음 버튼을 누르면 새 자리를 한 번 알리고, 자동으로 넘기는 동안은 알리지 않는다. 화면 밖 슬라이드는 읽지 않고, 멈춤 버튼이 "눌림" 을 읽는다 |  |  |  |  |
 | Chip | 켜는 칩이 "눌림" 을 읽고, 지우기 버튼이 이름을 읽는다 |  |  |  |  |
 | Avatar, AvatarGroup | 사람 이름과 "외 N명" 을 읽는다 |  |  |  |  |
 | QRCode | 그림으로 한 번, 준 이름만 읽고 URL 을 읽지 않는다 |  |  |  |  |
