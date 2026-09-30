@@ -61,6 +61,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - viewport 의 `mask-image` 그라디언트라 배경색을 몰라도 어느 표면 위에서나 맞습니다. 막대와 Corner 는 viewport 밖에 있어 흐려지지 않습니다.
 - 두 방향이면 그라디언트 둘을 `mask-composite: intersect` 로 겹칩니다. 가로는 `dir="rtl"` 에서 오른쪽이 시작입니다.
 - 스크롤하지 않는 방향은 흐리지 않습니다. `orientation="vertical"` 에 `fade` 면 위아래만 흐리고, `fade="x"` 면 아무 데도 흐리지 않습니다.
+- 흐리는 축의 `scroll-padding` 은 흐린 폭입니다. 포커스나 `scrollIntoView` 로 보이게 스크롤한 요소는 흐린 띠 밖에 멈춥니다. 목록에서 방향키로 옮긴 옵션이 흐려진 채 서지 않습니다.
 - 서버 HTML 과 첫 그림은 흐리지 않습니다. 넘친 거리를 잰 뒤부터 흐립니다.
 - 흐림은 스크롤 위치를 그대로 따라갈 뿐 전환이 없습니다. 그래서 `prefers-reduced-motion` 에서도 따로 바꾸지 않습니다.
 - Tab 으로 viewport 에 들어와 포커스 링이 보이는 동안은 흐리지 않습니다. 마스크는 viewport 가 그리는 모든 것을 테두리 상자 안으로 잘라서 바깥 링을 지웁니다.

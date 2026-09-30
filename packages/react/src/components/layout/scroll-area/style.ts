@@ -110,10 +110,16 @@ export const scrollAreaStyle = tv({
       class: { viewport: 'data-tab-stop:focus-visible:mask-none' },
     },
     {
+      fade: ['vertical', 'both'],
+      class: { viewport: 'scroll-py-(--scroll-area-fade-size)' },
+    },
+    {
       fade: ['horizontal', 'both'],
       class: {
-        viewport:
+        viewport: [
+          'scroll-px-(--scroll-area-fade-size)',
           '[--scroll-area-fade-x-direction:to_right] rtl:[--scroll-area-fade-x-direction:to_left]',
+        ],
       },
     },
     { occupied: true, vertical: 'end', class: { corner: 'end-0' } },

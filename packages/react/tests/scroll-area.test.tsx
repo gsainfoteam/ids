@@ -859,6 +859,45 @@ test('fade: in RTL the x gradient runs from the right, where the start is', asyn
   await expect.poll(() => fadeLengths(view)).toEqual([24, 0]);
 });
 
+test('fade: what the browser scrolls into view stops a fade size away from the faded edges', async () => {
+  const screen = await render(
+    <div className="flex gap-4">
+      <ScrollArea fade className="h-40 w-48" data-testid="y">
+        {Array.from({ length: 20 }, (_, index) => (
+          <div key={index} data-row={index + 1} className="h-8" />
+        ))}
+      </ScrollArea>
+      <ScrollArea fade size="tiny" orientation="horizontal" className="w-48" data-testid="x">
+        <div className="flex w-max">
+          {Array.from({ length: 20 }, (_, index) => (
+            <div key={index} data-column={index + 1} className="h-8 w-16 shrink-0" />
+          ))}
+        </div>
+      </ScrollArea>
+      <ScrollArea className="h-40 w-48" data-testid="off">
+        <Lines />
+      </ScrollArea>
+    </div>,
+  );
+  const viewportOf = (id: string) =>
+    q('[data-scroll-area-viewport]', screen.getByTestId(id).element());
+  const [y, x] = [viewportOf('y'), viewportOf('x')];
+
+  const row = q('[data-row="10"]', y);
+  row.scrollIntoView({ block: 'nearest' });
+  await expect
+    .poll(() => y.getBoundingClientRect().bottom - row.getBoundingClientRect().bottom)
+    .toBeCloseTo(24, 0);
+
+  const column = q('[data-column="10"]', x);
+  column.scrollIntoView({ inline: 'nearest' });
+  await expect
+    .poll(() => x.getBoundingClientRect().right - column.getBoundingClientRect().right)
+    .toBeCloseTo(16, 0);
+
+  expect(getComputedStyle(viewportOf('off')).scrollPaddingTop).toBe('auto');
+});
+
 test('fade: a tab-stop viewport drops the mask while its focus ring shows, since the mask would cut it', async () => {
   const screen = await render(
     <>
@@ -897,7 +936,7 @@ test('fade: a textarea viewport fades the lines typed past its top', async () =>
   await userEvent.click(textarea);
   await userEvent.keyboard('1{Enter}2{Enter}3{Enter}4{Enter}5{Enter}6{Enter}7{Enter}8');
   await expect.poll(() => markedEdges(input)).toContain('y-start');
-  expect(fadeLengths(input)[0]).toBe(24);
+  await expect.poll(() => fadeLengths(input)[0]).toBe(24);
 
   input.scrollTop = 0;
   await expect.poll(() => markedEdges(input)).toEqual(['y-end']);
