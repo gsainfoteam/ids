@@ -68,7 +68,7 @@ async function holdImages() {
   };
 }
 
-test('SSR: a plain img with its alt, lazily loaded, over a placeholder hidden from screen readers', () => {
+test('SSR: a plain img with its alt, lazily loaded, over a Skeleton hidden from screen readers', () => {
   const frame = serverFrame(<Image src="/lake.jpg" alt="Lake at dawn" />);
   expect(frame.dataset.status).toBe('loading');
   expect(frame.hasAttribute('data-preview')).toBe(false);
@@ -79,11 +79,28 @@ test('SSR: a plain img with its alt, lazily loaded, over a placeholder hidden fr
   expect(img.getAttribute('decoding')).toBe('async');
   const placeholder = frame.querySelector('[data-image-placeholder]')!;
   expect(placeholder.getAttribute('aria-hidden')).toBe('true');
-  expect(placeholder.className).toContain('animate-pulse');
+  expect(placeholder.hasAttribute('data-skeleton')).toBe(true);
+  expect(placeholder.getAttribute('data-animation')).toBe('pulse');
   expect(frame.querySelector('button'), 'only a previewable image is a button').toBeNull();
 });
 
-test('SSR: a custom placeholder replaces the pulsing block', () => {
+test('the Skeleton placeholder fills the image box while it loads', async (context) => {
+  skipWithoutCdp(context);
+  await holdImages();
+  const screen = await render(
+    <div style={{ width: 240 }}>
+      <Image src={`${HELD}box.png`} alt="Lake at dawn" ratio={2} />
+    </div>,
+  );
+  const placeholder = screen.container.querySelector<HTMLElement>('[data-image-placeholder]')!;
+  await expect.element(placeholder).toBeVisible();
+  const box = frameOf(screen.container).getBoundingClientRect();
+  const painted = placeholder.getBoundingClientRect();
+  expect(painted.width).toBeCloseTo(box.width, 0);
+  expect(painted.height).toBeCloseTo(box.height, 0);
+});
+
+test('SSR: a custom placeholder replaces the Skeleton', () => {
   const frame = serverFrame(
     <Image src="/lake.jpg" alt="Lake at dawn">
       <Image.Placeholder>Loading the photo</Image.Placeholder>
@@ -91,7 +108,8 @@ test('SSR: a custom placeholder replaces the pulsing block', () => {
   );
   const placeholder = frame.querySelector('[data-image-placeholder]')!;
   expect(placeholder.textContent).toBe('Loading the photo');
-  expect(placeholder.className).not.toContain('animate-pulse');
+  expect(placeholder.hasAttribute('data-skeleton')).toBe(false);
+  expect(placeholder.getAttribute('aria-hidden')).toBe('true');
 });
 
 test('without src the fallback stands for the picture at once, and hides when decorative', () => {

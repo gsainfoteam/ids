@@ -3,7 +3,7 @@
 native `<img>` 에 불러오는 동안의 자리, 깨졌을 때 대신할 그림, 비율 상자를 더한 컴포넌트입니다. `Image.Group` 으로 여러 장을 가로, 세로, 격자로 늘어놓으면 누른 장부터 크게 봅니다.
 
 - **서버에서도 그냥 `<img>`.** 서버 HTML 에 `src` 와 `alt` 가 든 `<img>` 가 그대로 있어서, JavaScript 가 오기 전에 그림을 불러옵니다.
-- **불러오는 동안.** 그림 뒤에 옅은 회색 블록(`Image.Placeholder`)이 깜빡이고, 다 불러오면 사라집니다. 그림을 가리지 않으므로 서버 HTML 의 그림은 hydration 을 기다리지 않고 보입니다.
+- **불러오는 동안.** 그림 뒤에 [Skeleton](../../feedback/skeleton/README.md)(`Image.Placeholder`)이 사진 상자를 채워 깜빡이고, 다 불러오면 사라집니다. 그림을 가리지 않으므로 서버 HTML 의 그림은 hydration 을 기다리지 않고 보입니다.
 - **깨지면.** 깨진 `<img>` 는 DOM 에서 빠지고 그림 아이콘(`Image.Fallback`)이 자리를 채웁니다. 스크린 리더는 `alt` 를 그림의 이름으로 계속 읽습니다.
 - **비율.** `ratio` 를 주면 [AspectRatio](../../layout/aspect-ratio/README.md) 가 폭에 맞춘 높이를 정하고, 그림은 칸을 채우고 넘치는 부분은 잘립니다.
 - **크게 보기.** `preview` 를 준 그림과 `Image.Group` 안의 그림은 버튼이 되어, 누르면 그 장부터 뷰어를 엽니다. 뷰어(확대, 넘기기, 쓸어 닫기)는 다음 버전에서 나옵니다. 지금은 열림 상태와 지금 보는 장만 바뀝니다.
@@ -36,7 +36,7 @@ import { Image } from '@gsainfoteam/ids-react';
 
 <Image src={src} alt="...">
   <Image.Placeholder>
-    <Spinner />                                  {/* 깜빡이는 블록 대신 */}
+    <Spinner />                                  {/* Skeleton 대신 */}
   </Image.Placeholder>
 </Image>
 
