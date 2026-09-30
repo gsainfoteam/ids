@@ -9,6 +9,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | 카테고리                  | 구현                     |
 | ------------------------- | ------------------------ |
 | [Login](login/README.md)  | Card, Minimal, QR, Split |
+| [SignUp](sign-up/README.md) | Card, Split, Steps       |
 
 ## 파일
 
