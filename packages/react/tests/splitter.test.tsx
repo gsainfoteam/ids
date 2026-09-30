@@ -65,6 +65,18 @@ async function keydownPrevented(keys: string, key: string) {
   return prevented;
 }
 
+function modifiedArrowPrevented(target: Element, modifier: 'ctrlKey' | 'altKey' | 'metaKey') {
+  const syntheticSinceRealOnesNavigateOrCloseTheTestPage = new KeyboardEvent('keydown', {
+    key: 'ArrowLeft',
+    code: 'ArrowLeft',
+    [modifier]: true,
+    bubbles: true,
+    cancelable: true,
+  });
+  target.dispatchEvent(syntheticSinceRealOnesNavigateOrCloseTheTestPage);
+  return syntheticSinceRealOnesNavigateOrCloseTheTestPage.defaultPrevented;
+}
+
 function Sized({
   size,
   children,
@@ -193,9 +205,11 @@ test('keyboard: arrows move 16px, Shift 64px, Home and End reach the bounds, one
     false,
   ]);
   expect(
-    await keydownPrevented('{Control>}{ArrowLeft}{/Control}', 'ArrowLeft'),
+    (['ctrlKey', 'altKey', 'metaKey'] as const).map((modifier) =>
+      modifiedArrowPrevented(handle.element(), modifier),
+    ),
     'an arrow with another modifier stays the browser’s',
-  ).toEqual([false]);
+  ).toEqual([false, false, false]);
   expect(valueNow(handle)).toBe(20);
 });
 
