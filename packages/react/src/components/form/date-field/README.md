@@ -84,6 +84,7 @@ import { DateField, Field } from '@gsainfoteam/ids-react';
 - 달력 안의 키보드는 [Calendar](../../data/calendar/README.md#키보드) 와 같습니다.
 - `onBlur` 는 포커스가 필드와 팝업을 모두 벗어날 때만 부릅니다.
 - 판(drawer)에서는 제목과 닫기 버튼이 위에 붙습니다.
+- 팝업이 남은 화면보다 길면 안에서 스크롤하고, 위나 아래에 내용이 더 남은 가장자리를 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)).
 
 ## 글자로 입력
 

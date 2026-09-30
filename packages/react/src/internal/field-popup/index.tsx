@@ -142,7 +142,7 @@ export function FieldPopup({
       backdrop={drawer && { 'data-field-popup-backdrop': '', className: styles.backdrop() }}
       onBackdropClick={() => onClose(true)}
     >
-      <ScrollArea asChild>
+      <ScrollArea asChild fade="y">
         <div
           {...props}
           popover="manual"
@@ -184,10 +184,19 @@ function scrollParent(option: HTMLElement, popup: HTMLElement) {
   return popup;
 }
 
+function scrollPaddingOf(scroller: HTMLElement) {
+  const style = scroller.ownerDocument.defaultView!.getComputedStyle(scroller);
+  return {
+    top: parseFloat(style.scrollPaddingTop) || 0,
+    bottom: parseFloat(style.scrollPaddingBottom) || 0,
+  };
+}
+
 function scrollWithinPopup(option: HTMLElement, popup: HTMLElement, center: boolean) {
   const scroller = scrollParent(option, popup);
   const view = scroller.clientHeight,
     from = scroller.scrollTop;
+  const padding = scrollPaddingOf(scroller);
 
   let top: number, height: number;
   const unscaledOffsetsApply = option.offsetParent === scroller;
@@ -202,8 +211,9 @@ function scrollWithinPopup(option: HTMLElement, popup: HTMLElement, center: bool
   }
 
   if (center) scroller.scrollTop = top - (view - height) / 2;
-  else if (top < from) scroller.scrollTop = top;
-  else if (top + height > from + view) scroller.scrollTop = top + height - view;
+  else if (top < from + padding.top) scroller.scrollTop = top - padding.top;
+  else if (top + height > from + view - padding.bottom)
+    scroller.scrollTop = top + height - view + padding.bottom;
 }
 
 export function revealPopupOption(

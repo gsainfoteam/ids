@@ -98,6 +98,7 @@ import { ColorField, Field } from '@gsainfoteam/ids-react';
 
 - `Esc`, 바깥 클릭, 포커스가 나갈 때도 `onOpenChange(false)` 가 불립니다.
 - `disabled` 나 `readOnly` 면 `open` 이어도 열리지 않습니다.
+- 팝업이 남은 화면보다 길면 안에서 스크롤하고, 위나 아래에 내용이 더 남은 가장자리를 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)).
 - 하단 시트는 모달입니다. 제목과 닫기 버튼이 붙고, 배경이 어두워지며 페이지 스크롤이 잠깁니다. 닫기 버튼이나 배경을 누르면 닫히고 트리거로 포커스가 돌아갑니다.
 
 ## 폼

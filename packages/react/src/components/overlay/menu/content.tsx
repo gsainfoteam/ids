@@ -62,7 +62,7 @@ function MenuPopup({ level, name, className, style, children, ...props }: PopupP
   const styles = menuStyle({ nested: level.nested });
 
   return (
-    <ScrollArea asChild>
+    <ScrollArea asChild fade="y">
       <div
         {...mergeProps(props, {
           ...floating,

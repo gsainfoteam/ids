@@ -163,6 +163,7 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 ```
 
 - 입력을 클릭하거나 글자를 치면 열리고, 옵션을 골라도 열린 채로 남습니다.
+- 목록은 위나 아래에 옵션이 더 남으면 그 가장자리를 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)). 방향키로 옮긴 옵션은 흐린 띠 밖에 멈춥니다.
 - 640px 보다 좁은 화면에서 `mobileVariant="drawer"`(기본) 는 모달 하단 시트로 엽니다. 필드의 입력이 시트 뒤로 가려지므로 시트 위에 같은 검색어를 쓰는 검색창이 있고, 닫으면 필드의 입력으로 포커스가 돌아옵니다.
 - 시트의 검색창은 `Select.SearchField` 와 같은 `TextField` 입니다. 테두리와 링 없이 아래 선만 그립니다.
 

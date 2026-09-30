@@ -479,6 +479,8 @@ test('asChild Content and Group still collect items; an empty string is a value'
   await expect.element(screen.getByRole('listbox')).not.toBeInTheDocument();
 });
 
+const CLEAR_OF_THE_LIST_FADE = 24;
+
 test('the list opens centered on the selection and later moves scroll only the popup', async () => {
   const screen = await render(
     <Select aria-label="Fruit" defaultValue="Fruit 15">
@@ -506,9 +508,9 @@ test('the list opens centered on the selection and later moves scroll only the p
   list.scrollTop = option('Fruit 15').offsetTop;
   await userEvent.keyboard('{ArrowUp}');
   await expect.element(trigger).toHaveAttribute('aria-activedescendant', optionId('Fruit 14'));
-  expect(Math.abs(option('Fruit 14').getBoundingClientRect().top - view().top)).toBeLessThanOrEqual(
-    1,
-  );
+  expect(
+    Math.abs(option('Fruit 14').getBoundingClientRect().top - view().top - CLEAR_OF_THE_LIST_FADE),
+  ).toBeLessThanOrEqual(1);
 });
 
 test('the popup flips above a trigger near the bottom, stays on screen and leaves with its trigger', async () => {

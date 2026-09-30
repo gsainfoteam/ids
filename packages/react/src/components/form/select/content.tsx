@@ -27,7 +27,7 @@ export function SelectContent({ asChild, children, className, ...props }: Select
   return (
     <>
       {search}
-      <ScrollArea className={c.styles.listArea()}>
+      <ScrollArea fade="y" className={c.styles.listArea()}>
         <ScrollArea.Viewport asChild>
           {part(
             'div',

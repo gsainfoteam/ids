@@ -157,7 +157,7 @@ function CommandPopup({
       >
         <OverlayItemContext value={null}>
           {searches.length ? searches : <CommandSearch />}
-          <ScrollArea className={styles.listArea()}>
+          <ScrollArea fade="y" className={styles.listArea()}>
             <ScrollArea.Viewport asChild>
               <div
                 ref={setList}

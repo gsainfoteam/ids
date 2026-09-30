@@ -100,6 +100,7 @@ revealed.current = true;
 
 - 팝업 안 스크롤 부모의 `scrollTop` 을 직접 바꿉니다(`scrollWithinPopup`). top layer 뒤의 문서는 스크롤하지 않습니다. 스크롤 부모는 옵션에서 가장 가까운 `overflow-y: auto | scroll` 조상이라, 목록이 있으면 listbox, 없으면 팝업의 viewport 입니다.
 - `center` 는 옵션을 가운데에 둡니다. 목록은 선택한 옵션을 가운데에 두고 열려야 합니다.
+- `center` 가 아니면 스크롤 부모의 `scroll-padding` 만큼 가장자리에서 떨어뜨립니다(`scrollPaddingOf`). 브라우저의 `scrollIntoView({ block: 'nearest' })` 와 같은 규칙입니다. 목록은 ScrollArea `fade="y"` 라 `scroll-padding` 이 흐린 폭이고, 방향키로 옮긴 옵션이 흐린 띠 안에 서지 않습니다.
 - 위치 계산은 비동기라 열린 뒤에도 팝업이 줄어들 수 있습니다. 첫 배치 전의 가운데 맞추기는 기억했다가 배치가 끝나면 다시 합니다(`firstPlacementLanded`, `recenterAfterFirstPlacement`, `onPlacementLanded`).
 - 옵션 위치는 가능하면 `offsetTop` 으로 읽습니다(`unscaledOffsetsApply`). `getBoundingClientRect` 는 열릴 때의 scale 애니메이션(`starting:scale-95`)을 받아 긴 목록에서 몇 줄씩 어긋납니다. `offsetTop` 은 스크롤 부모가 옵션의 offset parent 일 때만 맞으므로 [`listStyles.list`](../README.md#list-stylests) 가 `relative` 입니다.
 
@@ -118,7 +119,7 @@ revealed.current = true;
 ```ts
 // internal/field-popup/index.tsx
 const styles = popupStyle({ presentation });   // 'popover' | 'drawer'
-<ScrollArea asChild>
+<ScrollArea asChild fade="y">
   <div className={styles.popup({ className })}>
     <ScrollArea.Viewport className={styles.viewport()}>{children}</ScrollArea.Viewport>
   </div>
@@ -134,6 +135,7 @@ const styles = popupStyle();
 
 - `popupStyle.popup` 은 `inset-ring` 이 아니라 진짜 테두리입니다(`borderOptionsCannotCover`). 스크롤 컨테이너에서 inset shadow 는 내용 아래에 칠해지므로, 강조된 옵션이 가장자리를 지날 때 테두리를 가립니다.
 - 팝업은 `ScrollArea asChild` 의 root 이고 내용은 `ScrollArea.Viewport`(`viewport` 슬롯)에서 스크롤합니다. 달력이나 색 선택기가 화면보다 길 때 OS 막대 대신 IDS 막대가 둥근 모서리 안쪽에 섭니다.
+- 팝업과 그 안의 목록(Select, ChipField)은 `fade="y"` 입니다. 위나 아래에 내용이 더 남으면 그 가장자리가 흐려집니다. 좌우는 스크롤하지 않으므로 흐리지 않습니다.
 - `popup` 은 모서리만 `concentric-p-1` 로 정하고 padding 은 0 입니다(`cornerOfThePaddedViewport`). padding(`p-1`)은 viewport 가 가져서, 스크롤되는 내용이 padding 과 함께 움직이고 테두리 바로 안쪽에서 잘립니다.
 - `popup` 과 `viewport` 는 세로 flex 입니다. 안의 목록이 남은 높이를 받아, 고정된 검색 상자나 머리 아래에서 따로 스크롤합니다. 그래서 목록이 있는 팝업의 viewport 는 넘치지 않고 막대도 목록의 것 하나만 보입니다.
 - `backdrop` 은 drawer 뒤의 페이지를 어둡게 하고 클릭을 받는 별도 top layer 요소입니다. popover 자신의 `::backdrop` 은 UA 가 `pointer-events: none` 을 강제해서 클릭을 받지 못합니다.

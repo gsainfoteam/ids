@@ -60,7 +60,7 @@ export function ChipContent({ asChild, children, className, ...props }: ChipCont
     <>
       {c.drawer && <DrawerSearch />}
       {limits.length ? limits : <ChipLimit />}
-      <ScrollArea className={c.styles.listArea()}>
+      <ScrollArea fade="y" className={c.styles.listArea()}>
         <ScrollArea.Viewport asChild>
           {part(
             'div',

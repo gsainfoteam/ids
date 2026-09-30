@@ -8,6 +8,7 @@ import { cdp, userEvent, server } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import {
+  ChipField,
   Drawer,
   IdsProvider,
   Menu,
@@ -1053,6 +1054,131 @@ test('adopted: Menu content scrolls in its viewport and keeps its padding', asyn
   const last = screen.getByRole('menuitem', { name: '항목 20' }).element().getBoundingClientRect();
   expect(viewportOfMenu.scrollTop).toBeGreaterThan(0);
   expect(last.bottom).toBeLessThanOrEqual(viewportOfMenu.getBoundingClientRect().bottom);
+});
+
+const fadesOnlyTopAndBottom = (element: Element) =>
+  gradientsIn(element) === 1 && !/to (left|right)/.test(getComputedStyle(element).maskImage);
+
+const LIST_FADE = 24;
+
+test('adopted: popup lists and the field popup fade only their top and bottom', async () => {
+  const cities = Array.from({ length: 30 }, (_, index) => (
+    <Select.Item key={index} value={`도시 ${index + 1}`}>
+      도시 {index + 1}
+    </Select.Item>
+  ));
+  const screen = await render(
+    <IdsProvider>
+      <Select aria-label="도시">{cities}</Select>
+      <Menu>
+        <Menu.Trigger>열기</Menu.Trigger>
+        <Menu.Content style={{ maxHeight: 160 }}>
+          {Array.from({ length: 20 }, (_, index) => (
+            <Menu.Item key={index}>항목 {index + 1}</Menu.Item>
+          ))}
+        </Menu.Content>
+      </Menu>
+      <ChipField aria-label="기술">
+        {Array.from({ length: 30 }, (_, index) => (
+          <ChipField.Item key={index} value={`기술 ${index + 1}`}>
+            기술 {index + 1}
+          </ChipField.Item>
+        ))}
+      </ChipField>
+    </IdsProvider>,
+  );
+
+  await userEvent.click(screen.getByRole('combobox', { name: '도시' }));
+  const listbox = screen.getByRole('listbox').element();
+  const popup = listbox.closest<HTMLElement>('[data-field-popup]')!;
+  expect(fadesOnlyTopAndBottom(listbox)).toBe(true);
+  expect(fadesOnlyTopAndBottom(q('[data-scroll-area-viewport]', popup))).toBe(true);
+  await userEvent.keyboard('{Escape}');
+
+  await userEvent.click(screen.getByRole('button', { name: '열기' }));
+  const menu = screen.getByRole('menu').element();
+  expect(fadesOnlyTopAndBottom(q('[data-scroll-area-viewport]', menu))).toBe(true);
+  await userEvent.keyboard('{Escape}');
+
+  await userEvent.click(screen.getByRole('combobox', { name: '기술' }));
+  await expect.element(screen.getByRole('listbox')).toBeVisible();
+  expect(fadesOnlyTopAndBottom(screen.getByRole('listbox').element())).toBe(true);
+});
+
+test('adopted: the command palette list fades only its top and bottom', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Menu triggerType="command" defaultOpen>
+        <Menu.Content>
+          <Menu.Search data-1p-ignore data-lpignore="true" />
+          {Array.from({ length: 30 }, (_, index) => (
+            <Menu.Item key={index}>명령 {index + 1}</Menu.Item>
+          ))}
+        </Menu.Content>
+      </Menu>
+    </IdsProvider>,
+  );
+  const list = screen.getByRole('listbox').element();
+  expect(list.hasAttribute('data-scroll-area-viewport')).toBe(true);
+  expect(fadesOnlyTopAndBottom(list)).toBe(true);
+});
+
+test('adopted: arrowing through a Select list stops the highlighted option clear of the fade', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Select aria-label="도시" defaultValue="도시 1">
+        {Array.from({ length: 40 }, (_, index) => (
+          <Select.Item key={index} value={`도시 ${index + 1}`}>
+            도시 {index + 1}
+          </Select.Item>
+        ))}
+      </Select>
+    </IdsProvider>,
+  );
+  const trigger = screen.getByRole('combobox', { name: '도시' });
+  await userEvent.click(trigger);
+  const list = screen.getByRole('listbox').element() as HTMLElement;
+  const highlighted = () =>
+    document.getElementById(trigger.element().getAttribute('aria-activedescendant')!)!;
+
+  for (let step = 0; step < 12; step++) await userEvent.keyboard('{ArrowDown}');
+  await expect.poll(() => list.scrollTop).toBeGreaterThan(0);
+  expect(markedEdges(list)).toEqual(['y-start', 'y-end']);
+  expect(
+    list.getBoundingClientRect().bottom - highlighted().getBoundingClientRect().bottom,
+  ).toBeCloseTo(LIST_FADE, 0);
+
+  for (let step = 0; step < 6; step++) await userEvent.keyboard('{ArrowUp}');
+  expect(
+    highlighted().getBoundingClientRect().top - list.getBoundingClientRect().top,
+  ).toBeGreaterThanOrEqual(LIST_FADE - 1);
+});
+
+test('adopted: arrowing through a Menu stops the highlighted item clear of the fade', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Menu>
+        <Menu.Trigger>열기</Menu.Trigger>
+        <Menu.Content style={{ maxHeight: 160 }}>
+          {Array.from({ length: 20 }, (_, index) => (
+            <Menu.Item key={index}>항목 {index + 1}</Menu.Item>
+          ))}
+        </Menu.Content>
+      </Menu>
+    </IdsProvider>,
+  );
+  await userEvent.click(screen.getByRole('button', { name: '열기' }));
+  const menu = screen.getByRole('menu').element() as HTMLElement;
+  const view = q('[data-scroll-area-viewport]', menu);
+
+  for (let step = 0; step < 8; step++) await userEvent.keyboard('{ArrowDown}');
+  const focused = document.activeElement!;
+  expect(focused.getAttribute('role')).toBe('menuitem');
+  await expect.poll(() => view.scrollTop).toBeGreaterThan(0);
+  expect(view.getBoundingClientRect().bottom - focused.getBoundingClientRect().bottom).toBeCloseTo(
+    LIST_FADE,
+    0,
+  );
 });
 
 test('adopted: dragging the scrollbar of a Drawer body scrolls it instead of moving the sheet', async (context) => {
