@@ -18,6 +18,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [PostDetail](post-detail/README.md) | Article, Notice |
 | [Profile](profile/README.md) | Members, Page |
 | [Search](search/README.md) | Command, Results |
+| [Sidebar](sidebar/README.md) | Collapsible, Inset, Simple |
 
 ## 파일
 
