@@ -21,6 +21,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [Sidebar](sidebar/README.md) | Collapsible, Inset, Simple |
 | [Mail](mail/README.md) | Compose, Inbox |
 | [Chat](chat/README.md) | Assistant, Channel |
+| [Tasks](tasks/README.md) | Board, Table |
 
 ## 파일
 
