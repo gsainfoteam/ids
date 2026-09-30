@@ -22,6 +22,8 @@ export const stepperStyle = tv({
       'data-current:bg-(--control-fill) data-current:text-(--control-on-fill)',
       'data-current:ring-4 data-current:ring-(--ids-color-secondary)',
       'data-error:bg-(--ids-color-danger)/10 data-error:text-(--ids-color-danger-strong)',
+      'data-neutral:empty:bg-transparent data-neutral:empty:before:size-2.5',
+      'data-neutral:empty:before:rounded-full data-neutral:empty:before:bg-current',
       'transition-[background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
       'group-data-hovered/stepper-trigger:data-upcoming:bg-(--ids-color-muted-hover)',
       'group-data-active/stepper-trigger:data-upcoming:bg-(--ids-color-muted-active)',
@@ -38,7 +40,7 @@ export const stepperStyle = tv({
     description: 'col-start-2 text-(--ids-color-on-muted)',
     status: 'sr-only',
     separator: [
-      'shrink-0 bg-(--ids-color-border) data-completed:bg-(--ids-color-primary)',
+      'shrink-0 bg-(--ids-color-border)',
       'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
     ],
     content: 'text-(--ids-color-on-surface)',
@@ -80,6 +82,10 @@ export const stepperStyle = tv({
       },
       false: {},
     },
+    progress: {
+      true: { separator: 'data-completed:bg-(--ids-color-primary)' },
+      false: {},
+    },
   },
   compoundVariants: [
     {
@@ -98,6 +104,28 @@ export const stepperStyle = tv({
         separator: 'start-[calc(0.75rem-0.5px)] top-8',
       },
     },
+    {
+      orientation: 'vertical',
+      progress: false,
+      class: { separator: 'bottom-0' },
+    },
+    {
+      orientation: 'vertical',
+      size: 'standard',
+      progress: false,
+      class: { separator: 'top-8' },
+    },
+    {
+      orientation: 'vertical',
+      size: 'tiny',
+      progress: false,
+      class: { separator: 'top-6' },
+    },
   ],
-  defaultVariants: { orientation: 'horizontal', size: 'standard', interactive: false },
+  defaultVariants: {
+    orientation: 'horizontal',
+    size: 'standard',
+    interactive: false,
+    progress: true,
+  },
 });

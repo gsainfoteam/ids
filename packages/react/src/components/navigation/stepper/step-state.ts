@@ -1,14 +1,18 @@
-export type StepperStatus = 'completed' | 'current' | 'upcoming' | 'error';
+export type StepperStatus = 'completed' | 'current' | 'upcoming' | 'error' | 'neutral';
 
-export function stepStatus(
-  index: number,
-  current: number,
-  marks: { completed?: boolean; error?: boolean },
-): StepperStatus {
+type StepMarks = { completed?: boolean; error?: boolean };
+
+export function stepStatus(index: number, current: number, marks: StepMarks): StepperStatus {
   if (marks.error === true) return 'error';
   if (index === current) return 'current';
   if (marks.completed ?? index < current) return 'completed';
   return 'upcoming';
+}
+
+export function recordStatus(marks: StepMarks): StepperStatus {
+  if (marks.error === true) return 'error';
+  if (marks.completed === true) return 'completed';
+  return 'neutral';
 }
 
 export function isReachable({
@@ -37,5 +41,6 @@ export function statusAttributes(status: StepperStatus) {
     'data-current': flag(status === 'current'),
     'data-upcoming': flag(status === 'upcoming'),
     'data-error': flag(status === 'error'),
+    'data-neutral': flag(status === 'neutral'),
   } as const;
 }

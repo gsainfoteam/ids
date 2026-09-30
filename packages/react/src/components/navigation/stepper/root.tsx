@@ -18,6 +18,9 @@ import type { Stepper } from '.';
 
 export type StepperOrientation = 'horizontal' | 'vertical';
 
+const NO_CURRENT_STEP = -1;
+const PROGRESS_ONLY_PROPS = ['value', 'defaultValue', 'onValueChange', 'linear'] as const;
+
 const isStep = (node: unknown): node is ReactElement =>
   isValidElement(node) && elementTypeOf(node) === StepperItem;
 
@@ -31,6 +34,7 @@ export function StepperRoot(props: Stepper.Props) {
     onValueChange,
     orientation = 'horizontal',
     linear = true,
+    progress = true,
     size = 'standard',
     disabled = false,
     'aria-label': ariaLabel,
@@ -49,14 +53,19 @@ export function StepperRoot(props: Stepper.Props) {
     defaultValue: defaultValue ?? 0,
     onValueChange,
   });
-  const interactive = value === undefined || onValueChange !== undefined;
+  const interactive = progress && (value === undefined || onValueChange !== undefined);
+  const shownValue = progress ? current : NO_CURRENT_STEP;
 
-  const state: Stepper.State = { value: current, orientation, disabled };
+  const state: Stepper.State = { value: shownValue, orientation, disabled, progress };
   const nodes = flattenFragments(resolveState(children, state));
   const steps = nodes.filter(isStep);
   const others = nodes.filter((node) => !isStep(node));
   const count = steps.length;
   const strayCount = others.filter(isStray).length;
+  const ignoredInARecord = progress
+    ? ''
+    : PROGRESS_ONLY_PROPS.filter((name) => props[name] !== undefined).join(', ');
+  const unnamedRecord = !progress && ariaLabel === undefined && ariaLabelledBy === undefined;
 
   const roving = useRovingFocus({
     rootRef: listRef,
@@ -68,12 +77,12 @@ export function StepperRoot(props: Stepper.Props) {
   });
 
   useEffect(() => {
-    if (!isDevelopment) return;
+    if (!isDevelopment || !progress) return;
     if (current < 0 || current > count)
       console.warn(
         `[IDS] Stepper: value=${current} is outside the ${count} steps (0 to ${count}, where ${count} means every step is completed).`,
       );
-  }, [current, count]);
+  }, [progress, current, count]);
 
   useEffect(() => {
     if (!isDevelopment || strayCount === 0) return;
@@ -82,16 +91,32 @@ export function StepperRoot(props: Stepper.Props) {
     );
   }, [strayCount]);
 
-  const styles = stepperStyle({ orientation, size, interactive });
+  useEffect(() => {
+    if (!isDevelopment || ignoredInARecord === '') return;
+    console.warn(
+      `[IDS] Stepper: progress={false} lists events with no current step and ignores ${ignoredInARecord}. Mark an event with Stepper.Item completed or error instead.`,
+    );
+  }, [ignoredInARecord]);
+
+  useEffect(() => {
+    if (isDevelopment && unnamedRecord)
+      console.warn(
+        '[IDS] Stepper: progress={false} has no default list name, since "Progress" does not describe a record of events. Pass aria-label or aria-labelledby, such as aria-label="Recent activity".',
+      );
+  }, [unnamedRecord]);
+
+  const styles = stepperStyle({ orientation, size, interactive, progress });
+  const defaultLabel = progress ? t('stepper.label') : undefined;
 
   return (
     <StepperContext
       value={{
         id,
-        value: current,
+        value: shownValue,
         count,
         orientation,
         linear,
+        progress,
         disabled,
         interactive,
         styles,
@@ -114,7 +139,7 @@ export function StepperRoot(props: Stepper.Props) {
       >
         <ol
           ref={listRef}
-          aria-label={ariaLabelledBy === undefined ? (ariaLabel ?? t('stepper.label')) : ariaLabel}
+          aria-label={ariaLabelledBy === undefined ? (ariaLabel ?? defaultLabel) : ariaLabel}
           aria-labelledby={ariaLabelledBy}
           className={styles.list()}
         >

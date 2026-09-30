@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
-import { CreditCardIcon, TruckIcon, UserIcon } from '@heroicons/react/16/solid';
-import { expect, fn } from 'storybook/test';
+import { CommandLineIcon, CreditCardIcon, TruckIcon, UserIcon } from '@heroicons/react/16/solid';
+import { expect, fn, within } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
 import { Button } from '../../action/button';
+import { Avatar } from '../../data/avatar';
 
 import { Stepper } from '.';
 
@@ -22,6 +23,7 @@ const meta = {
     orientation: { control: 'radio', options: orientations },
     size: { control: 'radio', options: sizes },
     linear: { control: 'boolean' },
+    progress: { control: 'boolean' },
     disabled: { control: 'boolean' },
     defaultValue: { control: { type: 'number', min: 0, max: 3 } },
   },
@@ -196,6 +198,60 @@ export const Gallery: Story = {
               ))}
             </Stepper>
           </div>
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Record × Size"
+        description="progress={false} 는 현재 단계 없이 일어난 일을 늘어놓는 기록입니다. 표시하지 않은 기록은 점(neutral)이고, completed 와 error 는 진행에서처럼 그립니다. 연결선은 늘 중립색입니다."
+      >
+        <Showcase.Matrix
+          rows={sizes}
+          columns={orientations}
+          render={(size, orientation) => (
+            <div className={orientation === 'horizontal' ? 'w-[28rem]' : 'w-56'}>
+              <Stepper
+                progress={false}
+                orientation={orientation}
+                size={size}
+                aria-label="배포 기록"
+              >
+                <Stepper.Item completed>
+                  <Stepper.Title>배포</Stepper.Title>
+                  <Stepper.Description>v2.4.0</Stepper.Description>
+                </Stepper.Item>
+                <Stepper.Item error>
+                  <Stepper.Title>테스트</Stepper.Title>
+                </Stepper.Item>
+                <Stepper.Item>
+                  <Stepper.Title>빌드 시작</Stepper.Title>
+                </Stepper.Item>
+              </Stepper>
+            </div>
+          )}
+        />
+        <Showcase.Row label="avatars, icons">
+          {sizes.map((size) => (
+            <div key={size} className="w-64">
+              <Stepper progress={false} orientation="vertical" size={size} aria-label="최근 활동">
+                <Stepper.Item>
+                  <Stepper.Indicator asChild>
+                    <Avatar name="김지우" />
+                  </Stepper.Indicator>
+                  <Stepper.Title>김지우 님이 참여했습니다</Stepper.Title>
+                </Stepper.Item>
+                <Stepper.Item>
+                  <Stepper.Indicator>
+                    <CommandLineIcon />
+                  </Stepper.Indicator>
+                  <Stepper.Title>빌드를 시작했습니다</Stepper.Title>
+                </Stepper.Item>
+                <Stepper.Item>
+                  <Stepper.Title>제목이 길어 줄이 넘어가도 점은 첫 줄에 맞춥니다</Stepper.Title>
+                </Stepper.Item>
+              </Stepper>
+            </div>
+          ))}
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -395,5 +451,56 @@ export const ErrorStep: Story = {
     await expect(payment).toHaveAccessibleDescription('카드가 거절되었습니다');
     await expect(payment).toHaveAttribute('aria-current', 'step');
     await expect(payment).toHaveAttribute('data-state', 'error');
+  },
+};
+
+export const OrderStatus: Story = {
+  render: () => (
+    <div className="w-full max-w-sm">
+      <Stepper value={2} orientation="vertical" aria-label="주문 진행">
+        <Stepper.Item>
+          <Stepper.Title>주문 접수</Stepper.Title>
+          <Stepper.Description>
+            <time dateTime="2026-09-28T14:05">9월 28일 오후 2:05</time>
+          </Stepper.Description>
+        </Stepper.Item>
+        <Stepper.Item>
+          <Stepper.Title>결제</Stepper.Title>
+          <Stepper.Description>
+            <time dateTime="2026-09-28T14:06">9월 28일 오후 2:06</time>
+          </Stepper.Description>
+        </Stepper.Item>
+        <Stepper.Item>
+          <Stepper.Title>배송 준비 중</Stepper.Title>
+          <Stepper.Description>
+            <time dateTime="2026-09-29">9월 29일</time>
+          </Stepper.Description>
+        </Stepper.Item>
+        <Stepper.Item>
+          <Stepper.Title>배송 출발</Stepper.Title>
+          <Stepper.Description>예정</Stepper.Description>
+        </Stepper.Item>
+      </Stepper>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '세로 표시 전용 Stepper 는 주문과 배송처럼 정해진 순서의 진행을 시각과 함께 보여 줍니다. 시각은 `Stepper.Description` 안에 `<time dateTime>` 으로 두어, 기계가 읽는 값과 사람이 읽는 글을 함께 적습니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const list = canvas.getByRole('list', { name: '주문 진행' });
+    const items = within(list).getAllByRole('listitem');
+    await expect(items[0]).toHaveTextContent(/완료/);
+    await expect(items[1]).toHaveTextContent(/완료/);
+    await expect(items[2]).toHaveAttribute('aria-current', 'step');
+    await expect(items[3]).toHaveAttribute('data-state', 'upcoming');
+
+    const paid = canvas.getByText('9월 28일 오후 2:06');
+    await expect(paid.tagName).toBe('TIME');
+    await expect(paid).toHaveAttribute('datetime', '2026-09-28T14:06');
   },
 };

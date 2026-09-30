@@ -38,6 +38,7 @@ export namespace Stepper {
     value: number;
     orientation: StepperOrientation;
     disabled: boolean;
+    progress: boolean;
   };
 
   export type Props = Omit<
@@ -50,6 +51,7 @@ export namespace Stepper {
       onValueChange?: (value: number) => void;
       orientation?: StepperOrientation;
       linear?: boolean;
+      progress?: boolean;
       size?: IdsSize;
       disabled?: boolean;
     };

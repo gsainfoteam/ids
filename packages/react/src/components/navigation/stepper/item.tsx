@@ -5,7 +5,14 @@ import { isValidElement, use, type ComponentProps, type ReactNode } from 'react'
 import { StepperIndexContext, StepperItemContext, stepIds, useRootContext } from './context';
 import { StepperDescription } from './description';
 import { StepperSeparator } from './separator';
-import { flag, isReachable, statusAttributes, stepStatus, type StepperStatus } from './step-state';
+import {
+  flag,
+  isReachable,
+  recordStatus,
+  statusAttributes,
+  stepStatus,
+  type StepperStatus,
+} from './step-state';
 import { StepperTitle } from './title';
 import { StepperTrigger } from './trigger';
 import { resolveState, type StateRenderProps } from '../../../internal/state-props';
@@ -45,7 +52,9 @@ export function StepperItem({
   const index = use(StepperIndexContext);
   invariant(index !== null, '`<Stepper.Item>` must be a direct child of `<Stepper>`.');
 
-  const status = stepStatus(index, root.value, { completed, error });
+  const status = root.progress
+    ? stepStatus(index, root.value, { completed, error })
+    : recordStatus({ completed, error });
   const isDisabled = root.disabled || disabled === true;
   const reachable =
     root.interactive &&

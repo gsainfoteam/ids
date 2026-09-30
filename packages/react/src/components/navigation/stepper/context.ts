@@ -14,6 +14,7 @@ type RootContext = {
   count: number;
   orientation: StepperOrientation;
   linear: boolean;
+  progress: boolean;
   disabled: boolean;
   interactive: boolean;
   styles: ReturnType<typeof stepperStyle>;

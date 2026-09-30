@@ -3,7 +3,7 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Stepper } from '../src';
+import { Avatar, Stepper } from '../src';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -17,6 +17,12 @@ function linesOf(element: Element) {
   const range = document.createRange();
   range.selectNodeContents(element);
   return Array.from(range.getClientRects());
+}
+
+function silenceWarnings() {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  onTestFinished(() => warn.mockRestore());
+  return warn;
 }
 
 function steps(names = ['Account', 'Profile', 'Review'], marks: Stepper.Item.Props[] = []) {
@@ -256,6 +262,165 @@ test('a vertical title keeps its first line level with the indicator, also when 
       const indicator = rectOf(item.querySelector('[data-stepper-indicator]'));
       expect(Math.abs(middleOf(indicator) - middleOf(firstLine))).toBeLessThanOrEqual(1);
     }
+
+    await screen.unmount();
+  }
+});
+
+test('SSR: progress={false} lists events with no current step; unmarked events are neutral and read no status', () => {
+  const doc = parse(
+    renderToString(
+      <Stepper
+        progress={false}
+        aria-label="Activity"
+        className={(state) => `value-${state.value} progress-${state.progress}`}
+      >
+        {steps(['Commented', 'Deployed', 'Failed'], [{}, { completed: true }, { error: true }])}
+      </Stepper>,
+    ),
+  );
+  const list = doc.querySelector('ol')!;
+  const items = Array.from(list.children);
+
+  expect(doc.querySelector('[data-stepper]')!.className).toContain('value--1 progress-false');
+  expect(list.getAttribute('aria-label')).toBe('Activity');
+  expect(items.map((item) => item.getAttribute('data-state'))).toEqual([
+    'neutral',
+    'completed',
+    'error',
+  ]);
+  expect(doc.querySelectorAll('button')).toHaveLength(0);
+  expect(doc.querySelector('[aria-current]')).toBeNull();
+  expect(items.map((item) => item.textContent)).toEqual([
+    'CommentedCommented details',
+    'DeployedDeployed details완료',
+    'FailedFailed details오류',
+  ]);
+
+  const neutralParts = items[0]!.querySelectorAll(
+    '[data-stepper-trigger], [data-stepper-indicator], [data-stepper-title], [data-stepper-description], [data-stepper-separator]',
+  );
+  expect(neutralParts).toHaveLength(5);
+  for (const part of [items[0]!, ...neutralParts]) {
+    expect(part.getAttribute('data-state')).toBe('neutral');
+    expect(part.hasAttribute('data-neutral')).toBe(true);
+    expect(part.hasAttribute('data-upcoming')).toBe(false);
+  }
+  expect(items[0]!.querySelector('[data-stepper-indicator]')!.childNodes).toHaveLength(0);
+  expect(items[1]!.querySelector('[data-stepper-indicator] svg'), 'a check').not.toBeNull();
+});
+
+test('progress={false} draws a plain event as a dot on the first line of its title, and keeps the lines neutral', async () => {
+  await render(
+    <div className="w-48">
+      <Stepper progress={false} orientation="vertical" aria-label="Activity">
+        <Stepper.Item completed>
+          <Stepper.Title>Deployed</Stepper.Title>
+        </Stepper.Item>
+        <Stepper.Item>
+          <Stepper.Title>A title long enough to wrap onto another line</Stepper.Title>
+        </Stepper.Item>
+        <Stepper.Item>
+          <Stepper.Title>Created</Stepper.Title>
+        </Stepper.Item>
+      </Stepper>
+    </div>,
+  );
+
+  const [deployed, wrapped] = document.querySelectorAll('[data-stepper-item]');
+  const dot = wrapped!.querySelector('[data-stepper-indicator]')!;
+  const lines = linesOf(wrapped!.querySelector('[data-stepper-title]')!);
+  const drawn = getComputedStyle(dot, '::before');
+
+  expect(lines.length).toBeGreaterThan(1);
+  expect([drawn.width, drawn.height]).toEqual(['10px', '10px']);
+  expect(getComputedStyle(dot).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+  expect(Math.abs(middleOf(rectOf(dot)) - middleOf(lines[0]!))).toBeLessThanOrEqual(1);
+
+  const lineAfter = (item: Element) =>
+    getComputedStyle(item.querySelector('[data-stepper-separator]')!).backgroundColor;
+  expect(lineAfter(deployed!)).toBe(lineAfter(wrapped!));
+});
+
+test('progress={false} ignores value, onValueChange and linear, with a development warning', async () => {
+  const warn = silenceWarnings();
+  const onValueChange = vi.fn();
+  await render(
+    <Stepper
+      progress={false}
+      aria-label="Activity"
+      value={5}
+      onValueChange={onValueChange}
+      linear={false}
+    >
+      {steps()}
+    </Stepper>,
+  );
+
+  expect(document.querySelectorAll('button')).toHaveLength(0);
+  expect(document.querySelector('[aria-current]')).toBeNull();
+  expect(Array.from(document.querySelectorAll('li'), (item) => item.dataset.state)).toEqual([
+    'neutral',
+    'neutral',
+    'neutral',
+  ]);
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining('ignores value, onValueChange, linear'),
+  );
+  expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('is outside the'));
+  expect(onValueChange).not.toHaveBeenCalled();
+});
+
+test('progress={false} has no default list name and warns in development until it gets one', async () => {
+  const warn = silenceWarnings();
+  const unnamed = await render(<Stepper progress={false}>{steps()}</Stepper>);
+
+  expect(document.querySelector('ol')!.hasAttribute('aria-label')).toBe(false);
+  expect(warn).toHaveBeenCalledWith(expect.stringContaining('no default list name'));
+
+  await unnamed.unmount();
+  warn.mockClear();
+  await render(
+    <>
+      <h2 id="activity-heading">Activity</h2>
+      <Stepper progress={false} aria-labelledby="activity-heading">
+        {steps()}
+      </Stepper>
+    </>,
+  );
+
+  await expect.element(page.getByRole('list', { name: 'Activity' })).toBeInTheDocument();
+  expect(warn).not.toHaveBeenCalled();
+});
+
+test('Indicator asChild draws an Avatar at the indicator size, hidden from screen readers', async () => {
+  for (const [size, side] of [
+    ['standard', 32],
+    ['tiny', 24],
+  ] as const) {
+    const screen = await render(
+      <Stepper progress={false} orientation="vertical" size={size} aria-label="Activity">
+        <Stepper.Item>
+          <Stepper.Indicator asChild>
+            <Avatar name="Alice Kim" />
+          </Stepper.Indicator>
+          <Stepper.Title>Alice commented</Stepper.Title>
+        </Stepper.Item>
+        <Stepper.Item>
+          <Stepper.Title>Bob joined</Stepper.Title>
+        </Stepper.Item>
+      </Stepper>,
+    );
+
+    const avatar = document.querySelector<HTMLElement>('[data-avatar]')!;
+    const [avatarColumn, dotColumn] = document.querySelectorAll('[data-stepper-indicator]');
+    expect(avatar).toBe(avatarColumn);
+    expect(avatar.getAttribute('aria-hidden')).toBe('true');
+    expect(avatar.hasAttribute('role')).toBe(false);
+    expect([rectOf(avatar).width, rectOf(avatar).height]).toEqual([side, side]);
+    expect(rectOf(dotColumn!).width).toBe(side);
+    expect(getComputedStyle(avatar).borderRadius).not.toBe('0px');
+    await expect.element(page.getByText('AK')).toBeVisible();
 
     await screen.unmount();
   }

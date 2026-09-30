@@ -21,9 +21,12 @@ export type StepperIndicatorProps = Omit<
     asChild?: boolean;
   };
 
+const EMPTY_SO_THE_STYLE_DRAWS_A_DOT = null;
+
 function defaultGlyph(state: StepperIndicatorState) {
   if (state.status === 'completed') return <CheckIcon />;
   if (state.status === 'error') return <XMarkIcon />;
+  if (state.status === 'neutral') return EMPTY_SO_THE_STYLE_DRAWS_A_DOT;
   return state.index + 1;
 }
 
