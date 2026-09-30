@@ -12,6 +12,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [SignUp](sign-up/README.md) | Card, Split, Steps       |
 | [OTP](otp/README.md)      | Email, Phone, TwoFactor  |
 | [Error](error/README.md)  | NotFound, ServerError, Maintenance |
+| [Settings](settings/README.md) | Sections, Sidebar, Tabs |
 
 ## 파일
 
