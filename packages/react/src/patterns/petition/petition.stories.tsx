@@ -24,7 +24,8 @@ import { Stepper } from '../../components/navigation/stepper';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
-  title: 'Patterns/Petition',
+  title: 'Patterns/PC/Petition',
+  globals: { viewport: { value: 'desktop', isRotated: false } },
   tags: ['!autodocs'],
   parameters: { controls: { disable: true }, canvasPadding: false },
 } satisfies Meta;

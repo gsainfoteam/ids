@@ -1,6 +1,6 @@
 # 채팅
 
-Storybook `Patterns/Chat`. 대화 목록과 챗봇 대화 창입니다.
+Storybook `Patterns/PC/Chat` 와 `Patterns/Mobile/Chat`. 대화 목록과 챗봇 대화 창입니다.
 
 - **쓰인 컴포넌트.** Item.Group, ScrollArea, TextArea, IconButton, Chip, Menu, Divider, Spinner, Avatar
 - **폭에 따라.** `md` 부터 대화 목록이 보입니다.

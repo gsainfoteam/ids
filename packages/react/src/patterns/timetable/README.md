@@ -1,6 +1,6 @@
 # 시간표
 
-Storybook `Patterns/Timetable`. 평일 격자 시간표와 수강 과목 목록입니다.
+Storybook `Patterns/PC/Timetable` 와 `Patterns/Mobile/Timetable`. 평일 격자 시간표와 수강 과목 목록입니다.
 
 - **쓰인 컴포넌트.** IdsProvider, ToggleGroup, Toggle, Select, Card, Item.Group, Badge, Empty
 - **폭에 따라.** `sm` 부터 주간 격자를 보여 줍니다. 그보다 좁으면 요일을 골라 그날 수업을 목록으로 봅니다.

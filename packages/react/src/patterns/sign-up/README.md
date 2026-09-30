@@ -1,6 +1,6 @@
 # 회원가입
 
-Storybook `Patterns/SignUp`. 계정, 학생 인증, 약관의 세 단계로 나눈 회원가입입니다.
+Storybook `Patterns/PC/SignUp` 와 `Patterns/Mobile/SignUp`. 계정, 학생 인증, 약관의 세 단계로 나눈 회원가입입니다.
 
 - **쓰인 컴포넌트.** Stepper, Field, TextField, PasswordField, Select, OTPField, Checkbox, Divider, Empty, toast
 - **폭에 따라.** 카드 하나에 담기고, 학번과 학과는 `sm` 부터 한 줄에 놓입니다.

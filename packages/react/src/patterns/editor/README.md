@@ -1,6 +1,6 @@
 # 글쓰기
 
-Storybook `Patterns/Editor`. 제목, 게시판, 태그, 서식 도구, 미리 보기, 표지, 공개 범위, 예약 올리기를 갖춘 글쓰기 화면입니다.
+Storybook `Patterns/PC/Editor` 와 `Patterns/Mobile/Editor`. 제목, 게시판, 태그, 서식 도구, 미리 보기, 표지, 공개 범위, 예약 올리기를 갖춘 글쓰기 화면입니다.
 
 - **쓰인 컴포넌트.** TextField, Select, ChipField, Tabs, ToggleGroup (multiple), IconToggle, IconButton, TextArea, FileField, RadioGroup, Switch, DateTimeField
 - **폭에 따라.** `lg` 부터 올리기 설정이 오른쪽에 붙습니다.

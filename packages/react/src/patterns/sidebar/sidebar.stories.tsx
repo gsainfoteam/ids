@@ -40,7 +40,8 @@ import type { IdsColor } from '../../tokens/types';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
-  title: 'Patterns/Sidebar',
+  title: 'Patterns/PC/Sidebar',
+  globals: { viewport: { value: 'desktop', isRotated: false } },
   tags: ['!autodocs'],
   parameters: { controls: { disable: true }, canvasPadding: false },
 } satisfies Meta;

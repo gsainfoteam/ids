@@ -112,9 +112,19 @@ function withoutPlayAndDocs(source: string) {
   return code;
 }
 
+const IMPORTED_STORY_FILE = /from '(\.\/[\w.-]+\.stories)'/g;
+
+function sourceWithTheStoriesItImports(path: string) {
+  const directory = path.slice(0, path.lastIndexOf('/') + 1);
+  const imported = [...storySources[path].matchAll(IMPORTED_STORY_FILE)].map(
+    ([, module]) => storySources[`${directory}${module.slice(2)}.tsx`] ?? '',
+  );
+  return [storySources[path], ...imported].join('\n');
+}
+
 describe('every story under an English translate shows no Korean of its own', () => {
   for (const [path, module] of Object.entries(storyFiles)) {
-    const source = withoutPlayAndDocs(storySources[path]);
+    const source = withoutPlayAndDocs(sourceWithTheStoriesItImports(path));
     for (const [name, Story] of Object.entries(composeStories(module))) {
       test(`${path.replace('../src/', '')} ${name}`, async () => {
         const screen = await render(inEnglish(<Story />));

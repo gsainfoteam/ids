@@ -30,7 +30,8 @@ import { Menu } from '../../components/overlay/menu';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
-  title: 'Patterns/Tasks',
+  title: 'Patterns/PC/Tasks',
+  globals: { viewport: { value: 'desktop', isRotated: false } },
   tags: ['!autodocs'],
   parameters: { controls: { disable: true }, canvasPadding: false },
 } satisfies Meta;

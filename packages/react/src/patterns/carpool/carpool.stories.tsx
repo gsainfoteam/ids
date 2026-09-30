@@ -23,7 +23,8 @@ import { Drawer } from '../../components/overlay/drawer';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
-  title: 'Patterns/Carpool',
+  title: 'Patterns/PC/Carpool',
+  globals: { viewport: { value: 'desktop', isRotated: false } },
   tags: ['!autodocs'],
   parameters: { controls: { disable: true }, canvasPadding: false },
 } satisfies Meta;

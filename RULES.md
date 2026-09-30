@@ -269,10 +269,15 @@ Plain helpers (play queries, data factories, formatters) stay at module level.
 ## Patterns
 
 `src/patterns/<name>/` holds example pages (a post list, a dashboard, a login screen) built only
-from IDS components and Tailwind layout classes. Each is a story titled `Patterns/<Name>` with a
-README, not an export: an app copies the page from the Code tab and changes it.
+from IDS components and Tailwind layout classes. They are stories with a README, not exports: an
+app copies the page from the Code tab and changes it.
 
-- The story sets `tags: ['!autodocs']` and `parameters: { canvasPadding: false }`, so the page
+- `<name>.stories.tsx` holds the page under `Patterns/PC/<Name>` with
+  `globals: { viewport: { value: 'desktop' } }`. `<name>.mobile.stories.tsx` shows the same stories
+  under `Patterns/Mobile/<Name>` at the `mobile2` viewport: its meta spreads the PC meta and each
+  story spreads the PC story (`{ ...pc.Default }`), so the code lives in one file and the spread
+  keeps the PC story's Code tab.
+- The PC story sets `tags: ['!autodocs']` and `parameters: { canvasPadding: false }`, so the page
   fills the canvas.
 - The page is written inline in `render` like any demo and works from the 414px test viewport up.
   Its outermost element carries `break-keep`, so Korean wraps between words.
@@ -282,7 +287,8 @@ README, not an export: an app copies the page from the Code tab and changes it.
   render the same HTML.
 - A page that needs something IDS lacks is a component request, not pattern code.
 - `tests/stories-patterns.test.tsx` renders every pattern in light and dark and runs axe; the SSR,
-  hydration and translation checks take them like any other story.
+  hydration and translation checks take them like any other story. The translation check reads a
+  story file together with the story files it imports, since a Mobile file writes no text itself.
 
 ## Component styling
 

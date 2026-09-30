@@ -24,7 +24,8 @@ import { Menu } from '../../components/overlay/menu';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
-  title: 'Patterns/Notifications',
+  title: 'Patterns/PC/Notifications',
+  globals: { viewport: { value: 'desktop', isRotated: false } },
   tags: ['!autodocs'],
   parameters: { controls: { disable: true }, canvasPadding: false },
 } satisfies Meta;

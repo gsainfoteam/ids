@@ -1,6 +1,6 @@
 # 게시판
 
-Storybook `Patterns/PostList`. 분류 탭, 검색, 정렬, 목록과 카드 보기, 페이지를 갖춘 게시판입니다.
+Storybook `Patterns/PC/PostList` 와 `Patterns/Mobile/PostList`. 분류 탭, 검색, 정렬, 목록과 카드 보기, 페이지를 갖춘 게시판입니다.
 
 - **쓰인 컴포넌트.** Tabs, TextField, Select, ToggleGroup, IconToggle, Item.Group, Card, Image, Badge, Empty, Pagination
 - **폭에 따라.** 모바일에서는 검색창이 한 줄을 다 쓰고, 정렬과 보기 전환이 다음 줄에 옵니다. 카드 보기는 `sm` 부터 2열입니다.

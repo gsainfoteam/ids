@@ -1,6 +1,6 @@
 # 설정
 
-Storybook `Patterns/Settings`. 프로필, 알림, 화면, 보안 네 탭으로 나눈 설정 화면입니다.
+Storybook `Patterns/PC/Settings` 와 `Patterns/Mobile/Settings`. 프로필, 알림, 화면, 보안 네 탭으로 나눈 설정 화면입니다.
 
 - **쓰인 컴포넌트.** Tabs, Card, Field, TextField, Select, TextArea, Switch, RadioGroup, ToggleGroup, IconToggle, Item.Group, Dialog, IdsProvider
 - **폭에 따라.** 폼 격자는 `sm` 부터 2열이고 `items-start` 로 설명이 있는 칸과 윗줄을 맞춥니다.

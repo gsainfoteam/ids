@@ -1,6 +1,6 @@
 # 게시글과 댓글
 
-Storybook `Patterns/PostDetail`. 사진 묶음, 첨부 파일, 태그, 좋아요, 댓글과 답글을 갖춘 게시글 화면입니다.
+Storybook `Patterns/PC/PostDetail` 와 `Patterns/Mobile/PostDetail`. 사진 묶음, 첨부 파일, 태그, 좋아요, 댓글과 답글을 갖춘 게시글 화면입니다.
 
 - **쓰인 컴포넌트.** Breadcrumb, Image.Group, Alert, Item.Group, Chip, Toggle, IconToggle, Menu, TextArea, Badge, Divider
 - **폭에 따라.** 한 열이고 사진 묶음은 3열 격자입니다. 사진을 누르면 `Image.Viewer` 가 열립니다.

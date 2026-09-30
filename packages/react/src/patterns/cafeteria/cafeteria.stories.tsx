@@ -16,7 +16,8 @@ import { Tabs } from '../../components/navigation/tabs';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
-  title: 'Patterns/Cafeteria',
+  title: 'Patterns/PC/Cafeteria',
+  globals: { viewport: { value: 'desktop', isRotated: false } },
   tags: ['!autodocs'],
   parameters: { controls: { disable: true }, canvasPadding: false },
 } satisfies Meta;

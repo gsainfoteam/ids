@@ -1,6 +1,6 @@
 # 사이드바 앱 셸
 
-Storybook `Patterns/Sidebar`. 워크스페이스 전환, 명령 팔레트, 접히는 사이드바, 모바일 서랍을 갖춘 앱 셸입니다.
+Storybook `Patterns/PC/Sidebar` 와 `Patterns/Mobile/Sidebar`. 워크스페이스 전환, 명령 팔레트, 접히는 사이드바, 모바일 서랍을 갖춘 앱 셸입니다.
 
 - **쓰인 컴포넌트.** Menu (RadioGroup, command), Item, Tooltip, ScrollArea, Drawer, Breadcrumb, Card, AvatarGroup, Empty, Kbd
 - **폭에 따라.** `md` 부터 사이드바가 보이고 접을 수 있습니다. 그보다 좁으면 메뉴 버튼이 왼쪽 서랍(`Drawer side="left"`)을 엽니다.

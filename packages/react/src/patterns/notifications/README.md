@@ -1,6 +1,6 @@
 # 알림 센터
 
-Storybook `Patterns/Notifications`. 전체, 멘션, 시스템 탭과 날짜별 묶음을 갖춘 알림 목록입니다.
+Storybook `Patterns/PC/Notifications` 와 `Patterns/Mobile/Notifications`. 전체, 멘션, 시스템 탭과 날짜별 묶음을 갖춘 알림 목록입니다.
 
 - **쓰인 컴포넌트.** Tabs, Item.Group, Avatar, Badge, Menu, Button, Empty
 - **폭에 따라.** 한 열입니다.

@@ -1,6 +1,6 @@
 # 처음 시작
 
-Storybook `Patterns/Onboarding`. 기능 소개, 관심 게시판, 알림의 세 단계 온보딩입니다.
+Storybook `Patterns/PC/Onboarding` 와 `Patterns/Mobile/Onboarding`. 기능 소개, 관심 게시판, 알림의 세 단계 온보딩입니다.
 
 - **쓰인 컴포넌트.** Stepper, Carousel, Chip, Switch, Card, Button, toast
 - **폭에 따라.** 카드 하나에 담깁니다.

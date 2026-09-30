@@ -1,6 +1,6 @@
 # 운영 대시보드
 
-Storybook `Patterns/Dashboard`. 상단 메뉴, 기간 전환, 지표 카드, 서비스별 방문 막대, 최근 활동, 신고 표를 갖춘 대시보드입니다.
+Storybook `Patterns/PC/Dashboard` 와 `Patterns/Mobile/Dashboard`. 상단 메뉴, 기간 전환, 지표 카드, 서비스별 방문 막대, 최근 활동, 신고 표를 갖춘 대시보드입니다.
 
 - **쓰인 컴포넌트.** ToggleGroup, Card, Badge, Progress, Item.Group, DataTable, Select, TextField, Menu, IdsProvider
 - **폭에 따라.** 지표 카드는 모바일 2열, `lg` 부터 4열입니다. 상단 메뉴는 `md` 부터 보이고, 그보다 좁으면 메뉴 버튼이 `Menu` 를 엽니다.

@@ -1,6 +1,6 @@
 # 자료실
 
-Storybook `Patterns/FileManager`. 경로, 격자와 목록 보기, 우클릭 메뉴, 업로드 대화상자, 저장 공간을 갖춘 자료실입니다.
+Storybook `Patterns/PC/FileManager` 와 `Patterns/Mobile/FileManager`. 경로, 격자와 목록 보기, 우클릭 메뉴, 업로드 대화상자, 저장 공간을 갖춘 자료실입니다.
 
 - **쓰인 컴포넌트.** Breadcrumb, ToggleGroup, IconToggle, Card, Table, Menu (contextmenu), Dialog, FileField, Progress
 - **폭에 따라.** 격자는 모바일 2열, `sm` 3열, `xl` 4열입니다.

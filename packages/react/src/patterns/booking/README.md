@@ -1,6 +1,6 @@
 # 스터디룸 예약
 
-Storybook `Patterns/Booking`. 날짜, 방, 시작 시간을 골라 예약하는 화면입니다.
+Storybook `Patterns/PC/Booking` 와 `Patterns/Mobile/Booking`. 날짜, 방, 시작 시간을 골라 예약하는 화면입니다.
 
 - **쓰인 컴포넌트.** Calendar, RadioGroup, ToggleGroup, Toggle, Select, NumberField, Card, Badge, Alert, toast
 - **폭에 따라.** `lg` 부터 예약 내용 카드가 오른쪽에 붙고 스크롤해도 따라옵니다(`sticky`).
