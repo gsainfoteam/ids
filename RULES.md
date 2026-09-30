@@ -160,6 +160,7 @@ packages/react/src/
   foundations/   token stories with no component, one folder each with a story and a README:
                  Color, Typography, Radius, InteractiveState
   overview/      stories that show IDS as a whole, first in the sidebar: Cover
+  patterns/      example pages built only from IDS components, one folder each with a story and a README
   hooks/ utils/ tokens/
 ```
 
@@ -264,6 +265,24 @@ IDS elements appear, the hook code does not. The exceptions, which stay componen
 - the `Showcase` kit and decorators.
 
 Plain helpers (play queries, data factories, formatters) stay at module level.
+
+## Patterns
+
+`src/patterns/<name>/` holds example pages (a post list, a dashboard, a login screen) built only
+from IDS components and Tailwind layout classes. Each is a story titled `Patterns/<Name>` with a
+README, not an export: an app copies the page from the Code tab and changes it.
+
+- The story sets `tags: ['!autodocs']` and `parameters: { canvasPadding: false }`, so the page
+  fills the canvas.
+- The page is written inline in `render` like any demo and works from the 414px test viewport up.
+  Its outermost element carries `break-keep`, so Korean wraps between words.
+- A page picks `outline` or `soft` over `ghost`, including the parts whose default is ghost
+  (Toggle, IconToggle, Empty, Item.Group).
+- Data sits in module-level constants with fixed dates and numbers, so the server and the client
+  render the same HTML.
+- A page that needs something IDS lacks is a component request, not pattern code.
+- `tests/stories-patterns.test.tsx` renders every pattern in light and dark and runs axe; the SSR,
+  hydration and translation checks take them like any other story.
 
 ## Component styling
 
