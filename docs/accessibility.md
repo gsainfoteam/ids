@@ -63,6 +63,10 @@
 - **Safari 의 포커스 가드.** 모달(Dialog, Drawer, 하단 시트)은 floating-ui 의 포커스 가드로 Tab 을 가둡니다.
   - Safari 에서는 VoiceOver 의 가상 커서가 가드에 닿아야 포커스 이벤트가 나므로, floating-ui 가 가드를 이름 없는 `role="button"` 으로 둡니다.
   - VoiceOver 가 모달 가장자리에서 이름 없는 버튼을 읽을 수 있습니다. axe 검사는 이 가드를 빼고 봅니다.
+- **끌어서 크기 바꾸기(2.5.7).** Resizable 의 손잡이와 DataTable 의 열 너비 핸들은 끌어서 크기를 바꿉니다.
+  - 방향키로도 바꿀 수 있습니다. 하지만 2.5.7 은 끌기를 포인터의 한 번 누르기로 대신할 수 있어야 한다는 기준이라, 키보드 경로로는 채우지 못합니다.
+  - 모바일 스크린 리더(VoiceOver, TalkBack)는 `slider` 는 쓸어서 조절하지만 `separator` 는 조절하지 못합니다. 두 번 탭한 채 끄는 통과 제스처로만 바꿀 수 있습니다.
+  - 크기가 중요한 화면이면 앱이 크기를 고르는 버튼이나 NumberField 를 함께 둡니다.
 - **Firefox 의 스크롤 영역.** Firefox 는 스크롤되는 영역을 모두 Tab 에 넣습니다. 안에 버튼이 있는 ScrollArea 도 버튼 앞에서 한 번 멈춥니다.
 - **자동 이름(4.1.2).** IconButton, IconToggle, FloatingButton 은 `aria-label` 이 없으면 아이콘에서 이름을 찾습니다.
   - 찾은 이름은 영어입니다.
@@ -141,6 +145,7 @@
 | --- | --- | --- | --- | --- |
 | Divider | [ARIA separator](https://www.w3.org/TR/wai-aria-1.2/#separator) | 없음 | `separator` + `aria-orientation`, 가운데 글자는 `aria-labelledby` | 크기 조절 핸들이 아니다(포커스를 받지 않는다) |
 | ScrollArea | 없음 (native 스크롤) | 브라우저의 스크롤 키. 넘치는데 포커스 받을 요소가 없으면 viewport 가 Tab 에 멈춘다 | 막대는 `aria-hidden` | 막대는 포인터 전용이다. 키보드와 보조 기술은 native 스크롤을 쓴다 |
+| Resizable | [Window Splitter](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/) (값은 px) | 가장자리 손잡이: `←` `→`(세로면 `↑` `↓`) 16px, `Shift` 64px, `Home` `End` 최솟값과 최댓값, `Enter` 처음 크기. 모서리 손잡이는 Tab 한 칸이고 `←` `→` 너비, `↑` `↓` 높이, 포커스는 값이 바뀐 축으로 옮겨 간다. RTL 에서 `←` `→` 가 바뀐다 | 손잡이는 `separator` + `aria-orientation` `aria-valuenow` `aria-valuemin` `aria-valuemax` `aria-valuetext`("400px") `aria-controls`, 이름 "너비" "높이". 모서리 손잡이는 `group`("크기 조절") 안의 숨은 separator 둘(roving tabindex). 누를 영역 24px | 끌기(2.5.7)를 한 번 누르기로 대신할 방법이 없다. 키보드가 있지만 포인터 사용자를 위한 대안은 아니다. 모바일 스크린 리더는 separator 를 쓸어서 조절하지 못한다 |
 | Splitter | [Window Splitter](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/) | 핸들마다 Tab 이 멈춘다. `←` `→`(세로 분할은 `↑` `↓`) 16px, `Shift`+방향키 64px, `Home` `End` 앞 패널의 가장 작은 크기와 가장 큰 크기, `Enter` 접기와 펼치기 | 핸들은 `separator` + `aria-orientation`(선의 방향) `aria-valuenow` `aria-valuemin` `aria-valuemax` `aria-valuetext`("30%", "접힘"), `aria-controls` 는 앞 패널 하나, 이름 "패널 크기 조절". 접기 버튼은 `aria-expanded` `aria-controls`. 크기가 0 인 패널은 `inert` | 끌기(2.5.7)는 방향키와 접기 버튼이 대신한다. 접기 버튼은 탭 순서에 없다(`Enter` 가 대신한다). APG 의 선택 키인 `F6` 패널 이동은 없다 |
 | AspectRatio, Spacer | 없음 | 없음 | Spacer 는 `aria-hidden` | AspectRatio 에 `overflow-hidden` 을 주면 안의 포커스 링이 잘릴 수 있다 |
 | Kbd | 없음 | 없음 | 기호는 숨기고 "커맨드", "왼쪽 화살표" 처럼 이름을 읽는다 | 없음 |
@@ -258,6 +263,8 @@
 | 점검 항목 | 기대 결과 | VO + Safari (macOS) | VO + Safari (iOS) | NVDA + Firefox | TalkBack + Chrome |
 | --- | --- | --- | --- | --- | --- |
 | Splitter | 핸들이 이름, "구분선", 값("30%")을 읽고, 방향키로 바뀐 값과 접었을 때 "접힘" 을 읽는다. 접기 버튼이 "펼침 / 접힘" 을 읽는다 |  |  |  |  |
+| Resizable 가장자리 | 이름("너비"), "분리자", 값("400px")을 읽고, 방향키로 바뀐 값을 읽는다 |  |  |  |  |
+| Resizable 모서리 | "크기 조절" 묶음으로 들어가 "너비" 를 읽고, `↑` `↓` 를 누르면 "높이" 와 바뀐 값을 읽는다. Tab 은 한 번만 멈춘다 |  |  |  |  |
 
 ### 탐색
 

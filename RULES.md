@@ -139,7 +139,7 @@ packages/react/src/
     data/        Accordion, Avatar, Badge, Calendar, Card, Carousel, Chip, DataTable, Empty, Item,
                  Marquee, QRCode, Table, TimePicker, ...
     feedback/    Alert, Progress, Skeleton, Spinner, Toast
-    layout/      AspectRatio, Divider, Spacer, ScrollArea, Splitter
+    layout/      AspectRatio, Divider, Spacer, ScrollArea, Resizable, Splitter
     navigation/  Breadcrumb, Pagination, Stepper, Tabs
     overlay/     Dialog, Drawer, Menu, Popover, Tooltip
     typography/  Kbd, Label
@@ -149,7 +149,8 @@ packages/react/src/
                                 slider-surface
                    fields       text-control (shell, Clear, useMergedRef), field-popup, list-styles,
                                 temporal-field, form-value, date-locale
-                   behaviour    pressable, state-props, use-checked-writes, icon-label, arc
+                   behaviour    pressable, state-props, use-checked-writes, icon-label, arc,
+                                resize-handle
                    feedback     status-palette
                    overlays     overlay (layer stack, top layer, presence, anchoring, modal layer)
                    slides       slides (Embla track, slide ARIA, drag cancel, keys, announcer)

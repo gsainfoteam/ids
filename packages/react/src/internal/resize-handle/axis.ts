@@ -1,12 +1,24 @@
 import { clamp } from 'es-toolkit';
 
 import type { KeyMap } from '../keys';
+import type { Translate } from '../translate';
 
 export type ResizeDimension = 'width' | 'height';
 
 export type ResizeOrientation = 'horizontal' | 'vertical';
 
 export type ResizeRange = { value: number; min: number; max: number };
+
+export type ResizeAxis = {
+  dimension: ResizeDimension;
+  target: HTMLElement | null;
+  size: number | undefined;
+  min: number;
+  max: number;
+  controls?: string;
+  resize: (size: number) => void;
+  reset: () => void;
+};
 
 export const RESIZE_STEP = 16;
 export const RESIZE_STEP_LARGE = 64;
@@ -74,4 +86,21 @@ export function separatorProps({
     'data-resize-handle': '',
     'data-disabled': disabled ? '' : undefined,
   } as const;
+}
+
+export function axisSeparatorProps(axis: ResizeAxis, t: Translate, disabled: boolean) {
+  const value = axis.size === undefined ? undefined : Math.round(axis.size);
+
+  return {
+    ...separatorProps({
+      orientation: separatorOrientation(axis.dimension),
+      value,
+      min: Math.round(axis.min),
+      max: Number.isFinite(axis.max) ? Math.round(axis.max) : axis.max,
+      valueText: value === undefined ? undefined : t('resizable.value', { value }),
+      controls: axis.controls,
+      disabled,
+    }),
+    'aria-label': t(`resizable.${axis.dimension}`),
+  };
 }

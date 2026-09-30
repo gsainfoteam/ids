@@ -105,6 +105,8 @@ export { Divider } from './components/layout/divider';
 export { Spacer } from './components/layout/spacer';
 export { AspectRatio } from './components/layout/aspect-ratio';
 export { ScrollArea } from './components/layout/scroll-area';
+export { Resizable } from './components/layout/resizable';
+export type { ResizableProps } from './components/layout/resizable';
 export { Splitter } from './components/layout/splitter';
 export type {
   SplitterProps,

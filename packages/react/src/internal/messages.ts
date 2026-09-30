@@ -197,6 +197,12 @@ export const messages = {
     required: '점수를 선택하세요.',
     valueLabel: '{max}점 만점에 {value}점',
   },
+  resizable: {
+    handle: '크기 조절',
+    height: '높이',
+    value: '{value}px',
+    width: '너비',
+  },
   select: {
     clear: '선택 지우기',
     empty: '검색 결과가 없습니다.',

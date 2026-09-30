@@ -1,4 +1,4 @@
-import { cn } from '../../utils';
+import { cn, tv } from '../../utils';
 
 export const resizeHandle = {
   base: cn('touch-none select-none outline-none after:absolute'),
@@ -30,3 +30,26 @@ export const resizeHandle = {
   ),
   disabled: cn('data-disabled:pointer-events-none data-disabled:opacity-50'),
 };
+
+export const resizeGripStyle = tv({
+  slots: {
+    grip: [
+      resizeHandle.base,
+      resizeHandle.hitArea.corner,
+      resizeHandle.ladder.ink,
+      resizeHandle.motion,
+      resizeHandle.disabled,
+      'relative flex size-4 shrink-0 items-center justify-center rounded-indicator',
+    ],
+    mark: 'pointer-events-none size-2.5 rtl:-scale-x-100',
+    separator: 'sr-only',
+  },
+  variants: {
+    axes: {
+      inline: { grip: [resizeHandle.cursor.vertical, resizeHandle.focus] },
+      block: { grip: [resizeHandle.cursor.horizontal, resizeHandle.focus] },
+      both: { grip: [resizeHandle.cursor.corner, resizeHandle.focusWithin] },
+    },
+  },
+  defaultVariants: { axes: 'both' },
+});

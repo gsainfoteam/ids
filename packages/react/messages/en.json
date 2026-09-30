@@ -195,6 +195,12 @@
     "required": "Select a rating.",
     "valueLabel": "{value} out of {max}"
   },
+  "resizable": {
+    "handle": "Resize",
+    "height": "Height",
+    "value": "{value}px",
+    "width": "Width"
+  },
   "select": {
     "clear": "Clear selection",
     "empty": "No results found.",

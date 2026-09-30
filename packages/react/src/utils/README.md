@@ -215,7 +215,7 @@ DOM 이벤트를 다루는 작은 함수입니다: `isNodeFromAnyWindow`, `keepF
 
 - `isNodeFromAnyWindow`: [`internal/field-popup`](../internal/field-popup/README.md) 의 바깥 누르기와 포커스 판정, Select 와 ColorField 의 blur 판정, temporal-field 의 `use-temporal-field.ts`
 - `keepFocusWhereItIs`: Select 와 ChipField 의 옵션, ChipField 의 만들기 옵션(`onPointerDown`)
-- `tryCapturePointer`: ScrollArea 의 thumb, Drawer 와 Toast 의 끌기, Slider 의 thumb
+- `tryCapturePointer`: ScrollArea 의 thumb, Drawer 와 Toast 의 끌기, Slider 의 thumb, [`internal/resize-handle`](../internal/resize-handle/README.md) 의 끌기(Resizable)
 
 ### 쓰는 법
 
