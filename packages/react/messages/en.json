@@ -148,6 +148,9 @@
     "up": "Up Arrow",
     "windows": "Windows"
   },
+  "marquee": {
+    "pause": "Pause"
+  },
   "menu": {
     "command": "Commands",
     "empty": "No results found.",

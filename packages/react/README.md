@@ -612,3 +612,7 @@ Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만
 ## QRCode
 
 값을 토큰 색의 SVG QR 코드로 그립니다. 둥근 모듈과 점, 파인더 모양, 가운데 로고, 다크 모드 반전을 지원합니다. [QRCode API](./src/components/data/qr-code/README.md).
+
+## Marquee
+
+로고, 공지, 숫자를 한 방향으로 끊김 없이 흘리는 CSS 애니메이션 띠입니다. 멈춤 버튼, 포인터와 포커스에 잠시 멈춤, 동작 줄이기, 오른쪽에서 왼쪽 문서를 챙깁니다. [Marquee API](./src/components/data/marquee/README.md).

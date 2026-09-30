@@ -37,7 +37,7 @@
 - **가려지지 않는 포커스(2.4.11).** 레이어는 top layer 에 올라가므로 부모의 `overflow` 에 잘리지 않습니다.
 - **한글 입력.** IME 조합 중에 누른 Escape 와 Enter 는 조합만 끝내고, 레이어를 닫거나 값을 확정하지 않습니다.
 - **오른쪽에서 왼쪽 문서.** `dir="rtl"` 에서는 가로 방향키가 뒤집힙니다(Slider, Rating, Calendar, TimePicker, ChipField, 하위 메뉴).
-- **모션 감소.** `prefers-reduced-motion: reduce` 면 전환 애니메이션을 끄고, Spinner 는 회전 대신 천천히 깜빡이고, Skeleton 은 움직이지 않는 muted 바탕으로 남습니다.
+- **모션 감소.** `prefers-reduced-motion: reduce` 면 전환 애니메이션을 끄고, Spinner 는 회전 대신 천천히 깜빡이고, Skeleton 은 움직이지 않는 muted 바탕으로 남습니다. Marquee 는 흐르지 않고 항목을 모두 보여 줍니다.
 - **비활성이지만 포커스 가능.** 버튼류의 `focusableWhenDisabled` 는 `disabled` 대신 `aria-disabled` 를 붙여 탭 순서와 툴팁을 지킵니다.
 - **문구.** 닫기, 지우기, 불러오는 중 같은 기본 문구는 한국어이고, `IdsProvider translate` 로 앱의 i18n 을 거칩니다. 개발 경고만 영어입니다.
 
@@ -98,6 +98,7 @@
 | Chip | [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/) (누르거나 켜는 칩) | `Enter` `Space`, `Backspace` `Delete` 지우기 | 라벨이면 `span`, 누르는 칩은 `button` + `aria-pressed`. 지우기는 `Chip.Close` 버튼 | Chip.Close 가 24px 보다 작다 |
 | ColorPicker | [Slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), [Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) (팔레트) | 영역: `←` `→` 채도, `↑` `↓` `PageUp` `PageDown` 밝기, `Shift`+방향키 10%, `Home` `End`. 값 입력은 `Enter` 로 반영 | 영역은 채도와 밝기 두 `slider`(`aria-valuetext` 에 두 값), 색조와 투명도는 `slider`, 팔레트는 `radiogroup` | 2차원 영역은 APG 패턴이 없어 슬라이더 둘로 읽힌다 |
 | Empty | 없음 | 없음. `Empty.Actions` 의 버튼마다 Tab 이 멈춘다 | 역할이 없는 `div`, live region 없음. 기본 아이콘은 `aria-hidden`. 제목은 `Empty.Title asChild` 로 heading 이 된다 | 제목의 heading 수준과 결과 수 알림은 앱이 맡는다 |
+| Marquee | 없음 | 멈춤 버튼 `Enter` `Space`. 항목 안의 링크나 버튼마다 Tab 이 한 번 멈추고, 포커스를 받은 항목은 띠 가운데로 옮겨진다 | `role="group"` 과 이름(`aria-label`), live region 없음. 복제본은 `aria-hidden` 과 `inert`. 멈춤 버튼은 `aria-pressed` 토글("일시 정지"). 포인터나 키보드 포커스가 안에 있으면 잠시 멈춘다(2.2.2) | 이름은 앱이 준다. `pauseControl={false}` 면 내용이 5초 안에 멈추거나 장식이어야 한다. 항목의 `id` 는 복제본에도 생긴다 |
 | QRCode | 없음 | 없음 | `role="img"`, 이름은 `aria-label` 이나 `aria-labelledby`, 없으면 "QR 코드". 값은 이름에 넣지 않는다. SVG 와 로고는 이름 안에 숨는다 | 스캔할 수 없는 사람을 위한 주소 글자나 링크는 앱이 함께 보여 준다. 다크 모드의 기본 색은 반전되어 오래된 스캐너가 못 읽을 수 있다(`inverted={false}`) |
 | DataTable | [Table](https://www.w3.org/WAI/ARIA/apg/patterns/table/) ([Sortable Table 예제](https://www.w3.org/WAI/ARIA/apg/patterns/table/examples/sortable-table/)) | 정렬 머리글 버튼 `Enter` `Space`(`Shift`+누르기는 여러 열), 체크박스 `Space`(`Shift`+누르기는 범위), 너비 핸들 `←` `→`(`Shift` 64px) `Home` `End` `Enter`(되돌리기), 페이지 버튼 `Enter` `Space` | native `table`, 정렬된 열의 `th` 에 `aria-sort`, 체크박스 이름 "{행} 선택"과 "모든 행 선택"(일부면 mixed), 핸들 `separator` + `aria-valuenow` `aria-valuemin` `aria-valuemax`, 페이지는 `nav`(이름 "페이지 이동") + `aria-live` 글자, 로딩은 `aria-busy` | `grid` 가 아니라 셀 사이 방향키 이동이 없다. 끝 페이지 버튼은 `aria-disabled` 로 탭 순서에 남는다 |
 | Table | [Table](https://www.w3.org/WAI/ARIA/apg/patterns/table/) | 없음. 넘치는데 안에 포커스 받을 요소가 없으면 스크롤 영역이 Tab 에 멈춘다 | native `table`, `th` 는 머리글 행에서 `scope="col"`, 몸통과 바닥글에서 `scope="row"`, `caption` | 선택된 행(`selected`)은 모양만 바뀐다. `aria-selected` 는 grid 전용이라 행 안의 체크박스나 버튼이 알린다. `onClick` 행은 `role="button"` 이 아니어서 키보드 경로는 행 안의 버튼이다 |
@@ -240,6 +241,7 @@
 | Chip | 켜는 칩이 "눌림" 을 읽고, 지우기 버튼이 이름을 읽는다 |  |  |  |  |
 | Avatar, AvatarGroup | 사람 이름과 "외 N명" 을 읽는다 |  |  |  |  |
 | QRCode | 그림으로 한 번, 준 이름만 읽고 URL 을 읽지 않는다 |  |  |  |  |
+| Marquee | 그룹 이름을 읽고 항목을 한 번씩만 읽는다. 멈춤 버튼이 "일시 정지, 전환 버튼" 을 읽고, 누르면 "눌림" 을 읽는다. 동작 줄이기를 켜면 항목이 흐르지 않고 모두 보인다 |  |  |  |  |
 | Badge | `aria-label` 문장을 읽고 값이 바뀌면 다시 알린다 |  |  |  |  |
 | Empty | 제목(heading 이면 heading 으로)과 설명을 차례로 읽고, 나타날 때 끼어들어 알리지 않는다 |  |  |  |  |
 | Alert | danger 는 즉시, info 는 기다렸다 알린다 |  |  |  |  |

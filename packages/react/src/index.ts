@@ -55,6 +55,8 @@ export { Item } from './components/data/item';
 export { Accordion } from './components/data/accordion';
 export { Empty } from './components/data/empty';
 export { QRCode } from './components/data/qr-code';
+export { Marquee } from './components/data/marquee';
+export type { MarqueeOrientation, MarqueeSpeed } from './components/data/marquee';
 export { Table } from './components/data/table';
 export type {
   TableProps,

@@ -150,6 +150,9 @@ export const messages = {
     up: '위쪽 화살표',
     windows: '윈도우',
   },
+  marquee: {
+    pause: '일시 정지',
+  },
   menu: {
     command: '명령',
     empty: '결과가 없습니다.',

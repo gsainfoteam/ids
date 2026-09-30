@@ -132,8 +132,8 @@ packages/react/src/
   components/
     action/      Button, ButtonGroup, IconButton, IconToggle, Toggle, ToggleGroup, FloatingButton
     form/        Field and every *Field, Checkbox, Radio, Switch, Slider, Select, Rating, ...
-    data/        Accordion, Avatar, Badge, Calendar, Card, Chip, DataTable, Empty, Item, QRCode,
-                 Table, TimePicker, ...
+    data/        Accordion, Avatar, Badge, Calendar, Card, Chip, DataTable, Empty, Item, Marquee,
+                 QRCode, Table, TimePicker, ...
     feedback/    Alert, Progress, Skeleton, Spinner, Toast
     layout/      AspectRatio, Divider, Spacer, ScrollArea
     navigation/  Breadcrumb, Pagination, Stepper, Tabs
