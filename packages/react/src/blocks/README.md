@@ -62,7 +62,11 @@ login/
   - 색, 테두리, 배경, 모서리, 그림자, `style` 은 쓰지 않습니다. 선은 `Divider`, 면은 `Card` 와 `Item`, 흐린 글자는 각 컴포넌트의 `Description` 파트가 그립니다.
   - IDS 컴포넌트가 문서로 받는 className 은 씁니다: `Card.Header` 와 `Card.Footer` 의 `border-b`, `border-t`.
 - **ghost 는 쓰지 않습니다.** 버튼은 `solid`, `outline`, `soft` 입니다.
-- **링크는 `Button asChild`.** 글 속 링크 컴포넌트가 아직 없어서, 링크는 `<a>` 를 감싼 `outline` 이나 `soft` 버튼입니다.
+- **링크.** 링크 컴포넌트가 아직 없습니다.
+  - 눈에 띄어야 할 링크는 `<a>` 를 감싼 `outline` 이나 `soft` 버튼(`Button asChild`)입니다.
+  - 행과 카드 전체가 링크면 `Item asChild`, `Card asChild` 입니다.
+  - 표 칸과 바닥글 목록의 링크는 꾸미지 않은 `<a>` 입니다. 목록 안이라 밑줄 없이도 구별됩니다.
+  - 글 속 링크는 `Empty.Description` 처럼 밑줄을 긋는 파트 안에만 둡니다.
 - **폭.** 414px 부터 짭니다. 가장 바깥 요소의 `break-keep` 으로 한국어가 낱말 단위로 줄을 바꿉니다.
 - **데이터는 모듈 위 상수.** 날짜와 숫자를 고정해 서버와 클라이언트 렌더가 같습니다.
 - **없는 것은 컴포넌트 요청.** IDS 에 없는 모양이 필요하면 블록에서 그리지 않고 컴포넌트로 요청합니다.
