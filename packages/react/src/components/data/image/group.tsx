@@ -1,12 +1,20 @@
 'use client';
 
-import { isValidElement, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
+import {
+  isValidElement,
+  useCallback,
+  useLayoutEffect,
+  useState,
+  type ComponentProps,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 
 import { ImageGroupContext } from './context';
 import { imageStyle } from './style';
 import { useImageGroup, type UseImageGroupOptions } from './use-image-group';
 import { ImageViewer } from './viewer';
-import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
+import { elementTypeOf, flattenFragments, invariant, mergeRefs } from '../../../utils';
 
 export type ImageGroupLayout = 'row' | 'column' | 'grid';
 
@@ -35,6 +43,7 @@ export function ImageGroup({
   className,
   style,
   children,
+  ref,
   ...rest
 }: ImageGroupProps) {
   invariant(
@@ -53,6 +62,22 @@ export function ImageGroup({
     onZoomChange,
     loop,
   });
+  const [list, setList] = useState<HTMLUListElement | null>(null);
+  const attachList = useCallback(
+    (node: HTMLUListElement | null) => mergeRefs(setList, ref)(node),
+    [ref],
+  );
+  const { followTheDocumentOrder } = group;
+
+  useLayoutEffect(() => {
+    if (!list) return;
+
+    const observer = new MutationObserver(followTheDocumentOrder);
+    observer.observe(list, { childList: true });
+
+    return () => observer.disconnect();
+  }, [list, followTheDocumentOrder]);
+
   const styles = imageStyle({ layout });
   const columnCount = layout === 'grid' ? ({ '--image-columns': columns } as CSSProperties) : null;
 
@@ -65,6 +90,7 @@ export function ImageGroup({
       <ul
         {...keepListRoleInSafari}
         {...rest}
+        ref={attachList}
         data-image-group=""
         data-layout={layout}
         className={styles.group({ className })}

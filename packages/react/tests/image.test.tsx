@@ -331,6 +331,26 @@ test('a controlled group shows and marks the image at its value, in the document
   await expect.element(trigger('C')).toHaveAttribute('aria-expanded', 'false');
 });
 
+test('images that move keep the group value in document order before any press', async () => {
+  const gallery = (names: string[], open: boolean) => (
+    <Image.Group value={2} open={open}>
+      {names.map((name) => (
+        <Image key={name} src={INLINE_PICTURE} alt={name} />
+      ))}
+    </Image.Group>
+  );
+  const screen = await render(gallery(['A', 'B', 'C'], false));
+  await screen.rerender(gallery(['C', 'A', 'B'], false));
+  await screen.rerender(gallery(['C', 'A', 'B'], true));
+
+  await expect
+    .element(page.getByRole('group', { name: '3장 중 3번째' }).getByRole('img', { name: 'B' }))
+    .toBeVisible();
+  await expect
+    .element(page.elementLocator(document.querySelector('[aria-label="B 크게 보기"]')!))
+    .toHaveAttribute('aria-expanded', 'true');
+});
+
 test('the group lays images in a row, a column or a grid of columns', async () => {
   const photos = (count: number) =>
     Array.from({ length: count }, (_, index) => (

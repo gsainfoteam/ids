@@ -50,6 +50,11 @@ const inDocumentOrder = (entries: readonly ImageGroupEntry[]) =>
 const sameOrder = (a: readonly ImageGroupEntry[], b: readonly ImageGroupEntry[]) =>
   a.length === b.length && a.every((entry, index) => entry === b[index]);
 
+const keepingTheOrderWhenUnchanged = (entries: readonly ImageGroupEntry[]) => {
+  const ordered = inDocumentOrder(entries);
+  return sameOrder(ordered, entries) ? entries : ordered;
+};
+
 export function useImageGroup(options: UseImageGroupOptions) {
   const [value, setValue] = useControllableState({
     value: options.value,
@@ -77,12 +82,14 @@ export function useImageGroup(options: UseImageGroupOptions) {
     return () => setEntries((current) => current.filter((other) => other.key !== entry.key));
   }, []);
 
+  const followTheDocumentOrder = useCallback(() => setEntries(keepingTheOrderWhenUnchanged), []);
+
   const openAt = (key: string) => {
-    const ordered = inDocumentOrder(entries);
+    const ordered = keepingTheOrderWhenUnchanged(entries);
     const index = ordered.findIndex((entry) => entry.key === key);
     if (index < 0) return;
 
-    if (!sameOrder(ordered, entries)) setEntries(ordered);
+    setEntries(ordered);
     setOpener(ordered[index]!.trigger);
     setZoom(FITTED_ZOOM);
     setValue(index);
@@ -100,6 +107,7 @@ export function useImageGroup(options: UseImageGroupOptions) {
     loop: options.loop ?? false,
     opener,
     register,
+    followTheDocumentOrder,
     openAt,
   };
 }
