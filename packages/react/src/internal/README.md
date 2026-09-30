@@ -21,7 +21,7 @@
 | [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                               |
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
 | [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                                  | IconButton, IconToggle                                                                                                                                                                                                |
-| [`image-status.ts`](#image-statusts)             | `<img>` 를 불러오는 상태와 hydration 전에 끝난 이미지 읽기                            | Avatar                                                                                                                                                                                                                |
+| [`image-status.ts`](#image-statusts)             | `<img>` 를 불러오는 상태와 hydration 전에 끝난 이미지 읽기                            | Avatar, Image                                                                                                                                                                                                         |
 | [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/` |
 | [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
@@ -32,7 +32,7 @@
 | [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)                           | Select, ChipField, Menu                                                                                                                                                                                               |
 | [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                                                 | Slider, ColorPicker                                                                                                                                                                                                   |
 | [`slides/`](#slides)                             | Embla Carousel 을 감싼 슬라이드 엔진, 장마다의 ARIA, 키, 넘김 알림                    | Carousel, (예정) Image.Viewer                                                                                                                                                                                         |
-| [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                        |
+| [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Image, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                 |
 | [`status-palette.ts`](#status-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                                    | Alert                                                                                                                                                                                                                 |
 | [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                                   | Card, Item, Chip                                                                                                                                                                                                      |
 | [`surface-trigger.tsx`](#surface-triggertsx)     | 누르는 표면의 Title 안에 그리는 버튼                                                  | Card.Title, Item.Title                                                                                                                                                                                                |
@@ -538,6 +538,7 @@ export const iconButtonStyle = tv({
 ### 쓰는 곳
 
 - Avatar: 루트가 `useImageStatus`, `Avatar.Image` 가 `useImageSettledBeforeMount`
+- Image: 사진 상자(`root.tsx` 의 `ImageFrame`)가 둘 다. 깨진 `<img>` 는 빼고 `Image.Fallback` 이 `alt` 를 이름으로 가진 그림이 됩니다.
 
 ### 쓰는 법
 
@@ -568,7 +569,8 @@ useImageSettledBeforeMount(imageRef, current, report);
 ### 알아둘 것
 
 - 쓰는 쪽은 `<img>` 에 `key={src}` 를 줍니다. 같은 요소의 `src` 만 바꾸면 새 이미지가 올 때까지 앞 이미지가 남습니다.
-- 실패한 `<img>` 를 DOM 에서 빼고 무엇을 대신 그릴지는 쓰는 컴포넌트가 정합니다.
+- 실패한 `<img>` 를 DOM 에서 빼고 무엇을 대신 그릴지는 쓰는 컴포넌트가 정합니다. Avatar 는 이니셜, Image 는 `Image.Fallback` 입니다.
+- 상태의 규칙을 바꾸면 Avatar 와 Image 가 함께 바뀝니다. `tests/avatar.test.tsx` 와 `tests/image.test.tsx` 가 둘 다 확인합니다.
 
 ## keys.ts
 
@@ -939,7 +941,7 @@ onKeyDown={(event) => moveWithKeys(slides, event)}
 
 ### 쓰는 곳
 
-- `resolveState`, `StateValue`: Avatar, AvatarGroup, Badge, Card, Chip, Item
+- `resolveState`, `StateValue`: Avatar, AvatarGroup, Badge, Card, Chip, Image, Item
 - `resolveState`, `StateRenderProps`: Accordion
 - `resolveState`: Select, ChipField, ColorField, FileField, ColorPicker
 

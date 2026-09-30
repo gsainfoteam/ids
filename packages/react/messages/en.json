@@ -124,6 +124,10 @@
     "remove": "Remove {name}",
     "required": "Required"
   },
+  "image": {
+    "preview": "View larger: {alt}",
+    "previewUntitled": "View image larger"
+  },
   "input": {
     "clearSearch": "Clear search"
   },

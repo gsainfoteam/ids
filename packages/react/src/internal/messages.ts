@@ -126,6 +126,10 @@ export const messages = {
     remove: '{name} 삭제',
     required: '필수 항목',
   },
+  image: {
+    preview: '{alt} 크게 보기',
+    previewUntitled: '이미지 크게 보기',
+  },
   input: {
     clearSearch: '검색어 지우기',
   },

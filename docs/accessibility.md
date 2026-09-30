@@ -108,6 +108,7 @@
 | Chip | [Button](https://www.w3.org/WAI/ARIA/apg/patterns/button/) (누르거나 켜는 칩) | `Enter` `Space`, `Backspace` `Delete` 지우기 | 라벨이면 `span`, 누르는 칩은 `button` + `aria-pressed`. 지우기는 `Chip.Close` 버튼 | Chip.Close 가 24px 보다 작다 |
 | ColorPicker | [Slider](https://www.w3.org/WAI/ARIA/apg/patterns/slider/), [Radio Group](https://www.w3.org/WAI/ARIA/apg/patterns/radio/) (팔레트) | 영역: `←` `→` 채도, `↑` `↓` `PageUp` `PageDown` 밝기, `Shift`+방향키 10%, `Home` `End`. 값 입력은 `Enter` 로 반영 | 영역은 채도와 밝기 두 `slider`(`aria-valuetext` 에 두 값), 색조와 투명도는 `slider`, 팔레트는 `radiogroup` | 2차원 영역은 APG 패턴이 없어 슬라이더 둘로 읽힌다 |
 | Empty | 없음 | 없음. `Empty.Actions` 의 버튼마다 Tab 이 멈춘다 | 역할이 없는 `div`, live region 없음. 기본 아이콘은 `aria-hidden`. 제목은 `Empty.Title asChild` 로 heading 이 된다 | 제목의 heading 수준과 결과 수 알림은 앱이 맡는다 |
+| Image | 없음. 크게 보기는 [Dialog (Modal)](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/) 로 연다 | 누르는 사진마다 Tab 이 멈추고 `Enter` `Space` 로 연다 | native `img` + `alt`(필수, 장식은 `""`). 깨지거나 `src` 가 없으면 대신하는 그림이 `role="img"` + `aria-label`(alt). 불러오는 동안의 자리는 `aria-hidden`. 누르는 사진은 이름 "{alt} 크게 보기" 인 `button` + `aria-haspopup="dialog"` `aria-expanded`. `Image.Group` 은 `role="list"` | 뷰어는 아직 없어 열림 상태만 바뀐다. 사진 사이를 방향키로 옮기지 않는다 |
 | Marquee | 없음 | 멈춤 버튼 `Enter` `Space`. 항목 안의 링크나 버튼마다 Tab 이 한 번 멈추고, 포커스를 받은 항목은 띠 가운데로 옮겨진다 | `role="group"` 과 이름(`aria-label`), live region 없음. 복제본은 `aria-hidden` 과 `inert`. 멈춤 버튼은 `aria-pressed` 토글("일시 정지"). 포인터나 키보드 포커스가 안에 있으면 잠시 멈춘다(2.2.2) | 이름은 앱이 준다. `pauseControl={false}` 면 내용이 5초 안에 멈추거나 장식이어야 한다. 항목의 `id` 는 복제본에도 생긴다 |
 | QRCode | 없음 | 없음 | `role="img"`, 이름은 `aria-label` 이나 `aria-labelledby`, 없으면 "QR 코드". 값은 이름에 넣지 않는다. SVG 와 로고는 이름 안에 숨는다 | 스캔할 수 없는 사람을 위한 주소 글자나 링크는 앱이 함께 보여 준다. 다크 모드의 기본 색은 반전되어 오래된 스캐너가 못 읽을 수 있다(`inverted={false}`) |
 | DataTable | [Table](https://www.w3.org/WAI/ARIA/apg/patterns/table/) ([Sortable Table 예제](https://www.w3.org/WAI/ARIA/apg/patterns/table/examples/sortable-table/)) | 정렬 머리글 버튼 `Enter` `Space`(`Shift`+누르기는 여러 열), 체크박스 `Space`(`Shift`+누르기는 범위), 너비 핸들 `←` `→`(`Shift` 64px) `Home` `End` `Enter`(되돌리기), 페이지 버튼 `Enter` `Space` | native `table`, 정렬된 열의 `th` 에 `aria-sort`, 체크박스 이름 "{행} 선택"과 "모든 행 선택"(일부면 mixed), 핸들 `separator` + `aria-valuenow` `aria-valuemin` `aria-valuemax`, 페이지는 `nav`(이름 "페이지 이동") + `aria-live` 글자, 로딩은 `aria-busy` | `grid` 가 아니라 셀 사이 방향키 이동이 없다. 끝 페이지 버튼은 `aria-disabled` 로 탭 순서에 남는다 |
@@ -258,6 +259,7 @@
 | Marquee | 그룹 이름을 읽고 항목을 한 번씩만 읽는다. 멈춤 버튼이 "일시 정지, 전환 버튼" 을 읽고, 누르면 "눌림" 을 읽는다. 동작 줄이기를 켜면 항목이 흐르지 않고 모두 보인다 |  |  |  |  |
 | Badge | `aria-label` 문장을 읽고 값이 바뀌면 다시 알린다 |  |  |  |  |
 | Empty | 제목(heading 이면 heading 으로)과 설명을 차례로 읽고, 나타날 때 끼어들어 알리지 않는다 |  |  |  |  |
+| Image, Image.Group | 사진을 `alt` 로 한 번 읽고, 깨져도 같은 이름을 그림으로 읽는다. 누르는 사진은 "{alt} 크게 보기, 버튼" 으로, 묶음은 "목록, N개 항목" 으로 읽는다 |  |  |  |  |
 | Alert | danger 는 즉시, info 는 기다렸다 알린다 |  |  |  |  |
 | Toast | 나타나면 한 번 알리고, `F6` 으로 들어가 버튼을 쓰고 나온다 |  |  |  |  |
 | Progress | 이름과 값 문장을 읽는다 |  |  |  |  |
