@@ -159,6 +159,7 @@ packages/react/src/
                    strings      messages
   foundations/   token stories with no component, one folder each with a story and a README:
                  Color, Typography, Radius, InteractiveState
+  overview/      stories that show IDS as a whole, first in the sidebar: Cover
   hooks/ utils/ tokens/
 ```
 

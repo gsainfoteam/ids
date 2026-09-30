@@ -71,6 +71,7 @@ const preview: Preview = {
       storySort: {
         method: 'alphabetical',
         order: [
+          'Overview',
           'Foundations',
           [
             'Color',
