@@ -10,7 +10,7 @@
 | [`use-controllable-state.ts`](#use-controllable-statets) | 제어와 비제어를 한 모양으로 다루는 state             | 값이나 열림 상태를 가진 컴포넌트 대부분                              |
 | [`use-form-reset.ts`](#use-form-resetts)                 | native 폼 reset 뒤에 컴포넌트 state 를 되돌리는 hook | 자기 state 를 가진 폼 컨트롤                                         |
 | [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/surface.ts` |
-| [`use-reduced-motion.ts`](#use-reduced-motionts)         | 동작 줄이기 설정(`prefers-reduced-motion`)           | Marquee                                                              |
+| [`use-reduced-motion.ts`](#use-reduced-motionts)         | 동작 줄이기 설정(`prefers-reduced-motion`)           | Marquee, Carousel(`internal/slides`)                                 |
 
 ## use-controllable-state.ts
 
@@ -18,7 +18,7 @@
 
 ### 쓰는 곳
 
-- Toggle, ToggleGroup, Accordion, Alert, Calendar, Chip, ColorPicker, TimePicker, Checkbox, CheckboxGroup, ChipField, ColorField, FileField, NumberField, PasswordField, Radio, RadioGroup, Rating, Select, Slider, [`internal/temporal-field`](../internal/temporal-field/README.md)
+- Toggle, ToggleGroup, Accordion, Alert, Calendar, Chip, ColorPicker, TimePicker, Checkbox, CheckboxGroup, ChipField, ColorField, FileField, NumberField, PasswordField, Radio, RadioGroup, Rating, Select, Slider, [`internal/temporal-field`](../internal/temporal-field/README.md), Carousel(자동 넘김, [`internal/slides`](../internal/README.md#slides) 의 자리)
 
 ### 쓰는 법
 
@@ -144,6 +144,7 @@ const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
 ### 쓰는 곳
 
 - Marquee: 동작 줄이기면 복제본과 멈춤 버튼을 그리지 않고, 흐르지 않는 상태(`data-paused`)로 둡니다.
+- Carousel: [`internal/slides`](../internal/README.md#slides) 가 버튼, 점, 키로 넘길 때 움직임 없이 바로 옮기고(`jump`), 자동 넘김을 멈춘 채 시작합니다.
 
 ### 쓰는 법
 
@@ -162,3 +163,4 @@ const reduced = reducedMotion ?? prefersReducedMotion;
 ### 알아둘 것
 
 - 모양은 이 hook 이 아니라 CSS 의 `motion-reduce:` variant 가 먼저 정합니다. hook 은 hydration 뒤에야 `true` 가 되므로, 서버 HTML 의 첫 그림부터 맞으려면 CSS 가 같은 조건을 맡아야 합니다. hook 은 요소를 그릴지 말지(복제본), 상태가 무엇인지처럼 CSS 가 못 하는 일만 합니다.
+- Carousel 은 자동 넘김의 기본값을 `playing` 이 아니라 "고르지 않음(`undefined`)" 으로 두고, 고르지 않은 동안만 이 hook 의 값을 따릅니다. 첫 렌더의 `false` 가 재생 상태로 굳지 않게 하려는 것입니다(`components/data/carousel/use-carousel-motion.ts`).
