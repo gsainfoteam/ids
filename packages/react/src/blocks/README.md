@@ -30,6 +30,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [Survey](survey/README.md) | Form, OneByOne |
 | [Onboarding](onboarding/README.md) | Checklist, Steps |
 | [Hero](hero/README.md) | Centered, Split |
+| [Features](features/README.md) | Grid, Showcase |
 
 ## 파일
 
