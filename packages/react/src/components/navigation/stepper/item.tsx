@@ -1,9 +1,11 @@
 'use client';
 
-import { isValidElement, use, type ComponentProps, type ReactNode } from 'react';
+import { use, type ComponentProps } from 'react';
 
+import { StepperBody } from './body';
 import { StepperIndexContext, StepperItemContext, stepIds, useRootContext } from './context';
 import { StepperDescription } from './description';
+import { isType } from './is-type';
 import { StepperSeparator } from './separator';
 import {
   flag,
@@ -16,7 +18,7 @@ import {
 import { StepperTitle } from './title';
 import { StepperTrigger } from './trigger';
 import { resolveState, type StateRenderProps } from '../../../internal/state-props';
-import { containsElementOfType, elementTypeOf, flattenFragments, invariant } from '../../../utils';
+import { containsElementOfType, flattenFragments, invariant } from '../../../utils';
 
 export type StepperItemState = {
   index: number;
@@ -35,9 +37,6 @@ export type StepperItemProps = Omit<ComponentProps<'li'>, 'children' | 'classNam
 
 const TITLE = new Set<unknown>([StepperTitle]);
 const DESCRIPTION = new Set<unknown>([StepperDescription]);
-
-const isPart = (part: unknown) => (node: ReactNode) =>
-  isValidElement(node) && elementTypeOf(node) === part;
 
 export function StepperItem({
   completed,
@@ -70,17 +69,18 @@ export function StepperItem({
 
   const content = resolveState(children, state);
   const nodes = flattenFragments(content);
-  const separators = nodes.filter(isPart(StepperSeparator));
-  const steps = nodes.filter((node) => !isPart(StepperSeparator)(node));
-  const hasTrigger = steps.some(isPart(StepperTrigger));
+  const separators = nodes.filter(isType(StepperSeparator));
+  const bodies = nodes.filter(isType(StepperBody));
+  const steps = nodes.filter((node) => !separators.includes(node) && !bodies.includes(node));
+  const hasTrigger = steps.some(isType(StepperTrigger));
 
   return (
     <StepperItemContext
       value={{
         state,
         reachable,
-        hasTitle: containsElementOfType(content, TITLE),
-        hasDescription: containsElementOfType(content, DESCRIPTION),
+        hasTitle: containsElementOfType(steps, TITLE),
+        hasDescription: containsElementOfType(steps, DESCRIPTION),
         ids: stepIds(root.id, index),
       }}
     >
@@ -94,6 +94,7 @@ export function StepperItem({
         style={resolveState(style, state)}
       >
         {hasTrigger ? steps : <StepperTrigger>{steps}</StepperTrigger>}
+        {bodies}
         {separators.length > 0 ? separators : !state.last && <StepperSeparator />}
       </li>
     </StepperItemContext>

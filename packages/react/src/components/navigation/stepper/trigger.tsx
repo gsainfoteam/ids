@@ -1,9 +1,11 @@
 'use client';
 
-import { isValidElement, type ComponentProps } from 'react';
+import { useEffect, type ComponentProps } from 'react';
 
+import { StepperBody } from './body';
 import { useItemContext, useRootContext } from './context';
 import { StepperIndicator } from './indicator';
+import { isType } from './is-type';
 import { flag, statusAttributes } from './step-state';
 import {
   interactiveDataProps,
@@ -12,7 +14,8 @@ import {
 } from '../../../hooks/use-interactive';
 import { resolveState, type StateRenderProps } from '../../../internal/state-props';
 import { useTranslate } from '../../../internal/translate';
-import { elementTypeOf, flattenFragments } from '../../../utils';
+import { flattenFragments } from '../../../utils';
+import { isDevelopment } from '../../../utils/dev';
 
 import type { StepperItemState } from './item';
 import type { StepperStatus } from './step-state';
@@ -72,10 +75,18 @@ export function StepperTrigger({
   });
   const state: StepperTriggerState = { ...interaction, ...item.state };
   const content = resolveState(children, state);
-  const hasIndicator = flattenFragments(content).some(
-    (child) => isValidElement(child) && elementTypeOf(child) === StepperIndicator,
-  );
+  const nodes = flattenFragments(content);
+  const hasIndicator = nodes.some(isType(StepperIndicator));
+  const holdsBody = nodes.some(isType(StepperBody));
   const status = statusText(item.state.status, t);
+
+  useEffect(() => {
+    if (isDevelopment && holdsBody)
+      console.warn(
+        '[IDS] Stepper: Stepper.Body belongs in Stepper.Item next to Stepper.Trigger. Inside the trigger it becomes part of the step button, which cannot hold links or buttons.',
+      );
+  }, [holdsBody]);
+
   const shared = {
     id: item.ids.trigger,
     'data-stepper-trigger': root.id,
@@ -85,7 +96,7 @@ export function StepperTrigger({
     className: root.styles.trigger({ className: resolveState(className, state) }),
     style: resolveState(style, state),
   };
-  const body = (
+  const inner = (
     <>
       {!hasIndicator && <StepperIndicator />}
       {content}
@@ -100,7 +111,7 @@ export function StepperTrigger({
   if (!root.interactive)
     return (
       <div {...(rest as ComponentProps<'div'>)} {...shared}>
-        {body}
+        {inner}
       </div>
     );
 
@@ -129,7 +140,7 @@ export function StepperTrigger({
         root.select(item.state.index);
       }}
     >
-      {body}
+      {inner}
     </button>
   );
 }

@@ -38,6 +38,7 @@ export const stepperStyle = tv({
       'underline-offset-4 group-data-hovered/stepper-trigger:underline',
     ],
     description: 'col-start-2 text-(--ids-color-on-muted)',
+    body: 'min-w-0 text-(--ids-color-on-surface)',
     status: 'sr-only',
     separator: [
       'shrink-0 bg-(--ids-color-border)',
@@ -51,6 +52,7 @@ export const stepperStyle = tv({
         list: 'flex-row items-center gap-3',
         item: 'flex-1 items-center gap-3 last:flex-none',
         trigger: 'items-center',
+        body: 'hidden',
         separator: 'h-px min-w-4 flex-1',
       },
       vertical: {
@@ -59,6 +61,7 @@ export const stepperStyle = tv({
         trigger: 'items-start',
         indicator: 'self-start',
         title: 'flex items-center',
+        body: 'mt-2',
         separator: 'absolute bottom-1 w-px',
       },
     } satisfies Record<StepperOrientation, object>,
@@ -68,12 +71,14 @@ export const stepperStyle = tv({
         indicator: 'size-8 text-body-b3-medium [&_svg]:size-4',
         title: 'text-body-b3-medium',
         description: 'text-body-b3-regular',
+        body: 'text-body-b3-regular',
       },
       tiny: {
         trigger: 'gap-x-2',
         indicator: 'size-6 text-caption-c1-medium [&_svg]:size-3.5',
         title: 'text-caption-c1-medium',
         description: 'text-caption-c1-regular',
+        body: 'text-caption-c1-regular',
       },
     } satisfies Record<IdsSize, object>,
     interactive: {
@@ -94,6 +99,7 @@ export const stepperStyle = tv({
       class: {
         title: 'py-[calc((--spacing(8)-1lh)/2)]',
         separator: 'start-[calc(1rem-0.5px)] top-10',
+        body: 'ms-11',
       },
     },
     {
@@ -102,6 +108,7 @@ export const stepperStyle = tv({
       class: {
         title: 'py-[calc((--spacing(6)-1lh)/2)]',
         separator: 'start-[calc(0.75rem-0.5px)] top-8',
+        body: 'ms-8',
       },
     },
     {

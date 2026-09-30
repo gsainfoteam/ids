@@ -1,5 +1,6 @@
 import { type ComponentProps } from 'react';
 
+import { StepperBody, type StepperBodyProps, type StepperBodyState } from './body';
 import { StepperContent, type StepperContentProps, type StepperContentState } from './content';
 import {
   StepperDescription,
@@ -61,6 +62,7 @@ export namespace Stepper {
   export type IndicatorProps = StepperIndicatorProps;
   export type TitleProps = StepperTitleProps;
   export type DescriptionProps = StepperDescriptionProps;
+  export type BodyProps = StepperBodyProps;
   export type SeparatorProps = StepperSeparatorProps;
   export type ContentProps = StepperContentProps;
 
@@ -92,6 +94,12 @@ export namespace Stepper {
   export namespace Description {
     export type State = StepperDescriptionState;
     export type Props = StepperDescriptionProps;
+  }
+
+  export const Body = StepperBody;
+  export namespace Body {
+    export type State = StepperBodyState;
+    export type Props = StepperBodyProps;
   }
 
   export const Separator = StepperSeparator;

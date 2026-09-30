@@ -79,6 +79,9 @@ const [step, setStep] = useState(0);
     <Stepper.Description>
       <time dateTime="2026-09-30T09:12">5분 전</time>
     </Stepper.Description>
+    <Stepper.Body>
+      <Card variant="soft">좋은 의견이네요!</Card>
+    </Stepper.Body>
   </Stepper.Item>
   <Stepper.Item completed>
     <Stepper.Title>배포 성공</Stepper.Title>
@@ -104,6 +107,32 @@ const [step, setStep] = useState(0);
 - 진행 중인 일(도는 빌드)은 `<Stepper.Indicator><Spinner decorative /></Stepper.Indicator>` 와 제목의 글로 알립니다. 한 단계씩 나아가는 파이프라인이면 기록 대신 `value` 만 준 표시 전용 진행을 씁니다. 도는 단계에 `aria-current="step"` 이 붙습니다.
 - 루트의 `className`, `style`, `children` 함수는 `{ value, orientation, disabled, progress }` 를 받습니다. 기록에서 `value` 는 `-1` 입니다.
 
+## Body
+
+```tsx
+<Stepper.Item>
+  <Stepper.Title>계정</Stepper.Title>
+  <Stepper.Description>이메일 인증</Stepper.Description>
+  <Stepper.Body>
+    <Button variant="outline" size="tiny">인증 메일 다시 보내기</Button>
+  </Stepper.Body>
+</Stepper.Item>
+
+<Stepper.Body asChild>
+  <Card variant="soft">댓글 내용</Card>                  {/* 감싸는 div 없이 Card 에 속성을 합친다 */}
+</Stepper.Body>
+```
+
+- 제목과 설명 아래에 두는 자유로운 내용입니다. 링크, 버튼, `Item`, `Card` 를 담습니다.
+- 단계 버튼 밖에 그립니다.
+  - 안의 링크와 버튼은 단계와 따로 Tab 에 멈추고, 눌러도 단계를 옮기지 않습니다.
+  - 방향키는 단계 사이만 오가고 Body 에 들르지 않습니다.
+  - Item 안 어디에 적어도 단계 버튼 뒤에 그립니다.
+- 세로에서는 제목 칸에 맞춰 들여 쓰고, 연결선이 옆으로 이어져 다음 단계까지 닿습니다.
+- 가로에서는 단계가 나란히 놓여 자리가 없으므로 숨깁니다. DOM 에는 남아 입력한 값을 지키고, 개발 모드에서 경고합니다.
+- `Stepper.Trigger` 안에 두지 않습니다. 단계 버튼 안에서는 링크와 버튼을 담을 수 없으므로 개발 모드에서 경고합니다.
+- 진행과 기록에서 모두 씁니다.
+
 ## Content
 
 ```tsx
@@ -118,7 +147,7 @@ const [step, setStep] = useState(0);
 ```
 
 - 값이 같은 Content 만 보입니다. 다른 Content 는 `hidden` 으로 DOM 에 남아 입력한 값을 지킵니다.
-- Content 는 단계 목록 아래에 그려집니다. `Stepper.Item` 안에 두지 않습니다.
+- Content 는 단계 목록 아래에 그려집니다. `Stepper.Item` 안에 두지 않습니다. 단계 옆에 둘 내용은 `Stepper.Body` 입니다.
 - 이전, 다음 버튼은 앱이 둡니다: `setStep((step) => step + 1)`.
 
 ## 파트 꾸미기
@@ -160,7 +189,7 @@ const [step, setStep] = useState(0);
 - 아바타는 `Stepper.Indicator asChild` 로 둡니다. 표시의 크기와 둥근 모양을 받고 `aria-hidden` 이 되어, 이름은 제목이 읽습니다.
 - 시각은 새 파트 없이 `Stepper.Description` 안에 `<time dateTime>` 으로 적습니다. 기계가 읽는 값과 사람이 읽는 글이 함께 남습니다.
 - `Trigger` 를 생략하면 Item 의 내용이 기본 Trigger 에 들어갑니다. `Separator` 를 생략하면 마지막이 아닌 단계 끝에 연결선이 붙습니다.
-- `Indicator`, `Title`, `Description` 은 `asChild` 로 자식 요소에 속성을 합칩니다.
+- `Indicator`, `Title`, `Description`, `Body` 는 `asChild` 로 자식 요소에 속성을 합칩니다.
 - 모든 파트의 `className`, `style`, `children` 은 단계 상태 `{ index, status, current, disabled, last }` 를 받는 함수도 됩니다. `Trigger` 는 `hovered`, `focusVisible` 같은 인터랙션 상태도 받습니다.
 - `Stepper.Item` 은 `Stepper` 의 바로 아래 자식이어야 합니다. 직접 만든 컴포넌트로 감싸면 단계로 세지 않고, 개발 모드에서 경고합니다.
 
@@ -175,7 +204,7 @@ const [step, setStep] = useState(0);
 
 - 누를 수 없는 단계(disabled, linear 에서 먼 단계)는 건너뜁니다.
 - `dir="rtl"` 에서는 `←` `→` 가 뒤집힙니다.
-- 표시 전용과 기록은 키보드로 들르지 않습니다.
+- 표시 전용과 기록은 키보드로 들르지 않습니다. `Stepper.Body` 안의 링크와 버튼은 순서대로 Tab 이 멈춥니다.
 
 ## 방향과 크기
 
@@ -192,9 +221,10 @@ const [step, setStep] = useState(0);
 | 요소                                                             | 속성                                                                                               |
 | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | 루트                                                             | `data-stepper`, `data-orientation`, `data-size`, `data-disabled`                                   |
-| `Item`, `Indicator`, `Title`, `Description`, `Separator` | `data-state`, `data-completed`, `data-current`, `data-upcoming`, `data-error`, `data-neutral`      |
+| `Item`, `Indicator`, `Title`, `Description`, `Body`, `Separator` | `data-state`, `data-completed`, `data-current`, `data-upcoming`, `data-error`, `data-neutral`      |
 | `Item`                                                           | 위에 더해 `data-disabled`                                                                          |
 | `Trigger`                                                        | 위에 더해 `data-disabled`, `data-unreachable`(linear 에서 먼 단계), `data-hovered`, `data-focus-visible` |
+| `Body`                                                           | 위에 더해 `data-stepper-body`                                                                      |
 | `Content`                                                        | `data-current`                                                                                     |
 
 ## 속성
@@ -213,11 +243,12 @@ const [step, setStep] = useState(0);
 | `Item.completed`         | 순서와 상관없이 완료 여부를 정한다. 기록에서는 성공한 일           |
 | `Item.error`             | 오류 단계. 기록에서는 실패한 일                                    |
 | `Item.disabled`          | 그 단계만 비활성                                                   |
+| `Body.asChild`           | 감싸는 `div` 없이 자식 요소에 속성을 합친다                        |
 | `Content.value`          | 필수. 보일 단계 번호                                               |
-| 그 외                    | 각 파트의 native 속성. `Trigger` 는 `button` 으로 간다 |
+| 그 외                    | 각 파트의 native 속성. `Trigger` 는 `button` 으로, `Body` 는 `div` 로 간다 |
 
 ## 알아둘 것
 
-- 버튼의 이름은 `Title` 과 상태 문구("완료", "오류")이고, `Description` 은 `aria-describedby` 로 이어집니다. Title 이 없으면 버튼의 글자가 이름이 됩니다.
+- 버튼의 이름은 `Title` 과 상태 문구("완료", "오류")이고, `Description` 은 `aria-describedby` 로 이어집니다. Title 이 없으면 버튼의 글자가 이름이 됩니다. `Body` 는 버튼 밖이라 이름과 설명에 들어가지 않습니다.
 - 번호와 아이콘 표시는 `aria-hidden` 입니다. 순서는 `ol` 이 알립니다.
 - 상태 문구는 `IdsProvider translate` 의 `stepper.completed`, `stepper.error`, 목록 이름은 `stepper.label` 입니다. 기록은 `stepper.label` 을 쓰지 않습니다.

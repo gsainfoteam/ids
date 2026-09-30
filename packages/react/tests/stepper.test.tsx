@@ -1,3 +1,4 @@
+import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { expect, onTestFinished, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
@@ -424,4 +425,185 @@ test('Indicator asChild draws an Avatar at the indicator size, hidden from scree
 
     await screen.unmount();
   }
+});
+
+test('Body renders outside the step button: its button is its own Tab stop and pressing it keeps the step', async () => {
+  const onValueChange = vi.fn();
+  const onResend = vi.fn();
+  await render(
+    <>
+      <button type="button">before</button>
+      <Stepper orientation="vertical" defaultValue={0} onValueChange={onValueChange}>
+        <Stepper.Item>
+          <Stepper.Title>Account</Stepper.Title>
+          <Stepper.Body>
+            <button type="button" onClick={onResend}>
+              Resend
+            </button>
+          </Stepper.Body>
+          <Stepper.Description>Account details</Stepper.Description>
+        </Stepper.Item>
+        <Stepper.Item>
+          <Stepper.Title>Profile</Stepper.Title>
+        </Stepper.Item>
+      </Stepper>
+      <button type="button">after</button>
+    </>,
+  );
+
+  const resend = page.getByRole('button', { name: 'Resend' });
+  const body = resend.element().closest('[data-stepper-body]')!;
+  expect(resend.element().closest('[data-stepper-trigger]')).toBeNull();
+  expect(body.parentElement!.tagName).toBe('LI');
+  expect(body.previousElementSibling!.hasAttribute('data-stepper-trigger')).toBe(true);
+  await expect.element(step('Account')).toHaveAccessibleDescription('Account details');
+
+  page.getByRole('button', { name: 'before' }).element().focus();
+  await userEvent.keyboard('{Tab}');
+  await expect.element(step('Account')).toHaveFocus();
+  await userEvent.keyboard('{Tab}');
+  await expect.element(resend).toHaveFocus();
+  await userEvent.keyboard('{ArrowDown}');
+  await expect.element(resend).toHaveFocus();
+  await userEvent.keyboard('{Enter}');
+  await userEvent.keyboard('{Tab}');
+  await expect.element(page.getByRole('button', { name: 'after' })).toHaveFocus();
+  await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+  await expect.element(resend).toHaveFocus();
+  await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+  await expect.element(step('Account')).toHaveFocus();
+  await userEvent.keyboard('{ArrowDown}');
+  await expect.element(step('Profile')).toHaveFocus();
+
+  await userEvent.click(resend);
+  expect(onResend).toHaveBeenCalledTimes(2);
+  expect(onValueChange).not.toHaveBeenCalled();
+  await expect.element(step('Account')).toHaveAttribute('aria-current', 'step');
+});
+
+test('Body asChild hands its attributes and indent to the child, which takes the step state', async () => {
+  await render(
+    <Stepper progress={false} orientation="vertical" aria-label="Activity">
+      <Stepper.Item error>
+        <Stepper.Title>Tests failed</Stepper.Title>
+        <Stepper.Body asChild className={(state) => `body-${state.status}`}>
+          <section aria-label="Failure report">3 tests failed</section>
+        </Stepper.Body>
+      </Stepper.Item>
+    </Stepper>,
+  );
+
+  const report = page.getByRole('region', { name: 'Failure report' }).element();
+  expect(report.hasAttribute('data-stepper-body')).toBe(true);
+  expect(report.getAttribute('data-state')).toBe('error');
+  expect(report.className).toContain('body-error');
+  expect(rectOf(report).left).toBeCloseTo(
+    rectOf(document.querySelector('[data-stepper-title]')).left,
+    0,
+  );
+});
+
+test('the vertical connector line runs beside the Body, at the title column, to the next step', async () => {
+  for (const progress of [true, false]) {
+    const screen = await render(
+      <div className="w-80">
+        <Stepper orientation="vertical" progress={progress} aria-label="Activity">
+          <Stepper.Item>
+            <Stepper.Title>First</Stepper.Title>
+            <Stepper.Body>
+              <div className="h-40">A tall body</div>
+            </Stepper.Body>
+          </Stepper.Item>
+          <Stepper.Item>
+            <Stepper.Title>Second</Stepper.Title>
+          </Stepper.Item>
+        </Stepper>
+      </div>,
+    );
+
+    const [first, second] = document.querySelectorAll('[data-stepper-item]');
+    const line = rectOf(first!.querySelector('[data-stepper-separator]'));
+    const body = rectOf(first!.querySelector('[data-stepper-body]'));
+    const indicator = rectOf(first!.querySelector('[data-stepper-indicator]'));
+    const next = rectOf(second!.querySelector('[data-stepper-indicator]'));
+
+    expect(line.top).toBeGreaterThanOrEqual(indicator.bottom);
+    expect(line.top).toBeLessThanOrEqual(body.top);
+    expect(line.bottom).toBeGreaterThan(body.bottom);
+    expect(line.bottom).toBeLessThanOrEqual(next.top);
+    expect(line.right).toBeLessThan(body.left);
+    expect(body.left).toBeCloseTo(rectOf(first!.querySelector('[data-stepper-title]')).left, 0);
+    if (!progress) {
+      expect(line.top).toBeCloseTo(indicator.bottom, 0);
+      expect(line.bottom).toBeCloseTo(next.top, 0);
+    }
+
+    await screen.unmount();
+  }
+});
+
+test('Body is hidden in a horizontal Stepper and placed inside Trigger, each with a development warning', async () => {
+  const warn = silenceWarnings();
+  await render(
+    <Stepper defaultValue={0}>
+      <Stepper.Item>
+        <Stepper.Title>Account</Stepper.Title>
+        <Stepper.Body>Account body</Stepper.Body>
+      </Stepper.Item>
+      <Stepper.Item>
+        <Stepper.Trigger>
+          <Stepper.Title>Profile</Stepper.Title>
+          <Stepper.Body>Profile body</Stepper.Body>
+        </Stepper.Trigger>
+      </Stepper.Item>
+    </Stepper>,
+  );
+
+  await expect.element(page.getByText('Account body')).not.toBeVisible();
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining('Stepper.Body is hidden in a horizontal Stepper'),
+  );
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining('Stepper.Body belongs in Stepper.Item next to Stepper.Trigger'),
+  );
+});
+
+test('a record with avatars and a Body hydrates the server HTML without a mismatch', async () => {
+  const tree = (
+    <Stepper progress={false} orientation="vertical" aria-label="Activity">
+      <Stepper.Item>
+        <Stepper.Indicator asChild>
+          <Avatar name="Alice Kim" />
+        </Stepper.Indicator>
+        <Stepper.Title>Alice commented</Stepper.Title>
+        <Stepper.Description>
+          <time dateTime="2026-09-30T09:12">5 minutes ago</time>
+        </Stepper.Description>
+        <Stepper.Body>
+          <a href="#comment">Open the comment</a>
+        </Stepper.Body>
+      </Stepper.Item>
+      <Stepper.Item error>
+        <Stepper.Title>Tests failed</Stepper.Title>
+      </Stepper.Item>
+    </Stepper>
+  );
+  const container = document.body.appendChild(document.createElement('div'));
+  container.innerHTML = renderToString(tree);
+  const errors = vi.spyOn(console, 'error');
+  const recoverable: unknown[] = [];
+  const root = hydrateRoot(container, tree, {
+    onRecoverableError: (error) => recoverable.push(error),
+  });
+  onTestFinished(() => {
+    root.unmount();
+    container.remove();
+    errors.mockRestore();
+  });
+
+  const link = page.getByRole('link', { name: 'Open the comment' });
+  await expect.element(link).toBeVisible();
+  expect(link.element().closest('[data-stepper-trigger]')).toBeNull();
+  expect(recoverable).toEqual([]);
+  expect(errors).not.toHaveBeenCalled();
 });
