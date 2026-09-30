@@ -48,6 +48,22 @@
     "gzip": true
   },
   {
+    "name": "import { Splitter }",
+    "path": "dist/index.js",
+    "import": "{ Splitter }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "47 kB",
+    "gzip": true
+  },
+  {
     "name": "import * (every export)",
     "path": "dist/index.js",
     "import": "*",
