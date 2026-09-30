@@ -243,7 +243,8 @@ Declare the meta as `const meta = { ... } satisfies Meta<typeof X>` with `tags: 
 gives each component a Docs page (every story with Show code, plus the props table); foundation
 stories opt out with `'!autodocs'`. Every story also has a Code tab beside the canvas. The global
 decorator wraps every story in `IdsProvider`, so stories do not add their own theme or page
-padding.
+padding. A story that draws a whole page turns that padding off with
+`parameters: { canvasPadding: false }`.
 
 **Write the demo inline in `render`.** Show code and the Code tab are how a reader learns to
 compose IDS, so a story file declares no demo component of its own: the IDS tree goes straight

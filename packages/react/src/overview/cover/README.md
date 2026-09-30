@@ -10,7 +10,7 @@ Storybook 맨 앞의 표지입니다. IDS 로고 둘레에 실제 IDS 컴포넌�
 ## 구조
 
 ```tsx
-<section className="relative -m-8 h-dvh">
+<section className="relative h-dvh">
   <h1 className="sr-only">IDS, GIST Infoteam Design System</h1>
   <IdsProvider mode="dark" inert aria-hidden className="absolute inset-0">
     <div className="absolute inset-0 flex items-center justify-center gap-4">
@@ -27,7 +27,7 @@ Storybook 맨 앞의 표지입니다. IDS 로고 둘레에 실제 IDS 컴포넌�
 </section>
 ```
 
-- `-m-8 h-dvh` 로 데코레이터의 `p-8` 을 넘어 화면을 채웁니다.
+- `parameters: { canvasPadding: false }` 로 데코레이터의 `p-8` 을 빼고, `h-dvh` 로 화면을 채웁니다.
 - 가운데 열은 세 칸 격자입니다. 위 칸의 카드는 아래로, 아래 칸의 카드는 위로 붙어 로고 줄에 닿고, 넘치는 쪽은 화면 밖으로 잘립니다. `minmax(0, 1fr)` 이라 칸이 카드 높이만큼 늘지 않고, 로고 줄이 늘 화면 세로 가운데에 옵니다.
 - 좌우에 열을 세 개씩 둡니다. 열은 세로 가운데에 놓고 `translate-y` 로 조금씩 어긋나게 해 벽돌처럼 보이게 합니다.
 - 열 높이는 옆 열이 약 1,900px, 가운데 위아래 칸이 각각 700px 이상입니다. 2560×1440 화면까지 빈 곳 없이 채웁니다.

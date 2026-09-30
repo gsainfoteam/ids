@@ -74,7 +74,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const meta = {
   title: 'Overview/Cover',
   tags: ['!autodocs'],
-  parameters: { controls: { disable: true } },
+  parameters: { controls: { disable: true }, canvasPadding: false },
 } satisfies Meta;
 
 export default meta;
@@ -108,7 +108,7 @@ const hint = cn('text-caption-c1-regular text-(--ids-color-on-muted)');
 
 export const Cover: Story = {
   render: () => (
-    <section className="relative -m-8 h-dvh min-h-[720px] overflow-hidden">
+    <section className="relative h-dvh min-h-[720px] overflow-hidden">
       <h1 className="sr-only">IDS, GIST Infoteam Design System</h1>
 
       {(['dark', 'light'] as const).map((mode) => (

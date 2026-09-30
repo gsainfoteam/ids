@@ -25,6 +25,7 @@ function PaintThePageBehindWideStories() {
 const withIdsTheme: Decorator = (Story, context) => {
   const [globals, updateGlobals] = useGlobals();
   const oneBlockAmongMany = context.viewMode === 'docs';
+  const pageFillsTheCanvas = context.parameters['canvasPadding'] === false;
 
   return (
     <IdsProvider
@@ -35,7 +36,9 @@ const withIdsTheme: Decorator = (Story, context) => {
       className={
         oneBlockAmongMany
           ? 'rounded-standard w-full bg-(--ids-color-surface) p-6 text-(--ids-color-on-surface)'
-          : 'min-h-screen w-full bg-(--ids-color-surface) p-8 text-(--ids-color-on-surface)'
+          : pageFillsTheCanvas
+            ? 'min-h-screen w-full bg-(--ids-color-surface) text-(--ids-color-on-surface)'
+            : 'min-h-screen w-full bg-(--ids-color-surface) p-8 text-(--ids-color-on-surface)'
       }
     >
       <PaintThePageBehindWideStories />
