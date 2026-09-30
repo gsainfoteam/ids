@@ -1,9 +1,0 @@
-# 셔틀 시간표
-
-Storybook `Patterns/PC/Shuttle` 와 `Patterns/Mobile/Shuttle`. 노선 탭, 다음 셔틀까지 남은 시간, 도착 알림, 오늘 시간표, 정류장을 갖춘 화면입니다.
-
-- **쓰인 컴포넌트.** Tabs, Card, Progress, Switch, Table, Badge, Stepper, Alert, toast
-- **폭에 따라.** `lg` 부터 정류장 카드가 오른쪽에 붙습니다.
-- **알아둘 것.**
-  - 지난 차는 흐린 글자와 "떠남" 으로, 다음 차는 배지로 표시합니다.
-  - 지금 시각은 고정값이라 서버와 클라이언트 렌더가 같습니다. 실제 앱은 이 값을 시계에서 읽습니다.

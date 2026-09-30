@@ -95,7 +95,7 @@ const preview: Preview = {
           'Overlay',
           'Typography',
           'Utility',
-          'Patterns',
+          'Blocks',
           '*',
         ],
       },

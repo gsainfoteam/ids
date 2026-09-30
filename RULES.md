@@ -160,7 +160,8 @@ packages/react/src/
   foundations/   token stories with no component, one folder each with a story and a README:
                  Color, Typography, Radius, InteractiveState
   overview/      stories that show IDS as a whole, first in the sidebar: Cover
-  patterns/      example pages built only from IDS components, one folder each with a story and a README
+  blocks/        screens built only from IDS components, several takes on each, one folder per
+                 category with a story pair per take and a README
   hooks/ utils/ tokens/
 ```
 
@@ -266,27 +267,35 @@ IDS elements appear, the hook code does not. The exceptions, which stay componen
 
 Plain helpers (play queries, data factories, formatters) stay at module level.
 
-## Patterns
+## Blocks
 
-`src/patterns/<name>/` holds example pages (a post list, a dashboard, a login screen) built only
-from IDS components and Tailwind layout classes. They are stories with a README, not exports: an
-app copies the page from the Code tab and changes it.
+`src/blocks/<category>/` holds blocks: screens built only from IDS components, with several takes
+on each (Login as a card, a split page, an email-only page, a QR code), the way shadcn/ui lists its
+blocks. They are stories with a README, not exports: an app copies a block from the Code tab and
+changes it.
 
-- `<name>.stories.tsx` holds the page under `Patterns/PC/<Name>` with
-  `globals: { viewport: { value: 'desktop' } }`. `<name>.mobile.stories.tsx` shows the same stories
-  under `Patterns/Mobile/<Name>` at the `mobile2` viewport: its meta spreads the PC meta and each
-  story spreads the PC story (`{ ...pc.Default }`), so the code lives in one file and the spread
-  keeps the PC story's Code tab.
-- The PC story sets `tags: ['!autodocs']` and `parameters: { canvasPadding: false }`, so the page
-  fills the canvas.
-- The page is written inline in `render` like any demo and works from the 414px test viewport up.
-  Its outermost element carries `break-keep`, so Korean wraps between words.
-- A page picks `outline` or `soft` over `ghost`, including the parts whose default is ghost
-  (Toggle, IconToggle, Empty, Item.Group).
+- A take is two files. `<take>.stories.tsx` holds the `PC` story under `Blocks/<Category>/<Take>`
+  with `globals: { viewport: { value: 'desktop' } }`. `<take>.mobile.stories.tsx` shows the same
+  block as `Mobile` at the `mobile2` viewport: its meta spreads the PC meta and its story spreads
+  the PC story (`{ ...pc.PC }`), so the code lives in one file and the spread keeps the PC story's
+  Code tab. It writes `title` and `tags` out again, since Storybook reads both statically, and its
+  file name sorts before the PC file, so Mobile comes first.
+- The PC story sets `tags: ['!autodocs']` and `parameters: { canvasPadding: false }`, so the
+  block fills the canvas.
+- Every color, line, surface, corner and shadow comes from an IDS component. A block's own
+  className lays out (flex, grid, gaps, padding, widths, alignment, `hidden md:flex`) and sets the
+  IDS type scale on plain headings and paragraphs; it never sets a color, border, background,
+  radius, shadow or `style`. A line is a `Divider`, a surface a `Card` or an `Item`, muted text a
+  component's `Description` part. The classes a part documents (`border-t` on `Card.Footer`) are
+  fine.
+- A block picks `solid`, `outline` or `soft` and never `ghost`. A link is `Button asChild` around
+  the `<a>` until IDS has a Link.
+- The block is written inline in `render` and works from the 414px test viewport up. Its
+  outermost element carries `break-keep`, so Korean wraps between words.
 - Data sits in module-level constants with fixed dates and numbers, so the server and the client
   render the same HTML.
-- A page that needs something IDS lacks is a component request, not pattern code.
-- `tests/stories-patterns.test.tsx` renders every pattern in light and dark and runs axe; the SSR,
+- A block that needs something IDS lacks is a component request, not block code.
+- `tests/stories-blocks.test.tsx` renders every block in light and dark and runs axe; the SSR,
   hydration and translation checks take them like any other story. The translation check reads a
   story file together with the story files it imports, since a Mobile file writes no text itself.
 
