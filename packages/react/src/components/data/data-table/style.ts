@@ -1,3 +1,4 @@
+import { resizeHandle } from '../../../internal/resize-handle';
 import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -18,11 +19,14 @@ export const dataTableStyle = tv({
       'opacity-60 group-hover/sort:opacity-100 group-data-sorted/head:opacity-100',
     ],
     resizer: [
-      'absolute inset-y-0 end-0 z-10 flex w-3 translate-x-1/2 cursor-col-resize touch-none justify-center outline-none select-none rtl:-translate-x-1/2',
-      'after:h-full after:w-0.5 after:rounded-full after:bg-transparent',
-      'after:transition-colors after:duration-(--ids-motion-fast) motion-reduce:after:transition-none',
-      'hover:after:bg-(--ids-color-handle-hover) focus-visible:after:bg-(--ids-color-handle-active)',
-      'data-resizing:after:bg-(--ids-color-handle-active)',
+      resizeHandle.base,
+      resizeHandle.hitArea.vertical,
+      resizeHandle.focus,
+      'absolute inset-y-0 end-0 z-10 flex w-3 translate-x-1/2 cursor-col-resize justify-center rounded-full rtl:-translate-x-1/2',
+      'before:h-full before:w-0.5 before:rounded-full before:bg-transparent',
+      'before:transition-colors before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
+      'hover:before:bg-(--ids-color-handle-hover) focus-visible:before:bg-(--ids-color-handle-active)',
+      'data-resizing:before:bg-(--ids-color-handle-active)',
     ],
     selectCell: 'w-0 whitespace-nowrap',
     message: 'h-24 text-center text-(--ids-color-on-muted)',

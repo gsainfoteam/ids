@@ -75,6 +75,7 @@ import { Drawer } from '@gsainfoteam/ids-react';
   - 글자를 선택해 둔 채로 눌렀을 때
   - `data-drawer-no-drag` 가 붙은 요소 안에서 시작했을 때(지도, 캔버스, 슬라이더 영역)
   - ScrollArea 의 막대(`data-scroll-area-scrollbar`)에서 시작했을 때. 막대를 끌면 내용이 스크롤됩니다.
+  - 크기 조절 핸들(`data-resize-handle`)에서 시작했을 때. 핸들을 끌면 크기가 바뀝니다.
   - 안에 뜬 다른 레이어(Select 시트, Popover)에서 시작했을 때
 - 터치가 취소되면(`pointercancel`) 제자리로 돌아갑니다.
 - `dismissible={false}` 면 끌어도 닫히지 않고 돌아옵니다.

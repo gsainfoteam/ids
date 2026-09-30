@@ -22,7 +22,7 @@ export const FLICK_TO_END_VELOCITY = 2;
 export const ONE_SNAP_STEP_WITHIN = 0.4;
 
 const EDITABLE = 'input, textarea, select, [contenteditable]:not([contenteditable="false"])';
-const NO_DRAG = '[data-drawer-no-drag], [data-scroll-area-scrollbar]';
+const NO_DRAG = '[data-drawer-no-drag], [data-scroll-area-scrollbar], [data-resize-handle]';
 
 export const axisOf = (side: DrawerSide): DragAxis =>
   side === 'top' || side === 'bottom' ? 'y' : 'x';

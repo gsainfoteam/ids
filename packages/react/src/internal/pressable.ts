@@ -22,6 +22,7 @@ const NESTED_CONTROL = [
   '[role="option"]',
   '[role="tab"]',
   '[role="slider"]',
+  '[data-resize-handle]',
   '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 

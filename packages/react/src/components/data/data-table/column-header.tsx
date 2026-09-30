@@ -2,11 +2,11 @@
 
 import { ArrowDownIcon, ArrowUpIcon, ChevronUpDownIcon } from '@heroicons/react/16/solid';
 import { FlexRender } from '@tanstack/react-table';
-import { clamp } from 'es-toolkit';
 
 import { useDataTableContext } from './context';
 import { SELECTION_COLUMN_ID } from './selection';
 import { keyHandler } from '../../../internal/keys';
+import { resizeKeyMap, separatorProps } from '../../../internal/resize-handle';
 import { useTranslate } from '../../../internal/translate';
 import { TableHead } from '../table/head';
 
@@ -16,9 +16,6 @@ import type { Header, RowData, SortDirection } from '@tanstack/table-core';
 type ColumnHeaderProps<TData extends RowData> = {
   header: Header<DataTableFeatures, TData, unknown>;
 };
-
-const RESIZE_STEP = 16;
-const RESIZE_STEP_LARGE = 64;
 
 const ARIA_SORT: Record<SortDirection, 'ascending' | 'descending'> = {
   asc: 'ascending',
@@ -45,23 +42,17 @@ function ResizeHandle<TData extends RowData>({ header }: ColumnHeaderProps<TData
   const size = column.getSize();
   const min = column.columnDef.minSize ?? 0;
   const max = column.columnDef.maxSize ?? size;
+  const range = { value: size, min, max };
   const onResizeStart = header.getResizeHandler();
 
-  const resizeBy = (delta: number) => () => {
-    header
-      .getContext()
-      .table.setColumnSizing((sizes) => ({ ...sizes, [column.id]: clamp(size + delta, min, max) }));
+  const resizeTo = (next: number) => {
+    header.getContext().table.setColumnSizing((sizes) => ({ ...sizes, [column.id]: next }));
   };
 
   return (
     <div
-      role="separator"
-      aria-orientation="vertical"
+      {...separatorProps({ orientation: 'vertical', ...range })}
       aria-label={t('dataTable.resize', { column: columnName(header) })}
-      aria-valuenow={size}
-      aria-valuemin={min}
-      aria-valuemax={max}
-      tabIndex={0}
       data-data-table-resizer=""
       data-resizing={column.getIsResizing() ? '' : undefined}
       className={styles.resizer()}
@@ -69,15 +60,7 @@ function ResizeHandle<TData extends RowData>({ header }: ColumnHeaderProps<TData
       onTouchStart={onResizeStart}
       onDoubleClick={() => column.resetSize()}
       onKeyDown={keyHandler(
-        {
-          ArrowLeft: resizeBy(-RESIZE_STEP),
-          ArrowRight: resizeBy(RESIZE_STEP),
-          'Shift+ArrowLeft': resizeBy(-RESIZE_STEP_LARGE),
-          'Shift+ArrowRight': resizeBy(RESIZE_STEP_LARGE),
-          Home: resizeBy(min - size),
-          End: resizeBy(max - size),
-          Enter: () => column.resetSize(),
-        },
+        { ...resizeKeyMap('vertical', range, resizeTo), Enter: () => column.resetSize() },
         { dir: rtl ? 'rtl' : 'ltr' },
       )}
     />
