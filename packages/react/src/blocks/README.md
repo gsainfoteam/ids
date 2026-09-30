@@ -24,6 +24,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [Tasks](tasks/README.md) | Board, Table |
 | [FileManager](file-manager/README.md) | Browser, Upload |
 | [Editor](editor/README.md) | Event, Post |
+| [Booking](booking/README.md) | Room, Slots |
 
 ## 파일
 
