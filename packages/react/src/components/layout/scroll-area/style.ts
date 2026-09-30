@@ -72,13 +72,17 @@ export const scrollAreaStyle = tv({
     } satisfies Record<Axis, object>,
     placement: { start: {}, end: {} } satisfies Record<Placement, object>,
     vertical: {
-      start: { corner: 'start-(--scroll-area-gap)' },
-      end: { corner: 'end-(--scroll-area-gap)' },
+      start: { corner: 'start-[var(--scroll-area-corner-inset,var(--scroll-area-gap))]' },
+      end: { corner: 'end-[var(--scroll-area-corner-inset,var(--scroll-area-gap))]' },
     } satisfies Record<Placement, object>,
     horizontal: {
-      start: { corner: 'top-(--scroll-area-gap)' },
-      end: { corner: 'bottom-(--scroll-area-gap)' },
+      start: { corner: 'top-[var(--scroll-area-corner-inset,var(--scroll-area-gap))]' },
+      end: { corner: 'bottom-[var(--scroll-area-corner-inset,var(--scroll-area-gap))]' },
     } satisfies Record<Placement, object>,
+    occupied: {
+      true: { corner: 'size-auto rounded-none bg-transparent' },
+      false: {},
+    },
   },
   compoundVariants: [
     { axis: 'y', placement: 'end', class: { scrollbar: 'end-(--scroll-area-gap)' } },
@@ -93,5 +97,6 @@ export const scrollAreaStyle = tv({
     placement: 'end',
     vertical: 'end',
     horizontal: 'end',
+    occupied: false,
   },
 });

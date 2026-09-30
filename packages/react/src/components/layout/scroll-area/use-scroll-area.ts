@@ -9,6 +9,7 @@ import {
   NO_THUMB,
   PAGE_FRACTION,
   barCorners,
+  cornerInset,
   cornerSquareFits,
   edgeInset,
   meetingCorner,
@@ -24,6 +25,10 @@ import { tryCapturePointer } from '../../../utils';
 export type Overflow = Record<Axis, boolean>;
 
 type Bar = { element: HTMLElement; placement: Placement };
+
+type OccupiedCorner = { element: HTMLElement; placements: Record<Axis, Placement> };
+
+type CornerBox = { inset: number; width: number; height: number };
 
 type Drag = { axis: Axis; pointerId: number; from: number; scrollFrom: number; ratio: number };
 
@@ -91,6 +96,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
   const [cornerShown, setCornerShown] = useState(false);
 
   const bars = useRef(new Map<Axis, Bar>());
+  const occupiedCorner = useRef<OccupiedCorner | null>(null);
   const thumbs = useRef<Record<Axis, ThumbLayout>>({ x: NO_THUMB, y: NO_THUMB });
   const drag = useRef<Drag | null>(null);
   const remeasure = useRef<() => void>(noop);
@@ -105,6 +111,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
     const written = new WeakMap<Element, Map<string, string>>();
     let shape: Shape = readShape(root);
     let current: Overflow = { x: false, y: false };
+    let cornerBox: CornerBox | null = null;
     let frame = 0;
 
     const write = (element: HTMLElement, name: string, px: number) => {
@@ -118,15 +125,37 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
       element.style.setProperty(name, value);
     };
 
+    const measureCorner = () => {
+      const corner = occupiedCorner.current;
+      if (!corner) return null;
+
+      const { x, y } = corner.placements;
+      const inset = cornerInset(meetingCorner(y, x, shape.corners), shape.gap);
+      write(corner.element, '--scroll-area-corner-inset', inset);
+      return { inset, width: corner.element.offsetWidth, height: corner.element.offsetHeight };
+    };
+
     const placeBars = () => {
       for (const [axis, bar] of bars.current) {
         const crossAxis: Axis = axis === 'y' ? 'x' : 'y';
         const cross = bars.current.get(crossAxis);
         const crossShows = !!cross && current[crossAxis];
         const corners = barCorners(axis, bar.placement, shape.corners);
+        const corner = occupiedCorner.current;
 
-        const start = edgeInset(corners.start, shape, crossShows && cross.placement === 'start');
-        const end = edgeInset(corners.end, shape, crossShows && cross.placement === 'end');
+        const takenAt = (end: Placement) => {
+          const byCrossBar =
+            crossShows && cross.placement === end ? shape.gap + shape.thickness : 0;
+          const cornerAtThisEnd =
+            corner?.placements[axis] === bar.placement && corner.placements[crossAxis] === end;
+          if (!cornerBox || !cornerAtThisEnd) return byCrossBar;
+
+          const cornerLength = axis === 'y' ? cornerBox.height : cornerBox.width;
+          return Math.max(byCrossBar, cornerBox.inset + cornerLength + shape.gap);
+        };
+
+        const start = edgeInset(corners.start, shape, takenAt('start'));
+        const end = edgeInset(corners.end, shape, takenAt('end'));
         const track = (axis === 'y' ? shape.height : shape.width) - start - end;
         const thumb = measureThumb(viewport, axis, track);
         thumbs.current[axis] = thumb;
@@ -153,6 +182,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
 
     const measure = () => {
       shape = readShape(root);
+      cornerBox = measureCorner();
       const next = {
         x: scrollsX && viewport.scrollWidth - viewport.clientWidth > SUBPIXEL_ROUNDING,
         y: scrollsY && viewport.scrollHeight - viewport.clientHeight > SUBPIXEL_ROUNDING,
@@ -194,10 +224,14 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
       resize.observe(root);
       resize.observe(viewport);
       for (const child of viewport.children) resize.observe(child);
+      if (occupiedCorner.current) resize.observe(occupiedCorner.current.element);
     };
     const children = new MutationObserver(observeContent);
 
-    remeasure.current = measure;
+    remeasure.current = () => {
+      observeContent();
+      measure();
+    };
     viewport.addEventListener('scroll', onScroll, { passive: true });
     viewport.addEventListener('input', onTypingResizesContent);
     children.observe(viewport, { childList: true });
@@ -224,6 +258,20 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
       if (bars.current.get(axis)?.element === element) bars.current.delete(axis);
     };
   }, []);
+
+  const registerCorner = useCallback(
+    (element: HTMLElement, placements: Record<Axis, Placement>) => {
+      occupiedCorner.current = { element, placements };
+      remeasure.current();
+
+      return () => {
+        if (occupiedCorner.current?.element !== element) return;
+        occupiedCorner.current = null;
+        remeasure.current();
+      };
+    },
+    [],
+  );
 
   const endDrag = (event: PointerEvent<HTMLElement>) => {
     if (drag.current?.pointerId !== event.pointerId) return;
@@ -285,6 +333,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
     setRoot,
     setViewport,
     registerBar,
+    registerCorner,
     overflow,
     hovering,
     scrolling,

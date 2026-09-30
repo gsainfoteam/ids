@@ -505,6 +505,53 @@ test('both bars leave the corner to ScrollArea.Corner, which a rounded corner ha
   );
 });
 
+test('a Corner with content is occupied: shown with one bar, inside the curve, and the bar stops a gap short of it', async () => {
+  const screen = await render(
+    <div className="flex gap-4">
+      <ScrollArea
+        variant="always"
+        className="h-40 w-40"
+        style={{ borderRadius: 14 }}
+        data-testid="round"
+      >
+        <Lines />
+        <ScrollArea.Corner>
+          <button type="button" aria-label="크기" className="block size-4" />
+        </ScrollArea.Corner>
+      </ScrollArea>
+      <ScrollArea variant="always" className="h-40 w-40" data-testid="square">
+        <Lines />
+        <ScrollArea.Corner>
+          <span className="block size-4" />
+        </ScrollArea.Corner>
+      </ScrollArea>
+    </div>,
+  );
+  const inside = (id: string, selector: string) => q(selector, screen.getByTestId(id).element());
+  const corner = inside('round', '[data-scroll-area-corner]');
+  await expect.element(corner).toBeVisible();
+  await expect.element(corner).toHaveAttribute('data-occupied');
+  expect(corner.hasAttribute('aria-hidden')).toBe(false);
+  await expect.element(screen.getByRole('button', { name: '크기' })).toBeVisible();
+
+  const round = screen.getByTestId('round').element().getBoundingClientRect();
+  const clearOfTheDiagonal = 14 * (1 - Math.SQRT1_2);
+  await expect
+    .poll(() => round.right - corner.getBoundingClientRect().right)
+    .toBeCloseTo(clearOfTheDiagonal, 1);
+  const box = corner.getBoundingClientRect();
+  expect(round.bottom - box.bottom).toBeCloseTo(clearOfTheDiagonal, 1);
+  const vertical = inside('round', '[data-orientation="vertical"]').getBoundingClientRect();
+  expect(box.top - vertical.bottom).toBeCloseTo(GAP, 1);
+
+  const square = screen.getByTestId('square').element().getBoundingClientRect();
+  const squareCorner = inside('square', '[data-scroll-area-corner]').getBoundingClientRect();
+  expect([square.right - squareCorner.right, square.bottom - squareCorner.bottom]).toEqual([
+    GAP,
+    GAP,
+  ]);
+});
+
 test('asChild roots and viewports: a listbox can itself be the scroller', async () => {
   const screen = await render(
     <ScrollArea className="h-40 w-48">

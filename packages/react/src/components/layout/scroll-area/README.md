@@ -64,7 +64,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 | `Viewport`  | 스크롤하는 요소. 없으면 파트가 아닌 자식을 감싸 만든다                       |
 | `Scrollbar` | 막대(트랙). `orientation` 마다 하나. 선언한 방향으로 스크롤한다 |
 | `Thumb`     | 막대 안의 손잡이. 없으면 기본 thumb                                          |
-| `Corner`    | 두 막대가 만나는 칸. `both` 면 자동으로 붙는다                               |
+| `Corner`    | 두 막대가 만나는 칸. `both` 면 자동으로 붙는다. 내용을 넣으면 그 모서리를 차지한다 |
 
 - 세로 막대의 기본 자리는 논리적 끝(LTR 오른쪽, RTL 왼쪽), 가로 막대는 아래입니다. 내용보다 앞에 선언하면 시작 쪽, 위로 갑니다.
 - 가로 thumb 은 RTL 에서 오른쪽에서 출발합니다.
@@ -101,6 +101,25 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - 반지름은 root 의 크기가 바뀔 때 다시 읽습니다. 스크롤 중에는 읽지 않습니다.
 - padding 이 있는 컨테이너를 root 로 쓰면 모서리만 `concentric-p-*` 로 정하고 padding 은 viewport 에 줍니다(`concentric-p-1 p-0` + viewport `p-1`). 그래야 내용이 테두리 바로 안쪽에서 잘립니다.
 
+## 모서리를 차지하는 내용
+
+```tsx
+<ScrollArea>
+  <ScrollArea.Viewport asChild>
+    <textarea />
+  </ScrollArea.Viewport>
+  <ScrollArea.Corner>
+    <button type="button" aria-label="크기 조절" className="size-4" />
+  </ScrollArea.Corner>
+</ScrollArea>
+```
+
+- `ScrollArea.Corner` 에 내용을 넣으면 그 모서리(막대가 만나는 자리, 기본은 끝 아래)를 차지합니다. native 스크롤 막대가 native 크기 조절 손잡이 위에서 멈추는 것과 같습니다.
+- 막대가 하나만 보여도, 넘치지 않아도 늘 보입니다. `aria-hidden` 이 붙지 않고, `data-occupied` 가 붙습니다.
+- 그 모서리에서 끝나는 막대는 내용 앞에서 간격(`--scroll-area-gap`)만큼 떨어져 멈춥니다.
+- 내용은 둥근 모서리의 곡선 안에 들어갑니다. 두 가장자리에서 `max(간격, 반지름 × (1 - 1/√2))` 만큼 들어가 바깥 꼭짓점이 곡선 안에 옵니다. 이 거리는 Corner 요소의 `--scroll-area-corner-inset` 에 적힙니다.
+- 크기는 내용이 정합니다. 내용의 크기가 바뀌면 막대를 다시 놓습니다.
+
 ## 키보드
 
 - 스크롤 키(화살표, PageUp/Down, Home/End, Space)는 브라우저가 처리합니다.
@@ -128,6 +147,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 | `data-overflow`                       | 막대            | 막대 방향으로 넘친다                    |
 | `data-orientation` / `data-placement` | 막대            | 방향, 자리(`start` / `end`)             |
 | `data-tab-stop`                       | viewport        | Tab 멈춤을 받았다                       |
+| `data-occupied`                       | Corner          | 내용이 모서리를 차지한다                |
 | `data-variant` / `data-size`          | root            | 넘긴 값                                 |
 
 - `className` 과 `style` 은 `ScrollArea.State`(`overflowX`, `overflowY`, `hovering`, `scrolling`, `dragging` 등)를 받는 함수도 됩니다.

@@ -26,6 +26,7 @@ export const PAGE_FRACTION = 0.875;
 export const NO_THUMB: ThumbLayout = { size: 0, offset: 0, travel: 0 };
 
 const SQUARE_FITS_UNDER_RADIUS = Math.SQRT2 / (Math.SQRT2 - 1);
+const CURVE_DEPTH_ON_THE_DIAGONAL = 1 - Math.SQRT1_2;
 
 function lengthOf(value: string, box: number) {
   const number = parseFloat(value) || 0;
@@ -93,9 +94,12 @@ export function cornerSquareFits(radius: number, gap: number) {
   return radius <= gap * SQUARE_FITS_UNDER_RADIUS;
 }
 
-export function edgeInset(radius: number, shape: Shape, crossBarAtThisEnd: boolean) {
-  const curve = clearOfCurve(radius, shape.gap);
-  return crossBarAtThisEnd ? Math.max(curve, shape.gap + shape.thickness) : curve;
+export function cornerInset(radius: number, gap: number) {
+  return Math.max(gap, radius * CURVE_DEPTH_ON_THE_DIAGONAL);
+}
+
+export function edgeInset(radius: number, shape: Shape, takenAtThisEnd: number) {
+  return Math.max(clearOfCurve(radius, shape.gap), takenAtThisEnd);
 }
 
 export function thumbAlong(
