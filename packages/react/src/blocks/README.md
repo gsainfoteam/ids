@@ -26,6 +26,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [Editor](editor/README.md) | Event, Post |
 | [Booking](booking/README.md) | Room, Slots |
 | [Event](event/README.md) | Detail, List |
+| [Checkout](checkout/README.md) | Cart, Payment |
 
 ## 파일
 
