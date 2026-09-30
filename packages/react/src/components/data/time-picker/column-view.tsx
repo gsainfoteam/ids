@@ -68,7 +68,7 @@ export function ColumnView({
   );
 
   return (
-    <ScrollArea size="tiny" className={c.styles.columnArea()}>
+    <ScrollArea size="tiny" fade="y" className={c.styles.columnArea()}>
       <ScrollArea.Viewport asChild>{listbox}</ScrollArea.Viewport>
     </ScrollArea>
   );

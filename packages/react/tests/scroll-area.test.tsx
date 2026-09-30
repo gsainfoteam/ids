@@ -1267,6 +1267,31 @@ test('adopted: a TimePicker column is its own tiny viewport and still centers th
   expect(column.getAttribute('tabindex')).toBe('0');
 });
 
+const TINY_FADE = 16;
+
+test('adopted: a TimePicker column fades its top and bottom and keeps the centred time whole', async () => {
+  const screen = await render(
+    <>
+      <button type="button">앞</button>
+      <TimePicker defaultValue={new Time(9)} hourCycle="24h" precision="hour" />
+    </>,
+  );
+  const column = screen.getByRole('listbox').element() as HTMLElement;
+  expect(fadesOnlyTopAndBottom(column)).toBe(true);
+  await expect.poll(() => fadeLengths(column)).toEqual([TINY_FADE, TINY_FADE]);
+
+  const box = column.getBoundingClientRect();
+  const picked = q('[aria-selected="true"]', column).getBoundingClientRect();
+  expect(picked.top - box.top).toBeGreaterThan(TINY_FADE);
+  expect(box.bottom - picked.bottom).toBeGreaterThan(TINY_FADE);
+
+  await userEvent.click(screen.getByRole('button', { name: '앞' }));
+  await userEvent.keyboard('{Tab}');
+  expect(document.activeElement).toBe(column);
+  expect(getComputedStyle(column).maskImage).toBe('none');
+  expect(getComputedStyle(column).boxShadow).not.toBe('none');
+});
+
 test('adopted: a long Popover scrolls inside while its arrow still sticks out', async () => {
   const screen = await render(
     <IdsProvider>

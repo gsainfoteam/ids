@@ -1,7 +1,9 @@
 import { primaryFill } from '../../../internal/brand-fill';
-import { tv } from '../../../utils';
+import { cn, tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
+
+const fadeOffWhileItsRingShows = cn('focus-visible:mask-none');
 
 export const timePickerStyle = tv({
   slots: {
@@ -14,6 +16,7 @@ export const timePickerStyle = tv({
       'group/column relative h-(--time-picker-height) rounded-standard',
       'before:block before:h-[calc(50%-var(--time-option)/2)] after:block after:h-[calc(50%-var(--time-option)/2)]',
       'focus-ring aria-disabled:cursor-not-allowed aria-disabled:overflow-y-hidden',
+      fadeOffWhileItsRingShows,
       'data-[variant=wheel]:snap-y data-[variant=wheel]:snap-mandatory data-[variant=wheel]:[overflow-anchor:none]',
     ],
     option: [

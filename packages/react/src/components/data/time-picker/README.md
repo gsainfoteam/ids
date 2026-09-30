@@ -144,6 +144,7 @@ const [time, setTime] = useState<Time | null>(null);
 - 바깥에서 준 `value` 를 범위나 간격에 맞춰 고치지 않습니다.
 - 값은 벽시계 시각이라 시간대 변환도, 서머타임으로 빠지는 시각도 없습니다. 특정 날의 순간이 필요하면 앱에서 `toCalendarDateTime(day, time)` 처럼 합칩니다.
 - 컬럼은 `size="tiny"`(6px) [ScrollArea](../../layout/scroll-area/README.md) 이고, listbox 자신이 스크롤 요소입니다(`Viewport asChild`). OS 막대 대신 가리키거나 스크롤할 때만 얇은 IDS 막대가 보입니다. 마우스 휠, 트랙패드, 터치, 키보드로 움직입니다.
+- 컬럼은 위나 아래에 옵션이 더 남으면 그 가장자리를 16px 까지 흐립니다([ScrollArea `fade="y"`](../../layout/scroll-area/README.md#가장자리-흐림)). 가운데 줄의 고른 시각은 흐린 띠에 닿지 않습니다. 키보드로 들어와 컬럼의 포커스 링이 보이는 동안은 흐리지 않습니다. 마스크가 링을 잘라 내기 때문입니다.
 - 컬럼의 폭(`min-w-12 flex-1`)은 ScrollArea root 에 있습니다. `TimePicker.Column` 의 `className` 은 listbox 에 붙습니다.
 - 컬럼 높이는 옵션 다섯 개입니다. `className="[--time-picker-height:calc(var(--time-option)*7)]"` 처럼 바꿀 수 있고, 위아래 여백이 반 컬럼씩이라 어느 높이에서도 고른 시각이 가운데 줄에 옵니다.
 - 12시간제의 시 컬럼은 12, 1, 2, ... 11 순서입니다.
