@@ -192,15 +192,39 @@ export const Gallery: Story = {
               className="w-80"
             />
           </Showcase.Row>
-          <Showcase.Row label="resize">
+          <Showcase.Row label="resize vertical">
             <TextArea
               autoResize={false}
               resize="vertical"
               rows={3}
-              placeholder="직접 늘려 보세요"
-              aria-label="크기 조절"
+              placeholder="모서리를 끌어 높이를 바꿉니다"
+              aria-label="세로 조절"
               className="w-80"
             />
+          </Showcase.Row>
+          <Showcase.Row label="resize horizontal">
+            <TextArea
+              autoResize={false}
+              resize="horizontal"
+              rows={2}
+              placeholder="모서리를 끌어 너비를 바꿉니다"
+              aria-label="가로 조절"
+              className="w-80"
+            />
+          </Showcase.Row>
+          <Showcase.Row label="resize both">
+            <TextArea
+              autoResize={false}
+              resize="both"
+              rows={3}
+              maxLength={200}
+              placeholder="너비와 높이를 함께 바꿉니다"
+              aria-label="양방향 조절"
+              className="w-80"
+            >
+              <TextArea.Input />
+              <TextArea.Count />
+            </TextArea>
           </Showcase.Row>
         </Showcase.Section>
       </Showcase>
@@ -267,6 +291,66 @@ export const CharacterCount: Story = {
     await expect(count).toHaveAttribute('data-near-limit');
     const status = canvas.getByRole('status');
     await waitFor(() => expect(status.textContent).toMatch(/자 남았습니다|제한에 도달했습니다/));
+  },
+};
+
+export const ResizeHandle: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <TextArea
+        autoResize={false}
+        resize="vertical"
+        rows={3}
+        aria-label="높이만"
+        placeholder="resize=vertical (기본)"
+        className="w-80"
+      />
+      <TextArea
+        autoResize={false}
+        resize="horizontal"
+        rows={2}
+        aria-label="너비만"
+        placeholder="resize=horizontal"
+        className="w-80"
+      />
+      <TextArea
+        autoResize={false}
+        resize="both"
+        rows={3}
+        aria-label="둘 다"
+        placeholder="resize=both"
+        className="w-80"
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`autoResize={false}` 면 입력 칸의 끝 아래 모서리에 크기 조절 손잡이가 생깁니다. 브라우저의 CSS 손잡이와 달리 Tab 으로 가서 방향키로 바꿀 수 있고, 터치로 끌리고, 스크롤 막대는 손잡이 위에서 멈춥니다. 높이는 textarea 에, 너비는 필드 전체에 들어갑니다. Enter 나 두 번 누르기는 rows 로 정한 크기로 돌아갑니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const textarea = canvas.getByRole('textbox', { name: '높이만' });
+    const natural = textarea.offsetHeight;
+    const [height] = canvas.getAllByRole('separator', { name: '높이' });
+    height!.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() => expect(textarea.offsetHeight).toBe(natural + 16));
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(textarea.offsetHeight).toBe(natural));
+
+    const shell = canvas
+      .getByRole('textbox', { name: '너비만' })
+      .closest<HTMLElement>('[data-text-area]')!;
+    const [width] = canvas.getAllByRole('separator', { name: '너비' });
+    width!.focus();
+    await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
+    await waitFor(() => expect(shell.style.width).toBe('256px'));
+
+    const both = canvas.getByRole('group', { name: '크기 조절' });
+    await expect(both.querySelectorAll('[role="separator"]')).toHaveLength(2);
   },
 };
 

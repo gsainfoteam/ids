@@ -17,6 +17,7 @@
 | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `resizeKeyMap`, `separatorProps`, `resizeHandle`                      | DataTable 의 열 너비 핸들                           |
 | `useMeasuredAxes`, `useAxisSeparator`, `ResizeGrip`, `resizeHandle`   | Resizable(가장자리 손잡이와 모서리 손잡이)          |
+| `useMeasuredAxes`, `ResizeGrip`, `ResizeAxis`                         | TextArea 의 크기 조절 손잡이                        |
 | `data-resize-handle` 속성                                             | Drawer 의 끌기 제외, `pressable.ts` 의 안쪽 컨트롤 |
 
 - 크기를 가진 상태(열 너비, 요소 크기, 패널 크기)는 쓰는 쪽이 가집니다. 이 모듈은 값을 받아 다음 값을 계산하고 알려 줄 뿐입니다.
@@ -151,7 +152,15 @@ const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
   onDraggingChange={onDraggingChange}
   className={styles.grip({ className })}
 />
+
+// components/form/text-area/input.tsx: 입력 칸(ScrollArea)의 끝 아래 모서리를 차지한다.
+// 높이 축은 textarea, 너비 축은 테두리 컨테이너를 바꾼다
+<ScrollArea.Corner>
+  <ResizeGrip axes={resize.axes} disabled={resize.disabled} />
+</ScrollArea.Corner>
 ```
+
+- 두 축의 요소가 달라도 됩니다. 축마다 `target` 이 있어, TextArea 는 높이를 textarea 에, 너비를 필드 전체에 씁니다.
 
 - 두 축이면 `←` `→` 가 너비를 바꾸고 너비 separator 로, `↑` `↓` 가 높이를 바꾸고 높이 separator 로 포커스를 옮깁니다. 값을 바꾼 뒤(`flushSync`) 포커스를 옮기므로, 포커스는 늘 값이 이미 바뀐 separator 에 있어 스크린 리더가 바뀐 값을 읽습니다. `Home` `End` 는 포커스한 축, `Enter` 와 두 번 누르기는 두 축 모두를 되돌립니다.
 - 포커스 링은 group 에 `:has(:focus-visible)` 로 그립니다. separator 는 `sr-only` 입니다.

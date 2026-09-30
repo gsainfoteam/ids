@@ -8,6 +8,7 @@ import { TextAreaInput, type TextAreaInputPartProps } from './input';
 import { resolve } from './state-value';
 import { textAreaStyle } from './style';
 import { useTextArea, type CountState } from './use-text-area';
+import { useTextAreaResize } from './use-text-area-resize';
 import { stateAttributes, type TextControlState } from '../../../internal/text-control';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
@@ -72,11 +73,15 @@ export function TextAreaRoot({
     countId: countNode ? countId : undefined,
   });
   const state: TextAreaState = { size, variant, ...field.state };
-  const styles = textAreaStyle({
-    variant,
-    size,
-    resize: autoResize ? 'none' : (resize ?? 'vertical'),
+  const resizeMode = autoResize ? 'none' : (resize ?? 'vertical');
+  const { setShell, ...resizing } = useTextAreaResize({
+    resize: resizeMode,
+    disabled: field.state.disabled,
+    shellId: `ids-text-area-shell-${generatedId}`,
+    inputId: field.inputProps.id,
   });
+  const styles = textAreaStyle({ variant, size, resize: resizeMode });
+  const resizedWidth = resizing.width === undefined ? undefined : { width: `${resizing.width}px` };
 
   return (
     <TextAreaContext
@@ -87,15 +92,18 @@ export function TextAreaRoot({
         autoResize,
         minRows,
         maxRows,
+        resize: resizing,
         styles,
       }}
     >
       <div
+        ref={setShell}
+        id={resizing.shellId}
         data-text-area=""
         {...stateAttributes(state)}
         {...field.rootProps}
         className={styles.root({ className: resolve(className, state) })}
-        style={resolve(style, state)}
+        style={{ ...resolve(style, state), ...resizedWidth }}
       >
         <div data-text-area-top="" className={styles.bar({ position: 'top' })}>
           {top}

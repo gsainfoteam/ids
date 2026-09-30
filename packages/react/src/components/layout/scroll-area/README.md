@@ -180,7 +180,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - Select, ChipField 의 옵션 목록(팝업과 하단 시트), 필드 팝업 자체(달력, 색 선택기가 넘칠 때)
 - Menu 의 내용, 명령 팔레트의 목록
 - Dialog, Drawer, Popover 의 본문. Popover 의 화살표는 ScrollArea 밖에 둡니다
-- TextArea 의 textarea(`Viewport asChild`)
+- TextArea 의 textarea(`Viewport asChild`)와 크기 조절 손잡이(내용을 담은 `Corner`)
 - TimePicker 의 컬럼(`size="tiny"`, listbox 가 `Viewport asChild`)
 
 ## 알아둘 것

@@ -3,10 +3,11 @@ import { useEffect, useState, type ComponentProps } from 'react';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { expect, test } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Field, TextArea } from '../src';
+import { skipWithoutCdp } from './engines';
 import { Field as RhfField } from '../src/react-hook-form';
 
 const LINE_PX = 20;
@@ -98,7 +99,7 @@ test('sentinel/Fragment order, root native props, asChild handlers and React 19 
   expect(cleaned).toBe(1);
 });
 
-test('native form data, composition events, readOnly/disabled and root resize handle', async () => {
+test('native form data, composition events, readOnly/disabled and the resize grip', async () => {
   const events: string[] = [];
   const screen = await render(
     <form>
@@ -115,7 +116,10 @@ test('native form data, composition events, readOnly/disabled and root resize ha
   );
   const textarea = screen.getByRole('textbox');
   const shell = () => screen.container.querySelector<HTMLElement>('[data-text-area]')!;
-  await expect.element(shell()).toHaveClass('resize');
+  const grip = () => screen.container.querySelector<HTMLElement>('[data-resize-grip]');
+  await expect.element(screen.getByRole('group', { name: '크기 조절' })).toBeVisible();
+  expect(grip()).not.toHaveAttribute('data-disabled');
+  expect(getComputedStyle(shell()).resize).toBe('none');
   await expect.element(textarea).toHaveAttribute('readonly');
   expect(new FormData(screen.container.querySelector('form')!).get('message')).toBe('안녕');
   textarea.element().dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }));
@@ -129,7 +133,7 @@ test('native form data, composition events, readOnly/disabled and root resize ha
     </Field>,
   );
   await expect.element(textarea).toHaveAttribute('disabled');
-  await expect.element(shell()).toHaveClass('resize-none');
+  expect(grip()).toBeNull();
   await screen.rerender(
     <Field invalid={false} aria-label="Message">
       <TextArea invalid />
@@ -178,9 +182,7 @@ test('autoResize grows, caps at maxRows, shrinks, follows controlled changes and
   await screen.rerender(view('a', false));
   expect(textarea().style.height).toBe('99px');
   expect(textarea().style.overflowY).toBe('scroll');
-  await expect
-    .element(screen.container.querySelector<HTMLElement>('[data-text-area]'))
-    .toHaveClass('resize-y');
+  await expect.element(screen.getByRole('separator', { name: '높이' })).toBeInTheDocument();
 });
 
 test('native form reset resizes after defaultValue is restored', async () => {
@@ -384,4 +386,159 @@ test('Count follows a value written by code (react-hook-form setValue)', async (
   await expect.element(counter()).toHaveTextContent('2');
   setOuter('abcd');
   await expect.element(counter()).toHaveTextContent('4');
+});
+
+type Point = { x: number; y: number };
+
+const GAP = 2;
+
+async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', point: Point) {
+  const frame = window.frameElement!.getBoundingClientRect();
+  const scale = frame.width / window.innerWidth;
+  await cdp().send('Input.dispatchMouseEvent', {
+    type,
+    x: frame.left + point.x * scale,
+    y: frame.top + point.y * scale,
+    button: 'left',
+    buttons: type === 'mouseReleased' ? 0 : 1,
+    clickCount: 1,
+  });
+}
+
+const centerOf = (element: Element): Point => {
+  const box = element.getBoundingClientRect();
+  return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+};
+
+const resizable = (resize: TextArea.Resize) => (
+  <TextArea autoResize={false} resize={resize} rows={3} aria-label="메모" className="w-72">
+    <TextArea.Input ref={pinRowMetrics} />
+  </TextArea>
+);
+
+test('each resize mode draws an IDS grip in the corner of the input area, none draws nothing', async () => {
+  const screen = await render(resizable('vertical'));
+  const textarea = () => screen.getByRole('textbox', { name: '메모' }).element() as HTMLElement;
+  const shell = () => screen.container.querySelector<HTMLElement>('[data-text-area]')!;
+  const corner = () => screen.container.querySelector<HTMLElement>('[data-scroll-area-corner]');
+
+  const height = screen.getByRole('separator', { name: '높이' });
+  await expect.element(height).toHaveAttribute('aria-controls', textarea().id);
+  await expect.element(height).toHaveAttribute('aria-orientation', 'horizontal');
+  await expect.element(height).toHaveAttribute('aria-valuenow', String(textarea().offsetHeight));
+  expect(corner()!.contains(height.element())).toBe(true);
+  expect(corner()!.closest('[data-scroll-area]')!.contains(textarea())).toBe(true);
+  expect(getComputedStyle(textarea()).resize).toBe('none');
+
+  await screen.rerender(resizable('horizontal'));
+  const width = screen.getByRole('separator', { name: '너비' });
+  await expect.element(width).toHaveAttribute('aria-controls', shell().id);
+  await expect.element(width).toHaveAttribute('aria-valuenow', '288');
+
+  await screen.rerender(resizable('both'));
+  const group = screen.getByRole('group', { name: '크기 조절' });
+  await expect.element(group).toBeVisible();
+  expect(group.element().querySelectorAll('[role="separator"]')).toHaveLength(2);
+
+  await screen.rerender(resizable('none'));
+  expect(corner()).toBeNull();
+  expect(screen.container.querySelector('[data-resize-handle]')).toBeNull();
+});
+
+test('keys resize the height on the textarea and the width on the whole field; Enter goes back', async () => {
+  const screen = await render(resizable('both'));
+  const textarea = () => screen.getByRole('textbox', { name: '메모' }).element() as HTMLElement;
+  const shell = () => screen.container.querySelector<HTMLElement>('[data-text-area]')!;
+  const naturalHeight = textarea().offsetHeight;
+
+  await userEvent.click(screen.getByRole('textbox', { name: '메모' }));
+  await userEvent.keyboard('{Tab}');
+  await expect.element(screen.getByRole('separator', { name: '너비' })).toHaveFocus();
+
+  await userEvent.keyboard('{ArrowDown}');
+  await expect.element(screen.getByRole('separator', { name: '높이' })).toHaveFocus();
+  await expect.poll(() => textarea().style.height).toBe(`${naturalHeight + 16}px`);
+  expect(shell().style.height).toBe('');
+
+  await userEvent.keyboard('{Shift>}{ArrowLeft}{/Shift}');
+  await expect.element(screen.getByRole('separator', { name: '너비' })).toHaveFocus();
+  await expect.poll(() => shell().style.width).toBe('224px');
+  expect(textarea().offsetWidth).toBe(224);
+
+  await userEvent.keyboard('{Home}');
+  await expect.poll(() => shell().offsetWidth, { message: 'min-w-24 floors the width' }).toBe(96);
+
+  await userEvent.keyboard('{Enter}');
+  await expect.poll(() => shell().style.width).toBe('');
+  expect(textarea().style.height).toBe('');
+  expect(textarea().offsetHeight).toBe(naturalHeight);
+});
+
+test('the height floor is one line and maxRows caps it', async () => {
+  const screen = await render(
+    <TextArea autoResize={false} resize="vertical" rows={3} maxRows={4} aria-label="메모">
+      <TextArea.Input ref={pinRowMetrics} />
+    </TextArea>,
+  );
+  const handle = screen.getByRole('separator', { name: '높이' });
+  await expect.element(handle).toHaveAttribute('aria-valuemin', String(LINE_PX + PADDING_PX * 2));
+  await expect
+    .element(handle)
+    .toHaveAttribute('aria-valuemax', String(LINE_PX * 4 + PADDING_PX * 2));
+
+  handle.element().focus();
+  await userEvent.keyboard('{Home}');
+  await expect.element(handle).toHaveAttribute('aria-valuenow', String(LINE_PX + PADDING_PX * 2));
+  await userEvent.keyboard('{End}');
+  await expect
+    .element(handle)
+    .toHaveAttribute('aria-valuenow', String(LINE_PX * 4 + PADDING_PX * 2));
+});
+
+test('dragging the grip resizes the input area; the scrollbar stops above the grip, inside the curve', async (context) => {
+  skipWithoutCdp(context);
+  const screen = await render(
+    <TextArea
+      autoResize={false}
+      resize="vertical"
+      rows={3}
+      aria-label="메모"
+      className="w-72"
+      defaultValue={Array.from({ length: 12 }, (_, line) => `줄 ${line + 1}`).join('\n')}
+    >
+      <TextArea.Input ref={pinRowMetrics} />
+    </TextArea>,
+  );
+  const textarea = () => screen.getByRole('textbox', { name: '메모' }).element() as HTMLElement;
+  const grip = () => screen.getByRole('separator', { name: '높이' }).element();
+  const area = () => textarea().closest<HTMLElement>('[data-scroll-area]')!;
+  const bar = () => area().querySelector<HTMLElement>('[data-scroll-area-scrollbar]')!;
+  const clearance = () => grip().getBoundingClientRect().top - bar().getBoundingClientRect().bottom;
+  await expect.element(area()).toHaveAttribute('data-overflow-y');
+  await expect.poll(clearance).toBeCloseTo(GAP, 0);
+
+  const box = area().getBoundingClientRect();
+  const gripBox = grip().getBoundingClientRect();
+  const radius = 10;
+  const center = { x: box.right - radius, y: box.bottom - radius };
+  expect(Math.hypot(gripBox.right - center.x, gripBox.bottom - center.y)).toBeCloseTo(radius, 0);
+
+  textarea().focus();
+  const naturalHeight = textarea().offsetHeight;
+  const start = centerOf(grip());
+  await mouse('mousePressed', start);
+  await mouse('mouseMoved', { x: start.x, y: start.y + 30 });
+  await mouse('mouseReleased', { x: start.x, y: start.y + 30 });
+  await expect.poll(() => textarea().offsetHeight).toBe(naturalHeight + 30);
+  await expect.element(screen.getByRole('textbox', { name: '메모' })).toHaveFocus();
+  await expect.poll(clearance).toBeCloseTo(GAP, 0);
+});
+
+test('a disabled TextArea keeps its grip out of the tab order', async () => {
+  const screen = await render(
+    <TextArea autoResize={false} resize="vertical" disabled aria-label="메모" />,
+  );
+  const handle = screen.getByRole('separator', { name: '높이' });
+  await expect.element(handle).toHaveAttribute('aria-disabled', 'true');
+  await expect.element(handle).not.toHaveAttribute('tabindex');
 });

@@ -6,6 +6,7 @@ import { invariant } from '../../../utils';
 
 import type { textAreaStyle } from './style';
 import type { useTextArea } from './use-text-area';
+import type { useTextAreaResize } from './use-text-area-resize';
 
 type TextAreaContextValue = {
   inputProps: ReturnType<typeof useTextArea>['inputProps'];
@@ -14,6 +15,7 @@ type TextAreaContextValue = {
   autoResize: boolean;
   minRows?: number;
   maxRows?: number;
+  resize: Omit<ReturnType<typeof useTextAreaResize>, 'setShell'>;
   styles: ReturnType<typeof textAreaStyle>;
 };
 
