@@ -35,6 +35,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [Footer](footer/README.md) | Columns, Simple |
 | [Shuttle](shuttle/README.md) | Board, Stop |
 | [Cafeteria](cafeteria/README.md) | Today, Week |
+| [Timetable](timetable/README.md) | Today, Week |
 
 ## 파일
 
