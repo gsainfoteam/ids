@@ -14,6 +14,7 @@ type AreaContext = {
   variant: ScrollArea.Variant;
   size: IdsSize;
   scrolls: ScrollArea.Orientation;
+  faded: ScrollArea.Orientation | undefined;
   placements: Record<Axis, Placement>;
 };
 

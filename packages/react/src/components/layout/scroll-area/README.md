@@ -7,6 +7,7 @@
 - **폭을 차지하지 않습니다.** 막대는 내용 위에 겹쳐 그려서 넘치든 아니든 내용 폭이 같습니다.
 - **둥근 모서리를 넘지 않습니다.** 막대 끝은 root 의 모서리 반지름에서 곡선이 닿는 만큼 물러나고, 옆 가장자리와 2px 떨어집니다.
 - **선언 순서가 자리를 정합니다.** 내용 뒤에 선언한 막대는 기본 자리, 앞에 선언한 막대는 반대편에 섭니다.
+- **더 남은 쪽을 흐릴 수 있습니다.** `fade` 를 주면 내용이 더 남은 가장자리만 흐려서 그쪽에 내용이 더 있다는 것을 보여 줍니다.
 
 ```tsx
 import { ScrollArea } from '@gsainfoteam/ids-react';
@@ -45,6 +46,51 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - `orientation` 을 적으면 선언하지 않은 방향에 기본 막대를 채웁니다. `orientation="both"` 에 세로 막대만 선언하면 가로는 기본 막대입니다.
 - 두께는 root 의 `--scroll-area-thickness`, 옆 간격은 `--scroll-area-gap` 입니다. `className="[--scroll-area-thickness:4px]"` 로 바꿀 수 있습니다.
 - `orientation` 은 viewport 의 `overflow` 도 정합니다. `vertical` 은 가로를 잘라 냅니다(`overflow-x: hidden`).
+
+## 가장자리 흐림
+
+```tsx
+<ScrollArea fade />                                            // 스크롤하는 방향 모두
+<ScrollArea fade="y" />                                        // 위아래만
+<ScrollArea fade="x" />                                        // 좌우만
+<ScrollArea fade className="[--scroll-area-fade-size:40px]" /> // 흐린 폭
+```
+
+- 내용이 더 남은 가장자리만 흐립니다. 맨 위에서는 위 가장자리가 선명하고, 내리면 위가 흐려집니다. 끝에 닿은 가장자리는 다시 선명해집니다.
+- 흐린 폭은 그 가장자리 너머에 가려진 거리만큼 자라고 `--scroll-area-fade-size`(standard 24px, tiny 16px)에서 멈춥니다. 스크롤을 시작하면 0 에서 자라고, 끝에 다가가면 줄어듭니다. 갑자기 나타나지 않습니다.
+- viewport 의 `mask-image` 그라디언트라 배경색을 몰라도 어느 표면 위에서나 맞습니다. 막대와 Corner 는 viewport 밖에 있어 흐려지지 않습니다.
+- 두 방향이면 그라디언트 둘을 `mask-composite: intersect` 로 겹칩니다. 가로는 `dir="rtl"` 에서 오른쪽이 시작입니다.
+- 스크롤하지 않는 방향은 흐리지 않습니다. `orientation="vertical"` 에 `fade` 면 위아래만 흐리고, `fade="x"` 면 아무 데도 흐리지 않습니다.
+- 서버 HTML 과 첫 그림은 흐리지 않습니다. 넘친 거리를 잰 뒤부터 흐립니다.
+- 흐림은 스크롤 위치를 그대로 따라갈 뿐 전환이 없습니다. 그래서 `prefers-reduced-motion` 에서도 따로 바꾸지 않습니다.
+- Tab 으로 viewport 에 들어와 포커스 링이 보이는 동안은 흐리지 않습니다. 마스크는 viewport 가 그리는 모든 것을 테두리 상자 안으로 잘라서 바깥 링을 지웁니다.
+- 같은 이유로 viewport 자신에 준 그림자와 바깥 윤곽선도 잘립니다. `mask-image` 는 쌓임 맥락(stacking context)도 만듭니다. top layer 로 뜨는 IDS 팝업은 영향을 받지 않습니다.
+- 흐린 띠 안의 글자는 대비가 낮아집니다. 모양만 바뀌고, 스크롤해 들여오면 온전한 대비로 보입니다. 스크린 리더, 선택, 찾기는 그대로입니다.
+
+## 넘친 거리
+
+| 이름                                                        | 뜻                                                   |
+| ----------------------------------------------------------- | ---------------------------------------------------- |
+| `--scroll-area-overflow-y-start` / `-y-end`                 | 위 / 아래로 가려진 거리(px)                          |
+| `--scroll-area-overflow-x-start` / `-x-end`                 | 시작 / 끝 쪽으로 가려진 거리(px). RTL 은 오른쪽이 시작 |
+| `data-overflow-y-start` / `-y-end` / `-x-start` / `-x-end` | 그 거리가 0 보다 크다                                |
+
+```tsx
+// 위로 가려진 내용이 생기면 머리 아래에 선을 긋는다
+<div className="group/panel flex flex-col">
+  <header className="border-b border-transparent group-has-data-overflow-y-start/panel:border-(--ids-color-border)">
+    공지
+  </header>
+  <ScrollArea className="min-h-0 grow">...</ScrollArea>
+</div>
+```
+
+- 모두 viewport 에 붙고, `fade` 가 없어도 씁니다.
+- 막대와 같은 때 씁니다. 스크롤하면 한 프레임에 한 번, 크기가 바뀌면 그때 다시 잽니다. 렌더 중에는 쓰지 않아서 서버 HTML 과 첫 그림에는 없습니다.
+- 넘치지 않거나 스크롤하지 않는 방향은 0 입니다. 1px 이 안 되는 나머지(소수점 스크롤 값)는 0 으로 봅니다.
+- 가로는 논리 방향입니다. RTL 에서 브라우저가 음수로 주는 `scrollLeft` 도 시작에서 떨어진 거리로 바꿉니다.
+- 네 변수는 상속되지 않는 `<length>` 로 등록합니다(`CSS.registerProperty`, 초기값 `0px`). 스크롤마다 바뀌는 값을 내용이 물려받으면 프레임마다 내용 전체의 스타일을 다시 계산하기 때문입니다.
+- 그래서 변수는 viewport 자신에서만 읽힙니다. 안쪽 요소는 data 속성으로 고릅니다(`in-data-overflow-y-start:`).
 
 ## 파트와 자리
 
@@ -147,6 +193,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 | `data-overflow`                       | 막대            | 막대 방향으로 넘친다                    |
 | `data-orientation` / `data-placement` | 막대            | 방향, 자리(`start` / `end`)             |
 | `data-tab-stop`                       | viewport        | Tab 멈춤을 받았다                       |
+| `data-overflow-y-start` 등 넷         | viewport        | 그 가장자리 너머에 내용이 가려져 있다   |
 | `data-occupied`                       | Corner          | 내용이 모서리를 차지한다                |
 | `data-variant` / `data-size`          | root            | 넘긴 값                                 |
 
@@ -171,6 +218,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 | `variant`             | `hover`(기본) / `auto` / `always`        |
 | `size`                | `standard`(기본, 8px) / `tiny`(6px)      |
 | `orientation`         | 선언한 막대의 방향, 없으면 `vertical` |
+| `fade`                | `false`(기본) / `true` / `'y'` / `'x'`   |
 | `asChild`             | 자식 요소 하나를 root 로 쓴다            |
 | `className` / `style` | 상태를 받는 함수도 된다                  |
 | 그 외 속성            | root 로 간다                             |
@@ -189,4 +237,4 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - 스크립트가 바꾼 값(`value` prop)은 `input` 을 내지 않습니다. 높이가 그대로인 채 내용만 늘면 다음 스크롤이나 크기 변화 때 넘침을 다시 봅니다.
 - root 는 `relative flex flex-col` 이고 viewport 는 남은 높이를 받습니다(`grow`, `min-h-0`). 높이는 root 에 줍니다(`h-*`, `max-h-*`).
 - 내용 크기는 viewport 의 직접 자식마다 `ResizeObserver` 로 봅니다. 자식이 절대 위치로 viewport 밖까지 뻗는 경우는 다음 스크롤이나 크기 변화 때 맞춰집니다.
-- 스크롤 중에는 한 프레임에 한 번(`requestAnimationFrame`) viewport 의 스크롤 값만 읽고 막대 요소의 CSS 변수(`--scroll-area-thumb-offset`)만 씁니다. root 의 모양은 다시 읽지 않고, 바뀐 값만 쓰며, thumb 은 `translate` 로 움직입니다.
+- 스크롤 중에는 한 프레임에 한 번(`requestAnimationFrame`) viewport 의 스크롤 값만 읽고, 막대 요소의 CSS 변수(`--scroll-area-thumb-offset`)와 viewport 의 넘친 거리(`--scroll-area-overflow-*`, `data-overflow-*`)만 씁니다. root 의 모양은 다시 읽지 않고, 바뀐 값만 쓰며, thumb 은 `translate` 로 움직입니다.

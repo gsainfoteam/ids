@@ -20,7 +20,7 @@ export function ScrollAreaViewport({
   invariant(c, '`<ScrollArea.Viewport>` must be used inside `<ScrollArea>`.');
 
   const { area } = c;
-  const styles = scrollAreaStyle({ scrolls: c.scrolls });
+  const styles = scrollAreaStyle({ scrolls: c.scrolls, fade: c.faded });
 
   const own = {
     ...props,

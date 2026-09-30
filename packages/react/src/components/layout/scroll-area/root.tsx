@@ -11,7 +11,7 @@ import {
 
 import { PlacementContext, ScrollAreaContext } from './context';
 import { ScrollAreaCorner } from './corner';
-import { axisOf, orientationOf } from './orientation';
+import { axisOf, fadedAlong, orientationOf } from './orientation';
 import { ScrollAreaScrollbar } from './scrollbar';
 import { scrollAreaStyle } from './style';
 import { useScrollArea } from './use-scroll-area';
@@ -97,6 +97,7 @@ export function ScrollAreaRoot({
   variant = 'hover',
   size = 'standard',
   orientation,
+  fade = false,
   asChild = false,
   className,
   style,
@@ -142,8 +143,12 @@ export function ScrollAreaRoot({
     </PlacementContext>
   );
 
+  const faded = fadedAlong(fade, scrolls);
+
   const structure = (
-    <ScrollAreaContext value={{ area, variant, size, scrolls, placements: layout.placements }}>
+    <ScrollAreaContext
+      value={{ area, variant, size, scrolls, faded, placements: layout.placements }}
+    >
       {layout.bars.filter((bar) => bar.placement === 'start').map(placeBar)}
       {layout.viewport ?? <ScrollAreaViewport key="viewport">{layout.content}</ScrollAreaViewport>}
       {layout.bars.filter((bar) => bar.placement === 'end').map(placeBar)}

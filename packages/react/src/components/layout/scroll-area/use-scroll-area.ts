@@ -19,6 +19,12 @@ import {
   type Shape,
   type ThumbLayout,
 } from './geometry';
+import {
+  keepOverflowVariablesOffTheContent,
+  NO_OVERFLOW_EDGES,
+  OVERFLOW_EDGE_NAMES,
+  overflowEdgesAlong,
+} from './overflow-edges';
 import { tryCapturePointer } from '../../../utils';
 
 export type Overflow = Record<Axis, boolean>;
@@ -165,6 +171,18 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
       }
     };
 
+    const placeEdges = () => {
+      for (const axis of ['y', 'x'] as const) {
+        const edges = current[axis] ? overflowEdgesAlong(viewport, axis) : NO_OVERFLOW_EDGES;
+
+        for (const edge of ['start', 'end'] as const) {
+          const { variable, attribute } = OVERFLOW_EDGE_NAMES[axis][edge];
+          write(viewport, variable, edges[edge]);
+          viewport.toggleAttribute(attribute, edges[edge] > 0);
+        }
+      }
+    };
+
     const cornerFits = () => {
       const vertical = bars.current.get('y');
       const horizontal = bars.current.get('x');
@@ -187,11 +205,13 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
       setTabStop(needsTabStop(viewport, current));
       setCornerShown(cornerFits());
       placeBars();
+      placeEdges();
     };
 
     const paint = () => {
       frame = 0;
       placeBars();
+      placeEdges();
     };
 
     let typingFrame = 0;
@@ -222,6 +242,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
     };
     const children = new MutationObserver(observeContent);
 
+    keepOverflowVariablesOffTheContent(win);
     remeasure.current = () => {
       observeContent();
       measure();

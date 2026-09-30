@@ -17,8 +17,9 @@ const meta = {
     variant: { control: 'radio', options: ['hover', 'auto', 'always'] },
     size: { control: 'radio', options: ['standard', 'tiny'] },
     orientation: { control: 'radio', options: ['vertical', 'horizontal', 'both'] },
+    fade: { control: 'radio', options: [false, true, 'y', 'x'] },
   },
-  args: { variant: 'hover', size: 'standard', orientation: 'vertical' },
+  args: { variant: 'hover', size: 'standard', orientation: 'vertical', fade: false },
 } satisfies Meta<typeof ScrollArea>;
 
 export default meta;
@@ -89,6 +90,15 @@ const scrollbarOf = (root: Element, orientation: 'vertical' | 'horizontal' = 've
   root.querySelector<HTMLElement>(
     `[data-scroll-area-scrollbar][data-orientation="${orientation}"]`,
   )!;
+
+const CLEAR_OF_BOTH_EDGES = 120;
+
+const startClearOfBothEdges = (viewport: HTMLElement | null) => {
+  if (!viewport) return;
+
+  const towardTheEnd = getComputedStyle(viewport).direction === 'rtl' ? -1 : 1;
+  viewport.scrollTo({ top: CLEAR_OF_BOTH_EDGES, left: CLEAR_OF_BOTH_EDGES * towardTheEnd });
+};
 
 export const Playground: Story = {
   render: (args) => (
@@ -183,6 +193,49 @@ export const Gallery: Story = {
             <div className="concentric-p-4 h-56 w-64 border border-(--ids-color-border) p-0">
               <Grid />
             </div>
+          </ScrollArea>
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Fade"
+        description="내용이 더 남은 가장자리만 흐립니다. 흐린 폭은 가려진 거리만큼 자라 standard 24px, tiny 16px 에서 멈춥니다. 여기서는 모두 양쪽 끝에서 떨어진 자리에서 시작합니다."
+      >
+        <Showcase.Row label="vertical">
+          <ScrollArea fade variant="always" className={frame}>
+            <ScrollArea.Viewport ref={startClearOfBothEdges}>
+              <Text />
+            </ScrollArea.Viewport>
+          </ScrollArea>
+        </Showcase.Row>
+        <Showcase.Row label="horizontal">
+          <ScrollArea fade variant="always" orientation="horizontal" className="w-72">
+            <ScrollArea.Viewport ref={startClearOfBothEdges}>
+              <Wide />
+            </ScrollArea.Viewport>
+          </ScrollArea>
+        </Showcase.Row>
+        <Showcase.Row label="both">
+          <ScrollArea fade variant="always" orientation="both" className={frame}>
+            <ScrollArea.Viewport ref={startClearOfBothEdges}>
+              <Grid />
+            </ScrollArea.Viewport>
+          </ScrollArea>
+        </Showcase.Row>
+        <Showcase.Row label="rtl">
+          <div dir="rtl">
+            <ScrollArea fade variant="always" orientation="both" className={frame}>
+              <ScrollArea.Viewport ref={startClearOfBothEdges}>
+                <Grid />
+              </ScrollArea.Viewport>
+            </ScrollArea>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="tiny">
+          <ScrollArea fade size="tiny" variant="always" className={frame}>
+            <ScrollArea.Viewport ref={startClearOfBothEdges}>
+              <Text />
+            </ScrollArea.Viewport>
           </ScrollArea>
         </Showcase.Row>
       </Showcase.Section>
@@ -327,6 +380,66 @@ export const ListboxAsViewport: Story = {
 
     listbox.scrollTop = listbox.scrollHeight;
     await waitFor(() => expect(listbox.scrollTop).toBeGreaterThan(0));
+  },
+};
+
+export const FadeEdges: Story = {
+  render: () => (
+    <ScrollArea fade className={frame}>
+      <Text />
+    </ScrollArea>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`fade` 는 내용이 더 남은 가장자리만 흐립니다. 맨 위에서는 위가 선명하고, 내리면 위가 흐려지고, 끝에 닿으면 아래가 선명해집니다. viewport 의 `data-overflow-y-start`, `data-overflow-y-end` 도 같은 때 붙고 떨어집니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const viewport = () => canvasElement.querySelector<HTMLElement>('[data-scroll-area-viewport]')!;
+    await waitFor(() => expect(viewport()).toHaveAttribute('data-overflow-y-end'));
+    await expect(viewport()).not.toHaveAttribute('data-overflow-y-start');
+
+    viewport().scrollTop = CLEAR_OF_BOTH_EDGES;
+    await waitFor(() => expect(viewport()).toHaveAttribute('data-overflow-y-start'));
+    await expect(viewport()).toHaveAttribute('data-overflow-y-end');
+
+    viewport().scrollTop = viewport().scrollHeight;
+    await waitFor(() => expect(viewport()).not.toHaveAttribute('data-overflow-y-end'));
+    await expect(viewport()).toHaveAttribute('data-overflow-y-start');
+  },
+};
+
+export const OverflowEdges: Story = {
+  render: () => (
+    <div className="group/panel rounded-standard text-body-b3-regular flex h-56 w-64 flex-col border border-(--ids-color-border)">
+      <div className="text-body-b3-medium border-b border-transparent px-3 py-2 group-has-data-overflow-y-start/panel:border-(--ids-color-border)">
+        공지
+      </div>
+      <ScrollArea className="min-h-0 grow rounded-b-[inherit]">
+        <Text />
+      </ScrollArea>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'viewport 의 `data-overflow-*` 속성과 `--scroll-area-overflow-*` 변수는 `fade` 없이도 붙습니다. 여기서는 위로 가려진 내용이 생기면 머리 아래에 선을 긋습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const viewport = () => canvasElement.querySelector<HTMLElement>('[data-scroll-area-viewport]')!;
+    const rule = () => getComputedStyle(canvas.getByText('공지')).borderBottomColor;
+    await waitFor(() => expect(viewport()).toHaveAttribute('data-overflow-y-end'));
+    const clear = rule();
+
+    viewport().scrollTop = CLEAR_OF_BOTH_EDGES;
+    await waitFor(() => expect(viewport()).toHaveAttribute('data-overflow-y-start'));
+    await expect(rule()).not.toBe(clear);
   },
 };
 

@@ -40,8 +40,8 @@ export const scrollAreaStyle = tv({
       },
     } satisfies Record<ScrollArea.Variant, object>,
     size: {
-      standard: { root: '[--scroll-area-thickness:8px]' },
-      tiny: { root: '[--scroll-area-thickness:6px]' },
+      standard: { root: '[--scroll-area-thickness:8px] [--scroll-area-fade-size:24px]' },
+      tiny: { root: '[--scroll-area-thickness:6px] [--scroll-area-fade-size:16px]' },
     } satisfies Record<IdsSize, object>,
     scrolls: {
       vertical: { viewport: 'overflow-x-hidden overflow-y-auto' },
@@ -79,6 +79,22 @@ export const scrollAreaStyle = tv({
       start: { corner: 'top-(--scroll-area-gap)' },
       end: { corner: 'bottom-(--scroll-area-gap)' },
     } satisfies Record<Placement, object>,
+    fade: {
+      vertical: {
+        viewport:
+          '[mask-image:linear-gradient(to_bottom,transparent,#000_min(var(--scroll-area-fade-size),var(--scroll-area-overflow-y-start,0px)),#000_calc(100%-min(var(--scroll-area-fade-size),var(--scroll-area-overflow-y-end,0px))),transparent)]',
+      },
+      horizontal: {
+        viewport:
+          '[mask-image:linear-gradient(var(--scroll-area-fade-x-direction),transparent,#000_min(var(--scroll-area-fade-size),var(--scroll-area-overflow-x-start,0px)),#000_calc(100%-min(var(--scroll-area-fade-size),var(--scroll-area-overflow-x-end,0px))),transparent)]',
+      },
+      both: {
+        viewport: [
+          '[mask-image:linear-gradient(to_bottom,transparent,#000_min(var(--scroll-area-fade-size),var(--scroll-area-overflow-y-start,0px)),#000_calc(100%-min(var(--scroll-area-fade-size),var(--scroll-area-overflow-y-end,0px))),transparent),linear-gradient(var(--scroll-area-fade-x-direction),transparent,#000_min(var(--scroll-area-fade-size),var(--scroll-area-overflow-x-start,0px)),#000_calc(100%-min(var(--scroll-area-fade-size),var(--scroll-area-overflow-x-end,0px))),transparent)]',
+          '[mask-composite:intersect]',
+        ],
+      },
+    } satisfies Record<ScrollArea.Orientation, object>,
     occupied: {
       true: { corner: 'size-auto rounded-none bg-transparent' },
       false: {},
@@ -89,6 +105,17 @@ export const scrollAreaStyle = tv({
     { axis: 'y', placement: 'start', class: { scrollbar: 'start-(--scroll-area-gap)' } },
     { axis: 'x', placement: 'end', class: { scrollbar: 'bottom-(--scroll-area-gap)' } },
     { axis: 'x', placement: 'start', class: { scrollbar: 'top-(--scroll-area-gap)' } },
+    {
+      fade: ['vertical', 'horizontal', 'both'],
+      class: { viewport: 'data-tab-stop:focus-visible:mask-none' },
+    },
+    {
+      fade: ['horizontal', 'both'],
+      class: {
+        viewport:
+          '[--scroll-area-fade-x-direction:to_right] rtl:[--scroll-area-fade-x-direction:to_left]',
+      },
+    },
     { occupied: true, vertical: 'end', class: { corner: 'end-0' } },
     { occupied: true, vertical: 'start', class: { corner: 'start-0' } },
     { occupied: true, horizontal: 'end', class: { corner: 'bottom-0' } },

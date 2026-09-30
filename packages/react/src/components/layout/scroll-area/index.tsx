@@ -18,6 +18,7 @@ export namespace ScrollArea {
   export type Variant = 'auto' | 'always' | 'hover';
   export type Orientation = 'vertical' | 'horizontal' | 'both';
   export type ScrollbarOrientation = 'vertical' | 'horizontal';
+  export type Fade = boolean | 'x' | 'y';
 
   export type State = {
     variant: Variant;
@@ -34,6 +35,7 @@ export namespace ScrollArea {
     variant?: Variant;
     size?: IdsSize;
     orientation?: Orientation;
+    fade?: Fade;
     asChild?: boolean;
     className?: StateValue<string | undefined, State>;
     style?: StateValue<CSSProperties | undefined, State>;

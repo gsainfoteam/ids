@@ -1,8 +1,9 @@
 import { type ReactElement } from 'react';
 
 import { Time } from '@internationalized/date';
+import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
-import { afterEach, expect, test, vi } from 'vitest';
+import { afterEach, expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, userEvent, server } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
@@ -613,6 +614,340 @@ test('dev warnings: parts outside ScrollArea, two bars for one orientation, mixe
       </ScrollArea>,
     ),
   ).toThrow(/either inside/);
+});
+
+const OVERFLOW_EDGES = ['y-start', 'y-end', 'x-start', 'x-end'] as const;
+
+const overflowEdges = (element: Element) => {
+  const style = getComputedStyle(element);
+  return Object.fromEntries(
+    OVERFLOW_EDGES.map((edge) => [
+      edge,
+      parseFloat(style.getPropertyValue(`--scroll-area-overflow-${edge}`)),
+    ]),
+  );
+};
+
+const markedEdges = (element: Element) =>
+  OVERFLOW_EDGES.filter((edge) => element.hasAttribute(`data-overflow-${edge}`));
+
+const fadeLengths = (element: Element) =>
+  [
+    ...getComputedStyle(element).maskImage.matchAll(/calc\(100% - ([\d.]+)px\)|([\d.]+)px|100%/g),
+  ].map(([, fromTheEnd, fromTheStart]) => Number(fromTheEnd ?? fromTheStart ?? 0));
+
+const gradientsIn = (element: Element) =>
+  getComputedStyle(element).maskImage.match(/linear-gradient\(/g)?.length ?? 0;
+
+test('overflow edges: the viewport carries how far the content runs past the top and the bottom', async () => {
+  await render(
+    <ScrollArea className="h-40 w-48">
+      <Lines />
+    </ScrollArea>,
+  );
+  const view = viewport();
+  const range = view.scrollHeight - view.clientHeight;
+  expect(range).toBeGreaterThan(600);
+
+  await expect
+    .poll(() => overflowEdges(view))
+    .toEqual({ 'y-start': 0, 'y-end': range, 'x-start': 0, 'x-end': 0 });
+  expect(markedEdges(view)).toEqual(['y-end']);
+
+  view.scrollTop = 200;
+  await expect
+    .poll(() => overflowEdges(view))
+    .toEqual({ 'y-start': 200, 'y-end': range - 200, 'x-start': 0, 'x-end': 0 });
+  expect(markedEdges(view)).toEqual(['y-start', 'y-end']);
+
+  view.scrollTop = range;
+  await expect
+    .poll(() => overflowEdges(view))
+    .toEqual({ 'y-start': range, 'y-end': 0, 'x-start': 0, 'x-end': 0 });
+  expect(markedEdges(view)).toEqual(['y-start']);
+});
+
+test('overflow edges: the x axis is logical, left to right in LTR and right to left in RTL', async () => {
+  const screen = await render(
+    <div className="flex flex-col gap-4">
+      <ScrollArea orientation="horizontal" className="w-48" data-testid="ltr">
+        <div className="h-10 w-[600px]" />
+      </ScrollArea>
+      <div dir="rtl">
+        <ScrollArea orientation="horizontal" className="w-48" data-testid="rtl">
+          <div className="h-10 w-[600px]" />
+        </ScrollArea>
+      </div>
+    </div>,
+  );
+  const viewportOf = (id: string) =>
+    q('[data-scroll-area-viewport]', screen.getByTestId(id).element());
+  const [ltr, rtl] = [viewportOf('ltr'), viewportOf('rtl')];
+
+  for (const view of [ltr, rtl]) {
+    await expect
+      .poll(() => overflowEdges(view))
+      .toEqual({ 'y-start': 0, 'y-end': 0, 'x-start': 0, 'x-end': 408 });
+    expect(markedEdges(view)).toEqual(['x-end']);
+  }
+
+  ltr.scrollLeft = 100;
+  rtl.scrollLeft = -100;
+  for (const view of [ltr, rtl])
+    await expect
+      .poll(() => overflowEdges(view))
+      .toEqual({ 'y-start': 0, 'y-end': 0, 'x-start': 100, 'x-end': 308 });
+
+  ltr.scrollLeft = 408;
+  rtl.scrollLeft = -408;
+  for (const view of [ltr, rtl]) {
+    await expect
+      .poll(() => overflowEdges(view))
+      .toEqual({ 'y-start': 0, 'y-end': 0, 'x-start': 408, 'x-end': 0 });
+    expect(markedEdges(view)).toEqual(['x-start']);
+  }
+});
+
+test('overflow edges: an axis that does not scroll stays at 0 even when its content is wider', async () => {
+  await render(
+    <ScrollArea className="h-40 w-48">
+      <div className="h-[400px] w-[600px]" />
+    </ScrollArea>,
+  );
+  const view = viewport();
+  expect(view.scrollWidth).toBeGreaterThan(view.clientWidth);
+  await expect
+    .poll(() => overflowEdges(view))
+    .toEqual({ 'y-start': 0, 'y-end': 240, 'x-start': 0, 'x-end': 0 });
+  expect(markedEdges(view)).toEqual(['y-end']);
+});
+
+test('overflow edges: the content does not inherit the distances, so a scroll frame restyles only the viewport', async () => {
+  await render(
+    <ScrollArea className="h-40 w-48">
+      <p data-testid="line">줄</p>
+      <Lines />
+    </ScrollArea>,
+  );
+  const view = viewport();
+  await expect.poll(() => overflowEdges(view)['y-end']).toBeGreaterThan(0);
+
+  const line = q('[data-testid="line"]');
+  expect(getComputedStyle(line).getPropertyValue('--scroll-area-overflow-y-end')).toBe('0px');
+});
+
+test('fade: the mask goes only on the axes asked for that also scroll, and never on the bars', async () => {
+  const screen = await render(
+    <div className="flex flex-wrap gap-2">
+      <ScrollArea orientation="both" className="size-32" data-testid="off">
+        <div className="size-[400px]" />
+      </ScrollArea>
+      <ScrollArea fade="y" orientation="both" className="size-32" data-testid="y">
+        <div className="size-[400px]" />
+      </ScrollArea>
+      <ScrollArea fade="x" orientation="both" className="size-32" data-testid="x">
+        <div className="size-[400px]" />
+      </ScrollArea>
+      <ScrollArea fade orientation="both" className="size-32" data-testid="both">
+        <div className="size-[400px]" />
+      </ScrollArea>
+      <ScrollArea fade className="size-32" data-testid="vertical">
+        <div className="size-[400px]" />
+      </ScrollArea>
+      <ScrollArea fade="x" className="size-32" data-testid="x-on-vertical">
+        <div className="size-[400px]" />
+      </ScrollArea>
+    </div>,
+  );
+  const viewportOf = (id: string) =>
+    q('[data-scroll-area-viewport]', screen.getByTestId(id).element());
+
+  expect(getComputedStyle(viewportOf('off')).maskImage).toBe('none');
+  expect(getComputedStyle(viewportOf('x-on-vertical')).maskImage).toBe('none');
+
+  expect(gradientsIn(viewportOf('y'))).toBe(1);
+  expect(getComputedStyle(viewportOf('y')).maskImage).not.toMatch(/to (right|left)/);
+  expect(gradientsIn(viewportOf('vertical'))).toBe(1);
+  expect(getComputedStyle(viewportOf('vertical')).maskImage).not.toMatch(/to (right|left)/);
+
+  expect(gradientsIn(viewportOf('x'))).toBe(1);
+  expect(getComputedStyle(viewportOf('x')).maskImage).toMatch(/to right/);
+
+  expect(gradientsIn(viewportOf('both'))).toBe(2);
+  expect(getComputedStyle(viewportOf('both')).maskComposite).toMatch(/intersect/);
+
+  const both = screen.getByTestId('both').element();
+  for (const part of both.querySelectorAll(
+    '[data-scroll-area-scrollbar], [data-scroll-area-thumb], [data-scroll-area-corner]',
+  )) {
+    expect(part.closest('[data-scroll-area-viewport]')).toBeNull();
+    expect(getComputedStyle(part).maskImage).toBe('none');
+  }
+  expect(getComputedStyle(both).maskImage).toBe('none');
+});
+
+test('fade: each edge fades by the distance hidden past it, up to the fade size', async () => {
+  const screen = await render(
+    <div className="flex gap-4">
+      <ScrollArea fade className="h-40 w-48" data-testid="standard">
+        <Lines />
+      </ScrollArea>
+      <ScrollArea fade size="tiny" className="h-40 w-48" data-testid="tiny">
+        <Lines />
+      </ScrollArea>
+      <ScrollArea fade className="h-40 w-48 [--scroll-area-fade-size:40px]" data-testid="custom">
+        <Lines />
+      </ScrollArea>
+    </div>,
+  );
+  const viewportOf = (id: string) =>
+    q('[data-scroll-area-viewport]', screen.getByTestId(id).element());
+  const views = ['standard', 'tiny', 'custom'].map(viewportOf);
+
+  await expect
+    .poll(() => views.map(fadeLengths))
+    .toEqual([
+      [0, 24],
+      [0, 16],
+      [0, 40],
+    ]);
+
+  for (const view of views) view.scrollTop = 10;
+  await expect
+    .poll(() => views.map(fadeLengths))
+    .toEqual([
+      [10, 24],
+      [10, 16],
+      [10, 40],
+    ]);
+
+  for (const view of views) view.scrollTop = 100;
+  await expect
+    .poll(() => views.map(fadeLengths))
+    .toEqual([
+      [24, 24],
+      [16, 16],
+      [40, 40],
+    ]);
+
+  for (const view of views) view.scrollTop = view.scrollHeight - view.clientHeight - 6;
+  await expect
+    .poll(() => views.map(fadeLengths))
+    .toEqual([
+      [24, 6],
+      [16, 6],
+      [40, 6],
+    ]);
+});
+
+test('fade: in RTL the x gradient runs from the right, where the start is', async () => {
+  const screen = await render(
+    <div dir="rtl">
+      <ScrollArea fade orientation="horizontal" className="w-48" data-testid="area">
+        <div className="h-10 w-[600px]" />
+      </ScrollArea>
+    </div>,
+  );
+  const view = q('[data-scroll-area-viewport]', screen.getByTestId('area').element());
+  expect(getComputedStyle(view).maskImage).toMatch(/to left/);
+  await expect.poll(() => fadeLengths(view)).toEqual([0, 24]);
+
+  view.scrollLeft = -10;
+  await expect.poll(() => fadeLengths(view)).toEqual([10, 24]);
+
+  view.scrollLeft = -(view.scrollWidth - view.clientWidth);
+  await expect.poll(() => fadeLengths(view)).toEqual([24, 0]);
+});
+
+test('fade: a tab-stop viewport drops the mask while its focus ring shows, since the mask would cut it', async () => {
+  const screen = await render(
+    <>
+      <button type="button">앞</button>
+      <ScrollArea fade className="h-40 w-48">
+        <Lines />
+      </ScrollArea>
+    </>,
+  );
+  const view = viewport();
+  await expect.element(view).toHaveAttribute('tabindex', '0');
+  expect(gradientsIn(view)).toBe(1);
+
+  await userEvent.click(screen.getByRole('button', { name: '앞' }));
+  await userEvent.keyboard('{Tab}');
+  expect(document.activeElement).toBe(view);
+  expect(getComputedStyle(view).maskImage).toBe('none');
+  expect(getComputedStyle(view).boxShadow).not.toBe('none');
+
+  await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+  expect(gradientsIn(view)).toBe(1);
+});
+
+test('fade: a textarea viewport fades the lines typed past its top', async () => {
+  const screen = await render(
+    <ScrollArea fade className="h-24 w-48">
+      <ScrollArea.Viewport asChild>
+        <textarea aria-label="메모" className="resize-none leading-5" />
+      </ScrollArea.Viewport>
+    </ScrollArea>,
+  );
+  const textarea = screen.getByRole('textbox', { name: '메모' });
+  const input = textarea.element() as HTMLTextAreaElement;
+  expect(markedEdges(input)).toEqual([]);
+
+  await userEvent.click(textarea);
+  await userEvent.keyboard('1{Enter}2{Enter}3{Enter}4{Enter}5{Enter}6{Enter}7{Enter}8');
+  await expect.poll(() => markedEdges(input)).toContain('y-start');
+  expect(fadeLengths(input)[0]).toBe(24);
+
+  input.scrollTop = 0;
+  await expect.poll(() => markedEdges(input)).toEqual(['y-end']);
+  expect(fadeLengths(input)).toEqual([0, 24]);
+});
+
+test('fade SSR: the server HTML carries the mask but no distances, so nothing is faded before measuring', () => {
+  const doc = new DOMParser().parseFromString(
+    renderToString(
+      <ScrollArea fade orientation="both" className="h-40">
+        <Lines />
+      </ScrollArea>,
+    ),
+    'text/html',
+  );
+  const view = doc.querySelector('[data-scroll-area-viewport]')!;
+  expect(view.className).toMatch(/mask-image/);
+  expect(view.hasAttribute('style')).toBe(false);
+  expect(OVERFLOW_EDGES.filter((edge) => view.hasAttribute(`data-overflow-${edge}`))).toEqual([]);
+  expect(doc.querySelector('[data-scroll-area]')!.className).toMatch(
+    /\[--scroll-area-fade-size:24px\]/,
+  );
+});
+
+test('fade hydration: the first client render matches the server, then the distances arrive', async () => {
+  const area = (
+    <ScrollArea fade className="h-40 w-48">
+      <Lines />
+    </ScrollArea>
+  );
+  const host = document.createElement('div');
+  host.innerHTML = renderToString(area);
+  document.body.append(host);
+  const view = q('[data-scroll-area-viewport]', host);
+  expect(markedEdges(view)).toEqual([]);
+
+  const errors = vi.spyOn(console, 'error');
+  const recoverable: unknown[] = [];
+  const root = hydrateRoot(host, area, {
+    onRecoverableError: (error) => recoverable.push(error),
+  });
+  onTestFinished(() => {
+    root.unmount();
+    host.remove();
+  });
+
+  await expect.poll(() => markedEdges(view)).toEqual(['y-end']);
+  expect(q('[data-scroll-area-viewport]', host)).toBe(view);
+  expect(recoverable).toEqual([]);
+  expect(errors.mock.calls).toEqual([]);
 });
 
 test('adopted: a Select listbox is its own viewport inside the popup, both clear of the 14px corner', async () => {
