@@ -28,6 +28,7 @@ export function TableRoot({
     <TableContext value={{ styles, highlightOnHover }}>
       <ScrollArea
         orientation="both"
+        fade="x"
         size={size}
         data-table=""
         data-variant={variant}

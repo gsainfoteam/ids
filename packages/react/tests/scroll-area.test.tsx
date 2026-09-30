@@ -15,6 +15,7 @@ import {
   Popover,
   ScrollArea,
   Select,
+  Table,
   TextArea,
   TimePicker,
 } from '../src';
@@ -1290,6 +1291,45 @@ test('adopted: a TimePicker column fades its top and bottom and keeps the centre
   expect(document.activeElement).toBe(column);
   expect(getComputedStyle(column).maskImage).toBe('none');
   expect(getComputedStyle(column).boxShadow).not.toBe('none');
+});
+
+test('adopted: a Table fades only its left and right, so its sticky header never fades', async () => {
+  const columns = Array.from({ length: 8 }, (_, index) => `열 ${index + 1}`);
+  const screen = await render(
+    <Table stickyHeader className="max-h-40 w-72">
+      <Table.Header>
+        <Table.Row>
+          {columns.map((column) => (
+            <Table.Head key={column} className="min-w-28">
+              {column}
+            </Table.Head>
+          ))}
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {Array.from({ length: 20 }, (_, row) => (
+          <Table.Row key={row}>
+            {columns.map((column) => (
+              <Table.Cell key={column}>
+                {row + 1}행 {column}
+              </Table.Cell>
+            ))}
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>,
+  );
+  const view = q('[data-scroll-area-viewport]', screen.container);
+  await expect.poll(() => markedEdges(view)).toEqual(['y-end', 'x-end']);
+  expect(gradientsIn(view)).toBe(1);
+  expect(getComputedStyle(view).maskImage).toMatch(/to right/);
+  await expect.poll(() => fadeLengths(view)).toEqual([0, LIST_FADE]);
+
+  view.scrollTop = 80;
+  view.scrollLeft = 80;
+  await expect.poll(() => markedEdges(view)).toEqual(['y-start', 'y-end', 'x-start', 'x-end']);
+  expect(gradientsIn(view)).toBe(1);
+  expect(fadeLengths(view)).toEqual([LIST_FADE, LIST_FADE]);
 });
 
 test('adopted: a long Popover scrolls inside while its arrow still sticks out', async () => {

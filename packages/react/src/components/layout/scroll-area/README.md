@@ -231,6 +231,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - Dialog, Drawer, Popover 의 본문. Popover 의 화살표는 ScrollArea 밖에 둡니다
 - TextArea 의 textarea(`Viewport asChild`)와 크기 조절 손잡이(내용을 담은 `Corner`)
 - TimePicker 의 컬럼(`size="tiny"`, listbox 가 `Viewport asChild`, `fade="y"`)
+- Table 과 DataTable 의 표(`orientation="both"`, `fade="x"`). 붙는 머리글이 viewport 안에 있어 위아래는 흐리지 않습니다
 
 ## 알아둘 것
 

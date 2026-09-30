@@ -5,7 +5,7 @@
 - **TanStack 그대로.** `columns` 와 `data` 를 받고, 열 정의, 상태 모양(`SortingState`, `RowSelectionState`, `PaginationState`), 옵션 이름(`enableSorting`, `manualPagination`, `getRowId`)이 TanStack 과 같습니다.
 - **기능은 켜는 것만.** 정렬은 기본으로 켜져 있고, 선택(`enableRowSelection`), 페이지(`enablePagination`), 열 너비(`enableColumnResizing`)는 켤 때만 붙습니다.
 - **접근성.** 정렬 머리글은 버튼이고 `th` 에 `aria-sort`, 선택은 이름 있는 체크박스, 너비 핸들은 키보드로 움직이는 `separator`, 로딩은 `aria-busy` 입니다.
-- **Table 의 모양.** `variant`, `size`, `striped`, `highlightOnHover`, `stickyHeader` 는 `Table` 과 같습니다.
+- **Table 의 모양.** `variant`, `size`, `striped`, `highlightOnHover`, `stickyHeader` 는 `Table` 과 같습니다. 가로로 넘치면 열이 더 남은 가장자리가 흐려지는 것도 Table 과 같습니다.
 
 ```tsx
 import { DataTable } from '@gsainfoteam/ids-react';

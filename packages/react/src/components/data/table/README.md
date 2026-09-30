@@ -126,6 +126,8 @@ import { Table } from '@gsainfoteam/ids-react';
 - `stickyHeader` 는 `<thead>` 를 `sticky top-0` 으로 붙입니다. 머리글 배경이 밑으로 지나가는 행을 가립니다.
 - 넘치는데 안에 포커스 받을 요소가 없으면 스크롤 영역이 Tab 에 멈춰, 방향키로 표를 넘겨 볼 수 있습니다.
 - 막대는 ScrollArea 의 `hover` 방식입니다. 크기는 표의 `size` 를 따릅니다.
+- 가로로 넘치면 왼쪽이나 오른쪽에 열이 더 남은 가장자리를 흐립니다([ScrollArea `fade="x"`](../../layout/scroll-area/README.md#가장자리-흐림), `standard` 24px, `tiny` 16px). RTL 에서는 좌우가 바뀝니다.
+- 위아래는 흐리지 않습니다. 붙는 머리글이 같은 스크롤 영역 안에 있어서, 위를 흐리면 머리글이 흐려집니다.
 
 ## 고정 폭 열
 
