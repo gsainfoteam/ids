@@ -22,16 +22,16 @@
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
 | [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                                  | IconButton, IconToggle                                                                                                                                                                                                |
 | [`image-status.ts`](#image-statusts)             | `<img>` 를 불러오는 상태와 hydration 전에 끝난 이미지 읽기                            | Avatar, Image                                                                                                                                                                                                         |
-| [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
+| [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Image, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
 | [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
 | [`motion.ts`](#motionts)                         | 움직임 줄이기 설정 읽기, `--ids-motion-*` 토큰의 ms, 시트의 easing                    | Image, `zoom-pan/` |
-| [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어                  | Alert, `field-popup/`                                                                                                                                                                                                 |
+| [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어                  | Alert, Image, `field-popup/` |
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `surface.ts`                                                                                                                                                                                                  |
 | [`resize-handle/`](./resize-handle/README.md)    | 크기 조절 손잡이의 키 표, separator ARIA, 포인터 끌기, 클래스 조각, 모서리 손잡이     | DataTable, Resizable, Splitter, TextArea                                                                                                                                                                                                   |
 | [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)                           | Select, ChipField, Menu                                                                                                                                                                                               |
 | [`slider-surface.ts`](#slider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                                                 | Slider, ColorPicker                                                                                                                                                                                                   |
-| [`slides/`](#slides)                             | Embla Carousel 을 감싼 슬라이드 엔진, 장마다의 ARIA, 키, 넘김 알림                    | Carousel, (예정) Image.Viewer                                                                                                                                                                                         |
+| [`slides/`](#slides)                             | Embla Carousel 을 감싼 슬라이드 엔진, 장마다의 ARIA, 키, 넘김 알림                    | Carousel, Image |
 | [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Image, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                 |
 | [`status-palette.ts`](#status-palettets)         | 상태 알림의 color scheme, 기본 아이콘, 알리는 강도                                    | Alert                                                                                                                                                                                                                 |
 | [`surface.ts`](#surfacets)                       | 통째로 누르는 카드와 목록 행의 hook                                                   | Card, Item, Chip                                                                                                                                                                                                      |
@@ -41,7 +41,7 @@
 | [`toggle-surface.ts`](#toggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                                     | Toggle, IconToggle                                                                                                                                                                                                    |
 | [`translate.ts`](#translatets)                   | `IdsProvider` 의 `translate`, `locale` context 와 `useTranslate`, `useProviderLocale` | `IdsProvider`, 문구를 그리는 모든 컴포넌트                                                                                                                                                                            |
 | [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook                             | Checkbox, Radio                                                                                                                                                                                                       |
-| [`zoom-pan/`](./zoom-pan/README.md)              | 그림의 확대, 이동, 관성, 아래로 쓸어 닫기 제스처                                      | Image 의 뷰어(만드는 중)                                                                                                                                                                                              |
+| [`zoom-pan/`](./zoom-pan/README.md)              | 그림의 확대, 이동, 관성, 아래로 쓸어 닫기 제스처                                      | Image |
 
 ## arc.tsx
 
@@ -583,7 +583,7 @@ useImageSettledBeforeMount(imageRef, current, report);
 
 ### 쓰는 곳
 
-- 위젯의 키: Group 의 roving focus(ToggleGroup, Tabs), RadioGroup, Rating, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape, Carousel([slides/](#slides) 의 `moveWithKeys`)
+- 위젯의 키: Group 의 roving focus(ToggleGroup, Tabs), RadioGroup, Rating, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape, Carousel([slides/](#slides) 의 `moveWithKeys`), Image 의 뷰어(←/→ 는 `dir` 로 뒤집고, `Home` `End`)
 - [pressable.ts](#pressablets) 와 Button 의 Enter, Space
 - [text-control](./text-control/README.md) 의 Escape, [temporal-field](./temporal-field/README.md) 의 입력과 trigger
 - [overlay](./overlay/README.md) 의 레이어 스택: `keyWithModifiers('Escape')`, `isComposingKey`
@@ -862,7 +862,7 @@ thumb: [
 ### 쓰는 곳
 
 - Carousel: 모두. `root.tsx` 가 `useSlides`, `moveWithKeys`, `SlidesAnnouncer` 를, `style.ts` 가 `slidesLayout` 을 씁니다.
-- Image.Viewer(예정): 전체 화면 레이어 안에서 `useSlides`, `SlidesAnnouncer`(`counter`), `slidesLayout`. 키는 자기 `keyHandler` 로 받으므로 `moveWithKeys` 를 싣지 않습니다.
+- Image 의 뷰어(`components/data/image/viewer-layer.tsx`): 전체 화면 레이어 안에서 `useSlides`, `SlidesAnnouncer`, `slidesLayout`. "2 / 6" 은 `Image.Counter` 가 그리므로 `counter` 를 켜지 않습니다. 확대 중에는 방향키가 사진을 옮기므로 키는 자기 `keyHandler` 로 받고 `moveWithKeys` 를 싣지 않습니다. 확대 중에는 `watchDrag` 가 끌기를 막고, 두 번째 손가락이 닿거나 아래로 쓸기 시작하면 `cancelDrag()` 로 끌던 트랙을 돌려놓습니다.
 
 ### 쓰는 법
 

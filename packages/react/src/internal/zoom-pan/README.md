@@ -2,56 +2,48 @@
 
 그림 하나를 확대하고, 끌어서 옮기고, 아래로 쓸어 닫는 제스처 엔진입니다. 휠, 두 손가락, 두 번 탭(클릭), 키보드로 배율을 바꿉니다. 확대한 그림은 가장자리까지만 끌리고, 빠르게 놓으면 관성으로 미끄러집니다. 배율 1 에서 아래로 쓸면 Drawer 와 같은 기준으로 닫습니다.
 
-| 파일                     | 내용                                                                             |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| [`engine.ts`](#enginets) | 요소에 붙는 엔진 `createZoomPan`. pointer, wheel, Safari gesture, 키, 애니메이션 |
-| [`math.ts`](#mathts)     | 순수 계산. 이동 한계, 한 점을 기준으로 한 확대, 핀치, 휠 배율, 관성              |
+| 파일                                 | 내용                                                                             |
+| ------------------------------------ | -------------------------------------------------------------------------------- |
+| [`engine.ts`](#enginets)             | 요소에 붙는 엔진 `createZoomPan`. pointer, wheel, Safari gesture, 키, 애니메이션 |
+| [`use-zoom-pan.ts`](#use-zoom-pants) | React hook `useZoomPan`. 두 요소에 엔진을 붙이고 배율을 state 로 제어한다        |
+| [`math.ts`](#mathts)                 | 순수 계산. 이동 한계, 한 점을 기준으로 한 확대, 핀치, 휠 배율, 관성              |
 
 ## 쓰는 곳
 
-- Image 의 뷰어가 슬라이드마다 씁니다. 지금 보는 장에만 붙이고 나머지에서는 뗍니다. 뷰어는 아직 만드는 중이라 지금은 `tests/zoom-pan.test.tsx` 만 씁니다.
+- Image 의 뷰어(`components/data/image/viewer-layer.tsx`)가 `useZoomPan` 으로 지금 보는 장의 영역과 상자에 붙입니다. 장을 넘기면 앞 장에서 떼고(그 장의 배율은 1 로 돌아간다) 새 장에 붙습니다.
+- 뷰어는 배율을 Image.Group 의 `zoom` 으로 제어하고, 확대 중에는 슬라이드 트랙이 끌리지 않게 `watchDrag` 에서 `isZoomed()` 를 묻습니다. 쓸어 닫기의 `presence` 는 대화상자와 배경막의 `--image-viewer-presence` 로 칠합니다.
 
 ## 쓰는 법
 
 ```tsx
-const [zoomPan, setZoomPan] = useState<ZoomPan | null>(null);
-const latest = useRef({ settings, scale }); // 렌더마다 layout effect 에서 새로 쓴다
+const [area, setArea] = useState<HTMLElement | null>(null);
+const [box, setBox] = useState<HTMLElement | null>(null);
 
-useLayoutEffect(() => {
-  if (!area || !image || !current) return;
-
-  const created = createZoomPan(area, image, {
-    scale: latest.current.scale, // 붙일 때의 배율
-    read: () => latest.current.settings, // 쓸 때마다 최신 설정을 읽는다
-  });
-  setZoomPan(created);
-  return () => {
-    created.dispose(); // 리스너를 떼고 transform 과 영역의 스타일을 되돌린다
-    setZoomPan(null);
-  };
-}, [area, image, current]);
-
-useLayoutEffect(() => {
-  zoomPan?.follow(scale); // 제어하는 배율. 다르면 가운데를 기준으로 옮겨 간다
-}, [zoomPan, scale, commits]);
-
-const settings: ZoomPanSettings = {
+const zoomPan = useZoomPan({
+  element: area, // 제스처를 받는 영역
+  content: box, // 확대되는 상자. 둘 다 있어야 붙는다
+  scale: zoom, // 제어하는 배율. 없으면 defaultScale(1)에서 시작
+  onScaleChange: setZoom, // 제스처나 버튼이 끝난 배율
   maxScale: 4,
-  onCommit: (next) => setScale(next), // 제스처가 끝난 배율. 렌더를 한 번 더 부른다(commits)
+  disabled: false, // true 면 엔진을 떼고 transform 을 되돌린다
   onSwipe: (presence, dragging) => paintBackdrop(presence, dragging),
   onSwipeClose: () => setOpen(false),
-  onPinchStart: () => cancelTheTrackDrag(),
-};
+  onPinchStart: () => slides.cancelDrag(),
+});
 
-<div ref={setArea} onKeyDown={(event) => zoomPan?.onKeyDown(event)}>
-  <img ref={setImage} className="max-h-full max-w-full" />
+<div ref={setArea} onKeyDown={(event) => zoomPan.onKeyDown(event)}>
+  <div ref={setBox} style={{ aspectRatio }}>
+    <img className="size-full object-contain" />
+  </div>
 </div>;
 
+zoomPan.zoomed; // 제어하는 배율이 1 보다 큰가. 렌더에서 읽는다
+zoomPan.canZoomIn; // 배율이 최대보다 작은가. 확대 버튼의 disabled
 zoomPan.zoomIn(); // 가운데를 기준으로 2배
 zoomPan.zoomOut(); // 절반
 zoomPan.reset(); // 1배
 zoomPan.zoomTo(3, { x: event.clientX, y: event.clientY }); // 화면 좌표를 기준으로
-trackOptions.watchDrag = () => !zoomPan.isZoomed(); // 슬라이드 트랙이 누르는 순간 묻는다
+useSlides({ watchDrag: () => !zoomPan.isZoomed() }); // 트랙이 누르는 순간 엔진에 묻는다
 ```
 
 ## 입력
@@ -90,7 +82,22 @@ trackOptions.watchDrag = () => !zoomPan.isZoomed(); // 슬라이드 트랙이 �
 - 영역에 `touch-action: none` 과 `user-select: none` 을 줍니다. 브라우저가 손가락으로 페이지를 움직이거나 확대하지 않고, 끄는 동안 글자가 선택되지 않습니다. iOS Safari 가 두 손가락으로 페이지를 확대하지 않도록 `gesturestart` 도 막습니다. 그림을 끌어 내보내는 native drag(`dragstart`)도 막습니다.
 - 휠은 `passive: false` 로 들어 늘 `preventDefault()` 합니다. 영역 위의 휠과 트랙패드 핀치는 페이지를 스크롤하거나 확대하지 않습니다.
 - 영역이나 그림의 크기가 바뀌면(`ResizeObserver`) 이동을 새 한계 안으로 옮깁니다.
-- React hook 이 아니라 요소에 붙는 엔진입니다. 뷰어가 쓰기 전까지 `'use client'` hook 을 두면 `dist` 에 없는 client 모듈이 되어 `tests/use-client.test.ts` 가 실패합니다. React 에는 위 쓰는 법처럼 layout effect 로 붙입니다.
+- React 를 모르는 엔진입니다. React 에서는 아래 `useZoomPan` 이 붙입니다.
+
+## use-zoom-pan.ts
+
+| 이름                                            | 하는 일                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `useZoomPan(options)`                           | `element` 와 `content` 가 있고 `disabled` 가 아니면 layout effect 에서 엔진을 붙인다 |
+| `scale`, `zoomed`                               | 제어하는(또는 스스로 가진) 배율과 그것이 1 보다 큰가                                 |
+| `canZoomIn`, `canZoomOut`                       | 배율이 최대보다 작은가, 1 보다 큰가                                                  |
+| `isZoomed()`                                    | 엔진이 지금 그린 배율. 핀치 중이면 `true`. 엔진이 없으면 `false`                     |
+| `zoomIn` `zoomOut` `reset` `zoomTo` `onKeyDown` | 엔진에 넘긴다. 엔진이 없으면 아무것도 하지 않는다(`onKeyDown` 은 `false`)            |
+
+- 배율은 `useControllableState` 입니다. 엔진의 `onCommit` 이 배율을 넣고, 렌더가 끝나면 layout effect 가 `follow(scale)` 로 돌려줍니다. 부모가 같은 값을 받지 않아도 되돌아가도록 커밋 횟수(`commits`)도 effect 의 의존성에 넣습니다.
+- 설정(`maxScale`, 콜백)은 렌더마다 ref 에 새로 쓰고, 엔진은 `read()` 로 쓸 때마다 읽습니다. 콜백이 바뀌어도 엔진을 다시 만들지 않으므로 끌던 제스처가 끊기지 않습니다.
+- 엔진을 만들 때의 배율은 그 렌더의 배율입니다. 뷰어는 장을 넘길 때 `value` 와 `zoom`(1)을 한 번에 바꾸므로 새 장은 1 에서 시작합니다.
+- `disabled` 나 요소가 바뀌면 엔진을 떼면서 transform 을 지웁니다. 뷰어는 닫히는 동안 떼지 않습니다. 떼면 확대한 사진이 닫히는 애니메이션의 첫 장면보다 먼저 1 로 돌아갑니다.
 
 ## math.ts
 

@@ -3,7 +3,7 @@ import { createRef, type ReactNode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { expect, onTestFinished, test, vi } from 'vitest';
-import { cdp, userEvent } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Image } from '../src';
@@ -247,8 +247,10 @@ test('a previewable image is one button named after its alt that opens a dialog'
   expect(button.element().querySelector('img')).not.toBeNull();
   expect(frameOf(screen.container)).toHaveAttribute('data-preview');
 
+  const trigger = page.elementLocator(button.element());
   await userEvent.click(button);
-  await expect.element(button).toHaveAttribute('aria-expanded', 'true');
+  await expect.element(page.getByRole('dialog', { name: '사진 보기' })).toBeVisible();
+  await expect.element(trigger).toHaveAttribute('aria-expanded', 'true');
 });
 
 test('the focus ring is drawn on the image box while its button has keyboard focus', async () => {
@@ -277,42 +279,56 @@ test('Image.Group lists its images and opens the viewer at the pressed one, by p
   expect(screen.getByRole('listitem').all()).toHaveLength(3);
   expect(screen.getByRole('button').all(), 'preview={false} opts one image out').toHaveLength(2);
 
-  const first = screen.getByRole('button', { name: 'First 크게 보기' });
-  const third = screen.getByRole('button', { name: 'Third 크게 보기' });
+  const first = page.elementLocator(
+    screen.getByRole('button', { name: 'First 크게 보기' }).element(),
+  );
+  const third = page.elementLocator(
+    screen.getByRole('button', { name: 'Third 크게 보기' }).element(),
+  );
   await userEvent.click(third);
   expect(onValueChange.mock.calls).toEqual([[1]]);
   expect(onOpenChange.mock.calls).toEqual([[true]]);
+  await expect.element(page.getByRole('group', { name: '2장 중 2번째' })).toBeVisible();
   await expect.element(third).toHaveAttribute('aria-expanded', 'true');
 
+  await userEvent.keyboard('{Escape}');
+  await expect.element(third).toHaveFocus();
   await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
   await expect.element(first).toHaveFocus();
   await userEvent.keyboard('{Enter}');
   expect(onValueChange.mock.calls).toEqual([[1], [0]]);
-  expect(onOpenChange.mock.calls, 'already open').toEqual([[true]]);
+  expect(onOpenChange.mock.calls).toEqual([[true], [false], [true]]);
+  await expect.element(page.getByRole('group', { name: '2장 중 1번째' })).toBeVisible();
   await expect.element(first).toHaveAttribute('aria-expanded', 'true');
   await expect.element(third).toHaveAttribute('aria-expanded', 'false');
 });
 
-test('a controlled group marks the image it shows, and indexes follow the document order', async () => {
+test('a controlled group shows and marks the image at its value, in the document order', async () => {
   const onValueChange = vi.fn();
-  const gallery = (names: string[], value: number) => (
-    <Image.Group value={value} open onValueChange={onValueChange}>
+  const gallery = (names: string[], open: boolean) => (
+    <Image.Group value={2} open={open} onValueChange={onValueChange}>
       {names.map((name) => (
         <Image key={name} src={INLINE_PICTURE} alt={name} />
       ))}
     </Image.Group>
   );
-  const screen = await render(gallery(['A', 'B', 'C'], 2));
-  await expect
-    .element(screen.getByRole('button', { name: 'C 크게 보기' }))
-    .toHaveAttribute('aria-expanded', 'true');
+  const shown = () => page.getByRole('group', { name: '3장 중 3번째' });
+  const trigger = (name: string) =>
+    page.elementLocator(document.querySelector(`[aria-label="${name} 크게 보기"]`)!);
 
-  await screen.rerender(gallery(['C', 'A', 'B'], 2));
+  const screen = await render(gallery(['A', 'B', 'C'], true));
+  await expect.element(shown().getByRole('img', { name: 'C' })).toBeVisible();
+  await expect.element(trigger('C')).toHaveAttribute('aria-expanded', 'true');
+
+  await screen.rerender(gallery(['C', 'A', 'B'], false));
+  await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'A 크게 보기' }));
   expect(onValueChange).toHaveBeenLastCalledWith(1);
-  await expect
-    .element(screen.getByRole('button', { name: 'B 크게 보기' }))
-    .toHaveAttribute('aria-expanded', 'true');
+
+  await screen.rerender(gallery(['C', 'A', 'B'], true));
+  await expect.element(shown().getByRole('img', { name: 'B' })).toBeVisible();
+  await expect.element(trigger('B')).toHaveAttribute('aria-expanded', 'true');
+  await expect.element(trigger('C')).toHaveAttribute('aria-expanded', 'false');
 });
 
 test('the group lays images in a row, a column or a grid of columns', async () => {

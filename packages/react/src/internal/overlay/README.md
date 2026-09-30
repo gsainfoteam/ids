@@ -1,6 +1,6 @@
 # overlay
 
-오버레이(Dialog, Drawer, Popover, Menu, Tooltip, Toast, 필드의 팝업)가 함께 쓰는 코어입니다. 닫기 규칙, top layer, 나가는 애니메이션, anchor 위치, modal 의 포커스와 스크롤을 한곳에서 정합니다.
+오버레이(Dialog, Drawer, Popover, Menu, Tooltip, Toast, 필드의 팝업, Image 의 뷰어)가 함께 쓰는 코어입니다. 닫기 규칙, top layer, 나가는 애니메이션, anchor 위치, modal 의 포커스와 스크롤을 한곳에서 정합니다.
 
 | 파일                                     | 내용                                                                     |
 | ---------------------------------------- | ------------------------------------------------------------------------ |
@@ -27,6 +27,7 @@
 | Tooltip                                 | `useLayer`, `useAnchored`, `usePresence`, `showInTopLayer`, `focusWasReturned`, `PortalRootContext`, `interactions.ts`                                                                                                       |
 | Menu                                    | `useLayer`, `useAnchored`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `returnFocusTo`, `focusReturnTarget`, `interactions.ts` |
 | Drawer                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`              |
+| Image 의 뷰어                           | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `returnFocusTo`, `focusReturnTarget`                                                                                                        |
 | Toast                                   | `createExternalStore`, `keepAboveLayers`, `withoutTransitions`, `raiseInTopLayer`, `showInTopLayer`, `supportsPopover`, `usePresence`, `returnFocusTo`, `blurWithin`                                                         |
 | [field-popup](../field-popup/README.md) | `useLayer`, `useAnchored`, `ModalLayer`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`                                                                                            |
 

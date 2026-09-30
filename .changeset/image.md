@@ -9,5 +9,4 @@ through AspectRatio. The server renders a plain `<img>`, and an image that loade
 is read on mount. `alt` is required and a missing one warns in development. `Image.Group` lists
 images in a `row`, a `column` or a `grid` of `columns`; pressing an image, or `Enter` and `Space` on
 it, makes it the group's `value` and sets `open`, and `preview` makes a single image pressable the
-same way. The group also holds `loop` and `zoom` (`onZoomChange`) for the viewer, which comes in a
-later release.
+same way. The group also holds `loop` and `zoom` (`onZoomChange`) for the viewer.

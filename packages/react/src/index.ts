@@ -55,7 +55,7 @@ export { Item } from './components/data/item';
 export { Accordion } from './components/data/accordion';
 export { Empty } from './components/data/empty';
 export { Image } from './components/data/image';
-export type { ImageGroupLayout } from './components/data/image';
+export type { ImageGroupLayout, ImageViewerItem } from './components/data/image';
 export { QRCode } from './components/data/qr-code';
 export { Marquee } from './components/data/marquee';
 export type { MarqueeOrientation, MarqueeSpeed } from './components/data/marquee';

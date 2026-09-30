@@ -1,15 +1,18 @@
 'use client';
 
-import { isValidElement, type ComponentProps, type CSSProperties } from 'react';
+import { isValidElement, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { ImageGroupContext } from './context';
 import { imageStyle } from './style';
 import { useImageGroup, type UseImageGroupOptions } from './use-image-group';
-import { flattenFragments, invariant } from '../../../utils';
+import { ImageViewer } from './viewer';
+import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 
 export type ImageGroupLayout = 'row' | 'column' | 'grid';
 
 const keepListRoleInSafari = { role: 'list' } as const;
+
+const isViewer = (node: ReactNode) => isValidElement(node) && elementTypeOf(node) === ImageViewer;
 
 export type ImageGroupProps = Omit<ComponentProps<'ul'>, 'defaultValue' | 'onChange'> &
   UseImageGroupOptions & {
@@ -53,6 +56,10 @@ export function ImageGroup({
   const styles = imageStyle({ layout });
   const columnCount = layout === 'grid' ? ({ '--image-columns': columns } as CSSProperties) : null;
 
+  const nodes = flattenFragments(children);
+  const viewer = nodes.find(isViewer);
+  const images = nodes.filter((node) => node !== viewer);
+
   return (
     <ImageGroupContext value={group}>
       <ul
@@ -63,7 +70,7 @@ export function ImageGroup({
         className={styles.group({ className })}
         style={{ ...columnCount, ...style }}
       >
-        {flattenFragments(children).map((child, index) => {
+        {images.map((child, index) => {
           if (isValidElement(child) && child.type === 'li') return child;
 
           const key = isValidElement(child) ? (child.key ?? index) : index;
@@ -74,6 +81,7 @@ export function ImageGroup({
           );
         })}
       </ul>
+      {viewer ?? <ImageViewer />}
     </ImageGroupContext>
   );
 }

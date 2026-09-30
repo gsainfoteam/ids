@@ -94,5 +94,38 @@
     ],
     "limit": "53 kB",
     "gzip": true
+  },
+  {
+    "name": "import { Image }",
+    "path": "dist/index.js",
+    "import": "{ Image }",
+    "entry": ["index"],
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "51 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Image }, its viewer opened",
+    "path": "dist/index.js",
+    "import": "{ Image }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "81 kB",
+    "gzip": true
   }
 ]

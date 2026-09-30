@@ -17,7 +17,8 @@ import { ImageContext, ImageGroupContext } from './context';
 import { ImageFallback } from './fallback';
 import { ImagePlaceholder } from './placeholder';
 import { imageStyle } from './style';
-import { useImageGroup, type ImageItem } from './use-image-group';
+import { useImageGroup, type ImageItem, type NaturalSize } from './use-image-group';
+import { ImageViewer, preloadImageViewer } from './viewer';
 import { useImageSettledBeforeMount, useImageStatus } from '../../../internal/image-status';
 import { resolveState } from '../../../internal/state-props';
 import { useTranslate } from '../../../internal/translate';
@@ -40,9 +41,21 @@ function aspectOf(width: number | string | undefined, height: number | string | 
   return across > 0 && down > 0 ? across / down : undefined;
 }
 
+function loadedSizeOf(image: HTMLImageElement | null): NaturalSize | undefined {
+  if (!image?.complete || image.naturalWidth === 0) return undefined;
+  return { width: image.naturalWidth, height: image.naturalHeight };
+}
+
+const warmTheViewer = () => void preloadImageViewer();
+
 function OneImageGroup({ children }: { children: ReactNode }) {
   const group = useImageGroup({});
-  return <ImageGroupContext value={group}>{children}</ImageGroupContext>;
+  return (
+    <ImageGroupContext value={group}>
+      {children}
+      <ImageViewer />
+    </ImageGroupContext>
+  );
 }
 
 export function ImageRoot(props: Image.Props) {
@@ -106,8 +119,9 @@ function ImageFrame({
   const itemNow = (): ImageItem => ({
     src: shown ?? '',
     srcSet: previewSrc ? undefined : srcSet,
-    sizes: previewSrc ? undefined : sizes,
+    sizes: undefined,
     thumbnail: current,
+    thumbnailSize: loadedSizeOf(imageRef.current),
     alt: name,
     caption,
     crossOrigin,
@@ -190,6 +204,8 @@ function ImageFrame({
       aria-label={name.trim() ? t('image.preview', { alt: name }) : t('image.previewUntitled')}
       data-popup-open={expanded ? '' : undefined}
       className={styles.trigger()}
+      onPointerEnter={warmTheViewer}
+      onFocus={warmTheViewer}
       onClick={() => group?.openAt(key)}
     >
       {picture}

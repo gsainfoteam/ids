@@ -125,8 +125,19 @@
     "required": "Required"
   },
   "image": {
+    "close": "Close",
+    "download": "Download",
+    "failed": "The image could not be loaded",
+    "next": "Next image",
+    "photos": "Images",
     "preview": "View larger: {alt}",
-    "previewUntitled": "View image larger"
+    "previewUntitled": "View image larger",
+    "previous": "Previous image",
+    "share": "Share",
+    "thumbnails": "Image list",
+    "viewer": "Image viewer",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
   },
   "input": {
     "clearSearch": "Clear search"

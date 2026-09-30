@@ -4,16 +4,21 @@ import { useCallback, useState, type ComponentProps, type ReactNode } from 'reac
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 
+export type NaturalSize = { width: number; height: number };
+
 export type ImageItem = {
   src: string;
   srcSet: string | undefined;
   sizes: string | undefined;
   thumbnail: string | undefined;
+  thumbnailSize: NaturalSize | undefined;
   alt: string;
   caption: ReactNode;
   crossOrigin: ComponentProps<'img'>['crossOrigin'];
   referrerPolicy: ComponentProps<'img'>['referrerPolicy'];
 };
+
+export type ViewerItem = ImageItem & { key: string };
 
 export type ImageGroupEntry = {
   key: string;
