@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type CSSProperties, type ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, onTestFinished, test, vi } from 'vitest';
@@ -48,6 +48,19 @@ const announcer = () => document.querySelector('[data-slides-announcer]')!;
 const currentBox = () =>
   document.querySelector<HTMLElement>('[data-slide][data-selected] [data-image-viewer-box]')!;
 const scaleOf = (element: Element) => new DOMMatrixReadOnly(getComputedStyle(element).transform).a;
+
+const fadeUntilFinished = { '--ids-motion-fast': '60s' } as CSSProperties;
+
+const fadesOn = (element: Element) =>
+  element
+    .getAnimations()
+    .map((animation) =>
+      (animation.effect as KeyframeEffect).getKeyframes().map((frame) => frame.opacity),
+    );
+
+const finishAnimationsOn = (element: Element) => {
+  for (const animation of element.getAnimations()) animation.finish();
+};
 
 async function openAt(alt: string) {
   await userEvent.click(page.getByRole('button', { name: `${alt} 크게 보기` }));
@@ -393,12 +406,20 @@ test('state passed to a viewer inside a group warns in development, since the gr
 });
 
 test('with motion reduced the image fades in and out', async () => {
-  await render(<Gallery />);
+  await render(
+    <div style={fadeUntilFinished}>
+      <Gallery />
+    </div>,
+  );
+
   await openAt('Second');
-  const keyframes = currentBox()
-    .getAnimations()
-    .map((animation) => (animation.effect as KeyframeEffect).getKeyframes());
-  expect(keyframes.at(-1)?.map((frame) => frame.opacity)).toEqual(['0', '1']);
+  expect(fadesOn(currentBox())).toEqual([['0', '1']]);
+  finishAnimationsOn(currentBox());
+
+  await userEvent.keyboard('{Escape}');
+  expect(fadesOn(currentBox())).toEqual([['1', '0']]);
+  finishAnimationsOn(currentBox());
+  await expect.element(dialog()).not.toBeInTheDocument();
 });
 
 test('with motion on the image grows out of its thumbnail and shrinks back into it', async (context) => {
