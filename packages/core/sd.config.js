@@ -294,11 +294,22 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
   }
 }
 
+@keyframes ids-marquee {
+  to {
+    translate: var(--ids-marquee-translate, -50%);
+  }
+}
+
 @theme {
   --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
   --animate-caret-blink: ids-caret-blink 1.25s ease-out infinite;
   --animate-skeleton-pulse: ids-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-skeleton-wave: ids-skeleton-wave 2s ease-in-out infinite;
+}
+`;
+
+const T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES = `@theme inline {
+  --animate-marquee: ids-marquee var(--ids-marquee-duration, 20s) linear infinite var(--ids-marquee-direction, normal) var(--ids-marquee-play-state, running);
 }
 `;
 
@@ -451,6 +462,7 @@ const cssFormatter = ({ dictionary }) =>
     buildColorBridgeCSS(dictionary),
     buildStaticCSS(dictionary),
     T_CSS_ANIMATIONS,
+    T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES,
     T_CSS_VARIANTS,
     T_CSS_UTILITIES,
     buildConcentricCSS(),

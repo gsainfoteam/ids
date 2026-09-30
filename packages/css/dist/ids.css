@@ -87,11 +87,21 @@
   }
 }
 
+@keyframes ids-marquee {
+  to {
+    translate: var(--ids-marquee-translate, -50%);
+  }
+}
+
 @theme {
   --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
   --animate-caret-blink: ids-caret-blink 1.25s ease-out infinite;
   --animate-skeleton-pulse: ids-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-skeleton-wave: ids-skeleton-wave 2s ease-in-out infinite;
+}
+
+@theme inline {
+  --animate-marquee: ids-marquee var(--ids-marquee-duration, 20s) linear infinite var(--ids-marquee-direction, normal) var(--ids-marquee-play-state, running);
 }
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *):not(:where([data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *)));
