@@ -37,7 +37,7 @@
 - **가려지지 않는 포커스(2.4.11).** 레이어는 top layer 에 올라가므로 부모의 `overflow` 에 잘리지 않습니다.
 - **한글 입력.** IME 조합 중에 누른 Escape 와 Enter 는 조합만 끝내고, 레이어를 닫거나 값을 확정하지 않습니다.
 - **오른쪽에서 왼쪽 문서.** `dir="rtl"` 에서는 가로 방향키가 뒤집힙니다(Slider, Rating, Calendar, TimePicker, ChipField, 하위 메뉴).
-- **모션 감소.** `prefers-reduced-motion: reduce` 면 전환 애니메이션을 끄고, Spinner 는 회전 대신 천천히 깜빡입니다.
+- **모션 감소.** `prefers-reduced-motion: reduce` 면 전환 애니메이션을 끄고, Spinner 는 회전 대신 천천히 깜빡이고, Skeleton 은 움직이지 않는 muted 바탕으로 남습니다.
 - **비활성이지만 포커스 가능.** 버튼류의 `focusableWhenDisabled` 는 `disabled` 대신 `aria-disabled` 를 붙여 탭 순서와 툴팁을 지킵니다.
 - **문구.** 닫기, 지우기, 불러오는 중 같은 기본 문구는 한국어이고, `IdsProvider translate` 로 앱의 i18n 을 거칩니다. 개발 경고만 영어입니다.
 
@@ -109,6 +109,7 @@
 | --- | --- | --- | --- | --- |
 | Alert | [Alert](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) | 안에 포커스가 있을 때 `Escape` 로 닫기 | warning, danger 는 `role="alert"`, 나머지는 `role="status"`. `Alert.Close` 는 이름 "닫기" | 늘 있는 안내에는 `role` 을 직접 바꾼다(`note` 등) |
 | Progress | [ARIA progressbar](https://www.w3.org/TR/wai-aria-1.2/#progressbar) (APG 패턴 없음) | 없음 | `progressbar` + `aria-valuenow` `aria-valuemax` `aria-valuetext`, 이름은 `Progress.Label` | 이름이 없으면 개발 모드 경고만 한다 |
+| Skeleton | 없음 | 없음. 불러오는 동안 감싼 내용에 Tab 이 들어가지 않는다 | 모양은 `aria-hidden`. 감싸기는 감싼 `div` 에 `aria-busy="true"`, 자식은 보이지 않고 `inert`. `asChild` 면 자식 요소가 `aria-busy` 와 `inert` 를 함께 받는다 | live region 이 없다. "불러오는 중" 알림은 Spinner 나 앱이 맡고, 모양만 쓰는 영역의 `aria-busy` 는 앱이 준다 |
 | Spinner | 없음 | 없음 | 그림은 `aria-hidden`, 나타나고 100ms 뒤 `role="status"` 에 문장을 적는다 | 100ms 안에 끝나는 로딩은 알리지 않는다. 버튼 안에서는 알리지 않는다 |
 | Toast | [Alert](https://www.w3.org/WAI/ARIA/apg/patterns/alert/) | `F6` 이나 `Alt+T` 로 영역 들어가기와 나오기, `Tab` 영역 안 버튼, `Escape` 원래 자리로 | 영역은 이름 "알림" + `aria-keyshortcuts`, warning, error 는 `role="alert"`, 나머지는 `role="status"` | 시간이 지나면 사라진다(2.2.1). 스와이프로 닫기는 닫기 버튼이 대신한다 |
 
@@ -244,6 +245,7 @@
 | Alert | danger 는 즉시, info 는 기다렸다 알린다 |  |  |  |  |
 | Toast | 나타나면 한 번 알리고, `F6` 으로 들어가 버튼을 쓰고 나온다 |  |  |  |  |
 | Progress | 이름과 값 문장을 읽는다 |  |  |  |  |
+| Skeleton | 불러오는 동안 모양과 감싼 내용을 읽지 않고 Tab 이 들어가지 않는다. 끝나면 같은 자리의 내용을 읽는다 |  |  |  |  |
 | Spinner | "불러오는 중" 을 한 번만 읽는다 |  |  |  |  |
 
 ### 탐색
