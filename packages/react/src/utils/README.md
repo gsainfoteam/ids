@@ -13,7 +13,7 @@
 | [`merge.ts`](#mergets)         | props, 이벤트 핸들러, ref, style 합치기               | Slot, `asChild` 파트, 필드 hook, ref 를 합치는 모든 곳 |
 | [`children.ts`](#childrents)   | Fragment 를 풀어 자식을 평평하게 만드는 함수, 요소의 실제 타입 | 자식에서 파트를 찾는 컴포넌트                          |
 | [`part.ts`](#partts)           | 요소나 `asChild` 자식으로 파트 하나를 그리는 함수     | 파트가 많은 필드(Select, ChipField 등)                 |
-| [`dom.ts`](#domts)             | 이벤트 target 판별과 포커스를 두는 pointer 핸들러     | 팝업을 여는 필드, `internal/field-popup`               |
+| [`dom.ts`](#domts)             | 이벤트 target 판별, 포커스를 두는 pointer 핸들러, pointer capture | 팝업을 여는 필드, `internal/field-popup`, 끄는 컴포넌트 |
 | [`invariant.ts`](#invariantts) | 잘못된 사용에 `IdsError` 를 던지는 assert             | 거의 모든 컴포넌트와 `internal/`                       |
 | [`dev.ts`](#devts)             | 개발 빌드인지 알려 주는 `isDevelopment`               | 개발 경고를 내는 모든 곳                               |
 
@@ -209,12 +209,13 @@ return part(
 
 ## dom.ts
 
-DOM 이벤트를 다루는 작은 함수입니다: `isNodeFromAnyWindow`, `keepFocusWhereItIs`.
+DOM 이벤트를 다루는 작은 함수입니다: `isNodeFromAnyWindow`, `keepFocusWhereItIs`, `tryCapturePointer`.
 
 ### 쓰는 곳
 
 - `isNodeFromAnyWindow`: [`internal/field-popup`](../internal/field-popup/README.md) 의 바깥 누르기와 포커스 판정, Select 와 ColorField 의 blur 판정, temporal-field 의 `use-temporal-field.ts`
 - `keepFocusWhereItIs`: Select 와 ChipField 의 옵션, ChipField 의 만들기 옵션(`onPointerDown`)
+- `tryCapturePointer`: ScrollArea 의 thumb, Drawer 와 Toast 의 끌기, Slider 의 thumb
 
 ### 쓰는 법
 
@@ -224,16 +225,21 @@ const inPopup = isNodeFromAnyWindow(next) && (next as Element).closest?.(popupSe
 
 // components/form/chip-field/item.tsx: 옵션을 눌러도 포커스가 input 에 남는다
 { onPointerDown: keepFocusWhereItIs }
+
+// components/layout/scroll-area/use-scroll-area.ts: thumb 을 끄는 동안 막대 밖의 포인터도 받는다
+tryCapturePointer(bar, event.pointerId);
 ```
 
 ### 왜 이렇게
 
 - 이벤트 target 과 `relatedTarget` 이 Node 인지는 `instanceof Node` 가 아니라 `nodeType` 으로 봅니다. `instanceof` 는 다른 frame(Storybook 의 iframe, 테스트 frame)의 노드나 DOM 생성자가 전역에 없는 환경에서 틀립니다.
 - `keepFocusWhereItIs` 는 `pointerdown` 의 기본 동작을 막아 포커스가 누른 곳으로 옮겨 가지 않게 합니다. 옵션은 포커스를 받지 않고 `aria-activedescendant` 로 가리켜지므로, 포커스는 trigger 나 검색 상자에 남아야 키보드로 이어서 고를 수 있습니다.
+- `tryCapturePointer` 는 `setPointerCapture` 가 던지는 예외를 삼키고 잡았는지를 돌려줍니다. 누르는 사이에 이미 떼어진 포인터나 합성 이벤트의 `pointerId` 는 `NotFoundError` 를 던지는데, 그때도 끌기는 capture 없이 이어집니다.
 
 ### 알아둘 것
 
 - `isNodeFromAnyWindow` 는 Node 인지만 봅니다. `closest` 같은 Element 메서드가 필요하면 `?.` 로 부르거나 따로 좁힙니다(Text 노드도 Node 입니다).
+- capture 를 잡은 요소는 포인터가 요소 밖에 있어도 `pointermove`, `pointerup` 을 받습니다. 끄는 쪽은 `pointerup`, `pointercancel`, `lostpointercapture` 셋 모두에서 끌기를 끝냅니다.
 
 ## invariant.ts
 

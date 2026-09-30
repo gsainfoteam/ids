@@ -20,7 +20,7 @@ import { closestThumb, moveThumb, ratioAlong } from './slider-math';
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { keyHandler, withModifiers } from '../../../internal/keys';
-import { mergeRefs } from '../../../utils';
+import { mergeRefs, tryCapturePointer } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
 export type SliderValue = number | [number, number];
@@ -43,15 +43,6 @@ export type UseSliderOptions = {
 };
 
 type Drag = { index: number; tied: boolean; from: readonly number[]; pointerId: number };
-
-function tryCapturePointer(element: Element, pointerId: number) {
-  try {
-    element.setPointerCapture?.(pointerId);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 function keepFocusOnThumb(event: PointerEvent<HTMLDivElement>) {
   event.preventDefault();

@@ -28,6 +28,7 @@ import {
   type Sample,
   type SnapPoint,
 } from './drawer-gesture';
+import { tryCapturePointer } from '../../../utils';
 
 import type { BackgroundScale } from './background-scale';
 
@@ -60,14 +61,6 @@ type Metrics = { size: number; viewport: number };
 
 const DRAGGING = 'data-dragging';
 const NESTED_PUSH_BACK = 16;
-
-function tryCapturePointer(element: Element, pointerId: number) {
-  try {
-    element.setPointerCapture(pointerId);
-  } catch {
-    return;
-  }
-}
 
 function selectingTextIn(content: Element) {
   const selection = content.ownerDocument.getSelection();

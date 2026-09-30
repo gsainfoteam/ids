@@ -13,6 +13,7 @@ import { isEqual } from 'es-toolkit';
 
 import { dismissToast, removeToast, type ToastId, type ToastRecord } from './toast-store';
 import { usePresence } from '../../../internal/overlay';
+import { tryCapturePointer } from '../../../utils';
 
 import type { ToastPosition } from './use-toaster';
 
@@ -41,14 +42,6 @@ type Drag = {
   axis: SwipeAxis | null;
   amount: number;
 };
-
-function tryCapturePointer(node: Element, pointerId: number) {
-  try {
-    node.setPointerCapture(pointerId);
-  } catch {
-    return;
-  }
-}
 
 function startsOnAControl(event: PointerEvent<HTMLElement>) {
   return (event.target as Element).closest('button, a[href], input, select, textarea') !== null;

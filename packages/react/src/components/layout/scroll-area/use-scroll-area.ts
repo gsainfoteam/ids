@@ -19,6 +19,7 @@ import {
   type Shape,
   type ThumbLayout,
 } from './geometry';
+import { tryCapturePointer } from '../../../utils';
 
 export type Overflow = Record<Axis, boolean>;
 
@@ -39,15 +40,6 @@ const WIDGETS_THAT_MANAGE_THEIR_OWN_FOCUS = new Set([
   'tree',
   'treegrid',
 ]);
-
-function tryCapturePointer(element: Element, pointerId: number) {
-  try {
-    element.setPointerCapture(pointerId);
-    return true;
-  } catch {
-    return false;
-  }
-}
 
 const along = (axis: Axis, event: { clientX: number; clientY: number }) =>
   axis === 'y' ? event.clientY : event.clientX;
