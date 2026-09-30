@@ -3,7 +3,7 @@
 import { useCallback, useRef, type ComponentProps, type CSSProperties } from 'react';
 
 import { useAvatarContext } from './context';
-import { useImageSettledBeforeMount } from './use-avatar';
+import { useImageSettledBeforeMount } from '../../../internal/image-status';
 import { resolveState, type StateValue } from '../../../internal/state-props';
 import { mergeRefs } from '../../../utils';
 

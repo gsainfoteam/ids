@@ -21,6 +21,7 @@
 | [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                               |
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
 | [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                                  | IconButton, IconToggle                                                                                                                                                                                                |
+| [`image-status.ts`](#image-statusts)             | `<img>` 를 불러오는 상태와 hydration 전에 끝난 이미지 읽기                            | Avatar                                                                                                                                                                                                                |
 | [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/` |
 | [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
@@ -524,6 +525,48 @@ export const iconButtonStyle = tv({
 ### 알아둘 것
 
 - `[&_svg]` 는 svg 에 붙은 `size-*` 클래스보다 우선합니다. 생성된 선택자(`.cls svg`)의 specificity 가 더 높습니다. control surface 의 `[&_svg:not([class*='size-'])]` 와 달리 아이콘의 크기 클래스를 따르지 않습니다.
+
+## image-status.ts
+
+`<img>` 를 불러오는 상태(`loading`, `loaded`, `error`)를 다루는 hook 두 개입니다.
+
+- `useImageStatus(src, onStatusChange)`: 지금 `src` 의 상태와, 이미지가 상태를 알리는 `report(src, status)` 를 돌려줍니다. `src` 가 없으면 처음부터 `error` 입니다.
+- `useImageSettledBeforeMount(imageRef, src, report)`: React 가 듣기 전에 이미 끝난 이미지를 마운트 때 읽어 `report` 로 넘깁니다.
+
+### 쓰는 곳
+
+- Avatar: 루트가 `useImageStatus`, `Avatar.Image` 가 `useImageSettledBeforeMount`
+
+### 쓰는 법
+
+```tsx
+// components/data/avatar/root.tsx
+const { status, report } = useImageStatus(imageSrc || undefined, onStatusChange);
+
+// components/data/avatar/image.tsx
+useImageSettledBeforeMount(imageRef, current, report);
+
+<img
+  key={current}                                  // 새 src 는 새 요소
+  ref={mergedRef}
+  src={current}
+  onLoad={() => report(current, 'loaded')}
+  onError={() => report(current, 'error')}
+/>;
+```
+
+### 왜 이렇게
+
+- 상태는 `{ src, status }` 로 기억합니다. `src` 가 바뀐 렌더에서는 기억한 상태 대신 `loading` 을 씁니다. effect 로 되돌리지 않으므로 앞 이미지의 `loaded` 가 새 `src` 와 함께 그려지는 순간이 없습니다.
+- `report` 는 지금 `src` 에서 온 알림만 받습니다(`currentSrc`). 늦게 끝난 앞 이미지의 `error` 가 새 이미지의 상태를 덮지 않습니다.
+- 서버 HTML 의 `<img>` 는 hydration 전에 이미 다 불러왔을 수 있습니다. 그 `load` 는 React 가 듣기 전에 지나갔으므로, `useImageSettledBeforeMount` 가 layout effect 에서 `complete` 와 `naturalWidth` 를 읽습니다. 캐시에서 바로 온 이미지도 같습니다.
+- 크기를 적지 않은 SVG 는 불러와도 `naturalWidth` 가 0 일 수 있습니다. 그래서 `complete` 인데 폭이 0 이면 `decode()` 의 성공과 실패로 가립니다.
+- `onStatusChange` 는 상태가 바뀐 뒤의 effect 에서 부릅니다. 최신 함수는 ref 로 읽으므로 함수가 바뀌어도 다시 부르지 않습니다.
+
+### 알아둘 것
+
+- 쓰는 쪽은 `<img>` 에 `key={src}` 를 줍니다. 같은 요소의 `src` 만 바꾸면 새 이미지가 올 때까지 앞 이미지가 남습니다.
+- 실패한 `<img>` 를 DOM 에서 빼고 무엇을 대신 그릴지는 쓰는 컴포넌트가 정합니다.
 
 ## keys.ts
 
