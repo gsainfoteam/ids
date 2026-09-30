@@ -32,6 +32,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [Hero](hero/README.md) | Centered, Split |
 | [Features](features/README.md) | Grid, Showcase |
 | [FAQ](faq/README.md) | Accordion, Columns |
+| [Footer](footer/README.md) | Columns, Simple |
 
 ## 파일
 
