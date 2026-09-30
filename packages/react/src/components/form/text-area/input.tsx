@@ -3,6 +3,7 @@
 import {
   cloneElement,
   isValidElement,
+  useState,
   type CSSProperties,
   type ReactElement,
   type ReactNode,
@@ -34,6 +35,7 @@ function rowsToHeight(rows: number | undefined) {
 export function TextAreaInput({ asChild, children, className, style }: TextAreaInputPartProps) {
   const { inputProps, autoResize, minRows, maxRows, resize, styles } =
     useTextAreaContext('TextArea.Input');
+  const [inputArea, setInputArea] = useState<HTMLElement | null>(null);
 
   const props = {
     ...inputProps,
@@ -48,11 +50,16 @@ export function TextAreaInput({ asChild, children, className, style }: TextAreaI
   };
 
   const scrolled = (textarea: ReactElement) => (
-    <ScrollArea className={styles.scrollArea()}>
+    <ScrollArea ref={setInputArea} className={styles.scrollArea()}>
       <ScrollArea.Viewport asChild>{textarea}</ScrollArea.Viewport>
       {resize.axes.length > 0 && (
         <ScrollArea.Corner>
-          <ResizeGrip axes={resize.axes} disabled={resize.disabled} />
+          <ResizeGrip
+            axes={resize.axes}
+            corner={inputArea}
+            placement="inside"
+            disabled={resize.disabled}
+          />
         </ScrollArea.Corner>
       )}
     </ScrollArea>

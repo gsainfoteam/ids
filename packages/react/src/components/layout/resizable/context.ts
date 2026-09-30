@@ -11,6 +11,7 @@ import type { ResizeAxis } from '../../../internal/resize-handle';
 type ResizableContextValue = {
   direction: Resizable.Direction;
   disabled: boolean;
+  element: HTMLElement | null;
   axes: Record<'width' | 'height', ResizeAxis>;
   styles: ReturnType<typeof resizableStyle>;
   onDraggingChange: (dragging: boolean) => void;

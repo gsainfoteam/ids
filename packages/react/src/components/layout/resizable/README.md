@@ -4,6 +4,7 @@
 
 - **키보드로도.** 손잡이는 `role="separator"` 라 Tab 으로 가서 방향키로 16px, `Shift` 와 함께 64px 씩 바꿉니다.
 - **손잡이는 방향에 따라 하나.** `both` 는 모서리 손잡이 하나(Tab 한 칸), `horizontal` 은 끝 가장자리, `vertical` 은 아래 가장자리입니다.
+- **한 가족의 모양.** 가장자리 손잡이는 가장자리 선 위의 짧은 막대이고, 모서리 손잡이는 같은 두께, 색, 자리의 막대를 요소의 모서리를 따라 휘어 그린 호입니다. iPadOS, visionOS 창의 모서리 손잡이와 같은 모양입니다.
 - **끄는 동안 다시 렌더하지 않습니다.** 한 프레임에 한 번 DOM 에 크기를 쓰고, 놓을 때 한 번 알립니다.
 - **누를 영역은 24px.** 보이는 선과 표시가 얇아도 손잡이를 잡을 영역은 24px 입니다.
 - **쓰는 방향을 따릅니다.** RTL 에서는 손잡이가 왼쪽에 서고 `←` 가 넓힙니다.
@@ -27,9 +28,25 @@ import { Resizable } from '@gsainfoteam/ids-react';
 
 | `direction`  | 손잡이                            | 스크린 리더                                                 |
 | ------------ | --------------------------------- | ----------------------------------------------------------- |
-| `both`       | 끝 아래 모서리의 대각선 표시      | group "크기 조절" 안에 separator "너비", "높이"(Tab 한 칸) |
+| `both`       | 끝 아래 모서리를 따라 휜 호       | group "크기 조절" 안에 separator "너비", "높이"(Tab 한 칸) |
 | `horizontal` | 끝 가장자리 가운데의 세로 막대    | separator "너비"(`aria-orientation="vertical"`)             |
 | `vertical`   | 아래 가장자리 가운데의 가로 막대  | separator "높이"(`aria-orientation="horizontal"`)           |
+
+## 모서리 손잡이
+
+```tsx
+<Resizable className="rounded-none border" />           // 반지름 0: 끝이 살짝 둥근 ㄴ 자
+<Resizable className="concentric-p-4 border" />         // 16px 모서리와 같은 중심의 호
+<Resizable className="rounded-full border" />           // 알약 모양이면 높이의 절반 반지름의 호
+```
+
+- 아래 가장자리를 따라 짧게 오다가, 모서리와 같은 중심의 4분의 1 원을 돌아, 끝 가장자리를 따라 짧게 올라가는 선입니다. 두께는 가장자리 막대와 같은 4px 이고 양 끝이 둥급니다.
+- 선은 가장자리 막대처럼 요소의 테두리 안쪽 선(padding 상자의 가장자리) 위에 섭니다. 반지름은 요소의 `border-end-end-radius`(LTR 오른쪽 아래, RTL 왼쪽 아래)에서 테두리 두께를 뺀 값입니다.
+- 반지름은 마운트할 때, 요소의 크기가 바뀔 때(ResizeObserver), 손잡이가 다시 렌더될 때 읽습니다. `%` 반지름과 `rounded-full` 도 따라갑니다.
+- 직선은 호와 두 직선을 합한 길이가 가장자리 막대와 같은 32px 이 되도록 늘고 줄며, 적어도 4px 입니다. 반지름이 크면 호만으로 32px 을 넘습니다.
+- 누를 영역은 선을 따라 폭 24px(선의 양쪽 12px)의 띠입니다. 띠 밖의 내용은 모서리 가까이에서도 그대로 누를 수 있습니다.
+- 포커스는 호를 따라 그립니다. 선이 `primary` 가 되고 둘레에 3px 의 `primary` 40% 띠가 생깁니다. 누를 영역에 사각형 링을 두르지 않습니다.
+- 서버 렌더에는 호가 없고 separator 만 있습니다. 반지름을 읽은 뒤 그립니다.
 
 ## 크기
 
@@ -66,8 +83,13 @@ import { Resizable } from '@gsainfoteam/ids-react';
 
 <Resizable>
   내용
+  <Resizable.Handle className="text-(--ids-color-accent)" />   {/* 호의 색은 글자색 */}
+</Resizable>
+
+<Resizable>
+  내용
   <Resizable.Handle>
-    <MyGripIcon />                       {/* 모서리 표시를 바꾼다 */}
+    <MyGripIcon />                       {/* 호 대신 이 표시를 16px 상자에 그린다 */}
   </Resizable.Handle>
 </Resizable>
 
@@ -80,6 +102,8 @@ import { Resizable } from '@gsainfoteam/ids-react';
 ```
 
 - `Resizable.Handle` 을 적으면 기본 손잡이를 그리지 않습니다. 손잡이의 종류는 `direction` 이 정합니다.
+- 모서리 손잡이의 호는 글자색(`currentColor`)으로 그립니다. `text-*` 로 쉬는 때의 색을 바꾸고, 올렸을 때와 끄는 동안은 손잡이 단계를 따릅니다.
+- 모서리 손잡이에 `children` 이나 `asChild` 를 주면 호 대신 그 표시를 모서리 안쪽 16px 상자에 그리고, 누를 영역은 그 상자 둘레 24px 입니다.
 - 가장자리 손잡이의 보이는 막대는 `before:` 로 그립니다. 막대를 지우려면 `before:hidden` 입니다.
 - `asChild` 로 합칠 때 겹치는 클래스(위치, 크기)는 손잡이 쪽이 이깁니다. 위치와 크기는 `Resizable.Handle` 의 `className` 으로 바꿉니다.
 - `aria-label` 을 주면 기본 이름("너비", "높이", "크기 조절") 대신 씁니다.
@@ -140,7 +164,7 @@ import { Resizable } from '@gsainfoteam/ids-react';
 
 | 토큰                        | 쓰임                          |
 | --------------------------- | ----------------------------- |
-| `--ids-color-handle`        | 막대와 모서리 표시            |
+| `--ids-color-handle`        | 가장자리 막대와 모서리의 호   |
 | `--ids-color-handle-hover`  | 손잡이에 올렸을 때            |
 | `--ids-color-handle-active` | 끄는 동안                     |
 
@@ -163,7 +187,7 @@ import { Resizable } from '@gsainfoteam/ids-react';
 
 - `min*` 이 `max*` 보다 크면 개발 빌드에서 경고하고 최댓값을 씁니다.
 - `Resizable.Handle` 을 Resizable 밖에 두면 오류입니다.
-- 요소에 `overflow-hidden` 을 주면 끝 밖으로 나온 손잡이의 절반이 잘립니다. 누를 영역이 줄고 가장자리 막대가 반만 보입니다.
+- 요소에 `overflow-hidden` 을 주면 끝 밖으로 나온 손잡이의 절반이 잘립니다. 누를 영역이 줄고 가장자리 막대와 모서리의 호가 반만 보입니다.
 - 가장자리 손잡이의 누를 영역은 끝 선 안팎으로 12px 씩입니다. 끝에 붙은 안쪽 컨트롤(스크롤 막대 등)이 있으면 `Resizable.Handle` 의 `className` 으로 영역을 바꿉니다.
 - 손잡이는 끌기가 필요합니다. 끌지 못하는 포인터 사용자를 위한 한 번 누르기 방법은 없습니다(WCAG 2.5.7). 키보드 조작은 있습니다.
 - 모바일 스크린 리더는 separator 값을 쓸어서 바꾸지 못합니다.

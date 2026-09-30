@@ -33,6 +33,27 @@ export function measureAxis(element: HTMLElement, dimension: ResizeDimension): M
 
 export const isRightToLeft = (element: Element) => styleOf(element).direction === 'rtl';
 
+const lengthAlong = (value: string, side: number) =>
+  value.endsWith('%') ? (parseFloat(value) / 100) * side : parseFloat(value) || 0;
+
+export function innerEndEndRadius(element: HTMLElement) {
+  const style = styleOf(element);
+  const width = element.offsetWidth;
+  const height = element.offsetHeight;
+  const [across = '0px', down = across] = style.borderEndEndRadius.split(' ');
+
+  const outer = Math.min(
+    lengthAlong(across, width),
+    lengthAlong(down, height),
+    Math.min(width, height) / 2,
+  );
+  const border = Math.max(
+    parseFloat(style.borderInlineEndWidth) || 0,
+    parseFloat(style.borderBlockEndWidth) || 0,
+  );
+  return Math.max(0, outer - border);
+}
+
 export function markDragged(elements: readonly Element[], dragged: boolean) {
   for (const element of elements)
     if (dragged) BEING_DRAGGED.add(element);

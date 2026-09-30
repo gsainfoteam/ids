@@ -103,7 +103,14 @@ export function ResizableRoot({
 
   const structure = (
     <ResizableContext
-      value={{ direction, disabled, axes: resizable.axes, styles, onDraggingChange: setDragging }}
+      value={{
+        direction,
+        disabled,
+        element: resizable.element,
+        axes: resizable.axes,
+        styles,
+        onDraggingChange: setDragging,
+      }}
     >
       {content}
       {!containsElementOfType(content, HANDLE) && <ResizableHandle />}

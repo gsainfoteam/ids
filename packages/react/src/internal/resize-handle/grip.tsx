@@ -7,12 +7,21 @@ import {
   useRef,
   useState,
   type ComponentProps,
+  type CSSProperties,
   type ReactElement,
   type ReactNode,
 } from 'react';
 
 import { flushSync } from 'react-dom';
 
+import {
+  GRIP_HALO,
+  GRIP_STROKE,
+  GRIP_TARGET,
+  gripArc,
+  type GripArc,
+  type GripPlacement,
+} from './arc';
 import { axisSeparatorProps, type ResizeAxis, type ResizeDimension } from './axis';
 import { resizeGripStyle } from './style';
 import {
@@ -20,6 +29,7 @@ import {
   readingDirection,
   useAxesDrag,
   useAxisSeparator,
+  useCornerRadius,
   type AxesDragOptions,
 } from './use-resize-axes';
 import { invariant, mergeProps, part } from '../../utils';
@@ -28,28 +38,68 @@ import { useTranslate } from '../translate';
 
 export type ResizeGripProps = Omit<ComponentProps<'div'>, 'children'> & {
   axes: readonly ResizeAxis[];
+  corner: HTMLElement | null;
+  placement: GripPlacement;
   disabled?: boolean;
   onDraggingChange?: (dragging: boolean) => void;
   asChild?: boolean;
   children?: ReactNode;
 };
 
-type GripProps = Omit<ResizeGripProps, 'axes' | 'disabled' | 'onDraggingChange'> & {
+type GripProps = Omit<
+  ResizeGripProps,
+  'axes' | 'corner' | 'placement' | 'disabled' | 'onDraggingChange'
+> & {
   drag: AxesDragOptions;
+  arc: GripArc | null;
 };
 
-function GripMark({ className }: { className?: string }) {
+type Styles = ReturnType<typeof resizeGripStyle>;
+
+const HALO_WIDTH = GRIP_STROKE + 2 * GRIP_HALO;
+
+const isCustom = ({ asChild, children }: Pick<GripProps, 'asChild' | 'children'>) =>
+  asChild === true || children != null;
+
+function sized(style: CSSProperties | undefined, arc: GripArc | null) {
+  return arc ? { ...style, width: arc.size, height: arc.size } : style;
+}
+
+function Arc({ arc, styles }: { arc: GripArc; styles: Styles }) {
   return (
     <svg
-      viewBox="0 0 10 10"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
       aria-hidden="true"
-      className={className}
+      width={arc.view}
+      height={arc.view}
+      viewBox={`0 0 ${arc.view} ${arc.view}`}
+      fill="none"
+      className={styles.drawing()}
+      style={{ top: -arc.bleed, left: -arc.bleed }}
     >
-      <path d="M9 1 1 9M9 5 5 9" />
+      <path
+        d={arc.arc}
+        strokeWidth={HALO_WIDTH}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        data-resize-grip-halo=""
+        className={styles.halo()}
+      />
+      <path
+        d={arc.arc}
+        strokeWidth={GRIP_STROKE}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        data-resize-grip-arc=""
+        className={styles.arc()}
+      />
+      <path
+        d={arc.target}
+        stroke="transparent"
+        strokeWidth={GRIP_TARGET}
+        pointerEvents="stroke"
+        data-resize-grip-target=""
+        className={styles.target()}
+      />
     </svg>
   );
 }
@@ -57,23 +107,29 @@ function GripMark({ className }: { className?: string }) {
 function OneAxisGrip({
   axis,
   drag,
+  arc,
   asChild = false,
   className,
+  style,
   children,
   ...props
 }: GripProps & { axis: ResizeAxis }) {
   const separator = useAxisSeparator(axis, drag);
-  const styles = resizeGripStyle({ axes: axis.dimension === 'width' ? 'inline' : 'block' });
+  const styles = resizeGripStyle({
+    axes: axis.dimension === 'width' ? 'inline' : 'block',
+    custom: isCustom({ asChild, children }),
+  });
 
   return part(
     'div',
     asChild,
-    children ?? <GripMark className={styles.mark()} />,
+    children ?? (arc && <Arc arc={arc} styles={styles} />),
     mergeProps(props, {
       ...separator,
       'aria-label': props['aria-label'] ?? separator['aria-label'],
       'data-resize-grip': '',
       className: styles.grip({ className }),
+      style: sized(style, arc),
     }),
   );
 }
@@ -81,8 +137,10 @@ function OneAxisGrip({
 function TwoAxisGrip({
   axes,
   drag: options,
+  arc,
   asChild = false,
   className,
+  style,
   children,
   ...props
 }: GripProps & { axes: readonly ResizeAxis[] }) {
@@ -90,7 +148,7 @@ function TwoAxisGrip({
   const drag = useAxesDrag(axes, options);
   const [focusedAxis, setFocusedAxis] = useState<ResizeDimension>(axes[0]!.dimension);
   const separators = useRef(new Map<ResizeDimension, HTMLElement>());
-  const styles = resizeGripStyle({ axes: 'both' });
+  const styles = resizeGripStyle({ axes: 'both', custom: isCustom({ asChild, children }) });
   const { disabled } = options;
 
   const resizeAndFocus = (axis: ResizeAxis) => (size: number) => {
@@ -141,12 +199,13 @@ function TwoAxisGrip({
     'data-resize-grip': '',
     'data-disabled': disabled ? '' : undefined,
     className: styles.grip({ className }),
+    style: sized(style, arc),
   });
 
   if (!asChild)
     return (
       <div {...group}>
-        {children ?? <GripMark className={styles.mark()} />}
+        {children ?? (arc && <Arc arc={arc} styles={styles} />)}
         {hiddenSeparators}
       </div>
     );
@@ -166,6 +225,8 @@ function TwoAxisGrip({
 
 export function ResizeGrip({
   axes,
+  corner,
+  placement,
   disabled = false,
   onDraggingChange,
   ...props
@@ -173,7 +234,10 @@ export function ResizeGrip({
   const [first] = axes;
   invariant(first, 'A resize grip needs at least one axis to resize.');
 
+  const radius = useCornerRadius(corner);
+  const arc = radius === null || isCustom(props) ? null : gripArc(radius, placement);
   const drag = { disabled, onDraggingChange };
-  if (axes.length === 1) return <OneAxisGrip {...props} axis={first} drag={drag} />;
-  return <TwoAxisGrip {...props} axes={axes} drag={drag} />;
+
+  if (axes.length === 1) return <OneAxisGrip {...props} axis={first} drag={drag} arc={arc} />;
+  return <TwoAxisGrip {...props} axes={axes} drag={drag} arc={arc} />;
 }

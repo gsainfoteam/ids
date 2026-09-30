@@ -45,6 +45,8 @@ export function ResizableHandle({ className, ...props }: ResizableHandleProps) {
       <ResizeGrip
         {...props}
         axes={[c.axes.width, c.axes.height]}
+        corner={c.element}
+        placement="edge"
         disabled={c.disabled}
         onDraggingChange={c.onDraggingChange}
         data-resizable-handle=""

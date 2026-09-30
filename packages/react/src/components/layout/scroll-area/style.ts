@@ -72,12 +72,12 @@ export const scrollAreaStyle = tv({
     } satisfies Record<Axis, object>,
     placement: { start: {}, end: {} } satisfies Record<Placement, object>,
     vertical: {
-      start: { corner: 'start-[var(--scroll-area-corner-inset,var(--scroll-area-gap))]' },
-      end: { corner: 'end-[var(--scroll-area-corner-inset,var(--scroll-area-gap))]' },
+      start: { corner: 'start-(--scroll-area-gap)' },
+      end: { corner: 'end-(--scroll-area-gap)' },
     } satisfies Record<Placement, object>,
     horizontal: {
-      start: { corner: 'top-[var(--scroll-area-corner-inset,var(--scroll-area-gap))]' },
-      end: { corner: 'bottom-[var(--scroll-area-corner-inset,var(--scroll-area-gap))]' },
+      start: { corner: 'top-(--scroll-area-gap)' },
+      end: { corner: 'bottom-(--scroll-area-gap)' },
     } satisfies Record<Placement, object>,
     occupied: {
       true: { corner: 'size-auto rounded-none bg-transparent' },
@@ -89,6 +89,10 @@ export const scrollAreaStyle = tv({
     { axis: 'y', placement: 'start', class: { scrollbar: 'start-(--scroll-area-gap)' } },
     { axis: 'x', placement: 'end', class: { scrollbar: 'bottom-(--scroll-area-gap)' } },
     { axis: 'x', placement: 'start', class: { scrollbar: 'top-(--scroll-area-gap)' } },
+    { occupied: true, vertical: 'end', class: { corner: 'end-0' } },
+    { occupied: true, vertical: 'start', class: { corner: 'start-0' } },
+    { occupied: true, horizontal: 'end', class: { corner: 'bottom-0' } },
+    { occupied: true, horizontal: 'start', class: { corner: 'top-0' } },
   ],
   defaultVariants: {
     variant: 'hover',

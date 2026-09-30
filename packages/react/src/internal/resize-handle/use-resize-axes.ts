@@ -14,6 +14,7 @@ import {
   type ResizeRange,
 } from './axis';
 import {
+  innerEndEndRadius,
   isBeingDragged,
   isRightToLeft,
   markDragged,
@@ -95,6 +96,30 @@ export function useMeasuredAxes(targets: Partial<Record<ResizeDimension, HTMLEle
   }, [width, height]);
 
   return measured;
+}
+
+export function useCornerRadius(corner: HTMLElement | null) {
+  const [radius, setRadius] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    if (!corner) return;
+
+    const read = () => setRadius(innerEndEndRadius(corner));
+    const observer = new corner.ownerDocument.defaultView!.ResizeObserver(read);
+    observer.observe(corner);
+    read();
+
+    return () => observer.disconnect();
+  }, [corner]);
+
+  useLayoutEffect(() => {
+    const readAfterARestyleThatKeptTheSize = () => {
+      if (corner) setRadius(innerEndEndRadius(corner));
+    };
+    readAfterARestyleThatKeptTheSize();
+  });
+
+  return radius;
 }
 
 export function useAxesDrag(

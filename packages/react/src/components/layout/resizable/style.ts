@@ -15,7 +15,7 @@ export const resizableStyle = tv({
       'absolute z-10 rounded-full',
       'before:absolute before:top-1/2 before:left-1/2 before:-translate-1/2 before:rounded-full',
     ],
-    grip: 'absolute end-1 bottom-1 z-10',
+    grip: 'absolute end-0 bottom-0 z-10',
   },
   variants: {
     direction: {

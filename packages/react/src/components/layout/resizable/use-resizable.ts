@@ -78,6 +78,7 @@ export function useResizable({ width, height, controls }: UseResizableOptions) {
   };
 
   return {
+    element,
     setElement,
     width: sizes.width.size,
     height: sizes.height.size,

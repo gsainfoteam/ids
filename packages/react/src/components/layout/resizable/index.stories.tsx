@@ -47,6 +47,15 @@ type Story = StoryObj<typeof meta>;
 
 const valueOf = (separator: Element) => Number(separator.getAttribute('aria-valuenow'));
 
+function middleOf(path: SVGGeometryElement) {
+  const { x, y } = path.getPointAtLength(path.getTotalLength() / 2);
+  const toPage = path.getScreenCTM()!;
+  return {
+    clientX: toPage.a * x + toPage.c * y + toPage.e,
+    clientY: toPage.b * x + toPage.d * y + toPage.f,
+  };
+}
+
 export const Playground: Story = {};
 
 export const Gallery: Story = {
@@ -69,6 +78,38 @@ export const Gallery: Story = {
         <Showcase.Row label="vertical">
           <Resizable direction="vertical" defaultHeight={112} className={cn(panel, 'w-72')}>
             아래 가장자리를 끌어 높이를 바꿉니다.
+          </Resizable>
+        </Showcase.Row>
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Corner"
+        description="모서리 손잡이는 가장자리 손잡이와 같은 두께, 색, 자리의 선을 요소의 모서리를 따라 휘어 그립니다. 반지름은 요소에서 읽어서 같은 중심의 호가 되고, 반지름이 0 이면 끝이 살짝 둥근 ㄴ 자가 됩니다."
+      >
+        <Showcase.Row label="radius">
+          <Resizable
+            defaultWidth={180}
+            defaultHeight={112}
+            className="text-body-b3-regular rounded-none border border-(--ids-color-border) bg-(--ids-color-surface) p-4"
+          >
+            0
+          </Resizable>
+          <Resizable
+            defaultWidth={180}
+            defaultHeight={112}
+            className="rounded-standard text-body-b3-regular border border-(--ids-color-border) bg-(--ids-color-surface) p-4"
+          >
+            standard
+          </Resizable>
+          <Resizable defaultWidth={180} defaultHeight={112} className={panel}>
+            concentric-p-4
+          </Resizable>
+          <Resizable
+            defaultWidth={180}
+            defaultHeight={112}
+            className="text-body-b3-regular rounded-full border border-(--ids-color-border) bg-(--ids-color-surface) px-8 py-4"
+          >
+            full
           </Resizable>
         </Showcase.Row>
       </Showcase.Section>
@@ -111,7 +152,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Custom handle"
-        description="Resizable.Handle 을 선언하면 기본 손잡이 대신 그립니다. className 으로 모양을 바꾸고, children 으로 모서리 표시를 바꿉니다."
+        description="Resizable.Handle 을 선언하면 기본 손잡이 대신 그립니다. className 으로 모양과 색을 바꾸고, children 으로 모서리의 호를 다른 표시로 바꿉니다."
       >
         <Showcase.Row label="edge">
           <Resizable direction="horizontal" defaultWidth={260} className={cn(panel, 'h-28')}>
@@ -119,9 +160,15 @@ export const Gallery: Story = {
             <Resizable.Handle className="inset-y-3 -end-0.5 w-1 bg-(--ids-color-primary) before:hidden" />
           </Resizable>
         </Showcase.Row>
-        <Showcase.Row label="grip">
+        <Showcase.Row label="corner color">
           <Resizable defaultWidth={260} defaultHeight={120} className={panel}>
-            모서리 표시를 점으로 바꿨습니다.
+            호의 색은 글자색입니다. 올리거나 끄는 동안은 손잡이 단계를 따릅니다.
+            <Resizable.Handle className="text-(--ids-color-accent)" />
+          </Resizable>
+        </Showcase.Row>
+        <Showcase.Row label="corner mark">
+          <Resizable defaultWidth={260} defaultHeight={120} className={panel}>
+            children 은 호 대신 그릴 표시입니다.
             <Resizable.Handle>
               <span className="size-1.5 rounded-full bg-current" />
             </Resizable.Handle>
@@ -141,7 +188,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Right to left"
-        description="손잡이는 쓰는 방향의 끝(왼쪽)에 서고, 모서리 표시와 커서가 뒤집히며, ← 가 넓힙니다."
+        description="손잡이는 쓰는 방향의 끝(왼쪽)에 서고, 모서리의 호와 커서가 뒤집히며, ← 가 넓힙니다."
       >
         <Showcase.Row label="rtl">
           <div dir="rtl" className="flex flex-wrap gap-4">
@@ -219,19 +266,23 @@ export const PointerDrag: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const root = canvasElement.querySelector<HTMLElement>('[data-resizable]')!;
     const grip = canvas.getByRole('group', { name: '크기 조절' });
-    const box = grip.getBoundingClientRect();
-    const from = { clientX: box.left + box.width / 2, clientY: box.top + box.height / 2 };
+    const target = await waitFor(() => {
+      const path = grip.querySelector<SVGPathElement>('[data-resize-grip-target]');
+      expect(path).not.toBeNull();
+      return path!;
+    });
+    const from = middleOf(target);
     const by = (x: number, y: number) => ({ clientX: from.clientX + x, clientY: from.clientY + y });
 
     await userEvent.pointer([
-      { keys: '[MouseLeft>]', target: grip, coords: from },
-      { target: grip, coords: by(40, 30) },
-      { keys: '[/MouseLeft]', target: grip, coords: by(40, 30) },
+      { keys: '[MouseLeft>]', target, coords: from },
+      { target, coords: by(40, 30) },
+      { keys: '[/MouseLeft]', target, coords: by(40, 30) },
     ]);
     await waitFor(() => expect(root.style.width).toBe('280px'));
     await expect(root.style.height).toBe('150px');
 
-    await userEvent.dblClick(grip);
+    await userEvent.dblClick(target);
     await waitFor(() => expect(root.style.width).toBe('240px'));
   },
 };

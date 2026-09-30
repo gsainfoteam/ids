@@ -56,7 +56,11 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
   - 키보드로 조작됩니다. native 손잡이는 Tab 이 닿지 않습니다.
   - iOS 에서도 손가락으로 끌립니다.
   - 브라우저마다 모양이 같습니다.
-  - 스크롤 막대는 손잡이 위에서 멈춥니다. 손잡이는 ScrollArea 의 모서리를 차지하고(`ScrollArea.Corner`), 둥근 모서리의 곡선 안에 들어갑니다.
+  - 스크롤 막대는 손잡이 위에서 멈춥니다. 손잡이는 ScrollArea 의 모서리를 차지합니다(`ScrollArea.Corner`).
+- 손잡이는 Resizable 의 모서리 손잡이와 같은 호입니다. 입력 칸의 모서리 반지름을 읽어, 가장자리에서 5px 안쪽에 같은 중심의 호로 그립니다. 모든 `resize` 모드에서 모양이 같습니다.
+  - 기본 10px 모서리에서는 반지름 5px 의 호입니다.
+  - 아래 바가 있어 입력 칸의 아래 모서리가 각지면 끝이 살짝 둥근 ㄴ 자가 됩니다.
+  - 포커스는 호를 따라 그리고, 누를 영역은 입력 칸 모서리의 24px 정사각형입니다. 필드 밖으로 나가지 않습니다.
 - 높이는 textarea 에, 너비는 테두리 컨테이너 전체에 들어갑니다. 위아래 바의 높이는 그대로입니다.
 - 높이는 한 줄 이상, `maxRows` 가 있으면 그 이하입니다. 너비는 96px 이상입니다.
 - `Enter` 나 손잡이 두 번 누르기는 `rows` 와 `className` 으로 정한 크기로 돌아갑니다. 끄는 동안 `Escape` 는 끌기를 취소합니다.
@@ -187,7 +191,6 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 - `minRows` 가 `maxRows` 보다 크거나 양의 정수가 아니면 에러가 납니다.
 - `autoResize={false}` 에서 세로 패딩을 바꾸려면 `--ids-text-area-pad-y` 를 씁니다. `maxRows` 높이 계산에 이 값이 들어갑니다.
 - 손잡이로 바꾼 크기는 컴포넌트 안에만 있습니다. 새로 마운트하면(`key` 가 바뀌거나 `autoResize` 를 켜고 끄면) 처음 크기로 돌아갑니다.
-- 크기를 조절할 수 있는 TextArea 는 테두리 컨테이너의 `overflow` 가 `visible` 입니다. 손잡이의 누를 영역(24px)이 모서리 곡선에 잘리지 않게 하려는 것입니다.
 - `value` 를 주고 `onChange`, `onValueChange`, `readOnly` 가 모두 없으면 에러가 납니다.
 - `TextArea.Input` 을 둘 이상 두거나, Input에 children을 주거나, `asChild` 자식이 textarea가 아니면 에러가 납니다.
 - `id` 가 없으면 만들어 붙입니다.

@@ -39,21 +39,56 @@ export const resizeGripStyle = tv({
   slots: {
     grip: [
       resizeHandle.base,
-      resizeHandle.hitArea.corner,
       resizeHandle.ladder.ink,
       resizeHandle.motion,
-      resizeHandle.disabled,
-      'relative flex size-4 shrink-0 items-center justify-center rounded-indicator',
+      'group/grip relative shrink-0 data-disabled:opacity-50',
     ],
-    mark: 'pointer-events-none size-2.5 rtl:-scale-x-100',
+    drawing: 'pointer-events-none absolute overflow-visible rtl:-scale-x-100',
+    halo: [
+      'stroke-(--ids-color-primary)/40 opacity-0',
+      'group-focus-visible/grip:opacity-100 group-has-focus-visible/grip:opacity-100',
+    ],
+    arc: [
+      'stroke-current',
+      'group-focus-visible/grip:stroke-(--ids-color-primary)',
+      'group-has-focus-visible/grip:stroke-(--ids-color-primary)',
+    ],
+    target: 'group-data-disabled/grip:pointer-events-none',
     separator: 'sr-only',
   },
   variants: {
     axes: {
-      inline: { grip: [resizeHandle.cursor.vertical, resizeHandle.focus] },
-      block: { grip: [resizeHandle.cursor.horizontal, resizeHandle.focus] },
-      both: { grip: [resizeHandle.cursor.corner, resizeHandle.focusWithin] },
+      inline: { target: resizeHandle.cursor.vertical },
+      block: { target: resizeHandle.cursor.horizontal },
+      both: { target: resizeHandle.cursor.corner },
+    },
+    custom: {
+      true: {
+        grip: [
+          resizeHandle.hitArea.corner,
+          resizeHandle.disabled,
+          'm-1 flex size-4 items-center justify-center rounded-indicator',
+        ],
+      },
+      false: { grip: 'pointer-events-none' },
     },
   },
-  defaultVariants: { axes: 'both' },
+  compoundVariants: [
+    {
+      custom: true,
+      axes: 'inline',
+      class: { grip: [resizeHandle.cursor.vertical, resizeHandle.focus] },
+    },
+    {
+      custom: true,
+      axes: 'block',
+      class: { grip: [resizeHandle.cursor.horizontal, resizeHandle.focus] },
+    },
+    {
+      custom: true,
+      axes: 'both',
+      class: { grip: [resizeHandle.cursor.corner, resizeHandle.focusWithin] },
+    },
+  ],
+  defaultVariants: { axes: 'both', custom: false },
 });

@@ -505,7 +505,7 @@ test('both bars leave the corner to ScrollArea.Corner, which a rounded corner ha
   );
 });
 
-test('a Corner with content is occupied: shown with one bar, inside the curve, and the bar stops a gap short of it', async () => {
+test('a Corner with content is occupied: shown with one bar, flush in its corner, and the bar stops a gap short of it', async () => {
   const screen = await render(
     <div className="flex gap-4">
       <ScrollArea
@@ -535,21 +535,16 @@ test('a Corner with content is occupied: shown with one bar, inside the curve, a
   await expect.element(screen.getByRole('button', { name: '크기' })).toBeVisible();
 
   const round = screen.getByTestId('round').element().getBoundingClientRect();
-  const clearOfTheDiagonal = 14 * (1 - Math.SQRT1_2);
-  await expect
-    .poll(() => round.right - corner.getBoundingClientRect().right)
-    .toBeCloseTo(clearOfTheDiagonal, 1);
   const box = corner.getBoundingClientRect();
-  expect(round.bottom - box.bottom).toBeCloseTo(clearOfTheDiagonal, 1);
-  const vertical = inside('round', '[data-orientation="vertical"]').getBoundingClientRect();
-  expect(box.top - vertical.bottom).toBeCloseTo(GAP, 1);
+  expect([round.right - box.right, round.bottom - box.bottom]).toEqual([0, 0]);
+  expect([box.width, box.height]).toEqual([16, 16]);
+  const barBottom = () =>
+    inside('round', '[data-orientation="vertical"]').getBoundingClientRect().bottom;
+  await expect.poll(() => corner.getBoundingClientRect().top - barBottom()).toBeCloseTo(GAP, 1);
 
   const square = screen.getByTestId('square').element().getBoundingClientRect();
   const squareCorner = inside('square', '[data-scroll-area-corner]').getBoundingClientRect();
-  expect([square.right - squareCorner.right, square.bottom - squareCorner.bottom]).toEqual([
-    GAP,
-    GAP,
-  ]);
+  expect([square.right - squareCorner.right, square.bottom - squareCorner.bottom]).toEqual([0, 0]);
 });
 
 test('asChild roots and viewports: a listbox can itself be the scroller', async () => {

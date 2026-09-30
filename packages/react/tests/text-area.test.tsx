@@ -8,6 +8,7 @@ import { render } from 'vitest-browser-react';
 
 import { Field, TextArea } from '../src';
 import { skipWithoutCdp } from './engines';
+import { arcOf, expectTheArcToHug, middleOfTheArc, type Point } from './resize-grip';
 import { Field as RhfField } from '../src/react-hook-form';
 
 const LINE_PX = 20;
@@ -388,8 +389,6 @@ test('Count follows a value written by code (react-hook-form setValue)', async (
   await expect.element(counter()).toHaveTextContent('4');
 });
 
-type Point = { x: number; y: number };
-
 const GAP = 2;
 
 async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', point: Point) {
@@ -404,11 +403,6 @@ async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', poin
     clickCount: 1,
   });
 }
-
-const centerOf = (element: Element): Point => {
-  const box = element.getBoundingClientRect();
-  return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
-};
 
 const resizable = (resize: TextArea.Resize) => (
   <TextArea autoResize={false} resize={resize} rows={3} aria-label="메모" className="w-72">
@@ -495,7 +489,7 @@ test('the height floor is one line and maxRows caps it', async () => {
     .toHaveAttribute('aria-valuenow', String(LINE_PX * 4 + PADDING_PX * 2));
 });
 
-test('dragging the grip resizes the input area; the scrollbar stops above the grip, inside the curve', async (context) => {
+test('dragging the grip resizes the input area; the scrollbar stops above the grip', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(
     <TextArea
@@ -516,22 +510,91 @@ test('dragging the grip resizes the input area; the scrollbar stops above the gr
   const clearance = () => grip().getBoundingClientRect().top - bar().getBoundingClientRect().bottom;
   await expect.element(area()).toHaveAttribute('data-overflow-y');
   await expect.poll(clearance).toBeCloseTo(GAP, 0);
-
-  const box = area().getBoundingClientRect();
-  const gripBox = grip().getBoundingClientRect();
-  const radius = 10;
-  const center = { x: box.right - radius, y: box.bottom - radius };
-  expect(Math.hypot(gripBox.right - center.x, gripBox.bottom - center.y)).toBeCloseTo(radius, 0);
+  const cornerOfTheArea = area().getBoundingClientRect();
+  expect(grip().getBoundingClientRect().right).toBe(cornerOfTheArea.right);
+  expect(grip().getBoundingClientRect().bottom).toBe(cornerOfTheArea.bottom);
 
   textarea().focus();
   const naturalHeight = textarea().offsetHeight;
-  const start = centerOf(grip());
+  const start = middleOfTheArc(grip());
   await mouse('mousePressed', start);
   await mouse('mouseMoved', { x: start.x, y: start.y + 30 });
   await mouse('mouseReleased', { x: start.x, y: start.y + 30 });
   await expect.poll(() => textarea().offsetHeight).toBe(naturalHeight + 30);
   await expect.element(screen.getByRole('textbox', { name: '메모' })).toHaveFocus();
   await expect.poll(clearance).toBeCloseTo(GAP, 0);
+});
+
+test('every resize mode draws the arc 5px inside the input area, concentric with its corner, and a bottom bar squares it', async () => {
+  const field = (resize: TextArea.Resize, bottomBar = false) => (
+    <TextArea autoResize={false} resize={resize} rows={3} aria-label="메모" className="w-72">
+      <TextArea.Input />
+      {bottomBar && <span>아래</span>}
+    </TextArea>
+  );
+  const screen = await render(field('vertical'));
+  const grip = () => screen.container.querySelector<HTMLElement>('[data-resize-grip]')!;
+  const area = () =>
+    screen.getByRole('textbox', { name: '메모' }).element().closest('[data-scroll-area]')!;
+  const hugs = (radius: number) => () => {
+    const corner = area().getBoundingClientRect();
+    expectTheArcToHug(grip(), {
+      side: 'right',
+      runX: corner.right - 5,
+      runY: corner.bottom - 5,
+      radius,
+    });
+    return true;
+  };
+
+  for (const resize of ['vertical', 'horizontal', 'both'] as const) {
+    await screen.rerender(field(resize));
+    await expect.poll(() => arcOf(grip())).not.toBeNull();
+    await expect.poll(hugs(5), { message: resize }).toBe(true);
+  }
+
+  await screen.rerender(field('both', true));
+  await expect
+    .poll(hugs(2), { message: 'the bottom bar squares the corner, so the arc turns into an L' })
+    .toBe(true);
+});
+
+test('right to left: the TextArea arc sits in the bottom-left corner of the input area', async () => {
+  const screen = await render(
+    <div dir="rtl">
+      <TextArea autoResize={false} resize="both" rows={3} aria-label="메모" className="w-72" />
+    </div>,
+  );
+  const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
+  const area = () =>
+    screen.getByRole('textbox', { name: '메모' }).element().closest('[data-scroll-area]')!;
+
+  await expect.poll(() => arcOf(grip())).not.toBeNull();
+  const corner = area().getBoundingClientRect();
+  expect(grip().getBoundingClientRect().left).toBe(corner.left);
+  expectTheArcToHug(grip(), {
+    side: 'left',
+    runX: corner.left + 5,
+    runY: corner.bottom - 5,
+    radius: 5,
+  });
+});
+
+test('a one-axis grip draws its focus along the arc, not as a ring around its box', async () => {
+  const screen = await render(
+    <TextArea autoResize={false} resize="vertical" rows={3} aria-label="메모" className="w-72" />,
+  );
+  const handle = screen.getByRole('separator', { name: '높이' });
+  const halo = () => handle.element().querySelector('[data-resize-grip-halo]')!;
+
+  await expect.poll(() => handle.element().querySelector('[data-resize-grip-halo]')).not.toBeNull();
+  expect(getComputedStyle(halo()).opacity).toBe('0');
+
+  await userEvent.click(screen.getByRole('textbox', { name: '메모' }));
+  await userEvent.keyboard('{Tab}');
+  await expect.element(handle).toHaveFocus();
+  expect(getComputedStyle(halo()).opacity).toBe('1');
+  expect(getComputedStyle(handle.element()).boxShadow).toBe('none');
 });
 
 test('a disabled TextArea keeps its grip out of the tab order', async () => {

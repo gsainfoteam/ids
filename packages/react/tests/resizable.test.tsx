@@ -7,8 +7,7 @@ import { render } from 'vitest-browser-react';
 
 import { Card, IdsProvider, Resizable } from '../src';
 import { skipWithoutCdp } from './engines';
-
-type Point = { x: number; y: number };
+import { arcOf, expectTheArcToHug, middleOfTheArc, pointsAlong, type Point } from './resize-grip';
 
 const frameOffset = (point: Point) => {
   const frame = window.frameElement!.getBoundingClientRect();
@@ -149,10 +148,18 @@ test('the corner grip is one tab stop whose arrows resize each axis and move foc
   const grip = screen.getByRole('group', { name: '크기 조절' });
   const width = screen.getByRole('separator', { name: '너비' });
   const height = screen.getByRole('separator', { name: '높이' });
+  const halo = () => grip.element().querySelector('[data-resize-grip-halo]')!;
+  const arcColor = () => getComputedStyle(arcOf(grip.element())!).stroke;
+
+  await expect.poll(() => grip.element().querySelector('[data-resize-grip-halo]')).not.toBeNull();
+  const colorAtRest = arcColor();
+  expect(getComputedStyle(halo()).opacity).toBe('0');
 
   await userEvent.keyboard('{Tab}');
   await expect.element(width).toHaveFocus();
-  expect(getComputedStyle(grip.element()).boxShadow).not.toBe('none');
+  expect(getComputedStyle(halo()).opacity, 'the focus halo is drawn along the arc').toBe('1');
+  expect(arcColor()).not.toBe(colorAtRest);
+  expect(getComputedStyle(grip.element()).boxShadow, 'no rectangle around the target').toBe('none');
 
   await userEvent.keyboard('{ArrowDown}');
   await expect.element(height).toHaveFocus();
@@ -176,6 +183,110 @@ test('the corner grip is one tab stop whose arrows resize each axis and move foc
   await userEvent.keyboard('{Tab}');
   await expect.element(width).not.toHaveFocus();
   await expect.element(height).not.toHaveFocus();
+  expect(getComputedStyle(halo()).opacity).toBe('0');
+});
+
+test('the corner grip is an arc concentric with the corner, on the edge line the edge pills use, and follows a changed radius', async () => {
+  const panel = (rounded: string) => (
+    <Resizable defaultWidth={240} defaultHeight={160} className={`border ${rounded}`}>
+      내용
+    </Resizable>
+  );
+  const screen = await render(panel('rounded-[20px]'));
+  const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
+  const hugs = (radius: number) => () => {
+    const root = box(screen).getBoundingClientRect();
+    expectTheArcToHug(grip(), {
+      side: 'right',
+      runX: root.right - 1,
+      runY: root.bottom - 1,
+      radius,
+    });
+    return true;
+  };
+
+  await expect.poll(() => arcOf(grip())).not.toBeNull();
+  await expect.poll(hugs(19)).toBe(true);
+
+  const runStroke = Number(arcOf(grip())!.getAttribute('stroke-width'));
+  const edge = await render(
+    <Resizable direction="vertical" defaultHeight={80} className="w-40">
+      내용
+    </Resizable>,
+  );
+  const pill = getComputedStyle(
+    edge.container.querySelector('[role="separator"][data-resizable-handle]')!,
+    '::before',
+  );
+  expect(runStroke, 'the arc is as thick as an edge pill').toBe(parseFloat(pill.height));
+
+  await screen.rerender(panel('rounded-[8px]'));
+  await expect.poll(hugs(7)).toBe(true);
+
+  await screen.rerender(panel('rounded-none'));
+  await expect.poll(hugs(2), { message: 'a square corner bends the L a little' }).toBe(true);
+});
+
+test('right to left: the arc mirrors into the bottom-left corner', async () => {
+  const screen = await render(
+    <div dir="rtl" className="flex">
+      <Resizable defaultWidth={240} defaultHeight={160} className="rounded-[20px] border">
+        내용
+      </Resizable>
+    </div>,
+  );
+  const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
+
+  await expect.poll(() => arcOf(grip())).not.toBeNull();
+  const root = box(screen).getBoundingClientRect();
+  expectTheArcToHug(grip(), {
+    side: 'left',
+    runX: root.left + 1,
+    runY: root.bottom - 1,
+    radius: 19,
+  });
+  expect(getComputedStyle(grip().querySelector('[data-resize-grip-target]')!).cursor).toBe(
+    'nesw-resize',
+  );
+});
+
+test('the arc takes the pointer within 12px of it everywhere along it, and nowhere else', async () => {
+  const screen = await render(
+    <Resizable defaultWidth={240} defaultHeight={160} className="rounded-[20px] border">
+      내용
+    </Resizable>,
+  );
+  const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
+  await expect.poll(() => arcOf(grip())).not.toBeNull();
+
+  const points = pointsAlong(arcOf(grip())!, 24);
+  const hitsTheGrip = ({ x, y }: Point) => grip().contains(document.elementFromPoint(x, y));
+
+  points.forEach((point, index) => {
+    const before = points[Math.max(0, index - 1)]!;
+    const after = points[Math.min(points.length - 1, index + 1)]!;
+    const along = Math.hypot(after.x - before.x, after.y - before.y);
+    const normal = { x: -(after.y - before.y) / along, y: (after.x - before.x) / along };
+    const off = (distance: number) => ({
+      x: point.x + normal.x * distance,
+      y: point.y + normal.y * distance,
+    });
+
+    expect(hitsTheGrip(point), `on the arc at ${index}`).toBe(true);
+    expect(hitsTheGrip(off(11)), `11px to one side at ${index}`).toBe(true);
+    expect(hitsTheGrip(off(-11)), `11px to the other side at ${index}`).toBe(true);
+  });
+
+  const middle = middleOfTheArc(grip());
+  const root = box(screen).getBoundingClientRect();
+  const center = { x: root.right - 20, y: root.bottom - 20 };
+  const towardTheCenter = Math.hypot(middle.x - center.x, middle.y - center.y);
+  const inside = {
+    x: middle.x + ((center.x - middle.x) / towardTheCenter) * 14,
+    y: middle.y + ((center.y - middle.y) / towardTheCenter) * 14,
+  };
+  expect(hitsTheGrip(inside), 'the content 14px inside the arc stays pressable').toBe(false);
+  expect(document.elementFromPoint(inside.x, inside.y)).toBe(box(screen));
 });
 
 test('controlled: the size moves only when the app writes it back', async () => {
@@ -293,15 +404,16 @@ test('the grip drags both axes at once with the mouse, and by touch', async (con
     </Resizable>,
   );
   const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
+  await expect.poll(() => arcOf(grip())).not.toBeNull();
 
-  let start = centerOf(grip());
+  let start = middleOfTheArc(grip());
   await mouse('mousePressed', start);
   await mouse('mouseMoved', { x: start.x + 30, y: start.y + 20 });
   expect(document.documentElement.style.cursor).toBe('nwse-resize');
   await mouse('mouseReleased', { x: start.x + 30, y: start.y + 20 });
   await expect.poll(() => sizeOf(box(screen))).toEqual({ width: 230, height: 140 });
 
-  start = centerOf(grip());
+  start = middleOfTheArc(grip());
   await touch('touchStart', start);
   await touch('touchMove', { x: start.x - 20, y: start.y + 10 });
   await touch('touchMove', { x: start.x - 40, y: start.y + 30 });
@@ -440,7 +552,9 @@ test('dragging the grip inside a pressable card does not press the card', async 
       </Card>
     </IdsProvider>,
   );
-  const start = centerOf(screen.getByRole('group', { name: '크기 조절' }).element());
+  const grip = () => screen.getByRole('group', { name: '크기 조절' }).element();
+  await expect.poll(() => arcOf(grip())).not.toBeNull();
+  const start = middleOfTheArc(grip());
   await mouse('mousePressed', start);
   await mouse('mouseMoved', { x: start.x + 10, y: start.y + 10 });
   await mouse('mouseReleased', { x: start.x + 10, y: start.y + 10 });

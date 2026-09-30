@@ -9,7 +9,6 @@ import {
   NO_THUMB,
   PAGE_FRACTION,
   barCorners,
-  cornerInset,
   cornerSquareFits,
   edgeInset,
   meetingCorner,
@@ -28,7 +27,7 @@ type Bar = { element: HTMLElement; placement: Placement };
 
 type OccupiedCorner = { element: HTMLElement; placements: Record<Axis, Placement> };
 
-type CornerBox = { inset: number; width: number; height: number };
+type CornerBox = { width: number; height: number };
 
 type Drag = { axis: Axis; pointerId: number; from: number; scrollFrom: number; ratio: number };
 
@@ -126,13 +125,8 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
     };
 
     const measureCorner = () => {
-      const corner = occupiedCorner.current;
-      if (!corner) return null;
-
-      const { x, y } = corner.placements;
-      const inset = cornerInset(meetingCorner(y, x, shape.corners), shape.gap);
-      write(corner.element, '--scroll-area-corner-inset', inset);
-      return { inset, width: corner.element.offsetWidth, height: corner.element.offsetHeight };
+      const corner = occupiedCorner.current?.element;
+      return corner ? { width: corner.offsetWidth, height: corner.offsetHeight } : null;
     };
 
     const placeBars = () => {
@@ -151,7 +145,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
           if (!cornerBox || !cornerAtThisEnd) return byCrossBar;
 
           const cornerLength = axis === 'y' ? cornerBox.height : cornerBox.width;
-          return Math.max(byCrossBar, cornerBox.inset + cornerLength + shape.gap);
+          return Math.max(byCrossBar, cornerLength + shape.gap);
         };
 
         const start = edgeInset(corners.start, shape, takenAt('start'));
