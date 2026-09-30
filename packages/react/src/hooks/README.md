@@ -10,6 +10,7 @@
 | [`use-controllable-state.ts`](#use-controllable-statets) | 제어와 비제어를 한 모양으로 다루는 state             | 값이나 열림 상태를 가진 컴포넌트 대부분                              |
 | [`use-form-reset.ts`](#use-form-resetts)                 | native 폼 reset 뒤에 컴포넌트 state 를 되돌리는 hook | 자기 state 를 가진 폼 컨트롤                                         |
 | [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/surface.ts` |
+| [`use-reduced-motion.ts`](#use-reduced-motionts)         | 동작 줄이기 설정(`prefers-reduced-motion`)           | Marquee                                                              |
 
 ## use-controllable-state.ts
 
@@ -135,3 +136,29 @@ const { state: interaction, handlers } = useInteractive<HTMLButtonElement>({
 - 함수 자체를 값으로 받는 prop 을 새로 만들면 `CALLBACK_PROPS` 에 더합니다. 아니면 렌더 중에 state 를 인자로 불립니다.
 - `onInteractionChange` 는 마운트할 때도 한 번 불립니다.
 - DOM 속성 이름은 키를 kebab-case 로 바꾼 것입니다(`focusVisible` 은 `data-focus-visible`). CSS 패키지의 `focus-ring` 이 `[data-focus-visible]` 을 읽습니다.
+
+## use-reduced-motion.ts
+
+사용자가 운영체제에서 동작 줄이기를 켰는지(`(prefers-reduced-motion: reduce)`) 알려 주는 hook 입니다. 설정이 바뀌면 다시 렌더합니다.
+
+### 쓰는 곳
+
+- Marquee: 동작 줄이기면 복제본과 멈춤 버튼을 그리지 않고, 흐르지 않는 상태(`data-paused`)로 둡니다.
+
+### 쓰는 법
+
+```ts
+// components/data/marquee/root.tsx: prop 으로 정했으면 prop 이 이긴다
+const prefersReducedMotion = useReducedMotion();
+const reduced = reducedMotion ?? prefersReducedMotion;
+```
+
+### 왜 이렇게
+
+- `useSyncExternalStore` 로 `matchMedia` 의 `change` 를 구독합니다. 설정을 켜고 끄면 새로고침 없이 따라갑니다.
+- 서버와 hydration 의 첫 렌더는 `false` 입니다(`noPreferenceOnTheServer`). 서버는 설정을 모르고, hydration 은 서버 HTML 과 같은 값으로 해야 불일치가 나지 않습니다. 실제 값은 hydration 바로 뒤의 렌더에서 들어옵니다.
+- `matchMedia` 가 없는 환경(Node)에서는 구독하지 않고 `false` 입니다.
+
+### 알아둘 것
+
+- 모양은 이 hook 이 아니라 CSS 의 `motion-reduce:` variant 가 먼저 정합니다. hook 은 hydration 뒤에야 `true` 가 되므로, 서버 HTML 의 첫 그림부터 맞으려면 CSS 가 같은 조건을 맡아야 합니다. hook 은 요소를 그릴지 말지(복제본), 상태가 무엇인지처럼 CSS 가 못 하는 일만 합니다.
