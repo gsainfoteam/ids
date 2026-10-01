@@ -6,7 +6,7 @@ on:
 
 jobs:
   js:
-    name: JS (lint / typecheck / build)
+    name: JS (lint / typecheck / build / test)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,6 +37,42 @@ jobs:
 
       - name: Check react ships type declarations
         run: test -f packages/react/dist/index.d.ts
+
+      - name: Check the bundle size budget
+        run: pnpm size
+
+      - name: Build the Next.js, TanStack Start and Astro examples
+        run: pnpm examples:build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Check the examples server-render IDS
+        run: pnpm examples:check
+
+      - name: Install Chromium, Firefox and WebKit for browser tests
+        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium firefox webkit
+
+      - run: pnpm test
+
+  visual:
+    name: Visual regression (Playwright Linux image)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Compare every Gallery in light and dark with the committed baselines
+        run: node scripts/visual.mjs
+
+      - name: Upload the screenshots that differ
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-diffs
+          path: packages/react/.vitest/visual
 
   flutter:
     name: Flutter (test)

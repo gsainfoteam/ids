@@ -1,0 +1,131 @@
+[
+  {
+    "name": "import { Button }",
+    "path": "dist/index.js",
+    "import": "{ Button }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "29 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Dialog }",
+    "path": "dist/index.js",
+    "import": "{ Dialog }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "55 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Select }",
+    "path": "dist/index.js",
+    "import": "{ Select }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "74 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Splitter }",
+    "path": "dist/index.js",
+    "import": "{ Splitter }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "47 kB",
+    "gzip": true
+  },
+  {
+    "name": "import * (every export)",
+    "path": "dist/index.js",
+    "import": "*",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "400 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Carousel }",
+    "path": "dist/index.js",
+    "import": "{ Carousel }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "53 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Image }",
+    "path": "dist/index.js",
+    "import": "{ Image }",
+    "entry": ["index"],
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "51 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { Image }, its viewer opened",
+    "path": "dist/index.js",
+    "import": "{ Image }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "81 kB",
+    "gzip": true
+  }
+]

@@ -1,0 +1,99 @@
+'use client';
+
+import { ClockIcon } from '@heroicons/react/24/outline';
+
+import { resolveLocale } from '../../../internal/date-locale';
+import { TemporalField, type TemporalFieldProps } from '../../../internal/temporal-field';
+import {
+  formatter,
+  timeOptions,
+  type TemporalFormat,
+} from '../../../internal/temporal-field/format';
+import { useProviderLocale, useTranslate } from '../../../internal/translate';
+import { TimePicker, type TimePickerVariant } from '../../data/time-picker';
+import {
+  onUtcSampleDay,
+  resolveHourCycle,
+  sameTime,
+  timeKey,
+  validateTime,
+  type HourCycle,
+  type TimePrecision,
+} from '../../data/time-picker/time';
+
+import type { Time } from '@internationalized/date';
+
+export type TimeFieldProps = TemporalFieldProps<Time | null> & {
+  precision?: TimePrecision;
+  format?: TemporalFormat<Time>;
+  hourCycle?: HourCycle;
+  step?: number;
+  min?: Time;
+  max?: Time;
+  locale?: string;
+  pickerVariant?: TimePickerVariant;
+};
+
+export function TimeFieldRoot({
+  precision = 'minute',
+  format,
+  hourCycle,
+  step = 1,
+  min,
+  max,
+  locale,
+  pickerVariant,
+  ...props
+}: TimeFieldProps) {
+  const t = useTranslate();
+  const providerLocale = useProviderLocale();
+  validateTime(props.value, 'TimeField');
+  validateTime(props.defaultValue, 'TimeField');
+  validateTime(min, 'TimeField');
+  validateTime(max, 'TimeField');
+
+  const dateLocale = resolveLocale(locale ?? providerLocale);
+  const display = formatter(format, dateLocale, {
+    defaults: timeOptions(precision),
+    toDate: onUtcSampleDay,
+    cycle: resolveHourCycle(hourCycle, dateLocale),
+    timeZone: 'UTC',
+  });
+
+  return (
+    <TemporalField
+      {...props}
+      config={{
+        kind: 'time',
+        empty: null,
+        isEmpty: (value) => value === null,
+        isSame: sameTime,
+        display: (value) => display(value!),
+        serialize: (value) => timeKey(value!, precision),
+        messages: {
+          placeholder: t('timeField.placeholder'),
+          title: t('timeField.title'),
+          clear: t('timeField.clear'),
+          close: t('timeField.close'),
+        },
+        icon: ClockIcon,
+        initialFocusSelector: '[data-time-column]',
+        picker: ({ value, change, size }) => (
+          <TimePicker
+            value={value}
+            onValueChange={change}
+            precision={precision}
+            hourCycle={hourCycle}
+            step={step}
+            min={min}
+            max={max}
+            locale={dateLocale}
+            variant={pickerVariant}
+            size={size}
+            className="w-full"
+          />
+        ),
+      }}
+    />
+  );
+}

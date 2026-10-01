@@ -1,7 +1,14 @@
 {
   "ids": {
     "color": {
-      "values": { "$value": ["blue", "orange", "green"], "$type": "other" }
+      "values": {
+        "$value": [
+          "red", "orange", "amber", "yellow", "lime", "green",
+          "emerald", "teal", "cyan", "sky", "blue", "indigo",
+          "violet", "purple", "fuchsia", "pink", "rose"
+        ],
+        "$type": "other"
+      }
     },
     "mode": {
       "values": { "$value": ["light", "dark"], "$type": "other" }
@@ -10,7 +17,7 @@
       "values": { "$value": ["standard", "tiny"], "$type": "other" }
     },
     "variant": {
-      "values": { "$value": ["solid", "soft", "outline", "ghost"], "$type": "other" }
+      "values": { "$value": ["solid", "soft", "outline", "ghost", "glossy"], "$type": "other" }
     }
   }
 }

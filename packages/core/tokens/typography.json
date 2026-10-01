@@ -31,7 +31,10 @@
     "tight":  { "$value": "-0.025em", "$type": "dimension" }
   },
   "font-family": {
-    "sans": { "$value": ["Pretendard Variable", "Pretendard", "sans-serif"], "$type": "fontFamily" },
-    "mono": { "$value": ["JetBrains Mono", "monospace"], "$type": "fontFamily" }
+    "sans": { "$value": ["Pretendard GOV Variable", "Pretendard GOV", "Pretendard Variable", "Pretendard", "sans-serif"], "$type": "fontFamily" },
+    "mono": { "$value": ["Monaspace Neon Var", "Monaspace Neon", "ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"], "$type": "fontFamily" }
+  },
+  "font-size-adjust": {
+    "mono": { "$value": 0.487, "$type": "number" }
   }
 }

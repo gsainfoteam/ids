@@ -1,0 +1,10 @@
+{
+  "color": {
+    "primary": { "$value": "{amber.600}", "$type": "color" },
+    "on-primary": { "$value": "{neutral.950}", "$type": "color" },
+    "secondary": { "$value": "{amber.100}", "$type": "color" },
+    "on-secondary": { "$value": "{amber.800}", "$type": "color" },
+    "accent": { "$value": "{amber.700}", "$type": "color" },
+    "outline": { "$value": "{amber.200}", "$type": "color" }
+  }
+}

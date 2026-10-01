@@ -1,11 +1,9 @@
-import type { CSSProperties, ReactNode, Ref, RefCallback, SyntheticEvent } from 'react';
+import type { CSSProperties, Ref, RefCallback, SyntheticEvent } from 'react';
 
 import { isFunction, isNotNil, isPlainObject, isString, union } from 'es-toolkit';
-import { castArray } from 'es-toolkit/compat';
 
 import { cn } from './cn';
 
-/** handler1 → (defaultPrevented면 중단) → handler2 */
 export function mergeEventHandlers<E extends SyntheticEvent>(
   handler1: ((event: E) => void) | undefined,
   handler2: ((event: E) => void) | undefined,
@@ -21,7 +19,7 @@ export function mergeEventHandlers<E extends SyntheticEvent>(
   };
 }
 
-export function mergeRefs<T>(...refs: Array<Ref<T> | null | undefined>): RefCallback<T> {
+function attachAll<T>(refs: Array<Ref<T> | null | undefined>): RefCallback<T> {
   return (value) => {
     const cleanups = refs.map((ref) => {
       if (isFunction(ref)) {
@@ -38,6 +36,24 @@ export function mergeRefs<T>(...refs: Array<Ref<T> | null | undefined>): RefCall
     });
     return () => cleanups.forEach((cleanup) => cleanup?.());
   };
+}
+
+type RefPath = { next: WeakMap<object, RefPath>; callback?: RefCallback<unknown> };
+
+const NO_REF: object = {};
+const callbacksByRefs: RefPath = { next: new WeakMap() };
+
+export function mergeRefs<T>(...refs: Array<Ref<T> | null | undefined>): RefCallback<T> {
+  const path = refs.reduce<RefPath>((parent, ref) => {
+    const key = ref ?? NO_REF;
+    const known = parent.next.get(key);
+    if (known) return known;
+    const created: RefPath = { next: new WeakMap() };
+    parent.next.set(key, created);
+    return created;
+  }, callbacksByRefs);
+  path.callback ??= attachAll(refs);
+  return path.callback;
 }
 
 function mergeObject<A extends object | undefined, B extends object | undefined>(
@@ -67,14 +83,6 @@ function isStyle(value: unknown): value is CSSProperties {
   return isPlainObject(value);
 }
 
-/**
- * Slot / asChild용 props 합성.
- * - className: `cn`으로 병합
- * - style: shallow merge (next 우선)
- * - ref: `mergeRefs`
- * - on*: `mergeEventHandlers` (base → next, defaultPrevented 시 중단)
- * - 나머지: next ?? base
- */
 export function mergeProps<P extends Record<string, unknown>, Q extends Record<string, unknown>>(
   baseProps: P,
   nextProps: Q,
@@ -113,10 +121,4 @@ export function mergeProps<P extends Record<string, unknown>, Q extends Record<s
   }
 
   return merged as P & Q;
-}
-
-/** Slot 형제가 있을 때 root child의 children 뒤에 이어 붙인다 */
-export function mergeChildren(existing: ReactNode, ...extra: ReactNode[]): ReactNode {
-  if (extra.length === 0) return existing;
-  return [...castArray(existing), ...extra];
 }

@@ -15,6 +15,9 @@ React (Web)과 Flutter (Mobile)을 동시 지원하며, 토큰 파이프라인�
 
 설치법은 각 패키지 README 에 있다. npm 패키지는 GitHub Packages 라 인증이 필요하다.
 
+접근성 기준(WCAG 2.2 AA), 컴포넌트별 키보드와 ARIA, 알려진 한계, 스크린 리더 수동 점검표는
+[docs/accessibility.md](docs/accessibility.md) 에 있다.
+
 ## 환경 세팅
 
 ```bash
@@ -35,7 +38,7 @@ mise install   # .mise.toml에 명시된 Flutter 버전 설치
 
 PR을 열면 자동으로 아래 체크가 실행된다.
 
-- **JS**: `pnpm codegen` → 생성 파일 동기화 확인 → `typecheck` → `lint` → `build`
+- **JS**: `pnpm codegen` → 생성 파일 동기화 확인 → `typecheck` → `lint` → `build` → 번들 크기 예산(`size`) → 예제 앱 빌드(`examples:build`) → 예제가 서버에서 IDS 를 그렸는지 확인(`examples:check`) → `test`
 - **Flutter**: `flutter test`
 
 토큰 파일(`packages/core/tokens/`)을 수정했는데 `pnpm codegen`을 실행하지 않으면 CI가 실패한다.
@@ -91,13 +94,13 @@ pnpm lint
 
 컴포넌트는 외부 headless 라이브러리(Radix, Base UI 등)에 의존하지 않고 전부 직접 구현한다.
 
-모든 IDS 컴포넌트는 `ThemeProvider` 없이 동작하지 않는다:
+모든 IDS 컴포넌트는 `IdsProvider` 없이 동작하지 않는다:
 
 ```tsx
 // Storybook decorator나 App 최상단에 반드시 추가
-<ThemeProvider color="blue" mode="light">
+<IdsProvider color="blue" mode="light">
   <App />
-</ThemeProvider>
+</IdsProvider>
 ```
 
 ### Flutter 컴포넌트 개발
@@ -157,10 +160,13 @@ graph LR
 ## 자주 쓰는 명령어
 
 ```bash
-pnpm codegen      # 토큰 → css / react / flutter 생성
-pnpm build        # 전체 빌드 (turbo, css → react 순서 자동)
-pnpm typecheck    # TypeScript 검사
-pnpm lint         # ESLint
-pnpm storybook    # Storybook (포트 6006)
-pnpm changeset    # 변경 내용 기록
+pnpm codegen         # 토큰 → css / react / flutter 생성
+pnpm build           # 패키지 빌드 (turbo, css → react 순서 자동)
+pnpm examples:build  # examples/ 의 Next.js, TanStack Start, Astro 앱 빌드
+pnpm examples:check  # 예제 빌드 결과에 서버에서 그린 IDS 가 있는지 확인
+pnpm size            # ids-react 번들 크기(gzip)가 예산 안인지 확인
+pnpm typecheck       # TypeScript 검사
+pnpm lint            # ESLint
+pnpm storybook       # Storybook (포트 6006)
+pnpm changeset       # 변경 내용 기록
 ```

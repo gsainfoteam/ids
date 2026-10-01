@@ -1,9 +1,23 @@
 // GENERATED — do not edit manually
 
 enum IdsColor {
-  blue,
+  red,
   orange,
+  amber,
+  yellow,
+  lime,
   green,
+  emerald,
+  teal,
+  cyan,
+  sky,
+  blue,
+  indigo,
+  violet,
+  purple,
+  fuchsia,
+  pink,
+  rose,
 }
 
 enum IdsMode {
@@ -21,4 +35,5 @@ enum IdsVariant {
   soft,
   outline,
   ghost,
+  glossy,
 }

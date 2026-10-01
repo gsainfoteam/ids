@@ -1,0 +1,22 @@
+name: 기능 제안
+description: 새 컴포넌트, prop, 토큰을 제안할 때
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 풀고 싶은 문제
+      description: 지금 무엇이 불편한지, 어떤 화면에서 필요한지 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 제안
+      description: 원하는 API 나 모양. 참고한 라이브러리가 있으면 링크를 붙여 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 지금 쓰는 우회 방법

@@ -1,0 +1,26 @@
+---
+import { Badge, Button, IdsProvider } from '@gsainfoteam/ids-react';
+
+import { Demo } from '../components/demo';
+import '../styles/global.css';
+---
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IDS on Astro</title>
+  </head>
+  <body>
+    <IdsProvider color="blue" mode="light">
+      <header class="mx-auto flex max-w-xl flex-col gap-4 p-8">
+        <h1 class="text-headline-h3-bold">IDS + Astro</h1>
+        <p class="text-body-b2-regular">이 머리말은 JavaScript 없이 정적으로 그린 React 컴포넌트입니다.</p>
+        <Badge content={3}>
+          <Button variant="outline">정적 버튼</Button>
+        </Badge>
+      </header>
+    </IdsProvider>
+    <Demo client:load />
+  </body>
+</html>

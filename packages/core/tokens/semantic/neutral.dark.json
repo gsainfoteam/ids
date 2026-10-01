@@ -1,8 +1,14 @@
 {
   "color": {
-    "surface":    { "$value": "{neutral.950}", "$type": "color" },
-    "on-surface": { "$value": "{neutral.50}",  "$type": "color" },
-    "muted":      { "$value": "{neutral.800}", "$type": "color" },
-    "on-muted":   { "$value": "{neutral.400}", "$type": "color" }
+    "surface":       { "$value": "{neutral.950}", "$type": "color" },
+    "on-surface":    { "$value": "{neutral.50}",  "$type": "color" },
+    "muted":         { "$value": "{neutral.800}", "$type": "color" },
+    "muted-hover":   { "$value": "{neutral.700}", "$type": "color" },
+    "muted-active":  { "$value": "{neutral.600}", "$type": "color" },
+    "border":        { "$value": "{neutral.800}", "$type": "color" },
+    "on-muted":      { "$value": "{neutral.400}", "$type": "color" },
+    "handle":        { "$value": "{neutral.700}", "$type": "color" },
+    "handle-hover":  { "$value": "{neutral.600}", "$type": "color" },
+    "handle-active": { "$value": "{neutral.500}", "$type": "color" }
   }
 }

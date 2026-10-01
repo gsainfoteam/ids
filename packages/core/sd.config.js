@@ -1,8 +1,6 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { StyleDictionary } from "style-dictionary-utils";
 
-// ─── Shared helpers ───────────────────────────────────────────────────────────
-
 const GENERATED = "// GENERATED — do not edit manually";
 
 const slug = (t) => t.path.slice(1).join("-");
@@ -33,7 +31,6 @@ const byCategory = (dictionary, cat) =>
 const byPath = (dictionary, key) =>
   dictionary.allTokens.filter((t) => t.path[0] === key);
 
-// Extracts palette (non-semantic) tokens for reference resolution
 const buildPalette = (dictionary) => {
   const p = {};
   for (const t of dictionary.allTokens.filter(
@@ -43,15 +40,13 @@ const buildPalette = (dictionary) => {
   return p;
 };
 
-// Resolves {token.path} references against palette
 const resolveRef = (value, palette) => {
   if (typeof value !== "string") return value;
   const m = value.match(/^\{([^}]+)\}$/);
   return m ? (palette[m[1]] ?? value) : value;
 };
 
-// Reads a semantic JSON file and returns color entries with resolved values
-const readColorEntries = (color, mode, palette) => {
+const readColorEntriesWithoutCollision = (color, mode, palette) => {
   const json = JSON.parse(
     readFileSync(`./tokens/semantic/${color}.${mode}.json`, "utf8"),
   );
@@ -67,7 +62,6 @@ const isTypographyToken = (node) =>
   (node.$type === "typography" ||
     (node.$value && typeof node.$value === "object" && "fontSize" in node.$value));
 
-// Flatten nested text.* typography composites → [{ name: 'headline-h1-bold', ... }]
 const flattenTypography = (node, path = []) => {
   if (isTypographyToken(node)) {
     const raw = node.$value ?? node.value;
@@ -87,7 +81,6 @@ const flattenTypography = (node, path = []) => {
   );
 };
 
-// Reads semantic/typography.json and returns resolved composite entries
 const readTypographyEntries = (palette) => {
   const json = JSON.parse(
     readFileSync("./tokens/semantic/typography.json", "utf8"),
@@ -101,7 +94,6 @@ const readTypographyEntries = (palette) => {
   }));
 };
 
-// Flutter letterSpacing is px — convert em relative to fontSize when needed
 const letterSpacingToPx = (letterSpacing, fontSize) => {
   const raw = String(letterSpacing);
   if (raw.endsWith("em")) return parseFloat(raw) * parseFloat(fontSize);
@@ -117,7 +109,6 @@ const parseEnums = (dictionary) => {
   return result;
 };
 
-// Discover color pairs from semantic/ dir — excludes neutral, status
 const colorPairs = [
   ...new Map(
     readdirSync("./tokens/semantic").flatMap((f) => {
@@ -129,7 +120,6 @@ const colorPairs = [
   ).values(),
 ];
 
-// Tailwind v4 @theme namespace — token path[0] → CSS var prefix
 const TW_NS = {
   color: "--color-",
   spacing: "--spacing-",
@@ -161,8 +151,7 @@ const TYPOGRAPHY_CATS = [
   "letter-spacing",
   "line-height",
 ];
-
-// ─── Templates ────────────────────────────────────────────────────────────────
+const TYPOGRAPHY_CATS_TAILWIND_HAS_NO_THEME_FOR = ["font-size-adjust"];
 
 const T_CSS_THEME = `@theme {
 {{THEME}}
@@ -243,10 +232,6 @@ const T_CSS_TEXT_ROOT = `  --ids-text-{{NAME}}: {{FONT_SIZE}};
 
 const T_DART_TEXT_STYLE = `TextStyle(fontFamily: '{{FONT_FAMILY}}', package: '{{FONT_PACKAGE}}', fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
 
-// ─── CSS helpers ─────────────────────────────────────────────────────────────
-
-// @theme { --color-primary: var(--ids-color-primary); ... } — Tailwind bridge
-// deduplicates across color+mode files so each token name appears once
 const buildColorBridgeCSS = (dictionary) => {
   const seen = new Set();
   const theme = dictionary.allTokens
@@ -262,20 +247,16 @@ const buildColorBridgeCSS = (dictionary) => {
   return render(T_CSS_THEME, { THEME: theme });
 };
 
-// :root { --ids-motion-fast: 150ms; ... }
 const buildStaticCSS = (dictionary) => {
   const lines = ["motion", "radius", "size"].flatMap((cat) =>
     byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
   );
-  // rounded-* has to resolve to the IDS scale, so bridge radius into @theme too.
-  const theme = byCategory(dictionary, "radius").map(
+  const roundedUsesIdsRadius = byCategory(dictionary, "radius").map(
     (t) => `  --radius-${slug(t)}: var(${idsVar("radius", t)});`,
   );
-  return `:root {\n${lines.join("\n")}\n}\n\n@theme {\n${theme.join("\n")}\n}\n`;
+  return `:root {\n${lines.join("\n")}\n}\n\n@theme {\n${roundedUsesIdsRadius.join("\n")}\n}\n`;
 };
 
-// Keyframes can't come from a token file, but they have to ship with the CSS
-// package so consumers get the same motion the components assume.
 const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
   from {
     transform: translateX(-100%);
@@ -285,27 +266,157 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
   }
 }
 
+@keyframes ids-caret-blink {
+  0%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes ids-skeleton-pulse {
+  50% {
+    background-color: var(--ids-color-muted-hover);
+  }
+}
+
+@keyframes ids-skeleton-wave {
+  from {
+    background-position: -100% 0;
+  }
+  60%,
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes ids-marquee {
+  to {
+    translate: var(--ids-marquee-translate, -50%);
+  }
+}
+
 @theme {
   --animate-progress-slide: ids-progress-slide 1.4s ease-in-out infinite;
+  --animate-caret-blink: ids-caret-blink 1.25s ease-out infinite;
+  --animate-skeleton-pulse: ids-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-skeleton-wave: ids-skeleton-wave 2s ease-in-out infinite;
 }
 `;
 
-// One definition for every focus trigger IDS uses: real form controls, components
-// driven by useInteractive, and a shell that wraps a focusable field.
+const T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES = `@theme inline {
+  --animate-marquee: ids-marquee var(--ids-marquee-duration, 20s) linear infinite var(--ids-marquee-direction, normal) var(--ids-marquee-play-state, running);
+}
+`;
+
+const darkModeRegion = `[data-mode="dark"], [data-mode="dark"] *`;
+const lightRegionInsideDark = `[data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *`;
+
+const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:where(${lightRegionInsideDark})));
+`;
+
+const focusedInsideButNotInItsPopups = (marker) =>
+  `&:has([${marker}]:focus-visible):not(:has([popover] [${marker}]:focus-visible))`;
+
+const FOCUS_RING_TRIGGERS = {
+  formControl: "&:focus-visible",
+  useInteractive: "&[data-focus-visible]",
+  shellAroundFieldInput: focusedInsideButNotInItsPopups("data-field-input"),
+  textField: focusedInsideButNotInItsPopups("data-text-field-input"),
+  textArea: focusedInsideButNotInItsPopups("data-text-area-input"),
+};
+
+const focusRingTriggers = (indent) =>
+  Object.values(FOCUS_RING_TRIGGERS).join(`,\n${indent}`);
+
 const T_CSS_UTILITIES = `@utility focus-ring {
   outline: none;
 
-  &:focus-visible,
-  &[data-focus-visible],
-  &:has([data-text-field-input]:focus-visible),
-  &:has([data-text-area-input]:focus-visible) {
-    @apply ring-[3px] ring-(--ids-color-primary)/40;
+  ${focusRingTriggers("  ")} {
+    @apply ring-[3px] ring-(--ids-color-primary)/40 inset-ring-(--ids-color-primary);
   }
+
+  &[aria-invalid="true"],
+  &[data-invalid] {
+    @apply inset-ring-(--ids-color-danger);
+
+    ${focusRingTriggers("    ")} {
+      @apply ring-(--ids-color-danger)/40 inset-ring-(--ids-color-danger);
+    }
+  }
+}
+
+@utility font-mono {
+  font-size-adjust: var(--ids-font-size-adjust-mono);
 }
 `;
 
-// :root { --ids-text-button-standard: ...; --ids-font-size-h1: ... }
-// @theme { --text-button-standard: var(--ids-text-button-standard); --font-weight-semibold: ... }
+const CONCENTRIC_PADS = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 8];
+
+const PAGE_OVERLAY_AND_OVERLAY_IN_OVERLAY = [0, 1, 2];
+
+const concentricClass = (n) => `.concentric-p-${String(n).replace(".", "\\.")}`;
+
+const withinPopovers = (depth) => {
+  const path = Array(depth).fill("[popover]").join(" ");
+  return `${path}, ${path} *`;
+};
+
+const nestedChains = [
+  ...CONCENTRIC_PADS.map((a) => ({ sum: a, sel: concentricClass(a) })),
+  ...CONCENTRIC_PADS.flatMap((a) =>
+    CONCENTRIC_PADS.map((b) => ({
+      sum: a + b,
+      sel: `:where(${concentricClass(a)}) ${concentricClass(b)}`,
+    })),
+  ),
+];
+
+const nestedRulesAt = (depth) => {
+  const containerDepth = depth === 0 ? "" : `:is(${withinPopovers(depth)})`;
+  const notBehindAnotherPopover = `:not(${withinPopovers(depth + 1)})`;
+  const sums = [...new Set(nestedChains.map((c) => c.sum))].sort((x, y) => x - y);
+  return sums.map((sum) => {
+    const chains = nestedChains
+      .filter((c) => c.sum === sum)
+      .map((c) => `${c.sel}${notBehindAnotherPopover}`);
+    return `  [class*="concentric-p-"]${containerDepth}:has(\n    ${chains.join(",\n    ")}\n  ) {\n    --ids-concentric-nested: calc(var(--spacing) * ${sum});\n  }`;
+  });
+};
+
+const buildConcentricCSS = () => {
+
+  return `@property --ids-concentric-pad {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --ids-concentric-nested {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@utility concentric-p-* {
+  --ids-concentric-pad: --spacing(--value(number));
+  padding: var(--ids-concentric-pad);
+  border-radius: min(
+    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested),
+    var(--ids-radius-container)
+  );
+}
+
+@layer utilities {
+${PAGE_OVERLAY_AND_OVERLAY_IN_OVERLAY.flatMap(nestedRulesAt).join("\n")}
+}
+`;
+};
+
 const buildTypographyCSS = (dictionary) => {
   const palette = buildPalette(dictionary);
   const entries = readTypographyEntries(palette);
@@ -332,30 +443,29 @@ const buildTypographyCSS = (dictionary) => {
             LETTER_SPACING: letterSpacing,
           }),
       ),
-      ...TYPOGRAPHY_CATS.flatMap((cat) =>
+      ...[...TYPOGRAPHY_CATS, ...TYPOGRAPHY_CATS_TAILWIND_HAS_NO_THEME_FOR].flatMap((cat) =>
         byPath(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
       ),
     ].join("\n"),
   });
 };
 
-// [data-color="blue"][data-mode="light"] { --ids-color-primary: #2563eb; ... }
-// Reads source JSON directly — bypasses SD token collision from multi-theme files
 const buildColorThemeCSS = (dictionary, color, mode, selector) => {
-  const lines = readColorEntries(color, mode, buildPalette(dictionary)).map(
+  const lines = readColorEntriesWithoutCollision(color, mode, buildPalette(dictionary)).map(
     ({ name, value }) => `  --ids-color-${name}: ${value};`,
   );
   return `${selector} {\n${lines.join("\n")}\n}\n`;
 };
-
-// ─── CSS formatter ────────────────────────────────────────────────────────────
 
 const cssFormatter = ({ dictionary }) =>
   [
     buildColorBridgeCSS(dictionary),
     buildStaticCSS(dictionary),
     T_CSS_ANIMATIONS,
+    T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES,
+    T_CSS_VARIANTS,
     T_CSS_UTILITIES,
+    buildConcentricCSS(),
     buildTypographyCSS(dictionary),
     ...colorPairs.map(([c, m]) =>
       buildColorThemeCSS(
@@ -371,8 +481,6 @@ const cssFormatter = ({ dictionary }) =>
     buildColorThemeCSS(dictionary, "status", "dark", '[data-mode="dark"]'),
   ].join("\n");
 
-// ─── TS formatters ────────────────────────────────────────────────────────────
-
 const tsTypesFormatter = ({ dictionary }) => {
   const enums = parseEnums(dictionary);
   return render(T_TS_FILE, {
@@ -384,8 +492,6 @@ const tsTypesFormatter = ({ dictionary }) => {
       .join("\n"),
   });
 };
-
-// ─── Dart formatters ──────────────────────────────────────────────────────────
 
 const dartEnumsFormatter = ({ dictionary }) => {
   const enums = parseEnums(dictionary);
@@ -405,7 +511,6 @@ const dartEnumsFormatter = ({ dictionary }) => {
   return `${GENERATED}\n\n${blocks}\n`;
 };
 
-// Reads source JSON directly — bypasses SD token collision from multi-theme files
 const dartColorTokensFormatter = ({ dictionary }) => {
   const palette = buildPalette(dictionary);
   const toColorLine = ({ name, value }) =>
@@ -423,8 +528,8 @@ const dartColorTokensFormatter = ({ dictionary }) => {
       render(T_DART_COLOR_MAP, {
         NAME: mapName(c, m),
         ENTRIES: [
-          ...readColorEntries(c, m, palette),
-          ...readColorEntries("status", m, palette),
+          ...readColorEntriesWithoutCollision(c, m, palette),
+          ...readColorEntriesWithoutCollision("status", m, palette),
         ]
           .map(toColorLine)
           .join("\n"),
@@ -434,17 +539,6 @@ const dartColorTokensFormatter = ({ dictionary }) => {
 
   return render(T_DART_IDS_TOKENS, { CASES: cases, MAPS: maps });
 };
-
-const dartSpacingFormatter = ({ dictionary }) =>
-  render(T_DART_CLASS, {
-    NAME: "IdsSpacing",
-    MEMBERS: byCategory(dictionary, "spacing")
-      .map(
-        (t) =>
-          `  static const double ${toCamel(t.path[1])} = ${parseFloat(val(t))};`,
-      )
-      .join("\n"),
-  });
 
 const dartMotionFormatter = ({ dictionary }) =>
   render(T_DART_CLASS, {
@@ -463,7 +557,7 @@ const dartTypographyFormatter = ({ dictionary }) => {
     .find((t) => t.path[1] === "sans");
   const baseFontFamily = sansFontFamily
     ? val(sansFontFamily)[0]
-    : "Pretendard Variable";
+    : "Pretendard GOV Variable";
   const fontFamily = baseFontFamily;
   const fontPackage = "ids_flutter";
   const members = [
@@ -487,21 +581,16 @@ const dartTypographyFormatter = ({ dictionary }) => {
   });
 };
 
-// ─── Register ─────────────────────────────────────────────────────────────────
-
 for (const [name, format] of [
   ["ids/css", cssFormatter],
   ["ids/ts-types", tsTypesFormatter],
   ["ids/dart-enums", dartEnumsFormatter],
   ["ids/dart-color-tokens", dartColorTokensFormatter],
-  // ["ids/dart-spacing", dartSpacingFormatter],
   ["ids/dart-motion", dartMotionFormatter],
   ["ids/dart-typography", dartTypographyFormatter],
 ]) {
   StyleDictionary.registerFormat({ name, format });
 }
-
-// ─── Config ───────────────────────────────────────────────────────────────────
 
 export default {
   log: { warnings: "disabled" },
@@ -524,7 +613,6 @@ export default {
           destination: "../flutter/lib/tokens/ids_color_tokens.dart",
           format: "ids/dart-color-tokens",
         },
-        // { destination: "../flutter/lib/tokens/ids_spacing.dart", format: "ids/dart-spacing" },
         { destination: "../flutter/lib/tokens/ids_motion.dart", format: "ids/dart-motion" },
         {
           destination: "../flutter/lib/tokens/ids_typography.dart",

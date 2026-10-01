@@ -54,37 +54,232 @@ steps:
 
 Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환경변수로 넣는다.
 
-## 설정
+## 프레임워크별 설치
 
-CSS 엔트리포인트에서 import:
+모든 프레임워크에서 할 일은 세 가지다.
+
+- CSS 엔트리에서 `tailwindcss`, `@gsainfoteam/ids-css` 순서로 가져온다.
+- `@source` 로 `@gsainfoteam/ids-react` 의 `dist` 를 스캔하게 한다. Tailwind 는 `node_modules` 를 스스로 스캔하지 않아서, 이 줄이 없으면 컴포넌트의 클래스가 CSS 에 생기지 않는다. 경로는 그 CSS 파일에서 본 상대 경로다.
+- 앱 최상단을 `IdsProvider` 로 감싼다. `IdsProvider` 가 없으면 CSS 변수가 정의되지 않아 색이 보이지 않는다.
 
 ```css
-@import "@gsainfoteam/ids-css";
-@import "tailwindcss";
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../node_modules/@gsainfoteam/ids-react/dist';
 ```
 
-앱 최상단에 `ThemeProvider` 추가:
+- 글꼴은 [`@gsainfoteam/ids-css` README](../css/README.md#폰트) 를 따른다.
+- Next.js, TanStack Start, Astro 설정은 `examples/` 의 앱과 같다. CI 가 세 앱을 빌드하고, 서버가 그린 HTML 에 IDS 가 들어 있는지와 CSS 에 IDS 클래스가 생겼는지 확인한다(`pnpm examples:check`).
+
+### Next.js (App Router)
+
+예제: [`examples/next-app-router`](../../examples/next-app-router)
+
+```bash
+npm install next react react-dom @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install -D tailwindcss @tailwindcss/postcss
+```
+
+```js
+// postcss.config.mjs
+export default {
+  plugins: { '@tailwindcss/postcss': {} },
+};
+```
+
+```css
+/* app/globals.css */
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../node_modules/@gsainfoteam/ids-react/dist';
+```
 
 ```tsx
-import { ThemeProvider } from '@gsainfoteam/ids-react';
+// app/layout.tsx
+import { IdsProvider } from '@gsainfoteam/ids-react';
 
-function App() {
+import './globals.css';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider color="blue" mode="light">
-      {/* 앱 전체 */}
-    </ThemeProvider>
+    <html lang="ko">
+      <body>
+        <IdsProvider color="blue" mode="light">{children}</IdsProvider>
+      </body>
+    </html>
   );
 }
 ```
 
-`ThemeProvider` 없이는 CSS 변수가 정의되지 않아 색상이 렌더링되지 않는다.
+- 페이지와 레이아웃은 서버 컴포넌트 그대로 둔다. `'use client'` 없이 `<Dialog.Trigger>`, `<Select.Item>`, `Button.Style()` 을 쓸 수 있다.
+- 이벤트 핸들러를 넘기는 곳만 클라이언트 컴포넌트로 뺀다. 예: `onClick={() => toast.success(...)}` 을 가진 버튼(`examples/next-app-router/app/toast-button.tsx`).
 
-## ThemeProvider
+```tsx
+// app/page.tsx: 서버 컴포넌트
+import { Button, Dialog } from '@gsainfoteam/ids-react';
+
+export default function Page() {
+  return (
+    <Dialog>
+      <Dialog.Trigger asChild>
+        <Button variant="outline">프로필 수정</Button>
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <Dialog.Title>프로필 수정</Dialog.Title>
+      </Dialog.Content>
+    </Dialog>
+  );
+}
+```
+
+### TanStack Start
+
+예제: [`examples/tanstack-start`](../../examples/tanstack-start)
+
+```bash
+npm install @tanstack/react-start @tanstack/react-router react react-dom @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install -D vite @vitejs/plugin-react tailwindcss @tailwindcss/vite
+```
+
+```ts
+// vite.config.ts
+import tailwindcss from '@tailwindcss/vite';
+import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  plugins: [tailwindcss(), tanstackStart(), react()],
+});
+```
+
+```css
+/* src/styles.css */
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../node_modules/@gsainfoteam/ids-react/dist';
+```
+
+```tsx
+// src/routes/__root.tsx
+import { IdsProvider } from '@gsainfoteam/ids-react';
+import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router';
+
+import styles from '../styles.css?url';
+
+export const Route = createRootRoute({
+  head: () => ({ links: [{ rel: 'stylesheet', href: styles }] }),
+  shellComponent: ({ children }) => (
+    <html lang="ko">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <IdsProvider color="blue" mode="light">{children}</IdsProvider>
+        <Scripts />
+      </body>
+    </html>
+  ),
+});
+```
+
+- 라우트는 서버에서 그린 뒤 hydrate 된다. 컴포넌트를 평소처럼 쓰면 된다.
+
+### Astro
+
+예제: [`examples/astro`](../../examples/astro)
+
+```bash
+npm install astro @astrojs/react react react-dom @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install -D tailwindcss @tailwindcss/vite
+```
+
+```js
+// astro.config.mjs
+import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  integrations: [react()],
+  vite: { plugins: [tailwindcss()] },
+});
+```
+
+```css
+/* src/styles/global.css */
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../../node_modules/@gsainfoteam/ids-react/dist';
+```
+
+```astro
+---
+// src/pages/index.astro
+import { Button, IdsProvider } from '@gsainfoteam/ids-react';
+import { Demo } from '../components/demo';
+import '../styles/global.css';
+---
+<IdsProvider color="blue" mode="light">
+  <Button variant="outline">정적 버튼</Button>
+</IdsProvider>
+<Demo client:load />
+```
+
+- 움직이는 부분(Dialog, Select, Menu, toast)은 `client:load` 같은 지시어를 단 React island 에 둔다.
+- island 는 저마다 따로 React 루트라서, `IdsProvider` 도 island 안에 둔다. 바깥의 `IdsProvider` 는 island 에 닿지 않는다.
+- 지시어 없는 React 컴포넌트는 빌드 때 HTML 만 그린다. 보이기만 하는 버튼, 배지에 쓴다.
+
+### Vite (SPA)
+
+```bash
+npm install react react-dom @gsainfoteam/ids-react @gsainfoteam/ids-css
+npm install -D vite @vitejs/plugin-react tailwindcss @tailwindcss/vite
+```
+
+```ts
+// vite.config.ts
+import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+export default defineConfig({ plugins: [tailwindcss(), react()] });
+```
+
+```css
+/* src/index.css */
+@import 'tailwindcss';
+@import '@gsainfoteam/ids-css';
+
+@source '../node_modules/@gsainfoteam/ids-react/dist';
+```
+
+```tsx
+// src/main.tsx
+import { IdsProvider } from '@gsainfoteam/ids-react';
+import { createRoot } from 'react-dom/client';
+
+import { App } from './app';
+import './index.css';
+
+createRoot(document.getElementById('root')!).render(
+  <IdsProvider color="blue" mode="light">
+    <App />
+  </IdsProvider>,
+);
+```
+
+## IdsProvider
 
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `color` | `IdsColor` | `'blue'` | 색상 테마 |
-| `mode` | `IdsMode` | `'light'` | 라이트/다크 모드 |
+| `color` / `defaultColor` | `IdsColor` | 바깥 Provider, 최상위는 `'blue'` | 색상 테마 (제어 / 비제어) |
+| `mode` / `defaultMode` | `'light' \| 'dark' \| 'system'` | 바깥 Provider, 최상위는 `'light'` | 모드 (제어 / 비제어) |
+| `onColorChange` / `onModeChange` | `(value) => void` | | 값을 바꾸려 할 때 |
 
 ```tsx
 import { useTheme } from '@gsainfoteam/ids-react';
@@ -95,12 +290,102 @@ function ThemeToggle() {
 }
 ```
 
+중첩, 시스템 모드, `asChild` 는 `src/components/utility/ids-provider/README.md` 를 참고한다.
+
+## 문구와 언어
+
+IDS 가 스스로 그리는 문구(닫기 버튼 이름, 달력 버튼, placeholder, 검증 문구, 스크린 리더 안내)는 기본이 한국어다. 앱의 i18n 라이브러리를 `IdsProvider` 에 한 번 꽂으면 그 언어로 바뀐다.
+
+```tsx
+<IdsProvider translate={(key, values) => myT(`ids.${key}`, values)} locale="en-US">
+  <App />
+</IdsProvider>
+```
+
+- `translate(key, values)` 는 문구 하나를 돌려준다. `undefined` 나 키 그대로를 돌려주면 그 문구는 한국어 기본값으로 돌아간다.
+- `key` 는 점으로 이은 경로(`'dialog.close'`, `'textArea.remaining'`)다. 타입은 `IdsMessageKey` 로 가져온다.
+- `values` 는 문구에 끼울 값(`{ count: 3 }`)이다. 문구는 ICU 메시지 문법이라 `{count, plural, one {…} other {…}}` 를 앱의 라이브러리가 포맷한다.
+- `locale` 은 날짜, 시간, 숫자, 국가 이름 형식에만 쓴다. 컴포넌트에 준 `locale` 이 이긴다.
+- 안쪽 `IdsProvider` 는 `translate`, `locale` 을 주지 않으면 바깥 것을 물려받고, 주면 그 안에서 바꾼다.
+- `translate` 는 함수라서, Next.js App Router 에서는 `IdsProvider` 를 감싼 클라이언트 컴포넌트에서 넘긴다.
+
+### 카탈로그
+
+패키지가 중첩 JSON 카탈로그 두 개를 내보낸다. 앱 번역 파일의 시작점이다.
+
+```ts
+import ko from '@gsainfoteam/ids-react/messages/ko.json'; // 한국어 기본값과 같다
+import en from '@gsainfoteam/ids-react/messages/en.json';
+```
+
+```json
+{ "calendar": { "previousMonth": "Previous month", "weekNumber": "Week {week}" }, "dialog": { "close": "Close" } }
+```
+
+- 앱 카탈로그의 `ids` 아래에 그대로 붙이면 `ids.dialog.close` 로 읽힌다. 바꾸고 싶은 문구만 고친다.
+- 빠진 키는 한국어 기본값으로 나온다. 새 버전에서 문구가 늘어도 깨지지 않는다.
+
+### next-intl
+
+```tsx
+'use client';
+
+export function IdsWithIntl({ children }: { children: React.ReactNode }) {
+  const t = useTranslations('ids');
+  const locale = useLocale();
+  return (
+    <IdsProvider translate={(key, values) => (t.has(key) ? t(key, values) : undefined)} locale={locale}>
+      {children}
+    </IdsProvider>
+  );
+}
+```
+
+- `messages/en.json` 을 앱 카탈로그의 `"ids"` 아래에 둔다.
+
+### i18next
+
+```tsx
+export function IdsWithI18next({ children }: { children: React.ReactNode }) {
+  const { t, i18n } = useTranslation();
+  const translate: IdsTranslate = (key, values) =>
+    i18n.exists(`ids.${key}`) ? t(`ids.${key}`, values) : undefined;
+  return <IdsProvider translate={translate} locale={i18n.language}>{children}</IdsProvider>;
+}
+```
+
+- 리소스의 `ids` 아래에 카탈로그를 둔다. ICU 문법(`{count}`, plural)을 읽으려면 [`i18next-icu`](https://github.com/i18next/i18next-icu) 를 쓴다.
+
+### react-intl
+
+FormatJS 는 평평한 id 를 쓰므로 카탈로그를 한 번 펼친다.
+
+```tsx
+const flatten = (tree: object, prefix = ''): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(tree).flatMap(([key, value]) =>
+      typeof value === 'string' ? [[prefix + key, value]] : Object.entries(flatten(value, `${prefix}${key}.`)),
+    ),
+  );
+
+<IntlProvider locale="en" messages={{ ...flatten(en, 'ids.'), ...appMessages }}>
+  <IdsWithIntl>{children}</IdsWithIntl>
+</IntlProvider>;
+
+function IdsWithIntl({ children }: { children: React.ReactNode }) {
+  const intl = useIntl();
+  const translate: IdsTranslate = (key, values) =>
+    intl.messages[`ids.${key}`] ? intl.formatMessage({ id: `ids.${key}` }, values) : undefined;
+  return <IdsProvider translate={translate} locale={intl.locale}>{children}</IdsProvider>;
+}
+```
+
 ## 인터랙션 state
 
 IDS는 hover / press / focus의 **소유권을 컴포넌트 안에 둔다.**  
 외부 구독·controlled 인터랙션 API는 두지 않고, 아래 두 길로만 바깥에 노출한다.
 
-실행 예시는 Storybook `Patterns/Interactive state`를 참고한다.
+실행 예시는 Storybook `Foundations/InteractiveState`를 참고한다.
 
 ### 1. 노드 로컬 (부모 → 자식)
 
@@ -152,6 +437,29 @@ function Row() {
 
 Tabs·Menu처럼 **진짜 compound**가 생기면 그때 Root Context(또는 store)를 도입한다.
 
+## 지원 브라우저
+
+| 브라우저 | 최소 버전 | 테스트 엔진 (Playwright 1.63) |
+| --- | --- | --- |
+| Chrome, Edge | 114 | Chromium 153 |
+| Firefox | 128 | Firefox 155 |
+| Safari (macOS, iOS) | 17 | WebKit 26.6 |
+
+- 최소 버전은 IDS 가 기대는 기능에서 나옵니다. top layer 에 올리는 `popover` API(Chrome 114, Firefox 125, Safari 17)와 Tailwind CSS v4(Chrome 111, Firefox 128, Safari 16.4)입니다.
+- 아래 기능은 없는 브라우저에서 모양만 덜 다듬어집니다.
+  - `@starting-style` 이 없으면 여는 애니메이션 없이 바로 나타납니다.
+  - relative color syntax(Chrome 119, Firefox 128, Safari 18)가 없으면 브랜드 채움의 hover 와 press 가 글자색에서 멀어지는 대신 90%, 80% 로 흐려집니다.
+  - `cap` 단위(Safari 17.2)가 없으면 Kbd 가 글자 가운데가 아니라 기준선에 맞춰 놓입니다.
+- 모든 브라우저 테스트가 CI(ubuntu)에서 세 엔진으로 돕니다. macOS 에서는 `pnpm test` 가 Chromium 만 돌리고, `pnpm test:browsers` 가 Docker 의 Playwright Linux 이미지에서 세 엔진을 모두 돌립니다.
+- 엔진마다 건너뛰는 테스트와 그 이유:
+  - CDP(Chrome DevTools Protocol)로 누른 채 끌기, 터치, IME 조합, 키 반복, 미디어와 시간대 흉내, 응답 붙잡기를 하는 테스트는 Chromium 에서만 돕니다. Firefox 와 WebKit 에는 CDP 가 없습니다.
+  - FileField 의 붙여넣기 테스트는 Firefox 에서 건너뜁니다. Firefox 는 스크립트로 만든 paste 이벤트의 `clipboardData` 를 버리고, 테스트는 OS 의 파일을 붙여넣을 수 없습니다.
+
+## 접근성
+
+- 목표 기준은 WCAG 2.2 AA 이고, 키보드와 역할은 WAI-ARIA APG 패턴을 따릅니다.
+- 컴포넌트별 키보드, 역할과 ARIA, 알려진 한계, 스크린 리더 수동 점검표는 [접근성 준수 안내](../../docs/accessibility.md) 에 있습니다.
+
 ## 컴포넌트
 
 ### Button
@@ -167,35 +475,37 @@ import { Button } from '@gsainfoteam/ids-react';
 | prop | 타입 | 기본값 |
 |---|---|---|
 | `variant` | `'solid' \| 'soft' \| 'outline' \| 'ghost'` | `'solid'` |
+| `colorScheme` | `'primary' \| 'neutral' \| 'danger' \| 'success' \| 'warning' \| 'info'` | `'primary'` |
 | `size` | `'standard' \| 'tiny'` | `'standard'` |
 | `disabled` | `boolean` | `false` |
 
+`asChild`, `focusableWhenDisabled` 와 로딩 합성은 [Button API](./src/components/action/button/README.md) 를 참고하세요.
+
 ### Spinner
 
-부모의 글자색을 상속하는 로딩 표시다. `standard`는 20px, `tiny`는 16px이며
-모션 감소 설정에서는 회전을 멈춘다. 네이티브 span 속성과 ref를 전달할 수 있다.
+부모의 글자색을 상속하는 로딩 표시다. 크기를 주지 않으면 버튼 안에서는 버튼의 아이콘 크기,
+그 밖에서는 글자 크기를 따른다. 모션 감소 설정에서는 회전 대신 천천히 깜빡인다.
 
 ```tsx
 import { Button, Spinner } from '@gsainfoteam/ids-react';
 
-// 단독 사용: role="status"와 스크린 리더 텍스트를 제공한다.
-<Spinner label="불러오는 중" />
+// 단독 사용: 잠시 뒤 role="status"로 "불러오는 중"을 한 번 알린다.
+<Spinner aria-label="댓글을 불러오는 중" />
 
-// 이미 로딩 텍스트가 있는 버튼: Spinner의 중복 알림을 생략한다.
+// 버튼 안: 스스로 알림을 빼서 버튼 이름에 섞이지 않는다.
 <Button disabled aria-busy="true">
-  <Spinner decorative />
+  <Spinner />
   저장 중
 </Button>
 ```
 
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `size` | `'standard' \| 'tiny'` | `'standard'` | 표시 크기 |
-| `label` | `string` | `'Loading'` | 스크린 리더용 로딩 텍스트 |
-| `decorative` | `boolean` | `false` | `true`이면 접근성 트리에서 숨김 |
+| `size` | `'standard' \| 'tiny'` | 주변을 따름 | 표시 크기 |
+| `aria-label` | `string` | `'불러오는 중'` | 스크린 리더가 읽을 문장 |
+| `decorative` | `boolean` | 주변을 보고 결정 | `true`면 알리지 않고, `false`면 버튼 안에서도 알림 |
 
-단독 사용 시 비어 있지 않은 `label`을 사용한다. `decorative`는 버튼 텍스트나
-`IconButton`의 `aria-label` 등 다른 요소가 로딩 상태를 설명할 때 사용한다.
+자세한 동작은 `src/components/feedback/spinner/README.md` 를 참고한다.
 
 ## 개발
 
@@ -207,6 +517,17 @@ pnpm lint
 ```
 
 외부 headless 라이브러리(Radix, Base UI 등)에 의존하지 않고 전부 직접 구현한다.
+
+### 시각 회귀
+
+- 모든 `Gallery` 스토리를 라이트와 다크로 찍어 `tests/__screenshots__` 의 기준 이미지와 비교합니다.
+- 기준 이미지는 Playwright Linux 이미지(`mcr.microsoft.com/playwright`, `linux/amd64`) 안에서만 만듭니다. 글꼴, 래스터라이저, Chromium 빌드가 같아야 픽셀이 같기 때문입니다. macOS 나 일반 CI 러너에서는 이 테스트를 건너뜁니다.
+- Docker 가 필요합니다.
+
+```bash
+pnpm test:visual          # 기준 이미지와 비교. 다르면 packages/react/.vitest/visual 에 실제와 차이 이미지를 남긴다
+pnpm test:visual:update   # 의도한 변화라면 기준 이미지를 다시 만든다. 새 PNG 를 변경과 같은 커밋에 넣는다
+```
 
 ## Field
 
@@ -258,27 +579,27 @@ RHF에는 `controlMode="value"`로 연결합니다. [OTPField API와 편집 규�
 
 ## Calendar
 
-단일·범위·다중 날짜 선택과 키보드 월 탐색을 제공합니다. [Calendar API](./src/components/calendar/README.md).
+단일·범위·다중 날짜 선택과 키보드 월 탐색을 제공합니다. [Calendar API](./src/components/data/calendar/README.md).
 
 ## DateField
 
-Calendar 팝업으로 날짜·기간·여러 날짜를 선택합니다. [DateField API](./src/components/date-field/README.md).
+Calendar 팝업으로 날짜·기간·여러 날짜를 선택하고, 날짜를 글자로 칠 수도 있습니다. [DateField API](./src/components/form/date-field/README.md).
 
 ## TimePicker
 
-시·분·초 컬럼과 12/24시간제를 지원합니다. [TimePicker API](./src/components/time-picker/README.md).
+시·분·초 컬럼과 12/24시간제를 지원합니다. [TimePicker API](./src/components/data/time-picker/README.md).
 
 ## TimeField
 
-TimePicker 팝업으로 시간을 선택합니다. [TimeField API](./src/components/time-field/README.md).
+TimePicker 팝업으로 시간을 선택합니다. [TimeField API](./src/components/form/time-field/README.md).
 
 ## DateTimeField
 
-Calendar와 TimePicker로 일시를 선택합니다. [DateTimeField API](./src/components/date-time-field/README.md).
+Calendar와 TimePicker로 일시를 선택합니다. [DateTimeField API](./src/components/form/date-time-field/README.md).
 
 ## Interaction feedback
 
-Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만 150ms로 전환합니다. 키보드 포커스에서는 전환과 누름 배율을 적용하지 않으며 reduced-motion도 지원합니다. TextField 계열은 색상만 전환하고 포커스 표시는 즉시 반영합니다. ThemeProvider는 `color-scheme`도 모드에 맞춰 네이티브 폼 컨트롤과 스크롤바에 전달합니다.
+Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만 150ms로 전환합니다. 키보드 포커스에서는 전환과 누름 배율을 적용하지 않으며 reduced-motion도 지원합니다. TextField 계열은 색상만 전환하고 포커스 표시는 즉시 반영합니다. IdsProvider는 `color-scheme`도 모드에 맞춰 네이티브 폼 컨트롤과 스크롤바에 전달합니다.
 
 ## Rating
 
@@ -286,4 +607,12 @@ Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만
 
 ## FloatingButton
 
-화면 모서리에 고정된 아이콘/확장형 행동 버튼입니다. safe-area와 링크 합성·비활성 상태를 지원합니다. [FloatingButton API](./src/components/floating-button/README.md).
+화면 모서리에 떠 있는 아이콘/확장형 주 동작 버튼입니다. safe area, 읽는 방향, 링크 합성과 비활성 상태를 챙깁니다. [FloatingButton API](./src/components/action/floating-button/README.md).
+
+## QRCode
+
+값을 토큰 색의 SVG QR 코드로 그립니다. 둥근 모듈과 점, 파인더 모양, 가운데 로고, 다크 모드 반전을 지원합니다. [QRCode API](./src/components/data/qr-code/README.md).
+
+## Marquee
+
+로고, 공지, 숫자를 한 방향으로 끊김 없이 흘리는 CSS 애니메이션 띠입니다. 멈춤 버튼, 포인터와 포커스에 잠시 멈춤, 동작 줄이기, 오른쪽에서 왼쪽 문서를 챙깁니다. [Marquee API](./src/components/data/marquee/README.md).

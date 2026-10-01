@@ -1,5 +1,4 @@
-export { ThemeProvider, ThemeContext } from './theme/theme-provider';
-export { useTheme } from './theme/use-theme';
+export { IdsProvider, ThemeContext, useTheme } from './components/utility/ids-provider';
 
 export {
   useInteractive,
@@ -24,90 +23,188 @@ export type { UseControllableStateOptions } from './hooks/use-controllable-state
 
 export { IdsError, invariant } from './utils/invariant';
 
-export { Slot } from './components/slot';
-export { Card } from './components/card';
-export { Chip } from './components/chip';
-export { Badge } from './components/badge';
-export { Alert } from './components/alert';
-export { Avatar, initialsOf } from './components/avatar';
-export { AvatarGroup } from './components/avatar-group';
-export { Item } from './components/item';
-export { Accordion } from './components/accordion';
+export { Slot } from './components/utility/slot';
+export { Card } from './components/data/card';
+export { Chip } from './components/data/chip';
+export { Badge } from './components/data/badge';
+export { Alert } from './components/feedback/alert';
+export { Dialog } from './components/overlay/dialog';
+export { Drawer } from './components/overlay/drawer';
+export { Menu } from './components/overlay/menu';
+export { Popover } from './components/overlay/popover';
+export { Tooltip, TooltipDelayGroup } from './components/overlay/tooltip';
+export {
+  Toaster,
+  toast,
+  type ToastAction,
+  type ToastId,
+  type ToastOptions,
+  type ToastPromiseMessages,
+  type ToastRecord,
+} from './components/feedback/toast';
+export {
+  overlay,
+  useOverlay,
+  type OverlayControls,
+  type OverlayOptions,
+  type OverlayRender,
+} from './internal/overlay';
+export { Avatar, initialsOf } from './components/data/avatar';
+export { AvatarGroup } from './components/data/avatar-group';
+export { Item } from './components/data/item';
+export { Accordion } from './components/data/accordion';
+export { Empty } from './components/data/empty';
+export { Image } from './components/data/image';
+export type { ImageGroupLayout, ImageViewerItem } from './components/data/image';
+export { QRCode } from './components/data/qr-code';
+export { Marquee } from './components/data/marquee';
+export type { MarqueeOrientation, MarqueeSpeed } from './components/data/marquee';
+export { Table } from './components/data/table';
+export type {
+  TableProps,
+  TableAlign,
+  TableLayout,
+  TableSection,
+  TableVariant,
+} from './components/data/table';
+export { DataTable } from './components/data/data-table';
+export type {
+  DataTableProps,
+  DataTableColumnDef,
+  DataTableColumnMeta,
+  DataTableFeatures,
+} from './components/data/data-table';
+export { Carousel } from './components/data/carousel';
+export type { CarouselProps, CarouselState } from './components/data/carousel';
 
-export { Button } from './components/button';
-export { IconButton } from './components/icon-button';
-export { ButtonGroup } from './components/button-group';
-export { Toggle } from './components/toggle';
-export { IconToggle } from './components/icon-toggle';
-export { ToggleGroup } from './components/toggle-group';
-export { Checkbox } from './components/checkbox';
-export { Switch } from './components/switch';
-export { Radio } from './components/radio';
-export { RadioGroup } from './components/radio-group';
-export { CheckboxGroup } from './components/checkbox-group';
-export { Slider } from './components/slider';
-export { TextField } from './components/text-field';
-export { NumberField } from './components/number-field';
-export type { NumberFieldProps, NumberFieldVariant } from './components/number-field';
-export { TextArea } from './components/text-area';
-export type { TextAreaProps, TextAreaVariant } from './components/text-area';
+export { Button } from './components/action/button';
+export { IconButton } from './components/action/icon-button';
+export { ButtonGroup } from './components/action/button-group';
+export { Toggle } from './components/action/toggle';
+export { IconToggle } from './components/action/icon-toggle';
+export { ToggleGroup } from './components/action/toggle-group';
+export { Checkbox } from './components/form/checkbox';
+export { Switch } from './components/form/switch';
+export { Radio } from './components/form/radio';
+export { RadioGroup } from './components/form/radio-group';
+export { CheckboxGroup } from './components/form/checkbox-group';
+export { Slider } from './components/form/slider';
+export { TextField } from './components/form/text-field';
+export { NumberField } from './components/form/number-field';
+export type { NumberFieldProps, NumberFieldVariant } from './components/form/number-field';
+export { TextArea } from './components/form/text-area';
+export type { TextAreaProps, TextAreaVariant } from './components/form/text-area';
 
-export { Spinner } from './components/spinner';
-export { Progress } from './components/progress';
-export { Label } from './components/label';
-export { Kbd } from './components/kbd';
+export { Spinner } from './components/feedback/spinner';
+export { Progress } from './components/feedback/progress';
+export { Skeleton } from './components/feedback/skeleton';
+export { Label } from './components/typography/label';
+export { Kbd } from './components/typography/kbd';
 
-export { Divider } from './components/divider';
-export { Spacer } from './components/spacer';
-export { AspectRatio } from './components/aspect-ratio';
+export { Pagination } from './components/navigation/pagination';
+
+export { Divider } from './components/layout/divider';
+export { Spacer } from './components/layout/spacer';
+export { AspectRatio } from './components/layout/aspect-ratio';
+export { ScrollArea } from './components/layout/scroll-area';
+export { Resizable } from './components/layout/resizable';
+export type { ResizableProps } from './components/layout/resizable';
+export { Splitter } from './components/layout/splitter';
+export type {
+  SplitterProps,
+  SplitterPanelProps,
+  SplitterHandleProps,
+  SplitterOrientation,
+} from './components/layout/splitter';
+
+export { Breadcrumb } from './components/navigation/breadcrumb';
+export { Tabs } from './components/navigation/tabs';
+export type {
+  TabsProps,
+  TabsState,
+  TabsRenderProps,
+  TabsAppearance,
+  TabsOrientation,
+  TabsActivationMode,
+} from './components/navigation/tabs';
+export { Stepper } from './components/navigation/stepper';
+export type { StepperOrientation, StepperStatus } from './components/navigation/stepper';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
+export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
+export type { IdsTranslate } from './internal/translate';
 
-export { Field } from './components/field';
-export type { FieldProps } from './components/field';
-export { useFieldSize } from './components/field/context';
+export { Field } from './components/form/field';
+export type {
+  FieldProps,
+  FieldState,
+  FieldOrientation,
+  FieldErrorState,
+  FieldValidity,
+  FieldValidityKey,
+} from './components/form/field';
+export { useFieldSize, useFieldState } from './components/form/field/context';
 
-export { PasswordField } from './components/password-field';
-export type { PasswordFieldProps, PasswordFieldVariant } from './components/password-field';
+export { PasswordField } from './components/form/password-field';
+export type { PasswordFieldProps, PasswordFieldVariant } from './components/form/password-field';
 
-export { OTPField } from './components/otp-field';
-export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './components/otp-field';
+export { OTPField } from './components/form/otp-field';
+export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './components/form/otp-field';
 
-export { Select } from './components/select';
-export type { SelectProps, SelectVariant } from './components/select';
+export { Select } from './components/form/select';
+export type { SelectProps, SelectVariant } from './components/form/select';
 
-export { TelField } from './components/tel-field';
-export type { TelFieldProps, TelFieldFormat } from './components/tel-field';
+export { TelField } from './components/form/tel-field';
+export type { TelFieldProps, TelFieldFormat } from './components/form/tel-field';
 
-export { ColorField } from './components/color-field';
-export type { ColorFieldProps, ColorFormat } from './components/color-field';
+export { ColorPicker } from './components/data/color-picker';
+export type {
+  ColorPickerProps,
+  ColorPickerState,
+  ColorPickerSwatchOption,
+} from './components/data/color-picker';
 
-export { ChipField } from './components/chip-field';
-export type { ChipFieldProps } from './components/chip-field';
+export { ColorField } from './components/form/color-field';
+export type { ColorFieldProps, ColorFormat } from './components/form/color-field';
 
-export { FileField } from './components/file-field';
-export type { FileFieldProps, FileFieldRejection } from './components/file-field';
+export { ChipField } from './components/form/chip-field';
+export type { ChipFieldProps } from './components/form/chip-field';
 
-export { Calendar } from './components/calendar';
-export type { CalendarProps, CalendarOptions, CalendarCellState, DateRange } from './components/calendar';
+export { FileField } from './components/form/file-field';
+export type { FileFieldProps, FileFieldRejection } from './components/form/file-field';
 
-export { DateField } from './components/date-field';
-export type { DateFieldProps, DateFieldFormat } from './components/date-field';
+export { Calendar } from './components/data/calendar';
+export type {
+  CalendarProps,
+  CalendarOptions,
+  CalendarState,
+  CalendarDayState,
+  DateMatcher,
+  DateRange,
+} from './components/data/calendar';
 
-export { TimePicker } from './components/time-picker';
-export type { TimePickerProps, TimePickerOptions, TimePrecision, TimeFormat } from './components/time-picker';
+export { DateField } from './components/form/date-field';
+export type { DateFieldProps, DateFieldFormat } from './components/form/date-field';
 
-export { TimeField } from './components/time-field';
-export type { TimeFieldProps } from './components/time-field';
+export { TimePicker } from './components/data/time-picker';
+export type {
+  TimePickerProps,
+  TimePickerOptions,
+  TimePrecision,
+  HourCycle,
+} from './components/data/time-picker';
 
-export { DateTimeField } from './components/date-time-field';
-export type { DateTimeFieldProps } from './components/date-time-field';
+export { TimeField } from './components/form/time-field';
+export type { TimeFieldProps } from './components/form/time-field';
 
-export { Input } from './components/input';
-export type { InputProps } from './components/input';
+export { DateTimeField } from './components/form/date-time-field';
+export type { DateTimeFieldProps } from './components/form/date-time-field';
 
-export { Rating } from './components/rating';
-export type { RatingProps } from './components/rating';
+export { Input } from './components/form/input';
+export type { InputProps } from './components/form/input';
 
-export { FloatingButton } from './components/floating-button';
-export type { FloatingButtonProps, FloatingPlacement } from './components/floating-button';
+export { Rating } from './components/form/rating';
+export type { RatingProps } from './components/form/rating';
+
+export { FloatingButton } from './components/action/floating-button';
+export type { FloatingButtonProps, FloatingPlacement } from './components/action/floating-button';

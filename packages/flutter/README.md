@@ -42,12 +42,17 @@ void main() {
 | `color` | `IdsColor` | `IdsColor.blue` |
 | `mode` | `IdsMode` | `IdsMode.light` |
 
+- `IdsColor` 는 17색이다: `red` `orange` `amber` `yellow` `lime` `green` `emerald` `teal` `cyan` `sky` `blue` `indigo` `violet` `purple` `fuchsia` `pink` `rose`.
+- `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` 는 `onPrimary` 가 검은색이다.
+
 테마 접근:
 
 ```dart
 final theme = ThemeProvider.of(context);
-// theme.primary, theme.onPrimary, theme.secondary, ...
+// theme.primary, theme.onPrimary, theme.secondary, theme.onSecondary, theme.accent, ...
 ```
+
+- `accent` 는 배경 채움 없이 페이지 위에 놓이는 브랜드 글자와 아이콘 색이다. `surface` 와 `secondary` 위에서 대비 4.5:1 을 넘는다.
 
 ## 컴포넌트
 

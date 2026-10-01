@@ -1,3 +1,5 @@
+'use client';
+
 import { useLayoutEffect, useRef, useState } from 'react';
 import type { FocusEvent, KeyboardEvent, PointerEvent } from 'react';
 
@@ -24,7 +26,6 @@ const INTERACTIVE_INIT = {
 export type UseInteractiveOptions<E extends Element = Element> = {
   disabled?: boolean;
   pressed?: boolean;
-  /** 컴포넌트가 소유한 InteractiveState를 부모에 mirror. 구독/controlled가 아님. */
   onInteractionChange?: (state: InteractiveState) => void;
   onPointerEnter?: (e: PointerEvent<E>) => void;
   onPointerLeave?: (e: PointerEvent<E>) => void;
@@ -52,6 +53,12 @@ export function useInteractive<E extends Element = Element>({
   onKeyUp,
 }: UseInteractiveOptions<E> = {}) {
   const [state, setState] = useState(INTERACTIVE_INIT);
+  const [disabledBefore, setDisabledBefore] = useState(disabled);
+  if (disabled !== disabledBefore) {
+    setDisabledBefore(disabled);
+    const stuckWithoutPointerEvents = disabled && (state.hovered || state.active);
+    if (stuckWithoutPointerEvents) setState((s) => ({ ...s, hovered: false, active: false }));
+  }
   const interactiveState: InteractiveState = {
     ...state,
     pressed: pressed ?? false,
@@ -73,14 +80,7 @@ export function useInteractive<E extends Element = Element>({
       pressed: pressed ?? false,
       disabled: disabled ?? false,
     });
-  }, [
-    state.hovered,
-    state.active,
-    state.focused,
-    state.focusVisible,
-    pressed,
-    disabled,
-  ]);
+  }, [state.hovered, state.active, state.focused, state.focusVisible, pressed, disabled]);
 
   const handlers = {
     onPointerEnter(e: PointerEvent<E>) {
@@ -152,12 +152,9 @@ function kebabCase(key: string) {
   return key.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
 }
 
-/** true인 state만 `data-hovered` 형태의 DOM props로 변환.
- *  동일 속성(bg 등)을 두고 싸우지 않도록 DOM에는 pressed > active > hovered 우선순위로 하나만 올린다.
- *  render prop의 `state`는 원시값 그대로 유지한다. */
 export function interactiveDataProps(state: Record<string, boolean>) {
   const { hovered, active, pressed, ...rest } = state;
-  const forDom = {
+  const pressedOverActiveOverHovered = {
     ...rest,
     pressed: Boolean(pressed),
     active: Boolean(active && !pressed),
@@ -165,11 +162,12 @@ export function interactiveDataProps(state: Record<string, boolean>) {
   };
 
   return Object.fromEntries(
-    Object.keys(pickBy(forDom, Boolean)).map((key) => [`data-${kebabCase(key)}`, ''] as const),
+    Object.keys(pickBy(pressedOverActiveOverHovered, Boolean)).map(
+      (key) => [`data-${kebabCase(key)}`, ''] as const,
+    ),
   ) as Record<`data-${string}`, ''>;
 }
 
-/** 값 또는 InteractiveState를 받는 함수 */
 export type InteractiveValue<T> = T | ((state: InteractiveState) => T);
 
 type ExcludedInteractiveKey =
@@ -186,10 +184,6 @@ type ExcludedInteractiveKey =
 type HasFunction<T> =
   Extract<NonNullable<T>, (...args: never[]) => unknown> extends never ? false : true;
 
-/**
- * prop을 `T | ((state) => T)`로 확장.
- * 이벤트 핸들러·이미 함수인 prop·ref·disabled·key는 그대로 둔다.
- */
 export type WithInteractiveValues<P> = {
   [K in keyof P]: K extends ExcludedInteractiveKey
     ? P[K]
@@ -198,7 +192,6 @@ export type WithInteractiveValues<P> = {
       : P[K] | ((state: InteractiveState) => P[K]);
 };
 
-/** state render fn을 제거한 resolve 결과 타입 */
 export type ResolvedInteractiveValues<P> = {
   [K in keyof P]: [Exclude<P[K], (state: InteractiveState) => unknown>] extends [never]
     ? P[K]
@@ -212,10 +205,8 @@ export function resolveInteractiveValue<T>(
   return isFunction(value) ? (value as (state: InteractiveState) => T)(state) : value;
 }
 
-/** `onClick` 등 이벤트 핸들러·`formAction`·`ref`는 state render fn이 아님 */
-const SKIP_RESOLVE = /^(on[A-Z].*|formAction|ref)$/;
+const CALLBACK_PROPS = /^(on[A-Z].*|formAction|ref)$/;
 
-/** 객체 prop을 state로 resolve. 이벤트/`formAction` 함수는 그대로 통과. */
 export function resolveInteractiveProps<P extends Record<string, unknown>>(
   props: P,
   state: InteractiveState,
@@ -224,7 +215,7 @@ export function resolveInteractiveProps<P extends Record<string, unknown>>(
 
   for (const key of Object.keys(props)) {
     const value = props[key];
-    if (isFunction(value) && SKIP_RESOLVE.test(key)) continue;
+    if (isFunction(value) && CALLBACK_PROPS.test(key)) continue;
     if (isFunction(value)) {
       (resolved as Record<string, unknown>)[key] = value(state);
     }
@@ -273,10 +264,6 @@ function omitNonDomProps<P extends Record<string, unknown>>(props: P) {
   return rest;
 }
 
-/**
- * 인터랙션 state/handlers + prop resolve를 한 번에 처리.
- * 컴포넌트는 반환된 `props`만 쓰면 된다.
- */
 export function useInteractiveProps<E extends Element = Element, P extends object = object>(
   props: P,
 ) {

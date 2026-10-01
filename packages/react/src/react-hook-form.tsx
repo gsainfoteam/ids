@@ -1,8 +1,21 @@
-import { useEffect, type Ref } from 'react';
+'use client';
+
+import { useEffect } from 'react';
 
 import { useController, useFormContext, type RegisterOptions } from 'react-hook-form';
 
-import { Field as BaseField, FieldRoot, type FieldProps as BaseProps } from './components/field';
+import {
+  Field as BaseField,
+  FieldRoot,
+  type FieldProps as BaseProps,
+} from './components/form/field';
+import {
+  keepInputControlled,
+  mergeBinding,
+  valueReports,
+  withoutDefaults,
+} from './internal/form-bridge';
+import { isDevelopment } from './utils/dev';
 
 type ControlledOptions = Omit<RegisterOptions, 'valueAsNumber' | 'valueAsDate' | 'setValueAs'>;
 export type FieldProps = BaseProps &
@@ -10,36 +23,6 @@ export type FieldProps = BaseProps &
     | { controlMode?: 'native'; registerOptions?: RegisterOptions }
     | { controlMode: 'value' | 'checked'; registerOptions?: ControlledOptions }
   );
-type Props = Record<string, unknown>;
-
-// RHF must observe changes even when a consumer handler prevents the default action.
-function bind(props: Props, binding: Props) {
-  const result = { ...props, ...binding };
-  for (const key of ['onChange', 'onBlur']) {
-    result[key] = (...args: unknown[]) => {
-      (props[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
-      (binding[key] as ((...args: unknown[]) => void) | undefined)?.(...args);
-    };
-  }
-  result.ref = (node: HTMLElement | null) => {
-    const refs = [props.ref, binding.ref] as Array<Ref<HTMLElement> | undefined>;
-    const cleanups = refs.map((ref) => {
-      if (typeof ref === 'function') {
-        const cleanup = ref(node);
-        return typeof cleanup === 'function' ? cleanup : () => ref(null);
-      }
-      if (ref) {
-        ref.current = node;
-        return () => {
-          ref.current = null;
-        };
-      }
-      return undefined;
-    });
-    return () => cleanups.forEach((cleanup) => cleanup?.());
-  };
-  return result;
-}
 
 function NativeField({
   name,
@@ -55,10 +38,12 @@ function NativeField({
       {...props}
       name={name}
       disabled={disabled}
-      invalid={props.invalid ?? state.invalid}
+      invalid={props.invalid ?? (state.invalid || undefined)}
+      dirty={props.dirty ?? state.isDirty}
+      touched={props.touched ?? state.isTouched}
       errorMessage={state.error?.message}
       bindControl={(original) =>
-        bind(original, { ...registration, disabled: disabled ?? original.disabled })
+        mergeBinding(original, { ...registration, disabled: disabled ?? original.disabled })
       }
     />
   );
@@ -86,17 +71,16 @@ function ControlledField({
       {...props}
       name={name}
       disabled={disabled}
-      invalid={props.invalid ?? fieldState.invalid}
+      invalid={props.invalid ?? (fieldState.invalid || undefined)}
+      dirty={props.dirty ?? fieldState.isDirty}
+      touched={props.touched ?? fieldState.isTouched}
       errorMessage={fieldState.error?.message}
-      bindControl={(original) => {
-        const { value, ...binding } = field;
-        // A native text input needs a string for an unset value; custom controls may use null.
-        const resolvedValue =
-          value === undefined ? (controlMode === 'checked' ? false : '') : value;
-        const { defaultValue: _defaultValue, defaultChecked: _defaultChecked, ...rest } = original;
-        return bind(rest, {
+      bindControl={(original, control) => {
+        const { value, onChange, ...binding } = field;
+        return mergeBinding(withoutDefaults(original), {
           ...binding,
-          [controlMode]: resolvedValue,
+          ...valueReports(control, controlMode, onChange, { readsNativeEvents: true }),
+          [controlMode]: keepInputControlled(value, controlMode),
           disabled: disabled ?? original.disabled,
         });
       }}
@@ -106,7 +90,7 @@ function ControlledField({
 function RhfField({ name, controlMode = 'native', registerOptions, ...props }: FieldProps) {
   const methods = useFormContext();
   useEffect(() => {
-    if (import.meta.env.DEV && name && !methods) {
+    if (isDevelopment && name && !methods) {
       console.warn('[IDS] Field: automatic registration requires react-hook-form FormProvider.');
     }
   }, [name, methods]);
@@ -124,10 +108,19 @@ function RhfField({ name, controlMode = 'native', registerOptions, ...props }: F
   );
 }
 
-/** Same anatomy as the base Field; FormProvider + name enables automatic binding. */
 export const Field = Object.assign(RhfField, {
   Label: BaseField.Label,
   Description: BaseField.Description,
   Hint: BaseField.Hint,
   Error: BaseField.Error,
+  Style: BaseField.Style,
 });
+
+export namespace Field {
+  export type Props = FieldProps;
+  export type State = BaseField.State;
+  export type LabelProps = BaseField.LabelProps;
+  export type DescriptionProps = BaseField.DescriptionProps;
+  export type HintProps = BaseField.HintProps;
+  export type ErrorProps = BaseField.ErrorProps;
+}

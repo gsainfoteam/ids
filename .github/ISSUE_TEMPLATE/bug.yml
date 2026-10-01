@@ -1,0 +1,39 @@
+name: 버그 신고
+description: 컴포넌트나 토큰이 기대와 다르게 동작할 때
+labels: [bug]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: 패키지
+      options:
+        - '@gsainfoteam/ids-react'
+        - '@gsainfoteam/ids-css'
+        - ids_flutter
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 버전
+      placeholder: 0.2.0
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 재현 방법
+      description: 최소 코드나 Storybook 스토리, 누른 키와 클릭 순서를 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대한 동작과 실제 동작
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 환경
+      description: 브라우저와 버전, OS, 프레임워크(Next.js, TanStack Start, Astro 등)
