@@ -22,6 +22,7 @@ IDS 컴포넌트만으로 짠 화면 조각입니다. 패키지에서 내보내�
 | [Mail](mail/README.md) | Compose, Inbox |
 | [Chat](chat/README.md) | Channel |
 | [Chatbot](chatbot/README.md) | Research, Simple, Thread, Welcome, Widget |
+| [Agent](agent/README.md) | Ask, Builder, Queue, Run |
 | [Tasks](tasks/README.md) | Board, Table |
 | [FileManager](file-manager/README.md) | Browser, Upload |
 | [Editor](editor/README.md) | Event, Post |
