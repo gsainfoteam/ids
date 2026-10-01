@@ -7,7 +7,12 @@ import 'package:ids_flutter/ids.dart';
 late IdsInteractiveState state;
 late int presses;
 
-Future<FocusNode> pump(WidgetTester tester, {bool disabled = false}) async {
+Future<FocusNode> pump(
+  WidgetTester tester, {
+  bool disabled = false,
+  bool pressed = false,
+  ValueChanged<IdsInteractiveState>? onInteractionChange,
+}) async {
   final node = FocusNode();
   addTearDown(node.dispose);
   presses = 0;
@@ -23,6 +28,8 @@ Future<FocusNode> pump(WidgetTester tester, {bool disabled = false}) async {
             child: IdsInteractive(
               focusNode: node,
               disabled: disabled,
+              pressed: pressed,
+              onInteractionChange: onInteractionChange,
               onPressed: () => presses++,
               builder: (_, s) {
                 state = s;
@@ -172,19 +179,7 @@ void main() {
 
   testWidgets('onInteractionChange mirrors state', (tester) async {
     final log = <IdsInteractiveState>[];
-    await tester.pumpWidget(
-      WidgetsApp(
-        color: const Color(0xFF000000),
-        builder: (_, _) => FocusScope(
-          autofocus: true,
-          child: IdsInteractive(
-            pressed: true,
-            onInteractionChange: log.add,
-            builder: (_, _) => const SizedBox.expand(),
-          ),
-        ),
-      ),
-    );
+    await pump(tester, pressed: true, onInteractionChange: log.add);
     await tester.pump();
     expect(log, [const IdsInteractiveState(pressed: true)]);
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
