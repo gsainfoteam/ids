@@ -1,10 +1,10 @@
-import * as pc from './assistant.stories';
+import * as pc from './thread.stories';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
   ...pc.default,
-  title: 'Blocks/Chat/Assistant',
+  title: 'Blocks/Chatbot/Thread',
   tags: ['!autodocs'],
   globals: { viewport: { value: 'mobile2', isRotated: false } },
 } satisfies Meta;

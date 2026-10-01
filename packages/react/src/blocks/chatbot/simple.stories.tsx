@@ -28,7 +28,7 @@ import { Spacer } from '../../components/layout/spacer';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
-  title: 'Blocks/Chat/Assistant',
+  title: 'Blocks/Chatbot/Simple',
   globals: { viewport: { value: 'desktop', isRotated: false } },
   tags: ['!autodocs'],
   parameters: { controls: { disable: true }, canvasPadding: false },
