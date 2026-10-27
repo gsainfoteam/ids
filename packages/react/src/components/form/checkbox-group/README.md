@@ -180,4 +180,4 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 ## 알아둘 것
 
 - 그룹 루트는 `tabIndex={-1}` 이라 Tab 순서에는 없고, 포커스를 받으면 바로 항목으로 넘깁니다.
-- `role="group"` 에는 `aria-required` 를 둘 수 없어서, Field가 넘겨준 `aria-required` 는 버립니다. 필수 표시는 `Field.Label` 의 `*` 가 합니다.
+- 루트는 `<fieldset>` 입니다. 그 역할인 group 에는 `aria-required` 를 둘 수 없어서, Field가 넘겨준 `aria-required` 는 버립니다. 필수 표시는 `Field.Label` 의 `*` 가 합니다.

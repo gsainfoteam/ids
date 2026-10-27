@@ -13,11 +13,11 @@ import type { AccordionItemState } from './item';
 export type AccordionContentState = AccordionItemState;
 
 export type AccordionContentProps = Omit<
-  ComponentProps<'div'>,
+  ComponentProps<'section'>,
   'children' | 'className' | 'style' | 'id' | 'role' | 'hidden' | 'inert'
 > &
   StateRenderProps<AccordionContentState> & {
-    ref?: Ref<HTMLDivElement>;
+    ref?: Ref<HTMLElement>;
   };
 
 export function AccordionContent({
@@ -37,16 +37,15 @@ export function AccordionContent({
     onReveal: () => root.reveal(state.value),
   });
   const mergedRef = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(panelRef, ref)(node),
+    (node: HTMLElement | null) => mergeRefs(panelRef, ref)(node),
     [panelRef, ref],
   );
 
   return (
-    <div
+    <section
       {...rest}
       ref={mergedRef}
       id={item.contentId}
-      role="region"
       aria-labelledby={item.triggerId}
       hidden={hidden}
       inert={closing}
@@ -64,7 +63,7 @@ export function AccordionContent({
           {resolveState(children, state)}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

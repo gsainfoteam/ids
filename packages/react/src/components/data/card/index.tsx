@@ -7,7 +7,7 @@ import { CardFooter, type CardFooterProps } from './footer';
 import { CardHeader, type CardHeaderProps } from './header';
 import { CardMedia, type CardMediaProps } from './media';
 import { type CardPartProps } from './part';
-import { CardRoot, type CardVariant } from './root';
+import { CardRoot, type CardHeadingLevel, type CardVariant } from './root';
 import { cardStyle } from './style';
 import { CardTitle, type CardTitleProps } from './title';
 import { type StateValue } from '../../../internal/state-props';
@@ -21,6 +21,7 @@ export function Card(props: Card.Props) {
 
 export namespace Card {
   export type Variant = CardVariant;
+  export type HeadingLevel = CardHeadingLevel;
 
   export type State = InteractiveState & { interactive: boolean };
 
@@ -30,6 +31,7 @@ export namespace Card {
     interactive?: boolean;
     disabled?: boolean;
     asChild?: boolean;
+    headingLevel?: CardHeadingLevel;
     onInteractionChange?: (state: InteractiveState) => void;
     className?: StateValue<string | undefined, State>;
     style?: StateValue<CSSProperties | undefined, State>;

@@ -112,7 +112,7 @@ export const PC: Story = {
               className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]"
             >
               <div className="flex flex-col gap-6">
-                <Card>
+                <Card headingLevel={2}>
                   <Card.Header>
                     <Card.Description>
                       학생회관에서 타요 · {route.name}까지 {route.minutes}분

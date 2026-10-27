@@ -188,7 +188,7 @@ export const PC: Story = {
 
               return (
                 <li key={ride.id} className="flex">
-                  <Card className="w-full">
+                  <Card headingLevel={2} className="w-full">
                     <Card.Header>
                       <Card.Description>
                         {ride.day} {ride.time} 출발

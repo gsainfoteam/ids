@@ -16,7 +16,8 @@ export const marqueeStyle = tv({
     ],
     viewport: 'col-start-1 row-start-1 flex min-h-0 min-w-0 gap-[inherit]',
     track: 'flex gap-[inherit]',
-    content: 'flex gap-[inherit]',
+    content: 'm-0 flex list-none gap-[inherit] p-0',
+    listItem: 'flex shrink-0 flex-col',
     item: 'shrink-0 whitespace-nowrap',
     pause: 'col-start-1 row-start-1 self-center justify-self-end',
   },
@@ -40,6 +41,7 @@ export const marqueeStyle = tv({
       off: {
         track: 'w-full min-w-0',
         content: 'w-full flex-wrap justify-center',
+        listItem: 'max-w-full',
         item: 'max-w-full whitespace-normal',
       },
       media: {
@@ -53,6 +55,7 @@ export const marqueeStyle = tv({
           'motion-reduce:w-full motion-reduce:shrink',
           'motion-reduce:flex-wrap motion-reduce:justify-center',
         ],
+        listItem: 'motion-reduce:max-w-full',
         item: 'motion-reduce:max-w-full motion-reduce:whitespace-normal',
         pause: 'motion-reduce:hidden',
       },

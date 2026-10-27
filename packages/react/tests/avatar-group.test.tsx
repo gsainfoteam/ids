@@ -14,7 +14,7 @@ function renderGroup(props: AvatarGroup.Props, children: ReactNode = people()) {
   const html = renderToString(<AvatarGroup {...props}>{children}</AvatarGroup>);
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const group = doc.querySelector<HTMLElement>('[data-avatar-group]')!;
-  const items = Array.from(group.children) as HTMLElement[];
+  const items = Array.from(group.children, (li) => li.firstElementChild) as HTMLElement[];
   return { group, items };
 }
 const cutouts = (items: HTMLElement[]) =>
@@ -27,7 +27,8 @@ const cutouts = (items: HTMLElement[]) =>
 
 test('max shows that many avatars and gathers the rest into a labelled +N', () => {
   const { group, items } = renderGroup({ max: 3, 'aria-label': 'Attendees' });
-  expect(group.getAttribute('role')).toBe('group');
+  expect(group.tagName, 'a list of people').toBe('UL');
+  expect([...group.children].every((child) => child.tagName === 'LI')).toBe(true);
   expect(group.getAttribute('aria-label')).toBe('Attendees');
   expect(items).toHaveLength(4);
   const overflow = items[3]!;
@@ -153,6 +154,6 @@ test('an open popover beside the stacked avatars is not pulled into the overlap'
   );
   const popover = screen.getByTestId('popover').element() as HTMLElement;
   const avatars = screen.container.querySelectorAll<HTMLElement>('[data-avatar]');
-  expect(getComputedStyle(avatars[1]!).marginInlineStart).toBe('-10px');
+  expect(getComputedStyle(avatars[1]!.closest('li')!).marginInlineStart).toBe('-10px');
   expect(getComputedStyle(popover).marginInlineStart).toBe('0px');
 });

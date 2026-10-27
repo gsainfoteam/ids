@@ -47,7 +47,7 @@ export type CheckboxGroupRenderProps<T extends string> = {
 };
 
 export type CheckboxGroupProps<T extends string> = Omit<
-  ComponentProps<'div'>,
+  ComponentProps<'fieldset'>,
   'children' | 'defaultValue' | 'onChange' | 'role' | 'className' | 'style'
 > & {
   value?: readonly T[];
@@ -159,10 +159,9 @@ export function CheckboxGroupRoot<T extends string>({
         variant,
       }}
     >
-      <div
+      <fieldset
         {...rest}
         ref={rootRef}
-        role="group"
         tabIndex={-1}
         aria-disabled={disabled || undefined}
         aria-invalid={ariaInvalid}
@@ -190,7 +189,7 @@ export function CheckboxGroupRoot<T extends string>({
           anchor={anchorRef}
           message={requiredMessage}
         />
-      </div>
+      </fieldset>
     </CheckboxGroupContext.Provider>
   );
 }

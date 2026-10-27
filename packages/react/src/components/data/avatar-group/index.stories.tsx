@@ -182,7 +182,7 @@ export const Gallery: Story = {
 };
 
 const avatars = (element: HTMLElement) => [
-  ...element.querySelectorAll<HTMLElement>('[data-avatar-group] > [data-avatar]'),
+  ...element.querySelectorAll<HTMLElement>('[data-avatar-group] > li > [data-avatar]'),
 ];
 
 export const Overflow: Story = {
@@ -195,7 +195,7 @@ export const Overflow: Story = {
     },
   },
   play: async ({ canvas }) => {
-    const group = canvas.getByRole('group', { name: '회의 참석자' });
+    const group = canvas.getByRole('list', { name: '회의 참석자' });
     await expect(canvas.getAllByRole('img')).toHaveLength(4);
     await expect(canvas.getByRole('img', { name: '외 2명' })).toHaveTextContent('+2');
     await expect(group).toHaveAttribute('data-layout', 'stack');

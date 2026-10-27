@@ -150,7 +150,7 @@ export function useAccordionPanel({
   triggerId: string;
   onReveal: () => void;
 }) {
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
 
   const [settled, setSettled] = useState(!open);
   if (open && settled) setSettled(false);

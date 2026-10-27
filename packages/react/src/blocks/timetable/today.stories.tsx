@@ -35,7 +35,7 @@ export const PC: Story = {
         <h1 className="text-headline-h3-bold">오늘 수업 {CLASSES.length}개</h1>
       </div>
 
-      <Card>
+      <Card headingLevel={2}>
         <Card.Header>
           <Card.Description>다음 수업까지 16분</Card.Description>
           <Card.Title className="text-headline-h5-bold">{CLASSES[NOW_INDEX].name}</Card.Title>

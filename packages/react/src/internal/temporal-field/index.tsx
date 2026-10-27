@@ -447,7 +447,7 @@ export function TemporalField<V>({
           initialFocusSelector={config.initialFocusSelector}
           role="dialog"
           id={popupId}
-          aria-label={config.messages.title}
+          label={config.messages.title}
           data-temporal-owner={popupId}
           className="concentric-p-3"
           onBlur={handleBlur as (event: FocusEvent<HTMLDivElement>) => void}

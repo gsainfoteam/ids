@@ -222,7 +222,7 @@ export const PC: Story = {
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {shown.map((post) => (
             <li key={post.id} className="flex">
-              <Card asChild className="w-full">
+              <Card asChild headingLevel={2} className="w-full">
                 <a href={`#${post.id}`}>
                   <Card.Header>
                     <Card.Description>

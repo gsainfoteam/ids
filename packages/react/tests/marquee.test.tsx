@@ -499,7 +499,10 @@ test('Marquee.Item keeps its content on one line and passes itself onto its chil
       </Marquee>
     </IdsProvider>,
   );
-  const [text, link] = [...parts(screen.container).content.children] as HTMLElement[];
+  const { content } = parts(screen.container);
+  expect(content.tagName, 'the items are a list').toBe('UL');
+  expect([...content.children].every((child) => child.tagName === 'LI')).toBe(true);
+  const [text, link] = [...content.children].map((li) => li.firstElementChild) as HTMLElement[];
 
   expect(getComputedStyle(text!).whiteSpace).toBe('nowrap');
   expect(getComputedStyle(text!).flexShrink).toBe('0');

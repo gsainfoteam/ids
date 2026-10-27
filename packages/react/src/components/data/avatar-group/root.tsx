@@ -65,8 +65,7 @@ export function AvatarGroupRoot({
       <OverflowContext
         value={{ count: hidden, label: overflowLabel(hidden), names: hiddenNames, styles }}
       >
-        <div
-          role="group"
+        <ul
           {...rest}
           data-avatar-group=""
           data-layout={layout}
@@ -76,14 +75,16 @@ export function AvatarGroupRoot({
           style={resolveState(style, state)}
         >
           {items.map(({ node, cutout, overflow }, index) => (
-            <AvatarCutoutContext
+            <li
               key={overflow ? 'overflow' : isValidElement(node) ? node.key : index}
-              value={cutout}
+              className={styles.item()}
             >
-              {node ?? <AvatarGroupOverflow />}
-            </AvatarCutoutContext>
+              <AvatarCutoutContext value={cutout}>
+                {node ?? <AvatarGroupOverflow />}
+              </AvatarCutoutContext>
+            </li>
           ))}
-        </div>
+        </ul>
       </OverflowContext>
     </AvatarGroupContext>
   );

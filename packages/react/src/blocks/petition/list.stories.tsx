@@ -122,7 +122,7 @@ export const PC: Story = {
                 <ul className="flex flex-col gap-3">
                   {shown.map((petition) => (
                     <li key={petition.id}>
-                      <Card asChild interactive>
+                      <Card asChild interactive headingLevel={2}>
                         <a href={`#${petition.id}`}>
                           <Card.Header>
                             <Card.Description>

@@ -141,7 +141,9 @@ export const PC: Story = {
                       {message.attachment && (
                         <Card size="tiny" className="mt-2 max-w-xs">
                           <Card.Header>
-                            <Card.Title>{message.attachment.name}</Card.Title>
+                            <Card.Title asChild>
+                              <p>{message.attachment.name}</p>
+                            </Card.Title>
                             <Card.Description>{message.attachment.size}</Card.Description>
                           </Card.Header>
                         </Card>

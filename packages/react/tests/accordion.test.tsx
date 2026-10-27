@@ -52,7 +52,7 @@ test('SSR: each header is a heading with a button that controls a labelled regio
   expect(first!.getAttribute('aria-expanded')).toBe('true');
   expect(second!.getAttribute('aria-expanded')).toBe('false');
   const region = doc.getElementById(first!.getAttribute('aria-controls')!)!;
-  expect(region.getAttribute('role')).toBe('region');
+  expect(region.tagName, 'a section named by its trigger is a region').toBe('SECTION');
   expect(region.getAttribute('aria-labelledby')).toBe(first!.id);
   expect(region.hasAttribute('hidden')).toBe(false);
   expect(doc.getElementById(second!.getAttribute('aria-controls')!)!.hasAttribute('hidden')).toBe(

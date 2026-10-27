@@ -12,6 +12,7 @@ import { Slot } from '../../utility/slot';
 
 import type { Item } from '.';
 
+export type ItemHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 export type ItemVariant = 'ghost' | 'outline' | 'soft';
 
 const ITEM_TITLE = new Set<unknown>([ItemTitle]);
@@ -32,6 +33,7 @@ export function ItemRoot({
   selected,
   disabled = false,
   asChild = false,
+  headingLevel,
   className,
   style,
   children,
@@ -82,7 +84,7 @@ export function ItemRoot({
   const Root = asChild ? Slot : 'div';
 
   return (
-    <ItemContext value={{ styles, trigger, ...register }}>
+    <ItemContext value={{ headingLevel, styles, trigger, ...register }}>
       <Root
         {...rest}
         {...props}

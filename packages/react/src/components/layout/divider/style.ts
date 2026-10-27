@@ -4,7 +4,7 @@ import type { Divider } from '.';
 
 export const dividerStyle = tv({
   slots: {
-    root: 'shrink-0 border-0',
+    root: 'm-0 shrink-0 border-0',
     label: 'min-w-0 text-center text-caption-c1-medium text-(--ids-color-on-muted)',
   },
   variants: {
@@ -27,7 +27,7 @@ export const dividerStyle = tv({
     {
       orientation: 'vertical',
       labelled: false,
-      class: { root: 'min-h-[1lh] w-px self-stretch' },
+      class: { root: 'h-auto min-h-[1lh] w-px self-stretch' },
     },
     {
       orientation: 'horizontal',

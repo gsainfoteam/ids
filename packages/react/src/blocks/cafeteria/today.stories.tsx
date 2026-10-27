@@ -214,7 +214,7 @@ export const PC: Story = {
 
                   return (
                     <li key={menu.corner} className="flex">
-                      <Card className="w-full">
+                      <Card headingLevel={2} className="w-full">
                         <Card.Header>
                           <Card.Description>
                             {menu.corner} · {menu.kcal}kcal

@@ -6,7 +6,7 @@ import { ItemDescription, type ItemDescriptionProps } from './description';
 import { ItemGroup, type ItemGroupProps, type ItemGroupVariant } from './group';
 import { ItemMedia, type ItemMediaProps } from './media';
 import { type ItemPartProps } from './part';
-import { ItemRoot, type ItemVariant } from './root';
+import { ItemRoot, type ItemHeadingLevel, type ItemVariant } from './root';
 import { ItemSeparator, type ItemSeparatorProps } from './separator';
 import { itemStyle } from './style';
 import { ItemTitle, type ItemTitleProps } from './title';
@@ -21,6 +21,7 @@ export function Item(props: Item.Props) {
 
 export namespace Item {
   export type Variant = ItemVariant;
+  export type HeadingLevel = ItemHeadingLevel;
 
   export type State = InteractiveState & { interactive: boolean; selected: boolean };
 
@@ -32,6 +33,7 @@ export namespace Item {
     selected?: boolean;
     disabled?: boolean;
     asChild?: boolean;
+    headingLevel?: ItemHeadingLevel;
     onInteractionChange?: (state: InteractiveState) => void;
     className?: StateValue<string | undefined, State>;
     style?: StateValue<CSSProperties | undefined, State>;

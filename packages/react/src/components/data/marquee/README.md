@@ -104,7 +104,7 @@ import { Marquee } from '@gsainfoteam/ids-react';
 <Marquee aria-labelledby="partners-title">...</Marquee>
 ```
 
-- 루트는 `role="group"` 이고 이름이 필요합니다. `aria-label` 이나 `aria-labelledby` 가 없으면 개발 모드에서 경고합니다.
+- 루트는 `role="group"` 이고 이름이 필요합니다. 항목은 그 안의 `ul` 에서 하나씩 `li` 로 감싸입니다. `aria-label` 이나 `aria-labelledby` 가 없으면 개발 모드에서 경고합니다.
 - 흐름을 알리지 않습니다(live region 없음). 스크린 리더는 원본 항목을 차례로 한 번씩 읽습니다.
 - 복제본은 `aria-hidden="true"` 와 `inert` 입니다. Tab 은 항목 안의 링크나 버튼마다 한 번 멈춥니다.
 - 키보드 포커스를 받은 항목은 띠 가운데로 옮겨집니다. 띠 밖에 가려지거나 페이드에 걸린 항목도 포커스 링까지 또렷이 보입니다. 띠는 `overflow: clip` 이라 브라우저가 대신 스크롤하지 않습니다.

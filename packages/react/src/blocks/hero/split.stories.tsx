@@ -102,7 +102,7 @@ export const PC: Story = {
               </Chip>
             ))}
           </div>
-          <Card>
+          <Card headingLevel={2}>
             <Card.Header>
               <Avatar name="GIST 도우미" size="tiny" aria-hidden>
                 <Avatar.Fallback>

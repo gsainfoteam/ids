@@ -128,7 +128,7 @@ const styles = popupStyle({ presentation });   // 'popover' | 'drawer'
 
 // internal/field-popup/header.tsx
 const styles = popupStyle();
-<div className={styles.header()}><span className={styles.title()}>{title}</span></div>
+<div className={styles.header()}><h2 id={titleId} className={styles.title()}>{title}</h2></div>
 ```
 
 ### 왜 이렇게
@@ -159,6 +159,7 @@ const styles = popupStyle();
 
 - drawer 는 자기를 연 필드를 덮으므로 스스로 이름을 밝히고 나갈 길을 줍니다. popover 는 필드가 보이므로 머리를 그리지 않습니다.
 - temporal-field 는 늘 렌더하고 `header` 슬롯의 CSS 로 숨기고, ColorField 는 `drawer` 일 때만 렌더합니다.
+- 제목은 `h2` 입니다. `FieldPopup` 이 `FieldPopupTitleContext` 로 넘긴 함수에 자기 id 를 등록하고, 팝업은 호출한 쪽이 `aria-label` 도 `aria-labelledby` 도 주지 않았으면 `aria-labelledby` 로 그 제목을 이름으로 삼습니다. temporal-field 는 그래서 `aria-label` 대신 `label`(머리가 없을 때의 대비)만 넘깁니다. popover 에서 CSS 로 숨긴 제목도 이름은 됩니다.
 - `autoFocus` 면 닫기 버튼에 `data-popup-autofocus` 를 붙입니다. `initialFocusSelector` 에 맞는 요소가 먼저입니다.
 
 ## search.tsx
