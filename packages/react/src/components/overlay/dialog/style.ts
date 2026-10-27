@@ -1,3 +1,4 @@
+import { overlayStyles } from '../../../internal/overlay/styles';
 import { cn, tv } from '../../../utils';
 
 const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');
@@ -5,10 +6,8 @@ const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');
 export const dialogStyle = tv({
   slots: {
     backdrop: [
-      'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none border-0 p-0',
-      'bg-black/50 transition-opacity duration-(--ids-motion-normal) ease-out',
-      'starting:opacity-0 data-ending-style:opacity-0 data-stacked:bg-transparent',
-      'motion-reduce:transition-none',
+      overlayStyles.backdrop,
+      'duration-(--ids-motion-normal) ease-out data-stacked:bg-transparent',
     ],
     content: [
       'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm flex-col outline-none',

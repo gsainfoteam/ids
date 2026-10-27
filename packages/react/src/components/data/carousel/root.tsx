@@ -82,7 +82,7 @@ type CarouselName =
   | { 'aria-label'?: string; 'aria-labelledby': string };
 
 export type CarouselProps = Omit<
-  ComponentProps<'div'>,
+  ComponentProps<'section'>,
   keyof CarouselOwnProps | 'aria-label' | 'aria-labelledby' | 'role'
 > &
   CarouselOwnProps &
@@ -168,12 +168,9 @@ export function CarouselRoot(props: CarouselProps) {
   } = props;
 
   const t = useTranslate();
-  const rootRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
   const focusIndicatorAfterMove = useRef(false);
-  const mergedRef = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(rootRef, ref)(node),
-    [ref],
-  );
+  const mergedRef = useCallback((node: HTMLElement | null) => mergeRefs(rootRef, ref)(node), [ref]);
 
   useNameWarning(Boolean(props['aria-label'] || props['aria-labelledby']));
 
@@ -247,10 +244,9 @@ export function CarouselRoot(props: CarouselProps) {
 
   return (
     <CarouselContext value={context}>
-      <div
+      <section
         {...rest}
         ref={mergedRef}
-        role="region"
         aria-roledescription={t('carousel.roleDescription')}
         data-carousel=""
         data-orientation={orientation}
@@ -259,7 +255,7 @@ export function CarouselRoot(props: CarouselProps) {
         data-dragging={flag(slides.dragging)}
         className={styles.root({ className: resolveState(className, state) })}
         style={resolveState(style, state)}
-        onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+        onKeyDown={(event: KeyboardEvent<HTMLElement>) => {
           onKeyDown?.(event);
           if (event.defaultPrevented) return;
           const fromIndicator = Boolean(
@@ -282,7 +278,7 @@ export function CarouselRoot(props: CarouselProps) {
           rotating={rotation.rotating}
           className={styles.announcer()}
         />
-      </div>
+      </section>
     </CarouselContext>
   );
 }

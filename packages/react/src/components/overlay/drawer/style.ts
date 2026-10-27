@@ -1,3 +1,4 @@
+import { overlayStyles } from '../../../internal/overlay/styles';
 import { cn, tv } from '../../../utils';
 
 const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');
@@ -5,11 +6,9 @@ const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');
 export const drawerStyle = tv({
   slots: {
     backdrop: [
-      'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none touch-none border-0 p-0',
-      'bg-black/50 opacity-[var(--drawer-fade,1)]',
-      'transition-opacity duration-(--ids-motion-slow) ease-[cubic-bezier(0.32,0.72,0,1)]',
-      'starting:opacity-0 data-ending-style:opacity-0 data-stacked:bg-transparent',
-      'data-dragging:transition-none motion-reduce:transition-none',
+      overlayStyles.backdrop,
+      'touch-none opacity-[var(--drawer-fade,1)] data-stacked:bg-transparent',
+      'duration-(--ids-motion-slow) ease-[cubic-bezier(0.32,0.72,0,1)] data-dragging:transition-none',
     ],
     content: [
       'fixed z-50 m-0 flex flex-col outline-none',

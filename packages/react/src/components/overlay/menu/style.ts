@@ -1,15 +1,12 @@
 import { listStyles } from '../../../internal/list-styles';
-import { cn, tv } from '../../../utils';
-
-const cornerOfThePaddedViewport = cn('concentric-p-1 p-0');
+import { overlayStyles } from '../../../internal/overlay/styles';
+import { tv } from '../../../utils';
 
 export const menuStyle = tv({
   slots: {
     content: [
-      'fixed z-50 m-0 flex max-h-(--available-height) max-w-(--available-width) flex-col outline-none',
-      cornerOfThePaddedViewport,
-      'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface)',
-      'text-body-b3-regular shadow-md',
+      overlayStyles.popup,
+      'max-h-(--available-height) max-w-(--available-width)',
       'transition-[opacity,scale] duration-(--ids-motion-fast) ease-out',
       'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
       'data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom',
@@ -26,11 +23,7 @@ export const menuStyle = tv({
       'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
       'motion-reduce:transition-none',
     ],
-    backdrop: [
-      'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none border-0 p-0',
-      'bg-black/50 transition-opacity duration-(--ids-motion-fast) ease-out',
-      'starting:opacity-0 data-ending-style:opacity-0 motion-reduce:transition-none',
-    ],
+    backdrop: [overlayStyles.backdrop, 'duration-(--ids-motion-fast) ease-out'],
     listArea: listStyles.listArea,
     list: listStyles.list,
     empty: [listStyles.empty, 'not-data-empty:sr-only'],

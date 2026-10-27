@@ -49,6 +49,7 @@ export function CarouselSlide({
     ...engine,
     'aria-label': rest['aria-label'] ?? engine['aria-label'],
     'data-carousel-slide': '',
+    'data-field-input': '',
     className: styles.slide({ className: resolveState(className, state) }),
     style: resolveState(style, state),
   });

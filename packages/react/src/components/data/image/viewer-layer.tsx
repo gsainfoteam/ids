@@ -193,11 +193,11 @@ function ViewerSession({
     )(event);
   };
 
-  const notePress = (event: PointerEvent<HTMLDivElement>) => {
+  const notePress = (event: PointerEvent<HTMLElement>) => {
     pressedAt.current = { x: event.clientX, y: event.clientY };
   };
 
-  const closeOnAnEmptyPress = (event: MouseEvent<HTMLDivElement>) => {
+  const closeOnAnEmptyPress = (event: MouseEvent<HTMLElement>) => {
     const from = pressedAt.current;
     pressedAt.current = null;
     if (!from) return;
@@ -253,9 +253,8 @@ function ViewerSession({
         style={look.style}
         onKeyDown={onKeyDown}
       >
-        <div
+        <section
           ref={attachViewport}
-          role="region"
           aria-roledescription={t('carousel.roleDescription')}
           aria-label={t('image.photos')}
           data-image-viewer-stage=""
@@ -277,7 +276,7 @@ function ViewerSession({
               />
             ))}
           </div>
-        </div>
+        </section>
         <OverlayItemContext value={null}>
           <ImageViewerContext value={context}>{look.children ?? DEFAULT_PARTS}</ImageViewerContext>
         </OverlayItemContext>
