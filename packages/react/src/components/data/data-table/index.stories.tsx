@@ -226,12 +226,12 @@ export const Pagination: Story = {
     docs: {
       description: {
         story:
-          '`enablePagination` 은 아래에 페이지 이동 버튼을 붙입니다. 끝에 닿은 버튼은 포커스를 잃지 않게 `aria-disabled` 로 꺼집니다. 이 바닥글은 Pagination 컴포넌트가 나오면 그것으로 바꿀 수 있습니다.',
+          '`enablePagination` 은 아래에 페이지 이동 버튼을 붙입니다. 바닥글은 IDS `Pagination` 에 `Pagination.First`, `Pagination.Last` 를 더해 짭니다. 끝에 닿은 버튼은 포커스를 잃지 않게 `aria-disabled` 로 꺼집니다.',
       },
     },
   },
   play: async ({ canvas, userEvent, args }) => {
-    const pages = canvas.getByRole('navigation', { name: '페이지 이동' });
+    const pages = canvas.getByRole('navigation', { name: '페이지 탐색' });
     await expect(pages).toHaveTextContent('1 / 9 페이지');
     await expect(canvas.getByRole('button', { name: '이전 페이지' })).toHaveAttribute(
       'aria-disabled',
@@ -311,7 +311,7 @@ export const LoadingAndEmpty: Story = {
     docs: {
       description: {
         story:
-          '행이 없으면 `empty` 를 한 칸짜리 행에 보여 줍니다(기본 "데이터가 없습니다."). `loading` 이면 표에 `aria-busy` 가 붙고, 행이 없으면 그 칸에, 있으면 표 위에 Spinner 를 겹칩니다. Empty 컴포넌트가 나오면 `empty` 에 그대로 넣을 수 있습니다.',
+          '행이 없으면 `empty` 를 한 칸짜리 행에 보여 줍니다(기본 "데이터가 없습니다."). `loading` 이면 표에 `aria-busy` 가 붙고, 행이 없으면 그 칸에, 있으면 표 위에 Spinner 를 겹칩니다. `empty` 에는 `Empty` 컴포넌트를 그대로 넣을 수 있습니다.',
       },
     },
   },
@@ -372,7 +372,7 @@ export const ServerSide: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const pages = canvas.getByRole('navigation', { name: '페이지 이동' });
+    const pages = canvas.getByRole('navigation', { name: '페이지 탐색' });
     await expect(pages).toHaveTextContent('1 / 9 페이지');
     await userEvent.click(canvas.getByRole('button', { name: '다음 페이지' }));
     await expect(pages).toHaveTextContent('2 / 9 페이지');

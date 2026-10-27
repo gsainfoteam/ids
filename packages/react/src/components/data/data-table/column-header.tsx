@@ -8,6 +8,7 @@ import { SELECTION_COLUMN_ID } from './selection';
 import { keyHandler } from '../../../internal/keys';
 import { resizeKeyMap, separatorProps } from '../../../internal/resize-handle';
 import { useTranslate } from '../../../internal/translate';
+import { Button } from '../../action/button';
 import { TableHead } from '../table/head';
 
 import type { DataTableFeatures } from './features';
@@ -68,7 +69,7 @@ function ResizeHandle<TData extends RowData>({ header }: ColumnHeaderProps<TData
 }
 
 export function DataTableColumnHeader<TData extends RowData>({ header }: ColumnHeaderProps<TData>) {
-  const { styles } = useDataTableContext();
+  const { styles, size } = useDataTableContext();
   const { column } = header;
 
   const sorted = column.getIsSorted();
@@ -87,15 +88,16 @@ export function DataTableColumnHeader<TData extends RowData>({ header }: ColumnH
       })}
     >
       {sortable ? (
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size={size}
           data-data-table-sort=""
           className={styles.sortButton()}
           onClick={column.getToggleSortingHandler()}
         >
           {content}
           <SortIcon sorted={sorted} className={styles.sortIcon()} />
-        </button>
+        </Button>
       ) : (
         content
       )}

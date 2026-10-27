@@ -14,14 +14,30 @@ export type PaginationStepProps = Omit<
   icon?: ReactElement;
   asChild?: boolean;
   children?: ReactElement;
+  focusableWhenDisabled?: boolean;
   onClick?: (event: MouseEvent<HTMLElement>) => void;
 };
 
+type StepDirection = 'first' | 'previous' | 'next' | 'last';
+
 type StepOptions = {
   part: string;
-  direction: 'previous' | 'next';
+  direction: StepDirection;
   defaultIcon: ReactElement;
 };
+
+function stepTarget(direction: StepDirection, page: number, pageCount: number) {
+  switch (direction) {
+    case 'first':
+      return 1;
+    case 'previous':
+      return Math.max(1, page - 1);
+    case 'next':
+      return Math.min(pageCount, page + 1);
+    case 'last':
+      return pageCount;
+  }
+}
 
 export function PaginationStep({
   part,
@@ -37,8 +53,9 @@ export function PaginationStep({
 }: PaginationStepProps & StepOptions) {
   const t = useTranslate();
   const { page, pageCount } = usePaginationContext(part);
-  const atEdge = direction === 'previous' ? page <= 1 : page >= pageCount;
-  const target = direction === 'previous' ? Math.max(1, page - 1) : Math.min(pageCount, page + 1);
+  const towardStart = direction === 'first' || direction === 'previous';
+  const atEdge = towardStart ? page <= 1 : page >= pageCount;
+  const target = stepTarget(direction, page, pageCount);
   const glyph = icon ?? defaultIcon;
 
   const { context, control, content } = usePaginationControl({

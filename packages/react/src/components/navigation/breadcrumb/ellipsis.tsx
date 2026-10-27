@@ -6,6 +6,7 @@ import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid';
 
 import { CollapsedContext, useBreadcrumbContext } from './context';
 import { useTranslate } from '../../../internal/translate';
+import { IconButton } from '../../action/icon-button';
 import { Menu } from '../../overlay/menu';
 
 export type BreadcrumbEllipsisProps = Omit<ComponentProps<'button'>, 'children'> & {
@@ -29,12 +30,14 @@ export function BreadcrumbEllipsis({
   return (
     <li data-breadcrumb-item="" data-breadcrumb-ellipsis="" className={styles.item()}>
       <Menu open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
-        <Menu.Trigger
-          aria-label={t('breadcrumb.more')}
-          {...props}
-          className={styles.ellipsis({ className })}
-        >
-          <EllipsisHorizontalIcon aria-hidden="true" />
+        <Menu.Trigger asChild>
+          <IconButton
+            aria-label={t('breadcrumb.more')}
+            {...props}
+            variant="ghost"
+            icon={<EllipsisHorizontalIcon aria-hidden="true" />}
+            className={styles.ellipsis({ className })}
+          />
         </Menu.Trigger>
         <Menu.Content>
           <CollapsedContext value={true}>{children}</CollapsedContext>

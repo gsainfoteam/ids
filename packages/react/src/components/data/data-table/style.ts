@@ -10,9 +10,10 @@ export const dataTableStyle = tv({
     frame: 'relative',
     head: 'group/head relative',
     sortButton: [
-      'group/sort -mx-2 inline-flex max-w-full items-center gap-1 rounded-standard px-2 outline-none',
-      'cursor-pointer text-inherit select-none focus-ring',
-      'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'group/sort -mx-2 max-w-full gap-1 px-2 text-inherit',
+      'data-hovered:text-(--ids-color-on-surface) data-active:text-(--ids-color-on-surface)',
+      'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2',
+      'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2',
     ],
     sortIcon: [
       'pointer-events-none size-4 shrink-0 text-(--ids-color-on-muted)',
@@ -37,18 +38,16 @@ export const dataTableStyle = tv({
     spinner: 'size-6 text-(--ids-color-on-muted)',
     footer: 'flex flex-wrap items-center justify-between gap-3',
     summary: 'text-(--ids-color-on-muted)',
-    pagination: 'ms-auto flex items-center gap-1',
+    pagination: 'ms-auto',
     page: 'min-w-16 px-1 text-center whitespace-nowrap tabular-nums',
-    pageIcon: 'rtl:-scale-x-100',
   },
   variants: {
     variant: {
       outline: {
-        sortButton: 'hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)',
+        sortButton:
+          '[--control-hover:var(--ids-color-muted-hover)] [--control-press:var(--ids-color-muted-active)]',
       },
-      ghost: {
-        sortButton: 'hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)',
-      },
+      ghost: {},
     } satisfies Record<TableVariant, object>,
     size: {
       standard: {

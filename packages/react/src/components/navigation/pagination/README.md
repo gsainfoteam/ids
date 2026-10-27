@@ -104,8 +104,26 @@ import { Link } from '@tanstack/react-router';
 ```
 
 - 자식을 직접 쓰면 그 순서 그대로 그리고 생략은 계산하지 않습니다. 자식이 없으면 `<Pagination.List />` 를 그립니다.
+- `Pagination.First`, `Pagination.Last` 는 첫 페이지, 마지막 페이지로 가는 화살표입니다. 기본 목록에는 없고 직접 쓸 때만 놓습니다.
 - `Pagination.Previous`, `Pagination.Next` 의 `icon` 으로 화살표를 바꿉니다. 오른쪽에서 왼쪽으로 쓰는 화면에서는 화살표가 뒤집힙니다.
 - `Pagination.Ellipsis` 의 자식으로 생략 표시를 바꿉니다. 스크린 리더에는 숨깁니다.
+
+## 처음과 끝
+
+```tsx
+<Pagination page={page} pageCount={20} onPageChange={setPage}>
+  <Pagination.List>
+    <Pagination.Item><Pagination.First focusableWhenDisabled /></Pagination.Item>
+    <Pagination.Item><Pagination.Previous focusableWhenDisabled /></Pagination.Item>
+    <Pagination.Item>{page} / 20</Pagination.Item>
+    <Pagination.Item><Pagination.Next focusableWhenDisabled /></Pagination.Item>
+    <Pagination.Item><Pagination.Last focusableWhenDisabled /></Pagination.Item>
+  </Pagination.List>
+</Pagination>
+```
+
+- 번호 없이 "7 / 20" 처럼 적는 꼴입니다. `DataTable` 의 바닥글이 이 모양입니다.
+- 화살표의 `focusableWhenDisabled` 는 끝에 닿은 버튼을 `aria-disabled` 로 끄고 포커스를 남깁니다. 마지막 페이지 버튼을 누른 뒤에도 포커스가 그 버튼에 있습니다.
 
 ## 모양
 
@@ -144,6 +162,9 @@ import { Link } from '@tanstack/react-router';
 | `Pagination.Link`       | `page` 필수. `asChild`, 자식이 없으면 번호                    |
 | `Pagination.Previous`   | `icon`, `asChild`. 이름은 "이전 페이지"                       |
 | `Pagination.Next`       | `icon`, `asChild`. 이름은 "다음 페이지"                       |
+| `Pagination.First`      | `icon`, `asChild`. 이름은 "첫 페이지"                         |
+| `Pagination.Last`       | `icon`, `asChild`. 이름은 "마지막 페이지"                     |
+| `focusableWhenDisabled` | 화살표 네 개. 끝에 닿아도 포커스와 탭 순서를 지킨다           |
 | `Pagination.List`       | `ul`. 자식은 노드 또는 `(entry) => ReactNode`                 |
 | `Pagination.Item`       | `li`                                                          |
 | `Pagination.Ellipsis`   | `aria-hidden` 인 `span`. 자식이 없으면 가로 점 세 개 아이콘   |
@@ -151,5 +172,5 @@ import { Link } from '@tanstack/react-router';
 ## 알아둘 것
 
 - `getHref` 와 `Pagination.List` 의 함수는 함수라서 Server Component 에서 넘길 수 없습니다. 서버에서 그리는 페이지는 이 부분만 클라이언트 컴포넌트로 둡니다.
-- 이름("페이지 탐색", "3페이지", "이전 페이지", "다음 페이지")은 `IdsProvider translate` 의 `pagination.*` 키로 바꿉니다. 한 화면에 페이지네이션이 둘이면 `aria-label` 로 구분합니다.
+- 이름("페이지 탐색", "3페이지", "이전 페이지", "다음 페이지", "첫 페이지", "마지막 페이지")은 `IdsProvider translate` 의 `pagination.*` 키로 바꿉니다. 한 화면에 페이지네이션이 둘이면 `aria-label` 로 구분합니다.
 - 항목 수로 "41-60 / 1,000" 같은 안내를 적는 파트는 없습니다. 옆에 글자로 둡니다.

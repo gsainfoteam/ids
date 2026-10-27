@@ -265,3 +265,56 @@ export const Composition: Story = {
     await expect(canvas.getByRole('button', { name: '다음 페이지' })).toBeDisabled();
   },
 };
+
+export const FirstAndLast: Story = {
+  render: function Render() {
+    const [page, setPage] = useState(7);
+
+    return (
+      <Pagination page={page} pageCount={20} onPageChange={setPage}>
+        <Pagination.List>
+          <Pagination.Item>
+            <Pagination.First focusableWhenDisabled />
+          </Pagination.Item>
+          <Pagination.Item>
+            <Pagination.Previous focusableWhenDisabled />
+          </Pagination.Item>
+          <Pagination.Item>
+            <span
+              aria-live="polite"
+              className="text-body-b3-regular min-w-16 text-center tabular-nums"
+            >
+              {page} / 20
+            </span>
+          </Pagination.Item>
+          <Pagination.Item>
+            <Pagination.Next focusableWhenDisabled />
+          </Pagination.Item>
+          <Pagination.Item>
+            <Pagination.Last focusableWhenDisabled />
+          </Pagination.Item>
+        </Pagination.List>
+      </Pagination>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Pagination.First`, `Pagination.Last` 는 첫 페이지, 마지막 페이지로 갑니다. 번호 대신 "7 / 20" 을 적는 바닥글에 씁니다. `focusableWhenDisabled` 를 주면 끝에 닿은 버튼이 `aria-disabled` 로 꺼지고 포커스를 지킵니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: '마지막 페이지' }));
+    await expect(canvas.getByText('20 / 20')).toBeVisible();
+    await expect(canvas.getByRole('button', { name: '마지막 페이지' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    await expect(canvas.getByRole('button', { name: '마지막 페이지' })).toHaveFocus();
+
+    await userEvent.click(canvas.getByRole('button', { name: '첫 페이지' }));
+    await expect(canvas.getByText('1 / 20')).toBeVisible();
+  },
+};
