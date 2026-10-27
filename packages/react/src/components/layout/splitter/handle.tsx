@@ -13,6 +13,7 @@ import { HandleIndexContext, useSplitterPart } from './context';
 import { splitterStyle, type SplitterToggleSide } from './style';
 import { useResizeDrag } from '../../../internal/resize-handle';
 import { mergeProps, part } from '../../../utils';
+import { IconButton } from '../../action/icon-button';
 
 export type SplitterHandleProps = ComponentProps<'div'> & { asChild?: boolean };
 
@@ -57,18 +58,17 @@ export function SplitterHandle({ asChild, className, children, ...props }: Split
   return (
     <div data-splitter-handle-group="" className={styles.group()}>
       {separator}
-      <button
-        type="button"
+      <IconButton
+        variant="outline"
         tabIndex={-1}
         aria-label={toggle.label}
         aria-expanded={!toggle.collapsed}
         aria-controls={toggle.controls}
         data-splitter-toggle=""
         className={placed.toggle()}
+        icon={<Chevron className={placed.toggleIcon()} />}
         onClick={toggle.onClick}
-      >
-        <Chevron className={placed.toggleIcon()} />
-      </button>
+      />
     </div>
   );
 }

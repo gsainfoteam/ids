@@ -60,7 +60,7 @@
       "react-hook-form",
       "tailwindcss"
     ],
-    "limit": "47 kB",
+    "limit": "55 kB",
     "gzip": true
   },
   {

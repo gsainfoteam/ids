@@ -1,3 +1,4 @@
+import { fieldSurface } from '../../../internal/field-surface';
 import { cn, tv } from '../../../utils';
 
 import type { OTPFieldVariant } from '.';
@@ -17,17 +18,12 @@ export const otpFieldStyle = tv({
     ],
     group: 'flex items-center',
     slot: [
-      'relative flex items-center justify-center border shadow-xs',
-      'text-(--ids-color-on-surface)',
-      'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast)',
-      'motion-reduce:transition-none',
+      fieldSurface.base,
+      'relative flex items-center justify-center',
       'rounded-standard data-grouped:rounded-none',
       'data-grouped:-ms-px data-grouped:first:ms-0',
       'data-grouped:first:rounded-s-standard data-grouped:last:rounded-e-standard',
-      'data-active:z-20 data-active:border-(--ids-color-primary)',
-      'data-active:ring-[3px] data-active:ring-(--ids-color-primary)/40',
-      'group-data-invalid/otp:border-(--ids-color-danger)',
-      'group-data-invalid/otp:data-active:ring-(--ids-color-danger)/40',
+      'data-focus-visible:z-20',
     ],
     placeholder: 'text-(--ids-color-on-muted)',
     maskDot: 'size-2 rounded-full bg-current',
@@ -38,8 +34,8 @@ export const otpFieldStyle = tv({
   },
   variants: {
     variant: {
-      outline: { slot: 'border-(--ids-color-border) bg-(--ids-color-surface)' },
-      soft: { slot: 'border-transparent bg-(--ids-color-secondary) shadow-none' },
+      outline: { slot: fieldSurface.variant.outline },
+      soft: { slot: fieldSurface.variant.soft },
     } satisfies Record<OTPFieldVariant, object>,
     size: {
       standard: { slot: 'size-(--ids-size-control-standard) text-body-b2-medium' },

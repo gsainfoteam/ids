@@ -11,6 +11,7 @@ type Context = {
   slots: OTPSlotState[];
   mask: boolean | string | undefined;
   placeholder: string | undefined;
+  invalid: boolean;
   styles: ReturnType<typeof otpFieldStyle>;
 };
 

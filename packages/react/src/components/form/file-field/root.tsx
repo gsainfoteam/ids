@@ -326,17 +326,19 @@ export function FileFieldRoot(props: FileFieldProps) {
           </span>
         )}
         {s.rejections.length > 0 && (
-          <div id={errorId} role="alert" className={styles.rejections()}>
-            {s.rejections.map(({ file, reason }) => (
-              <div key={fileKey(file)}>
-                {file.name}:{' '}
-                {reason === 'type'
-                  ? t('fileField.rejectType')
-                  : reason === 'size'
-                    ? t('fileField.rejectSize', { max: formatBytes(maxSize ?? 0) })
-                    : t('fileField.rejectCount', { max: multiple ? (maxCount ?? 0) : 1 })}
-              </div>
-            ))}
+          <div id={errorId} role="alert">
+            <ul className={styles.rejections()}>
+              {s.rejections.map(({ file, reason }) => (
+                <li key={fileKey(file)}>
+                  {file.name}:{' '}
+                  {reason === 'type'
+                    ? t('fileField.rejectType')
+                    : reason === 'size'
+                      ? t('fileField.rejectSize', { max: formatBytes(maxSize ?? 0) })
+                      : t('fileField.rejectCount', { max: multiple ? (maxCount ?? 0) : 1 })}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
         <FormValue

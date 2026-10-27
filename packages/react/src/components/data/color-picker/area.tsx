@@ -28,6 +28,7 @@ export function ColorPickerArea({ className, style, ...props }: ColorPickerAreaP
     'aria-readonly': c.state.readOnly || undefined,
     disabled: c.state.disabled,
     className: c.styles.channel(),
+    'data-field-input': '',
     onKeyDown: c.picker.area.onKeyDown,
   } as const;
   return (
@@ -50,28 +51,28 @@ export function ColorPickerArea({ className, style, ...props }: ColorPickerAreaP
       }}
     >
       <span
-        aria-hidden="true"
         className={c.styles.areaThumb()}
         style={{
           left: `${color.s * 100}%`,
           top: `${(1 - color.v) * 100}%`,
           backgroundColor: cssColor({ ...rgba, alpha: 1 }),
         }}
-      />
-      <input
-        {...channel}
-        aria-label={t('colorPicker.saturation')}
-        value={saturation}
-        onChange={(event) => c.picker.actions.onChannelChange('saturation', event)}
-      />
-      <input
-        {...channel}
-        aria-label={t('colorPicker.brightness')}
-        aria-orientation="vertical"
-        tabIndex={-1}
-        value={brightness}
-        onChange={(event) => c.picker.actions.onChannelChange('brightness', event)}
-      />
+      >
+        <input
+          {...channel}
+          aria-label={t('colorPicker.saturation')}
+          value={saturation}
+          onChange={(event) => c.picker.actions.onChannelChange('saturation', event)}
+        />
+        <input
+          {...channel}
+          aria-label={t('colorPicker.brightness')}
+          aria-orientation="vertical"
+          tabIndex={-1}
+          value={brightness}
+          onChange={(event) => c.picker.actions.onChannelChange('brightness', event)}
+        />
+      </span>
     </div>
   );
 }

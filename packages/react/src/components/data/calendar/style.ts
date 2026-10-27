@@ -1,4 +1,5 @@
 import { primaryFill } from '../../../internal/brand-fill';
+import { fieldSurface } from '../../../internal/field-surface';
 import { cn, tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -16,9 +17,9 @@ export const calendarStyle = tv({
     captionLabel: 'truncate font-medium select-none',
     dropdowns: 'flex min-w-0 items-center justify-center gap-1.5',
     dropdownRoot: [
-      'relative inline-flex min-w-0 items-center rounded-standard shadow-xs',
-      'inset-ring-1 inset-ring-(--ids-color-border) focus-ring',
-      'data-disabled:opacity-50',
+      fieldSurface.base,
+      fieldSurface.variant.outline,
+      'relative inline-flex min-w-0 items-center rounded-standard',
     ],
     dropdown:
       'absolute inset-0 size-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed',
