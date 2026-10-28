@@ -275,7 +275,11 @@ export const PC: Story = {
                   <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-4">
                     <Accordion type="multiple" variant="soft">
                       <Accordion.Item value="reasoning">
-                        <Accordion.Trigger>12초 동안 생각했어요</Accordion.Trigger>
+                        <Accordion.Header asChild>
+                          <h2>
+                            <Accordion.Trigger>12초 동안 생각했어요</Accordion.Trigger>
+                          </h2>
+                        </Accordion.Header>
                         <Accordion.Content>
                           성적표에서 들은 과목 31개를 찾고, 2026 학사 요람의 전공 필수와 견줬어요.
                           남은 전공 필수는 세 과목이라, 2학기에 열리는 분반 중 서로 시간이 겹치지
@@ -283,10 +287,14 @@ export const PC: Story = {
                         </Accordion.Content>
                       </Accordion.Item>
                       <Accordion.Item value="tool">
-                        <Accordion.Trigger>
-                          학사 시스템에서 개설 과목을 찾았어요{' '}
-                          <Badge content="38과목" variant="soft" colorScheme="success" />
-                        </Accordion.Trigger>
+                        <Accordion.Header asChild>
+                          <h2>
+                            <Accordion.Trigger>
+                              학사 시스템에서 개설 과목을 찾았어요{' '}
+                              <Badge content="38과목" variant="soft" colorScheme="success" />
+                            </Accordion.Trigger>
+                          </h2>
+                        </Accordion.Header>
                         <Accordion.Content>
                           <Table aria-label="도구에 넘긴 값" size="tiny">
                             <Table.Header>

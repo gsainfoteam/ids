@@ -1,8 +1,13 @@
 'use client';
 
-import { isValidElement, type ComponentProps } from 'react';
+import { isValidElement, use, type ComponentProps } from 'react';
 
-import { IndicatorPlacementContext, useItemContext, useRootContext } from './context';
+import {
+  HeaderContext,
+  IndicatorPlacementContext,
+  useItemContext,
+  useRootContext,
+} from './context';
 import { AccordionIndicator } from './indicator';
 import { openState } from './open-state';
 import { TRIGGER_ATTRIBUTE } from './use-accordion';
@@ -63,39 +68,39 @@ export function AccordionTrigger({
   const indicatorIndex = nodes.findIndex(
     (child) => isValidElement(child) && elementTypeOf(child) === AccordionIndicator,
   );
-  const Heading = `h${root.headingLevel}` as const;
+  const insideHeader = use(HeaderContext);
 
-  return (
-    <Heading className={root.styles.heading()}>
-      <button
-        type="button"
-        {...rest}
-        {...handlers}
-        id={item.triggerId}
-        aria-expanded={item.state.open}
-        aria-controls={item.contentId}
-        aria-disabled={item.locked ? true : undefined}
-        disabled={item.state.disabled}
-        {...{ [TRIGGER_ATTRIBUTE]: '' }}
-        {...interactiveDataProps(interaction)}
-        {...openState(item.state.open)}
-        onClick={(event) => {
-          onClick?.(event);
-          if (event.defaultPrevented || item.locked) return;
-          root.toggle(item.state.value);
-        }}
-        className={root.styles.trigger({ className: resolveState(className, state) })}
-        style={resolveState(style, state)}
+  const button = (
+    <button
+      type="button"
+      {...rest}
+      {...handlers}
+      id={item.triggerId}
+      aria-expanded={item.state.open}
+      aria-controls={item.contentId}
+      aria-disabled={item.locked ? true : undefined}
+      disabled={item.state.disabled}
+      {...{ [TRIGGER_ATTRIBUTE]: '' }}
+      {...interactiveDataProps(interaction)}
+      {...openState(item.state.open)}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented || item.locked) return;
+        root.toggle(item.state.value);
+      }}
+      className={root.styles.trigger({ className: resolveState(className, state) })}
+      style={resolveState(style, state)}
+    >
+      <IndicatorPlacementContext
+        value={indicatorIndex === -1 || indicatorIndex === nodes.length - 1 ? 'end' : 'inline'}
       >
-        <IndicatorPlacementContext
-          value={indicatorIndex === -1 || indicatorIndex === nodes.length - 1 ? 'end' : 'inline'}
-        >
-          {content}
-          {indicatorIndex === -1 && <AccordionIndicator />}
-        </IndicatorPlacementContext>
-      </button>
-    </Heading>
+        {content}
+        {indicatorIndex === -1 && <AccordionIndicator />}
+      </IndicatorPlacementContext>
+    </button>
   );
+
+  return insideHeader ? button : <h3 className={root.styles.heading()}>{button}</h3>;
 }
 
 AccordionTrigger.displayName = 'Accordion.Trigger';

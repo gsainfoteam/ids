@@ -4,7 +4,6 @@ import { createContext, use, type KeyboardEvent } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { AccordionHeadingLevel } from '.';
 import type { AccordionItemState } from './item';
 import type { accordionStyle } from './style';
 
@@ -12,7 +11,6 @@ type RootContext = {
   open: readonly string[];
   disabled: boolean;
   canCollapse: boolean;
-  headingLevel: AccordionHeadingLevel;
   styles: ReturnType<typeof accordionStyle>;
   toggle: (value: string) => void;
   reveal: (value: string) => void;
@@ -29,6 +27,7 @@ type ItemContext = {
 
 export const AccordionContext = createContext<RootContext | null>(null);
 export const AccordionItemContext = createContext<ItemContext | null>(null);
+export const HeaderContext = createContext(false);
 export const IndicatorPlacementContext = createContext<'end' | 'inline'>('end');
 
 export function useRootContext(part: string) {

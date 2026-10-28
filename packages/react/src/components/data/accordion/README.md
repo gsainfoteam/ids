@@ -72,6 +72,24 @@ type FaqId = 'shipping' | 'returns';
 - 기본 chevron은 열리면 180도 돕니다. 회전을 바꾸려면 `data-open:` 으로 덮어씁니다: `className="-rotate-90 data-open:rotate-0"`.
 - `Accordion.Item`, `Trigger`, `Content`, `Indicator` 의 `className`, `style`, `children` 은 섹션 상태를 받는 함수도 됩니다.
 
+## heading 수준
+
+`Accordion.Trigger` 는 `h3` 안에 놓입니다. 다른 수준이 필요하면 `Accordion.Header` 로 감싸고 `asChild` 로 태그를 넣습니다.
+
+```tsx
+<Accordion.Item value="shipping">
+  <Accordion.Header asChild>
+    <h2>
+      <Accordion.Trigger>배송은 얼마나 걸리나요?</Accordion.Trigger>
+    </h2>
+  </Accordion.Header>
+  <Accordion.Content>일반 배송 2~3일, 빠른 배송 1일.</Accordion.Content>
+</Accordion.Item>
+```
+
+- `Accordion.Header` 를 생략하면 Trigger 가 스스로 `h3` 로 감쌉니다. Header 안의 Trigger 는 heading 을 더 만들지 않습니다.
+- `asChild` 없는 `Accordion.Header` 는 `h3` 입니다.
+
 ## 키보드
 
 | 키                | 동작                                      |
@@ -118,7 +136,7 @@ type FaqId = 'shipping' | 'returns';
 | `disabled`               | 모든 섹션 비활성                                       |
 | `variant`                | `outline`(기본) / `soft` / `ghost`                     |
 | `size`                   | `standard`(기본) / `tiny`                              |
-| `headingLevel`           | 헤더를 감싸는 heading 수준. 기본 `3`                   |
+| `Header.asChild`         | 기본 `h3` 대신 자식 요소(`<h2>` 등)를 heading 으로 쓴다 |
 | `Item.value`             | 필수. 섹션을 가리키는 문자열                           |
 | `Item.disabled`          | 그 섹션만 비활성                                       |
 | `Indicator.asChild`      | 기본 `span` 대신 자식 요소에 속성을 합친다             |

@@ -13,7 +13,6 @@ import type { Accordion } from '.';
 import type { AccordionValue } from './accordion-value';
 
 export type AccordionVariant = 'outline' | 'soft' | 'ghost';
-export type AccordionHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 export function AccordionRoot<T extends string = string>(props: Accordion.Props<T>) {
   const {
@@ -25,7 +24,6 @@ export function AccordionRoot<T extends string = string>(props: Accordion.Props<
     disabled = false,
     variant = 'outline',
     size = 'standard',
-    headingLevel = 3,
     className,
     style,
     children,
@@ -55,7 +53,6 @@ export function AccordionRoot<T extends string = string>(props: Accordion.Props<
         open: state.open,
         disabled,
         canCollapse: state.canCollapse,
-        headingLevel,
         styles,
         toggle: toggle as (value: string) => void,
         reveal: reveal as (value: string) => void,
