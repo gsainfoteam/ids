@@ -6,7 +6,7 @@ export const kbdStyle = tv({
   slots: {
     root: [
       'relative inline-flex w-fit shrink-0 items-center justify-center before:self-end',
-      'rounded-indicator bg-current/10 font-sans text-current/75 select-none',
+      'rounded-indicator bg-current/10 font-sans text-current select-none',
     ],
     face: 'inline-flex items-center gap-0.5',
     group: 'inline-flex items-center gap-1',
