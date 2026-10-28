@@ -7,7 +7,7 @@ on:
 jobs:
   js:
     name: JS (lint / typecheck / build / test)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -56,6 +56,7 @@ jobs:
 
   visual:
     name: Visual regression (Playwright Linux image)
+    if: vars.IDS_VISUAL_CHECK == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -944,6 +944,7 @@ test('fade: a textarea viewport fades the lines typed past its top', async () =>
     input.scrollHeight - input.clientHeight - input.scrollTop < 1;
   await expect.poll(typingScrolledToTheCaret).toBe(true);
 
+  input.blur();
   input.scrollTop = 0;
   await expect.poll(() => markedEdges(input)).toEqual(['y-end']);
   expect(fadeLengths(input)).toEqual([0, 24]);

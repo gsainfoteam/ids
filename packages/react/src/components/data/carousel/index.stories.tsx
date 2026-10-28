@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 
-import { expect, fn } from 'storybook/test';
+import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
@@ -423,13 +423,15 @@ export const Autoplay: Story = {
     const carousel = canvas.getByRole('region', { name: '공지 배너' });
     const pause = canvas.getByRole('button', { name: '자동 넘김 멈춤' });
     const startsPaused = prefersReducedMotion();
+    const content = carousel.querySelector('[data-carousel-content]');
+    if (content) await userEvent.unhover(content);
 
     await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
-    await expect(carousel.hasAttribute('data-playing')).toBe(!startsPaused);
+    await waitFor(() => expect(carousel.hasAttribute('data-playing')).toBe(!startsPaused));
 
     await userEvent.click(pause);
     await expect(pause).toHaveAttribute('aria-pressed', String(!startsPaused));
-    await expect(carousel.hasAttribute('data-playing')).toBe(startsPaused);
+    await waitFor(() => expect(carousel.hasAttribute('data-playing')).toBe(startsPaused));
 
     await userEvent.click(pause);
     await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
@@ -468,10 +470,12 @@ export const AutoScroll: Story = {
     const carousel = canvas.getByRole('region', { name: '후원 단체' });
     const pause = canvas.getByRole('button', { name: '자동 넘김 멈춤' });
     const startsPaused = prefersReducedMotion();
+    const content = carousel.querySelector('[data-carousel-content]');
+    if (content) await userEvent.unhover(content);
 
     await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
     await userEvent.click(pause);
-    await expect(carousel.hasAttribute('data-playing')).toBe(startsPaused);
+    await waitFor(() => expect(carousel.hasAttribute('data-playing')).toBe(startsPaused));
     await userEvent.click(pause);
     await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
   },

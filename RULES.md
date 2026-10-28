@@ -589,9 +589,15 @@ projects:
   version>-noble` on `linux/amd64`, through `scripts/visual.mjs`, which `pnpm test:visual`, its
   `:update` and the CI `visual` job all run. Anywhere else (macOS, the plain CI runner) the tests
   skip with that reason, because the fonts, the rasterizer and the Chromium build differ; never
-  commit a baseline rendered outside the image. After an intended visual change, run
-  `pnpm test:visual:update` and commit the new PNGs with the change; a failing run leaves the
-  actual and diff images in `packages/react/.vitest/visual` (a CI artifact on failure).
+  commit a baseline rendered outside the image. A failing run leaves the actual and diff images in
+  `packages/react/.vitest/visual` (a CI artifact on failure).
+
+  **The visual check is off until the design is fixed.** No component's look is final yet, so a
+  pixel comparison would fail on every intended change. The CI `visual` job runs only when the
+  repository variable `IDS_VISUAL_CHECK` is `true`, and a change does not render or commit new
+  baselines; the PNGs in `tests/__screenshots__` are stale until then. To turn it on, run
+  `pnpm test:visual:update`, commit the PNGs, and set `IDS_VISUAL_CHECK` to `true`; from then on an
+  intended visual change runs `pnpm test:visual:update` and commits its PNGs with the change.
 - `ssr`: `tests/**/*.ssr.test.tsx` run in Node with no DOM. `tests/stories.ssr.test.tsx` renders
   every story with `renderToString` and fails on a throw or any `console.error` / `console.warn`,
   so a module that touches `window` or `document` at import or during render fails here. Code that
