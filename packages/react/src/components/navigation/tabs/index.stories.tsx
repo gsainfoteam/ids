@@ -181,18 +181,12 @@ export const Gallery: Story = {
             <Tabs.Content value="account">비밀번호와 탈퇴</Tabs.Content>
           </Tabs>
         </Showcase.Row>
-        <Showcase.Row label="full width" className="w-full max-w-md">
+        <Showcase.Row label="stretch" className="w-full max-w-md">
           <Tabs defaultValue="new" className="w-full">
-            <Tabs.List aria-label="정렬" className="w-full">
-              <Tabs.Trigger value="new" className="flex-1">
-                최신
-              </Tabs.Trigger>
-              <Tabs.Trigger value="popular" className="flex-1">
-                인기
-              </Tabs.Trigger>
-              <Tabs.Trigger value="comments" className="flex-1">
-                댓글 많은
-              </Tabs.Trigger>
+            <Tabs.List aria-label="정렬" stretch>
+              <Tabs.Trigger value="new">최신</Tabs.Trigger>
+              <Tabs.Trigger value="popular">인기</Tabs.Trigger>
+              <Tabs.Trigger value="comments">댓글 많은</Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="new">최신 글</Tabs.Content>
             <Tabs.Content value="popular">인기 글</Tabs.Content>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import {
   BellIcon,
+  ChevronRightIcon,
   Cog6ToothIcon,
   DocumentIcon,
   EllipsisVerticalIcon,
@@ -227,7 +228,7 @@ export const Gallery: Story = {
 
       <Showcase.Section title="Group">
         <Showcase.Row>
-          <Item.Group className="w-80" aria-label="설정">
+          <Item.Group variant="ghost" className="w-80" aria-label="설정">
             <Item>
               <Item.Media>
                 <BellIcon />
@@ -456,9 +457,52 @@ export const Selectable: Story = {
   },
 };
 
+export const LinkRow: Story = {
+  render: () => (
+    <Item.Group className="w-80" aria-label="자주 찾는 페이지">
+      <Item asChild>
+        <a href="#notices">
+          <Item.Content>
+            <Item.Title>공지</Item.Title>
+            <Item.Description>학사, 장학, 행사 소식</Item.Description>
+          </Item.Content>
+          <Item.Actions>
+            <ChevronRightIcon aria-hidden className="rtl:-scale-x-100" />
+          </Item.Actions>
+        </a>
+      </Item>
+      <Item asChild>
+        <a href="#shuttle">
+          <Item.Content>
+            <Item.Title>셔틀</Item.Title>
+            <Item.Description>오늘 운행 시간표</Item.Description>
+          </Item.Content>
+          <Item.Actions>
+            <ChevronRightIcon aria-hidden className="rtl:-scale-x-100" />
+          </Item.Actions>
+        </a>
+      </Item>
+    </Item.Group>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`Item.Actions` 에 맨 아이콘을 두면 `Item.Media` 처럼 아이콘 크기와 흐린 색으로 그립니다. 링크 행의 끝 화살표에 씁니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const icon = canvas
+      .getByRole('link', { name: /공지/ })
+      .querySelector('[data-item-actions] svg')!;
+    await expect(icon.getBoundingClientRect().width).toBeGreaterThan(0);
+  },
+};
+
 export const Navigation: Story = {
   render: () => (
-    <Item.Group size="tiny" className="w-56" aria-label="메뉴">
+    <Item.Group variant="ghost" size="tiny" className="w-56" aria-label="메뉴">
       <Item asChild selected aria-current="page">
         <a href="#home">
           <Item.Media>

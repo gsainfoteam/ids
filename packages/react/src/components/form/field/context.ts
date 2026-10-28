@@ -22,6 +22,8 @@ export type FieldState = {
   dirty: boolean;
 };
 
+export const FieldGroupContext = createContext<FieldOrientation | undefined>(undefined);
+
 export const FieldSizeContext = createContext<IdsSize | undefined>(undefined);
 
 export const FieldStateContext = createContext<FieldState | null>(null);

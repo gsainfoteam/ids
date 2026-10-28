@@ -73,7 +73,12 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 </Item>
 
 <Item asChild>
-  <a href="/inbox">...</a>                      {/* 링크 행 */}
+  <a href="/inbox">                             {/* 링크 행 */}
+    <Item.Content>...</Item.Content>
+    <Item.Actions>
+      <ChevronRightIcon aria-hidden />          {/* 맨 아이콘은 아이콘 크기와 흐린 색으로 */}
+    </Item.Actions>
+  </a>
 </Item>
 
 <Item onClick={open} disabled />                {/* 제목 버튼이 disabled, 행은 aria-disabled */}

@@ -5,6 +5,7 @@ import {
   Fragment,
   cloneElement,
   isValidElement,
+  use,
   useEffect,
   useId,
   type ComponentProps,
@@ -17,6 +18,7 @@ import { isString, uniq } from 'es-toolkit';
 
 import {
   FieldContext,
+  FieldGroupContext,
   FieldNotifyContext,
   FieldSizeContext,
   FieldStateContext,
@@ -100,7 +102,8 @@ export function FieldRoot({
   errorMessage,
   ...rest
 }: FieldProps & FormLibraryBridge) {
-  const orientation = orientationProp ?? deprecatedOrientation ?? 'vertical';
+  const groupOrientation = use(FieldGroupContext);
+  const orientation = orientationProp ?? deprecatedOrientation ?? groupOrientation ?? 'vertical';
   const generatedId = useId();
   const field = useField({ dirty, touched });
   const nodes = flatten(children);

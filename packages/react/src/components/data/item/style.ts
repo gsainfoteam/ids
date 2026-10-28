@@ -20,7 +20,10 @@ export const itemStyle = tv({
     content: 'flex min-w-0 flex-1 flex-col gap-0.5 [&+[data-item-content]]:flex-none',
     title: 'flex w-fit items-center gap-2',
     description: 'line-clamp-2 text-(--ids-color-on-muted)',
-    actions: 'ms-auto flex shrink-0 items-center gap-2',
+    actions: [
+      'ms-auto flex shrink-0 items-center gap-2',
+      "[&>svg]:pointer-events-none [&>svg]:text-(--ids-color-on-muted) [&>svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
+    ],
     group: 'flex min-w-0 flex-col',
     groupItem: 'flex',
   },

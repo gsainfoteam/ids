@@ -6,6 +6,7 @@ import type { IdsSize } from '../../../tokens/types';
 export const fieldStyle = tv({
   slots: {
     root: 'grid min-w-0 gap-x-3 gap-y-2',
+    group: 'min-w-0 gap-x-3 gap-y-5',
     description: 'text-(--ids-color-on-muted)',
     hint: 'text-(--ids-color-on-muted)',
     error: 'text-(--ids-color-danger)',
@@ -17,8 +18,10 @@ export const fieldStyle = tv({
       tiny: { root: 'text-caption-c1-regular' },
     } satisfies Record<IdsSize, object>,
     orientation: {
-      vertical: {},
+      vertical: { group: 'flex flex-col' },
       horizontal: {
+        group:
+          'grid grid-cols-[auto_minmax(0,1fr)] [&>[data-field]]:col-span-full [&>[data-field]]:grid-cols-subgrid',
         root: 'grid-cols-[auto_minmax(0,1fr)] [&>:not([data-field-part=label])]:col-start-2 [&>[data-field-part=label]]:col-start-1 [&>[data-field-part=label]]:self-center',
       },
     } satisfies Record<FieldOrientation, object>,

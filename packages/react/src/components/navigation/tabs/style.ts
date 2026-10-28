@@ -23,6 +23,7 @@ export const tabsStyle = tv({
     ],
   },
   variants: {
+    stretch: { true: {}, false: {} },
     orientation: {
       horizontal: {
         root: 'flex-col',
@@ -83,6 +84,7 @@ export const tabsStyle = tv({
     } satisfies Record<IdsSize, object>,
   },
   compoundVariants: [
+    { orientation: 'horizontal', stretch: true, class: { list: '[&>[role=tab]]:flex-1' } },
     {
       appearance: 'underline',
       orientation: 'horizontal',
