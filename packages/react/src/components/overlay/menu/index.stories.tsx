@@ -595,7 +595,9 @@ export const Submenu: Story = {
     );
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(canvas.getByRole('menuitem', { name: '공유' })).toHaveFocus());
-    expect(canvas.queryByRole('menu', { name: '공유 하위 메뉴' })).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(canvas.queryByRole('menu', { name: '공유 하위 메뉴' })).not.toBeInTheDocument(),
+    );
     expect(canvas.getByRole('menu', { name: '파일' })).toBeInTheDocument();
   },
 };
