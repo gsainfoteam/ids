@@ -126,12 +126,12 @@ export const PC: Story = {
         </div>
 
         {shown.length === 0 ? (
-          <Empty variant="outline">
+          <Empty>
             <Empty.Title>이 분류의 행사가 없어요</Empty.Title>
           </Empty>
         ) : (
           <Card size="tiny">
-            <Item.Group variant="bordered" aria-label="10월 행사">
+            <Item.Group aria-label="10월 행사">
               {shown.map((event) => (
                 <Item key={event.id}>
                   <Item.Media variant="outline" aria-hidden>
@@ -140,7 +140,7 @@ export const PC: Story = {
                   <Item.Content>
                     <Item.Title>
                       {event.title}
-                      {event.full && <Badge content="마감" variant="soft" colorScheme="neutral" />}
+                      {event.full && <Badge content="마감" variant="soft" />}
                     </Item.Title>
                     <Item.Description>
                       10월 {event.day}일 ({event.weekday}) {event.time} · {event.place}
@@ -148,7 +148,6 @@ export const PC: Story = {
                   </Item.Content>
                   <Item.Actions>
                     <Toggle
-                      variant="outline"
                       size="tiny"
                       disabled={event.full}
                       pressed={going.includes(event.id)}

@@ -115,7 +115,7 @@ export const badgeStyle = tv({
   ],
   defaultVariants: {
     variant: 'solid',
-    colorScheme: 'danger',
+    colorScheme: 'neutral',
     size: 'standard',
     dot: false,
     shape: 'auto',

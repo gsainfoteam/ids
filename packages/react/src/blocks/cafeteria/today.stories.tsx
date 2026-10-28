@@ -223,11 +223,7 @@ export const PC: Story = {
                             <h2>{menu.main}</h2>
                           </Card.Title>
                           <Card.Action>
-                            <Badge
-                              content={`${won.format(menu.price)}원`}
-                              variant="outline"
-                              colorScheme="neutral"
-                            />
+                            <Badge content={`${won.format(menu.price)}원`} variant="outline" />
                           </Card.Action>
                         </Card.Header>
                         <Card.Content className="flex flex-col gap-3">

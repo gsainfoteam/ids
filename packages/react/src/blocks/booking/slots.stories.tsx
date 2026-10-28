@@ -57,8 +57,8 @@ export const PC: Story = {
                 <h1 className="text-headline-h4-bold">지도 교수 면담</h1>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                <Badge content="30분" variant="outline" colorScheme="neutral" />
-                <Badge content="연구동 B 312호" variant="outline" colorScheme="neutral" />
+                <Badge content="30분" variant="outline" />
+                <Badge content="연구동 B 312호" variant="outline" />
                 {date && time && (
                   <Badge content={`${dayOf(date)} ${time}`} variant="soft" colorScheme="primary" />
                 )}

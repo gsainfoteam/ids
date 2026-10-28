@@ -174,7 +174,7 @@ export const PC: Story = {
         </div>
 
         {shown.length === 0 ? (
-          <Empty variant="outline">
+          <Empty>
             <Empty.Title>{day} 모집 중인 합승이 없어요</Empty.Title>
             <Empty.Description>
               직접 모집해 보세요. 같은 시간에 가는 사람이 알림을 받아요.

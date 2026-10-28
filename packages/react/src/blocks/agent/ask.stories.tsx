@@ -96,7 +96,7 @@ export const PC: Story = {
             {done ? (
               <>
                 <Card size="tiny">
-                  <Item.Group variant="bordered" size="tiny" aria-label="고른 답">
+                  <Item.Group size="tiny" aria-label="고른 답">
                     {QUESTIONS.map((question) => {
                       const chosen = question.choices.find(
                         (choice) => choice.value === answers[question.id],

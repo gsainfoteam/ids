@@ -43,7 +43,7 @@ export const PC: Story = {
         </div>
         <Card variant="soft" aria-hidden>
           <Card>
-            <Item.Group variant="bordered" size="tiny">
+            <Item.Group size="tiny">
               {[
                 ['2학기 수강 정정 안내', '학사 · 내일 마감', 'D-1'],
                 ['근로 장학생 추가 모집', '장학 · 10월 6일까지', 'D-5'],

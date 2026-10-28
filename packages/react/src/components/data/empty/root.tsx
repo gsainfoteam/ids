@@ -15,7 +15,7 @@ const EMPTY_MEDIA = new Set<unknown>([EmptyMedia]);
 const EMPTY_TITLE = new Set<unknown>([EmptyTitle]);
 
 export function EmptyRoot({
-  variant = 'ghost',
+  variant = 'outline',
   size = 'standard',
   align = 'center',
   className,

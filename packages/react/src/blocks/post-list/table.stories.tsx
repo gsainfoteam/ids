@@ -183,9 +183,7 @@ const column = DataTable.createColumnHelper<Post>();
 const COLUMNS = column.columns([
   column.accessor('category', {
     header: '분류',
-    cell: ({ getValue }) => (
-      <Badge content={CATEGORY_LABEL[getValue()]} variant="soft" colorScheme="neutral" />
-    ),
+    cell: ({ getValue }) => <Badge content={CATEGORY_LABEL[getValue()]} variant="soft" />,
     size: 88,
   }),
   column.accessor('title', {

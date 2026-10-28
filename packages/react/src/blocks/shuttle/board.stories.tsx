@@ -172,7 +172,7 @@ export const PC: Story = {
                             {departure === next ? (
                               <Badge content="다음 차" variant="soft" colorScheme="primary" />
                             ) : gone ? (
-                              <Badge content="떠남" variant="outline" colorScheme="neutral" />
+                              <Badge content="떠남" variant="outline" />
                             ) : null}
                           </Table.Cell>
                         </Table.Row>

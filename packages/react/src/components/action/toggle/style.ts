@@ -10,7 +10,7 @@ export const toggleStyle = tv({
     size: controlSurface.size,
   },
   defaultVariants: {
-    variant: 'ghost',
+    variant: 'outline',
     colorScheme: 'primary',
     size: 'standard',
   },

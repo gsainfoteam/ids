@@ -36,8 +36,8 @@ import { Toggle } from '@gsainfoteam/ids-react';
 ## variant
 
 ```tsx
-<Toggle variant="ghost">굵게</Toggle>    // 기본. 켜지면 옅은 회색
-<Toggle variant="outline">굵게</Toggle>  // 테두리. 켜지면 옅은 회색
+<Toggle variant="outline">굵게</Toggle>  // 기본. 테두리, 켜지면 옅은 회색
+<Toggle variant="ghost">굵게</Toggle>    // 테두리 없이. 툴바처럼 이미 칸이 있는 곳에
 <Toggle variant="soft">굵게</Toggle>     // 켜지면 옅은 테마 색
 <Toggle variant="solid">굵게</Toggle>    // 켜지면 테마 색으로 채움
 <Toggle variant="glossy">굵게</Toggle>   // 켜지면 테마 색 채움에 광택, 진한 가장자리, 그림자
@@ -92,7 +92,7 @@ import { Toggle } from '@gsainfoteam/ids-react';
 | ------------------------------ | ----------------------------------------------------------------------- |
 | `pressed` / `defaultPressed`   | 켜짐 여부. 기본 `false`                                                 |
 | `onPressedChange`              | 켜짐 여부가 바뀔 때                                                     |
-| `variant`                      | `ghost`(기본) / `outline` / `soft` / `solid` / `glossy`                 |
+| `variant`                      | `outline`(기본) / `ghost` / `soft` / `solid` / `glossy`                 |
 | `colorScheme`                  | `primary`(기본) / `neutral` / `danger` / `success` / `warning` / `info` |
 | `size`                         | `standard`(36px, 기본) / `tiny`(32px). 그룹 안에서는 그룹 크기          |
 | `value`                        | `ToggleGroup` 안에서 필수                                               |

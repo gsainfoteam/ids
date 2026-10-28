@@ -79,7 +79,7 @@ export const PC: Story = {
                     </Item.Content>
                     {item.count && (
                       <Item.Actions>
-                        <Badge content={item.count} variant="soft" colorScheme="neutral" />
+                        <Badge content={item.count} variant="soft" />
                       </Item.Actions>
                     )}
                   </a>

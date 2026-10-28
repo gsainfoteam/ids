@@ -151,7 +151,7 @@ export const PC: Story = {
             return (
               <Tabs.Content key={kind.value} value={kind.value} className="flex flex-col gap-6">
                 {ofKind.length === 0 ? (
-                  <Empty variant="outline">
+                  <Empty>
                     <Empty.Media>
                       <MagnifyingGlassIcon />
                     </Empty.Media>
@@ -162,7 +162,7 @@ export const PC: Story = {
                   </Empty>
                 ) : (
                   <Card size="tiny">
-                    <Item.Group variant="bordered" aria-label={`${kind.label} 결과`}>
+                    <Item.Group aria-label={`${kind.label} 결과`}>
                       {ofKind.map((result) => (
                         <Item key={result.id} asChild>
                           <a href={`#${result.id}`}>

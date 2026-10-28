@@ -112,7 +112,7 @@ export const PC: Story = {
               </Card.Title>
               <Card.Description>사진부 · 초안은 나만 볼 수 있어요</Card.Description>
               <Card.Action>
-                <Badge content="초안" variant="soft" colorScheme="neutral" />
+                <Badge content="초안" variant="soft" />
               </Card.Action>
             </Card.Header>
 
@@ -151,7 +151,7 @@ export const PC: Story = {
                   도구
                 </h2>
                 <Card size="tiny">
-                  <Item.Group variant="bordered" aria-labelledby="tools">
+                  <Item.Group aria-labelledby="tools">
                     {TOOLS.map((tool) => (
                       <Item key={tool.id}>
                         <Item.Media variant="soft">{tool.icon}</Item.Media>

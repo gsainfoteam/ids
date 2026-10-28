@@ -139,7 +139,7 @@ export const PC: Story = {
         {STATES.map((state) => (
           <Tabs.Content key={state.value} value={state.value}>
             <Card size="tiny">
-              <Item.Group variant="bordered" aria-label={`${state.label} 작업`}>
+              <Item.Group aria-label={`${state.label} 작업`}>
                 {JOBS.filter((job) => job.state === state.value).map((job) => (
                   <Item key={job.id}>
                     <Item.Media variant="soft">

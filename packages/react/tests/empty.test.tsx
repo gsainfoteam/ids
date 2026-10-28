@@ -36,7 +36,7 @@ test('SSR: static content with no role or live region, every part marks itself',
   const root = doc.querySelector<HTMLElement>('[data-empty]')!;
   expect(root.hasAttribute('role')).toBe(false);
   expect(root.hasAttribute('aria-live')).toBe(false);
-  expect(root.dataset.variant).toBe('ghost');
+  expect(root.dataset.variant).toBe('outline');
   expect(root.dataset.size).toBe('standard');
   expect(root.dataset.align).toBe('center');
   expect(root.className).toContain('concentric-p-8');
@@ -119,7 +119,9 @@ test('parts stack in order and sit on the center line; align start moves them to
   expect(getComputedStyle(centered!).textAlign).toBe('center');
 
   const startLeft =
-    start!.getBoundingClientRect().left + parseFloat(getComputedStyle(start!).paddingLeft);
+    start!.getBoundingClientRect().left +
+    start!.clientLeft +
+    parseFloat(getComputedStyle(start!).paddingLeft);
   for (const part of parts(start!))
     expect(part.getBoundingClientRect().left).toBeCloseTo(startLeft, 0);
   expect(getComputedStyle(start!).textAlign).toBe('start');

@@ -168,7 +168,7 @@ export const PC: Story = {
 
           <Tabs.Content value="posts">
             <Card size="tiny">
-              <Item.Group variant="bordered" aria-label="쓴 글">
+              <Item.Group aria-label="쓴 글">
                 {POSTS.map((post) => (
                   <Item key={post.id} asChild>
                     <a href={`#${post.id}`}>
@@ -187,7 +187,7 @@ export const PC: Story = {
 
           <Tabs.Content value="comments">
             <Card size="tiny">
-              <Item.Group variant="bordered" aria-label="쓴 댓글">
+              <Item.Group aria-label="쓴 댓글">
                 {COMMENTS.map((comment) => (
                   <Item key={comment.id} asChild>
                     <a href={`#${comment.id}`}>

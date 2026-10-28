@@ -115,7 +115,7 @@ export const PC: Story = {
           return (
             <Tabs.Content key={state.value} value={state.value}>
               {shown.length === 0 ? (
-                <Empty variant="outline">
+                <Empty>
                   <Empty.Title>이 상태의 청원이 없어요</Empty.Title>
                 </Empty>
               ) : (

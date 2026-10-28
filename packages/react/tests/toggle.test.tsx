@@ -9,7 +9,7 @@ import { ButtonGroup, IdsProvider, Toggle, ToggleGroup } from '../src';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
-test('SSR: a quiet ghost toggle that exposes its pressed state', () => {
+test('SSR: an outline toggle that exposes its pressed state', () => {
   const [off, on] = parse(
     renderToString(
       <div>
@@ -21,7 +21,7 @@ test('SSR: a quiet ghost toggle that exposes its pressed state', () => {
   expect(off.type).toBe('button');
   expect(off.getAttribute('aria-pressed')).toBe('false');
   expect(off.hasAttribute('data-pressed')).toBe(false);
-  expect(off.dataset.variant).toBe('ghost');
+  expect(off.dataset.variant).toBe('outline');
   expect(on.getAttribute('aria-pressed')).toBe('true');
   expect(on.hasAttribute('data-pressed')).toBe(true);
 });

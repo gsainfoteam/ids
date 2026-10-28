@@ -175,7 +175,7 @@ export const PC: Story = {
                 </Item.Content>
                 {item.count && (
                   <Item.Actions>
-                    <Badge content={item.count} variant="soft" colorScheme="neutral" />
+                    <Badge content={item.count} variant="soft" />
                   </Item.Actions>
                 )}
               </a>
@@ -187,7 +187,7 @@ export const PC: Story = {
 
     const list = (
       <ScrollArea fade className="h-full">
-        <Item.Group variant="bordered" aria-label="받은 메일" className="p-2">
+        <Item.Group aria-label="받은 메일" className="p-2">
           {MAILS.map((mail) => (
             <Item key={mail.id} selected={mail.id === openId} onClick={() => open(mail.id)}>
               <Item.Content>
@@ -237,14 +237,7 @@ export const PC: Story = {
           </div>
 
           <div className="flex flex-col gap-3">
-            {opened.label && (
-              <Badge
-                content={opened.label}
-                variant="soft"
-                colorScheme="neutral"
-                className="self-start"
-              />
-            )}
+            {opened.label && <Badge content={opened.label} variant="soft" className="self-start" />}
             <h2 className="text-headline-h4-bold">{opened.subject}</h2>
             <Item variant="soft" size="tiny">
               <Item.Media>

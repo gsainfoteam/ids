@@ -70,7 +70,7 @@ export const PC: Story = {
           <article className="flex flex-col gap-8">
             <header className="flex flex-col gap-4">
               <div className="flex flex-wrap gap-1.5">
-                <Badge content="교통" variant="soft" colorScheme="neutral" />
+                <Badge content="교통" variant="soft" />
                 <Badge content="진행 중" variant="soft" colorScheme="primary" />
               </div>
               <h1 className="text-headline-h2-bold">
@@ -187,7 +187,7 @@ export const PC: Story = {
                   <h2>비슷한 청원</h2>
                 </Card.Title>
               </Card.Header>
-              <Item.Group variant="bordered" size="tiny" aria-label="비슷한 청원">
+              <Item.Group size="tiny" aria-label="비슷한 청원">
                 {RELATED.map((petition) => (
                   <Item key={petition.id} asChild>
                     <a href={`#${petition.id}`}>

@@ -13,7 +13,7 @@ export function ToggleRoot(props: Toggle.Props) {
     toggleProps,
     render,
   } = useToggle(props, 'Toggle');
-  const variant = ownVariant ?? layout?.variant ?? 'ghost';
+  const variant = ownVariant ?? layout?.variant ?? 'outline';
   const resolvedSize = size ?? layout?.size ?? 'standard';
 
   return render({

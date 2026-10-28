@@ -116,8 +116,8 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 ### 구분선과 간격
 
 ```tsx
-<Item.Group variant="ghost" />      // 기본. 구분선도 간격도 없다
-<Item.Group variant="bordered" />   // 행 사이 구분선. 행 모서리는 각지게 편다
+<Item.Group variant="bordered" />   // 기본. 행 사이 구분선. 행 모서리는 각지게 편다
+<Item.Group variant="ghost" />      // 구분선도 간격도 없다
 <Item.Group variant="separated" />  // 행마다 테두리 카드(Item outline), 8px 간격
 ```
 

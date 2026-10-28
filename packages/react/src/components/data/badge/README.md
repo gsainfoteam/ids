@@ -92,7 +92,7 @@ import { Badge } from '@gsainfoteam/ids-react';
 <Badge variant="solid" />     // 기본. 채운 배경
 <Badge variant="soft" />      // 옅은 배경. 겹쳐 놓여도 뒤가 비치지 않는다
 <Badge variant="outline" />   // 테두리
-<Badge colorScheme="danger" />   // 기본. neutral / primary / success / warning / info
+<Badge colorScheme="danger" />   // 무언가에 붙으면 기본. 혼자 쓰면 neutral 이 기본
 <Badge size="tiny" />            // standard(20px, 기본) / tiny(16px)
 ```
 
@@ -123,7 +123,7 @@ import { Badge } from '@gsainfoteam/ids-react';
 | `placement`   | `top-end`(기본) / `top-start` / `bottom-end` / `bottom-start`           |
 | `shape`       | `rectangular` / `circular`. 생략하면 Avatar를 보고 정한다               |
 | `variant`     | `solid`(기본) / `soft` / `outline`                                      |
-| `colorScheme` | `danger`(기본) / `neutral` / `primary` / `success` / `warning` / `info` |
+| `colorScheme` | `danger`(붙은 배지 기본) / `neutral`(혼자 쓰는 배지 기본) / `primary` / `success` / `warning` / `info` |
 | `size`        | `standard`(기본) / `tiny`                                               |
 | `aria-label`  | 바뀔 때 읽을 문장                                                       |
 | 그 외         | 루트 `span` 의 native 속성                                              |

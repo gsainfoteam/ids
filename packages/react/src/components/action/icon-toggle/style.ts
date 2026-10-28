@@ -11,7 +11,7 @@ export const iconToggleStyle = tv({
     size: iconSquare.size,
   },
   defaultVariants: {
-    variant: 'ghost',
+    variant: 'outline',
     colorScheme: 'primary',
     size: 'standard',
   },

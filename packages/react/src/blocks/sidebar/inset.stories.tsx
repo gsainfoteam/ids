@@ -142,7 +142,7 @@ export const PC: Story = {
                       </Item.Content>
                       {channel.unread > 0 && (
                         <Item.Actions>
-                          <Badge content={channel.unread} variant="soft" colorScheme="neutral" />
+                          <Badge content={channel.unread} variant="soft" />
                         </Item.Actions>
                       )}
                     </a>

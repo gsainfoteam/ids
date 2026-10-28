@@ -26,7 +26,7 @@ export function IconToggleRoot(props: IconToggle.Props) {
 
   const glyph = icon ?? content;
   const label = useIconLabel('IconToggle', glyph, rest, element?.props as object | undefined);
-  const variant = ownVariant ?? layout?.variant ?? 'ghost';
+  const variant = ownVariant ?? layout?.variant ?? 'outline';
   const resolvedSize = size ?? layout?.size ?? 'standard';
 
   return render(

@@ -24,7 +24,7 @@ export function BadgeRoot({
   placement = 'top-end',
   shape,
   variant = 'solid',
-  colorScheme = 'danger',
+  colorScheme,
   size = 'standard',
   className,
   style,
@@ -44,7 +44,7 @@ export function BadgeRoot({
   const standalone = children == null || typeof children === 'boolean';
   const styles = badgeStyle({
     variant,
-    colorScheme,
+    colorScheme: colorScheme ?? (standalone ? 'neutral' : 'danger'),
     size,
     dot,
     placement: standalone ? 'none' : placement,

@@ -73,9 +73,9 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
 ## variant, 크기, 정렬
 
 ```tsx
-<Empty variant="ghost" />    // 기본. 배경과 테두리 없음
+<Empty variant="outline" />  // 기본. 점선 테두리. 끌어다 놓는 자리나 빈 영역 표시
 <Empty variant="soft" />     // 옅은 배경
-<Empty variant="outline" />  // 점선 테두리. 끌어다 놓는 자리나 빈 영역 표시
+<Empty variant="ghost" />    // 배경과 테두리 없음. 이미 칸이 있는 곳에
 <Empty size="tiny" />        // standard(패딩 32px, 기본) / tiny(16px)
 <Empty align="start" />      // center(기본) / start
 ```
@@ -95,7 +95,7 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
 
 | 속성             | 기본 / 동작                                       |
 | ---------------- | ------------------------------------------------- |
-| `variant`        | `ghost`(기본) / `soft` / `outline`                |
+| `variant`        | `outline`(기본) / `soft` / `ghost`                |
 | `size`           | `standard`(기본) / `tiny`                         |
 | `align`          | `center`(기본) / `start`                          |
 | `Media.variant`  | `soft`(기본) / `outline` / `ghost`                |

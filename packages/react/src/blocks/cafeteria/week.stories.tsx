@@ -95,7 +95,7 @@ export const PC: Story = {
                       </Table.Cell>
                       {closed ? (
                         <Table.Cell colSpan={3}>
-                          <Badge content="쉬는 날" variant="outline" colorScheme="neutral" />
+                          <Badge content="쉬는 날" variant="outline" />
                         </Table.Cell>
                       ) : (
                         <>

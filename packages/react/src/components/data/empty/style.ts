@@ -64,5 +64,5 @@ export const emptyStyle = tv({
     { media: 'soft', variant: 'soft', class: { media: 'bg-(--ids-color-surface)' } },
     { media: ['soft', 'outline'], class: { media: '[&>img]:size-full [&>img]:object-cover' } },
   ],
-  defaultVariants: { variant: 'ghost', media: 'soft', size: 'standard', align: 'center' },
+  defaultVariants: { variant: 'outline', media: 'soft', size: 'standard', align: 'center' },
 });

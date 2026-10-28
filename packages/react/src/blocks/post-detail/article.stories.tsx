@@ -101,7 +101,7 @@ export const PC: Story = {
         <article className="flex flex-col gap-6">
           <header className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-1.5">
-              <Badge content="행사" variant="soft" colorScheme="neutral" />
+              <Badge content="행사" variant="soft" />
               <Badge content="마감 D-7" variant="soft" colorScheme="warning" />
             </div>
             <h1 className="text-headline-h2-bold">가을 축제 부스 운영 동아리 모집</h1>
@@ -115,7 +115,6 @@ export const PC: Story = {
               </Item.Content>
               <Item.Actions>
                 <IconToggle
-                  variant="outline"
                   aria-label="북마크"
                   icon={<BookmarkIcon />}
                   onPressedChange={(pressed) => pressed && toast.success('북마크에 넣었어요')}
@@ -149,7 +148,7 @@ export const PC: Story = {
                 <h2>첨부 파일 {ATTACHMENTS.length}개</h2>
               </Card.Title>
             </Card.Header>
-            <Item.Group variant="bordered" size="tiny" aria-label="첨부 파일">
+            <Item.Group size="tiny" aria-label="첨부 파일">
               {ATTACHMENTS.map((file) => (
                 <Item key={file.name}>
                   <Item.Media variant="soft">{file.icon}</Item.Media>
@@ -176,7 +175,7 @@ export const PC: Story = {
                 <Chip key={tag}>#{tag}</Chip>
               ))}
             </div>
-            <Toggle variant="outline" defaultPressed>
+            <Toggle defaultPressed>
               <HeartIcon />
               좋아요 24
             </Toggle>
@@ -218,7 +217,7 @@ export const PC: Story = {
                   </p>
                   <p className="text-body-b2-regular">{comment.text}</p>
                   <div className="flex gap-2">
-                    <Toggle variant="outline" size="tiny" aria-label={`좋아요 ${comment.likes}개`}>
+                    <Toggle size="tiny" aria-label={`좋아요 ${comment.likes}개`}>
                       <HeartIcon />
                       {comment.likes}
                     </Toggle>

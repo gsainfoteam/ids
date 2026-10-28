@@ -98,7 +98,7 @@ export const PC: Story = {
           <Card.Content>
             <Progress value={percent} aria-label="시작하기 진행" />
           </Card.Content>
-          <Item.Group variant="bordered" aria-label="할 일">
+          <Item.Group aria-label="할 일">
             {TASKS.map((task) => {
               const done = finished.includes(task.id);
 

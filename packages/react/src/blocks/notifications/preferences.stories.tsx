@@ -126,7 +126,7 @@ export const PC: Story = {
                   <h2>{group.title}</h2>
                 </Card.Title>
               </Card.Header>
-              <Item.Group variant="bordered" aria-label={group.title}>
+              <Item.Group aria-label={group.title}>
                 {group.events.map((event) => (
                   <Item key={event.id}>
                     <Item.Content>
