@@ -24,7 +24,8 @@ export function SpacerRoot({ flex = 1, className, style, ref, ...rest }: Spacer.
   useEffect(() => {
     const parent = elementRef.current?.parentElement;
     if (!isDevelopment || !parent) return;
-    if (!getComputedStyle(parent).display.includes('flex'))
+    const { display } = getComputedStyle(parent);
+    if (display !== 'none' && !display.includes('flex'))
       console.warn('[IDS] Spacer: its parent is not a flex container, so it takes no space.');
   }, []);
 

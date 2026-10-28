@@ -222,6 +222,19 @@ test('SSR wires generated IDs immediately, without effects', () => {
   );
 });
 
+test('Field.Label required={false} drops the marker a required Field would add', () => {
+  const doc = parse(
+    renderToString(
+      <Field required>
+        <Field.Label required={false}>Email</Field.Label>
+        <TextField />
+      </Field>,
+    ),
+  );
+  expect(doc.querySelector('[data-label-required]')).toBeNull();
+  expect(doc.querySelector('input')!.required).toBe(true);
+});
+
 test('label association, explicit IDs, describedby merge and dynamic error/hint swap', async () => {
   const view = (invalid: boolean) => (
     <Field invalid={invalid} required>

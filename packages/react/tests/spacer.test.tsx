@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
+import { render } from 'vitest-browser-react';
 
 import { Spacer } from '../src';
 
@@ -45,4 +46,21 @@ test('className and style may read the state, and style wins over flex', () => {
   );
   expect(spacer.className).toMatch(/share-3/);
   expect(spacer.style.flexGrow).toBe('5');
+});
+
+test('it warns outside a flex parent, but not while the parent is hidden', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  await render(
+    <div className="hidden">
+      <Spacer />
+    </div>,
+  );
+  expect(warn).not.toHaveBeenCalled();
+  await render(
+    <div className="block">
+      <Spacer />
+    </div>,
+  );
+  expect(warn).toHaveBeenCalledWith(expect.stringMatching(/not a flex container/));
+  warn.mockRestore();
 });

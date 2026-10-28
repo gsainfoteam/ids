@@ -70,7 +70,9 @@ export function BadgeRoot({
           role: 'status',
           children: (
             <>
-              <span aria-hidden="true">{text}</span>
+              <span aria-hidden="true" className="contents">
+                {text}
+              </span>
               <span className="sr-only">{label}</span>
             </>
           ),
