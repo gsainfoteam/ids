@@ -188,13 +188,15 @@ export const PC: Story = {
 
               return (
                 <li key={ride.id} className="flex">
-                  <Card headingLevel={2} className="w-full">
+                  <Card className="w-full">
                     <Card.Header>
                       <Card.Description>
                         {ride.day} {ride.time} 출발
                       </Card.Description>
-                      <Card.Title className="text-headline-h5-bold">
-                        {direction === 'out' ? `학교 → ${ride.place}` : `${ride.place} → 학교`}
+                      <Card.Title className="text-headline-h5-bold" asChild>
+                        <h2>
+                          {direction === 'out' ? `학교 → ${ride.place}` : `${ride.place} → 학교`}
+                        </h2>
                       </Card.Title>
                       <Card.Action>
                         <Badge

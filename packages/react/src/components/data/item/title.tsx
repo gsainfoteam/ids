@@ -1,14 +1,12 @@
 'use client';
 
-import { type ComponentProps } from 'react';
-
 import { useItemContext } from './context';
+import { Part, type ItemPartProps } from './part';
 import { useRegisteredId } from '../../../internal/surface';
 import { titleContent } from '../../../internal/surface-trigger';
 import { cn } from '../../../utils';
-import { Slot } from '../../utility/slot';
 
-export type ItemTitleProps = ComponentProps<'h3'> & { asChild?: boolean; truncate?: boolean };
+export type ItemTitleProps = ItemPartProps & { truncate?: boolean };
 
 export function ItemTitle({
   truncate = false,
@@ -18,15 +16,14 @@ export function ItemTitle({
   children,
   ...props
 }: ItemTitleProps) {
-  const { headingLevel, styles, trigger, setTitleId } = useItemContext('Item.Title');
+  const { styles, trigger, setTitleId } = useItemContext('Item.Title');
   const titleId = useRegisteredId(setTitleId, id);
-  const Title = asChild ? Slot : headingLevel ? (`h${headingLevel}` as const) : 'div';
-
   return (
-    <Title
+    <Part
       {...props}
+      asChild={asChild}
       id={titleId}
-      data-item-title=""
+      kind="title"
       className={styles.title({ truncate, className })}
     >
       {titleContent({
@@ -35,7 +32,7 @@ export function ItemTitle({
         children,
         triggerClassName: truncate ? cn('block truncate') : undefined,
       })}
-    </Title>
+    </Part>
   );
 }
 

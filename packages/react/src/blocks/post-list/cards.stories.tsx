@@ -222,13 +222,15 @@ export const PC: Story = {
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {shown.map((post) => (
             <li key={post.id} className="flex">
-              <Card asChild headingLevel={2} className="w-full">
+              <Card asChild className="w-full">
                 <a href={`#${post.id}`}>
                   <Card.Header>
                     <Card.Description>
                       {CATEGORY_LABEL[post.category]} · {dayOf(post.postedOn)}
                     </Card.Description>
-                    <Card.Title>{post.title}</Card.Title>
+                    <Card.Title asChild>
+                      <h2>{post.title}</h2>
+                    </Card.Title>
                     {post.pinned && (
                       <Card.Action>
                         <Badge content="고정" variant="soft" colorScheme="primary" />

@@ -69,10 +69,12 @@ export const PC: Story = {
         </div>
 
         <form onSubmit={submit} className="flex flex-col gap-4">
-          <Card headingLevel={2}>
+          <Card>
             <Card.Header>
               <Card.Description>1번</Card.Description>
-              <Card.Title id="overall-question">강의에 몇 점을 주고 싶나요?</Card.Title>
+              <Card.Title id="overall-question" asChild>
+                <h2>강의에 몇 점을 주고 싶나요?</h2>
+              </Card.Title>
             </Card.Header>
             <Card.Content>
               <Rating
@@ -85,10 +87,12 @@ export const PC: Story = {
             </Card.Content>
           </Card>
 
-          <Card headingLevel={2}>
+          <Card>
             <Card.Header>
               <Card.Description>2번</Card.Description>
-              <Card.Title id="pace-question">진도는 어땠나요?</Card.Title>
+              <Card.Title id="pace-question" asChild>
+                <h2>진도는 어땠나요?</h2>
+              </Card.Title>
             </Card.Header>
             <Card.Content>
               <RadioGroup<string>
@@ -117,10 +121,12 @@ export const PC: Story = {
             </Card.Content>
           </Card>
 
-          <Card headingLevel={2}>
+          <Card>
             <Card.Header>
               <Card.Description>3번 · 여러 개 고를 수 있어요</Card.Description>
-              <Card.Title id="helpful-question">배우는 데 도움이 된 것은?</Card.Title>
+              <Card.Title id="helpful-question" asChild>
+                <h2>배우는 데 도움이 된 것은?</h2>
+              </Card.Title>
             </Card.Header>
             <Card.Content>
               <CheckboxGroup<string>
@@ -143,10 +149,12 @@ export const PC: Story = {
             </Card.Content>
           </Card>
 
-          <Card headingLevel={2}>
+          <Card>
             <Card.Header>
               <Card.Description>4번</Card.Description>
-              <Card.Title id="difficulty-question">과제는 얼마나 어려웠나요?</Card.Title>
+              <Card.Title id="difficulty-question" asChild>
+                <h2>과제는 얼마나 어려웠나요?</h2>
+              </Card.Title>
             </Card.Header>
             <Card.Content>
               <Slider
@@ -162,10 +170,12 @@ export const PC: Story = {
             </Card.Content>
           </Card>
 
-          <Card headingLevel={2}>
+          <Card>
             <Card.Header>
               <Card.Description>5번 · 선택</Card.Description>
-              <Card.Title>교수님께 하고 싶은 말</Card.Title>
+              <Card.Title asChild>
+                <h2>교수님께 하고 싶은 말</h2>
+              </Card.Title>
             </Card.Header>
             <Card.Content>
               <Field aria-label="교수님께 하고 싶은 말">

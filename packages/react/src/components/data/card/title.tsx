@@ -10,9 +10,9 @@ import { Slot } from '../../utility/slot';
 export type CardTitleProps = ComponentProps<'h3'> & { asChild?: boolean };
 
 export function CardTitle({ className, id, asChild, children, ...props }: CardTitleProps) {
-  const { headingLevel, styles, trigger, setTitleId } = useCardContext('Card.Title');
+  const { styles, trigger, setTitleId } = useCardContext('Card.Title');
   const titleId = useRegisteredId(setTitleId, id);
-  const Heading = asChild ? Slot : (`h${headingLevel}` as const);
+  const Heading = asChild ? Slot : 'h3';
 
   return (
     <Heading {...props} id={titleId} data-card-title="" className={styles.title({ className })}>

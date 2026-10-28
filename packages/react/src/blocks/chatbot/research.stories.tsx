@@ -72,13 +72,15 @@ export const PC: Story = {
             <ol aria-label="출처" className="grid grid-cols-2 gap-2 md:grid-cols-4">
               {SOURCES.map((source, index) => (
                 <li key={source.id} className="flex">
-                  <Card size="tiny" variant="soft" asChild headingLevel={2} className="w-full">
+                  <Card size="tiny" variant="soft" asChild className="w-full">
                     <a href={`#${source.id}`}>
                       <Card.Header>
                         <Card.Description>
                           {index + 1} · {source.site}
                         </Card.Description>
-                        <Card.Title>{source.title}</Card.Title>
+                        <Card.Title asChild>
+                          <h2>{source.title}</h2>
+                        </Card.Title>
                       </Card.Header>
                     </a>
                   </Card>

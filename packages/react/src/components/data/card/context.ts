@@ -4,12 +4,10 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { CardHeadingLevel } from './root';
 import type { cardStyle } from './style';
 import type { SurfaceTrigger } from '../../../internal/surface-trigger';
 
 type Context = {
-  headingLevel: CardHeadingLevel;
   styles: ReturnType<typeof cardStyle>;
   trigger: SurfaceTrigger | null;
   setTitleId: (id: string | undefined) => void;

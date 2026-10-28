@@ -124,10 +124,9 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 | `interactive` | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동 |
 | `disabled`    | 누를 수 없고 흐려진다                                           |
 | `asChild`     | 루트 `div` 대신 자식 요소에 속성을 합친다                       |
-| `headingLevel` | `Card.Title` 의 heading 수준. 기본 `3`                        |
 | 각 부분       | `asChild` 와 `div` 의 native 속성                               |
 
 ## 알아둘 것
 
-- `Card.Title` 은 `headingLevel` 수준의 heading(`h3` 기본) 입니다. 페이지의 heading 순서에 맞춰 `headingLevel` 을 줍니다. heading 이 아니어야 하면 `<Card.Title asChild><span>...</span></Card.Title>` 처럼 씁니다.
+- `Card.Title` 은 `h3` 입니다. 다른 수준이 필요하면 `<Card.Title asChild><h2>...</h2></Card.Title>`, heading 이 아니어야 하면 `<Card.Title asChild><span>...</span></Card.Title>` 처럼 태그를 넣습니다.
 - 누를 수 있는 카드는 글자 선택이 되지 않습니다. 버튼처럼 눌리는 면이기 때문입니다.

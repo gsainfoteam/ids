@@ -214,12 +214,14 @@ export const PC: Story = {
 
                   return (
                     <li key={menu.corner} className="flex">
-                      <Card headingLevel={2} className="w-full">
+                      <Card className="w-full">
                         <Card.Header>
                           <Card.Description>
                             {menu.corner} · {menu.kcal}kcal
                           </Card.Description>
-                          <Card.Title className="text-headline-h5-bold">{menu.main}</Card.Title>
+                          <Card.Title className="text-headline-h5-bold" asChild>
+                            <h2>{menu.main}</h2>
+                          </Card.Title>
                           <Card.Action>
                             <Badge
                               content={`${won.format(menu.price)}원`}

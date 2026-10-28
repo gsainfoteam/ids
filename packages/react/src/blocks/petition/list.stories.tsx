@@ -122,13 +122,15 @@ export const PC: Story = {
                 <ul className="flex flex-col gap-3">
                   {shown.map((petition) => (
                     <li key={petition.id}>
-                      <Card asChild interactive headingLevel={2}>
+                      <Card asChild interactive>
                         <a href={`#${petition.id}`}>
                           <Card.Header>
                             <Card.Description>
                               {petition.topic} · {petition.left}
                             </Card.Description>
-                            <Card.Title>{petition.title}</Card.Title>
+                            <Card.Title asChild>
+                              <h2>{petition.title}</h2>
+                            </Card.Title>
                             <Card.Action>
                               <Badge
                                 content={`${count.format(petition.signed)}명`}

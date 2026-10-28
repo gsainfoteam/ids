@@ -30,7 +30,6 @@ const meta = {
     size: { control: 'radio', options: sizes },
     interactive: { control: 'boolean' },
     disabled: { control: 'boolean' },
-    headingLevel: { control: { type: 'number', min: 1, max: 6 } },
   },
   args: { variant: 'outline', size: 'standard' },
   render: (args) => (

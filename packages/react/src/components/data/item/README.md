@@ -84,7 +84,6 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 | `Enter` | 누르는 순간 실행                           |
 | `Space` | 뗄 때 실행. 떼기 전에 포커스가 떠나면 취소 |
 
-- `Item.Title` 은 기본으로 heading 이 아닙니다. 행은 글쓴이, 파일 이름, 선택지처럼 문서의 절이 아닌 것이 많고, `<label>` 이나 `<button>` 루트는 heading 을 담지 못합니다. 행이 목록의 절 제목일 때만 `headingLevel` 을 줍니다. 그러면 제목 버튼은 heading 안에 들어갑니다.
 - `Item.Title` 이 없거나 다른 컴포넌트 안에 숨어 있으면 행 자신이 `role="button"` 이 됩니다. 이때는 안에 다른 버튼을 두지 않습니다.
 
 ## 선택과 현재 위치
@@ -188,7 +187,6 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 | `selected`       | 선택 표시                                                          |
 | `disabled`       | 누를 수 없고 흐려진다                                              |
 | `asChild`        | 루트 `div` 대신 자식 요소에 속성을 합친다                          |
-| `headingLevel`   | 주면 `Item.Title` 이 그 수준의 heading 이 된다. 기본은 `div`       |
 | `Media.variant`  | `ghost`(기본) / `soft` / `outline`                                 |
 | `Title.truncate` | `false`. 한 줄에서 말줄임표로 줄인다                               |
 | 각 부분          | `asChild` 와 `div` 의 native 속성                                  |

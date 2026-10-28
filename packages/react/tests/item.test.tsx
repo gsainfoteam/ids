@@ -37,17 +37,6 @@ test('SSR: a static row has no role, and every part marks itself', () => {
   for (const part of ['media', 'content', 'title', 'description', 'actions'])
     expect(doc.querySelector(`[data-item-${part}]`), part).not.toBeNull();
   expect(
-    doc.querySelector('[data-item-title]')!.tagName,
-    'a row title is no heading by default',
-  ).toBe('DIV');
-  expect(
-    html(
-      <Item headingLevel={2}>
-        <Item.Title>Title</Item.Title>
-      </Item>,
-    ).querySelector('[data-item-title]')!.tagName,
-  ).toBe('H2');
-  expect(
     doc.querySelector('[data-item-content]')!.className,
     'a second content block keeps its width',
   ).toContain('[&+[data-item-content]]:flex-none');

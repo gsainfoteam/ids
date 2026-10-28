@@ -102,14 +102,16 @@ export const PC: Story = {
               </Chip>
             ))}
           </div>
-          <Card headingLevel={2}>
+          <Card>
             <Card.Header>
               <Avatar name="GIST 도우미" size="tiny" aria-hidden>
                 <Avatar.Fallback>
                   <SparklesIcon />
                 </Avatar.Fallback>
               </Avatar>
-              <Card.Title>{current.question}</Card.Title>
+              <Card.Title asChild>
+                <h2>{current.question}</h2>
+              </Card.Title>
               <Card.Description>{current.answer}</Card.Description>
             </Card.Header>
             {index === 0 && (

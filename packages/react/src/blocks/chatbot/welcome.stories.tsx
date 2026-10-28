@@ -115,14 +115,11 @@ export const PC: Story = {
           <ul aria-label="이렇게 물어보세요" className="grid gap-3 sm:grid-cols-2">
             {STARTERS.map((starter) => (
               <li key={starter.title} className="flex">
-                <Card
-                  size="tiny"
-                  headingLevel={2}
-                  className="w-full"
-                  onClick={() => setDraft(starter.title)}
-                >
+                <Card size="tiny" className="w-full" onClick={() => setDraft(starter.title)}>
                   <Card.Header>
-                    <Card.Title>{starter.title}</Card.Title>
+                    <Card.Title asChild>
+                      <h2>{starter.title}</h2>
+                    </Card.Title>
                     <Card.Description>{starter.description}</Card.Description>
                   </Card.Header>
                 </Card>

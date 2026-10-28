@@ -12,7 +12,6 @@ import { Slot } from '../../utility/slot';
 
 import type { Card } from '.';
 
-export type CardHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 export type CardVariant = 'outline' | 'soft' | 'ghost';
 
 const CARD_TITLE = new Set<unknown>([CardTitle]);
@@ -27,7 +26,6 @@ export function CardRoot({
   interactive: interactiveProp,
   disabled = false,
   asChild = false,
-  headingLevel = 3,
   className,
   style,
   children,
@@ -75,7 +73,6 @@ export function CardRoot({
   return (
     <CardContext
       value={{
-        headingLevel,
         styles,
         trigger: titleIsTheButton ? { disabled, describedBy: descriptionId } : null,
         ...register,

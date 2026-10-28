@@ -40,9 +40,17 @@ test('SSR: a static card has no role and every part marks itself', () => {
   );
 });
 
-test('SSR: the title is a heading at headingLevel, 3 by default, and its button sits inside', () => {
+test('SSR: the title is an h3, asChild picks another tag, and its button sits inside', () => {
   expect(parse(renderToString(anatomy())).querySelector('[data-card-title]')!.tagName).toBe('H3');
-  const doc = parse(renderToString(anatomy({ headingLevel: 2, onClick: () => {} })));
+  const doc = parse(
+    renderToString(
+      <Card onClick={() => {}}>
+        <Card.Title asChild>
+          <h2>Design review</h2>
+        </Card.Title>
+      </Card>,
+    ),
+  );
   const button = doc.querySelector('h2[data-card-title] > button[data-surface-trigger]')!;
   expect(button.textContent).toBe('Design review');
 });

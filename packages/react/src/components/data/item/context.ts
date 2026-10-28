@@ -4,13 +4,12 @@ import { createContext, use } from 'react';
 
 import { invariant } from '../../../utils';
 
-import type { ItemVariant, ItemHeadingLevel } from './root';
+import type { ItemVariant } from './root';
 import type { itemStyle } from './style';
 import type { SurfaceTrigger } from '../../../internal/surface-trigger';
 import type { IdsSize } from '../../../tokens/types';
 
 type Context = {
-  headingLevel: ItemHeadingLevel | undefined;
   styles: ReturnType<typeof itemStyle>;
   trigger: SurfaceTrigger | null;
   setTitleId: (id: string | undefined) => void;

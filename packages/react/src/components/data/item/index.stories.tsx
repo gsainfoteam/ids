@@ -44,7 +44,6 @@ const meta = {
     interactive: { control: 'boolean' },
     selected: { control: 'boolean' },
     disabled: { control: 'boolean' },
-    headingLevel: { control: { type: 'number', min: 1, max: 6 } },
   },
   args: { variant: 'outline', size: 'standard' },
   render: (args) => (
