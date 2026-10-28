@@ -1,6 +1,6 @@
 import { useId, useState } from 'react';
 
-import { expect, fn } from 'storybook/test';
+import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
@@ -425,11 +425,11 @@ export const Autoplay: Story = {
     const startsPaused = prefersReducedMotion();
 
     await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
-    await expect(carousel.hasAttribute('data-playing')).toBe(!startsPaused);
+    await waitFor(() => expect(carousel.hasAttribute('data-playing')).toBe(!startsPaused));
 
     await userEvent.click(pause);
     await expect(pause).toHaveAttribute('aria-pressed', String(!startsPaused));
-    await expect(carousel.hasAttribute('data-playing')).toBe(startsPaused);
+    await waitFor(() => expect(carousel.hasAttribute('data-playing')).toBe(startsPaused));
 
     await userEvent.click(pause);
     await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
@@ -471,7 +471,7 @@ export const AutoScroll: Story = {
 
     await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
     await userEvent.click(pause);
-    await expect(carousel.hasAttribute('data-playing')).toBe(startsPaused);
+    await waitFor(() => expect(carousel.hasAttribute('data-playing')).toBe(startsPaused));
     await userEvent.click(pause);
     await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
   },

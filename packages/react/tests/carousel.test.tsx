@@ -545,6 +545,7 @@ test('motion: autoScroll flows past the snaps, and Pause stops the track', async
   await expect.poll(() => onValueChange.mock.calls.length, { timeout: 5000 }).toBeGreaterThan(0);
   await userEvent.click(pause());
   await expect.element(pause()).toHaveAttribute('aria-pressed', 'true');
+  await wait(100);
   const stopped = trackOffset();
   await wait(300);
   expect(Math.abs(trackOffset() - stopped)).toBeLessThan(1);
