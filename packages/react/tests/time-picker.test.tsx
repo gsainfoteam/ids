@@ -359,9 +359,9 @@ test('pending wheel settlement respects a new readonly prop', async () => {
   const screen = await render(view(false));
   const column = col('hour');
   column.dispatchEvent(new WheelEvent('wheel', { bubbles: true }));
-  column.scrollTop = 10 * OPTION_HEIGHT;
   column.dispatchEvent(new Event('scroll'));
   await screen.rerender(view(true));
+  column.scrollTop = 10 * OPTION_HEIGHT;
   await scrollSettles();
   expect(onValueChange).not.toHaveBeenCalled();
 });
