@@ -10,7 +10,7 @@ import {
 } from '@heroicons/react/16/solid';
 import { expect, fn, spyOn, waitFor } from 'storybook/test';
 
-import { Showcase } from '~story-kit';
+import { Showcase, holdTheNextCall } from '~story-kit';
 
 import { isDevelopment } from '../../../utils/dev';
 import { Spinner } from '../../feedback/spinner';
@@ -147,6 +147,7 @@ export const Gallery: Story = {
 const A_SAVE_TAKES = 2000;
 
 export const Loading: Story = {
+  args: { onClick: fn(() => new Promise((resolve) => setTimeout(resolve, A_SAVE_TAKES))) },
   render: function Render(args) {
     const [saving, setSaving] = useState(false);
 
@@ -155,10 +156,10 @@ export const Loading: Story = {
         disabled={saving}
         focusableWhenDisabled
         aria-busy={saving}
-        onClick={(event) => {
-          args.onClick?.(event);
+        onClick={async (event) => {
           setSaving(true);
-          setTimeout(() => setSaving(false), A_SAVE_TAKES);
+          await args.onClick?.(event);
+          setSaving(false);
         }}
       >
         {saving && <Spinner decorative />}
@@ -175,21 +176,23 @@ export const Loading: Story = {
     },
   },
   play: async ({ canvas, userEvent, args }) => {
-    const button = canvas.getByRole('button', { name: '저장' });
-    await userEvent.click(button);
-    await expect(button).toHaveAccessibleName('저장 중');
-    await expect(button).toHaveAttribute('aria-disabled', 'true');
-    await expect(button).toHaveAttribute('aria-busy', 'true');
-    await expect(button).not.toBeDisabled();
-    await expect(button).toHaveFocus();
-    await userEvent.click(button);
+    const finishSave = holdTheNextCall(args.onClick);
+    const button = () => canvas.getByRole('button');
+
+    await userEvent.click(button());
+    await expect(button()).toHaveAccessibleName('저장 중');
+    await expect(button()).toHaveAttribute('aria-disabled', 'true');
+    await expect(button()).toHaveAttribute('aria-busy', 'true');
+    await expect(button()).not.toBeDisabled();
+    await expect(button()).toHaveFocus();
+    await userEvent.click(button());
     await userEvent.keyboard('{Enter}');
     await expect(args.onClick).toHaveBeenCalledOnce();
-    await waitFor(() => expect(button).toHaveAccessibleName('저장'), {
-      timeout: A_SAVE_TAKES * 2,
-    });
-    await expect(button).not.toHaveAttribute('aria-disabled');
-    await expect(button).toHaveFocus();
+
+    finishSave();
+    await waitFor(() => expect(button()).toHaveAccessibleName('저장'));
+    await expect(button()).not.toHaveAttribute('aria-disabled');
+    await expect(button()).toHaveFocus();
   },
 };
 

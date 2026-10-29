@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { expect, fn, spyOn, waitFor } from 'storybook/test';
 
-import { Showcase } from '~story-kit';
+import { Showcase, holdTheNextCall } from '~story-kit';
 
 import { isDevelopment } from '../../../utils/dev';
 import { Spinner } from '../../feedback/spinner';
@@ -285,8 +285,11 @@ export const AutomaticLabel: Story = {
   },
 };
 
+const AN_UPLOAD_TAKES = 800;
+
 export const Loading: Story = {
   decorators: inContainingBlock,
+  args: { onClick: fn(() => new Promise((resolve) => setTimeout(resolve, AN_UPLOAD_TAKES))) },
   render: function Render(args) {
     const [uploading, setUploading] = useState(false);
 
@@ -295,10 +298,10 @@ export const Loading: Story = {
         disabled={uploading}
         focusableWhenDisabled
         aria-busy={uploading}
-        onClick={(event) => {
-          args.onClick?.(event);
+        onClick={async (event) => {
           setUploading(true);
-          setTimeout(() => setUploading(false), 800);
+          await args.onClick?.(event);
+          setUploading(false);
         }}
       >
         {uploading ? <Spinner decorative /> : <CheckIcon />}
@@ -315,14 +318,20 @@ export const Loading: Story = {
     },
   },
   play: async ({ canvas, userEvent, args }) => {
-    const button = canvas.getByRole('button', { name: '업로드' });
-    await userEvent.click(button);
-    await expect(button).toHaveAccessibleName('업로드 중');
-    await expect(button).toHaveFocus();
-    await expect((button.firstElementChild as HTMLElement).getBoundingClientRect().width).toBe(24);
-    await userEvent.click(button);
+    const finishUpload = holdTheNextCall(args.onClick);
+    const button = () => canvas.getByRole('button');
+
+    await userEvent.click(button());
+    await expect(button()).toHaveAccessibleName('업로드 중');
+    await expect(button()).toHaveFocus();
+    await expect((button().firstElementChild as HTMLElement).getBoundingClientRect().width).toBe(
+      24,
+    );
+    await userEvent.click(button());
     await expect(args.onClick).toHaveBeenCalledOnce();
-    await waitFor(() => expect(button).toHaveAccessibleName('업로드'));
+
+    finishUpload();
+    await waitFor(() => expect(button()).toHaveAccessibleName('업로드'));
   },
 };
 

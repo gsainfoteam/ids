@@ -24,7 +24,7 @@ configure({ asyncUtilTimeout: PLAYS_WAIT_LONGER_WHILE_THREE_ENGINES_SHARE_THE_MA
 
 const MODES_ONE_AFTER_THE_OTHER = ['light', 'dark'] as const;
 
-const A_GALLERY_RENDERS_AND_SCANS_EVERY_VARIANT_MS = 30_000;
+const A_GALLERY_OR_A_WHOLE_PAGE_RENDERS_AND_SCANS_IN_MS = 30_000;
 
 const FLOATING_UI_FOCUS_GUARDS = '[data-floating-ui-focus-guard]';
 
@@ -71,7 +71,9 @@ export function checkEveryStory(storyFiles: StoryFiles) {
               name,
               {
                 timeout:
-                  name === 'Gallery' ? A_GALLERY_RENDERS_AND_SCANS_EVERY_VARIANT_MS : undefined,
+                  name === 'Gallery' || Story.parameters['canvasPadding'] === false
+                    ? A_GALLERY_OR_A_WHOLE_PAGE_RENDERS_AND_SCANS_IN_MS
+                    : undefined,
               },
               async () => {
                 await Story.run({ globals: { ...Story.globals, idsMode: mode } });

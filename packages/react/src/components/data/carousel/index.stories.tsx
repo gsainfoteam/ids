@@ -420,21 +420,21 @@ export const Autoplay: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const carousel = canvas.getByRole('region', { name: '공지 배너' });
-    const pause = canvas.getByRole('button', { name: '자동 넘김 멈춤' });
+    const carousel = () => canvas.getByRole('region', { name: '공지 배너' });
+    const pause = () => canvas.getByRole('button', { name: '자동 넘김 멈춤' });
+    const playing = () => carousel().hasAttribute('data-playing');
     const startsPaused = prefersReducedMotion();
-    const content = carousel.querySelector('[data-carousel-content]');
-    if (content) await userEvent.unhover(content);
+    await userEvent.unhover(carousel());
 
-    await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
-    await waitFor(() => expect(carousel.hasAttribute('data-playing')).toBe(!startsPaused));
+    await expect(pause()).toHaveAttribute('aria-pressed', String(startsPaused));
+    await waitFor(() => expect(playing()).toBe(!startsPaused));
 
-    await userEvent.click(pause);
-    await expect(pause).toHaveAttribute('aria-pressed', String(!startsPaused));
-    await waitFor(() => expect(carousel.hasAttribute('data-playing')).toBe(startsPaused));
+    await userEvent.click(pause());
+    await waitFor(() => expect(pause()).toHaveAttribute('aria-pressed', String(!startsPaused)));
+    await waitFor(() => expect(playing()).toBe(startsPaused));
 
-    await userEvent.click(pause);
-    await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
+    await userEvent.click(pause());
+    await waitFor(() => expect(pause()).toHaveAttribute('aria-pressed', String(startsPaused)));
   },
 };
 
