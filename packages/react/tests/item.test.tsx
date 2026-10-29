@@ -5,7 +5,7 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Item } from '../src';
+import { IdsProvider, Item } from '../src';
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html');
@@ -337,4 +337,27 @@ test('className takes the row state', () => {
 
 test('parts outside Item throw', () => {
   expect(() => renderToString(<Item.Title>x</Item.Title>)).toThrow(/inside `<Item>`/);
+});
+
+test('Item.Actions mutes a bare icon and keeps the color an icon sets', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Item>
+        <Item.Content>
+          <Item.Title>Build</Item.Title>
+        </Item.Content>
+        <Item.Actions>
+          <svg data-testid="bare" />
+          <svg data-testid="colored" className="text-(--ids-color-danger)" />
+        </Item.Actions>
+        <span data-testid="probe" className="text-(--ids-color-on-muted)">
+          <span data-testid="danger" className="text-(--ids-color-danger)" />
+        </span>
+      </Item>
+    </IdsProvider>,
+  );
+  const color = (id: string) => getComputedStyle(screen.getByTestId(id).element()).color;
+
+  expect(color('bare')).toBe(color('probe'));
+  expect(color('colored')).toBe(color('danger'));
 });

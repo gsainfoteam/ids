@@ -76,7 +76,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
   <a href="/inbox">                             {/* 링크 행 */}
     <Item.Content>...</Item.Content>
     <Item.Actions>
-      <ChevronRightIcon aria-hidden />          {/* 맨 아이콘은 아이콘 크기와 흐린 색으로 */}
+      <ChevronRightIcon aria-hidden />          {/* 맨 아이콘은 아이콘 크기와 흐린 색으로. size-*, text-* 를 주면 그 값 */}
     </Item.Actions>
   </a>
 </Item>

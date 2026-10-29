@@ -22,7 +22,7 @@ export const itemStyle = tv({
     description: 'line-clamp-2 text-(--ids-color-on-muted)',
     actions: [
       'ms-auto flex shrink-0 items-center gap-2',
-      "[&>svg]:pointer-events-none [&>svg]:text-(--ids-color-on-muted) [&>svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
+      "[&>svg]:pointer-events-none [&>svg:not([class*='text-'])]:text-(--ids-color-on-muted) [&>svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
     ],
     group: 'flex min-w-0 flex-col',
     groupItem: 'flex',

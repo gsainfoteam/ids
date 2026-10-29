@@ -21,7 +21,7 @@ export const fieldStyle = tv({
       vertical: { group: 'flex flex-col' },
       horizontal: {
         group:
-          'grid grid-cols-[auto_minmax(0,1fr)] [&>[data-field]]:col-span-full [&>[data-field]]:grid-cols-subgrid',
+          'grid grid-cols-[auto_minmax(0,1fr)] *:col-span-full [&>[data-field][data-orientation=horizontal]]:grid-cols-subgrid',
         root: 'grid-cols-[auto_minmax(0,1fr)] [&>:not([data-field-part=label])]:col-start-2 [&>[data-field-part=label]]:col-start-1 [&>[data-field-part=label]]:self-center',
       },
     } satisfies Record<FieldOrientation, object>,

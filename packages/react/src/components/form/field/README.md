@@ -126,6 +126,7 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 
 - `Field.Group` 은 Field 를 쌓습니다. `horizontal` 이면 가장 긴 라벨에 맞춘 열 하나를 모든 Field 가 subgrid 로 나눠 써서, 입력칸의 시작이 줄마다 같습니다.
 - 안의 Field 는 그룹의 `orientation` 을 따릅니다. Field 에 직접 준 값이 이깁니다.
+- 가로 그룹 안에서 `orientation="vertical"` 인 Field 와 Field 가 아닌 자식(감싼 `div` 등)은 두 열을 다 차지합니다. 감싼 `div` 안의 Field 는 그룹의 라벨 열을 나눠 쓰지 않으니, 정렬할 Field 는 `Field.Group` 의 바로 아래에 둡니다.
 
 ## 상태 상속
 
