@@ -616,12 +616,16 @@ default, so on macOS `pnpm test` runs Chromium only; CI (ubuntu) runs all three,
 `IDS_BROWSERS=firefox,webkit` picks engines by hand.
 
 CI gives each engine its own runner: the JS job runs `pnpm test` with Chromium, and the
-`engines` job runs the browser project for Firefox on one runner and for WebKit on two, each
-WebKit runner taking half the files (`--shard`). WebKit on Linux, run through every file in one
-process, now and then stops typing or firing a timer for seconds partway through the run, while
-the same story passes alone and in its own file, so each WebKit process runs half the files.
+`engines` job runs the browser project once for Firefox and once for WebKit. WebKit on Linux
+retries a failed test once (`--retry 1` in that job only): about one run in three, one test there
+stops typing or firing a timer for seconds and runs out of time, a different typing or timer
+story each time (TextArea `CharacterCount`, TelField). The same story passes alone and with its
+whole category file in the Playwright Linux image, and splitting the files by mode or across two
+runners did not stop it, so it is not one story's code. Vitest reports a retried test as flaky; a
+test that fails on both tries is a bug. Chromium and Firefox do not retry.
 `turbo.json` declares `IDS_BROWSERS` in the test task's `env`: turbo hides undeclared variables
-from a task, and a variable in `env` is part of the cache key, so a run with other engines never replays a Chromium-only result.
+from a task, and a variable in `env` is part of the cache key, so a run with other engines never
+replays a Chromium-only result.
 
 - A test that needs CDP starts with `skipWithoutCdp(context)` from `tests/engines.ts`, which skips it
   outside Chromium with the reason. A test that relies on something another engine cannot do
