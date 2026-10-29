@@ -64,12 +64,18 @@ jobs:
           path: packages/react/.vitest/attachments/failure-screenshots
 
   engines:
-    name: Browser tests (${{ matrix.browser }})
+    name: Browser tests (${{ matrix.browser }} ${{ matrix.shard }})
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        browser: [firefox, webkit]
+        include:
+          - browser: firefox
+            shard: 1/1
+          - browser: webkit
+            shard: 1/2
+          - browser: webkit
+            shard: 2/2
     steps:
       - uses: actions/checkout@v4
 
@@ -87,7 +93,7 @@ jobs:
       - name: Install ${{ matrix.browser }}
         run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell ${{ matrix.browser }}
 
-      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --project browser
+      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --project browser --shard ${{ matrix.shard }}
         env:
           IDS_BROWSERS: ${{ matrix.browser }}
 
@@ -95,7 +101,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: failure-screenshots-${{ matrix.browser }}
+          name: failure-screenshots-${{ matrix.browser }}-${{ strategy.job-index }}
           path: packages/react/.vitest/attachments/failure-screenshots
 
   visual:

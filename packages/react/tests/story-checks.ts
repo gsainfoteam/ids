@@ -22,6 +22,8 @@ const PLAYS_WAIT_LONGER_WHILE_THREE_ENGINES_SHARE_THE_MACHINE = 5000;
 
 configure({ asyncUtilTimeout: PLAYS_WAIT_LONGER_WHILE_THREE_ENGINES_SHARE_THE_MACHINE });
 
+const MODES_ONE_AFTER_THE_OTHER = ['light', 'dark'] as const;
+
 const A_GALLERY_OR_A_WHOLE_PAGE_RENDERS_AND_SCANS_IN_MS = 30_000;
 
 const FLOATING_UI_FOCUS_GUARDS = '[data-floating-ui-focus-guard]';
@@ -56,25 +58,28 @@ async function checkAccessibility(storyA11y: A11yParameters | undefined) {
   expect(violations, `axe found violations:\n${describeViolations(violations)}`).toEqual([]);
 }
 
-export function checkEveryStory(mode: 'light' | 'dark', storyFiles: StoryFiles) {
+export function checkEveryStory(storyFiles: StoryFiles) {
   const project = setProjectAnnotations([preview]);
   beforeAll(project.beforeAll);
 
-  for (const [path, module] of Object.entries(storyFiles))
-    describe(path.replace('../src/', ''), () => {
-      for (const [name, Story] of Object.entries(composeStories(module)))
-        test.skipIf(!Story.tags.includes('test'))(
-          name,
-          {
-            timeout:
-              name === 'Gallery' || Story.parameters['canvasPadding'] === false
-                ? A_GALLERY_OR_A_WHOLE_PAGE_RENDERS_AND_SCANS_IN_MS
-                : undefined,
-          },
-          async () => {
-            await Story.run({ globals: { ...Story.globals, idsMode: mode } });
-            await checkAccessibility(Story.parameters.a11y as A11yParameters | undefined);
-          },
-        );
+  for (const mode of MODES_ONE_AFTER_THE_OTHER)
+    describe(mode, () => {
+      for (const [path, module] of Object.entries(storyFiles))
+        describe(path.replace('../src/', ''), () => {
+          for (const [name, Story] of Object.entries(composeStories(module)))
+            test.skipIf(!Story.tags.includes('test'))(
+              name,
+              {
+                timeout:
+                  name === 'Gallery' || Story.parameters['canvasPadding'] === false
+                    ? A_GALLERY_OR_A_WHOLE_PAGE_RENDERS_AND_SCANS_IN_MS
+                    : undefined,
+              },
+              async () => {
+                await Story.run({ globals: { ...Story.globals, idsMode: mode } });
+                await checkAccessibility(Story.parameters.a11y as A11yParameters | undefined);
+              },
+            );
+        });
     });
 }

@@ -297,8 +297,8 @@ changes it.
 - Data sits in module-level constants with fixed dates and numbers, so the server and the client
   render the same HTML.
 - A block that needs something IDS lacks is a component request, not block code.
-- `tests/stories-blocks.light.test.tsx` and `.dark.test.tsx` render every block in light and dark
-  and run axe; the SSR, hydration and translation checks take them like any other story. The translation check reads a
+- `tests/stories-blocks.test.tsx` renders every block in light and dark and runs axe; the SSR,
+  hydration and translation checks take them like any other story. The translation check reads a
   story file together with the story files it imports, since a Mobile file writes no text itself.
 
 ## Component styling
@@ -566,14 +566,13 @@ projects:
   Playwright (Chromium only outside Linux, see Engines below), with Tailwind and the IDS CSS loaded
   and reduced motion on. They keep the system fonts: WebKit caches Pretendard's variable font per
   size and weight and grows past several gigabytes over a story file. `tests/kbd.test.tsx`, which
-  measures text, imports Pretendard for itself. `tests/stories-<category>.<mode>.test.tsx` (a light
-  and a dark file per component category and for the foundations, all through `checkEveryStory`
-  in `tests/story-checks.ts`) render every story in that mode and run its `play` through portable
-  stories (`composeStories` + `run()`), then run axe-core over the page with the WCAG 2.0, 2.1 and
-  2.2 A and AA tags and fail with one line per rule, node and fix; a story tagged `'!test'` is
-  skipped. Each file gets a page of its own, and WebKit's main thread stalls longer the more
-  stories one page has rendered, until a typed string or a 600ms timer outlasts the play's wait.
-  So the stories are split by category and by mode, and a new category adds both files.
+  measures text, imports Pretendard for itself. `tests/stories-<category>.test.tsx` (one file per
+  component category and one for the foundations, all through `checkEveryStory` in
+  `tests/story-checks.ts`) render every story and run its `play` through portable stories
+  (`composeStories` + `run()`), every story in light and then every story in dark mode, then run
+  axe-core over the page with the WCAG 2.0, 2.1 and 2.2 A and AA tags and fail with one line per
+  rule, node and fix; a story tagged `'!test'` is skipped. The stories are split by category so
+  no single page renders all of them.
   `tests/hydration.test.tsx` renders every story with `renderToString`, hydrates that HTML with
   `hydrateRoot` and fails on a recoverable error or any `console.error`.
 - `clipboard`: the browser files that call `userEvent.copy` / `cut` / `paste` or
@@ -617,10 +616,12 @@ default, so on macOS `pnpm test` runs Chromium only; CI (ubuntu) runs all three,
 `IDS_BROWSERS=firefox,webkit` picks engines by hand.
 
 CI gives each engine its own runner: the JS job runs `pnpm test` with Chromium, and the
-`engines` job runs the browser project once for Firefox and once for WebKit, so the three
-engines no longer split one four-core runner and the whole run takes less time. `turbo.json` declares `IDS_BROWSERS` in
-the test task's `env`: turbo hides undeclared variables from a task, and a variable in `env` is
-part of the cache key, so a run with other engines never replays a Chromium-only result.
+`engines` job runs the browser project for Firefox on one runner and for WebKit on two, each
+WebKit runner taking half the files (`--shard`). WebKit on Linux, run through every file in one
+process, now and then stops typing or firing a timer for seconds partway through the run, while
+the same story passes alone and in its own file, so each WebKit process runs half the files.
+`turbo.json` declares `IDS_BROWSERS` in the test task's `env`: turbo hides undeclared variables
+from a task, and a variable in `env` is part of the cache key, so a run with other engines never replays a Chromium-only result.
 
 - A test that needs CDP starts with `skipWithoutCdp(context)` from `tests/engines.ts`, which skips it
   outside Chromium with the reason. A test that relies on something another engine cannot do

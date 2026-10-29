@@ -39,4 +39,4 @@ Storybook 맨 앞의 표지입니다. IDS 로고 둘레에 실제 IDS 컴포넌�
 - 로고는 `bg-clip-text` 로 칠합니다. 음수 자간이 글자 상자를 S 의 끝보다 좁게 만들어 S 가 잘리므로, `pe-[0.1em]` 으로 칠할 영역을 넓히고 `-me-[0.1em]` 으로 자리는 그대로 둡니다.
 - 새 카드는 실제 IDS 컴포넌트로만 만듭니다. 팝업, 메뉴, 툴팁처럼 top layer 에 뜨는 것은 열린 채로 두지 않습니다.
 - 로그인과 회원가입 칸에는 `data-1p-ignore` 와 `data-lpignore="true"` 를 붙입니다. 붙이지 않으면 비밀번호 관리자가 표지 위에 입력 제안을 띄웁니다.
-- 스토리 검사(`tests/stories-overview.light.test.tsx`, `.dark.test.tsx`)가 라이트와 다크에서 axe 를 돌리고, hydration, SSR, 번역 검사도 다른 스토리처럼 이 표지를 그립니다.
+- 스토리 검사(`tests/stories-overview.test.tsx`)가 라이트와 다크에서 axe 를 돌리고, hydration, SSR, 번역 검사도 다른 스토리처럼 이 표지를 그립니다.
