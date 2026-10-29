@@ -383,14 +383,15 @@ export const CharacterCount: Story = {
     },
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
-    const input = canvas.getByRole('textbox', { name: '한 줄 소개' });
-    const count = canvasElement.querySelector('[data-text-area-count]')!;
-    await expect(count).toHaveTextContent('0 / 30');
-    await expect(input).toHaveAccessibleDescription('프로필에 보입니다. 0 / 30');
-    await userEvent.type(input, 'GIST 인포팀에서 서비스를 만듭니다. 반갑습니다');
-    await expect(count).toHaveAttribute('data-near-limit');
-    const status = canvas.getByRole('status');
-    await waitFor(() => expect(status.textContent).toMatch(/자 남았습니다|제한에 도달했습니다/));
+    const input = () => canvas.getByRole('textbox', { name: '한 줄 소개' });
+    const count = () => canvasElement.querySelector('[data-text-area-count]')!;
+    await expect(count()).toHaveTextContent('0 / 30');
+    await expect(input()).toHaveAccessibleDescription('프로필에 보입니다. 0 / 30');
+    await userEvent.type(input(), 'GIST 인포팀에서 서비스를 만듭니다. 반갑습니다');
+    await expect(count()).toHaveAttribute('data-near-limit');
+    await waitFor(() =>
+      expect(canvas.getByRole('status')).toHaveTextContent(/자 남았습니다|제한에 도달했습니다/),
+    );
   },
 };
 

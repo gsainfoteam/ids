@@ -56,6 +56,13 @@ jobs:
         env:
           IDS_BROWSERS: chromium
 
+      - name: Upload the failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots-chromium
+          path: packages/react/.vitest/attachments/failure-screenshots
+
   engines:
     name: Browser tests (${{ matrix.browser }})
     runs-on: ubuntu-24.04
@@ -83,6 +90,13 @@ jobs:
       - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --project browser
         env:
           IDS_BROWSERS: ${{ matrix.browser }}
+
+      - name: Upload the failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots-${{ matrix.browser }}
+          path: packages/react/.vitest/attachments/failure-screenshots
 
   visual:
     name: Visual regression (Playwright Linux image)
