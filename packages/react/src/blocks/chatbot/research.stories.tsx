@@ -78,7 +78,9 @@ export const PC: Story = {
                         <Card.Description>
                           {index + 1} · {source.site}
                         </Card.Description>
-                        <Card.Title>{source.title}</Card.Title>
+                        <Card.Title asChild>
+                          <h2>{source.title}</h2>
+                        </Card.Title>
                       </Card.Header>
                     </a>
                   </Card>

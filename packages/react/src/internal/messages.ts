@@ -70,12 +70,7 @@ export const messages = {
   },
   dataTable: {
     empty: '데이터가 없습니다.',
-    firstPage: '첫 페이지',
-    lastPage: '마지막 페이지',
-    nextPage: '다음 페이지',
     page: '{page} / {count} 페이지',
-    pagination: '페이지 이동',
-    previousPage: '이전 페이지',
     resize: '{column} 열 너비',
     selectAll: '모든 행 선택',
     selectRow: '{label} 선택',
@@ -192,7 +187,9 @@ export const messages = {
     label: '인증 코드',
   },
   pagination: {
+    first: '첫 페이지',
     label: '페이지 탐색',
+    last: '마지막 페이지',
     next: '다음 페이지',
     page: '{page}페이지',
     previous: '이전 페이지',

@@ -6,9 +6,10 @@ import type { IdsSize } from '../../../tokens/types';
 
 const opaqueFills = {
   solid: cn(
-    'bg-(--control-fill) text-(--control-on-fill)',
-    'data-hovered:bg-[color-mix(in_oklab,var(--control-fill)_90%,var(--ids-color-surface))]',
-    'data-active:bg-[color-mix(in_oklab,var(--control-fill)_80%,var(--ids-color-surface))]',
+    controlSurface.variant.solid,
+    'supports-[not_(color:oklch(from_red_l_c_h))]:[--control-fill-hover:color-mix(in_oklab,var(--control-fill)_90%,var(--ids-color-surface))]',
+    'supports-[not_(color:oklch(from_red_l_c_h))]:[--control-fill-press:color-mix(in_oklab,var(--control-fill)_80%,var(--ids-color-surface))]',
+    'shadow-lg',
   ),
   soft: cn(
     'bg-(--ids-color-surface) text-(--control-on-soft)',
@@ -20,14 +21,7 @@ const opaqueFills = {
     'bg-(--ids-color-surface) text-(--control-quiet) inset-ring-1 inset-ring-(--ids-color-border)',
     'data-hovered:bg-(--ids-color-muted) data-active:bg-(--ids-color-muted-hover)',
   ),
-  glossy: cn(
-    'bg-(--control-fill) text-(--control-on-fill)',
-    'bg-linear-to-b from-white/20 to-transparent',
-    'inset-shadow-[0_1px_0_rgb(255_255_255/0.35)]',
-    'inset-ring-1 inset-ring-[color-mix(in_oklab,var(--control-fill),black_20%)]',
-    'data-hovered:from-white/30',
-    'data-active:from-transparent data-active:inset-shadow-[0_1px_2px_rgb(0_0_0/0.2)]',
-  ),
+  glossy: cn(controlSurface.variant.glossy, 'shadow-lg data-active:shadow-lg'),
 } satisfies Record<FloatingButton.Variant, string>;
 
 export const floatingButtonStyle = tv({

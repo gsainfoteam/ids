@@ -8,7 +8,7 @@ import { cdp, userEvent, type Locator } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { z } from 'zod';
 
-import { Field, NumberField } from '../src';
+import { Field, IdsProvider, NumberField } from '../src';
 import { skipWithoutCdp } from './engines';
 import { Field as FormField } from '../src/react-hook-form';
 
@@ -951,6 +951,25 @@ test('a tap on a stepper steps without focusing the input, and a cancelled press
   await cdp().send('Input.dispatchTouchEvent', { type: 'touchCancel', touchPoints: [] });
   await wait(500);
   expect(form.changes, 'a cancelled press does not keep stepping').toEqual([1]);
+});
+
+test('a stepper keeps its pressed color while a touch holds it', async (context) => {
+  skipWithoutCdp(context);
+  const screen = await render(
+    <IdsProvider>
+      <NumberField defaultValue={0} />
+    </IdsProvider>,
+  );
+  const input = screen.getByRole('spinbutton');
+  const increment = screen.getByRole('button', { name: '값 늘리기' });
+  await cdp().send('Input.dispatchTouchEvent', {
+    type: 'touchStart',
+    touchPoints: [touchPointOn(increment)],
+  });
+  await expect.element(increment).toHaveAttribute('data-active');
+  await expect.element(increment).not.toHaveAttribute('data-hovered');
+  expect(getComputedStyle(increment.element()).color).toBe(getComputedStyle(input.element()).color);
+  await cdp().send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
 });
 
 test('on iOS a field that accepts negatives asks for the full keyboard', async () => {

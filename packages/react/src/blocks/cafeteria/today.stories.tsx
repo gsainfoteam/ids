@@ -219,7 +219,9 @@ export const PC: Story = {
                           <Card.Description>
                             {menu.corner} · {menu.kcal}kcal
                           </Card.Description>
-                          <Card.Title className="text-headline-h5-bold">{menu.main}</Card.Title>
+                          <Card.Title className="text-headline-h5-bold" asChild>
+                            <h2>{menu.main}</h2>
+                          </Card.Title>
                           <Card.Action>
                             <Badge
                               content={`${won.format(menu.price)}원`}

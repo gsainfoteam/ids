@@ -128,7 +128,9 @@ export const PC: Story = {
                             <Card.Description>
                               {petition.topic} · {petition.left}
                             </Card.Description>
-                            <Card.Title>{petition.title}</Card.Title>
+                            <Card.Title asChild>
+                              <h2>{petition.title}</h2>
+                            </Card.Title>
                             <Card.Action>
                               <Badge
                                 content={`${count.format(petition.signed)}명`}

@@ -25,7 +25,7 @@ export namespace AvatarGroup {
     shape: AvatarShape;
   };
 
-  export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children'> & {
+  export type Props = Omit<ComponentProps<'ul'>, 'className' | 'style' | 'children'> & {
     max?: number;
     total?: number;
     layout?: AvatarGroupLayout;

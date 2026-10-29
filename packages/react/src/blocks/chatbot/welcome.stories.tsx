@@ -117,7 +117,9 @@ export const PC: Story = {
               <li key={starter.title} className="flex">
                 <Card size="tiny" className="w-full" onClick={() => setDraft(starter.title)}>
                   <Card.Header>
-                    <Card.Title>{starter.title}</Card.Title>
+                    <Card.Title asChild>
+                      <h2>{starter.title}</h2>
+                    </Card.Title>
                     <Card.Description>{starter.description}</Card.Description>
                   </Card.Header>
                 </Card>

@@ -1,7 +1,9 @@
 import type { ComponentProps, ReactNode } from 'react';
 
 import { PaginationEllipsis, type PaginationEllipsisProps } from './ellipsis';
+import { PaginationFirst, type PaginationFirstProps } from './first';
 import { PaginationItem, type PaginationItemProps } from './item';
+import { PaginationLast, type PaginationLastProps } from './last';
 import { PaginationLink, type PaginationLinkProps } from './link';
 import { PaginationList, type PaginationListProps } from './list';
 import { PaginationNext, type PaginationNextProps } from './next';
@@ -38,6 +40,8 @@ export namespace Pagination {
   export type LinkProps = PaginationLinkProps;
   export type PreviousProps = PaginationPreviousProps;
   export type NextProps = PaginationNextProps;
+  export type FirstProps = PaginationFirstProps;
+  export type LastProps = PaginationLastProps;
   export type EllipsisProps = PaginationEllipsisProps;
 
   export const List = PaginationList;
@@ -63,6 +67,16 @@ export namespace Pagination {
   export const Next = PaginationNext;
   export namespace Next {
     export type Props = PaginationNextProps;
+  }
+
+  export const First = PaginationFirst;
+  export namespace First {
+    export type Props = PaginationFirstProps;
+  }
+
+  export const Last = PaginationLast;
+  export namespace Last {
+    export type Props = PaginationLastProps;
   }
 
   export const Ellipsis = PaginationEllipsis;

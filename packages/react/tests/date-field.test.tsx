@@ -166,7 +166,7 @@ test('StrictMode opens on the active day; custom content keeps the close button 
   await userEvent.click(trigger);
   await expect.element(screen.getByRole('dialog')).toMatchTextContent('Custom content');
   await expect.element(screen.getByRole('button', { name: '닫기' })).toHaveFocus();
-  await expect.element(screen.getByRole('dialog')).toHaveAttribute('aria-label', '날짜 선택');
+  await expect.element(screen.getByRole('dialog')).toHaveAccessibleName('날짜 선택');
 });
 
 test('range stays open, a half-picked range is missing from FormData and fails required', async () => {
@@ -186,7 +186,7 @@ test('range stays open, a half-picked range is missing from FormData and fails r
   const trigger = screen.getByRole('combobox');
   await expect.element(trigger).toMatchTextContent('기간 선택');
   await userEvent.click(trigger);
-  await expect.element(screen.getByRole('dialog')).toHaveAttribute('aria-label', '기간 선택');
+  await expect.element(screen.getByRole('dialog')).toHaveAccessibleName('기간 선택');
   await userEvent.click(day('2026-09-18'));
   expect(value?.end).toBeNull();
   await expect.element(trigger).toMatchTextContent('2026. 09. 18. – …');

@@ -3,7 +3,7 @@
 import { isValidElement, useId } from 'react';
 
 import { dividerStyle } from './style';
-import { invariant } from '../../../utils';
+import { invariant, mergeRefs } from '../../../utils';
 import { Slot } from '../../utility/slot';
 
 import type { Divider } from '.';
@@ -17,6 +17,7 @@ export function DividerRoot({
   align = 'center',
   decorative = false,
   asChild = false,
+  ref,
   className,
   style,
   children,
@@ -53,14 +54,18 @@ export function DividerRoot({
     style: resolve(style, state),
   };
 
-  if (asChild) return <Slot {...rootProps}>{children}</Slot>;
+  if (asChild)
+    return (
+      <Slot {...rootProps} ref={ref}>
+        {children}
+      </Slot>
+    );
+  if (!labelled) return <hr {...rootProps} ref={mergeRefs(ref)} />;
   return (
-    <div {...rootProps}>
-      {labelled && (
-        <span id={labelId} className={label()}>
-          {children}
-        </span>
-      )}
+    <div {...rootProps} ref={mergeRefs(ref)}>
+      <span id={labelId} className={label()}>
+        {children}
+      </span>
     </div>
   );
 }

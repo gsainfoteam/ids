@@ -1,25 +1,23 @@
 'use client';
 
+import { type ComponentProps } from 'react';
+
 import { useCardContext } from './context';
-import { Part, type CardPartProps } from './part';
 import { useRegisteredId } from '../../../internal/surface';
 import { titleContent } from '../../../internal/surface-trigger';
+import { Slot } from '../../utility/slot';
 
-export type CardTitleProps = CardPartProps;
+export type CardTitleProps = ComponentProps<'h3'> & { asChild?: boolean };
 
 export function CardTitle({ className, id, asChild, children, ...props }: CardTitleProps) {
   const { styles, trigger, setTitleId } = useCardContext('Card.Title');
   const titleId = useRegisteredId(setTitleId, id);
+  const Heading = asChild ? Slot : 'h3';
+
   return (
-    <Part
-      {...props}
-      asChild={asChild}
-      id={titleId}
-      kind="title"
-      className={styles.title({ className })}
-    >
+    <Heading {...props} id={titleId} data-card-title="" className={styles.title({ className })}>
       {titleContent({ trigger, asChild, children })}
-    </Part>
+    </Heading>
   );
 }
 

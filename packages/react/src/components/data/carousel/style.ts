@@ -6,11 +6,7 @@ import type { IdsSize } from '../../../tokens/types';
 export const carouselStyle = tv({
   slots: {
     root: 'flex min-w-0 flex-col',
-    content: [
-      slidesLayout.viewport,
-      'relative isolate',
-      'has-[[data-slide]:focus-visible]:ring-[3px] has-[[data-slide]:focus-visible]:ring-(--ids-color-primary)/40',
-    ],
+    content: [slidesLayout.viewport, 'relative isolate focus-ring'],
     track: '',
     slide: slidesLayout.slide,
     edgePrev: 'absolute z-10',

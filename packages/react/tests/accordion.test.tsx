@@ -39,20 +39,20 @@ function items(values = ['a', 'b', 'c'], disabled: string[] = []) {
 test('SSR: each header is a heading with a button that controls a labelled region', () => {
   const doc = parse(
     renderToString(
-      <Accordion type="single" defaultValue="a" headingLevel={2}>
+      <Accordion type="single" defaultValue="a">
         {items()}
       </Accordion>,
     ),
   );
   const buttons = Array.from(
-    doc.querySelectorAll<HTMLElement>('h2 > button[data-accordion-trigger]'),
+    doc.querySelectorAll<HTMLElement>('h3 > button[data-accordion-trigger]'),
   );
   expect(buttons).toHaveLength(3);
   const [first, second] = buttons;
   expect(first!.getAttribute('aria-expanded')).toBe('true');
   expect(second!.getAttribute('aria-expanded')).toBe('false');
   const region = doc.getElementById(first!.getAttribute('aria-controls')!)!;
-  expect(region.getAttribute('role')).toBe('region');
+  expect(region.tagName, 'a section named by its trigger is a region').toBe('SECTION');
   expect(region.getAttribute('aria-labelledby')).toBe(first!.id);
   expect(region.hasAttribute('hidden')).toBe(false);
   expect(doc.getElementById(second!.getAttribute('aria-controls')!)!.hasAttribute('hidden')).toBe(
@@ -65,6 +65,26 @@ test('SSR: each header is a heading with a button that controls a labelled regio
   expect(first!.dataset.state).toBe('open');
   expect(first!.hasAttribute('data-open')).toBe(true);
   expect(doc.querySelector<HTMLElement>('[data-accordion]')!.dataset.variant).toBe('outline');
+});
+
+test('SSR: Header takes another heading tag through asChild and holds the trigger', () => {
+  const doc = parse(
+    renderToString(
+      <Accordion type="single">
+        <Accordion.Item value="a">
+          <Accordion.Header asChild>
+            <h2 className="custom">
+              <Accordion.Trigger>Shipping</Accordion.Trigger>
+            </h2>
+          </Accordion.Header>
+          <Accordion.Content>Two days.</Accordion.Content>
+        </Accordion.Item>
+      </Accordion>,
+    ),
+  );
+  const heading = doc.querySelector('h2.custom')!;
+  expect(heading.querySelector(':scope > button[data-accordion-trigger]')).not.toBeNull();
+  expect(doc.querySelector('h3'), 'the trigger adds no heading of its own').toBeNull();
 });
 
 test('single: one open at a time, a second press closes it when collapsible', async () => {

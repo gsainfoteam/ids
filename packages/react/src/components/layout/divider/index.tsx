@@ -1,4 +1,4 @@
-import { type ComponentProps, type CSSProperties, type ReactNode } from 'react';
+import { type CSSProperties, type HTMLAttributes, type ReactNode, type Ref } from 'react';
 
 import { DividerRoot } from './root';
 import { dividerStyle } from './style';
@@ -19,9 +19,10 @@ export namespace Divider {
   };
 
   export type Props = Omit<
-    ComponentProps<'div'>,
+    HTMLAttributes<HTMLElement>,
     'role' | 'aria-orientation' | 'aria-hidden' | 'tabIndex' | 'className' | 'style'
   > & {
+    ref?: Ref<HTMLElement>;
     orientation?: Orientation;
     align?: Align;
     decorative?: boolean;

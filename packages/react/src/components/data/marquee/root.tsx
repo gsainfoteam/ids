@@ -80,6 +80,11 @@ export function MarqueeRoot({
     pauseOnHover,
     pauseOnFocus,
   });
+  const listItems = content.map((node, index) => (
+    <li key={isValidElement(node) ? node.key : index} className={styles.listItem()}>
+      {node}
+    </li>
+  ));
   const duration = { '--ids-marquee-duration': loopDuration(length, speed) } as CSSProperties;
 
   return (
@@ -98,19 +103,19 @@ export function MarqueeRoot({
       >
         <div {...viewportProps} data-marquee-viewport="" className={styles.viewport()}>
           <div ref={setTrack} data-marquee-track="" className={styles.track()}>
-            <div data-marquee-content="" className={styles.content()}>
-              {content}
-            </div>
+            <ul data-marquee-content="" className={styles.content()}>
+              {listItems}
+            </ul>
             {!reduced && (
-              <div
+              <ul
                 aria-hidden="true"
                 inert
                 data-marquee-content=""
                 data-marquee-copy=""
                 className={styles.content({ copy: true })}
               >
-                {content}
-              </div>
+                {listItems}
+              </ul>
             )}
           </div>
         </div>

@@ -84,7 +84,7 @@ import { Divider } from '@gsainfoteam/ids-react';
 | `decorative`          | `false`. `true` 면 접근성 트리에서 뺀다          |
 | `asChild`             | 자식 요소 하나를 선으로 그린다. 글자는 넣지 않는다 |
 | `className` / `style` | 상태를 받는 함수도 된다                          |
-| 그 외 속성            | div로 간다                                       |
+| 그 외 속성            | 선(`hr`)으로 간다. 글자가 있으면 `div`           |
 
 ## 알아둘 것
 

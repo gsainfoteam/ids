@@ -109,7 +109,9 @@ export const PC: Story = {
                   <SparklesIcon />
                 </Avatar.Fallback>
               </Avatar>
-              <Card.Title>{current.question}</Card.Title>
+              <Card.Title asChild>
+                <h2>{current.question}</h2>
+              </Card.Title>
               <Card.Description>{current.answer}</Card.Description>
             </Card.Header>
             {index === 0 && (

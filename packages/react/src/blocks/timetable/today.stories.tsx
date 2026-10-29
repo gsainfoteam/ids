@@ -38,7 +38,9 @@ export const PC: Story = {
       <Card>
         <Card.Header>
           <Card.Description>다음 수업까지 16분</Card.Description>
-          <Card.Title className="text-headline-h5-bold">{CLASSES[NOW_INDEX].name}</Card.Title>
+          <Card.Title className="text-headline-h5-bold" asChild>
+            <h2>{CLASSES[NOW_INDEX].name}</h2>
+          </Card.Title>
           <Card.Action>
             <Badge content="14:30" variant="soft" colorScheme="primary" />
           </Card.Action>

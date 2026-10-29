@@ -128,7 +128,7 @@ test('custom parts, readOnly, and a native onClick that prevents opening', async
   await userEvent.click(screen.getByRole('combobox'));
   await expect.element(screen.getByRole('dialog')).toMatchTextContent('Custom time controls');
   await expect.element(screen.getByRole('button', { name: '닫기' })).toHaveFocus();
-  await expect.element(screen.getByRole('dialog')).toHaveAttribute('aria-label', '시간 선택');
+  await expect.element(screen.getByRole('dialog')).toHaveAccessibleName('시간 선택');
 });
 
 test('required and native reset go through the hidden form value', async () => {

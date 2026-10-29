@@ -133,6 +133,30 @@ test('a press on the trigger closes it, and the focus the press gives does not r
   expect(onOpenChange.mock.calls).toEqual([[true], [false]]);
 });
 
+test('a hover that arrives after Escape does not reopen it until the pointer leaves the trigger', async () => {
+  const screen = await render(
+    <Scene>
+      <Tooltip content="Save changes" openDelay={0}>
+        <Button>Save</Button>
+      </Tooltip>
+      <Button>Elsewhere</Button>
+    </Scene>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Save' });
+  await userEvent.hover(trigger);
+  await expect.element(screen.getByRole('tooltip')).toBeVisible();
+
+  await userEvent.keyboard('{Escape}');
+  await expect.element(screen.getByRole('tooltip')).not.toBeInTheDocument();
+  trigger.element().dispatchEvent(new MouseEvent('mouseenter'));
+  await nextFrames();
+  await expect.element(screen.getByRole('tooltip')).not.toBeInTheDocument();
+
+  await userEvent.hover(screen.getByRole('button', { name: 'Elsewhere' }));
+  await userEvent.hover(trigger);
+  await expect.element(screen.getByRole('tooltip')).toBeVisible();
+});
+
 test('Escape closes the tooltip before the dialog it sits in', async () => {
   const screen = await render(
     <Scene>

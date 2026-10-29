@@ -100,7 +100,7 @@ const outsideButton = <button type="button">밖</button>;
 test('SSR: a named carousel region, a group per slide, and only the first slide in view', () => {
   const doc = parse(renderToString(<Photos />));
   const root = doc.querySelector('[data-carousel]')!;
-  expect(root.getAttribute('role')).toBe('region');
+  expect(root.tagName).toBe('SECTION');
   expect(root.getAttribute('aria-roledescription')).toBe('캐러셀');
   expect(root.getAttribute('aria-label')).toBe('사진');
 
@@ -267,7 +267,9 @@ test('keyboard: from inside a slide focus moves to the new slide before the old 
   await expect.element(slide(2, 3)).toHaveFocus();
   await expect.poll(inertSlides).toEqual([1, 3]);
   expect(
-    document.querySelector('[data-carousel-content]')!.matches(':has([data-slide]:focus-visible)'),
+    document
+      .querySelector('[data-carousel-content]')!
+      .matches(':has([data-field-input]:focus-visible)'),
   ).toBe(true);
 });
 

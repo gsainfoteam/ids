@@ -29,7 +29,11 @@ test('SSR: a labelled group of native checkboxes sharing one name', () => {
       </form>,
     ),
   );
-  const group = doc.querySelector<HTMLElement>('[role=group]')!;
+  const group = doc.querySelector<HTMLElement>('fieldset[data-checkbox-group]')!;
+  expect(group.hasAttribute('role'), 'a fieldset is a group without one').toBe(false);
+  expect(group.className, "the fieldset's own border, padding and min-width are reset").toMatch(
+    /\bmin-w-0\b/,
+  );
   const label = doc.querySelector('label')!;
   expect(label.htmlFor).toBe(group.id);
   expect(group.getAttribute('aria-labelledby')).toBe(label.id);
@@ -180,7 +184,7 @@ test('required means at least one, with its own message, and reset restores the 
 });
 
 test('focus on the root goes to the first checked box, else the first enabled one', async () => {
-  let root: HTMLDivElement | null = null;
+  let root: HTMLFieldSetElement | null = null;
   const screen = await render(
     <CheckboxGroup
       aria-label="Skills"

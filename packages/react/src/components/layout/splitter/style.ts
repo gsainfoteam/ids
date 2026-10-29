@@ -18,11 +18,8 @@ export const splitterStyle = tv({
     ],
     group: 'relative z-10 flex shrink-0',
     toggle: [
-      'absolute z-20 flex size-6 cursor-pointer items-center justify-center rounded-full',
-      'bg-(--ids-color-surface) text-(--ids-color-on-muted) shadow-xs inset-ring-1 inset-ring-(--ids-color-border)',
-      'hover:bg-(--ids-color-muted) hover:text-(--ids-color-on-surface) active:bg-(--ids-color-muted-hover)',
-      'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'focus-ring',
+      'absolute z-20 size-6 rounded-full',
+      'dark:bg-[color-mix(in_oklab,var(--ids-color-muted)_30%,var(--ids-color-surface))]',
     ],
     toggleIcon: 'pointer-events-none size-3.5',
   },

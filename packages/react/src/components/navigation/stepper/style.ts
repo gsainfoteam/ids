@@ -62,7 +62,7 @@ export const stepperStyle = tv({
         indicator: 'self-start',
         title: 'flex items-center',
         body: 'mt-2',
-        separator: 'absolute bottom-1 w-px',
+        separator: 'absolute bottom-1 min-h-0 w-px',
       },
     } satisfies Record<StepperOrientation, object>,
     size: {

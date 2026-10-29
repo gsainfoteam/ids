@@ -4,7 +4,7 @@
 
 - **TanStack 그대로.** `columns` 와 `data` 를 받고, 열 정의, 상태 모양(`SortingState`, `RowSelectionState`, `PaginationState`), 옵션 이름(`enableSorting`, `manualPagination`, `getRowId`)이 TanStack 과 같습니다.
 - **기능은 켜는 것만.** 정렬은 기본으로 켜져 있고, 선택(`enableRowSelection`), 페이지(`enablePagination`), 열 너비(`enableColumnResizing`)는 켤 때만 붙습니다.
-- **접근성.** 정렬 머리글은 버튼이고 `th` 에 `aria-sort`, 선택은 이름 있는 체크박스, 너비 핸들은 키보드로 움직이는 `separator`, 로딩은 `aria-busy` 입니다.
+- **접근성.** 정렬 머리글은 ghost `Button` 이고 `th` 에 `aria-sort`, 선택은 이름 있는 체크박스, 너비 핸들은 키보드로 움직이는 `separator`, 로딩은 `aria-busy` 입니다.
 - **Table 의 모양.** `variant`, `size`, `striped`, `highlightOnHover`, `stickyHeader` 는 `Table` 과 같습니다. 가로로 넘치면 열이 더 남은 가장자리가 흐려지는 것도 Table 과 같습니다.
 
 ```tsx
@@ -112,11 +112,11 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 />
 ```
 
-- 켜면 표 아래에 첫 페이지, 이전, "1 / 5 페이지", 다음, 마지막 페이지 버튼이 붙습니다. 버튼은 ghost `IconButton` 입니다.
+- 켜면 표 아래에 IDS `Pagination` 이 붙습니다. 첫 페이지(`Pagination.First`), 이전, "1 / 5 페이지", 다음, 마지막 페이지(`Pagination.Last`) 순서이고, 버튼은 ghost `IconButton` 입니다.
 - 끝에 닿은 버튼은 `aria-disabled` 로 꺼지고 포커스를 잃지 않습니다(`focusableWhenDisabled`).
-- 페이지 글자는 `aria-live="polite"` 라 바뀐 페이지를 읽습니다. 버튼 묶음은 이름 "페이지 이동" 인 `<nav>` 입니다.
+- 페이지 글자는 `aria-live="polite"` 라 바뀐 페이지를 읽습니다. 버튼 묶음은 이름 "페이지 탐색" 인 `<nav>` 입니다.
+- 키보드는 Pagination 과 같습니다. 버튼에서 `←` `→` 는 이전, 다음 페이지, `Home` `End` 는 첫, 마지막 페이지입니다.
 - 데이터나 정렬이 바뀌면 TanStack 이 첫 페이지로 돌아갑니다(`autoResetPageIndex`). `manualPagination` 이면 돌아가지 않습니다.
-- 이 바닥글은 임시입니다. Pagination 컴포넌트가 나오면 그것으로 바꿀 수 있고, 그때도 `pagination` 과 `onPaginationChange` 는 그대로입니다.
 
 ## 열 너비
 
@@ -142,7 +142,7 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 ```tsx
 <DataTable data={[]} />                                   // "데이터가 없습니다."
 <DataTable data={[]} empty="아직 멤버가 없습니다." />      // 문구 바꾸기
-<DataTable data={[]} empty={<Empty>...</Empty>} />        // Empty 컴포넌트가 나오면 그대로 넣는다
+<DataTable data={[]} empty={<Empty>...</Empty>} />        // Empty 컴포넌트를 그대로 넣는다
 <DataTable loading />                                     // aria-busy, Spinner
 ```
 

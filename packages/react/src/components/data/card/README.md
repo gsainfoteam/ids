@@ -87,7 +87,7 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 | `Enter` | 누르는 순간 실행. 누르고 있으면 반복한다   |
 | `Space` | 뗄 때 실행. 떼기 전에 포커스가 떠나면 취소 |
 
-- 제목 버튼은 `data-surface-trigger` 로 표시되고, 제목의 글자 모양을 그대로 씁니다. `<Card.Title asChild><h3>...</h3></Card.Title>` 면 `h3` 안에 버튼이 들어갑니다.
+- 제목 버튼은 `data-surface-trigger` 로 표시되고, 제목의 글자 모양을 그대로 씁니다. 제목은 heading 이라 버튼은 heading 안에 들어갑니다.
 - `Card.Title` 이 없거나 다른 컴포넌트 안에 숨어 있으면(자식이 함수이거나 직접 만든 컴포넌트 안) 카드 자신이 `role="button"` 이 됩니다. 이때는 안에 다른 버튼을 두지 않습니다.
 - hover와 누름은 배경 위에 반투명 층을 얹어 표시하므로 어느 variant에서나 같게 보입니다.
 - 포커스는 `focus-ring` 입니다. 제목 버튼에 포커스가 가면 카드 전체에 링이 그려지고, outline 카드는 테두리도 primary 색으로 바뀝니다.
@@ -128,5 +128,5 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 
 ## 알아둘 것
 
-- 제목을 heading으로 만들려면 `<Card.Title asChild><h3>...</h3></Card.Title>` 처럼 씁니다.
+- `Card.Title` 은 `h3` 입니다. 다른 수준이 필요하면 `<Card.Title asChild><h2>...</h2></Card.Title>`, heading 이 아니어야 하면 `<Card.Title asChild><span>...</span></Card.Title>` 처럼 태그를 넣습니다.
 - 누를 수 있는 카드는 글자 선택이 되지 않습니다. 버튼처럼 눌리는 면이기 때문입니다.

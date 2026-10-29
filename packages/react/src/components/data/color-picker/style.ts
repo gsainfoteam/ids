@@ -15,14 +15,13 @@ export const colorPickerStyle = tv({
     root: 'grid w-full min-w-0 gap-3 text-(--ids-color-on-surface) data-disabled:opacity-50',
     area: [
       sliderSurface.edge,
-      'group/area relative w-full cursor-crosshair touch-none rounded-standard select-none',
+      'relative w-full cursor-crosshair touch-none rounded-standard select-none',
       'data-disabled:cursor-not-allowed',
     ],
     areaThumb: [
       sliderSurface.thumb,
       'pointer-events-none absolute -translate-x-1/2 -translate-y-1/2',
-      'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'group-has-[input:focus-visible]/area:ring-[3px] group-has-[input:focus-visible]/area:ring-(--ids-color-primary)/50',
+      'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none focus-ring',
     ],
     channel: 'sr-only',
     row: 'flex min-w-0 items-center gap-2',

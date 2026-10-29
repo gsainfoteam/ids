@@ -193,8 +193,10 @@ export const PC: Story = {
                       <Card.Description>
                         {ride.day} {ride.time} 출발
                       </Card.Description>
-                      <Card.Title className="text-headline-h5-bold">
-                        {direction === 'out' ? `학교 → ${ride.place}` : `${ride.place} → 학교`}
+                      <Card.Title className="text-headline-h5-bold" asChild>
+                        <h2>
+                          {direction === 'out' ? `학교 → ${ride.place}` : `${ride.place} → 학교`}
+                        </h2>
                       </Card.Title>
                       <Card.Action>
                         <Badge

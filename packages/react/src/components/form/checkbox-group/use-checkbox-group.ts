@@ -12,7 +12,7 @@ export type UseCheckboxGroupOptions<T extends string> = {
   value?: readonly T[];
   defaultValue?: readonly T[];
   onValueChange?: (value: T[]) => void;
-  ref?: Ref<HTMLDivElement>;
+  ref?: Ref<HTMLFieldSetElement>;
 };
 
 type Registered = { value: string; id: string; disabled: boolean };
@@ -33,7 +33,7 @@ export function useCheckboxGroup<T extends string>({
   const blankFromReactHookForm = !Array.isArray(stored);
   const value: readonly string[] = blankFromReactHookForm ? none : stored;
   const controlled = valueProp !== undefined;
-  const anchorRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLFieldSetElement>(null);
 
   const [items, setItems] = useState<readonly Registered[]>(none);
   const register = useCallback((itemValue: string, id: string, disabled: boolean) => {
@@ -70,7 +70,7 @@ export function useCheckboxGroup<T extends string>({
     if (!controlled) setValue(defaultValue, { silent: true });
   });
 
-  const forwardRootFocusToBox = (event: FocusEvent<HTMLDivElement>) => {
+  const forwardRootFocusToBox = (event: FocusEvent<HTMLFieldSetElement>) => {
     if (event.target !== event.currentTarget) return;
     const boxes = [
       ...event.currentTarget.querySelectorAll<HTMLInputElement>('input[type=checkbox]'),
@@ -78,8 +78,8 @@ export function useCheckboxGroup<T extends string>({
     (boxes.find((box) => box.checked) ?? boxes[0])?.focus();
   };
 
-  const rootRef: RefCallback<HTMLDivElement> = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(anchorRef, ref)(node),
+  const rootRef: RefCallback<HTMLFieldSetElement> = useCallback(
+    (node: HTMLFieldSetElement | null) => mergeRefs(anchorRef, ref)(node),
     [ref],
   );
 

@@ -44,7 +44,6 @@ const meta = {
     size: { control: 'radio', options: sizes },
     collapsible: { control: 'boolean' },
     disabled: { control: 'boolean' },
-    headingLevel: { control: { type: 'number', min: 1, max: 6 } },
   },
   args: {
     type: 'single',
@@ -418,5 +417,33 @@ export const CustomIndicator: Story = {
     await expect(second.querySelectorAll('svg')).toHaveLength(1);
     await userEvent.click(second);
     await expect(second).toHaveAttribute('data-open');
+  },
+};
+
+export const HeadingTag: Story = {
+  args: { type: 'single' },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Trigger 는 기본으로 `h3` 안에 놓입니다. 페이지 제목 바로 아래라면 `Accordion.Header asChild` 로 `h2` 를 넣습니다.',
+      },
+    },
+  },
+  render: () => (
+    <Accordion type="single">
+      <Accordion.Item value="shipping">
+        <Accordion.Header asChild>
+          <h2>
+            <Accordion.Trigger>배송은 얼마나 걸리나요?</Accordion.Trigger>
+          </h2>
+        </Accordion.Header>
+        <Accordion.Content>일반 배송 2~3일, 빠른 배송 1일.</Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  ),
+  play: async ({ canvas }) => {
+    const heading = canvas.getByRole('heading', { level: 2, name: /배송은/ });
+    await expect(heading).toContainElement(canvas.getByRole('button', { name: /배송은/ }));
   },
 };

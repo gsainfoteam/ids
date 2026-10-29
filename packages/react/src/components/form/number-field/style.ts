@@ -1,3 +1,4 @@
+import { fieldAction } from '../../../internal/field-surface';
 import { textControlStyle } from '../../../internal/text-control/style';
 import { tv } from '../../../utils';
 
@@ -7,11 +8,7 @@ export const numberFieldStyle = tv({
   extend: textControlStyle,
   slots: {
     stepper: 'flex shrink-0 flex-col self-center',
-    stepButton: [
-      'min-w-0 rounded-indicator px-0 text-(--ids-color-on-muted)',
-      'data-hovered:text-(--ids-color-on-surface) data-pressed:text-(--ids-color-on-surface)',
-      'touch-manipulation select-none',
-    ],
+    stepButton: [fieldAction.base, 'min-w-0 rounded-indicator px-0 touch-manipulation select-none'],
   },
   variants: {
     size: {

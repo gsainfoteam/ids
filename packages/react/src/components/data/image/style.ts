@@ -1,3 +1,4 @@
+import { overlayStyles } from '../../../internal/overlay/styles';
 import { slidesLayout } from '../../../internal/slides/layout';
 import { cn, tv } from '../../../utils';
 
@@ -33,10 +34,9 @@ export const imageStyle = tv({
     group: 'min-w-0',
     groupItem: 'flex min-w-0',
     backdrop: [
-      'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none touch-none border-0 p-0',
-      'bg-black/50 opacity-[var(--image-viewer-presence,1)]',
-      'transition-opacity duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
-      'starting:opacity-0 data-ending-style:opacity-0 data-swiping:transition-none',
+      overlayStyles.backdrop,
+      'touch-none opacity-[var(--image-viewer-presence,1)]',
+      'duration-(--ids-motion-normal) ease-out data-swiping:transition-none',
     ],
     viewer: [
       'group/viewer fixed inset-0 z-50 m-0 grid size-full max-h-none max-w-none overflow-hidden',

@@ -130,7 +130,9 @@ export function OTPFieldRoot({
   );
 
   return (
-    <OTPContext.Provider value={{ slots: state.slots, mask, placeholder, styles }}>
+    <OTPContext.Provider
+      value={{ slots: state.slots, mask, placeholder, invalid: isInvalid, styles }}
+    >
       <div
         ref={rootRef}
         className={styles.root({ className })}

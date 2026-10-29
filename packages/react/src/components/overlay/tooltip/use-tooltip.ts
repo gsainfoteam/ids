@@ -63,13 +63,27 @@ export function useTooltip({
   const [trigger, setTrigger] = useState<HTMLElement | null>(null);
   const [content, setContent] = useState<HTMLElement | null>(null);
   const [arrow, setArrow] = useState<HTMLElement | null>(null);
+  const [hoverHeldByEscape, setHoverHeldByEscape] = useState(false);
 
   const requestOpen = (next: boolean, _event?: Event, reason?: OpenChangeReason) => {
     const openedByReturnedFocus =
       next && reason === 'focus' && !!trigger && focusWasReturned(trigger);
-    if (next && (disabled || openedByReturnedFocus)) return;
+    const reopenedByHoverAfterEscape = next && reason === 'hover' && hoverHeldByEscape;
+    if (next && (disabled || openedByReturnedFocus || reopenedByHoverAfterEscape)) return;
+    if (!next && reason === 'escape-key') setHoverHeldByEscape(true);
     setOpen(next);
   };
+
+  useEffect(() => {
+    if (!hoverHeldByEscape || !trigger) return;
+
+    const doc = trigger.ownerDocument;
+    const releaseOutsideTrigger = (event: PointerEvent) => {
+      if (!trigger.contains(event.target as Node)) setHoverHeldByEscape(false);
+    };
+    doc.addEventListener('pointermove', releaseOutsideTrigger);
+    return () => doc.removeEventListener('pointermove', releaseOutsideTrigger);
+  }, [hoverHeldByEscape, trigger]);
 
   const anchored = useAnchored({
     open: shown,

@@ -5,7 +5,8 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const avatarGroupStyle = tv({
   slots: {
-    root: 'inline-flex items-center [--ag-gap:2px]',
+    root: 'm-0 inline-flex list-none items-center p-0 [--ag-gap:2px]',
+    item: 'flex',
     overflow: 'text-(--ids-color-on-surface) tabular-nums',
   },
   variants: {
@@ -16,7 +17,7 @@ export const avatarGroupStyle = tv({
     },
     layout: {
       stack: {
-        root: '[&>*:not(:first-child,[popover],[data-floating-ui-focus-guard])]:-ms-(--ag-overlap)',
+        root: '[&>:not(:first-child)]:-ms-(--ag-overlap)',
       },
       inline: {},
     } satisfies Record<AvatarGroupLayout, object>,

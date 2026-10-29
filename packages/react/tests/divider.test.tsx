@@ -11,6 +11,10 @@ const divider = (node: ReactNode) => parse(node).querySelector<HTMLElement>('[da
 
 test('a plain divider is a horizontal separator without focus or children', () => {
   const line = divider(<Divider />);
+  expect(line.tagName).toBe('HR');
+  expect(line.className, "the hr's own border and margin are reset").toMatch(
+    /\bm-0\b.*\bborder-0\b/,
+  );
   expect(line.getAttribute('role')).toBe('separator');
   expect(line.getAttribute('aria-orientation')).toBe('horizontal');
   expect(line.hasAttribute('tabindex')).toBe(false);
@@ -22,6 +26,9 @@ test('a plain divider is a horizontal separator without focus or children', () =
 test('vertical dividers stretch in a flex row and keep one line outside it', () => {
   const line = divider(<Divider orientation="vertical" />);
   expect(line.getAttribute('aria-orientation')).toBe('vertical');
+  expect(line.className, "preflight's hr height of 0 would block the stretch").toMatch(
+    /\bh-auto\b/,
+  );
   expect(line.dataset.orientation).toBe('vertical');
   expect(line.className).toMatch(/self-stretch/);
   expect(line.className).toMatch(/min-h-\[1lh\]/);
@@ -29,6 +36,7 @@ test('vertical dividers stretch in a flex row and keep one line outside it', () 
 
 test('a label names the separator by reference', () => {
   const line = divider(<Divider>or</Divider>);
+  expect(line.tagName, 'an hr cannot hold the label').toBe('DIV');
   const label = line.querySelector('span')!;
   expect(label.textContent).toBe('or');
   expect(line.getAttribute('aria-labelledby')).toBe(label.id);

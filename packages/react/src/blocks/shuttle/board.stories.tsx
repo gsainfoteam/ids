@@ -117,12 +117,14 @@ export const PC: Story = {
                     <Card.Description>
                       학생회관에서 타요 · {route.name}까지 {route.minutes}분
                     </Card.Description>
-                    <Card.Title className="text-headline-h3-bold">
-                      {wait === null
-                        ? '오늘은 끝났어요'
-                        : wait === 0
-                          ? '곧 떠나요'
-                          : `${wait}분 뒤`}
+                    <Card.Title className="text-headline-h3-bold" asChild>
+                      <h2>
+                        {wait === null
+                          ? '오늘은 끝났어요'
+                          : wait === 0
+                            ? '곧 떠나요'
+                            : `${wait}분 뒤`}
+                      </h2>
                     </Card.Title>
                     {next && (
                       <Card.Action>

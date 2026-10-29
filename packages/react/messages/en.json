@@ -68,12 +68,7 @@
   },
   "dataTable": {
     "empty": "No data.",
-    "firstPage": "First page",
-    "lastPage": "Last page",
-    "nextPage": "Next page",
     "page": "Page {page} of {count}",
-    "pagination": "Pagination",
-    "previousPage": "Previous page",
     "resize": "{column} column width",
     "selectAll": "Select all rows",
     "selectRow": "Select {label}",
@@ -190,7 +185,9 @@
     "label": "Verification code"
   },
   "pagination": {
+    "first": "First page",
     "label": "Pagination",
+    "last": "Last page",
     "next": "Next page",
     "page": "Page {page}",
     "previous": "Previous page"

@@ -15,6 +15,7 @@
 | [`host.tsx`](#hosttsx)                   | 항목을 그리는 `OverlayHost`, 항목에 붙는 binding, portal root            |
 | [`external-store.ts`](#external-storets) | `useSyncExternalStore` 가 읽는 작은 스토어                               |
 | [`interactions.ts`](#interactionsts)     | 컴포넌트가 쓰는 `@floating-ui/react` 의 상호작용 hook 과 파트            |
+| [`styles.ts`](#stylests)                 | 목록 팝업의 표면과 modal 배경의 클래스 조각(`overlayStyles`)             |
 
 ## 쓰는 곳
 
@@ -353,3 +354,24 @@ const scoped = useOverlay();                    // 부른 곳의 theme 으로 �
 
 - `useDismiss` 는 내보내지 않습니다. 닫기는 [`layer-stack.ts`](#layer-stackts) 의 일입니다.
 - 새 hook 이 필요하면 여기에 더합니다. 버전을 올릴 때 바뀐 API 를 이 파일 하나에서 찾습니다.
+
+## styles.ts
+
+레이어들이 같은 모양으로 그리는 클래스 조각입니다. `tv` 슬롯에 넣고, 길이나 이징 같은 다른 점만 뒤에 덧붙입니다.
+
+| 조각       | 쓰는 곳                                                    | 내용                                                                 |
+| ---------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
+| `popup`    | Menu 의 `content`, [field-popup](../field-popup/README.md) 의 `popup` | 위치, 테두리, 표면색, 글자, `shadow-md`, `concentric-p-1` 의 모서리 |
+| `backdrop` | Dialog, Drawer, Menu 의 팔레트, field-popup 의 drawer, Image 의 뷰어 | 화면을 덮는 `bg-black/50` 과 들어오고 나가는 opacity 전환           |
+
+```ts
+backdrop: [overlayStyles.backdrop, 'duration-(--ids-motion-normal) ease-out data-stacked:bg-transparent'],
+popup: [overlayStyles.popup, 'transition-[opacity,scale] duration-(--ids-motion-fast) ease-out'],
+```
+
+### 왜 이렇게
+
+- `popup` 은 `inset-ring` 이 아니라 진짜 테두리입니다(`borderOptionsCannotCover`). 스크롤 컨테이너에서 inset shadow 는 내용 아래에 칠해지므로, 강조된 옵션이 가장자리를 지날 때 테두리를 가립니다.
+- `popup` 은 모서리만 `concentric-p-1` 로 정하고 padding 은 0 입니다(`cornerOfThePaddedViewport`). padding 은 안의 `ScrollArea.Viewport` 가 가집니다.
+- transition 의 속성, 길이, 이징은 조각에 넣지 않습니다. field-popup 의 drawer 는 `translate` 도 움직이고 Drawer 는 끌기 중에 전환을 끕니다. Menu 에 `translate` 전환이 붙으면 anchor 를 따라가는 위치 이동까지 움직입니다.
+- 이 파일은 `'use client'` 가 없는 순수 모듈입니다. 서버에서 읽는 `style.ts` 가 `internal/overlay` 의 index 대신 이 파일을 바로 import 합니다.

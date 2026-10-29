@@ -79,10 +79,10 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 | `size`          | `standard`(기본) / `tiny`. 아바타로 전파     |
 | `shape`         | `circle`(기본) / `square`. 아바타로 전파     |
 | `overflowLabel` | `+N` 의 이름. 기본 `(count) => '외 N명'`     |
-| 그 외           | 루트 `div` 의 native 속성. `aria-label` 권장 |
+| 그 외           | 루트 `ul` 의 native 속성. `aria-label` 권장  |
 
 ## 알아둘 것
 
 - 자식 하나가 한 사람입니다. `<a href>` 나 툴팁으로 감싼 아바타도 한 사람으로 세고, 안쪽 아바타가 오려집니다.
 - 겹침 간격은 `size` 에 맞춰져 있습니다. 아바타 크기를 `className` 으로 따로 바꾸면 겹침이 맞지 않습니다.
-- 아바타 옆에 제자리로 렌더된 팝오버(`[popover]`)와 그 focus guard 는 겹치게 당기지 않습니다.
+- 루트는 `ul`, 아바타는 하나씩 `li` 에 담깁니다. 겹치게 당기는 것은 `li` 라서, 아바타 옆에 제자리로 렌더된 팝오버와 그 focus guard 는 당겨지지 않습니다.

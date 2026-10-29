@@ -188,9 +188,9 @@ const [step, setStep] = useState(0);
 - 기본 표시는 upcoming 과 current 가 번호, completed 가 체크, error 가 X, 기록의 neutral 이 점입니다. `children` 에 `null` 을 주면 비웁니다.
 - 아바타는 `Stepper.Indicator asChild` 로 둡니다. 표시의 크기와 둥근 모양을 받고 `aria-hidden` 이 되어, 이름은 제목이 읽습니다.
 - 시각은 새 파트 없이 `Stepper.Description` 안에 `<time dateTime>` 으로 적습니다. 기계가 읽는 값과 사람이 읽는 글이 함께 남습니다.
-- `Trigger` 를 생략하면 Item 의 내용이 기본 Trigger 에 들어갑니다. `Separator` 를 생략하면 마지막이 아닌 단계 끝에 연결선이 붙습니다.
+- `Trigger` 를 생략하면 Item 의 내용이 기본 Trigger 에 들어갑니다. `Separator` 를 생략하면 마지막이 아닌 단계 끝에 연결선(장식용 `Divider`, `<hr aria-hidden>`)이 붙습니다.
 - `Indicator`, `Title`, `Description`, `Body` 는 `asChild` 로 자식 요소에 속성을 합칩니다.
-- 모든 파트의 `className`, `style`, `children` 은 단계 상태 `{ index, status, current, disabled, last }` 를 받는 함수도 됩니다. `Trigger` 는 `hovered`, `focusVisible` 같은 인터랙션 상태도 받습니다.
+- 모든 파트의 `className`, `style`, `children`(Separator 는 `children` 없음) 은 단계 상태 `{ index, status, current, disabled, last }` 를 받는 함수도 됩니다. `Trigger` 는 `hovered`, `focusVisible` 같은 인터랙션 상태도 받습니다.
 - `Stepper.Item` 은 `Stepper` 의 바로 아래 자식이어야 합니다. 직접 만든 컴포넌트로 감싸면 단계로 세지 않고, 개발 모드에서 경고합니다.
 
 ## 키보드

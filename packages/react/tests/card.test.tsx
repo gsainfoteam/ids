@@ -40,6 +40,21 @@ test('SSR: a static card has no role and every part marks itself', () => {
   );
 });
 
+test('SSR: the title is an h3, asChild picks another tag, and its button sits inside', () => {
+  expect(parse(renderToString(anatomy())).querySelector('[data-card-title]')!.tagName).toBe('H3');
+  const doc = parse(
+    renderToString(
+      <Card onClick={() => {}}>
+        <Card.Title asChild>
+          <h2>Design review</h2>
+        </Card.Title>
+      </Card>,
+    ),
+  );
+  const button = doc.querySelector('h2[data-card-title] > button[data-surface-trigger]')!;
+  expect(button.textContent).toBe('Design review');
+});
+
 test('SSR: a pressable card already renders its title as the button, inside a heading given by asChild', () => {
   const doc = parse(
     renderToString(

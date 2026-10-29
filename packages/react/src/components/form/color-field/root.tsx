@@ -237,9 +237,9 @@ export function ColorFieldRoot({
           initialFocusSelector={FIRST_CONTROL}
           role="dialog"
           id={popupId}
-          {...(native['aria-labelledby']
-            ? { 'aria-labelledby': native['aria-labelledby'] }
-            : { 'aria-label': native['aria-label'] ?? t('colorField.dialog') })}
+          aria-labelledby={native['aria-labelledby']}
+          aria-label={native['aria-labelledby'] ? undefined : native['aria-label']}
+          label={t('colorField.dialog')}
           data-color-field-popup={popupId}
           className={styles.popup()}
           onBlur={(event) => {

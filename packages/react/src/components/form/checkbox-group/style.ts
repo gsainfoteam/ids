@@ -3,7 +3,7 @@ import { tv } from '../../../utils';
 import type { CheckboxGroupOrientation } from '.';
 
 export const checkboxGroupStyle = tv({
-  base: 'relative flex outline-none',
+  base: 'relative m-0 flex min-w-0 border-0 p-0 outline-none',
   variants: {
     orientation: {
       vertical: 'flex-col gap-3',

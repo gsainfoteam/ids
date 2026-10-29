@@ -29,7 +29,7 @@ function Masked({
 }
 
 export function OTPFieldSlot({ index, className, children, ...props }: OTPFieldSlotProps) {
-  const { slots, mask, placeholder, styles } = useOTPContext('OTPField.Slot');
+  const { slots, mask, placeholder, invalid, styles } = useOTPContext('OTPField.Slot');
   const grouped = use(GroupContext);
   const state = slots[index];
   invariant(state, `OTPField.Slot: index ${index} is outside the code length.`);
@@ -56,8 +56,10 @@ export function OTPFieldSlot({ index, className, children, ...props }: OTPFieldS
       aria-hidden="true"
       data-otp-slot={index}
       data-active={state.isActive ? '' : undefined}
+      data-focus-visible={state.isActive ? '' : undefined}
       data-filled={state.isFilled ? '' : undefined}
       data-grouped={grouped ? '' : undefined}
+      data-invalid={invalid ? '' : undefined}
       className={styles.slot({ className: resolvedClassName })}
     >
       {content}

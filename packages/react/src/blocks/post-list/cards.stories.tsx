@@ -228,7 +228,9 @@ export const PC: Story = {
                     <Card.Description>
                       {CATEGORY_LABEL[post.category]} · {dayOf(post.postedOn)}
                     </Card.Description>
-                    <Card.Title>{post.title}</Card.Title>
+                    <Card.Title asChild>
+                      <h2>{post.title}</h2>
+                    </Card.Title>
                     {post.pinned && (
                       <Card.Action>
                         <Badge content="고정" variant="soft" colorScheme="primary" />

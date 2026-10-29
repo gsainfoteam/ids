@@ -5,13 +5,14 @@ import {
   type AccordionContentProps,
   type AccordionContentState,
 } from './content';
+import { AccordionHeader, type AccordionHeaderProps } from './header';
 import {
   AccordionIndicator,
   type AccordionIndicatorProps,
   type AccordionIndicatorState,
 } from './indicator';
 import { AccordionItem, type AccordionItemProps, type AccordionItemState } from './item';
-import { AccordionRoot, type AccordionVariant, type AccordionHeadingLevel } from './root';
+import { AccordionRoot, type AccordionVariant } from './root';
 import { accordionStyle } from './style';
 import {
   AccordionTrigger,
@@ -29,7 +30,6 @@ export function Accordion<T extends string = string>(props: Accordion.Props<T>) 
 
 export namespace Accordion {
   export type Variant = AccordionVariant;
-  export type HeadingLevel = AccordionHeadingLevel;
 
   export type State<T extends string = string> = {
     value: AccordionValue<T>;
@@ -44,7 +44,6 @@ export namespace Accordion {
       variant?: AccordionVariant;
       size?: IdsSize;
       disabled?: boolean;
-      headingLevel?: AccordionHeadingLevel;
     };
 
   export type SingleProps<T extends string = string> = RootProps<T> & {
@@ -71,6 +70,11 @@ export namespace Accordion {
     export type Props = AccordionItemProps;
   }
 
+  export const Header = AccordionHeader;
+  export namespace Header {
+    export type Props = AccordionHeaderProps;
+  }
+
   export const Trigger = AccordionTrigger;
   export namespace Trigger {
     export type State = AccordionTriggerState;
@@ -92,4 +96,4 @@ export namespace Accordion {
   export const Style = accordionStyle;
 }
 
-export type { AccordionVariant, AccordionHeadingLevel } from './root';
+export type { AccordionVariant } from './root';
