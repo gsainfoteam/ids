@@ -49,10 +49,58 @@ jobs:
       - name: Check the examples server-render IDS
         run: pnpm examples:check
 
-      - name: Install Chromium, Firefox and WebKit for browser tests
-        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium firefox webkit
+      - name: Install Chromium for browser tests
+        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium
 
       - run: pnpm test
+        env:
+          IDS_BROWSERS: chromium
+
+      - name: Upload the failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots-chromium
+          path: packages/react/.vitest/attachments/failure-screenshots
+
+  engines:
+    name: Browser tests (${{ matrix.browser }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - browser: firefox
+            retry: 0
+          - browser: webkit
+            retry: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      - name: Install ${{ matrix.browser }}
+        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell ${{ matrix.browser }}
+
+      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --project browser --retry ${{ matrix.retry }}
+        env:
+          IDS_BROWSERS: ${{ matrix.browser }}
+
+      - name: Upload the failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-screenshots-${{ matrix.browser }}
+          path: packages/react/.vitest/attachments/failure-screenshots
 
   visual:
     name: Visual regression (Playwright Linux image)
