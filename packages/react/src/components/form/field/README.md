@@ -39,6 +39,7 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 - 입력은 native 요소이거나, 받은 `id`, ARIA, 상태, 이벤트, ref를 실제 입력으로 넘기는 컴포넌트여야 합니다.
 - `aria-describedby` 에는 화면에 보이는 설명과 오류만 들어갑니다.
 - `Field.Label` 은 `Label` 로 그립니다. 크기, 필수 `*`, 비활성, 오류 색을 Field에서 받고, 누르면 RadioGroup 같은 커스텀 컨트롤로도 포커스가 갑니다.
+- `<Field.Label required={false}>` 는 Field 가 `required` 여도 `*` 를 그리지 않습니다. 모든 칸이 필수인 로그인 폼처럼 표시가 소음일 때 씁니다.
 
 ## 상태
 

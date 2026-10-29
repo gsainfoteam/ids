@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, test } from 'vitest';
+import { render } from 'vitest-browser-react';
 
 import { Avatar, Badge } from '../src';
 
@@ -116,4 +117,24 @@ test('className takes the badge state', () => {
   });
   expect(root.classList.contains('count-120')).toBe(true);
   expect(root.classList.contains('over-true')).toBe(true);
+});
+
+test('an icon in the content takes the text size, labelled or not', async () => {
+  const content = (
+    <>
+      <svg viewBox="0 0 24 24" />
+      Done
+    </>
+  );
+  const screen = await render(
+    <>
+      <Badge content={content} />
+      <Badge content={content} aria-label="Done" size="tiny" />
+    </>,
+  );
+  const [standard, tiny] = Array.from(screen.container.querySelectorAll('svg'), (icon) =>
+    icon.getBoundingClientRect(),
+  );
+  expect([standard.width, standard.height]).toEqual([12, 12]);
+  expect([tiny.width, tiny.height]).toEqual([10, 10]);
 });

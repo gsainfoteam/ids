@@ -25,6 +25,7 @@ import { Badge } from '@gsainfoteam/ids-react';
 <Badge content={0}>...</Badge>                // 숨는다
 <Badge content={0} showZero>...</Badge>       // 0
 <Badge content="New">...</Badge>              // 숫자가 아니어도 된다
+<Badge content={<><CheckIcon />완료</>} />  // 아이콘은 글자 크기에 맞춰 그린다
 ```
 
 - 음수와 소수는 0 이상의 정수로 셉니다.

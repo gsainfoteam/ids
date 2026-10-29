@@ -6,9 +6,9 @@ import { Label as BaseLabel } from '../../typography/label';
 
 import type { FieldPartProps } from './part';
 
-export type FieldLabelProps = FieldPartProps<'label', FieldState>;
+export type FieldLabelProps = FieldPartProps<'label', FieldState> & { required?: boolean };
 
-export function FieldLabel({ className, style, children, ...rest }: FieldLabelProps) {
+export function FieldLabel({ required, className, style, children, ...rest }: FieldLabelProps) {
   const { controlId, state } = useFieldContext('Label');
 
   return (
@@ -17,7 +17,7 @@ export function FieldLabel({ className, style, children, ...rest }: FieldLabelPr
         {...rest}
         htmlFor={controlId}
         size={state.size}
-        required={state.required}
+        required={required ?? state.required}
         disabled={state.disabled}
         invalid={state.invalid}
         data-field-part="label"

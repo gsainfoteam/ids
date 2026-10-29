@@ -97,12 +97,18 @@ export const badgeStyle = tv({
     {
       dot: false,
       size: 'standard',
-      class: { indicator: 'h-5 min-w-5 px-1.5 text-caption-c1-medium leading-none' },
+      class: {
+        indicator:
+          'h-5 min-w-5 px-1.5 text-caption-c1-medium leading-none gap-0.5 [&_svg]:size-3 [&_svg]:shrink-0',
+      },
     },
     {
       dot: false,
       size: 'tiny',
-      class: { indicator: 'h-4 min-w-4 px-1 text-caption-c2-medium leading-none' },
+      class: {
+        indicator:
+          'h-4 min-w-4 px-1 text-caption-c2-medium leading-none gap-0.5 [&_svg]:size-2.5 [&_svg]:shrink-0',
+      },
     },
     { dot: true, size: 'standard', class: { indicator: 'size-2.5' } },
     { dot: true, size: 'tiny', class: { indicator: 'size-2' } },

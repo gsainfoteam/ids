@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { BellIcon, EnvelopeIcon, InboxIcon } from '@heroicons/react/24/outline';
+import { BellIcon, CheckIcon, EnvelopeIcon, InboxIcon } from '@heroicons/react/24/outline';
 import { expect, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
@@ -146,6 +146,29 @@ export const Gallery: Story = {
             받은 편지함
             <Badge content={12} variant="soft" colorScheme="primary" size="tiny" />
           </span>
+        </Showcase.Row>
+        <Showcase.Row label="icon">
+          <Badge
+            content={
+              <>
+                <CheckIcon />
+                완료
+              </>
+            }
+            variant="soft"
+            colorScheme="success"
+          />
+          <Badge
+            content={
+              <>
+                <CheckIcon />
+                완료
+              </>
+            }
+            variant="soft"
+            colorScheme="success"
+            size="tiny"
+          />
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
