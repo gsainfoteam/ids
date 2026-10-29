@@ -13,7 +13,7 @@ import {
 import { HeartIcon as HeartOutlineIcon } from '@heroicons/react/24/outline';
 import { expect, fn, waitFor } from 'storybook/test';
 
-import { Showcase } from '~story-kit';
+import { Showcase, holdTheNextCall } from '~story-kit';
 
 import { isDevelopment } from '../../../utils/dev';
 import { Spinner } from '../../feedback/spinner';
@@ -166,7 +166,10 @@ export const AutomaticLabel: Story = {
   },
 };
 
+const A_SAVE_TAKES = 800;
+
 export const Loading: Story = {
+  args: { onClick: fn(() => new Promise((resolve) => setTimeout(resolve, A_SAVE_TAKES))) },
   render: function Render(args) {
     const [saving, setSaving] = useState(false);
 
@@ -178,10 +181,10 @@ export const Loading: Story = {
         aria-busy={saving}
         aria-label={saving ? '저장 중' : '저장'}
         icon={saving ? <Spinner decorative /> : <CheckIcon />}
-        onClick={(event) => {
-          args.onClick?.(event);
+        onClick={async (event) => {
           setSaving(true);
-          setTimeout(() => setSaving(false), 800);
+          await args.onClick?.(event);
+          setSaving(false);
         }}
       />
     );
@@ -195,17 +198,21 @@ export const Loading: Story = {
     },
   },
   play: async ({ canvas, userEvent, args }) => {
-    const button = canvas.getByRole('button', { name: '저장' });
-    const before = button.getBoundingClientRect();
-    await userEvent.click(button);
-    await expect(button).toHaveAccessibleName('저장 중');
-    await expect(button).toHaveFocus();
-    const spinner = button.firstElementChild as HTMLElement;
+    const finishSave = holdTheNextCall(args.onClick);
+    const button = () => canvas.getByRole('button');
+    const before = button().getBoundingClientRect();
+
+    await userEvent.click(button());
+    await expect(button()).toHaveAccessibleName('저장 중');
+    await expect(button()).toHaveFocus();
+    const spinner = button().firstElementChild as HTMLElement;
     await expect(spinner.getBoundingClientRect().width).toBe(16);
-    await expect(button.getBoundingClientRect().width).toBe(before.width);
-    await userEvent.click(button);
+    await expect(button().getBoundingClientRect().width).toBe(before.width);
+    await userEvent.click(button());
     await expect(args.onClick).toHaveBeenCalledOnce();
-    await waitFor(() => expect(button).toHaveAccessibleName('저장'));
+
+    finishSave();
+    await waitFor(() => expect(button()).toHaveAccessibleName('저장'));
   },
 };
 

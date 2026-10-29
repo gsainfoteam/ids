@@ -654,7 +654,10 @@ default, so on macOS `pnpm test` runs Chromium only; CI (ubuntu) runs all three,
   (`focusableWhenDisabled`), assert `disabled` itself.
 - Never assert a state that only lasts until a timer fires. Declare the duration the code reads
   (an inline `transition-duration`) and end it with `getAnimations().forEach((a) => a.finish())`,
-  or fake only the clock involved: `vi.useFakeTimers({ toFake: ['Date'] })`.
+  or fake only the clock involved: `vi.useFakeTimers({ toFake: ['Date'] })`. A story whose demo
+  waits (a save, an upload) awaits a promise from its `fn()` spy arg, and its `play` holds that
+  promise with `holdTheNextCall` from `~story-kit` and releases it after the assertions, so a busy
+  machine cannot end the wait early or late.
 - Console output of passing tests is hidden. Run with `--silent=false` to see React warnings.
 
 **Accessibility.** The axe options live in `parameters.a11y` of `.storybook/preview.tsx`, which

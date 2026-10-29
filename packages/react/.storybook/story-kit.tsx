@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import type { Mock } from 'storybook/test';
+
 import { cn } from '../src/utils';
 
 export function Showcase({ children, className }: { children: ReactNode; className?: string }) {
@@ -79,4 +81,15 @@ export namespace Showcase {
       </div>
     );
   }
+}
+
+export function holdTheNextCall(spy: unknown) {
+  let release = () => {};
+  (spy as Mock).mockImplementationOnce(
+    () =>
+      new Promise<void>((resolve) => {
+        release = resolve;
+      }),
+  );
+  return () => release();
 }
