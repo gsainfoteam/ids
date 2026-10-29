@@ -615,6 +615,12 @@ default, so on macOS `pnpm test` runs Chromium only; CI (ubuntu) runs all three,
 `pnpm test:browsers` runs all three in the Playwright Linux image through Docker.
 `IDS_BROWSERS=firefox,webkit` picks engines by hand.
 
+CI gives each engine its own runner: the JS job runs `pnpm test` with Chromium, and the
+`engines` job runs the browser project once for Firefox and once for WebKit. On one shared
+four-core runner WebKit, the slowest, got so little CPU that a 600ms timer or a typed string took
+seconds, and plays that wait on a timer failed at random. `turbo.json` passes `IDS_BROWSERS`
+through to the test task, since turbo hides undeclared variables from it.
+
 - A test that needs CDP starts with `skipWithoutCdp(context)` from `tests/engines.ts`, which skips it
   outside Chromium with the reason. A test that relies on something another engine cannot do
   from a test skips with `skipInFirefox(context, reason)` and a named reason.

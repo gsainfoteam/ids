@@ -49,10 +49,40 @@ jobs:
       - name: Check the examples server-render IDS
         run: pnpm examples:check
 
-      - name: Install Chromium, Firefox and WebKit for browser tests
-        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium firefox webkit
+      - name: Install Chromium for browser tests
+        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium
 
       - run: pnpm test
+        env:
+          IDS_BROWSERS: chromium
+
+  engines:
+    name: Browser tests (${{ matrix.browser }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      - name: Install ${{ matrix.browser }}
+        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell ${{ matrix.browser }}
+
+      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --project browser
+        env:
+          IDS_BROWSERS: ${{ matrix.browser }}
 
   visual:
     name: Visual regression (Playwright Linux image)
