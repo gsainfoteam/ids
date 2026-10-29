@@ -98,6 +98,13 @@ jobs:
           name: failure-screenshots-${{ matrix.browser }}
           path: packages/react/.vitest/attachments/failure-screenshots
 
+      - name: Upload the WebKit timer probe
+        if: always() && matrix.browser == 'webkit'
+        uses: actions/upload-artifact@v4
+        with:
+          name: webkit-probe
+          path: packages/react/.vitest/webkit-probe
+
   visual:
     name: Visual regression (Playwright Linux image)
     if: vars.IDS_VISUAL_CHECK == 'true'
