@@ -164,13 +164,8 @@ export const PC: Story = {
           icon={<DocumentDuplicateIcon />}
           onClick={() => toast.success('답을 복사했어요')}
         />
-        <IconToggle variant="outline" size="tiny" aria-label="좋은 답" icon={<HandThumbUpIcon />} />
-        <IconToggle
-          variant="outline"
-          size="tiny"
-          aria-label="아쉬운 답"
-          icon={<HandThumbDownIcon />}
-        />
+        <IconToggle size="tiny" aria-label="좋은 답" icon={<HandThumbUpIcon />} />
+        <IconToggle size="tiny" aria-label="아쉬운 답" icon={<HandThumbDownIcon />} />
         <IconButton
           variant="outline"
           size="tiny"
@@ -419,7 +414,7 @@ export const PC: Story = {
                 aria-label="파일 붙이기"
                 icon={<PaperClipIcon />}
               />
-              <Toggle variant="outline" size="tiny">
+              <Toggle size="tiny">
                 <GlobeAltIcon />웹 검색
               </Toggle>
               <Spacer />

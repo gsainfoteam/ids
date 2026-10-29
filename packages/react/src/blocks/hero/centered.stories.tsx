@@ -73,7 +73,7 @@ export const PC: Story = {
                 <Badge content="3" variant="soft" colorScheme="primary" />
               </Card.Action>
             </Card.Header>
-            <Item.Group variant="bordered" size="tiny">
+            <Item.Group size="tiny">
               {NOTICES.map((notice) => (
                 <Item key={notice.id}>
                   <Item.Media variant="soft">
@@ -107,7 +107,7 @@ export const PC: Story = {
                 <Card.Description>오늘 점심 · 학생식당</Card.Description>
                 <Card.Title>제육볶음, 된장찌개</Card.Title>
                 <Card.Action>
-                  <Badge content="5,000원" variant="outline" colorScheme="neutral" />
+                  <Badge content="5,000원" variant="outline" />
                 </Card.Action>
               </Card.Header>
             </Card>

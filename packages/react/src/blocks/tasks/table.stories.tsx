@@ -181,7 +181,7 @@ const COLUMNS = column.columns([
     size: 320,
     cell: ({ row, getValue }) => (
       <>
-        <Badge content={row.original.label} variant="outline" colorScheme="neutral" /> {getValue()}
+        <Badge content={row.original.label} variant="outline" /> {getValue()}
       </>
     ),
   }),

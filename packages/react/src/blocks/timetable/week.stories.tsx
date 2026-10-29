@@ -155,7 +155,7 @@ export const PC: Story = {
               <h2>듣는 과목</h2>
             </Card.Title>
           </Card.Header>
-          <Item.Group variant="bordered" size="tiny" aria-label="듣는 과목">
+          <Item.Group size="tiny" aria-label="듣는 과목">
             {COURSES.map((course) => (
               <Item key={course.id}>
                 <Item.Content>
@@ -170,11 +170,7 @@ export const PC: Story = {
                   </Item.Description>
                 </Item.Content>
                 <Item.Actions>
-                  <Badge
-                    content={`${course.credits}학점`}
-                    variant="outline"
-                    colorScheme="neutral"
-                  />
+                  <Badge content={`${course.credits}학점`} variant="outline" />
                 </Item.Actions>
               </Item>
             ))}

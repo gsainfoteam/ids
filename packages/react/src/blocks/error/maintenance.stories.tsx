@@ -47,7 +47,7 @@ export const PC: Story = {
             </Card.Title>
             <Card.Description>10월 3일 금요일</Card.Description>
             <Card.Action>
-              <Badge content="약 2시간 남음" variant="soft" colorScheme="neutral" />
+              <Badge content="약 2시간 남음" variant="soft" />
             </Card.Action>
           </Card.Header>
           <Card.Content className="flex flex-col gap-6">

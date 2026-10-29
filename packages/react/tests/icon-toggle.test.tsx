@@ -8,14 +8,14 @@ import { IconToggle } from '../src';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
-test('SSR: named from the icon, pressed state exposed, ghost by default', () => {
+test('SSR: named from the icon, pressed state exposed, outline by default', () => {
   const toggle = parse(
     renderToString(<IconToggle icon={<BoldIcon />} defaultPressed />),
   ).querySelector('button')!;
   expect(toggle.getAttribute('aria-label')).toBe('Bold');
   expect(toggle.getAttribute('aria-pressed')).toBe('true');
   expect(toggle.hasAttribute('data-pressed')).toBe(true);
-  expect(toggle.dataset.variant).toBe('ghost');
+  expect(toggle.dataset.variant).toBe('outline');
 });
 
 test('an explicit name wins and stays put while the icon follows the state', async () => {

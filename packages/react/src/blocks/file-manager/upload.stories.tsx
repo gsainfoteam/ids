@@ -79,7 +79,7 @@ export const PC: Story = {
               maxSize={100 * 1024 * 1024}
             />
 
-            <Item.Group variant="bordered" size="tiny" aria-label="올리는 파일">
+            <Item.Group size="tiny" aria-label="올리는 파일">
               {UPLOADS.map((upload) => (
                 <Item key={upload.id}>
                   <Item.Media variant="soft">{upload.icon}</Item.Media>

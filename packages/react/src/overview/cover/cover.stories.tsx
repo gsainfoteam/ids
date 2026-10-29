@@ -461,7 +461,7 @@ export const Cover: Story = {
                   <Card.Header>
                     <Card.Title>알림</Card.Title>
                     <Card.Action>
-                      <Badge content={3} aria-label="새 알림 3개" />
+                      <Badge content={3} aria-label="새 알림 3개" colorScheme="danger" />
                     </Card.Action>
                   </Card.Header>
                   <Item.Group aria-label="알림" size="tiny">
@@ -709,7 +709,7 @@ export const Cover: Story = {
                   <Card.Header>
                     <Card.Title>대출 중인 책</Card.Title>
                   </Card.Header>
-                  <Item.Group variant="bordered" aria-label="대출 중인 책" size="tiny">
+                  <Item.Group aria-label="대출 중인 책" size="tiny">
                     <Item>
                       <Item.Content>
                         <Item.Title>클린 코드</Item.Title>
@@ -839,7 +839,7 @@ export const Cover: Story = {
                           </Badge>
                         </Card.Action>
                       </Card.Header>
-                      <Item.Group variant="bordered" aria-label="식당" size="tiny">
+                      <Item.Group aria-label="식당" size="tiny">
                         <Item>
                           <Item.Media variant="soft">
                             <BuildingStorefrontIcon />

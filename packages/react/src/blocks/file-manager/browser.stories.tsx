@@ -212,7 +212,7 @@ export const PC: Story = {
           </div>
 
           {shown.length === 0 ? (
-            <Empty variant="outline">
+            <Empty>
               <Empty.Media>
                 <MagnifyingGlassIcon />
               </Empty.Media>
@@ -239,7 +239,7 @@ export const PC: Story = {
             </ul>
           ) : (
             <Card size="tiny">
-              <Item.Group variant="bordered" aria-label="파일">
+              <Item.Group aria-label="파일">
                 {shown.map((file) => (
                   <Item key={file.id}>
                     <Item.Media variant="soft">{KIND_ICON[file.kind]}</Item.Media>

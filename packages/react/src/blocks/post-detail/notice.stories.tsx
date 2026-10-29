@@ -54,7 +54,7 @@ export const PC: Story = {
         <article>
           <Card.Header className="border-b">
             <div className="flex flex-wrap gap-1.5">
-              <Badge content="학사" variant="soft" colorScheme="neutral" />
+              <Badge content="학사" variant="soft" />
               <Badge content="중요" variant="soft" colorScheme="danger" />
             </div>
             <Card.Title asChild>
@@ -127,7 +127,7 @@ export const PC: Story = {
 
       <nav aria-label="다른 글">
         <Card size="tiny">
-          <Item.Group variant="bordered" aria-label="이전 글과 다음 글">
+          <Item.Group aria-label="이전 글과 다음 글">
             {NEIGHBORS.map((neighbor) => (
               <Item key={neighbor.id} asChild>
                 <a href={`#${neighbor.id}`}>

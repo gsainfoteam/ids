@@ -64,7 +64,7 @@ export const PC: Story = {
             장바구니
           </h1>
           {lines.length === 0 ? (
-            <Empty variant="outline">
+            <Empty>
               <Empty.Media>
                 <ShoppingBagIcon />
               </Empty.Media>
@@ -77,7 +77,7 @@ export const PC: Story = {
             </Empty>
           ) : (
             <Card size="tiny">
-              <Item.Group variant="bordered" aria-label="담은 상품">
+              <Item.Group aria-label="담은 상품">
                 {lines.map((product) => (
                   <Item key={product.id}>
                     <Item.Media>

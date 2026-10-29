@@ -219,7 +219,7 @@ export const PC: Story = {
             </Stepper.Content>
 
             <Stepper.Content value={3}>
-              <Empty variant="outline">
+              <Empty>
                 <Empty.Media>
                   <CheckCircleIcon />
                 </Empty.Media>

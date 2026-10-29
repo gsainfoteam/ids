@@ -292,7 +292,7 @@ export const PC: Story = {
           {TABS.map((tab) => (
             <Tabs.Content key={tab.value} value={tab.value} className="flex flex-col gap-6">
               {shown.length === 0 ? (
-                <Empty variant="outline">
+                <Empty>
                   <Empty.Media>
                     <MagnifyingGlassIcon />
                   </Empty.Media>
@@ -303,7 +303,7 @@ export const PC: Story = {
                 </Empty>
               ) : (
                 <Card size="tiny">
-                  <Item.Group variant="bordered" aria-label="글 목록">
+                  <Item.Group aria-label="글 목록">
                     {shown.map((post) => (
                       <Item key={post.id} asChild>
                         <a href={`#${post.id}`}>
@@ -321,11 +321,7 @@ export const PC: Story = {
                             </Item.Description>
                           </Item.Content>
                           <Item.Actions>
-                            <Badge
-                              content={`댓글 ${post.comments}`}
-                              variant="outline"
-                              colorScheme="neutral"
-                            />
+                            <Badge content={`댓글 ${post.comments}`} variant="outline" />
                           </Item.Actions>
                         </a>
                       </Item>

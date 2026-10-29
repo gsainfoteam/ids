@@ -160,7 +160,7 @@ export const PC: Story = {
             return (
               <Tabs.Content key={tab.value} value={tab.value} className="flex flex-col gap-6">
                 {shown.length === 0 && (
-                  <Empty variant="outline">
+                  <Empty>
                     <Empty.Media>
                       <BellSlashIcon />
                     </Empty.Media>
@@ -181,7 +181,7 @@ export const PC: Story = {
                         {day}
                       </h2>
                       <Card size="tiny">
-                        <Item.Group variant="bordered" aria-label={`${day} 알림`}>
+                        <Item.Group aria-label={`${day} 알림`}>
                           {ofTheDay.map((notification) => (
                             <Item key={notification.id} onClick={() => markRead(notification.id)}>
                               <Item.Media variant={notification.icon ? 'soft' : undefined}>

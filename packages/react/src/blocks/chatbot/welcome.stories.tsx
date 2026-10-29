@@ -97,7 +97,7 @@ export const PC: Story = {
                 aria-label="파일 붙이기"
                 icon={<PaperClipIcon />}
               />
-              <Toggle variant="outline" size="tiny">
+              <Toggle size="tiny">
                 <GlobeAltIcon />웹 검색
               </Toggle>
               <Spacer />

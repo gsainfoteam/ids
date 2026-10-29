@@ -56,7 +56,6 @@ export const PC: Story = {
             <h1 className="text-headline-h3-bold">{stop} 정류장</h1>
           </div>
           <IconToggle
-            variant="outline"
             aria-label="즐겨찾기"
             icon={<StarIcon />}
             defaultPressed
@@ -75,7 +74,7 @@ export const PC: Story = {
         </div>
 
         <Card size="tiny">
-          <Item.Group variant="bordered" aria-label={`${stop}에 곧 오는 셔틀`}>
+          <Item.Group aria-label={`${stop}에 곧 오는 셔틀`}>
             {arrivals.map((arrival, index) => (
               <Item key={arrival.id}>
                 <Item.Content>

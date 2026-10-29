@@ -163,7 +163,7 @@ export const PC: Story = {
               />
               <Card.Title className="text-headline-h5-bold">{name || '행사 이름'}</Card.Title>
             </Card.Header>
-            <Item.Group variant="bordered" size="tiny" aria-label="행사 정보">
+            <Item.Group size="tiny" aria-label="행사 정보">
               <Item>
                 <Item.Content>
                   <Item.Description>날짜</Item.Description>

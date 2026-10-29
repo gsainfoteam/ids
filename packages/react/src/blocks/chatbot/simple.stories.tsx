@@ -62,13 +62,8 @@ export const PC: Story = {
 
     const feedback = (
       <div className="flex gap-1">
-        <IconToggle variant="outline" size="tiny" aria-label="좋은 답" icon={<HandThumbUpIcon />} />
-        <IconToggle
-          variant="outline"
-          size="tiny"
-          aria-label="아쉬운 답"
-          icon={<HandThumbDownIcon />}
-        />
+        <IconToggle size="tiny" aria-label="좋은 답" icon={<HandThumbUpIcon />} />
+        <IconToggle size="tiny" aria-label="아쉬운 답" icon={<HandThumbDownIcon />} />
         <IconButton
           variant="outline"
           size="tiny"

@@ -22,7 +22,7 @@ export type ItemGroupProps = Omit<ComponentProps<'ul'>, 'ref'> & {
 };
 
 export function ItemGroup({
-  variant = 'ghost',
+  variant = 'bordered',
   ordered = false,
   size,
   dense,

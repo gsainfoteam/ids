@@ -135,7 +135,7 @@ export const PC: Story = {
 
             {section === 'account' && (
               <Card>
-                <Item.Group variant="bordered" aria-label="계정 정보">
+                <Item.Group aria-label="계정 정보">
                   {ACCOUNT.map((row) => (
                     <Item key={row.id}>
                       <Item.Content>

@@ -100,7 +100,7 @@ export const PC: Story = {
             </header>
 
             <Card size="tiny">
-              <Item.Group variant="bordered" aria-label="행사 정보">
+              <Item.Group aria-label="행사 정보">
                 {FACTS.map((fact) => (
                   <Item key={fact.id}>
                     <Item.Media variant="soft">{fact.icon}</Item.Media>

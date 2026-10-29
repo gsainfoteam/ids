@@ -149,7 +149,7 @@ export const PC: Story = {
         </div>
 
         {shown.length === 0 ? (
-          <Empty variant="outline">
+          <Empty>
             <Empty.Media>
               <UserGroupIcon />
             </Empty.Media>

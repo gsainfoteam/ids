@@ -33,7 +33,7 @@ export function FileList({ asChild, children, className, ...props }: FileListPro
   if (asChild) return part('div', true, items, mergeProps(props, { ...list, role: 'list' }));
 
   return (
-    <Item.Group {...props} {...list} size={c.size} dense>
+    <Item.Group variant="ghost" {...props} {...list} size={c.size} dense>
       {items}
     </Item.Group>
   );

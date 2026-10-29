@@ -106,7 +106,6 @@ export const PC: Story = {
                   </>
                 }
                 variant="outline"
-                colorScheme="neutral"
               />
               . 신청하지 않고 외박하면 벌점 3점이 쌓여요{' '}
               <Badge
@@ -116,7 +115,6 @@ export const PC: Story = {
                   </>
                 }
                 variant="outline"
-                colorScheme="neutral"
               />
               .
             </p>
@@ -152,18 +150,8 @@ export const PC: Story = {
                 onClick={() => toast.success('답을 복사했어요')}
               />
               <IconButton variant="outline" size="tiny" aria-label="답 공유" icon={<ShareIcon />} />
-              <IconToggle
-                variant="outline"
-                size="tiny"
-                aria-label="좋은 답"
-                icon={<HandThumbUpIcon />}
-              />
-              <IconToggle
-                variant="outline"
-                size="tiny"
-                aria-label="아쉬운 답"
-                icon={<HandThumbDownIcon />}
-              />
+              <IconToggle size="tiny" aria-label="좋은 답" icon={<HandThumbUpIcon />} />
+              <IconToggle size="tiny" aria-label="아쉬운 답" icon={<HandThumbDownIcon />} />
             </div>
 
             <section aria-labelledby="related" className="flex flex-col gap-3">
@@ -171,7 +159,7 @@ export const PC: Story = {
                 이어서 많이 묻는 질문
               </h2>
               <Card size="tiny">
-                <Item.Group variant="bordered" aria-label="이어서 많이 묻는 질문">
+                <Item.Group aria-label="이어서 많이 묻는 질문">
                   {RELATED.map((question) => (
                     <Item key={question} onClick={() => setDraft(question)}>
                       <Item.Content>
@@ -186,7 +174,7 @@ export const PC: Story = {
 
           <Tabs.Content value="sources">
             <Card size="tiny">
-              <Item.Group variant="bordered" aria-label="출처">
+              <Item.Group aria-label="출처">
                 {SOURCES.map((source, index) => (
                   <Item key={source.id} asChild>
                     <a href={`#${source.id}`}>

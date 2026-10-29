@@ -178,7 +178,7 @@ export const PC: Story = {
             </Card.Title>
             <Card.Description>휴대폰과 브라우저로 받을 알림을 골라요.</Card.Description>
           </Card.Header>
-          <Item.Group variant="bordered" aria-label="알림">
+          <Item.Group aria-label="알림">
             {NOTIFICATIONS.map((notification) => (
               <Item key={notification.id}>
                 <Item.Content>
@@ -216,7 +216,7 @@ export const PC: Story = {
               </Button>
             </Card.Action>
           </Card.Header>
-          <Item.Group variant="bordered" aria-label="로그인한 기기">
+          <Item.Group aria-label="로그인한 기기">
             {DEVICES.map((device) => (
               <Item key={device.id}>
                 <Item.Media variant="soft">{device.icon}</Item.Media>
