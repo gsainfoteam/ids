@@ -24,9 +24,16 @@ export function SpacerRoot({ flex = 1, className, style, ref, ...rest }: Spacer.
   useEffect(() => {
     const parent = elementRef.current?.parentElement;
     if (!isDevelopment || !parent) return;
-    const { display } = getComputedStyle(parent);
-    if (display !== 'none' && !display.includes('flex'))
-      console.warn('[IDS] Spacer: its parent is not a flex container, so it takes no space.');
+
+    const checkOnceShown = new ResizeObserver(() => {
+      const { display } = getComputedStyle(parent);
+      if (display === 'none') return;
+      checkOnceShown.disconnect();
+      if (!display.includes('flex'))
+        console.warn('[IDS] Spacer: its parent is not a flex container, so it takes no space.');
+    });
+    checkOnceShown.observe(parent);
+    return () => checkOnceShown.disconnect();
   }, []);
 
   return (

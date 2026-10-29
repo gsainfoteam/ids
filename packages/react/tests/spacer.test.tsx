@@ -61,6 +61,21 @@ test('it warns outside a flex parent, but not while the parent is hidden', async
       <Spacer />
     </div>,
   );
-  expect(warn).toHaveBeenCalledWith(expect.stringMatching(/not a flex container/));
+  await expect.poll(() => warn).toHaveBeenCalledWith(expect.stringMatching(/not a flex container/));
+  warn.mockRestore();
+});
+
+test('it checks a parent hidden at mount once the parent is shown', async () => {
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  const screen = await render(
+    <div data-testid="parent" className="hidden">
+      <Spacer />
+    </div>,
+  );
+  await new Promise(requestAnimationFrame);
+  expect(warn).not.toHaveBeenCalled();
+
+  screen.getByTestId('parent').element().setAttribute('class', 'block');
+  await expect.poll(() => warn).toHaveBeenCalledWith(expect.stringMatching(/not a flex container/));
   warn.mockRestore();
 });
