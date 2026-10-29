@@ -618,8 +618,9 @@ default, so on macOS `pnpm test` runs Chromium only; CI (ubuntu) runs all three,
 CI gives each engine its own runner: the JS job runs `pnpm test` with Chromium, and the
 `engines` job runs the browser project once for Firefox and once for WebKit. On one shared
 four-core runner WebKit, the slowest, got so little CPU that a 600ms timer or a typed string took
-seconds, and plays that wait on a timer failed at random. `turbo.json` passes `IDS_BROWSERS`
-through to the test task, since turbo hides undeclared variables from it.
+seconds, and plays that wait on a timer failed at random. `turbo.json` declares `IDS_BROWSERS` in
+the test task's `env`: turbo hides undeclared variables from a task, and a variable in `env` is
+part of the cache key, so a run with other engines never replays a Chromium-only result.
 
 - A test that needs CDP starts with `skipWithoutCdp(context)` from `tests/engines.ts`, which skips it
   outside Chromium with the reason. A test that relies on something another engine cannot do
