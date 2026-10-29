@@ -5,12 +5,7 @@ import type { FloatingButton } from '.';
 import type { IdsSize } from '../../../tokens/types';
 
 const opaqueFills = {
-  solid: cn(
-    controlSurface.variant.solid,
-    'supports-[not_(color:oklch(from_red_l_c_h))]:[--control-fill-hover:color-mix(in_oklab,var(--control-fill)_90%,var(--ids-color-surface))]',
-    'supports-[not_(color:oklch(from_red_l_c_h))]:[--control-fill-press:color-mix(in_oklab,var(--control-fill)_80%,var(--ids-color-surface))]',
-    'shadow-lg',
-  ),
+  solid: cn(controlSurface.variant.solid, 'shadow-lg'),
   soft: cn(
     'bg-(--ids-color-surface) text-(--control-on-soft)',
     'bg-[image:linear-gradient(var(--control-soft),var(--control-soft))]',
