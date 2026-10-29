@@ -21,6 +21,16 @@ function ShownAfterPress({ children }: { children: ReactNode }) {
   return shown ? children : <Button onClick={() => setShown(true)}>Show</Button>;
 }
 
+function OpenUntilHidden({ children }: { children: (open: boolean) => ReactNode }) {
+  const [open, setOpen] = useState(true);
+  return (
+    <>
+      {children(open)}
+      <Button onClick={() => setOpen(false)}>Hide</Button>
+    </>
+  );
+}
+
 const nextFrames = async (count = 3) => {
   for (let frame = 0; frame < count; frame++) await new Promise(requestAnimationFrame);
 };
@@ -258,13 +268,17 @@ test('the exit keeps the content until its animation ends', async () => {
   const screen = await render(
     <Scene>
       <ShownAfterPress>
-        <Tooltip defaultOpen>
-          <Tooltip.Trigger>Save</Tooltip.Trigger>
-          <Tooltip.Content style={{ transition: 'opacity 60s' }}>
-            Save changes
-            <Tooltip.Arrow />
-          </Tooltip.Content>
-        </Tooltip>
+        <OpenUntilHidden>
+          {(open) => (
+            <Tooltip open={open}>
+              <Tooltip.Trigger>Save</Tooltip.Trigger>
+              <Tooltip.Content style={{ transition: 'opacity 60s' }}>
+                Save changes
+                <Tooltip.Arrow />
+              </Tooltip.Content>
+            </Tooltip>
+          )}
+        </OpenUntilHidden>
       </ShownAfterPress>
     </Scene>,
   );
@@ -273,7 +287,8 @@ test('the exit keeps the content until its animation ends', async () => {
   await expect.element(tooltip).toBeVisible();
   expect(tooltip.element().querySelector('[data-tooltip-arrow]')).not.toBeNull();
   for (const animation of tooltip.element().getAnimations()) animation.finish();
-  await userEvent.keyboard('{Escape}');
+  screen.getByRole('button', { name: 'Hide' }).element().focus();
+  await userEvent.keyboard('{Enter}');
   await expect.element(tooltip).toHaveAttribute('data-ending-style');
   const content = tooltip.element();
   await expect
