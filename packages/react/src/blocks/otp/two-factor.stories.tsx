@@ -42,12 +42,12 @@ export const PC: Story = {
 
         <Card.Content>
           <Tabs defaultValue="app" className="flex flex-col gap-5">
-            <Tabs.List aria-label="인증 방법">
-              <Tabs.Trigger value="app" className="flex-1">
+            <Tabs.List aria-label="인증 방법" stretch>
+              <Tabs.Trigger value="app">
                 <DevicePhoneMobileIcon />
                 인증 앱
               </Tabs.Trigger>
-              <Tabs.Trigger value="recovery" className="flex-1">
+              <Tabs.Trigger value="recovery">
                 <KeyIcon />
                 복구 코드
               </Tabs.Trigger>

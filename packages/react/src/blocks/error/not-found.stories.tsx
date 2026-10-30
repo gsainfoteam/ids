@@ -1,6 +1,7 @@
 import {
   ArrowLeftIcon,
   BuildingLibraryIcon,
+  ChevronRightIcon,
   HomeIcon,
   MagnifyingGlassIcon,
   MegaphoneIcon,
@@ -78,6 +79,9 @@ export const PC: Story = {
                     <Item.Title>{label}</Item.Title>
                     <Item.Description>{description}</Item.Description>
                   </Item.Content>
+                  <Item.Actions>
+                    <ChevronRightIcon aria-hidden className="rtl:-scale-x-100" />
+                  </Item.Actions>
                 </a>
               </Item>
             ))}

@@ -94,7 +94,7 @@ export const PC: Story = {
       <main className="mx-auto grid w-full max-w-5xl items-start gap-6 px-4 py-10 break-keep sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:py-14">
         <Card>
           <Card.Header>
-            <Avatar name="김지수" />
+            <Avatar name="김지수" className="size-20" />
             <Card.Title asChild>
               <h1 className="text-headline-h4-bold">김지수</h1>
             </Card.Title>

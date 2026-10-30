@@ -67,12 +67,12 @@ export const PC: Story = {
 
           <Card.Content>
             <Tabs defaultValue="qr" appearance="pill" className="flex flex-col gap-5">
-              <Tabs.List aria-label="로그인 방법">
-                <Tabs.Trigger value="qr" className="flex-1">
+              <Tabs.List aria-label="로그인 방법" stretch>
+                <Tabs.Trigger value="qr">
                   <QrCodeIcon />
                   QR 코드
                 </Tabs.Trigger>
-                <Tabs.Trigger value="password" className="flex-1">
+                <Tabs.Trigger value="password">
                   <KeyIcon />
                   비밀번호
                 </Tabs.Trigger>

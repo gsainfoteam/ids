@@ -1,6 +1,7 @@
 import { type FieldOrientation, type FieldState } from './context';
 import { FieldDescription, type FieldDescriptionProps } from './description';
 import { FieldError, type FieldErrorProps } from './error';
+import { FieldGroup, type FieldGroupProps } from './group';
 import { FieldHint, type FieldHintProps } from './hint';
 import { FieldLabel, type FieldLabelProps } from './label';
 import { FieldRoot, type FieldProps, type FieldErrorState } from './root';
@@ -23,11 +24,13 @@ export namespace Field {
   export type DescriptionProps = FieldDescriptionProps;
   export type HintProps = FieldHintProps;
   export type ErrorProps = FieldErrorProps;
+  export type GroupProps = FieldGroupProps;
 
   export const Label = FieldLabel;
   export const Description = FieldDescription;
   export const Hint = FieldHint;
   export const Error = FieldError;
+  export const Group = FieldGroup;
 
   export const Style = fieldStyle;
 }

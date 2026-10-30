@@ -324,3 +324,23 @@ test('development warnings name a trigger without content, content without a tri
       '[IDS] Tabs: value="z" matches no Tabs.Trigger.',
     ]);
 });
+
+test('a stretched list shares its width between horizontal tabs', async () => {
+  const screen = await render(
+    <Tabs defaultValue="a" className="w-80">
+      <Tabs.List aria-label="Sort" stretch>
+        <Tabs.Trigger value="a">A</Tabs.Trigger>
+        <Tabs.Trigger value="b">Longer label</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value="a">A</Tabs.Content>
+      <Tabs.Content value="b">B</Tabs.Content>
+    </Tabs>,
+  );
+  const list = screen.getByRole('tablist').element().getBoundingClientRect();
+  const widths = screen
+    .getByRole('tab')
+    .elements()
+    .map((tab) => tab.getBoundingClientRect().width);
+  expect(widths[0]).toBeCloseTo(widths[1]!, 0);
+  expect(widths[0]! + widths[1]!).toBeCloseTo(list.width, 0);
+});

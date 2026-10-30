@@ -89,7 +89,7 @@ const [section, setSection] = useState<Section>('docs');
 - `variant` 는 `pill` 에서만 받습니다(`ghost` `outline` `soft` `solid` `glossy`). 다른 모양에 주면 타입 오류입니다.
 - 고르지 않은 탭은 흐린 글자(`on-muted`), 고른 탭은 본문 글자(`on-surface`)입니다. `pill` 의 `soft` 는 `secondary`, `solid` 와 `glossy` 는 `primary` 로 채웁니다.
 - `enclosed` 의 고른 탭은 `surface` 로 칠해 목록 선을 덮습니다. `surface` 가 아닌 배경 위에서는 탭 색을 `className` 으로 맞춥니다.
-- 탭을 목록 폭에 나눠 채우려면 `Tabs.List` 에 `w-full`, 각 `Tabs.Trigger` 에 `flex-1` 을 줍니다.
+- `<Tabs.List stretch>` 는 가로 탭이 목록 폭을 똑같이 나눠 채웁니다. 카드 폭에 맞춘 두세 칸짜리 탭에 씁니다.
 
 ```tsx
 <Tabs.Trigger value="profile">
@@ -134,7 +134,7 @@ const [section, setSection] = useState<Section>('docs');
 | `activationMode`         | `automatic`(기본) / `manual`                                     |
 | `loop`                   | `true`. 화살표가 끝에서 처음으로 돌아간다                        |
 | `size`                   | `standard`(기본) / `tiny`                                        |
-| `Tabs.List`              | `tablist`. 이름은 `aria-label` 로 준다                           |
+| `Tabs.List`              | `tablist`. 이름은 `aria-label` 로 준다. `stretch` 면 가로 탭이 폭을 나눈다 |
 | `Tabs.Trigger`           | `value`(필수), `disabled`                                        |
 | `Tabs.Content`           | `value`(필수), `forceMount`                                      |
 

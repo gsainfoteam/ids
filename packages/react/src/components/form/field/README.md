@@ -111,6 +111,23 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 
 - 라벨은 입력과 같은 줄에 맞춰집니다. 설명이 있으면 설명 아래의 입력 줄로 내려갑니다.
 
+```tsx
+<Field.Group orientation="horizontal">    {/* 안의 Field 가 라벨 열 하나를 나눠 쓴다 */}
+  <Field>
+    <Field.Label>이름</Field.Label>
+    <TextField />
+  </Field>
+  <Field>
+    <Field.Label>GIST 메일</Field.Label>
+    <TextField />
+  </Field>
+</Field.Group>
+```
+
+- `Field.Group` 은 Field 를 쌓습니다. `horizontal` 이면 가장 긴 라벨에 맞춘 열 하나를 모든 Field 가 subgrid 로 나눠 써서, 입력칸의 시작이 줄마다 같습니다.
+- 안의 Field 는 그룹의 `orientation` 을 따릅니다. Field 에 직접 준 값이 이깁니다.
+- 가로 그룹 안에서 `orientation="vertical"` 인 Field 와 Field 가 아닌 자식(감싼 `div` 등)은 두 열을 다 차지합니다. 감싼 `div` 안의 Field 는 그룹의 라벨 열을 나눠 쓰지 않으니, 정렬할 Field 는 `Field.Group` 의 바로 아래에 둡니다.
+
 ## 상태 상속
 
 ```tsx
@@ -268,7 +285,8 @@ const { useAppForm } = createFormHook({
 
 | 속성                                                | 기본 / 동작                                                          |
 | --------------------------------------------------- | -------------------------------------------------------------------- |
-| `orientation`                                       | `vertical`(기본) / `horizontal`                                      |
+| `orientation`                                       | `vertical`(기본) / `horizontal`. `Field.Group` 안에서는 그룹을 따른다 |
+| `Field.Group` `orientation`                         | `vertical`(기본) / `horizontal`                                      |
 | `size`                                              | `standard`(기본) / `tiny`. 입력이 크기를 명시하지 않으면 이를 따른다 |
 | `invalid`                                           | 입력의 `aria-invalid` 와 브라우저 검증을 따른다. 명시하면 우선       |
 | `disabled`                                          | 입력 상태를 따른다. 명시하면 우선                                    |

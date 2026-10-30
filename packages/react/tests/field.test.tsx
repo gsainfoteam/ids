@@ -700,6 +700,33 @@ test('orientation lays the label beside the control; variant stays as an alias',
   await expect.element(root()).toHaveAttribute('data-orientation', 'horizontal');
 });
 
+test('a horizontal Field.Group lines up its horizontal Fields and leaves a vertical one stacked', async () => {
+  const screen = await render(
+    <Field.Group orientation="horizontal" className="w-96">
+      <Field>
+        <Field.Label>Name</Field.Label>
+        <TextField />
+      </Field>
+      <Field>
+        <Field.Label>Email address</Field.Label>
+        <TextField />
+      </Field>
+      <Field orientation="vertical">
+        <Field.Label>Bio</Field.Label>
+        <TextArea />
+      </Field>
+    </Field.Group>,
+  );
+  const box = (name: string) =>
+    screen.getByRole('textbox', { name }).element().getBoundingClientRect();
+  const label = (name: string) => screen.getByText(name).element().getBoundingClientRect();
+
+  expect(box('Name').left).toBe(box('Email address').left);
+  expect(box('Name').left).toBeGreaterThan(label('Email address').right);
+  expect(box('Bio').left).toBe(label('Bio').left);
+  expect(box('Bio').top).toBeGreaterThan(label('Bio').bottom);
+});
+
 test('native validation: an invalid event shows the message, editing clears it', async () => {
   const screen = await render(
     <form>
