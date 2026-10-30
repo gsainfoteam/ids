@@ -441,15 +441,13 @@ Tabs·Menu처럼 **진짜 compound**가 생기면 그때 Root Context(또는 sto
 
 | 브라우저 | 최소 버전 | 테스트 엔진 (Playwright 1.63) |
 | --- | --- | --- |
-| Chrome, Edge | 114 | Chromium 153 |
+| Chrome, Edge | 119 | Chromium 153 |
 | Firefox | 128 | Firefox 155 |
-| Safari (macOS, iOS) | 17 | WebKit 26.6 |
+| Safari (macOS, iOS) | 18 | WebKit 26.6 |
 
-- 최소 버전은 IDS 가 기대는 기능에서 나옵니다. top layer 에 올리는 `popover` API(Chrome 114, Firefox 125, Safari 17)와 Tailwind CSS v4(Chrome 111, Firefox 128, Safari 16.4)입니다.
+- 최소 버전은 IDS 가 기대는 기능에서 나옵니다. 브랜드 채움의 hover 와 press 를 글자색에서 멀어지게 섞는 relative color syntax(Chrome 119, Firefox 128, Safari 18), top layer 에 올리는 `popover` API(Chrome 114, Firefox 125, Safari 17), Tailwind CSS v4(Chrome 111, Firefox 128, Safari 16.4)입니다.
 - 아래 기능은 없는 브라우저에서 모양만 덜 다듬어집니다.
   - `@starting-style` 이 없으면 여는 애니메이션 없이 바로 나타납니다.
-  - relative color syntax(Chrome 119, Firefox 128, Safari 18)가 없으면 브랜드 채움의 hover 와 press 가 글자색에서 멀어지는 대신 90%, 80% 로 흐려집니다.
-  - `cap` 단위(Safari 17.2)가 없으면 Kbd 가 글자 가운데가 아니라 기준선에 맞춰 놓입니다.
 - 모든 브라우저 테스트가 CI(ubuntu)에서 세 엔진으로 돕니다. macOS 에서는 `pnpm test` 가 Chromium 만 돌리고, `pnpm test:browsers` 가 Docker 의 Playwright Linux 이미지에서 세 엔진을 모두 돌립니다.
 - 엔진마다 건너뛰는 테스트와 그 이유:
   - CDP(Chrome DevTools Protocol)로 누른 채 끌기, 터치, IME 조합, 키 반복, 미디어와 시간대 흉내, 응답 붙잡기를 하는 테스트는 Chromium 에서만 돕니다. Firefox 와 WebKit 에는 CDP 가 없습니다.
