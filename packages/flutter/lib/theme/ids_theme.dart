@@ -16,6 +16,7 @@ class IdsTheme {
   Color get secondary => resolve('secondary');
   Color get onSecondary => resolve('on-secondary');
   Color get accent => resolve('accent');
+  Color get danger => resolve('danger');
 
   Color get surface => _neutral('surface');
   Color get onSurface => _neutral('on-surface');
