@@ -100,6 +100,22 @@ void main() {
       },
     );
 
+    testWidgets('a wrapped error still waits for invalid', (tester) async {
+      Widget wrapped({required bool invalid}) => IdsField(
+        invalid: invalid,
+        children: const [
+          Padding(
+            padding: EdgeInsets.zero,
+            child: IdsFieldError(child: Text('오류')),
+          ),
+        ],
+      );
+      await pump(tester, wrapped(invalid: false));
+      expect(find.text('오류'), findsNothing);
+      await pump(tester, wrapped(invalid: true));
+      expect(find.text('오류'), findsOne);
+    });
+
     testWidgets('a part outside a field fails', (tester) async {
       await pump(tester, const IdsFieldHint(child: Text('도움말')));
       expect(tester.takeException(), isAssertionError);

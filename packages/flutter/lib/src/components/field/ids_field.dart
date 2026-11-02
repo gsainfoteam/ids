@@ -98,7 +98,9 @@ class IdsFieldHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    IdsField._of(context, 'IdsFieldHint');
+    if (IdsField._of(context, 'IdsFieldHint').invalid) {
+      return const SizedBox.shrink();
+    }
     return _tinted(context, ThemeProvider.of(context).onMuted, child);
   }
 }
@@ -110,7 +112,9 @@ class IdsFieldError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    IdsField._of(context, 'IdsFieldError');
+    if (!IdsField._of(context, 'IdsFieldError').invalid) {
+      return const SizedBox.shrink();
+    }
     return _tinted(context, ThemeProvider.of(context).danger, child);
   }
 }
