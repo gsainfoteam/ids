@@ -77,10 +77,49 @@ void main() {
       tester,
       SizedBox(width: 200, child: IdsDivider(child: Text('또는 ' * 20))),
     );
-    final sizes = lineSizes(tester);
-    expect(sizes, [const Size(16, 1), const Size(16, 1)]);
-    expect(tester.getSize(find.byType(Text)).height, greaterThan(20));
+    expect(tester.getSize(find.byType(IdsDivider)).width, 200);
+    final label = tester.getRect(find.byType(Text));
+    expect(label.left, 28);
+    expect(label.right, 172);
+    expect(label.height, greaterThan(20));
   });
+
+  testWidgets('a labelled vertical divider fits an IntrinsicHeight row', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      const IntrinsicHeight(
+        child: Row(
+          children: [
+            SizedBox(height: 60),
+            IdsDivider(orientation: Axis.vertical, child: Text('또는')),
+          ],
+        ),
+      ),
+    );
+    final divider = tester.getRect(find.byType(IdsDivider));
+    expect(divider.height, 60);
+    expect(tester.getCenter(find.text('또는')).dy, divider.center.dy);
+  });
+
+  testWidgets(
+    'a labelled divider without a limit takes its label plus the ends',
+    (tester) async {
+      await pump(
+        tester,
+        const Column(
+          children: [IdsDivider(orientation: Axis.vertical, child: Text('또는'))],
+        ),
+      );
+      final labelHeight = tester.getSize(find.text('또는')).height;
+      expect(tester.getSize(find.byType(IdsDivider)).height, labelHeight + 32);
+
+      await pump(tester, const Row(children: [IdsDivider(child: Text('또는'))]));
+      final labelWidth = tester.getSize(find.text('또는')).width;
+      expect(tester.getSize(find.byType(IdsDivider)).width, labelWidth + 56);
+    },
+  );
 
   testWidgets('decorative leaves the label out of semantics', (tester) async {
     final semantics = tester.ensureSemantics();
