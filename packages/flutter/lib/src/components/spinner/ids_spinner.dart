@@ -22,7 +22,7 @@ class IdsSpinner extends StatefulWidget {
 }
 
 class _IdsSpinnerState extends State<IdsSpinner>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   static const _sizes = {IdsSize.standard: 16.0, IdsSize.tiny: 14.0};
   static const _turn = Duration(seconds: 1);
   static const _announceDelay = Duration(milliseconds: 100);
@@ -36,6 +36,7 @@ class _IdsSpinnerState extends State<IdsSpinner>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _announceTimer = Timer(
       _announceDelay,
       () => setState(() => _announced = true),
@@ -45,16 +46,29 @@ class _IdsSpinnerState extends State<IdsSpinner>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final reduced = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    _syncMotion();
+  }
+
+  @override
+  void didChangeAccessibilityFeatures() => _syncMotion();
+
+  void _syncMotion() {
+    if (!mounted) return;
+    final reduced =
+        (MediaQuery.maybeDisableAnimationsOf(context) ?? false) ||
+        View.of(context).platformDispatcher.accessibilityFeatures.reduceMotion;
     if (reduced == _reducedMotion) return;
-    _reducedMotion = reduced;
-    _controller
-      ..duration = _turn
-      ..repeat(reverse: reduced);
+    setState(() {
+      _reducedMotion = reduced;
+      _controller
+        ..duration = _turn
+        ..repeat(reverse: reduced);
+    });
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _announceTimer.cancel();
     _controller.dispose();
     super.dispose();
@@ -63,9 +77,12 @@ class _IdsSpinnerState extends State<IdsSpinner>
   @override
   Widget build(BuildContext context) {
     final icon = IconTheme.of(context);
+    final color = icon.color!;
     final arc = CustomPaint(
       size: Size.square(_sizes[widget.size] ?? icon.size!),
-      painter: _ArcPainter(icon.color!),
+      painter: _ArcPainter(
+        color.withValues(alpha: color.a * (icon.opacity ?? 1)),
+      ),
     );
     final spinning = _reducedMotion!
         ? FadeTransition(

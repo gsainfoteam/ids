@@ -48,6 +48,14 @@ void main() {
     expect(find.byType(FadeTransition), findsOne);
   });
 
+  testWidgets('pulses when iOS asks to reduce motion', (tester) async {
+    tester.platformDispatcher.accessibilityFeaturesTestValue =
+        const FakeAccessibilityFeatures(reduceMotion: true);
+    addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+    await pump(tester, const IdsSpinner());
+    expect(find.byType(FadeTransition), findsOne);
+  });
+
   testWidgets('announces after a short delay', (tester) async {
     final semantics = tester.ensureSemantics();
     await pump(tester, const IdsSpinner());

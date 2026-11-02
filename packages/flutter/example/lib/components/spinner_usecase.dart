@@ -13,11 +13,11 @@ final spinnerUseCases = [
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 16,
         children: [
-          const IdsSpinner(size: IdsSize.standard),
-          const IdsSpinner(size: IdsSize.tiny),
+          const IdsSpinner(size: IdsSize.standard, decorative: true),
+          const IdsSpinner(size: IdsSize.tiny, decorative: true),
           IconTheme.merge(
             data: const IconThemeData(size: 32),
-            child: const IdsSpinner(),
+            child: const IdsSpinner(decorative: true),
           ),
         ],
       ),
