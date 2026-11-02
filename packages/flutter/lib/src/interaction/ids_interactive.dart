@@ -167,10 +167,9 @@ class _IdsInteractiveState extends State<IdsInteractive> {
       _set(() => _active = true);
       if (enter) widget.onPressed?.call();
     } else if (event is KeyUpEvent) {
-      final releasesOwnSpace = !enter && _spaceHeld;
-      _spaceHeld = false;
       _set(() => _active = false);
-      if (releasesOwnSpace) widget.onPressed?.call();
+      if (!enter && _spaceHeld) widget.onPressed?.call();
+      _spaceHeld = false;
     }
     return KeyEventResult.handled;
   }

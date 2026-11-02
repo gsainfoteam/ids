@@ -28,7 +28,7 @@ class _IdsSpinnerState extends State<IdsSpinner>
   static const _announceDelay = Duration(milliseconds: 100);
   static const _defaultLabel = '불러오는 중';
 
-  late final _controller = AnimationController(vsync: this);
+  late final _controller = AnimationController(vsync: this, duration: _turn);
   late final Timer _announceTimer;
   bool _announced = false;
   bool? _reducedMotion;
@@ -53,16 +53,13 @@ class _IdsSpinnerState extends State<IdsSpinner>
   void didChangeAccessibilityFeatures() => _syncMotion();
 
   void _syncMotion() {
-    if (!mounted) return;
     final reduced =
         (MediaQuery.maybeDisableAnimationsOf(context) ?? false) ||
         View.of(context).platformDispatcher.accessibilityFeatures.reduceMotion;
     if (reduced == _reducedMotion) return;
     setState(() {
       _reducedMotion = reduced;
-      _controller
-        ..duration = _turn
-        ..repeat(reverse: reduced);
+      _controller.repeat(reverse: reduced);
     });
   }
 

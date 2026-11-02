@@ -131,31 +131,31 @@ class _RenderLabelledLine extends RenderShiftedBox {
     );
   }
 
-  @override
-  double computeMinIntrinsicWidth(double height) => _horizontal
-      ? child!.getMinIntrinsicWidth(height) + _ends
-      : math.max(IdsDivider._thickness, child!.getMinIntrinsicWidth(height));
+  double _intrinsicWidth(double height, double Function(double) label) =>
+      _horizontal
+      ? label(height) + _ends
+      : math.max(IdsDivider._thickness, label(height));
+
+  double _intrinsicHeight(double width, double Function(double) label) =>
+      _horizontal
+      ? math.max(IdsDivider._thickness, label(math.max(0, width - _ends)))
+      : label(width) + _ends;
 
   @override
-  double computeMaxIntrinsicWidth(double height) => _horizontal
-      ? child!.getMaxIntrinsicWidth(height) + _ends
-      : math.max(IdsDivider._thickness, child!.getMaxIntrinsicWidth(height));
+  double computeMinIntrinsicWidth(double height) =>
+      _intrinsicWidth(height, child!.getMinIntrinsicWidth);
 
   @override
-  double computeMinIntrinsicHeight(double width) => _horizontal
-      ? math.max(
-          IdsDivider._thickness,
-          child!.getMinIntrinsicHeight(math.max(0, width - _ends)),
-        )
-      : child!.getMinIntrinsicHeight(width) + _ends;
+  double computeMaxIntrinsicWidth(double height) =>
+      _intrinsicWidth(height, child!.getMaxIntrinsicWidth);
 
   @override
-  double computeMaxIntrinsicHeight(double width) => _horizontal
-      ? math.max(
-          IdsDivider._thickness,
-          child!.getMaxIntrinsicHeight(math.max(0, width - _ends)),
-        )
-      : child!.getMaxIntrinsicHeight(width) + _ends;
+  double computeMinIntrinsicHeight(double width) =>
+      _intrinsicHeight(width, child!.getMinIntrinsicHeight);
+
+  @override
+  double computeMaxIntrinsicHeight(double width) =>
+      _intrinsicHeight(width, child!.getMaxIntrinsicHeight);
 
   @override
   Size computeDryLayout(BoxConstraints constraints) => _sizeFor(
@@ -172,39 +172,39 @@ class _RenderLabelledLine extends RenderShiftedBox {
         ((size - label.size) as Offset) / 2;
   }
 
+  Rect _segment(Offset offset, double start, double length) {
+    const thickness = IdsDivider._thickness;
+    return _horizontal
+        ? Rect.fromLTWH(
+            offset.dx + start,
+            offset.dy + (size.height - thickness) / 2,
+            length,
+            thickness,
+          )
+        : Rect.fromLTWH(
+            offset.dx + (size.width - thickness) / 2,
+            offset.dy + start,
+            thickness,
+            length,
+          );
+  }
+
   @override
   void paint(PaintingContext context, Offset offset) {
     final label = child!;
     final labelOffset = (label.parentData! as BoxParentData).offset;
+    final labelStart = _horizontal ? labelOffset.dx : labelOffset.dy;
+    final labelEnd =
+        labelStart + (_horizontal ? label.size.width : label.size.height);
+    final mainSize = _horizontal ? size.width : size.height;
     final paint = Paint()..color = _color;
-    const thickness = IdsDivider._thickness;
 
-    if (_horizontal) {
-      final top = offset.dy + (size.height - thickness) / 2;
-      final before = labelOffset.dx - _gap;
-      final after = labelOffset.dx + label.size.width + _gap;
-      context.canvas
-        ..drawRect(Rect.fromLTWH(offset.dx, top, before, thickness), paint)
-        ..drawRect(
-          Rect.fromLTWH(offset.dx + after, top, size.width - after, thickness),
-          paint,
-        );
-    } else {
-      final left = offset.dx + (size.width - thickness) / 2;
-      final before = labelOffset.dy - _gap;
-      final after = labelOffset.dy + label.size.height + _gap;
-      context.canvas
-        ..drawRect(Rect.fromLTWH(left, offset.dy, thickness, before), paint)
-        ..drawRect(
-          Rect.fromLTWH(
-            left,
-            offset.dy + after,
-            thickness,
-            size.height - after,
-          ),
-          paint,
-        );
-    }
+    context.canvas
+      ..drawRect(_segment(offset, 0, labelStart - _gap), paint)
+      ..drawRect(
+        _segment(offset, labelEnd + _gap, mainSize - labelEnd - _gap),
+        paint,
+      );
     super.paint(context, offset);
   }
 }
