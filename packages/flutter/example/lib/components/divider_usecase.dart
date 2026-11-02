@@ -2,28 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-Widget _themed(BuildContext context, Widget child) {
-  final mode = context.knobs.object.dropdown(
-    label: 'Mode',
-    options: IdsMode.values,
-    initialOption: IdsMode.light,
-    labelBuilder: (m) => m.name,
-  );
-  return ThemeProvider(
-    mode: mode,
-    child: Builder(
-      builder: (context) => Material(
-        color: ThemeProvider.of(context).surface,
-        child: Center(child: SizedBox(width: 320, child: child)),
-      ),
-    ),
-  );
-}
+import 'themed.dart';
 
 final dividerUseCases = [
   WidgetbookUseCase(
     name: 'Horizontal',
-    builder: (context) => _themed(
+    builder: (context) => themed(
       context,
       const Column(
         mainAxisSize: MainAxisSize.min,
@@ -34,7 +18,7 @@ final dividerUseCases = [
   ),
   WidgetbookUseCase(
     name: 'Vertical',
-    builder: (context) => _themed(
+    builder: (context) => themed(
       context,
       const IntrinsicHeight(
         child: Row(
@@ -50,7 +34,7 @@ final dividerUseCases = [
   ),
   WidgetbookUseCase(
     name: 'Label',
-    builder: (context) => _themed(
+    builder: (context) => themed(
       context,
       Column(
         mainAxisSize: MainAxisSize.min,
