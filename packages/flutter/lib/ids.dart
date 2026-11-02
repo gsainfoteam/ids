@@ -10,3 +10,5 @@ export 'theme/ids_theme.dart';
 export 'src/layout/ids_axis.dart';
 
 export 'src/interaction/ids_interactive.dart';
+
+export 'src/components/divider/ids_divider.dart';

@@ -21,6 +21,7 @@ class IdsTheme {
   Color get onSurface => _neutral('on-surface');
   Color get muted => _neutral('muted');
   Color get onMuted => _neutral('on-muted');
+  Color get border => _neutral('border');
   Color get outline => resolve('outline');
 
   bool get isDark => mode == IdsMode.dark;
@@ -35,6 +36,7 @@ class IdsTheme {
     'on-surface': Color(0xFF171717),
     'muted': Color(0xFFF5F5F5),
     'on-muted': Color(0xFF525252),
+    'border': Color(0xFFE5E5E5),
   };
 
   static const _neutralDark = <String, Color>{
@@ -42,5 +44,6 @@ class IdsTheme {
     'on-surface': Color(0xFFFAFAFA),
     'muted': Color(0xFF262626),
     'on-muted': Color(0xFFA3A3A3),
+    'border': Color(0xFF262626),
   };
 }
