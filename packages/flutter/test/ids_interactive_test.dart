@@ -44,11 +44,9 @@ Future<FocusNode> pump(
   return node;
 }
 
-// Center 밖의 빈 곳. 직전 입력 종류만 바꾼다.
 const outside = Offset(1, 1);
 
 void main() {
-  // MIGRATION.md focusVisible 표.
   group('focusVisible', () {
     testWidgets('Tab', (tester) async {
       await pump(tester);

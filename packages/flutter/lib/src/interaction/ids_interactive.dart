@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-/// React `useInteractive`의 `InteractiveState`. 원시값 그대로이고 우선순위는 적용하지 않는다.
 @immutable
 class IdsInteractiveState {
   const IdsInteractiveState({
@@ -14,19 +13,14 @@ class IdsInteractiveState {
     this.disabled = false,
   });
 
-  /// 마우스가 올라가 있다. 터치에는 없다.
   final bool hovered;
 
-  /// 누르는 중. pointer 또는 Enter / Space.
   final bool active;
 
-  /// 시각 효과 없음. 포커스 링은 [focusVisible]에만.
   final bool focused;
 
-  /// 포커스를 얻는 시점에 한 번 정한다. 자기 pointer down으로 얻은 포커스, 터치 입력 뒤의 포커스는 false.
   final bool focusVisible;
 
-  /// 외부 주입. Toggle의 on.
   final bool pressed;
 
   final bool disabled;
@@ -51,8 +45,6 @@ class IdsInteractiveState {
       'focusVisible: $focusVisible, pressed: $pressed, disabled: $disabled)';
 }
 
-/// 인터랙션 상태만 내보내고 그리지 않는다. 배경 알파·scale·포커스 링·disabled는
-/// control surface가 정한다. Semantics도 감싸는 컴포넌트가 넣는다.
 class IdsInteractive extends StatefulWidget {
   const IdsInteractive({
     super.key,
@@ -68,13 +60,11 @@ class IdsInteractive extends StatefulWidget {
   final Widget Function(BuildContext context, IdsInteractiveState state)
   builder;
 
-  /// 탭, Enter(누를 때), Space(뗄 때). 브라우저 `<button>`과 같다.
   final VoidCallback? onPressed;
 
   final bool disabled;
   final bool pressed;
 
-  /// 상태를 부모에 미러링. controlled가 아니다.
   final ValueChanged<IdsInteractiveState>? onInteractionChange;
 
   final FocusNode? focusNode;
@@ -90,7 +80,6 @@ class _IdsInteractiveState extends State<IdsInteractive> {
   bool _focused = false;
   bool _focusVisible = false;
 
-  /// 자기 pointer down이 요청한 포커스인지. 다음 포커스 변화에서 소비한다.
   bool _pointerFocus = false;
 
   FocusNode? _internalNode;
@@ -120,7 +109,6 @@ class _IdsInteractiveState extends State<IdsInteractive> {
         widget.pressed == oldWidget.pressed) {
       return;
     }
-    // disabled가 되면 제스처 인식기가 빠져 tap up이 오지 않는다.
     if (widget.disabled) _active = false;
     _reportAfterFrame();
   }
@@ -144,7 +132,6 @@ class _IdsInteractiveState extends State<IdsInteractive> {
     widget.onInteractionChange?.call(state);
   }
 
-  // build 중에 부모 setState를 부르지 않도록 프레임 뒤로 미룬다.
   void _reportAfterFrame() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _report();
@@ -213,7 +200,6 @@ class _IdsInteractiveState extends State<IdsInteractive> {
                 }
               : null,
           onTapUp: enabled ? (_) => _set(() => _active = false) : null,
-          // hover는 MouseRegion이 소유한다. 여기서 끄면 마우스가 올라가 있어도 꺼진다.
           onTapCancel: enabled ? () => _set(() => _active = false) : null,
           onTap: enabled ? widget.onPressed : null,
           child: widget.builder(context, _state),
