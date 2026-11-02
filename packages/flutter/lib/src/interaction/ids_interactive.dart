@@ -81,6 +81,7 @@ class _IdsInteractiveState extends State<IdsInteractive> {
   bool _focusVisible = false;
 
   bool _pointerFocus = false;
+  bool _spaceHeld = false;
 
   FocusNode? _internalNode;
   FocusNode get _node => widget.focusNode ?? (_internalNode ??= FocusNode());
@@ -145,8 +146,10 @@ class _IdsInteractiveState extends State<IdsInteractive> {
           focused &&
           !_pointerFocus &&
           FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+      if (!focused) _active = false;
     });
     _pointerFocus = false;
+    if (!focused) _spaceHeld = false;
   }
 
   KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
@@ -154,15 +157,20 @@ class _IdsInteractiveState extends State<IdsInteractive> {
     final enter =
         key == LogicalKeyboardKey.enter ||
         key == LogicalKeyboardKey.numpadEnter;
-    if (widget.disabled || !(enter || key == LogicalKeyboardKey.space)) {
+    if (widget.disabled ||
+        !node.hasPrimaryFocus ||
+        !(enter || key == LogicalKeyboardKey.space)) {
       return KeyEventResult.ignored;
     }
     if (event is KeyDownEvent) {
+      if (!enter) _spaceHeld = true;
       _set(() => _active = true);
       if (enter) widget.onPressed?.call();
     } else if (event is KeyUpEvent) {
+      final releasesOwnSpace = !enter && _spaceHeld;
+      _spaceHeld = false;
       _set(() => _active = false);
-      if (!enter) widget.onPressed?.call();
+      if (releasesOwnSpace) widget.onPressed?.call();
     }
     return KeyEventResult.handled;
   }

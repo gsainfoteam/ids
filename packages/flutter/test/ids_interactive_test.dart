@@ -161,6 +161,60 @@ void main() {
     expect(presses, 2);
   });
 
+  testWidgets('losing focus drops active', (tester) async {
+    final node = await pump(tester);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(state.active, isTrue);
+    node.unfocus();
+    await tester.pumpAndSettle();
+    expect(state.active, isFalse);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.enter);
+  });
+
+  testWidgets('a Space pressed elsewhere does not press on release', (
+    tester,
+  ) async {
+    final node = await pump(tester);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.space);
+    node.requestFocus();
+    await tester.pump();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.space);
+    await tester.pump();
+    expect(presses, 0);
+    expect(state.active, isFalse);
+  });
+
+  testWidgets('keys stay with a focused descendant', (tester) async {
+    final inner = FocusNode();
+    addTearDown(inner.dispose);
+    presses = 0;
+    await tester.pumpWidget(
+      WidgetsApp(
+        color: const Color(0xFF000000),
+        builder: (_, _) => IdsInteractive(
+          onPressed: () => presses++,
+          builder: (_, s) {
+            state = s;
+            return Focus(
+              focusNode: inner,
+              autofocus: true,
+              child: const SizedBox(width: 100, height: 40),
+            );
+          },
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(inner.hasPrimaryFocus, isTrue);
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(presses, 0);
+    expect(state.active, isFalse);
+  });
+
   testWidgets('disabled ignores input and focus', (tester) async {
     await pump(tester, disabled: true);
     expect(state.disabled, isTrue);
