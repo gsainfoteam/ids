@@ -23,11 +23,15 @@ TextStyle? styleOf(WidgetTester tester, String text) => tester
     .style;
 
 IdsField field({
+  IdsSize size = IdsSize.standard,
   bool required = false,
+  bool disabled = false,
   bool invalid = false,
   bool? labelRequired,
 }) => IdsField(
+  size: size,
   required: required,
+  disabled: disabled,
   invalid: invalid,
   children: [
     IdsFieldLabel(required: labelRequired, child: const Text('이메일')),
@@ -50,12 +54,27 @@ void main() {
       semantics.dispose();
     });
 
-    testWidgets('invalid turns danger, disabled fades, tiny is smaller', (
+    testWidgets('the asterisk sits where Pretendard draws it, at any scale', (
       tester,
     ) async {
-      await pump(tester, const IdsLabel(invalid: true, child: Text('이름')));
-      expect(styleOf(tester, '이름')?.color, danger);
+      for (final scale in [1.0, 2.0]) {
+        await pump(
+          tester,
+          MediaQuery(
+            data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+            child: const IdsLabel(required: true, child: Text('이름')),
+          ),
+        );
+        expect(
+          tester.getRect(find.text('*')).top,
+          moreOrLessEquals(
+            tester.getRect(find.text('이름')).top - 14 * scale * 316 / 2048,
+          ),
+        );
+      }
+    });
 
+    testWidgets('disabled fades, tiny is smaller', (tester) async {
       await pump(tester, const IdsLabel(disabled: true, child: Text('이름')));
       expect(tester.widget<Opacity>(find.byType(Opacity)).opacity, 0.5);
 
@@ -77,15 +96,30 @@ void main() {
       expect(find.text('도움말'), findsNothing);
       expect(find.text('오류'), findsOne);
       expect(styleOf(tester, '오류')?.color, danger);
-      expect(styleOf(tester, '이메일')?.color, danger);
+      expect(styleOf(tester, '이메일')?.color, isNot(danger));
     });
 
-    testWidgets('keeps 8px between parts', (tester) async {
+    testWidgets('keeps 8px between parts, 6px when tiny', (tester) async {
+      for (final (size, gap) in [(IdsSize.standard, 8), (IdsSize.tiny, 6)]) {
+        await pump(tester, field(size: size));
+        expect(
+          tester.getRect(find.byKey(const Key('control'))).top,
+          tester.getRect(find.text('설명')).bottom + gap,
+        );
+      }
+    });
+
+    testWidgets('description, hint and error are captions', (tester) async {
       await pump(tester, field());
-      final description = tester.getRect(find.text('설명'));
+      expect(styleOf(tester, '설명')?.fontSize, 12);
+      expect(styleOf(tester, '도움말')?.fontSize, 12);
+    });
+
+    testWidgets('disabled fades the whole field once', (tester) async {
+      await pump(tester, field(disabled: true));
       expect(
-        tester.getRect(find.byKey(const Key('control'))).top,
-        description.bottom + 8,
+        tester.widgetList<Opacity>(find.byType(Opacity)).map((o) => o.opacity),
+        [0.5, 1],
       );
     });
 

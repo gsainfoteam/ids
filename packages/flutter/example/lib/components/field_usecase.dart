@@ -19,7 +19,7 @@ IdsField _emailField({
     IdsFieldDescription(child: Text('안내를 받을 이메일 주소입니다.')),
     _EmailInput(),
     IdsFieldHint(child: Text('예시 주소이며 실제로 발송되지 않습니다.')),
-    IdsFieldError(child: Text('올바른 이메일 주소를 입력하세요.')),
+    IdsFieldError(child: Text('올바른 이메일 주소를 입력해 주세요.')),
   ],
 );
 
@@ -30,26 +30,26 @@ class _EmailInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = ThemeProvider.of(context);
     final field = IdsField.maybeOf(context)!;
-    return Opacity(
-      opacity: field.disabled ? 0.5 : 1,
-      child: Container(
-        height: 44,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: theme.surface,
-          border: Border.all(
-            color: field.invalid ? theme.danger : theme.border,
+    final tiny = field.size == IdsSize.tiny;
+    final icon = tiny ? 14.0 : 16.0;
+    return Container(
+      height: tiny ? 32 : 44,
+      padding: EdgeInsetsDirectional.only(start: tiny ? 10 : 12, end: 4),
+      decoration: BoxDecoration(
+        color: theme.surface,
+        border: Border.all(color: field.invalid ? theme.danger : theme.border),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        spacing: tiny ? 6 : 8,
+        children: [
+          Icon(Icons.mail_outline, size: icon, color: theme.onMuted),
+          const Expanded(child: Text('hello@ids.example')),
+          SizedBox.square(
+            dimension: tiny ? 24 : 28,
+            child: Icon(Icons.close, size: icon, color: theme.onMuted),
           ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          spacing: 8,
-          children: [
-            Icon(Icons.mail_outline, size: 18, color: theme.onMuted),
-            const Expanded(child: Text('hello@ids.example')),
-            Icon(Icons.close, size: 16, color: theme.onMuted),
-          ],
-        ),
+        ],
       ),
     );
   }

@@ -21,7 +21,7 @@ class IdsField extends StatelessWidget {
   final bool invalid;
   final List<Widget> children;
 
-  static const _gap = 8.0;
+  static const _gaps = {IdsSize.standard: 8.0, IdsSize.tiny: 6.0};
 
   static IdsField? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<_IdsFieldScope>()?.field;
@@ -41,16 +41,19 @@ class IdsField extends StatelessWidget {
 
     return _IdsFieldScope(
       field: this,
-      child: DefaultTextStyle(
-        style: style.copyWith(color: ThemeProvider.of(context).onSurface),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: _gap,
-          children: [
-            for (final child in children)
-              if (!(invalid ? child is IdsFieldHint : child is IdsFieldError))
-                child,
-          ],
+      child: Opacity(
+        opacity: disabled ? 0.5 : 1,
+        child: DefaultTextStyle(
+          style: style.copyWith(color: ThemeProvider.of(context).onSurface),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: _gaps[size]!,
+            children: [
+              for (final child in children)
+                if (!(invalid ? child is IdsFieldHint : child is IdsFieldError))
+                  child,
+            ],
+          ),
         ),
       ),
     );
@@ -71,8 +74,6 @@ class IdsFieldLabel extends StatelessWidget {
       child: IdsLabel(
         size: field.size,
         required: required ?? field.required,
-        disabled: field.disabled,
-        invalid: field.invalid,
         child: child,
       ),
     );
@@ -87,7 +88,7 @@ class IdsFieldDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     IdsField._of(context, 'IdsFieldDescription');
-    return _tinted(context, ThemeProvider.of(context).onMuted, child);
+    return _tinted(ThemeProvider.of(context).onMuted, child);
   }
 }
 
@@ -101,7 +102,7 @@ class IdsFieldHint extends StatelessWidget {
     if (IdsField._of(context, 'IdsFieldHint').invalid) {
       return const SizedBox.shrink();
     }
-    return _tinted(context, ThemeProvider.of(context).onMuted, child);
+    return _tinted(ThemeProvider.of(context).onMuted, child);
   }
 }
 
@@ -115,15 +116,14 @@ class IdsFieldError extends StatelessWidget {
     if (!IdsField._of(context, 'IdsFieldError').invalid) {
       return const SizedBox.shrink();
     }
-    return _tinted(context, ThemeProvider.of(context).danger, child);
+    return _tinted(ThemeProvider.of(context).danger, child);
   }
 }
 
-Widget _tinted(BuildContext context, Color color, Widget child) =>
-    DefaultTextStyle(
-      style: DefaultTextStyle.of(context).style.copyWith(color: color),
-      child: child,
-    );
+Widget _tinted(Color color, Widget child) => DefaultTextStyle(
+  style: IdsTypography.captionC1Regular.copyWith(color: color),
+  child: child,
+);
 
 class _IdsFieldScope extends InheritedWidget {
   const _IdsFieldScope({required this.field, required super.child});

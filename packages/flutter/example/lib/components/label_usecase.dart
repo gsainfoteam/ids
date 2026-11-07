@@ -18,7 +18,6 @@ final labelUseCases = [
           ),
           required: context.knobs.boolean(label: 'Required'),
           disabled: context.knobs.boolean(label: 'Disabled'),
-          invalid: context.knobs.boolean(label: 'Invalid'),
           child: const Text('이메일'),
         ),
       ),

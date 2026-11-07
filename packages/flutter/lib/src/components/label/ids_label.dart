@@ -10,15 +10,15 @@ class IdsLabel extends StatelessWidget {
     this.size = IdsSize.standard,
     this.required = false,
     this.disabled = false,
-    this.invalid = false,
     required this.child,
   });
 
   final IdsSize size;
   final bool required;
   final bool disabled;
-  final bool invalid;
   final Widget child;
+
+  static const _asteriskLiftToPretendard = (1041 - 725) / 2048;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class IdsLabel extends StatelessWidget {
     return Opacity(
       opacity: disabled ? 0.5 : 1,
       child: DefaultTextStyle(
-        style: style.copyWith(color: invalid ? theme.danger : theme.onSurface),
+        style: style.copyWith(color: theme.onSurface),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 4,
@@ -39,7 +39,14 @@ class IdsLabel extends StatelessWidget {
             Flexible(child: child),
             if (required)
               ExcludeSemantics(
-                child: Text('*', style: TextStyle(color: theme.danger)),
+                child: Transform.translate(
+                  offset: Offset(
+                    0,
+                    -MediaQuery.textScalerOf(context).scale(style.fontSize!) *
+                        _asteriskLiftToPretendard,
+                  ),
+                  child: Text('*', style: TextStyle(color: theme.danger)),
+                ),
               ),
           ],
         ),
