@@ -44,11 +44,13 @@ class _ThemeProviderState extends State<ThemeProvider> {
 
   void _setColor(IdsColor color) => setState(() => _color = color);
   void _setMode(IdsMode mode) => setState(() => _mode = mode);
-  void _toggleMode() =>
-      setState(() => _mode = _mode == IdsMode.light ? IdsMode.dark : IdsMode.light);
+  void _toggleMode() => setState(
+    () => _mode = _mode == IdsMode.light ? IdsMode.dark : IdsMode.light,
+  );
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = IdsTheme(color: _color, mode: _mode).onSurface;
     return IdsScope(
       color: _color,
       mode: _mode,
@@ -57,10 +59,14 @@ class _ThemeProviderState extends State<ThemeProvider> {
       toggleMode: _toggleMode,
       child: DefaultTextStyle(
         style: DefaultTextStyle.of(context).style.copyWith(
+          color: onSurface,
           fontFamily: IdsTypography.sansFontFamily,
           package: IdsTypography.sansFontPackage,
         ),
-        child: widget.child,
+        child: IconTheme.merge(
+          data: IconThemeData(color: onSurface),
+          child: widget.child,
+        ),
       ),
     );
   }

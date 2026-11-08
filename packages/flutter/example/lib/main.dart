@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import 'components/divider_usecase.dart';
+import 'components/field_usecase.dart';
+import 'components/label_usecase.dart';
+import 'components/spinner_usecase.dart';
+
 void main() {
   runApp(const WidgetbookApp());
 }
@@ -19,7 +24,12 @@ class WidgetbookApp extends StatelessWidget {
         ),
         home: child,
       ),
-      directories: const [],
+      directories: [
+        WidgetbookComponent(name: 'IdsDivider', useCases: dividerUseCases),
+        WidgetbookComponent(name: 'IdsField', useCases: fieldUseCases),
+        WidgetbookComponent(name: 'IdsLabel', useCases: labelUseCases),
+        WidgetbookComponent(name: 'IdsSpinner', useCases: spinnerUseCases),
+      ],
     );
   }
 }
