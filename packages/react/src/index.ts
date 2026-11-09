@@ -100,6 +100,7 @@ export { Progress } from './components/feedback/progress';
 export { Skeleton } from './components/feedback/skeleton';
 export { Label } from './components/typography/label';
 export { Kbd } from './components/typography/kbd';
+export { Link } from './components/typography/link';
 
 export { Pagination } from './components/navigation/pagination';
 

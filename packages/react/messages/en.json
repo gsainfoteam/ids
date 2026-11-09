@@ -165,6 +165,9 @@
     "up": "Up Arrow",
     "windows": "Windows"
   },
+  "link": {
+    "newTab": "(opens in a new tab)"
+  },
   "marquee": {
     "pause": "Pause"
   },
