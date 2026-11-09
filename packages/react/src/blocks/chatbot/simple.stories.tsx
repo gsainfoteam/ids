@@ -3,6 +3,7 @@ import { useState } from 'react';
 import {
   BellAlertIcon,
   DocumentDuplicateIcon,
+  DocumentTextIcon,
   HandThumbDownIcon,
   HandThumbUpIcon,
   PlusIcon,
@@ -186,8 +187,12 @@ export const PC: Story = {
           <PromptInput value={draft} onValueChange={setDraft} onSend={() => {}}>
             <PromptInput.Input
               aria-label="GIST 도우미에게 묻기"
-              placeholder="무엇이든 물어보세요"
+              placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요"
             />
+            <PromptInput.ActionMenu />
+            <PromptInput.Tool value="sources" icon={<DocumentTextIcon />}>
+              출처 공지 함께 보기
+            </PromptInput.Tool>
             <PromptInput.Submit aria-label="묻기" />
           </PromptInput>
           <p className="text-caption-c1-regular text-center">
