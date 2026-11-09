@@ -104,6 +104,46 @@ export const Gallery: Story = {
             </Bubble>
           </div>
         </Showcase.Row>
+        <Showcase.Row label="여러 개">
+          <div className="flex w-80">
+            <Bubble>
+              응
+              <Bubble.Reactions>
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>👍</Chip.Icon>3
+                </Chip>
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>🎉</Chip.Icon>2
+                </Chip>
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>🔥</Chip.Icon>1
+                </Chip>
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>😂</Chip.Icon>1
+                </Chip>
+              </Bubble.Reactions>
+            </Bubble>
+          </div>
+          <div className="flex w-80 justify-end">
+            <Bubble align="end" variant="solid">
+              응
+              <Bubble.Reactions>
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>❤️</Chip.Icon>2
+                </Chip>
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>🙏</Chip.Icon>1
+                </Chip>
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>👏</Chip.Icon>1
+                </Chip>
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>😮</Chip.Icon>1
+                </Chip>
+              </Bubble.Reactions>
+            </Bubble>
+          </div>
+        </Showcase.Row>
         <Showcase.Row label="in flow">
           <div className="flex w-80">
             <Bubble variant="outline">
@@ -177,7 +217,7 @@ export const Reactions: Story = {
     docs: {
       description: {
         story:
-          '`Bubble.Reactions` 를 마지막 자식으로 두면 상자 아래 모서리에 겹쳐 그리고, 그만큼 아래 여백을 둡니다. 꼬리의 반대쪽 끝에 붙습니다. 반응은 이름이 "반응" 인 `role="group"` 입니다.',
+          '`Bubble.Reactions` 를 마지막 자식으로 두면 상자 아래 모서리에 겹쳐 그리고, 그만큼 아래 여백을 둡니다. 꼬리의 반대쪽 끝에 붙고, 반응이 말풍선보다 길면 한 줄을 지킨 채 빈 쪽으로 뻗습니다. 반응은 이름이 "반응" 인 `role="group"` 입니다.',
       },
     },
   },

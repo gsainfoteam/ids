@@ -8,7 +8,7 @@ export const bubbleStyle = tv({
       'relative w-[var(--bubble-fit-width,fit-content)] max-w-[var(--bubble-max-width,80%)] min-w-0',
       'concentric-p-3 text-body-b2-regular text-balance [overflow-wrap:anywhere]',
     ],
-    reactions: 'flex flex-wrap items-center gap-1',
+    reactions: 'flex items-center gap-1',
   },
   variants: {
     variant: {
@@ -25,14 +25,17 @@ export const bubbleStyle = tv({
     overlap: {
       true: {
         root: 'mb-4',
-        reactions: ['absolute top-full -translate-y-1.5', '*:ring-2 *:ring-(--ids-color-surface)'],
+        reactions: [
+          'absolute top-full w-max min-w-[calc(100%-1.5rem)] -translate-y-1.5 flex-nowrap',
+          'pointer-events-none *:pointer-events-auto *:ring-2 *:ring-(--ids-color-surface)',
+        ],
       },
-      false: { reactions: 'not-first:mt-2' },
+      false: { reactions: 'flex-wrap not-first:mt-2' },
     },
   },
   compoundVariants: [
-    { overlap: true, align: 'start', class: { reactions: 'end-3' } },
-    { overlap: true, align: 'end', class: { reactions: 'start-3' } },
+    { overlap: true, align: 'start', class: { reactions: 'start-3 justify-end' } },
+    { overlap: true, align: 'end', class: { reactions: 'end-3 justify-start' } },
   ],
   defaultVariants: { variant: 'soft', align: 'start', overlap: false },
 });

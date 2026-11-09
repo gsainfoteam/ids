@@ -344,6 +344,49 @@ test('overlapping reactions sit on the bottom corner away from the tail and leav
   expect(reactionsOf(end!).left - end!.getBoundingClientRect().left).toBeCloseTo(12, 0);
 });
 
+test('many overlapping reactions on a short bubble stay on one line and grow toward the open side', async () => {
+  const reactions = ['👍', '🎉', '🔥', '😂', '🙏'].map((emoji) => (
+    <Chip key={emoji}>
+      <Chip.Icon aria-hidden={false}>{emoji}</Chip.Icon>1
+    </Chip>
+  ));
+  const screen = await render(
+    <IdsProvider>
+      <div className="flex w-80 flex-col items-start">
+        <Bubble>
+          Ok
+          <Bubble.Reactions>{reactions}</Bubble.Reactions>
+        </Bubble>
+      </div>
+      <div className="flex w-80 flex-col items-end">
+        <Bubble align="end">
+          Ok
+          <Bubble.Reactions>{reactions}</Bubble.Reactions>
+        </Bubble>
+      </div>
+    </IdsProvider>,
+  );
+  const [start, end] = bubbles(screen.container);
+  const rects = (bubble: HTMLElement) => {
+    const group = bubble.querySelector<HTMLElement>('[data-bubble-reactions]')!;
+    return {
+      box: bubble.getBoundingClientRect(),
+      group: group.getBoundingClientRect(),
+      chip: group.firstElementChild!.getBoundingClientRect(),
+    };
+  };
+
+  const received = rects(start!);
+  expect(received.group.height).toBe(received.chip.height);
+  expect(received.group.left - received.box.left).toBeCloseTo(12, 0);
+  expect(received.group.right).toBeGreaterThan(received.box.right);
+
+  const sent = rects(end!);
+  expect(sent.group.height).toBe(sent.chip.height);
+  expect(sent.box.right - sent.group.right).toBeCloseTo(12, 0);
+  expect(sent.group.left).toBeLessThan(sent.box.left);
+});
+
 test('overlapping reactions do not widen the fitted box', async () => {
   const screen = await render(
     <IdsProvider>
