@@ -18,7 +18,7 @@ import { Bubble, Chip } from '@gsainfoteam/ids-react';
 <Bubble>
   학식 메뉴 알려 줘
   <Bubble.Reactions>
-    <Chip size="tiny" variant="outline">👍 2</Chip>
+    <Chip><Chip.Icon aria-hidden={false}>👍</Chip.Icon>2</Chip>
   </Bubble.Reactions>
 </Bubble>
 ```
@@ -89,8 +89,8 @@ import { Bubble, Chip } from '@gsainfoteam/ids-react';
 <Bubble>
   학식 메뉴 알려 줘
   <Bubble.Reactions>                         {/* 마지막 자식: 아래 모서리에 겹침 */}
-    <Chip size="tiny" variant="outline">👍 2</Chip>
-    <Chip size="tiny" variant="outline">😮 1</Chip>
+    <Chip><Chip.Icon aria-hidden={false}>👍</Chip.Icon>2</Chip>
+    <Chip><Chip.Icon aria-hidden={false}>😮</Chip.Icon>1</Chip>
   </Bubble.Reactions>
 </Bubble>
 
@@ -103,4 +103,6 @@ import { Bubble, Chip } from '@gsainfoteam/ids-react';
 - 겹친 반응은 아래 가장자리에서 꼬리의 반대쪽 끝, 12px 안쪽에 붙습니다. `align="start"` 면 끝 쪽, `align="end"` 면 시작 쪽입니다.
 - 겹치면 말풍선 아래에 12px 여백을 두어 다음 줄과 부딪치지 않게 합니다. 반응의 자식에는 바탕색 2px 고리를 둘러 상자 테두리와 떼어 놓습니다.
 - 반응은 `role="group"` 이고 이름은 `t('bubble.reactions')`("반응") 입니다. `aria-label` 로 바꿉니다.
-- 무엇을 넣을지는 앱이 정합니다. 누르는 반응은 `Chip`, 숫자만 보이면 `Badge` 입니다.
+- 무엇을 넣을지는 앱이 정합니다. 반응은 기본 `soft` 인 `Chip` 이 어울립니다. 회색 면에 바탕색 고리가 둘러져 말풍선과 떨어져 보입니다.
+- 이모지는 `Chip.Icon` 에 넣습니다. 숫자와 같은 줄에 가운데 맞고 Chip 의 간격만큼 떨어집니다. `Chip.Icon` 은 기본이 `aria-hidden` 이므로 `aria-hidden={false}` 를 주어 이모지 이름을 읽게 합니다.
+- 크기는 기본(`standard`)을 씁니다. `tiny` 는 간격이 2px 라 이모지와 숫자가 붙어 보입니다.

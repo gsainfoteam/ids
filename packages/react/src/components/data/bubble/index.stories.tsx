@@ -4,7 +4,6 @@ import { expect } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { Avatar } from '../avatar';
-import { Badge } from '../badge';
 import { Chip } from '../chip';
 
 import { Bubble } from '.';
@@ -88,8 +87,8 @@ export const Gallery: Story = {
             <Bubble>
               학식 메뉴 알려 줘
               <Bubble.Reactions>
-                <Chip size="tiny" variant="outline">
-                  👍 2
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>👍</Chip.Icon>2
                 </Chip>
               </Bubble.Reactions>
             </Bubble>
@@ -98,7 +97,9 @@ export const Gallery: Story = {
             <Bubble align="end" variant="solid">
               고마워!
               <Bubble.Reactions>
-                <Badge content="❤️ 1" variant="outline" />
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>❤️</Chip.Icon>1
+                </Chip>
               </Bubble.Reactions>
             </Bubble>
           </div>
@@ -107,7 +108,9 @@ export const Gallery: Story = {
           <div className="flex w-80">
             <Bubble variant="outline">
               <Bubble.Reactions>
-                <Chip size="tiny">👍 2</Chip>
+                <Chip>
+                  <Chip.Icon aria-hidden={false}>👍</Chip.Icon>2
+                </Chip>
               </Bubble.Reactions>
               <p className="mt-2">반응을 마지막이 아닌 곳에 두면 상자 안에 그립니다.</p>
             </Bubble>
@@ -160,11 +163,11 @@ export const Reactions: Story = {
       <Bubble>
         학식 메뉴 알려 줘
         <Bubble.Reactions>
-          <Chip size="tiny" variant="outline" defaultSelected>
-            👍 2
+          <Chip defaultSelected>
+            <Chip.Icon aria-hidden={false}>👍</Chip.Icon>2
           </Chip>
-          <Chip size="tiny" variant="outline">
-            😮 1
+          <Chip>
+            <Chip.Icon aria-hidden={false}>😮</Chip.Icon>1
           </Chip>
         </Bubble.Reactions>
       </Bubble>
