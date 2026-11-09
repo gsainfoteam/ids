@@ -5,7 +5,7 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IdsProvider, Link } from '../src';
+import { Empty, IdsProvider, Link } from '../src';
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html').querySelector('a')!;
@@ -117,4 +117,24 @@ test('neutral follows the surrounding text color', async () => {
   );
   const link = screen.getByRole('link').element() as HTMLElement;
   expect(getComputedStyle(link).color).toBe('rgb(1, 2, 3)');
+});
+
+test('inside Empty.Description a Link keeps its own underline offset', async () => {
+  const screen = await render(
+    <div>
+      <Link href="#a">Alone</Link>
+      <Empty>
+        <Empty.Description>
+          <Link href="#b">Inside</Link>
+        </Empty.Description>
+      </Empty>
+    </div>,
+  );
+  const alone = screen.getByRole('link', { name: 'Alone' }).element();
+  const inside = screen.getByRole('link', { name: 'Inside' }).element();
+  const offsetInEm = (element: Element) =>
+    parseFloat(getComputedStyle(element).textUnderlineOffset) /
+    parseFloat(getComputedStyle(element).fontSize);
+  expect(offsetInEm(inside)).toBeCloseTo(offsetInEm(alone));
+  expect(getComputedStyle(inside).color).toBe(getComputedStyle(alone).color);
 });
