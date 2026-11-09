@@ -8,10 +8,7 @@ export const messageScrollerStyle = tv({
     list: 'flex flex-col gap-4 p-4',
     item: 'flex min-w-0 flex-col',
     loader: 'pointer-events-none absolute inset-x-0 top-3 flex justify-center',
-    loaderSurface: [
-      'flex rounded-full bg-(--ids-color-surface) p-1.5 shadow-md',
-      'inset-ring-1 inset-ring-(--ids-color-border)',
-    ],
+    loaderSurface: 'concentric-p-2 shadow-md',
     scrollToBottom: [
       'absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full shadow-md',
       'transition-[color,background-color,box-shadow,scale,opacity,translate]',

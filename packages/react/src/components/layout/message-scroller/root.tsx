@@ -9,6 +9,7 @@ import { messageScrollerStyle } from './style';
 import { useMessageScroller } from './use-message-scroller';
 import { useTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
+import { Card } from '../../data/card';
 import { Spinner } from '../../feedback/spinner';
 import { ScrollArea } from '../scroll-area';
 
@@ -84,9 +85,9 @@ export function MessageScrollerRoot({
           </ScrollArea>
           {loading ? (
             <div data-message-scroller-loader="" className={styles.loader()}>
-              <span className={styles.loaderSurface()}>
+              <Card variant="outline" size="tiny" className={styles.loaderSurface()}>
                 <Spinner size="tiny" aria-label={t('messageScroller.loading')} />
-              </span>
+              </Card>
             </div>
           ) : null}
           {scrollToBottom}
