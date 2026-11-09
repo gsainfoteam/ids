@@ -336,9 +336,9 @@ test('overlapping reactions sit on the bottom corner away from the tail and leav
   for (const bubble of [start!, end!]) {
     const box = bubble.getBoundingClientRect();
     const reactions = reactionsOf(bubble);
-    expect(reactions.top).toBeLessThan(box.bottom);
+    expect(box.bottom - reactions.top).toBeCloseTo(6, 0);
     expect(reactions.bottom).toBeGreaterThan(box.bottom);
-    expect(parseFloat(getComputedStyle(bubble).marginBottom)).toBeGreaterThan(0);
+    expect(parseFloat(getComputedStyle(bubble).marginBottom)).toBe(16);
   }
   expect(start!.getBoundingClientRect().right - reactionsOf(start!).right).toBeCloseTo(12, 0);
   expect(reactionsOf(end!).left - end!.getBoundingClientRect().left).toBeCloseTo(12, 0);

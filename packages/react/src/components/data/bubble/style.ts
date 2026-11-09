@@ -24,8 +24,8 @@ export const bubbleStyle = tv({
     } satisfies Record<BubbleAlign, object>,
     overlap: {
       true: {
-        root: 'mb-3',
-        reactions: ['absolute bottom-0 translate-y-1/2', '*:ring-2 *:ring-(--ids-color-surface)'],
+        root: 'mb-4',
+        reactions: ['absolute top-full -translate-y-1.5', '*:ring-2 *:ring-(--ids-color-surface)'],
       },
       false: { reactions: 'not-first:mt-2' },
     },
