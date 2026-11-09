@@ -29,7 +29,7 @@ export const sidebarStyle = tv({
     listItem: 'flex min-w-0 flex-col',
     subList:
       'ms-4.5 flex min-w-0 flex-col gap-0.5 border-s border-(--ids-color-border) ps-2 pt-0.5',
-    item: 'px-2',
+    item: 'concentric-p-0 px-2',
     label: 'min-w-0',
     end: '',
     submenuTrigger: 'data-hovered:bg-transparent data-active:bg-transparent',
