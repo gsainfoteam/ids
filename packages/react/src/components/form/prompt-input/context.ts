@@ -13,6 +13,8 @@ type PromptInputContextValue = {
   busy: boolean;
   canSend: boolean;
   stop: (() => void) | undefined;
+  tools: string[];
+  toggleTool: (tool: string) => void;
   disabled: boolean;
   size: IdsSize;
   styles: ReturnType<typeof promptInputStyle>;

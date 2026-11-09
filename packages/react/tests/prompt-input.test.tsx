@@ -66,7 +66,7 @@ test('Enter sends and clears, Shift+Enter breaks the line, empty or blank text i
   await expect.element(textbox()).toHaveValue('first\nsecond');
   await userEvent.keyboard('{Enter}');
 
-  expect(onSend).toHaveBeenCalledExactlyOnceWith({ text: 'first\nsecond', files: [] });
+  expect(onSend).toHaveBeenCalledExactlyOnceWith({ text: 'first\nsecond', files: [], tools: [] });
   await expect.element(textbox()).toHaveValue('');
   await expect.element(textbox()).toHaveFocus();
 });
@@ -91,7 +91,7 @@ test('Enter that commits an IME composition does not send', async (context) => {
   expect(onSend).not.toHaveBeenCalled();
 
   await userEvent.keyboard('{Enter}');
-  expect(onSend).toHaveBeenCalledExactlyOnceWith({ text: '안녕', files: [] });
+  expect(onSend).toHaveBeenCalledExactlyOnceWith({ text: '안녕', files: [], tools: [] });
 });
 
 test('while busy, Enter keeps the draft and the button or Escape stops, or it waits without onStop', async () => {
@@ -202,6 +202,7 @@ test('attachments: picked and dropped files list in the top bar and go with the 
   expect(onSend).toHaveBeenCalledExactlyOnceWith({
     text: '',
     files: [expect.objectContaining({ name: 'a.pdf' })],
+    tools: [],
   });
   await expect.element(attachments()).not.toBeInTheDocument();
   expect(onFilesChange).toHaveBeenLastCalledWith([]);
@@ -247,7 +248,7 @@ test('controlled value reports the cleared text and parts may be placed by hand'
   ).toEqual(['Ask', 'Extra']);
 
   await userEvent.click(ask);
-  expect(onSend).toHaveBeenCalledExactlyOnceWith({ text: 'draft', files: [] });
+  expect(onSend).toHaveBeenCalledExactlyOnceWith({ text: 'draft', files: [], tools: [] });
   await expect.element(question).toHaveValue('');
 });
 
@@ -294,22 +295,92 @@ test('onSubmit may cancel sending, and without onSend the form submits natively'
   }
 });
 
-test('form reset restores the default text and files without reporting them', async () => {
-  const onValueChange = vi.fn();
+test('tools toggle, go with every message and stay on after sending', async () => {
+  const onSend = vi.fn();
+  const onToolsChange = vi.fn();
+  await render(
+    <PromptInput onSend={onSend} onToolsChange={onToolsChange}>
+      <PromptInput.Input />
+      <PromptInput.Tool value="search">웹 검색</PromptInput.Tool>
+      <PromptInput.Tool value="sources">출처 보기</PromptInput.Tool>
+    </PromptInput>,
+  );
+  const search = page.getByRole('button', { name: '웹 검색' });
+
+  await expect.element(search).toHaveAttribute('aria-pressed', 'false');
+  await userEvent.click(search);
+  await expect.element(search).toHaveAttribute('aria-pressed', 'true');
+  expect(onToolsChange).toHaveBeenLastCalledWith(['search']);
+  expect(onSend).not.toHaveBeenCalled();
+
+  await userEvent.fill(textbox(), 'news');
+  await userEvent.keyboard('{Enter}');
+  expect(onSend).toHaveBeenCalledExactlyOnceWith({ text: 'news', files: [], tools: ['search'] });
+  await expect.element(search).toHaveAttribute('aria-pressed', 'true');
+
+  await userEvent.click(search);
+  expect(onToolsChange).toHaveBeenLastCalledWith([]);
+});
+
+test('the action menu opens the file picker from its default item', async () => {
   const screen = await render(
-    <PromptInput defaultValue="start" defaultFiles={[pdf()]} onValueChange={onValueChange}>
+    <PromptInput onSend={vi.fn()}>
+      <PromptInput.Input />
+      <PromptInput.ActionMenu />
+    </PromptInput>,
+  );
+  const opened = vi.fn();
+  picker(screen.container).addEventListener('click', (event) => {
+    event.preventDefault();
+    opened();
+  });
+
+  await userEvent.click(page.getByRole('button', { name: '더하기' }));
+  await userEvent.click(page.getByRole('menuitem', { name: '파일 첨부' }));
+  expect(opened).toHaveBeenCalledOnce();
+  await expect.element(page.getByRole('menu')).not.toBeInTheDocument();
+});
+
+test('the bars join the input with no line between them', async () => {
+  const screen = await render(
+    <PromptInput defaultFiles={[pdf()]}>
       <PromptInput.Input />
       <PromptInput.Attach />
+    </PromptInput>,
+  );
+  const top = screen.container.querySelector<HTMLElement>('[data-text-area-top]')!;
+  const bottom = screen.container.querySelector<HTMLElement>('[data-text-area-bottom]')!;
+
+  expect(getComputedStyle(top).borderBottomWidth).toBe('0px');
+  expect(getComputedStyle(bottom).borderTopWidth).toBe('0px');
+});
+
+test('form reset restores the default text, files and tools without reporting them', async () => {
+  const onValueChange = vi.fn();
+  const screen = await render(
+    <PromptInput
+      defaultValue="start"
+      defaultFiles={[pdf()]}
+      defaultTools={['search']}
+      onValueChange={onValueChange}
+    >
+      <PromptInput.Input />
+      <PromptInput.Attach />
+      <PromptInput.Tool value="search">웹 검색</PromptInput.Tool>
     </PromptInput>,
   );
 
   await userEvent.fill(textbox(), 'changed');
   await userEvent.click(page.getByRole('button', { name: 'report.pdf 삭제', exact: true }));
+  await userEvent.click(page.getByRole('button', { name: '웹 검색' }));
   onValueChange.mockClear();
   screen.container.querySelector('form')!.reset();
 
   await expect.element(textbox()).toHaveValue('start');
   await expect.poll(attachedNames).toEqual(['report.pdf']);
+  await expect
+    .element(page.getByRole('button', { name: '웹 검색' }))
+    .toHaveAttribute('aria-pressed', 'true');
   expect(onValueChange).not.toHaveBeenCalled();
 });
 

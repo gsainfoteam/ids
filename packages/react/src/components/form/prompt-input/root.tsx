@@ -37,7 +37,7 @@ import type { FileFieldRejection } from '../file-field/file-rules';
 
 export type PromptInputStatus = 'idle' | 'submitting' | 'streaming';
 export type PromptInputVariant = 'outline' | 'soft';
-export type PromptInputMessage = { text: string; files: File[] };
+export type PromptInputMessage = { text: string; files: File[]; tools: string[] };
 
 export type PromptInputProps = Omit<
   ComponentProps<'form'>,
@@ -49,6 +49,9 @@ export type PromptInputProps = Omit<
   files?: File[];
   defaultFiles?: File[];
   onFilesChange?: (files: File[]) => void;
+  tools?: string[];
+  defaultTools?: string[];
+  onToolsChange?: (tools: string[]) => void;
   onSend?: (message: PromptInputMessage) => void;
   onStop?: () => void;
   status?: PromptInputStatus;
@@ -63,6 +66,7 @@ export type PromptInputProps = Omit<
 };
 
 const NO_FILES: File[] = [];
+const NO_TOOLS: string[] = [];
 const ONE_LINE = 1;
 const LINES_BEFORE_SCROLLING = 6;
 
@@ -95,6 +99,9 @@ export function PromptInputRoot({
   files: filesProp,
   defaultFiles = NO_FILES,
   onFilesChange,
+  tools: toolsProp,
+  defaultTools = NO_TOOLS,
+  onToolsChange,
   onSend,
   onStop,
   status = 'idle',
@@ -121,6 +128,14 @@ export function PromptInputRoot({
     defaultValue: defaultFiles,
     onValueChange: onFilesChange,
   });
+  const [tools, setTools] = useControllableState({
+    value: toolsProp,
+    defaultValue: defaultTools,
+    onValueChange: onToolsChange,
+  });
+  const toggleTool = (tool: string) =>
+    setTools(tools.includes(tool) ? tools.filter((on) => on !== tool) : [...tools, tool]);
+
   const attachments = useFileFieldRoot(
     {
       multiple: true,
@@ -143,6 +158,7 @@ export function PromptInputRoot({
   useFormReset(formRef, () => {
     setText(defaultValue, { silent: true });
     setFiles(defaultFiles, { silent: true });
+    setTools(defaultTools, { silent: true });
   });
 
   const send = (event: SubmitEvent<HTMLFormElement>) => {
@@ -154,7 +170,7 @@ export function PromptInputRoot({
     }
     if (!onSend) return;
     event.preventDefault();
-    onSend({ text, files });
+    onSend({ text, files, tools });
     setText('');
     setFiles(NO_FILES);
   };
@@ -177,7 +193,19 @@ export function PromptInputRoot({
   } = input;
 
   return (
-    <PromptInputContext value={{ status, busy, canSend, stop: onStop, disabled, size, styles }}>
+    <PromptInputContext
+      value={{
+        status,
+        busy,
+        canSend,
+        stop: onStop,
+        tools,
+        toggleTool,
+        disabled,
+        size,
+        styles,
+      }}
+    >
       <FileContext value={attachments.context}>
         <form
           {...mergeProps(formProps, attachments.rootProps)}
@@ -199,6 +227,7 @@ export function PromptInputRoot({
             rows={rows}
             minRows={minRows}
             maxRows={maxRows}
+            divided={false}
             className={styles.textArea()}
           >
             {top}

@@ -200,6 +200,7 @@
     "close": "Close"
   },
   "promptInput": {
+    "actions": "Add",
     "attach": "Attach files",
     "attachments": "Attached files",
     "label": "Message",

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
-import { GlobeAltIcon } from '@heroicons/react/24/outline';
+import { CameraIcon, DocumentTextIcon } from '@heroicons/react/16/solid';
 import { expect, fn, waitFor, within } from 'storybook/test';
 
 import { Showcase, holdTheNextCall } from '~story-kit';
 
 import { cn } from '../../../utils';
-import { IconToggle } from '../../action/icon-toggle';
 import { Chip } from '../../data/chip';
+import { Menu } from '../../overlay/menu';
 import { Select } from '../select';
 
 import { PromptInput } from '.';
@@ -108,6 +108,15 @@ export const Gallery: Story = {
             <PromptInput.Attach />
           </PromptInput>
         </Showcase.Row>
+        <Showcase.Row label="tools">
+          <PromptInput defaultTools={['sources']} className="w-72">
+            <PromptInput.Input aria-label="도구" />
+            <PromptInput.ActionMenu />
+            <PromptInput.Tool value="sources" icon={<DocumentTextIcon />}>
+              출처 공지
+            </PromptInput.Tool>
+          </PromptInput>
+        </Showcase.Row>
         <Showcase.Row label="disabled">
           <PromptInput disabled defaultValue="보낼 수 없음" className="w-72">
             <PromptInput.Input aria-label="비활성" />
@@ -143,6 +152,7 @@ export const EnterToSend: Story = {
     await expect(args.onSend).toHaveBeenCalledWith({
       text: '학식 메뉴\n저녁도',
       files: [],
+      tools: [],
     });
     await expect(textbox(canvasElement)).toHaveValue('');
     await expect(textbox(canvasElement)).toHaveFocus();
@@ -175,7 +185,7 @@ export const Attachments: Story = {
 
     await userEvent.click(button(canvasElement, '보내기'));
     await expect(args.onSend).toHaveBeenCalledOnce();
-    await expect(args.onSend).toHaveBeenCalledWith({ text: '', files: [REPORT] });
+    await expect(args.onSend).toHaveBeenCalledWith({ text: '', files: [REPORT], tools: [] });
     await expect(
       within(canvasElement).queryByRole('list', { name: '첨부한 파일' }),
     ).not.toBeInTheDocument();
@@ -237,9 +247,17 @@ export const Streaming: Story = {
 export const Tools: Story = {
   render: (args) => (
     <PromptInput {...args}>
-      <PromptInput.Input placeholder="무엇이든 물어보세요" />
-      <PromptInput.Attach />
-      <IconToggle variant="outline" aria-label="웹 검색" icon={<GlobeAltIcon />} />
+      <PromptInput.Input placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요" />
+      <PromptInput.ActionMenu>
+        <PromptInput.AddAttachments />
+        <Menu.Item>
+          <CameraIcon />
+          사진 찍기
+        </Menu.Item>
+      </PromptInput.ActionMenu>
+      <PromptInput.Tool value="sources" icon={<DocumentTextIcon />}>
+        출처 공지 함께 보기
+      </PromptInput.Tool>
       <Select size="tiny" variant="soft" defaultValue="fast" aria-label="모델" className="w-auto">
         <Select.Item value="fast">빠른 답</Select.Item>
         <Select.Item value="deep">깊은 생각</Select.Item>
@@ -250,9 +268,24 @@ export const Tools: Story = {
     docs: {
       description: {
         story:
-          'PromptInput.Input 뒤의 자식은 아래 바에 앞에서부터 놓이고, 보내기 버튼은 생략하면 아래 바 끝에 붙습니다. 모델 고르기나 웹 검색 같은 도구는 앱이 IDS 컴포넌트로 넣습니다.',
+          'PromptInput.Tool 은 켜고 끄는 도구이고, 켠 도구의 value 는 onSend 의 tools 로 함께 옵니다. PromptInput.ActionMenu 는 + 버튼의 메뉴로, PromptInput.AddAttachments 가 파일 고르기를 엽니다. 모델 고르기처럼 그 밖의 도구는 앱이 IDS 컴포넌트로 넣습니다.',
       },
     },
+  },
+  play: async ({ canvasElement, userEvent, args }) => {
+    await userEvent.click(button(canvasElement, '출처 공지 함께 보기'));
+    await expect(button(canvasElement, '출처 공지 함께 보기')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    await userEvent.type(textbox(canvasElement), '장학금 신청 기간{Enter}');
+    await expect(args.onSend).toHaveBeenCalledOnce();
+    await expect(args.onSend).toHaveBeenCalledWith({
+      text: '장학금 신청 기간',
+      files: [],
+      tools: ['sources'],
+    });
   },
 };
 
@@ -287,7 +320,7 @@ export const Suggestions: Story = {
 
     await userEvent.click(button(canvasElement, '보내기'));
     await expect(args.onSend).toHaveBeenCalledOnce();
-    await expect(args.onSend).toHaveBeenCalledWith({ text: '셔틀 시간표', files: [] });
+    await expect(args.onSend).toHaveBeenCalledWith({ text: '셔틀 시간표', files: [], tools: [] });
     await expect(textbox(canvasElement)).toHaveValue('');
   },
 };

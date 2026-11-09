@@ -1,3 +1,5 @@
+import { PromptInputActionMenu, type PromptInputActionMenuProps } from './action-menu';
+import { PromptInputAddAttachments, type PromptInputAddAttachmentsProps } from './add-attachments';
 import { PromptInputAttach, type PromptInputAttachProps } from './attach';
 import { PromptInputAttachments, type PromptInputAttachmentsProps } from './attachments';
 import { PromptInputInput, type PromptInputInputProps } from './input';
@@ -10,6 +12,7 @@ import {
 } from './root';
 import { promptInputStyle } from './style';
 import { PromptInputSubmit, type PromptInputSubmitProps } from './submit';
+import { PromptInputTool, type PromptInputToolProps } from './tool';
 
 export function PromptInput(props: PromptInput.Props) {
   return <PromptInputRoot {...props} />;
@@ -25,11 +28,17 @@ export namespace PromptInput {
   export type AttachmentsProps = PromptInputAttachmentsProps;
   export type AttachProps = PromptInputAttachProps;
   export type SubmitProps = PromptInputSubmitProps;
+  export type ToolProps = PromptInputToolProps;
+  export type ActionMenuProps = PromptInputActionMenuProps;
+  export type AddAttachmentsProps = PromptInputAddAttachmentsProps;
 
   export const Input = PromptInputInput;
   export const Attachments = PromptInputAttachments;
   export const Attach = PromptInputAttach;
   export const Submit = PromptInputSubmit;
+  export const Tool = PromptInputTool;
+  export const ActionMenu = PromptInputActionMenu;
+  export const AddAttachments = PromptInputAddAttachments;
 
   export const Style = promptInputStyle;
 }

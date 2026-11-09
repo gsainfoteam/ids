@@ -202,6 +202,7 @@ export const messages = {
     close: '닫기',
   },
   promptInput: {
+    actions: '더하기',
     attach: '파일 첨부',
     attachments: '첨부한 파일',
     label: '메시지',

@@ -1,0 +1,39 @@
+'use client';
+
+import { type ReactElement, type ReactNode } from 'react';
+
+import { CheckIcon } from '@heroicons/react/16/solid';
+
+import { usePromptInputContext } from './context';
+import { Toggle } from '../../action/toggle';
+
+export type PromptInputToolProps = Omit<
+  Toggle.Props,
+  'value' | 'pressed' | 'defaultPressed' | 'onPressedChange' | 'variant' | 'size' | 'type' | 'children'
+> & {
+  value: string;
+  icon?: ReactElement;
+  children?: ReactNode;
+};
+
+export function PromptInputTool({ value, icon, disabled, children, ...props }: PromptInputToolProps) {
+  const c = usePromptInputContext('PromptInput.Tool');
+  const on = c.tools.includes(value);
+
+  return (
+    <Toggle
+      {...props}
+      variant="soft"
+      size={c.size}
+      disabled={disabled ?? c.disabled}
+      pressed={on}
+      onPressedChange={() => c.toggleTool(value)}
+      data-prompt-input-tool={value}
+    >
+      {on ? <CheckIcon aria-hidden="true" /> : icon}
+      {children}
+    </Toggle>
+  );
+}
+
+PromptInputTool.displayName = 'PromptInput.Tool';
