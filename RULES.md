@@ -144,7 +144,7 @@ packages/react/src/
     layout/      AspectRatio, Divider, Spacer, ScrollArea, Resizable, Splitter
     navigation/  Breadcrumb, Pagination, Stepper, Tabs
     overlay/     Dialog, Drawer, Menu, Popover, Tooltip
-    typography/  Kbd, Label
+    typography/  Kbd, Label, Link
     utility/     Slot, Group, IdsProvider
   internal/      shared parts that are not exported:
                    surfaces     control-surface, toggle-surface, icon-square, field-surface, surface,
@@ -288,10 +288,11 @@ changes it.
   radius, shadow or `style`. A line is a `Divider`, a surface a `Card` or an `Item`, muted text a
   component's `Description` part. The classes a part documents (`border-t` on `Card.Footer`) are
   fine.
-- A block picks `solid`, `outline` or `soft` and never `ghost`. Until IDS has a Link, a link that
-  should stand out is `Button asChild` around the `<a>`, a row or card that links is `Item asChild`
-  or `Card asChild`, a link in a table cell or a footer list is a plain `<a>`, and a link inside
-  running text sits only in a part that underlines it (`Empty.Description`).
+- A block picks `solid`, `outline` or `soft` and never `ghost`. A text link (in running text, or
+  a "forgot password" or "sign up" line) is `Link`; a link in a table cell or a footer list is
+  `Link colorScheme="neutral" underline="hover"`; a link that should stand out is `Button asChild`
+  around the `<a>`; a row or card that links is `Item asChild` or `Card asChild`. A bare `<a>`
+  appears only as the `asChild` child of one of these or of an `IconButton`.
 - The block is written inline in `render` and works from the 414px test viewport up. Its
   outermost element carries `break-keep`, so Korean wraps between words.
 - Data sits in module-level constants with fixed dates and numbers, so the server and the client
