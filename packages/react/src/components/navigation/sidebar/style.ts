@@ -29,7 +29,7 @@ export const sidebarStyle = tv({
     listItem: 'flex min-w-0 flex-col',
     subList:
       'ms-4.5 flex min-w-0 flex-col gap-0.5 border-s border-(--ids-color-border) ps-2 pt-0.5',
-    item: '',
+    item: 'px-2',
     label: 'min-w-0',
     end: '',
     submenuTrigger: 'data-hovered:bg-transparent data-active:bg-transparent',
@@ -55,7 +55,7 @@ export const sidebarStyle = tv({
     state: {
       expanded: {},
       rail: {
-        panel: 'w-14',
+        panel: 'w-12',
         header: 'flex-col',
         groupLabel: 'sr-only',
         item: 'justify-center',

@@ -47,6 +47,7 @@ export function SidebarAccordionSubmenu({ parts, disabled, className }: SubmenuP
               asChild
               interactive
               size="tiny"
+              dense
               disabled={disabled}
               className={sidebar.styles.item({
                 className: cn(sidebar.styles.submenuTrigger(), className),
@@ -99,6 +100,7 @@ export function SidebarMenuSubmenu({ parts, disabled, className }: SubmenuProps)
           asChild
           interactive
           size="tiny"
+          dense
           disabled={disabled}
           selected={containsValue(parts.subItems, sidebar.value)}
           className={sidebar.styles.item({ className })}

@@ -63,6 +63,7 @@ export function SidebarTrigger({
       }
     >
       <IconButton
+        size="tiny"
         {...props}
         variant={variant}
         aria-label={props['aria-label'] ?? label}
