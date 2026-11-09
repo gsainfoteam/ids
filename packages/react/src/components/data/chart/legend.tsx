@@ -58,6 +58,8 @@ export function ChartLegendContent({
   );
 }
 
+ChartLegendContent.displayName = 'Chart.LegendContent';
+
 export function ChartLegend({ indicator, formatter, content, ...props }: ChartLegendProps) {
   const { config } = useChartContext('Chart.Legend');
 

@@ -247,13 +247,11 @@ export const DefaultTooltipAndLegend: Story = {
     },
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
-    const legend = await waitFor(() => {
-      const list = canvasElement.querySelector<HTMLElement>('[data-chart-legend]');
-      expect(list).not.toBeNull();
-      return list!;
+    await waitFor(() => {
+      const legend = canvasElement.querySelector<HTMLElement>('[data-chart-legend]');
+      expect(legend?.tagName).toBe('UL');
+      expect(legend).toHaveTextContent('웹앱');
     });
-    await expect(legend.tagName).toBe('UL');
-    await expect(legend).toHaveTextContent('웹앱');
 
     await pointAtTheMiddle(userEvent, await canvas.findByRole('img', { name: '주간 방문' }));
     await waitFor(() => expect(tooltipText(canvasElement)).toMatch(/웹[\d,]+/));
@@ -281,9 +279,9 @@ export const Keyboard: Story = {
     },
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
-    const graph = await canvas.findByRole('img', { name: '주간 방문' });
+    await canvas.findByRole('img', { name: '주간 방문' });
     await userEvent.keyboard('{Tab}');
-    await expect(graph).toHaveFocus();
+    await expect(await canvas.findByRole('img', { name: '주간 방문' })).toHaveFocus();
     await waitFor(() => expect(tooltipText(canvasElement)).toMatch(/^월/));
     await userEvent.keyboard('{ArrowRight}');
     await waitFor(() => expect(tooltipText(canvasElement)).toMatch(/^화/));

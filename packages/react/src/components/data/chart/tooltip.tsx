@@ -75,6 +75,8 @@ export function ChartTooltipContent({
   );
 }
 
+ChartTooltipContent.displayName = 'Chart.TooltipContent';
+
 export function ChartTooltip({ indicator, hideLabel, content, ...props }: ChartTooltipProps) {
   const { config } = useChartContext('Chart.Tooltip');
 

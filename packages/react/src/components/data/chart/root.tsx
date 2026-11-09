@@ -146,9 +146,11 @@ export function ChartRoot({
   const descriptionId = description ? (description.props.id ?? `${id}description`) : undefined;
   const table = recognised ? tableOf(graph.props, config) : undefined;
 
+  const wrapsAnUnknownChart = graph !== undefined && !recognised && !hasOwnTable;
+
   useEffect(() => {
-    if (isDevelopment && graph && !recognised && !hasOwnTable) console.warn(WRAPPED_CHART_WARNING);
-  }, [graph, recognised, hasOwnTable]);
+    if (isDevelopment && wrapsAnUnknownChart) console.warn(WRAPPED_CHART_WARNING);
+  }, [wrapsAnUnknownChart]);
 
   const drawn =
     graph && size

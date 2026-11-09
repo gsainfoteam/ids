@@ -331,6 +331,7 @@ test('a chart wrapped in an app component gets a development warning and keeps i
 
   await expect.element(screen.getByRole('img', { name: '방문' })).toHaveAttribute('width', '400');
   expect(warn).toHaveBeenCalledWith(expect.stringContaining('Chart.Table'));
+  expect(warn).toHaveBeenCalledTimes(1);
   expect(document.querySelector('table')).toBeNull();
   warn.mockRestore();
 });
