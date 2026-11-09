@@ -6,6 +6,7 @@ import 'components/aspect_ratio_usecase.dart';
 import 'components/divider_usecase.dart';
 import 'components/field_usecase.dart';
 import 'components/label_usecase.dart';
+import 'components/skeleton_usecase.dart';
 import 'components/spinner_usecase.dart';
 
 void main() {
@@ -30,6 +31,7 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(name: 'Divider', useCases: dividerUseCases),
         WidgetbookComponent(name: 'Field', useCases: fieldUseCases),
         WidgetbookComponent(name: 'Label', useCases: labelUseCases),
+        WidgetbookComponent(name: 'Skeleton', useCases: skeletonUseCases),
         WidgetbookComponent(name: 'Spinner', useCases: spinnerUseCases),
       ],
     );
