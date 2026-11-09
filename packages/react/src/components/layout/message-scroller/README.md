@@ -6,17 +6,22 @@
 - **읽는 중에는 멈춘다.** 위로 스크롤하거나, 휠을 위로 돌리거나, PageUp·Home·위 화살표를 누르거나, 손가락으로 목록을 내리거나, 글자를 고르면 따라가지 않습니다. 맨 아래로 다시 내리면 따라갑니다.
 - **AI 대화는 질문을 위에.** `scrollOnAppend="start"` 면 새로 붙은 자식을 위쪽에 맞추고 답이 그 아래로 자랍니다.
 - **앞 기록을 불러와도 제자리.** 위에 메시지가 붙거나 위쪽 메시지의 크기가 바뀌어도 읽던 메시지는 그 자리에 있습니다.
-- **아래로 가기 버튼.** 맨 아래가 아니면 스크롤 영역 안에 버튼이 뜨고, 읽는 동안 온 메시지 수를 셉니다.
+- **아래로 가기 버튼.** 맨 아래가 아니면 스크롤 영역 아래 가운데에 작은 버튼이 뜨고, 읽는 동안 온 메시지 수를 보여 줍니다.
 - **시멘틱 구성.** 스크롤 영역이 `role="log"` 이고 그 안이 `<ol>`, 자식마다 `<li>` 입니다. 스크롤은 `ScrollArea` 위에서 합니다.
 
 ```tsx
-import { MessageScroller } from '@gsainfoteam/ids-react';
+import { Bubble, MessageScroller } from '@gsainfoteam/ids-react';
 
 <MessageScroller className="h-96">
   {messages.map((message) => (
-    <Card key={message.id} variant={message.mine ? 'soft' : 'outline'}>
-      <Card.Content>{message.text}</Card.Content>
-    </Card>
+    <Bubble
+      key={message.id}
+      align={message.mine ? 'end' : 'start'}
+      variant={message.mine ? 'solid' : 'soft'}
+      className={message.mine ? 'self-end' : 'self-start'}
+    >
+      {message.text}
+    </Bubble>
   ))}
 </MessageScroller>;
 ```
@@ -71,7 +76,7 @@ import { MessageScroller } from '@gsainfoteam/ids-react';
 <MessageScroller>
   {messages.map(...)}
   {/* 없으면 기본 버튼. 바꿀 때만 둔다 */}
-  <MessageScroller.ScrollToBottom placement="bottom-left" variant="solid" />
+  <MessageScroller.ScrollToBottom variant="soft" colorScheme="primary" />
 </MessageScroller>
 
 <MessageScroller.ScrollToBottom>
@@ -79,10 +84,10 @@ import { MessageScroller } from '@gsainfoteam/ids-react';
 </MessageScroller.ScrollToBottom>
 ```
 
-- `FloatingButton` 입니다. 기본은 `variant="outline"`, `colorScheme="neutral"`, `size="tiny"`, `placement="bottom-right"` 이고 FloatingButton 의 속성을 모두 받습니다.
-- MessageScroller root 가 `contain: layout` 이라 버튼의 `position: fixed` 가 화면이 아니라 스크롤 영역 모서리를 기준으로 섭니다.
+- `Button` 입니다. 기본은 `variant="outline"`, `colorScheme="neutral"`, `size="tiny"` 이고 Button 의 속성을 모두 받습니다.
+- 스크롤 영역 아래 가운데에 둥글게 뜹니다. 입력창을 MessageScroller 바로 아래에 두면 입력창 위에 뜹니다.
 - 맨 아래에 있으면 흐려지며 숨고 `inert` 라 누를 수도, Tab 으로 갈 수도 없습니다.
-- 기본 내용은 아래 화살표와 그 모서리의 Badge 입니다. Badge 는 위로 올려 둔 동안 온 메시지 수이고, 0 이면 숨습니다.
+- 기본 내용은 아래 화살표입니다. 위로 올려 둔 동안 메시지가 오면 "새 메시지 3개" 처럼 글자가 붙어 알약 모양으로 늘어납니다.
 - 기본 이름은 "맨 아래로", 새 메시지가 있으면 "맨 아래로, 새 메시지 3개" 입니다. children 을 주면 이름은 그 글자이고, `aria-label` 을 주면 그 값입니다.
 - 누르면 맨 아래로 부드럽게 스크롤하고 다시 따라갑니다. `prefers-reduced-motion` 이면 바로 갑니다. `onClick` 에서 `preventDefault` 하면 스크롤하지 않습니다.
 
@@ -181,7 +186,7 @@ export function Chat() {
 | 파트             | 기본 / 동작                                                  |
 | ---------------- | ------------------------------------------------------------ |
 | `List`           | `<ol>`. 간격과 폭을 바꿀 때만 둔다                            |
-| `ScrollToBottom` | FloatingButton. 없으면 기본 버튼이 붙는다                     |
+| `ScrollToBottom` | Button. 없으면 기본 버튼이 붙는다                             |
 
 ## 알아둘 것
 

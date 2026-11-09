@@ -7,7 +7,7 @@ import { Showcase, holdTheNextCall } from '~story-kit';
 
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
-import { Card } from '../../data/card';
+import { Bubble } from '../../data/bubble';
 
 import { MessageScroller } from '.';
 
@@ -86,14 +86,14 @@ export const Playground: Story = {
   render: (args) => (
     <MessageScroller {...args} className={frame}>
       {CONVERSATION.map((line) => (
-        <Card
+        <Bubble
           key={line.id}
-          variant={line.mine ? 'soft' : 'outline'}
-          size="tiny"
-          className={line.mine ? 'max-w-[80%] self-end' : 'max-w-[80%] self-start'}
+          align={line.mine ? 'end' : 'start'}
+          variant={line.mine ? 'solid' : 'soft'}
+          className={line.mine ? 'self-end' : 'self-start'}
         >
-          <Card.Content>{line.text}</Card.Content>
-        </Card>
+          {line.text}
+        </Bubble>
       ))}
     </MessageScroller>
   ),
@@ -109,28 +109,28 @@ export const Gallery: Story = {
         <Showcase.Row label="end (기본)">
           <MessageScroller className={frame}>
             {CONVERSATION.map((line) => (
-              <Card
+              <Bubble
                 key={line.id}
-                variant={line.mine ? 'soft' : 'outline'}
-                size="tiny"
-                className={line.mine ? 'max-w-[80%] self-end' : 'max-w-[80%] self-start'}
+                align={line.mine ? 'end' : 'start'}
+                variant={line.mine ? 'solid' : 'soft'}
+                className={line.mine ? 'self-end' : 'self-start'}
               >
-                <Card.Content>{line.text}</Card.Content>
-              </Card>
+                {line.text}
+              </Bubble>
             ))}
           </MessageScroller>
         </Showcase.Row>
         <Showcase.Row label="넘치지 않음">
           <MessageScroller className={frame}>
             {CONVERSATION.slice(0, 3).map((line) => (
-              <Card
+              <Bubble
                 key={line.id}
-                variant={line.mine ? 'soft' : 'outline'}
-                size="tiny"
-                className={line.mine ? 'max-w-[80%] self-end' : 'max-w-[80%] self-start'}
+                align={line.mine ? 'end' : 'start'}
+                variant={line.mine ? 'solid' : 'soft'}
+                className={line.mine ? 'self-end' : 'self-start'}
               >
-                <Card.Content>{line.text}</Card.Content>
-              </Card>
+                {line.text}
+              </Bubble>
             ))}
           </MessageScroller>
         </Showcase.Row>
@@ -143,14 +143,14 @@ export const Gallery: Story = {
         <Showcase.Row label="loading">
           <MessageScroller loading className={frame}>
             {CONVERSATION.map((line) => (
-              <Card
+              <Bubble
                 key={line.id}
-                variant={line.mine ? 'soft' : 'outline'}
-                size="tiny"
-                className={line.mine ? 'max-w-[80%] self-end' : 'max-w-[80%] self-start'}
+                align={line.mine ? 'end' : 'start'}
+                variant={line.mine ? 'solid' : 'soft'}
+                className={line.mine ? 'self-end' : 'self-start'}
               >
-                <Card.Content>{line.text}</Card.Content>
-              </Card>
+                {line.text}
+              </Bubble>
             ))}
           </MessageScroller>
         </Showcase.Row>
@@ -164,17 +164,17 @@ export const Gallery: Story = {
           <MessageScroller className={frame}>
             <MessageScroller.List className="mx-auto w-full max-w-sm gap-6 px-6">
               {CONVERSATION.map((line) => (
-                <Card
+                <Bubble
                   key={line.id}
-                  variant={line.mine ? 'soft' : 'outline'}
-                  size="tiny"
-                  className={line.mine ? 'max-w-[80%] self-end' : 'max-w-[80%] self-start'}
+                  align={line.mine ? 'end' : 'start'}
+                  variant={line.mine ? 'solid' : 'soft'}
+                  className={line.mine ? 'self-end' : 'self-start'}
                 >
-                  <Card.Content>{line.text}</Card.Content>
-                </Card>
+                  {line.text}
+                </Bubble>
               ))}
             </MessageScroller.List>
-            <MessageScroller.ScrollToBottom placement="bottom-left" variant="solid" />
+            <MessageScroller.ScrollToBottom variant="soft" colorScheme="primary" />
           </MessageScroller>
         </Showcase.Row>
       </Showcase.Section>
@@ -190,14 +190,14 @@ export const StickToBottom: Story = {
       <div className="flex w-full max-w-md flex-col gap-3">
         <MessageScroller className={frame}>
           {lines.map((line) => (
-            <Card
+            <Bubble
               key={line.id}
-              variant={line.mine ? 'soft' : 'outline'}
-              size="tiny"
-              className={line.mine ? 'max-w-[80%] self-end' : 'max-w-[80%] self-start'}
+              align={line.mine ? 'end' : 'start'}
+              variant={line.mine ? 'solid' : 'soft'}
+              className={line.mine ? 'self-end' : 'self-start'}
             >
-              <Card.Content>{line.text}</Card.Content>
-            </Card>
+              {line.text}
+            </Bubble>
           ))}
         </MessageScroller>
         <Button
@@ -261,9 +261,9 @@ export const ScrollOnAppendStart: Story = {
         <MessageScroller scrollOnAppend="start" className={frame}>
           {turns.map((turn) => (
             <div key={turn.id} className="flex flex-col gap-3">
-              <Card variant="soft" size="tiny" className="max-w-[80%] self-end">
-                <Card.Content>{turn.question}</Card.Content>
-              </Card>
+              <Bubble align="end" variant="solid" className="self-end">
+                {turn.question}
+              </Bubble>
               {ANSWER.slice(0, turn.answer).map((paragraph) => (
                 <p key={paragraph} className="text-body-b2-regular">
                   {paragraph}
@@ -354,14 +354,14 @@ export const OnReachStart: Story = {
         }}
       >
         {lines.map((line) => (
-          <Card
+          <Bubble
             key={line.id}
-            variant={line.mine ? 'soft' : 'outline'}
-            size="tiny"
-            className={line.mine ? 'max-w-[80%] self-end' : 'max-w-[80%] self-start'}
+            align={line.mine ? 'end' : 'start'}
+            variant={line.mine ? 'solid' : 'soft'}
+            className={line.mine ? 'self-end' : 'self-start'}
           >
-            <Card.Content>{line.text}</Card.Content>
-          </Card>
+            {line.text}
+          </Bubble>
         ))}
       </MessageScroller>
     );
@@ -402,16 +402,16 @@ export const CustomScrollToBottom: Story = {
   render: () => (
     <MessageScroller className={frame}>
       {CONVERSATION.map((line) => (
-        <Card
+        <Bubble
           key={line.id}
-          variant={line.mine ? 'soft' : 'outline'}
-          size="tiny"
-          className={line.mine ? 'max-w-[80%] self-end' : 'max-w-[80%] self-start'}
+          align={line.mine ? 'end' : 'start'}
+          variant={line.mine ? 'solid' : 'soft'}
+          className={line.mine ? 'self-end' : 'self-start'}
         >
-          <Card.Content>{line.text}</Card.Content>
-        </Card>
+          {line.text}
+        </Bubble>
       ))}
-      <MessageScroller.ScrollToBottom placement="bottom-left" variant="soft" colorScheme="primary">
+      <MessageScroller.ScrollToBottom variant="soft" colorScheme="primary">
         <ArrowDownCircleIcon />
         최신 메시지
       </MessageScroller.ScrollToBottom>
@@ -421,7 +421,7 @@ export const CustomScrollToBottom: Story = {
     docs: {
       description: {
         story:
-          '아래로 가기 버튼은 기본으로 붙습니다. 바꿀 때만 MessageScroller.ScrollToBottom 을 자식으로 둡니다. FloatingButton 의 속성을 그대로 받고, 스크롤 영역 안에 뜹니다.',
+          '아래로 가기 버튼은 기본으로 붙습니다. 바꿀 때만 MessageScroller.ScrollToBottom 을 자식으로 둡니다. Button 의 속성을 그대로 받고, 스크롤 영역 아래 가운데에 뜹니다.',
       },
     },
   },
@@ -436,6 +436,9 @@ export const CustomScrollToBottom: Story = {
     const rect = button.getBoundingClientRect();
     await expect(rect.bottom).toBeLessThanOrEqual(area.bottom);
     await expect(rect.left).toBeGreaterThanOrEqual(area.left);
+    await expect(
+      Math.abs((rect.left + rect.right) / 2 - (area.left + area.right) / 2),
+    ).toBeLessThanOrEqual(SAME_PLACE_PX);
 
     await userEvent.click(button);
     await waitFor(() => expect(distanceToEnd(viewport())).toBeLessThanOrEqual(AT_THE_END_PX));

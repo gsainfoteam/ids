@@ -2,7 +2,7 @@ import { tv } from '../../../utils';
 
 export const messageScrollerStyle = tv({
   slots: {
-    root: 'relative flex min-h-0 min-w-0 flex-col [contain:layout]',
+    root: 'relative flex min-h-0 min-w-0 flex-col',
     area: 'min-h-0 flex-1 rounded-[inherit]',
     viewport: '[overflow-anchor:none]',
     list: 'flex flex-col gap-4 p-4',
@@ -13,9 +13,24 @@ export const messageScrollerStyle = tv({
       'inset-ring-1 inset-ring-(--ids-color-border)',
     ],
     scrollToBottom: [
-      'transition-[color,background-color,box-shadow,scale,opacity]',
-      'data-hidden:pointer-events-none data-hidden:scale-90 data-hidden:opacity-0',
+      'absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full shadow-md',
+      'transition-[color,background-color,box-shadow,scale,opacity,translate]',
+      'data-hidden:pointer-events-none data-hidden:translate-y-2 data-hidden:scale-95 data-hidden:opacity-0',
       'motion-reduce:transition-none',
     ],
+  },
+  variants: {
+    opaque: {
+      true: { scrollToBottom: 'dark:bg-(--ids-color-surface)' },
+    },
+    iconOnly: {
+      true: {
+        scrollToBottom: [
+          'aspect-square px-0',
+          'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-0',
+          'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-0',
+        ],
+      },
+    },
   },
 });

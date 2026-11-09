@@ -7,10 +7,9 @@ import { ArrowDownIcon } from '@heroicons/react/24/outline';
 import { MessageScrollerViewContext, useMessageScrollerContext } from './context';
 import { messageScrollerStyle } from './style';
 import { useTranslate } from '../../../internal/translate';
-import { FloatingButton } from '../../action/floating-button';
-import { Badge } from '../../data/badge';
+import { Button } from '../../action/button';
 
-export type MessageScrollerScrollToBottomProps = FloatingButton.Props;
+export type MessageScrollerScrollToBottomProps = Button.Props;
 
 export function MessageScrollerScrollToBottom({
   variant = 'outline',
@@ -25,7 +24,10 @@ export function MessageScrollerScrollToBottom({
   const scroll = useMessageScrollerContext('MessageScroller.ScrollToBottom');
   const { atEnd, unseen } = use(MessageScrollerViewContext);
   const t = useTranslate();
-  const styles = messageScrollerStyle();
+
+  const ownContent = children !== undefined;
+  const iconOnly = !ownContent && unseen === 0;
+  const styles = messageScrollerStyle({ opaque: variant === 'outline', iconOnly });
 
   const defaultLabel =
     unseen > 0
@@ -33,12 +35,12 @@ export function MessageScrollerScrollToBottom({
       : t('messageScroller.scrollToBottom');
 
   return (
-    <FloatingButton
+    <Button
       {...props}
       variant={variant}
       colorScheme={colorScheme}
       size={size}
-      aria-label={label ?? (children === undefined ? defaultLabel : undefined)}
+      aria-label={label ?? (ownContent ? undefined : defaultLabel)}
       inert={atEnd}
       data-hidden={atEnd ? '' : undefined}
       data-message-scroller-scroll-to-bottom=""
@@ -52,12 +54,15 @@ export function MessageScrollerScrollToBottom({
         if (!event.defaultPrevented) scroll.scrollToBottom();
       }}
     >
-      {children ?? (
-        <Badge content={unseen}>
+      {ownContent ? (
+        children
+      ) : (
+        <>
           <ArrowDownIcon />
-        </Badge>
+          {unseen > 0 ? t('messageScroller.unseen', { count: unseen }) : null}
+        </>
       )}
-    </FloatingButton>
+    </Button>
   );
 }
 

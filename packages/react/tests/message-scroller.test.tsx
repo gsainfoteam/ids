@@ -134,7 +134,7 @@ test('scrolling up stops following and counts what arrives', async () => {
   await expect.poll(() => viewport().scrollTop).toBe(top);
   await expect
     .element(page.getByRole('button', { name: '맨 아래로, 새 메시지 2개' }))
-    .toBeInTheDocument();
+    .toHaveTextContent('새 메시지 2개');
 
   viewport().scrollTop = viewport().scrollHeight;
   await atTheEnd();
@@ -279,17 +279,22 @@ test('onReachStart fires once on reaching the top, and not while loading', async
   expect(onReachStart).toHaveBeenCalledTimes(1);
 });
 
-test('the scroll-to-bottom button floats inside the scroller', async () => {
+test('the scroll-to-bottom button floats centered at the bottom of the scroller', async () => {
   render(<Chat />);
   await atTheEnd();
   viewport().scrollTop = 0;
   await expect.poll(() => scrollToBottom().inert).toBe(false);
+  expect(scrollToBottom()).toHaveTextContent('');
 
   const area = document.querySelector('[data-message-scroller]')!.getBoundingClientRect();
   const button = scrollToBottom().getBoundingClientRect();
   expect(button.bottom).toBeLessThanOrEqual(area.bottom);
   expect(button.right).toBeLessThanOrEqual(area.right);
   expect(button.top).toBeGreaterThanOrEqual(area.top);
+  expect(
+    Math.abs(button.left + button.width / 2 - (area.left + area.width / 2)),
+  ).toBeLessThanOrEqual(SAME_PLACE_PX);
+  expect(Math.abs(button.width - button.height)).toBeLessThanOrEqual(SAME_PLACE_PX);
 });
 
 test('a part outside MessageScroller throws', () => {
