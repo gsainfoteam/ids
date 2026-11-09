@@ -69,8 +69,8 @@ const frame = cn('h-80 w-full max-w-md rounded-container border border-(--ids-co
 const viewportIn = (root: HTMLElement) =>
   root.querySelector<HTMLElement>('[data-message-scroller] [role="log"]')!;
 
-const scrollToBottomIn = (root: HTMLElement) =>
-  root.querySelector<HTMLElement>('[data-message-scroller-scroll-to-bottom]')!;
+const jumpIn = (root: HTMLElement) =>
+  root.querySelector<HTMLElement>('[data-message-scroller-jump]')!;
 
 const distanceToEnd = (viewport: HTMLElement) =>
   viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
@@ -158,7 +158,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Parts"
-        description="MessageScroller.List 로 목록의 간격과 폭을, MessageScroller.ScrollToBottom 으로 아래로 가기 버튼을 바꿉니다."
+        description="MessageScroller.List 로 목록의 간격과 폭을, MessageScroller.Jump 로 아래로 가기 버튼을 바꿉니다."
       >
         <Showcase.Row label="List">
           <MessageScroller className={frame}>
@@ -174,7 +174,7 @@ export const Gallery: Story = {
                 </Bubble>
               ))}
             </MessageScroller.List>
-            <MessageScroller.ScrollToBottom variant="soft" colorScheme="primary" />
+            <MessageScroller.Jump variant="soft" colorScheme="primary" />
           </MessageScroller>
         </Showcase.Row>
       </Showcase.Section>
@@ -231,13 +231,13 @@ export const StickToBottom: Story = {
     const viewport = () => viewportIn(canvasElement);
 
     await waitFor(() => expect(distanceToEnd(viewport())).toBeLessThanOrEqual(AT_THE_END_PX));
-    await expect(scrollToBottomIn(canvasElement)).toHaveAttribute('inert');
+    await expect(jumpIn(canvasElement)).toHaveAttribute('inert');
 
     await userEvent.click(canvas.getByRole('button', { name: '메시지 받기' }));
     await waitFor(() => expect(distanceToEnd(viewport())).toBeLessThanOrEqual(AT_THE_END_PX));
 
     viewport().scrollTo({ top: 0 });
-    await waitFor(() => expect(scrollToBottomIn(canvasElement)).not.toHaveAttribute('inert'));
+    await waitFor(() => expect(jumpIn(canvasElement)).not.toHaveAttribute('inert'));
 
     await userEvent.click(canvas.getByRole('button', { name: '메시지 받기' }));
     await waitFor(() => expect(viewport().scrollTop).toBe(0));
@@ -245,7 +245,7 @@ export const StickToBottom: Story = {
 
     await userEvent.click(toBottom);
     await waitFor(() => expect(distanceToEnd(viewport())).toBeLessThanOrEqual(AT_THE_END_PX));
-    await waitFor(() => expect(scrollToBottomIn(canvasElement)).toHaveAttribute('inert'));
+    await waitFor(() => expect(jumpIn(canvasElement)).toHaveAttribute('inert'));
 
     await userEvent.click(canvas.getByRole('button', { name: '메시지 받기' }));
     await waitFor(() => expect(distanceToEnd(viewport())).toBeLessThanOrEqual(AT_THE_END_PX));
@@ -329,7 +329,7 @@ export const ScrollOnAppendStart: Story = {
         SAME_PLACE_PX,
       ),
     );
-    await waitFor(() => expect(scrollToBottomIn(canvasElement)).not.toHaveAttribute('inert'));
+    await waitFor(() => expect(jumpIn(canvasElement)).not.toHaveAttribute('inert'));
   },
 };
 
@@ -398,7 +398,7 @@ export const OnReachStart: Story = {
   },
 };
 
-export const CustomScrollToBottom: Story = {
+export const CustomJump: Story = {
   render: () => (
     <MessageScroller className={frame}>
       {CONVERSATION.map((line) => (
@@ -411,17 +411,17 @@ export const CustomScrollToBottom: Story = {
           {line.text}
         </Bubble>
       ))}
-      <MessageScroller.ScrollToBottom variant="soft" colorScheme="primary">
+      <MessageScroller.Jump variant="soft" colorScheme="primary">
         <ArrowDownCircleIcon />
         최신 메시지
-      </MessageScroller.ScrollToBottom>
+      </MessageScroller.Jump>
     </MessageScroller>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          '아래로 가기 버튼은 기본으로 붙습니다. 바꿀 때만 MessageScroller.ScrollToBottom 을 자식으로 둡니다. Button 의 속성을 그대로 받고, 스크롤 영역 아래 가운데에 뜹니다.',
+          '아래로 가기 버튼은 기본으로 붙습니다. 바꿀 때만 MessageScroller.Jump 를 자식으로 둡니다. Button 의 속성을 그대로 받고, 스크롤 영역 아래 가운데에 뜹니다.',
       },
     },
   },
@@ -429,7 +429,7 @@ export const CustomScrollToBottom: Story = {
     const viewport = () => viewportIn(canvasElement);
 
     viewport().scrollTo({ top: 0 });
-    await waitFor(() => expect(scrollToBottomIn(canvasElement)).not.toHaveAttribute('inert'));
+    await waitFor(() => expect(jumpIn(canvasElement)).not.toHaveAttribute('inert'));
     const button = canvas.getByRole('button', { name: '최신 메시지' });
 
     const area = canvasElement.querySelector('[data-message-scroller]')!.getBoundingClientRect();

@@ -9,9 +9,9 @@ import { messageScrollerStyle } from './style';
 import { useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
 
-export type MessageScrollerScrollToBottomProps = Button.Props;
+export type MessageScrollerJumpProps = Button.Props;
 
-export function MessageScrollerScrollToBottom({
+export function MessageScrollerJump({
   variant = 'outline',
   colorScheme = 'neutral',
   size = 'tiny',
@@ -20,8 +20,8 @@ export function MessageScrollerScrollToBottom({
   onClick,
   'aria-label': label,
   ...props
-}: MessageScrollerScrollToBottomProps) {
-  const scroll = useMessageScrollerContext('MessageScroller.ScrollToBottom');
+}: MessageScrollerJumpProps) {
+  const scroll = useMessageScrollerContext('MessageScroller.Jump');
   const { atEnd, unseen } = use(MessageScrollerViewContext);
   const t = useTranslate();
 
@@ -30,9 +30,7 @@ export function MessageScrollerScrollToBottom({
   const styles = messageScrollerStyle({ opaque: variant === 'outline', iconOnly });
 
   const defaultLabel =
-    unseen > 0
-      ? t('messageScroller.scrollToBottomUnseen', { count: unseen })
-      : t('messageScroller.scrollToBottom');
+    unseen > 0 ? t('messageScroller.jumpUnseen', { count: unseen }) : t('messageScroller.jump');
 
   return (
     <Button
@@ -43,9 +41,9 @@ export function MessageScrollerScrollToBottom({
       aria-label={label ?? (ownContent ? undefined : defaultLabel)}
       inert={atEnd}
       data-hidden={atEnd ? '' : undefined}
-      data-message-scroller-scroll-to-bottom=""
+      data-message-scroller-jump=""
       className={(state) =>
-        styles.scrollToBottom({
+        styles.jump({
           className: typeof className === 'function' ? className(state) : className,
         })
       }
@@ -66,4 +64,4 @@ export function MessageScrollerScrollToBottom({
   );
 }
 
-MessageScrollerScrollToBottom.displayName = 'MessageScroller.ScrollToBottom';
+MessageScrollerJump.displayName = 'MessageScroller.Jump';

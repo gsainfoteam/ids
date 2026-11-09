@@ -18,8 +18,7 @@ const LIST_PADDING_PX = 16;
 const viewport = () => document.querySelector<HTMLElement>('[role="log"]')!;
 const list = () => viewport().querySelector('ol')!;
 const items = () => [...list().children] as HTMLElement[];
-const scrollToBottom = () =>
-  document.querySelector<HTMLElement>('[data-message-scroller-scroll-to-bottom]')!;
+const jump = () => document.querySelector<HTMLElement>('[data-message-scroller-jump]')!;
 const distanceToEnd = () =>
   viewport().scrollHeight - viewport().scrollTop - viewport().clientHeight;
 const topWithin = (element: Element) =>
@@ -107,7 +106,7 @@ test('draws an ordered list inside a log and starts at the end', async () => {
   expect(items()).toHaveLength(20);
   expect(items().every((item) => item.tagName === 'LI')).toBe(true);
   await atTheEnd();
-  expect(scrollToBottom().inert).toBe(true);
+  expect(jump().inert).toBe(true);
 });
 
 test('follows appended messages and growth while at the end', async () => {
@@ -126,7 +125,7 @@ test('scrolling up stops following and counts what arrives', async () => {
   await atTheEnd();
 
   viewport().scrollTop -= 120;
-  await expect.poll(() => scrollToBottom().inert).toBe(false);
+  await expect.poll(() => jump().inert).toBe(false);
   const top = viewport().scrollTop;
 
   await receive();
@@ -138,12 +137,12 @@ test('scrolling up stops following and counts what arrives', async () => {
 
   viewport().scrollTop = viewport().scrollHeight;
   await atTheEnd();
-  await expect.poll(() => scrollToBottom().inert).toBe(true);
+  await expect.poll(() => jump().inert).toBe(true);
   await receive();
   await atTheEnd();
 });
 
-test('the scroll-to-bottom button goes back to the end and follows again', async () => {
+test('the jump button goes back to the end and follows again', async () => {
   render(<Chat />);
   await atTheEnd();
   viewport().scrollTop = 0;
@@ -191,7 +190,7 @@ test('selecting text in a message stops following, even at the end', async () =>
   const top = viewport().scrollTop;
 
   await receive();
-  await expect.poll(() => scrollToBottom().inert).toBe(false);
+  await expect.poll(() => jump().inert).toBe(false);
   expect(viewport().scrollTop).toBe(top);
 });
 
@@ -221,7 +220,7 @@ test('stickToBottom={false} keeps the place when messages arrive', async () => {
   const top = viewport().scrollTop;
 
   await receive();
-  await expect.poll(() => scrollToBottom().inert).toBe(false);
+  await expect.poll(() => jump().inert).toBe(false);
   expect(viewport().scrollTop).toBe(top);
 });
 
@@ -250,7 +249,7 @@ test('messages added above keep the one being read in place', async () => {
   render(<Chat />);
   await atTheEnd();
   viewport().scrollTop = 100;
-  await expect.poll(() => scrollToBottom().inert).toBe(false);
+  await expect.poll(() => jump().inert).toBe(false);
   const reading = page.getByText('메시지 5').element();
   const before = topWithin(reading);
 
@@ -279,15 +278,15 @@ test('onReachStart fires once on reaching the top, and not while loading', async
   expect(onReachStart).toHaveBeenCalledTimes(1);
 });
 
-test('the scroll-to-bottom button floats centered at the bottom of the scroller', async () => {
+test('the jump button floats centered at the bottom of the scroller', async () => {
   render(<Chat />);
   await atTheEnd();
   viewport().scrollTop = 0;
-  await expect.poll(() => scrollToBottom().inert).toBe(false);
-  expect(scrollToBottom()).toHaveTextContent('');
+  await expect.poll(() => jump().inert).toBe(false);
+  expect(jump()).toHaveTextContent('');
 
   const area = document.querySelector('[data-message-scroller]')!.getBoundingClientRect();
-  const button = scrollToBottom().getBoundingClientRect();
+  const button = jump().getBoundingClientRect();
   expect(button.bottom).toBeLessThanOrEqual(area.bottom);
   expect(button.right).toBeLessThanOrEqual(area.right);
   expect(button.top).toBeGreaterThanOrEqual(area.top);

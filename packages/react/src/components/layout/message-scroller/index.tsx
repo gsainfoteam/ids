@@ -1,11 +1,8 @@
 import { type ComponentProps } from 'react';
 
+import { MessageScrollerJump, type MessageScrollerJumpProps } from './jump';
 import { MessageScrollerList, type MessageScrollerListProps } from './list';
 import { MessageScrollerRoot } from './root';
-import {
-  MessageScrollerScrollToBottom,
-  type MessageScrollerScrollToBottomProps,
-} from './scroll-to-bottom';
 import { messageScrollerStyle } from './style';
 
 export function MessageScroller(props: MessageScroller.Props) {
@@ -22,10 +19,10 @@ export namespace MessageScroller {
     scrollOnAppend?: ScrollOnAppend;
   };
   export type ListProps = MessageScrollerListProps;
-  export type ScrollToBottomProps = MessageScrollerScrollToBottomProps;
+  export type JumpProps = MessageScrollerJumpProps;
 
   export const List = MessageScrollerList;
-  export const ScrollToBottom = MessageScrollerScrollToBottom;
+  export const Jump = MessageScrollerJump;
 
   export const Style = messageScrollerStyle;
 }

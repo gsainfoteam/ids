@@ -9,7 +9,7 @@ export const messageScrollerStyle = tv({
     item: 'flex min-w-0 flex-col',
     loader: 'pointer-events-none absolute inset-x-0 top-3 flex justify-center',
     loaderSurface: 'concentric-p-2 shadow-md',
-    scrollToBottom: [
+    jump: [
       'absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full shadow-md',
       'transition-[color,background-color,box-shadow,scale,opacity,translate]',
       'data-hidden:pointer-events-none data-hidden:translate-y-2 data-hidden:scale-95 data-hidden:opacity-0',
@@ -18,11 +18,11 @@ export const messageScrollerStyle = tv({
   },
   variants: {
     opaque: {
-      true: { scrollToBottom: 'dark:bg-(--ids-color-surface)' },
+      true: { jump: 'dark:bg-(--ids-color-surface)' },
     },
     iconOnly: {
       true: {
-        scrollToBottom: [
+        jump: [
           'aspect-square px-0',
           'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-0',
           'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-0',

@@ -181,10 +181,10 @@ export const messages = {
     submenu: '{label} 하위 메뉴',
   },
   messageScroller: {
+    jump: '맨 아래로',
+    jumpUnseen: '맨 아래로, 새 메시지 {count}개',
     label: '메시지',
     loading: '이전 메시지를 불러오는 중',
-    scrollToBottom: '맨 아래로',
-    scrollToBottomUnseen: '맨 아래로, 새 메시지 {count}개',
     unseen: '새 메시지 {count}개',
   },
   numberField: {

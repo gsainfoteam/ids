@@ -76,12 +76,12 @@ import { Bubble, MessageScroller } from '@gsainfoteam/ids-react';
 <MessageScroller>
   {messages.map(...)}
   {/* 없으면 기본 버튼. 바꿀 때만 둔다 */}
-  <MessageScroller.ScrollToBottom variant="soft" colorScheme="primary" />
+  <MessageScroller.Jump variant="soft" colorScheme="primary" />
 </MessageScroller>
 
-<MessageScroller.ScrollToBottom>
+<MessageScroller.Jump>
   <ArrowDownIcon />최신 메시지     {/* 글자를 주면 확장형, 이름은 글자 */}
-</MessageScroller.ScrollToBottom>
+</MessageScroller.Jump>
 ```
 
 - `Button` 입니다. 기본은 `variant="outline"`, `colorScheme="neutral"`, `size="tiny"` 이고 Button 의 속성을 모두 받습니다.
@@ -166,11 +166,11 @@ export function Chat() {
 | ----------------------------------------- | --------------- | ---------------------- |
 | `data-at-end`                             | root            | 맨 아래에 있다         |
 | `data-loading`                            | root            | `loading`              |
-| `data-hidden`                             | ScrollToBottom  | 맨 아래라 숨었다       |
+| `data-hidden`                             | Jump            | 맨 아래라 숨었다       |
 | `data-message-scroller`                   | root            |                        |
 | `data-message-scroller-list` / `-item`    | `<ol>` / `<li>` |                        |
 | `data-message-scroller-loader`            | Spinner 를 담은 층 |                     |
-| `data-message-scroller-scroll-to-bottom`  | 아래로 가기 버튼 |                       |
+| `data-message-scroller-jump`              | 아래로 가기 버튼 |                       |
 
 ## 속성
 
@@ -186,7 +186,7 @@ export function Chat() {
 | 파트             | 기본 / 동작                                                  |
 | ---------------- | ------------------------------------------------------------ |
 | `List`           | `<ol>`. 간격과 폭을 바꿀 때만 둔다                            |
-| `ScrollToBottom` | Button. 없으면 기본 버튼이 붙는다                             |
+| `Jump`           | Button. 없으면 기본 버튼이 붙는다                             |
 
 ## 알아둘 것
 

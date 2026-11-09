@@ -3,8 +3,8 @@
 import { isValidElement, type ReactNode } from 'react';
 
 import { MessageScrollerContext, MessageScrollerViewContext } from './context';
+import { MessageScrollerJump } from './jump';
 import { MessageScrollerList } from './list';
-import { MessageScrollerScrollToBottom } from './scroll-to-bottom';
 import { messageScrollerStyle } from './style';
 import { useMessageScroller } from './use-message-scroller';
 import { useTranslate } from '../../../internal/translate';
@@ -19,13 +19,13 @@ const isPart = (type: unknown) => (node: ReactNode) =>
   isValidElement(node) && elementTypeOf(node) === type;
 
 const isList = isPart(MessageScrollerList);
-const isScrollToBottom = isPart(MessageScrollerScrollToBottom);
+const isJump = isPart(MessageScrollerJump);
 
 function arrange(children: ReactNode) {
   const nodes = flattenFragments(children);
   const lists = nodes.filter(isList);
-  const buttons = nodes.filter(isScrollToBottom);
-  const messages = nodes.filter((node) => !isList(node) && !isScrollToBottom(node));
+  const buttons = nodes.filter(isJump);
+  const messages = nodes.filter((node) => !isList(node) && !isJump(node));
 
   invariant(lists.length <= 1, '`<MessageScroller>` accepts at most one `<MessageScroller.List>`.');
   invariant(
@@ -35,7 +35,7 @@ function arrange(children: ReactNode) {
 
   return {
     list: lists[0] ?? <MessageScrollerList>{messages}</MessageScrollerList>,
-    scrollToBottom: buttons.at(-1) ?? <MessageScrollerScrollToBottom />,
+    jump: buttons.at(-1) ?? <MessageScrollerJump />,
   };
 }
 
@@ -58,7 +58,7 @@ export function MessageScrollerRoot({
     scrollOnAppend,
   });
 
-  const { list, scrollToBottom } = arrange(children);
+  const { list, jump } = arrange(children);
   const styles = messageScrollerStyle();
 
   return (
@@ -90,7 +90,7 @@ export function MessageScrollerRoot({
               </Card>
             </div>
           ) : null}
-          {scrollToBottom}
+          {jump}
         </div>
       </MessageScrollerViewContext>
     </MessageScrollerContext>
