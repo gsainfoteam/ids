@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart' as ids;
 import 'package:widgetbook/widgetbook.dart';
 
+import 'components/aspect_ratio_usecase.dart';
 import 'components/divider_usecase.dart';
 import 'components/field_usecase.dart';
 import 'components/label_usecase.dart';
@@ -25,6 +26,7 @@ class WidgetbookApp extends StatelessWidget {
         home: child,
       ),
       directories: [
+        WidgetbookComponent(name: 'AspectRatio', useCases: aspectRatioUseCases),
         WidgetbookComponent(name: 'ids.Divider', useCases: dividerUseCases),
         WidgetbookComponent(name: 'ids.Field', useCases: fieldUseCases),
         WidgetbookComponent(name: 'ids.Label', useCases: labelUseCases),
