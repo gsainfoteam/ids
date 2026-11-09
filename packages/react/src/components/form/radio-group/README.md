@@ -101,7 +101,7 @@ type Plan = 'free' | 'pro' | 'team';
 | 속성                              | 뜻                          |
 | --------------------------------- | --------------------------- |
 | `data-orientation`                | `vertical` / `horizontal`   |
-| `data-disabled` / `aria-disabled` | 모든 항목이 비활성          |
+| `data-disabled` / `disabled`      | 모든 항목이 비활성          |
 | `data-readonly` / `aria-readonly` | 선택을 바꿀 수 없다         |
 | `data-required` / `aria-required` | 필수                        |
 | `data-invalid` / `aria-invalid`   | 오류. 모든 항목이 danger 색 |
@@ -163,10 +163,11 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `invalid`                | 오류 표시. 명시한 `aria-invalid` 가 우선              |
 | `size` / `variant`       | 항목으로 전해진다                                     |
 | `children`               | `({ Item }) => ReactNode` 또는 `Radio` 들             |
-| `ref`                    | 그룹 루트. `focus()` 는 항목으로 넘어간다             |
+| `ref`                    | `<fieldset>` 루트. `focus()` 는 항목으로 넘어간다     |
 | 그 외 속성               | 그룹 루트로 간다 (`id`, `aria-label`, `className` 등) |
 
 ## 알아둘 것
 
 - 그룹 루트는 `tabIndex={-1}` 이라 Tab 순서에는 들어가지 않고, 포커스를 받으면 바로 항목으로 넘깁니다.
+- 루트는 `<fieldset role="radiogroup">` 입니다. `disabled` 는 fieldset 의 native `disabled` 라 안의 radio 가 모두 꺼집니다. 이름은 `Field.Label` 이 `aria-labelledby` 로 주고, `<legend>` 는 쓰지 않아도 됩니다.
 - 한 그룹에 같은 `value` 를 두 번 쓰지 않습니다. 둘 다 선택된 것처럼 보입니다.

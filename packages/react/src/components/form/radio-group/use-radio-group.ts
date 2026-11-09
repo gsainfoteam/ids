@@ -19,7 +19,7 @@ export type UseRadioGroupOptions<T extends string> = {
   defaultValue?: T | null;
   onValueChange?: (value: T) => void;
   name: string;
-  ref?: Ref<HTMLDivElement>;
+  ref?: Ref<HTMLFieldSetElement>;
 };
 
 export function useRadioGroup<T extends string>({
@@ -35,7 +35,7 @@ export function useRadioGroup<T extends string>({
     onValueChange: onValueChange as ((next: T | null) => void) | undefined,
   });
   const controlled = valueProp !== undefined;
-  const rootRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLFieldSetElement>(null);
 
   useFormReset(rootRef, () => {
     if (!controlled) setValue(defaultValue, { silent: true });
@@ -43,10 +43,10 @@ export function useRadioGroup<T extends string>({
 
   const enabledRadios = (root: HTMLElement) =>
     [...root.querySelectorAll<HTMLInputElement>('input[type=radio]')].filter(
-      (radio) => radio.name === name && !radio.disabled,
+      (radio) => radio.name === name && !radio.matches(':disabled'),
     );
 
-  const forwardRootFocusToRadio = (event: FocusEvent<HTMLDivElement>) => {
+  const forwardRootFocusToRadio = (event: FocusEvent<HTMLFieldSetElement>) => {
     if (event.target !== event.currentTarget) return;
     const radios = enabledRadios(event.currentTarget);
     (radios.find((radio) => radio.checked) ?? radios[0])?.focus();
@@ -57,7 +57,7 @@ export function useRadioGroup<T extends string>({
     radio.click();
   };
 
-  const moveToEnd = (event: KeyboardEvent<HTMLDivElement>) => {
+  const moveToEnd = (event: KeyboardEvent<HTMLFieldSetElement>) => {
     const radios = enabledRadios(event.currentTarget);
     const chooseFromFocused = (target: HTMLInputElement | undefined) => () => {
       if (!target || !radios.includes(event.target as HTMLInputElement)) return false;
@@ -69,8 +69,8 @@ export function useRadioGroup<T extends string>({
     );
   };
 
-  const mergedRef: RefCallback<HTMLDivElement> = useCallback(
-    (node: HTMLDivElement | null) => mergeRefs(rootRef, ref)(node),
+  const mergedRef: RefCallback<HTMLFieldSetElement> = useCallback(
+    (node: HTMLFieldSetElement | null) => mergeRefs(rootRef, ref)(node),
     [ref],
   );
 
