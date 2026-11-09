@@ -17,5 +17,5 @@ RadioGroup, the five prose descriptions and Rating use the HTML elements that ca
 Breaking: RadioGroup and ColorPicker.Swatches refs are `HTMLFieldSetElement`, and RadioGroup's root
 no longer sets `aria-disabled`. Those five descriptions are `<p>` elements, so a `<div>`, list or
 heading inside one needs `asChild`. Rating drops `Home`, `End` and the digit keys, its arrow keys
-wrap at the ends like any radio group (right on the last score goes to 0), and a Rating without a
-`name` keeps its radios out of the form.
+behave at the ends as the browser's radio groups do (Chrome and Firefox wrap, so right on the last
+score goes to 0), and a Rating without a `name` keeps its radios out of the form.

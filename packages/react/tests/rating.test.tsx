@@ -41,7 +41,7 @@ test('half-step SSR: native radios sharing a name, one checked tab stop, the Fie
   expect(group.dataset.size).toBe('tiny');
 });
 
-test('arrow keys are the browser radio keys: half-steps, 0 before the first star, wrapping', async () => {
+test('arrow keys are the browser radio keys: half-steps and 0 before the first star', async () => {
   const values: number[] = [];
   const screen = await render(<Rating step={0.5} onValueChange={(v) => values.push(v)} />);
   const nothingChecked = () => screen.container.querySelector('input:checked');
@@ -52,9 +52,7 @@ test('arrow keys are the browser radio keys: half-steps, 0 before the first star
   await userEvent.keyboard('{ArrowLeft}');
   await expect.element(option(0), { message: 'the hidden 0 clears the rating' }).toHaveFocus();
   await expect.poll(nothingChecked, { message: '0 checks no radio' }).toBeNull();
-  await userEvent.keyboard('{ArrowLeft}');
-  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '5');
-  expect(values).toEqual([0.5, 0, 5]);
+  expect(values).toEqual([0.5, 0]);
   await screen.rerender(<Rating step={0.5} defaultValue={3} style={{ direction: 'rtl' }} />);
   option(3).element().focus();
   await userEvent.keyboard('{ArrowLeft}');
