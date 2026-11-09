@@ -136,7 +136,7 @@ export const HalfSteps: Story = {
     docs: {
       description: {
         story:
-          '`step={0.5}` 면 별의 앞쪽 절반이 .5점, 뒤쪽 절반이 1점입니다. 방향키는 반 점씩, 숫자 키는 그 점수로, Home과 0은 0점으로 갑니다.',
+          '`step={0.5}` 면 별의 앞쪽 절반이 .5점, 뒤쪽 절반이 1점입니다. 방향키는 브라우저의 라디오 그대로 반 점씩 움직이고, 끝에서는 반대쪽 끝으로 돌아갑니다. 첫 별에서 한 번 더 내리면 0점입니다.',
       },
     },
   },
@@ -145,10 +145,9 @@ export const HalfSteps: Story = {
     await expect(canvas.getByRole('radio', { name: '5점 만점에 3.5점' })).toBeChecked();
     await userEvent.keyboard('{ArrowRight}');
     await expect(canvas.getByRole('radio', { name: '5점 만점에 4점' })).toHaveFocus();
-    await userEvent.keyboard('2');
-    await expect(canvas.getByRole('radio', { name: '5점 만점에 2점' })).toBeChecked();
-    await userEvent.keyboard('{Home}');
-    await expect(canvas.getByRole('radio', { name: '5점 만점에 0점' })).toBeChecked();
+    await expect(canvas.getByRole('radio', { name: '5점 만점에 4점' })).toBeChecked();
+    await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
+    await expect(canvas.getByRole('radio', { name: '5점 만점에 3점' })).toBeChecked();
   },
 };
 
@@ -206,20 +205,18 @@ export const NativeForm: Story = {
     docs: {
       description: {
         story:
-          '`name` 을 주면 hidden input으로 제출합니다. 0점은 고르지 않은 것이라 항목이 없고, `required` 면 브라우저가 "점수를 선택하세요." 로 제출을 막습니다.',
+          '점수마다 `name` 을 가진 라디오라 고른 점수가 그대로 제출됩니다. 0점은 아무 라디오도 고르지 않은 것이라 항목이 없고, `required` 면 브라우저가 "점수를 선택하세요." 로 제출을 막습니다. 초기화도 브라우저가 합니다.',
       },
     },
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
-    const validator = canvasElement.querySelector<HTMLInputElement>('[data-form-value-validator]')!;
-    await expect(validator.validationMessage).toBe('점수를 선택하세요.');
+    const radio = canvas.getByRole('radio', { name: '5점 만점에 1점' }) as HTMLInputElement;
+    await expect(radio.validationMessage).toBe('점수를 선택하세요.');
     await userEvent.click(canvas.getByRole('radio', { name: '5점 만점에 4점' }));
     await userEvent.click(canvas.getByRole('button', { name: '제출' }));
     await expect(canvas.getByLabelText('제출 결과')).toHaveTextContent('[["score","4"]]');
     await userEvent.click(canvas.getByRole('button', { name: '초기화' }));
-    await waitFor(() =>
-      expect(canvas.getByRole('radio', { name: '5점 만점에 0점' })).toBeChecked(),
-    );
+    await waitFor(() => expect(canvasElement.querySelector('input:checked')).toBeNull());
   },
 };
 

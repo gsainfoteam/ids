@@ -426,8 +426,8 @@ TelField, ChipField, Select and the date, time and color triggers draw their box
 fill) and `ghost` (no fill, no border). Put `data-field-input` on the element that takes focus and
 `data-invalid` on the shell; `focus-ring` does the rest.
 
-**A control without a native input still joins the form.** Select, a date trigger, a Rating drawn
-as buttons: render `internal/form-value.tsx` inside the component's `relative` root. It writes one
+**A control without a native input still joins the form.** Select, a date trigger, a
+ToggleGroup: render `internal/form-value.tsx` inside the component's `relative` root. It writes one
 hidden input per value for FormData and, when `required`, a nameless input covering the control
 so the browser blocks the submit, anchors its message there and hands focus to the control.
 

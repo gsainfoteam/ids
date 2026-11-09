@@ -18,11 +18,11 @@
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
 | [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각                      | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea                                                                                                                 |
 | [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수                         | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                                                                                                                            |
-| [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                               |
+| [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                                       |
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
 | [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                                  | IconButton, IconToggle                                                                                                                                                                                                |
 | [`image-status.ts`](#image-statusts)             | `<img>` 를 불러오는 상태와 hydration 전에 끝난 이미지 읽기                            | Avatar, Image                                                                                                                                                                                                         |
-| [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Image, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
+| [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Image, Menu, NumberField, RadioGroup, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
 | [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
 | [`motion.ts`](#motionts)                         | 움직임 줄이기 설정 읽기, `--ids-motion-*` 토큰의 ms, 시트의 easing                    | Image, `zoom-pan/` |
@@ -399,10 +399,10 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 
 ### 쓰는 곳
 
-- 값(`name`)과 `required`: Select, ChipField, ColorField, Rating, ToggleGroup, [temporal-field](./temporal-field/README.md)
+- 값(`name`)과 `required`: Select, ChipField, ColorField, ToggleGroup, [temporal-field](./temporal-field/README.md)
 - 값만: Slider
 - `required` 만: CheckboxGroup, FileField. 값은 각 Checkbox 와 `<input type="file">` 이 이미 FormData 에 넣습니다.
-- `message`: CheckboxGroup, Rating (`requiredMessage` prop)
+- `message`: CheckboxGroup (`requiredMessage` prop)
 
 ### 쓰는 법
 
@@ -583,7 +583,7 @@ useImageSettledBeforeMount(imageRef, current, report);
 
 ### 쓰는 곳
 
-- 위젯의 키: Group 의 roving focus(ToggleGroup, Tabs), RadioGroup, Rating, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape, Carousel([slides/](#slides) 의 `moveWithKeys`), Image 의 뷰어(←/→ 는 `dir` 로 뒤집고, `Home` `End`)
+- 위젯의 키: Group 의 roving focus(ToggleGroup, Tabs), RadioGroup, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape, Carousel([slides/](#slides) 의 `moveWithKeys`), Image 의 뷰어(←/→ 는 `dir` 로 뒤집고, `Home` `End`)
 - [pressable.ts](#pressablets) 와 Button 의 Enter, Space
 - [text-control](./text-control/README.md) 의 Escape, [temporal-field](./temporal-field/README.md) 의 입력과 trigger
 - [overlay](./overlay/README.md) 의 레이어 스택: `keyWithModifiers('Escape')`, `isComposingKey`
