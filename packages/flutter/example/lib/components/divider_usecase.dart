@@ -33,7 +33,7 @@ final dividerUseCases = [
     ),
   ),
   WidgetbookUseCase(
-    name: 'ids.Label',
+    name: 'Label',
     builder: (context) => themed(
       context,
       Column(
@@ -42,7 +42,7 @@ final dividerUseCases = [
         children: [
           ids.Divider(
             child: Text(
-              context.knobs.string(label: 'ids.Label', initialValue: '또는'),
+              context.knobs.string(label: 'Label', initialValue: '또는'),
             ),
           ),
           const SizedBox(
