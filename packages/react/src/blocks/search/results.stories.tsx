@@ -15,6 +15,7 @@ import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { TextField } from '../../components/form/text-field';
 import { Tabs } from '../../components/navigation/tabs';
+import { Highlight } from '../../components/typography/highlight';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -170,8 +171,12 @@ export const PC: Story = {
                               {result.icon ?? <Avatar name={result.person} size="tiny" />}
                             </Item.Media>
                             <Item.Content>
-                              <Item.Title>{result.title}</Item.Title>
-                              <Item.Description>{result.description}</Item.Description>
+                              <Item.Title>
+                                <Highlight query={query}>{result.title}</Highlight>
+                              </Item.Title>
+                              <Item.Description>
+                                <Highlight query={query}>{result.description}</Highlight>
+                              </Item.Description>
                             </Item.Content>
                           </a>
                         </Item>
