@@ -114,7 +114,7 @@ export function SidebarRoot({
     ...shared,
     presentation: 'drawer',
     rail: false,
-    styles: sidebarStyle({ variant: 'sidebar', state: 'expanded', inDrawer: true }),
+    styles: sidebarStyle({ variant: 'sidebar', state: 'expanded', touch: true }),
     navigate: () => controls.setMobileOpen(false),
   };
   const bar: SidebarContextValue = { ...panel, presentation: 'bar' };
@@ -166,11 +166,16 @@ export function SidebarRoot({
         </SidebarContext>
         {variant === 'sidebar' && <Divider orientation="vertical" className={styles.divider()} />}
       </aside>
-      <Drawer side="left" open={controls.mobileOpen} onOpenChange={controls.setMobileOpen}>
-        <Drawer.Content aria-label={label}>
+      <Drawer
+        side="left"
+        hideClose
+        open={controls.mobileOpen}
+        onOpenChange={controls.setMobileOpen}
+      >
+        <Drawer.Content aria-label={label} className={drawer.styles.drawer()}>
           <SidebarContext value={drawer}>
             {header ?? <SidebarHeader />}
-            <nav aria-label={label} className={drawer.styles.drawer()}>
+            <nav aria-label={label} className={drawer.styles.drawerNav()}>
               {body}
             </nav>
             {footer}

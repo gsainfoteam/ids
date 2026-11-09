@@ -11,8 +11,10 @@ export type SidebarHeaderProps = ComponentProps<'div'>;
 const TRIGGER = new Set<unknown>([SidebarTrigger]);
 
 export function SidebarHeader({ className, children, ...props }: SidebarHeaderProps) {
-  const { styles, collapsible } = useSidebarContext('Sidebar.Header');
-  const addsTrigger = collapsible !== false && !containsElementOfType(children, TRIGGER);
+  const { styles, collapsible, presentation } = useSidebarContext('Sidebar.Header');
+  const addsTrigger =
+    (collapsible !== false || presentation === 'drawer') &&
+    !containsElementOfType(children, TRIGGER);
 
   return (
     <div {...props} data-sidebar-header="" className={styles.header({ className })}>

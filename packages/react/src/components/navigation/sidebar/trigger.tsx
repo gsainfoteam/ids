@@ -6,6 +6,7 @@ import {
   Bars3Icon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 import { SidebarContext, useSidebarControls } from './context';
@@ -13,6 +14,7 @@ import { toggleSidebar, useSmallScreen } from './use-sidebar';
 import { useTranslate } from '../../../internal/translate';
 import { cn } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
+import { Drawer } from '../../overlay/drawer';
 import { Tooltip } from '../../overlay/tooltip';
 import { Kbd } from '../../typography/kbd';
 
@@ -33,7 +35,21 @@ export function SidebarTrigger({
   const sidebar = use(SidebarContext);
   const small = useSmallScreen();
 
-  if (sidebar?.presentation === 'drawer') return null;
+  if (sidebar?.presentation === 'drawer')
+    return (
+      <Drawer.Close asChild>
+        <IconButton
+          size="tiny"
+          {...props}
+          variant={variant}
+          aria-label={t('drawer.close')}
+          icon={<XMarkIcon />}
+          data-sidebar-trigger=""
+          className={className}
+          onClick={onClick}
+        />
+      </Drawer.Close>
+    );
   if (sidebar?.presentation === 'panel' && !controls.collapsible) return null;
 
   const opensDrawer = small;

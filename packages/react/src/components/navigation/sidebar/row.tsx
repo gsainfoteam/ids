@@ -15,7 +15,7 @@ export function SidebarRow({
   return (
     <>
       {parts.icon !== undefined && (
-        <Item.Media asChild>
+        <Item.Media asChild className={styles.media()}>
           <span>{parts.icon}</span>
         </Item.Media>
       )}

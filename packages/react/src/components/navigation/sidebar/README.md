@@ -41,7 +41,7 @@ import { Badge, Sidebar } from '@gsainfoteam/ids-react';
 
 | 파트               | 역할                                                                                      |
 | ------------------ | ----------------------------------------------------------------------------------------- |
-| `Sidebar.Header`   | 위 끝 줄. `collapsible` 이면 끝에 접기 버튼이 저절로 붙는다                               |
+| `Sidebar.Header`   | 위 끝 줄. `collapsible` 이면 접기 버튼, Drawer 에서는 닫기 버튼이 끝에 저절로 붙는다      |
 | `Sidebar.Group`    | 라벨과 항목 목록. `label` 이 `<section>` 의 이름이 된다                                   |
 | `Sidebar.Item`     | 항목. `href` 면 `<a>`, `asChild` 면 자식 링크, 둘 다 없으면 `<button>`                    |
 | `Sidebar.Footer`   | 아래 끝 줄. 스크롤하지 않는다                                                             |
@@ -119,6 +119,7 @@ import { Badge, Sidebar } from '@gsainfoteam/ids-react';
 - `offcanvas` 로 접힌 사이드바는 폭이 0 이 되고 `inert` 라 Tab 이 들어가지 않습니다. 다시 열 `Sidebar.Trigger` 가 밖에 있어야 하므로 `Sidebar.Provider` 없이 쓰면 개발 모드에서 경고합니다.
 - 단축키는 입력칸에 포커스가 있을 때는 동작하지 않습니다(편집기의 굵게 `Mod+B` 를 막지 않습니다). 640px 아래에서는 Drawer 를 열고 닫습니다.
 - 접기 버튼의 Tooltip 에 단축키가 `Kbd` 로 함께 뜹니다.
+- 아이콘 띠에서 Header 는 첫 자식(로고)과 접기 버튼만 보이고, 나머지는 `sr-only` 로 숨깁니다.
 - 접힌 동안 `<aside>` 에 `data-collapsed` 가 붙습니다. Header 나 Footer 의 내용을 접혔을 때 숨기려면 `in-data-collapsed:hidden`, 화면에서만 숨기려면 `in-data-collapsed:sr-only` 를 줍니다.
 
 ### 상태를 쿠키에 남기기
@@ -179,6 +180,7 @@ export default async function Layout({ children }) {
 ## 좁은 화면
 
 - 640px 아래에서는 사이드바 대신 왼쪽 Drawer 에 같은 Header, 메뉴, Footer 를 그립니다. 접힘 상태와 상관없이 늘 펼친 모양입니다.
+- Drawer 는 손가락으로 누르기 좋게 그립니다. 폭은 256px, 항목은 40px 높이에 16px 글자와 20px 아이콘입니다.
 - Drawer 의 항목을 누르면 Drawer 가 닫힙니다. 하위 메뉴 버튼과 묶음 라벨은 닫지 않습니다.
 - 화면이 640px 이상으로 넓어지면 열린 Drawer 를 닫습니다.
 - 경계는 Select 의 시트와 같은 640px(`sm`)입니다.
