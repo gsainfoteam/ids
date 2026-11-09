@@ -99,6 +99,7 @@ export { Spinner } from './components/feedback/spinner';
 export { Progress } from './components/feedback/progress';
 export { Skeleton } from './components/feedback/skeleton';
 export { Label } from './components/typography/label';
+export { Highlight } from './components/typography/highlight';
 export { Kbd } from './components/typography/kbd';
 
 export { Pagination } from './components/navigation/pagination';
