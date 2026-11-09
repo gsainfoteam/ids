@@ -23,7 +23,7 @@ import { Toggle } from '../../components/action/toggle';
 import { Accordion } from '../../components/data/accordion';
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
-import { Card } from '../../components/data/card';
+import { Bubble } from '../../components/data/bubble';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { Table } from '../../components/data/table';
@@ -238,9 +238,7 @@ export const PC: Story = {
                     <Item.Description>PDF · 182KB</Item.Description>
                   </Item.Content>
                 </Item>
-                <Card variant="soft" className="max-w-[80%]">
-                  <Card.Content>남은 전공 필수를 찾아서 다음 학기 시간표에 넣어 줘.</Card.Content>
-                </Card>
+                <Bubble align="end">남은 전공 필수를 찾아서 다음 학기 시간표에 넣어 줘.</Bubble>
               </div>
 
               <div className="flex gap-3">
@@ -324,9 +322,7 @@ export const PC: Story = {
               </div>
 
               <div className="flex justify-end">
-                <Card variant="soft" className="max-w-[80%]">
-                  <Card.Content>화요일 오전 수업은 빼 줘. 그날은 근로 장학이 있어.</Card.Content>
-                </Card>
+                <Bubble align="end">화요일 오전 수업은 빼 줘. 그날은 근로 장학이 있어.</Bubble>
               </div>
 
               <div className="flex gap-3">
@@ -349,9 +345,7 @@ export const PC: Story = {
               {sent.map((message) => (
                 <div key={message.id} className="flex flex-col gap-8">
                   <div className="flex justify-end">
-                    <Card variant="soft" className="max-w-[80%]">
-                      <Card.Content>{message.text}</Card.Content>
-                    </Card>
+                    <Bubble align="end">{message.text}</Bubble>
                   </div>
                   <div className="flex gap-3">
                     {assistant}

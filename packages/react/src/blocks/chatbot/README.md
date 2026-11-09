@@ -12,7 +12,7 @@ Storybook `Blocks/Chatbot/*`. AI 챗봇 화면 다섯 가지입니다.
 
 - **쓰인 컴포넌트.** TextArea, IconButton, Toggle, Select, Card, Bubble, Avatar, Accordion, Table, Badge, Button, Chip, Item, Tabs, Alert, Spinner, ScrollArea, MessageScroller, Drawer, Menu, Popover, FloatingButton, TextField, Divider, Spacer, toast
 - **대신 쓴 것.** shadcn/ui 와 AI Elements 의 채팅 파트가 IDS 에는 아직 없습니다. 아래는 각 블록이 무엇으로 대신했는지입니다.
-  - 내 말풍선: Simple 은 `Bubble align="end"`, 나머지는 `Card variant="soft"` 를 오른쪽에 붙인 상자.
+  - 내 말풍선: Simple 과 Thread 는 `Bubble align="end"`, 나머지는 `Card variant="soft"` 를 오른쪽에 붙인 상자.
   - 답 한 줄(Message): 아바타와 본문을 배치 클래스로 나란히.
   - 생각 과정(Reasoning), 도구 호출(Tool): `Accordion variant="soft"` 항목. 도구에 넘긴 값은 `Table`.
   - 진행 중 표시(Marker, Shimmer): `Spinner` 와 글자를 담은 `role="status"` 문단.
