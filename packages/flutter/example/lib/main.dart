@@ -27,10 +27,10 @@ class WidgetbookApp extends StatelessWidget {
       ),
       directories: [
         WidgetbookComponent(name: 'AspectRatio', useCases: aspectRatioUseCases),
-        WidgetbookComponent(name: 'ids.Divider', useCases: dividerUseCases),
-        WidgetbookComponent(name: 'ids.Field', useCases: fieldUseCases),
-        WidgetbookComponent(name: 'ids.Label', useCases: labelUseCases),
-        WidgetbookComponent(name: 'ids.Spinner', useCases: spinnerUseCases),
+        WidgetbookComponent(name: 'Divider', useCases: dividerUseCases),
+        WidgetbookComponent(name: 'Field', useCases: fieldUseCases),
+        WidgetbookComponent(name: 'Label', useCases: labelUseCases),
+        WidgetbookComponent(name: 'Spinner', useCases: spinnerUseCases),
       ],
     );
   }
