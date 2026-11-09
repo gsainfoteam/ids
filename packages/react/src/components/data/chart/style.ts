@@ -10,8 +10,7 @@ export const chartStyle = tv({
     description: 'text-body-b3-regular text-(--ids-color-on-muted)',
     frame: [
       'text-caption-c1-regular',
-      '[&_.recharts-surface]:overflow-visible [&_.recharts-surface]:rounded-standard [&_.recharts-surface]:outline-none',
-      '[&_.recharts-surface:focus-visible]:ring-[3px] [&_.recharts-surface:focus-visible]:ring-(--ids-color-primary)/40',
+      '[&_.recharts-surface]:overflow-visible [&_.recharts-surface]:rounded-standard [&_.recharts-surface]:focus-ring',
       '[&_.recharts-text]:fill-(--ids-color-on-muted)',
       '[&_.recharts-cartesian-axis-line]:stroke-(--ids-color-border) [&_.recharts-cartesian-axis-tick-line]:stroke-(--ids-color-border)',
       '[&_.recharts-cartesian-grid_line]:stroke-(--ids-color-border) [&_.recharts-polar-grid_*]:stroke-(--ids-color-border)',
@@ -24,9 +23,8 @@ export const chartStyle = tv({
     srTable: 'sr-only',
     srTableInner: 'w-max max-w-none',
     tooltip: [
-      'grid min-w-32 gap-1.5 concentric-p-2 px-2.5',
-      'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-md',
-      'text-caption-c1-regular',
+      'pointer-events-none fixed z-50 m-0 min-w-32 gap-1.5 concentric-p-2 px-2.5 shadow-md',
+      'transition-opacity duration-(--ids-motion-fast) ease-out starting:opacity-0 motion-reduce:transition-none',
     ],
     tooltipLabel: 'text-caption-c1-medium',
     tooltipList: 'm-0 grid gap-1',

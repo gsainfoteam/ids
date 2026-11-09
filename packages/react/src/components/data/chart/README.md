@@ -114,6 +114,7 @@ const shares = rows.map((row) => ({ ...row, fill: `var(--chart-${row.service})` 
 - `Chart.Tooltip` 의 `formatter(value, name, item, index, payload)` 와 `labelFormatter(label, payload)` 는 Recharts 와 같습니다. `[값, 이름]` 배열을 돌려주면 이름도 바꿉니다. `hideLabel` 은 맨 위 항목 이름을 숨깁니다.
 - `Chart.Legend` 의 `formatter(label, item, index)` 는 config 의 label 을 받아 바꿉니다.
 - `content` 를 주면 IDS 의 내용 대신 그것을 그립니다. `Chart.TooltipContent`, `Chart.LegendContent` 를 감싸 일부만 바꿀 수도 있습니다.
+- IDS 툴팁 내용은 Card 로 그리고, 가리킨 지점 옆에 IDS 오버레이(`popover`, `useAnchored`)로 띄웁니다. top layer 에 올라가므로 `overflow: hidden` 인 Card 나 ScrollArea 안에서도 잘리지 않고, 화면 끝에서는 반대쪽으로 넘어갑니다.
 - 숫자는 `locale` → IdsProvider `locale` → `ko-KR` 순으로 정한 언어로 씁니다(`1,590`).
 
 ## 표

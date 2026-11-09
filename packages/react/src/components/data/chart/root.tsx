@@ -179,6 +179,7 @@ export function ChartRoot({
         titleId,
         descriptionId,
         table,
+        frameRef,
       }}
     >
       <figure

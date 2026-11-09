@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, use } from 'react';
+import { createContext, use, type RefObject } from 'react';
 
 import { invariant } from '../../../utils';
 
@@ -15,6 +15,7 @@ type Context = {
   titleId: string | undefined;
   descriptionId: string | undefined;
   table: ChartTableModel | undefined;
+  frameRef: RefObject<HTMLDivElement | null>;
 };
 
 export const ChartContext = createContext<Context | null>(null);

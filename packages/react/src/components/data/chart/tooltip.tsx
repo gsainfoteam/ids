@@ -1,6 +1,6 @@
 'use client';
 
-import { isValidElement, type ReactNode } from 'react';
+import { isValidElement, useLayoutEffect, useState, type ReactNode, type RefObject } from 'react';
 
 import {
   Tooltip,
@@ -13,6 +13,8 @@ import { configOrder, entryFor, type ChartIndicator } from './config';
 import { useChartContext } from './context';
 import { Indicator } from './indicator';
 import { useFormatValue } from './use-format-value';
+import { showInTopLayer, useAnchored } from '../../../internal/overlay';
+import { Card } from '../card';
 
 export type ChartTooltipProps = TooltipProps & {
   indicator?: ChartIndicator;
@@ -26,6 +28,15 @@ export type ChartTooltipContentProps = Partial<TooltipContentProps> & {
 
 type Row = { fill?: unknown };
 
+const GAP_FROM_THE_POINT = 12;
+
+const pointIn = (frameRef: RefObject<HTMLDivElement | null>, x: number, y: number) => ({
+  getBoundingClientRect: () => {
+    const frame = frameRef.current?.getBoundingClientRect();
+    return DOMRect.fromRect({ x: (frame?.left ?? 0) + x, y: (frame?.top ?? 0) + y });
+  },
+});
+
 const colorOf = (item: TooltipPayloadEntry) =>
   item.color ?? (item.payload as Row | undefined)?.fill?.toString() ?? item.fill?.toString();
 
@@ -37,16 +48,48 @@ export function ChartTooltipContent({
   hideLabel = false,
   formatter,
   labelFormatter,
+  coordinate,
 }: ChartTooltipContentProps) {
-  const { config, styles, locale } = useChartContext('Chart.Tooltip');
+  const { config, styles, locale, frameRef } = useChartContext('Chart.Tooltip');
   const format = useFormatValue(locale);
-  if (!active || !payload?.length) return null;
+  const [box, setBox] = useState<HTMLDivElement | null>(null);
+  const open = Boolean(active && payload?.length);
+
+  const anchored = useAnchored({
+    open,
+    reference: frameRef,
+    floating: box,
+    side: 'right',
+    align: 'start',
+    sideOffset: GAP_FROM_THE_POINT,
+  });
+  const { setPositionReference } = anchored.refs;
+  const x = coordinate?.x;
+  const y = coordinate?.y;
+
+  useLayoutEffect(() => {
+    if (x !== undefined && y !== undefined) setPositionReference(pointIn(frameRef, x, y));
+  }, [frameRef, x, y, setPositionReference]);
+
+  useLayoutEffect(() => {
+    if (box?.isConnected) showInTopLayer(box);
+  }, [box]);
+
+  if (!open || !payload) return null;
 
   const labelText: ReactNode = entryFor(config, label)?.entry.label ?? label;
   const heading = labelFormatter ? labelFormatter(labelText, payload) : labelText;
 
   return (
-    <div data-chart-tooltip="" className={styles.tooltip()}>
+    <Card
+      ref={setBox}
+      popover="manual"
+      size="tiny"
+      data-chart-tooltip=""
+      data-side={anchored.side}
+      className={styles.tooltip()}
+      style={anchored.floatingStyles}
+    >
       {!hideLabel && heading !== undefined && heading !== '' && (
         <p className={styles.tooltipLabel()}>{heading}</p>
       )}
@@ -71,7 +114,7 @@ export function ChartTooltipContent({
           );
         })}
       </dl>
-    </div>
+    </Card>
   );
 }
 

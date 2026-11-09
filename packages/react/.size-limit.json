@@ -142,7 +142,7 @@
       "tailwindcss",
       "recharts"
     ],
-    "limit": "39 kB",
+    "limit": "57 kB",
     "gzip": true
   }
 ]

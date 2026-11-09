@@ -199,6 +199,35 @@ test('the default tooltip lists each series in config order with its label and v
   expect(values).toEqual(['1,240', '860']);
 });
 
+test('the tooltip opens in the top layer beside the point, outside a clipping parent', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <div style={{ width: 400, overflow: 'hidden' }}>
+        <Chart config={CONFIG}>
+          <Chart.Title>방문</Chart.Title>
+          <BarChart data={ROWS}>
+            <XAxis dataKey="day" />
+            <Bar dataKey="web" />
+          </BarChart>
+        </Chart>
+      </div>
+    </IdsProvider>,
+  );
+  const graph = screen.getByRole('img', { name: '방문' });
+  await expect.element(graph).toBeInTheDocument();
+
+  await pointAt(graph.element(), 60, 100);
+
+  await expect
+    .poll(() => document.querySelector('[data-chart-tooltip]')?.matches(':popover-open'))
+    .toBe(true);
+  const frame = document.querySelector('[data-chart-frame]')!.getBoundingClientRect();
+  const box = document.querySelector('[data-chart-tooltip]')!.getBoundingClientRect();
+  expect(box.left).toBeGreaterThan(frame.left);
+  expect(box.top).toBeGreaterThanOrEqual(frame.top);
+  expect(box.width).toBeGreaterThan(0);
+});
+
 test('a locale on Chart formats the tooltip numbers', async () => {
   const screen = await render(visits({ locale: 'de-DE' }));
   const graph = screen.getByRole('img', { name: '방문' });
