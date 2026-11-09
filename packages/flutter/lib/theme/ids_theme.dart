@@ -35,12 +35,8 @@ class IdsTheme {
   Color get onSurface => resolve('on-surface');
   Color get muted => resolve('muted');
   Color get mutedHover => resolve('muted-hover');
-  Color get mutedActive => resolve('muted-active');
   Color get onMuted => resolve('on-muted');
   Color get border => resolve('border');
-  Color get handle => resolve('handle');
-  Color get handleHover => resolve('handle-hover');
-  Color get handleActive => resolve('handle-active');
 
   bool get isDark => mode == IdsMode.dark;
 }
