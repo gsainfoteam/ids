@@ -2,7 +2,7 @@
 
 챗봇과 에이전트에 메시지를 보내는 입력창입니다. 글, 첨부 파일, 도구, 보내기와 멈추기 버튼을 구분선 없는 한 테두리 안에 담습니다.
 
-- **TextArea 와 FileField 로 짓습니다.** 입력은 [TextArea](../text-area/README.md) 라 내용에 맞춰 늘고 `maxRows`(기본 6줄)를 넘으면 IDS 스크롤 막대가 생깁니다. 첨부는 [FileField](../file-field/README.md) 의 고르기, 끌어다 놓기, 붙여넣기, 제한, 목록을 그대로 씁니다.
+- **TextArea 와 FileField 로 짓습니다.** 입력은 [TextArea](../text-area/README.md) 라 처음에는 두 줄 높이(`rows`, 기본 2)이고, 내용에 맞춰 늘다가 `maxRows`(기본 6줄)를 넘으면 IDS 스크롤 막대가 생깁니다. 첨부는 [FileField](../file-field/README.md) 의 고르기, 끌어다 놓기, 붙여넣기, 제한, 목록을 그대로 씁니다.
 - **Enter 로 보냅니다.** Enter 는 보내고 Shift+Enter 는 줄을 바꿉니다. 한글처럼 조합 중인 글자를 확정하는 Enter 는 보내지 않습니다. 모바일 키보드의 Enter 키에는 `보내기` 가 보입니다(`enterkeyhint="send"`).
 - **보내는 중.** `status` 가 `idle` 이 아니면 보내지 않고, 보내기 버튼이 멈추기 버튼으로 바뀝니다. 그동안에도 다음 메시지를 적어 둘 수 있습니다.
 - **`<form>` 입니다.** 보내기는 `submit` 이라 `onSubmit` 이 먼저 불리고, `onSend` 가 없으면 브라우저나 React 의 form `action` 이 그대로 제출합니다.
@@ -76,20 +76,20 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 ## 도구
 
 ```tsx
-<PromptInput onSend={({ text, tools }) => ask(text, { sources: tools.includes('sources') })}>
+<PromptInput onSend={({ text, tools }) => ask(text, { search: tools.includes('search') })}>
   <PromptInput.Input />
   <PromptInput.ActionMenu>                          {/* + 버튼과 메뉴. 생략하면 AddAttachments 하나 */}
     <PromptInput.AddAttachments />                  {/* 파일 고르기를 연다 */}
     <Menu.Item onSelect={capture}>사진 찍기</Menu.Item>
   </PromptInput.ActionMenu>
-  <PromptInput.Tool value="sources" icon={<DocumentTextIcon />}>출처 공지 함께 보기</PromptInput.Tool>
+  <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>웹 검색</PromptInput.Tool>
 </PromptInput>
 
-<PromptInput defaultTools={['sources']} />                   // 처음부터 켠 도구
+<PromptInput defaultTools={['search']} />                   // 처음부터 켠 도구
 <PromptInput tools={tools} onToolsChange={setTools} />       // 제어
 ```
 
-- `PromptInput.Tool` 은 soft `Toggle` 입니다. 켜면 브랜드 옅은 채움에 체크 아이콘이 붙고 `aria-pressed="true"` 가 됩니다.
+- `PromptInput.Tool` 은 outline `Toggle` 입니다. 켜면 테두리 대신 브랜드 옅은 채움(`secondary`)이 깔리고 `aria-pressed="true"` 가 됩니다. `icon` 이 없으면 켰을 때 체크 아이콘을 붙입니다.
 - 켠 도구의 `value` 는 `onSend` 의 `tools` 로 옵니다. 보낸 뒤에도 켜진 채로 남고, form reset 은 `defaultTools` 로 되돌립니다.
 - `PromptInput.ActionMenu` 는 outline `IconButton` 과 `Menu` 입니다. 메뉴는 위로 열리고(`side="top"`), 자리가 없으면 아래로 뒤집힙니다.
 - `PromptInput.AddAttachments` 는 `Menu.Item` 이라 `onSelect` 에서 `preventDefault()` 하면 파일 고르기를 열지 않습니다.
@@ -112,11 +112,12 @@ import { PromptInput } from '@gsainfoteam/ids-react';
 | `PromptInput.Attachments` | 첨부 목록 (`FileField.List`). 파일이 없으면 그리지 않는다. children 도 FileField.List 와 같다 |
 | `PromptInput.Attach`      | 파일 고르기 (`FileField.Trigger` + outline `IconButton`). `icon` 으로 아이콘을 바꾼다     |
 | `PromptInput.Submit`      | 보내기와 멈추기 (solid `IconButton`)                                                     |
-| `PromptInput.Tool`        | 켜고 끄는 도구 (soft `Toggle`). `value` 가 `tools` 에 들어간다                            |
+| `PromptInput.Tool`        | 켜고 끄는 도구 (outline `Toggle`). `value` 가 `tools` 에 들어간다                            |
 | `PromptInput.ActionMenu`  | + 버튼과 메뉴 (`IconButton` + `Menu`). 자식은 `Menu.Item` 들                              |
 | `PromptInput.AddAttachments` | 파일 고르기를 여는 메뉴 항목 (`Menu.Item`)                                            |
 
 - 입력과 바 사이에는 구분선이 없습니다 (`TextArea divided={false}`).
+- 넉넉한 입력창입니다. 여백은 `concentric-p-1.5`(tiny `concentric-p-1`)라 모서리가 컨테이너 최대인 16px 이고, 글자는 `body-b2`, 아래 바의 버튼은 36px, 버튼 사이는 8px 입니다(tiny 는 TextArea 바와 같은 버튼에 6px).
 - 모든 파트는 `PromptInput` 의 바로 아래 자식으로 둡니다. 다른 요소로 감싸면 찾지 못해 기본 파트가 하나 더 생깁니다.
 - 모델 고르기처럼 켜고 끄는 것이 아닌 도구는 앱이 `Select` 같은 IDS 컴포넌트로 넣습니다. 아래 바의 버튼은 TextArea 바 안쪽 크기로 줄어듭니다.
 - 입력의 이름은 기본 `aria-label="메시지"` 이고, placeholder 는 기본 `메시지를 입력하세요` 입니다. `aria-label` 이나 `aria-labelledby` 를 주면 그 값을 씁니다.

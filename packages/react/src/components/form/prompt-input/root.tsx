@@ -67,7 +67,7 @@ export type PromptInputProps = Omit<
 
 const NO_FILES: File[] = [];
 const NO_TOOLS: string[] = [];
-const ONE_LINE = 1;
+const ROOM_FOR_TWO_LINES = 2;
 const LINES_BEFORE_SCROLLING = 6;
 
 const isPart =
@@ -153,7 +153,7 @@ export function PromptInputRoot({
 
   const busy = status !== 'idle';
   const canSend = !disabled && !busy && (text.trim() !== '' || files.length > 0);
-  const styles = promptInputStyle();
+  const styles = promptInputStyle({ size });
 
   useFormReset(formRef, () => {
     setText(defaultValue, { silent: true });
@@ -187,7 +187,7 @@ export function PromptInputRoot({
   const {
     minRows,
     maxRows = LINES_BEFORE_SCROLLING,
-    rows = ONE_LINE,
+    rows = ROOM_FOR_TWO_LINES,
     onKeyDown,
     ...inputProps
   } = input;

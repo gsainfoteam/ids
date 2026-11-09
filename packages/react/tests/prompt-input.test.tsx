@@ -42,7 +42,7 @@ test('the default composition is a form with a labelled textarea and a send butt
   expect(form).toHaveAttribute('data-status', 'idle');
   await expect.element(textbox()).toHaveAttribute('placeholder', '메시지를 입력하세요');
   await expect.element(textbox()).toHaveAttribute('enterkeyhint', 'send');
-  await expect.element(textbox()).toHaveAttribute('rows', '1');
+  await expect.element(textbox()).toHaveAttribute('rows', '2');
   await expect.element(sendButton()).toHaveAttribute('type', 'submit');
   await expect.element(sendButton()).toHaveAttribute('aria-disabled', 'true');
   expect(form.contains(sendButton().element())).toBe(true);
