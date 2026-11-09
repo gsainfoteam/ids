@@ -6,7 +6,7 @@ export const bubbleStyle = tv({
   slots: {
     root: [
       'relative w-[var(--bubble-fit-width,fit-content)] max-w-[var(--bubble-max-width,80%)] min-w-0',
-      'concentric-p-3 text-body-b2-regular [overflow-wrap:anywhere]',
+      'concentric-p-3 text-body-b2-regular text-balance [overflow-wrap:anywhere]',
     ],
     reactions: 'flex flex-wrap items-center gap-1',
   },

@@ -22,6 +22,30 @@ const lineRects = (bubble: HTMLElement) => {
   return [...range.getClientRects()].filter((rect) => rect.width > 0);
 };
 
+const TWO_LINES = 'Yo did you see the new Pretext library?';
+
+const MANY_LINES =
+  'Lunch moved to the student union today, so meet at the second floor entrance. Bring the printed notes from Tuesday, the lab report draft, and your student card because the library gate checks it after six. If you run late, text me and I will save a seat by the window.';
+
+const EMOJI_KOREAN =
+  '오늘 점심 같이 먹을래? 🍜 학생회관 앞에서 12시에 보자 😀 늦으면 먼저 들어가 있을게 👍';
+
+const lines = (bubble: HTMLElement) => {
+  const tops = new Map<number, number>();
+  for (const rect of lineRects(bubble)) {
+    const top = Math.round(rect.top);
+    tops.set(top, Math.max(tops.get(top) ?? 0, rect.right) - 0);
+  }
+  return [...tops.values()];
+};
+
+const lineWidths = (bubble: HTMLElement) => {
+  const left = contentBox(bubble).left;
+  return lines(bubble).map((right) => right - left);
+};
+
+const endGap = (bubble: HTMLElement) => contentBox(bubble).right - Math.max(...lines(bubble));
+
 const contentBox = (element: HTMLElement) => {
   const rect = element.getBoundingClientRect();
   const style = getComputedStyle(element);
@@ -177,6 +201,78 @@ test('shrinking keeps every line where it broke', async () => {
   bubble!.style.removeProperty('--bubble-fit-width');
   const natural = lineRects(bubble!).length;
   expect(fitted).toBe(natural);
+});
+
+test('two lines wrap evenly and the box ends at the longer one', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <div className="flex w-80 flex-col items-start">
+        <Bubble>{TWO_LINES}</Bubble>
+      </div>
+    </IdsProvider>,
+  );
+  const [bubble] = bubbles(screen.container);
+  const balanced = lineWidths(bubble!);
+  expect(balanced).toHaveLength(2);
+  expect(Math.min(...balanced) / Math.max(...balanced)).toBeGreaterThan(0.75);
+  expect(endGap(bubble!)).toBeLessThanOrEqual(1);
+  const fitted = bubble!.getBoundingClientRect().width;
+
+  bubble!.style.textWrap = 'wrap';
+  bubble!.style.setProperty('--bubble-fit-width', 'fit-content');
+  const greedy = lineWidths(bubble!);
+  expect(greedy).toHaveLength(2);
+  expect(Math.max(...greedy)).toBeGreaterThan(Math.max(...balanced) + 20);
+  expect(fitted).toBeLessThan(bubble!.getBoundingClientRect().width - 20);
+});
+
+test('past the lines a browser balances, the box still ends at the longest line', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <div className="flex w-80 flex-col items-start">
+        <Bubble>{MANY_LINES}</Bubble>
+      </div>
+    </IdsProvider>,
+  );
+  const [bubble] = bubbles(screen.container);
+  expect(lines(bubble!).length).toBeGreaterThanOrEqual(7);
+  expect(endGap(bubble!)).toBeLessThanOrEqual(1);
+  expect(bubble!.getBoundingClientRect().width).toBeLessThanOrEqual(320 * 0.8);
+});
+
+test('Korean kept by word with emoji wraps evenly and fits', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <div className="flex w-80 flex-col items-start break-keep">
+        <Bubble>{EMOJI_KOREAN}</Bubble>
+      </div>
+    </IdsProvider>,
+  );
+  const [bubble] = bubbles(screen.container);
+  expect(lines(bubble!).length).toBeGreaterThanOrEqual(2);
+  expect(endGap(bubble!)).toBeLessThanOrEqual(1);
+  expect(bubble!.style.getPropertyValue('--bubble-fit-width')).not.toBe('');
+});
+
+test('many bubbles mounted together are all fitted, and a column resize refits each', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <div data-testid="column" className="flex w-80 flex-col items-start gap-2">
+        {Array.from({ length: 30 }, (_, index) => (
+          <Bubble key={index}>{TWO_LINES}</Bubble>
+        ))}
+      </div>
+    </IdsProvider>,
+  );
+  const all = bubbles(screen.container);
+  for (const bubble of all) expect(endGap(bubble)).toBeLessThanOrEqual(1);
+
+  const column = screen.getByTestId('column').element() as HTMLElement;
+  column.style.width = '200px';
+  await expect.poll(() => Math.max(...all.map(endGap))).toBeLessThanOrEqual(1);
+  for (const bubble of all) {
+    expect(bubble.getBoundingClientRect().width).toBeLessThanOrEqual(200 * 0.8);
+  }
 });
 
 test('the fit follows new content and a new column width', async () => {

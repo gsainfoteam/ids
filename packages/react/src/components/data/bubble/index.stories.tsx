@@ -57,8 +57,18 @@ export const Gallery: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Fit"
-        description="여러 줄이면 가장 긴 줄에 맞춰 상자를 줄입니다. 최대폭은 줄의 80% 입니다."
+        description="여러 줄이면 줄을 고르게 접고 가장 긴 줄에 맞춰 상자를 줄입니다. 최대폭은 줄의 80% 입니다."
       >
+        <Showcase.Row label="두 줄">
+          <div className="flex w-80">
+            <Bubble>새로 나온 라이브러리 봤어? 진짜 신기하더라</Bubble>
+          </div>
+          <div className="flex w-80 justify-end">
+            <Bubble align="end" variant="solid">
+              응 봤어. 말풍선 폭을 글에 딱 맞추더라 🙂
+            </Bubble>
+          </div>
+        </Showcase.Row>
         {variants.map((variant) => (
           <Showcase.Row key={variant} label={variant}>
             <div className="flex w-80">
@@ -125,7 +135,7 @@ export const FitsTheLongestLine: Story = {
     docs: {
       description: {
         story:
-          '글이 여러 줄로 접히면 CSS 만으로는 상자가 줄의 80% 에 머물러 줄 끝에 빈 공간이 남습니다. Bubble 은 `Range.getClientRects()` 로 줄마다 글자의 끝을 재고, 가장 긴 줄에 맞춰 상자를 줄입니다. 서버 HTML 에는 폭이 없고, 브라우저가 그린 뒤에 잽니다.',
+          '글이 여러 줄로 접히면 CSS 만으로는 상자가 줄의 80% 에 머물러 줄 끝에 빈 공간이 남습니다. Bubble 은 `text-wrap: balance` 로 줄 길이를 고르게 맞추고, `Range.getClientRects()` 로 가장 긴 줄의 끝을 재서 상자를 그 폭으로 줄입니다. 서버 HTML 에는 폭이 없고, 브라우저가 그린 뒤에 잽니다.',
       },
     },
   },

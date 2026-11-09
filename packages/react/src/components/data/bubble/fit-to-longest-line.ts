@@ -66,44 +66,99 @@ function longestLine(root: HTMLElement, edges: Edges, rtl: boolean) {
   return longest;
 }
 
-function fit(root: HTMLElement) {
-  root.style.removeProperty(FIT_WIDTH_PROPERTY);
-
+function measureFitWidth(root: HTMLElement) {
   const style = getComputedStyle(root);
   const edges = contentEdges(root, style);
   const longest = longestLine(root, edges, style.direction === 'rtl');
   const wrappedShorterThanTheBox =
     longest > 0 && edges.end - edges.start - longest >= SUBPIXEL_SLACK;
-  if (!wrappedShorterThanTheBox) return;
+  if (!wrappedShorterThanTheBox) return null;
 
   const frame = root.getBoundingClientRect().width - (edges.end - edges.start);
-  root.style.setProperty(FIT_WIDTH_PROPERTY, `${Math.ceil(frame + longest)}px`);
+  return `${Math.ceil(frame + longest)}px`;
+}
+
+const mounted = new Set<HTMLElement>();
+const pending = new Set<HTMLElement>();
+let flushQueued = false;
+
+function flushInOneLayout() {
+  flushQueued = false;
+  const roots = [...pending].filter((root) => root.isConnected);
+  pending.clear();
+
+  for (const root of roots) root.style.removeProperty(FIT_WIDTH_PROPERTY);
+  const widths = roots.map(measureFitWidth);
+  roots.forEach((root, index) => {
+    const width = widths[index];
+    if (width) root.style.setProperty(FIT_WIDTH_PROPERTY, width);
+  });
+}
+
+function scheduleFit(root: HTMLElement) {
+  pending.add(root);
+  if (flushQueued) return;
+  flushQueued = true;
+  queueMicrotask(flushInOneLayout);
+}
+
+const parentWidths = new Map<Element, number | undefined>();
+const bubblesByParent = new Map<Element, Set<HTMLElement>>();
+let parentResize: ResizeObserver | null = null;
+
+function refitWhenParentWidthChanges(entries: ResizeObserverEntry[]) {
+  for (const { target, contentRect } of entries) {
+    const previous = parentWidths.get(target);
+    parentWidths.set(target, contentRect.width);
+    if (previous === contentRect.width) continue;
+    bubblesByParent.get(target)?.forEach(scheduleFit);
+  }
+}
+
+function refitEveryBubble() {
+  mounted.forEach(scheduleFit);
+}
+
+function watchParent(root: HTMLElement, parent: Element) {
+  parentResize ??= new ResizeObserver(refitWhenParentWidthChanges);
+  const siblings = bubblesByParent.get(parent);
+  if (siblings) {
+    siblings.add(root);
+    return;
+  }
+  bubblesByParent.set(parent, new Set([root]));
+  parentWidths.set(parent, undefined);
+  parentResize.observe(parent);
+}
+
+function unwatchParent(root: HTMLElement, parent: Element) {
+  const siblings = bubblesByParent.get(parent);
+  siblings?.delete(root);
+  if (siblings?.size) return;
+  bubblesByParent.delete(parent);
+  parentWidths.delete(parent);
+  parentResize?.unobserve(parent);
 }
 
 export function fitToLongestLine(root: HTMLElement | null) {
   if (!root) return;
 
-  fit(root);
+  if (mounted.size === 0) document.fonts.addEventListener('loadingdone', refitEveryBubble);
+  mounted.add(root);
+  scheduleFit(root);
 
   const parent = root.parentElement;
-  let parentWidth = parent?.clientWidth;
-  const resize = new ResizeObserver(() => {
-    if (parent?.clientWidth === parentWidth) return;
-    parentWidth = parent?.clientWidth;
-    fit(root);
-  });
-  if (parent) resize.observe(parent);
+  if (parent) watchParent(root, parent);
 
-  const mutation = new MutationObserver(() => fit(root));
+  const mutation = new MutationObserver(() => scheduleFit(root));
   mutation.observe(root, { childList: true, characterData: true, subtree: true });
 
-  const refit = () => fit(root);
-  document.fonts.addEventListener('loadingdone', refit);
-
   return () => {
-    resize.disconnect();
     mutation.disconnect();
-    document.fonts.removeEventListener('loadingdone', refit);
+    if (parent) unwatchParent(root, parent);
+    mounted.delete(root);
+    pending.delete(root);
+    if (mounted.size === 0) document.fonts.removeEventListener('loadingdone', refitEveryBubble);
     root.style.removeProperty(FIT_WIDTH_PROPERTY);
   };
 }
