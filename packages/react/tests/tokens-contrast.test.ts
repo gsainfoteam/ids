@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-import { interpolate, wcagContrast } from 'culori';
+import { differenceCiede2000, interpolate, wcagContrast } from 'culori';
 import { describe, expect, test } from 'vitest';
 
 import type { IdsColor, IdsMode } from '../src/tokens/types';
@@ -30,6 +30,8 @@ const colors = Object.keys(everyColor) as IdsColor[];
 const modes: IdsMode[] = ['light', 'dark'];
 
 const AA_TEXT = 4.5;
+const AA_GRAPHICS = 3;
+const NEIGHBOURING_SERIES_DIFFERENCE = 25;
 
 const css = readFileSync(createRequire(import.meta.url).resolve('@gsainfoteam/ids-css'), 'utf8');
 
@@ -129,4 +131,24 @@ describe.each(modes)('%s status pairs', (mode) => {
       AA_TEXT,
     );
   });
+});
+
+describe.each(modes)('%s chart series', (mode) => {
+  const series = ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5'];
+  const difference = differenceCiede2000();
+
+  test.each(series)('%s reaches AA for graphics on surface', (token) => {
+    expect(contrast(modeTokens(mode), token, 'surface')).toBeGreaterThanOrEqual(AA_GRAPHICS);
+  });
+
+  test.each(series.slice(0, -1).map((token, index) => [token, series[index + 1]!]))(
+    '%s and %s stay apart',
+    (token, next) => {
+      const tokens = modeTokens(mode);
+
+      expect(difference(tokens[token]!, tokens[next]!)).toBeGreaterThanOrEqual(
+        NEIGHBOURING_SERIES_DIFFERENCE,
+      );
+    },
+  );
 });

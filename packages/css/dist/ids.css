@@ -5,6 +5,11 @@
   --color-on-secondary: var(--ids-color-on-secondary);
   --color-accent: var(--ids-color-accent);
   --color-outline: var(--ids-color-outline);
+  --color-chart-1: var(--ids-color-chart-1);
+  --color-chart-2: var(--ids-color-chart-2);
+  --color-chart-3: var(--ids-color-chart-3);
+  --color-chart-4: var(--ids-color-chart-4);
+  --color-chart-5: var(--ids-color-chart-5);
   --color-surface: var(--ids-color-surface);
   --color-on-surface: var(--ids-color-on-surface);
   --color-muted: var(--ids-color-muted);
@@ -1570,4 +1575,20 @@
   --ids-color-info: #00bcff;
   --ids-color-on-info: #0a0a0a;
   --ids-color-info-strong: #00bcff;
+}
+
+[data-mode="light"] {
+  --ids-color-chart-1: #155dfc;
+  --ids-color-chart-2: #e17100;
+  --ids-color-chart-3: #009689;
+  --ids-color-chart-4: #ec003f;
+  --ids-color-chart-5: #7f22fe;
+}
+
+[data-mode="dark"] {
+  --ids-color-chart-1: #51a2ff;
+  --ids-color-chart-2: #ffb900;
+  --ids-color-chart-3: #00d5be;
+  --ids-color-chart-4: #ff637e;
+  --ids-color-chart-5: #a684ff;
 }

@@ -109,11 +109,13 @@ const parseEnums = (dictionary) => {
   return result;
 };
 
+const MODE_WIDE_COLOR_FILES = ["neutral", "status", "chart"];
+
 const colorPairs = [
   ...new Map(
     readdirSync("./tokens/semantic").flatMap((f) => {
       const m = f.match(/^([^.]+)\.(light|dark)\.json$/);
-      return m && m[1] !== "neutral" && m[1] !== "status"
+      return m && !MODE_WIDE_COLOR_FILES.includes(m[1])
         ? [[`${m[1]}.${m[2]}`, [m[1], m[2]]]]
         : [];
     }),
@@ -479,6 +481,8 @@ const cssFormatter = ({ dictionary }) =>
     buildColorThemeCSS(dictionary, "neutral", "dark", '[data-mode="dark"]'),
     buildColorThemeCSS(dictionary, "status", "light", '[data-mode="light"]'),
     buildColorThemeCSS(dictionary, "status", "dark", '[data-mode="dark"]'),
+    buildColorThemeCSS(dictionary, "chart", "light", '[data-mode="light"]'),
+    buildColorThemeCSS(dictionary, "chart", "dark", '[data-mode="dark"]'),
   ].join("\n");
 
 const tsTypesFormatter = ({ dictionary }) => {
