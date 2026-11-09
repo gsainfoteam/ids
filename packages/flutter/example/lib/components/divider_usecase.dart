@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/ids.dart' as ids;
 import 'package:widgetbook/widgetbook.dart';
 
 import 'themed.dart';
@@ -12,7 +12,7 @@ final dividerUseCases = [
       const Column(
         mainAxisSize: MainAxisSize.min,
         spacing: 16,
-        children: [Text('위'), IdsDivider(), Text('아래')],
+        children: [Text('위'), ids.Divider(), Text('아래')],
       ),
     ),
   ),
@@ -25,7 +25,7 @@ final dividerUseCases = [
           spacing: 12,
           children: [
             Text('계정'),
-            IdsDivider(orientation: Axis.vertical),
+            ids.Divider(orientation: Axis.vertical),
             Text('설정'),
           ],
         ),
@@ -33,21 +33,21 @@ final dividerUseCases = [
     ),
   ),
   WidgetbookUseCase(
-    name: 'Label',
+    name: 'ids.Label',
     builder: (context) => themed(
       context,
       Column(
         mainAxisSize: MainAxisSize.min,
         spacing: 24,
         children: [
-          IdsDivider(
+          ids.Divider(
             child: Text(
-              context.knobs.string(label: 'Label', initialValue: '또는'),
+              context.knobs.string(label: 'ids.Label', initialValue: '또는'),
             ),
           ),
           const SizedBox(
             height: 120,
-            child: IdsDivider(orientation: Axis.vertical, child: Text('또는')),
+            child: ids.Divider(orientation: Axis.vertical, child: Text('또는')),
           ),
         ],
       ),

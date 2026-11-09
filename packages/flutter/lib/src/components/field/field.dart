@@ -3,10 +3,10 @@ import 'package:flutter/widgets.dart';
 import '../../../theme/theme_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_typography.dart';
-import '../label/ids_label.dart';
+import '../label/label.dart';
 
-class IdsField extends StatelessWidget {
-  const IdsField({
+class Field extends StatelessWidget {
+  const Field({
     super.key,
     this.size = IdsSize.standard,
     this.required = false,
@@ -23,12 +23,12 @@ class IdsField extends StatelessWidget {
 
   static const _gaps = {IdsSize.standard: 8.0, IdsSize.tiny: 6.0};
 
-  static IdsField? maybeOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_IdsFieldScope>()?.field;
+  static Field? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_FieldScope>()?.field;
 
-  static IdsField _of(BuildContext context, String part) {
+  static Field _of(BuildContext context, String part) {
     final field = maybeOf(context);
-    assert(field != null, '$part must be rendered inside an IdsField.');
+    assert(field != null, '$part must be rendered inside a Field.');
     return field!;
   }
 
@@ -39,7 +39,7 @@ class IdsField extends StatelessWidget {
       IdsSize.tiny => IdsTypography.captionC1Regular,
     };
 
-    return _IdsFieldScope(
+    return _FieldScope(
       field: this,
       child: Opacity(
         opacity: disabled ? 0.5 : 1,
@@ -50,7 +50,7 @@ class IdsField extends StatelessWidget {
             spacing: _gaps[size]!,
             children: [
               for (final child in children)
-                if (!(invalid ? child is IdsFieldHint : child is IdsFieldError))
+                if (!(invalid ? child is FieldHint : child is FieldError))
                   child,
             ],
           ),
@@ -60,18 +60,18 @@ class IdsField extends StatelessWidget {
   }
 }
 
-class IdsFieldLabel extends StatelessWidget {
-  const IdsFieldLabel({super.key, this.required, required this.child});
+class FieldLabel extends StatelessWidget {
+  const FieldLabel({super.key, this.required, required this.child});
 
   final bool? required;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final field = IdsField._of(context, 'IdsFieldLabel');
+    final field = Field._of(context, 'FieldLabel');
     return Align(
       alignment: AlignmentDirectional.centerStart,
-      child: IdsLabel(
+      child: Label(
         size: field.size,
         required: required ?? field.required,
         child: child,
@@ -80,40 +80,40 @@ class IdsFieldLabel extends StatelessWidget {
   }
 }
 
-class IdsFieldDescription extends StatelessWidget {
-  const IdsFieldDescription({super.key, required this.child});
+class FieldDescription extends StatelessWidget {
+  const FieldDescription({super.key, required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    IdsField._of(context, 'IdsFieldDescription');
+    Field._of(context, 'FieldDescription');
     return _tinted(ThemeProvider.of(context).onMuted, child);
   }
 }
 
-class IdsFieldHint extends StatelessWidget {
-  const IdsFieldHint({super.key, required this.child});
+class FieldHint extends StatelessWidget {
+  const FieldHint({super.key, required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    if (IdsField._of(context, 'IdsFieldHint').invalid) {
+    if (Field._of(context, 'FieldHint').invalid) {
       return const SizedBox.shrink();
     }
     return _tinted(ThemeProvider.of(context).onMuted, child);
   }
 }
 
-class IdsFieldError extends StatelessWidget {
-  const IdsFieldError({super.key, required this.child});
+class FieldError extends StatelessWidget {
+  const FieldError({super.key, required this.child});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    if (!IdsField._of(context, 'IdsFieldError').invalid) {
+    if (!Field._of(context, 'FieldError').invalid) {
       return const SizedBox.shrink();
     }
     return _tinted(ThemeProvider.of(context).danger, child);
@@ -125,13 +125,13 @@ Widget _tinted(Color color, Widget child) => DefaultTextStyle(
   child: child,
 );
 
-class _IdsFieldScope extends InheritedWidget {
-  const _IdsFieldScope({required this.field, required super.child});
+class _FieldScope extends InheritedWidget {
+  const _FieldScope({required this.field, required super.child});
 
-  final IdsField field;
+  final Field field;
 
   @override
-  bool updateShouldNotify(_IdsFieldScope old) =>
+  bool updateShouldNotify(_FieldScope old) =>
       old.field.size != field.size ||
       old.field.required != field.required ||
       old.field.disabled != field.disabled ||

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
-import 'package:ids_flutter/src/components/group/ids_group.dart';
+import 'package:ids_flutter/src/components/group/group.dart';
 
 Future<void> pump(WidgetTester tester, Widget group) => tester.pumpWidget(
   Directionality(
@@ -22,42 +22,42 @@ void main() {
   testWidgets('attached children touch and share the tallest height', (
     tester,
   ) async {
-    await pump(tester, const IdsGroup(children: [a, b]));
+    await pump(tester, const Group(children: [a, b]));
     expect(rectOf(tester, 'a'), const Rect.fromLTWH(0, 0, 40, 36));
     expect(rectOf(tester, 'b'), const Rect.fromLTWH(40, 0, 30, 36));
   });
 
   testWidgets('separated children keep 8px apart', (tester) async {
-    await pump(tester, const IdsGroup(attached: false, children: [a, b]));
+    await pump(tester, const Group(attached: false, children: [a, b]));
     expect(rectOf(tester, 'b').left, 48);
   });
 
   testWidgets('vertical stacks and shares the widest width', (tester) async {
     await pump(
       tester,
-      const IdsGroup(orientation: Axis.vertical, children: [a, b]),
+      const Group(orientation: Axis.vertical, children: [a, b]),
     );
     expect(rectOf(tester, 'a'), const Rect.fromLTWH(0, 0, 40, 20));
     expect(rectOf(tester, 'b'), const Rect.fromLTWH(0, 20, 40, 36));
   });
 
   testWidgets('separator crosses the group', (tester) async {
-    await pump(tester, const IdsGroup(children: [a, IdsGroupSeparator(), b]));
-    expect(tester.getSize(find.byType(IdsDivider)), const Size(1, 36));
+    await pump(tester, const Group(children: [a, GroupSeparator(), b]));
+    expect(tester.getSize(find.byType(Divider)), const Size(1, 36));
     expect(rectOf(tester, 'b').left, 41);
 
     await pump(
       tester,
-      const IdsGroup(
+      const Group(
         orientation: Axis.vertical,
-        children: [a, IdsGroupSeparator(), b],
+        children: [a, GroupSeparator(), b],
       ),
     );
-    expect(tester.getSize(find.byType(IdsDivider)), const Size(40, 1));
+    expect(tester.getSize(find.byType(Divider)), const Size(40, 1));
   });
 
   testWidgets('separator outside a group fails', (tester) async {
-    await pump(tester, const IdsGroupSeparator());
+    await pump(tester, const GroupSeparator());
     expect(tester.takeException(), isAssertionError);
   });
 
@@ -65,7 +65,7 @@ void main() {
     final semantics = tester.ensureSemantics();
     await pump(
       tester,
-      const IdsGroup(
+      const Group(
         semanticLabel: '글자 모양',
         children: [Text('굵게'), Text('기울임')],
       ),

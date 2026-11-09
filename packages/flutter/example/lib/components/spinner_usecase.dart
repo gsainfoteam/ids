@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/ids.dart' as ids;
 import 'package:widgetbook/widgetbook.dart';
 
 import 'themed.dart';
@@ -13,11 +13,11 @@ final spinnerUseCases = [
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 16,
         children: [
-          const IdsSpinner(size: IdsSize.standard, decorative: true),
-          const IdsSpinner(size: IdsSize.tiny, decorative: true),
+          const ids.Spinner(size: ids.IdsSize.standard, decorative: true),
+          const ids.Spinner(size: ids.IdsSize.tiny, decorative: true),
           IconTheme.merge(
             data: const IconThemeData(size: 32),
-            child: const IdsSpinner(decorative: true),
+            child: const ids.Spinner(decorative: true),
           ),
         ],
       ),

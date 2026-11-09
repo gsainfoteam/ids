@@ -29,9 +29,9 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
 ## 결정 사항
 
-- **StateMask는 만들지 않는다.** 상태는 배경색 알파로 표현한다. 상태 감지는 `useInteractive`의 Flutter 대응물 `IdsInteractive`.
-- **`IdsInteractive`는 그리지 않는다.** 상태만 내보내고 배경 알파·scale·focus ring·disabled는 control surface 값 파일이 정한다. React의 `useInteractive` / `control-surface.ts` 분리와 같다. 그래서 Figma를 보지 않는다.
-- **`IdsTextField`도 `IdsInteractive`를 쓴다.** React는 `Button`·`Toggle`만 쓰고 `TextField`는 네이티브 `:focus-visible`로 처리한다. Flutter엔 의사클래스가 없다.
+- **StateMask는 만들지 않는다.** 상태는 배경색 알파로 표현한다. 상태 감지는 `useInteractive`의 Flutter 대응물 `Interactive`.
+- **`Interactive`는 그리지 않는다.** 상태만 내보내고 배경 알파·scale·focus ring·disabled는 control surface 값 파일이 정한다. React의 `useInteractive` / `control-surface.ts` 분리와 같다. 그래서 Figma를 보지 않는다.
+- **`TextField`도 `Interactive`를 쓴다.** React는 `Button`·`Toggle`만 쓰고 `TextField`는 네이티브 `:focus-visible`로 처리한다. Flutter엔 의사클래스가 없다.
 - **로컬 enum은 만들지 않는다.** `IdsSize`/`IdsVariant`로 안 되는 축은 `packages/core/tokens/enums.json`에 추가한다. 추가는 FE가 그 컴포넌트를 만들 때 한다.
 - **치수·상태 알파는 Figma가 기준.** Figma에 없으면 React 값을 쓴다. core에 `radius.json`·`size.json`은 있으나 dart formatter가 없어 `lib/tokens/`로 나오지 않는다. 상태 알파(`--ids-state-*`)는 core에 아예 없고 [control-surface.ts](../react/src/internal/control-surface.ts)에만 있다. Flutter는 이 값을 파일 한 곳에만 둔다. 값이 굳으면 core로 올리고 `sd.config.js`에 dart formatter를 켠다.
 - **컴포넌트 색은 `colorScheme` prop이다.** FE의 Button, IconButton, Toggle, IconToggle, FloatingButton, Badge, Chip, Alert, Progress에 있다. 컨트롤의 값은 `primary` `neutral` `danger` `success` `warning` `info`. `enums.json`에는 아직 없고 React의 TS 타입(`ControlColorScheme`)이다. 옮기는 컴포넌트에서 쓰일 때 `enums.json`에 올린다.
@@ -46,7 +46,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
   코드 규약 — Figma로 닫히지 않는다. 미결.
 
   - 그룹 size: 코드는 불일치 시 항상 throw, `variant`는 전파 안 함. 문서는 자식 명시값 우선
-  - `Ids` prefix: codegen과 `IdsScope`·`IdsTheme`에 있음. 문서는 prefix 없음
+  - `Ids` prefix: 컴포넌트에는 붙이지 않는다 (React와 같음). 생성 토큰 타입과 `IdsScope`·`IdsTheme`에만 남긴다. Flutter SDK·Material과 이름이 겹치면 사용하는 쪽이 `as ids`로 import한다
   - size / variant: `enums.json`의 `standard` `tiny` / `solid` `soft` `outline` `ghost`. 문서의 `sm`/`md`/`lg`, `link`는 코드에 없음
   - spacing: core에 `spacing.json`은 있으나 `ids_spacing.dart`가 없다. 위 dart formatter 건과 같다
 
@@ -84,7 +84,7 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 
 ## 옮겨야 할 규약
 
-### `useInteractive` → `IdsInteractive`
+### `useInteractive` → `Interactive`
 
 ```text
 { hovered, active, focused, focusVisible, pressed, disabled }
@@ -106,11 +106,11 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 | `onPointerDown/Up/Cancel`         | `Listener` 또는 `GestureDetector`             |
 | `onFocus/Blur` + `:focus-visible` | `Focus` + 포커스 원인 추적 (아래 참고)        |
 | `onKeyDown` Enter/Space           | `Focus.onKeyEvent` 또는 `Shortcuts`/`Actions` |
-| `T \| (state) => T`               | `ValueBuilder<IdsInteractiveState>` 계열      |
+| `T \| (state) => T`               | `ValueBuilder<InteractiveState>` 계열      |
 
 **`focusVisible`.** `FocusManager.instance.highlightMode`만으로 정하지 않는다. 전역 입력 모드라서 마우스 입력도 `traditional`이고, 그대로 쓰면 마우스 클릭으로 포커스된 컨트롤에도 포커스 링이 뜬다. React는 포커스를 얻는 시점의 `:focus-visible`을 스냅샷하므로 마우스 클릭에는 링이 없다.
 
-`IdsInteractive`가 포커스 원인을 직접 추적한다. 포커스를 얻는 시점에 한 번 계산하고, blur에서 `false`로 되돌린다.
+`Interactive`가 포커스 원인을 직접 추적한다. 포커스를 얻는 시점에 한 번 계산하고, blur에서 `false`로 되돌린다.
 
 ```text
 focusVisible = focused
@@ -126,11 +126,11 @@ focusVisible = focused
 | `requestFocus()` — 직전 입력이 키보드·마우스 | `true`         |
 | `requestFocus()` — 직전 입력이 터치          | `false`        |
 
-위 표가 `IdsInteractive` 위젯 테스트의 계약이다.
+위 표가 `Interactive` 위젯 테스트의 계약이다.
 
 ### control surface — Button / IconButton / Toggle / IconToggle 공통
 
-[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 색 여섯 개를 정하고 variant가 그 색을 쓴다. 아래 값은 임시값이다. `IdsButton` 때 Figma로 덮어쓴다.
+[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 색 여섯 개를 정하고 variant가 그 색을 쓴다. 아래 값은 임시값이다. `Button` 때 Figma로 덮어쓴다.
 
 | `colorScheme`                       | fill / on-fill          | accent       | quiet        | hover     | ring      |
 | ----------------------------------- | ----------------------- | ------------ | ------------ | --------- | --------- |
@@ -166,9 +166,9 @@ focusVisible = focused
 
 ## 순서
 
-1. `IdsInteractive` — 상태 추가가 breaking이 아니게
-2. `IdsButton` — `Toggle`·`ButtonGroup` 확장을 염두
-3. `IdsIconButton`
+1. `Interactive` — 상태 추가가 breaking이 아니게
+2. `Button` — `Toggle`·`ButtonGroup` 확장을 염두
+3. `IconButton`
 4. 나머지 A, 그다음 C
 5. B는 FE 순서대로. `bottom_navigation`은 Flutter 단독
 
@@ -179,5 +179,5 @@ focusVisible = focused
 - `hstack` `vstack`: `gap` `mainAxis` `crossAxis` `fit`. enum은 남아 있는 `lib/src/layout/ids_axis.dart`
 - `empty`: Media / Title / Description / Actions
 - `dialog`: Header / Title / Content / Footer. `open` `onOpenChanged` `dismissible`
-- `tabs`: `IdsTabItem(value, label, child, disabled)`. `value`/`defaultValue`로 controlled/uncontrolled
+- `tabs`: `TabItem(value, label, child, disabled)`. `value`/`defaultValue`로 controlled/uncontrolled
 - `bottom_navigation`: `currentIndex` `onTap`, item은 `icon` `label`

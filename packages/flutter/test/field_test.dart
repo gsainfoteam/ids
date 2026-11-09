@@ -22,33 +22,33 @@ TextStyle? styleOf(WidgetTester tester, String text) => tester
     .text
     .style;
 
-IdsField field({
+Field field({
   IdsSize size = IdsSize.standard,
   bool required = false,
   bool disabled = false,
   bool invalid = false,
   bool? labelRequired,
-}) => IdsField(
+}) => Field(
   size: size,
   required: required,
   disabled: disabled,
   invalid: invalid,
   children: [
-    IdsFieldLabel(required: labelRequired, child: const Text('이메일')),
-    const IdsFieldDescription(child: Text('설명')),
+    FieldLabel(required: labelRequired, child: const Text('이메일')),
+    const FieldDescription(child: Text('설명')),
     const SizedBox(key: Key('control'), height: 36),
-    const IdsFieldHint(child: Text('도움말')),
-    const IdsFieldError(child: Text('오류')),
+    const FieldHint(child: Text('도움말')),
+    const FieldError(child: Text('오류')),
   ],
 );
 
 void main() {
-  group('IdsLabel', () {
+  group('Label', () {
     testWidgets('required adds an asterisk screen readers skip', (
       tester,
     ) async {
       final semantics = tester.ensureSemantics();
-      await pump(tester, const IdsLabel(required: true, child: Text('이름')));
+      await pump(tester, const Label(required: true, child: Text('이름')));
       expect(find.text('*'), findsOne);
       expect(find.semantics.byLabel('*'), findsNothing);
       semantics.dispose();
@@ -62,7 +62,7 @@ void main() {
           tester,
           MediaQuery(
             data: MediaQueryData(textScaler: TextScaler.linear(scale)),
-            child: const IdsLabel(required: true, child: Text('이름')),
+            child: const Label(required: true, child: Text('이름')),
           ),
         );
         expect(
@@ -75,10 +75,10 @@ void main() {
     });
 
     testWidgets('disabled fades, tiny is smaller', (tester) async {
-      await pump(tester, const IdsLabel(disabled: true, child: Text('이름')));
+      await pump(tester, const Label(disabled: true, child: Text('이름')));
       expect(tester.widget<Opacity>(find.byType(Opacity)).opacity, 0.5);
 
-      await pump(tester, const IdsLabel(size: IdsSize.tiny, child: Text('이름')));
+      await pump(tester, const Label(size: IdsSize.tiny, child: Text('이름')));
       expect(
         tester.widget<RichText>(find.byType(RichText)).text.style?.fontSize,
         12,
@@ -86,7 +86,7 @@ void main() {
     });
   });
 
-  group('IdsField', () {
+  group('Field', () {
     testWidgets('shows the hint until invalid, then the error', (tester) async {
       await pump(tester, field());
       expect(find.text('도움말'), findsOne);
@@ -135,12 +135,12 @@ void main() {
     );
 
     testWidgets('a wrapped error still waits for invalid', (tester) async {
-      Widget wrapped({required bool invalid}) => IdsField(
+      Widget wrapped({required bool invalid}) => Field(
         invalid: invalid,
         children: const [
           Padding(
             padding: EdgeInsets.zero,
-            child: IdsFieldError(child: Text('오류')),
+            child: FieldError(child: Text('오류')),
           ),
         ],
       );
@@ -151,7 +151,7 @@ void main() {
     });
 
     testWidgets('a part outside a field fails', (tester) async {
-      await pump(tester, const IdsFieldHint(child: Text('도움말')));
+      await pump(tester, const FieldHint(child: Text('도움말')));
       expect(tester.takeException(), isAssertionError);
     });
   });

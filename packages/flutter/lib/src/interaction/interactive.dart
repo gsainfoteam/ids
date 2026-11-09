@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 @immutable
-class IdsInteractiveState {
-  const IdsInteractiveState({
+class InteractiveState {
+  const InteractiveState({
     this.hovered = false,
     this.active = false,
     this.focused = false,
@@ -27,7 +27,7 @@ class IdsInteractiveState {
 
   @override
   bool operator ==(Object other) =>
-      other is IdsInteractiveState &&
+      other is InteractiveState &&
       other.hovered == hovered &&
       other.active == active &&
       other.focused == focused &&
@@ -41,12 +41,12 @@ class IdsInteractiveState {
 
   @override
   String toString() =>
-      'IdsInteractiveState(hovered: $hovered, active: $active, focused: $focused, '
+      'InteractiveState(hovered: $hovered, active: $active, focused: $focused, '
       'focusVisible: $focusVisible, pressed: $pressed, disabled: $disabled)';
 }
 
-class IdsInteractive extends StatefulWidget {
-  const IdsInteractive({
+class Interactive extends StatefulWidget {
+  const Interactive({
     super.key,
     required this.builder,
     this.onPressed,
@@ -57,7 +57,7 @@ class IdsInteractive extends StatefulWidget {
     this.autofocus = false,
   });
 
-  final Widget Function(BuildContext context, IdsInteractiveState state)
+  final Widget Function(BuildContext context, InteractiveState state)
   builder;
 
   final VoidCallback? onPressed;
@@ -65,16 +65,16 @@ class IdsInteractive extends StatefulWidget {
   final bool disabled;
   final bool pressed;
 
-  final ValueChanged<IdsInteractiveState>? onInteractionChange;
+  final ValueChanged<InteractiveState>? onInteractionChange;
 
   final FocusNode? focusNode;
   final bool autofocus;
 
   @override
-  State<IdsInteractive> createState() => _IdsInteractiveState();
+  State<Interactive> createState() => _InteractiveState();
 }
 
-class _IdsInteractiveState extends State<IdsInteractive> {
+class _InteractiveState extends State<Interactive> {
   bool _hovered = false;
   bool _active = false;
   bool _focused = false;
@@ -86,9 +86,9 @@ class _IdsInteractiveState extends State<IdsInteractive> {
   FocusNode? _internalNode;
   FocusNode get _node => widget.focusNode ?? (_internalNode ??= FocusNode());
 
-  IdsInteractiveState? _reported;
+  InteractiveState? _reported;
 
-  IdsInteractiveState get _state => IdsInteractiveState(
+  InteractiveState get _state => InteractiveState(
     hovered: _hovered,
     active: _active,
     focused: _focused,
@@ -104,7 +104,7 @@ class _IdsInteractiveState extends State<IdsInteractive> {
   }
 
   @override
-  void didUpdateWidget(IdsInteractive oldWidget) {
+  void didUpdateWidget(Interactive oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.disabled == oldWidget.disabled &&
         widget.pressed == oldWidget.pressed) {

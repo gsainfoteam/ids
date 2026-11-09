@@ -4,14 +4,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
-late IdsInteractiveState state;
+late InteractiveState state;
 late int presses;
 
 Future<FocusNode> pump(
   WidgetTester tester, {
   bool disabled = false,
   bool pressed = false,
-  ValueChanged<IdsInteractiveState>? onInteractionChange,
+  ValueChanged<InteractiveState>? onInteractionChange,
 }) async {
   final node = FocusNode();
   addTearDown(node.dispose);
@@ -25,7 +25,7 @@ Future<FocusNode> pump(
           child: SizedBox(
             width: 100,
             height: 40,
-            child: IdsInteractive(
+            child: Interactive(
               focusNode: node,
               disabled: disabled,
               pressed: pressed,
@@ -59,7 +59,7 @@ void main() {
     testWidgets('mouse click', (tester) async {
       await pump(tester);
       await tester.tap(
-        find.byType(IdsInteractive),
+        find.byType(Interactive),
         kind: PointerDeviceKind.mouse,
       );
       await tester.pump();
@@ -69,7 +69,7 @@ void main() {
 
     testWidgets('touch tap', (tester) async {
       await pump(tester);
-      await tester.tap(find.byType(IdsInteractive));
+      await tester.tap(find.byType(Interactive));
       await tester.pump();
       expect(state.focused, isTrue);
       expect(state.focusVisible, isFalse);
@@ -113,7 +113,7 @@ void main() {
 
   testWidgets('hover is mouse only', (tester) async {
     await pump(tester);
-    final center = tester.getCenter(find.byType(IdsInteractive));
+    final center = tester.getCenter(find.byType(Interactive));
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(mouse.removePointer);
     await mouse.addPointer(location: outside);
@@ -128,7 +128,7 @@ void main() {
   testWidgets('pointer press is active, not pressed', (tester) async {
     await pump(tester);
     final touch = await tester.startGesture(
-      tester.getCenter(find.byType(IdsInteractive)),
+      tester.getCenter(find.byType(Interactive)),
     );
     await tester.pump(kPressTimeout);
     expect(state.active, isTrue);
@@ -193,7 +193,7 @@ void main() {
     await tester.pumpWidget(
       WidgetsApp(
         color: const Color(0xFF000000),
-        builder: (_, _) => IdsInteractive(
+        builder: (_, _) => Interactive(
           onPressed: () => presses++,
           builder: (_, s) {
             state = s;
@@ -219,7 +219,7 @@ void main() {
     await pump(tester, disabled: true);
     expect(state.disabled, isTrue);
     await tester.tap(
-      find.byType(IdsInteractive),
+      find.byType(Interactive),
       kind: PointerDeviceKind.mouse,
     );
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
@@ -230,15 +230,15 @@ void main() {
   });
 
   testWidgets('onInteractionChange mirrors state', (tester) async {
-    final log = <IdsInteractiveState>[];
+    final log = <InteractiveState>[];
     await pump(tester, pressed: true, onInteractionChange: log.add);
     await tester.pump();
-    expect(log, [const IdsInteractiveState(pressed: true)]);
+    expect(log, [const InteractiveState(pressed: true)]);
     await tester.sendKeyEvent(LogicalKeyboardKey.tab);
     await tester.pump();
     expect(
       log.last,
-      const IdsInteractiveState(
+      const InteractiveState(
         pressed: true,
         focused: true,
         focusVisible: true,

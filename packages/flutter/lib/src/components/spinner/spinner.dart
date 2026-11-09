@@ -5,8 +5,8 @@ import 'package:flutter/widgets.dart';
 
 import '../../../tokens/ids_enums.dart';
 
-class IdsSpinner extends StatefulWidget {
-  const IdsSpinner({
+class Spinner extends StatefulWidget {
+  const Spinner({
     super.key,
     this.size,
     this.semanticLabel,
@@ -18,10 +18,10 @@ class IdsSpinner extends StatefulWidget {
   final bool decorative;
 
   @override
-  State<IdsSpinner> createState() => _IdsSpinnerState();
+  State<Spinner> createState() => _SpinnerState();
 }
 
-class _IdsSpinnerState extends State<IdsSpinner>
+class _SpinnerState extends State<Spinner>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   static const _sizes = {IdsSize.standard: 16.0, IdsSize.tiny: 14.0};
   static const _turn = Duration(seconds: 1);

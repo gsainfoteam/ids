@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/ids.dart' as ids;
 import 'package:widgetbook/widgetbook.dart';
 
 import 'themed.dart';
@@ -10,10 +10,10 @@ final labelUseCases = [
     builder: (context) => themed(
       context,
       Center(
-        child: IdsLabel(
+        child: ids.Label(
           size: context.knobs.object.dropdown(
             label: 'Size',
-            options: IdsSize.values,
+            options: ids.IdsSize.values,
             labelBuilder: (s) => s.name,
           ),
           required: context.knobs.boolean(label: 'Required'),

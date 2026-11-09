@@ -4,8 +4,8 @@ import '../../../theme/theme_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_typography.dart';
 
-class IdsLabel extends StatelessWidget {
-  const IdsLabel({
+class Label extends StatelessWidget {
+  const Label({
     super.key,
     this.size = IdsSize.standard,
     this.required = false,

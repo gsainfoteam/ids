@@ -25,25 +25,25 @@ Size spinnerSize(WidgetTester tester) =>
 
 void main() {
   testWidgets('follows the icon size unless given one', (tester) async {
-    await pump(tester, const IdsSpinner(), icon: const IconThemeData(size: 20));
+    await pump(tester, const Spinner(), icon: const IconThemeData(size: 20));
     expect(spinnerSize(tester), const Size.square(20));
 
     await pump(
       tester,
-      const IdsSpinner(size: IdsSize.standard),
+      const Spinner(size: IdsSize.standard),
       icon: const IconThemeData(size: 20),
     );
     expect(spinnerSize(tester), const Size.square(16));
 
-    await pump(tester, const IdsSpinner(size: IdsSize.tiny));
+    await pump(tester, const Spinner(size: IdsSize.tiny));
     expect(spinnerSize(tester), const Size.square(14));
   });
 
   testWidgets('spins, or pulses under reduced motion', (tester) async {
-    await pump(tester, const IdsSpinner());
+    await pump(tester, const Spinner());
     expect(find.byType(RotationTransition), findsOne);
 
-    await pump(tester, const IdsSpinner(), reducedMotion: true);
+    await pump(tester, const Spinner(), reducedMotion: true);
     expect(find.byType(RotationTransition), findsNothing);
     expect(find.byType(FadeTransition), findsOne);
   });
@@ -52,19 +52,19 @@ void main() {
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(reduceMotion: true);
     addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
-    await pump(tester, const IdsSpinner());
+    await pump(tester, const Spinner());
     expect(find.byType(FadeTransition), findsOne);
   });
 
   testWidgets('announces after a short delay', (tester) async {
     final semantics = tester.ensureSemantics();
-    await pump(tester, const IdsSpinner());
+    await pump(tester, const Spinner());
     expect(find.semantics.byLabel('불러오는 중'), findsNothing);
 
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.semantics.byLabel('불러오는 중'), findsOne);
 
-    await pump(tester, const IdsSpinner(semanticLabel: '댓글 불러오는 중'));
+    await pump(tester, const Spinner(semanticLabel: '댓글 불러오는 중'));
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.semantics.byLabel('댓글 불러오는 중'), findsOne);
     semantics.dispose();
@@ -72,7 +72,7 @@ void main() {
 
   testWidgets('decorative stays silent', (tester) async {
     final semantics = tester.ensureSemantics();
-    await pump(tester, const IdsSpinner(decorative: true));
+    await pump(tester, const Spinner(decorative: true));
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.semantics.byLabel('불러오는 중'), findsNothing);
     semantics.dispose();

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/ids.dart' as ids;
 import 'package:widgetbook/widgetbook.dart';
 
 import 'components/divider_usecase.dart';
@@ -19,16 +19,16 @@ class WidgetbookApp extends StatelessWidget {
     return Widgetbook.material(
       appBuilder: (context, child) => MaterialApp(
         theme: ThemeData(
-          fontFamily: IdsTypography.sansFontFamily,
-          package: IdsTypography.sansFontPackage,
+          fontFamily: ids.IdsTypography.sansFontFamily,
+          package: ids.IdsTypography.sansFontPackage,
         ),
         home: child,
       ),
       directories: [
-        WidgetbookComponent(name: 'IdsDivider', useCases: dividerUseCases),
-        WidgetbookComponent(name: 'IdsField', useCases: fieldUseCases),
-        WidgetbookComponent(name: 'IdsLabel', useCases: labelUseCases),
-        WidgetbookComponent(name: 'IdsSpinner', useCases: spinnerUseCases),
+        WidgetbookComponent(name: 'ids.Divider', useCases: dividerUseCases),
+        WidgetbookComponent(name: 'ids.Field', useCases: fieldUseCases),
+        WidgetbookComponent(name: 'ids.Label', useCases: labelUseCases),
+        WidgetbookComponent(name: 'ids.Spinner', useCases: spinnerUseCases),
       ],
     );
   }

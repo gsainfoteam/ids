@@ -6,8 +6,8 @@ import 'package:flutter/widgets.dart';
 import '../../../theme/theme_provider.dart';
 import '../../../tokens/ids_typography.dart';
 
-class IdsDivider extends StatelessWidget {
-  const IdsDivider({
+class Divider extends StatelessWidget {
+  const Divider({
     super.key,
     this.orientation = Axis.horizontal,
     this.decorative = false,
@@ -125,7 +125,7 @@ class _RenderLabelledLine extends RenderShiftedBox {
     final labelMain = _horizontal ? label.width : label.height;
     final labelCross = _horizontal ? label.height : label.width;
     final mainSize = main.isFinite ? main : labelMain + _ends;
-    final crossSize = math.max(labelCross, IdsDivider._thickness);
+    final crossSize = math.max(labelCross, Divider._thickness);
     return constraints.constrain(
       _horizontal ? Size(mainSize, crossSize) : Size(crossSize, mainSize),
     );
@@ -134,11 +134,11 @@ class _RenderLabelledLine extends RenderShiftedBox {
   double _intrinsicWidth(double height, double Function(double) label) =>
       _horizontal
       ? label(height) + _ends
-      : math.max(IdsDivider._thickness, label(height));
+      : math.max(Divider._thickness, label(height));
 
   double _intrinsicHeight(double width, double Function(double) label) =>
       _horizontal
-      ? math.max(IdsDivider._thickness, label(math.max(0, width - _ends)))
+      ? math.max(Divider._thickness, label(math.max(0, width - _ends)))
       : label(width) + _ends;
 
   @override
@@ -173,7 +173,7 @@ class _RenderLabelledLine extends RenderShiftedBox {
   }
 
   Rect _segment(Offset offset, double start, double length) {
-    const thickness = IdsDivider._thickness;
+    const thickness = Divider._thickness;
     return _horizontal
         ? Rect.fromLTWH(
             offset.dx + start,

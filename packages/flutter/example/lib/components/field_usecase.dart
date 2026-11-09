@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/ids.dart' as ids;
 import 'package:widgetbook/widgetbook.dart';
 
 import 'themed.dart';
 
-IdsField _emailField({
-  IdsSize size = IdsSize.standard,
+ids.Field _emailField({
+  ids.IdsSize size = ids.IdsSize.standard,
   bool required = true,
   bool disabled = false,
   bool invalid = false,
-}) => IdsField(
+}) => ids.Field(
   size: size,
   required: required,
   disabled: disabled,
   invalid: invalid,
   children: const [
-    IdsFieldLabel(child: Text('이메일')),
-    IdsFieldDescription(child: Text('안내를 받을 이메일 주소입니다.')),
+    ids.FieldLabel(child: Text('이메일')),
+    ids.FieldDescription(child: Text('안내를 받을 이메일 주소입니다.')),
     _EmailInput(),
-    IdsFieldHint(child: Text('예시 주소이며 실제로 발송되지 않습니다.')),
-    IdsFieldError(child: Text('올바른 이메일 주소를 입력해 주세요.')),
+    ids.FieldHint(child: Text('예시 주소이며 실제로 발송되지 않습니다.')),
+    ids.FieldError(child: Text('올바른 이메일 주소를 입력해 주세요.')),
   ],
 );
 
@@ -28,9 +28,9 @@ class _EmailInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
-    final field = IdsField.maybeOf(context)!;
-    final tiny = field.size == IdsSize.tiny;
+    final theme = ids.ThemeProvider.of(context);
+    final field = ids.Field.maybeOf(context)!;
+    final tiny = field.size == ids.IdsSize.tiny;
     final icon = tiny ? 14.0 : 16.0;
     return Container(
       height: tiny ? 32 : 44,
@@ -63,7 +63,7 @@ final fieldUseCases = [
       _emailField(
         size: context.knobs.object.dropdown(
           label: 'Size',
-          options: IdsSize.values,
+          options: ids.IdsSize.values,
           labelBuilder: (s) => s.name,
         ),
         required: context.knobs.boolean(label: 'Required', initialValue: true),
