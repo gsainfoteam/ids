@@ -101,6 +101,9 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
     its server-safe helpers imported from `@tanstack/table-core`;
   - slide dragging, snapping and auto-advance `embla-carousel` 8.6 (`embla-carousel-react`,
     `-autoplay`, `-auto-scroll`), wrapped only by `internal/slides`; Carousel adds the plugins.
+  - charts `recharts` 3, an optional peer imported only by the `@gsainfoteam/ids-react/chart`
+    entry, so an app without charts never installs it. Chart sizes, colors and labels the Recharts
+    chart the app writes; Tooltip, Legend and the screen reader table are IDS's code.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:
   - the `overlay` and `toast` stores, on React's `useSyncExternalStore`. overlay-kit leaves a

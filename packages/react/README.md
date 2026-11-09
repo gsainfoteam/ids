@@ -595,6 +595,12 @@ TimePicker 팝업으로 시간을 선택합니다. [TimeField API](./src/compone
 
 Calendar와 TimePicker로 일시를 선택합니다. [DateTimeField API](./src/components/form/date-time-field/README.md).
 
+## Chart
+
+Recharts 차트를 IDS 의 계열 색 토큰(`chart-1` ~ `chart-5`), 툴팁, 범례, 스크린 리더용 표로 그립니다.
+`@gsainfoteam/ids-react/chart` 에서 가져오고, `recharts` 와 `react-is` 는 차트를 쓰는 앱만 설치합니다.
+[Chart API](./src/components/data/chart/README.md).
+
 ## Interaction feedback
 
 Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만 150ms로 전환합니다. 키보드 포커스에서는 전환과 누름 배율을 적용하지 않으며 reduced-motion도 지원합니다. TextField 계열은 색상만 전환하고 포커스 표시는 즉시 반영합니다. IdsProvider는 `color-scheme`도 모드에 맞춰 네이티브 폼 컨트롤과 스크롤바에 전달합니다.
