@@ -854,3 +854,29 @@ test('a disabled TextArea keeps its handle out of the tab order', async () => {
   await expect.element(handle).toHaveAttribute('aria-disabled', 'true');
   await expect.element(handle).not.toHaveAttribute('tabindex');
 });
+
+test('bars sit behind a line unless divided is off', async () => {
+  const bars = (shell: Element) =>
+    [
+      getComputedStyle(shell.querySelector('[data-text-area-top]')!).borderBottomWidth,
+      getComputedStyle(shell.querySelector('[data-text-area-bottom]')!).borderTopWidth,
+    ] as const;
+  const screen = await render(
+    <div>
+      <TextArea aria-label="divided">
+        <span>Top</span>
+        <TextArea.Input />
+        <span>Bottom</span>
+      </TextArea>
+      <TextArea aria-label="joined" divided={false}>
+        <span>Top</span>
+        <TextArea.Input />
+        <span>Bottom</span>
+      </TextArea>
+    </div>,
+  );
+  const [divided, joined] = screen.container.querySelectorAll('[data-text-area]');
+
+  expect(bars(divided!)).toEqual(['1px', '1px']);
+  expect(bars(joined!)).toEqual(['0px', '0px']);
+});
