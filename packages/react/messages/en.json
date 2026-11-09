@@ -178,6 +178,12 @@
     "searchPlaceholder": "Search commands…",
     "submenu": "{label} submenu"
   },
+  "messageScroller": {
+    "label": "Messages",
+    "loading": "Loading earlier messages",
+    "scrollToBottom": "Scroll to bottom",
+    "scrollToBottomUnseen": "{count, plural, one {Scroll to bottom, # new message} other {Scroll to bottom, # new messages}}"
+  },
   "numberField": {
     "decrement": "Decrease",
     "increment": "Increase",

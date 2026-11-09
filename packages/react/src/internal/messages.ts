@@ -180,6 +180,12 @@ export const messages = {
     searchPlaceholder: '명령 검색…',
     submenu: '{label} 하위 메뉴',
   },
+  messageScroller: {
+    label: '메시지',
+    loading: '이전 메시지를 불러오는 중',
+    scrollToBottom: '맨 아래로',
+    scrollToBottomUnseen: '맨 아래로, 새 메시지 {count}개',
+  },
   numberField: {
     decrement: '값 줄이기',
     increment: '값 늘리기',
