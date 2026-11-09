@@ -6,8 +6,10 @@ export 'tokens/ids_color_tokens.dart';
 export 'theme/theme_provider.dart';
 export 'theme/ids_scope.dart';
 export 'theme/ids_theme.dart';
+export 'theme/ids_radius.dart';
 
 export 'src/layout/ids_axis.dart';
+export 'package:flutter/widgets.dart' show Spacer;
 
 export 'src/interaction/interactive.dart';
 

@@ -17,7 +17,7 @@ const mapName = (color, mode) =>
   `_${color}${mode.charAt(0).toUpperCase() + mode.slice(1)}`;
 
 const hexToFlutterColor = (hex) =>
-  `const Color(0xFF${hex.replace("#", "").toUpperCase()})`;
+  `Color(0xFF${hex.replace("#", "").toUpperCase()})`;
 
 const render = (template, vars) =>
   Object.entries(vars).reduce(
@@ -530,6 +530,7 @@ const dartColorTokensFormatter = ({ dictionary }) => {
         ENTRIES: [
           ...readColorEntriesWithoutCollision(c, m, palette),
           ...readColorEntriesWithoutCollision("status", m, palette),
+          ...readColorEntriesWithoutCollision("neutral", m, palette),
         ]
           .map(toColorLine)
           .join("\n"),

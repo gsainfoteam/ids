@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../tokens/ids_enums.dart';
 import '../tokens/ids_color_tokens.dart';
 
@@ -16,35 +16,31 @@ class IdsTheme {
   Color get secondary => resolve('secondary');
   Color get onSecondary => resolve('on-secondary');
   Color get accent => resolve('accent');
-  Color get danger => resolve('danger');
-
-  Color get surface => _neutral('surface');
-  Color get onSurface => _neutral('on-surface');
-  Color get muted => _neutral('muted');
-  Color get onMuted => _neutral('on-muted');
-  Color get border => _neutral('border');
   Color get outline => resolve('outline');
 
+  Color get success => resolve('success');
+  Color get onSuccess => resolve('on-success');
+  Color get successStrong => resolve('success-strong');
+  Color get warning => resolve('warning');
+  Color get onWarning => resolve('on-warning');
+  Color get warningStrong => resolve('warning-strong');
+  Color get danger => resolve('danger');
+  Color get onDanger => resolve('on-danger');
+  Color get dangerStrong => resolve('danger-strong');
+  Color get info => resolve('info');
+  Color get onInfo => resolve('on-info');
+  Color get infoStrong => resolve('info-strong');
+
+  Color get surface => resolve('surface');
+  Color get onSurface => resolve('on-surface');
+  Color get muted => resolve('muted');
+  Color get mutedHover => resolve('muted-hover');
+  Color get mutedActive => resolve('muted-active');
+  Color get onMuted => resolve('on-muted');
+  Color get border => resolve('border');
+  Color get handle => resolve('handle');
+  Color get handleHover => resolve('handle-hover');
+  Color get handleActive => resolve('handle-active');
+
   bool get isDark => mode == IdsMode.dark;
-
-  Color _neutral(String token) {
-    final neutralMap = mode == IdsMode.light ? _neutralLight : _neutralDark;
-    return neutralMap[token] ?? Colors.transparent;
-  }
-
-  static const _neutralLight = <String, Color>{
-    'surface': Color(0xFFFFFFFF),
-    'on-surface': Color(0xFF171717),
-    'muted': Color(0xFFF5F5F5),
-    'on-muted': Color(0xFF525252),
-    'border': Color(0xFFE5E5E5),
-  };
-
-  static const _neutralDark = <String, Color>{
-    'surface': Color(0xFF0A0A0A),
-    'on-surface': Color(0xFFFAFAFA),
-    'muted': Color(0xFF262626),
-    'on-muted': Color(0xFFA3A3A3),
-    'border': Color(0xFF262626),
-  };
 }

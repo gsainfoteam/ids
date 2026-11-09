@@ -33,7 +33,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 - **`Interactive`는 그리지 않는다.** 상태만 내보내고 배경 알파·scale·focus ring·disabled는 control surface 값 파일이 정한다. React의 `useInteractive` / `control-surface.ts` 분리와 같다. 그래서 Figma를 보지 않는다.
 - **`TextField`도 `Interactive`를 쓴다.** React는 `Button`·`Toggle`만 쓰고 `TextField`는 네이티브 `:focus-visible`로 처리한다. Flutter엔 의사클래스가 없다.
 - **로컬 enum은 만들지 않는다.** `IdsSize`/`IdsVariant`로 안 되는 축은 `packages/core/tokens/enums.json`에 추가한다. 추가는 FE가 그 컴포넌트를 만들 때 한다.
-- **치수·상태 알파는 Figma가 기준.** Figma에 없으면 React 값을 쓴다. core에 `radius.json`·`size.json`은 있으나 dart formatter가 없어 `lib/tokens/`로 나오지 않는다. 상태 알파(`--ids-state-*`)는 core에 아예 없고 [control-surface.ts](../react/src/internal/control-surface.ts)에만 있다. Flutter는 이 값을 파일 한 곳에만 둔다. 값이 굳으면 core로 올리고 `sd.config.js`에 dart formatter를 켠다.
+- **치수·상태 알파는 Figma가 기준.** Figma에 없으면 React 값을 쓴다. 색만 코드젠한다 (회의 결정): brand·status·neutral 색이 `ids_color_tokens.dart`로 나오고 `IdsTheme` getter로 읽는다. radius는 `lib/theme/ids_radius.dart`에 손으로 두고, `size.json`의 컨트롤·아이콘 크기와 컴포넌트 치수는 각 컴포넌트 안의 상수로 둔다. 상태 알파(`--ids-state-*`)는 core에 아예 없고 [control-surface.ts](../react/src/internal/control-surface.ts)에만 있다. Flutter도 이 값을 파일 한 곳에만 둔다.
 - **컴포넌트 색은 `colorScheme` prop이다.** FE의 Button, IconButton, Toggle, IconToggle, FloatingButton, Badge, Chip, Alert, Progress에 있다. 컨트롤의 값은 `primary` `neutral` `danger` `success` `warning` `info`. `enums.json`에는 아직 없고 React의 TS 타입(`ControlColorScheme`)이다. 옮기는 컴포넌트에서 쓰일 때 `enums.json`에 올린다.
 - **설계 문서(Notion, `IDS Architecture.md`)와 다른 곳.** 시각값은 Figma를 보고 닫는다. 나머지는 코드를 따르고 미결로 둔다.
 
@@ -48,7 +48,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
   - 그룹 size: 코드는 불일치 시 항상 throw, `variant`는 전파 안 함. 문서는 자식 명시값 우선
   - `Ids` prefix: 컴포넌트에는 붙이지 않는다 (React와 같음). 생성 토큰 타입과 `IdsScope`·`IdsTheme`에만 남긴다. Flutter SDK·Material과 이름이 겹치면 사용하는 쪽이 `as ids`로 import한다
   - size / variant: `enums.json`의 `standard` `tiny` / `solid` `soft` `outline` `ghost`. 문서의 `sm`/`md`/`lg`, `link`는 코드에 없음
-  - spacing: core에 `spacing.json`은 있으나 `ids_spacing.dart`가 없다. 위 dart formatter 건과 같다
+  - spacing: core에 `spacing.json`은 있으나 React도 쓰지 않는다 (Tailwind 눈금). Flutter도 생성하지 않는다
 
 이전 기록에서 참조하는 것: 컴포넌트 목록, 서브컴포넌트 조립 구조, 다뤘던 기능·상태.
 참조하지 않는 것: 로컬 enum, 치수, 상태 처리 방식.
@@ -146,7 +146,7 @@ focusVisible = focused
 | `ghost`   | 투명                           | hover     | hover            | quiet   | 없음                           |
 
 - 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`, `hover`)이다. `primary`와 `neutral`의 hover는 `muted`다
-- `outline` 테두리는 중립 `border`(neutral 200 · dark 800)다. `IdsTheme`에는 아직 없다: 중립 색은 `ids_theme.dart`에 손으로 적혀 있고 `border`가 빠져 있다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
+- `outline` 테두리는 중립 `border`(neutral 200 · dark 800)다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
 - Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 hover 색이다. 켜지면(`pressed`) `ghost`·`outline`은 hover 색, `soft`는 fill 0.10 + accent, `solid`는 fill + on-fill
 - `active`는 배경만 바뀐다. scale 없음
 - `focusVisible`: 바깥 3px 링(ring 색 0.40)과 안쪽 1px 테두리를 ring 색으로. offset outline이 아니다
