@@ -76,7 +76,7 @@
       "react-hook-form",
       "tailwindcss"
     ],
-    "limit": "400 kB",
+    "limit": "455 kB",
     "gzip": true
   },
   {
@@ -126,6 +126,39 @@
       "tailwindcss"
     ],
     "limit": "81 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { CodeBlock }",
+    "path": "dist/index.js",
+    "import": "{ CodeBlock }",
+    "entry": ["index"],
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "72 kB",
+    "gzip": true
+  },
+  {
+    "name": "import { CodeBlock }, its lazy languages loaded",
+    "path": "dist/index.js",
+    "import": "{ CodeBlock }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "87 kB",
     "gzip": true
   }
 ]

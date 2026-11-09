@@ -43,6 +43,10 @@
     "remove": "Remove {label}",
     "search": "Search items"
   },
+  "codeBlock": {
+    "copied": "Copied",
+    "copy": "Copy code"
+  },
   "colorField": {
     "clear": "Clear color",
     "close": "Close",

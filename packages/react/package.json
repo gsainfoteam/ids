@@ -76,6 +76,7 @@
     "react-day-picker": "^10.0.1",
     "react-remove-scroll": "^2.7.2",
     "react-textarea-autosize": "^8.5.9",
+    "refractor": "^5.0.0",
     "tabbable": "^6.5.0",
     "tailwind-variants": "^3.2.2",
     "uqr": "^0.1.3"

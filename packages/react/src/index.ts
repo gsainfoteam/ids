@@ -57,6 +57,7 @@ export { Empty } from './components/data/empty';
 export { Image } from './components/data/image';
 export type { ImageGroupLayout, ImageViewerItem } from './components/data/image';
 export { QRCode } from './components/data/qr-code';
+export { CodeBlock } from './components/data/code-block';
 export { Marquee } from './components/data/marquee';
 export type { MarqueeOrientation, MarqueeSpeed } from './components/data/marquee';
 export { Table } from './components/data/table';

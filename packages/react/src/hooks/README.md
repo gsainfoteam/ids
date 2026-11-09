@@ -7,10 +7,38 @@
 
 | 파일                                                     | 내용                                                 | 쓰는 곳                                                              |
 | -------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------- |
+| [`use-clipboard-support.ts`](#use-clipboard-supportts)   | `navigator.clipboard.writeText` 가 있는지            | ColorPicker, CodeBlock 의 복사 버튼                                  |
 | [`use-controllable-state.ts`](#use-controllable-statets) | 제어와 비제어를 한 모양으로 다루는 state             | 값이나 열림 상태를 가진 컴포넌트 대부분                              |
 | [`use-form-reset.ts`](#use-form-resetts)                 | native 폼 reset 뒤에 컴포넌트 state 를 되돌리는 hook | 자기 state 를 가진 폼 컨트롤                                         |
 | [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/surface.ts` |
 | [`use-reduced-motion.ts`](#use-reduced-motionts)         | 동작 줄이기 설정(`prefers-reduced-motion`)           | Marquee, Carousel(`internal/slides`)                                 |
+
+## use-clipboard-support.ts
+
+이 페이지에서 `navigator.clipboard.writeText` 를 쓸 수 있는지 알려 주는 hook 입니다. 복사 버튼은 이 값이 `false` 면 그리지 않습니다.
+
+### 쓰는 곳
+
+- ColorPicker.Copy, CodeBlock.Copy
+
+### 쓰는 법
+
+```ts
+// components/data/code-block/copy.tsx
+const supported = useClipboardSupport();
+if (!supported) return null;
+```
+
+### 왜 이렇게
+
+- Clipboard API 는 보안 컨텍스트(https, localhost)에만 있습니다. http 로 연 페이지에서 누를 수 없는 버튼을 그리지 않습니다.
+- 서버와 hydration 의 첫 렌더는 `false` 입니다. 서버는 브라우저를 모르고, hydration 은 서버 HTML 과 같아야 합니다. 버튼은 hydration 바로 뒤의 렌더에서 나타납니다.
+- 값은 페이지가 사는 동안 바뀌지 않아서 아무것도 구독하지 않습니다.
+- ColorPicker 의 `use-color-picker.ts` 에 있던 것을 CodeBlock 이 함께 쓰려고 옮겼습니다. 거기서 가져오면 CodeBlock 이 색 계산 모듈까지 끌고 옵니다.
+
+### 알아둘 것
+
+- 버튼이 hydration 뒤에 생기므로, 자리를 차지하는 곳에 두면 레이아웃이 밀립니다. CodeBlock 은 절대 위치에 둡니다.
 
 ## use-controllable-state.ts
 
