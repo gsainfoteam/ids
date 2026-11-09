@@ -29,9 +29,12 @@ export type SidebarContextValue = SidebarControls & {
 
 export const SidebarContext = createContext<SidebarContextValue | null>(null);
 
-export type PublishedSidebar = Pick<SidebarControls, 'collapsed' | 'collapsible' | 'shortcut'>;
+export type PublishedSidebar = Pick<SidebarControls, 'collapsed' | 'collapsible' | 'shortcut'> & {
+  variant: SidebarVariant;
+};
 
 export type SidebarProviderContextValue = {
+  variant: SidebarVariant;
   published: PublishedSidebar | null;
   publish: (sidebar: PublishedSidebar | null) => void;
   registerSetCollapsed: (setCollapsed: (collapsed: boolean) => void) => void;
@@ -54,6 +57,7 @@ const NOTHING_PUBLISHED: PublishedSidebar = {
   collapsed: false,
   collapsible: false,
   shortcut: false,
+  variant: 'sidebar',
 };
 
 export function useSidebarControls(part: string): SidebarControls & { inside: boolean } {

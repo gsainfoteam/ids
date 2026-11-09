@@ -27,24 +27,14 @@ export const sidebarStyle = tv({
       'min-h-8 items-center px-2 py-0 text-caption-c1-medium text-(--ids-color-on-muted)',
     list: 'flex min-w-0 flex-col gap-px',
     listItem: 'flex min-w-0 flex-col',
-    subList:
-      'ms-4.5 flex min-w-0 flex-col gap-px border-s border-(--ids-color-border) ps-2 pt-0.5',
+    subTree: 'ms-4.5 flex min-w-0 pt-0.5',
+    subList: 'flex min-w-0 flex-1 flex-col gap-px ps-2',
     item: 'concentric-p-0 px-2',
     label: 'min-w-0',
     title: 'text-body-b3-medium',
     end: '',
     submenuTrigger: 'data-hovered:bg-transparent data-active:bg-transparent',
-    inset: [
-      'flex min-w-0 flex-1 flex-col',
-      'group-has-[[data-sidebar-variant=inset]]/sidebar-provider:m-2',
-      'sm:group-has-[[data-sidebar-variant=inset]:not([data-collapsible=offcanvas][data-collapsed])]/sidebar-provider:ms-0',
-      'group-has-[[data-sidebar-variant=inset]]/sidebar-provider:overflow-hidden',
-      'group-has-[[data-sidebar-variant=inset]]/sidebar-provider:rounded-container',
-      'group-has-[[data-sidebar-variant=inset]]/sidebar-provider:bg-(--ids-color-surface)',
-      'group-has-[[data-sidebar-variant=inset]]/sidebar-provider:shadow-xs',
-      'group-has-[[data-sidebar-variant=inset]]/sidebar-provider:inset-ring-1',
-      'group-has-[[data-sidebar-variant=inset]]/sidebar-provider:inset-ring-(--ids-color-border)',
-    ],
+    inset: 'flex min-w-0 flex-1 flex-col',
     provider: 'group/sidebar-provider flex min-h-dvh w-full',
   },
   variants: {
@@ -67,6 +57,21 @@ export const sidebarStyle = tv({
     } satisfies Record<SidebarPanelState, object>,
     standalone: { true: {}, false: { root: 'max-sm:hidden' } },
     inDrawer: { true: { header: 'min-h-8 pe-10' }, false: {} },
+    card: {
+      true: {
+        inset: [
+          'm-2 gap-0 overflow-hidden p-0',
+          'sm:group-has-[[data-sidebar-variant=inset]:not([data-collapsible=offcanvas][data-collapsed])]/sidebar-provider:ms-0',
+        ],
+      },
+      false: {},
+    },
   },
-  defaultVariants: { variant: 'sidebar', state: 'expanded', standalone: true, inDrawer: false },
+  defaultVariants: {
+    variant: 'sidebar',
+    state: 'expanded',
+    standalone: true,
+    inDrawer: false,
+    card: false,
+  },
 });

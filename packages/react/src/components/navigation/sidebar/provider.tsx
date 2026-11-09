@@ -5,12 +5,17 @@ import { useCallback, useRef, useState, type ComponentProps } from 'react';
 import { noop } from 'es-toolkit';
 
 import { SidebarProviderContext, type PublishedSidebar } from './context';
-import { sidebarStyle } from './style';
+import { sidebarStyle, type SidebarVariant } from './style';
 import { Slot } from '../../utility/slot';
 
 export type SidebarProviderProps = ComponentProps<'div'> & { asChild?: boolean };
 
-export function SidebarProvider({ asChild, className, ...props }: SidebarProviderProps) {
+export function SidebarProvider({
+  sidebarVariant = 'sidebar',
+  asChild,
+  className,
+  ...props
+}: SidebarProviderProps & { sidebarVariant?: SidebarVariant }) {
   const [published, setPublished] = useState<PublishedSidebar | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const setCollapsedRef = useRef<(collapsed: boolean) => void>(noop);
@@ -23,6 +28,7 @@ export function SidebarProvider({ asChild, className, ...props }: SidebarProvide
   return (
     <SidebarProviderContext
       value={{
+        variant: published?.variant ?? sidebarVariant,
         published,
         publish: setPublished,
         registerSetCollapsed,

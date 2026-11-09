@@ -156,6 +156,28 @@ test('defaultCollapsed renders the icon rail in the server HTML', () => {
   expect(html).toContain('aria-label="사이드바 펼치기"');
 });
 
+test('the inset body is a Card in the server HTML, and a plain main beside other variants', () => {
+  const insetOf = (variant: Sidebar.Variant) =>
+    new DOMParser()
+      .parseFromString(
+        renderToString(
+          ui(
+            <Sidebar.Provider>
+              <Sidebar variant={variant}>
+                <Menu />
+              </Sidebar>
+              <Sidebar.Inset>본문</Sidebar.Inset>
+            </Sidebar.Provider>,
+          ),
+        ),
+        'text/html',
+      )
+      .querySelector('main[data-sidebar-inset]')!;
+
+  expect(insetOf('inset').className).toContain('shadow-xs');
+  expect(insetOf('sidebar').className).not.toContain('shadow-xs');
+});
+
 test('a nested item opens as an accordion, and as a menu in the icon rail', async () => {
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(

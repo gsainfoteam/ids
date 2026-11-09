@@ -53,6 +53,7 @@ function usePersistedCollapse(name: string | undefined, collapsed: boolean) {
 function usePublishToProvider(
   provider: SidebarProviderContextValue | null,
   controls: Pick<SidebarControls, 'collapsed' | 'collapsible' | 'shortcut' | 'setCollapsed'>,
+  variant: SidebarVariant,
 ) {
   const { collapsed, collapsible, shortcut, setCollapsed } = controls;
   const publish = provider?.publish;
@@ -64,9 +65,9 @@ function usePublishToProvider(
 
   useLayoutEffect(() => {
     if (!publish) return;
-    publish({ collapsed, collapsible, shortcut });
+    publish({ collapsed, collapsible, shortcut, variant });
     return () => publish(null);
-  }, [publish, collapsed, collapsible, shortcut]);
+  }, [publish, collapsed, collapsible, shortcut, variant]);
 }
 
 function useMissingProviderWarning(
@@ -133,7 +134,7 @@ export function useSidebar({
   };
 
   usePersistedCollapse(persist, collapsedState);
-  usePublishToProvider(provider, controls);
+  usePublishToProvider(provider, controls, variant);
   useMissingProviderWarning(provider !== null, variant, collapsible);
   useHotkey(shortcut || DEFAULT_SHORTCUT, () => toggleSidebar(controls, small), {
     ...ONCE_PER_PRESS_OUTSIDE_INPUTS,

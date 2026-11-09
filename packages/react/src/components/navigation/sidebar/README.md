@@ -6,7 +6,7 @@
 - **자식 순서로 칸을 나눕니다.** `Sidebar.Item` 의 첫 아이콘은 아이콘 칸, 글자는 라벨, 그 뒤(Badge, Kbd)는 끝 칸입니다.
 - **아이콘 띠로 접힙니다.** 접으면 라벨은 Tooltip 으로, 하위 메뉴는 Menu 로 뜹니다. `Mod+B` 로 접고 펼칩니다.
 - **좁은 화면에서는 Drawer.** 640px 아래에서는 사이드바 대신 왼쪽 Drawer 가 열리고, 항목을 누르면 닫힙니다.
-- **IDS 로 짓습니다.** 항목은 Item, 하위 메뉴는 Accordion 과 Menu, 라벨은 Tooltip, 접기 버튼은 IconButton, 스크롤은 ScrollArea, floating 표면은 Card 입니다.
+- **IDS 로 짓습니다.** 항목은 Item, 하위 메뉴는 Accordion 과 Menu, 라벨은 Tooltip, 접기 버튼은 IconButton, 스크롤은 ScrollArea, 선은 Divider, floating 사이드바와 inset 본문의 표면은 Card 입니다.
 
 ```tsx
 import { Badge, Sidebar } from '@gsainfoteam/ids-react';
@@ -151,6 +151,7 @@ export default async function Layout({ children }) {
 ```
 
 - `inset` 은 본문을 `Sidebar.Inset` 이 그리므로 `Sidebar.Provider` 가 필요합니다. 없으면 개발 모드에서 경고합니다.
+- Provider 는 자식 JSX 에서 `Sidebar` 를 찾아 `variant` 를 읽으므로, 서버 HTML 부터 본문이 Card 입니다. `Sidebar` 를 앱의 컴포넌트로 감싸 Provider 가 찾지 못하면, 마운트 뒤 Sidebar 가 알려 준 `variant` 로 본문을 Card 로 바꿉니다.
 - 사이드바는 `sticky top-0 h-dvh` 로 화면 높이를 채우고 본문과 함께 스크롤되지 않습니다. 다른 높이는 `className` 으로 줍니다.
 - 폭은 `--sidebar-width`(기본 15rem)입니다: `className="[--sidebar-width:18rem]"`.
 

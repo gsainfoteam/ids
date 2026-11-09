@@ -14,6 +14,7 @@ import { SidebarRow } from './row';
 import { cn, elementTypeOf } from '../../../utils';
 import { Accordion } from '../../data/accordion';
 import { Item } from '../../data/item';
+import { Divider } from '../../layout/divider';
 import { Menu } from '../../overlay/menu';
 
 import type { SidebarItemProps } from './item';
@@ -60,9 +61,12 @@ export function SidebarAccordionSubmenu({ parts, disabled, className }: SubmenuP
           </div>
         </Accordion.Header>
         <Accordion.Content className="p-0">
-          <SidebarListContext value>
-            <ul className={sidebar.styles.subList()}>{parts.subItems}</ul>
-          </SidebarListContext>
+          <div className={sidebar.styles.subTree()}>
+            <Divider orientation="vertical" decorative />
+            <SidebarListContext value>
+              <ul className={sidebar.styles.subList()}>{parts.subItems}</ul>
+            </SidebarListContext>
+          </div>
         </Accordion.Content>
       </Accordion.Item>
     </Accordion>

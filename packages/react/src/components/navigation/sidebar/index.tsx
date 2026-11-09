@@ -9,12 +9,15 @@ import { SidebarProvider, type SidebarProviderProps } from './provider';
 import { SidebarRoot } from './root';
 import { sidebarStyle, type SidebarCollapsibleMode, type SidebarVariant } from './style';
 import { SidebarTrigger, type SidebarTriggerProps } from './trigger';
+import { findElementOfType } from '../../../utils';
 
 import type { Hotkey } from '@tanstack/react-hotkeys';
 
 export function Sidebar(props: Sidebar.Props) {
   return <SidebarRoot {...props} />;
 }
+
+const SIDEBARS = new Set<unknown>([Sidebar, SidebarRoot]);
 
 export namespace Sidebar {
   export type Variant = SidebarVariant;
@@ -57,7 +60,18 @@ export namespace Sidebar {
     export type Props = SidebarTriggerProps;
   }
 
-  export const Provider = SidebarProvider;
+  export function Provider({ children, ...props }: Provider.Props) {
+    const sidebar = findElementOfType<Sidebar.Props>(children, SIDEBARS);
+
+    return (
+      <SidebarProvider {...props} sidebarVariant={sidebar?.props.variant}>
+        {children}
+      </SidebarProvider>
+    );
+  }
+
+  Provider.displayName = 'Sidebar.Provider';
+
   export namespace Provider {
     export type Props = SidebarProviderProps;
   }
