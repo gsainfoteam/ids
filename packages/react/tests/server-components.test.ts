@@ -98,13 +98,14 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     (name) => /^[A-Z][a-z]/.test(name) && ids[name].$$typeof === clientReference,
   );
 
-  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Divider, Image } = ids;
+  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image } = ids;
   const page = h(
     IdsProvider,
     { color: 'blue', mode: 'light' },
     h('a', { href: '/', className: Button.Style({ variant: 'outline' }) }, 'A link styled as a button'),
     h(Badge, { content: 3 }, h(Button, null, 'Inbox')),
     h(Divider),
+    h(Bubble, { align: 'end' }, 'Hi', h(Bubble.Reactions, null, '👍')),
     h(Card, null, h(Card.Header, null, h(Card.Title, null, 'Card'))),
     h(
       Dialog,
@@ -182,6 +183,8 @@ test(
     );
     for (const reference of [
       'ButtonRoot',
+      'BubbleRoot',
+      'BubbleReactions',
       'DialogRoot',
       'DialogTrigger',
       'SelectRoot',

@@ -11,6 +11,9 @@ export const messages = {
     label: '이동 경로',
     more: '숨은 경로 보기',
   },
+  bubble: {
+    reactions: '반응',
+  },
   calendar: {
     label: '달력',
     month: '월',

@@ -9,6 +9,9 @@
     "label": "Breadcrumb",
     "more": "Show hidden path"
   },
+  "bubble": {
+    "reactions": "Reactions"
+  },
   "calendar": {
     "label": "Calendar",
     "month": "Month",
