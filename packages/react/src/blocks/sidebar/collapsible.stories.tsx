@@ -3,8 +3,6 @@ import { useState } from 'react';
 import {
   BookmarkIcon,
   CalendarDaysIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
   Cog6ToothIcon,
   DocumentTextIcon,
   HomeIcon,
@@ -12,13 +10,9 @@ import {
   TruckIcon,
 } from '@heroicons/react/24/outline';
 
-import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
-import { Item } from '../../components/data/item';
 import { Skeleton } from '../../components/feedback/skeleton';
-import { Divider } from '../../components/layout/divider';
-import { Spacer } from '../../components/layout/spacer';
-import { Tooltip } from '../../components/overlay/tooltip';
+import { Sidebar } from '../../components/navigation/sidebar';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -44,69 +38,44 @@ const ITEMS = [
 
 export const PC: Story = {
   render: function Render() {
-    const [collapsed, setCollapsed] = useState(false);
     const [current, setCurrent] = useState('shuttle');
 
     const label = ITEMS.find((item) => item.id === current)!.label;
 
     return (
-      <div className="flex min-h-dvh break-keep">
-        <aside className="flex shrink-0 flex-col gap-4 p-2">
-          <IconButton
-            variant="outline"
-            aria-label={collapsed ? '메뉴 펼치기' : '메뉴 접기'}
-            aria-expanded={!collapsed}
-            icon={collapsed ? <ChevronDoubleRightIcon /> : <ChevronDoubleLeftIcon />}
-            onClick={() => setCollapsed(!collapsed)}
-          />
-          <nav aria-label="주 메뉴">
-            <Item.Group size="tiny" aria-label="주 메뉴">
-              {ITEMS.map((item) => {
-                const link = (
-                  <Item
-                    key={item.id}
-                    asChild
-                    selected={item.id === current}
-                    aria-current={item.id === current ? 'page' : undefined}
-                  >
-                    <a
-                      href={`#${item.id}`}
-                      aria-label={collapsed ? item.label : undefined}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        setCurrent(item.id);
-                      }}
-                    >
-                      <Item.Media>{item.icon}</Item.Media>
-                      {!collapsed && (
-                        <Item.Content>
-                          <Item.Title>{item.label}</Item.Title>
-                        </Item.Content>
-                      )}
-                    </a>
-                  </Item>
-                );
+      <Sidebar.Provider className="break-keep">
+        <Sidebar value={current} collapsible aria-label="주 메뉴">
+          {ITEMS.map((item) => (
+            <Sidebar.Item
+              key={item.id}
+              value={item.id}
+              href={`#${item.id}`}
+              onClick={(event) => {
+                event.preventDefault();
+                setCurrent(item.id);
+              }}
+            >
+              {item.icon}
+              {item.label}
+            </Sidebar.Item>
+          ))}
+          <Sidebar.Footer>
+            <Sidebar.Item href="#settings">
+              <Cog6ToothIcon />
+              설정
+            </Sidebar.Item>
+            <Sidebar.Item href="#profile">
+              <Avatar name="김지수" size="tiny" />
+              김지수
+            </Sidebar.Item>
+          </Sidebar.Footer>
+        </Sidebar>
 
-                return collapsed ? (
-                  <Tooltip key={item.id} content={item.label} side="right">
-                    {link}
-                  </Tooltip>
-                ) : (
-                  link
-                );
-              })}
-            </Item.Group>
-          </nav>
-          <Spacer />
-          <Tooltip content="설정" side="right">
-            <IconButton variant="outline" aria-label="설정" icon={<Cog6ToothIcon />} />
-          </Tooltip>
-          <Avatar name="김지수" size="tiny" />
-        </aside>
-        <Divider orientation="vertical" />
-
-        <main className="flex min-w-0 flex-1 flex-col gap-6 px-4 py-8 md:px-8">
-          <h1 className="text-headline-h3-bold">{label}</h1>
+        <Sidebar.Inset className="gap-6 px-4 py-8 md:px-8">
+          <div className="flex items-center gap-3">
+            <Sidebar.Trigger />
+            <h1 className="text-headline-h3-bold">{label}</h1>
+          </div>
           <Skeleton shape="text" lines={2} />
           <div className="grid gap-4 lg:grid-cols-3">
             <Skeleton className="h-32" />
@@ -114,8 +83,8 @@ export const PC: Story = {
             <Skeleton className="h-32" />
           </div>
           <Skeleton className="h-64" />
-        </main>
-      </div>
+        </Sidebar.Inset>
+      </Sidebar.Provider>
     );
   },
 };

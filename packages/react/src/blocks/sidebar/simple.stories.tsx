@@ -1,5 +1,4 @@
 import {
-  Bars3Icon,
   BellIcon,
   BookmarkIcon,
   CalendarDaysIcon,
@@ -15,12 +14,11 @@ import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
-import { Item } from '../../components/data/item';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Divider } from '../../components/layout/divider';
 import { Spacer } from '../../components/layout/spacer';
 import { Breadcrumb } from '../../components/navigation/breadcrumb';
-import { Drawer } from '../../components/overlay/drawer';
+import { Sidebar } from '../../components/navigation/sidebar';
 import { Menu } from '../../components/overlay/menu';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -58,114 +56,74 @@ const GROUPS = [
 const CURRENT = 'board';
 
 export const PC: Story = {
-  render: () => {
-    const navigation = (
-      <nav aria-label="주 메뉴" className="flex flex-col gap-5">
+  render: () => (
+    <Sidebar.Provider className="break-keep">
+      <Sidebar value={CURRENT} aria-label="주 메뉴">
+        <Sidebar.Header>
+          <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+            <Avatar.Fallback>
+              <CubeTransparentIcon />
+            </Avatar.Fallback>
+          </Avatar>
+          <span className="text-subtitle-s2-semibold">GIST 인포팀</span>
+        </Sidebar.Header>
         {GROUPS.map((group) => (
-          <div key={group.label} className="flex flex-col gap-1">
-            <h2 className="text-caption-c1-medium px-2">{group.label}</h2>
-            <Item.Group size="tiny" aria-label={group.label}>
-              {group.items.map((item) => (
-                <Item
-                  key={item.id}
-                  asChild
-                  selected={item.id === CURRENT}
-                  aria-current={item.id === CURRENT ? 'page' : undefined}
-                >
-                  <a href={`#${item.id}`}>
-                    <Item.Media>{item.icon}</Item.Media>
-                    <Item.Content>
-                      <Item.Title>{item.label}</Item.Title>
-                    </Item.Content>
-                    {item.count && (
-                      <Item.Actions>
-                        <Badge content={item.count} variant="soft" />
-                      </Item.Actions>
-                    )}
-                  </a>
-                </Item>
-              ))}
-            </Item.Group>
-          </div>
+          <Sidebar.Group key={group.label} label={group.label}>
+            {group.items.map((item) => (
+              <Sidebar.Item key={item.id} value={item.id} href={`#${item.id}`}>
+                {item.icon}
+                {item.label}
+                {item.count && <Badge content={item.count} variant="soft" />}
+              </Sidebar.Item>
+            ))}
+          </Sidebar.Group>
         ))}
-      </nav>
-    );
+        <Sidebar.Footer>
+          <Menu>
+            <Menu.Trigger asChild>
+              <Button variant="outline" className="w-full">
+                <Avatar name="김지수" size="tiny" />
+                김지수
+                <Spacer />
+                <ChevronUpDownIcon />
+              </Button>
+            </Menu.Trigger>
+            <Menu.Content>
+              <Menu.Item>내 프로필</Menu.Item>
+              <Menu.Item>설정</Menu.Item>
+              <Menu.Separator />
+              <Menu.Item>로그아웃</Menu.Item>
+            </Menu.Content>
+          </Menu>
+        </Sidebar.Footer>
+      </Sidebar>
 
-    return (
-      <div className="flex min-h-dvh break-keep">
-        <aside className="hidden w-64 shrink-0 flex-col gap-6 p-3 md:flex">
-          <div className="text-subtitle-s2-semibold flex items-center gap-2 px-2 pt-2">
-            <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
-              <Avatar.Fallback>
-                <CubeTransparentIcon />
-              </Avatar.Fallback>
-            </Avatar>
-            GIST 인포팀
+      <Sidebar.Inset>
+        <header className="flex items-center gap-3 px-4 py-3 md:px-8">
+          <Sidebar.Trigger />
+          <Breadcrumb aria-label="위치">
+            <Breadcrumb.Item>
+              <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>
+              <Breadcrumb.Page>게시판</Breadcrumb.Page>
+            </Breadcrumb.Item>
+          </Breadcrumb>
+          <Spacer />
+          <IconButton variant="outline" aria-label="알림" icon={<BellIcon />} />
+        </header>
+        <Divider />
+
+        <div className="flex flex-col gap-6 px-4 py-8 md:px-8">
+          <h1 className="text-headline-h3-bold">게시판</h1>
+          <Skeleton shape="text" lines={2} />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Skeleton className="h-40" />
+            <Skeleton className="h-40" />
           </div>
-          {navigation}
-          <div className="mt-auto">
-            <Menu>
-              <Menu.Trigger asChild>
-                <Button variant="outline" className="w-full">
-                  <Avatar name="김지수" size="tiny" />
-                  김지수
-                  <Spacer />
-                  <ChevronUpDownIcon />
-                </Button>
-              </Menu.Trigger>
-              <Menu.Content>
-                <Menu.Item>내 프로필</Menu.Item>
-                <Menu.Item>설정</Menu.Item>
-                <Menu.Separator />
-                <Menu.Item>로그아웃</Menu.Item>
-              </Menu.Content>
-            </Menu>
-          </div>
-        </aside>
-        <Divider orientation="vertical" className="hidden md:block" />
-
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center gap-3 px-4 py-3 md:px-8">
-            <Drawer side="left">
-              <Drawer.Trigger asChild>
-                <IconButton
-                  variant="outline"
-                  aria-label="메뉴 열기"
-                  icon={<Bars3Icon />}
-                  className="md:hidden"
-                />
-              </Drawer.Trigger>
-              <Drawer.Content>
-                <Drawer.Header>
-                  <Drawer.Title>GIST 인포팀</Drawer.Title>
-                </Drawer.Header>
-                {navigation}
-              </Drawer.Content>
-            </Drawer>
-            <Breadcrumb aria-label="위치">
-              <Breadcrumb.Item>
-                <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
-              </Breadcrumb.Item>
-              <Breadcrumb.Item>
-                <Breadcrumb.Page>게시판</Breadcrumb.Page>
-              </Breadcrumb.Item>
-            </Breadcrumb>
-            <Spacer />
-            <IconButton variant="outline" aria-label="알림" icon={<BellIcon />} />
-          </header>
-          <Divider />
-
-          <main className="flex flex-col gap-6 px-4 py-8 md:px-8">
-            <h1 className="text-headline-h3-bold">게시판</h1>
-            <Skeleton shape="text" lines={2} />
-            <div className="grid gap-4 lg:grid-cols-2">
-              <Skeleton className="h-40" />
-              <Skeleton className="h-40" />
-            </div>
-            <Skeleton className="h-64" />
-          </main>
+          <Skeleton className="h-64" />
         </div>
-      </div>
-    );
-  },
+      </Sidebar.Inset>
+    </Sidebar.Provider>
+  ),
 };
