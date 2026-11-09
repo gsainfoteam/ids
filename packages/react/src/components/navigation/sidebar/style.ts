@@ -65,6 +65,7 @@ export const sidebarStyle = tv({
       hidden: { root: 'p-0', panel: 'w-0', divider: 'hidden' },
     } satisfies Record<SidebarPanelState, object>,
     standalone: { true: {}, false: { root: 'max-sm:hidden' } },
+    inDrawer: { true: { header: 'min-h-8 pe-10' }, false: {} },
   },
-  defaultVariants: { variant: 'sidebar', state: 'expanded', standalone: true },
+  defaultVariants: { variant: 'sidebar', state: 'expanded', standalone: true, inDrawer: false },
 });
