@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { CameraIcon, DocumentTextIcon } from '@heroicons/react/16/solid';
+import { CameraIcon, GlobeAltIcon } from '@heroicons/react/16/solid';
 import { expect, fn, waitFor, within } from 'storybook/test';
 
 import { Showcase, holdTheNextCall } from '~story-kit';
@@ -109,11 +109,11 @@ export const Gallery: Story = {
           </PromptInput>
         </Showcase.Row>
         <Showcase.Row label="tools">
-          <PromptInput defaultTools={['sources']} className="w-72">
+          <PromptInput defaultTools={['search']} className="w-72">
             <PromptInput.Input aria-label="도구" />
             <PromptInput.ActionMenu />
-            <PromptInput.Tool value="sources" icon={<DocumentTextIcon />}>
-              출처 공지
+            <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
+              웹 검색
             </PromptInput.Tool>
           </PromptInput>
         </Showcase.Row>
@@ -255,8 +255,8 @@ export const Tools: Story = {
           사진 찍기
         </Menu.Item>
       </PromptInput.ActionMenu>
-      <PromptInput.Tool value="sources" icon={<DocumentTextIcon />}>
-        출처 공지 함께 보기
+      <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
+        웹 검색
       </PromptInput.Tool>
       <Select size="tiny" variant="soft" defaultValue="fast" aria-label="모델" className="w-auto">
         <Select.Item value="fast">빠른 답</Select.Item>
@@ -273,8 +273,8 @@ export const Tools: Story = {
     },
   },
   play: async ({ canvasElement, userEvent, args }) => {
-    await userEvent.click(button(canvasElement, '출처 공지 함께 보기'));
-    await expect(button(canvasElement, '출처 공지 함께 보기')).toHaveAttribute(
+    await userEvent.click(button(canvasElement, '웹 검색'));
+    await expect(button(canvasElement, '웹 검색')).toHaveAttribute(
       'aria-pressed',
       'true',
     );
@@ -284,7 +284,7 @@ export const Tools: Story = {
     await expect(args.onSend).toHaveBeenCalledWith({
       text: '장학금 신청 기간',
       files: [],
-      tools: ['sources'],
+      tools: ['search'],
     });
   },
 };

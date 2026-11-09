@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   BellAlertIcon,
   DocumentDuplicateIcon,
-  DocumentTextIcon,
+  GlobeAltIcon,
   HandThumbDownIcon,
   HandThumbUpIcon,
   PlusIcon,
@@ -190,8 +190,8 @@ export const PC: Story = {
               placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요"
             />
             <PromptInput.ActionMenu />
-            <PromptInput.Tool value="sources" icon={<DocumentTextIcon />}>
-              출처 공지 함께 보기
+            <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
+              웹 검색
             </PromptInput.Tool>
             <PromptInput.Submit aria-label="묻기" />
           </PromptInput>
