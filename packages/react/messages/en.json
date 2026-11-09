@@ -222,6 +222,12 @@
     "search": "Search options",
     "searchPlaceholder": "Search…"
   },
+  "sidebar": {
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "label": "Sidebar",
+    "open": "Open menu"
+  },
   "slider": {
     "end": "End",
     "start": "Start"

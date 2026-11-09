@@ -224,6 +224,12 @@ export const messages = {
     search: '옵션 검색',
     searchPlaceholder: '검색…',
   },
+  sidebar: {
+    collapse: '사이드바 접기',
+    expand: '사이드바 펼치기',
+    label: '사이드바',
+    open: '메뉴 열기',
+  },
   slider: {
     end: '끝',
     start: '시작',
