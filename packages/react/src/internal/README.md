@@ -786,13 +786,14 @@ const press = usePressable<HTMLElement>({
 
 ## search-text.ts
 
-검색어로 항목을 거르는 글자 비교입니다. React 자식에서 글자를 뽑는 `textOf`, 비교용으로 글자를 고르는 `normalizeText`, 들어 있는지 보는 `matchesSearch` 가 있습니다.
+검색어로 항목을 거르는 글자 비교입니다. React 자식에서 글자를 뽑는 `textOf`, 비교용으로 글자를 고르는 `normalizeText`, 들어 있는지 보는 `matchesSearch`, 맞은 구간을 찾는 `matchRanges` 와 그 구간으로 글을 나누는 `searchChunks` 가 있습니다.
 
 ### 쓰는 곳
 
 - Select: `select-options.ts` 의 `collectOptions`(`textOf`), `matchesQuery`, `typeaheadIndex`
 - ChipField: `chip-values.ts` 의 같은 값 판정(`normalizeText`), 제안 거르기(Select 의 `matchesQuery`)
 - Menu: 명령 팔레트 항목의 거르기(`use-command.ts` 의 `useCommandOption`)
+- Highlight: 맞은 부분을 `<mark>` 로 나누기(`searchChunks`, `textOf`)
 
 ### 쓰는 법
 
@@ -802,6 +803,10 @@ const visible = matchesSearch(textValue ?? textOf(children), palette.query);
 
 // components/form/select/select-options.ts
 export const matchesQuery = (option, query) => matchesSearch(option.search, query);
+
+// components/typography/highlight/root.tsx
+searchChunks('Café ＧＩＳＴ', ['cafe', 'gist']);
+// [{ text: 'Café', match: true }, { text: ' ', match: false }, { text: 'ＧＩＳＴ', match: true }]
 ```
 
 ### 왜 이렇게
@@ -809,12 +814,16 @@ export const matchesQuery = (option, query) => matchesSearch(option.search, quer
 - `NFD` 로 나눠 결합 악센트(`U+0300`–`U+036F`)를 지운 뒤 `NFKC` 로 다시 묶습니다. `é` 는 `e` 가 되고, 전각 `Ａ` 는 `A` 가 되고, 한글 음절은 다시 음절로 돌아와 그대로 비교됩니다.
 - 대소문자는 `toLocaleLowerCase` 로 맞춥니다.
 - 빈 검색어(공백만 포함)는 모두와 맞습니다.
+- `matchRanges` 는 글을 grapheme 마다 `normalizeText` 로 접고, 접은 글자마다 원래 grapheme 의 위치를 적어 둡니다. 접은 글에서 찾은 구간을 그 위치로 되돌리므로, 길이가 바뀌는 접기(`ﬁ` → `fi`, `é` 를 `e` + 결합 악센트로 적은 글)에서도 구간이 원래 글자 경계에 떨어집니다.
+- 찾기는 `indexOf` 라 정규식 기호를 글자로 다룹니다. 한 칸씩 밀며 찾고, 겹치거나 맞닿은 구간은 하나로 합칩니다.
+- grapheme 은 `Intl.Segmenter` 로 나누고, 없는 환경에서는 코드 포인트로 나눕니다.
 
 ### 알아둘 것
 
 - `textOf` 는 React 트리의 문자열 자식만 읽습니다. 글자를 스스로 그리는 컴포넌트 안의 글자는 보지 못하므로, 그런 항목은 `textValue`(Menu), `label`/`searchValue`(Select)를 받습니다.
 - 한글 자모 하나(`ㅅ`)는 음절(`설`)의 일부로 맞지 않습니다. 초성 검색은 하지 않습니다.
-- 비교를 바꾸면 Select, ChipField, Menu 의 거르기와 ChipField 의 중복 판정이 함께 바뀝니다.
+- 비교를 바꾸면 Select, ChipField, Menu 의 거르기, ChipField 의 중복 판정, Highlight 의 칠하기가 함께 바뀝니다. `tests/search-text.test.ts` 는 `matchRanges` 가 `matchesSearch` 와 같은 판정을 내는지 봅니다.
+- `searchChunks` 의 조각을 이어 붙이면 언제나 받은 글과 같습니다. 서버와 클라이언트가 같은 HTML 을 내려면 이 함수는 순수해야 합니다.
 
 ## slider-surface.ts
 
