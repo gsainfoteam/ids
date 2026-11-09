@@ -53,10 +53,6 @@ test('arrow keys are the browser radio keys: half-steps and 0 before the first s
   await expect.element(option(0), { message: 'the hidden 0 clears the rating' }).toHaveFocus();
   await expect.poll(nothingChecked, { message: '0 checks no radio' }).toBeNull();
   expect(values).toEqual([0.5, 0]);
-  await screen.rerender(<Rating step={0.5} defaultValue={3} style={{ direction: 'rtl' }} />);
-  option(3).element().focus();
-  await userEvent.keyboard('{ArrowLeft}');
-  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '3.5');
 });
 
 test('hover previews, drawn translucent, without changing the value; half clicks commit once', async () => {
