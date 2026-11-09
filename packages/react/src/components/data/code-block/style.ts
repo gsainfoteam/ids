@@ -41,6 +41,7 @@ export const codeBlockStyle = tv({
       },
       soft: {
         root: 'bg-(--ids-color-muted)',
+        caption: 'border-(--ids-color-surface)',
         line: 'data-highlighted:bg-(--ids-color-surface)',
       },
     },

@@ -136,6 +136,8 @@ const answer = 42;
 <CodeBlock variant="soft" />      // 옅은 바탕, 테두리 없음
 ```
 
+- `soft`의 caption 아래 선은 `border`가 아니라 `surface` 색입니다. 다크 모드에서 `border`는 `muted` 바탕과 같은 색이라 보이지 않습니다.
+
 - 모서리는 `container`(16px)입니다. 모서리 안쪽에 붙는 것은 6px 떨어진 10px 복사 버튼이라 `10 + 6` 이 `container` 에서 멈춥니다.
 - 글자는 `font-mono` `text-body-b3-regular` 입니다.
 
