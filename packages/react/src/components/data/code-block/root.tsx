@@ -16,6 +16,7 @@ import { codeBlockStyle } from './style';
 import { useHighlightedLines } from './use-code-block';
 import { elementTypeOf } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
+import { Divider } from '../../layout/divider';
 import { ScrollArea } from '../../layout/scroll-area';
 
 import type { CodeBlock } from '.';
@@ -75,6 +76,7 @@ export function CodeBlockRoot({
             {showLanguage && <span className={styles.language()}>{language}</span>}
           </figcaption>
         )}
+        {hasCaption && <Divider decorative className={styles.divider()} />}
         {copy ?? <CodeBlockCopy />}
         <ScrollArea orientation="horizontal" className={styles.scroller()}>
           <ScrollArea.Viewport asChild>

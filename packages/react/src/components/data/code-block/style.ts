@@ -5,8 +5,9 @@ export const codeBlockStyle = tv({
     root: 'relative flex min-w-0 flex-col rounded-container text-(--ids-color-on-surface)',
     caption: [
       'flex min-h-[calc(var(--ids-size-control-tiny)+--spacing(3))] min-w-0 items-center gap-2',
-      'border-b border-(--ids-color-border) ps-4 pe-[calc(var(--ids-size-control-tiny)+--spacing(3))]',
+      'ps-4 pe-[calc(var(--ids-size-control-tiny)+--spacing(3))]',
     ],
+    divider: '',
     title: 'min-w-0 truncate text-body-b3-medium',
     language:
       'ms-auto shrink-0 font-mono text-caption-c1-regular text-(--ids-color-on-muted) first:ms-0',
@@ -41,7 +42,7 @@ export const codeBlockStyle = tv({
       },
       soft: {
         root: 'bg-(--ids-color-muted)',
-        caption: 'border-(--ids-color-surface)',
+        divider: 'bg-(--ids-color-surface)',
         line: 'data-highlighted:bg-(--ids-color-surface)',
       },
     },
