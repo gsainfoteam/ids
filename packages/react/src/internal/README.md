@@ -27,6 +27,7 @@
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
 | [`motion.ts`](#motionts)                         | 움직임 줄이기 설정 읽기, `--ids-motion-*` 토큰의 ms, 시트의 easing                    | Image, `zoom-pan/` |
 | [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어                  | Alert, Image, `field-popup/` |
+| [`paragraph.ts`](#paragraphts)                   | `<p>` 로 그리는 Description 파트의 ref, 안에 든 블록 요소 경고                       | Card, Item, Empty, Alert, Field |
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `surface.ts`                                                                                                                                                                                                  |
 | [`resize-handle/`](./resize-handle/README.md)    | 크기 조절 손잡이의 키 표, separator ARIA, 포인터 끌기, 클래스 조각, 가장자리와 모서리 손잡이 | DataTable, Resizable, Splitter, TextArea                                                                                                                                                                                                   |
 | [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)                           | Select, ChipField, Menu                                                                                                                                                                                               |
@@ -739,6 +740,37 @@ content.animate(keyframes, { duration: motionDuration(content, 'normal'), easing
 - CSS transition 은 `motion-reduce:` 변형과 `duration-(--ids-motion-*)` 로 규칙을 따르지만, `element.animate()` 는 CSS 를 거치지 않습니다. 그래서 같은 설정과 같은 토큰을 JS 에서 읽습니다.
 - 토큰은 요소의 계산된 스타일에서 읽습니다. 앱이 `--ids-motion-*` 를 바꾸면 JS 애니메이션도 따라갑니다. CSS 패키지를 불러오지 않은 곳에서는 토큰의 기본값(150, 250, 400ms)을 씁니다.
 - 설정은 부를 때마다 읽습니다. 열려 있는 동안 사용자가 설정을 바꿔도 다음 움직임부터 따릅니다.
+
+## paragraph.ts
+
+`<p>` 로 그리는 Description 파트가 쓰는 hook(`useParagraphRef`)입니다. 사용자의 `ref` 와 합친 ref 를 돌려주고, 개발 빌드에서 그 `<p>` 안에 블록 요소가 있으면 한 번 경고합니다.
+
+### 쓰는 곳
+
+- Card.Description, Item.Description, Empty.Description, Alert.Description, Field.Description
+
+### 쓰는 법
+
+```tsx
+// components/data/card/description.tsx
+export function CardDescription({ asChild, className, ref, ...props }: CardDescriptionProps) {
+  const paragraphRef = useParagraphRef('Card.Description', ref);
+  const Root = asChild === true ? Slot : 'p';
+  return <Root {...props} ref={paragraphRef} /* ... */ />;
+}
+```
+
+### 왜 이렇게
+
+- `<p>` 는 블록 요소를 담지 못합니다. 서버 HTML 을 읽는 브라우저는 `<div>` 같은 태그에서 `<p>` 를 닫아 버려, 클라이언트가 만든 트리와 어긋나고 hydration 이 깨집니다. 클라이언트에서만 그리면 DOM 에는 그대로 들어가 조용히 넘어가므로, 개발 빌드에서 먼저 알립니다.
+- 찾는 태그(`CLOSES_A_PARAGRAPH`)는 HTML 파서가 열린 `<p>` 를 닫는 태그 목록입니다. `<span>`, `<a>`, `<strong>` 처럼 문장 안에 들어가는 요소는 경고하지 않습니다.
+- 검사는 렌더마다 effect 에서 DOM 을 봅니다. 컴포넌트가 그리는 `<div>` 도 찾으려면 React 요소가 아니라 그려진 결과를 봐야 합니다. 경고는 요소마다 한 번입니다.
+- `asChild` 로 다른 태그를 넣으면 그 요소가 `<p>` 가 아니라 검사하지 않습니다. `asChild` 로 넣은 `<p>` 는 검사합니다.
+
+### 알아둘 것
+
+- 경고는 `isDevelopment` 로만 켭니다([utils/README](../utils/README.md#devts)).
+- 돌려주는 ref 는 `ref` 가 바뀔 때만 새로 만듭니다. 렌더마다 새 함수를 주면 React 가 ref 를 떼었다 다시 붙입니다.
 
 ## pressable.ts
 

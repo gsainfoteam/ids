@@ -104,5 +104,6 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
 
 ## 알아둘 것
 
+- `Empty.Description` 은 `<p>` 입니다. 목록이나 문단 여럿 같은 블록 내용은 `<Empty.Description asChild><div>...</div></Empty.Description>` 처럼 태그를 넣습니다. `<p>` 안에 블록 요소가 들어가면 개발 빌드에서 경고합니다.
 - `Empty.Title` 이 없으면 개발 모드에서 `[IDS] Empty: give it an Empty.Title.` 를 경고합니다.
 - 빈 상태가 사용자의 동작에 대한 결과라서 바로 알려야 한다면(검색어를 치는 동안 결과가 비는 경우 등), Empty 는 그대로 두고 앱이 별도의 live region 으로 결과 수를 알립니다.

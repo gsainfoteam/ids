@@ -2,7 +2,7 @@ import type { ComponentProps } from 'react';
 
 import type { Alert } from '.';
 
-export type PartProps<E extends 'span' | 'div'> = Omit<ComponentProps<E>, 'className'> & {
+export type PartProps<E extends 'span' | 'div' | 'p'> = Omit<ComponentProps<E>, 'className'> & {
   asChild?: boolean;
   className?: string | ((state: Alert.State) => string | undefined);
 };

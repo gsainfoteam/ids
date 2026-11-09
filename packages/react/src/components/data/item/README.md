@@ -195,3 +195,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 | `Media.variant`  | `ghost`(기본) / `soft` / `outline`                                 |
 | `Title.truncate` | `false`. 한 줄에서 말줄임표로 줄인다                               |
 | 각 부분          | `asChild` 와 `div` 의 native 속성                                  |
+
+## 알아둘 것
+
+- `Item.Description` 은 `<p>` 입니다. 목록이나 문단 여럿 같은 블록 내용은 `<Item.Description asChild><div>...</div></Item.Description>` 처럼 태그를 넣습니다. `<p>` 안에 블록 요소가 들어가면 개발 빌드에서 경고합니다.
