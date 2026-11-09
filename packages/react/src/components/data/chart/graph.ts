@@ -36,6 +36,7 @@ type SeriesProps = {
   name?: unknown;
   data?: unknown;
   children?: ReactNode;
+  fillOpacity?: unknown;
 } & Partial<Record<PaintProperty, unknown>>;
 
 export type GraphProps = SeriesProps & { layout?: unknown };
@@ -85,7 +86,25 @@ const isSeries = (element: ReactElement) => {
   return PAINTED_BY_KEY.has(type) || PAINTED_BY_ROW.has(type);
 };
 
-export function paintSeries(children: ReactNode, config: ChartConfig): ReactNode {
+const isFadedArea = (element: ReactElement<SeriesProps>, config: ChartConfig) =>
+  elementTypeOf(element) === Area &&
+  typeof element.props.dataKey === 'string' &&
+  config[element.props.dataKey] !== undefined &&
+  element.props.fill === undefined;
+
+export const fadedSeriesOf = (children: ReactNode, config: ChartConfig) => [
+  ...new Set(
+    elementsIn(children)
+      .filter((element) => isFadedArea(element, config))
+      .map((element) => element.props.dataKey as string),
+  ),
+];
+
+export function paintSeries(
+  children: ReactNode,
+  config: ChartConfig,
+  fadeIdOf: (key: string) => string,
+): ReactNode {
   return Children.map(children, (child) => {
     if (!isValidElement<SeriesProps>(child)) return child;
     const paints = PAINTED_BY_KEY.get(elementTypeOf(child));
@@ -94,8 +113,12 @@ export function paintSeries(children: ReactNode, config: ChartConfig): ReactNode
 
     const label = config[dataKey].label;
     const unpainted = paints.filter((property) => child.props[property] === undefined);
+    const fade = isFadedArea(child, config)
+      ? { fill: `url(#${fadeIdOf(dataKey)})`, fillOpacity: child.props.fillOpacity ?? 1 }
+      : {};
     return cloneElement(child, {
       ...Object.fromEntries(unpainted.map((property) => [property, seriesColor(dataKey)])),
+      ...fade,
       ...(name === undefined && typeof label === 'string' ? { name: label } : {}),
     });
   });

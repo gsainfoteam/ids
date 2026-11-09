@@ -61,6 +61,7 @@ const config = {
 - `color` 는 `chart-1` ~ `chart-5`, `primary`, `accent`, `success`, `warning`, `danger`, `info`, `on-muted` 중 하나입니다.
 - 계열 변수는 `--chart-<key>` 입니다. `--color-*` 는 Tailwind 테마 변수 이름공간이라 `primary` 같은 키가 겹칩니다. 키는 CSS 변수 이름에 들어가므로 영문, 숫자, `-`, `_` 로 씁니다.
 - Chart 가 칠하는 것은 Chart 의 차트 바로 아래에 둔 `Bar`(`fill`), `Line`(`stroke`), `Area`·`Radar`(`stroke`, `fill`), `Scatter`(`fill`) 중 `dataKey` 가 config 에 있는 것입니다. `fill` 이나 `stroke` 를 직접 주면 그 값이 이깁니다. label 이 글자면 `name` 도 채웁니다.
+- `Area` 의 면은 계열 색 40% 에서 투명으로 내려가는 그라디언트입니다. Chart 가 차트 안에 `<linearGradient>` 를 넣고 `fill` 을 `url(#…)` 로 칠합니다. `fill` 을 직접 주면 그라디언트를 넣지 않고, `fillOpacity` 는 그라디언트 위에 곱해집니다.
 - 데이터 행에 `fill` 이 있으면 Recharts 가 막대를 그 값으로 칠합니다. 원을 위해 `fill` 을 넣은 행을 막대 차트에 그대로 쓰지 않습니다.
 - 원(`Pie`), `RadialBar`, `Funnel` 은 행마다 색이 다르므로 데이터에 `fill: 'var(--chart-<key>)'` 를 적습니다.
 

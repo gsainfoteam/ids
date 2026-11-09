@@ -11,10 +11,11 @@ import {
   type ReactNode,
 } from 'react';
 
-import { seriesVariables } from './config';
+import { seriesColor, seriesVariables } from './config';
 import { ChartContext } from './context';
 import { ChartDescription } from './description';
 import {
+  fadedSeriesOf,
   paintSeries,
   RECHARTS_CHARTS,
   RECHARTS_LEGEND,
@@ -58,14 +59,48 @@ const isElementOf =
 const WRAPPED_CHART_WARNING =
   '[IDS] Chart: its chart child is not a Recharts chart, so Chart cannot add the default Tooltip, Legend and screen reader table. Place the Recharts chart as a direct child, or place Chart.Tooltip, Chart.Legend and Chart.Table yourself.';
 
+const FADE_START_OPACITY = 0.4;
+const FADE_END_OPACITY = 0;
+
+const svgSafeId = (id: string) => id.replace(/[^\w-]/g, '');
+
+function fadeDefinitions(keys: string[], fadeIdOf: (key: string) => string, sideways: boolean) {
+  if (keys.length === 0) return null;
+  return (
+    <defs key="ids-chart-fades">
+      {keys.map((key) => (
+        <linearGradient
+          key={key}
+          id={fadeIdOf(key)}
+          x1="0"
+          y1="0"
+          x2={sideways ? '1' : '0'}
+          y2={sideways ? '0' : '1'}
+        >
+          <stop
+            offset="0%"
+            style={{ stopColor: seriesColor(key), stopOpacity: FADE_START_OPACITY }}
+          />
+          <stop
+            offset="100%"
+            style={{ stopColor: seriesColor(key), stopOpacity: FADE_END_OPACITY }}
+          />
+        </linearGradient>
+      ))}
+    </defs>
+  );
+}
+
 function withDefaults(
   graph: GraphElement,
   config: Chart.Config,
+  fadeIdOf: (key: string) => string,
   { tooltip, legend }: { tooltip: boolean; legend: boolean },
 ) {
   const own = graph.props.children;
   return [
-    paintSeries(own, config),
+    fadeDefinitions(fadedSeriesOf(own, config), fadeIdOf, graph.props.layout === 'vertical'),
+    paintSeries(own, config, fadeIdOf),
     tooltip && !containsElementOfType(own, TOOLTIPS)
       ? createElement(ChartTooltip, { key: 'ids-chart-tooltip' })
       : null,
@@ -106,6 +141,7 @@ export function ChartRoot({
   const hasOwnTable = elements.some(isElementOf(ChartTable));
   const recognised = graph !== undefined && RECHARTS_CHARTS.has(elementTypeOf(graph));
 
+  const fadeIdOf = (key: string) => `${svgSafeId(id)}-fade-${key}`;
   const titleId = title ? (title.props.id ?? `${id}title`) : undefined;
   const descriptionId = description ? (description.props.id ?? `${id}description`) : undefined;
   const table = recognised ? tableOf(graph.props, config) : undefined;
@@ -128,7 +164,7 @@ export function ChartRoot({
               : (graph.props['aria-label'] ?? t('chart.label')),
             'aria-describedby': graph.props['aria-describedby'] ?? descriptionId,
           } as Partial<GraphElement['props']>,
-          ...(recognised ? [withDefaults(graph, config, { tooltip, legend })] : []),
+          ...(recognised ? [withDefaults(graph, config, fadeIdOf, { tooltip, legend })] : []),
         )
       : null;
 

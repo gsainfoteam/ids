@@ -1,7 +1,19 @@
 import type { ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
-import { Bar, BarChart, Line, LineChart, Pie, PieChart, Tooltip, XAxis, YAxis } from 'recharts';
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
@@ -136,6 +148,37 @@ test('lines are stroked with their series variable', async () => {
   await expect
     .poll(() => document.querySelector('.recharts-line-curve')?.getAttribute('stroke'))
     .toBe('var(--chart-web)');
+});
+
+test('areas fade from their series color to transparent, and an own fill wins', async () => {
+  await render(
+    <IdsProvider>
+      <div style={{ width: 400 }}>
+        <Chart config={CONFIG}>
+          <AreaChart data={ROWS}>
+            <XAxis dataKey="day" />
+            <Area dataKey="web" />
+            <Area dataKey="app" fill="var(--ids-color-muted)" />
+          </AreaChart>
+        </Chart>
+      </div>
+    </IdsProvider>,
+  );
+
+  await expect
+    .poll(() =>
+      [...document.querySelectorAll('.recharts-area-area')].map((area) =>
+        area.getAttribute('fill'),
+      ),
+    )
+    .toEqual([expect.stringMatching(/^url\(#.+-fade-web\)$/), 'var(--ids-color-muted)']);
+  const fadeId = document.querySelector('.recharts-area-area')!.getAttribute('fill')!.slice(5, -1);
+  const stops = [...document.getElementById(fadeId)!.querySelectorAll('stop')].map((stop) =>
+    getComputedStyle(stop),
+  );
+  expect(stops.map((stop) => stop.stopOpacity)).toEqual(['0.4', '0']);
+  expect(stops[0]!.stopColor).not.toBe('rgb(0, 0, 0)');
+  expect(document.querySelectorAll('linearGradient')).toHaveLength(1);
 });
 
 test('the default tooltip lists each series in config order with its label and value', async () => {

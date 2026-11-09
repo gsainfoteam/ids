@@ -147,8 +147,8 @@ export const Gallery: Story = {
             <AreaChart data={VISITS} margin={{ left: 12, right: 12 }}>
               <CartesianGrid vertical={false} />
               <XAxis dataKey="day" tickLine={false} axisLine={false} />
-              <Area dataKey="web" type="monotone" fillOpacity={0.3} stackId="visits" />
-              <Area dataKey="app" type="monotone" fillOpacity={0.3} stackId="visits" />
+              <Area dataKey="web" type="monotone" stackId="visits" />
+              <Area dataKey="app" type="monotone" stackId="visits" />
             </AreaChart>
           </Chart>
           <Chart config={SERVICES_CONFIG} ratio={1} className="w-80">
@@ -360,8 +360,8 @@ export const CustomTooltip: Story = {
       <AreaChart data={VISITS} margin={{ left: 12, right: 12 }}>
         <CartesianGrid vertical={false} />
         <XAxis dataKey="day" tickLine={false} axisLine={false} />
-        <Area dataKey="web" type="monotone" fillOpacity={0.3} />
-        <Area dataKey="app" type="monotone" fillOpacity={0.3} />
+        <Area dataKey="web" type="monotone" />
+        <Area dataKey="app" type="monotone" />
         <Chart.Tooltip
           indicator="line"
           labelFormatter={(label) => `${label}요일`}
