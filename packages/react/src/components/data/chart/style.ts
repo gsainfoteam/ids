@@ -24,7 +24,9 @@ export const chartStyle = tv({
     srTableInner: 'w-max max-w-none',
     tooltip: [
       'pointer-events-none fixed z-50 m-0 min-w-32 gap-1.5 concentric-p-2 px-2.5 shadow-md',
-      'transition-opacity duration-(--ids-motion-fast) ease-out starting:opacity-0 motion-reduce:transition-none',
+      'transition-opacity duration-(--ids-motion-fast) ease-out starting:opacity-0',
+      'data-gliding:transition-[opacity,left,top] data-gliding:duration-(--ids-motion-normal)',
+      'motion-reduce:transition-none',
     ],
     tooltipLabel: 'text-caption-c1-medium',
     tooltipList: 'm-0 grid gap-1',

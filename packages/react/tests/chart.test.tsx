@@ -226,6 +226,11 @@ test('the tooltip opens in the top layer beside the point, outside a clipping pa
   expect(box.left).toBeGreaterThan(frame.left);
   expect(box.top).toBeGreaterThanOrEqual(frame.top);
   expect(box.width).toBeGreaterThan(0);
+
+  await pointAt(graph.element(), 300, 100);
+  await expect
+    .poll(() => document.querySelector('[data-chart-tooltip]')?.hasAttribute('data-gliding'))
+    .toBe(true);
 });
 
 test('a locale on Chart formats the tooltip numbers', async () => {

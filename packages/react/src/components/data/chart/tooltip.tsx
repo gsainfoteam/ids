@@ -62,6 +62,7 @@ export function ChartTooltipContent({
     side: 'right',
     align: 'start',
     sideOffset: GAP_FROM_THE_POINT,
+    glide: true,
   });
   const { setPositionReference } = anchored.refs;
   const x = coordinate?.x;
@@ -87,6 +88,7 @@ export function ChartTooltipContent({
       size="tiny"
       data-chart-tooltip=""
       data-side={anchored.side}
+      data-gliding={anchored.gliding ? '' : undefined}
       className={styles.tooltip()}
       style={anchored.floatingStyles}
     >

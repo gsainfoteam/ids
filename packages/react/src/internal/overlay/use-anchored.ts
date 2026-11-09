@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useState, type CSSProperties, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useState, type CSSProperties, type RefObject } from 'react';
 
 import {
   arrow as arrowPosition,
@@ -53,6 +53,7 @@ export type UseAnchoredOptions = {
   arrow?: Element | null;
   arrowPadding?: number;
   nodeId?: string;
+  glide?: boolean;
 };
 
 export type Anchored = {
@@ -63,6 +64,7 @@ export type Anchored = {
   side: AnchoredSide;
   align: AnchoredAlign;
   isPositioned: boolean;
+  gliding: boolean;
   update: () => void;
 };
 
@@ -81,6 +83,7 @@ export function useAnchored({
   arrow,
   arrowPadding = 8,
   nodeId,
+  glide = false,
 }: UseAnchoredOptions): Anchored {
   const preferred = placementOf(side, align);
   const [landed, setLanded] = useState<Placement>(preferred);
@@ -160,6 +163,16 @@ export function useAnchored({
   const { placement, isPositioned } = floatingState;
   if (isPositioned && placement !== landed && landedFor.open === open) setLanded(placement);
 
+  const [placedOnce, setPlacedOnce] = useState(false);
+  const firstPlacementIsDue = glide && open && isPositioned && !placedOnce;
+  if (placedOnce && !(open && isPositioned)) setPlacedOnce(false);
+
+  useEffect(() => {
+    if (!firstPlacementIsDue) return;
+    const frame = requestAnimationFrame(() => setPlacedOnce(true));
+    return () => cancelAnimationFrame(frame);
+  }, [firstPlacementIsDue]);
+
   return {
     context: floatingState.context,
     refs: floatingState.refs,
@@ -168,6 +181,7 @@ export function useAnchored({
     side: sideOf(placement),
     align: alignOf(placement),
     isPositioned,
+    gliding: glide && placedOnce,
     update: floatingState.update,
   };
 }
