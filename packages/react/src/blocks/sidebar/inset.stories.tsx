@@ -70,7 +70,7 @@ export const PC: Story = {
           <Sidebar.Header>
             <Menu>
               <Menu.Trigger asChild>
-                <Button variant="outline" className="min-w-0 flex-1">
+                <Button variant="outline" className="-ms-2 min-w-0 flex-1">
                   <Avatar name={active.name} shape="square" size="tiny" />
                   {active.name}
                   <Spacer />

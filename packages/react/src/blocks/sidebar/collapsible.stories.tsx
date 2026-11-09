@@ -4,6 +4,7 @@ import {
   BookmarkIcon,
   CalendarDaysIcon,
   Cog6ToothIcon,
+  CubeTransparentIcon,
   DocumentTextIcon,
   HomeIcon,
   MegaphoneIcon,
@@ -45,6 +46,14 @@ export const PC: Story = {
     return (
       <Sidebar.Provider className="break-keep">
         <Sidebar value={current} collapsible aria-label="주 메뉴">
+          <Sidebar.Header>
+            <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+              <Avatar.Fallback>
+                <CubeTransparentIcon />
+              </Avatar.Fallback>
+            </Avatar>
+            <span className="text-subtitle-s2-semibold">GIST 인포팀</span>
+          </Sidebar.Header>
           {ITEMS.map((item) => (
             <Sidebar.Item
               key={item.id}
