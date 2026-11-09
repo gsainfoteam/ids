@@ -17,6 +17,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
+import { CodeBlock } from '../../components/data/code-block';
 import { Item } from '../../components/data/item';
 import { toast } from '../../components/feedback/toast';
 import { ChipField } from '../../components/form/chip-field';
@@ -91,6 +92,12 @@ const KNOWLEDGE = [
 ];
 
 const STARTERS = ['가을 축제 부스 준비 계획 세워 줘', '신입 부원 환영회 공지 써 줘'];
+
+const EMBED = `<script
+  src="https://gistory.me/agents/widget.js"
+  data-agent="photo-club-events"
+  defer
+></script>`;
 
 export const PC: Story = {
   render: function Render() {
@@ -230,42 +237,57 @@ export const PC: Story = {
           </form>
         </Card>
 
-        <section aria-labelledby="preview" className="flex flex-col gap-3 lg:sticky lg:top-6">
-          <h2 id="preview" className="text-body-b3-semibold">
-            미리 보기
-          </h2>
-          <Card>
-            <Card.Header>
-              <Avatar name={name} aria-hidden>
-                <Avatar.Fallback>
-                  <SparklesIcon />
-                </Avatar.Fallback>
-              </Avatar>
-              <Card.Title>{name || '이름 없는 에이전트'}</Card.Title>
-              <Card.Description>사진부 · 깊게 생각하는 모델</Card.Description>
-            </Card.Header>
-            <Card.Content className="flex flex-col gap-3">
-              <p>안녕하세요. 행사 공지, 일정, 장소 예약을 도와드릴게요.</p>
-              <div
-                role="group"
-                aria-label="대화 시작 문장"
-                className="flex flex-col items-start gap-2"
-              >
-                {starters.map((starter) => (
-                  <Chip key={starter} onClick={() => toast(`‘${starter}’로 대화를 시작해요`)}>
-                    {starter}
-                  </Chip>
-                ))}
-              </div>
-            </Card.Content>
-            <Card.Footer className="border-t">
-              <TextField aria-label="미리 물어보기" placeholder="미리 물어보기" className="flex-1">
-                <TextField.Input />
-                <IconButton variant="solid" aria-label="묻기" icon={<ArrowUpIcon />} />
-              </TextField>
-            </Card.Footer>
-          </Card>
-        </section>
+        <div className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-6">
+          <section aria-labelledby="preview" className="flex flex-col gap-3">
+            <h2 id="preview" className="text-body-b3-semibold">
+              미리 보기
+            </h2>
+            <Card>
+              <Card.Header>
+                <Avatar name={name} aria-hidden>
+                  <Avatar.Fallback>
+                    <SparklesIcon />
+                  </Avatar.Fallback>
+                </Avatar>
+                <Card.Title>{name || '이름 없는 에이전트'}</Card.Title>
+                <Card.Description>사진부 · 깊게 생각하는 모델</Card.Description>
+              </Card.Header>
+              <Card.Content className="flex flex-col gap-3">
+                <p>안녕하세요. 행사 공지, 일정, 장소 예약을 도와드릴게요.</p>
+                <div
+                  role="group"
+                  aria-label="대화 시작 문장"
+                  className="flex flex-col items-start gap-2"
+                >
+                  {starters.map((starter) => (
+                    <Chip key={starter} onClick={() => toast(`‘${starter}’로 대화를 시작해요`)}>
+                      {starter}
+                    </Chip>
+                  ))}
+                </div>
+              </Card.Content>
+              <Card.Footer className="border-t">
+                <TextField
+                  aria-label="미리 물어보기"
+                  placeholder="미리 물어보기"
+                  className="flex-1"
+                >
+                  <TextField.Input />
+                  <IconButton variant="solid" aria-label="묻기" icon={<ArrowUpIcon />} />
+                </TextField>
+              </Card.Footer>
+            </Card>
+          </section>
+
+          <section aria-labelledby="embed" className="flex flex-col gap-3">
+            <h2 id="embed" className="text-body-b3-semibold">
+              사이트에 붙이기
+            </h2>
+            <CodeBlock language="html" title="동아리 홈페이지의 </body> 앞에">
+              {EMBED}
+            </CodeBlock>
+          </section>
+        </div>
       </main>
     );
   },
