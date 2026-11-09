@@ -63,6 +63,13 @@ export function MarkerRoot({
           <span />
         </Divider>
       </>
+    ) : variant === 'underline' ? (
+      <>
+        {body}
+        <Divider asChild decorative>
+          <span />
+        </Divider>
+      </>
     ) : (
       body
     );

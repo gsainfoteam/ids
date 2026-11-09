@@ -19,7 +19,7 @@ export const markerStyle = tv({
   variants: {
     variant: {
       default: { root: 'rounded-standard' },
-      underline: { root: 'border-b border-(--ids-color-border) pb-2' },
+      underline: { root: 'flex-col items-stretch gap-2' },
       separator: { root: 'rounded-standard gap-3', content: 'justify-center text-center' },
     } satisfies Record<Marker.Variant, object>,
     size: {

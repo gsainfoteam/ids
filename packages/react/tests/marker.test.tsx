@@ -74,13 +74,29 @@ test('separator draws two decorative Divider lines around the text, inside the p
   expect(marker.querySelector('[role="separator"]')).toBeNull();
 });
 
-test('underline sets a neutral line under the row', () => {
+test('underline draws a decorative Divider under the text, inside the paragraph', async () => {
   const marker = markerIn(parse(<Marker variant="underline">구현 메모를 열었어요</Marker>));
-  expect(marker.className).toMatch(/\bborder-b\b/);
-  expect(marker.className).toContain('border-(--ids-color-border)');
-  expect(marker.className, 'a rounded corner would bend the line').not.toMatch(
-    /\brounded-standard\b/,
+  const [content, line] = Array.from(marker.children);
+  expect(content.textContent).toBe('구현 메모를 열었어요');
+  expect(line.tagName).toBe('SPAN');
+  expect(line.hasAttribute('data-divider')).toBe(true);
+  expect(line.getAttribute('aria-hidden')).toBe('true');
+  expect(marker.className, 'the line is the Divider, not a border').not.toMatch(/\bborder-b\b/);
+
+  const screen = await render(
+    <IdsProvider>
+      <div className="w-80">
+        <Marker variant="underline" data-testid="underline">
+          구현 메모를 열었어요
+        </Marker>
+      </div>
+    </IdsProvider>,
   );
+  const drawn = screen.getByTestId('underline').element();
+  const [text, rule] = Array.from(drawn.children);
+  expect(box(rule).height).toBeCloseTo(1, 0);
+  expect(box(rule).width).toBeCloseTo(320, 0);
+  expect(box(rule).top).toBeGreaterThan(box(text).bottom);
 });
 
 test('asChild hands the props to the child, keeps its children and its role', async () => {

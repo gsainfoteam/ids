@@ -23,7 +23,7 @@ import { Marker } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Marker>파일 4개를 읽었어요</Marker>                       // default
-<Marker variant="underline">구현 메모를 열었어요</Marker>  // 아래에 중립색 선
+<Marker variant="underline">구현 메모를 열었어요</Marker>  // 아래에 장식용 Divider
 <Marker variant="separator">오늘</Marker>                  // 양쪽에 선
 
 <Marker size="tiny">웹 검색 3건</Marker>                   // caption 글자, 14px 아이콘
