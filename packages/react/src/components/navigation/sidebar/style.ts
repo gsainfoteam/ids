@@ -8,7 +8,7 @@ export const sidebarStyle = tv({
   slots: {
     root: [
       'group/sidebar sticky top-0 flex h-dvh shrink-0 self-start text-(--ids-color-on-surface)',
-      '[--sidebar-width:16rem]',
+      '[--sidebar-width:15rem]',
     ],
     mobileBar: 'flex flex-col p-2 sm:hidden',
     panel: [
@@ -16,7 +16,7 @@ export const sidebarStyle = tv({
       'transition-[width] duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
     ],
     divider: 'max-sm:hidden',
-    header: 'flex min-w-0 items-center gap-2 p-2',
+    header: 'flex min-w-0 items-center gap-2 p-2 pt-3',
     footer: 'flex min-w-0 flex-col gap-2 p-2',
     scroll: 'min-h-0 flex-1',
     nav: 'flex min-w-0 flex-col gap-4 p-2',
@@ -25,12 +25,13 @@ export const sidebarStyle = tv({
     groupLabel: 'flex min-h-8 items-center px-2 text-caption-c1-medium text-(--ids-color-on-muted)',
     groupTrigger:
       'min-h-8 items-center px-2 py-0 text-caption-c1-medium text-(--ids-color-on-muted)',
-    list: 'flex min-w-0 flex-col gap-0.5',
+    list: 'flex min-w-0 flex-col gap-px',
     listItem: 'flex min-w-0 flex-col',
     subList:
-      'ms-4.5 flex min-w-0 flex-col gap-0.5 border-s border-(--ids-color-border) ps-2 pt-0.5',
+      'ms-4.5 flex min-w-0 flex-col gap-px border-s border-(--ids-color-border) ps-2 pt-0.5',
     item: 'concentric-p-0 px-2',
     label: 'min-w-0',
+    title: 'text-body-b3-medium',
     end: '',
     submenuTrigger: 'data-hovered:bg-transparent data-active:bg-transparent',
     inset: [
