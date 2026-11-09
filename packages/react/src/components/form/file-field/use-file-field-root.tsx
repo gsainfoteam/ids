@@ -165,14 +165,16 @@ export function useFileFieldRoot(props: FileFieldProps, placement: FileFieldPlac
 
   const rootProps = {
     ref: setRoot,
-    'data-file-field': embedded ? undefined : '',
-    'data-appearance': embedded ? undefined : appearance,
     'data-dragging': s.dragging ? '' : undefined,
-    'data-disabled': disabled ? '' : undefined,
-    'data-readonly': readOnly ? '' : undefined,
-    'data-invalid': showsInvalid ? '' : undefined,
-    'data-required': required ? '' : undefined,
-    'data-empty': state.empty ? '' : undefined,
+    ...(!embedded && {
+      'data-file-field': '',
+      'data-appearance': appearance,
+      'data-disabled': disabled ? '' : undefined,
+      'data-readonly': readOnly ? '' : undefined,
+      'data-invalid': showsInvalid ? '' : undefined,
+      'data-required': required ? '' : undefined,
+      'data-empty': state.empty ? '' : undefined,
+    }),
     onDragEnter: handlers.onDragEnter,
     onDragLeave: handlers.onDragLeave,
     onDragOver: (event: DragEvent<HTMLDivElement>) => {
