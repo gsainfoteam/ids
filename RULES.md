@@ -621,7 +621,10 @@ runners, Firefox and WebKit run the browser project on five each. `tests/balance
 deals the files out by the seconds `tests/durations.json` gives each (WebKit times from a CI run,
 the median for a file not listed), so every runner gets about the same time; Vitest's own shard
 splits by path hash and leaves one runner twice as long as another. When a file grows much slower
-or faster, take the new times from a WebKit job's log. The required checks are small jobs that
+or faster, take the new times from a WebKit job's log. The test runners run inside the Playwright
+Linux image of the version `pnpm-lock.yaml` holds, which ships the browsers and their system
+libraries: `playwright install --with-deps` on the plain runner took from 20 seconds to 12 minutes
+waiting on apt. The required checks are small jobs that
 pass only when every runner behind them passed: `JS (lint / typecheck / build / test)` waits for
 the lint, typecheck and build job and both Chromium runners, `Browser tests (firefox)` and
 `Browser tests (webkit)` for their five. WebKit on Linux retries a failed test once (`--retry 1`
