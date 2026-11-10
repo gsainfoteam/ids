@@ -431,7 +431,6 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
           {dragging && (
             <Item
               size="tiny"
-              dense
               variant="outline"
               className={styles.item({ className: styles.dragPreview() })}
             >
