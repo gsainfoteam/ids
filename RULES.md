@@ -441,9 +441,10 @@ so the browser blocks the submit, anchors its message there and hands focus to t
 height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regular leading-none`.
 
 **Monospace text is `font-mono`, never a hand-written `font-family`.** The CSS package extends the
-utility with `font-size-adjust: var(--ids-font-size-adjust-mono)`, which sets Monaspace Neon at 95%
-so code sits level with the body text and brings any fallback font to the same x-height. Do not
-shrink it again with `text-[0.9em]`.
+utility with `font-size-adjust: var(--ids-font-size-adjust-mono)`, which matches Pretendard GOV's
+x-height (0.53), so Geist Mono draws at full size level with the body text and any fallback font
+comes to the same x-height. Pretendard follows the monospace fonts in the stack, so Hangul in code
+falls back to it. Do not shrink it again with `text-[0.9em]`.
 
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
@@ -586,7 +587,7 @@ projects:
 - `visual`: `tests/gallery.visual.test.tsx` renders every story named `Gallery` in light and dark at
   1440px wide, grows the viewport to the story's height and compares it with `toMatchScreenshot`
   against `tests/__screenshots__/gallery.visual.test.tsx/<category>-<component>-<mode>-chromium-linux.png`.
-  The fonts come from npm (`pretendard-gov`, `@fontsource/monaspace-neon`, pinned in
+  The fonts come from npm (`pretendard-gov`, `@fontsource-variable/geist-mono`, pinned in
   `tests/visual.css`), `Date` is fixed and animations are stopped, so nothing but the code and the
   image changes a pixel. The baselines are rendered only in `mcr.microsoft.com/playwright:v<playwright
   version>-noble` on `linux/amd64`, through `scripts/visual.mjs`, which `pnpm test:visual`, its
