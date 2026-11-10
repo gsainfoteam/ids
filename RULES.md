@@ -27,6 +27,8 @@ These files are written by `pnpm codegen` (Style Dictionary build). Edits will b
 - `packages/react/src/internal/messages-catalog.ts`
 - `packages/react/messages/en.json`
 - `packages/flutter/lib/tokens/*.dart`
+- `packages/flutter/lib/messages/ids_messages.dart`
+- `packages/flutter/messages/ko.i18n.json`
 
 To change tokens: edit files under `packages/core/tokens/`, then run `pnpm codegen`.
 

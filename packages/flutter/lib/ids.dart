@@ -1,3 +1,5 @@
+export 'messages/ids_messages.dart';
+
 export 'tokens/ids_enums.dart';
 export 'tokens/ids_motion.dart';
 export 'tokens/ids_typography.dart';
