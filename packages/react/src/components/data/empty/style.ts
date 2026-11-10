@@ -13,7 +13,8 @@ export const emptyStyle = tv({
     title: 'text-balance [overflow-wrap:anywhere]',
     description: [
       'max-w-sm text-pretty text-(--ids-color-on-muted)',
-      '[&_a]:underline [&_a]:underline-offset-4 [&_a:hover]:text-(--ids-color-on-surface)',
+      '[&_a:not([data-link])]:underline [&_a:not([data-link])]:underline-offset-4',
+      '[&_a:not([data-link]):hover]:text-(--ids-color-on-surface)',
     ],
     actions: 'flex flex-wrap items-center gap-2',
   },

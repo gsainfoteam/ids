@@ -102,6 +102,7 @@ export { Skeleton } from './components/feedback/skeleton';
 export { Marker } from './components/feedback/marker';
 export { Label } from './components/typography/label';
 export { Kbd } from './components/typography/kbd';
+export { Link } from './components/typography/link';
 
 export { Pagination } from './components/navigation/pagination';
 

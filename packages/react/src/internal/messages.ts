@@ -170,6 +170,9 @@ export const messages = {
     up: '위쪽 화살표',
     windows: '윈도우',
   },
+  link: {
+    newTab: '(새 탭에서 열림)',
+  },
   marquee: {
     pause: '일시 정지',
   },

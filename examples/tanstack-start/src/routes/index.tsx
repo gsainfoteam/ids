@@ -3,19 +3,28 @@ import {
   DateField,
   Dialog,
   Field,
+  Link,
   Menu,
   Select,
   TextField,
   toast,
 } from '@gsainfoteam/ids-react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, createLink } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({ component: Home });
+
+const AppLink = createLink(Link);
 
 function Home() {
   return (
     <main className="mx-auto flex max-w-xl flex-col gap-8 p-8">
       <h1 className="text-headline-h3-bold">IDS + TanStack Start</h1>
+
+      <p className="text-body-b3-regular">
+        <AppLink to="/" colorScheme="neutral" underline="hover">
+          처음 화면
+        </AppLink>
+      </p>
 
       <section className="flex flex-wrap gap-2">
         <Button>저장</Button>
