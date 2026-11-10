@@ -138,3 +138,11 @@ flutter pub get
 dart run slang
 flutter test
 ```
+
+## 런타임 테마 데이터
+
+`IdsPalette`는 `shade50`, `shade100`, …, `shade900`, `shade950`의 11개 opaque sRGB 색을 필수로 받는다. 역할 색은 IDS-19의 대비 규칙으로 선택한다. `palette.check()`는 두 모드의 문제 목록을 반환한다. 통과하는 역할 색이 없으면 `resolve`가 오류를 낸다.
+
+`IdsThemeData(radius: 12, fontFamily: 'App Sans', cornerShape: IdsCornerShape.squircle)`로 외형을 지정한다. 기본 radius는 10이고 indicator는 ×0.4, container는 ×1.6이다. 기본 sans는 패키지의 Pretendard GOV Variable이며 `fontPackage`로 다른 패키지 글꼴도 지정할 수 있다. `monoFontFamily`와 `monoFontPackage`는 고정폭 글꼴에 사용한다. `theme.check()`는 잘못된 radius와 빈 글꼴 이름을 보고한다.
+
+`theme.shape()`는 round일 때 `RoundedRectangleBorder`, squircle일 때 `ContinuousRectangleBorder`를 반환한다. `theme.textStyle`은 IDS 글자 스타일에 서비스 글꼴을 적용한다. scale의 범위 및 글자·radius 확대 정책은 IDS-24에서 미정이므로 공개 scale 인자는 아직 없다. `theme.dimension(value)`는 현재 값을 그대로 반환한다.
