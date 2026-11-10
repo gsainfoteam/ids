@@ -25,6 +25,15 @@ enum IdsMode {
   dark,
 }
 
+enum IdsColorScheme {
+  primary,
+  neutral,
+  danger,
+  success,
+  warning,
+  info,
+}
+
 enum IdsSize {
   standard,
   tiny,

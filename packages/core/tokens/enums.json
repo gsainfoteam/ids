@@ -13,6 +13,12 @@
     "mode": {
       "values": { "$value": ["light", "dark"], "$type": "other" }
     },
+    "colorScheme": {
+      "values": {
+        "$value": ["primary", "neutral", "danger", "success", "warning", "info"],
+        "$type": "other"
+      }
+    },
     "size": {
       "values": { "$value": ["standard", "tiny"], "$type": "other" }
     },
