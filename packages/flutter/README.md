@@ -164,4 +164,6 @@ Widgetbook: `packages/flutter/example`에서 `flutter run`으로 사용 가능�
 
 글꼴 비교의 Helvetica·Times·Courier는 macOS 시스템 글꼴이다. 다른 플랫폼에서는 해당 글꼴이 없으면 시스템 fallback을 사용한다. `Text scale (MediaQuery)`는 예제에 접근성 배율을 주입한다. IDS의 scale API가 아니며, `System`은 플랫폼이 제공한 배율을 유지한다. 생성 fixture와 예제의 slang Dart 파일은 커밋하지 않으며, CI에서 위와 같은 순서로 생성한다.
 
+Field 예제는 Material `TextFormField`를 IDS Field 안에 배치해 입력·포커스·비활성·오류 상태를 확인한다. IDS 입력 컴포넌트를 추가한 것은 아니다. Group 예제는 방향·간격·구분선과 자식 버튼의 동작을 보여준다. 각 컴포넌트 예제도 `Text scale (MediaQuery)`로 확대하고 스크롤할 수 있다.
+
 배율 정책과 intl/gen_l10n 객체의 직접 연동은 이번 구현에 포함하지 않는다.

@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import 'components/divider_usecase.dart';
 import 'components/field_usecase.dart';
+import 'components/group_usecase.dart';
 import 'components/label_usecase.dart';
 import 'components/spinner_usecase.dart';
 import 'components/provider_usecase.dart';
@@ -29,6 +30,7 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(name: 'IdsProvider', useCases: providerUseCases),
         WidgetbookComponent(name: 'IdsDivider', useCases: dividerUseCases),
         WidgetbookComponent(name: 'IdsField', useCases: fieldUseCases),
+        WidgetbookComponent(name: 'IdsGroup', useCases: groupUseCases),
         WidgetbookComponent(name: 'IdsLabel', useCases: labelUseCases),
         WidgetbookComponent(name: 'IdsSpinner', useCases: spinnerUseCases),
       ],
