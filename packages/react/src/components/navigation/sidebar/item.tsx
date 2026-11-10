@@ -71,7 +71,6 @@ export function SidebarItem({
             asChild
             interactive
             size="tiny"
-            dense
             disabled={disabled}
             selected={value !== undefined && value === sidebar.value}
             aria-current={value !== undefined && value === sidebar.value ? 'page' : undefined}
