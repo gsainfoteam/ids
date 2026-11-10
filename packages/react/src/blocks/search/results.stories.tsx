@@ -95,15 +95,23 @@ const KINDS: { value: 'all' | Kind; label: string }[] = [
 
 const SUGGESTIONS = ['셔틀 막차', '광주송정역', '주말 셔틀', '셔틀 알림'];
 
+const COMBINING_ACCENTS = /[\u0300-\u036f]/g;
+
+const foldForSearch = (text: string) =>
+  text.normalize('NFD').replace(COMBINING_ACCENTS, '').normalize('NFKC').toLocaleLowerCase();
+
+const matchesQuery = (result: Result, query: string) => {
+  const needle = foldForSearch(query);
+
+  return [result.title, result.description].some((text) => foldForSearch(text).includes(needle));
+};
+
 export const PC: Story = {
   render: function Render() {
     const [draft, setDraft] = useState('셔틀');
     const [query, setQuery] = useState('셔틀');
 
-    const found = RESULTS.filter(
-      (result) =>
-        query !== '' && (result.title.includes(query) || result.description.includes(query)),
-    );
+    const found = RESULTS.filter((result) => query !== '' && matchesQuery(result, query));
 
     const search = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
