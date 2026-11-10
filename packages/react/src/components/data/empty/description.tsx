@@ -1,13 +1,25 @@
 'use client';
 
+import { type ComponentProps } from 'react';
+
 import { useEmptyContext } from './context';
-import { Part, type EmptyPartProps } from './part';
+import { useParagraphRef } from '../../../internal/paragraph';
+import { Slot } from '../../utility/slot';
 
-export type EmptyDescriptionProps = EmptyPartProps;
+export type EmptyDescriptionProps = ComponentProps<'p'> & { asChild?: boolean };
 
-export function EmptyDescription({ className, ...props }: EmptyDescriptionProps) {
+export function EmptyDescription({ asChild, className, ref, ...props }: EmptyDescriptionProps) {
   const { styles } = useEmptyContext('Empty.Description');
-  return <Part {...props} kind="description" className={styles.description({ className })} />;
+  const paragraphRef = useParagraphRef('Empty.Description', ref);
+  const Root = asChild === true ? Slot : 'p';
+  return (
+    <Root
+      {...props}
+      ref={paragraphRef}
+      data-empty-description=""
+      className={styles.description({ className })}
+    />
+  );
 }
 
 EmptyDescription.displayName = 'Empty.Description';

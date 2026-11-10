@@ -1,4 +1,14 @@
-import { Button, DateField, Dialog, Field, Menu, Select, TextField } from '@gsainfoteam/ids-react';
+import {
+  Button,
+  DateField,
+  Dialog,
+  Field,
+  Link,
+  Menu,
+  Select,
+  TextField,
+} from '@gsainfoteam/ids-react';
+import NextLink from 'next/link';
 
 import { ToastButton } from './toast-button';
 
@@ -6,6 +16,12 @@ export default function Page() {
   return (
     <main className="mx-auto flex max-w-xl flex-col gap-8 p-8">
       <h1 className="text-headline-h3-bold">IDS + Next.js App Router</h1>
+
+      <p className="text-body-b3-regular">
+        <Link asChild colorScheme="neutral" underline="hover">
+          <NextLink href="/">처음 화면</NextLink>
+        </Link>
+      </p>
 
       <section className="flex flex-wrap gap-2">
         <Button>저장</Button>

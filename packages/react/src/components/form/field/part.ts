@@ -18,7 +18,7 @@ type PartOwnProps<S> = {
   children?: StateValue<S, ReactNode>;
 };
 
-export type FieldPartProps<Tag extends 'label' | 'div', S> = Omit<
+export type FieldPartProps<Tag extends 'label' | 'div' | 'p', S> = Omit<
   ComponentProps<Tag>,
   keyof PartOwnProps<S>
 > &
@@ -29,10 +29,11 @@ export function renderPart(
   asChild: boolean | undefined,
   props: Record<string, unknown>,
   content: ReactNode,
+  tag: 'div' | 'p' = 'div',
 ) {
   if (asChild) {
     invariant(isValidElement(content), `Field.${name} asChild requires one element.`);
     return cloneElement(content, mergeProps(content.props as Record<string, unknown>, props));
   }
-  return createElement('div', props, content);
+  return createElement(tag, props, content);
 }

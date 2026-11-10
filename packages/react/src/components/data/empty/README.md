@@ -48,6 +48,16 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
 - `ghost` 의 아이콘은 크기 클래스가 없으면 standard 48px, tiny 40px 로 그립니다.
 - 기본 아이콘은 `aria-hidden` 입니다. 뜻이 있는 일러스트는 `alt` 로 설명하고, 장식이면 `alt=""` 를 줍니다.
 
+## 설명 속 링크
+
+```tsx
+<Empty.Description>
+  계속되면 <Link href="/status">서비스 상태</Link>를 확인해 주세요.   {/* Link 모양 그대로 */}
+</Empty.Description>
+```
+
+- 글 속 링크는 `Link` 입니다. 맨 `<a>` 를 두면 Empty 가 밑줄만 긋습니다.
+
 ## 자리별 사용
 
 ```tsx
@@ -104,5 +114,6 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
 
 ## 알아둘 것
 
+- `Empty.Description` 은 `<p>` 입니다. 목록이나 문단 여럿 같은 블록 내용은 `<Empty.Description asChild><div>...</div></Empty.Description>` 처럼 태그를 넣습니다. `<p>` 안에 블록 요소가 들어가면 개발 빌드에서 경고합니다.
 - `Empty.Title` 이 없으면 개발 모드에서 `[IDS] Empty: give it an Empty.Title.` 를 경고합니다.
 - 빈 상태가 사용자의 동작에 대한 결과라서 바로 알려야 한다면(검색어를 치는 동안 결과가 비는 경우 등), Empty 는 그대로 두고 앱이 별도의 live region 으로 결과 수를 알립니다.

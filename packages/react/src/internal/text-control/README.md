@@ -114,7 +114,7 @@ return {
 ### 왜 이렇게
 
 - `focused` 는 포커스가 셸 안 어디에든 있으면 `true` 입니다. 포커스가 셸 밖으로 나갈 때만 `false` 가 됩니다.
-- 셸의 padding 이나 아이콘을 눌러도 input 에 포커스가 갑니다(`pressAnywhereFocusesInput`). 일반 input 은 상자 어디를 눌러도 포커스가 가기 때문입니다. 스스로 누르기를 처리하는 요소(`HANDLES_ITS_OWN_PRESS`: button, a, input, textarea, select, label, `[role=button]`)는 건드리지 않습니다.
+- 셸의 padding 이나 아이콘을 눌러도 input 에 포커스가 갑니다(`pressAnywhereFocusesInput`). 일반 input 은 상자 어디를 눌러도 포커스가 가기 때문입니다. 스스로 누르기를 처리하는 요소(`HANDLES_ITS_OWN_PRESS`: button, a, input, textarea, select, label, `[role=button]`)는 건드리지 않습니다. 셸 안에 제자리로 그린 레이어(`[popover]`: 바에 둔 Menu, Select 의 목록)를 누른 것도 그 레이어에 맡깁니다. 그러지 않으면 누르는 순간 포커스가 input 으로 가서 레이어가 닫히고, 항목의 click 이 오지 않습니다. 셸을 감싼 바깥 레이어(Dialog 안의 TextArea)는 해당하지 않습니다.
 - Clear 파트가 있으면(`clearable`) Escape 가 검색 필드처럼 값을 지웁니다.
 - 빈 필드에서는 Escape 를 그대로 흘려보냅니다(`escapeLeftForEnclosingPopup`). 바깥의 dialog 나 팝업이 닫힐 수 있어야 합니다. IME 조합 중인 Escape 도 무시합니다.
 

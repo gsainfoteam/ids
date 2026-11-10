@@ -10,6 +10,7 @@ import { Field } from '../../components/form/field';
 import { OTPField } from '../../components/form/otp-field';
 import { Tabs } from '../../components/navigation/tabs';
 import { Label } from '../../components/typography/label';
+import { Link } from '../../components/typography/link';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -114,9 +115,7 @@ export const PC: Story = {
 
         <Card.Footer className="justify-center border-t">
           휴대폰을 잃어버렸나요?
-          <Button asChild variant="soft" size="tiny">
-            <a href="#account-recovery">도움 받기</a>
-          </Button>
+          <Link href="#account-recovery">도움 받기</Link>
         </Card.Footer>
       </Card>
     </main>

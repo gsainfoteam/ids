@@ -116,6 +116,29 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. 패키�
 | caption | `text-caption-c1-regular`, `text-caption-c2-medium` |
 | button | `text-button-standard`, `text-button-tiny` |
 
+### shimmer
+
+흘러나오는 중인 글자 위로 밝은 띠가 지나가게 합니다. AI 답의 "생각하는 중" 같은 상태 줄에 씁니다.
+
+```html
+<p role="status" class="shimmer text-on-muted">생각하는 중</p>
+```
+
+- 바탕은 글자색(`currentColor`)이고, 띠는 `--ids-color-on-surface` 입니다. 띠가 지나가는 동안 대비가 글자색보다 낮아지지 않습니다.
+- 글자만 칠합니다(`background-clip: text`). 같은 요소 안의 아이콘은 `currentColor` 로 그대로 그려집니다.
+- 쓰는 방향을 따릅니다. 오른쪽에서 왼쪽 글에서는 오른쪽에서 왼쪽으로 지나갑니다.
+- `prefers-reduced-motion: reduce` 면 움직이지 않고 보통 글자로 보입니다.
+
+| 변수 | 기본 | 뜻 |
+|---|---|---|
+| `--ids-shimmer-color` | `var(--ids-color-on-surface)` | 띠 색 |
+| `--ids-shimmer-spread` | `3em` | 띠 가운데에서 한쪽 끝까지의 폭 |
+| `--ids-shimmer-duration` | `2s` | 한 번 지나가는 시간 |
+
+```html
+<p class="shimmer [--ids-shimmer-duration:3s]">불러오는 중</p>
+```
+
 ### 지원 색상 테마
 
 | `data-color` | 설명 |

@@ -294,6 +294,15 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
   }
 }
 
+@keyframes ids-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
 @keyframes ids-marquee {
   to {
     translate: var(--ids-marquee-translate, -50%);
@@ -352,6 +361,30 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 
 @utility font-mono {
   font-size-adjust: var(--ids-font-size-adjust-mono);
+}
+
+@utility shimmer {
+  background-image: linear-gradient(
+    90deg,
+    currentColor calc(50% - var(--ids-shimmer-spread, 3em)),
+    var(--ids-shimmer-color, var(--ids-color-on-surface)) 50%,
+    currentColor calc(50% + var(--ids-shimmer-spread, 3em))
+  );
+  background-size: calc(200% + 2 * var(--ids-shimmer-spread, 3em)) 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ids-shimmer var(--ids-shimmer-duration, 2s) linear infinite;
+
+  @variant rtl {
+    animation-direction: reverse;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+    animation: none;
+  }
 }
 `;
 

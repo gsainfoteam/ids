@@ -100,8 +100,10 @@ export type { TextAreaProps, TextAreaVariant } from './components/form/text-area
 export { Spinner } from './components/feedback/spinner';
 export { Progress } from './components/feedback/progress';
 export { Skeleton } from './components/feedback/skeleton';
+export { Marker } from './components/feedback/marker';
 export { Label } from './components/typography/label';
 export { Kbd } from './components/typography/kbd';
+export { Link } from './components/typography/link';
 
 export { Pagination } from './components/navigation/pagination';
 
@@ -157,6 +159,14 @@ export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './componen
 
 export { Select } from './components/form/select';
 export type { SelectProps, SelectVariant } from './components/form/select';
+
+export { PromptInput } from './components/form/prompt-input';
+export type {
+  PromptInputMessage,
+  PromptInputProps,
+  PromptInputStatus,
+  PromptInputVariant,
+} from './components/form/prompt-input';
 
 export { TelField } from './components/form/tel-field';
 export type { TelFieldProps, TelFieldFormat } from './components/form/tel-field';

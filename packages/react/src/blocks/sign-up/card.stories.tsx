@@ -12,6 +12,7 @@ import { PasswordField } from '../../components/form/password-field';
 import { TextField } from '../../components/form/text-field';
 import { Divider } from '../../components/layout/divider';
 import { Label } from '../../components/typography/label';
+import { Link } from '../../components/typography/link';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -130,9 +131,7 @@ export const PC: Story = {
 
           <Card.Footer className="justify-center border-t">
             이미 계정이 있나요?
-            <Button asChild variant="soft" size="tiny">
-              <a href="#login">로그인</a>
-            </Button>
+            <Link href="#login">로그인</Link>
           </Card.Footer>
         </Card>
       </main>

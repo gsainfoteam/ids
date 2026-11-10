@@ -3,11 +3,12 @@ import { useState, type ReactNode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { expect, onTestFinished, test, vi } from 'vitest';
-import { cdp, userEvent } from 'vitest/browser';
+import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Avatar, initialsOf } from '../src';
 import { skipWithoutCdp } from './engines';
+import { holdImages as holdImagesUnder } from './held-images';
 
 const avatarOf = (node: ReactNode) =>
   new DOMParser()
@@ -18,53 +19,8 @@ const PICTURE = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"/>'
 const INLINE_PICTURE = `data:image/svg+xml;base64,${btoa(PICTURE)}`;
 const HELD = '/__held-avatar__/';
 const nextFrame = () => new Promise<number>((resolve) => requestAnimationFrame(resolve));
-const lazyImagesStartLateOnASlowRunner = 5_000;
 
-async function cdpReadyForListeners() {
-  const session = cdp();
-  await session.send('Fetch.disable');
-  return session;
-}
-
-async function holdImages() {
-  const session = await cdpReadyForListeners();
-  const paused = new Map<string, string>();
-  const onPaused = (event: { requestId: string; request: { url: string } }) => {
-    paused.set(new URL(event.request.url).pathname, event.requestId);
-  };
-  session.on('Fetch.requestPaused', onPaused);
-  await session.send('Fetch.enable', { patterns: [{ urlPattern: `*${HELD}*` }] });
-  onTestFinished(async () => {
-    session.off('Fetch.requestPaused', onPaused);
-    await session.send('Fetch.disable');
-  });
-  const requestOf = async (src: string) => {
-    await expect
-      .poll(() => paused.get(src), {
-        message: `${src} is requested`,
-        timeout: lazyImagesStartLateOnASlowRunner,
-      })
-      .toBeDefined();
-    return paused.get(src)!;
-  };
-  return {
-    requested: requestOf,
-    async load(src: string) {
-      await session.send('Fetch.fulfillRequest', {
-        requestId: await requestOf(src),
-        responseCode: 200,
-        responseHeaders: [{ name: 'Content-Type', value: 'image/svg+xml' }],
-        body: btoa(PICTURE),
-      });
-    },
-    async fail(src: string) {
-      await session.send('Fetch.failRequest', {
-        requestId: await requestOf(src),
-        errorReason: 'Failed',
-      });
-    },
-  };
-}
+const holdImages = () => holdImagesUnder(HELD, PICTURE);
 
 test('SSR: a named image with an empty inner alt, and no fallback while the image loads', () => {
   const doc = new DOMParser().parseFromString(
