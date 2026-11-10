@@ -43,7 +43,7 @@ export const sidebarStyle = tv({
     listItem: 'flex min-w-0 flex-col',
     subTree: 'ms-[15.5px] flex min-w-0 pt-0.5',
     subList: 'flex min-w-0 flex-1 flex-col gap-px ps-[7.5px]',
-    item: 'concentric-p-0 px-2',
+    item: 'min-h-8 concentric-p-0 px-2',
     media: 'w-4 justify-center [&>svg]:stroke-2',
     icon: '',
     label: 'min-w-0',
