@@ -3,7 +3,7 @@
 사용자 목록, 알림, 메뉴, 설정 행처럼 미디어와 글과 동작을 가로 한 줄에 놓는 행입니다. 세로로 쌓는 덩어리는 `Card` 를 씁니다.
 
 - **shadcn/ui 구성.** `Item.Media`, `Item.Content` 안의 `Item.Title` 과 `Item.Description`, 그리고 `Item.Actions` 입니다. 전부 선택입니다.
-- **두 줄이 되면.** 설명은 두 줄에서 말줄임표로 줄고, 미디어는 행 가운데가 아니라 첫 줄에 맞춰 위에 붙습니다.
+- **두 줄이 되면.** 설명은 두 줄에서 말줄임표로 줄고, 타일 미디어(`soft`, `outline`)는 한 줄일 때의 크기로 왼쪽 위에 남고 맨 아이콘은 세로 가운데에 놓입니다.
 - **행 어디를 눌러도 열린다.** `onClick` 만 주면 행 어디를 눌러도 열리고, 키보드와 스크린 리더에는 `Item.Title` 이 버튼이 됩니다. 설명은 `Item.Description` 입니다. `Item.Actions` 의 버튼을 눌러도 행은 눌리지 않고, 버튼이 버튼 안에 들어가지 않습니다.
 - **선택.** `selected` 는 옅은 층을 깔고, 버튼인 행에서는 `aria-pressed` 로 알립니다. `aria-current` 를 주면 그쪽이 선택을 말합니다.
 - **목록.** `Item.Group` 은 `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다. Safari가 목록 의미를 잃지 않습니다.
@@ -35,9 +35,23 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 <Item.Media><Avatar name="Alice Kim" /></Item.Media>   {/* 아바타, 아바타 그룹, 이미지 */}
 ```
 
-- 크기를 정하지 않은 아이콘은 `--ids-size-icon-standard` 를 따릅니다.
+- 크기를 정하지 않은 아이콘은 `--ids-size-icon-standard` 를 따르고, 타일 안에서는 타일의 절반입니다.
 - 타일(`soft`, `outline`) 바로 안의 이미지는 타일을 채우고 모서리를 따릅니다. 비율이 달라도 잘라서 채웁니다.
-- 설명이 있으면 미디어가 첫 줄 높이에 맞춰 위로 붙습니다.
+- 타일(`soft`, `outline`)과 그 둘레 여백은 행 높이에 비례해 함께 커집니다. 제목만 있는 행(standard 56px)의 타일 32px 과 여백 12px 를 한 단위로 보고, 행이 높아지면 그 단위를 같은 비율로 늘립니다.
+- 제목과 설명 한 줄을 담은 행(standard 66px)에서 더 커지지 않습니다. 그보다 높은 행에서는 그 크기 그대로 왼쪽 위에 남습니다.
+- 왼쪽 여백과 위 여백은 언제나 같고, 아래 여백은 행이 한 줄 높이를 넘을 때만 넓어집니다.
+
+| 행           | standard 타일 / 여백 | 놓이는 곳 |
+| ------------ | -------------------- | --------- |
+| 제목만       | 32px / 12px          | 가운데    |
+| 설명 한 줄   | 38px / 14px          | 가운데    |
+| 설명 두 줄   | 38px / 14px          | 왼쪽 위   |
+
+- 패딩을 그대로 두고 타일만 키우면 타일이 테두리에 붙어 보이고, 타일을 그대로 두면 위아래만 빕니다. 둘을 같은 비율로 키우면 높이가 달라도 같은 모양의 행으로 읽힙니다.
+- 긴 글을 따라 계속 커지면 타일이 글보다 무거워지므로, 한 줄 높이에서 멈추고 첫 줄 곁에 둡니다.
+- 아이콘은 타일의 절반 크기로 함께 커집니다. 글은 비율과 상관없이 행 패딩에 놓입니다.
+- 제목만 있는 행과 설명이 한 줄인 행의 높이는 CSS 가 알고 있어, 서버가 그린 HTML 에서도 같은 크기입니다. 설명이 제목보다 작은 글씨이거나 `Item.Actions` 가 글보다 높으면, 타일이 행 높이를 지켜보다가 하이드레이션 뒤에 맞춥니다.
+- 맨 아이콘과 아바타(`ghost`)는 크기를 바꾸지 않고 세로 가운데에 놓입니다. 둘레를 그리는 상자가 없어 여백이 눈에 띄지 않고, 키우면 맨 글리프가 제목보다 무거워집니다.
 
 ## 긴 제목
 
@@ -108,7 +122,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 ```tsx
 <Item.Group aria-label="설정" size="tiny">
   {' '}
-  {/* 안의 행이 size와 dense를 따른다 */}
+  {/* 안의 행이 size를 따른다 */}
   <Item>...</Item> {/* <li> 로 감싼다 */}
   <Item.Separator /> {/* 목록 항목으로 세지 않는 구분선 */}
   <Item>...</Item>
@@ -153,25 +167,11 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 <Item size="tiny" />        // standard(패딩 12px, 기본) / tiny(8px)
 ```
 
-## 촘촘한 행
-
-```tsx
-<Item.Group aria-label="첨부 파일" dense>  {/* 안의 행이 dense를 따른다 */}
-  <Item variant="outline">...</Item>       {/* 패딩 6px, 최소 높이 48px */}
-</Item.Group>
-
-<Item size="tiny" dense />                  // 패딩 4px, 최소 높이 32px
-```
-
-- `dense` 는 패딩을 반으로 줄입니다. 36px 컨트롤을 담은 standard 행이 48px 가 됩니다.
-- 파일 목록이나 메뉴처럼 행이 많은 목록에 씁니다.
-
 ## 상태와 data 속성
 
 | 속성                                                                | 뜻              |
 | ------------------------------------------------------------------- | --------------- |
 | `data-item`, `data-variant`, `data-size`                            | 루트            |
-| `data-dense`                                                        | 촘촘한 행       |
 | `data-interactive`                                                  | 누를 수 있는 행 |
 | `data-selected`                                                     | 선택됨          |
 | `data-disabled`                                                     | 비활성          |
@@ -186,7 +186,6 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 | ---------------- | ------------------------------------------------------------------ |
 | `variant`        | `ghost`(기본) / `outline` / `soft`. `Item.Group variant="separated"` 안에서는 `outline` |
 | `size`           | `standard`(기본) / `tiny`. `Item.Group` 안에서는 그룹을 따른다     |
-| `dense`          | `false`. 패딩을 반으로 줄인다. `Item.Group` 안에서는 그룹을 따른다 |
 | `onClick`        | 주면 행 어디를 눌러도 불린다. 제목이 버튼이 된다                   |
 | `interactive`    | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동    |
 | `selected`       | 선택 표시                                                          |

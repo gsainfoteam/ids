@@ -322,7 +322,7 @@ test('dropzone: limits are described up front, and a single file is listed with 
   expect(screen.container.querySelector('[data-file-field-control]')).toBeNull();
 });
 
-test('rows are dense outline Items in a group; Clear and Remove are ghost IconButtons', async () => {
+test('rows are outline Items in a group; Clear and Remove are ghost IconButtons', async () => {
   const screen = await render(
     <FileField
       aria-label="Files"
@@ -338,7 +338,6 @@ test('rows are dense outline Items in a group; Clear and Remove are ghost IconBu
   expect(row.hasAttribute('data-item')).toBe(true);
   expect(row.dataset.variant).toBe('outline');
   expect(row.dataset.size).toBe('standard');
-  expect(row.hasAttribute('data-dense')).toBe(true);
   expect(row.hasAttribute('role')).toBe(false);
   const title = row.querySelector<HTMLElement>('[data-item-title]')!;
   expect(title.textContent).toBe('quarterly-report.pdf');

@@ -19,7 +19,6 @@ type Context = {
 export const ItemContext = createContext<Context | null>(null);
 export const ItemGroupContext = createContext<{
   size: IdsSize | undefined;
-  dense: boolean | undefined;
   variant: ItemVariant | undefined;
 } | null>(null);
 
