@@ -209,6 +209,16 @@
   "popover": {
     "close": "Close"
   },
+  "promptInput": {
+    "actions": "Add",
+    "attach": "Attach files",
+    "attachments": "Attached files",
+    "label": "Message",
+    "placeholder": "Type a message",
+    "send": "Send",
+    "sending": "Sending",
+    "stop": "Stop"
+  },
   "qrCode": {
     "label": "QR code"
   },

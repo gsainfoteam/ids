@@ -58,6 +58,7 @@ export function TextAreaRoot({
   onValueChange,
   autoResize = true,
   resize,
+  divided = true,
   minRows,
   maxRows,
   rows = 3,
@@ -94,7 +95,7 @@ export function TextAreaRoot({
     shellId: `ids-text-area-shell-${generatedId}`,
     inputId: field.inputProps.id,
   });
-  const styles = textAreaStyle({ variant, size, resize: resizeMode });
+  const styles = textAreaStyle({ variant, size, resize: resizeMode, divided });
   const resizedWidth = resizing.width === undefined ? undefined : { width: `${resizing.width}px` };
 
   return (
