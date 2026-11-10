@@ -89,8 +89,8 @@ importers:
         specifier: ^4.1.18
         version: 4.3.0
       typescript:
-        specifier: ^7.0.2
-        version: 7.0.2
+        specifier: ^6.0.3
+        version: 6.0.3
 
   examples/tanstack-start:
     dependencies:
