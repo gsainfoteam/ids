@@ -320,13 +320,22 @@ test('column positioning ignores its page offset and keeps clicked time visible'
 
 const TICKS_FIREFOX_NEEDS_FOR_A_LONG_WHEEL = 30;
 
+const nextEvent = (target: EventTarget, type: string) =>
+  new Promise((resolve) => target.addEventListener(type, resolve, { once: true }));
+
+async function wheelTickReachingThePage(scroller: HTMLElement, deltaY: number) {
+  const delivered = nextEvent(scroller, 'wheel');
+  await userEvent.wheel(scroller, { delta: { y: deltaY } });
+  await delivered;
+}
+
 async function wheelToTheEnd(scroller: HTMLElement, direction: 1 | -1) {
   const atTheEnd = () =>
     direction > 0
       ? scroller.scrollTop >= scroller.scrollHeight - scroller.clientHeight - 1
       : scroller.scrollTop <= 0;
   for (let tick = 0; tick < TICKS_FIREFOX_NEEDS_FOR_A_LONG_WHEEL && !atTheEnd(); tick++)
-    await userEvent.wheel(scroller, { delta: { y: direction * 30 * OPTION_HEIGHT } });
+    await wheelTickReachingThePage(scroller, direction * 30 * OPTION_HEIGHT);
 }
 
 test('wheel commits at both edges without requiring another scroll event', async () => {
@@ -361,8 +370,9 @@ test('pending wheel settlement respects a new readonly prop', async () => {
   column.dispatchEvent(new WheelEvent('wheel', { bubbles: true }));
   column.dispatchEvent(new Event('scroll'));
   await screen.rerender(view(true));
+  const settled = nextEvent(column, 'scrollend');
   column.scrollTop = 10 * OPTION_HEIGHT;
-  await scrollSettles();
+  await settled;
   expect(onValueChange).not.toHaveBeenCalled();
 });
 
