@@ -41,7 +41,6 @@ async function untilTheFrameLoadsThroughInterception(
       });
       return;
     }
-    console.error(`HELD-PROBE ${probe} reached the server`);
   }
   throw new Error(`Requests under ${held} still reach the server after Fetch.enable.`);
 }
