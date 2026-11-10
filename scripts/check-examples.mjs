@@ -33,6 +33,7 @@ const apps = [
       return response.text();
     },
     stylesheet: (href) => join(examples, 'tanstack-start/dist/client', href),
+    extra: [['Link made a router link by createLink', 'data-link=""']],
   },
   {
     name: 'astro',
