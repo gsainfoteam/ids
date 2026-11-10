@@ -4,13 +4,17 @@ import { Children, isValidElement, useId, type ComponentProps, type ReactNode } 
 
 import { SidebarListContext, useSidebarContext } from './context';
 import { SidebarItem } from './item';
+import { SidebarSortable } from './sortable';
 import { elementTypeOf } from '../../../utils';
 import { Accordion } from '../../data/accordion';
+
+import type { SidebarItemMove } from './tree';
 
 export type SidebarGroupProps = Omit<ComponentProps<'section'>, 'children'> & {
   label?: ReactNode;
   collapsible?: boolean;
   defaultOpen?: boolean;
+  onItemMove?: (move: SidebarItemMove) => void;
   children?: ReactNode;
 };
 
@@ -36,10 +40,26 @@ export function SidebarList({ children }: { children?: ReactNode }) {
   );
 }
 
+function SidebarGroupList({
+  onItemMove,
+  children,
+}: Pick<SidebarGroupProps, 'onItemMove' | 'children'>) {
+  const { rail, presentation } = useSidebarContext('Sidebar.Group');
+  const list = <SidebarList>{children}</SidebarList>;
+  if (!onItemMove || rail || presentation === 'drawer') return list;
+
+  return (
+    <SidebarSortable items={children} itemType={SidebarItem} onItemMove={onItemMove}>
+      {list}
+    </SidebarSortable>
+  );
+}
+
 export function SidebarGroup({
   label,
   collapsible = false,
   defaultOpen = true,
+  onItemMove,
   className,
   children,
   ...props
@@ -65,7 +85,7 @@ export function SidebarGroup({
             </div>
           </Accordion.Header>
           <Accordion.Content className="p-0">
-            <SidebarList>{children}</SidebarList>
+            <SidebarGroupList onItemMove={onItemMove}>{children}</SidebarGroupList>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion>
@@ -83,7 +103,7 @@ export function SidebarGroup({
           {label}
         </div>
       )}
-      <SidebarList>{children}</SidebarList>
+      <SidebarGroupList onItemMove={onItemMove}>{children}</SidebarGroupList>
     </section>
   );
 }

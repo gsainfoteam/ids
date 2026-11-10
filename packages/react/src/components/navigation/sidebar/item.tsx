@@ -2,9 +2,10 @@
 
 import { use, type ComponentProps, type ReactNode } from 'react';
 
-import { SidebarListContext, useSidebarContext } from './context';
+import { SidebarListContext, SidebarSortableContext, useSidebarContext } from './context';
 import { linkChildrenOf, linkElementOf, splitItemChildren } from './item-children';
 import { SidebarRow } from './row';
+import { SidebarDragFrame } from './sortable';
 import { SidebarAccordionSubmenu, SidebarMenuSubmenu } from './submenu';
 import { Item } from '../../data/item';
 import { Tooltip } from '../../overlay/tooltip';
@@ -29,6 +30,7 @@ export function SidebarItem({
 }: SidebarItemProps) {
   const sidebar = useSidebarContext('Sidebar.Item');
   const inList = use(SidebarListContext);
+  const sortable = use(SidebarSortableContext);
   const parts = splitItemChildren<SidebarItemProps>(
     linkChildrenOf({ asChild, children }),
     SidebarItem,
@@ -39,34 +41,46 @@ export function SidebarItem({
       sidebar.rail ? (
         <SidebarMenuSubmenu parts={parts} disabled={disabled} className={className} />
       ) : (
-        <SidebarAccordionSubmenu parts={parts} disabled={disabled} className={className} />
+        <SidebarAccordionSubmenu
+          value={value}
+          parts={parts}
+          disabled={disabled}
+          className={className}
+        />
       )
     ) : (
-      <Tooltip content={parts.label} side="right" disabled={!sidebar.rail}>
-        <Item
-          asChild
-          interactive
-          size="tiny"
-          dense
-          disabled={disabled}
-          selected={value !== undefined && value === sidebar.value}
-          aria-current={value !== undefined && value === sidebar.value ? 'page' : undefined}
-          className={sidebar.styles.item({ className })}
-        >
-          {linkElementOf(
-            { href, asChild, children },
-            {
-              ...rest,
-              'data-sidebar-item': '',
-              onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
-                onClick?.(event);
-                sidebar.navigate();
+      <SidebarDragFrame
+        value={value}
+        preview={<SidebarRow parts={parts} styles={sidebar.styles} />}
+      >
+        <Tooltip content={parts.label} side="right" disabled={!sidebar.rail}>
+          <Item
+            asChild
+            interactive
+            size="tiny"
+            dense
+            disabled={disabled}
+            selected={value !== undefined && value === sidebar.value}
+            aria-current={value !== undefined && value === sidebar.value ? 'page' : undefined}
+            className={sidebar.styles.item({ className })}
+          >
+            {linkElementOf(
+              { href, asChild, children },
+              {
+                'aria-describedby': sortable && value !== undefined ? sortable.hintId : undefined,
+                ...rest,
+                'data-sidebar-item': '',
+                'data-sidebar-value': value,
+                onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
+                  onClick?.(event);
+                  sidebar.navigate();
+                },
               },
-            },
-            <SidebarRow parts={parts} styles={sidebar.styles} />,
-          )}
-        </Item>
-      </Tooltip>
+              <SidebarRow parts={parts} styles={sidebar.styles} />,
+            )}
+          </Item>
+        </Tooltip>
+      </SidebarDragFrame>
     );
 
   const listItem = <li className={sidebar.styles.listItem()}>{row}</li>;

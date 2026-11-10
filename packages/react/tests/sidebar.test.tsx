@@ -1,12 +1,13 @@
-import { type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
-import { Cog6ToothIcon, HomeIcon, InboxIcon } from '@heroicons/react/24/outline';
+import { Cog6ToothIcon, DocumentTextIcon, HomeIcon, InboxIcon } from '@heroicons/react/24/outline';
 import { renderToString } from 'react-dom/server';
-import { afterEach, expect, onTestFinished, test, vi } from 'vitest';
-import { page, userEvent } from 'vitest/browser';
+import { afterEach, expect, onTestFinished, test, vi, type Mock } from 'vitest';
+import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Badge, IdsProvider, Sidebar } from '../src';
+import { skipWithoutCdp } from './engines';
 import { MOD_AS_THE_APP_READS_IT } from './hotkeys';
 
 const DESKTOP = { width: 1024, height: 768 };
@@ -287,4 +288,164 @@ test('offcanvas or inset without a Provider warns in development', async () => {
 
   expect(warn).toHaveBeenCalledWith(expect.stringContaining('collapsible="offcanvas"'));
   expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="inset"'));
+});
+
+test('items nest to any depth, as accordions in the panel and as nested menus in the icon rail', async () => {
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const screen = await render(
+    ui(
+      <Sidebar value="frontend-issues" collapsible>
+        <Sidebar.Item value="info">
+          <HomeIcon />
+          인포팀
+          <Sidebar.Item value="info-issues" href="#info-issues">
+            팀 이슈
+          </Sidebar.Item>
+          <Sidebar.Item value="frontend">
+            프론트엔드
+            <Sidebar.Item value="frontend-issues" href="#frontend-issues">
+              프론트엔드 이슈
+            </Sidebar.Item>
+          </Sidebar.Item>
+        </Sidebar.Item>
+      </Sidebar>,
+    ),
+  );
+
+  await expect
+    .element(screen.getByRole('link', { name: '프론트엔드 이슈' }))
+    .toHaveAttribute('aria-current', 'page');
+  await expect
+    .element(screen.getByRole('button', { name: '프론트엔드' }))
+    .toHaveAttribute('aria-expanded', 'true');
+
+  await userEvent.click(screen.getByRole('button', { name: '사이드바 접기' }));
+  await userEvent.click(screen.getByRole('button', { name: '인포팀' }));
+  await userEvent.click(screen.getByRole('menuitem', { name: '프론트엔드' }));
+  await expect
+    .element(screen.getByRole('menuitem', { name: '프론트엔드 이슈' }))
+    .toHaveAttribute('aria-current', 'page');
+});
+
+type Doc = { value: string; label: string; children?: Doc[] };
+
+const DOCS: Doc[] = [
+  { value: 'roadmap', label: '로드맵' },
+  {
+    value: 'ids',
+    label: 'IDS',
+    children: [
+      { value: 'minutes', label: '회의록' },
+      { value: 'tokens', label: '토큰' },
+    ],
+  },
+  { value: 'shuttle', label: '셔틀' },
+];
+
+function Docs({ onItemMove }: { onItemMove: Mock }) {
+  const [docs, setDocs] = useState(DOCS);
+  const item = (doc: Doc) => (
+    <Sidebar.Item key={doc.value} value={doc.value} href={`#${doc.value}`}>
+      <DocumentTextIcon />
+      {doc.label}
+      {doc.children?.map(item)}
+    </Sidebar.Item>
+  );
+
+  return (
+    <Sidebar>
+      <Sidebar.Group
+        label="문서"
+        onItemMove={(move) => {
+          onItemMove(move);
+          setDocs((current) => Sidebar.moveItem(current, move));
+        }}
+      >
+        {docs.map(item)}
+      </Sidebar.Group>
+    </Sidebar>
+  );
+}
+
+const rowOrder = () =>
+  [...document.querySelectorAll('[data-sidebar-item]')].map((row) => row.textContent);
+
+test('Alt and the arrow keys reorder, nest and lift an item and keep focus on it', async () => {
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onItemMove = vi.fn();
+  const screen = await render(ui(<Docs onItemMove={onItemMove} />));
+  const shuttle = () => screen.getByRole('link', { name: '셔틀' });
+  const press = async (key: string) => {
+    await userEvent.keyboard(`{Alt>}{${key}}{/Alt}`);
+    await expect.element(shuttle()).toHaveFocus();
+  };
+
+  await expect.element(shuttle()).toHaveAttribute('aria-describedby');
+  shuttle().element().focus();
+
+  await press('ArrowUp');
+  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'shuttle', parent: null, index: 1 });
+  expect(rowOrder()).toEqual(['로드맵', '셔틀', 'IDS', '회의록', '토큰']);
+
+  await press('ArrowDown');
+  await press('ArrowRight');
+  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'shuttle', parent: 'ids', index: 2 });
+  await expect.element(shuttle()).toBeVisible();
+  await expect
+    .element(screen.getByRole('button', { name: 'IDS' }))
+    .toHaveAttribute('aria-expanded', 'true');
+
+  await press('ArrowLeft');
+  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'shuttle', parent: null, index: 2 });
+
+  await userEvent.keyboard('{Alt>}{ArrowDown}{/Alt}');
+  expect(onItemMove).toHaveBeenCalledTimes(4);
+});
+
+const frameOffset = (x: number, y: number) => {
+  const frame = window.frameElement!.getBoundingClientRect();
+  const scale = frame.width / window.innerWidth;
+  return { x: frame.left + x * scale, y: frame.top + y * scale };
+};
+
+async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', x: number, y: number) {
+  await cdp().send('Input.dispatchMouseEvent', {
+    type,
+    ...frameOffset(x, y),
+    button: 'left',
+    buttons: type === 'mouseReleased' ? 0 : 1,
+    clickCount: 1,
+  });
+}
+
+async function drag(from: Element, to: Element, fraction: number) {
+  const start = from.getBoundingClientRect();
+  const end = to.getBoundingClientRect();
+  const startX = start.left + start.width / 2;
+  const startY = start.top + start.height / 2;
+  const endY = end.top + end.height * fraction;
+
+  await mouse('mousePressed', startX, startY);
+  for (let step = 1; step <= 8; step++)
+    await mouse('mouseMoved', startX, startY + ((endY - startY) * step) / 8);
+  await mouse('mouseReleased', startX, endY);
+}
+
+test('dragging a row drops it before, after or inside the row under the pointer', async (context) => {
+  skipWithoutCdp(context);
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onItemMove = vi.fn();
+  const screen = await render(ui(<Docs onItemMove={onItemMove} />));
+  const row = (name: string) => screen.getByRole('link', { name }).element();
+
+  await drag(row('셔틀'), row('로드맵'), 0.1);
+  await expect.poll(rowOrder).toEqual(['셔틀', '로드맵', 'IDS', '회의록', '토큰']);
+  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'shuttle', parent: null, index: 0 });
+  expect(location.hash).not.toBe('#roadmap');
+
+  await drag(row('로드맵'), screen.getByRole('button', { name: 'IDS' }).element(), 0.5);
+  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'roadmap', parent: 'ids', index: 0 });
+
+  await drag(row('셔틀'), row('셔틀'), 0.5);
+  expect(onItemMove).toHaveBeenCalledTimes(2);
 });

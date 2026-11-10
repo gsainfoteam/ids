@@ -5,10 +5,14 @@ import {
   BookmarkIcon,
   Cog6ToothIcon,
   CubeTransparentIcon,
+  DocumentTextIcon,
+  FolderIcon,
   HomeIcon,
   InboxIcon,
   MegaphoneIcon,
+  RectangleStackIcon,
   TruckIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import { expect, waitFor, within } from 'storybook/test';
 
@@ -410,6 +414,90 @@ export const CollapsibleGroups: Story = {
       </Sidebar.Inset>
     </Sidebar.Provider>
   ),
+};
+
+export const Tree: Story = {
+  render: () => (
+    <Sidebar.Provider>
+      <Sidebar value="frontend-issues" collapsible aria-label="워크스페이스">
+        <Sidebar.Group label="팀">
+          <Sidebar.Item value="info">
+            <UserGroupIcon />
+            인포팀
+            <Sidebar.Item value="info-issues" href="#info-issues">
+              <InboxIcon />
+              이슈
+            </Sidebar.Item>
+            <Sidebar.Item value="info-projects" href="#info-projects">
+              <RectangleStackIcon />
+              프로젝트
+            </Sidebar.Item>
+            <Sidebar.Item value="frontend">
+              <UserGroupIcon />
+              프론트엔드
+              <Sidebar.Item value="frontend-issues" href="#frontend-issues">
+                <InboxIcon />
+                이슈
+              </Sidebar.Item>
+              <Sidebar.Item value="frontend-projects" href="#frontend-projects">
+                <RectangleStackIcon />
+                프로젝트
+              </Sidebar.Item>
+            </Sidebar.Item>
+          </Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar>
+      <Sidebar.Inset className="p-6">
+        <Skeleton className="h-64" />
+      </Sidebar.Inset>
+    </Sidebar.Provider>
+  ),
+};
+
+const FAVORITES = [
+  { value: 'roadmap', label: 'Ziggle 로드맵', icon: <DocumentTextIcon /> },
+  {
+    value: 'ids',
+    label: 'IDS',
+    icon: <FolderIcon />,
+    children: [
+      { value: 'minutes', label: '회의록', icon: <DocumentTextIcon /> },
+      { value: 'tokens', label: '토큰 정리', icon: <DocumentTextIcon /> },
+    ],
+  },
+  { value: 'shuttle', label: '셔틀 시간표', icon: <DocumentTextIcon /> },
+];
+
+type Favorite = (typeof FAVORITES)[number] & { children?: Favorite[] };
+
+export const Reorder: Story = {
+  render: function Render() {
+    const [favorites, setFavorites] = useState<Favorite[]>(FAVORITES);
+
+    const renderFavorite = (favorite: Favorite) => (
+      <Sidebar.Item key={favorite.value} value={favorite.value} href={`#${favorite.value}`}>
+        {favorite.icon}
+        {favorite.label}
+        {favorite.children?.map(renderFavorite)}
+      </Sidebar.Item>
+    );
+
+    return (
+      <Sidebar.Provider>
+        <Sidebar aria-label="워크스페이스">
+          <Sidebar.Group
+            label="즐겨찾기"
+            onItemMove={(move) => setFavorites((current) => Sidebar.moveItem(current, move))}
+          >
+            {favorites.map(renderFavorite)}
+          </Sidebar.Group>
+        </Sidebar>
+        <Sidebar.Inset className="p-6">
+          <Skeleton className="h-64" />
+        </Sidebar.Inset>
+      </Sidebar.Provider>
+    );
+  },
 };
 
 export const MobileDrawer: Story = {

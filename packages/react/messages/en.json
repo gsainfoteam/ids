@@ -224,6 +224,12 @@
   },
   "sidebar": {
     "collapse": "Collapse sidebar",
+    "drag": {
+      "cancel": "Returned {item} to its place.",
+      "end": "Moved {item}.",
+      "hint": "Use Alt and the arrow keys to reorder and nest.",
+      "start": "Picked up {item}."
+    },
     "expand": "Expand sidebar",
     "label": "Sidebar",
     "open": "Open menu"

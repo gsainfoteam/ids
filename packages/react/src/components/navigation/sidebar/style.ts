@@ -42,6 +42,16 @@ export const sidebarStyle = tv({
     title: 'text-body-b3-medium',
     end: '',
     submenuTrigger: 'data-hovered:bg-transparent data-active:bg-transparent',
+    dragFrame: [
+      'relative w-full min-w-0 data-dragging:opacity-40',
+      'data-[drop=inside]:[&>[data-sidebar-item]]:bg-(--ids-color-secondary) data-[drop=inside]:[&>[data-sidebar-item]]:text-(--ids-color-on-secondary)',
+    ],
+    dropLine: [
+      'pointer-events-none absolute inset-x-1 z-10 h-0.5 rounded-full bg-(--ids-color-primary)',
+      'data-[position=before]:-top-px data-[position=after]:-bottom-px',
+    ],
+    dragPreview:
+      'w-max max-w-60 cursor-grabbing bg-(--ids-color-surface) px-2 shadow-lg concentric-p-0',
     inset: 'flex min-w-0 flex-1 flex-col',
     provider: 'group/sidebar-provider flex min-h-dvh w-full',
   },

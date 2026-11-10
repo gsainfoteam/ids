@@ -226,6 +226,12 @@ export const messages = {
   },
   sidebar: {
     collapse: '사이드바 접기',
+    drag: {
+      cancel: '{item}을(를) 제자리에 두었습니다.',
+      end: '{item}을(를) 옮겼습니다.',
+      hint: 'Alt와 방향키로 순서와 단계를 바꿉니다.',
+      start: '{item}을(를) 집었습니다.',
+    },
     expand: '사이드바 펼치기',
     label: '사이드바',
     open: '메뉴 열기',

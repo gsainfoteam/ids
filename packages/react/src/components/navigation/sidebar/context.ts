@@ -1,10 +1,11 @@
 'use client';
 
-import { createContext, use } from 'react';
+import { createContext, use, type ReactNode } from 'react';
 
 import { invariant } from '../../../utils';
 
 import type { SidebarCollapsibleMode, SidebarVariant, sidebarStyle } from './style';
+import type { SidebarDrop, SidebarMoveKey } from './tree';
 import type { Hotkey } from '@tanstack/react-hotkeys';
 
 export type SidebarControls = {
@@ -46,6 +47,19 @@ export type SidebarProviderContextValue = {
 export const SidebarProviderContext = createContext<SidebarProviderContextValue | null>(null);
 
 export const SidebarListContext = createContext(false);
+
+export const SidebarFoldedContext = createContext(false);
+
+export type SidebarSortableValue = {
+  drop: SidebarDrop | null;
+  dragging: string | null;
+  revealed: { value: string; times: number } | null;
+  hintId: string;
+  register: (value: string, frame: { element: HTMLElement; preview: ReactNode }) => () => void;
+  moveByKey: (value: string, direction: SidebarMoveKey) => boolean;
+};
+
+export const SidebarSortableContext = createContext<SidebarSortableValue | null>(null);
 
 export function useSidebarContext(part: string) {
   const context = use(SidebarContext);

@@ -8,6 +8,7 @@ import { SidebarItem, type SidebarItemProps } from './item';
 import { SidebarProvider, type SidebarProviderProps } from './provider';
 import { SidebarRoot } from './root';
 import { sidebarStyle, type SidebarCollapsibleMode, type SidebarVariant } from './style';
+import { moveSidebarItem, type SidebarItemMove, type SidebarMovableItem } from './tree';
 import { SidebarTrigger, type SidebarTriggerProps } from './trigger';
 import { findElementOfType } from '../../../utils';
 
@@ -48,7 +49,12 @@ export namespace Sidebar {
   export const Item = SidebarItem;
   export namespace Item {
     export type Props = SidebarItemProps;
+    export type Move = SidebarItemMove;
   }
+
+  export type MovableItem<T> = SidebarMovableItem<T>;
+
+  export const moveItem = moveSidebarItem;
 
   export const Footer = SidebarFooter;
   export namespace Footer {
