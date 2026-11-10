@@ -42,7 +42,7 @@ final providerUseCases = [
           builder: (context) {
             final scope = IdsProvider.of(context);
             final theme = scope.theme;
-            return ColoredBox(
+            return Material(
               color: theme.surface,
               child: Center(
                 child: SizedBox(
