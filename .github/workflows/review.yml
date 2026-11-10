@@ -15,6 +15,6 @@ permissions:
 jobs:
   review:
     if: vars.ENABLE_CLAUDE_REVIEW == 'true'
-    uses: rhseung/claude-review-plugin/.github/workflows/review.yml@v1
+    uses: rhseung/claude-review-plugin/.github/workflows/review.yml@2fa5d4bb8b4e8896757861d7d53237bb2f7bdeac
     secrets:
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
