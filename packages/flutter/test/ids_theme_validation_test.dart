@@ -104,33 +104,42 @@ void main() {
     }
   });
 
-  testWidgets(
-    'invalid palette requests preserve state and do not call the callback in debug builds',
-    (tester) async {
-      late IdsScope scope;
-      final changes = <IdsPalette>[];
-      await tester.pumpWidget(
-        IdsProvider(
-          theme: const IdsThemeData(),
-          defaultPalette: testPalette,
-          onPaletteChange: changes.add,
-          child: Builder(
-            builder: (context) {
-              scope = IdsProvider.of(context);
-              return const SizedBox();
-            },
+  for (final controlled in [false, true]) {
+    testWidgets(
+      'invalid palette requests preserve state and do not call the callback (controlled: $controlled)',
+      (tester) async {
+        late IdsScope scope;
+        final changes = <IdsPalette>[];
+        await tester.pumpWidget(
+          IdsProvider(
+            theme: const IdsThemeData(),
+            palette: controlled ? testPalette : null,
+            defaultPalette: controlled ? null : testPalette,
+            onPaletteChange: changes.add,
+            child: Builder(
+              builder: (context) {
+                scope = IdsProvider.of(context);
+                return const SizedBox();
+              },
+            ),
           ),
-        ),
-      );
-      expect(
-        () => scope.setColor(
-          paletteWithPrimary(testPalette.shade600.withValues(alpha: .5)),
-        ),
-        throwsAssertionError,
-      );
-      await tester.pump();
-      expect(scope.palette, testPalette);
-      expect(changes, isEmpty);
-    },
-  );
+        );
+        expect(
+          () => scope.setColor(
+            paletteWithPrimary(testPalette.shade600.withValues(alpha: .5)),
+          ),
+          throwsA(
+            isA<ArgumentError>().having(
+              (error) => error.message,
+              'message',
+              'Palette shade 600 must be an opaque sRGB color.',
+            ),
+          ),
+        );
+        await tester.pump();
+        expect(scope.palette, testPalette);
+        expect(changes, isEmpty);
+      },
+    );
+  }
 }

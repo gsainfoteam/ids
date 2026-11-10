@@ -86,7 +86,8 @@ class _IdsProviderState extends State<IdsProvider> with WidgetsBindingObserver {
       return;
     }
     if (palette == _effectivePalette) return;
-    assert(palette.check().isEmpty, palette.check().join('\n'));
+    final issues = palette.check();
+    if (issues.isNotEmpty) throw ArgumentError(issues.join('\n'));
     if (widget.palette == null) setState(() => _palette = palette);
     widget.onPaletteChange?.call(palette);
   }

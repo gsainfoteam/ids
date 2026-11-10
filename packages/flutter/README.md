@@ -134,6 +134,8 @@ return IdsProvider(
 
 `IdsPalette`는 `shade50`, `shade100`, …, `shade900`, `shade950`의 11개 opaque sRGB 색을 필수로 받는다. 역할 색은 IDS-19의 대비 규칙으로 선택한다. `palette.check()`는 두 모드의 문제 목록을 반환한다. 통과하는 역할 색이 없으면 `resolve`가 오류를 낸다.
 
+`setColor()`는 모든 빌드 모드에서 변경할 팔레트를 검증한다. 문제가 있으면 상태 변경과 `onPaletteChange` 호출 전에 `ArgumentError`를 던진다.
+
 `IdsThemeData(radius: 12, fontFamily: 'App Sans', cornerShape: IdsCornerShape.squircle)`로 외형을 지정한다. 기본 radius는 10이고 indicator는 ×0.4, container는 ×1.6이다. 기본 sans는 패키지의 Pretendard GOV Variable이며 `fontPackage`로 다른 패키지 글꼴도 지정할 수 있다. `monoFontFamily`와 `monoFontPackage`는 고정폭 글꼴에 사용한다. `theme.check()`는 잘못된 radius와 빈 글꼴 이름을 보고한다.
 
 `theme.shape()`는 round일 때 `RoundedRectangleBorder`, squircle일 때 `ContinuousRectangleBorder`를 반환한다. 반경은 기본적으로 `theme.radius.standard`이며, 호출할 때 다른 반경을 지정할 수 있다. Provider는 컨테이너의 여백과 자식 구조를 읽지 않는다. 중첩 여백으로 바깥 반경을 구하는 동심 모서리는 컨테이너·레이아웃 계층의 범위이며 이 API에 포함하지 않는다.
