@@ -3,6 +3,13 @@ import { tv } from '../../../utils';
 export type SidebarVariant = 'sidebar' | 'floating' | 'inset';
 export type SidebarCollapsibleMode = 'icon' | 'offcanvas';
 export type SidebarPanelState = 'expanded' | 'rail' | 'hidden';
+export type SidebarIconColorScheme =
+  | 'neutral'
+  | 'primary'
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'danger';
 
 export const sidebarStyle = tv({
   slots: {
@@ -37,7 +44,8 @@ export const sidebarStyle = tv({
     subTree: 'ms-[15.5px] flex min-w-0 pt-0.5',
     subList: 'flex min-w-0 flex-1 flex-col gap-px ps-[7.5px]',
     item: 'concentric-p-0 px-2',
-    media: 'w-4 justify-center',
+    media: 'w-4 justify-center [&>svg]:stroke-2',
+    icon: '',
     label: 'min-w-0',
     title: 'text-body-b3-medium',
     end: '',
@@ -50,8 +58,7 @@ export const sidebarStyle = tv({
       'pointer-events-none absolute inset-x-1 z-10 h-0.5 rounded-full bg-(--ids-color-primary)',
       'data-[position=before]:-top-px data-[position=after]:-bottom-px',
     ],
-    dragPreview:
-      'w-full cursor-grabbing bg-(--ids-color-surface) opacity-75 shadow-lg',
+    dragPreview: 'w-full cursor-grabbing bg-(--ids-color-surface) opacity-75 shadow-lg',
     inset: 'flex min-w-0 flex-1 flex-col',
     provider: 'group/sidebar-provider flex min-h-dvh w-full',
   },
@@ -73,6 +80,14 @@ export const sidebarStyle = tv({
       hidden: { root: 'p-0', panel: 'w-0', divider: 'hidden' },
     } satisfies Record<SidebarPanelState, object>,
     standalone: { true: {}, false: { root: 'max-sm:hidden' } },
+    iconColor: {
+      neutral: {},
+      primary: { icon: 'text-(--ids-color-accent)' },
+      info: { icon: 'text-(--ids-color-info-strong)' },
+      success: { icon: 'text-(--ids-color-success-strong)' },
+      warning: { icon: 'text-(--ids-color-warning-strong)' },
+      danger: { icon: 'text-(--ids-color-danger-strong)' },
+    } satisfies Record<SidebarIconColorScheme, object>,
     touch: {
       true: {
         header: 'gap-3 ps-5 pt-4',

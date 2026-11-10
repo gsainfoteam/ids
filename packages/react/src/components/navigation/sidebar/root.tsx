@@ -122,7 +122,7 @@ export function SidebarRoot({
   const panelContent = (
     <>
       {header ?? (addsHeader && <SidebarHeader />)}
-      <ScrollArea className={styles.scroll()}>
+      <ScrollArea fade="y" className={styles.scroll()}>
         <nav aria-label={label} className={styles.nav()}>
           {body}
         </nav>

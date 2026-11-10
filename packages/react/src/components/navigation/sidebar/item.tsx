@@ -6,6 +6,7 @@ import { SidebarListContext, SidebarSortableContext, useSidebarContext } from '.
 import { linkChildrenOf, linkElementOf, splitItemChildren } from './item-children';
 import { SidebarRow } from './row';
 import { SidebarDragFrame } from './sortable';
+import { type SidebarIconColorScheme } from './style';
 import { SidebarAccordionSubmenu, SidebarMenuSubmenu } from './submenu';
 import { Item } from '../../data/item';
 import { Tooltip } from '../../overlay/tooltip';
@@ -15,6 +16,7 @@ export type SidebarItemProps = Omit<ComponentProps<'a'>, 'children' | 'href'> & 
   href?: string;
   asChild?: boolean;
   disabled?: boolean;
+  colorScheme?: SidebarIconColorScheme;
   children?: ReactNode;
 };
 
@@ -23,6 +25,7 @@ export function SidebarItem({
   href,
   asChild = false,
   disabled = false,
+  colorScheme,
   className,
   children,
   onClick,
@@ -39,19 +42,25 @@ export function SidebarItem({
   const row =
     parts.subItems.length > 0 ? (
       sidebar.rail ? (
-        <SidebarMenuSubmenu parts={parts} disabled={disabled} className={className} />
+        <SidebarMenuSubmenu
+          parts={parts}
+          disabled={disabled}
+          colorScheme={colorScheme}
+          className={className}
+        />
       ) : (
         <SidebarAccordionSubmenu
           value={value}
           parts={parts}
           disabled={disabled}
+          colorScheme={colorScheme}
           className={className}
         />
       )
     ) : (
       <SidebarDragFrame
         value={value}
-        preview={<SidebarRow parts={parts} styles={sidebar.styles} />}
+        preview={<SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />}
       >
         <Tooltip content={parts.label} side="right" disabled={!sidebar.rail}>
           <Item
@@ -76,7 +85,7 @@ export function SidebarItem({
                   sidebar.navigate();
                 },
               },
-              <SidebarRow parts={parts} styles={sidebar.styles} />,
+              <SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />,
             )}
           </Item>
         </Tooltip>

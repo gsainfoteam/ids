@@ -1,12 +1,22 @@
+import type { ReactNode } from 'react';
+
+import {
+  CameraIcon as CameraSolid,
+  CpuChipIcon as CpuChipSolid,
+  MusicalNoteIcon as MusicalNoteSolid,
+} from '@heroicons/react/16/solid';
 import {
   BellIcon,
   BookmarkIcon,
+  CakeIcon,
   CalendarDaysIcon,
+  ChatBubbleLeftRightIcon,
   ChevronUpDownIcon,
   CubeTransparentIcon,
   DocumentTextIcon,
   HomeIcon,
   MegaphoneIcon,
+  NewspaperIcon,
   TruckIcon,
 } from '@heroicons/react/24/outline';
 
@@ -34,21 +44,77 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const GROUPS = [
+type Entry = {
+  id: string;
+  label: string;
+  icon: ReactNode;
+  colorScheme?: Sidebar.Item.Props['colorScheme'];
+  badge?: ReactNode;
+};
+
+const GROUPS: { label: string; items: Entry[] }[] = [
   {
     label: '둘러보기',
     items: [
       { id: 'home', label: '홈', icon: <HomeIcon /> },
-      { id: 'board', label: '게시판', icon: <MegaphoneIcon />, count: 12 },
-      { id: 'shuttle', label: '셔틀', icon: <TruckIcon /> },
+      {
+        id: 'board',
+        label: '게시판',
+        icon: <NewspaperIcon />,
+        badge: <Badge content={12} variant="soft" colorScheme="primary" />,
+      },
+      {
+        id: 'notice',
+        label: '공지',
+        icon: <MegaphoneIcon />,
+        badge: <Badge content="새 글" variant="soft" colorScheme="danger" />,
+      },
+      {
+        id: 'shuttle',
+        label: '셔틀',
+        icon: <TruckIcon />,
+        badge: <Badge content="운행 중" variant="outline" colorScheme="success" />,
+      },
+      { id: 'meal', label: '오늘의 식단', icon: <CakeIcon /> },
     ],
   },
   {
     label: '내 활동',
     items: [
       { id: 'posts', label: '내 글', icon: <DocumentTextIcon /> },
-      { id: 'bookmarks', label: '북마크', icon: <BookmarkIcon />, count: 3 },
-      { id: 'reservations', label: '예약', icon: <CalendarDaysIcon /> },
+      {
+        id: 'comments',
+        label: '받은 댓글',
+        icon: <ChatBubbleLeftRightIcon />,
+        badge: <Badge content={4} variant="soft" colorScheme="info" />,
+      },
+      { id: 'bookmarks', label: '북마크', icon: <BookmarkIcon /> },
+      {
+        id: 'reservations',
+        label: '예약',
+        icon: <CalendarDaysIcon />,
+        badge: <Badge content="D-2" variant="soft" colorScheme="warning" />,
+      },
+    ],
+  },
+  {
+    label: '내 동아리',
+    items: [
+      {
+        id: 'photo',
+        label: '사진부',
+        icon: <CameraSolid />,
+        colorScheme: 'warning',
+        badge: <Badge dot colorScheme="success" />,
+      },
+      { id: 'band', label: '밴드부 소리샘', icon: <MusicalNoteSolid />, colorScheme: 'danger' },
+      {
+        id: 'robot',
+        label: '로봇 연구회',
+        icon: <CpuChipSolid />,
+        colorScheme: 'info',
+        badge: <Badge dot colorScheme="warning" />,
+      },
     ],
   },
 ];
@@ -70,10 +136,15 @@ export const PC: Story = {
         {GROUPS.map((group) => (
           <Sidebar.Group key={group.label} label={group.label}>
             {group.items.map((item) => (
-              <Sidebar.Item key={item.id} value={item.id} href={`#${item.id}`}>
+              <Sidebar.Item
+                key={item.id}
+                value={item.id}
+                href={`#${item.id}`}
+                colorScheme={item.colorScheme}
+              >
                 {item.icon}
                 {item.label}
-                {item.count && <Badge content={item.count} variant="soft" />}
+                {item.badge}
               </Sidebar.Item>
             ))}
           </Sidebar.Group>

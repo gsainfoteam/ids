@@ -15,7 +15,7 @@ import {
   splitItemChildren,
   type ItemParts,
 } from './item-children';
-import { SidebarRow } from './row';
+import { SidebarRow, tintedIcon } from './row';
 import { SidebarDragFrame } from './sortable';
 import { cn, elementTypeOf } from '../../../utils';
 import { Accordion } from '../../data/accordion';
@@ -24,17 +24,25 @@ import { Divider } from '../../layout/divider';
 import { Menu } from '../../overlay/menu';
 
 import type { SidebarItemProps } from './item';
+import type { SidebarIconColorScheme } from './style';
 
 const SUBMENU = 'submenu';
 
 type SubmenuProps = {
   value?: string;
+  colorScheme?: SidebarIconColorScheme;
   parts: ItemParts<SidebarItemProps>;
   disabled: boolean;
   className: string | undefined;
 };
 
-export function SidebarAccordionSubmenu({ value, parts, disabled, className }: SubmenuProps) {
+export function SidebarAccordionSubmenu({
+  value,
+  parts,
+  disabled,
+  colorScheme,
+  className,
+}: SubmenuProps) {
   const sidebar = useSidebarContext('Sidebar.Item');
   const sortable = use(SidebarSortableContext);
   const folded = use(SidebarFoldedContext);
@@ -67,7 +75,9 @@ export function SidebarAccordionSubmenu({ value, parts, disabled, className }: S
           <div>
             <SidebarDragFrame
               value={value}
-              preview={<SidebarRow parts={parts} styles={sidebar.styles} />}
+              preview={
+                <SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />
+              }
             >
               <Item
                 asChild
@@ -84,7 +94,7 @@ export function SidebarAccordionSubmenu({ value, parts, disabled, className }: S
                   data-sidebar-item=""
                   data-sidebar-value={value}
                 >
-                  <SidebarRow parts={parts} styles={sidebar.styles} />
+                  <SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />
                 </Accordion.Trigger>
               </Item>
             </SidebarDragFrame>
@@ -107,7 +117,7 @@ export function SidebarAccordionSubmenu({ value, parts, disabled, className }: S
 
 function SidebarMenuEntry({ item }: { item: ReactElement<SidebarItemProps> }) {
   const sidebar = useSidebarContext('Sidebar.Item');
-  const { value, href, asChild, disabled, children, className, ...rest } = item.props;
+  const { value, href, asChild, disabled, colorScheme, children, className, ...rest } = item.props;
   const parts = splitItemChildren<SidebarItemProps>(
     linkChildrenOf({ asChild, children }),
     elementTypeOf(item),
@@ -118,7 +128,7 @@ function SidebarMenuEntry({ item }: { item: ReactElement<SidebarItemProps> }) {
     return (
       <Menu>
         <Menu.Trigger disabled={disabled} className={className}>
-          {parts.icon}
+          {tintedIcon(parts.icon, colorScheme)}
           {parts.label}
         </Menu.Trigger>
         <Menu.Content>
@@ -135,7 +145,7 @@ function SidebarMenuEntry({ item }: { item: ReactElement<SidebarItemProps> }) {
         { href, asChild, children },
         { ...rest, 'aria-current': current ? 'page' : undefined },
         <>
-          {parts.icon}
+          {tintedIcon(parts.icon, colorScheme)}
           {parts.label}
           {parts.end}
         </>,
@@ -144,7 +154,7 @@ function SidebarMenuEntry({ item }: { item: ReactElement<SidebarItemProps> }) {
   );
 }
 
-export function SidebarMenuSubmenu({ parts, disabled, className }: SubmenuProps) {
+export function SidebarMenuSubmenu({ parts, disabled, colorScheme, className }: SubmenuProps) {
   const sidebar = useSidebarContext('Sidebar.Item');
 
   return (
@@ -160,7 +170,7 @@ export function SidebarMenuSubmenu({ parts, disabled, className }: SubmenuProps)
           className={sidebar.styles.item({ className })}
         >
           <button type="button" disabled={disabled} data-sidebar-item="">
-            <SidebarRow parts={parts} styles={sidebar.styles} />
+            <SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />
           </button>
         </Item>
       </Menu.Trigger>

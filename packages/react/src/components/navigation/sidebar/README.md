@@ -50,7 +50,7 @@ import { Badge, Sidebar } from '@gsainfoteam/ids-react';
 | `Sidebar.Provider` | 선택. 사이드바와 본문을 감싸고, 밖의 `Trigger` 와 `Inset` 이 사이드바의 상태를 함께 쓴다 |
 | `Sidebar.Inset`    | 선택. 본문 `<main>`. `variant="inset"` 이면 카드 표면으로 뜬다                            |
 
-- Header, Footer 밖의 자식은 가운데 스크롤 영역(ScrollArea)의 `<nav>` 에 들어갑니다. Group 밖의 Item 은 이어진 것끼리 `<ul>` 하나로 묶입니다.
+- Header, Footer 밖의 자식은 가운데 스크롤 영역(ScrollArea)의 `<nav>` 에 들어갑니다. 위아래에 더 내용이 있으면 그 끝이 흐려집니다(`fade`). Group 밖의 Item 은 이어진 것끼리 `<ul>` 하나로 묶입니다.
 - Header 를 생략해도 `collapsible` 이면 접기 버튼만 있는 줄이 생깁니다. `Sidebar.Trigger` 를 직접 두면 저절로 붙지 않습니다.
 - 사이드바의 이름은 `aria-label` 로 줍니다. 기본은 "사이드바" 이고 `<aside>`, `<nav>`, Drawer 가 같은 이름을 씁니다.
 
@@ -78,6 +78,22 @@ import { Badge, Sidebar } from '@gsainfoteam/ids-react';
 - 칸은 자식 순서로 정합니다. 글자보다 앞의 첫 요소가 아이콘, 글자가 라벨, 라벨 뒤의 요소가 끝 칸입니다. 글자가 없으면 아이콘 다음 요소가 라벨입니다.
 - 링크의 이름은 라벨입니다. 끝 칸의 Badge 는 이름에 들어가지 않습니다.
 - `asChild` 의 자식은 ref 와 `onClick` 을 받는 링크 하나여야 합니다.
+
+### 아이콘 색
+
+```tsx
+import { CodeBracketIcon } from '@heroicons/react/16/solid';
+
+<Sidebar.Item value="frontend" colorScheme="info">
+  <CodeBracketIcon />
+  프론트엔드
+</Sidebar.Item>
+```
+
+- `colorScheme` 은 아이콘 칸만 칠합니다. `neutral`(기본) / `primary` / `info` / `success` / `warning` / `danger` 중에서 고릅니다.
+- 라벨과 배경은 그대로입니다. 아이콘 띠의 하위 Menu 와 끌기 복사본에서도 같은 색을 씁니다.
+- 팀이나 프로젝트처럼 서로 구별해야 하는 항목에는 채워진 아이콘(`@heroicons/react/16/solid`)에 색을 주고, 메뉴 항목은 선 아이콘(`24/outline`)으로 둡니다.
+- 아이콘 칸의 선 아이콘은 선 굵기 2로 그립니다. 16px 에서 1.5 는 너무 가늘어 보입니다.
 
 ## 하위 메뉴
 
@@ -136,6 +152,29 @@ const item = (doc: Doc) => (
 - 옮긴 항목이 접힌 하위 메뉴 안으로 들어가면 그 하위 메뉴를 펼칩니다.
 - `onItemMove` 는 `{ value, parent, index }` 를 줍니다. `parent` 는 새 부모의 `value` 이고 묶음의 맨 위 단계면 `null` 입니다. `index` 는 옮긴 뒤 새 부모 안에서의 자리입니다.
 - `Sidebar.moveItem(items, move)` 는 `{ value, children? }` 모양의 트리에 이 이동을 적용한 새 배열을 돌려줍니다. 다른 모양의 데이터는 `move` 를 직접 읽어 옮깁니다.
+- 옮기기 전에 확인을 받으려면 `onItemMove` 에서 `overlay.open` 을 기다린 뒤 적용합니다. 취소하면 아무것도 바뀌지 않습니다.
+
+```tsx
+<Sidebar.Group
+  label="즐겨찾기"
+  onItemMove={async (move) => {
+    const confirmed = await overlay.open<boolean>(({ close }) => (
+      <Dialog>
+        <Dialog.Content>
+          <Dialog.Header>
+            <Dialog.Title>페이지를 옮길까요?</Dialog.Title>
+          </Dialog.Header>
+          <Dialog.Footer>
+            <Dialog.Close>취소</Dialog.Close>
+            <Button onClick={() => close(true)}>옮기기</Button>
+          </Dialog.Footer>
+        </Dialog.Content>
+      </Dialog>
+    ));
+    if (confirmed) setDocs((current) => Sidebar.moveItem(current, move));
+  }}
+>
+```
 - 아이콘 띠와 640px 아래의 Drawer 에서는 끌지 않습니다.
 
 ## 접기
@@ -232,7 +271,7 @@ export default async function Layout({ children }) {
 | `persist`                                    | 접힘 상태를 쓸 쿠키 이름                                            |
 | `aria-label`                                 | 사이드바의 이름. 기본 "사이드바"                                    |
 | `Sidebar.Group`                              | `label`, `collapsible`, `defaultOpen`(`true`), `onItemMove`         |
-| `Sidebar.Item`                               | `value`, `href`, `asChild`, `disabled`, `onClick`                   |
+| `Sidebar.Item`                               | `value`, `href`, `asChild`, `disabled`, `onClick`, `colorScheme`    |
 | `Sidebar.Trigger`                            | IconButton 의 속성. `icon` 으로 아이콘을 바꾼다                     |
 | `Sidebar.Provider`, `Sidebar.Inset`          | `asChild` 로 다른 요소에 붙인다                                     |
 | `Sidebar.moveItem(items, move)`              | `onItemMove` 의 이동을 `{ value, children? }` 트리에 적용한 새 배열 |
