@@ -114,7 +114,9 @@ test('without a caption, the first line wraps before the copy button', async () 
       <CodeBlock wrap>{'x'.repeat(200)}</CodeBlock>
     </div>,
   );
-  const firstRow = screen.container.querySelector('[data-line="1"] > span')!.getClientRects()[0]!;
+  const firstLineText = document.createRange();
+  firstLineText.selectNodeContents(screen.container.querySelector('[data-line="1"]')!);
+  const firstRow = firstLineText.getClientRects()[0]!;
   const button = screen.getByRole('button', { name: '코드 복사' }).element();
 
   expect(firstRow.right).toBeLessThanOrEqual(button.getBoundingClientRect().left);
