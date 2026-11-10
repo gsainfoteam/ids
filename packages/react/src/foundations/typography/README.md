@@ -29,8 +29,9 @@
 
 ## 글꼴
 
-- 본문은 Pretendard GOV Variable(`font-sans`, 기본), 코드와 값은 Monaspace Neon(`font-mono`)입니다.
-- `font-mono` 는 같은 텍스트 스타일 안에서 x-height 를 95% 로 맞춥니다. 폭이 넓은 고정폭 글자가 본문 줄에서 튀지 않으니 따로 줄이지 않습니다.
+- 본문은 Pretendard GOV Variable(`font-sans`, 기본), 코드와 값은 Geist Mono(`font-mono`)입니다.
+- `font-mono` 는 x-height 를 본문과 같게 맞춥니다. 고정폭 글자가 본문 줄에서 튀지 않으니 따로 줄이지 않습니다.
+- 코드 안의 한글은 Pretendard 로 그립니다.
 
 ```tsx
 <p className="text-body-b2-regular">
