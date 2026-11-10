@@ -65,7 +65,7 @@ export const PC: Story = {
           <p className="text-body-b1-regular">
             학교 공지와 시간표를 읽어 두었다가, 궁금한 걸 물으면 출처와 함께 알려 줘요.
           </p>
-          <Item.Group size="tiny" dense aria-label="도우미가 하는 일">
+          <Item.Group size="tiny" aria-label="도우미가 하는 일">
             {POINTS.map((point) => (
               <Item key={point}>
                 <Item.Media variant="soft">

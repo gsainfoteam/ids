@@ -41,7 +41,6 @@ const meta = {
   argTypes: {
     variant: { control: 'radio', options: variants },
     size: { control: 'radio', options: sizes },
-    dense: { control: 'boolean' },
     interactive: { control: 'boolean' },
     selected: { control: 'boolean' },
     disabled: { control: 'boolean' },
@@ -94,18 +93,23 @@ export const Gallery: Story = {
         />
       </Showcase.Section>
 
-      <Showcase.Section title="Dense · Variant × Size">
+      <Showcase.Section title="Tile × Text">
         <Showcase.Matrix
           rows={sizes}
-          columns={variants}
-          render={(size, variant) => (
-            <Item variant={variant} size={size} dense className="w-64">
+          columns={['title', 'one line', 'two lines'] as const}
+          render={(size, text) => (
+            <Item variant="outline" size={size} className="w-64">
               <Item.Media variant="soft">
                 <BellIcon />
               </Item.Media>
               <Item.Content>
-                <Item.Title>{variant}</Item.Title>
-                <Item.Description>size {size} · dense</Item.Description>
+                <Item.Title>알림</Item.Title>
+                {text === 'one line' && <Item.Description>새 댓글 3개</Item.Description>}
+                {text === 'two lines' && (
+                  <Item.Description>
+                    새 댓글 3개와 멘션 1개가 있습니다. 확인하지 않은 알림이 더 있습니다.
+                  </Item.Description>
+                )}
               </Item.Content>
             </Item>
           )}
@@ -121,6 +125,19 @@ export const Gallery: Story = {
               </Item.Media>
               <Item.Content>
                 <Item.Title>media {variant}</Item.Title>
+              </Item.Content>
+            </Item>
+          ))}
+        </Showcase.Row>
+        <Showcase.Row label="description">
+          {variants.map((variant) => (
+            <Item key={variant} variant="outline" className="w-56">
+              <Item.Media variant={variant}>
+                <InboxIcon />
+              </Item.Media>
+              <Item.Content>
+                <Item.Title>media {variant}</Item.Title>
+                <Item.Description>받은 편지 12통</Item.Description>
               </Item.Content>
             </Item>
           ))}
@@ -163,7 +180,7 @@ export const Gallery: Story = {
             <Item.Content>
               <Item.Title>회의록.md</Item.Title>
               <Item.Description>
-                설명이 두 줄을 넘으면 말줄임표로 줄고, 미디어는 첫 줄에 맞춰 위에 붙습니다. 이
+                설명이 두 줄을 넘으면 말줄임표로 줄고, 타일은 행 높이에 비례해 커집니다. 이
                 문장은 일부러 길게 썼습니다.
               </Item.Description>
             </Item.Content>
@@ -295,7 +312,7 @@ export const GroupVariant: Story = {
         ))}
       </Item.Group>
 
-      <Item.Group variant="separated" dense aria-label="첨부 파일">
+      <Item.Group variant="separated" aria-label="첨부 파일">
         {['보고서.pdf', '예산안.xlsx'].map((file) => (
           <Item key={file}>
             <Item.Media variant="soft">
@@ -563,10 +580,10 @@ const attachments = [
   { name: '회의록.md', size: '3 KB' },
 ];
 
-export const Dense: Story = {
+export const Attachments: Story = {
   render: () => (
     <div className="grid w-80">
-      <Item.Group dense aria-label="첨부 파일" className="gap-1">
+      <Item.Group variant="separated" aria-label="첨부 파일">
         {attachments.map((file) => (
           <Item key={file.name} variant="outline">
             <Item.Media variant="soft">
@@ -595,7 +612,7 @@ export const Dense: Story = {
     docs: {
       description: {
         story:
-          '`dense` 는 패딩을 반으로 줄여 첨부 파일이나 메뉴처럼 행이 많은 목록을 촘촘하게 보여 줍니다. `Item.Group` 에 주면 안의 행이 모두 따릅니다. `Item.Title truncate` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄이고, grid 안에서도 목록을 넓히지 않습니다. 타일 안의 이미지는 타일을 채웁니다.',
+          '타일과 그 둘레 여백은 행 높이에 비례해 함께 커지고, 왼쪽·위·아래 여백이 같습니다. `Item.Title truncate` 는 긴 파일 이름을 한 줄에서 말줄임표로 줄이고, grid 안에서도 목록을 넓히지 않습니다. 타일 안의 이미지는 타일을 채웁니다.',
       },
     },
   },
@@ -603,8 +620,11 @@ export const Dense: Story = {
     const rows = canvas.getAllByRole('listitem').map((item) => item.firstElementChild!);
     await expect(rows).toHaveLength(3);
     for (const row of rows) {
-      await expect(row).toHaveAttribute('data-dense');
-      await expect(getComputedStyle(row).paddingTop).toBe('6px');
+      const box = row.getBoundingClientRect();
+      const tile = row.querySelector('[data-item-media]')!.getBoundingClientRect();
+      const start = tile.left - box.left;
+      for (const inset of [tile.top - box.top, box.bottom - tile.bottom])
+        await expect(Math.abs(inset - start)).toBeLessThanOrEqual(1);
     }
     const list = canvas.getByRole('list');
     await expect(list.getBoundingClientRect().width).toBe(

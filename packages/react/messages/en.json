@@ -228,6 +228,22 @@
     "search": "Search options",
     "searchPlaceholder": "Search…"
   },
+  "sidebar": {
+    "collapse": "Collapse sidebar",
+    "drag": {
+      "after": "After {target}",
+      "before": "Before {target}",
+      "cancel": "Returned {item} to its place.",
+      "end": "Moved {item}.",
+      "hint": "Press Space to pick up, the up and down arrows to choose a place, and Enter to drop. Escape cancels.",
+      "inside": "Inside {target}",
+      "origin": "Original place",
+      "start": "Picked up {item}."
+    },
+    "expand": "Expand sidebar",
+    "label": "Sidebar",
+    "open": "Open menu"
+  },
   "slider": {
     "end": "End",
     "start": "Start"
