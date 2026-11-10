@@ -160,6 +160,8 @@ flutter analyze
 flutter test
 ```
 
-Widgetbook: `packages/flutter/example`에서 `flutter run`으로 사용 가능한 iOS 기기를 선택한다. 현재 예제에는 웹 플랫폼 설정이 없다. IdsProvider usecase는 radius, 모서리, 모드, slang 언어 전환과 누락된 문구의 한국어 fallback을 보여준다. 생성 fixture와 예제의 slang Dart 파일은 커밋하지 않으며, CI에서 위와 같은 순서로 생성한다.
+Widgetbook: `packages/flutter/example`에서 `flutter run`으로 사용 가능한 iOS 기기를 선택한다. 현재 예제에는 웹 플랫폼 설정이 없다. IdsProvider의 `Runtime theme and slang`은 파란색·보라색 팔레트, 색상 역할, radius, 모서리, 모드, slang 번역과 누락 문구의 한국어 fallback을 보여준다. locale은 번역과 별도로 변경한다. `Nested scopes`에서 부모·상속 자식·독립 자식·형제의 팔레트 변경 범위를 비교할 수 있다.
+
+글꼴 비교의 Helvetica·Times·Courier는 macOS 시스템 글꼴이다. 다른 플랫폼에서는 해당 글꼴이 없으면 시스템 fallback을 사용한다. `Text scale (MediaQuery)`는 예제에 접근성 배율을 주입한다. IDS의 scale API가 아니며, `System`은 플랫폼이 제공한 배율을 유지한다. 생성 fixture와 예제의 slang Dart 파일은 커밋하지 않으며, CI에서 위와 같은 순서로 생성한다.
 
 배율 정책과 intl/gen_l10n 객체의 직접 연동은 이번 구현에 포함하지 않는다.

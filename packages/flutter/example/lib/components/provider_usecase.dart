@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../i18n/translations.g.dart';
 import '../ids_theme.dart';
+import 'provider_preview.dart';
 
 final providerUseCases = [
   WidgetbookUseCase(
@@ -25,74 +26,50 @@ final providerUseCases = [
         options: IdsMode.values,
         labelBuilder: (value) => value.name,
       );
-      final english = context.knobs.boolean(
-        label: 'English',
-        initialValue: false,
+      final purple = context.knobs.boolean(label: 'Purple palette');
+      final font = context.knobs.object.dropdown(
+        label: 'Service font (macOS)',
+        options: ['IDS default', 'Helvetica', 'Times'],
       );
-      final IdsMessages translation = (english ? AppLocale.en : AppLocale.ko)
-          .buildSync()
-          .ids;
-      return IdsProvider(
-        theme: IdsThemeData(radius: radius, cornerShape: corner),
-        palette: brandPalette,
-        mode: mode,
-        translation: translation,
-        locale: Locale(english ? 'en' : 'ko'),
-        child: Builder(
-          builder: (context) {
-            final scope = IdsProvider.of(context);
-            final theme = scope.theme;
-            return Material(
-              color: theme.surface,
-              child: Center(
-                child: SizedBox(
-                  width: 320,
-                  child: DecoratedBox(
-                    decoration: ShapeDecoration(
-                      color: theme.secondary,
-                      shape: theme.shape(side: BorderSide(color: theme.border)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 16,
-                        children: [
-                          const IdsLabel(child: Text('IDS')),
-                          IconTheme(
-                            data: IconThemeData(
-                              color: theme.onSecondary,
-                              size: 20,
-                            ),
-                            child: const IdsSpinner(),
-                          ),
-                          Text(
-                            translation.spinnerLabel ??
-                                IdsMessages.ko.spinnerLabel,
-                            style: theme.textStyle(
-                              IdsTypography.bodyB3Regular,
-                              color: theme.onSecondary,
-                            ),
-                          ),
-                          const IdsDivider(),
-                          Text(
-                            translation.dialogClose ??
-                                IdsMessages.ko.dialogClose,
-                            style: theme.textStyle(
-                              IdsTypography.captionC1Regular,
-                              color: theme.onSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+      final courier = context.knobs.boolean(label: 'Service mono (Courier)');
+      final language = context.knobs.object.dropdown(
+        label: 'Translation',
+        options: ['Korean', 'English', 'None'],
+      );
+      final englishLocale = context.knobs.boolean(label: 'English IDS locale');
+      final scale = context.knobs.object.dropdown(
+        label: 'Text scale (MediaQuery)',
+        options: ['System', '1.0', '2.0', '3.0'],
+      );
+      return ProviderPreview(
+        theme: IdsThemeData(
+          radius: radius,
+          cornerShape: corner,
+          fontFamily: font == 'IDS default'
+              ? IdsTypography.sansFontFamily
+              : font,
+          monoFontFamily: courier ? 'Courier' : 'monospace',
         ),
+        palette: purple ? purplePalette : brandPalette,
+        mode: mode,
+        translation: language == 'None'
+            ? null
+            : (language == 'English' ? AppLocale.en : AppLocale.ko)
+                  .buildSync()
+                  .ids,
+        locale: Locale(englishLocale ? 'en' : 'ko'),
+        textScale: double.tryParse(scale),
       );
     },
+  ),
+  WidgetbookUseCase(
+    name: 'Nested scopes',
+    builder: (context) => NestedProviderPreview(
+      mode: context.knobs.object.dropdown(
+        label: 'Mode',
+        options: IdsMode.values,
+        labelBuilder: (value) => value.name,
+      ),
+    ),
   ),
 ];
