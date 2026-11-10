@@ -371,9 +371,10 @@ export const RouterLinks: Story = {
 };
 
 export const Tree: Story = {
-  render: () => (
+  args: { value: 'frontend-active' },
+  render: (args) => (
     <Sidebar.Provider>
-      <Sidebar value="frontend-active" collapsible aria-label="워크스페이스">
+      <Sidebar {...args} aria-label="워크스페이스">
         <Sidebar.Header>
           <Avatar name="GIST 인포팀" shape="square" size="tiny" aria-hidden>
             <Avatar.Fallback>
@@ -587,7 +588,8 @@ const findPage = (pages: Page[], value: string): Page | undefined => {
 };
 
 export const Reorder: Story = {
-  render: function Render() {
+  args: { value: 'color' },
+  render: function Render(args) {
     const [favorites, setFavorites] = useState(FAVORITES);
     const [projects, setProjects] = useState(PROJECTS);
 
@@ -632,7 +634,7 @@ export const Reorder: Story = {
 
     return (
       <Sidebar.Provider className="break-keep">
-        <Sidebar value="color" aria-label="워크스페이스">
+        <Sidebar {...args} aria-label="워크스페이스">
           <Sidebar.Item value="inbox" href="#inbox">
             <InboxIcon />
             받은 소식
