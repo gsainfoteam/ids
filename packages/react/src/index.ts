@@ -157,6 +157,14 @@ export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './componen
 export { Select } from './components/form/select';
 export type { SelectProps, SelectVariant } from './components/form/select';
 
+export { PromptInput } from './components/form/prompt-input';
+export type {
+  PromptInputMessage,
+  PromptInputProps,
+  PromptInputStatus,
+  PromptInputVariant,
+} from './components/form/prompt-input';
+
 export { TelField } from './components/form/tel-field';
 export type { TelFieldProps, TelFieldFormat } from './components/form/tel-field';
 
