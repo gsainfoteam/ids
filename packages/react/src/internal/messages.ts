@@ -204,6 +204,16 @@ export const messages = {
   popover: {
     close: '닫기',
   },
+  promptInput: {
+    actions: '더하기',
+    attach: '파일 첨부',
+    attachments: '첨부한 파일',
+    label: '메시지',
+    placeholder: '메시지를 입력하세요',
+    send: '보내기',
+    sending: '보내는 중',
+    stop: '멈추기',
+  },
   qrCode: {
     label: 'QR 코드',
   },
