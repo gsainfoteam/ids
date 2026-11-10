@@ -8,12 +8,12 @@ import {
   MeasuringStrategy,
   MouseSensor,
   TouchSensor,
-  pointerWithin,
   useDraggable,
   useDroppable,
   useSensor,
   useSensors,
   type Announcements,
+  type CollisionDetection,
   type DragMoveEvent,
   type UniqueIdentifier,
 } from '@dnd-kit/core';
@@ -33,6 +33,7 @@ import {
   isInside,
   keyboardStops,
   moveForDrop,
+  siblingKeysOf,
   type SidebarDescribedMove,
   type SidebarDrop,
   type SidebarKeyboardStop,
@@ -51,6 +52,26 @@ const POINTER_TRAVEL_BEFORE_DRAG = 4;
 const TOUCH_HOLD_BEFORE_DRAG = 250;
 const TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING = 5;
 const SPACE = ' ';
+const REACH_BEYOND_THE_ROWS = 36;
+const SAME_HEIGHT = 2;
+
+const rowAtThePointerHeight: CollisionDetection = ({
+  droppableContainers,
+  droppableRects,
+  pointerCoordinates,
+}) => {
+  if (!pointerCoordinates) return [];
+  const rows = droppableContainers.flatMap((container) => {
+    const rect = droppableRects.get(container.id);
+    return rect ? [{ id: container.id, rect }] : [];
+  });
+  const left = Math.min(...rows.map(({ rect }) => rect.left));
+  const right = Math.max(...rows.map(({ rect }) => rect.right));
+  const { x, y } = pointerCoordinates;
+  if (x < left || x > right) return [];
+  const row = rows.find(({ rect }) => y >= rect.top && y < rect.bottom);
+  return row ? [{ id: row.id }] : [];
+};
 
 const sameDrop = (a: SidebarDrop | null, b: SidebarDrop | null) =>
   a?.key === b?.key && a?.position === b?.position;
@@ -183,42 +204,112 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
     setAnnouncement(message);
   };
 
-  const followPointer = ({ active, over, activatorEvent, delta }: DragMoveEvent) => {
-    const start = getEventCoordinates(activatorEvent);
-    const dragged = String(active.id);
-    const target = over && String(over.id);
-    if (!start || !over || !target || target === dragged || isInside(tree, target, dragged))
-      return showDrop(null);
+  const rowOf = (key: string) => frames.current.get(key)?.element;
 
-    const into = moveForDrop(tree, dragged, { key: target, position: 'inside' });
-    const canDropInside = into === null || isAllowed(into);
-    const hasChildren = (tree.nodes.get(target)?.children.length ?? 0) > 0;
-    const ratio = (start.y + delta.y - over.rect.top) / over.rect.height;
-    const next: SidebarDrop = {
-      key: target,
-      position: dropPositionAt(ratio, canDropInside, hasChildren),
-    };
-    const move = moveForDrop(tree, dragged, next);
-    if (!move) return showDrop(null);
-    showDrop(isAllowed(move) ? next : nearestAllowedDrop(dragged, start.y + delta.y));
+  const lineRectOf = ({ key, position }: SidebarDrop) => {
+    const row = rowOf(key);
+    if (!row) return null;
+    return (position === 'inside' ? row : (row.closest('li') ?? row)).getBoundingClientRect();
   };
 
-  const lineYOf = ({ drop }: SidebarKeyboardStop) => {
-    const element = frames.current.get(drop.key)?.element;
-    if (!element) return Infinity;
-    if (drop.position === 'inside') {
-      const { top, bottom } = element.getBoundingClientRect();
-      return (top + bottom) / 2;
-    }
-    const { top, bottom } = (element.closest('li') ?? element).getBoundingClientRect();
-    return drop.position === 'before' ? top : bottom;
+  const lineYOf = (drop: SidebarDrop) => {
+    const rect = lineRectOf(drop);
+    if (!rect) return Infinity;
+    if (drop.position === 'before') return rect.top;
+    if (drop.position === 'after') return rect.bottom;
+    return (rect.top + rect.bottom) / 2;
   };
 
-  const nearestAllowedDrop = (dragged: string, pointerY: number) => {
-    const nearest = minBy(keyboardStops(tree, dragged, isVisible, isAllowed), (stop) =>
-      Math.abs(lineYOf(stop) - pointerY),
+  const lineXOf = (drop: SidebarDrop) => lineRectOf(drop)?.left ?? Infinity;
+
+  const isOpenFor = (dragged: string, drop: SidebarDrop) => {
+    const move = moveForDrop(tree, dragged, drop);
+    return move === null || isAllowed(move);
+  };
+
+  const isNearTheRows = ({ x, y }: { x: number; y: number }) => {
+    const rects = [...frames.current.values()]
+      .filter((frame) => !frame.folded)
+      .map((frame) => frame.element.getBoundingClientRect());
+    if (rects.length === 0) return false;
+    const left = Math.min(...rects.map((rect) => rect.left));
+    const right = Math.max(...rects.map((rect) => rect.right));
+    const top = Math.min(...rects.map((rect) => rect.top)) - REACH_BEYOND_THE_ROWS;
+    const bottom = Math.max(...rects.map((rect) => rect.bottom)) + REACH_BEYOND_THE_ROWS;
+    return x >= left && x <= right && y >= top && y <= bottom;
+  };
+
+  const nearestAllowedDrop = (dragged: string, pointerY: number, previewLeft: number) => {
+    const stops = keyboardStops(tree, dragged, isVisible, isAllowed);
+    const distance = (stop: SidebarKeyboardStop) => Math.abs(lineYOf(stop.drop) - pointerY);
+    const closest = minBy(stops, distance);
+    if (!closest) return null;
+    const level = distance(closest) + SAME_HEIGHT;
+    const nearest = minBy(
+      stops.filter((stop) => distance(stop) <= level),
+      (stop) => Math.abs(lineXOf(stop.drop) - previewLeft),
     );
     return nearest?.move ? nearest.drop : null;
+  };
+
+  const dropsAtTheSameLine = (drop: SidebarDrop): SidebarDrop[] => {
+    const node = tree.nodes.get(drop.key);
+    if (!node || drop.position === 'inside') return [drop];
+
+    const drops: SidebarDrop[] = [];
+    if (drop.position === 'after')
+      for (let outer: typeof node | undefined = node; outer; ) {
+        drops.push({ key: outer.key, position: 'after' });
+        if (outer.parent === null || siblingKeysOf(tree, outer.parent).at(-1) !== outer.key) break;
+        outer = tree.nodes.get(outer.parent);
+      }
+    else {
+      drops.push(drop);
+      let inner = siblingKeysOf(tree, node.parent)[node.index - 1];
+      for (; inner !== undefined; ) {
+        const last = tree.nodes.get(inner)?.children.filter(isVisible).at(-1);
+        if (last === undefined) break;
+        drops.push({ key: last, position: 'after' });
+        inner = last;
+      }
+    }
+    return drops;
+  };
+
+  const depthUnderThePreview = (dragged: string, drop: SidebarDrop, previewLeft: number) =>
+    minBy(
+      dropsAtTheSameLine(drop).filter((candidate) => isOpenFor(dragged, candidate)),
+      (candidate) => Math.abs(lineXOf(candidate) - previewLeft),
+    ) ?? drop;
+
+  const followPointer = ({ active, over, activatorEvent, delta }: DragMoveEvent) => {
+    const start = getEventCoordinates(activatorEvent);
+    if (!start) return showDrop(null);
+    const dragged = String(active.id);
+    const pointer = { x: start.x + delta.x, y: start.y + delta.y };
+    const previewLeft = active.rect.current.translated?.left ?? pointer.x;
+    const target = over && String(over.id);
+
+    if (!over || !target)
+      return showDrop(
+        isNearTheRows(pointer) ? nearestAllowedDrop(dragged, pointer.y, previewLeft) : null,
+      );
+    if (target === dragged || isInside(tree, target, dragged)) return showDrop(null);
+
+    const childrenShown = (tree.nodes.get(target)?.children ?? []).some(isVisible);
+    const ratio = (pointer.y - over.rect.top) / over.rect.height;
+    const zone: SidebarDrop = {
+      key: target,
+      position: dropPositionAt(
+        ratio,
+        isOpenFor(dragged, { key: target, position: 'inside' }),
+        childrenShown,
+      ),
+    };
+    const drop = depthUnderThePreview(dragged, zone, previewLeft);
+    const move = moveForDrop(tree, dragged, drop);
+    if (!move) return showDrop(null);
+    showDrop(isAllowed(move) ? drop : nearestAllowedDrop(dragged, pointer.y, previewLeft));
   };
 
   const announcements: Announcements = {
@@ -270,7 +361,7 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
     <SidebarSortableContext value={value}>
       <DndContext
         sensors={sensors}
-        collisionDetection={pointerWithin}
+        collisionDetection={rowAtThePointerHeight}
         measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
         accessibility={{
           announcements,

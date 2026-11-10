@@ -84,10 +84,14 @@ export function isInside<T>(tree: SidebarTree<T>, key: string, ancestor: string)
   return false;
 }
 
-export function dropPositionAt(ratio: number, canDropInside: boolean, hasChildren: boolean) {
-  if (!canDropInside) return ratio < HALF ? 'before' : 'after';
+export function dropPositionAt(
+  ratio: number,
+  canDropInside: boolean,
+  childrenShown: boolean,
+): SidebarDropPosition {
+  if (!canDropInside) return ratio < HALF ? 'before' : childrenShown ? 'inside' : 'after';
   if (ratio < OUTER_EDGE) return 'before';
-  if (hasChildren || ratio <= 1 - OUTER_EDGE) return 'inside';
+  if (childrenShown || ratio <= 1 - OUTER_EDGE) return 'inside';
   return 'after';
 }
 

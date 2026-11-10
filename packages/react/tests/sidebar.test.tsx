@@ -476,17 +476,19 @@ async function mouse(type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', x: n
   });
 }
 
-async function drag(from: Element, to: Element, fraction: number) {
+async function drag(from: Element, to: Element, fraction: number, shiftX = 0) {
   const start = from.getBoundingClientRect();
   const end = to.getBoundingClientRect();
-  const startX = start.left + start.width / 2;
+  const startX = start.left + 16;
   const startY = start.top + start.height / 2;
+  const endX = startX + shiftX;
   const endY = end.top + end.height * fraction;
 
   await mouse('mousePressed', startX, startY);
   for (let step = 1; step <= 8; step++)
-    await mouse('mouseMoved', startX, startY + ((endY - startY) * step) / 8);
-  await mouse('mouseReleased', startX, endY);
+    await mouse('mouseMoved', startX + (shiftX * step) / 8, startY + ((endY - startY) * step) / 8);
+  await new Promise(requestAnimationFrame);
+  await mouse('mouseReleased', endX, endY);
 }
 
 test('dragging a row drops it before, after or inside the row under the pointer', async (context) => {
@@ -560,9 +562,43 @@ test('the line after an open row sits below its children', async () => {
   const line = document.querySelector('[data-position="after"]')!.getBoundingClientRect();
   const tokens = screen.getByRole('link', { name: '토큰' }).element().getBoundingClientRect();
   const ids = screen.getByRole('button', { name: 'IDS' }).element().getBoundingClientRect();
-  expect(line.top).toBeGreaterThanOrEqual(tokens.bottom - 1);
+  expect(line.top).toBeGreaterThan(tokens.top + tokens.height / 2);
   expect(line.left).toBeLessThan(ids.left + 8);
 
   await userEvent.keyboard('{Enter}');
+  expect(lastMove(onItemsChange)).toMatchObject({ item: 'roadmap', to: [null, 2] });
+});
+
+test('at the end of an open row the preview’s left edge picks the depth', async (context) => {
+  skipWithoutCdp(context);
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onItemsChange = vi.fn();
+  const screen = await render(ui(<Docs onItemsChange={onItemsChange} />));
+  const row = (name: string) => screen.getByRole('link', { name }).element();
+
+  await screen.getByRole('button', { name: 'IDS' }).click();
+  await expect.element(screen.getByRole('link', { name: '토큰' })).toBeVisible();
+  const indent =
+    row('토큰').getBoundingClientRect().left - row('로드맵').getBoundingClientRect().left;
+
+  await drag(row('로드맵'), row('토큰'), 0.9);
+  await expect.poll(rowOrder).toEqual(['IDS', '회의록', '토큰', '로드맵', '셔틀']);
+  expect(lastMove(onItemsChange)).toMatchObject({ item: 'roadmap', to: [null, 1] });
+
+  await drag(row('셔틀'), row('토큰'), 0.9, indent);
+  await expect.poll(rowOrder).toEqual(['IDS', '회의록', '토큰', '셔틀', '로드맵']);
+  expect(lastMove(onItemsChange)).toMatchObject({ item: 'shuttle', to: ['ids', 2] });
+});
+
+test('below the last row a drag lands at the nearest place', async (context) => {
+  skipWithoutCdp(context);
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onItemsChange = vi.fn();
+  const screen = await render(ui(<Docs onItemsChange={onItemsChange} />));
+  const row = (name: string) => screen.getByRole('link', { name }).element();
+  const shuttle = row('셔틀').getBoundingClientRect();
+
+  await drag(row('로드맵'), row('셔틀'), 1 + 12 / shuttle.height);
+  await expect.poll(rowOrder).toEqual(['IDS', '회의록', '토큰', '셔틀', '로드맵']);
   expect(lastMove(onItemsChange)).toMatchObject({ item: 'roadmap', to: [null, 2] });
 });
