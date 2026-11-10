@@ -51,6 +51,35 @@ const BUILT_IN_NAMES: ReadonlySet<string> = new Set(
   BUILT_IN.flatMap((syntax) => [syntax.displayName, ...(syntax.aliases ?? [])]),
 );
 
+export const LAZY_NAMES: ReadonlySet<string> = new Set([
+  'c',
+  'cpp',
+  'csharp',
+  'cs',
+  'dotnet',
+  'dart',
+  'docker',
+  'dockerfile',
+  'go',
+  'graphql',
+  'ini',
+  'java',
+  'kotlin',
+  'kt',
+  'kts',
+  'lua',
+  'makefile',
+  'objectivec',
+  'objc',
+  'php',
+  'ruby',
+  'rb',
+  'rust',
+  'scss',
+  'swift',
+  'toml',
+]);
+
 const PLAIN_TEXT: ReadonlySet<string> = new Set(['', 'text', 'plain', 'plaintext', 'txt']);
 
 const TOKEN_OF_PRISM_TYPE: Readonly<Record<string, CodeBlockToken>> = {
@@ -98,7 +127,7 @@ export const languageKey = (language: string) => language.trim().toLowerCase();
 
 export const isPlainText = (language: string) => PLAIN_TEXT.has(languageKey(language));
 
-export const isBuiltIn = (language: string) => BUILT_IN_NAMES.has(languageKey(language));
+export const isLazy = (language: string) => LAZY_NAMES.has(languageKey(language));
 
 function tokenOf(node: HighlightedNode): CodeBlockToken | undefined {
   if (node.type !== 'element') return undefined;

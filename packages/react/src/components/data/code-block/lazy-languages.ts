@@ -19,7 +19,7 @@ import scss from 'refractor/scss';
 import swift from 'refractor/swift';
 import toml from 'refractor/toml';
 
-const LAZY: Syntax[] = [
+export const LAZY_LANGUAGES: Syntax[] = [
   c,
   cpp,
   csharp,
@@ -42,5 +42,5 @@ const LAZY: Syntax[] = [
 ];
 
 export function registerLazyLanguages() {
-  LAZY.forEach((syntax) => refractor.register(syntax));
+  LAZY_LANGUAGES.forEach((syntax) => refractor.register(syntax));
 }

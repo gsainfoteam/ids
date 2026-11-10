@@ -4,8 +4,7 @@ import { useEffect, useMemo, useSyncExternalStore } from 'react';
 
 import {
   highlightLines,
-  isBuiltIn,
-  isPlainText,
+  isLazy,
   lazyLanguagesLoaded,
   loadLazyLanguages,
   subscribeToLazyLanguages,
@@ -19,7 +18,7 @@ export function useHighlightedLines(code: string, language: string) {
     lazyLanguagesLoaded,
     NOT_ON_THE_SERVER,
   );
-  const needsLazyLanguages = !lazyLoaded && !isPlainText(language) && !isBuiltIn(language);
+  const needsLazyLanguages = !lazyLoaded && isLazy(language);
 
   useEffect(() => {
     if (needsLazyLanguages) loadLazyLanguages();

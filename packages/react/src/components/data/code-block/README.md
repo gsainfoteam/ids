@@ -67,7 +67,7 @@ const answer = 42;
 
 - 대소문자는 가리지 않습니다. 별칭은 refractor 의 것입니다.
 - 기본 묶음은 `import { CodeBlock }` 에 함께 들어갑니다(약 24 kB gzip). AI 답에서 가장 자주 나오는 언어입니다.
-- 불러오는 묶음은 기본에 없는 언어를 처음 그릴 때 `import()` 로 한 번 불러옵니다(약 15 kB gzip). 그때까지, 그리고 서버 HTML 과 hydration 첫 그림에서는 강조 없이 보이고, 불러오면 그 언어를 쓴 모든 CodeBlock 이 다시 칠해집니다. 서버와 클라이언트의 첫 HTML 이 같아서 hydration 이 어긋나지 않습니다.
+- 불러오는 묶음은 위 표의 언어를 처음 그릴 때 `import()` 로 한 번 불러옵니다(약 15 kB gzip). 그때까지, 그리고 서버 HTML 과 hydration 첫 그림에서는 강조 없이 보이고, 불러오면 그 언어를 쓴 모든 CodeBlock 이 다시 칠해집니다. 서버와 클라이언트의 첫 HTML 이 같아서 hydration 이 어긋나지 않습니다. 표에 없는 이름(오타, Prism 에 없는 언어)은 묶음을 받지 않고 일반 텍스트로 남습니다.
 - 두 묶음 어디에도 없는 언어는 강조 없이 보입니다. 이름(`language`)은 그대로 figcaption 에 나옵니다.
 - `text`, `plain`, `plaintext`, `txt` 는 강조하지 않고 figcaption 에도 적지 않습니다.
 

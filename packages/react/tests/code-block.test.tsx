@@ -6,6 +6,8 @@ import { render } from 'vitest-browser-react';
 
 import { CodeBlock, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
+import { isLazy, LAZY_NAMES } from '../src/components/data/code-block/highlight';
+import { LAZY_LANGUAGES } from '../src/components/data/code-block/lazy-languages';
 
 const SAVE = `export function Save() {
   return <Button>저장</Button>;
@@ -164,6 +166,18 @@ test('a lazily loaded language hydrates as plain text, then highlights', async (
   root.unmount();
   container.remove();
   errors.mockRestore();
+});
+
+test('only the names in the lazy bundle ask for it', () => {
+  const bundled = LAZY_LANGUAGES.flatMap((syntax) => [
+    syntax.displayName,
+    ...(syntax.aliases ?? []),
+  ]);
+
+  expect([...LAZY_NAMES].sort()).toEqual(bundled.sort());
+  expect(isLazy('Rust')).toBe(true);
+  expect(isLazy('brainfuck')).toBe(false);
+  expect(isLazy('tsx')).toBe(false);
 });
 
 test('an unknown language stays plain and keeps its name in the caption', async () => {
