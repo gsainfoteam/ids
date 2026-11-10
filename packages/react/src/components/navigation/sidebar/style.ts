@@ -51,7 +51,7 @@ export const sidebarStyle = tv({
       'data-[position=before]:-top-px data-[position=after]:-bottom-px',
     ],
     dragPreview:
-      'w-full cursor-grabbing bg-(--ids-color-surface) px-2 shadow-lg concentric-p-0',
+      'w-full cursor-grabbing bg-(--ids-color-surface) opacity-75 shadow-lg',
     inset: 'flex min-w-0 flex-1 flex-col',
     provider: 'group/sidebar-provider flex min-h-dvh w-full',
   },

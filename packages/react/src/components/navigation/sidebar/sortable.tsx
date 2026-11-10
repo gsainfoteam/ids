@@ -206,7 +206,12 @@ export function SidebarSortable({ items, itemType, onItemMove, children }: Sideb
         </span>
         <DragOverlay dropAnimation={null}>
           {dragging && (
-            <Item size="tiny" dense variant="outline" className={styles.dragPreview()}>
+            <Item
+              size="tiny"
+              dense
+              variant="outline"
+              className={styles.item({ className: styles.dragPreview() })}
+            >
               {dragging.preview}
             </Item>
           )}
