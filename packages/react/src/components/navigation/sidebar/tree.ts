@@ -124,13 +124,9 @@ export function drawnDrop<T>(
   drop: SidebarDrop,
   isVisible: (key: string) => boolean,
 ): SidebarDrop {
-  const node = tree.nodes.get(drop.key);
-  if (!node || drop.position === 'before') return drop;
-
-  const siblings = siblingKeysOf(tree, node.parent);
-  const next =
-    drop.position === 'after' ? siblings[siblings.indexOf(node.key) + 1] : node.children[0];
-  return next !== undefined && isVisible(next) ? { key: next, position: 'before' } : drop;
+  if (drop.position !== 'inside') return drop;
+  const first = tree.nodes.get(drop.key)?.children[0];
+  return first !== undefined && isVisible(first) ? { key: first, position: 'before' } : drop;
 }
 
 function withChildren<T extends SidebarTreeItem<T>>(item: T, children: readonly T[]): T {

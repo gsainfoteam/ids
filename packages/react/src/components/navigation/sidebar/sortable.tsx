@@ -18,7 +18,7 @@ import {
   type UniqueIdentifier,
 } from '@dnd-kit/core';
 import { getEventCoordinates } from '@dnd-kit/utilities';
-import { minBy } from 'es-toolkit';
+import { clamp, minBy } from 'es-toolkit';
 
 import {
   SidebarFoldedContext,
@@ -55,6 +55,10 @@ const TOUCH_TRAVEL_ALLOWED_WHILE_HOLDING = 5;
 const SPACE = ' ';
 const REACH_BEYOND_THE_ROWS = 36;
 const SAME_HEIGHT = 2;
+const LINE_INSET = 4;
+const LINE_DOT_RADIUS = 3;
+
+type SidebarLine = { position: 'before' | 'after'; top: number; left: number; width: number };
 
 const rowAtThePointerHeight: CollisionDetection = ({
   droppableContainers,
@@ -121,6 +125,8 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
   const pending = useRef<PendingMove | null>(null);
   const dropRef = useRef<SidebarDrop | null>(null);
   const [drop, setDrop] = useState<SidebarDrop | null>(null);
+  const [line, setLine] = useState<SidebarLine | null>(null);
+  const layer = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState<{ key: string; preview: ReactNode } | null>(null);
   const [grab, setGrab] = useState<Grab | null>(null);
   const [announcement, setAnnouncement] = useState('');
@@ -175,10 +181,29 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
     return frame !== undefined && !frame.folded;
   };
 
+  const lineFor = ({ key, position }: SidebarDrop): SidebarLine | null => {
+    const row = frames.current.get(key)?.element.closest('li');
+    const box = layer.current?.getBoundingClientRect();
+    if (position === 'inside' || !row || !box) return null;
+
+    const rect = row.getBoundingClientRect();
+    const neighbour = position === 'before' ? row.previousElementSibling : row.nextElementSibling;
+    const edge = position === 'before' ? rect.top : rect.bottom;
+    const across = neighbour?.getBoundingClientRect()[position === 'before' ? 'bottom' : 'top'];
+    const middle = across === undefined ? edge : (edge + across) / 2;
+    return {
+      position,
+      top: clamp(middle - box.top, LINE_DOT_RADIUS, box.height - LINE_DOT_RADIUS),
+      left: rect.left - box.left + LINE_INSET,
+      width: rect.width - LINE_INSET * 2,
+    };
+  };
+
   const showDrop = (next: SidebarDrop | null) => {
     const drawn = next && drawnDrop(tree, next, isVisible);
     dropRef.current = drawn;
     setDrop((previous) => (sameDrop(previous, drawn) ? previous : drawn));
+    setLine(drawn && lineFor(drawn));
   };
 
   const commit = (move: SidebarTreeMove, focus: boolean) => {
@@ -385,7 +410,17 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
         }}
         onDragCancel={endPointerDrag}
       >
-        {children}
+        <div ref={layer} className={styles.dropLayer()}>
+          {children}
+          {line && (
+            <span
+              aria-hidden
+              data-position={line.position}
+              className={styles.dropLine()}
+              style={{ top: line.top, left: line.left, width: line.width }}
+            />
+          )}
+        </div>
         <span id={hintId} hidden>
           {t('sidebar.drag.hint')}
         </span>

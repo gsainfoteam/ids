@@ -603,7 +603,7 @@ test('below the last row a drag lands at the nearest place', async (context) => 
   expect(lastMove(onItemsChange)).toMatchObject({ item: 'roadmap', to: [null, 2] });
 });
 
-test('one place draws one line, whichever row the pointer is over', async (context) => {
+test('the line after a row and the line before the next one are drawn at the same height', async (context) => {
   skipWithoutCdp(context);
   await page.viewport(DESKTOP.width, DESKTOP.height);
   const screen = await render(
@@ -614,17 +614,18 @@ test('one place draws one line, whichever row the pointer is over', async (conte
   const ids = screen.getByRole('button', { name: 'IDS' }).element().getBoundingClientRect();
   const shuttle = rect('셔틀');
   const x = shuttle.left + 16;
-  const line = () => {
-    const drawn = document.querySelector('[data-position]');
-    return drawn && `${drawn.getAttribute('data-position')} ${drawn.getBoundingClientRect().top}`;
-  };
+  const line = () => document.querySelector('[data-position]')?.getBoundingClientRect().top;
 
   await mouse('mousePressed', x, shuttle.top + shuttle.height / 2);
   await mouse('mouseMoved', x, shuttle.top);
   await mouse('mouseMoved', x, rect('로드맵').top + rect('로드맵').height * 0.75);
-  await expect.poll(line).toMatch(/^before /);
+  await expect.poll(line).toBeDefined();
   const belowTheRoadmap = line();
+  expect(document.querySelector('[data-position]')).toHaveAttribute('data-position', 'after');
   await mouse('mouseMoved', x, ids.top + ids.height * 0.25);
-  await expect.poll(line).toBe(belowTheRoadmap);
+  await expect
+    .poll(() => document.querySelector('[data-position]')?.getAttribute('data-position'))
+    .toBe('before');
+  expect(line()).toBe(belowTheRoadmap);
   await mouse('mouseReleased', x, ids.top + ids.height * 0.25);
 });

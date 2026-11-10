@@ -40,7 +40,7 @@ export const sidebarStyle = tv({
     groupTrigger:
       'min-h-6 items-center px-2 py-0 text-caption-c1-medium text-(--ids-color-on-muted)',
     list: 'flex min-w-0 flex-col gap-px',
-    listItem: 'relative flex min-w-0 flex-col',
+    listItem: 'flex min-w-0 flex-col',
     subTree: 'ms-[15.5px] flex min-w-0 pt-0.5',
     subList: 'flex min-w-0 flex-1 flex-col gap-px ps-[7.5px]',
     item: 'concentric-p-0 px-2',
@@ -54,9 +54,9 @@ export const sidebarStyle = tv({
       'relative w-full min-w-0 data-dragging:opacity-40',
       'data-[drop=inside]:[&>[data-sidebar-item]]:bg-(--ids-color-secondary) data-[drop=inside]:[&>[data-sidebar-item]]:text-(--ids-color-on-secondary)',
     ],
+    dropLayer: 'relative',
     dropLine: [
-      'pointer-events-none absolute inset-x-1 z-10 h-0.5 rounded-full bg-(--ids-color-primary)',
-      'data-[position=before]:top-0.5 data-[position=after]:bottom-0.5',
+      'pointer-events-none absolute z-10 h-0.5 -translate-y-1/2 rounded-full bg-(--ids-color-primary)',
       'before:absolute before:-start-1 before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full before:border-[1.5px] before:border-(--ids-color-primary) before:bg-(--ids-color-surface)',
     ],
     dragPreview: 'w-full cursor-grabbing bg-(--ids-color-surface) opacity-75 shadow-lg',
