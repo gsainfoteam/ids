@@ -251,7 +251,10 @@ test('Korean kept by word with emoji wraps evenly and fits', async () => {
   const [bubble] = bubbles(screen.container);
   expect(lines(bubble!).length).toBeGreaterThanOrEqual(2);
   expect(endGap(bubble!)).toBeLessThanOrEqual(1);
-  expect(bubble!.style.getPropertyValue('--bubble-fit-width')).not.toBe('');
+
+  const fitted = lineWidths(bubble!);
+  bubble!.style.removeProperty('--bubble-fit-width');
+  expect(fitted).toEqual(lineWidths(bubble!));
 });
 
 test('many bubbles mounted together are all fitted, and a column resize refits each', async () => {
