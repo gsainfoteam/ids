@@ -14,7 +14,7 @@ export const itemStyle = tv({
     ],
     media: [
       'flex shrink-0 items-center justify-center gap-2 text-(--ids-color-on-muted)',
-      'group-has-[[data-item-description]]/item:self-start [&_img]:object-cover',
+      '[&_img]:object-cover',
       "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
     ],
     content: 'flex min-w-0 flex-1 flex-col gap-0.5 [&+[data-item-content]]:flex-none',
@@ -50,17 +50,26 @@ export const itemStyle = tv({
     } satisfies Record<ItemVariant, object>,
     size: {
       standard: {
-        root: 'min-h-14 gap-3 concentric-p-3',
+        root: [
+          'min-h-14 gap-3 concentric-p-3 [--item-padding:calc(var(--spacing)*3)]',
+          '[--item-media-ratio:calc(8/14)] [--item-row-height:calc(var(--spacing)*14)]',
+          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-body-b3-medium)*var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular)*var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
+          '[--item-row-largest:calc(var(--ids-text-body-b3-medium)*var(--ids-text-body-b3-medium--line-height)+var(--spacing)*0.5+var(--ids-text-body-b3-regular)*var(--ids-text-body-b3-regular--line-height)+var(--spacing)*6)]',
+        ],
         title: 'text-body-b3-medium',
         description: 'text-body-b3-regular',
       },
       tiny: {
-        root: 'min-h-10 gap-2 concentric-p-2',
+        root: [
+          'min-h-10 gap-2 concentric-p-2 [--item-padding:calc(var(--spacing)*2)]',
+          '[--item-media-ratio:calc(7/11)] [--item-row-height:calc(var(--spacing)*11)]',
+          'has-[[data-item-description]]:[--item-row-height:calc(var(--ids-text-caption-c1-medium)*var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular)*var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
+          '[--item-row-largest:calc(var(--ids-text-caption-c1-medium)*var(--ids-text-caption-c1-medium--line-height)+var(--spacing)*0.5+var(--ids-text-caption-c1-regular)*var(--ids-text-caption-c1-regular--line-height)+var(--spacing)*4)]',
+        ],
         title: 'text-caption-c1-medium',
         description: 'text-caption-c1-regular',
       },
     } satisfies Record<IdsSize, object>,
-    dense: { true: {}, false: {} },
     truncate: { true: { title: 'block max-w-full truncate' }, false: {} },
     interactive: {
       true: {
@@ -75,18 +84,25 @@ export const itemStyle = tv({
     },
   },
   compoundVariants: [
-    { media: ['soft', 'outline'], size: 'standard', class: { media: 'size-8' } },
-    { media: ['soft', 'outline'], size: 'tiny', class: { media: 'size-7' } },
-    { media: ['soft', 'outline'], class: { media: 'overflow-hidden [&>img]:size-full' } },
-    { dense: true, size: 'standard', class: { root: 'min-h-12 concentric-p-1.5' } },
-    { dense: true, size: 'tiny', class: { root: 'min-h-8 concentric-p-1' } },
+    {
+      media: ['soft', 'outline'],
+      class: {
+        media: [
+          'overflow-hidden [&>img]:size-full',
+          '[--item-row:min(var(--item-row-height),var(--item-row-largest))]',
+          'size-[calc(var(--item-row)*var(--item-media-ratio))]',
+          '[--item-media-inset:calc(var(--item-row)*(1-var(--item-media-ratio))/2-var(--item-padding))]',
+          'ms-(--item-media-inset) mt-(--item-media-inset) self-start',
+          "[&_svg:not([class*='size-'])]:size-[calc(var(--item-row)*var(--item-media-ratio)/2)]",
+        ],
+      },
+    },
   ],
   defaultVariants: {
     groupVariant: 'ghost',
     variant: 'ghost',
     media: 'ghost',
     size: 'standard',
-    dense: false,
     truncate: false,
     interactive: false,
   },

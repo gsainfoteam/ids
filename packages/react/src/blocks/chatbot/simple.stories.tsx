@@ -15,7 +15,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { IconToggle } from '../../components/action/icon-toggle';
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
-import { Card } from '../../components/data/card';
+import { Bubble } from '../../components/data/bubble';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { Table } from '../../components/data/table';
@@ -111,9 +111,7 @@ export const PC: Story = {
         <ScrollArea fade className="min-h-0 flex-1">
           <ol aria-label="대화" className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-6">
             <li className="flex justify-end">
-              <Card variant="soft" className="max-w-[80%]">
-                <Card.Content>오늘 학식 뭐야?</Card.Content>
-              </Card>
+              <Bubble align="end">오늘 학식 뭐야?</Bubble>
             </li>
 
             <li className="flex gap-3">
@@ -144,9 +142,7 @@ export const PC: Story = {
             </li>
 
             <li className="flex justify-end">
-              <Card variant="soft" className="max-w-[80%]">
-                <Card.Content>학생회관에서 셔틀은 언제 와?</Card.Content>
-              </Card>
+              <Bubble align="end">학생회관에서 셔틀은 언제 와?</Bubble>
             </li>
 
             <li className="flex gap-3">
