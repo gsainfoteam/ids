@@ -3,7 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
+import '../../../theme/ids_theme_data.dart';
 import '../../../tokens/ids_typography.dart';
 
 class IdsDivider extends StatelessWidget {
@@ -17,7 +18,6 @@ class IdsDivider extends StatelessWidget {
   final Axis orientation;
   final bool decorative;
 
-  /// 레이블이 없으면 null을 넘긴다. 빈 [Text]도 레이블 자리를 차지한다.
   final Widget? child;
 
   static const _thickness = 1.0;
@@ -26,18 +26,20 @@ class IdsDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
+    final theme = IdsProvider.of(context).theme;
     final label = child;
 
     return ExcludeSemantics(
       excluding: decorative,
       child: label == null
-          ? _line(context, theme.border)
+          ? _line(context, theme.border, theme.dimension(_thickness))
           : _LabelledLine(
               orientation: orientation,
               color: theme.border,
+              theme: theme.data,
               child: DefaultTextStyle(
-                style: IdsTypography.captionC1Medium.copyWith(
+                style: theme.textStyle(
+                  IdsTypography.captionC1Medium,
                   color: theme.onMuted,
                 ),
                 textAlign: TextAlign.center,
@@ -47,12 +49,12 @@ class IdsDivider extends StatelessWidget {
     );
   }
 
-  Widget _line(BuildContext context, Color color) {
+  Widget _line(BuildContext context, Color color, double thickness) {
     final line = ColoredBox(
       color: color,
       child: SizedBox(
-        width: _horizontal ? double.infinity : _thickness,
-        height: _horizontal ? _thickness : double.infinity,
+        width: _horizontal ? double.infinity : thickness,
+        height: _horizontal ? thickness : double.infinity,
       ),
     );
     if (_horizontal) return line;
@@ -68,15 +70,17 @@ class _LabelledLine extends SingleChildRenderObjectWidget {
   const _LabelledLine({
     required this.orientation,
     required this.color,
+    required this.theme,
     required super.child,
   });
 
   final Axis orientation;
   final Color color;
+  final IdsThemeData theme;
 
   @override
   _RenderLabelledLine createRenderObject(BuildContext context) =>
-      _RenderLabelledLine(orientation, color);
+      _RenderLabelledLine(orientation, color, theme);
 
   @override
   void updateRenderObject(
@@ -85,12 +89,23 @@ class _LabelledLine extends SingleChildRenderObjectWidget {
   ) {
     renderObject
       ..orientation = orientation
-      ..color = color;
+      ..color = color
+      ..theme = theme;
   }
 }
 
 class _RenderLabelledLine extends RenderShiftedBox {
-  _RenderLabelledLine(this._orientation, this._color) : super(null);
+  _RenderLabelledLine(this._orientation, this._color, this._theme)
+    : super(null);
+
+  IdsThemeData _theme;
+  set theme(IdsThemeData value) {
+    if (_theme == value) return;
+    _theme = value;
+    markNeedsLayout();
+  }
+
+  double get _thickness => _theme.dimension(IdsDivider._thickness);
 
   Axis _orientation;
   set orientation(Axis value) {
@@ -107,8 +122,9 @@ class _RenderLabelledLine extends RenderShiftedBox {
   }
 
   bool get _horizontal => _orientation == Axis.horizontal;
-  double get _gap => _horizontal ? 12 : 8;
-  double get _ends => _horizontal ? 2 * (16 + 12) : 2 * (8 + 8);
+  double get _gap => _theme.dimension(_horizontal ? 12 : 8);
+  double get _ends =>
+      _theme.dimension(_horizontal ? 2 * (16 + 12) : 2 * (8 + 8));
 
   double _main(BoxConstraints constraints) =>
       _horizontal ? constraints.maxWidth : constraints.maxHeight;
@@ -125,20 +141,18 @@ class _RenderLabelledLine extends RenderShiftedBox {
     final labelMain = _horizontal ? label.width : label.height;
     final labelCross = _horizontal ? label.height : label.width;
     final mainSize = main.isFinite ? main : labelMain + _ends;
-    final crossSize = math.max(labelCross, IdsDivider._thickness);
+    final crossSize = math.max(labelCross, _thickness);
     return constraints.constrain(
       _horizontal ? Size(mainSize, crossSize) : Size(crossSize, mainSize),
     );
   }
 
   double _intrinsicWidth(double height, double Function(double) label) =>
-      _horizontal
-      ? label(height) + _ends
-      : math.max(IdsDivider._thickness, label(height));
+      _horizontal ? label(height) + _ends : math.max(_thickness, label(height));
 
   double _intrinsicHeight(double width, double Function(double) label) =>
       _horizontal
-      ? math.max(IdsDivider._thickness, label(math.max(0, width - _ends)))
+      ? math.max(_thickness, label(math.max(0, width - _ends)))
       : label(width) + _ends;
 
   @override
@@ -173,7 +187,7 @@ class _RenderLabelledLine extends RenderShiftedBox {
   }
 
   Rect _segment(Offset offset, double start, double length) {
-    const thickness = IdsDivider._thickness;
+    final thickness = _thickness;
     return _horizontal
         ? Rect.fromLTWH(
             offset.dx + start,

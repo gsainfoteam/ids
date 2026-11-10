@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_typography.dart';
 
@@ -22,7 +22,7 @@ class IdsLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
+    final theme = IdsProvider.of(context).theme;
     final style = switch (size) {
       IdsSize.standard => IdsTypography.bodyB3Regular,
       IdsSize.tiny => IdsTypography.captionC1Regular,
@@ -31,10 +31,10 @@ class IdsLabel extends StatelessWidget {
     return Opacity(
       opacity: disabled ? 0.5 : 1,
       child: DefaultTextStyle(
-        style: style.copyWith(color: theme.onSurface),
+        style: theme.textStyle(style, color: theme.onSurface),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: 4,
+          spacing: theme.dimension(4),
           children: [
             Flexible(child: child),
             if (required)

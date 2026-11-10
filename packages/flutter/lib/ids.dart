@@ -5,7 +5,7 @@ export 'tokens/ids_motion.dart';
 export 'tokens/ids_typography.dart';
 export 'tokens/ids_color_tokens.dart';
 
-export 'theme/theme_provider.dart';
+export 'theme/ids_provider.dart';
 export 'theme/ids_scope.dart';
 export 'theme/ids_theme.dart';
 export 'theme/ids_palette.dart';

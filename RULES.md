@@ -9,7 +9,7 @@ packages/
   core/     tokens + Style Dictionary codegen. Private — not published.
   css/      @gsainfoteam/ids-css GitHub Packages npm package. CSS variables + Tailwind @theme.
   react/    @gsainfoteam/ids-react GitHub Packages npm package. React components + IdsProvider.
-  flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + ThemeProvider.
+  flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + IdsProvider.
 examples/
   next-app-router/  tanstack-start/  astro/   private apps that install IDS the way a consumer does.
 ```
@@ -20,7 +20,7 @@ stylesheet holds a class only `@source` on `ids-react/dist` produces. Changesets
 
 ## Generated files — do not edit manually
 
-These files are written by `pnpm codegen` (Style Dictionary build). Edits will be overwritten.
+These files are written by `pnpm codegen` (Style Dictionary and message generation). Edits will be overwritten.
 
 - `packages/css/dist/ids.css`
 - `packages/react/src/tokens/types.ts`
@@ -718,8 +718,9 @@ may remount the story. Inputs whose focus a play checks carry `data-1p-ignore` a
 
 ## IdsProvider
 
-Every IDS component relies on `data-color` and `data-mode` attributes injected by `IdsProvider`
-(`ThemeProvider` in Flutter). Without it, CSS variables are undefined and colors will not render.
+React IDS components rely on `data-color` and `data-mode` attributes injected by `IdsProvider`.
+Without it, CSS variables are undefined and colors will not render. Flutter uses its own
+`IdsProvider` inherited scope with runtime theme and palette objects.
 
 ```tsx
 <IdsProvider color="blue" mode="light">
@@ -774,3 +775,12 @@ graph LR
 ```
 
 `core` is never a runtime dependency of anything. It is a build-time code generator only.
+
+
+## Flutter runtime provider
+
+Flutter uses `IdsProvider(theme: ..., palette: ...)`, with app-owned `IdsPalette` shades 50–950. The outer provider requires theme and palette (or defaultPalette); nested providers inherit omitted settings and setters. `IdsColor` is React-only. Flutter mode also supports system. IDS styles stay inside IDS components.
+
+Flutter strings use the generated `IdsMessages` mixin. Consumers supply a slang object through `translation`; component code falls back per member with `t?.spinnerLabel ?? IdsMessages.ko.spinnerLabel`. Edit `packages/core/messages/ko.json` and `en.json`, then run `pnpm codegen`. Do not hand-edit generated Dart messages or catalogs.
+
+Before Flutter tests or analysis, run `dart run slang` in both `packages/flutter` and `packages/flutter/example` to generate the service fixtures. Scale policy is deferred; do not introduce a scale range or apply scaling to fonts/radius until IDS-24 is decided.

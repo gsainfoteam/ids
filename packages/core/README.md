@@ -1,6 +1,6 @@
 # @gsainfoteam/ids-core
 
-토큰 소스 + Style Dictionary codegen. **배포하지 않음** — 빌드 타임 전용.
+토큰·문구 소스 + Style Dictionary 및 문구 codegen. **배포하지 않음** — 빌드 타임 전용.
 
 ## 역할
 

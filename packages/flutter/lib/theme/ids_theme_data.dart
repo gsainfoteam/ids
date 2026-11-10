@@ -40,8 +40,29 @@ class IdsThemeData {
   ];
 
   TextStyle textStyle(TextStyle base, {Color? color, bool mono = false}) =>
-      base.copyWith(
-        color: color,
+      TextStyle(
+        inherit: base.inherit,
+        color: color ?? base.color,
+        backgroundColor: base.backgroundColor,
+        fontSize: base.fontSize,
+        fontWeight: base.fontWeight,
+        fontStyle: base.fontStyle,
+        letterSpacing: base.letterSpacing,
+        wordSpacing: base.wordSpacing,
+        textBaseline: base.textBaseline,
+        height: base.height,
+        leadingDistribution: base.leadingDistribution,
+        locale: base.locale,
+        foreground: color == null ? base.foreground : null,
+        background: base.background,
+        shadows: base.shadows,
+        fontFeatures: base.fontFeatures,
+        fontVariations: base.fontVariations,
+        decoration: base.decoration,
+        decorationColor: base.decorationColor,
+        decorationStyle: base.decorationStyle,
+        decorationThickness: base.decorationThickness,
+        overflow: base.overflow,
         fontFamily: mono ? monoFontFamily : fontFamily,
         package: mono
             ? monoFontPackage

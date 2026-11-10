@@ -28,7 +28,7 @@ class _EmailInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
+    final theme = IdsProvider.of(context).theme;
     final field = IdsField.maybeOf(context)!;
     final tiny = field.size == IdsSize.tiny;
     final icon = tiny ? 14.0 : 16.0;

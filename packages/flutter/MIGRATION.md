@@ -146,7 +146,7 @@ focusVisible = focused
 | `ghost`   | 투명                           | hover     | hover            | quiet   | 없음                           |
 
 - 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`, `hover`)이다. `primary`와 `neutral`의 hover는 `muted`다
-- `outline` 테두리는 중립 `border`(neutral 200 · dark 800)다. `IdsTheme`에는 아직 없다: 중립 색은 `ids_theme.dart`에 손으로 적혀 있고 `border`가 빠져 있다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
+- `outline` 테두리는 중립 `border`(neutral 200 · dark 800)다. `IdsProvider.of(context).theme.border`로 읽는다. 중립색과 상태색은 core에서 생성한다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
 - Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 hover 색이다. 켜지면(`pressed`) `ghost`·`outline`은 hover 색, `soft`는 fill 0.10 + accent, `solid`는 fill + on-fill
 - `active`는 배경만 바뀐다. scale 없음
 - `focusVisible`: 바깥 3px 링(ring 색 0.40)과 안쪽 1px 테두리를 ring 색으로. offset outline이 아니다
