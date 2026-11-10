@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, ready_for_review]
+  merge_group:
 
 jobs:
   js:
@@ -143,7 +144,7 @@ jobs:
   review:
     name: Claude review
     needs: [js, flutter]
-    if: vars.ENABLE_CLAUDE_REVIEW == 'true'
+    if: github.event_name == 'pull_request' && vars.ENABLE_CLAUDE_REVIEW == 'true'
     permissions:
       contents: read
       pull-requests: write
