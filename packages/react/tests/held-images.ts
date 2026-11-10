@@ -2,6 +2,9 @@ import { expect, onTestFinished } from 'vitest';
 import { cdp } from 'vitest/browser';
 
 const lazyImagesStartLateOnASlowRunner = 5_000;
+const probesBeforeGivingUp = 20;
+
+type Session = ReturnType<typeof cdp>;
 
 async function cdpReadyForListeners() {
   const session = cdp();
@@ -9,61 +12,38 @@ async function cdpReadyForListeners() {
   return session;
 }
 
-function countFrames() {
-  let frames = 0;
-  let counting = true;
-  const tick = () => {
-    frames++;
-    if (counting) requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-  return () => {
-    counting = false;
-    return frames;
-  };
+async function probeIsHeld(probe: string, paused: Map<string, string>) {
+  const reachedTheServer = fetch(probe).then(
+    () => false,
+    () => false,
+  );
+  const held = expect
+    .poll(() => paused.get(probe), { timeout: lazyImagesStartLateOnASlowRunner })
+    .toBeDefined()
+    .then(
+      () => true,
+      () => false,
+    );
+  return Promise.race([reachedTheServer, held]);
 }
 
-function describeTheImage(
-  src: string,
+async function untilTheFrameLoadsThroughInterception(
+  session: Session,
+  held: string,
   paused: Map<string, string>,
-  frames: number,
-  waited: number,
-  sent: string[],
 ) {
-  const img = [...document.querySelectorAll('img')].find((i) => i.getAttribute('src') === src);
-  const entries = performance
-    .getEntriesByType('resource')
-    .filter((e) => e.name.includes(src)) as PerformanceResourceTiming[];
-  const frame = window.frameElement?.getBoundingClientRect();
-  const box = img?.getBoundingClientRect();
-  return JSON.stringify({
-    waited,
-    frames,
-    pausedPaths: [...paused.keys()],
-    networkSent: sent.filter((url) => url.includes(src)),
-    img: img && {
-      complete: img.complete,
-      naturalWidth: img.naturalWidth,
-      currentSrc: img.currentSrc,
-      loading: img.loading,
-      box: box && [box.x, box.y, box.width, box.height].map(Math.round),
-      status: img.closest('[data-status]')?.getAttribute('data-status'),
-    },
-    resourceEntries: entries.map((e) => ({
-      start: Math.round(e.startTime),
-      duration: Math.round(e.duration),
-      status: e.responseStatus,
-    })),
-    iframeAge: Math.round(performance.now()),
-    visibility: document.visibilityState,
-    hasFocus: document.hasFocus(),
-    frameRect: frame && [frame.x, frame.y, frame.width, frame.height].map(Math.round),
-    top: window.top && {
-      size: [window.top.innerWidth, window.top.innerHeight],
-      scrollY: window.top.scrollY,
-      iframes: window.top.document.querySelectorAll('iframe').length,
-    },
-  });
+  for (let attempt = 0; attempt < probesBeforeGivingUp; attempt++) {
+    const probe = `${held}interception-probe-${attempt}`;
+    if (await probeIsHeld(probe, paused)) {
+      await session.send('Fetch.fulfillRequest', {
+        requestId: paused.get(probe)!,
+        responseCode: 204,
+      });
+      return;
+    }
+    console.error(`HELD-PROBE ${probe} reached the server`);
+  }
+  throw new Error(`Requests under ${held} still reach the server after Fetch.enable.`);
 }
 
 export async function holdImages(held: string, picture: string) {
@@ -73,45 +53,23 @@ export async function holdImages(held: string, picture: string) {
     paused.set(new URL(event.request.url).pathname, event.requestId);
   };
   session.on('Fetch.requestPaused', onPaused);
-  const sent: string[] = [];
-  const onSent = (event: { request: { url: string } }) => {
-    sent.push(`${Math.round(performance.now())} ${new URL(event.request.url).pathname}`);
-  };
-  session.on('Network.requestWillBeSent', onSent);
-  await session.send('Network.enable');
   await session.send('Fetch.enable', { patterns: [{ urlPattern: `*${held}*` }] });
   onTestFinished(async () => {
     session.off('Fetch.requestPaused', onPaused);
-    session.off('Network.requestWillBeSent', onSent);
-    await session.send('Network.disable');
     await session.send('Fetch.disable');
   });
+  await untilTheFrameLoadsThroughInterception(session, held, paused);
+
   const requestOf = async (src: string) => {
-    const start = performance.now();
-    const stopCounting = countFrames();
-    try {
-      await expect
-        .poll(() => paused.get(src), {
-          message: `${src} is requested`,
-          timeout: lazyImagesStartLateOnASlowRunner,
-        })
-        .toBeDefined();
-    } catch (error) {
-      const atTimeout = describeTheImage(src, paused, stopCounting(), Math.round(performance.now() - start), sent);
-      console.error(`HELD-DIAG ${src} at timeout: ${atTimeout}`);
-      const stopLate = countFrames();
-      const lateStart = performance.now();
-      await expect
-        .poll(() => paused.get(src) ?? (performance.getEntriesByName(new URL(src, location.href).href).length ? 'served' : undefined), { timeout: 15_000 })
-        .toBeDefined()
-        .catch(() => {});
-      const late = describeTheImage(src, paused, stopLate(), Math.round(performance.now() - lateStart), sent);
-      console.error(`HELD-DIAG ${src} later: ${late}`);
-      throw new Error(`HELD-DIAG ${src}\n at timeout: ${atTimeout}\n 15s later: ${late}`, { cause: error });
-    }
-    stopCounting();
+    await expect
+      .poll(() => paused.get(src), {
+        message: `${src} is requested`,
+        timeout: lazyImagesStartLateOnASlowRunner,
+      })
+      .toBeDefined();
     return paused.get(src)!;
   };
+
   return {
     requested: requestOf,
     async load(src: string) {

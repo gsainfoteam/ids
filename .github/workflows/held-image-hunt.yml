@@ -38,7 +38,7 @@ jobs:
           for round in 1 2 3 4; do
             pnpm exec vitest run > run.log 2>&1 || status=1
             echo "round $round"
-            grep -E "HELD-DIAG|FAIL |Test Files" run.log | sed 's/\x1b\[[0-9;]*m//g' | cut -c1-3000
+            grep -E "HELD-PROBE|FAIL |Test Files" run.log | sed 's/\x1b\[[0-9;]*m//g' | cut -c1-3000
           done
           exit $status
 
