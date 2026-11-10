@@ -36,7 +36,7 @@ jobs:
         run: |
           status=0
           for round in 1 2 3 4 5 6; do
-            pnpm exec vitest run > run.log 2>&1 || status=1
+            pnpm exec vitest run --sequence.shuffle.files --sequence.seed="$RANDOM" > run.log 2>&1 || status=1
             echo "round $round"
             grep -E "FAIL |Test Files|Expected|Received" run.log | sed 's/\x1b\[[0-9;]*m//g' | cut -c1-3000
           done
