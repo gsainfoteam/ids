@@ -3,6 +3,7 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   js:
@@ -138,3 +139,15 @@ jobs:
 
       - run: flutter test
         working-directory: packages/flutter
+
+  review:
+    name: Claude review
+    needs: [js, flutter]
+    if: vars.ENABLE_CLAUDE_REVIEW == 'true'
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+      id-token: write
+    uses: rhseung/claude-review-plugin/.github/workflows/review.yml@v1
+    secrets: inherit
