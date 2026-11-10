@@ -227,9 +227,13 @@ export const messages = {
   sidebar: {
     collapse: '사이드바 접기',
     drag: {
+      after: '{target} 뒤',
+      before: '{target} 앞',
       cancel: '{item}을(를) 제자리에 두었습니다.',
       end: '{item}을(를) 옮겼습니다.',
-      hint: 'Alt와 방향키로 순서와 단계를 바꿉니다.',
+      hint: 'Space로 집고, 위아래 방향키로 놓을 자리를 고른 뒤 Enter로 놓습니다. Escape는 취소합니다.',
+      inside: '{target} 안',
+      origin: '원래 자리',
       start: '{item}을(를) 집었습니다.',
     },
     expand: '사이드바 펼치기',

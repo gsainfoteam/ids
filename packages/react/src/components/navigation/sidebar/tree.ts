@@ -1,94 +1,101 @@
-import { isValidElement, type ReactElement, type ReactNode } from 'react';
+export type SidebarTreeId = string | number;
 
-import { elementTypeOf, flattenFragments } from '../../../utils';
+export type SidebarTreeItem<T> = { id: SidebarTreeId; children?: readonly T[] };
 
-export type SidebarItemMove = {
-  value: string;
-  parent: string | null;
+export type SidebarPlace<T> = {
+  parent: T | null;
+  ancestors: readonly T[];
   index: number;
+  previousSibling: T | null;
+  nextSibling: T | null;
 };
+
+export type SidebarMove<T> = { item: T; from: SidebarPlace<T>; to: SidebarPlace<T> };
 
 export type SidebarDropPosition = 'before' | 'after' | 'inside';
 
-export type SidebarDrop = { value: string; position: SidebarDropPosition };
+export type SidebarDrop = { key: string; position: SidebarDropPosition };
 
-export type SidebarTreeNode = {
-  value: string;
+export type SidebarTreeMove = { key: string; parent: string | null; index: number };
+
+export type SidebarTreeNode<T> = {
+  key: string;
+  item: T;
+  path: SidebarTreeId[];
   parent: string | null;
   index: number;
   children: string[];
+  depth: number;
 };
 
-export type SidebarTree = Map<string, SidebarTreeNode>;
+export type SidebarTree<T> = {
+  nodes: Map<string, SidebarTreeNode<T>>;
+  roots: string[];
+  duplicates: SidebarTreeId[];
+};
 
-export type SidebarMovableItem<T> = { value: string; children?: T[] };
-
-type ItemProps = { value?: string; asChild?: boolean; children?: ReactNode };
+export const TREE_KEY_PROP = 'data-sidebar-tree-key';
 
 const ROOT = null;
 const OUTER_EDGE = 0.25;
+const HALF = 0.5;
 
-export function itemElementsOf(children: ReactNode, itemType: unknown) {
-  return flattenFragments(children).filter(
-    (node): node is ReactElement<ItemProps> =>
-      isValidElement(node) && elementTypeOf(node) === itemType,
-  );
-}
+export const treeKeyOf = (path: readonly SidebarTreeId[]) => JSON.stringify(path);
 
-function ownChildrenOf(item: ReactElement<ItemProps>): ReactNode {
-  const { asChild, children } = item.props;
-  if (asChild && isValidElement<{ children?: ReactNode }>(children)) return children.props.children;
-  return children;
-}
+export function buildTree<T extends SidebarTreeItem<T>>(items: readonly T[]): SidebarTree<T> {
+  const nodes = new Map<string, SidebarTreeNode<T>>();
+  const duplicates: SidebarTreeId[] = [];
 
-export function collectTree(children: ReactNode, itemType: unknown) {
-  const tree: SidebarTree = new Map();
-  let everyItemHasAValue = true;
-
-  const visit = (nodes: ReactNode, parent: string | null) => {
-    const items = itemElementsOf(nodes, itemType);
-    const values: string[] = [];
-
-    items.forEach((item, index) => {
-      const { value } = item.props;
-      if (value === undefined) {
-        everyItemHasAValue = false;
-        return;
+  const visit = (list: readonly T[], parent: SidebarTreeNode<T> | null): string[] =>
+    list.flatMap((item, index) => {
+      const path = [...(parent?.path ?? []), item.id];
+      const key = treeKeyOf(path);
+      if (nodes.has(key)) {
+        duplicates.push(item.id);
+        return [];
       }
-      values.push(value);
-      tree.set(value, { value, parent, index, children: visit(ownChildrenOf(item), value) });
+
+      const node: SidebarTreeNode<T> = {
+        key,
+        item,
+        path,
+        parent: parent?.key ?? ROOT,
+        index,
+        children: [],
+        depth: path.length - 1,
+      };
+      nodes.set(key, node);
+      node.children = visit(item.children ?? [], node);
+      return [key];
     });
 
-    return values;
-  };
-
-  visit(children, ROOT);
-  return { tree, everyItemHasAValue };
+  return { nodes, roots: visit(items, null), duplicates };
 }
 
-export function isInside(tree: SidebarTree, value: string, ancestor: string): boolean {
-  for (let node = tree.get(value); node; node = tree.get(node.parent ?? '')) {
+export function siblingKeysOf<T>(tree: SidebarTree<T>, parent: string | null) {
+  return parent === ROOT ? tree.roots : (tree.nodes.get(parent)?.children ?? []);
+}
+
+export function isInside<T>(tree: SidebarTree<T>, key: string, ancestor: string): boolean {
+  for (let node = tree.nodes.get(key); node && node.parent !== ROOT; ) {
     if (node.parent === ancestor) return true;
-    if (node.parent === ROOT) return false;
+    node = tree.nodes.get(node.parent);
   }
   return false;
 }
 
-export function dropPositionAt(ratio: number, hasChildren: boolean): SidebarDropPosition {
+export function dropPositionAt(ratio: number, canDropInside: boolean, hasChildren: boolean) {
+  if (!canDropInside) return ratio < HALF ? 'before' : 'after';
   if (ratio < OUTER_EDGE) return 'before';
   if (hasChildren || ratio <= 1 - OUTER_EDGE) return 'inside';
   return 'after';
 }
 
-function siblingsOf(tree: SidebarTree, parent: string | null) {
-  return [...tree.values()].filter((node) => node.parent === parent);
-}
-
-function settled(tree: SidebarTree, move: SidebarItemMove): SidebarItemMove | null {
-  const source = tree.get(move.value);
+function settled<T>(tree: SidebarTree<T>, move: SidebarTreeMove): SidebarTreeMove | null {
+  const source = tree.nodes.get(move.key);
   if (!source) return null;
-  if (move.parent === move.value) return null;
-  if (move.parent !== ROOT && isInside(tree, move.parent, move.value)) return null;
+  if (move.parent === move.key) return null;
+  if (move.parent !== ROOT && isInside(tree, move.parent, move.key)) return null;
 
   const sameParent = source.parent === move.parent;
   const index = sameParent && source.index < move.index ? move.index - 1 : move.index;
@@ -96,68 +103,124 @@ function settled(tree: SidebarTree, move: SidebarItemMove): SidebarItemMove | nu
   return { ...move, index };
 }
 
-export function moveForDrop(tree: SidebarTree, value: string, drop: SidebarDrop) {
-  const target = tree.get(drop.value);
-  if (!target || drop.value === value) return null;
+export function moveForDrop<T>(tree: SidebarTree<T>, key: string, drop: SidebarDrop) {
+  const target = tree.nodes.get(drop.key);
+  if (!target || drop.key === key) return null;
 
-  if (drop.position === 'inside') return settled(tree, { value, parent: target.value, index: 0 });
+  if (drop.position === 'inside') return settled(tree, { key, parent: target.key, index: 0 });
   return settled(tree, {
-    value,
+    key,
     parent: target.parent,
     index: drop.position === 'before' ? target.index : target.index + 1,
   });
 }
 
-export type SidebarMoveKey = 'up' | 'down' | 'indent' | 'outdent';
-
-export function moveForKey(tree: SidebarTree, value: string, key: SidebarMoveKey) {
-  const node = tree.get(value);
-  if (!node) return null;
-  const siblings = siblingsOf(tree, node.parent);
-
-  switch (key) {
-    case 'up':
-      return node.index > 0 ? { value, parent: node.parent, index: node.index - 1 } : null;
-    case 'down':
-      return node.index < siblings.length - 1
-        ? { value, parent: node.parent, index: node.index + 1 }
-        : null;
-    case 'indent': {
-      const previous = siblings.find((sibling) => sibling.index === node.index - 1);
-      return previous ? { value, parent: previous.value, index: previous.children.length } : null;
-    }
-    case 'outdent': {
-      const parent = tree.get(node.parent ?? '');
-      return parent ? { value, parent: parent.parent, index: parent.index + 1 } : null;
-    }
-  }
+function withChildren<T extends SidebarTreeItem<T>>(item: T, children: readonly T[]): T {
+  return { ...item, children };
 }
 
-export function moveSidebarItem<T extends SidebarMovableItem<T>>(
-  items: readonly T[],
-  move: SidebarItemMove,
+function removeAt<T extends SidebarTreeItem<T>>(
+  list: readonly T[],
+  path: readonly SidebarTreeId[],
 ): T[] {
-  let moved: T | undefined;
+  const [id, ...rest] = path;
+  if (rest.length === 0) return list.filter((item) => item.id !== id);
+  return list.map((item) =>
+    item.id === id ? withChildren(item, removeAt(item.children ?? [], rest)) : item,
+  );
+}
 
-  const without = (list: readonly T[]): T[] =>
-    list.flatMap((item) => {
-      if (item.value === move.value) {
-        moved = item;
-        return [];
-      }
-      return item.children ? [{ ...item, children: without(item.children) }] : [item];
-    });
+function insertAt<T extends SidebarTreeItem<T>>(
+  list: readonly T[],
+  path: readonly SidebarTreeId[],
+  index: number,
+  moved: T,
+): T[] {
+  if (path.length === 0) return [...list.slice(0, index), moved, ...list.slice(index)];
+  const [id, ...rest] = path;
+  return list.map((item) =>
+    item.id === id ? withChildren(item, insertAt(item.children ?? [], rest, index, moved)) : item,
+  );
+}
 
-  const into = (list: readonly T[], parent: string | null): T[] => {
-    if (parent === move.parent)
-      return [...list.slice(0, move.index), moved!, ...list.slice(move.index)];
-    return list.map((item) =>
-      item.children || item.value === move.parent
-        ? { ...item, children: into(item.children ?? [], item.value) }
-        : item,
-    );
+export function placeOf<T>(tree: SidebarTree<T>, key: string): SidebarPlace<T> {
+  const node = tree.nodes.get(key)!;
+  const ancestors: T[] = [];
+  for (let parent = node.parent; parent !== ROOT; ) {
+    const ancestor = tree.nodes.get(parent)!;
+    ancestors.unshift(ancestor.item);
+    parent = ancestor.parent;
+  }
+  const siblings = siblingKeysOf(tree, node.parent);
+  const itemAt = (index: number) => {
+    const sibling = siblings[index];
+    return sibling === undefined ? null : tree.nodes.get(sibling)!.item;
   };
 
-  const rest = without(items);
-  return moved ? into(rest, ROOT) : [...items];
+  return {
+    parent: ancestors.at(-1) ?? null,
+    ancestors,
+    index: node.index,
+    previousSibling: itemAt(node.index - 1),
+    nextSibling: itemAt(node.index + 1),
+  };
+}
+
+export type SidebarDescribedMove<T> = { items: T[]; move: SidebarMove<T>; key: string };
+
+export function describeMove<T extends SidebarTreeItem<T>>(
+  items: readonly T[],
+  tree: SidebarTree<T>,
+  move: SidebarTreeMove,
+): SidebarDescribedMove<T> {
+  const source = tree.nodes.get(move.key)!;
+  const parentPath = move.parent === ROOT ? [] : tree.nodes.get(move.parent)!.path;
+  const next = insertAt(removeAt(items, source.path), parentPath, move.index, source.item);
+  const nextTree = buildTree(next);
+  const key = treeKeyOf([...parentPath, source.item.id]);
+  const to = placeOf(nextTree, key);
+
+  return {
+    items: next,
+    move: { item: nextTree.nodes.get(key)!.item, from: placeOf(tree, move.key), to },
+    key,
+  };
+}
+
+export type SidebarKeyboardStop = { drop: SidebarDrop; move: SidebarTreeMove | null };
+
+export function keyboardStops<T>(
+  tree: SidebarTree<T>,
+  key: string,
+  isVisible: (key: string) => boolean,
+  isAllowed: (move: SidebarTreeMove) => boolean,
+): SidebarKeyboardStop[] {
+  const stops: SidebarKeyboardStop[] = [];
+  const seen = new Set<string>();
+  const source = tree.nodes.get(key)!;
+  const origin = `${source.parent}|${source.index}`;
+
+  const add = (drop: SidebarDrop) => {
+    const move = moveForDrop(tree, key, drop);
+    const stopKey = move ? `${move.parent}|${move.index}` : origin;
+    const isOrigin = move === null;
+    if (isOrigin && drop.key !== key) return;
+    if (seen.has(stopKey) || (move && !isAllowed(move))) return;
+    seen.add(stopKey);
+    stops.push({ drop, move });
+  };
+
+  const visit = (keys: readonly string[]) =>
+    keys.forEach((nodeKey, index) => {
+      if (!isVisible(nodeKey)) return;
+      add({ key: nodeKey, position: 'before' });
+      if (nodeKey !== key) {
+        add({ key: nodeKey, position: 'inside' });
+        visit(tree.nodes.get(nodeKey)!.children);
+      }
+      if (index === keys.length - 1) add({ key: nodeKey, position: 'after' });
+    });
+
+  visit(tree.roots);
+  return stops;
 }

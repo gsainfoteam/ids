@@ -1,17 +1,22 @@
 import { type ComponentProps, type ReactNode } from 'react';
 
 import { SidebarFooter, type SidebarFooterProps } from './footer';
-import { SidebarGroup, type SidebarGroupProps } from './group';
+import {
+  SidebarGroup,
+  type SidebarGroupItemState,
+  type SidebarGroupItemsProps,
+  type SidebarGroupProps,
+} from './group';
 import { SidebarHeader, type SidebarHeaderProps } from './header';
 import { SidebarInset, type SidebarInsetProps } from './inset';
 import { SidebarItem, type SidebarItemProps } from './item';
 import { SidebarProvider, type SidebarProviderProps } from './provider';
 import { SidebarRoot } from './root';
 import { sidebarStyle, type SidebarCollapsibleMode, type SidebarVariant } from './style';
-import { moveSidebarItem, type SidebarItemMove, type SidebarMovableItem } from './tree';
 import { SidebarTrigger, type SidebarTriggerProps } from './trigger';
 import { findElementOfType } from '../../../utils';
 
+import type { SidebarMove, SidebarPlace, SidebarTreeItem } from './tree';
 import type { Hotkey } from '@tanstack/react-hotkeys';
 
 export function Sidebar(props: Sidebar.Props) {
@@ -41,20 +46,21 @@ export namespace Sidebar {
     export type Props = SidebarHeaderProps;
   }
 
+  export type TreeItem<T> = SidebarTreeItem<T>;
+
   export const Group = SidebarGroup;
   export namespace Group {
     export type Props = SidebarGroupProps;
+    export type ItemsProps<T extends TreeItem<T>> = SidebarGroupItemsProps<T>;
+    export type ItemState = SidebarGroupItemState;
+    export type Move<T> = SidebarMove<T>;
+    export type Place<T> = SidebarPlace<T>;
   }
 
   export const Item = SidebarItem;
   export namespace Item {
     export type Props = SidebarItemProps;
-    export type Move = SidebarItemMove;
   }
-
-  export type MovableItem<T> = SidebarMovableItem<T>;
-
-  export const moveItem = moveSidebarItem;
 
   export const Footer = SidebarFooter;
   export namespace Footer {

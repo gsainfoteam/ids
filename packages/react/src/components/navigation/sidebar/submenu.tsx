@@ -17,6 +17,7 @@ import {
 } from './item-children';
 import { SidebarRow, tintedIcon } from './row';
 import { SidebarDragFrame } from './sortable';
+import { TREE_KEY_PROP } from './tree';
 import { cn, elementTypeOf } from '../../../utils';
 import { Accordion } from '../../data/accordion';
 import { Item } from '../../data/item';
@@ -29,7 +30,7 @@ import type { SidebarIconColorScheme } from './style';
 const SUBMENU = 'submenu';
 
 type SubmenuProps = {
-  value?: string;
+  treeKey?: string;
   colorScheme?: SidebarIconColorScheme;
   parts: ItemParts<SidebarItemProps>;
   disabled: boolean;
@@ -37,7 +38,7 @@ type SubmenuProps = {
 };
 
 export function SidebarAccordionSubmenu({
-  value,
+  treeKey,
   parts,
   disabled,
   colorScheme,
@@ -47,16 +48,12 @@ export function SidebarAccordionSubmenu({
   const sortable = use(SidebarSortableContext);
   const folded = use(SidebarFoldedContext);
   const revealed = sortable?.revealed ?? null;
-  const [open, setOpen] = useState(
-    () =>
-      containsValue(parts.subItems, sidebar.value) ||
-      containsValue(parts.subItems, revealed?.value),
-  );
+  const [open, setOpen] = useState(() => containsValue(parts.subItems, sidebar.value));
   const [seenReveal, setSeenReveal] = useState(revealed?.times);
 
   if (revealed && revealed.times !== seenReveal) {
     setSeenReveal(revealed.times);
-    if (containsValue(parts.subItems, revealed.value)) setOpen(true);
+    if (treeKey !== undefined && revealed.ancestors.includes(treeKey)) setOpen(true);
   }
 
   return (
@@ -74,7 +71,7 @@ export function SidebarAccordionSubmenu({
         <Accordion.Header asChild>
           <div>
             <SidebarDragFrame
-              value={value}
+              dragKey={treeKey}
               preview={
                 <SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />
               }
@@ -90,9 +87,8 @@ export function SidebarAccordionSubmenu({
                 })}
               >
                 <Accordion.Trigger
-                  aria-describedby={sortable && value !== undefined ? sortable.hintId : undefined}
+                  aria-describedby={sortable && treeKey !== undefined ? sortable.hintId : undefined}
                   data-sidebar-item=""
-                  data-sidebar-value={value}
                 >
                   <SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />
                 </Accordion.Trigger>
@@ -117,7 +113,17 @@ export function SidebarAccordionSubmenu({
 
 function SidebarMenuEntry({ item }: { item: ReactElement<SidebarItemProps> }) {
   const sidebar = useSidebarContext('Sidebar.Item');
-  const { value, href, asChild, disabled, colorScheme, children, className, ...rest } = item.props;
+  const {
+    value,
+    href,
+    asChild,
+    disabled,
+    colorScheme,
+    children,
+    className,
+    [TREE_KEY_PROP]: _treeKey,
+    ...rest
+  } = item.props as SidebarItemProps & { [TREE_KEY_PROP]?: string };
   const parts = splitItemChildren<SidebarItemProps>(
     linkChildrenOf({ asChild, children }),
     elementTypeOf(item),

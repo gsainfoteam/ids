@@ -8,6 +8,7 @@ import { SidebarRow } from './row';
 import { SidebarDragFrame } from './sortable';
 import { type SidebarIconColorScheme } from './style';
 import { SidebarAccordionSubmenu, SidebarMenuSubmenu } from './submenu';
+import { TREE_KEY_PROP } from './tree';
 import { Item } from '../../data/item';
 import { Tooltip } from '../../overlay/tooltip';
 
@@ -29,8 +30,11 @@ export function SidebarItem({
   className,
   children,
   onClick,
-  ...rest
+  ...props
 }: SidebarItemProps) {
+  const { [TREE_KEY_PROP]: treeKey, ...rest } = props as typeof props & {
+    [TREE_KEY_PROP]?: string;
+  };
   const sidebar = useSidebarContext('Sidebar.Item');
   const inList = use(SidebarListContext);
   const sortable = use(SidebarSortableContext);
@@ -50,7 +54,7 @@ export function SidebarItem({
         />
       ) : (
         <SidebarAccordionSubmenu
-          value={value}
+          treeKey={treeKey}
           parts={parts}
           disabled={disabled}
           colorScheme={colorScheme}
@@ -59,7 +63,7 @@ export function SidebarItem({
       )
     ) : (
       <SidebarDragFrame
-        value={value}
+        dragKey={treeKey}
         preview={<SidebarRow parts={parts} styles={sidebar.styles} colorScheme={colorScheme} />}
       >
         <Tooltip content={parts.label} side="right" disabled={!sidebar.rail}>
@@ -76,7 +80,7 @@ export function SidebarItem({
             {linkElementOf(
               { href, asChild, children },
               {
-                'aria-describedby': sortable && value !== undefined ? sortable.hintId : undefined,
+                'aria-describedby': sortable && treeKey !== undefined ? sortable.hintId : undefined,
                 ...rest,
                 'data-sidebar-item': '',
                 'data-sidebar-value': value,

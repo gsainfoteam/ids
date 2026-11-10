@@ -327,41 +327,47 @@ test('items nest to any depth, as accordions in the panel and as nested menus in
     .toHaveAttribute('aria-current', 'page');
 });
 
-type Doc = { value: string; label: string; children?: Doc[] };
+type Doc = { id: string; label: string; children?: Doc[] };
 
 const DOCS: Doc[] = [
-  { value: 'roadmap', label: '로드맵' },
+  { id: 'roadmap', label: '로드맵' },
   {
-    value: 'ids',
+    id: 'ids',
     label: 'IDS',
     children: [
-      { value: 'minutes', label: '회의록' },
-      { value: 'tokens', label: '토큰' },
+      { id: 'minutes', label: '회의록' },
+      { id: 'tokens', label: '토큰' },
     ],
   },
-  { value: 'shuttle', label: '셔틀' },
+  { id: 'shuttle', label: '셔틀' },
 ];
 
-function Docs({ onItemMove }: { onItemMove: Mock }) {
+function Docs({
+  onItemsChange,
+  canMove,
+}: {
+  onItemsChange: Mock;
+  canMove?: Sidebar.Group.ItemsProps<Doc>['canMove'];
+}) {
   const [docs, setDocs] = useState(DOCS);
-  const item = (doc: Doc) => (
-    <Sidebar.Item key={doc.value} value={doc.value} href={`#${doc.value}`}>
-      <DocumentTextIcon />
-      {doc.label}
-      {doc.children?.map(item)}
-    </Sidebar.Item>
-  );
 
   return (
     <Sidebar>
       <Sidebar.Group
         label="문서"
-        onItemMove={(move) => {
-          onItemMove(move);
-          setDocs((current) => Sidebar.moveItem(current, move));
+        items={docs}
+        canMove={canMove}
+        onItemsChange={(next, move) => {
+          onItemsChange(move);
+          setDocs(next);
         }}
       >
-        {docs.map(item)}
+        {(doc) => (
+          <Sidebar.Item value={doc.id} href={`#${doc.id}`}>
+            <DocumentTextIcon />
+            {doc.label}
+          </Sidebar.Item>
+        )}
       </Sidebar.Group>
     </Sidebar>
   );
@@ -370,36 +376,88 @@ function Docs({ onItemMove }: { onItemMove: Mock }) {
 const rowOrder = () =>
   [...document.querySelectorAll('[data-sidebar-item]')].map((row) => row.textContent);
 
-test('Alt and the arrow keys reorder, nest and lift an item and keep focus on it', async () => {
-  await page.viewport(DESKTOP.width, DESKTOP.height);
-  const onItemMove = vi.fn();
-  const screen = await render(ui(<Docs onItemMove={onItemMove} />));
-  const shuttle = () => screen.getByRole('link', { name: '셔틀' });
-  const press = async (key: string) => {
-    await userEvent.keyboard(`{Alt>}{${key}}{/Alt}`);
-    await expect.element(shuttle()).toHaveFocus();
+const lastMove = (onItemsChange: Mock) => {
+  const move = onItemsChange.mock.lastCall?.[0] as Sidebar.Group.Move<Doc>;
+  return {
+    item: move.item.id,
+    from: [move.from.parent?.id ?? null, move.from.index],
+    to: [move.to.parent?.id ?? null, move.to.index],
+    between: [move.to.previousSibling?.id ?? null, move.to.nextSibling?.id ?? null],
   };
+};
+
+test('items render each row through the function and place the children under it', async () => {
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const screen = await render(ui(<Docs onItemsChange={vi.fn()} />));
+
+  await screen.getByRole('button', { name: 'IDS' }).click();
+  await expect.element(screen.getByRole('link', { name: '토큰' })).toBeVisible();
+  expect(rowOrder()).toEqual(['로드맵', 'IDS', '회의록', '토큰', '셔틀']);
+});
+
+test('Space picks a row up, the arrows choose a place, Enter drops it there and Escape cancels', async () => {
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onItemsChange = vi.fn();
+  const screen = await render(ui(<Docs onItemsChange={onItemsChange} />));
+  const shuttle = () => screen.getByRole('link', { name: '셔틀' });
 
   await expect.element(shuttle()).toHaveAttribute('aria-describedby');
   shuttle().element().focus();
 
-  await press('ArrowUp');
-  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'shuttle', parent: null, index: 1 });
-  expect(rowOrder()).toEqual(['로드맵', '셔틀', 'IDS', '회의록', '토큰']);
+  await userEvent.keyboard(' ');
+  await userEvent.keyboard('{ArrowDown}');
+  await userEvent.keyboard('{Escape}');
+  expect(onItemsChange).not.toHaveBeenCalled();
+  await expect.element(shuttle()).toHaveFocus();
 
-  await press('ArrowDown');
-  await press('ArrowRight');
-  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'shuttle', parent: 'ids', index: 2 });
+  await userEvent.keyboard(' ');
+  await userEvent.keyboard('{ArrowUp}');
+  await userEvent.keyboard('{Enter}');
+  expect(lastMove(onItemsChange)).toEqual({
+    item: 'shuttle',
+    from: [null, 2],
+    to: ['ids', 0],
+    between: [null, 'minutes'],
+  });
   await expect.element(shuttle()).toBeVisible();
+  await expect.element(shuttle()).toHaveFocus();
   await expect
     .element(screen.getByRole('button', { name: 'IDS' }))
     .toHaveAttribute('aria-expanded', 'true');
+  expect(rowOrder()).toEqual(['로드맵', 'IDS', '셔틀', '회의록', '토큰']);
 
-  await press('ArrowLeft');
-  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'shuttle', parent: null, index: 2 });
+  await userEvent.keyboard(' ');
+  await userEvent.keyboard('{ArrowUp}');
+  await userEvent.keyboard(' ');
+  expect(lastMove(onItemsChange)).toEqual({
+    item: 'shuttle',
+    from: ['ids', 0],
+    to: [null, 1],
+    between: ['roadmap', 'ids'],
+  });
+  await expect.element(shuttle()).toHaveFocus();
+  expect(rowOrder()).toEqual(['로드맵', '셔틀', 'IDS', '회의록', '토큰']);
+  expect(onItemsChange).toHaveBeenCalledTimes(2);
+});
 
-  await userEvent.keyboard('{Alt>}{ArrowDown}{/Alt}');
-  expect(onItemMove).toHaveBeenCalledTimes(4);
+test('the arrows only stop at places canMove allows', async () => {
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onItemsChange = vi.fn();
+  const screen = await render(
+    ui(<Docs onItemsChange={onItemsChange} canMove={({ to }) => to.parent === null} />),
+  );
+
+  screen.getByRole('link', { name: '셔틀' }).element().focus();
+  await userEvent.keyboard(' ');
+  await userEvent.keyboard('{ArrowUp}{ArrowUp}{ArrowUp}');
+  await userEvent.keyboard('{Enter}');
+
+  expect(lastMove(onItemsChange)).toEqual({
+    item: 'shuttle',
+    from: [null, 2],
+    to: [null, 0],
+    between: [null, 'roadmap'],
+  });
 });
 
 const frameOffset = (x: number, y: number) => {
@@ -434,18 +492,32 @@ async function drag(from: Element, to: Element, fraction: number) {
 test('dragging a row drops it before, after or inside the row under the pointer', async (context) => {
   skipWithoutCdp(context);
   await page.viewport(DESKTOP.width, DESKTOP.height);
-  const onItemMove = vi.fn();
-  const screen = await render(ui(<Docs onItemMove={onItemMove} />));
+  const onItemsChange = vi.fn();
+  const screen = await render(ui(<Docs onItemsChange={onItemsChange} />));
   const row = (name: string) => screen.getByRole('link', { name }).element();
 
   await drag(row('셔틀'), row('로드맵'), 0.1);
   await expect.poll(rowOrder).toEqual(['셔틀', '로드맵', 'IDS', '회의록', '토큰']);
-  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'shuttle', parent: null, index: 0 });
+  expect(lastMove(onItemsChange)).toMatchObject({ item: 'shuttle', to: [null, 0] });
   expect(location.hash).not.toBe('#roadmap');
 
   await drag(row('로드맵'), screen.getByRole('button', { name: 'IDS' }).element(), 0.5);
-  expect(onItemMove).toHaveBeenLastCalledWith({ value: 'roadmap', parent: 'ids', index: 0 });
+  expect(lastMove(onItemsChange)).toMatchObject({ item: 'roadmap', to: ['ids', 0] });
 
   await drag(row('셔틀'), row('셔틀'), 0.5);
-  expect(onItemMove).toHaveBeenCalledTimes(2);
+  expect(onItemsChange).toHaveBeenCalledTimes(2);
+});
+
+test('a row that canMove keeps closed splits into before and after', async (context) => {
+  skipWithoutCdp(context);
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onItemsChange = vi.fn();
+  const screen = await render(
+    ui(<Docs onItemsChange={onItemsChange} canMove={({ to }) => to.parent?.id !== 'roadmap'} />),
+  );
+  const row = (name: string) => screen.getByRole('link', { name }).element();
+
+  await drag(row('셔틀'), row('로드맵'), 0.6);
+  await expect.poll(rowOrder).toEqual(['로드맵', '셔틀', 'IDS', '회의록', '토큰']);
+  expect(lastMove(onItemsChange)).toMatchObject({ item: 'shuttle', to: [null, 1] });
 });

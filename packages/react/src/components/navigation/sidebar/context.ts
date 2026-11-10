@@ -5,7 +5,7 @@ import { createContext, use, type ReactNode } from 'react';
 import { invariant } from '../../../utils';
 
 import type { SidebarCollapsibleMode, SidebarVariant, sidebarStyle } from './style';
-import type { SidebarDrop, SidebarMoveKey } from './tree';
+import type { SidebarDrop } from './tree';
 import type { Hotkey } from '@tanstack/react-hotkeys';
 
 export type SidebarControls = {
@@ -50,13 +50,18 @@ export const SidebarListContext = createContext(false);
 
 export const SidebarFoldedContext = createContext(false);
 
+export type SidebarFrame = { element: HTMLElement; preview: ReactNode; folded: boolean };
+
 export type SidebarSortableValue = {
   drop: SidebarDrop | null;
-  dragging: string | null;
-  revealed: { value: string; times: number } | null;
+  grabbed: string | null;
+  revealed: { ancestors: readonly string[]; times: number } | null;
   hintId: string;
-  register: (value: string, frame: { element: HTMLElement; preview: ReactNode }) => () => void;
-  moveByKey: (value: string, direction: SidebarMoveKey) => boolean;
+  register: (key: string, frame: SidebarFrame) => () => void;
+  grab: (key: string) => void;
+  step: (direction: 1 | -1) => void;
+  release: () => void;
+  cancel: () => void;
 };
 
 export const SidebarSortableContext = createContext<SidebarSortableValue | null>(null);

@@ -27,6 +27,9 @@ import {
   CheckCircleIcon,
   Cog6ToothIcon,
   CubeTransparentIcon,
+  DocumentTextIcon,
+  FolderIcon,
+  HashtagIcon,
   HomeIcon,
   InboxIcon,
   MagnifyingGlassIcon,
@@ -510,7 +513,7 @@ export const Tree: Story = {
 };
 
 type Page = {
-  value: string;
+  id: string;
   label: string;
   icon: ReactNode;
   colorScheme?: Sidebar.Item.Props['colorScheme'];
@@ -519,26 +522,140 @@ type Page = {
 };
 
 const FAVORITES: Page[] = [
-  { value: 'roadmap', label: 'Ziggle 로드맵', icon: <MapSolid />, colorScheme: 'info' },
+  { id: 'roadmap', label: 'Ziggle 로드맵', icon: <MapSolid />, colorScheme: 'info' },
+  { id: 'tokens', label: 'IDS 색 토큰', icon: <SwatchSolid />, colorScheme: 'danger' },
+  { id: 'shuttle', label: '셔틀 시간표', icon: <TruckSolid />, colorScheme: 'warning' },
+  { id: 'onboarding', label: '신입 온보딩', icon: <AcademicCapSolid />, colorScheme: 'success' },
+];
+
+export const Favorites: Story = {
+  args: { value: 'tokens' },
+  render: function Render(args) {
+    const [favorites, setFavorites] = useState(FAVORITES);
+
+    return (
+      <Sidebar.Provider>
+        <Sidebar {...args} aria-label="워크스페이스">
+          <Sidebar.Item value="inbox" href="#inbox">
+            <InboxIcon />
+            받은 소식
+          </Sidebar.Item>
+          <Sidebar.Group
+            label="즐겨찾기"
+            items={favorites}
+            onItemsChange={setFavorites}
+            canMove={({ to }) => to.parent === null}
+          >
+            {(page) => (
+              <Sidebar.Item value={page.id} href={`#${page.id}`} colorScheme={page.colorScheme}>
+                {page.icon}
+                {page.label}
+              </Sidebar.Item>
+            )}
+          </Sidebar.Group>
+        </Sidebar>
+        <Sidebar.Inset className="p-6">
+          <Skeleton className="h-64" />
+        </Sidebar.Inset>
+      </Sidebar.Provider>
+    );
+  },
+};
+
+type Channel = {
+  id: string;
+  kind: 'category' | 'channel';
+  label: string;
+  unread?: number;
+  children?: Channel[];
+};
+
+const CHANNELS: Channel[] = [
   {
-    value: 'ids',
+    id: 'notice',
+    kind: 'category',
+    label: '공지',
+    children: [
+      { id: 'announcements', kind: 'channel', label: '공지사항', unread: 2 },
+      { id: 'events', kind: 'channel', label: '행사' },
+    ],
+  },
+  {
+    id: 'dev',
+    kind: 'category',
+    label: '개발',
+    children: [
+      { id: 'frontend', kind: 'channel', label: '프론트엔드', unread: 12 },
+      { id: 'backend', kind: 'channel', label: '백엔드' },
+      { id: 'deploy', kind: 'channel', label: '배포 알림' },
+    ],
+  },
+  { id: 'lounge', kind: 'category', label: '잡담', children: [] },
+];
+
+export const ChannelSections: Story = {
+  args: { value: 'frontend' },
+  render: function Render(args) {
+    const [channels, setChannels] = useState(CHANNELS);
+
+    return (
+      <Sidebar.Provider>
+        <Sidebar {...args} aria-label="워크스페이스">
+          <Sidebar.Group
+            label="채널"
+            items={channels}
+            onItemsChange={setChannels}
+            canMove={({ item, to }) =>
+              item.kind === 'category' ? to.parent === null : to.parent?.kind === 'category'
+            }
+          >
+            {(channel) =>
+              channel.kind === 'category' ? (
+                <Sidebar.Item>
+                  <FolderIcon />
+                  {channel.label}
+                </Sidebar.Item>
+              ) : (
+                <Sidebar.Item value={channel.id} href={`#${channel.id}`}>
+                  <HashtagIcon />
+                  {channel.label}
+                  {channel.unread && (
+                    <Badge content={channel.unread} variant="soft" colorScheme="primary" />
+                  )}
+                </Sidebar.Item>
+              )
+            }
+          </Sidebar.Group>
+        </Sidebar>
+        <Sidebar.Inset className="p-6">
+          <Skeleton className="h-64" />
+        </Sidebar.Inset>
+      </Sidebar.Provider>
+    );
+  },
+};
+
+const PAGES: Page[] = [
+  { id: 'roadmap', label: 'Ziggle 로드맵', icon: <MapSolid />, colorScheme: 'info' },
+  {
+    id: 'ids',
     label: 'IDS 디자인 시스템',
     icon: <SwatchSolid />,
     colorScheme: 'danger',
     children: [
-      { value: 'minutes', label: '주간 회의록', icon: <PencilSquareSolid /> },
+      { id: 'minutes', label: '주간 회의록', icon: <PencilSquareSolid /> },
       {
-        value: 'tokens',
+        id: 'tokens',
         label: '토큰',
         icon: <PuzzlePieceSolid />,
         colorScheme: 'primary',
         children: [
-          { value: 'color', label: '색', icon: <SparklesSolid />, colorScheme: 'warning' },
-          { value: 'radius', label: '모서리', icon: <FolderSolid /> },
+          { id: 'color', label: '색', icon: <SparklesSolid />, colorScheme: 'warning' },
+          { id: 'radius', label: '모서리', icon: <FolderSolid /> },
         ],
       },
       {
-        value: 'review',
+        id: 'review',
         label: '컴포넌트 리뷰',
         icon: <EyeSolid />,
         colorScheme: 'success',
@@ -547,116 +664,127 @@ const FAVORITES: Page[] = [
     ],
   },
   {
-    value: 'shuttle',
+    id: 'shuttle',
     label: '셔틀 시간표',
     icon: <TruckSolid />,
     colorScheme: 'warning',
     badge: <Badge content="새 학기" variant="outline" colorScheme="success" />,
   },
-  { value: 'onboarding', label: '신입 온보딩', icon: <AcademicCapSolid />, colorScheme: 'success' },
-];
-
-const PROJECTS: Page[] = [
   {
-    value: 'ziggle-v3',
-    label: 'Ziggle v3',
+    id: 'projects',
+    label: '프로젝트',
     icon: <RocketLaunchSolid />,
     colorScheme: 'primary',
-    badge: <Badge dot colorScheme="success" />,
-  },
-  {
-    value: 'gistory',
-    label: 'GISTORY 앱',
-    icon: <DevicePhoneMobileSolid />,
-    colorScheme: 'info',
-    badge: <Badge dot colorScheme="warning" />,
-  },
-  {
-    value: 'infoteam-site',
-    label: '인포팀 홈페이지',
-    icon: <HomeModernSolid />,
-    colorScheme: 'danger',
+    children: [
+      { id: 'ziggle-v3', label: 'Ziggle v3', icon: <RocketLaunchSolid /> },
+      { id: 'gistory', label: 'GISTORY 앱', icon: <DevicePhoneMobileSolid />, colorScheme: 'info' },
+      { id: 'site', label: '인포팀 홈페이지', icon: <HomeModernSolid />, colorScheme: 'danger' },
+    ],
   },
 ];
 
-const findPage = (pages: Page[], value: string): Page | undefined => {
-  for (const page of pages) {
-    if (page.value === value) return page;
-    const inside = page.children && findPage(page.children, value);
-    if (inside) return inside;
-  }
-};
-
-export const Reorder: Story = {
+export const NestedPages: Story = {
   args: { value: 'color' },
   render: function Render(args) {
-    const [favorites, setFavorites] = useState(FAVORITES);
-    const [projects, setProjects] = useState(PROJECTS);
-
-    const confirmMove = (pages: Page[], move: Sidebar.Item.Move) => {
-      const page = findPage(pages, move.value);
-      const parent = move.parent === null ? null : findPage(pages, move.parent);
-      const place = parent
-        ? `"${parent.label}" 안의 ${move.index + 1}번째 자리`
-        : `맨 위 ${move.index + 1}번째 자리`;
-
-      return overlay.open<boolean>(({ close }) => (
-        <Dialog>
-          <Dialog.Content>
-            <Dialog.Header>
-              <Dialog.Title>페이지를 옮길까요?</Dialog.Title>
-              <Dialog.Description>
-                &quot;{page?.label}&quot; 페이지가 {place}로 옮겨집니다.
-              </Dialog.Description>
-            </Dialog.Header>
-            <Dialog.Footer>
-              <Dialog.Close>취소</Dialog.Close>
-              <Button onClick={() => close(true)}>옮기기</Button>
-            </Dialog.Footer>
-          </Dialog.Content>
-        </Dialog>
-      ));
-    };
-
-    const renderPage = (page: Page) => (
-      <Sidebar.Item
-        key={page.value}
-        value={page.value}
-        href={`#${page.value}`}
-        colorScheme={page.colorScheme}
-      >
-        {page.icon}
-        {page.label}
-        {page.badge}
-        {page.children?.map(renderPage)}
-      </Sidebar.Item>
-    );
+    const [pages, setPages] = useState(PAGES);
 
     return (
-      <Sidebar.Provider className="break-keep">
+      <Sidebar.Provider>
         <Sidebar {...args} aria-label="워크스페이스">
-          <Sidebar.Item value="inbox" href="#inbox">
-            <InboxIcon />
-            받은 소식
-            <Badge content={5} variant="soft" colorScheme="primary" />
-          </Sidebar.Item>
           <Sidebar.Group
-            label="즐겨찾기"
-            onItemMove={async (move) => {
-              if (await confirmMove(favorites, move))
-                setFavorites((current) => Sidebar.moveItem(current, move));
+            label="페이지"
+            items={pages}
+            onItemsChange={async (next, { item, to }) => {
+              const place = to.parent ? `"${to.parent.label}" 안` : '맨 위';
+              const confirmed = await overlay.open<boolean>(({ close }) => (
+                <Dialog>
+                  <Dialog.Content className="break-keep">
+                    <Dialog.Header>
+                      <Dialog.Title>페이지를 옮길까요?</Dialog.Title>
+                      <Dialog.Description>
+                        &quot;{item.label}&quot; 페이지가 {place}의 {to.index + 1}번째 자리로
+                        옮겨집니다.
+                      </Dialog.Description>
+                    </Dialog.Header>
+                    <Dialog.Footer>
+                      <Dialog.Close>취소</Dialog.Close>
+                      <Button onClick={() => close(true)}>옮기기</Button>
+                    </Dialog.Footer>
+                  </Dialog.Content>
+                </Dialog>
+              ));
+              if (confirmed) setPages(next);
             }}
           >
-            {favorites.map(renderPage)}
+            {(page) => (
+              <Sidebar.Item value={page.id} href={`#${page.id}`} colorScheme={page.colorScheme}>
+                {page.icon}
+                {page.label}
+                {page.badge}
+              </Sidebar.Item>
+            )}
           </Sidebar.Group>
+        </Sidebar>
+        <Sidebar.Inset className="p-6">
+          <Skeleton className="h-64" />
+        </Sidebar.Inset>
+      </Sidebar.Provider>
+    );
+  },
+};
+
+type FileNode = { id: string; kind: 'folder' | 'file'; name: string; children?: FileNode[] };
+
+const FILES: FileNode[] = [
+  {
+    id: 'src',
+    kind: 'folder',
+    name: 'src',
+    children: [
+      {
+        id: 'components',
+        kind: 'folder',
+        name: 'components',
+        children: [
+          { id: 'button.tsx', kind: 'file', name: 'button.tsx' },
+          { id: 'dialog.tsx', kind: 'file', name: 'dialog.tsx' },
+        ],
+      },
+      { id: 'index.ts', kind: 'file', name: 'index.ts' },
+    ],
+  },
+  { id: 'assets', kind: 'folder', name: 'assets', children: [] },
+  { id: 'README.md', kind: 'file', name: 'README.md' },
+  { id: 'package.json', kind: 'file', name: 'package.json' },
+];
+
+export const FileTree: Story = {
+  args: { value: 'button.tsx' },
+  render: function Render(args) {
+    const [files, setFiles] = useState(FILES);
+
+    return (
+      <Sidebar.Provider>
+        <Sidebar {...args} aria-label="파일">
           <Sidebar.Group
-            label="프로젝트"
-            onItemMove={async (move) => {
-              if (await confirmMove(projects, move))
-                setProjects((current) => Sidebar.moveItem(current, move));
-            }}
+            label="ids-react"
+            items={files}
+            onItemsChange={setFiles}
+            canMove={({ to }) => to.parent === null || to.parent.kind === 'folder'}
           >
-            {projects.map(renderPage)}
+            {(file) =>
+              file.kind === 'folder' ? (
+                <Sidebar.Item>
+                  <FolderIcon />
+                  {file.name}
+                </Sidebar.Item>
+              ) : (
+                <Sidebar.Item value={file.id} href={`#${file.id}`}>
+                  <DocumentTextIcon />
+                  {file.name}
+                </Sidebar.Item>
+              )
+            }
           </Sidebar.Group>
         </Sidebar>
         <Sidebar.Inset className="p-6">

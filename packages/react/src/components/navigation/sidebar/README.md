@@ -5,7 +5,7 @@
 - **구조가 곧 접근성.** `<aside>` 안의 `<nav aria-label>`, 묶음은 `<section aria-labelledby>` 와 `<ul>`, 항목은 `<li>` 안의 링크입니다. 지금 페이지 링크에 `aria-current="page"` 가 붙습니다.
 - **자식 순서로 칸을 나눕니다.** `Sidebar.Item` 의 첫 아이콘은 아이콘 칸, 글자는 라벨, 그 뒤(Badge, Kbd)는 끝 칸입니다.
 - **아이콘 띠로 접힙니다.** 접으면 라벨은 Tooltip 으로, 하위 메뉴는 Menu 로 뜹니다. `Mod+B` 로 접고 펼칩니다.
-- **끌어서 옮깁니다.** `Sidebar.Group` 에 `onItemMove` 를 주면 항목을 끌어 순서를 바꾸고 다른 항목 안으로 넣습니다. 키보드는 Alt 와 방향키입니다.
+- **데이터로 그리고 끌어서 옮깁니다.** `Sidebar.Group` 에 `items` 와 한 줄을 그리는 함수를 주면 트리를 그리고, `onItemsChange` 를 주면 항목을 끌어 순서를 바꾸고 다른 항목 안으로 넣습니다. 키보드는 Space 로 집고 방향키로 고릅니다.
 - **좁은 화면에서는 Drawer.** 640px 아래에서는 사이드바 대신 왼쪽 Drawer 가 열리고, 항목을 누르면 닫힙니다.
 - **IDS 로 짓습니다.** 끌기는 `@dnd-kit/core`, 항목은 Item, 하위 메뉴는 Accordion 과 Menu, 라벨은 Tooltip, 접기 버튼은 IconButton, 스크롤은 ScrollArea, 선은 Divider, floating 사이드바와 inset 본문의 표면은 Card 입니다.
 
@@ -122,60 +122,112 @@ import { CodeBracketIcon } from '@heroicons/react/16/solid';
 - `collapsible` 묶음은 Accordion 입니다. 라벨이 `aria-expanded` 버튼이 되고, 목록은 그 버튼을 이름으로 가진 영역입니다.
 - 사이드바가 아이콘 띠로 접히면 묶음 라벨은 화면에서 숨고(스크린 리더는 읽음) 목록은 늘 보입니다.
 
-## 끌어서 옮기기
+## 데이터로 그리기
 
 ```tsx
-const [docs, setDocs] = useState(DOCS); // { value, label, children? }[]
+const [docs, setDocs] = useState(DOCS); // { id, label, children? }[]
 
-const item = (doc: Doc) => (
-  <Sidebar.Item key={doc.value} value={doc.value} href={`/docs/${doc.value}`}>
-    <DocumentTextIcon />
-    {doc.label}
-    {doc.children?.map(item)}
-  </Sidebar.Item>
-);
-
-<Sidebar.Group
-  label="즐겨찾기"
-  onItemMove={(move) => setDocs((current) => Sidebar.moveItem(current, move))}
->
-  {docs.map(item)}
+<Sidebar.Group label="즐겨찾기" items={docs} onItemsChange={setDocs}>
+  {(doc) => (
+    <Sidebar.Item value={doc.id} href={`/docs/${doc.id}`}>
+      <DocumentTextIcon />
+      {doc.label}
+    </Sidebar.Item>
+  )}
 </Sidebar.Group>
 ```
 
-- `onItemMove` 를 준 묶음의 항목은 끌 수 있습니다. 끌리는 항목에는 `value` 가 있어야 합니다.
-- 마우스는 4px 넘게 움직여야 끌기가 시작됩니다. 그 전에 떼면 그냥 누른 것입니다. 손가락은 0.25초 누르고 있어야 시작합니다.
-- 놓을 자리는 포인터가 올라간 줄의 높이로 정합니다. 위 1/4 은 그 줄 앞, 아래 1/4 은 그 줄 뒤, 가운데는 그 줄 안의 맨 앞입니다. 하위 항목이 있는 줄은 아래 3/4 이 모두 안입니다.
-- 앞과 뒤는 줄 사이의 선으로, 안은 그 줄을 옅은 브랜드 색으로 칠해 보여 줍니다. 끌리는 항목은 흐려지고, 포인터에는 그 항목의 복사본이 붙습니다.
-- 자기 자신이나 자기 하위 항목 안으로는 놓을 수 없습니다. 접힌 하위 메뉴 안의 항목은 끌거나 놓을 자리가 되지 않습니다.
-- 키보드: 항목에 포커스를 두고 Alt+↑/↓ 는 형제 사이에서 한 칸, Alt+→ 는 바로 위 형제의 맨 끝 하위 항목으로, Alt+← 는 부모 바로 뒤로 옮깁니다. 포커스는 옮긴 항목에 남습니다. 이 안내는 `aria-describedby` 로 읽힙니다.
-- 옮긴 항목이 접힌 하위 메뉴 안으로 들어가면 그 하위 메뉴를 펼칩니다.
-- `onItemMove` 는 `{ value, parent, index }` 를 줍니다. `parent` 는 새 부모의 `value` 이고 묶음의 맨 위 단계면 `null` 입니다. `index` 는 옮긴 뒤 새 부모 안에서의 자리입니다.
-- `Sidebar.moveItem(items, move)` 는 `{ value, children? }` 모양의 트리에 이 이동을 적용한 새 배열을 돌려줍니다. 다른 모양의 데이터는 `move` 를 직접 읽어 옮깁니다.
-- 옮기기 전에 확인을 받으려면 `onItemMove` 에서 `overlay.open` 을 기다린 뒤 적용합니다. 취소하면 아무것도 바뀌지 않습니다.
+- Group 은 항목을 JSX children 으로 받거나, `items` 와 한 줄을 그리는 함수로 받습니다. 한 Group 안에서 둘을 섞으면 타입 오류입니다.
+- 함수는 항목 하나의 `Sidebar.Item` 을 돌려줍니다. `children` 이 있는 항목은 IDS 가 하위 항목을 같은 함수로 그려 그 Item 의 하위 메뉴로 붙입니다. 하위 메뉴, 아이콘 띠의 Menu 는 JSX 로 겹쳐 쓸 때와 같습니다.
+- 함수는 `Sidebar.Item` 을 직접 돌려줘야 합니다. 그것을 감싼 컴포넌트를 돌려주면 하위 항목을 붙이지 못하고 끌 수 없으며, 개발 모드에서 경고합니다.
+- 함수의 두 번째 인자는 `{ depth }` 입니다. 맨 위 단계가 `0` 입니다.
+- 데이터는 `{ id, children? }` 모양입니다. `id` 는 `string` 이나 `number` 이고 같은 부모 아래에서만 겹치지 않으면 됩니다(React 의 `key` 와 같은 규칙). 겹치면 개발 모드에서 경고하고 뒤의 것을 뺍니다.
+- `id` 는 항목을 가리키는 값이고, 지금 페이지를 고르는 `value` 와는 따로입니다. 이름을 바꿔도 `id` 는 그대로 둡니다.
+- 타입은 `items` 에서 추론합니다. 함수, `onItemsChange`, `canMove` 의 항목은 모두 그 타입이고, 폴더와 파일처럼 모양이 다른 노드의 유니온도 좁혀집니다.
+- 렌더 함수는 서버에서 클라이언트로 넘길 수 없으므로, `items` 를 쓰는 Group 은 클라이언트 컴포넌트 안에 둡니다.
+
+## 끌어서 옮기기
 
 ```tsx
 <Sidebar.Group
-  label="즐겨찾기"
-  onItemMove={async (move) => {
-    const confirmed = await overlay.open<boolean>(({ close }) => (
-      <Dialog>
-        <Dialog.Content>
-          <Dialog.Header>
-            <Dialog.Title>페이지를 옮길까요?</Dialog.Title>
-          </Dialog.Header>
-          <Dialog.Footer>
-            <Dialog.Close>취소</Dialog.Close>
-            <Button onClick={() => close(true)}>옮기기</Button>
-          </Dialog.Footer>
-        </Dialog.Content>
-      </Dialog>
-    ));
-    if (confirmed) setDocs((current) => Sidebar.moveItem(current, move));
-  }}
+  label="파일"
+  items={files}
+  onItemsChange={setFiles}
+  canMove={({ to }) => to.parent === null || to.parent.kind === 'folder'}
 >
+  {(file) => <Sidebar.Item value={file.id}>{file.name}</Sidebar.Item>}
+</Sidebar.Group>
 ```
+
+- `onItemsChange` 를 주면 항목을 끌 수 있습니다. 제어 방식만 있습니다. IDS 는 옮긴 뒤의 새 배열을 넘기기만 하고, 앱이 `items` 를 바꿔야 화면이 바뀝니다.
+- 마우스는 4px 넘게 움직여야 끌기가 시작됩니다. 그 전에 떼면 그냥 누른 것입니다. 손가락은 0.25초 누르고 있어야 시작합니다.
+- 놓을 자리는 포인터가 올라간 줄의 높이로 정합니다. 위 1/4 은 그 줄 앞, 아래 1/4 은 그 줄 뒤, 가운데는 그 줄 안의 맨 앞입니다. 하위 항목이 있는 줄은 아래 3/4 이 모두 안입니다.
+- 그 줄 안으로 넣는 것을 `canMove` 가 막으면 줄을 반으로 나눠 위는 앞, 아래는 뒤입니다. 앞뒤도 막히면 아무것도 그리지 않습니다.
+- 앞과 뒤는 줄 사이의 선으로, 안은 그 줄을 옅은 브랜드 색으로 칠해 보여 줍니다. 끌리는 항목은 흐려지고, 포인터에는 그 항목의 복사본이 붙습니다.
+- 자기 자신이나 자기 하위 항목 안으로는 놓을 수 없습니다. 접힌 하위 메뉴 안의 항목은 끌거나 놓을 자리가 되지 않습니다.
+- 키보드: 항목에 포커스를 두고 Space 로 집습니다. ↑ ↓ 는 놓을 수 있는 자리를 화면 순서대로 오가고, Enter 나 Space 로 놓고, Escape 나 Tab 으로 취소합니다. 포커스는 옮긴 항목에 남습니다. 이 안내는 `aria-describedby` 로, 지금 고른 자리는 스크린 리더 알림으로 읽힙니다.
+- 옮긴 항목이 접힌 하위 메뉴 안으로 들어가면 그 하위 메뉴를 펼칩니다.
 - 아이콘 띠와 640px 아래의 Drawer 에서는 끌지 않습니다.
+
+### `move`
+
+```ts
+type Place<T> = {
+  parent: T | null;          // 맨 위 단계면 null
+  ancestors: readonly T[];   // 맨 위부터 부모까지
+  index: number;             // 부모 안의 자리
+  previousSibling: T | null;
+  nextSibling: T | null;
+};
+type Move<T> = { item: T; from: Place<T>; to: Place<T> };
+```
+
+- `onItemsChange(items, move)` 는 옮긴 뒤의 새 배열과 이동 정보를 줍니다.
+- `from` 의 항목은 옮기기 전 `items` 의 객체이고, `item` 과 `to` 의 항목은 새 배열의 객체입니다. 옮길 때 지나간 부모는 새로 복사되므로 둘은 같은 객체가 아닐 수 있습니다.
+- 앞뒤 항목 사이의 값으로 순서를 매기는 서버(`sortOrder`, LexoRank, "이 항목 뒤에")는 `to.previousSibling`, `to.nextSibling` 을 씁니다. 되돌리기는 `from` 을 씁니다.
+
+```tsx
+onItemsChange={(next, { item, to }) => {
+  setDocs(next);
+  api.move(item.id, { parent: to.parent?.id ?? null, after: to.previousSibling?.id ?? null });
+}}
+```
+
+### 놓을 수 있는 자리 정하기
+
+- `canMove(move)` 가 `false` 를 돌려주면 그 자리에 놓지 못합니다. 끄는 동안 자리마다 불리므로 동기 함수여야 합니다.
+- 안으로 넣는 것도 `to.parent` 가 그 항목인 이동이라 같은 함수로 막습니다. 따로 폴더를 표시하는 값은 없습니다.
+
+```tsx
+canMove={({ to }) => to.parent === null}                                       // 즐겨찾기: 순서만
+canMove={({ item, to }) =>
+  item.kind === 'category' ? to.parent === null : to.parent?.kind === 'category'
+}                                                                              // 채널 묶음
+canMove={({ to }) => to.parent === null || to.parent.kind === 'folder'}        // 파일 트리
+```
+
+### 옮기기 전 확인
+
+- `onItemsChange` 에서 `overlay.open` 을 기다린 뒤 `items` 를 바꿉니다. 취소하면 아무것도 바뀌지 않습니다.
+
+```tsx
+onItemsChange={async (next, { item, to }) => {
+  const confirmed = await overlay.open<boolean>(({ close }) => (
+    <Dialog>
+      <Dialog.Content>
+        <Dialog.Header>
+          <Dialog.Title>&quot;{item.label}&quot; 을(를) 옮길까요?</Dialog.Title>
+        </Dialog.Header>
+        <Dialog.Footer>
+          <Dialog.Close>취소</Dialog.Close>
+          <Button onClick={() => close(true)}>옮기기</Button>
+        </Dialog.Footer>
+      </Dialog.Content>
+    </Dialog>
+  ));
+  if (confirmed) setDocs(next);
+}}
+```
 
 ## 접기
 
@@ -270,11 +322,11 @@ export default async function Layout({ children }) {
 | `shortcut`                                   | `'Mod+B'`. `false` 면 끈다                                          |
 | `persist`                                    | 접힘 상태를 쓸 쿠키 이름                                            |
 | `aria-label`                                 | 사이드바의 이름. 기본 "사이드바"                                    |
-| `Sidebar.Group`                              | `label`, `collapsible`, `defaultOpen`(`true`), `onItemMove`         |
+| `Sidebar.Group`                              | `label`, `collapsible`, `defaultOpen`(`true`)                       |
+| `Sidebar.Group` 데이터 방식                  | `items`, `children(item, { depth })`, `onItemsChange`, `canMove`    |
 | `Sidebar.Item`                               | `value`, `href`, `asChild`, `disabled`, `onClick`, `colorScheme`    |
 | `Sidebar.Trigger`                            | IconButton 의 속성. `icon` 으로 아이콘을 바꾼다                     |
 | `Sidebar.Provider`, `Sidebar.Inset`          | `asChild` 로 다른 요소에 붙인다                                     |
-| `Sidebar.moveItem(items, move)`              | `onItemMove` 의 이동을 `{ value, children? }` 트리에 적용한 새 배열 |
 
 ## 알아둘 것
 
