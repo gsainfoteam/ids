@@ -11,6 +11,9 @@ export const messages = {
     label: '이동 경로',
     more: '숨은 경로 보기',
   },
+  bubble: {
+    reactions: '반응',
+  },
   calendar: {
     label: '달력',
     month: '월',
@@ -226,6 +229,22 @@ export const messages = {
     placeholder: '선택하세요',
     search: '옵션 검색',
     searchPlaceholder: '검색…',
+  },
+  sidebar: {
+    collapse: '사이드바 접기',
+    drag: {
+      after: '{target} 뒤',
+      before: '{target} 앞',
+      cancel: '{item}을(를) 제자리에 두었습니다.',
+      end: '{item}을(를) 옮겼습니다.',
+      hint: 'Space로 집고, 위아래 방향키로 놓을 자리를 고른 뒤 Enter로 놓습니다. Escape는 취소합니다.',
+      inside: '{target} 안',
+      origin: '원래 자리',
+      start: '{item}을(를) 집었습니다.',
+    },
+    expand: '사이드바 펼치기',
+    label: '사이드바',
+    open: '메뉴 열기',
   },
   slider: {
     end: '끝',
