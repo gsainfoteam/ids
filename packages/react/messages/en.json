@@ -30,6 +30,9 @@
     "previous": "Previous slide",
     "roleDescription": "carousel"
   },
+  "chart": {
+    "label": "Chart"
+  },
   "checkboxGroup": {
     "required": "Select at least one option."
   },

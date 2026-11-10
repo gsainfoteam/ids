@@ -32,6 +32,9 @@ export const messages = {
     previous: '이전 슬라이드',
     roleDescription: '캐러셀',
   },
+  chart: {
+    label: '차트',
+  },
   checkboxGroup: {
     required: '하나 이상 선택하세요.',
   },

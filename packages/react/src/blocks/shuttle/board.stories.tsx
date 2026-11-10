@@ -1,5 +1,8 @@
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
+import { Chart } from '../../components/data/chart';
 import { Table } from '../../components/data/table';
 import { Alert } from '../../components/feedback/alert';
 import { Progress } from '../../components/feedback/progress';
@@ -30,6 +33,14 @@ const ROUTES = [
     name: '광주송정역',
     minutes: 25,
     stops: ['학생회관', '기숙사 A동', '첨단 우체국', '광주송정역'],
+    waits: [
+      { hour: '8시', wait: 7 },
+      { hour: '10시', wait: 12 },
+      { hour: '12시', wait: 9 },
+      { hour: '15시', wait: 18 },
+      { hour: '17시', wait: 14 },
+      { hour: '21시', wait: 22 },
+    ],
     departures: [
       '08:30',
       '09:30',
@@ -48,6 +59,14 @@ const ROUTES = [
     name: '교내 순환',
     minutes: 15,
     stops: ['학생회관', '대학 A동', '도서관', '체육관', '기숙사 B동'],
+    waits: [
+      { hour: '8시', wait: 5 },
+      { hour: '10시', wait: 6 },
+      { hour: '12시', wait: 4 },
+      { hour: '14시', wait: 8 },
+      { hour: '16시', wait: 7 },
+      { hour: '18시', wait: 9 },
+    ],
     departures: [
       '08:00',
       '09:00',
@@ -66,6 +85,12 @@ const ROUTES = [
     name: '유스퀘어 터미널',
     minutes: 40,
     stops: ['학생회관', '첨단 상무지구', '광주 터미널'],
+    waits: [
+      { hour: '9시', wait: 15 },
+      { hour: '12시', wait: 20 },
+      { hour: '15시', wait: 24 },
+      { hour: '18시', wait: 31 },
+    ],
     departures: ['09:00', '12:40', '15:00', '18:00'],
   },
 ];
@@ -79,6 +104,8 @@ const clockOf = (total: number) =>
   `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 
 const WAIT_SHOWN_AS_FULL_BAR = 30;
+
+const WAIT_CONFIG = { wait: { label: '평균 대기(분)' } } satisfies Chart.Config;
 
 export const PC: Story = {
   render: () => (
@@ -180,6 +207,21 @@ export const PC: Story = {
                     })}
                   </Table.Body>
                 </Table>
+
+                <Card>
+                  <Card.Content>
+                    <Chart config={WAIT_CONFIG} ratio={2} legend={false}>
+                      <Chart.Title>시간대별 대기 시간</Chart.Title>
+                      <Chart.Description>학생회관 정류장 · 지난 4주 평균</Chart.Description>
+                      <BarChart data={route.waits}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="hour" name="시간대" tickLine={false} axisLine={false} />
+                        <YAxis width={28} tickLine={false} axisLine={false} />
+                        <Bar dataKey="wait" radius={4} />
+                      </BarChart>
+                    </Chart>
+                  </Card.Content>
+                </Card>
               </div>
 
               <Card>

@@ -6,7 +6,7 @@ import { expect, test } from 'vitest';
 const coldNodeStartOnABusyRunner = 30_000;
 
 test(
-  'the ESM entry loads when no form library can resolve',
+  'the ESM entry loads when no form library or chart engine can resolve',
   () => {
     const result = spawnSync(
       process.execPath,
@@ -16,7 +16,7 @@ test(
         `
     import { registerHooks } from 'node:module';
     registerHooks({ resolve(specifier, context, nextResolve) {
-      if (specifier === 'react-hook-form' || specifier === '@tanstack/react-form')
+      if (['react-hook-form', '@tanstack/react-form', 'recharts'].includes(specifier))
         throw new Error('Optional peer is unavailable');
       return nextResolve(specifier, context);
     }});

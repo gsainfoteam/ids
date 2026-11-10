@@ -26,6 +26,7 @@
 | Dialog                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`                                                                                  |
 | Popover                                 | `useLayer`, `useAnchored`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `interactions.ts` |
 | Tooltip                                 | `useLayer`, `useAnchored`, `usePresence`, `showInTopLayer`, `focusWasReturned`, `PortalRootContext`, `interactions.ts`                                                                                                       |
+| Chart 의 툴팁                           | `useAnchored`(`glide`), `showInTopLayer` |
 | Menu                                    | `useLayer`, `useAnchored`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `returnFocusTo`, `focusReturnTarget`, `interactions.ts` |
 | Drawer                                  | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `initialFocusTarget`, `returnFocusTo`, `focusReturnTarget`, `showInTopLayer`, `raiseWhatStaysAboveLayers`, `sheet-viewport.ts`              |
 | Image 의 뷰어                           | `useLayer`, `ModalLayer`, `usePresence`, `useOverlayItem`, `OverlayItemContext`, `returnFocusTo`, `focusReturnTarget`                                                                                                        |
@@ -184,8 +185,9 @@ const anchored = useAnchored({
   width: 240,                          // 숫자: anchor 폭과 이 값 중 큰 폭, 'anchor': anchor 와 같은 폭
   maxHeight: 360,
   arrow: arrowElement,
+  glide: true,                         // 자리를 잡은 뒤의 이동을 transition 으로 그릴 수 있게 gliding 을 준다
 });
-<div ref={setElement} style={anchored.floatingStyles} data-side={anchored.side} />
+<div ref={setElement} style={anchored.floatingStyles} data-side={anchored.side} data-gliding={anchored.gliding ? '' : undefined} />
 ```
 
 ### 왜 이렇게
@@ -194,6 +196,7 @@ const anchored = useAnchored({
 - 높이는 처음부터 상한으로 둡니다(`capHeightBeforeFirstFlip`). 첫 `flip` 이 긴 목록의 전체 길이가 아니라 실제로 가질 높이로 판단합니다. 이 layout effect 는 `useFloating` 보다 먼저 선언해서 먼저 돕니다.
 - `size.apply` 가 `--anchor-width`, `--anchor-height`, `--available-width`, `--available-height` 를 씁니다. `width`, `maxHeight` 를 주면 폭과 높이(120px 와 `maxHeight` 사이)도 직접 씁니다.
 - 화면 가장자리에서 8px(`VIEWPORT_MARGIN`) 안쪽에 머뭅니다(`shift`, `limitShift`). 필요하면 anchor 를 덮지만 anchor 를 떠나지는 않아서, anchor 가 스크롤로 사라지면 따라갑니다.
+- `glide` 를 주면 열린 뒤 처음 자리를 잡고 한 프레임이 지나야 `gliding` 이 `true` 가 됩니다. 레이어는 `data-gliding:transition-[left,top]` 처럼 그때부터만 위치에 transition 을 겁니다. 처음부터 걸면 `left: 0`, `top: 0` 에서 미끄러져 들어옵니다. 닫히면 다시 `false` 입니다.
 - `transform: false` 입니다. 레이어의 `scale` 들어오기 애니메이션과 `transform` 이 겹치지 않습니다.
 - UA 가 `[popover]` 에 주는 `inset: 0` 을 `right`, `bottom` 에서 `auto` 로 풉니다(`undoPopoverUaInset`). 그대로 두면 상자가 과하게 제약되고, RTL 에서는 브라우저가 `right` 대신 `left` 를 버립니다.
 - `reference` 가 RefObject 면 렌더 중에 `.current` 를 읽지 않고 layout effect 에서 `refs.setReference` 로 넘깁니다. `positioned` 가 `false` 면 `null` 을 넘겨서 위치를 계산하지 않습니다.
