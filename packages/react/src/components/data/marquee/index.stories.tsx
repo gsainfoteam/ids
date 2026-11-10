@@ -275,6 +275,7 @@ export const PauseButton: Story = {
     const pause = () => canvas.getByRole('button', { name: '일시 정지' });
 
     await expect(pause()).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.hover(pause());
     await expect(playState(root())).toBe('running');
 
     await userEvent.click(pause());

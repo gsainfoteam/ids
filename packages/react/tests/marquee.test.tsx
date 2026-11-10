@@ -227,10 +227,12 @@ test('following the preference, it flows without reduced motion and stops when t
 
   const screen = await render(<IdsProvider>{words()}</IdsProvider>);
   const root = () => parts(screen.container).root;
+  const pause = screen.getByRole('button', { name: '일시 정지' });
 
   expect(root().hasAttribute('data-reduced-motion')).toBe(false);
   expect(parts(screen.container).copy).not.toBeNull();
-  await expect.element(screen.getByRole('button', { name: '일시 정지' })).toBeVisible();
+  await expect.element(pause).toBeVisible();
+  await userEvent.hover(pause);
   expect(getComputedStyle(parts(screen.container).track).animationName).toBe('ids-marquee');
   expect(playState(parts(screen.container).track)).toBe('running');
 
