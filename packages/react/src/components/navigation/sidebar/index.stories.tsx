@@ -48,8 +48,10 @@ import { overlay } from '../../../internal/overlay';
 import { Button } from '../../action/button';
 import { Avatar } from '../../data/avatar';
 import { Badge } from '../../data/badge';
+import { Card } from '../../data/card';
 import { Item } from '../../data/item';
 import { Skeleton } from '../../feedback/skeleton';
+import { ScrollArea } from '../../layout/scroll-area';
 import { Dialog } from '../../overlay/dialog';
 import { Kbd } from '../../typography/kbd';
 
@@ -528,6 +530,26 @@ const FAVORITES: Page[] = [
   { id: 'onboarding', label: '신입 온보딩', icon: <AcademicCapSolid />, colorScheme: 'success' },
 ];
 
+const FAVORITES_CODE = `<Sidebar aria-label="워크스페이스">
+  <Sidebar.Item value="inbox" href="#inbox">
+    <InboxIcon />
+    받은 소식
+  </Sidebar.Item>
+  <Sidebar.Group
+    label="즐겨찾기"
+    items={favorites}
+    onItemsChange={setFavorites}
+    canMove={({ to }) => to.parent === null}
+  >
+    {(page) => (
+      <Sidebar.Item value={page.id} href={\`#\${page.id}\`} colorScheme={page.colorScheme}>
+        {page.icon}
+        {page.label}
+      </Sidebar.Item>
+    )}
+  </Sidebar.Group>
+</Sidebar>`;
+
 export const Favorites: Story = {
   args: { value: 'tokens' },
   render: function Render(args) {
@@ -555,7 +577,13 @@ export const Favorites: Story = {
           </Sidebar.Group>
         </Sidebar>
         <Sidebar.Inset className="p-6">
-          <Skeleton className="h-64" />
+          <Card>
+            <ScrollArea orientation="horizontal">
+              <pre className="text-body-b3-regular font-mono">
+                <code>{FAVORITES_CODE}</code>
+              </pre>
+            </ScrollArea>
+          </Card>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
@@ -593,6 +621,34 @@ const CHANNELS: Channel[] = [
   { id: 'lounge', kind: 'category', label: '잡담', children: [] },
 ];
 
+const CHANNELS_CODE = `<Sidebar aria-label="워크스페이스">
+  <Sidebar.Group
+    label="채널"
+    items={channels}
+    onItemsChange={setChannels}
+    canMove={({ item, to }) =>
+      item.kind === 'category' ? to.parent === null : to.parent?.kind === 'category'
+    }
+  >
+    {(channel) =>
+      channel.kind === 'category' ? (
+        <Sidebar.Item>
+          <FolderIcon />
+          {channel.label}
+        </Sidebar.Item>
+      ) : (
+        <Sidebar.Item value={channel.id} href={\`#\${channel.id}\`}>
+          <HashtagIcon />
+          {channel.label}
+          {channel.unread && (
+            <Badge content={channel.unread} variant="soft" colorScheme="primary" />
+          )}
+        </Sidebar.Item>
+      )
+    }
+  </Sidebar.Group>
+</Sidebar>`;
+
 export const ChannelSections: Story = {
   args: { value: 'frontend' },
   render: function Render(args) {
@@ -628,7 +684,13 @@ export const ChannelSections: Story = {
           </Sidebar.Group>
         </Sidebar>
         <Sidebar.Inset className="p-6">
-          <Skeleton className="h-64" />
+          <Card>
+            <ScrollArea orientation="horizontal">
+              <pre className="text-body-b3-regular font-mono">
+                <code>{CHANNELS_CODE}</code>
+              </pre>
+            </ScrollArea>
+          </Card>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
@@ -683,6 +745,41 @@ const PAGES: Page[] = [
   },
 ];
 
+const PAGES_CODE = `<Sidebar aria-label="워크스페이스">
+  <Sidebar.Group
+    label="페이지"
+    items={pages}
+    onItemsChange={async (next, { item, to }) => {
+      const place = to.parent ? \`"\${to.parent.label}" 안\` : '맨 위';
+      const confirmed = await overlay.open<boolean>(({ close }) => (
+        <Dialog>
+          <Dialog.Content>
+            <Dialog.Header>
+              <Dialog.Title>페이지를 옮길까요?</Dialog.Title>
+              <Dialog.Description>
+                "{item.label}" 페이지가 {place}의 {to.index + 1}번째 자리로 옮겨집니다.
+              </Dialog.Description>
+            </Dialog.Header>
+            <Dialog.Footer>
+              <Dialog.Close>취소</Dialog.Close>
+              <Button onClick={() => close(true)}>옮기기</Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog>
+      ));
+      if (confirmed) setPages(next);
+    }}
+  >
+    {(page) => (
+      <Sidebar.Item value={page.id} href={\`#\${page.id}\`} colorScheme={page.colorScheme}>
+        {page.icon}
+        {page.label}
+        {page.badge}
+      </Sidebar.Item>
+    )}
+  </Sidebar.Group>
+</Sidebar>`;
+
 export const NestedPages: Story = {
   args: { value: 'color' },
   render: function Render(args) {
@@ -726,7 +823,13 @@ export const NestedPages: Story = {
           </Sidebar.Group>
         </Sidebar>
         <Sidebar.Inset className="p-6">
-          <Skeleton className="h-64" />
+          <Card>
+            <ScrollArea orientation="horizontal">
+              <pre className="text-body-b3-regular font-mono">
+                <code>{PAGES_CODE}</code>
+              </pre>
+            </ScrollArea>
+          </Card>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
@@ -758,6 +861,29 @@ const FILES: FileNode[] = [
   { id: 'package.json', kind: 'file', name: 'package.json' },
 ];
 
+const FILES_CODE = `<Sidebar aria-label="파일">
+  <Sidebar.Group
+    label="ids-react"
+    items={files}
+    onItemsChange={setFiles}
+    canMove={({ to }) => to.parent === null || to.parent.kind === 'folder'}
+  >
+    {(file) =>
+      file.kind === 'folder' ? (
+        <Sidebar.Item>
+          <FolderIcon />
+          {file.name}
+        </Sidebar.Item>
+      ) : (
+        <Sidebar.Item value={file.id} href={\`#\${file.id}\`}>
+          <DocumentTextIcon />
+          {file.name}
+        </Sidebar.Item>
+      )
+    }
+  </Sidebar.Group>
+</Sidebar>`;
+
 export const FileTree: Story = {
   args: { value: 'button.tsx' },
   render: function Render(args) {
@@ -788,7 +914,13 @@ export const FileTree: Story = {
           </Sidebar.Group>
         </Sidebar>
         <Sidebar.Inset className="p-6">
-          <Skeleton className="h-64" />
+          <Card>
+            <ScrollArea orientation="horizontal">
+              <pre className="text-body-b3-regular font-mono">
+                <code>{FILES_CODE}</code>
+              </pre>
+            </ScrollArea>
+          </Card>
         </Sidebar.Inset>
       </Sidebar.Provider>
     );
