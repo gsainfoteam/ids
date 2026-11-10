@@ -13,7 +13,7 @@
 | 구조 · API · 상태 | **React**               | prop 이름, 서브컴포넌트 조립, 상태 집합, 그룹 전파 규칙  |
 | 플랫폼 대응       | **이 문서**             | `focusVisible` 판정, `strokeAlignInside`, Semantics 주입 |
 
-- Figma(IDS 새로운 마음으로)에는 Action, Form 페이지만 있다. 그 밖의 컴포넌트는 React 값을 쓴다.
+- Figma(Infoteam Design System)에는 Action, Form 페이지만 있다. 그 밖의 컴포넌트는 React 값을 쓴다.
 - Notion이나 `IDS Architecture.md`가 코드와 다르면 위 표의 기준을 따른다.
 
 ## 기준 커밋
