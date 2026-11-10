@@ -70,22 +70,20 @@ Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환�
 
 ### 폰트
 
-IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Monaspace Neon 이다. 패키지에 글꼴 파일은 없으니 앱이 불러온다.
+IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. 패키지에 글꼴 파일은 없으니 앱이 불러온다.
 
 ```css
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-gov-dynamic-subset.min.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.3.0/400.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.3.0/500.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.3.0/600.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.3.0/700.css");
+@import url("https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@5.3.0/index.css");
 @import "tailwindcss";
 @import "@gsainfoteam/ids-css";
 ```
 
 - `font-sans` 와 `--ids-font-family-sans` 는 `'Pretendard GOV Variable'`, `'Pretendard GOV'`, 일반 Pretendard, `sans-serif` 순서다. Pretendard 만 불러온 앱은 Pretendard 로 보인다.
 - dynamic subset 은 화면에 쓰인 글자 범위만 받는다. 전체 파일(`pretendardvariable-gov.min.css`)은 woff2 5.4MB 다.
-- `font-mono` 와 `--ids-font-family-mono` 는 `'Monaspace Neon Var'`, `'Monaspace Neon'`, 시스템 고정폭 글꼴 순서다. 가변 글꼴(Var)은 CDN 에 없어서 웹에서는 Fontsource 의 굵기별 Monaspace Neon 을 쓰고, 가변 글꼴을 설치했거나 직접 호스팅한 앱은 그것을 먼저 쓴다.
-- `font-mono` 는 x-height 를 글자 크기의 0.487 로 맞춘다(`--ids-font-size-adjust-mono`, `font-size-adjust`). Monaspace Neon 을 95% 로 줄인 크기다. 같은 크기에서 글자 폭이 본문보다 18% 넓고 숫자와 대문자가 3% 높아서, 본문 사이에 넣으면 커 보이기 때문이다. 대체 글꼴이 쓰여도 같은 x-height 로 맞춰진다.
+- `font-mono` 와 `--ids-font-family-mono` 는 `'Geist Mono Variable'`(Fontsource), `'Geist Mono'`(설치하거나 직접 호스팅한 글꼴), 시스템 고정폭 글꼴, Pretendard 순서다. 한글처럼 고정폭 글꼴에 없는 글자는 Pretendard 로 그린다.
+- `font-mono` 는 x-height 를 글자 크기의 0.53 으로 맞춘다(`--ids-font-size-adjust-mono`, `font-size-adjust`). Pretendard GOV 의 x-height 와 같아서 Geist Mono 는 100% 크기로 본문과 높이가 맞는다. 대체 글꼴이 쓰여도 같은 x-height 로 맞춰진다.
+- Geist Mono 는 ascent 와 descent 가 대문자를 가운데에 두어서, 행간을 키운 줄에서도 글자가 줄 가운데에 선다.
 
 ## Tailwind 유틸리티
 
