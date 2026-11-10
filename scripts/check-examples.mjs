@@ -22,6 +22,7 @@ const apps = [
     name: 'next-app-router',
     html: () => readFileSync(join(examples, 'next-app-router/.next/server/app/index.html'), 'utf8'),
     stylesheet: (href) => join(examples, 'next-app-router/.next', href.replace(/^\/_next\//, '')),
+    extra: [['Link asChild around next/link from a Server Component', 'data-link=""']],
   },
   {
     name: 'tanstack-start',
