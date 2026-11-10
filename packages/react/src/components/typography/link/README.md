@@ -90,8 +90,20 @@ import NextLink from 'next/link';
 
 - 자식 요소 하나에 Link 의 class 와 속성을 합칩니다. 새 탭 아이콘은 자식 안 끝에 붙습니다.
 - 자식은 `<a>` 를 그리는 컴포넌트여야 합니다.
-- 자식의 함수 children (`{({ isActive }) => ...}`) 은 그대로 둡니다.
-- `className` 은 문자열만 합칩니다. React Router `NavLink` 의 `className` 함수는 받지 않습니다.
+- 자식이 함수로 받는 `children`, `className`, `style` (`NavLink` 의 `({ isActive }) => ...`) 은 함수인 채로 넘기고, IDS 의 class 는 그 결과에 합칩니다.
+- 라우터가 붙이는 `aria-current="page"`, `data-status` 는 그대로 남습니다.
+
+### 내부 링크와 외부 링크
+
+```tsx
+<AppLink to="/notices">공지</AppLink>                                   // 앱 안: 라우터 링크
+<Link href="https://gist.ac.kr" target="_blank">GIST</Link>             // 앱 밖: 그냥 Link
+```
+
+- 앱 안 경로는 라우터 링크로 그립니다. 페이지를 다시 불러오지 않고 이동하고, preload 와 `aria-current` 가 붙습니다.
+- 앱 밖 URL 은 라우터 없이 `Link href` 로 그립니다. TanStack Router 의 `createLink` 링크는 `to` 에 외부 URL 을 받지 않습니다(타입 오류). Next.js 와 React Router 의 링크는 외부 URL 을 받아 보통 `<a>` 로 그립니다.
+- 새 탭 아이콘과 `rel` 은 외부인지가 아니라 `target="_blank"` 로 정합니다. 같은 탭에서 여는 외부 링크에는 붙지 않습니다.
+- `href` 문자열을 보고 둘을 고르는 공용 컴포넌트는 만들지 않습니다. `to` 가 `string` 이 되어 경로의 타입 검사가 사라집니다.
 
 ## 속성
 

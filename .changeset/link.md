@@ -10,3 +10,7 @@ hidden from screen readers and the hidden text `link.newTab` ("(새 탭에서 �
 
 `Empty.Description` now underlines only a bare `<a>`, so a `Link` inside it keeps its own color,
 underline and hover.
+
+`asChild` (Link, Button, Slot and every part that takes it) now keeps a child's `className` and
+`style` functions, such as React Router `NavLink`'s `({ isActive }) => ...`, and merges IDS's class
+and style into their result instead of dropping them.

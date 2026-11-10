@@ -1,4 +1,4 @@
-import { createRef, type ComponentProps, type ReactNode } from 'react';
+import { createRef, type ComponentProps, type CSSProperties, type ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
@@ -7,14 +7,23 @@ import { render } from 'vitest-browser-react';
 
 import { Empty, IdsProvider, Link } from '../src';
 
-type RouterLinkProps = Omit<ComponentProps<'a'>, 'children'> & {
-  children: ReactNode | ((state: { isActive: boolean }) => ReactNode);
+type RouterState = { isActive: boolean };
+type RouterLinkProps = Omit<ComponentProps<'a'>, 'children' | 'className' | 'style'> & {
+  children: ReactNode | ((state: RouterState) => ReactNode);
+  className?: string | ((state: RouterState) => string);
+  style?: CSSProperties | ((state: RouterState) => CSSProperties);
 };
 
-function RouterLink({ children, ...props }: RouterLinkProps) {
+function RouterLink({ children, className, style, ...props }: RouterLinkProps) {
+  const state = { isActive: true };
   return (
-    <a {...props} data-status="active">
-      {typeof children === 'function' ? children({ isActive: true }) : children}
+    <a
+      {...props}
+      data-status="active"
+      className={typeof className === 'function' ? className(state) : className}
+      style={typeof style === 'function' ? style(state) : style}
+    >
+      {typeof children === 'function' ? children(state) : children}
     </a>
   );
 }
@@ -112,6 +121,24 @@ test("asChild keeps a router link's render function children, with and without t
   await expect
     .element(screen.getByRole('link', { name: /External/ }))
     .toHaveAccessibleName('External (새 탭에서 열림)');
+});
+
+test("asChild keeps a router link's className and style functions and adds its own", async () => {
+  const screen = await render(
+    <Link asChild>
+      <RouterLink
+        href="/a"
+        className={({ isActive }) => (isActive ? 'mine-active' : 'mine')}
+        style={({ isActive }) => ({ fontWeight: isActive ? 700 : 400 })}
+      >
+        Current
+      </RouterLink>
+    </Link>,
+  );
+  const link = screen.getByRole('link');
+  await expect.element(link).toHaveClass('mine-active');
+  await expect.element(link).toHaveClass('focus-ring');
+  expect(getComputedStyle(link.element()).fontWeight).toBe('700');
 });
 
 test('asChild without an element throws', () => {

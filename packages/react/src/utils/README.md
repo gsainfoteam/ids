@@ -129,13 +129,14 @@ const mergedRef = useCallback(
 
 | 키          | 방법                                                                                                         |
 | ----------- | ------------------------------------------------------------------------------------------------------------ |
-| `className` | `cn(base, next)`. 충돌하면 next                                                                              |
-| `style`     | 얕게 합친다. 같은 속성은 next                                                                                |
+| `className` | `cn(base, next)`. 충돌하면 next. 한쪽이 함수면 같은 인자로 부른 결과를 합치는 함수                           |
+| `style`     | 얕게 합친다. 같은 속성은 next. 한쪽이 함수면 같은 인자로 부른 결과를 합치는 함수                             |
 | `ref`       | `mergeRefs(base, next)`                                                                                      |
 | `on[A-Z]*`  | `mergeEventHandlers(base, next)`. base 를 먼저 부르고, base 가 `preventDefault()` 하면 next 는 부르지 않는다 |
 | 그 밖       | `next ?? base`                                                                                               |
 
 - 그래서 `asChild` 파트는 `mergeProps(사용자나 자식의 props, 내부 props)` 순서로 부릅니다. 내부 wiring(`role`, `aria-*`)이 이기고, 사용자 핸들러가 먼저 돌며 `preventDefault()` 로 내부 동작을 막을 수 있습니다.
+- `className` 과 `style` 을 함수로 받는 자식(React Router `NavLink` 의 `({ isActive }) => ...`)은 합친 뒤에도 함수를 받습니다. 문자열로 합치면 자식이 그 함수를 부르지 못해 앱의 활성 클래스가 사라집니다.
 - `mergeRefs` 는 React 19 의 ref cleanup 을 돌려줍니다. cleanup 을 돌려주지 않는 callback ref 는 cleanup 때 `ref(null)` 로, object ref 는 `current = null` 로 뗍니다.
 - `mergeRefs` 는 같은 ref 들에 같은 함수를 돌려줍니다. ref 하나마다 `WeakMap` 을 한 단계 내려가 합친 함수를 찾습니다(`callbacksByRefs`, 없는 ref 는 `NO_REF`). 그래서 렌더 중에 `mergeRefs(...)` 나 ref 가 든 `mergeProps(...)` 를 그대로 넘겨도 React 가 렌더마다 ref 를 떼었다 붙이지 않습니다. `asChild` 파트와 Slot 이 hover 로 다시 렌더될 때 ref cleanup 이 돌던 것이 이 때문이었습니다.
 
