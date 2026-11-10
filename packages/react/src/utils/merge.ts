@@ -83,6 +83,26 @@ function isStyle(value: unknown): value is CSSProperties {
   return isPlainObject(value);
 }
 
+function resolveWith(value: unknown, args: unknown[]): unknown {
+  return isFunction(value) ? value(...args) : value;
+}
+
+function mergeClassNames(base: unknown, next: unknown) {
+  const join = (a: unknown, b: unknown) =>
+    cn(isString(a) ? a : undefined, isString(b) ? b : undefined);
+  if (!isFunction(base) && !isFunction(next)) return join(base, next);
+
+  return (...args: unknown[]) => join(resolveWith(base, args), resolveWith(next, args));
+}
+
+function mergeStyles(base: unknown, next: unknown) {
+  const join = (a: unknown, b: unknown) =>
+    mergeObjects(isStyle(a) ? a : undefined, isStyle(b) ? b : undefined);
+  if (!isFunction(base) && !isFunction(next)) return join(base, next);
+
+  return (...args: unknown[]) => join(resolveWith(base, args), resolveWith(next, args));
+}
+
 export function mergeProps<P extends Record<string, unknown>, Q extends Record<string, unknown>>(
   baseProps: P,
   nextProps: Q,
@@ -96,15 +116,9 @@ export function mergeProps<P extends Record<string, unknown>, Q extends Record<s
     const nextValue = nextProps[key];
 
     if (key === 'className') {
-      merged.className = cn(
-        isString(baseValue) ? baseValue : undefined,
-        isString(nextValue) ? nextValue : undefined,
-      );
+      merged.className = mergeClassNames(baseValue, nextValue);
     } else if (key === 'style') {
-      merged.style = mergeObjects(
-        isStyle(baseValue) ? baseValue : undefined,
-        isStyle(nextValue) ? nextValue : undefined,
-      );
+      merged.style = mergeStyles(baseValue, nextValue);
     } else if (key === 'ref') {
       merged.ref = mergeRefs(
         isRef(baseValue) ? baseValue : undefined,

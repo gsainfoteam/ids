@@ -1,5 +1,6 @@
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Divider } from '../../components/layout/divider';
+import { Link } from '../../components/typography/link';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -32,7 +33,9 @@ export const PC: Story = {
             {LINKS.map((link, index) => (
               <li key={link} className="flex items-center gap-2">
                 {index > 0 && <Divider orientation="vertical" className="h-3" />}
-                <a href={`#${link}`}>{link}</a>
+                <Link href={`#${link}`} colorScheme="neutral" underline="hover">
+                  {link}
+                </Link>
               </li>
             ))}
           </ul>

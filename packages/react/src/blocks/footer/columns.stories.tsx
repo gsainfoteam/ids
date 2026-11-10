@@ -10,6 +10,7 @@ import { toast } from '../../components/feedback/toast';
 import { Select } from '../../components/form/select';
 import { TextField } from '../../components/form/text-field';
 import { Divider } from '../../components/layout/divider';
+import { Link } from '../../components/typography/link';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -87,7 +88,9 @@ export const PC: Story = {
                 <ul className="text-body-b3-regular flex flex-col gap-2">
                   {column.links.map((link) => (
                     <li key={link}>
-                      <a href={`#${link}`}>{link}</a>
+                      <Link href={`#${link}`} colorScheme="neutral" underline="hover">
+                        {link}
+                      </Link>
                     </li>
                   ))}
                 </ul>

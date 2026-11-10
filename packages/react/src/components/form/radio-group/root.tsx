@@ -42,7 +42,7 @@ export type RadioGroupRenderProps<T extends string> = {
 };
 
 export type RadioGroupProps<T extends string> = Omit<
-  ComponentProps<'div'>,
+  ComponentProps<'fieldset'>,
   'children' | 'defaultValue' | 'onChange' | 'role' | 'className' | 'style'
 > & {
   value?: T | null;
@@ -120,13 +120,13 @@ export function RadioGroupRoot<T extends string>({
         variant,
       }}
     >
-      <div
+      <fieldset
         {...rest}
         ref={rootRef}
         role="radiogroup"
         tabIndex={-1}
+        disabled={disabled}
         aria-orientation={orientation}
-        aria-disabled={disabled || undefined}
         aria-readonly={readOnly || undefined}
         aria-required={required || undefined}
         aria-invalid={ariaInvalid}
@@ -150,7 +150,7 @@ export function RadioGroupRoot<T extends string>({
         {typeof children === 'function'
           ? children(render as unknown as RadioGroupRenderProps<T>)
           : children}
-      </div>
+      </fieldset>
     </RadioGroupContext.Provider>
   );
 }

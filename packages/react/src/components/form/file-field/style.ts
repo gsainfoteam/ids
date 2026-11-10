@@ -6,14 +6,15 @@ import type { IdsSize } from '../../../tokens/types';
 
 const alreadyDimmedByField = cn('data-disabled:opacity-100');
 
+const ownTriggerLook = cn(
+  'flex min-w-0 cursor-pointer items-center text-start text-(--ids-color-on-surface)',
+);
+
 export const fileFieldStyle = tv({
   slots: {
     root: 'relative grid min-w-0 gap-2',
     control: ['relative', fieldTrigger.base],
-    trigger: [
-      'flex min-w-0 cursor-pointer touch-manipulation items-center text-start text-(--ids-color-on-surface)',
-      'disabled:cursor-not-allowed aria-disabled:cursor-default',
-    ],
+    trigger: 'touch-manipulation disabled:cursor-not-allowed aria-disabled:cursor-default',
     icon: 'shrink-0 text-(--ids-color-on-muted)',
     thumb: [
       'flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-indicator',
@@ -33,9 +34,12 @@ export const fileFieldStyle = tv({
   },
   variants: {
     appearance: {
-      field: { trigger: 'h-full flex-1 self-stretch bg-transparent outline-none' },
+      field: {
+        trigger: [ownTriggerLook, 'h-full flex-1 self-stretch bg-transparent outline-none'],
+      },
       dropzone: {
         trigger: [
+          ownTriggerLook,
           'min-h-32 w-full flex-col justify-center gap-1 text-center concentric-p-4',
           'border border-dashed focus-ring',
           'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
@@ -45,6 +49,7 @@ export const fileFieldStyle = tv({
           'disabled:opacity-50',
         ],
       },
+      embedded: {},
     },
     variant: {
       outline: {},

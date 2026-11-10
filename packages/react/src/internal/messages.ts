@@ -170,6 +170,9 @@ export const messages = {
     up: '위쪽 화살표',
     windows: '윈도우',
   },
+  link: {
+    newTab: '(새 탭에서 열림)',
+  },
   marquee: {
     pause: '일시 정지',
   },
@@ -203,6 +206,16 @@ export const messages = {
   },
   popover: {
     close: '닫기',
+  },
+  promptInput: {
+    actions: '더하기',
+    attach: '파일 첨부',
+    attachments: '첨부한 파일',
+    label: '메시지',
+    placeholder: '메시지를 입력하세요',
+    send: '보내기',
+    sending: '보내는 중',
+    stop: '멈추기',
   },
   qrCode: {
     label: 'QR 코드',

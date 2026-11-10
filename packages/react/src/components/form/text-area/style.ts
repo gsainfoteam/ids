@@ -64,8 +64,12 @@ export const textAreaStyle = tv({
       },
     } satisfies Record<IdsSize, object>,
     position: {
-      top: { bar: 'border-b' },
-      bottom: { bar: 'border-t' },
+      top: {},
+      bottom: {},
+    },
+    divided: {
+      true: {},
+      false: {},
     },
     resize: {
       none: {},
@@ -80,9 +84,14 @@ export const textAreaStyle = tv({
       },
     } satisfies Record<TextAreaResize, object>,
   },
+  compoundVariants: [
+    { divided: true, position: 'top', class: { bar: 'border-b' } },
+    { divided: true, position: 'bottom', class: { bar: 'border-t' } },
+  ],
   defaultVariants: {
     variant: 'outline',
     size: 'standard',
     resize: 'none',
+    divided: true,
   },
 });

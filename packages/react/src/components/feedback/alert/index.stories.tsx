@@ -114,7 +114,7 @@ export const Gallery: Story = {
         <Showcase.Row label="list">
           <Alert colorScheme="danger" variant="outline" className="w-80">
             <Alert.Title>다음 항목을 고쳐 주세요</Alert.Title>
-            <Alert.Description>
+            <Alert.Description asChild>
               <ul>
                 <li>이메일 형식이 올바르지 않습니다.</li>
                 <li>비밀번호는 8자 이상이어야 합니다.</li>

@@ -14,13 +14,14 @@ import { StarIcon } from '@heroicons/react/24/solid';
 import { RatingItem, type RatingItemProps } from './item';
 import { resolve, type StateProp } from './state-prop';
 import { ratingStyle, type RatingOptionPlacement } from './style';
-import { useRating } from './use-rating';
-import { FormValue } from '../../../internal/form-value';
+import { isCheckedScore, useRating } from './use-rating';
 import { useTranslate } from '../../../internal/translate';
 import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
 import type { IdsSize } from '../../../tokens/types';
+
+const NO_FORM_OWNER = '';
 
 export type RatingState = {
   value: number;
@@ -85,7 +86,6 @@ export function RatingRoot({
   children,
   ref,
   id,
-  onKeyDown,
   onBlur,
   onFocus,
   onPointerLeave,
@@ -135,18 +135,10 @@ export function RatingRoot({
     max,
     step,
     interactive,
+    missingMessage: required && interactive ? requiredMessage : null,
     ref,
   });
-  const {
-    current,
-    hover,
-    displayed,
-    anchorRef,
-    rootRef,
-    preview,
-    choose,
-    forwardRootFocusToChecked,
-  } = rating;
+  const { current, hover, displayed, rootRef, preview, choose, forwardRootFocusToChecked } = rating;
   const ariaInvalid = ariaInvalidProp ?? invalid;
   const state: RatingState = {
     value: current,
@@ -161,23 +153,27 @@ export function RatingRoot({
   const scoreLabel = getValueLabel(current, max);
   const generatedId = useId();
   const scoreId = `${id ?? generatedId}-score`;
+  const groupName = name ?? generatedId;
+  const formOwner = name === undefined && form === undefined ? NO_FORM_OWNER : form;
 
   const option = (score: number, placement: RatingOptionPlacement) => (
-    <button
+    <input
       key={score}
-      type="button"
-      role="radio"
+      type="radio"
+      name={groupName}
+      form={formOwner}
+      value={score}
+      checked={isCheckedScore(score, current)}
+      tabIndex={score === current ? 0 : -1}
+      required={required && interactive}
+      disabled={disabled}
       data-rating-value={score}
       data-field-input=""
       aria-label={getValueLabel(score, max)}
-      aria-checked={score === current}
       aria-describedby={ariaDescribedby}
       aria-invalid={ariaInvalid}
-      aria-disabled={readOnly || undefined}
-      disabled={disabled}
-      tabIndex={!disabled && score === current ? 0 : -1}
       className={styles.option({ placement })}
-      onClick={() => {
+      onChange={() => {
         choose(score);
         preview(null);
       }}
@@ -230,10 +226,6 @@ export function RatingRoot({
         forwardRootFocusToChecked(event);
         onFocus?.(event);
       }}
-      onKeyDown={(event) => {
-        onKeyDown?.(event);
-        if (!event.defaultPrevented) rating.onKeyDown(event);
-      }}
     >
       {!displayOnly && option(0, 'zero')}
       {Array.from({ length: max }, (_, index) => {
@@ -275,20 +267,10 @@ export function RatingRoot({
           </span>
         );
       })}
-      {displayOnly ? (
+      {displayOnly && (
         <span id={scoreId} className="sr-only">
           {scoreLabel}
         </span>
-      ) : (
-        <FormValue
-          name={name}
-          form={form}
-          value={current > 0 ? String(current) : null}
-          required={required && !readOnly}
-          disabled={disabled}
-          anchor={anchorRef}
-          message={requiredMessage}
-        />
       )}
     </div>
   );

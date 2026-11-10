@@ -23,7 +23,7 @@ export const ratingStyle = tv({
       'rtl:[clip-path:inset(0_0_0_calc(100%-var(--rating-fill)))]',
     ],
     option:
-      'absolute inset-y-0 cursor-pointer touch-manipulation rounded-standard outline-none disabled:cursor-not-allowed',
+      'absolute inset-y-0 m-0 cursor-pointer touch-manipulation appearance-none rounded-standard outline-none disabled:cursor-not-allowed',
   },
   variants: {
     size: {
