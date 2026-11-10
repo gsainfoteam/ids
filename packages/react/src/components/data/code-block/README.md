@@ -114,7 +114,22 @@ const answer = 42;
 - 강조한 줄의 바탕은 스크롤한 폭 끝까지 이어집니다. `<code>` 가 가장 긴 줄의 폭(`w-max min-w-full`)입니다.
 - `wrap` 이면 `white-space: pre-wrap` 과 `overflow-wrap: break-word` 입니다. 바뀐 줄은 줄 번호 뒤에서 이어집니다.
 - 가로 flex 안에 두면 CodeBlock 을 담은 flex 항목에 `min-w-0` 을 줍니다. 그러지 않으면 `<pre>` 처럼 가장 긴 줄만큼 넓어집니다.
-- 줄 수가 많아 높이를 제한하려면 부모가 높이를 정합니다. CodeBlock 은 세로로 스크롤하지 않습니다.
+- CodeBlock 은 세로로 스크롤하지 않습니다. 긴 코드는 아래처럼 접습니다.
+
+## 접기
+
+```tsx
+<CodeBlock language="tsx" collapsedLines={8} />                 // 8줄보다 길면 접힌 채로 시작
+<CodeBlock language="tsx" collapsedLines={8} defaultExpanded />
+<CodeBlock language="tsx" collapsedLines={8} expanded={open} onExpandedChange={setOpen} />
+```
+
+- 코드가 `collapsedLines` 보다 길면 그 줄 수만 보이고, 다음 줄이 흐리게 비칩니다. 짧으면 아무것도 바꾸지 않습니다.
+- 아래 가운데의 `Button`(outline, tiny)이 "N줄 더 보기" 와 "접기" 를 오갑니다. `aria-expanded` 와 `aria-controls`(`<pre>`)가 붙습니다.
+- 접을 때 버튼이 화면 밖으로 밀려나면 버튼이 보이게 스크롤합니다.
+- 줄 수는 서버에서 셉니다. 서버 HTML 부터 접힌 채로 오고, 크기를 재지 않아 hydration 뒤에 높이가 바뀌지 않습니다.
+- `wrap` 이면 바뀐 줄도 한 줄로 셉니다. 보이는 높이는 `collapsedLines` 줄 높이 그대로입니다.
+- 접혀 있어도 복사 버튼은 코드 전체를 복사합니다.
 
 ## 복사
 
@@ -151,6 +166,7 @@ const answer = 42;
 | `data-language`      | root        | 넘긴 `language`             |
 | `data-wrap`          | root        | `wrap`                      |
 | `data-line-numbers`  | root        | `lineNumbers`               |
+| `data-collapsed`     | root        | 접혀 있을 때                |
 | `data-line`          | 줄          | 1부터 센 줄 번호            |
 | `data-highlighted`   | 줄          | `highlight` 에 든 줄        |
 | `data-token`         | 강조한 조각 | 위 색 표의 이름             |
@@ -167,6 +183,10 @@ const answer = 42;
 | `highlight`   | `number[]` (1부터 세는 줄 번호)                | -           |
 | `wrap`        | `boolean`                                      | `false`     |
 | `variant`     | `'outline' \| 'soft'`                          | `'outline'` |
+| `collapsedLines` | `number` (접었을 때 보이는 줄 수)           | -           |
+| `expanded`    | `boolean`                                      | -           |
+| `defaultExpanded` | `boolean`                                  | `false`     |
+| `onExpandedChange` | `(expanded: boolean) => void`             | -           |
 
 ## 파트
 

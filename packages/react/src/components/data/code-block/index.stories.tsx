@@ -52,6 +52,34 @@ const RUST = `fn main() {
     }
 }`;
 
+const FORM = `import { Button, Field, TextField } from '@gsainfoteam/ids-react';
+import { useState } from 'react';
+
+export function ProfileForm({ onSave }: { onSave: (name: string) => Promise<void> }) {
+  const [name, setName] = useState('');
+  const [pending, setPending] = useState(false);
+
+  const submit = async () => {
+    setPending(true);
+    try {
+      await onSave(name);
+    } finally {
+      setPending(false);
+    }
+  };
+
+  return (
+    <form onSubmit={(event) => (event.preventDefault(), submit())}>
+      <Field label="이름">
+        <TextField value={name} onValueChange={setName} />
+      </Field>
+      <Button type="submit" disabled={pending}>
+        저장
+      </Button>
+    </form>
+  );
+}`;
+
 const codeOf = (canvasElement: HTMLElement) => canvasElement.querySelector('code')!;
 
 const meta = {
@@ -65,6 +93,7 @@ const meta = {
     lineNumbers: { control: 'boolean' },
     wrap: { control: 'boolean' },
     highlight: { control: 'object' },
+    collapsedLines: { control: 'number' },
     children: { control: 'text' },
   },
   args: {
@@ -154,6 +183,35 @@ export const Gallery: Story = {
         <CodeBlock language="ts" title="wrap" lineNumbers wrap>
           {LONG_LINE}
         </CodeBlock>
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Collapse"
+        description="collapsedLines 보다 긴 코드는 그만큼만 보이고 아래가 흐려집니다. 버튼으로 펼치고 접습니다."
+      >
+        <Showcase.Row label="collapsed">
+          <CodeBlock
+            language="tsx"
+            title="profile-form.tsx"
+            lineNumbers
+            collapsedLines={8}
+            className="w-full"
+          >
+            {FORM}
+          </CodeBlock>
+        </Showcase.Row>
+        <Showcase.Row label="expanded">
+          <CodeBlock
+            language="tsx"
+            title="profile-form.tsx"
+            lineNumbers
+            collapsedLines={8}
+            defaultExpanded
+            className="w-full"
+          >
+            {FORM}
+          </CodeBlock>
+        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section
@@ -329,6 +387,38 @@ export const Wrap: Story = {
     await expect(line.getBoundingClientRect().height).toBeGreaterThan(
       parseFloat(getComputedStyle(line).lineHeight) * 1.5,
     );
+  },
+};
+
+export const Collapse: Story = {
+  render: () => (
+    <CodeBlock language="tsx" title="profile-form.tsx" lineNumbers collapsedLines={8}>
+      {FORM}
+    </CodeBlock>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`collapsedLines` 보다 긴 코드는 앞의 그 줄 수만 보이고, 아래의 버튼으로 펼치고 접습니다. 접혀 있어도 복사 버튼은 코드 전체를 복사합니다.',
+      },
+    },
+  },
+  play: async ({ canvasElement, canvas, userEvent }) => {
+    const pre = () => canvasElement.querySelector('pre')!;
+    const hidden = FORM.split('\n').length - 8;
+    const expand = canvas.getByRole('button', { name: `${hidden}줄 더 보기` });
+    await expect(expand).toHaveAttribute('aria-expanded', 'false');
+    await expect(expand).toHaveAttribute('aria-controls', pre().id);
+    await expect(pre().scrollHeight).toBeGreaterThan(pre().clientHeight);
+
+    await userEvent.click(expand);
+    const collapse = canvas.getByRole('button', { name: '접기' });
+    await expect(collapse).toHaveAttribute('aria-expanded', 'true');
+    await expect(pre().scrollHeight).toBe(pre().clientHeight);
+
+    await userEvent.click(collapse);
+    await expect(canvas.getByRole('button', { name: `${hidden}줄 더 보기` })).toHaveFocus();
   },
 };
 

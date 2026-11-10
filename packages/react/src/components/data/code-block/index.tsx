@@ -22,6 +22,10 @@ export namespace CodeBlock {
     highlight?: readonly number[];
     wrap?: boolean;
     variant?: Variant;
+    collapsedLines?: number;
+    expanded?: boolean;
+    defaultExpanded?: boolean;
+    onExpandedChange?: (expanded: boolean) => void;
   };
 
   export type CopyProps = CodeBlockCopyProps;

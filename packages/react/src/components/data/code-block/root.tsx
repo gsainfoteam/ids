@@ -4,6 +4,7 @@ import {
   Children,
   Fragment,
   isValidElement,
+  useId,
   type CSSProperties,
   type ReactElement,
   type ReactNode,
@@ -11,9 +12,11 @@ import {
 
 import { CodeBlockContext } from './context';
 import { CodeBlockCopy } from './copy';
+import { CodeBlockFold } from './fold';
 import { isPlainText } from './highlight';
 import { codeBlockStyle } from './style';
 import { useHighlightedLines } from './use-code-block';
+import { useControllableState } from '../../../hooks/use-controllable-state';
 import { elementTypeOf } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Divider } from '../../layout/divider';
@@ -47,6 +50,10 @@ export function CodeBlockRoot({
   highlight,
   wrap = false,
   variant = 'outline',
+  collapsedLines,
+  expanded: expandedProp,
+  defaultExpanded = false,
+  onExpandedChange,
   className,
   style,
   ...rest
@@ -54,7 +61,16 @@ export function CodeBlockRoot({
   const { code, copy } = splitChildren(children);
   const lines = useHighlightedLines(code, language);
   const highlighted = new Set(highlight);
-  const styles = codeBlockStyle({ variant, wrap, lineNumbers });
+  const preId = useId();
+  const [expanded, setExpanded] = useControllableState({
+    value: expandedProp,
+    defaultValue: defaultExpanded,
+    onValueChange: onExpandedChange,
+  });
+  const hiddenLines = collapsedLines == null ? 0 : Math.max(0, lines.length - collapsedLines);
+  const foldable = hiddenLines > 0;
+  const collapsed = foldable && !expanded;
+  const styles = codeBlockStyle({ variant, wrap, lineNumbers, collapsed });
   const showLanguage = !isPlainText(language);
   const hasCaption = title != null || showLanguage;
   const digits = String(lines.length).length;
@@ -67,6 +83,7 @@ export function CodeBlockRoot({
         data-language={language}
         data-wrap={wrap ? '' : undefined}
         data-line-numbers={lineNumbers ? '' : undefined}
+        data-collapsed={collapsed ? '' : undefined}
         className={styles.root({ className })}
         style={style}
       >
@@ -80,7 +97,12 @@ export function CodeBlockRoot({
         {copy ?? <CodeBlockCopy />}
         <ScrollArea orientation="horizontal" className={styles.scroller()}>
           <ScrollArea.Viewport asChild>
-            <pre dir="ltr" className={styles.pre()}>
+            <pre
+              id={preId}
+              dir="ltr"
+              className={styles.pre()}
+              style={{ '--code-block-collapsed-lines': collapsedLines } as CSSProperties}
+            >
               <code
                 className={styles.code()}
                 style={{ '--code-block-digits': digits } as CSSProperties}
@@ -111,6 +133,15 @@ export function CodeBlockRoot({
             </pre>
           </ScrollArea.Viewport>
         </ScrollArea>
+        {foldable && (
+          <CodeBlockFold
+            className={styles.fold()}
+            controls={preId}
+            expanded={expanded}
+            hiddenLines={hiddenLines}
+            onExpandedChange={setExpanded}
+          />
+        )}
       </figure>
     </CodeBlockContext>
   );

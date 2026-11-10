@@ -34,6 +34,7 @@ export const codeBlockStyle = tv({
       'data-highlighted:shadow-[inset_2px_0_0_var(--ids-color-primary)]',
     ],
     glyphs: 'relative top-(--code-block-glyph-drop)',
+    fold: 'flex justify-center px-4 pb-3',
   },
   variants: {
     variant: {
@@ -66,6 +67,14 @@ export const codeBlockStyle = tv({
         ],
       },
     },
+    collapsed: {
+      true: {
+        pre: [
+          'max-h-[calc((var(--code-block-collapsed-lines)+1)*1lh+--spacing(3))]',
+          '[mask-image:linear-gradient(to_bottom,#000_calc(100%-1.5lh),transparent)]',
+        ],
+      },
+    },
   },
-  defaultVariants: { variant: 'outline', wrap: false, lineNumbers: false },
+  defaultVariants: { variant: 'outline', wrap: false, lineNumbers: false, collapsed: false },
 });
