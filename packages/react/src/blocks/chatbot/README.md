@@ -8,7 +8,7 @@ Storybook `Blocks/Chatbot/*`. AI 챗봇 화면 다섯 가지입니다.
 | `Thread`   | 대화 기록 사이드바와 대화. 생각 과정과 도구 호출을 접어 두고, 표로 답하고, 출처와 평가 버튼을 단다.      |
 | `Research` | 검색형 답. 출처 카드 넷, 번호를 단 답, 순서 목록, 출처 탭, 이어서 많이 묻는 질문.                        |
 | `Widget`   | 사이트 오른쪽 아래 버튼으로 여는 작은 상담 창. 자주 묻는 것을 칩으로 고른다.                             |
-| `Simple`   | 대화 한 줄기만 있는 가장 단순한 챗봇. 표와 목록으로 답하고 아래에 추천 질문.                             |
+| `Simple`   | 대화 한 줄기만 있는 가장 단순한 챗봇. 표와 목록으로 답하고, 아래에 도구가 붙은 입력창.                    |
 
 - **쓰인 컴포넌트.** PromptInput, TextArea, IconButton, Toggle, Select, Card, Avatar, Accordion, Table, Badge, Button, Chip, Item, Tabs, Alert, Spinner, ScrollArea, Drawer, Menu, Popover, FloatingButton, TextField, Divider, Spacer, toast
 - **대신 쓴 것.** shadcn/ui 와 AI Elements 의 채팅 파트가 IDS 에는 아직 없습니다. 아래는 각 블록이 무엇으로 대신했는지입니다.

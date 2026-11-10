@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import {
   BellAlertIcon,
   DocumentDuplicateIcon,
@@ -16,7 +14,6 @@ import { IconToggle } from '../../components/action/icon-toggle';
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
-import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { Table } from '../../components/data/table';
 import { toast } from '../../components/feedback/toast';
@@ -48,12 +45,8 @@ const SHUTTLES = [
   { id: 'campus', route: '교내 순환', time: '12:30', wait: '16분 뒤' },
 ];
 
-const SUGGESTIONS = ['도서관 빈자리', '이번 주 행사', '수강 정정 마감'];
-
 export const PC: Story = {
   render: function Render() {
-    const [draft, setDraft] = useState('');
-
     const feedback = (
       <div className="flex gap-1">
         <IconToggle size="tiny" aria-label="좋은 답" icon={<HandThumbUpIcon />} />
@@ -177,14 +170,7 @@ export const PC: Story = {
         </ScrollArea>
 
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pb-4">
-          <div className="flex flex-wrap gap-2">
-            {SUGGESTIONS.map((suggestion) => (
-              <Chip key={suggestion} onClick={() => setDraft(suggestion)}>
-                {suggestion}
-              </Chip>
-            ))}
-          </div>
-          <PromptInput value={draft} onValueChange={setDraft} onSend={() => {}}>
+          <PromptInput onSend={() => {}}>
             <PromptInput.Input
               aria-label="GIST 도우미에게 묻기"
               placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요"
