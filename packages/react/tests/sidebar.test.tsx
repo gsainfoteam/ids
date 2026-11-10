@@ -222,7 +222,9 @@ test('a collapsible group folds its list', async () => {
   await expect.element(screen.getByRole('link', { name: '문서' })).toBeVisible();
   await userEvent.click(label);
   await expect.element(label).toHaveAttribute('aria-expanded', 'false');
-  await expect.element(screen.getByRole('link', { name: '문서' })).not.toBeInTheDocument();
+  const panel = document.getElementById(label.element().getAttribute('aria-controls')!)!;
+  await expect.element(panel).toHaveAttribute('hidden', 'until-found');
+  expect(panel.querySelector('a[href="#a"]')).not.toBeNull();
 });
 
 test('below 640px the trigger opens the sidebar in a drawer that a press on an item closes', async () => {
