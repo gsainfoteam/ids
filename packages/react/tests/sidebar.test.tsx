@@ -227,6 +227,33 @@ test('a collapsible group folds its list', async () => {
   expect(panel.querySelector('a[href="#a"]')).not.toBeNull();
 });
 
+test('a group hands its section props to its section, collapsible or not', async () => {
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const screen = await render(
+    ui(
+      <Sidebar>
+        <Sidebar.Group label="즐겨찾기" collapsible id="favorites" data-testid="collapsible">
+          <Sidebar.Item href="#a">문서</Sidebar.Item>
+        </Sidebar.Group>
+        <Sidebar.Group label="채널" id="channels" data-testid="fixed">
+          <Sidebar.Item href="#b">공지</Sidebar.Item>
+        </Sidebar.Group>
+      </Sidebar>,
+    ),
+  );
+
+  const collapsible = screen.getByTestId('collapsible');
+  const fixed = screen.getByRole('region', { name: '채널' });
+  await expect.element(collapsible).toHaveProperty('tagName', 'SECTION');
+  await expect
+    .element(collapsible.getByRole('region', { name: '즐겨찾기', includeHidden: true }))
+    .toBeInTheDocument();
+  await expect.element(collapsible).toHaveAttribute('id', 'favorites');
+  await expect.element(collapsible).toHaveAttribute('data-testid', 'collapsible');
+  await expect.element(fixed).toHaveAttribute('id', 'channels');
+  await expect.element(fixed).toHaveAttribute('data-testid', 'fixed');
+});
+
 test('below 640px the trigger opens the sidebar in a drawer that a press on an item closes', async () => {
   const screen = await render(
     ui(

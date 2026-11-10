@@ -196,41 +196,42 @@ export function SidebarGroup({
     </SidebarGroupBody>
   );
 
-  if (collapsible && label !== undefined && !rail)
-    return (
-      <Accordion
-        type="single"
-        collapsible
-        defaultValue={defaultOpen ? GROUP : null}
-        variant="ghost"
-        size="tiny"
-        data-sidebar-group=""
-        className={styles.group({ className })}
-      >
-        <Accordion.Item value={GROUP}>
-          <Accordion.Header asChild>
-            <div>
-              <Accordion.Trigger className={styles.groupTrigger()}>{label}</Accordion.Trigger>
-            </div>
-          </Accordion.Header>
-          <Accordion.Content className="p-0">{body}</Accordion.Content>
-        </Accordion.Item>
-      </Accordion>
-    );
+  const collapses = collapsible && label !== undefined && !rail;
 
   return (
     <section
       {...props}
-      aria-labelledby={label !== undefined ? labelId : props['aria-labelledby']}
+      aria-labelledby={label !== undefined && !collapses ? labelId : props['aria-labelledby']}
       data-sidebar-group=""
       className={styles.group({ className })}
     >
-      {label !== undefined && (
-        <div id={labelId} className={styles.groupLabel()}>
-          {label}
-        </div>
+      {collapses ? (
+        <Accordion
+          type="single"
+          collapsible
+          defaultValue={defaultOpen ? GROUP : null}
+          variant="ghost"
+          size="tiny"
+        >
+          <Accordion.Item value={GROUP}>
+            <Accordion.Header asChild>
+              <div>
+                <Accordion.Trigger className={styles.groupTrigger()}>{label}</Accordion.Trigger>
+              </div>
+            </Accordion.Header>
+            <Accordion.Content className="p-0">{body}</Accordion.Content>
+          </Accordion.Item>
+        </Accordion>
+      ) : (
+        <>
+          {label !== undefined && (
+            <div id={labelId} className={styles.groupLabel()}>
+              {label}
+            </div>
+          )}
+          {body}
+        </>
       )}
-      {body}
     </section>
   );
 }
