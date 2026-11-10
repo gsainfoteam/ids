@@ -212,6 +212,10 @@ jobs:
       - run: flutter test
         working-directory: packages/flutter
 
+      - name: Test provider service examples
+        run: flutter test
+        working-directory: packages/flutter/example
+
   review:
     name: Claude review
     needs: [js, flutter]
