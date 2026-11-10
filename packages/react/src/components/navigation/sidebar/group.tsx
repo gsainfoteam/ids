@@ -76,7 +76,11 @@ export function SidebarList({ children }: { children?: ReactNode }) {
   );
 }
 
-function withNestedItems(element: ReactElement<SidebarItemProps>, key: string, nested: ReactNode[]) {
+function withNestedItems(
+  element: ReactElement<SidebarItemProps>,
+  key: string,
+  nested: ReactNode[],
+) {
   const ownProps = { key, [TREE_KEY_PROP]: key } as Partial<SidebarItemProps>;
   if (nested.length === 0) return cloneElement(element, ownProps);
 
