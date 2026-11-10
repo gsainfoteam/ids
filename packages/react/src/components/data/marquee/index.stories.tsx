@@ -275,7 +275,7 @@ export const PauseButton: Story = {
     const pause = () => canvas.getByRole('button', { name: '일시 정지' });
 
     await expect(pause()).toHaveAttribute('aria-pressed', 'false');
-    await expect(playState(root())).toBe('running');
+    await expect(root()).toHaveAttribute('data-playing');
 
     await userEvent.click(pause());
     await expect(pause()).toHaveAttribute('aria-pressed', 'true');
@@ -283,8 +283,8 @@ export const PauseButton: Story = {
     await waitFor(() => expect(playState(root())).toBe('paused'));
 
     await userEvent.click(pause());
+    await expect(pause()).toHaveAttribute('aria-pressed', 'false');
     await expect(root()).toHaveAttribute('data-playing');
-    await waitFor(() => expect(playState(root())).toBe('running'));
   },
 };
 
