@@ -5,16 +5,9 @@
 
 ## 공통
 
-### 코드
+### 생성 파일과 릴리스
 
-- 주석. tool directive(`eslint-disable`, `@ts-expect-error`, `@deprecated`, Dart의 `// ignore:`)만 허용합니다
-- 이름이 뜻을 말하지 않는 helper나 constant, 주석이 필요해 보이는 조건문
-- React의 `src/internal`, `src/hooks`, `src/utils`에 새 module을 넣으면서 그 폴더 README에 절을 더하지 않은 경우
-- 선언, 로직, effect, JSX 사이에 빈 줄 없이 한 덩어리로 이어 쓴 경우
 - 생성 파일을 손으로 고친 경우. 토큰은 `packages/core/tokens/`를 고치고 `pnpm codegen`을 돌립니다
-
-### 릴리스
-
 - `packages/css`, `packages/react`, `packages/flutter`의 공개 동작을 바꾸면서 `.changeset/*.md`가 없는 경우
 - 공개 API를 깨면서 changeset이 major가 아니거나 commit 제목에 `!`가 없는 경우
 - README나 스토리 description이 바뀐 API를 따라가지 않는 경우
@@ -22,6 +15,13 @@
 ## React
 
 `packages/react`와 `packages/css`의 변경에 적용합니다.
+
+### 코드
+
+- 주석. tool directive(`eslint-disable`, `@ts-expect-error`, `@deprecated`)만 허용합니다
+- 이름이 뜻을 말하지 않는 helper나 constant, 주석이 필요해 보이는 조건문
+- `src/internal`, `src/hooks`, `src/utils`에 새 module을 넣으면서 그 폴더 README에 절을 더하지 않은 경우
+- 선언, 로직, effect, JSX 사이에 빈 줄 없이 한 덩어리로 이어 쓴 경우
 
 ### Server Component 안전성
 
@@ -154,60 +154,6 @@
 - CDP가 필요한 테스트가 `skipWithoutCdp`로 시작하지 않는 경우, 엔진별 skip에 이유가 없는 경우
 - 바뀐 동작을 확인하는 테스트가 없는 경우
 
-## Flutter
-
-`packages/flutter`의 변경에 적용합니다. 컴포넌트는 지금 다시 만드는 중이고, 규칙의 원본은 `packages/flutter/MIGRATION.md`입니다.
-
-### 무엇을 만드는가
-
-- `packages/react`에 없는 컴포넌트를 먼저 만든 경우. 예외는 `bottom_navigation`뿐입니다
-- prop 이름, 부품 조립, 상태 집합이 React 구현과 다른 경우. 구조, API, 상태는 React를 따릅니다
-- 높이, padding, radius, 색, 상태 알파, 모션 시간이 Figma와 다른 경우. Figma에 없는 값은 React 값을 씁니다
-- 컴포넌트 안에 로컬 enum을 만든 경우. `IdsSize`, `IdsVariant`로 안 되는 축은 `packages/core/tokens/enums.json`에 더합니다
-- 치수와 상태 알파를 컴포넌트 파일마다 흩어 적은 경우. control surface 값은 파일 한 곳에 둡니다
-- `lib/theme/`, `lib/tokens/`, `lib/src/layout/ids_axis.dart`를 지운 경우
-
-### 파일과 공개 API
-
-- 컴포넌트가 `lib/src/components/<name>/ids_<name>.dart`가 아니거나 이름에 `Ids` 접두사가 없는 경우
-- 공개 컴포넌트를 `lib/ids.dart`에서 export하지 않은 경우, `IdsGroup`처럼 내부용 파일을 export한 경우
-- 컴포넌트에 widgetbook usecase(`example/lib/components/<name>_usecase.dart`)나 위젯 테스트(`test/ids_<name>_test.dart`)가 없는 경우
-- 부모 밖에서 쓰면 안 되는 부품이 영어 메시지의 `assert` 없이 조용히 실패하는 경우
-- `android/`, `ios/` 같은 플랫폼 디렉터리를 추가한 경우. 이 패키지는 앱이 아닙니다
-- `pubspec.yaml`의 `version`을 손으로 바꾼 경우. `pnpm version:packages`가 `package.json`에서 옮겨 적습니다
-
-### 상태와 상호작용
-
-- 상태를 StateMask나 덮는 레이어로 그린 경우. 상태는 배경색 알파로 표현합니다
-- `IdsInteractive`가 무언가를 그리는 경우. 상태만 내보내고 배경, 링, disabled는 control surface가 정합니다
-- `focusVisible`을 `FocusManager.instance.highlightMode`만으로 정한 경우. 마우스 클릭이나 터치로 얻은 focus에는 링이 없어야 합니다
-- hover가 마우스가 아닌 입력에서 켜지는 경우
-- `active`(누르는 중)와 `pressed`(Toggle의 켜짐)를 섞어 쓴 경우
-- `disabled`가 되어도 `hovered`, `active`가 남는 경우, pointer cancel 뒤에 `active`, `hovered`가 돌아오지 않는 경우
-- Enter와 Space로 `active`가 되지 않는 경우
-- 스타일 우선순위가 `pressed`, `active`, `hovered` 순이 아닌 경우
-
-### 스타일
-
-- `Color(0x...)`처럼 색을 직접 쓴 경우. 색은 `ThemeProvider.of(context)`에서 가져옵니다
-- 글자 스타일을 직접 만든 경우. `IdsTypography` 상수를 씁니다
-- `colorScheme` prop을 받는 컴포넌트에서 `outline`, `ghost`가 theme 색을 쓰는 경우. 둘은 중립색입니다
-- 테두리를 `Container(decoration:)`로 그린 경우. 자식이 1px 안으로 밀리므로 `DecoratedBox`, `Border.all(width: 1)`, 안쪽 `Padding`을 씁니다
-- focus 링이 바깥 3px 링(ring 색 0.40)과 안쪽 1px 테두리가 아닌 경우
-- `active`에서 크기가 바뀌는 경우. 배경만 바뀝니다
-- disabled가 opacity 0.50이 아닌 경우
-- 전환 시간이 `IdsMotion` 밖의 값인 경우, reduced motion(`MediaQuery.disableAnimationsOf`)에서도 전환이 도는 경우
-- radius가 `standard`(10)가 아닌 경우
-
-### 접근성
-
-- 컴포넌트가 `Semantics`(button, label, enabled, Toggle은 toggled)를 스스로 주입하지 않아 앱이 감싸야 하는 경우
-
-### 그룹
-
-- 그룹 안의 자식이 `size ?? group.size ?? standard`, `variant ?? group.variant ?? solid` 순서를 따르지 않는 경우
-- 그룹과 자식의 값이 어긋날 때 throw하는 경우
-- 그룹 안의 그룹이 바깥 그룹 값을 물려받지 않는 경우
 
 ## 보지 않을 것
 
