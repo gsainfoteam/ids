@@ -127,5 +127,22 @@
     ],
     "limit": "81 kB",
     "gzip": true
+  },
+  {
+    "name": "import { Chart } from chart",
+    "path": "dist/chart.js",
+    "import": "{ Chart }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss",
+      "recharts"
+    ],
+    "limit": "57 kB",
+    "gzip": true
   }
 ]

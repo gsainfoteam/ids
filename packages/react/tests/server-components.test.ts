@@ -160,6 +160,64 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
   console.log(JSON.stringify({ clientComponents, payload }));
 `;
 
+const renderChartFromAServerComponent = `
+  ${clientModulesAsReferences}
+
+  const { createElement: h } = await import('react');
+  const { renderToPipeableStream } = await import('react-server-dom-turbopack/server');
+  const { Writable } = await import('node:stream');
+  const { Chart } = await import('./dist/chart.js');
+
+  const clientReference = Symbol.for('react.client.reference');
+  const parts = ['Title', 'Description', 'Tooltip', 'TooltipContent', 'Legend', 'LegendContent', 'Table', 'Style'];
+  const unreachable = Chart.$$typeof === clientReference ? ['Chart'] : parts.filter((part) => Chart[part] === undefined);
+  if (unreachable.length) {
+    console.error('Parts a Server Component cannot reach: ' + unreachable.join(', '));
+    process.exit(1);
+  }
+  Chart.Style();
+
+  const page = h(
+    Chart,
+    { config: { web: { label: 'Web' } } },
+    h(Chart.Title, null, 'Visits'),
+    h(Chart.Description, null, 'Last week'),
+    h(Chart.Table),
+  );
+  const manifest = new Proxy({}, {
+    get: (_, id) => {
+      const [module, name] = String(id).split('#');
+      return { id: module, chunks: [], name };
+    },
+  });
+  const errors = [];
+  let payload = '';
+  await new Promise((resolve) => {
+    const sink = new Writable({
+      write(chunk, _encoding, done) { payload += chunk; done(); },
+      final(done) { resolve(); done(); },
+    });
+    renderToPipeableStream(page, manifest, { onError: (error) => { errors.push(String(error)); } }).pipe(sink);
+  });
+  if (errors.length) {
+    console.error(errors.join('\\n'));
+    process.exit(1);
+  }
+  console.log(payload);
+`;
+
+test(
+  'a Server Component renders Chart and its parts from the chart entry',
+  () => {
+    const rendered = runNode(['react-server'], renderChartFromAServerComponent);
+    expect(rendered.status, rendered.stderr).toBe(0);
+
+    for (const reference of ['ChartRoot', 'ChartTitle', 'ChartDescription', 'ChartTable'])
+      expect(rendered.stdout).toContain(`"${reference}"`);
+  },
+  coldNodeStartOnABusyRunner,
+);
+
 test(
   'a Server Component renders every component, its parts and its Style',
   () => {
