@@ -20,6 +20,91 @@ Widget host(Widget child) =>
     Directionality(textDirection: TextDirection.ltr, child: child);
 
 void main() {
+  testWidgets(
+    'resolved text styles replace inherited font packages at render time',
+    (tester) async {
+      for (final data in [
+        const IdsThemeData(),
+        const IdsThemeData(fontFamily: 'Helvetica', monoFontFamily: 'Courier'),
+        const IdsThemeData(
+          fontFamily: 'Service Sans',
+          fontPackage: 'service_fonts',
+          monoFontFamily: 'Service Mono',
+          monoFontPackage: 'service_fonts',
+        ),
+      ]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(
+              fontFamily: IdsTypography.sansFontFamily,
+              package: IdsTypography.sansFontPackage,
+            ),
+            home: Material(
+              child: IdsProvider(
+                theme: data,
+                palette: testPalette,
+                child: Builder(
+                  builder: (context) {
+                    final theme = IdsProvider.of(context).theme;
+                    return Column(
+                      children: [
+                        Text(
+                          'Sans',
+                          style: theme.textStyle(
+                            IdsTypography.bodyB3Regular,
+                            color: theme.onSurface,
+                          ),
+                        ),
+                        Text(
+                          'Mono',
+                          style: theme.textStyle(
+                            IdsTypography.bodyB3Regular,
+                            color: theme.onSurface,
+                            mono: true,
+                          ),
+                        ),
+                        TextField(
+                          style: theme.textStyle(
+                            IdsTypography.bodyB3Regular,
+                            color: theme.onSurface,
+                            mono: true,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(tester.takeException(), isNull);
+        for (final mono in [false, true]) {
+          final rich = tester.widget<RichText>(
+            find.descendant(
+              of: find.text(mono ? 'Mono' : 'Sans'),
+              matching: find.byType(RichText),
+            ),
+          );
+          final expected = data.textStyle(
+            IdsTypography.bodyB3Regular,
+            mono: mono,
+          );
+          expect(rich.text.style!.fontFamily, expected.fontFamily);
+          expect(
+            rich.text.style!.fontSize,
+            IdsTypography.bodyB3Regular.fontSize,
+          );
+          expect(
+            rich.text.style!.fontWeight,
+            IdsTypography.bodyB3Regular.fontWeight,
+          );
+          expect(rich.text.style!.color, const Color(0xff171717));
+        }
+      }
+    },
+  );
+
   testWidgets('the root requires an explicit theme and palette', (
     tester,
   ) async {

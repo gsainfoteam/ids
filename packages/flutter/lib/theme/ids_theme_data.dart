@@ -41,7 +41,7 @@ class IdsThemeData {
 
   TextStyle textStyle(TextStyle base, {Color? color, bool mono = false}) =>
       TextStyle(
-        inherit: base.inherit,
+        inherit: false,
         color: color ?? base.color,
         backgroundColor: base.backgroundColor,
         fontSize: base.fontSize,
@@ -49,7 +49,7 @@ class IdsThemeData {
         fontStyle: base.fontStyle,
         letterSpacing: base.letterSpacing,
         wordSpacing: base.wordSpacing,
-        textBaseline: base.textBaseline,
+        textBaseline: base.textBaseline ?? TextBaseline.alphabetic,
         height: base.height,
         leadingDistribution: base.leadingDistribution,
         locale: base.locale,

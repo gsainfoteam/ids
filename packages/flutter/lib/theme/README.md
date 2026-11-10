@@ -11,4 +11,4 @@
 
 `IdsTheme` combines runtime palette roles with generated neutral and status colors. The provider caches this resolved object until its data, palette or resolved mode changes. It inserts no global text, icon or Material theme wrappers. Component defaults therefore stay inside IDS.
 
-`textStyle` constructs a new TextStyle from the token's metrics and paint properties: Flutter's copyWith retains a bundled font package when its package argument is null, incorrectly looking up an app font inside ids_flutter. A provider widget test guards the app-font case.
+`textStyle` constructs a new TextStyle from the token's metrics and paint properties: Flutter's copyWith retains a bundled font package when its package argument is null, incorrectly looking up an app font inside ids_flutter. The resolved style has `inherit: false` because Text otherwise merges it with the ancestor's bundled font and restores that package. Supply the desired color when resolving a style. Provider widget tests inspect the final RichText style for default, service and external-package fonts in both sans and mono roles.
