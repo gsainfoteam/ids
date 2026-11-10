@@ -1,0 +1,9 @@
+{
+  "color": {
+    "chart-1": { "$value": "{blue.600}",   "$type": "color" },
+    "chart-2": { "$value": "{amber.600}",  "$type": "color" },
+    "chart-3": { "$value": "{teal.600}",   "$type": "color" },
+    "chart-4": { "$value": "{rose.600}",   "$type": "color" },
+    "chart-5": { "$value": "{violet.600}", "$type": "color" }
+  }
+}
