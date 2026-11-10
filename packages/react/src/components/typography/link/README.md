@@ -4,7 +4,7 @@
 
 - **두 가지 색.** 글 속 링크는 브랜드 글자색 `accent`, 바닥글이나 표 칸처럼 링크가 모인 자리는 둘레 글자색을 따르는 `neutral`.
 - **두 가지 밑줄.** 늘 긋는 `always` 와 가리킬 때만 긋는 `hover`.
-- **라우터 링크와 합성.** TanStack Router 는 `createLink(Link)`, Next.js 와 React Router 는 `asChild` 로 씁니다.
+- **라우터 링크와 합성.** TanStack Router 는 `createLink(Link)`, Next.js 와 React Router 는 `asChild` 로 한 번 감싸 둡니다.
 - **새 탭.** `target="_blank"` 면 `rel="noopener noreferrer"` 와 새 탭 아이콘, 스크린 리더용 "(새 탭에서 열림)" 이 붙습니다.
 
 ```tsx
@@ -55,7 +55,15 @@ import { Link } from '@gsainfoteam/ids-react';
 
 ## 라우터 링크
 
-### TanStack Router: `createLink`
+앱에서 프레임워크마다 한 번 감싸 두고 씁니다. IDS 는 라우터에 의존하지 않습니다.
+
+| 프레임워크      | 감싸는 법                          |
+| --------------- | ---------------------------------- |
+| TanStack Router | `createLink(Link)`                 |
+| Next.js         | `Link asChild` 안에 `next/link`    |
+| React Router    | `Link asChild` 안에 `NavLink`      |
+
+### TanStack Router
 
 ```tsx
 import { Link } from '@gsainfoteam/ids-react';
@@ -71,18 +79,60 @@ const notices = linkOptions({ to: '/notices', search: { page: 1 } });
 ```
 
 - `to`, `params`, `search` 는 라우트 트리로 타입 검사됩니다. 없는 경로는 타입 오류입니다.
-- 앱에서 한 번 만들어 두고 씁니다. IDS 는 라우터에 의존하지 않습니다.
 - 라우터가 `href`, `onClick`, `ref`, `aria-current` 를 넘기고, 함수 children 도 먼저 풀어서 넘깁니다.
 
-### Next.js, React Router: `asChild`
+### Next.js
 
 ```tsx
+import { Link } from '@gsainfoteam/ids-react';
 import NextLink from 'next/link';
+import type { ComponentProps } from 'react';
 
-<Link asChild>
-  <NextLink href="/notices">공지</NextLink>
-</Link>
+type AppLinkProps = ComponentProps<typeof NextLink> & Pick<Link.Props, 'colorScheme' | 'underline'>;
 
+export function AppLink({ colorScheme, underline, ...props }: AppLinkProps) {
+  return (
+    <Link asChild colorScheme={colorScheme} underline={underline}>
+      <NextLink {...props} />
+    </Link>
+  );
+}
+
+<AppLink href="/notices" prefetch={false}>공지</AppLink>
+<AppLink href={{ pathname: '/posts', query: { page: 2 } }} colorScheme="neutral">글 목록</AppLink>
+```
+
+- `'use client'` 없이 Server Component 에서 그대로 씁니다.
+- `prefetch`, 객체 `href` 같은 `next/link` 의 속성을 그대로 받습니다.
+
+### React Router
+
+```tsx
+import { Link } from '@gsainfoteam/ids-react';
+import { NavLink, type NavLinkProps } from 'react-router';
+
+type AppLinkProps = NavLinkProps & Pick<Link.Props, 'colorScheme' | 'underline'>;
+
+export function AppLink({ colorScheme, underline, ...props }: AppLinkProps) {
+  return (
+    <Link asChild colorScheme={colorScheme} underline={underline}>
+      <NavLink {...props} />
+    </Link>
+  );
+}
+
+<AppLink to="/notices">공지</AppLink>
+<AppLink to="/posts" className={({ isActive }) => (isActive ? 'font-bold' : undefined)}>
+  {({ isActive }) => (isActive ? '글 목록 (지금)' : '글 목록')}
+</AppLink>
+```
+
+- 활성 상태가 필요 없으면 `NavLink` 대신 `Link` 를 감쌉니다.
+- React Router 7 과 8 에서 같습니다.
+
+### `asChild` 가 하는 일
+
+```tsx
 <Link asChild>
   <NextLink href="https://gist.ac.kr" target="_blank">GIST</NextLink>   {/* 자식의 target 도 읽는다 */}
 </Link>
