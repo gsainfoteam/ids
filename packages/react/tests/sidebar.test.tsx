@@ -538,3 +538,31 @@ test('a row canMove keeps out of drops at the nearest place it allows', async (c
   await expect.poll(rowOrder).toEqual(['로드맵', '셔틀', 'IDS', '회의록', '토큰']);
   expect(lastMove(onItemsChange)).toMatchObject({ item: 'shuttle', to: [null, 1] });
 });
+
+test('the line after an open row sits below its children', async () => {
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onItemsChange = vi.fn();
+  const screen = await render(
+    ui(<Docs onItemsChange={onItemsChange} canMove={({ to }) => to.parent === null} />),
+  );
+
+  screen.getByRole('link', { name: '셔틀' }).element().focus();
+  await userEvent.keyboard(' ');
+  await userEvent.keyboard('{ArrowUp}');
+  await userEvent.keyboard('{Enter}');
+  await screen.getByRole('button', { name: 'IDS' }).click();
+  await expect.element(screen.getByRole('link', { name: '토큰' })).toBeVisible();
+
+  screen.getByRole('link', { name: '로드맵' }).element().focus();
+  await userEvent.keyboard(' ');
+  await userEvent.keyboard('{ArrowDown}{ArrowDown}');
+
+  const line = document.querySelector('[data-position="after"]')!.getBoundingClientRect();
+  const tokens = screen.getByRole('link', { name: '토큰' }).element().getBoundingClientRect();
+  const ids = screen.getByRole('button', { name: 'IDS' }).element().getBoundingClientRect();
+  expect(line.top).toBeGreaterThanOrEqual(tokens.bottom - 1);
+  expect(line.left).toBeLessThan(ids.left + 8);
+
+  await userEvent.keyboard('{Enter}');
+  expect(lastMove(onItemsChange)).toMatchObject({ item: 'roadmap', to: [null, 2] });
+});

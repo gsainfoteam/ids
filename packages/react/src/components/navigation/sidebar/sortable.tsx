@@ -206,10 +206,12 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
   const lineYOf = ({ drop }: SidebarKeyboardStop) => {
     const element = frames.current.get(drop.key)?.element;
     if (!element) return Infinity;
-    const { top, bottom } = element.getBoundingClientRect();
-    if (drop.position === 'before') return top;
-    if (drop.position === 'after') return bottom;
-    return (top + bottom) / 2;
+    if (drop.position === 'inside') {
+      const { top, bottom } = element.getBoundingClientRect();
+      return (top + bottom) / 2;
+    }
+    const { top, bottom } = (element.closest('li') ?? element).getBoundingClientRect();
+    return drop.position === 'before' ? top : bottom;
   };
 
   const nearestAllowedDrop = (dragged: string, pointerY: number) => {
@@ -372,9 +374,6 @@ function SortableFrame({
       }}
     >
       {children}
-      {(drop === 'before' || drop === 'after') && (
-        <span aria-hidden data-position={drop} className={styles.dropLine()} />
-      )}
     </div>
   );
 }

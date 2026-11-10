@@ -96,7 +96,16 @@ export function SidebarItem({
       </SidebarDragFrame>
     );
 
-  const listItem = <li className={sidebar.styles.listItem()}>{row}</li>;
+  const drop =
+    treeKey !== undefined && sortable?.drop?.key === treeKey ? sortable.drop.position : undefined;
+  const listItem = (
+    <li className={sidebar.styles.listItem()}>
+      {row}
+      {(drop === 'before' || drop === 'after') && (
+        <span aria-hidden data-position={drop} className={sidebar.styles.dropLine()} />
+      )}
+    </li>
+  );
 
   return inList ? listItem : <ul className={sidebar.styles.list()}>{listItem}</ul>;
 }

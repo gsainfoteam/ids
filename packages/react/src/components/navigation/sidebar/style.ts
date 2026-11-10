@@ -40,7 +40,7 @@ export const sidebarStyle = tv({
     groupTrigger:
       'min-h-6 items-center px-2 py-0 text-caption-c1-medium text-(--ids-color-on-muted)',
     list: 'flex min-w-0 flex-col gap-px',
-    listItem: 'flex min-w-0 flex-col',
+    listItem: 'relative flex min-w-0 flex-col',
     subTree: 'ms-[15.5px] flex min-w-0 pt-0.5',
     subList: 'flex min-w-0 flex-1 flex-col gap-px ps-[7.5px]',
     item: 'concentric-p-0 px-2',
