@@ -4,10 +4,10 @@ import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { renderToString } from 'react-dom/server';
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form';
 import { expect, test, vi } from 'vitest';
-import { cdp, userEvent } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Field, IconButton, Resizable, TextArea } from '../src';
+import { Field, IconButton, Menu, Resizable, TextArea } from '../src';
 import { skipWithoutCdp } from './engines';
 import { arcOf, expectTheArcToHug, middleOfTheArc, pointsAlong, type Point } from './resize-grip';
 import { clearOfCurve } from '../src/components/layout/scroll-area/geometry';
@@ -879,4 +879,27 @@ test('bars sit behind a line unless divided is off', async () => {
 
   expect(bars(divided!)).toEqual(['1px', '1px']);
   expect(bars(joined!)).toEqual(['0px', '0px']);
+});
+
+test('a menu drawn in a bar takes its own press, so the input does not pull focus and close it', async () => {
+  const selected = vi.fn();
+  const screen = await render(
+    <TextArea aria-label="message">
+      <TextArea.Input />
+      <Menu>
+        <Menu.Trigger asChild>
+          <IconButton aria-label="more" icon={<PaperAirplaneIcon />} />
+        </Menu.Trigger>
+        <Menu.Content side="top">
+          <Menu.Item onSelect={selected}>Attach</Menu.Item>
+        </Menu.Content>
+      </Menu>
+    </TextArea>,
+  );
+
+  await userEvent.click(page.getByRole('button', { name: 'more' }));
+  await userEvent.click(page.getByRole('menuitem', { name: 'Attach' }));
+
+  expect(selected).toHaveBeenCalledOnce();
+  await expect.element(screen.getByRole('textbox')).not.toHaveFocus();
 });
