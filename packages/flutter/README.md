@@ -136,7 +136,9 @@ return IdsProvider(
 
 `IdsThemeData(radius: 12, fontFamily: 'App Sans', cornerShape: IdsCornerShape.squircle)`로 외형을 지정한다. 기본 radius는 10이고 indicator는 ×0.4, container는 ×1.6이다. 기본 sans는 패키지의 Pretendard GOV Variable이며 `fontPackage`로 다른 패키지 글꼴도 지정할 수 있다. `monoFontFamily`와 `monoFontPackage`는 고정폭 글꼴에 사용한다. `theme.check()`는 잘못된 radius와 빈 글꼴 이름을 보고한다.
 
-`theme.shape()`는 round일 때 `RoundedRectangleBorder`, squircle일 때 `ContinuousRectangleBorder`를 반환한다. `theme.textStyle`은 IDS 글자 스타일에 서비스 글꼴을 적용한다. scale의 범위 및 글자·radius 확대 정책은 IDS-24에서 미정이므로 공개 scale 인자는 아직 없다. `theme.dimension(value)`는 현재 값을 그대로 반환한다.
+`theme.shape()`는 round일 때 `RoundedRectangleBorder`, squircle일 때 `ContinuousRectangleBorder`를 반환한다. 반경은 기본적으로 `theme.radius.standard`이며, 호출할 때 다른 반경을 지정할 수 있다. Provider는 컨테이너의 여백과 자식 구조를 읽지 않는다. 중첩 여백으로 바깥 반경을 구하는 동심 모서리는 컨테이너·레이아웃 계층의 범위이며 이 API에 포함하지 않는다.
+
+`theme.textStyle`은 IDS 글자 스타일에 서비스 글꼴을 적용한다. 반환한 스타일은 상위 글꼴 패키지를 다시 상속하지 않는다. 사용할 전경색은 `color`로 전달한다. scale의 범위 및 글자·radius 확대 정책은 IDS-24에서 미정이므로 공개 scale 인자는 아직 없다. `theme.dimension(value)`는 현재 값을 그대로 반환한다.
 
 ## 기존 API에서 이동
 
@@ -155,12 +157,15 @@ flutter pub get
 dart run slang
 cd example
 dart run slang
+flutter test
 cd ..
 flutter analyze
 flutter test
 ```
 
 Widgetbook: `packages/flutter/example`에서 `flutter run`으로 사용 가능한 iOS 기기를 선택한다. 현재 예제에는 웹 플랫폼 설정이 없다. IdsProvider의 `Runtime theme and slang`은 파란색·보라색 팔레트, 색상 역할, radius, 모서리, 모드, slang 번역과 누락 문구의 한국어 fallback을 보여준다. locale은 번역과 별도로 변경한다. `Nested scopes`에서 부모·상속 자식·독립 자식·형제의 팔레트 변경 범위를 비교할 수 있다.
+
+`Service integration`은 실제 slang `TranslationProvider`와 `LocaleSettings`를 사용한다. 화면 안의 버튼으로 테마와 언어를 바꾸며 자식 카운터가 유지되는지 확인한다. 글꼴은 IDS 기본 글꼴, 앱 자산, Widgetbook 패키지 자산 사이에서 전환한다. CI는 패키지 테스트와 이 예제의 테스트를 모두 실행한다.
 
 글꼴 비교의 Helvetica·Times·Courier는 macOS 시스템 글꼴이다. 다른 플랫폼에서는 해당 글꼴이 없으면 시스템 fallback을 사용한다. `Text scale (MediaQuery)`는 예제에 접근성 배율을 주입한다. IDS의 scale API가 아니며, `System`은 플랫폼이 제공한 배율을 유지한다. 생성 fixture와 예제의 slang Dart 파일은 커밋하지 않으며, CI에서 위와 같은 순서로 생성한다.
 
