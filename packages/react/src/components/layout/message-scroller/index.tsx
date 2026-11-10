@@ -2,6 +2,7 @@ import { type ComponentProps } from 'react';
 
 import { MessageScrollerJump, type MessageScrollerJumpProps } from './jump';
 import { MessageScrollerList, type MessageScrollerListProps } from './list';
+import { type ScrollOnAppend as EngineScrollOnAppend } from './message-scroll';
 import { MessageScrollerRoot } from './root';
 import { messageScrollerStyle } from './style';
 
@@ -10,7 +11,7 @@ export function MessageScroller(props: MessageScroller.Props) {
 }
 
 export namespace MessageScroller {
-  export type ScrollOnAppend = 'start' | 'end';
+  export type ScrollOnAppend = EngineScrollOnAppend;
 
   export type Props = ComponentProps<'div'> & {
     onReachStart?: () => void;
