@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/src/components/group/ids_group.dart';
 
 import 'test_theme.dart';
 

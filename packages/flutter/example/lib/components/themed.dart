@@ -11,11 +11,7 @@ Widget themed(BuildContext context, Widget child) {
     initialOption: IdsMode.light,
     labelBuilder: (m) => m.name,
   );
-  final scale = context.knobs.object.dropdown(
-    label: 'Text scale (MediaQuery)',
-    options: ['System', '1.0', '2.0', '3.0'],
-  );
-  final preview = IdsProvider(
+  return IdsProvider(
     theme: appTheme,
     palette: brandPalette,
     mode: mode,
@@ -25,19 +21,8 @@ Widget themed(BuildContext context, Widget child) {
         textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
           color: IdsProvider.of(context).theme.onSurface,
         ),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Center(child: SizedBox(width: 320, child: child)),
-        ),
+        child: Center(child: SizedBox(width: 320, child: child)),
       ),
     ),
   );
-  return scale == 'System'
-      ? preview
-      : MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(textScaler: TextScaler.linear(double.parse(scale))),
-          child: preview,
-        );
 }
