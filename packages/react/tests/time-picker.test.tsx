@@ -20,6 +20,8 @@ const periods = (doc: Document) =>
   );
 const OPTION_HEIGHT = 36;
 const scrollSettles = () => new Promise((resolve) => setTimeout(resolve, 200));
+const nextEvent = (target: EventTarget, type: string) =>
+  new Promise((resolve) => target.addEventListener(type, resolve, { once: true }));
 
 test('SSR: Korean names by default, the clock and periods from the locale tag, diagnostics', () => {
   const doc = ssr({ precision: 'second', step: 15 });
@@ -264,9 +266,7 @@ test('a wheel scroll commits, and a scroll set by script does not', async () => 
   await userEvent.wheel(col('hour'), { delta: { y: OPTION_HEIGHT } });
   await expect.poll(() => value?.hour).toBe(10);
   const column = col('hour');
-  const ended = new Promise((resolve) =>
-    column.addEventListener('scrollend', resolve, { once: true }),
-  );
+  const ended = nextEvent(column, 'scrollend');
   column.scrollTop = 14 * OPTION_HEIGHT;
   await ended;
   await scrollSettles();
@@ -319,9 +319,6 @@ test('column positioning ignores its page offset and keeps clicked time visible'
 });
 
 const TICKS_FIREFOX_NEEDS_FOR_A_LONG_WHEEL = 30;
-
-const nextEvent = (target: EventTarget, type: string) =>
-  new Promise((resolve) => target.addEventListener(type, resolve, { once: true }));
 
 async function wheelTickReachingThePage(scroller: HTMLElement, deltaY: number) {
   const delivered = nextEvent(scroller, 'wheel');
