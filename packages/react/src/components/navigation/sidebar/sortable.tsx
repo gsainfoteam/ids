@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  use,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type ReactNode,
-  type RefCallback,
-} from 'react';
+import { use, useEffect, useId, useRef, useState, type ReactNode, type RefCallback } from 'react';
 
 import {
   DndContext,
@@ -26,6 +18,7 @@ import {
   type UniqueIdentifier,
 } from '@dnd-kit/core';
 import { getEventCoordinates } from '@dnd-kit/utilities';
+import { minBy } from 'es-toolkit';
 
 import {
   SidebarFoldedContext,
@@ -155,6 +148,11 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
 
   const isAllowed = (move: SidebarTreeMove) => !canMove || canMove(describe(move).move);
 
+  const isVisible = (key: string) => {
+    const frame = frames.current.get(key);
+    return frame !== undefined && !frame.folded;
+  };
+
   const showDrop = (next: SidebarDrop | null) => {
     dropRef.current = next;
     setDrop((previous) => (sameDrop(previous, next) ? previous : next));
@@ -201,7 +199,24 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
       position: dropPositionAt(ratio, canDropInside, hasChildren),
     };
     const move = moveForDrop(tree, dragged, next);
-    showDrop(move && isAllowed(move) ? next : null);
+    if (!move) return showDrop(null);
+    showDrop(isAllowed(move) ? next : nearestAllowedDrop(dragged, start.y + delta.y));
+  };
+
+  const lineYOf = ({ drop }: SidebarKeyboardStop) => {
+    const element = frames.current.get(drop.key)?.element;
+    if (!element) return Infinity;
+    const { top, bottom } = element.getBoundingClientRect();
+    if (drop.position === 'before') return top;
+    if (drop.position === 'after') return bottom;
+    return (top + bottom) / 2;
+  };
+
+  const nearestAllowedDrop = (dragged: string, pointerY: number) => {
+    const nearest = minBy(keyboardStops(tree, dragged, isVisible, isAllowed), (stop) =>
+      Math.abs(lineYOf(stop) - pointerY),
+    );
+    return nearest?.move ? nearest.drop : null;
   };
 
   const announcements: Announcements = {
@@ -224,10 +239,6 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
       };
     },
     grab: (key) => {
-      const isVisible = (nodeKey: string) => {
-        const frame = frames.current.get(nodeKey);
-        return frame !== undefined && !frame.folded;
-      };
       const stops = keyboardStops(tree, key, isVisible, isAllowed);
       pending.current = null;
       setGrab({ key, stops, at: stops.findIndex((stop) => stop.move === null) });
@@ -286,7 +297,7 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
         <span aria-live="assertive" className="sr-only">
           {announcement}
         </span>
-        <DragOverlay dropAnimation={null}>
+        <DragOverlay dropAnimation={null} zIndex={0}>
           {dragging && (
             <Item
               size="tiny"

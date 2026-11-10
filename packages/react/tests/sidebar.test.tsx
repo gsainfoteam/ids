@@ -521,3 +521,20 @@ test('a row that canMove keeps closed splits into before and after', async (cont
   await expect.poll(rowOrder).toEqual(['로드맵', '셔틀', 'IDS', '회의록', '토큰']);
   expect(lastMove(onItemsChange)).toMatchObject({ item: 'shuttle', to: [null, 1] });
 });
+
+test('a row canMove keeps out of drops at the nearest place it allows', async (context) => {
+  skipWithoutCdp(context);
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const onItemsChange = vi.fn();
+  const screen = await render(
+    ui(<Docs onItemsChange={onItemsChange} canMove={({ to }) => to.parent === null} />),
+  );
+  const row = (name: string) => screen.getByRole('link', { name }).element();
+
+  await screen.getByRole('button', { name: 'IDS' }).click();
+  await expect.element(screen.getByRole('link', { name: '회의록' })).toBeVisible();
+
+  await drag(row('셔틀'), row('회의록'), 0.5);
+  await expect.poll(rowOrder).toEqual(['로드맵', '셔틀', 'IDS', '회의록', '토큰']);
+  expect(lastMove(onItemsChange)).toMatchObject({ item: 'shuttle', to: [null, 1] });
+});
