@@ -81,6 +81,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 - `disabled`가 되면 `hovered`, `active`를 버린다. 비활성 요소에는 pointer leave·up이 오지 않는다
 - 스타일 적용은 `pressed > active > hovered` 우선순위로 하나만. state 객체는 원시값 그대로
 - `onInteractionChange`로 부모에 미러링. controlled 아님
+- `Interactive` 안의 `Interactive`를 누르면 바깥은 포커스를 가져가지 않고 `onPressed`도 부르지 않는다. 안쪽이 `disabled`여도 같다 (React `isFromNestedControl`)
 - `T | (state) => T`: `Button` `IconButton` `Toggle` `IconToggle` `FloatingButton`의 prop 대부분(`children` `variant` `size` `colorScheme` …). 이벤트 핸들러, `disabled`, `pressed`, `value`는 제외
 
 | React                             | Flutter                                       |

@@ -57,8 +57,7 @@ class Interactive extends StatefulWidget {
     this.autofocus = false,
   });
 
-  final Widget Function(BuildContext context, InteractiveState state)
-  builder;
+  final Widget Function(BuildContext context, InteractiveState state) builder;
 
   final VoidCallback? onPressed;
 
@@ -82,6 +81,14 @@ class _InteractiveState extends State<Interactive> {
 
   bool _pointerFocus = false;
   bool _spaceHeld = false;
+  bool _primary = false;
+  FocusNode? _listened;
+
+  int? _pointerDownHere;
+  int? _pointerTakenByDescendant;
+
+  bool get _pressBelongsToDescendant =>
+      _pointerDownHere != null && _pointerDownHere == _pointerTakenByDescendant;
 
   FocusNode? _internalNode;
   FocusNode get _node => widget.focusNode ?? (_internalNode ??= FocusNode());
@@ -100,22 +107,28 @@ class _InteractiveState extends State<Interactive> {
   @override
   void initState() {
     super.initState();
+    _listenTo(_node);
     _reportAfterFrame();
   }
 
   @override
   void didUpdateWidget(Interactive oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (_node != _listened) _listenTo(_node);
     if (widget.disabled == oldWidget.disabled &&
         widget.pressed == oldWidget.pressed) {
       return;
     }
-    if (widget.disabled) _active = false;
+    if (widget.disabled) {
+      _active = false;
+      _hovered = false;
+    }
     _reportAfterFrame();
   }
 
   @override
   void dispose() {
+    _listened?.removeListener(_handlePrimaryFocus);
     _internalNode?.dispose();
     super.dispose();
   }
@@ -139,16 +152,40 @@ class _InteractiveState extends State<Interactive> {
     });
   }
 
+  void _descendantTookPointer(int pointer) {
+    _pointerTakenByDescendant = pointer;
+    _tellAncestorsPointerIsTaken(pointer);
+  }
+
+  void _tellAncestorsPointerIsTaken(int pointer) => context
+      .findAncestorStateOfType<_InteractiveState>()
+      ?._descendantTookPointer(pointer);
+
+  static void _ignorePress() {}
+
+  void _listenTo(FocusNode node) {
+    _listened?.removeListener(_handlePrimaryFocus);
+    _listened = node..addListener(_handlePrimaryFocus);
+    _primary = node.hasPrimaryFocus;
+  }
+
+  void _handlePrimaryFocus() {
+    final primary = _node.hasPrimaryFocus;
+    if (primary == _primary) return;
+    _primary = primary;
+    final visible =
+        primary &&
+        !_pointerFocus &&
+        FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+    _pointerFocus = false;
+    _set(() => _focusVisible = visible);
+  }
+
   void _handleFocusChange(bool focused) {
     _set(() {
       _focused = focused;
-      _focusVisible =
-          focused &&
-          !_pointerFocus &&
-          FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
       if (!focused) _active = false;
     });
-    _pointerFocus = false;
     if (!focused) _spaceHeld = false;
   }
 
@@ -197,19 +234,32 @@ class _InteractiveState extends State<Interactive> {
             });
           }
         },
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTapDown: enabled
-              ? (_) {
-                  _pointerFocus = true;
-                  _node.requestFocus();
-                  _set(() => _active = true);
-                }
-              : null,
-          onTapUp: enabled ? (_) => _set(() => _active = false) : null,
-          onTapCancel: enabled ? () => _set(() => _active = false) : null,
-          onTap: enabled ? widget.onPressed : null,
-          child: widget.builder(context, _state),
+        child: Listener(
+          onPointerDown: (event) {
+            _pointerDownHere = event.pointer;
+            _tellAncestorsPointerIsTaken(event.pointer);
+          },
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTapDown: enabled
+                ? (_) {
+                    if (!_pressBelongsToDescendant) {
+                      _pointerFocus = true;
+                      _node.requestFocus();
+                    }
+                    _set(() => _active = true);
+                  }
+                : null,
+            onTapUp: enabled ? (_) => _set(() => _active = false) : null,
+            onTapCancel: enabled
+                ? () {
+                    if (_active) _set(() => _active = false);
+                  }
+                : null,
+            onTap: enabled ? widget.onPressed : _ignorePress,
+            excludeFromSemantics: !enabled,
+            child: widget.builder(context, _state),
+          ),
         ),
       ),
     );
