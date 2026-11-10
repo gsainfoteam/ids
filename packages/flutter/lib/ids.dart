@@ -17,5 +17,6 @@ export 'src/interaction/ids_interactive.dart';
 
 export 'src/components/divider/ids_divider.dart';
 export 'src/components/field/ids_field.dart';
+export 'src/components/group/ids_group.dart';
 export 'src/components/label/ids_label.dart';
 export 'src/components/spinner/ids_spinner.dart';
