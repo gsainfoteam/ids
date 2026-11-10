@@ -8,6 +8,7 @@ import 'components/group_usecase.dart';
 import 'components/label_usecase.dart';
 import 'components/spinner_usecase.dart';
 import 'components/provider_usecase.dart';
+import 'components/provider_integration_preview.dart';
 
 void main() {
   runApp(const WidgetbookApp());
@@ -27,7 +28,10 @@ class WidgetbookApp extends StatelessWidget {
         home: child,
       ),
       directories: [
-        WidgetbookComponent(name: 'IdsProvider', useCases: providerUseCases),
+        WidgetbookComponent(
+          name: 'IdsProvider',
+          useCases: [...providerUseCases, ...providerIntegrationUseCases],
+        ),
         WidgetbookComponent(name: 'IdsDivider', useCases: dividerUseCases),
         WidgetbookComponent(name: 'IdsField', useCases: fieldUseCases),
         WidgetbookComponent(name: 'IdsGroup', useCases: groupUseCases),

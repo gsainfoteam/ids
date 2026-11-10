@@ -16,9 +16,14 @@ dependencies:
   hugeicons: ^1.1.7
   flutter_svg: ^2.1.0
   slang: ^4.19.2
+  slang_flutter: ^4.19.0
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: App Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
   assets:
     - assets/mvp/
 
