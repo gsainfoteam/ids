@@ -21,7 +21,7 @@ jobs:
 
       - name: Check generated files are up to date
         run: |
-          if ! git diff --exit-code -- packages/css/dist packages/react/src/tokens packages/flutter/lib/tokens; then
+          if ! git diff --exit-code -- packages/css/dist packages/react/src/tokens packages/react/src/internal/messages-catalog.ts packages/react/messages packages/flutter/lib/tokens; then
             echo "Generated files are out of date. Run 'pnpm codegen' and commit the result."
             exit 1
           fi

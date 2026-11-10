@@ -685,7 +685,7 @@ slots: {
 
 - [translate.ts](#translatets): 앱의 `translate` 가 답하지 않을 때 `formatDefaultMessage` 로 기본값을 채웁니다.
 - [date-locale.ts](#date-localets): `DEFAULT_LOCALE`(`'ko-KR'`).
-- `vite.config.ts`: 빌드 때 `messages` 를 `dist/messages/ko.json` 으로 씁니다. `messages/en.json` 은 손으로 쓴 영어 카탈로그이고 같은 곳으로 복사됩니다.
+- `vite.config.ts`: 빌드 때 `messages` 를 `dist/messages/ko.json` 으로 씁니다. `messages/en.json` 은 core에서 생성한 영어 카탈로그이고 같은 곳으로 복사됩니다.
 - `src/index.ts`: 앱이 쓰는 `IdsMessageKey`, `IdsMessageValues` 타입.
 
 ### 쓰는 법
@@ -710,7 +710,7 @@ formatDefaultMessage('calendar.weekNumber', { week: 3 }); // '3주차'
 
 ### 알아둘 것
 
-- 새 문구는 컴포넌트 이름의 그룹 아래, 알파벳 자리에 넣고, `messages/en.json` 의 같은 자리에 영어를 씁니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
+- 새 문구는 `packages/core/messages/ko.json`의 컴포넌트 그룹 아래 알파벳 자리에 넣고, `packages/core/messages/en.json`의 같은 자리에 영어를 씁니다. `pnpm codegen`이 `messages-catalog.ts`와 `messages/en.json`을 생성합니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
 - 문구를 컴포넌트 안에 한국어 문자열로 직접 쓰지 않습니다. 컴포넌트 코드에 한국어 문자열이 있으면 `tests/messages.test.ts` 가 실패합니다.
 - 개발 경고(`[IDS] ...`)는 영어로 두고 여기에 넣지 않습니다. 사용자가 보는 문구만 넣습니다.
 

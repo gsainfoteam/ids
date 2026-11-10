@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "style-dictionary build --config sd.config.js"
+    "build": "style-dictionary build --config sd.config.js && node messages.build.mjs"
   },
   "devDependencies": {
     "style-dictionary": "^5.4.0",
