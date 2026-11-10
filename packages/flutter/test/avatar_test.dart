@@ -77,6 +77,22 @@ void main() {
   });
 
   group('fallback', () {
+    testWidgets('the initials keep their size at any text scale', (
+      tester,
+    ) async {
+      await pump(tester, const Avatar(name: 'Alice Kim'));
+      final unscaled = tester.getSize(find.text('AK'));
+
+      await pump(
+        tester,
+        const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: Avatar(name: 'Alice Kim'),
+        ),
+      );
+      expect(tester.getSize(find.text('AK')), unscaled);
+    });
+
     testWidgets('shows the initials, or a person without a name', (
       tester,
     ) async {

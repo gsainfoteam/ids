@@ -61,6 +61,10 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 - `Slot`은 만들지 않는다. `asChild`는 조합으로 대신한다.
 - `BottomNavigation`은 Flutter 단독이다. 이전 코드(`currentIndex` `onTap`, item은 `icon` `label`)가 출발점이다.
 
+**선행 컴포넌트를 기다리는 기능.** 선행 컴포넌트를 만들 때 함께 추가한다.
+
+- `Tooltip`: `AvatarGroup`의 `+N`에 마우스를 올리면 숨은 사람들의 이름을 보여 준다 (React `AvatarGroup.Overflow`의 `title`).
+
 ## 옮겨야 할 규약
 
 ### `useInteractive` → `Interactive`

@@ -162,6 +162,22 @@ void main() {
       );
       expect(indicatorCenter(tester), within(distance: 0.01, from: pulled));
     });
+
+    testWidgets('reads the shape an avatar takes from its group', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const AvatarGroup(
+          shape: AvatarShape.square,
+          children: [Badge.dot(child: Avatar(name: 'A'))],
+        ),
+      );
+      expect(
+        tester.getCenter(indicator()) - tester.getTopLeft(find.byType(Avatar)),
+        const Offset(40, 0),
+      );
+    });
   });
 
   group('color', () {

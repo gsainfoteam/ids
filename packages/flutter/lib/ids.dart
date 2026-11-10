@@ -15,6 +15,7 @@ export 'src/interaction/interactive.dart';
 
 export 'src/components/aspect_ratio/aspect_ratio.dart';
 export 'src/components/avatar/avatar.dart';
+export 'src/components/avatar_group/avatar_group.dart';
 export 'src/components/badge/badge.dart';
 export 'src/components/divider/divider.dart';
 export 'src/components/field/field.dart';

@@ -9,6 +9,7 @@ import '../../../theme/ids_radius.dart';
 import '../../../theme/theme_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_typography.dart';
+import 'avatar_scope.dart';
 
 enum AvatarShape { circle, square }
 
@@ -139,20 +140,22 @@ class _AvatarState extends State<Avatar> {
 
   Widget _fallback(double width, Color color) {
     final initials = widget.name == null ? '' : initialsOf(widget.name!);
-    return DefaultTextStyle(
-      style: IdsTypography.bodyB3Medium.copyWith(
-        fontSize: math.max(_minInitialsSize, width * _initialsFactor),
-        height: 1,
-        color: color,
-      ),
-      child: IconTheme(
-        data: IconThemeData(size: width * _iconFactor, color: color),
-        child: Center(
-          child:
-              widget.fallback ??
-              (initials.isEmpty
-                  ? const Icon(Icons.person)
-                  : Text(initials, maxLines: 1, softWrap: false)),
+    return _WithoutTextScaling(
+      child: DefaultTextStyle(
+        style: IdsTypography.bodyB3Medium.copyWith(
+          fontSize: math.max(_minInitialsSize, width * _initialsFactor),
+          height: 1,
+          color: color,
+        ),
+        child: IconTheme(
+          data: IconThemeData(size: width * _iconFactor, color: color),
+          child: Center(
+            child:
+                widget.fallback ??
+                (initials.isEmpty
+                    ? const Icon(Icons.person)
+                    : Text(initials, maxLines: 1, softWrap: false)),
+          ),
         ),
       ),
     );
@@ -161,8 +164,11 @@ class _AvatarState extends State<Avatar> {
   @override
   Widget build(BuildContext context) {
     final theme = ThemeProvider.of(context);
-    final size = widget.size ?? IdsSize.standard;
-    final circle = (widget.shape ?? AvatarShape.circle) == AvatarShape.circle;
+    final scope = AvatarScope.maybeOf(context);
+    final size = widget.size ?? scope?.size ?? IdsSize.standard;
+    final circle =
+        (widget.shape ?? scope?.shape ?? AvatarShape.circle) ==
+        AvatarShape.circle;
     ShapeBorder outline([BorderSide side = BorderSide.none]) => circle
         ? CircleBorder(side: side)
         : RoundedRectangleBorder(
@@ -170,39 +176,55 @@ class _AvatarState extends State<Avatar> {
             borderRadius: BorderRadius.circular(_squareRadii[size]!),
           );
 
+    final cutout = scope?.cutout;
+    final surface = Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(color: theme.muted, shape: outline()),
+      foregroundDecoration: ShapeDecoration(
+        shape: outline(
+          BorderSide(color: theme.onSurface.withValues(alpha: _ringAlpha)),
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final fallback = _fallback(constraints.maxWidth, theme.onMuted);
+          final image = widget.image;
+          if (image == null) return fallback;
+          return Image(
+            image: image,
+            fit: BoxFit.cover,
+            excludeFromSemantics: true,
+            frameBuilder: (_, child, frame, _) {
+              if (frame == null) {
+                return _waitedEnough ? fallback : const SizedBox.shrink();
+              }
+              _report(AvatarStatus.loaded);
+              return child;
+            },
+            errorBuilder: (_, _, _) {
+              _report(AvatarStatus.error);
+              return fallback;
+            },
+          );
+        },
+      ),
+    );
+
     final avatar = SizedBox.square(
       dimension: _sizes[size],
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: ShapeDecoration(color: theme.muted, shape: outline()),
-        foregroundDecoration: ShapeDecoration(
-          shape: outline(
-            BorderSide(color: theme.onSurface.withValues(alpha: _ringAlpha)),
-          ),
-        ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final fallback = _fallback(constraints.maxWidth, theme.onMuted);
-            final image = widget.image;
-            if (image == null) return fallback;
-            return Image(
-              image: image,
-              fit: BoxFit.cover,
-              excludeFromSemantics: true,
-              frameBuilder: (_, child, frame, _) {
-                if (frame == null) {
-                  return _waitedEnough ? fallback : const SizedBox.shrink();
-                }
-                _report(AvatarStatus.loaded);
-                return child;
-              },
-              errorBuilder: (_, _, _) {
-                _report(AvatarStatus.error);
-                return fallback;
-              },
-            );
-          },
-        ),
+      child: ClipPath(
+        clipBehavior: cutout == null ? Clip.none : Clip.antiAlias,
+        clipper: cutout == null
+            ? null
+            : _CutoutClipper(
+                left:
+                    (cutout == AvatarCutout.start) !=
+                    (Directionality.of(context) == TextDirection.rtl),
+                overlap: scope!.overlap,
+                circle: circle,
+                radius: _squareRadii[size]!,
+              ),
+        child: surface,
       ),
     );
 
@@ -214,4 +236,63 @@ class _AvatarState extends State<Avatar> {
       child: avatar,
     );
   }
+}
+
+class _WithoutTextScaling extends StatelessWidget {
+  const _WithoutTextScaling({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.maybeOf(context);
+    if (media == null) return child;
+    return MediaQuery(
+      data: media.copyWith(textScaler: TextScaler.noScaling),
+      child: child,
+    );
+  }
+}
+
+class _CutoutClipper extends CustomClipper<Path> {
+  const _CutoutClipper({
+    required this.left,
+    required this.overlap,
+    required this.circle,
+    required this.radius,
+  });
+
+  static const _gap = 2.0;
+
+  final bool left;
+  final double overlap;
+  final bool circle;
+  final double radius;
+
+  @override
+  Path getClip(Size size) {
+    final neighbour = Rect.fromLTWH(
+      left ? overlap - size.width : size.width - overlap,
+      0,
+      size.width,
+      size.height,
+    ).inflate(_gap);
+    final hole = circle
+        ? (Path()..addOval(neighbour))
+        : (Path()..addRRect(
+            RRect.fromRectAndRadius(neighbour, Radius.circular(radius + _gap)),
+          ));
+    return Path.combine(
+      PathOperation.difference,
+      Path()..addRect(Offset.zero & size),
+      hole,
+    );
+  }
+
+  @override
+  bool shouldReclip(_CutoutClipper old) =>
+      left != old.left ||
+      overlap != old.overlap ||
+      circle != old.circle ||
+      radius != old.radius;
 }

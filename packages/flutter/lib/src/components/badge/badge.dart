@@ -8,6 +8,7 @@ import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
 import '../avatar/avatar.dart';
+import '../avatar/avatar_scope.dart';
 
 enum BadgePlacement { topEnd, topStart, bottomEnd, bottomStart }
 
@@ -141,9 +142,11 @@ class Badge extends StatelessWidget {
     return _shownCount! > cap ? '$cap+' : '$_shownCount';
   }
 
-  bool get _circular => switch ((shape, child)) {
+  bool _circular(BuildContext context) => switch ((shape, child)) {
     (BadgeShape.circular, _) => true,
-    (null, Avatar(shape: null || AvatarShape.circle)) => true,
+    (null, Avatar(shape: final own)) =>
+      (own ?? AvatarScope.maybeOf(context)?.shape ?? AvatarShape.circle) ==
+          AvatarShape.circle,
     _ => false,
   };
 
@@ -287,7 +290,7 @@ class Badge extends StatelessWidget {
         placement == BadgePlacement.topEnd ||
         placement == BadgePlacement.bottomEnd;
     final right = end != rtl;
-    final inset = _circular ? _circularInset : 0.0;
+    final inset = _circular(context) ? _circularInset : 0.0;
 
     final badge = Stack(
       clipBehavior: Clip.none,

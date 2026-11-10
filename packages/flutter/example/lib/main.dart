@@ -3,6 +3,7 @@ import 'package:ids_flutter/ids.dart' as ids;
 import 'package:widgetbook/widgetbook.dart';
 
 import 'components/aspect_ratio_usecase.dart';
+import 'components/avatar_group_usecase.dart';
 import 'components/avatar_usecase.dart';
 import 'components/badge_usecase.dart';
 import 'components/divider_usecase.dart';
@@ -31,6 +32,7 @@ class WidgetbookApp extends StatelessWidget {
       directories: [
         WidgetbookComponent(name: 'AspectRatio', useCases: aspectRatioUseCases),
         WidgetbookComponent(name: 'Avatar', useCases: avatarUseCases),
+        WidgetbookComponent(name: 'AvatarGroup', useCases: avatarGroupUseCases),
         WidgetbookComponent(name: 'Badge', useCases: badgeUseCases),
         WidgetbookComponent(name: 'Divider', useCases: dividerUseCases),
         WidgetbookComponent(name: 'Field', useCases: fieldUseCases),
