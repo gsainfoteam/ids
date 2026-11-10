@@ -626,9 +626,19 @@ default, so on macOS `pnpm test` runs Chromium only; CI (ubuntu) runs all three,
 `pnpm test:browsers` runs all three in the Playwright Linux image through Docker.
 `IDS_BROWSERS=firefox,webkit` picks engines by hand.
 
-CI gives each engine its own runner: the JS job runs `pnpm test` with Chromium, and the
-`engines` job runs the browser project once for Firefox and once for WebKit. WebKit on Linux
-retries a failed test once (`--retry 1` in that job only): about one run in three, one test there
+CI splits the tests over runners with `vitest run --shard`: Chromium runs every project on two
+runners, Firefox and WebKit run the browser project on five each. `tests/balanced-sequencer.ts`
+deals the files out by the seconds `tests/durations.json` gives each (WebKit times from a CI run,
+the median for a file not listed), so every runner gets about the same time; Vitest's own shard
+splits by path hash and leaves one runner twice as long as another. When a file grows much slower
+or faster, take the new times from a WebKit job's log. The test runners run inside the Playwright
+Linux image of the version `pnpm-lock.yaml` holds, which ships the browsers and their system
+libraries: `playwright install --with-deps` on the plain runner took from 20 seconds to 12 minutes
+waiting on apt. The required checks are small jobs that
+pass only when every runner behind them passed: `JS (lint / typecheck / build / test)` waits for
+the lint, typecheck and build job and both Chromium runners, `Browser tests (firefox)` and
+`Browser tests (webkit)` for their five. WebKit on Linux retries a failed test once (`--retry 1`
+on its runners only): about one run in three, one test there
 stops typing or firing a timer for seconds and runs out of time, a different typing or timer
 story each time (TextArea `CharacterCount`, TelField). The same story passes alone and with its
 whole category file in the Playwright Linux image, and splitting the files by mode or across two
