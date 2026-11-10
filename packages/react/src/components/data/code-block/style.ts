@@ -67,6 +67,9 @@ export const codeBlockStyle = tv({
         ],
       },
     },
+    captioned: {
+      false: { line: 'first:pe-[calc(var(--ids-size-control-tiny)+--spacing(3))]' },
+    },
     collapsed: {
       true: {
         pre: [
@@ -76,5 +79,11 @@ export const codeBlockStyle = tv({
       },
     },
   },
-  defaultVariants: { variant: 'outline', wrap: false, lineNumbers: false, collapsed: false },
+  defaultVariants: {
+    variant: 'outline',
+    wrap: false,
+    lineNumbers: false,
+    captioned: true,
+    collapsed: false,
+  },
 });

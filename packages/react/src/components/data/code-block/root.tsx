@@ -70,9 +70,9 @@ export function CodeBlockRoot({
   const hiddenLines = collapsedLines == null ? 0 : Math.max(0, lines.length - collapsedLines);
   const foldable = hiddenLines > 0;
   const collapsed = foldable && !expanded;
-  const styles = codeBlockStyle({ variant, wrap, lineNumbers, collapsed });
   const showLanguage = !isPlainText(language);
   const hasCaption = title != null || showLanguage;
+  const styles = codeBlockStyle({ variant, wrap, lineNumbers, captioned: hasCaption, collapsed });
   const digits = String(lines.length).length;
 
   return (

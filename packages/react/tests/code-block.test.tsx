@@ -108,6 +108,18 @@ test('selecting the code and copying it leaves the line numbers out', async () =
   expect(await pastedText()).toBe(SAVE);
 });
 
+test('without a caption, the first line wraps before the copy button', async () => {
+  const screen = await render(
+    <div className="w-72">
+      <CodeBlock wrap>{'x'.repeat(200)}</CodeBlock>
+    </div>,
+  );
+  const firstRow = screen.container.querySelector('[data-line="1"] > span')!.getClientRects()[0]!;
+  const button = screen.getByRole('button', { name: '코드 복사' }).element();
+
+  expect(firstRow.right).toBeLessThanOrEqual(button.getBoundingClientRect().left);
+});
+
 test('a long line scrolls sideways from the keyboard once Tab reaches the code', async () => {
   const screen = await render(
     <>

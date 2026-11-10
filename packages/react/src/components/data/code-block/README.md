@@ -34,7 +34,7 @@ import { CodeBlock } from '@gsainfoteam/ids-react';
 </figure>
 ```
 
-- `title` 과 `language` 가 `<figcaption>` 이 됩니다. 둘 다 없으면(`language` 가 `text`) figcaption 없이 복사 버튼만 코드 위에 뜹니다.
+- `title` 과 `language` 가 `<figcaption>` 이 됩니다. 둘 다 없으면(`language` 가 `text`) figcaption 없이 복사 버튼만 코드 위에 뜹니다. 그때 첫 줄은 오른쪽을 버튼 폭만큼 비워, 글자가 버튼 밑에 가리지 않습니다.
 - 복사 버튼은 figcaption 밖에 둡니다. 안에 두면 figure 의 이름에 "코드 복사" 가 섞입니다.
 - `<pre>` 는 `dir="ltr"` 입니다. 오른쪽에서 왼쪽으로 쓰는 페이지에서도 코드는 왼쪽부터 씁니다.
 
