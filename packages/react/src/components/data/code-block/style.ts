@@ -16,7 +16,7 @@ export const codeBlockStyle = tv({
     scroller: 'min-w-0 rounded-[inherit]',
     pre: 'rounded-[inherit] py-3 font-mono text-body-b3-regular',
     code: [
-      'block [--code-block-gutter:0px]',
+      'block [--code-block-gutter:0px] [--code-block-glyph-drop:0.125em]',
       '[&_[data-token=comment]]:text-(--ids-color-on-muted) [&_[data-token=comment]]:italic',
       '[&_[data-token=keyword]]:text-(--ids-color-accent)',
       '[&_[data-token=string]]:text-(--ids-color-success-strong)',
@@ -33,6 +33,7 @@ export const codeBlockStyle = tv({
       'ps-[calc(--spacing(4)+var(--code-block-gutter))]',
       'data-highlighted:shadow-[inset_2px_0_0_var(--ids-color-primary)]',
     ],
+    glyphs: 'relative top-(--code-block-glyph-drop)',
   },
   variants: {
     variant: {
@@ -61,6 +62,7 @@ export const codeBlockStyle = tv({
           "before:content-[counter(line)_/_'']",
           'before:-ms-(--code-block-gutter) before:inline-block before:w-[calc(var(--code-block-digits)*1ch)]',
           'before:me-4 before:text-end before:text-(--ids-color-on-muted) before:select-none',
+          'before:relative before:top-(--code-block-glyph-drop)',
         ],
       },
     },

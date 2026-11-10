@@ -93,15 +93,17 @@ export function CodeBlockRoot({
                       data-highlighted={highlighted.has(index + 1) ? '' : undefined}
                       className={styles.line()}
                     >
-                      {segments.map((segment, at) =>
-                        segment.token ? (
-                          <span key={at} data-token={segment.token}>
-                            {segment.text}
-                          </span>
-                        ) : (
-                          segment.text
-                        ),
-                      )}
+                      <span className={styles.glyphs()}>
+                        {segments.map((segment, at) =>
+                          segment.token ? (
+                            <span key={at} data-token={segment.token}>
+                              {segment.text}
+                            </span>
+                          ) : (
+                            segment.text
+                          ),
+                        )}
+                      </span>
                     </span>
                   </Fragment>
                 ))}
