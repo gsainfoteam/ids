@@ -27,9 +27,20 @@ jobs:
       - name: Install Chromium for browser tests
         run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium
 
-      - run: pnpm test
+      - run: pnpm build
+
+      - name: Run the whole suite four times
+        working-directory: packages/react
         env:
           IDS_BROWSERS: chromium
+        run: |
+          status=0
+          for round in 1 2 3 4; do
+            pnpm exec vitest run > run.log 2>&1 || status=1
+            echo "round $round"
+            grep -E "HELD-DIAG|FAIL |Test Files" run.log | sed 's/\x1b\[[0-9;]*m//g' | cut -c1-3000
+          done
+          exit $status
 
       - name: Upload the failure screenshots
         if: failure()

@@ -23,7 +23,13 @@ function countFrames() {
   };
 }
 
-function describeTheImage(src: string, paused: Map<string, string>, frames: number, waited: number) {
+function describeTheImage(
+  src: string,
+  paused: Map<string, string>,
+  frames: number,
+  waited: number,
+  sent: string[],
+) {
   const img = [...document.querySelectorAll('img')].find((i) => i.getAttribute('src') === src);
   const entries = performance
     .getEntriesByType('resource')
@@ -34,6 +40,7 @@ function describeTheImage(src: string, paused: Map<string, string>, frames: numb
     waited,
     frames,
     pausedPaths: [...paused.keys()],
+    networkSent: sent.filter((url) => url.includes(src)),
     img: img && {
       complete: img.complete,
       naturalWidth: img.naturalWidth,
@@ -66,9 +73,17 @@ export async function holdImages(held: string, picture: string) {
     paused.set(new URL(event.request.url).pathname, event.requestId);
   };
   session.on('Fetch.requestPaused', onPaused);
+  const sent: string[] = [];
+  const onSent = (event: { request: { url: string } }) => {
+    sent.push(`${Math.round(performance.now())} ${new URL(event.request.url).pathname}`);
+  };
+  session.on('Network.requestWillBeSent', onSent);
+  await session.send('Network.enable');
   await session.send('Fetch.enable', { patterns: [{ urlPattern: `*${held}*` }] });
   onTestFinished(async () => {
     session.off('Fetch.requestPaused', onPaused);
+    session.off('Network.requestWillBeSent', onSent);
+    await session.send('Network.disable');
     await session.send('Fetch.disable');
   });
   const requestOf = async (src: string) => {
@@ -82,7 +97,7 @@ export async function holdImages(held: string, picture: string) {
         })
         .toBeDefined();
     } catch (error) {
-      const atTimeout = describeTheImage(src, paused, stopCounting(), Math.round(performance.now() - start));
+      const atTimeout = describeTheImage(src, paused, stopCounting(), Math.round(performance.now() - start), sent);
       console.error(`HELD-DIAG ${src} at timeout: ${atTimeout}`);
       const stopLate = countFrames();
       const lateStart = performance.now();
@@ -90,7 +105,7 @@ export async function holdImages(held: string, picture: string) {
         .poll(() => paused.get(src) ?? (performance.getEntriesByName(new URL(src, location.href).href).length ? 'served' : undefined), { timeout: 15_000 })
         .toBeDefined()
         .catch(() => {});
-      const late = describeTheImage(src, paused, stopLate(), Math.round(performance.now() - lateStart));
+      const late = describeTheImage(src, paused, stopLate(), Math.round(performance.now() - lateStart), sent);
       console.error(`HELD-DIAG ${src} later: ${late}`);
       throw new Error(`HELD-DIAG ${src}\n at timeout: ${atTimeout}\n 15s later: ${late}`, { cause: error });
     }
