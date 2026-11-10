@@ -42,7 +42,8 @@ test('SSR: a static row has no role, and every part marks itself', () => {
   ).toContain('[&+[data-item-content]]:flex-none');
   const media = doc.querySelector<HTMLElement>('[data-item-media]')!;
   expect(media.dataset.variant).toBe('soft');
-  expect(media.className).toContain('group-has-[[data-item-description]]/item:self-start');
+  expect(media.className).toContain('mt-(--item-media-inset)');
+  expect(media.className).toContain('size-[calc(var(--item-row)*var(--item-media-ratio))]');
 });
 
 test('onClick: the title is the button, described by the description, and the row presses around its actions', async () => {
@@ -254,27 +255,6 @@ test('Group ordered: an ol a screen reader counts, still a list in Safari', asyn
   expect(html(<Item.Group aria-label="x" />).querySelector('ul')).not.toBeNull();
 });
 
-test('dense halves the padding and a group shares it with its rows', () => {
-  const doc = html(
-    <Item.Group dense aria-label="Files">
-      <Item>One</Item>
-      <Item size="tiny">Two</Item>
-      <Item dense={false}>Three</Item>
-    </Item.Group>,
-  );
-  const [one, two, three] = Array.from(doc.querySelectorAll('[data-item]'));
-  expect(one!.hasAttribute('data-dense')).toBe(true);
-  expect(one!.className).toMatch(/(^| )min-h-12( |$)/);
-  expect(one!.className).toMatch(/(^| )concentric-p-1\.5( |$)/);
-  expect(one!.className, 'the standard padding is replaced').not.toMatch(/min-h-14|concentric-p-3/);
-  expect(two!.className).toMatch(/(^| )min-h-8( |$)/);
-  expect(two!.className).toMatch(/(^| )concentric-p-1( |$)/);
-  expect(three!.hasAttribute('data-dense'), 'a row can opt out of the group').toBe(false);
-  expect(three!.className).toMatch(/(^| )concentric-p-3( |$)/);
-  const plain = html(<Item>x</Item>).querySelector('[data-item]')!;
-  expect(plain.hasAttribute('data-dense'), 'rows are not dense by default').toBe(false);
-});
-
 test('a truncated title stays on one line within its row', () => {
   const title = (props: Item.Title.Props) =>
     html(
@@ -324,6 +304,155 @@ test('an image fills its media tile', () => {
   expect(media('ghost').className, 'an image without a tile keeps its size').not.toMatch(
     /size-full/,
   );
+});
+
+const WRAPPING_DESCRIPTION =
+  'A description long enough to wrap onto a second line inside this narrow row, and a little more.';
+
+function insets(media: Element) {
+  const row = media.closest('[data-item]')!;
+  const outer = row.getBoundingClientRect();
+  const box = media.getBoundingClientRect();
+  return {
+    padding: parseFloat(getComputedStyle(row).paddingTop),
+    start: box.left - outer.left,
+    top: box.top - outer.top,
+    bottom: outer.bottom - box.bottom,
+    width: box.width,
+    height: box.height,
+    icon: media.querySelector('svg')!.getBoundingClientRect().width,
+  };
+}
+
+const tileCases = (['standard', 'tiny'] as const).flatMap((size) =>
+  (['title', 'one line', 'caption line', 'two lines', 'tall action'] as const).map(
+    (text, index) => ({ size, text, media: index % 2 === 0 ? ('soft' as const) : ('outline' as const) }),
+  ),
+);
+
+const RATIO = { standard: 8 / 14, tiny: 7 / 11 };
+
+function rowHeight(tile: Element) {
+  return tile.closest('[data-item]')!.getBoundingClientRect().height;
+}
+
+function oneLineRow(row: Element) {
+  const line = (part: string) =>
+    parseFloat(getComputedStyle(row.querySelector(`[data-item-${part}]`)!).lineHeight);
+  return line('title') + 2 + line('description') + parseFloat(getComputedStyle(row).paddingTop) * 2;
+}
+
+test('a tile and the space around it scale with the row up to one line of description', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <div className="flex w-72 flex-col gap-2">
+        {tileCases.map(({ size, text, media }, index) => (
+          <Item key={index} variant="outline" size={size}>
+            <Item.Media variant={media}>
+              <svg />
+            </Item.Media>
+            <Item.Content>
+              <Item.Title>Report.pdf</Item.Title>
+              {text === 'one line' && <Item.Description>16 B</Item.Description>}
+              {text === 'caption line' && (
+                <Item.Description className="text-caption-c1-regular">16 B</Item.Description>
+              )}
+              {text === 'two lines' && <Item.Description>{WRAPPING_DESCRIPTION}</Item.Description>}
+            </Item.Content>
+            {text === 'tall action' && (
+              <Item.Actions>
+                <button type="button" className={size === 'standard' ? 'h-10' : 'h-8'}>
+                  Remove
+                </button>
+              </Item.Actions>
+            )}
+          </Item>
+        ))}
+      </div>
+    </IdsProvider>,
+  );
+  const tiles = Array.from(screen.container.querySelectorAll('[data-item-media]'));
+  const heights = new Map<string, number>();
+
+  for (const [index, tile] of tiles.entries()) {
+    const { size, text } = tileCases[index]!;
+    const label = `${size}, ${text}`;
+    const row = tile.closest('[data-item]')!;
+    const scaledRow = text === 'two lines' ? oneLineRow(row) : 0;
+    await expect
+      .poll(
+        () => {
+          const { start, top, bottom, height } = insets(tile);
+          const scaled = text === 'two lines' ? scaledRow : rowHeight(tile);
+          const vertical = text === 'two lines' ? 0 : Math.abs(bottom - top);
+          return Math.max(Math.abs(height - scaled * RATIO[size]), Math.abs(start - top), vertical);
+        },
+        { message: `${label}: the tile and its inset keep their share of the row` },
+      )
+      .toBeLessThanOrEqual(1);
+    const { top, bottom, width, height, icon } = insets(tile);
+    if (text === 'two lines') expect(bottom, `${label}: stays at the top`).toBeGreaterThan(top + 5);
+    expect(Math.abs(width - height), `${label}: square`).toBeLessThanOrEqual(1);
+    expect(icon, `${label}: the icon is half its tile`).toBeCloseTo(height / 2, 0);
+    heights.set(label, height);
+  }
+  for (const size of ['standard', 'tiny']) {
+    expect(heights.get(`${size}, title`)).toBe(size === 'standard' ? 32 : 28);
+    expect(heights.get(`${size}, one line`)).toBeGreaterThan(heights.get(`${size}, title`)!);
+    expect(heights.get(`${size}, two lines`)).toBeCloseTo(heights.get(`${size}, one line`)!, 0);
+  }
+});
+
+test('a tile keeps its size in the top corner once its text wraps', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Item variant="outline" className="w-96">
+        <Item.Media variant="soft">
+          <svg />
+        </Item.Media>
+        <Item.Content>
+          <Item.Title>Quarterly report.pdf</Item.Title>
+          <Item.Description>Wraps once the row narrows.</Item.Description>
+        </Item.Content>
+      </Item>
+    </IdsProvider>,
+  );
+  const row = screen.container.querySelector<HTMLElement>('[data-item]')!;
+  const tile = row.querySelector('[data-item-media]')!;
+  const oneLine = insets(tile);
+  expect(Math.abs(oneLine.bottom - oneLine.top)).toBeLessThanOrEqual(1);
+
+  row.style.width = '160px';
+
+  await expect.poll(() => rowHeight(tile)).toBeGreaterThan(oneLineRow(row) + 10);
+  const { start, top, bottom, height } = insets(tile);
+  expect(height).toBeCloseTo(oneLine.height, 0);
+  expect(top).toBeCloseTo(oneLine.top, 0);
+  expect(start).toBeCloseTo(top, 0);
+  expect(bottom).toBeGreaterThan(top + 10);
+});
+
+test('a bare icon keeps its size and is centred on the row', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Item variant="outline" className="w-72">
+        <Item.Media>
+          <svg />
+        </Item.Media>
+        <Item.Content>
+          <Item.Title>Report.pdf</Item.Title>
+          <Item.Description>{WRAPPING_DESCRIPTION}</Item.Description>
+        </Item.Content>
+      </Item>
+    </IdsProvider>,
+  );
+  const { padding, start, top, bottom, icon } = insets(
+    screen.container.querySelector('[data-item-media]')!,
+  );
+
+  expect(icon).toBe(16);
+  expect(Math.abs(start - padding)).toBeLessThanOrEqual(1);
+  expect(Math.abs(top - bottom)).toBeLessThanOrEqual(1);
 });
 
 test('className takes the row state', () => {

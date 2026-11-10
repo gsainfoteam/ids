@@ -27,6 +27,7 @@ export { Slot } from './components/utility/slot';
 export { Card } from './components/data/card';
 export { Chip } from './components/data/chip';
 export { Badge } from './components/data/badge';
+export { Bubble } from './components/data/bubble';
 export { Alert } from './components/feedback/alert';
 export { Dialog } from './components/overlay/dialog';
 export { Drawer } from './components/overlay/drawer';
@@ -129,6 +130,8 @@ export type {
 } from './components/navigation/tabs';
 export { Stepper } from './components/navigation/stepper';
 export type { StepperOrientation, StepperStatus } from './components/navigation/stepper';
+export { Sidebar } from './components/navigation/sidebar';
+export type { SidebarCollapsibleMode, SidebarVariant } from './components/navigation/sidebar';
 
 export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
