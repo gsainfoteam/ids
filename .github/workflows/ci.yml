@@ -7,20 +7,15 @@ on:
   merge_group:
 
 jobs:
-  js:
-    name: JS (lint / typecheck / build / test)
+  checks:
+    name: Lint / typecheck / build
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/setup
         with:
-          node-version: 22
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
+          build: false
 
       - run: pnpm codegen
 
@@ -51,10 +46,22 @@ jobs:
       - name: Check the examples server-render IDS
         run: pnpm examples:check
 
-      - name: Install Chromium for browser tests
+  chromium:
+    name: Chromium tests (${{ matrix.shard }}/${{ strategy.job-total }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+
+      - name: Install Chromium
         run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium
 
-      - run: pnpm test
+      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --shard ${{ matrix.shard }}/${{ strategy.job-total }}
         env:
           IDS_BROWSERS: chromium
 
@@ -62,38 +69,27 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: failure-screenshots-chromium
+          name: failure-screenshots-chromium-${{ matrix.shard }}
           path: packages/react/.vitest/attachments/failure-screenshots
 
-  engines:
-    name: Browser tests (${{ matrix.browser }})
+  firefox:
+    name: Firefox tests (${{ matrix.shard }}/${{ strategy.job-total }})
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - browser: firefox
-            retry: 0
-          - browser: webkit
-            retry: 1
-    steps:
+        browser: [firefox]
+        retry: [0]
+        shard: [1, 2, 3, 4, 5]
+    steps: &engine-steps
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - run: pnpm build
+      - uses: ./.github/actions/setup
 
       - name: Install ${{ matrix.browser }}
         run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell ${{ matrix.browser }}
 
-      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --project browser --retry ${{ matrix.retry }}
+      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --project browser --shard ${{ matrix.shard }}/${{ strategy.job-total }} --retry ${{ matrix.retry }}
         env:
           IDS_BROWSERS: ${{ matrix.browser }}
 
@@ -101,8 +97,50 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: failure-screenshots-${{ matrix.browser }}
+          name: failure-screenshots-${{ matrix.browser }}-${{ matrix.shard }}
           path: packages/react/.vitest/attachments/failure-screenshots
+
+  webkit:
+    name: WebKit tests (${{ matrix.shard }}/${{ strategy.job-total }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [webkit]
+        retry: [1]
+        shard: [1, 2, 3, 4, 5]
+    steps: *engine-steps
+
+  js:
+    name: JS (lint / typecheck / build / test)
+    needs: [checks, chromium]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - run: test "$CHECKS" = success && test "$CHROMIUM" = success
+        env:
+          CHECKS: ${{ needs.checks.result }}
+          CHROMIUM: ${{ needs.chromium.result }}
+
+  firefox-result:
+    name: Browser tests (firefox)
+    needs: firefox
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - run: test "$SHARDS" = success
+        env:
+          SHARDS: ${{ needs.firefox.result }}
+
+  webkit-result:
+    name: Browser tests (webkit)
+    needs: webkit
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - run: test "$SHARDS" = success
+        env:
+          SHARDS: ${{ needs.webkit.result }}
 
   visual:
     name: Visual regression (Playwright Linux image)
