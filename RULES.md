@@ -152,7 +152,7 @@ packages/react/src/
                    fields       text-control (shell, Clear, useMergedRef), field-popup, list-styles,
                                 temporal-field, form-value, date-locale
                    behaviour    pressable, state-props, use-checked-writes, icon-label, arc,
-                                resize-handle
+                                resize-handle, paragraph
                    feedback     status-palette
                    overlays     overlay (layer stack, top layer, presence, anchoring, modal layer)
                    slides       slides (Embla track, slide ARIA, drag cancel, keys, announcer)
@@ -426,8 +426,8 @@ TelField, ChipField, Select and the date, time and color triggers draw their box
 fill) and `ghost` (no fill, no border). Put `data-field-input` on the element that takes focus and
 `data-invalid` on the shell; `focus-ring` does the rest.
 
-**A control without a native input still joins the form.** Select, a date trigger, a Rating drawn
-as buttons: render `internal/form-value.tsx` inside the component's `relative` root. It writes one
+**A control without a native input still joins the form.** Select, a date trigger, a
+ToggleGroup: render `internal/form-value.tsx` inside the component's `relative` root. It writes one
 hidden input per value for FormData and, when `required`, a nameless input covering the control
 so the browser blocks the submit, anchors its message there and hands focus to the control.
 
@@ -495,6 +495,12 @@ read from `event.key`, since TanStack falls back to the key's position.
 **Parts.** Part props types are named `X.PartProps` (`OTPField.SlotProps`,
 `ButtonGroup.SeparatorProps`), one level down for a sub-component's parts
 (`Image.Viewer.CloseProps`). Every part is optional and falls back to a default.
+
+**A description is a paragraph.** A `Description` part of prose (Card, Item, Empty, Alert, Field,
+Dialog, Popover) renders a `<p>`; one inside a button (Stepper) stays a `<span>`. Block content
+goes in through `asChild` (`<Card.Description asChild><div>…</div></Card.Description>`), the way a
+Title takes another heading level. `internal/paragraph.ts` warns in development when a block
+element lands inside the `<p>`, which the HTML parser would split apart on the server.
 
 **Group-like controls keep a stable focus target.** RadioGroup, CheckboxGroup, Rating and
 ToggleGroup put `ref` and `id` on the root, with `tabIndex={-1}`, and hand `focus()` to the

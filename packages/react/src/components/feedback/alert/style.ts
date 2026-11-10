@@ -15,7 +15,7 @@ export const alertStyle = tv({
     ],
     content: 'flex min-w-0 flex-col gap-0.5',
     title: 'text-body-b3-semibold text-(--alert-title)',
-    description: 'text-(--alert-body) [&_ul]:list-disc [&_ul]:ps-5',
+    description: 'text-(--alert-body) [&_ul]:list-disc [&_ul]:ps-5 [ul&]:list-disc [ul&]:ps-5',
     actions: 'mt-2 flex flex-wrap items-center gap-2',
     close: '-my-0.5 -me-1.5 size-6 rounded-full',
   },

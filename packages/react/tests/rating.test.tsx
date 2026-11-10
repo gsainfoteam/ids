@@ -16,7 +16,7 @@ const checkedOption = (within: LocatorSelectors = page) =>
   within.getByRole('radio', { checked: true });
 const letACancelledResetRunIfItWould = () => new Promise((resolve) => setTimeout(resolve, 100));
 
-test('half-step SSR: one tabbable option, the Field label and id stay on the group', () => {
+test('half-step SSR: native radios sharing a name, one checked tab stop, the Field label and id on the group', () => {
   const doc = parse(
     renderToString(
       <Field invalid size="tiny">
@@ -27,9 +27,12 @@ test('half-step SSR: one tabbable option, the Field label and id stay on the gro
     ),
   );
   const group = doc.querySelector<HTMLElement>('[role=radiogroup]')!;
-  expect(doc.querySelectorAll('[role=radio]')).toHaveLength(11);
-  expect(doc.querySelectorAll('[tabindex="0"]')).toHaveLength(1);
-  const selected = doc.querySelector<HTMLElement>('[aria-checked=true]')!;
+  const radios = [...doc.querySelectorAll<HTMLInputElement>('input[type=radio]')];
+  expect(radios).toHaveLength(11);
+  expect(new Set(radios.map((radio) => radio.name)).size, 'one group').toBe(1);
+  expect(doc.querySelectorAll('input:checked')).toHaveLength(1);
+  expect(doc.querySelectorAll('[tabindex="0"]'), 'one tab stop').toHaveLength(1);
+  const selected = doc.querySelector<HTMLElement>('input:checked')!;
   expect(selected.dataset.ratingValue).toBe('2.5');
   expect(doc.querySelector('label')!.htmlFor, 'the id does not move').toBe(group.id);
   expect(group.getAttribute('aria-labelledby')).toBe(doc.querySelector('label')!.id);
@@ -38,26 +41,18 @@ test('half-step SSR: one tabbable option, the Field label and id stay on the gro
   expect(group.dataset.size).toBe('tiny');
 });
 
-test('keyboard moves by half-step, clamps boundaries, clears and keeps focus', async () => {
+test('arrow keys are the browser radio keys: half-steps and 0 before the first star', async () => {
   const values: number[] = [];
   const screen = await render(<Rating step={0.5} onValueChange={(v) => values.push(v)} />);
+  const nothingChecked = () => screen.container.querySelector('input:checked');
   option(0).element().focus();
   await userEvent.keyboard('{ArrowRight}');
   await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '0.5');
   await expect.element(option(0.5)).toHaveFocus();
-  await userEvent.keyboard('{End}');
-  await userEvent.keyboard('{ArrowRight}');
-  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '5');
-  await userEvent.keyboard('{Home}');
   await userEvent.keyboard('{ArrowLeft}');
-  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '0');
-  await userEvent.keyboard('3');
-  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '3');
-  expect(values).toEqual([0.5, 5, 0, 3]);
-  await screen.rerender(<Rating step={0.5} style={{ direction: 'rtl' }} />);
-  option(3).element().focus();
-  await userEvent.keyboard('{ArrowLeft}');
-  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '3.5');
+  await expect.element(option(0), { message: 'the hidden 0 clears the rating' }).toHaveFocus();
+  await expect.poll(nothingChecked, { message: '0 checks no radio' }).toBeNull();
+  expect(values).toEqual([0.5, 0]);
 });
 
 test('hover previews, drawn translucent, without changing the value; half clicks commit once', async () => {
@@ -117,13 +112,13 @@ test('readOnly, disabled and display-only block changes; display-only reads as o
     const screen = await render(<Rating {...blocked} value={2} onValueChange={onValueChange} />);
     await userEvent.click(option(4), { force: true });
     option(2).element().focus();
-    await userEvent.keyboard('{End}');
+    await userEvent.keyboard('{ArrowRight}');
     await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '2');
     await screen.unmount();
   }
   expect(onValueChange).not.toHaveBeenCalled();
   const screen = await render(<Rating selectionMode="none" value={3} aria-label="상품" />);
-  expect(screen.container.querySelectorAll('button')).toHaveLength(0);
+  expect(screen.container.querySelectorAll('input')).toHaveLength(0);
   await expect.element(screen.getByRole('img')).toHaveAccessibleName(/상품.*3점/);
   expect(screen.container.querySelector('input'), 'nothing to submit').toBeNull();
 });
@@ -162,7 +157,7 @@ test('Rating.Item: one template for every star, indexed items for their own, all
   ).toThrow(/Rating.Item elements/);
 });
 
-test('form: a hidden input only with a name and a score, required, reset without a report', async () => {
+test('form: radios submit only with a name and a score, required, reset without a report', async () => {
   const values: number[] = [];
   const screen = await render(
     <form>
@@ -179,8 +174,8 @@ test('form: a hidden input only with a name and a score, required, reset without
   await userEvent.click(reset);
   await expect.element(checkedOption(score)).toHaveAttribute('data-rating-value', '2');
   expect(values).toEqual([4]);
-  option(0, score).element().focus();
-  await userEvent.keyboard('0');
+  option(2, score).element().focus();
+  await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
   await expect
     .poll(() => [...new FormData(form())], { message: 'no rating, no entry' })
     .toEqual([]);
@@ -196,11 +191,11 @@ test('form: a hidden input only with a name and a score, required, reset without
       <Rating name="score" required />
     </form>,
   );
-  const validator = () =>
-    screen.container.querySelector<HTMLInputElement>('[data-form-value-validator]')!;
-  expect(validator().validationMessage).toBe('점수를 선택하세요.');
+  const first = () => option(1).element() as HTMLInputElement;
+  await expect.poll(() => first().validationMessage).toBe('점수를 선택하세요.');
+  expect(screen.container.querySelector('form')!.checkValidity()).toBe(false);
   await userEvent.click(option(1));
-  expect(validator().checkValidity()).toBe(true);
+  await expect.poll(() => screen.container.querySelector('form')!.checkValidity()).toBe(true);
   await screen.rerender(
     <form key="disabled">
       <Rating name="score" disabled defaultValue={3} />
@@ -257,9 +252,30 @@ test('RHF stores numbers, focuses the checked option on error, marks blur, and r
   (document.activeElement as HTMLElement).blur();
   await expect.poll(() => methods.getFieldState('score').isTouched).toBe(true);
   methods.reset();
-  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '0');
+  await expect.element(checkedOption()).not.toBeInTheDocument();
   const onValid = vi.fn();
   await methods.handleSubmit(onValid)();
   expect(onValid).not.toHaveBeenCalled();
   await expect.element(option(0)).toHaveFocus();
+});
+
+test('a form reset leaves a controlled value where the parent put it', async () => {
+  let update!: (value: number) => void;
+  function Demo() {
+    const [value, set] = useState(3);
+    update = set;
+    return (
+      <form>
+        <Rating name="score" value={value} onValueChange={set} />
+        <button type="reset">Reset</button>
+      </form>
+    );
+  }
+  const screen = await render(<Demo />);
+  update(4);
+  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '4');
+  await userEvent.click(screen.getByRole('button', { name: 'Reset' }));
+  await letACancelledResetRunIfItWould();
+  await expect.element(checkedOption()).toHaveAttribute('data-rating-value', '4');
+  expect([...new FormData(screen.container.querySelector('form')!)]).toEqual([['score', '4']]);
 });

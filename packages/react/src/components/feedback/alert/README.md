@@ -54,6 +54,7 @@ import { Alert } from '@gsainfoteam/ids-react';
 ```
 
 - 모든 파트는 `asChild` 로 다른 요소를 그릴 수 있습니다. 제목을 `h3` 로 두려면 `<Alert.Title asChild><h3>…</h3></Alert.Title>`.
+- `Alert.Description` 은 `<p>` 입니다. 목록이나 문단 여럿 같은 블록 내용은 `<Alert.Description asChild><div>...</div></Alert.Description>` 처럼 태그를 넣습니다. `<p>` 안에 블록 요소가 들어가면 개발 빌드에서 경고합니다. 목록은 `<Alert.Description asChild><ul>...</ul></Alert.Description>` 로 넣으면 글머리표가 붙습니다.
 
 ## 닫기
 

@@ -6,18 +6,19 @@ import {
   useRef,
   useState,
   type FocusEvent,
-  type KeyboardEvent,
   type Ref,
   type RefCallback,
 } from 'react';
 
 import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
-import { keyHandler, withModifiers } from '../../../internal/keys';
 import { mergeRefs } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 
-const DIGIT = /^[0-9]$/;
+const radiosOf = (root: HTMLElement) =>
+  root.querySelectorAll<HTMLInputElement>('input[type=radio][data-rating-value]');
+
+export const isCheckedScore = (score: number, current: number) => score > 0 && score === current;
 
 export type UseRatingOptions = {
   value?: number;
@@ -27,6 +28,7 @@ export type UseRatingOptions = {
   max: number;
   step: 1 | 0.5;
   interactive: boolean;
+  missingMessage: string | null;
   ref?: Ref<HTMLDivElement>;
 };
 
@@ -38,6 +40,7 @@ export function useRating({
   max,
   step,
   interactive,
+  missingMessage,
   ref,
 }: UseRatingOptions) {
   const normalize = (score: number) =>
@@ -53,7 +56,20 @@ export function useRating({
       console.warn('[IDS] Rating: value must be between 0 and max.');
   }, [raw, max]);
 
+  useEffect(() => {
+    if (!rootRef.current) return;
+    const message = missingMessage !== null && current === 0 ? missingMessage : '';
+    for (const radio of radiosOf(rootRef.current)) radio.setCustomValidity(message);
+  }, [missingMessage, current]);
+
+  const putBrowserResetBackOnTheValue = (root: HTMLElement, restored: number) => {
+    for (const radio of radiosOf(root))
+      radio.checked = isCheckedScore(Number(radio.dataset.ratingValue), restored);
+  };
+
   useFormReset(rootRef, () => {
+    const restored = value === undefined ? normalize(defaultValue) : current;
+    if (rootRef.current) putBrowserResetBackOnTheValue(rootRef.current, restored);
     if (value === undefined) setRaw(defaultValue, { silent: true });
     setHover(null);
   });
@@ -68,51 +84,10 @@ export function useRating({
     if (interactive) setRaw(normalize(next));
   };
 
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!interactive) return;
-
-    const root = event.currentTarget;
-    const focusedScore = Number(
-      (event.target as HTMLElement).getAttribute('data-rating-value') ?? current,
-    );
-    const rtl = getComputedStyle(root).direction === 'rtl';
-
-    const rateAndFocus = (score: number) => {
-      const next = normalize(score);
-      choose(next);
-      preview(null);
-      root
-        .querySelector<HTMLButtonElement>(`[data-rating-value="${next}"]`)
-        ?.focus({ preventScroll: true });
-    };
-
-    const rateBy = (score: number) => () => rateAndFocus(score);
-
-    const moved = keyHandler(
-      withModifiers(
-        {
-          ArrowRight: rateBy(focusedScore + step),
-          ArrowLeft: rateBy(focusedScore - step),
-          ArrowUp: rateBy(focusedScore + step),
-          ArrowDown: rateBy(focusedScore - step),
-          Home: rateBy(0),
-          End: rateBy(max),
-        },
-        ['Shift'],
-      ),
-      { dir: rtl ? 'rtl' : 'ltr' },
-    )(event);
-
-    const typedScore = DIGIT.test(event.key) && !event.altKey && !event.ctrlKey && !event.metaKey;
-    if (moved || !typedScore) return;
-
-    event.preventDefault();
-    rateAndFocus(Number(event.key));
-  };
-
   const forwardRootFocusToChecked = (event: FocusEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
-    event.currentTarget.querySelector<HTMLButtonElement>('[aria-checked=true]')?.focus();
+    const radios = [...radiosOf(event.currentTarget)];
+    (radios.find((radio) => radio.checked) ?? radios[0])?.focus();
   };
 
   const mergedRef: RefCallback<HTMLDivElement> = useCallback(
@@ -124,11 +99,9 @@ export function useRating({
     current,
     hover,
     displayed,
-    anchorRef: rootRef,
     rootRef: mergedRef,
     preview,
     choose,
-    onKeyDown,
     forwardRootFocusToChecked,
   };
 }

@@ -129,4 +129,5 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 ## 알아둘 것
 
 - `Card.Title` 은 `h3` 입니다. 다른 수준이 필요하면 `<Card.Title asChild><h2>...</h2></Card.Title>`, heading 이 아니어야 하면 `<Card.Title asChild><span>...</span></Card.Title>` 처럼 태그를 넣습니다.
+- `Card.Description` 은 `<p>` 입니다. 목록이나 문단 여럿 같은 블록 내용은 `<Card.Description asChild><div>...</div></Card.Description>` 처럼 태그를 넣습니다. `<p>` 안에 블록 요소가 들어가면 개발 빌드에서 경고합니다.
 - 누를 수 있는 카드는 글자 선택이 되지 않습니다. 버튼처럼 눌리는 면이기 때문입니다.
