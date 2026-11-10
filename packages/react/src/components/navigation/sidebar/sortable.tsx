@@ -29,6 +29,7 @@ import {
 } from './context';
 import {
   describeMove,
+  drawnDrop,
   dropPositionAt,
   isInside,
   keyboardStops,
@@ -175,8 +176,9 @@ export function SidebarSortable<T extends SidebarTreeItem<T>>({
   };
 
   const showDrop = (next: SidebarDrop | null) => {
-    dropRef.current = next;
-    setDrop((previous) => (sameDrop(previous, next) ? previous : next));
+    const drawn = next && drawnDrop(tree, next, isVisible);
+    dropRef.current = drawn;
+    setDrop((previous) => (sameDrop(previous, drawn) ? previous : drawn));
   };
 
   const commit = (move: SidebarTreeMove, focus: boolean) => {

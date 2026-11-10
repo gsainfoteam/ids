@@ -602,3 +602,29 @@ test('below the last row a drag lands at the nearest place', async (context) => 
   await expect.poll(rowOrder).toEqual(['IDS', '회의록', '토큰', '셔틀', '로드맵']);
   expect(lastMove(onItemsChange)).toMatchObject({ item: 'roadmap', to: [null, 2] });
 });
+
+test('one place draws one line, whichever row the pointer is over', async (context) => {
+  skipWithoutCdp(context);
+  await page.viewport(DESKTOP.width, DESKTOP.height);
+  const screen = await render(
+    ui(<Docs onItemsChange={vi.fn()} canMove={({ to }) => to.parent === null} />),
+  );
+  const rect = (name: string) =>
+    screen.getByRole('link', { name }).element().getBoundingClientRect();
+  const ids = screen.getByRole('button', { name: 'IDS' }).element().getBoundingClientRect();
+  const shuttle = rect('셔틀');
+  const x = shuttle.left + 16;
+  const line = () => {
+    const drawn = document.querySelector('[data-position]');
+    return drawn && `${drawn.getAttribute('data-position')} ${drawn.getBoundingClientRect().top}`;
+  };
+
+  await mouse('mousePressed', x, shuttle.top + shuttle.height / 2);
+  await mouse('mouseMoved', x, shuttle.top);
+  await mouse('mouseMoved', x, rect('로드맵').top + rect('로드맵').height * 0.75);
+  await expect.poll(line).toMatch(/^before /);
+  const belowTheRoadmap = line();
+  await mouse('mouseMoved', x, ids.top + ids.height * 0.25);
+  await expect.poll(line).toBe(belowTheRoadmap);
+  await mouse('mouseReleased', x, ids.top + ids.height * 0.25);
+});
