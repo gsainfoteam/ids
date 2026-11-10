@@ -1,4 +1,4 @@
-import { createRef, type ReactNode } from 'react';
+import { createRef, type ComponentProps, type ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
@@ -6,6 +6,18 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Empty, IdsProvider, Link } from '../src';
+
+type RouterLinkProps = Omit<ComponentProps<'a'>, 'children'> & {
+  children: ReactNode | ((state: { isActive: boolean }) => ReactNode);
+};
+
+function RouterLink({ children, ...props }: RouterLinkProps) {
+  return (
+    <a {...props} data-status="active">
+      {typeof children === 'function' ? children({ isActive: true }) : children}
+    </a>
+  );
+}
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html').querySelector('a')!;
@@ -81,6 +93,25 @@ test('asChild merges into the child, reads its target and appends the icon insid
   await expect.element(link).toHaveAccessibleName('Router (새 탭에서 열림)');
   expect(ref.current).toBe(link.element());
   expect(link.element().lastElementChild!.className).toBe('sr-only');
+});
+
+test("asChild keeps a router link's render function children, with and without the hint", async () => {
+  const screen = await render(
+    <div>
+      <Link asChild>
+        <RouterLink href="/a">{({ isActive }) => (isActive ? 'Current' : 'Other')}</RouterLink>
+      </Link>
+      <Link asChild>
+        <RouterLink href="/b" target="_blank">
+          {({ isActive }) => (isActive ? 'External' : 'Other')}
+        </RouterLink>
+      </Link>
+    </div>,
+  );
+  await expect.element(screen.getByRole('link', { name: 'Current' })).toHaveAttribute('data-link');
+  await expect
+    .element(screen.getByRole('link', { name: /External/ }))
+    .toHaveAccessibleName('External (새 탭에서 열림)');
 });
 
 test('asChild without an element throws', () => {

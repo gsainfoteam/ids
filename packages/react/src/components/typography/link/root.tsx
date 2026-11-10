@@ -3,6 +3,7 @@
 import { cloneElement, isValidElement, type ReactNode } from 'react';
 
 import { ArrowUpRightIcon } from '@heroicons/react/16/solid';
+import { isFunction } from 'es-toolkit';
 
 import { linkStyle } from './style';
 import { useTranslate } from '../../../internal/translate';
@@ -10,9 +11,27 @@ import { invariant, mergeProps } from '../../../utils';
 
 import type { Link } from '.';
 
-type ChildProps = { target?: string; rel?: string; children?: ReactNode };
+type RenderChildren = (...args: never[]) => ReactNode;
+type ChildProps = { target?: string; rel?: string; children?: ReactNode | RenderChildren };
 
 const SAFE_NEW_TAB_REL = 'noopener noreferrer';
+
+function appendToChildren(children: ChildProps['children'], tail: ReactNode) {
+  if (isFunction(children))
+    return (...args: never[]) => (
+      <>
+        {children(...args)}
+        {tail}
+      </>
+    );
+
+  return (
+    <>
+      {children}
+      {tail}
+    </>
+  );
+}
 
 export function LinkRoot({
   colorScheme = 'accent',
@@ -52,8 +71,14 @@ export function LinkRoot({
     </>
   );
 
-  if (child)
-    return cloneElement(child, mergeProps(child.props, props), child.props.children, newTabHint);
+  if (child) {
+    const merged = mergeProps(child.props, props);
+    if (!newTabHint) return cloneElement(child, merged);
+    return cloneElement(child, {
+      ...merged,
+      children: appendToChildren(child.props.children, newTabHint),
+    });
+  }
 
   return (
     <a {...props}>
