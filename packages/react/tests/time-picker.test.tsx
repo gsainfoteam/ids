@@ -20,6 +20,8 @@ const periods = (doc: Document) =>
   );
 const OPTION_HEIGHT = 36;
 const scrollSettles = () => new Promise((resolve) => setTimeout(resolve, 200));
+const nextEvent = (target: EventTarget, type: string) =>
+  new Promise((resolve) => target.addEventListener(type, resolve, { once: true }));
 
 test('SSR: Korean names by default, the clock and periods from the locale tag, diagnostics', () => {
   const doc = ssr({ precision: 'second', step: 15 });
@@ -264,9 +266,7 @@ test('a wheel scroll commits, and a scroll set by script does not', async () => 
   await userEvent.wheel(col('hour'), { delta: { y: OPTION_HEIGHT } });
   await expect.poll(() => value?.hour).toBe(10);
   const column = col('hour');
-  const ended = new Promise((resolve) =>
-    column.addEventListener('scrollend', resolve, { once: true }),
-  );
+  const ended = nextEvent(column, 'scrollend');
   column.scrollTop = 14 * OPTION_HEIGHT;
   await ended;
   await scrollSettles();
@@ -320,13 +320,19 @@ test('column positioning ignores its page offset and keeps clicked time visible'
 
 const TICKS_FIREFOX_NEEDS_FOR_A_LONG_WHEEL = 30;
 
+async function wheelTickReachingThePage(scroller: HTMLElement, deltaY: number) {
+  const delivered = nextEvent(scroller, 'wheel');
+  await userEvent.wheel(scroller, { delta: { y: deltaY } });
+  await delivered;
+}
+
 async function wheelToTheEnd(scroller: HTMLElement, direction: 1 | -1) {
   const atTheEnd = () =>
     direction > 0
       ? scroller.scrollTop >= scroller.scrollHeight - scroller.clientHeight - 1
       : scroller.scrollTop <= 0;
   for (let tick = 0; tick < TICKS_FIREFOX_NEEDS_FOR_A_LONG_WHEEL && !atTheEnd(); tick++)
-    await userEvent.wheel(scroller, { delta: { y: direction * 30 * OPTION_HEIGHT } });
+    await wheelTickReachingThePage(scroller, direction * 30 * OPTION_HEIGHT);
 }
 
 test('wheel commits at both edges without requiring another scroll event', async () => {
@@ -361,8 +367,9 @@ test('pending wheel settlement respects a new readonly prop', async () => {
   column.dispatchEvent(new WheelEvent('wheel', { bubbles: true }));
   column.dispatchEvent(new Event('scroll'));
   await screen.rerender(view(true));
+  const settled = nextEvent(column, 'scrollend');
   column.scrollTop = 10 * OPTION_HEIGHT;
-  await scrollSettles();
+  await settled;
   expect(onValueChange).not.toHaveBeenCalled();
 });
 
