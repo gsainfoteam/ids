@@ -191,6 +191,7 @@ class _AvatarState extends State<Avatar> {
           final image = widget.image;
           if (image == null) return fallback;
           return Image(
+            key: ValueKey(image),
             image: image,
             fit: BoxFit.cover,
             excludeFromSemantics: true,
@@ -212,19 +213,25 @@ class _AvatarState extends State<Avatar> {
 
     final avatar = SizedBox.square(
       dimension: _sizes[size],
-      child: ClipPath(
-        clipBehavior: cutout == null ? Clip.none : Clip.antiAlias,
-        clipper: cutout == null
-            ? null
-            : _CutoutClipper(
-                left:
-                    (cutout == AvatarCutout.start) !=
-                    (Directionality.of(context) == TextDirection.rtl),
-                overlap: scope!.overlap,
-                circle: circle,
-                radius: _squareRadii[size]!,
-              ),
-        child: surface,
+      child: Align(
+        alignment: AlignmentDirectional.topStart,
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: ClipPath(
+            clipBehavior: cutout == null ? Clip.none : Clip.antiAlias,
+            clipper: cutout == null
+                ? null
+                : _CutoutClipper(
+                    left:
+                        (cutout == AvatarCutout.start) !=
+                        (Directionality.of(context) == TextDirection.rtl),
+                    overlap: scope!.overlap,
+                    circle: circle,
+                    radius: _squareRadii[size]!,
+                  ),
+            child: surface,
+          ),
+        ),
       ),
     );
 

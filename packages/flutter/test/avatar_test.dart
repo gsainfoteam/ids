@@ -60,6 +60,28 @@ void main() {
       expect(tester.getSize(find.byType(Avatar)), const Size.square(24));
     });
 
+    testWidgets('stays square when only its width is forced', (tester) async {
+      await pump(
+        tester,
+        const SizedBox(width: 300, child: Avatar(name: 'Alice Kim')),
+      );
+      expect(
+        tester.getSize(
+          find
+              .descendant(
+                of: find.byType(Avatar),
+                matching: find.byType(ClipPath),
+              )
+              .first,
+        ),
+        const Size.square(40),
+      );
+      expect(
+        DefaultTextStyle.of(tester.element(find.text('AK'))).style.fontSize,
+        16,
+      );
+    });
+
     testWidgets('follows a tight parent and scales the initials', (
       tester,
     ) async {
@@ -163,6 +185,38 @@ void main() {
           fallbackDelay: Duration.zero,
         ),
       );
+      expect(find.text('AK'), findsOneWidget);
+    });
+
+    testWidgets('a new image after a failed one loads and waits again', (
+      tester,
+    ) async {
+      final broken = _HeldImage();
+      final statuses = <AvatarStatus>[];
+      await pump(
+        tester,
+        Avatar(image: broken, name: 'Alice Kim', onStatusChange: statuses.add),
+      );
+      broken.completer.completeError(Exception('broken'));
+      await tester.pump();
+      await tester.pump();
+
+      await pump(
+        tester,
+        Avatar(
+          image: _HeldImage(),
+          name: 'Alice Kim',
+          onStatusChange: statuses.add,
+        ),
+      );
+      await tester.pump();
+      expect(find.text('AK'), findsNothing);
+      expect(statuses, [
+        AvatarStatus.loading,
+        AvatarStatus.error,
+        AvatarStatus.loading,
+      ]);
+      await tester.pump(const Duration(milliseconds: 600));
       expect(find.text('AK'), findsOneWidget);
     });
 
