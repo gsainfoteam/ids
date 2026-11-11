@@ -103,23 +103,25 @@ class AvatarGroup extends StatelessWidget {
       role: SemanticsRole.list,
       label: semanticLabel,
       container: true,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: stack ? 0 : _inlineGaps[size]!,
-        children: [
-          for (final (index, item) in items.indexed)
-            _Overlap(
-              key: item.key == null ? null : ValueKey(item.key),
-              overlap: stack && index > 0 ? overlap : 0,
-              child: AvatarScope(
-                size: size,
-                shape: shape,
-                cutout: _cutoutAt(index, items.length),
-                overlap: overlap,
-                child: Semantics(role: SemanticsRole.listItem, child: item),
+      child: BadgeLayer(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: stack ? 0 : _inlineGaps[size]!,
+          children: [
+            for (final (index, item) in items.indexed)
+              _Overlap(
+                key: item.key == null ? null : ValueKey(item.key),
+                overlap: stack && index > 0 ? overlap : 0,
+                child: AvatarScope(
+                  size: size,
+                  shape: shape,
+                  cutout: _cutoutAt(index, items.length),
+                  overlap: overlap,
+                  child: Semantics(role: SemanticsRole.listItem, child: item),
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../tokens/ids_enums.dart';
@@ -29,4 +30,37 @@ class AvatarScope extends InheritedWidget {
       shape != oldWidget.shape ||
       cutout != oldWidget.cutout ||
       overlap != oldWidget.overlap;
+}
+
+class BadgeLayer extends SingleChildRenderObjectWidget {
+  const BadgeLayer({super.key, super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => RenderBadgeLayer();
+}
+
+class RenderBadgeLayer extends RenderProxyBox {
+  final _aboveEverySibling = <(RenderBox, Offset)>[];
+  PaintingContext? _painting;
+
+  bool paintAboveSiblings(
+    PaintingContext context,
+    RenderBox indicator,
+    Offset offset,
+  ) {
+    if (!identical(context, _painting)) return false;
+    _aboveEverySibling.add((indicator, offset));
+    return true;
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    _painting = context;
+    super.paint(context, offset);
+    _painting = null;
+    for (final (indicator, at) in _aboveEverySibling) {
+      context.paintChild(indicator, at);
+    }
+    _aboveEverySibling.clear();
+  }
 }

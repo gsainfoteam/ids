@@ -1,4 +1,7 @@
-import 'package:flutter/semantics.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
@@ -468,4 +471,63 @@ void main() {
       }
     });
   });
+
+  for (final stacking in AvatarGroupStacking.values) {
+    testWidgets('a badge stays above the avatar beside it ($stacking)', (
+      tester,
+    ) async {
+      final boundary = GlobalKey();
+      await pump(
+        tester,
+        RepaintBoundary(
+          key: boundary,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: AvatarGroup(
+              stacking: stacking,
+              children: const [
+                Badge(
+                  content: SizedBox.shrink(),
+                  child: Avatar(name: 'A'),
+                ),
+                Avatar(name: 'B'),
+              ],
+            ),
+          ),
+        ),
+      );
+      final danger = ThemeProvider.of(
+        tester.element(find.byType(AvatarGroup)),
+      ).danger;
+      final indicator = tester.getRect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Container &&
+              widget.decoration is ShapeDecoration &&
+              (widget.decoration! as ShapeDecoration).shape is StadiumBorder,
+        ),
+      );
+      final origin = tester.getTopLeft(find.byKey(boundary));
+      late ui.Image image;
+      late ByteData bytes;
+      await tester.runAsync(() async {
+        image =
+            await (boundary.currentContext!.findRenderObject()!
+                    as RenderRepaintBoundary)
+                .toImage();
+        bytes = (await image.toByteData())!;
+      });
+      for (var dx = -6.0; dx <= 6; dx += 3) {
+        for (var dy = -6.0; dy <= 6; dy += 3) {
+          final at = indicator.center + Offset(dx, dy) - origin;
+          final index = (at.dy.floor() * image.width + at.dx.floor()) * 4;
+          expect(
+            (bytes.getUint8(index), bytes.getUint8(index + 1)),
+            ((danger.r * 255).round(), (danger.g * 255).round()),
+            reason: 'offset ($dx, $dy)',
+          );
+        }
+      }
+    });
+  }
 }

@@ -323,7 +323,9 @@ class Badge extends StatelessWidget {
                           right ? 0.5 : -0.5,
                           top ? -0.5 : 0.5,
                         ),
-                        child: _indicator(context, attached: true),
+                        child: _AboveSiblings(
+                          child: _indicator(context, attached: true),
+                        ),
                       ),
                     ),
                   ],
@@ -336,6 +338,36 @@ class Badge extends StatelessWidget {
     );
 
     return _MergeSemanticsWhen(merge: _describes, child: badge);
+  }
+}
+
+class _AboveSiblings extends SingleChildRenderObjectWidget {
+  const _AboveSiblings({super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderAboveSiblings();
+}
+
+class _RenderAboveSiblings extends RenderProxyBox {
+  RenderBadgeLayer? _layer;
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    var ancestor = parent;
+    while (ancestor != null && ancestor is! RenderBadgeLayer) {
+      ancestor = ancestor.parent;
+    }
+    _layer = ancestor as RenderBadgeLayer?;
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final child = this.child;
+    if (child == null) return;
+    final later = _layer?.paintAboveSiblings(context, child, offset) ?? false;
+    if (!later) context.paintChild(child, offset);
   }
 }
 
