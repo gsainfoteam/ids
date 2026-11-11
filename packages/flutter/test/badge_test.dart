@@ -297,6 +297,16 @@ void main() {
       semantics.dispose();
     });
 
+    testWidgets('a badge on its own reads its text', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pump(tester, const Badge(content: Text('완료')));
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('완료')),
+        matchesSemantics(label: '완료'),
+      );
+      semantics.dispose();
+    });
+
     testWidgets('an unlabelled dot stays silent', (tester) async {
       final semantics = tester.ensureSemantics();
       await pump(

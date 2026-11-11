@@ -282,7 +282,7 @@ class Badge extends StatelessWidget {
         child: box,
       );
     }
-    return ExcludeSemantics(excluding: !attached || !_describes, child: box);
+    return ExcludeSemantics(excluding: !_describes, child: box);
   }
 
   @override
