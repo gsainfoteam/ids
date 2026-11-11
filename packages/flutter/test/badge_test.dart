@@ -235,7 +235,7 @@ void main() {
         tester,
         const Badge.count(
           count: 3,
-          semanticsLabel: '읽지 않은 알림 3개',
+          semanticLabel: '읽지 않은 알림 3개',
           child: _anchor,
         ),
       );

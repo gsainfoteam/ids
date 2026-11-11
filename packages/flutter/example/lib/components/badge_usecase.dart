@@ -49,7 +49,7 @@ final badgeUseCases = [
             colorScheme: colorScheme,
             size: size,
             placement: placement,
-            semanticsLabel: '읽지 않은 알림 $count개',
+            semanticLabel: '읽지 않은 알림 $count개',
             child: _bell,
           ),
         ),
@@ -71,7 +71,7 @@ final badgeUseCases = [
               invisible: !online,
               colorScheme: ids.IdsColorScheme.success,
               placement: ids.BadgePlacement.bottomEnd,
-              semanticsLabel: online ? '온라인' : '오프라인',
+              semanticLabel: online ? '온라인' : '오프라인',
               child: const ids.Avatar(name: 'Alice Kim'),
             ),
             const ids.Badge.dot(

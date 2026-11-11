@@ -67,7 +67,7 @@ class Badge extends StatelessWidget {
     this.variant = BadgeVariant.solid,
     this.colorScheme,
     this.size = IdsSize.standard,
-    this.semanticsLabel,
+    this.semanticLabel,
     this.child,
   }) : count = null,
        max = 99,
@@ -85,7 +85,7 @@ class Badge extends StatelessWidget {
     this.variant = BadgeVariant.solid,
     this.colorScheme,
     this.size = IdsSize.standard,
-    this.semanticsLabel,
+    this.semanticLabel,
     this.child,
   }) : content = null,
        dot = false;
@@ -98,7 +98,7 @@ class Badge extends StatelessWidget {
     this.variant = BadgeVariant.solid,
     this.colorScheme,
     this.size = IdsSize.standard,
-    this.semanticsLabel,
+    this.semanticLabel,
     this.child,
   }) : content = null,
        count = null,
@@ -117,7 +117,7 @@ class Badge extends StatelessWidget {
   final BadgeVariant variant;
   final IdsColorScheme? colorScheme;
   final IdsSize size;
-  final String? semanticsLabel;
+  final String? semanticLabel;
   final Widget? child;
 
   static const _circularInset = 0.146;
@@ -150,7 +150,7 @@ class Badge extends StatelessWidget {
     _ => false,
   };
 
-  bool get _describes => semanticsLabel == null && !dot && !_hidden;
+  bool get _describes => semanticLabel == null && !dot && !_hidden;
 
   ({Color background, Color foreground, Color? edge}) _colors(
     IdsTheme theme,
@@ -266,10 +266,10 @@ class Badge extends StatelessWidget {
       ),
     );
 
-    if (semanticsLabel != null) {
+    if (semanticLabel != null) {
       return Semantics(
         liveRegion: true,
-        label: semanticsLabel,
+        label: semanticLabel,
         excludeSemantics: true,
         child: box,
       );
