@@ -280,6 +280,12 @@ class _CardBody extends MultiChildRenderObjectWidget {
 
 class _CardBodyParentData extends ContainerBoxParentData<RenderBox> {}
 
+typedef _BodyLayout = ({
+  Size size,
+  List<double> heights,
+  List<BoxConstraints> constraints,
+});
+
 class _RenderCardBody extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _CardBodyParentData>,
@@ -339,9 +345,10 @@ class _RenderCardBody extends RenderBox
         : getMaxIntrinsicWidth(double.infinity),
   );
 
-  Size _layout(BoxConstraints constraints, ChildLayouter layoutChild) {
+  _BodyLayout _layout(BoxConstraints constraints, ChildLayouter layoutChild) {
     final regions = getChildrenAsList();
     final fullWidth = BoxConstraints.tightFor(width: _widthFor(constraints));
+    final given = List.filled(regions.length, fullWidth);
     final heights = [
       for (final region in regions) layoutChild(region, fullWidth).height,
     ];
@@ -362,14 +369,16 @@ class _RenderCardBody extends RenderBox
       }
       final share = pool / growing.length;
       for (final index in growing) {
-        heights[index] = layoutChild(
-          regions[index],
-          fullWidth.copyWith(minHeight: share, maxHeight: share),
-        ).height;
+        given[index] = fullWidth.copyWith(minHeight: share, maxHeight: share);
+        heights[index] = layoutChild(regions[index], given[index]).height;
       }
     }
     final height = heights.fold(_gaps, (sum, height) => sum + height);
-    return constraints.constrain(Size(fullWidth.maxWidth, height));
+    return (
+      size: constraints.constrain(Size(fullWidth.maxWidth, height)),
+      heights: heights,
+      constraints: given,
+    );
   }
 
   @override
@@ -380,18 +389,27 @@ class _RenderCardBody extends RenderBox
   double? computeDryBaseline(
     BoxConstraints constraints,
     TextBaseline baseline,
-  ) => firstChild?.getDryBaseline(
-    BoxConstraints.tightFor(width: _widthFor(constraints)),
-    baseline,
-  );
+  ) {
+    final layout = _layout(constraints, ChildLayoutHelper.dryLayoutChild);
+    var top = 0.0;
+    for (final (index, region) in getChildrenAsList().indexed) {
+      final distance = region.getDryBaseline(
+        layout.constraints[index],
+        baseline,
+      );
+      if (distance != null) return top + distance;
+      top += layout.heights[index] + _gap;
+    }
+    return null;
+  }
 
   @override
   Size computeDryLayout(BoxConstraints constraints) =>
-      _layout(constraints, ChildLayoutHelper.dryLayoutChild);
+      _layout(constraints, ChildLayoutHelper.dryLayoutChild).size;
 
   @override
   void performLayout() {
-    size = _layout(constraints, ChildLayoutHelper.layoutChild);
+    size = _layout(constraints, ChildLayoutHelper.layoutChild).size;
     var top = 0.0;
     for (final region in getChildrenAsList()) {
       (region.parentData! as _CardBodyParentData).offset = Offset(0, top);

@@ -259,6 +259,36 @@ void main() {
       );
     });
 
+    testWidgets('a card that starts with media lines up on its first text', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text('Label'),
+              Expanded(
+                child: Card(
+                  children: [
+                    CardMedia(child: SizedBox(height: 60)),
+                    CardHeader(children: [CardTitle(child: Text('Title'))]),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(
+        tester.getTopLeft(find.text('Label')).dy,
+        greaterThan(tester.getTopLeft(find.byType(Card)).dy + 60),
+      );
+    });
+
     testWidgets('content takes the height a taller card leaves over', (
       tester,
     ) async {
