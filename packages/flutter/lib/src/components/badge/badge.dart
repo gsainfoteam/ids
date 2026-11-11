@@ -204,16 +204,23 @@ class Badge extends StatelessWidget {
     );
     final reduced = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final duration = reduced ? Duration.zero : IdsMotion.fast;
+    final style = _styles[size]!;
+    final textScale =
+        MediaQuery.textScalerOf(context).scale(style.fontSize!) /
+        style.fontSize!;
+    final height = _heights[size]! * textScale;
 
     Widget box = Container(
       constraints: dot
           ? BoxConstraints.tight(Size.square(_dotSizes[size]!))
           : BoxConstraints(
-              minWidth: _heights[size]!,
-              minHeight: _heights[size]!,
-              maxHeight: _heights[size]!,
+              minWidth: height,
+              minHeight: height,
+              maxHeight: height,
             ),
-      padding: dot ? null : EdgeInsets.symmetric(horizontal: _paddings[size]!),
+      padding: dot
+          ? null
+          : EdgeInsets.symmetric(horizontal: _paddings[size]! * textScale),
       decoration: ShapeDecoration(
         color: colors.background,
         shape: StadiumBorder(
@@ -234,7 +241,7 @@ class Badge extends StatelessWidget {
       child: dot
           ? null
           : DefaultTextStyle(
-              style: _styles[size]!.copyWith(
+              style: style.copyWith(
                 height: 1,
                 color: colors.foreground,
                 fontFeatures: const [FontFeature.tabularFigures()],
@@ -243,7 +250,7 @@ class Badge extends StatelessWidget {
               softWrap: false,
               child: IconTheme(
                 data: IconThemeData(
-                  size: _iconSizes[size],
+                  size: _iconSizes[size]! * textScale,
                   color: colors.foreground,
                 ),
                 child: Center(

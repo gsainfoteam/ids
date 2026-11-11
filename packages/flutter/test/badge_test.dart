@@ -89,6 +89,21 @@ void main() {
   });
 
   group('size', () {
+    testWidgets('grows with the system text size', (tester) async {
+      await pump(
+        tester,
+        const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: Badge.count(count: 3, child: _anchor),
+        ),
+      );
+      expect(tester.getSize(indicator()).height, 40);
+      expect(
+        tester.getSize(find.text('3')).height,
+        lessThanOrEqualTo(tester.getSize(indicator()).height),
+      );
+    });
+
     testWidgets('is 20 tall and at least 20 wide, 16 when tiny', (
       tester,
     ) async {
