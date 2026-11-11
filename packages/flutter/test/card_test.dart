@@ -128,7 +128,7 @@ void main() {
       expect(offsetIn(tester, find.byKey(const ValueKey('h'))).dx, 16);
       expect(
         offsetIn(tester, find.byKey(const ValueKey('c'))).dy,
-        16 + 20 + 16 + 16,
+        16 + 20 + 16 + 1 + 16,
       );
     });
 

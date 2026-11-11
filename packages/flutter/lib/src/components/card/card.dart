@@ -61,7 +61,7 @@ class Card extends StatelessWidget {
         top: index == 0 ? pad : 0,
         bottom: index == children.length - 1 ? pad : 0,
       ),
-      child: DecoratedBox(
+      child: Container(
         decoration: BoxDecoration(
           border: Border(
             top: lineAbove ? line : BorderSide.none,
