@@ -52,7 +52,10 @@ class Card extends StatelessWidget {
     required double pad,
     required Color lineColor,
   }) {
-    if (child is CardMedia) return child;
+    final separate = _interactive && _hasHeader && child is! CardHeader;
+    if (child is CardMedia) {
+      return separate ? Semantics(container: true, child: child) : child;
+    }
     final lineAbove = child is CardFooter && child.divider;
     final lineBelow = child is CardHeader && child.divider;
     final line = BorderSide(color: lineColor);
@@ -75,9 +78,7 @@ class Card extends StatelessWidget {
             pad,
             lineBelow ? pad : 0,
           ),
-          child: _interactive && _hasHeader && child is! CardHeader
-              ? Semantics(container: true, child: child)
-              : child,
+          child: separate ? Semantics(container: true, child: child) : child,
         ),
       ),
     );

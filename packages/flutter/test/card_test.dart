@@ -658,5 +658,24 @@ void main() {
       expect(find.bySemanticsLabel('Body'), findsOneWidget);
       semantics.dispose();
     });
+
+    testWidgets('media keeps its own name beside the header', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pump(
+        tester,
+        Card(
+          onPressed: () {},
+          children: [
+            CardMedia(
+              child: Semantics(image: true, label: 'A cabin', child: _box),
+            ),
+            const CardHeader(children: [CardTitle(child: Text('Title'))]),
+          ],
+        ),
+      );
+      expect(tester.getSemantics(find.byType(Card)).label, 'Title');
+      expect(find.bySemanticsLabel('A cabin'), findsOneWidget);
+      semantics.dispose();
+    });
   });
 }
