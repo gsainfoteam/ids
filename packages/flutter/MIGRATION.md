@@ -46,9 +46,9 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | action     | `Button` `IconButton` `ButtonGroup` `Toggle` `IconToggle` `ToggleGroup` `FloatingButton`                                                                                                                                                            |
 | form       | `Input` `TextField` `TextArea` `NumberField` `PasswordField` `TelField` `OTPField` `ChipField` `FileField` `ColorField` `Select` `Checkbox` `CheckboxGroup` `Radio` `RadioGroup` `Switch` `Slider` `Rating` `DateField` `TimeField` `DateTimeField` |
-| data       | `Accordion` `Avatar` `AvatarGroup` `Badge` `Calendar` `Card` `Carousel` `Chip` `ColorPicker` `DataTable` `Empty` `Image` `Item` `Marquee` `QRCode` `Table` `TimePicker`                                                                            |
-| feedback   | `Alert` `Progress` `Skeleton` `Toast`                                                                                                                                                                                                               |
-| layout     | `AspectRatio` `ScrollArea` `Resizable` `Splitter`                                                                                                                                                                                                   |
+| data       | `Accordion` `Calendar` `Carousel` `Chip` `ColorPicker` `DataTable` `Image` `Marquee` `QRCode` `Table` `TimePicker`                                                                                                                                  |
+| feedback   | `Alert` `Progress` `Toast`                                                                                                                                                                                                                          |
+| layout     | `ScrollArea` `Resizable` `Splitter`                                                                                                                                                                                                                 |
 | navigation | `Breadcrumb` `Pagination` `Stepper` `Tabs`                                                                                                                                                                                                          |
 | overlay    | `Dialog` `Drawer` `Menu` `Popover` `Tooltip`                                                                                                                                                                                                        |
 | typography | `Kbd`                                                                                                                                                                                                                                               |
@@ -111,6 +111,14 @@ focusVisible = focused
 | `requestFocus()` — 직전 입력이 터치          | `false`        |
 
 위 표가 `Interactive` 위젯 테스트의 계약이다.
+
+**`Button`을 옮길 때 정한다.** 지금은 다루지 않는다.
+
+- 자리는 지키고 동작만 끄는 모드. 지금 `PressableSurface`(Card, Item)는 `onPressed`가 없으면 `Interactive`를 빼고 그려서, `onPressed`가 null과 함수 사이로 바뀌면 안쪽 State가 초기화된다
+- 스크롤 안에서 짧게 탭해도 `active`가 보이는 최소 유지 시간
+- 누르는 중에 안쪽 `Interactive`가 사라지면 바깥이 눌린다
+- `focusNode`를 바꾸면 이전 노드의 링이 남는다
+- `select`·`gameButtonA` 키 (TV, 게임패드)
 
 ### control surface — Button / IconButton / Toggle / IconToggle 공통
 
