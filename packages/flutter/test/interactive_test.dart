@@ -213,6 +213,96 @@ void main() {
     expect(state.active, isFalse);
   });
 
+  testWidgets('a press that turns into a drag takes no focus', (tester) async {
+    final node = await pump(tester);
+    final drag = await tester.startGesture(
+      tester.getCenter(find.byType(Interactive)),
+    );
+    await tester.pump(const Duration(milliseconds: 150));
+    expect(state.active, isTrue);
+    await drag.moveBy(const Offset(0, -60));
+    await drag.up();
+    await tester.pump();
+    expect(node.hasFocus, isFalse);
+    expect(presses, 0);
+    expect(state.active, isFalse);
+  });
+
+  testWidgets('a held press on an inner control of another kind keeps its '
+      'focus', (tester) async {
+    final field = FocusNode();
+    addTearDown(field.dispose);
+    presses = 0;
+    var inner = 0;
+    await tester.pumpWidget(
+      WidgetsApp(
+        color: const Color(0xFF000000),
+        builder: (_, _) => Center(
+          child: Interactive(
+            onPressed: () => presses++,
+            builder: (_, _) => SizedBox(
+              width: 200,
+              height: 100,
+              child: Center(
+                child: Focus(
+                  focusNode: field,
+                  autofocus: true,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => inner++,
+                    child: const SizedBox(width: 50, height: 20),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    final moves = <bool>[];
+    field.addListener(() => moves.add(field.hasPrimaryFocus));
+    final press = await tester.startGesture(
+      tester.getCenter(find.byType(GestureDetector).last),
+    );
+    await tester.pump(const Duration(milliseconds: 300));
+    await press.up();
+    await tester.pump();
+    expect(moves, isEmpty);
+    expect((presses, inner), (0, 1));
+  });
+
+  testWidgets('a key held while focus moves inside does not stick', (
+    tester,
+  ) async {
+    final inner = FocusNode();
+    addTearDown(inner.dispose);
+    await tester.pumpWidget(
+      WidgetsApp(
+        color: const Color(0xFF000000),
+        builder: (_, _) => FocusScope(
+          autofocus: true,
+          child: Interactive(
+            onPressed: inner.requestFocus,
+            builder: (_, s) {
+              state = s;
+              return Focus(
+                focusNode: inner,
+                child: const SizedBox(width: 100, height: 40),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(inner.hasPrimaryFocus, isTrue);
+    expect(state.active, isFalse);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.enter);
+  });
+
   group('nested', () {
     late int outerPresses;
     late int innerPresses;

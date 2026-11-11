@@ -84,12 +84,6 @@ class _InteractiveState extends State<Interactive> {
   bool _primary = false;
   FocusNode? _listened;
 
-  int? _pointerDownHere;
-  int? _pointerTakenByDescendant;
-
-  bool get _pressBelongsToDescendant =>
-      _pointerDownHere != null && _pointerDownHere == _pointerTakenByDescendant;
-
   FocusNode? _internalNode;
   FocusNode get _node => widget.focusNode ?? (_internalNode ??= FocusNode());
 
@@ -152,16 +146,15 @@ class _InteractiveState extends State<Interactive> {
     });
   }
 
-  void _descendantTookPointer(int pointer) {
-    _pointerTakenByDescendant = pointer;
-    _tellAncestorsPointerIsTaken(pointer);
-  }
-
-  void _tellAncestorsPointerIsTaken(int pointer) => context
-      .findAncestorStateOfType<_InteractiveState>()
-      ?._descendantTookPointer(pointer);
-
   static void _ignorePress() {}
+
+  void _press() {
+    if (!_node.hasPrimaryFocus) {
+      _pointerFocus = true;
+      _node.requestFocus();
+    }
+    widget.onPressed?.call();
+  }
 
   void _listenTo(FocusNode node) {
     _listened?.removeListener(_handlePrimaryFocus);
@@ -178,7 +171,11 @@ class _InteractiveState extends State<Interactive> {
         !_pointerFocus &&
         FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
     _pointerFocus = false;
-    _set(() => _focusVisible = visible);
+    if (!primary) _spaceHeld = false;
+    _set(() {
+      _focusVisible = visible;
+      if (!primary) _active = false;
+    });
   }
 
   void _handleFocusChange(bool focused) {
@@ -234,32 +231,18 @@ class _InteractiveState extends State<Interactive> {
             });
           }
         },
-        child: Listener(
-          onPointerDown: (event) {
-            _pointerDownHere = event.pointer;
-            _tellAncestorsPointerIsTaken(event.pointer);
-          },
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapDown: enabled
-                ? (_) {
-                    if (!_pressBelongsToDescendant) {
-                      _pointerFocus = true;
-                      _node.requestFocus();
-                    }
-                    _set(() => _active = true);
-                  }
-                : null,
-            onTapUp: enabled ? (_) => _set(() => _active = false) : null,
-            onTapCancel: enabled
-                ? () {
-                    if (_active) _set(() => _active = false);
-                  }
-                : null,
-            onTap: enabled ? widget.onPressed : _ignorePress,
-            excludeFromSemantics: !enabled,
-            child: widget.builder(context, _state),
-          ),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: enabled ? (_) => _set(() => _active = true) : null,
+          onTapUp: enabled ? (_) => _set(() => _active = false) : null,
+          onTapCancel: enabled
+              ? () {
+                  if (_active) _set(() => _active = false);
+                }
+              : null,
+          onTap: enabled ? _press : _ignorePress,
+          excludeFromSemantics: !enabled,
+          child: widget.builder(context, _state),
         ),
       ),
     );

@@ -82,6 +82,8 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 - 스타일 적용은 `pressed > active > hovered` 우선순위로 하나만. state 객체는 원시값 그대로
 - `onInteractionChange`로 부모에 미러링. controlled 아님
 - `Interactive` 안의 `Interactive`를 누르면 바깥은 포커스를 가져가지 않고 `onPressed`도 부르지 않는다. 안쪽이 `disabled`여도 같다 (React `isFromNestedControl`)
+- 포인터로는 누름이 확정된 뒤(`onTap`)에 포커스를 가져간다. React는 pointer down에 가져가지만, Flutter의 tap down은 누가 눌릴지 정해지기 전에 온다. 그래서 안쪽 컨트롤(`TextField`, Material 버튼 포함)을 누르거나 스크롤로 바뀐 누름은 바깥의 포커스를 옮기지 않는다
+- 키로 생긴 `active`는 primary focus를 잃으면 버린다. 포커스가 자식으로 내려가도 같다
 - `T | (state) => T`: `Button` `IconButton` `Toggle` `IconToggle` `FloatingButton`의 prop 대부분(`children` `variant` `size` `colorScheme` …). 이벤트 핸들러, `disabled`, `pressed`, `value`는 제외
 
 | React                             | Flutter                                       |
@@ -96,7 +98,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
 ```text
 focusVisible = focused
-            && 자기 자신의 pointer down으로 얻은 포커스가 아님
+            && 자기 자신의 탭으로 얻은 포커스가 아님
             && highlightMode == FocusHighlightMode.traditional
 ```
 
