@@ -51,6 +51,12 @@ export const messages = {
     remove: '{label} 삭제',
     search: '항목 검색',
   },
+  codeBlock: {
+    collapse: '접기',
+    copied: '복사했습니다',
+    copy: '코드 복사',
+    expand: '{count}줄 더 보기',
+  },
   colorField: {
     clear: '색상 지우기',
     close: '닫기',
@@ -185,6 +191,13 @@ export const messages = {
     search: '명령 검색',
     searchPlaceholder: '명령 검색…',
     submenu: '{label} 하위 메뉴',
+  },
+  messageScroller: {
+    jump: '맨 아래로',
+    jumpUnseen: '맨 아래로, 새 메시지 {count}개',
+    label: '메시지',
+    loading: '이전 메시지를 불러오는 중',
+    unseen: '새 메시지 {count}개',
   },
   numberField: {
     decrement: '값 줄이기',

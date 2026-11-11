@@ -254,6 +254,7 @@ test('ArrowRight enters a submenu, ArrowLeft and Escape leave only the submenu',
   const { screen, trigger, item } = await renderActions();
   trigger.element().focus();
   await userEvent.keyboard('{Enter}');
+  await expect.element(item(/^Copy/)).toHaveFocus();
   await userEvent.keyboard('{ArrowDown}{ArrowDown}');
   await expect.element(item('Share')).toHaveFocus();
 
