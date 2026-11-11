@@ -19,6 +19,7 @@ export 'src/components/avatar_group/avatar_group.dart';
 export 'src/components/badge/badge.dart';
 export 'src/components/card/card.dart';
 export 'src/components/divider/divider.dart';
+export 'src/components/empty/empty.dart';
 export 'src/components/field/field.dart';
 export 'src/components/label/label.dart';
 export 'src/components/skeleton/skeleton.dart';
