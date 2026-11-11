@@ -21,6 +21,7 @@ export 'src/components/card/card.dart';
 export 'src/components/divider/divider.dart';
 export 'src/components/empty/empty.dart';
 export 'src/components/field/field.dart';
+export 'src/components/item/item.dart';
 export 'src/components/label/label.dart';
 export 'src/components/skeleton/skeleton.dart';
 export 'src/components/spinner/spinner.dart';

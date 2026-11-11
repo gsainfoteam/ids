@@ -10,6 +10,7 @@ import 'components/card_usecase.dart';
 import 'components/divider_usecase.dart';
 import 'components/empty_usecase.dart';
 import 'components/field_usecase.dart';
+import 'components/item_usecase.dart';
 import 'components/label_usecase.dart';
 import 'components/skeleton_usecase.dart';
 import 'components/spinner_usecase.dart';
@@ -40,6 +41,7 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(name: 'Divider', useCases: dividerUseCases),
         WidgetbookComponent(name: 'Empty', useCases: emptyUseCases),
         WidgetbookComponent(name: 'Field', useCases: fieldUseCases),
+        WidgetbookComponent(name: 'Item', useCases: itemUseCases),
         WidgetbookComponent(name: 'Label', useCases: labelUseCases),
         WidgetbookComponent(name: 'Skeleton', useCases: skeletonUseCases),
         WidgetbookComponent(name: 'Spinner', useCases: spinnerUseCases),
