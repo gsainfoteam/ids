@@ -4,22 +4,12 @@ import 'package:widgetbook/widgetbook.dart';
 
 import 'themed.dart';
 
-T _dropdown<T extends Enum>(
-  BuildContext context,
-  String label,
-  List<T> options,
-) => context.knobs.object.dropdown(
-  label: label,
-  options: options,
-  labelBuilder: (value) => value.name,
-);
-
 final cardUseCases = [
   WidgetbookUseCase(
     name: 'Regions',
     builder: (context) {
-      final variant = _dropdown(context, 'Variant', ids.CardVariant.values);
-      final size = _dropdown(context, 'Size', ids.IdsSize.values);
+      final variant = dropdown(context, 'Variant', ids.CardVariant.values);
+      final size = dropdown(context, 'Size', ids.IdsSize.values);
       final dividers = context.knobs.boolean(label: 'Dividers');
       return themed(
         context,

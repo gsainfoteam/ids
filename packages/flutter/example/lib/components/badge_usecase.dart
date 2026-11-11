@@ -4,18 +4,6 @@ import 'package:widgetbook/widgetbook.dart';
 
 import 'themed.dart';
 
-T _dropdown<T extends Enum>(
-  BuildContext context,
-  String label,
-  List<T> options, {
-  T? initial,
-}) => context.knobs.object.dropdown(
-  label: label,
-  options: options,
-  initialOption: initial ?? options.first,
-  labelBuilder: (value) => value.name,
-);
-
 const _bell = Icon(Icons.notifications_outlined, size: 28);
 
 final badgeUseCases = [
@@ -25,15 +13,15 @@ final badgeUseCases = [
       final count = context.knobs.int.input(label: 'Count', initialValue: 3);
       final max = context.knobs.int.input(label: 'Max', initialValue: 99);
       final showZero = context.knobs.boolean(label: 'Show zero');
-      final variant = _dropdown(context, 'Variant', ids.BadgeVariant.values);
-      final colorScheme = _dropdown(
+      final variant = dropdown(context, 'Variant', ids.BadgeVariant.values);
+      final colorScheme = dropdown(
         context,
         'Color scheme',
         ids.IdsColorScheme.values,
         initial: ids.IdsColorScheme.danger,
       );
-      final size = _dropdown(context, 'Size', ids.IdsSize.values);
-      final placement = _dropdown(
+      final size = dropdown(context, 'Size', ids.IdsSize.values);
+      final placement = dropdown(
         context,
         'Placement',
         ids.BadgePlacement.values,

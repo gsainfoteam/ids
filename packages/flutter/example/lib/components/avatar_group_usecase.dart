@@ -13,16 +13,6 @@ const _members = [
   ids.Avatar(name: 'Dave Choi'),
 ];
 
-T _dropdown<T extends Enum>(
-  BuildContext context,
-  String label,
-  List<T> options,
-) => context.knobs.object.dropdown(
-  label: label,
-  options: options,
-  labelBuilder: (value) => value.name,
-);
-
 final avatarGroupUseCases = [
   WidgetbookUseCase(
     name: 'Overflow',
@@ -38,14 +28,14 @@ final avatarGroupUseCases = [
         Center(
           child: ids.AvatarGroup(
             max: max,
-            layout: _dropdown(context, 'Layout', ids.AvatarGroupLayout.values),
-            stacking: _dropdown(
+            layout: dropdown(context, 'Layout', ids.AvatarGroupLayout.values),
+            stacking: dropdown(
               context,
               'Stacking',
               ids.AvatarGroupStacking.values,
             ),
-            size: _dropdown(context, 'Size', ids.IdsSize.values),
-            shape: _dropdown(context, 'Shape', ids.AvatarShape.values),
+            size: dropdown(context, 'Size', ids.IdsSize.values),
+            shape: dropdown(context, 'Shape', ids.AvatarShape.values),
             semanticLabel: '회의 참석자',
             children: _members,
           ),

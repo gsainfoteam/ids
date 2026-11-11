@@ -22,3 +22,15 @@ Widget themed(BuildContext context, Widget child) {
     ),
   );
 }
+
+T dropdown<T extends Enum>(
+  BuildContext context,
+  String label,
+  List<T> options, {
+  T? initial,
+}) => context.knobs.object.dropdown(
+  label: label,
+  options: options,
+  initialOption: initial ?? options.first,
+  labelBuilder: (value) => value.name,
+);
