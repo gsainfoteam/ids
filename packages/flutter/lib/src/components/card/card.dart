@@ -9,6 +9,7 @@ import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
 import '../../interaction/interactive.dart';
+import '../../interaction/pressable_surface.dart';
 
 enum CardVariant { outline, soft, ghost }
 
@@ -35,11 +36,6 @@ class Card extends StatelessWidget {
     IdsSize.standard: IdsTypography.bodyB3Regular,
     IdsSize.tiny: IdsTypography.captionC1Regular,
   };
-  static const _hoverAlpha = 0.04;
-  static const _activeAlpha = 0.08;
-  static const _disabledOpacity = 0.5;
-  static const _focusRingWidth = 3.0;
-  static const _focusRingAlpha = 0.4;
   static const _shadow = BoxShadow(
     color: Color(0x0D000000),
     offset: Offset(0, 1),
@@ -96,32 +92,20 @@ class Card extends StatelessWidget {
       CardVariant.soft => theme.muted,
       CardVariant.ghost => theme.surface.withValues(alpha: 0),
     };
-    final layer = state.active
-        ? _activeAlpha
-        : state.hovered
-        ? _hoverAlpha
-        : 0.0;
-    final edge = state.focusVisible ? theme.primary : theme.border;
     final radius = BorderRadius.circular(IdsRadius.container);
 
     return AnimatedContainer(
       duration: reduced ? Duration.zero : IdsMotion.fast,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Color.alphaBlend(theme.onSurface.withValues(alpha: layer), base),
+        color: SurfaceLayer.over(base, theme, state),
         borderRadius: radius,
-        border: Border.all(
-          color: theme.primary.withValues(
-            alpha: state.focusVisible ? _focusRingAlpha : 0,
-          ),
-          width: state.focusVisible ? _focusRingWidth : 0,
-          strokeAlign: BorderSide.strokeAlignOutside,
-        ),
+        border: FocusRing.around(theme, state),
         boxShadow: [if (variant == CardVariant.outline) _shadow],
       ),
       foregroundDecoration: variant == CardVariant.outline
           ? BoxDecoration(
-              border: Border.all(color: edge),
+              border: Border.all(color: FocusRing.edge(theme, state)),
               borderRadius: radius,
             )
           : null,
@@ -145,27 +129,12 @@ class Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) => _CardScope(
     size: size,
-    child: !_interactive
-        ? _surface(context, const InteractiveState())
-        : Semantics(
-            button: true,
-            enabled: !disabled,
-            container: true,
-            child: MouseRegion(
-              cursor: disabled
-                  ? SystemMouseCursors.forbidden
-                  : SystemMouseCursors.click,
-              child: Opacity(
-                opacity: disabled ? _disabledOpacity : 1,
-                child: Interactive(
-                  onPressed: onPressed,
-                  disabled: disabled,
-                  onInteractionChange: onInteractionChange,
-                  builder: _surface,
-                ),
-              ),
-            ),
-          ),
+    child: PressableSurface(
+      onPressed: onPressed,
+      disabled: disabled,
+      onInteractionChange: onInteractionChange,
+      builder: _surface,
+    ),
   );
 }
 
