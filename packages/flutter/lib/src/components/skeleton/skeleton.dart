@@ -38,7 +38,7 @@ class _SkeletonState extends State<Skeleton>
 
   late final _controller = AnimationController(vsync: this, duration: _cycle);
 
-  bool get _busy => widget.child == null || (widget.loading ?? true);
+  bool get _busy => widget.loading ?? true;
 
   bool get _moving =>
       _busy &&
@@ -147,6 +147,7 @@ class _SkeletonState extends State<Skeleton>
   Widget build(BuildContext context) {
     final child = widget.child;
     if (child != null) return _wrap(child);
+    if (!_busy) return const SizedBox.shrink();
 
     return switch (widget.shape) {
       SkeletonShape.rect => SizedBox(

@@ -242,5 +242,14 @@ void main() {
       await pump(tester, const Skeleton(loading: false, child: Text('child')));
       expect(tester.hasRunningAnimations, isFalse);
     });
+
+    testWidgets('draws nothing once loading ends without a child', (
+      tester,
+    ) async {
+      await pump(tester, const Skeleton(loading: false));
+      expect(skeletonSize(tester).height, 0);
+      expect(find.byType(CustomPaint), findsNothing);
+      expect(tester.hasRunningAnimations, isFalse);
+    });
   });
 }
