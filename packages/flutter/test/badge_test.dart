@@ -59,6 +59,26 @@ void main() {
       expect(find.text('0'), findsOneWidget);
     });
 
+    testWidgets('fades out on the same anchor when the count reaches zero', (
+      tester,
+    ) async {
+      Widget badge(int count) => Badge.count(count: count, child: _anchor);
+      await pump(tester, badge(3));
+      final anchor = tester.element(find.byWidget(_anchor));
+      await pump(tester, badge(0));
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(tester.element(find.byWidget(_anchor)), same(anchor));
+      final fade = tester.widget<FadeTransition>(
+        find.descendant(
+          of: find.byType(Badge),
+          matching: find.byType(FadeTransition),
+        ),
+      );
+      expect(fade.opacity.value, inExclusiveRange(0, 1));
+      await tester.pumpAndSettle();
+      expect(fade.opacity.value, 0);
+    });
+
     testWidgets('counts a negative number as zero', (tester) async {
       await pump(
         tester,

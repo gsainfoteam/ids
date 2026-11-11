@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../theme/ids_theme.dart';
@@ -327,6 +328,42 @@ class Badge extends StatelessWidget {
       ],
     );
 
-    return _describes ? MergeSemantics(child: badge) : badge;
+    return _MergeSemanticsWhen(merge: _describes, child: badge);
+  }
+}
+
+class _MergeSemanticsWhen extends SingleChildRenderObjectWidget {
+  const _MergeSemanticsWhen({required this.merge, super.child});
+
+  final bool merge;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderMergeSemanticsWhen(merge);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderMergeSemanticsWhen renderObject,
+  ) => renderObject.merge = merge;
+}
+
+class _RenderMergeSemanticsWhen extends RenderProxyBox {
+  _RenderMergeSemanticsWhen(this._merge);
+
+  bool _merge;
+  set merge(bool value) {
+    if (value == _merge) return;
+    _merge = value;
+    markNeedsSemanticsUpdate();
+  }
+
+  @override
+  void describeSemanticsConfiguration(SemanticsConfiguration config) {
+    super.describeSemanticsConfiguration(config);
+    if (!_merge) return;
+    config
+      ..isSemanticBoundary = true
+      ..isMergingSemanticsOfDescendants = true;
   }
 }
