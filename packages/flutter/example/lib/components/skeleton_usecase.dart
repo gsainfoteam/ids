@@ -91,7 +91,7 @@ final skeletonUseCases = [
               loading: loading,
               shape: ids.SkeletonShape.circle,
               animation: animation,
-              child: const CircleAvatar(radius: 20, child: Text('김')),
+              child: const ids.Avatar(name: '김지스트'),
             ),
             Expanded(
               child: ids.Skeleton(
