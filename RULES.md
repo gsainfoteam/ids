@@ -117,6 +117,10 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
     `role="listbox"` element the scroller (the options' offset parent and `scrollTop` must stay on
     the listbox), cannot place a bar by where it is declared, and does not inset the bar ends from
     a rounded corner. What is left over native scrolling is a ResizeObserver and a thumb drag.
+  - MessageScroller's follow and anchor engine. `@shadcn/react`'s message-scroller draws the
+    scroller and the list as its own `<div>`s, so the ScrollArea viewport cannot be the scroller and
+    the list cannot be an `<ol>` of `<li>`; it also puts a spacer `<div>` inside the list and has no
+    release on text selection, `onReachStart` or new-message count.
 
 **flutter** — Dart package. Platform directories (android/, ios/, etc.) intentionally absent — this is a package, not an app. Published to pub.dev via OIDC — no token.
 
@@ -144,7 +148,7 @@ packages/react/src/
     data/        Accordion, Avatar, Badge, Calendar, Card, Carousel, Chip, DataTable, Empty, Image,
                  Item, Marquee, QRCode, Table, TimePicker, ...
     feedback/    Alert, Progress, Skeleton, Spinner, Toast
-    layout/      AspectRatio, Divider, Spacer, ScrollArea, Resizable, Splitter
+    layout/      AspectRatio, Divider, Spacer, ScrollArea, MessageScroller, Resizable, Splitter
     navigation/  Breadcrumb, Pagination, Stepper, Tabs
     overlay/     Dialog, Drawer, Menu, Popover, Tooltip
     typography/  Kbd, Label, Link

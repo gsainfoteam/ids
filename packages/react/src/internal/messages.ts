@@ -186,6 +186,13 @@ export const messages = {
     searchPlaceholder: '명령 검색…',
     submenu: '{label} 하위 메뉴',
   },
+  messageScroller: {
+    jump: '맨 아래로',
+    jumpUnseen: '맨 아래로, 새 메시지 {count}개',
+    label: '메시지',
+    loading: '이전 메시지를 불러오는 중',
+    unseen: '새 메시지 {count}개',
+  },
   numberField: {
     decrement: '값 줄이기',
     increment: '값 늘리기',
