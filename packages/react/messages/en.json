@@ -49,6 +49,12 @@
     "remove": "Remove {label}",
     "search": "Search items"
   },
+  "codeBlock": {
+    "collapse": "Show less",
+    "copied": "Copied",
+    "copy": "Copy code",
+    "expand": "{count, plural, one {Show # more line} other {Show # more lines}}"
+  },
   "colorField": {
     "clear": "Clear color",
     "close": "Close",

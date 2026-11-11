@@ -51,6 +51,12 @@ export const messages = {
     remove: '{label} 삭제',
     search: '항목 검색',
   },
+  codeBlock: {
+    collapse: '접기',
+    copied: '복사했습니다',
+    copy: '코드 복사',
+    expand: '{count}줄 더 보기',
+  },
   colorField: {
     clear: '색상 지우기',
     close: '닫기',
