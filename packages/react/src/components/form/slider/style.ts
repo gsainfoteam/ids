@@ -55,8 +55,8 @@ export const sliderStyle = tv({
       },
     } satisfies Record<SliderOrientation, object>,
     size: {
-      standard: { root: '[--slider-thumb:1rem] [--slider-track:0.75rem]' },
-      tiny: { root: '[--slider-thumb:0.875rem] [--slider-track:0.625rem]' },
+      standard: { root: '[--slider-thumb:--spacing(4)] [--slider-track:--spacing(3)]' },
+      tiny: { root: '[--slider-thumb:--spacing(3.5)] [--slider-track:--spacing(2.5)]' },
     } satisfies Record<IdsSize, object>,
   },
   defaultVariants: { orientation: 'horizontal', size: 'standard' },

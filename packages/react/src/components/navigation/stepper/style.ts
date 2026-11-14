@@ -98,7 +98,7 @@ export const stepperStyle = tv({
       size: 'standard',
       class: {
         title: 'py-[calc((--spacing(8)-1lh)/2)]',
-        separator: 'start-[calc(1rem-0.5px)] top-10',
+        separator: 'start-[calc(--spacing(4)-0.5px)] top-10',
         body: 'ms-11',
       },
     },
@@ -107,7 +107,7 @@ export const stepperStyle = tv({
       size: 'tiny',
       class: {
         title: 'py-[calc((--spacing(6)-1lh)/2)]',
-        separator: 'start-[calc(0.75rem-0.5px)] top-8',
+        separator: 'start-[calc(--spacing(3)-0.5px)] top-8',
         body: 'ms-8',
       },
     },

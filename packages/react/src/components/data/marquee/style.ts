@@ -10,7 +10,7 @@ export type MarqueePauseSpace = IdsSize | 'none';
 export const marqueeStyle = tv({
   slots: {
     root: [
-      'grid w-full min-w-0 grid-cols-1 grid-rows-1 gap-8 [--marquee-fade:min(15%,5rem)]',
+      'grid w-full min-w-0 grid-cols-1 grid-rows-1 gap-8 [--marquee-fade:min(15%,--spacing(20))]',
       '[--ids-marquee-play-state:running] data-paused:[--ids-marquee-play-state:paused]',
       'data-reduced-motion:h-auto data-reduced-motion:max-h-none',
     ],

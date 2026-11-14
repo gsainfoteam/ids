@@ -10,7 +10,7 @@ export const dialogStyle = tv({
       'duration-(--ids-motion-normal) ease-out data-stacked:bg-transparent',
     ],
     content: [
-      'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-sm flex-col outline-none',
+      'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-var(--spacing)*8)] w-[calc(100%-var(--spacing)*8)] max-w-sm flex-col outline-none',
       cornerOfThePaddedViewport,
       'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-lg',
       'transition-[opacity,scale] duration-(--ids-motion-normal) ease-out',

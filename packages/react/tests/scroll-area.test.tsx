@@ -968,7 +968,7 @@ test('fade SSR: the server HTML carries the mask but no distances, so nothing is
   expect(view.hasAttribute('style')).toBe(false);
   expect(OVERFLOW_EDGES.filter((edge) => view.hasAttribute(`data-overflow-${edge}`))).toEqual([]);
   expect(doc.querySelector('[data-scroll-area]')!.className).toMatch(
-    /\[--scroll-area-fade-size:24px\]/,
+    /\[--scroll-area-fade-size:--spacing\(6\)\]/,
   );
 });
 

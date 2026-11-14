@@ -49,7 +49,7 @@ export const textAreaStyle = tv({
           insetButtons.size.standard,
           '[&>:first-child:is(button,:has(button))]:-ms-1.5 [&>:last-child:is(button,:has(button))]:-me-1.5',
         ],
-        input: 'px-3 [--ids-text-area-pad-y:0.5rem]',
+        input: 'px-3 [--ids-text-area-pad-y:--spacing(2)]',
         count: 'text-caption-c1-regular',
       },
       tiny: {
@@ -59,7 +59,7 @@ export const textAreaStyle = tv({
           insetButtons.size.tiny,
           '[&>:first-child:is(button,:has(button))]:-ms-1 [&>:last-child:is(button,:has(button))]:-me-1',
         ],
-        input: 'px-2 [--ids-text-area-pad-y:0.5rem]',
+        input: 'px-2 [--ids-text-area-pad-y:--spacing(2)]',
         count: 'text-caption-c2-regular',
       },
     } satisfies Record<IdsSize, object>,
