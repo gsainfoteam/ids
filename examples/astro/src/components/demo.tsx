@@ -10,9 +10,11 @@ import {
   toast,
 } from '@gsainfoteam/ids-react';
 
+import { theme } from '../ids-theme';
+
 export function Demo() {
   return (
-    <IdsProvider color="blue" mode="light">
+    <IdsProvider theme={theme} mode="light">
       <main className="mx-auto flex max-w-xl flex-col gap-8 p-8">
         <section className="flex flex-wrap gap-2">
           <Button>저장</Button>

@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const examples = fileURLToPath(new URL('../examples/', import.meta.url));
 
 const serverRenderedIds = [
-  ['IdsProvider theme', 'data-color="blue"'],
+  ['IdsProvider theme', '--ids-theme-light-primary:#155dfc'],
   ['glossy Button', 'data-variant="glossy"'],
   ['Dialog.Trigger', 'aria-haspopup="dialog"'],
   ['Select', 'data-select=""'],

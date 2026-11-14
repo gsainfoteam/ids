@@ -2,6 +2,7 @@
 import { Badge, Button, IdsProvider } from '@gsainfoteam/ids-react';
 
 import { Demo } from '../components/demo';
+import { theme } from '../ids-theme';
 import '../styles/global.css';
 ---
 
@@ -12,7 +13,7 @@ import '../styles/global.css';
     <title>IDS on Astro</title>
   </head>
   <body>
-    <IdsProvider color="blue" mode="light">
+    <IdsProvider theme={theme} mode="light">
       <header class="mx-auto flex max-w-xl flex-col gap-4 p-8">
         <h1 class="text-headline-h3-bold">IDS + Astro</h1>
         <p class="text-body-b2-regular">이 머리말은 JavaScript 없이 정적으로 그린 React 컴포넌트입니다.</p>
