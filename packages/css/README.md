@@ -60,13 +60,20 @@ Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환�
 @import "@gsainfoteam/ids-css";
 ```
 
-루트에 `data-color` / `data-mode`를 설정한다:
+React 앱은 `IdsProvider theme` 이 아래 변수를 루트 요소에 넣는다. CSS 만 쓰는 페이지는 직접 준다:
 
 ```html
-<div data-color="blue" data-mode="light">
+<div
+  data-mode="light"
+  style="--ids-theme-light-primary: #155dfc; --ids-theme-light-on-primary: #ffffff; /* … 역할 6개 × 두 모드 */"
+>
   <!-- 이 하위에서 CSS 변수 활성화 -->
 </div>
 ```
+
+- 브랜드 역할 `primary`, `on-primary`, `secondary`, `on-secondary`, `accent`, `outline` 은 `--ids-theme-{light|dark}-{역할}` 에서 읽는다. `data-mode` 가 둘 중 하나를 `--ids-color-{역할}` 로 연결한다.
+- neutral, status, chart 는 이 패키지가 정하고 `data-mode` 에만 따른다.
+- `--ids-radius-standard`, `--ids-radius-indicator`, `--ids-radius-container`, `--ids-font-family-sans`, `--ids-font-family-mono`, `--ids-corner-shape` 를 요소에 주면 그 아래만 바뀐다. Tailwind 유틸리티(`rounded-standard`, `font-sans`, `bg-primary`)는 `@theme inline` 이라 이 변수를 바로 읽는다.
 
 ### 폰트
 
@@ -139,16 +146,10 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. 패키�
 <p class="shimmer [--ids-shimmer-duration:3s]">불러오는 중</p>
 ```
 
-### 지원 색상 테마
+### 브랜드 색
 
-| `data-color` | 설명 |
-|---|---|
-| `blue` | 기본 |
-| `orange` | 지글. IDS 고유 팔레트 |
-| `green` | 팟쥐. IDS 고유 팔레트 |
-| `red` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` `indigo` `violet` `purple` `fuchsia` `pink` `rose` | Tailwind CSS v4 기본 팔레트 |
-
-- `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` 는 `--ids-color-on-primary` 가 검은 글자다. 흰 글자로는 대비 4.5:1 이 안 된다.
+- 이 패키지에는 브랜드 팔레트가 없다. 앱이 `IdsProvider theme` 에 팔레트를 주면 역할 색을 대비로 골라 위 변수로 넣는다.
+- corner shape: Provider 아래 요소는 `corner-shape: var(--ids-corner-shape, round)` 를 받는다. `rounded-full` 은 언제나 `round` 다.
 - 브랜드 색 글자는 배경에 따라 고른다. `primary` 채움 위는 `on-primary`, `secondary` 위는 `on-secondary`, 채움 없는 페이지 위는 `accent` 다. 셋 다 두 모드에서 4.5:1 을 넘는다.
 
 `data-mode`는 `light` / `dark`.

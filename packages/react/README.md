@@ -96,9 +96,23 @@ export default {
 @source '../node_modules/@gsainfoteam/ids-react/dist';
 ```
 
+```ts
+// app/ids-theme.ts: 앱의 팔레트. 50 ~ 950 의 11단계
+import { defineIdsTheme } from '@gsainfoteam/ids-react';
+
+export const theme = defineIdsTheme({
+  palette: {
+    50: '#eff6ff', 100: '#dbeafe', 200: '#bedbff', 300: '#8ec5ff', 400: '#51a2ff', 500: '#2b7fff',
+    600: '#155dfc', 700: '#1447e6', 800: '#193cb8', 900: '#1c398e', 950: '#162456',
+  },
+});
+```
+
 ```tsx
 // app/layout.tsx
 import { IdsProvider } from '@gsainfoteam/ids-react';
+
+import { theme } from './ids-theme';
 
 import './globals.css';
 
@@ -106,7 +120,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body>
-        <IdsProvider color="blue" mode="light">{children}</IdsProvider>
+        <IdsProvider theme={theme} mode="light">{children}</IdsProvider>
       </body>
     </html>
   );
@@ -168,6 +182,7 @@ export default defineConfig({
 import { IdsProvider } from '@gsainfoteam/ids-react';
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router';
 
+import { theme } from '../ids-theme';
 import styles from '../styles.css?url';
 
 export const Route = createRootRoute({
@@ -178,7 +193,7 @@ export const Route = createRootRoute({
         <HeadContent />
       </head>
       <body>
-        <IdsProvider color="blue" mode="light">{children}</IdsProvider>
+        <IdsProvider theme={theme} mode="light">{children}</IdsProvider>
         <Scripts />
       </body>
     </html>
@@ -222,9 +237,10 @@ export default defineConfig({
 // src/pages/index.astro
 import { Button, IdsProvider } from '@gsainfoteam/ids-react';
 import { Demo } from '../components/demo';
+import { theme } from '../ids-theme';
 import '../styles/global.css';
 ---
-<IdsProvider color="blue" mode="light">
+<IdsProvider theme={theme} mode="light">
   <Button variant="outline">정적 버튼</Button>
 </IdsProvider>
 <Demo client:load />
@@ -264,10 +280,11 @@ import { IdsProvider } from '@gsainfoteam/ids-react';
 import { createRoot } from 'react-dom/client';
 
 import { App } from './app';
+import { theme } from './ids-theme';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
-  <IdsProvider color="blue" mode="light">
+  <IdsProvider theme={theme} mode="light">
     <App />
   </IdsProvider>,
 );
@@ -275,11 +292,18 @@ createRoot(document.getElementById('root')!).render(
 
 ## IdsProvider
 
+IDS 에는 기본 색이 없다. 앱이 `defineIdsTheme` 으로 테마를 만들어 `theme` 에 넘기고, 없으면 타입 오류다.
+
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `color` / `defaultColor` | `IdsColor` | 바깥 Provider, 최상위는 `'blue'` | 색상 테마 (제어 / 비제어) |
+| `theme` | `IdsTheme` | 필수 | `palette`(11단계), `radius`, `font`, `cornerShape` |
 | `mode` / `defaultMode` | `'light' \| 'dark' \| 'system'` | 바깥 Provider, 최상위는 `'light'` | 모드 (제어 / 비제어) |
-| `onColorChange` / `onModeChange` | `(value) => void` | | 값을 바꾸려 할 때 |
+| `onModeChange` | `(mode) => void` | | 모드를 바꾸려 할 때 |
+
+- 라이트와 다크의 역할 색(primary, secondary, accent …)은 팔레트에서 IDS 가 4.5:1 대비를 지키도록 고른다.
+- `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾼다. 예: `<IdsProvider.Scope theme={{ radius: 16 }}>`.
+- `checkIdsTheme(theme)` 은 팔레트와 값의 문제를 목록으로 돌려준다. 앱 테스트에서 `[]` 인지 확인하면 된다.
+- IDS 는 글꼴을 불러오지 않는다. 앱이 불러오고 `font.sans`, `font.mono` 에 CSS `font-family` 값을 넘긴다.
 
 ```tsx
 import { useTheme } from '@gsainfoteam/ids-react';
@@ -290,7 +314,7 @@ function ThemeToggle() {
 }
 ```
 
-중첩, 시스템 모드, `asChild` 는 `src/components/utility/ids-provider/README.md` 를 참고한다.
+역할 색 규칙, 글꼴 불러오기, Scope, 시스템 모드, `asChild` 는 `src/components/utility/ids-provider/README.md` 를 참고한다.
 
 ## 문구와 언어
 

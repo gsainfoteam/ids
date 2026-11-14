@@ -714,20 +714,36 @@ may remount the story. Inputs whose focus a play checks carry `data-1p-ignore` a
 
 ## IdsProvider
 
-Every IDS component relies on `data-color` and `data-mode` attributes injected by `IdsProvider`
-(`ThemeProvider` in Flutter). Without it, CSS variables are undefined and colors will not render.
+Every IDS component relies on the theme `IdsProvider` writes on its root (`ThemeProvider` in
+Flutter): `data-mode` and inline variables. Without it, the brand variables are undefined and
+colors will not render.
 
 ```tsx
-<IdsProvider color="blue" mode="light">
+const theme = defineIdsTheme({ palette: appPalette, radius: 10, cornerShape: 'round' });
+
+<IdsProvider theme={theme} mode="light">
   <App />
 </IdsProvider>
 ```
 
-## Adding a new color
+- The app owns its brand palette (`50` to `950`). The provider picks the six brand roles for both
+  modes by contrast (`ids-provider/theme-roles.ts`) and writes them as `--ids-theme-{mode}-{role}`;
+  `ids.css` maps the current mode's set onto `--ids-color-{role}`. Neutral, status and chart stay
+  IDS's own tokens.
+- `radius`, `font` and `cornerShape` become `--ids-radius-*`, `--ids-font-family-*` and
+  `--ids-corner-shape` on the same element. The Tailwind bridges are `@theme inline`, so utilities
+  read the provider's variables and not the values on `:root`.
+- `IdsProvider.Scope` takes any part of a theme and overrides it for a subtree; `checkIdsTheme`
+  returns the problems the provider warns about in development.
+- Stories and tests take their palettes from `.storybook/palettes.ts` (`palettes.blue`,
+  `tests/theme.ts`'s `testTheme`).
 
-1. Add palette values to `packages/core/tokens/palette.json`
-2. Add `packages/core/tokens/semantic/[color].light.json` and `[color].dark.json`
-3. Run `pnpm codegen` and commit the generated files
+## Palettes in core
+
+IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral and the 17 demo
+palettes the stories use. The per-hue `semantic/[color].{light,dark}.json` files and the `color`
+enum feed only the Dart output until Flutter takes a runtime palette too (#33); the CSS and the
+React types no longer read them.
 
 ## Versioning — Changesets (fixed mode)
 
