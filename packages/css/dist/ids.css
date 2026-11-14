@@ -1261,6 +1261,170 @@
   }
 }
 
+[data-scale="default"] {
+  --ids-scale: 1;
+}
+
+[data-scale="large"] {
+  --ids-scale: 1.25;
+}
+
+[data-scale="tv"] {
+  --ids-scale: 1.5;
+}
+
+[data-mode] {
+  --ids-radius-standard: calc(var(--ids-theme-radius-standard, 10px) * var(--ids-scale, 1));
+  --ids-radius-indicator: calc(var(--ids-theme-radius-indicator, 4px) * var(--ids-scale, 1));
+  --ids-radius-container: calc(var(--ids-theme-radius-container, 16px) * var(--ids-scale, 1));
+}
+
+[data-scale] {
+  --spacing: calc(0.25rem * var(--ids-scale, 1));
+  --ids-text-headline-h1-bold: calc(48px * var(--ids-scale, 1));
+  --ids-text-headline-h1-semibold: calc(48px * var(--ids-scale, 1));
+  --ids-text-headline-h1-medium: calc(48px * var(--ids-scale, 1));
+  --ids-text-headline-h2-bold: calc(40px * var(--ids-scale, 1));
+  --ids-text-headline-h2-semibold: calc(40px * var(--ids-scale, 1));
+  --ids-text-headline-h2-medium: calc(40px * var(--ids-scale, 1));
+  --ids-text-headline-h3-bold: calc(32px * var(--ids-scale, 1));
+  --ids-text-headline-h3-semibold: calc(32px * var(--ids-scale, 1));
+  --ids-text-headline-h3-medium: calc(32px * var(--ids-scale, 1));
+  --ids-text-headline-h4-bold: calc(28px * var(--ids-scale, 1));
+  --ids-text-headline-h4-semibold: calc(28px * var(--ids-scale, 1));
+  --ids-text-headline-h4-medium: calc(28px * var(--ids-scale, 1));
+  --ids-text-headline-h5-bold: calc(24px * var(--ids-scale, 1));
+  --ids-text-headline-h5-semibold: calc(24px * var(--ids-scale, 1));
+  --ids-text-headline-h5-medium: calc(24px * var(--ids-scale, 1));
+  --ids-text-headline-h6-bold: calc(20px * var(--ids-scale, 1));
+  --ids-text-headline-h6-semibold: calc(20px * var(--ids-scale, 1));
+  --ids-text-headline-h6-medium: calc(20px * var(--ids-scale, 1));
+  --ids-text-subtitle-s1-bold: calc(18px * var(--ids-scale, 1));
+  --ids-text-subtitle-s1-semibold: calc(18px * var(--ids-scale, 1));
+  --ids-text-subtitle-s1-medium: calc(18px * var(--ids-scale, 1));
+  --ids-text-subtitle-s2-bold: calc(16px * var(--ids-scale, 1));
+  --ids-text-subtitle-s2-semibold: calc(16px * var(--ids-scale, 1));
+  --ids-text-subtitle-s2-medium: calc(16px * var(--ids-scale, 1));
+  --ids-text-body-b1-bold: calc(18px * var(--ids-scale, 1));
+  --ids-text-body-b1-semibold: calc(18px * var(--ids-scale, 1));
+  --ids-text-body-b1-medium: calc(18px * var(--ids-scale, 1));
+  --ids-text-body-b1-regular: calc(18px * var(--ids-scale, 1));
+  --ids-text-body-b2-bold: calc(16px * var(--ids-scale, 1));
+  --ids-text-body-b2-semibold: calc(16px * var(--ids-scale, 1));
+  --ids-text-body-b2-medium: calc(16px * var(--ids-scale, 1));
+  --ids-text-body-b2-regular: calc(16px * var(--ids-scale, 1));
+  --ids-text-body-b3-bold: calc(14px * var(--ids-scale, 1));
+  --ids-text-body-b3-semibold: calc(14px * var(--ids-scale, 1));
+  --ids-text-body-b3-medium: calc(14px * var(--ids-scale, 1));
+  --ids-text-body-b3-regular: calc(14px * var(--ids-scale, 1));
+  --ids-text-caption-c1-semibold: calc(12px * var(--ids-scale, 1));
+  --ids-text-caption-c1-medium: calc(12px * var(--ids-scale, 1));
+  --ids-text-caption-c1-regular: calc(12px * var(--ids-scale, 1));
+  --ids-text-caption-c2-semibold: calc(10px * var(--ids-scale, 1));
+  --ids-text-caption-c2-medium: calc(10px * var(--ids-scale, 1));
+  --ids-text-caption-c2-regular: calc(10px * var(--ids-scale, 1));
+  --ids-text-button-standard: calc(14px * var(--ids-scale, 1));
+  --ids-text-button-tiny: calc(12px * var(--ids-scale, 1));
+  --ids-font-size-c2: calc(10px * var(--ids-scale, 1));
+  --ids-font-size-c1: calc(12px * var(--ids-scale, 1));
+  --ids-font-size-b3: calc(14px * var(--ids-scale, 1));
+  --ids-font-size-b2: calc(16px * var(--ids-scale, 1));
+  --ids-font-size-b1: calc(18px * var(--ids-scale, 1));
+  --ids-font-size-h6: calc(20px * var(--ids-scale, 1));
+  --ids-font-size-h5: calc(24px * var(--ids-scale, 1));
+  --ids-font-size-h4: calc(28px * var(--ids-scale, 1));
+  --ids-font-size-h3: calc(32px * var(--ids-scale, 1));
+  --ids-font-size-h2: calc(40px * var(--ids-scale, 1));
+  --ids-font-size-h1: calc(48px * var(--ids-scale, 1));
+  --ids-size-control-standard: calc(36px * var(--ids-scale, 1));
+  --ids-size-control-tiny: calc(32px * var(--ids-scale, 1));
+  --ids-size-icon-standard: calc(16px * var(--ids-scale, 1));
+  --ids-size-icon-tiny: calc(14px * var(--ids-scale, 1));
+}
+
+@supports (width: round(1px, 1px)) {
+  [data-mode] {
+    --ids-radius-standard: round(calc(var(--ids-theme-radius-standard, 10px) * var(--ids-scale, 1)), 1px);
+    --ids-radius-indicator: round(calc(var(--ids-theme-radius-indicator, 4px) * var(--ids-scale, 1)), 1px);
+    --ids-radius-container: round(calc(var(--ids-theme-radius-container, 16px) * var(--ids-scale, 1)), 1px);
+  }
+
+  [data-scale] {
+    --spacing: calc(0.25rem * var(--ids-scale, 1));
+    --ids-text-headline-h1-bold: round(calc(48px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h1-semibold: round(calc(48px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h1-medium: round(calc(48px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h2-bold: round(calc(40px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h2-semibold: round(calc(40px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h2-medium: round(calc(40px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h3-bold: round(calc(32px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h3-semibold: round(calc(32px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h3-medium: round(calc(32px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h4-bold: round(calc(28px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h4-semibold: round(calc(28px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h4-medium: round(calc(28px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h5-bold: round(calc(24px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h5-semibold: round(calc(24px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h5-medium: round(calc(24px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h6-bold: round(calc(20px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h6-semibold: round(calc(20px * var(--ids-scale, 1)), 1px);
+    --ids-text-headline-h6-medium: round(calc(20px * var(--ids-scale, 1)), 1px);
+    --ids-text-subtitle-s1-bold: round(calc(18px * var(--ids-scale, 1)), 1px);
+    --ids-text-subtitle-s1-semibold: round(calc(18px * var(--ids-scale, 1)), 1px);
+    --ids-text-subtitle-s1-medium: round(calc(18px * var(--ids-scale, 1)), 1px);
+    --ids-text-subtitle-s2-bold: round(calc(16px * var(--ids-scale, 1)), 1px);
+    --ids-text-subtitle-s2-semibold: round(calc(16px * var(--ids-scale, 1)), 1px);
+    --ids-text-subtitle-s2-medium: round(calc(16px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b1-bold: round(calc(18px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b1-semibold: round(calc(18px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b1-medium: round(calc(18px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b1-regular: round(calc(18px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b2-bold: round(calc(16px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b2-semibold: round(calc(16px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b2-medium: round(calc(16px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b2-regular: round(calc(16px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b3-bold: round(calc(14px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b3-semibold: round(calc(14px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b3-medium: round(calc(14px * var(--ids-scale, 1)), 1px);
+    --ids-text-body-b3-regular: round(calc(14px * var(--ids-scale, 1)), 1px);
+    --ids-text-caption-c1-semibold: round(calc(12px * var(--ids-scale, 1)), 1px);
+    --ids-text-caption-c1-medium: round(calc(12px * var(--ids-scale, 1)), 1px);
+    --ids-text-caption-c1-regular: round(calc(12px * var(--ids-scale, 1)), 1px);
+    --ids-text-caption-c2-semibold: round(calc(10px * var(--ids-scale, 1)), 1px);
+    --ids-text-caption-c2-medium: round(calc(10px * var(--ids-scale, 1)), 1px);
+    --ids-text-caption-c2-regular: round(calc(10px * var(--ids-scale, 1)), 1px);
+    --ids-text-button-standard: round(calc(14px * var(--ids-scale, 1)), 1px);
+    --ids-text-button-tiny: round(calc(12px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-c2: round(calc(10px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-c1: round(calc(12px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-b3: round(calc(14px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-b2: round(calc(16px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-b1: round(calc(18px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-h6: round(calc(20px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-h5: round(calc(24px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-h4: round(calc(28px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-h3: round(calc(32px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-h2: round(calc(40px * var(--ids-scale, 1)), 1px);
+    --ids-font-size-h1: round(calc(48px * var(--ids-scale, 1)), 1px);
+    --ids-size-control-standard: round(calc(36px * var(--ids-scale, 1)), 1px);
+    --ids-size-control-tiny: round(calc(32px * var(--ids-scale, 1)), 1px);
+    --ids-size-icon-standard: round(calc(16px * var(--ids-scale, 1)), 1px);
+    --ids-size-icon-tiny: round(calc(14px * var(--ids-scale, 1)), 1px);
+  }
+}
+
+@property --scroll-area-thickness {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --scroll-area-gap {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
 [data-mode="light"] {
   --ids-color-primary: var(--ids-theme-light-primary);
   --ids-color-on-primary: var(--ids-theme-light-on-primary);

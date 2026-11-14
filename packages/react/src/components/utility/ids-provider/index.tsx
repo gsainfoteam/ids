@@ -25,10 +25,12 @@ export { ThemeContext } from './use-ids-provider';
 export { useTheme } from './use-theme';
 export { defineIdsTheme } from './theme';
 export { checkIdsTheme } from './theme-variables';
+export { createIdsPalette } from './palette-seed';
 export type {
   IdsCornerShape,
   IdsPalette,
   IdsPaletteStep,
+  IdsScale,
   IdsTheme,
   IdsThemeFont,
   IdsThemeOverrides,

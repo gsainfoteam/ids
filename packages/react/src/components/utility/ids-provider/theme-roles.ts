@@ -1,18 +1,7 @@
-import {
-  formatHex,
-  interpolate,
-  modeHsl,
-  modeLab,
-  modeLch,
-  modeLrgb,
-  modeOklab,
-  modeOklch,
-  modeRgb,
-  parse,
-  useMode as registerMode,
-  wcagContrast,
-} from 'culori/fn';
+import { formatHex, interpolate, parse } from 'culori/fn';
 
+import { AA_TEXT, DARK_TEXT, LIGHT_TEXT, reaches } from './contrast';
+import { createIdsPalette } from './palette-seed';
 import {
   PALETTE_STEPS,
   type IdsBrandRoles,
@@ -23,23 +12,11 @@ import {
 
 import type { IdsMode } from '../../../tokens/types';
 
-registerMode(modeRgb);
-registerMode(modeLrgb);
-registerMode(modeHsl);
-registerMode(modeLab);
-registerMode(modeLch);
-registerMode(modeOklab);
-registerMode(modeOklch);
-
-export const AA_TEXT = 4.5;
+export { AA_TEXT, DARK_TEXT, LIGHT_TEXT };
 
 export const SOFT_TINTS = [0.06, 0.12] as const;
 
 export const NEUTRAL_SURFACE: { [mode in IdsMode]: string } = { light: '#ffffff', dark: '#0a0a0a' };
-
-export const LIGHT_TEXT = '#ffffff';
-
-export const DARK_TEXT = '#0a0a0a';
 
 type ModeRule = {
   primary: IdsPaletteStep;
@@ -73,14 +50,30 @@ export type IdsThemeIssue = {
 
 export type ParsedPalette = { [step in IdsPaletteStep]: string };
 
-export function parsePalette(palette: IdsPalette | undefined): {
+export function parsePalette(palette: IdsPalette | string | undefined): {
   shades: ParsedPalette | undefined;
   issues: IdsThemeIssue[];
 } {
+  if (typeof palette === 'string') {
+    const generated = createIdsPalette(palette);
+    return generated === undefined
+      ? {
+          shades: undefined,
+          issues: [{ path: 'palette', message: `The palette is not a CSS color: ${palette}.` }],
+        }
+      : { shades: generated, issues: [] };
+  }
+
   if (palette === undefined || palette === null || typeof palette !== 'object')
     return {
       shades: undefined,
-      issues: [{ path: 'palette', message: 'The theme needs a palette with steps 50 to 950.' }],
+      issues: [
+        {
+          path: 'palette',
+          message:
+            'The theme needs a palette: steps 50 to 950, or one CSS color to build them from.',
+        },
+      ],
     };
 
   const issues: IdsThemeIssue[] = [];
@@ -106,9 +99,6 @@ export function parsePalette(palette: IdsPalette | undefined): {
 
   return { shades: issues.length === 0 ? shades : undefined, issues };
 }
-
-const reaches = (text: string, ...backgrounds: string[]) =>
-  backgrounds.every((background) => wcagContrast(text, background) >= AA_TEXT);
 
 function firstReaching(
   shades: ParsedPalette,
@@ -176,7 +166,7 @@ function rolesFor(
   };
 }
 
-export function resolveThemeRoles(palette: IdsPalette | undefined): {
+export function resolveThemeRoles(palette: IdsPalette | string | undefined): {
   roles: IdsThemeRoles | undefined;
   issues: IdsThemeIssue[];
 } {

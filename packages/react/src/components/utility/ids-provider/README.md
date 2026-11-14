@@ -1,12 +1,13 @@
 # IdsProvider
 
-앱의 테마(팔레트, radius, 글꼴, corner shape)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
+앱의 테마(팔레트, radius, 글꼴, corner shape, 배율)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
 
 - **테마는 앱이 줍니다.** IDS 에는 기본 색이 없습니다. `theme` 이 없으면 타입 오류입니다.
-- **팔레트 하나로 두 모드를 칠합니다.** 라이트와 다크의 역할 색(primary, secondary, accent …)은 IDS 가 대비 4.5:1 을 지키도록 고릅니다.
+- **팔레트 하나로 두 모드를 칠합니다.** 라이트와 다크의 역할 색(primary, secondary, accent …)은 IDS 가 대비 4.5:1 을 지키도록 고릅니다. 팔레트 대신 색 하나를 주면 IDS 가 11단계를 만듭니다.
 - **CSS 변수로 칠합니다.** 테마는 감싸는 요소의 inline 변수가 되고, `@gsainfoteam/ids-css` 가 `data-mode` 에 따라 연결합니다. 서버 HTML 에 들어가므로 깜빡이지 않습니다.
 - **제어와 비제어.** `mode` 를 넘기면 부모가 값을 가지고, `defaultMode` 를 넘기면 Provider 가 가집니다.
 - **시스템 모드.** `mode="system"` 은 운영체제의 다크 모드 설정을 따르고, 설정을 바꾸면 새로고침 없이 바로 바뀝니다.
+- **배율.** `scale` 은 영역 하나를 1.25배(`large`), 1.5배(`tv`)로 키웁니다.
 - **Scope.** `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾸고 나머지는 물려받습니다.
 - **`useTheme()`.** 어디서든 현재 테마와 모드를 읽고 `setMode`, `toggleMode` 로 바꿉니다.
 - **네이티브 컨트롤.** `color-scheme` 을 함께 설정해 스크롤바, 날짜 입력, 체크박스 같은 브라우저 기본 UI 도 모드를 따릅니다.
@@ -50,13 +51,28 @@ import { theme } from './ids-theme';
 
 ## 테마
 
-| 키            | 값                                                                | 기본                   |
-| ------------- | ----------------------------------------------------------------- | ---------------------- |
-| `palette`     | 50, 100 … 900, 950 의 11단계. 값은 CSS 색(hex, `oklch()` …)       | 없음 (필수)            |
-| `radius`      | `standard` 모서리(px, 0–18). `indicator` 는 0.4배, `container` 는 1.6배 | 10                     |
-| `font.sans`   | CSS `font-family` 값                                              | Pretendard GOV 스택    |
-| `font.mono`   | CSS `font-family` 값                                              | Geist Mono 스택        |
-| `cornerShape` | `'round'` / `'squircle'`                                          | `'round'`              |
+| 키            | 값                                                                                   | 기본                |
+| ------------- | ------------------------------------------------------------------------------------ | ------------------- |
+| `palette`     | 50, 100 … 900, 950 의 11단계, 또는 색 하나. 값은 CSS 색(hex, `oklch()` …)            | 없음 (필수)         |
+| `radius`      | `standard` 모서리(px, 0–18). `indicator` 는 0.4배, `container` 는 1.6배              | 10                  |
+| `font.sans`   | CSS `font-family` 값                                                                 | Pretendard GOV 스택 |
+| `font.mono`   | CSS `font-family` 값                                                                 | Geist Mono 스택     |
+| `cornerShape` | `'round'` / `'squircle'`                                                             | `'round'`           |
+| `scale`       | `'default'`(1) / `'large'`(1.25) / `'tv'`(1.5)                                       | `'default'`         |
+
+### 앱이 바꾸는 것과 IDS 가 정하는 것
+
+| 토큰                     | 앱이 값을 바꾼다 | 앱이 단계를 더한다 | 비고                                                              |
+| ------------------------ | ---------------- | ------------------ | ----------------------------------------------------------------- |
+| 색                       | ✅ 팔레트 하나   | ❌                 | 역할 색은 IDS 가 대비로 고른다. neutral, status, chart 는 고정    |
+| radius                   | ✅               | ❌                 | `standard` 하나를 받고 `indicator`, `container` 는 계산한다       |
+| 글꼴                     | ✅               | ❌                 | `sans`, `mono`. 타입 스케일의 단계와 크기는 고정이다 (크기는 배율로) |
+| corner shape             | ✅               | ❌                 | `round` / `squircle`                                              |
+| 배율                     | ✅ 프리셋        | ❌                 | 영역마다 줄 수 있다                                               |
+| size (`standard`/`tiny`) | ❌               | ❌                 | 컴포넌트마다 값이 다르다. 내용 크기는 `className` 으로 바꾼다     |
+| spacing, motion, shadow  | ❌               | ❌                 | spacing 은 배율만 따른다                                          |
+
+- 크기를 키우는 방법은 size 단계를 더하는 것이 아니라 배율입니다. Radix `scaling`, Spectrum 의 모바일 배율, Material density 와 같은 방식입니다.
 
 ### 팔레트에서 역할 색 고르기
 
@@ -73,6 +89,40 @@ import { theme } from './ids-theme';
 - `accent` 는 `surface` 와 `secondary` 에서 모두 4.5:1 을 넘어야 합니다.
 - neutral, status(success, warning, danger, info), chart 색은 IDS 가 정하고 바뀌지 않습니다.
 - 이 규칙으로 Tailwind 계열 17색 팔레트를 돌리면 이전 IDS 의 고정 표와 같은 값이 나옵니다.
+
+### 색 하나로 팔레트 만들기
+
+```ts
+import { createIdsPalette, defineIdsTheme } from '@gsainfoteam/ids-react';
+
+export const theme = defineIdsTheme({ palette: '#0d9488' });
+
+createIdsPalette('#0d9488'); // { 50: '#f0fdfa', …, 600: '#04968d', …, 950: '#032f30' }
+```
+
+- 고른 색에서 hue 와 채도만 읽습니다. 단계별 밝기와 채도는 IDS 의 기준 팔레트 17개에서 hue 가 가까운 둘을 섞어 정합니다. 노랑과 남색의 600 은 밝기가 다릅니다.
+- 고른 색이 같은 hue 의 기준보다 덜 선명하면 그 비율만큼 모든 단계의 채도를 줄입니다. 회색을 주면 회색 팔레트입니다.
+- OKLCH 로 계산하고 sRGB 밖으로 나간 단계는 채도만 줄입니다. 결과는 8비트 hex 입니다.
+- 만든 팔레트는 역할 색 규칙을 늘 통과합니다. 600 위의 글자가 4.5:1 에 모자라면 600 의 밝기를 가장 가까운 통과 지점으로 옮깁니다.
+- 고른 색이 팔레트에 그대로 들어간다는 보장은 없습니다. 브랜드 색이 정확히 들어가야 하면 `createIdsPalette` 의 결과를 고쳐 11단계 객체로 넘깁니다.
+
+### 배율
+
+```tsx
+<IdsProvider theme={theme}>
+  <App />
+  <IdsProvider.Scope theme={{ scale: 'tv' }}>
+    <TvRoute /> {/* 이 아래만 1.5배 */}
+  </IdsProvider.Scope>
+</IdsProvider>
+```
+
+- 곱하는 것: Tailwind `--spacing`(그래서 `h-9`, `p-4`, `gap-2` 같은 크기와 간격), 글자 크기, `--ids-size-*`, radius.
+- 곱하지 않는 것: 테두리 두께, focus ring, 그림자, 줄 간격 비율.
+- 글자 크기, 크기 토큰, radius 는 px 로 반올림합니다. CSS `round()` 가 없는 브라우저는 반올림하지 않습니다.
+- 안쪽 Scope 의 `scale` 은 바깥 배율에 곱하지 않고 바꿉니다. `'default'` 를 주면 원래 크기로 돌아옵니다.
+- Popover, Menu 같은 레이어의 간격(`sideOffset`)과 폭도 배율을 따릅니다. `overlay.open` 으로 연 항목은 연 곳의 배율을 받습니다.
+- 앱이 쓴 `w-[320px]` 같은 px 값은 배율을 따르지 않습니다. 배율을 따라야 하면 `w-80` 이나 `--spacing(80)` 으로 씁니다.
 
 ### 글꼴 불러오기
 
@@ -104,7 +154,7 @@ test('the app theme passes IDS', () => {
 });
 ```
 
-- 빠진 팔레트 단계, CSS 색이 아닌 값, 4.5:1 을 넘는 단계가 없는 역할, 범위를 벗어난 `radius`, 모르는 `cornerShape` 를 `{ path, message }` 목록으로 돌려줍니다.
+- 빠진 팔레트 단계, CSS 색이 아닌 값, 4.5:1 을 넘는 단계가 없는 역할, 범위를 벗어난 `radius`, 모르는 `cornerShape` 와 `scale` 을 `{ path, message }` 목록으로 돌려줍니다.
 - 개발 모드에서는 Provider 가 같은 목록을 `console.warn` 으로 알립니다. 팔레트가 아예 없으면 `console.error` 입니다.
 - 통과하지 못한 역할은 마지막 후보 단계로 그립니다. 화면은 깨지지 않지만 대비가 모자랍니다.
 
@@ -168,7 +218,7 @@ const { mode, resolvedMode } = useTheme();
 import { useTheme } from '@gsainfoteam/ids-react';
 
 function ThemeMenu() {
-  const { theme, mode, resolvedMode, setMode, toggleMode } = useTheme();
+  const { theme, scale, mode, resolvedMode, setMode, toggleMode } = useTheme();
   return (
     <>
       <Button onClick={toggleMode}>{resolvedMode === 'dark' ? '라이트로' : '다크로'}</Button>
@@ -181,6 +231,7 @@ function ThemeMenu() {
 | 값             | 뜻                                                                    |
 | -------------- | --------------------------------------------------------------------- |
 | `theme`        | 가장 가까운 Provider 까지 합친 테마                                   |
+| `scale`        | 가장 가까운 Provider 의 배율. 아무도 주지 않았으면 `undefined`        |
 | `mode`         | 고른 모드. `light` / `dark` / `system`                                |
 | `resolvedMode` | 실제로 칠해진 모드. `light` / `dark`                                  |
 | `setMode`      | 모드를 바꾼다                                                         |
@@ -210,9 +261,9 @@ function ThemeMenu() {
 | `asChild`                             | 자식 요소에 속성을 붙인다                                                                            |
 | `className` / `style` / `ref` / 그 외 | 감싸는 요소(또는 자식)로 간다                                                                        |
 
-- 요소에는 `data-mode`(항상 `light` / `dark`), `style.colorScheme`, 그리고 준 테마의 변수가 붙습니다.
+- 요소에는 `data-mode`(항상 `light` / `dark`), `style.colorScheme`, 준 테마의 변수, `scale` 을 준 경우 `data-scale` 이 붙습니다.
   - 역할 색: `--ids-theme-light-primary`, `--ids-theme-dark-primary` … (두 모드 다)
-  - radius: `--ids-radius-standard`, `--ids-radius-indicator`, `--ids-radius-container`
+  - radius: `--ids-theme-radius-standard`, `-indicator`, `-container`. `ids.css` 가 배율을 곱해 `--ids-radius-*` 로 씁니다
   - 글꼴: `--ids-font-family-sans`, `--ids-font-family-mono`
   - corner shape: `--ids-corner-shape`
 - `translate` 와 `locale` 은 패키지 README 의 [문구와 언어](../../../../README.md#문구와-언어) 를 참고합니다.

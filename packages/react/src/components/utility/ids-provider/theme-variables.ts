@@ -1,6 +1,13 @@
 import type { CSSProperties } from 'react';
 
-import { BRAND_ROLES, type IdsCornerShape, type IdsTheme, type IdsThemeOverrides } from './theme';
+import {
+  BRAND_ROLES,
+  SCALE_PRESETS,
+  type IdsCornerShape,
+  type IdsScale,
+  type IdsTheme,
+  type IdsThemeOverrides,
+} from './theme';
 import { resolveThemeRoles, type IdsThemeIssue } from './theme-roles';
 
 import type { IdsMode } from '../../../tokens/types';
@@ -39,9 +46,9 @@ function radiusVariables(radius: number | undefined, issues: IdsThemeIssue[]): T
   }
 
   return {
-    '--ids-radius-standard': px(radius),
-    '--ids-radius-indicator': px(radius * INDICATOR_RADIUS_RATIO),
-    '--ids-radius-container': px(radius * CONTAINER_RADIUS_RATIO),
+    '--ids-theme-radius-standard': px(radius),
+    '--ids-theme-radius-indicator': px(radius * INDICATOR_RADIUS_RATIO),
+    '--ids-theme-radius-container': px(radius * CONTAINER_RADIUS_RATIO),
   };
 }
 
@@ -100,8 +107,24 @@ function paletteVariables(
   return variables;
 }
 
+const isScale = (scale: unknown): scale is IdsScale =>
+  typeof scale === 'string' && Object.hasOwn(SCALE_PRESETS, scale);
+
+function checkedScale(scale: IdsScale | undefined, issues: IdsThemeIssue[]) {
+  if (scale === undefined || isScale(scale)) return scale;
+
+  issues.push({
+    path: 'scale',
+    message: `scale is ${Object.keys(SCALE_PRESETS)
+      .map((preset) => `'${preset}'`)
+      .join(', ')}. Got ${String(scale)}.`,
+  });
+  return undefined;
+}
+
 export function resolveThemeVariables(theme: IdsThemeOverrides): {
   variables: ThemeVariables;
+  scale: IdsScale | undefined;
   issues: IdsThemeIssue[];
 } {
   const issues: IdsThemeIssue[] = [];
@@ -113,7 +136,7 @@ export function resolveThemeVariables(theme: IdsThemeOverrides): {
     ...cornerShapeVariables(theme.cornerShape, issues),
   };
 
-  return { variables, issues };
+  return { variables, scale: checkedScale(theme.scale, issues), issues };
 }
 
 export function checkIdsTheme(theme: IdsTheme): IdsThemeIssue[] {

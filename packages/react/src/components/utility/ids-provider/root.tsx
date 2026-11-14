@@ -38,7 +38,7 @@ export function IdsProviderRoot({
   children,
   ...rest
 }: IdsProviderRootProps) {
-  const { context, ownVariables, issues, outermost, paintsSurface } = useIdsProvider({
+  const { context, ownVariables, ownScale, issues, outermost, paintsSurface } = useIdsProvider({
     theme,
     mode,
     defaultMode,
@@ -96,6 +96,7 @@ export function IdsProviderRoot({
             {...rest}
             ref={mergedRef}
             data-mode={context.resolvedMode}
+            data-scale={ownScale}
             className={cn(
               paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
               className,

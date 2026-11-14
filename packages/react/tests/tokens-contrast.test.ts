@@ -5,7 +5,7 @@ import { differenceCiede2000, interpolate, wcagContrast } from 'culori';
 import { describe, expect, test } from 'vitest';
 
 import { paletteHues, palettes } from '../.storybook/palettes';
-import { BRAND_ROLES } from '../src/components/utility/ids-provider/theme';
+import { BRAND_ROLES, SCALE_PRESETS } from '../src/components/utility/ids-provider/theme';
 import { resolveThemeRoles } from '../src/components/utility/ids-provider/theme-roles';
 
 import type { IdsMode } from '../src/tokens/types';
@@ -67,6 +67,11 @@ test.each(modes)('ids.css maps the %s brand roles from the provider variables', 
       ([, role, from, fromRole]) => [role, from, fromRole],
     ),
   ).toEqual(BRAND_ROLES.map((role) => [role, mode, role]));
+});
+
+test('ids.css sets the scale presets IdsProvider writes', () => {
+  for (const [preset, factor] of Object.entries(SCALE_PRESETS))
+    expect(css).toMatch(new RegExp(`\\[data-scale="${preset}"\\] \\{\\s*--ids-scale: ${factor};`));
 });
 
 test('ids.css no longer themes by color name', () => {

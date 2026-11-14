@@ -70,13 +70,30 @@ test('SSR: radius, fonts and corner shape become variables on the element', () =
       />,
     ),
   ).querySelector<HTMLElement>('[data-mode]')!;
-  expect(element.style.getPropertyValue('--ids-radius-standard')).toBe('12px');
-  expect(element.style.getPropertyValue('--ids-radius-indicator')).toBe('5px');
-  expect(element.style.getPropertyValue('--ids-radius-container')).toBe('19px');
+  expect(element.style.getPropertyValue('--ids-theme-radius-standard')).toBe('12px');
+  expect(element.style.getPropertyValue('--ids-theme-radius-indicator')).toBe('5px');
+  expect(element.style.getPropertyValue('--ids-theme-radius-container')).toBe('19px');
   expect(element.style.getPropertyValue('--ids-font-family-sans')).toBe('Georgia, serif');
   expect(element.style.getPropertyValue('--ids-font-family-mono')).toBe('Courier, monospace');
   expect(element.style.fontFamily).toBe('var(--ids-font-family-sans)');
   expect(element.style.getPropertyValue('--ids-corner-shape')).toBe('squircle');
+});
+
+test('SSR: one color is enough, the provider builds the palette from it', () => {
+  const element = parse(
+    renderToString(<IdsProvider theme={{ palette: palettes.violet[500] }} />),
+  ).querySelector<HTMLElement>('[data-mode]')!;
+  expect(element.style.getPropertyValue('--ids-theme-light-primary')).toBe(palettes.violet[600]);
+  expect(element.style.getPropertyValue('--ids-theme-dark-secondary')).toBe(palettes.violet[950]);
+});
+
+test('SSR: a scale is an attribute, and no scale writes none', () => {
+  const html = renderToString(
+    <IdsProvider theme={testTheme}>
+      <IdsProvider.Scope theme={{ scale: 'tv' }} />
+    </IdsProvider>,
+  );
+  expect(html.match(/data-scale="[^"]*"/g)).toEqual(['data-scale="tv"']);
 });
 
 test('SSR: system mode renders light because the server cannot see the scheme', () => {
@@ -203,6 +220,37 @@ test('radius, font and corner shape reach the components under the provider', as
     expect(themed.getPropertyValue('corner-shape')).not.toBe(round);
     expect(getComputedStyle(circle).getPropertyValue('corner-shape')).toBe(round);
   }
+});
+
+test('a scale multiplies sizes, spacing, text and radius, and a nested scale replaces it', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <Button>default</Button>
+      <IdsProvider.Scope theme={{ scale: 'tv' }}>
+        <Button>tv</Button>
+        <IdsProvider.Scope theme={{ radius: 12 }}>
+          <Button>tv, radius 12</Button>
+        </IdsProvider.Scope>
+        <IdsProvider.Scope theme={{ scale: 'large' }}>
+          <Button>large</Button>
+        </IdsProvider.Scope>
+      </IdsProvider.Scope>
+    </IdsProvider>,
+  );
+  const measure = (name: string) => {
+    const element = screen.getByRole('button', { name, exact: true }).element();
+    const style = getComputedStyle(element);
+    return {
+      height: element.getBoundingClientRect().height,
+      fontSize: style.fontSize,
+      radius: style.borderTopLeftRadius,
+    };
+  };
+
+  expect(measure('default')).toEqual({ height: 36, fontSize: '14px', radius: '10px' });
+  expect(measure('tv')).toEqual({ height: 54, fontSize: '21px', radius: '15px' });
+  expect(measure('tv, radius 12')).toEqual({ height: 54, fontSize: '21px', radius: '18px' });
+  expect(measure('large')).toEqual({ height: 45, fontSize: '18px', radius: '13px' });
 });
 
 test('a theme without a palette is reported in development', async () => {

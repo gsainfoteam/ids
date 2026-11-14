@@ -296,12 +296,14 @@ IDS 에는 기본 색이 없다. 앱이 `defineIdsTheme` 으로 테마를 만들
 
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `theme` | `IdsTheme` | 필수 | `palette`(11단계), `radius`, `font`, `cornerShape` |
+| `theme` | `IdsTheme` | 필수 | `palette`(11단계 또는 색 하나), `radius`, `font`, `cornerShape`, `scale` |
 | `mode` / `defaultMode` | `'light' \| 'dark' \| 'system'` | 바깥 Provider, 최상위는 `'light'` | 모드 (제어 / 비제어) |
 | `onModeChange` | `(mode) => void` | | 모드를 바꾸려 할 때 |
 
 - 라이트와 다크의 역할 색(primary, secondary, accent …)은 팔레트에서 IDS 가 4.5:1 대비를 지키도록 고른다.
-- `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾼다. 예: `<IdsProvider.Scope theme={{ radius: 16 }}>`.
+- `palette` 에 색 하나(`'#0d9488'`)를 주면 IDS 가 50~950 을 만든다. `createIdsPalette(color)` 로 결과를 미리 볼 수 있다.
+- `scale` 은 영역을 키운다: `'default'`(1), `'large'`(1.25), `'tv'`(1.5). 크기, 간격, 글자 크기, radius 에 곱한다.
+- `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾼다. 예: `<IdsProvider.Scope theme={{ scale: 'tv' }}>`.
 - `checkIdsTheme(theme)` 은 팔레트와 값의 문제를 목록으로 돌려준다. 앱 테스트에서 `[]` 인지 확인하면 된다.
 - IDS 는 글꼴을 불러오지 않는다. 앱이 불러오고 `font.sans`, `font.mono` 에 CSS `font-family` 값을 넘긴다.
 
@@ -314,7 +316,7 @@ function ThemeToggle() {
 }
 ```
 
-역할 색 규칙, 글꼴 불러오기, Scope, 시스템 모드, `asChild` 는 `src/components/utility/ids-provider/README.md` 를 참고한다.
+역할 색 규칙, 색 하나로 팔레트 만들기, 배율, 앱이 바꾸는 토큰의 범위, 글꼴 불러오기, Scope, 시스템 모드, `asChild` 는 `src/components/utility/ids-provider/README.md` 를 참고한다.
 
 ## 문구와 언어
 

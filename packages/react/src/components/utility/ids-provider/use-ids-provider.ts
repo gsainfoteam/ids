@@ -15,7 +15,7 @@ import { noop } from 'es-toolkit';
 
 import { resolveThemeVariables, type ThemeVariables } from './theme-variables';
 
-import type { IdsThemeOverrides } from './theme';
+import type { IdsScale, IdsThemeOverrides } from './theme';
 import type { IdsThemeIssue } from './theme-roles';
 import type { IdsMode } from '../../../tokens/types';
 
@@ -24,6 +24,7 @@ export type ThemeMode = IdsMode | 'system';
 export type ThemeContextValue = {
   theme: IdsThemeOverrides;
   variables: ThemeVariables;
+  scale: IdsScale | undefined;
   mode: ThemeMode;
   resolvedMode: IdsMode;
   setMode: (mode: ThemeMode) => void;
@@ -37,6 +38,7 @@ const NO_ISSUES: IdsThemeIssue[] = [];
 const DEFAULT_THEME: ThemeContextValue = {
   theme: {},
   variables: NO_VARIABLES,
+  scale: undefined,
   mode: 'light',
   resolvedMode: 'light',
   setMode: noop,
@@ -115,7 +117,7 @@ export function useIdsProvider({ theme, mode, defaultMode, onModeChange }: UseId
   const own = useMemo(
     () =>
       theme === undefined
-        ? { variables: NO_VARIABLES, issues: NO_ISSUES }
+        ? { variables: NO_VARIABLES, scale: undefined, issues: NO_ISSUES }
         : resolveThemeVariables(theme),
     [theme],
   );
@@ -159,17 +161,28 @@ export function useIdsProvider({ theme, mode, defaultMode, onModeChange }: UseId
     () => ({
       theme: mergedTheme,
       variables: mergedVariables,
+      scale: own.scale ?? parent.scale,
       mode: currentMode,
       resolvedMode,
       setMode,
       toggleMode,
     }),
-    [mergedTheme, mergedVariables, currentMode, resolvedMode, setMode, toggleMode],
+    [
+      mergedTheme,
+      mergedVariables,
+      own.scale,
+      parent.scale,
+      currentMode,
+      resolvedMode,
+      setMode,
+      toggleMode,
+    ],
   );
 
   return {
     context,
     ownVariables: own.variables,
+    ownScale: own.scale,
     issues: own.issues,
     outermost: root,
     paintsSurface: !root && resolvedMode !== parent.resolvedMode,

@@ -29,7 +29,21 @@ const demoThemes = {
     palette: palettes.violet,
     font: { sans: 'ui-serif, Georgia, serif' },
   }),
+  'seed #0d9488': defineIdsTheme({ palette: '#0d9488' }),
+  'blue, tv': defineIdsTheme({ palette: palettes.blue, scale: 'tv' }),
 };
+
+const seeds = [
+  '#e11d48',
+  '#f59e0b',
+  '#16a34a',
+  '#0891b2',
+  '#7c3aed',
+  'oklch(0.6 0.08 250)',
+  '#8a8a8a',
+];
+
+const scales = ['default', 'large', 'tv'] as const;
 
 const meta = {
   title: 'Utility/IdsProvider',
@@ -51,11 +65,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 function Readout() {
-  const { theme, mode, resolvedMode } = useTheme();
+  const { theme, scale, mode, resolvedMode } = useTheme();
   return (
     <dl className="text-caption-c1-regular grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 font-mono text-(--ids-color-on-muted)">
-      <dt>palette 600</dt>
-      <dd data-testid="palette">{theme.palette?.[600]}</dd>
+      <dt>palette</dt>
+      <dd data-testid="palette">
+        {typeof theme.palette === 'string' ? theme.palette : theme.palette?.[600]}
+      </dd>
+      <dt>scale</dt>
+      <dd data-testid="scale">{scale ?? 'default'}</dd>
       <dt>mode</dt>
       <dd data-testid="mode">{mode}</dd>
       <dt>resolvedMode</dt>
@@ -105,6 +123,39 @@ export const Gallery: Story = {
             </IdsProvider.Scope>
           )}
         />
+      </Showcase.Section>
+      <Showcase.Section
+        title="Seed × Mode"
+        description="palette 에 색 하나를 주면 IdsProvider 가 그 색의 hue 와 채도로 50~950 을 만듭니다. 고른 색이 그대로 들어간다는 보장은 없습니다. 회색을 주면 회색 팔레트가 됩니다."
+      >
+        <Showcase.Matrix
+          rows={seeds}
+          columns={modes}
+          render={(seed, mode) => (
+            <IdsProvider.Scope theme={{ palette: seed }} mode={mode} className={region}>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button>저장</Button>
+                <Button variant="soft">임시 저장</Button>
+                <Badge variant="outline">초안</Badge>
+              </div>
+            </IdsProvider.Scope>
+          )}
+        />
+      </Showcase.Section>
+      <Showcase.Section
+        title="Scale"
+        description="크기, 간격, 글자 크기, radius 에 1, 1.25, 1.5 를 곱하고 px 로 반올림합니다. 테두리, focus ring, 그림자는 그대로입니다. 안쪽 Scope 의 scale 은 곱하지 않고 바꿉니다."
+      >
+        {scales.map((scale) => (
+          <Showcase.Row key={scale} label={scale}>
+            <IdsProvider.Scope theme={{ scale }} className="flex flex-wrap items-center gap-2">
+              <Button>저장</Button>
+              <TextField aria-label={`제목 ${scale}`} placeholder="제목" className="w-40" />
+              <Checkbox defaultChecked aria-label={`선택 ${scale}`} />
+              <Badge>새 글</Badge>
+            </IdsProvider.Scope>
+          </Showcase.Row>
+        ))}
       </Showcase.Section>
       <Showcase.Section
         title="Radius"

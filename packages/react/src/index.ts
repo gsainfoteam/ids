@@ -2,6 +2,7 @@ export {
   IdsProvider,
   ThemeContext,
   checkIdsTheme,
+  createIdsPalette,
   defineIdsTheme,
   useTheme,
 } from './components/utility/ids-provider';
@@ -9,6 +10,7 @@ export type {
   IdsCornerShape,
   IdsPalette,
   IdsPaletteStep,
+  IdsScale,
   IdsTheme,
   IdsThemeFont,
   IdsThemeIssue,

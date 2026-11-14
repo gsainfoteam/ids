@@ -83,6 +83,7 @@ function OverlayItemView({ item }: { item: OverlayItem }) {
         className="contents"
         data-overlay-item={item.id}
         data-mode={theme.resolvedMode}
+        data-scale={theme.scale}
         style={{ colorScheme: theme.resolvedMode, ...themeStyle(theme.variables) }}
       >
         <OverlayItemContext value={binding}>
