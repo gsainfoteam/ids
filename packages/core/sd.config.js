@@ -13,9 +13,6 @@ const idsVar = (prefix, t) => `--ids-${prefix}-${slug(t)}`;
 const toCamel = (str) =>
   str.replace(/-([a-zA-Z0-9]+)/g, (_, s) => s.charAt(0).toUpperCase() + s.slice(1));
 const enumName = (key) => `Ids${key.charAt(0).toUpperCase() + key.slice(1)}`;
-const mapName = (color, mode) =>
-  `_${color}${mode.charAt(0).toUpperCase() + mode.slice(1)}`;
-
 const hexToFlutterColor = (hex) =>
   `const Color(0xFF${hex.replace("#", "").toUpperCase()})`;
 
@@ -187,22 +184,14 @@ abstract final class {{NAME}} {
 }
 `;
 
-const T_DART_IDS_TOKENS = `${GENERATED}
+const T_DART_IDS_TOKENS = `import 'package:flutter/widgets.dart';
 
-import 'package:flutter/material.dart';
-import 'ids_enums.dart';
-
-class IdsTokens {
-  IdsTokens._();
-
-  static Color resolve({
-    required IdsColor color,
-    required IdsMode mode,
-    required String token,
-  }) {
-    return switch ((color, mode)) {
-{{CASES}}
-    };
+abstract final class IdsTokens {
+  static Color resolve({required Brightness brightness, required String token}) {
+    final colors = brightness == Brightness.light ? _light : _dark;
+    final color = colors[token];
+    if (color == null) throw ArgumentError.value(token, 'token', 'Unknown IDS semantic color');
+    return color;
   }
 
 {{MAPS}}
@@ -533,6 +522,8 @@ const tsTypesFormatter = ({ dictionary }) => {
 const dartEnumsFormatter = ({ dictionary }) => {
   const enums = parseEnums(dictionary);
   const blocks = Object.entries(enums)
+    .filter(([key]) => key !== "color")
+    .map(([key, values]) => [key, key === "mode" ? [...values, "system"] : values])
     .map(([key, values]) =>
       render(T_DART_ENUM, {
         NAME: enumName(key),
@@ -550,31 +541,14 @@ const dartEnumsFormatter = ({ dictionary }) => {
 
 const dartColorTokensFormatter = ({ dictionary }) => {
   const palette = buildPalette(dictionary);
-  const toColorLine = ({ name, value }) =>
-    `    '${name}': ${hexToFlutterColor(value)},`;
-
-  const cases = colorPairs
-    .map(
-      ([c, m]) =>
-        `      (IdsColor.${c}, IdsMode.${m}) => ${mapName(c, m)}[token] ?? Colors.transparent,`,
-    )
-    .join("\n");
-
-  const maps = colorPairs
-    .map(([c, m]) =>
-      render(T_DART_COLOR_MAP, {
-        NAME: mapName(c, m),
-        ENTRIES: [
-          ...readColorEntriesWithoutCollision(c, m, palette),
-          ...readColorEntriesWithoutCollision("status", m, palette),
-        ]
-          .map(toColorLine)
-          .join("\n"),
-      }),
-    )
-    .join("\n\n");
-
-  return render(T_DART_IDS_TOKENS, { CASES: cases, MAPS: maps });
+  const maps = ["light", "dark"].map((mode) => render(T_DART_COLOR_MAP, {
+    NAME: `_${mode}`,
+    ENTRIES: [
+      ...readColorEntriesWithoutCollision("neutral", mode, palette),
+      ...readColorEntriesWithoutCollision("status", mode, palette),
+    ].map(({ name, value }) => `    '${name}': ${hexToFlutterColor(value).replace(/^const /, '')},`).join("\n"),
+  })).join("\n\n");
+  return render(T_DART_IDS_TOKENS, { MAPS: maps });
 };
 
 const dartMotionFormatter = ({ dictionary }) =>

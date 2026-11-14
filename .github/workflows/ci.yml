@@ -21,10 +21,12 @@ jobs:
 
       - name: Check generated files are up to date
         run: |
-          if ! git diff --exit-code -- packages/css/dist packages/react/src/tokens packages/flutter/lib/tokens; then
+          if ! git diff --exit-code -- packages/css/dist packages/react/src/tokens packages/react/src/internal/messages-catalog.ts packages/react/messages packages/flutter/lib/tokens packages/flutter/lib/messages packages/flutter/messages; then
             echo "Generated files are out of date. Run 'pnpm codegen' and commit the result."
             exit 1
           fi
+
+      - run: node --test packages/core/dart-messages.test.mjs
 
       - run: pnpm typecheck
 
@@ -198,8 +200,21 @@ jobs:
       - run: flutter pub get
         working-directory: packages/flutter
 
+      - run: dart run slang
+        working-directory: packages/flutter
+
+      - run: dart run slang
+        working-directory: packages/flutter/example
+
+      - run: flutter analyze
+        working-directory: packages/flutter
+
       - run: flutter test
         working-directory: packages/flutter
+
+      - name: Test provider service examples
+        run: flutter test
+        working-directory: packages/flutter/example
 
   review:
     name: Claude review
