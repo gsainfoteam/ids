@@ -233,6 +233,53 @@ test('the tooltip opens in the top layer beside the point, outside a clipping pa
     .toBe(true);
 });
 
+const tooltipLabel = () => document.querySelector('[data-chart-tooltip] p')?.textContent;
+
+test('keys move the tooltip while the pointer rests on another datum, and moving the pointer takes it back', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Button>앞</Button>
+      {visits()}
+    </IdsProvider>,
+  );
+  const graph = screen.getByRole('img', { name: '방문' });
+  await expect.element(graph).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: '앞' }));
+  await pointAt(graph.element(), 300, 100);
+  await expect.poll(tooltipLabel).toBe('수');
+
+  await userEvent.keyboard('{Tab}');
+  await expect.element(graph).toHaveFocus();
+  await expect.poll(tooltipLabel).toBe('월');
+  await userEvent.keyboard('{ArrowRight}');
+  await expect.poll(tooltipLabel).toBe('화');
+
+  await pointAt(graph.element(), 300, 110);
+  await expect.poll(tooltipLabel).toBe('수');
+  await userEvent.keyboard('{ArrowLeft}');
+  await expect.poll(tooltipLabel).toBe('월');
+});
+
+test('focus that follows a click keeps the tooltip on the datum under the pointer', async () => {
+  const screen = await render(
+    <IdsProvider>
+      <Button>앞</Button>
+      {visits()}
+    </IdsProvider>,
+  );
+  const graph = screen.getByRole('img', { name: '방문' });
+  await expect.element(graph).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: '앞' }));
+  await pointAt(graph.element(), 300, 100);
+  await expect.poll(tooltipLabel).toBe('수');
+
+  graph.element().focus();
+
+  await expect.element(graph).toHaveFocus();
+  expect(graph.element().matches(':focus-visible')).toBe(false);
+  expect(tooltipLabel()).toBe('수');
+});
+
 test('a locale on Chart formats the tooltip numbers', async () => {
   const screen = await render(visits({ locale: 'de-DE' }));
   const graph = screen.getByRole('img', { name: '방문' });

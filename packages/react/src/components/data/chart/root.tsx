@@ -29,6 +29,7 @@ import { ChartTable } from './table';
 import { ChartTitle } from './title';
 import { ChartTooltip } from './tooltip';
 import { useChartSize } from './use-chart-size';
+import { useKeysOverARestingPointer } from './use-keys-over-a-resting-pointer';
 import { DEFAULT_LOCALE } from '../../../internal/messages';
 import { useProviderLocale, useTranslate } from '../../../internal/translate';
 import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils';
@@ -126,6 +127,7 @@ export function ChartRoot({
   const id = useId();
   const frameRef = useRef<HTMLDivElement>(null);
   const size = useChartSize(frameRef);
+  const keysOverARestingPointer = useKeysOverARestingPointer(frameRef);
   const styles = chartStyle();
 
   const elements = flattenFragments(children);
@@ -189,7 +191,13 @@ export function ChartRoot({
         style={{ ...seriesVariables(config), ...style }}
       >
         {caption.length > 0 && <figcaption className={styles.caption()}>{caption}</figcaption>}
-        <AspectRatio ref={frameRef} ratio={ratio} data-chart-frame="" className={styles.frame()}>
+        <AspectRatio
+          ref={frameRef}
+          ratio={ratio}
+          data-chart-frame=""
+          className={styles.frame()}
+          {...keysOverARestingPointer}
+        >
           {drawn}
         </AspectRatio>
         {rest}

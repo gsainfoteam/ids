@@ -172,5 +172,6 @@ const shares = rows.map((row) => ({ ...row, fill: `var(--chart-${row.service})` 
 - Chart 는 차트를 바로 아래 자식으로 둘 때만 안을 봅니다. 차트를 앱의 컴포넌트로 감싸면 기본 Tooltip·Legend·표와 계열 색을 넣지 못하고, 개발 모드에서 경고합니다. 그때는 감싼 컴포넌트 안에 `Chart.Tooltip`, `Chart.Legend` 를 두고 `Chart.Table` 을 Chart 바로 아래에 둡니다. 감싼 컴포넌트는 받은 `width`, `height` 를 차트에 넘겨야 합니다.
 - 알아보는 차트는 `BarChart`, `LineChart`, `AreaChart`, `ComposedChart`, `PieChart`, `RadarChart`, `RadialBarChart`, `ScatterChart`, `FunnelChart` 입니다.
 - 움직임 줄이기를 켠 사용자에게는 Recharts 가 애니메이션을 끕니다(`isAnimationActive` 기본값 `'auto'`).
-- 그래프는 Recharts 의 키보드 탐색을 그대로 씁니다. Tab 으로 들어가 화살표 키로 항목을 옮기면 툴팁이 따라갑니다.
+- 그래프는 Recharts 의 키보드 탐색을 씁니다. Tab 으로 들어가 화살표 키로 항목을 옮기면 툴팁이 따라갑니다.
+- 툴팁은 마지막 입력을 따릅니다. 포인터가 그래프 위에 머물러 있어도 Tab, 화살표 키, Enter 를 누르면 키보드가 고른 항목을 보여 주고, 포인터를 움직이면 다시 포인터 아래 항목을 보여 줍니다.
 - 축 이름처럼 SVG 글자를 재야 하는 기능은 넣지 않았습니다. 필요해지면 Pretext 를 다시 봅니다.
