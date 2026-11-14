@@ -5,7 +5,9 @@ import { expect, test } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
+import { palettes } from '../.storybook/palettes';
 import { IdsProvider } from '../src';
+import { testTheme } from './theme';
 import { OverlayItemContext, useOverlay, useOverlayItem } from '../src/internal/overlay/host';
 import { overlay } from '../src/internal/overlay/store';
 import { usePresence } from '../src/internal/overlay/use-presence';
@@ -48,7 +50,7 @@ function Counter() {
 }
 
 test('open resolves with the value it is closed with, and unbound content leaves at once', async () => {
-  const screen = await render(<IdsProvider>page</IdsProvider>);
+  const screen = await render(<IdsProvider theme={testTheme}>page</IdsProvider>);
   const confirmed = overlay.open<boolean>(({ close }) => (
     <button type="button" onClick={() => close(true)}>
       confirm
@@ -65,7 +67,7 @@ test('open resolves with the value it is closed with, and unbound content leaves
 });
 
 test('a bound layer stays through its exit, and reopening the id during it keeps the element', async () => {
-  const screen = await render(<IdsProvider>page</IdsProvider>);
+  const screen = await render(<IdsProvider theme={testTheme}>page</IdsProvider>);
   const first = overlay.open(() => <BoundBox label="sheet" />, { id: 'sheet' });
   const sheet = screen.getByRole('dialog', { name: 'sheet' });
   await expect.element(sheet).toBeInTheDocument();
@@ -89,7 +91,7 @@ test('a bound layer stays through its exit, and reopening the id during it keeps
 });
 
 test('opening an open id replaces what it renders and settles the earlier promise', async () => {
-  const screen = await render(<IdsProvider>page</IdsProvider>);
+  const screen = await render(<IdsProvider theme={testTheme}>page</IdsProvider>);
   const earlier = overlay.open(() => <Counter />, { id: 'same' });
   await userEvent.click(screen.getByRole('button', { name: 'count 0' }));
   const later = overlay.open(
@@ -110,7 +112,7 @@ test('opening an open id replaces what it renders and settles the earlier promis
 });
 
 test('closeAll closes every open item', async () => {
-  await render(<IdsProvider>page</IdsProvider>);
+  await render(<IdsProvider theme={testTheme}>page</IdsProvider>);
   const results = [overlay.open(() => <p>one</p>), overlay.open(() => <p>two</p>)];
   overlay.closeAll();
   await expect(Promise.all(results)).resolves.toEqual([undefined, undefined]);
@@ -127,12 +129,12 @@ test('only the first outermost provider hosts, and items take the theme they wer
   }
   const screen = await render(
     <>
-      <IdsProvider data-testid="first" color="blue">
-        <IdsProvider color="orange" mode="dark">
+      <IdsProvider theme={testTheme} data-testid="first">
+        <IdsProvider.Scope theme={{ palette: palettes.orange }} mode="dark">
           <Opener />
-        </IdsProvider>
+        </IdsProvider.Scope>
       </IdsProvider>
-      <IdsProvider data-testid="second" color="green" />
+      <IdsProvider theme={{ palette: palettes.green }} data-testid="second" />
     </>,
   );
   void overlay.open(() => <p>global</p>);
@@ -141,17 +143,19 @@ test('only the first outermost provider hosts, and items take the theme they wer
   expect(screen.getByText('global').elements()).toHaveLength(1);
   const first = screen.getByTestId('first').element();
   expect(first.contains(global.element())).toBe(true);
-  expect(global.element().closest('[data-overlay-item]')).toHaveAttribute('data-color', 'blue');
+  const primaryOf = (element: Element | null) =>
+    getComputedStyle(element!).getPropertyValue('--ids-color-primary');
+  expect(primaryOf(global.element().closest('[data-overlay-item]'))).toBe(palettes.blue[600]);
 
   await userEvent.click(screen.getByRole('button', { name: 'open here' }));
   const scoped = screen.getByText('scoped').element().closest('[data-overlay-item]');
-  expect(scoped).toHaveAttribute('data-color', 'orange');
+  expect(primaryOf(scoped)).toBe(palettes.orange[600]);
   expect(scoped).toHaveAttribute('data-mode', 'dark');
   overlay.closeAll();
 });
 
 test('unmounting the last host settles everything still open', async () => {
-  const screen = await render(<IdsProvider>page</IdsProvider>);
+  const screen = await render(<IdsProvider theme={testTheme}>page</IdsProvider>);
   const pending = overlay.open(() => <BoundBox label="left open" />);
   await expect.element(screen.getByRole('dialog', { name: 'left open' })).toBeInTheDocument();
   await screen.unmount();
@@ -160,13 +164,13 @@ test('unmounting the last host settles everything still open', async () => {
 
 test('the host adds nothing to server HTML, and only a silent toaster beside an asChild root', async () => {
   const server = new DOMParser().parseFromString(
-    renderToString(<IdsProvider>page</IdsProvider>),
+    renderToString(<IdsProvider theme={testTheme}>page</IdsProvider>),
     'text/html',
   );
   expect(server.body.children).toHaveLength(1);
   expect(server.body.firstElementChild!.innerHTML).toBe('page');
   const screen = await render(
-    <IdsProvider asChild>
+    <IdsProvider theme={testTheme} asChild>
       <main>page</main>
     </IdsProvider>,
   );

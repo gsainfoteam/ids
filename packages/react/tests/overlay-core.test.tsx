@@ -6,6 +6,7 @@ import { render } from 'vitest-browser-react';
 
 import { IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
+import { palettes } from '../.storybook/palettes';
 import {
   focusReturnTarget,
   keepAboveLayers,
@@ -96,7 +97,7 @@ test('a top layer box escapes a scaled ancestor and still takes its theme from t
     );
   }
   const screen = await render(
-    <IdsProvider color="orange">
+    <IdsProvider theme={{ palette: palettes.orange }}>
       <div style={{ transform: 'scale(0.5)', transformOrigin: '0 0' }}>
         <div data-testid="fixed" style={{ position: 'fixed', left: 10, top: 80, width: 100 }} />
         <Lifted />

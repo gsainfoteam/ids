@@ -243,7 +243,7 @@ export const Gallery: Story = {
       <Showcase.Section title="Dark mode" description="막대 색은 scrollbar-* 토큰을 따릅니다.">
         <Showcase.Row>
           {(['light', 'dark'] as const).map((mode) => (
-            <IdsProvider
+            <IdsProvider.Scope
               key={mode}
               mode={mode}
               className="rounded-standard bg-(--ids-color-surface) p-4 text-(--ids-color-on-surface)"
@@ -251,7 +251,7 @@ export const Gallery: Story = {
               <ScrollArea variant="always" className={frame}>
                 <Text />
               </ScrollArea>
-            </IdsProvider>
+            </IdsProvider.Scope>
           ))}
         </Showcase.Row>
       </Showcase.Section>

@@ -12,7 +12,7 @@ Storybook `Blocks/Settings/*`. 설정 화면 세 가지입니다.
 - **알아둘 것.**
   - 스위치 행은 `Item` 입니다. `Switch` 에 `Item.Title` 과 `Item.Description` 의 id 를 `aria-labelledby`, `aria-describedby` 로 이어 이름과 설명을 줍니다.
   - 계정 삭제는 `role="alertdialog"` 인 `Dialog` 입니다. 확인 문구를 똑같이 적어야 지우기 버튼이 켜집니다.
-  - Tabs 는 페이지를 `IdsProvider color mode` 로 감싸 고른 값을 바로 보여 줍니다. 모드가 바깥과 다르면 IdsProvider 가 면을 칠합니다.
-  - 테마 색 견본은 색마다 `IdsProvider color` 로 감싼 `Badge dot` 입니다. 견본을 따로 그리지 않습니다.
+  - Tabs 는 페이지를 `IdsProvider.Scope theme={{ palette }} mode` 로 감싸 고른 값을 바로 보여 줍니다. 모드가 바깥과 다르면 IdsProvider 가 면을 칠합니다.
+  - 테마 색 견본은 팔레트마다 `IdsProvider.Scope` 로 감싼 `Badge dot` 입니다. 견본을 따로 그리지 않습니다.
   - 가로 `Field` 는 라벨 열의 폭이 줄마다 달라, 여러 줄을 맞춰야 하는 곳은 세로 Field 를 두 열로 놓습니다.
   - Sidebar 의 분류는 `Item asChild` 링크이고, 고른 분류에 `selected` 와 `aria-current="page"` 를 줍니다.

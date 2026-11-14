@@ -1,4 +1,19 @@
-export { IdsProvider, ThemeContext, useTheme } from './components/utility/ids-provider';
+export {
+  IdsProvider,
+  ThemeContext,
+  checkIdsTheme,
+  defineIdsTheme,
+  useTheme,
+} from './components/utility/ids-provider';
+export type {
+  IdsCornerShape,
+  IdsPalette,
+  IdsPaletteStep,
+  IdsTheme,
+  IdsThemeFont,
+  IdsThemeIssue,
+  IdsThemeOverrides,
+} from './components/utility/ids-provider';
 
 export {
   useInteractive,
@@ -138,7 +153,7 @@ export type { StepperOrientation, StepperStatus } from './components/navigation/
 export { Sidebar } from './components/navigation/sidebar';
 export type { SidebarCollapsibleMode, SidebarVariant } from './components/navigation/sidebar';
 
-export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
+export type { IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
 export type { IdsTranslate } from './internal/translate';
 

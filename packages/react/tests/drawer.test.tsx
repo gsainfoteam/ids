@@ -7,6 +7,7 @@ import { render } from 'vitest-browser-react';
 
 import { Button, FloatingButton, IdsProvider, Select, overlay } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 import { Drawer } from '../src/components/overlay/drawer';
 import {
   DRAG_THRESHOLD,
@@ -232,7 +233,7 @@ test('SSR renders only the trigger', () => {
 test('opening focuses the first field on the right edge, Tab stays inside, Escape closes and returns focus', async () => {
   const onOpenChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Sheet onOpenChange={onOpenChange} />
     </IdsProvider>,
   );
@@ -265,7 +266,7 @@ test('opening focuses the first field on the right edge, Tab stays inside, Escap
 test('each side sits on its own edge with the flat corners there', async () => {
   for (const side of ['top', 'bottom', 'left'] as const) {
     const screen = await render(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <Sheet side={side} defaultOpen />
       </IdsProvider>,
     );
@@ -294,7 +295,7 @@ test('each side sits on its own edge with the flat corners there', async () => {
 test('a backdrop click closes and the drawer does not', async () => {
   const onOpenChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Sheet defaultOpen onOpenChange={onOpenChange} />
     </IdsProvider>,
   );
@@ -310,7 +311,7 @@ test('a backdrop click closes and the drawer does not', async () => {
 test('a drawer that cannot be dismissed ignores Escape, the backdrop and a flick', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Sheet side="bottom" defaultOpen dismissible={false} role="alertdialog">
         <TallBody />
       </Sheet>
@@ -330,7 +331,7 @@ test('a drawer that cannot be dismissed ignores Escape, the backdrop and a flick
 test('the exit keeps the drawer until its animation ends, then reports completion', async () => {
   const onOpenChangeComplete = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Drawer defaultOpen onOpenChangeComplete={onOpenChangeComplete}>
         <Drawer.Content aria-label="Slow" style={{ transition: 'translate 60s' }} />
       </Drawer>
@@ -352,7 +353,7 @@ describe('dragging with a mouse', () => {
   const renderBottom = async (extra?: ReactNode) => {
     const onOpenChange = vi.fn();
     const screen = await render(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <Sheet side="bottom" defaultOpen onOpenChange={onOpenChange}>
           <TallBody />
           {extra}
@@ -519,13 +520,13 @@ test('with motion on, a release springs back and the page animates out before it
     });
   });
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Sheet side="bottom" defaultOpen>
         <TallBody />
       </Sheet>
     </IdsProvider>,
   );
-  const root = screen.container.querySelector<HTMLElement>('[data-color]')!;
+  const root = screen.container.querySelector<HTMLElement>('[data-mode]')!;
   const finish = (element: Element) => {
     for (const animation of element.getAnimations()) animation.finish();
   };
@@ -555,7 +556,7 @@ describe('dragging with touch', () => {
     skipWithoutCdp(context);
     const onOpenChange = vi.fn();
     const screen = await render(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <Sheet side="bottom" defaultOpen onOpenChange={onOpenChange}>
           <TallBody />
         </Sheet>
@@ -578,7 +579,7 @@ describe('dragging with touch', () => {
   test('a cancelled touch puts the drawer back', async (context) => {
     skipWithoutCdp(context);
     const screen = await render(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <Sheet side="bottom" defaultOpen>
           <TallBody />
         </Sheet>
@@ -597,7 +598,7 @@ describe('dragging with touch', () => {
   test('a right drawer follows a horizontal swipe and closes on a flick', async (context) => {
     skipWithoutCdp(context);
     const screen = await render(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <Sheet defaultOpen />
       </IdsProvider>,
     );
@@ -620,7 +621,7 @@ describe('snap points', () => {
     skipWithoutCdp(context);
     const onActiveSnapPointChange = vi.fn();
     await render(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <Sheet
           side="bottom"
           defaultOpen
@@ -655,7 +656,7 @@ describe('snap points', () => {
   test('the handle cycles through the points with the keyboard and the backdrop fades in last', async () => {
     const onActiveSnapPointChange = vi.fn();
     const screen = await render(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <Sheet
           side="bottom"
           defaultOpen
@@ -679,7 +680,7 @@ describe('snap points', () => {
 
   test('without snap points the handle is a picture, not a button', async () => {
     const screen = await render(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <Sheet side="bottom" defaultOpen />
       </IdsProvider>,
     );
@@ -692,12 +693,12 @@ describe('snap points', () => {
 
 describe('background scale', () => {
   const rootOf = (screen: { container: HTMLElement }) =>
-    screen.container.querySelector<HTMLElement>('[data-color]')!;
+    screen.container.querySelector<HTMLElement>('[data-mode]')!;
 
   test('a modal drawer scales the outermost provider root and restores it after closing', async () => {
     const screen = await render(
-      <IdsProvider>
-        <IdsProvider mode="dark">
+      <IdsProvider theme={testTheme}>
+        <IdsProvider theme={testTheme} mode="dark">
           <Sheet side="bottom" />
         </IdsProvider>
       </IdsProvider>,
@@ -713,7 +714,7 @@ describe('background scale', () => {
     expect(root.style.overflow).toBe('clip');
     expect(document.body.style.background).toContain('black');
     expect(
-      screen.container.querySelectorAll('[data-color]')[1]!.getAttribute('style'),
+      screen.container.querySelectorAll('[data-mode]')[1]!.getAttribute('style'),
     ).not.toContain('transform');
     expect(sheetOf().getBoundingClientRect().bottom).toBeCloseTo(window.innerHeight, 0);
     expect(sheetOf().getBoundingClientRect().width).toBeCloseTo(window.innerWidth, 0);
@@ -729,7 +730,7 @@ describe('background scale', () => {
   test('scaleBackground={false} and a non-modal drawer leave the page alone', async () => {
     for (const props of [{ scaleBackground: false }, { modal: false }]) {
       const screen = await render(
-        <IdsProvider>
+        <IdsProvider theme={testTheme}>
           <Sheet defaultOpen {...props} />
         </IdsProvider>,
       );
@@ -742,7 +743,7 @@ describe('background scale', () => {
 
   test('fixed elements of the page stay where they were on screen and scale with it', async () => {
     const screen = await render(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <div className="h-[3000px]" />
         <FloatingButton aria-label="Compose">+</FloatingButton>
         <Sheet side="bottom" />
@@ -771,7 +772,7 @@ describe('background scale', () => {
 
 test('a drawer opened from a drawer pushes the parent back, and only the parent scales the page', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Drawer side="bottom" defaultOpen>
         <Drawer.Content>
           <Drawer.Title>Outer</Drawer.Title>
@@ -785,7 +786,7 @@ test('a drawer opened from a drawer pushes the parent back, and only the parent 
       </Drawer>
     </IdsProvider>,
   );
-  const root = screen.container.querySelector<HTMLElement>('[data-color]')!;
+  const root = screen.container.querySelector<HTMLElement>('[data-mode]')!;
   const outer = screen.getByRole('dialog', { name: 'Outer' }).element() as HTMLElement;
   await expect.poll(() => root.style.transform).toContain('scale(');
   const scaled = root.style.transform;
@@ -808,7 +809,7 @@ test('a drawer opened from a drawer pushes the parent back, and only the parent 
 
 test('Escape closes a Select sheet inside first, then the drawer', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Sheet side="bottom" defaultOpen>
         <Select aria-label="Sort" mobileVariant="drawer">
           <Select.Item value="new">Newest</Select.Item>
@@ -839,7 +840,7 @@ test('a non-modal drawer leaves the page usable and stays open on a press outsid
   await page.viewport(800, 896);
   const pressed = vi.fn();
   const screen = await render(
-    <IdsProvider className="flex justify-end">
+    <IdsProvider theme={testTheme} className="flex justify-end">
       <Button onClick={pressed}>Page action</Button>
       <Sheet side="left" modal={false} defaultOpen />
     </IdsProvider>,
@@ -857,7 +858,7 @@ test('a non-modal drawer leaves the page usable and stays open on a press outsid
 });
 
 test('overlay.open resolves with the value the drawer is closed with', async () => {
-  const screen = await render(<IdsProvider>page</IdsProvider>);
+  const screen = await render(<IdsProvider theme={testTheme}>page</IdsProvider>);
   const pick = overlay.open<string>(({ close }) => (
     <Drawer side="bottom">
       <Drawer.Content>

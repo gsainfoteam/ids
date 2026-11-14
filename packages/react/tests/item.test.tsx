@@ -6,6 +6,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Item } from '../src';
+import { testTheme } from './theme';
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html');
@@ -326,7 +327,11 @@ function insets(media: Element) {
 
 const tileCases = (['standard', 'tiny'] as const).flatMap((size) =>
   (['title', 'one line', 'caption line', 'two lines', 'tall action'] as const).map(
-    (text, index) => ({ size, text, media: index % 2 === 0 ? ('soft' as const) : ('outline' as const) }),
+    (text, index) => ({
+      size,
+      text,
+      media: index % 2 === 0 ? ('soft' as const) : ('outline' as const),
+    }),
   ),
 );
 
@@ -344,7 +349,7 @@ function oneLineRow(row: Element) {
 
 test('a tile and the space around it scale with the row up to one line of description', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="flex w-72 flex-col gap-2">
         {tileCases.map(({ size, text, media }, index) => (
           <Item key={index} variant="outline" size={size}>
@@ -405,7 +410,7 @@ test('a tile and the space around it scale with the row up to one line of descri
 
 test('a tile keeps its size in the top corner once its text wraps', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Item variant="outline" className="w-96">
         <Item.Media variant="soft">
           <svg />
@@ -434,7 +439,7 @@ test('a tile keeps its size in the top corner once its text wraps', async () => 
 
 test('a bare icon keeps its size and is centred on the row', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Item variant="outline" className="w-72">
         <Item.Media>
           <svg />
@@ -470,7 +475,7 @@ test('parts outside Item throw', () => {
 
 test('Item.Actions mutes a bare icon and keeps the color an icon sets', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Item>
         <Item.Content>
           <Item.Title>Build</Item.Title>

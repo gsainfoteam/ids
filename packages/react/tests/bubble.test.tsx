@@ -5,6 +5,7 @@ import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
 
 import { Bubble, Chip, IdsProvider } from '../src';
+import { testTheme } from './theme';
 
 const LONG =
   '내일 오전 수업이 끝나면 학생회관 앞에서 만나서 같이 점심 먹고 도서관으로 가자. 자리는 내가 먼저 잡아 둘게.';
@@ -104,7 +105,7 @@ test('SSR: reactions as the last child overlap; anywhere else they stay in the f
 
 test('align shapes only the tail corner and follows the writing direction', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Bubble>start</Bubble>
       <Bubble align="end">end</Bubble>
       <div dir="rtl">
@@ -126,7 +127,7 @@ test('align shapes only the tail corner and follows the writing direction', asyn
 
 test('align does not move the bubble', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="w-80">
         <Bubble>start</Bubble>
         <Bubble align="end">end</Bubble>
@@ -139,7 +140,7 @@ test('align does not move the bubble', async () => {
 
 test('variants: soft is the muted fill, solid the brand fill, outline the neutral edge', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Bubble variant="soft">soft</Bubble>
       <Bubble variant="solid">solid</Bubble>
       <Bubble variant="outline">outline</Bubble>
@@ -165,7 +166,7 @@ test('variants: soft is the muted fill, solid the brand fill, outline the neutra
 
 test('one line keeps its own width; wrapped lines shrink the box to the longest line', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div data-testid="column" className="flex w-80 flex-col items-start break-keep">
         <Bubble>Hi</Bubble>
         <Bubble>{LONG}</Bubble>
@@ -190,7 +191,7 @@ test('one line keeps its own width; wrapped lines shrink the box to the longest 
 
 test('shrinking keeps every line where it broke', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="flex w-80 flex-col items-start break-keep">
         <Bubble>{LONG}</Bubble>
       </div>
@@ -205,7 +206,7 @@ test('shrinking keeps every line where it broke', async () => {
 
 test('two lines wrap evenly and the box ends at the longer one', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="flex w-80 flex-col items-start">
         <Bubble>{TWO_LINES}</Bubble>
       </div>
@@ -228,7 +229,7 @@ test('two lines wrap evenly and the box ends at the longer one', async () => {
 
 test('past the lines a browser balances, the box still ends at the longest line', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="flex w-80 flex-col items-start">
         <Bubble>{MANY_LINES}</Bubble>
       </div>
@@ -242,7 +243,7 @@ test('past the lines a browser balances, the box still ends at the longest line'
 
 test('Korean kept by word with emoji wraps evenly and fits', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="flex w-80 flex-col items-start break-keep">
         <Bubble>{EMOJI_KOREAN}</Bubble>
       </div>
@@ -259,7 +260,7 @@ test('Korean kept by word with emoji wraps evenly and fits', async () => {
 
 test('many bubbles mounted together are all fitted, and a column resize refits each', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div data-testid="column" className="flex w-80 flex-col items-start gap-2">
         {Array.from({ length: 30 }, (_, index) => (
           <Bubble key={index}>{TWO_LINES}</Bubble>
@@ -280,7 +281,7 @@ test('many bubbles mounted together are all fitted, and a column resize refits e
 
 test('the fit follows new content and a new column width', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div data-testid="column" className="flex w-80 flex-col items-start break-keep">
         <Bubble>Hi</Bubble>
       </div>
@@ -301,7 +302,7 @@ test('the fit follows new content and a new column width', async () => {
 
 test('--bubble-max-width set on an ancestor caps the box', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="flex w-80 flex-col items-start break-keep [--bubble-max-width:50%]">
         <Bubble>{LONG}</Bubble>
       </div>
@@ -313,7 +314,7 @@ test('--bubble-max-width set on an ancestor caps the box', async () => {
 
 test('overlapping reactions sit on the bottom corner away from the tail and leave room below', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="flex w-80 flex-col items-start break-keep">
         <Bubble>
           Lunch menu?
@@ -354,7 +355,7 @@ test('many overlapping reactions on a short bubble stay on one line and grow tow
     </Chip>
   ));
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="flex w-80 flex-col items-start">
         <Bubble>
           Ok
@@ -392,7 +393,7 @@ test('many overlapping reactions on a short bubble stay on one line and grow tow
 
 test('overlapping reactions do not widen the fitted box', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="flex w-80 flex-col items-start break-keep">
         <Bubble>
           Hi
@@ -410,7 +411,7 @@ test('overlapping reactions do not widen the fitted box', async () => {
 
 test('reactions are a group named by the catalog, and the name can be replaced', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Bubble>
         Hi
         <Bubble.Reactions>👍</Bubble.Reactions>
@@ -428,7 +429,7 @@ test('reactions are a group named by the catalog, and the name can be replaced',
 test('asChild renders the child element, keeps the ref and still places trailing reactions', async () => {
   const ref = createRef<HTMLDivElement>();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <ol>
         <Bubble asChild ref={ref}>
           <li>

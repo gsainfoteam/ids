@@ -13,24 +13,32 @@ import {
 
 import { noop } from 'es-toolkit';
 
-import type { IdsColor, IdsMode } from '../../../tokens/types';
+import { resolveThemeVariables, type ThemeVariables } from './theme-variables';
+
+import type { IdsThemeOverrides } from './theme';
+import type { IdsThemeIssue } from './theme-roles';
+import type { IdsMode } from '../../../tokens/types';
 
 export type ThemeMode = IdsMode | 'system';
 
 export type ThemeContextValue = {
-  color: IdsColor;
+  theme: IdsThemeOverrides;
+  variables: ThemeVariables;
   mode: ThemeMode;
   resolvedMode: IdsMode;
-  setColor: (color: IdsColor) => void;
   setMode: (mode: ThemeMode) => void;
   toggleMode: () => void;
 };
 
+const NO_VARIABLES: ThemeVariables = {};
+
+const NO_ISSUES: IdsThemeIssue[] = [];
+
 const DEFAULT_THEME: ThemeContextValue = {
-  color: 'blue',
+  theme: {},
+  variables: NO_VARIABLES,
   mode: 'light',
   resolvedMode: 'light',
-  setColor: noop,
   setMode: noop,
   toggleMode: noop,
 };
@@ -93,34 +101,33 @@ function useAxis<T>({
 }
 
 export type UseIdsProviderOptions = {
-  color?: IdsColor;
-  defaultColor?: IdsColor;
-  onColorChange?: (color: IdsColor) => void;
+  theme?: IdsThemeOverrides;
   mode?: ThemeMode;
   defaultMode?: ThemeMode;
   onModeChange?: (mode: ThemeMode) => void;
 };
 
-export function useIdsProvider({
-  color,
-  defaultColor,
-  onColorChange,
-  mode,
-  defaultMode,
-  onModeChange,
-}: UseIdsProviderOptions) {
+export function useIdsProvider({ theme, mode, defaultMode, onModeChange }: UseIdsProviderOptions) {
   const parent = use(ThemeContext);
   const root = parent === DEFAULT_THEME;
   const ownsMode = root || mode !== undefined || defaultMode !== undefined;
 
-  const [currentColor, setColor] = useAxis({
-    owned: root || color !== undefined || defaultColor !== undefined,
-    value: color,
-    defaultValue: defaultColor ?? parent.color,
-    onChange: onColorChange,
-    inherited: parent.color,
-    setInherited: parent.setColor,
-  });
+  const own = useMemo(
+    () =>
+      theme === undefined
+        ? { variables: NO_VARIABLES, issues: NO_ISSUES }
+        : resolveThemeVariables(theme),
+    [theme],
+  );
+  const mergedTheme = useMemo(
+    () => (theme === undefined ? parent.theme : { ...parent.theme, ...theme }),
+    [parent.theme, theme],
+  );
+  const mergedVariables = useMemo(
+    () =>
+      own.variables === NO_VARIABLES ? parent.variables : { ...parent.variables, ...own.variables },
+    [parent.variables, own.variables],
+  );
   const [currentMode, setMode] = useAxis({
     owned: ownsMode,
     value: mode,
@@ -150,18 +157,20 @@ export function useIdsProvider({
 
   const context = useMemo<ThemeContextValue>(
     () => ({
-      color: currentColor,
+      theme: mergedTheme,
+      variables: mergedVariables,
       mode: currentMode,
       resolvedMode,
-      setColor,
       setMode,
       toggleMode,
     }),
-    [currentColor, currentMode, resolvedMode, setColor, setMode, toggleMode],
+    [mergedTheme, mergedVariables, currentMode, resolvedMode, setMode, toggleMode],
   );
 
   return {
     context,
+    ownVariables: own.variables,
+    issues: own.issues,
     outermost: root,
     paintsSurface: !root && resolvedMode !== parent.resolvedMode,
   };

@@ -2,58 +2,60 @@ import { useState } from 'react';
 
 import { expect, within } from 'storybook/test';
 
-import { Showcase } from '~story-kit';
+import { Showcase, paletteHues, palettes } from '~story-kit';
 
 import { cn } from '../../../utils';
 import { Button } from '../../action/button';
+import { Badge } from '../../data/badge';
+import { Card } from '../../data/card';
+import { Checkbox } from '../../form/checkbox';
+import { TextField } from '../../form/text-field';
 
-import { IdsProvider, useTheme } from '.';
+import { IdsProvider, defineIdsTheme, useTheme } from '.';
 
-import type { IdsColor } from '../../../tokens/types';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const colors = [
-  'red',
-  'orange',
-  'amber',
-  'yellow',
-  'lime',
-  'green',
-  'emerald',
-  'teal',
-  'cyan',
-  'sky',
-  'blue',
-  'indigo',
-  'violet',
-  'purple',
-  'fuchsia',
-  'pink',
-  'rose',
-] as const satisfies readonly IdsColor[];
 const modes = ['light', 'dark'] as const;
+
+const demoThemes = {
+  blue: defineIdsTheme({ palette: palettes.blue }),
+  'orange, squircle': defineIdsTheme({
+    palette: palettes.orange,
+    radius: 14,
+    cornerShape: 'squircle',
+  }),
+  'emerald, sharp': defineIdsTheme({ palette: palettes.emerald, radius: 4 }),
+  'violet, serif': defineIdsTheme({
+    palette: palettes.violet,
+    font: { sans: 'ui-serif, Georgia, serif' },
+  }),
+};
 
 const meta = {
   title: 'Utility/IdsProvider',
   component: IdsProvider,
   tags: ['autodocs'],
   argTypes: {
-    color: { control: 'select', options: colors },
+    theme: {
+      control: 'select',
+      options: Object.keys(demoThemes),
+      mapping: demoThemes,
+    },
     mode: { control: 'radio', options: [...modes, 'system'] },
     asChild: { control: false },
   },
-  args: { color: 'orange', mode: 'dark' },
+  args: { theme: demoThemes['orange, squircle'], mode: 'dark' },
 } satisfies Meta<typeof IdsProvider>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 function Readout() {
-  const { color, mode, resolvedMode } = useTheme();
+  const { theme, mode, resolvedMode } = useTheme();
   return (
     <dl className="text-caption-c1-regular grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 font-mono text-(--ids-color-on-muted)">
-      <dt>color</dt>
-      <dd data-testid="color">{color}</dd>
+      <dt>palette 600</dt>
+      <dd data-testid="palette">{theme.palette?.[600]}</dd>
       <dt>mode</dt>
       <dd data-testid="mode">{mode}</dd>
       <dt>resolvedMode</dt>
@@ -72,7 +74,10 @@ export const Playground: Story = {
           <Button>저장</Button>
           <Button variant="soft">임시 저장</Button>
           <Button variant="outline">취소</Button>
+          <Badge variant="outline">초안</Badge>
         </div>
+        <TextField aria-label="제목" placeholder="제목" />
+        <Checkbox defaultChecked aria-label="알림 받기" />
         <Readout />
       </div>
     </IdsProvider>
@@ -83,50 +88,73 @@ export const Gallery: Story = {
   render: () => (
     <Showcase>
       <Showcase.Section
-        title="Color × Mode"
-        description="같은 컴포넌트가 data-color와 data-mode만 바꿔 다시 칠해집니다. 밝은 색은 채움 위 글자가 검은색입니다."
+        title="Palette × Mode"
+        description="앱이 준 팔레트 하나에서 IdsProvider 가 라이트와 다크의 역할 색을 대비로 고릅니다. 여기는 레포 데모 팔레트 17개입니다. 밝은 팔레트는 채움 위 글자가 검은색입니다."
       >
         <Showcase.Matrix
-          rows={colors}
+          rows={paletteHues}
           columns={modes}
-          render={(color, mode) => (
-            <IdsProvider color={color} mode={mode} className={region}>
+          render={(hue, mode) => (
+            <IdsProvider.Scope theme={{ palette: palettes[hue] }} mode={mode} className={region}>
               <div className="flex flex-wrap items-center gap-2">
                 <Button>저장</Button>
                 <Button variant="soft">임시 저장</Button>
                 <Button variant="outline">취소</Button>
+                <Badge variant="outline">초안</Badge>
               </div>
-            </IdsProvider>
+            </IdsProvider.Scope>
           )}
         />
       </Showcase.Section>
       <Showcase.Section
-        title="중첩"
-        description="안쪽 Provider는 지정하지 않은 축을 바깥에서 물려받습니다. 모드가 바뀌는 영역은 스스로 배경을 칠합니다."
+        title="Radius"
+        description="standard 하나를 받고 indicator 는 0.4배, container 는 1.6배로 계산합니다. concentric 공식은 그대로입니다."
       >
-        <Showcase.Row label="mode만">
-          <IdsProvider mode="dark" className={region}>
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <Button>저장</Button>
-                <Button variant="soft">임시 저장</Button>
-                <Button variant="outline">취소</Button>
-              </div>
-              <Readout />
-            </div>
-          </IdsProvider>
-        </Showcase.Row>
-        <Showcase.Row label="color만">
-          <IdsProvider color="green" className={region}>
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <Button>저장</Button>
-                <Button variant="soft">임시 저장</Button>
-                <Button variant="outline">취소</Button>
-              </div>
-              <Readout />
-            </div>
-          </IdsProvider>
+        {[0, 6, 10, 14, 18].map((radius) => (
+          <Showcase.Row key={radius} label={`${radius}px`}>
+            <IdsProvider.Scope theme={{ radius }} className="flex flex-wrap items-center gap-2">
+              <Button>저장</Button>
+              <TextField aria-label={`제목 ${radius}`} placeholder="제목" className="w-40" />
+              <Checkbox defaultChecked aria-label={`선택 ${radius}`} />
+              <Card size="tiny" className="w-40">
+                <Card.Title>카드</Card.Title>
+              </Card>
+            </IdsProvider.Scope>
+          </Showcase.Row>
+        ))}
+      </Showcase.Section>
+      <Showcase.Section
+        title="Corner shape"
+        description="squircle 은 CSS corner-shape 로 그립니다. rounded-full 은 원으로 남고, corner-shape 를 모르는 브라우저는 round 로 그립니다."
+      >
+        {(['round', 'squircle'] as const).map((cornerShape) => (
+          <Showcase.Row key={cornerShape} label={cornerShape}>
+            <IdsProvider.Scope
+              theme={{ radius: 14, cornerShape }}
+              className="flex flex-wrap items-center gap-2"
+            >
+              <Button>저장</Button>
+              <Button variant="soft">임시 저장</Button>
+              <Badge>새 글</Badge>
+              <Card size="tiny" className="w-40">
+                <Card.Title>카드</Card.Title>
+              </Card>
+            </IdsProvider.Scope>
+          </Showcase.Row>
+        ))}
+      </Showcase.Section>
+      <Showcase.Section
+        title="Font"
+        description="font.sans 와 font.mono 는 CSS font-family 값입니다. 글꼴 파일은 앱이 불러옵니다."
+      >
+        <Showcase.Row label="sans: serif">
+          <IdsProvider.Scope
+            theme={{ font: { sans: 'ui-serif, Georgia, serif' } }}
+            className="flex flex-wrap items-center gap-2"
+          >
+            <Button>저장</Button>
+            <span className="text-body-b2-regular">다람쥐 헌 쳇바퀴에 타고파</span>
+          </IdsProvider.Scope>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -148,7 +176,7 @@ function ModeSwitcher() {
           {option}
         </Button>
       ))}
-      <Button size="tiny" variant="ghost" onClick={toggleMode}>
+      <Button size="tiny" variant="soft" onClick={toggleMode}>
         반전
       </Button>
     </div>
@@ -162,7 +190,7 @@ export const Controlled: Story = {
     return (
       <div className="flex flex-col gap-3">
         <IdsProvider
-          defaultColor="blue"
+          theme={defineIdsTheme({ palette: palettes.blue })}
           mode={mode}
           onModeChange={setMode}
           className={region}
@@ -175,9 +203,7 @@ export const Controlled: Story = {
               <Button variant="outline">취소</Button>
             </div>
             <Readout />
-            <div className="flex flex-wrap items-center gap-2">
-              <ModeSwitcher />
-            </div>
+            <ModeSwitcher />
           </div>
         </IdsProvider>
         <output aria-label="부모 상태" className="text-caption-c1-regular font-mono">
@@ -207,7 +233,12 @@ export const Controlled: Story = {
 
 export const SystemMode: Story = {
   render: () => (
-    <IdsProvider defaultColor="blue" defaultMode="system" className={region} data-testid="provider">
+    <IdsProvider
+      theme={defineIdsTheme({ palette: palettes.blue })}
+      defaultMode="system"
+      className={region}
+      data-testid="provider"
+    >
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <Button>저장</Button>
@@ -215,9 +246,7 @@ export const SystemMode: Story = {
           <Button variant="outline">취소</Button>
         </div>
         <Readout />
-        <div className="flex flex-wrap items-center gap-2">
-          <ModeSwitcher />
-        </div>
+        <ModeSwitcher />
       </div>
     </IdsProvider>
   ),
@@ -225,7 +254,7 @@ export const SystemMode: Story = {
     docs: {
       description: {
         story:
-          'mode="system"은 운영체제의 prefers-color-scheme을 따르고, 설정이 바뀌면 새로고침 없이 바로 바뀝니다. resolvedMode가 실제로 칠해진 모드입니다.',
+          'mode="system"은 운영체제의 prefers-color-scheme을 따르고, 설정이 바뀌면 새로고침 없이 바로 바뀝니다. resolvedMode가 실제로 칠해진 모드입니다. 두 모드의 역할 색이 처음부터 HTML 에 있어서 깜빡이지 않습니다.',
       },
     },
   },
@@ -238,34 +267,17 @@ export const SystemMode: Story = {
   },
 };
 
-function SetColor() {
-  const { setColor } = useTheme();
-  return (
-    <Button size="tiny" variant="outline" onClick={() => setColor('green')}>
-      바깥 color를 green으로
-    </Button>
-  );
-}
-
-export const Nested: Story = {
+export const Scope: Story = {
   render: () => (
-    <IdsProvider defaultColor="blue" defaultMode="light" className={region} data-testid="outer">
+    <IdsProvider
+      theme={defineIdsTheme({ palette: palettes.blue })}
+      defaultMode="light"
+      className={region}
+      data-testid="outer"
+    >
       <div className="flex flex-col gap-4">
         <Readout />
-        <IdsProvider mode="dark" className={region} data-testid="dark">
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Button>저장</Button>
-              <Button variant="soft">임시 저장</Button>
-              <Button variant="outline">취소</Button>
-            </div>
-            <Readout />
-            <div className="flex flex-wrap items-center gap-2">
-              <SetColor />
-            </div>
-          </div>
-        </IdsProvider>
-        <IdsProvider color="orange" className={region} data-testid="orange">
+        <IdsProvider.Scope mode="dark" className={region} data-testid="dark">
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <Button>저장</Button>
@@ -274,7 +286,22 @@ export const Nested: Story = {
             </div>
             <Readout />
           </div>
-        </IdsProvider>
+        </IdsProvider.Scope>
+        <IdsProvider.Scope
+          theme={{ palette: palettes.orange, radius: 16 }}
+          className={region}
+          data-testid="orange"
+        >
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button>저장</Button>
+              <Button variant="soft">임시 저장</Button>
+              <Button variant="outline">취소</Button>
+            </div>
+            <Readout />
+            <ModeSwitcher />
+          </div>
+        </IdsProvider.Scope>
       </div>
     </IdsProvider>
   ),
@@ -282,7 +309,7 @@ export const Nested: Story = {
     docs: {
       description: {
         story:
-          '안쪽 Provider는 지정한 축만 바꾸고 나머지는 물려받습니다. 물려받은 축의 setter는 그 축을 가진 바깥 Provider를 바꿉니다.',
+          'IdsProvider.Scope 는 하위 트리의 테마 일부나 mode 만 바꾸고 나머지는 물려받습니다. 물려받은 mode 의 setter 는 그 mode 를 가진 바깥 Provider 를 바꿉니다. 모드가 바뀌는 영역은 스스로 배경을 칠합니다.',
       },
     },
   },
@@ -290,22 +317,21 @@ export const Nested: Story = {
     const outer = canvas.getByTestId('outer');
     const dark = canvas.getByTestId('dark');
     const orange = canvas.getByTestId('orange');
-    await expect(dark).toHaveAttribute('data-color', 'blue');
+    await expect(within(dark).getByTestId('palette')).toHaveTextContent(palettes.blue[600]);
     await expect(dark).toHaveAttribute('data-mode', 'dark');
-    await expect(orange).toHaveAttribute('data-color', 'orange');
+    await expect(within(orange).getByTestId('palette')).toHaveTextContent(palettes.orange[600]);
     await expect(orange).toHaveAttribute('data-mode', 'light');
     await expect(dark.className).toContain('bg-(--ids-color-surface)');
     await expect(orange.className).not.toContain('bg-(--ids-color-surface)');
-    await userEvent.click(within(dark).getByRole('button', { name: /바깥 color/ }));
-    await expect(outer).toHaveAttribute('data-color', 'green');
-    await expect(dark).toHaveAttribute('data-color', 'green');
-    await expect(orange).toHaveAttribute('data-color', 'orange');
+    await userEvent.click(within(orange).getByRole('button', { name: 'dark' }));
+    await expect(outer).toHaveAttribute('data-mode', 'dark');
+    await expect(orange).toHaveAttribute('data-mode', 'dark');
   },
 };
 
 export const AsChild: Story = {
   render: () => (
-    <IdsProvider asChild color="green" mode="dark">
+    <IdsProvider.Scope asChild theme={{ palette: palettes.green }} mode="dark">
       <section aria-label="녹색 영역" className={region}>
         <div className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2">
@@ -316,19 +342,21 @@ export const AsChild: Story = {
           <Readout />
         </div>
       </section>
-    </IdsProvider>
+    </IdsProvider.Scope>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'asChild면 감싸는 div 없이 자식 요소에 data-color와 data-mode를 바로 붙입니다.',
+        story: 'asChild면 감싸는 div 없이 자식 요소에 data-mode 와 테마 변수를 바로 붙입니다.',
       },
     },
   },
   play: async ({ canvas }) => {
     const section = canvas.getByRole('region', { name: '녹색 영역' });
-    await expect(section).toHaveAttribute('data-color', 'green');
     await expect(section).toHaveAttribute('data-mode', 'dark');
-    await expect(section.parentElement).not.toHaveAttribute('data-color', 'green');
+    await expect(section.style.getPropertyValue('--ids-theme-dark-primary')).toBe(
+      palettes.green[600],
+    );
+    await expect(section.parentElement).not.toBe(null);
   },
 };

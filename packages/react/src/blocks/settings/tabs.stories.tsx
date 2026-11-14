@@ -3,6 +3,8 @@ import { useState, type FormEvent } from 'react';
 import { ComputerDesktopIcon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';
 import { Time } from '@internationalized/date';
 
+import { palettes, type PaletteHue } from '~story-kit';
+
 import { Button } from '../../components/action/button';
 import { Toggle } from '../../components/action/toggle';
 import { ToggleGroup } from '../../components/action/toggle-group';
@@ -23,7 +25,6 @@ import { Tabs } from '../../components/navigation/tabs';
 import { Label } from '../../components/typography/label';
 import { IdsProvider, useTheme } from '../../components/utility/ids-provider';
 
-import type { IdsColor } from '../../tokens/types';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
@@ -37,7 +38,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const COLOR_NAMES: Record<IdsColor, string> = {
+const COLOR_NAMES: Record<PaletteHue, string> = {
   red: '빨강',
   orange: '주황',
   amber: '호박',
@@ -57,7 +58,7 @@ const COLOR_NAMES: Record<IdsColor, string> = {
   rose: '장미',
 };
 
-const isColor = (value: string): value is IdsColor => value in COLOR_NAMES;
+const isColor = (value: string): value is PaletteHue => value in COLOR_NAMES;
 
 const MODES = ['light', 'dark', 'system'] as const;
 
@@ -72,12 +73,12 @@ const save = (message: string) => (event: FormEvent<HTMLFormElement>) => {
 export const PC: Story = {
   render: function Render() {
     const theme = useTheme();
-    const [color, setColor] = useState<IdsColor>(theme.color);
+    const [color, setColor] = useState<PaletteHue>('blue');
     const [mode, setMode] = useState<IdsProvider.Mode>(theme.mode);
     const [quiet, setQuiet] = useState(true);
 
     return (
-      <IdsProvider color={color} mode={mode} className="min-h-dvh">
+      <IdsProvider.Scope theme={{ palette: palettes[color] }} mode={mode} className="min-h-dvh">
         <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10 break-keep sm:px-6 lg:py-14">
           <div className="flex flex-col gap-2">
             <h1 className="text-headline-h3-bold">설정</h1>
@@ -248,11 +249,11 @@ export const PC: Story = {
                           if (next !== null && isColor(next)) setColor(next);
                         }}
                       >
-                        {(Object.keys(COLOR_NAMES) as IdsColor[]).map((value) => (
+                        {(Object.keys(COLOR_NAMES) as PaletteHue[]).map((value) => (
                           <Select.Item key={value} value={value}>
-                            <IdsProvider color={value} asChild>
+                            <IdsProvider.Scope theme={{ palette: palettes[value] }} asChild>
                               <Badge dot colorScheme="primary" aria-hidden />
-                            </IdsProvider>
+                            </IdsProvider.Scope>
                             {COLOR_NAMES[value]}
                           </Select.Item>
                         ))}
@@ -332,7 +333,7 @@ export const PC: Story = {
             </Tabs.Content>
           </Tabs>
         </main>
-      </IdsProvider>
+      </IdsProvider.Scope>
     );
   },
 };

@@ -10,6 +10,7 @@ import { z } from 'zod';
 
 import { Field, IdsProvider, NumberField } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 import { Field as FormField } from '../src/react-hook-form';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -956,7 +957,7 @@ test('a tap on a stepper steps without focusing the input, and a cancelled press
 test('a stepper keeps its pressed color while a touch holds it', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <NumberField defaultValue={0} />
     </IdsProvider>,
   );

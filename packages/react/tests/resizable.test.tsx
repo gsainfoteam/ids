@@ -8,6 +8,7 @@ import { render } from 'vitest-browser-react';
 import { Card, IdsProvider, Resizable } from '../src';
 import { skipWithoutCdp } from './engines';
 import { arcOf, expectTheArcToHug, middleOfTheArc, pointsAlong, type Point } from './resize-grip';
+import { testTheme } from './theme';
 
 const frameOffset = (point: Point) => {
   const frame = window.frameElement!.getBoundingClientRect();
@@ -543,7 +544,7 @@ test('dragging the grip inside a pressable card does not press the card', async 
   skipWithoutCdp(context);
   const onClick = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Card onClick={onClick}>
         <Card.Title>카드</Card.Title>
         <Resizable defaultWidth={160} defaultHeight={80}>

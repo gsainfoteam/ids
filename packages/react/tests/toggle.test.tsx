@@ -6,6 +6,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { ButtonGroup, IdsProvider, Toggle, ToggleGroup } from '../src';
+import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -126,7 +127,7 @@ test('inside ToggleGroup a value is required and the group owns the state', () =
 
 test('a glossy toggle is quiet while off and takes the glossy layers once pressed', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Toggle variant="glossy">굵게</Toggle>
       <p>Elsewhere</p>
     </IdsProvider>,

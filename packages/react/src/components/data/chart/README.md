@@ -85,7 +85,7 @@ const shares = rows.map((row) => ({ ...row, fill: `var(--chart-${row.service})` 
 | `chart-4` | rose 600     | rose 400     |
 | `chart-5` | violet 600   | violet 400   |
 
-- 브랜드 색(`data-color`)을 따르지 않는 고정 팔레트입니다. 브랜드 색 계열이 필요하면 `color: 'primary'` 를 줍니다.
+- 앱 팔레트를 따르지 않는 고정 팔레트입니다. 브랜드 색 계열이 필요하면 `color: 'primary'` 를 줍니다.
 - 다섯 색 모두 바탕(`surface`)과 3:1 이상입니다(그래픽 대비 기준).
 - 이웃한 두 색은 CIEDE2000 색차 25 이상으로 떨어져 있습니다. `tests/tokens-contrast.test.ts` 가 두 규칙을 라이트와 다크에서 확인합니다.
 - 계열을 더할 때도 같은 두 규칙을 지킵니다. 둘이 같은 색 계열로 보이면 순서를 바꿔 이웃하지 않게 합니다.

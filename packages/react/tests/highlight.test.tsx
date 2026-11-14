@@ -3,6 +3,7 @@ import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 
+import { palettes } from '../.storybook/palettes';
 import { Highlight, IdsProvider } from '../src';
 
 const marksIn = (element: Element) =>
@@ -25,7 +26,7 @@ test('renders the text in a span and each match in a mark', async () => {
 
 test('colors soft marks with secondary and solid marks with primary', async () => {
   const screen = await render(
-    <IdsProvider color="yellow">
+    <IdsProvider theme={{ palette: palettes.yellow }}>
       <Highlight query="a" data-testid="soft">
         a
       </Highlight>

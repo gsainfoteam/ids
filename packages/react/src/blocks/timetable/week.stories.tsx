@@ -1,10 +1,11 @@
+import { palettes, type PaletteHue } from '~story-kit';
+
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
 import { Table } from '../../components/data/table';
 import { IdsProvider } from '../../components/utility/ids-provider';
 
-import type { IdsColor } from '../../tokens/types';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
@@ -28,7 +29,7 @@ const COURSES: {
   room: string;
   professor: string;
   credits: number;
-  color: IdsColor;
+  color: PaletteHue;
   slots: [day: number, period: number][];
 }[] = [
   {
@@ -135,9 +136,9 @@ export const PC: Story = {
                     <Table.Cell key={day}>
                       {course && (
                         <div className="flex flex-col items-start gap-1">
-                          <IdsProvider color={course.color} asChild>
+                          <IdsProvider.Scope theme={{ palette: palettes[course.color] }} asChild>
                             <Badge content={course.name} variant="soft" colorScheme="primary" />
-                          </IdsProvider>
+                          </IdsProvider.Scope>
                           <span className="text-caption-c1-regular">{course.room}</span>
                         </div>
                       )}
@@ -160,9 +161,9 @@ export const PC: Story = {
               <Item key={course.id}>
                 <Item.Content>
                   <Item.Title>
-                    <IdsProvider color={course.color} asChild>
+                    <IdsProvider.Scope theme={{ palette: palettes[course.color] }} asChild>
                       <Badge dot colorScheme="primary" aria-hidden />
-                    </IdsProvider>
+                    </IdsProvider.Scope>
                     {course.name}
                   </Item.Title>
                   <Item.Description>

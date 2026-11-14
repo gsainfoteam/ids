@@ -7,6 +7,7 @@ import { render } from 'vitest-browser-react';
 
 import { Button, IdsProvider, MessageScroller } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 import { START_ZONE_PX } from '../src/components/layout/message-scroller/message-scroll';
 
 type Point = { x: number; y: number };
@@ -67,7 +68,7 @@ function Chat({
   const [grown, setGrown] = useState(0);
 
   return (
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <MessageScroller {...props} className="h-64 w-80">
         {messages.map((message, index) => (
           <div key={message.id}>

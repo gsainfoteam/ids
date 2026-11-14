@@ -57,7 +57,7 @@ if (!presence.mounted) return null;
 
 - `useLayer` 는 초기 포커스를 옮기는 effect 보다 먼저 부릅니다. 스택은 등록할 때의 `activeElement` 를 되돌아갈 곳으로 기억합니다.
 - 레이어는 `open` 이 `false` 가 되는 순간 스택을 떠납니다. 나가는 애니메이션 동안은 Escape 와 바깥 누르기를 받지 않습니다.
-- 레이어는 제자리에 렌더하고 `popover="manual"` 로 top layer 에 올립니다. DOM 위치가 그대로라 theme(`data-color`, `data-mode`), Field 의 `focusout` 판정, 폼 소속, Tab 순서를 물려받고, top layer 라서 조상의 `transform`, `overflow`, `opacity` 에 갇히지 않습니다.
+- 레이어는 제자리에 렌더하고 `popover="manual"` 로 top layer 에 올립니다. DOM 위치가 그대로라 theme(`data-mode` 와 Provider 의 테마 변수), Field 의 `focusout` 판정, 폼 소속, Tab 순서를 물려받고, top layer 라서 조상의 `transform`, `overflow`, `opacity` 에 갇히지 않습니다.
 
 ## layer-stack.ts
 
@@ -333,7 +333,7 @@ const scoped = useOverlay();                    // 부른 곳의 theme 으로 �
 
 ### 왜 이렇게
 
-- 항목마다 `display: contents` 인 wrapper 가 `data-color`, `data-mode` 를 가집니다. 항목은 host 의 theme 을 따르고, `useOverlay()` 로 열면 부른 곳의 theme 을 씁니다.
+- 항목마다 `display: contents` 인 wrapper 가 `data-mode` 와 연 곳의 테마 변수(`ThemeContext` 의 `variables`)를 가집니다. 항목은 host 의 theme 을 따르고, `useOverlay()` 로 열면 부른 곳의 theme 을 씁니다.
 - host 는 IdsProvider 의 요소 안, children 뒤에 그립니다. `asChild` 면 자식 요소 하나를 지켜야 하므로 요소 옆에 그립니다. 항목이 없으면 아무것도 그리지 않아서 서버 HTML 이 그대로입니다.
 - 레이어는 `open` prop 이 없을 때만 항목에 붙습니다(`useOverlayItem`). 붙은 레이어는 자식에게 `OverlayItemContext` 를 `null` 로 넘겨서, 안에 든 다른 레이어가 같은 항목에 붙지 않게 합니다.
 - `PortalRootContext` 는 가장 가까운 IdsProvider 의 요소입니다. Tooltip 이 그 안에 portal 합니다.

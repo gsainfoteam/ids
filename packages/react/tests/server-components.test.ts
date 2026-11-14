@@ -98,10 +98,17 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     (name) => /^[A-Z][a-z]/.test(name) && ids[name].$$typeof === clientReference,
   );
 
-  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image } = ids;
+  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image, defineIdsTheme, checkIdsTheme } = ids;
+  const palette = { 50: '#eff6ff', 100: '#dbeafe', 200: '#bedbff', 300: '#8ec5ff', 400: '#51a2ff', 500: '#2b7fff', 600: '#155dfc', 700: '#1447e6', 800: '#193cb8', 900: '#1c398e', 950: '#162456' };
+  const theme = defineIdsTheme({ palette, radius: 12 });
+  if (checkIdsTheme(theme).length) {
+    console.error('A Server Component could not check the theme');
+    process.exit(1);
+  }
   const page = h(
     IdsProvider,
-    { color: 'blue', mode: 'light' },
+    { theme, mode: 'light' },
+    h(IdsProvider.Scope, { mode: 'dark' }, 'A dark region'),
     h('a', { href: '/', className: Button.Style({ variant: 'outline' }) }, 'A link styled as a button'),
     h(Badge, { content: 3 }, h(Button, null, 'Inbox')),
     h(Divider),
@@ -235,11 +242,14 @@ test(
       payload: string;
     };
 
-    expect(clientComponents).toEqual(['IdsProvider', 'ThemeContext', 'TooltipDelayGroup']);
+    expect(clientComponents).toEqual(['ThemeContext', 'TooltipDelayGroup']);
     expect(namespaced.Image).toEqual(
       expect.arrayContaining(['Group', 'Viewer', 'Viewer.Toolbar', 'Viewer.Close']),
     );
+    expect(payload).toContain('"600":"#155dfc"');
     for (const reference of [
+      'IdsProviderRoot',
+      'IdsProviderScope',
       'ButtonRoot',
       'BubbleRoot',
       'BubbleReactions',

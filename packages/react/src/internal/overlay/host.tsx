@@ -21,6 +21,7 @@ import {
   type OverlayOptions,
   type OverlayRender,
 } from './store';
+import { themeStyle } from '../../components/utility/ids-provider/theme-variables';
 import { ThemeContext } from '../../components/utility/ids-provider/use-ids-provider';
 
 export type OverlayItemBinding = {
@@ -81,9 +82,8 @@ function OverlayItemView({ item }: { item: OverlayItem }) {
       <div
         className="contents"
         data-overlay-item={item.id}
-        data-color={theme.color}
         data-mode={theme.resolvedMode}
-        style={{ colorScheme: theme.resolvedMode }}
+        style={{ colorScheme: theme.resolvedMode, ...themeStyle(theme.variables) }}
       >
         <OverlayItemContext value={binding}>
           {item.render({

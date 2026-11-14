@@ -6,6 +6,7 @@ import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Marker } from '../src';
+import { testTheme } from './theme';
 
 const parse = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html');
@@ -84,7 +85,7 @@ test('underline draws a decorative Divider under the text, inside the paragraph'
   expect(marker.className, 'the line is the Divider, not a border').not.toMatch(/\bborder-b\b/);
 
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="w-80">
         <Marker variant="underline" data-testid="underline">
           구현 메모를 열었어요
@@ -102,7 +103,7 @@ test('underline draws a decorative Divider under the text, inside the paragraph'
 test('asChild hands the props to the child, keeps its children and its role', async () => {
   const ref = createRef<HTMLElement>();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Marker asChild pending ref={ref} className="extra">
         <a href="#pr" className="own">
           풀 리퀘스트
@@ -126,7 +127,7 @@ test('asChild without an element child fails loudly', () => {
 
 test('icons take the icon token of the size, the separator lines share what the text leaves', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="w-80">
         <Marker size="tiny" data-testid="tiny">
           <GlobeAltIcon data-testid="icon" />웹 검색

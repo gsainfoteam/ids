@@ -4,6 +4,8 @@ import type { Mock } from 'storybook/test';
 
 import { cn } from '../src/utils';
 
+export { paletteHues, palettes, type PaletteHue } from './palettes';
+
 export function Showcase({ children, className }: { children: ReactNode; className?: string }) {
   return <div className={cn('flex w-full max-w-5xl flex-col gap-12', className)}>{children}</div>;
 }

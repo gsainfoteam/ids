@@ -20,6 +20,7 @@ import {
   TimePicker,
 } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 import {
   clearOfCurve,
   MIN_THUMB_LENGTH,
@@ -1001,7 +1002,7 @@ test('fade hydration: the first client render matches the server, then the dista
 
 test('adopted: a Select listbox is its own viewport inside the popup, both clear of the 14px corner', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Select aria-label="도시" defaultValue="도시 20">
         {Array.from({ length: 40 }, (_, index) => (
           <Select.Item key={index} value={`도시 ${index + 1}`}>
@@ -1038,7 +1039,7 @@ test('adopted: a Select listbox is its own viewport inside the popup, both clear
 
 test('adopted: Menu content scrolls in its viewport and keeps its padding', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Menu>
         <Menu.Trigger>열기</Menu.Trigger>
         <Menu.Content style={{ maxHeight: 160 }}>
@@ -1077,7 +1078,7 @@ test('adopted: popup lists and the field popup fade only their top and bottom', 
     </Select.Item>
   ));
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Select aria-label="도시">{cities}</Select>
       <Menu>
         <Menu.Trigger>열기</Menu.Trigger>
@@ -1116,7 +1117,7 @@ test('adopted: popup lists and the field popup fade only their top and bottom', 
 
 test('adopted: the command palette list fades only its top and bottom', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Menu triggerType="command" defaultOpen>
         <Menu.Content>
           <Menu.Search data-1p-ignore data-lpignore="true" />
@@ -1134,7 +1135,7 @@ test('adopted: the command palette list fades only its top and bottom', async ()
 
 test('adopted: arrowing through a Select list stops the highlighted option clear of the fade', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Select aria-label="도시" defaultValue="도시 1">
         {Array.from({ length: 40 }, (_, index) => (
           <Select.Item key={index} value={`도시 ${index + 1}`}>
@@ -1165,7 +1166,7 @@ test('adopted: arrowing through a Select list stops the highlighted option clear
 
 test('adopted: arrowing through a Menu stops the highlighted item clear of the fade', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Menu>
         <Menu.Trigger>열기</Menu.Trigger>
         <Menu.Content style={{ maxHeight: 160 }}>
@@ -1193,7 +1194,7 @@ test('adopted: arrowing through a Menu stops the highlighted item clear of the f
 test('adopted: dragging the scrollbar of a Drawer body scrolls it instead of moving the sheet', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Drawer side="bottom" defaultOpen>
         <Drawer.Content aria-label="필터">
           <div className="h-[2000px] shrink-0" />
@@ -1342,7 +1343,7 @@ test('adopted: a Table fades only its left and right, so its sticky header never
 
 test('adopted: a long Popover scrolls inside while its arrow still sticks out', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Popover defaultOpen>
         <Popover.Trigger>열기</Popover.Trigger>
         <Popover.Content aria-label="안내" style={{ maxHeight: 160 }}>

@@ -5,6 +5,7 @@ import { expect, test } from 'vitest';
 import { render } from 'vitest-browser-react';
 
 import { Button, ButtonGroup, IdsProvider, Toggle, ToggleGroup } from '../src';
+import { testTheme } from './theme';
 
 const separator = (node: ReactNode) =>
   new DOMParser()
@@ -103,7 +104,7 @@ const dropShadow = /0px 1px 3px 0px/;
 
 test('joined glossy buttons share one edge and one shadow drawn by the group', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <ButtonGroup aria-label="저장" variant="glossy">
         <Button>저장</Button>
         <Button>더보기</Button>
@@ -123,7 +124,7 @@ test('joined glossy buttons share one edge and one shadow drawn by the group', a
 
 test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its own', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <ToggleGroup aria-label="정렬" variant="glossy" defaultValue="left">
         <Toggle value="left">왼쪽</Toggle>
         <Toggle value="right">오른쪽</Toggle>
@@ -142,7 +143,7 @@ test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its
 
 test('spaced glossy buttons keep their own shadows', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <ButtonGroup aria-label="저장" variant="glossy" attached={false}>
         <Button>저장</Button>
         <Button>더보기</Button>

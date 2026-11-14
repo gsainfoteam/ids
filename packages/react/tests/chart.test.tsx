@@ -19,6 +19,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, IdsProvider } from '../src';
+import { testTheme } from './theme';
 import { Chart } from '../src/chart';
 
 const ROWS = [
@@ -30,7 +31,7 @@ const ROWS = [
 const CONFIG = { web: { label: '웹' }, app: { label: '앱' } } satisfies Chart.Config;
 
 const visits = (props: Partial<Chart.Props> = {}, inside: ReactNode = null) => (
-  <IdsProvider>
+  <IdsProvider theme={testTheme}>
     <div style={{ width: 400 }}>
       <Chart config={CONFIG} {...props}>
         <Chart.Title>방문</Chart.Title>
@@ -83,7 +84,7 @@ test('the graph follows the width of its parent', async () => {
 
 test('without a title the graph is named by the catalog and described by the description', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={CONFIG}>
           <Chart.Description>최근 사흘</Chart.Description>
@@ -105,7 +106,7 @@ test('series take the config colors in order, wrapping after chart-5, and an own
   const keys = ['a', 'b', 'c', 'd', 'e', 'f'];
   const config = Object.fromEntries(keys.map((key) => [key, { label: key }]));
   await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={{ ...config, b: { label: 'b', color: 'danger' } }}>
           <BarChart data={[{ name: 'x', a: 1, b: 2, c: 3, d: 4, e: 5, f: 6 }]}>
@@ -133,7 +134,7 @@ test('series take the config colors in order, wrapping after chart-5, and an own
 
 test('lines are stroked with their series variable', async () => {
   await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={CONFIG}>
           <LineChart data={ROWS}>
@@ -152,7 +153,7 @@ test('lines are stroked with their series variable', async () => {
 
 test('areas fade from their series color to transparent, and an own fill wins', async () => {
   await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={CONFIG}>
           <AreaChart data={ROWS}>
@@ -201,7 +202,7 @@ test('the default tooltip lists each series in config order with its label and v
 
 test('the tooltip opens in the top layer beside the point, outside a clipping parent', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 400, overflow: 'hidden' }}>
         <Chart config={CONFIG}>
           <Chart.Title>방문</Chart.Title>
@@ -237,7 +238,7 @@ const tooltipLabel = () => document.querySelector('[data-chart-tooltip] p')?.tex
 
 test('keys move the tooltip while the pointer rests on another datum, and moving the pointer takes it back', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Button>앞</Button>
       {visits()}
     </IdsProvider>,
@@ -262,7 +263,7 @@ test('keys move the tooltip while the pointer rests on another datum, and moving
 
 test('focus that follows a click keeps the tooltip on the datum under the pointer', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Button>앞</Button>
       {visits()}
     </IdsProvider>,
@@ -314,7 +315,7 @@ test('tooltip and legend turn off, and an own Recharts Tooltip replaces the defa
 
 test('the hidden table adds no Tab stop: Tab goes from the graph to the next control', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Button>앞</Button>
       <div style={{ width: 400 }}>
         <Chart config={CONFIG}>
@@ -339,7 +340,7 @@ test('the hidden table adds no Tab stop: Tab goes from the graph to the next con
 
 test('a pie draws its table from the Pie data and names the rows by config', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={{ chrome: { label: 'Chrome' }, safari: { label: 'Safari' } }}>
           <Chart.Title>브라우저</Chart.Title>
@@ -368,7 +369,7 @@ test('a pie draws its table from the Pie data and names the rows by config', asy
 
 test('a vertical bar chart takes its rows from the category on the Y axis', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={{ visits: { label: '방문' } }}>
           <Chart.Title>서비스</Chart.Title>
@@ -400,7 +401,7 @@ test('a chart wrapped in an app component gets a development warning and keeps i
   }
 
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 400 }}>
         <Chart config={CONFIG}>
           <Chart.Title>방문</Chart.Title>
