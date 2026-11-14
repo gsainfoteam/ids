@@ -11,6 +11,8 @@ mixin IdsMessages {
 
   String? get breadcrumbMore => null;
 
+  String? get bubbleReactions => null;
+
   String? get calendarLabel => null;
 
   String? get calendarMonth => null;
@@ -39,6 +41,8 @@ mixin IdsMessages {
 
   String? get carouselRoleDescription => null;
 
+  String? get chartLabel => null;
+
   String? get checkboxGroupRequired => null;
 
   String? get chipRemove => null;
@@ -58,6 +62,14 @@ mixin IdsMessages {
   String? chipFieldRemove({required Object label}) => null;
 
   String? get chipFieldSearch => null;
+
+  String? get codeBlockCollapse => null;
+
+  String? get codeBlockCopied => null;
+
+  String? get codeBlockCopy => null;
+
+  String? codeBlockExpand({required Object count}) => null;
 
   String? get colorFieldClear => null;
 
@@ -255,6 +267,8 @@ mixin IdsMessages {
 
   String? get kbdWindows => null;
 
+  String? get linkNewTab => null;
+
   String? get marqueePause => null;
 
   String? get menuCommand => null;
@@ -266,6 +280,16 @@ mixin IdsMessages {
   String? get menuSearchPlaceholder => null;
 
   String? menuSubmenu({required Object label}) => null;
+
+  String? get messageScrollerJump => null;
+
+  String? messageScrollerJumpUnseen({required Object count}) => null;
+
+  String? get messageScrollerLabel => null;
+
+  String? get messageScrollerLoading => null;
+
+  String? messageScrollerUnseen({required Object count}) => null;
 
   String? get numberFieldDecrement => null;
 
@@ -294,6 +318,22 @@ mixin IdsMessages {
   String? get passwordFieldShow => null;
 
   String? get popoverClose => null;
+
+  String? get promptInputActions => null;
+
+  String? get promptInputAttach => null;
+
+  String? get promptInputAttachments => null;
+
+  String? get promptInputLabel => null;
+
+  String? get promptInputPlaceholder => null;
+
+  String? get promptInputSend => null;
+
+  String? get promptInputSending => null;
+
+  String? get promptInputStop => null;
 
   String? get qrCodeLabel => null;
 
@@ -324,6 +364,30 @@ mixin IdsMessages {
   String? get selectSearch => null;
 
   String? get selectSearchPlaceholder => null;
+
+  String? get sidebarCollapse => null;
+
+  String? sidebarDragAfter({required Object target}) => null;
+
+  String? sidebarDragBefore({required Object target}) => null;
+
+  String? sidebarDragCancel({required Object item}) => null;
+
+  String? sidebarDragEnd({required Object item}) => null;
+
+  String? get sidebarDragHint => null;
+
+  String? sidebarDragInside({required Object target}) => null;
+
+  String? get sidebarDragOrigin => null;
+
+  String? sidebarDragStart({required Object item}) => null;
+
+  String? get sidebarExpand => null;
+
+  String? get sidebarLabel => null;
+
+  String? get sidebarOpen => null;
 
   String? get sliderEnd => null;
 
@@ -415,6 +479,9 @@ final class IdsKoreanMessages with IdsMessages {
   String get breadcrumbMore => '숨은 경로 보기';
 
   @override
+  String get bubbleReactions => '반응';
+
+  @override
   String get calendarLabel => '달력';
 
   @override
@@ -457,6 +524,9 @@ final class IdsKoreanMessages with IdsMessages {
   String get carouselRoleDescription => '캐러셀';
 
   @override
+  String get chartLabel => '차트';
+
+  @override
   String get checkboxGroupRequired => '하나 이상 선택하세요.';
 
   @override
@@ -485,6 +555,18 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get chipFieldSearch => '항목 검색';
+
+  @override
+  String get codeBlockCollapse => '접기';
+
+  @override
+  String get codeBlockCopied => '복사했습니다';
+
+  @override
+  String get codeBlockCopy => '코드 복사';
+
+  @override
+  String codeBlockExpand({required Object count}) => '${_format(count)}줄 더 보기';
 
   @override
   String get colorFieldClear => '색상 지우기';
@@ -781,6 +863,9 @@ final class IdsKoreanMessages with IdsMessages {
   String get kbdWindows => '윈도우';
 
   @override
+  String get linkNewTab => '(새 탭에서 열림)';
+
+  @override
   String get marqueePause => '일시 정지';
 
   @override
@@ -797,6 +882,21 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String menuSubmenu({required Object label}) => '${_format(label)} 하위 메뉴';
+
+  @override
+  String get messageScrollerJump => '맨 아래로';
+
+  @override
+  String messageScrollerJumpUnseen({required Object count}) => '맨 아래로, 새 메시지 ${_format(count)}개';
+
+  @override
+  String get messageScrollerLabel => '메시지';
+
+  @override
+  String get messageScrollerLoading => '이전 메시지를 불러오는 중';
+
+  @override
+  String messageScrollerUnseen({required Object count}) => '새 메시지 ${_format(count)}개';
 
   @override
   String get numberFieldDecrement => '값 줄이기';
@@ -839,6 +939,30 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get popoverClose => '닫기';
+
+  @override
+  String get promptInputActions => '더하기';
+
+  @override
+  String get promptInputAttach => '파일 첨부';
+
+  @override
+  String get promptInputAttachments => '첨부한 파일';
+
+  @override
+  String get promptInputLabel => '메시지';
+
+  @override
+  String get promptInputPlaceholder => '메시지를 입력하세요';
+
+  @override
+  String get promptInputSend => '보내기';
+
+  @override
+  String get promptInputSending => '보내는 중';
+
+  @override
+  String get promptInputStop => '멈추기';
 
   @override
   String get qrCodeLabel => 'QR 코드';
@@ -884,6 +1008,42 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get selectSearchPlaceholder => '검색…';
+
+  @override
+  String get sidebarCollapse => '사이드바 접기';
+
+  @override
+  String sidebarDragAfter({required Object target}) => '${_format(target)} 뒤';
+
+  @override
+  String sidebarDragBefore({required Object target}) => '${_format(target)} 앞';
+
+  @override
+  String sidebarDragCancel({required Object item}) => '${_format(item)}을(를) 제자리에 두었습니다.';
+
+  @override
+  String sidebarDragEnd({required Object item}) => '${_format(item)}을(를) 옮겼습니다.';
+
+  @override
+  String get sidebarDragHint => 'Space로 집고, 위아래 방향키로 놓을 자리를 고른 뒤 Enter로 놓습니다. Escape는 취소합니다.';
+
+  @override
+  String sidebarDragInside({required Object target}) => '${_format(target)} 안';
+
+  @override
+  String get sidebarDragOrigin => '원래 자리';
+
+  @override
+  String sidebarDragStart({required Object item}) => '${_format(item)}을(를) 집었습니다.';
+
+  @override
+  String get sidebarExpand => '사이드바 펼치기';
+
+  @override
+  String get sidebarLabel => '사이드바';
+
+  @override
+  String get sidebarOpen => '메뉴 열기';
 
   @override
   String get sliderEnd => '끝';
