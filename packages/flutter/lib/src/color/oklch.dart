@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' show ColorSpace;
 
 import 'package:flutter/painting.dart';
 
@@ -139,7 +140,10 @@ bool _displayable(Oklch color) {
 
 double _clipChannel(double channel) => math.max(0, math.min(channel, 1));
 
-Oklch oklchOf(Color color) => _oklchOfRgb((r: color.r, g: color.g, b: color.b));
+Oklch oklchOf(Color color) {
+  final srgb = color.withValues(colorSpace: ColorSpace.extendedSRGB);
+  return _oklchOfRgb((r: srgb.r, g: srgb.g, b: srgb.b));
+}
 
 Oklch clampChroma(Oklch color) {
   if (_displayable(color)) return color;
