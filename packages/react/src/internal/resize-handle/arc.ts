@@ -1,4 +1,4 @@
-import { ROUND_CORNER_EXPONENT } from '../corner-shape';
+import { ROUND_CORNER_EXPONENT, superellipseQuarter } from '../corner-shape';
 
 export type ResizeBand = 'centered' | 'outward';
 
@@ -25,16 +25,7 @@ const TARGET_OUTSIDE_THE_LINE: Record<ResizeBand, number> = {
   outward: GRIP_TARGET / 2 - GRIP_STROKE / 2,
 };
 
-const SUPERELLIPSE_SEGMENTS = 16;
-
 const hundredths = (value: number) => Math.round(value * 100) / 100;
-
-function superellipseQuarter(exponent: number) {
-  return Array.from({ length: SUPERELLIPSE_SEGMENTS + 1 }, (_, index) => {
-    const angle = (Math.PI / 2) * (1 - index / SUPERELLIPSE_SEGMENTS);
-    return [Math.cos(angle) ** (2 / exponent), Math.sin(angle) ** (2 / exponent)] as const;
-  });
-}
 
 function quarterLength(radius: number, exponent: number) {
   if (exponent === ROUND_CORNER_EXPONENT) return (Math.PI * radius) / 2;

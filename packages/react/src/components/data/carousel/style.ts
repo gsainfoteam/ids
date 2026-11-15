@@ -20,7 +20,7 @@ export const carouselStyle = tv({
     indicators: 'flex flex-wrap items-center justify-center',
     indicator: [
       'group/indicator inline-flex h-6 min-w-6 shrink-0 cursor-pointer items-center justify-center px-2',
-      'rounded-standard focus-ring',
+      'rounded-full focus-ring',
     ],
     dot: [
       'block rounded-full bg-neutral',

@@ -532,12 +532,17 @@ const T_CSS_CORNER_SHAPE = `@layer base {
   [data-mode] * {
     corner-shape: var(--ids-corner-shape, round);
   }
+
+  [data-mode]::before,
+  [data-mode]::after,
+  [data-mode] *::before,
+  [data-mode] *::after {
+    corner-shape: inherit;
+  }
 }
 
-@layer utilities {
-  .rounded-full {
-    corner-shape: round;
-  }
+@utility rounded-full {
+  corner-shape: round;
 }
 
 @supports (corner-shape: squircle) {

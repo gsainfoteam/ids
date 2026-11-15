@@ -13,7 +13,7 @@
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, Progress                                                                                                                                                                                                     |
 | [`brand-fill.ts`](#brand-fillts)                 | 브랜드 채움의 hover, press 색. 글자색에서 멀어지는 쪽으로 섞는다                      | `control-surface.ts`(solid), Calendar, TimePicker                                                                                                                                                                     |
 | [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                                       | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
-| [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기                                    | `resize-handle/`, ScrollArea                                                                                                                                                                                          |
+| [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer                                                                                                                                                                                       |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
 | [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
@@ -211,18 +211,26 @@ export const iconToggleStyle = tv({
 
 - `resize-handle/`: `endEndCornerExponent` 가 끝 아래 모서리의 지수를 읽고, `gripArc` 가 그 초타원을 따라 손잡이를 그립니다.
 - ScrollArea: `geometry.ts` 가 위 왼쪽 모서리의 지수로 막대 끝을 곡선에서 띄웁니다.
+- Image: `flip.ts` 가 뷰어를 열고 닫을 때 썸네일 모서리 모양으로 자릅니다(`insetClipPath`).
+- Drawer: `background-scale.ts` 가 뒤 페이지를 squircle 로 자르고, 반지름에 `cornerRadiusScale` 을 곱합니다.
 
 ### 쓰는 법
 
 ```ts
 const style = getComputedStyle(element);
 cornerExponent(style, 'bottom-right'); // round 2, squircle 4, superellipse(k) 2^k
+cornerRadiusScale(style); // --ids-corner-radius-scale, squircle 을 그리는 브라우저에서 1.84
+
+insetClipPath({ width, height }, { top, right, bottom, left }, radius, exponent);
+// 지수 2: inset(... round r), 그 밖: 같은 자리를 초타원 모서리로 도는 path()
 ```
 
 ### 왜 이렇게
 
 - CSS 의 `superellipse(k)` 는 `|x|ⁿ + |y|ⁿ = 1` 에서 `n = 2^k` 입니다. `round` 는 `k = 1`(원), `squircle` 은 `k = 2` 입니다.
 - 브라우저는 키워드를 그대로 두기도 하고 `superellipse(2)` 로 풀기도 해서, 둘 다 읽습니다.
+- `clip-path` 의 `inset(... round)` 는 `corner-shape` 를 따르지 않고 늘 원입니다. 그래서 squircle 은 모서리마다 초타원 4분의 1 을 16 토막의 직선으로 도는 `path()` 로 자릅니다.
+- `path()` 는 반지름이 0 이어도 같은 명령 수를 냅니다. 두 값 사이를 `transition` 과 Web Animations 가 점마다 보간합니다.
 - `k < 1`(안으로 파인 모서리, `bevel`, `notch`, `scoop`)과 읽지 못한 값은 원으로 둡니다. IDS 테마는 `round` 와 `squircle` 만 씁니다.
 
 ### 알아둘 것

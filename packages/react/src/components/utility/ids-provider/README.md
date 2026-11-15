@@ -348,6 +348,7 @@ function ThemeMenu() {
   - 같은 radius 의 squircle 은 round 보다 모서리가 얕아 각져 보입니다. 그래서 squircle 테마는 모든 radius 를 1.84배로 키워, 45° 지점의 모서리 깊이를 round 와 맞춥니다.
   - `corner-shape` 를 지원하지 않는 브라우저는 둥근 모서리와 원래 radius 로 그립니다.
   - `rounded-full` 은 squircle 테마에서도 원입니다.
+  - `::before` `::after` 는 자기 요소의 모양을 따릅니다. `before:rounded-[inherit]` 로 위에 칠한 hover 색이 squircle 모서리를 그대로 덮습니다.
 - 최상위 Provider 는 배경을 칠하지 않습니다. 페이지 배경은 앱이 `bg-surface` 로 칠합니다.
 - 최상위 Provider 는 `overlay.open` 으로 연 대화상자와 기본 `Toaster` 를 자기 요소 안(`asChild` 면 그 옆)에 그립니다. 최상위 Provider 가 여럿이면 먼저 마운트된 하나가 그립니다. 앱이 `<Toaster />` 를 직접 두면 기본 Toaster 는 물러납니다. `useOverlay()` 로 연 항목은 연 곳의 테마 변수를 받습니다.
 - 서버 HTML 에는 테마 변수 말고 아무것도 더하지 않습니다. 브라우저에서는 토스트를 읽어 줄 빈 `aria-live` 영역 하나가 붙습니다. 역할(role)이 없어 스크린 리더에게 드러나지 않습니다.

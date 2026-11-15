@@ -229,6 +229,10 @@ test('radius and corner shape reach the components under the provider', async ()
       <IdsProvider.Scope theme={{ radius: 14, cornerShape: 'squircle' }}>
         <Button>themed</Button>
         <span data-testid="circle" className="size-4 rounded-full" />
+        <span
+          data-testid="overlaid"
+          className="relative size-8 rounded-standard before:absolute before:inset-0 before:rounded-[inherit] after:absolute after:inset-x-0 after:h-1 after:rounded-full"
+        />
         <IdsProvider.Scope theme={{ cornerShape: 'round' }}>
           <Button>round again</Button>
         </IdsProvider.Scope>
@@ -254,6 +258,13 @@ test('radius and corner shape reach the components under the provider', async ()
 
     expect(themed.getPropertyValue('corner-shape')).not.toBe(round);
     expect(getComputedStyle(circle).getPropertyValue('corner-shape')).toBe(round);
+
+    const overlaid = screen.getByTestId('overlaid').element();
+    expect(
+      getComputedStyle(overlaid, '::before').getPropertyValue('corner-shape'),
+      'a pseudo-element painting over its element takes the same corner',
+    ).toBe(themed.getPropertyValue('corner-shape'));
+    expect(getComputedStyle(overlaid, '::after').getPropertyValue('corner-shape')).toBe(round);
   }
 });
 
