@@ -16,16 +16,16 @@ export const kbdStyle = tv({
   variants: {
     size: {
       standard: {
-        root: 'h-5 min-w-5 px-1 align-[calc(0.5cap-10px)]',
+        root: 'h-5 min-w-5 px-1 align-[calc(0.5cap-var(--spacing)*2.5)]',
         face: 'text-caption-c1-medium',
-        group: 'align-[calc(0.5cap-10px)]',
+        group: 'align-[calc(0.5cap-var(--spacing)*2.5)]',
         glyph: 'size-3!',
         separator: 'text-caption-c1-regular',
       },
       tiny: {
-        root: 'h-4 min-w-4 px-0.5 align-[calc(0.5cap-8px)]',
+        root: 'h-4 min-w-4 px-0.5 align-[calc(0.5cap-var(--spacing)*2)]',
         face: 'text-caption-c2-medium',
-        group: 'align-[calc(0.5cap-8px)]',
+        group: 'align-[calc(0.5cap-var(--spacing)*2)]',
         glyph: 'size-2.5!',
         separator: 'text-caption-c2-regular',
       },

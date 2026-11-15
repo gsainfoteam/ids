@@ -2,12 +2,7 @@
 
 import { use, useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 
-import {
-  ThemeContext,
-  useIdsProvider,
-  type ThemeContextValue,
-  type ThemeMode,
-} from './use-ids-provider';
+import { ThemeContext, useIdsProvider, type ThemeMode } from './use-ids-provider';
 import { OverlayHost, PortalRootContext } from '../../../internal/overlay/host';
 import { LanguageContext, type IdsTranslate } from '../../../internal/translate';
 import { cn, mergeRefs } from '../../../utils';
@@ -16,14 +11,20 @@ import { DefaultToaster } from '../../feedback/toast';
 import { TooltipDelayGroup } from '../../overlay/tooltip/delay-group';
 import { Slot } from '../slot';
 
-import type { IdsColor } from '../../../tokens/types';
+import type { IdsThemeOverrides } from './theme';
 
-export { ThemeContext };
+export type IdsProviderRootProps = Omit<ComponentProps<'div'>, 'color' | 'translate'> & {
+  theme?: IdsThemeOverrides;
+  mode?: ThemeMode;
+  defaultMode?: ThemeMode;
+  onModeChange?: (mode: ThemeMode) => void;
+  translate?: IdsTranslate;
+  locale?: string;
+  asChild?: boolean;
+};
 
-export function IdsProvider({
-  color,
-  defaultColor,
-  onColorChange,
+export function IdsProviderRoot({
+  theme,
   mode,
   defaultMode,
   onModeChange,
@@ -35,11 +36,9 @@ export function IdsProvider({
   ref,
   children,
   ...rest
-}: IdsProvider.Props) {
-  const { context, outermost, paintsSurface } = useIdsProvider({
-    color,
-    defaultColor,
-    onColorChange,
+}: IdsProviderRootProps) {
+  const { context, ownVariables, ownScale, issues, outermost, paintsSurface } = useIdsProvider({
+    theme,
     mode,
     defaultMode,
     onModeChange,
@@ -59,14 +58,26 @@ export function IdsProvider({
     [ref],
   );
 
+  const hasPalette = context.theme.palette !== undefined;
+
   useEffect(() => {
-    if (!isDevelopment || !elementRef.current) return;
-    const primary = getComputedStyle(elementRef.current).getPropertyValue('--ids-color-primary');
-    if (primary.trim() === '')
-      console.warn(
-        `[IDS] IdsProvider: no color tokens for data-color="${context.color}" data-mode="${context.resolvedMode}". Import @gsainfoteam/ids-css and use a color it defines.`,
+    if (!isDevelopment) return;
+    if (!hasPalette)
+      console.error(
+        '[IDS] IdsProvider: the outermost IdsProvider needs a theme with a palette, such as <IdsProvider theme={defineIdsTheme({ palette })}>. IdsProvider.Scope only changes the theme it inherits.',
       );
-  }, [context.color, context.resolvedMode]);
+    for (const issue of issues)
+      console.warn(`[IDS] IdsProvider theme.${issue.path}: ${issue.message}`);
+  }, [hasPalette, issues]);
+
+  useEffect(() => {
+    if (!isDevelopment || !hasPalette || !elementRef.current) return;
+    const surface = getComputedStyle(elementRef.current).getPropertyValue('--ids-color-surface');
+    if (surface.trim() === '')
+      console.warn(
+        '[IDS] IdsProvider: no IDS color tokens on this element. Import @gsainfoteam/ids-css after tailwindcss.',
+      );
+  }, [hasPalette, context.resolvedMode]);
 
   const Root = asChild ? Slot : 'div';
   const host = outermost && (
@@ -83,13 +94,13 @@ export function IdsProvider({
           <Root
             {...rest}
             ref={mergedRef}
-            data-color={context.color}
             data-mode={context.resolvedMode}
+            data-scale={ownScale}
             className={cn(
               paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
               className,
             )}
-            style={{ colorScheme: context.resolvedMode, ...style }}
+            style={{ colorScheme: context.resolvedMode, ...ownVariables, ...style }}
           >
             {asChild ? (
               children
@@ -107,22 +118,4 @@ export function IdsProvider({
   );
 
   return outermost ? <TooltipDelayGroup>{themed}</TooltipDelayGroup> : themed;
-}
-
-export namespace IdsProvider {
-  export type Mode = ThemeMode;
-
-  export type State = ThemeContextValue;
-
-  export type Props = Omit<ComponentProps<'div'>, 'color' | 'translate'> & {
-    color?: IdsColor;
-    defaultColor?: IdsColor;
-    onColorChange?: (color: IdsColor) => void;
-    mode?: Mode;
-    defaultMode?: Mode;
-    onModeChange?: (mode: Mode) => void;
-    translate?: IdsTranslate;
-    locale?: string;
-    asChild?: boolean;
-  };
 }

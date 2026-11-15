@@ -21,9 +21,8 @@ import { TimeField } from '../../components/form/time-field';
 import { Divider } from '../../components/layout/divider';
 import { Tabs } from '../../components/navigation/tabs';
 import { Label } from '../../components/typography/label';
-import { IdsProvider, useTheme } from '../../components/utility/ids-provider';
+import { IdsProvider, defineIdsTheme, useTheme } from '../../components/utility/ids-provider';
 
-import type { IdsColor } from '../../tokens/types';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
@@ -37,27 +36,111 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const COLOR_NAMES: Record<IdsColor, string> = {
-  red: '빨강',
-  orange: '주황',
-  amber: '호박',
-  yellow: '노랑',
-  lime: '라임',
-  green: '초록',
-  emerald: '에메랄드',
-  teal: '청록',
-  cyan: '시안',
-  sky: '하늘',
+const THEMES = {
+  blue: defineIdsTheme({
+    palette: {
+      50: '#eff6ff',
+      100: '#dbeafe',
+      200: '#bedbff',
+      300: '#8ec5ff',
+      400: '#51a2ff',
+      500: '#2b7fff',
+      600: '#155dfc',
+      700: '#1447e6',
+      800: '#193cb8',
+      900: '#1c398e',
+      950: '#162456',
+    },
+  }),
+  green: defineIdsTheme({
+    palette: {
+      50: '#f0fdf0',
+      100: '#dcfcdc',
+      200: '#bbf7bb',
+      300: '#86ef86',
+      400: '#4ade5e',
+      500: '#22c53e',
+      600: '#418501',
+      700: '#366e01',
+      800: '#2a5701',
+      900: '#1e4001',
+      950: '#0f2400',
+    },
+  }),
+  orange: defineIdsTheme({
+    palette: {
+      50: '#fff6f2',
+      100: '#ffe8de',
+      200: '#ffc8b4',
+      300: '#ffa082',
+      400: '#ff7650',
+      500: '#ff5722',
+      600: '#ff4500',
+      700: '#d63a00',
+      800: '#a32d00',
+      900: '#7a2200',
+      950: '#451300',
+    },
+  }),
+  teal: defineIdsTheme({
+    palette: {
+      50: '#f0fdfa',
+      100: '#cbfbf1',
+      200: '#96f7e4',
+      300: '#46ecd5',
+      400: '#00d5be',
+      500: '#00bba7',
+      600: '#009689',
+      700: '#00786f',
+      800: '#005f5a',
+      900: '#0b4f4a',
+      950: '#022f2e',
+    },
+  }),
+  violet: defineIdsTheme({
+    palette: {
+      50: '#f5f3ff',
+      100: '#ede9fe',
+      200: '#ddd6ff',
+      300: '#c4b4ff',
+      400: '#a684ff',
+      500: '#8e51ff',
+      600: '#7f22fe',
+      700: '#7008e7',
+      800: '#5d0ec0',
+      900: '#4d179a',
+      950: '#2f0d68',
+    },
+  }),
+  rose: defineIdsTheme({
+    palette: {
+      50: '#fff1f2',
+      100: '#ffe4e6',
+      200: '#ffccd3',
+      300: '#ffa1ad',
+      400: '#ff637e',
+      500: '#ff2056',
+      600: '#ec003f',
+      700: '#c70036',
+      800: '#a50036',
+      900: '#8b0836',
+      950: '#4d0218',
+    },
+  }),
+};
+
+type ThemeColor = keyof typeof THEMES;
+
+const COLOR_NAMES: Record<ThemeColor, string> = {
   blue: '파랑',
-  indigo: '남색',
+  green: '초록',
+  orange: '주황',
+  teal: '청록',
   violet: '제비꽃',
-  purple: '보라',
-  fuchsia: '자홍',
-  pink: '분홍',
   rose: '장미',
 };
 
-const isColor = (value: string): value is IdsColor => value in COLOR_NAMES;
+const isColor = (value: string): value is ThemeColor => value in COLOR_NAMES;
 
 const MODES = ['light', 'dark', 'system'] as const;
 
@@ -72,12 +155,12 @@ const save = (message: string) => (event: FormEvent<HTMLFormElement>) => {
 export const PC: Story = {
   render: function Render() {
     const theme = useTheme();
-    const [color, setColor] = useState<IdsColor>(theme.color);
+    const [color, setColor] = useState<ThemeColor>('blue');
     const [mode, setMode] = useState<IdsProvider.Mode>(theme.mode);
     const [quiet, setQuiet] = useState(true);
 
     return (
-      <IdsProvider color={color} mode={mode} className="min-h-dvh">
+      <IdsProvider.Scope theme={THEMES[color]} mode={mode} className="min-h-dvh">
         <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10 break-keep sm:px-6 lg:py-14">
           <div className="flex flex-col gap-2">
             <h1 className="text-headline-h3-bold">설정</h1>
@@ -248,11 +331,11 @@ export const PC: Story = {
                           if (next !== null && isColor(next)) setColor(next);
                         }}
                       >
-                        {(Object.keys(COLOR_NAMES) as IdsColor[]).map((value) => (
+                        {(Object.keys(COLOR_NAMES) as ThemeColor[]).map((value) => (
                           <Select.Item key={value} value={value}>
-                            <IdsProvider color={value} asChild>
+                            <IdsProvider.Scope theme={THEMES[value]} asChild>
                               <Badge dot colorScheme="primary" aria-hidden />
-                            </IdsProvider>
+                            </IdsProvider.Scope>
                             {COLOR_NAMES[value]}
                           </Select.Item>
                         ))}
@@ -332,7 +415,7 @@ export const PC: Story = {
             </Tabs.Content>
           </Tabs>
         </main>
-      </IdsProvider>
+      </IdsProvider.Scope>
     );
   },
 };

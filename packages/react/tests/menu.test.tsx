@@ -9,6 +9,7 @@ import { render } from 'vitest-browser-react';
 import { Button, Dialog, IdsProvider, overlay } from '../src';
 import { skipWithoutCdp } from './engines';
 import { MOD_AS_THE_APP_READS_IT } from './hotkeys';
+import { testTheme } from './theme';
 import { Menu } from '../src/components/overlay/menu';
 
 type ActionsProps = Partial<Menu.Props> & {
@@ -42,7 +43,7 @@ function Actions({ onCopy, onEmail, ...props }: ActionsProps) {
 
 async function renderActions(props: ActionsProps = {}) {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Actions {...props} />
       <button type="button">Outside</button>
     </IdsProvider>,
@@ -201,7 +202,7 @@ test('checkbox and radio items report their state', async () => {
   const onCheckedChange = vi.fn();
   const onValueChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <ViewMenu onCheckedChange={onCheckedChange} onValueChange={onValueChange} />
     </IdsProvider>,
   );
@@ -305,7 +306,7 @@ test('a nested trigger is a menuitem of its parent, reached by arrows and typing
 
 test('a nested trigger matches typing by textValue, and a disabled one is skipped and never opens', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Menu>
         <Menu.Trigger>Library</Menu.Trigger>
         <Menu.Content>
@@ -356,7 +357,7 @@ test('a nested trigger matches typing by textValue, and a disabled one is skippe
 test('a nested Menu warns that triggerType belongs to the outermost Menu, and still opens as a submenu', async () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Menu>
         <Menu.Trigger>File</Menu.Trigger>
         <Menu.Content>
@@ -418,7 +419,7 @@ test('Tab closes the menu and returns focus to the trigger', async () => {
 test('a context menu opens at the pointer', async () => {
   const onOpenChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Menu triggerType="contextmenu" onOpenChange={onOpenChange}>
         <Menu.Trigger data-testid="area" style={{ width: 300, height: 200, margin: 24 }}>
           Right-click here
@@ -458,7 +459,7 @@ test('a context menu opens at the pointer', async () => {
 
 test('an item that opens a dialog closes the menu first, and the dialog returns focus to the trigger', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Menu>
         <Menu.Trigger>File</Menu.Trigger>
         <Menu.Content>
@@ -495,7 +496,7 @@ test('an item that opens a dialog closes the menu first, and the dialog returns 
 
 test('the menu opens below its trigger, aligned to its start', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ padding: 48 }}>
         <Actions />
       </div>
@@ -547,7 +548,7 @@ function DeepMenu(props: Partial<Menu.Props> & { onNestedOpenChange?: (open: boo
 
 async function renderDeep(props: Parameters<typeof DeepMenu>[0] = {}, justify = 'flex-start') {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ display: 'flex', justifyContent: justify }}>
         <DeepMenu {...props} />
       </div>
@@ -702,7 +703,7 @@ function Palette({ onNewFile, onGrid, ...props }: PaletteProps) {
 
 async function renderPalette(props: PaletteProps = {}) {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <button type="button">Before</button>
       <Palette {...props} />
     </IdsProvider>,
@@ -967,7 +968,7 @@ test('Enter and Escape while an IME composes neither select nor close', async (c
 });
 
 test('a palette opened with overlay.open binds to the item and resolves through an option', async () => {
-  await render(<IdsProvider />);
+  await render(<IdsProvider theme={testTheme} />);
   const picked = overlay.open<string>(({ close }) => (
     <Menu triggerType="command">
       <Menu.Content aria-label="Go to">
@@ -988,7 +989,7 @@ test('a palette opened with overlay.open binds to the item and resolves through 
 test('a nested Menu inside a command palette warns and renders nothing', async () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Menu triggerType="command" defaultOpen>
         <Menu.Content>
           <Menu.Item>Copy</Menu.Item>

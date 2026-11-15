@@ -1,0 +1,37 @@
+import type { IdsMode } from '../../../tokens/types';
+
+export const PALETTE_STEPS = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950] as const;
+
+export type IdsPaletteStep = (typeof PALETTE_STEPS)[number];
+
+export type IdsPalette = { [step in IdsPaletteStep]: string };
+
+export type IdsCornerShape = 'round' | 'squircle';
+
+export type IdsTheme = {
+  palette: IdsPalette | string;
+  radius?: number;
+  cornerShape?: IdsCornerShape;
+  scale?: number;
+};
+
+export type IdsThemeOverrides = Partial<IdsTheme>;
+
+export const BRAND_ROLES = [
+  'primary',
+  'on-primary',
+  'secondary',
+  'on-secondary',
+  'accent',
+  'outline',
+] as const;
+
+export type IdsBrandRole = (typeof BRAND_ROLES)[number];
+
+export type IdsBrandRoles = { [role in IdsBrandRole]: string };
+
+export type IdsThemeRoles = { [mode in IdsMode]: IdsBrandRoles };
+
+export function defineIdsTheme<const Theme extends IdsTheme>(theme: Theme): Theme {
+  return theme;
+}

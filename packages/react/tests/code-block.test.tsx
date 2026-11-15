@@ -6,6 +6,7 @@ import { render } from 'vitest-browser-react';
 
 import { CodeBlock, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 import { isLazy, LAZY_NAMES } from '../src/components/data/code-block/highlight';
 import { LAZY_LANGUAGES } from '../src/components/data/code-block/lazy-languages';
 
@@ -161,7 +162,7 @@ test('wrap keeps the code inside the block', async () => {
 test('a lazily loaded language hydrates as plain text, then highlights', async () => {
   const errors = vi.spyOn(console, 'error');
   const tree = (
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <CodeBlock language="rust">{RUST}</CodeBlock>
     </IdsProvider>
   );

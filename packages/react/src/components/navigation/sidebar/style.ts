@@ -15,7 +15,7 @@ export const sidebarStyle = tv({
   slots: {
     root: [
       'group/sidebar sticky top-0 flex h-dvh shrink-0 self-start text-(--ids-color-on-surface)',
-      '[--sidebar-width:15rem]',
+      '[--sidebar-width:--spacing(60)]',
     ],
     mobileBar: 'flex flex-col p-2 sm:hidden',
     panel: [
@@ -28,7 +28,7 @@ export const sidebarStyle = tv({
     scroll: 'min-h-0 flex-1',
     nav: 'flex min-w-0 flex-col gap-4 p-2',
     drawer: [
-      'w-[min(16rem,calc(100%-4rem))]',
+      'w-[min(--spacing(64),calc(100%-var(--spacing)*16))]',
       '[&>[data-scroll-area-viewport]]:gap-0 [&>[data-scroll-area-viewport]]:p-0',
     ],
     drawerNav: 'flex min-w-0 grow flex-col gap-4 p-2',
@@ -41,8 +41,8 @@ export const sidebarStyle = tv({
       'min-h-6 items-center px-2 py-0 text-caption-c1-medium text-(--ids-color-on-muted)',
     list: 'flex min-w-0 flex-col gap-px',
     listItem: 'flex min-w-0 flex-col',
-    subTree: 'ms-[15.5px] flex min-w-0 pt-0.5',
-    subList: 'flex min-w-0 flex-1 flex-col gap-px ps-[7.5px]',
+    subTree: 'ms-[calc(--spacing(4)-0.5px)] flex min-w-0 pt-0.5',
+    subList: 'flex min-w-0 flex-1 flex-col gap-px ps-[calc(--spacing(2)-0.5px)]',
     item: 'min-h-8 concentric-p-0 px-2',
     media: 'w-4 justify-center [&>svg]:stroke-2',
     icon: '',
@@ -96,10 +96,10 @@ export const sidebarStyle = tv({
         groupLabel: 'h-8 px-3',
         groupTrigger: 'min-h-8 px-3',
         list: 'gap-0.5',
-        subTree: 'ms-[21.5px]',
-        subList: 'ps-[9.5px]',
+        subTree: 'ms-[calc(--spacing(5.5)-0.5px)]',
+        subList: 'ps-[calc(--spacing(2.5)-0.5px)]',
         item: 'min-h-10 gap-3 px-3',
-        media: 'w-5 [--ids-size-icon-standard:1.25rem]',
+        media: 'w-5 [--ids-size-icon-standard:--spacing(5)]',
         title: 'text-body-b2-medium',
       },
       false: {},

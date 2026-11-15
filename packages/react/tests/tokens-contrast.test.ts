@@ -4,36 +4,21 @@ import { createRequire } from 'node:module';
 import { differenceCiede2000, interpolate, wcagContrast } from 'culori';
 import { describe, expect, test } from 'vitest';
 
-import type { IdsColor, IdsMode } from '../src/tokens/types';
+import { paletteHues, palettes } from '../.storybook/palettes';
+import { BRAND_ROLES } from '../src/components/utility/ids-provider/theme';
+import { resolveThemeRoles } from '../src/components/utility/ids-provider/theme-roles';
 
-const everyColor = {
-  red: true,
-  orange: true,
-  amber: true,
-  yellow: true,
-  lime: true,
-  green: true,
-  emerald: true,
-  teal: true,
-  cyan: true,
-  sky: true,
-  blue: true,
-  indigo: true,
-  violet: true,
-  purple: true,
-  fuchsia: true,
-  pink: true,
-  rose: true,
-} satisfies Record<IdsColor, true>;
+import type { IdsMode } from '../src/tokens/types';
 
-const colors = Object.keys(everyColor) as IdsColor[];
 const modes: IdsMode[] = ['light', 'dark'];
 
 const AA_TEXT = 4.5;
 const AA_GRAPHICS = 3;
 const NEIGHBOURING_SERIES_DIFFERENCE = 25;
 
-const css = readFileSync(createRequire(import.meta.url).resolve('@gsainfoteam/ids-css'), 'utf8');
+const resolveCss = (entry: string) => createRequire(import.meta.url).resolve(entry);
+
+const css = readFileSync(resolveCss('@gsainfoteam/ids-css/no-fonts.css'), 'utf8');
 
 const controlSurface = readFileSync(
   new URL('../src/internal/control-surface.ts', import.meta.url),
@@ -61,8 +46,8 @@ const tokensFor = (selector: string) =>
     [token: string]: string;
   };
 
-const brandTokens = (color: IdsColor, mode: IdsMode) =>
-  tokensFor(`[data-color="${color}"][data-mode="${mode}"]`);
+const brandTokens = (hue: keyof typeof palettes, mode: IdsMode) =>
+  resolveThemeRoles(palettes[hue]).roles![mode] as { [token: string]: string };
 
 const modeTokens = (mode: IdsMode) => tokensFor(`[data-mode="${mode}"]`);
 
@@ -74,22 +59,49 @@ const contrast = (tokens: { [token: string]: string }, foreground: string, backg
   return wcagContrast(fg!, bg!);
 };
 
-test('ids.css themes exactly the IdsColor values', () => {
-  const themed = new Set(
-    rules.flatMap(({ selector }) => selector.match(/data-color="([a-z]+)"/)?.slice(1) ?? []),
+test.each(modes)('ids.css maps the %s brand roles from the provider variables', (mode) => {
+  const mapping = css.match(
+    new RegExp(`\\[data-mode="${mode}"\\] \\{([^}]*--ids-theme-[^}]*)\\}`),
+  )?.[1];
+
+  expect(
+    [...(mapping ?? '').matchAll(/--ids-color-([\w-]+): var\(--ids-theme-(\w+)-([\w-]+)\);/g)].map(
+      ([, role, from, fromRole]) => [role, from, fromRole],
+    ),
+  ).toEqual(BRAND_ROLES.map((role) => [role, mode, role]));
+});
+
+test('ids.css reads the scale from the provider and rounds without a fallback', () => {
+  expect(css).not.toMatch(/--ids-scale:\s*[\d.]+;/);
+  expect(css).not.toMatch(/@supports \(width: round/);
+  expect(css).toMatch(/--ids-size-control-standard: round\(calc\(36px \* var\(--ids-scale, 1\)\), 1px\);/);
+});
+
+test('the default entry loads the fonts, and no-fonts.css is the tokens alone', () => {
+  const entry = resolveCss('@gsainfoteam/ids-css');
+  const imports = [...readFileSync(entry, 'utf8').matchAll(/@import '([^']+)'/g)].map(
+    ([, path]) => new URL(path, `file://${entry}`).pathname,
   );
 
-  expect([...themed].sort()).toEqual([...colors].sort());
+  expect(imports).toEqual([
+    new URL('fonts/fonts.css', `file://${entry}`).pathname,
+    resolveCss('@gsainfoteam/ids-css/no-fonts.css'),
+  ]);
+  expect(css).not.toMatch(/@font-face/);
+});
+
+test('ids.css no longer themes by color name', () => {
+  expect(css).not.toMatch(/data-color/);
 });
 
 describe.each(modes)('%s brand pairs', (mode) => {
-  test.each(colors)('%s on-primary on primary reaches AA', (color) => {
+  test.each(paletteHues)('%s on-primary on primary reaches AA', (color) => {
     expect(contrast(brandTokens(color, mode), 'on-primary', 'primary')).toBeGreaterThanOrEqual(
       AA_TEXT,
     );
   });
 
-  test.each(colors)('%s on-secondary on secondary reaches AA', (color) => {
+  test.each(paletteHues)('%s on-secondary on secondary reaches AA', (color) => {
     expect(contrast(brandTokens(color, mode), 'on-secondary', 'secondary')).toBeGreaterThanOrEqual(
       AA_TEXT,
     );
@@ -101,14 +113,14 @@ test('control-surface tints soft controls on hover and press', () => {
 });
 
 describe.each(modes)('%s accent and soft tints', (mode) => {
-  test.each(colors)('%s accent reaches AA on surface and on secondary', (color) => {
+  test.each(paletteHues)('%s accent reaches AA on surface and on secondary', (color) => {
     const tokens = { ...modeTokens(mode), ...brandTokens(color, mode) };
 
     expect(contrast(tokens, 'accent', 'surface')).toBeGreaterThanOrEqual(AA_TEXT);
     expect(contrast(tokens, 'accent', 'secondary')).toBeGreaterThanOrEqual(AA_TEXT);
   });
 
-  test.each(colors)('%s on-secondary stays AA on the hover and press tints', (color) => {
+  test.each(paletteHues)('%s on-secondary stays AA on the hover and press tints', (color) => {
     const tokens = brandTokens(color, mode);
     const towardPrimary = interpolate([tokens.secondary!, tokens.primary!], 'oklab');
 

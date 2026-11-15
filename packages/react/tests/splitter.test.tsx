@@ -7,6 +7,7 @@ import { render } from 'vitest-browser-react';
 
 import { Dialog, Drawer, IdsProvider, Menu, Splitter } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 
 type Point = { x: number; y: number };
 
@@ -555,7 +556,7 @@ test('an in-place Menu option lying over a handle is chosen without starting a r
   const chosen = vi.fn();
   const changes: number[][] = [];
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Sized size={PANELS_SHARE_400PX_BESIDE_ONE_HANDLE}>
         <Splitter onValueChange={(value) => changes.push(value)}>
           <Splitter.Panel defaultSize={50}>
@@ -721,7 +722,7 @@ test('pointer: Escape during a drag puts the layout back, reports it and commits
 test('pointer: Escape during a drag inside a Dialog cancels the drag and leaves the Dialog open', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Dialog defaultOpen>
         <Dialog.Content>
           <Dialog.Title>Layout</Dialog.Title>
@@ -840,7 +841,7 @@ test('pointer: a handle removed during its drag ends the drag and commits nothin
 test('a Splitter inside a bottom Drawer resizes its panels without dragging the Drawer', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Drawer side="bottom" defaultOpen>
         <Drawer.Content>
           <Drawer.Title>Panels</Drawer.Title>

@@ -15,7 +15,7 @@ export const menuStyle = tv({
     viewport: 'flex flex-col p-1',
     palette: [
       'fixed inset-x-0 top-[15vh] bottom-auto z-50 mx-auto my-0 flex h-fit flex-col',
-      'max-h-[min(28rem,calc(85dvh-1rem))] w-[min(36rem,calc(100%-2rem))] max-w-none',
+      'max-h-[min(--spacing(112),calc(85dvh-var(--spacing)*4))] w-[min(--spacing(144),calc(100%-var(--spacing)*8))] max-w-none',
       'overflow-hidden concentric-p-1 outline-none',
       'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface)',
       'text-body-b3-regular shadow-lg',
@@ -41,7 +41,7 @@ export const menuStyle = tv({
   },
   variants: {
     nested: {
-      false: { content: 'min-w-[max(var(--anchor-width),8rem)]' },
+      false: { content: 'min-w-[max(var(--anchor-width),--spacing(32))]' },
       true: { content: 'min-w-32' },
     },
     checkable: {

@@ -98,7 +98,7 @@ pnpm lint
 
 ```tsx
 // Storybook decorator나 App 최상단에 반드시 추가
-<IdsProvider color="blue" mode="light">
+<IdsProvider theme={defineIdsTheme({ palette: appPalette })} mode="light">
   <App />
 </IdsProvider>
 ```

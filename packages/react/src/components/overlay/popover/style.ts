@@ -6,7 +6,7 @@ export const popoverStyle = tv({
   slots: {
     backdrop: 'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none border-0 bg-transparent p-0',
     content: [
-      'fixed z-50 m-0 flex max-h-(--available-height) w-72 max-w-[calc(100vw-1rem)] flex-col overflow-visible outline-none',
+      'fixed z-50 m-0 flex max-h-(--available-height) w-72 max-w-[calc(100vw-var(--spacing)*4)] flex-col overflow-visible outline-none',
       cornerOfThePaddedViewport,
       'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface)',
       'text-body-b3-regular shadow-md',

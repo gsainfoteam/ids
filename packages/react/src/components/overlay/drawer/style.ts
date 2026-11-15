@@ -35,7 +35,7 @@ export const drawerStyle = tv({
     side: {
       bottom: {
         content: [
-          'inset-x-0 top-auto bottom-0 h-fit max-h-[calc(100%-2rem)] w-full max-w-none',
+          'inset-x-0 top-auto bottom-0 h-fit max-h-[calc(100%-var(--spacing)*8)] w-full max-w-none',
           'data-[side=bottom]:rounded-b-none data-[side=bottom]:border-b-0',
           'starting:translate-y-full data-ending-style:translate-y-full data-nested-open:-translate-y-4',
         ],
@@ -44,7 +44,7 @@ export const drawerStyle = tv({
       },
       top: {
         content: [
-          'inset-x-0 top-0 bottom-auto h-fit max-h-[calc(100%-2rem)] w-full max-w-none',
+          'inset-x-0 top-0 bottom-auto h-fit max-h-[calc(100%-var(--spacing)*8)] w-full max-w-none',
           'data-[side=top]:rounded-t-none data-[side=top]:border-t-0',
           'starting:-translate-y-full data-ending-style:-translate-y-full data-nested-open:translate-y-4',
         ],
@@ -53,7 +53,7 @@ export const drawerStyle = tv({
       },
       right: {
         content: [
-          'inset-y-0 right-0 left-auto h-full max-h-none w-[min(24rem,calc(100%-2rem))]',
+          'inset-y-0 right-0 left-auto h-full max-h-none w-[min(--spacing(96),calc(100%-var(--spacing)*8))]',
           'data-[side=right]:rounded-r-none data-[side=right]:border-r-0',
           'starting:translate-x-full data-ending-style:translate-x-full data-nested-open:-translate-x-4',
         ],
@@ -61,7 +61,7 @@ export const drawerStyle = tv({
       },
       left: {
         content: [
-          'inset-y-0 right-auto left-0 h-full max-h-none w-[min(24rem,calc(100%-2rem))]',
+          'inset-y-0 right-auto left-0 h-full max-h-none w-[min(--spacing(96),calc(100%-var(--spacing)*8))]',
           'data-[side=left]:rounded-l-none data-[side=left]:border-l-0',
           'starting:-translate-x-full data-ending-style:-translate-x-full data-nested-open:translate-x-4',
         ],
@@ -71,11 +71,15 @@ export const drawerStyle = tv({
     snapping: { true: {}, false: {} },
   },
   compoundVariants: [
-    { side: ['top', 'bottom'], snapping: true, class: { content: 'h-[calc(100%-2rem)]' } },
+    {
+      side: ['top', 'bottom'],
+      snapping: true,
+      class: { content: 'h-[calc(100%-var(--spacing)*8)]' },
+    },
     {
       side: ['left', 'right'],
       snapping: true,
-      class: { content: 'w-[calc(100%-2rem)]' },
+      class: { content: 'w-[calc(100%-var(--spacing)*8)]' },
     },
   ],
   defaultVariants: { side: 'right', snapping: false },

@@ -6,6 +6,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, Dialog, IdsProvider, Select, overlay } from '../src';
+import { testTheme } from './theme';
 
 const finishAnimations = (element: Element) => {
   for (const animation of element.getAnimations()) animation.finish();
@@ -39,7 +40,7 @@ test('SSR renders only the trigger', () => {
 test('opening focuses the first field, Tab stays inside, Escape closes and returns focus', async () => {
   const onOpenChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Settings onOpenChange={onOpenChange} />
     </IdsProvider>,
   );
@@ -72,7 +73,7 @@ test('opening focuses the first field, Tab stays inside, Escape closes and retur
 test('a backdrop click closes once and the content does not', async () => {
   const onOpenChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Settings defaultOpen onOpenChange={onOpenChange} />
     </IdsProvider>,
   );
@@ -87,7 +88,7 @@ test('a backdrop click closes once and the content does not', async () => {
 
 test('Escape closes a Select inside first, then the dialog', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Settings defaultOpen>
         <Select aria-label="Theme">
           <Select.Item value="light">Light</Select.Item>
@@ -109,7 +110,7 @@ test('Escape closes a Select inside first, then the dialog', async () => {
 
 test('a dialog that cannot be dismissed ignores Escape and the backdrop', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Settings defaultOpen dismissible={false} role="alertdialog" />
     </IdsProvider>,
   );
@@ -127,7 +128,7 @@ test('a dialog that cannot be dismissed ignores Escape and the backdrop', async 
 test('the exit keeps the dialog until its animation ends, then reports completion', async () => {
   const onOpenChangeComplete = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Dialog defaultOpen onOpenChangeComplete={onOpenChangeComplete}>
         <Dialog.Content aria-label="Slow" style={{ transition: 'opacity 60s' }} />
       </Dialog>
@@ -146,7 +147,7 @@ test('the exit keeps the dialog until its animation ends, then reports completio
 });
 
 test('overlay.open resolves with the value closed with, or undefined when dismissed', async () => {
-  const screen = await render(<IdsProvider>page</IdsProvider>);
+  const screen = await render(<IdsProvider theme={testTheme}>page</IdsProvider>);
   const confirm = () =>
     overlay.open<boolean>(({ close }) => (
       <Dialog role="alertdialog">
@@ -195,7 +196,7 @@ test('a dialog opened from a dialog stays usable and the one under it steps back
     );
   }
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Scene />
     </IdsProvider>,
   );

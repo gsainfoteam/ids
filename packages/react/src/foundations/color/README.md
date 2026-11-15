@@ -1,6 +1,6 @@
 # Color
 
-IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsProvider` 가 붙이는 `data-color` 와 `data-mode` 에 따라 CSS가 바꿉니다.
+IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 브랜드 색은 앱이 `IdsProvider theme` 에 준 팔레트에서 오고, 모든 색은 `IdsProvider` 가 붙이는 `data-mode` 에 따라 CSS 가 바꿉니다.
 
 ```tsx
 <div className="bg-(--ids-color-surface) text-(--ids-color-on-surface)">
@@ -13,7 +13,7 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 
 ## 브랜드
 
-`data-color` 와 `data-mode` 둘 다에 따라 바뀝니다.
+앱의 팔레트와 `data-mode` 에 따라 바뀝니다.
 
 | 토큰                         | 쓰임                                                                   |
 | ---------------------------- | ---------------------------------------------------------------------- |
@@ -32,36 +32,28 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 - soft 컨트롤의 hover 와 press 는 `secondary` 에 `primary` 를 6%, 12% 섞습니다. `on-secondary` 는 이 배경에서도 4.5:1 을 지킵니다.
 - `accent` 를 쓰는 곳: outline Badge 와 Chip 의 글자, Rating 별, Radio 점.
 
-### 17색
+### 팔레트에서 고르기
 
 ```tsx
-<IdsProvider color="emerald">
+<IdsProvider theme={defineIdsTheme({ palette: { 50: '…', /* … */ 950: '…' } })}>
   <App />
 </IdsProvider>
 ```
 
-- `red` `orange` `amber` `yellow` `lime` `green` `emerald` `teal` `cyan` `sky` `blue` `indigo` `violet` `purple` `fuchsia` `pink` `rose`.
-- 팔레트는 Tailwind CSS v4 기본 색을 hex 로 옮긴 값입니다. `orange` 와 `green` 은 IDS 고유 값입니다.
-- 채움과 선은 모든 색이 같은 단계를 씁니다. 글자 단계는 대비로 정합니다.
+- 앱은 50 ~ 950 의 11단계 팔레트 하나를 줍니다. IDS 에는 기본 색이 없습니다.
+- 채움과 선은 고정 단계, 글자는 대비 4.5:1 을 넘는 첫 단계입니다. 규칙은 [IdsProvider](../../components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 에 있습니다.
 
-| 토큰           | light      | dark       |
-| -------------- | ---------- | ---------- |
-| `primary`      | 600        | 600        |
-| `secondary`    | 100        | 950        |
-| `on-secondary` | 700 또는 800 | 400        |
-| `accent`       | 600 ~ 800  | 400 또는 500 |
-| `outline`      | 200        | 800        |
+| 토큰           | light                    | dark                |
+| -------------- | ------------------------ | ------------------- |
+| `primary`      | 600                      | 600                 |
+| `secondary`    | 100                      | 950                 |
+| `on-secondary` | 700 → 800 → 900          | 400 → 300 → 200     |
+| `accent`       | 600 → 700 → 800 → 900    | 500 → 400 → 300     |
+| `outline`      | 200                      | 800                 |
+| `on-primary`   | 흰색, 안 되면 neutral 950 | 같음                |
 
-- `on-secondary`: light 는 700 과 800 중 soft 의 hover, press 배경까지 4.5:1 을 지키는 밝은 쪽입니다.
-  - 800: `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` `pink` `rose`.
-  - 700: 나머지 7색.
-- `accent`: light 는 600, 700, 800 중 흰 배경과 `secondary` 위에서 4.5:1 을 넘는 가장 밝은 단계, dark 는 500, 400, 300 중 `neutral.950` 과 `secondary` 위에서 4.5:1 을 넘는 가장 진한 단계입니다.
-  - light 600: `indigo` `violet` `purple`. 800: `orange`. 나머지는 700.
-  - dark 500: `orange` `amber` `yellow` `lime` `green` `emerald` `teal` `cyan` `sky`. 나머지는 400.
-- `on-primary` 는 흰 글자(`neutral.0`)가 기본입니다. 흰 글자로 4.5:1 이 안 되는 밝은 색은 검은 글자(`neutral.950`)입니다.
-  - 검은 글자: `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky`.
-  - 흰 글자: 나머지 9색.
-- 채움 위 글자와 아이콘은 색을 직접 고르지 말고 `on-primary` 로 칠합니다. 그래야 밝은 색에서도 읽힙니다.
+- 채움 위 글자와 아이콘은 색을 직접 고르지 말고 `on-primary` 로 칠합니다. 그래야 밝은 팔레트에서도 읽힙니다.
+- Storybook 의 Palette 툴바와 이 스토리는 레포 데모 팔레트 17개(Tailwind CSS v4 기본 색, `orange` 와 `green` 은 IDS 고유 값)를 씁니다. 패키지에는 들어 있지 않습니다.
 
 ## 중립
 
@@ -118,5 +110,5 @@ IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsP
 - 구조선과 테두리는 중립입니다. 테마 색은 주요 동작과 포커스에만 씁니다.
 - 색만으로 의미를 전하지 않습니다. 아이콘이나 글자를 함께 둡니다.
 - 대비는 Storybook `Foundations/Color` 의 Contrast에서 모드와 테마마다 확인합니다.
-- Tokens 스토리는 `semantic/*.json` 과 `enums.json` 을 읽어 그리므로 토큰이나 색을 더하면 저절로 나타납니다. 원시 단계는 [Palette](../palette/README.md) 에 있습니다.
-- `tests/tokens-contrast.test.ts` 가 17색 × 두 모드의 `on-primary` / `primary`, `on-secondary` / `secondary` 와 그 hover, press 배경, `accent` / `surface`, `accent` / `secondary`, 상태 짝이 4.5:1 을 넘는지 검사합니다.
+- Tokens 스토리는 neutral 과 status 의 `semantic/*.json` 과 데모 팔레트를 읽어 그리므로 토큰을 더하면 저절로 나타납니다. 데모 팔레트의 원시 단계는 [Palette](../palette/README.md) 에 있습니다.
+- `tests/theme-roles.test.ts` 가 데모 팔레트 17개 × 두 모드에서 역할 규칙이 이전 고정 표와 같은 값을 내는지, `tests/tokens-contrast.test.ts` 가 그 짝(`on-primary` / `primary`, `on-secondary` / `secondary` 와 hover, press 배경, `accent` / `surface`, `accent` / `secondary`)과 상태 짝이 4.5:1 을 넘는지 검사합니다.

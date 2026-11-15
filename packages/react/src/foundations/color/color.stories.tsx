@@ -1,15 +1,13 @@
 import { expect } from 'storybook/test';
 
-import { Showcase } from '~story-kit';
+import { Showcase, paletteHues, palettes } from '~story-kit';
 
-import enums from '../../../../core/tokens/enums.json';
-import brandTokens from '../../../../core/tokens/semantic/blue.light.json';
 import neutralTokens from '../../../../core/tokens/semantic/neutral.light.json';
 import statusTokens from '../../../../core/tokens/semantic/status.light.json';
 import { IdsProvider, useTheme } from '../../components/utility/ids-provider';
+import { BRAND_ROLES } from '../../components/utility/ids-provider/theme';
 import { cn } from '../../utils';
 
-import type { IdsColor } from '../../tokens/types';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
@@ -21,10 +19,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const colors = enums.ids.color.values.$value as IdsColor[];
+const colors = paletteHues;
 const modes = ['light', 'dark'] as const;
 
-const brand = Object.keys(brandTokens.color);
+const brand = [...BRAND_ROLES];
 const neutral = Object.keys(neutralTokens.color);
 const status = Object.keys(statusTokens.color);
 
@@ -87,8 +85,8 @@ function readSwatch(element: HTMLElement | null) {
 }
 
 function Swatch({ token }: { token: string }) {
-  const { color, resolvedMode } = useTheme();
-  const rereadWhenThemeChanges = `${color}:${resolvedMode}`;
+  const { theme, resolvedMode } = useTheme();
+  const rereadWhenThemeChanges = `${theme.palette?.[600]}:${resolvedMode}`;
   return (
     <div
       key={rereadWhenThemeChanges}
@@ -116,8 +114,8 @@ function readPair(element: HTMLElement | null) {
 }
 
 function Pair({ background, foreground }: { background: string; foreground: string }) {
-  const { color, resolvedMode } = useTheme();
-  const rereadWhenThemeChanges = `${color}:${resolvedMode}`;
+  const { theme, resolvedMode } = useTheme();
+  const rereadWhenThemeChanges = `${theme.palette?.[600]}:${resolvedMode}`;
   return (
     <div
       key={rereadWhenThemeChanges}
@@ -151,7 +149,7 @@ function TokenTable({ tokens }: { tokens: readonly string[] }) {
   return (
     <div className="flex flex-wrap gap-4">
       {modes.map((mode) => (
-        <IdsProvider key={mode} mode={mode} className={panel}>
+        <IdsProvider.Scope key={mode} mode={mode} className={panel}>
           <div className="flex flex-col gap-2">
             <span className={columnLabel}>{mode}</span>
             {tokens.map((token) => (
@@ -161,7 +159,7 @@ function TokenTable({ tokens }: { tokens: readonly string[] }) {
               </div>
             ))}
           </div>
-        </IdsProvider>
+        </IdsProvider.Scope>
       ))}
     </div>
   );
@@ -174,7 +172,7 @@ function BrandTokenTable() {
   return (
     <div className="flex flex-col gap-4">
       {modes.map((mode) => (
-        <IdsProvider key={mode} mode={mode} className={panel}>
+        <IdsProvider.Scope key={mode} mode={mode} className={panel}>
           <div className="flex flex-col gap-2">
             <div className={brandTokenRow} style={brandTokenColumns}>
               <span className={columnLabel}>{mode}</span>
@@ -185,17 +183,17 @@ function BrandTokenTable() {
               ))}
             </div>
             {colors.map((color) => (
-              <IdsProvider key={color} asChild color={color}>
+              <IdsProvider.Scope key={color} asChild theme={{ palette: palettes[color] }}>
                 <div className={brandTokenRow} style={brandTokenColumns}>
                   <span className="text-body-b3-regular">{color}</span>
                   {brand.map((token) => (
                     <Swatch key={token} token={token} />
                   ))}
                 </div>
-              </IdsProvider>
+              </IdsProvider.Scope>
             ))}
           </div>
-        </IdsProvider>
+        </IdsProvider.Scope>
       ))}
     </div>
   );
@@ -208,7 +206,7 @@ function BrandContrastTable() {
   return (
     <div data-brand-contrast="" className="flex flex-wrap gap-4">
       {modes.map((mode) => (
-        <IdsProvider key={mode} mode={mode} className={panel}>
+        <IdsProvider.Scope key={mode} mode={mode} className={panel}>
           <div className="flex flex-col gap-2">
             <div className={brandContrastRow} style={brandContrastColumns}>
               <span className={columnLabel}>{mode}</span>
@@ -219,7 +217,7 @@ function BrandContrastTable() {
               ))}
             </div>
             {colors.map((color) => (
-              <IdsProvider key={color} asChild color={color}>
+              <IdsProvider.Scope key={color} asChild theme={{ palette: palettes[color] }}>
                 <div className={brandContrastRow} style={brandContrastColumns}>
                   <span className="text-body-b3-regular">{color}</span>
                   {brandPairs.map(([background, foreground]) => (
@@ -230,10 +228,10 @@ function BrandContrastTable() {
                     />
                   ))}
                 </div>
-              </IdsProvider>
+              </IdsProvider.Scope>
             ))}
           </div>
-        </IdsProvider>
+        </IdsProvider.Scope>
       ))}
     </div>
   );
@@ -244,7 +242,7 @@ export const Tokens: Story = {
     <Showcase>
       <Showcase.Section
         title="Brand"
-        description="data-color 17색과 data-mode 둘 다에 따라 바뀝니다. 채움은 primary, soft 는 secondary 와 on-secondary, 채움 없이 페이지 위에 놓이는 브랜드 글자와 아이콘은 accent 입니다. outline은 브랜드 색을 띠어야 하는 드문 선에 씁니다."
+        description="앱이 준 팔레트에서 IdsProvider 가 대비로 고르고, data-mode 에 따라 바뀝니다. 여기는 레포 데모 팔레트 17개입니다. 채움은 primary, soft 는 secondary 와 on-secondary, 채움 없이 페이지 위에 놓이는 브랜드 글자와 아이콘은 accent 입니다. outline은 브랜드 색을 띠어야 하는 드문 선에 씁니다."
       >
         <BrandTokenTable />
       </Showcase.Section>
@@ -277,11 +275,11 @@ export const Contrast: Story = {
     <Showcase>
       <Showcase.Section
         title="글자와 배경 대비"
-        description="같이 쓰는 짝의 WCAG 대비입니다. 본문 글자는 4.5:1(AA), 큰 글자와 아이콘은 3:1(AA Large) 이상이어야 합니다. 툴바의 color를 바꾸면 브랜드 짝이 다시 계산됩니다."
+        description="같이 쓰는 짝의 WCAG 대비입니다. 본문 글자는 4.5:1(AA), 큰 글자와 아이콘은 3:1(AA Large) 이상이어야 합니다. 툴바의 Palette 를 바꾸면 브랜드 짝이 다시 계산됩니다."
       >
         <div className="flex flex-wrap gap-4">
           {modes.map((mode) => (
-            <IdsProvider key={mode} mode={mode} className={panel}>
+            <IdsProvider.Scope key={mode} mode={mode} className={panel}>
               <div className="flex flex-col gap-2">
                 <span className={columnLabel}>{mode}</span>
                 {pairs.map(([background, foreground]) => (
@@ -296,7 +294,7 @@ export const Contrast: Story = {
                   </div>
                 ))}
               </div>
-            </IdsProvider>
+            </IdsProvider.Scope>
           ))}
         </div>
       </Showcase.Section>

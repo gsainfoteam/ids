@@ -9,21 +9,22 @@
 | 출력 파일 | 설명 |
 |---|---|
 | `packages/css/dist/ids.css` | CSS 변수 + Tailwind `@theme` |
-| `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsColor`, `IdsSize` 등) |
+| `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등). `IdsColor` 는 Dart 에만 나간다 |
 | `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스 |
 
 ## 토큰 구조
 
 ```
 tokens/
-  palette.json          # 원시 색상 팔레트 (blue.500, orange.300 등)
+  palette.json          # 원시 색상 팔레트. neutral 과 레포 데모 팔레트 17색
   spacing.json          # 간격 원시값 (xs, sm, md, ...)
   typography.json       # 폰트 패밀리·사이즈·웨이트·행간 원시값
   motion.json           # 애니메이션 지속시간 원시값
-  enums.json            # IdsColor·IdsMode·IdsSize·IdsVariant 열거값
+  enums.json            # IdsColor(Dart 전용)·IdsMode·IdsSize·IdsVariant 열거값
   semantic/
-    [color].light.json  # 라이트 모드 시맨틱 색상 (primary, on-primary 등)
-    [color].dark.json   # 다크 모드 시맨틱 색상
+    neutral|status|chart.{light,dark}.json  # IDS 가 정하는 색. CSS 와 Dart 로 나간다
+    [color].light.json  # hue 별 역할 색. Dart 생성에만 쓴다 (Flutter 가 런타임 팔레트로 옮기면 지운다)
+    [color].dark.json
     typography.json     # 시맨틱 타이포그래피 스케일 (display, heading, body 등)
 ```
 

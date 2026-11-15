@@ -110,7 +110,7 @@ import { Drawer } from '@gsainfoteam/ids-react';
 - 가장 바깥 `IdsProvider` 가 배경색이 없으면 그 위 요소의 배경색(없으면 `Canvas`)을 칠해서 검은 `body` 가 비치지 않게 합니다.
 - 닫히면 애니메이션이 끝난 뒤 바꾼 스타일을 모두 되돌립니다.
 - 가장 아래 Drawer 하나만 줄입니다. 안에서 연 Drawer 는 뒤 페이지를 다시 줄이지 않습니다.
-- 가장 바깥 `IdsProvider` 는 화면을 채워야 자연스럽습니다(`min-h-dvh`). Provider 가 화면보다 짧으면 그 아래는 검게 보입니다. `data-color` 를 `<html>` 이나 `<body>` 에 직접 준 앱에서는 줄이지 않습니다.
+- 가장 바깥 `IdsProvider` 는 화면을 채워야 자연스럽습니다(`min-h-dvh`). Provider 가 화면보다 짧으면 그 아래는 검게 보입니다. `data-mode` 를 `<html>` 이나 `<body>` 에 직접 준 앱에서는 줄이지 않습니다.
 - `modal={false}` 이거나 `scaleBackground={false}` 면 줄이지 않습니다.
 
 ### 고정된 요소(FloatingButton)

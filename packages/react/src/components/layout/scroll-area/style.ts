@@ -6,7 +6,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const scrollAreaStyle = tv({
   slots: {
-    root: 'relative flex min-h-0 min-w-0 flex-col [--scroll-area-gap:2px]',
+    root: 'relative flex min-h-0 min-w-0 flex-col [--scroll-area-gap:--spacing(0.5)]',
     viewport: [
       'min-h-0 min-w-0 grow overscroll-none rounded-[inherit] outline-none',
       '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
@@ -40,8 +40,12 @@ export const scrollAreaStyle = tv({
       },
     } satisfies Record<ScrollArea.Variant, object>,
     size: {
-      standard: { root: '[--scroll-area-thickness:8px] [--scroll-area-fade-size:24px]' },
-      tiny: { root: '[--scroll-area-thickness:6px] [--scroll-area-fade-size:16px]' },
+      standard: {
+        root: '[--scroll-area-thickness:--spacing(2)] [--scroll-area-fade-size:--spacing(6)]',
+      },
+      tiny: {
+        root: '[--scroll-area-thickness:--spacing(1.5)] [--scroll-area-fade-size:--spacing(4)]',
+      },
     } satisfies Record<IdsSize, object>,
     scrolls: {
       vertical: { viewport: 'overflow-x-hidden overflow-y-auto' },
@@ -53,8 +57,8 @@ export const scrollAreaStyle = tv({
         scrollbar: [
           'top-[var(--scroll-area-inset-start,var(--scroll-area-gap))]',
           'bottom-[var(--scroll-area-inset-end,var(--scroll-area-gap))]',
-          'w-(--scroll-area-thickness) hover:w-[calc(var(--scroll-area-thickness)+2px)]',
-          'data-dragging:w-[calc(var(--scroll-area-thickness)+2px)]',
+          'w-(--scroll-area-thickness) hover:w-[calc(var(--scroll-area-thickness)+var(--spacing)*0.5)]',
+          'data-dragging:w-[calc(var(--scroll-area-thickness)+var(--spacing)*0.5)]',
         ],
         thumb:
           'inset-x-0 top-0 h-(--scroll-area-thumb-size) translate-y-(--scroll-area-thumb-offset)',
@@ -63,8 +67,8 @@ export const scrollAreaStyle = tv({
         scrollbar: [
           'start-[var(--scroll-area-inset-start,var(--scroll-area-gap))]',
           'end-[var(--scroll-area-inset-end,var(--scroll-area-gap))]',
-          'h-(--scroll-area-thickness) hover:h-[calc(var(--scroll-area-thickness)+2px)]',
-          'data-dragging:h-[calc(var(--scroll-area-thickness)+2px)]',
+          'h-(--scroll-area-thickness) hover:h-[calc(var(--scroll-area-thickness)+var(--spacing)*0.5)]',
+          'data-dragging:h-[calc(var(--scroll-area-thickness)+var(--spacing)*0.5)]',
         ],
         thumb:
           'inset-y-0 start-0 w-(--scroll-area-thumb-size) translate-x-(--scroll-area-thumb-offset)',

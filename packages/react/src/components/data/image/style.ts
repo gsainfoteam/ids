@@ -29,7 +29,7 @@ export const imageStyle = tv({
     fallback: [
       'flex size-full items-center justify-center gap-2 p-2 text-center',
       'bg-(--ids-color-muted) text-body-b3-regular text-(--ids-color-on-muted)',
-      '[&_svg]:size-[min(1.5rem,40%)] [&_svg]:shrink-0',
+      '[&_svg]:size-[min(--spacing(6),40%)] [&_svg]:shrink-0',
     ],
     group: 'min-w-0',
     groupItem: 'flex min-w-0',
@@ -77,7 +77,7 @@ export const imageStyle = tv({
     caption: [
       chrome,
       floatingSurface,
-      'col-start-1 row-start-3 mb-3 max-w-[min(40rem,calc(100%-1.5rem))] justify-self-center',
+      'col-start-1 row-start-3 mb-3 max-w-[min(--spacing(160),calc(100%-var(--spacing)*6))] justify-self-center',
       'concentric-p-3 text-center text-body-b3-regular',
     ],
     thumbnails: [

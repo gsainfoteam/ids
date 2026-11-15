@@ -1,9 +1,9 @@
-import { use, useEffect } from 'react';
+import { use, useEffect, useMemo } from 'react';
 
 import { useGlobals } from 'storybook/preview-api';
 
-import enums from '../../core/tokens/enums.json';
-import { IdsProvider, useTheme } from '../src/components/utility/ids-provider';
+import { paletteHues, palettes, type PaletteHue } from './palettes';
+import { IdsProvider, defineIdsTheme, useTheme } from '../src/components/utility/ids-provider';
 import { PortalRootContext } from '../src/internal/overlay';
 
 import type { Decorator, Preview } from '@storybook/react-vite';
@@ -26,12 +26,17 @@ const withIdsTheme: Decorator = (Story, context) => {
   const [globals, updateGlobals] = useGlobals();
   const oneBlockAmongMany = context.viewMode === 'docs';
   const pageFillsTheCanvas = context.parameters['canvasPadding'] === false;
+  const hue: PaletteHue = globals['idsColor'] in palettes ? globals['idsColor'] : 'blue';
+  const cornerShape = globals['idsCornerShape'] === 'squircle' ? 'squircle' : 'round';
+  const theme = useMemo(
+    () => defineIdsTheme({ palette: palettes[hue], cornerShape }),
+    [hue, cornerShape],
+  );
 
   return (
     <IdsProvider
-      color={globals['idsColor'] ?? 'blue'}
+      theme={theme}
       mode={globals['idsMode'] ?? 'light'}
-      onColorChange={(color) => updateGlobals({ idsColor: color })}
       onModeChange={(mode) => updateGlobals({ idsMode: mode })}
       className={
         oneBlockAmongMany
@@ -103,11 +108,20 @@ const preview: Preview = {
   },
   globalTypes: {
     idsColor: {
-      description: 'IDS color theme',
+      description: 'The palette of the repository demo theme',
       toolbar: {
-        title: 'Color',
+        title: 'Palette',
         icon: 'paintbrush',
-        items: enums.ids.color.values.$value,
+        items: paletteHues,
+        dynamicTitle: true,
+      },
+    },
+    idsCornerShape: {
+      description: 'IDS corner shape',
+      toolbar: {
+        title: 'Corner',
+        icon: 'component',
+        items: ['round', 'squircle'],
         dynamicTitle: true,
       },
     },
@@ -124,6 +138,7 @@ const preview: Preview = {
   initialGlobals: {
     idsColor: 'blue',
     idsMode: 'light',
+    idsCornerShape: 'round',
   },
   decorators: [withIdsTheme],
 };

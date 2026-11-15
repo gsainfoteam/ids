@@ -9,6 +9,7 @@ import { render } from 'vitest-browser-react';
 import { Badge, IdsProvider, Sidebar } from '../src';
 import { skipWithoutCdp } from './engines';
 import { MOD_AS_THE_APP_READS_IT } from './hotkeys';
+import { testTheme } from './theme';
 
 const DESKTOP = { width: 1024, height: 768 };
 const PHONE = { width: 414, height: 896 };
@@ -47,7 +48,7 @@ function Menu() {
   );
 }
 
-const ui = (children: ReactNode) => <IdsProvider>{children}</IdsProvider>;
+const ui = (children: ReactNode) => <IdsProvider theme={testTheme}>{children}</IdsProvider>;
 
 const pressShortcut = () =>
   userEvent.keyboard(`{${MOD_AS_THE_APP_READS_IT}>}b{/${MOD_AS_THE_APP_READS_IT}}`);

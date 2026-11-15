@@ -22,7 +22,7 @@ const opaqueFills = {
 export const floatingButtonStyle = tv({
   base: [
     controlSurface.base,
-    'fixed z-40 max-w-[calc(100vw-3rem)] shadow-lg data-hovered:shadow-xl print:hidden',
+    'fixed z-40 max-w-[calc(100vw-var(--spacing)*12)] shadow-lg data-hovered:shadow-xl print:hidden',
     'transition-[color,background-color,box-shadow,scale] motion-safe:data-active:scale-95',
   ],
   variants: {
@@ -38,20 +38,20 @@ export const floatingButtonStyle = tv({
     },
     placement: {
       'top-left': [
-        'top-[calc(1.5rem+env(safe-area-inset-top))]',
-        'ltr:left-[calc(1.5rem+env(safe-area-inset-left))] rtl:right-[calc(1.5rem+env(safe-area-inset-right))]',
+        'top-[calc(--spacing(6)+env(safe-area-inset-top))]',
+        'ltr:left-[calc(--spacing(6)+env(safe-area-inset-left))] rtl:right-[calc(--spacing(6)+env(safe-area-inset-right))]',
       ],
       'top-right': [
-        'top-[calc(1.5rem+env(safe-area-inset-top))]',
-        'ltr:right-[calc(1.5rem+env(safe-area-inset-right))] rtl:left-[calc(1.5rem+env(safe-area-inset-left))]',
+        'top-[calc(--spacing(6)+env(safe-area-inset-top))]',
+        'ltr:right-[calc(--spacing(6)+env(safe-area-inset-right))] rtl:left-[calc(--spacing(6)+env(safe-area-inset-left))]',
       ],
       'bottom-left': [
-        'bottom-[calc(1.5rem+env(safe-area-inset-bottom))]',
-        'ltr:left-[calc(1.5rem+env(safe-area-inset-left))] rtl:right-[calc(1.5rem+env(safe-area-inset-right))]',
+        'bottom-[calc(--spacing(6)+env(safe-area-inset-bottom))]',
+        'ltr:left-[calc(--spacing(6)+env(safe-area-inset-left))] rtl:right-[calc(--spacing(6)+env(safe-area-inset-right))]',
       ],
       'bottom-right': [
-        'bottom-[calc(1.5rem+env(safe-area-inset-bottom))]',
-        'ltr:right-[calc(1.5rem+env(safe-area-inset-right))] rtl:left-[calc(1.5rem+env(safe-area-inset-left))]',
+        'bottom-[calc(--spacing(6)+env(safe-area-inset-bottom))]',
+        'ltr:right-[calc(--spacing(6)+env(safe-area-inset-right))] rtl:left-[calc(--spacing(6)+env(safe-area-inset-left))]',
       ],
     } satisfies Record<FloatingButton.Placement, string[]>,
   },

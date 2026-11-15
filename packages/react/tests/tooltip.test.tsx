@@ -6,11 +6,12 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, Dialog, IdsProvider, Kbd } from '../src';
+import { testTheme } from './theme';
 import { Tooltip, TooltipDelayGroup } from '../src/components/overlay/tooltip';
 
 function Scene({ children }: { children: ReactNode }) {
   return (
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <TooltipDelayGroup>{children}</TooltipDelayGroup>
     </IdsProvider>
   );
@@ -59,7 +60,7 @@ test('hovering opens after the delay, and leaving closes', async () => {
 
 test('the content is portaled into the IdsProvider root and shown in the top layer', async () => {
   const screen = await render(
-    <IdsProvider data-testid="root">
+    <IdsProvider theme={testTheme} data-testid="root">
       <ul className="space-y-2">
         <li>
           <Tooltip content="Hint" defaultOpen side="bottom">
@@ -338,7 +339,7 @@ test('development warns about a disabled trigger and focusable content', async (
 
 test('shortcuts in the bubble are tiny keys, described by name', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Tooltip
         open
         content={

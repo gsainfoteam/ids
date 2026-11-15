@@ -69,7 +69,7 @@ Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환�
 @source '../node_modules/@gsainfoteam/ids-react/dist';
 ```
 
-- 글꼴은 [`@gsainfoteam/ids-css` README](../css/README.md#폰트) 를 따른다.
+- `@gsainfoteam/ids-css` 는 글꼴 Pretendard GOV 와 Geist Mono 의 파일까지 싣는다. 자세한 내용은 [`@gsainfoteam/ids-css` README](../css/README.md#폰트) 를 따른다.
 - Next.js, TanStack Start, Astro 설정은 `examples/` 의 앱과 같다. CI 가 세 앱을 빌드하고, 서버가 그린 HTML 에 IDS 가 들어 있는지와 CSS 에 IDS 클래스가 생겼는지 확인한다(`pnpm examples:check`).
 
 ### Next.js (App Router)
@@ -96,9 +96,23 @@ export default {
 @source '../node_modules/@gsainfoteam/ids-react/dist';
 ```
 
+```ts
+// app/ids-theme.ts: 앱의 팔레트. 50 ~ 950 의 11단계
+import { defineIdsTheme } from '@gsainfoteam/ids-react';
+
+export const theme = defineIdsTheme({
+  palette: {
+    50: '#eff6ff', 100: '#dbeafe', 200: '#bedbff', 300: '#8ec5ff', 400: '#51a2ff', 500: '#2b7fff',
+    600: '#155dfc', 700: '#1447e6', 800: '#193cb8', 900: '#1c398e', 950: '#162456',
+  },
+});
+```
+
 ```tsx
 // app/layout.tsx
 import { IdsProvider } from '@gsainfoteam/ids-react';
+
+import { theme } from './ids-theme';
 
 import './globals.css';
 
@@ -106,7 +120,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body>
-        <IdsProvider color="blue" mode="light">{children}</IdsProvider>
+        <IdsProvider theme={theme} mode="light">{children}</IdsProvider>
       </body>
     </html>
   );
@@ -168,6 +182,7 @@ export default defineConfig({
 import { IdsProvider } from '@gsainfoteam/ids-react';
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router';
 
+import { theme } from '../ids-theme';
 import styles from '../styles.css?url';
 
 export const Route = createRootRoute({
@@ -178,7 +193,7 @@ export const Route = createRootRoute({
         <HeadContent />
       </head>
       <body>
-        <IdsProvider color="blue" mode="light">{children}</IdsProvider>
+        <IdsProvider theme={theme} mode="light">{children}</IdsProvider>
         <Scripts />
       </body>
     </html>
@@ -222,9 +237,10 @@ export default defineConfig({
 // src/pages/index.astro
 import { Button, IdsProvider } from '@gsainfoteam/ids-react';
 import { Demo } from '../components/demo';
+import { theme } from '../ids-theme';
 import '../styles/global.css';
 ---
-<IdsProvider color="blue" mode="light">
+<IdsProvider theme={theme} mode="light">
   <Button variant="outline">정적 버튼</Button>
 </IdsProvider>
 <Demo client:load />
@@ -264,10 +280,11 @@ import { IdsProvider } from '@gsainfoteam/ids-react';
 import { createRoot } from 'react-dom/client';
 
 import { App } from './app';
+import { theme } from './ids-theme';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
-  <IdsProvider color="blue" mode="light">
+  <IdsProvider theme={theme} mode="light">
     <App />
   </IdsProvider>,
 );
@@ -275,11 +292,20 @@ createRoot(document.getElementById('root')!).render(
 
 ## IdsProvider
 
+IDS 에는 기본 색이 없다. 앱이 `defineIdsTheme` 으로 테마를 만들어 `theme` 에 넘기고, 없으면 타입 오류다.
+
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `color` / `defaultColor` | `IdsColor` | 바깥 Provider, 최상위는 `'blue'` | 색상 테마 (제어 / 비제어) |
+| `theme` | `IdsTheme` | 필수 | `palette`(11단계 또는 색 하나), `radius`, `cornerShape`, `scale` |
 | `mode` / `defaultMode` | `'light' \| 'dark' \| 'system'` | 바깥 Provider, 최상위는 `'light'` | 모드 (제어 / 비제어) |
-| `onColorChange` / `onModeChange` | `(value) => void` | | 값을 바꾸려 할 때 |
+| `onModeChange` | `(mode) => void` | | 모드를 바꾸려 할 때 |
+
+- 라이트와 다크의 역할 색(primary, secondary, accent …)은 팔레트에서 IDS 가 4.5:1 대비를 지키도록 고른다.
+- `palette` 에 색 하나(`'#0d9488'`)를 주면 IDS 가 50~950 을 만든다. `createIdsPalette(color)` 로 결과를 미리 볼 수 있다.
+- `scale` 은 영역을 키우거나 줄이는 배율이다(0.5–2, 기본 1). 크기, 간격, 글자 크기, radius 에 곱한다.
+- `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾼다. 예: `<IdsProvider.Scope theme={{ scale: 1.5 }}>`.
+- `checkIdsTheme(theme)` 은 팔레트와 값의 문제를 목록으로 돌려준다. 앱 테스트에서 `[]` 인지 확인하면 된다.
+- 글꼴은 Pretendard GOV 와 Geist Mono 로 고정이다. `@gsainfoteam/ids-css` 가 파일을 싣는다.
 
 ```tsx
 import { useTheme } from '@gsainfoteam/ids-react';
@@ -290,7 +316,7 @@ function ThemeToggle() {
 }
 ```
 
-중첩, 시스템 모드, `asChild` 는 `src/components/utility/ids-provider/README.md` 를 참고한다.
+역할 색 규칙, 색 하나로 팔레트 만들기, 배율, 앱이 바꾸는 토큰의 범위, 글꼴 불러오기, Scope, 시스템 모드, `asChild` 는 `src/components/utility/ids-provider/README.md` 를 참고한다.
 
 ## 문구와 언어
 
@@ -441,11 +467,11 @@ Tabs·Menu처럼 **진짜 compound**가 생기면 그때 Root Context(또는 sto
 
 | 브라우저 | 최소 버전 | 테스트 엔진 (Playwright 1.63) |
 | --- | --- | --- |
-| Chrome, Edge | 119 | Chromium 153 |
+| Chrome, Edge | 125 | Chromium 153 |
 | Firefox | 128 | Firefox 155 |
 | Safari (macOS, iOS) | 18 | WebKit 26.6 |
 
-- 최소 버전은 IDS 가 기대는 기능에서 나옵니다. 브랜드 채움의 hover 와 press 를 글자색에서 멀어지게 섞는 relative color syntax(Chrome 119, Firefox 128, Safari 18), top layer 에 올리는 `popover` API(Chrome 114, Firefox 125, Safari 17), Tailwind CSS v4(Chrome 111, Firefox 128, Safari 16.4)입니다.
+- 최소 버전은 IDS 가 기대는 기능에서 나옵니다. 브랜드 채움의 hover 와 press 를 글자색에서 멀어지게 섞는 relative color syntax(Chrome 119, Firefox 128, Safari 18), 배율을 px 에 맞추는 CSS `round()`(Chrome 125, Firefox 118, Safari 15.4), top layer 에 올리는 `popover` API(Chrome 114, Firefox 125, Safari 17), Tailwind CSS v4(Chrome 111, Firefox 128, Safari 16.4)입니다.
 - 아래 기능은 없는 브라우저에서 모양만 덜 다듬어집니다.
   - `@starting-style` 이 없으면 여는 애니메이션 없이 바로 나타납니다.
 - 모든 브라우저 테스트가 CI(ubuntu)에서 세 엔진으로 돕니다. macOS 에서는 `pnpm test` 가 Chromium 만 돌리고, `pnpm test:browsers` 가 Docker 의 Playwright Linux 이미지에서 세 엔진을 모두 돌립니다.

@@ -25,6 +25,9 @@ export type AnchoredAlign = 'start' | 'center' | 'end';
 export const VIEWPORT_MARGIN = 8;
 const MIN_HEIGHT = 120;
 
+const scaleOf = (element: Element) =>
+  parseFloat(getComputedStyle(element).getPropertyValue('--ids-scale')) || 1;
+
 const OPPOSITE: Record<AnchoredSide, AnchoredSide> = {
   top: 'bottom',
   bottom: 'top',
@@ -100,7 +103,8 @@ export function useAnchored({
     const undoPopoverUaInset = { right: 'auto', bottom: 'auto' };
     Object.assign(floating.style, undoPopoverUaInset);
 
-    const capHeightBeforeFirstFlip = maxHeight;
+    const capHeightBeforeFirstFlip =
+      maxHeight === undefined ? undefined : maxHeight * scaleOf(floating);
     if (capHeightBeforeFirstFlip !== undefined)
       floating.style.setProperty('max-height', `${capHeightBeforeFirstFlip}px`);
   }, [floating, positioned, maxHeight]);
@@ -119,7 +123,13 @@ export function useAnchored({
     transform: false,
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset({ mainAxis: sideOffset, alignmentAxis: alignOffset }),
+      offset(({ elements }) => {
+        const scale = scaleOf(elements.floating);
+        return {
+          mainAxis: sideOffset * scale,
+          alignmentAxis: alignOffset * scale,
+        };
+      }),
       flip({
         padding: VIEWPORT_MARGIN,
         crossAxis: false,
@@ -131,6 +141,7 @@ export function useAnchored({
           const node = elements.floating;
           const doc = node.ownerDocument;
           const anchorWidth = rects.reference.width;
+          const scale = scaleOf(node);
 
           node.style.setProperty('--anchor-width', `${anchorWidth}px`);
           node.style.setProperty('--anchor-height', `${rects.reference.height}px`);
@@ -139,13 +150,14 @@ export function useAnchored({
 
           if (width !== undefined) {
             const viewport = doc.documentElement.clientWidth || doc.defaultView!.innerWidth;
-            const wanted = width === 'anchor' ? anchorWidth : Math.max(anchorWidth, width);
+            const wanted = width === 'anchor' ? anchorWidth : Math.max(anchorWidth, width * scale);
             node.style.width = `${Math.min(wanted, viewport - VIEWPORT_MARGIN * 2)}px`;
           }
 
           if (maxHeight !== undefined) {
-            const floor = Math.min(MIN_HEIGHT, maxHeight);
-            node.style.maxHeight = `${clamp(availableHeight, floor, maxHeight)}px`;
+            const scaledMaxHeight = maxHeight * scale;
+            const floor = Math.min(MIN_HEIGHT * scale, scaledMaxHeight);
+            node.style.maxHeight = `${clamp(availableHeight, floor, scaledMaxHeight)}px`;
           }
         },
       }),

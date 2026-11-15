@@ -155,7 +155,7 @@ const TYPOGRAPHY_CATS = [
 ];
 const TYPOGRAPHY_CATS_TAILWIND_HAS_NO_THEME_FOR = ["font-size-adjust"];
 
-const T_CSS_THEME = `@theme {
+const T_CSS_THEME = `@theme inline {
 {{THEME}}
 }
 `;
@@ -164,7 +164,7 @@ const T_CSS_THEME_ROOT = `:root {
 {{ROOT}}
 }
 
-@theme {
+@theme inline {
 {{THEME}}
 }
 `;
@@ -256,7 +256,7 @@ const buildStaticCSS = (dictionary) => {
   const roundedUsesIdsRadius = byCategory(dictionary, "radius").map(
     (t) => `  --radius-${slug(t)}: var(${idsVar("radius", t)});`,
   );
-  return `:root {\n${lines.join("\n")}\n}\n\n@theme {\n${roundedUsesIdsRadius.join("\n")}\n}\n`;
+  return `:root {\n${lines.join("\n")}\n}\n\n@theme inline {\n${roundedUsesIdsRadius.join("\n")}\n}\n`;
 };
 
 const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
@@ -492,6 +492,73 @@ const buildColorThemeCSS = (dictionary, color, mode, selector) => {
   return `${selector} {\n${lines.join("\n")}\n}\n`;
 };
 
+const BRAND_ROLES = ["primary", "on-primary", "secondary", "on-secondary", "accent", "outline"];
+
+const buildBrandRolesFromTheProviderCSS = (mode) =>
+  `[data-mode="${mode}"] {\n${BRAND_ROLES.map(
+    (role) => `  --ids-color-${role}: var(--ids-theme-${mode}-${role});`,
+  ).join("\n")}\n}\n`;
+
+const T_CSS_CORNER_SHAPE = `@layer base {
+  [data-mode],
+  [data-mode] * {
+    corner-shape: var(--ids-corner-shape, round);
+  }
+}
+
+@layer utilities {
+  .rounded-full {
+    corner-shape: round;
+  }
+}
+`;
+
+const LENGTHS_SCRIPTS_READ_IN_PIXELS = ["--scroll-area-thickness", "--scroll-area-gap"];
+
+const T_CSS_REGISTERED_LENGTHS = LENGTHS_SCRIPTS_READ_IN_PIXELS.map(
+  (name) => `@property ${name} {\n  syntax: "<length>";\n  inherits: true;\n  initial-value: 0px;\n}\n`,
+).join("\n");
+
+const SCALE = "var(--ids-scale, 1)";
+
+const SPACING_UNIT = "0.25rem";
+
+const scaled = (value) => `calc(${value} * ${SCALE})`;
+
+const scaledToWholePixels = (value) => `round(${scaled(value)}, 1px)`;
+
+const radiusFromTheProvider = (dictionary) =>
+  byCategory(dictionary, "radius")
+    .filter((t) => slug(t) !== "full")
+    .map(
+      (t) =>
+        `  ${idsVar("radius", t)}: ${scaledToWholePixels(`var(--ids-theme-radius-${slug(t)}, ${toVal(t)})`)};`,
+    );
+
+const lengthsTheScaleMultiplies = (dictionary) => [
+  ...readTypographyEntries(buildPalette(dictionary)).map(({ name, fontSize }) => [
+    `--ids-text-${name}`,
+    fontSize,
+  ]),
+  ...byPath(dictionary, "font-size").map((t) => [idsVar("font-size", t), toVal(t)]),
+  ...byCategory(dictionary, "size").map((t) => [idsVar("size", t), toVal(t)]),
+];
+
+const scaledLengths = (dictionary) => [
+  `  --spacing: ${scaled(SPACING_UNIT)};`,
+  ...lengthsTheScaleMultiplies(dictionary).map(
+    ([name, value]) => `  ${name}: ${scaledToWholePixels(value)};`,
+  ),
+];
+
+const block = (selector, lines) => `${selector} {\n${lines.join("\n")}\n}\n`;
+
+const buildScaleCSS = (dictionary) =>
+  [
+    block("[data-mode]", radiusFromTheProvider(dictionary)),
+    block("[data-scale]", scaledLengths(dictionary)),
+  ].join("\n");
+
 const cssFormatter = ({ dictionary }) =>
   [
     buildColorBridgeCSS(dictionary),
@@ -502,14 +569,11 @@ const cssFormatter = ({ dictionary }) =>
     T_CSS_UTILITIES,
     buildConcentricCSS(),
     buildTypographyCSS(dictionary),
-    ...colorPairs.map(([c, m]) =>
-      buildColorThemeCSS(
-        dictionary,
-        c,
-        m,
-        `[data-color="${c}"][data-mode="${m}"]`,
-      ),
-    ),
+    T_CSS_CORNER_SHAPE,
+    buildScaleCSS(dictionary),
+    T_CSS_REGISTERED_LENGTHS,
+    buildBrandRolesFromTheProviderCSS("light"),
+    buildBrandRolesFromTheProviderCSS("dark"),
     buildColorThemeCSS(dictionary, "neutral", "light", '[data-mode="light"]'),
     buildColorThemeCSS(dictionary, "neutral", "dark", '[data-mode="dark"]'),
     buildColorThemeCSS(dictionary, "status", "light", '[data-mode="light"]'),
@@ -518,8 +582,14 @@ const cssFormatter = ({ dictionary }) =>
     buildColorThemeCSS(dictionary, "chart", "dark", '[data-mode="dark"]'),
   ].join("\n");
 
+const ENUMS_THE_APP_DEFINES_IN_REACT = ["color"];
+
 const tsTypesFormatter = ({ dictionary }) => {
-  const enums = parseEnums(dictionary);
+  const enums = Object.fromEntries(
+    Object.entries(parseEnums(dictionary)).filter(
+      ([key]) => !ENUMS_THE_APP_DEFINES_IN_REACT.includes(key),
+    ),
+  );
   return render(T_TS_FILE, {
     BODY: Object.entries(enums)
       .map(

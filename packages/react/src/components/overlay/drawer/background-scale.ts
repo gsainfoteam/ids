@@ -21,7 +21,7 @@ export function outermostProviderRoot(from: Element) {
 
   for (let node = from.parentElement; node; node = node.parentElement) {
     const paintsABox = getComputedStyle(node).display !== 'contents';
-    if (node.hasAttribute('data-color') && paintsABox) root = node;
+    if (node.hasAttribute('data-mode') && paintsABox) root = node;
   }
 
   return root === doc.body || root === doc.documentElement ? null : root;

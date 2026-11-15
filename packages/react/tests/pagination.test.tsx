@@ -6,6 +6,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Pagination } from '../src';
+import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -320,6 +321,7 @@ test('labels follow the provider translation', async () => {
   };
   await render(
     <IdsProvider
+      theme={testTheme}
       translate={(key, values) =>
         key === 'pagination.page' ? `Page ${values?.page}` : english[key]
       }

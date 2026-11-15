@@ -48,7 +48,7 @@ export const Scales: Story = {
     <Showcase>
       <Showcase.Section
         title="원시 팔레트"
-        description="palette.json 의 모든 단계입니다. 컴포넌트는 이 값을 직접 쓰지 않고 Color 의 시맨틱 토큰을 거칩니다. neutral 과 17색이고, orange 와 green 을 뺀 색은 Tailwind CSS v4 기본값입니다."
+        description="palette.json 의 모든 단계입니다. 컴포넌트는 이 값을 직접 쓰지 않고 Color 의 시맨틱 토큰을 거칩니다. neutral 과 레포 데모 팔레트 17색이고, orange 와 green 을 뺀 색은 Tailwind CSS v4 기본값입니다."
       >
         <div className="grid items-center gap-x-1.5 gap-y-2" style={columns}>
           <span />

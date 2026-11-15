@@ -6,6 +6,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Empty, IdsProvider, Link } from '../src';
+import { testTheme } from './theme';
 
 type RouterState = { isActive: boolean };
 type RouterLinkProps = Omit<ComponentProps<'a'>, 'children' | 'className' | 'style'> & {
@@ -77,7 +78,10 @@ test('the rel the app gives wins, and other targets get no hint', async () => {
 
 test('the hint follows the IdsProvider translate', async () => {
   const screen = await render(
-    <IdsProvider translate={(key) => (key === 'link.newTab' ? '(opens in a new tab)' : undefined)}>
+    <IdsProvider
+      theme={testTheme}
+      translate={(key) => (key === 'link.newTab' ? '(opens in a new tab)' : undefined)}
+    >
       <Link href="https://www.gist.ac.kr" target="_blank">
         GIST
       </Link>

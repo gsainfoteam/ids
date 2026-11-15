@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const examples = fileURLToPath(new URL('../examples/', import.meta.url));
 
 const serverRenderedIds = [
-  ['IdsProvider theme', 'data-color="blue"'],
+  ['IdsProvider theme', '--ids-theme-light-primary:#155dfc'],
   ['glossy Button', 'data-variant="glossy"'],
   ['Dialog.Trigger', 'aria-haspopup="dialog"'],
   ['Select', 'data-select=""'],
@@ -16,6 +16,13 @@ const serverRenderedIds = [
 ];
 
 const utilityOnlyIdsUses = '.bg-\\(--ids-color-surface\\)';
+
+const idsFonts = ['Pretendard GOV Variable', 'Geist Mono Variable'];
+
+const fontFaceOf = (css, family) =>
+  [...css.matchAll(/@font-face\s*\{[^}]*\}/g)].find(
+    ([rule]) => rule.includes(family) && rule.includes('.woff2'),
+  );
 
 const apps = [
   {
@@ -73,6 +80,12 @@ for (const app of apps) {
     failures.push(
       `${app.name}: the stylesheet has no ${utilityOnlyIdsUses}, so Tailwind did not scan @gsainfoteam/ids-react`,
     );
+
+  for (const family of idsFonts)
+    if (!fontFaceOf(css, family))
+      failures.push(
+        `${app.name}: the stylesheet has no @font-face for ${family}, so the fonts in @gsainfoteam/ids-css did not reach the bundle`,
+      );
 
   if (!failures.some((failure) => failure.startsWith(`${app.name}:`)))
     console.log(`ok ${app.name}`);

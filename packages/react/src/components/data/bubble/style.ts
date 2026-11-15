@@ -26,7 +26,7 @@ export const bubbleStyle = tv({
       true: {
         root: 'mb-4',
         reactions: [
-          'absolute top-full w-max min-w-[calc(100%-1.5rem)] -translate-y-1.5 flex-nowrap',
+          'absolute top-full w-max min-w-[calc(100%-var(--spacing)*6)] -translate-y-1.5 flex-nowrap',
           'pointer-events-none *:pointer-events-auto *:ring-2 *:ring-(--ids-color-surface)',
         ],
       },

@@ -6,6 +6,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, IdsProvider, overlay } from '../src';
+import { testTheme } from './theme';
 import { Popover } from '../src/components/overlay/popover';
 
 afterEach(() => {
@@ -41,7 +42,7 @@ test('SSR renders only the trigger', () => {
 test('a click opens it beside the trigger without moving focus, and a second click closes it', async () => {
   const onOpenChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Share onOpenChange={onOpenChange} />
     </IdsProvider>,
   );
@@ -67,7 +68,7 @@ test('a click opens it beside the trigger without moving focus, and a second cli
 
 test('initialFocus moves focus in, and Escape closes and returns it to the trigger', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Share initialFocus="input" />
     </IdsProvider>,
   );
@@ -81,7 +82,7 @@ test('initialFocus moves focus in, and Escape closes and returns it to the trigg
 
 test('Popover.Close closes and returns focus to the trigger', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Share defaultOpen />
     </IdsProvider>,
   );
@@ -93,7 +94,7 @@ test('Popover.Close closes and returns focus to the trigger', async () => {
 test('a press outside closes it once and leaves focus where the press put it', async () => {
   const onOpenChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <p>Outside text</p>
       <Share initialFocus="input" onOpenChange={onOpenChange} />
     </IdsProvider>,
@@ -111,7 +112,7 @@ test('a press inside the outer popover closes only the inner one; outside both c
   const onOuterChange = vi.fn();
   const onInnerChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <p>Page</p>
       <Popover onOpenChange={onOuterChange}>
         <Popover.Trigger>Outer</Popover.Trigger>
@@ -163,7 +164,7 @@ function HoverCard(props: Partial<Popover.Props>) {
 
 test('hover opens it, the pointer can travel into the content, and leaving both closes it', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <HoverCard />
     </IdsProvider>,
   );
@@ -179,7 +180,7 @@ test('hover opens it, the pointer can travel into the content, and leaving both 
 
 test('a click on a hover trigger keeps it open after the pointer leaves', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <HoverCard />
     </IdsProvider>,
   );
@@ -196,7 +197,7 @@ test('a click on a hover trigger keeps it open after the pointer leaves', async 
 
 test('a modal popover holds focus inside and hides the page', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Popover modal>
         <Popover.Trigger>Edit</Popover.Trigger>
         <Popover.Content aria-label="Edit name">
@@ -227,7 +228,7 @@ test('a modal popover holds focus inside and hides the page', async () => {
 
 test('Popover.Arrow is drawn at the edge facing the trigger', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ marginLeft: 150 }}>
         <Popover defaultOpen>
           <Popover.Trigger>Info</Popover.Trigger>
@@ -258,7 +259,7 @@ test('Popover.Arrow is drawn at the edge facing the trigger', async () => {
 
 test('it flips to the other side when the preferred side has no room', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ position: 'fixed', bottom: 8, left: 8 }}>
         <Popover defaultOpen>
           <Popover.Trigger>Bottom</Popover.Trigger>
@@ -298,7 +299,7 @@ test('an anchor positions it against another element', async () => {
     );
   }
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Scene />
     </IdsProvider>,
   );
@@ -314,7 +315,7 @@ test('an anchor positions it against another element', async () => {
 
 test('overlay.open binds a popover without an open prop and resolves its value', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <span>anchor spot</span>
     </IdsProvider>,
   );
@@ -341,7 +342,7 @@ test('overlay.open binds a popover without an open prop and resolves its value',
 test('the exit keeps the content until its animation ends, then reports completion', async () => {
   const onOpenChangeComplete = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Popover defaultOpen onOpenChangeComplete={onOpenChangeComplete}>
         <Popover.Trigger>Slow</Popover.Trigger>
         <Popover.Content aria-label="Slow panel" style={{ transition: 'opacity 60s' }} />
@@ -363,7 +364,7 @@ test('the exit keeps the content until its animation ends, then reports completi
 test('development warns about a content with nothing to sit next to, and about a second content', async () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Popover>
         <Popover.Content aria-label="Lost" />
       </Popover>

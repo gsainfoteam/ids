@@ -6,7 +6,7 @@ export const toasterStyle = tv({
   slots: {
     region: [
       'fixed inset-x-4 z-50 m-0 h-(--front-toast-height) w-auto overflow-visible border-0 bg-transparent p-0',
-      'text-(--ids-color-on-surface) outline-none sm:w-[356px]',
+      'text-(--ids-color-on-surface) outline-none sm:w-89',
     ],
     toast: [
       'absolute inset-x-0 z-(--toast-z) touch-none concentric-p-3 px-4',

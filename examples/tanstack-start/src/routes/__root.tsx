@@ -1,6 +1,7 @@
 import { IdsProvider } from '@gsainfoteam/ids-react';
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router';
 
+import { theme } from '../ids-theme';
 import styles from '../styles.css?url';
 
 import type { ReactNode } from 'react';
@@ -24,7 +25,7 @@ function RootDocument({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <IdsProvider color="blue" mode="light">
+        <IdsProvider theme={theme} mode="light">
           {children}
         </IdsProvider>
         <Scripts />

@@ -9,6 +9,7 @@ import { render } from 'vitest-browser-react';
 import englishCatalog from '../messages/en.json';
 import { DataTable, IdsProvider, type IdsTranslate } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 
 type Person = { id: string; name: string; age: number };
 
@@ -38,7 +39,7 @@ const nameOf = (row: Person) => row.name;
 
 function table(props: Partial<DataTable.Props<Person>> = {}) {
   return (
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <DataTable
         columns={columns}
         data={PEOPLE}
@@ -204,7 +205,7 @@ test('server pagination draws the rows it is given and counts pages from rowCoun
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 2 });
     const start = pagination.pageIndex * pagination.pageSize;
     return (
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <DataTable
           columns={columns}
           data={PEOPLE.slice(start, start + pagination.pageSize)}
@@ -303,7 +304,7 @@ test('every string speaks the translation', async () => {
     return new IntlMessageFormat(pattern as string, 'en-US').format(values) as string;
   };
   const screen = await render(
-    <IdsProvider translate={english} locale="en-US">
+    <IdsProvider theme={testTheme} translate={english} locale="en-US">
       <DataTable
         columns={columns}
         data={manyPeople(12)}

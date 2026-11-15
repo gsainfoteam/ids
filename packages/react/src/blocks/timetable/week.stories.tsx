@@ -2,9 +2,8 @@ import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
 import { Table } from '../../components/data/table';
-import { IdsProvider } from '../../components/utility/ids-provider';
+import { IdsProvider, defineIdsTheme } from '../../components/utility/ids-provider';
 
-import type { IdsColor } from '../../tokens/types';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta = {
@@ -22,13 +21,106 @@ const DAYS = ['월', '화', '수', '목', '금'];
 
 const PERIODS = ['09:00', '10:30', '13:00', '14:30', '16:00'];
 
+const COURSE_THEMES = {
+  blue: defineIdsTheme({
+    palette: {
+      50: '#eff6ff',
+      100: '#dbeafe',
+      200: '#bedbff',
+      300: '#8ec5ff',
+      400: '#51a2ff',
+      500: '#2b7fff',
+      600: '#155dfc',
+      700: '#1447e6',
+      800: '#193cb8',
+      900: '#1c398e',
+      950: '#162456',
+    },
+  }),
+  violet: defineIdsTheme({
+    palette: {
+      50: '#f5f3ff',
+      100: '#ede9fe',
+      200: '#ddd6ff',
+      300: '#c4b4ff',
+      400: '#a684ff',
+      500: '#8e51ff',
+      600: '#7f22fe',
+      700: '#7008e7',
+      800: '#5d0ec0',
+      900: '#4d179a',
+      950: '#2f0d68',
+    },
+  }),
+  teal: defineIdsTheme({
+    palette: {
+      50: '#f0fdfa',
+      100: '#cbfbf1',
+      200: '#96f7e4',
+      300: '#46ecd5',
+      400: '#00d5be',
+      500: '#00bba7',
+      600: '#009689',
+      700: '#00786f',
+      800: '#005f5a',
+      900: '#0b4f4a',
+      950: '#022f2e',
+    },
+  }),
+  orange: defineIdsTheme({
+    palette: {
+      50: '#fff6f2',
+      100: '#ffe8de',
+      200: '#ffc8b4',
+      300: '#ffa082',
+      400: '#ff7650',
+      500: '#ff5722',
+      600: '#ff4500',
+      700: '#d63a00',
+      800: '#a32d00',
+      900: '#7a2200',
+      950: '#451300',
+    },
+  }),
+  pink: defineIdsTheme({
+    palette: {
+      50: '#fdf2f8',
+      100: '#fce7f3',
+      200: '#fccee8',
+      300: '#fda5d5',
+      400: '#fb64b6',
+      500: '#f6339a',
+      600: '#e60076',
+      700: '#c6005c',
+      800: '#a3004c',
+      900: '#861043',
+      950: '#510424',
+    },
+  }),
+  lime: defineIdsTheme({
+    palette: {
+      50: '#f7fee7',
+      100: '#ecfcca',
+      200: '#d8f999',
+      300: '#bbf451',
+      400: '#9ae600',
+      500: '#7ccf00',
+      600: '#5ea500',
+      700: '#497d00',
+      800: '#3c6300',
+      900: '#35530e',
+      950: '#192e03',
+    },
+  }),
+};
+
 const COURSES: {
   id: string;
   name: string;
   room: string;
   professor: string;
   credits: number;
-  color: IdsColor;
+  color: keyof typeof COURSE_THEMES;
   slots: [day: number, period: number][];
 }[] = [
   {
@@ -135,9 +227,9 @@ export const PC: Story = {
                     <Table.Cell key={day}>
                       {course && (
                         <div className="flex flex-col items-start gap-1">
-                          <IdsProvider color={course.color} asChild>
+                          <IdsProvider.Scope theme={COURSE_THEMES[course.color]} asChild>
                             <Badge content={course.name} variant="soft" colorScheme="primary" />
-                          </IdsProvider>
+                          </IdsProvider.Scope>
                           <span className="text-caption-c1-regular">{course.room}</span>
                         </div>
                       )}
@@ -160,9 +252,9 @@ export const PC: Story = {
               <Item key={course.id}>
                 <Item.Content>
                   <Item.Title>
-                    <IdsProvider color={course.color} asChild>
+                    <IdsProvider.Scope theme={COURSE_THEMES[course.color]} asChild>
                       <Badge dot colorScheme="primary" aria-hidden />
-                    </IdsProvider>
+                    </IdsProvider.Scope>
                     {course.name}
                   </Item.Title>
                   <Item.Description>

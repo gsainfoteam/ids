@@ -6,6 +6,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Breadcrumb, IdsProvider } from '../src';
+import { testTheme } from './theme';
 
 function RouterLink({
   to,
@@ -50,7 +51,7 @@ const visibleTrail = (nav: Element) =>
 
 test('renders a named nav landmark holding an ordered list with the current page marked', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb>{crumbs(['Home', 'Products', 'Laptop'])}</Breadcrumb>
     </IdsProvider>,
   );
@@ -66,7 +67,7 @@ test('renders a named nav landmark holding an ordered list with the current page
 
 test('an aria-label replaces the default name', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb aria-label="Docs trail">{crumbs(['Home', 'Docs'])}</Breadcrumb>
     </IdsProvider>,
   );
@@ -76,7 +77,7 @@ test('an aria-label replaces the default name', async () => {
 
 test('puts a hidden separator between crumbs and none after the last', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb>
         <>{crumbs(['Home', 'Products'])}</>
         <Breadcrumb.Item>
@@ -95,7 +96,7 @@ test('puts a hidden separator between crumbs and none after the last', async () 
 
 test('separator replaces the chevron, and written Separators turn the automatic ones off', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb separator="/" aria-label="slashes">
         {crumbs(['Home', 'Docs', 'Page'])}
       </Breadcrumb>
@@ -130,7 +131,7 @@ test('separator replaces the chevron, and written Separators turn the automatic 
 
 test('the default chevron mirrors in a right-to-left page', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div dir="rtl">
         <Breadcrumb aria-label="rtl">{crumbs(['Home', 'Page'])}</Breadcrumb>
       </div>
@@ -148,7 +149,7 @@ test('the default chevron mirrors in a right-to-left page', async () => {
 test('maxItems keeps the first and the last maxItems - 1 crumbs and folds the rest into a menu', async () => {
   const navigate = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb maxItems={3}>
         <Breadcrumb.Item>
           <Breadcrumb.Link href="#home">Home</Breadcrumb.Link>
@@ -198,7 +199,7 @@ test('maxItems keeps the first and the last maxItems - 1 crumbs and folds the re
 
 test('maxItems leaves a trail that already fits, and an Ellipsis written by hand', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb maxItems={3} aria-label="fits">
         {crumbs(['Home', 'Docs', 'Page'])}
       </Breadcrumb>
@@ -224,7 +225,7 @@ test('maxItems leaves a trail that already fits, and an Ellipsis written by hand
 test('a router link placed through asChild keeps its own element and takes the link styles', async () => {
   const navigate = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb>
         <Breadcrumb.Item>
           <Breadcrumb.Link asChild className="custom">
@@ -251,7 +252,7 @@ test('a router link placed through asChild keeps its own element and takes the l
 
 test('size sets the text scale of the trail', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb aria-label="standard">{crumbs(['Home', 'Page'])}</Breadcrumb>
       <Breadcrumb size="tiny" aria-label="tiny">
         {crumbs(['Home', 'Page'])}
@@ -274,7 +275,7 @@ test('size sets the text scale of the trail', async () => {
 test('the English catalog names the landmark and the menu button', async () => {
   const english = { 'breadcrumb.label': 'Breadcrumb', 'breadcrumb.more': 'Show hidden path' };
   const screen = await render(
-    <IdsProvider translate={(key) => english[key as keyof typeof english] ?? key}>
+    <IdsProvider theme={testTheme} translate={(key) => english[key as keyof typeof english] ?? key}>
       <Breadcrumb maxItems={2}>{crumbs(['Home', 'Docs', 'Page'])}</Breadcrumb>
     </IdsProvider>,
   );
@@ -287,7 +288,7 @@ test('the English catalog names the landmark and the menu button', async () => {
 
 test('server HTML already holds the landmark, the list and the current page', () => {
   const html = renderToString(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb maxItems={2}>{crumbs(['Home', 'Docs', 'Page'])}</Breadcrumb>
     </IdsProvider>,
   );
@@ -305,7 +306,7 @@ test('warns in development when the trail is empty', async () => {
   onTestFinished(() => warn.mockRestore());
 
   await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Breadcrumb />
     </IdsProvider>,
   );
