@@ -13,15 +13,18 @@ Color _color(String hex) =>
     Color(int.parse(hex.substring(1), radix: 16) | 0xFF000000);
 
 final _palettes = {
-  for (final MapEntry(:key, :value)
-      in (jsonDecode(File('../core/tokens/palette.json').readAsStringSync())
-              as Map<String, dynamic>)
-          .entries)
-    if (key != 'neutral')
-      key: IdsPalette([
-        for (final step in IdsPalette.steps)
-          _color((value as Map<String, dynamic>)['$step'][r'$value'] as String),
-      ]),
+  for (final theme
+      in ((jsonDecode(
+                    File(
+                      '../core/tests/fixtures/theme-roles.json',
+                    ).readAsStringSync(),
+                  )
+                  as Map<String, dynamic>)['themes']
+              as List)
+          .cast<Map<String, dynamic>>())
+    theme['primary'] as String: IdsPalette.fromSeed(
+      _color(theme['seed'] as String),
+    ),
 };
 
 void main() {

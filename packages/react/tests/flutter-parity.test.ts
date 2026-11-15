@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { paletteHues, palettes } from '../.storybook/palettes';
+import { paletteHues, palettes, paletteSeeds } from '../.storybook/palettes';
 import { MODES, resolveColors, slotsOf } from '../src/components/utility/ids-provider/theme-roles';
 import { IDS_BASE_SLOTS, IDS_COLOR_FAMILIES } from '../src/tokens/color-roles';
 
@@ -18,6 +18,7 @@ function resolvedRoles(primary: (typeof paletteHues)[number], neutral: IdsNeutra
   const { colors } = resolveColors({ primary: palettes[primary], neutral, status });
   return {
     primary,
+    seed: paletteSeeds[primary],
     neutral,
     status,
     ...Object.fromEntries(MODES.map((mode) => [mode, ROLES.map((role) => colors!.roles[mode][role])])),

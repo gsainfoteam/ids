@@ -14,13 +14,7 @@ String _hex(Color color) =>
 Map<String, dynamic> _readJson(String path) =>
     jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
 
-IdsPalette _paletteOf(Map<String, dynamic> steps) => IdsPalette([
-  for (final step in IdsPalette.steps)
-    _color((steps['$step'] as Map<String, dynamic>)[r'$value'] as String),
-]);
-
 void main() {
-  final palettes = _readJson('../core/tokens/palette.json');
   final fixture = _readJson('../core/tests/fixtures/theme-roles.json');
   final roles = (fixture['roles'] as List).cast<String>();
 
@@ -34,7 +28,7 @@ void main() {
 
     test('$name resolves the roles ids-react resolves', () {
       final resolved = IdsTheme(
-        primary: _paletteOf(palettes[theme['primary']] as Map<String, dynamic>),
+        primary: IdsThemeColor.seed(_color(theme['seed'] as String)),
         neutral: IdsNeutral.values.byName(theme['neutral'] as String),
         status: theme['status'] == 'fixed'
             ? IdsStatus.fixed
