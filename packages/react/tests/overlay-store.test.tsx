@@ -130,7 +130,7 @@ test('only the first outermost provider hosts, and items take the theme they wer
   const screen = await render(
     <>
       <IdsProvider theme={testTheme} data-testid="first">
-        <IdsProvider.Scope theme={{ palette: palettes.orange, scale: 'tv' }} mode="dark">
+        <IdsProvider.Scope theme={{ palette: palettes.orange, scale: 1.5 }} mode="dark">
           <Opener />
         </IdsProvider.Scope>
       </IdsProvider>
@@ -152,7 +152,7 @@ test('only the first outermost provider hosts, and items take the theme they wer
   const scoped = screen.getByText('scoped').element().closest('[data-overlay-item]');
   expect(primaryOf(scoped)).toBe(palettes.orange[600]);
   expect(scoped).toHaveAttribute('data-mode', 'dark');
-  expect(scoped).toHaveAttribute('data-scale', 'tv');
+  expect(scoped).toHaveAttribute('data-scale', '1.5');
   overlay.closeAll();
 });
 

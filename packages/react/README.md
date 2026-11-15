@@ -302,8 +302,8 @@ IDS 에는 기본 색이 없다. 앱이 `defineIdsTheme` 으로 테마를 만들
 
 - 라이트와 다크의 역할 색(primary, secondary, accent …)은 팔레트에서 IDS 가 4.5:1 대비를 지키도록 고른다.
 - `palette` 에 색 하나(`'#0d9488'`)를 주면 IDS 가 50~950 을 만든다. `createIdsPalette(color)` 로 결과를 미리 볼 수 있다.
-- `scale` 은 영역을 키운다: `'default'`(1), `'large'`(1.25), `'tv'`(1.5). 크기, 간격, 글자 크기, radius 에 곱한다.
-- `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾼다. 예: `<IdsProvider.Scope theme={{ scale: 'tv' }}>`.
+- `scale` 은 영역을 키우거나 줄이는 배율이다(0.5–2, 기본 1). 크기, 간격, 글자 크기, radius 에 곱한다.
+- `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾼다. 예: `<IdsProvider.Scope theme={{ scale: 1.5 }}>`.
 - `checkIdsTheme(theme)` 은 팔레트와 값의 문제를 목록으로 돌려준다. 앱 테스트에서 `[]` 인지 확인하면 된다.
 - IDS 는 글꼴을 불러오지 않는다. 앱이 불러오고 `font.sans`, `font.mono` 에 CSS `font-family` 값을 넘긴다.
 
@@ -467,11 +467,11 @@ Tabs·Menu처럼 **진짜 compound**가 생기면 그때 Root Context(또는 sto
 
 | 브라우저 | 최소 버전 | 테스트 엔진 (Playwright 1.63) |
 | --- | --- | --- |
-| Chrome, Edge | 119 | Chromium 153 |
+| Chrome, Edge | 125 | Chromium 153 |
 | Firefox | 128 | Firefox 155 |
 | Safari (macOS, iOS) | 18 | WebKit 26.6 |
 
-- 최소 버전은 IDS 가 기대는 기능에서 나옵니다. 브랜드 채움의 hover 와 press 를 글자색에서 멀어지게 섞는 relative color syntax(Chrome 119, Firefox 128, Safari 18), top layer 에 올리는 `popover` API(Chrome 114, Firefox 125, Safari 17), Tailwind CSS v4(Chrome 111, Firefox 128, Safari 16.4)입니다.
+- 최소 버전은 IDS 가 기대는 기능에서 나옵니다. 브랜드 채움의 hover 와 press 를 글자색에서 멀어지게 섞는 relative color syntax(Chrome 119, Firefox 128, Safari 18), 배율을 px 에 맞추는 CSS `round()`(Chrome 125, Firefox 118, Safari 15.4), top layer 에 올리는 `popover` API(Chrome 114, Firefox 125, Safari 17), Tailwind CSS v4(Chrome 111, Firefox 128, Safari 16.4)입니다.
 - 아래 기능은 없는 브라우저에서 모양만 덜 다듬어집니다.
   - `@starting-style` 이 없으면 여는 애니메이션 없이 바로 나타납니다.
 - 모든 브라우저 테스트가 CI(ubuntu)에서 세 엔진으로 돕니다. macOS 에서는 `pnpm test` 가 Chromium 만 돌리고, `pnpm test:browsers` 가 Docker 의 Playwright Linux 이미지에서 세 엔진을 모두 돌립니다.

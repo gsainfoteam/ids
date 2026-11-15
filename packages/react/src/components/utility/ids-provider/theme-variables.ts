@@ -2,9 +2,7 @@ import type { CSSProperties } from 'react';
 
 import {
   BRAND_ROLES,
-  SCALE_PRESETS,
   type IdsCornerShape,
-  type IdsScale,
   type IdsTheme,
   type IdsThemeOverrides,
 } from './theme';
@@ -17,6 +15,8 @@ export const RADIUS_RANGE = { min: 0, max: 18 } as const;
 export const INDICATOR_RADIUS_RATIO = 0.4;
 
 export const CONTAINER_RADIUS_RATIO = 1.6;
+
+export const SCALE_RANGE = { min: 0.5, max: 2 } as const;
 
 const CORNER_SHAPES: readonly IdsCornerShape[] = ['round', 'squircle'];
 
@@ -107,24 +107,28 @@ function paletteVariables(
   return variables;
 }
 
-const isScale = (scale: unknown): scale is IdsScale =>
-  typeof scale === 'string' && Object.hasOwn(SCALE_PRESETS, scale);
+function scaleVariables(scale: number | undefined, issues: IdsThemeIssue[]): ThemeVariables {
+  if (scale === undefined) return {};
 
-function checkedScale(scale: IdsScale | undefined, issues: IdsThemeIssue[]) {
-  if (scale === undefined || isScale(scale)) return scale;
+  if (
+    typeof scale !== 'number' ||
+    !Number.isFinite(scale) ||
+    scale < SCALE_RANGE.min ||
+    scale > SCALE_RANGE.max
+  ) {
+    issues.push({
+      path: 'scale',
+      message: `scale multiplies sizes, from ${SCALE_RANGE.min} to ${SCALE_RANGE.max}. Got ${String(scale)}.`,
+    });
+    return {};
+  }
 
-  issues.push({
-    path: 'scale',
-    message: `scale is ${Object.keys(SCALE_PRESETS)
-      .map((preset) => `'${preset}'`)
-      .join(', ')}. Got ${String(scale)}.`,
-  });
-  return undefined;
+  return { '--ids-scale': String(scale) };
 }
 
 export function resolveThemeVariables(theme: IdsThemeOverrides): {
   variables: ThemeVariables;
-  scale: IdsScale | undefined;
+  scale: number | undefined;
   issues: IdsThemeIssue[];
 } {
   const issues: IdsThemeIssue[] = [];
@@ -134,9 +138,11 @@ export function resolveThemeVariables(theme: IdsThemeOverrides): {
     ...radiusVariables(theme.radius, issues),
     ...fontVariables(theme.font, issues),
     ...cornerShapeVariables(theme.cornerShape, issues),
+    ...scaleVariables(theme.scale, issues),
   };
+  const scale = '--ids-scale' in variables ? theme.scale : undefined;
 
-  return { variables, scale: checkedScale(theme.scale, issues), issues };
+  return { variables, scale, issues };
 }
 
 export function checkIdsTheme(theme: IdsTheme): IdsThemeIssue[] {

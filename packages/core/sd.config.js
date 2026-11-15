@@ -519,23 +519,20 @@ const T_CSS_REGISTERED_LENGTHS = LENGTHS_SCRIPTS_READ_IN_PIXELS.map(
   (name) => `@property ${name} {\n  syntax: "<length>";\n  inherits: true;\n  initial-value: 0px;\n}\n`,
 ).join("\n");
 
-const SCALE_PRESETS = { default: 1, large: 1.25, tv: 1.5 };
-
 const SCALE = "var(--ids-scale, 1)";
 
 const SPACING_UNIT = "0.25rem";
 
-const ROUNDS_TO_WHOLE_PIXELS = "@supports (width: round(1px, 1px))";
+const scaled = (value) => `calc(${value} * ${SCALE})`;
 
-const scaled = (value, toWholePixels) =>
-  toWholePixels ? `round(calc(${value} * ${SCALE}), 1px)` : `calc(${value} * ${SCALE})`;
+const scaledToWholePixels = (value) => `round(${scaled(value)}, 1px)`;
 
-const radiusFromTheProvider = (dictionary, toWholePixels) =>
+const radiusFromTheProvider = (dictionary) =>
   byCategory(dictionary, "radius")
     .filter((t) => slug(t) !== "full")
     .map(
       (t) =>
-        `  ${idsVar("radius", t)}: ${scaled(`var(--ids-theme-radius-${slug(t)}, ${toVal(t)})`, toWholePixels)};`,
+        `  ${idsVar("radius", t)}: ${scaledToWholePixels(`var(--ids-theme-radius-${slug(t)}, ${toVal(t)})`)};`,
     );
 
 const lengthsTheScaleMultiplies = (dictionary) => [
@@ -547,27 +544,19 @@ const lengthsTheScaleMultiplies = (dictionary) => [
   ...byCategory(dictionary, "size").map((t) => [idsVar("size", t), toVal(t)]),
 ];
 
-const scaledLengths = (dictionary, toWholePixels) => [
-  `  --spacing: ${scaled(SPACING_UNIT, false)};`,
+const scaledLengths = (dictionary) => [
+  `  --spacing: ${scaled(SPACING_UNIT)};`,
   ...lengthsTheScaleMultiplies(dictionary).map(
-    ([name, value]) => `  ${name}: ${scaled(value, toWholePixels)};`,
+    ([name, value]) => `  ${name}: ${scaledToWholePixels(value)};`,
   ),
 ];
 
-const block = (selector, lines, indent = "") =>
-  `${indent}${selector} {\n${lines.map((line) => indent + line).join("\n")}\n${indent}}\n`;
+const block = (selector, lines) => `${selector} {\n${lines.join("\n")}\n}\n`;
 
 const buildScaleCSS = (dictionary) =>
   [
-    ...Object.entries(SCALE_PRESETS).map(([preset, factor]) =>
-      block(`[data-scale="${preset}"]`, [`  --ids-scale: ${factor};`]),
-    ),
-    block("[data-mode]", radiusFromTheProvider(dictionary, false)),
-    block("[data-scale]", scaledLengths(dictionary, false)),
-    `${ROUNDS_TO_WHOLE_PIXELS} {\n${[
-      block("[data-mode]", radiusFromTheProvider(dictionary, true), "  "),
-      block("[data-scale]", scaledLengths(dictionary, true), "  "),
-    ].join("\n")}}\n`,
+    block("[data-mode]", radiusFromTheProvider(dictionary)),
+    block("[data-scale]", scaledLengths(dictionary)),
   ].join("\n");
 
 const cssFormatter = ({ dictionary }) =>

@@ -90,10 +90,11 @@ test('SSR: one color is enough, the provider builds the palette from it', () => 
 test('SSR: a scale is an attribute, and no scale writes none', () => {
   const html = renderToString(
     <IdsProvider theme={testTheme}>
-      <IdsProvider.Scope theme={{ scale: 'tv' }} />
+      <IdsProvider.Scope theme={{ scale: 1.5 }} />
     </IdsProvider>,
   );
-  expect(html.match(/data-scale="[^"]*"/g)).toEqual(['data-scale="tv"']);
+  expect(html.match(/data-scale="[^"]*"/g)).toEqual(['data-scale="1.5"']);
+  expect(html).toMatch(/--ids-scale:1\.5/);
 });
 
 test('SSR: system mode renders light because the server cannot see the scheme', () => {
@@ -226,13 +227,16 @@ test('a scale multiplies sizes, spacing, text and radius, and a nested scale rep
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <Button>default</Button>
-      <IdsProvider.Scope theme={{ scale: 'tv' }}>
-        <Button>tv</Button>
+      <IdsProvider.Scope theme={{ scale: 1.5 }}>
+        <Button>1.5</Button>
         <IdsProvider.Scope theme={{ radius: 12 }}>
-          <Button>tv, radius 12</Button>
+          <Button>1.5, radius 12</Button>
         </IdsProvider.Scope>
-        <IdsProvider.Scope theme={{ scale: 'large' }}>
-          <Button>large</Button>
+        <IdsProvider.Scope theme={{ scale: 1.25 }}>
+          <Button>1.25</Button>
+        </IdsProvider.Scope>
+        <IdsProvider.Scope theme={{ scale: 1.1 }}>
+          <Button>1.1</Button>
         </IdsProvider.Scope>
       </IdsProvider.Scope>
     </IdsProvider>,
@@ -248,9 +252,10 @@ test('a scale multiplies sizes, spacing, text and radius, and a nested scale rep
   };
 
   expect(measure('default')).toEqual({ height: 36, fontSize: '14px', radius: '10px' });
-  expect(measure('tv')).toEqual({ height: 54, fontSize: '21px', radius: '15px' });
-  expect(measure('tv, radius 12')).toEqual({ height: 54, fontSize: '21px', radius: '18px' });
-  expect(measure('large')).toEqual({ height: 45, fontSize: '18px', radius: '13px' });
+  expect(measure('1.5')).toEqual({ height: 54, fontSize: '21px', radius: '15px' });
+  expect(measure('1.5, radius 12')).toEqual({ height: 54, fontSize: '21px', radius: '18px' });
+  expect(measure('1.25')).toEqual({ height: 45, fontSize: '18px', radius: '13px' });
+  expect(measure('1.1')).toEqual({ height: 40, fontSize: '15px', radius: '11px' });
 });
 
 test('a theme without a palette is reported in development', async () => {

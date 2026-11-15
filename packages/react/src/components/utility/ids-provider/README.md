@@ -7,7 +7,7 @@
 - **CSS 변수로 칠합니다.** 테마는 감싸는 요소의 inline 변수가 되고, `@gsainfoteam/ids-css` 가 `data-mode` 에 따라 연결합니다. 서버 HTML 에 들어가므로 깜빡이지 않습니다.
 - **제어와 비제어.** `mode` 를 넘기면 부모가 값을 가지고, `defaultMode` 를 넘기면 Provider 가 가집니다.
 - **시스템 모드.** `mode="system"` 은 운영체제의 다크 모드 설정을 따르고, 설정을 바꾸면 새로고침 없이 바로 바뀝니다.
-- **배율.** `scale` 은 영역 하나를 1.25배(`large`), 1.5배(`tv`)로 키웁니다.
+- **배율.** `scale` 은 영역 하나를 숫자만큼(예: 1.5) 키우거나 줄입니다.
 - **Scope.** `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾸고 나머지는 물려받습니다.
 - **`useTheme()`.** 어디서든 현재 테마와 모드를 읽고 `setMode`, `toggleMode` 로 바꿉니다.
 - **네이티브 컨트롤.** `color-scheme` 을 함께 설정해 스크롤바, 날짜 입력, 체크박스 같은 브라우저 기본 UI 도 모드를 따릅니다.
@@ -58,7 +58,7 @@ import { theme } from './ids-theme';
 | `font.sans`   | CSS `font-family` 값                                                                 | Pretendard GOV 스택 |
 | `font.mono`   | CSS `font-family` 값                                                                 | Geist Mono 스택     |
 | `cornerShape` | `'round'` / `'squircle'`                                                             | `'round'`           |
-| `scale`       | `'default'`(1) / `'large'`(1.25) / `'tv'`(1.5)                                       | `'default'`         |
+| `scale`       | 크기에 곱할 배율(0.5–2). TV 화면은 1.5, 키오스크는 1.25 정도                          | 1                   |
 
 ### 앱이 바꾸는 것과 IDS 가 정하는 것
 
@@ -68,7 +68,7 @@ import { theme } from './ids-theme';
 | radius                   | ✅               | ❌                 | `standard` 하나를 받고 `indicator`, `container` 는 계산한다       |
 | 글꼴                     | ✅               | ❌                 | `sans`, `mono`. 타입 스케일의 단계와 크기는 고정이다 (크기는 배율로) |
 | corner shape             | ✅               | ❌                 | `round` / `squircle`                                              |
-| 배율                     | ✅ 프리셋        | ❌                 | 영역마다 줄 수 있다                                               |
+| 배율                     | ✅ 숫자          | ❌                 | 영역마다 줄 수 있다                                               |
 | size (`standard`/`tiny`) | ❌               | ❌                 | 컴포넌트마다 값이 다르다. 내용 크기는 `className` 으로 바꾼다     |
 | spacing, motion, shadow  | ❌               | ❌                 | spacing 은 배율만 따른다                                          |
 
@@ -111,7 +111,7 @@ createIdsPalette('#0d9488'); // { 50: '#f0fdfa', …, 600: '#04968d', …, 950: 
 ```tsx
 <IdsProvider theme={theme}>
   <App />
-  <IdsProvider.Scope theme={{ scale: 'tv' }}>
+  <IdsProvider.Scope theme={{ scale: 1.5 }}>
     <TvRoute /> {/* 이 아래만 1.5배 */}
   </IdsProvider.Scope>
 </IdsProvider>
@@ -119,8 +119,8 @@ createIdsPalette('#0d9488'); // { 50: '#f0fdfa', …, 600: '#04968d', …, 950: 
 
 - 곱하는 것: Tailwind `--spacing`(그래서 `h-9`, `p-4`, `gap-2` 같은 크기와 간격), 글자 크기, `--ids-size-*`, radius.
 - 곱하지 않는 것: 테두리 두께, focus ring, 그림자, 줄 간격 비율.
-- 글자 크기, 크기 토큰, radius 는 px 로 반올림합니다. CSS `round()` 가 없는 브라우저는 반올림하지 않습니다.
-- 안쪽 Scope 의 `scale` 은 바깥 배율에 곱하지 않고 바꿉니다. `'default'` 를 주면 원래 크기로 돌아옵니다.
+- 글자 크기, 크기 토큰, radius 는 CSS `round()` 로 px 에 맞춥니다. `--spacing` 은 `p-4` 처럼 곱해 쓰는 단위라 반올림하지 않습니다.
+- 안쪽 Scope 의 `scale` 은 바깥 배율에 곱하지 않고 바꿉니다. `1` 을 주면 원래 크기로 돌아옵니다.
 - Popover, Menu 같은 레이어의 간격(`sideOffset`)과 폭도 배율을 따릅니다. `overlay.open` 으로 연 항목은 연 곳의 배율을 받습니다.
 - 앱이 쓴 `w-[320px]` 같은 px 값은 배율을 따르지 않습니다. 배율을 따라야 하면 `w-80` 이나 `--spacing(80)` 으로 씁니다.
 
@@ -154,7 +154,7 @@ test('the app theme passes IDS', () => {
 });
 ```
 
-- 빠진 팔레트 단계, CSS 색이 아닌 값, 4.5:1 을 넘는 단계가 없는 역할, 범위를 벗어난 `radius`, 모르는 `cornerShape` 와 `scale` 을 `{ path, message }` 목록으로 돌려줍니다.
+- 빠진 팔레트 단계, CSS 색이 아닌 값, 4.5:1 을 넘는 단계가 없는 역할, 범위를 벗어난 `radius` 와 `scale`, 모르는 `cornerShape` 를 `{ path, message }` 목록으로 돌려줍니다.
 - 개발 모드에서는 Provider 가 같은 목록을 `console.warn` 으로 알립니다. 팔레트가 아예 없으면 `console.error` 입니다.
 - 통과하지 못한 역할은 마지막 후보 단계로 그립니다. 화면은 깨지지 않지만 대비가 모자랍니다.
 
@@ -261,7 +261,7 @@ function ThemeMenu() {
 | `asChild`                             | 자식 요소에 속성을 붙인다                                                                            |
 | `className` / `style` / `ref` / 그 외 | 감싸는 요소(또는 자식)로 간다                                                                        |
 
-- 요소에는 `data-mode`(항상 `light` / `dark`), `style.colorScheme`, 준 테마의 변수, `scale` 을 준 경우 `data-scale` 이 붙습니다.
+- 요소에는 `data-mode`(항상 `light` / `dark`), `style.colorScheme`, 준 테마의 변수, `scale` 을 준 경우 `--ids-scale` 변수와 `data-scale` 이 붙습니다.
   - 역할 색: `--ids-theme-light-primary`, `--ids-theme-dark-primary` … (두 모드 다)
   - radius: `--ids-theme-radius-standard`, `-indicator`, `-container`. `ids.css` 가 배율을 곱해 `--ids-radius-*` 로 씁니다
   - 글꼴: `--ids-font-family-sans`, `--ids-font-family-mono`

@@ -30,7 +30,7 @@ const demoThemes = {
     font: { sans: 'ui-serif, Georgia, serif' },
   }),
   'seed #0d9488': defineIdsTheme({ palette: '#0d9488' }),
-  'blue, tv': defineIdsTheme({ palette: palettes.blue, scale: 'tv' }),
+  'blue, ×1.5': defineIdsTheme({ palette: palettes.blue, scale: 1.5 }),
 };
 
 const seeds = [
@@ -43,7 +43,7 @@ const seeds = [
   '#8a8a8a',
 ];
 
-const scales = ['default', 'large', 'tv'] as const;
+const scales = [0.875, 1, 1.25, 1.5];
 
 const meta = {
   title: 'Utility/IdsProvider',
@@ -73,7 +73,7 @@ function Readout() {
         {typeof theme.palette === 'string' ? theme.palette : theme.palette?.[600]}
       </dd>
       <dt>scale</dt>
-      <dd data-testid="scale">{scale ?? 'default'}</dd>
+      <dd data-testid="scale">{scale ?? 1}</dd>
       <dt>mode</dt>
       <dd data-testid="mode">{mode}</dd>
       <dt>resolvedMode</dt>
@@ -144,10 +144,10 @@ export const Gallery: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Scale"
-        description="크기, 간격, 글자 크기, radius 에 1, 1.25, 1.5 를 곱하고 px 로 반올림합니다. 테두리, focus ring, 그림자는 그대로입니다. 안쪽 Scope 의 scale 은 곱하지 않고 바꿉니다."
+        description="크기, 간격, 글자 크기, radius 에 scale 을 곱하고 px 로 반올림합니다. 테두리, focus ring, 그림자는 그대로입니다. 안쪽 Scope 의 scale 은 곱하지 않고 바꿉니다."
       >
         {scales.map((scale) => (
-          <Showcase.Row key={scale} label={scale}>
+          <Showcase.Row key={scale} label={`×${scale}`}>
             <IdsProvider.Scope theme={{ scale }} className="flex flex-wrap items-center gap-2">
               <Button>저장</Button>
               <TextField aria-label={`제목 ${scale}`} placeholder="제목" className="w-40" />

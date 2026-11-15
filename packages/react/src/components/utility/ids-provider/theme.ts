@@ -13,16 +13,12 @@ export type IdsThemeFont = {
   mono?: string;
 };
 
-export const SCALE_PRESETS = { default: 1, large: 1.25, tv: 1.5 } as const;
-
-export type IdsScale = keyof typeof SCALE_PRESETS;
-
 export type IdsTheme = {
   palette: IdsPalette | string;
   radius?: number;
   font?: IdsThemeFont;
   cornerShape?: IdsCornerShape;
-  scale?: IdsScale;
+  scale?: number;
 };
 
 export type IdsThemeOverrides = Partial<IdsTheme>;

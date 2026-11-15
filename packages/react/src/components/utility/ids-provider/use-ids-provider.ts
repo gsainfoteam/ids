@@ -15,7 +15,7 @@ import { noop } from 'es-toolkit';
 
 import { resolveThemeVariables, type ThemeVariables } from './theme-variables';
 
-import type { IdsScale, IdsThemeOverrides } from './theme';
+import type { IdsThemeOverrides } from './theme';
 import type { IdsThemeIssue } from './theme-roles';
 import type { IdsMode } from '../../../tokens/types';
 
@@ -24,7 +24,7 @@ export type ThemeMode = IdsMode | 'system';
 export type ThemeContextValue = {
   theme: IdsThemeOverrides;
   variables: ThemeVariables;
-  scale: IdsScale | undefined;
+  scale: number | undefined;
   mode: ThemeMode;
   resolvedMode: IdsMode;
   setMode: (mode: ThemeMode) => void;

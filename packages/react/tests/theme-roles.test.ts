@@ -96,15 +96,17 @@ describe('checkIdsTheme', () => {
     expect(checkIdsTheme({ palette: washedOut }).length).toBeGreaterThan(0);
   });
 
-  test('reports radius, font and corner shape outside their range', () => {
+  test('reports radius, font, corner shape and scale outside their range', () => {
     expect(
       checkIdsTheme({
         palette: palettes.blue,
         radius: 40,
         font: { sans: '' },
         cornerShape: 'bevel' as never,
+        scale: 3,
       }).map((issue) => issue.path),
-    ).toEqual(['radius', 'font.sans', 'cornerShape']);
+    ).toEqual(['radius', 'font.sans', 'cornerShape', 'scale']);
+    expect(checkIdsTheme({ palette: palettes.blue, scale: 0.875 })).toEqual([]);
   });
 
   test('accepts any CSS color for a step', () => {

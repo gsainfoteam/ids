@@ -10,7 +10,6 @@ export type {
   IdsCornerShape,
   IdsPalette,
   IdsPaletteStep,
-  IdsScale,
   IdsTheme,
   IdsThemeFont,
   IdsThemeIssue,

@@ -21,9 +21,9 @@ root as `--ids-theme-{light|dark}-{role}`; `ids.css` maps the current mode's set
   and chroma per step come from the two reference palettes nearest in hue, the result is clamped
   to sRGB by chroma and rounded to 8-bit hex, and step 600 moves to the nearest lightness where
   white or dark text reaches 4.5:1. `createIdsPalette(color)` returns the same palette.
-- `scale: 'default' | 'large' | 'tv'` multiplies spacing, text sizes, the size tokens and radius by
-  1, 1.25 or 1.5 under the provider, rounded to whole pixels; borders, rings and shadows stay. A
-  nested scale replaces the outer one. Overlay offsets and widths follow it too. Component sizes
+- `scale` (0.5 to 2, default 1) multiplies spacing, text sizes, the size tokens and radius under the
+  provider, rounded to whole pixels with CSS `round()`; borders, rings and shadows stay. A nested
+  scale replaces the outer one. Overlay offsets and widths follow it too. Component sizes
   written in px or rem now use `--spacing()`, so they scale with the rest.
 - The provider writes the radius as `--ids-theme-radius-*`; `ids.css` derives `--ids-radius-*`
   from it and the scale.
@@ -35,3 +35,5 @@ root as `--ids-theme-{light|dark}-{role}`; `ids.css` maps the current mode's set
   and `font-sans` read `var(--ids-…)` directly, so a provider's variables reach them. `--color-*`,
   `--radius-*`, `--font-*` and `--text-*` are no longer emitted on `:root`; read the `--ids-*`
   variables instead.
+- The minimum Chrome and Edge is now 125, the first with CSS `round()`, which keeps scaled sizes on
+  whole pixels. Firefox 128 and Safari 18 already have it.
