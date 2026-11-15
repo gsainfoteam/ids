@@ -54,6 +54,25 @@ final theme = ThemeProvider.of(context);
 
 - `accent` 는 배경 채움 없이 페이지 위에 놓이는 브랜드 글자와 아이콘 색이다. `surface` 와 `secondary` 위에서 대비 4.5:1 을 넘는다.
 
+## IdsPalette
+
+앱 브랜드 색 하나로 `50`–`950` 팔레트를 만든다:
+
+```dart
+final palette = IdsPalette.fromSeed(const Color(0xFF0D9488));
+
+palette[500];     // Color
+palette.colors;   // 50 부터 950 까지 11색
+IdsPalette.steps; // [50, 100, ..., 950]
+```
+
+- ids-react 의 `createIdsPalette` 와 같은 모델을 쓰고, 같은 시드에서 같은 8비트 색을 낸다.
+- 모델 계수는 `pnpm codegen` 이 `packages/core/tokens/palette.json` 의 17색에 맞춰 `lib/tokens/ids_palette_model.dart` 에 쓴다.
+- 시드 색은 바뀌지 않고, 명도가 가장 가까운 단계에 그대로 들어간다.
+- 시드의 alpha 는 무시한다.
+- 상태 팔레트는 `IdsStatusPalettes.red` `yellow` `green` `sky` 에 있다.
+- 아직 `ThemeProvider` 는 `IdsPalette` 를 받지 않는다. 지금은 `IdsColor` 로 고른다.
+
 ## 컴포넌트
 
 ### IdsButton

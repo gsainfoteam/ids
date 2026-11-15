@@ -24,7 +24,8 @@ These files are written by `pnpm codegen` (Style Dictionary build). Edits will b
 
 - `packages/css/dist/ids.css`
 - `packages/react/src/tokens/types.ts`
-- `packages/react/src/tokens/palette-model.ts` (`packages/core/palette-model.js`)
+- `packages/react/src/tokens/palette-model.ts` and
+  `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/palette-model.js`)
 - `packages/flutter/lib/tokens/*.dart`
 
 To change tokens: edit files under `packages/core/tokens/`, then run `pnpm codegen`.
@@ -792,11 +793,13 @@ IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral an
 palettes the stories use. ids-react does not ship the 17: `pnpm codegen` fits a model to them
 (`packages/core/palette-model.js`, Fourier series of the 500 hue per step) and writes its
 coefficients and the four status palettes to `src/tokens/palette-model.ts`, which the one-color
-palette builder evaluates. The per-hue `semantic/[color].{light,dark}.json` files and the `color`
+palette builder evaluates, and to `packages/flutter/lib/tokens/ids_palette_model.dart`, which
+`IdsPalette.fromSeed` evaluates to the same 8-bit colors. The per-hue `semantic/[color].{light,dark}.json` files and the `color`
 enum feed only the Dart output until Flutter takes a runtime palette too (#33); the CSS and the
 React types no longer read them. The Dart formatter keeps the old role names (`primary`,
 `on-primary`, `secondary`, `on-secondary`, `accent`, `outline`) from those files, so `packages/flutter/lib/tokens/*.dart` stay byte-identical while the CSS
-and React use the family roles; CI fails a pull request whose codegen changes them.
+and React use the family roles; CI fails a pull request whose codegen changes them, leaving out
+`ids_palette_model.dart`.
 
 ## Versioning — Changesets (fixed mode)
 

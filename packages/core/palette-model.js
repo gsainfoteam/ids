@@ -4,6 +4,7 @@ import { clampChroma, converter, differenceEuclidean, formatHex, parse } from "c
 
 const GENERATED = "// GENERATED — do not edit manually";
 const OUTPUT = "../react/src/tokens/palette-model.ts";
+const DART_OUTPUT = "../flutter/lib/tokens/ids_palette_model.dart";
 
 const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"];
 const ANCHOR_STEP = STEPS.indexOf("500");
@@ -213,17 +214,46 @@ ${statuses}
 `;
 }
 
+const dartColor = (hex) => `Color(0xFF${hex.slice(1).toUpperCase()})`;
+
+function dartSource(model, palettes) {
+  const parts = Object.entries(model)
+    .map(
+      ([name, steps]) =>
+        `  static const ${name} = <List<double>>[\n${steps.map((s) => `    ${listOf(s)},`).join("\n")}\n  ];`,
+    )
+    .join("\n\n");
+  const statuses = STATUS_PALETTE_NAMES.map((name) => {
+    const { hexes } = palettes.find((palette) => palette.name === name);
+    return `  static const ${name} = <Color>[\n${hexes.map((hex) => `    ${dartColor(hex)},`).join("\n")}\n  ];`;
+  }).join("\n\n");
+
+  return `${GENERATED}
+
+import 'package:flutter/painting.dart';
+
+abstract final class IdsPaletteModel {
+${parts}
+}
+
+abstract final class IdsStatusPalettes {
+${statuses}
+}
+`;
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const palettes = readPalettes();
   const { model, shapes } = fitPaletteModel(palettes);
   writeFileSync(new URL(OUTPUT, import.meta.url), moduleSource(model, palettes));
+  writeFileSync(new URL(DART_OUTPUT, import.meta.url), dartSource(model, palettes));
 
   const errors = fitErrors(model, palettes);
   const shapeLine = Object.entries(shapes)
     .map(([name, { count, smoothness }]) => `${name} ${count} harmonics, smoothness ${smoothness}`)
     .join("; ");
   const worst = errors.reduce((a, b) => (b.max > a.max ? b : a));
-  console.log(`✔︎ ${OUTPUT}: ${shapeLine}`);
+  console.log(`✔︎ ${OUTPUT}, ${DART_OUTPUT}: ${shapeLine}`);
   console.log(
     `  fit ΔE_OK×100: mean ${(errors.reduce((sum, e) => sum + e.mean, 0) / errors.length).toFixed(2)}, max ${worst.max.toFixed(2)} (${worst.name})`,
   );
