@@ -24,6 +24,7 @@ These files are written by `pnpm codegen` (Style Dictionary build). Edits will b
 
 - `packages/css/dist/ids.css`
 - `packages/react/src/tokens/types.ts`
+- `packages/react/src/tokens/palette-model.ts` (`packages/core/palette-model.js`)
 - `packages/flutter/lib/tokens/*.dart`
 
 To change tokens: edit files under `packages/core/tokens/`, then run `pnpm codegen`.
@@ -433,7 +434,7 @@ page with no fill behind it (an outline Badge or Chip, a Rating star, a Radio do
 such as yellow and cyan fall under Lc 60 there. Statuses follow the same roles (`bg-danger-soft`
 with `text-on-danger-soft`, `text-danger` for text). Text on a fill or a soft surface reaches APCA
 Lc 75, `text-X` Lc 60 on the surface and on `bg-X-soft` (short labels, links and messages), and every
-`border-X` (the `text-X` step) at least Lc 45 in both modes, for all 17 demo palettes, pure and tinted neutrals and harmonized and
+`border-X` (the `text-X` step) at least Lc 45 in both modes, for all 17 story palettes, pure and tinted neutrals and harmonized and
 fixed statuses, which `tests/tokens-contrast.test.ts` checks.
 
 **Contrast is APCA, not WCAG 2.** Roles are picked by APCA lightness contrast (`contrastAPCA` from
@@ -765,8 +766,8 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
   half the distance, and stays in its hue range), `'fixed'`, or colors the app picks.
 - `checkIdsTheme` also reports brand families that sit too close to each other or to a status
   (OKLab), a status hue outside its range, and success or warning that look like danger under
-  red-green color blindness. The thresholds come from the 17 reference palettes and
-  `tests/theme-colors.test.ts` derives them again.
+  red-green color blindness. The thresholds were set from the 17 demo palettes that core used
+  to hold and are fixed values now.
 - Chart has no color tokens: a series without `color` takes `bg-primary`, `bg-secondary` and
   `bg-tertiary` in config order (`DEFAULT_SERIES` in `data/chart/config.ts`). A fourth draws in
   neutral and warns in development.
@@ -787,12 +788,17 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
 
 ## Palettes in core
 
-IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral and the 17 demo
-palettes the stories use. The per-hue `semantic/[color].{light,dark}.json` files and the `color`
-enum feed only the Dart output until Flutter takes a runtime palette too (#33); the CSS and the
-React types no longer read them. The Dart formatter keeps the old role names (`primary`,
-`on-primary`, `secondary`, `on-secondary`, `accent`, `outline`) from those files, so `packages/flutter/lib/tokens/*.dart` stay byte-identical while the CSS
-and React use the family roles.
+IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral and the four status
+palettes (red, yellow, green, sky). The one-color palette builder evaluates a model whose
+coefficients live in `packages/core/palette-model.json` (Fourier series of the 500 hue per step,
+fitted once to 17 demo palettes that are gone now); `pnpm codegen` copies them and the status
+palettes to `src/tokens/palette-model.ts`. Stories and tests build their 17 palettes from seed hex
+values in `.storybook/palettes.ts`. The per-hue `semantic/[color].{light,dark}.json` files (with hex
+values where they pointed at a removed palette) and the `color` enum feed only the Dart output until
+Flutter takes a runtime palette too (#33); the CSS and the React types no longer read them. The Dart
+formatter keeps the old role names (`primary`, `on-primary`, `secondary`, `on-secondary`, `accent`,
+`outline`) from those files, so `packages/flutter/lib/tokens/*.dart` stay byte-identical while the
+CSS and React use the family roles.
 
 ## Versioning — Changesets (fixed mode)
 

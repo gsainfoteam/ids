@@ -6,7 +6,7 @@ import { cdp, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { palettes } from '../.storybook/palettes';
-import { Button, IdsProvider, useTheme } from '../src';
+import { Button, IdsProvider, createIdsPalette, useTheme } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 
@@ -91,10 +91,9 @@ test('SSR: one color is enough, the provider builds the palette from it', () => 
   const element = parse(
     renderToString(<IdsProvider theme={{ primary: palettes.violet[500] }} />),
   ).querySelector<HTMLElement>('[data-mode]')!;
-  expect(element.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(palettes.violet[600]);
-  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-soft')).toBe(
-    palettes.violet[950],
-  );
+  const built = createIdsPalette(palettes.violet[500])!;
+  expect(element.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(built[600]);
+  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-soft')).toBe(built[950]);
 });
 
 test('SSR: a scale is an attribute, and no scale writes none', () => {

@@ -1,47 +1,38 @@
-import { clampChroma, differenceEuclidean, formatHex } from 'culori/fn';
-import { describe, expect, test } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-import { paletteHues, palettes } from '../.storybook/palettes';
-import {
-  createIdsPalette,
-  paletteFromSeed,
-  referencesFrom,
-} from '../src/components/utility/ids-provider/palette-seed';
-import { REFERENCE_PALETTES } from '../src/components/utility/ids-provider/reference-palettes';
+import { clampChroma, formatHex } from 'culori/fn';
+import { expect, test } from 'vitest';
+
+import palette from '../../core/tokens/palette.json';
+import { createIdsPalette, shadeOf } from '../src/components/utility/ids-provider/palette-seed';
 import { PALETTE_STEPS, type IdsPalette } from '../src/components/utility/ids-provider/theme';
 import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
 import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
+import { STATUS_PALETTES } from '../src/tokens/palette-model';
 
-const stepsOf = (palette: IdsPalette) => PALETTE_STEPS.map((step) => palette[step]);
-
-const oklabDistance = differenceEuclidean('oklab');
-
-const DELTA_E_SCALE = 100;
+const stepsOf = (built: IdsPalette) => PALETTE_STEPS.map((step) => built[step]);
 
 const seedAt = (l: number, c: number, h: number) =>
   formatHex(clampChroma({ mode: 'oklch', l, c, h }, 'oklch'));
 
-test('the reference table is the 17 palettes in core', () => {
-  expect(REFERENCE_PALETTES).toEqual(paletteHues.map((hue) => stepsOf(palettes[hue])));
-});
-
-test.each(paletteHues)('the %s step 500 rebuilds %s exactly', (hue) => {
-  expect(createIdsPalette(palettes[hue][500])).toEqual(palettes[hue]);
-});
-
-describe('leave one out: a palette rebuilt from its neighbours', () => {
-  test.each(paletteHues)('%s', (hue) => {
-    const others = paletteHues.filter((other) => other !== hue);
-    const references = referencesFrom(others.map((other) => stepsOf(palettes[other])));
-    const rebuilt = paletteFromSeed(palettes[hue][500], references)!;
-    const distances = PALETTE_STEPS.map(
-      (step) => oklabDistance(rebuilt[step], palettes[hue][step]) * DELTA_E_SCALE,
+test('the status palettes are the four in core', () => {
+  for (const [name, steps] of Object.entries(STATUS_PALETTES))
+    expect(steps).toEqual(
+      PALETTE_STEPS.map((step) => palette[name as keyof typeof STATUS_PALETTES][step].$value),
     );
-    const mean = distances.reduce((sum, distance) => sum + distance) / distances.length;
+});
 
-    expect(mean).toBeLessThan(5);
-    expect(Math.max(...distances)).toBeLessThan(10);
-  });
+test.each([
+  ['#0d9488', 600],
+  ['#fde68a', 300],
+  ['#1e3a8a', 900],
+  ['#7c3aed', 600],
+] as const)('the seed %s lands on the step with the nearest lightness, %s', (seed, step) => {
+  const built = createIdsPalette(seed)!;
+
+  expect(built[step]).toBe(seed);
+  expect(stepsOf(built).filter((hex) => hex === seed)).toHaveLength(1);
 });
 
 const SEEDS: [lightness: number, chroma: number][] = [
@@ -58,25 +49,38 @@ const SEEDS: [lightness: number, chroma: number][] = [
   [0.2, 0.05],
 ];
 
+const SWEEP_OF_EVERY_SEED_MS = 30_000;
+
+const COLD_NODE_START_ON_A_BUSY_RUNNER_MS = 30_000;
+
 const HUES = Array.from({ length: 72 }, (_, index) => index * 5);
 
-test('every seed builds a palette whose roles reach their Lc in both modes', () => {
-  const failing = HUES.flatMap((hue) =>
-    SEEDS.flatMap(([lightness, chroma]) => {
-      const seed = seedAt(lightness, chroma, hue);
+const everySeed = () =>
+  HUES.flatMap((hue) => SEEDS.map(([lightness, chroma]) => seedAt(lightness, chroma, hue)));
+
+test(
+  'every seed builds a palette whose roles reach their Lc in both modes',
+  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  () => {
+    const failing = everySeed().flatMap((seed) => {
       const { issues } = resolveColors({ primary: seed, secondary: seed, tertiary: seed });
       return issues.length === 0 ? [] : [`${seed}: ${issues.map((issue) => issue.message)}`];
-    }),
-  );
-  expect(failing).toEqual([]);
+    });
+    expect(failing).toEqual([]);
+  },
+);
+
+test('every seed builds a palette that runs from light to dark', () => {
+  const unordered = everySeed().filter((seed) => {
+    const lightness = stepsOf(createIdsPalette(seed)!).map((hex) => shadeOf(hex).l);
+    return lightness.some((l, index) => index > 0 && l >= lightness[index - 1]!);
+  });
+  expect(unordered).toEqual([]);
 });
 
-test('a built palette runs from light to dark in 8-bit hex', () => {
+test('a built palette is in 8-bit hex', () => {
   const palette = createIdsPalette('oklch(0.62 0.19 150)')!;
-  const lightness = stepsOf(palette).map((hex) => differenceEuclidean('oklab')(hex, '#000000'));
-
   expect(stepsOf(palette).every((hex) => /^#[0-9a-f]{6}$/.test(hex))).toBe(true);
-  expect(lightness).toEqual([...lightness].sort((a, b) => b - a));
 });
 
 test('a gray seed builds a gray palette, and a bad seed is reported', () => {
@@ -88,3 +92,23 @@ test('a gray seed builds a gray palette, and a bad seed is reported', () => {
     { path: 'primary', message: 'primary is not a CSS color: not a color.' },
   ]);
 });
+
+test(
+  'the built palette module works without the rest of the package, as a tree-shaken app loads it',
+  { timeout: COLD_NODE_START_ON_A_BUSY_RUNNER_MS },
+  () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        '--input-type=module',
+        '-e',
+        `
+    const { createIdsPalette } = await import('./dist/components/utility/ids-provider/palette-seed.js');
+    process.stdout.write(createIdsPalette('#0d9488')?.[600] ?? 'undefined');
+  `,
+      ],
+      { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' },
+    );
+    expect(result.stdout, result.stderr).toBe('#0d9488');
+  },
+);
