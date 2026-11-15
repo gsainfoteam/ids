@@ -22,15 +22,32 @@ function PaintThePageBehindWideStories() {
   return null;
 }
 
+const DERIVED = 'derived';
+
+const brandFamilyFrom = (global: unknown): PaletteHue | undefined =>
+  typeof global === 'string' && global in palettes ? (global as PaletteHue) : undefined;
+
 const withIdsTheme: Decorator = (Story, context) => {
   const [globals, updateGlobals] = useGlobals();
   const oneBlockAmongMany = context.viewMode === 'docs';
   const pageFillsTheCanvas = context.parameters['canvasPadding'] === false;
   const hue: PaletteHue = globals['idsColor'] in palettes ? globals['idsColor'] : 'blue';
+  const secondary = brandFamilyFrom(globals['idsSecondary']);
+  const tertiary = brandFamilyFrom(globals['idsTertiary']);
   const cornerShape = globals['idsCornerShape'] === 'squircle' ? 'squircle' : 'round';
+  const neutral = globals['idsNeutral'] === 'tinted' ? 'tinted' : 'pure';
+  const status = globals['idsStatus'] === 'fixed' ? 'fixed' : 'harmonized';
   const theme = useMemo(
-    () => defineIdsTheme({ palette: palettes[hue], cornerShape }),
-    [hue, cornerShape],
+    () =>
+      defineIdsTheme({
+        primary: palettes[hue],
+        ...(secondary && { secondary: palettes[secondary] }),
+        ...(tertiary && { tertiary: palettes[tertiary] }),
+        neutral,
+        status,
+        cornerShape,
+      }),
+    [hue, secondary, tertiary, neutral, status, cornerShape],
   );
 
   return (
@@ -40,10 +57,10 @@ const withIdsTheme: Decorator = (Story, context) => {
       onModeChange={(mode) => updateGlobals({ idsMode: mode })}
       className={
         oneBlockAmongMany
-          ? 'rounded-standard w-full bg-(--ids-color-surface) p-6 text-(--ids-color-on-surface)'
+          ? 'rounded-standard bg-surface text-on-surface w-full p-6'
           : pageFillsTheCanvas
-            ? 'min-h-screen w-full bg-(--ids-color-surface) text-(--ids-color-on-surface)'
-            : 'min-h-screen w-full bg-(--ids-color-surface) p-8 text-(--ids-color-on-surface)'
+            ? 'bg-surface text-on-surface min-h-screen w-full'
+            : 'bg-surface text-on-surface min-h-screen w-full p-8'
       }
     >
       <PaintThePageBehindWideStories />
@@ -116,6 +133,42 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    idsSecondary: {
+      description: 'The secondary palette of the demo theme, or derived from primary',
+      toolbar: {
+        title: 'Secondary',
+        icon: 'paintbrush',
+        items: [DERIVED, ...paletteHues],
+        dynamicTitle: true,
+      },
+    },
+    idsTertiary: {
+      description: 'The tertiary palette of the demo theme, or derived from primary',
+      toolbar: {
+        title: 'Tertiary',
+        icon: 'paintbrush',
+        items: [DERIVED, ...paletteHues],
+        dynamicTitle: true,
+      },
+    },
+    idsNeutral: {
+      description: 'Pure gray, or gray tinted with the primary hue',
+      toolbar: {
+        title: 'Neutral',
+        icon: 'contrast',
+        items: ['pure', 'tinted'],
+        dynamicTitle: true,
+      },
+    },
+    idsStatus: {
+      description: 'Status hues turned toward primary, or the fixed references',
+      toolbar: {
+        title: 'Status',
+        icon: 'alert',
+        items: ['harmonized', 'fixed'],
+        dynamicTitle: true,
+      },
+    },
     idsCornerShape: {
       description: 'IDS corner shape',
       toolbar: {
@@ -137,6 +190,10 @@ const preview: Preview = {
   },
   initialGlobals: {
     idsColor: 'blue',
+    idsSecondary: DERIVED,
+    idsTertiary: DERIVED,
+    idsNeutral: 'pure',
+    idsStatus: 'harmonized',
     idsMode: 'light',
     idsCornerShape: 'round',
   },

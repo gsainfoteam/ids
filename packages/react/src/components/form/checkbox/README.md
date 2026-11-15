@@ -103,7 +103,7 @@ import { Checkbox, Label } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Checkbox className={(state) => (state.checked ? 'shadow-md' : undefined)} />
-<Checkbox className="data-[state=checked]:[--checkbox-accent:var(--ids-color-success)]" />
+<Checkbox className="data-[state=checked]:[--checkbox-accent:var(--ids-color-bg-success)]" />
 ```
 
 | 상태            | `data-*`                     | 뜻                                |

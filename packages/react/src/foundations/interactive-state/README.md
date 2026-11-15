@@ -11,7 +11,7 @@ IDS 컴포넌트는 hover, press, focus 상태를 스스로 가지고, 그 상�
   {(state) => (state.hovered ? '올라왔어요' : '올려 보세요')}
 </Button>
 
-<Button className="data-hovered:inset-ring-(--ids-color-primary)">테두리</Button>
+<Button className="data-hovered:inset-ring-primary">테두리</Button>
 
 const [interaction, setInteraction] = useState(INTERACTIVE_STATE_DEFAULTS);
 <Button onInteractionChange={setInteraction}>올려 보세요</Button>

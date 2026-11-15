@@ -477,7 +477,7 @@ test.each(['ltr', 'rtl'] as const)(
               defaultWidth={288}
               defaultHeight={80}
               data-testid={mode}
-              className="rounded-standard inset-ring-1 inset-ring-(--ids-color-border)"
+              className="rounded-standard inset-ring-neutral inset-ring-1"
             >
               내용
             </Resizable>

@@ -14,8 +14,8 @@ export const groupStyle = tv({
     separator: 'relative z-25',
     text: [
       'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-standard shadow-xs',
-      'bg-(--ids-color-muted) text-(--ids-color-on-surface)',
-      'inset-ring-1 inset-ring-(--ids-color-border)',
+      'bg-neutral-soft text-on-surface',
+      'inset-ring-1 inset-ring-neutral',
       '[&_svg]:pointer-events-none [&_svg]:shrink-0',
     ],
   },

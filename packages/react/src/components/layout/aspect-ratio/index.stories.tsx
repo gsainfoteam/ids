@@ -27,7 +27,7 @@ const picture = `data:image/svg+xml;utf8,${encodeURIComponent(
 )}`;
 
 const tile = cn(
-  'flex items-center justify-center rounded-standard bg-(--ids-color-secondary) text-body-b3-medium text-(--ids-color-on-secondary)',
+  'flex items-center justify-center rounded-standard bg-primary-soft text-body-b3-medium text-on-primary-soft',
 );
 
 export const Playground: Story = {
@@ -75,7 +75,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="object-contain" className="items-start">
           <div className="w-40">
-            <AspectRatio className="rounded-standard overflow-hidden bg-(--ids-color-muted)">
+            <AspectRatio className="rounded-standard bg-neutral-soft overflow-hidden">
               <img src={picture} alt="그라데이션" className="object-contain" />
             </AspectRatio>
           </div>
@@ -149,7 +149,7 @@ export const IntrinsicContent: Story = {
     <div className="w-60">
       <AspectRatio
         data-testid="square"
-        className="rounded-standard overflow-hidden bg-(--ids-color-muted)"
+        className="rounded-standard bg-neutral-soft overflow-hidden"
       >
         <div className="text-body-b3-regular h-96 p-3">
           콘텐츠가 커도 바깥 정사각형 비율은 그대로입니다.

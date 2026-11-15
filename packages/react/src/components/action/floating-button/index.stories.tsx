@@ -19,7 +19,16 @@ import { FloatingButton } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['solid', 'soft', 'outline', 'glossy'] as const;
-const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'info'] as const;
+const colorSchemes = [
+  'primary',
+  'secondary',
+  'tertiary',
+  'neutral',
+  'danger',
+  'success',
+  'warning',
+  'info',
+] as const;
 const sizes = ['standard', 'tiny'] as const;
 const placements = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const;
 const functionNamesSurviveBuild = isDevelopment;
@@ -38,7 +47,7 @@ function ContainingBlock({
       dir={dir}
       aria-label={label}
       data-frame=""
-      className="rounded-standard relative h-64 w-full max-w-sm transform-[translateZ(0)] overflow-hidden border border-(--ids-color-border) bg-(--ids-color-muted)/40"
+      className="rounded-standard border-neutral bg-neutral-soft/40 relative h-64 w-full max-w-sm transform-[translateZ(0)] overflow-hidden border"
     >
       {children}
     </div>

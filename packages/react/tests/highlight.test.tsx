@@ -24,9 +24,9 @@ test('renders the text in a span and each match in a mark', async () => {
   expect(marksIn(root)).toEqual(['셔틀', '셔틀']);
 });
 
-test('colors soft marks with secondary and solid marks with primary', async () => {
+test('colors soft marks with the primary soft pair and solid marks with the primary fill', async () => {
   const screen = await render(
-    <IdsProvider theme={{ palette: palettes.yellow }}>
+    <IdsProvider theme={{ primary: palettes.yellow }}>
       <Highlight query="a" data-testid="soft">
         a
       </Highlight>
@@ -46,10 +46,10 @@ test('colors soft marks with secondary and solid marks with primary', async () =
     return value;
   };
 
-  expect(getComputedStyle(soft).backgroundColor).toBe(color('secondary'));
-  expect(getComputedStyle(soft).color).toBe(color('on-secondary'));
-  expect(getComputedStyle(solid).backgroundColor).toBe(color('primary'));
-  expect(getComputedStyle(solid).color).toBe(color('on-primary'));
+  expect(getComputedStyle(soft).backgroundColor).toBe(color('bg-primary-soft'));
+  expect(getComputedStyle(soft).color).toBe(color('text-on-primary-soft'));
+  expect(getComputedStyle(solid).backgroundColor).toBe(color('bg-primary'));
+  expect(getComputedStyle(solid).color).toBe(color('text-on-primary'));
 });
 
 test('takes the props of a Highlight.Mark child for every match', async () => {

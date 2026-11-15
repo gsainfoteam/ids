@@ -23,7 +23,7 @@ const PERIODS = ['09:00', '10:30', '13:00', '14:30', '16:00'];
 
 const COURSE_THEMES = {
   blue: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#eff6ff',
       100: '#dbeafe',
       200: '#bedbff',
@@ -38,7 +38,7 @@ const COURSE_THEMES = {
     },
   }),
   violet: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#f5f3ff',
       100: '#ede9fe',
       200: '#ddd6ff',
@@ -53,7 +53,7 @@ const COURSE_THEMES = {
     },
   }),
   teal: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#f0fdfa',
       100: '#cbfbf1',
       200: '#96f7e4',
@@ -68,7 +68,7 @@ const COURSE_THEMES = {
     },
   }),
   orange: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#fff6f2',
       100: '#ffe8de',
       200: '#ffc8b4',
@@ -83,7 +83,7 @@ const COURSE_THEMES = {
     },
   }),
   pink: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#fdf2f8',
       100: '#fce7f3',
       200: '#fccee8',
@@ -98,7 +98,7 @@ const COURSE_THEMES = {
     },
   }),
   lime: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#f7fee7',
       100: '#ecfcca',
       200: '#d8f999',

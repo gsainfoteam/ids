@@ -1,9 +1,10 @@
 # IdsProvider
 
-앱의 테마(팔레트, radius, corner shape, 배율)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
+앱의 테마(브랜드 색, 중립과 상태 색의 방식, radius, corner shape, 배율)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
 
 - **테마는 앱이 줍니다.** IDS 에는 기본 색이 없습니다. `theme` 이 없으면 타입 오류입니다.
-- **팔레트 하나로 두 모드를 칠합니다.** 라이트와 다크의 역할 색(primary, secondary, accent …)은 IDS 가 대비 4.5:1 을 지키도록 고릅니다. 팔레트 대신 색 하나를 주면 IDS 가 11단계를 만듭니다.
+- **브랜드 색 하나로 두 모드를 칠합니다.** `primary` 하나만 있으면 됩니다. 계열마다 라이트와 다크의 역할 색(`bg-primary`, `bg-primary-soft`, `text-primary` …)을 IDS 가 대비(글자 4.5:1, 선 3:1)를 지키도록 고릅니다. 팔레트 대신 색 하나를 주면 IDS 가 11단계를 만듭니다.
+- **계열 여덟 개.** neutral, primary, secondary, tertiary, success, warning, danger, info 가 같은 역할 열 개를 가집니다.
 - **CSS 변수로 칠합니다.** 테마는 감싸는 요소의 inline 변수가 되고, `@gsainfoteam/ids-css` 가 `data-mode` 에 따라 연결합니다. 서버 HTML 에 들어가므로 깜빡이지 않습니다.
 - **제어와 비제어.** `mode` 를 넘기면 부모가 값을 가지고, `defaultMode` 를 넘기면 Provider 가 가집니다.
 - **시스템 모드.** `mode="system"` 은 운영체제의 다크 모드 설정을 따르고, 설정을 바꾸면 새로고침 없이 바로 바뀝니다.
@@ -17,7 +18,7 @@
 import { defineIdsTheme } from '@gsainfoteam/ids-react';
 
 export const theme = defineIdsTheme({
-  palette: {
+  primary: {
     50: '#eff6ff',
     100: '#dbeafe',
     200: '#bedbff',
@@ -52,7 +53,11 @@ import { theme } from './ids-theme';
 
 | 키            | 값                                                                                   | 기본                |
 | ------------- | ------------------------------------------------------------------------------------ | ------------------- |
-| `palette`     | 50, 100 … 900, 950 의 11단계, 또는 색 하나. 값은 CSS 색(hex, `oklch()` …)            | 없음 (필수)         |
+| `primary`     | 50, 100 … 900, 950 의 11단계, 또는 색 하나. 값은 CSS 색(hex, `oklch()` …)            | 없음 (필수)         |
+| `secondary`   | `primary` 와 같은 형식                                                               | [primary 에서 만든다](#secondary-와-tertiary) |
+| `tertiary`    | `primary` 와 같은 형식                                                               | [primary 에서 만든다](#secondary-와-tertiary) |
+| `neutral`     | `'pure'` / `'tinted'`                                                                | `'pure'`            |
+| `status`      | `'harmonized'` / `'fixed'` / `{ success?, warning?, danger?, info? }`               | `'harmonized'`      |
 | `radius`      | `standard` 모서리(px, 0–18). `indicator` 는 0.4배, `container` 는 1.6배              | 10                  |
 | `cornerShape` | `'round'` / `'squircle'`                                                             | `'round'`           |
 | `scale`       | 크기에 곱할 배율(0.5–2). TV 화면은 1.5, 키오스크는 1.25 정도                          | 1                   |
@@ -61,7 +66,7 @@ import { theme } from './ids-theme';
 
 | 토큰                     | 앱이 값을 바꾼다 | 앱이 단계를 더한다 | 비고                                                              |
 | ------------------------ | ---------------- | ------------------ | ----------------------------------------------------------------- |
-| 색                       | ✅ 팔레트 하나   | ❌                 | 역할 색은 IDS 가 대비로 고른다. neutral, status, chart 는 고정    |
+| 색                       | ✅ 브랜드 셋까지 | ❌                 | 역할 색은 IDS 가 대비로 고른다. neutral 은 tint, status 는 방식이나 색 |
 | radius                   | ✅               | ❌                 | `standard` 하나를 받고 `indicator`, `container` 는 계산한다       |
 | 글꼴, 타입 스케일        | ❌               | ❌                 | Pretendard GOV, Geist Mono 고정. 크기는 배율로 바꾼다              |
 | corner shape             | ✅               | ❌                 | `round` / `squircle`                                              |
@@ -71,28 +76,93 @@ import { theme } from './ids-theme';
 
 - 크기를 키우는 방법은 size 단계를 더하는 것이 아니라 배율입니다. Radix `scaling`, Spectrum 의 모바일 배율, Material density 와 같은 방식입니다.
 
+### 계열과 역할
+
+| 역할 | 쓰임 |
+| --- | --- |
+| `bg-X`, `bg-X-hover`, `bg-X-active` | 채움과 그 hover, press |
+| `bg-X-soft`, `bg-X-soft-hover`, `bg-X-soft-active` | 옅은 채움과 그 hover, press |
+| `text-on-X` | 채움 위 글자 |
+| `text-on-X-soft` | 옅은 채움 위 글자 |
+| `text-X` | 채움 없는 바탕 위 글자와 아이콘 |
+| `border-X` | 선 |
+
+```tsx
+<button className="bg-primary text-on-primary hover:bg-primary-hover">저장</button>
+<span className="bg-danger-soft text-on-danger-soft">실패</span>
+<a className="text-secondary">자세히 보기</a>
+```
+
+- `X` 는 neutral, primary, secondary, tertiary, success, warning, danger, info 중 하나입니다. 바탕 층은 `bg-surface` 와 `text-on-surface` 입니다.
+- 이름은 [`packages/core/color-roles.json`](../../../../../core/color-roles.json) 한 표에서 나옵니다.
+- 바뀐 이름: `secondary` → `primary-soft`, `accent` → `text-primary`, `outline` → `border-primary`, `muted` → `neutral-soft`, `on-muted` → `text-neutral`, `border` → `border-neutral`, `handle` → `bg-neutral`, `X-strong` → `text-X`.
+
 ### 팔레트에서 역할 색 고르기
 
-| 역할           | light                               | dark                               |
-| -------------- | ----------------------------------- | ---------------------------------- |
-| `primary`      | 600                                 | 600                                |
-| `secondary`    | 100                                 | 950                                |
-| `outline`      | 200                                 | 800                                |
-| `on-primary`   | 흰색이 4.5:1 을 넘으면 흰색, 아니면 neutral 950 | 같음                     |
-| `on-secondary` | 700, 800, 900 중 처음 통과하는 단계 | 400, 300, 200 중 처음 통과하는 단계 |
-| `accent`       | 600, 700, 800, 900 중 처음 통과하는 단계 | 500, 400, 300 중 처음 통과하는 단계 |
+브랜드와 상태 계열은 같은 규칙입니다.
 
-- `on-secondary` 는 `secondary` 와 그 hover(6%), press(12%) 틴트에서 모두 4.5:1 을 넘어야 합니다.
-- `accent` 는 `surface` 와 `secondary` 에서 모두 4.5:1 을 넘어야 합니다.
-- neutral, status(success, warning, danger, info), chart 색은 IDS 가 정하고 바뀌지 않습니다.
-- 이 규칙으로 Tailwind 계열 17색 팔레트를 돌리면 이전 IDS 의 고정 표와 같은 값이 나옵니다.
+| 역할 | light | dark |
+| --- | --- | --- |
+| `bg-X` | 600 | 600 |
+| `bg-X-hover`, `-active` | 600 을 글자에서 먼 쪽(흰 글자면 검정, 검은 글자면 흰색)으로 10%, 20% 섞는다 | 같음 |
+| `bg-X-soft` | 100 | 950 |
+| `bg-X-soft-hover`, `-active` | soft 에 600 을 6%, 12% 섞는다 | 같음 |
+| `text-on-X` | 흰색이 4.5:1 을 넘으면 흰색, 아니면 neutral 950 | 같음 |
+| `text-on-X-soft` | 700, 800, 900 중 처음 통과하는 단계 | 400, 300, 200 중 처음 통과하는 단계 |
+| `text-X` | 600, 700, 800, 900 중 처음 통과하는 단계 | 500, 400, 300 중 처음 통과하는 단계 |
+| `border-X` | 600, 700, 800, 900 중 바탕과 3:1 을 넘는 첫 단계 | 600, 500, 400, 300 중 같은 규칙 |
+
+- `text-on-X-soft` 는 soft 와 그 hover, press 에서 모두 4.5:1 을 넘어야 합니다.
+- `text-X` 는 `surface` 와 `bg-X-soft` 에서 모두 4.5:1 을 넘어야 합니다.
+- `border-neutral` 은 구조선이라 대비 규칙이 없습니다(neutral 200 / 800). 브랜드와 상태의 `border-X` 는 바탕과 3:1 을 넘습니다.
+- 이 규칙으로 Tailwind 계열 17색 팔레트를 돌리면 이전 IDS 의 고정 표와 같은 값이 나옵니다. Flutter 는 그 표를 예전 이름 그대로 씁니다.
+
+### secondary 와 tertiary
+
+```ts
+defineIdsTheme({ primary: blue });                                  // secondary, tertiary 를 blue 에서 만든다
+defineIdsTheme({ primary: blue, secondary: violet });               // tertiary 만 만든다
+defineIdsTheme({ primary: blue, secondary: violet, tertiary: '#f59e0b' });
+```
+
+- 생략한 계열은 Provider 가 primary 에서 만듭니다(Material 3 의 규칙).
+  - `secondary`: primary 와 같은 hue, primary 채도 비율의 1/3.
+  - `tertiary`: primary 의 hue + 60°, 같은 채도 비율. 그 색이 상태 색과 너무 가까우면(아래 검증의 거리) −60° 로 돌린다.
+  - 만든 계열도 [색 하나로 팔레트 만들기](#색-하나로-팔레트-만들기)와 같은 방법으로 11단계를 짓고, 위 역할 규칙으로 역할을 고릅니다.
+- 채도 비율은 primary 500 의 채도를 같은 hue·밝기의 기준 팔레트 채도로 나눈 값입니다. 회색에 가까운 primary 면 secondary 와 tertiary 도 회색에 가깝습니다.
+- Provider 는 세 계열을 늘 씁니다. 그래서 `colorScheme="secondary"`, `"tertiary"` 와 Chart 의 기본 세 색은 앱이 몇 계열을 주든 서로 다른 색입니다.
+- 거리 검사는 앱이 준 계열만 합니다. 만든 계열이 primary 와 구별되는지는 `tests/theme-colors.test.ts` 가 17개 팔레트에서 확인합니다.
+
+### neutral
+
+```ts
+defineIdsTheme({ primary: blue, neutral: 'tinted' });
+```
+
+- `'pure'`(기본)는 IDS 의 회색입니다. Provider 는 변수를 쓰지 않고 `ids.css` 의 값으로 그립니다.
+- `'tinted'` 는 같은 밝기에 primary 의 hue 를 채도 0.02 이하로 섞습니다. 가운데 단계가 가장 많이 물들고 흰색과 가까운 끝은 거의 그대로입니다.
+- 대비 규칙은 같습니다. `tests/tokens-contrast.test.ts` 가 두 방식 모두 확인합니다.
+
+### status
+
+```ts
+defineIdsTheme({ primary: blue });                                     // 'harmonized'
+defineIdsTheme({ primary: blue, status: 'fixed' });                    // green, yellow, red, sky
+defineIdsTheme({ primary: blue, status: { danger: '#be123c' } });      // danger 만 앱의 색
+```
+
+- 기준 색은 success green, warning yellow, danger red, info sky 입니다(`'fixed'`).
+- `'harmonized'` 는 상태 색의 hue 를 primary 쪽으로 돌립니다. 최대 15° 이고, 두 hue 거리의 절반을 넘지 않습니다. 단계별 밝기와 채도는 기준 그대로입니다.
+- 돌린 색은 그 상태의 hue 범위(danger 5–31°, warning 31–108°, success 108–200°, info 200–268°) 안에 머뭅니다.
+- 돌려서 primary 와 너무 가까워지거나 적록 색각에서 success·warning 과 danger 가 비슷해지면, 그 상태는 회전을 절반씩 줄이고 끝내 0 으로 돌아갑니다.
+- 객체로 준 상태는 그 색으로, 나머지는 `'harmonized'` 로 정합니다.
 
 ### 색 하나로 팔레트 만들기
 
 ```ts
 import { createIdsPalette, defineIdsTheme } from '@gsainfoteam/ids-react';
 
-export const theme = defineIdsTheme({ palette: '#0d9488' });
+export const theme = defineIdsTheme({ primary: '#0d9488' });
 
 createIdsPalette('#0d9488'); // { 50: '#f0fdfa', …, 600: '#04968d', …, 950: '#032f30' }
 ```
@@ -138,8 +208,21 @@ test('the app theme passes IDS', () => {
 });
 ```
 
-- 빠진 팔레트 단계, CSS 색이 아닌 값, 4.5:1 을 넘는 단계가 없는 역할, 범위를 벗어난 `radius` 와 `scale`, 모르는 `cornerShape` 를 `{ path, message }` 목록으로 돌려줍니다.
-- 개발 모드에서는 Provider 가 같은 목록을 `console.warn` 으로 알립니다. 팔레트가 아예 없으면 `console.error` 입니다.
+- `{ path, message }` 목록으로 돌려줍니다.
+
+| 문제 | `path` |
+| --- | --- |
+| 빠진 팔레트 단계, CSS 색이 아닌 값 | `primary.500`, `secondary`, `status.danger` … |
+| 대비를 넘는 단계가 없는 역할 | 그 계열 |
+| 모르는 `neutral`, `status`, `cornerShape`, 범위를 벗어난 `radius`, `scale` | 그 키 |
+| 브랜드 계열 둘이 너무 가깝다 (OKLab 600 단계 거리 0.039 미만) | 뒤의 계열 |
+| 브랜드 계열이 상태 색과 너무 가깝다 | 그 브랜드 계열 |
+| 상태 색의 hue 가 그 상태의 범위 밖이다 | `status.X` |
+| 적록 색각(deuteranopia, protanopia)에서 success 나 warning 이 danger 와 비슷하다 (0.07 미만) | `status.success`, `status.warning` |
+
+- 거리 기준은 17개 기준 팔레트에서 나옵니다. 0.039 는 가장 가까운 두 팔레트(red, rose)의 거리이고, 0.07 은 기준 팔레트의 success·warning 과 danger 짝 중 가장 가까운 짝의 절반입니다. `tests/theme-colors.test.ts` 가 다시 계산합니다.
+- primary 와 hue 가 같은 상태 색(빨간 primary 와 danger)은 가깝다고 알립니다. 의도한 것이면 `status` 로 다른 색을 줍니다.
+- 개발 모드에서는 Provider 가 같은 목록을 `console.warn` 으로 알립니다. `primary` 가 아예 없으면 `console.error` 입니다.
 - 통과하지 못한 역할은 마지막 후보 단계로 그립니다. 화면은 깨지지 않지만 대비가 모자랍니다.
 
 ## 제어와 비제어
@@ -183,7 +266,7 @@ const { mode, resolvedMode } = useTheme();
     <Sidebar />
   </IdsProvider.Scope>
 
-  <IdsProvider.Scope theme={{ palette: promoPalette, radius: 16 }}>
+  <IdsProvider.Scope theme={{ primary: promoPalette, radius: 16 }}>
     {/* mode 와 배율은 바깥을 물려받는다 */}
     <PromoBanner />
   </IdsProvider.Scope>
@@ -246,7 +329,8 @@ function ThemeMenu() {
 | `className` / `style` / `ref` / 그 외 | 감싸는 요소(또는 자식)로 간다                                                                        |
 
 - 요소에는 `data-mode`(항상 `light` / `dark`), `style.colorScheme`, 준 테마의 변수, `scale` 을 준 경우 `--ids-scale` 변수와 `data-scale` 이 붙습니다.
-  - 역할 색: `--ids-theme-light-primary`, `--ids-theme-dark-primary` … (두 모드 다)
+  - 역할 색: `--ids-theme-light-bg-primary`, `--ids-theme-dark-text-on-danger-soft` … (두 모드 다). 최상위 Provider 는 primary 와 상태, 준 secondary·tertiary, `'tinted'` 일 때 neutral 과 바탕 층을 씁니다
+  - 색 키를 준 Scope 는 바깥 테마와 합친 모든 계열을 다시 씁니다
   - radius: `--ids-theme-radius-standard`, `-indicator`, `-container`. `ids.css` 가 배율을 곱해 `--ids-radius-*` 로 씁니다
   - corner shape: `--ids-corner-shape`
 - `translate` 와 `locale` 은 패키지 README 의 [문구와 언어](../../../../README.md#문구와-언어) 를 참고합니다.
@@ -256,7 +340,7 @@ function ThemeMenu() {
 - IDS 컴포넌트는 `IdsProvider` 안에 있어야 색이 칠해집니다. 밖에 두면 CSS 변수가 정의되지 않습니다.
 - `@gsainfoteam/ids-css` 를 불러오지 않아 색 변수가 비어 있으면 개발 모드에서 경고가 나옵니다.
 - squircle 은 CSS `corner-shape` 로 그립니다. 지원하지 않는 브라우저는 둥근 모서리로 그립니다. `rounded-full` 은 squircle 테마에서도 원입니다.
-- 최상위 Provider 는 배경을 칠하지 않습니다. 페이지 배경은 앱이 `bg-(--ids-color-surface)` 로 칠합니다.
+- 최상위 Provider 는 배경을 칠하지 않습니다. 페이지 배경은 앱이 `bg-surface` 로 칠합니다.
 - 최상위 Provider 는 `overlay.open` 으로 연 대화상자와 기본 `Toaster` 를 자기 요소 안(`asChild` 면 그 옆)에 그립니다. 최상위 Provider 가 여럿이면 먼저 마운트된 하나가 그립니다. 앱이 `<Toaster />` 를 직접 두면 기본 Toaster 는 물러납니다. `useOverlay()` 로 연 항목은 연 곳의 테마 변수를 받습니다.
 - 서버 HTML 에는 테마 변수 말고 아무것도 더하지 않습니다. 브라우저에서는 토스트를 읽어 줄 빈 `aria-live` 영역 하나가 붙습니다. 역할(role)이 없어 스크린 리더에게 드러나지 않습니다.
 - 최상위 Provider 는 Tooltip 의 지연 그룹(`TooltipDelayGroup`)도 둡니다. 툴팁 하나가 열린 뒤 곧바로 다른 툴팁에 올라가면 기다리지 않고 열립니다.

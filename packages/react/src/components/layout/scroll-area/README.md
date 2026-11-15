@@ -12,7 +12,7 @@
 ```tsx
 import { ScrollArea } from '@gsainfoteam/ids-react';
 
-<ScrollArea className="h-64 w-72 rounded-standard border border-(--ids-color-border)">
+<ScrollArea className="h-64 w-72 rounded-standard border border-neutral">
   <p>긴 내용</p>
 </ScrollArea>
 ```
@@ -79,7 +79,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 ```tsx
 // 위로 가려진 내용이 생기면 머리 아래에 선을 긋는다
 <div className="group/panel flex flex-col">
-  <header className="border-b border-transparent group-has-data-overflow-y-start/panel:border-(--ids-color-border)">
+  <header className="border-b border-transparent group-has-data-overflow-y-start/panel:border-neutral">
     공지
   </header>
   <ScrollArea className="min-h-0 grow">...</ScrollArea>
@@ -100,7 +100,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
   <ScrollArea.Scrollbar orientation="vertical" />   {/* 내용 앞: 시작 쪽(LTR 왼쪽) */}
   <ScrollArea.Viewport>...</ScrollArea.Viewport>
   <ScrollArea.Scrollbar orientation="horizontal">   {/* 내용 뒤: 아래 */}
-    <ScrollArea.Thumb className="bg-(--ids-color-primary)" />
+    <ScrollArea.Thumb className="bg-primary" />
   </ScrollArea.Scrollbar>
   <ScrollArea.Corner />
 </ScrollArea>
@@ -205,10 +205,10 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 
 | 토큰                        | 쓰임                                    |
 | --------------------------- | --------------------------------------- |
-| `--ids-color-handle`        | thumb                                   |
-| `--ids-color-handle-hover`  | thumb 에 올렸을 때                      |
-| `--ids-color-handle-active` | thumb 을 끌 때                          |
-| `--ids-color-muted`         | `always` 트랙, 막대에 올렸을 때, Corner |
+| `--ids-color-bg-neutral`        | thumb                                   |
+| `--ids-color-bg-neutral-hover`  | thumb 에 올렸을 때                      |
+| `--ids-color-bg-neutral-active` | thumb 을 끌 때                          |
+| `--ids-color-bg-neutral-soft`         | `always` 트랙, 막대에 올렸을 때, Corner |
 
 - 중립 토큰이라 `data-mode` 에만 따릅니다. 다크 모드는 토큰이 바꿉니다.
 

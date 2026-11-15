@@ -81,10 +81,7 @@ export const Gallery: Story = {
               <BuildingOffice2Icon />
             </Avatar.Fallback>
           </Avatar>
-          <Avatar
-            name="Design Team"
-            className="bg-(--ids-color-primary) text-(--ids-color-on-primary)"
-          />
+          <Avatar name="Design Team" className="bg-primary text-on-primary" />
         </Showcase.Row>
       </Showcase.Section>
 
@@ -112,9 +109,7 @@ export const LoadingStatus: Story = {
         <Avatar
           src={src}
           name="Alice Kim"
-          className={(state) =>
-            state.status === 'loaded' ? 'ring-2 ring-(--ids-color-success)' : undefined
-          }
+          className={(state) => (state.status === 'loaded' ? 'ring-success ring-2' : undefined)}
           onStatusChange={(status) => setLog((prev) => [...prev, status])}
         />
         <div className="flex gap-2">

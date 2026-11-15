@@ -1,7 +1,7 @@
 import { defineIdsTheme } from '@gsainfoteam/ids-react';
 
 export const theme = defineIdsTheme({
-  palette: {
+  primary: {
     50: '#eff6ff',
     100: '#dbeafe',
     200: '#bedbff',

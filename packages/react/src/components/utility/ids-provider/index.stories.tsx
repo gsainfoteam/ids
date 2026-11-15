@@ -18,15 +18,15 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const modes = ['light', 'dark'] as const;
 
 const demoThemes = {
-  blue: defineIdsTheme({ palette: palettes.blue }),
+  blue: defineIdsTheme({ primary: palettes.blue }),
   'orange, squircle': defineIdsTheme({
-    palette: palettes.orange,
+    primary: palettes.orange,
     radius: 14,
     cornerShape: 'squircle',
   }),
-  'emerald, sharp': defineIdsTheme({ palette: palettes.emerald, radius: 4 }),
-  'seed #0d9488': defineIdsTheme({ palette: '#0d9488' }),
-  'blue, ×1.5': defineIdsTheme({ palette: palettes.blue, scale: 1.5 }),
+  'emerald, sharp': defineIdsTheme({ primary: palettes.emerald, radius: 4 }),
+  'seed #0d9488': defineIdsTheme({ primary: '#0d9488' }),
+  'blue, ×1.5': defineIdsTheme({ primary: palettes.blue, scale: 1.5 }),
 };
 
 const seeds = [
@@ -40,6 +40,24 @@ const seeds = [
 ];
 
 const scales = [0.875, 1, 1.25, 1.5];
+
+const brandSets = {
+  'primary 만': { primary: palettes.blue, secondary: undefined, tertiary: undefined },
+  'secondary violet': { primary: palettes.blue, secondary: palettes.violet, tertiary: undefined },
+  'secondary violet, tertiary teal': {
+    primary: palettes.blue,
+    secondary: palettes.violet,
+    tertiary: palettes.teal,
+  },
+};
+
+const neutrals = ['pure', 'tinted'] as const;
+
+const statusModes = ['harmonized', 'fixed'] as const;
+
+const statusFamilies = ['success', 'warning', 'danger', 'info'] as const;
+
+const tintedPrimaries = ['blue', 'orange', 'emerald'] as const;
 
 const meta = {
   title: 'Utility/IdsProvider',
@@ -63,10 +81,10 @@ type Story = StoryObj<typeof meta>;
 function Readout() {
   const { theme, scale, mode, resolvedMode } = useTheme();
   return (
-    <dl className="text-caption-c1-regular grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 font-mono text-(--ids-color-on-muted)">
-      <dt>palette</dt>
+    <dl className="text-caption-c1-regular text-neutral grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 font-mono">
+      <dt>primary</dt>
       <dd data-testid="palette">
-        {typeof theme.palette === 'string' ? theme.palette : theme.palette?.[600]}
+        {typeof theme.primary === 'string' ? theme.primary : theme.primary?.[600]}
       </dd>
       <dt>scale</dt>
       <dd data-testid="scale">{scale ?? 1}</dd>
@@ -78,7 +96,7 @@ function Readout() {
   );
 }
 
-const region = cn('concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)');
+const region = cn('concentric-p-4 inset-ring-1 inset-ring-neutral');
 
 export const Playground: Story = {
   render: (args) => (
@@ -103,13 +121,13 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Palette × Mode"
-        description="앱이 준 팔레트 하나에서 IdsProvider 가 라이트와 다크의 역할 색을 대비로 고릅니다. 여기는 레포 데모 팔레트 17개입니다. 밝은 팔레트는 채움 위 글자가 검은색입니다."
+        description="앱이 준 primary 팔레트 하나에서 IdsProvider 가 라이트와 다크의 역할 색을 대비로 고릅니다. 여기는 레포 데모 팔레트 17개입니다. 밝은 팔레트는 채움 위 글자가 검은색입니다."
       >
         <Showcase.Matrix
           rows={paletteHues}
           columns={modes}
           render={(hue, mode) => (
-            <IdsProvider.Scope theme={{ palette: palettes[hue] }} mode={mode} className={region}>
+            <IdsProvider.Scope theme={{ primary: palettes[hue] }} mode={mode} className={region}>
               <div className="flex flex-wrap items-center gap-2">
                 <Button>저장</Button>
                 <Button variant="soft">임시 저장</Button>
@@ -122,17 +140,104 @@ export const Gallery: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Seed × Mode"
-        description="palette 에 색 하나를 주면 IdsProvider 가 그 색의 hue 와 채도로 50~950 을 만듭니다. 고른 색이 그대로 들어간다는 보장은 없습니다. 회색을 주면 회색 팔레트가 됩니다."
+        description="primary 에 색 하나를 주면 IdsProvider 가 그 색의 hue 와 채도로 50~950 을 만듭니다. 고른 색이 그대로 들어간다는 보장은 없습니다. 회색을 주면 회색 팔레트가 됩니다."
       >
         <Showcase.Matrix
           rows={seeds}
           columns={modes}
           render={(seed, mode) => (
-            <IdsProvider.Scope theme={{ palette: seed }} mode={mode} className={region}>
+            <IdsProvider.Scope theme={{ primary: seed }} mode={mode} className={region}>
               <div className="flex flex-wrap items-center gap-2">
                 <Button>저장</Button>
                 <Button variant="soft">임시 저장</Button>
                 <Badge variant="outline">초안</Badge>
+              </div>
+            </IdsProvider.Scope>
+          )}
+        />
+      </Showcase.Section>
+      <Showcase.Section
+        title="Brand families × Mode"
+        description="secondary 와 tertiary 는 선택입니다. 생략한 계열은 primary 에서 만듭니다. secondary 는 같은 hue 에 채도 1/3, tertiary 는 hue 를 60° 돌린 색입니다."
+      >
+        <Showcase.Matrix
+          rows={Object.keys(brandSets) as (keyof typeof brandSets)[]}
+          columns={modes}
+          render={(set, mode) => (
+            <IdsProvider.Scope theme={brandSets[set]} mode={mode} className={region}>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button>primary</Button>
+                <Button colorScheme="secondary">secondary</Button>
+                <Button colorScheme="tertiary">tertiary</Button>
+                <Badge variant="soft" colorScheme="secondary">
+                  soft
+                </Badge>
+                <Badge variant="outline" colorScheme="tertiary">
+                  outline
+                </Badge>
+              </div>
+            </IdsProvider.Scope>
+          )}
+        />
+      </Showcase.Section>
+      <Showcase.Section
+        title="Neutral: pure × tinted"
+        description="neutral: 'tinted' 는 같은 밝기의 회색에 primary 의 색상을 채도 0.02 이하로 섞습니다. 배경, 구조선, 보조 글자, 옅은 채움이 함께 물듭니다."
+      >
+        {tintedPrimaries.map((hue) => (
+          <Showcase.Row key={hue} label={hue}>
+            <div className="flex flex-wrap gap-4">
+              {neutrals.flatMap((neutral) =>
+                modes.map((mode) => (
+                  <IdsProvider.Scope
+                    key={`${neutral}:${mode}`}
+                    theme={{ primary: palettes[hue], neutral }}
+                    mode={mode}
+                    className="bg-surface text-on-surface"
+                  >
+                    <Card className="w-56">
+                      <Card.Header>
+                        <Card.Title>
+                          {neutral} · {mode}
+                        </Card.Title>
+                        <Card.Description>구조선과 보조 글자</Card.Description>
+                      </Card.Header>
+                      <Card.Content className="flex flex-wrap gap-2">
+                        <Button variant="soft" colorScheme="neutral">
+                          취소
+                        </Button>
+                        <Badge variant="soft" colorScheme="neutral">
+                          초안
+                        </Badge>
+                      </Card.Content>
+                    </Card>
+                  </IdsProvider.Scope>
+                )),
+              )}
+            </div>
+          </Showcase.Row>
+        ))}
+      </Showcase.Section>
+      <Showcase.Section
+        title="Status: harmonized × fixed"
+        description="기본 'harmonized' 는 상태 색의 색상을 primary 쪽으로 최대 15° 돌리고 그 상태의 범위 안에 둡니다. 'fixed' 는 green, yellow, red, sky 그대로입니다."
+      >
+        <Showcase.Matrix
+          rows={tintedPrimaries}
+          columns={statusModes}
+          render={(hue, status) => (
+            <IdsProvider.Scope theme={{ primary: palettes[hue], status }} className={region}>
+              <div className="flex flex-wrap items-center gap-2">
+                {statusFamilies.map((family) => (
+                  <Badge key={family} colorScheme={family}>
+                    {family}
+                  </Badge>
+                ))}
+                {statusFamilies.map((family) => (
+                  <Badge key={family} variant="soft" colorScheme={family}>
+                    {family}
+                  </Badge>
+                ))}
               </div>
             </IdsProvider.Scope>
           )}
@@ -223,7 +328,7 @@ export const Controlled: Story = {
     return (
       <div className="flex flex-col gap-3">
         <IdsProvider
-          theme={defineIdsTheme({ palette: palettes.blue })}
+          theme={defineIdsTheme({ primary: palettes.blue })}
           mode={mode}
           onModeChange={setMode}
           className={region}
@@ -267,7 +372,7 @@ export const Controlled: Story = {
 export const SystemMode: Story = {
   render: () => (
     <IdsProvider
-      theme={defineIdsTheme({ palette: palettes.blue })}
+      theme={defineIdsTheme({ primary: palettes.blue })}
       defaultMode="system"
       className={region}
       data-testid="provider"
@@ -303,7 +408,7 @@ export const SystemMode: Story = {
 export const Scope: Story = {
   render: () => (
     <IdsProvider
-      theme={defineIdsTheme({ palette: palettes.blue })}
+      theme={defineIdsTheme({ primary: palettes.blue })}
       defaultMode="light"
       className={region}
       data-testid="outer"
@@ -321,7 +426,7 @@ export const Scope: Story = {
           </div>
         </IdsProvider.Scope>
         <IdsProvider.Scope
-          theme={{ palette: palettes.orange, radius: 16 }}
+          theme={{ primary: palettes.orange, radius: 16 }}
           className={region}
           data-testid="orange"
         >
@@ -354,8 +459,8 @@ export const Scope: Story = {
     await expect(dark).toHaveAttribute('data-mode', 'dark');
     await expect(within(orange).getByTestId('palette')).toHaveTextContent(palettes.orange[600]);
     await expect(orange).toHaveAttribute('data-mode', 'light');
-    await expect(dark.className).toContain('bg-(--ids-color-surface)');
-    await expect(orange.className).not.toContain('bg-(--ids-color-surface)');
+    await expect(dark.className).toContain('bg-surface');
+    await expect(orange.className).not.toContain('bg-surface');
     await userEvent.click(within(orange).getByRole('button', { name: 'dark' }));
     await expect(outer).toHaveAttribute('data-mode', 'dark');
     await expect(orange).toHaveAttribute('data-mode', 'dark');
@@ -364,7 +469,7 @@ export const Scope: Story = {
 
 export const AsChild: Story = {
   render: () => (
-    <IdsProvider.Scope asChild theme={{ palette: palettes.green }} mode="dark">
+    <IdsProvider.Scope asChild theme={{ primary: palettes.green }} mode="dark">
       <section aria-label="녹색 영역" className={region}>
         <div className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2">
@@ -387,7 +492,7 @@ export const AsChild: Story = {
   play: async ({ canvas }) => {
     const section = canvas.getByRole('region', { name: '녹색 영역' });
     await expect(section).toHaveAttribute('data-mode', 'dark');
-    await expect(section.style.getPropertyValue('--ids-theme-dark-primary')).toBe(
+    await expect(section.style.getPropertyValue('--ids-theme-dark-bg-primary')).toBe(
       palettes.green[600],
     );
     await expect(section.parentElement).not.toBe(null);

@@ -5,30 +5,29 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const emptyStyle = tv({
   slots: {
-    root: 'flex w-full min-w-0 flex-col text-(--ids-color-on-surface)',
+    root: 'flex w-full min-w-0 flex-col text-on-surface',
     media: [
-      'flex shrink-0 items-center justify-center overflow-hidden text-(--ids-color-on-muted)',
+      'flex shrink-0 items-center justify-center overflow-hidden text-neutral',
       '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&>img]:max-w-full',
     ],
     title: 'text-balance [overflow-wrap:anywhere]',
     description: [
-      'max-w-sm text-pretty text-(--ids-color-on-muted)',
+      'max-w-sm text-pretty text-neutral',
       '[&_a:not([data-link])]:underline [&_a:not([data-link])]:underline-offset-4',
-      '[&_a:not([data-link]):hover]:text-(--ids-color-on-surface)',
+      '[&_a:not([data-link]):hover]:text-on-surface',
     ],
     actions: 'flex flex-wrap items-center gap-2',
   },
   variants: {
     variant: {
       ghost: {},
-      soft: { root: 'bg-(--ids-color-muted)' },
-      outline: { root: 'border border-dashed border-(--ids-color-border)' },
+      soft: { root: 'bg-neutral-soft' },
+      outline: { root: 'border border-dashed border-neutral' },
     } satisfies Record<EmptyVariant, object>,
     media: {
-      soft: { media: 'rounded-standard bg-(--ids-color-muted) text-(--ids-color-on-surface)' },
+      soft: { media: 'rounded-standard bg-neutral-soft text-on-surface' },
       outline: {
-        media:
-          'rounded-standard inset-ring-1 inset-ring-(--ids-color-border) text-(--ids-color-on-surface)',
+        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-on-surface',
       },
       ghost: {},
     } satisfies Record<EmptyMediaVariant, object>,
@@ -62,7 +61,7 @@ export const emptyStyle = tv({
       class: { media: "[&_svg:not([class*='size-'])]:size-12" },
     },
     { media: 'ghost', size: 'tiny', class: { media: "[&_svg:not([class*='size-'])]:size-10" } },
-    { media: 'soft', variant: 'soft', class: { media: 'bg-(--ids-color-surface)' } },
+    { media: 'soft', variant: 'soft', class: { media: 'bg-surface' } },
     { media: ['soft', 'outline'], class: { media: '[&>img]:size-full [&>img]:object-cover' } },
   ],
   defaultVariants: { variant: 'outline', media: 'soft', size: 'standard', align: 'center' },

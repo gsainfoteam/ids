@@ -20,9 +20,10 @@ const lerp = (from: number, to: number, amount: number) => from + (to - from) * 
 
 const turnsFrom = (from: number, to: number) => (((to - from) % 360) + 360) % 360;
 
-const signedHueDelta = (from: number, to: number) => ((((to - from) % 360) + 540) % 360) - 180;
+export const signedHueDelta = (from: number, to: number) =>
+  ((((to - from) % 360) + 540) % 360) - 180;
 
-function shadeOf(color: string): Shade {
+export function shadeOf(color: string): Shade {
   const { l, c, h } = toOklch(parse(color)!);
   return { l, c, h: h ?? 0 };
 }
@@ -117,12 +118,51 @@ export function paletteFromSeed(
   const chromaRatio = referenceChroma > 0 ? Math.min(1, c / referenceChroma) : 0;
   const steps = shades.map((shade) => ({ ...shade, c: shade.c * chromaRatio }));
 
+  return paletteWithReadableFill(steps);
+}
+
+function paletteWithReadableFill(steps: Shade[]): IdsPalette {
   const hexes = steps.map(inSrgb);
   if (!takesLightOrDarkText(hexes[PRIMARY_STEP_INDEX]!))
     hexes[PRIMARY_STEP_INDEX] = nearestLightnessWithReadableText(steps[PRIMARY_STEP_INDEX]!);
 
   return Object.fromEntries(
     PALETTE_STEPS.map((step, index) => [step, hexes[index]!]),
+  ) as unknown as IdsPalette;
+}
+
+export const hueOf = (palette: IdsPalette) => shadeOf(palette[500]).h;
+
+export function chromaRatioOf(palette: IdsPalette, references: Reference[] = referencesInIds()) {
+  const { l, c, h } = shadeOf(palette[500]);
+  const referenceChroma = chromaAtLightness(blendedShades(h, references), l);
+  return referenceChroma > 0 ? Math.min(1, c / referenceChroma) : 0;
+}
+
+export function paletteAtHue(
+  hue: number,
+  chromaRatio: number,
+  references: Reference[] = referencesInIds(),
+): IdsPalette {
+  return paletteWithReadableFill(
+    blendedShades(hue, references).map((shade) => ({ ...shade, c: shade.c * chromaRatio })),
+  );
+}
+
+export const chromaOf = (palette: IdsPalette) => shadeOf(palette[500]).c;
+
+export function rotatedPalette(palette: IdsPalette, degrees: number): IdsPalette {
+  return paletteWithReadableFill(
+    PALETTE_STEPS.map((step) => {
+      const shade = shadeOf(palette[step]);
+      return { ...shade, h: shade.h + degrees };
+    }),
+  );
+}
+
+export function paletteFromSteps(steps: readonly string[]): IdsPalette {
+  return Object.fromEntries(
+    PALETTE_STEPS.map((step, index) => [step, steps[index]!]),
   ) as unknown as IdsPalette;
 }
 

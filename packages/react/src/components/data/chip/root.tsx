@@ -15,7 +15,15 @@ import { Slot } from '../../utility/slot';
 import type { Chip } from '.';
 
 export type ChipVariant = 'solid' | 'soft' | 'outline';
-export type ChipColorScheme = 'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
+export type ChipColorScheme =
+  | 'neutral'
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'info';
 
 function flag(on: boolean) {
   return on ? '' : undefined;

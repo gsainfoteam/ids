@@ -10,7 +10,7 @@ export const chipFieldStyle = tv({
     root: ['relative', fieldTrigger.base, 'flex-wrap gap-1 py-1'],
     adornment: [
       'inline-flex shrink-0 items-center empty:hidden',
-      'not-has-[button]:text-(--ids-color-on-muted)',
+      'not-has-[button]:text-neutral',
       'not-has-[button]:[&_svg]:shrink-0 not-has-[button]:[&_svg]:text-current',
       '[&_button]:size-auto [&_button]:h-auto [&_button]:min-h-0 [&_button]:w-auto [&_button]:min-w-0',
       '[&_button]:p-0',
@@ -18,31 +18,28 @@ export const chipFieldStyle = tv({
     chip: [
       'max-w-full min-w-0 gap-0.5 data-disabled:opacity-60',
       'transition-[color,background-color] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'data-focus-visible:bg-(--ids-color-secondary) data-focus-visible:text-(--ids-color-on-secondary)',
+      'data-focus-visible:bg-primary-soft data-focus-visible:text-on-primary-soft',
     ],
     chipRemove: 'relative ring-0! after:absolute after:-inset-1',
     input: [
       'min-w-20 flex-1 bg-transparent py-1 outline-none',
-      'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
+      'placeholder:text-neutral disabled:cursor-not-allowed',
     ],
-    icon: 'shrink-0 cursor-pointer text-(--ids-color-on-muted)',
+    icon: 'shrink-0 cursor-pointer text-neutral',
     listArea: listStyles.listArea,
     listbox: listStyles.list,
     item: listStyles.option,
     indicator: listStyles.indicator,
     group: 'flex flex-col',
     groupHeading: listStyles.heading,
-    create: [listStyles.option, 'data-invalid:text-(--ids-color-danger)'],
+    create: [listStyles.option, 'data-invalid:text-danger'],
     empty: [listStyles.empty, 'not-data-empty:sr-only'],
-    limit: [
-      'px-2.5 pt-1.5 pb-1 text-caption-c1-regular text-(--ids-color-on-muted)',
-      'not-data-full:sr-only',
-    ],
+    limit: ['px-2.5 pt-1.5 pb-1 text-caption-c1-regular text-neutral', 'not-data-full:sr-only'],
   },
   variants: {
     variant: {
       outline: { root: fieldTrigger.variant.outline },
-      soft: { root: fieldTrigger.variant.soft, chip: 'bg-(--ids-color-surface)' },
+      soft: { root: fieldTrigger.variant.soft, chip: 'bg-surface' },
       ghost: { root: fieldTrigger.variant.ghost },
     } satisfies Record<ChipFieldVariant, object>,
     size: {

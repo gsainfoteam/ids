@@ -96,7 +96,7 @@ export const Playground: Story = {
       ) : args.triggerType === 'contextmenu' ? (
         <Menu.Trigger
           data-testid={contextArea}
-          className="rounded-standard text-body-b3-regular flex h-40 w-80 items-center justify-center border border-dashed border-(--ids-color-border) text-(--ids-color-on-muted)"
+          className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
         >
           여기를 우클릭하세요
         </Menu.Trigger>
@@ -465,7 +465,7 @@ export const Gallery: Story = {
         >
           <Showcase.Row label="우클릭">
             <Menu triggerType="contextmenu">
-              <Menu.Trigger className="rounded-standard text-body-b3-regular flex h-32 w-72 items-center justify-center border border-dashed border-(--ids-color-border) text-(--ids-color-on-muted)">
+              <Menu.Trigger className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-32 w-72 items-center justify-center border border-dashed">
                 여기를 우클릭하세요
               </Menu.Trigger>
               <Menu.Content aria-label="편집">
@@ -646,7 +646,7 @@ export const ContextMenu: Story = {
     <Menu triggerType="contextmenu">
       <Menu.Trigger
         data-testid={contextArea}
-        className="rounded-standard text-body-b3-regular flex h-40 w-80 items-center justify-center border border-dashed border-(--ids-color-border) text-(--ids-color-on-muted)"
+        className="rounded-standard text-body-b3-regular border-neutral text-neutral flex h-40 w-80 items-center justify-center border border-dashed"
       >
         여기를 우클릭하세요
       </Menu.Trigger>

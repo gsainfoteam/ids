@@ -20,7 +20,16 @@ import { Button } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
-const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'info'] as const;
+const colorSchemes = [
+  'primary',
+  'secondary',
+  'tertiary',
+  'neutral',
+  'danger',
+  'success',
+  'warning',
+  'info',
+] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const meta = {
@@ -232,7 +241,7 @@ export const ColorScheme: Story = {
     <div className="flex gap-2">
       <Button variant="outline">취소</Button>
       <Button colorScheme="danger">삭제</Button>
-      <span data-probe className="hidden text-(--ids-color-danger) ring-(--ids-color-danger)/40" />
+      <span data-probe className="bg-danger ring-danger/40 hidden" />
     </div>
   ),
   parameters: {
@@ -246,7 +255,7 @@ export const ColorScheme: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const probe = getComputedStyle(canvasElement.querySelector<HTMLElement>('[data-probe]')!);
     const danger = canvas.getByRole('button', { name: '삭제' });
-    await expect(getComputedStyle(danger).backgroundColor).toBe(probe.color);
+    await expect(getComputedStyle(danger).backgroundColor).toBe(probe.backgroundColor);
     await userEvent.tab();
     await userEvent.tab();
     await expect(danger).toHaveFocus();

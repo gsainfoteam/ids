@@ -93,19 +93,19 @@ const column = cn('flex shrink-0 flex-col gap-4');
 
 const tile = cn(
   'shrink-0 shadow-[0_24px_48px_-24px_rgb(15_23_42/0.24)]',
-  'dark:bg-(--ids-color-muted) dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
+  'dark:bg-neutral-soft dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
 );
 
 const frame = cn(
-  'shrink-0 overflow-hidden rounded-container bg-(--ids-color-surface) inset-ring-1 inset-ring-(--ids-color-border)',
-  'shadow-[0_24px_48px_-24px_rgb(15_23_42/0.24)] dark:bg-(--ids-color-muted) dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
+  'shrink-0 overflow-hidden rounded-container bg-surface inset-ring-1 inset-ring-neutral',
+  'shadow-[0_24px_48px_-24px_rgb(15_23_42/0.24)] dark:bg-neutral-soft dark:shadow-[0_24px_48px_-24px_rgb(0_0_0/0.8)]',
 );
 
 const row = cn('flex items-center justify-between gap-3 text-body-b3-medium');
 
 const option = cn('inline-flex items-center gap-2 text-body-b3-medium');
 
-const hint = cn('text-caption-c1-regular text-(--ids-color-on-muted)');
+const hint = cn('text-caption-c1-regular text-neutral');
 
 export const Cover: Story = {
   render: () => (
@@ -116,17 +116,17 @@ export const Cover: Story = {
         <IdsProvider.Scope
           key={mode}
           mode={mode}
-          theme={{ palette: palettes.blue }}
+          theme={{ primary: palettes.blue }}
           inert
           aria-hidden
           className={cn(
-            'absolute inset-0 overflow-hidden bg-(--ids-color-muted) text-(--ids-color-on-surface) dark:bg-(--ids-color-surface)',
+            'bg-neutral-soft text-on-surface dark:bg-surface absolute inset-0 overflow-hidden',
             halves[mode],
           )}
         >
           <div className="absolute inset-0 flex items-center justify-center gap-4">
             <div className={cn(column, 'w-[300px] -translate-y-24')}>
-              <IdsProvider.Scope theme={{ palette: palettes.amber }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.amber }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>평점 분포</Card.Title>
@@ -147,7 +147,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.lime }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>동아리</Card.Title>
@@ -179,7 +179,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.blue }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.blue }} asChild>
                 <Card size="tiny" className={tile}>
                   <Accordion type="single" defaultValue="when">
                     <Accordion.Item value="when">
@@ -194,7 +194,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.emerald }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.emerald }} asChild>
                 <Card size="tiny" className={cn(tile, 'flex-row flex-wrap gap-2')}>
                   <Chip defaultSelected>전공</Chip>
                   <Chip>교양</Chip>
@@ -203,7 +203,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.violet }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.violet }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>회원가입</Card.Title>
@@ -225,7 +225,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.amber }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.amber }} asChild>
                 <Card size="tiny" className={tile}>
                   <div className={row}>
                     <span className="text-headline-h4-bold">4.9</span>
@@ -235,7 +235,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.rose }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.rose }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>택배</Card.Title>
@@ -258,7 +258,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.sky }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                 <Card size="tiny" className={tile}>
                   <Empty size="tiny">
                     <Empty.Media>
@@ -270,7 +270,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.red }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.red }} asChild>
                 <Card size="tiny" className={cn(tile, 'flex-row gap-2')}>
                   <Button size="tiny" className="flex-1">
                     삭제
@@ -284,7 +284,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.indigo }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.indigo }} asChild>
                 <Card size="tiny" className={tile}>
                   <Label className={row}>
                     위치 공유
@@ -297,7 +297,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.fuchsia }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.fuchsia }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>축제 공연 투표</Card.Title>
@@ -321,7 +321,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.violet }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.violet }} asChild>
                 <Card size="tiny" className={cn(tile, 'flex-row flex-wrap gap-2')}>
                   <Badge content="새 기능" colorScheme="primary" />
                   <Badge content="베타" variant="soft" colorScheme="primary" />
@@ -333,7 +333,7 @@ export const Cover: Story = {
             </div>
 
             <div className={cn(column, 'w-[300px] translate-y-10')}>
-              <IdsProvider.Scope theme={{ palette: palettes.teal }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.teal }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>셔틀 시간표</Card.Title>
@@ -369,7 +369,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.fuchsia }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.fuchsia }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>강조 색</Card.Title>
@@ -382,7 +382,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.amber }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.amber }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>인포팀 신입 모집</Card.Title>
@@ -406,7 +406,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.sky }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                 <Card size="tiny" className={tile}>
                   <Item.Group variant="separated" aria-label="파일" size="tiny">
                     <Item>
@@ -440,7 +440,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.cyan }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.cyan }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>서비스 소개</Card.Title>
@@ -457,7 +457,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.red }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.red }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>알림</Card.Title>
@@ -488,7 +488,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.orange }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                 <Card size="tiny" className={cn(tile, 'flex-row items-center gap-2')}>
                   <ButtonGroup variant="outline" aria-label="글 관리" size="tiny">
                     <Button>보관</Button>
@@ -511,7 +511,7 @@ export const Cover: Story = {
                 <Alert.Description>17가지 색과 새 컴포넌트</Alert.Description>
               </Alert>
 
-              <IdsProvider.Scope theme={{ palette: palettes.green }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.green }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>학점 계산</Card.Title>
@@ -536,7 +536,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.rose }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.rose }} asChild>
                 <Card size="tiny" className={cn(tile, 'items-center')}>
                   <Calendar
                     defaultMonth={new CalendarDate(2026, 12, 1)}
@@ -547,7 +547,7 @@ export const Cover: Story = {
             </div>
 
             <div className={cn(column, 'w-[320px] -translate-y-16')}>
-              <IdsProvider.Scope theme={{ palette: palettes.lime }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>택시 합승</Card.Title>
@@ -578,7 +578,7 @@ export const Cover: Story = {
                 <Alert.Description>중앙도서관 3층 A-12</Alert.Description>
               </Alert>
 
-              <IdsProvider.Scope theme={{ palette: palettes.teal }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.teal }} asChild>
                 <Card size="tiny" className={tile}>
                   <Table aria-label="준비 상태">
                     <Table.Header>
@@ -617,7 +617,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.teal }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.teal }} asChild>
                 <Card size="tiny" className={tile}>
                   <Accordion type="single" defaultValue="free">
                     <Accordion.Item value="free">
@@ -633,11 +633,11 @@ export const Cover: Story = {
               </IdsProvider.Scope>
 
               <IdsProvider.Scope
-                theme={{ palette: palettes.cyan }}
-                className="h-[600px] shrink-0 overflow-hidden rounded-[48px] border-[10px] border-(--ids-color-on-surface) bg-(--ids-color-surface) p-5 shadow-[0_32px_64px_-24px_rgb(15_23_42/0.4)] dark:border-(--ids-color-muted-active)"
+                theme={{ primary: palettes.cyan }}
+                className="bg-surface h-[600px] shrink-0 overflow-hidden rounded-[48px] border-[10px] border-(--ids-color-on-surface) p-5 shadow-[0_32px_64px_-24px_rgb(15_23_42/0.4)] dark:border-(--ids-color-bg-neutral-soft-active)"
               >
-                <div className="mx-auto mb-4 h-6 w-24 rounded-full bg-(--ids-color-on-surface) dark:bg-(--ids-color-muted-active)" />
-                <p className="text-caption-c1-medium text-(--ids-color-on-muted)">gistory</p>
+                <div className="dark:bg-neutral-soft-active mx-auto mb-4 h-6 w-24 rounded-full bg-(--ids-color-on-surface)" />
+                <p className="text-caption-c1-medium text-neutral">gistory</p>
                 <p className="text-headline-h5-bold mb-4">최근 활동</p>
                 <Stepper progress={false} orientation="vertical" size="tiny" aria-label="최근 활동">
                   <Stepper.Item completed>
@@ -664,7 +664,7 @@ export const Cover: Story = {
                 </Stepper>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.pink }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.pink }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>셔틀 노선</Card.Title>
@@ -690,7 +690,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.orange }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                 <Card size="tiny" className={tile}>
                   <div className={row}>
                     <span className="text-headline-h4-bold">4.8</span>
@@ -705,7 +705,7 @@ export const Cover: Story = {
                 <Skeleton lines={2} className="text-body-b3-regular flex-1" />
               </Card>
 
-              <IdsProvider.Scope theme={{ palette: palettes.amber }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.amber }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>대출 중인 책</Card.Title>
@@ -735,7 +735,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.indigo }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.indigo }} asChild>
                 <Card size="tiny" className={tile}>
                   <div className={row}>
                     밝기
@@ -754,7 +754,7 @@ export const Cover: Story = {
             <div className="grid h-full w-[840px] shrink-0 grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-4">
               <div className="flex items-end gap-4">
                 <div className={cn(column, 'w-[300px]')}>
-                  <IdsProvider.Scope theme={{ palette: palettes.blue }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.blue }} asChild>
                     <Card size="tiny" className={tile}>
                       <Card.Header>
                         <Card.Title>학생회비 납부</Card.Title>
@@ -768,7 +768,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.purple }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.purple }} asChild>
                     <Card size="tiny" className={tile}>
                       <Empty size="tiny">
                         <Empty.Media>
@@ -785,7 +785,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.emerald }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.emerald }} asChild>
                     <Card size="tiny" className={tile}>
                       <p className={hint}>이번 주 방문자</p>
                       <div className="flex items-end justify-between">
@@ -796,7 +796,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.sky }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                     <Card size="tiny" className={tile}>
                       <Tabs defaultValue="notice">
                         <Tabs.List aria-label="게시판">
@@ -829,7 +829,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.green }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.green }} asChild>
                     <Card size="tiny" className={tile}>
                       <Card.Header>
                         <Card.Title>오늘의 학식</Card.Title>
@@ -867,7 +867,7 @@ export const Cover: Story = {
                 </div>
 
                 <div className={cn(column, 'w-[260px]')}>
-                  <IdsProvider.Scope theme={{ palette: palettes.sky }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                     <Card size="tiny" className={cn(tile, 'flex-row flex-wrap gap-2')}>
                       <Chip defaultSelected>중간고사</Chip>
                       <Chip>퀴즈</Chip>
@@ -875,7 +875,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.red }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.red }} asChild>
                     <Card size="tiny" className={cn(tile, 'flex-row items-center justify-between')}>
                       <IconButton aria-label="좋아요" icon={<HeartIcon />} />
                       <IconButton variant="soft" aria-label="공유" icon={<ShareIcon />} />
@@ -888,7 +888,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.rose }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.rose }} asChild>
                     <Card size="tiny" className={tile}>
                       <div className="flex items-center gap-3">
                         <Avatar name="오세린" />
@@ -903,13 +903,13 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.purple }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.purple }} asChild>
                     <Card size="tiny" className={cn(tile, 'items-center')}>
                       <Pagination defaultPage={2} pageCount={4} size="tiny" variant="soft" />
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.teal }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.teal }} asChild>
                     <Card size="tiny" className={cn(tile, 'flex-row items-center justify-between')}>
                       <ToggleGroup aria-label="정렬" defaultValue="center">
                         <IconToggle
@@ -928,7 +928,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.pink }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.pink }} asChild>
                     <Card size="tiny" className={cn(tile, 'flex-row flex-wrap gap-2')}>
                       <Chip defaultSelected>전체</Chip>
                       <Chip defaultSelected>학사</Chip>
@@ -940,7 +940,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.amber }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.amber }} asChild>
                     <Card size="tiny" className={tile}>
                       <Card.Header>
                         <Card.Title>강의 평가</Card.Title>
@@ -951,7 +951,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.sky }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                     <Card size="tiny" className={tile}>
                       <div className="text-body-b3-medium flex items-center gap-2">
                         <Spinner />
@@ -963,7 +963,7 @@ export const Cover: Story = {
                 </div>
 
                 <div className={cn(column, 'w-[240px]')}>
-                  <IdsProvider.Scope theme={{ palette: palettes.yellow }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.yellow }} asChild>
                     <Card size="tiny" className={cn(tile, 'items-center')}>
                       <Rating aria-label="만족도" defaultValue={3} />
                     </Card>
@@ -977,7 +977,7 @@ export const Cover: Story = {
                     불러오는 중
                   </Card>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.pink }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.pink }} asChild>
                     <Card size="tiny" className={tile}>
                       <Label className={row}>
                         좋아요 알림
@@ -990,7 +990,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.orange }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                     <Card size="tiny" className={cn(tile, 'flex-row items-center justify-between')}>
                       <AvatarGroup aria-label="참여자" max={3}>
                         <Avatar name="김지수" />
@@ -1004,7 +1004,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.blue }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.blue }} asChild>
                     <Card size="tiny" className={cn(tile, 'grid grid-cols-2 gap-2')}>
                       <Button size="tiny">저장</Button>
                       <Button size="tiny" variant="soft">
@@ -1022,7 +1022,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.yellow }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.yellow }} asChild>
                     <Card size="tiny" className={cn(tile, 'items-center')}>
                       <ToggleGroup aria-label="보기" defaultValue="week">
                         <Toggle value="day">일</Toggle>
@@ -1032,7 +1032,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.lime }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                     <Card size="tiny" className={tile}>
                       <Label className={row}>
                         공지사항
@@ -1049,7 +1049,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.cyan }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.cyan }} asChild>
                     <Card size="tiny" className={cn(tile, 'flex-row items-center justify-between')}>
                       <span className="text-body-b3-medium">인원</span>
                       <NumberField aria-label="인원" defaultValue={4} size="tiny" className="w-24">
@@ -1073,26 +1073,26 @@ export const Cover: Story = {
                       {themes.map((color) => (
                         <IdsProvider.Scope
                           key={color}
-                          theme={{ palette: palettes[color] }}
-                          className="aspect-square rounded-full bg-(--ids-color-primary)"
+                          theme={{ primary: palettes[color] }}
+                          className="bg-primary aspect-square rounded-full"
                         />
                       ))}
                     </div>
                   </Card>
 
-                  <p className="-me-[0.1em] bg-linear-to-b from-(--ids-color-on-surface) to-(--ids-color-on-muted) bg-clip-text pe-[0.1em] font-[system-ui] text-[200px] leading-none font-black tracking-[-0.06em] text-transparent">
+                  <p className="-me-[0.1em] bg-linear-to-b from-(--ids-color-on-surface) to-(--ids-color-text-neutral) bg-clip-text pe-[0.1em] font-[system-ui] text-[200px] leading-none font-black tracking-[-0.06em] text-transparent">
                     IDS
                   </p>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.violet }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.violet }} asChild>
                     <Card size="tiny" className={cn(tile, 'w-[240px] gap-2')}>
-                      <p className="text-caption-c1-medium text-(--ids-color-on-muted)">app.tsx</p>
+                      <p className="text-caption-c1-medium text-neutral">app.tsx</p>
                       <pre className="text-body-b3-regular font-mono">
                         <code>
                           {'<IdsProvider\n  theme='}
-                          <span className="text-(--ids-color-accent)">{'{theme}'}</span>
+                          <span className="text-primary">{'{theme}'}</span>
                           {'\n  mode='}
-                          <span className="text-(--ids-color-accent)">{'"dark"'}</span>
+                          <span className="text-primary">{'"dark"'}</span>
                           {'\n>\n  <App />\n</IdsProvider>'}
                         </code>
                       </pre>
@@ -1101,9 +1101,9 @@ export const Cover: Story = {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <IdsProvider.Scope theme={{ palette: palettes.sky }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                     <Card size="tiny" className={cn(tile, 'w-[560px] flex-row items-center gap-1')}>
-                      <MagnifyingGlassIcon className="ms-1 size-5 shrink-0 text-(--ids-color-on-muted)" />
+                      <MagnifyingGlassIcon className="text-neutral ms-1 size-5 shrink-0" />
                       <TextField
                         aria-label="검색"
                         defaultValue="Button"
@@ -1119,7 +1119,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.rose }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.rose }} asChild>
                     <Chip variant="solid" colorScheme="primary" className="[zoom:2.4]">
                       #gistory
                     </Chip>
@@ -1129,7 +1129,7 @@ export const Cover: Story = {
 
               <div className="flex items-start gap-4">
                 <div className={cn(column, 'w-[300px]')}>
-                  <IdsProvider.Scope theme={{ palette: palettes.blue }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.blue }} asChild>
                     <Card size="tiny" className={cn(tile, 'items-center')}>
                       <Calendar
                         selectionMode="range"
@@ -1142,7 +1142,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.emerald }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.emerald }} asChild>
                     <Card size="tiny" className={tile}>
                       <Progress value={72}>
                         <Progress.Label>졸업 요건</Progress.Label>
@@ -1152,7 +1152,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.orange }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                     <Card size="tiny" className={cn(tile, 'items-center')}>
                       <Pagination defaultPage={3} pageCount={8} size="tiny" />
                     </Card>
@@ -1169,7 +1169,7 @@ export const Cover: Story = {
                     </div>
                   </Card>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.orange }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                     <Card size="tiny" className={tile}>
                       <Card.Header>
                         <Card.Title>공지 작성</Card.Title>
@@ -1191,7 +1191,7 @@ export const Cover: Story = {
                 </div>
 
                 <div className={cn(column, 'w-[260px]')}>
-                  <IdsProvider.Scope theme={{ palette: palettes.purple }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.purple }} asChild>
                     <Card size="tiny" className={cn(tile, 'gap-2')}>
                       <TextField aria-label="명령" placeholder="명령 찾기" variant="soft" />
                       <Item.Group aria-label="명령" size="tiny">
@@ -1223,7 +1223,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.rose }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.rose }} asChild>
                     <Card size="tiny" className={tile}>
                       <Card.Header>
                         <Card.Title>인증번호</Card.Title>
@@ -1233,7 +1233,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.indigo }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.indigo }} asChild>
                     <Card size="tiny" className={tile}>
                       <Field>
                         <Field.Label>관심 분야</Field.Label>
@@ -1251,7 +1251,7 @@ export const Cover: Story = {
                     <Alert.Description>카드 한도를 확인하세요</Alert.Description>
                   </Alert>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.blue }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.blue }} asChild>
                     <Card size="tiny" className={tile}>
                       <Card.Header>
                         <Card.Title>소식 받기</Card.Title>
@@ -1270,7 +1270,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.lime }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                     <Card size="tiny" className={tile}>
                       <Accordion type="single" defaultValue="umbrella">
                         <Accordion.Item value="umbrella">
@@ -1287,7 +1287,7 @@ export const Cover: Story = {
                 </div>
 
                 <div className={cn(column, 'w-[240px]')}>
-                  <IdsProvider.Scope theme={{ palette: palettes.indigo }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.indigo }} asChild>
                     <Card size="tiny" className={tile}>
                       <div className="flex items-center gap-3">
                         <Avatar name="김지수" />
@@ -1313,7 +1313,7 @@ export const Cover: Story = {
                     </Card>
                   </IdsProvider.Scope>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.red }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.red }} asChild>
                     <Card size="tiny" className={cn(tile, 'flex-row items-center gap-2')}>
                       <NumberField
                         aria-label="수강 학점"
@@ -1345,7 +1345,7 @@ export const Cover: Story = {
                     <p className={hint}>github.com/gsainfoteam/ids</p>
                   </Card>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.emerald }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.emerald }} asChild>
                     <Card size="tiny" className={cn(tile, 'grid grid-cols-2 gap-2')}>
                       <Button size="tiny">확인</Button>
                       <Button size="tiny" variant="soft">
@@ -1371,7 +1371,7 @@ export const Cover: Story = {
                     </Breadcrumb>
                   </Card>
 
-                  <IdsProvider.Scope theme={{ palette: palettes.teal }} asChild>
+                  <IdsProvider.Scope theme={{ primary: palettes.teal }} asChild>
                     <Card size="tiny" className={tile}>
                       <Stepper defaultValue={2} size="tiny" aria-label="주문 단계">
                         <Stepper.Item>
@@ -1391,7 +1391,7 @@ export const Cover: Story = {
             </div>
 
             <div className={cn(column, 'w-[320px] translate-y-8')}>
-              <IdsProvider.Scope theme={{ palette: palettes.indigo }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.indigo }} asChild>
                 <Card size="tiny" className={tile}>
                   <Tabs defaultValue="open">
                     <Tabs.List aria-label="스터디">
@@ -1434,7 +1434,7 @@ export const Cover: Story = {
                 <Alert.Description>생활관 A동 우편함</Alert.Description>
               </Alert>
 
-              <IdsProvider.Scope theme={{ palette: palettes.yellow }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.yellow }} asChild>
                 <Card size="tiny" className={tile}>
                   <Empty size="tiny">
                     <Empty.Media>
@@ -1449,7 +1449,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.fuchsia }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.fuchsia }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>로그인</Card.Title>
@@ -1484,7 +1484,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.rose }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.rose }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>셔틀 출발</Card.Title>
@@ -1497,14 +1497,12 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.orange }} className={frame}>
-                <div className="flex items-center gap-1.5 border-b border-(--ids-color-border) px-4 py-3">
-                  <span className="size-3 rounded-full bg-(--ids-color-danger)" />
-                  <span className="size-3 rounded-full bg-(--ids-color-warning)" />
-                  <span className="size-3 rounded-full bg-(--ids-color-success)" />
-                  <span className="text-caption-c1-medium ms-3 text-(--ids-color-on-muted)">
-                    gistory.me
-                  </span>
+              <IdsProvider.Scope theme={{ primary: palettes.orange }} className={frame}>
+                <div className="border-neutral flex items-center gap-1.5 border-b px-4 py-3">
+                  <span className="bg-danger size-3 rounded-full" />
+                  <span className="bg-warning size-3 rounded-full" />
+                  <span className="bg-success size-3 rounded-full" />
+                  <span className="text-caption-c1-medium text-neutral ms-3">gistory.me</span>
                 </div>
                 <Splitter className="h-56">
                   <Splitter.Panel defaultSize={40}>
@@ -1545,7 +1543,7 @@ export const Cover: Story = {
                 </Splitter>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.purple }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.purple }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>이번 주 시간표</Card.Title>
@@ -1586,7 +1584,7 @@ export const Cover: Story = {
                 <Alert.Description>10월 2일 18시까지</Alert.Description>
               </Alert>
 
-              <IdsProvider.Scope theme={{ palette: palettes.emerald }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.emerald }} asChild>
                 <Card size="tiny" className={tile}>
                   <Progress value={82}>
                     <Progress.Label>저장 공간</Progress.Label>
@@ -1606,7 +1604,7 @@ export const Cover: Story = {
                 </Select>
               </Card>
 
-              <IdsProvider.Scope theme={{ palette: palettes.cyan }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.cyan }} asChild>
                 <Card size="tiny" className={cn(tile, 'flex-row flex-wrap gap-2')}>
                   <Chip defaultSelected>월</Chip>
                   <Chip>화</Chip>
@@ -1618,7 +1616,7 @@ export const Cover: Story = {
             </div>
 
             <div className={cn(column, 'w-[300px] -translate-y-20')}>
-              <IdsProvider.Scope theme={{ palette: palettes.sky }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                 <Card size="tiny" className={tile}>
                   <div className="flex items-center gap-3">
                     <Avatar name="한지우" />
@@ -1638,7 +1636,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.yellow }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.yellow }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>메모</Card.Title>
@@ -1651,7 +1649,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.emerald }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.emerald }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>함께 편집</Card.Title>
@@ -1705,7 +1703,7 @@ export const Cover: Story = {
                 </div>
               </Card>
 
-              <IdsProvider.Scope theme={{ palette: palettes.lime }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                 <Card size="tiny" className={cn(tile, 'items-center')}>
                   <Calendar
                     defaultMonth={new CalendarDate(2026, 11, 1)}
@@ -1714,7 +1712,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.violet }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.violet }} asChild>
                 <Card size="tiny" className={tile}>
                   <Stepper defaultValue={1} size="tiny" aria-label="지원 단계">
                     <Stepper.Item>
@@ -1730,7 +1728,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.green }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.green }} asChild>
                 <Card size="tiny" className={tile}>
                   <div className="flex items-center gap-3">
                     <Avatar name="박서연" />
@@ -1750,7 +1748,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.orange }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>정렬</Card.Title>
@@ -1776,7 +1774,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.sky }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.sky }} asChild>
                 <Card size="tiny" className={tile}>
                   <Progress value={56}>
                     <Progress.Label>강의 영상</Progress.Label>
@@ -1790,7 +1788,7 @@ export const Cover: Story = {
                 <Alert.Description>다시 시도하는 중입니다</Alert.Description>
               </Alert>
 
-              <IdsProvider.Scope theme={{ palette: palettes.lime }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                 <Card size="tiny" className={tile}>
                   <div className="text-body-b3-medium flex items-center gap-2">
                     <Spinner />
@@ -1800,7 +1798,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.orange }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                 <Card size="tiny" className={tile}>
                   <div className={row}>
                     <span className="text-headline-h4-bold">4.6</span>
@@ -1810,7 +1808,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.teal }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.teal }} asChild>
                 <Card size="tiny" className={tile}>
                   <Label className={row}>
                     셔틀 알림
@@ -1847,7 +1845,7 @@ export const Cover: Story = {
             </div>
 
             <div className={cn(column, 'w-[300px] translate-y-14')}>
-              <IdsProvider.Scope theme={{ palette: palettes.blue }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.blue }} asChild>
                 <Card size="tiny" className={cn(tile, 'flex-row items-center gap-4')}>
                   <QRCode value="gistory:student:20265123" size="tiny" aria-label="모바일 학생증" />
                   <div className="flex min-w-0 flex-col items-start gap-1">
@@ -1858,7 +1856,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.red }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.red }} asChild>
                 <Card size="tiny" className={tile}>
                   <p className={hint}>이번 달 지출</p>
                   <div className="flex items-end justify-between">
@@ -1869,7 +1867,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.teal }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.teal }} asChild>
                 <Card size="tiny" className={cn(tile, 'gap-2')}>
                   <TextField aria-label="사람 찾기" placeholder="사람 찾기" variant="soft" />
                   <Item.Group aria-label="사람" size="tiny">
@@ -1893,7 +1891,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.pink }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.pink }} asChild>
                 <Card size="tiny" className={tile}>
                   <Table aria-label="성적">
                     <Table.Header>
@@ -1922,7 +1920,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.purple }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.purple }} asChild>
                 <Card size="tiny" className={tile}>
                   <div className="flex items-center gap-3">
                     <Avatar name="이도윤" />
@@ -1935,7 +1933,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.orange }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.orange }} asChild>
                 <Card size="tiny" className={tile}>
                   <Progress value={30}>
                     <Progress.Label>봉사 시간</Progress.Label>
@@ -1948,7 +1946,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.violet }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.violet }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>알람</Card.Title>
@@ -1961,7 +1959,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.yellow }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.yellow }} asChild>
                 <Card size="tiny" className={cn(tile, 'flex-row flex-wrap gap-2')}>
                   <Chip defaultSelected>맑음</Chip>
                   <Chip>흐림</Chip>
@@ -1975,7 +1973,7 @@ export const Cover: Story = {
                 <Alert.Description>과제 3, 9월 30일 14시</Alert.Description>
               </Alert>
 
-              <IdsProvider.Scope theme={{ palette: palettes.lime }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.lime }} asChild>
                 <Card size="tiny" className={tile}>
                   <div className="text-body-b3-medium flex items-center gap-2">
                     <Spinner />
@@ -1985,7 +1983,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.cyan }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.cyan }} asChild>
                 <Card size="tiny" className={tile}>
                   <Card.Header>
                     <Card.Title>학식 만족도</Card.Title>
@@ -2012,7 +2010,7 @@ export const Cover: Story = {
                 </Card>
               </IdsProvider.Scope>
 
-              <IdsProvider.Scope theme={{ palette: palettes.amber }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.amber }} asChild>
                 <Card size="tiny" className={cn(tile, 'grid grid-cols-2 gap-2')}>
                   <Button size="tiny">예약</Button>
                   <Button size="tiny" variant="soft">
@@ -2032,7 +2030,7 @@ export const Cover: Story = {
                 <Alert.Description>마지막으로 바꾼 지 90일이 지났어요</Alert.Description>
               </Alert>
 
-              <IdsProvider.Scope theme={{ palette: palettes.pink }} asChild>
+              <IdsProvider.Scope theme={{ primary: palettes.pink }} asChild>
                 <Card size="tiny" className={tile}>
                   <Accordion type="single" defaultValue="leave">
                     <Accordion.Item value="leave">

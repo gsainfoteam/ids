@@ -22,10 +22,10 @@ export namespace Showcase {
   }) {
     return (
       <section className="flex flex-col gap-4">
-        <header className="flex flex-col gap-1 border-b border-(--ids-color-border) pb-2">
+        <header className="border-neutral flex flex-col gap-1 border-b pb-2">
           <h2 className="text-subtitle-s2-semibold">{title}</h2>
           {description !== undefined && (
-            <p className="text-body-b3-regular text-(--ids-color-on-muted)">{description}</p>
+            <p className="text-body-b3-regular text-neutral">{description}</p>
           )}
         </header>
         <div className="flex flex-col gap-3">{children}</div>
@@ -45,9 +45,7 @@ export namespace Showcase {
     return (
       <div className="flex items-center gap-4">
         {label !== undefined && (
-          <span className="text-caption-c1-medium w-24 shrink-0 text-(--ids-color-on-muted)">
-            {label}
-          </span>
+          <span className="text-caption-c1-medium text-neutral w-24 shrink-0">{label}</span>
         )}
         <div className={cn('flex flex-1 flex-wrap items-center gap-3', className)}>{children}</div>
       </div>
@@ -70,12 +68,12 @@ export namespace Showcase {
       >
         <span />
         {columns.map((column) => (
-          <span key={column} className="text-caption-c1-medium text-(--ids-color-on-muted)">
+          <span key={column} className="text-caption-c1-medium text-neutral">
             {column}
           </span>
         ))}
         {rows.flatMap((row) => [
-          <span key={row} className="text-caption-c1-medium text-(--ids-color-on-muted)">
+          <span key={row} className="text-caption-c1-medium text-neutral">
             {row}
           </span>,
           ...columns.map((column) => <div key={`${row}:${column}`}>{render(row, column)}</div>),

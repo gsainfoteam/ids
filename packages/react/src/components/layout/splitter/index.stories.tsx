@@ -28,8 +28,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof Splitter>;
 
-const frame = cn('h-48 w-full overflow-hidden rounded-standard border border-(--ids-color-border)');
-const tall = cn('h-80 w-full overflow-hidden rounded-standard border border-(--ids-color-border)');
+const frame = cn('h-48 w-full overflow-hidden rounded-standard border border-neutral');
+const tall = cn('h-80 w-full overflow-hidden rounded-standard border border-neutral');
 
 const framed: Decorator = (Story) => (
   <div className={frame}>
@@ -39,7 +39,7 @@ const framed: Decorator = (Story) => (
 
 function Pane({ children }: { children: ReactNode }) {
   return (
-    <div className="text-body-b3-medium flex h-full items-center justify-center p-3 text-center text-(--ids-color-on-muted)">
+    <div className="text-body-b3-medium text-neutral flex h-full items-center justify-center p-3 text-center">
       {children}
     </div>
   );

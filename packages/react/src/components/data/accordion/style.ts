@@ -10,14 +10,14 @@ export const accordionStyle = tv({
     heading: 'flex',
     trigger: [
       'flex w-full flex-1 cursor-pointer items-start gap-2 rounded-standard text-start',
-      'text-(--ids-color-on-surface) focus-ring',
+      'text-on-surface focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
       'disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-default',
     ],
     indicator: [
       'pointer-events-none inline-flex h-[1lh] shrink-0 items-center',
-      'text-(--ids-color-on-muted) [&_svg]:size-4',
+      'text-neutral [&_svg]:size-4',
       'transition-transform duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
       'data-open:rotate-180',
     ],
@@ -26,25 +26,23 @@ export const accordionStyle = tv({
       'data-open:grid-rows-[1fr] data-instant:transition-none motion-reduce:transition-none',
     ],
     clip: 'min-h-0 overflow-hidden',
-    body: 'text-(--ids-color-on-surface)',
+    body: 'text-on-surface',
   },
   variants: {
     variant: {
       outline: {
-        item: 'border-b border-(--ids-color-border) last:border-b-0',
+        item: 'border-b border-neutral last:border-b-0',
         trigger: 'underline-offset-4 data-hovered:underline',
       },
       soft: {
         root: 'gap-2',
-        item: 'bg-(--ids-color-muted) concentric-p-1',
-        trigger:
-          'px-3 data-hovered:bg-(--ids-color-muted-hover) data-active:bg-(--ids-color-muted-active)',
+        item: 'bg-neutral-soft concentric-p-1',
+        trigger: 'px-3 data-hovered:bg-neutral-soft-hover data-active:bg-neutral-soft-active',
         body: 'px-3',
       },
       ghost: {
         root: 'gap-1',
-        trigger:
-          'px-3 data-hovered:bg-(--ids-color-muted) data-active:bg-(--ids-color-muted-hover)',
+        trigger: 'px-3 data-hovered:bg-neutral-soft data-active:bg-neutral-soft-hover',
         body: 'px-3',
       },
     } satisfies Record<AccordionVariant, object>,

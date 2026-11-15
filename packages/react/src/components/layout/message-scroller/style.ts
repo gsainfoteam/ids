@@ -18,7 +18,7 @@ export const messageScrollerStyle = tv({
   },
   variants: {
     opaque: {
-      true: { jump: 'dark:bg-(--ids-color-surface)' },
+      true: { jump: 'dark:bg-surface' },
     },
     iconOnly: {
       true: {

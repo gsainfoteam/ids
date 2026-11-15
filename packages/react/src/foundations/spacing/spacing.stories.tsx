@@ -39,15 +39,13 @@ export const Scale: Story = {
               className="grid grid-cols-[3rem_4rem_6rem_1fr] items-center gap-4"
             >
               <span className="text-body-b3-medium">{name}</span>
-              <code className="text-caption-c1-regular font-mono text-(--ids-color-on-muted)">
-                {value}
-              </code>
-              <code className="text-caption-c1-regular font-mono text-(--ids-color-on-muted)">
+              <code className="text-caption-c1-regular text-neutral font-mono">{value}</code>
+              <code className="text-caption-c1-regular text-neutral font-mono">
                 p-{step} · gap-{step}
               </code>
               <span
                 data-bar=""
-                className="h-4 rounded-full bg-(--ids-color-primary)"
+                className="bg-primary h-4 rounded-full"
                 style={{ width: `calc(var(--spacing) * ${step})` }}
               />
             </div>
@@ -58,9 +56,9 @@ export const Scale: Story = {
         title="쓰임"
         description="컨트롤 사이는 sm, 카드 안 여백은 md, 영역 사이는 lg 이상입니다."
       >
-        <div className="concentric-p-4 flex flex-col gap-2 inset-ring-1 inset-ring-(--ids-color-border)">
+        <div className="concentric-p-4 inset-ring-neutral flex flex-col gap-2 inset-ring-1">
           <span className="text-subtitle-s2-semibold">md 여백의 카드</span>
-          <span className="text-body-b3-regular text-(--ids-color-on-muted)">
+          <span className="text-body-b3-regular text-neutral">
             제목과 설명 사이는 sm(8px)입니다.
           </span>
         </div>

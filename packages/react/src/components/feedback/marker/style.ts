@@ -6,12 +6,12 @@ import type { IdsSize } from '../../../tokens/types';
 export const markerStyle = tv({
   slots: {
     root: [
-      'flex w-full min-w-0 items-center text-start wrap-break-word text-(--ids-color-on-muted)',
+      'flex w-full min-w-0 items-center text-start wrap-break-word text-neutral',
       '[&_svg]:shrink-0',
-      '[&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-(--ids-color-on-surface)',
+      '[&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-on-surface',
       'focus-ring [a&]:underline [a&]:underline-offset-2',
       '[&:is(a,button)]:cursor-pointer [&:is(a,button)]:transition-colors [&:is(a,button)]:duration-(--ids-motion-fast) motion-reduce:transition-none',
-      '[&:is(a,button)]:hover:text-(--ids-color-on-surface)',
+      '[&:is(a,button)]:hover:text-on-surface',
     ],
     content: 'flex min-w-0 items-center',
     line: 'w-auto min-w-4 flex-1',

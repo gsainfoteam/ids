@@ -118,8 +118,8 @@ export function useIdsProvider({ theme, mode, defaultMode, onModeChange }: UseId
     () =>
       theme === undefined
         ? { variables: NO_VARIABLES, scale: undefined, issues: NO_ISSUES }
-        : resolveThemeVariables(theme),
-    [theme],
+        : resolveThemeVariables(theme, root ? undefined : parent.theme),
+    [theme, root, parent.theme],
   );
   const mergedTheme = useMemo(
     () => (theme === undefined ? parent.theme : { ...parent.theme, ...theme }),

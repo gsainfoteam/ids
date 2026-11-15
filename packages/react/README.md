@@ -97,11 +97,11 @@ export default {
 ```
 
 ```ts
-// app/ids-theme.ts: 앱의 팔레트. 50 ~ 950 의 11단계
+// app/ids-theme.ts: 앱의 브랜드 색. 50 ~ 950 의 11단계 또는 색 하나
 import { defineIdsTheme } from '@gsainfoteam/ids-react';
 
 export const theme = defineIdsTheme({
-  palette: {
+  primary: {
     50: '#eff6ff', 100: '#dbeafe', 200: '#bedbff', 300: '#8ec5ff', 400: '#51a2ff', 500: '#2b7fff',
     600: '#155dfc', 700: '#1447e6', 800: '#193cb8', 900: '#1c398e', 950: '#162456',
   },
@@ -296,15 +296,19 @@ IDS 에는 기본 색이 없다. 앱이 `defineIdsTheme` 으로 테마를 만들
 
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `theme` | `IdsTheme` | 필수 | `palette`(11단계 또는 색 하나), `radius`, `cornerShape`, `scale` |
+| `theme` | `IdsTheme` | 필수 | `primary`(필수), `secondary`, `tertiary`, `neutral`, `status`, `radius`, `cornerShape`, `scale` |
 | `mode` / `defaultMode` | `'light' \| 'dark' \| 'system'` | 바깥 Provider, 최상위는 `'light'` | 모드 (제어 / 비제어) |
 | `onModeChange` | `(mode) => void` | | 모드를 바꾸려 할 때 |
 
-- 라이트와 다크의 역할 색(primary, secondary, accent …)은 팔레트에서 IDS 가 4.5:1 대비를 지키도록 고른다.
-- `palette` 에 색 하나(`'#0d9488'`)를 주면 IDS 가 50~950 을 만든다. `createIdsPalette(color)` 로 결과를 미리 볼 수 있다.
+- 색은 계열 여덟 개(neutral, primary, secondary, tertiary, success, warning, danger, info)가 같은 역할을 가진다. 유틸리티 앞머리가 속성을 말한다: `bg-primary`, `bg-primary-soft`, `text-on-primary`, `text-on-primary-soft`, `text-primary`, `border-primary`.
+- 라이트와 다크의 역할 색은 팔레트에서 IDS 가 대비(글자 4.5:1, 선 3:1)를 지키도록 고른다.
+- `primary`, `secondary`, `tertiary` 에 색 하나(`'#0d9488'`)를 주면 IDS 가 50~950 을 만든다. `createIdsPalette(color)` 로 결과를 미리 볼 수 있다.
+- `secondary` 와 `tertiary` 를 생략하면 IdsProvider 가 primary 에서 만든다. secondary 는 같은 hue 의 옅은 채도, tertiary 는 hue 를 60° 돌린 색이다.
+- `neutral: 'tinted'` 는 중립색에 primary 색상을 옅게 섞는다. 기본은 `'pure'`.
+- `status` 는 기본 `'harmonized'`(상태 색을 primary 쪽으로 최대 15° 돌린다), `'fixed'`(고정 색), 또는 `{ danger: '#…' }` 처럼 앱이 고른 색이다.
 - `scale` 은 영역을 키우거나 줄이는 배율이다(0.5–2, 기본 1). 크기, 간격, 글자 크기, radius 에 곱한다.
 - `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾼다. 예: `<IdsProvider.Scope theme={{ scale: 1.5 }}>`.
-- `checkIdsTheme(theme)` 은 팔레트와 값의 문제를 목록으로 돌려준다. 앱 테스트에서 `[]` 인지 확인하면 된다.
+- `checkIdsTheme(theme)` 은 팔레트와 값의 문제, 구별되지 않는 계열(브랜드끼리, 브랜드와 상태), 범위를 벗어난 상태 색상, 적록 색각에서 비슷해 보이는 success·warning 과 danger 를 목록으로 돌려준다. 앱 테스트에서 `[]` 인지 확인하면 된다.
 - 글꼴은 Pretendard GOV 와 Geist Mono 로 고정이다. `@gsainfoteam/ids-css` 가 파일을 싣는다.
 
 ```tsx
@@ -499,7 +503,7 @@ import { Button } from '@gsainfoteam/ids-react';
 | prop | 타입 | 기본값 |
 |---|---|---|
 | `variant` | `'solid' \| 'soft' \| 'outline' \| 'ghost'` | `'solid'` |
-| `colorScheme` | `'primary' \| 'neutral' \| 'danger' \| 'success' \| 'warning' \| 'info'` | `'primary'` |
+| `colorScheme` | `'primary' \| 'secondary' \| 'tertiary' \| 'neutral' \| 'danger' \| 'success' \| 'warning' \| 'info'` | `'primary'` |
 | `size` | `'standard' \| 'tiny'` | `'standard'` |
 | `disabled` | `boolean` | `false` |
 
@@ -623,7 +627,7 @@ Calendar와 TimePicker로 일시를 선택합니다. [DateTimeField API](./src/c
 
 ## Chart
 
-Recharts 차트를 IDS 의 계열 색 토큰(`chart-1` ~ `chart-5`), 툴팁, 범례, 스크린 리더용 표로 그립니다.
+Recharts 차트를 테마의 브랜드 계열에서 고른 계열 색, 툴팁, 범례, 스크린 리더용 표로 그립니다.
 `@gsainfoteam/ids-react/chart` 에서 가져오고, `recharts` 와 `react-is` 는 차트를 쓰는 앱만 설치합니다.
 [Chart API](./src/components/data/chart/README.md).
 

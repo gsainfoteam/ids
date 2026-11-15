@@ -19,24 +19,24 @@ export const scrollAreaStyle = tv({
       'not-data-visible:delay-300 motion-reduce:transition-none',
     ],
     thumb: [
-      'absolute rounded-full bg-(--ids-color-handle)',
+      'absolute rounded-full bg-neutral',
       'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'hover:bg-(--ids-color-handle-hover)',
-      'group-data-dragging/scrollbar:bg-(--ids-color-handle-active)',
+      'hover:bg-neutral-hover',
+      'group-data-dragging/scrollbar:bg-neutral-active',
     ],
     corner: 'absolute size-(--scroll-area-thickness) rounded-full',
   },
   variants: {
     variant: {
       auto: {
-        scrollbar: 'hover:bg-(--ids-color-muted) data-dragging:bg-(--ids-color-muted)',
+        scrollbar: 'hover:bg-neutral-soft data-dragging:bg-neutral-soft',
       },
       hover: {
-        scrollbar: 'hover:bg-(--ids-color-muted) data-dragging:bg-(--ids-color-muted)',
+        scrollbar: 'hover:bg-neutral-soft data-dragging:bg-neutral-soft',
       },
       always: {
-        scrollbar: 'bg-(--ids-color-muted)',
-        corner: 'bg-(--ids-color-muted)',
+        scrollbar: 'bg-neutral-soft',
+        corner: 'bg-neutral-soft',
       },
     } satisfies Record<ScrollArea.Variant, object>,
     size: {

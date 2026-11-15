@@ -140,7 +140,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 <Item.Group variant="separated" />  // 행마다 테두리 카드(Item outline), 8px 간격
 ```
 
-- 구분선은 `--ids-color-border` 입니다. 목록 바깥 테두리는 그리지 않으니, 필요하면 `Card` 안에 둡니다.
+- 구분선은 `--ids-color-border-neutral` 입니다. 목록 바깥 테두리는 그리지 않으니, 필요하면 `Card` 안에 둡니다.
 - `bordered` 는 구분선을 스스로 긋습니다. `Item.Separator` 는 `ghost` 에서 쓰는 것입니다.
 - `separated` 에서도 `Item` 에 `variant` 를 주면 그 값이 이깁니다.
 

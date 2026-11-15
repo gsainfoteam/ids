@@ -33,12 +33,10 @@ function Step({ token, hex }: { token: string; hex: string }) {
     <div data-palette={token} data-hex={hex} title={token} className="flex min-w-0 flex-col gap-1">
       <span
         data-chip=""
-        className="rounded-indicator h-8 w-full inset-ring-1 inset-ring-(--ids-color-border)"
+        className="rounded-indicator inset-ring-neutral h-8 w-full inset-ring-1"
         style={{ background: hex }}
       />
-      <code className="text-caption-c2-regular truncate font-mono text-(--ids-color-on-muted)">
-        {hex}
-      </code>
+      <code className="text-caption-c2-regular text-neutral truncate font-mono">{hex}</code>
     </div>
   );
 }
@@ -53,7 +51,7 @@ export const Scales: Story = {
         <div className="grid items-center gap-x-1.5 gap-y-2" style={columns}>
           <span />
           {steps.map((step) => (
-            <span key={step} className="text-caption-c1-medium text-(--ids-color-on-muted)">
+            <span key={step} className="text-caption-c1-medium text-neutral">
               {step}
             </span>
           ))}

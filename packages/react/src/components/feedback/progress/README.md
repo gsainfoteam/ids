@@ -59,7 +59,7 @@ import { Progress } from '@gsainfoteam/ids-react';
 
 <Progress value={72} aria-label="진행률">
   <Progress.Track className="h-3">
-    <Progress.Indicator className="bg-linear-to-r from-(--ids-color-info) to-(--ids-color-success)" />
+    <Progress.Indicator className="bg-linear-to-r from-info to-success" />
   </Progress.Track>
 </Progress>
 ```

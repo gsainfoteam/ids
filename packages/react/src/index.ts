@@ -7,10 +7,17 @@ export {
   useTheme,
 } from './components/utility/ids-provider';
 export type {
+  IdsBrandFamily,
+  IdsColorFamily,
   IdsCornerShape,
+  IdsNeutral,
   IdsPalette,
   IdsPaletteStep,
+  IdsStatus,
+  IdsStatusColors,
+  IdsStatusFamily,
   IdsTheme,
+  IdsThemeColor,
   IdsThemeIssue,
   IdsThemeOverrides,
 } from './components/utility/ids-provider';

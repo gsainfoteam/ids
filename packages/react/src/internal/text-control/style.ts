@@ -18,15 +18,15 @@ export const textControlStyle = tv({
     root: ['inline-flex w-full min-w-0 cursor-text items-center', fieldSurface.base],
     input: [
       'h-full w-full min-w-0 flex-1 bg-transparent outline-none',
-      'text-inherit placeholder:text-(--ids-color-on-muted)',
-      'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
+      'text-inherit placeholder:text-neutral',
+      'selection:bg-primary/30 selection:text-on-surface',
       'disabled:cursor-not-allowed',
       '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none',
       '[&::-ms-clear]:hidden [&::-ms-reveal]:hidden',
     ],
     adornment: [
       'inline-flex shrink-0 items-center empty:hidden',
-      'text-(--ids-color-on-muted) [&_svg]:shrink-0',
+      'text-neutral [&_svg]:shrink-0',
       insetButtons.base,
     ],
     action: fieldAction.base,

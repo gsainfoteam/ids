@@ -25,9 +25,9 @@ export const otpFieldStyle = tv({
       'data-grouped:first:rounded-s-standard data-grouped:last:rounded-e-standard',
       'data-focus-visible:z-20',
     ],
-    placeholder: 'text-(--ids-color-on-muted)',
+    placeholder: 'text-neutral',
     maskDot: 'size-2 rounded-full bg-current',
-    separator: 'flex items-center text-(--ids-color-on-muted) [&_svg]:size-4',
+    separator: 'flex items-center text-neutral [&_svg]:size-4',
     caret: 'pointer-events-none absolute inset-0 flex items-center justify-center',
     caretLine:
       'h-1/2 w-px animate-caret-blink bg-(--ids-color-on-surface) motion-reduce:animate-none',

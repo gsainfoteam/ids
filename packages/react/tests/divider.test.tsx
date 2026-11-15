@@ -19,7 +19,7 @@ test('a plain divider is a horizontal separator without focus or children', () =
   expect(line.getAttribute('aria-orientation')).toBe('horizontal');
   expect(line.hasAttribute('tabindex')).toBe(false);
   expect(line.children).toHaveLength(0);
-  expect(line.className).toMatch(/bg-\(--ids-color-border\)/);
+  expect(line.className).toMatch(/bg-\(--ids-color-border-neutral\)/);
   expect(line.className).toMatch(/h-px w-full/);
 });
 

@@ -180,11 +180,11 @@ export const Gallery: Story = {
             <Item.Content>
               <Item.Title>회의록.md</Item.Title>
               <Item.Description>
-                설명이 두 줄을 넘으면 말줄임표로 줄고, 타일은 행 높이에 비례해 커집니다. 이
-                문장은 일부러 길게 썼습니다.
+                설명이 두 줄을 넘으면 말줄임표로 줄고, 타일은 행 높이에 비례해 커집니다. 이 문장은
+                일부러 길게 썼습니다.
               </Item.Description>
             </Item.Content>
-            <Item.Content className="text-caption-c1-regular items-end text-(--ids-color-on-muted)">
+            <Item.Content className="text-caption-c1-regular text-neutral items-end">
               2분 전
             </Item.Content>
           </Item>

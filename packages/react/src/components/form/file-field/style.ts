@@ -6,31 +6,29 @@ import type { IdsSize } from '../../../tokens/types';
 
 const alreadyDimmedByField = cn('data-disabled:opacity-100');
 
-const ownTriggerLook = cn(
-  'flex min-w-0 cursor-pointer items-center text-start text-(--ids-color-on-surface)',
-);
+const ownTriggerLook = cn('flex min-w-0 cursor-pointer items-center text-start text-on-surface');
 
 export const fileFieldStyle = tv({
   slots: {
     root: 'relative grid min-w-0 gap-2',
     control: ['relative', fieldTrigger.base],
     trigger: 'touch-manipulation disabled:cursor-not-allowed aria-disabled:cursor-default',
-    icon: 'shrink-0 text-(--ids-color-on-muted)',
+    icon: 'shrink-0 text-neutral',
     thumb: [
       'flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-indicator',
-      'text-(--ids-color-on-muted) [&_img]:size-full [&_img]:object-cover [&_svg]:size-3.5',
+      'text-neutral [&_img]:size-full [&_img]:object-cover [&_svg]:size-3.5',
     ],
-    value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
+    value: 'min-w-0 flex-1 truncate data-placeholder:text-neutral',
     clear: [fieldAction.base, alreadyDimmedByField],
-    dropzoneIcon: 'mb-1 size-6 text-(--ids-color-on-muted)',
+    dropzoneIcon: 'mb-1 size-6 text-neutral',
     dropzoneTitle: 'font-medium break-keep text-balance',
-    dropzoneHint: 'text-caption-c1-regular text-(--ids-color-on-muted) break-keep text-balance',
+    dropzoneHint: 'text-caption-c1-regular text-neutral break-keep text-balance',
     list: 'flex flex-col gap-1',
-    item: 'bg-(--ids-color-surface) dark:bg-(--ids-color-muted)/30',
-    preview: 'text-(--ids-color-on-muted)',
+    item: 'bg-surface dark:bg-neutral-soft/30',
+    preview: 'text-neutral',
     itemSize: 'text-caption-c1-regular',
     itemRemove: fieldAction.base,
-    rejections: 'grid gap-0.5 wrap-anywhere text-(--ids-color-danger)',
+    rejections: 'grid gap-0.5 wrap-anywhere text-danger',
   },
   variants: {
     appearance: {
@@ -43,9 +41,9 @@ export const fileFieldStyle = tv({
           'min-h-32 w-full flex-col justify-center gap-1 text-center concentric-p-4',
           'border border-dashed focus-ring',
           'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-          'data-dragging:border-(--ids-color-primary) data-dragging:bg-(--ids-color-secondary)',
-          'data-dragging:text-(--ids-color-on-secondary)',
-          'aria-invalid:border-(--ids-color-danger)',
+          'data-dragging:border-primary data-dragging:bg-primary-soft',
+          'data-dragging:text-on-primary-soft',
+          'aria-invalid:border-danger',
           'disabled:opacity-50',
         ],
       },
@@ -97,8 +95,7 @@ export const fileFieldStyle = tv({
       appearance: 'dropzone',
       variant: 'outline',
       class: {
-        trigger:
-          'border-(--ids-color-border) hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)',
+        trigger: 'border-neutral hover:bg-neutral-soft active:bg-neutral-soft-hover',
       },
     },
     {
@@ -106,8 +103,8 @@ export const fileFieldStyle = tv({
       variant: 'soft',
       class: {
         trigger: [
-          'border-transparent bg-(--ids-color-muted)',
-          'hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)',
+          'border-transparent bg-neutral-soft',
+          'hover:bg-neutral-soft-hover active:bg-neutral-soft-active',
         ],
       },
     },
@@ -115,8 +112,7 @@ export const fileFieldStyle = tv({
       appearance: 'dropzone',
       variant: 'ghost',
       class: {
-        trigger:
-          'border-transparent hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)',
+        trigger: 'border-transparent hover:bg-neutral-soft active:bg-neutral-soft-hover',
       },
     },
   ],

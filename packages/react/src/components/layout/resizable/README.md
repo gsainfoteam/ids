@@ -78,12 +78,12 @@ import { Resizable } from '@gsainfoteam/ids-react';
 ```tsx
 <Resizable direction="horizontal">
   내용
-  <Resizable.Handle className="inset-y-3 w-1 bg-(--ids-color-primary) before:hidden" />
+  <Resizable.Handle className="inset-y-3 w-1 bg-primary before:hidden" />
 </Resizable>
 
 <Resizable>
   내용
-  <Resizable.Handle className="text-(--ids-color-accent)" />   {/* 호의 색은 글자색 */}
+  <Resizable.Handle className="text-primary" />   {/* 호의 색은 글자색 */}
 </Resizable>
 
 <Resizable>
@@ -96,7 +96,7 @@ import { Resizable } from '@gsainfoteam/ids-react';
 <Resizable direction="vertical">
   내용
   <Resizable.Handle asChild>
-    <div className="bg-(--ids-color-muted)" />   {/* 자식 요소가 손잡이가 된다 */}
+    <div className="bg-neutral-soft" />   {/* 자식 요소가 손잡이가 된다 */}
   </Resizable.Handle>
 </Resizable>
 ```
@@ -164,9 +164,9 @@ import { Resizable } from '@gsainfoteam/ids-react';
 
 | 토큰                        | 쓰임                          |
 | --------------------------- | ----------------------------- |
-| `--ids-color-handle`        | 가장자리 막대와 모서리의 호   |
-| `--ids-color-handle-hover`  | 손잡이에 올렸을 때            |
-| `--ids-color-handle-active` | 끄는 동안                     |
+| `--ids-color-bg-neutral`        | 가장자리 막대와 모서리의 호   |
+| `--ids-color-bg-neutral-hover`  | 손잡이에 올렸을 때            |
+| `--ids-color-bg-neutral-active` | 끄는 동안                     |
 
 ## 속성
 

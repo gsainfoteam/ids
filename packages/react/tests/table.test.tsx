@@ -116,15 +116,15 @@ test('the neutral ladder: stripe muted, hover a step up, selected the press step
 
   await expect.element(row('Ada')).toBeInTheDocument();
   expect(background('Ada')).toBe('rgba(0, 0, 0, 0)');
-  expect(background('Grace')).toBe(colorOf('--ids-color-muted'));
-  expect(background('Linus')).toBe(colorOf('--ids-color-muted-hover'));
+  expect(background('Grace')).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  expect(background('Linus')).toBe(colorOf('--ids-color-bg-neutral-soft-hover'));
 
   await userEvent.hover(row('Ada'));
-  await expect.poll(() => background('Ada')).toBe(colorOf('--ids-color-muted'));
+  await expect.poll(() => background('Ada')).toBe(colorOf('--ids-color-bg-neutral-soft'));
   await userEvent.hover(row('Grace'));
-  await expect.poll(() => background('Grace')).toBe(colorOf('--ids-color-muted-hover'));
+  await expect.poll(() => background('Grace')).toBe(colorOf('--ids-color-bg-neutral-soft-hover'));
   await userEvent.hover(row('Linus'));
-  await expect.poll(() => background('Linus')).toBe(colorOf('--ids-color-muted-active'));
+  await expect.poll(() => background('Linus')).toBe(colorOf('--ids-color-bg-neutral-soft-active'));
 });
 
 test('stickyHeader keeps the header row in view while the body scrolls', async () => {

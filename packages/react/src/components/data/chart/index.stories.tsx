@@ -18,7 +18,9 @@ import {
 } from 'recharts';
 import { expect, waitFor, type userEvent as storyUserEvent } from 'storybook/test';
 
-import { Showcase } from '~story-kit';
+import { Showcase, palettes } from '~story-kit';
+
+import { IdsProvider } from '../../utility/ids-provider';
 
 import { Chart } from '.';
 
@@ -44,15 +46,13 @@ const SERVICES = [
   { service: 'gistory', label: 'GIStory', visits: 3110 },
   { service: 'shuttle', label: '셔틀', visits: 2640 },
   { service: 'cafeteria', label: '학식', visits: 2290 },
-  { service: 'carpool', label: '카풀', visits: 940 },
 ];
 
 const SERVICES_CONFIG = {
   ziggle: { label: 'Ziggle' },
   gistory: { label: 'GIStory' },
   shuttle: { label: '셔틀' },
-  cafeteria: { label: '학식' },
-  carpool: { label: '카풀' },
+  cafeteria: { label: '학식', color: 'neutral' },
 } satisfies Chart.Config;
 
 const SERVICE_TOTALS = [
@@ -71,7 +71,7 @@ const SURVEY = [
   { topic: '위생', score: 4.4 },
 ];
 
-const SURVEY_CONFIG = { score: { label: '평균 점수', color: 'chart-3' } } satisfies Chart.Config;
+const SURVEY_CONFIG = { score: { label: '평균 점수', color: 'info' } } satisfies Chart.Config;
 
 const pointAtTheMiddle = (user: ReturnType<typeof storyUserEvent.setup>, target: Element) => {
   const box = target.getBoundingClientRect();
@@ -177,18 +177,30 @@ export const Gallery: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Series colors"
-        description="color 를 생략하면 키 순서대로 chart-1 부터 chart-5 를 씁니다."
+        description="color 를 생략한 계열은 차례로 primary, secondary, tertiary 채움을 씁니다. 테마가 primary 만 주면 secondary 와 tertiary 는 primary 에서 만든 색입니다. 네 번째 계열(학식)부터는 config 에서 color 를 고릅니다."
       >
         <Chart config={SERVICES_CONFIG} className="w-full max-w-xl" tooltip={false}>
+          <Chart.Title>primary 만</Chart.Title>
           <BarChart data={SERVICE_TOTALS}>
             <XAxis dataKey="week" tickLine={false} axisLine={false} />
             <Bar dataKey="ziggle" radius={4} />
             <Bar dataKey="gistory" radius={4} />
             <Bar dataKey="shuttle" radius={4} />
             <Bar dataKey="cafeteria" radius={4} />
-            <Bar dataKey="carpool" radius={4} />
           </BarChart>
         </Chart>
+        <IdsProvider.Scope theme={{ secondary: palettes.violet, tertiary: palettes.amber }}>
+          <Chart config={SERVICES_CONFIG} className="w-full max-w-xl" tooltip={false}>
+            <Chart.Title>primary, secondary violet, tertiary amber</Chart.Title>
+            <BarChart data={SERVICE_TOTALS}>
+              <XAxis dataKey="week" tickLine={false} axisLine={false} />
+              <Bar dataKey="ziggle" radius={4} />
+              <Bar dataKey="gistory" radius={4} />
+              <Bar dataKey="shuttle" radius={4} />
+              <Bar dataKey="cafeteria" radius={4} />
+            </BarChart>
+          </Chart>
+        </IdsProvider.Scope>
       </Showcase.Section>
       <Showcase.Section
         title="Indicator"
@@ -404,7 +416,7 @@ export const RechartsTooltip: Story = {
           cursor={false}
           contentStyle={{
             background: 'var(--ids-color-surface)',
-            borderColor: 'var(--ids-color-border)',
+            borderColor: 'var(--ids-color-border-neutral)',
           }}
           itemStyle={{ color: 'var(--ids-color-on-surface)' }}
         />
@@ -456,13 +468,15 @@ export const SeriesColors: Story = {
     docs: {
       description: {
         story:
-          '`color` 에 IDS 색 토큰 이름을 주면 그 토큰을 씁니다. 계열은 `var(--chart-<key>)` 로 칠해지고, 막대·선·면에 `fill` 이나 `stroke` 를 직접 주면 그것이 이깁니다.',
+          '`color` 에 계열 이름(`primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`, `neutral`)을 주면 그 계열의 채움을, 그 밖의 문자열은 CSS 색으로 씁니다. 상태 색은 기본 순서에 들지 않고 이렇게 고를 때만 씁니다. 계열은 `var(--chart-<key>)` 로 칠해지고, 막대·선·면에 `fill` 이나 `stroke` 를 직접 주면 그것이 이깁니다.',
       },
     },
   },
   play: async ({ canvasElement }) => {
     const figure = canvasElement.querySelector<HTMLElement>('[data-chart]')!;
-    await expect(figure.style.getPropertyValue('--chart-income')).toBe('var(--ids-color-success)');
+    await expect(figure.style.getPropertyValue('--chart-income')).toBe(
+      'var(--ids-color-bg-success)',
+    );
     await waitFor(() =>
       expect(
         canvasElement.querySelector('.recharts-bar-rectangle path')?.getAttribute('fill'),

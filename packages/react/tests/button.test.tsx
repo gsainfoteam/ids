@@ -22,7 +22,7 @@ test('SSR: a native button that never submits by accident and names its variant 
   expect(button.type).toBe('button');
   expect(button.dataset.variant).toBe('solid');
   expect(button.dataset.size).toBe('tiny');
-  expect(button.className).toMatch(/\[--control-fill:var\(--ids-color-danger\)\]/);
+  expect(button.className).toMatch(/\[--control-fill:var\(--ids-color-bg-danger\)\]/);
   expect(button.textContent).toBe('삭제');
 });
 
@@ -353,10 +353,10 @@ test(
       <div>
         {cases.map((entry) => (
           <IdsProvider
-            theme={{ palette: palettes[entry.color] }}
+            theme={{ primary: palettes[entry.color] }}
             key={name(entry)}
             mode={entry.mode}
-            className="bg-(--ids-color-surface)"
+            className="bg-surface"
           >
             <Button colorScheme={entry.scheme}>{name(entry)}</Button>
           </IdsProvider>

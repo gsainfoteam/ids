@@ -4,7 +4,7 @@
 
 - **native 시멘틱.** `<table>`, `<thead>`, `<tbody>`, `<tfoot>`, `<tr>`, `<th>`, `<td>`, `<caption>` 그대로라 스크린 리더가 행과 열, 머리글을 스스로 읽습니다.
 - **스크롤은 ScrollArea.** 표는 ScrollArea 안에 들어 있어 넓으면 가로로, 높이를 제한하면 세로로 스크롤하고, OS 막대 대신 IDS 막대를 그립니다.
-- **중립 상태.** 줄무늬, 올렸을 때, 선택된 행은 `muted` 사다리를 한 칸씩 오릅니다. 브랜드 색을 쓰지 않습니다.
+- **중립 상태.** 줄무늬, 올렸을 때, 선택된 행은 `bg-neutral-soft` 사다리를 한 칸씩 오릅니다. 브랜드 색을 쓰지 않습니다.
 - **shadcn/ui 구성.** `Table.Header`, `Table.Body`, `Table.Footer`, `Table.Row`, `Table.Head`, `Table.Cell`, `Table.Caption` 입니다.
 
 ```tsx
@@ -46,29 +46,29 @@ import { Table } from '@gsainfoteam/ids-react';
 ## variant와 크기
 
 ```tsx
-<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행에 muted 배경
+<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행에 `bg-neutral-soft` 배경
 <Table variant="ghost" />    // 상자 없이 행 구분선만
 <Table size="standard" />    // 기본. 셀 패딩 16px × 12px, 머리글 44px, body b3
 <Table size="tiny" />        // 셀 패딩 12px × 8px, 머리글 36px, caption c1
 ```
 
 - 상자 모서리는 `rounded-container`(16px) 입니다. 안쪽 여백이 없는 상자라 concentric 계산을 쓰지 않습니다.
-- 선은 모두 `--ids-color-border` 입니다. 마지막 행은 아래 선이 없고, `Table.Footer` 는 위 선으로 몸통과 나뉩니다.
+- 선은 모두 `--ids-color-border-neutral` 입니다. 마지막 행은 아래 선이 없고, `Table.Footer` 는 위 선으로 몸통과 나뉩니다.
 
 ## 행 상태
 
 ```tsx
-<Table striped />              // 짝수 행에 muted
-<Table highlightOnHover />     // 몸통 행에 올리면 muted
-<Table.Row selected />         // 선택된 행은 muted-hover
+<Table striped />              // 짝수 행에 `bg-neutral-soft`
+<Table highlightOnHover />     // 몸통 행에 올리면 `bg-neutral-soft`
+<Table.Row selected />         // 선택된 행은 `bg-neutral-soft-hover`
 <Table.Row onClick={open} />   // 올리면 밝아지고 어디를 눌러도 된다(cursor-pointer)
 ```
 
 | 행               | 평소          | 올렸을 때      |
 | ---------------- | ------------- | -------------- |
-| 기본             | 투명          | `muted`        |
-| 줄무늬(짝수)     | `muted`       | `muted-hover`  |
-| 선택             | `muted-hover` | `muted-active` |
+| 기본             | 투명          | `bg-neutral-soft`        |
+| 줄무늬(짝수)     | `bg-neutral-soft`       | `bg-neutral-soft-hover`  |
+| 선택             | `bg-neutral-soft-hover` | `bg-neutral-soft-active` |
 
 - 올렸을 때 색은 `highlightOnHover` 나 `onClick` 이 있는 몸통 행에만 붙습니다. 머리글과 바닥글 행은 바뀌지 않습니다.
 - `selected` 는 모양과 `data-selected` 만 바꿉니다. `aria-selected` 는 `grid` 역할에서만 뜻이 있어 붙이지 않습니다. 선택은 행 안의 체크박스나 `aria-pressed` 버튼이 알립니다.
@@ -104,7 +104,7 @@ import { Table } from '@gsainfoteam/ids-react';
 ```
 
 - `Table.Head` 는 `Table.Header` 안에서 열 머리글(`scope="col"`), 몸통과 바닥글에서 행 머리글(`scope="row"`)입니다. `scope` 를 주면 그 값을 씁니다.
-- 열 머리글 글자는 `on-muted`, 행 머리글은 본문 색입니다.
+- 열 머리글 글자는 `text-neutral`, 행 머리글은 본문 색입니다.
 
 ## 정렬
 
@@ -166,7 +166,7 @@ import { Table } from '@gsainfoteam/ids-react';
 | `variant`          | `outline`(기본) / `ghost`                             |
 | `size`             | `standard`(기본) / `tiny`                             |
 | `layout`           | `auto`(기본) / `fixed`                                |
-| `striped`          | 짝수 몸통 행에 `muted`                                |
+| `striped`          | 짝수 몸통 행에 `bg-neutral-soft`                                |
 | `highlightOnHover` | 몸통 행에 올리면 한 단계 진하게                       |
 | `stickyHeader`     | 스크롤해도 머리글 행이 위에 붙는다                    |
 | `className`, `style` | 바깥 스크롤 상자                                    |
@@ -176,10 +176,10 @@ import { Table } from '@gsainfoteam/ids-react';
 | --------------- | ----------- | -------------------------------------- |
 | `Table.Header`  | `<thead>`   | 안의 `Head` 가 열 머리글이 된다        |
 | `Table.Body`    | `<tbody>`   |                                        |
-| `Table.Footer`  | `<tfoot>`   | muted 배경, 위 선                      |
+| `Table.Footer`  | `<tfoot>`   | `bg-neutral-soft` 배경, 위 선                      |
 | `Table.Row`     | `<tr>`      | `selected`, `onClick`                  |
 | `Table.Head`    | `<th>`      | `align`, `scope`(자동)                 |
 | `Table.Cell`    | `<td>`      | `align`, `colSpan`, `rowSpan`          |
-| `Table.Caption` | `<caption>` | 표 아래, `on-muted` 글자               |
+| `Table.Caption` | `<caption>` | 표 아래, `text-neutral` 글자               |
 
 - 파트는 `<Table>` 안에서만 씁니다. 밖에 두면 오류입니다.

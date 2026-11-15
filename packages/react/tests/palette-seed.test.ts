@@ -9,6 +9,7 @@ import {
 } from '../src/components/utility/ids-provider/palette-seed';
 import { REFERENCE_PALETTES } from '../src/components/utility/ids-provider/reference-palettes';
 import { PALETTE_STEPS, type IdsPalette } from '../src/components/utility/ids-provider/theme';
+import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
 import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
 
 const stepsOf = (palette: IdsPalette) => PALETTE_STEPS.map((step) => palette[step]);
@@ -63,7 +64,7 @@ test('every seed builds a palette whose roles reach 4.5:1 in both modes', () => 
   const failing = HUES.flatMap((hue) =>
     SEEDS.flatMap(([lightness, chroma]) => {
       const seed = seedAt(lightness, chroma, hue);
-      const issues = checkIdsTheme({ palette: seed });
+      const { issues } = resolveColors({ primary: seed, secondary: seed, tertiary: seed });
       return issues.length === 0 ? [] : [`${seed}: ${issues.map((issue) => issue.message)}`];
     }),
   );
@@ -83,7 +84,7 @@ test('a gray seed builds a gray palette, and a bad seed is reported', () => {
     hex.slice(1, 3) === hex.slice(3, 5) && hex.slice(3, 5) === hex.slice(5, 7);
   expect(stepsOf(createIdsPalette('#808080')!).every(isGray)).toBe(true);
   expect(createIdsPalette('not a color')).toBeUndefined();
-  expect(checkIdsTheme({ palette: 'not a color' })).toEqual([
-    { path: 'palette', message: 'The palette is not a CSS color: not a color.' },
+  expect(checkIdsTheme({ primary: 'not a color' })).toEqual([
+    { path: 'primary', message: 'primary is not a CSS color: not a color.' },
   ]);
 });

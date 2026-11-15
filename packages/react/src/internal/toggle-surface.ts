@@ -7,12 +7,12 @@ export const toggleSurface = {
     ghost: cn(
       'bg-transparent text-(--control-quiet)',
       'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
-      'data-pressed:bg-(--control-press)',
+      'data-pressed:bg-(--control-press) data-pressed:text-(--control-on-press)',
     ),
     outline: cn(
-      'bg-transparent text-(--control-quiet) shadow-xs inset-ring-1 inset-ring-(--ids-color-border)',
+      'bg-transparent text-(--control-quiet) shadow-xs inset-ring-1 inset-ring-neutral',
       'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
-      'data-pressed:bg-(--control-press)',
+      'data-pressed:bg-(--control-press) data-pressed:text-(--control-on-press)',
     ),
     soft: cn(
       'bg-transparent text-(--control-quiet)',

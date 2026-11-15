@@ -100,10 +100,10 @@ export const Gallery: Story = {
           <Spinner size="standard" />
         </Showcase.Row>
         <Showcase.Row label="primary">
-          <Spinner size="standard" className="text-(--ids-color-accent)" />
+          <Spinner size="standard" className="text-primary" />
         </Showcase.Row>
         <Showcase.Row label="on-muted">
-          <Spinner size="standard" className="text-(--ids-color-on-muted)" />
+          <Spinner size="standard" className="text-neutral" />
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
@@ -177,7 +177,7 @@ export const Announcement: Story = {
           {loading ? '멈추기' : '불러오기'}
         </Button>
         {loading ? (
-          <div className="flex items-center gap-2 text-(--ids-color-on-muted)">
+          <div className="text-neutral flex items-center gap-2">
             <Spinner aria-label="댓글을 불러오는 중" />
           </div>
         ) : (

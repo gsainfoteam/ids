@@ -97,7 +97,7 @@ test('a top layer box escapes a scaled ancestor and still takes its theme from t
     );
   }
   const screen = await render(
-    <IdsProvider theme={{ palette: palettes.orange }}>
+    <IdsProvider theme={{ primary: palettes.orange }}>
       <div style={{ transform: 'scale(0.5)', transformOrigin: '0 0' }}>
         <div data-testid="fixed" style={{ position: 'fixed', left: 10, top: 80, width: 100 }} />
         <Lifted />
@@ -109,7 +109,7 @@ test('a top layer box escapes a scaled ancestor and still takes its theme from t
   expect(lifted.getBoundingClientRect().width).toBe(100);
   expect(fixed.getBoundingClientRect().width, 'a plain fixed box shrinks with it').toBe(50);
   const primary = (element: Element) =>
-    getComputedStyle(element).getPropertyValue('--ids-color-primary');
+    getComputedStyle(element).getPropertyValue('--ids-color-bg-primary');
   expect(primary(lifted)).toBe(primary(fixed));
   expect(primary(lifted)).not.toBe(primary(document.body));
 });

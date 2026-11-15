@@ -100,7 +100,7 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
 
   const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image, defineIdsTheme, checkIdsTheme } = ids;
   const palette = { 50: '#eff6ff', 100: '#dbeafe', 200: '#bedbff', 300: '#8ec5ff', 400: '#51a2ff', 500: '#2b7fff', 600: '#155dfc', 700: '#1447e6', 800: '#193cb8', 900: '#1c398e', 950: '#162456' };
-  const theme = defineIdsTheme({ palette, radius: 12 });
+  const theme = defineIdsTheme({ primary: palette, radius: 12 });
   if (checkIdsTheme(theme).length) {
     console.error('A Server Component could not check the theme');
     process.exit(1);

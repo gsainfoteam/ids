@@ -157,7 +157,7 @@ function Specimen({ className, sample }: { className: string; sample: string }) 
       <span data-sample="" className={cn(className, 'whitespace-nowrap')}>
         {sample}
       </span>
-      <code data-spec="" className="text-caption-c1-regular text-(--ids-color-on-muted)" />
+      <code data-spec="" className="text-caption-c1-regular text-neutral" />
     </div>
   );
 }
@@ -249,7 +249,7 @@ export const Primitives: Story = {
               <code className="text-caption-c1-regular truncate font-mono">{variable}</code>
               <code
                 data-resolved=""
-                className="text-caption-c1-regular truncate font-mono text-(--ids-color-on-muted)"
+                className="text-caption-c1-regular text-neutral truncate font-mono"
               />
               <span
                 className="text-body-b3-regular whitespace-nowrap"

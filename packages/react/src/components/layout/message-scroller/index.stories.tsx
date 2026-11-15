@@ -64,7 +64,7 @@ const ANSWER = [
   '근로 장학 시간과도 겹치지 않게 골랐어요.',
 ];
 
-const frame = cn('h-80 w-full max-w-md rounded-container border border-(--ids-color-border)');
+const frame = cn('h-80 w-full max-w-md rounded-container border border-neutral');
 
 const viewportIn = (root: HTMLElement) =>
   root.querySelector<HTMLElement>('[data-message-scroller] [role="log"]')!;

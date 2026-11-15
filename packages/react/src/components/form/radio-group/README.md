@@ -81,8 +81,8 @@ type Plan = 'free' | 'pro' | 'team';
     plans.map((plan) => (
       <Label
         key={plan.value}
-        className="flex items-start gap-3 rounded-standard p-4 inset-ring-1 inset-ring-(--ids-color-border)
-                   has-data-[state=checked]:inset-ring-(--ids-color-primary)"   // 선택된 카드
+        className="flex items-start gap-3 rounded-standard p-4 inset-ring-1 inset-ring-neutral
+                   has-data-[state=checked]:inset-ring-primary"   // 선택된 카드
       >
         <Item value={plan.value} />
         <span>{plan.label}</span>

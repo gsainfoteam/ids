@@ -14,8 +14,8 @@ export const textAreaStyle = tv({
     ],
     bar: [
       'flex shrink-0 items-center empty:hidden',
-      'border-(--ids-color-border)',
-      'not-has-[button]:text-(--ids-color-on-muted)',
+      'border-neutral',
+      'not-has-[button]:text-neutral',
       '[&_svg]:shrink-0',
       insetButtons.base,
     ],
@@ -25,15 +25,12 @@ export const textAreaStyle = tv({
     ],
     input: [
       'w-full min-w-0 grow resize-none bg-transparent outline-none',
-      'text-inherit placeholder:text-(--ids-color-on-muted)',
-      'selection:bg-(--ids-color-primary)/30 selection:text-(--ids-color-on-surface)',
+      'text-inherit placeholder:text-neutral',
+      'selection:bg-primary/30 selection:text-on-surface',
       'disabled:cursor-not-allowed',
       'py-(--ids-text-area-pad-y)',
     ],
-    count: [
-      'ms-auto shrink-0 text-(--ids-color-on-muted) tabular-nums',
-      'data-near-limit:text-(--ids-color-on-surface)',
-    ],
+    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-on-surface'],
   },
   variants: {
     variant: {

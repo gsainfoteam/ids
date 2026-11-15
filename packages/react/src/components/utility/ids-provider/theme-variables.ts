@@ -1,10 +1,7 @@
-import {
-  BRAND_ROLES,
-  type IdsCornerShape,
-  type IdsTheme,
-  type IdsThemeOverrides,
-} from './theme';
-import { resolveThemeRoles, type IdsThemeIssue } from './theme-roles';
+import { COLOR_KEYS, type IdsCornerShape, type IdsTheme, type IdsThemeOverrides } from './theme';
+import { checkColorDistinction } from './theme-checks';
+import { MODES, resolveColorsOnce, slotsOf, type IdsThemeIssue } from './theme-roles';
+import { IDS_BASE_SLOTS, IDS_COLOR_FAMILIES } from '../../../tokens/color-roles';
 
 import type { IdsMode } from '../../../tokens/types';
 
@@ -17,8 +14,6 @@ export const CONTAINER_RADIUS_RATIO = 1.6;
 export const SCALE_RANGE = { min: 0.5, max: 2 } as const;
 
 const CORNER_SHAPES: readonly IdsCornerShape[] = ['round', 'squircle'];
-
-const MODES: readonly IdsMode[] = ['light', 'dark'];
 
 export type ThemeVariables = { [variable: `--${string}`]: string };
 
@@ -67,17 +62,32 @@ function cornerShapeVariables(
   return { '--ids-corner-shape': cornerShape };
 }
 
-function paletteVariables(
-  palette: IdsThemeOverrides['palette'],
+const writesColors = (theme: IdsThemeOverrides) => COLOR_KEYS.some((key) => key in theme);
+
+function writtenFamilies(theme: IdsThemeOverrides, complete: boolean) {
+  if (complete) return IDS_COLOR_FAMILIES;
+  return IDS_COLOR_FAMILIES.filter((family) => family !== 'neutral' || theme.neutral === 'tinted');
+}
+
+function colorVariables(
+  theme: IdsThemeOverrides,
+  complete: boolean,
   issues: IdsThemeIssue[],
 ): ThemeVariables {
-  const { roles, issues: paletteIssues } = resolveThemeRoles(palette);
-  issues.push(...paletteIssues);
-  if (roles === undefined) return {};
+  const { colors, issues: colorIssues } = resolveColorsOnce(theme);
+  issues.push(...colorIssues);
+  if (colors === undefined) return {};
+  issues.push(...checkColorDistinction(colors));
+
+  const families = writtenFamilies(theme, complete);
+  const slots = [
+    ...(families.includes('neutral') ? IDS_BASE_SLOTS : []),
+    ...families.flatMap(slotsOf),
+  ];
 
   const variables: ThemeVariables = {};
   for (const mode of MODES)
-    for (const role of BRAND_ROLES) variables[themeRoleVariable(mode, role)] = roles[mode][role];
+    for (const slot of slots) variables[themeRoleVariable(mode, slot)] = colors.roles[mode][slot]!;
 
   return variables;
 }
@@ -101,15 +111,21 @@ function scaleVariables(scale: number | undefined, issues: IdsThemeIssue[]): The
   return { '--ids-scale': String(scale) };
 }
 
-export function resolveThemeVariables(theme: IdsThemeOverrides): {
+export function resolveThemeVariables(
+  theme: IdsThemeOverrides,
+  inherited?: IdsThemeOverrides,
+): {
   variables: ThemeVariables;
   scale: number | undefined;
   issues: IdsThemeIssue[];
 } {
   const issues: IdsThemeIssue[] = [];
+  const isScope = inherited !== undefined;
 
   const variables = {
-    ...('palette' in theme ? paletteVariables(theme.palette, issues) : {}),
+    ...(writesColors(theme) || !isScope
+      ? colorVariables(isScope ? { ...inherited, ...theme } : theme, isScope, issues)
+      : {}),
     ...radiusVariables(theme.radius, issues),
     ...cornerShapeVariables(theme.cornerShape, issues),
     ...scaleVariables(theme.scale, issues),
@@ -120,5 +136,5 @@ export function resolveThemeVariables(theme: IdsThemeOverrides): {
 }
 
 export function checkIdsTheme(theme: IdsTheme): IdsThemeIssue[] {
-  return resolveThemeVariables({ ...theme, palette: theme?.palette }).issues;
+  return resolveThemeVariables({ ...theme, primary: theme?.primary }).issues;
 }

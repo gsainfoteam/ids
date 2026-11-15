@@ -9,7 +9,7 @@ import { cssColor } from '../../data/color-picker/color';
 export type ColorFieldSwatchProps = ComponentProps<'span'> & { asChild?: boolean };
 
 const CHECKER =
-  'conic-gradient(var(--ids-color-muted) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-muted) 0 75%, var(--ids-color-surface) 0)';
+  'conic-gradient(var(--ids-color-bg-neutral-soft) 25%, var(--ids-color-surface) 0 50%, var(--ids-color-bg-neutral-soft) 0 75%, var(--ids-color-surface) 0)';
 
 export function ColorFieldSwatch({
   asChild,

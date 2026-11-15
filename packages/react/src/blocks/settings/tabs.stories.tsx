@@ -38,7 +38,7 @@ type Story = StoryObj<typeof meta>;
 
 const THEMES = {
   blue: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#eff6ff',
       100: '#dbeafe',
       200: '#bedbff',
@@ -53,7 +53,7 @@ const THEMES = {
     },
   }),
   green: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#f0fdf0',
       100: '#dcfcdc',
       200: '#bbf7bb',
@@ -68,7 +68,7 @@ const THEMES = {
     },
   }),
   orange: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#fff6f2',
       100: '#ffe8de',
       200: '#ffc8b4',
@@ -83,7 +83,7 @@ const THEMES = {
     },
   }),
   teal: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#f0fdfa',
       100: '#cbfbf1',
       200: '#96f7e4',
@@ -98,7 +98,7 @@ const THEMES = {
     },
   }),
   violet: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#f5f3ff',
       100: '#ede9fe',
       200: '#ddd6ff',
@@ -113,7 +113,7 @@ const THEMES = {
     },
   }),
   rose: defineIdsTheme({
-    palette: {
+    primary: {
       50: '#fff1f2',
       100: '#ffe4e6',
       200: '#ffccd3',

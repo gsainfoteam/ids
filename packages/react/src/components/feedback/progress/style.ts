@@ -7,18 +7,18 @@ export const progressStyle = tv({
   slots: {
     root: '',
     header: 'flex items-baseline gap-2',
-    track: 'relative w-full overflow-hidden rounded-full bg-(--ids-color-muted)',
+    track: 'relative w-full overflow-hidden rounded-full bg-neutral-soft',
     indicator: 'h-full rounded-full bg-(--progress-fill)',
     circle: 'relative inline-flex shrink-0 items-center justify-center',
     svg: 'size-full',
-    trackCircle: 'text-(--ids-color-muted)',
+    trackCircle: 'text-(--ids-color-bg-neutral-soft)',
     indicatorCircle: [
       'origin-center -rotate-90 text-(--progress-fill)',
       'transition-[stroke-dashoffset] duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
     ],
     center: 'absolute inset-0 flex items-center justify-center [&_svg]:size-[40%]',
-    label: 'min-w-0 truncate text-(--ids-color-on-surface)',
-    value: 'shrink-0 text-(--ids-color-on-muted) tabular-nums',
+    label: 'min-w-0 truncate text-on-surface',
+    value: 'shrink-0 text-neutral tabular-nums',
   },
   variants: {
     shape: {
@@ -30,12 +30,14 @@ export const progressStyle = tv({
       tiny: { track: 'h-1', circle: 'size-6', label: 'text-caption-c1-medium' },
     } satisfies Record<IdsSize, object>,
     colorScheme: {
-      primary: { root: '[--progress-fill:var(--ids-color-primary)]' },
+      primary: { root: '[--progress-fill:var(--ids-color-bg-primary)]' },
+      secondary: { root: '[--progress-fill:var(--ids-color-bg-secondary)]' },
+      tertiary: { root: '[--progress-fill:var(--ids-color-bg-tertiary)]' },
       neutral: { root: '[--progress-fill:var(--ids-color-on-surface)]' },
-      info: { root: '[--progress-fill:var(--ids-color-info)]' },
-      success: { root: '[--progress-fill:var(--ids-color-success)]' },
-      warning: { root: '[--progress-fill:var(--ids-color-warning)]' },
-      danger: { root: '[--progress-fill:var(--ids-color-danger)]' },
+      info: { root: '[--progress-fill:var(--ids-color-bg-info)]' },
+      success: { root: '[--progress-fill:var(--ids-color-bg-success)]' },
+      warning: { root: '[--progress-fill:var(--ids-color-bg-warning)]' },
+      danger: { root: '[--progress-fill:var(--ids-color-bg-danger)]' },
     } satisfies Record<Progress.ColorScheme, object>,
     indeterminate: {
       true: {

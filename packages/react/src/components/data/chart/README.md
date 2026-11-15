@@ -51,14 +51,15 @@ const config = {
 
 ```tsx
 const config = {
-  income: { label: '수입', color: 'success' },   // 토큰 이름
+  income: { label: '수입', color: 'success' },   // 계열 이름
   spending: { label: '지출', color: 'danger' },
-  members: { label: '회원' },                     // 생략하면 키 순서대로 chart-1 부터
+  guests: { label: '손님', color: '#64748b' },     // 그 밖의 CSS 색
+  members: { label: '회원' },                      // 생략하면 기본 순서
 } satisfies Chart.Config;
 ```
 
-- `color` 를 생략하면 config 에 적힌 순서대로 `chart-1` ~ `chart-5` 를 쓰고, 여섯 번째 키부터 다시 `chart-1` 입니다.
-- `color` 는 `chart-1` ~ `chart-5`, `primary`, `accent`, `success`, `warning`, `danger`, `info`, `on-muted` 중 하나입니다.
+- `color` 를 생략한 계열은 config 에 적힌 순서대로 [기본 순서](#기본-순서)를 씁니다.
+- `color` 는 계열 이름(`primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`, `neutral`) 이나 CSS 색입니다. 계열 이름은 그 계열의 `bg-*` 채움, `neutral` 은 `text-neutral` 입니다.
 - 계열 변수는 `--chart-<key>` 입니다. `--color-*` 는 Tailwind 테마 변수 이름공간이라 `primary` 같은 키가 겹칩니다. 키는 CSS 변수 이름에 들어가므로 영문, 숫자, `-`, `_` 로 씁니다.
 - Chart 가 칠하는 것은 Chart 의 차트 바로 아래에 둔 `Bar`(`fill`), `Line`(`stroke`), `Area`·`Radar`(`stroke`, `fill`), `Scatter`(`fill`) 중 `dataKey` 가 config 에 있는 것입니다. `fill` 이나 `stroke` 를 직접 주면 그 값이 이깁니다. label 이 글자면 `name` 도 채웁니다.
 - `Area` 의 면은 계열 색 40% 에서 투명으로 내려가는 그라디언트입니다. Chart 가 차트 안에 `<linearGradient>` 를 넣고 `fill` 을 `url(#…)` 로 칠합니다. `fill` 을 직접 주면 그라디언트를 넣지 않고, `fillOpacity` 는 그라디언트 위에 곱해집니다.
@@ -75,20 +76,22 @@ const shares = rows.map((row) => ({ ...row, fill: `var(--chart-${row.service})` 
 </Chart>;
 ```
 
-### 계열 토큰
+### 기본 순서
 
-| 토큰      | 라이트       | 다크         |
-| --------- | ------------ | ------------ |
-| `chart-1` | blue 600     | blue 400     |
-| `chart-2` | amber 600    | amber 400    |
-| `chart-3` | teal 600     | teal 400     |
-| `chart-4` | rose 600     | rose 400     |
-| `chart-5` | violet 600   | violet 400   |
+```tsx
+const config = {
+  web: { label: '웹' },                        // bg-primary
+  app: { label: '앱' },                        // bg-secondary
+  kiosk: { label: '키오스크' },                // bg-tertiary
+  other: { label: '기타', color: 'neutral' },  // 네 번째부터는 color 를 준다
+} satisfies Chart.Config;
+```
 
-- 앱 팔레트를 따르지 않는 고정 팔레트입니다. 브랜드 색 계열이 필요하면 `color: 'primary'` 를 줍니다.
-- 다섯 색 모두 바탕(`surface`)과 3:1 이상입니다(그래픽 대비 기준).
-- 이웃한 두 색은 CIEDE2000 색차 25 이상으로 떨어져 있습니다. `tests/tokens-contrast.test.ts` 가 두 규칙을 라이트와 다크에서 확인합니다.
-- 계열을 더할 때도 같은 두 규칙을 지킵니다. 둘이 같은 색 계열로 보이면 순서를 바꿔 이웃하지 않게 합니다.
+- `color` 를 생략한 계열은 config 순서대로 `bg-primary`, `bg-secondary`, `bg-tertiary` 를 씁니다. 기본 색은 이 세 개뿐입니다.
+- 테마가 `primary` 만 주면 `secondary` 와 `tertiary` 는 IdsProvider 가 primary 에서 만든 색입니다([만든 secondary 와 tertiary](../../utility/ids-provider/README.md#secondary-와-tertiary)). 테마가 몇 계열을 주든 세 색은 서로 다릅니다.
+- `color` 없는 계열이 네 개 이상이면 네 번째부터 `neutral` 로 칠하고 개발 모드에서 경고합니다. 네 번째부터는 `color` 에 `neutral`, 상태 이름, CSS 색 중 하나를 줍니다.
+- 상태 색(`success`, `warning`, `danger`, `info`)은 의미가 있으므로 기본 순서에 들지 않습니다.
+- 계열 변수는 `var(--ids-color-bg-*)` 를 가리키므로 `IdsProvider.Scope` 가 모드나 브랜드 계열을 바꾸면 그 안의 차트도 따라 바뀝니다.
 
 ## Tooltip 과 Legend
 

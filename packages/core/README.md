@@ -22,13 +22,32 @@ tokens/
   motion.json           # 애니메이션 지속시간 원시값
   enums.json            # IdsColor(Dart 전용)·IdsMode·IdsSize·IdsVariant 열거값
   semantic/
-    neutral|status|chart.{light,dark}.json  # IDS 가 정하는 색. CSS 와 Dart 로 나간다
-    [color].light.json  # hue 별 역할 색. Dart 생성에만 쓴다 (Flutter 가 런타임 팔레트로 옮기면 지운다)
+    neutral.{light,dark}.json  # 중립 계열과 바탕 층의 단계. CSS fallback 과 tokens/color-roles.ts 로 나간다
+    status.{light,dark}.json   # 상태 색(예전 이름). Dart 생성에만 쓴다
+    [color].light.json  # hue 별 역할 색(예전 이름). Dart 생성에만 쓴다 (Flutter 가 런타임 팔레트로 옮기면 지운다)
     [color].dark.json
     typography.json     # 시맨틱 타이포그래피 스케일 (display, heading, body 등)
+color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지와 React 의 tokens/color-roles.ts 를 만든다
 ```
 
 시맨틱 색상 파일에서 `{blue.600}` 형태로 팔레트를 참조한다.
+
+## 색 역할 표
+
+`color-roles.json` 하나가 색 이름을 정한다.
+
+```json
+{
+  "families": { "neutral": ["neutral"], "brand": ["primary", "secondary", "tertiary"], "status": ["success", "warning", "danger", "info"] },
+  "slots": { "bg": ["{family}", "{family}-hover", "…"], "text": ["on-{family}", "on-{family}-soft", "{family}"], "border": ["{family}"] },
+  "namespaces": { "bg": ["--background-color"], "text": ["--text-color", "--fill"], "border": ["--border-color", "--ring-color", "--outline-color", "--stroke"] }
+}
+```
+
+- 역할 변수는 `--ids-color-{bg|text|border}-{이름}` 이다. 바탕 층(`surface`, `on-surface`)만 앞머리가 없다.
+- Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-soft` 는 있고 `--color-primary` 나 `--background-color-on-primary` 는 없다.
+- `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다. 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다). neutral 과 바탕 층은 없으면 `neutral.*.json` 의 단계를 읽는다.
+- Dart 포매터는 이 표를 읽지 않는다. `packages/flutter/lib/tokens` 는 예전 이름 그대로 나오고, CI 가 바뀌지 않았는지 확인한다.
 
 ## codegen 실행
 
@@ -42,7 +61,7 @@ pnpm build
 
 생성된 파일은 직접 편집하지 않는다. `pnpm codegen` 실행 시 덮어쓴다.
 
-## 새 색상 추가
+## 새 데모 팔레트 추가
 
 ```bash
 # 1. 팔레트 값 추가

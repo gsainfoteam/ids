@@ -75,20 +75,20 @@ const answer = 42;
 
 | `data-token`  | Prism 토큰                                          | 색                     |
 | ------------- | --------------------------------------------------- | ---------------------- |
-| `comment`     | comment, prolog, doctype, cdata                     | `on-muted`, 기울임     |
+| `comment`     | comment, prolog, doctype, cdata                     | `text-neutral`, 기울임     |
 | `keyword`     | keyword, atrule, rule, important                    | `accent` (테마 색)     |
-| `string`      | string, char, attr-value, regex, url                | `success-strong`       |
-| `number`      | number, boolean, constant, symbol                   | `warning-strong`       |
-| `function`    | function, class-name, builtin                       | `info-strong`          |
-| `property`    | property, attr-name, variable                       | `info-strong`          |
-| `tag`         | tag, selector, namespace                            | `danger-strong`        |
-| `punctuation` | punctuation, operator                               | `on-muted`             |
-| `inserted`    | inserted (diff 의 `+`)                              | `success-strong`       |
-| `deleted`     | deleted (diff 의 `-`)                               | `danger-strong`        |
+| `string`      | string, char, attr-value, regex, url                | `text-success`       |
+| `number`      | number, boolean, constant, symbol                   | `text-warning`       |
+| `function`    | function, class-name, builtin                       | `text-info`          |
+| `property`    | property, attr-name, variable                       | `text-info`          |
+| `tag`         | tag, selector, namespace                            | `text-danger`        |
+| `punctuation` | punctuation, operator                               | `text-neutral`             |
+| `inserted`    | inserted (diff 의 `+`)                              | `text-success`       |
+| `deleted`     | deleted (diff 의 `-`)                               | `text-danger`        |
 
 - 한 조각에 여러 Prism 토큰이 겹치면 가장 안쪽 토큰, 그 안에서는 먼저 적힌 클래스를 씁니다.
-- 모든 색은 `surface` 와 `muted` 바탕 위에서 두 모드 모두 4.5:1 을 넘습니다. `accent` 는 가장 낮은 노란색도 넘습니다.
-- 색을 바꾸려면 `data-token` 으로 고릅니다: `className="[&_[data-token=keyword]]:text-(--ids-color-info-strong)"`.
+- 모든 색은 `surface` 와 `bg-neutral-soft` 바탕 위에서 두 모드 모두 4.5:1 을 넘습니다. `accent` 는 가장 낮은 노란색도 넘습니다.
+- 색을 바꾸려면 `data-token` 으로 고릅니다: `className="[&_[data-token=keyword]]:text-info"`.
 
 ## 줄 번호와 강조
 
@@ -99,7 +99,7 @@ const answer = 42;
 
 - 줄 번호는 `::before` 의 CSS counter 입니다(`content: counter(line) / ''`). 글자가 아니라서 골라 복사해도 섞이지 않고, 대체 텍스트가 빈 문자열이라 스크린 리더도 읽지 않습니다.
 - 번호 칸의 폭은 줄 수의 자릿수(`--code-block-digits`, `ch` 단위)입니다.
-- 강조한 줄은 `data-highlighted` 를 받고 바탕(outline 은 `muted`, soft 는 `surface`)과 왼쪽 2px `primary` 막대로 보입니다. 어느 바탕에서도 글자 대비가 4.5:1 을 넘게 고른 바탕입니다.
+- 강조한 줄은 `data-highlighted` 를 받고 바탕(outline 은 `bg-neutral-soft`, soft 는 `surface`)과 왼쪽 2px `primary` 막대로 보입니다. 어느 바탕에서도 글자 대비가 4.5:1 을 넘게 고른 바탕입니다.
 - 줄마다 `data-line` 에 1부터 센 번호가 있습니다.
 
 ## 넘침
@@ -152,7 +152,7 @@ const answer = 42;
 <CodeBlock variant="soft" />      // 옅은 바탕, 테두리 없음
 ```
 
-- caption 아래 선은 `Divider`(`decorative`)입니다. `soft`에서는 그 선을 `border`가 아니라 `surface` 색으로 칠합니다. 다크 모드에서 `border`는 `muted` 바탕과 같은 색이라 보이지 않습니다.
+- caption 아래 선은 `Divider`(`decorative`)입니다. `soft`에서는 그 선을 `border`가 아니라 `surface` 색으로 칠합니다. 다크 모드에서 `border`는 `bg-neutral-soft` 바탕과 같은 색이라 보이지 않습니다.
 
 - 모서리는 `container`(16px)입니다. 모서리 안쪽에 붙는 것은 6px 떨어진 10px 복사 버튼이라 `10 + 6` 이 `container` 에서 멈춥니다.
 - 글자는 `font-mono` `text-body-b3-regular` 입니다.

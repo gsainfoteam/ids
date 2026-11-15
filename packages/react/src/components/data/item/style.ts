@@ -6,23 +6,23 @@ import type { IdsSize } from '../../../tokens/types';
 export const itemStyle = tv({
   slots: {
     root: [
-      'group/item relative isolate flex w-full min-w-0 items-center text-start text-(--ids-color-on-surface)',
+      'group/item relative isolate flex w-full min-w-0 items-center text-start text-on-surface',
       'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit]',
       'before:bg-(--ids-color-on-surface) before:opacity-0',
       'before:transition-opacity before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
       'data-selected:before:opacity-6',
     ],
     media: [
-      'flex shrink-0 items-center justify-center gap-2 text-(--ids-color-on-muted)',
+      'flex shrink-0 items-center justify-center gap-2 text-neutral',
       '[&_img]:object-cover',
       "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
     ],
     content: 'flex min-w-0 flex-1 flex-col gap-0.5 [&+[data-item-content]]:flex-none',
     title: 'flex w-fit items-center gap-2',
-    description: 'line-clamp-2 text-(--ids-color-on-muted)',
+    description: 'line-clamp-2 text-neutral',
     actions: [
       'ms-auto flex shrink-0 items-center gap-2',
-      "[&>svg]:pointer-events-none [&>svg:not([class*='text-'])]:text-(--ids-color-on-muted) [&>svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
+      "[&>svg]:pointer-events-none [&>svg:not([class*='text-'])]:text-neutral [&>svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
     ],
     group: 'flex min-w-0 flex-col',
     groupItem: 'flex',
@@ -30,22 +30,21 @@ export const itemStyle = tv({
   variants: {
     groupVariant: {
       bordered: {
-        group: 'divide-y divide-(--ids-color-border) [&>li>[data-item]]:rounded-none',
+        group: 'divide-y divide-neutral [&>li>[data-item]]:rounded-none',
       },
       separated: { group: 'gap-2' },
       ghost: {},
     } satisfies Record<ItemGroupVariant, object>,
     variant: {
       ghost: {},
-      outline: { root: 'inset-ring-1 inset-ring-(--ids-color-border)' },
-      soft: { root: 'bg-(--ids-color-muted)' },
+      outline: { root: 'inset-ring-1 inset-ring-neutral' },
+      soft: { root: 'bg-neutral-soft' },
     } satisfies Record<ItemVariant, object>,
     media: {
       ghost: {},
-      soft: { media: 'rounded-standard bg-(--ids-color-muted) text-(--ids-color-on-surface)' },
+      soft: { media: 'rounded-standard bg-neutral-soft text-on-surface' },
       outline: {
-        media:
-          'rounded-standard inset-ring-1 inset-ring-(--ids-color-border) text-(--ids-color-on-surface)',
+        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-on-surface',
       },
     } satisfies Record<ItemVariant, object>,
     size: {
