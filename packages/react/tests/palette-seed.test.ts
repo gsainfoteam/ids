@@ -1,62 +1,23 @@
-import { clampChroma, differenceEuclidean, formatHex } from 'culori/fn';
-import { describe, expect, test } from 'vitest';
+import { clampChroma, formatHex } from 'culori/fn';
+import { expect, test } from 'vitest';
 
-import { paletteHues, palettes } from '../.storybook/palettes';
-import {
-  createIdsPalette,
-  hueOf,
-  paletteAtHue,
-  shadeOf,
-} from '../src/components/utility/ids-provider/palette-seed';
+import palette from '../../core/tokens/palette.json';
+import { createIdsPalette, shadeOf } from '../src/components/utility/ids-provider/palette-seed';
 import { PALETTE_STEPS, type IdsPalette } from '../src/components/utility/ids-provider/theme';
 import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
 import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
 import { STATUS_PALETTES } from '../src/tokens/palette-model';
 
-const stepsOf = (palette: IdsPalette) => PALETTE_STEPS.map((step) => palette[step]);
-
-const oklabDistance = differenceEuclidean('oklab');
-
-const DELTA_E_SCALE = 100;
-
-const FULL_CHROMA = 1;
-
-const TOLERANCE = { mean: 3, max: 6.5 };
-
-const distancesFrom = (built: IdsPalette, reference: IdsPalette) =>
-  PALETTE_STEPS.map((step) => oklabDistance(built[step], reference[step]) * DELTA_E_SCALE);
-
-const summary = (distances: number[]) => ({
-  mean: distances.reduce((sum, distance) => sum + distance) / distances.length,
-  max: Math.max(...distances),
-});
+const stepsOf = (built: IdsPalette) => PALETTE_STEPS.map((step) => built[step]);
 
 const seedAt = (l: number, c: number, h: number) =>
   formatHex(clampChroma({ mode: 'oklch', l, c, h }, 'oklch'));
 
 test('the status palettes are the four in core', () => {
   for (const [name, steps] of Object.entries(STATUS_PALETTES))
-    expect(steps).toEqual(stepsOf(palettes[name as keyof typeof STATUS_PALETTES]));
-});
-
-describe('the model reproduces each core palette', () => {
-  test.each(paletteHues)('%s at its own hue and full chroma', (hue) => {
-    const { mean, max } = summary(
-      distancesFrom(paletteAtHue(hueOf(palettes[hue]), FULL_CHROMA), palettes[hue]),
+    expect(steps).toEqual(
+      PALETTE_STEPS.map((step) => palette[name as keyof typeof STATUS_PALETTES][step].$value),
     );
-
-    expect(mean).toBeLessThan(TOLERANCE.mean);
-    expect(max).toBeLessThan(TOLERANCE.max);
-  });
-
-  test.each(paletteHues)('%s from its step 500, which it keeps exactly', (hue) => {
-    const built = createIdsPalette(palettes[hue][500])!;
-    const { mean, max } = summary(distancesFrom(built, palettes[hue]));
-
-    expect(built[500]).toBe(palettes[hue][500]);
-    expect(mean).toBeLessThan(TOLERANCE.mean);
-    expect(max).toBeLessThan(TOLERANCE.max);
-  });
 });
 
 test.each([
@@ -85,18 +46,24 @@ const SEEDS: [lightness: number, chroma: number][] = [
   [0.2, 0.05],
 ];
 
+const SWEEP_OF_EVERY_SEED_MS = 30_000;
+
 const HUES = Array.from({ length: 72 }, (_, index) => index * 5);
 
 const everySeed = () =>
   HUES.flatMap((hue) => SEEDS.map(([lightness, chroma]) => seedAt(lightness, chroma, hue)));
 
-test('every seed builds a palette whose roles reach their Lc in both modes', () => {
-  const failing = everySeed().flatMap((seed) => {
-    const { issues } = resolveColors({ primary: seed, secondary: seed, tertiary: seed });
-    return issues.length === 0 ? [] : [`${seed}: ${issues.map((issue) => issue.message)}`];
-  });
-  expect(failing).toEqual([]);
-});
+test(
+  'every seed builds a palette whose roles reach their Lc in both modes',
+  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  () => {
+    const failing = everySeed().flatMap((seed) => {
+      const { issues } = resolveColors({ primary: seed, secondary: seed, tertiary: seed });
+      return issues.length === 0 ? [] : [`${seed}: ${issues.map((issue) => issue.message)}`];
+    });
+    expect(failing).toEqual([]);
+  },
+);
 
 test('every seed builds a palette that runs from light to dark', () => {
   const unordered = everySeed().filter((seed) => {

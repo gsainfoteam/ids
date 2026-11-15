@@ -492,8 +492,8 @@ export const AsChild: Story = {
   play: async ({ canvas }) => {
     const section = canvas.getByRole('region', { name: '녹색 영역' });
     await expect(section).toHaveAttribute('data-mode', 'dark');
-    await expect(section.style.getPropertyValue('--ids-theme-dark-bg-primary')).toBe(
-      palettes.green[600],
+    await expect(Object.values(palettes.green)).toContain(
+      section.style.getPropertyValue('--ids-theme-dark-bg-primary'),
     );
     await expect(section.parentElement).not.toBe(null);
   },

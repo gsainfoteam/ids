@@ -1,10 +1,10 @@
 {
   "color": {
-    "primary": { "$value": "{blue.600}", "$type": "color" },
+    "primary": { "$value": "#155dfc", "$type": "color" },
     "on-primary": { "$value": "{neutral.0}", "$type": "color" },
-    "secondary": { "$value": "{blue.100}", "$type": "color" },
-    "on-secondary": { "$value": "{blue.700}", "$type": "color" },
-    "accent": { "$value": "{blue.700}", "$type": "color" },
-    "outline": { "$value": "{blue.200}", "$type": "color" }
+    "secondary": { "$value": "#dbeafe", "$type": "color" },
+    "on-secondary": { "$value": "#1447e6", "$type": "color" },
+    "accent": { "$value": "#1447e6", "$type": "color" },
+    "outline": { "$value": "#bedbff", "$type": "color" }
   }
 }
