@@ -18,7 +18,7 @@
 
 ```
 tokens/
-  palette.json          # 원시 색상 팔레트. neutral 과 레포 데모 팔레트 17색
+  palette.json          # 원시 색상 팔레트. neutral 과 상태 색의 기준 넷(red, yellow, green, sky)
   spacing.json          # 간격 원시값 (xs, sm, md, ...)
   typography.json       # 폰트 패밀리·사이즈·웨이트·행간 원시값
   motion.json           # 애니메이션 지속시간 원시값
@@ -53,13 +53,12 @@ color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지와 R
 
 ## 팔레트 모델
 
-`palette-model.js` 는 Style Dictionary 다음에 돈다. IdsProvider 와 `IdsPalette.fromSeed` 가 색 하나로 11단계를 만들 때 읽는 모델이다.
+`palette-model.json` 이 IdsProvider 와 `IdsPalette.fromSeed` 가 색 하나로 11단계를 만들 때 읽는 모델의 계수다. `palette-model.js` 는 Style Dictionary 다음에 돌며, 이 계수와 `palette.json` 의 상태 색 넷을 `react/src/tokens/palette-model.ts` 와 `flutter/lib/tokens/ids_palette_model.dart` 로 옮긴다.
 
-- 단계마다 500 의 hue 를 받는 푸리에 급수 셋을 맞춘다: 밝기, sRGB 최대 채도에 대한 채도 비율, 500 에서의 hue 회전.
-- 가중치는 OKLab 거리다. 밝기는 그대로, 채도 비율은 최대 채도, hue 회전은 그 단계의 채도를 곱한다.
-- 고조파 수(1–7)와 매끄러움 벌점은 계열마다 leave-one-out 오차가 가장 작은 조합을 고른다. 1% 안의 차이면 단순한 쪽을 고른다.
-- 실행하면 고른 조합과 17색을 다시 만든 오차를 출력한다.
-- 계수와 고르는 규칙은 [IdsProvider README](../react/src/components/utility/ids-provider/README.md#색-하나로-팔레트-만들기) 에 적는다.
+- 단계마다 500 의 hue 를 받는 푸리에 급수 셋이다: 밝기, sRGB 최대 채도에 대한 채도 비율, 500 에서의 hue 회전. 한 줄이 한 단계이고, 값은 `[a0, a1, b1, a2, b2, …]` 순서다.
+- 계수는 데모 팔레트 17색에 맞춰 구한 뒤 고정했다. 17색과 맞추던 코드는 지웠다. 다시 맞추려면 `f3b8fc4b` 커밋의 `palette-model.js` 와 17색이 있던 `tokens/palette.json` 을 꺼낸다.
+- 계수를 바꾸면 Storybook `Foundations/Palette` 의 Model 스토리로 hue 한 바퀴와 시드 고정을 눈으로 확인한다.
+- 모델의 동작은 [IdsProvider README](../react/src/components/utility/ids-provider/README.md#색-하나로-팔레트-만들기) 에 적는다.
 
 ## codegen 실행
 
@@ -72,28 +71,3 @@ pnpm build
 ```
 
 생성된 파일은 직접 편집하지 않는다. `pnpm codegen` 실행 시 덮어쓴다.
-
-## 새 데모 팔레트 추가
-
-```bash
-# 1. 팔레트 값 추가
-#    tokens/palette.json
-
-# 2. 시맨틱 파일 추가
-#    tokens/semantic/[color].light.json
-#    tokens/semantic/[color].dark.json
-
-# 3. codegen
-pnpm codegen
-```
-
-시맨틱 파일 구조:
-
-```json
-{
-  "color": {
-    "primary":    { "$value": "{blue.600}", "$type": "color" },
-    "on-primary": { "$value": "{neutral.0}", "$type": "color" }
-  }
-}
-```

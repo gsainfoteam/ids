@@ -138,7 +138,7 @@ defineIdsTheme({ primary: blue, secondary: violet, tertiary: '#f59e0b' });
 - 채도 비율은 primary 500 의 채도를 같은 hue·밝기에서 모델이 내는 채도로 나눈 값입니다. 회색에 가까운 primary 면 secondary 와 tertiary 도 회색에 가깝습니다.
 - 만든 계열은 모델 값 그대로입니다. 고정할 색이 없으니 primary 에서 정한 hue 와 채도 비율로 모든 단계를 모델에서 읽습니다.
 - Provider 는 세 계열을 늘 씁니다. 그래서 `colorScheme="secondary"`, `"tertiary"` 와 Chart 의 기본 세 색은 앱이 몇 계열을 주든 서로 다른 색입니다.
-- 거리 검사는 앱이 준 계열만 합니다. 만든 계열이 primary 와 구별되는지는 `tests/theme-colors.test.ts` 가 17개 팔레트에서 확인합니다.
+- 거리 검사는 앱이 준 계열만 합니다. 만든 계열이 primary 와 구별되는지는 `tests/theme-colors.test.ts` 가 스토리의 17개 팔레트에서 확인합니다.
 
 ### neutral
 
@@ -181,16 +181,16 @@ createIdsPalette('#0d9488'); // { 50: '#f0fdfb', …, 600: '#0d9488', …, 950: 
   - 밝기 `L(h)`
   - 채도: 그 밝기와 hue 에서 sRGB 가 낼 수 있는 최대 채도에 대한 비율 `c(h)`
   - hue 회전 `Δh(h)`: 500 의 hue 에서 그 단계 hue 까지의 각도
-- 세 함수는 `packages/core/tokens/palette.json` 의 17색에 맞춘 푸리에 급수입니다. `pnpm codegen` 이 `packages/core/palette-model.js` 로 계수를 구해 `src/tokens/palette-model.ts` 에 씁니다.
-  - OKLab 거리의 가중 최소제곱과 매끄러움 벌점(고조파 k 에 k⁴)으로 맞춥니다.
-  - 고조파 수와 벌점 세기는 한 팔레트씩 빼고 나머지로 맞춘 오차(leave-one-out)가 가장 작은 값입니다. 지금은 밝기 3, 채도 6, hue 회전 5 입니다.
-  - 17색을 다시 만들면 오차는 ΔE_OK×100 으로 평균 1.08, 최대 6.29(green) 입니다. 노랑은 최대 1.67 입니다. green 과 lime 은 hue 가 12° 차이인데 밝기가 많이 달라서, 매끄러운 함수로는 둘 다 맞출 수 없습니다.
-  - 한 팔레트를 빼고 나머지 16색으로 다시 만들면 평균 1.88, 최대 8.58 입니다. 예전처럼 이웃 두 팔레트를 섞으면 평균 1.99, 최대 8.85 였습니다.
+- 세 함수는 푸리에 급수이고, 계수는 `packages/core/palette-model.json` 에 고정되어 있습니다. `pnpm codegen` 이 `src/tokens/palette-model.ts` 로 옮깁니다.
+  - 계수는 데모 팔레트 17색(Tailwind CSS v4 기본값과 비슷한 색)에 OKLab 거리의 가중 최소제곱과 매끄러움 벌점(고조파 k 에 k⁴)으로 맞춘 뒤 고정했습니다. 17색은 레포에서 지웠습니다.
+  - 고조파 수는 밝기 3, 채도 6, hue 회전 5 입니다. 한 팔레트씩 빼고 맞춘 오차(leave-one-out)가 가장 작은 값입니다.
+  - 맞출 때 17색과의 오차는 ΔE_OK×100 으로 평균 1.08, 최대 6.29(green) 였습니다. green 과 lime 은 hue 가 12° 차이인데 밝기가 많이 달라서, 매끄러운 함수로는 둘 다 맞출 수 없습니다.
+  - Storybook `Foundations/Palette` 의 Model 스토리가 hue 한 바퀴와 시드 고정을 보여 줍니다.
 - 고른 색의 채도가 같은 hue·밝기의 모델보다 낮으면, 그 비율만큼 모든 단계의 채도를 줄입니다. 회색을 주면 회색 팔레트입니다.
 - 팔레트의 hue(500 의 hue)는 고른 색의 hue 입니다. 고른 색이 700 에 들어가도 500 을 모델의 hue 회전만큼 되돌리지 않습니다. 상태 hue 범위 검사와 harmonized 회전이 500 의 hue 를 읽기 때문에, 앱이 고른 hue 가 그대로 검사받아야 합니다. 그래서 고른 색이 놓인 단계만 모델의 hue 회전을 따르지 않습니다.
 - OKLCH 로 계산하고 sRGB 밖으로 나간 단계는 채도만 줄입니다. 결과는 8비트 hex 입니다.
 - 만든 팔레트는 단계를 고치지 않습니다. 600 위의 글자가 Lc 75 에 모자라면 역할 규칙이 채움을 이웃 단계로 옮깁니다. 그래서 고른 색도 늘 그대로 남습니다.
-- 패키지에는 17색이 아니라 계수만 들어갑니다. 상태 색의 기준 넷(green, yellow, red, sky)만 값 그대로 같이 나갑니다.
+- 패키지에는 계수만 들어갑니다. 상태 색의 기준 넷(green, yellow, red, sky)만 값 그대로 같이 나갑니다.
 
 ### 배율
 
@@ -239,7 +239,7 @@ test('the app theme passes IDS', () => {
 | 상태 색의 hue 가 그 상태의 범위 밖이다 | `status.X` |
 | 적록 색각(deuteranopia, protanopia)에서 success 나 warning 이 danger 와 비슷하다 (0.07 미만) | `status.success`, `status.warning` |
 
-- 거리 기준은 `palette.json` 의 17색에서 나옵니다. 0.039 는 가장 가까운 두 팔레트(red, rose)의 거리이고, 0.07 은 17색에서 success·warning 과 danger 로 읽히는 짝 중 가장 가까운 짝의 절반입니다. `tests/theme-colors.test.ts` 가 다시 계산합니다.
+- 거리 기준은 예전 데모 팔레트 17색에서 정한 값입니다. 0.039 는 가장 가까운 두 팔레트(red, rose)의 거리이고, 0.07 은 success·warning 과 danger 로 읽히는 짝 중 가장 가까운 짝의 절반입니다. 17색을 지운 뒤로는 값으로 고정되어 있습니다.
 - primary 와 hue 가 같은 상태 색(빨간 primary 와 danger)은 가깝다고 알립니다. 의도한 것이면 `status` 로 다른 색을 줍니다.
 - 개발 모드에서는 Provider 가 같은 목록을 `console.warn` 으로 알립니다. `primary` 가 아예 없으면 `console.error` 입니다.
 - 통과하지 못한 역할은 마지막 후보 단계로 그립니다. 화면은 깨지지 않지만 대비가 모자랍니다.

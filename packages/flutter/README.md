@@ -67,7 +67,7 @@ IdsPalette.steps; // [50, 100, ..., 950]
 ```
 
 - ids-react 의 `createIdsPalette` 와 같은 모델을 쓰고, 같은 시드에서 같은 8비트 색을 낸다.
-- 모델 계수는 `pnpm codegen` 이 `packages/core/tokens/palette.json` 의 17색에 맞춰 `lib/tokens/ids_palette_model.dart` 에 쓴다.
+- 모델 계수는 `packages/core/palette-model.json` 에 고정돼 있고, `pnpm codegen` 이 `lib/tokens/ids_palette_model.dart` 로 옮긴다.
 - 시드 색은 바뀌지 않고, 명도가 가장 가까운 단계에 그대로 들어간다.
 - 시드의 alpha 는 무시한다.
 - 상태 팔레트는 `IdsStatusPalettes.red` `yellow` `green` `sky` 에 있다.

@@ -1,4 +1,16 @@
-import { clampChroma, converter, formatHex, parse } from 'culori/fn';
+import {
+  clampChroma,
+  formatHex,
+  modeHsl,
+  modeLab,
+  modeLch,
+  modeLrgb,
+  modeOklab,
+  modeOklch,
+  modeRgb,
+  parse,
+  useMode as registerMode,
+} from 'culori/fn';
 import { clamp, minBy, range } from 'es-toolkit';
 
 import { PALETTE_STEPS, type IdsPalette } from './theme';
@@ -8,7 +20,18 @@ type Shade = { l: number; c: number; h: number };
 
 type ModelShade = { l: number; gamutShare: number; h: number };
 
-const toOklch = converter('oklch');
+const CSS_COLOR_MODES_A_SEED_MAY_BE_WRITTEN_IN = [
+  modeRgb,
+  modeLrgb,
+  modeHsl,
+  modeLab,
+  modeLch,
+  modeOklab,
+];
+
+for (const mode of CSS_COLOR_MODES_A_SEED_MAY_BE_WRITTEN_IN) registerMode(mode);
+
+const toOklch = registerMode(modeOklch);
 
 const BEYOND_SRGB_CHROMA = 0.5;
 

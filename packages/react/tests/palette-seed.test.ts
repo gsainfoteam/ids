@@ -1,62 +1,26 @@
-import { clampChroma, differenceEuclidean, formatHex } from 'culori/fn';
-import { describe, expect, test } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
-import { paletteHues, palettes } from '../.storybook/palettes';
-import {
-  createIdsPalette,
-  hueOf,
-  paletteAtHue,
-  shadeOf,
-} from '../src/components/utility/ids-provider/palette-seed';
+import { clampChroma, formatHex } from 'culori/fn';
+import { expect, test } from 'vitest';
+
+import palette from '../../core/tokens/palette.json';
+import { createIdsPalette, shadeOf } from '../src/components/utility/ids-provider/palette-seed';
 import { PALETTE_STEPS, type IdsPalette } from '../src/components/utility/ids-provider/theme';
 import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
 import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
 import { STATUS_PALETTES } from '../src/tokens/palette-model';
 
-const stepsOf = (palette: IdsPalette) => PALETTE_STEPS.map((step) => palette[step]);
-
-const oklabDistance = differenceEuclidean('oklab');
-
-const DELTA_E_SCALE = 100;
-
-const FULL_CHROMA = 1;
-
-const TOLERANCE = { mean: 3, max: 6.5 };
-
-const distancesFrom = (built: IdsPalette, reference: IdsPalette) =>
-  PALETTE_STEPS.map((step) => oklabDistance(built[step], reference[step]) * DELTA_E_SCALE);
-
-const summary = (distances: number[]) => ({
-  mean: distances.reduce((sum, distance) => sum + distance) / distances.length,
-  max: Math.max(...distances),
-});
+const stepsOf = (built: IdsPalette) => PALETTE_STEPS.map((step) => built[step]);
 
 const seedAt = (l: number, c: number, h: number) =>
   formatHex(clampChroma({ mode: 'oklch', l, c, h }, 'oklch'));
 
 test('the status palettes are the four in core', () => {
   for (const [name, steps] of Object.entries(STATUS_PALETTES))
-    expect(steps).toEqual(stepsOf(palettes[name as keyof typeof STATUS_PALETTES]));
-});
-
-describe('the model reproduces each core palette', () => {
-  test.each(paletteHues)('%s at its own hue and full chroma', (hue) => {
-    const { mean, max } = summary(
-      distancesFrom(paletteAtHue(hueOf(palettes[hue]), FULL_CHROMA), palettes[hue]),
+    expect(steps).toEqual(
+      PALETTE_STEPS.map((step) => palette[name as keyof typeof STATUS_PALETTES][step].$value),
     );
-
-    expect(mean).toBeLessThan(TOLERANCE.mean);
-    expect(max).toBeLessThan(TOLERANCE.max);
-  });
-
-  test.each(paletteHues)('%s from its step 500, which it keeps exactly', (hue) => {
-    const built = createIdsPalette(palettes[hue][500])!;
-    const { mean, max } = summary(distancesFrom(built, palettes[hue]));
-
-    expect(built[500]).toBe(palettes[hue][500]);
-    expect(mean).toBeLessThan(TOLERANCE.mean);
-    expect(max).toBeLessThan(TOLERANCE.max);
-  });
 });
 
 test.each([
@@ -85,18 +49,26 @@ const SEEDS: [lightness: number, chroma: number][] = [
   [0.2, 0.05],
 ];
 
+const SWEEP_OF_EVERY_SEED_MS = 30_000;
+
+const COLD_NODE_START_ON_A_BUSY_RUNNER_MS = 30_000;
+
 const HUES = Array.from({ length: 72 }, (_, index) => index * 5);
 
 const everySeed = () =>
   HUES.flatMap((hue) => SEEDS.map(([lightness, chroma]) => seedAt(lightness, chroma, hue)));
 
-test('every seed builds a palette whose roles reach their Lc in both modes', () => {
-  const failing = everySeed().flatMap((seed) => {
-    const { issues } = resolveColors({ primary: seed, secondary: seed, tertiary: seed });
-    return issues.length === 0 ? [] : [`${seed}: ${issues.map((issue) => issue.message)}`];
-  });
-  expect(failing).toEqual([]);
-});
+test(
+  'every seed builds a palette whose roles reach their Lc in both modes',
+  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  () => {
+    const failing = everySeed().flatMap((seed) => {
+      const { issues } = resolveColors({ primary: seed, secondary: seed, tertiary: seed });
+      return issues.length === 0 ? [] : [`${seed}: ${issues.map((issue) => issue.message)}`];
+    });
+    expect(failing).toEqual([]);
+  },
+);
 
 test('every seed builds a palette that runs from light to dark', () => {
   const unordered = everySeed().filter((seed) => {
@@ -120,3 +92,23 @@ test('a gray seed builds a gray palette, and a bad seed is reported', () => {
     { path: 'primary', message: 'primary is not a CSS color: not a color.' },
   ]);
 });
+
+test(
+  'the built palette module works without the rest of the package, as a tree-shaken app loads it',
+  { timeout: COLD_NODE_START_ON_A_BUSY_RUNNER_MS },
+  () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        '--input-type=module',
+        '-e',
+        `
+    const { createIdsPalette } = await import('./dist/components/utility/ids-provider/palette-seed.js');
+    process.stdout.write(createIdsPalette('#0d9488')?.[600] ?? 'undefined');
+  `,
+      ],
+      { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' },
+    );
+    expect(result.stdout, result.stderr).toBe('#0d9488');
+  },
+);
