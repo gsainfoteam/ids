@@ -2,86 +2,173 @@
 
 IDS Flutter 컴포넌트 라이브러리. [pub.dev](https://pub.dev/packages/ids_flutter)에서 배포한다.
 
-## 시작하기
+- 테마는 ids-react 와 같다. 같은 `IdsTheme` 이면 두 플랫폼이 같은 8비트 색, 같은 radius, 같은 글자 스타일을 낸다.
+- 색은 앱이 준다. IDS 에는 브랜드 색이 없고, 앱의 팔레트에서 역할 색을 대비(APCA)로 고른다.
+- 글꼴은 고정이다. 본문은 Pretendard GOV(패키지에 포함), 고정폭은 Geist Mono 다.
 
-서비스가 테마와 브랜드 팔레트를 Dart 코드로 만든다. 앱에 설정 파일이나 Node 코드 생성은 필요 없다. 아래 코드를 서비스의 `ids_theme.dart`에 둘 수 있다.
+## 시작하기
 
 ```dart
 import 'package:flutter/painting.dart';
 import 'package:ids_flutter/ids.dart';
 
-const appTheme = IdsThemeData();
-
-const brandPalette = IdsPalette(
-  shade50: Color(0xffeff6ff),
-  shade100: Color(0xffdbeafe),
-  shade200: Color(0xffbedbff),
-  shade300: Color(0xff8ec5ff),
-  shade400: Color(0xff51a2ff),
-  shade500: Color(0xff2b7fff),
-  shade600: Color(0xff155dfc),
-  shade700: Color(0xff1447e6),
-  shade800: Color(0xff193cb8),
-  shade900: Color(0xff1c398e),
-  shade950: Color(0xff162456),
+const appTheme = IdsTheme(
+  primary: IdsThemeColor.seed(Color(0xFF155DFC)),
 );
 ```
 
 ```dart
 IdsProvider(
   theme: appTheme,
-  palette: brandPalette,
   mode: IdsMode.system,
   child: const MyApp(),
 )
 ```
 
-Provider는 IDS 컴포넌트의 설정만 제공한다. 일반 Text·Icon, Material/Cupertino 테마와 Localizations를 바꾸지 않는다. IDS 컴포넌트는 내부의 `DefaultTextStyle` 등으로 글꼴과 색을 적용한다. 서비스 화면의 배경이나 글자를 IDS로 맞추려면 `IdsProvider.of(context).theme`에서 명시적으로 꺼내 쓴다.
+- 테마는 Dart 코드로 만든다. 설정 파일이나 Node 코드 생성은 필요 없다.
+- Provider 는 IDS 컴포넌트에만 스타일을 준다. Material, Cupertino 테마, 일반 `Text`, `Icon`, `Localizations` 는 바꾸지 않는다.
+
+## IdsTheme
+
+| 필드          | 값                                                      | 기본                 |
+| ------------- | ------------------------------------------------------- | -------------------- |
+| `primary`     | `IdsPalette` 또는 `IdsThemeColor.seed(color)`           | 필수                 |
+| `secondary`   | 같음                                                    | primary 에서 만든다  |
+| `tertiary`    | 같음                                                    | primary 에서 만든다  |
+| `neutral`     | `IdsNeutral.pure`, `IdsNeutral.tinted`                  | `pure`               |
+| `status`      | `IdsStatus.harmonized`, `IdsStatus.fixed`, `IdsStatusColors(...)` | `harmonized` |
+| `radius`      | 0 – 18                                                  | 10                   |
+| `cornerShape` | `IdsCornerShape.round`, `IdsCornerShape.squircle`       | `round`              |
+| `scale`       | 0.5 – 2. 글자 크기, `dimension`, radius 에 곱한다       | 1                    |
+
+```dart
+// 색 하나: hue 와 채도 비율만 읽고 11단계를 만든다
+const IdsThemeColor.seed(Color(0xFF155DFC));
+
+// 정확한 브랜드 색이 필요하면 11단계(50 – 950)를 직접 준다
+final brand = IdsPalette(const [
+  Color(0xFFEFF6FF), Color(0xFFDBEAFE), Color(0xFFBEDBFF), Color(0xFF8EC5FF),
+  Color(0xFF51A2FF), Color(0xFF2B7FFF), Color(0xFF155DFC), Color(0xFF1447E6),
+  Color(0xFF193CB8), Color(0xFF1C398E), Color(0xFF162456),
+]);
+
+final theme = IdsTheme(
+  primary: brand,
+  neutral: IdsNeutral.tinted,          // neutral 에 primary hue 를 옅게
+  status: IdsStatus.fixed,             // 상태 색을 primary 쪽으로 돌리지 않는다
+  radius: 12,
+  cornerShape: IdsCornerShape.squircle,
+);
+```
+
+- `secondary` 를 빼면 primary 의 hue 에 채도 1/3, `tertiary` 를 빼면 hue 를 +60° (상태 색과 겹치면 −60°) 돌린다.
+- `harmonized` 는 상태 hue 를 primary 쪽으로 최대 15° 돌린다. `IdsStatusColors(danger: ...)` 로 일부만 고를 수 있다.
+- `IdsPalette.fromSeed(color)` 는 seed 로 만든 팔레트를 직접 읽을 때 쓴다.
+- 입력 색은 불투명 sRGB 로 맞춘다. 알파와 Display P3 는 버린다.
+
+## 테마 검사
+
+```dart
+for (final issue in checkIdsTheme(appTheme)) {
+  print('${issue.path}: ${issue.message}');
+}
+```
+
+- 범위를 벗어난 `radius`, `scale`, 대비를 맞출 단계가 없는 팔레트를 보고한다.
+- 브랜드 계열끼리, 브랜드와 상태 색이 너무 가까운 경우와 적록 색약에서 success, warning 이 danger 와 겹치는 경우도 보고한다.
+- 개발 빌드에서 Provider 가 같은 문제를 `debugPrint('[IDS] ...')` 로 한 번 알린다.
 
 ## IdsProvider
 
-| 인자 | 의미 |
-|---|---|
-| `theme` | `IdsThemeData`. 바깥에서 필수, 안쪽에서 생략하면 부모 테마 상속 |
-| `palette` | controlled `IdsPalette`. setter는 콜백만 호출하고 새 인자를 기다림 |
-| `defaultPalette` | uncontrolled 초기 팔레트. setter가 내부 상태 변경 |
-| `onPaletteChange` | 팔레트 변경 요청 알림 |
-| `mode` / `defaultMode` | controlled 모드 / uncontrolled 초기 모드 |
-| `onModeChange` | 모드 변경 요청 알림 |
-| `locale` | 날짜·숫자용 로케일. 바깥 기본값 `Locale('ko', 'KR')` |
-| `translation` | slang이 생성한 `IdsMessages` 객체. 생략하면 부모 객체 상속 |
-
-바깥 Provider는 `theme`와 `palette` 또는 `defaultPalette`가 필요하다. 같은 축의 controlled 인자와 default 인자를 동시에 주지 않는다. 바깥 모드 기본값은 `IdsMode.light`다. `IdsMode.system`은 시스템 밝기 변경을 따른다. 모드 변경 시 현재 시스템 밝기를 저장하는 대신 `mode`와 `resolvedMode`를 구분한다.
+| 인자                  | 의미                                                          |
+| --------------------- | ------------------------------------------------------------- |
+| `theme`               | `IdsTheme`. 가장 바깥 Provider 에서 필수                       |
+| `mode`                | controlled 모드. 바꾸기 요청은 `onModeChange` 만 부른다        |
+| `defaultMode`         | uncontrolled 초기 모드. 바깥 기본값 `IdsMode.light`            |
+| `onModeChange`        | 모드 변경 요청 알림                                           |
+| `locale`              | 날짜, 숫자용 로케일. 바깥 기본값 `Locale('ko', 'KR')`          |
+| `translation`         | slang 이 만든 `IdsMessages` 객체                              |
 
 ```dart
 final ids = IdsProvider.of(context);
-final theme = ids.theme;
 
-ids.setColor(otherPalette);
 ids.setMode(IdsMode.system);
-ids.toggleMode();
+ids.toggleMode();         // 지금 보이는 모드의 반대를 고른다
+ids.mode;                 // 고른 모드 (system 일 수 있다)
+ids.resolvedMode;         // 실제 그리는 light 또는 dark
 ```
 
-`toggleMode`는 현재 보이는 모드의 반대를 명시적으로 선택한다. default 인자는 초기화에만 쓰이며 부모가 다시 그려져도 로컬 선택을 초기화하지 않는다. 값이 같은 변경 요청은 콜백을 호출하지 않는다. 팔레트 동등성은 객체 동등성을 따른다.
+- `IdsMode.system` 은 플랫폼 밝기를 따른다.
+- `defaultMode` 는 처음 한 번만 읽는다. 부모가 다시 그려도 로컬 선택을 되돌리지 않는다.
+- 같은 값으로 바꾸기를 요청하면 콜백을 부르지 않는다.
 
-안쪽 Provider는 축별로 생략한 설정과 setter를 가장 가까운 소유자에게 위임한다. 예를 들어 테마만 바꾼 안쪽 Provider에서 `setColor`를 호출하면 부모의 팔레트를 바꾼다. 안쪽에서 `defaultPalette`를 지정하면 팔레트 상태는 그 하위 범위에만 속한다. theme 인자는 전체 테마 객체 교체이며 부분 병합은 하지 않는다.
+## IdsProviderScope
+
+하위 트리에서 테마 일부를 바꾼다. React 의 `IdsProvider.Scope` 다.
 
 ```dart
-IdsProvider(
-  theme: const IdsThemeData(radius: 12),
+IdsProviderScope(
+  theme: const IdsThemeOverrides(primary: IdsThemeColor.seed(Color(0xFF9810FA))),
+  child: child,
+)
+
+IdsProviderScope(
+  defaultMode: IdsMode.dark,   // 이 범위만 따로 모드를 가진다
   child: child,
 )
 ```
 
-`locale`과 `translation`은 독립적으로 상속한다. locale만 영어로 바꿔도 영어 문구를 자동 선택하지 않는다. 안쪽에서 한국어로 고정하려면 `translation: IdsMessages.ko`를 준다. 부분 번역 객체가 들어오면 해당 객체의 null 멤버는 한국어로 fallback하며, 부모 객체와 멤버별 병합하지 않는다.
+- 준 필드만 부모 테마에 덮는다. 나머지는 부모를 따른다.
+- `mode` 나 `defaultMode` 를 주지 않은 scope 의 `setMode`, `toggleMode` 는 모드를 가진 조상을 바꾼다.
+- `locale` 과 `translation` 은 따로 상속한다. locale 만 영어로 바꿔도 영어 문구를 고르지 않는다.
+
+## 색 역할
+
+```dart
+final colors = IdsProvider.of(context).colors;
+
+Container(
+  color: colors.bgPrimarySoft,
+  child: Text('저장됨', style: TextStyle(color: colors.textOnPrimarySoft)),
+);
+```
+
+- 계열 8개(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`) × 역할 10개에 바탕 층 `surface`, `onSurface` 다.
+- 역할: `bgX`, `bgXHover`, `bgXActive`, `bgXSoft`, `bgXSoftHover`, `bgXSoftActive`, `textOnX`, `textOnXSoft`, `textX`, `borderX`.
+- 이름은 CSS 의 `--ids-color-bg-primary-soft` 를 camelCase 로 바꾼 것이다. `colors['bg-primary-soft']` 로도 읽는다.
+- 채움(`bgX`)에는 `textOnX`, soft 면(`bgXSoft`)에는 `textOnXSoft`, 채움 없는 글자와 아이콘에는 `textX` 를 쓴다.
+- 구조선(필드 테두리, 구분선)은 `borderNeutral`, 보조 글자는 `textNeutral` 이다.
+
+## radius 와 글자
+
+```dart
+final ids = IdsProvider.of(context);
+
+DecoratedBox(
+  decoration: ShapeDecoration(
+    color: ids.colors.surface,
+    shape: ids.shape(radius: ids.radius.container),
+  ),
+  child: Text(
+    '제목',
+    style: ids.textStyle(IdsTypography.bodyB3Medium, color: ids.colors.onSurface),
+  ),
+);
+```
+
+- `ids.radius` 는 `standard`(theme radius), `indicator`(×0.4), `container`(×1.6), `full` 이다. squircle 이면 그린 반지름이 1.84배다.
+- `ids.shape()` 는 round 면 `RoundedRectangleBorder`, squircle 이면 `RoundedSuperellipseBorder` 다.
+- 글자 스타일 이름은 CSS 와 같다. `text-body-b3-medium` 은 `IdsTypography.bodyB3Medium` 이다.
+- `textStyle(..., mono: true)` 는 Geist Mono 로 그린다. Geist Mono 는 아직 패키지에 들어 있지 않아 기기에 없으면 SF Mono, Menlo 순으로 대체한다.
+- `textStyle` 은 `inherit: false` 스타일을 돌려준다. 색은 `color` 로 준다.
 
 ## IDS 문구와 slang
 
-IDS 문구의 원본은 `packages/core/messages/ko.json`과 `en.json`이다. IDS 저장소에서 `pnpm codegen`을 실행하면 한국어 Dart 기본 객체와 slang용 `messages/ko.i18n.json`을 생성한다. 배포 패키지는 생성 결과를 포함하므로 서비스가 IDS용 Node 생성기를 실행하지 않는다.
+- IDS 문구의 원본은 `packages/core/messages/ko.json` 과 `en.json` 이다. `pnpm codegen` 이 Dart 기본 객체 `IdsMessages.ko` 와 slang 용 `messages/ko.i18n.json` 을 만든다.
+- `IdsMessages` 는 모든 멤버가 nullable 인 mixin 이다. `dialog.close` 는 `dialogClose`, `chipField.remove` 는 `chipFieldRemove(label: ...)` 가 된다.
+- 빠진 멤버는 컴포넌트가 `t?.dialogClose ?? IdsMessages.ko.dialogClose` 로 한국어를 고른다.
 
-`IdsMessages`는 모든 멤버가 nullable인 mixin이다. `IdsMessages.ko`는 모든 멤버가 non-null인 기본 객체다. 예를 들어 `dialog.close`는 `dialogClose`, `chipField.remove`는 `chipFieldRemove(label: ...)`가 된다. 인자 타입은 slang 기본값과 같은 `Object`이며, 한국어 기본값은 숫자에 한국어 자릿수 구분을 적용한다.
-
-서비스는 slang 4.19.2 이상을 사용하고, 기존 `slang.yaml`에 다음 설정을 합친다.
+서비스는 slang 4.19.2 이상을 쓰고 `slang.yaml` 에 다음을 합친다.
 
 ```yaml
 string_interpolation: braces
@@ -91,8 +178,6 @@ interfaces:
   IdsMessages:
     generate_mixin: false
 ```
-
-기존 interpolation이 `dart`라면 설정을 유지하고 아래 `{label}`을 `$label`로 쓴다. JSON을 서비스 카탈로그에 합칠 때 IDS 하위 키 이름을 유지한다.
 
 ```json
 {
@@ -104,51 +189,28 @@ interfaces:
 }
 ```
 
-서비스의 기존 `dart run slang`으로 생성한 `t.ids`는 `IdsMessages`로 바로 사용할 수 있다. switch나 번역 함수 어댑터는 필요 없다. 전체 기본 문구가 필요하면 패키지의 `messages/ko.i18n.json`을 사용한다. 객체에서 생략된 IDS 멤버는 null이며, 컴포넌트가 `t?.dialogClose ?? IdsMessages.ko.dialogClose`로 한국어를 선택한다. slang 자체의 언어 fallback은 먼저 적용되므로, slang이 문자열을 돌려주면 IDS는 그 값을 사용한다. 빈 문자열도 유효한 번역이다.
-
-IDS 자체 번역 테스트는 아래 순서로 실행한다. `slang`은 IDS의 개발 의존성이고 런타임 의존성이 아니다.
-
-```bash
-flutter pub get
-dart run slang
-flutter test
-```
-
-서비스의 slang `TranslationProvider` 아래에서 생성 객체를 넘긴다. 언어를 바꿀 때 이 위젯도 재빌드되어 새 객체를 전달해야 한다.
-
 ```dart
 final t = Translations.of(context);
 
 return IdsProvider(
   theme: appTheme,
-  palette: brandPalette,
   translation: t.ids,
   locale: LocaleSettings.currentLocale.flutterLocale,
   child: child,
 );
 ```
 
-번역은 IDS 자체 문구에만 적용한다. 서비스가 전달하는 Label의 child나 명시적 `semanticLabel`은 바꾸지 않는다. 현재 기본 문구를 가진 Flutter 컴포넌트는 Spinner이며, 우선순위는 명시적 semanticLabel → translation.spinnerLabel → IdsMessages.ko.spinnerLabel이다. decorative Spinner는 안내하지 않는다.
+- 기존 interpolation 이 `dart` 이면 `{label}` 을 `$label` 로 쓴다.
+- 번역은 IDS 자체 문구에만 쓴다. Label 의 child 나 명시한 `semanticLabel` 은 바꾸지 않는다.
 
-## 런타임 테마 데이터
+## 이전 API 에서 옮기기
 
-`IdsPalette`는 `shade50`, `shade100`, …, `shade900`, `shade950`의 11개 opaque sRGB 색을 필수로 받는다. 역할 색은 IDS-19의 대비 규칙으로 선택한다. `palette.check()`는 두 모드의 문제 목록을 반환한다. 통과하는 역할 색이 없으면 `resolve`가 오류를 낸다.
-
-`setColor()`는 모든 빌드 모드에서 변경할 팔레트를 검증한다. 문제가 있으면 상태 변경과 `onPaletteChange` 호출 전에 `ArgumentError`를 던진다.
-
-`IdsThemeData(radius: 12, fontFamily: 'App Sans', cornerShape: IdsCornerShape.squircle)`로 외형을 지정한다. 기본 radius는 10이고 indicator는 ×0.4, container는 ×1.6이다. 기본 sans는 패키지의 Pretendard GOV Variable이며 `fontPackage`로 다른 패키지 글꼴도 지정할 수 있다. `monoFontFamily`와 `monoFontPackage`는 고정폭 글꼴에 사용한다. `theme.check()`는 잘못된 radius와 빈 글꼴 이름을 보고한다.
-
-`theme.shape()`는 round일 때 `RoundedRectangleBorder`, squircle일 때 `ContinuousRectangleBorder`를 반환한다. 반경은 기본적으로 `theme.radius.standard`이며, 호출할 때 다른 반경을 지정할 수 있다. Provider는 컨테이너의 여백과 자식 구조를 읽지 않는다. 중첩 여백으로 바깥 반경을 구하는 동심 모서리는 컨테이너·레이아웃 계층의 범위이며 이 API에 포함하지 않는다.
-
-`theme.textStyle`은 IDS 글자 스타일에 서비스 글꼴을 적용한다. 반환한 스타일은 상위 글꼴 패키지를 다시 상속하지 않는다. 사용할 전경색은 `color`로 전달한다. scale의 범위 및 글자·radius 확대 정책은 IDS-24에서 미정이므로 공개 scale 인자는 아직 없다. `theme.dimension(value)`는 현재 값을 그대로 반환한다.
-
-## 기존 API에서 이동
-
-- `ThemeProvider`를 `IdsProvider`로 바꾼다. 기존 이름의 별칭은 없다.
-- `color: IdsColor.blue` 대신 서비스가 작성한 `palette`와 `theme`를 전달한다. 내부 변경이 필요하면 `defaultPalette`를 쓴다.
-- 기존 `ThemeProvider.of(context)`의 테마 값은 `IdsProvider.of(context).theme`로 읽는다.
-- Flutter의 `IdsColor`와 내장 브랜드 색상표는 제거했다. neutral과 status 색은 core에서 계속 생성한다. `IdsTokens.resolve`는 브랜드를 받지 않고 `brightness`와 고정 semantic token을 받는다.
-- 일반 Text와 Icon에 Provider 스타일이 자동 적용되지 않는다. IDS 바깥의 스타일은 서비스가 지정한다.
+- `IdsThemeData` 와 `palette:` 는 `IdsTheme` 하나로 합쳤다. `IdsProvider(theme: IdsTheme(primary: ...))` 로 쓴다.
+- `setColor`, `defaultPalette`, `onPaletteChange` 는 없다. 색을 바꾸려면 앱이 새 `IdsTheme` 을 넘기거나 `IdsProviderScope` 로 덮는다.
+- 안쪽 `IdsProvider(theme: ...)` 는 `IdsProviderScope(theme: IdsThemeOverrides(...))` 로 바꾼다.
+- `theme.primary`, `onPrimary`, `secondary`, `onSecondary`, `accent`, `outline`, `muted` 같은 이전 역할은 `colors` 의 역할로 바꾼다. 예: `secondary` → `bgPrimarySoft`, `outline` → `borderNeutral`, `muted` → `bgNeutralSoft`.
+- `fontFamily`, `monoFontFamily` 는 없다. 글꼴은 고정이다.
+- `IdsTypography.buttonStandard`, `buttonTiny` 는 `bodyB3Medium`, `captionC1Medium` 이다.
 
 ## 개발과 Widgetbook
 
@@ -157,18 +219,16 @@ pnpm codegen
 cd packages/flutter
 flutter pub get
 dart run slang
+flutter analyze
+flutter test
 cd example
 dart run slang
 flutter test
-cd ..
-flutter analyze
-flutter test
 ```
 
-Widgetbook: `packages/flutter/example`에서 `flutter run`으로 사용 가능한 iOS 기기를 선택한다. 현재 예제에는 웹 플랫폼 설정이 없다. IdsProvider의 `Runtime theme and slang`은 파란색·보라색 팔레트, 색상 역할, radius, 모서리, 모드, slang 번역과 누락 문구의 한국어 fallback을 보여준다. locale은 번역과 별도로 변경한다. `Nested scopes`에서 부모·상속 자식·독립 자식·형제의 팔레트 변경 범위를 비교할 수 있다.
-
-`Service integration`은 실제 slang `TranslationProvider`와 `LocaleSettings`를 사용한다. 화면 안의 버튼으로 테마와 언어를 바꾸며 자식 카운터가 유지되는지 확인한다. 글꼴은 IDS 기본 글꼴, 앱 자산, Widgetbook 패키지 자산 사이에서 전환한다. CI는 패키지 테스트와 이 예제의 테스트를 모두 실행한다.
-
-글꼴 비교의 Helvetica·Times·Courier는 macOS 시스템 글꼴이다. 다른 플랫폼에서는 해당 글꼴이 없으면 시스템 fallback을 사용한다. `Text scale (MediaQuery)`는 예제에 접근성 배율을 주입한다. IDS의 scale API가 아니며, `System`은 플랫폼이 제공한 배율을 유지한다. 생성 fixture와 예제의 slang Dart 파일은 커밋하지 않으며, CI에서 위와 같은 순서로 생성한다.
-
-배율 정책과 intl/gen_l10n 객체의 직접 연동은 이번 구현에 포함하지 않는다.
+- Widgetbook 은 `packages/flutter/example` 에서 `flutter run` 으로 연다.
+- `Runtime theme and slang`: primary, neutral, status, radius, 모서리, 모드, 번역, 글자 배율을 바꾸며 계열마다 fill, soft, text, border 역할을 본다.
+- `Nested scopes`: 부모, 모드를 물려받는 scope, 색과 모드를 따로 가진 scope 의 범위를 비교한다.
+- `Service integration`: 실제 slang `TranslationProvider` 아래에서 테마와 언어를 바꿔도 자식 상태가 남는지 본다.
+- slang 이 만든 Dart 파일은 커밋하지 않는다. CI 가 위 순서로 만든다.
+- `test/theme_roles_parity_test.dart` 는 ids-react 가 쓴 `packages/core/tests/fixtures/theme-roles.json` 과 모든 역할을 비교한다.

@@ -9,8 +9,8 @@
 | 출력 파일 | 설명 |
 |---|---|
 | `packages/css/dist/ids.css` | CSS 변수 + Tailwind `@theme` |
-| `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등). `IdsColor` 는 Dart 에만 나간다 |
-| `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스 |
+| `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등) |
+| `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스. `ids_color_roles.dart` 는 `color-roles.json` 에서 `IdsColors` 와 계열·역할 목록을 만든다 |
 | `packages/react/src/tokens/palette-model.ts` | 17색에 맞춘 팔레트 모델의 계수와 상태 색의 기준 넷. `palette-model.js` 가 쓴다 |
 | `packages/flutter/lib/tokens/ids_palette_model.dart` | 같은 계수와 상태 색 넷의 Dart 판. `palette-model.js` 가 쓴다 |
 
@@ -22,17 +22,15 @@ tokens/
   spacing.json          # 간격 원시값 (xs, sm, md, ...)
   typography.json       # 폰트 패밀리·사이즈·웨이트·행간 원시값
   motion.json           # 애니메이션 지속시간 원시값
-  enums.json            # IdsColor(Dart 전용)·IdsMode·IdsSize·IdsVariant 열거값
+  enums.json            # IdsMode·IdsSize·IdsVariant 열거값. color 는 데모 hue 이름 목록(스토리 전용)이라 어디에도 나가지 않는다
   semantic/
-    neutral.{light,dark}.json  # 중립 계열과 바탕 층의 단계. CSS fallback 과 tokens/color-roles.ts 로 나간다
-    status.{light,dark}.json   # 상태 색(예전 이름). Dart 생성에만 쓴다
-    [color].light.json  # hue 별 역할 색(예전 이름). Dart 생성에만 쓴다 (Flutter 가 런타임 팔레트로 옮기면 지운다)
-    [color].dark.json
-    typography.json     # 텍스트 스타일. text 는 CSS 와 Dart, flutter-only(버튼)는 Dart 생성에만 쓴다
-color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지와 React 의 tokens/color-roles.ts 를 만든다
+    neutral.{light,dark}.json  # 중립 계열과 바탕 층의 단계. CSS fallback, tokens/color-roles.ts, Dart 의 neutralSteps 로 나간다
+    typography.json     # 텍스트 스타일. CSS 와 Dart 가 같은 이름으로 받는다
+color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지, React 의 tokens/color-roles.ts, Dart 의 IdsColors 를 만든다
+tests/fixtures/theme-roles.json  # ids-react 가 쓴 17색 × 조합별 역할 색. Flutter 테스트가 같은 값을 내는지 비교한다
 ```
 
-시맨틱 색상 파일에서 `{blue.600}` 형태로 팔레트를 참조한다.
+hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에서 런타임에 고른다.
 
 ## 색 역할 표
 
@@ -49,7 +47,7 @@ color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지와 R
 - 역할 변수는 `--ids-color-{bg|text|border}-{이름}` 이다. 바탕 층(`surface`, `on-surface`)만 앞머리가 없다.
 - Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-soft` 는 있고 `--color-primary` 나 `--background-color-on-primary` 는 없다.
 - `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다. 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다). neutral 과 바탕 층은 없으면 `neutral.*.json` 의 단계를 읽는다.
-- Dart 포매터는 이 표를 읽지 않는다. `packages/flutter/lib/tokens` 는 예전 이름 그대로 나오고, CI 가 바뀌지 않았는지 확인한다. `ids_palette_model.dart` 는 이 확인에서 빠진다.
+- Dart 포매터도 이 표를 읽는다. `--ids-color-bg-primary-soft` 는 `IdsColors.bgPrimarySoft` 가 되고, `colors['bg-primary-soft']` 로도 읽는다.
 
 ## 팔레트 모델
 
@@ -75,27 +73,12 @@ pnpm build
 
 ## 새 데모 팔레트 추가
 
+- `tokens/palette.json` 에 11단계를 넣고 `pnpm codegen` 을 돌린다. 팔레트 모델이 새 색까지 맞춰 다시 나온다.
+- fixture 를 다시 쓴다. Flutter 의 parity 테스트가 새 색도 비교한다.
+
 ```bash
-# 1. 팔레트 값 추가
-#    tokens/palette.json
-
-# 2. 시맨틱 파일 추가
-#    tokens/semantic/[color].light.json
-#    tokens/semantic/[color].dark.json
-
-# 3. codegen
 pnpm codegen
-```
-
-시맨틱 파일 구조:
-
-```json
-{
-  "color": {
-    "primary":    { "$value": "{blue.600}", "$type": "color" },
-    "on-primary": { "$value": "{neutral.0}", "$type": "color" }
-  }
-}
+pnpm --filter @gsainfoteam/ids-react exec vitest run --project node tests/flutter-parity.test.ts -u
 ```
 
 ## 문구 카탈로그

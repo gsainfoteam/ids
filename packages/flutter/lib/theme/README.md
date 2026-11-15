@@ -1,13 +1,34 @@
-# IDS theme
+# theme
 
-`IdsPalette` takes eleven opaque sRGB shades from the app. There is no built-in brand palette. `resolve` selects roles by the IDS-19 contrast rules. `check()` reports invalid colors and roles for both brightness modes.
+IdsProvider 와 그 테마 객체입니다. 앱이 넘긴 `IdsTheme` 을 색 역할, radius, 글자 스타일로 풀어 IDS 컴포넌트에 내려줍니다.
 
-`palette_contrast.dart` keeps the Oklab conversion local because Flutter has no Oklab color interpolation API. Its matrices match Culori 4's `convertLrgbToOklab` and `convertOklabToLrgb`, used by React's contrast tests. Hover and press backgrounds mix 6% and 12% toward primary in Oklab, not sRGB. Changing the interpolation changes which shade passes contrast. The palette tests compare the historical 102 foreground roles and independently check tint contrast with Culori-generated data.
+- 설계는 ids-react 의 [IdsProvider](../../../react/src/components/utility/ids-provider/README.md) 를 따릅니다. 규칙을 바꿀 때는 React 를 먼저 바꾸고 이쪽을 맞춥니다.
+- 색을 고르는 계산은 [`lib/src/color`](../src/color/README.md) 에 있습니다. 이 폴더는 입력을 받고, 결과를 캐시하고, 위젯 트리로 내려주는 일만 합니다.
 
-`IdsThemeData` configures radius, sans and mono font families, and round or squircle corners. `textStyle` replaces the token's bundled font inside an IDS component. It does not change Material or Cupertino themes. `dimension` currently preserves logical pixels; scale policy is pending in IDS-24. There is no public scale setting, font-size scaling, radius scaling, or invented scale range. Components route their dimensions through this method so a later policy has one entry point. System text scaling stays in Flutter's text layout.
+## 모듈 목록
 
-`IdsProvider` owns uncontrolled values and delegates inherited setters to the nearest provider that owns that axis. Controlled setters only report the requested value. Defaults initialize once. `IdsScope` stores the requested mode, resolved theme, formatting locale and translation object. Locale does not choose a translation. Replacing the translation object notifies IDS dependents; mutating one in place is not supported.
+| 모듈                       | 내용                                                                                  | 쓰는 곳                                  |
+| -------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `ids_palette.dart`         | `IdsThemeColor`(팔레트 또는 `seed`), 11단계 `IdsPalette`, `IdsPalette.fromSeed`         | 앱, `ids_theme.dart`, `src/color`        |
+| `ids_theme.dart`           | `IdsTheme`, `IdsThemeOverrides`, `IdsNeutral`, `IdsStatus`, `IdsCornerShape`, `IdsThemeIssue` | 앱, `ids_provider.dart`                  |
+| `ids_resolved_theme.dart`  | `IdsResolvedTheme`(색, radius, `textStyle`, `dimension`, `shape`), `IdsRadius`, `checkIdsTheme` | `ids_provider.dart`, `ids_scope.dart`, 테스트 |
+| `ids_provider.dart`        | `IdsProvider`, `IdsProviderScope`. 모드 소유, 테마 병합, 캐시, 개발 경고               | 앱                                       |
+| `ids_scope.dart`           | `InheritedWidget`. `IdsProvider.of(context)` 가 돌려주는 값                           | 모든 IDS 컴포넌트                        |
 
-`IdsTheme` combines runtime palette roles with generated neutral and status colors. The provider caches this resolved object until its data, palette or resolved mode changes. It inserts no global text, icon or Material theme wrappers. Component defaults therefore stay inside IDS.
+## ids_resolved_theme.dart
 
-`textStyle` constructs a new TextStyle from the token's metrics and paint properties: Flutter's copyWith retains a bundled font package when its package argument is null, incorrectly looking up an app font inside ids_flutter. The resolved style has `inherit: false` because Text otherwise merges it with the ancestor's bundled font and restores that package. Supply the desired color when resolving a style. Provider widget tests inspect the final RichText style for default, service and external-package fonts in both sans and mono roles.
+- 색은 테마의 색 필드(primary, secondary, tertiary, neutral, status)를 키로 `resolveColors` 결과를 32개까지 캐시합니다. light 와 dark 는 한 번에 풀립니다.
+- `IdsRadius.of` 는 React 의 `--ids-theme-radius-*` 계산과 같습니다. `indicator` 는 ×0.4, `container` 는 ×1.6, squircle 은 그린 반지름에 1.84 를 곱합니다. 이 값을 바꾸면 두 플랫폼의 모서리가 달라집니다.
+- `textStyle` 은 토큰에서 새 `TextStyle` 을 만들고 `inherit: false` 를 둡니다.
+  - `copyWith` 는 `package: null` 일 때 원래 패키지를 남기므로 앱 글꼴을 ids_flutter 안에서 찾습니다.
+  - `inherit: true` 이면 `Text` 가 조상의 글꼴 패키지를 다시 합칩니다.
+- `scale` 은 `textStyle` 의 글자 크기, `dimension`, radius 에 곱합니다. 시스템 글자 배율은 Flutter 가 따로 적용합니다.
+
+## ids_provider.dart
+
+- 가장 바깥 `IdsProvider` 는 `theme.primary` 가 있어야 합니다. 없으면 `FlutterError` 를 던집니다.
+- `IdsProviderScope` 는 부모 테마에 자기 `IdsThemeOverrides` 를 덮습니다(`merge`). 풀린 색은 병합한 테마로 캐시하므로 radius 만 바꾼 scope 는 부모와 같은 색을 다시 계산하지 않습니다. 색 필드를 쓴 scope 만 색 경고를 냅니다.
+- `mode` 나 `defaultMode` 를 가진 provider 가 모드를 소유합니다. 나머지는 `setMode`, `toggleMode` 를 소유한 조상에게 넘깁니다. `IdsMode.system` 은 플랫폼 밝기를 구독합니다.
+- 개발 빌드에서 자기 테마의 문제(`checkIdsTheme`)를 `debugPrint('[IDS] ...')` 로 한 번 알립니다.
+- `locale` 은 날짜와 숫자 형식에만 씁니다. 번역은 `translation` 객체가 정하고, 객체를 바꾸면 의존 위젯이 다시 그려집니다. 같은 객체를 고쳐 쓰는 것은 지원하지 않습니다.
+- Material, Cupertino 테마나 전역 `DefaultTextStyle` 을 넣지 않습니다. IDS 스타일은 IDS 컴포넌트 안에만 머뭅니다.
