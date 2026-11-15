@@ -1,4 +1,5 @@
 @import 'tailwindcss';
 @import '@gsainfoteam/ids-css';
+@import '@gsainfoteam/ids-css/fonts.css';
 
 @source '../../node_modules/@gsainfoteam/ids-react/dist';

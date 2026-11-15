@@ -126,7 +126,7 @@ createIdsPalette('#0d9488'); // { 50: '#f0fdfa', …, 600: '#04968d', …, 950: 
 
 ### 글꼴 불러오기
 
-IDS 는 글꼴을 불러오지 않습니다. 앱이 불러오고, 그 이름이나 변수를 `font` 에 넘깁니다.
+기본 글꼴(Pretendard GOV, Geist Mono)은 CSS 에서 `@import '@gsainfoteam/ids-css/fonts.css';` 한 줄로 싣습니다. 다른 글꼴은 앱이 불러오고, 그 이름이나 변수를 `font` 에 넘깁니다.
 
 ```tsx
 // Next.js
@@ -141,7 +141,7 @@ const pretendard = localFont({ src: './PretendardVariable.woff2', variable: '--f
 </html>;
 ```
 
-- `font` 를 주지 않으면 지금 기본 스택(Pretendard GOV, Geist Mono)을 씁니다. 이 경우에도 글꼴 파일은 앱이 불러옵니다.
+- `font` 를 주지 않으면 기본 스택(Pretendard GOV, Geist Mono)을 씁니다. `fonts.css` 를 가져오지 않으면 그 글꼴이 설치된 기기에서만 보이고, 나머지는 `sans-serif` 로 그립니다.
 - `font.sans` 를 준 Provider 는 자기 요소에 `font-family` 를 칠합니다. `font-mono` 유틸리티는 `font.mono` 를 따릅니다.
 
 ### 검증
