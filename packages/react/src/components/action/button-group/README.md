@@ -5,7 +5,7 @@
 - **이어 붙이기.** 바깥 모서리만 둥글고, 맞닿는 outline 테두리는 한 줄로 겹칩니다. 오른쪽에서 왼쪽으로 쓰는 화면에서도 바깥쪽이 둥급니다.
 - **크기와 variant 전파.** 그룹의 `size` 와 `variant` 를 안의 Button, IconButton, Toggle 이 따릅니다. 버튼에 직접 준 값이 이깁니다.
 - **앞으로 나오는 포커스.** hover, 누름, 포커스한 버튼이 이웃 위로 올라와 테두리와 포커스 링이 가려지지 않습니다.
-- **합성.** 그룹 안에 그룹을 넣으면 간격을 두고 떨어지고, `ButtonGroup.Text` 와 `TextField` 도 테두리를 이어 붙입니다.
+- **합성.** 그룹 안에 그룹을 넣으면 간격을 두고 떨어지고, `TextField` 도 테두리를 이어 붙입니다.
 - **접근성.** `role="group"` 이 붙고, `aria-label` 을 주면 스크린 리더가 무엇을 묶었는지 읽습니다.
 
 ```tsx
@@ -58,8 +58,9 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 </ButtonGroup>
 
 <ButtonGroup aria-label="주소">
-  <ButtonGroup.Text>https://</ButtonGroup.Text>   {/* 회색 칸. asChild 로 <label> 등을 그릴 수 있다 */}
-  <TextField aria-label="도메인" />                {/* 필드도 테두리를 이어 붙인다 */}
+  <TextField aria-label="도메인">                  {/* 필드도 테두리를 이어 붙인다 */}
+    <span>https://</span>                          {/* 앞 글자는 필드의 것이라 TextField 안에 둔다 */}
+  </TextField>
   <Button variant="outline">이동</Button>
 </ButtonGroup>
 ```
@@ -88,7 +89,6 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 | `variant`               | 안의 컨트롤이 따르는 variant. 생략하면 각자 기본값     |
 | `aria-label`            | 그룹의 이름                                            |
 | `ButtonGroup.Separator` | 선. 그룹 방향과 수직이다                               |
-| `ButtonGroup.Text`      | 회색 칸. `asChild` 를 받는다                           |
 | 그 외 native 속성       | `div` 로 간다                                          |
 
 ## 알아둘 것

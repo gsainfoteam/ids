@@ -111,7 +111,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Composition"
-        description="그룹 안의 그룹은 간격을 두고 떨어지고, 각 그룹은 붙은 채로 남습니다. Text는 outline 컨트롤처럼 테두리를 이어 붙입니다."
+        description="그룹 안의 그룹은 간격을 두고 떨어지고, 각 그룹은 붙은 채로 남습니다. TextField 도 outline 컨트롤처럼 테두리를 이어 붙입니다."
       >
         <Showcase.Row label="nested">
           <ButtonGroup variant="outline" aria-label="편집">
@@ -128,8 +128,9 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="text + field">
           <ButtonGroup aria-label="주소">
-            <ButtonGroup.Text>https://</ButtonGroup.Text>
-            <TextField aria-label="도메인" placeholder="example.com" className="w-48" />
+            <TextField aria-label="도메인" placeholder="example.com" className="w-64">
+              <span>https://</span>
+            </TextField>
             <Button variant="outline">이동</Button>
           </ButtonGroup>
         </Showcase.Row>

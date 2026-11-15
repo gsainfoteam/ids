@@ -105,8 +105,9 @@ test('whatever draws the focus ring sits above the joined items beside it', asyn
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <ButtonGroup aria-label="주소">
-        <ButtonGroup.Text>https://</ButtonGroup.Text>
-        <TextField aria-label="도메인" data-1p-ignore data-lpignore="true" />
+        <TextField aria-label="도메인" data-1p-ignore data-lpignore="true">
+          <span>https://</span>
+        </TextField>
         <Button>이동</Button>
       </ButtonGroup>
     </IdsProvider>,

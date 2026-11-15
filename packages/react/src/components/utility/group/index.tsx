@@ -2,7 +2,6 @@ import { type ComponentProps, type ReactNode } from 'react';
 
 import {
   GroupRoot,
-  GroupText,
   GroupSeparator,
   type GroupOrientation,
   type GroupContextValue,
@@ -30,11 +29,7 @@ export namespace Group {
     'children' | 'role' | 'aria-orientation' | 'aria-hidden' | 'tabIndex'
   >;
 
-  export type TextProps = ComponentProps<'div'> & { asChild?: boolean };
-
   export const Separator = GroupSeparator;
-
-  export const Text = GroupText;
 
   export const Style = groupStyle;
 }

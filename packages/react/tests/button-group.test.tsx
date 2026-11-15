@@ -64,20 +64,3 @@ test('the separator is announced across the group direction', () => {
   );
   expect(() => renderToString(<ButtonGroup.Separator />)).toThrow(/inside ButtonGroup/);
 });
-
-test('Text joins like an outline control and can render as its child', () => {
-  const doc = ssr(
-    <ButtonGroup aria-label="주소" size="tiny">
-      <ButtonGroup.Text id="text">https://</ButtonGroup.Text>
-      <ButtonGroup.Text asChild>
-        <label id="label" htmlFor="url">
-          URL
-        </label>
-      </ButtonGroup.Text>
-    </ButtonGroup>,
-  );
-  expect(doc.getElementById('text')!.dataset.variant).toBe('outline');
-  expect(doc.getElementById('text')!.className).toMatch(/text-caption-c1-medium/);
-  expect(doc.getElementById('label')!.tagName).toBe('LABEL');
-  expect(doc.getElementById('label')!.dataset.variant).toBe('outline');
-});

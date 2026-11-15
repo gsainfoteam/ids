@@ -2,11 +2,10 @@
 
 import { createContext, use, useEffect } from 'react';
 
+import { groupStyle } from './style';
 import { invariant } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { Divider } from '../../layout/divider';
-import { Slot } from '../slot';
-import { groupStyle } from './style';
 
 import type { Group } from '.';
 import type { IdsSize, IdsVariant } from '../../../tokens/types';
@@ -96,17 +95,3 @@ export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
 }
 
 GroupSeparator.displayName = 'Group.Separator';
-
-export function GroupText({ asChild, className, ...props }: Group.TextProps) {
-  const group = useGroupContext();
-  const Root = asChild ? Slot : 'div';
-  return (
-    <Root
-      data-variant="outline"
-      {...props}
-      className={groupStyle({ size: group?.size ?? 'standard' }).text({ className })}
-    />
-  );
-}
-
-GroupText.displayName = 'Group.Text';
