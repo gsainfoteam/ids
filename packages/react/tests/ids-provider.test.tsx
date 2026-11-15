@@ -57,14 +57,13 @@ test('SSR: the root writes both modes of the theme into its style', () => {
   expect(element.style.getPropertyValue('--ids-theme-dark-on-secondary')).toBe(palettes.blue[400]);
 });
 
-test('SSR: radius, fonts and corner shape become variables on the element', () => {
+test('SSR: radius and corner shape become variables on the element', () => {
   const element = parse(
     renderToString(
       <IdsProvider
         theme={{
           ...testTheme,
           radius: 12,
-          font: { sans: 'Georgia, serif', mono: 'Courier, monospace' },
           cornerShape: 'squircle',
         }}
       />,
@@ -73,9 +72,8 @@ test('SSR: radius, fonts and corner shape become variables on the element', () =
   expect(element.style.getPropertyValue('--ids-theme-radius-standard')).toBe('12px');
   expect(element.style.getPropertyValue('--ids-theme-radius-indicator')).toBe('5px');
   expect(element.style.getPropertyValue('--ids-theme-radius-container')).toBe('19px');
-  expect(element.style.getPropertyValue('--ids-font-family-sans')).toBe('Georgia, serif');
-  expect(element.style.getPropertyValue('--ids-font-family-mono')).toBe('Courier, monospace');
-  expect(element.style.fontFamily).toBe('var(--ids-font-family-sans)');
+  expect(element.style.getPropertyValue('--ids-font-family-sans')).toBe('');
+  expect(element.style.fontFamily).toBe('');
   expect(element.style.getPropertyValue('--ids-corner-shape')).toBe('squircle');
 });
 
@@ -194,12 +192,10 @@ test('a Scope inherits what it does not set, and the mode setter reaches the own
   await expect.element(dark, { message: 'same mode as the parent now' }).not.toHaveClass(/bg-/);
 });
 
-test('radius, font and corner shape reach the components under the provider', async () => {
+test('radius and corner shape reach the components under the provider', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <IdsProvider.Scope
-        theme={{ radius: 14, font: { sans: 'Georgia, serif' }, cornerShape: 'squircle' }}
-      >
+      <IdsProvider.Scope theme={{ radius: 14, cornerShape: 'squircle' }}>
         <Button>themed</Button>
         <span data-testid="circle" className="size-4 rounded-full" />
       </IdsProvider.Scope>
@@ -211,8 +207,6 @@ test('radius, font and corner shape reach the components under the provider', as
 
   expect(themed.borderTopLeftRadius).toBe('14px');
   expect(plain.borderTopLeftRadius).toBe('10px');
-  expect(themed.fontFamily).toMatch(/^Georgia/);
-  expect(plain.fontFamily).not.toMatch(/Georgia/);
 
   if (CSS.supports('corner-shape', 'squircle')) {
     const circle = screen.getByTestId('circle').element();

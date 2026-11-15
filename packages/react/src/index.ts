@@ -11,7 +11,6 @@ export type {
   IdsPalette,
   IdsPaletteStep,
   IdsTheme,
-  IdsThemeFont,
   IdsThemeIssue,
   IdsThemeOverrides,
 } from './components/utility/ids-provider';

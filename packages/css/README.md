@@ -73,7 +73,7 @@ React 앱은 `IdsProvider theme` 이 아래 변수를 루트 요소에 넣는다
 
 - 브랜드 역할 `primary`, `on-primary`, `secondary`, `on-secondary`, `accent`, `outline` 은 `--ids-theme-{light|dark}-{역할}` 에서 읽는다. `data-mode` 가 둘 중 하나를 `--ids-color-{역할}` 로 연결한다.
 - neutral, status, chart 는 이 패키지가 정하고 `data-mode` 에만 따른다.
-- `--ids-radius-standard`, `--ids-radius-indicator`, `--ids-radius-container`, `--ids-font-family-sans`, `--ids-font-family-mono`, `--ids-corner-shape` 를 요소에 주면 그 아래만 바뀐다. Tailwind 유틸리티(`rounded-standard`, `font-sans`, `bg-primary`)는 `@theme inline` 이라 이 변수를 바로 읽는다.
+- `--ids-radius-standard`, `--ids-radius-indicator`, `--ids-radius-container`, `--ids-corner-shape` 를 요소에 주면 그 아래만 바뀐다. Tailwind 유틸리티(`rounded-standard`, `font-sans`, `bg-primary`)는 `@theme inline` 이라 이 변수를 바로 읽는다.
 
 ### 폰트
 
@@ -89,7 +89,7 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `fonts.c
 - Pretendard GOV 는 dynamic subset(woff2 120개, 5.6MB)이다. 브라우저는 화면에 쓰인 글자 범위의 파일만 받는다.
 - Geist Mono 는 Fontsource 의 가변 글꼴 정체(normal)만 담는다. latin, latin-ext, cyrillic, symbols 범위다.
 - 두 글꼴 모두 SIL OFL 1.1 이다. 라이선스는 `fonts/pretendard-gov/LICENSE`, `fonts/geist-mono/LICENSE` 에 있다.
-- 다른 방식으로 불러오는 앱(`next/font`, 직접 호스팅)은 이 줄을 빼고 `IdsProvider` 의 `font` 에 그 글꼴을 넘긴다.
+- 글꼴은 고정이다. 고정폭 글꼴의 x-height 보정, Kbd 정렬, 타입 스케일의 행간과 자간을 이 두 글꼴에서 쟀다.
 
 - `font-sans` 와 `--ids-font-family-sans` 는 `'Pretendard GOV Variable'`, `'Pretendard GOV'`, 일반 Pretendard, `sans-serif` 순서다. Pretendard 만 불러온 앱은 Pretendard 로 보인다.
 - dynamic subset 은 화면에 쓰인 글자 범위만 받는다. 전체 파일(`pretendardvariable-gov.min.css`)은 woff2 5.4MB 다.

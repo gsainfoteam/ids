@@ -297,7 +297,7 @@ IDS 에는 기본 색이 없다. 앱이 `defineIdsTheme` 으로 테마를 만들
 
 | prop | 타입 | 기본값 | 설명 |
 |---|---|---|---|
-| `theme` | `IdsTheme` | 필수 | `palette`(11단계 또는 색 하나), `radius`, `font`, `cornerShape`, `scale` |
+| `theme` | `IdsTheme` | 필수 | `palette`(11단계 또는 색 하나), `radius`, `cornerShape`, `scale` |
 | `mode` / `defaultMode` | `'light' \| 'dark' \| 'system'` | 바깥 Provider, 최상위는 `'light'` | 모드 (제어 / 비제어) |
 | `onModeChange` | `(mode) => void` | | 모드를 바꾸려 할 때 |
 
@@ -306,7 +306,7 @@ IDS 에는 기본 색이 없다. 앱이 `defineIdsTheme` 으로 테마를 만들
 - `scale` 은 영역을 키우거나 줄이는 배율이다(0.5–2, 기본 1). 크기, 간격, 글자 크기, radius 에 곱한다.
 - `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾼다. 예: `<IdsProvider.Scope theme={{ scale: 1.5 }}>`.
 - `checkIdsTheme(theme)` 은 팔레트와 값의 문제를 목록으로 돌려준다. 앱 테스트에서 `[]` 인지 확인하면 된다.
-- 기본 글꼴은 `@gsainfoteam/ids-css/fonts.css` 가 싣는다. 다른 글꼴은 앱이 불러오고 `font.sans`, `font.mono` 에 CSS `font-family` 값을 넘긴다.
+- 글꼴은 Pretendard GOV 와 Geist Mono 로 고정이다. `@gsainfoteam/ids-css/fonts.css` 가 파일을 싣는다.
 
 ```tsx
 import { useTheme } from '@gsainfoteam/ids-react';

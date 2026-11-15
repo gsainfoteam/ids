@@ -1,5 +1,3 @@
-import type { CSSProperties } from 'react';
-
 import {
   BRAND_ROLES,
   type IdsCornerShape,
@@ -50,29 +48,6 @@ function radiusVariables(radius: number | undefined, issues: IdsThemeIssue[]): T
     '--ids-theme-radius-indicator': px(radius * INDICATOR_RADIUS_RATIO),
     '--ids-theme-radius-container': px(radius * CONTAINER_RADIUS_RATIO),
   };
-}
-
-function fontVariables(font: IdsThemeOverrides['font'], issues: IdsThemeIssue[]): ThemeVariables {
-  if (font === undefined) return {};
-
-  const variables: ThemeVariables = {};
-
-  for (const family of ['sans', 'mono'] as const) {
-    const value = font[family];
-    if (value === undefined) continue;
-
-    if (typeof value !== 'string' || value.trim() === '') {
-      issues.push({
-        path: `font.${family}`,
-        message: `font.${family} is a CSS font-family value.`,
-      });
-      continue;
-    }
-
-    variables[`--ids-font-family-${family}`] = value;
-  }
-
-  return variables;
 }
 
 function cornerShapeVariables(
@@ -136,7 +111,6 @@ export function resolveThemeVariables(theme: IdsThemeOverrides): {
   const variables = {
     ...('palette' in theme ? paletteVariables(theme.palette, issues) : {}),
     ...radiusVariables(theme.radius, issues),
-    ...fontVariables(theme.font, issues),
     ...cornerShapeVariables(theme.cornerShape, issues),
     ...scaleVariables(theme.scale, issues),
   };
@@ -148,8 +122,3 @@ export function resolveThemeVariables(theme: IdsThemeOverrides): {
 export function checkIdsTheme(theme: IdsTheme): IdsThemeIssue[] {
   return resolveThemeVariables({ ...theme, palette: theme?.palette }).issues;
 }
-
-const SANS_FAMILY = '--ids-font-family-sans';
-
-export const themeStyle = (variables: ThemeVariables): CSSProperties =>
-  SANS_FAMILY in variables ? { ...variables, fontFamily: `var(${SANS_FAMILY})` } : variables;

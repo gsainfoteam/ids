@@ -2,7 +2,6 @@
 
 import { use, useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 
-import { themeStyle } from './theme-variables';
 import { ThemeContext, useIdsProvider, type ThemeMode } from './use-ids-provider';
 import { OverlayHost, PortalRootContext } from '../../../internal/overlay/host';
 import { LanguageContext, type IdsTranslate } from '../../../internal/translate';
@@ -101,7 +100,7 @@ export function IdsProviderRoot({
               paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
               className,
             )}
-            style={{ colorScheme: context.resolvedMode, ...themeStyle(ownVariables), ...style }}
+            style={{ colorScheme: context.resolvedMode, ...ownVariables, ...style }}
           >
             {asChild ? (
               children

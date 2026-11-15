@@ -8,15 +8,9 @@ export type IdsPalette = { [step in IdsPaletteStep]: string };
 
 export type IdsCornerShape = 'round' | 'squircle';
 
-export type IdsThemeFont = {
-  sans?: string;
-  mono?: string;
-};
-
 export type IdsTheme = {
   palette: IdsPalette | string;
   radius?: number;
-  font?: IdsThemeFont;
   cornerShape?: IdsCornerShape;
   scale?: number;
 };

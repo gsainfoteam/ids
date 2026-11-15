@@ -730,8 +730,9 @@ const theme = defineIdsTheme({ palette: appPalette, radius: 10, cornerShape: 'ro
   modes by contrast (`ids-provider/theme-roles.ts`) and writes them as `--ids-theme-{mode}-{role}`;
   `ids.css` maps the current mode's set onto `--ids-color-{role}`. Neutral, status and chart stay
   IDS's own tokens.
-- `radius`, `font` and `cornerShape` become `--ids-radius-*`, `--ids-font-family-*` and
-  `--ids-corner-shape` on the same element. The Tailwind bridges are `@theme inline`, so utilities
+- `radius` and `cornerShape` become `--ids-theme-radius-*` and `--ids-corner-shape` on the same
+  element. The fonts are fixed (Pretendard GOV, Geist Mono); `@gsainfoteam/ids-css/fonts.css` loads
+  them. The Tailwind bridges are `@theme inline`, so utilities
   read the provider's variables and not the values on `:root`.
 - `IdsProvider.Scope` takes any part of a theme and overrides it for a subtree; `checkIdsTheme`
   returns the problems the provider warns about in development.

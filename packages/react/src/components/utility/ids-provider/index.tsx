@@ -31,7 +31,6 @@ export type {
   IdsPalette,
   IdsPaletteStep,
   IdsTheme,
-  IdsThemeFont,
   IdsThemeOverrides,
 } from './theme';
 export type { IdsThemeIssue } from './theme-roles';

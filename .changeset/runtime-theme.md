@@ -4,7 +4,7 @@
 ---
 
 Breaking: the app now owns its theme. `IdsProvider` takes a required `theme` built with
-`defineIdsTheme({ palette, radius, font, cornerShape })`, where `palette` is the app's brand
+`defineIdsTheme({ palette, radius, cornerShape, scale })`, where `palette` is the app's brand
 palette from `50` to `950`. The provider picks `primary`, `on-primary`, `secondary`,
 `on-secondary`, `accent` and `outline` for both modes by contrast (4.5:1) and writes them on its
 root as `--ids-theme-{light|dark}-{role}`; `ids.css` maps the current mode's set onto
@@ -14,9 +14,10 @@ root as `--ids-theme-{light|dark}-{role}`; `ids.css` maps the current mode's set
   `useTheme()`, the `data-color` attribute and its 17 `[data-color]` blocks in `ids.css`, and the
   `IdsColor` type. Pass `theme={defineIdsTheme({ palette })}` instead.
 - `radius` (0 to 18, default 10) sets the standard corner and derives `indicator` and
-  `container` from it. `font.sans` and `font.mono` set the font families; the app loads the
-  fonts. `cornerShape: 'squircle'` sets CSS `corner-shape` under the provider, where the browser
-  supports it; `rounded-full` stays round.
+  `container` from it. `cornerShape: 'squircle'` sets CSS `corner-shape` under the provider,
+  where the browser supports it; `rounded-full` stays round.
+- The fonts stay IDS's: Pretendard GOV and Geist Mono, loaded by `@gsainfoteam/ids-css/fonts.css`.
+  The type scale, the mono x-height adjustment and Kbd's alignment are measured on them.
 - `palette` also takes one CSS color. IDS builds the 11 steps from its hue and chroma: lightness
   and chroma per step come from the two reference palettes nearest in hue, the result is clamped
   to sRGB by chroma and rounded to 8-bit hex, and step 600 moves to the nearest lightness where

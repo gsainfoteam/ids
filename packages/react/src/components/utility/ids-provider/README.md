@@ -1,6 +1,6 @@
 # IdsProvider
 
-앱의 테마(팔레트, radius, 글꼴, corner shape, 배율)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
+앱의 테마(팔레트, radius, corner shape, 배율)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
 
 - **테마는 앱이 줍니다.** IDS 에는 기본 색이 없습니다. `theme` 이 없으면 타입 오류입니다.
 - **팔레트 하나로 두 모드를 칠합니다.** 라이트와 다크의 역할 색(primary, secondary, accent …)은 IDS 가 대비 4.5:1 을 지키도록 고릅니다. 팔레트 대신 색 하나를 주면 IDS 가 11단계를 만듭니다.
@@ -31,7 +31,6 @@ export const theme = defineIdsTheme({
     950: '#162456',
   },
   radius: 12,
-  font: { sans: 'var(--font-pretendard)', mono: 'var(--font-geist-mono)' },
   cornerShape: 'squircle',
 });
 ```
@@ -55,8 +54,6 @@ import { theme } from './ids-theme';
 | ------------- | ------------------------------------------------------------------------------------ | ------------------- |
 | `palette`     | 50, 100 … 900, 950 의 11단계, 또는 색 하나. 값은 CSS 색(hex, `oklch()` …)            | 없음 (필수)         |
 | `radius`      | `standard` 모서리(px, 0–18). `indicator` 는 0.4배, `container` 는 1.6배              | 10                  |
-| `font.sans`   | CSS `font-family` 값                                                                 | Pretendard GOV 스택 |
-| `font.mono`   | CSS `font-family` 값                                                                 | Geist Mono 스택     |
 | `cornerShape` | `'round'` / `'squircle'`                                                             | `'round'`           |
 | `scale`       | 크기에 곱할 배율(0.5–2). TV 화면은 1.5, 키오스크는 1.25 정도                          | 1                   |
 
@@ -66,7 +63,7 @@ import { theme } from './ids-theme';
 | ------------------------ | ---------------- | ------------------ | ----------------------------------------------------------------- |
 | 색                       | ✅ 팔레트 하나   | ❌                 | 역할 색은 IDS 가 대비로 고른다. neutral, status, chart 는 고정    |
 | radius                   | ✅               | ❌                 | `standard` 하나를 받고 `indicator`, `container` 는 계산한다       |
-| 글꼴                     | ✅               | ❌                 | `sans`, `mono`. 타입 스케일의 단계와 크기는 고정이다 (크기는 배율로) |
+| 글꼴, 타입 스케일        | ❌               | ❌                 | Pretendard GOV, Geist Mono 고정. 크기는 배율로 바꾼다              |
 | corner shape             | ✅               | ❌                 | `round` / `squircle`                                              |
 | 배율                     | ✅ 숫자          | ❌                 | 영역마다 줄 수 있다                                               |
 | size (`standard`/`tiny`) | ❌               | ❌                 | 컴포넌트마다 값이 다르다. 내용 크기는 `className` 으로 바꾼다     |
@@ -124,25 +121,17 @@ createIdsPalette('#0d9488'); // { 50: '#f0fdfa', …, 600: '#04968d', …, 950: 
 - Popover, Menu 같은 레이어의 간격(`sideOffset`)과 폭도 배율을 따릅니다. `overlay.open` 으로 연 항목은 연 곳의 배율을 받습니다.
 - 앱이 쓴 `w-[320px]` 같은 px 값은 배율을 따르지 않습니다. 배율을 따라야 하면 `w-80` 이나 `--spacing(80)` 으로 씁니다.
 
-### 글꼴 불러오기
+### 글꼴
 
-기본 글꼴(Pretendard GOV, Geist Mono)은 CSS 에서 `@import '@gsainfoteam/ids-css/fonts.css';` 한 줄로 싣습니다. 다른 글꼴은 앱이 불러오고, 그 이름이나 변수를 `font` 에 넘깁니다.
+글꼴은 IDS 가 정합니다. 본문은 Pretendard GOV, 고정폭은 Geist Mono 입니다. 앱은 CSS 에서 파일만 싣습니다.
 
-```tsx
-// Next.js
-import localFont from 'next/font/local';
-
-const pretendard = localFont({ src: './PretendardVariable.woff2', variable: '--font-pretendard' });
-
-<html className={pretendard.variable}>
-  <body>
-    <IdsProvider theme={theme}>…</IdsProvider>
-  </body>
-</html>;
+```css
+@import '@gsainfoteam/ids-css/fonts.css';
 ```
 
-- `font` 를 주지 않으면 기본 스택(Pretendard GOV, Geist Mono)을 씁니다. `fonts.css` 를 가져오지 않으면 그 글꼴이 설치된 기기에서만 보이고, 나머지는 `sans-serif` 로 그립니다.
-- `font.sans` 를 준 Provider 는 자기 요소에 `font-family` 를 칠합니다. `font-mono` 유틸리티는 `font.mono` 를 따릅니다.
+- 테마로 글꼴을 바꾸지 않습니다. 고정폭 글꼴의 x-height 보정(0.53), Kbd 의 세로 정렬, 타입 스케일의 행간과 자간이 이 두 글꼴에서 잰 값입니다.
+- 앱 콘텐츠에 다른 글꼴이 필요하면 그 요소에 `font-[…]` 를 줍니다. IDS 컴포넌트는 Pretendard GOV 로 그립니다.
+- `fonts.css` 를 가져오지 않으면 그 글꼴이 설치된 기기에서만 보이고, 나머지는 `sans-serif` 로 그립니다.
 
 ### 검증
 
@@ -200,7 +189,7 @@ const { mode, resolvedMode } = useTheme();
   </IdsProvider.Scope>
 
   <IdsProvider.Scope theme={{ palette: promoPalette, radius: 16 }}>
-    {/* mode 와 글꼴은 바깥을 물려받는다 */}
+    {/* mode 와 배율은 바깥을 물려받는다 */}
     <PromoBanner />
   </IdsProvider.Scope>
 </IdsProvider>
@@ -264,7 +253,6 @@ function ThemeMenu() {
 - 요소에는 `data-mode`(항상 `light` / `dark`), `style.colorScheme`, 준 테마의 변수, `scale` 을 준 경우 `--ids-scale` 변수와 `data-scale` 이 붙습니다.
   - 역할 색: `--ids-theme-light-primary`, `--ids-theme-dark-primary` … (두 모드 다)
   - radius: `--ids-theme-radius-standard`, `-indicator`, `-container`. `ids.css` 가 배율을 곱해 `--ids-radius-*` 로 씁니다
-  - 글꼴: `--ids-font-family-sans`, `--ids-font-family-mono`
   - corner shape: `--ids-corner-shape`
 - `translate` 와 `locale` 은 패키지 README 의 [문구와 언어](../../../../README.md#문구와-언어) 를 참고합니다.
 

@@ -25,10 +25,6 @@ const demoThemes = {
     cornerShape: 'squircle',
   }),
   'emerald, sharp': defineIdsTheme({ palette: palettes.emerald, radius: 4 }),
-  'violet, serif': defineIdsTheme({
-    palette: palettes.violet,
-    font: { sans: 'ui-serif, Georgia, serif' },
-  }),
   'seed #0d9488': defineIdsTheme({ palette: '#0d9488' }),
   'blue, ×1.5': defineIdsTheme({ palette: palettes.blue, scale: 1.5 }),
 };
@@ -193,20 +189,6 @@ export const Gallery: Story = {
             </IdsProvider.Scope>
           </Showcase.Row>
         ))}
-      </Showcase.Section>
-      <Showcase.Section
-        title="Font"
-        description="font.sans 와 font.mono 는 CSS font-family 값입니다. 글꼴 파일은 앱이 불러옵니다."
-      >
-        <Showcase.Row label="sans: serif">
-          <IdsProvider.Scope
-            theme={{ font: { sans: 'ui-serif, Georgia, serif' } }}
-            className="flex flex-wrap items-center gap-2"
-          >
-            <Button>저장</Button>
-            <span className="text-body-b2-regular">다람쥐 헌 쳇바퀴에 타고파</span>
-          </IdsProvider.Scope>
-        </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
