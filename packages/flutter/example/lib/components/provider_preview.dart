@@ -3,19 +3,20 @@ import 'package:ids_flutter/ids.dart';
 
 import '../ids_theme.dart';
 
+String hexOf(Color color) =>
+    '#${(color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+
 class ProviderPreview extends StatelessWidget {
   const ProviderPreview({
     super.key,
     required this.theme,
-    required this.palette,
     required this.mode,
     this.translation,
     this.locale = const Locale('ko', 'KR'),
     this.textScale,
   });
 
-  final IdsThemeData theme;
-  final IdsPalette palette;
+  final IdsTheme theme;
   final IdsMode mode;
   final IdsMessages? translation;
   final Locale locale;
@@ -25,24 +26,18 @@ class ProviderPreview extends StatelessWidget {
   Widget build(BuildContext context) {
     final child = IdsProvider(
       theme: theme,
-      palette: palette,
       mode: mode,
       translation: translation,
       locale: locale,
       child: Builder(
         builder: (context) {
-          final scope = IdsProvider.of(context);
-          final resolved = scope.theme;
-          final sans = resolved.textStyle(IdsTypography.bodyB3Regular);
-          final mono = resolved.textStyle(
-            IdsTypography.bodyB3Regular,
-            mono: true,
-          );
+          final ids = IdsProvider.of(context);
+          final colors = ids.colors;
+          TextStyle body(Color color) =>
+              ids.textStyle(IdsTypography.bodyB3Regular, color: color);
           return Material(
-            color: resolved.surface,
-            textStyle: Theme.of(
-              context,
-            ).textTheme.bodyMedium!.copyWith(color: resolved.onSurface),
+            color: colors.surface,
+            textStyle: body(colors.onSurface),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Center(
@@ -53,25 +48,8 @@ class ProviderPreview extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     spacing: 16,
                     children: [
-                      Material(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            children: [
-                              const Text('Service text: Aa Wi 0123'),
-                              const Icon(Icons.language),
-                              Text(
-                                'Service locale: ${Localizations.localeOf(context)}',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Text('IDS locale: ${scope.locale}'),
-                      Text(
-                        'Mode: ${scope.mode.name} → ${scope.resolvedMode.name}',
-                      ),
+                      Text('IDS locale: ${ids.locale}'),
+                      Text('Mode: ${ids.mode.name} → ${ids.resolvedMode.name}'),
                       Text(
                         'Text scale: ${MediaQuery.textScalerOf(context).scale(16) / 16}',
                       ),
@@ -81,94 +59,23 @@ class ProviderPreview extends StatelessWidget {
                       ),
                       Text(
                         'IDS mono: Aa Wi 0123',
-                        style: mono.copyWith(color: resolved.onSurface),
-                      ),
-                      Text(
-                        'Sans: ${sans.fontFamily}',
-                        style: TextStyle(color: resolved.onSurface),
-                      ),
-                      Text(
-                        'Mono: ${mono.fontFamily}',
-                        style: TextStyle(color: resolved.onSurface),
-                      ),
-                      for (final role in [
-                        ('primary', resolved.primary, resolved.onPrimary),
-                        ('secondary', resolved.secondary, resolved.onSecondary),
-                        ('neutral', resolved.muted, resolved.onMuted),
-                        (
-                          'danger',
-                          resolved.danger,
-                          resolved.resolve('on-danger'),
-                        ),
-                        (
-                          'success',
-                          resolved.resolve('success'),
-                          resolved.resolve('on-success'),
-                        ),
-                        (
-                          'warning',
-                          resolved.resolve('warning'),
-                          resolved.resolve('on-warning'),
-                        ),
-                        (
-                          'info',
-                          resolved.resolve('info'),
-                          resolved.resolve('on-info'),
-                        ),
-                      ])
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: ShapeDecoration(
-                            color: role.$2,
-                            shape: resolved.shape(),
-                          ),
-                          child: Text(
-                            '${role.$1}: ${role.$2.toARGB32().toRadixString(16)}',
-                            style: resolved.textStyle(
-                              IdsTypography.bodyB3Regular,
-                              color: role.$3,
-                            ),
-                          ),
-                        ),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: ShapeDecoration(
-                          shape: resolved.shape(
-                            side: BorderSide(color: resolved.outline, width: 2),
-                          ),
-                        ),
-                        child: Text(
-                          'accent / outline',
-                          style: resolved.textStyle(
-                            IdsTypography.bodyB3Regular,
-                            color: resolved.accent,
-                          ),
-                        ),
-                      ),
-                      IconTheme(
-                        data: IconThemeData(color: resolved.accent, size: 24),
-                        child: const IdsSpinner(),
-                      ),
-                      Text(
-                        scope.translation?.spinnerLabel ??
-                            IdsMessages.ko.spinnerLabel,
-                        style: resolved.textStyle(
+                        style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: resolved.onSurface,
+                          color: colors.onSurface,
+                          mono: true,
                         ),
                       ),
+                      for (final family in IdsColorRoles.families)
+                        _FamilySwatch(family: family, colors: colors),
+                      Text(
+                        ids.translation?.spinnerLabel ??
+                            IdsMessages.ko.spinnerLabel,
+                      ),
+                      const IdsSpinner(),
                       const IdsDivider(),
                       Text(
-                        scope.translation?.dialogClose ??
+                        ids.translation?.dialogClose ??
                             IdsMessages.ko.dialogClose,
-                        style: resolved.textStyle(
-                          IdsTypography.captionC1Regular,
-                          color: resolved.onSurface,
-                        ),
-                      ),
-                      IconTheme(
-                        data: IconThemeData(color: resolved.accent),
-                        child: const IdsSpinner(decorative: true),
                       ),
                     ],
                   ),
@@ -190,6 +97,50 @@ class ProviderPreview extends StatelessWidget {
   }
 }
 
+class _FamilySwatch extends StatelessWidget {
+  const _FamilySwatch({required this.family, required this.colors});
+
+  final String family;
+  final IdsColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    final ids = IdsProvider.of(context);
+    Color role(String name) => colors[name];
+    TextStyle on(String name) =>
+        ids.textStyle(IdsTypography.bodyB3Medium, color: role(name));
+    return Row(
+      spacing: 8,
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: ShapeDecoration(
+              color: role('bg-$family'),
+              shape: ids.shape(),
+            ),
+            child: Text(
+              '$family ${hexOf(role('bg-$family'))}',
+              style: on('text-on-$family'),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: ShapeDecoration(
+              color: role('bg-$family-soft'),
+              shape: ids.shape(side: BorderSide(color: role('border-$family'))),
+            ),
+            child: Text('$family soft', style: on('text-on-$family-soft')),
+          ),
+        ),
+        Expanded(child: Text(family, style: on('text-$family'))),
+      ],
+    );
+  }
+}
+
 class NestedProviderPreview extends StatelessWidget {
   const NestedProviderPreview({super.key, required this.mode});
 
@@ -198,8 +149,7 @@ class NestedProviderPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IdsProvider(
     theme: appTheme,
-    defaultPalette: brandPalette,
-    mode: mode,
+    defaultMode: mode,
     child: Material(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -208,10 +158,13 @@ class NestedProviderPreview extends StatelessWidget {
           children: [
             const Text('Service text stays outside IDS styling'),
             const ScopePreview(name: 'Parent'),
-            const IdsProvider(child: ScopePreview(name: 'Inherited child')),
-            const IdsProvider(
-              defaultPalette: purplePalette,
-              child: ScopePreview(name: 'Isolated child'),
+            const IdsProviderScope(
+              child: ScopePreview(name: 'Inherited child'),
+            ),
+            IdsProviderScope(
+              theme: const IdsThemeOverrides(primary: purple),
+              defaultMode: mode,
+              child: const ScopePreview(name: 'Isolated child'),
             ),
             const ScopePreview(name: 'Sibling'),
           ],
@@ -228,33 +181,34 @@ class ScopePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scope = IdsProvider.of(context);
-    final theme = scope.theme;
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
     return Container(
       width: 360,
       padding: const EdgeInsets.all(16),
-      color: theme.secondary,
+      decoration: ShapeDecoration(
+        color: colors.bgPrimarySoft,
+        shape: ids.shape(radius: ids.radius.container),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 8,
         children: [
           IdsLabel(child: Text(name)),
           Text(
-            '${scope.palette == brandPalette ? 'Blue' : 'Purple'} / ${scope.resolvedMode.name}',
-            style: theme.textStyle(
+            '${ids.theme.primary == blue ? 'Blue' : 'Purple'} / ${ids.resolvedMode.name}',
+            style: ids.textStyle(
               IdsTypography.bodyB3Regular,
-              color: theme.onSecondary,
+              color: colors.textOnPrimarySoft,
             ),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: theme.primary,
-              foregroundColor: theme.onPrimary,
+              backgroundColor: colors.bgPrimary,
+              foregroundColor: colors.textOnPrimary,
             ),
-            onPressed: () => scope.setColor(
-              scope.palette == brandPalette ? purplePalette : brandPalette,
-            ),
-            child: Text('Change $name palette'),
+            onPressed: ids.toggleMode,
+            child: Text('Toggle $name mode'),
           ),
         ],
       ),

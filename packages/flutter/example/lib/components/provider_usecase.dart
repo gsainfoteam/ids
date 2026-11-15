@@ -10,11 +10,26 @@ final providerUseCases = [
   WidgetbookUseCase(
     name: 'Runtime theme and slang',
     builder: (context) {
+      final primary = context.knobs.object.dropdown(
+        label: 'Primary',
+        options: [blue, purple],
+        labelBuilder: (value) => value == blue ? 'blue' : 'purple',
+      );
+      final neutral = context.knobs.object.dropdown(
+        label: 'Neutral',
+        options: IdsNeutral.values,
+        labelBuilder: (value) => value.name,
+      );
+      final status = context.knobs.object.dropdown(
+        label: 'Status',
+        options: [IdsStatus.harmonized, IdsStatus.fixed],
+        labelBuilder: (value) => value.toString(),
+      );
       final radius = context.knobs.double.slider(
         label: 'Radius',
         initialValue: 10,
         min: 0,
-        max: 24,
+        max: 18,
       );
       final corner = context.knobs.object.dropdown(
         label: 'Corner shape',
@@ -26,12 +41,6 @@ final providerUseCases = [
         options: IdsMode.values,
         labelBuilder: (value) => value.name,
       );
-      final purple = context.knobs.boolean(label: 'Purple palette');
-      final font = context.knobs.object.dropdown(
-        label: 'Service font (macOS)',
-        options: ['IDS default', 'Helvetica', 'Times'],
-      );
-      final courier = context.knobs.boolean(label: 'Service mono (Courier)');
       final language = context.knobs.object.dropdown(
         label: 'Translation',
         options: ['Korean', 'English', 'None'],
@@ -42,15 +51,13 @@ final providerUseCases = [
         options: ['System', '1.0', '2.0', '3.0'],
       );
       return ProviderPreview(
-        theme: IdsThemeData(
+        theme: IdsTheme(
+          primary: primary,
+          neutral: neutral,
+          status: status,
           radius: radius,
           cornerShape: corner,
-          fontFamily: font == 'IDS default'
-              ? IdsTypography.sansFontFamily
-              : font,
-          monoFontFamily: courier ? 'Courier' : 'monospace',
         ),
-        palette: purple ? purplePalette : brandPalette,
         mode: mode,
         translation: language == 'None'
             ? null

@@ -21,27 +21,17 @@ class ProviderIntegration extends StatefulWidget {
 }
 
 class _ProviderIntegrationState extends State<ProviderIntegration> {
-  int font = 0;
-  bool purple = false;
+  bool purpleBrand = false;
   bool childOverride = false;
-  bool defaults = false;
+  bool darkDefault = false;
   double radius = 10;
 
   @override
   Widget build(BuildContext context) {
     final translations = Translations.of(context);
-    final theme = IdsThemeData(
-      radius: radius,
-      fontFamily: switch (font) {
-        1 => 'App Poppins',
-        2 => 'Poppins',
-        _ => IdsTypography.sansFontFamily,
-      },
-      fontPackage: font == 2 ? 'widgetbook' : null,
-    );
+
     return IdsProvider(
-      theme: theme,
-      palette: purple ? purplePalette : brandPalette,
+      theme: IdsTheme(primary: purpleBrand ? purple : blue, radius: radius),
       translation: translations.ids,
       locale: Locale(LocaleSettings.currentLocale.languageCode),
       child: Material(
@@ -54,16 +44,12 @@ class _ProviderIntegrationState extends State<ProviderIntegration> {
                 spacing: 8,
                 children: [
                   TextButton(
-                    onPressed: () => setState(() => purple = !purple),
-                    child: const Text('Change palette'),
-                  ),
-                  TextButton(
-                    onPressed: () => setState(() => font = (font + 1) % 3),
-                    child: const Text('Change font'),
+                    onPressed: () => setState(() => purpleBrand = !purpleBrand),
+                    child: const Text('Change primary'),
                   ),
                   TextButton(
                     onPressed: () =>
-                        setState(() => radius = radius == 10 ? 24 : 10),
+                        setState(() => radius = radius == 10 ? 18 : 10),
                     child: const Text('Change radius'),
                   ),
                   TextButton(
@@ -80,15 +66,18 @@ class _ProviderIntegrationState extends State<ProviderIntegration> {
                     child: const Text('Toggle child override'),
                   ),
                   TextButton(
-                    onPressed: () => setState(() => defaults = !defaults),
-                    child: const Text('Change defaults'),
+                    onPressed: () => setState(() => darkDefault = !darkDefault),
+                    child: const Text('Change default mode'),
                   ),
                 ],
               ),
               const ScopeReadout(name: 'Parent'),
-              IdsProvider(
+              IdsProviderScope(
                 theme: childOverride
-                    ? const IdsThemeData(radius: 2, fontFamily: 'App Poppins')
+                    ? const IdsThemeOverrides(
+                        radius: 2,
+                        cornerShape: IdsCornerShape.squircle,
+                      )
                     : null,
                 translation: childOverride
                     ? AppLocale.en.buildSync().ids
@@ -96,9 +85,8 @@ class _ProviderIntegrationState extends State<ProviderIntegration> {
                 locale: childOverride ? const Locale('fr') : null,
                 child: const ScopeReadout(name: 'Child'),
               ),
-              IdsProvider(
-                defaultPalette: defaults ? purplePalette : brandPalette,
-                defaultMode: defaults ? IdsMode.dark : IdsMode.light,
+              IdsProviderScope(
+                defaultMode: darkDefault ? IdsMode.dark : IdsMode.light,
                 child: const DefaultReadout(),
               ),
             ],
@@ -111,6 +99,7 @@ class _ProviderIntegrationState extends State<ProviderIntegration> {
 
 class ScopeReadout extends StatefulWidget {
   const ScopeReadout({super.key, required this.name});
+
   final String name;
 
   @override
@@ -122,14 +111,18 @@ class _ScopeReadoutState extends State<ScopeReadout> {
 
   @override
   Widget build(BuildContext context) {
-    final scope = IdsProvider.of(context);
-    final theme = scope.theme;
+    final ids = IdsProvider.of(context);
+    final text = ids.textStyle(
+      IdsTypography.bodyB3Regular,
+      color: ids.colors.textOnPrimarySoft,
+    );
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: DecoratedBox(
         decoration: ShapeDecoration(
-          color: theme.secondary,
-          shape: theme.shape(),
+          color: ids.colors.bgPrimarySoft,
+          shape: ids.shape(),
         ),
         child: Padding(
           padding: const EdgeInsets.all(12),
@@ -138,18 +131,12 @@ class _ScopeReadoutState extends State<ScopeReadout> {
             children: [
               IdsLabel(child: Text('${widget.name} Aa Wi 0123 한글')),
               Text(
-                '${widget.name}: count $count, radius ${theme.radius.standard}, locale ${scope.locale}, font ${theme.textStyle(IdsTypography.bodyB3Regular).fontFamily}',
-                style: theme.textStyle(
-                  IdsTypography.bodyB3Regular,
-                  color: theme.onSecondary,
-                ),
+                '${widget.name}: count $count, radius ${ids.radius.standard}, locale ${ids.locale}, corner ${ids.cornerShape.name}',
+                style: text,
               ),
               Text(
-                '${scope.translation?.spinnerLabel ?? IdsMessages.ko.spinnerLabel} / ${scope.translation?.dialogClose ?? IdsMessages.ko.dialogClose}',
-                style: theme.textStyle(
-                  IdsTypography.bodyB3Regular,
-                  color: theme.onSecondary,
-                ),
+                '${ids.translation?.spinnerLabel ?? IdsMessages.ko.spinnerLabel} / ${ids.translation?.dialogClose ?? IdsMessages.ko.dialogClose}',
+                style: text,
               ),
               TextButton(
                 onPressed: () => setState(() => count++),
@@ -168,19 +155,15 @@ class DefaultReadout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scope = IdsProvider.of(context);
+    final ids = IdsProvider.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Default scope: ${scope.palette == brandPalette ? 'blue' : 'purple'} / ${scope.mode.name}',
-        ),
+        Text('Default scope: ${ids.mode.name}'),
         TextButton(
-          onPressed: () {
-            scope.setColor(purplePalette);
-            scope.setMode(IdsMode.dark);
-          },
-          child: const Text('Select purple and dark'),
+          onPressed: () => ids.setMode(IdsMode.dark),
+          child: const Text('Select dark'),
         ),
       ],
     );

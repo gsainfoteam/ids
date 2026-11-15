@@ -13,13 +13,12 @@ Widget themed(BuildContext context, Widget child) {
   );
   return IdsProvider(
     theme: appTheme,
-    palette: brandPalette,
     mode: mode,
     child: Builder(
       builder: (context) => Material(
-        color: IdsProvider.of(context).theme.surface,
+        color: IdsProvider.of(context).colors.surface,
         textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-          color: IdsProvider.of(context).theme.onSurface,
+          color: IdsProvider.of(context).colors.onSurface,
         ),
         child: Center(child: SizedBox(width: 320, child: child)),
       ),
