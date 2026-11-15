@@ -428,7 +428,7 @@ export const Tokens: Story = {
     docs: {
       description: {
         story:
-          '강조한 조각은 `data-token` 을 받고, 색은 IDS 토큰입니다. keyword 는 테마의 accent, 문자열은 success, 숫자는 warning 입니다.',
+          '강조한 조각은 `data-token` 을 받고, 색은 IDS 토큰입니다. keyword 는 primary, 함수는 tertiary, 속성과 태그는 secondary, 문자열은 success, 숫자는 warning 입니다.',
       },
     },
   },

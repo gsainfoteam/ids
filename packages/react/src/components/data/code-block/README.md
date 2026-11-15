@@ -76,18 +76,18 @@ const answer = 42;
 | `data-token`  | Prism 토큰                                          | 색                     |
 | ------------- | --------------------------------------------------- | ---------------------- |
 | `comment`     | comment, prolog, doctype, cdata                     | `text-neutral`, 기울임     |
-| `keyword`     | keyword, atrule, rule, important                    | `accent` (테마 색)     |
+| `keyword`     | keyword, atrule, rule, important                    | `text-primary`       |
 | `string`      | string, char, attr-value, regex, url                | `text-success`       |
 | `number`      | number, boolean, constant, symbol                   | `text-warning`       |
-| `function`    | function, class-name, builtin                       | `text-info`          |
-| `property`    | property, attr-name, variable                       | `text-info`          |
-| `tag`         | tag, selector, namespace                            | `text-danger`        |
+| `function`    | function, class-name, builtin                       | `text-tertiary`      |
+| `property`    | property, attr-name, variable                       | `text-secondary`     |
+| `tag`         | tag, selector, namespace                            | `text-secondary`     |
 | `punctuation` | punctuation, operator                               | `text-neutral`             |
 | `inserted`    | inserted (diff 의 `+`)                              | `text-success`       |
 | `deleted`     | deleted (diff 의 `-`)                               | `text-danger`        |
 
 - 한 조각에 여러 Prism 토큰이 겹치면 가장 안쪽 토큰, 그 안에서는 먼저 적힌 클래스를 씁니다.
-- 모든 색은 `surface` 와 `bg-neutral-soft` 바탕 위에서 두 모드 모두 4.5:1 을 넘습니다. `accent` 는 가장 낮은 노란색도 넘습니다.
+- 문법 색은 테마의 세 브랜드 색(primary, secondary, tertiary)과 success, warning 입니다. 브랜드 색을 바꾸면 코드 색도 따라 바뀝니다. diff 의 `+`, `-` 만 의미 색(success, danger)을 씁니다.
 - 색을 바꾸려면 `data-token` 으로 고릅니다: `className="[&_[data-token=keyword]]:text-info"`.
 
 ## 줄 번호와 강조
