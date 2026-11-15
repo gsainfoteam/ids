@@ -798,7 +798,7 @@ values where they pointed at a removed palette) and the `color` enum feed only t
 Flutter takes a runtime palette too (#33); the CSS and the React types no longer read them. The Dart
 formatter keeps the old role names (`primary`, `on-primary`, `secondary`, `on-secondary`, `accent`,
 `outline`) from those files, so `packages/flutter/lib/tokens/*.dart` stay byte-identical while the
-CSS and React use the family roles; CI fails a pull request whose codegen changes them.
+CSS and React use the family roles.
 
 ## Versioning — Changesets (fixed mode)
 
