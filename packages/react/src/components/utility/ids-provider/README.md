@@ -332,14 +332,17 @@ function ThemeMenu() {
   - 역할 색: `--ids-theme-light-bg-primary`, `--ids-theme-dark-text-on-danger-soft` … (두 모드 다). 최상위 Provider 는 primary 와 상태, 준 secondary·tertiary, `'tinted'` 일 때 neutral 과 바탕 층을 씁니다
   - 색 키를 준 Scope 는 바깥 테마와 합친 모든 계열을 다시 씁니다
   - radius: `--ids-theme-radius-standard`, `-indicator`, `-container`. `ids.css` 가 배율을 곱해 `--ids-radius-*` 로 씁니다
-  - corner shape: `--ids-corner-shape`
+  - corner shape: `--ids-corner-shape`, `--ids-theme-corner-radius-scale`
 - `translate` 와 `locale` 은 패키지 README 의 [문구와 언어](../../../../README.md#문구와-언어) 를 참고합니다.
 
 ## 알아둘 것
 
 - IDS 컴포넌트는 `IdsProvider` 안에 있어야 색이 칠해집니다. 밖에 두면 CSS 변수가 정의되지 않습니다.
 - `@gsainfoteam/ids-css` 를 불러오지 않아 색 변수가 비어 있으면 개발 모드에서 경고가 나옵니다.
-- squircle 은 CSS `corner-shape` 로 그립니다. 지원하지 않는 브라우저는 둥근 모서리로 그립니다. `rounded-full` 은 squircle 테마에서도 원입니다.
+- squircle 은 CSS `corner-shape` 로 그립니다.
+  - 같은 radius 의 squircle 은 round 보다 모서리가 얕아 각져 보입니다. 그래서 squircle 테마는 모든 radius 를 1.84배로 키워, 45° 지점의 모서리 깊이를 round 와 맞춥니다.
+  - `corner-shape` 를 지원하지 않는 브라우저는 둥근 모서리와 원래 radius 로 그립니다.
+  - `rounded-full` 은 squircle 테마에서도 원입니다.
 - 최상위 Provider 는 배경을 칠하지 않습니다. 페이지 배경은 앱이 `bg-surface` 로 칠합니다.
 - 최상위 Provider 는 `overlay.open` 으로 연 대화상자와 기본 `Toaster` 를 자기 요소 안(`asChild` 면 그 옆)에 그립니다. 최상위 Provider 가 여럿이면 먼저 마운트된 하나가 그립니다. 앱이 `<Toaster />` 를 직접 두면 기본 Toaster 는 물러납니다. `useOverlay()` 로 연 항목은 연 곳의 테마 변수를 받습니다.
 - 서버 HTML 에는 테마 변수 말고 아무것도 더하지 않습니다. 브라우저에서는 토스트를 읽어 줄 빈 `aria-live` 영역 하나가 붙습니다. 역할(role)이 없어 스크린 리더에게 드러나지 않습니다.

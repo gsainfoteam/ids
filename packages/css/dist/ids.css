@@ -291,7 +291,8 @@
   --ids-concentric-pad: --spacing(--value(number));
   padding: var(--ids-concentric-pad);
   border-radius: min(
-    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested),
+    var(--ids-radius-standard) +
+      (var(--ids-concentric-pad) + var(--ids-concentric-nested)) * var(--ids-corner-radius-scale, 1),
     var(--ids-radius-container)
   );
 }
@@ -1363,10 +1364,16 @@
   }
 }
 
+@supports (corner-shape: squircle) {
+  [data-mode] {
+    --ids-corner-radius-scale: var(--ids-theme-corner-radius-scale, 1);
+  }
+}
+
 [data-mode] {
-  --ids-radius-standard: round(calc(var(--ids-theme-radius-standard, 10px) * var(--ids-scale, 1)), 1px);
-  --ids-radius-indicator: round(calc(var(--ids-theme-radius-indicator, 4px) * var(--ids-scale, 1)), 1px);
-  --ids-radius-container: round(calc(var(--ids-theme-radius-container, 16px) * var(--ids-scale, 1)), 1px);
+  --ids-radius-standard: round(calc(var(--ids-theme-radius-standard, 10px) * var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)), 1px);
+  --ids-radius-indicator: round(calc(var(--ids-theme-radius-indicator, 4px) * var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)), 1px);
+  --ids-radius-container: round(calc(var(--ids-theme-radius-container, 16px) * var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)), 1px);
 }
 
 [data-scale] {

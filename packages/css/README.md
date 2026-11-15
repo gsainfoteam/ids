@@ -163,6 +163,7 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 
 - 이 패키지에는 브랜드 팔레트가 없다. 앱이 `IdsProvider theme` 에 `primary`(와 `secondary`, `tertiary`)를 주면 역할 색을 대비로 골라 위 변수로 넣는다.
 - corner shape: Provider 아래 요소는 `corner-shape: var(--ids-corner-shape, round)` 를 받는다. `rounded-full` 은 언제나 `round` 다.
+  - `corner-shape` 를 지원하는 브라우저에서 `--ids-radius-*` 와 `concentric-p-*` 의 radius 는 `--ids-theme-corner-radius-scale`(squircle 이면 1.84) 배가 된다. squircle 모서리가 round 만큼 깊어진다.
 - 브랜드 색 글자는 배경에 따라 고른다. `bg-primary` 위는 `text-on-primary`, `bg-primary-soft` 위는 `text-on-primary-soft`, 채움 없는 페이지 위는 `text-primary` 다. 셋 다 두 모드에서 4.5:1 을 넘는다.
 - `primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않는다. 밝은 색상은 흰 바탕에서 4.5:1 이 안 된다.
 

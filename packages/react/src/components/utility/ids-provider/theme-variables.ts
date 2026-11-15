@@ -15,6 +15,18 @@ export const SCALE_RANGE = { min: 0.5, max: 2 } as const;
 
 const CORNER_SHAPES: readonly IdsCornerShape[] = ['round', 'squircle'];
 
+const insetAt45Degrees = (exponent: number) => 1 - 2 ** (-1 / exponent);
+
+const SUPERELLIPSE_EXPONENT_OF_SQUIRCLE = 4;
+
+const squircleRadiusAsDeepAsRound =
+  insetAt45Degrees(2) / insetAt45Degrees(SUPERELLIPSE_EXPONENT_OF_SQUIRCLE);
+
+export const CORNER_RADIUS_SCALE: { [shape in IdsCornerShape]: number } = {
+  round: 1,
+  squircle: Math.round(squircleRadiusAsDeepAsRound * 100) / 100,
+};
+
 export type ThemeVariables = { [variable: `--${string}`]: string };
 
 export const themeRoleVariable = (mode: IdsMode, role: string) =>
@@ -59,7 +71,10 @@ function cornerShapeVariables(
     return {};
   }
 
-  return { '--ids-corner-shape': cornerShape };
+  return {
+    '--ids-corner-shape': cornerShape,
+    '--ids-theme-corner-radius-scale': String(CORNER_RADIUS_SCALE[cornerShape]),
+  };
 }
 
 const writesColors = (theme: IdsThemeOverrides) => COLOR_KEYS.some((key) => key in theme);

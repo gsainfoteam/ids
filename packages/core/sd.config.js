@@ -461,7 +461,8 @@ const buildConcentricCSS = () => {
   --ids-concentric-pad: --spacing(--value(number));
   padding: var(--ids-concentric-pad);
   border-radius: min(
-    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested),
+    var(--ids-radius-standard) +
+      (var(--ids-concentric-pad) + var(--ids-concentric-nested)) * var(--ids-corner-radius-scale, 1),
     var(--ids-radius-container)
   );
 }
@@ -538,6 +539,12 @@ const T_CSS_CORNER_SHAPE = `@layer base {
     corner-shape: round;
   }
 }
+
+@supports (corner-shape: squircle) {
+  [data-mode] {
+    --ids-corner-radius-scale: var(--ids-theme-corner-radius-scale, 1);
+  }
+}
 `;
 
 const LENGTHS_SCRIPTS_READ_IN_PIXELS = ["--scroll-area-thickness", "--scroll-area-gap"];
@@ -559,7 +566,7 @@ const radiusFromTheProvider = (dictionary) =>
     .filter((t) => slug(t) !== "full")
     .map(
       (t) =>
-        `  ${idsVar("radius", t)}: ${scaledToWholePixels(`var(--ids-theme-radius-${slug(t)}, ${toVal(t)})`)};`,
+        `  ${idsVar("radius", t)}: ${scaledToWholePixels(`var(--ids-theme-radius-${slug(t)}, ${toVal(t)}) * var(--ids-corner-radius-scale, 1)`)};`,
     );
 
 const lengthsTheScaleMultiplies = (dictionary) => [

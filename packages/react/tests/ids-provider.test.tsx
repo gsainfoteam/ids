@@ -84,6 +84,7 @@ test('SSR: radius and corner shape become variables on the element', () => {
   expect(element.style.getPropertyValue('--ids-font-family-sans')).toBe('');
   expect(element.style.fontFamily).toBe('');
   expect(element.style.getPropertyValue('--ids-corner-shape')).toBe('squircle');
+  expect(element.style.getPropertyValue('--ids-theme-corner-radius-scale')).toBe('1.84');
 });
 
 test('SSR: one color is enough, the provider builds the palette from it', () => {
@@ -228,17 +229,26 @@ test('radius and corner shape reach the components under the provider', async ()
       <IdsProvider.Scope theme={{ radius: 14, cornerShape: 'squircle' }}>
         <Button>themed</Button>
         <span data-testid="circle" className="size-4 rounded-full" />
+        <IdsProvider.Scope theme={{ cornerShape: 'round' }}>
+          <Button>round again</Button>
+        </IdsProvider.Scope>
       </IdsProvider.Scope>
       <Button>default</Button>
     </IdsProvider>,
   );
+  const radiusOf = (name: string) =>
+    getComputedStyle(screen.getByRole('button', { name }).element()).borderTopLeftRadius;
   const themed = getComputedStyle(screen.getByRole('button', { name: 'themed' }).element());
   const plain = getComputedStyle(screen.getByRole('button', { name: 'default' }).element());
+  const squircleDrawn = CSS.supports('corner-shape', 'squircle');
 
-  expect(themed.borderTopLeftRadius).toBe('14px');
-  expect(plain.borderTopLeftRadius).toBe('10px');
+  expect(radiusOf('themed'), 'a squircle grows to the depth of a round corner').toBe(
+    squircleDrawn ? '26px' : '14px',
+  );
+  expect(radiusOf('round again')).toBe('14px');
+  expect(radiusOf('default')).toBe('10px');
 
-  if (CSS.supports('corner-shape', 'squircle')) {
+  if (squircleDrawn) {
     const circle = screen.getByTestId('circle').element();
     const round = plain.getPropertyValue('corner-shape');
 
