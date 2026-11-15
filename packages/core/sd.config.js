@@ -81,11 +81,14 @@ const flattenTypography = (node, path = []) => {
   );
 };
 
-const readTypographyEntries = (palette) => {
+const readTypographyEntries = (palette, { withFlutterOnly = false } = {}) => {
   const json = JSON.parse(
     readFileSync("./tokens/semantic/typography.json", "utf8"),
   );
-  return flattenTypography(json.text ?? {}).map((entry) => ({
+  return [
+    ...flattenTypography(json.text ?? {}),
+    ...(withFlutterOnly ? flattenTypography(json["flutter-only"] ?? {}) : []),
+  ].map((entry) => ({
     name: entry.name,
     fontSize: resolveRef(entry.fontSize, palette),
     fontWeight: resolveRef(entry.fontWeight, palette),
@@ -741,7 +744,7 @@ const dartTypographyFormatter = ({ dictionary }) => {
   const members = [
     `  static const sansFontFamily = '${fontFamily}';`,
     `  static const sansFontPackage = '${fontPackage}';`,
-    ...readTypographyEntries(palette).map(
+    ...readTypographyEntries(palette, { withFlutterOnly: true }).map(
       ({ name, fontSize, fontWeight, lineHeight, letterSpacing }) =>
         `  static const ${toCamel(name)} = ${render(T_DART_TEXT_STYLE, {
           FONT_FAMILY: fontFamily,

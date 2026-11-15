@@ -118,8 +118,8 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 <!-- 타이포 (피그마 Text style = 크기+weight+leading+tracking 묶음) -->
 <p class="text-headline-h5-semibold">제목</p>
 <p class="text-body-b2-regular text-neutral">본문</p>
-<button class="text-button-standard">CTA</button>
-<button class="text-button-tiny">작은 CTA</button>
+<button class="text-body-b3-medium">CTA</button>
+<button class="text-caption-c1-medium">작은 CTA</button>
 
 <!-- 프리미티브 -->
 <span class="text-h1 font-bold tracking-tight leading-tight">48px</span>
@@ -134,7 +134,6 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 | subtitle | `text-subtitle-s1-semibold`, `text-subtitle-s2-medium` |
 | body | `text-body-b1-regular` … `text-body-b3-bold` |
 | caption | `text-caption-c1-regular`, `text-caption-c2-medium` |
-| button | `text-button-standard`, `text-button-tiny` |
 
 ### shimmer
 

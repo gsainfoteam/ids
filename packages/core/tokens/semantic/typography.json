@@ -411,7 +411,9 @@
           }
         }
       }
-    },
+    }
+  },
+  "flutter-only": {
     "button": {
       "standard": {
         "$type": "typography",

@@ -26,7 +26,7 @@ tokens/
     status.{light,dark}.json   # 상태 색(예전 이름). Dart 생성에만 쓴다
     [color].light.json  # hue 별 역할 색(예전 이름). Dart 생성에만 쓴다 (Flutter 가 런타임 팔레트로 옮기면 지운다)
     [color].dark.json
-    typography.json     # 시맨틱 타이포그래피 스케일 (display, heading, body 등)
+    typography.json     # 텍스트 스타일. text 는 CSS 와 Dart, flutter-only(버튼)는 Dart 생성에만 쓴다
 color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지와 React 의 tokens/color-roles.ts 를 만든다
 ```
 

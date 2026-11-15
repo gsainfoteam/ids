@@ -21,11 +21,9 @@
 | `subtitle` | s1 18, s2 16                             | bold, semibold, medium          | 1.35                         | 0     |
 | `body`     | b1 18, b2 16, b3 14                      | bold, semibold, medium, regular | b1 1.333, b2 1.375, b3 1.429 | 0     |
 | `caption`  | c1 12, c2 10                             | semibold, medium, regular       | 1.35                         | 0     |
-| `button`   | standard 14, tiny 12                     | medium (이름에 없음)            | 1                            | 0     |
 
 - 작은 body일수록 행간이 넓어 읽기 편합니다.
-- `text-button-*` 은 행간이 1이라 컨트롤 안에서 세로 가운데에 맞습니다. Button이 이미 쓰므로 직접 붙일 일은 드뭅니다.
-- 컨트롤 안의 글자(필드 값, 라벨)는 `text-body-b3-*`, 작은 크기에서는 `text-caption-c1-*` 입니다.
+- 컨트롤 안의 글자(버튼 라벨, 필드 값)는 `text-body-b3-*`, 작은 크기에서는 `text-caption-c1-*` 입니다. 버튼 전용 스타일은 따로 두지 않습니다.
 
 ## 글꼴
 

@@ -99,11 +99,6 @@ const caption = {
   },
 };
 
-const button = {
-  standard: { medium: cn('text-button-standard') },
-  tiny: { medium: cn('text-button-tiny') },
-};
-
 type TokenTree = { [key: string]: TokenTree | string | number | object };
 
 const compositeNames = (node: TokenTree, path: string[] = []): string[] =>
@@ -209,12 +204,6 @@ export const Scales: Story = {
         description="text-caption-{c1, c2}-{굵기}. 행간 1.35. 설명, 힌트, 메타 정보입니다."
       >
         <Scale styles={caption} sample="3분 전 · 보조 Aa" />
-      </Showcase.Section>
-      <Showcase.Section
-        title="Button"
-        description="text-button-{standard, tiny}. 행간 1이라 컨트롤 안에서 세로 가운데에 맞습니다."
-      >
-        <Scale styles={button} sample="저장 Save" />
       </Showcase.Section>
     </Showcase>
   ),

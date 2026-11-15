@@ -121,12 +121,12 @@ export const controlSurface = {
   ),
   size: {
     standard: cn(
-      'h-(--ids-size-control-standard) rounded-standard px-4 text-button-standard',
+      'h-(--ids-size-control-standard) rounded-standard px-4 text-body-b3-medium',
       trimBesideIconOrSpinner.standard,
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
     ),
     tiny: cn(
-      'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-3 text-button-tiny',
+      'h-(--ids-size-control-tiny) gap-1.5 rounded-standard px-3 text-caption-c1-medium',
       trimBesideIconOrSpinner.tiny,
       "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
     ),

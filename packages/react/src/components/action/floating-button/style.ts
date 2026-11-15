@@ -29,8 +29,8 @@ export const floatingButtonStyle = tv({
     variant: opaqueFills,
     colorScheme: controlSurface.colorScheme,
     size: {
-      standard: ['text-button-standard', "[&_svg:not([class*='size-'])]:size-6"],
-      tiny: ['text-button-tiny', "[&_svg:not([class*='size-'])]:size-5"],
+      standard: ['text-body-b3-medium', "[&_svg:not([class*='size-'])]:size-6"],
+      tiny: ['text-caption-c1-medium', "[&_svg:not([class*='size-'])]:size-5"],
     } satisfies Record<IdsSize, string[]>,
     iconOnly: {
       true: 'aspect-square rounded-full p-0',

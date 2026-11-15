@@ -77,7 +77,7 @@ test('Text joins like an outline control and can render as its child', () => {
     </ButtonGroup>,
   );
   expect(doc.getElementById('text')!.dataset.variant).toBe('outline');
-  expect(doc.getElementById('text')!.className).toMatch(/text-button-tiny/);
+  expect(doc.getElementById('text')!.className).toMatch(/text-caption-c1-medium/);
   expect(doc.getElementById('label')!.tagName).toBe('LABEL');
   expect(doc.getElementById('label')!.dataset.variant).toBe('outline');
 });

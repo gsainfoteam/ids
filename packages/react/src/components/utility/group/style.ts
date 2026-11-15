@@ -36,10 +36,10 @@ export const groupStyle = tv({
     },
     size: {
       standard: {
-        text: "px-4 text-button-standard [&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
+        text: "px-4 text-body-b3-medium [&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
       },
       tiny: {
-        text: "px-3 text-button-tiny [&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
+        text: "px-3 text-caption-c1-medium [&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
       },
     } satisfies Record<IdsSize, object>,
   },
