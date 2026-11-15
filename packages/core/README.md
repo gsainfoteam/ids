@@ -11,6 +11,7 @@
 | `packages/css/dist/ids.css` | CSS 변수 + Tailwind `@theme` |
 | `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등). `IdsColor` 는 Dart 에만 나간다 |
 | `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스 |
+| `packages/react/src/tokens/palette-model.ts` | 17색에 맞춘 팔레트 모델의 계수와 상태 색의 기준 넷. `palette-model.js` 가 쓴다 |
 
 ## 토큰 구조
 
@@ -48,6 +49,16 @@ color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지와 R
 - Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-soft` 는 있고 `--color-primary` 나 `--background-color-on-primary` 는 없다.
 - `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다. 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다). neutral 과 바탕 층은 없으면 `neutral.*.json` 의 단계를 읽는다.
 - Dart 포매터는 이 표를 읽지 않는다. `packages/flutter/lib/tokens` 는 예전 이름 그대로 나오고, CI 가 바뀌지 않았는지 확인한다.
+
+## 팔레트 모델
+
+`palette-model.js` 는 Style Dictionary 다음에 돈다. IdsProvider 가 색 하나로 11단계를 만들 때 읽는 모델이다.
+
+- 단계마다 500 의 hue 를 받는 푸리에 급수 셋을 맞춘다: 밝기, sRGB 최대 채도에 대한 채도 비율, 500 에서의 hue 회전.
+- 가중치는 OKLab 거리다. 밝기는 그대로, 채도 비율은 최대 채도, hue 회전은 그 단계의 채도를 곱한다.
+- 고조파 수(1–7)와 매끄러움 벌점은 계열마다 leave-one-out 오차가 가장 작은 조합을 고른다. 1% 안의 차이면 단순한 쪽을 고른다.
+- 실행하면 고른 조합과 17색을 다시 만든 오차를 출력한다.
+- 계수와 고르는 규칙은 [IdsProvider README](../react/src/components/utility/ids-provider/README.md#색-하나로-팔레트-만들기) 에 적는다.
 
 ## codegen 실행
 

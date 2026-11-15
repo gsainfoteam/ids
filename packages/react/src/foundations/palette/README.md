@@ -1,10 +1,10 @@
 # Palette
 
-`packages/core/tokens/palette.json` 의 원시 색입니다. 패키지에는 neutral 과 status, chart 가 가리키는 값만 나가고, 17색은 레포 안에서만 씁니다.
+`packages/core/tokens/palette.json` 의 원시 색입니다. 패키지에는 neutral 과 상태 색의 기준 넷(green, yellow, red, sky)만 값 그대로 나갑니다. 17색은 레포 안에서만 쓰고, 패키지에는 17색에 맞춘 팔레트 모델의 계수가 대신 들어갑니다([색 하나로 팔레트 만들기](../../components/utility/ids-provider/README.md#색-하나로-팔레트-만들기)).
 
 - **직접 쓰지 않습니다.** CSS 변수로 나가지 않고, 컴포넌트와 앱은 [Color](../color/README.md) 의 `--ids-color-*` 를 씁니다.
 - **neutral.** 50–950 의 11단계와 흰색 `0` 입니다. 중립 토큰이 가리킵니다.
-- **데모 팔레트 17색.** 각 색은 50–950 의 11단계입니다. Storybook 의 Palette 툴바, 테스트, 역할 규칙의 회귀 테스트가 씁니다.
+- **데모 팔레트 17색.** 각 색은 50–950 의 11단계입니다. Storybook 의 Palette 툴바, 테스트, 역할 규칙의 회귀 테스트, 팔레트 모델의 codegen 이 씁니다.
 - **Tailwind CSS v4 기본값.** OKLCH 값을 sRGB hex 로 옮긴 값입니다. `orange` 와 `green` 은 IDS 고유 값입니다.
 
 ```json

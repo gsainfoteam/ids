@@ -1,19 +1,20 @@
 import { clampChroma, converter, formatHex, parse } from 'culori/fn';
+import { clamp, minBy, range } from 'es-toolkit';
 
-import { REFERENCE_PALETTES } from './reference-palettes';
 import { PALETTE_STEPS, type IdsPalette } from './theme';
+import { PALETTE_MODEL } from '../../../tokens/palette-model';
 
 type Shade = { l: number; c: number; h: number };
 
-type Reference = { anchorHue: number; shades: Shade[] };
+type ModelShade = { l: number; gamutShare: number; h: number };
 
 const toOklch = converter('oklch');
 
-const ANCHOR_STEP_INDEX = PALETTE_STEPS.indexOf(500);
+const BEYOND_SRGB_CHROMA = 0.5;
+
+const DEGREES = Math.PI / 180;
 
 const lerp = (from: number, to: number, amount: number) => from + (to - from) * amount;
-
-const turnsFrom = (from: number, to: number) => (((to - from) % 360) + 360) % 360;
 
 export const signedHueDelta = (from: number, to: number) =>
   ((((to - from) % 360) + 540) % 360) - 180;
@@ -23,102 +24,83 @@ export function shadeOf(color: string): Shade {
   return { l, c, h: h ?? 0 };
 }
 
-export function referencesFrom(palettes: readonly (readonly string[])[]): Reference[] {
-  return palettes
-    .map((palette) => {
-      const shades = palette.map(shadeOf);
-      return { anchorHue: shades[ANCHOR_STEP_INDEX]!.h, shades };
-    })
-    .sort((a, b) => a.anchorHue - b.anchorHue);
+const harmonicTerm = (index: number, hue: number) => {
+  if (index === 0) return 1;
+  const angle = Math.ceil(index / 2) * hue * DEGREES;
+  return index % 2 === 1 ? Math.cos(angle) : Math.sin(angle);
+};
+
+const seriesAt = (coefficients: readonly number[], hue: number) =>
+  coefficients.reduce((sum, coefficient, index) => sum + coefficient * harmonicTerm(index, hue), 0);
+
+const gamutChroma = (l: number, h: number) =>
+  clampChroma({ mode: 'oklch', l, c: BEYOND_SRGB_CHROMA, h }, 'oklch').c;
+
+function modelAt(hue: number): ModelShade[] {
+  return PALETTE_STEPS.map((_, index) => ({
+    l: seriesAt(PALETTE_MODEL.lightness[index]!, hue),
+    gamutShare: clamp(seriesAt(PALETTE_MODEL.chroma[index]!, hue), 0, 1),
+    h: hue + seriesAt(PALETTE_MODEL.hueShift[index]!, hue),
+  }));
 }
 
-let defaultReferences: Reference[] | undefined;
+const nearestStepIndex = (model: ModelShade[], lightness: number) =>
+  minBy(range(model.length), (index) => Math.abs(model[index]!.l - lightness))!;
 
-const referencesInIds = () => (defaultReferences ??= referencesFrom(REFERENCE_PALETTES));
+function gamutShareAtLightness(model: ModelShade[], lightness: number) {
+  const lightest = model[0]!;
+  const darkest = model[model.length - 1]!;
+  if (lightness >= lightest.l) return lightest.gamutShare;
+  if (lightness <= darkest.l) return darkest.gamutShare;
 
-function neighboursOf(hue: number, references: Reference[]) {
-  for (const [index, below] of references.entries()) {
-    const above = references[(index + 1) % references.length]!;
-    const span = turnsFrom(below.anchorHue, above.anchorHue) || 360;
-    const offset = turnsFrom(below.anchorHue, hue);
-    if (offset <= span) return { below, above, amount: offset / span };
-  }
-  return { below: references[0]!, above: references[0]!, amount: 0 };
-}
-
-function blendedShades(hue: number, references: Reference[]): Shade[] {
-  const { below, above, amount } = neighboursOf(hue, references);
-  return below.shades.map((low, index) => {
-    const high = above.shades[index]!;
-    return {
-      l: lerp(low.l, high.l, amount),
-      c: lerp(low.c, high.c, amount),
-      h:
-        hue +
-        lerp(
-          signedHueDelta(below.anchorHue, low.h),
-          signedHueDelta(above.anchorHue, high.h),
-          amount,
-        ),
-    };
-  });
-}
-
-function chromaAtLightness(shades: Shade[], lightness: number) {
-  const lightest = shades[0]!;
-  const darkest = shades[shades.length - 1]!;
-  if (lightness >= lightest.l) return lightest.c;
-  if (lightness <= darkest.l) return darkest.c;
-
-  for (let index = 0; index < shades.length - 1; index++) {
-    const lighter = shades[index]!;
-    const darker = shades[index + 1]!;
+  for (let index = 0; index < model.length - 1; index++) {
+    const lighter = model[index]!;
+    const darker = model[index + 1]!;
     if (lightness <= lighter.l && lightness >= darker.l)
-      return lerp(lighter.c, darker.c, (lighter.l - lightness) / (lighter.l - darker.l || 1));
+      return lerp(
+        lighter.gamutShare,
+        darker.gamutShare,
+        (lighter.l - lightness) / (lighter.l - darker.l || 1),
+      );
   }
-  return darkest.c;
+  return darkest.gamutShare;
 }
+
+function chromaRatioAgainst(model: ModelShade[], shade: Shade) {
+  const modelChroma = gamutShareAtLightness(model, shade.l) * gamutChroma(shade.l, shade.h);
+  return modelChroma > 0 ? Math.min(1, shade.c / modelChroma) : 0;
+}
+
+const shadesOf = (model: ModelShade[], chromaRatio: number): Shade[] =>
+  model.map(({ l, gamutShare, h }) => ({ l, h, c: gamutShare * chromaRatio * gamutChroma(l, h) }));
 
 const inSrgb = (shade: Shade) =>
   formatHex(clampChroma({ mode: 'oklch', l: shade.l, c: shade.c, h: shade.h }, 'oklch'));
-
-export function paletteFromSeed(
-  seed: string,
-  references: Reference[] = referencesInIds(),
-): IdsPalette | undefined {
-  const parsed = parse(seed);
-  if (parsed === undefined) return undefined;
-
-  const { l, c, h } = shadeOf(seed);
-  const shades = blendedShades(h, references);
-  const referenceChroma = chromaAtLightness(shades, l);
-  const chromaRatio = referenceChroma > 0 ? Math.min(1, c / referenceChroma) : 0;
-  const steps = shades.map((shade) => ({ ...shade, c: shade.c * chromaRatio }));
-
-  return paletteOf(steps);
-}
 
 function paletteOf(steps: Shade[]): IdsPalette {
   return paletteFromSteps(steps.map(inSrgb));
 }
 
+export function paletteFromSeed(seed: string): IdsPalette | undefined {
+  if (parse(seed) === undefined) return undefined;
+
+  const shade = shadeOf(seed);
+  const model = modelAt(shade.h);
+  const steps = shadesOf(model, chromaRatioAgainst(model, shade));
+  steps[nearestStepIndex(model, shade.l)] = shade;
+
+  return paletteOf(steps);
+}
+
 export const hueOf = (palette: IdsPalette) => shadeOf(palette[500]).h;
 
-export function chromaRatioOf(palette: IdsPalette, references: Reference[] = referencesInIds()) {
-  const { l, c, h } = shadeOf(palette[500]);
-  const referenceChroma = chromaAtLightness(blendedShades(h, references), l);
-  return referenceChroma > 0 ? Math.min(1, c / referenceChroma) : 0;
+export function chromaRatioOf(palette: IdsPalette) {
+  const shade = shadeOf(palette[500]);
+  return chromaRatioAgainst(modelAt(shade.h), shade);
 }
 
-export function paletteAtHue(
-  hue: number,
-  chromaRatio: number,
-  references: Reference[] = referencesInIds(),
-): IdsPalette {
-  return paletteOf(
-    blendedShades(hue, references).map((shade) => ({ ...shade, c: shade.c * chromaRatio })),
-  );
-}
+export const paletteAtHue = (hue: number, chromaRatio: number): IdsPalette =>
+  paletteOf(shadesOf(modelAt(hue), chromaRatio));
 
 export const chromaOf = (palette: IdsPalette) => shadeOf(palette[500]).c;
 

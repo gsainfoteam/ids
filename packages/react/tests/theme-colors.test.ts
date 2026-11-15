@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { paletteHues, palettes } from '../.storybook/palettes';
+import { paletteHues, palettes, type PaletteHue } from '../.storybook/palettes';
 import {
   DISTINCT_FAMILIES,
   DISTINCT_UNDER_RED_GREEN_CVD,
@@ -22,13 +22,9 @@ import {
   signedHueDelta,
 } from '../src/components/utility/ids-provider/palette-seed';
 import {
-  REFERENCE_NAMES,
-  referencePalette,
-} from '../src/components/utility/ids-provider/reference-palettes';
-import {
   HARMONIZE_LIMIT,
   STATUS_HUES,
-  STATUS_REFERENCES,
+  STATUS_PALETTE_NAMES,
   fixedStatusPalette,
   harmonizedStatusPalettes,
   readsAs,
@@ -43,18 +39,17 @@ import { IDS_NEUTRAL_PALETTE, IDS_STATUS_FAMILIES } from '../src/tokens/color-ro
 
 import type { IdsStatusFamily } from '../src/components/utility/ids-provider/theme';
 
-const reference = (name: (typeof REFERENCE_NAMES)[number]) =>
-  paletteFromSteps(referencePalette(name));
+const reference = (name: PaletteHue) => palettes[name];
 
 const readingAs = (family: IdsStatusFamily) =>
-  REFERENCE_NAMES.filter((name) => readsAs(family, hueOf(reference(name))));
+  paletteHues.filter((name) => readsAs(family, hueOf(reference(name))));
 
 const floored = (value: number) => Math.floor(value * 1000) / 1000;
 
 describe('thresholds from the 17 reference palettes', () => {
   test('two families are distinct from the closest pair of references', () => {
-    const distances = REFERENCE_NAMES.flatMap((a, index) =>
-      REFERENCE_NAMES.slice(index + 1).map((b) =>
+    const distances = paletteHues.flatMap((a, index) =>
+      paletteHues.slice(index + 1).map((b) =>
         distanceBetween(reference(a)[600], reference(b)[600]),
       ),
     );
@@ -75,7 +70,7 @@ describe('thresholds from the 17 reference palettes', () => {
 
   test('every status reference reads as its status', () => {
     for (const family of IDS_STATUS_FAMILIES)
-      expect(readsAs(family, hueOf(reference(STATUS_REFERENCES[family])))).toBe(true);
+      expect(readsAs(family, hueOf(reference(STATUS_PALETTE_NAMES[family])))).toBe(true);
   });
 
   test('the status hue ranges cover the circle once', () => {
@@ -122,11 +117,11 @@ describe('harmonized status', () => {
     );
   });
 
-  test("'fixed' uses the reference palettes", () => {
+  test("'fixed' uses the core palettes", () => {
     const { colors } = resolveColors({ primary: palettes.violet, status: 'fixed' });
 
     for (const family of IDS_STATUS_FAMILIES)
-      expect(colors!.palettes[family]).toEqual(reference(STATUS_REFERENCES[family]));
+      expect(colors!.palettes[family]).toEqual(reference(STATUS_PALETTE_NAMES[family]));
   });
 
   test('a status the app gives replaces only that status', () => {
