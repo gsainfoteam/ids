@@ -2,6 +2,17 @@
 "ids_flutter": major
 ---
 
-Replace ThemeProvider with IdsProvider and require an app theme and palette at the outer scope. Remove Flutter's built-in IdsColor and hue tables. Support controlled and uncontrolled palette/mode, nested inheritance, system brightness, locale and slang translation objects. Apply fonts and colors only inside IDS components and route Spinner defaults through the generated Korean catalog.
+Replace `ThemeProvider` with `IdsProvider(theme: IdsTheme(...))`, which takes the same theme as
+ids-react's `defineIdsTheme`.
 
-Migrate theme reads to IdsProvider.of(context).theme. Use defaultPalette for locally mutable palette state. Scale remains deferred pending IDS-24.
+- `IdsTheme` holds `primary` (required), `secondary`, `tertiary`, `neutral`, `status`, `radius`,
+  `cornerShape` and `scale`. Each brand color is an `IdsPalette` of eleven shades or
+  `IdsThemeColor.seed(color)`. Flutter's `IdsColor` and its built-in hue tables are gone.
+- `IdsProviderScope(theme: IdsThemeOverrides(...))` overrides part of the theme for a subtree, like
+  `IdsProvider.Scope`. Nested providers inherit what they leave out.
+- Mode is controlled (`mode`, `onModeChange`) or uncontrolled (`defaultMode`), and
+  `IdsMode.system` follows the platform brightness. `setMode` and `toggleMode` reach the provider
+  that owns the mode.
+- `locale` and a slang `translation` object pass down separately. Fonts and colors apply only
+  inside IDS components; Material and Cupertino themes are left alone.
+- In development the provider prints the problems `checkIdsTheme` finds once per theme.
