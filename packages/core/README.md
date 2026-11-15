@@ -13,6 +13,7 @@
 | `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스. `ids_color_roles.dart` 는 `color-roles.json` 에서 `IdsColors` 와 계열·역할 목록을 만든다 |
 | `packages/react/src/tokens/palette-model.ts` | 17색에 맞춘 팔레트 모델의 계수와 상태 색의 기준 넷. `palette-model.js` 가 쓴다 |
 | `packages/flutter/lib/tokens/ids_palette_model.dart` | 같은 계수와 상태 색 넷의 Dart 판. `palette-model.js` 가 쓴다 |
+| `packages/flutter/fonts/*` | Flutter 패키지에 넣는 글꼴과 라이선스. `fonts.build.mjs` 가 npm 패키지에서 복사한다 |
 
 ## 토큰 구조
 
@@ -69,6 +70,18 @@ pnpm build
 ```
 
 생성된 파일은 직접 편집하지 않는다. `pnpm codegen` 실행 시 덮어쓴다.
+
+## Flutter 글꼴
+
+`fonts.build.mjs` 는 Style Dictionary 와 문구 생성 다음에 돌며, core 의 devDependency 에서 글꼴을 복사한다.
+
+| npm 패키지 | 원본 | `packages/flutter/fonts/` |
+|---|---|---|
+| `pretendard-gov` | `dist/public/variable/PretendardGOVVariable.ttf`, `dist/LICENSE.txt` | `PretendardGOVVariable.ttf`, `PretendardGOV-LICENSE.txt` |
+| `geist` (Vercel) | `dist/fonts/geist-mono/GeistMono-Variable.ttf`, `LICENSE.txt` | `GeistMonoVariable.ttf`, `GeistMono-LICENSE.txt` |
+
+- 웹은 같은 글꼴을 `pretendard-gov` 와 `@fontsource-variable/geist-mono`(woff2)로 싣는다. Flutter 는 TTF 가 필요해서 Geist Mono 는 Vercel 의 `geist` 에서 가져온다.
+- 글꼴을 올리려면 `packages/core/package.json` 의 버전을 바꾸고 `pnpm codegen` 을 돌린다. ids-css 의 `pretendard-gov` 와 같은 버전으로 맞춘다.
 
 ## 데모 팔레트
 

@@ -4,7 +4,7 @@ IDS Flutter 컴포넌트 라이브러리. [pub.dev](https://pub.dev/packages/ids
 
 - 테마는 ids-react 와 같다. 같은 `IdsTheme` 이면 두 플랫폼이 같은 8비트 색, 같은 radius, 같은 글자 스타일을 낸다.
 - 색은 앱이 준다. IDS 에는 브랜드 색이 없고, 앱의 팔레트에서 역할 색을 대비(APCA)로 고른다.
-- 글꼴은 고정이다. 본문은 Pretendard GOV(패키지에 포함), 고정폭은 Geist Mono 다.
+- 글꼴은 고정이다. 본문은 Pretendard GOV, 고정폭은 Geist Mono 이고 둘 다 패키지에 들어 있다.
 
 ## 시작하기
 
@@ -161,7 +161,8 @@ DecoratedBox(
 - `ids.radius` 는 `standard`(theme radius), `indicator`(×0.4), `container`(×1.6), `full` 이다. squircle 이면 그린 반지름이 1.84배다.
 - `ids.shape()` 는 round 면 `RoundedRectangleBorder`, squircle 이면 `RoundedSuperellipseBorder` 다.
 - 글자 스타일 이름은 CSS 와 같다. `text-body-b3-medium` 은 `IdsTypography.bodyB3Medium` 이다.
-- `textStyle(..., mono: true)` 는 Geist Mono 로 그린다. Geist Mono 는 아직 패키지에 들어 있지 않아 기기에 없으면 SF Mono, Menlo 순으로 대체한다.
+- `textStyle(..., mono: true)` 는 패키지에 든 Geist Mono 로 그린다. Geist Mono 에 없는 글자(한글 등)는 Pretendard GOV 로 그린다.
+- 두 글꼴 파일은 `pnpm codegen` 이 npm 패키지(`pretendard-gov`, Vercel 의 `geist`)에서 `fonts/` 로 복사한다. 버전은 `packages/core/package.json` 이 정한다. 라이선스(SIL OFL 1.1)는 `fonts/*-LICENSE.txt` 에 있다.
 - `textStyle` 은 `inherit: false` 스타일을 돌려준다. 색은 `color` 로 준다.
 
 ## IDS 문구와 slang

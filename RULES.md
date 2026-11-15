@@ -20,7 +20,7 @@ stylesheet holds a class only `@source` on `ids-react/dist` produces. Changesets
 
 ## Generated files — do not edit manually
 
-These files are written by `pnpm codegen` (Style Dictionary and message generation). Edits will be overwritten.
+These files are written by `pnpm codegen` (Style Dictionary, message generation and the font copy). Edits will be overwritten.
 
 - `packages/css/dist/ids.css`
 - `packages/react/src/tokens/types.ts`
@@ -32,6 +32,8 @@ These files are written by `pnpm codegen` (Style Dictionary and message generati
   `packages/core/color-roles.json`)
 - `packages/flutter/lib/messages/ids_messages.dart`
 - `packages/flutter/messages/ko.i18n.json`
+- `packages/flutter/fonts/*` (`packages/core/fonts.build.mjs` copies them from the `pretendard-gov` and
+  `geist` npm packages, so the Flutter fonts move with the versions in `packages/core/package.json`)
 
 To change tokens: edit files under `packages/core/tokens/`, then run `pnpm codegen`.
 

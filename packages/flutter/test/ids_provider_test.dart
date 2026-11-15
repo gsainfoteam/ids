@@ -98,7 +98,7 @@ void main() {
         ('Sans', 'packages/ids_flutter/Pretendard GOV Variable', null),
         (
           'Mono',
-          IdsTypography.monoFontFamily,
+          'packages/ids_flutter/Geist Mono Variable',
           IdsTypography.monoFontFamilyFallback,
         ),
       ]) {

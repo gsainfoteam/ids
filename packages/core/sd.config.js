@@ -770,10 +770,11 @@ const FAMILIES_FLUTTER_CANNOT_NAME = ["sans-serif", "ui-monospace"];
 
 const bundledFontPath = (fontFamily, fontPackage) => `packages/${fontPackage}/${fontFamily}`;
 
-const flutterFallback = (stack, sansFontFamily, fontPackage) => [
+const flutterFallback = (stack, monoFontFamily, sansFontFamily, fontPackage) => [
   ...new Set(
     stack
       .filter((name) => !FAMILIES_FLUTTER_CANNOT_NAME.includes(name))
+      .filter((name) => !monoFontFamily.startsWith(name))
       .map((name) =>
         name.startsWith("Pretendard") ? bundledFontPath(sansFontFamily, fontPackage) : name,
       ),
@@ -788,9 +789,9 @@ const dartTypographyFormatter = ({ dictionary }) => {
   const members = [
     `  static const sansFontFamily = '${sansFontFamily}';`,
     `  static const sansFontPackage = '${fontPackage}';`,
-    `  static const monoFontFamily = '${monoFontFamily}';`,
+    `  static const monoFontFamily = '${bundledFontPath(monoFontFamily, fontPackage)}';`,
     `  static const monoFontFamilyFallback = ${dartList(
-      flutterFallback(monoFallback, sansFontFamily, fontPackage),
+      flutterFallback(monoFallback, monoFontFamily, sansFontFamily, fontPackage),
     )};`,
     ...readTypographyEntries(palette).map(
       ({ name, fontSize, fontWeight, lineHeight, letterSpacing }) =>
