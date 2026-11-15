@@ -11,10 +11,23 @@ export {
   type ResizeRange,
   type SeparatorOptions,
 } from './axis';
-export { GRIP_HALO, GRIP_STROKE, GRIP_TARGET, gripArc, type GripArc, type ResizeBand } from './arc';
+export {
+  GRIP_HALO,
+  GRIP_STROKE,
+  GRIP_TARGET,
+  gripArc,
+  type GripArc,
+  type ResizeBand,
+} from './arc';
 export { ResizeEdge, type ResizeEdgeProps } from './edge';
 export { ResizeGrip, type ResizeGripProps } from './grip';
-export { innerEndEndRadius, isRightToLeft, measureAxis, type MeasuredAxis } from './measure';
+export {
+  endEndCornerExponent,
+  innerEndEndRadius,
+  isRightToLeft,
+  measureAxis,
+  type MeasuredAxis,
+} from './measure';
 export { resizeEdgeStyle, resizeGripStyle, resizeHandle } from './style';
 export {
   axisKeyMap,
@@ -22,7 +35,8 @@ export {
   readingDirection,
   useAxesDrag,
   useAxisSeparator,
-  useCornerRadius,
+  useCornerShape,
+  type CornerShape,
   useMeasuredAxes,
   type AxesDragOptions,
   type MeasuredAxes,

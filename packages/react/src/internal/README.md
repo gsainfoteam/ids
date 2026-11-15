@@ -13,6 +13,7 @@
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, Progress                                                                                                                                                                                                     |
 | [`brand-fill.ts`](#brand-fillts)                 | 브랜드 채움의 hover, press 색. 글자색에서 멀어지는 쪽으로 섞는다                      | `control-surface.ts`(solid), Calendar, TimePicker                                                                                                                                                                     |
 | [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                                       | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
+| [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기                                    | `resize-handle/`, ScrollArea                                                                                                                                                                                          |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
 | [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
@@ -201,6 +202,33 @@ export const iconToggleStyle = tv({
 - scheme 을 더하면 일곱 변수를 모두 정의합니다. 빠진 변수는 `fallbackScheme` 의 primary 값으로 남습니다.
 - `schemes` 는 `satisfies Record<ControlColorScheme, string>` 이라 `ControlColorScheme` 과 `schemes` 중 한쪽만 고치면 타입 검사가 실패합니다.
 - 아이콘만 있는 컨트롤은 `size` 대신 `iconSquare.size` 를 씁니다. `size` 의 padding 과 trim 이 정사각형을 깹니다.
+
+## corner-shape.ts
+
+모서리 하나의 계산된 `corner-*-shape` 를 초타원 지수로 바꿉니다. 테마의 `cornerShape: 'squircle'` 에서 모서리를 따라 그리는 코드가 원 대신 초타원을 쓰게 합니다.
+
+### 쓰는 곳
+
+- `resize-handle/`: `endEndCornerExponent` 가 끝 아래 모서리의 지수를 읽고, `gripArc` 가 그 초타원을 따라 손잡이를 그립니다.
+- ScrollArea: `geometry.ts` 가 위 왼쪽 모서리의 지수로 막대 끝을 곡선에서 띄웁니다.
+
+### 쓰는 법
+
+```ts
+const style = getComputedStyle(element);
+cornerExponent(style, 'bottom-right'); // round 2, squircle 4, superellipse(k) 2^k
+```
+
+### 왜 이렇게
+
+- CSS 의 `superellipse(k)` 는 `|x|ⁿ + |y|ⁿ = 1` 에서 `n = 2^k` 입니다. `round` 는 `k = 1`(원), `squircle` 은 `k = 2` 입니다.
+- 브라우저는 키워드를 그대로 두기도 하고 `superellipse(2)` 로 풀기도 해서, 둘 다 읽습니다.
+- `k < 1`(안으로 파인 모서리, `bevel`, `notch`, `scoop`)과 읽지 못한 값은 원으로 둡니다. IDS 테마는 `round` 와 `squircle` 만 씁니다.
+
+### 알아둘 것
+
+- `corner-shape` 를 모르는 브라우저는 값이 비어 있어 원(2)을 돌려줍니다. 그 브라우저는 모서리도 원으로 그립니다.
+- 지수 계산을 바꾸면 Resizable, TextArea 의 모서리 손잡이와 ScrollArea 막대 끝이 함께 바뀝니다.
 
 ## date-locale.ts
 

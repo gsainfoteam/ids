@@ -189,7 +189,7 @@ export function useScrollArea({ axes }: { axes: Record<Axis, boolean> }) {
       if (!vertical || !horizontal || !current.x || !current.y) return false;
 
       const radius = meetingCorner(vertical.placement, horizontal.placement, shape.corners);
-      return cornerSquareFits(radius, shape.gap);
+      return cornerSquareFits(radius, shape.gap, shape.exponent);
     };
 
     const measure = () => {

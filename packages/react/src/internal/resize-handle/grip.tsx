@@ -17,7 +17,7 @@ import { flushSync } from 'react-dom';
 import { GRIP_HALO, GRIP_STROKE, GRIP_TARGET, gripArc, type GripArc, type ResizeBand } from './arc';
 import { axisSeparatorProps, type ResizeAxis, type ResizeDimension } from './axis';
 import { resizeGripStyle } from './style';
-import { axisKeyMap, readingDirection, useAxesDrag, useCornerRadius } from './use-resize-axes';
+import { axisKeyMap, readingDirection, useAxesDrag, useCornerShape } from './use-resize-axes';
 import { invariant, mergeProps } from '../../utils';
 import { keyHandler, type KeyMap } from '../keys';
 import { useTranslate } from '../translate';
@@ -93,8 +93,8 @@ export function ResizeGrip({
 }: ResizeGripProps) {
   const t = useTranslate();
   const custom = asChild || children != null;
-  const radius = useCornerRadius(corner);
-  const arc = radius === null || custom ? null : gripArc(radius, band);
+  const shape = useCornerShape(corner);
+  const arc = shape === null || custom ? null : gripArc(shape.radius, band, shape.exponent);
   const drag = useAxesDrag(axes, { disabled, onDraggingChange });
   const [focusedAxis, setFocusedAxis] = useState<ResizeDimension>(axes[0].dimension);
   const separators = useRef(new Map<ResizeDimension, HTMLElement>());

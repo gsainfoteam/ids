@@ -1,5 +1,7 @@
 import { clamp } from 'es-toolkit';
 
+import { ROUND_CORNER_EXPONENT, cornerExponent } from '../../../internal/corner-shape';
+
 export type Axis = 'x' | 'y';
 export type Placement = 'start' | 'end';
 
@@ -17,6 +19,7 @@ export type Shape = {
   width: number;
   height: number;
   corners: Corners;
+  exponent: number;
 };
 
 export type ThumbLayout = { size: number; offset: number; travel: number };
@@ -24,8 +27,6 @@ export type ThumbLayout = { size: number; offset: number; travel: number };
 export const MIN_THUMB_LENGTH = 20;
 export const PAGE_FRACTION = 0.875;
 export const NO_THUMB: ThumbLayout = { size: 0, offset: 0, travel: 0 };
-
-const SQUARE_FITS_UNDER_RADIUS = Math.SQRT2 / (Math.SQRT2 - 1);
 
 function lengthOf(value: string, box: number) {
   const number = parseFloat(value) || 0;
@@ -80,21 +81,23 @@ export function readShape(root: HTMLElement): Shape {
     corners: rtl
       ? { topStart: topRight, topEnd: topLeft, bottomStart: bottomRight, bottomEnd: bottomLeft }
       : { topStart: topLeft, topEnd: topRight, bottomStart: bottomLeft, bottomEnd: bottomRight },
+    exponent: cornerExponent(style, 'top-left'),
   };
 }
 
-export function clearOfCurve(radius: number, gap: number) {
+export function clearOfCurve(radius: number, gap: number, exponent = ROUND_CORNER_EXPONENT) {
   if (radius <= gap) return gap;
-  const curveReachAtOuterEdge = radius - Math.sqrt(radius ** 2 - (radius - gap) ** 2);
-  return gap + curveReachAtOuterEdge;
+  const alongTheEdge = radius * (1 - ((radius - gap) / radius) ** exponent) ** (1 / exponent);
+  return gap + radius - alongTheEdge;
 }
 
-export function cornerSquareFits(radius: number, gap: number) {
-  return radius <= gap * SQUARE_FITS_UNDER_RADIUS;
+export function cornerSquareFits(radius: number, gap: number, exponent = ROUND_CORNER_EXPONENT) {
+  const diagonalInsetPerRadius = 1 - 2 ** (-1 / exponent);
+  return radius * diagonalInsetPerRadius <= gap;
 }
 
 export function edgeInset(radius: number, shape: Shape, takenAtThisEnd: number) {
-  return Math.max(clearOfCurve(radius, shape.gap), takenAtThisEnd);
+  return Math.max(clearOfCurve(radius, shape.gap, shape.exponent), takenAtThisEnd);
 }
 
 export function thumbAlong(
