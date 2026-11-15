@@ -12,8 +12,7 @@ Future<void> pump(
   Directionality(
     textDirection: TextDirection.ltr,
     child: IdsProvider(
-      theme: const IdsThemeData(),
-      palette: testPalette,
+      theme: testTheme,
       mode: mode,
       child: Align(alignment: Alignment.topLeft, child: child),
     ),

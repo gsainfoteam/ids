@@ -22,19 +22,19 @@ class IdsLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = IdsProvider.of(context).theme;
+    final ids = IdsProvider.of(context);
     final style = switch (size) {
-      IdsSize.standard => IdsTypography.bodyB3Regular,
-      IdsSize.tiny => IdsTypography.captionC1Regular,
+      IdsSize.standard => IdsTypography.bodyB3Medium,
+      IdsSize.tiny => IdsTypography.captionC1Medium,
     };
 
     return Opacity(
       opacity: disabled ? 0.5 : 1,
       child: DefaultTextStyle(
-        style: theme.textStyle(style, color: theme.onSurface),
+        style: ids.textStyle(style, color: ids.colors.onSurface),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: theme.dimension(4),
+          spacing: ids.dimension(4),
           children: [
             Flexible(child: child),
             if (required)
@@ -45,7 +45,10 @@ class IdsLabel extends StatelessWidget {
                     -MediaQuery.textScalerOf(context).scale(style.fontSize!) *
                         _asteriskLiftToPretendard,
                   ),
-                  child: Text('*', style: TextStyle(color: theme.danger)),
+                  child: Text(
+                    '*',
+                    style: TextStyle(color: ids.colors.textDanger),
+                  ),
                 ),
               ),
           ],

@@ -34,7 +34,7 @@ class IdsField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = IdsProvider.of(context).theme;
+    final ids = IdsProvider.of(context);
     final style = switch (size) {
       IdsSize.standard => IdsTypography.bodyB3Regular,
       IdsSize.tiny => IdsTypography.captionC1Regular,
@@ -45,10 +45,10 @@ class IdsField extends StatelessWidget {
       child: Opacity(
         opacity: disabled ? 0.5 : 1,
         child: DefaultTextStyle(
-          style: theme.textStyle(style, color: theme.onSurface),
+          style: ids.textStyle(style, color: ids.colors.onSurface),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: theme.dimension(_gaps[size]!),
+            spacing: ids.dimension(_gaps[size]!),
             children: [
               for (final child in children)
                 if (!(invalid ? child is IdsFieldHint : child is IdsFieldError))
@@ -89,7 +89,7 @@ class IdsFieldDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     IdsField._of(context, 'IdsFieldDescription');
-    return _tinted(context, IdsProvider.of(context).theme.onMuted, child);
+    return _tinted(context, IdsProvider.of(context).colors.textNeutral, child);
   }
 }
 
@@ -103,7 +103,7 @@ class IdsFieldHint extends StatelessWidget {
     if (IdsField._of(context, 'IdsFieldHint').invalid) {
       return const SizedBox.shrink();
     }
-    return _tinted(context, IdsProvider.of(context).theme.onMuted, child);
+    return _tinted(context, IdsProvider.of(context).colors.textNeutral, child);
   }
 }
 
@@ -117,14 +117,14 @@ class IdsFieldError extends StatelessWidget {
     if (!IdsField._of(context, 'IdsFieldError').invalid) {
       return const SizedBox.shrink();
     }
-    return _tinted(context, IdsProvider.of(context).theme.danger, child);
+    return _tinted(context, IdsProvider.of(context).colors.textDanger, child);
   }
 }
 
 Widget _tinted(BuildContext context, Color color, Widget child) {
-  final theme = IdsProvider.of(context).theme;
+  final ids = IdsProvider.of(context);
   return DefaultTextStyle(
-    style: theme.textStyle(IdsTypography.captionC1Regular, color: color),
+    style: ids.textStyle(IdsTypography.captionC1Regular, color: color),
     child: child,
   );
 }

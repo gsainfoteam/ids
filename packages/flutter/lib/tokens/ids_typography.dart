@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 abstract final class IdsTypography {
   static const sansFontFamily = 'Pretendard GOV Variable';
   static const sansFontPackage = 'ids_flutter';
+  static const monoFontFamily = 'Geist Mono Variable';
+  static const monoFontFamilyFallback = <String>['Geist Mono', 'SFMono-Regular', 'Menlo', 'Consolas', 'packages/ids_flutter/Pretendard GOV Variable', 'monospace'];
   static const headlineH1Bold = TextStyle(fontFamily: 'Pretendard GOV Variable', package: 'ids_flutter', fontSize: 48, fontWeight: FontWeight.w700, height: 1.2, letterSpacing: -1.2000000000000002);
   static const headlineH1Semibold = TextStyle(fontFamily: 'Pretendard GOV Variable', package: 'ids_flutter', fontSize: 48, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -1.2000000000000002);
   static const headlineH1Medium = TextStyle(fontFamily: 'Pretendard GOV Variable', package: 'ids_flutter', fontSize: 48, fontWeight: FontWeight.w500, height: 1.2, letterSpacing: -1.2000000000000002);
@@ -47,6 +49,4 @@ abstract final class IdsTypography {
   static const captionC2Semibold = TextStyle(fontFamily: 'Pretendard GOV Variable', package: 'ids_flutter', fontSize: 10, fontWeight: FontWeight.w600, height: 1.35, letterSpacing: 0);
   static const captionC2Medium = TextStyle(fontFamily: 'Pretendard GOV Variable', package: 'ids_flutter', fontSize: 10, fontWeight: FontWeight.w500, height: 1.35, letterSpacing: 0);
   static const captionC2Regular = TextStyle(fontFamily: 'Pretendard GOV Variable', package: 'ids_flutter', fontSize: 10, fontWeight: FontWeight.w400, height: 1.35, letterSpacing: 0);
-  static const buttonStandard = TextStyle(fontFamily: 'Pretendard GOV Variable', package: 'ids_flutter', fontSize: 14, fontWeight: FontWeight.w500, height: 1, letterSpacing: 0);
-  static const buttonTiny = TextStyle(fontFamily: 'Pretendard GOV Variable', package: 'ids_flutter', fontSize: 12, fontWeight: FontWeight.w500, height: 1, letterSpacing: 0);
 }

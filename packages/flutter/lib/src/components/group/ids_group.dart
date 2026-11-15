@@ -31,7 +31,7 @@ class IdsGroup extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: attached
           ? 0
-          : IdsProvider.maybeOf(context)?.theme.dimension(_gap) ?? _gap,
+          : IdsProvider.maybeOf(context)?.dimension(_gap) ?? _gap,
       children: children,
     );
 

@@ -94,3 +94,28 @@ List<Color> paletteFromSeed(Color seed) {
   steps[_nearestStepIndex(model, shade.l)] = shade;
   return [for (final step in steps) colorOf(step)];
 }
+
+const _referenceStep = 5;
+
+double hueOf(List<Color> palette) => oklchOf(palette[_referenceStep]).h;
+
+double chromaOf(List<Color> palette) => oklchOf(palette[_referenceStep]).c;
+
+double chromaRatioOf(List<Color> palette) {
+  final shade = oklchOf(palette[_referenceStep]);
+  return chromaRatioAgainst(modelAt(shade.h), shade);
+}
+
+List<Color> paletteAtHue(double hue, double chromaRatio) => [
+  for (final step in shadesOf(modelAt(hue), chromaRatio)) colorOf(step),
+];
+
+Oklch _turned(Oklch shade, double degrees) =>
+    (l: shade.l, c: shade.c, h: shade.h + degrees);
+
+List<Color> rotatedPalette(List<Color> palette, double degrees) => [
+  for (final color in palette) colorOf(_turned(oklchOf(color), degrees)),
+];
+
+double signedHueDelta(double from, double to) =>
+    ((((to - from) % 360) + 540) % 360) - 180;

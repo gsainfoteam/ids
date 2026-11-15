@@ -26,16 +26,6 @@ jobs:
             exit 1
           fi
 
-      - name: Check codegen leaves the Flutter tokens as the base has them
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
-        run: |
-          git fetch --no-tags --depth=1 origin "$BASE_SHA"
-          if ! git diff --exit-code "$BASE_SHA" -- packages/flutter/lib/tokens ':!packages/flutter/lib/tokens/ids_palette_model.dart'; then
-            echo "Codegen changed packages/flutter/lib/tokens. The Dart outputs must stay byte-identical until Flutter takes the new color roles."
-            exit 1
-          fi
-
       - run: node --test packages/core/dart-messages.test.mjs
 
       - run: pnpm typecheck

@@ -30,15 +30,15 @@ class _ConsumerState extends State<_Consumer> {
       child: DecoratedBox(
         key: ValueKey('${widget.name}-surface'),
         decoration: ShapeDecoration(
-          color: scope.theme.primary,
-          shape: scope.theme.shape(),
+          color: scope.colors.bgPrimary,
+          shape: scope.shape(),
         ),
         child: Text(
           '${widget.name}: $count / ${scope.locale} / ${scope.translation?.dialogClose ?? IdsMessages.ko.dialogClose}',
           key: ValueKey(widget.name),
-          style: scope.theme.textStyle(
+          style: scope.textStyle(
             IdsTypography.bodyB3Regular,
-            color: scope.theme.onPrimary,
+            color: scope.colors.textOnPrimary,
           ),
         ),
       ),
@@ -63,31 +63,25 @@ void main() {
   testWidgets(
     'theme updates reach a stable child without resetting its state',
     (tester) async {
-      Widget build(IdsThemeData theme, IdsPalette palette) => MaterialApp(
-        home: IdsProvider(
-          theme: theme,
-          palette: palette,
-          child: const _Consumer('child'),
-        ),
+      Widget build(IdsTheme theme) => MaterialApp(
+        home: IdsProvider(theme: theme, child: const _Consumer('child')),
       );
-      await tester.pumpWidget(build(const IdsThemeData(), testPalette));
+      await tester.pumpWidget(build(testTheme));
       await tester.tap(find.byKey(const ValueKey('child')));
       await tester.pump();
       final state = tester.state(find.byType(_Consumer));
       expect(find.text('child: 1 / ko_KR / 닫기'), findsOneWidget);
       await tester.pumpWidget(
         build(
-          const IdsThemeData(
-            fontFamily: 'Service Sans',
+          const IdsTheme(
+            primary: IdsThemeColor.seed(Color(0xFF418501)),
             radius: 18,
             cornerShape: IdsCornerShape.squircle,
           ),
-          alternatePalette,
         ),
       );
       expect(tester.state(find.byType(_Consumer)), same(state));
       expect(find.text('child: 1 / ko_KR / 닫기'), findsOneWidget);
-      expect(renderedStyle(tester, 'child').fontFamily, 'Service Sans');
       final decoration =
           tester
                   .widget<DecoratedBox>(
@@ -95,13 +89,22 @@ void main() {
                   )
                   .decoration
               as ShapeDecoration;
-      expect(decoration.color, alternatePalette.shade600);
-      expect(decoration.shape, isA<ContinuousRectangleBorder>());
+      expect(decoration.color, scopeOf(tester, 'child').colors.bgPrimary);
       expect(
-        (decoration.shape as ContinuousRectangleBorder).borderRadius,
-        BorderRadius.circular(18),
+        decoration.color,
+        isNot(
+          IdsResolvedTheme(
+            theme: testTheme,
+            mode: IdsMode.light,
+          ).colors.bgPrimary,
+        ),
       );
-      await tester.pumpWidget(build(const IdsThemeData(), testPalette));
+      expect(decoration.shape, isA<RoundedSuperellipseBorder>());
+      expect(
+        (decoration.shape as RoundedSuperellipseBorder).borderRadius,
+        BorderRadius.circular((18 * 1.84).roundToDouble()),
+      );
+      await tester.pumpWidget(build(testTheme));
       expect(tester.state(find.byType(_Consumer)), same(state));
       expect(
         renderedStyle(tester, 'child').fontFamily,
@@ -118,9 +121,11 @@ void main() {
           MaterialApp(
             home: IdsProvider(
               theme: changed
-                  ? const IdsThemeData(fontFamily: 'Parent New', radius: 20)
-                  : const IdsThemeData(),
-              palette: changed ? alternatePalette : testPalette,
+                  ? const IdsTheme(
+                      primary: IdsThemeColor.seed(Color(0xFF418501)),
+                      radius: 16,
+                    )
+                  : testTheme,
               translation: changed
                   ? const _Messages('Fermer')
                   : const _Messages('Close'),
@@ -128,13 +133,10 @@ void main() {
               child: Column(
                 children: [
                   const _Consumer('parent'),
-                  const IdsProvider(child: _Consumer('inherited')),
-                  IdsProvider(
+                  const IdsProviderScope(child: _Consumer('inherited')),
+                  IdsProviderScope(
                     theme: overridden
-                        ? const IdsThemeData(
-                            fontFamily: 'Child Font',
-                            radius: 3,
-                          )
+                        ? const IdsThemeOverrides(radius: 3)
                         : null,
                     translation: overridden ? const _Messages(null) : null,
                     locale: overridden ? const Locale('ja') : null,
@@ -153,42 +155,36 @@ void main() {
       expect(find.text('parent: 0 / fr / Fermer'), findsOneWidget);
       expect(find.text('inherited: 0 / fr / Fermer'), findsOneWidget);
       expect(find.text('overridden: 1 / ja / 닫기'), findsOneWidget);
-      expect(renderedStyle(tester, 'inherited').fontFamily, 'Parent New');
-      expect(renderedStyle(tester, 'overridden').fontFamily, 'Child Font');
-      expect(scopeOf(tester, 'inherited').theme.radius.standard, 20);
-      expect(scopeOf(tester, 'overridden').theme.radius.standard, 3);
-      expect(scopeOf(tester, 'overridden').palette, alternatePalette);
+      expect(scopeOf(tester, 'inherited').radius.standard, 16);
+      expect(scopeOf(tester, 'overridden').radius.standard, 3);
+      expect(
+        scopeOf(tester, 'overridden').colors,
+        scopeOf(tester, 'parent').colors,
+      );
       await tester.pumpWidget(build(changed: true, overridden: false));
       expect(find.text('overridden: 1 / fr / Fermer'), findsOneWidget);
-      expect(renderedStyle(tester, 'overridden').fontFamily, 'Parent New');
-      expect(scopeOf(tester, 'overridden').theme.radius.standard, 20);
+      expect(scopeOf(tester, 'overridden').radius.standard, 16);
     },
   );
 
   testWidgets(
-    'changed defaults do not replace user choices on the same provider',
+    'a changed default mode does not replace the user choice on the same provider',
     (tester) async {
-      final palettes = <IdsPalette>[];
       final modes = <IdsMode>[];
-      Widget build(IdsPalette palette, IdsMode mode) => MaterialApp(
+      Widget build(IdsMode mode) => MaterialApp(
         home: IdsProvider(
-          theme: const IdsThemeData(),
-          defaultPalette: palette,
+          theme: testTheme,
           defaultMode: mode,
-          onPaletteChange: palettes.add,
           onModeChange: modes.add,
           child: const _Consumer('child'),
         ),
       );
-      await tester.pumpWidget(build(testPalette, IdsMode.light));
-      scopeOf(tester, 'child').setColor(alternatePalette);
+      await tester.pumpWidget(build(IdsMode.light));
       scopeOf(tester, 'child').setMode(IdsMode.dark);
       await tester.pump();
-      await tester.pumpWidget(build(alternatePalette, IdsMode.system));
-      await tester.pumpWidget(build(testPalette, IdsMode.light));
-      expect(scopeOf(tester, 'child').palette, alternatePalette);
+      await tester.pumpWidget(build(IdsMode.system));
+      await tester.pumpWidget(build(IdsMode.light));
       expect(scopeOf(tester, 'child').mode, IdsMode.dark);
-      expect(palettes, [alternatePalette]);
       expect(modes, [IdsMode.dark]);
     },
   );
@@ -202,10 +198,9 @@ void main() {
         home: MediaQuery(
           data: MediaQueryData(platformBrightness: brightness),
           child: const IdsProvider(
-            theme: IdsThemeData(),
-            palette: testPalette,
+            theme: testTheme,
             defaultMode: IdsMode.system,
-            child: IdsProvider(child: _Consumer('child')),
+            child: IdsProviderScope(child: _Consumer('child')),
           ),
         ),
       );

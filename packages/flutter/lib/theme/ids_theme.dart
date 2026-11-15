@@ -1,57 +1,166 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 
-import '../tokens/ids_color_tokens.dart';
-import '../tokens/ids_enums.dart';
 import 'ids_palette.dart';
-import 'ids_theme_data.dart';
 
-class IdsTheme {
-  IdsTheme({required this.data, required this.palette, required this.mode})
-    : colors = palette.resolve(
-        mode == IdsMode.dark ? Brightness.dark : Brightness.light,
-      ) {
-    assert(
-      mode != IdsMode.system,
-      'IdsTheme needs a resolved light or dark mode.',
-    );
-  }
+enum IdsNeutral { pure, tinted }
 
-  final IdsThemeData data;
-  final IdsPalette palette;
-  final IdsMode mode;
-  final IdsPaletteColors colors;
+enum IdsCornerShape { round, squircle }
 
-  bool get isDark => mode == IdsMode.dark;
-  IdsRadius get radius => data.radius;
-  double dimension(double value) => data.dimension(value);
-  TextStyle textStyle(TextStyle base, {Color? color, bool mono = false}) =>
-      data.textStyle(base, color: color, mono: mono);
-  ShapeBorder shape({double? radius, BorderSide side = BorderSide.none}) =>
-      data.shape(radius: radius, side: side);
+@immutable
+sealed class IdsStatus {
+  const IdsStatus();
 
-  Color resolve(String token) => switch (token) {
-    'primary' => colors.primary,
-    'on-primary' => colors.onPrimary,
-    'secondary' => colors.secondary,
-    'on-secondary' => colors.onSecondary,
-    'accent' => colors.accent,
-    'outline' => colors.outline,
-    _ => IdsTokens.resolve(
-      brightness: isDark ? Brightness.dark : Brightness.light,
-      token: token,
-    ),
+  static const harmonized = _HarmonizedStatus();
+
+  static const fixed = _FixedStatus();
+}
+
+final class _HarmonizedStatus extends IdsStatus {
+  const _HarmonizedStatus();
+
+  @override
+  String toString() => 'IdsStatus.harmonized';
+}
+
+final class _FixedStatus extends IdsStatus {
+  const _FixedStatus();
+
+  @override
+  String toString() => 'IdsStatus.fixed';
+}
+
+final class IdsStatusColors extends IdsStatus {
+  const IdsStatusColors({this.success, this.warning, this.danger, this.info});
+
+  final IdsThemeColor? success;
+  final IdsThemeColor? warning;
+  final IdsThemeColor? danger;
+  final IdsThemeColor? info;
+
+  IdsThemeColor? operator [](String family) => switch (family) {
+    'success' => success,
+    'warning' => warning,
+    'danger' => danger,
+    'info' => info,
+    _ => null,
   };
 
-  Color get primary => colors.primary;
-  Color get onPrimary => colors.onPrimary;
-  Color get secondary => colors.secondary;
-  Color get onSecondary => colors.onSecondary;
-  Color get accent => colors.accent;
-  Color get outline => colors.outline;
-  Color get surface => resolve('surface');
-  Color get onSurface => resolve('on-surface');
-  Color get muted => resolve('muted');
-  Color get onMuted => resolve('on-muted');
-  Color get border => resolve('border');
-  Color get danger => resolve('danger');
+  @override
+  bool operator ==(Object other) =>
+      other is IdsStatusColors &&
+      other.success == success &&
+      other.warning == warning &&
+      other.danger == danger &&
+      other.info == info;
+
+  @override
+  int get hashCode => Object.hash(success, warning, danger, info);
+}
+
+@immutable
+class IdsThemeOverrides {
+  const IdsThemeOverrides({
+    this.primary,
+    this.secondary,
+    this.tertiary,
+    this.neutral,
+    this.status,
+    this.radius,
+    this.cornerShape,
+    this.scale,
+  });
+
+  final IdsThemeColor? primary;
+  final IdsThemeColor? secondary;
+  final IdsThemeColor? tertiary;
+  final IdsNeutral? neutral;
+  final IdsStatus? status;
+  final double? radius;
+  final IdsCornerShape? cornerShape;
+  final double? scale;
+
+  bool get writesColors =>
+      primary != null ||
+      secondary != null ||
+      tertiary != null ||
+      neutral != null ||
+      status != null;
+
+  IdsThemeOverrides merge(IdsThemeOverrides? other) => other == null
+      ? this
+      : IdsThemeOverrides(
+          primary: other.primary ?? primary,
+          secondary: other.secondary ?? secondary,
+          tertiary: other.tertiary ?? tertiary,
+          neutral: other.neutral ?? neutral,
+          status: other.status ?? status,
+          radius: other.radius ?? radius,
+          cornerShape: other.cornerShape ?? cornerShape,
+          scale: other.scale ?? scale,
+        );
+
+  IdsThemeColor? brand(String family) => switch (family) {
+    'primary' => primary,
+    'secondary' => secondary,
+    'tertiary' => tertiary,
+    _ => null,
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsThemeOverrides &&
+      other.primary == primary &&
+      other.secondary == secondary &&
+      other.tertiary == tertiary &&
+      other.neutral == neutral &&
+      other.status == status &&
+      other.radius == radius &&
+      other.cornerShape == cornerShape &&
+      other.scale == scale;
+
+  @override
+  int get hashCode => Object.hash(
+    primary,
+    secondary,
+    tertiary,
+    neutral,
+    status,
+    radius,
+    cornerShape,
+    scale,
+  );
+}
+
+class IdsTheme extends IdsThemeOverrides {
+  const IdsTheme({
+    required IdsThemeColor super.primary,
+    super.secondary,
+    super.tertiary,
+    super.neutral,
+    super.status,
+    super.radius,
+    super.cornerShape,
+    super.scale,
+  });
+
+  @override
+  IdsThemeColor get primary => super.primary!;
+}
+
+@immutable
+class IdsThemeIssue {
+  const IdsThemeIssue(this.path, this.message);
+
+  final String path;
+  final String message;
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsThemeIssue && other.path == path && other.message == message;
+
+  @override
+  int get hashCode => Object.hash(path, message);
+
+  @override
+  String toString() => '$path: $message';
 }

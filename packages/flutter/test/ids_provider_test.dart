@@ -19,104 +19,118 @@ class _EmptyMessages with IdsMessages {
 Widget host(Widget child) =>
     Directionality(textDirection: TextDirection.ltr, child: child);
 
+IdsColors colorsOf(IdsTheme theme, IdsMode mode) =>
+    IdsResolvedTheme(theme: theme, mode: mode).colors;
+
 void main() {
+  testWidgets('colors read as the CSS role names in camelCase', (tester) async {
+    late IdsScope scope;
+    await tester.pumpWidget(
+      host(
+        IdsProvider(
+          theme: testTheme,
+          child: Builder(
+            builder: (context) {
+              scope = IdsProvider.of(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      ),
+    );
+    final colors = scope.colors;
+    expect(colors.surface, const Color(0xFFFFFFFF));
+    expect(colors.onSurface, const Color(0xFF171717));
+    expect(colors.borderNeutral, const Color(0xFFE5E5E5));
+    expect(colors.textNeutral, const Color(0xFF525252));
+    expect(colors.bgPrimary, const Color(0xFF155DFC));
+    expect(colors['bg-primary-soft'], colors.bgPrimarySoft);
+    expect(colors['text-on-primary-soft'], colors.textOnPrimarySoft);
+    expect(colors.roles.keys, IdsColorRoles.all);
+  });
+
   testWidgets(
     'resolved text styles replace inherited font packages at render time',
     (tester) async {
-      for (final data in [
-        const IdsThemeData(),
-        const IdsThemeData(fontFamily: 'Helvetica', monoFontFamily: 'Courier'),
-        const IdsThemeData(
-          fontFamily: 'Service Sans',
-          fontPackage: 'service_fonts',
-          monoFontFamily: 'Service Mono',
-          monoFontPackage: 'service_fonts',
-        ),
-      ]) {
-        await tester.pumpWidget(
-          MaterialApp(
-            theme: ThemeData(
-              fontFamily: IdsTypography.sansFontFamily,
-              package: IdsTypography.sansFontPackage,
-            ),
-            home: Material(
-              child: IdsProvider(
-                theme: data,
-                palette: testPalette,
-                child: Builder(
-                  builder: (context) {
-                    final theme = IdsProvider.of(context).theme;
-                    return Column(
-                      children: [
-                        Text(
-                          'Sans',
-                          style: theme.textStyle(
-                            IdsTypography.bodyB3Regular,
-                            color: theme.onSurface,
-                          ),
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(fontFamily: 'Service Sans', package: 'service'),
+          home: Material(
+            child: IdsProvider(
+              theme: testTheme,
+              child: Builder(
+                builder: (context) {
+                  final ids = IdsProvider.of(context);
+                  return Column(
+                    children: [
+                      Text(
+                        'Sans',
+                        style: ids.textStyle(
+                          IdsTypography.bodyB3Regular,
+                          color: ids.colors.onSurface,
                         ),
-                        Text(
-                          'Mono',
-                          style: theme.textStyle(
-                            IdsTypography.bodyB3Regular,
-                            color: theme.onSurface,
-                            mono: true,
-                          ),
+                      ),
+                      Text(
+                        'Mono',
+                        style: ids.textStyle(
+                          IdsTypography.bodyB3Regular,
+                          color: ids.colors.onSurface,
+                          mono: true,
                         ),
-                        TextField(
-                          style: theme.textStyle(
-                            IdsTypography.bodyB3Regular,
-                            color: theme.onSurface,
-                            mono: true,
-                          ),
+                      ),
+                      TextField(
+                        style: ids.textStyle(
+                          IdsTypography.bodyB3Regular,
+                          color: ids.colors.onSurface,
+                          mono: true,
                         ),
-                      ],
-                    );
-                  },
-                ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
-        );
-        expect(tester.takeException(), isNull);
-        for (final mono in [false, true]) {
-          final rich = tester.widget<RichText>(
-            find.descendant(
-              of: find.text(mono ? 'Mono' : 'Sans'),
-              matching: find.byType(RichText),
-            ),
-          );
-          final expected = data.textStyle(
-            IdsTypography.bodyB3Regular,
-            mono: mono,
-          );
-          expect(rich.text.style!.fontFamily, expected.fontFamily);
-          expect(
-            rich.text.style!.fontSize,
-            IdsTypography.bodyB3Regular.fontSize,
-          );
-          expect(
-            rich.text.style!.fontWeight,
-            IdsTypography.bodyB3Regular.fontWeight,
-          );
-          expect(rich.text.style!.color, const Color(0xff171717));
-        }
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      for (final (text, family, fallback) in [
+        ('Sans', 'packages/ids_flutter/Pretendard GOV Variable', null),
+        (
+          'Mono',
+          IdsTypography.monoFontFamily,
+          IdsTypography.monoFontFamilyFallback,
+        ),
+      ]) {
+        final style = tester
+            .widget<RichText>(
+              find.descendant(
+                of: find.text(text),
+                matching: find.byType(RichText),
+              ),
+            )
+            .text
+            .style!;
+        expect(style.fontFamily, family);
+        expect(style.fontFamilyFallback, fallback);
+        expect(style.fontSize, IdsTypography.bodyB3Regular.fontSize);
+        expect(style.fontWeight, IdsTypography.bodyB3Regular.fontWeight);
+        expect(style.color, const Color(0xff171717));
       }
     },
   );
 
-  testWidgets('the root requires an explicit theme and palette', (
-    tester,
-  ) async {
-    await tester.pumpWidget(host(const IdsProvider(child: SizedBox())));
-    expect(tester.takeException(), isA<FlutterError>());
+  testWidgets('the outermost provider needs a primary color', (tester) async {
     await tester.pumpWidget(
-      host(const IdsProvider(theme: IdsThemeData(), child: SizedBox())),
+      host(
+        const IdsProviderScope(
+          theme: IdsThemeOverrides(radius: 12),
+          child: SizedBox(),
+        ),
+      ),
     );
     expect(tester.takeException(), isA<FlutterError>());
-    await tester.pumpWidget(
-      host(const IdsProvider(palette: testPalette, child: SizedBox())),
-    );
+    await tester.pumpWidget(host(const IdsProviderScope(child: SizedBox())));
     expect(tester.takeException(), isA<FlutterError>());
   });
 
@@ -134,18 +148,15 @@ void main() {
     );
   });
 
-  testWidgets('controlled setters report changes and wait for incoming props', (
+  testWidgets('a controlled mode reports changes and waits for the prop', (
     tester,
   ) async {
     late IdsScope scope;
-    final palettes = <IdsPalette>[];
     final modes = <IdsMode>[];
-    Widget build(IdsPalette palette, IdsMode mode) => host(
+    Widget build(IdsMode mode) => host(
       IdsProvider(
-        theme: const IdsThemeData(),
-        palette: palette,
+        theme: testTheme,
         mode: mode,
-        onPaletteChange: palettes.add,
         onModeChange: modes.add,
         child: Builder(
           builder: (context) {
@@ -155,56 +166,45 @@ void main() {
         ),
       ),
     );
-    await tester.pumpWidget(build(testPalette, IdsMode.light));
-    scope.setColor(testPalette);
+    await tester.pumpWidget(build(IdsMode.light));
     scope.setMode(IdsMode.light);
-    expect(palettes, isEmpty);
     expect(modes, isEmpty);
-    scope.setColor(alternatePalette);
     scope.toggleMode();
     await tester.pump();
-    expect(scope.palette, testPalette);
     expect(scope.mode, IdsMode.light);
-    expect(palettes, [alternatePalette]);
     expect(modes, [IdsMode.dark]);
-    await tester.pumpWidget(build(alternatePalette, IdsMode.dark));
-    expect(scope.palette, alternatePalette);
+    await tester.pumpWidget(build(IdsMode.dark));
     expect(scope.resolvedMode, IdsMode.dark);
+    expect(scope.colors, colorsOf(testTheme, IdsMode.dark));
   });
 
-  testWidgets(
-    'uncontrolled defaults initialize once and setters update locally',
-    (tester) async {
-      late IdsScope scope;
-      final changes = <IdsPalette>[];
-      Widget build(IdsPalette initial) => host(
-        IdsProvider(
-          theme: const IdsThemeData(),
-          defaultPalette: initial,
-          onPaletteChange: changes.add,
-          child: Builder(
-            builder: (context) {
-              scope = IdsProvider.of(context);
-              return const SizedBox();
-            },
-          ),
+  testWidgets('an uncontrolled default mode initializes once', (tester) async {
+    late IdsScope scope;
+    final changes = <IdsMode>[];
+    Widget build(IdsMode initial) => host(
+      IdsProvider(
+        theme: testTheme,
+        defaultMode: initial,
+        onModeChange: changes.add,
+        child: Builder(
+          builder: (context) {
+            scope = IdsProvider.of(context);
+            return const SizedBox();
+          },
         ),
-      );
-      await tester.pumpWidget(build(testPalette));
-      expect(scope.mode, IdsMode.light);
-      expect(scope.locale, const Locale('ko', 'KR'));
-      scope.setColor(alternatePalette);
-      scope.setColor(alternatePalette);
-      scope.toggleMode();
-      await tester.pump();
-      expect(changes, [alternatePalette]);
-      expect(scope.palette, alternatePalette);
-      expect(scope.mode, IdsMode.dark);
-      await tester.pumpWidget(build(testPalette));
-      expect(scope.palette, alternatePalette);
-      expect(scope.mode, IdsMode.dark);
-    },
-  );
+      ),
+    );
+    await tester.pumpWidget(build(IdsMode.light));
+    expect(scope.mode, IdsMode.light);
+    expect(scope.locale, const Locale('ko', 'KR'));
+    scope.toggleMode();
+    scope.toggleMode();
+    await tester.pump();
+    expect(changes, [IdsMode.dark]);
+    expect(scope.mode, IdsMode.dark);
+    await tester.pumpWidget(build(IdsMode.light));
+    expect(scope.mode, IdsMode.dark);
+  });
 
   testWidgets(
     'nested settings and setters inherit their nearest owner independently',
@@ -216,8 +216,7 @@ void main() {
       await tester.pumpWidget(
         host(
           IdsProvider(
-            theme: const IdsThemeData(),
-            defaultPalette: testPalette,
+            theme: testTheme,
             translation: translations,
             locale: const Locale('en', 'US'),
             child: Builder(
@@ -225,7 +224,7 @@ void main() {
                 root = IdsProvider.of(context);
                 return Column(
                   children: [
-                    IdsProvider(
+                    IdsProviderScope(
                       child: Builder(
                         builder: (context) {
                           inherited = IdsProvider.of(context);
@@ -233,8 +232,8 @@ void main() {
                         },
                       ),
                     ),
-                    IdsProvider(
-                      theme: const IdsThemeData(radius: 12),
+                    IdsProviderScope(
+                      theme: const IdsThemeOverrides(radius: 12),
                       defaultMode: IdsMode.dark,
                       locale: const Locale('ja'),
                       child: Builder(
@@ -251,16 +250,15 @@ void main() {
           ),
         ),
       );
-      expect(inherited.theme.data, root.theme.data);
-      expect(nested.theme.radius.standard, 12);
+      expect(inherited.theme, root.theme);
+      expect(nested.radius.standard, 12);
+      expect(nested.theme.primary, testTheme.primary);
       expect(nested.translation, translations);
       expect(nested.locale, const Locale('ja'));
       inherited.setMode(IdsMode.dark);
-      nested.setColor(alternatePalette);
       await tester.pump();
-      expect(root.palette, alternatePalette);
-      expect(inherited.palette, alternatePalette);
       expect(root.mode, IdsMode.dark);
+      expect(inherited.resolvedMode, IdsMode.dark);
       nested.toggleMode();
       await tester.pump();
       expect(nested.mode, IdsMode.light);
@@ -268,24 +266,24 @@ void main() {
     },
   );
 
-  testWidgets('a nested palette isolates changes from its parent', (
-    tester,
-  ) async {
+  testWidgets('a scope changes only the colors it names', (tester) async {
     late IdsScope root;
-    late IdsScope nested;
+    late IdsScope scope;
     await tester.pumpWidget(
       host(
         IdsProvider(
-          theme: const IdsThemeData(),
-          defaultPalette: testPalette,
+          theme: testTheme,
           child: Builder(
             builder: (context) {
               root = IdsProvider.of(context);
-              return IdsProvider(
-                defaultPalette: alternatePalette,
+              return IdsProviderScope(
+                theme: const IdsThemeOverrides(
+                  primary: IdsThemeColor.seed(Color(0xFF418501)),
+                  neutral: IdsNeutral.tinted,
+                ),
                 child: Builder(
                   builder: (context) {
-                    nested = IdsProvider.of(context);
+                    scope = IdsProvider.of(context);
                     return const SizedBox();
                   },
                 ),
@@ -295,13 +293,10 @@ void main() {
         ),
       ),
     );
-    nested.setColor(testPalette);
-    await tester.pump();
-    expect(root.palette, testPalette);
-    expect(nested.palette, testPalette);
-    root.setColor(alternatePalette);
-    await tester.pump();
-    expect(nested.palette, testPalette);
+    expect(scope.colors.bgPrimary, isNot(root.colors.bgPrimary));
+    expect(scope.colors.surface, root.colors.surface);
+    expect(scope.colors.borderNeutral, isNot(root.colors.borderNeutral));
+    expect(root.colors, colorsOf(testTheme, IdsMode.light));
   });
 
   testWidgets(
@@ -313,10 +308,9 @@ void main() {
       await tester.pumpWidget(
         host(
           IdsProvider(
-            theme: const IdsThemeData(),
-            palette: testPalette,
+            theme: testTheme,
             defaultMode: IdsMode.system,
-            child: IdsProvider(
+            child: IdsProviderScope(
               child: Builder(
                 builder: (context) {
                   scope = IdsProvider.of(context);
@@ -352,8 +346,7 @@ void main() {
         bool decorative = false,
       }) => host(
         IdsProvider(
-          theme: const IdsThemeData(),
-          palette: testPalette,
+          theme: testTheme,
           translation: translation,
           locale: const Locale('en'),
           child: IdsSpinner(semanticLabel: label, decorative: decorative),
@@ -397,8 +390,7 @@ void main() {
               child: MediaQuery(
                 data: const MediaQueryData(textScaler: TextScaler.linear(1.5)),
                 child: IdsProvider(
-                  theme: const IdsThemeData(fontFamily: 'IDS Custom'),
-                  palette: testPalette,
+                  theme: testTheme,
                   mode: IdsMode.dark,
                   locale: const Locale('ko', 'KR'),
                   child: Builder(
@@ -426,7 +418,10 @@ void main() {
       final rich = tester.widget<RichText>(
         find.descendant(of: find.text('IDS'), matching: find.byType(RichText)),
       );
-      expect(rich.text.style!.fontFamily, 'IDS Custom');
+      expect(
+        rich.text.style!.fontFamily,
+        'packages/ids_flutter/Pretendard GOV Variable',
+      );
       expect(rich.text.style!.color, const Color(0xfffafafa));
     },
   );

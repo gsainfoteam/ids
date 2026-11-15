@@ -81,10 +81,10 @@ class _IdsSpinnerState extends State<IdsSpinner>
     final inheritedIcon = context
         .dependOnInheritedWidgetOfExactType<IconTheme>();
     final color =
-        inheritedIcon?.data.color ?? scope?.theme.onSurface ?? icon.color!;
+        inheritedIcon?.data.color ?? scope?.colors.onSurface ?? icon.color!;
     final size = _sizes[widget.size] ?? icon.size!;
     final arc = CustomPaint(
-      size: Size.square(scope?.theme.dimension(size) ?? size),
+      size: Size.square(scope?.dimension(size) ?? size),
       painter: _ArcPainter(
         color.withValues(alpha: color.a * (icon.opacity ?? 1)),
       ),

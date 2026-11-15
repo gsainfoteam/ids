@@ -9,8 +9,7 @@ Future<void> pump(WidgetTester tester, Widget group) => tester.pumpWidget(
   Directionality(
     textDirection: TextDirection.ltr,
     child: IdsProvider(
-      theme: const IdsThemeData(),
-      palette: testPalette,
+      theme: testTheme,
       child: Align(alignment: Alignment.topLeft, child: group),
     ),
   ),

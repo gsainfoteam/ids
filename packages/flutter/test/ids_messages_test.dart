@@ -4,13 +4,19 @@ import 'package:ids_flutter/ids.dart';
 import 'fixtures/slang/generated/translations.g.dart';
 
 void main() {
-  test('generated Korean defaults preserve interpolation and number grouping', () {
-    const ko = IdsMessages.ko;
-    expect(ko.dialogClose, '닫기');
-    expect(ko.chipFieldRemove(label: '사과'), '사과 삭제');
-    expect(ko.textAreaCountOfMax(count: 1200, maxLength: 2000), '1,200 / 2,000');
-    expect(ko.ratingValueLabel(max: 5, value: 4.5), '5점 만점에 4.5점');
-  });
+  test(
+    'generated Korean defaults preserve interpolation and number grouping',
+    () {
+      const ko = IdsMessages.ko;
+      expect(ko.dialogClose, '닫기');
+      expect(ko.chipFieldRemove(label: '사과'), '사과 삭제');
+      expect(
+        ko.textAreaCountOfMax(count: 1200, maxLength: 2000),
+        '1,200 / 2,000',
+      );
+      expect(ko.ratingValueLabel(max: 5, value: 4.5), '5점 만점에 4.5점');
+    },
+  );
 
   test('slang objects implement the IDS contract without an adapter', () {
     final IdsMessages en = Translations().ids;

@@ -4,7 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../theme/ids_provider.dart';
-import '../../../theme/ids_theme_data.dart';
+import '../../../theme/ids_resolved_theme.dart';
 import '../../../tokens/ids_typography.dart';
 
 class IdsDivider extends StatelessWidget {
@@ -26,21 +26,21 @@ class IdsDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = IdsProvider.of(context).theme;
+    final ids = IdsProvider.of(context);
     final label = child;
 
     return ExcludeSemantics(
       excluding: decorative,
       child: label == null
-          ? _line(context, theme.border, theme.dimension(_thickness))
+          ? _line(context, ids.colors.borderNeutral, ids.dimension(_thickness))
           : _LabelledLine(
               orientation: orientation,
-              color: theme.border,
-              theme: theme.data,
+              color: ids.colors.borderNeutral,
+              theme: ids.resolved,
               child: DefaultTextStyle(
-                style: theme.textStyle(
+                style: ids.textStyle(
                   IdsTypography.captionC1Medium,
-                  color: theme.onMuted,
+                  color: ids.colors.textNeutral,
                 ),
                 textAlign: TextAlign.center,
                 child: label,
@@ -76,7 +76,7 @@ class _LabelledLine extends SingleChildRenderObjectWidget {
 
   final Axis orientation;
   final Color color;
-  final IdsThemeData theme;
+  final IdsResolvedTheme theme;
 
   @override
   _RenderLabelledLine createRenderObject(BuildContext context) =>
@@ -98,8 +98,8 @@ class _RenderLabelledLine extends RenderShiftedBox {
   _RenderLabelledLine(this._orientation, this._color, this._theme)
     : super(null);
 
-  IdsThemeData _theme;
-  set theme(IdsThemeData value) {
+  IdsResolvedTheme _theme;
+  set theme(IdsResolvedTheme value) {
     if (_theme == value) return;
     _theme = value;
     markNeedsLayout();

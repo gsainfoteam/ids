@@ -4,7 +4,31 @@ import 'package:flutter/painting.dart';
 import '../src/color/palette_seed.dart';
 
 @immutable
-class IdsPalette {
+sealed class IdsThemeColor {
+  const IdsThemeColor();
+
+  const factory IdsThemeColor.seed(Color color) = IdsSeedColor;
+}
+
+@immutable
+final class IdsSeedColor extends IdsThemeColor {
+  const IdsSeedColor(this.color);
+
+  final Color color;
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsSeedColor && other.color == color;
+
+  @override
+  int get hashCode => color.hashCode;
+
+  @override
+  String toString() => 'IdsThemeColor.seed(${_hexOf(color)})';
+}
+
+@immutable
+final class IdsPalette extends IdsThemeColor {
   IdsPalette(List<Color> colors)
     : assert(
         colors.length == steps.length,
