@@ -1,3 +1,6 @@
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
 import { clampChroma, formatHex } from 'culori/fn';
 import { expect, test } from 'vitest';
 
@@ -48,6 +51,8 @@ const SEEDS: [lightness: number, chroma: number][] = [
 
 const SWEEP_OF_EVERY_SEED_MS = 30_000;
 
+const COLD_NODE_START_ON_A_BUSY_RUNNER_MS = 30_000;
+
 const HUES = Array.from({ length: 72 }, (_, index) => index * 5);
 
 const everySeed = () =>
@@ -87,3 +92,23 @@ test('a gray seed builds a gray palette, and a bad seed is reported', () => {
     { path: 'primary', message: 'primary is not a CSS color: not a color.' },
   ]);
 });
+
+test(
+  'the built palette module works without the rest of the package, as a tree-shaken app loads it',
+  { timeout: COLD_NODE_START_ON_A_BUSY_RUNNER_MS },
+  () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        '--input-type=module',
+        '-e',
+        `
+    const { createIdsPalette } = await import('./dist/components/utility/ids-provider/palette-seed.js');
+    process.stdout.write(createIdsPalette('#0d9488')?.[600] ?? 'undefined');
+  `,
+      ],
+      { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' },
+    );
+    expect(result.stdout, result.stderr).toBe('#0d9488');
+  },
+);
