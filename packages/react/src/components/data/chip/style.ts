@@ -26,26 +26,56 @@ export const chipStyle = tv({
   variants: {
     colorScheme: {
       neutral: {
-        root: '[--chip-fill:var(--ids-color-on-surface)] [--chip-on-fill:var(--ids-color-surface)] [--chip-tint:var(--ids-color-muted)] [--chip-on-tint:var(--ids-color-on-surface)] [--chip-text:var(--ids-color-on-surface)] [--chip-line:var(--ids-color-border)]',
+        root: '[--chip-fill:var(--ids-color-on-surface)] [--chip-on-fill:var(--ids-color-surface)] [--chip-tint:var(--ids-color-bg-neutral-soft)] [--chip-on-tint:var(--ids-color-on-surface)] [--chip-text:var(--ids-color-on-surface)] [--chip-line:var(--ids-color-border-neutral)]',
       },
       primary: {
         root: [
-          '[--chip-fill:var(--ids-color-primary)] [--chip-on-fill:var(--ids-color-on-primary)]',
-          '[--chip-tint:var(--ids-color-secondary)] [--chip-on-tint:var(--ids-color-on-secondary)]',
-          '[--chip-text:var(--ids-color-accent)] [--chip-line:color-mix(in_oklab,var(--ids-color-primary)_40%,transparent)]',
+          '[--chip-fill:var(--ids-color-bg-primary)] [--chip-on-fill:var(--ids-color-text-on-primary)]',
+          '[--chip-tint:var(--ids-color-bg-primary-soft)] [--chip-on-tint:var(--ids-color-text-on-primary-soft)]',
+          '[--chip-text:var(--ids-color-text-primary)] [--chip-line:color-mix(in_oklab,var(--ids-color-border-primary)_40%,transparent)]',
+        ],
+      },
+      secondary: {
+        root: [
+          '[--chip-fill:var(--ids-color-bg-secondary)] [--chip-on-fill:var(--ids-color-text-on-secondary)]',
+          '[--chip-tint:var(--ids-color-bg-secondary-soft)] [--chip-on-tint:var(--ids-color-text-on-secondary-soft)]',
+          '[--chip-text:var(--ids-color-text-secondary)] [--chip-line:color-mix(in_oklab,var(--ids-color-border-secondary)_40%,transparent)]',
+        ],
+      },
+      tertiary: {
+        root: [
+          '[--chip-fill:var(--ids-color-bg-tertiary)] [--chip-on-fill:var(--ids-color-text-on-tertiary)]',
+          '[--chip-tint:var(--ids-color-bg-tertiary-soft)] [--chip-on-tint:var(--ids-color-text-on-tertiary-soft)]',
+          '[--chip-text:var(--ids-color-text-tertiary)] [--chip-line:color-mix(in_oklab,var(--ids-color-border-tertiary)_40%,transparent)]',
         ],
       },
       success: {
-        root: '[--chip-fill:var(--ids-color-success)] [--chip-on-fill:var(--ids-color-on-success)] [--chip-tint:color-mix(in_oklab,var(--ids-color-success)_15%,transparent)] [--chip-on-tint:var(--ids-color-success-strong)] [--chip-text:var(--ids-color-success-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-success)_40%,transparent)]',
+        root: [
+          '[--chip-fill:var(--ids-color-bg-success)] [--chip-on-fill:var(--ids-color-text-on-success)]',
+          '[--chip-tint:var(--ids-color-bg-success-soft)] [--chip-on-tint:var(--ids-color-text-on-success-soft)]',
+          '[--chip-text:var(--ids-color-text-success)] [--chip-line:color-mix(in_oklab,var(--ids-color-border-success)_40%,transparent)]',
+        ],
       },
       warning: {
-        root: '[--chip-fill:var(--ids-color-warning)] [--chip-on-fill:var(--ids-color-on-warning)] [--chip-tint:color-mix(in_oklab,var(--ids-color-warning)_18%,transparent)] [--chip-on-tint:var(--ids-color-warning-strong)] [--chip-text:var(--ids-color-warning-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-warning)_50%,transparent)]',
+        root: [
+          '[--chip-fill:var(--ids-color-bg-warning)] [--chip-on-fill:var(--ids-color-text-on-warning)]',
+          '[--chip-tint:var(--ids-color-bg-warning-soft)] [--chip-on-tint:var(--ids-color-text-on-warning-soft)]',
+          '[--chip-text:var(--ids-color-text-warning)] [--chip-line:color-mix(in_oklab,var(--ids-color-border-warning)_40%,transparent)]',
+        ],
       },
       danger: {
-        root: '[--chip-fill:var(--ids-color-danger)] [--chip-on-fill:var(--ids-color-on-danger)] [--chip-tint:color-mix(in_oklab,var(--ids-color-danger)_12%,transparent)] [--chip-on-tint:var(--ids-color-danger-strong)] [--chip-text:var(--ids-color-danger-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-danger)_40%,transparent)]',
+        root: [
+          '[--chip-fill:var(--ids-color-bg-danger)] [--chip-on-fill:var(--ids-color-text-on-danger)]',
+          '[--chip-tint:var(--ids-color-bg-danger-soft)] [--chip-on-tint:var(--ids-color-text-on-danger-soft)]',
+          '[--chip-text:var(--ids-color-text-danger)] [--chip-line:color-mix(in_oklab,var(--ids-color-border-danger)_40%,transparent)]',
+        ],
       },
       info: {
-        root: '[--chip-fill:var(--ids-color-info)] [--chip-on-fill:var(--ids-color-on-info)] [--chip-tint:color-mix(in_oklab,var(--ids-color-info)_12%,transparent)] [--chip-on-tint:var(--ids-color-info-strong)] [--chip-text:var(--ids-color-info-strong)] [--chip-line:color-mix(in_oklab,var(--ids-color-info)_40%,transparent)]',
+        root: [
+          '[--chip-fill:var(--ids-color-bg-info)] [--chip-on-fill:var(--ids-color-text-on-info)]',
+          '[--chip-tint:var(--ids-color-bg-info-soft)] [--chip-on-tint:var(--ids-color-text-on-info-soft)]',
+          '[--chip-text:var(--ids-color-text-info)] [--chip-line:color-mix(in_oklab,var(--ids-color-border-info)_40%,transparent)]',
+        ],
       },
     } satisfies Record<ChipColorScheme, object>,
     variant: {

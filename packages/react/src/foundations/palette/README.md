@@ -19,7 +19,7 @@
 // .storybook/palettes.ts 가 앱 팔레트 모양으로 바꾼다
 import { palettes } from '~story-kit';
 
-<IdsProvider.Scope theme={{ palette: palettes.blue }}>…</IdsProvider.Scope>;
+<IdsProvider.Scope theme={{ primary: palettes.blue }}>…</IdsProvider.Scope>;
 ```
 
 ## 알아둘 것

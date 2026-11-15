@@ -72,7 +72,7 @@ const meta = {
   render: (args) => (
     <Marquee {...args} className={args.orientation === 'vertical' ? 'h-48 w-80' : undefined}>
       {PARTNERS.map((name) => (
-        <Marquee.Item key={name} className="text-subtitle-s1-semibold text-(--ids-color-on-muted)">
+        <Marquee.Item key={name} className="text-subtitle-s1-semibold text-neutral">
           {name}
         </Marquee.Item>
       ))}
@@ -113,10 +113,7 @@ export const Gallery: Story = {
               className={orientation === 'vertical' ? 'h-40 w-80 gap-3' : 'w-80'}
             >
               {PARTNERS.map((name) => (
-                <Marquee.Item
-                  key={name}
-                  className="text-body-b1-semibold text-(--ids-color-on-muted)"
-                >
+                <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
                   {name}
                 </Marquee.Item>
               ))}
@@ -132,10 +129,7 @@ export const Gallery: Story = {
         <Showcase.Row label="fade">
           <Marquee aria-label="fade" defaultPlaying={false} reducedMotion={false}>
             {PARTNERS.map((name) => (
-              <Marquee.Item
-                key={name}
-                className="text-body-b1-semibold text-(--ids-color-on-muted)"
-              >
+              <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
                 {name}
               </Marquee.Item>
             ))}
@@ -144,10 +138,7 @@ export const Gallery: Story = {
         <Showcase.Row label="no fade">
           <Marquee aria-label="no fade" fade={false} defaultPlaying={false} reducedMotion={false}>
             {PARTNERS.map((name) => (
-              <Marquee.Item
-                key={name}
-                className="text-body-b1-semibold text-(--ids-color-on-muted)"
-              >
+              <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
                 {name}
               </Marquee.Item>
             ))}
@@ -176,10 +167,7 @@ export const Gallery: Story = {
         <Showcase.Row label="Marquee.Pause">
           <Marquee aria-label="outline pause" defaultPlaying={false} reducedMotion={false}>
             {PARTNERS.map((name) => (
-              <Marquee.Item
-                key={name}
-                className="text-body-b1-semibold text-(--ids-color-on-muted)"
-              >
+              <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
                 {name}
               </Marquee.Item>
             ))}
@@ -194,10 +182,7 @@ export const Gallery: Story = {
             reducedMotion={false}
           >
             {PARTNERS.map((name) => (
-              <Marquee.Item
-                key={name}
-                className="text-body-b1-semibold text-(--ids-color-on-muted)"
-              >
+              <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
                 {name}
               </Marquee.Item>
             ))}
@@ -212,10 +197,7 @@ export const Gallery: Story = {
         <Showcase.Row label="reducedMotion">
           <Marquee aria-label="reduced motion" reducedMotion className="w-80">
             {PARTNERS.map((name) => (
-              <Marquee.Item
-                key={name}
-                className="text-body-b1-semibold text-(--ids-color-on-muted)"
-              >
+              <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
                 {name}
               </Marquee.Item>
             ))}
@@ -338,10 +320,7 @@ export const Controlled: Story = {
           reducedMotion={false}
         >
           {PARTNERS.map((name) => (
-            <Marquee.Item
-              key={name}
-              className="text-subtitle-s1-semibold text-(--ids-color-on-muted)"
-            >
+            <Marquee.Item key={name} className="text-subtitle-s1-semibold text-neutral">
               {name}
             </Marquee.Item>
           ))}
@@ -350,7 +329,7 @@ export const Controlled: Story = {
           <Button variant="outline" size="tiny" onClick={() => setPlaying(!playing)}>
             {playing ? '모두 멈추기' : '다시 흐르기'}
           </Button>
-          <span className="text-body-b3-regular text-(--ids-color-on-muted)">
+          <span className="text-body-b3-regular text-neutral">
             {playing ? '흐르는 중' : '멈춤'}
           </span>
         </div>
@@ -387,7 +366,7 @@ export const Speed: Story = {
       {speeds.map((speed) => (
         <Marquee key={speed} aria-label={`speed ${speed}`} speed={speed} reducedMotion={false}>
           {PARTNERS.map((name) => (
-            <Marquee.Item key={name} className="text-body-b1-semibold text-(--ids-color-on-muted)">
+            <Marquee.Item key={name} className="text-body-b1-semibold text-neutral">
               {name}
             </Marquee.Item>
           ))}
@@ -486,7 +465,7 @@ export const ReducedMotion: Story = {
   render: () => (
     <Marquee aria-label="함께하는 단체" reducedMotion className="w-72">
       {PARTNERS.map((name) => (
-        <Marquee.Item key={name} className="text-subtitle-s1-semibold text-(--ids-color-on-muted)">
+        <Marquee.Item key={name} className="text-subtitle-s1-semibold text-neutral">
           {name}
         </Marquee.Item>
       ))}

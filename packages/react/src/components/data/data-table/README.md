@@ -91,7 +91,7 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 - 머리글 체크박스는 모든 행(모든 페이지)을 고르고 풉니다. 일부만 골랐으면 `indeterminate` 입니다.
 - `Shift` 를 누른 채 체크박스를 누르면 마지막으로 누른 행부터 그 행까지 같은 값으로 바꿉니다.
 - 체크박스 이름은 `getRowLabel` 이 있으면 "{label} 선택", 없으면 "{n}번째 행 선택" 입니다.
-- 선택된 행은 `Table.Row selected` 로 `muted-hover` 가 깔리고 `data-selected` 가 붙습니다.
+- 선택된 행은 `Table.Row selected` 로 `bg-neutral-soft-hover` 가 깔리고 `data-selected` 가 붙습니다.
 - 표 아래 "{n}개 선택됨" 이 `aria-live="polite"` 로 바뀐 수를 알립니다.
 - 값은 `{ [rowId]: true }` 입니다. 지운 행의 id 는 스스로 빠지지 않으니 데이터에서 행을 지울 때 선택에서도 뺍니다.
 

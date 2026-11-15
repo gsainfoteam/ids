@@ -20,7 +20,7 @@ async function withMotion() {
 const shimmerOf = async (dir: 'ltr' | 'rtl' = 'ltr') => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <p dir={dir} className="shimmer text-(--ids-color-on-muted)" data-testid="line">
+      <p dir={dir} className="shimmer text-neutral" data-testid="line">
         <svg aria-hidden="true" width="16" height="16" data-testid="icon">
           <circle cx="8" cy="8" r="6" fill="currentColor" />
         </svg>

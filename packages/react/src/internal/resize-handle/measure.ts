@@ -1,3 +1,5 @@
+import { cornerExponent } from '../corner-shape';
+
 import type { ResizeDimension } from './axis';
 
 export type MeasuredAxis = { size: number; min: number; max: number };
@@ -52,6 +54,11 @@ export function innerEndEndRadius(element: HTMLElement) {
     parseFloat(style.borderBlockEndWidth) || 0,
   );
   return Math.max(0, outer - border);
+}
+
+export function endEndCornerExponent(element: HTMLElement) {
+  const style = styleOf(element);
+  return cornerExponent(style, style.direction === 'rtl' ? 'bottom-left' : 'bottom-right');
 }
 
 export function markDragged(elements: readonly Element[], dragged: boolean) {

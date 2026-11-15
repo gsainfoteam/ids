@@ -85,7 +85,7 @@ import { QRCode } from '@gsainfoteam/ids-react';
 
 <QRCode
   value={url}
-  className="[--qr-code-foreground:var(--ids-color-accent)]"  // 모듈 색
+  className="[--qr-code-foreground:var(--ids-color-text-primary)]"  // 모듈 색
 />
 ```
 

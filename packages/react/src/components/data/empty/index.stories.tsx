@@ -197,7 +197,7 @@ export const TableEmptyState: Story = {
     <table className="text-body-b3-regular w-full max-w-xl">
       <caption className="text-body-b3-semibold mb-2 text-start">구성원</caption>
       <thead>
-        <tr className="border-b border-(--ids-color-border) text-(--ids-color-on-muted)">
+        <tr className="border-neutral text-neutral border-b">
           <th scope="col" className="px-3 py-2 text-start font-medium">
             이름
           </th>

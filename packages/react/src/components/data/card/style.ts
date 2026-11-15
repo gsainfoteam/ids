@@ -6,20 +6,20 @@ import type { IdsSize } from '../../../tokens/types';
 export const cardStyle = tv({
   slots: {
     root: [
-      'relative isolate flex flex-col text-(--ids-color-on-surface)',
+      'relative isolate flex flex-col text-on-surface',
       '[--card-pad:var(--ids-concentric-pad)]',
     ],
     header: [
-      'grid auto-rows-min items-start gap-1 border-(--ids-color-border)',
+      'grid auto-rows-min items-start gap-1 border-neutral',
       'has-[[data-card-action]]:grid-cols-[minmax(0,1fr)_auto]',
       '[.border-b]:-mx-(--card-pad) [.border-b]:px-(--card-pad) [.border-b]:pb-(--card-gap)',
     ],
     title: '[overflow-wrap:anywhere]',
-    description: 'text-(--ids-color-on-muted)',
+    description: 'text-neutral',
     action: 'col-start-2 row-span-2 row-start-1 self-start justify-self-end',
-    content: 'flex-1 border-(--ids-color-border)',
+    content: 'flex-1 border-neutral',
     footer: [
-      'flex items-center gap-2 border-(--ids-color-border)',
+      'flex items-center gap-2 border-neutral',
       '[.border-t]:-mx-(--card-pad) [.border-t]:px-(--card-pad) [.border-t]:pt-(--card-gap)',
     ],
     media: [
@@ -32,9 +32,9 @@ export const cardStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-(--ids-color-surface) shadow-xs inset-ring-1 inset-ring-(--ids-color-border) [--card-ring:1px]',
+        root: 'bg-surface shadow-xs inset-ring-1 inset-ring-neutral [--card-ring:1px]',
       },
-      soft: { root: 'bg-(--ids-color-muted) [--card-ring:0px]' },
+      soft: { root: 'bg-neutral-soft [--card-ring:0px]' },
       ghost: { root: 'bg-transparent [--card-ring:0px]' },
     } satisfies Record<CardVariant, object>,
     size: {

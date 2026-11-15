@@ -338,7 +338,7 @@ with a bare `cn('...')` when it belongs to the same component — that hides the
 variant system and duplicates the variant keys.
 
 Colors that a variant fans out to several parts go through a CSS custom property
-(`[--chip-accent:var(--ids-color-primary)]`) rather than one class per part-and-scheme pair.
+(`[--chip-accent:var(--ids-color-bg-primary)]`) rather than one class per part-and-scheme pair.
 
 **Tailwind only generates classes it can see as literal text in a source file.** A class assembled
 at runtime never reaches the stylesheet, and the failure is silent — the class lands in the DOM
@@ -365,8 +365,11 @@ controls, `[data-focus-visible]` for components driven by `useInteractive`, and
 inner element with `data-field-input` rather than adding a component-specific `has-[...]:ring`.
 Borders stay `inset-ring`, so the focus ring sits outside them and composes with `shadow-xs`
 instead of replacing it. Focus also recolors that inset-ring border to primary, and an element
-with `aria-invalid="true"` or `data-invalid` gets a danger border and a danger ring; neither
-state is repeated in component styles.
+with `aria-invalid="true"` or `data-invalid` gets a border and a ring in `border-danger`, which is
+the color of its label and error message; neither state is repeated in component styles. An element whose ring must sit above its neighbours (a joined
+Group item, an OTP slot, a Calendar day) raises itself with the `focus-ring-visible:` variant, which
+the CSS package builds from the same triggers as `focus-ring`; stacking on `focus-visible:` or
+`data-focus-visible:` alone leaves a ring drawn by another trigger under the next item.
 
 **Radius is 10px, and containers grow it concentrically.** The scale is `standard` (10px, every
 control at every size), `indicator` (4px, only for boxes under 24px such as the Checkbox box or
@@ -401,32 +404,59 @@ since the bar ends are inset from the root's own computed radius. A `<textarea>`
 too (`ScrollArea.Viewport asChild`): it scrolls itself, and ScrollArea remeasures it on `input`.
 Popover keeps its arrow outside the ScrollArea, since the viewport clips what overflows.
 
+**Colors are families × roles, and the utility prefix states the property.** Eight families
+(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`) each have
+the same ten roles: `bg-X`, `bg-X-hover`, `bg-X-active`, `bg-X-soft`, `bg-X-soft-hover`,
+`bg-X-soft-active`, `text-on-X`, `text-on-X-soft`, `text-X` and `border-X`, over the base layer
+`bg-surface` / `text-on-surface`. The table lives in `packages/core/color-roles.json`; the CSS
+variable is `--ids-color-<role>`, and each Tailwind namespace (`--background-color-*`,
+`--text-color-*`, `--border-color-*`, `--ring-color-*`, `--outline-color-*`, `--fill-*`,
+`--stroke-*`) maps only the roles that fit it, so there is no shared `--color-<role>` and
+`bg-on-primary` does not exist. Write named utilities (`bg-primary-soft`, `inset-ring-neutral`),
+not `bg-(--ids-color-…)`; an arbitrary value is only for an inverted use such as
+`bg-(--ids-color-on-surface)`. A brand family the theme leaves out (`secondary`, `tertiary`) is
+derived from primary (`ids-provider/derived-brands.ts`), so the provider always writes all three.
+
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
-`--ids-color-border` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
+`border-neutral` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
-the theme color, while `outline` and `ghost` stay neutral. `--ids-color-outline` is the
-theme-tinted line for the rare edge that should itself read as the brand.
+the theme color, while `outline` and `ghost` stay neutral. `border-neutral` is decorative and
+exempt from contrast. `border-primary` and every other family's `border-X`, for the rare edge that
+should itself read as that color, is the same step as `text-X`, so a line and the text beside it
+(an invalid field's border, its label and error message) are one color.
 
-**Brand color has one role per background.** A brand fill (`primary`) carries `on-primary`; a soft
-brand surface is `secondary` with `on-secondary` text, and its hover and press mix 6% and 12% of
-`primary` in; brand-colored text or an icon sitting on the page with no brand fill behind it (an
-outline Badge or Chip, a Rating star, a Radio dot) is `accent`. Never write `primary` as a text
-color or `primary/10` as a soft fill: light hues such as yellow and cyan fall under 4.5:1 there.
-Every pair reaches 4.5:1 in both modes, which `tests/tokens-contrast.test.ts` checks. Status
-schemes keep their own ladder: `-strong` for text, the status color at 10% to 20% for tints.
+**Each family has one role per background.** A fill (`bg-primary`) carries `text-on-primary`; a
+soft surface is `bg-primary-soft` with `text-on-primary-soft`, and its hover and press
+(`bg-primary-soft-hover`, `-active`) mix 6% and 12% of the fill in; text or an icon sitting on the
+page with no fill behind it (an outline Badge or Chip, a Rating star, a Radio dot, a Link) is
+`text-primary`. Never write `bg-primary` as a text color or `primary/10` as a soft fill: light hues
+such as yellow and cyan fall under Lc 60 there. Statuses follow the same roles (`bg-danger-soft`
+with `text-on-danger-soft`, `text-danger` for text). Text on a fill or a soft surface reaches APCA
+Lc 75, `text-X` Lc 60 on the surface and on `bg-X-soft` (short labels, links and messages), and every
+`border-X` (the `text-X` step) at least Lc 45 in both modes, for all 17 demo palettes, pure and tinted neutrals and harmonized and
+fixed statuses, which `tests/tokens-contrast.test.ts` checks.
 
-**Neutral states climb one step at a time.** A transparent control goes rest → hover `muted` →
-press `muted-hover`; a filled control goes `muted` → `muted-hover` → `muted-active`; a handle (a
-ScrollArea thumb, the Drawer handle) goes `handle` → `handle-hover` → `handle-active` while
-dragged. A pressed toggle takes the press step. The ladder leaves alone translucent layers over a
-background it does not know (Item and Card `on-surface` overlays, Chip's `currentColor` layer,
-Kbd), brand states, edge rings, disabled opacity and backdrops.
+**Contrast is APCA, not WCAG 2.** Roles are picked by APCA lightness contrast (`contrastAPCA` from
+`colorjs.io/fn`, in `ids-provider/contrast.ts`). The fill starts at 600 and moves to 500 or 700,
+then 400 or 800, until white or neutral 950 text reaches Lc 75; the text is whichever reads
+better. WCAG 2's ratio rates dark text on mid-tone fills too well, so it is not used, and axe's
+`color-contrast` rule, which computes it, is off in `parameters.a11y`; the token test checks APCA
+instead.
+
+**Neutral states climb one step at a time.** A transparent control goes rest → hover
+`bg-neutral-soft` → press `bg-neutral-soft-hover`; a filled control goes `bg-neutral-soft` →
+`bg-neutral-soft-hover` → `bg-neutral-soft-active`; a handle (a ScrollArea thumb, the Drawer
+handle) goes `bg-neutral` → `bg-neutral-hover` → `bg-neutral-active` while dragged. Secondary text
+is `text-neutral`. A pressed toggle takes the press step. The ladder leaves alone translucent layers
+over a background it does not know (Item and Card `on-surface` overlays, Chip's `currentColor`
+layer, Kbd), brand states, edge rings, disabled opacity and backdrops.
 
 **A brand fill's states move away from its text.** Hover and press on a solid brand fill (solid
 Button, a selected Calendar day or TimePicker option) take `--control-fill-hover` and
-`--control-fill-press` from `internal/brand-fill.ts`: 10% and 20% toward black under white text,
-toward white under dark text, so no palette drops below the 4.5:1 it has at rest. Do not fade a
-filled brand color with `/90`: over a white page it lightens blue under white text to 4.46:1.
+`--control-fill-press` from the family's `bg-X-hover` and `bg-X-active`, which the provider mixes
+10% and 20% toward black under white text and toward white under dark text, so no palette drops
+below the contrast it has at rest. Do not fade a
+filled brand color with `/90`: over a white page it lightens the fill under white text.
 
 **Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
 TelField, ChipField, Select and the date, time and color triggers draw their box from
@@ -586,7 +616,7 @@ projects:
   `tests/story-checks.ts`) render every story and run its `play` through portable stories
   (`composeStories` + `run()`), every story in light and then every story in dark mode, then run
   axe-core over the page with the WCAG 2.0, 2.1 and 2.2 A and AA tags and fail with one line per
-  rule, node and fix; a story tagged `'!test'` is skipped. The stories are split by category so
+  rule, node and fix (`color-contrast` excepted, see APCA above); a story tagged `'!test'` is skipped. The stories are split by category so
   no single page renders all of them.
   `tests/hydration.test.tsx` renders every story with `renderToString`, hydrates that HTML with
   `hydrateRoot` and fails on a recoverable error or any `console.error`.
@@ -700,7 +730,7 @@ replays a Chromium-only result.
 **Accessibility.** The axe options live in `parameters.a11y` of `.storybook/preview.tsx`, which
 `@storybook/addon-a11y` reads for the Accessibility panel too, so the panel and the test check the
 same rules. A violation is fixed in the component, with a test, or in the story when only its
-scaffolding is wrong. A rule is never turned off for the project. A story that shows a misuse on
+scaffolding is wrong. A rule is never turned off for the project, except `color-contrast`, which APCA replaces. A story that shows a misuse on
 purpose (Button's `DevelopmentWarnings` nests a button in a button) turns off that one rule with
 `parameters: { a11y: { options: { rules: { 'nested-interactive': { enabled: false } } } } }` and
 says why in its description. The decorator paints `<body>` with the story's surface color, so a
@@ -719,17 +749,32 @@ Flutter): `data-mode` and inline variables. Without it, the brand variables are 
 colors will not render.
 
 ```tsx
-const theme = defineIdsTheme({ palette: appPalette, radius: 10, cornerShape: 'round' });
+const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'round' });
 
 <IdsProvider theme={theme} mode="light">
   <App />
 </IdsProvider>
 ```
 
-- The app owns its brand palette (`50` to `950`). The provider picks the six brand roles for both
-  modes by contrast (`ids-provider/theme-roles.ts`) and writes them as `--ids-theme-{mode}-{role}`;
-  `ids.css` maps the current mode's set onto `--ids-color-{role}`. Neutral, status and chart stay
-  IDS's own tokens.
+- The app owns its brand colors: `primary` (required), `secondary` and `tertiary`, each a palette
+  (`50` to `950`) or one CSS color to build one from. The provider picks every family's roles for
+  both modes by contrast (`ids-provider/theme-roles.ts`) and writes them as
+  `--ids-theme-{mode}-{role}`; `ids.css` maps the current mode's set onto `--ids-color-{role}`.
+- `neutral: 'tinted'` gives the neutral the primary hue at low chroma (`'pure'` by default).
+  `status` is `'harmonized'` by default (each status hue turns toward primary by at most 15°, or
+  half the distance, and stays in its hue range), `'fixed'`, or colors the app picks.
+- `checkIdsTheme` also reports brand families that sit too close to each other or to a status
+  (OKLab), a status hue outside its range, and success or warning that look like danger under
+  red-green color blindness. The thresholds come from the 17 reference palettes and
+  `tests/theme-colors.test.ts` derives them again.
+- Chart has no color tokens: a series without `color` takes `bg-primary`, `bg-secondary` and
+  `bg-tertiary` in config order (`DEFAULT_SERIES` in `data/chart/config.ts`). A fourth draws in
+  neutral and warns in development.
+- A `secondary` or `tertiary` the app leaves out is derived from primary, the Material 3 way:
+  secondary keeps primary's hue at a third of its chroma ratio, tertiary turns the hue by +60° at
+  the same ratio, or by −60° when +60° lands too close to a status. Each goes through the same
+  palette builder and role rules, so `colorScheme="tertiary"` and Chart always get three distinct
+  colors.
 - `radius` and `cornerShape` become `--ids-theme-radius-*` and `--ids-corner-shape` on the same
   element. The fonts are fixed (Pretendard GOV, Geist Mono); `@gsainfoteam/ids-css` ships
   their files; `@gsainfoteam/ids-css/no-fonts.css` is the same CSS without them, which the browser
@@ -745,7 +790,9 @@ const theme = defineIdsTheme({ palette: appPalette, radius: 10, cornerShape: 'ro
 IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral and the 17 demo
 palettes the stories use. The per-hue `semantic/[color].{light,dark}.json` files and the `color`
 enum feed only the Dart output until Flutter takes a runtime palette too (#33); the CSS and the
-React types no longer read them.
+React types no longer read them. The Dart formatter keeps the old role names (`primary`,
+`on-primary`, `secondary`, `on-secondary`, `accent`, `outline`) from those files, so `packages/flutter/lib/tokens/*.dart` stay byte-identical while the CSS
+and React use the family roles.
 
 ## Versioning — Changesets (fixed mode)
 

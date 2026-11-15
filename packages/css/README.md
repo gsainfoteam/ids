@@ -65,14 +65,26 @@ React 앱은 `IdsProvider theme` 이 아래 변수를 루트 요소에 넣는다
 ```html
 <div
   data-mode="light"
-  style="--ids-theme-light-primary: #155dfc; --ids-theme-light-on-primary: #ffffff; /* … 역할 6개 × 두 모드 */"
+  style="--ids-theme-light-bg-primary: #155dfc; --ids-theme-light-text-on-primary: #ffffff; /* … 계열 × 역할 × 두 모드 */"
 >
   <!-- 이 하위에서 CSS 변수 활성화 -->
 </div>
 ```
 
-- 브랜드 역할 `primary`, `on-primary`, `secondary`, `on-secondary`, `accent`, `outline` 은 `--ids-theme-{light|dark}-{역할}` 에서 읽는다. `data-mode` 가 둘 중 하나를 `--ids-color-{역할}` 로 연결한다.
-- neutral, status, chart 는 이 패키지가 정하고 `data-mode` 에만 따른다.
+- 색은 계열 여덟 개(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`)가 역할 열 개를 가진다. 바탕 층은 `surface`, `on-surface` 두 개다.
+
+  | 역할 | 쓰임 |
+  |---|---|
+  | `bg-X`, `bg-X-hover`, `bg-X-active` | 채움과 그 hover, press |
+  | `bg-X-soft`, `bg-X-soft-hover`, `bg-X-soft-active` | 옅은 채움과 그 hover, press |
+  | `text-on-X` | 채움 위 글자 |
+  | `text-on-X-soft` | 옅은 채움 위 글자 |
+  | `text-X` | 채움 없는 바탕 위 글자와 아이콘 |
+  | `border-X` | 선. 브랜드와 상태는 `text-X` 와 같은 색, `border-neutral` 은 구조선 |
+
+- 역할 변수는 `--ids-color-{역할}` 이고, `--ids-theme-{light|dark}-{역할}` 에서 읽는다. `data-mode` 가 둘 중 하나를 연결한다.
+- 브랜드와 상태 계열의 변수는 IdsProvider 가 모두 쓴다. 테마가 `secondary`, `tertiary` 를 생략해도 primary 에서 만든 값을 쓴다. neutral 과 바탕 층만 변수가 없으면 IDS 의 회색으로 그린다.
+- 공유 `--color-*` 이름은 없다. 유틸리티마다 이름공간이 따로라 앞머리가 속성을 말한다: `bg-primary-soft`(배경), `text-on-primary-soft`(글자), `border-primary`·`ring-primary`·`outline-primary`·`stroke-primary`(선), `fill-primary`(글자 역할).
 - `--ids-radius-standard`, `--ids-radius-indicator`, `--ids-radius-container`, `--ids-corner-shape` 를 요소에 주면 그 아래만 바뀐다. Tailwind 유틸리티(`rounded-standard`, `font-sans`, `bg-primary`)는 `@theme inline` 이라 이 변수를 바로 읽는다.
 
 ### 폰트
@@ -98,15 +110,16 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 
 ```html
 <!-- 색상 -->
-<button class="bg-primary text-on-primary">확인</button>
-<span class="bg-secondary text-on-secondary">새 글</span>
-<a class="text-accent">자세히 보기</a>
+<button class="bg-primary text-on-primary hover:bg-primary-hover">확인</button>
+<span class="bg-primary-soft text-on-primary-soft">새 글</span>
+<a class="text-primary">자세히 보기</a>
+<div class="border border-neutral bg-surface text-on-surface">카드</div>
 
 <!-- 타이포 (피그마 Text style = 크기+weight+leading+tracking 묶음) -->
 <p class="text-headline-h5-semibold">제목</p>
-<p class="text-body-b2-regular text-on-muted">본문</p>
-<button class="text-button-standard">CTA</button>
-<button class="text-button-tiny">작은 CTA</button>
+<p class="text-body-b2-regular text-neutral">본문</p>
+<button class="text-body-b3-medium">CTA</button>
+<button class="text-caption-c1-medium">작은 CTA</button>
 
 <!-- 프리미티브 -->
 <span class="text-h1 font-bold tracking-tight leading-tight">48px</span>
@@ -121,14 +134,24 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 | subtitle | `text-subtitle-s1-semibold`, `text-subtitle-s2-medium` |
 | body | `text-body-b1-regular` … `text-body-b3-bold` |
 | caption | `text-caption-c1-regular`, `text-caption-c2-medium` |
-| button | `text-button-standard`, `text-button-tiny` |
+
+### focus-ring-visible
+
+`focus-ring` 이 ring 을 그리는 바로 그 조건에서 맞는 variant 입니다. ring 이 옆 요소에 가리지 않게 쌓을 때 씁니다.
+
+```html
+<div class="flex [&>*]:focus-ring-visible:z-30">…</div>
+```
+
+- 조건은 `focus-ring` 과 같은 표에서 나옵니다: `:focus-visible`, `[data-focus-visible]`, 안쪽 입력(`data-field-input` 등)에 포커스가 있는 껍데기.
+- `focus-visible:` 이나 `data-focus-visible:` 하나만 쓰면 다른 조건으로 그린 ring(TextField 껍데기 같은)이 옆 요소 밑에 깔립니다.
 
 ### shimmer
 
 흘러나오는 중인 글자 위로 밝은 띠가 지나가게 합니다. AI 답의 "생각하는 중" 같은 상태 줄에 씁니다.
 
 ```html
-<p role="status" class="shimmer text-on-muted">생각하는 중</p>
+<p role="status" class="shimmer text-neutral">생각하는 중</p>
 ```
 
 - 바탕은 글자색(`currentColor`)이고, 띠는 `--ids-color-on-surface` 입니다. 띠가 지나가는 동안 대비가 글자색보다 낮아지지 않습니다.
@@ -148,9 +171,11 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 
 ### 브랜드 색
 
-- 이 패키지에는 브랜드 팔레트가 없다. 앱이 `IdsProvider theme` 에 팔레트를 주면 역할 색을 대비로 골라 위 변수로 넣는다.
-- corner shape: Provider 아래 요소는 `corner-shape: var(--ids-corner-shape, round)` 를 받는다. `rounded-full` 은 언제나 `round` 다.
-- 브랜드 색 글자는 배경에 따라 고른다. `primary` 채움 위는 `on-primary`, `secondary` 위는 `on-secondary`, 채움 없는 페이지 위는 `accent` 다. 셋 다 두 모드에서 4.5:1 을 넘는다.
+- 이 패키지에는 브랜드 팔레트가 없다. 앱이 `IdsProvider theme` 에 `primary`(와 `secondary`, `tertiary`)를 주면 역할 색을 대비로 골라 위 변수로 넣는다.
+- corner shape: Provider 아래 요소는 `corner-shape: var(--ids-corner-shape, round)` 를 받고, `::before` `::after` 는 자기 요소의 모양을 물려받는다. `rounded-full` 은 `before:`, `after:` 같은 variant 를 붙여도 언제나 `round` 다.
+  - `corner-shape` 를 지원하는 브라우저에서 `--ids-radius-*` 와 `concentric-p-*` 의 radius 는 `--ids-theme-corner-radius-scale`(squircle 이면 1.84) 배가 된다. squircle 모서리가 round 만큼 깊어진다.
+- 브랜드 색 글자는 배경에 따라 고른다. `bg-primary` 위는 `text-on-primary`, `bg-primary-soft` 위는 `text-on-primary-soft`, 채움 없는 페이지 위는 `text-primary` 다. 앞의 둘은 APCA Lc 75, `text-primary` 는 바탕과 soft 에서 Lc 60 을 넘는다.
+- `primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않는다. 밝은 색상은 흰 바탕에서 Lc 60 도 안 된다.
 
 `data-mode`는 `light` / `dark`.
 

@@ -8,7 +8,7 @@ export function Link(props: Link.Props) {
 }
 
 export namespace Link {
-  export type ColorScheme = 'accent' | 'neutral';
+  export type ColorScheme = 'primary' | 'secondary' | 'tertiary' | 'neutral';
   export type Underline = 'always' | 'hover';
 
   export type Props = ComponentProps<'a'> & {

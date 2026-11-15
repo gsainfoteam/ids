@@ -5,16 +5,16 @@ import type { Divider } from '.';
 export const dividerStyle = tv({
   slots: {
     root: 'm-0 shrink-0 border-0',
-    label: 'min-w-0 text-center text-caption-c1-medium text-(--ids-color-on-muted)',
+    label: 'min-w-0 text-center text-caption-c1-medium text-neutral',
   },
   variants: {
     orientation: { horizontal: {}, vertical: {} } satisfies Record<Divider.Orientation, object>,
     labelled: {
-      false: { root: 'bg-(--ids-color-border)' },
+      false: { root: 'bg-(--ids-color-border-neutral)' },
       true: {
         root: [
           'flex items-center',
-          'before:shrink before:bg-(--ids-color-border) after:shrink after:bg-(--ids-color-border)',
+          'before:shrink before:bg-(--ids-color-border-neutral) after:shrink after:bg-(--ids-color-border-neutral)',
         ],
       },
     },

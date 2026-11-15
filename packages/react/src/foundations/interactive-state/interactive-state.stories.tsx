@@ -23,7 +23,7 @@ function StateDump({ state }: { state: InteractiveState }) {
   return (
     <pre
       data-testid="state"
-      className="rounded-standard text-caption-c1-regular bg-(--ids-color-muted) px-3 py-2 font-mono text-(--ids-color-on-muted)"
+      className="rounded-standard text-caption-c1-regular bg-neutral-soft text-neutral px-3 py-2 font-mono"
     >
       {JSON.stringify(state, null, 2)}
     </pre>
@@ -43,7 +43,7 @@ export const NodeLocal: Story = {
           </Button>
         </Showcase.Row>
         <Showcase.Row label="data-* 스타일">
-          <Button variant="outline" className="data-hovered:inset-ring-(--ids-color-primary)">
+          <Button variant="outline" className="data-hovered:inset-ring-primary">
             data-hovered로 테두리
           </Button>
         </Showcase.Row>
@@ -75,12 +75,12 @@ export const Mirror: Story = {
               올려 보세요
             </Button>
             {interaction.hovered ? (
-              <span className="text-body-b3-regular flex items-center gap-1 text-(--ids-color-accent)">
+              <span className="text-body-b3-regular text-primary flex items-center gap-1">
                 <InformationCircleIcon className="size-4" />
                 형제가 반응합니다
               </span>
             ) : (
-              <span className="text-body-b3-regular text-(--ids-color-on-muted)">대기 중</span>
+              <span className="text-body-b3-regular text-neutral">대기 중</span>
             )}
           </Showcase.Row>
           <Showcase.Row label="사본">

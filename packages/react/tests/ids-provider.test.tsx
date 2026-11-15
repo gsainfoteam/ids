@@ -51,10 +51,19 @@ test('SSR: the root writes both modes of the theme into its style', () => {
   expect(element.dataset.mode).toBe('light');
   expect(element.hasAttribute('data-color')).toBe(false);
   expect(element.style.colorScheme).toBe('light');
-  expect(element.style.getPropertyValue('--ids-theme-light-primary')).toBe(palettes.blue[600]);
-  expect(element.style.getPropertyValue('--ids-theme-light-secondary')).toBe(palettes.blue[100]);
-  expect(element.style.getPropertyValue('--ids-theme-dark-secondary')).toBe(palettes.blue[950]);
-  expect(element.style.getPropertyValue('--ids-theme-dark-on-secondary')).toBe(palettes.blue[400]);
+  expect(element.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(palettes.blue[600]);
+  expect(element.style.getPropertyValue('--ids-theme-light-bg-primary-soft')).toBe(
+    palettes.blue[100],
+  );
+  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-soft')).toBe(
+    palettes.blue[950],
+  );
+  expect(element.style.getPropertyValue('--ids-theme-dark-text-on-primary-soft')).toBe(
+    palettes.blue[200],
+  );
+  expect(element.style.getPropertyValue('--ids-theme-light-bg-danger')).toMatch(/^#/);
+  expect(element.style.getPropertyValue('--ids-theme-light-bg-secondary')).toMatch(/^#/);
+  expect(element.getAttribute('style')).not.toMatch(/--ids-theme-light-surface/);
 });
 
 test('SSR: radius and corner shape become variables on the element', () => {
@@ -75,14 +84,17 @@ test('SSR: radius and corner shape become variables on the element', () => {
   expect(element.style.getPropertyValue('--ids-font-family-sans')).toBe('');
   expect(element.style.fontFamily).toBe('');
   expect(element.style.getPropertyValue('--ids-corner-shape')).toBe('squircle');
+  expect(element.style.getPropertyValue('--ids-theme-corner-radius-scale')).toBe('1.84');
 });
 
 test('SSR: one color is enough, the provider builds the palette from it', () => {
   const element = parse(
-    renderToString(<IdsProvider theme={{ palette: palettes.violet[500] }} />),
+    renderToString(<IdsProvider theme={{ primary: palettes.violet[500] }} />),
   ).querySelector<HTMLElement>('[data-mode]')!;
-  expect(element.style.getPropertyValue('--ids-theme-light-primary')).toBe(palettes.violet[600]);
-  expect(element.style.getPropertyValue('--ids-theme-dark-secondary')).toBe(palettes.violet[950]);
+  expect(element.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(palettes.violet[600]);
+  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-soft')).toBe(
+    palettes.violet[950],
+  );
 });
 
 test('SSR: a scale is an attribute, and no scale writes none', () => {
@@ -126,8 +138,29 @@ test('the primary role follows the mode the element shows', async () => {
   const role = (testId: string, name: string) =>
     getComputedStyle(screen.getByTestId(testId).element()).getPropertyValue(`--ids-color-${name}`);
 
-  await expect.poll(() => role('light', 'secondary')).toBe(palettes.blue[100]);
-  expect(role('dark', 'secondary')).toBe(palettes.blue[950]);
+  await expect.poll(() => role('light', 'bg-primary-soft')).toBe(palettes.blue[100]);
+  expect(role('dark', 'bg-primary-soft')).toBe(palettes.blue[950]);
+  expect(role('dark', 'bg-secondary-soft'), 'secondary is derived from primary').not.toBe(
+    palettes.blue[950],
+  );
+});
+
+test('a Scope with one color key keeps the colors it inherits', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <IdsProvider.Scope theme={{ secondary: palettes.violet }} data-testid="secondary">
+        <IdsProvider.Scope theme={{ neutral: 'tinted' }} data-testid="tinted" />
+      </IdsProvider.Scope>
+    </IdsProvider>,
+  );
+  const value = (testId: string, name: string) =>
+    getComputedStyle(screen.getByTestId(testId).element()).getPropertyValue(`--ids-color-${name}`);
+
+  await expect.poll(() => value('secondary', 'bg-secondary')).toBe(palettes.violet[600]);
+  expect(value('secondary', 'bg-primary')).toBe(palettes.blue[600]);
+  expect(value('secondary', 'surface')).toBe('#ffffff');
+  expect(value('tinted', 'bg-secondary')).toBe(palettes.violet[600]);
+  expect(value('tinted', 'border-neutral')).not.toBe('#e5e5e5');
 });
 
 test('controlled: setters only report, the parent value decides', async () => {
@@ -161,7 +194,7 @@ test('a Scope inherits what it does not set, and the mode setter reaches the own
       <IdsProvider.Scope mode="dark" data-testid="dark">
         <Probe name="dark" />
       </IdsProvider.Scope>
-      <IdsProvider.Scope theme={{ palette: palettes.orange }} data-testid="orange">
+      <IdsProvider.Scope theme={{ primary: palettes.orange }} data-testid="orange">
         <Probe name="orange" />
       </IdsProvider.Scope>
     </IdsProvider>,
@@ -170,19 +203,17 @@ test('a Scope inherits what it does not set, and the mode setter reaches the own
   const dark = screen.getByTestId('dark');
   const orange = screen.getByTestId('orange');
   const primary = (element: Element) =>
-    getComputedStyle(element).getPropertyValue('--ids-color-primary');
+    getComputedStyle(element).getPropertyValue('--ids-color-bg-primary');
 
   await expect.poll(() => primary(dark.element())).toBe(palettes.blue[600]);
   await expect.element(dark).toHaveAttribute('data-mode', 'dark');
   expect(dark.element().getAttribute('style')).not.toMatch(/--ids-theme/);
-  expect(primary(orange.element())).toBe(palettes.orange[600]);
+  expect(primary(orange.element()), 'orange 600 is too light for Lc 75').toBe(palettes.orange[700]);
   await expect.element(orange).toHaveAttribute('data-mode', 'light');
-  expect(themeSeenBy.orange.theme.palette).toBe(palettes.orange);
-  expect(themeSeenBy.dark.theme.palette).toBe(palettes.blue);
+  expect(themeSeenBy.orange.theme.primary).toBe(palettes.orange);
+  expect(themeSeenBy.dark.theme.primary).toBe(palettes.blue);
 
-  await expect
-    .element(dark, { message: 'a mode switch paints' })
-    .toHaveClass('bg-(--ids-color-surface)');
+  await expect.element(dark, { message: 'a mode switch paints' }).toHaveClass('bg-surface');
   await expect.element(orange, { message: 'a palette switch does not' }).not.toHaveClass(/bg-/);
   await expect.element(outer, { message: 'the root never paints' }).not.toHaveClass(/bg-/);
 
@@ -198,22 +229,42 @@ test('radius and corner shape reach the components under the provider', async ()
       <IdsProvider.Scope theme={{ radius: 14, cornerShape: 'squircle' }}>
         <Button>themed</Button>
         <span data-testid="circle" className="size-4 rounded-full" />
+        <span
+          data-testid="overlaid"
+          className="relative size-8 rounded-standard before:absolute before:inset-0 before:rounded-[inherit] after:absolute after:inset-x-0 after:h-1 after:rounded-full"
+        />
+        <IdsProvider.Scope theme={{ cornerShape: 'round' }}>
+          <Button>round again</Button>
+        </IdsProvider.Scope>
       </IdsProvider.Scope>
       <Button>default</Button>
     </IdsProvider>,
   );
+  const radiusOf = (name: string) =>
+    getComputedStyle(screen.getByRole('button', { name }).element()).borderTopLeftRadius;
   const themed = getComputedStyle(screen.getByRole('button', { name: 'themed' }).element());
   const plain = getComputedStyle(screen.getByRole('button', { name: 'default' }).element());
+  const squircleDrawn = CSS.supports('corner-shape', 'squircle');
 
-  expect(themed.borderTopLeftRadius).toBe('14px');
-  expect(plain.borderTopLeftRadius).toBe('10px');
+  expect(radiusOf('themed'), 'a squircle grows to the depth of a round corner').toBe(
+    squircleDrawn ? '26px' : '14px',
+  );
+  expect(radiusOf('round again')).toBe('14px');
+  expect(radiusOf('default')).toBe('10px');
 
-  if (CSS.supports('corner-shape', 'squircle')) {
+  if (squircleDrawn) {
     const circle = screen.getByTestId('circle').element();
     const round = plain.getPropertyValue('corner-shape');
 
     expect(themed.getPropertyValue('corner-shape')).not.toBe(round);
     expect(getComputedStyle(circle).getPropertyValue('corner-shape')).toBe(round);
+
+    const overlaid = screen.getByTestId('overlaid').element();
+    expect(
+      getComputedStyle(overlaid, '::before').getPropertyValue('corner-shape'),
+      'a pseudo-element painting over its element takes the same corner',
+    ).toBe(themed.getPropertyValue('corner-shape'));
+    expect(getComputedStyle(overlaid, '::after').getPropertyValue('corner-shape')).toBe(round);
   }
 });
 
@@ -252,7 +303,7 @@ test('a scale multiplies sizes, spacing, text and radius, and a nested scale rep
   expect(measure('1.1')).toEqual({ height: 40, fontSize: '15px', radius: '11px' });
 });
 
-test('a theme without a palette is reported in development', async () => {
+test('a theme without a primary is reported in development', async () => {
   const error = vi.spyOn(console, 'error').mockImplementation(() => {});
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   onTestFinished(() => {
@@ -261,7 +312,9 @@ test('a theme without a palette is reported in development', async () => {
   });
 
   await render(<IdsProvider theme={{} as never} />);
-  await expect.poll(() => error.mock.calls.flat().join()).toMatch(/needs a theme with a palette/);
+  await expect
+    .poll(() => error.mock.calls.flat().join())
+    .toMatch(/needs a theme with a primary color/);
 
   await render(
     <IdsProvider theme={testTheme}>
@@ -297,7 +350,7 @@ test('a nested provider inherits a system mode already resolved by its parent', 
   await preferColorScheme('dark');
   const screen = await render(
     <IdsProvider theme={testTheme} defaultMode="system">
-      <IdsProvider.Scope theme={{ palette: palettes.orange }} data-testid="inner">
+      <IdsProvider.Scope theme={{ primary: palettes.orange }} data-testid="inner">
         <Probe name="inner" />
       </IdsProvider.Scope>
     </IdsProvider>,
@@ -313,7 +366,7 @@ test('asChild puts the attributes on the child element', async () => {
     </IdsProvider>,
   );
   const section = screen.container.querySelector<HTMLElement>('#area')!;
-  expect(section.style.getPropertyValue('--ids-theme-light-primary')).toBe(palettes.blue[600]);
+  expect(section.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(palettes.blue[600]);
   expect(section.dataset.mode).toBe('light');
   expect(section.className).toBe('x');
   expect(screen.container.firstElementChild).toBe(section);

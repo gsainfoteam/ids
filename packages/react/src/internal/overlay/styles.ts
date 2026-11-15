@@ -1,6 +1,6 @@
 import { cn } from '../../utils/cn';
 
-const borderOptionsCannotCover = cn('border border-(--ids-color-border)');
+const borderOptionsCannotCover = cn('border border-neutral');
 const cornerOfThePaddedViewport = cn('concentric-p-1 p-0');
 
 export const overlayStyles = {
@@ -8,7 +8,7 @@ export const overlayStyles = {
     'fixed z-50 m-0 flex flex-col outline-none',
     cornerOfThePaddedViewport,
     borderOptionsCannotCover,
-    'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+    'bg-surface text-on-surface',
     'text-body-b3-regular shadow-md',
   ),
   backdrop: cn(

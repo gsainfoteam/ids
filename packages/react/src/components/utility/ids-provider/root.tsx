@@ -58,26 +58,26 @@ export function IdsProviderRoot({
     [ref],
   );
 
-  const hasPalette = context.theme.palette !== undefined;
+  const hasPrimary = context.theme.primary !== undefined;
 
   useEffect(() => {
     if (!isDevelopment) return;
-    if (!hasPalette)
+    if (!hasPrimary)
       console.error(
-        '[IDS] IdsProvider: the outermost IdsProvider needs a theme with a palette, such as <IdsProvider theme={defineIdsTheme({ palette })}>. IdsProvider.Scope only changes the theme it inherits.',
+        "[IDS] IdsProvider: the outermost IdsProvider needs a theme with a primary color, such as <IdsProvider theme={defineIdsTheme({ primary: '#0d9488' })}>. IdsProvider.Scope only changes the theme it inherits.",
       );
     for (const issue of issues)
       console.warn(`[IDS] IdsProvider theme.${issue.path}: ${issue.message}`);
-  }, [hasPalette, issues]);
+  }, [hasPrimary, issues]);
 
   useEffect(() => {
-    if (!isDevelopment || !hasPalette || !elementRef.current) return;
+    if (!isDevelopment || !hasPrimary || !elementRef.current) return;
     const surface = getComputedStyle(elementRef.current).getPropertyValue('--ids-color-surface');
     if (surface.trim() === '')
       console.warn(
         '[IDS] IdsProvider: no IDS color tokens on this element. Import @gsainfoteam/ids-css after tailwindcss.',
       );
-  }, [hasPalette, context.resolvedMode]);
+  }, [hasPrimary, context.resolvedMode]);
 
   const Root = asChild ? Slot : 'div';
   const host = outermost && (
@@ -96,10 +96,7 @@ export function IdsProviderRoot({
             ref={mergedRef}
             data-mode={context.resolvedMode}
             data-scale={ownScale}
-            className={cn(
-              paintsSurface && 'bg-(--ids-color-surface) text-(--ids-color-on-surface)',
-              className,
-            )}
+            className={cn(paintsSurface && 'bg-surface text-on-surface', className)}
             style={{ colorScheme: context.resolvedMode, ...ownVariables, ...style }}
           >
             {asChild ? (

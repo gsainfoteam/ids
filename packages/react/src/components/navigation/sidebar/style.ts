@@ -6,6 +6,8 @@ export type SidebarPanelState = 'expanded' | 'rail' | 'hidden';
 export type SidebarIconColorScheme =
   | 'neutral'
   | 'primary'
+  | 'secondary'
+  | 'tertiary'
   | 'info'
   | 'success'
   | 'warning'
@@ -14,7 +16,7 @@ export type SidebarIconColorScheme =
 export const sidebarStyle = tv({
   slots: {
     root: [
-      'group/sidebar sticky top-0 flex h-dvh shrink-0 self-start text-(--ids-color-on-surface)',
+      'group/sidebar sticky top-0 flex h-dvh shrink-0 self-start text-on-surface',
       '[--sidebar-width:--spacing(60)]',
     ],
     mobileBar: 'flex flex-col p-2 sm:hidden',
@@ -34,11 +36,10 @@ export const sidebarStyle = tv({
     drawerNav: 'flex min-w-0 grow flex-col gap-4 p-2',
     group: 'flex min-w-0 flex-col gap-0.5',
     groupLabel: [
-      'flex h-6 items-center overflow-hidden px-2 text-caption-c1-medium text-(--ids-color-on-muted)',
+      'flex h-6 items-center overflow-hidden px-2 text-caption-c1-medium text-neutral',
       'transition-[height,opacity] duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
     ],
-    groupTrigger:
-      'min-h-6 items-center px-2 py-0 text-caption-c1-medium text-(--ids-color-on-muted)',
+    groupTrigger: 'min-h-6 items-center px-2 py-0 text-caption-c1-medium text-neutral',
     list: 'flex min-w-0 flex-col gap-px',
     listItem: 'flex min-w-0 flex-col',
     subTree: 'ms-[calc(--spacing(4)-0.5px)] flex min-w-0 pt-0.5',
@@ -52,14 +53,14 @@ export const sidebarStyle = tv({
     submenuTrigger: 'data-hovered:bg-transparent data-active:bg-transparent',
     dragFrame: [
       'relative w-full min-w-0 data-dragging:opacity-40',
-      'data-[drop=inside]:[&>[data-sidebar-item]]:bg-(--ids-color-secondary) data-[drop=inside]:[&>[data-sidebar-item]]:text-(--ids-color-on-secondary)',
+      'data-[drop=inside]:[&>[data-sidebar-item]]:bg-primary-soft data-[drop=inside]:[&>[data-sidebar-item]]:text-on-primary-soft',
     ],
     dropLayer: 'relative',
     dropLine: [
-      'pointer-events-none absolute z-10 h-0.5 -translate-y-1/2 rounded-full bg-(--ids-color-primary)',
-      'before:absolute before:-start-1 before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full before:border-[1.5px] before:border-(--ids-color-primary) before:bg-(--ids-color-surface)',
+      'pointer-events-none absolute z-10 h-0.5 -translate-y-1/2 rounded-full bg-primary',
+      'before:absolute before:-start-1 before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full before:border-[1.5px] before:border-primary before:bg-surface',
     ],
-    dragPreview: 'w-full cursor-grabbing bg-(--ids-color-surface) opacity-75 shadow-lg',
+    dragPreview: 'w-full cursor-grabbing bg-surface opacity-75 shadow-lg',
     inset: 'flex min-w-0 flex-1 flex-col',
     provider: 'group/sidebar-provider flex min-h-dvh w-full',
   },
@@ -83,11 +84,13 @@ export const sidebarStyle = tv({
     standalone: { true: {}, false: { root: 'max-sm:hidden' } },
     iconColor: {
       neutral: {},
-      primary: { icon: 'text-(--ids-color-accent)' },
-      info: { icon: 'text-(--ids-color-info-strong)' },
-      success: { icon: 'text-(--ids-color-success-strong)' },
-      warning: { icon: 'text-(--ids-color-warning-strong)' },
-      danger: { icon: 'text-(--ids-color-danger-strong)' },
+      primary: { icon: 'text-primary' },
+      secondary: { icon: 'text-secondary' },
+      tertiary: { icon: 'text-tertiary' },
+      info: { icon: 'text-info' },
+      success: { icon: 'text-success' },
+      warning: { icon: 'text-warning' },
+      danger: { icon: 'text-danger' },
     } satisfies Record<SidebarIconColorScheme, object>,
     touch: {
       true: {

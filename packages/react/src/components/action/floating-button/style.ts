@@ -7,14 +7,14 @@ import type { IdsSize } from '../../../tokens/types';
 const opaqueFills = {
   solid: cn(controlSurface.variant.solid, 'shadow-lg'),
   soft: cn(
-    'bg-(--ids-color-surface) text-(--control-on-soft)',
+    'bg-surface text-(--control-on-soft)',
     'bg-[image:linear-gradient(var(--control-soft),var(--control-soft))]',
     'data-hovered:bg-[image:linear-gradient(var(--control-soft-hover),var(--control-soft-hover))]',
     'data-active:bg-[image:linear-gradient(var(--control-soft-press),var(--control-soft-press))]',
   ),
   outline: cn(
-    'bg-(--ids-color-surface) text-(--control-quiet) inset-ring-1 inset-ring-(--ids-color-border)',
-    'data-hovered:bg-(--ids-color-muted) data-active:bg-(--ids-color-muted-hover)',
+    'bg-surface text-(--control-quiet) inset-ring-1 inset-ring-neutral',
+    'data-hovered:bg-neutral-soft data-active:bg-neutral-soft-hover',
   ),
   glossy: cn(controlSurface.variant.glossy, 'shadow-lg data-active:shadow-lg'),
 } satisfies Record<FloatingButton.Variant, string>;
@@ -29,8 +29,8 @@ export const floatingButtonStyle = tv({
     variant: opaqueFills,
     colorScheme: controlSurface.colorScheme,
     size: {
-      standard: ['text-button-standard', "[&_svg:not([class*='size-'])]:size-6"],
-      tiny: ['text-button-tiny', "[&_svg:not([class*='size-'])]:size-5"],
+      standard: ['text-body-b3-medium', "[&_svg:not([class*='size-'])]:size-6"],
+      tiny: ['text-caption-c1-medium', "[&_svg:not([class*='size-'])]:size-5"],
     } satisfies Record<IdsSize, string[]>,
     iconOnly: {
       true: 'aspect-square rounded-full p-0',

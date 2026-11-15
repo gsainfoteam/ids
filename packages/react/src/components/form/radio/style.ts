@@ -9,7 +9,7 @@ export const radioStyle = tv({
       'relative inline-flex shrink-0 items-center justify-center align-middle',
       'rounded-full focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      '[--radio-accent:var(--ids-color-accent)] data-invalid:[--radio-accent:var(--ids-color-danger)]',
+      '[--radio-accent:var(--ids-color-text-primary)] data-invalid:[--radio-accent:var(--ids-color-text-danger)]',
       'data-disabled:opacity-50',
     ],
     input:
@@ -24,9 +24,9 @@ export const radioStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-(--ids-color-surface) shadow-xs inset-ring-1 inset-ring-(--ids-color-border) dark:bg-(--ids-color-muted)/30',
+        root: 'bg-surface shadow-xs inset-ring-1 inset-ring-neutral dark:bg-neutral-soft/30',
       },
-      soft: { root: 'bg-(--ids-color-muted) inset-ring-1 inset-ring-transparent' },
+      soft: { root: 'bg-neutral-soft inset-ring-1 inset-ring-transparent' },
     } satisfies Record<RadioVariant, object>,
     size: {
       standard: { root: 'size-4', indicator: 'size-2' },

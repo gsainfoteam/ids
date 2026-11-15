@@ -32,13 +32,13 @@ function RouterLink({ children, className, style, ...props }: RouterLinkProps) {
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html').querySelector('a')!;
 
-test('SSR: a native link with accent color and an underline by default', () => {
+test('SSR: a native link with primary color and an underline by default', () => {
   const element = html(<Link href="/notices">Notices</Link>);
   expect(element.getAttribute('href')).toBe('/notices');
   expect(element.hasAttribute('data-link')).toBe(true);
-  expect(element.dataset.colorScheme).toBe('accent');
+  expect(element.dataset.colorScheme).toBe('primary');
   expect(element.dataset.underline).toBe('always');
-  expect(element.className).toMatch(/text-\(--ids-color-accent\)/);
+  expect(element.className).toMatch(/(^| )text-primary( |$)/);
   expect(element.className).toMatch(/focus-ring/);
   expect(element.hasAttribute('rel')).toBe(false);
   expect(element.querySelector('[data-link-new-tab]')).toBeNull();

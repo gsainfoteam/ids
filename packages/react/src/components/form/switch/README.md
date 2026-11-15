@@ -63,7 +63,7 @@ import { Field, Switch } from '@gsainfoteam/ids-react';
   </Switch.Thumb>
 </Switch>
 
-<Switch className="data-[state=checked]:bg-(--ids-color-success)" />   {/* 트랙은 루트다 */}
+<Switch className="data-[state=checked]:bg-success" />   {/* 트랙은 루트다 */}
 ```
 
 - 루트가 트랙입니다. `className` 과 `style` 은 트랙으로 갑니다.

@@ -56,7 +56,7 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 <Card.Footer className="border-t">...</Card.Footer>   {/* 위쪽 선 */}
 ```
 
-- 선 색은 `--ids-color-border` 입니다. 선이 있는 쪽에 패딩이 붙어 간격이 맞습니다.
+- 선 색은 `--ids-color-border-neutral` 입니다. 선이 있는 쪽에 패딩이 붙어 간격이 맞습니다.
 
 ## 누를 수 있는 카드
 

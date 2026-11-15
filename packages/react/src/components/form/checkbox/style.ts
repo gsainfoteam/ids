@@ -9,8 +9,8 @@ export const checkboxStyle = tv({
       'relative inline-flex shrink-0 items-center justify-center align-middle',
       'rounded-indicator focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      '[--checkbox-accent:var(--ids-color-primary)] [--checkbox-on-accent:var(--ids-color-on-primary)]',
-      'data-invalid:[--checkbox-accent:var(--ids-color-danger)] data-invalid:[--checkbox-on-accent:var(--ids-color-on-danger)]',
+      '[--checkbox-accent:var(--ids-color-bg-primary)] [--checkbox-on-accent:var(--ids-color-text-on-primary)]',
+      'data-invalid:[--checkbox-accent:var(--ids-color-bg-danger)] data-invalid:[--checkbox-on-accent:var(--ids-color-text-on-danger)]',
       'data-[state=checked]:bg-(--checkbox-accent) data-[state=checked]:text-(--checkbox-on-accent) data-[state=checked]:inset-ring-(--checkbox-accent)',
       'data-[state=indeterminate]:bg-(--checkbox-accent) data-[state=indeterminate]:text-(--checkbox-on-accent) data-[state=indeterminate]:inset-ring-(--checkbox-accent)',
       'data-disabled:opacity-50',
@@ -26,9 +26,9 @@ export const checkboxStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-(--ids-color-surface) shadow-xs inset-ring-1 inset-ring-(--ids-color-border) dark:bg-(--ids-color-muted)/30',
+        root: 'bg-surface shadow-xs inset-ring-1 inset-ring-neutral dark:bg-neutral-soft/30',
       },
-      soft: { root: 'bg-(--ids-color-muted) inset-ring-1 inset-ring-transparent' },
+      soft: { root: 'bg-neutral-soft inset-ring-1 inset-ring-transparent' },
     } satisfies Record<CheckboxVariant, object>,
     size: {
       standard: { root: 'size-4', indicator: 'size-3.5' },

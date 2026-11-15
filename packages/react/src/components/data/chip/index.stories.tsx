@@ -10,7 +10,16 @@ import { Chip } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['solid', 'soft', 'outline'] as const;
-const colorSchemes = ['neutral', 'primary', 'success', 'warning', 'danger', 'info'] as const;
+const colorSchemes = [
+  'neutral',
+  'primary',
+  'secondary',
+  'tertiary',
+  'success',
+  'warning',
+  'danger',
+  'info',
+] as const;
 
 const meta = {
   title: 'Data/Chip',

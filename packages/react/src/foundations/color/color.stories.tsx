@@ -1,11 +1,63 @@
+import { useMemo } from 'react';
+
+import { PlusIcon, StarIcon } from '@heroicons/react/16/solid';
+import { CalendarDate } from '@internationalized/date';
+import { Area, AreaChart, Bar, BarChart, XAxis } from 'recharts';
 import { expect } from 'storybook/test';
 
 import { Showcase, paletteHues, palettes } from '~story-kit';
 
-import neutralTokens from '../../../../core/tokens/semantic/neutral.light.json';
-import statusTokens from '../../../../core/tokens/semantic/status.light.json';
-import { IdsProvider, useTheme } from '../../components/utility/ids-provider';
-import { BRAND_ROLES } from '../../components/utility/ids-provider/theme';
+import { Button } from '../../components/action/button';
+import { IconButton } from '../../components/action/icon-button';
+import { IconToggle } from '../../components/action/icon-toggle';
+import { Toggle } from '../../components/action/toggle';
+import { Avatar } from '../../components/data/avatar';
+import { Badge } from '../../components/data/badge';
+import { Calendar } from '../../components/data/calendar';
+import { Card } from '../../components/data/card';
+import { Chart } from '../../components/data/chart';
+import { Chip } from '../../components/data/chip';
+import { Item } from '../../components/data/item';
+import { Alert } from '../../components/feedback/alert';
+import { Progress } from '../../components/feedback/progress';
+import { Skeleton } from '../../components/feedback/skeleton';
+import { Spinner } from '../../components/feedback/spinner';
+import { Checkbox } from '../../components/form/checkbox';
+import { Field } from '../../components/form/field';
+import { RadioGroup } from '../../components/form/radio-group';
+import { Rating } from '../../components/form/rating';
+import { Select } from '../../components/form/select';
+import { Slider } from '../../components/form/slider';
+import { Switch } from '../../components/form/switch';
+import { TextField } from '../../components/form/text-field';
+import { Breadcrumb } from '../../components/navigation/breadcrumb';
+import { Pagination } from '../../components/navigation/pagination';
+import { Stepper } from '../../components/navigation/stepper';
+import { Tabs } from '../../components/navigation/tabs';
+import { Kbd } from '../../components/typography/kbd';
+import { Label } from '../../components/typography/label';
+import { Link } from '../../components/typography/link';
+import {
+  IdsProvider,
+  checkIdsTheme,
+  defineIdsTheme,
+  useTheme,
+} from '../../components/utility/ids-provider';
+import {
+  ACCENT_TEXT_LC,
+  MARK_LC,
+  TEXT_LC,
+  lightnessContrast,
+} from '../../components/utility/ids-provider/contrast';
+import { PALETTE_STEPS, type IdsNeutral } from '../../components/utility/ids-provider/theme';
+import { resolveColorsOnce } from '../../components/utility/ids-provider/theme-roles';
+import {
+  IDS_BASE_SLOTS,
+  IDS_BRAND_FAMILIES,
+  IDS_COLOR_FAMILIES,
+  IDS_FAMILY_SLOTS,
+  IDS_STATUS_FAMILIES,
+} from '../../tokens/color-roles';
 import { cn } from '../../utils';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -22,31 +74,33 @@ type Story = StoryObj<typeof meta>;
 const colors = paletteHues;
 const modes = ['light', 'dark'] as const;
 
-const brand = [...BRAND_ROLES];
-const neutral = Object.keys(neutralTokens.color);
-const status = Object.keys(statusTokens.color);
+const slotTemplates = IDS_FAMILY_SLOTS.map((template) => template.replace('{family}', '·'));
 
-const brandPairs = [
-  ['primary', 'on-primary'],
-  ['secondary', 'on-secondary'],
-  ['surface', 'accent'],
-  ['secondary', 'accent'],
-] as const;
+const slotOf = (template: string, family: string) => template.replace('{family}', family);
 
-const pairs = [
-  ...brandPairs,
-  ['surface', 'on-surface'],
-  ['surface', 'on-muted'],
-  ['muted', 'on-muted'],
-  ['success', 'on-success'],
-  ['warning', 'on-warning'],
-  ['danger', 'on-danger'],
-  ['info', 'on-info'],
-  ['surface', 'success-strong'],
-  ['surface', 'warning-strong'],
-  ['surface', 'danger-strong'],
-  ['surface', 'info-strong'],
-] as const;
+const familySlots = (family: string) =>
+  IDS_FAMILY_SLOTS.map((template) => slotOf(template, family));
+
+type Pairing = readonly [background: string, foreground: string, kind: 'text' | 'accent' | 'mark'];
+
+const pairsOf = (family: string): Pairing[] => [
+  [`bg-${family}`, `text-on-${family}`, 'text'],
+  [`bg-${family}-hover`, `text-on-${family}`, 'text'],
+  [`bg-${family}-soft`, `text-on-${family}-soft`, 'text'],
+  [`bg-${family}-soft-active`, `text-on-${family}-soft`, 'text'],
+  ['surface', `text-${family}`, 'accent'],
+  ['surface', `border-${family}`, 'mark'],
+];
+
+const brandPairs = pairsOf('primary');
+
+const pairs: Pairing[] = [
+  ['surface', 'on-surface', 'text'],
+  ['surface', 'text-neutral', 'text'],
+  ['bg-neutral-soft', 'text-on-neutral-soft', 'text'],
+  ['bg-neutral', 'text-on-neutral', 'text'],
+  ...[...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES].flatMap(pairsOf),
+];
 
 function channels(value: string) {
   const [r = 0, g = 0, b = 0] = (value.match(/[\d.]+/g) ?? []).map(Number);
@@ -58,21 +112,8 @@ const hex = (value: string) =>
     .map((channel) => Math.round(channel).toString(16).padStart(2, '0'))
     .join('')}`;
 
-function relativeLuminance(value: string) {
-  const [r, g, b] = channels(value).map((channel) => {
-    const c = channel / 255;
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
-}
-
-function contrastRatio(a: string, b: string) {
-  const [light, dark] = [relativeLuminance(a), relativeLuminance(b)].sort((x, y) => y - x);
-  return (light! + 0.05) / (dark! + 0.05);
-}
-
-const grade = (ratio: number) =>
-  ratio >= 7 ? 'AAA' : ratio >= 4.5 ? 'AA' : ratio >= 3 ? 'AA Large' : 'Fail';
+const gradeOf = (lc: number) =>
+  lc >= TEXT_LC ? 'text' : lc >= ACCENT_TEXT_LC ? 'accent' : lc >= MARK_LC ? 'mark' : 'Fail';
 
 function readSwatch(element: HTMLElement | null) {
   const chip = element?.querySelector<HTMLElement>('[data-chip]');
@@ -84,9 +125,13 @@ function readSwatch(element: HTMLElement | null) {
   output.textContent = isDefined ? hex(style.backgroundColor) : '';
 }
 
-function Swatch({ token }: { token: string }) {
+function useRereadKey() {
   const { theme, resolvedMode } = useTheme();
-  const rereadWhenThemeChanges = `${theme.palette?.[600]}:${resolvedMode}`;
+  return `${JSON.stringify(theme)}:${resolvedMode}`;
+}
+
+function Swatch({ token }: { token: string }) {
+  const rereadWhenThemeChanges = useRereadKey();
   return (
     <div
       key={rereadWhenThemeChanges}
@@ -96,10 +141,10 @@ function Swatch({ token }: { token: string }) {
     >
       <span
         data-chip=""
-        className="rounded-indicator size-7 shrink-0 inset-ring-1 inset-ring-(--ids-color-border)"
+        className="rounded-indicator inset-ring-neutral size-7 shrink-0 inset-ring-1"
         style={{ background: `var(--ids-color-${token})` }}
       />
-      <code data-hex="" className="text-caption-c1-regular font-mono text-(--ids-color-on-muted)" />
+      <code data-hex="" className="text-caption-c1-regular text-neutral font-mono" />
     </div>
   );
 }
@@ -108,54 +153,78 @@ function readPair(element: HTMLElement | null) {
   const sample = element?.querySelector<HTMLElement>('[data-sample]');
   const output = element?.querySelector('[data-ratio]');
   if (!sample || !output) return;
+
   const style = getComputedStyle(sample);
-  const ratio = contrastRatio(style.color, style.backgroundColor);
-  output.textContent = `${ratio.toFixed(2)}:1 ${grade(ratio)}`;
+  const lc = lightnessContrast(hex(style.color), hex(style.backgroundColor));
+  output.textContent = `Lc ${Math.round(lc)} ${gradeOf(lc)}`;
 }
 
-function Pair({ background, foreground }: { background: string; foreground: string }) {
-  const { theme, resolvedMode } = useTheme();
-  const rereadWhenThemeChanges = `${theme.palette?.[600]}:${resolvedMode}`;
+function Pair({
+  background,
+  foreground,
+  kind,
+}: {
+  background: string;
+  foreground: string;
+  kind: Pairing[2];
+}) {
+  const rereadWhenThemeChanges = useRereadKey();
   return (
     <div
       key={rereadWhenThemeChanges}
       ref={readPair}
       data-pair={`${foreground} on ${background}`}
+      data-kind={kind}
       className="flex items-center gap-2"
     >
       <span
         data-sample=""
-        className="rounded-indicator text-caption-c1-semibold flex h-7 w-12 shrink-0 items-center justify-center inset-ring-1 inset-ring-(--ids-color-border)"
+        className="rounded-indicator text-caption-c1-semibold inset-ring-neutral flex h-7 w-12 shrink-0 items-center justify-center inset-ring-1"
         style={{
           background: `var(--ids-color-${background})`,
           color: `var(--ids-color-${foreground})`,
         }}
       >
-        Aa 가
+        {kind === 'mark' ? '■' : 'Aa 가'}
       </span>
-      <code
-        data-ratio=""
-        className="text-caption-c1-regular font-mono text-(--ids-color-on-muted)"
-      />
+      <code data-ratio="" className="text-caption-c1-regular text-neutral font-mono" />
     </div>
   );
 }
 
-const panel = cn('w-max concentric-p-4 inset-ring-1 inset-ring-(--ids-color-border)');
+const panel = cn('w-max concentric-p-4 inset-ring-1 inset-ring-neutral');
 
-const columnLabel = cn('text-caption-c1-medium text-(--ids-color-on-muted)');
+const columnLabel = cn('text-caption-c1-medium text-neutral');
 
-function TokenTable({ tokens }: { tokens: readonly string[] }) {
+const familyRow = cn('grid items-center gap-x-4');
+const familyColumns = { gridTemplateColumns: `9rem repeat(${IDS_COLOR_FAMILIES.length}, 6.5rem)` };
+
+function FamilyTable() {
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-col gap-4">
       {modes.map((mode) => (
         <IdsProvider.Scope key={mode} mode={mode} className={panel}>
           <div className="flex flex-col gap-2">
-            <span className={columnLabel}>{mode}</span>
-            {tokens.map((token) => (
-              <div key={token} className="grid grid-cols-[8.5rem_auto] items-center gap-3">
-                <span className="text-body-b3-regular">{token}</span>
-                <Swatch token={token} />
+            <div className={familyRow} style={familyColumns}>
+              <span className={columnLabel}>{mode}</span>
+              {IDS_COLOR_FAMILIES.map((family) => (
+                <span key={family} className={columnLabel}>
+                  {family}
+                </span>
+              ))}
+            </div>
+            {IDS_FAMILY_SLOTS.map((template, index) => (
+              <div key={template} className={familyRow} style={familyColumns}>
+                <span className="text-body-b3-regular font-mono">{slotTemplates[index]}</span>
+                {IDS_COLOR_FAMILIES.map((family) => (
+                  <Swatch key={family} token={slotOf(template, family)} />
+                ))}
+              </div>
+            ))}
+            {IDS_BASE_SLOTS.map((slot) => (
+              <div key={slot} className={familyRow} style={familyColumns}>
+                <span className="text-body-b3-regular font-mono">{slot}</span>
+                <Swatch token={slot} />
               </div>
             ))}
           </div>
@@ -165,28 +234,29 @@ function TokenTable({ tokens }: { tokens: readonly string[] }) {
   );
 }
 
-const brandTokenRow = cn('grid items-center gap-x-4');
-const brandTokenColumns = { gridTemplateColumns: `4.5rem repeat(${brand.length}, 6.5rem)` };
+const paletteRow = cn('grid items-center gap-x-4');
+const primarySlots = familySlots('primary');
+const paletteColumns = { gridTemplateColumns: `4.5rem repeat(${primarySlots.length}, 6.5rem)` };
 
-function BrandTokenTable() {
+function PaletteTable() {
   return (
     <div className="flex flex-col gap-4">
       {modes.map((mode) => (
         <IdsProvider.Scope key={mode} mode={mode} className={panel}>
           <div className="flex flex-col gap-2">
-            <div className={brandTokenRow} style={brandTokenColumns}>
+            <div className={paletteRow} style={paletteColumns}>
               <span className={columnLabel}>{mode}</span>
-              {brand.map((token) => (
+              {primarySlots.map((token) => (
                 <span key={token} className={columnLabel}>
                   {token}
                 </span>
               ))}
             </div>
             {colors.map((color) => (
-              <IdsProvider.Scope key={color} asChild theme={{ palette: palettes[color] }}>
-                <div className={brandTokenRow} style={brandTokenColumns}>
+              <IdsProvider.Scope key={color} asChild theme={{ primary: palettes[color] }}>
+                <div className={paletteRow} style={paletteColumns}>
                   <span className="text-body-b3-regular">{color}</span>
-                  {brand.map((token) => (
+                  {primarySlots.map((token) => (
                     <Swatch key={token} token={token} />
                   ))}
                 </div>
@@ -217,14 +287,15 @@ function BrandContrastTable() {
               ))}
             </div>
             {colors.map((color) => (
-              <IdsProvider.Scope key={color} asChild theme={{ palette: palettes[color] }}>
+              <IdsProvider.Scope key={color} asChild theme={{ primary: palettes[color] }}>
                 <div className={brandContrastRow} style={brandContrastColumns}>
                   <span className="text-body-b3-regular">{color}</span>
-                  {brandPairs.map(([background, foreground]) => (
+                  {brandPairs.map(([background, foreground, kind]) => (
                     <Pair
                       key={`${foreground}:${background}`}
                       background={background}
                       foreground={foreground}
+                      kind={kind}
                     />
                   ))}
                 </div>
@@ -237,86 +308,491 @@ function BrandContrastTable() {
   );
 }
 
-export const Tokens: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section
-        title="Brand"
-        description="앱이 준 팔레트에서 IdsProvider 가 대비로 고르고, data-mode 에 따라 바뀝니다. 여기는 레포 데모 팔레트 17개입니다. 채움은 primary, soft 는 secondary 와 on-secondary, 채움 없이 페이지 위에 놓이는 브랜드 글자와 아이콘은 accent 입니다. outline은 브랜드 색을 띠어야 하는 드문 선에 씁니다."
-      >
-        <BrandTokenTable />
-      </Showcase.Section>
-      <Showcase.Section
-        title="Neutral"
-        description="data-mode에만 따릅니다. 배경(surface, muted), 글자(on-surface, on-muted), 구조선(border), ScrollArea thumb와 Drawer 손잡이(handle)입니다. 상태는 한 단계씩 오릅니다. muted 다음은 muted-hover, muted-active이고, handle 다음은 handle-hover, handle-active입니다."
-      >
-        <TokenTable tokens={neutral} />
-      </Showcase.Section>
-      <Showcase.Section
-        title="Status"
-        description="의미 색입니다. 채움은 기본 톤, 그 위 글자는 on-*, 흰 배경 위 글자와 아이콘은 대비를 지키는 -strong 톤을 씁니다."
-      >
-        <TokenTable tokens={status} />
-      </Showcase.Section>
-    </Showcase>
-  ),
-  play: async ({ canvasElement }) => {
-    const swatches = [...canvasElement.querySelectorAll('[data-token]')];
-    await expect(swatches.length).toBe(
-      (brand.length * colors.length + neutral.length + status.length) * modes.length,
-    );
-    for (const swatch of swatches)
-      await expect(swatch.querySelector('[data-hex]')?.textContent).toMatch(/^#[0-9a-f]{6}$/);
-  },
+const passes = {
+  text: /^Lc \d+ text$/,
+  accent: /^Lc \d+ (text|accent)$/,
+  mark: /^Lc \d+ (text|accent|mark)$/,
 };
 
-export const Contrast: Story = {
+export const Palettes: Story = {
   render: () => (
     <Showcase>
       <Showcase.Section
-        title="글자와 배경 대비"
-        description="같이 쓰는 짝의 WCAG 대비입니다. 본문 글자는 4.5:1(AA), 큰 글자와 아이콘은 3:1(AA Large) 이상이어야 합니다. 툴바의 Palette 를 바꾸면 브랜드 짝이 다시 계산됩니다."
+        title="Primary × 17 palettes"
+        description="레포 데모 팔레트 17개를 primary 로 줄 때 IdsProvider 가 고르는 역할 색입니다. 테마 하나를 깊게 보려면 Lab 을 씁니다."
       >
-        <div className="flex flex-wrap gap-4">
-          {modes.map((mode) => (
-            <IdsProvider.Scope key={mode} mode={mode} className={panel}>
-              <div className="flex flex-col gap-2">
-                <span className={columnLabel}>{mode}</span>
-                {pairs.map(([background, foreground]) => (
-                  <div
-                    key={`${foreground}:${background}`}
-                    className="grid grid-cols-[13rem_auto] items-center gap-3"
-                  >
-                    <span className="text-body-b3-regular">
-                      {foreground} / {background}
-                    </span>
-                    <Pair background={background} foreground={foreground} />
-                  </div>
-                ))}
-              </div>
-            </IdsProvider.Scope>
-          ))}
-        </div>
+        <PaletteTable />
       </Showcase.Section>
       <Showcase.Section
-        title="브랜드 17색"
-        description="색마다 채움과 그 위 글자, 페이지와 secondary 위 accent 의 대비입니다. 모든 색이 두 모드에서 4.5:1(AA)을 넘습니다. 흰 글자로 AA가 안 되는 밝은 색(orange, amber, yellow, lime, emerald, teal, cyan, sky)은 on-primary가 검은 글자입니다."
+        title="Contrast × 17 palettes"
+        description="색마다 채움과 그 위 글자, soft 채움과 그 위 글자, 페이지 위 글자와 선의 APCA 대비(Lc)입니다. 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60, 선은 Lc 45 를 넘어야 합니다."
       >
         <BrandContrastTable />
       </Showcase.Section>
     </Showcase>
   ),
   play: async ({ canvasElement }) => {
-    const outputs = [...canvasElement.querySelectorAll('[data-ratio]')];
-    const brandOutputs = [...canvasElement.querySelectorAll('[data-brand-contrast] [data-ratio]')];
+    const swatches = [...canvasElement.querySelectorAll('[data-token]')];
+    await expect(swatches.length).toBe(primarySlots.length * colors.length * modes.length);
+    for (const swatch of swatches)
+      await expect(swatch.querySelector('[data-hex]')?.textContent).toMatch(/^#[0-9a-f]{6}$/);
 
-    await expect(outputs.length).toBe(
-      (pairs.length + colors.length * brandPairs.length) * modes.length,
-    );
-    for (const output of outputs)
-      await expect(output.textContent).toMatch(/^\d+\.\d{2}:1 (AAA|AA|AA Large|Fail)$/);
-
+    const brandOutputs = [...canvasElement.querySelectorAll('[data-brand-contrast] [data-pair]')];
     await expect(brandOutputs.length).toBe(colors.length * brandPairs.length * modes.length);
-    for (const output of brandOutputs) await expect(output.textContent).toMatch(/:1 AAA?$/);
+    for (const pair of brandOutputs)
+      await expect(pair.querySelector('[data-ratio]')?.textContent).toMatch(
+        passes[(pair as HTMLElement).dataset.kind as Pairing[2]],
+      );
+  },
+};
+
+const labSchemes = [
+  'primary',
+  'secondary',
+  'tertiary',
+  'neutral',
+  'success',
+  'warning',
+  'danger',
+  'info',
+] as const;
+
+const linkSchemes: readonly string[] = ['primary', 'secondary', 'tertiary', 'neutral'];
+
+const isLinkScheme = (scheme: string): scheme is Link.ColorScheme => linkSchemes.includes(scheme);
+
+const labVariants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
+
+const labMarkVariants = ['solid', 'soft', 'outline'] as const;
+
+const labToday = new CalendarDate(2026, 9, 15);
+
+const labPaletteFamilies = [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES];
+
+const presetColors = paletteHues.map((hue) => palettes[hue][600]);
+
+const LAB_CHART_CONFIG = {
+  web: { label: '웹' },
+  app: { label: '앱' },
+  kiosk: { label: '키오스크' },
+} satisfies Chart.Config;
+
+const LAB_FRUITS = [
+  ['apple', '사과'],
+  ['pear', '배'],
+  ['grape', '포도'],
+] as const;
+
+const LAB_CHART_ROWS = [
+  { day: '월', web: 120, app: 80, kiosk: 30 },
+  { day: '화', web: 150, app: 95, kiosk: 42 },
+  { day: '수', web: 132, app: 110, kiosk: 38 },
+];
+
+type LabArgs = {
+  primary: string;
+  secondary: string;
+  tertiary: string;
+  neutral: IdsNeutral;
+  status: 'harmonized' | 'fixed';
+};
+
+const labThemeOf = ({ primary, secondary, tertiary, neutral, status }: LabArgs) =>
+  defineIdsTheme({
+    primary,
+    secondary: secondary === '' ? undefined : secondary,
+    tertiary: tertiary === '' ? undefined : tertiary,
+    neutral,
+    status,
+  });
+
+const sourceOf = (family: string, given: readonly string[], status: LabArgs['status']) =>
+  given.includes(family)
+    ? '준 색'
+    : IDS_BRAND_FAMILIES.includes(family as (typeof IDS_BRAND_FAMILIES)[number])
+      ? 'primary 에서 만듦'
+      : status;
+
+const labPaletteRow = cn('grid items-center gap-x-2');
+const labPaletteColumns = {
+  gridTemplateColumns: `6rem 8rem repeat(${PALETTE_STEPS.length}, 4.5rem)`,
+};
+
+export const Lab: StoryObj<LabArgs> = {
+  args: {
+    primary: palettes.blue[600],
+    secondary: '',
+    tertiary: '',
+    neutral: 'pure',
+    status: 'harmonized',
+  },
+  argTypes: {
+    primary: {
+      description: '브랜드 색 하나. IdsProvider 가 11단계 팔레트로 만든다',
+      control: { type: 'color', presetColors },
+    },
+    secondary: {
+      description: '비우면 primary 와 같은 hue 에 채도 1/3',
+      control: { type: 'color', presetColors },
+    },
+    tertiary: {
+      description: '비우면 primary hue 를 +60° (상태 색과 겹치면 −60°) 돌리고 채도 1/3',
+      control: { type: 'color', presetColors },
+    },
+    neutral: { control: 'inline-radio', options: ['pure', 'tinted'] },
+    status: { control: 'inline-radio', options: ['harmonized', 'fixed'] },
+  },
+  parameters: {
+    controls: { disable: false },
+    docs: {
+      description: {
+        story:
+          'Controls 에서 색을 고르면 팔레트, 역할, 대비, 컴포넌트가 바로 다시 그려집니다. secondary 와 tertiary 를 비우면 primary 에서 만든 계열을 봅니다.',
+      },
+    },
+  },
+  render: function Render({ primary, secondary, tertiary, neutral, status }) {
+    const theme = useMemo(
+      () => labThemeOf({ primary, secondary, tertiary, neutral, status }),
+      [primary, secondary, tertiary, neutral, status],
+    );
+    const issues = checkIdsTheme(theme);
+    const { colors } = resolveColorsOnce(theme);
+
+    return (
+      <IdsProvider.Scope theme={theme}>
+        <Showcase>
+          <Showcase.Section
+            title="checkIdsTheme"
+            description="IdsProvider 가 개발 모드에서 알리는 목록과 같습니다."
+          >
+            {issues.length === 0 ? (
+              <Alert colorScheme="success" className="max-w-xl">
+                <Alert.Title>문제 없음</Alert.Title>
+                <Alert.Description>checkIdsTheme 이 빈 목록을 돌려줍니다.</Alert.Description>
+              </Alert>
+            ) : (
+              <Alert colorScheme="warning" className="max-w-xl">
+                <Alert.Title>문제 {issues.length}개</Alert.Title>
+                <Alert.Description asChild>
+                  <ul className="list-disc pl-4">
+                    {issues.map((issue) => (
+                      <li key={`${issue.path}:${issue.message}`}>
+                        <code className="font-mono">{issue.path}</code> {issue.message}
+                      </li>
+                    ))}
+                  </ul>
+                </Alert.Description>
+              </Alert>
+            )}
+          </Showcase.Section>
+          <Showcase.Section
+            title="Palettes"
+            description="IdsProvider 가 역할을 고르는 11단계입니다. 채움은 600, 나머지 역할은 대비를 넘는 첫 단계입니다."
+          >
+            <div data-lab-palettes="" className={cn('flex flex-col gap-2', panel)}>
+              <div className={labPaletteRow} style={labPaletteColumns}>
+                <span className={columnLabel}>계열</span>
+                <span className={columnLabel}>출처</span>
+                {PALETTE_STEPS.map((step) => (
+                  <span key={step} className={columnLabel}>
+                    {step}
+                  </span>
+                ))}
+              </div>
+              {colors &&
+                labPaletteFamilies.map((family) => (
+                  <div key={family} className={labPaletteRow} style={labPaletteColumns}>
+                    <span className="text-body-b3-regular font-mono">{family}</span>
+                    <span className="text-caption-c1-regular text-neutral">
+                      {sourceOf(family, colors.given, status)}
+                    </span>
+                    {PALETTE_STEPS.map((step) => (
+                      <div key={step} className="flex flex-col gap-1">
+                        <span
+                          className="rounded-indicator inset-ring-neutral h-7 w-full inset-ring-1"
+                          style={{ background: colors.palettes[family][step] }}
+                        />
+                        <code className="text-caption-c1-regular text-neutral font-mono">
+                          {colors.palettes[family][step]}
+                        </code>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+            </div>
+          </Showcase.Section>
+          <Showcase.Section
+            title="Families × Roles"
+            description="계열 여덟 개가 같은 역할 열 개를 가집니다. bg-primary-soft 는 배경, text-on-primary-soft 는 그 위 글자, border-primary 는 선입니다."
+          >
+            <FamilyTable />
+          </Showcase.Section>
+          <Showcase.Section
+            title="Contrast"
+            description="같이 쓰는 짝의 APCA 대비(Lc)입니다. 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60, 선과 아이콘 같은 표시는 Lc 45 이상이어야 합니다."
+          >
+            <div className="flex flex-wrap gap-4">
+              {modes.map((mode) => (
+                <IdsProvider.Scope key={mode} mode={mode} className={panel}>
+                  <div className="flex flex-col gap-2">
+                    <span className={columnLabel}>{mode}</span>
+                    {pairs.map(([background, foreground, kind]) => (
+                      <div
+                        key={`${foreground}:${background}`}
+                        className="grid grid-cols-[17rem_auto] items-center gap-3"
+                      >
+                        <span className="text-body-b3-regular font-mono">
+                          {foreground} / {background}
+                        </span>
+                        <Pair background={background} foreground={foreground} kind={kind} />
+                      </div>
+                    ))}
+                  </div>
+                </IdsProvider.Scope>
+              ))}
+            </div>
+          </Showcase.Section>
+          {modes.map((mode) => (
+            <Showcase.Section key={mode} title={`Components · ${mode}`}>
+              <IdsProvider.Scope
+                mode={mode}
+                className={cn('flex w-full max-w-6xl flex-col gap-8', panel)}
+              >
+                <div className="flex flex-col gap-2">
+                  <span className={columnLabel}>Button · IconButton · Toggle</span>
+                  {labSchemes.map((colorScheme) => (
+                    <div key={colorScheme} className="flex flex-wrap items-center gap-2">
+                      <span className="text-caption-c1-regular text-neutral w-20 font-mono">
+                        {colorScheme}
+                      </span>
+                      {labVariants.map((variant) => (
+                        <Button key={variant} colorScheme={colorScheme} variant={variant}>
+                          {variant}
+                        </Button>
+                      ))}
+                      <IconButton
+                        colorScheme={colorScheme}
+                        icon={<PlusIcon />}
+                        aria-label={`${colorScheme} 추가`}
+                      />
+                      <Toggle colorScheme={colorScheme} variant="outline" defaultPressed>
+                        켜짐
+                      </Toggle>
+                      <Toggle colorScheme={colorScheme} variant="soft" defaultPressed>
+                        켜짐
+                      </Toggle>
+                      <IconToggle
+                        colorScheme={colorScheme}
+                        variant="solid"
+                        defaultPressed
+                        icon={<StarIcon />}
+                        aria-label={`${colorScheme} 별표`}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="flex flex-col gap-2">
+                    <span className={columnLabel}>Badge · Chip · Link</span>
+                    {labSchemes.map((colorScheme) => (
+                      <div key={colorScheme} className="flex flex-wrap items-center gap-2">
+                        {labMarkVariants.map((variant) => (
+                          <Badge
+                            key={variant}
+                            content={colorScheme}
+                            variant={variant}
+                            colorScheme={colorScheme}
+                          />
+                        ))}
+                        {labMarkVariants.map((variant) => (
+                          <Chip key={variant} variant={variant} colorScheme={colorScheme}>
+                            칩
+                          </Chip>
+                        ))}
+                        {isLinkScheme(colorScheme) && (
+                          <Link colorScheme={colorScheme} href="#lab">
+                            링크
+                          </Link>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className={columnLabel}>Alert · Progress</span>
+                    {labSchemes.map((colorScheme) => (
+                      <div key={colorScheme} className="grid grid-cols-[1fr_1fr_8rem] gap-2">
+                        <Alert colorScheme={colorScheme} variant="soft">
+                          <Alert.Title>{colorScheme}</Alert.Title>
+                        </Alert>
+                        <Alert colorScheme={colorScheme} variant="solid">
+                          <Alert.Title>{colorScheme}</Alert.Title>
+                        </Alert>
+                        <Progress
+                          value={60}
+                          colorScheme={colorScheme}
+                          aria-label={`${colorScheme} 진행`}
+                          className="self-center"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid gap-6 md:grid-cols-3">
+                  <div className="flex flex-col gap-4">
+                    <span className={columnLabel}>Form</span>
+                    <Field>
+                      <Field.Label>이름</Field.Label>
+                      <TextField defaultValue="인포팀" data-1p-ignore data-lpignore="true" />
+                    </Field>
+                    <Field invalid>
+                      <Field.Label>닉네임</Field.Label>
+                      <TextField defaultValue="a" data-1p-ignore data-lpignore="true" />
+                      <Field.Error>두 글자 이상 적어 주세요.</Field.Error>
+                    </Field>
+                    <Select aria-label={`과일 ${mode}`} defaultValue="pear">
+                      {LAB_FRUITS.map(([value, label]) => (
+                        <Select.Item key={value} value={value}>
+                          {label}
+                        </Select.Item>
+                      ))}
+                    </Select>
+                    <div className="flex flex-wrap items-center gap-4">
+                      <Checkbox defaultChecked aria-label={`체크 ${mode}`} />
+                      <Switch defaultChecked aria-label={`스위치 ${mode}`} />
+                      <RadioGroup<'a' | 'b'>
+                        orientation="horizontal"
+                        defaultValue="b"
+                        aria-label={`선택 ${mode}`}
+                      >
+                        {({ Item }) =>
+                          (['a', 'b'] as const).map((value) => (
+                            <Label key={value} className="flex items-center gap-2">
+                              <Item value={value} />
+                              {value}
+                            </Label>
+                          ))
+                        }
+                      </RadioGroup>
+                    </div>
+                    <Slider defaultValue={40} aria-label={`슬라이더 ${mode}`} />
+                    <Rating defaultValue={3.5} step={0.5} aria-label={`별점 ${mode}`} />
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <span className={columnLabel}>Navigation</span>
+                    <Tabs defaultValue="overview">
+                      <Tabs.List aria-label={`탭 ${mode}`}>
+                        <Tabs.Trigger value="overview">개요</Tabs.Trigger>
+                        <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>
+                      </Tabs.List>
+                      <Tabs.Content value="overview">가볍고 오래 가는 키보드입니다.</Tabs.Content>
+                      <Tabs.Content value="reviews">리뷰 128개.</Tabs.Content>
+                    </Tabs>
+                    <Tabs defaultValue="overview" appearance="pill" variant="soft">
+                      <Tabs.List aria-label={`알약 탭 ${mode}`}>
+                        <Tabs.Trigger value="overview">개요</Tabs.Trigger>
+                        <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>
+                      </Tabs.List>
+                      <Tabs.Content value="overview">개요 내용.</Tabs.Content>
+                      <Tabs.Content value="reviews">리뷰 내용.</Tabs.Content>
+                    </Tabs>
+                    <Pagination
+                      defaultPage={3}
+                      pageCount={7}
+                      getHref={(page) => `#page-${page}`}
+                      aria-label={`페이지 ${mode}`}
+                    />
+                    <Breadcrumb aria-label={`위치 ${mode}`}>
+                      <Breadcrumb.List>
+                        <Breadcrumb.Item>
+                          <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
+                        </Breadcrumb.Item>
+                        <Breadcrumb.Item>
+                          <Breadcrumb.Page>설정</Breadcrumb.Page>
+                        </Breadcrumb.Item>
+                      </Breadcrumb.List>
+                    </Breadcrumb>
+                    <Stepper defaultValue={1}>
+                      <Stepper.Item>
+                        <Stepper.Title>계정</Stepper.Title>
+                      </Stepper.Item>
+                      <Stepper.Item>
+                        <Stepper.Title>프로필</Stepper.Title>
+                      </Stepper.Item>
+                      <Stepper.Item>
+                        <Stepper.Title>완료</Stepper.Title>
+                      </Stepper.Item>
+                    </Stepper>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <span className={columnLabel}>Data · Feedback</span>
+                    <Card>
+                      <Card.Header>
+                        <Card.Title>새 프로젝트</Card.Title>
+                        <Card.Description>팀과 함께 쓰는 공간을 만듭니다.</Card.Description>
+                      </Card.Header>
+                      <Card.Footer className="flex justify-end gap-2">
+                        <Button variant="outline">취소</Button>
+                        <Button>만들기</Button>
+                      </Card.Footer>
+                    </Card>
+                    <Item variant="outline">
+                      <Item.Media>
+                        <Avatar name="김철수" />
+                      </Item.Media>
+                      <Item.Content>
+                        <Item.Title>김철수</Item.Title>
+                        <Item.Description>디자인 팀</Item.Description>
+                      </Item.Content>
+                    </Item>
+                    <div className="flex items-center gap-3">
+                      <Spinner aria-label={`불러오는 중 ${mode}`} />
+                      <Skeleton className="h-4 w-24" />
+                      <Kbd keys="Mod+K" platform="mac" />
+                    </div>
+                    <Calendar
+                      today={labToday}
+                      defaultValue={labToday.add({ days: 3 })}
+                      aria-label={`달력 ${mode}`}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
+                    <Chart.Title>막대</Chart.Title>
+                    <BarChart data={LAB_CHART_ROWS}>
+                      <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                      <Bar dataKey="web" radius={4} />
+                      <Bar dataKey="app" radius={4} />
+                      <Bar dataKey="kiosk" radius={4} />
+                    </BarChart>
+                  </Chart>
+                  <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
+                    <Chart.Title>면</Chart.Title>
+                    <AreaChart data={LAB_CHART_ROWS}>
+                      <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                      <Area dataKey="web" type="monotone" />
+                      <Area dataKey="app" type="monotone" />
+                      <Area dataKey="kiosk" type="monotone" />
+                    </AreaChart>
+                  </Chart>
+                </div>
+              </IdsProvider.Scope>
+            </Showcase.Section>
+          ))}
+        </Showcase>
+      </IdsProvider.Scope>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.textContent).toContain('문제 없음');
+    const rows = canvasElement.querySelectorAll('[data-lab-palettes] code');
+    await expect(rows.length).toBe(PALETTE_STEPS.length * labPaletteFamilies.length);
+    for (const row of rows) await expect(row.textContent).toMatch(/^#[0-9a-f]{6}$/);
+
+    const outputs = [...canvasElement.querySelectorAll('[data-ratio]')];
+    await expect(outputs.length).toBe(pairs.length * modes.length);
+    for (const output of outputs)
+      await expect(output.textContent).toMatch(/^Lc \d+ (text|accent|mark|Fail)$/);
   },
 };

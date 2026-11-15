@@ -534,10 +534,7 @@ export const ActivityLog: Story = {
             <time dateTime="2026-09-30T08:40">40분 전</time>
           </Stepper.Description>
           <Stepper.Body>
-            <a
-              href="#design-system-v2"
-              className="text-(--ids-color-accent) underline underline-offset-4"
-            >
+            <a href="#design-system-v2" className="text-primary underline underline-offset-4">
               디자인 시스템 v2 개편안
             </a>
           </Stepper.Body>
@@ -590,10 +587,7 @@ export const DeployLog: Story = {
           <Stepper.Title>테스트</Stepper.Title>
           <Stepper.Description>3개 실패</Stepper.Description>
           <Stepper.Body>
-            <a
-              href="#test-report"
-              className="text-(--ids-color-accent) underline underline-offset-4"
-            >
+            <a href="#test-report" className="text-primary underline underline-offset-4">
               실패한 테스트 보기
             </a>
           </Stepper.Body>

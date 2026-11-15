@@ -130,11 +130,11 @@ test('only the first outermost provider hosts, and items take the theme they wer
   const screen = await render(
     <>
       <IdsProvider theme={testTheme} data-testid="first">
-        <IdsProvider.Scope theme={{ palette: palettes.orange, scale: 1.5 }} mode="dark">
+        <IdsProvider.Scope theme={{ primary: palettes.orange, scale: 1.5 }} mode="dark">
           <Opener />
         </IdsProvider.Scope>
       </IdsProvider>
-      <IdsProvider theme={{ palette: palettes.green }} data-testid="second" />
+      <IdsProvider theme={{ primary: palettes.green }} data-testid="second" />
     </>,
   );
   void overlay.open(() => <p>global</p>);
@@ -144,13 +144,13 @@ test('only the first outermost provider hosts, and items take the theme they wer
   const first = screen.getByTestId('first').element();
   expect(first.contains(global.element())).toBe(true);
   const primaryOf = (element: Element | null) =>
-    getComputedStyle(element!).getPropertyValue('--ids-color-primary');
+    getComputedStyle(element!).getPropertyValue('--ids-color-bg-primary');
   expect(primaryOf(global.element().closest('[data-overlay-item]'))).toBe(palettes.blue[600]);
   expect(global.element().closest('[data-overlay-item]')).not.toHaveAttribute('data-scale');
 
   await userEvent.click(screen.getByRole('button', { name: 'open here' }));
   const scoped = screen.getByText('scoped').element().closest('[data-overlay-item]');
-  expect(primaryOf(scoped)).toBe(palettes.orange[600]);
+  expect(primaryOf(scoped)).toBe(palettes.orange[700]);
   expect(scoped).toHaveAttribute('data-mode', 'dark');
   expect(scoped).toHaveAttribute('data-scale', '1.5');
   overlay.closeAll();

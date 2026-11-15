@@ -5,9 +5,9 @@
 | 파일                                       | 내용                                                                                 |
 | ------------------------------------------ | ------------------------------------------------------------------------------------ |
 | [`axis.ts`](#axists)                       | 키 표(`resizeKeyMap`), separator 의 ARIA(`separatorProps`), `ResizeAxis` 타입         |
-| [`measure.ts`](#measurets)                 | 그려진 크기와 CSS 의 px 한계, 모서리 반지름 재기, 쓰는 방향, 끄는 동안 문서의 커서  |
+| [`measure.ts`](#measurets)                 | 그려진 크기와 CSS 의 px 한계, 모서리 반지름과 모양 재기, 쓰는 방향, 끄는 동안 문서의 커서  |
 | [`use-resize-drag.ts`](#use-resize-dragts) | 포인터 끌기 hook. 한 프레임에 한 번 움직임을 알리고 Escape 로 되돌린다               |
-| [`use-resize-axes.ts`](#use-resize-axests) | `ResizeAxis` 를 끌기, 키, separator 에 잇는 hook, 크기와 모서리 반지름을 지켜보는 hook |
+| [`use-resize-axes.ts`](#use-resize-axests) | `ResizeAxis` 를 끌기, 키, separator 에 잇는 hook, 크기와 모서리 모양을 지켜보는 hook |
 | [`edge.tsx`](#edgetsx)                     | 가장자리 손잡이 `ResizeEdge`. 한 축의 separator 이고 가장자리 위의 막대로 그린다     |
 | [`arc.ts`](#arcts)                         | 모서리 손잡이의 호와 누를 띠의 SVG path, 손잡이 상자의 크기(순수 함수)               |
 | [`grip.tsx`](#griptsx)                     | 모서리 손잡이 `ResizeGrip`. 숨은 separator 둘(너비, 높이)을 담은 group               |
@@ -86,6 +86,7 @@ resizeKeyMap(
 - `holdResizeCursor(document, cursor)` 는 끄는 동안 `<html>` 에 크기 조절 커서와 `user-select: none` 을 걸고, 되돌리는 함수를 돌려줍니다. 포인터가 손잡이 밖으로 나가도 커서가 바뀌지 않고, 끄는 길의 글자가 선택되지 않습니다.
 - `markDragged`, `isBeingDragged` 는 끄는 중인 요소를 `WeakSet` 에 적습니다. `useMeasuredAxes` 가 끄는 동안의 크기 변화를 state 로 옮기지 않게 합니다.
 - `innerEndEndRadius(element)` 는 `border-end-end-radius`(LTR 오른쪽 아래, RTL 왼쪽 아래)를 읽어, 짧은 변의 절반으로 자르고, 그 모서리의 테두리 두께(`border-inline-end-width`, `border-block-end-width` 중 큰 쪽)를 뺀 안쪽 반지름입니다. `%` 는 가로 값은 폭, 세로 값은 높이에 대해 풀고, 타원 반지름은 둘 중 작은 쪽을 씁니다.
+- `endEndCornerExponent(element)` 는 같은 모서리의 `corner-*-shape` 를 [corner-shape.ts](../README.md#corner-shapets) 로 읽어 초타원 지수를 돌려줍니다. `round` 는 2, `squircle` 은 4 입니다.
 
 ## use-resize-drag.ts
 
@@ -148,14 +149,14 @@ const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
 - `useAxesDrag(axes, { disabled, onDraggingChange })` 는 `useResizeDrag` 를 축에 잇습니다. 시작할 때 그려진 크기와 한계를 재고, 프레임마다 요소의 `style.width` / `style.height` 에 바로 쓰고, 끝에는 인라인 값을 시작 전으로 되돌린 뒤 `flushSync` 로 `resize` 를 부릅니다. 제어 컴포넌트의 부모가 값을 받지 않으면 요소는 원래 크기로 남습니다.
 - `axisKeyMap(axis, resizeTo?)` 는 누른 순간의 그려진 크기로 `resizeKeyMap` 을 만듭니다.
 - `useAxisSeparator(axis, options)` 는 한 축의 separator 에 필요한 것(ARIA, 끌기, 키, `Enter` 되돌리기)을 한 번에 돌려줍니다.
-- `useCornerRadius(corner)` 는 `corner` 요소의 `innerEndEndRadius` 를 state 로 둡니다. 마운트할 때와 `ResizeObserver` 가 크기 변화를 알릴 때 읽고, 부른 컴포넌트가 다시 렌더될 때마다 한 번 더 읽습니다. 요소가 아직 없으면 `null` 입니다.
+- `useCornerShape(corner)` 는 `corner` 요소의 `innerEndEndRadius` 와 `endEndCornerExponent` 를 `{ radius, exponent }` state 로 둡니다. 마운트할 때와 `ResizeObserver` 가 크기 변화를 알릴 때 읽고, 부른 컴포넌트가 다시 렌더될 때마다 한 번 더 읽습니다. 요소가 아직 없으면 `null` 입니다.
 
 ### 왜 이렇게
 
 - 끄는 동안 CSS 변수가 아니라 크기 속성 자체를 씁니다. 인라인 `width: var(--x)` 는 변수가 비어 있으면 `auto` 가 되어 요소의 `w-full`, `w-80` 같은 클래스 너비를 지웁니다. 크기를 바꾼 적 없는 요소는 클래스 너비를 그대로 써야 합니다.
 - 계산은 늘 **그려진 크기**에서 시작합니다. CSS 한계에 막혀 state 와 그려진 크기가 달라져도, 다음 끌기와 키가 막힌 곳에서 이어집니다.
 - 끝에 되돌리고 확정하는 것은 한 이벤트 안이라 화면에는 되돌린 크기가 그려지지 않습니다.
-- 반지름은 크기가 그대로인 채 클래스만 바뀌어도(`rounded-*` 교체) 달라지는데, `ResizeObserver` 는 이것을 알리지 않습니다. 그래서 렌더마다 다시 읽고, 같은 값이면 state 가 그대로라 다시 렌더하지 않습니다.
+- 반지름과 모양은 크기가 그대로인 채 클래스나 테마만 바뀌어도(`rounded-*` 교체, `cornerShape`) 달라지는데, `ResizeObserver` 는 이것을 알리지 않습니다. 그래서 렌더마다 다시 읽고, 같은 값이면 state 가 그대로라 다시 렌더하지 않습니다.
 
 ## edge.tsx
 
@@ -214,7 +215,7 @@ const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
 
 ## arc.ts
 
-`gripArc(cornerRadius, band)` 는 모서리 손잡이를 그릴 값을 돌려줍니다. 순수 함수입니다.
+`gripArc(cornerRadius, band, exponent = 2)` 는 모서리 손잡이를 그릴 값을 돌려줍니다. 순수 함수입니다.
 
 | 값       | 뜻                                                                                     |
 | -------- | -------------------------------------------------------------------------------------- |
@@ -228,14 +229,16 @@ const separator = useAxisSeparator(axis, { disabled, onDraggingChange });
 gripArc(15, 'centered'); // Resizable 의 16px 모서리(테두리 1px): 반지름 15 의 호, 선은 테두리 안쪽 선 위
 gripArc(10, 'outward');  // TextArea 의 10px 모서리(테두리는 inset ring): 반지름 10 의 호, 띠는 반지름 20 의 path
 gripArc(0, 'centered');  // 각진 모서리: 반지름 2 로 끝이 살짝 둥근 ㄴ 자
+gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4분의 1
 ```
 
-- path 는 LTR 의 끝 아래 모서리 모양입니다. 아래 가장자리를 따라 오다가(`H`) 모서리와 같은 중심의 4분의 1 원을 돌고(`A`) 끝 가장자리를 따라 올라갑니다(`V`). RTL 은 SVG 를 `rtl:-scale-x-100` 으로 뒤집어 왼쪽 아래 모서리가 됩니다.
+- path 는 LTR 의 끝 아래 모서리 모양입니다. 아래 가장자리를 따라 오다가(`H`) 모서리와 같은 중심의 4분의 1 원을 돌고(`A`) 끝 가장자리를 따라 올라갑니다(`V`). 지수가 2 가 아니면 원 대신 초타원 `|x|ⁿ + |y|ⁿ = 1` 의 4분의 1 을 16 토막의 `L` 로 그립니다. RTL 은 SVG 를 `rtl:-scale-x-100` 으로 뒤집어 왼쪽 아래 모서리가 됩니다.
 
 ### 왜 이렇게
 
 - 선은 가장자리 막대처럼 padding 상자의 가장자리 위에 섭니다. 그래서 선의 반지름은 모서리 반지름이고, 선과 모서리의 중심이 같습니다. 반지름이 2px(선 두께의 절반)보다 작으면 2px 로 둡니다. 각진 모서리에서 끝이 살짝 둥근 ㄴ 자가 되는 까닭입니다.
-- 직선은 호와 두 직선의 길이가 가장자리 막대와 같은 32px 이 되게 정하고, 적어도 4px 입니다.
+- 직선은 호와 두 직선의 길이가 가장자리 막대와 같은 32px 이 되게 정하고, 적어도 4px 입니다. 초타원의 길이는 그 토막들의 길이를 더한 값입니다.
+- SVG 에는 초타원 명령이 없습니다. `corner-shape: squircle` 인 모서리에 원호를 그리면 호가 모서리 안쪽으로 파고들어, 곡선은 꺾은선으로 따라갑니다.
 - 누를 띠는 끝을 자른 선(`butt`)이라 손잡이 상자 밖으로 가장자리를 따라 더 나가지 않습니다.
 - `outward` 의 띠는 선보다 10px 바깥에 반지름이 10px 큰 같은 중심 path 입니다. 24px 띠의 안쪽 끝이 선의 안쪽 끝과 겹칩니다([누를 띠](#누를-띠)).
 - 좌표는 0.01px 로 반올림해 path 문자열을 짧게 둡니다.
@@ -259,7 +262,7 @@ gripArc(0, 'centered');  // 각진 모서리: 반지름 2 로 끝이 살짝 둥�
 
 - 손잡이는 가장 가까운 positioned 조상의 끝 아래 꼭짓점에 스스로 섭니다(`absolute end-0 bottom-0`). `corner` 는 그 조상이어야 호가 모서리와 같은 중심이 됩니다.
 - 두 축의 요소가 달라도 됩니다. 축마다 `target` 이 있어, TextArea 는 높이를 textarea 에, 너비를 필드 전체에 씁니다.
-- 반지름은 `useCornerRadius(corner)` 로 읽습니다. 읽기 전에는(서버 렌더, 첫 렌더) 호를 그리지 않고 separator 만 둡니다.
+- 반지름과 모양은 `useCornerShape(corner)` 로 읽습니다. 읽기 전에는(서버 렌더, 첫 렌더) 호를 그리지 않고 separator 만 둡니다.
 - `←` `→` 가 너비를 바꾸고 너비 separator 로, `↑` `↓` 가 높이를 바꾸고 높이 separator 로 포커스를 옮깁니다. 값을 바꾼 뒤(`flushSync`) 포커스를 옮기므로, 포커스는 늘 값이 이미 바뀐 separator 에 있어 스크린 리더가 바뀐 값을 읽습니다. `Home` `End` 는 포커스한 축, `Enter` 와 두 번 누르기는 두 축 모두를 되돌립니다.
 - 포인터로는 두 축을 함께 끕니다.
 

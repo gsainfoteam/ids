@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 
-import { seriesColor, seriesVariables } from './config';
+import { DEFAULT_SERIES, seriesColor, seriesVariables, uncoloredKeys } from './config';
 import { ChartContext } from './context';
 import { ChartDescription } from './description';
 import {
@@ -59,6 +59,9 @@ const isElementOf =
 
 const WRAPPED_CHART_WARNING =
   '[IDS] Chart: its chart child is not a Recharts chart, so Chart cannot add the default Tooltip, Legend and screen reader table. Place the Recharts chart as a direct child, or place Chart.Tooltip, Chart.Legend and Chart.Table yourself.';
+
+const tooManySeriesWarning = (count: number) =>
+  `[IDS] Chart: ${count} series have no color, but the default colors are only ${DEFAULT_SERIES.join(', ')}, so the rest draw in neutral. Give the 4th and later series a color in the config.`;
 
 const FADE_START_OPACITY = 0.4;
 const FADE_END_OPACITY = 0;
@@ -149,10 +152,16 @@ export function ChartRoot({
   const table = recognised ? tableOf(graph.props, config) : undefined;
 
   const wrapsAnUnknownChart = graph !== undefined && !recognised && !hasOwnTable;
+  const uncoloredSeries = uncoloredKeys(config).length;
 
   useEffect(() => {
     if (isDevelopment && wrapsAnUnknownChart) console.warn(WRAPPED_CHART_WARNING);
   }, [wrapsAnUnknownChart]);
+
+  useEffect(() => {
+    if (isDevelopment && uncoloredSeries > DEFAULT_SERIES.length)
+      console.warn(tooManySeriesWarning(uncoloredSeries));
+  }, [uncoloredSeries]);
 
   const drawn =
     graph && size

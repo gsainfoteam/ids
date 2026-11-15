@@ -27,10 +27,17 @@ export { defineIdsTheme } from './theme';
 export { checkIdsTheme } from './theme-variables';
 export { createIdsPalette } from './palette-seed';
 export type {
+  IdsBrandFamily,
+  IdsColorFamily,
   IdsCornerShape,
+  IdsNeutral,
   IdsPalette,
   IdsPaletteStep,
+  IdsStatus,
+  IdsStatusColors,
+  IdsStatusFamily,
   IdsTheme,
+  IdsThemeColor,
   IdsThemeOverrides,
 } from './theme';
 export type { IdsThemeIssue } from './theme-roles';

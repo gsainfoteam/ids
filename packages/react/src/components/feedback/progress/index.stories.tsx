@@ -9,7 +9,16 @@ import { Progress } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const schemes = ['primary', 'neutral', 'info', 'success', 'warning', 'danger'] as const;
+const schemes = [
+  'primary',
+  'secondary',
+  'tertiary',
+  'neutral',
+  'info',
+  'success',
+  'warning',
+  'danger',
+] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const meta = {
@@ -125,7 +134,7 @@ export const Gallery: Story = {
           <div className="w-64">
             <Progress value={72} aria-label="그라데이션">
               <Progress.Track className="h-3">
-                <Progress.Indicator className="bg-linear-to-r from-(--ids-color-info) to-(--ids-color-success)" />
+                <Progress.Indicator className="from-info to-success bg-linear-to-r" />
               </Progress.Track>
             </Progress>
           </div>

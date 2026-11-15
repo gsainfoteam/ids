@@ -179,7 +179,7 @@ test('variant, colorScheme, size and placement land on the element', () => {
   expect(node.dataset.variant).toBe('soft');
   expect(node.dataset.size).toBe('tiny');
   expect(node.dataset.placement).toBe('top-left');
-  expect(node.className).toMatch(/\[--control-fill:var\(--ids-color-danger\)\]/);
+  expect(node.className).toMatch(/\[--control-fill:var\(--ids-color-bg-danger\)\]/);
   expect(node.className).toMatch(/print:hidden/);
   expect(node.className).toMatch(/motion-safe:data-active:scale-95/);
   expect(node.className).toMatch(/motion-reduce:transition-none/);

@@ -6,7 +6,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const calendarStyle = tv({
   slots: {
-    root: 'relative w-fit min-w-0 text-(--ids-color-on-surface)',
+    root: 'relative w-fit min-w-0 text-on-surface',
     months: 'flex flex-wrap gap-4',
     month:
       'grid grid-cols-[var(--calendar-cell)_minmax(0,1fr)_var(--calendar-cell)] content-start gap-y-2',
@@ -25,35 +25,35 @@ export const calendarStyle = tv({
       'absolute inset-0 size-full cursor-pointer appearance-none opacity-0 disabled:cursor-not-allowed',
     dropdownLabel: [
       'pointer-events-none flex h-(--calendar-dropdown) items-center gap-1 ps-2 pe-1 font-medium whitespace-nowrap',
-      '[&_svg]:size-3.5 [&_svg]:text-(--ids-color-on-muted)',
+      '[&_svg]:size-3.5 [&_svg]:text-neutral',
     ],
     grid: 'col-span-3 row-start-2',
     weekdays: 'flex',
     weekday: [
       'flex h-(--calendar-weekday) w-(--calendar-cell) items-center justify-center p-0',
-      'font-normal text-(--ids-color-on-muted) select-none',
+      'font-normal text-neutral select-none',
     ],
     week: 'flex not-first:mt-1',
     weekNumber: [
       'flex h-(--calendar-cell) w-(--calendar-cell) items-center justify-center p-0',
-      'text-caption-c1-regular text-(--ids-color-on-muted) select-none',
+      'text-caption-c1-regular text-neutral select-none',
     ],
     day: [
       'relative size-(--calendar-cell) p-0 text-center',
       'first:rounded-s-standard last:rounded-e-standard',
       '[[data-hidden]+&]:rounded-s-standard [&:has(+[data-hidden])]:rounded-e-standard',
     ],
-    rangeStart: 'rounded-s-standard bg-(--ids-color-muted)',
-    rangeMiddle: 'bg-(--ids-color-muted)',
-    rangeEnd: 'rounded-e-standard bg-(--ids-color-muted)',
+    rangeStart: 'rounded-s-standard bg-neutral-soft',
+    rangeMiddle: 'bg-neutral-soft',
+    rangeEnd: 'rounded-e-standard bg-neutral-soft',
     hidden: 'invisible',
     dayButton: [
       'relative inline-flex size-full cursor-pointer items-center justify-center rounded-standard',
-      'tabular-nums select-none focus-ring focus-visible:z-10',
+      'tabular-nums select-none focus-ring focus-ring-visible:z-10',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
     ],
-    footer: 'mt-3 text-caption-c1-regular text-(--ids-color-on-muted)',
+    footer: 'mt-3 text-caption-c1-regular text-neutral',
   },
   variants: {
     size: {
@@ -73,7 +73,7 @@ export const calendarStyle = tv({
       },
     } satisfies Record<IdsSize, object>,
     today: { true: { dayButton: 'font-semibold' } },
-    outside: { true: { dayButton: 'text-(--ids-color-on-muted)' } },
+    outside: { true: { dayButton: 'text-neutral' } },
     selected: {
       true: {
         dayButton: cn(
@@ -84,7 +84,7 @@ export const calendarStyle = tv({
     },
     onBand: {
       true: {
-        dayButton: 'hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)',
+        dayButton: 'hover:bg-neutral-soft-hover active:bg-neutral-soft-active',
       },
     },
     unavailable: { true: { dayButton: 'cursor-not-allowed opacity-50' } },
@@ -94,13 +94,13 @@ export const calendarStyle = tv({
       selected: false,
       onBand: false,
       today: true,
-      class: { dayButton: 'bg-(--ids-color-muted)' },
+      class: { dayButton: 'bg-neutral-soft' },
     },
     {
       selected: false,
       onBand: false,
       unavailable: false,
-      class: { dayButton: 'hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)' },
+      class: { dayButton: 'hover:bg-neutral-soft active:bg-neutral-soft-hover' },
     },
     {
       selected: false,
@@ -108,10 +108,10 @@ export const calendarStyle = tv({
       unavailable: false,
       today: true,
       class: {
-        dayButton: 'hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)',
+        dayButton: 'hover:bg-neutral-soft-hover active:bg-neutral-soft-active',
       },
     },
-    { selected: true, unavailable: true, class: { dayButton: 'hover:bg-(--ids-color-primary)' } },
+    { selected: true, unavailable: true, class: { dayButton: 'hover:bg-primary' } },
     {
       onBand: true,
       unavailable: true,

@@ -12,7 +12,16 @@ import { Toggle } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['ghost', 'outline', 'soft', 'solid', 'glossy'] as const;
-const colorSchemes = ['primary', 'neutral', 'danger', 'success', 'warning', 'info'] as const;
+const colorSchemes = [
+  'primary',
+  'secondary',
+  'tertiary',
+  'neutral',
+  'danger',
+  'success',
+  'warning',
+  'info',
+] as const;
 const sizes = ['standard', 'tiny'] as const;
 const pressedStates = ['off', 'on'] as const;
 

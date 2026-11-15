@@ -81,11 +81,14 @@ const flattenTypography = (node, path = []) => {
   );
 };
 
-const readTypographyEntries = (palette) => {
+const readTypographyEntries = (palette, { withFlutterOnly = false } = {}) => {
   const json = JSON.parse(
     readFileSync("./tokens/semantic/typography.json", "utf8"),
   );
-  return flattenTypography(json.text ?? {}).map((entry) => ({
+  return [
+    ...flattenTypography(json.text ?? {}),
+    ...(withFlutterOnly ? flattenTypography(json["flutter-only"] ?? {}) : []),
+  ].map((entry) => ({
     name: entry.name,
     fontSize: resolveRef(entry.fontSize, palette),
     fontWeight: resolveRef(entry.fontWeight, palette),
@@ -109,7 +112,30 @@ const parseEnums = (dictionary) => {
   return result;
 };
 
-const MODE_WIDE_COLOR_FILES = ["neutral", "status", "chart"];
+const MODE_WIDE_COLOR_FILES = ["neutral", "status"];
+
+const COLOR_ROLES = JSON.parse(readFileSync("./color-roles.json", "utf8"));
+
+const COLOR_FAMILIES = Object.values(COLOR_ROLES.families).flat();
+
+const slotsOf = (family) =>
+  Object.entries(COLOR_ROLES.slots).flatMap(([property, names]) =>
+    names.map((name) => ({
+      property,
+      name: name.replaceAll("{family}", family),
+      slot: `${property}-${name.replaceAll("{family}", family)}`,
+    })),
+  );
+
+const FAMILY_SLOTS = COLOR_FAMILIES.flatMap((family) =>
+  slotsOf(family).map((entry) => ({ ...entry, family })),
+);
+
+const BASE_SLOTS = Object.keys(COLOR_ROLES.base);
+
+const colorVar = (slot) => `--ids-color-${slot}`;
+
+const themeVar = (mode, slot) => `--ids-theme-${mode}-${slot}`;
 
 const colorPairs = [
   ...new Map(
@@ -234,19 +260,16 @@ const T_CSS_TEXT_ROOT = `  --ids-text-{{NAME}}: {{FONT_SIZE}};
 
 const T_DART_TEXT_STYLE = `TextStyle(fontFamily: '{{FONT_FAMILY}}', package: '{{FONT_PACKAGE}}', fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
 
-const buildColorBridgeCSS = (dictionary) => {
-  const seen = new Set();
-  const theme = dictionary.allTokens
-    .filter((t) => {
-      if (t.attributes?.category !== "color" || t.path[0] === "ids")
-        return false;
-      if (seen.has(slug(t))) return false;
-      seen.add(slug(t));
-      return true;
-    })
-    .map((t) => `  ${TW_NS.color}${slug(t)}: var(${idsVar("color", t)});`)
-    .join("\n");
-  return render(T_CSS_THEME, { THEME: theme });
+const buildColorBridgeCSS = () => {
+  const base = Object.entries(COLOR_ROLES.base).flatMap(([slot, namespaces]) =>
+    namespaces.map((namespace) => `  ${namespace}-${slot}: var(${colorVar(slot)});`),
+  );
+  const families = FAMILY_SLOTS.flatMap(({ property, name, slot }) =>
+    COLOR_ROLES.namespaces[property].map(
+      (namespace) => `  ${namespace}-${name}: var(${colorVar(slot)});`,
+    ),
+  );
+  return render(T_CSS_THEME, { THEME: [...base, ...families].join("\n") });
 };
 
 const buildStaticCSS = (dictionary) => {
@@ -282,7 +305,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 
 @keyframes ids-skeleton-pulse {
   50% {
-    background-color: var(--ids-color-muted-hover);
+    background-color: var(--ids-color-bg-neutral-soft-hover);
   }
 }
 
@@ -327,8 +350,6 @@ const T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES = `@theme inline {
 const darkModeRegion = `[data-mode="dark"], [data-mode="dark"] *`;
 const lightRegionInsideDark = `[data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *`;
 
-const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:where(${lightRegionInsideDark})));
-`;
 
 const focusedInsideButNotInItsPopups = (marker) =>
   `&:has([${marker}]:focus-visible):not(:has([popover] [${marker}]:focus-visible))`;
@@ -344,19 +365,28 @@ const FOCUS_RING_TRIGGERS = {
 const focusRingTriggers = (indent) =>
   Object.values(FOCUS_RING_TRIGGERS).join(`,\n${indent}`);
 
+const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:where(${lightRegionInsideDark})));
+
+@custom-variant focus-ring-visible {
+  ${focusRingTriggers("  ")} {
+    @slot;
+  }
+}
+`;
+
 const T_CSS_UTILITIES = `@utility focus-ring {
   outline: none;
 
   ${focusRingTriggers("  ")} {
-    @apply ring-[3px] ring-(--ids-color-primary)/40 inset-ring-(--ids-color-primary);
+    @apply ring-[3px] ring-primary/40 inset-ring-primary;
   }
 
   &[aria-invalid="true"],
   &[data-invalid] {
-    @apply inset-ring-(--ids-color-danger);
+    @apply inset-ring-danger;
 
     ${focusRingTriggers("    ")} {
-      @apply ring-(--ids-color-danger)/40 inset-ring-(--ids-color-danger);
+      @apply ring-danger/40 inset-ring-danger;
     }
   }
 }
@@ -441,7 +471,8 @@ const buildConcentricCSS = () => {
   --ids-concentric-pad: --spacing(--value(number));
   padding: var(--ids-concentric-pad);
   border-radius: min(
-    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested),
+    var(--ids-radius-standard) +
+      (var(--ids-concentric-pad) + var(--ids-concentric-nested)) * var(--ids-corner-radius-scale, 1),
     var(--ids-radius-container)
   );
 }
@@ -485,30 +516,48 @@ const buildTypographyCSS = (dictionary) => {
   });
 };
 
-const buildColorThemeCSS = (dictionary, color, mode, selector) => {
-  const lines = readColorEntriesWithoutCollision(color, mode, buildPalette(dictionary)).map(
-    ({ name, value }) => `  --ids-color-${name}: ${value};`,
+const neutralFallbacks = (dictionary, mode) =>
+  Object.fromEntries(
+    readColorEntriesWithoutCollision("neutral", mode, buildPalette(dictionary)).map(
+      ({ name, value }) => [name, value],
+    ),
   );
-  return `${selector} {\n${lines.join("\n")}\n}\n`;
+
+const providerValue = (mode, slot, fallbacks) => {
+  if (slot in fallbacks) return `var(${themeVar(mode, slot)}, ${fallbacks[slot]})`;
+  return `var(${themeVar(mode, slot)})`;
 };
 
-const BRAND_ROLES = ["primary", "on-primary", "secondary", "on-secondary", "accent", "outline"];
-
-const buildBrandRolesFromTheProviderCSS = (mode) =>
-  `[data-mode="${mode}"] {\n${BRAND_ROLES.map(
-    (role) => `  --ids-color-${role}: var(--ids-theme-${mode}-${role});`,
-  ).join("\n")}\n}\n`;
+const buildColorRolesCSS = (dictionary, mode) => {
+  const fallbacks = neutralFallbacks(dictionary, mode);
+  const lines = [
+    ...BASE_SLOTS,
+    ...FAMILY_SLOTS.map(({ slot }) => slot),
+  ].map((slot) => `  ${colorVar(slot)}: ${providerValue(mode, slot, fallbacks)};`);
+  return block(`[data-mode="${mode}"]`, lines);
+};
 
 const T_CSS_CORNER_SHAPE = `@layer base {
   [data-mode],
   [data-mode] * {
     corner-shape: var(--ids-corner-shape, round);
   }
+
+  [data-mode]::before,
+  [data-mode]::after,
+  [data-mode] *::before,
+  [data-mode] *::after {
+    corner-shape: inherit;
+  }
 }
 
-@layer utilities {
-  .rounded-full {
-    corner-shape: round;
+@utility rounded-full {
+  corner-shape: round;
+}
+
+@supports (corner-shape: squircle) {
+  [data-mode] {
+    --ids-corner-radius-scale: var(--ids-theme-corner-radius-scale, 1);
   }
 }
 `;
@@ -532,7 +581,7 @@ const radiusFromTheProvider = (dictionary) =>
     .filter((t) => slug(t) !== "full")
     .map(
       (t) =>
-        `  ${idsVar("radius", t)}: ${scaledToWholePixels(`var(--ids-theme-radius-${slug(t)}, ${toVal(t)})`)};`,
+        `  ${idsVar("radius", t)}: ${scaledToWholePixels(`var(--ids-theme-radius-${slug(t)}, ${toVal(t)}) * var(--ids-corner-radius-scale, 1)`)};`,
     );
 
 const lengthsTheScaleMultiplies = (dictionary) => [
@@ -561,7 +610,7 @@ const buildScaleCSS = (dictionary) =>
 
 const cssFormatter = ({ dictionary }) =>
   [
-    buildColorBridgeCSS(dictionary),
+    buildColorBridgeCSS(),
     buildStaticCSS(dictionary),
     T_CSS_ANIMATIONS,
     T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES,
@@ -572,14 +621,8 @@ const cssFormatter = ({ dictionary }) =>
     T_CSS_CORNER_SHAPE,
     buildScaleCSS(dictionary),
     T_CSS_REGISTERED_LENGTHS,
-    buildBrandRolesFromTheProviderCSS("light"),
-    buildBrandRolesFromTheProviderCSS("dark"),
-    buildColorThemeCSS(dictionary, "neutral", "light", '[data-mode="light"]'),
-    buildColorThemeCSS(dictionary, "neutral", "dark", '[data-mode="dark"]'),
-    buildColorThemeCSS(dictionary, "status", "light", '[data-mode="light"]'),
-    buildColorThemeCSS(dictionary, "status", "dark", '[data-mode="dark"]'),
-    buildColorThemeCSS(dictionary, "chart", "light", '[data-mode="light"]'),
-    buildColorThemeCSS(dictionary, "chart", "dark", '[data-mode="dark"]'),
+    buildColorRolesCSS(dictionary, "light"),
+    buildColorRolesCSS(dictionary, "dark"),
   ].join("\n");
 
 const ENUMS_THE_APP_DEFINES_IN_REACT = ["color"];
@@ -599,6 +642,44 @@ const tsTypesFormatter = ({ dictionary }) => {
       .join("\n"),
   });
 };
+
+const stepOf = (reference) => Number(reference.match(/^\{neutral\.(\d+)\}$/)[1]);
+
+const neutralSteps = (mode) => {
+  const json = JSON.parse(readFileSync(`./tokens/semantic/neutral.${mode}.json`, "utf8"));
+  return Object.fromEntries(
+    Object.entries(json.color).map(([slot, token]) => [slot, stepOf(token.$value)]),
+  );
+};
+
+const tsList = (values) => `[${values.map((v) => `'${v}'`).join(", ")}]`;
+
+const tsRecord = (entries, indent) =>
+  `{\n${Object.entries(entries)
+    .map(([key, value]) => `${indent}  '${key}': ${value},`)
+    .join("\n")}\n${indent}}`;
+
+const neutralPalette = (dictionary) =>
+  Object.fromEntries(
+    byPath(dictionary, "neutral").map((t) => [t.path[1], `'${val(t)}'`]),
+  );
+
+const tsColorRolesFormatter = ({ dictionary }) =>
+  render(T_TS_FILE, {
+    BODY: [
+      ...Object.entries(COLOR_ROLES.families).map(
+        ([group, families]) =>
+          `export const IDS_${group.toUpperCase()}_FAMILIES = ${tsList(families)} as const;`,
+      ),
+      `export const IDS_COLOR_FAMILIES = ${tsList(COLOR_FAMILIES)} as const;`,
+      `export const IDS_BASE_SLOTS = ${tsList(BASE_SLOTS)} as const;`,
+      `export const IDS_FAMILY_SLOTS = ${tsList(slotsOf("{family}").map(({ slot }) => slot))} as const;`,
+      `export const IDS_NEUTRAL_PALETTE = ${tsRecord(neutralPalette(dictionary), "")} as const;`,
+      `export const IDS_NEUTRAL_STEPS = {\n${["light", "dark"]
+        .map((mode) => `  ${mode}: ${tsRecord(neutralSteps(mode), "  ")},`)
+        .join("\n")}\n} as const;`,
+    ].join("\n\n"),
+  });
 
 const dartEnumsFormatter = ({ dictionary }) => {
   const enums = parseEnums(dictionary);
@@ -670,7 +751,7 @@ const dartTypographyFormatter = ({ dictionary }) => {
   const members = [
     `  static const sansFontFamily = '${fontFamily}';`,
     `  static const sansFontPackage = '${fontPackage}';`,
-    ...readTypographyEntries(palette).map(
+    ...readTypographyEntries(palette, { withFlutterOnly: true }).map(
       ({ name, fontSize, fontWeight, lineHeight, letterSpacing }) =>
         `  static const ${toCamel(name)} = ${render(T_DART_TEXT_STYLE, {
           FONT_FAMILY: fontFamily,
@@ -691,6 +772,7 @@ const dartTypographyFormatter = ({ dictionary }) => {
 for (const [name, format] of [
   ["ids/css", cssFormatter],
   ["ids/ts-types", tsTypesFormatter],
+  ["ids/ts-color-roles", tsColorRolesFormatter],
   ["ids/dart-enums", dartEnumsFormatter],
   ["ids/dart-color-tokens", dartColorTokensFormatter],
   ["ids/dart-motion", dartMotionFormatter],
@@ -710,7 +792,10 @@ export default {
     },
     ts: {
       transformGroup: "js",
-      files: [{ destination: "../react/src/tokens/types.ts", format: "ids/ts-types" }],
+      files: [
+        { destination: "../react/src/tokens/types.ts", format: "ids/ts-types" },
+        { destination: "../react/src/tokens/color-roles.ts", format: "ids/ts-color-roles" },
+      ],
     },
     dart: {
       transformGroup: "js",

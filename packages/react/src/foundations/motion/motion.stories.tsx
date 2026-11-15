@@ -55,21 +55,17 @@ export const Durations: Story = {
                 className="grid grid-cols-[4rem_4rem_1fr] items-center gap-4"
               >
                 <span className="text-body-b3-medium">{name}</span>
-                <code className="text-caption-c1-regular font-mono text-(--ids-color-on-muted)">
-                  {value}
-                </code>
+                <code className="text-caption-c1-regular text-neutral font-mono">{value}</code>
                 <div className="flex flex-col gap-1">
-                  <div className="relative h-4 w-full max-w-80 rounded-full bg-(--ids-color-muted)">
+                  <div className="bg-neutral-soft relative h-4 w-full max-w-80 rounded-full">
                     <span
                       data-dot=""
-                      className="absolute inset-y-0 left-0 size-4 rounded-full bg-(--ids-color-primary) transition-[left] ease-out data-moved:left-[calc(100%-1rem)] motion-reduce:transition-none"
+                      className="bg-primary absolute inset-y-0 left-0 size-4 rounded-full transition-[left] ease-out data-moved:left-[calc(100%-1rem)] motion-reduce:transition-none"
                       data-moved={moved ? '' : undefined}
                       style={{ transitionDuration: `var(--ids-motion-${name})` }}
                     />
                   </div>
-                  <span className="text-caption-c1-regular text-(--ids-color-on-muted)">
-                    {usage[name]}
-                  </span>
+                  <span className="text-caption-c1-regular text-neutral">{usage[name]}</span>
                 </div>
               </div>
             ))}

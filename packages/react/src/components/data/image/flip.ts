@@ -1,8 +1,8 @@
+import { cornerExponent, insetClipPath } from '../../../internal/corner-shape';
 import { motionDuration, prefersReducedMotion, SHEET_EASING } from '../../../internal/motion';
 
 type Box = { x: number; y: number; width: number; height: number };
 
-const UNCLIPPED = 'inset(0px 0px round 0px)';
 const ARRIVING_FROM_NOWHERE = 'scale(0.96)';
 const FADE_EASING = 'ease-out';
 const LEAVE_AS_IT_ENDS = { fill: 'forwards' } as const;
@@ -32,7 +32,11 @@ const onScreen = (rect: DOMRectReadOnly, view: Window) =>
   rect.left < view.innerWidth &&
   rect.top < view.innerHeight;
 
-function thumbnailFrame(element: HTMLElement, origin: Element | null): Keyframe | null {
+const NO_INSETS = { top: 0, right: 0, bottom: 0, left: 0 };
+
+type ThumbnailFrames = { thumbnail: Keyframe; unclipped: string };
+
+function thumbnailFrames(element: HTMLElement, origin: Element | null): ThumbnailFrames | null {
   const view = element.ownerDocument.defaultView;
   if (!origin || !view) return null;
 
@@ -44,11 +48,17 @@ function thumbnailFrame(element: HTMLElement, origin: Element | null): Keyframe 
   const cover = Math.max(from.width / box.width, from.height / box.height);
   const insetX = (box.width - from.width / cover) / 2;
   const insetY = (box.height - from.height / cover) / 2;
-  const radius = Number.parseFloat(getComputedStyle(origin).borderTopLeftRadius) || 0;
+  const originStyle = getComputedStyle(origin);
+  const radius = Number.parseFloat(originStyle.borderTopLeftRadius) || 0;
+  const exponent = cornerExponent(originStyle, 'top-left');
+  const insets = { top: insetY, right: insetX, bottom: insetY, left: insetX };
 
   return {
-    transform: `translate(${center.x - box.x}px, ${center.y - box.y}px) scale(${cover})`,
-    clipPath: `inset(${insetY}px ${insetX}px round ${radius / cover}px)`,
+    thumbnail: {
+      transform: `translate(${center.x - box.x}px, ${center.y - box.y}px) scale(${cover})`,
+      clipPath: insetClipPath(box, insets, radius / cover, exponent),
+    },
+    unclipped: insetClipPath(box, NO_INSETS, 0, exponent),
   };
 }
 
@@ -70,9 +80,9 @@ export function enterFrom(element: HTMLElement, origin: Element | null): Animati
     return element.animate([{ opacity: 0 }, { opacity: 1 }], fadeTiming(element));
 
   const rest = element.style.transform || 'none';
-  const thumbnail = thumbnailFrame(element, origin);
+  const frames = thumbnailFrames(element, origin);
 
-  if (!thumbnail)
+  if (!frames)
     return element.animate(
       [
         { opacity: 0, transform: shrunkFrom(rest) },
@@ -82,7 +92,7 @@ export function enterFrom(element: HTMLElement, origin: Element | null): Animati
     );
 
   return element.animate(
-    [thumbnail, { transform: rest, clipPath: UNCLIPPED }],
+    [frames.thumbnail, { transform: rest, clipPath: frames.unclipped }],
     moveTiming(element),
   );
 }
@@ -95,9 +105,9 @@ export function exitTo(element: HTMLElement, origin: Element | null): Animation 
     });
 
   const now = getComputedStyle(element).transform;
-  const thumbnail = thumbnailFrame(element, origin);
+  const frames = thumbnailFrames(element, origin);
 
-  if (!thumbnail)
+  if (!frames)
     return element.animate(
       [
         { opacity: 1, transform: now },
@@ -106,7 +116,7 @@ export function exitTo(element: HTMLElement, origin: Element | null): Animation 
       { ...moveTiming(element), ...LEAVE_AS_IT_ENDS },
     );
 
-  return element.animate([{ transform: now, clipPath: UNCLIPPED }, thumbnail], {
+  return element.animate([{ transform: now, clipPath: frames.unclipped }, frames.thumbnail], {
     ...moveTiming(element),
     ...LEAVE_AS_IT_ENDS,
   });

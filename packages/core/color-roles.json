@@ -1,0 +1,21 @@
+{
+  "families": {
+    "neutral": ["neutral"],
+    "brand": ["primary", "secondary", "tertiary"],
+    "status": ["success", "warning", "danger", "info"]
+  },
+  "base": {
+    "surface": ["--background-color", "--fill", "--stroke", "--ring-color", "--ring-offset-color"],
+    "on-surface": ["--text-color", "--fill"]
+  },
+  "slots": {
+    "bg": ["{family}", "{family}-hover", "{family}-active", "{family}-soft", "{family}-soft-hover", "{family}-soft-active"],
+    "text": ["on-{family}", "on-{family}-soft", "{family}"],
+    "border": ["{family}"]
+  },
+  "namespaces": {
+    "bg": ["--background-color"],
+    "text": ["--text-color", "--fill"],
+    "border": ["--border-color", "--ring-color", "--outline-color", "--stroke"]
+  }
+}

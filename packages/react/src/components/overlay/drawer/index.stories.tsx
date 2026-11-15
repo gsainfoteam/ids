@@ -313,7 +313,7 @@ export const FixedElementsBehind: Story = {
   name: 'Fixed elements behind',
   render: () => (
     <div className="flex h-[200vh] flex-col gap-3">
-      <p className="text-body-b3-regular text-(--ids-color-on-muted)">
+      <p className="text-body-b3-regular text-neutral">
         페이지를 내린 뒤 열어 보세요. 오른쪽 아래 버튼은 화면에 있던 자리에서 페이지와 함께
         줄어듭니다.
       </p>

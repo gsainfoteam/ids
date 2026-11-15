@@ -5,11 +5,11 @@ import type { IdsSize } from '../../../tokens/types';
 export const labelStyle = tv({
   slots: {
     root: [
-      'inline-flex items-center gap-2 text-(--ids-color-on-surface) select-none',
+      'inline-flex items-center gap-2 text-on-surface select-none',
       'data-disabled:cursor-not-allowed data-disabled:opacity-50',
-      'data-invalid:text-(--ids-color-danger)',
+      'data-invalid:text-danger',
     ],
-    marker: '-ms-1 text-(--ids-color-danger)',
+    marker: '-ms-1 text-danger',
   },
   variants: {
     size: {

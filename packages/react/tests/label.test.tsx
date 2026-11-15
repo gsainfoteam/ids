@@ -187,7 +187,7 @@ test('invalid is set directly, not read from the control', async () => {
   const mirrored = screen.getByText('F');
   await expect.element(explicit).toHaveAttribute('data-invalid');
   await expect.element(explicit).toHaveClass('is-invalid');
-  await expect.element(explicit).toHaveClass('data-invalid:text-(--ids-color-danger)');
+  await expect.element(explicit).toHaveClass('data-invalid:text-danger');
   await expect.element(mirrored).not.toHaveAttribute('data-invalid');
 });
 

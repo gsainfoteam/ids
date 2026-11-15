@@ -158,16 +158,14 @@ export const Gallery: Story = {
                   key={plan.value}
                   className={cn(
                     'rounded-standard flex cursor-pointer items-start gap-3 p-4',
-                    'inset-ring-1 inset-ring-(--ids-color-border)',
-                    'has-data-[state=checked]:bg-(--ids-color-primary)/5 has-data-[state=checked]:inset-ring-(--ids-color-primary)',
+                    'inset-ring-neutral inset-ring-1',
+                    'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary',
                   )}
                 >
                   <Item value={plan.value} className="mt-0.5" />
                   <span className="flex flex-col gap-1">
                     <span className="text-body-b3-medium">{plan.label}</span>
-                    <span className="text-caption-c1-regular text-(--ids-color-on-muted)">
-                      {plan.description}
-                    </span>
+                    <span className="text-caption-c1-regular text-neutral">{plan.description}</span>
                   </span>
                 </Label>
               ))
@@ -194,16 +192,14 @@ export const Cards: Story = {
             key={plan.value}
             className={cn(
               'rounded-standard flex cursor-pointer items-start gap-3 p-4',
-              'inset-ring-1 inset-ring-(--ids-color-border)',
-              'has-data-[state=checked]:bg-(--ids-color-primary)/5 has-data-[state=checked]:inset-ring-(--ids-color-primary)',
+              'inset-ring-neutral inset-ring-1',
+              'has-data-[state=checked]:bg-primary-soft has-data-[state=checked]:inset-ring-primary',
             )}
           >
             <Item value={plan.value} className="mt-0.5" />
             <span className="flex flex-col gap-1">
               <span className="text-body-b3-medium">{plan.label}</span>
-              <span className="text-caption-c1-regular text-(--ids-color-on-muted)">
-                {plan.description}
-              </span>
+              <span className="text-caption-c1-regular text-neutral">{plan.description}</span>
             </span>
           </Label>
         ))

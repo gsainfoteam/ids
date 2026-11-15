@@ -32,9 +32,9 @@
 // internal/field-surface.ts: 공유 조각은 cn('...') 값의 객체
 export const fieldAction = {
   base: cn(
-    'shrink-0 text-(--ids-color-on-muted)',
-    'data-hovered:text-(--ids-color-on-surface) data-active:text-(--ids-color-on-surface)',
-    'data-pressed:text-(--ids-color-on-surface)',
+    'shrink-0 text-neutral',
+    'data-hovered:text-on-surface data-active:text-on-surface',
+    'data-pressed:text-on-surface',
   ),
   // ...
 };
@@ -48,7 +48,7 @@ className={cn('origin-center -rotate-90', indicatorClassName)}
 | 설정                                                               | 없으면                                                                                 |
 | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
 | `theme.radius: ['standard', 'indicator']`                          | `rounded-standard` 와 `rounded-full` 이 충돌로 잡히지 않아 둘 다 남는다                |
-| `font-size` 에 IDS 글자 스타일(`text-body-*`, `text-caption-*` 등) | `text-body-b3-regular` 를 글자색으로 읽어 앞의 `text-(--ids-color-on-muted)` 를 지운다 |
+| `font-size` 에 IDS 글자 스타일(`text-body-*`, `text-caption-*` 등) | `text-body-b3-regular` 를 글자색으로 읽어 앞의 `text-neutral` 를 지운다 |
 | `concentric-p` 가 `p-*`, `rounded-*` 와 충돌                       | `p-4 concentric-p-3` 이 둘 다 남는다                                                   |
 
 - `concentric-p-*` 는 padding 과 radius 를 함께 정하므로 앞의 `p-*`, `rounded-*` 를 지웁니다.
@@ -78,7 +78,7 @@ export const passwordFieldStyle = tv({
   extend: textControlStyle,
   slots: {
     toggle: [fieldAction.base, 'data-pressed:bg-transparent'],
-    capsLock: 'inline-flex shrink-0 items-center text-(--ids-color-on-muted)',
+    capsLock: 'inline-flex shrink-0 items-center text-neutral',
   },
   variants: {
     size: {

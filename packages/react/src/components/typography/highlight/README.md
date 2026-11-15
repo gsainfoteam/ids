@@ -43,7 +43,7 @@ import { Highlight } from '@gsainfoteam/ids-react';
 | `variant`  | `'soft' \| 'solid'`           | `'soft'` |
 | `children` | `ReactNode` (글)              | -        |
 
-- 두 모양 모두 바탕과 글자가 4.5:1 을 넘습니다(브랜드 색 규칙).
+- 두 모양 모두 바탕과 글자가 APCA Lc 75 를 넘습니다(브랜드 색 규칙).
 
 ## Highlight.Mark
 

@@ -1,3 +1,5 @@
+import { cornerExponent, cornerRadiusScale, insetClipPath } from '../../../internal/corner-shape';
+
 const PAGE_INSET = 26;
 const PAGE_DROP = 'calc(env(safe-area-inset-top) + 14px)';
 const PAGE_RADIUS = 8;
@@ -162,19 +164,20 @@ export function scaleBackground(from: Element, timing: Timing): BackgroundScale 
   const scale = (view.innerWidth - PAGE_INSET) / view.innerWidth;
   const originX = view.innerWidth / 2 - rect.left;
 
+  const rootStyle = getComputedStyle(root);
+  const pageRadius = PAGE_RADIUS * cornerRadiusScale(rootStyle);
+  const exponent = cornerExponent(rootStyle, 'top-left');
+  const visible = { top: scrolledPast, right: 0, bottom: belowViewport, left: 0 };
+
   const paint = (progress: number) => {
-    const radius = `${PAGE_RADIUS * progress}px`;
+    const radius = pageRadius * progress;
     styles.write(
       root,
       'transform',
       `translateY(calc(${PAGE_DROP} * ${progress})) scale(${1 - (1 - scale) * progress})`,
     );
-    styles.write(root, 'border-radius', radius);
-    styles.write(
-      root,
-      'clip-path',
-      `inset(${scrolledPast}px 0px ${belowViewport}px 0px round ${radius})`,
-    );
+    styles.write(root, 'border-radius', `${radius}px`);
+    styles.write(root, 'clip-path', insetClipPath(rect, visible, radius, exponent));
   };
 
   if (isTransparent(getComputedStyle(root).backgroundColor))

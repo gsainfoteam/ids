@@ -12,7 +12,7 @@
 ```tsx
 import { ScrollArea } from '@gsainfoteam/ids-react';
 
-<ScrollArea className="h-64 w-72 rounded-standard border border-(--ids-color-border)">
+<ScrollArea className="h-64 w-72 rounded-standard border border-neutral">
   <p>긴 내용</p>
 </ScrollArea>
 ```
@@ -79,7 +79,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 ```tsx
 // 위로 가려진 내용이 생기면 머리 아래에 선을 긋는다
 <div className="group/panel flex flex-col">
-  <header className="border-b border-transparent group-has-data-overflow-y-start/panel:border-(--ids-color-border)">
+  <header className="border-b border-transparent group-has-data-overflow-y-start/panel:border-neutral">
     공지
   </header>
   <ScrollArea className="min-h-0 grow">...</ScrollArea>
@@ -100,7 +100,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
   <ScrollArea.Scrollbar orientation="vertical" />   {/* 내용 앞: 시작 쪽(LTR 왼쪽) */}
   <ScrollArea.Viewport>...</ScrollArea.Viewport>
   <ScrollArea.Scrollbar orientation="horizontal">   {/* 내용 뒤: 아래 */}
-    <ScrollArea.Thumb className="bg-(--ids-color-primary)" />
+    <ScrollArea.Thumb className="bg-primary" />
   </ScrollArea.Scrollbar>
   <ScrollArea.Corner />
 </ScrollArea>
@@ -143,7 +143,8 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 
 - 막대 끝의 안쪽 거리는 **ScrollArea root 의 계산된 `border-radius`** 로 정합니다. 네 모서리를 따로 읽고, 테두리 두께를 빼고, RTL 이면 좌우를 바꿉니다.
 - 거리는 `간격 + 반지름 - √(반지름² - (반지름 - 간격)²)` 입니다. 막대 바깥 모서리가 곡선 안쪽에 오는 가장 가까운 자리입니다. 14px 팝업(테두리 1px)에서 약 9px 입니다.
-- 두 막대가 함께 보이면 서로의 두께 + 간격만큼도 비웁니다. 모서리가 둥글어 Corner 칸이 곡선 밖으로 나가면 Corner 를 숨깁니다.
+- 모서리가 squircle 이면 `corner-*-shape` 를 함께 읽어 원 대신 초타원(`|x|ⁿ + |y|ⁿ = 1`, squircle 은 n = 4)으로 같은 자리를 구합니다: `간격 + 반지름 - 반지름 · (1 - ((반지름 - 간격) / 반지름)ⁿ)^(1/n)`.
+- 두 막대가 함께 보이면 서로의 두께 + 간격만큼도 비웁니다. 모서리가 둥글어 Corner 칸이 곡선 밖으로 나가면(`반지름 · (1 - 2^(-1/n)) > 간격`) Corner 를 숨깁니다.
 - root 가 둥근 컨테이너의 모서리에 붙어 있지만 root 자신은 둥글지 않으면 `rounded-[inherit]` 를 줍니다. Select 목록이 팝업 모서리를 이렇게 받습니다.
 - 반지름은 root 의 크기가 바뀔 때 다시 읽습니다. 스크롤 중에는 읽지 않습니다.
 - padding 이 있는 컨테이너를 root 로 쓰면 모서리만 `concentric-p-*` 로 정하고 padding 은 viewport 에 줍니다(`concentric-p-1 p-0` + viewport `p-1`). 그래야 내용이 테두리 바로 안쪽에서 잘립니다.
@@ -203,13 +204,14 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 
 ## 색
 
-| 토큰                        | 쓰임                                    |
-| --------------------------- | --------------------------------------- |
-| `--ids-color-handle`        | thumb                                   |
-| `--ids-color-handle-hover`  | thumb 에 올렸을 때                      |
-| `--ids-color-handle-active` | thumb 을 끌 때                          |
-| `--ids-color-muted`         | `always` 트랙, 막대에 올렸을 때, Corner |
+| 토큰                            | 불투명도 | 쓰임                                    |
+| ------------------------------- | -------- | --------------------------------------- |
+| `--ids-color-bg-neutral`        | 60%      | thumb                                   |
+| `--ids-color-bg-neutral-hover`  | 75%      | thumb 에 올렸을 때                      |
+| `--ids-color-bg-neutral-active` | 90%      | thumb 을 끌 때                          |
+| `--ids-color-bg-neutral-soft`   | 50%      | `always` 트랙, 막대에 올렸을 때, Corner |
 
+- 막대는 내용 위에 겹쳐 그려지므로 반투명합니다. 밑의 글자가 비쳐 보여 막대가 내용을 덜 가립니다.
 - 중립 토큰이라 `data-mode` 에만 따릅니다. 다크 모드는 토큰이 바꿉니다.
 
 ## 속성

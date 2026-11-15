@@ -11,13 +11,15 @@ export const linkStyle = tv({
   },
   variants: {
     colorScheme: {
-      accent: { root: 'text-(--ids-color-accent)' },
-      neutral: { root: 'text-inherit hover:text-(--ids-color-on-surface)' },
+      primary: { root: 'text-primary' },
+      secondary: { root: 'text-secondary' },
+      tertiary: { root: 'text-tertiary' },
+      neutral: { root: 'text-inherit hover:text-on-surface' },
     },
     underline: {
       always: { root: 'underline decoration-current/40 hover:decoration-current' },
       hover: { root: 'no-underline hover:underline focus-visible:underline' },
     },
   },
-  defaultVariants: { colorScheme: 'accent', underline: 'always' },
+  defaultVariants: { colorScheme: 'primary', underline: 'always' },
 });

@@ -27,7 +27,7 @@ test('SSR: a muted paragraph that names its variant and size', () => {
   expect(marker.dataset.variant).toBe('default');
   expect(marker.dataset.size).toBe('standard');
   expect(marker.hasAttribute('data-pending')).toBe(false);
-  expect(marker.className).toContain('text-(--ids-color-on-muted)');
+  expect(marker.className).toContain('text-neutral');
   expect(marker.className).toMatch(/\btext-body-b3-regular\b/);
   expect(marker.querySelector('.shimmer')).toBeNull();
   expect(marker.querySelector('svg')!.getAttribute('aria-hidden')).toBe('true');

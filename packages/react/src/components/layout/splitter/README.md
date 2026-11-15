@@ -128,7 +128,7 @@ export function Workspace({ layout }: { layout?: number[] }) {
   </Splitter.Panel>
 </Splitter>
 
-<Splitter.Handle className="w-1 bg-(--ids-color-muted)" />   {/* 모양은 className 으로 */}
+<Splitter.Handle className="w-1 bg-neutral-soft" />   {/* 모양은 className 으로 */}
 
 <Splitter.Handle asChild>
   <hr />                                                    {/* 자식 요소 하나가 핸들이 된다 */}
@@ -178,7 +178,7 @@ export function Workspace({ layout }: { layout?: number[] }) {
 | `data-splitter-toggle` | 접기 버튼            | 선택자                    |
 | `data-resize-handle`   | 핸들                 | 크기 조절 손잡이 선택자   |
 
-- 선은 `--ids-color-border`, 올리면 `--ids-color-handle-hover`, 끄는 동안 `--ids-color-handle-active` 입니다.
+- 선은 `--ids-color-border-neutral`, 올리면 `--ids-color-bg-neutral-hover`, 끄는 동안 `--ids-color-bg-neutral-active` 입니다.
 - 루트는 부모를 채웁니다(`size-full`). 가로 분할은 부모에 높이가 있어야 합니다.
 - 패널은 `overflow: hidden` 입니다. 넘치는 내용은 패널 안에 `ScrollArea` 를 둡니다.
 - 끄는 동안 패널이 포인터를 받지 않아서 iframe 위를 지나도 끌기가 끊기지 않습니다.

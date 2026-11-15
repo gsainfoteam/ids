@@ -34,7 +34,7 @@ function appendToChildren(children: ChildProps['children'], tail: ReactNode) {
 }
 
 export function LinkRoot({
-  colorScheme = 'accent',
+  colorScheme = 'primary',
   underline = 'always',
   asChild = false,
   target,

@@ -35,10 +35,11 @@ import { Button } from '@gsainfoteam/ids-react';
 | `danger` `success` `warning` `info` | 상태 색 채움 | 옅은 상태 색 | 글자만 상태 색 | 상태 색 채움과 광택 |
 
 - 상태 색에서는 포커스 링과 포커스된 테두리도 그 색입니다. `primary` 와 `neutral` 은 테마 색 링입니다.
-- `primary` 의 `soft` 는 `secondary` 배경에 `on-secondary` 글자입니다. 올리면 `primary` 를 6%, 누르면 12% 섞어 진해지고, 글자는 그 배경에서도 4.5:1 을 지킵니다.
-- 상태 색의 옅은 배경 위 글자는 진한 단계(`*-strong`)라 밝은 노랑 `warning` 도 읽힙니다.
+- `soft` 는 계열의 `bg-X-soft` 배경에 `text-on-X-soft` 글자입니다. 올리면 `bg-X-soft-hover`, 누르면 `bg-X-soft-active`(채움을 6%, 12% 섞은 색)이고, 글자는 그 배경에서도 APCA Lc 75 를 지킵니다.
+- 옅은 배경 위 글자는 `text-on-X-soft` 라 밝은 노랑 `warning` 도 읽힙니다.
+- `secondary` 와 `tertiary` 는 테마가 그 색을 주지 않으면 IdsProvider 가 primary 에서 만든 색입니다. 어느 테마에서나 primary 와 다른 색입니다.
 - `glossy` 는 `solid` 의 채움 위에 위쪽이 밝은 광택, 채움보다 20% 진한 가장자리, 안쪽 위 하이라이트, 그림자를 얹습니다. 올리면 광택이 밝아지고, 누르면 광택과 그림자가 빠지며 안쪽 그림자로 눌려 들어갑니다. 포커스 때 가장자리는 `outline` 처럼 scheme 색 링이 됩니다.
-- `outline` 과 `ghost` 는 올리면 `muted`, 누르면 한 단계 진한 `muted-hover` 입니다. 상태 색에서는 그 색 10% 와 16% 입니다.
+- `outline` 과 `ghost` 는 올리면 `bg-neutral-soft`, 누르면 한 단계 진한 `bg-neutral-soft-hover` 입니다. 상태 색에서는 `bg-X-soft` 와 `bg-X-soft-hover` 입니다.
 
 ## 아이콘
 

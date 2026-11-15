@@ -32,7 +32,7 @@ import { Bubble, Chip } from '@gsainfoteam/ids-react';
 ## Variant
 
 ```tsx
-<Bubble variant="soft">     {/* 기본. 옅은 중립 면 (muted). 받은 말 */}
+<Bubble variant="soft">     {/* 기본. 옅은 중립 면 (`bg-neutral-soft`). 받은 말 */}
 <Bubble variant="solid">    {/* 브랜드 채움 (primary). 보낸 말 */}
 <Bubble variant="outline">  {/* 바탕색 면에 중립 테두리. 시스템 안내에 가까운 말 */}
 ```

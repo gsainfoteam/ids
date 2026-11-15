@@ -14,6 +14,7 @@ import {
   type ResizeRange,
 } from './axis';
 import {
+  endEndCornerExponent,
   innerEndEndRadius,
   isBeingDragged,
   isRightToLeft,
@@ -98,13 +99,23 @@ export function useMeasuredAxes(targets: Partial<Record<ResizeDimension, HTMLEle
   return measured;
 }
 
-export function useCornerRadius(corner: HTMLElement | null) {
-  const [radius, setRadius] = useState<number | null>(null);
+export type CornerShape = { radius: number; exponent: number };
+
+const cornerShapeOf = (element: HTMLElement): CornerShape => ({
+  radius: innerEndEndRadius(element),
+  exponent: endEndCornerExponent(element),
+});
+
+const keepingAnEqualShape = (next: CornerShape) => (previous: CornerShape | null) =>
+  isEqual(previous, next) ? previous : next;
+
+export function useCornerShape(corner: HTMLElement | null) {
+  const [shape, setShape] = useState<CornerShape | null>(null);
 
   useLayoutEffect(() => {
     if (!corner) return;
 
-    const read = () => setRadius(innerEndEndRadius(corner));
+    const read = () => setShape(keepingAnEqualShape(cornerShapeOf(corner)));
     const observer = new corner.ownerDocument.defaultView!.ResizeObserver(read);
     observer.observe(corner);
     read();
@@ -114,12 +125,12 @@ export function useCornerRadius(corner: HTMLElement | null) {
 
   useLayoutEffect(() => {
     const readAfterARestyleThatKeptTheSize = () => {
-      if (corner) setRadius(innerEndEndRadius(corner));
+      if (corner) setShape(keepingAnEqualShape(cornerShapeOf(corner)));
     };
     readAfterARestyleThatKeptTheSize();
   });
 
-  return radius;
+  return shape;
 }
 
 export function useAxesDrag(

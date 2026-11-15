@@ -46,7 +46,7 @@ import { Avatar, AvatarGroup } from '@gsainfoteam/ids-react';
 ```
 
 - 아래에 깔린 아바타는 겹친 쪽에 `data-cutout="start"` 또는 `"end"` 가 붙고, 그쪽이 2px 틈을 두고 오려집니다.
-- 네모난 아바타는 위 아바타의 둥근 모서리 모양대로 오려집니다.
+- 네모난 아바타는 위 아바타의 둥근 모서리 모양대로 오려집니다. 테마가 squircle 이면 squircle 모양대로 오려서, 모서리 대각선에서도 틈이 2px 입니다.
 - `dir="rtl"` 안에서는 방향이 뒤집힙니다.
 
 ## 크기와 모양

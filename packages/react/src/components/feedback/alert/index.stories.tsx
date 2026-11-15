@@ -11,7 +11,16 @@ import { Alert } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const schemes = ['neutral', 'info', 'success', 'warning', 'danger'] as const;
+const schemes = [
+  'neutral',
+  'primary',
+  'secondary',
+  'tertiary',
+  'info',
+  'success',
+  'warning',
+  'danger',
+] as const;
 const variants = ['solid', 'soft', 'outline', 'ghost'] as const;
 
 const meta = {
@@ -47,6 +56,9 @@ export const Playground: Story = {
 
 const copy = {
   neutral: ['공지', '점검은 오전 2시에 끝납니다.'],
+  primary: ['새 학기 안내', '수강 신청은 다음 주 월요일에 열립니다.'],
+  secondary: ['동아리 모집', '이번 주 금요일까지 지원서를 받습니다.'],
+  tertiary: ['행사 소식', '축제 부스 신청이 시작되었습니다.'],
   info: ['업데이트 가능', 'v2.5.0이 출시되었습니다.'],
   success: ['저장 완료', '변경 사항이 저장되었습니다.'],
   warning: ['결제 정보 만료 임박', '5일 뒤 만료됩니다. 갱신해 주세요.'],

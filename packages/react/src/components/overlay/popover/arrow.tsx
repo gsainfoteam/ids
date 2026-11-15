@@ -23,7 +23,7 @@ export function PopoverArrow(props: PopoverArrowProps) {
       width={14}
       height={7}
       fill="var(--ids-color-surface)"
-      stroke="var(--ids-color-border)"
+      stroke="var(--ids-color-border-neutral)"
       strokeWidth={1}
       {...props}
       ref={setArrow}

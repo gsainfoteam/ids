@@ -51,7 +51,7 @@ test('SSR: a shape is an aria-hidden span that names its shape and animation', (
   expect(rect.className).toContain('before:h-4');
   expect(rect.className).toMatch(/\bw-full\b/);
   expect(rect.className).toMatch(/\brounded-standard\b/);
-  expect(rect.className).toContain('bg-(--ids-color-muted)');
+  expect(rect.className).toContain('bg-neutral-soft');
   expect(rect.className).toContain('animate-skeleton-pulse');
   expect(rect.className).toContain('motion-reduce:animate-none');
 
@@ -92,7 +92,7 @@ test('SSR: a text shape draws one line box per line and the last of several is s
   expect(lines({ lines: 2.7 })).toHaveLength(2);
 
   const root = skeletonIn(html(<Skeleton shape="text" className="text-body-b3-medium w-1/3" />));
-  expect(root.className).not.toContain('bg-(--ids-color-muted)');
+  expect(root.className).not.toContain('bg-neutral-soft');
   expect(root.className).toBe('block text-body-b3-medium w-1/3');
 });
 
@@ -111,7 +111,7 @@ test('SSR: wrapping paints the div, marks it busy and puts the children in an in
   expect(loading.hasAttribute('data-shape')).toBe(false);
   expect(loading.hasAttribute('inert')).toBe(false);
   expect(loading.className).toMatch(/\brounded-standard\b/);
-  expect(loading.className).toContain('bg-(--ids-color-muted)');
+  expect(loading.className).toContain('bg-neutral-soft');
   const content = loading.firstElementChild as HTMLElement;
   expect(content.hasAttribute('data-skeleton-content')).toBe(true);
   expect(content.hasAttribute('inert')).toBe(true);
@@ -241,7 +241,7 @@ test('asChild merges into an IDS component: its radius, its ref and its own prop
           <Card.Title>Painted</Card.Title>
         </Card>
       </Skeleton>
-      <span data-testid="muted" className="block bg-(--ids-color-muted)" />
+      <span data-testid="muted" className="bg-neutral-soft block" />
     </IdsProvider>,
   );
   const plain = screen.getByTestId('plain').element();
@@ -355,7 +355,7 @@ test('with motion reduced both animations stop on the plain muted fill', async (
       <div className="w-40">
         <Skeleton data-testid="pulse" />
         <Skeleton data-testid="wave" animation="wave" />
-        <span data-testid="muted" className="block bg-(--ids-color-muted)" />
+        <span data-testid="muted" className="bg-neutral-soft block" />
       </div>
     </IdsProvider>,
   );

@@ -11,9 +11,7 @@ const chrome = cn(
   'group-data-swiping/viewer:transition-none',
 );
 
-const floatingSurface = cn(
-  'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-md',
-);
+const floatingSurface = cn('border border-neutral bg-surface text-on-surface shadow-md');
 
 export const imageStyle = tv({
   slots: {
@@ -28,7 +26,7 @@ export const imageStyle = tv({
     placeholder: 'absolute inset-0 flex items-center justify-center rounded-none',
     fallback: [
       'flex size-full items-center justify-center gap-2 p-2 text-center',
-      'bg-(--ids-color-muted) text-body-b3-regular text-(--ids-color-on-muted)',
+      'bg-neutral-soft text-body-b3-regular text-neutral',
       '[&_svg]:size-[min(--spacing(6),40%)] [&_svg]:shrink-0',
     ],
     group: 'min-w-0',
@@ -41,7 +39,7 @@ export const imageStyle = tv({
     viewer: [
       'group/viewer fixed inset-0 z-50 m-0 grid size-full max-h-none max-w-none overflow-hidden',
       'grid-cols-1 grid-rows-[auto_minmax(0,1fr)_auto_auto]',
-      'border-0 bg-transparent p-0 text-(--ids-color-on-surface) outline-none',
+      'border-0 bg-transparent p-0 text-on-surface outline-none',
     ],
     stage: [slidesLayout.viewport, 'relative col-start-1 row-[1/4] min-h-0'],
     track: slidesLayout.track.horizontal,
@@ -80,10 +78,7 @@ export const imageStyle = tv({
       'col-start-1 row-start-3 mb-3 max-w-[min(--spacing(160),calc(100%-var(--spacing)*6))] justify-self-center',
       'concentric-p-3 text-center text-body-b3-regular',
     ],
-    thumbnails: [
-      chrome,
-      'col-start-1 row-start-4 min-w-0 border-t border-(--ids-color-border) bg-(--ids-color-surface)',
-    ],
+    thumbnails: [chrome, 'col-start-1 row-start-4 min-w-0 border-t border-neutral bg-surface'],
     thumbnailList: 'flex gap-2 p-2 [justify-content:safe_center]',
     thumbnail: [
       'relative size-12 shrink-0 cursor-pointer overflow-hidden rounded-standard focus-ring',
@@ -100,7 +95,7 @@ export const imageStyle = tv({
       grid: { group: 'grid grid-cols-[repeat(var(--image-columns),minmax(0,1fr))] gap-2' },
     } satisfies Record<ImageGroupLayout, object>,
     painted: {
-      true: { placeholder: 'bg-(--ids-color-muted)' },
+      true: { placeholder: 'bg-neutral-soft' },
       false: {},
     },
   },

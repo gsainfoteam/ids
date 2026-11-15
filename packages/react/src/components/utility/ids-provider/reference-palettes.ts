@@ -1,3 +1,25 @@
+export const REFERENCE_NAMES = [
+  'red',
+  'orange',
+  'amber',
+  'yellow',
+  'lime',
+  'green',
+  'emerald',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose',
+] as const;
+
+export type ReferenceName = (typeof REFERENCE_NAMES)[number];
+
 export const REFERENCE_PALETTES: readonly (readonly string[])[] = [
   [
     '#fef2f2',
@@ -221,3 +243,6 @@ export const REFERENCE_PALETTES: readonly (readonly string[])[] = [
     '#4d0218',
   ],
 ];
+
+export const referencePalette = (name: ReferenceName) =>
+  REFERENCE_PALETTES[REFERENCE_NAMES.indexOf(name)]!;

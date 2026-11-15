@@ -4,7 +4,12 @@ import { TabsRoot, type TabsProps, type TabsRenderProps, type TabsState } from '
 import { tabsStyle } from './style';
 import { TabsTrigger, type TabsTriggerProps, type TabsTriggerState } from './trigger';
 
-import type { TabsActivationMode, TabsAppearance, TabsOrientation } from './context';
+import type {
+  TabsActivationMode,
+  TabsAppearance,
+  TabsColorScheme,
+  TabsOrientation,
+} from './context';
 
 export function Tabs<T extends string = string>(props: Tabs.Props<T>) {
   return <TabsRoot {...props} />;
@@ -16,6 +21,7 @@ export namespace Tabs {
   export type RenderProps<T extends string = string> = TabsRenderProps<T>;
   export type Orientation = TabsOrientation;
   export type Appearance = TabsAppearance;
+  export type ColorScheme = TabsColorScheme;
   export type ActivationMode = TabsActivationMode;
 
   export const List = TabsList;
@@ -38,5 +44,10 @@ export namespace Tabs {
   export const Style = tabsStyle;
 }
 
-export type { TabsActivationMode, TabsAppearance, TabsOrientation } from './context';
+export type {
+  TabsActivationMode,
+  TabsAppearance,
+  TabsColorScheme,
+  TabsOrientation,
+} from './context';
 export type { TabsProps, TabsRenderProps, TabsState } from './root';

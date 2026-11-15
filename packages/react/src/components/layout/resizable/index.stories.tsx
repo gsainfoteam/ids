@@ -11,9 +11,7 @@ import { Resizable } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const panel = cn(
-  'concentric-p-4 border border-(--ids-color-border) bg-(--ids-color-surface) text-body-b3-regular',
-);
+const panel = cn('concentric-p-4 border border-neutral bg-surface text-body-b3-regular');
 
 const meta = {
   title: 'Layout/Resizable',
@@ -90,14 +88,14 @@ export const Gallery: Story = {
           <Resizable
             defaultWidth={180}
             defaultHeight={112}
-            className="text-body-b3-regular rounded-none border border-(--ids-color-border) bg-(--ids-color-surface) p-4"
+            className="text-body-b3-regular border-neutral bg-surface rounded-none border p-4"
           >
             0
           </Resizable>
           <Resizable
             defaultWidth={180}
             defaultHeight={112}
-            className="rounded-standard text-body-b3-regular border border-(--ids-color-border) bg-(--ids-color-surface) p-4"
+            className="rounded-standard text-body-b3-regular border-neutral bg-surface border p-4"
           >
             standard
           </Resizable>
@@ -107,7 +105,7 @@ export const Gallery: Story = {
           <Resizable
             defaultWidth={180}
             defaultHeight={112}
-            className="text-body-b3-regular rounded-full border border-(--ids-color-border) bg-(--ids-color-surface) px-8 py-4"
+            className="text-body-b3-regular border-neutral bg-surface rounded-full border px-8 py-4"
           >
             full
           </Resizable>
@@ -157,13 +155,13 @@ export const Gallery: Story = {
         <Showcase.Row label="edge">
           <Resizable direction="horizontal" defaultWidth={260} className={cn(panel, 'h-28')}>
             테마 색 막대가 손잡이입니다.
-            <Resizable.Handle className="inset-y-3 -end-0.5 w-1 bg-(--ids-color-primary) before:hidden" />
+            <Resizable.Handle className="bg-primary inset-y-3 -end-0.5 w-1 before:hidden" />
           </Resizable>
         </Showcase.Row>
         <Showcase.Row label="corner color">
           <Resizable defaultWidth={260} defaultHeight={120} className={panel}>
             호의 색은 글자색입니다. 올리거나 끄는 동안은 손잡이 단계를 따릅니다.
-            <Resizable.Handle className="text-(--ids-color-accent)" />
+            <Resizable.Handle className="text-primary" />
           </Resizable>
         </Showcase.Row>
         <Showcase.Row label="corner mark">

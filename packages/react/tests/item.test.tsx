@@ -482,10 +482,10 @@ test('Item.Actions mutes a bare icon and keeps the color an icon sets', async ()
         </Item.Content>
         <Item.Actions>
           <svg data-testid="bare" />
-          <svg data-testid="colored" className="text-(--ids-color-danger)" />
+          <svg data-testid="colored" className="text-danger" />
         </Item.Actions>
-        <span data-testid="probe" className="text-(--ids-color-on-muted)">
-          <span data-testid="danger" className="text-(--ids-color-danger)" />
+        <span data-testid="probe" className="text-neutral">
+          <span data-testid="danger" className="text-danger" />
         </span>
       </Item>
     </IdsProvider>,

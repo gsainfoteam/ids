@@ -2,7 +2,7 @@
 
 글자로 된 링크입니다. native `<a>` 위에 서비스마다 같아야 할 색, 밑줄, 포커스 링을 얹습니다.
 
-- **두 가지 색.** 글 속 링크는 브랜드 글자색 `accent`, 바닥글이나 표 칸처럼 링크가 모인 자리는 둘레 글자색을 따르는 `neutral`.
+- **브랜드 글자색과 둘레 색.** 글 속 링크는 브랜드 글자색 `primary`(또는 `secondary`, `tertiary`), 바닥글이나 표 칸처럼 링크가 모인 자리는 둘레 글자색을 따르는 `neutral`.
 - **두 가지 밑줄.** 늘 긋는 `always` 와 가리킬 때만 긋는 `hover`.
 - **라우터 링크와 합성.** TanStack Router 는 `createLink(Link)`, Next.js 와 React Router 는 `asChild` 로 한 번 감싸 둡니다.
 - **새 탭.** `target="_blank"` 면 `rel="noopener noreferrer"` 와 새 탭 아이콘, 스크린 리더용 "(새 탭에서 열림)" 이 붙습니다.
@@ -24,11 +24,14 @@ import { Link } from '@gsainfoteam/ids-react';
 ## 색
 
 ```tsx
-<Link colorScheme="accent" />    // 기본. 브랜드 글자색(--ids-color-accent)
-<Link colorScheme="neutral" />   // 둘레 글자색을 따르고, 가리키면 on-surface
+<Link colorScheme="primary" />    // 기본. 브랜드 글자색(text-primary)
+<Link colorScheme="secondary" />  // text-secondary, 테마에 없으면 primary 에서 만든 색
+<Link colorScheme="tertiary" />   // text-tertiary, 테마에 없으면 primary 에서 만든 색
+<Link colorScheme="neutral" />    // 둘레 글자색을 따르고, 가리키면 on-surface
 ```
 
-- `accent` 는 모든 테마에서 바탕과 4.5:1 을 넘는 브랜드 글자색입니다. `primary` 를 글자색으로 쓰지 않습니다.
+- 브랜드 색은 채우기(`bg-primary`)가 아니라 글자 역할(`text-primary`)을 씁니다. 모든 테마에서 바탕과 APCA Lc 60 을 넘습니다.
+- 예전 `accent` 는 `primary` 로 바뀌었습니다.
 - `neutral` 은 `Card.Description` 처럼 흐린 글자 안에 두면 그 색을 따릅니다.
 
 ## 밑줄
@@ -159,7 +162,7 @@ export function AppLink({ colorScheme, underline, ...props }: AppLinkProps) {
 
 | 속성          | 기본 / 동작                                                   |
 | ------------- | ------------------------------------------------------------- |
-| `colorScheme` | `accent`(기본) / `neutral`                                    |
+| `colorScheme` | `primary`(기본) / `secondary` / `tertiary` / `neutral`        |
 | `underline`   | `always`(기본) / `hover`                                      |
 | `asChild`     | 자식 요소 하나를 링크로 그린다 (라우터 링크)                  |
 | `target`      | `_blank` 면 새 탭 아이콘과 안내가 붙는다                      |

@@ -8,7 +8,7 @@ import { Link } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const colorSchemes = ['accent', 'neutral'] as const;
+const colorSchemes = ['primary', 'secondary', 'tertiary', 'neutral'] as const;
 const underlines = ['always', 'hover'] as const;
 
 const meta = {
@@ -48,7 +48,7 @@ export const Gallery: Story = {
         title="New tab"
         description="target이 _blank면 아이콘과 숨긴 안내가 붙습니다."
       >
-        <Showcase.Row label="accent">
+        <Showcase.Row label="primary">
           <Link href="https://www.gist.ac.kr" target="_blank">
             GIST 누리집
           </Link>
@@ -111,7 +111,7 @@ export const InRunningText: Story = {
     docs: {
       description: {
         story:
-          '글 속 링크는 기본값 그대로 accent 색에 밑줄을 긋습니다. 색을 구별하지 못해도 밑줄로 링크를 알아봅니다.',
+          '글 속 링크는 기본값 그대로 primary 글자색에 밑줄을 긋습니다. 색을 구별하지 못해도 밑줄로 링크를 알아봅니다.',
       },
     },
   },

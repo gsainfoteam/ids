@@ -1,28 +1,33 @@
 import { controlSurface } from '../../../internal/control-surface';
 import { tv } from '../../../utils';
 
-import type { TabsAppearance, TabsOrientation } from './context';
+import type { TabsAppearance, TabsColorScheme, TabsOrientation } from './context';
 import type { IdsSize, IdsVariant } from '../../../tokens/types';
 
 export const tabsStyle = tv({
   slots: {
     root: 'flex min-w-0',
-    list: ['relative flex shrink-0', controlSurface.colorScheme.primary],
+    list: 'relative flex shrink-0',
     trigger: [
       'relative inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap select-none',
-      'text-(--ids-color-on-muted) aria-selected:text-(--ids-color-on-surface)',
-      'not-aria-selected:data-hovered:text-(--ids-color-on-surface) focus-ring',
+      'text-neutral aria-selected:text-on-surface',
+      'not-aria-selected:data-hovered:text-on-surface focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
       'disabled:cursor-not-allowed disabled:opacity-50',
       '[&_svg]:pointer-events-none [&_svg]:shrink-0',
     ],
     content: [
-      'min-w-0 flex-1 rounded-standard text-(--ids-color-on-surface) focus-ring',
+      'min-w-0 flex-1 rounded-standard text-on-surface focus-ring',
       '[&[hidden]:not([hidden=until-found])]:hidden',
     ],
   },
   variants: {
+    colorScheme: {
+      primary: { list: controlSurface.colorScheme.primary },
+      secondary: { list: controlSurface.colorScheme.secondary },
+      tertiary: { list: controlSurface.colorScheme.tertiary },
+    } satisfies Record<TabsColorScheme, object>,
     stretch: { true: {}, false: {} },
     orientation: {
       horizontal: {
@@ -41,7 +46,7 @@ export const tabsStyle = tv({
         trigger: [
           'rounded-standard',
           'after:pointer-events-none after:absolute after:bg-transparent',
-          'aria-selected:after:bg-(--ids-color-accent)',
+          'aria-selected:after:bg-(--control-ring)',
         ],
       },
       pill: {
@@ -53,8 +58,7 @@ export const tabsStyle = tv({
         ],
       },
       enclosed: {
-        trigger:
-          'border border-transparent aria-selected:border-(--ids-color-border) aria-selected:bg-(--ids-color-surface)',
+        trigger: 'border border-transparent aria-selected:border-neutral aria-selected:bg-surface',
       },
     } satisfies Record<TabsAppearance, object>,
     variant: {
@@ -89,7 +93,7 @@ export const tabsStyle = tv({
       appearance: 'underline',
       orientation: 'horizontal',
       class: {
-        list: 'border-b border-(--ids-color-border)',
+        list: 'border-b border-neutral',
         trigger: 'after:inset-x-0 after:-bottom-px after:h-0.5 after:rounded-full',
       },
     },
@@ -97,7 +101,7 @@ export const tabsStyle = tv({
       appearance: 'underline',
       orientation: 'vertical',
       class: {
-        list: 'border-e border-(--ids-color-border)',
+        list: 'border-e border-neutral',
         trigger: 'after:inset-y-0 after:-end-px after:w-0.5 after:rounded-full',
       },
     },
@@ -105,7 +109,7 @@ export const tabsStyle = tv({
       appearance: 'enclosed',
       orientation: 'horizontal',
       class: {
-        list: 'border-b border-(--ids-color-border)',
+        list: 'border-b border-neutral',
         trigger: '-mb-px rounded-t-standard aria-selected:border-b-transparent',
       },
     },
@@ -113,7 +117,7 @@ export const tabsStyle = tv({
       appearance: 'enclosed',
       orientation: 'vertical',
       class: {
-        list: 'border-e border-(--ids-color-border)',
+        list: 'border-e border-neutral',
         trigger: '-me-px rounded-s-standard aria-selected:border-e-transparent',
       },
     },
@@ -134,9 +138,9 @@ export const tabsStyle = tv({
       variant: 'outline',
       class: {
         trigger: [
-          'aria-selected:bg-(--ids-color-surface) aria-selected:shadow-xs',
-          'aria-selected:inset-ring-1 aria-selected:inset-ring-(--ids-color-border)',
-          'dark:aria-selected:bg-(--ids-color-muted)',
+          'aria-selected:bg-surface aria-selected:shadow-xs',
+          'aria-selected:inset-ring-1 aria-selected:inset-ring-neutral',
+          'dark:aria-selected:bg-neutral-soft',
         ],
       },
     },
@@ -166,6 +170,7 @@ export const tabsStyle = tv({
     },
   ],
   defaultVariants: {
+    colorScheme: 'primary',
     orientation: 'horizontal',
     appearance: 'underline',
     variant: 'soft',

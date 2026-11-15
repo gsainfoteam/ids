@@ -1,80 +1,165 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-import { differenceCiede2000, interpolate, wcagContrast } from 'culori';
 import { describe, expect, test } from 'vitest';
 
 import { paletteHues, palettes } from '../.storybook/palettes';
-import { BRAND_ROLES } from '../src/components/utility/ids-provider/theme';
-import { resolveThemeRoles } from '../src/components/utility/ids-provider/theme-roles';
+import { lightnessContrast } from '../src/components/utility/ids-provider/contrast';
+import {
+  ACCENT_TEXT_LC,
+  MARK_LC,
+  TEXT_LC,
+  MODES,
+  neutralRoles,
+  resolveColors,
+} from '../src/components/utility/ids-provider/theme-roles';
+import {
+  IDS_BASE_SLOTS,
+  IDS_BRAND_FAMILIES,
+  IDS_COLOR_FAMILIES,
+  IDS_FAMILY_SLOTS,
+  IDS_NEUTRAL_PALETTE,
+  IDS_NEUTRAL_STEPS,
+  IDS_STATUS_FAMILIES,
+} from '../src/tokens/color-roles';
 
+import type { IdsNeutral, IdsStatus } from '../src/components/utility/ids-provider/theme';
 import type { IdsMode } from '../src/tokens/types';
-
-const modes: IdsMode[] = ['light', 'dark'];
-
-const AA_TEXT = 4.5;
-const AA_GRAPHICS = 3;
-const NEIGHBOURING_SERIES_DIFFERENCE = 25;
 
 const resolveCss = (entry: string) => createRequire(import.meta.url).resolve(entry);
 
 const css = readFileSync(resolveCss('@gsainfoteam/ids-css/no-fonts.css'), 'utf8');
 
-const controlSurface = readFileSync(
-  new URL('../src/internal/control-surface.ts', import.meta.url),
-  'utf8',
-);
+const modeBlock = (mode: IdsMode) =>
+  css.match(new RegExp(`\\[data-mode="${mode}"\\] \\{([^}]*)\\}`))?.[1] ?? '';
 
-const softTints = [
-  ...controlSurface.matchAll(
-    /\[--control-soft-(hover|press):color-mix\(in_oklab,var\(--control-soft\),var\(--control-fill\)_(\d+)%\)\]/g,
-  ),
-].map(([, state, percent]) => ({ state: state!, amount: Number(percent) / 100 }));
-
-const rules = [...css.matchAll(/^(\[data-[^{]+?)\s*\{([^}]*)\}/gm)].map(([, selector, body]) => ({
-  selector: selector!,
-  values: Object.fromEntries(
-    [...body!.matchAll(/--ids-color-([\w-]+):\s*(#[0-9a-f]{6});/g)].map(([, name, value]) => [
-      name!,
+const mappedSlots = (mode: IdsMode) =>
+  Object.fromEntries(
+    [...modeBlock(mode).matchAll(/--ids-color-([\w-]+): var\((.+)\);/g)].map(([, slot, value]) => [
+      slot!,
       value!,
     ]),
-  ),
-}));
+  );
 
-const tokensFor = (selector: string) =>
-  Object.assign({}, ...rules.filter((rule) => rule.selector === selector).map((r) => r.values)) as {
-    [token: string]: string;
+const slotsOf = (family: string) =>
+  IDS_FAMILY_SLOTS.map((template) => template.replace('{family}', family));
+
+const themeVar = (mode: IdsMode, slot: string) => `--ids-theme-${mode}-${slot}`;
+
+const atLeast = (foreground: string, backgrounds: string[], lc: number) =>
+  Math.min(...backgrounds.map((background) => lightnessContrast(foreground, background))) >= lc;
+
+const pairsFor = (family: string) => {
+  const [bg, bgHover, bgActive, soft, softHover, softActive, onFill, onSoft, text, border] =
+    slotsOf(family) as [
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+    ];
+
+  return {
+    text: [
+      [onFill, family === 'neutral' ? [bg] : [bg, bgHover, bgActive]],
+      [onSoft, [soft, softHover, softActive]],
+      ...(family === 'neutral' ? [[text, ['surface', soft]]] : []),
+    ] as [string, string[]][],
+    accent: family === 'neutral' ? [] : ([[text, ['surface', soft]]] as [string, string[]][]),
+    mark: family === 'neutral' ? [] : ([[border, ['surface']]] as [string, string[]][]),
   };
-
-const brandTokens = (hue: keyof typeof palettes, mode: IdsMode) =>
-  resolveThemeRoles(palettes[hue]).roles![mode] as { [token: string]: string };
-
-const modeTokens = (mode: IdsMode) => tokensFor(`[data-mode="${mode}"]`);
-
-const contrast = (tokens: { [token: string]: string }, foreground: string, background: string) => {
-  const fg = tokens[foreground];
-  const bg = tokens[background];
-  expect(fg, foreground).toMatch(/^#/);
-  expect(bg, background).toMatch(/^#/);
-  return wcagContrast(fg!, bg!);
 };
 
-test.each(modes)('ids.css maps the %s brand roles from the provider variables', (mode) => {
-  const mapping = css.match(
-    new RegExp(`\\[data-mode="${mode}"\\] \\{([^}]*--ids-theme-[^}]*)\\}`),
-  )?.[1];
+const failingPairs = (roles: { [slot: string]: string }) => {
+  const failures: string[] = [];
+  const check = (foreground: string, backgrounds: string[], lc: number) => {
+    const values = backgrounds.map((background) => roles[background]!);
+    if (!atLeast(roles[foreground]!, values, lc))
+      failures.push(`${foreground} on ${backgrounds.join(' / ')} below Lc ${lc}`);
+  };
 
-  expect(
-    [...(mapping ?? '').matchAll(/--ids-color-([\w-]+): var\(--ids-theme-(\w+)-([\w-]+)\);/g)].map(
-      ([, role, from, fromRole]) => [role, from, fromRole],
-    ),
-  ).toEqual(BRAND_ROLES.map((role) => [role, mode, role]));
+  check('on-surface', ['surface'], TEXT_LC);
+  for (const family of IDS_COLOR_FAMILIES) {
+    const { text, accent, mark } = pairsFor(family);
+    for (const [foreground, backgrounds] of text) check(foreground, backgrounds, TEXT_LC);
+    for (const [foreground, backgrounds] of accent) check(foreground, backgrounds, ACCENT_TEXT_LC);
+    for (const [foreground, backgrounds] of mark) check(foreground, backgrounds, MARK_LC);
+  }
+
+  return failures;
+};
+
+test.each(MODES)('ids.css maps every %s slot from the provider variables', (mode) => {
+  const mapped = mappedSlots(mode);
+  const expected = [...IDS_BASE_SLOTS, ...IDS_COLOR_FAMILIES.flatMap(slotsOf)];
+
+  expect(Object.keys(mapped).sort()).toEqual([...expected].sort());
+  for (const slot of expected) expect(mapped[slot]!.startsWith(themeVar(mode, slot))).toBe(true);
+});
+
+test.each(MODES)(
+  'ids.css has no %s brand fallback, since the provider writes every family',
+  (mode) => {
+    const mapped = mappedSlots(mode);
+
+    for (const family of IDS_BRAND_FAMILIES)
+      for (const slot of slotsOf(family)) expect(mapped[slot]).toBe(themeVar(mode, slot));
+  },
+);
+
+test.each(MODES)('ids.css falls back to the pure %s neutral without a provider value', (mode) => {
+  const mapped = mappedSlots(mode);
+
+  for (const [slot, step] of Object.entries(IDS_NEUTRAL_STEPS[mode]))
+    expect(mapped[slot]).toBe(
+      `${themeVar(mode, slot)}, ${IDS_NEUTRAL_PALETTE[String(step) as keyof typeof IDS_NEUTRAL_PALETTE]}`,
+    );
+});
+
+test.each(MODES)('the pure %s neutral fallback reaches its Lc', (mode) => {
+  const roles = neutralRoles({ ...IDS_NEUTRAL_PALETTE }, mode);
+  const { text } = pairsFor('neutral');
+
+  expect(atLeast(roles['on-surface']!, [roles['surface']!], TEXT_LC)).toBe(true);
+  for (const [foreground, backgrounds] of text)
+    expect(
+      atLeast(
+        roles[foreground]!,
+        backgrounds.map((background) => roles[background]!),
+        TEXT_LC,
+      ),
+      foreground,
+    ).toBe(true);
+});
+
+test('ids.css emits no shared color namespace and no chart colors', () => {
+  expect(css).not.toMatch(/--color-(primary|secondary|danger|neutral|surface)\b/);
+  expect(css).not.toMatch(/--ids-color-chart-/);
+  expect(css).not.toMatch(/data-color/);
+});
+
+test('every utility namespace reads a family role', () => {
+  for (const family of [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES, 'neutral']) {
+    expect(css).toContain(`--background-color-${family}-soft: var(--ids-color-bg-${family}-soft);`);
+    expect(css).toContain(
+      `--text-color-on-${family}-soft: var(--ids-color-text-on-${family}-soft);`,
+    );
+    expect(css).toContain(`--border-color-${family}: var(--ids-color-border-${family});`);
+    expect(css).toContain(`--ring-color-${family}: var(--ids-color-border-${family});`);
+  }
 });
 
 test('ids.css reads the scale from the provider and rounds without a fallback', () => {
   expect(css).not.toMatch(/--ids-scale:\s*[\d.]+;/);
   expect(css).not.toMatch(/@supports \(width: round/);
-  expect(css).toMatch(/--ids-size-control-standard: round\(calc\(36px \* var\(--ids-scale, 1\)\), 1px\);/);
+  expect(css).toMatch(
+    /--ids-size-control-standard: round\(calc\(36px \* var\(--ids-scale, 1\)\), 1px\);/,
+  );
 });
 
 test('the default entry loads the fonts, and no-fonts.css is the tokens alone', () => {
@@ -90,77 +175,47 @@ test('the default entry loads the fonts, and no-fonts.css is the tokens alone', 
   expect(css).not.toMatch(/@font-face/);
 });
 
-test('ids.css no longer themes by color name', () => {
-  expect(css).not.toMatch(/data-color/);
+const neutrals: IdsNeutral[] = ['pure', 'tinted'];
+
+test.each(MODES)(
+  'every family × slot reaches its Lc with all three brands given in %s',
+  (mode) => {
+    for (const hue of paletteHues) {
+      const { colors, issues } = resolveColors({
+        primary: palettes[hue],
+        secondary: palettes[paletteHues[(paletteHues.indexOf(hue) + 4) % paletteHues.length]!],
+        tertiary: palettes[paletteHues[(paletteHues.indexOf(hue) + 8) % paletteHues.length]!],
+      });
+
+      expect(issues, hue).toEqual([]);
+      expect(failingPairs(colors!.roles[mode]), hue).toEqual([]);
+    }
+  },
+);
+
+test.each(MODES)('a %s line is the color of the text beside it', (mode) => {
+  for (const hue of paletteHues) {
+    const roles = resolveColors({ primary: palettes[hue] }).colors!.roles[mode];
+
+    for (const family of [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES])
+      expect(roles[`border-${family}`], `${hue} ${family}`).toBe(roles[`text-${family}`]);
+  }
 });
 
-describe.each(modes)('%s brand pairs', (mode) => {
-  test.each(paletteHues)('%s on-primary on primary reaches AA', (color) => {
-    expect(contrast(brandTokens(color, mode), 'on-primary', 'primary')).toBeGreaterThanOrEqual(
-      AA_TEXT,
-    );
-  });
+const statuses: IdsStatus[] = ['harmonized', 'fixed'];
 
-  test.each(paletteHues)('%s on-secondary on secondary reaches AA', (color) => {
-    expect(contrast(brandTokens(color, mode), 'on-secondary', 'secondary')).toBeGreaterThanOrEqual(
-      AA_TEXT,
-    );
-  });
-});
+describe.each(MODES)('%s', (mode) => {
+  describe.each(neutrals)('%s neutral', (neutral) => {
+    describe.each(statuses)('%s status', (status) => {
+      test.each(paletteHues)(
+        'every family × slot reaches its Lc with %s and the brands derived from it',
+        (hue) => {
+          const { colors, issues } = resolveColors({ primary: palettes[hue], neutral, status });
 
-test('control-surface tints soft controls on hover and press', () => {
-  expect(softTints.map(({ state }) => state)).toEqual(['hover', 'press']);
-});
-
-describe.each(modes)('%s accent and soft tints', (mode) => {
-  test.each(paletteHues)('%s accent reaches AA on surface and on secondary', (color) => {
-    const tokens = { ...modeTokens(mode), ...brandTokens(color, mode) };
-
-    expect(contrast(tokens, 'accent', 'surface')).toBeGreaterThanOrEqual(AA_TEXT);
-    expect(contrast(tokens, 'accent', 'secondary')).toBeGreaterThanOrEqual(AA_TEXT);
-  });
-
-  test.each(paletteHues)('%s on-secondary stays AA on the hover and press tints', (color) => {
-    const tokens = brandTokens(color, mode);
-    const towardPrimary = interpolate([tokens.secondary!, tokens.primary!], 'oklab');
-
-    for (const { amount } of softTints)
-      expect(wcagContrast(tokens['on-secondary']!, towardPrimary(amount))).toBeGreaterThanOrEqual(
-        AA_TEXT,
+          expect(issues).toEqual([]);
+          expect(failingPairs(colors!.roles[mode])).toEqual([]);
+        },
       );
+    });
   });
-});
-
-describe.each(modes)('%s status pairs', (mode) => {
-  const statuses = ['success', 'warning', 'danger', 'info'];
-
-  test.each(statuses)('on-%s on its fill reaches AA', (status) => {
-    expect(contrast(modeTokens(mode), `on-${status}`, status)).toBeGreaterThanOrEqual(AA_TEXT);
-  });
-
-  test.each(statuses)('%s-strong on surface reaches AA', (status) => {
-    expect(contrast(modeTokens(mode), `${status}-strong`, 'surface')).toBeGreaterThanOrEqual(
-      AA_TEXT,
-    );
-  });
-});
-
-describe.each(modes)('%s chart series', (mode) => {
-  const series = ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5'];
-  const difference = differenceCiede2000();
-
-  test.each(series)('%s reaches AA for graphics on surface', (token) => {
-    expect(contrast(modeTokens(mode), token, 'surface')).toBeGreaterThanOrEqual(AA_GRAPHICS);
-  });
-
-  test.each(series.slice(0, -1).map((token, index) => [token, series[index + 1]!]))(
-    '%s and %s stay apart',
-    (token, next) => {
-      const tokens = modeTokens(mode);
-
-      expect(difference(tokens[token]!, tokens[next]!)).toBeGreaterThanOrEqual(
-        NEIGHBOURING_SERIES_DIFFERENCE,
-      );
-    },
-  );
 });

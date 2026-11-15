@@ -10,7 +10,7 @@ export const paginationStyle = tv({
     link: 'tabular-nums aria-[current=page]:data-[variant=ghost]:bg-(--control-press)',
     arrow: 'rtl:[&_svg]:-scale-x-100',
     ellipsis:
-      'flex shrink-0 items-center justify-center text-(--ids-color-on-muted) select-none [&_svg]:pointer-events-none',
+      'flex shrink-0 items-center justify-center text-neutral select-none [&_svg]:pointer-events-none',
   },
   variants: {
     size: {
