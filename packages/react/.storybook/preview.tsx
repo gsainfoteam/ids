@@ -24,6 +24,9 @@ function PaintThePageBehindWideStories() {
 
 const DERIVED = 'derived';
 
+const labelled = (name: string, values: readonly string[]) =>
+  values.map((value) => ({ value, title: `${name} ${value}` }));
+
 const brandFamilyFrom = (global: unknown): PaletteHue | undefined =>
   typeof global === 'string' && global in palettes ? (global as PaletteHue) : undefined;
 
@@ -125,11 +128,11 @@ const preview: Preview = {
   },
   globalTypes: {
     idsColor: {
-      description: 'The palette of the repository demo theme',
+      description: 'The primary palette of the repository demo theme',
       toolbar: {
-        title: 'Palette',
+        title: 'Primary',
         icon: 'paintbrush',
-        items: paletteHues,
+        items: labelled('primary', paletteHues),
         dynamicTitle: true,
       },
     },
@@ -138,7 +141,7 @@ const preview: Preview = {
       toolbar: {
         title: 'Secondary',
         icon: 'paintbrush',
-        items: [DERIVED, ...paletteHues],
+        items: labelled('secondary', [DERIVED, ...paletteHues]),
         dynamicTitle: true,
       },
     },
@@ -147,7 +150,7 @@ const preview: Preview = {
       toolbar: {
         title: 'Tertiary',
         icon: 'paintbrush',
-        items: [DERIVED, ...paletteHues],
+        items: labelled('tertiary', [DERIVED, ...paletteHues]),
         dynamicTitle: true,
       },
     },
@@ -156,7 +159,7 @@ const preview: Preview = {
       toolbar: {
         title: 'Neutral',
         icon: 'contrast',
-        items: ['pure', 'tinted'],
+        items: labelled('neutral', ['pure', 'tinted']),
         dynamicTitle: true,
       },
     },
@@ -164,8 +167,11 @@ const preview: Preview = {
       description: 'Status hues turned toward primary, or the fixed references',
       toolbar: {
         title: 'Status',
-        icon: 'alert',
-        items: ['harmonized', 'fixed'],
+        icon: 'sync',
+        items: [
+          { value: 'harmonized', title: 'status harmonized', icon: 'sync' },
+          { value: 'fixed', title: 'status fixed', icon: 'lock' },
+        ],
         dynamicTitle: true,
       },
     },
@@ -173,8 +179,11 @@ const preview: Preview = {
       description: 'IDS corner shape',
       toolbar: {
         title: 'Corner',
-        icon: 'component',
-        items: ['round', 'squircle'],
+        icon: 'circlehollow',
+        items: [
+          { value: 'round', title: 'corner round', icon: 'circlehollow' },
+          { value: 'squircle', title: 'corner squircle', icon: 'outline' },
+        ],
         dynamicTitle: true,
       },
     },
@@ -182,8 +191,12 @@ const preview: Preview = {
       description: 'IDS color mode',
       toolbar: {
         title: 'Mode',
-        icon: 'mirror',
-        items: ['light', 'dark', 'system'],
+        icon: 'sun',
+        items: [
+          { value: 'light', title: 'light', icon: 'sun' },
+          { value: 'dark', title: 'dark', icon: 'moon' },
+          { value: 'system', title: 'system', icon: 'browser' },
+        ],
         dynamicTitle: true,
       },
     },
