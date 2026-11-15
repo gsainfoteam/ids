@@ -104,7 +104,7 @@ function paletteOf(steps: Shade[]): IdsPalette {
   return paletteFromSteps(steps.map(inSrgb));
 }
 
-export function paletteFromSeed(seed: string): IdsPalette | undefined {
+export function createIdsPalette(seed: string): IdsPalette | undefined {
   if (parse(seed) === undefined) return undefined;
 
   const shade = shadeOf(seed);
@@ -140,8 +140,4 @@ export function paletteFromSteps(steps: readonly string[]): IdsPalette {
   return Object.fromEntries(
     PALETTE_STEPS.map((step, index) => [step, steps[index]!]),
   ) as unknown as IdsPalette;
-}
-
-export function createIdsPalette(seed: string): IdsPalette | undefined {
-  return paletteFromSeed(seed);
 }
