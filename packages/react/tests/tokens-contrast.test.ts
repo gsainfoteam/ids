@@ -16,7 +16,9 @@ const AA_TEXT = 4.5;
 const AA_GRAPHICS = 3;
 const NEIGHBOURING_SERIES_DIFFERENCE = 25;
 
-const css = readFileSync(createRequire(import.meta.url).resolve('@gsainfoteam/ids-css'), 'utf8');
+const resolveCss = (entry: string) => createRequire(import.meta.url).resolve(entry);
+
+const css = readFileSync(resolveCss('@gsainfoteam/ids-css/no-fonts.css'), 'utf8');
 
 const controlSurface = readFileSync(
   new URL('../src/internal/control-surface.ts', import.meta.url),
@@ -73,6 +75,19 @@ test('ids.css reads the scale from the provider and rounds without a fallback', 
   expect(css).not.toMatch(/--ids-scale:\s*[\d.]+;/);
   expect(css).not.toMatch(/@supports \(width: round/);
   expect(css).toMatch(/--ids-size-control-standard: round\(calc\(36px \* var\(--ids-scale, 1\)\), 1px\);/);
+});
+
+test('the default entry loads the fonts, and no-fonts.css is the tokens alone', () => {
+  const entry = resolveCss('@gsainfoteam/ids-css');
+  const imports = [...readFileSync(entry, 'utf8').matchAll(/@import '([^']+)'/g)].map(
+    ([, path]) => new URL(path, `file://${entry}`).pathname,
+  );
+
+  expect(imports).toEqual([
+    new URL('fonts/fonts.css', `file://${entry}`).pathname,
+    resolveCss('@gsainfoteam/ids-css/no-fonts.css'),
+  ]);
+  expect(css).not.toMatch(/@font-face/);
 });
 
 test('ids.css no longer themes by color name', () => {

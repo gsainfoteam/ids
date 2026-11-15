@@ -16,7 +16,7 @@ root as `--ids-theme-{light|dark}-{role}`; `ids.css` maps the current mode's set
 - `radius` (0 to 18, default 10) sets the standard corner and derives `indicator` and
   `container` from it. `cornerShape: 'squircle'` sets CSS `corner-shape` under the provider,
   where the browser supports it; `rounded-full` stays round.
-- The fonts stay IDS's: Pretendard GOV and Geist Mono, loaded by `@gsainfoteam/ids-css/fonts.css`.
+- The fonts stay IDS's: Pretendard GOV and Geist Mono, which `@gsainfoteam/ids-css` now ships.
   The type scale, the mono x-height adjustment and Kbd's alignment are measured on them.
 - `palette` also takes one CSS color. IDS builds the 11 steps from its hue and chroma: lightness
   and chroma per step come from the two reference palettes nearest in hue, the result is clamped

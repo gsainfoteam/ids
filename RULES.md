@@ -579,7 +579,7 @@ projects:
 
 - `browser`: `tests/**/*.test.tsx` render from `src` in headless Chromium, Firefox and WebKit through
   Playwright (Chromium only outside Linux, see Engines below), with Tailwind and the IDS CSS loaded
-  and reduced motion on. They keep the system fonts: WebKit caches Pretendard's variable font per
+  and reduced motion on. They keep the system fonts (`tests/styles.css` imports `@gsainfoteam/ids-css/no-fonts.css`): WebKit caches Pretendard's variable font per
   size and weight and grows past several gigabytes over a story file. `tests/kbd.test.tsx`, which
   measures text, imports Pretendard for itself. `tests/stories-<category>.test.tsx` (one file per
   component category and one for the foundations, all through `checkEveryStory` in
@@ -731,8 +731,9 @@ const theme = defineIdsTheme({ palette: appPalette, radius: 10, cornerShape: 'ro
   `ids.css` maps the current mode's set onto `--ids-color-{role}`. Neutral, status and chart stay
   IDS's own tokens.
 - `radius` and `cornerShape` become `--ids-theme-radius-*` and `--ids-corner-shape` on the same
-  element. The fonts are fixed (Pretendard GOV, Geist Mono); `@gsainfoteam/ids-css/fonts.css` loads
-  them. The Tailwind bridges are `@theme inline`, so utilities
+  element. The fonts are fixed (Pretendard GOV, Geist Mono); `@gsainfoteam/ids-css` ships
+  their files; `@gsainfoteam/ids-css/no-fonts.css` is the same CSS without them, which the browser
+  tests import. The Tailwind bridges are `@theme inline`, so utilities
   read the provider's variables and not the values on `:root`.
 - `IdsProvider.Scope` takes any part of a theme and overrides it for a subtree; `checkIdsTheme`
   returns the problems the provider warns about in development.

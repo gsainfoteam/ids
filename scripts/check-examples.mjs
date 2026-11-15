@@ -84,7 +84,7 @@ for (const app of apps) {
   for (const family of idsFonts)
     if (!fontFaceOf(css, family))
       failures.push(
-        `${app.name}: the stylesheet has no @font-face for ${family}, so @gsainfoteam/ids-css/fonts.css is not imported`,
+        `${app.name}: the stylesheet has no @font-face for ${family}, so the fonts in @gsainfoteam/ids-css did not reach the bundle`,
       );
 
   if (!failures.some((failure) => failure.startsWith(`${app.name}:`)))

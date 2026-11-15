@@ -65,12 +65,11 @@ Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환�
 ```css
 @import 'tailwindcss';
 @import '@gsainfoteam/ids-css';
-@import '@gsainfoteam/ids-css/fonts.css';
 
 @source '../node_modules/@gsainfoteam/ids-react/dist';
 ```
 
-- `fonts.css` 는 기본 글꼴 Pretendard GOV 와 Geist Mono 를 싣는다. 자세한 내용은 [`@gsainfoteam/ids-css` README](../css/README.md#폰트) 를 따른다.
+- `@gsainfoteam/ids-css` 는 글꼴 Pretendard GOV 와 Geist Mono 의 파일까지 싣는다. 자세한 내용은 [`@gsainfoteam/ids-css` README](../css/README.md#폰트) 를 따른다.
 - Next.js, TanStack Start, Astro 설정은 `examples/` 의 앱과 같다. CI 가 세 앱을 빌드하고, 서버가 그린 HTML 에 IDS 가 들어 있는지와 CSS 에 IDS 클래스가 생겼는지 확인한다(`pnpm examples:check`).
 
 ### Next.js (App Router)
@@ -306,7 +305,7 @@ IDS 에는 기본 색이 없다. 앱이 `defineIdsTheme` 으로 테마를 만들
 - `scale` 은 영역을 키우거나 줄이는 배율이다(0.5–2, 기본 1). 크기, 간격, 글자 크기, radius 에 곱한다.
 - `IdsProvider.Scope` 는 하위 트리의 테마 일부나 모드만 바꾼다. 예: `<IdsProvider.Scope theme={{ scale: 1.5 }}>`.
 - `checkIdsTheme(theme)` 은 팔레트와 값의 문제를 목록으로 돌려준다. 앱 테스트에서 `[]` 인지 확인하면 된다.
-- 글꼴은 Pretendard GOV 와 Geist Mono 로 고정이다. `@gsainfoteam/ids-css/fonts.css` 가 파일을 싣는다.
+- 글꼴은 Pretendard GOV 와 Geist Mono 로 고정이다. `@gsainfoteam/ids-css` 가 파일을 싣는다.
 
 ```tsx
 import { useTheme } from '@gsainfoteam/ids-react';

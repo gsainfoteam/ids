@@ -77,19 +77,14 @@ React 앱은 `IdsProvider theme` 이 아래 변수를 루트 요소에 넣는다
 
 ### 폰트
 
-IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `fonts.css` 를 가져오면 두 글꼴의 `@font-face` 와 woff2 파일이 앱 번들에 들어간다.
-
-```css
-@import "tailwindcss";
-@import "@gsainfoteam/ids-css";
-@import "@gsainfoteam/ids-css/fonts.css";
-```
+IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainfoteam/ids-css` 가 두 글꼴의 `@font-face` 와 woff2 파일을 함께 싣는다. 따로 불러올 것은 없다.
 
 - 파일은 패키지 안에 있어서 CDN 이나 다른 글꼴 패키지가 필요 없다. 번들러(Next.js, Vite, Astro)가 woff2 를 앱의 정적 파일로 내보낸다.
 - Pretendard GOV 는 dynamic subset(woff2 120개, 5.6MB)이다. 브라우저는 화면에 쓰인 글자 범위의 파일만 받는다.
 - Geist Mono 는 Fontsource 의 가변 글꼴 정체(normal)만 담는다. latin, latin-ext, cyrillic, symbols 범위다.
 - 두 글꼴 모두 SIL OFL 1.1 이다. 라이선스는 `fonts/pretendard-gov/LICENSE`, `fonts/geist-mono/LICENSE` 에 있다.
 - 글꼴은 고정이다. 고정폭 글꼴의 x-height 보정, Kbd 정렬, 타입 스케일의 행간과 자간을 이 두 글꼴에서 쟀다.
+- 글꼴 없이 토큰만 필요하면 `@gsainfoteam/ids-css/no-fonts.css` 를 가져온다. IDS 의 브라우저 테스트가 이것을 쓴다(WebKit 이 가변 글꼴을 크기와 굵기마다 캐시해 메모리가 커진다).
 
 - `font-sans` 와 `--ids-font-family-sans` 는 `'Pretendard GOV Variable'`, `'Pretendard GOV'`, 일반 Pretendard, `sans-serif` 순서다. Pretendard 만 불러온 앱은 Pretendard 로 보인다.
 - dynamic subset 은 화면에 쓰인 글자 범위만 받는다. 전체 파일(`pretendardvariable-gov.min.css`)은 woff2 5.4MB 다.

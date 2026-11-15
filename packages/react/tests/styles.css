@@ -1,4 +1,4 @@
 @import 'tailwindcss';
-@import '@gsainfoteam/ids-css';
+@import '@gsainfoteam/ids-css/no-fonts.css';
 
 @source '../src';

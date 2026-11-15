@@ -123,15 +123,10 @@ createIdsPalette('#0d9488'); // { 50: '#f0fdfa', …, 600: '#04968d', …, 950: 
 
 ### 글꼴
 
-글꼴은 IDS 가 정합니다. 본문은 Pretendard GOV, 고정폭은 Geist Mono 입니다. 앱은 CSS 에서 파일만 싣습니다.
-
-```css
-@import '@gsainfoteam/ids-css/fonts.css';
-```
+글꼴은 IDS 가 정합니다. 본문은 Pretendard GOV, 고정폭은 Geist Mono 입니다. `@import '@gsainfoteam/ids-css';` 가 두 글꼴의 파일까지 싣습니다.
 
 - 테마로 글꼴을 바꾸지 않습니다. 고정폭 글꼴의 x-height 보정(0.53), Kbd 의 세로 정렬, 타입 스케일의 행간과 자간이 이 두 글꼴에서 잰 값입니다.
 - 앱 콘텐츠에 다른 글꼴이 필요하면 그 요소에 `font-[…]` 를 줍니다. IDS 컴포넌트는 Pretendard GOV 로 그립니다.
-- `fonts.css` 를 가져오지 않으면 그 글꼴이 설치된 기기에서만 보이고, 나머지는 `sans-serif` 로 그립니다.
 
 ### 검증
 

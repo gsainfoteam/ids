@@ -12,16 +12,17 @@
     "registry": "https://npm.pkg.github.com"
   },
   "files": [
+    "index.css",
     "dist",
     "fonts"
   ],
   "sideEffects": [
     "*.css"
   ],
-  "main": "dist/ids.css",
+  "main": "index.css",
   "exports": {
-    ".": "./dist/ids.css",
-    "./fonts.css": "./fonts/fonts.css"
+    ".": "./index.css",
+    "./no-fonts.css": "./dist/ids.css"
   },
   "scripts": {
     "build": "pnpm --filter @gsainfoteam/ids-core build && node scripts/copy-fonts.mjs"
