@@ -16,3 +16,6 @@ ids-react's `defineIdsTheme`.
 - `locale` and a slang `translation` object pass down separately. Fonts and colors apply only
   inside IDS components; Material and Cupertino themes are left alone.
 - In development the provider prints the problems `checkIdsTheme` finds once per theme.
+- There is no palette axis: `palette`, `defaultPalette`, `onPaletteChange` and `setColor` are
+  gone, as in ids-react. To change colors, pass a new `theme` (or an `IdsProviderScope` with
+  `IdsThemeOverrides(primary: ...)` for a subtree).
