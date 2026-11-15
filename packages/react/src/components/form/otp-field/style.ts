@@ -23,7 +23,7 @@ export const otpFieldStyle = tv({
       'rounded-standard data-grouped:rounded-none',
       'data-grouped:-ms-px data-grouped:first:ms-0',
       'data-grouped:first:rounded-s-standard data-grouped:last:rounded-e-standard',
-      'data-focus-visible:z-20',
+      'focus-ring-visible:z-20',
     ],
     placeholder: 'text-neutral',
     maskDot: 'size-2 rounded-full bg-current',

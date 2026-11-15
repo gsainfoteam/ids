@@ -350,8 +350,6 @@ const T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES = `@theme inline {
 const darkModeRegion = `[data-mode="dark"], [data-mode="dark"] *`;
 const lightRegionInsideDark = `[data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *`;
 
-const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:where(${lightRegionInsideDark})));
-`;
 
 const focusedInsideButNotInItsPopups = (marker) =>
   `&:has([${marker}]:focus-visible):not(:has([popover] [${marker}]:focus-visible))`;
@@ -366,6 +364,15 @@ const FOCUS_RING_TRIGGERS = {
 
 const focusRingTriggers = (indent) =>
   Object.values(FOCUS_RING_TRIGGERS).join(`,\n${indent}`);
+
+const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:where(${lightRegionInsideDark})));
+
+@custom-variant focus-ring-visible {
+  ${focusRingTriggers("  ")} {
+    @slot;
+  }
+}
+`;
 
 const T_CSS_UTILITIES = `@utility focus-ring {
   outline: none;

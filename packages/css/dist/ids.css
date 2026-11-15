@@ -222,6 +222,16 @@
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *):not(:where([data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *)));
 
+@custom-variant focus-ring-visible {
+  &:focus-visible,
+  &[data-focus-visible],
+  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
+  &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
+  &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+    @slot;
+  }
+}
+
 @utility focus-ring {
   outline: none;
 

@@ -135,6 +135,17 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 | body | `text-body-b1-regular` … `text-body-b3-bold` |
 | caption | `text-caption-c1-regular`, `text-caption-c2-medium` |
 
+### focus-ring-visible
+
+`focus-ring` 이 ring 을 그리는 바로 그 조건에서 맞는 variant 입니다. ring 이 옆 요소에 가리지 않게 쌓을 때 씁니다.
+
+```html
+<div class="flex [&>*]:focus-ring-visible:z-30">…</div>
+```
+
+- 조건은 `focus-ring` 과 같은 표에서 나옵니다: `:focus-visible`, `[data-focus-visible]`, 안쪽 입력(`data-field-input` 등)에 포커스가 있는 껍데기.
+- `focus-visible:` 이나 `data-focus-visible:` 하나만 쓰면 다른 조건으로 그린 ring(TextField 껍데기 같은)이 옆 요소 밑에 깔립니다.
+
 ### shimmer
 
 흘러나오는 중인 글자 위로 밝은 띠가 지나가게 합니다. AI 답의 "생각하는 중" 같은 상태 줄에 씁니다.

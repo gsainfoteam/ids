@@ -49,7 +49,7 @@ export const calendarStyle = tv({
     hidden: 'invisible',
     dayButton: [
       'relative inline-flex size-full cursor-pointer items-center justify-center rounded-standard',
-      'tabular-nums select-none focus-ring focus-visible:z-10',
+      'tabular-nums select-none focus-ring focus-ring-visible:z-10',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
     ],

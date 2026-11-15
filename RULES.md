@@ -366,7 +366,10 @@ inner element with `data-field-input` rather than adding a component-specific `h
 Borders stay `inset-ring`, so the focus ring sits outside them and composes with `shadow-xs`
 instead of replacing it. Focus also recolors that inset-ring border to primary, and an element
 with `aria-invalid="true"` or `data-invalid` gets a border and a ring in `border-danger`, which is
-the color of its label and error message; neither state is repeated in component styles.
+the color of its label and error message; neither state is repeated in component styles. An element whose ring must sit above its neighbours (a joined
+Group item, an OTP slot, a Calendar day) raises itself with the `focus-ring-visible:` variant, which
+the CSS package builds from the same triggers as `focus-ring`; stacking on `focus-visible:` or
+`data-focus-visible:` alone leaves a ring drawn by another trigger under the next item.
 
 **Radius is 10px, and containers grow it concentrically.** The scale is `standard` (10px, every
 control at every size), `indicator` (4px, only for boxes under 24px such as the Checkbox box or
