@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_typography.dart';
 import '../label/ids_label.dart';
@@ -34,6 +34,7 @@ class IdsField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = IdsProvider.of(context).theme;
     final style = switch (size) {
       IdsSize.standard => IdsTypography.bodyB3Regular,
       IdsSize.tiny => IdsTypography.captionC1Regular,
@@ -44,10 +45,10 @@ class IdsField extends StatelessWidget {
       child: Opacity(
         opacity: disabled ? 0.5 : 1,
         child: DefaultTextStyle(
-          style: style.copyWith(color: ThemeProvider.of(context).onSurface),
+          style: theme.textStyle(style, color: theme.onSurface),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: _gaps[size]!,
+            spacing: theme.dimension(_gaps[size]!),
             children: [
               for (final child in children)
                 if (!(invalid ? child is IdsFieldHint : child is IdsFieldError))
@@ -88,7 +89,7 @@ class IdsFieldDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     IdsField._of(context, 'IdsFieldDescription');
-    return _tinted(ThemeProvider.of(context).onMuted, child);
+    return _tinted(context, IdsProvider.of(context).theme.onMuted, child);
   }
 }
 
@@ -102,7 +103,7 @@ class IdsFieldHint extends StatelessWidget {
     if (IdsField._of(context, 'IdsFieldHint').invalid) {
       return const SizedBox.shrink();
     }
-    return _tinted(ThemeProvider.of(context).onMuted, child);
+    return _tinted(context, IdsProvider.of(context).theme.onMuted, child);
   }
 }
 
@@ -116,14 +117,17 @@ class IdsFieldError extends StatelessWidget {
     if (!IdsField._of(context, 'IdsFieldError').invalid) {
       return const SizedBox.shrink();
     }
-    return _tinted(ThemeProvider.of(context).danger, child);
+    return _tinted(context, IdsProvider.of(context).theme.danger, child);
   }
 }
 
-Widget _tinted(Color color, Widget child) => DefaultTextStyle(
-  style: IdsTypography.captionC1Regular.copyWith(color: color),
-  child: child,
-);
+Widget _tinted(BuildContext context, Color color, Widget child) {
+  final theme = IdsProvider.of(context).theme;
+  return DefaultTextStyle(
+    style: theme.textStyle(IdsTypography.captionC1Regular, color: color),
+    child: child,
+  );
+}
 
 class _IdsFieldScope extends InheritedWidget {
   const _IdsFieldScope({required this.field, required super.child});

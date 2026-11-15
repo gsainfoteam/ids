@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "style-dictionary build --config sd.config.js && node palette-model.js"
+    "build": "style-dictionary build --config sd.config.js && node palette-model.js && node messages.build.mjs"
   },
   "devDependencies": {
     "culori": "^4.0.2",

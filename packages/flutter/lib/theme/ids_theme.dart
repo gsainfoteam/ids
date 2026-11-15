@@ -1,50 +1,57 @@
-import 'package:flutter/material.dart';
-import '../tokens/ids_enums.dart';
+import 'package:flutter/widgets.dart';
+
 import '../tokens/ids_color_tokens.dart';
+import '../tokens/ids_enums.dart';
+import 'ids_palette.dart';
+import 'ids_theme_data.dart';
 
 class IdsTheme {
-  const IdsTheme({required this.color, required this.mode});
-
-  final IdsColor color;
-  final IdsMode mode;
-
-  Color resolve(String token) =>
-      IdsTokens.resolve(color: color, mode: mode, token: token);
-
-  Color get primary => resolve('primary');
-  Color get onPrimary => resolve('on-primary');
-  Color get secondary => resolve('secondary');
-  Color get onSecondary => resolve('on-secondary');
-  Color get accent => resolve('accent');
-  Color get danger => resolve('danger');
-
-  Color get surface => _neutral('surface');
-  Color get onSurface => _neutral('on-surface');
-  Color get muted => _neutral('muted');
-  Color get onMuted => _neutral('on-muted');
-  Color get border => _neutral('border');
-  Color get outline => resolve('outline');
-
-  bool get isDark => mode == IdsMode.dark;
-
-  Color _neutral(String token) {
-    final neutralMap = mode == IdsMode.light ? _neutralLight : _neutralDark;
-    return neutralMap[token] ?? Colors.transparent;
+  IdsTheme({required this.data, required this.palette, required this.mode})
+    : colors = palette.resolve(
+        mode == IdsMode.dark ? Brightness.dark : Brightness.light,
+      ) {
+    assert(
+      mode != IdsMode.system,
+      'IdsTheme needs a resolved light or dark mode.',
+    );
   }
 
-  static const _neutralLight = <String, Color>{
-    'surface': Color(0xFFFFFFFF),
-    'on-surface': Color(0xFF171717),
-    'muted': Color(0xFFF5F5F5),
-    'on-muted': Color(0xFF525252),
-    'border': Color(0xFFE5E5E5),
+  final IdsThemeData data;
+  final IdsPalette palette;
+  final IdsMode mode;
+  final IdsPaletteColors colors;
+
+  bool get isDark => mode == IdsMode.dark;
+  IdsRadius get radius => data.radius;
+  double dimension(double value) => data.dimension(value);
+  TextStyle textStyle(TextStyle base, {Color? color, bool mono = false}) =>
+      data.textStyle(base, color: color, mono: mono);
+  ShapeBorder shape({double? radius, BorderSide side = BorderSide.none}) =>
+      data.shape(radius: radius, side: side);
+
+  Color resolve(String token) => switch (token) {
+    'primary' => colors.primary,
+    'on-primary' => colors.onPrimary,
+    'secondary' => colors.secondary,
+    'on-secondary' => colors.onSecondary,
+    'accent' => colors.accent,
+    'outline' => colors.outline,
+    _ => IdsTokens.resolve(
+      brightness: isDark ? Brightness.dark : Brightness.light,
+      token: token,
+    ),
   };
 
-  static const _neutralDark = <String, Color>{
-    'surface': Color(0xFF0A0A0A),
-    'on-surface': Color(0xFFFAFAFA),
-    'muted': Color(0xFF262626),
-    'on-muted': Color(0xFFA3A3A3),
-    'border': Color(0xFF262626),
-  };
+  Color get primary => colors.primary;
+  Color get onPrimary => colors.onPrimary;
+  Color get secondary => colors.secondary;
+  Color get onSecondary => colors.onSecondary;
+  Color get accent => colors.accent;
+  Color get outline => colors.outline;
+  Color get surface => resolve('surface');
+  Color get onSurface => resolve('on-surface');
+  Color get muted => resolve('muted');
+  Color get onMuted => resolve('on-muted');
+  Color get border => resolve('border');
+  Color get danger => resolve('danger');
 }

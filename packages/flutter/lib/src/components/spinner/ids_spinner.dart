@@ -3,6 +3,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 
+import '../../../messages/ids_messages.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 
 class IdsSpinner extends StatefulWidget {
@@ -26,7 +28,6 @@ class _IdsSpinnerState extends State<IdsSpinner>
   static const _sizes = {IdsSize.standard: 16.0, IdsSize.tiny: 14.0};
   static const _turn = Duration(seconds: 1);
   static const _announceDelay = Duration(milliseconds: 100);
-  static const _defaultLabel = '불러오는 중';
 
   late final _controller = AnimationController(vsync: this, duration: _turn);
   late final Timer _announceTimer;
@@ -74,9 +75,16 @@ class _IdsSpinnerState extends State<IdsSpinner>
   @override
   Widget build(BuildContext context) {
     final icon = IconTheme.of(context);
-    final color = icon.color!;
+    final scope = IdsProvider.maybeOf(context);
+    final t = scope?.translation;
+    final ko = IdsMessages.ko;
+    final inheritedIcon = context
+        .dependOnInheritedWidgetOfExactType<IconTheme>();
+    final color =
+        inheritedIcon?.data.color ?? scope?.theme.onSurface ?? icon.color!;
+    final size = _sizes[widget.size] ?? icon.size!;
     final arc = CustomPaint(
-      size: Size.square(_sizes[widget.size] ?? icon.size!),
+      size: Size.square(scope?.theme.dimension(size) ?? size),
       painter: _ArcPainter(
         color.withValues(alpha: color.a * (icon.opacity ?? 1)),
       ),
@@ -96,7 +104,9 @@ class _IdsSpinnerState extends State<IdsSpinner>
     if (widget.decorative) return spinning;
     return Semantics(
       liveRegion: true,
-      label: _announced ? widget.semanticLabel ?? _defaultLabel : null,
+      label: _announced
+          ? widget.semanticLabel ?? t?.spinnerLabel ?? ko.spinnerLabel
+          : null,
       child: spinning,
     );
   }
