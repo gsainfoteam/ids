@@ -53,7 +53,7 @@ export const IDS_NEUTRAL_STEPS = {
     'bg-neutral-soft-active': 600,
     'text-on-neutral': 50,
     'text-on-neutral-soft': 50,
-    'text-neutral': 400,
+    'text-neutral': 300,
     'border-neutral': 800,
   },
 } as const;

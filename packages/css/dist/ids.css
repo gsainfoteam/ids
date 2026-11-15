@@ -1547,7 +1547,7 @@
   --ids-color-bg-neutral-soft-active: var(--ids-theme-dark-bg-neutral-soft-active, #525252);
   --ids-color-text-on-neutral: var(--ids-theme-dark-text-on-neutral, #fafafa);
   --ids-color-text-on-neutral-soft: var(--ids-theme-dark-text-on-neutral-soft, #fafafa);
-  --ids-color-text-neutral: var(--ids-theme-dark-text-neutral, #a3a3a3);
+  --ids-color-text-neutral: var(--ids-theme-dark-text-neutral, #d4d4d4);
   --ids-color-border-neutral: var(--ids-theme-dark-border-neutral, #262626);
   --ids-color-bg-primary: var(--ids-theme-dark-bg-primary);
   --ids-color-bg-primary-hover: var(--ids-theme-dark-bg-primary-hover);

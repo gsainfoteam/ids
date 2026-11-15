@@ -60,7 +60,7 @@ const SEEDS: [lightness: number, chroma: number][] = [
 
 const HUES = Array.from({ length: 72 }, (_, index) => index * 5);
 
-test('every seed builds a palette whose roles reach 4.5:1 in both modes', () => {
+test('every seed builds a palette whose roles reach their Lc in both modes', () => {
   const failing = HUES.flatMap((hue) =>
     SEEDS.flatMap(([lightness, chroma]) => {
       const seed = seedAt(lightness, chroma, hue);

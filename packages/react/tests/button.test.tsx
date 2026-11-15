@@ -1,4 +1,4 @@
-import { blend, wcagContrast } from 'culori';
+import { blend, formatHex } from 'culori';
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
@@ -8,6 +8,7 @@ import { paletteHues, palettes } from '../.storybook/palettes';
 import { Button, ButtonGroup, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
+import { TEXT_LC, lightnessContrast } from '../src/components/utility/ids-provider/contrast';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -341,7 +342,7 @@ const statusSchemes = ['danger', 'success', 'warning', 'info'] as const;
 const FORTY_TWO_HOVERS = 45_000;
 
 test(
-  'hovering a solid fill moves it away from its text, keeping 4.5:1 in every color and mode',
+  'hovering a solid fill moves it away from its text, keeping Lc 75 in every color and mode',
   { timeout: FORTY_TWO_HOVERS },
   async () => {
     const cases = (['light', 'dark'] as const).flatMap((mode) => [
@@ -372,8 +373,8 @@ test(
       const style = getComputedStyle(button.element());
       const page = getComputedStyle(button.element().parentElement!).backgroundColor;
       const shown = blend([page, style.backgroundColor], 'normal', 'rgb');
-      const ratio = wcagContrast(style.color, shown);
-      if (ratio < 4.5) failing.push(`${name(entry)}: ${ratio.toFixed(2)}`);
+      const lc = lightnessContrast(style.color, formatHex(shown));
+      if (lc < TEXT_LC) failing.push(`${name(entry)}: Lc ${lc.toFixed(1)}`);
     }
 
     expect(failing).toEqual([]);

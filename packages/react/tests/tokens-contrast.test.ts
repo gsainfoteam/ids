@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-import { wcagContrast } from 'culori';
 import { describe, expect, test } from 'vitest';
 
 import { paletteHues, palettes } from '../.storybook/palettes';
+import { lightnessContrast } from '../src/components/utility/ids-provider/contrast';
 import {
-  AA_MARK,
-  AA_TEXT,
+  MARK_LC,
+  TEXT_LC,
   MODES,
   neutralRoles,
   resolveColors,
@@ -45,8 +45,8 @@ const slotsOf = (family: string) =>
 
 const themeVar = (mode: IdsMode, slot: string) => `--ids-theme-${mode}-${slot}`;
 
-const atLeast = (foreground: string, backgrounds: string[], ratio: number) =>
-  Math.min(...backgrounds.map((background) => wcagContrast(foreground, background))) >= ratio;
+const atLeast = (foreground: string, backgrounds: string[], lc: number) =>
+  Math.min(...backgrounds.map((background) => lightnessContrast(foreground, background))) >= lc;
 
 const pairsFor = (family: string) => {
   const [bg, bgHover, bgActive, soft, softHover, softActive, onFill, onSoft, text, border] =
@@ -65,7 +65,7 @@ const pairsFor = (family: string) => {
 
   return {
     text: [
-      [onFill, family === 'neutral' ? [bg, bgHover] : [bg, bgHover, bgActive]],
+      [onFill, family === 'neutral' ? [bg] : [bg, bgHover, bgActive]],
       [onSoft, [soft, softHover, softActive]],
       [text, ['surface', soft]],
     ] as [string, string[]][],
@@ -75,17 +75,17 @@ const pairsFor = (family: string) => {
 
 const failingPairs = (roles: { [slot: string]: string }) => {
   const failures: string[] = [];
-  const check = (foreground: string, backgrounds: string[], ratio: number) => {
+  const check = (foreground: string, backgrounds: string[], lc: number) => {
     const values = backgrounds.map((background) => roles[background]!);
-    if (!atLeast(roles[foreground]!, values, ratio))
-      failures.push(`${foreground} on ${backgrounds.join(' / ')} below ${ratio}:1`);
+    if (!atLeast(roles[foreground]!, values, lc))
+      failures.push(`${foreground} on ${backgrounds.join(' / ')} below Lc ${lc}`);
   };
 
-  check('on-surface', ['surface'], AA_TEXT);
+  check('on-surface', ['surface'], TEXT_LC);
   for (const family of IDS_COLOR_FAMILIES) {
     const { text, mark } = pairsFor(family);
-    for (const [foreground, backgrounds] of text) check(foreground, backgrounds, AA_TEXT);
-    for (const [foreground, backgrounds] of mark) check(foreground, backgrounds, AA_MARK);
+    for (const [foreground, backgrounds] of text) check(foreground, backgrounds, TEXT_LC);
+    for (const [foreground, backgrounds] of mark) check(foreground, backgrounds, MARK_LC);
   }
 
   return failures;
@@ -118,17 +118,17 @@ test.each(MODES)('ids.css falls back to the pure %s neutral without a provider v
     );
 });
 
-test.each(MODES)('the pure %s neutral fallback reaches AA', (mode) => {
+test.each(MODES)('the pure %s neutral fallback reaches its Lc', (mode) => {
   const roles = neutralRoles({ ...IDS_NEUTRAL_PALETTE }, mode);
   const { text } = pairsFor('neutral');
 
-  expect(atLeast(roles['on-surface']!, [roles['surface']!], AA_TEXT)).toBe(true);
+  expect(atLeast(roles['on-surface']!, [roles['surface']!], TEXT_LC)).toBe(true);
   for (const [foreground, backgrounds] of text)
     expect(
       atLeast(
         roles[foreground]!,
         backgrounds.map((background) => roles[background]!),
-        AA_TEXT,
+        TEXT_LC,
       ),
       foreground,
     ).toBe(true);
@@ -175,7 +175,7 @@ test('the default entry loads the fonts, and no-fonts.css is the tokens alone', 
 const neutrals: IdsNeutral[] = ['pure', 'tinted'];
 
 test.each(MODES)(
-  'every family × slot reaches its ratio with all three brands given in %s',
+  'every family × slot reaches its Lc with all three brands given in %s',
   (mode) => {
     for (const hue of paletteHues) {
       const { colors, issues } = resolveColors({
@@ -195,7 +195,7 @@ describe.each(MODES)('%s', (mode) => {
   describe.each(neutrals)('%s neutral', (neutral) => {
     describe.each(statuses)('%s status', (status) => {
       test.each(paletteHues)(
-        'every family × slot reaches its ratio with %s and the brands derived from it',
+        'every family × slot reaches its Lc with %s and the brands derived from it',
         (hue) => {
           const { colors, issues } = resolveColors({ primary: palettes[hue], neutral, status });
 

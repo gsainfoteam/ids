@@ -43,6 +43,7 @@ import {
   defineIdsTheme,
   useTheme,
 } from '../../components/utility/ids-provider';
+import { MARK_LC, TEXT_LC, lightnessContrast } from '../../components/utility/ids-provider/contrast';
 import { PALETTE_STEPS, type IdsNeutral } from '../../components/utility/ids-provider/theme';
 import { resolveColorsOnce } from '../../components/utility/ids-provider/theme-roles';
 import {
@@ -106,21 +107,7 @@ const hex = (value: string) =>
     .map((channel) => Math.round(channel).toString(16).padStart(2, '0'))
     .join('')}`;
 
-function relativeLuminance(value: string) {
-  const [r, g, b] = channels(value).map((channel) => {
-    const c = channel / 255;
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
-}
-
-function contrastRatio(a: string, b: string) {
-  const [light, dark] = [relativeLuminance(a), relativeLuminance(b)].sort((x, y) => y - x);
-  return (light! + 0.05) / (dark! + 0.05);
-}
-
-const grade = (ratio: number) =>
-  ratio >= 7 ? 'AAA' : ratio >= 4.5 ? 'AA' : ratio >= 3 ? 'AA Large' : 'Fail';
+const gradeOf = (lc: number) => (lc >= TEXT_LC ? 'text' : lc >= MARK_LC ? 'mark' : 'Fail');
 
 function readSwatch(element: HTMLElement | null) {
   const chip = element?.querySelector<HTMLElement>('[data-chip]');
@@ -162,8 +149,8 @@ function readPair(element: HTMLElement | null) {
   if (!sample || !output) return;
 
   const style = getComputedStyle(sample);
-  const ratio = contrastRatio(style.color, style.backgroundColor);
-  output.textContent = `${ratio.toFixed(2)}:1 ${grade(ratio)}`;
+  const lc = lightnessContrast(hex(style.color), hex(style.backgroundColor));
+  output.textContent = `Lc ${Math.round(lc)} ${gradeOf(lc)}`;
 }
 
 function Pair({
@@ -315,7 +302,7 @@ function BrandContrastTable() {
   );
 }
 
-const passes = { text: /:1 AAA?$/, mark: /:1 (AAA|AA|AA Large)$/ };
+const passes = { text: /^Lc \d+ text$/, mark: /^Lc \d+ (text|mark)$/ };
 
 export const Palettes: Story = {
   render: () => (
@@ -328,7 +315,7 @@ export const Palettes: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Contrast × 17 palettes"
-        description="색마다 채움과 그 위 글자, soft 채움과 그 위 글자, 페이지 위 글자와 선의 대비입니다. 글자는 4.5:1, 선은 3:1 을 넘어야 합니다."
+        description="색마다 채움과 그 위 글자, soft 채움과 그 위 글자, 페이지 위 글자와 선의 APCA 대비(Lc)입니다. 글자는 Lc 75, 선은 Lc 45 를 넘어야 합니다."
       >
         <BrandContrastTable />
       </Showcase.Section>
@@ -533,7 +520,7 @@ export const Lab: StoryObj<LabArgs> = {
           </Showcase.Section>
           <Showcase.Section
             title="Contrast"
-            description="같이 쓰는 짝의 WCAG 대비입니다. 글자는 4.5:1(AA), 선과 아이콘 같은 표시는 3:1 이상이어야 합니다."
+            description="같이 쓰는 짝의 APCA 대비(Lc)입니다. 글자는 Lc 75, 선과 아이콘 같은 표시는 Lc 45 이상이어야 합니다."
           >
             <div className="flex flex-wrap gap-4">
               {modes.map((mode) => (
@@ -796,6 +783,6 @@ export const Lab: StoryObj<LabArgs> = {
     const outputs = [...canvasElement.querySelectorAll('[data-ratio]')];
     await expect(outputs.length).toBe(pairs.length * modes.length);
     for (const output of outputs)
-      await expect(output.textContent).toMatch(/^\d+\.\d{2}:1 (AAA|AA|AA Large|Fail)$/);
+      await expect(output.textContent).toMatch(/^Lc \d+ (text|mark|Fail)$/);
   },
 };

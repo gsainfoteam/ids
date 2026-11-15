@@ -99,7 +99,7 @@ const answer = 42;
 
 - 줄 번호는 `::before` 의 CSS counter 입니다(`content: counter(line) / ''`). 글자가 아니라서 골라 복사해도 섞이지 않고, 대체 텍스트가 빈 문자열이라 스크린 리더도 읽지 않습니다.
 - 번호 칸의 폭은 줄 수의 자릿수(`--code-block-digits`, `ch` 단위)입니다.
-- 강조한 줄은 `data-highlighted` 를 받고 바탕(outline 은 `bg-neutral-soft`, soft 는 `surface`)과 왼쪽 2px `primary` 막대로 보입니다. 어느 바탕에서도 글자 대비가 4.5:1 을 넘게 고른 바탕입니다.
+- 강조한 줄은 `data-highlighted` 를 받고 바탕(outline 은 `bg-neutral-soft`, soft 는 `surface`)과 왼쪽 2px `primary` 막대로 보입니다. 글자 대비를 크게 해치지 않는 옅은 바탕입니다.
 - 줄마다 `data-line` 에 1부터 센 번호가 있습니다.
 
 ## 넘침

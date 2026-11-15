@@ -418,7 +418,7 @@ derived from primary (`ids-provider/derived-brands.ts`), so the provider always 
 `border-neutral` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
 the theme color, while `outline` and `ghost` stay neutral. `border-neutral` is decorative and
-exempt from 3:1; `border-primary` and every other family's `border-X` reach 3:1 on the surface,
+exempt from contrast; `border-primary` and every other family's `border-X` reach APCA Lc 45 on the surface,
 for the rare edge that should itself read as that color.
 
 **Each family has one role per background.** A fill (`bg-primary`) carries `text-on-primary`; a
@@ -426,10 +426,17 @@ soft surface is `bg-primary-soft` with `text-on-primary-soft`, and its hover and
 (`bg-primary-soft-hover`, `-active`) mix 6% and 12% of the fill in; text or an icon sitting on the
 page with no fill behind it (an outline Badge or Chip, a Rating star, a Radio dot, a Link) is
 `text-primary`. Never write `bg-primary` as a text color or `primary/10` as a soft fill: light hues
-such as yellow and cyan fall under 4.5:1 there. Statuses follow the same roles (`bg-danger-soft`
-with `text-on-danger-soft`, `text-danger` for text). Every text pair reaches 4.5:1 and every
-`border-X` 3:1 in both modes, for all 17 demo palettes, pure and tinted neutrals and harmonized and
+such as yellow and cyan fall under Lc 75 there. Statuses follow the same roles (`bg-danger-soft`
+with `text-on-danger-soft`, `text-danger` for text). Every text pair reaches APCA Lc 75 and every
+`border-X` Lc 45 in both modes, for all 17 demo palettes, pure and tinted neutrals and harmonized and
 fixed statuses, which `tests/tokens-contrast.test.ts` checks.
+
+**Contrast is APCA, not WCAG 2.** Roles are picked by APCA lightness contrast (`contrastAPCA` from
+`colorjs.io/fn`, in `ids-provider/contrast.ts`). The fill starts at 600 and moves to 500 or 700,
+then 400 or 800, until white or neutral 950 text reaches Lc 75; the text is whichever reads
+better. WCAG 2's ratio rates dark text on mid-tone fills too well, so it is not used, and axe's
+`color-contrast` rule, which computes it, is off in `parameters.a11y`; the token test checks APCA
+instead.
 
 **Neutral states climb one step at a time.** A transparent control goes rest → hover
 `bg-neutral-soft` → press `bg-neutral-soft-hover`; a filled control goes `bg-neutral-soft` →
@@ -443,8 +450,8 @@ layer, Kbd), brand states, edge rings, disabled opacity and backdrops.
 Button, a selected Calendar day or TimePicker option) take `--control-fill-hover` and
 `--control-fill-press` from the family's `bg-X-hover` and `bg-X-active`, which the provider mixes
 10% and 20% toward black under white text and toward white under dark text, so no palette drops
-below the 4.5:1 it has at rest. Do not fade a
-filled brand color with `/90`: over a white page it lightens blue under white text to 4.46:1.
+below the contrast it has at rest. Do not fade a
+filled brand color with `/90`: over a white page it lightens the fill under white text.
 
 **Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
 TelField, ChipField, Select and the date, time and color triggers draw their box from
@@ -604,7 +611,7 @@ projects:
   `tests/story-checks.ts`) render every story and run its `play` through portable stories
   (`composeStories` + `run()`), every story in light and then every story in dark mode, then run
   axe-core over the page with the WCAG 2.0, 2.1 and 2.2 A and AA tags and fail with one line per
-  rule, node and fix; a story tagged `'!test'` is skipped. The stories are split by category so
+  rule, node and fix (`color-contrast` excepted, see APCA above); a story tagged `'!test'` is skipped. The stories are split by category so
   no single page renders all of them.
   `tests/hydration.test.tsx` renders every story with `renderToString`, hydrates that HTML with
   `hydrateRoot` and fails on a recoverable error or any `console.error`.
@@ -718,7 +725,7 @@ replays a Chromium-only result.
 **Accessibility.** The axe options live in `parameters.a11y` of `.storybook/preview.tsx`, which
 `@storybook/addon-a11y` reads for the Accessibility panel too, so the panel and the test check the
 same rules. A violation is fixed in the component, with a test, or in the story when only its
-scaffolding is wrong. A rule is never turned off for the project. A story that shows a misuse on
+scaffolding is wrong. A rule is never turned off for the project, except `color-contrast`, which APCA replaces. A story that shows a misuse on
 purpose (Button's `DevelopmentWarnings` nests a button in a button) turns off that one rule with
 `parameters: { a11y: { options: { rules: { 'nested-interactive': { enabled: false } } } } }` and
 says why in its description. The decorator paints `<body>` with the story's surface color, so a

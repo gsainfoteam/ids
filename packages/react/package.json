@@ -71,6 +71,7 @@
     "@zag-js/react": "1.44.0",
     "@zag-js/splitter": "1.44.0",
     "cn": "^0.4.0",
+    "colorjs.io": "0.7.1",
     "culori": "^4.0.2",
     "decimal.js": "^10.6.0",
     "embla-carousel": "8.6.0",

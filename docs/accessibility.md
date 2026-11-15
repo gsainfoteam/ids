@@ -22,7 +22,7 @@
 - **자동 검사.** `pnpm test` 가 매 커밋마다 돌립니다.
   - `packages/react/tests/*.test.tsx` 는 Chromium, Firefox, WebKit 에서 실제 클릭과 키 입력으로 역할, 접근 가능한 이름, `aria-*` 상태, 포커스 이동을 확인합니다.
   - `tests/stories-<분류>.test.tsx` 는 모든 스토리를 렌더하고 `play` 에 적은 키보드와 스크린 리더 관련 단언을 실행합니다.
-  - 같은 테스트가 모든 스토리를 라이트와 다크 모드에서 한 번씩 그리고, `play` 뒤에 [axe-core](https://github.com/dequelabs/axe-core) 로 WCAG 2.0, 2.1, 2.2 의 A, AA 규칙을 검사합니다. 위반이 하나라도 있으면 실패합니다. 같은 설정을 Storybook 의 Accessibility 패널(`@storybook/addon-a11y`)도 씁니다.
+  - 같은 테스트가 모든 스토리를 라이트와 다크 모드에서 한 번씩 그리고, `play` 뒤에 [axe-core](https://github.com/dequelabs/axe-core) 로 WCAG 2.0, 2.1, 2.2 의 A, AA 규칙을 검사합니다. 위반이 하나라도 있으면 실패합니다. 글자 대비(`color-contrast`)만 빼고, 대비는 APCA 로 따로 검사합니다(아래 [글자 대비](#공통-한계)). 같은 설정을 Storybook 의 Accessibility 패널(`@storybook/addon-a11y`)도 씁니다.
   - axe 는 사람이 판단해야 하는 항목(경계선 대비, 누를 대상 크기, 툴팁 위로 마우스 옮기기, 읽는 순서)을 잡지 못합니다. 아래 공통 한계와 수동 점검이 그 몫입니다.
   - `tests/hydration.test.tsx` 와 `tests/stories.ssr.test.tsx` 는 서버 HTML 에 라벨 연결(`id`, `aria-labelledby`, `aria-describedby`)이 처음부터 들어 있는지 확인합니다.
 - **수동 점검.** 자동 검사로 알 수 없는 것(실제 스크린 리더가 읽는 순서와 문장, 모바일 제스처)은 [수동 점검 체크리스트](#수동-점검-체크리스트) 로 사람이 확인합니다.
@@ -43,6 +43,10 @@
 
 ## 공통 한계
 
+- **글자 대비(1.4.3).** IDS 는 WCAG 2 의 대비비 대신 [APCA](https://git.apcacontrast.com/) 의 Lc 로 역할 색을 고릅니다.
+  - 기준: 글자 Lc 75, 선과 아이콘 Lc 45. `tests/tokens-contrast.test.ts` 가 데모 팔레트 17개 × 두 모드에서 검사합니다.
+  - WCAG 2 는 중간 밝기 채움 위의 검은 글자를 실제보다 잘 읽힌다고 봅니다. APCA 는 그런 짝 대신 흰 글자나 더 진한 채움을 고릅니다.
+  - 그 결과 WCAG 2 의 4.5:1 에 못 미치는 짝이 있을 수 있습니다. WCAG 2 로 감사를 받으면 그 짝이 걸립니다. axe 의 `color-contrast` 규칙을 끈 이유입니다.
 - **경계선 대비(1.4.11).** 구조선은 `--ids-color-border` 를 씁니다. 이 선은 배경과 대비가 약 1.3:1 입니다.
   - 값: 라이트 `#e5e5e5` on `#ffffff` 1.26:1, 다크 `#262626` on `#0a0a0a` 1.31:1
   - 적용되는 곳: outline 필드의 테두리, 꺼진 Checkbox 와 Radio 의 테두리, 꺼진 Switch 트랙

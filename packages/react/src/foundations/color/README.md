@@ -35,7 +35,7 @@ IDS 색은 계열 여덟 개가 같은 역할 열 개를 가지는 시맨틱 토
 | `text-on-X` | `bg-X` 와 그 hover, press 위 글자 |
 | `text-on-X-soft` | `bg-X-soft` 와 그 hover, press 위 글자 |
 | `text-X` | 채움 없는 바탕 위 글자와 아이콘 (Link, outline Badge, Rating 별) |
-| `border-X` | 선. 브랜드와 상태는 바탕과 3:1 |
+| `border-X` | 선. 브랜드와 상태는 바탕과 APCA Lc 45 |
 
 바탕 층은 따로 둘입니다.
 
@@ -45,7 +45,7 @@ IDS 색은 계열 여덟 개가 같은 역할 열 개를 가지는 시맨틱 토
 | `on-surface` | 본문 글자 (`text-on-surface`) |
 
 - 채움 위 글자는 색을 직접 고르지 말고 `text-on-X` 로 칠합니다. 밝은 팔레트에서는 검은 글자가 됩니다.
-- `bg-primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않습니다. yellow, cyan 처럼 밝은 색은 흰 배경 위에서 4.5:1 이 안 됩니다.
+- `bg-primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않습니다. yellow, cyan 처럼 밝은 색은 흰 배경 위에서 Lc 75 가 안 됩니다.
 - 노란 `warning` 채움 위 글자도 `text-on-warning` 입니다. 흰 바탕 위 경고 글자는 `text-warning` 입니다.
 
 ### 바뀐 이름
@@ -73,7 +73,7 @@ IDS 색은 계열 여덟 개가 같은 역할 열 개를 가지는 시맨틱 토
 ```
 
 - 앱은 브랜드 색을 50 ~ 950 의 11단계 팔레트나 색 하나로 줍니다. IDS 에는 기본 색이 없습니다.
-- 채움은 고정 단계, 글자는 대비 4.5:1, 선은 3:1 을 넘는 첫 단계입니다. 규칙은 [IdsProvider](../../components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 에 있습니다.
+- 대비는 APCA 의 Lc 입니다. 채움은 600 에서 시작해 글자가 Lc 75 에 닿을 때까지 이웃 단계로 옮기고, 글자는 Lc 75, 선은 Lc 45 를 넘는 첫 단계입니다. 규칙은 [IdsProvider](../../components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 에 있습니다.
 - Storybook 의 Palette 툴바와 이 스토리는 레포 데모 팔레트 17개(Tailwind CSS v4 기본 색, `orange` 와 `green` 은 IDS 고유 값)를 씁니다. 패키지에는 들어 있지 않습니다.
 
 ## 중립
@@ -101,7 +101,7 @@ IDS 색은 계열 여덟 개가 같은 역할 열 개를 가지는 시맨틱 토
 
 ### 구조선
 
-- 필드 테두리, 카드 가장자리, 구분선은 `border-neutral` 입니다. 꾸밈 선이라 3:1 규칙이 없습니다.
+- 필드 테두리, 카드 가장자리, 구분선은 `border-neutral` 입니다. 꾸밈 선이라 대비 규칙이 없습니다.
 - 선 자체가 브랜드로 읽혀야 하는 드문 자리만 `border-primary` 를 씁니다.
 
 ## 실시간으로 조정하기
@@ -132,6 +132,6 @@ IDS 색은 계열 여덟 개가 같은 역할 열 개를 가지는 시맨틱 토
 - 대비는 Storybook `Foundations/Color` 의 Lab(테마 하나)과 Palettes(17색)에서 확인합니다.
 - Lab 의 역할 표는 `tokens/color-roles.ts`(core 의 `color-roles.json` 에서 생성)의 계열과 역할을 읽어 그리므로 계열이나 역할을 더하면 저절로 나타납니다. 데모 팔레트의 원시 단계는 [Palette](../palette/README.md) 에 있습니다.
 - 테스트:
-  - `tests/tokens-contrast.test.ts`: 데모 팔레트 17개 × 두 모드 × pure·tinted × harmonized·fixed 에서 모든 계열의 글자 짝이 4.5:1, 선이 3:1 을 넘는다.
+  - `tests/tokens-contrast.test.ts`: 데모 팔레트 17개 × 두 모드 × pure·tinted × harmonized·fixed 에서 모든 계열의 글자 짝이 Lc 75, 선이 Lc 45 를 넘는다.
   - `tests/theme-roles.test.ts`: 역할 규칙이 이전 고정 표(Flutter 가 쓰는 표)와 같은 단계를 고른다.
   - `tests/theme-colors.test.ts`: harmonize, tinted neutral, `checkIdsTheme` 의 구별 검사와 그 기준값.

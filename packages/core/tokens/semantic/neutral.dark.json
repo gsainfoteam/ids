@@ -10,7 +10,7 @@
     "bg-neutral-soft-active":{ "$value": "{neutral.600}", "$type": "color" },
     "text-on-neutral":       { "$value": "{neutral.50}",  "$type": "color" },
     "text-on-neutral-soft":  { "$value": "{neutral.50}",  "$type": "color" },
-    "text-neutral":          { "$value": "{neutral.400}", "$type": "color" },
+    "text-neutral":          { "$value": "{neutral.300}", "$type": "color" },
     "border-neutral":        { "$value": "{neutral.800}", "$type": "color" }
   }
 }

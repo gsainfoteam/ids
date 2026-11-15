@@ -59,7 +59,7 @@ test('SSR: the root writes both modes of the theme into its style', () => {
     palettes.blue[950],
   );
   expect(element.style.getPropertyValue('--ids-theme-dark-text-on-primary-soft')).toBe(
-    palettes.blue[400],
+    palettes.blue[200],
   );
   expect(element.style.getPropertyValue('--ids-theme-light-bg-danger')).toMatch(/^#/);
   expect(element.style.getPropertyValue('--ids-theme-light-bg-secondary')).toMatch(/^#/);
@@ -208,7 +208,7 @@ test('a Scope inherits what it does not set, and the mode setter reaches the own
   await expect.poll(() => primary(dark.element())).toBe(palettes.blue[600]);
   await expect.element(dark).toHaveAttribute('data-mode', 'dark');
   expect(dark.element().getAttribute('style')).not.toMatch(/--ids-theme/);
-  expect(primary(orange.element())).toBe(palettes.orange[600]);
+  expect(primary(orange.element()), 'orange 600 is too light for Lc 75').toBe(palettes.orange[700]);
   await expect.element(orange).toHaveAttribute('data-mode', 'light');
   expect(themeSeenBy.orange.theme.primary).toBe(palettes.orange);
   expect(themeSeenBy.dark.theme.primary).toBe(palettes.blue);

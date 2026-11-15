@@ -1,6 +1,14 @@
 import { clampChroma, converter, formatHex, interpolate, parse } from 'culori/fn';
+import { maxBy } from 'es-toolkit';
 
-import { AA_MARK, AA_TEXT, DARK_TEXT, LIGHT_TEXT, reaches } from './contrast';
+import {
+  DARK_TEXT,
+  LIGHT_TEXT,
+  MARK_LC,
+  TEXT_LC,
+  lightnessContrast,
+  reaches,
+} from './contrast';
 import { derivedSecondary, derivedTertiary } from './derived-brands';
 import { createIdsPalette, hueOf, shadeOf } from './palette-seed';
 import { fixedStatusPalette, harmonizedStatusPalettes } from './status';
@@ -28,7 +36,7 @@ import {
 
 import type { IdsMode } from '../../../tokens/types';
 
-export { AA_MARK, AA_TEXT, DARK_TEXT, LIGHT_TEXT };
+export { DARK_TEXT, LIGHT_TEXT, MARK_LC, TEXT_LC };
 
 export const MODES: readonly IdsMode[] = ['light', 'dark'];
 
@@ -38,8 +46,14 @@ export const SOFT_TINTS = [0.06, 0.12] as const;
 
 export const TINTED_NEUTRAL_CHROMA = 0.02;
 
+const FILL_STEPS_OUTWARD_FROM_600: readonly (readonly IdsPaletteStep[])[] = [
+  [600],
+  [500, 700],
+  [400, 800],
+];
+
 type ModeRule = {
-  fill: IdsPaletteStep;
+  fill: readonly (readonly IdsPaletteStep[])[];
   soft: IdsPaletteStep;
   onSoft: readonly IdsPaletteStep[];
   text: readonly IdsPaletteStep[];
@@ -48,17 +62,17 @@ type ModeRule = {
 
 export const ROLE_RULES: { [mode in IdsMode]: ModeRule } = {
   light: {
-    fill: 600,
+    fill: FILL_STEPS_OUTWARD_FROM_600,
     soft: 100,
-    onSoft: [700, 800, 900],
-    text: [600, 700, 800, 900],
+    onSoft: [700, 800, 900, 950],
+    text: [600, 700, 800, 900, 950],
     border: [600, 700, 800, 900],
   },
   dark: {
-    fill: 600,
+    fill: FILL_STEPS_OUTWARD_FROM_600,
     soft: 950,
-    onSoft: [400, 300, 200],
-    text: [500, 400, 300],
+    onSoft: [400, 300, 200, 100, 50],
+    text: [500, 400, 300, 200, 100, 50],
     border: [600, 500, 400, 300],
   },
 };
@@ -144,10 +158,27 @@ function firstReaching(
   shades: IdsPalette,
   candidates: readonly IdsPaletteStep[],
   backgrounds: string[],
-  ratio = AA_TEXT,
+  lc = TEXT_LC,
 ) {
-  const step = candidates.find((candidate) => reaches(shades[candidate], backgrounds, ratio));
+  const step = candidates.find((candidate) => reaches(shades[candidate], backgrounds, lc));
   return step === undefined ? undefined : shades[step];
+}
+
+function mostReadable(fills: string[]) {
+  return maxBy(
+    fills.flatMap((fill) =>
+      [LIGHT_TEXT, DARK_TEXT].map((text) => ({ fill, text, lc: lightnessContrast(text, fill) })),
+    ),
+    (pair) => pair.lc,
+  )!;
+}
+
+function readableFill(shades: IdsPalette, stepsOutward: ModeRule['fill']) {
+  for (const steps of stepsOutward) {
+    const best = mostReadable(steps.map((step) => shades[step]));
+    if (best.lc >= TEXT_LC) return best;
+  }
+  return undefined;
 }
 
 const lastOf = (shades: IdsPalette, steps: readonly IdsPaletteStep[]) =>
@@ -162,42 +193,38 @@ export function familyRoles(
 ): { roles: IdsColorRoles; issues: IdsThemeIssue[] } {
   const rule = ROLE_RULES[mode];
   const issues: IdsThemeIssue[] = [];
-  const fill = shades[rule.fill];
   const soft = shades[rule.soft];
 
-  const onFill = reaches(LIGHT_TEXT, [fill])
-    ? LIGHT_TEXT
-    : reaches(DARK_TEXT, [fill])
-      ? DARK_TEXT
-      : undefined;
-  if (onFill === undefined)
+  const readable = readableFill(shades, rule.fill);
+  if (readable === undefined)
     issues.push({
-      path: `${path}.${rule.fill}`,
-      message: `${mode}: neither white nor neutral 950 reaches ${AA_TEXT}:1 on ${family} (step ${rule.fill}).`,
+      path,
+      message: `${mode}: neither white nor neutral 950 reaches Lc ${TEXT_LC} on ${family} steps ${rule.fill.flat().join(', ')}.`,
     });
+  const { fill, text: onFill } = readable ?? mostReadable([shades[600]]);
 
-  const [fillHover, fillActive] = fillStatesOf(fill, onFill ?? LIGHT_TEXT);
+  const [fillHover, fillActive] = fillStatesOf(fill, onFill);
   const [softHover, softActive] = softTintsOf(soft, fill);
 
   const onSoft = firstReaching(shades, rule.onSoft, [soft, softHover!, softActive!]);
   if (onSoft === undefined)
     issues.push({
       path,
-      message: `${mode}: no step of ${rule.onSoft.join(', ')} reaches ${AA_TEXT}:1 on ${family}-soft (step ${rule.soft}) and its hover and press tints.`,
+      message: `${mode}: no step of ${rule.onSoft.join(', ')} reaches Lc ${TEXT_LC} on ${family}-soft (step ${rule.soft}) and its hover and press tints.`,
     });
 
   const text = firstReaching(shades, rule.text, [surface, soft]);
   if (text === undefined)
     issues.push({
       path,
-      message: `${mode}: no step of ${rule.text.join(', ')} reaches ${AA_TEXT}:1 as ${family} text on the surface and on ${family}-soft.`,
+      message: `${mode}: no step of ${rule.text.join(', ')} reaches Lc ${TEXT_LC} as ${family} text on the surface and on ${family}-soft.`,
     });
 
-  const border = firstReaching(shades, rule.border, [surface], AA_MARK);
+  const border = firstReaching(shades, rule.border, [surface], MARK_LC);
   if (border === undefined)
     issues.push({
       path,
-      message: `${mode}: no step of ${rule.border.join(', ')} reaches ${AA_MARK}:1 as a ${family} line on the surface.`,
+      message: `${mode}: no step of ${rule.border.join(', ')} reaches Lc ${MARK_LC} as a ${family} line on the surface.`,
     });
 
   const [
@@ -221,7 +248,7 @@ export function familyRoles(
       [bgSoft!]: soft,
       [bgSoftHover!]: softHover!,
       [bgSoftActive!]: softActive!,
-      [textOn!]: onFill ?? LIGHT_TEXT,
+      [textOn!]: onFill,
       [textOnSoft!]: onSoft ?? lastOf(shades, rule.onSoft),
       [textFamily!]: text ?? lastOf(shades, rule.text),
       [borderFamily!]: border ?? lastOf(shades, rule.border),

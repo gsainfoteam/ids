@@ -150,7 +150,7 @@ test('only the first outermost provider hosts, and items take the theme they wer
 
   await userEvent.click(screen.getByRole('button', { name: 'open here' }));
   const scoped = screen.getByText('scoped').element().closest('[data-overlay-item]');
-  expect(primaryOf(scoped)).toBe(palettes.orange[600]);
+  expect(primaryOf(scoped)).toBe(palettes.orange[700]);
   expect(scoped).toHaveAttribute('data-mode', 'dark');
   expect(scoped).toHaveAttribute('data-scale', '1.5');
   overlay.closeAll();

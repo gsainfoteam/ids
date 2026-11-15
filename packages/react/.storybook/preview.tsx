@@ -24,6 +24,8 @@ function PaintThePageBehindWideStories() {
 
 const DERIVED = 'derived';
 
+const WCAG_2_CONTRAST_REPLACED_BY_APCA = 'color-contrast';
+
 const labelled = (name: string, values: readonly string[]) =>
   values.map((value) => ({ value, title: `${name} ${value}` }));
 
@@ -86,6 +88,7 @@ const preview: Preview = {
           type: 'tag',
           values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'],
         },
+        rules: { [WCAG_2_CONTRAST_REPLACED_BY_APCA]: { enabled: false } },
       },
       test: 'error',
     },

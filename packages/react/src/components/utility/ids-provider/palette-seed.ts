@@ -1,6 +1,5 @@
 import { clampChroma, converter, formatHex, parse } from 'culori/fn';
 
-import { takesLightOrDarkText } from './contrast';
 import { REFERENCE_PALETTES } from './reference-palettes';
 import { PALETTE_STEPS, type IdsPalette } from './theme';
 
@@ -11,10 +10,6 @@ type Reference = { anchorHue: number; shades: Shade[] };
 const toOklch = converter('oklch');
 
 const ANCHOR_STEP_INDEX = PALETTE_STEPS.indexOf(500);
-
-const PRIMARY_STEP_INDEX = PALETTE_STEPS.indexOf(600);
-
-const LIGHTNESS_SEARCH_ROUNDS = 30;
 
 const lerp = (from: number, to: number, amount: number) => from + (to - from) * amount;
 
@@ -87,24 +82,6 @@ function chromaAtLightness(shades: Shade[], lightness: number) {
 const inSrgb = (shade: Shade) =>
   formatHex(clampChroma({ mode: 'oklch', l: shade.l, c: shade.c, h: shade.h }, 'oklch'));
 
-function nearestLightnessWithReadableText(shade: Shade) {
-  const at = (l: number) => inSrgb({ ...shade, l });
-  const searchToward = (limit: number) => {
-    let failing = shade.l;
-    let passing = limit;
-    for (let round = 0; round < LIGHTNESS_SEARCH_ROUNDS; round++) {
-      const middle = (failing + passing) / 2;
-      if (takesLightOrDarkText(at(middle))) passing = middle;
-      else failing = middle;
-    }
-    return passing;
-  };
-
-  const darker = searchToward(0);
-  const lighter = searchToward(1);
-  return at(shade.l - darker <= lighter - shade.l ? darker : lighter);
-}
-
 export function paletteFromSeed(
   seed: string,
   references: Reference[] = referencesInIds(),
@@ -118,17 +95,11 @@ export function paletteFromSeed(
   const chromaRatio = referenceChroma > 0 ? Math.min(1, c / referenceChroma) : 0;
   const steps = shades.map((shade) => ({ ...shade, c: shade.c * chromaRatio }));
 
-  return paletteWithReadableFill(steps);
+  return paletteOf(steps);
 }
 
-function paletteWithReadableFill(steps: Shade[]): IdsPalette {
-  const hexes = steps.map(inSrgb);
-  if (!takesLightOrDarkText(hexes[PRIMARY_STEP_INDEX]!))
-    hexes[PRIMARY_STEP_INDEX] = nearestLightnessWithReadableText(steps[PRIMARY_STEP_INDEX]!);
-
-  return Object.fromEntries(
-    PALETTE_STEPS.map((step, index) => [step, hexes[index]!]),
-  ) as unknown as IdsPalette;
+function paletteOf(steps: Shade[]): IdsPalette {
+  return paletteFromSteps(steps.map(inSrgb));
 }
 
 export const hueOf = (palette: IdsPalette) => shadeOf(palette[500]).h;
@@ -144,7 +115,7 @@ export function paletteAtHue(
   chromaRatio: number,
   references: Reference[] = referencesInIds(),
 ): IdsPalette {
-  return paletteWithReadableFill(
+  return paletteOf(
     blendedShades(hue, references).map((shade) => ({ ...shade, c: shade.c * chromaRatio })),
   );
 }
@@ -152,7 +123,7 @@ export function paletteAtHue(
 export const chromaOf = (palette: IdsPalette) => shadeOf(palette[500]).c;
 
 export function rotatedPalette(palette: IdsPalette, degrees: number): IdsPalette {
-  return paletteWithReadableFill(
+  return paletteOf(
     PALETTE_STEPS.map((step) => {
       const shade = shadeOf(palette[step]);
       return { ...shade, h: shade.h + degrees };
