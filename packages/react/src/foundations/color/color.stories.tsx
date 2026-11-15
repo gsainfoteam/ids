@@ -43,7 +43,12 @@ import {
   defineIdsTheme,
   useTheme,
 } from '../../components/utility/ids-provider';
-import { MARK_LC, TEXT_LC, lightnessContrast } from '../../components/utility/ids-provider/contrast';
+import {
+  ACCENT_TEXT_LC,
+  MARK_LC,
+  TEXT_LC,
+  lightnessContrast,
+} from '../../components/utility/ids-provider/contrast';
 import { PALETTE_STEPS, type IdsNeutral } from '../../components/utility/ids-provider/theme';
 import { resolveColorsOnce } from '../../components/utility/ids-provider/theme-roles';
 import {
@@ -76,14 +81,14 @@ const slotOf = (template: string, family: string) => template.replace('{family}'
 const familySlots = (family: string) =>
   IDS_FAMILY_SLOTS.map((template) => slotOf(template, family));
 
-type Pairing = readonly [background: string, foreground: string, kind: 'text' | 'mark'];
+type Pairing = readonly [background: string, foreground: string, kind: 'text' | 'accent' | 'mark'];
 
 const pairsOf = (family: string): Pairing[] => [
   [`bg-${family}`, `text-on-${family}`, 'text'],
   [`bg-${family}-hover`, `text-on-${family}`, 'text'],
   [`bg-${family}-soft`, `text-on-${family}-soft`, 'text'],
   [`bg-${family}-soft-active`, `text-on-${family}-soft`, 'text'],
-  ['surface', `text-${family}`, 'text'],
+  ['surface', `text-${family}`, 'accent'],
   ['surface', `border-${family}`, 'mark'],
 ];
 
@@ -107,7 +112,8 @@ const hex = (value: string) =>
     .map((channel) => Math.round(channel).toString(16).padStart(2, '0'))
     .join('')}`;
 
-const gradeOf = (lc: number) => (lc >= TEXT_LC ? 'text' : lc >= MARK_LC ? 'mark' : 'Fail');
+const gradeOf = (lc: number) =>
+  lc >= TEXT_LC ? 'text' : lc >= ACCENT_TEXT_LC ? 'accent' : lc >= MARK_LC ? 'mark' : 'Fail';
 
 function readSwatch(element: HTMLElement | null) {
   const chip = element?.querySelector<HTMLElement>('[data-chip]');
@@ -302,7 +308,11 @@ function BrandContrastTable() {
   );
 }
 
-const passes = { text: /^Lc \d+ text$/, mark: /^Lc \d+ (text|mark)$/ };
+const passes = {
+  text: /^Lc \d+ text$/,
+  accent: /^Lc \d+ (text|accent)$/,
+  mark: /^Lc \d+ (text|accent|mark)$/,
+};
 
 export const Palettes: Story = {
   render: () => (
@@ -315,7 +325,7 @@ export const Palettes: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Contrast × 17 palettes"
-        description="색마다 채움과 그 위 글자, soft 채움과 그 위 글자, 페이지 위 글자와 선의 APCA 대비(Lc)입니다. 글자는 Lc 75, 선은 Lc 45 를 넘어야 합니다."
+        description="색마다 채움과 그 위 글자, soft 채움과 그 위 글자, 페이지 위 글자와 선의 APCA 대비(Lc)입니다. 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60, 선은 Lc 45 를 넘어야 합니다."
       >
         <BrandContrastTable />
       </Showcase.Section>
@@ -520,7 +530,7 @@ export const Lab: StoryObj<LabArgs> = {
           </Showcase.Section>
           <Showcase.Section
             title="Contrast"
-            description="같이 쓰는 짝의 APCA 대비(Lc)입니다. 글자는 Lc 75, 선과 아이콘 같은 표시는 Lc 45 이상이어야 합니다."
+            description="같이 쓰는 짝의 APCA 대비(Lc)입니다. 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60, 선과 아이콘 같은 표시는 Lc 45 이상이어야 합니다."
           >
             <div className="flex flex-wrap gap-4">
               {modes.map((mode) => (
@@ -783,6 +793,6 @@ export const Lab: StoryObj<LabArgs> = {
     const outputs = [...canvasElement.querySelectorAll('[data-ratio]')];
     await expect(outputs.length).toBe(pairs.length * modes.length);
     for (const output of outputs)
-      await expect(output.textContent).toMatch(/^Lc \d+ (text|mark|Fail)$/);
+      await expect(output.textContent).toMatch(/^Lc \d+ (text|accent|mark|Fail)$/);
   },
 };

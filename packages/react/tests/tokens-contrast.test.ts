@@ -6,6 +6,7 @@ import { describe, expect, test } from 'vitest';
 import { paletteHues, palettes } from '../.storybook/palettes';
 import { lightnessContrast } from '../src/components/utility/ids-provider/contrast';
 import {
+  ACCENT_TEXT_LC,
   MARK_LC,
   TEXT_LC,
   MODES,
@@ -67,8 +68,9 @@ const pairsFor = (family: string) => {
     text: [
       [onFill, family === 'neutral' ? [bg] : [bg, bgHover, bgActive]],
       [onSoft, [soft, softHover, softActive]],
-      [text, ['surface', soft]],
+      ...(family === 'neutral' ? [[text, ['surface', soft]]] : []),
     ] as [string, string[]][],
+    accent: family === 'neutral' ? [] : ([[text, ['surface', soft]]] as [string, string[]][]),
     mark: family === 'neutral' ? [] : ([[border, ['surface']]] as [string, string[]][]),
   };
 };
@@ -83,8 +85,9 @@ const failingPairs = (roles: { [slot: string]: string }) => {
 
   check('on-surface', ['surface'], TEXT_LC);
   for (const family of IDS_COLOR_FAMILIES) {
-    const { text, mark } = pairsFor(family);
+    const { text, accent, mark } = pairsFor(family);
     for (const [foreground, backgrounds] of text) check(foreground, backgrounds, TEXT_LC);
+    for (const [foreground, backgrounds] of accent) check(foreground, backgrounds, ACCENT_TEXT_LC);
     for (const [foreground, backgrounds] of mark) check(foreground, backgrounds, MARK_LC);
   }
 
@@ -189,6 +192,16 @@ test.each(MODES)(
     }
   },
 );
+
+test.each(MODES)('a %s line is the color of the text beside it', (mode) => {
+  for (const hue of paletteHues) {
+    const roles = resolveColors({ primary: palettes[hue] }).colors!.roles[mode];
+
+    for (const family of [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES])
+      expect(roles[`border-${family}`], `${hue} ${family}`).toBe(roles[`text-${family}`]);
+  }
+});
+
 const statuses: IdsStatus[] = ['harmonized', 'fixed'];
 
 describe.each(MODES)('%s', (mode) => {

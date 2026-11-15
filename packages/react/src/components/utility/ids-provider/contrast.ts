@@ -26,6 +26,8 @@ ColorSpace.register(sRGB);
 
 export const TEXT_LC = 75;
 
+export const ACCENT_TEXT_LC = 60;
+
 export const MARK_LC = 45;
 
 export const LIGHT_TEXT = '#ffffff';

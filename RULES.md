@@ -365,8 +365,8 @@ controls, `[data-focus-visible]` for components driven by `useInteractive`, and
 inner element with `data-field-input` rather than adding a component-specific `has-[...]:ring`.
 Borders stay `inset-ring`, so the focus ring sits outside them and composes with `shadow-xs`
 instead of replacing it. Focus also recolors that inset-ring border to primary, and an element
-with `aria-invalid="true"` or `data-invalid` gets a danger border and a danger ring; neither
-state is repeated in component styles.
+with `aria-invalid="true"` or `data-invalid` gets a border and a ring in `border-danger`, which is
+the color of its label and error message; neither state is repeated in component styles.
 
 **Radius is 10px, and containers grow it concentrically.** The scale is `standard` (10px, every
 control at every size), `indicator` (4px, only for boxes under 24px such as the Checkbox box or
@@ -418,17 +418,19 @@ derived from primary (`ids-provider/derived-brands.ts`), so the provider always 
 `border-neutral` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
 the theme color, while `outline` and `ghost` stay neutral. `border-neutral` is decorative and
-exempt from contrast; `border-primary` and every other family's `border-X` reach APCA Lc 45 on the surface,
-for the rare edge that should itself read as that color.
+exempt from contrast. `border-primary` and every other family's `border-X`, for the rare edge that
+should itself read as that color, is the same step as `text-X`, so a line and the text beside it
+(an invalid field's border, its label and error message) are one color.
 
 **Each family has one role per background.** A fill (`bg-primary`) carries `text-on-primary`; a
 soft surface is `bg-primary-soft` with `text-on-primary-soft`, and its hover and press
 (`bg-primary-soft-hover`, `-active`) mix 6% and 12% of the fill in; text or an icon sitting on the
 page with no fill behind it (an outline Badge or Chip, a Rating star, a Radio dot, a Link) is
 `text-primary`. Never write `bg-primary` as a text color or `primary/10` as a soft fill: light hues
-such as yellow and cyan fall under Lc 75 there. Statuses follow the same roles (`bg-danger-soft`
-with `text-on-danger-soft`, `text-danger` for text). Every text pair reaches APCA Lc 75 and every
-`border-X` Lc 45 in both modes, for all 17 demo palettes, pure and tinted neutrals and harmonized and
+such as yellow and cyan fall under Lc 60 there. Statuses follow the same roles (`bg-danger-soft`
+with `text-on-danger-soft`, `text-danger` for text). Text on a fill or a soft surface reaches APCA
+Lc 75, `text-X` Lc 60 on the surface and on `bg-X-soft` (short labels, links and messages), and every
+`border-X` (the `text-X` step) at least Lc 45 in both modes, for all 17 demo palettes, pure and tinted neutrals and harmonized and
 fixed statuses, which `tests/tokens-contrast.test.ts` checks.
 
 **Contrast is APCA, not WCAG 2.** Roles are picked by APCA lightness contrast (`contrastAPCA` from

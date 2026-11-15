@@ -2,6 +2,7 @@ import { clampChroma, converter, formatHex, interpolate, parse } from 'culori/fn
 import { maxBy } from 'es-toolkit';
 
 import {
+  ACCENT_TEXT_LC,
   DARK_TEXT,
   LIGHT_TEXT,
   MARK_LC,
@@ -36,7 +37,7 @@ import {
 
 import type { IdsMode } from '../../../tokens/types';
 
-export { DARK_TEXT, LIGHT_TEXT, MARK_LC, TEXT_LC };
+export { ACCENT_TEXT_LC, DARK_TEXT, LIGHT_TEXT, MARK_LC, TEXT_LC };
 
 export const MODES: readonly IdsMode[] = ['light', 'dark'];
 
@@ -57,7 +58,6 @@ type ModeRule = {
   soft: IdsPaletteStep;
   onSoft: readonly IdsPaletteStep[];
   text: readonly IdsPaletteStep[];
-  border: readonly IdsPaletteStep[];
 };
 
 export const ROLE_RULES: { [mode in IdsMode]: ModeRule } = {
@@ -66,14 +66,12 @@ export const ROLE_RULES: { [mode in IdsMode]: ModeRule } = {
     soft: 100,
     onSoft: [700, 800, 900, 950],
     text: [600, 700, 800, 900, 950],
-    border: [600, 700, 800, 900],
   },
   dark: {
     fill: FILL_STEPS_OUTWARD_FROM_600,
     soft: 950,
     onSoft: [400, 300, 200, 100, 50],
     text: [500, 400, 300, 200, 100, 50],
-    border: [600, 500, 400, 300],
   },
 };
 
@@ -213,18 +211,11 @@ export function familyRoles(
       message: `${mode}: no step of ${rule.onSoft.join(', ')} reaches Lc ${TEXT_LC} on ${family}-soft (step ${rule.soft}) and its hover and press tints.`,
     });
 
-  const text = firstReaching(shades, rule.text, [surface, soft]);
+  const text = firstReaching(shades, rule.text, [surface, soft], ACCENT_TEXT_LC);
   if (text === undefined)
     issues.push({
       path,
-      message: `${mode}: no step of ${rule.text.join(', ')} reaches Lc ${TEXT_LC} as ${family} text on the surface and on ${family}-soft.`,
-    });
-
-  const border = firstReaching(shades, rule.border, [surface], MARK_LC);
-  if (border === undefined)
-    issues.push({
-      path,
-      message: `${mode}: no step of ${rule.border.join(', ')} reaches Lc ${MARK_LC} as a ${family} line on the surface.`,
+      message: `${mode}: no step of ${rule.text.join(', ')} reaches Lc ${ACCENT_TEXT_LC} as ${family} text on the surface and on ${family}-soft.`,
     });
 
   const [
@@ -251,7 +242,7 @@ export function familyRoles(
       [textOn!]: onFill,
       [textOnSoft!]: onSoft ?? lastOf(shades, rule.onSoft),
       [textFamily!]: text ?? lastOf(shades, rule.text),
-      [borderFamily!]: border ?? lastOf(shades, rule.border),
+      [borderFamily!]: text ?? lastOf(shades, rule.text),
     },
     issues,
   };

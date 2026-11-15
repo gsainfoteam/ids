@@ -80,7 +80,7 @@ React 앱은 `IdsProvider theme` 이 아래 변수를 루트 요소에 넣는다
   | `text-on-X` | 채움 위 글자 |
   | `text-on-X-soft` | 옅은 채움 위 글자 |
   | `text-X` | 채움 없는 바탕 위 글자와 아이콘 |
-  | `border-X` | 선. 브랜드와 상태는 바탕과 APCA Lc 45, `border-neutral` 은 구조선 |
+  | `border-X` | 선. 브랜드와 상태는 `text-X` 와 같은 색, `border-neutral` 은 구조선 |
 
 - 역할 변수는 `--ids-color-{역할}` 이고, `--ids-theme-{light|dark}-{역할}` 에서 읽는다. `data-mode` 가 둘 중 하나를 연결한다.
 - 브랜드와 상태 계열의 변수는 IdsProvider 가 모두 쓴다. 테마가 `secondary`, `tertiary` 를 생략해도 primary 에서 만든 값을 쓴다. neutral 과 바탕 층만 변수가 없으면 IDS 의 회색으로 그린다.
@@ -164,8 +164,8 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainf
 - 이 패키지에는 브랜드 팔레트가 없다. 앱이 `IdsProvider theme` 에 `primary`(와 `secondary`, `tertiary`)를 주면 역할 색을 대비로 골라 위 변수로 넣는다.
 - corner shape: Provider 아래 요소는 `corner-shape: var(--ids-corner-shape, round)` 를 받고, `::before` `::after` 는 자기 요소의 모양을 물려받는다. `rounded-full` 은 `before:`, `after:` 같은 variant 를 붙여도 언제나 `round` 다.
   - `corner-shape` 를 지원하는 브라우저에서 `--ids-radius-*` 와 `concentric-p-*` 의 radius 는 `--ids-theme-corner-radius-scale`(squircle 이면 1.84) 배가 된다. squircle 모서리가 round 만큼 깊어진다.
-- 브랜드 색 글자는 배경에 따라 고른다. `bg-primary` 위는 `text-on-primary`, `bg-primary-soft` 위는 `text-on-primary-soft`, 채움 없는 페이지 위는 `text-primary` 다. 셋 다 두 모드에서 APCA Lc 75 를 넘는다.
-- `primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않는다. 밝은 색상은 흰 바탕에서 Lc 75 가 안 된다.
+- 브랜드 색 글자는 배경에 따라 고른다. `bg-primary` 위는 `text-on-primary`, `bg-primary-soft` 위는 `text-on-primary-soft`, 채움 없는 페이지 위는 `text-primary` 다. 앞의 둘은 APCA Lc 75, `text-primary` 는 바탕과 soft 에서 Lc 60 을 넘는다.
+- `primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않는다. 밝은 색상은 흰 바탕에서 Lc 60 도 안 된다.
 
 `data-mode`는 `light` / `dark`.
 

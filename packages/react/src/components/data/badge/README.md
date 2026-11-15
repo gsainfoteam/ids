@@ -96,7 +96,7 @@ import { Badge } from '@gsainfoteam/ids-react';
 <Badge size="tiny" />            // standard(20px, 기본) / tiny(16px)
 ```
 
-- `primary` 의 `soft` 는 `bg-primary-soft` 배경에 `text-on-primary-soft` 글자, `outline` 은 `text-primary` 글자입니다. 밝은 테마 색에서도 APCA Lc 75 를 지킵니다.
+- `primary` 의 `soft` 는 `bg-primary-soft` 배경에 `text-on-primary-soft` 글자, `outline` 은 `text-primary` 글자입니다. 밝은 테마 색에서도 soft 는 APCA Lc 75, outline 은 Lc 60 을 지킵니다.
 - 상태 색의 `soft` 와 `outline` 글자는 `*-strong` 입니다.
 
 ## 상태와 data 속성

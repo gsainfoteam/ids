@@ -3,7 +3,7 @@
 앱의 테마(브랜드 색, 중립과 상태 색의 방식, radius, corner shape, 배율)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
 
 - **테마는 앱이 줍니다.** IDS 에는 기본 색이 없습니다. `theme` 이 없으면 타입 오류입니다.
-- **브랜드 색 하나로 두 모드를 칠합니다.** `primary` 하나만 있으면 됩니다. 계열마다 라이트와 다크의 역할 색(`bg-primary`, `bg-primary-soft`, `text-primary` …)을 IDS 가 APCA 대비(글자 Lc 75, 선 Lc 45)를 지키도록 고릅니다. 팔레트 대신 색 하나를 주면 IDS 가 11단계를 만듭니다.
+- **브랜드 색 하나로 두 모드를 칠합니다.** `primary` 하나만 있으면 됩니다. 계열마다 라이트와 다크의 역할 색(`bg-primary`, `bg-primary-soft`, `text-primary` …)을 IDS 가 APCA 대비(채움과 soft 위 글자 Lc 75, 페이지 위 색 글자와 선 Lc 60)를 지키도록 고릅니다. 팔레트 대신 색 하나를 주면 IDS 가 11단계를 만듭니다.
 - **계열 여덟 개.** neutral, primary, secondary, tertiary, success, warning, danger, info 가 같은 역할 열 개를 가집니다.
 - **CSS 변수로 칠합니다.** 테마는 감싸는 요소의 inline 변수가 되고, `@gsainfoteam/ids-css` 가 `data-mode` 에 따라 연결합니다. 서버 HTML 에 들어가므로 깜빡이지 않습니다.
 - **제어와 비제어.** `mode` 를 넘기면 부모가 값을 가지고, `defaultMode` 를 넘기면 Provider 가 가집니다.
@@ -110,16 +110,17 @@ import { theme } from './ids-theme';
 | `text-on-X` | 흰색과 neutral 950 중 채움 위 Lc 가 높은 쪽 | 같음 |
 | `text-on-X-soft` | 700, 800, 900, 950 중 처음 통과하는 단계 | 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
 | `text-X` | 600, 700, 800, 900, 950 중 처음 통과하는 단계 | 500, 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
-| `border-X` | 600, 700, 800, 900 중 바탕과 Lc 45 를 넘는 첫 단계 | 600, 500, 400, 300 중 같은 규칙 |
+| `border-X` | `text-X` 와 같은 단계 | 같음 |
 
 - 대비는 [APCA](https://git.apcacontrast.com/) 의 Lc 입니다. WCAG 2 의 대비비는 쓰지 않습니다.
   - WCAG 2 는 중간 밝기 채움 위의 검은 글자를 실제보다 잘 읽힌다고 봅니다. 그래서 보라색 채움 위에 검은 글자를 골랐습니다. APCA 는 글자 쪽(어두운 글자, 밝은 글자)에 따라 다르게 재서 이런 짝을 걸러 냅니다.
-  - 글자는 Lc 75(본문 글자의 기준), 선과 아이콘 같은 표시는 Lc 45 입니다.
+  - 채움과 soft 위 글자는 Lc 75(본문 글자의 기준), 페이지 위 색 글자(`text-X`)는 Lc 60(라벨, 링크, 에러 문구 같은 짧은 글자의 기준), 선과 아이콘 같은 표시의 하한은 Lc 45 입니다.
   - 계산은 `colorjs.io` 의 `contrastAPCA` 입니다(MIT).
 - `text-on-X-soft` 는 soft 와 그 hover, press 에서 모두 Lc 75 를 넘어야 합니다.
-- `text-X` 는 `surface` 와 `bg-X-soft` 에서 모두 Lc 75 를 넘어야 합니다.
-- `border-neutral` 은 구조선이라 대비 규칙이 없습니다(neutral 200 / 800). 브랜드와 상태의 `border-X` 는 바탕과 Lc 45 를 넘습니다.
-- 결과는 Material 3 의 톤과 비슷합니다. soft 위 글자는 거의 950(M3 의 on-container, 톤 10), 다크 모드 글자는 200 언저리(톤 80)입니다.
+- `text-X` 는 `surface` 와 `bg-X-soft` 에서 모두 Lc 60 을 넘어야 합니다. 그래서 라이트는 채움과 같거나 한 단계 진하고, 다크도 200 까지 옅어지지 않습니다.
+- `border-X` 는 따로 고르지 않고 `text-X` 와 같은 단계를 씁니다. 선과 그 옆 글자가 한 색이라, invalid 필드의 테두리(`border-danger`)와 라벨, 에러 문구(`text-danger`)가 같은 색입니다. `text-X` 가 Lc 60 을 넘으므로 선의 하한 Lc 45 도 넘습니다.
+- `border-neutral` 은 구조선이라 대비 규칙이 없습니다(neutral 200 / 800).
+- 결과는 Material 3 의 톤과 비슷합니다. soft 위 글자는 거의 950(M3 의 on-container, 톤 10), 다크 모드의 soft 위 글자는 200 언저리(톤 80)입니다.
 - Flutter 의 고정 표(`packages/flutter/lib/tokens`)는 이 규칙을 따르지 않고 예전 WCAG 표 그대로입니다. Flutter 가 런타임 팔레트를 받으면(#33) 맞춥니다.
 
 ### secondary 와 tertiary
