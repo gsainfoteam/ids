@@ -12,6 +12,7 @@
 | `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등). `IdsColor` 는 Dart 에만 나간다 |
 | `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스 |
 | `packages/react/src/tokens/palette-model.ts` | 17색에 맞춘 팔레트 모델의 계수와 상태 색의 기준 넷. `palette-model.js` 가 쓴다 |
+| `packages/flutter/lib/tokens/ids_palette_model.dart` | 같은 계수와 상태 색 넷의 Dart 판. `palette-model.js` 가 쓴다 |
 
 ## 토큰 구조
 
@@ -48,11 +49,11 @@ color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지와 R
 - 역할 변수는 `--ids-color-{bg|text|border}-{이름}` 이다. 바탕 층(`surface`, `on-surface`)만 앞머리가 없다.
 - Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-soft` 는 있고 `--color-primary` 나 `--background-color-on-primary` 는 없다.
 - `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다. 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다). neutral 과 바탕 층은 없으면 `neutral.*.json` 의 단계를 읽는다.
-- Dart 포매터는 이 표를 읽지 않는다. `packages/flutter/lib/tokens` 는 예전 이름 그대로 나오고, CI 가 바뀌지 않았는지 확인한다.
+- Dart 포매터는 이 표를 읽지 않는다. `packages/flutter/lib/tokens` 는 예전 이름 그대로 나온다. `ids_palette_model.dart` 는 아래 팔레트 모델의 계수를 옮긴 것이라, 계수가 바뀌면 함께 바뀐다.
 
 ## 팔레트 모델
 
-`palette-model.json` 이 IdsProvider 가 색 하나로 11단계를 만들 때 읽는 모델의 계수다. `palette-model.js` 는 Style Dictionary 다음에 돌며, 이 계수와 `palette.json` 의 상태 색 넷을 `react/src/tokens/palette-model.ts` 로 옮긴다.
+`palette-model.json` 이 IdsProvider 와 `IdsPalette.fromSeed` 가 색 하나로 11단계를 만들 때 읽는 모델의 계수다. `palette-model.js` 는 Style Dictionary 다음에 돌며, 이 계수와 `palette.json` 의 상태 색 넷을 `react/src/tokens/palette-model.ts` 와 `flutter/lib/tokens/ids_palette_model.dart` 로 옮긴다.
 
 - 단계마다 500 의 hue 를 받는 푸리에 급수 셋이다: 밝기, sRGB 최대 채도에 대한 채도 비율, 500 에서의 hue 회전. 한 줄이 한 단계이고, 값은 `[a0, a1, b1, a2, b2, …]` 순서다.
 - 계수는 데모 팔레트 17색에 맞춰 구한 뒤 고정했다. 17색과 맞추던 코드는 지웠다. 다시 맞추려면 `f3b8fc4b` 커밋의 `palette-model.js` 와 17색이 있던 `tokens/palette.json` 을 꺼낸다.

@@ -24,7 +24,8 @@ These files are written by `pnpm codegen` (Style Dictionary build). Edits will b
 
 - `packages/css/dist/ids.css`
 - `packages/react/src/tokens/types.ts`
-- `packages/react/src/tokens/palette-model.ts` (`packages/core/palette-model.js`)
+- `packages/react/src/tokens/palette-model.ts` and
+  `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/palette-model.js`)
 - `packages/flutter/lib/tokens/*.dart`
 
 To change tokens: edit files under `packages/core/tokens/`, then run `pnpm codegen`.
@@ -792,13 +793,15 @@ IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral an
 palettes (red, yellow, green, sky). The one-color palette builder evaluates a model whose
 coefficients live in `packages/core/palette-model.json` (Fourier series of the 500 hue per step,
 fitted once to 17 demo palettes that are gone now); `pnpm codegen` copies them and the status
-palettes to `src/tokens/palette-model.ts`. Stories and tests build their 17 palettes from seed hex
-values in `.storybook/palettes.ts`. The per-hue `semantic/[color].{light,dark}.json` files (with hex
-values where they pointed at a removed palette) and the `color` enum feed only the Dart output until
-Flutter takes a runtime palette too (#33); the CSS and the React types no longer read them. The Dart
-formatter keeps the old role names (`primary`, `on-primary`, `secondary`, `on-secondary`, `accent`,
-`outline`) from those files, so `packages/flutter/lib/tokens/*.dart` stay byte-identical while the
-CSS and React use the family roles.
+palettes to `src/tokens/palette-model.ts` and to `packages/flutter/lib/tokens/ids_palette_model.dart`,
+which `IdsPalette.fromSeed` evaluates to the same 8-bit colors. Stories and tests build their 17
+palettes from seed hex values in `.storybook/palettes.ts`. The per-hue
+`semantic/[color].{light,dark}.json` files (with hex values where they pointed at a removed palette)
+and the `color` enum feed only the Dart output until Flutter takes a runtime palette too (#33); the
+CSS and the React types no longer read them. The Dart formatter keeps the old role names
+(`primary`, `on-primary`, `secondary`, `on-secondary`, `accent`, `outline`) from those files, so
+`packages/flutter/lib/tokens/*.dart` stay byte-identical while the CSS and React use the family
+roles.
 
 ## Versioning — Changesets (fixed mode)
 
