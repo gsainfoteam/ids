@@ -64,6 +64,8 @@ final theme = IdsTheme(
 - `secondary` 를 빼면 primary 의 hue 에 채도 1/3, `tertiary` 를 빼면 hue 를 +60° (상태 색과 겹치면 −60°) 돌린다.
 - `harmonized` 는 상태 hue 를 primary 쪽으로 최대 15° 돌린다. `IdsStatusColors(danger: ...)` 로 일부만 고를 수 있다.
 - `IdsPalette.fromSeed(color)` 는 seed 로 만든 팔레트를 직접 읽을 때 쓴다.
+- seed 모델은 ids-react 의 `createIdsPalette` 와 같아 같은 8비트 색을 낸다. 계수는 `packages/core/palette-model.json` 에 고정돼 있고 `pnpm codegen` 이 `lib/tokens/ids_palette_model.dart` 로 옮긴다.
+- 상태 팔레트는 `IdsStatusPalettes.red` `yellow` `green` `sky` 에 있다.
 - 입력 색은 불투명 sRGB 로 맞춘다. 알파와 Display P3 는 버린다.
 
 ## 테마 검사

@@ -1,20 +1,35 @@
 import palette from '../../core/tokens/palette.json';
-import { PALETTE_STEPS, type IdsPalette } from '../src/components/utility/ids-provider/theme';
+import { createIdsPalette } from '../src';
 
-export type PaletteHue = Exclude<keyof typeof palette, 'neutral'>;
+import type { IdsPalette } from '../src/components/utility/ids-provider/theme';
 
-const shadesOf = (hue: keyof typeof palette): IdsPalette =>
-  Object.fromEntries(
-    PALETTE_STEPS.map((step) => [step, palette[hue][`${step}`].$value]),
-  ) as unknown as IdsPalette;
+export const paletteSeeds = {
+  red: '#fb2c36',
+  orange: '#ff5722',
+  amber: '#fe9a00',
+  yellow: '#f0b100',
+  lime: '#7ccf00',
+  green: '#22c53e',
+  emerald: '#00bc7d',
+  teal: '#00bba7',
+  cyan: '#00b8db',
+  sky: '#00a6f4',
+  blue: '#2b7fff',
+  indigo: '#615fff',
+  violet: '#8e51ff',
+  purple: '#ad46ff',
+  fuchsia: '#e12afb',
+  pink: '#f6339a',
+  rose: '#ff2056',
+} as const;
 
-export const paletteHues = (Object.keys(palette) as (keyof typeof palette)[]).filter(
-  (hue): hue is PaletteHue => hue !== 'neutral',
-);
+export type PaletteHue = keyof typeof paletteSeeds;
 
-export const palettes = Object.fromEntries(paletteHues.map((hue) => [hue, shadesOf(hue)])) as {
-  [hue in PaletteHue]: IdsPalette;
-};
+export const paletteHues = Object.keys(paletteSeeds) as PaletteHue[];
+
+export const palettes = Object.fromEntries(
+  paletteHues.map((hue) => [hue, createIdsPalette(paletteSeeds[hue])!]),
+) as { [hue in PaletteHue]: IdsPalette };
 
 export const neutralShades = Object.fromEntries(
   Object.entries(palette.neutral).map(([step, token]) => [step, token.$value]),

@@ -440,7 +440,7 @@ page with no fill behind it (an outline Badge or Chip, a Rating star, a Radio do
 such as yellow and cyan fall under Lc 60 there. Statuses follow the same roles (`bg-danger-soft`
 with `text-on-danger-soft`, `text-danger` for text). Text on a fill or a soft surface reaches APCA
 Lc 75, `text-X` Lc 60 on the surface and on `bg-X-soft` (short labels, links and messages), and every
-`border-X` (the `text-X` step) at least Lc 45 in both modes, for all 17 demo palettes, pure and tinted neutrals and harmonized and
+`border-X` (the `text-X` step) at least Lc 45 in both modes, for all 17 story palettes, pure and tinted neutrals and harmonized and
 fixed statuses, which `tests/tokens-contrast.test.ts` checks.
 
 **Contrast is APCA, not WCAG 2.** Roles are picked by APCA lightness contrast (`contrastAPCA` from
@@ -772,8 +772,8 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
   half the distance, and stays in its hue range), `'fixed'`, or colors the app picks.
 - `checkIdsTheme` also reports brand families that sit too close to each other or to a status
   (OKLab), a status hue outside its range, and success or warning that look like danger under
-  red-green color blindness. The thresholds come from the 17 reference palettes and
-  `tests/theme-colors.test.ts` derives them again.
+  red-green color blindness. The thresholds were set from the 17 demo palettes that core used
+  to hold and are fixed values now.
 - Chart has no color tokens: a series without `color` takes `bg-primary`, `bg-secondary` and
   `bg-tertiary` in config order (`DEFAULT_SERIES` in `data/chart/config.ts`). A fourth draws in
   neutral and warns in development.
@@ -794,12 +794,13 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
 
 ## Palettes in core
 
-IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral and the 17 demo
-palettes the stories use. ids-react does not ship the 17: `pnpm codegen` fits a model to them
-(`packages/core/palette-model.js`, Fourier series of the 500 hue per step) and writes its
-coefficients and the four status palettes to `src/tokens/palette-model.ts`, which the one-color
-palette builder evaluates, and to `packages/flutter/lib/tokens/ids_palette_model.dart`, which
-`IdsPalette.fromSeed` evaluates to the same 8-bit colors. There are no per-hue role tables: every
+IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral and the four status
+palettes (red, yellow, green, sky). The one-color palette builder evaluates a model whose
+coefficients live in `packages/core/palette-model.json` (Fourier series of the 500 hue per step,
+fitted once to 17 demo palettes that are gone now); `pnpm codegen` copies them and the status
+palettes to `src/tokens/palette-model.ts` and to `packages/flutter/lib/tokens/ids_palette_model.dart`,
+which `IdsPalette.fromSeed` evaluates to the same 8-bit colors. Stories and tests build their 17
+palettes from seed hex values in `.storybook/palettes.ts`. There are no per-hue role tables: every
 platform picks the roles from the app's palette at runtime. `packages/core/color-roles.json` names
 the roles once; the CSS, the React types and the Dart `IdsColors` class are all written from it.
 
