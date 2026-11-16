@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../theme/ids_provider.dart';
-
 import '../divider/ids_divider.dart';
 
 class IdsGroup extends StatelessWidget {
@@ -29,9 +28,7 @@ class IdsGroup extends StatelessWidget {
       direction: orientation,
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: attached
-          ? 0
-          : IdsProvider.maybeOf(context)?.dimension(_gap) ?? _gap,
+      spacing: attached ? 0 : IdsProvider.of(context).dimension(_gap),
       children: children,
     );
 
