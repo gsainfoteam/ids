@@ -1,3 +1,5 @@
+import 'dart:ui' show ColorSpace;
+
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
@@ -80,6 +82,16 @@ void main() {
       expect(
         IdsPalette.fromSeed(const Color(0x800D9488)),
         IdsPalette.fromSeed(const Color(0xFF0D9488)),
+      );
+    });
+
+    test('reads a Display P3 seed as the sRGB color it shows', () {
+      const seed = Color(0xFF0D9488);
+      final p3Seed = seed.withValues(colorSpace: ColorSpace.displayP3);
+
+      expect(
+        _argbOf(IdsPalette.fromSeed(p3Seed)),
+        _argbOf(IdsPalette.fromSeed(seed)),
       );
     });
   });
