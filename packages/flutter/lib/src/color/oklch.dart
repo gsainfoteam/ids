@@ -5,7 +5,9 @@ import 'package:flutter/painting.dart';
 
 typedef Oklch = ({double l, double c, double h});
 
-typedef _Rgb = ({double r, double g, double b});
+typedef Oklab = ({double l, double a, double b});
+
+typedef Rgb = ({double r, double g, double b});
 
 const _chromaRange = 0.4;
 
@@ -44,7 +46,7 @@ double _normalizeHue(double hue) {
   return turned < 0 ? turned + 360 : turned;
 }
 
-Oklch _oklchOfRgb(_Rgb rgb) {
+Oklab oklabOfRgb(Rgb rgb) {
   final r = _toLinear(rgb.r);
   final g = _toLinear(rgb.g);
   final b = _toLinear(rgb.b);
@@ -74,42 +76,27 @@ Oklch _oklchOfRgb(_Rgb rgb) {
       : 0.0259040424655478 * long +
             0.7827717124575296 * medium -
             0.8086757549230774 * short;
-
-  final chroma = math.sqrt(greenRed * greenRed + blueYellow * blueYellow);
-  final hue = chroma != 0
-      ? _normalizeHue((math.atan2(blueYellow, greenRed) * 180) / math.pi)
-      : 0.0;
-  return (l: lightness, c: chroma, h: hue);
+  return (l: lightness, a: greenRed, b: blueYellow);
 }
 
-_Rgb _rgbOf(Oklch color) {
-  final angle = (color.h / 180) * math.pi;
-  final greenRed = color.c != 0 ? color.c * math.cos(angle) : 0.0;
-  final blueYellow = color.c != 0 ? color.c * math.sin(angle) : 0.0;
+Oklch _oklchOfRgb(Rgb rgb) {
+  final lab = oklabOfRgb(rgb);
+  final chroma = math.sqrt(lab.a * lab.a + lab.b * lab.b);
+  final hue = chroma != 0
+      ? _normalizeHue((math.atan2(lab.b, lab.a) * 180) / math.pi)
+      : 0.0;
+  return (l: lab.l, c: chroma, h: hue);
+}
 
+Rgb _rgbOfOklab(Oklab lab) {
   final long = math
-      .pow(
-        color.l +
-            0.3963377773761749 * greenRed +
-            0.2158037573099136 * blueYellow,
-        3,
-      )
+      .pow(lab.l + 0.3963377773761749 * lab.a + 0.2158037573099136 * lab.b, 3)
       .toDouble();
   final medium = math
-      .pow(
-        color.l -
-            0.1055613458156586 * greenRed -
-            0.0638541728258133 * blueYellow,
-        3,
-      )
+      .pow(lab.l - 0.1055613458156586 * lab.a - 0.0638541728258133 * lab.b, 3)
       .toDouble();
   final short = math
-      .pow(
-        color.l -
-            0.0894841775298119 * greenRed -
-            1.2914855480194092 * blueYellow,
-        3,
-      )
+      .pow(lab.l - 0.0894841775298119 * lab.a - 1.2914855480194092 * lab.b, 3)
       .toDouble();
 
   return (
@@ -131,6 +118,15 @@ _Rgb _rgbOf(Oklch color) {
   );
 }
 
+Rgb _rgbOf(Oklch color) {
+  final angle = (color.h / 180) * math.pi;
+  return _rgbOfOklab((
+    l: color.l,
+    a: color.c != 0 ? color.c * math.cos(angle) : 0.0,
+    b: color.c != 0 ? color.c * math.sin(angle) : 0.0,
+  ));
+}
+
 bool _inUnit(double channel) => channel >= 0 && channel <= 1;
 
 bool _displayable(Oklch color) {
@@ -140,10 +136,14 @@ bool _displayable(Oklch color) {
 
 double _clipChannel(double channel) => math.max(0, math.min(channel, 1));
 
-Oklch oklchOf(Color color) {
+Rgb rgbOf(Color color) {
   final srgb = color.withValues(colorSpace: ColorSpace.extendedSRGB);
-  return _oklchOfRgb((r: srgb.r, g: srgb.g, b: srgb.b));
+  return (r: srgb.r, g: srgb.g, b: srgb.b);
 }
+
+Oklch oklchOf(Color color) => _oklchOfRgb(rgbOf(color));
+
+Oklab oklabOf(Color color) => oklabOfRgb(rgbOf(color));
 
 Oklch clampChroma(Oklch color) {
   if (_displayable(color)) return color;
@@ -184,12 +184,32 @@ int _eightBit(double channel) {
   return (unit * 255).round();
 }
 
-Color colorOf(Oklch color) {
-  final rgb = _rgbOf(clampChroma(color));
-  return Color.fromARGB(
-    255,
-    _eightBit(rgb.r),
-    _eightBit(rgb.g),
-    _eightBit(rgb.b),
+Color colorOf(Oklch color) => _colorOfRgb(_rgbOf(clampChroma(color)));
+
+Color _colorOfRgb(Rgb rgb) =>
+    Color.fromARGB(255, _eightBit(rgb.r), _eightBit(rgb.g), _eightBit(rgb.b));
+
+double _lerp(double from, double to, double amount) =>
+    from + amount * (to - from);
+
+Color mixOklab(Color from, Color to, double amount) {
+  final start = oklabOf(from);
+  final end = oklabOf(to);
+  return _colorOfRgb(
+    _rgbOfOklab((
+      l: _lerp(start.l, end.l, amount),
+      a: _lerp(start.a, end.a, amount),
+      b: _lerp(start.b, end.b, amount),
+    )),
   );
 }
+
+double oklabDistanceOf(Oklab first, Oklab second) {
+  final l = first.l - second.l;
+  final a = first.a - second.a;
+  final b = first.b - second.b;
+  return math.sqrt(l * l + a * a + b * b);
+}
+
+double oklabDistance(Color first, Color second) =>
+    oklabDistanceOf(oklabOf(first), oklabOf(second));

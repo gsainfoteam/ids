@@ -39,7 +39,6 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
   시각값 — 그 컴포넌트를 만들 때 Figma에서 확인하고 아래 control surface 절에 값을 적는다.
 
-  - soft: 코드는 `primary`/10 + 전경 `primary`. 문서는 `primary-weak` + `on-primary-weak` (core에 없는 토큰)
   - disabled: 코드는 opacity 0.50. 문서는 opacity-50 또는 disabled 토큰 (core에 없음)
   - 치수: 코드는 `standard` h36 / px16 / r10. 문서와 어긋나는지 미확인
 
@@ -80,7 +79,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 **예외.** `bottom_navigation`은 FE 목록에 없다. Flutter 단독, 이전 기록이 출발점.
 FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 수 있다. 차례에 판단.
 
-`Text`가 없는 동안 컨트롤 안의 텍스트는 `lib/tokens/ids_typography.dart` 상수를 `DefaultTextStyle`로 직접 쓴다.
+`Text`가 없는 동안 컨트롤 안의 텍스트는 `IdsProvider.of(context).textStyle(IdsTypography.bodyB3Medium, color: ...)`를 `DefaultTextStyle`로 쓴다. 이름은 CSS의 `text-body-b3-medium`과 같다.
 
 ## 옮겨야 할 규약
 
@@ -130,24 +129,25 @@ focusVisible = focused
 
 ### control surface — Button / IconButton / Toggle / IconToggle 공통
 
-[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 색 여섯 개를 정하고 variant가 그 색을 쓴다. 아래 값은 임시값이다. `IdsButton` 때 Figma로 덮어쓴다.
+[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySoft`, `textOnPrimary` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
 
-| `colorScheme`                       | fill / on-fill          | accent       | quiet        | hover     | ring      |
-| ----------------------------------- | ----------------------- | ------------ | ------------ | --------- | --------- |
-| `primary`                           | `primary` / `onPrimary` | `primary`    | `onSurface`  | `muted`   | `primary` |
-| `neutral`                           | `onSurface` / `surface` | `onSurface`  | `onSurface`  | `muted`   | `primary` |
-| `danger` `success` `warning` `info` | 그 색 / `on-` 색        | `-strong` 색 | `-strong` 색 | 그 색 10% | 그 색     |
+| `colorScheme`                                 | fill / on-fill                  | fill hover / press                 | quiet         | hover / press                              | ring        |
+| --------------------------------------------- | ------------------------------- | ---------------------------------- | ------------- | ------------------------------------------ | ----------- |
+| `primary` `secondary` `tertiary`              | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderX`   |
+| `neutral`                                     | `onSurface` / `surface`         | fill을 글자 반대쪽으로 10% / 20%   | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderPrimary` |
+| `danger` `success` `warning` `info`           | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `textX`       | `bgXSoft` / `bgXSoftHover`                 | `borderX`   |
 
-|           | 배경 default                   | hover     | active / pressed | 전경    | 테두리·그림자                  |
-| --------- | ------------------------------ | --------- | ---------------- | ------- | ------------------------------ |
-| `solid`   | fill                           | fill 0.90 | fill 0.80        | on-fill | 그림자 `shadow-xs`             |
-| `soft`    | fill 0.10                      | fill 0.15 | fill 0.20        | accent  | 없음                           |
-| `outline` | `surface` (dark: `muted` 0.30) | hover     | hover            | quiet   | 안쪽 1px `border`, `shadow-xs` |
-| `ghost`   | 투명                           | hover     | hover            | quiet   | 없음                           |
+|           | 배경 default                          | hover / active                         | 전경            | 테두리·그림자                        |
+| --------- | ------------------------------------- | -------------------------------------- | --------------- | ------------------------------------ |
+| `solid`   | fill                                  | fill hover / fill press                | on-fill         | 그림자 `shadow-xs`                   |
+| `soft`    | `bgXSoft`                             | `bgXSoftHover` / `bgXSoftActive`       | `textOnXSoft`   | 없음                                 |
+| `outline` | `surface` (dark: `bgNeutralSoft` 0.30) | hover / press                          | quiet           | 안쪽 1px `borderNeutral`, `shadow-xs` |
+| `ghost`   | 투명                                  | hover / press                          | quiet           | 없음                                 |
 
-- 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`, `hover`)이다. `primary`와 `neutral`의 hover는 `muted`다
-- `outline` 테두리는 중립 `border`(neutral 200 · dark 800)다. `IdsTheme`에는 아직 없다: 중립 색은 `ids_theme.dart`에 손으로 적혀 있고 `border`가 빠져 있다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
-- Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 hover 색이다. 켜지면(`pressed`) `ghost`·`outline`은 hover 색, `soft`는 fill 0.10 + accent, `solid`는 fill + on-fill
+- 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`, hover)이다
+- `outline` 테두리는 `colors.borderNeutral`이다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
+- 브랜드 fill을 `withValues(alpha: 0.9)`로 흐리게 하지 않는다. hover·press는 `bgXHover`·`bgXActive`이고, 글자에서 멀어지는 쪽으로 섞여 대비가 떨어지지 않는다
+- Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 hover 색이다. 켜지면(`pressed`) press 단계를 쓴다
 - `active`는 배경만 바뀐다. scale 없음
 - `focusVisible`: 바깥 3px 링(ring 색 0.40)과 안쪽 1px 테두리를 ring 색으로. offset outline이 아니다
 - `disabled`: opacity 0.50. 로딩(`aria-busy`) 중에는 커서만 바뀐다
@@ -157,8 +157,8 @@ focusVisible = focused
 
 |            | 높이 | 좌우 | 아이콘 쪽 | 간격 | 아이콘 | 글자                  |
 | ---------- | ---- | ---- | --------- | ---- | ------ | --------------------- |
-| `standard` | 36   | 16   | 12        | 8    | 16     | `buttonStandard` (14) |
-| `tiny`     | 32   | 12   | 10        | 6    | 14     | `buttonTiny` (12)     |
+| `standard` | 36   | 16   | 12        | 8    | 16     | `bodyB3Medium` (14)   |
+| `tiny`     | 32   | 12   | 10        | 6    | 14     | `captionC1Medium` (12) |
 
 ### 그룹 전파
 

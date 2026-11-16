@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "style-dictionary build --config sd.config.js && node palette-model.js"
+    "build": "style-dictionary build --config sd.config.js && node palette-model.js && node messages.build.mjs && node fonts.build.mjs"
   },
   "devDependencies": {
+    "geist": "1.9.2",
+    "pretendard-gov": "1.3.9",
     "style-dictionary": "^5.4.0",
     "style-dictionary-utils": "^6.0.1"
   }

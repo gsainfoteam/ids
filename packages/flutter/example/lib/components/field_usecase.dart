@@ -28,7 +28,8 @@ class _EmailInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
     final field = IdsField.maybeOf(context)!;
     final tiny = field.size == IdsSize.tiny;
     final icon = tiny ? 14.0 : 16.0;
@@ -36,18 +37,20 @@ class _EmailInput extends StatelessWidget {
       height: tiny ? 32 : 44,
       padding: EdgeInsetsDirectional.only(start: tiny ? 10 : 12, end: 4),
       decoration: BoxDecoration(
-        color: theme.surface,
-        border: Border.all(color: field.invalid ? theme.danger : theme.border),
-        borderRadius: BorderRadius.circular(10),
+        color: colors.surface,
+        border: Border.all(
+          color: field.invalid ? colors.borderDanger : colors.borderNeutral,
+        ),
+        borderRadius: BorderRadius.circular(ids.radius.standard),
       ),
       child: Row(
         spacing: tiny ? 6 : 8,
         children: [
-          Icon(Icons.mail_outline, size: icon, color: theme.onMuted),
+          Icon(Icons.mail_outline, size: icon, color: colors.textNeutral),
           const Expanded(child: Text('hello@ids.example')),
           SizedBox.square(
             dimension: tiny ? 24 : 28,
-            child: Icon(Icons.close, size: icon, color: theme.onMuted),
+            child: Icon(Icons.close, size: icon, color: colors.textNeutral),
           ),
         ],
       ),

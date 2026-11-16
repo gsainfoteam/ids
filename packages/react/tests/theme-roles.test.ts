@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-
 import { describe, expect, test } from 'vitest';
 
 import { palettes } from '../.storybook/palettes';
@@ -8,29 +6,12 @@ import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-vari
 
 import type { IdsPalette } from '../src/components/utility/ids-provider/theme';
 
-const readTokens = (file: string) =>
-  JSON.parse(readFileSync(new URL(`../../core/tokens/semantic/${file}`, import.meta.url), 'utf8'));
-
-const slotOfTheDartName = {
-  primary: 'bg-primary',
-  'on-primary': 'text-on-primary',
-  secondary: 'bg-primary-soft',
-  'on-secondary': 'text-on-primary-soft',
-  accent: 'text-primary',
-} as const;
-
 describe.each(Object.keys(palettes))('%s', (hue) => {
   const { issues } = resolveColors({ primary: palettes[hue as keyof typeof palettes] });
 
   test('passes every role rule', () => {
     expect(issues).toEqual([]);
   });
-});
-
-test('the Dart table keeps the old names, outline included', () => {
-  expect(Object.keys(readTokens('blue.light.json').color).sort()).toEqual(
-    [...Object.keys(slotOfTheDartName), 'outline'].sort(),
-  );
 });
 
 describe('checkIdsTheme', () => {

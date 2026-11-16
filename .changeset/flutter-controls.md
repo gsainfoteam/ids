@@ -9,6 +9,3 @@ follows Figma. Divider draws a 1px neutral line with an optional centered label,
 takes its size and color from `IconTheme` unless given `IdsSize.standard` or `tiny`. Field
 hands `size`, `required`, `disabled` and `invalid` down to its parts: disabled fades the whole
 field, and invalid swaps the hint for the error while the label keeps its color.
-
-`ThemeProvider` now sets the default text and icon color to `onSurface`, so widgets that follow
-the surrounding color stay visible in dark mode. `IdsTheme` gains `border` and `danger`.

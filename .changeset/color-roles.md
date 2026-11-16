@@ -31,4 +31,3 @@ namespace maps only the roles that fit it, and no shared `--color-<role>` is emi
   `bg-secondary` and `bg-tertiary` in config order; a fourth draws in neutral and warns in
   development. `color` takes a family
   name or any CSS color; `'accent'` and `'on-muted'` are gone (`'primary'`, `'neutral'`).
-- Flutter keeps the old role names; `ids_flutter`'s tokens do not change.

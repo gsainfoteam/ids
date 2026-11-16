@@ -13,9 +13,6 @@ const idsVar = (prefix, t) => `--ids-${prefix}-${slug(t)}`;
 const toCamel = (str) =>
   str.replace(/-([a-zA-Z0-9]+)/g, (_, s) => s.charAt(0).toUpperCase() + s.slice(1));
 const enumName = (key) => `Ids${key.charAt(0).toUpperCase() + key.slice(1)}`;
-const mapName = (color, mode) =>
-  `_${color}${mode.charAt(0).toUpperCase() + mode.slice(1)}`;
-
 const hexToFlutterColor = (hex) =>
   `const Color(0xFF${hex.replace("#", "").toUpperCase()})`;
 
@@ -81,14 +78,11 @@ const flattenTypography = (node, path = []) => {
   );
 };
 
-const readTypographyEntries = (palette, { withFlutterOnly = false } = {}) => {
+const readTypographyEntries = (palette) => {
   const json = JSON.parse(
     readFileSync("./tokens/semantic/typography.json", "utf8"),
   );
-  return [
-    ...flattenTypography(json.text ?? {}),
-    ...(withFlutterOnly ? flattenTypography(json["flutter-only"] ?? {}) : []),
-  ].map((entry) => ({
+  return flattenTypography(json.text ?? {}).map((entry) => ({
     name: entry.name,
     fontSize: resolveRef(entry.fontSize, palette),
     fontWeight: resolveRef(entry.fontWeight, palette),
@@ -112,8 +106,6 @@ const parseEnums = (dictionary) => {
   return result;
 };
 
-const MODE_WIDE_COLOR_FILES = ["neutral", "status"];
-
 const COLOR_ROLES = JSON.parse(readFileSync("./color-roles.json", "utf8"));
 
 const COLOR_FAMILIES = Object.values(COLOR_ROLES.families).flat();
@@ -136,17 +128,6 @@ const BASE_SLOTS = Object.keys(COLOR_ROLES.base);
 const colorVar = (slot) => `--ids-color-${slot}`;
 
 const themeVar = (mode, slot) => `--ids-theme-${mode}-${slot}`;
-
-const colorPairs = [
-  ...new Map(
-    readdirSync("./tokens/semantic").flatMap((f) => {
-      const m = f.match(/^([^.]+)\.(light|dark)\.json$/);
-      return m && !MODE_WIDE_COLOR_FILES.includes(m[1])
-        ? [[`${m[1]}.${m[2]}`, [m[1], m[2]]]]
-        : [];
-    }),
-  ).values(),
-];
 
 const TW_NS = {
   color: "--color-",
@@ -212,32 +193,6 @@ abstract final class {{NAME}} {
 {{MEMBERS}}
 }
 `;
-
-const T_DART_IDS_TOKENS = `${GENERATED}
-
-import 'package:flutter/material.dart';
-import 'ids_enums.dart';
-
-class IdsTokens {
-  IdsTokens._();
-
-  static Color resolve({
-    required IdsColor color,
-    required IdsMode mode,
-    required String token,
-  }) {
-    return switch ((color, mode)) {
-{{CASES}}
-    };
-  }
-
-{{MAPS}}
-}
-`;
-
-const T_DART_COLOR_MAP = `  static const {{NAME}} = <String, Color>{
-{{ENTRIES}}
-  };`;
 
 const T_DART_ENUM = `enum {{NAME}} {
 {{VALUES}},
@@ -684,6 +639,8 @@ const tsColorRolesFormatter = ({ dictionary }) =>
 const dartEnumsFormatter = ({ dictionary }) => {
   const enums = parseEnums(dictionary);
   const blocks = Object.entries(enums)
+    .filter(([key]) => key !== "color")
+    .map(([key, values]) => [key, key === "mode" ? [...values, "system"] : values])
     .map(([key, values]) =>
       render(T_DART_ENUM, {
         NAME: enumName(key),
@@ -699,33 +656,100 @@ const dartEnumsFormatter = ({ dictionary }) => {
   return `${GENERATED}\n\n${blocks}\n`;
 };
 
-const dartColorTokensFormatter = ({ dictionary }) => {
-  const palette = buildPalette(dictionary);
-  const toColorLine = ({ name, value }) =>
-    `    '${name}': ${hexToFlutterColor(value)},`;
+const dartList = (values) => `<String>[${values.map((v) => `'${v}'`).join(", ")}]`;
 
-  const cases = colorPairs
-    .map(
-      ([c, m]) =>
-        `      (IdsColor.${c}, IdsMode.${m}) => ${mapName(c, m)}[token] ?? Colors.transparent,`,
-    )
-    .join("\n");
+const dartRoleField = (slot) => toCamel(slot);
 
-  const maps = colorPairs
-    .map(([c, m]) =>
-      render(T_DART_COLOR_MAP, {
-        NAME: mapName(c, m),
-        ENTRIES: [
-          ...readColorEntriesWithoutCollision(c, m, palette),
-          ...readColorEntriesWithoutCollision("status", m, palette),
-        ]
-          .map(toColorLine)
-          .join("\n"),
-      }),
-    )
-    .join("\n\n");
+const T_DART_COLOR_ROLES = `${GENERATED}
 
-  return render(T_DART_IDS_TOKENS, { CASES: cases, MAPS: maps });
+import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
+
+import 'ids_enums.dart';
+
+abstract final class IdsColorRoles {
+{{LISTS}}
+
+  static const neutralPalette = <int, Color>{
+{{NEUTRAL_PALETTE}}
+  };
+
+  static const neutralSteps = <IdsMode, Map<String, int>>{
+{{NEUTRAL_STEPS}}
+  };
+
+  static List<String> slotsOf(String family) => [
+    for (final slot in familySlots) slot.replaceAll('{family}', family),
+  ];
+}
+
+@immutable
+class IdsColors {
+  const IdsColors({
+{{PARAMS}}
+  });
+
+  factory IdsColors.fromRoles(Map<String, Color> roles) {
+    Color role(String name) =>
+        roles[name] ?? (throw ArgumentError.value(name, 'roles', 'is missing'));
+    return IdsColors(
+{{FROM_ROLES}}
+    );
+  }
+
+{{FIELDS}}
+
+  Map<String, Color> get roles => {
+{{ROLES}}
+  };
+
+  Color operator [](String role) =>
+      roles[role] ?? (throw ArgumentError.value(role, 'role', 'is not an IDS color role'));
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsColors &&
+{{EQUALS}};
+
+  @override
+  int get hashCode => Object.hashAll(roles.values);
+}
+`;
+
+const dartColorRolesFormatter = ({ dictionary }) => {
+  const allSlots = [...BASE_SLOTS, ...FAMILY_SLOTS.map(({ slot }) => slot)];
+  const lists = [
+    ...Object.entries(COLOR_ROLES.families).map(
+      ([group, families]) => `  static const ${group}Families = ${dartList(families)};`,
+    ),
+    `  static const families = ${dartList(COLOR_FAMILIES)};`,
+    `  static const baseSlots = ${dartList(BASE_SLOTS)};`,
+    `  static const familySlots = ${dartList(slotsOf("{family}").map(({ slot }) => slot))};`,
+    `  static const all = ${dartList(allSlots)};`,
+  ];
+  const neutral = Object.entries(neutralPalette(dictionary)).map(
+    ([step, hex]) => `    ${step}: ${hexToFlutterColor(hex.replaceAll("'", "")).replace(/^const /, "")},`,
+  );
+  const steps = ["light", "dark"].map(
+    (mode) =>
+      `    IdsMode.${mode}: {\n${Object.entries(neutralSteps(mode))
+        .map(([slot, step]) => `      '${slot}': ${step},`)
+        .join("\n")}\n    },`,
+  );
+  return render(T_DART_COLOR_ROLES, {
+    LISTS: lists.join("\n"),
+    NEUTRAL_PALETTE: neutral.join("\n"),
+    NEUTRAL_STEPS: steps.join("\n"),
+    PARAMS: allSlots.map((slot) => `    required this.${dartRoleField(slot)},`).join("\n"),
+    FROM_ROLES: allSlots
+      .map((slot) => `      ${dartRoleField(slot)}: role('${slot}'),`)
+      .join("\n"),
+    FIELDS: allSlots.map((slot) => `  final Color ${dartRoleField(slot)};`).join("\n"),
+    ROLES: allSlots.map((slot) => `    '${slot}': ${dartRoleField(slot)},`).join("\n"),
+    EQUALS: allSlots
+      .map((slot) => `      other.${dartRoleField(slot)} == ${dartRoleField(slot)}`)
+      .join(" &&\n"),
+  });
 };
 
 const dartMotionFormatter = ({ dictionary }) =>
@@ -739,22 +763,40 @@ const dartMotionFormatter = ({ dictionary }) =>
       .join("\n"),
   });
 
+const fontStack = (dictionary, name) =>
+  val(byPath(dictionary, "font-family").find((t) => t.path[1] === name));
+
+const FAMILIES_FLUTTER_CANNOT_NAME = ["sans-serif", "ui-monospace"];
+
+const bundledFontPath = (fontFamily, fontPackage) => `packages/${fontPackage}/${fontFamily}`;
+
+const flutterFallback = (stack, monoFontFamily, sansFontFamily, fontPackage) => [
+  ...new Set(
+    stack
+      .filter((name) => !FAMILIES_FLUTTER_CANNOT_NAME.includes(name))
+      .filter((name) => !monoFontFamily.startsWith(name))
+      .map((name) =>
+        name.startsWith("Pretendard") ? bundledFontPath(sansFontFamily, fontPackage) : name,
+      ),
+  ),
+];
+
 const dartTypographyFormatter = ({ dictionary }) => {
   const palette = buildPalette(dictionary);
-  const sansFontFamily = byPath(dictionary, "font-family")
-    .find((t) => t.path[1] === "sans");
-  const baseFontFamily = sansFontFamily
-    ? val(sansFontFamily)[0]
-    : "Pretendard GOV Variable";
-  const fontFamily = baseFontFamily;
+  const [sansFontFamily] = fontStack(dictionary, "sans");
+  const [monoFontFamily, ...monoFallback] = fontStack(dictionary, "mono");
   const fontPackage = "ids_flutter";
   const members = [
-    `  static const sansFontFamily = '${fontFamily}';`,
+    `  static const sansFontFamily = '${sansFontFamily}';`,
     `  static const sansFontPackage = '${fontPackage}';`,
-    ...readTypographyEntries(palette, { withFlutterOnly: true }).map(
+    `  static const monoFontFamily = '${bundledFontPath(monoFontFamily, fontPackage)}';`,
+    `  static const monoFontFamilyFallback = ${dartList(
+      flutterFallback(monoFallback, monoFontFamily, sansFontFamily, fontPackage),
+    )};`,
+    ...readTypographyEntries(palette).map(
       ({ name, fontSize, fontWeight, lineHeight, letterSpacing }) =>
         `  static const ${toCamel(name)} = ${render(T_DART_TEXT_STYLE, {
-          FONT_FAMILY: fontFamily,
+          FONT_FAMILY: sansFontFamily,
           FONT_PACKAGE: fontPackage,
           FONT_SIZE: parseFloat(fontSize),
           FONT_WEIGHT: parseInt(fontWeight),
@@ -774,7 +816,7 @@ for (const [name, format] of [
   ["ids/ts-types", tsTypesFormatter],
   ["ids/ts-color-roles", tsColorRolesFormatter],
   ["ids/dart-enums", dartEnumsFormatter],
-  ["ids/dart-color-tokens", dartColorTokensFormatter],
+  ["ids/dart-color-roles", dartColorRolesFormatter],
   ["ids/dart-motion", dartMotionFormatter],
   ["ids/dart-typography", dartTypographyFormatter],
 ]) {
@@ -802,8 +844,8 @@ export default {
       files: [
         { destination: "../flutter/lib/tokens/ids_enums.dart", format: "ids/dart-enums" },
         {
-          destination: "../flutter/lib/tokens/ids_color_tokens.dart",
-          format: "ids/dart-color-tokens",
+          destination: "../flutter/lib/tokens/ids_color_roles.dart",
+          format: "ids/dart-color-roles",
         },
         { destination: "../flutter/lib/tokens/ids_motion.dart", format: "ids/dart-motion" },
         {

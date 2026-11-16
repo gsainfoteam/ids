@@ -1,0 +1,17 @@
+base_locale: ko
+input_directory: assets/i18n
+output_directory: lib/i18n
+output_file_name: translations.g.dart
+flutter_integration: true
+lazy: false
+locale_handling: true
+timestamp: false
+statistics: false
+autodoc:
+  enabled: false
+string_interpolation: braces
+imports:
+  - 'package:ids_flutter/ids.dart'
+interfaces:
+  IdsMessages:
+    generate_mixin: false

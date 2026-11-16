@@ -9,7 +9,7 @@ packages/
   core/     tokens + Style Dictionary codegen. Private — not published.
   css/      @gsainfoteam/ids-css GitHub Packages npm package. CSS variables + Tailwind @theme.
   react/    @gsainfoteam/ids-react GitHub Packages npm package. React components + IdsProvider.
-  flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + ThemeProvider.
+  flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + IdsProvider.
 examples/
   next-app-router/  tanstack-start/  astro/   private apps that install IDS the way a consumer does.
 ```
@@ -20,13 +20,20 @@ stylesheet holds a class only `@source` on `ids-react/dist` produces. Changesets
 
 ## Generated files — do not edit manually
 
-These files are written by `pnpm codegen` (Style Dictionary build). Edits will be overwritten.
+These files are written by `pnpm codegen` (Style Dictionary, message generation and the font copy). Edits will be overwritten.
 
 - `packages/css/dist/ids.css`
 - `packages/react/src/tokens/types.ts`
 - `packages/react/src/tokens/palette-model.ts` and
   `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/palette-model.js`)
-- `packages/flutter/lib/tokens/*.dart`
+- `packages/react/src/internal/messages-catalog.ts`
+- `packages/react/messages/en.json`
+- `packages/flutter/lib/tokens/*.dart`, including `ids_color_roles.dart` (`IdsColors`, written from
+  `packages/core/color-roles.json`)
+- `packages/flutter/lib/messages/ids_messages.dart`
+- `packages/flutter/messages/ko.i18n.json`
+- `packages/flutter/fonts/*` (`packages/core/fonts.build.mjs` copies them from the `pretendard-gov` and
+  `geist` npm packages, so the Flutter fonts move with the versions in `packages/core/package.json`)
 
 To change tokens: edit files under `packages/core/tokens/`, then run `pnpm codegen`.
 
@@ -493,9 +500,9 @@ has them all: drawn as text they fall back to a system font that sits them off c
 **Strings.** User-facing strings go through `useTranslate()` with a stable dotted key
 (`t('dialog.close')`, `t('textArea.remaining', { remaining })`), never a Korean literal and never
 a module-level read of `messages`, so the nearest `IdsProvider translate` decides the language on
-the server and the client alike. The Korean defaults live nested in `internal/messages.ts`, sorted
+the server and the client alike. The Korean defaults live in `packages/core/messages/ko.json`, sorted
 by group and key, as ICU strings with plain `{name}` arguments; a new key also goes into
-`messages/en.json` at the same place. `IdsMessageKey` is the union of their dotted leaf paths.
+`packages/core/messages/en.json` at the same place. Run `pnpm codegen` to refresh the catalogs. `IdsMessageKey` is the union of their dotted leaf paths.
 Developer warnings stay English and out of the catalog. A default that has to be a function
 (`getValueLabel`) is built in the body from `t`, not in the parameter list. Dates, times and numbers
 take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
@@ -746,9 +753,9 @@ may remount the story. Inputs whose focus a play checks carry `data-1p-ignore` a
 
 ## IdsProvider
 
-Every IDS component relies on the theme `IdsProvider` writes on its root (`ThemeProvider` in
-Flutter): `data-mode` and inline variables. Without it, the brand variables are undefined and
-colors will not render.
+Every IDS component relies on the theme `IdsProvider` writes on its root: `data-mode` and inline
+variables. Without it, the brand variables are undefined and colors will not render. Flutter's
+`IdsProvider` takes the same theme fields and resolves the same roles (see Flutter runtime provider).
 
 ```tsx
 const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'round' });
@@ -795,13 +802,9 @@ coefficients live in `packages/core/palette-model.json` (Fourier series of the 5
 fitted once to 17 demo palettes that are gone now); `pnpm codegen` copies them and the status
 palettes to `src/tokens/palette-model.ts` and to `packages/flutter/lib/tokens/ids_palette_model.dart`,
 which `IdsPalette.fromSeed` evaluates to the same 8-bit colors. Stories and tests build their 17
-palettes from seed hex values in `.storybook/palettes.ts`. The per-hue
-`semantic/[color].{light,dark}.json` files (with hex values where they pointed at a removed palette)
-and the `color` enum feed only the Dart output until Flutter takes a runtime palette too (#33); the
-CSS and the React types no longer read them. The Dart formatter keeps the old role names
-(`primary`, `on-primary`, `secondary`, `on-secondary`, `accent`, `outline`) from those files, so
-`packages/flutter/lib/tokens/*.dart` stay byte-identical while the CSS and React use the family
-roles.
+palettes from seed hex values in `.storybook/palettes.ts`. There are no per-hue role tables: every
+platform picks the roles from the app's palette at runtime. `packages/core/color-roles.json` names
+the roles once; the CSS, the React types and the Dart `IdsColors` class are all written from it.
 
 ## Versioning — Changesets (fixed mode)
 
@@ -844,3 +847,32 @@ graph LR
 ```
 
 `core` is never a runtime dependency of anything. It is a build-time code generator only.
+
+
+## Flutter runtime provider
+
+ids_flutter follows ids-react's theme. The design is decided in React; Flutter ports it.
+
+- `IdsProvider(theme: IdsTheme(...), mode: ...)` takes the same fields as `defineIdsTheme`:
+  `primary` (required), `secondary`, `tertiary` (each `IdsPalette` or `IdsThemeColor.seed(color)`),
+  `neutral`, `status`, `radius`, `cornerShape`, `scale`. `IdsProviderScope(theme: IdsThemeOverrides(...))`
+  is `IdsProvider.Scope`. Nested providers inherit what they leave out; a scope with its own `mode`
+  or `defaultMode` owns its mode, the others forward `setMode` and `toggleMode` to the owner.
+  `IdsMode.system` follows the platform brightness.
+- `lib/src/color` ports `ids-provider/theme-roles.ts`, `contrast.ts` (APCA from colorjs.io),
+  `derived-brands.ts`, `status.ts` and the `checkIdsTheme` checks line by line, so a theme gives the
+  same 8-bit colors on both platforms. `packages/react/tests/flutter-parity.test.ts` writes
+  `packages/core/tests/fixtures/theme-roles.json` (17 palettes × pure/tinted × harmonized/fixed ×
+  light/dark) and `test/theme_roles_parity_test.dart` checks every role against it. A change to
+  the role rules updates both ports and the fixture (`vitest run --project node
+  tests/flutter-parity.test.ts -u`) in one commit.
+- Components read roles with `IdsProvider.of(context).colors.bgPrimarySoft` and pick them the way
+  the React component does (field borders `borderNeutral`, invalid `borderDanger`, secondary text
+  `textNeutral`). Text goes through `textStyle(IdsTypography.x, color: ...)`, which sets
+  `inherit: false`, the fixed fonts (Pretendard GOV, Geist Mono) and `scale`; sizes go through
+  `dimension`, corners through `radius` and `shape()`.
+- IDS styles stay inside IDS components; Material and Cupertino themes are not touched.
+
+Flutter strings use the generated `IdsMessages` mixin. Consumers supply a slang object through `translation`; component code falls back per member with `t?.spinnerLabel ?? IdsMessages.ko.spinnerLabel`. Edit `packages/core/messages/ko.json` and `en.json`, then run `pnpm codegen`. Do not hand-edit generated Dart messages or catalogs.
+
+Before Flutter tests or analysis, run `dart run slang` in both `packages/flutter` and `packages/flutter/example` to generate the service fixtures.

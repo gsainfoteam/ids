@@ -412,27 +412,5 @@
         }
       }
     }
-  },
-  "flutter-only": {
-    "button": {
-      "standard": {
-        "$type": "typography",
-        "$value": {
-          "fontSize": "{font-size.b3}",
-          "fontWeight": "{font-weight.medium}",
-          "lineHeight": "{line-height.none}",
-          "letterSpacing": "{letter-spacing.normal}"
-        }
-      },
-      "tiny": {
-        "$type": "typography",
-        "$value": {
-          "fontSize": "{font-size.c1}",
-          "fontWeight": "{font-weight.medium}",
-          "lineHeight": "{line-height.none}",
-          "letterSpacing": "{letter-spacing.normal}"
-        }
-      }
-    }
   }
 }
