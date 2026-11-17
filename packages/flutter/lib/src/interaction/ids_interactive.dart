@@ -51,6 +51,7 @@ class IdsInteractive extends StatefulWidget {
     required this.builder,
     this.onPressed,
     this.disabled = false,
+    this.focusableWhenDisabled = false,
     this.pressed = false,
     this.onInteractionChange,
     this.focusNode,
@@ -63,6 +64,7 @@ class IdsInteractive extends StatefulWidget {
   final VoidCallback? onPressed;
 
   final bool disabled;
+  final bool focusableWhenDisabled;
   final bool pressed;
 
   final ValueChanged<IdsInteractiveState>? onInteractionChange;
@@ -110,7 +112,11 @@ class _IdsInteractiveState extends State<IdsInteractive> {
         widget.pressed == oldWidget.pressed) {
       return;
     }
-    if (widget.disabled) _active = false;
+    if (widget.disabled) {
+      _hovered = false;
+      _active = false;
+      _spaceHeld = false;
+    }
     _reportAfterFrame();
   }
 
@@ -157,11 +163,10 @@ class _IdsInteractiveState extends State<IdsInteractive> {
     final enter =
         key == LogicalKeyboardKey.enter ||
         key == LogicalKeyboardKey.numpadEnter;
-    if (widget.disabled ||
-        !node.hasPrimaryFocus ||
-        !(enter || key == LogicalKeyboardKey.space)) {
+    if (!node.hasPrimaryFocus || !(enter || key == LogicalKeyboardKey.space)) {
       return KeyEventResult.ignored;
     }
+    if (widget.disabled) return KeyEventResult.handled;
     if (event is KeyDownEvent) {
       if (!enter) _spaceHeld = true;
       _set(() => _active = true);
@@ -180,7 +185,7 @@ class _IdsInteractiveState extends State<IdsInteractive> {
     return Focus(
       focusNode: _node,
       autofocus: widget.autofocus,
-      canRequestFocus: enabled,
+      canRequestFocus: enabled || widget.focusableWhenDisabled,
       onFocusChange: _handleFocusChange,
       onKeyEvent: _handleKey,
       child: MouseRegion(

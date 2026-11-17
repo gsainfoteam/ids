@@ -215,6 +215,23 @@ return IdsProvider(
 - `fontFamily`, `monoFontFamily` 는 없다. 글꼴은 고정이다.
 - `IdsTypography.buttonStandard`, `buttonTiny` 는 `bodyB3Medium`, `captionC1Medium` 이다.
 
+## Button
+
+`IdsButton`은 `variant`, `colorScheme`, `size`를 지원한다. `leading`과 `trailing`에 넣은 아이콘은 버튼의 색상과 크기를 상속한다. `IdsButton.builder`와 `onInteractionChange`로 포커스, 호버, 누르는 중 같은 상태를 읽을 수 있다. `onPressed`를 생략하거나 `disabled`를 켜면 비활성화된다.
+
+```dart
+IdsButton(
+  onPressed: save,
+  disabled: saving,
+  busy: saving,
+  focusableWhenDisabled: true,
+  leading: saving ? const IdsSpinner(decorative: true) : null,
+  child: Text(saving ? '저장 중' : '저장'),
+)
+```
+
+`busy`는 진행 커서와 접근성 안내를 적용한다. `disabled`가 재실행을 막고 `focusableWhenDisabled`가 키보드 포커스를 유지한다.
+
 ## 개발과 Widgetbook
 
 ```bash
