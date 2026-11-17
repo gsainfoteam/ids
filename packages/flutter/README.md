@@ -232,6 +232,8 @@ IdsButton(
 
 `busy`는 진행 커서와 접근성 안내를 적용한다. `disabled`가 재실행을 막고 `focusableWhenDisabled`가 키보드 포커스를 유지한다.
 
+부모가 가로 너비를 정하는 곳에서 `SizedBox(width: double.infinity, child: IdsButton(...))`으로 버튼을 가로로 채울 수 있다.
+
 ## 개발과 Widgetbook
 
 ```bash

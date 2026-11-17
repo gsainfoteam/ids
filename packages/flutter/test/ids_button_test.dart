@@ -60,6 +60,31 @@ void main() {
     }
   });
 
+  testWidgets('fills a bounded width and responds to taps near the edge', (
+    tester,
+  ) async {
+    var presses = 0;
+    await pumpButton(
+      tester,
+      SizedBox(
+        width: 280,
+        child: SizedBox(
+          width: double.infinity,
+          child: IdsButton(
+            onPressed: () => presses++,
+            child: const Text('Save'),
+          ),
+        ),
+      ),
+    );
+
+    final button = tester.getRect(find.byType(IdsButton));
+    expect(button.size, const Size(280, 36));
+    expect(tester.getCenter(find.text('Save')), button.center);
+    await tester.tapAt(button.centerRight.translate(-8, 0));
+    expect(presses, 1);
+  });
+
   testWidgets('uses the generated status colors for solid and outline states', (
     tester,
   ) async {

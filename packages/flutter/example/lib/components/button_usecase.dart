@@ -74,6 +74,15 @@ final buttonUseCases = [
                   ),
                 ],
               ),
+            const Text('Full width'),
+            SizedBox(
+              width: double.infinity,
+              child: IdsButton(
+                leading: const Icon(Icons.check),
+                onPressed: () {},
+                child: const Text('확인'),
+              ),
+            ),
           ],
         ),
       ),
