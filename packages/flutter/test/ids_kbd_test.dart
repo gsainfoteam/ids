@@ -10,6 +10,35 @@ class _Messages with IdsMessages {
 }
 
 void main() {
+  testWidgets('draws Shift separately from arrows and renders special glyphs', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: IdsProvider(
+          theme: testTheme,
+          child: Column(
+            children: [
+              IdsKbd(keys: 'Shift+ArrowUp', platform: TargetPlatform.macOS),
+              IdsKbd(child: '⌦␣↖↘', platform: TargetPlatform.macOS),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final shiftAndArrow = find.byType(IdsKbd).first;
+    expect(
+      find.descendant(of: shiftAndArrow, matching: find.byType(CustomPaint)),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.arrow_upward), findsOneWidget);
+    expect(find.byIcon(Icons.backspace_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.space_bar), findsOneWidget);
+    expect(find.byIcon(Icons.north_west), findsOneWidget);
+    expect(find.byIcon(Icons.south_east), findsOneWidget);
+  });
+
   testWidgets('shows localized modifier names and platform ordering', (
     tester,
   ) async {

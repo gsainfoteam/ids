@@ -7,22 +7,68 @@ typedef KbdFace = ({List<String> parts, String label});
 bool isMacKbd(TargetPlatform platform) =>
     platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
 
-IconData? kbdIcon(String glyph) => const {
+IconData? _iconData(String glyph) => const {
   '⌘': Icons.keyboard_command_key,
   '⌃': Icons.keyboard_control_key,
   '⌥': Icons.keyboard_option_key,
-  '⇧': Icons.arrow_upward_outlined,
   '↩': Icons.keyboard_return,
   '⏎': Icons.keyboard_return,
   '↵': Icons.keyboard_return,
   '⌫': Icons.backspace_outlined,
+  '⌦': Icons.backspace_outlined,
+  '␣': Icons.space_bar,
   '⇥': Icons.keyboard_tab,
   '⇪': Icons.keyboard_capslock,
   '↑': Icons.arrow_upward,
   '↓': Icons.arrow_downward,
   '←': Icons.arrow_back,
   '→': Icons.arrow_forward,
+  '↖': Icons.north_west,
+  '↘': Icons.south_east,
 }[glyph];
+
+Widget? kbdIcon(String glyph, {required double size, required Color color}) {
+  if (glyph == '⇧') {
+    return CustomPaint(size: Size.square(size), painter: _ShiftPainter(color));
+  }
+  final data = _iconData(glyph);
+  if (data == null) return null;
+  final icon = Icon(data, size: size, color: color);
+  return glyph == '⌦' ? Transform.flip(flipX: true, child: icon) : icon;
+}
+
+class _ShiftPainter extends CustomPainter {
+  const _ShiftPainter(this.color);
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 12);
+    final outline = Path()
+      ..moveTo(6, 1.4)
+      ..lineTo(11, 6.6)
+      ..lineTo(8, 6.6)
+      ..lineTo(8, 10.6)
+      ..lineTo(4, 10.6)
+      ..lineTo(4, 6.6)
+      ..lineTo(1, 6.6)
+      ..close();
+    canvas.drawPath(
+      outline,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.1
+        ..strokeJoin = StrokeJoin.round,
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_ShiftPainter oldDelegate) => color != oldDelegate.color;
+}
 
 const _aliases = {
   'ctrl': 'control',

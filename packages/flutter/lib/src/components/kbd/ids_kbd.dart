@@ -84,12 +84,13 @@ class IdsKbd extends StatelessWidget {
                     spacing: theme.dimension(2),
                     children: [
                       for (final part in face.parts)
-                        if (kbdIcon(part) case final icon?)
-                          Icon(
-                            icon,
-                            color: color,
-                            size: theme.dimension(tiny ? 10 : 12),
-                          )
+                        if (kbdIcon(
+                              part,
+                              color: color,
+                              size: theme.dimension(tiny ? 10 : 12),
+                            )
+                            case final icon?)
+                          icon
                         else
                           Text(part, style: captions),
                     ],
