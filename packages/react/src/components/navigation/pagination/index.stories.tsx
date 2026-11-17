@@ -9,7 +9,7 @@ import { Pagination } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
+const variants = ['soft', 'solid', 'outline', 'ghost', 'glossy'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const meta = {
@@ -31,7 +31,7 @@ const meta = {
     siblingCount: 1,
     boundaryCount: 1,
     size: 'standard',
-    variant: 'solid',
+    variant: 'soft',
     disabled: false,
     onPageChange: fn(),
   },

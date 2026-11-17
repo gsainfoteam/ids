@@ -7,7 +7,7 @@ export const paginationStyle = tv({
     root: 'flex min-w-0',
     list: 'flex flex-wrap items-center gap-1',
     item: 'flex',
-    link: 'tabular-nums aria-[current=page]:data-[variant=ghost]:bg-(--control-press)',
+    link: 'tabular-nums aria-[current=page]:data-[variant=ghost]:text-primary',
     arrow: 'rtl:[&_svg]:-scale-x-100',
     ellipsis:
       'flex shrink-0 items-center justify-center text-neutral select-none [&_svg]:pointer-events-none',
