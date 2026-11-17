@@ -20,6 +20,88 @@ Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
 );
 
 void main() {
+  testWidgets('validation uses Field spacing and styling and clears on reset', (
+    tester,
+  ) async {
+    final form = GlobalKey<FormState>();
+    await pump(
+      tester,
+      Form(
+        key: form,
+        child: const IdsField(
+          required: true,
+          children: [
+            IdsFieldLabel(child: Text('Name')),
+            IdsTextField(),
+            IdsFieldHint(child: Text('Hint')),
+          ],
+        ),
+      ),
+    );
+
+    final label = find.text('Name');
+    final error = find.text(IdsMessages.ko.textFieldRequired);
+    final surface = find
+        .descendant(
+          of: find.byType(IdsTextField),
+          matching: find.byType(AnimatedContainer),
+        )
+        .first;
+    final colors = IdsProvider.of(tester.element(label)).colors;
+    Color? labelColor() =>
+        DefaultTextStyle.of(tester.element(label)).style.color;
+    expect(labelColor(), colors.onSurface);
+    expect(form.currentState!.validate(), isFalse);
+    await tester.pumpAndSettle();
+
+    expect(labelColor(), colors.textDanger);
+    expect(find.text('Hint'), findsNothing);
+    expect(tester.widget<Text>(error).style!.fontSize, 14);
+    expect(tester.getTopLeft(error).dy - tester.getBottomLeft(surface).dy, 8);
+
+    form.currentState!.reset();
+    await tester.pumpAndSettle();
+    expect(labelColor(), colors.onSurface);
+    expect(error, findsNothing);
+    expect(find.text('Hint'), findsOneWidget);
+  });
+
+  testWidgets('a provider update preserves the first registered input', (
+    tester,
+  ) async {
+    final first = FocusNode();
+    final second = FocusNode();
+    addTearDown(first.dispose);
+    addTearDown(second.dispose);
+    var mode = IdsMode.light;
+    late StateSetter rebuild;
+    await pump(
+      tester,
+      StatefulBuilder(
+        builder: (context, setState) {
+          rebuild = setState;
+          return IdsField(
+            children: [
+              const IdsFieldLabel(child: Text('Name')),
+              IdsProviderScope(
+                mode: mode,
+                child: IdsTextField(focusNode: first),
+              ),
+              IdsTextField(focusNode: second),
+            ],
+          );
+        },
+      ),
+    );
+
+    rebuild(() => mode = IdsMode.dark);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Name'));
+    await tester.pumpAndSettle();
+    expect(first.hasPrimaryFocus, isTrue);
+    expect(second.hasPrimaryFocus, isFalse);
+  });
+
   testWidgets(
     'moves the focus ring with the input rather than a trailing action',
     (tester) async {

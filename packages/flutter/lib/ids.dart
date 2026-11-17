@@ -18,7 +18,8 @@ export 'src/interaction/ids_interactive.dart';
 
 export 'src/components/button/ids_button.dart';
 export 'src/components/divider/ids_divider.dart';
-export 'src/components/field/ids_field.dart';
+export 'src/components/field/ids_field.dart'
+    hide FieldControlBinding, bindFieldControl;
 export 'src/components/icon_button/ids_icon_button.dart';
 export 'src/components/kbd/ids_kbd.dart';
 export 'src/components/label/ids_label.dart';

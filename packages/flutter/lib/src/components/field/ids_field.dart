@@ -24,38 +24,80 @@ class IdsField extends StatefulWidget {
   static IdsField? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<_IdsFieldScope>()?.field;
 
-  static VoidCallback? bindControl(BuildContext context, FocusNode node) {
+  static String? controlLabelOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_IdsFieldScope>()?.label;
+
+  static _IdsFieldScope _of(BuildContext context, String part) {
     final scope = context.dependOnInheritedWidgetOfExactType<_IdsFieldScope>();
-    if (scope == null) return null;
-    scope.controls.add(node);
-    return () => scope.controls.remove(node);
-  }
-
-  static String? controlLabelOf(BuildContext context) {
-    final field = maybeOf(context);
-    for (final child in field?.children ?? const <Widget>[]) {
-      if (child is IdsFieldLabel && child.child is Text) {
-        final label = child.child as Text;
-        return label.semanticsLabel ??
-            label.data ??
-            label.textSpan?.toPlainText();
-      }
-    }
-    return null;
-  }
-
-  static IdsField _of(BuildContext context, String part) {
-    final field = maybeOf(context);
-    assert(field != null, '$part must be rendered inside an IdsField.');
-    return field!;
+    assert(scope != null, '$part must be rendered inside an IdsField.');
+    return scope!;
   }
 
   @override
   State<IdsField> createState() => _IdsFieldState();
 }
 
+FieldControlBinding? bindFieldControl(
+  BuildContext context,
+  FocusNode focus,
+  FieldControlBinding? binding,
+) {
+  final owner = context
+      .dependOnInheritedWidgetOfExactType<_IdsFieldScope>()
+      ?.owner;
+  if (binding?._owner == owner && binding?._focus == focus) return binding;
+  binding?.dispose();
+  if (owner == null) return null;
+  owner._controls[focus] = false;
+  return FieldControlBinding._(owner, focus);
+}
+
+class FieldControlBinding {
+  FieldControlBinding._(this._owner, this._focus);
+
+  final _IdsFieldState _owner;
+  final FocusNode _focus;
+
+  void setInvalid(bool invalid) {
+    if (_owner._controls[_focus] == invalid) return;
+    _owner._controls[_focus] = invalid;
+    _owner._scheduleValidationUpdate();
+  }
+
+  void dispose() {
+    if (_owner._controls.remove(_focus) == true) {
+      _owner._scheduleValidationUpdate();
+    }
+  }
+}
+
+String? _controlLabel(List<Widget> children) {
+  for (final child in children) {
+    if (child is IdsFieldLabel && child.child is Text) {
+      final label = child.child as Text;
+      return label.semanticsLabel ??
+          label.data ??
+          label.textSpan?.toPlainText();
+    }
+  }
+  return null;
+}
+
 class _IdsFieldState extends State<IdsField> {
-  final _controls = <FocusNode>{};
+  final _controls = <FocusNode, bool>{};
+  bool _controlInvalid = false;
+  bool _validationUpdateScheduled = false;
+
+  void _scheduleValidationUpdate() {
+    if (_validationUpdateScheduled) return;
+    _validationUpdateScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _validationUpdateScheduled = false;
+      if (!mounted) return;
+      final invalid = _controls.values.any((invalid) => invalid);
+      if (invalid != _controlInvalid) setState(() => _controlInvalid = invalid);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +107,12 @@ class _IdsFieldState extends State<IdsField> {
       IdsSize.tiny => IdsTypography.captionC1Regular,
     };
 
+    final invalid = widget.invalid || _controlInvalid;
     return _IdsFieldScope(
       field: widget,
-      controls: _controls,
+      owner: this,
+      invalid: invalid,
+      label: _controlLabel(widget.children),
       child: Opacity(
         opacity: widget.disabled ? 0.5 : 1,
         child: DefaultTextStyle(
@@ -77,9 +122,7 @@ class _IdsFieldState extends State<IdsField> {
             spacing: theme.dimension(8),
             children: [
               for (final child in widget.children)
-                if (!(widget.invalid
-                    ? child is IdsFieldHint
-                    : child is IdsFieldError))
+                if (!(invalid ? child is IdsFieldHint : child is IdsFieldError))
                   child,
             ],
           ),
@@ -97,7 +140,8 @@ class IdsFieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final field = IdsField._of(context, 'IdsFieldLabel');
+    final scope = IdsField._of(context, 'IdsFieldLabel');
+    final field = scope.field;
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: GestureDetector(
@@ -105,10 +149,7 @@ class IdsFieldLabel extends StatelessWidget {
         onTap: field.disabled
             ? null
             : () {
-                final controls = context
-                    .getInheritedWidgetOfExactType<_IdsFieldScope>()!
-                    .controls;
-                for (final node in controls) {
+                for (final node in scope.owner._controls.keys) {
                   if (node.canRequestFocus) {
                     node.requestFocus();
                     break;
@@ -118,7 +159,7 @@ class IdsFieldLabel extends StatelessWidget {
         child: IdsLabel(
           size: field.size,
           required: required ?? field.required,
-          invalid: field.invalid,
+          invalid: scope.invalid,
           child: child,
         ),
       ),
@@ -176,12 +217,16 @@ Widget _tinted(BuildContext context, Color color, Widget child) {
 class _IdsFieldScope extends InheritedWidget {
   const _IdsFieldScope({
     required this.field,
-    required this.controls,
+    required this.owner,
+    required this.invalid,
+    required this.label,
     required super.child,
   });
 
   final IdsField field;
-  final Set<FocusNode> controls;
+  final _IdsFieldState owner;
+  final bool invalid;
+  final String? label;
 
   @override
   bool updateShouldNotify(_IdsFieldScope old) =>
@@ -189,5 +234,6 @@ class _IdsFieldScope extends InheritedWidget {
       old.field.required != field.required ||
       old.field.disabled != field.disabled ||
       old.field.invalid != field.invalid ||
-      old.field.children != field.children;
+      old.invalid != invalid ||
+      old.label != label;
 }

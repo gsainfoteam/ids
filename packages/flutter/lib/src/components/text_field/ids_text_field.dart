@@ -76,7 +76,7 @@ class IdsTextField extends StatefulWidget {
 class _IdsTextFieldState extends State<IdsTextField> {
   TextEditingController? _ownedController;
   FocusNode? _ownedFocus;
-  VoidCallback? _unbindField;
+  FieldControlBinding? _fieldControl;
   String? _externalInitialValue;
 
   TextEditingController get _controller =>
@@ -115,7 +115,8 @@ class _IdsTextFieldState extends State<IdsTextField> {
       _externalInitialValue = widget.controller?.text;
     }
     if (widget.focusNode != oldWidget.focusNode) {
-      _unbindField?.call();
+      _fieldControl?.dispose();
+      _fieldControl = null;
       _ownedFocus?.dispose();
       _ownedFocus = widget.focusNode == null ? FocusNode() : null;
       _bindField();
@@ -123,13 +124,12 @@ class _IdsTextFieldState extends State<IdsTextField> {
   }
 
   void _bindField() {
-    _unbindField?.call();
-    _unbindField = IdsField.bindControl(context, _focus);
+    _fieldControl = bindFieldControl(context, _focus, _fieldControl);
   }
 
   @override
   void dispose() {
-    _unbindField?.call();
+    _fieldControl?.dispose();
     _ownedController?.dispose();
     _ownedFocus?.dispose();
     super.dispose();
@@ -188,6 +188,9 @@ class _IdsTextFieldState extends State<IdsTextField> {
             : widget.validator?.call(value);
       },
       builder: (form) {
+        _fieldControl?.setInvalid(
+          !disabled && (form.hasError || widget.invalid),
+        );
         final invalid =
             widget.invalid || (field?.invalid ?? false) || form.hasError;
         final ring = invalid ? colors.borderDanger : colors.borderPrimary;
@@ -215,7 +218,7 @@ class _IdsTextFieldState extends State<IdsTextField> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: theme.dimension(4),
+            spacing: theme.dimension(field == null ? 4 : 8),
             children: [
               IdsInteractive(
                 disabled: disabled,
@@ -308,10 +311,14 @@ class _IdsTextFieldState extends State<IdsTextField> {
                   liveRegion: true,
                   child: Text(
                     error,
-                    style: theme.textStyle(
-                      IdsTypography.captionC1Regular,
-                      color: colors.textDanger,
-                    ),
+                    style: field == null
+                        ? theme.textStyle(
+                            IdsTypography.captionC1Regular,
+                            color: colors.textDanger,
+                          )
+                        : DefaultTextStyle.of(
+                            context,
+                          ).style.copyWith(color: colors.textDanger),
                   ),
                 ),
             ],
