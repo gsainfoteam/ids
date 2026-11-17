@@ -1,0 +1,98 @@
+import { type CSSProperties, type ReactNode } from 'react';
+
+import { EditorBlockType, type EditorBlockTypeProps, type EditorHeadingLevel } from './block-type';
+import { EditorBlockquote, EditorBulletList, EditorCodeBlock, EditorOrderedList } from './blocks';
+import { EditorBubbleMenu, type EditorBubbleMenuProps } from './bubble-menu';
+import { EditorContentPart, type EditorContentProps } from './content';
+import { EditorCount, type EditorCountProps, type EditorCountState } from './count';
+import { EditorLink, type EditorLinkProps } from './link';
+import {
+  EditorBold,
+  EditorCode,
+  EditorItalic,
+  EditorStrike,
+  EditorUnderline,
+  type EditorMarkProps,
+} from './marks';
+import { EditorRoot, type EditorState, type EditorVariant } from './root';
+import { EditorSeparator, type EditorSeparatorProps } from './separator';
+import { editorStyle } from './style';
+import { type EditorFormat } from './value';
+
+import type { IdsSize } from '../../../tokens/types';
+import type { JSONContent } from '@tiptap/core';
+
+export function Editor(props: Editor.Props) {
+  return <EditorRoot {...props} />;
+}
+
+export namespace Editor {
+  type StringValue = {
+    format?: 'html' | 'markdown';
+    value?: string;
+    defaultValue?: string;
+    onValueChange?: (value: string) => void;
+  };
+
+  type JsonValue = {
+    format: 'json';
+    value?: JSONContent;
+    defaultValue?: JSONContent;
+    onValueChange?: (value: JSONContent) => void;
+  };
+
+  export type Props = (StringValue | JsonValue) & {
+    name?: string;
+    form?: string;
+    required?: boolean;
+    disabled?: boolean;
+    readOnly?: boolean;
+    invalid?: boolean;
+    maxLength?: number;
+    variant?: EditorVariant;
+    size?: IdsSize;
+    id?: string;
+    'aria-label'?: string;
+    'aria-labelledby'?: string;
+    'aria-describedby'?: string;
+    'aria-invalid'?: boolean | 'true' | 'false' | 'grammar' | 'spelling';
+    'aria-required'?: boolean | 'true' | 'false';
+    className?: string | ((state: EditorState) => string | undefined);
+    style?: CSSProperties | ((state: EditorState) => CSSProperties | undefined);
+    children?: ReactNode;
+  };
+  export type State = EditorState;
+  export type Variant = EditorVariant;
+  export type Format = EditorFormat;
+  export type Json = JSONContent;
+  export type HeadingLevel = EditorHeadingLevel;
+  export type CountState = EditorCountState;
+
+  export type ContentProps = EditorContentProps;
+  export type ToolProps = EditorMarkProps;
+  export type BlockTypeProps = EditorBlockTypeProps;
+  export type LinkProps = EditorLinkProps;
+  export type SeparatorProps = EditorSeparatorProps;
+  export type BubbleMenuProps = EditorBubbleMenuProps;
+  export type CountProps = EditorCountProps;
+
+  export const Content = EditorContentPart;
+  export const BlockType = EditorBlockType;
+  export const Bold = EditorBold;
+  export const Italic = EditorItalic;
+  export const Underline = EditorUnderline;
+  export const Strike = EditorStrike;
+  export const Code = EditorCode;
+  export const Link = EditorLink;
+  export const BulletList = EditorBulletList;
+  export const OrderedList = EditorOrderedList;
+  export const Blockquote = EditorBlockquote;
+  export const CodeBlock = EditorCodeBlock;
+  export const Separator = EditorSeparator;
+  export const BubbleMenu = EditorBubbleMenu;
+  export const Count = EditorCount;
+
+  export const Style = editorStyle;
+}
+
+export type EditorProps = Editor.Props;
