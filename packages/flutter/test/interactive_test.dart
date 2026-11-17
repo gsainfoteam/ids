@@ -519,4 +519,50 @@ void main() {
       const InteractiveState(pressed: true, focused: true, focusVisible: true),
     );
   });
+
+  testWidgets(
+    'a press that hands the focus on still rings for the keys later',
+    (tester) async {
+      final node = FocusNode();
+      final other = FocusNode();
+      addTearDown(node.dispose);
+      addTearDown(other.dispose);
+      await tester.pumpWidget(
+        WidgetsApp(
+          color: const Color(0xFF000000),
+          builder: (_, _) => FocusScope(
+            autofocus: true,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 100,
+                  height: 40,
+                  child: Interactive(
+                    focusNode: node,
+                    onPressed: other.requestFocus,
+                    builder: (_, s) {
+                      state = s;
+                      return const SizedBox.expand();
+                    },
+                  ),
+                ),
+                Focus(
+                  focusNode: other,
+                  child: const SizedBox(width: 100, height: 40),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.byType(Interactive));
+      await tester.pump();
+      expect(other.hasPrimaryFocus, isTrue);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(node.hasPrimaryFocus, isTrue);
+      expect(state.focusVisible, isTrue);
+    },
+  );
 }

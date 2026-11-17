@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -152,9 +154,12 @@ class _InteractiveState extends State<Interactive> {
     if (!_node.hasPrimaryFocus) {
       _pointerFocus = true;
       _node.requestFocus();
+      scheduleMicrotask(_forgetThePressOnceFocusSettles);
     }
     widget.onPressed?.call();
   }
+
+  void _forgetThePressOnceFocusSettles() => _pointerFocus = false;
 
   void _listenTo(FocusNode node) {
     _listened?.removeListener(_handlePrimaryFocus);
