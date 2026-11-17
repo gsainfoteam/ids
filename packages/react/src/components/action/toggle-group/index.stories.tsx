@@ -34,6 +34,7 @@ const meta = {
     orientation: { control: 'radio', options: ['horizontal', 'vertical'] },
     size: { control: 'radio', options: sizes },
     variant: { control: 'radio', options: variants },
+    layout: { control: 'radio', options: ['attached', 'spaced', 'tray', 'framed'] },
     disabled: { control: 'boolean' },
     required: { control: 'boolean' },
     loop: { control: 'boolean' },
@@ -142,17 +143,40 @@ export const Gallery: Story = {
             <Toggle value="comments">댓글 많은</Toggle>
           </ToggleGroup>
         </Showcase.Row>
-        <Showcase.Row label="attached=false">
+        <Showcase.Row label="spaced">
           <ToggleGroup
             aria-label="태그"
             selectionMode="multiple"
-            attached={false}
+            layout="spaced"
             variant="outline"
             defaultValue={['react']}
           >
             <Toggle value="react">React</Toggle>
             <Toggle value="flutter">Flutter</Toggle>
             <Toggle value="design">디자인</Toggle>
+          </ToggleGroup>
+        </Showcase.Row>
+        <Showcase.Row label="tray">
+          <ToggleGroup
+            aria-label="서식"
+            selectionMode="multiple"
+            layout="tray"
+            defaultValue={['bold', 'underline']}
+          >
+            <IconToggle value="bold" icon={<BoldIcon />} aria-label="굵게" />
+            <IconToggle value="italic" icon={<ItalicIcon />} aria-label="기울임" />
+            <ToggleGroup.Separator />
+            <IconToggle value="underline" icon={<UnderlineIcon />} aria-label="밑줄" />
+            <IconToggle value="strike" icon={<StrikethroughIcon />} aria-label="취소선" />
+          </ToggleGroup>
+        </Showcase.Row>
+        <Showcase.Row label="framed">
+          <ToggleGroup aria-label="정렬" layout="framed" defaultValue="left">
+            <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
+            <ToggleGroup.Separator />
+            <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
+            <ToggleGroup.Separator />
+            <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
           </ToggleGroup>
         </Showcase.Row>
       </Showcase.Section>

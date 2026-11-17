@@ -13,9 +13,13 @@ import type { IdsSize } from '../../../tokens/types';
 
 export type GroupOrientation = 'horizontal' | 'vertical';
 
+export type GroupLayout = 'attached' | 'spaced' | 'tray' | 'framed';
+
+const surfaceLayouts = new Set<GroupLayout>(['tray', 'framed']);
+
 export type GroupContextValue = {
   orientation: GroupOrientation;
-  attached: boolean;
+  layout: GroupLayout;
   size?: IdsSize;
   variant?: SurfaceVariant;
   separator: 'semantic' | 'decorative';
@@ -45,7 +49,7 @@ export function useGroupNameWarning(
 
 export function GroupRoot({
   orientation = 'horizontal',
-  attached = true,
+  layout = 'attached',
   size,
   variant,
   separator = 'semantic',
@@ -56,9 +60,9 @@ export function GroupRoot({
   const parent = useGroupContext();
   const context: GroupContextValue = {
     orientation,
-    attached,
+    layout,
     size: size ?? parent?.size,
-    variant: variant ?? parent?.variant,
+    variant: variant ?? parent?.variant ?? (surfaceLayouts.has(layout) ? 'ghost' : undefined),
     separator,
   };
   return (
@@ -67,9 +71,10 @@ export function GroupRoot({
         role="group"
         data-group=""
         data-orientation={orientation}
+        data-layout={layout}
         data-size={context.size}
         {...rest}
-        className={groupStyle({ orientation, attached }).root({ className })}
+        className={groupStyle({ orientation, layout }).root({ className })}
       >
         {children}
       </div>
@@ -86,11 +91,11 @@ export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
       orientation={group.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
       decorative={group.separator === 'decorative'}
       data-group-separator=""
-      className={groupStyle({ orientation: group.orientation, attached: group.attached }).separator(
-        {
-          className,
-        },
-      )}
+      className={groupStyle({
+        orientation: group.orientation,
+        layout: group.layout,
+        size: group.size,
+      }).separator({ className })}
     />
   );
 }

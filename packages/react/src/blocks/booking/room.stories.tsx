@@ -141,7 +141,7 @@ export const PC: Story = {
               </h2>
               <ToggleGroup
                 variant="outline"
-                attached={false}
+                layout="spaced"
                 aria-labelledby="slots"
                 value={slot}
                 onValueChange={setSlot}

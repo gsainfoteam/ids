@@ -1,15 +1,17 @@
 import { useState } from 'react';
 
 import {
-  ArchiveBoxIcon,
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   ClipboardIcon,
   DocumentDuplicateIcon,
   MinusIcon,
   PlusIcon,
   ScissorsIcon,
+  XMarkIcon,
 } from '@heroicons/react/16/solid';
 import { expect, spyOn, waitFor } from 'storybook/test';
 
@@ -27,6 +29,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
 const sizes = ['standard', 'tiny'] as const;
 const orientations = ['horizontal', 'vertical'] as const;
+const layouts = ['attached', 'spaced', 'tray', 'framed'] as const;
 
 const meta = {
   title: 'Action/ButtonGroup',
@@ -36,14 +39,14 @@ const meta = {
     orientation: { control: 'radio', options: orientations },
     size: { control: 'radio', options: sizes },
     variant: { control: 'radio', options: variants },
-    attached: { control: 'boolean' },
+    layout: { control: 'radio', options: layouts },
   },
   args: {
     'aria-label': '보관함 동작',
     orientation: 'horizontal',
     size: 'standard',
     variant: 'outline',
-    attached: true,
+    layout: 'attached',
   },
   render: (args) => (
     <ButtonGroup {...args}>
@@ -80,6 +83,58 @@ export const Gallery: Story = {
             </ButtonGroup>
           </Showcase.Row>
         ))}
+      </Showcase.Section>
+
+      <Showcase.Section
+        title="Layout"
+        description="attached 는 버튼을 이어 붙이고, spaced 는 띄웁니다. tray 는 테두리 막대 안에 버튼을 띄우고, framed 는 테두리 하나 안에 버튼을 이어 붙입니다. tray 와 framed 의 구분선은 짧고, 안의 버튼은 배경 없이 그려집니다."
+      >
+        <Showcase.Matrix
+          rows={layouts}
+          columns={orientations}
+          render={(layout, orientation) =>
+            orientation === 'horizontal' ? (
+              <ButtonGroup
+                layout={layout}
+                variant={layout === 'attached' || layout === 'spaced' ? 'outline' : undefined}
+                aria-label={`${layout} 사진 넘기기`}
+              >
+                <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+                <Button className="tabular-nums">3 / 12</Button>
+                <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+                <ButtonGroup.Separator />
+                <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+              </ButtonGroup>
+            ) : (
+              <ButtonGroup
+                layout={layout}
+                orientation="vertical"
+                variant={layout === 'attached' || layout === 'spaced' ? 'outline' : undefined}
+                aria-label={`${layout} 지도 확대`}
+              >
+                <IconButton icon={<PlusIcon />} aria-label="확대" />
+                <IconButton icon={<MinusIcon />} aria-label="축소" />
+                <ButtonGroup.Separator />
+                <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+              </ButtonGroup>
+            )
+          }
+        />
+        <Showcase.Row label="tray, tiny">
+          <ButtonGroup layout="tray" size="tiny" aria-label="작은 사진 넘기기">
+            <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+            <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+            <ButtonGroup.Separator />
+            <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+          </ButtonGroup>
+        </Showcase.Row>
+        <Showcase.Row label="framed, tiny">
+          <ButtonGroup layout="framed" size="tiny" aria-label="작은 지도 확대">
+            <IconButton icon={<MinusIcon />} aria-label="축소" />
+            <ButtonGroup.Separator />
+            <IconButton icon={<PlusIcon />} aria-label="확대" />
+          </ButtonGroup>
+        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Size × Orientation">
@@ -132,16 +187,6 @@ export const Gallery: Story = {
               <span>https://</span>
             </TextField>
             <Button variant="outline">이동</Button>
-          </ButtonGroup>
-        </Showcase.Row>
-        <Showcase.Row label="attached=false">
-          <ButtonGroup attached={false} variant="outline" aria-label="필터">
-            <Button>전체</Button>
-            <Button>읽지 않음</Button>
-            <Button>
-              <ArchiveBoxIcon />
-              보관함
-            </Button>
           </ButtonGroup>
         </Showcase.Row>
         <Showcase.Row label="rtl">
@@ -262,6 +307,72 @@ export const Separator: Story = {
     const more = canvas.getByRole('button', { name: '저장 옵션' });
     await expect(separator.getBoundingClientRect().width).toBe(1);
     await expect(more.getBoundingClientRect().left - save.getBoundingClientRect().right).toBe(-1);
+  },
+};
+
+export const Tray: Story = {
+  render: () => (
+    <ButtonGroup layout="tray" aria-label="사진 보기">
+      <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+      <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+      <ButtonGroup.Separator />
+      <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+    </ButtonGroup>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'tray 는 테두리 막대 안에 버튼을 4px씩 띄워 둡니다. 버튼은 제 모서리를 지키고, 구분선은 버튼보다 짧게 가운데에 섭니다. 막대 모서리는 버튼 모서리에 안쪽 여백을 더한 값입니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const bar = canvas.getByRole('group');
+    const prev = canvas.getByRole('button', { name: '이전 사진' });
+    const next = canvas.getByRole('button', { name: '다음 사진' });
+    const line = canvas.getByRole('separator');
+    await expect(prev).toHaveAttribute('data-variant', 'ghost');
+    await expect(radii(prev)).toEqual(['10px', '10px', '10px', '10px']);
+    await expect(getComputedStyle(bar).borderTopLeftRadius).toBe('14px');
+    await expect(next.getBoundingClientRect().left - prev.getBoundingClientRect().right).toBe(4);
+    const lineBox = line.getBoundingClientRect();
+    const buttonBox = next.getBoundingClientRect();
+    await expect(lineBox.height).toBe(20);
+    await expect(lineBox.top + lineBox.height / 2).toBeCloseTo(
+      buttonBox.top + buttonBox.height / 2,
+    );
+  },
+};
+
+export const Framed: Story = {
+  render: () => (
+    <ButtonGroup layout="framed" aria-label="지도 확대">
+      <IconButton icon={<MinusIcon />} aria-label="축소" />
+      <ButtonGroup.Separator />
+      <IconButton icon={<PlusIcon />} aria-label="확대" />
+    </ButtonGroup>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'framed 는 테두리 하나 안에 버튼을 이어 붙이고, 그 사이를 짧은 선으로 나눕니다. 그룹은 버튼 한 개와 높이가 같아 다른 컨트롤과 한 줄에 놓입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const frame = canvas.getByRole('group');
+    const minus = canvas.getByRole('button', { name: '축소' });
+    const plus = canvas.getByRole('button', { name: '확대' });
+    await expect(minus).toHaveAttribute('data-variant', 'ghost');
+    await expect(radii(minus)).toEqual(['10px', '0px', '0px', '10px']);
+    await expect(radii(plus)).toEqual(['0px', '10px', '10px', '0px']);
+    await expect(frame.getBoundingClientRect().height).toBe(minus.getBoundingClientRect().height);
+    await expect(canvas.getByRole('separator').getBoundingClientRect().height).toBe(20);
+    await userEvent.hover(plus);
+    await expect(getComputedStyle(frame, '::after').zIndex).toBe('25');
+    await expect(Number(getComputedStyle(plus).zIndex)).toBeLessThan(25);
   },
 };
 

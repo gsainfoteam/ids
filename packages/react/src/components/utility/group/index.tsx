@@ -3,6 +3,7 @@ import { type ComponentProps, type ReactNode } from 'react';
 import {
   GroupRoot,
   GroupSeparator,
+  type GroupLayout,
   type GroupOrientation,
   type GroupContextValue,
 } from './root';
@@ -18,7 +19,7 @@ export function Group(props: Group.Props) {
 export namespace Group {
   export type Props = ComponentProps<'div'> & {
     orientation?: GroupOrientation;
-    attached?: boolean;
+    layout?: GroupLayout;
     size?: IdsSize;
     variant?: SurfaceVariant;
     separator?: GroupContextValue['separator'];
@@ -38,6 +39,7 @@ export namespace Group {
 export {
   useGroupContext,
   useGroupNameWarning,
+  type GroupLayout,
   type GroupOrientation,
   type GroupContextValue,
 } from './root';
