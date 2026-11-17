@@ -26,10 +26,11 @@ const text = (element: Element) => getComputedStyle(element).color;
 const indicatorOf = (element: Element) =>
   element.querySelector('[data-select-item-indicator], [data-menu-item-indicator], [aria-hidden]')!;
 
-test('Select: a selected option is primary soft with a primary check, the highlight stays neutral', async () => {
+const transparent = 'rgba(0, 0, 0, 0)';
+
+test('Select: a selected option keeps the surface and a primary check, the highlight is neutral', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <p>Outside</p>
       <Select
         aria-label="Fruit"
         selectionMode="multiple"
@@ -46,11 +47,11 @@ test('Select: a selected option is primary soft with a primary check, the highli
   await expect.element(screen.getByRole('option', { name: 'Grape' })).toBeVisible();
 
   expect(option('Apple').hasAttribute('data-highlighted')).toBe(true);
-  expect(background(option('Apple'))).toBe(colorOf('--ids-color-bg-primary-soft-hover'));
-  expect(background(option('Grape'))).toBe(colorOf('--ids-color-bg-primary-soft'));
-  expect(text(option('Grape'))).toBe(colorOf('--ids-color-text-on-primary-soft'));
+  expect(background(option('Apple'))).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  expect(background(option('Grape'))).toBe(transparent);
+  expect(text(option('Grape'))).toBe(colorOf('--ids-color-on-surface'));
   expect(text(indicatorOf(option('Grape')))).toBe(colorOf('--ids-color-text-primary'));
-  expect(background(option('Cherry'))).toBe('rgba(0, 0, 0, 0)');
+  expect(background(option('Cherry'))).toBe(transparent);
 
   await userEvent.hover(option('Cherry'));
   await expect
@@ -59,40 +60,10 @@ test('Select: a selected option is primary soft with a primary check, the highli
   await userEvent.hover(option('Banana'));
   await expect
     .poll(() => background(option('Banana')))
-    .toBe(colorOf('--ids-color-bg-primary-soft-hover'));
+    .toBe(colorOf('--ids-color-bg-neutral-soft'));
 });
 
-test('Select: neighbouring selected options join into one shape', async () => {
-  const screen = await render(
-    <IdsProvider theme={testTheme}>
-      <Select
-        aria-label="Fruit"
-        selectionMode="multiple"
-        defaultValue={['apple', 'banana', 'grape']}
-        defaultOpen
-      >
-        <Select.Item value="apple">Apple</Select.Item>
-        <Select.Item value="banana">Banana</Select.Item>
-        <Select.Item value="cherry">Cherry</Select.Item>
-        <Select.Item value="grape">Grape</Select.Item>
-      </Select>
-    </IdsProvider>,
-  );
-  await expect.element(screen.getByRole('option', { name: 'Grape' })).toBeVisible();
-
-  const corners = (name: string) => {
-    const style = getComputedStyle(option(name));
-    return [style.borderTopLeftRadius, style.borderBottomLeftRadius];
-  };
-  const [rounded] = corners('Grape');
-
-  expect(rounded).not.toBe('0px');
-  expect(corners('Apple')).toEqual([rounded, '0px']);
-  expect(corners('Banana')).toEqual(['0px', rounded]);
-  expect(corners('Grape')).toEqual([rounded, rounded]);
-});
-
-test('Menu: checked checkbox and radio items are primary soft, unchecked ones hover neutral', async () => {
+test('Menu: checked checkbox and radio items keep the surface and a primary indicator', async () => {
   function Demo() {
     const [grid, setGrid] = useState(true);
     const [ruler, setRuler] = useState(false);
@@ -125,10 +96,11 @@ test('Menu: checked checkbox and radio items are primary soft, unchecked ones ho
   const zoom = screen.getByRole('menuitemradio', { name: '100%' });
   await expect.element(grid).toBeVisible();
 
-  expect(background(grid.element())).toBe(colorOf('--ids-color-bg-primary-soft'));
-  expect(text(grid.element())).toBe(colorOf('--ids-color-text-on-primary-soft'));
+  expect(grid.element().hasAttribute('data-highlighted')).toBe(false);
+  expect(background(grid.element())).toBe(transparent);
+  expect(text(grid.element())).toBe(colorOf('--ids-color-on-surface'));
   expect(text(indicatorOf(grid.element()))).toBe(colorOf('--ids-color-text-primary'));
-  expect(background(zoom.element())).toBe(colorOf('--ids-color-bg-primary-soft'));
+  expect(background(zoom.element())).toBe(transparent);
   expect(background(indicatorOf(zoom.element()).firstElementChild!)).toBe(
     colorOf('--ids-color-text-primary'),
   );
@@ -136,12 +108,10 @@ test('Menu: checked checkbox and radio items are primary soft, unchecked ones ho
   await userEvent.hover(ruler);
   await expect.poll(() => background(ruler.element())).toBe(colorOf('--ids-color-bg-neutral-soft'));
   await userEvent.hover(grid);
-  await expect
-    .poll(() => background(grid.element()))
-    .toBe(colorOf('--ids-color-bg-primary-soft-hover'));
+  await expect.poll(() => background(grid.element())).toBe(colorOf('--ids-color-bg-neutral-soft'));
 });
 
-test('ChipField: a chosen option is primary soft with a primary check', async () => {
+test('ChipField: a chosen option keeps the surface and a primary check', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <ChipField aria-label="Stack" defaultValue={['svelte']} defaultOpen>
@@ -154,8 +124,8 @@ test('ChipField: a chosen option is primary soft with a primary check', async ()
   await expect.element(screen.getByRole('option', { name: 'Svelte' })).toBeVisible();
 
   expect(option('Svelte').hasAttribute('data-highlighted')).toBe(false);
-  expect(background(option('Svelte'))).toBe(colorOf('--ids-color-bg-primary-soft'));
-  expect(text(option('Svelte'))).toBe(colorOf('--ids-color-text-on-primary-soft'));
+  expect(background(option('Svelte'))).toBe(transparent);
+  expect(text(option('Svelte'))).toBe(colorOf('--ids-color-on-surface'));
   expect(text(indicatorOf(option('Svelte')))).toBe(colorOf('--ids-color-text-primary'));
 
   await userEvent.hover(option('Vue'));

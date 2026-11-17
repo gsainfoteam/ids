@@ -77,7 +77,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Open"
-        description="고른 옵션은 primary soft 배경에 primary 체크가 붙습니다. 찾는 옵션이 없으면 새 값을 만드는 행이 나옵니다."
+        description="고른 옵션에는 primary 체크가 붙습니다. 찾는 옵션이 없으면 새 값을 만드는 행이 나옵니다."
       >
         <Showcase.Row label="creatable" className="h-72 items-start">
           <div className="w-80">

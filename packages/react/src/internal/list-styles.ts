@@ -3,29 +3,13 @@ import { cn } from '../utils/cn';
 const offsetParentOfOptions = cn('relative');
 const ringOffSinceCaretShowsFocus = cn('ring-0! inset-ring-transparent!');
 
-const selected = cn(
-  'data-selected:bg-primary-soft data-selected:text-on-primary-soft',
-  'data-selected:data-highlighted:bg-primary-soft-hover',
-  'data-selected:data-highlighted:active:bg-primary-soft-active',
-  'data-selected:has-[+[data-selected]]:rounded-b-none data-selected:[[data-selected]+&]:rounded-t-none',
-);
-
-const checked = cn(
-  'data-checked:bg-primary-soft data-checked:text-on-primary-soft',
-  'data-checked:data-highlighted:bg-primary-soft-hover',
-  'data-checked:data-highlighted:active:bg-primary-soft-active',
-  'data-checked:has-[+[data-checked]]:rounded-b-none data-checked:[[data-checked]+&]:rounded-t-none',
-);
-
 export const listStyles = {
   option: cn(
     'relative flex cursor-default items-center gap-2 rounded-standard py-1.5 ps-2.5 pe-8 outline-none select-none wrap-anywhere',
     'data-highlighted:bg-neutral-soft data-highlighted:active:bg-neutral-soft-hover',
-    selected,
     'aria-disabled:opacity-50',
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
   ),
-  checked,
   indicator: cn(
     'pointer-events-none absolute end-2.5 flex items-center justify-center text-primary',
     '[&_svg]:size-(--ids-size-icon-standard)',

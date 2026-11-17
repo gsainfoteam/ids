@@ -72,7 +72,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Open"
-        description="고른 옵션은 primary soft 배경에 primary 체크가 붙고, 이어서 고른 옵션은 한 덩어리로 붙습니다. 키보드나 마우스로 가리킨 옵션은 neutral soft 배경이고, 고른 옵션을 가리키면 primary soft 가 한 단계 짙어집니다."
+        description="고른 옵션에는 primary 체크가 붙고, 키보드나 마우스로 가리킨 옵션만 neutral soft 배경이 됩니다."
       >
         <Showcase.Row label="multiple, groups" className="h-64 items-start">
           <div className="w-56">

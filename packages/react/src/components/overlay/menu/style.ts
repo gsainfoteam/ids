@@ -29,7 +29,6 @@ export const menuStyle = tv({
     empty: [listStyles.empty, 'not-data-empty:sr-only'],
     item: [
       listStyles.option,
-      listStyles.checked,
       'pe-2.5 data-popup-open:bg-neutral-soft-hover [&_svg]:size-(--ids-size-icon-standard)',
     ],
     indicator: listStyles.indicator,
