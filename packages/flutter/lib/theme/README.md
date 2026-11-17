@@ -18,7 +18,7 @@ IdsProvider 와 그 테마 객체입니다. 앱이 넘긴 `IdsTheme` 을 색 역
 ## ids_resolved_theme.dart
 
 - 색은 테마의 색 필드(primary, secondary, tertiary, neutral, status)를 키로 `resolveColors` 결과를 32개까지 캐시합니다. light 와 dark 는 한 번에 풀립니다.
-- `IdsRadius.of` 는 React 의 `--ids-theme-radius-*` 계산과 같습니다. `indicator` 는 ×0.4, `container` 는 ×1.6, squircle 은 그린 반지름에 1.84 를 곱합니다. 이 값을 바꾸면 두 플랫폼의 모서리가 달라집니다.
+- `IdsRadius.of` 는 React 의 `--ids-theme-radius-*` 계산과 같습니다. `indicator` 는 ×0.4, `container` 는 ×1.6, squircle 이어도 반지름은 그대로입니다. React 는 CSS squircle 이 같은 숫자에서 덜 파이므로 1.84 를 곱하지만, Flutter 의 `RoundedSuperellipseBorder` 는 같은 반지름의 원만큼 파이므로 곱하지 않아야 두 플랫폼의 모서리가 같습니다.
 - `textStyle` 은 토큰에서 새 `TextStyle` 을 만들고 `inherit: false` 를 둡니다.
   - `copyWith` 는 `package: null` 일 때 원래 패키지를 남기므로 앱 글꼴을 ids_flutter 안에서 찾습니다.
   - `inherit: true` 이면 `Text` 가 조상의 글꼴 패키지를 다시 합칩니다.

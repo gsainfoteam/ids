@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
@@ -22,19 +20,6 @@ const _containerRadiusRatio = 1.6;
 
 const _fullRadius = 9999.0;
 
-double _insetAt45Degrees(double exponent) =>
-    1 - math.pow(2, -1 / exponent).toDouble();
-
-const _superellipseExponentOfSquircle = 4.0;
-
-final _squircleRadiusAsDeepAsRound =
-    _insetAt45Degrees(2) / _insetAt45Degrees(_superellipseExponentOfSquircle);
-
-final idsCornerRadiusScale = {
-  IdsCornerShape.round: 1.0,
-  IdsCornerShape.squircle: (_squircleRadiusAsDeepAsRound * 100).round() / 100,
-};
-
 @immutable
 class IdsRadius {
   const IdsRadius({
@@ -43,14 +28,9 @@ class IdsRadius {
     required this.container,
   });
 
-  factory IdsRadius.of(
-    double radius,
-    IdsCornerShape cornerShape,
-    double scale,
-  ) {
-    final cornerScale = idsCornerRadiusScale[cornerShape]!;
+  factory IdsRadius.of(double radius, double scale) {
     double drawn(double value) =>
-        (value.roundToDouble() * cornerScale * scale).roundToDouble();
+        (value.roundToDouble() * scale).roundToDouble();
     return IdsRadius(
       standard: drawn(radius),
       indicator: drawn(radius * _indicatorRadiusRatio),
@@ -182,7 +162,6 @@ class IdsResolvedTheme {
 
   late final IdsRadius radius = IdsRadius.of(
     theme.radius ?? _defaultRadius,
-    cornerShape,
     scale,
   );
 

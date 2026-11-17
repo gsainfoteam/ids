@@ -31,7 +31,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       find.textContaining(
-        'Child: count 1, radius 4.0, locale fr, corner squircle',
+        'Child: count 1, radius 2.0, locale fr, corner squircle',
       ),
       findsOneWidget,
     );
