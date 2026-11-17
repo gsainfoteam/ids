@@ -108,6 +108,26 @@ test('Escape closes a Select inside first, then the dialog', async () => {
   await expect.element(screen.getByRole('dialog', { name: 'Settings' })).not.toBeInTheDocument();
 });
 
+test('a Select sheet opened over a dialog marks its backdrop stacked, so it does not blur the dialog', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <Settings defaultOpen>
+        <Select aria-label="Theme" mobileVariant="drawer">
+          <Select.Item value="light">Light</Select.Item>
+          <Select.Item value="dark">Dark</Select.Item>
+        </Select>
+      </Settings>
+    </IdsProvider>,
+  );
+  await userEvent.click(screen.getByRole('combobox', { name: 'Theme' }));
+  await expect
+    .element(screen.getByRole('dialog', { name: 'Theme' }))
+    .toHaveAttribute('data-presentation', 'drawer');
+  const sheet = document.querySelector<HTMLElement>('[data-field-popup-backdrop]')!;
+  await expect.poll(() => sheet.hasAttribute('data-stacked')).toBe(true);
+  expect(getComputedStyle(sheet).backdropFilter).toBe('none');
+});
+
 test('a dialog that cannot be dismissed ignores Escape and the backdrop', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
