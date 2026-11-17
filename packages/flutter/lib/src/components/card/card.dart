@@ -370,29 +370,48 @@ class _RenderCardBody extends RenderBox
     final regions = getChildrenAsList();
     final fullWidth = BoxConstraints.tightFor(width: _widthFor(constraints));
     final given = List.filled(regions.length, fullWidth);
-    final heights = [
-      for (final region in regions) layoutChild(region, fullWidth).height,
-    ];
-    final fixed = [
-      for (final (index, height) in heights.indexed)
-        if (!_growing.contains(index)) height,
-    ].fold(_gaps, (sum, height) => sum + height);
+    final heights = List.filled(regions.length, 0.0);
+    void fit(Iterable<int> indexes, BoxConstraints within) {
+      for (final index in indexes) {
+        given[index] = within;
+        heights[index] = layoutChild(regions[index], within).height;
+      }
+    }
+
     final growing = [
       for (final index in _growing)
         if (index < regions.length) index,
-    ]..sort((a, b) => heights[b].compareTo(heights[a]));
+    ];
+    fit([
+      for (var index = 0; index < regions.length; index++)
+        if (!growing.contains(index)) index,
+    ], fullWidth);
+    final fixed = heights.fold(_gaps, (sum, height) => sum + height);
+    final room = math.max(0.0, constraints.maxHeight - fixed);
+    fit(growing, fullWidth.copyWith(maxHeight: room));
+    double taken(Iterable<int> indexes) =>
+        indexes.fold(0.0, (sum, index) => sum + heights[index]);
+
+    if (taken(growing) > room) {
+      final crowded = [...growing]
+        ..sort((a, b) => heights[a].compareTo(heights[b]));
+      var pool = room;
+      while (crowded.length > 1 &&
+          heights[crowded.first] < pool / crowded.length) {
+        pool -= heights[crowded.removeAt(0)];
+      }
+      fit(crowded, fullWidth.copyWith(maxHeight: pool / crowded.length));
+    }
+
+    final spare = [...growing]
+      ..sort((a, b) => heights[b].compareTo(heights[a]));
     var pool = constraints.minHeight - fixed;
-    final natural = growing.fold(0.0, (sum, index) => sum + heights[index]);
-    if (growing.isNotEmpty && pool > natural) {
-      while (growing.length > 1 &&
-          heights[growing.first] > pool / growing.length) {
-        pool -= heights[growing.removeAt(0)];
+    if (spare.isNotEmpty && pool > taken(spare)) {
+      while (spare.length > 1 && heights[spare.first] > pool / spare.length) {
+        pool -= heights[spare.removeAt(0)];
       }
-      final share = pool / growing.length;
-      for (final index in growing) {
-        given[index] = fullWidth.copyWith(minHeight: share, maxHeight: share);
-        heights[index] = layoutChild(regions[index], given[index]).height;
-      }
+      final share = pool / spare.length;
+      fit(spare, fullWidth.copyWith(minHeight: share, maxHeight: share));
     }
     final height = heights.fold(_gaps, (sum, height) => sum + height);
     return (

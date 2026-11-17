@@ -1012,4 +1012,50 @@ void main() {
     await pump(tester, card(header: true));
     expect(tester.state(find.byType(Kept)), same(kept));
   });
+
+  testWidgets('a list scrolls inside the content of a card with a set height', (
+    tester,
+  ) async {
+    Widget list(String name) => ListView(
+      key: ValueKey(name),
+      children: [for (var row = 0; row < 20; row++) const SizedBox(height: 40)],
+    );
+    await pump(
+      tester,
+      SizedBox(
+        height: 300,
+        child: Card(
+          children: [
+            const CardHeader(children: [CardTitle(child: Text('Title'))]),
+            CardContent(child: list('list')),
+            const CardFooter(children: [SizedBox(width: 40, height: 20)]),
+          ],
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.byType(Card)).height, 300);
+    final rows = tester.getRect(find.byKey(const ValueKey('list')));
+    expect(rows.top, tester.getRect(find.byType(CardHeader)).bottom + 16);
+    expect(rows.bottom, tester.getRect(find.byType(CardFooter)).top - 16);
+
+    await pump(
+      tester,
+      SizedBox(
+        height: 300,
+        child: Card(
+          children: [
+            CardContent(child: list('first')),
+            CardContent(child: list('second')),
+          ],
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    final first = tester.getRect(find.byKey(const ValueKey('first')));
+    final second = tester.getRect(find.byKey(const ValueKey('second')));
+    expect(first.height, second.height);
+    expect(second.top, first.bottom + 16);
+    expect(second.bottom, tester.getRect(find.byType(Card)).bottom - 16);
+  });
 }
