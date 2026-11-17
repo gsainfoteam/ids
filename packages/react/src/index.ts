@@ -159,6 +159,7 @@ export { Stepper } from './components/navigation/stepper';
 export type { StepperOrientation, StepperStatus } from './components/navigation/stepper';
 export { Sidebar } from './components/navigation/sidebar';
 export type { SidebarCollapsibleMode, SidebarVariant } from './components/navigation/sidebar';
+export { Navbar } from './components/navigation/navbar';
 
 export type { IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';

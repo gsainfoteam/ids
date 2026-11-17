@@ -197,6 +197,10 @@
     "loading": "이전 메시지를 불러오는 중",
     "unseen": "새 메시지 {count}개"
   },
+  "navbar": {
+    "label": "주 메뉴",
+    "open": "메뉴 열기"
+  },
   "numberField": {
     "decrement": "값 줄이기",
     "increment": "값 늘리기",
