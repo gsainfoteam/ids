@@ -205,7 +205,7 @@ class _LoadingStatusState extends State<_LoadingStatus> {
           shape: CircleBorder(
             side: _log.lastOrNull == ids.AvatarStatus.loaded
                 ? BorderSide(
-                    color: ids.IdsProvider.of(context).colors.bgSuccess,
+                    color: ids.IdsProvider.of(context).colors.borderSuccess,
                     width: 2,
                     strokeAlign: BorderSide.strokeAlignOutside,
                   )

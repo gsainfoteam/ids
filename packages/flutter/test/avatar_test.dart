@@ -21,15 +21,29 @@ class _HeldImage extends ImageProvider<_HeldImage> {
       OneFrameImageStreamCompleter(completer.future);
 }
 
-Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
+Future<void> pump(
+  WidgetTester tester,
+  Widget child, {
+  IdsTheme theme = testTheme,
+  IdsMode? mode,
+}) => tester.pumpWidget(
   Directionality(
     textDirection: TextDirection.ltr,
     child: IdsProvider(
-      theme: testTheme,
+      theme: theme,
+      mode: mode,
       child: Center(child: child),
     ),
   ),
 );
+
+Container surfaceOf(WidgetTester tester) =>
+    tester.widget<Container>(find.byType(Container));
+
+BorderSide ringOf(WidgetTester tester) =>
+    ((surfaceOf(tester).foregroundDecoration! as ShapeDecoration).shape
+            as OutlinedBorder)
+        .side;
 
 Future<ui.Image> testImage(WidgetTester tester) async =>
     (await tester.runAsync(() => createTestImage(width: 1, height: 1)))!;
@@ -101,6 +115,65 @@ void main() {
         32,
       );
     });
+
+    testWidgets('follows the theme scale', (tester) async {
+      await pump(tester, const Avatar(name: 'Alice Kim'), theme: scaledTheme);
+      expect(tester.getSize(find.byType(Avatar)), const Size.square(60));
+      expect(
+        DefaultTextStyle.of(tester.element(find.text('AK'))).style.fontSize,
+        24,
+      );
+      expect(ringOf(tester).width, 1);
+
+      await pump(
+        tester,
+        const Avatar(name: 'Alice Kim', size: IdsSize.tiny),
+        theme: scaledTheme,
+      );
+      expect(tester.getSize(find.byType(Avatar)), const Size.square(36));
+
+      await pump(
+        tester,
+        const SizedBox.square(dimension: 20, child: Avatar(name: 'Alice Kim')),
+        theme: scaledTheme,
+      );
+      expect(
+        DefaultTextStyle.of(tester.element(find.text('AK'))).style.fontSize,
+        10,
+      );
+    });
+  });
+
+  group('shape', () {
+    ShapeBorder shapeOf(WidgetTester tester) =>
+        (surfaceOf(tester).decoration! as ShapeDecoration).shape;
+
+    testWidgets('a square avatar takes the corner shape of the theme', (
+      tester,
+    ) async {
+      await pump(tester, const Avatar(name: 'A', shape: AvatarShape.square));
+      expect(
+        shapeOf(tester),
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      );
+
+      const squircle = IdsTheme(
+        primary: IdsThemeColor.seed(Color(0xFF155DFC)),
+        cornerShape: IdsCornerShape.squircle,
+      );
+      await pump(
+        tester,
+        const Avatar(name: 'A', shape: AvatarShape.square),
+        theme: squircle,
+      );
+      expect(
+        shapeOf(tester),
+        RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(10)),
+      );
+
+      await pump(tester, const Avatar(name: 'A'), theme: squircle);
+      expect(shapeOf(tester), const CircleBorder());
+    });
   });
 
   group('fallback', () {
@@ -138,6 +211,35 @@ void main() {
       expect(find.byIcon(Icons.business), findsOneWidget);
       expect(find.text('A'), findsNothing);
     });
+
+    for (final mode in [IdsMode.light, IdsMode.dark]) {
+      testWidgets('reads every colour from its role (${mode.name})', (
+        tester,
+      ) async {
+        await pump(tester, const Avatar(name: 'Alice Kim'), mode: mode);
+        final colors = IdsProvider.of(
+          tester.element(find.byType(Avatar)),
+        ).colors;
+        expect(
+          (surfaceOf(tester).decoration! as ShapeDecoration).color,
+          colors.bgNeutralSoft,
+        );
+        expect(
+          ringOf(tester),
+          BorderSide(color: colors.onSurface.withValues(alpha: 0.08)),
+        );
+        expect(
+          DefaultTextStyle.of(tester.element(find.text('AK'))).style.color,
+          colors.textNeutral,
+        );
+
+        await pump(tester, const Avatar(semanticLabel: 'user'), mode: mode);
+        expect(
+          IconTheme.of(tester.element(find.byIcon(Icons.person))).color,
+          colors.textNeutral,
+        );
+      });
+    }
   });
 
   group('image', () {

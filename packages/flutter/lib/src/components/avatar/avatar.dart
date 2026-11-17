@@ -133,17 +133,16 @@ class _AvatarState extends State<Avatar> {
     });
   }
 
-  Widget _fallback(double width, Color color) {
+  Widget _fallback(double width, TextStyle text) {
     final initials = widget.name == null ? '' : initialsOf(widget.name!);
     return _WithoutTextScaling(
       child: DefaultTextStyle(
-        style: IdsTypography.bodyB3Medium.copyWith(
+        style: text.copyWith(
           fontSize: math.max(_minInitialsSize, width * _initialsFactor),
           height: 1,
-          color: color,
         ),
         child: IconTheme(
-          data: IconThemeData(size: width * _iconFactor, color: color),
+          data: IconThemeData(size: width * _iconFactor, color: text.color),
           child: Center(
             child:
                 widget.fallback ??
@@ -169,12 +168,16 @@ class _AvatarState extends State<Avatar> {
     final circle =
         (widget.shape ?? scope?.shape ?? AvatarShape.circle) ==
         AvatarShape.circle;
-    ShapeBorder outline([BorderSide side = BorderSide.none]) => circle
+    ShapeBorder outline({
+      double grownBy = 0,
+      BorderSide side = BorderSide.none,
+    }) => circle
         ? CircleBorder(side: side)
-        : RoundedRectangleBorder(
-            side: side,
-            borderRadius: BorderRadius.circular(squareRadius),
-          );
+        : ids.shape(radius: squareRadius + grownBy, side: side);
+    final text = ids.textStyle(
+      IdsTypography.bodyB3Medium,
+      color: colors.textNeutral,
+    );
 
     final cutout = scope?.cutout;
     final surface = Container(
@@ -185,12 +188,14 @@ class _AvatarState extends State<Avatar> {
       ),
       foregroundDecoration: ShapeDecoration(
         shape: outline(
-          BorderSide(color: colors.onSurface.withValues(alpha: _ringAlpha)),
+          side: BorderSide(
+            color: colors.onSurface.withValues(alpha: _ringAlpha),
+          ),
         ),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final fallback = _fallback(constraints.maxWidth, colors.textNeutral);
+          final fallback = _fallback(constraints.maxWidth, text);
           final image = widget.image;
           if (image == null) return fallback;
           return Image(
@@ -215,7 +220,7 @@ class _AvatarState extends State<Avatar> {
     );
 
     final avatar = SizedBox.square(
-      dimension: _sizes[size],
+      dimension: ids.dimension(_sizes[size]!),
       child: Align(
         alignment: AlignmentDirectional.topStart,
         child: AspectRatio(
@@ -229,8 +234,7 @@ class _AvatarState extends State<Avatar> {
                         (cutout == AvatarCutout.start) !=
                         (Directionality.of(context) == TextDirection.rtl),
                     overlap: scope!.overlap,
-                    circle: circle,
-                    radius: squareRadius,
+                    hole: outline(grownBy: _CutoutClipper._gap),
                   ),
             child: surface,
           ),
@@ -268,16 +272,14 @@ class _CutoutClipper extends CustomClipper<Path> {
   const _CutoutClipper({
     required this.left,
     required this.overlap,
-    required this.circle,
-    required this.radius,
+    required this.hole,
   });
 
   static const _gap = 2.0;
 
   final bool left;
   final double overlap;
-  final bool circle;
-  final double radius;
+  final ShapeBorder hole;
 
   @override
   Path getClip(Size size) {
@@ -287,22 +289,14 @@ class _CutoutClipper extends CustomClipper<Path> {
       size.width,
       size.height,
     ).inflate(_gap);
-    final hole = circle
-        ? (Path()..addOval(neighbour))
-        : (Path()..addRRect(
-            RRect.fromRectAndRadius(neighbour, Radius.circular(radius + _gap)),
-          ));
     return Path.combine(
       PathOperation.difference,
       Path()..addRect(Offset.zero & size),
-      hole,
+      hole.getOuterPath(neighbour),
     );
   }
 
   @override
   bool shouldReclip(_CutoutClipper old) =>
-      left != old.left ||
-      overlap != old.overlap ||
-      circle != old.circle ||
-      radius != old.radius;
+      left != old.left || overlap != old.overlap || hole != old.hole;
 }
