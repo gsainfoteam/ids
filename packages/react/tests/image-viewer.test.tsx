@@ -301,7 +301,7 @@ test('the zoom level shows the scale, and pressing it fits the image again', asy
   await expect.element(fitted).toHaveTextContent('100%');
 });
 
-test('the caption hides while the image is zoomed', async () => {
+test('the caption hides while the image is zoomed and lets presses through to the image', async () => {
   await render(<Gallery />);
   await openAt('First');
   const caption = document.querySelector('[data-image-viewer-caption]')!;
@@ -309,6 +309,23 @@ test('the caption hides while the image is zoomed', async () => {
 
   await userEvent.keyboard('+');
   await expect.poll(() => getComputedStyle(caption).opacity).toBe('0');
+  const { left, top, width, height } = caption.getBoundingClientRect();
+  const underTheCaption = document.elementFromPoint(left + width / 2, top + height / 2);
+  expect(caption.contains(underTheCaption)).toBe(false);
+  expect(document.querySelector('[data-image-viewer-stage]')!.contains(underTheCaption)).toBe(true);
+});
+
+test('the fitted image keeps its room whether or not the image shown has a caption', async () => {
+  await render(<Gallery />);
+  await openAt('Second');
+  const stage = document.querySelector('[data-image-viewer-stage]')!;
+  const withACaption = stage.getBoundingClientRect();
+
+  await userEvent.keyboard('{ArrowRight}');
+  await expect.poll(counter).toHaveTextContent('3 / 3');
+  expect(document.querySelector('[data-image-viewer-caption]')).toBeNull();
+  expect(stage.getBoundingClientRect().top).toBe(withACaption.top);
+  expect(stage.getBoundingClientRect().height).toBe(withACaption.height);
 });
 
 test('thumbnails jump to an image and mark the one shown', async () => {

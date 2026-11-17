@@ -144,7 +144,8 @@ const [index, setIndex] = useState(0);
   - 축소, 배율("150%"), 확대. 배율을 누르면 화면에 맞춘다. 폭이 640px 보다 좁으면 배율은 빠진다
   - 내려받기 | 닫기
 - 뷰어는 페이지가 밝은 모드여도 늘 어둡습니다. 대화상자와 뒤 배경에 `data-mode="dark"` 가 붙고, 브랜드 색은 그 테마의 어두운 모드 역할을 씁니다. 뒤 배경은 `bg-surface` 의 95% 라서 뒤 페이지가 거의 보이지 않습니다.
-- 맞춘 사진은 설명과 도구 막대 사이에 놓입니다. 확대하면 사진이 그 위아래로 넘어가고, 설명은 사진을 가리지 않도록 숨습니다.
+- 맞춘 사진은 설명 두 줄의 자리와 도구 막대 사이에 놓입니다. 설명이 없는 장도 그 자리를 비워 두므로, 넘겨도 사진 크기가 바뀌지 않습니다. 설명은 두 줄까지 보이고 넘치면 말줄임표로 잘립니다(스크린 리더는 전부 읽습니다).
+- 확대하면 사진이 설명과 도구 막대 아래로 넘어갑니다. 설명은 숨고 포인터도 받지 않아서, 그 자리에서 시작한 끌기, 휠, 두 번 누르기가 사진에 닿습니다.
 - 뷰어 부품은 `Image.Viewer` 아래에 있습니다(`Image.Viewer.Close`). 모두 뷰어의 상태를 읽으므로 `Image.Viewer` 안이면 어디에 두어도 됩니다. 버튼 부품은 도구 막대 안에 두는 것을 전제로 자리를 잡지 않습니다.
 - `Image.Viewer` 에 자식을 주면 그 부품만 그립니다. `Image.Viewer.Toolbar` 에 자식을 주지 않으면 기본 도구 막대입니다.
 - 썸네일 줄(`Image.Viewer.Thumbnails`)은 기본 뷰어에 없습니다. 넣으면 도구 막대 아래에 놓입니다.
@@ -321,7 +322,7 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | `Image.Viewer.Download`                        | `IconButton` 속성과 `<a>` 속성. 이름 "내려받기"                           |
 | `Image.Viewer.Close`                           | `IconButton` 속성. 이름 "닫기"                                            |
 | `Image.Viewer.Prev` / `Image.Viewer.Next`      | `IconButton` 속성. 이름 "이전 사진" / "다음 사진"                         |
-| `Image.Viewer.Caption`                         | 위 왼쪽의 지금 장 `caption`. 없으면 그리지 않는다                         |
+| `Image.Viewer.Caption`                         | 위 왼쪽의 지금 장 `caption`, 두 줄까지. 없으면 그리지 않는다              |
 | `Image.Viewer.Thumbnails`                      | 도구 막대 아래 썸네일 줄. 넘치면 가로로 스크롤한다                        |
 
 ## 알아둘 것
