@@ -19,8 +19,9 @@ export const tableStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'rounded-container border border-neutral',
-        header: 'bg-surface',
+        root: '[--table-radius:var(--radius-container)] rounded-(--table-radius) border border-neutral',
+        viewport: 'rounded-[calc(var(--table-radius)-1px)]',
+        header: 'bg-neutral-soft',
       },
       ghost: { header: 'bg-surface' },
     } satisfies Record<TableVariant, object>,

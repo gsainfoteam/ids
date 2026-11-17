@@ -46,15 +46,16 @@ import { Table } from '@gsainfoteam/ids-react';
 ## variant와 크기
 
 ```tsx
-<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행은 몸통과 같은 `bg-surface`
+<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행은 `bg-neutral-soft`
 <Table variant="ghost" />    // 상자 없이 행 구분선만
 <Table size="standard" />    // 기본. 셀 패딩 16px × 10px, 머리글 40px, body b3
 <Table size="tiny" />        // 셀 패딩 12px × 6px, 머리글 32px, caption c1
 ```
 
-- 상자 모서리는 `rounded-container`(16px) 입니다. 안쪽 여백이 없는 상자라 concentric 계산을 쓰지 않습니다.
+- 상자 모서리는 `--table-radius`(기본 `rounded-container`, 16px) 입니다. 안쪽 여백이 없는 상자라 concentric 계산을 쓰지 않습니다.
+- 스크롤 영역은 테두리 1px 를 뺀 `--table-radius - 1px` 로 깎습니다. 같은 값이면 채운 머리글 모서리와 테두리 사이로 바탕색이 비칩니다. 모서리를 바꾸려면 `rounded-*` 가 아니라 `[--table-radius:...]` 를 줍니다.
 - 선은 모두 `--ids-color-border-neutral` 입니다. 마지막 행은 아래 선이 없고, `Table.Footer` 는 위 선으로 몸통과 나뉩니다.
-- 머리글 행은 채우지 않고 `text-neutral` 글자와 아래 선으로만 나뉩니다. 붙는 머리글(`stickyHeader`)이 아래 행을 가리도록 배경은 `bg-surface` 입니다.
+- `outline` 의 머리글 행은 `bg-neutral-soft` 로 채우고 글자는 `text-neutral` 입니다. `ghost` 의 머리글은 채우지 않지만, 붙는 머리글(`stickyHeader`)이 아래 행을 가리도록 배경은 `bg-surface` 입니다.
 
 ## 행 상태
 
