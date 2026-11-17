@@ -3,8 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/ids_radius.dart';
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
@@ -63,15 +62,16 @@ class Item extends StatelessWidget {
     required bool dense,
     required bool flat,
   }) {
-    final theme = ThemeProvider.of(context);
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
     final pad = (dense ? _densePaddings : _paddings)[size]!;
     final radius = BorderRadius.circular(
-      flat ? 0 : math.min(IdsRadius.standard + pad, IdsRadius.container),
+      flat ? 0 : math.min(ids.radius.standard + pad, ids.radius.container),
     );
     final reduced = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final base = variant == ItemVariant.soft
-        ? theme.muted
-        : theme.surface.withValues(alpha: 0);
+        ? colors.bgNeutralSoft
+        : colors.surface.withValues(alpha: 0);
     final separate =
         onPressed != null && children.any((child) => child is ItemContent);
     final grow = children.indexWhere((child) => child is ItemContent);
@@ -84,16 +84,16 @@ class Item extends StatelessWidget {
       decoration: BoxDecoration(
         color: SurfaceLayer.over(
           base,
-          theme,
+          colors,
           state,
           selected: selected == true,
         ),
         borderRadius: radius,
-        border: FocusRing.around(theme, state),
+        border: FocusRing.around(colors, state),
       ),
       foregroundDecoration: variant == ItemVariant.outline
           ? BoxDecoration(
-              border: Border.all(color: FocusRing.edge(theme, state)),
+              border: Border.all(color: FocusRing.edge(colors, state)),
               borderRadius: radius,
             )
           : null,
@@ -104,7 +104,7 @@ class Item extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(pad),
           child: DefaultTextStyle.merge(
-            style: TextStyle(color: theme.onSurface),
+            style: TextStyle(color: colors.onSurface),
             child: _ItemRow(
               gap: _gaps[size]!,
               grow: grow == -1 ? null : grow,
@@ -163,28 +163,29 @@ class ItemMedia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = _ItemScope.sizeOf(context, 'ItemMedia');
-    final theme = ThemeProvider.of(context);
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
     if (variant == ItemVariant.ghost) {
       return IconTheme.merge(
-        data: IconThemeData(size: _icon, color: theme.onMuted),
+        data: IconThemeData(size: _icon, color: colors.textNeutral),
         child: child ?? const SizedBox.shrink(),
       );
     }
-    final radius = BorderRadius.circular(IdsRadius.standard);
+    final radius = BorderRadius.circular(ids.radius.standard);
     return SizedBox.square(
       dimension: _tiles[size],
       child: ClipRRect(
         borderRadius: radius,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: variant == ItemVariant.soft ? theme.muted : null,
+            color: variant == ItemVariant.soft ? colors.bgNeutralSoft : null,
             border: variant == ItemVariant.outline
-                ? Border.all(color: theme.border)
+                ? Border.all(color: colors.borderNeutral)
                 : null,
             borderRadius: radius,
           ),
           child: IconTheme.merge(
-            data: IconThemeData(size: _icon, color: theme.onSurface),
+            data: IconThemeData(size: _icon, color: colors.onSurface),
             child: child is Image ? child! : Center(child: child),
           ),
         ),
@@ -247,7 +248,7 @@ class ItemDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DefaultTextStyle.merge(
     style: _styles[_ItemScope.sizeOf(context, 'ItemDescription')]!.copyWith(
-      color: ThemeProvider.of(context).onMuted,
+      color: IdsProvider.of(context).colors.textNeutral,
     ),
     maxLines: _lines,
     overflow: TextOverflow.ellipsis,
@@ -269,7 +270,7 @@ class ItemActions extends StatelessWidget {
     return IconTheme.merge(
       data: IconThemeData(
         size: _icon,
-        color: ThemeProvider.of(context).onMuted,
+        color: IdsProvider.of(context).colors.textNeutral,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -300,7 +301,9 @@ class ItemGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final line = BorderSide(color: ThemeProvider.of(context).border);
+    final line = BorderSide(
+      color: IdsProvider.of(context).colors.borderNeutral,
+    );
     final bordered = variant == ItemGroupVariant.bordered;
     return _ItemGroupScope(
       variant: variant,

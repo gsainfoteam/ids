@@ -269,9 +269,9 @@ final itemUseCases = [
                               '2분 전',
                               style: ids.IdsTypography.captionC1Regular
                                   .copyWith(
-                                    color: ids.ThemeProvider.of(
+                                    color: ids.IdsProvider.of(
                                       context,
-                                    ).onMuted,
+                                    ).colors.textNeutral,
                                   ),
                             ),
                           ),

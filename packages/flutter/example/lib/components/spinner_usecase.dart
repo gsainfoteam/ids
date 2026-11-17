@@ -120,7 +120,7 @@ final spinnerUseCases = [
                 Builder(
                   builder: (context) => IconTheme.merge(
                     data: IconThemeData(
-                      color: ids.ThemeProvider.of(context).accent,
+                      color: ids.IdsProvider.of(context).colors.textPrimary,
                     ),
                     child: const ids.Spinner(size: ids.IdsSize.standard),
                   ),
@@ -133,7 +133,7 @@ final spinnerUseCases = [
                 Builder(
                   builder: (context) => IconTheme.merge(
                     data: IconThemeData(
-                      color: ids.ThemeProvider.of(context).onMuted,
+                      color: ids.IdsProvider.of(context).colors.textNeutral,
                     ),
                     child: const ids.Spinner(size: ids.IdsSize.standard),
                   ),
@@ -263,7 +263,7 @@ class _AnnouncementState extends State<_Announcement> {
       ),
       if (_loading)
         IconTheme.merge(
-          data: IconThemeData(color: ids.ThemeProvider.of(context).onMuted),
+          data: IconThemeData(color: ids.IdsProvider.of(context).colors.textNeutral),
           child: const ids.Spinner(semanticLabel: '댓글을 불러오는 중'),
         )
       else

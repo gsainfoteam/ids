@@ -3,8 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/ids_radius.dart';
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
@@ -85,33 +84,34 @@ class Card extends StatelessWidget {
   }
 
   Widget _surface(BuildContext context, InteractiveState state) {
-    final theme = ThemeProvider.of(context);
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
     final pad = _paddings[size]!;
     final reduced = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final base = switch (variant) {
-      CardVariant.outline => theme.surface,
-      CardVariant.soft => theme.muted,
-      CardVariant.ghost => theme.surface.withValues(alpha: 0),
+      CardVariant.outline => colors.surface,
+      CardVariant.soft => colors.bgNeutralSoft,
+      CardVariant.ghost => colors.surface.withValues(alpha: 0),
     };
-    final radius = BorderRadius.circular(IdsRadius.container);
+    final radius = BorderRadius.circular(ids.radius.container);
 
     return AnimatedContainer(
       duration: reduced ? Duration.zero : IdsMotion.fast,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: SurfaceLayer.over(base, theme, state),
+        color: SurfaceLayer.over(base, colors, state),
         borderRadius: radius,
-        border: FocusRing.around(theme, state),
+        border: FocusRing.around(colors, state),
         boxShadow: [if (variant == CardVariant.outline) _shadow],
       ),
       foregroundDecoration: variant == CardVariant.outline
           ? BoxDecoration(
-              border: Border.all(color: FocusRing.edge(theme, state)),
+              border: Border.all(color: FocusRing.edge(colors, state)),
               borderRadius: radius,
             )
           : null,
       child: DefaultTextStyle.merge(
-        style: _textStyles[size]!.copyWith(color: theme.onSurface),
+        style: ids.textStyle(_textStyles[size]!, color: colors.onSurface),
         child: _CardBody(
           gap: pad,
           growing: {
@@ -120,7 +120,12 @@ class Card extends StatelessWidget {
           },
           children: [
             for (final (index, child) in children.indexed)
-              _region(child, index: index, pad: pad, lineColor: theme.border),
+              _region(
+                child,
+                index: index,
+                pad: pad,
+                lineColor: colors.borderNeutral,
+              ),
           ],
         ),
       ),
@@ -203,7 +208,7 @@ class CardDescription extends StatelessWidget {
   Widget build(BuildContext context) {
     _CardScope.check(context, 'CardDescription');
     return DefaultTextStyle.merge(
-      style: TextStyle(color: ThemeProvider.of(context).onMuted),
+      style: TextStyle(color: IdsProvider.of(context).colors.textNeutral),
       child: child,
     );
   }

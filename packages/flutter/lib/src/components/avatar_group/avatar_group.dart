@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../avatar/avatar.dart';
 import '../avatar/avatar_scope.dart';
@@ -61,7 +61,7 @@ class AvatarGroup extends StatelessWidget {
           softWrap: false,
           style: TextStyle(
             fontSize: math.max(min, box.maxWidth * factor),
-            color: ThemeProvider.of(context).onSurface,
+            color: IdsProvider.of(context).colors.onSurface,
             fontFeatures: const [FontFeature.tabularFigures()],
           ),
           child:

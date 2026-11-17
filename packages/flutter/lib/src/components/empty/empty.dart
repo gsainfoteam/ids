@@ -4,8 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/ids_radius.dart';
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_typography.dart';
 
@@ -59,11 +58,12 @@ class _EmptyState extends State<Empty> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
     final centered = widget.align == EmptyAlign.center;
     final outline = widget.variant == EmptyVariant.outline;
     final pad = _paddings[widget.size]! + (outline ? _DashedOutline._width : 0);
-    final radius = BorderRadius.circular(IdsRadius.container);
+    final radius = BorderRadius.circular(ids.radius.container);
 
     final body = Padding(
       padding: EdgeInsets.all(pad),
@@ -73,7 +73,7 @@ class _EmptyState extends State<Empty> {
             : AlignmentDirectional.topStart,
         heightFactor: 1,
         child: DefaultTextStyle.merge(
-          style: TextStyle(color: theme.onSurface),
+          style: TextStyle(color: colors.onSurface),
           textAlign: centered ? TextAlign.center : TextAlign.start,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -96,11 +96,17 @@ class _EmptyState extends State<Empty> {
       align: widget.align,
       child: switch (widget.variant) {
         EmptyVariant.outline => CustomPaint(
-          foregroundPainter: _DashedOutline(color: theme.border),
+          foregroundPainter: _DashedOutline(
+            color: colors.borderNeutral,
+            radius: ids.radius.container,
+          ),
           child: body,
         ),
         EmptyVariant.soft => DecoratedBox(
-          decoration: BoxDecoration(color: theme.muted, borderRadius: radius),
+          decoration: BoxDecoration(
+            color: colors.bgNeutralSoft,
+            borderRadius: radius,
+          ),
           child: body,
         ),
         EmptyVariant.ghost => body,
@@ -129,14 +135,18 @@ class EmptyMedia extends StatelessWidget {
   Widget build(BuildContext context) {
     final scope = _EmptyScope.of(context, 'EmptyMedia');
     if (hidden) return const SizedBox.shrink();
-    final theme = ThemeProvider.of(context);
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
     final glyph =
         child ?? const ExcludeSemantics(child: Icon(Icons.inbox_outlined));
-    final radius = BorderRadius.circular(IdsRadius.standard);
+    final radius = BorderRadius.circular(ids.radius.standard);
 
     final media = switch (variant) {
       EmptyMediaVariant.ghost => IconTheme.merge(
-        data: IconThemeData(size: _boxes[scope.size], color: theme.onMuted),
+        data: IconThemeData(
+          size: _boxes[scope.size],
+          color: colors.textNeutral,
+        ),
         child: glyph,
       ),
       EmptyMediaVariant.soft || EmptyMediaVariant.outline => SizedBox.square(
@@ -147,18 +157,18 @@ class EmptyMedia extends StatelessWidget {
             decoration: BoxDecoration(
               color: variant == EmptyMediaVariant.soft
                   ? (scope.variant == EmptyVariant.soft
-                        ? theme.surface
-                        : theme.muted)
+                        ? colors.surface
+                        : colors.bgNeutralSoft)
                   : null,
               border: variant == EmptyMediaVariant.outline
-                  ? Border.all(color: theme.border)
+                  ? Border.all(color: colors.borderNeutral)
                   : null,
               borderRadius: radius,
             ),
             child: IconTheme.merge(
               data: IconThemeData(
                 size: _icons[scope.size],
-                color: theme.onSurface,
+                color: colors.onSurface,
               ),
               child: glyph is Image ? glyph : Center(child: glyph),
             ),
@@ -218,7 +228,7 @@ class EmptyDescription extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: _maxWidth),
         child: DefaultTextStyle.merge(
           style: _styles[size]!.copyWith(
-            color: ThemeProvider.of(context).onMuted,
+            color: IdsProvider.of(context).colors.textNeutral,
           ),
           child: child,
         ),
@@ -286,13 +296,14 @@ class _EmptyScope extends InheritedWidget {
 }
 
 class _DashedOutline extends CustomPainter {
-  const _DashedOutline({required this.color});
+  const _DashedOutline({required this.color, required this.radius});
 
   static const _dash = 3.0;
   static const _gap = 2.0;
   static const _width = 1.0;
 
   final Color color;
+  final double radius;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -301,7 +312,7 @@ class _DashedOutline extends CustomPainter {
       ..addRRect(
         RRect.fromRectAndRadius(
           (Offset.zero & size).deflate(inset),
-          const Radius.circular(IdsRadius.container - _width / 2),
+          Radius.circular(radius - _width / 2),
         ),
       );
     final paint = Paint()

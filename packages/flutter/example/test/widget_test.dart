@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ids_flutter/ids.dart' show ThemeProvider;
+import 'package:ids_flutter/ids.dart' show IdsProvider;
 import 'package:ids_flutter_example/main.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -27,7 +27,7 @@ void main() {
         () => Future<void>.delayed(const Duration(milliseconds: 300)),
       );
       await tester.pump(const Duration(milliseconds: 100));
-      expect(find.byType(ThemeProvider), findsWidgets);
+      expect(find.byType(IdsProvider), findsWidgets);
       expect(tester.takeException(), isNull);
 
       await tester.pumpWidget(const SizedBox.shrink());

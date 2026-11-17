@@ -6,6 +6,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_theme.dart';
+
 Future<void> pump(
   WidgetTester tester,
   Widget child, {
@@ -13,7 +15,10 @@ Future<void> pump(
 }) => tester.pumpWidget(
   Directionality(
     textDirection: direction,
-    child: ThemeProvider(child: Center(child: child)),
+    child: IdsProvider(
+      theme: testTheme,
+      child: Center(child: child),
+    ),
   ),
 );
 
@@ -496,9 +501,9 @@ void main() {
           ),
         ),
       );
-      final danger = ThemeProvider.of(
+      final danger = IdsProvider.of(
         tester.element(find.byType(AvatarGroup)),
-      ).danger;
+      ).colors.bgDanger;
       final indicator = tester.getRect(
         find.byWidgetPredicate(
           (widget) =>

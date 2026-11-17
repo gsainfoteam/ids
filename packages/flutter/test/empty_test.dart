@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_theme.dart';
+
 Future<void> pump(
   WidgetTester tester,
   Widget child, {
@@ -11,7 +13,8 @@ Future<void> pump(
 }) => tester.pumpWidget(
   Directionality(
     textDirection: direction,
-    child: ThemeProvider(
+    child: IdsProvider(
+      theme: testTheme,
       child: Align(
         alignment: Alignment.topLeft,
         child: SizedBox(width: 400, child: child),
@@ -246,8 +249,8 @@ void main() {
               .color!;
 
       await pump(tester, const Empty(children: [_title]));
-      final theme = ThemeProvider.of(tester.element(find.byType(Empty)));
-      expect(tileOf(), theme.muted);
+      final theme = IdsProvider.of(tester.element(find.byType(Empty))).colors;
+      expect(tileOf(), theme.bgNeutralSoft);
 
       await pump(
         tester,
@@ -272,12 +275,12 @@ void main() {
       );
       TextStyle styleOf(String text) =>
           DefaultTextStyle.of(tester.element(find.text(text))).style;
-      final theme = ThemeProvider.of(tester.element(find.byType(Empty)));
+      final theme = IdsProvider.of(tester.element(find.byType(Empty))).colors;
       expect(styleOf('Title').fontSize, 16);
       expect(styleOf('Title').fontWeight, FontWeight.w600);
       expect(styleOf('Title').color, theme.onSurface);
       expect(styleOf('Description').fontSize, 14);
-      expect(styleOf('Description').color, theme.onMuted);
+      expect(styleOf('Description').color, theme.textNeutral);
     });
 
     testWidgets('the title is a heading only when given a level', (

@@ -14,17 +14,19 @@ const _colorSchemes = [
 ];
 
 class _Box extends StatelessWidget {
-  const _Box({this.radius = ids.IdsRadius.standard});
+  const _Box({this.radius});
 
-  final double radius;
+  final double? radius;
 
   @override
   Widget build(BuildContext context) => Container(
     width: 40,
     height: 40,
     decoration: BoxDecoration(
-      color: ids.ThemeProvider.of(context).muted,
-      borderRadius: BorderRadius.circular(radius),
+      color: ids.IdsProvider.of(context).colors.bgNeutralSoft,
+      borderRadius: BorderRadius.circular(
+        radius ?? ids.IdsProvider.of(context).radius.standard,
+      ),
     ),
   );
 }

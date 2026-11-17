@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_theme.dart';
+
 const _anchor = SizedBox.square(dimension: 40);
 
 Future<void> pump(
@@ -11,7 +13,10 @@ Future<void> pump(
 }) => tester.pumpWidget(
   Directionality(
     textDirection: direction,
-    child: ThemeProvider(child: Center(child: child)),
+    child: IdsProvider(
+      theme: testTheme,
+      child: Center(child: child),
+    ),
   ),
 );
 
@@ -222,16 +227,14 @@ void main() {
 
     testWidgets('is danger attached and neutral on its own', (tester) async {
       await pump(tester, const Badge.count(count: 3, child: _anchor));
-      final theme = ThemeProvider.of(tester.element(find.byType(Badge)));
-      expect(fill(tester), theme.danger);
+      final theme = IdsProvider.of(tester.element(find.byType(Badge))).colors;
+      expect(fill(tester), theme.bgDanger);
 
       await pump(tester, const Badge.count(count: 3));
       expect(fill(tester), theme.onSurface);
     });
 
-    testWidgets('soft mixes 16% of the scheme into the surface in oklab', (
-      tester,
-    ) async {
+    testWidgets('soft takes the soft fill of its scheme', (tester) async {
       await pump(
         tester,
         const Badge.count(
@@ -241,12 +244,29 @@ void main() {
           child: _anchor,
         ),
       );
-      final color = fill(tester);
-      expect(
-        [color.r, color.g, color.b].map((c) => (c * 255).round()),
-        orderedEquals([251, 221, 217]),
-      );
+      final theme = IdsProvider.of(tester.element(find.byType(Badge))).colors;
+      expect(fill(tester), theme.bgDangerSoft);
     });
+
+    testWidgets(
+      'neutral soft mixes 16% of on-surface into the surface in oklab',
+      (tester) async {
+        await pump(
+          tester,
+          const Badge.count(
+            count: 3,
+            variant: BadgeVariant.soft,
+            colorScheme: IdsColorScheme.neutral,
+            child: _anchor,
+          ),
+        );
+        final color = fill(tester);
+        expect(
+          [color.r, color.g, color.b].map((c) => (c * 255).round()),
+          orderedEquals([213, 213, 213]),
+        );
+      },
+    );
 
     testWidgets('outline draws on the surface', (tester) async {
       await pump(
@@ -258,7 +278,7 @@ void main() {
           child: _anchor,
         ),
       );
-      final theme = ThemeProvider.of(tester.element(find.byType(Badge)));
+      final theme = IdsProvider.of(tester.element(find.byType(Badge))).colors;
       expect(fill(tester), theme.surface);
     });
   });

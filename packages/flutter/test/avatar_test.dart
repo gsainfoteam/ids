@@ -7,6 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_theme.dart';
+
 class _HeldImage extends ImageProvider<_HeldImage> {
   final completer = Completer<ImageInfo>();
 
@@ -22,7 +24,10 @@ class _HeldImage extends ImageProvider<_HeldImage> {
 Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
   Directionality(
     textDirection: TextDirection.ltr,
-    child: ThemeProvider(child: Center(child: child)),
+    child: IdsProvider(
+      theme: testTheme,
+      child: Center(child: child),
+    ),
   ),
 );
 

@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_theme.dart';
+
 Future<void> pump(
   WidgetTester tester,
   Widget spinner, {
@@ -49,7 +51,7 @@ void main() {
     await pump(tester, text);
     expect(spinnerSize(tester), const Size.square(18));
 
-    await pump(tester, const ThemeProvider(child: text));
+    await pump(tester, const IdsProvider(theme: testTheme, child: text));
     expect(spinnerSize(tester), const Size.square(18));
 
     await pump(
@@ -63,7 +65,8 @@ void main() {
   });
 
   testWidgets('takes the size of the Field around it', (tester) async {
-    Widget field(IdsSize size) => ThemeProvider(
+    Widget field(IdsSize size) => IdsProvider(
+      theme: testTheme,
       child: Field(
         size: size,
         children: const [

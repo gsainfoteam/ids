@@ -16,17 +16,21 @@ Widget _onBackground(String label, {Color? color, Gradient? gradient}) =>
     ShowcaseRow(
       label: label,
       children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: color,
-            gradient: gradient,
-            borderRadius: BorderRadius.circular(ids.IdsRadius.standard),
-          ),
-          child: ids.AvatarGroup(
-            max: 4,
-            semanticLabel: label,
-            children: _members,
+        Builder(
+          builder: (context) => Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color,
+              gradient: gradient,
+              borderRadius: BorderRadius.circular(
+                ids.IdsProvider.of(context).radius.standard,
+              ),
+            ),
+            child: ids.AvatarGroup(
+              max: 4,
+              semanticLabel: label,
+              children: _members,
+            ),
           ),
         ),
       ],
@@ -50,7 +54,7 @@ final avatarGroupUseCases = [
     name: 'Gallery',
     builder: (context) => Builder(
       builder: (context) {
-        final theme = ids.ThemeProvider.of(context);
+        final theme = ids.IdsProvider.of(context).colors;
         return Showcase(
           children: [
             ShowcaseSection(
@@ -139,8 +143,8 @@ final avatarGroupUseCases = [
               title: 'Any background',
               description: '겹친 쪽은 투명하게 오려내므로 어떤 배경에서도 틈이 배경색 그대로 보입니다.',
               children: [
-                _onBackground('muted', color: theme.muted),
-                _onBackground('primary', color: theme.primary),
+                _onBackground('muted', color: theme.bgNeutralSoft),
+                _onBackground('primary', color: theme.bgPrimary),
                 _onBackground(
                   'gradient',
                   gradient: const LinearGradient(
@@ -184,11 +188,11 @@ final avatarGroupUseCases = [
                       overflowFirst: true,
                       overflowBuilder: (count) => SizedBox.expand(
                         child: ColoredBox(
-                          color: theme.primary,
+                          color: theme.bgPrimary,
                           child: Center(
                             child: Text(
                               '$count+',
-                              style: TextStyle(color: theme.onPrimary),
+                              style: TextStyle(color: theme.textOnPrimary),
                             ),
                           ),
                         ),

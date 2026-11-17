@@ -8,6 +8,8 @@ enum IdsMode {
 
 enum IdsColorScheme {
   primary,
+  secondary,
+  tertiary,
   neutral,
   danger,
   success,

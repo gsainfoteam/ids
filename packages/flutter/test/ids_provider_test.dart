@@ -349,7 +349,7 @@ void main() {
           theme: testTheme,
           translation: translation,
           locale: const Locale('en'),
-          child: IdsSpinner(semanticLabel: label, decorative: decorative),
+          child: Spinner(semanticLabel: label, decorative: decorative),
         ),
       );
       await tester.pumpWidget(build(Translations().ids));
@@ -400,7 +400,7 @@ void main() {
                       icons = IconTheme.of(context);
                       locale = Localizations.localeOf(context);
                       textScale = MediaQuery.textScalerOf(context).scale(10);
-                      return const IdsLabel(child: Text('IDS'));
+                      return const Label(child: Text('IDS'));
                     },
                   ),
                 ),

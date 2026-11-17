@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/ids_radius.dart';
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
 
 enum SkeletonShape { rect, circle, text }
 
@@ -72,7 +71,8 @@ class _SkeletonState extends State<Skeleton>
   }
 
   Widget _paint({required bool circle, required double radius, Widget? child}) {
-    final theme = ThemeProvider.of(context);
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
     return CustomPaint(
       painter: _SkeletonPainter(
         progress: _controller,
@@ -80,8 +80,8 @@ class _SkeletonState extends State<Skeleton>
         visible: _busy,
         circle: circle,
         radius: radius,
-        base: theme.muted,
-        highlight: theme.mutedHover,
+        base: colors.bgNeutralSoft,
+        highlight: colors.bgNeutralSoftHover,
         direction: Directionality.maybeOf(context) ?? TextDirection.ltr,
       ),
       child: child,
@@ -90,7 +90,7 @@ class _SkeletonState extends State<Skeleton>
 
   Widget _wrap(Widget child) => _paint(
     circle: widget.shape == SkeletonShape.circle,
-    radius: IdsRadius.standard,
+    radius: IdsProvider.of(context).radius.standard,
     child: ExcludeSemantics(
       excluding: _busy,
       child: ExcludeFocus(
@@ -133,7 +133,10 @@ class _SkeletonState extends State<Skeleton>
                       : 1,
                   child: SizedBox(
                     height: barHeight,
-                    child: _paint(circle: false, radius: IdsRadius.indicator),
+                    child: _paint(
+                      circle: false,
+                      radius: IdsProvider.of(context).radius.indicator,
+                    ),
                   ),
                 ),
               ),
@@ -153,7 +156,10 @@ class _SkeletonState extends State<Skeleton>
       SkeletonShape.rect => SizedBox(
         width: double.infinity,
         height: _rectHeight,
-        child: _paint(circle: false, radius: IdsRadius.standard),
+        child: _paint(
+          circle: false,
+          radius: IdsProvider.of(context).radius.standard,
+        ),
       ),
       SkeletonShape.circle => SizedBox.square(
         dimension: _circleSize,

@@ -25,7 +25,7 @@ class _Code extends StatelessWidget {
     text,
     style: TextStyle(
       inherit: false,
-      color: ids.ThemeProvider.of(context).onSurface,
+      color: ids.IdsProvider.of(context).colors.onSurface,
       fontFamily: 'monospace',
       fontFamilyFallback: const ['Menlo', 'Consolas'],
       fontSize: ids.IdsTypography.bodyB3Regular.fontSize,
@@ -205,7 +205,7 @@ class _LoadingStatusState extends State<_LoadingStatus> {
           shape: CircleBorder(
             side: _log.lastOrNull == ids.AvatarStatus.loaded
                 ? BorderSide(
-                    color: ids.ThemeProvider.of(context).success,
+                    color: ids.IdsProvider.of(context).colors.bgSuccess,
                     width: 2,
                     strokeAlign: BorderSide.strokeAlignOutside,
                   )

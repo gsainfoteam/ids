@@ -280,9 +280,9 @@ final emptyUseCases = [
     name: 'Table Empty State',
     builder: (context) => Builder(
       builder: (context) {
-        final theme = ids.ThemeProvider.of(context);
+        final theme = ids.IdsProvider.of(context).colors;
         final heading = ids.IdsTypography.bodyB3Regular.copyWith(
-          color: theme.onMuted,
+          color: theme.textNeutral,
           fontWeight: FontWeight.w500,
         );
         return ConstrainedBox(
@@ -299,7 +299,9 @@ final emptyUseCases = [
                 children: [
                   TableRow(
                     decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: theme.border)),
+                      border: Border(
+                        bottom: BorderSide(color: theme.borderNeutral),
+                      ),
                     ),
                     children: [
                       for (final column in const ['이름', '이메일', '역할'])

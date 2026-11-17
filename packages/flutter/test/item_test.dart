@@ -7,6 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_theme.dart';
+
 Future<void> pump(
   WidgetTester tester,
   Widget child, {
@@ -16,7 +18,8 @@ Future<void> pump(
     color: const Color(0xFFFFFFFF),
     builder: (context, _) => Directionality(
       textDirection: direction,
-      child: ThemeProvider(
+      child: IdsProvider(
+        theme: testTheme,
         child: Align(
           alignment: Alignment.topLeft,
           child: SizedBox(width: 300, child: child),
@@ -44,8 +47,8 @@ AnimatedContainer containerOf(WidgetTester tester, [Finder? item]) =>
 BoxDecoration surfaceOf(WidgetTester tester, [Finder? item]) =>
     containerOf(tester, item).decoration! as BoxDecoration;
 
-IdsTheme themeOf(WidgetTester tester) =>
-    ThemeProvider.of(tester.element(find.byType(Item).first));
+IdsColors themeOf(WidgetTester tester) =>
+    IdsProvider.of(tester.element(find.byType(Item).first)).colors;
 
 void main() {
   group('size', () {
@@ -291,7 +294,7 @@ void main() {
       expect(textOf('Title').style.fontWeight, FontWeight.w500);
       expect(textOf('Title').maxLines, 1);
       expect(textOf('Title').overflow, TextOverflow.ellipsis);
-      expect(textOf('Description').style.color, theme.onMuted);
+      expect(textOf('Description').style.color, theme.textNeutral);
       expect(textOf('Description').maxLines, 2);
     });
   });
@@ -306,7 +309,7 @@ void main() {
         tester,
         const Item(variant: ItemVariant.soft, children: [_content]),
       );
-      expect(surfaceOf(tester).color, theme.muted);
+      expect(surfaceOf(tester).color, theme.bgNeutralSoft);
     });
 
     testWidgets('a selected row lays 6%, 10% hovered, 8% pressed', (
@@ -434,7 +437,7 @@ void main() {
               as Border?;
       final theme = themeOf(tester);
       expect(tester.getSize(find.byType(ItemGroup)).height, 56 + 1 + 56);
-      expect(borderAbove('a')!.bottom.color, theme.border);
+      expect(borderAbove('a')!.bottom.color, theme.borderNeutral);
       expect(borderAbove('b')!.bottom, BorderSide.none);
       expect(
         surfaceOf(tester, find.byKey(const ValueKey('a'))).borderRadius,

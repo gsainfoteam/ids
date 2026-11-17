@@ -4,10 +4,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_theme.dart';
+
 Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
   WidgetsApp(
     color: const Color(0xFFFFFFFF),
-    builder: (context, _) => ThemeProvider(
+    builder: (context, _) => IdsProvider(
+      theme: testTheme,
       child: FocusScope(
         autofocus: true,
         child: Align(
@@ -35,8 +38,8 @@ BoxDecoration surfaceOf(WidgetTester tester) =>
             .decoration!
         as BoxDecoration;
 
-IdsTheme themeOf(WidgetTester tester) =>
-    ThemeProvider.of(tester.element(find.byType(Card)));
+IdsColors themeOf(WidgetTester tester) =>
+    IdsProvider.of(tester.element(find.byType(Card))).colors;
 
 void main() {
   group('layout', () {
@@ -394,7 +397,7 @@ void main() {
         styleOf('Title').fontWeight,
         IdsTypography.subtitleS2Semibold.fontWeight,
       );
-      expect(styleOf('Description').color, themeOf(tester).onMuted);
+      expect(styleOf('Description').color, themeOf(tester).textNeutral);
     });
 
     testWidgets('outline, soft and ghost fill the surface', (tester) async {
@@ -411,7 +414,7 @@ void main() {
           children: [CardContent(child: _box)],
         ),
       );
-      expect(surfaceOf(tester).color, theme.muted);
+      expect(surfaceOf(tester).color, theme.bgNeutralSoft);
       expect(surfaceOf(tester).boxShadow, isEmpty);
 
       await pump(
@@ -570,7 +573,7 @@ void main() {
       expect(
         surfaceOf(tester).border,
         Border.all(
-          color: theme.primary.withValues(alpha: 0.4),
+          color: theme.borderPrimary.withValues(alpha: 0.4),
           width: 3,
           strokeAlign: BorderSide.strokeAlignOutside,
         ),
@@ -585,7 +588,7 @@ void main() {
                   )
                   .foregroundDecoration!
               as BoxDecoration;
-      expect((edge.border! as Border).top.color, theme.primary);
+      expect((edge.border! as Border).top.color, theme.borderPrimary);
     });
 
     testWidgets('a focused ghost card stays clear inside its ring', (

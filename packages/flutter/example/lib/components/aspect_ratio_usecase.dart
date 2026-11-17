@@ -158,17 +158,19 @@ class _Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ids.ThemeProvider.of(context);
+    final theme = ids.IdsProvider.of(context).colors;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: theme.secondary,
-        borderRadius: BorderRadius.circular(ids.IdsRadius.standard),
+        color: theme.bgPrimarySoft,
+        borderRadius: BorderRadius.circular(
+          ids.IdsProvider.of(context).radius.standard,
+        ),
       ),
       child: Center(
         child: Text(
           label,
           style: ids.IdsTypography.bodyB3Medium.copyWith(
-            color: theme.onSecondary,
+            color: theme.textOnPrimarySoft,
           ),
         ),
       ),
@@ -184,9 +186,14 @@ class _Rounded extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-    borderRadius: BorderRadius.circular(ids.IdsRadius.standard),
+    borderRadius: BorderRadius.circular(
+      ids.IdsProvider.of(context).radius.standard,
+    ),
     child: muted
-        ? ColoredBox(color: ids.ThemeProvider.of(context).muted, child: child)
+        ? ColoredBox(
+            color: ids.IdsProvider.of(context).colors.bgNeutralSoft,
+            child: child,
+          )
         : child,
   );
 }

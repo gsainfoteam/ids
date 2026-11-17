@@ -15,7 +15,7 @@
     },
     "colorScheme": {
       "values": {
-        "$value": ["primary", "neutral", "danger", "success", "warning", "info"],
+        "$value": ["primary", "secondary", "tertiary", "neutral", "danger", "success", "warning", "info"],
         "$type": "other"
       }
     },

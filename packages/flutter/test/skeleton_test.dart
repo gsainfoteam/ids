@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart' hide AspectRatio;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_theme.dart';
+
 Future<void> pump(
   WidgetTester tester,
   Widget child, {
@@ -15,7 +17,8 @@ Future<void> pump(
     ),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: ThemeProvider(
+      child: IdsProvider(
+        theme: testTheme,
         child: Align(
           alignment: Alignment.topLeft,
           child: SizedBox(width: 200, child: child),

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../theme/ids_theme.dart';
+import '../../tokens/ids_color_roles.dart';
 import 'interactive.dart';
 
 abstract final class SurfaceLayer {
@@ -11,11 +11,11 @@ abstract final class SurfaceLayer {
 
   static Color over(
     Color base,
-    IdsTheme theme,
+    IdsColors colors,
     InteractiveState state, {
     bool selected = false,
   }) => Color.alphaBlend(
-    theme.onSurface.withValues(
+    colors.onSurface.withValues(
       alpha: switch ((selected, state)) {
         (_, InteractiveState(active: true)) => _active,
         (true, InteractiveState(hovered: true)) => _selectedHover,
@@ -32,14 +32,16 @@ abstract final class FocusRing {
   static const _width = 3.0;
   static const _alpha = 0.4;
 
-  static Border around(IdsTheme theme, InteractiveState state) => Border.all(
-    color: theme.primary.withValues(alpha: state.focusVisible ? _alpha : 0),
+  static Border around(IdsColors colors, InteractiveState state) => Border.all(
+    color: colors.borderPrimary.withValues(
+      alpha: state.focusVisible ? _alpha : 0,
+    ),
     width: state.focusVisible ? _width : 0,
     strokeAlign: BorderSide.strokeAlignOutside,
   );
 
-  static Color edge(IdsTheme theme, InteractiveState state) =>
-      state.focusVisible ? theme.primary : theme.border;
+  static Color edge(IdsColors colors, InteractiveState state) =>
+      state.focusVisible ? colors.borderPrimary : colors.borderNeutral;
 }
 
 class PressableSurface extends StatelessWidget {

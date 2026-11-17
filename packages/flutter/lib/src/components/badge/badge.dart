@@ -3,8 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/ids_theme.dart';
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
+import '../../../tokens/ids_color_roles.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
@@ -154,51 +154,37 @@ class Badge extends StatelessWidget {
   bool get _describes => semanticLabel == null && !dot && !_hidden;
 
   ({Color background, Color foreground, Color? edge}) _colors(
-    IdsTheme theme,
+    IdsColors colors,
     IdsColorScheme scheme,
   ) {
-    final (fill, onFill, strong) = switch (scheme) {
-      IdsColorScheme.neutral => (
-        theme.onSurface,
-        theme.surface,
-        theme.onSurface,
-      ),
-      IdsColorScheme.primary => (theme.primary, theme.onPrimary, theme.accent),
-      IdsColorScheme.success => (
-        theme.success,
-        theme.onSuccess,
-        theme.successStrong,
-      ),
-      IdsColorScheme.warning => (
-        theme.warning,
-        theme.onWarning,
-        theme.warningStrong,
-      ),
-      IdsColorScheme.danger => (
-        theme.danger,
-        theme.onDanger,
-        theme.dangerStrong,
-      ),
-      IdsColorScheme.info => (theme.info, theme.onInfo, theme.infoStrong),
-    };
-    final (tinted, onTint) = scheme == IdsColorScheme.primary
-        ? (theme.secondary, theme.onSecondary)
-        : (_mixOklab(theme.surface, fill, _tintAmount), strong);
+    final neutral = scheme == IdsColorScheme.neutral;
+    final family = scheme.name;
     return switch (variant) {
-      BadgeVariant.solid => (background: fill, foreground: onFill, edge: null),
-      BadgeVariant.soft => (background: tinted, foreground: onTint, edge: null),
+      BadgeVariant.solid => (
+        background: neutral ? colors.onSurface : colors['bg-$family'],
+        foreground: neutral ? colors.surface : colors['text-on-$family'],
+        edge: null,
+      ),
+      BadgeVariant.soft => (
+        background: neutral
+            ? _mixOklab(colors.surface, colors.onSurface, _tintAmount)
+            : colors['bg-$family-soft'],
+        foreground: neutral ? colors.onSurface : colors['text-on-$family-soft'],
+        edge: null,
+      ),
       BadgeVariant.outline => (
-        background: theme.surface,
-        foreground: strong,
-        edge: fill.withValues(alpha: _outlineAlpha),
+        background: colors.surface,
+        foreground: neutral ? colors.onSurface : colors['text-$family'],
+        edge: (neutral ? colors.onSurface : colors['border-$family'])
+            .withValues(alpha: _outlineAlpha),
       ),
     };
   }
 
   Widget _indicator(BuildContext context, {required bool attached}) {
-    final theme = ThemeProvider.of(context);
+    final roles = IdsProvider.of(context).colors;
     final colors = _colors(
-      theme,
+      roles,
       colorScheme ??
           (attached ? IdsColorScheme.danger : IdsColorScheme.neutral),
     );
@@ -226,7 +212,7 @@ class Badge extends StatelessWidget {
         shape: StadiumBorder(
           side: attached
               ? BorderSide(
-                  color: theme.surface,
+                  color: roles.surface,
                   width: _ringWidth,
                   strokeAlign: BorderSide.strokeAlignOutside,
                 )

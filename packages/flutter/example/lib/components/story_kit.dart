@@ -5,84 +5,88 @@ import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart' as ids;
 import 'package:widgetbook/widgetbook.dart';
 
-WidgetbookComponent docs(String component, List<WidgetbookUseCase> stories) =>
-    WidgetbookComponent(
-      name: component,
-      useCases: [
-        WidgetbookUseCase(
-          name: 'Docs',
+import '../ids_theme.dart';
+
+WidgetbookComponent docs(
+  String component,
+  List<WidgetbookUseCase> stories,
+) => WidgetbookComponent(
+  name: component,
+  useCases: [
+    WidgetbookUseCase(
+      name: 'Docs',
+      builder: (context) => ids.IdsProvider(
+        theme: appTheme,
+        mode: context.knobs.object.dropdown<ids.IdsMode>(
+          label: 'Mode',
+          options: ids.IdsMode.values,
+          initialOption: ids.IdsMode.light,
+          labelBuilder: (mode) => mode.name,
+        ),
+        child: Builder(
           builder: (context) {
-            final mode = context.knobs.object.dropdown(
-              label: 'Mode',
-              options: ids.IdsMode.values,
-              initialOption: ids.IdsMode.light,
-              labelBuilder: (mode) => mode.name,
-            );
+            final scope = ids.IdsProvider.of(context);
+            final theme = scope.colors;
             return Theme(
               data: ThemeData(
-                brightness: mode == ids.IdsMode.dark
-                    ? Brightness.dark
-                    : Brightness.light,
+                brightness: scope.isDark ? Brightness.dark : Brightness.light,
                 fontFamily: ids.IdsTypography.sansFontFamily,
                 package: ids.IdsTypography.sansFontPackage,
               ),
-              child: ids.ThemeProvider(
-                mode: mode,
-                child: Builder(
-                  builder: (context) {
-                    final theme = ids.ThemeProvider.of(context);
-                    return Material(
-                      color: theme.surface,
-                      textStyle: Theme.of(context).textTheme.bodyLarge!
-                          .copyWith(
-                            fontSize: 16,
-                            height: 1.5,
-                            letterSpacing: 0,
-                            color: theme.onSurface,
+              child: Builder(
+                builder: (context) => Material(
+                  color: theme.surface,
+                  textStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    fontSize: 16,
+                    height: 1.5,
+                    letterSpacing: 0,
+                    color: theme.onSurface,
+                  ),
+                  child: SizedBox.expand(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 16,
+                        children: [
+                          Text(
+                            component,
+                            style: ids.IdsTypography.headlineH4Bold,
                           ),
-                      child: SizedBox.expand(
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            spacing: 16,
-                            children: [
-                              Text(
-                                component,
-                                style: ids.IdsTypography.headlineH4Bold,
+                          for (final story in stories) ...[
+                            Container(
+                              margin: const EdgeInsets.only(top: 32),
+                              padding: const EdgeInsets.only(bottom: 8),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: theme.borderNeutral,
+                                  ),
+                                ),
                               ),
-                              for (final story in stories) ...[
-                                Container(
-                                  margin: const EdgeInsets.only(top: 32),
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(color: theme.border),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    story.name,
-                                    style: ids.IdsTypography.headlineH6Semibold,
-                                  ),
-                                ),
-                                Align(
-                                  alignment: AlignmentDirectional.topStart,
-                                  child: Builder(builder: story.builder),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
+                              child: Text(
+                                story.name,
+                                style: ids.IdsTypography.headlineH6Semibold,
+                              ),
+                            ),
+                            Align(
+                              alignment: AlignmentDirectional.topStart,
+                              child: Builder(builder: story.builder),
+                            ),
+                          ],
+                        ],
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 ),
               ),
             );
           },
         ),
-      ],
-    );
+      ),
+    ),
+  ],
+);
 
 T dropdown<T extends Enum>(
   BuildContext context,
@@ -127,7 +131,7 @@ class ShowcaseSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ids.ThemeProvider.of(context);
+    final theme = ids.IdsProvider.of(context).colors;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -136,7 +140,7 @@ class ShowcaseSection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
-            border: Border(bottom: BorderSide(color: theme.border)),
+            border: Border(bottom: BorderSide(color: theme.borderNeutral)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -148,7 +152,7 @@ class ShowcaseSection extends StatelessWidget {
                 Text(
                   description!,
                   style: ids.IdsTypography.bodyB3Regular.copyWith(
-                    color: theme.onMuted,
+                    color: theme.textNeutral,
                   ),
                 ),
             ],
@@ -253,7 +257,7 @@ class _Caption extends StatelessWidget {
   Widget build(BuildContext context) => Text(
     text,
     style: ids.IdsTypography.captionC1Medium.copyWith(
-      color: ids.ThemeProvider.of(context).onMuted,
+      color: ids.IdsProvider.of(context).colors.textNeutral,
     ),
   );
 }
@@ -345,7 +349,9 @@ class StandInButton extends StatelessWidget {
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.standard,
       textStyle: WidgetStatePropertyAll(
-        tiny ? ids.IdsTypography.buttonTiny : ids.IdsTypography.buttonStandard,
+        tiny
+            ? ids.IdsTypography.captionC1Medium
+            : ids.IdsTypography.bodyB3Medium,
       ),
     );
     final label = icon == null

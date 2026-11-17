@@ -14,8 +14,10 @@ class _Panel extends StatelessWidget {
     width: 96,
     alignment: Alignment.center,
     decoration: BoxDecoration(
-      color: ids.ThemeProvider.of(context).muted,
-      borderRadius: BorderRadius.circular(ids.IdsRadius.standard),
+      color: ids.IdsProvider.of(context).colors.bgNeutralSoft,
+      borderRadius: BorderRadius.circular(
+        ids.IdsProvider.of(context).radius.standard,
+      ),
     ),
     child: Text(text, style: ids.IdsTypography.bodyB3Regular),
   );

@@ -5,8 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/ids_radius.dart';
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_typography.dart';
 import 'avatar_scope.dart';
@@ -59,10 +58,6 @@ class Avatar extends StatefulWidget {
 
 class _AvatarState extends State<Avatar> {
   static const _sizes = {IdsSize.standard: 40.0, IdsSize.tiny: 24.0};
-  static const _squareRadii = {
-    IdsSize.standard: IdsRadius.standard,
-    IdsSize.tiny: IdsRadius.indicator,
-  };
   static const _ringAlpha = 0.08;
   static const _initialsFactor = 0.4;
   static const _minInitialsSize = 10.0;
@@ -163,9 +158,14 @@ class _AvatarState extends State<Avatar> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
     final scope = AvatarScope.maybeOf(context);
     final size = widget.size ?? scope?.size ?? IdsSize.standard;
+    final squareRadius = switch (size) {
+      IdsSize.standard => ids.radius.standard,
+      IdsSize.tiny => ids.radius.indicator,
+    };
     final circle =
         (widget.shape ?? scope?.shape ?? AvatarShape.circle) ==
         AvatarShape.circle;
@@ -173,21 +173,24 @@ class _AvatarState extends State<Avatar> {
         ? CircleBorder(side: side)
         : RoundedRectangleBorder(
             side: side,
-            borderRadius: BorderRadius.circular(_squareRadii[size]!),
+            borderRadius: BorderRadius.circular(squareRadius),
           );
 
     final cutout = scope?.cutout;
     final surface = Container(
       clipBehavior: Clip.antiAlias,
-      decoration: ShapeDecoration(color: theme.muted, shape: outline()),
+      decoration: ShapeDecoration(
+        color: colors.bgNeutralSoft,
+        shape: outline(),
+      ),
       foregroundDecoration: ShapeDecoration(
         shape: outline(
-          BorderSide(color: theme.onSurface.withValues(alpha: _ringAlpha)),
+          BorderSide(color: colors.onSurface.withValues(alpha: _ringAlpha)),
         ),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final fallback = _fallback(constraints.maxWidth, theme.onMuted);
+          final fallback = _fallback(constraints.maxWidth, colors.textNeutral);
           final image = widget.image;
           if (image == null) return fallback;
           return Image(
@@ -227,7 +230,7 @@ class _AvatarState extends State<Avatar> {
                         (Directionality.of(context) == TextDirection.rtl),
                     overlap: scope!.overlap,
                     circle: circle,
-                    radius: _squareRadii[size]!,
+                    radius: squareRadius,
                   ),
             child: surface,
           ),
