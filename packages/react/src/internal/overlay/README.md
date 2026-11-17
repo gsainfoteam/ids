@@ -366,10 +366,10 @@ const scoped = useOverlay();                    // 부른 곳의 theme 으로 �
 | 조각       | 쓰는 곳                                                    | 내용                                                                 |
 | ---------- | ---------------------------------------------------------- | -------------------------------------------------------------------- |
 | `popup`    | Menu 의 `content`, [field-popup](../field-popup/README.md) 의 `popup` | 위치, 테두리, 표면색, 글자, `shadow-md`, `concentric-p-1` 의 모서리 |
-| `backdrop` | Dialog, Drawer, Menu 의 팔레트, field-popup 의 drawer, Image 의 뷰어 | 화면을 덮는 `bg-black/50` 과 들어오고 나가는 opacity 전환           |
+| `backdrop` | Dialog, Drawer, Menu 의 팔레트, field-popup 의 drawer, Image 의 뷰어 | 화면을 덮는 `bg-black/40` 과 `backdrop-blur-xs`, 들어오고 나가는 opacity 전환. 겹친 모달(`data-stacked`)은 투명하고 흐리지 않음 |
 
 ```ts
-backdrop: [overlayStyles.backdrop, 'duration-(--ids-motion-normal) ease-out data-stacked:bg-transparent'],
+backdrop: [overlayStyles.backdrop, 'duration-(--ids-motion-normal) ease-out'],
 popup: [overlayStyles.popup, 'transition-[opacity,scale] duration-(--ids-motion-fast) ease-out'],
 ```
 
@@ -378,4 +378,7 @@ popup: [overlayStyles.popup, 'transition-[opacity,scale] duration-(--ids-motion-
 - `popup` 은 `inset-ring` 이 아니라 진짜 테두리입니다(`borderOptionsCannotCover`). 스크롤 컨테이너에서 inset shadow 는 내용 아래에 칠해지므로, 강조된 옵션이 가장자리를 지날 때 테두리를 가립니다.
 - `popup` 은 모서리만 `concentric-p-1` 로 정하고 padding 은 0 입니다(`cornerOfThePaddedViewport`). padding 은 안의 `ScrollArea.Viewport` 가 가집니다.
 - transition 의 속성, 길이, 이징은 조각에 넣지 않습니다. field-popup 의 drawer 는 `translate` 도 움직이고 Drawer 는 끌기 중에 전환을 끕니다. Menu 에 `translate` 전환이 붙으면 anchor 를 따라가는 위치 이동까지 움직입니다.
+- `backdrop` 의 흐림은 `blur` 반경을 전환하지 않고 opacity 만 전환합니다. 요소의 opacity 가 흐린 배경까지 함께 섞으므로, 흐림은 어두워지는 정도와 같이 들어오고 나갑니다. 반경을 전환하면 매 프레임 다른 크기로 다시 흐려야 합니다.
+- 흐림이 있으니 어둡게 하는 정도는 50% 에서 40% 로 낮췄습니다. 흐린 뒤 페이지는 같은 농도에서 더 어둡고 무겁게 읽힙니다.
+- 겹친 모달은 아래 모달의 배경이 이미 페이지를 흐리고 어둡게 합니다. 두 번째 배경은 `data-stacked` 에서 투명해지고 흐림도 끕니다. 그러지 않으면 아래 모달까지 흐려집니다.
 - 이 파일은 `'use client'` 가 없는 순수 모듈입니다. 서버에서 읽는 `style.ts` 가 `internal/overlay` 의 index 대신 이 파일을 바로 import 합니다.
