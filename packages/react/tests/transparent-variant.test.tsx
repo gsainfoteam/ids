@@ -10,8 +10,8 @@ import { render } from 'vitest-browser-react';
 import { Button, IconButton, IconToggle, IdsProvider, Toggle } from '../src';
 import { testTheme } from './theme';
 
-
 const NO_BACKGROUND = 'rgba(0, 0, 0, 0)';
+const HOVER_OPACITY = '0.7';
 const PRESS_OPACITY = '0.4';
 
 async function renderInTheme(control: ReactElement) {
@@ -61,7 +61,7 @@ test.each([
     />,
   ],
 ])(
-  'a transparent %s never paints a background: hover strengthens the text, press lowers the opacity',
+  'a transparent %s never paints a background: hover and press lower the opacity, the text keeps its color',
   async (_, control) => {
     const { screen, token } = await renderInTheme(control);
     const button = screen.getByRole('button', { name: '삭제' });
@@ -81,7 +81,8 @@ test.each([
     expect(paint(element)).toMatchObject({
       background: NO_BACKGROUND,
       shadow: 'none',
-      color: token('--ids-color-text-on-danger-soft'),
+      color: token('--ids-color-text-danger'),
+      opacity: HOVER_OPACITY,
     });
 
     (element as HTMLElement).focus();
@@ -94,11 +95,23 @@ test.each([
   },
 );
 
-test('a transparent Button in a brand scheme rests in the ghost foreground', async () => {
+test('a transparent Button in a brand scheme rests in the ghost foreground and still shows hover', async () => {
   const { screen, token } = await renderInTheme(<Button variant="transparent">취소</Button>);
   const button = screen.getByRole('button', { name: '취소' });
   await expect.element(button).toHaveAttribute('data-variant', 'transparent');
-  expect(paint(button.element()).color).toBe(token('--ids-color-on-surface'));
+  expect(paint(button.element())).toMatchObject({
+    color: token('--ids-color-on-surface'),
+    opacity: '1',
+  });
+
+  await userEvent.hover(button);
+  await expect.element(button).toHaveAttribute('data-hovered');
+  expect(paint(button.element())).toMatchObject({
+    background: NO_BACKGROUND,
+    color: token('--ids-color-on-surface'),
+    opacity: HOVER_OPACITY,
+  });
+  await userEvent.hover(screen.getByText('Elsewhere'));
 });
 
 test('a transparent IconToggle turns on by coloring only its glyph', async () => {
@@ -124,7 +137,7 @@ test('a transparent IconToggle turns on by coloring only its glyph', async () =>
 
   await userEvent.hover(toggle);
   await expect.element(toggle).toHaveAttribute('data-hovered');
-  expect(paint(element).background).toBe(NO_BACKGROUND);
+  expect(paint(element)).toMatchObject({ background: NO_BACKGROUND, opacity: HOVER_OPACITY });
 
   (element as HTMLElement).focus();
   await userEvent.keyboard('[Space>]');
@@ -144,6 +157,11 @@ test('a transparent IconToggle turns on by coloring only its glyph', async () =>
     color: token('--ids-color-text-danger'),
     opacity: '1',
   });
+
+  await userEvent.hover(toggle);
+  await expect.element(toggle).not.toHaveAttribute('data-hovered');
+  expect(paint(element).opacity).toBe('1');
+  await userEvent.hover(screen.getByText('Elsewhere'));
 });
 
 test('SSR: a transparent IconToggle names its variant and keeps the 36px and 32px squares', () => {

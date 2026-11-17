@@ -189,7 +189,7 @@ export const iconToggleStyle = tv({
 - soft 는 `bg-X-soft` 위 `text-on-X-soft` 짝입니다. hover 와 press 는 IdsProvider 가 배경에 채움 색을 6%, 12% 섞어 둔 `bg-X-soft-hover`, `bg-X-soft-active` 입니다. `text-on-X-soft` 는 이 두 배경에서도 Lc 75 를 지키는 단계라, `SOFT_TINTS` 를 올리면 `tests/tokens-contrast.test.ts` 가 실패합니다.
 - scheme 은 primary, secondary, tertiary, neutral, danger, success, warning, info 입니다. 테마가 secondary 나 tertiary 를 주지 않아도 IdsProvider 가 primary 에서 만든 값을 쓰므로 변수는 늘 정의됩니다.
 - `glossy` 는 solid 의 채움(`--control-fill`) 위에 층을 얹습니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택(`background-image` 라 채움 색 위에 그려진다), 안쪽 위 1px 하이라이트(`inset-shadow`), 채움보다 20% 진한 가장자리(`inset-ring` 의 `color-mix`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다. focus 때는 `ringFollowsScheme` 이 가장자리를 `--control-ring` 으로 바꿉니다. outline 과 같은 방식입니다.
-- `transparent` 는 어느 상태에서도 배경을 칠하지 않습니다. 쉴 때 글자는 ghost 와 같은 `--control-quiet`, hover 는 한 단계 진한 `--control-on-press`, press 는 `opacity-40` 입니다. 그래서 `transition` 에 `opacity` 를 더합니다. 브랜드와 neutral scheme 은 두 변수가 모두 `on-surface` 라 hover 에서 글자가 바뀌지 않습니다.
+- `transparent` 는 어느 상태에서도 배경을 칠하지 않습니다. 쉴 때 글자는 ghost 와 같은 `--control-quiet`, hover 는 `opacity-70`, press 는 `opacity-40` 입니다. 그래서 `transition` 에 `opacity` 를 더합니다. 글자 색으로 hover 를 보이면 이미 `on-surface` 인 브랜드와 neutral scheme 에서 아무것도 바뀌지 않으므로, 모든 scheme 이 불투명도로 반응합니다.
 - `SurfaceVariant` 는 `transparent` 를 뺀 variant 입니다. Toggle, Group(ToggleGroup 포함), Pagination, Tabs, Carousel 과 Image 의 버튼이 받습니다. 배경 없이 글자 색만 바뀌는 상태를 이 컴포넌트들에 들이지 않기 위해서입니다.
 - scheme 색은 solid, soft, glossy 만 씁니다. outline 과 ghost 는 primary 에서도 neutral 이고, 브랜드 색은 focus 에 남깁니다. shadcn/ui 가 primary 버튼 옆의 보조 버튼을 조용하게 두는 방식입니다.
 - `base` 에는 primary 의 변수를 담은 `fallbackScheme` 이 들어 있습니다. `colorScheme` 을 받지 않는 컴포넌트도 scheme 변수가 모두 정의돼야 하기 때문입니다. `colorScheme` 을 주면 `cn` 이 같은 변수의 뒤쪽 값만 남깁니다.
@@ -1191,7 +1191,7 @@ export const toggleStyle = tv({
 
 - 색은 [control-surface.ts](#control-surfacets) 의 scheme 변수에서 옵니다.
 - `transparent` 는 `glyphVariant` 에만 있습니다. 글자 Toggle 이 배경 없이 색만 바꾸면 켜짐을 색으로만 알리게 됩니다. IconToggle 은 `icon` 함수로 채운 아이콘을 바꿀 수 있습니다.
-- 꺼진 `transparent` 는 scheme 과 상관없이 `text-on-surface` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-active` 가 붙지 않으므로(pressed > active) 눌러 끌 때는 불투명도가 바뀌지 않습니다.
+- 꺼진 `transparent` 는 scheme 과 상관없이 `text-on-surface` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered) 올리거나 눌러 끌 때는 불투명도가 바뀌지 않습니다.
 - 켜진 `ghost`, `outline` 의 글자는 `--control-on-press` 입니다. 브랜드와 neutral scheme 은 press 배경이 중립이라 `on-surface`, 상태 scheme 은 press 배경이 `bg-X-soft-hover` 라 `text-on-X-soft` 입니다. `text-X` 는 바탕과 `bg-X-soft` 에서만 Lc 60 이 보장되므로, 밝은 warning 은 soft-hover 위에서 모자랍니다.
 - 켜진 `glossy` 는 control-surface 의 `glossy` 층을 `data-pressed:` 로 하나씩 풀어 적습니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 접두사를 붙여 조합할 수 없습니다.
 - 크기는 따로 두지 않습니다. 라벨이 있는 Toggle 은 Button 과 같은 padding 을 갖고, IconToggle 은 icon-square 로 정사각형이 됩니다.

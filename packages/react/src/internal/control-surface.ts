@@ -170,7 +170,7 @@ export const controlSurface = {
     transparent: cn(
       'bg-transparent text-(--control-quiet)',
       'transition-[color,background-color,border-color,box-shadow,opacity]',
-      'data-hovered:text-(--control-on-press) data-active:opacity-40',
+      'data-hovered:opacity-70 data-active:opacity-40',
     ),
   } satisfies Record<IdsVariant, string>,
   colorScheme: schemes,

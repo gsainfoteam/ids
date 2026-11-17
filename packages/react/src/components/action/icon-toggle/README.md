@@ -38,7 +38,7 @@ import { BoldIcon } from '@heroicons/react/16/solid';
 
 - 켜져도 꺼져도 배경과 테두리가 없습니다. 올려도 눌러도 배경을 칠하지 않습니다.
 - 꺼지면 아이콘이 `on-surface` 입니다. 켜지면 아이콘만 `colorScheme` 의 `text-X` 를 띱니다. `neutral` 은 켜져도 `on-surface` 라 모양으로만 구별됩니다.
-- 누르면 불투명도가 내려갑니다.
+- 꺼진 동안에는 올리면 불투명도가 70% 로, 누르면 40% 로 내려갑니다. 켜진 동안에는 hover 와 press 상태가 붙지 않으므로(pressed > active > hovered) 불투명도가 바뀌지 않습니다.
 - 색만으로 켜짐을 알리지 않도록 `icon` 함수로 채운 아이콘과 빈 아이콘을 바꿉니다.
 - Toggle 에는 `transparent` 가 없습니다. 글자 토글은 색만으로 켜짐을 알리게 되기 때문입니다.
 

@@ -41,7 +41,7 @@ export const toggleSurface = {
     transparent: cn(
       'bg-transparent text-on-surface',
       'transition-[color,background-color,border-color,box-shadow,opacity]',
-      'data-active:opacity-40',
+      'data-hovered:opacity-70 data-active:opacity-40',
       'data-pressed:text-(--control-glyph-on)',
     ),
   } satisfies Record<IdsVariant, string>,

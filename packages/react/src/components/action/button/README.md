@@ -43,8 +43,7 @@ import { Button } from '@gsainfoteam/ids-react';
 - `outline` 과 `ghost` 는 올리면 `bg-neutral-soft`, 누르면 한 단계 진한 `bg-neutral-soft-hover` 입니다. 상태 색에서는 `bg-X-soft` 와 `bg-X-soft-hover` 입니다.
 - `transparent` 는 배경과 테두리가 없고, 어느 상태에서도 배경을 칠하지 않습니다.
   - 쉴 때 글자는 `ghost` 와 같습니다.
-  - 올리면 글자가 한 단계 진해집니다. 상태 색은 `text-X` 에서 `text-on-X-soft` 로 바뀌고, `primary` 와 `neutral` 은 이미 가장 진한 `on-surface` 라 그대로입니다.
-  - 누르면 Cupertino 처럼 불투명도가 40% 로 내려갑니다.
+  - 올리면 불투명도가 70% 로, 누르면 Cupertino 처럼 40% 로 내려갑니다. 글자 색은 바뀌지 않으므로 모든 colorScheme 이 같은 방식으로 반응합니다.
   - 올리면 배경이 깔려야 하는 툴바나 목록 버튼은 `ghost` 를 씁니다.
 
 ## 아이콘

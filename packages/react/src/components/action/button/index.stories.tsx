@@ -169,7 +169,7 @@ export const Transparent: Story = {
     docs: {
       description: {
         story:
-          'transparent는 배경과 테두리를 그리지 않고, hover와 press 때도 배경을 칠하지 않습니다. hover는 글자를 한 단계 진하게, press는 불투명도를 낮춥니다. 배경이 바뀌는 조용한 버튼은 ghost입니다.',
+          'transparent는 배경과 테두리를 그리지 않고, hover와 press 때도 배경을 칠하지 않습니다. hover는 불투명도를 70%로, press는 40%로 낮춥니다. 배경이 바뀌는 조용한 버튼은 ghost입니다.',
       },
     },
   },

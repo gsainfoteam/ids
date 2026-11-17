@@ -303,7 +303,7 @@ export const Transparent: Story = {
     docs: {
       description: {
         story:
-          'transparent는 아이콘만 그립니다. hover는 아이콘을 한 단계 진하게, press는 불투명도를 낮추고, 배경은 어느 상태에서도 칠하지 않습니다. 크기는 다른 variant와 같은 36px, 32px입니다.',
+          'transparent는 아이콘만 그립니다. hover는 불투명도를 70%로, press는 40%로 낮추고, 배경은 어느 상태에서도 칠하지 않습니다. 크기는 다른 variant와 같은 36px, 32px입니다.',
       },
     },
   },

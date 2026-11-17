@@ -64,7 +64,7 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 <IconButton icon={<EllipsisHorizontalIcon />} aria-label="더보기" variant="transparent" />
 ```
 
-- `transparent` 는 아이콘만 그립니다. 올려도 눌러도 배경이 없고, 올리면 아이콘이 한 단계 진해지고 누르면 불투명도가 내려갑니다. 규칙은 Button 의 `transparent` 와 같습니다.
+- `transparent` 는 아이콘만 그립니다. 올려도 눌러도 배경이 없고, 올리면 불투명도가 70% 로, 누르면 40% 로 내려갑니다. 규칙은 Button 의 `transparent` 와 같습니다.
 - 크기는 다른 variant 와 같은 36px, 32px 정사각형입니다. 누를 수 있는 영역은 줄지 않습니다.
 
 - 크기를 주지 않은 아이콘은 `standard` 16px, `tiny` 14px 입니다.
