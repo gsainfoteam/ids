@@ -85,7 +85,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 - `focused`에는 시각 효과가 없다. 포커스 링은 `focusVisible`에만
 - hover는 마우스일 때만
 - Enter / Space로도 `active`
-- `onPointerCancel`에서 `active`, `hovered` 복구
+- 누름이 취소되면(`onTapCancel`) `active`만 되돌린다. 누름이 드래그로 바뀔 때도 불리고 그때 마우스는 아직 위에 있으므로, `hovered`는 `MouseRegion`의 enter·exit만 바꾼다
 - `disabled`가 되면 `hovered`, `active`를 버린다. 비활성 요소에는 pointer leave·up이 오지 않는다
 - 스타일 적용은 `pressed > active > hovered` 우선순위로 하나만. state 객체는 원시값 그대로
 - `onInteractionChange`로 부모에 미러링. controlled 아님
