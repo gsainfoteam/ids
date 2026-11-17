@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import 'components/button_usecase.dart';
 import 'components/divider_usecase.dart';
 import 'components/field_usecase.dart';
 import 'components/label_usecase.dart';
@@ -31,6 +32,7 @@ class WidgetbookApp extends StatelessWidget {
           name: 'IdsProvider',
           useCases: [...providerUseCases, ...providerIntegrationUseCases],
         ),
+        WidgetbookComponent(name: 'IdsButton', useCases: buttonUseCases),
         WidgetbookComponent(name: 'IdsDivider', useCases: dividerUseCases),
         WidgetbookComponent(name: 'IdsField', useCases: fieldUseCases),
         WidgetbookComponent(name: 'IdsLabel', useCases: labelUseCases),

@@ -1,17 +1,9 @@
 import { fillStatesAwayFromText } from './brand-fill';
 import { cn } from '../utils/cn';
 
-import type { IdsSize, IdsVariant } from '../tokens/types';
+import type { IdsColorScheme, IdsSize, IdsVariant } from '../tokens/types';
 
-export type ControlColorScheme =
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'neutral'
-  | 'danger'
-  | 'success'
-  | 'warning'
-  | 'info';
+export type ControlColorScheme = IdsColorScheme;
 
 const quietNeutral = cn(
   '[--control-quiet:var(--ids-color-on-surface)] [--control-on-press:var(--ids-color-on-surface)]',

@@ -125,6 +125,35 @@ void main() {
     expect(state.hovered, isFalse);
   });
 
+  testWidgets('re-enabling restores hover at the current mouse position', (
+    tester,
+  ) async {
+    await pump(tester);
+    final center = tester.getCenter(find.byType(IdsInteractive));
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(mouse.removePointer);
+    await mouse.addPointer(location: center);
+    await tester.pump();
+    expect(state.hovered, isTrue);
+
+    await pump(tester, disabled: true);
+    expect(state.hovered, isFalse);
+    await pump(tester);
+    expect(state.hovered, isTrue);
+
+    await pump(tester, disabled: true);
+    await mouse.moveTo(outside);
+    await pump(tester);
+    expect(state.hovered, isFalse);
+
+    await pump(tester, disabled: true);
+    await mouse.moveTo(center);
+    await tester.pump();
+    expect(state.hovered, isFalse);
+    await pump(tester);
+    expect(state.hovered, isTrue);
+  });
+
   testWidgets('pointer press is active, not pressed', (tester) async {
     await pump(tester);
     final touch = await tester.startGesture(
