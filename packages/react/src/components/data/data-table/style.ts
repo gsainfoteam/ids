@@ -18,7 +18,7 @@ export const dataTableStyle = tv({
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2',
     ],
-    label: 'flex min-w-0 items-center gap-1.5 [&_svg]:size-4 [&_svg]:shrink-0',
+    label: 'flex min-w-0 items-center gap-1.5 [&>svg]:size-4 [&>svg]:shrink-0',
     sortIcon: [
       'pointer-events-none size-4 shrink-0 text-neutral opacity-0',
       'transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',

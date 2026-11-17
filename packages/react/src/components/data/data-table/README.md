@@ -165,7 +165,7 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 - 바닥글은 트레이 안쪽 아래 줄입니다. 페이지 버튼은 트레이 위에서도 보이도록 올렸을 때 `bg-neutral-soft-hover`, 누를 때 `bg-neutral-soft-active` 로 한 단계씩 올라갑니다. 정렬 버튼도 같습니다.
 - 바닥글이 없으면(선택과 페이지가 모두 꺼짐) 트레이는 표 둘레 4px 테두리로만 보입니다.
 
-머리글에 아이콘을 넣으려면 `header` 에 아이콘과 글자를 함께 줍니다. 머리글 내용은 `gap-1.5` 의 가로 줄로 감싸지고 svg 는 16px 입니다.
+머리글에 아이콘을 넣으려면 `header` 에 아이콘과 글자를 함께 줍니다. 머리글 내용은 `gap-1.5` 의 가로 줄로 감싸지고, 그 줄의 직계 자식 svg 는 16px 입니다. 선택 열의 Checkbox 안 svg 는 Checkbox 가 크기를 정합니다.
 
 ```tsx
 column.accessor('name', {
