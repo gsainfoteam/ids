@@ -1,11 +1,9 @@
-import { useMemo } from 'react';
-
 import { PlusIcon, StarIcon } from '@heroicons/react/16/solid';
 import { CalendarDate } from '@internationalized/date';
 import { Area, AreaChart, Bar, BarChart, XAxis } from 'recharts';
 import { expect } from 'storybook/test';
 
-import { Showcase, paletteHues, palettes } from '~story-kit';
+import { Showcase } from '~story-kit';
 
 import { Button } from '../../components/action/button';
 import { IconButton } from '../../components/action/icon-button';
@@ -37,19 +35,18 @@ import { Tabs } from '../../components/navigation/tabs';
 import { Kbd } from '../../components/typography/kbd';
 import { Label } from '../../components/typography/label';
 import { Link } from '../../components/typography/link';
-import {
-  IdsProvider,
-  checkIdsTheme,
-  defineIdsTheme,
-  useTheme,
-} from '../../components/utility/ids-provider';
+import { IdsProvider, checkIdsTheme, useTheme } from '../../components/utility/ids-provider';
 import {
   ACCENT_TEXT_LC,
   MARK_LC,
   TEXT_LC,
   lightnessContrast,
 } from '../../components/utility/ids-provider/contrast';
-import { PALETTE_STEPS, type IdsNeutral } from '../../components/utility/ids-provider/theme';
+import {
+  PALETTE_STEPS,
+  type IdsStatus,
+  type IdsThemeOverrides,
+} from '../../components/utility/ids-provider/theme';
 import { resolveColorsOnce } from '../../components/utility/ids-provider/theme-roles';
 import {
   IDS_BASE_SLOTS,
@@ -71,15 +68,11 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const colors = paletteHues;
 const modes = ['light', 'dark'] as const;
 
 const slotTemplates = IDS_FAMILY_SLOTS.map((template) => template.replace('{family}', '·'));
 
 const slotOf = (template: string, family: string) => template.replace('{family}', family);
-
-const familySlots = (family: string) =>
-  IDS_FAMILY_SLOTS.map((template) => slotOf(template, family));
 
 type Pairing = readonly [background: string, foreground: string, kind: 'text' | 'accent' | 'mark'];
 
@@ -91,8 +84,6 @@ const pairsOf = (family: string): Pairing[] => [
   ['surface', `text-${family}`, 'accent'],
   ['surface', `border-${family}`, 'mark'],
 ];
-
-const brandPairs = pairsOf('primary');
 
 const pairs: Pairing[] = [
   ['surface', 'on-surface', 'text'],
@@ -234,118 +225,6 @@ function FamilyTable() {
   );
 }
 
-const paletteRow = cn('grid items-center gap-x-4');
-const primarySlots = familySlots('primary');
-const paletteColumns = { gridTemplateColumns: `4.5rem repeat(${primarySlots.length}, 6.5rem)` };
-
-function PaletteTable() {
-  return (
-    <div className="flex flex-col gap-4">
-      {modes.map((mode) => (
-        <IdsProvider.Scope key={mode} mode={mode} className={panel}>
-          <div className="flex flex-col gap-2">
-            <div className={paletteRow} style={paletteColumns}>
-              <span className={columnLabel}>{mode}</span>
-              {primarySlots.map((token) => (
-                <span key={token} className={columnLabel}>
-                  {token}
-                </span>
-              ))}
-            </div>
-            {colors.map((color) => (
-              <IdsProvider.Scope key={color} asChild theme={{ primary: palettes[color] }}>
-                <div className={paletteRow} style={paletteColumns}>
-                  <span className="text-body-b3-regular">{color}</span>
-                  {primarySlots.map((token) => (
-                    <Swatch key={token} token={token} />
-                  ))}
-                </div>
-              </IdsProvider.Scope>
-            ))}
-          </div>
-        </IdsProvider.Scope>
-      ))}
-    </div>
-  );
-}
-
-const brandContrastRow = cn('grid items-center gap-x-4');
-const brandContrastColumns = { gridTemplateColumns: `4.5rem repeat(${brandPairs.length}, 10rem)` };
-
-function BrandContrastTable() {
-  return (
-    <div data-brand-contrast="" className="flex flex-wrap gap-4">
-      {modes.map((mode) => (
-        <IdsProvider.Scope key={mode} mode={mode} className={panel}>
-          <div className="flex flex-col gap-2">
-            <div className={brandContrastRow} style={brandContrastColumns}>
-              <span className={columnLabel}>{mode}</span>
-              {brandPairs.map(([background, foreground]) => (
-                <span key={`${foreground}:${background}`} className={columnLabel}>
-                  {foreground} / {background}
-                </span>
-              ))}
-            </div>
-            {colors.map((color) => (
-              <IdsProvider.Scope key={color} asChild theme={{ primary: palettes[color] }}>
-                <div className={brandContrastRow} style={brandContrastColumns}>
-                  <span className="text-body-b3-regular">{color}</span>
-                  {brandPairs.map(([background, foreground, kind]) => (
-                    <Pair
-                      key={`${foreground}:${background}`}
-                      background={background}
-                      foreground={foreground}
-                      kind={kind}
-                    />
-                  ))}
-                </div>
-              </IdsProvider.Scope>
-            ))}
-          </div>
-        </IdsProvider.Scope>
-      ))}
-    </div>
-  );
-}
-
-const passes = {
-  text: /^Lc \d+ text$/,
-  accent: /^Lc \d+ (text|accent)$/,
-  mark: /^Lc \d+ (text|accent|mark)$/,
-};
-
-export const Palettes: Story = {
-  render: () => (
-    <Showcase>
-      <Showcase.Section
-        title="Primary × 17 palettes"
-        description="레포 데모 팔레트 17개를 primary 로 줄 때 IdsProvider 가 고르는 역할 색입니다. 테마 하나를 깊게 보려면 Lab 을 씁니다."
-      >
-        <PaletteTable />
-      </Showcase.Section>
-      <Showcase.Section
-        title="Contrast × 17 palettes"
-        description="색마다 채움과 그 위 글자, soft 채움과 그 위 글자, 페이지 위 글자와 선의 APCA 대비(Lc)입니다. 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60, 선은 Lc 45 를 넘어야 합니다."
-      >
-        <BrandContrastTable />
-      </Showcase.Section>
-    </Showcase>
-  ),
-  play: async ({ canvasElement }) => {
-    const swatches = [...canvasElement.querySelectorAll('[data-token]')];
-    await expect(swatches.length).toBe(primarySlots.length * colors.length * modes.length);
-    for (const swatch of swatches)
-      await expect(swatch.querySelector('[data-hex]')?.textContent).toMatch(/^#[0-9a-f]{6}$/);
-
-    const brandOutputs = [...canvasElement.querySelectorAll('[data-brand-contrast] [data-pair]')];
-    await expect(brandOutputs.length).toBe(colors.length * brandPairs.length * modes.length);
-    for (const pair of brandOutputs)
-      await expect(pair.querySelector('[data-ratio]')?.textContent).toMatch(
-        passes[(pair as HTMLElement).dataset.kind as Pairing[2]],
-      );
-  },
-};
-
 const labSchemes = [
   'primary',
   'secondary',
@@ -369,8 +248,6 @@ const labToday = new CalendarDate(2026, 9, 15);
 
 const labPaletteFamilies = [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES];
 
-const presetColors = paletteHues.map((hue) => palettes[hue][600]);
-
 const LAB_CHART_CONFIG = {
   web: { label: '웹' },
   app: { label: '앱' },
@@ -389,399 +266,358 @@ const LAB_CHART_ROWS = [
   { day: '수', web: 132, app: 110, kiosk: 38 },
 ];
 
-type LabArgs = {
-  primary: string;
-  secondary: string;
-  tertiary: string;
-  neutral: IdsNeutral;
-  status: 'harmonized' | 'fixed';
-};
+const issuesOf = (theme: IdsThemeOverrides) =>
+  theme.primary ? checkIdsTheme({ ...theme, primary: theme.primary }) : [];
 
-const labThemeOf = ({ primary, secondary, tertiary, neutral, status }: LabArgs) =>
-  defineIdsTheme({
-    primary,
-    secondary: secondary === '' ? undefined : secondary,
-    tertiary: tertiary === '' ? undefined : tertiary,
-    neutral,
-    status,
-  });
-
-const sourceOf = (family: string, given: readonly string[], status: LabArgs['status']) =>
+const sourceOf = (family: string, given: readonly string[], status: IdsStatus | undefined) =>
   given.includes(family)
     ? '준 색'
     : IDS_BRAND_FAMILIES.includes(family as (typeof IDS_BRAND_FAMILIES)[number])
       ? 'primary 에서 만듦'
-      : status;
+      : typeof status === 'string'
+        ? status
+        : 'harmonized';
 
 const labPaletteRow = cn('grid items-center gap-x-2');
 const labPaletteColumns = {
   gridTemplateColumns: `6rem 8rem repeat(${PALETTE_STEPS.length}, 4.5rem)`,
 };
 
-export const Lab: StoryObj<LabArgs> = {
-  args: {
-    primary: palettes.blue[600],
-    secondary: '',
-    tertiary: '',
-    neutral: 'pure',
-    status: 'harmonized',
-  },
-  argTypes: {
-    primary: {
-      description: '브랜드 색 하나. IdsProvider 가 11단계 팔레트로 만든다',
-      control: { type: 'color', presetColors },
-    },
-    secondary: {
-      description: '비우면 primary 와 같은 hue 에 채도 1/3',
-      control: { type: 'color', presetColors },
-    },
-    tertiary: {
-      description: '비우면 primary hue 를 +60° (상태 색과 겹치면 −60°) 돌리고 채도 1/3',
-      control: { type: 'color', presetColors },
-    },
-    neutral: { control: 'inline-radio', options: ['pure', 'tinted'] },
-    status: { control: 'inline-radio', options: ['harmonized', 'fixed'] },
-  },
+export const Lab: Story = {
   parameters: {
-    controls: { disable: false },
     docs: {
       description: {
         story:
-          'Controls 에서 색을 고르면 팔레트, 역할, 대비, 컴포넌트가 바로 다시 그려집니다. secondary 와 tertiary 를 비우면 primary 에서 만든 계열을 봅니다.',
+          '툴바의 Primary, Secondary, Tertiary, Neutral, Status 로 테마를 바꾸면 팔레트, 역할, 대비, 컴포넌트가 바로 다시 그려집니다.',
       },
     },
   },
-  render: function Render({ primary, secondary, tertiary, neutral, status }) {
-    const theme = useMemo(
-      () => labThemeOf({ primary, secondary, tertiary, neutral, status }),
-      [primary, secondary, tertiary, neutral, status],
-    );
-    const issues = checkIdsTheme(theme);
+  render: function Render() {
+    const { theme } = useTheme();
+    const issues = issuesOf(theme);
     const { colors } = resolveColorsOnce(theme);
 
     return (
-      <IdsProvider.Scope theme={theme}>
-        <Showcase>
-          <Showcase.Section
-            title="checkIdsTheme"
-            description="IdsProvider 가 개발 모드에서 알리는 목록과 같습니다."
-          >
-            {issues.length === 0 ? (
-              <Alert colorScheme="success" className="max-w-xl">
-                <Alert.Title>문제 없음</Alert.Title>
-                <Alert.Description>checkIdsTheme 이 빈 목록을 돌려줍니다.</Alert.Description>
-              </Alert>
-            ) : (
-              <Alert colorScheme="warning" className="max-w-xl">
-                <Alert.Title>문제 {issues.length}개</Alert.Title>
-                <Alert.Description asChild>
-                  <ul className="list-disc pl-4">
-                    {issues.map((issue) => (
-                      <li key={`${issue.path}:${issue.message}`}>
-                        <code className="font-mono">{issue.path}</code> {issue.message}
-                      </li>
-                    ))}
-                  </ul>
-                </Alert.Description>
-              </Alert>
-            )}
-          </Showcase.Section>
-          <Showcase.Section
-            title="Palettes"
-            description="IdsProvider 가 역할을 고르는 11단계입니다. 채움은 600, 나머지 역할은 대비를 넘는 첫 단계입니다."
-          >
-            <div data-lab-palettes="" className={cn('flex flex-col gap-2', panel)}>
-              <div className={labPaletteRow} style={labPaletteColumns}>
-                <span className={columnLabel}>계열</span>
-                <span className={columnLabel}>출처</span>
-                {PALETTE_STEPS.map((step) => (
-                  <span key={step} className={columnLabel}>
-                    {step}
-                  </span>
-                ))}
-              </div>
-              {colors &&
-                labPaletteFamilies.map((family) => (
-                  <div key={family} className={labPaletteRow} style={labPaletteColumns}>
-                    <span className="text-body-b3-regular font-mono">{family}</span>
-                    <span className="text-caption-c1-regular text-neutral">
-                      {sourceOf(family, colors.given, status)}
-                    </span>
-                    {PALETTE_STEPS.map((step) => (
-                      <div key={step} className="flex flex-col gap-1">
-                        <span
-                          className="rounded-indicator inset-ring-neutral h-7 w-full inset-ring-1"
-                          style={{ background: colors.palettes[family][step] }}
-                        />
-                        <code className="text-caption-c1-regular text-neutral font-mono">
-                          {colors.palettes[family][step]}
-                        </code>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-            </div>
-          </Showcase.Section>
-          <Showcase.Section
-            title="Families × Roles"
-            description="계열 여덟 개가 같은 역할 열 개를 가집니다. bg-primary-soft 는 배경, text-on-primary-soft 는 그 위 글자, border-primary 는 선입니다."
-          >
-            <FamilyTable />
-          </Showcase.Section>
-          <Showcase.Section
-            title="Contrast"
-            description="같이 쓰는 짝의 APCA 대비(Lc)입니다. 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60, 선과 아이콘 같은 표시는 Lc 45 이상이어야 합니다."
-          >
-            <div className="flex flex-wrap gap-4">
-              {modes.map((mode) => (
-                <IdsProvider.Scope key={mode} mode={mode} className={panel}>
-                  <div className="flex flex-col gap-2">
-                    <span className={columnLabel}>{mode}</span>
-                    {pairs.map(([background, foreground, kind]) => (
-                      <div
-                        key={`${foreground}:${background}`}
-                        className="grid grid-cols-[17rem_auto] items-center gap-3"
-                      >
-                        <span className="text-body-b3-regular font-mono">
-                          {foreground} / {background}
-                        </span>
-                        <Pair background={background} foreground={foreground} kind={kind} />
-                      </div>
-                    ))}
-                  </div>
-                </IdsProvider.Scope>
+      <Showcase>
+        <Showcase.Section
+          title="checkIdsTheme"
+          description="IdsProvider 가 개발 모드에서 알리는 목록과 같습니다."
+        >
+          {issues.length === 0 ? (
+            <Alert colorScheme="success" className="max-w-xl">
+              <Alert.Title>문제 없음</Alert.Title>
+              <Alert.Description>checkIdsTheme 이 빈 목록을 돌려줍니다.</Alert.Description>
+            </Alert>
+          ) : (
+            <Alert colorScheme="warning" className="max-w-xl">
+              <Alert.Title>문제 {issues.length}개</Alert.Title>
+              <Alert.Description asChild>
+                <ul className="list-disc pl-4">
+                  {issues.map((issue) => (
+                    <li key={`${issue.path}:${issue.message}`}>
+                      <code className="font-mono">{issue.path}</code> {issue.message}
+                    </li>
+                  ))}
+                </ul>
+              </Alert.Description>
+            </Alert>
+          )}
+        </Showcase.Section>
+        <Showcase.Section
+          title="Palettes"
+          description="IdsProvider 가 역할을 고르는 11단계입니다. 채움은 600, 나머지 역할은 대비를 넘는 첫 단계입니다."
+        >
+          <div data-lab-palettes="" className={cn('flex flex-col gap-2', panel)}>
+            <div className={labPaletteRow} style={labPaletteColumns}>
+              <span className={columnLabel}>계열</span>
+              <span className={columnLabel}>출처</span>
+              {PALETTE_STEPS.map((step) => (
+                <span key={step} className={columnLabel}>
+                  {step}
+                </span>
               ))}
             </div>
-          </Showcase.Section>
-          {modes.map((mode) => (
-            <Showcase.Section key={mode} title={`Components · ${mode}`}>
-              <IdsProvider.Scope
-                mode={mode}
-                className={cn('flex w-full max-w-6xl flex-col gap-8', panel)}
-              >
+            {colors &&
+              labPaletteFamilies.map((family) => (
+                <div key={family} className={labPaletteRow} style={labPaletteColumns}>
+                  <span className="text-body-b3-regular font-mono">{family}</span>
+                  <span className="text-caption-c1-regular text-neutral">
+                    {sourceOf(family, colors.given, theme.status)}
+                  </span>
+                  {PALETTE_STEPS.map((step) => (
+                    <div key={step} className="flex flex-col gap-1">
+                      <span
+                        className="rounded-indicator inset-ring-neutral h-7 w-full inset-ring-1"
+                        style={{ background: colors.palettes[family][step] }}
+                      />
+                      <code className="text-caption-c1-regular text-neutral font-mono">
+                        {colors.palettes[family][step]}
+                      </code>
+                    </div>
+                  ))}
+                </div>
+              ))}
+          </div>
+        </Showcase.Section>
+        <Showcase.Section
+          title="Families × Roles"
+          description="계열 여덟 개가 같은 역할 열 개를 가집니다. bg-primary-soft 는 배경, text-on-primary-soft 는 그 위 글자, border-primary 는 선입니다."
+        >
+          <FamilyTable />
+        </Showcase.Section>
+        <Showcase.Section
+          title="Contrast"
+          description="같이 쓰는 짝의 APCA 대비(Lc)입니다. 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60, 선과 아이콘 같은 표시는 Lc 45 이상이어야 합니다."
+        >
+          <div className="flex flex-wrap gap-4">
+            {modes.map((mode) => (
+              <IdsProvider.Scope key={mode} mode={mode} className={panel}>
                 <div className="flex flex-col gap-2">
-                  <span className={columnLabel}>Button · IconButton · Toggle</span>
+                  <span className={columnLabel}>{mode}</span>
+                  {pairs.map(([background, foreground, kind]) => (
+                    <div
+                      key={`${foreground}:${background}`}
+                      className="grid grid-cols-[17rem_auto] items-center gap-3"
+                    >
+                      <span className="text-body-b3-regular font-mono">
+                        {foreground} / {background}
+                      </span>
+                      <Pair background={background} foreground={foreground} kind={kind} />
+                    </div>
+                  ))}
+                </div>
+              </IdsProvider.Scope>
+            ))}
+          </div>
+        </Showcase.Section>
+        {modes.map((mode) => (
+          <Showcase.Section key={mode} title={`Components · ${mode}`}>
+            <IdsProvider.Scope
+              mode={mode}
+              className={cn('flex w-full max-w-6xl flex-col gap-8', panel)}
+            >
+              <div className="flex flex-col gap-2">
+                <span className={columnLabel}>Button · IconButton · Toggle</span>
+                {labSchemes.map((colorScheme) => (
+                  <div key={colorScheme} className="flex flex-wrap items-center gap-2">
+                    <span className="text-caption-c1-regular text-neutral w-20 font-mono">
+                      {colorScheme}
+                    </span>
+                    {labVariants.map((variant) => (
+                      <Button key={variant} colorScheme={colorScheme} variant={variant}>
+                        {variant}
+                      </Button>
+                    ))}
+                    <IconButton
+                      colorScheme={colorScheme}
+                      icon={<PlusIcon />}
+                      aria-label={`${colorScheme} 추가`}
+                    />
+                    <Toggle colorScheme={colorScheme} variant="outline" defaultPressed>
+                      켜짐
+                    </Toggle>
+                    <Toggle colorScheme={colorScheme} variant="soft" defaultPressed>
+                      켜짐
+                    </Toggle>
+                    <IconToggle
+                      colorScheme={colorScheme}
+                      variant="solid"
+                      defaultPressed
+                      icon={<StarIcon />}
+                      aria-label={`${colorScheme} 별표`}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="flex flex-col gap-2">
+                  <span className={columnLabel}>Badge · Chip · Link</span>
                   {labSchemes.map((colorScheme) => (
                     <div key={colorScheme} className="flex flex-wrap items-center gap-2">
-                      <span className="text-caption-c1-regular text-neutral w-20 font-mono">
-                        {colorScheme}
-                      </span>
-                      {labVariants.map((variant) => (
-                        <Button key={variant} colorScheme={colorScheme} variant={variant}>
-                          {variant}
-                        </Button>
+                      {labMarkVariants.map((variant) => (
+                        <Badge
+                          key={variant}
+                          content={colorScheme}
+                          variant={variant}
+                          colorScheme={colorScheme}
+                        />
                       ))}
-                      <IconButton
+                      {labMarkVariants.map((variant) => (
+                        <Chip key={variant} variant={variant} colorScheme={colorScheme}>
+                          칩
+                        </Chip>
+                      ))}
+                      {isLinkScheme(colorScheme) && (
+                        <Link colorScheme={colorScheme} href="#lab">
+                          링크
+                        </Link>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-2">
+                  <span className={columnLabel}>Alert · Progress</span>
+                  {labSchemes.map((colorScheme) => (
+                    <div key={colorScheme} className="grid grid-cols-[1fr_1fr_8rem] gap-2">
+                      <Alert colorScheme={colorScheme} variant="soft">
+                        <Alert.Title>{colorScheme}</Alert.Title>
+                      </Alert>
+                      <Alert colorScheme={colorScheme} variant="solid">
+                        <Alert.Title>{colorScheme}</Alert.Title>
+                      </Alert>
+                      <Progress
+                        value={60}
                         colorScheme={colorScheme}
-                        icon={<PlusIcon />}
-                        aria-label={`${colorScheme} 추가`}
-                      />
-                      <Toggle colorScheme={colorScheme} variant="outline" defaultPressed>
-                        켜짐
-                      </Toggle>
-                      <Toggle colorScheme={colorScheme} variant="soft" defaultPressed>
-                        켜짐
-                      </Toggle>
-                      <IconToggle
-                        colorScheme={colorScheme}
-                        variant="solid"
-                        defaultPressed
-                        icon={<StarIcon />}
-                        aria-label={`${colorScheme} 별표`}
+                        aria-label={`${colorScheme} 진행`}
+                        className="self-center"
                       />
                     </div>
                   ))}
                 </div>
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div className="flex flex-col gap-2">
-                    <span className={columnLabel}>Badge · Chip · Link</span>
-                    {labSchemes.map((colorScheme) => (
-                      <div key={colorScheme} className="flex flex-wrap items-center gap-2">
-                        {labMarkVariants.map((variant) => (
-                          <Badge
-                            key={variant}
-                            content={colorScheme}
-                            variant={variant}
-                            colorScheme={colorScheme}
-                          />
-                        ))}
-                        {labMarkVariants.map((variant) => (
-                          <Chip key={variant} variant={variant} colorScheme={colorScheme}>
-                            칩
-                          </Chip>
-                        ))}
-                        {isLinkScheme(colorScheme) && (
-                          <Link colorScheme={colorScheme} href="#lab">
-                            링크
-                          </Link>
-                        )}
-                      </div>
+              </div>
+              <div className="grid gap-6 md:grid-cols-3">
+                <div className="flex flex-col gap-4">
+                  <span className={columnLabel}>Form</span>
+                  <Field>
+                    <Field.Label>이름</Field.Label>
+                    <TextField defaultValue="인포팀" data-1p-ignore data-lpignore="true" />
+                  </Field>
+                  <Field invalid>
+                    <Field.Label>닉네임</Field.Label>
+                    <TextField defaultValue="a" data-1p-ignore data-lpignore="true" />
+                    <Field.Error>두 글자 이상 적어 주세요.</Field.Error>
+                  </Field>
+                  <Select aria-label={`과일 ${mode}`} defaultValue="pear">
+                    {LAB_FRUITS.map(([value, label]) => (
+                      <Select.Item key={value} value={value}>
+                        {label}
+                      </Select.Item>
                     ))}
+                  </Select>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <Checkbox defaultChecked aria-label={`체크 ${mode}`} />
+                    <Switch defaultChecked aria-label={`스위치 ${mode}`} />
+                    <RadioGroup<'a' | 'b'>
+                      orientation="horizontal"
+                      defaultValue="b"
+                      aria-label={`선택 ${mode}`}
+                    >
+                      {({ Item }) =>
+                        (['a', 'b'] as const).map((value) => (
+                          <Label key={value} className="flex items-center gap-2">
+                            <Item value={value} />
+                            {value}
+                          </Label>
+                        ))
+                      }
+                    </RadioGroup>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <span className={columnLabel}>Alert · Progress</span>
-                    {labSchemes.map((colorScheme) => (
-                      <div key={colorScheme} className="grid grid-cols-[1fr_1fr_8rem] gap-2">
-                        <Alert colorScheme={colorScheme} variant="soft">
-                          <Alert.Title>{colorScheme}</Alert.Title>
-                        </Alert>
-                        <Alert colorScheme={colorScheme} variant="solid">
-                          <Alert.Title>{colorScheme}</Alert.Title>
-                        </Alert>
-                        <Progress
-                          value={60}
-                          colorScheme={colorScheme}
-                          aria-label={`${colorScheme} 진행`}
-                          className="self-center"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  <Slider defaultValue={40} aria-label={`슬라이더 ${mode}`} />
+                  <Rating defaultValue={3.5} step={0.5} aria-label={`별점 ${mode}`} />
                 </div>
-                <div className="grid gap-6 md:grid-cols-3">
-                  <div className="flex flex-col gap-4">
-                    <span className={columnLabel}>Form</span>
-                    <Field>
-                      <Field.Label>이름</Field.Label>
-                      <TextField defaultValue="인포팀" data-1p-ignore data-lpignore="true" />
-                    </Field>
-                    <Field invalid>
-                      <Field.Label>닉네임</Field.Label>
-                      <TextField defaultValue="a" data-1p-ignore data-lpignore="true" />
-                      <Field.Error>두 글자 이상 적어 주세요.</Field.Error>
-                    </Field>
-                    <Select aria-label={`과일 ${mode}`} defaultValue="pear">
-                      {LAB_FRUITS.map(([value, label]) => (
-                        <Select.Item key={value} value={value}>
-                          {label}
-                        </Select.Item>
-                      ))}
-                    </Select>
-                    <div className="flex flex-wrap items-center gap-4">
-                      <Checkbox defaultChecked aria-label={`체크 ${mode}`} />
-                      <Switch defaultChecked aria-label={`스위치 ${mode}`} />
-                      <RadioGroup<'a' | 'b'>
-                        orientation="horizontal"
-                        defaultValue="b"
-                        aria-label={`선택 ${mode}`}
-                      >
-                        {({ Item }) =>
-                          (['a', 'b'] as const).map((value) => (
-                            <Label key={value} className="flex items-center gap-2">
-                              <Item value={value} />
-                              {value}
-                            </Label>
-                          ))
-                        }
-                      </RadioGroup>
-                    </div>
-                    <Slider defaultValue={40} aria-label={`슬라이더 ${mode}`} />
-                    <Rating defaultValue={3.5} step={0.5} aria-label={`별점 ${mode}`} />
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    <span className={columnLabel}>Navigation</span>
-                    <Tabs defaultValue="overview">
-                      <Tabs.List aria-label={`탭 ${mode}`}>
-                        <Tabs.Trigger value="overview">개요</Tabs.Trigger>
-                        <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>
-                      </Tabs.List>
-                      <Tabs.Content value="overview">가볍고 오래 가는 키보드입니다.</Tabs.Content>
-                      <Tabs.Content value="reviews">리뷰 128개.</Tabs.Content>
-                    </Tabs>
-                    <Tabs defaultValue="overview" appearance="pill" variant="soft">
-                      <Tabs.List aria-label={`알약 탭 ${mode}`}>
-                        <Tabs.Trigger value="overview">개요</Tabs.Trigger>
-                        <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>
-                      </Tabs.List>
-                      <Tabs.Content value="overview">개요 내용.</Tabs.Content>
-                      <Tabs.Content value="reviews">리뷰 내용.</Tabs.Content>
-                    </Tabs>
-                    <Pagination
-                      defaultPage={3}
-                      pageCount={7}
-                      getHref={(page) => `#page-${page}`}
-                      aria-label={`페이지 ${mode}`}
-                    />
-                    <Breadcrumb aria-label={`위치 ${mode}`}>
-                      <Breadcrumb.List>
-                        <Breadcrumb.Item>
-                          <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
-                        </Breadcrumb.Item>
-                        <Breadcrumb.Item>
-                          <Breadcrumb.Page>설정</Breadcrumb.Page>
-                        </Breadcrumb.Item>
-                      </Breadcrumb.List>
-                    </Breadcrumb>
-                    <Stepper defaultValue={1}>
-                      <Stepper.Item>
-                        <Stepper.Title>계정</Stepper.Title>
-                      </Stepper.Item>
-                      <Stepper.Item>
-                        <Stepper.Title>프로필</Stepper.Title>
-                      </Stepper.Item>
-                      <Stepper.Item>
-                        <Stepper.Title>완료</Stepper.Title>
-                      </Stepper.Item>
-                    </Stepper>
-                  </div>
-                  <div className="flex flex-col gap-4">
-                    <span className={columnLabel}>Data · Feedback</span>
-                    <Card>
-                      <Card.Header>
-                        <Card.Title>새 프로젝트</Card.Title>
-                        <Card.Description>팀과 함께 쓰는 공간을 만듭니다.</Card.Description>
-                      </Card.Header>
-                      <Card.Footer className="flex justify-end gap-2">
-                        <Button variant="outline">취소</Button>
-                        <Button>만들기</Button>
-                      </Card.Footer>
-                    </Card>
-                    <Item variant="outline">
-                      <Item.Media>
-                        <Avatar name="김철수" />
-                      </Item.Media>
-                      <Item.Content>
-                        <Item.Title>김철수</Item.Title>
-                        <Item.Description>디자인 팀</Item.Description>
-                      </Item.Content>
-                    </Item>
-                    <div className="flex items-center gap-3">
-                      <Spinner aria-label={`불러오는 중 ${mode}`} />
-                      <Skeleton className="h-4 w-24" />
-                      <Kbd keys="Mod+K" platform="mac" />
-                    </div>
-                    <Calendar
-                      today={labToday}
-                      defaultValue={labToday.add({ days: 3 })}
-                      aria-label={`달력 ${mode}`}
-                    />
-                  </div>
+                <div className="flex flex-col gap-4">
+                  <span className={columnLabel}>Navigation</span>
+                  <Tabs defaultValue="overview">
+                    <Tabs.List aria-label={`탭 ${mode}`}>
+                      <Tabs.Trigger value="overview">개요</Tabs.Trigger>
+                      <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>
+                    </Tabs.List>
+                    <Tabs.Content value="overview">가볍고 오래 가는 키보드입니다.</Tabs.Content>
+                    <Tabs.Content value="reviews">리뷰 128개.</Tabs.Content>
+                  </Tabs>
+                  <Tabs defaultValue="overview" appearance="pill" variant="soft">
+                    <Tabs.List aria-label={`알약 탭 ${mode}`}>
+                      <Tabs.Trigger value="overview">개요</Tabs.Trigger>
+                      <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>
+                    </Tabs.List>
+                    <Tabs.Content value="overview">개요 내용.</Tabs.Content>
+                    <Tabs.Content value="reviews">리뷰 내용.</Tabs.Content>
+                  </Tabs>
+                  <Pagination
+                    defaultPage={3}
+                    pageCount={7}
+                    getHref={(page) => `#page-${page}`}
+                    aria-label={`페이지 ${mode}`}
+                  />
+                  <Breadcrumb aria-label={`위치 ${mode}`}>
+                    <Breadcrumb.List>
+                      <Breadcrumb.Item>
+                        <Breadcrumb.Link href="#home">홈</Breadcrumb.Link>
+                      </Breadcrumb.Item>
+                      <Breadcrumb.Item>
+                        <Breadcrumb.Page>설정</Breadcrumb.Page>
+                      </Breadcrumb.Item>
+                    </Breadcrumb.List>
+                  </Breadcrumb>
+                  <Stepper defaultValue={1}>
+                    <Stepper.Item>
+                      <Stepper.Title>계정</Stepper.Title>
+                    </Stepper.Item>
+                    <Stepper.Item>
+                      <Stepper.Title>프로필</Stepper.Title>
+                    </Stepper.Item>
+                    <Stepper.Item>
+                      <Stepper.Title>완료</Stepper.Title>
+                    </Stepper.Item>
+                  </Stepper>
                 </div>
-                <div className="grid gap-6 md:grid-cols-2">
-                  <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
-                    <Chart.Title>막대</Chart.Title>
-                    <BarChart data={LAB_CHART_ROWS}>
-                      <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                      <Bar dataKey="web" radius={4} />
-                      <Bar dataKey="app" radius={4} />
-                      <Bar dataKey="kiosk" radius={4} />
-                    </BarChart>
-                  </Chart>
-                  <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
-                    <Chart.Title>면</Chart.Title>
-                    <AreaChart data={LAB_CHART_ROWS}>
-                      <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                      <Area dataKey="web" type="monotone" />
-                      <Area dataKey="app" type="monotone" />
-                      <Area dataKey="kiosk" type="monotone" />
-                    </AreaChart>
-                  </Chart>
+                <div className="flex flex-col gap-4">
+                  <span className={columnLabel}>Data · Feedback</span>
+                  <Card>
+                    <Card.Header>
+                      <Card.Title>새 프로젝트</Card.Title>
+                      <Card.Description>팀과 함께 쓰는 공간을 만듭니다.</Card.Description>
+                    </Card.Header>
+                    <Card.Footer className="flex justify-end gap-2">
+                      <Button variant="outline">취소</Button>
+                      <Button>만들기</Button>
+                    </Card.Footer>
+                  </Card>
+                  <Item variant="outline">
+                    <Item.Media>
+                      <Avatar name="김철수" />
+                    </Item.Media>
+                    <Item.Content>
+                      <Item.Title>김철수</Item.Title>
+                      <Item.Description>디자인 팀</Item.Description>
+                    </Item.Content>
+                  </Item>
+                  <div className="flex items-center gap-3">
+                    <Spinner aria-label={`불러오는 중 ${mode}`} />
+                    <Skeleton className="h-4 w-24" />
+                    <Kbd keys="Mod+K" platform="mac" />
+                  </div>
+                  <Calendar
+                    today={labToday}
+                    defaultValue={labToday.add({ days: 3 })}
+                    aria-label={`달력 ${mode}`}
+                  />
                 </div>
-              </IdsProvider.Scope>
-            </Showcase.Section>
-          ))}
-        </Showcase>
-      </IdsProvider.Scope>
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
+                  <Chart.Title>막대</Chart.Title>
+                  <BarChart data={LAB_CHART_ROWS}>
+                    <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                    <Bar dataKey="web" radius={4} />
+                    <Bar dataKey="app" radius={4} />
+                    <Bar dataKey="kiosk" radius={4} />
+                  </BarChart>
+                </Chart>
+                <Chart config={LAB_CHART_CONFIG} className="w-full" tooltip={false}>
+                  <Chart.Title>면</Chart.Title>
+                  <AreaChart data={LAB_CHART_ROWS}>
+                    <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                    <Area dataKey="web" type="monotone" />
+                    <Area dataKey="app" type="monotone" />
+                    <Area dataKey="kiosk" type="monotone" />
+                  </AreaChart>
+                </Chart>
+              </div>
+            </IdsProvider.Scope>
+          </Showcase.Section>
+        ))}
+      </Showcase>
     );
   },
   play: async ({ canvasElement }) => {

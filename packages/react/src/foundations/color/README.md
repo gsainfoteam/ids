@@ -74,7 +74,7 @@ IDS 색은 계열 여덟 개가 같은 역할 열 개를 가지는 시맨틱 토
 
 - 앱은 브랜드 색을 50 ~ 950 의 11단계 팔레트나 색 하나로 줍니다. IDS 에는 기본 색이 없습니다.
 - 대비는 APCA 의 Lc 입니다. 채움은 600 에서 시작해 글자가 Lc 75 에 닿을 때까지 이웃 단계로 옮기고, 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60 을 넘는 첫 단계이고, 선은 페이지 위 색 글자와 같은 단계입니다. 규칙은 [IdsProvider](../../components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 에 있습니다.
-- Storybook 의 Palette 툴바와 이 스토리는 레포 데모 팔레트 17개(Tailwind CSS v4 기본 색, `orange` 와 `green` 은 IDS 고유 값)를 씁니다. 패키지에는 들어 있지 않습니다.
+- Storybook 툴바의 Primary 는 레포 데모 팔레트 17개(Tailwind CSS v4 기본 색, `orange` 와 `green` 은 IDS 고유 값)에서 고릅니다. 패키지에는 들어 있지 않습니다.
 
 ## 중립
 
@@ -107,14 +107,7 @@ IDS 색은 계열 여덟 개가 같은 역할 열 개를 가지는 시맨틱 토
 ## 실시간으로 조정하기
 
 - 툴바: Primary, Secondary, Tertiary, Neutral(`pure`, `tinted`), Status(`harmonized`, `fixed`), Corner, Mode 가 모든 스토리의 테마를 바꿉니다. Secondary 와 Tertiary 의 `derived` 는 primary 에서 만든 계열입니다.
-- `Foundations/Color` 의 스토리는 둘입니다.
-
-| 스토리 | 보는 것 |
-| --- | --- |
-| Lab | 테마 하나. Controls 의 색 선택기로 primary, secondary, tertiary 를 아무 CSS 색으로 고르고, 비우면 primary 에서 만든 계열을 본다 |
-| Palettes | 데모 팔레트 17개를 primary 로 줄 때의 역할 색과 대비 |
-
-- Lab 은 한 화면에 이것들을 그립니다.
+- `Foundations/Color` 의 Lab 은 툴바가 고른 테마 하나를 한 화면에 그립니다.
   - `checkIdsTheme` 의 문제 목록.
   - 계열마다 11단계 팔레트와 출처(준 색, primary 에서 만듦, harmonized, fixed).
   - 계열 × 역할 스워치와 모든 계열 짝의 대비, 두 모드.
@@ -129,8 +122,8 @@ IDS 색은 계열 여덟 개가 같은 역할 열 개를 가지는 시맨틱 토
 
 - 구조선과 테두리는 중립입니다. 테마 색은 주요 동작과 포커스에만 씁니다.
 - 색만으로 의미를 전하지 않습니다. 아이콘이나 글자를 함께 둡니다.
-- 대비는 Storybook `Foundations/Color` 의 Lab(테마 하나)과 Palettes(17색)에서 확인합니다.
-- Lab 의 역할 표는 `tokens/color-roles.ts`(core 의 `color-roles.json` 에서 생성)의 계열과 역할을 읽어 그리므로 계열이나 역할을 더하면 저절로 나타납니다. 데모 팔레트의 원시 단계는 [Palette](../palette/README.md) 에 있습니다.
+- 테마 하나의 대비는 Storybook `Foundations/Color` 의 Lab 에서 보고, 데모 팔레트 17개 전체는 `tests/tokens-contrast.test.ts` 가 검사합니다.
+- Lab 의 역할 표는 `tokens/color-roles.ts`(core 의 `color-roles.json` 에서 생성)의 계열과 역할을 읽어 그리므로 계열이나 역할을 더하면 저절로 나타납니다.
 - 테스트:
   - `tests/tokens-contrast.test.ts`: 데모 팔레트 17개 × 두 모드 × pure·tinted × harmonized·fixed 에서 모든 계열의 채움과 soft 위 글자가 Lc 75, `text-X` 가 Lc 60, 선이 Lc 45 이상이다.
   - `tests/theme-roles.test.ts`: 역할 규칙이 이전 고정 표(Flutter 가 쓰는 표)와 같은 단계를 고른다.
