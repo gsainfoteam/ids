@@ -8,7 +8,8 @@ import {
 } from './root';
 import { groupStyle } from './style';
 
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { IdsSize } from '../../../tokens/types';
 
 export function Group(props: Group.Props) {
   return <GroupRoot {...props} />;
@@ -19,7 +20,7 @@ export namespace Group {
     orientation?: GroupOrientation;
     attached?: boolean;
     size?: IdsSize;
-    variant?: IdsVariant;
+    variant?: SurfaceVariant;
     separator?: GroupContextValue['separator'];
     children?: ReactNode;
   };

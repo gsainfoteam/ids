@@ -3,7 +3,7 @@
 누르면 명령을 실행하는 버튼입니다.
 
 - **실수로 제출하지 않음.** `type` 을 생략하면 `button` 이라 폼 안에 두어도 폼을 제출하지 않습니다.
-- **강도는 variant, 의미는 colorScheme.** `danger` 같은 색은 `variant` 와 따로 고르고, `solid` `soft` `outline` `ghost` `glossy` 가 모두 그 색을 따릅니다. 포커스 링도 같은 색입니다.
+- **강도는 variant, 의미는 colorScheme.** `danger` 같은 색은 `variant` 와 따로 고르고, `solid` `soft` `outline` `ghost` `glossy` `transparent` 가 모두 그 색을 따릅니다. 포커스 링도 같은 색입니다.
 - **로딩은 합성.** `disabled` 와 `<Spinner />` 를 넣으면 스피너가 아이콘 자리에 아이콘 크기로 들어가고, `focusableWhenDisabled` 를 켜면 누른 버튼이 로딩 중에도 포커스를 지킵니다.
 - **asChild.** 링크나 라우터 `Link` 를 버튼 모양으로 그립니다. 링크는 링크로 남고, 비활성이면 이동하지 않습니다.
 - **상태 기반 스타일.** hover, active, focus-visible 이 `data-*` 로 붙고, `className` `style` `children` 은 상태를 받는 함수도 됩니다.
@@ -23,16 +23,17 @@ import { Button } from '@gsainfoteam/ids-react';
 <Button variant="outline">취소</Button>                     // primary 의 outline, ghost 는 무채색
 <Button variant="ghost">더보기</Button>
 <Button variant="glossy">구매</Button>                      // 채움 위에 광택, 진한 가장자리, 그림자
+<Button variant="transparent">취소</Button>                 // 배경 없음. 올려도 눌러도 배경을 칠하지 않는다
 <Button colorScheme="danger">삭제</Button>                  // 색만 바뀐다
 <Button colorScheme="danger" variant="ghost">삭제</Button>  // 글자만 danger, 올리면 옅은 danger
 <Button colorScheme="neutral">계속</Button>                 // 검은 버튼. 다크 모드에서는 흰 버튼
 ```
 
-| colorScheme                         | solid        | soft         | outline, ghost | glossy              |
-| ----------------------------------- | ------------ | ------------ | -------------- | ------------------- |
-| `primary` (기본)                    | 테마 색 채움 | `secondary`  | 무채색         | 테마 색 채움과 광택 |
-| `neutral`                           | 글자색 채움  | 옅은 회색    | 무채색         | 글자색 채움과 광택  |
-| `danger` `success` `warning` `info` | 상태 색 채움 | 옅은 상태 색 | 글자만 상태 색 | 상태 색 채움과 광택 |
+| colorScheme                         | solid        | soft         | outline, ghost, transparent | glossy              |
+| ----------------------------------- | ------------ | ------------ | --------------------------- | ------------------- |
+| `primary` (기본)                    | 테마 색 채움 | `secondary`  | 무채색                      | 테마 색 채움과 광택 |
+| `neutral`                           | 글자색 채움  | 옅은 회색    | 무채색                      | 글자색 채움과 광택  |
+| `danger` `success` `warning` `info` | 상태 색 채움 | 옅은 상태 색 | 글자만 상태 색              | 상태 색 채움과 광택 |
 
 - 상태 색에서는 포커스 링과 포커스된 테두리도 그 색입니다. `primary` 와 `neutral` 은 테마 색 링입니다.
 - `soft` 는 계열의 `bg-X-soft` 배경에 `text-on-X-soft` 글자입니다. 올리면 `bg-X-soft-hover`, 누르면 `bg-X-soft-active`(채움을 6%, 12% 섞은 색)이고, 글자는 그 배경에서도 APCA Lc 75 를 지킵니다.
@@ -40,6 +41,11 @@ import { Button } from '@gsainfoteam/ids-react';
 - `secondary` 와 `tertiary` 는 테마가 그 색을 주지 않으면 IdsProvider 가 primary 에서 만든 색입니다. 어느 테마에서나 primary 와 다른 색입니다.
 - `glossy` 는 `solid` 의 채움 위에 위쪽이 밝은 광택, 채움보다 20% 진한 가장자리, 안쪽 위 하이라이트, 그림자를 얹습니다. 올리면 광택이 밝아지고, 누르면 광택과 그림자가 빠지며 안쪽 그림자로 눌려 들어갑니다. 포커스 때 가장자리는 `outline` 처럼 scheme 색 링이 됩니다.
 - `outline` 과 `ghost` 는 올리면 `bg-neutral-soft`, 누르면 한 단계 진한 `bg-neutral-soft-hover` 입니다. 상태 색에서는 `bg-X-soft` 와 `bg-X-soft-hover` 입니다.
+- `transparent` 는 배경과 테두리가 없고, 어느 상태에서도 배경을 칠하지 않습니다.
+  - 쉴 때 글자는 `ghost` 와 같습니다.
+  - 올리면 글자가 한 단계 진해집니다. 상태 색은 `text-X` 에서 `text-on-X-soft` 로 바뀌고, `primary` 와 `neutral` 은 이미 가장 진한 `on-surface` 라 그대로입니다.
+  - 누르면 Cupertino 처럼 불투명도가 40% 로 내려갑니다.
+  - 올리면 배경이 깔려야 하는 툴바나 목록 버튼은 `ghost` 를 씁니다.
 
 ## 아이콘
 
@@ -143,7 +149,7 @@ import { Button } from '@gsainfoteam/ids-react';
 
 | 속성                           | 기본 / 동작                                                             |
 | ------------------------------ | ----------------------------------------------------------------------- |
-| `variant`                      | `solid`(기본) / `soft` / `outline` / `ghost` / `glossy`                 |
+| `variant`                      | `solid`(기본) / `soft` / `outline` / `ghost` / `glossy` / `transparent` |
 | `colorScheme`                  | `primary`(기본) / `neutral` / `danger` / `success` / `warning` / `info` |
 | `size`                         | `standard`(36px, 기본) / `tiny`(32px). 그룹 안에서는 그룹 크기          |
 | `type`                         | `button`                                                                |

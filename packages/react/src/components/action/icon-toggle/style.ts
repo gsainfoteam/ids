@@ -6,7 +6,7 @@ import { tv } from '../../../utils';
 export const iconToggleStyle = tv({
   base: [controlSurface.base, iconSquare.base],
   variants: {
-    variant: toggleSurface.variant,
+    variant: toggleSurface.glyphVariant,
     colorScheme: controlSurface.colorScheme,
     size: iconSquare.size,
   },

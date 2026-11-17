@@ -5,7 +5,8 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { paginationStyle } from './style';
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { IdsSize } from '../../../tokens/types';
 
 export type PaginationContextValue = {
   page: number;
@@ -13,7 +14,7 @@ export type PaginationContextValue = {
   siblingCount: number;
   boundaryCount: number;
   size: IdsSize;
-  variant: IdsVariant;
+  variant: SurfaceVariant;
   disabled: boolean;
   getHref: ((page: number) => string) | undefined;
   setPage: (page: number) => void;

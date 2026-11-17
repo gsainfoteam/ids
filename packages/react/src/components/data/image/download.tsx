@@ -8,10 +8,11 @@ import { useImageViewerContext } from './context';
 import { useTranslate } from '../../../internal/translate';
 import { IconButton } from '../../action/icon-button';
 
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { IdsSize } from '../../../tokens/types';
 
 export type ImageViewerDownloadProps = Omit<ComponentProps<'a'>, 'children' | 'href' | 'color'> & {
-  variant?: IdsVariant;
+  variant?: SurfaceVariant;
   size?: IdsSize;
   icon?: ReactElement;
 };

@@ -4,10 +4,11 @@ import { type ComponentProps, type MouseEvent, type ReactElement } from 'react';
 
 import { IconButton } from '../../action/icon-button';
 
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { IdsSize } from '../../../tokens/types';
 
 export type ImageViewerButtonProps = Omit<ComponentProps<'button'>, 'children' | 'color'> & {
-  variant?: IdsVariant;
+  variant?: SurfaceVariant;
   size?: IdsSize;
   icon?: ReactElement;
 };

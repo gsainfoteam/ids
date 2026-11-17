@@ -16,7 +16,8 @@ import { TabsTrigger, type TabsTriggerProps } from './trigger';
 import { useTabs } from './use-tabs';
 import { resolveState, type StateRenderProps } from '../../../internal/state-props';
 
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { IdsSize } from '../../../tokens/types';
 
 export type TabsState<T extends string = string> = {
   value: T | undefined;
@@ -33,7 +34,7 @@ export type TabsRenderProps<T extends string = string> = {
 
 type TabsLook =
   | { appearance?: 'underline' | 'enclosed'; variant?: never }
-  | { appearance: 'pill'; variant?: IdsVariant };
+  | { appearance: 'pill'; variant?: SurfaceVariant };
 
 export type TabsProps<T extends string = string> = Omit<
   ComponentProps<'div'>,

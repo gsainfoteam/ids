@@ -3,6 +3,8 @@ import { cn } from '../utils/cn';
 
 import type { IdsSize, IdsVariant } from '../tokens/types';
 
+export type SurfaceVariant = Exclude<IdsVariant, 'transparent'>;
+
 export type ControlColorScheme =
   | 'primary'
   | 'secondary'
@@ -26,6 +28,7 @@ const schemes = {
     '[--control-soft-hover:var(--ids-color-bg-primary-soft-hover)] [--control-soft-press:var(--ids-color-bg-primary-soft-active)]',
     quietNeutral,
     '[--control-ring:var(--ids-color-border-primary)]',
+    '[--control-glyph-on:var(--ids-color-text-primary)]',
   ),
   secondary: cn(
     '[--control-fill:var(--ids-color-bg-secondary)] [--control-on-fill:var(--ids-color-text-on-secondary)]',
@@ -34,6 +37,7 @@ const schemes = {
     '[--control-soft-hover:var(--ids-color-bg-secondary-soft-hover)] [--control-soft-press:var(--ids-color-bg-secondary-soft-active)]',
     quietNeutral,
     '[--control-ring:var(--ids-color-border-secondary)]',
+    '[--control-glyph-on:var(--ids-color-text-secondary)]',
   ),
   tertiary: cn(
     '[--control-fill:var(--ids-color-bg-tertiary)] [--control-on-fill:var(--ids-color-text-on-tertiary)]',
@@ -42,6 +46,7 @@ const schemes = {
     '[--control-soft-hover:var(--ids-color-bg-tertiary-soft-hover)] [--control-soft-press:var(--ids-color-bg-tertiary-soft-active)]',
     quietNeutral,
     '[--control-ring:var(--ids-color-border-tertiary)]',
+    '[--control-glyph-on:var(--ids-color-text-tertiary)]',
   ),
   neutral: cn(
     '[--control-fill:var(--ids-color-on-surface)] [--control-on-fill:var(--ids-color-surface)]',
@@ -50,6 +55,7 @@ const schemes = {
     '[--control-soft-hover:var(--ids-color-bg-neutral-soft-hover)] [--control-soft-press:var(--ids-color-bg-neutral-soft-active)]',
     quietNeutral,
     '[--control-ring:var(--ids-color-border-primary)]',
+    '[--control-glyph-on:var(--ids-color-on-surface)]',
   ),
   danger: cn(
     '[--control-fill:var(--ids-color-bg-danger)] [--control-on-fill:var(--ids-color-text-on-danger)]',
@@ -59,6 +65,7 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-danger)] [--control-on-press:var(--ids-color-text-on-danger-soft)]',
     '[--control-hover:var(--ids-color-bg-danger-soft)] [--control-press:var(--ids-color-bg-danger-soft-hover)]',
     '[--control-ring:var(--ids-color-border-danger)]',
+    '[--control-glyph-on:var(--ids-color-text-danger)]',
   ),
   success: cn(
     '[--control-fill:var(--ids-color-bg-success)] [--control-on-fill:var(--ids-color-text-on-success)]',
@@ -68,6 +75,7 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-success)] [--control-on-press:var(--ids-color-text-on-success-soft)]',
     '[--control-hover:var(--ids-color-bg-success-soft)] [--control-press:var(--ids-color-bg-success-soft-hover)]',
     '[--control-ring:var(--ids-color-border-success)]',
+    '[--control-glyph-on:var(--ids-color-text-success)]',
   ),
   warning: cn(
     '[--control-fill:var(--ids-color-bg-warning)] [--control-on-fill:var(--ids-color-text-on-warning)]',
@@ -77,6 +85,7 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-warning)] [--control-on-press:var(--ids-color-text-on-warning-soft)]',
     '[--control-hover:var(--ids-color-bg-warning-soft)] [--control-press:var(--ids-color-bg-warning-soft-hover)]',
     '[--control-ring:var(--ids-color-border-warning)]',
+    '[--control-glyph-on:var(--ids-color-text-warning)]',
   ),
   info: cn(
     '[--control-fill:var(--ids-color-bg-info)] [--control-on-fill:var(--ids-color-text-on-info)]',
@@ -86,6 +95,7 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-info)] [--control-on-press:var(--ids-color-text-on-info-soft)]',
     '[--control-hover:var(--ids-color-bg-info-soft)] [--control-press:var(--ids-color-bg-info-soft-hover)]',
     '[--control-ring:var(--ids-color-border-info)]',
+    '[--control-glyph-on:var(--ids-color-text-info)]',
   ),
 } satisfies Record<ControlColorScheme, string>;
 
@@ -156,6 +166,11 @@ export const controlSurface = {
       'inset-ring-1 inset-ring-[color-mix(in_oklab,var(--control-fill),black_20%)]',
       'data-hovered:from-white/30',
       'data-active:from-transparent data-active:shadow-none data-active:inset-shadow-[0_1px_2px_rgb(0_0_0/0.2)]',
+    ),
+    transparent: cn(
+      'bg-transparent text-(--control-quiet)',
+      'transition-[color,background-color,border-color,box-shadow,opacity]',
+      'data-hovered:text-(--control-on-press) data-active:opacity-40',
     ),
   } satisfies Record<IdsVariant, string>,
   colorScheme: schemes,

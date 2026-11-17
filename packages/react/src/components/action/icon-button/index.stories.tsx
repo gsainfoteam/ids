@@ -22,7 +22,7 @@ import { IconButton } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
+const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy', 'transparent'] as const;
 const colorSchemes = [
   'primary',
   'secondary',
@@ -87,7 +87,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Variant × Color scheme"
-        description="Button과 같은 색 규칙입니다. ghost가 기본이라 툴바와 카드 모서리에서 조용합니다."
+        description="Button과 같은 색 규칙입니다. ghost가 기본이라 툴바와 카드 모서리에서 조용합니다. transparent는 hover와 press에도 배경이 없습니다."
       >
         <Showcase.Matrix
           rows={colorSchemes}
@@ -283,6 +283,37 @@ export const AsLink: Story = {
     await expect(link).toHaveAttribute('href', '#docs');
     await expect(link.querySelector('svg')).not.toBeNull();
     await expect(link.getBoundingClientRect().width).toBe(36);
+  },
+};
+
+export const Transparent: Story = {
+  render: () => (
+    <div className="flex items-center gap-1">
+      <IconButton variant="transparent" icon={<MagnifyingGlassIcon />} aria-label="검색" />
+      <IconButton variant="transparent" icon={<EllipsisHorizontalIcon />} aria-label="더보기" />
+      <IconButton
+        variant="transparent"
+        colorScheme="danger"
+        icon={<TrashIcon />}
+        aria-label="삭제"
+      />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'transparent는 아이콘만 그립니다. hover는 아이콘을 한 단계 진하게, press는 불투명도를 낮추고, 배경은 어느 상태에서도 칠하지 않습니다. 크기는 다른 variant와 같은 36px, 32px입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const remove = canvas.getByRole('button', { name: '삭제' });
+    await userEvent.hover(remove);
+    await waitFor(() => expect(remove).toHaveAttribute('data-hovered'));
+    await expect(getComputedStyle(remove).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(remove.getBoundingClientRect().width).toBe(36);
+    await userEvent.unhover(remove);
   },
 };
 
