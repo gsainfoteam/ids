@@ -164,6 +164,10 @@ focusVisible = focused
 
 그룹은 `orientation`, `size`, `variant`를 내려준다. 자식은 자기 값이 있으면 그것을 쓰고, 없으면 그룹 값을 쓴다(`size ?? group.size ?? standard`, `variant ?? group.variant ?? solid`). 어긋나도 throw하지 않는다. 그룹 안의 그룹은 바깥 그룹 값을 물려받는다. [group](../react/src/components/utility/group/index.tsx) `useGroupContext`.
 
+- 컨트롤은 `IdsGroup.maybeOf(context)`로 그룹 값(`IdsGroupData`: `orientation`, `attached`, `size`)을 읽는다
+- `attached: false`인 그룹의 `IdsGroupSeparator`는 컨트롤 가운데에 서는 짧은 선이다. standard 20, tiny 16. 8px 간격이 이미 떼어 놓으므로 여백은 없다
+- 떨어진 `ToggleGroup`은 토글을 늘이지 않는다. 늘이는 건 `attached`일 때뿐이다(React `flex-1`). `IdsToggleGroup`을 만들 때 따른다
+
 ## 순서
 
 1. `IdsInteractive` — 상태 추가가 breaking이 아니게
