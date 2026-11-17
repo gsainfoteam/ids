@@ -4,6 +4,7 @@ import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
+import '../../../tokens/ids_sizes.dart';
 import '../../interaction/control_surface.dart';
 import '../../interaction/ids_interactive.dart';
 
@@ -64,10 +65,14 @@ class IdsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = IdsProvider.of(context).resolved;
     final tiny = size == IdsSize.tiny;
-    final height = theme.dimension(tiny ? 32 : 36);
+    final height = theme.dimension(
+      tiny ? IdsSizes.controlTiny : IdsSizes.controlStandard,
+    );
     final padding = theme.dimension(tiny ? 12 : 16);
     final iconPadding = theme.dimension(tiny ? 10 : 12);
-    final iconSize = theme.dimension(tiny ? 14 : 16);
+    final iconSize = theme.dimension(
+      tiny ? IdsSizes.iconTiny : IdsSizes.iconStandard,
+    );
     final gap = theme.dimension(tiny ? 6 : 8);
     final textStyle = tiny
         ? IdsTypography.captionC1Medium
