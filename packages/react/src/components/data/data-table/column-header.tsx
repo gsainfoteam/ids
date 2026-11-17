@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowDownIcon, ArrowUpIcon, ChevronUpDownIcon } from '@heroicons/react/16/solid';
+import { ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon } from '@heroicons/react/16/solid';
 import { FlexRender } from '@tanstack/react-table';
 
 import { useDataTableContext } from './context';
@@ -30,8 +30,8 @@ function columnName<TData extends RowData>(header: ColumnHeaderProps<TData>['hea
 }
 
 function SortIcon({ sorted, className }: { sorted: false | SortDirection; className?: string }) {
-  if (sorted === 'asc') return <ArrowUpIcon className={className} />;
-  if (sorted === 'desc') return <ArrowDownIcon className={className} />;
+  if (sorted === 'asc') return <ChevronUpIcon className={className} />;
+  if (sorted === 'desc') return <ChevronDownIcon className={className} />;
   return <ChevronUpDownIcon className={className} />;
 }
 

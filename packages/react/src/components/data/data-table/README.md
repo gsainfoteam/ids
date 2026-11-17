@@ -76,7 +76,7 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 
 - 글자 열은 오름차순, 숫자 열은 내림차순부터 시작합니다(TanStack 기본값). 열의 `sortDescFirst` 로 바꿉니다.
 - 정렬된 열의 `th` 에만 `aria-sort="ascending"` / `"descending"` 이 붙습니다. APG 정렬 표 예제와 같습니다.
-- 아이콘은 머리글 칸 끝에 붙습니다. 정렬 없음 `ChevronUpDown` 은 버튼에 올리거나 포커스할 때만 보이고, 오름차순 `ArrowUp` 과 내림차순 `ArrowDown` 은 `text-primary` 로 늘 보입니다. 모두 `aria-hidden` 입니다.
+- 아이콘은 머리글 칸 끝에 붙습니다. 정렬 없음 `ChevronUpDown` 은 버튼에 올리거나 포커스할 때만 보이고, 오름차순 `ChevronUp` 과 내림차순 `ChevronDown` 은 `text-primary` 로 늘 보입니다. 모두 `aria-hidden` 입니다.
 - `align: 'end'` 열은 글자가 끝에, 아이콘이 칸 앞에 옵니다.
 - 서버가 정렬하면 `manualSorting` 을 줍니다. DataTable 은 받은 순서를 그대로 그립니다.
 
@@ -161,6 +161,7 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 
 - `outline` 의 바깥 `div` 는 `concentric-p-1 bg-neutral-soft` 트레이입니다. 표 카드는 `rounded-standard`(10px) 라 트레이 모서리는 14px 이 됩니다.
 - 표 카드는 `bg-surface`, `border-neutral` 테두리와 `shadow-xs` 이고, 열 사이에 `border-neutral` 세로선이 들어갑니다.
+- 머리글 행은 `bg-neutral-soft` 와 `bg-surface` 를 반씩 섞은 색입니다. 트레이와 같은 `bg-neutral-soft` 면 다크 모드에서 머리글이 트레이에 묻힙니다.
 - 바닥글은 트레이 안쪽 아래 줄입니다. 페이지 버튼은 트레이 위에서도 보이도록 올렸을 때 `bg-neutral-soft-hover`, 누를 때 `bg-neutral-soft-active` 로 한 단계씩 올라갑니다. 정렬 버튼도 같습니다.
 - 바닥글이 없으면(선택과 페이지가 모두 꺼짐) 트레이는 표 둘레 4px 테두리로만 보입니다.
 

@@ -81,7 +81,7 @@ export function DataTableRoot<TData extends RowData>(props: DataTable.Props<TDat
                 ))}
               </colgroup>
             )}
-            <TableHeader>
+            <TableHeader className={styles.header()}>
               {table.getHeaderGroups().map((group) => (
                 <TableRow key={group.id}>
                   {group.headers.map((header) => (

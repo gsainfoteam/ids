@@ -9,6 +9,7 @@ export const dataTableStyle = tv({
     root: 'flex w-full min-w-0 flex-col',
     frame: 'relative',
     table: '',
+    header: '',
     head: 'group/head relative',
     cell: '',
     sortButton: [
@@ -48,7 +49,9 @@ export const dataTableStyle = tv({
     variant: {
       outline: {
         root: 'concentric-p-1 bg-neutral-soft',
-        table: 'rounded-standard bg-surface shadow-xs',
+        table: '[--table-radius:var(--radius-standard)] bg-surface shadow-xs',
+        header:
+          '[--data-table-header:color-mix(in_oklab,var(--ids-color-bg-neutral-soft),var(--ids-color-surface))] bg-(--data-table-header)',
         head: 'not-last:border-e not-last:border-neutral',
         cell: 'not-last:border-e not-last:border-neutral',
         sortButton:
