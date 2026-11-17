@@ -1,0 +1,73 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:ids_flutter/ids.dart';
+
+import 'test_theme.dart';
+
+class _Messages with IdsMessages {
+  @override
+  String get kbdCommand => 'Command';
+}
+
+void main() {
+  testWidgets('shows localized modifier names and platform ordering', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: IdsProvider(
+          theme: testTheme,
+          translation: _Messages(),
+          child: const Column(
+            children: [
+              IdsKbd(keys: 'Mod+Shift+KeyK', platform: TargetPlatform.macOS),
+              IdsKbd(keys: 'Shift+Mod+K', platform: TargetPlatform.windows),
+            ],
+          ),
+        ),
+      ),
+    );
+    expect(find.bySemanticsLabel('시프트 Command K'), findsOneWidget);
+    expect(find.bySemanticsLabel('컨트롤 시프트 K'), findsOneWidget);
+    final caps = find.byType(IdsKbd);
+    expect(
+      find.descendant(of: caps.first, matching: find.text('+')),
+      findsNothing,
+    );
+    expect(
+      find.descendant(of: caps.last, matching: find.text('+')),
+      findsNWidgets(2),
+    );
+    expect(
+      tester.getTopLeft(find.text('Ctrl')).dx,
+      lessThan(tester.getTopLeft(find.text('Shift')).dx),
+    );
+  });
+
+  testWidgets('literal glyphs stay in one cap and size inherits from Field', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: IdsProvider(
+          theme: testTheme,
+          child: const IdsField(
+            size: IdsSize.tiny,
+            children: [
+              Align(
+                child: IdsKbd(child: '⌘K', labels: {'command': 'Command'}),
+              ),
+              Align(
+                child: IdsKbd(keys: '+', size: IdsSize.standard),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    expect(find.bySemanticsLabel('Command K'), findsOneWidget);
+    expect(tester.getSize(find.byType(IdsKbd).first).height, 16);
+    expect(tester.getSize(find.byType(IdsKbd).last), const Size.square(20));
+    expect(find.text('+'), findsOneWidget);
+  });
+}
