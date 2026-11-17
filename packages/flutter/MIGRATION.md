@@ -1,89 +1,81 @@
 # ids_flutter 컴포넌트 재구축
 
-임시 문서. 마이그레이션이 끝나면 삭제한다. 삭제 전에 아래 미결 건을 이슈로 옮기고, [RULES.md](RULES.md)의 이 문서 링크도 지운다. 설계 원칙은 [IDS Architecture.md](../../IDS%20Architecture.md).
+임시 문서. 마이그레이션이 끝나면 삭제하고, [RULES.md](RULES.md)의 이 문서 링크도 지운다. 설계 원칙은 [IDS Architecture.md](../../IDS%20Architecture.md).
 
 ## 원칙
 
-- FE(`packages/react`)에 없는 컴포넌트를 먼저 만들지 않는다. 컴포넌트의 존재 여부와 조립 구조는 FE를 따른다.
-- `lib/src/components/`는 전부 지우고 컴포넌트 단위로 다시 만든다.
-- `lib/theme/`, `lib/tokens/`, `lib/src/layout/ids_axis.dart`는 지우지 않는다.
-- 컴포넌트 하나마다 커밋 하나, widgetbook usecase 동반. 여러 컴포넌트를 한 브랜치에 모아 PR 하나로 올린다. `example/lib/components/`는 비어 있으니 usecase도 새로 쓴다.
+- 컴포넌트의 존재 여부와 조립 구조는 FE(`packages/react`)를 따른다. FE에 없는 컴포넌트는 먼저 만들지 않는다.
+- 컴포넌트 하나마다 커밋 하나, widgetbook usecase 동반. 여러 컴포넌트를 한 브랜치에 모아 PR로 올린다.
 
-### 무엇을 어디서 가져오는가
+| 무엇              | 기준                    | 예                                                       |
+| ----------------- | ----------------------- | -------------------------------------------------------- |
+| 시각값            | **Figma**, 없으면 React | 높이, padding, radius, 색, 상태별 알파, 모션 duration    |
+| 구조 · API · 상태 | **React**               | prop 이름, 서브컴포넌트 조립, 상태 집합, 그룹 전파 규칙  |
+| 플랫폼 대응       | **이 문서**             | `focusVisible` 판정, `strokeAlignInside`, Semantics 주입 |
 
-| 무엇              | 기준        | 예                                                      |
-| ----------------- | ----------- | ------------------------------------------------------- |
-| 시각값            | **Figma**   | 높이, padding, radius, 색, 상태별 알파, 모션 duration    |
-| 구조 · API · 상태 | **React**   | prop 이름, 서브컴포넌트 조립, 상태 집합, 그룹 전파 규칙  |
-| 플랫폼 대응       | **이 문서** | `focusVisible` 판정, `strokeAlignInside`, Semantics 주입 |
+- Figma(Infoteam Design System)에는 Action, Form 페이지만 있다. 그 밖의 컴포넌트는 React 값을 쓴다.
+- Notion이나 `IDS Architecture.md`가 코드와 다르면 위 표의 기준을 따른다.
 
 ## 기준 커밋
 
-삭제 직전 상태. 별도 백업 폴더는 두지 않는다.
+컴포넌트를 지우기 직전 상태. 이전 코드는 여기서 본다.
 
 ```bash
-git show ed74578:packages/flutter/lib/src/components/tabs/ids_tabs.dart
 git show ed74578:packages/flutter/lib/src/components/
 git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 ```
 
 ## 결정 사항
 
-- **StateMask는 만들지 않는다.** 상태는 배경색 알파로 표현한다. 상태 감지는 `useInteractive`의 Flutter 대응물 `IdsInteractive`.
-- **`IdsInteractive`는 그리지 않는다.** 상태만 내보내고 배경 알파·scale·focus ring·disabled는 control surface 값 파일이 정한다. React의 `useInteractive` / `control-surface.ts` 분리와 같다. 그래서 Figma를 보지 않는다.
-- **`IdsTextField`도 `IdsInteractive`를 쓴다.** React는 `Button`·`Toggle`만 쓰고 `TextField`는 네이티브 `:focus-visible`로 처리한다. Flutter엔 의사클래스가 없다.
-- **로컬 enum은 만들지 않는다.** `IdsSize`/`IdsVariant`로 안 되는 축은 `packages/core/tokens/enums.json`에 추가한다. 추가는 FE가 그 컴포넌트를 만들 때 한다.
-- **치수·상태 알파는 Figma가 기준.** Figma에 없으면 React 값을 쓴다. core에 `radius.json`·`size.json`은 있으나 dart formatter가 없어 `lib/tokens/`로 나오지 않는다. 상태 알파(`--ids-state-*`)는 core에 아예 없고 [control-surface.ts](../react/src/internal/control-surface.ts)에만 있다. Flutter는 이 값을 파일 한 곳에만 둔다. 값이 굳으면 core로 올리고 `sd.config.js`에 dart formatter를 켠다.
-- **컴포넌트 색은 `colorScheme` prop이다.** FE의 Button, IconButton, Toggle, IconToggle, FloatingButton, Badge, Chip, Alert, Progress에 있다. 컨트롤의 값은 `primary` `neutral` `danger` `success` `warning` `info`. `enums.json`에는 아직 없고 React의 TS 타입(`ControlColorScheme`)이다. 옮기는 컴포넌트에서 쓰일 때 `enums.json`에 올린다.
-- **설계 문서(Notion, `IDS Architecture.md`)와 다른 곳.** 시각값은 Figma를 보고 닫는다. 나머지는 코드를 따르고 미결로 둔다.
+- **이름.** 컴포넌트에는 `Ids` prefix를 붙이지 않는다. 생성 토큰 타입과 `IdsProvider`·`IdsScope`·`IdsTheme` 같은 테마 타입에만 붙인다. Flutter SDK·Material과 이름이 겹치면 사용하는 쪽이 `as ids`로 import한다.
+- **상태.** `Interactive`가 상태를 감지하고, 컴포넌트는 배경색 알파로 표현한다. StateMask는 만들지 않는다. `Interactive`는 상태만 내보내고, 배경 알파·focus ring·disabled는 control surface 값이 정한다. React의 `useInteractive` / `control-surface.ts`와 같은 분리다. Flutter에는 `:focus-visible`이 없으므로 `TextField`도 `Interactive`를 쓴다.
+- **토큰.** 색, 모서리, 치수, 글자는 `IdsProvider.of(context)`에서 읽는다. 색은 `colors`의 역할(`bgNeutralSoft` `textNeutral` `borderNeutral` …), 모서리는 `shape(radius: radius.x)`(테마가 round면 둥근 사각형, squircle이면 `RoundedSuperellipseBorder`. 반지름 숫자는 둘이 같다), 치수는 `dimension(값)`, 글자는 `textStyle(IdsTypography.x, color:)`다. React가 spacing 눈금으로 쓰는 값은 `dimension`을 거쳐 테마 `scale`을 따르고, px로 쓰는 값(테두리, 링 두께)은 거치지 않는다. 컴포넌트 치수는 각 컴포넌트 안의 상수로 둔다. 상태 알파는 core에 없고 [control-surface.ts](../react/src/internal/control-surface.ts)에만 있으며, Flutter도 한 파일에 둔다.
+- **enum.** 여러 컴포넌트가 공유하는 축(`IdsSize` `IdsVariant`, React가 `internal/`이나 `tokens/`에 둔 타입)은 `packages/core/tokens/enums.json`에서 생성한다. 컴포넌트 하나만 쓰는 축(React가 그 컴포넌트 폴더에 둔 타입)은 그 컴포넌트 파일의 enum으로 두고, 값은 React와 같게 한다. Flutter가 새 값을 정하지 않는다.
+- **`colorScheme`.** 컴포넌트 색은 `colorScheme` prop이고 값은 `primary` `secondary` `tertiary` `neutral` `danger` `success` `warning` `info`다. 이름이 `colors`의 계열 이름과 같아서 역할을 `colors['bg-$name']`로 읽는다. 공유 축이므로 처음 쓰는 컴포넌트에서 `enums.json`에 올린다.
+- **아이콘.** 기본 아이콘(Avatar fallback, Empty media 등)은 Material Icons를 쓴다.
+- **`Group`** 은 내부 전용이다. React처럼 export하지 않고 `ButtonGroup`·`ToggleGroup`이 공유한다.
+- **`Text`** 가 없는 동안 텍스트는 `IdsProvider.of(context).textStyle(IdsTypography.bodyB3Medium, color: ...)`를 `DefaultTextStyle`로 쓴다. 이름은 CSS의 `text-body-b3-medium`과 같다.
 
-  시각값 — 그 컴포넌트를 만들 때 Figma에서 확인하고 아래 control surface 절에 값을 적는다.
+## widgetbook
 
-  - disabled: 코드는 opacity 0.50. 문서는 opacity-50 또는 disabled 토큰 (core에 없음)
-  - 치수: 코드는 `standard` h36 / px16 / r10. 문서와 어긋나는지 미확인
-
-  코드 규약 — Figma로 닫히지 않는다. 미결.
-
-  - 그룹 size: 코드는 불일치 시 항상 throw, `variant`는 전파 안 함. 문서는 자식 명시값 우선
-  - `Ids` prefix: codegen과 `IdsScope`·`IdsTheme`에 있음. 문서는 prefix 없음
-  - size / variant: `enums.json`의 `standard` `tiny` / `solid` `soft` `outline` `ghost`. 문서의 `sm`/`md`/`lg`, `link`는 코드에 없음
-  - spacing: core에 `spacing.json`은 있으나 `ids_spacing.dart`가 없다. 위 dart formatter 건과 같다
-
-이전 기록에서 참조하는 것: 컴포넌트 목록, 서브컴포넌트 조립 구조, 다뤘던 기능·상태.
-참조하지 않는 것: 로컬 enum, 치수, 상태 처리 방식.
-
-이전 코드의 로컬 enum — `IdsCardVariant`, `IdsCardSize`, `IdsDialogSize`, `IdsEmptyVariant`, `IdsFloatingButtonVariant`.
+- usecase는 Storybook(React `index.stories.tsx`)과 같게 만든다. 스토리 이름·순서·문구·크기를 그대로 옮기고, 컴포넌트 하나가 한 페이지다.
+- 링크는 `onPressed`로 옮긴다. `asChild`처럼 Flutter에 없는 동작만 보여 주는 스토리는 뺀다.
+- Flutter에 아직 없는 IDS 컴포넌트는 `example/lib/components/story_kit.dart`의 `StandIn*`(Material 위젯)으로 대신한다. usecase 파일은 Material 컨트롤을 직접 쓰지 않는다.
+- 그 컴포넌트를 옮기는 PR에서 `StandIn*`을 지우고 usecase를 IDS 컴포넌트로 바꾼다.
+- `StandIn*`이 없는 컴포넌트가 필요한 스토리와 Gallery 칸은 빼 두고, 그 컴포넌트를 옮길 때 채운다.
 
 ## 분류
 
-**A — FE 구현됨. 지금 옮긴다.** 구조는 React 구현과 README, 시각값은 Figma. 이전 기록 참조 안 함. C도 같다.
+컴포넌트 이름과 분류는 React 폴더([CLAUDE.md](../../CLAUDE.md))를 따른다.
 
-`button` `icon_button` `divider` `spacer` `avatar` `badge` `card` `item` `floating_button` `checkbox`
+**FE 구현, Flutter 미구현.** 옮긴다.
 
-**B — FE 목록에 있으나 미구현. FE가 만든 뒤 옮긴다.** 그동안 패키지에서 빠져 있다.
+| 분류       | 컴포넌트                                                                                                                                                                                                                                                          |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| action     | `Button` `IconButton` `ButtonGroup` `Toggle` `IconToggle` `ToggleGroup` `FloatingButton`                                                                                                                                                                          |
+| form       | `Input` `TextField` `TextArea` `NumberField` `PasswordField` `TelField` `OTPField` `ChipField` `FileField` `ColorField` `Select` `Checkbox` `CheckboxGroup` `Radio` `RadioGroup` `Switch` `Slider` `Rating` `DateField` `TimeField` `DateTimeField` `PromptInput` |
+| data       | `Accordion` `Calendar` `Carousel` `Chip` `ColorPicker` `DataTable` `Image` `Marquee` `QRCode` `Table` `TimePicker` `Bubble` `Chart` `CodeBlock`                                                                                                                   |
+| feedback   | `Alert` `Progress` `Toast` `Marker`                                                                                                                                                                                                                               |
+| layout     | `ScrollArea` `Resizable` `Splitter` `MessageScroller`                                                                                                                                                                                                             |
+| navigation | `Breadcrumb` `Pagination` `Stepper` `Tabs` `Sidebar`                                                                                                                                                                                                              |
+| overlay    | `Dialog` `Drawer` `Menu` `Popover` `Tooltip`                                                                                                                                                                                                                      |
+| typography | `Kbd` `Highlight` `Link`                                                                                                                                                                                                                                          |
 
-`text` `heading` `hstack` `vstack` `empty` `dialog` `tabs`
+**FE 미구현.** FE가 만든 뒤 옮긴다: `Text` `Heading` `HStack` `VStack`. `HStack`·`VStack`의 enum은 `lib/src/layout/ids_axis.dart`에 있다.
 
-**C — FE에만 있음. 지금 옮긴다.**
+**예외.**
 
-`Toggle` `IconToggle` `ToggleGroup` `TextField` `ButtonGroup` `Spinner` `Label` `Kbd` `AspectRatio`
+- `Spacer`는 Flutter SDK 위젯을 re-export한다.
+- `Slot`은 만들지 않는다. `asChild`는 조합으로 대신한다.
+- `BottomNavigation`은 Flutter 단독이다. 이전 코드(`currentIndex` `onTap`, item은 `icon` `label`)가 출발점이다.
 
-`TextFieldGroup`은 FE에서 `TextField`로 합쳐졌다(#24).
+**선행 컴포넌트를 기다리는 기능.** 선행 컴포넌트를 만들 때 함께 추가한다.
 
-**D — FE에 새로 생김. 옮길 순서는 미정.**
-
-`Field` `TextArea` `NumberField` `PasswordField` `TelField` `OTPField` `Input` `Select` `ChipField` `FileField` `ColorField` `CheckboxGroup` `Radio` `RadioGroup` `Switch` `Slider` `Rating` `DateField` `TimeField` `DateTimeField` `Calendar` `TimePicker` `ColorPicker` `Accordion` `AvatarGroup` `Chip` `Alert` `Progress` `Group`
-
-`Group`은 컴포넌트가 아니다. React에서도 `index.ts` export가 없는 내부 파일이라 `ButtonGroup`·`ToggleGroup`이 공유한다. 분류에 넣지 않는다.
-
-**예외.** `bottom_navigation`은 FE 목록에 없다. Flutter 단독, 이전 기록이 출발점.
-FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 수 있다. 차례에 판단.
-
-`Text`가 없는 동안 컨트롤 안의 텍스트는 `IdsProvider.of(context).textStyle(IdsTypography.bodyB3Medium, color: ...)`를 `DefaultTextStyle`로 쓴다. 이름은 CSS의 `text-body-b3-medium`과 같다.
+- `Tooltip`: `AvatarGroup`의 `+N`에 마우스를 올리면 숨은 사람들의 이름을 보여 준다 (React `AvatarGroup.Overflow`의 `title`).
 
 ## 옮겨야 할 규약
 
-### `useInteractive` → `IdsInteractive`
+### `useInteractive` → `Interactive`
 
 ```text
 { hovered, active, focused, focusVisible, pressed, disabled }
@@ -93,11 +85,14 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 - `focused`에는 시각 효과가 없다. 포커스 링은 `focusVisible`에만
 - hover는 마우스일 때만
 - Enter / Space로도 `active`
-- `onPointerCancel`에서 `active`, `hovered` 복구
-- `disabled`가 되면 `hovered`, `active`를 버린다. 비활성 요소에는 pointer leave·up이 오지 않아 남기 때문이다
+- 누름이 취소되면(`onTapCancel`) `active`만 되돌린다. 누름이 드래그로 바뀔 때도 불리고 그때 마우스는 아직 위에 있으므로, `hovered`는 `MouseRegion`의 enter·exit만 바꾼다
+- `disabled`가 되면 `hovered`, `active`를 버린다. 비활성 요소에는 pointer leave·up이 오지 않는다
 - 스타일 적용은 `pressed > active > hovered` 우선순위로 하나만. state 객체는 원시값 그대로
 - `onInteractionChange`로 부모에 미러링. controlled 아님
-- `T | (state) => T`: `Button` `IconButton` `Toggle` `IconToggle` `FloatingButton`의 prop 대부분(`children` `variant` `size` `colorScheme` `className` `style` …). 이벤트 핸들러, `ref`, `disabled`, `pressed`, `value`는 제외
+- `Interactive` 안의 `Interactive`를 누르면 바깥은 포커스를 가져가지 않고 `onPressed`도 부르지 않는다. 안쪽이 `disabled`여도 같다 (React `isFromNestedControl`)
+- 포인터로는 누름이 확정된 뒤(`onTap`)에 포커스를 가져간다. React는 pointer down에 가져가지만, Flutter의 tap down은 누가 눌릴지 정해지기 전에 온다. 그래서 안쪽 컨트롤(`TextField`, Material 버튼 포함)을 누르거나 스크롤로 바뀐 누름은 바깥의 포커스를 옮기지 않는다
+- 키로 생긴 `active`는 primary focus를 잃으면 버린다. 포커스가 자식으로 내려가도 같다
+- `T | (state) => T`: `Button` `IconButton` `Toggle` `IconToggle` `FloatingButton`의 prop 대부분(`children` `variant` `size` `colorScheme` …). 이벤트 핸들러, `disabled`, `pressed`, `value`는 제외
 
 | React                             | Flutter                                       |
 | --------------------------------- | --------------------------------------------- |
@@ -105,15 +100,13 @@ FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 
 | `onPointerDown/Up/Cancel`         | `Listener` 또는 `GestureDetector`             |
 | `onFocus/Blur` + `:focus-visible` | `Focus` + 포커스 원인 추적 (아래 참고)        |
 | `onKeyDown` Enter/Space           | `Focus.onKeyEvent` 또는 `Shortcuts`/`Actions` |
-| `T \| (state) => T`               | `ValueBuilder<IdsInteractiveState>` 계열      |
+| `T \| (state) => T`               | `ValueBuilder<InteractiveState>` 계열         |
 
-**`focusVisible`.** `FocusManager.instance.highlightMode`만으로 정하지 않는다. 전역 입력 모드라서 마우스 입력도 `traditional`이고, 그대로 쓰면 마우스 클릭으로 포커스된 컨트롤에도 포커스 링이 뜬다. React는 포커스를 얻는 시점의 `:focus-visible`을 스냅샷하므로 마우스 클릭에는 링이 없다.
-
-`IdsInteractive`가 포커스 원인을 직접 추적한다. 포커스를 얻는 시점에 한 번 계산하고, blur에서 `false`로 되돌린다.
+**`focusVisible`.** `Interactive`가 포커스 원인을 직접 추적한다. 포커스를 얻는 시점에 한 번 계산하고, blur에서 `false`로 되돌린다. `FocusManager.instance.highlightMode`는 전역 입력 모드라서 그것만으로는 마우스 클릭에도 링이 뜬다.
 
 ```text
 focusVisible = focused
-            && 자기 자신의 pointer down으로 얻은 포커스가 아님
+            && 자기 자신의 탭으로 얻은 포커스가 아님
             && highlightMode == FocusHighlightMode.traditional
 ```
 
@@ -125,59 +118,47 @@ focusVisible = focused
 | `requestFocus()` — 직전 입력이 키보드·마우스 | `true`         |
 | `requestFocus()` — 직전 입력이 터치          | `false`        |
 
-위 표가 `IdsInteractive` 위젯 테스트의 계약이다.
+위 표가 `Interactive` 위젯 테스트의 계약이다.
+
+**`Button`을 옮길 때 정한다.** 지금은 다루지 않는다.
+
+- 자리는 지키고 동작만 끄는 모드. 지금 `PressableSurface`(Card, Item)는 `onPressed`가 없으면 `Interactive`를 빼고 그려서, `onPressed`가 null과 함수 사이로 바뀌면 안쪽 State가 초기화된다
+- 스크롤 안에서 짧게 탭해도 `active`가 보이는 최소 유지 시간
+- 누르는 중에 안쪽 `Interactive`가 사라지면 바깥이 눌린다
+- `focusNode`를 바꾸면 이전 노드의 링이 남는다
+- `select`·`gameButtonA` 키 (TV, 게임패드)
 
 ### control surface — Button / IconButton / Toggle / IconToggle 공통
 
-[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySoft`, `textOnPrimary` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
+[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySoft`, `textOnPrimary` …). 치수는 `Button` 때 Figma로 덮어쓴다.
 
-| `colorScheme`                                 | fill / on-fill                  | fill hover / press                 | quiet         | hover / press                              | ring        |
-| --------------------------------------------- | ------------------------------- | ---------------------------------- | ------------- | ------------------------------------------ | ----------- |
-| `primary` `secondary` `tertiary`              | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderX`   |
-| `neutral`                                     | `onSurface` / `surface`         | fill을 글자 반대쪽으로 10% / 20%   | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderPrimary` |
-| `danger` `success` `warning` `info`           | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `textX`       | `bgXSoft` / `bgXSoftHover`                 | `borderX`   |
+| `colorScheme`                       | fill / on-fill          | fill hover / press               | quiet       | hover / press                          | ring            |
+| ----------------------------------- | ----------------------- | -------------------------------- | ----------- | -------------------------------------- | --------------- |
+| `primary` `secondary` `tertiary`    | `bgX` / `textOnX`       | `bgXHover` / `bgXActive`         | `onSurface` | `bgNeutralSoft` / `bgNeutralSoftHover` | `borderX`       |
+| `neutral`                           | `onSurface` / `surface` | fill을 글자 반대쪽으로 10% / 20% | `onSurface` | `bgNeutralSoft` / `bgNeutralSoftHover` | `borderPrimary` |
+| `danger` `success` `warning` `info` | `bgX` / `textOnX`       | `bgXHover` / `bgXActive`         | `textX`     | `bgXSoft` / `bgXSoftHover`             | `borderX`       |
 
-|           | 배경 default                          | hover / active                         | 전경            | 테두리·그림자                        |
-| --------- | ------------------------------------- | -------------------------------------- | --------------- | ------------------------------------ |
-| `solid`   | fill                                  | fill hover / fill press                | on-fill         | 그림자 `shadow-xs`                   |
-| `soft`    | `bgXSoft`                             | `bgXSoftHover` / `bgXSoftActive`       | `textOnXSoft`   | 없음                                 |
-| `outline` | `surface` (dark: `bgNeutralSoft` 0.30) | hover / press                          | quiet           | 안쪽 1px `borderNeutral`, `shadow-xs` |
-| `ghost`   | 투명                                  | hover / press                          | quiet           | 없음                                 |
+|           | 배경 default                           | hover / active                   | 전경          | 테두리·그림자                         |
+| --------- | -------------------------------------- | -------------------------------- | ------------- | ------------------------------------- |
+| `solid`   | fill                                   | fill hover / fill press          | on-fill       | 그림자 `shadow-xs`                    |
+| `soft`    | `bgXSoft`                              | `bgXSoftHover` / `bgXSoftActive` | `textOnXSoft` | 없음                                  |
+| `outline` | `surface` (dark: `bgNeutralSoft` 0.30) | hover / press                    | quiet         | 안쪽 1px `borderNeutral`, `shadow-xs` |
+| `ghost`   | 투명                                   | hover / press                    | quiet         | 없음                                  |
 
 - 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`, hover)이다
 - `outline` 테두리는 `colors.borderNeutral`이다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
 - 브랜드 fill을 `withValues(alpha: 0.9)`로 흐리게 하지 않는다. hover·press는 `bgXHover`·`bgXActive`이고, 글자에서 멀어지는 쪽으로 섞여 대비가 떨어지지 않는다
 - Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 hover 색이다. 켜지면(`pressed`) press 단계를 쓴다
-- `active`는 배경만 바뀐다. scale 없음
-- `focusVisible`: 바깥 3px 링(ring 색 0.40)과 안쪽 1px 테두리를 ring 색으로. offset outline이 아니다
-- `disabled`: opacity 0.50. 로딩(`aria-busy`) 중에는 커서만 바뀐다
-- 전환은 색·배경·테두리·그림자, 시간은 `IdsMotion.fast`. reduced motion: 전환 없음
-- Semantics는 컴포넌트가 내부에서 주입 (button, label, enabled. Toggle은 `toggled` 추가 — React의 `aria-pressed`)
-- 크기(radius는 모두 `standard` 10):
+- `focusVisible`: 바깥 3px 링(ring 색 40%)과 안쪽 1px 테두리를 ring 색으로
+- 전환은 색·배경·테두리·그림자, 시간은 `IdsMotion.fast`. reduced motion이면 전환 없음
+- Semantics는 컴포넌트가 주입한다 (button, label, enabled. Toggle은 `toggled`)
+- 크기 (radius는 모두 `radius.standard`):
 
-|            | 높이 | 좌우 | 아이콘 쪽 | 간격 | 아이콘 | 글자                  |
-| ---------- | ---- | ---- | --------- | ---- | ------ | --------------------- |
-| `standard` | 36   | 16   | 12        | 8    | 16     | `bodyB3Medium` (14)   |
+|            | 높이 | 좌우 | 아이콘 쪽 | 간격 | 아이콘 | 글자                   |
+| ---------- | ---- | ---- | --------- | ---- | ------ | ---------------------- |
+| `standard` | 36   | 16   | 12        | 8    | 16     | `bodyB3Medium` (14)    |
 | `tiny`     | 32   | 12   | 10        | 6    | 14     | `captionC1Medium` (12) |
 
 ### 그룹 전파
 
-그룹은 `orientation`, `size`, `variant`를 내려준다. 자식은 자기 값이 있으면 그것을 쓰고, 없으면 그룹 값을 쓴다(`size ?? group.size ?? standard`, `variant ?? group.variant ?? solid`). 어긋나도 throw하지 않는다. 그룹 안의 그룹은 바깥 그룹 값을 물려받는다. [group](../react/src/components/utility/group/index.tsx) `useGroupContext`.
-
-## 순서
-
-1. `IdsInteractive` — 상태 추가가 breaking이 아니게
-2. `IdsButton` — `Toggle`·`ButtonGroup` 확장을 염두
-3. `IdsIconButton`
-4. 나머지 A, 그다음 C
-5. B는 FE 순서대로. `bottom_navigation`은 Flutter 단독
-
-## 이전 구조 (B와 `bottom_navigation`만)
-
-서브컴포넌트 조립 구조와 다뤘던 기능만 적는다. `text` `heading`은 적을 구조가 없어 뺐다. 정확한 시그니처는 기준 커밋에서 본다.
-
-- `hstack` `vstack`: `gap` `mainAxis` `crossAxis` `fit`. enum은 남아 있는 `lib/src/layout/ids_axis.dart`
-- `empty`: Media / Title / Description / Actions
-- `dialog`: Header / Title / Content / Footer. `open` `onOpenChanged` `dismissible`
-- `tabs`: `IdsTabItem(value, label, child, disabled)`. `value`/`defaultValue`로 controlled/uncontrolled
-- `bottom_navigation`: `currentIndex` `onTap`, item은 `icon` `label`
+그룹은 `orientation`, `size`, `variant`를 내려준다. 자식은 자기 값이 있으면 그것을 쓰고, 없으면 그룹 값을 쓴다(`size ?? group.size ?? standard`, `variant ?? group.variant ?? solid`). 어긋나도 throw하지 않는다. 그룹 안의 그룹은 바깥 그룹 값을 물려받는다. [group](../react/src/components/utility/group/root.tsx) 참고.

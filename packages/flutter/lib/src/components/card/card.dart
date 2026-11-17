@@ -1,0 +1,489 @@
+import 'dart:math' as math;
+
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+
+import '../../../theme/ids_provider.dart';
+import '../../../tokens/ids_enums.dart';
+import '../../../tokens/ids_motion.dart';
+import '../../../tokens/ids_typography.dart';
+import '../../interaction/interactive.dart';
+import '../../interaction/pressable_surface.dart';
+import '../../layout/covering_image.dart';
+
+enum CardVariant { outline, soft, ghost }
+
+class Card extends StatelessWidget {
+  const Card({
+    super.key,
+    this.variant = CardVariant.outline,
+    this.size = IdsSize.standard,
+    this.onPressed,
+    this.disabled = false,
+    this.onInteractionChange,
+    this.children = const [],
+  });
+
+  final CardVariant variant;
+  final IdsSize size;
+  final VoidCallback? onPressed;
+  final bool disabled;
+  final ValueChanged<InteractiveState>? onInteractionChange;
+  final List<Widget> children;
+
+  static const _paddings = {IdsSize.standard: 16.0, IdsSize.tiny: 12.0};
+  static const _textStyles = {
+    IdsSize.standard: IdsTypography.bodyB3Regular,
+    IdsSize.tiny: IdsTypography.captionC1Regular,
+  };
+  static const _shadow = BoxShadow(
+    color: Color(0x0D000000),
+    offset: Offset(0, 1),
+    blurRadius: 2,
+  );
+
+  bool get _interactive => onPressed != null;
+
+  bool get _hasHeader => children.any((child) => child is CardHeader);
+
+  Widget _region(
+    Widget child, {
+    required int index,
+    required double pad,
+    required Color lineColor,
+  }) {
+    final separate = _interactive && _hasHeader && child is! CardHeader;
+    if (child is CardMedia) {
+      return separate ? Semantics(container: true, child: child) : child;
+    }
+    final lineAbove = child is CardFooter && child.divider;
+    final lineBelow = child is CardHeader && child.divider;
+    final line = BorderSide(color: lineColor);
+    return Padding(
+      padding: EdgeInsets.only(
+        top: index == 0 ? pad : 0,
+        bottom: index == children.length - 1 ? pad : 0,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: lineAbove ? line : BorderSide.none,
+            bottom: lineBelow ? line : BorderSide.none,
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            pad,
+            lineAbove ? pad : 0,
+            pad,
+            lineBelow ? pad : 0,
+          ),
+          child: separate ? Semantics(container: true, child: child) : child,
+        ),
+      ),
+    );
+  }
+
+  Widget _surface(BuildContext context, InteractiveState state) {
+    final ids = IdsProvider.of(context);
+    final colors = ids.colors;
+    final pad = ids.dimension(_paddings[size]!);
+    final reduced = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    final base = switch (variant) {
+      CardVariant.outline => colors.surface,
+      CardVariant.soft => colors.bgNeutralSoft,
+      CardVariant.ghost => colors.surface.withValues(alpha: 0),
+    };
+    ShapeBorder outline(BorderSide side) =>
+        ids.shape(radius: ids.radius.container, side: side);
+
+    return AnimatedContainer(
+      duration: reduced ? Duration.zero : IdsMotion.fast,
+      clipBehavior: Clip.antiAlias,
+      decoration: ShapeDecoration(
+        color: SurfaceLayer.over(base, colors, state),
+        shape: outline(FocusRing.around(colors, state)),
+        shadows: [if (variant == CardVariant.outline) _shadow],
+      ),
+      foregroundDecoration: variant == CardVariant.outline
+          ? ShapeDecoration(
+              shape: outline(BorderSide(color: FocusRing.edge(colors, state))),
+            )
+          : null,
+      child: DefaultTextStyle.merge(
+        style: ids.textStyle(_textStyles[size]!, color: colors.onSurface),
+        child: _CardBody(
+          gap: pad,
+          growing: {
+            for (final (index, child) in children.indexed)
+              if (child is CardContent) index,
+          },
+          children: [
+            for (final (index, child) in children.indexed)
+              KeyedSubtree(
+                key: child.key == null ? null : ValueKey(child.key),
+                child: _region(
+                  child,
+                  index: index,
+                  pad: pad,
+                  lineColor: colors.borderNeutral,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) => _CardScope(
+    size: size,
+    child: PressableSurface(
+      onPressed: onPressed,
+      disabled: disabled,
+      onInteractionChange: onInteractionChange,
+      builder: _surface,
+    ),
+  );
+}
+
+class CardHeader extends StatelessWidget {
+  const CardHeader({super.key, this.divider = false, this.children = const []});
+
+  final bool divider;
+  final List<Widget> children;
+
+  static const _gap = 4.0;
+
+  @override
+  Widget build(BuildContext context) {
+    _CardScope.check(context, 'CardHeader');
+    final gap = IdsProvider.of(context).dimension(_gap);
+    final action = children.whereType<CardAction>().firstOrNull;
+    final text = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: gap,
+      children: [
+        for (final child in children)
+          if (child is! CardAction) child,
+      ],
+    );
+    if (action == null) return text;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: gap,
+      children: [
+        Expanded(child: text),
+        action,
+      ],
+    );
+  }
+}
+
+class CardTitle extends StatelessWidget {
+  const CardTitle({super.key, this.headingLevel = 3, required this.child});
+
+  final int headingLevel;
+  final Widget child;
+
+  static const _styles = {
+    IdsSize.standard: IdsTypography.subtitleS2Semibold,
+    IdsSize.tiny: IdsTypography.bodyB3Semibold,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final ids = IdsProvider.of(context);
+    return Semantics(
+      header: true,
+      headingLevel: headingLevel,
+      child: DefaultTextStyle.merge(
+        style: ids.textStyle(
+          _styles[_CardScope.sizeOf(context, 'CardTitle')]!,
+          color: ids.colors.onSurface,
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+class CardDescription extends StatelessWidget {
+  const CardDescription({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final ids = IdsProvider.of(context);
+    return DefaultTextStyle.merge(
+      style: ids.textStyle(
+        Card._textStyles[_CardScope.sizeOf(context, 'CardDescription')]!,
+        color: ids.colors.textNeutral,
+      ),
+      child: child,
+    );
+  }
+}
+
+class CardAction extends StatelessWidget {
+  const CardAction({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    _CardScope.check(context, 'CardAction');
+    return child;
+  }
+}
+
+class CardContent extends StatelessWidget {
+  const CardContent({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    _CardScope.check(context, 'CardContent');
+    return child;
+  }
+}
+
+class CardFooter extends StatelessWidget {
+  const CardFooter({super.key, this.divider = false, this.children = const []});
+
+  final bool divider;
+  final List<Widget> children;
+
+  static const _gap = 8.0;
+
+  @override
+  Widget build(BuildContext context) {
+    _CardScope.check(context, 'CardFooter');
+    return Row(
+      spacing: IdsProvider.of(context).dimension(_gap),
+      children: children,
+    );
+  }
+}
+
+class CardMedia extends StatelessWidget {
+  const CardMedia({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    _CardScope.check(context, 'CardMedia');
+    return coveringItsBox(child);
+  }
+}
+
+class _CardBody extends MultiChildRenderObjectWidget {
+  const _CardBody({required this.gap, required this.growing, super.children});
+
+  final double gap;
+  final Set<int> growing;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderCardBody(gap, growing);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderCardBody renderObject) {
+    renderObject
+      ..gap = gap
+      ..growing = growing;
+  }
+}
+
+class _CardBodyParentData extends ContainerBoxParentData<RenderBox> {}
+
+typedef _BodyLayout = ({
+  Size size,
+  List<double> heights,
+  List<BoxConstraints> constraints,
+});
+
+class _RenderCardBody extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, _CardBodyParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _CardBodyParentData> {
+  _RenderCardBody(this._gap, this._growing);
+
+  double _gap;
+  set gap(double value) {
+    if (value == _gap) return;
+    _gap = value;
+    markNeedsLayout();
+  }
+
+  Set<int> _growing;
+  set growing(Set<int> value) {
+    if (value.length == _growing.length && value.containsAll(_growing)) return;
+    _growing = value;
+    markNeedsLayout();
+  }
+
+  double get _gaps => _gap * math.max(0, childCount - 1);
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _CardBodyParentData) {
+      child.parentData = _CardBodyParentData();
+    }
+  }
+
+  double _widest(double Function(RenderBox child) widthOf) =>
+      getChildrenAsList().map(widthOf).fold(0, math.max);
+
+  double _stacked(double Function(RenderBox child) heightOf) =>
+      getChildrenAsList()
+          .map(heightOf)
+          .fold(_gaps, (sum, height) => sum + height);
+
+  @override
+  double computeMinIntrinsicWidth(double height) =>
+      _widest((child) => child.getMinIntrinsicWidth(double.infinity));
+
+  @override
+  double computeMaxIntrinsicWidth(double height) =>
+      _widest((child) => child.getMaxIntrinsicWidth(double.infinity));
+
+  @override
+  double computeMinIntrinsicHeight(double width) =>
+      _stacked((child) => child.getMinIntrinsicHeight(width));
+
+  @override
+  double computeMaxIntrinsicHeight(double width) =>
+      _stacked((child) => child.getMaxIntrinsicHeight(width));
+
+  double _widthFor(BoxConstraints constraints) => constraints.constrainWidth(
+    constraints.hasBoundedWidth
+        ? constraints.maxWidth
+        : getMaxIntrinsicWidth(double.infinity),
+  );
+
+  _BodyLayout _layout(BoxConstraints constraints, ChildLayouter layoutChild) {
+    final regions = getChildrenAsList();
+    final fullWidth = BoxConstraints.tightFor(width: _widthFor(constraints));
+    final given = List.filled(regions.length, fullWidth);
+    final heights = List.filled(regions.length, 0.0);
+    void fit(Iterable<int> indexes, BoxConstraints within) {
+      for (final index in indexes) {
+        given[index] = within;
+        heights[index] = layoutChild(regions[index], within).height;
+      }
+    }
+
+    final growing = [
+      for (final index in _growing)
+        if (index < regions.length) index,
+    ];
+    fit([
+      for (var index = 0; index < regions.length; index++)
+        if (!growing.contains(index)) index,
+    ], fullWidth);
+    final fixed = heights.fold(_gaps, (sum, height) => sum + height);
+    final room = math.max(0.0, constraints.maxHeight - fixed);
+    fit(growing, fullWidth.copyWith(maxHeight: room));
+    double taken(Iterable<int> indexes) =>
+        indexes.fold(0.0, (sum, index) => sum + heights[index]);
+
+    if (taken(growing) > room) {
+      final crowded = [...growing]
+        ..sort((a, b) => heights[a].compareTo(heights[b]));
+      var pool = room;
+      while (crowded.length > 1 &&
+          heights[crowded.first] < pool / crowded.length) {
+        pool -= heights[crowded.removeAt(0)];
+      }
+      fit(crowded, fullWidth.copyWith(maxHeight: pool / crowded.length));
+    }
+
+    final spare = [...growing]
+      ..sort((a, b) => heights[b].compareTo(heights[a]));
+    var pool = constraints.minHeight - fixed;
+    if (spare.isNotEmpty && pool > taken(spare)) {
+      while (spare.length > 1 && heights[spare.first] > pool / spare.length) {
+        pool -= heights[spare.removeAt(0)];
+      }
+      final share = pool / spare.length;
+      fit(spare, fullWidth.copyWith(minHeight: share, maxHeight: share));
+    }
+    final height = heights.fold(_gaps, (sum, height) => sum + height);
+    return (
+      size: constraints.constrain(Size(fullWidth.maxWidth, height)),
+      heights: heights,
+      constraints: given,
+    );
+  }
+
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) =>
+      defaultComputeDistanceToFirstActualBaseline(baseline);
+
+  @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) {
+    final layout = _layout(constraints, ChildLayoutHelper.dryLayoutChild);
+    var top = 0.0;
+    for (final (index, region) in getChildrenAsList().indexed) {
+      final distance = region.getDryBaseline(
+        layout.constraints[index],
+        baseline,
+      );
+      if (distance != null) return top + distance;
+      top += layout.heights[index] + _gap;
+    }
+    return null;
+  }
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) =>
+      _layout(constraints, ChildLayoutHelper.dryLayoutChild).size;
+
+  @override
+  void performLayout() {
+    size = _layout(constraints, ChildLayoutHelper.layoutChild).size;
+    var top = 0.0;
+    for (final region in getChildrenAsList()) {
+      (region.parentData! as _CardBodyParentData).offset = Offset(0, top);
+      top += region.size.height + _gap;
+    }
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
+      defaultHitTestChildren(result, position: position);
+
+  @override
+  void paint(PaintingContext context, Offset offset) =>
+      defaultPaint(context, offset);
+}
+
+class _CardScope extends InheritedWidget {
+  const _CardScope({required this.size, required super.child});
+
+  final IdsSize size;
+
+  static void check(BuildContext context, String part) {
+    assert(
+      context.getInheritedWidgetOfExactType<_CardScope>() != null,
+      '[IDS] $part: must be used inside Card.',
+    );
+  }
+
+  static IdsSize sizeOf(BuildContext context, String part) {
+    final scope = context.dependOnInheritedWidgetOfExactType<_CardScope>();
+    assert(scope != null, '[IDS] $part: must be used inside Card.');
+    return scope?.size ?? IdsSize.standard;
+  }
+
+  @override
+  bool updateShouldNotify(_CardScope oldWidget) => size != oldWidget.size;
+}

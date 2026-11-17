@@ -129,7 +129,7 @@ class _ScopeReadoutState extends State<ScopeReadout> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IdsLabel(child: Text('${widget.name} Aa Wi 0123 한글')),
+              Label(child: Text('${widget.name} Aa Wi 0123 한글')),
               Text(
                 '${widget.name}: count $count, radius ${ids.radius.standard}, locale ${ids.locale}, corner ${ids.cornerShape.name}',
                 style: text,

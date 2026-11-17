@@ -158,7 +158,7 @@ DecoratedBox(
 );
 ```
 
-- `ids.radius` 는 `standard`(theme radius), `indicator`(×0.4), `container`(×1.6), `full` 이다. squircle 이면 그린 반지름이 1.84배다.
+- `ids.radius` 는 `standard`(theme radius), `indicator`(×0.4), `container`(×1.6), `full` 이다. squircle 이어도 숫자는 같다.
 - `ids.shape()` 는 round 면 `RoundedRectangleBorder`, squircle 이면 `RoundedSuperellipseBorder` 다.
 - 글자 스타일 이름은 CSS 와 같다. `text-body-b3-medium` 은 `IdsTypography.bodyB3Medium` 이다.
 - `textStyle(..., mono: true)` 는 패키지에 든 Geist Mono 로 그린다. Geist Mono 에 없는 글자(한글 등)는 Pretendard GOV 로 그린다.

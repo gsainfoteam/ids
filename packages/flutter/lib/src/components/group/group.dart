@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../theme/ids_provider.dart';
-import '../divider/ids_divider.dart';
+import '../divider/divider.dart';
 
-class IdsGroup extends StatelessWidget {
-  const IdsGroup({
+class Group extends StatelessWidget {
+  const Group({
     super.key,
     this.orientation = Axis.horizontal,
     this.attached = true,
@@ -19,8 +19,8 @@ class IdsGroup extends StatelessWidget {
 
   static const _gap = 8.0;
 
-  static IdsGroup? maybeOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_IdsGroupScope>()?.group;
+  static Group? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_GroupScope>()?.group;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class IdsGroup extends StatelessWidget {
       container: true,
       explicitChildNodes: true,
       label: semanticLabel,
-      child: _IdsGroupScope(
+      child: _GroupScope(
         group: this,
         child: orientation == Axis.horizontal
             ? IntrinsicHeight(child: flex)
@@ -46,17 +46,14 @@ class IdsGroup extends StatelessWidget {
   }
 }
 
-class IdsGroupSeparator extends StatelessWidget {
-  const IdsGroupSeparator({super.key});
+class GroupSeparator extends StatelessWidget {
+  const GroupSeparator({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final group = IdsGroup.maybeOf(context);
-    assert(
-      group != null,
-      'IdsGroupSeparator must be rendered inside an IdsGroup.',
-    );
-    return IdsDivider(
+    final group = Group.maybeOf(context);
+    assert(group != null, 'GroupSeparator must be rendered inside a Group.');
+    return Divider(
       orientation: group!.orientation == Axis.horizontal
           ? Axis.vertical
           : Axis.horizontal,
@@ -64,12 +61,12 @@ class IdsGroupSeparator extends StatelessWidget {
   }
 }
 
-class _IdsGroupScope extends InheritedWidget {
-  const _IdsGroupScope({required this.group, required super.child});
+class _GroupScope extends InheritedWidget {
+  const _GroupScope({required this.group, required super.child});
 
-  final IdsGroup group;
+  final Group group;
 
   @override
-  bool updateShouldNotify(_IdsGroupScope old) =>
+  bool updateShouldNotify(_GroupScope old) =>
       old.group.orientation != group.orientation;
 }

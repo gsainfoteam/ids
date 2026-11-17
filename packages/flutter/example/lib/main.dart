@@ -1,41 +1,86 @@
 import 'package:flutter/material.dart';
-import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/ids.dart' as ids;
 import 'package:widgetbook/widgetbook.dart';
 
+import 'components/aspect_ratio_usecase.dart';
+import 'components/avatar_group_usecase.dart';
+import 'components/avatar_usecase.dart';
+import 'components/badge_usecase.dart';
+import 'components/card_usecase.dart';
 import 'components/divider_usecase.dart';
+import 'components/empty_usecase.dart';
 import 'components/field_usecase.dart';
+import 'components/item_usecase.dart';
 import 'components/label_usecase.dart';
+import 'components/skeleton_usecase.dart';
 import 'components/spinner_usecase.dart';
-import 'components/provider_usecase.dart';
 import 'components/provider_integration_preview.dart';
+import 'components/provider_usecase.dart';
+import 'components/story_kit.dart';
 
 void main() {
   runApp(const WidgetbookApp());
 }
 
+final directories = [
+  WidgetbookFolder(name: 'Form', children: [docs('Field', fieldUseCases)]),
+  WidgetbookFolder(
+    name: 'Data',
+    children: [
+      docs('Avatar', avatarUseCases),
+      docs('AvatarGroup', avatarGroupUseCases),
+      docs('Badge', badgeUseCases),
+      docs('Card', cardUseCases),
+      docs('Empty', emptyUseCases),
+      docs('Item', itemUseCases),
+    ],
+  ),
+  WidgetbookFolder(
+    name: 'Feedback',
+    children: [
+      docs('Skeleton', skeletonUseCases),
+      docs('Spinner', spinnerUseCases),
+    ],
+  ),
+  WidgetbookFolder(
+    name: 'Layout',
+    children: [
+      docs('AspectRatio', aspectRatioUseCases),
+      docs('Divider', dividerUseCases),
+    ],
+  ),
+  WidgetbookFolder(
+    name: 'Typography',
+    children: [docs('Label', labelUseCases)],
+  ),
+  WidgetbookFolder(
+    name: 'Utility',
+    children: [
+      WidgetbookComponent(
+        name: 'IdsProvider',
+        useCases: [...providerUseCases, ...providerIntegrationUseCases],
+      ),
+    ],
+  ),
+];
+
 class WidgetbookApp extends StatelessWidget {
-  const WidgetbookApp({super.key});
+  const WidgetbookApp({super.key, this.initialRoute = '/'});
+
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
     return Widgetbook.material(
+      initialRoute: initialRoute,
       appBuilder: (context, child) => MaterialApp(
         theme: ThemeData(
-          fontFamily: IdsTypography.sansFontFamily,
-          package: IdsTypography.sansFontPackage,
+          fontFamily: ids.IdsTypography.sansFontFamily,
+          package: ids.IdsTypography.sansFontPackage,
         ),
         home: child,
       ),
-      directories: [
-        WidgetbookComponent(
-          name: 'IdsProvider',
-          useCases: [...providerUseCases, ...providerIntegrationUseCases],
-        ),
-        WidgetbookComponent(name: 'IdsDivider', useCases: dividerUseCases),
-        WidgetbookComponent(name: 'IdsField', useCases: fieldUseCases),
-        WidgetbookComponent(name: 'IdsLabel', useCases: labelUseCases),
-        WidgetbookComponent(name: 'IdsSpinner', useCases: spinnerUseCases),
-      ],
+      directories: directories,
     );
   }
 }

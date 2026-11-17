@@ -7,8 +7,8 @@ import '../../../theme/ids_provider.dart';
 import '../../../theme/ids_resolved_theme.dart';
 import '../../../tokens/ids_typography.dart';
 
-class IdsDivider extends StatelessWidget {
-  const IdsDivider({
+class Divider extends StatelessWidget {
+  const Divider({
     super.key,
     this.orientation = Axis.horizontal,
     this.decorative = false,
@@ -105,7 +105,7 @@ class _RenderLabelledLine extends RenderShiftedBox {
     markNeedsLayout();
   }
 
-  double get _thickness => _theme.dimension(IdsDivider._thickness);
+  double get _thickness => _theme.dimension(Divider._thickness);
 
   Axis _orientation;
   set orientation(Axis value) {

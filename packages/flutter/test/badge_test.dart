@@ -1,0 +1,506 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/src/color/oklch.dart';
+
+import 'test_theme.dart';
+
+const _anchor = SizedBox.square(dimension: 40);
+
+Future<void> pump(
+  WidgetTester tester,
+  Widget child, {
+  TextDirection direction = TextDirection.ltr,
+  IdsTheme theme = testTheme,
+  IdsMode? mode,
+}) => tester.pumpWidget(
+  Directionality(
+    textDirection: direction,
+    child: IdsProvider(
+      theme: theme,
+      mode: mode,
+      child: Center(child: child),
+    ),
+  ),
+);
+
+Finder indicator() => find.byWidgetPredicate(
+  (widget) =>
+      widget is Container &&
+      widget.decoration is ShapeDecoration &&
+      (widget.decoration! as ShapeDecoration).shape is StadiumBorder,
+);
+
+BorderSide? edgeOf(WidgetTester tester) =>
+    ((tester.widget<Container>(indicator()).foregroundDecoration
+                    as ShapeDecoration?)
+                ?.shape
+            as StadiumBorder?)
+        ?.side;
+
+Offset indicatorCenter(WidgetTester tester) =>
+    tester.getCenter(indicator()) - tester.getTopLeft(find.byWidget(_anchor));
+
+double indicatorOpacity(WidgetTester tester) => tester
+    .widget<AnimatedOpacity>(
+      find.descendant(
+        of: find.byType(Badge),
+        matching: find.byType(AnimatedOpacity),
+      ),
+    )
+    .opacity;
+
+void main() {
+  group('count', () {
+    testWidgets('caps at max', (tester) async {
+      await pump(tester, const Badge.count(count: 120, child: _anchor));
+      expect(find.text('99+'), findsOneWidget);
+
+      await pump(
+        tester,
+        const Badge.count(count: 1200, max: 999, child: _anchor),
+      );
+      expect(find.text('999+'), findsOneWidget);
+    });
+
+    testWidgets('hides zero unless showZero', (tester) async {
+      await pump(tester, const Badge.count(count: 0, child: _anchor));
+      expect(indicatorOpacity(tester), 0);
+
+      await pump(
+        tester,
+        const Badge.count(count: 0, showZero: true, child: _anchor),
+      );
+      expect(indicatorOpacity(tester), 1);
+      expect(find.text('0'), findsOneWidget);
+    });
+
+    testWidgets('fades out on the same anchor when the count reaches zero', (
+      tester,
+    ) async {
+      Widget badge(int count) => Badge.count(count: count, child: _anchor);
+      await pump(tester, badge(3));
+      final anchor = tester.element(find.byWidget(_anchor));
+      await pump(tester, badge(0));
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(tester.element(find.byWidget(_anchor)), same(anchor));
+      final fade = tester.widget<FadeTransition>(
+        find.descendant(
+          of: find.byType(Badge),
+          matching: find.byType(FadeTransition),
+        ),
+      );
+      expect(fade.opacity.value, inExclusiveRange(0, 1));
+      await tester.pumpAndSettle();
+      expect(fade.opacity.value, 0);
+    });
+
+    testWidgets('counts a negative number as zero', (tester) async {
+      await pump(
+        tester,
+        const Badge.count(count: -3, showZero: true, child: _anchor),
+      );
+      expect(find.text('0'), findsOneWidget);
+    });
+  });
+
+  group('size', () {
+    testWidgets('grows with the system text size', (tester) async {
+      await pump(
+        tester,
+        const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: Badge.count(count: 3, child: _anchor),
+        ),
+      );
+      expect(tester.getSize(indicator()).height, 40);
+      expect(
+        tester.getSize(find.text('3')).height,
+        lessThanOrEqualTo(tester.getSize(indicator()).height),
+      );
+    });
+
+    testWidgets('is 20 tall and at least 20 wide, 16 when tiny', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const Badge(content: SizedBox.shrink(), child: _anchor),
+      );
+      expect(tester.getSize(indicator()), const Size(20, 20));
+
+      await pump(
+        tester,
+        const Badge(
+          content: SizedBox.shrink(),
+          size: IdsSize.tiny,
+          child: _anchor,
+        ),
+      );
+      expect(tester.getSize(indicator()), const Size(16, 16));
+    });
+
+    testWidgets('a dot is 10, or 8 when tiny', (tester) async {
+      await pump(tester, const Badge.dot(child: _anchor));
+      expect(tester.getSize(indicator()), const Size.square(10));
+
+      await pump(tester, const Badge.dot(size: IdsSize.tiny, child: _anchor));
+      expect(tester.getSize(indicator()), const Size.square(8));
+    });
+
+    testWidgets('grows past a narrow anchor', (tester) async {
+      await pump(
+        tester,
+        const Badge.count(count: 120, child: SizedBox.square(dimension: 16)),
+      );
+      expect(
+        tester.getSize(indicator()).width,
+        tester.getSize(find.text('99+')).width + 12,
+      );
+    });
+
+    testWidgets('the anchor keeps its own size', (tester) async {
+      await pump(tester, const Badge.count(count: 3, child: _anchor));
+      expect(tester.getSize(find.byType(Badge)), const Size.square(40));
+    });
+
+    testWidgets('follows the theme scale on top of the system text size', (
+      tester,
+    ) async {
+      const content = SizedBox.shrink();
+      double? iconSize() =>
+          IconTheme.of(tester.element(find.byWidget(content))).size;
+
+      await pump(
+        tester,
+        const Badge(content: content, child: _anchor),
+        theme: scaledTheme,
+      );
+      expect(tester.getSize(indicator()), const Size(30, 30));
+      expect(iconSize(), 18);
+
+      await pump(
+        tester,
+        const Badge(content: content, size: IdsSize.tiny, child: _anchor),
+        theme: scaledTheme,
+      );
+      expect(tester.getSize(indicator()), const Size(24, 24));
+      expect(iconSize(), 15);
+
+      await pump(
+        tester,
+        const Badge.count(count: 120, child: _anchor),
+        theme: scaledTheme,
+      );
+      expect(
+        DefaultTextStyle.of(tester.element(find.text('99+'))).style.fontSize,
+        18,
+      );
+      expect(
+        tester.getSize(indicator()).width,
+        tester.getSize(find.text('99+')).width + 18,
+      );
+      final ring =
+          (tester.widget<Container>(indicator()).decoration! as ShapeDecoration)
+                  .shape
+              as StadiumBorder;
+      expect(ring.side.width, 2);
+
+      await pump(
+        tester,
+        const Badge.count(
+          count: 3,
+          variant: BadgeVariant.outline,
+          child: _anchor,
+        ),
+        theme: scaledTheme,
+      );
+      expect(edgeOf(tester)!.width, 1);
+
+      await pump(tester, const Badge.dot(child: _anchor), theme: scaledTheme);
+      expect(tester.getSize(indicator()), const Size.square(15));
+
+      await pump(
+        tester,
+        const Badge.dot(size: IdsSize.tiny, child: _anchor),
+        theme: scaledTheme,
+      );
+      expect(tester.getSize(indicator()), const Size.square(12));
+
+      await pump(
+        tester,
+        const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: Badge.count(count: 3, child: _anchor),
+        ),
+        theme: scaledTheme,
+      );
+      expect(tester.getSize(indicator()).height, 60);
+    });
+  });
+
+  group('placement', () {
+    testWidgets('centres on the corner', (tester) async {
+      await pump(tester, const Badge.dot(child: _anchor));
+      expect(indicatorCenter(tester), const Offset(40, 0));
+
+      await pump(
+        tester,
+        const Badge.dot(placement: BadgePlacement.bottomStart, child: _anchor),
+      );
+      expect(indicatorCenter(tester), const Offset(0, 40));
+    });
+
+    testWidgets('start and end flip in right-to-left text', (tester) async {
+      await pump(
+        tester,
+        const Badge.dot(child: _anchor),
+        direction: TextDirection.rtl,
+      );
+      expect(indicatorCenter(tester), const Offset(0, 0));
+    });
+
+    testWidgets('pulls in to the edge of a round avatar on its own', (
+      tester,
+    ) async {
+      const pulled = Offset(40 - 40 * 0.146, 40 * 0.146);
+      await pump(tester, const Badge.dot(child: Avatar(name: 'A')));
+      expect(
+        tester.getCenter(indicator()) - tester.getTopLeft(find.byType(Avatar)),
+        within(distance: 0.01, from: pulled),
+      );
+
+      await pump(
+        tester,
+        const Badge.dot(
+          child: Avatar(name: 'A', shape: AvatarShape.square),
+        ),
+      );
+      expect(
+        tester.getCenter(indicator()) - tester.getTopLeft(find.byType(Avatar)),
+        const Offset(40, 0),
+      );
+
+      await pump(
+        tester,
+        const Badge.dot(shape: BadgeShape.circular, child: _anchor),
+      );
+      expect(indicatorCenter(tester), within(distance: 0.01, from: pulled));
+    });
+
+    testWidgets('reads the shape an avatar takes from its group', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const AvatarGroup(
+          shape: AvatarShape.square,
+          children: [Badge.dot(child: Avatar(name: 'A'))],
+        ),
+      );
+      expect(
+        tester.getCenter(indicator()) - tester.getTopLeft(find.byType(Avatar)),
+        const Offset(40, 0),
+      );
+    });
+  });
+
+  group('color', () {
+    Color fill(WidgetTester tester) =>
+        (tester.widget<Container>(indicator()).decoration! as ShapeDecoration)
+            .color!;
+
+    testWidgets('is danger attached and neutral on its own', (tester) async {
+      await pump(tester, const Badge.count(count: 3, child: _anchor));
+      final theme = IdsProvider.of(tester.element(find.byType(Badge))).colors;
+      expect(fill(tester), theme.bgDanger);
+
+      await pump(tester, const Badge.count(count: 3));
+      expect(fill(tester), theme.onSurface);
+    });
+
+    testWidgets('soft takes the soft fill of its scheme', (tester) async {
+      await pump(
+        tester,
+        const Badge.count(
+          count: 3,
+          variant: BadgeVariant.soft,
+          colorScheme: IdsColorScheme.danger,
+          child: _anchor,
+        ),
+      );
+      final theme = IdsProvider.of(tester.element(find.byType(Badge))).colors;
+      expect(fill(tester), theme.bgDangerSoft);
+    });
+
+    testWidgets(
+      'neutral soft mixes 16% of on-surface into the surface in oklab',
+      (tester) async {
+        await pump(
+          tester,
+          const Badge.count(
+            count: 3,
+            variant: BadgeVariant.soft,
+            colorScheme: IdsColorScheme.neutral,
+            child: _anchor,
+          ),
+        );
+        final color = fill(tester);
+        expect(
+          [color.r, color.g, color.b].map((c) => (c * 255).round()),
+          orderedEquals([213, 213, 213]),
+        );
+      },
+    );
+
+    testWidgets('outline draws on the surface', (tester) async {
+      await pump(
+        tester,
+        const Badge.count(
+          count: 3,
+          variant: BadgeVariant.outline,
+          colorScheme: IdsColorScheme.primary,
+          child: _anchor,
+        ),
+      );
+      final theme = IdsProvider.of(tester.element(find.byType(Badge))).colors;
+      expect(fill(tester), theme.surface);
+    });
+
+    for (final mode in [IdsMode.light, IdsMode.dark]) {
+      testWidgets('every scheme and variant reads its roles (${mode.name})', (
+        tester,
+      ) async {
+        for (final scheme in IdsColorScheme.values) {
+          for (final variant in BadgeVariant.values) {
+            await pump(
+              tester,
+              Badge.count(
+                count: 3,
+                variant: variant,
+                colorScheme: scheme,
+                child: _anchor,
+              ),
+              mode: mode,
+            );
+            final colors = IdsProvider.of(
+              tester.element(find.byType(Badge)),
+            ).colors;
+            final family = scheme.name;
+            final neutral = scheme == IdsColorScheme.neutral;
+            final (background, foreground, edge) = switch (variant) {
+              BadgeVariant.solid => (
+                neutral ? colors.onSurface : colors['bg-$family'],
+                neutral ? colors.surface : colors['text-on-$family'],
+                null,
+              ),
+              BadgeVariant.soft => (
+                neutral
+                    ? mixOklab(colors.surface, colors.onSurface, 0.16)
+                    : colors['bg-$family-soft'],
+                neutral ? colors.onSurface : colors['text-on-$family-soft'],
+                null,
+              ),
+              BadgeVariant.outline => (
+                colors.surface,
+                neutral ? colors.onSurface : colors['text-$family'],
+                BorderSide(
+                  color: (neutral ? colors.onSurface : colors['border-$family'])
+                      .withValues(alpha: 0.45),
+                ),
+              ),
+            };
+            final reason = '$family ${variant.name}';
+            final count = tester.element(find.text('3'));
+            expect(fill(tester), background, reason: reason);
+            expect(
+              DefaultTextStyle.of(count).style.color,
+              foreground,
+              reason: reason,
+            );
+            expect(IconTheme.of(count).color, foreground, reason: reason);
+            expect(edgeOf(tester), edge, reason: reason);
+          }
+        }
+      });
+    }
+  });
+
+  group('semantics', () {
+    testWidgets('a label is a live region', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pump(
+        tester,
+        const Badge.count(
+          count: 3,
+          semanticLabel: '읽지 않은 알림 3개',
+          child: _anchor,
+        ),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('읽지 않은 알림 3개')),
+        matchesSemantics(label: '읽지 않은 알림 3개', isLiveRegion: true),
+      );
+      semantics.dispose();
+    });
+
+    testWidgets('an unlabelled count joins the anchor', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pump(
+        tester,
+        Badge.count(
+          count: 3,
+          child: Semantics(button: true, label: '알림', child: _anchor),
+        ),
+      );
+      expect(
+        tester.getSemantics(find.byType(Badge)),
+        matchesSemantics(label: '알림\n3', isButton: true),
+      );
+      semantics.dispose();
+    });
+
+    testWidgets('a badge on its own reads its text', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pump(tester, const Badge(content: Text('완료')));
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('완료')),
+        matchesSemantics(label: '완료'),
+      );
+      semantics.dispose();
+    });
+
+    testWidgets('an unlabelled dot stays silent', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pump(
+        tester,
+        Badge.dot(
+          child: Semantics(button: true, label: '알림', child: _anchor),
+        ),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('알림')),
+        matchesSemantics(label: '알림', isButton: true),
+      );
+      semantics.dispose();
+    });
+  });
+
+  testWidgets('never takes a tap meant for the anchor', (tester) async {
+    var taps = 0;
+    await pump(
+      tester,
+      Badge.count(
+        count: 3,
+        placement: BadgePlacement.bottomEnd,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => taps++,
+          child: _anchor,
+        ),
+      ),
+    );
+    await tester.tapAt(tester.getCenter(indicator()) - const Offset(4, 4));
+    expect(taps, 1);
+  });
+}

@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_theme.dart';
+
 Future<void> pump(
   WidgetTester tester,
   Widget spinner, {
@@ -25,25 +27,91 @@ Size spinnerSize(WidgetTester tester) =>
 
 void main() {
   testWidgets('follows the icon size unless given one', (tester) async {
-    await pump(tester, const IdsSpinner(), icon: const IconThemeData(size: 20));
+    await pump(tester, const Spinner(), icon: const IconThemeData(size: 20));
     expect(spinnerSize(tester), const Size.square(20));
 
     await pump(
       tester,
-      const IdsSpinner(size: IdsSize.standard),
+      const Spinner(size: IdsSize.standard),
       icon: const IconThemeData(size: 20),
     );
     expect(spinnerSize(tester), const Size.square(16));
 
-    await pump(tester, const IdsSpinner(size: IdsSize.tiny));
+    await pump(tester, const Spinner(size: IdsSize.tiny));
     expect(spinnerSize(tester), const Size.square(14));
   });
 
+  testWidgets('follows the text size when nothing sets an icon size', (
+    tester,
+  ) async {
+    const text = DefaultTextStyle(
+      style: TextStyle(fontSize: 18),
+      child: Spinner(),
+    );
+    await pump(tester, text);
+    expect(spinnerSize(tester), const Size.square(18));
+
+    await pump(tester, const IdsProvider(theme: testTheme, child: text));
+    expect(spinnerSize(tester), const Size.square(18));
+
+    await pump(
+      tester,
+      const MediaQuery(
+        data: MediaQueryData(textScaler: TextScaler.linear(2)),
+        child: text,
+      ),
+    );
+    expect(spinnerSize(tester), const Size.square(36));
+  });
+
+  testWidgets('takes the size of the Field around it', (tester) async {
+    Widget field(IdsSize size) => IdsProvider(
+      theme: testTheme,
+      child: Field(
+        size: size,
+        children: const [
+          FieldHint(child: Row(children: [Spinner()])),
+        ],
+      ),
+    );
+    await pump(tester, field(IdsSize.tiny));
+    expect(spinnerSize(tester), const Size.square(14));
+
+    await pump(tester, field(IdsSize.standard));
+    expect(spinnerSize(tester), const Size.square(16));
+  });
+
+  testWidgets('scales its own sizes with the theme, not a size it is given', (
+    tester,
+  ) async {
+    const scaled = IdsTheme(
+      primary: IdsThemeColor.seed(Color(0xFF155DFC)),
+      scale: 1.5,
+    );
+    await pump(
+      tester,
+      const IdsProvider(
+        theme: scaled,
+        child: Spinner(size: IdsSize.tiny),
+      ),
+    );
+    expect(spinnerSize(tester), const Size.square(21));
+
+    await pump(
+      tester,
+      const IdsProvider(
+        theme: scaled,
+        child: IconTheme(data: IconThemeData(size: 20), child: Spinner()),
+      ),
+    );
+    expect(spinnerSize(tester), const Size.square(20));
+  });
+
   testWidgets('spins, or pulses under reduced motion', (tester) async {
-    await pump(tester, const IdsSpinner());
+    await pump(tester, const Spinner());
     expect(find.byType(RotationTransition), findsOne);
 
-    await pump(tester, const IdsSpinner(), reducedMotion: true);
+    await pump(tester, const Spinner(), reducedMotion: true);
     expect(find.byType(RotationTransition), findsNothing);
     expect(find.byType(FadeTransition), findsOne);
   });
@@ -52,19 +120,19 @@ void main() {
     tester.platformDispatcher.accessibilityFeaturesTestValue =
         const FakeAccessibilityFeatures(reduceMotion: true);
     addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
-    await pump(tester, const IdsSpinner());
+    await pump(tester, const Spinner());
     expect(find.byType(FadeTransition), findsOne);
   });
 
   testWidgets('announces after a short delay', (tester) async {
     final semantics = tester.ensureSemantics();
-    await pump(tester, const IdsSpinner());
+    await pump(tester, const Spinner());
     expect(find.semantics.byLabel('불러오는 중'), findsNothing);
 
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.semantics.byLabel('불러오는 중'), findsOne);
 
-    await pump(tester, const IdsSpinner(semanticLabel: '댓글 불러오는 중'));
+    await pump(tester, const Spinner(semanticLabel: '댓글 불러오는 중'));
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.semantics.byLabel('댓글 불러오는 중'), findsOne);
     semantics.dispose();
@@ -72,7 +140,7 @@ void main() {
 
   testWidgets('decorative stays silent', (tester) async {
     final semantics = tester.ensureSemantics();
-    await pump(tester, const IdsSpinner(decorative: true));
+    await pump(tester, const Spinner(decorative: true));
     await tester.pump(const Duration(milliseconds: 100));
     expect(find.semantics.byLabel('불러오는 중'), findsNothing);
     semantics.dispose();

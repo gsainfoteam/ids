@@ -102,7 +102,7 @@ void main() {
       expect(decoration.shape, isA<RoundedSuperellipseBorder>());
       expect(
         (decoration.shape as RoundedSuperellipseBorder).borderRadius,
-        BorderRadius.circular((18 * 1.84).roundToDouble()),
+        BorderRadius.circular(18),
       );
       await tester.pumpWidget(build(testTheme));
       expect(tester.state(find.byType(_Consumer)), same(state));

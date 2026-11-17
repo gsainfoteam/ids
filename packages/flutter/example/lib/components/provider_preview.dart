@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Divider;
 import 'package:ids_flutter/ids.dart';
 
 import '../ids_theme.dart';
@@ -53,7 +53,7 @@ class ProviderPreview extends StatelessWidget {
                       Text(
                         'Text scale: ${MediaQuery.textScalerOf(context).scale(16) / 16}',
                       ),
-                      const IdsLabel(
+                      const Label(
                         required: true,
                         child: Text('IDS sans: Aa Wi 0123 한글'),
                       ),
@@ -71,8 +71,8 @@ class ProviderPreview extends StatelessWidget {
                         ids.translation?.spinnerLabel ??
                             IdsMessages.ko.spinnerLabel,
                       ),
-                      const IdsSpinner(),
-                      const IdsDivider(),
+                      const Spinner(),
+                      const Divider(),
                       Text(
                         ids.translation?.dialogClose ??
                             IdsMessages.ko.dialogClose,
@@ -194,7 +194,7 @@ class ScopePreview extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 8,
         children: [
-          IdsLabel(child: Text(name)),
+          Label(child: Text(name)),
           Text(
             '${ids.theme.primary == blue ? 'Blue' : 'Purple'} / ${ids.resolvedMode.name}',
             style: ids.textStyle(

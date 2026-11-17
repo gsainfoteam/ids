@@ -1,11 +1,12 @@
 ---
-'ids_flutter': minor
+"ids_flutter": minor
 ---
 
-Add `IdsDivider`, `IdsSpinner`, `IdsLabel` and `IdsField` (with `IdsFieldLabel`,
-`IdsFieldDescription`, `IdsFieldHint` and `IdsFieldError`), the first components after the
+Add `Divider`, `Spinner`, `Label` and `Field` (with `FieldLabel`,
+`FieldDescription`, `FieldHint` and `FieldError`), the first components after the
 package was cleared for the rebuild. Their API follows the React components and their look
 follows Figma. Divider draws a 1px neutral line with an optional centered label, and Spinner
-takes its size and color from `IconTheme` unless given `IdsSize.standard` or `tiny`. Field
+takes its color from `IconTheme` and, unless given `IdsSize.standard` or `tiny`, the size of the
+`Field` around it, then of an icon theme that sets one, then of the surrounding text. Field
 hands `size`, `required`, `disabled` and `invalid` down to its parts: disabled fades the whole
 field, and invalid swaps the hint for the error while the label keeps its color.

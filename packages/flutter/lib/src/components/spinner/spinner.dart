@@ -6,9 +6,10 @@ import 'package:flutter/widgets.dart';
 import '../../../messages/ids_messages.dart';
 import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
+import '../field/field.dart';
 
-class IdsSpinner extends StatefulWidget {
-  const IdsSpinner({
+class Spinner extends StatefulWidget {
+  const Spinner({
     super.key,
     this.size,
     this.semanticLabel,
@@ -20,12 +21,13 @@ class IdsSpinner extends StatefulWidget {
   final bool decorative;
 
   @override
-  State<IdsSpinner> createState() => _IdsSpinnerState();
+  State<Spinner> createState() => _SpinnerState();
 }
 
-class _IdsSpinnerState extends State<IdsSpinner>
+class _SpinnerState extends State<Spinner>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   static const _sizes = {IdsSize.standard: 16.0, IdsSize.tiny: 14.0};
+  static const _flutterFontSize = 14.0;
   static const _turn = Duration(seconds: 1);
   static const _announceDelay = Duration(milliseconds: 100);
 
@@ -82,9 +84,15 @@ class _IdsSpinnerState extends State<IdsSpinner>
         .dependOnInheritedWidgetOfExactType<IconTheme>();
     final color =
         inheritedIcon?.data.color ?? scope?.colors.onSurface ?? icon.color!;
-    final size = _sizes[widget.size] ?? icon.size!;
+    final token = _sizes[widget.size ?? Field.maybeOf(context)?.size];
+    final dimension = token != null
+        ? scope?.dimension(token) ?? token
+        : inheritedIcon?.data.size ??
+              MediaQuery.textScalerOf(context).scale(
+                DefaultTextStyle.of(context).style.fontSize ?? _flutterFontSize,
+              );
     final arc = CustomPaint(
-      size: Size.square(scope?.dimension(size) ?? size),
+      size: Size.square(dimension),
       painter: _ArcPainter(
         color.withValues(alpha: color.a * (icon.opacity ?? 1)),
       ),

@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 @immutable
-class IdsInteractiveState {
-  const IdsInteractiveState({
+class InteractiveState {
+  const InteractiveState({
     this.hovered = false,
     this.active = false,
     this.focused = false,
@@ -27,7 +29,7 @@ class IdsInteractiveState {
 
   @override
   bool operator ==(Object other) =>
-      other is IdsInteractiveState &&
+      other is InteractiveState &&
       other.hovered == hovered &&
       other.active == active &&
       other.focused == focused &&
@@ -41,12 +43,12 @@ class IdsInteractiveState {
 
   @override
   String toString() =>
-      'IdsInteractiveState(hovered: $hovered, active: $active, focused: $focused, '
+      'InteractiveState(hovered: $hovered, active: $active, focused: $focused, '
       'focusVisible: $focusVisible, pressed: $pressed, disabled: $disabled)';
 }
 
-class IdsInteractive extends StatefulWidget {
-  const IdsInteractive({
+class Interactive extends StatefulWidget {
+  const Interactive({
     super.key,
     required this.builder,
     this.onPressed,
@@ -57,24 +59,23 @@ class IdsInteractive extends StatefulWidget {
     this.autofocus = false,
   });
 
-  final Widget Function(BuildContext context, IdsInteractiveState state)
-  builder;
+  final Widget Function(BuildContext context, InteractiveState state) builder;
 
   final VoidCallback? onPressed;
 
   final bool disabled;
   final bool pressed;
 
-  final ValueChanged<IdsInteractiveState>? onInteractionChange;
+  final ValueChanged<InteractiveState>? onInteractionChange;
 
   final FocusNode? focusNode;
   final bool autofocus;
 
   @override
-  State<IdsInteractive> createState() => _IdsInteractiveState();
+  State<Interactive> createState() => _InteractiveState();
 }
 
-class _IdsInteractiveState extends State<IdsInteractive> {
+class _InteractiveState extends State<Interactive> {
   bool _hovered = false;
   bool _active = false;
   bool _focused = false;
@@ -82,13 +83,15 @@ class _IdsInteractiveState extends State<IdsInteractive> {
 
   bool _pointerFocus = false;
   bool _spaceHeld = false;
+  bool _primary = false;
+  FocusNode? _listened;
 
   FocusNode? _internalNode;
   FocusNode get _node => widget.focusNode ?? (_internalNode ??= FocusNode());
 
-  IdsInteractiveState? _reported;
+  InteractiveState? _reported;
 
-  IdsInteractiveState get _state => IdsInteractiveState(
+  InteractiveState get _state => InteractiveState(
     hovered: _hovered,
     active: _active,
     focused: _focused,
@@ -100,22 +103,28 @@ class _IdsInteractiveState extends State<IdsInteractive> {
   @override
   void initState() {
     super.initState();
+    _listenTo(_node);
     _reportAfterFrame();
   }
 
   @override
-  void didUpdateWidget(IdsInteractive oldWidget) {
+  void didUpdateWidget(Interactive oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (_node != _listened) _listenTo(_node);
     if (widget.disabled == oldWidget.disabled &&
         widget.pressed == oldWidget.pressed) {
       return;
     }
-    if (widget.disabled) _active = false;
+    if (widget.disabled) {
+      _active = false;
+      _hovered = false;
+    }
     _reportAfterFrame();
   }
 
   @override
   void dispose() {
+    _listened?.removeListener(_handlePrimaryFocus);
     _internalNode?.dispose();
     super.dispose();
   }
@@ -139,16 +148,46 @@ class _IdsInteractiveState extends State<IdsInteractive> {
     });
   }
 
+  static void _ignorePress() {}
+
+  void _press() {
+    if (!_node.hasPrimaryFocus) {
+      _pointerFocus = true;
+      _node.requestFocus();
+      scheduleMicrotask(_forgetThePressOnceFocusSettles);
+    }
+    widget.onPressed?.call();
+  }
+
+  void _forgetThePressOnceFocusSettles() => _pointerFocus = false;
+
+  void _listenTo(FocusNode node) {
+    _listened?.removeListener(_handlePrimaryFocus);
+    _listened = node..addListener(_handlePrimaryFocus);
+    _primary = node.hasPrimaryFocus;
+  }
+
+  void _handlePrimaryFocus() {
+    final primary = _node.hasPrimaryFocus;
+    if (primary == _primary) return;
+    _primary = primary;
+    final visible =
+        primary &&
+        !_pointerFocus &&
+        FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
+    _pointerFocus = false;
+    if (!primary) _spaceHeld = false;
+    _set(() {
+      _focusVisible = visible;
+      if (!primary) _active = false;
+    });
+  }
+
   void _handleFocusChange(bool focused) {
     _set(() {
       _focused = focused;
-      _focusVisible =
-          focused &&
-          !_pointerFocus &&
-          FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
       if (!focused) _active = false;
     });
-    _pointerFocus = false;
     if (!focused) _spaceHeld = false;
   }
 
@@ -199,16 +238,15 @@ class _IdsInteractiveState extends State<IdsInteractive> {
         },
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTapDown: enabled
-              ? (_) {
-                  _pointerFocus = true;
-                  _node.requestFocus();
-                  _set(() => _active = true);
+          onTapDown: enabled ? (_) => _set(() => _active = true) : null,
+          onTapUp: enabled ? (_) => _set(() => _active = false) : null,
+          onTapCancel: enabled
+              ? () {
+                  if (_active) _set(() => _active = false);
                 }
               : null,
-          onTapUp: enabled ? (_) => _set(() => _active = false) : null,
-          onTapCancel: enabled ? () => _set(() => _active = false) : null,
-          onTap: enabled ? widget.onPressed : null,
+          onTap: enabled ? _press : _ignorePress,
+          excludeFromSemantics: !enabled,
           child: widget.builder(context, _state),
         ),
       ),
