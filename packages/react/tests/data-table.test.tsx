@@ -146,8 +146,8 @@ test('the sort icon hides until hover or focus, and a sorted column shows it in 
   const icon = (name: string) =>
     screen.getByRole('button', { name }).element().querySelector('svg:last-child')!;
 
-  await expect.element(screen.getByRole('button', { name: 'Name' })).toBeVisible();
-  expect(getComputedStyle(icon('Name')).opacity).toBe('0');
+  await userEvent.hover(screen.getByRole('cell', { name: 'Barbara' }));
+  await expect.poll(() => getComputedStyle(icon('Name')).opacity).toBe('0');
   expect(getComputedStyle(icon('Age')).opacity).toBe('1');
   expect(getComputedStyle(icon('Age')).color).toBe(colorOf('--ids-color-text-primary'));
 
