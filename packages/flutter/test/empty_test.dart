@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
@@ -10,14 +12,18 @@ Future<void> pump(
   WidgetTester tester,
   Widget child, {
   TextDirection direction = TextDirection.ltr,
+  IdsTheme theme = testTheme,
+  IdsMode? mode,
+  double width = 400,
 }) => tester.pumpWidget(
   Directionality(
     textDirection: direction,
     child: IdsProvider(
-      theme: testTheme,
+      theme: theme,
+      mode: mode,
       child: Align(
         alignment: Alignment.topLeft,
-        child: SizedBox(width: 400, child: child),
+        child: SizedBox(width: width, child: child),
       ),
     ),
   ),
@@ -32,6 +38,117 @@ Finder mediaBox() => find.descendant(
   of: find.byType(EmptyMedia),
   matching: find.byType(SizedBox),
 );
+
+Finder tile() => find.descendant(
+  of: find.byType(EmptyMedia),
+  matching: find.byType(DecoratedBox),
+);
+
+ShapeDecoration tileOf(WidgetTester tester) =>
+    tester.widget<DecoratedBox>(tile().first).decoration as ShapeDecoration;
+
+ShapeBorderClipper tileClipOf(WidgetTester tester) =>
+    tester
+            .widget<ClipPath>(
+              find.descendant(
+                of: find.byType(EmptyMedia),
+                matching: find.byType(ClipPath),
+              ),
+            )
+            .clipper!
+        as ShapeBorderClipper;
+
+ShapeDecoration fillOf(WidgetTester tester) =>
+    tester
+            .widget<DecoratedBox>(
+              find
+                  .descendant(
+                    of: find.byType(Empty),
+                    matching: find.byType(DecoratedBox),
+                  )
+                  .first,
+            )
+            .decoration
+        as ShapeDecoration;
+
+IdsScope themeOf(WidgetTester tester) =>
+    IdsProvider.of(tester.element(find.byType(Empty)));
+
+List<({Path path, Paint paint})> dashesOf(WidgetTester tester) {
+  final canvas = TestRecordingCanvas();
+  tester
+      .widget<CustomPaint>(
+        find
+            .descendant(
+              of: find.byType(Empty),
+              matching: find.byType(CustomPaint),
+            )
+            .first,
+      )
+      .foregroundPainter!
+      .paint(canvas, tester.getSize(find.byType(Empty)));
+  return [
+    for (final call in canvas.invocations)
+      if (call.invocation.memberName == #drawPath)
+        (
+          path: call.invocation.positionalArguments[0] as Path,
+          paint: call.invocation.positionalArguments[1] as Paint,
+        ),
+  ];
+}
+
+List<Offset> pointsOn(List<({Path path, Paint paint})> dashes) => [
+  for (final dash in dashes)
+    for (final metric in dash.path.computeMetrics())
+      for (var at = 0.0; at <= metric.length; at += 0.25)
+        metric.getTangentForOffset(at)!.position,
+];
+
+double cornerInsetOf(List<({Path path, Paint paint})> dashes) =>
+    pointsOn(dashes).map((point) => (point.dx + point.dy) / 2).reduce(math.min);
+
+Path areaInside(List<({Path path, Paint paint})> dashes) =>
+    Path()..addPolygon(pointsOn(dashes), true);
+
+Offset edgeBetween(Path path, Offset inside, Offset outside) {
+  var low = 0.0;
+  var high = 1.0;
+  while (high - low > 1e-6) {
+    final middle = (low + high) / 2;
+    if (path.contains(Offset.lerp(inside, outside, middle)!)) {
+      low = middle;
+    } else {
+      high = middle;
+    }
+  }
+  return Offset.lerp(inside, outside, low)!;
+}
+
+Offset insideOnlyARoundCorner(Rect bounds, double radius) {
+  const whereTheShapesDifferMost = 188 * math.pi / 180;
+  final corner = BorderRadius.circular(radius);
+  final arcCentre = bounds.topLeft + Offset(radius, radius);
+  final outside =
+      arcCentre + Offset.fromDirection(whereTheShapesDifferMost, radius * 1.5);
+  final roundedEdge = edgeBetween(
+    RoundedRectangleBorder(borderRadius: corner).getOuterPath(bounds),
+    arcCentre,
+    outside,
+  );
+  final squircleEdge = edgeBetween(
+    RoundedSuperellipseBorder(borderRadius: corner).getOuterPath(bounds),
+    arcCentre,
+    outside,
+  );
+  expect(
+    (roundedEdge - arcCentre).distance - (squircleEdge - arcCentre).distance,
+    greaterThan(0.05),
+  );
+  return Offset.lerp(roundedEdge, squircleEdge, 0.5)!;
+}
+
+double insetOfCorner(double radius) =>
+    0.5 + (radius - 0.5) * (1 - math.sqrt1_2);
 
 void main() {
   group('layout', () {
@@ -137,6 +254,7 @@ void main() {
             EmptyDescription(child: Text('word ' * 30)),
           ],
         ),
+        width: 1200,
       );
       expect(
         tester.getSize(find.byType(EmptyDescription)).width,
@@ -234,30 +352,75 @@ void main() {
     testWidgets('a soft tile turns to the surface on a soft Empty', (
       tester,
     ) async {
-      Color tileOf() =>
-          (tester
-                      .widget<DecoratedBox>(
-                        find
-                            .descendant(
-                              of: find.byType(EmptyMedia),
-                              matching: find.byType(DecoratedBox),
-                            )
-                            .first,
-                      )
-                      .decoration
-                  as BoxDecoration)
-              .color!;
-
       await pump(tester, const Empty(children: [_title]));
-      final theme = IdsProvider.of(tester.element(find.byType(Empty))).colors;
-      expect(tileOf(), theme.bgNeutralSoft);
+      final theme = themeOf(tester).colors;
+      expect(tileOf(tester).color, theme.bgNeutralSoft);
 
       await pump(
         tester,
         const Empty(variant: EmptyVariant.soft, children: [_title]),
       );
-      expect(tileOf(), theme.surface);
+      expect(tileOf(tester).color, theme.surface);
     });
+
+    for (final mode in [IdsMode.light, IdsMode.dark]) {
+      testWidgets('reads every colour from its role (${mode.name})', (
+        tester,
+      ) async {
+        Widget empty(EmptyVariant variant, EmptyMediaVariant media) => Empty(
+          variant: variant,
+          children: [
+            EmptyMedia(variant: media, child: const Icon(Icons.search)),
+            _title,
+            const EmptyDescription(child: Text('Description')),
+            const EmptyActions(children: [Text('Action')]),
+          ],
+        );
+        Color? iconColor() =>
+            IconTheme.of(tester.element(find.byIcon(Icons.search))).color;
+        Color? colorOf(String text) =>
+            DefaultTextStyle.of(tester.element(find.text(text))).style.color;
+
+        await pump(
+          tester,
+          empty(EmptyVariant.outline, EmptyMediaVariant.outline),
+          mode: mode,
+        );
+        final colors = themeOf(tester).colors;
+        expect(
+          dashesOf(tester).first.paint.color,
+          isSameColorAs(colors.borderNeutral),
+        );
+        expect(tileOf(tester).color, isNull);
+        expect(
+          (tileOf(tester).shape as OutlinedBorder).side,
+          BorderSide(color: colors.borderNeutral),
+        );
+        expect(iconColor(), colors.onSurface);
+        expect(colorOf('Title'), colors.onSurface);
+        expect(colorOf('Description'), colors.textNeutral);
+        expect(colorOf('Action'), colors.onSurface);
+
+        await pump(
+          tester,
+          empty(EmptyVariant.soft, EmptyMediaVariant.ghost),
+          mode: mode,
+        );
+        final fill =
+            tester
+                    .widget<DecoratedBox>(
+                      find.descendant(
+                        of: find.byType(Empty),
+                        matching: find.byType(DecoratedBox),
+                      ),
+                    )
+                    .decoration
+                as ShapeDecoration;
+        expect(fill.color, colors.bgNeutralSoft);
+        expect(tile(), findsNothing);
+        expect(iconColor(), colors.textNeutral);
+      });
+    }
   });
 
   group('text', () {
@@ -336,6 +499,163 @@ void main() {
         );
       }
     });
+  });
+
+  testWidgets('follows the theme scale', (tester) async {
+    await pump(
+      tester,
+      const Empty(
+        children: [
+          EmptyMedia(
+            variant: EmptyMediaVariant.outline,
+            child: Icon(Icons.search),
+          ),
+          _title,
+          EmptyDescription(
+            child: SizedBox(width: double.infinity, child: Text('Description')),
+          ),
+          EmptyActions(
+            children: [
+              SizedBox(key: ValueKey('first'), width: 40, height: 20),
+              SizedBox(key: ValueKey('second'), width: 40, height: 20),
+            ],
+          ),
+        ],
+      ),
+      theme: scaledTheme,
+      width: 800,
+    );
+    double top(Finder finder) => tester.getTopLeft(finder).dy;
+    double bottom(Finder finder) => tester.getBottomLeft(finder).dy;
+    TextStyle styleOf(String text) =>
+        DefaultTextStyle.of(tester.element(find.text(text))).style;
+    final first = find.byKey(const ValueKey('first'));
+
+    expect(offsetIn(tester, mediaBox().first).dy, 32 * 1.5 + 1);
+    expect(tester.getSize(mediaBox().first), const Size.square(48 * 1.5));
+    expect(
+      IconTheme.of(tester.element(find.byIcon(Icons.search))).size,
+      24 * 1.5,
+    );
+    expect(top(find.text('Title')) - bottom(mediaBox().first), 16 * 1.5);
+    expect(top(find.text('Description')) - bottom(find.text('Title')), 4 * 1.5);
+    expect(top(first) - bottom(find.text('Description')), 20 * 1.5);
+    expect(
+      tester.getTopLeft(find.byKey(const ValueKey('second'))).dx -
+          tester.getTopRight(first).dx,
+      8 * 1.5,
+    );
+    expect(styleOf('Title').fontSize, 16 * 1.5);
+    expect(styleOf('Description').fontSize, 14 * 1.5);
+    expect(tester.getSize(find.byType(EmptyDescription)).width, 384);
+    expect((tileOf(tester).shape as OutlinedBorder).side.width, 1);
+
+    final dashes = dashesOf(tester);
+    final firstDash = dashes[0].path.computeMetrics().single;
+    final secondDash = dashes[1].path.computeMetrics().single;
+    expect(dashes.first.paint.strokeWidth, 1);
+    expect(firstDash.length, closeTo(3, 0.001));
+    expect(
+      (secondDash.getTangentForOffset(0)!.position -
+              firstDash.getTangentForOffset(firstDash.length)!.position)
+          .distance,
+      closeTo(2, 0.001),
+    );
+  });
+
+  testWidgets('follows the theme radius', (tester) async {
+    await pump(tester, const Empty(children: [_title]), theme: roundedTheme);
+    final radius = themeOf(tester).radius;
+    expect(
+      cornerInsetOf(dashesOf(tester)),
+      closeTo(insetOfCorner(radius.container), 0.05),
+    );
+    expect(
+      tileOf(tester).shape,
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radius.standard),
+      ),
+    );
+    expect(
+      tileClipOf(tester).shape,
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radius.standard),
+      ),
+    );
+
+    await pump(
+      tester,
+      const Empty(variant: EmptyVariant.soft, children: [_title]),
+      theme: roundedTheme,
+    );
+    expect(
+      fillOf(tester).shape,
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radius.container),
+      ),
+    );
+  });
+
+  testWidgets('takes the corner shape of the theme', (tester) async {
+    for (final (theme, shape, round) in [
+      (testTheme, RoundedRectangleBorder.new, true),
+      (
+        IdsTheme(
+          primary: testTheme.primary,
+          cornerShape: IdsCornerShape.squircle,
+        ),
+        RoundedSuperellipseBorder.new,
+        false,
+      ),
+    ]) {
+      await pump(
+        tester,
+        const Empty(
+          children: [
+            EmptyMedia(
+              variant: EmptyMediaVariant.outline,
+              child: Icon(Icons.search),
+            ),
+            _title,
+          ],
+        ),
+        theme: theme,
+      );
+      final ids = themeOf(tester);
+      final tileBounds = Offset.zero & tester.getSize(mediaBox().first);
+      final lineBounds = (Offset.zero & tester.getSize(find.byType(Empty)))
+          .deflate(0.5);
+
+      expect(
+        tileOf(tester).shape,
+        shape(
+          borderRadius: BorderRadius.circular(ids.radius.standard),
+          side: BorderSide(color: ids.colors.borderNeutral),
+        ),
+      );
+      expect(
+        tileClipOf(tester)
+            .getClip(tileBounds.size)
+            .contains(insideOnlyARoundCorner(tileBounds, ids.radius.standard)),
+        round,
+      );
+      expect(
+        areaInside(dashesOf(tester)).contains(
+          insideOnlyARoundCorner(lineBounds, ids.radius.container - 0.5),
+        ),
+        round,
+      );
+
+      await pump(
+        tester,
+        const Empty(variant: EmptyVariant.soft, children: [_title]),
+        theme: theme,
+      );
+      expect(
+        fillOf(tester).shape,
+        shape(borderRadius: BorderRadius.circular(ids.radius.container)),
+      );
+    }
   });
 
   testWidgets('has no role of its own', (tester) async {

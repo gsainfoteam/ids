@@ -62,8 +62,9 @@ class _EmptyState extends State<Empty> {
     final colors = ids.colors;
     final centered = widget.align == EmptyAlign.center;
     final outline = widget.variant == EmptyVariant.outline;
-    final pad = _paddings[widget.size]! + (outline ? _DashedOutline._width : 0);
-    final radius = BorderRadius.circular(ids.radius.container);
+    final pad =
+        ids.dimension(_paddings[widget.size]!) +
+        (outline ? _DashedOutline._width : 0);
 
     final body = Padding(
       padding: EdgeInsets.all(pad),
@@ -98,14 +99,16 @@ class _EmptyState extends State<Empty> {
         EmptyVariant.outline => CustomPaint(
           foregroundPainter: _DashedOutline(
             color: colors.borderNeutral,
-            radius: ids.radius.container,
+            centreLine: ids.shape(
+              radius: ids.radius.container - _DashedOutline._width / 2,
+            ),
           ),
           child: body,
         ),
         EmptyVariant.soft => DecoratedBox(
-          decoration: BoxDecoration(
+          decoration: ShapeDecoration(
             color: colors.bgNeutralSoft,
-            borderRadius: radius,
+            shape: ids.shape(radius: ids.radius.container),
           ),
           child: body,
         ),
@@ -139,35 +142,35 @@ class EmptyMedia extends StatelessWidget {
     final colors = ids.colors;
     final glyph =
         child ?? const ExcludeSemantics(child: Icon(Icons.inbox_outlined));
-    final radius = BorderRadius.circular(ids.radius.standard);
+    final outline = ids.shape(
+      radius: ids.radius.standard,
+      side: variant == EmptyMediaVariant.outline
+          ? BorderSide(color: colors.borderNeutral)
+          : BorderSide.none,
+    );
+    final box = ids.dimension(_boxes[scope.size]!);
 
     final media = switch (variant) {
       EmptyMediaVariant.ghost => IconTheme.merge(
-        data: IconThemeData(
-          size: _boxes[scope.size],
-          color: colors.textNeutral,
-        ),
+        data: IconThemeData(size: box, color: colors.textNeutral),
         child: glyph,
       ),
       EmptyMediaVariant.soft || EmptyMediaVariant.outline => SizedBox.square(
-        dimension: _boxes[scope.size],
-        child: ClipRRect(
-          borderRadius: radius,
+        dimension: box,
+        child: ClipPath(
+          clipper: ShapeBorderClipper(shape: outline),
           child: DecoratedBox(
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: variant == EmptyMediaVariant.soft
                   ? (scope.variant == EmptyVariant.soft
                         ? colors.surface
                         : colors.bgNeutralSoft)
                   : null,
-              border: variant == EmptyMediaVariant.outline
-                  ? Border.all(color: colors.borderNeutral)
-                  : null,
-              borderRadius: radius,
+              shape: outline,
             ),
             child: IconTheme.merge(
               data: IconThemeData(
-                size: _icons[scope.size],
+                size: ids.dimension(_icons[scope.size]!),
                 color: colors.onSurface,
               ),
               child: glyph is Image ? glyph : Center(child: glyph),
@@ -178,7 +181,7 @@ class EmptyMedia extends StatelessWidget {
     };
 
     return Padding(
-      padding: EdgeInsets.only(bottom: _gaps[scope.size]!),
+      padding: EdgeInsets.only(bottom: ids.dimension(_gaps[scope.size]!)),
       child: media,
     );
   }
@@ -197,8 +200,10 @@ class EmptyTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = _EmptyScope.of(context, 'EmptyTitle').size;
+    final ids = IdsProvider.of(context);
     final title = DefaultTextStyle.merge(
-      style: _styles[_EmptyScope.of(context, 'EmptyTitle').size],
+      style: ids.textStyle(_styles[size]!, color: ids.colors.onSurface),
       child: child,
     );
     return headingLevel == null
@@ -222,14 +227,13 @@ class EmptyDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = _EmptyScope.of(context, 'EmptyDescription').size;
+    final ids = IdsProvider.of(context);
     return Padding(
-      padding: EdgeInsets.only(top: _gaps[size]!),
+      padding: EdgeInsets.only(top: ids.dimension(_gaps[size]!)),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: _maxWidth),
         child: DefaultTextStyle.merge(
-          style: _styles[size]!.copyWith(
-            color: IdsProvider.of(context).colors.textNeutral,
-          ),
+          style: ids.textStyle(_styles[size]!, color: ids.colors.textNeutral),
           child: child,
         ),
       ),
@@ -248,11 +252,13 @@ class EmptyActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scope = _EmptyScope.of(context, 'EmptyActions');
+    final ids = IdsProvider.of(context);
+    final spacing = ids.dimension(_spacing);
     return Padding(
-      padding: EdgeInsets.only(top: _gaps[scope.size]!),
+      padding: EdgeInsets.only(top: ids.dimension(_gaps[scope.size]!)),
       child: Wrap(
-        spacing: _spacing,
-        runSpacing: _spacing,
+        spacing: spacing,
+        runSpacing: spacing,
         alignment: scope.align == EmptyAlign.center
             ? WrapAlignment.center
             : WrapAlignment.start,
@@ -296,25 +302,20 @@ class _EmptyScope extends InheritedWidget {
 }
 
 class _DashedOutline extends CustomPainter {
-  const _DashedOutline({required this.color, required this.radius});
+  const _DashedOutline({required this.color, required this.centreLine});
 
   static const _dash = 3.0;
   static const _gap = 2.0;
   static const _width = 1.0;
 
   final Color color;
-  final double radius;
+  final ShapeBorder centreLine;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final inset = _width / 2;
-    final outline = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          (Offset.zero & size).deflate(inset),
-          Radius.circular(radius - _width / 2),
-        ),
-      );
+    final outline = centreLine.getOuterPath(
+      (Offset.zero & size).deflate(_width / 2),
+    );
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
@@ -330,5 +331,6 @@ class _DashedOutline extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DashedOutline oldDelegate) => color != oldDelegate.color;
+  bool shouldRepaint(_DashedOutline oldDelegate) =>
+      color != oldDelegate.color || centreLine != oldDelegate.centreLine;
 }
