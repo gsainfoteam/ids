@@ -53,10 +53,9 @@ void main() {
       expect(icon.left - button.left, start);
       expect(label.left - icon.right, gap);
       expect(button.right - label.right, end);
-      expect(
-        DefaultTextStyle.of(tester.element(labelFinder)).style.fontSize,
-        fontSize,
-      );
+      final style = DefaultTextStyle.of(tester.element(labelFinder)).style;
+      expect(style.fontSize, fontSize);
+      expect(style.leadingDistribution, TextLeadingDistribution.even);
     }
   });
 

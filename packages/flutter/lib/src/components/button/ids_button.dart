@@ -74,9 +74,9 @@ class IdsButton extends StatelessWidget {
       tiny ? IdsSizes.iconTiny : IdsSizes.iconStandard,
     );
     final gap = theme.dimension(tiny ? 6 : 8);
-    final textStyle = tiny
-        ? IdsTypography.captionC1Medium
-        : IdsTypography.bodyB3Medium;
+    final textStyle =
+        (tiny ? IdsTypography.captionC1Medium : IdsTypography.bodyB3Medium)
+            .copyWith(leadingDistribution: TextLeadingDistribution.even);
     final reducedMotion =
         (MediaQuery.maybeDisableAnimationsOf(context) ?? false) ||
         View.of(context).platformDispatcher.accessibilityFeatures.reduceMotion;
