@@ -32,7 +32,7 @@ function Tag({
       {...props}
       data-tag=""
       className={cn(
-        'text-caption-c1-medium inline-flex h-6 items-center rounded-full bg-(--ids-color-secondary) px-2.5 text-(--ids-color-on-secondary)',
+        'text-caption-c1-medium bg-primary-soft text-on-primary-soft inline-flex h-6 items-center rounded-full px-2.5',
         className,
       )}
     />
@@ -41,7 +41,7 @@ function Tag({
 
 export const Playground: Story = {
   render: () => (
-    <Slot className="rounded-standard bg-(--ids-color-primary) px-4 py-2 text-(--ids-color-on-primary)">
+    <Slot className="rounded-standard bg-primary text-on-primary px-4 py-2">
       <a href="#slot">Slot이 감싼 링크</a>
     </Slot>
   ),
@@ -91,7 +91,7 @@ export const Gallery: Story = {
 
 export const MergesClassName: Story = {
   render: () => (
-    <Slot className="px-2 text-(--ids-color-accent)">
+    <Slot className="text-primary px-2">
       <span className="px-4 underline">양쪽 className이 합쳐진다</span>
     </Slot>
   ),
@@ -105,7 +105,7 @@ export const MergesClassName: Story = {
   play: async ({ canvas }) => {
     const span = canvas.getByText('양쪽 className이 합쳐진다');
     await expect(span).toHaveClass('underline');
-    await expect(span).toHaveClass('text-(--ids-color-accent)');
+    await expect(span).toHaveClass('text-primary');
     await expect(span).toHaveClass('px-2');
     await expect(span).not.toHaveClass('px-4');
   },
@@ -113,7 +113,7 @@ export const MergesClassName: Story = {
 
 export const MergesStyle: Story = {
   render: () => (
-    <Slot style={{ color: 'var(--ids-color-accent)' }}>
+    <Slot style={{ color: 'var(--ids-color-text-primary)' }}>
       <span style={{ color: 'red', fontWeight: 600 }}>style 합치기</span>
     </Slot>
   ),
@@ -123,7 +123,7 @@ export const MergesStyle: Story = {
   play: async ({ canvas }) => {
     const span = canvas.getByText('style 합치기');
     await expect(span.style.fontWeight).toBe('600');
-    await expect(span.style.color).toBe('var(--ids-color-accent)');
+    await expect(span.style.color).toBe('var(--ids-color-text-primary)');
   },
 };
 

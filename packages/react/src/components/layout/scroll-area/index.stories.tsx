@@ -28,12 +28,8 @@ type Story = StoryObj<typeof meta>;
 const variants = ['hover', 'auto', 'always'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
-const frame = cn(
-  'h-40 w-56 rounded-standard border border-(--ids-color-border) text-body-b3-regular',
-);
-const panel = cn(
-  'h-56 w-64 concentric-p-1 p-0 border border-(--ids-color-border) bg-(--ids-color-surface) shadow-md',
-);
+const frame = cn('h-40 w-56 rounded-standard border border-neutral text-body-b3-regular');
+const panel = cn('h-56 w-64 concentric-p-1 p-0 border border-neutral bg-surface shadow-md');
 
 const paragraphs = [
   '스크롤 영역은 브라우저의 스크롤을 그대로 씁니다. 휠, 트랙패드, 터치, 키보드가 평소처럼 움직입니다.',
@@ -62,7 +58,7 @@ function Wide() {
       {Array.from({ length: 16 }, (_, index) => (
         <div
           key={index}
-          className="rounded-standard text-body-b3-medium flex size-20 shrink-0 items-center justify-center bg-(--ids-color-muted)"
+          className="rounded-standard text-body-b3-medium bg-neutral-soft flex size-20 shrink-0 items-center justify-center"
         >
           {index + 1}
         </div>
@@ -77,7 +73,7 @@ function Grid() {
       {Array.from({ length: 96 }, (_, index) => (
         <div
           key={index}
-          className="rounded-standard text-caption-c1-regular flex h-12 items-center justify-center bg-(--ids-color-muted)"
+          className="rounded-standard text-caption-c1-regular bg-neutral-soft flex h-12 items-center justify-center"
         >
           {index + 1}
         </div>
@@ -190,7 +186,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="card 16px">
           <ScrollArea asChild variant="always" orientation="both">
-            <div className="concentric-p-4 h-56 w-64 border border-(--ids-color-border) p-0">
+            <div className="concentric-p-4 border-neutral h-56 w-64 border p-0">
               <Grid />
             </div>
           </ScrollArea>
@@ -243,15 +239,15 @@ export const Gallery: Story = {
       <Showcase.Section title="Dark mode" description="막대 색은 scrollbar-* 토큰을 따릅니다.">
         <Showcase.Row>
           {(['light', 'dark'] as const).map((mode) => (
-            <IdsProvider
+            <IdsProvider.Scope
               key={mode}
               mode={mode}
-              className="rounded-standard bg-(--ids-color-surface) p-4 text-(--ids-color-on-surface)"
+              className="rounded-standard bg-surface text-on-surface p-4"
             >
               <ScrollArea variant="always" className={frame}>
                 <Text />
               </ScrollArea>
-            </IdsProvider>
+            </IdsProvider.Scope>
           ))}
         </Showcase.Row>
       </Showcase.Section>
@@ -353,7 +349,7 @@ export const ListboxAsViewport: Story = {
               role="option"
               aria-selected={index === 0}
               tabIndex={index === 0 ? 0 : -1}
-              className="focus-ring rounded-standard px-2.5 py-1.5 aria-selected:bg-(--ids-color-muted)"
+              className="focus-ring rounded-standard aria-selected:bg-neutral-soft px-2.5 py-1.5"
             >
               도시 {index + 1}
             </div>
@@ -414,8 +410,8 @@ export const FadeEdges: Story = {
 
 export const OverflowEdges: Story = {
   render: () => (
-    <div className="group/panel rounded-standard text-body-b3-regular flex h-56 w-64 flex-col border border-(--ids-color-border)">
-      <div className="text-body-b3-medium border-b border-transparent px-3 py-2 group-has-data-overflow-y-start/panel:border-(--ids-color-border)">
+    <div className="group/panel rounded-standard text-body-b3-regular border-neutral flex h-56 w-64 flex-col border">
+      <div className="text-body-b3-medium group-has-data-overflow-y-start/panel:border-neutral border-b border-transparent px-3 py-2">
         공지
       </div>
       <ScrollArea className="min-h-0 grow rounded-b-[inherit]">
@@ -448,7 +444,7 @@ export const CustomThumb: Story = {
     <ScrollArea variant="auto" className={frame}>
       <Text />
       <ScrollArea.Scrollbar>
-        <ScrollArea.Thumb className="bg-(--ids-color-primary) hover:bg-(--ids-color-primary)" />
+        <ScrollArea.Thumb className="bg-primary hover:bg-primary" />
       </ScrollArea.Scrollbar>
     </ScrollArea>
   ),
@@ -462,6 +458,6 @@ export const CustomThumb: Story = {
   play: async ({ canvasElement }) => {
     const thumb = canvasElement.querySelector<HTMLElement>('[data-scroll-area-thumb]')!;
     await waitFor(() => expect(thumb).toBeVisible());
-    await expect(thumb.className).toMatch(/bg-\(--ids-color-primary\)/);
+    await expect(thumb.className).toMatch(/(^| )bg-primary( |$)/);
   },
 };

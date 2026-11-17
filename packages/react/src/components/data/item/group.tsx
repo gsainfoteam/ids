@@ -18,14 +18,12 @@ export type ItemGroupProps = Omit<ComponentProps<'ul'>, 'ref'> & {
   variant?: ItemGroupVariant;
   ordered?: boolean;
   size?: IdsSize;
-  dense?: boolean;
 };
 
 export function ItemGroup({
   variant = 'bordered',
   ordered = false,
   size,
-  dense,
   ref,
   className,
   children,
@@ -36,7 +34,7 @@ export function ItemGroup({
   const rowVariant = variant === 'separated' ? 'outline' : undefined;
 
   return (
-    <ItemGroupContext value={{ size, dense, variant: rowVariant }}>
+    <ItemGroupContext value={{ size, variant: rowVariant }}>
       <List
         {...keepListRoleInSafari}
         {...props}

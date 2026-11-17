@@ -10,15 +10,15 @@ export const sliderStyle = tv({
       'group/slider relative grid select-none outline-none',
       'data-disabled:cursor-not-allowed data-disabled:opacity-50',
     ],
-    track: [sliderSurface.edge, 'relative rounded-full bg-(--ids-color-muted)'],
+    track: [sliderSurface.edge, 'relative rounded-full bg-neutral-soft'],
     range: [
       sliderSurface.edge,
-      'absolute rounded-full bg-(--ids-color-primary) group-data-invalid/slider:bg-(--ids-color-danger)',
+      'absolute rounded-full bg-primary group-data-invalid/slider:bg-danger',
     ],
     thumb: [
       sliderSurface.thumb,
       'group/thumb absolute block size-(--slider-thumb)',
-      'bg-(--ids-color-primary) group-data-invalid/slider:bg-(--ids-color-danger)',
+      'bg-primary group-data-invalid/slider:bg-danger',
       'transition-shadow duration-(--ids-motion-fast) motion-reduce:transition-none focus-ring',
     ],
     valueLabel: [
@@ -27,9 +27,9 @@ export const sliderStyle = tv({
       'opacity-0 transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',
       'group-focus-visible/thumb:opacity-100 group-data-dragging/thumb:opacity-100 data-visible:opacity-100',
     ],
-    marks: 'relative text-caption-c2-regular text-(--ids-color-on-muted)',
+    marks: 'relative text-caption-c2-regular text-neutral',
     mark: 'absolute flex items-center gap-1 whitespace-nowrap',
-    tick: 'rounded-full bg-(--ids-color-border)',
+    tick: 'rounded-full bg-(--ids-color-border-neutral)',
   },
   variants: {
     orientation: {
@@ -55,8 +55,8 @@ export const sliderStyle = tv({
       },
     } satisfies Record<SliderOrientation, object>,
     size: {
-      standard: { root: '[--slider-thumb:1rem] [--slider-track:0.75rem]' },
-      tiny: { root: '[--slider-thumb:0.875rem] [--slider-track:0.625rem]' },
+      standard: { root: '[--slider-thumb:--spacing(4)] [--slider-track:--spacing(3)]' },
+      tiny: { root: '[--slider-thumb:--spacing(3.5)] [--slider-track:--spacing(2.5)]' },
     } satisfies Record<IdsSize, object>,
   },
   defaultVariants: { orientation: 'horizontal', size: 'standard' },

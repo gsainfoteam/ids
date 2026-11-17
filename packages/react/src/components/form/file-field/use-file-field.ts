@@ -73,7 +73,7 @@ export function useFileField({
   const [dragging, setDragging] = useState(false);
   const dragDepth = useRef(0);
 
-  const rootRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLElement>(null);
   const pickerRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const pendingFocus = useRef<number | 'trigger' | null>(null);
@@ -140,30 +140,30 @@ export function useFileField({
   });
 
   const handlers = {
-    onDragEnter: (event: DragEvent<HTMLDivElement>) => {
+    onDragEnter: (event: DragEvent<HTMLElement>) => {
       if (!carriesFiles(event)) return;
       event.preventDefault();
       dragDepth.current += 1;
       if (!blocked) setDragging(true);
     },
-    onDragOver: (event: DragEvent<HTMLDivElement>) => {
+    onDragOver: (event: DragEvent<HTMLElement>) => {
       if (!carriesFiles(event)) return;
       event.preventDefault();
       event.dataTransfer.dropEffect = blocked ? 'none' : 'copy';
     },
-    onDragLeave: (event: DragEvent<HTMLDivElement>) => {
+    onDragLeave: (event: DragEvent<HTMLElement>) => {
       if (!carriesFiles(event)) return;
       dragDepth.current = Math.max(0, dragDepth.current - 1);
       if (dragDepth.current === 0) setDragging(false);
     },
-    onDrop: (event: DragEvent<HTMLDivElement>) => {
+    onDrop: (event: DragEvent<HTMLElement>) => {
       dragDepth.current = 0;
       setDragging(false);
       if (!carriesFiles(event)) return;
       event.preventDefault();
       receive(Array.from(event.dataTransfer.files));
     },
-    onPaste: (event: ClipboardEvent<HTMLDivElement>) => {
+    onPaste: (event: ClipboardEvent<HTMLElement>) => {
       const pasted = Array.from(event.clipboardData?.files ?? []);
       if (blocked || !pasted.length) return;
       event.preventDefault();

@@ -13,20 +13,22 @@
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, Progress                                                                                                                                                                                                     |
 | [`brand-fill.ts`](#brand-fillts)                 | 브랜드 채움의 hover, press 색. 글자색에서 멀어지는 쪽으로 섞는다                      | `control-surface.ts`(solid), Calendar, TimePicker                                                                                                                                                                     |
 | [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                                       | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
+| [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer                                                                                                                                                                                       |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
 | [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
 | [`field-surface.ts`](#field-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각                      | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea                                                                                                                 |
 | [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수                         | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                                                                                                                            |
-| [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, Rating, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                               |
+| [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                                       |
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
 | [`icon-square.ts`](#icon-squarets)               | 아이콘만 있는 정사각형 컨트롤의 크기                                                  | IconButton, IconToggle                                                                                                                                                                                                |
 | [`image-status.ts`](#image-statusts)             | `<img>` 를 불러오는 상태와 hydration 전에 끝난 이미지 읽기                            | Avatar, Image                                                                                                                                                                                                         |
-| [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Image, Menu, NumberField, RadioGroup, Rating, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
+| [`keys.ts`](#keysts)                             | 위젯 키 조작을 키→동작 표로 읽는 `keyHandler`, 조합 중 입력 판정                      | Accordion, Alert, Button, Chip, ChipField, ColorField, ColorPicker, Image, Menu, NumberField, RadioGroup, Select, Slider, TimePicker, Toaster, Group, `overlay/`, `pressable.ts`, `resize-handle/`, `temporal-field/`, `text-control/`, `zoom-pan/` |
 | [`list-styles.ts`](#list-stylests)               | 팝업 안 목록의 옵션, 머리, 구분선, 검색 줄 클래스 조각                                | Select, ChipField, Menu, `field-popup/`                                                                                                                                                                               |
 | [`messages.ts`](#messagests)                     | 컴포넌트가 스스로 그리는 문구의 한국어 기본값, `IdsMessageKey`, 기본 locale           | [translate.ts](#translatets), `date-locale.ts`, 빌드(`ko.json`)                                                                                                                                                       |
 | [`motion.ts`](#motionts)                         | 움직임 줄이기 설정 읽기, `--ids-motion-*` 토큰의 ms, 시트의 easing                    | Image, `zoom-pan/` |
 | [`overlay/`](./overlay/README.md)                | 오버레이의 레이어 스택, top layer, presence, 위치 계산, modal 레이어                  | Alert, Image, `field-popup/` |
+| [`paragraph.ts`](#paragraphts)                   | `<p>` 로 그리는 Description 파트의 ref, 안에 든 블록 요소 경고                       | Card, Item, Empty, Alert, Field |
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `surface.ts`                                                                                                                                                                                                  |
 | [`resize-handle/`](./resize-handle/README.md)    | 크기 조절 손잡이의 키 표, separator ARIA, 포인터 끌기, 클래스 조각, 가장자리와 모서리 손잡이 | DataTable, Resizable, Splitter, TextArea                                                                                                                                                                                                   |
 | [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)                           | Select, ChipField, Menu                                                                                                                                                                                               |
@@ -92,12 +94,15 @@ Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
 
 ## brand-fill.ts
 
-브랜드 채움(흰 글자나 검은 글자가 올라간 테마 색 면)의 hover 와 press 색입니다. `brandFillStates` 는 `--control-fill` 과 `--control-on-fill` 에서 `--control-fill-hover`, `--control-fill-press` 를 만들고, `primaryFill` 은 두 변수를 `primary` 와 `on-primary` 로 정한 뒤 같은 상태를 더합니다.
+브랜드 채움(흰 글자나 검은 글자가 올라간 테마 색 면)의 hover 와 press 색입니다.
+
+- `primaryFill` 은 `--control-fill`, `--control-on-fill`, `--control-fill-hover`, `--control-fill-press` 를 primary 계열의 토큰(`bg-primary`, `text-on-primary`, `bg-primary-hover`, `bg-primary-active`)으로 정합니다.
+- `fillStatesAwayFromText` 는 토큰이 없는 채움(neutral scheme 의 `on-surface` 채움)에서 같은 상태를 CSS 로 만듭니다.
 
 ### 쓰는 곳
 
-- [control-surface.ts](#control-surfacets) 의 solid variant: Button, IconButton, FloatingButton
 - Calendar 의 선택한 날, TimePicker 의 선택한 옵션, Stepper 의 완료와 현재 단계 표시: `primaryFill`
+- [control-surface.ts](#control-surfacets) 의 neutral scheme: `fillStatesAwayFromText`
 
 ### 쓰는 법
 
@@ -112,13 +117,14 @@ option: [
 
 ### 왜 이렇게
 
-- hover 는 채움을 글자색의 반대쪽으로 10%, press 는 20% 섞습니다. 흰 글자 아래에서는 검정 쪽, 어두운 글자 아래에서는 흰색 쪽입니다. 그래서 쉬는 때 4.5:1 인 팔레트는 hover 와 press 에서도 4.5:1 이상입니다.
-- 반대쪽 색은 relative color syntax 로 글자색의 밝기에서 고릅니다(`oklch(from var(--control-on-fill) clamp(0, (0.5 - l) * 1000, 1) 0 0)`). 밝기 0.5 를 넘는 글자면 검정, 아니면 흰색입니다.
-- `/90` 으로 흐리면 흰 페이지 위에서 채움이 밝아집니다. 파랑 위 흰 글자가 4.46:1 로 떨어졌고 axe 가 잡았습니다.
+- hover 는 채움을 글자색의 반대쪽으로 10%, press 는 20% 섞습니다. 흰 글자 아래에서는 검정 쪽, 어두운 글자 아래에서는 흰색 쪽입니다. 그래서 쉬는 때 Lc 75 인 채움은 hover 와 press 에서도 Lc 75 이상입니다.
+- 브랜드와 상태 계열은 이 섞기를 IdsProvider 가 미리 해서 `bg-X-hover`, `bg-X-active` 로 씁니다(`theme-roles.ts` 의 `fillStatesOf`). 그래서 `tokens-contrast.test.ts` 가 그 값을 직접 잴 수 있습니다.
+- `fillStatesAwayFromText` 의 반대쪽 색은 relative color syntax 로 글자색의 밝기에서 고릅니다(`oklch(from var(--control-on-fill) clamp(0, (0.5 - l) * 1000, 1) 0 0)`). 밝기 0.5 를 넘는 글자면 검정, 아니면 흰색입니다.
+- `/90` 으로 흐리면 흰 페이지 위에서 채움이 밝아져 흰 글자의 대비가 떨어집니다.
 
 ### 알아둘 것
 
-- 섞는 비율을 줄이면 hover 가 눈에 띄지 않고, 반대 방향으로 섞으면 `tests/button.test.tsx` 의 hover 대비 테스트가 17색 x 두 모드에서 실패합니다.
+- 섞는 비율(`FILL_STATES`)을 줄이면 hover 가 눈에 띄지 않고, 반대 방향으로 섞으면 `tests/button.test.tsx` 의 hover 대비 테스트가 17색 x 두 모드에서 실패합니다.
 
 ## control-surface.ts
 
@@ -168,18 +174,19 @@ export const iconToggleStyle = tv({
 | ---------------------- | -------------------------------------------------------------------------------------------------- |
 | `--control-fill`       | solid, glossy 배경. soft 의 hover, press 가 섞어 드는 색                                           |
 | `--control-on-fill`    | solid, glossy 배경 위의 글자                                                                       |
-| `--control-soft`       | soft 배경과 켜진 soft toggle. primary 는 `secondary`, 나머지는 scheme 색 10% (투명)                |
-| `--control-on-soft`    | soft 글자. primary 는 `on-secondary`, neutral 은 `on-surface`, status 는 `-strong` 색              |
-| `--control-soft-hover` | soft 의 hover 배경. `--control-soft` 에 `--control-fill` 6% 를 섞는다. `base` 가 정한다            |
-| `--control-soft-press` | soft 의 press 배경. `--control-fill` 12%. `base` 가 정한다                                         |
-| `--control-quiet`      | outline, ghost 글자. primary 와 neutral 은 `on-surface`, 나머지는 `-strong` 색                     |
-| `--control-hover`      | outline, ghost 의 hover 배경. `muted`, 또는 status 색 10%                                          |
-| `--control-press`      | outline, ghost 의 press 배경과 켜진 ghost, outline toggle. `muted-hover`, 또는 status 색 16%       |
-| `--control-ring`       | focus ring 과 focus 때의 테두리. neutral 도 primary                                                |
+| `--control-soft`       | soft 배경과 켜진 soft toggle. 계열의 `bg-X-soft`                                                   |
+| `--control-on-soft`    | soft 글자. 계열의 `text-on-X-soft`                                                                 |
+| `--control-soft-hover` | soft 의 hover 배경. 계열의 `bg-X-soft-hover`                                                       |
+| `--control-soft-press` | soft 의 press 배경. 계열의 `bg-X-soft-active`                                                      |
+| `--control-quiet`      | outline, ghost 글자. 브랜드와 neutral 은 `on-surface`, 상태는 `text-X`                              |
+| `--control-on-press`   | 켜진 outline, ghost toggle 글자. 브랜드와 neutral 은 `on-surface`, 상태는 `text-on-X-soft`          |
+| `--control-hover`      | outline, ghost 의 hover 배경. 브랜드와 neutral 은 `bg-neutral-soft`, 상태는 `bg-X-soft`             |
+| `--control-press`      | outline, ghost 의 press 배경과 켜진 ghost, outline toggle. 한 단계 위(`-soft-hover`)               |
+| `--control-ring`       | focus ring 과 focus 때의 테두리. 계열의 `border-X`, neutral 은 `border-primary`                    |
 
 - outline 과 ghost 는 중립 상태 사다리를 따릅니다. hover 는 `--control-hover`, press 는 한 단계 진한 `--control-press` 입니다. solid 는 [brand-fill.ts](#brand-fillts) 의 `--control-fill-hover`, `--control-fill-press` 라 사다리 밖이고, glossy 는 색 대신 광택과 그림자로 상태를 보입니다.
-- soft 는 `secondary` 위 `on-secondary` 짝입니다. hover 와 press 는 배경에 채움 색을 6%, 12% 섞어 한 단계씩 진해집니다. `on-secondary` 는 이 두 배경에서도 4.5:1 을 지키는 단계라, 섞는 비율을 올리면 `tests/tokens-contrast.test.ts` 가 실패합니다. 테스트는 이 파일에서 비율을 읽습니다.
-- soft 의 hover, press 변수는 `base` 에서 정합니다. custom property 안의 `var()` 는 그 요소에서 풀리므로, 같은 요소에 붙는 scheme 의 `--control-soft` 를 따라갑니다.
+- soft 는 `bg-X-soft` 위 `text-on-X-soft` 짝입니다. hover 와 press 는 IdsProvider 가 배경에 채움 색을 6%, 12% 섞어 둔 `bg-X-soft-hover`, `bg-X-soft-active` 입니다. `text-on-X-soft` 는 이 두 배경에서도 Lc 75 를 지키는 단계라, `SOFT_TINTS` 를 올리면 `tests/tokens-contrast.test.ts` 가 실패합니다.
+- scheme 은 primary, secondary, tertiary, neutral, danger, success, warning, info 입니다. 테마가 secondary 나 tertiary 를 주지 않아도 IdsProvider 가 primary 에서 만든 값을 쓰므로 변수는 늘 정의됩니다.
 - `glossy` 는 solid 의 채움(`--control-fill`) 위에 층을 얹습니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택(`background-image` 라 채움 색 위에 그려진다), 안쪽 위 1px 하이라이트(`inset-shadow`), 채움보다 20% 진한 가장자리(`inset-ring` 의 `color-mix`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다. focus 때는 `ringFollowsScheme` 이 가장자리를 `--control-ring` 으로 바꿉니다. outline 과 같은 방식입니다.
 - scheme 색은 solid, soft, glossy 만 씁니다. outline 과 ghost 는 primary 에서도 neutral 이고, 브랜드 색은 focus 에 남깁니다. shadcn/ui 가 primary 버튼 옆의 보조 버튼을 조용하게 두는 방식입니다.
 - `base` 에는 primary 의 변수를 담은 `fallbackScheme` 이 들어 있습니다. `colorScheme` 을 받지 않는 컴포넌트도 scheme 변수가 모두 정의돼야 하기 때문입니다. `colorScheme` 을 주면 `cn` 이 같은 변수의 뒤쪽 값만 남깁니다.
@@ -195,6 +202,41 @@ export const iconToggleStyle = tv({
 - scheme 을 더하면 일곱 변수를 모두 정의합니다. 빠진 변수는 `fallbackScheme` 의 primary 값으로 남습니다.
 - `schemes` 는 `satisfies Record<ControlColorScheme, string>` 이라 `ControlColorScheme` 과 `schemes` 중 한쪽만 고치면 타입 검사가 실패합니다.
 - 아이콘만 있는 컨트롤은 `size` 대신 `iconSquare.size` 를 씁니다. `size` 의 padding 과 trim 이 정사각형을 깹니다.
+
+## corner-shape.ts
+
+모서리 하나의 계산된 `corner-*-shape` 를 초타원 지수로 바꿉니다. 테마의 `cornerShape: 'squircle'` 에서 모서리를 따라 그리는 코드가 원 대신 초타원을 쓰게 합니다.
+
+### 쓰는 곳
+
+- `resize-handle/`: `endEndCornerExponent` 가 끝 아래 모서리의 지수를 읽고, `gripArc` 가 그 초타원을 따라 손잡이를 그립니다.
+- ScrollArea: `geometry.ts` 가 위 왼쪽 모서리의 지수로 막대 끝을 곡선에서 띄웁니다.
+- Image: `flip.ts` 가 뷰어를 열고 닫을 때 썸네일 모서리 모양으로 자릅니다(`insetClipPath`).
+- Drawer: `background-scale.ts` 가 뒤 페이지를 squircle 로 자르고, 반지름에 `cornerRadiusScale` 을 곱합니다.
+
+### 쓰는 법
+
+```ts
+const style = getComputedStyle(element);
+cornerExponent(style, 'bottom-right'); // round 2, squircle 4, superellipse(k) 2^k
+cornerRadiusScale(style); // --ids-corner-radius-scale, squircle 을 그리는 브라우저에서 1.84
+
+insetClipPath({ width, height }, { top, right, bottom, left }, radius, exponent);
+// 지수 2: inset(... round r), 그 밖: 같은 자리를 초타원 모서리로 도는 path()
+```
+
+### 왜 이렇게
+
+- CSS 의 `superellipse(k)` 는 `|x|ⁿ + |y|ⁿ = 1` 에서 `n = 2^k` 입니다. `round` 는 `k = 1`(원), `squircle` 은 `k = 2` 입니다.
+- 브라우저는 키워드를 그대로 두기도 하고 `superellipse(2)` 로 풀기도 해서, 둘 다 읽습니다.
+- `clip-path` 의 `inset(... round)` 는 `corner-shape` 를 따르지 않고 늘 원입니다. 그래서 squircle 은 모서리마다 초타원 4분의 1 을 16 토막의 직선으로 도는 `path()` 로 자릅니다.
+- `path()` 는 반지름이 0 이어도 같은 명령 수를 냅니다. 두 값 사이를 `transition` 과 Web Animations 가 점마다 보간합니다.
+- `k < 1`(안으로 파인 모서리, `bevel`, `notch`, `scoop`)과 읽지 못한 값은 원으로 둡니다. IDS 테마는 `round` 와 `squircle` 만 씁니다.
+
+### 알아둘 것
+
+- `corner-shape` 를 모르는 브라우저는 값이 비어 있어 원(2)을 돌려줍니다. 그 브라우저는 모서리도 원으로 그립니다.
+- 지수 계산을 바꾸면 Resizable, TextArea 의 모서리 손잡이와 ScrollArea 막대 끝이 함께 바뀝니다.
 
 ## date-locale.ts
 
@@ -330,7 +372,7 @@ size: {
 
 ### 왜 이렇게
 
-- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 테두리와 surface 배경, `soft` 는 muted 배경, `ghost` 는 배경과 테두리가 없습니다.
+- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 테두리와 surface 배경, `soft` 는 `bg-neutral-soft` 배경, `ghost` 는 배경과 테두리가 없습니다.
 - focus 와 invalid 색은 여기서 정하지 않습니다. `focus-ring` 이 이 파일이 그린 `inset-ring` 테두리의 색을 바꾸므로 그 상태를 되풀이해 적지 않습니다.
 - `soft` 와 `ghost` 도 투명한 `inset-ring-1` 을 그립니다. `focus-ring` 은 inset ring 의 색만 바꾸므로, 폭이 있는 inset ring 이 있어야 focus 와 invalid 테두리가 보입니다.
 - `fieldAction` 은 상자 안의 버튼(Clear, 보기 버튼, stepper, 달력 버튼)입니다. standard 는 36px 상자에 28px(`size-7`), tiny 는 32px 상자에 24px(`size-6`)라서 위아래로 4px 씩 남습니다. 양 끝의 버튼도 테두리에서 4px 떨어지도록 geometry 가 두 가지입니다.
@@ -398,10 +440,10 @@ native input 이 없는 컨트롤(버튼 trigger, listbox, 버튼으로 그린 �
 
 ### 쓰는 곳
 
-- 값(`name`)과 `required`: Select, ChipField, ColorField, Rating, ToggleGroup, [temporal-field](./temporal-field/README.md)
+- 값(`name`)과 `required`: Select, ChipField, ColorField, ToggleGroup, [temporal-field](./temporal-field/README.md)
 - 값만: Slider
 - `required` 만: CheckboxGroup, FileField. 값은 각 Checkbox 와 `<input type="file">` 이 이미 FormData 에 넣습니다.
-- `message`: CheckboxGroup, Rating (`requiredMessage` prop)
+- `message`: CheckboxGroup (`requiredMessage` prop)
 
 ### 쓰는 법
 
@@ -582,7 +624,7 @@ useImageSettledBeforeMount(imageRef, current, report);
 
 ### 쓰는 곳
 
-- 위젯의 키: Group 의 roving focus(ToggleGroup, Tabs), RadioGroup, Rating, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape, Carousel([slides/](#slides) 의 `moveWithKeys`), Image 의 뷰어(←/→ 는 `dir` 로 뒤집고, `Home` `End`)
+- 위젯의 키: Group 의 roving focus(ToggleGroup, Tabs), RadioGroup, Slider, NumberField, ColorPicker(영역, 입력), TimePicker(열), Select, ChipField(입력, 칩), Menu(명령 팔레트, 항목, 목록의 Tab), Accordion, Chip, ColorField, Alert, Toaster 영역의 Escape, Carousel([slides/](#slides) 의 `moveWithKeys`), Image 의 뷰어(←/→ 는 `dir` 로 뒤집고, `Home` `End`)
 - [pressable.ts](#pressablets) 와 Button 의 Enter, Space
 - [text-control](./text-control/README.md) 의 Escape, [temporal-field](./temporal-field/README.md) 의 입력과 trigger
 - [overlay](./overlay/README.md) 의 레이어 스택: `keyWithModifiers('Escape')`, `isComposingKey`
@@ -660,8 +702,8 @@ slots: {
 
 ### 왜 이렇게
 
-- 옵션 강조는 메뉴처럼 neutral hover 단계인 `muted` 배경(`data-highlighted`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
-- 옵션에는 누르는 상태가 없어 강조가 한 단계뿐입니다. Menu 에서 하위 메뉴가 열린 항목(`data-popup-open`)은 켜진 toggle 처럼 press 단계(`muted-hover`)라, 포인터가 하위 메뉴로 옮겨 가도 강조된 항목과 구별됩니다.
+- 옵션 강조는 메뉴처럼 neutral hover 단계인 `bg-neutral-soft` 배경(`data-highlighted`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
+- 옵션에는 누르는 상태가 없어 강조가 한 단계뿐입니다. Menu 에서 하위 메뉴가 열린 항목(`data-popup-open`)은 켜진 toggle 처럼 press 단계(`bg-neutral-soft-hover`)라, 포인터가 하위 메뉴로 옮겨 가도 강조된 항목과 구별됩니다.
 - 옵션은 체크가 없어도 끝 padding(`pe-8`)을 비워 둡니다. 체크가 나타날 때 라벨이 밀리지 않습니다.
 - `list` 는 옵션의 스크롤 컨테이너입니다. 키보드 이동이 팝업이 아니라 이 목록을 스크롤합니다. `relative` 라 옵션의 offset parent 입니다(`offsetParentOfOptions`). field-popup 의 `revealPopupOption` 이 옵션 위치를 `offsetTop` 으로 읽습니다.
 - `listArea` 는 목록을 감싸는 `ScrollArea` 의 root 이고, `list` 는 `ScrollArea.Viewport asChild` 로 listbox 자신이 스크롤 요소가 됩니다. 옵션과 listbox 사이에 요소가 끼지 않아 위의 offset parent 와 `scrollTop` 이 그대로입니다.
@@ -684,7 +726,7 @@ slots: {
 
 - [translate.ts](#translatets): 앱의 `translate` 가 답하지 않을 때 `formatDefaultMessage` 로 기본값을 채웁니다.
 - [date-locale.ts](#date-localets): `DEFAULT_LOCALE`(`'ko-KR'`).
-- `vite.config.ts`: 빌드 때 `messages` 를 `dist/messages/ko.json` 으로 씁니다. `messages/en.json` 은 손으로 쓴 영어 카탈로그이고 같은 곳으로 복사됩니다.
+- `vite.config.ts`: 빌드 때 `messages` 를 `dist/messages/ko.json` 으로 씁니다. `messages/en.json` 은 core에서 생성한 영어 카탈로그이고 같은 곳으로 복사됩니다.
 - `src/index.ts`: 앱이 쓰는 `IdsMessageKey`, `IdsMessageValues` 타입.
 
 ### 쓰는 법
@@ -709,7 +751,7 @@ formatDefaultMessage('calendar.weekNumber', { week: 3 }); // '3주차'
 
 ### 알아둘 것
 
-- 새 문구는 컴포넌트 이름의 그룹 아래, 알파벳 자리에 넣고, `messages/en.json` 의 같은 자리에 영어를 씁니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
+- 새 문구는 `packages/core/messages/ko.json`의 컴포넌트 그룹 아래 알파벳 자리에 넣고, `packages/core/messages/en.json`의 같은 자리에 영어를 씁니다. `pnpm codegen`이 `messages-catalog.ts`와 `messages/en.json`을 생성합니다. 키를 코드에서 문자열 그대로 쓰거나(`t('dialog.close')`) 같은 그룹의 template literal(`` t(`kbd.${label}`) ``)로 써야 "쓰지 않는 키" 테스트를 통과합니다.
 - 문구를 컴포넌트 안에 한국어 문자열로 직접 쓰지 않습니다. 컴포넌트 코드에 한국어 문자열이 있으면 `tests/messages.test.ts` 가 실패합니다.
 - 개발 경고(`[IDS] ...`)는 영어로 두고 여기에 넣지 않습니다. 사용자가 보는 문구만 넣습니다.
 
@@ -739,6 +781,37 @@ content.animate(keyframes, { duration: motionDuration(content, 'normal'), easing
 - CSS transition 은 `motion-reduce:` 변형과 `duration-(--ids-motion-*)` 로 규칙을 따르지만, `element.animate()` 는 CSS 를 거치지 않습니다. 그래서 같은 설정과 같은 토큰을 JS 에서 읽습니다.
 - 토큰은 요소의 계산된 스타일에서 읽습니다. 앱이 `--ids-motion-*` 를 바꾸면 JS 애니메이션도 따라갑니다. CSS 패키지를 불러오지 않은 곳에서는 토큰의 기본값(150, 250, 400ms)을 씁니다.
 - 설정은 부를 때마다 읽습니다. 열려 있는 동안 사용자가 설정을 바꿔도 다음 움직임부터 따릅니다.
+
+## paragraph.ts
+
+`<p>` 로 그리는 Description 파트가 쓰는 hook(`useParagraphRef`)입니다. 사용자의 `ref` 와 합친 ref 를 돌려주고, 개발 빌드에서 그 `<p>` 안에 블록 요소가 있으면 한 번 경고합니다.
+
+### 쓰는 곳
+
+- Card.Description, Item.Description, Empty.Description, Alert.Description, Field.Description
+
+### 쓰는 법
+
+```tsx
+// components/data/card/description.tsx
+export function CardDescription({ asChild, className, ref, ...props }: CardDescriptionProps) {
+  const paragraphRef = useParagraphRef('Card.Description', ref);
+  const Root = asChild === true ? Slot : 'p';
+  return <Root {...props} ref={paragraphRef} /* ... */ />;
+}
+```
+
+### 왜 이렇게
+
+- `<p>` 는 블록 요소를 담지 못합니다. 서버 HTML 을 읽는 브라우저는 `<div>` 같은 태그에서 `<p>` 를 닫아 버려, 클라이언트가 만든 트리와 어긋나고 hydration 이 깨집니다. 클라이언트에서만 그리면 DOM 에는 그대로 들어가 조용히 넘어가므로, 개발 빌드에서 먼저 알립니다.
+- 찾는 태그(`CLOSES_A_PARAGRAPH`)는 HTML 파서가 열린 `<p>` 를 닫는 태그 목록입니다. `<span>`, `<a>`, `<strong>` 처럼 문장 안에 들어가는 요소는 경고하지 않습니다.
+- 검사는 렌더마다 effect 에서 DOM 을 봅니다. 컴포넌트가 그리는 `<div>` 도 찾으려면 React 요소가 아니라 그려진 결과를 봐야 합니다. 경고는 요소마다 한 번입니다.
+- `asChild` 로 다른 태그를 넣으면 그 요소가 `<p>` 가 아니라 검사하지 않습니다. `asChild` 로 넣은 `<p>` 는 검사합니다.
+
+### 알아둘 것
+
+- 경고는 `isDevelopment` 로만 켭니다([utils/README](../utils/README.md#devts)).
+- 돌려주는 ref 는 `ref` 가 바뀔 때만 새로 만듭니다. 렌더마다 새 함수를 주면 React 가 ref 를 떼었다 다시 붙입니다.
 
 ## pressable.ts
 
@@ -786,13 +859,14 @@ const press = usePressable<HTMLElement>({
 
 ## search-text.ts
 
-검색어로 항목을 거르는 글자 비교입니다. React 자식에서 글자를 뽑는 `textOf`, 비교용으로 글자를 고르는 `normalizeText`, 들어 있는지 보는 `matchesSearch` 가 있습니다.
+검색어로 항목을 거르는 글자 비교입니다. React 자식에서 글자를 뽑는 `textOf`, 비교용으로 글자를 고르는 `normalizeText`, 들어 있는지 보는 `matchesSearch`, 맞은 구간을 찾는 `matchRanges` 와 그 구간으로 글을 나누는 `searchChunks` 가 있습니다.
 
 ### 쓰는 곳
 
 - Select: `select-options.ts` 의 `collectOptions`(`textOf`), `matchesQuery`, `typeaheadIndex`
 - ChipField: `chip-values.ts` 의 같은 값 판정(`normalizeText`), 제안 거르기(Select 의 `matchesQuery`)
 - Menu: 명령 팔레트 항목의 거르기(`use-command.ts` 의 `useCommandOption`)
+- Highlight: 맞은 부분을 `<mark>` 로 나누기(`searchChunks`, `textOf`)
 
 ### 쓰는 법
 
@@ -802,6 +876,10 @@ const visible = matchesSearch(textValue ?? textOf(children), palette.query);
 
 // components/form/select/select-options.ts
 export const matchesQuery = (option, query) => matchesSearch(option.search, query);
+
+// components/typography/highlight/root.tsx
+searchChunks('Café ＧＩＳＴ', ['cafe', 'gist']);
+// [{ text: 'Café', match: true }, { text: ' ', match: false }, { text: 'ＧＩＳＴ', match: true }]
 ```
 
 ### 왜 이렇게
@@ -809,12 +887,16 @@ export const matchesQuery = (option, query) => matchesSearch(option.search, quer
 - `NFD` 로 나눠 결합 악센트(`U+0300`–`U+036F`)를 지운 뒤 `NFKC` 로 다시 묶습니다. `é` 는 `e` 가 되고, 전각 `Ａ` 는 `A` 가 되고, 한글 음절은 다시 음절로 돌아와 그대로 비교됩니다.
 - 대소문자는 `toLocaleLowerCase` 로 맞춥니다.
 - 빈 검색어(공백만 포함)는 모두와 맞습니다.
+- `matchRanges` 는 글을 grapheme 마다 `normalizeText` 로 접고, 접은 글자마다 원래 grapheme 의 위치를 적어 둡니다. 접은 글에서 찾은 구간을 그 위치로 되돌리므로, 길이가 바뀌는 접기(`ﬁ` → `fi`, `é` 를 `e` + 결합 악센트로 적은 글)에서도 구간이 원래 글자 경계에 떨어집니다.
+- 찾기는 `indexOf` 라 정규식 기호를 글자로 다룹니다. 한 칸씩 밀며 찾고, 겹치거나 맞닿은 구간은 하나로 합칩니다.
+- grapheme 은 `Intl.Segmenter` 로 나누고, 없는 환경에서는 코드 포인트로 나눕니다.
 
 ### 알아둘 것
 
 - `textOf` 는 React 트리의 문자열 자식만 읽습니다. 글자를 스스로 그리는 컴포넌트 안의 글자는 보지 못하므로, 그런 항목은 `textValue`(Menu), `label`/`searchValue`(Select)를 받습니다.
 - 한글 자모 하나(`ㅅ`)는 음절(`설`)의 일부로 맞지 않습니다. 초성 검색은 하지 않습니다.
-- 비교를 바꾸면 Select, ChipField, Menu 의 거르기와 ChipField 의 중복 판정이 함께 바뀝니다.
+- 비교를 바꾸면 Select, ChipField, Menu 의 거르기, ChipField 의 중복 판정, Highlight 의 칠하기가 함께 바뀝니다. `tests/search-text.test.ts` 는 `matchRanges` 가 `matchesSearch` 와 같은 판정을 내는지 봅니다.
+- `searchChunks` 의 조각을 이어 붙이면 언제나 받은 글과 같습니다. 서버와 클라이언트가 같은 HTML 을 내려면 이 함수는 순수해야 합니다.
 
 ## slider-surface.ts
 
@@ -829,11 +911,11 @@ export const matchesQuery = (option, query) => matchesSearch(option.search, quer
 
 ```tsx
 // components/form/slider/style.ts
-track: [sliderSurface.edge, 'relative rounded-full bg-(--ids-color-muted)'],
+track: [sliderSurface.edge, 'relative rounded-full bg-neutral-soft'],
 thumb: [
   sliderSurface.thumb,
   'group/thumb absolute block size-(--slider-thumb)',
-  'bg-(--ids-color-primary) group-data-invalid/slider:bg-(--ids-color-danger)',
+  'bg-primary group-data-invalid/slider:bg-danger',
 ],
 ```
 
@@ -1098,12 +1180,13 @@ export const toggleStyle = tv({
 
 | variant            | 켜짐(`data-pressed`)                                                     |
 | ------------------ | ------------------------------------------------------------------------ |
-| `ghost`, `outline` | neutral press 배경(`--control-press`)                                    |
+| `ghost`, `outline` | press 배경(`--control-press`)과 `--control-on-press` 글자                 |
 | `soft`             | `--control-soft` 배경과 `--control-on-soft` 글자                         |
 | `solid`            | scheme 배경과 `--control-on-fill` 글자, `shadow-xs`                      |
 | `glossy`           | scheme 배경과 `--control-on-fill` 글자, 광택, 진한 가장자리, `shadow-sm` |
 
 - 색은 [control-surface.ts](#control-surfacets) 의 scheme 변수에서 옵니다.
+- 켜진 `ghost`, `outline` 의 글자는 `--control-on-press` 입니다. 브랜드와 neutral scheme 은 press 배경이 중립이라 `on-surface`, 상태 scheme 은 press 배경이 `bg-X-soft-hover` 라 `text-on-X-soft` 입니다. `text-X` 는 바탕과 `bg-X-soft` 에서만 Lc 60 이 보장되므로, 밝은 warning 은 soft-hover 위에서 모자랍니다.
 - 켜진 `glossy` 는 control-surface 의 `glossy` 층을 `data-pressed:` 로 하나씩 풀어 적습니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 접두사를 붙여 조합할 수 없습니다.
 - 크기는 따로 두지 않습니다. 라벨이 있는 Toggle 은 Button 과 같은 padding 을 갖고, IconToggle 은 icon-square 로 정사각형이 됩니다.
 - hovered, active, pressed 를 각각 적습니다. `interactiveDataProps` 가 셋 중 하나만 붙이므로(pressed > active > hovered), 켜진 toggle 에 마우스를 올려도 켜진 모양이 유지됩니다.
@@ -1111,7 +1194,7 @@ export const toggleStyle = tv({
 
 ### 알아둘 것
 
-- 꺼진 outline 은 `bg-transparent` 입니다. Button 의 outline(`bg-(--ids-color-surface)`)과 다릅니다.
+- 꺼진 outline 은 `bg-transparent` 입니다. Button 의 outline(`bg-surface`)과 다릅니다.
 
 ## translate.ts
 

@@ -105,7 +105,7 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 </TextArea>
 ```
 
-- 바는 구분선으로 입력과 나뉘고, 비어 있으면 구분선까지 접힙니다.
+- 바는 구분선으로 입력과 나뉘고, 비어 있으면 구분선까지 접힙니다. `divided={false}` 면 구분선 없이 입력과 한 면으로 이어집니다.
 - 바 안의 버튼은 높이 28px(tiny 24px)로 줄어듭니다. 아이콘 버튼은 정사각형입니다.
 - 양 끝의 버튼 묶음은 버튼 여백만큼 바깥으로 당겨져서, 아이콘이 입력한 글자와 같은 선에 섭니다.
 
@@ -188,6 +188,7 @@ import { Field, TextArea } from '@gsainfoteam/ids-react';
 | `autoResize`             | `true`. 내용에 맞춰 높이 조절                                         |
 | `rows`                   | `3`. `minRows` 를 생략하면 최소 높이                                  |
 | `minRows` / `maxRows`    | 양의 정수. `maxRows` 를 넘으면 스크롤                                 |
+| `divided`                | `true`. `false` 면 바와 입력 사이의 구분선을 그리지 않는다            |
 | `resize`                 | `autoResize={false}` 일 때만. `vertical`(기본). Resizable 과 같은 손잡이로 바꾼다 |
 | `className` / `style`    | 컨테이너로 간다. 상태를 받는 함수도 된다. Input에 주면 textarea로 간다 |
 | 그 외 native 속성, ref    | 실제 textarea로 간다                                                  |

@@ -1,4 +1,26 @@
-export { IdsProvider, ThemeContext, useTheme } from './components/utility/ids-provider';
+export {
+  IdsProvider,
+  ThemeContext,
+  checkIdsTheme,
+  createIdsPalette,
+  defineIdsTheme,
+  useTheme,
+} from './components/utility/ids-provider';
+export type {
+  IdsBrandFamily,
+  IdsColorFamily,
+  IdsCornerShape,
+  IdsNeutral,
+  IdsPalette,
+  IdsPaletteStep,
+  IdsStatus,
+  IdsStatusColors,
+  IdsStatusFamily,
+  IdsTheme,
+  IdsThemeColor,
+  IdsThemeIssue,
+  IdsThemeOverrides,
+} from './components/utility/ids-provider';
 
 export {
   useInteractive,
@@ -27,6 +49,7 @@ export { Slot } from './components/utility/slot';
 export { Card } from './components/data/card';
 export { Chip } from './components/data/chip';
 export { Badge } from './components/data/badge';
+export { Bubble } from './components/data/bubble';
 export { Alert } from './components/feedback/alert';
 export { Dialog } from './components/overlay/dialog';
 export { Drawer } from './components/overlay/drawer';
@@ -57,6 +80,7 @@ export { Empty } from './components/data/empty';
 export { Image } from './components/data/image';
 export type { ImageGroupLayout, ImageViewerItem } from './components/data/image';
 export { QRCode } from './components/data/qr-code';
+export { CodeBlock } from './components/data/code-block';
 export { Marquee } from './components/data/marquee';
 export type { MarqueeOrientation, MarqueeSpeed } from './components/data/marquee';
 export { Table } from './components/data/table';
@@ -98,8 +122,11 @@ export type { TextAreaProps, TextAreaVariant } from './components/form/text-area
 export { Spinner } from './components/feedback/spinner';
 export { Progress } from './components/feedback/progress';
 export { Skeleton } from './components/feedback/skeleton';
+export { Marker } from './components/feedback/marker';
 export { Label } from './components/typography/label';
+export { Highlight } from './components/typography/highlight';
 export { Kbd } from './components/typography/kbd';
+export { Link } from './components/typography/link';
 
 export { Pagination } from './components/navigation/pagination';
 
@@ -107,6 +134,7 @@ export { Divider } from './components/layout/divider';
 export { Spacer } from './components/layout/spacer';
 export { AspectRatio } from './components/layout/aspect-ratio';
 export { ScrollArea } from './components/layout/scroll-area';
+export { MessageScroller } from './components/layout/message-scroller';
 export { Resizable } from './components/layout/resizable';
 export type { ResizableProps } from './components/layout/resizable';
 export { Splitter } from './components/layout/splitter';
@@ -129,8 +157,10 @@ export type {
 } from './components/navigation/tabs';
 export { Stepper } from './components/navigation/stepper';
 export type { StepperOrientation, StepperStatus } from './components/navigation/stepper';
+export { Sidebar } from './components/navigation/sidebar';
+export type { SidebarCollapsibleMode, SidebarVariant } from './components/navigation/sidebar';
 
-export type { IdsColor, IdsMode, IdsSize, IdsVariant } from './tokens/types';
+export type { IdsMode, IdsSize, IdsVariant } from './tokens/types';
 export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
 export type { IdsTranslate } from './internal/translate';
 
@@ -153,6 +183,14 @@ export type { OTPFieldProps, OTPFieldVariant, OTPFieldPattern } from './componen
 
 export { Select } from './components/form/select';
 export type { SelectProps, SelectVariant } from './components/form/select';
+
+export { PromptInput } from './components/form/prompt-input';
+export type {
+  PromptInputMessage,
+  PromptInputProps,
+  PromptInputStatus,
+  PromptInputVariant,
+} from './components/form/prompt-input';
 
 export { TelField } from './components/form/tel-field';
 export type { TelFieldProps, TelFieldFormat } from './components/form/tel-field';

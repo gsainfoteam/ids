@@ -5,10 +5,21 @@ import {
   XCircleIcon,
 } from '@heroicons/react/16/solid';
 
-export type StatusColorScheme = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+export type StatusColorScheme =
+  | 'neutral'
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'danger';
 
 export const statusIcons = {
   neutral: InformationCircleIcon,
+  primary: InformationCircleIcon,
+  secondary: InformationCircleIcon,
+  tertiary: InformationCircleIcon,
   info: InformationCircleIcon,
   success: CheckCircleIcon,
   warning: ExclamationTriangleIcon,

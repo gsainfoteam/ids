@@ -13,11 +13,8 @@ const idsVar = (prefix, t) => `--ids-${prefix}-${slug(t)}`;
 const toCamel = (str) =>
   str.replace(/-([a-zA-Z0-9]+)/g, (_, s) => s.charAt(0).toUpperCase() + s.slice(1));
 const enumName = (key) => `Ids${key.charAt(0).toUpperCase() + key.slice(1)}`;
-const mapName = (color, mode) =>
-  `_${color}${mode.charAt(0).toUpperCase() + mode.slice(1)}`;
-
 const hexToFlutterColor = (hex) =>
-  `Color(0xFF${hex.replace("#", "").toUpperCase()})`;
+  `const Color(0xFF${hex.replace("#", "").toUpperCase()})`;
 
 const render = (template, vars) =>
   Object.entries(vars).reduce(
@@ -109,16 +106,28 @@ const parseEnums = (dictionary) => {
   return result;
 };
 
-const colorPairs = [
-  ...new Map(
-    readdirSync("./tokens/semantic").flatMap((f) => {
-      const m = f.match(/^([^.]+)\.(light|dark)\.json$/);
-      return m && m[1] !== "neutral" && m[1] !== "status"
-        ? [[`${m[1]}.${m[2]}`, [m[1], m[2]]]]
-        : [];
-    }),
-  ).values(),
-];
+const COLOR_ROLES = JSON.parse(readFileSync("./color-roles.json", "utf8"));
+
+const COLOR_FAMILIES = Object.values(COLOR_ROLES.families).flat();
+
+const slotsOf = (family) =>
+  Object.entries(COLOR_ROLES.slots).flatMap(([property, names]) =>
+    names.map((name) => ({
+      property,
+      name: name.replaceAll("{family}", family),
+      slot: `${property}-${name.replaceAll("{family}", family)}`,
+    })),
+  );
+
+const FAMILY_SLOTS = COLOR_FAMILIES.flatMap((family) =>
+  slotsOf(family).map((entry) => ({ ...entry, family })),
+);
+
+const BASE_SLOTS = Object.keys(COLOR_ROLES.base);
+
+const colorVar = (slot) => `--ids-color-${slot}`;
+
+const themeVar = (mode, slot) => `--ids-theme-${mode}-${slot}`;
 
 const TW_NS = {
   color: "--color-",
@@ -153,7 +162,7 @@ const TYPOGRAPHY_CATS = [
 ];
 const TYPOGRAPHY_CATS_TAILWIND_HAS_NO_THEME_FOR = ["font-size-adjust"];
 
-const T_CSS_THEME = `@theme {
+const T_CSS_THEME = `@theme inline {
 {{THEME}}
 }
 `;
@@ -162,7 +171,7 @@ const T_CSS_THEME_ROOT = `:root {
 {{ROOT}}
 }
 
-@theme {
+@theme inline {
 {{THEME}}
 }
 `;
@@ -185,32 +194,6 @@ abstract final class {{NAME}} {
 }
 `;
 
-const T_DART_IDS_TOKENS = `${GENERATED}
-
-import 'package:flutter/material.dart';
-import 'ids_enums.dart';
-
-class IdsTokens {
-  IdsTokens._();
-
-  static Color resolve({
-    required IdsColor color,
-    required IdsMode mode,
-    required String token,
-  }) {
-    return switch ((color, mode)) {
-{{CASES}}
-    };
-  }
-
-{{MAPS}}
-}
-`;
-
-const T_DART_COLOR_MAP = `  static const {{NAME}} = <String, Color>{
-{{ENTRIES}}
-  };`;
-
 const T_DART_ENUM = `enum {{NAME}} {
 {{VALUES}},
 }`;
@@ -232,19 +215,16 @@ const T_CSS_TEXT_ROOT = `  --ids-text-{{NAME}}: {{FONT_SIZE}};
 
 const T_DART_TEXT_STYLE = `TextStyle(fontFamily: '{{FONT_FAMILY}}', package: '{{FONT_PACKAGE}}', fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
 
-const buildColorBridgeCSS = (dictionary) => {
-  const seen = new Set();
-  const theme = dictionary.allTokens
-    .filter((t) => {
-      if (t.attributes?.category !== "color" || t.path[0] === "ids")
-        return false;
-      if (seen.has(slug(t))) return false;
-      seen.add(slug(t));
-      return true;
-    })
-    .map((t) => `  ${TW_NS.color}${slug(t)}: var(${idsVar("color", t)});`)
-    .join("\n");
-  return render(T_CSS_THEME, { THEME: theme });
+const buildColorBridgeCSS = () => {
+  const base = Object.entries(COLOR_ROLES.base).flatMap(([slot, namespaces]) =>
+    namespaces.map((namespace) => `  ${namespace}-${slot}: var(${colorVar(slot)});`),
+  );
+  const families = FAMILY_SLOTS.flatMap(({ property, name, slot }) =>
+    COLOR_ROLES.namespaces[property].map(
+      (namespace) => `  ${namespace}-${name}: var(${colorVar(slot)});`,
+    ),
+  );
+  return render(T_CSS_THEME, { THEME: [...base, ...families].join("\n") });
 };
 
 const buildStaticCSS = (dictionary) => {
@@ -254,7 +234,7 @@ const buildStaticCSS = (dictionary) => {
   const roundedUsesIdsRadius = byCategory(dictionary, "radius").map(
     (t) => `  --radius-${slug(t)}: var(${idsVar("radius", t)});`,
   );
-  return `:root {\n${lines.join("\n")}\n}\n\n@theme {\n${roundedUsesIdsRadius.join("\n")}\n}\n`;
+  return `:root {\n${lines.join("\n")}\n}\n\n@theme inline {\n${roundedUsesIdsRadius.join("\n")}\n}\n`;
 };
 
 const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
@@ -280,7 +260,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 
 @keyframes ids-skeleton-pulse {
   50% {
-    background-color: var(--ids-color-muted-hover);
+    background-color: var(--ids-color-bg-neutral-soft-hover);
   }
 }
 
@@ -291,6 +271,15 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
   60%,
   to {
     background-position: 200% 0;
+  }
+}
+
+@keyframes ids-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
   }
 }
 
@@ -316,8 +305,6 @@ const T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES = `@theme inline {
 const darkModeRegion = `[data-mode="dark"], [data-mode="dark"] *`;
 const lightRegionInsideDark = `[data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *`;
 
-const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:where(${lightRegionInsideDark})));
-`;
 
 const focusedInsideButNotInItsPopups = (marker) =>
   `&:has([${marker}]:focus-visible):not(:has([popover] [${marker}]:focus-visible))`;
@@ -333,25 +320,58 @@ const FOCUS_RING_TRIGGERS = {
 const focusRingTriggers = (indent) =>
   Object.values(FOCUS_RING_TRIGGERS).join(`,\n${indent}`);
 
+const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:where(${lightRegionInsideDark})));
+
+@custom-variant focus-ring-visible {
+  ${focusRingTriggers("  ")} {
+    @slot;
+  }
+}
+`;
+
 const T_CSS_UTILITIES = `@utility focus-ring {
   outline: none;
 
   ${focusRingTriggers("  ")} {
-    @apply ring-[3px] ring-(--ids-color-primary)/40 inset-ring-(--ids-color-primary);
+    @apply ring-[3px] ring-primary/40 inset-ring-primary;
   }
 
   &[aria-invalid="true"],
   &[data-invalid] {
-    @apply inset-ring-(--ids-color-danger);
+    @apply inset-ring-danger;
 
     ${focusRingTriggers("    ")} {
-      @apply ring-(--ids-color-danger)/40 inset-ring-(--ids-color-danger);
+      @apply ring-danger/40 inset-ring-danger;
     }
   }
 }
 
 @utility font-mono {
   font-size-adjust: var(--ids-font-size-adjust-mono);
+}
+
+@utility shimmer {
+  background-image: linear-gradient(
+    90deg,
+    currentColor calc(50% - var(--ids-shimmer-spread, 3em)),
+    var(--ids-shimmer-color, var(--ids-color-on-surface)) 50%,
+    currentColor calc(50% + var(--ids-shimmer-spread, 3em))
+  );
+  background-size: calc(200% + 2 * var(--ids-shimmer-spread, 3em)) 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ids-shimmer var(--ids-shimmer-duration, 2s) linear infinite;
+
+  @variant rtl {
+    animation-direction: reverse;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+    animation: none;
+  }
 }
 `;
 
@@ -406,7 +426,8 @@ const buildConcentricCSS = () => {
   --ids-concentric-pad: --spacing(--value(number));
   padding: var(--ids-concentric-pad);
   border-radius: min(
-    var(--ids-radius-standard) + var(--ids-concentric-pad) + var(--ids-concentric-nested),
+    var(--ids-radius-standard) +
+      (var(--ids-concentric-pad) + var(--ids-concentric-nested)) * var(--ids-corner-radius-scale, 1),
     var(--ids-radius-container)
   );
 }
@@ -450,16 +471,101 @@ const buildTypographyCSS = (dictionary) => {
   });
 };
 
-const buildColorThemeCSS = (dictionary, color, mode, selector) => {
-  const lines = readColorEntriesWithoutCollision(color, mode, buildPalette(dictionary)).map(
-    ({ name, value }) => `  --ids-color-${name}: ${value};`,
+const neutralFallbacks = (dictionary, mode) =>
+  Object.fromEntries(
+    readColorEntriesWithoutCollision("neutral", mode, buildPalette(dictionary)).map(
+      ({ name, value }) => [name, value],
+    ),
   );
-  return `${selector} {\n${lines.join("\n")}\n}\n`;
+
+const providerValue = (mode, slot, fallbacks) => {
+  if (slot in fallbacks) return `var(${themeVar(mode, slot)}, ${fallbacks[slot]})`;
+  return `var(${themeVar(mode, slot)})`;
 };
+
+const buildColorRolesCSS = (dictionary, mode) => {
+  const fallbacks = neutralFallbacks(dictionary, mode);
+  const lines = [
+    ...BASE_SLOTS,
+    ...FAMILY_SLOTS.map(({ slot }) => slot),
+  ].map((slot) => `  ${colorVar(slot)}: ${providerValue(mode, slot, fallbacks)};`);
+  return block(`[data-mode="${mode}"]`, lines);
+};
+
+const T_CSS_CORNER_SHAPE = `@layer base {
+  [data-mode],
+  [data-mode] * {
+    corner-shape: var(--ids-corner-shape, round);
+  }
+
+  [data-mode]::before,
+  [data-mode]::after,
+  [data-mode] *::before,
+  [data-mode] *::after {
+    corner-shape: inherit;
+  }
+}
+
+@utility rounded-full {
+  corner-shape: round;
+}
+
+@supports (corner-shape: squircle) {
+  [data-mode] {
+    --ids-corner-radius-scale: var(--ids-theme-corner-radius-scale, 1);
+  }
+}
+`;
+
+const LENGTHS_SCRIPTS_READ_IN_PIXELS = ["--scroll-area-thickness", "--scroll-area-gap"];
+
+const T_CSS_REGISTERED_LENGTHS = LENGTHS_SCRIPTS_READ_IN_PIXELS.map(
+  (name) => `@property ${name} {\n  syntax: "<length>";\n  inherits: true;\n  initial-value: 0px;\n}\n`,
+).join("\n");
+
+const SCALE = "var(--ids-scale, 1)";
+
+const SPACING_UNIT = "0.25rem";
+
+const scaled = (value) => `calc(${value} * ${SCALE})`;
+
+const scaledToWholePixels = (value) => `round(${scaled(value)}, 1px)`;
+
+const radiusFromTheProvider = (dictionary) =>
+  byCategory(dictionary, "radius")
+    .filter((t) => slug(t) !== "full")
+    .map(
+      (t) =>
+        `  ${idsVar("radius", t)}: ${scaledToWholePixels(`var(--ids-theme-radius-${slug(t)}, ${toVal(t)}) * var(--ids-corner-radius-scale, 1)`)};`,
+    );
+
+const lengthsTheScaleMultiplies = (dictionary) => [
+  ...readTypographyEntries(buildPalette(dictionary)).map(({ name, fontSize }) => [
+    `--ids-text-${name}`,
+    fontSize,
+  ]),
+  ...byPath(dictionary, "font-size").map((t) => [idsVar("font-size", t), toVal(t)]),
+  ...byCategory(dictionary, "size").map((t) => [idsVar("size", t), toVal(t)]),
+];
+
+const scaledLengths = (dictionary) => [
+  `  --spacing: ${scaled(SPACING_UNIT)};`,
+  ...lengthsTheScaleMultiplies(dictionary).map(
+    ([name, value]) => `  ${name}: ${scaledToWholePixels(value)};`,
+  ),
+];
+
+const block = (selector, lines) => `${selector} {\n${lines.join("\n")}\n}\n`;
+
+const buildScaleCSS = (dictionary) =>
+  [
+    block("[data-mode]", radiusFromTheProvider(dictionary)),
+    block("[data-scale]", scaledLengths(dictionary)),
+  ].join("\n");
 
 const cssFormatter = ({ dictionary }) =>
   [
-    buildColorBridgeCSS(dictionary),
+    buildColorBridgeCSS(),
     buildStaticCSS(dictionary),
     T_CSS_ANIMATIONS,
     T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES,
@@ -467,22 +573,21 @@ const cssFormatter = ({ dictionary }) =>
     T_CSS_UTILITIES,
     buildConcentricCSS(),
     buildTypographyCSS(dictionary),
-    ...colorPairs.map(([c, m]) =>
-      buildColorThemeCSS(
-        dictionary,
-        c,
-        m,
-        `[data-color="${c}"][data-mode="${m}"]`,
-      ),
-    ),
-    buildColorThemeCSS(dictionary, "neutral", "light", '[data-mode="light"]'),
-    buildColorThemeCSS(dictionary, "neutral", "dark", '[data-mode="dark"]'),
-    buildColorThemeCSS(dictionary, "status", "light", '[data-mode="light"]'),
-    buildColorThemeCSS(dictionary, "status", "dark", '[data-mode="dark"]'),
+    T_CSS_CORNER_SHAPE,
+    buildScaleCSS(dictionary),
+    T_CSS_REGISTERED_LENGTHS,
+    buildColorRolesCSS(dictionary, "light"),
+    buildColorRolesCSS(dictionary, "dark"),
   ].join("\n");
 
+const ENUMS_THE_APP_DEFINES_IN_REACT = ["color"];
+
 const tsTypesFormatter = ({ dictionary }) => {
-  const enums = parseEnums(dictionary);
+  const enums = Object.fromEntries(
+    Object.entries(parseEnums(dictionary)).filter(
+      ([key]) => !ENUMS_THE_APP_DEFINES_IN_REACT.includes(key),
+    ),
+  );
   return render(T_TS_FILE, {
     BODY: Object.entries(enums)
       .map(
@@ -493,9 +598,49 @@ const tsTypesFormatter = ({ dictionary }) => {
   });
 };
 
+const stepOf = (reference) => Number(reference.match(/^\{neutral\.(\d+)\}$/)[1]);
+
+const neutralSteps = (mode) => {
+  const json = JSON.parse(readFileSync(`./tokens/semantic/neutral.${mode}.json`, "utf8"));
+  return Object.fromEntries(
+    Object.entries(json.color).map(([slot, token]) => [slot, stepOf(token.$value)]),
+  );
+};
+
+const tsList = (values) => `[${values.map((v) => `'${v}'`).join(", ")}]`;
+
+const tsRecord = (entries, indent) =>
+  `{\n${Object.entries(entries)
+    .map(([key, value]) => `${indent}  '${key}': ${value},`)
+    .join("\n")}\n${indent}}`;
+
+const neutralPalette = (dictionary) =>
+  Object.fromEntries(
+    byPath(dictionary, "neutral").map((t) => [t.path[1], `'${val(t)}'`]),
+  );
+
+const tsColorRolesFormatter = ({ dictionary }) =>
+  render(T_TS_FILE, {
+    BODY: [
+      ...Object.entries(COLOR_ROLES.families).map(
+        ([group, families]) =>
+          `export const IDS_${group.toUpperCase()}_FAMILIES = ${tsList(families)} as const;`,
+      ),
+      `export const IDS_COLOR_FAMILIES = ${tsList(COLOR_FAMILIES)} as const;`,
+      `export const IDS_BASE_SLOTS = ${tsList(BASE_SLOTS)} as const;`,
+      `export const IDS_FAMILY_SLOTS = ${tsList(slotsOf("{family}").map(({ slot }) => slot))} as const;`,
+      `export const IDS_NEUTRAL_PALETTE = ${tsRecord(neutralPalette(dictionary), "")} as const;`,
+      `export const IDS_NEUTRAL_STEPS = {\n${["light", "dark"]
+        .map((mode) => `  ${mode}: ${tsRecord(neutralSteps(mode), "  ")},`)
+        .join("\n")}\n} as const;`,
+    ].join("\n\n"),
+  });
+
 const dartEnumsFormatter = ({ dictionary }) => {
   const enums = parseEnums(dictionary);
   const blocks = Object.entries(enums)
+    .filter(([key]) => key !== "color")
+    .map(([key, values]) => [key, key === "mode" ? [...values, "system"] : values])
     .map(([key, values]) =>
       render(T_DART_ENUM, {
         NAME: enumName(key),
@@ -511,34 +656,100 @@ const dartEnumsFormatter = ({ dictionary }) => {
   return `${GENERATED}\n\n${blocks}\n`;
 };
 
-const dartColorTokensFormatter = ({ dictionary }) => {
-  const palette = buildPalette(dictionary);
-  const toColorLine = ({ name, value }) =>
-    `    '${name}': ${hexToFlutterColor(value)},`;
+const dartList = (values) => `<String>[${values.map((v) => `'${v}'`).join(", ")}]`;
 
-  const cases = colorPairs
-    .map(
-      ([c, m]) =>
-        `      (IdsColor.${c}, IdsMode.${m}) => ${mapName(c, m)}[token] ?? Colors.transparent,`,
-    )
-    .join("\n");
+const dartRoleField = (slot) => toCamel(slot);
 
-  const maps = colorPairs
-    .map(([c, m]) =>
-      render(T_DART_COLOR_MAP, {
-        NAME: mapName(c, m),
-        ENTRIES: [
-          ...readColorEntriesWithoutCollision(c, m, palette),
-          ...readColorEntriesWithoutCollision("status", m, palette),
-          ...readColorEntriesWithoutCollision("neutral", m, palette),
-        ]
-          .map(toColorLine)
-          .join("\n"),
-      }),
-    )
-    .join("\n\n");
+const T_DART_COLOR_ROLES = `${GENERATED}
 
-  return render(T_DART_IDS_TOKENS, { CASES: cases, MAPS: maps });
+import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
+
+import 'ids_enums.dart';
+
+abstract final class IdsColorRoles {
+{{LISTS}}
+
+  static const neutralPalette = <int, Color>{
+{{NEUTRAL_PALETTE}}
+  };
+
+  static const neutralSteps = <IdsMode, Map<String, int>>{
+{{NEUTRAL_STEPS}}
+  };
+
+  static List<String> slotsOf(String family) => [
+    for (final slot in familySlots) slot.replaceAll('{family}', family),
+  ];
+}
+
+@immutable
+class IdsColors {
+  const IdsColors({
+{{PARAMS}}
+  });
+
+  factory IdsColors.fromRoles(Map<String, Color> roles) {
+    Color role(String name) =>
+        roles[name] ?? (throw ArgumentError.value(name, 'roles', 'is missing'));
+    return IdsColors(
+{{FROM_ROLES}}
+    );
+  }
+
+{{FIELDS}}
+
+  Map<String, Color> get roles => {
+{{ROLES}}
+  };
+
+  Color operator [](String role) =>
+      roles[role] ?? (throw ArgumentError.value(role, 'role', 'is not an IDS color role'));
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsColors &&
+{{EQUALS}};
+
+  @override
+  int get hashCode => Object.hashAll(roles.values);
+}
+`;
+
+const dartColorRolesFormatter = ({ dictionary }) => {
+  const allSlots = [...BASE_SLOTS, ...FAMILY_SLOTS.map(({ slot }) => slot)];
+  const lists = [
+    ...Object.entries(COLOR_ROLES.families).map(
+      ([group, families]) => `  static const ${group}Families = ${dartList(families)};`,
+    ),
+    `  static const families = ${dartList(COLOR_FAMILIES)};`,
+    `  static const baseSlots = ${dartList(BASE_SLOTS)};`,
+    `  static const familySlots = ${dartList(slotsOf("{family}").map(({ slot }) => slot))};`,
+    `  static const all = ${dartList(allSlots)};`,
+  ];
+  const neutral = Object.entries(neutralPalette(dictionary)).map(
+    ([step, hex]) => `    ${step}: ${hexToFlutterColor(hex.replaceAll("'", "")).replace(/^const /, "")},`,
+  );
+  const steps = ["light", "dark"].map(
+    (mode) =>
+      `    IdsMode.${mode}: {\n${Object.entries(neutralSteps(mode))
+        .map(([slot, step]) => `      '${slot}': ${step},`)
+        .join("\n")}\n    },`,
+  );
+  return render(T_DART_COLOR_ROLES, {
+    LISTS: lists.join("\n"),
+    NEUTRAL_PALETTE: neutral.join("\n"),
+    NEUTRAL_STEPS: steps.join("\n"),
+    PARAMS: allSlots.map((slot) => `    required this.${dartRoleField(slot)},`).join("\n"),
+    FROM_ROLES: allSlots
+      .map((slot) => `      ${dartRoleField(slot)}: role('${slot}'),`)
+      .join("\n"),
+    FIELDS: allSlots.map((slot) => `  final Color ${dartRoleField(slot)};`).join("\n"),
+    ROLES: allSlots.map((slot) => `    '${slot}': ${dartRoleField(slot)},`).join("\n"),
+    EQUALS: allSlots
+      .map((slot) => `      other.${dartRoleField(slot)} == ${dartRoleField(slot)}`)
+      .join(" &&\n"),
+  });
 };
 
 const dartMotionFormatter = ({ dictionary }) =>
@@ -552,22 +763,40 @@ const dartMotionFormatter = ({ dictionary }) =>
       .join("\n"),
   });
 
+const fontStack = (dictionary, name) =>
+  val(byPath(dictionary, "font-family").find((t) => t.path[1] === name));
+
+const FAMILIES_FLUTTER_CANNOT_NAME = ["sans-serif", "ui-monospace"];
+
+const bundledFontPath = (fontFamily, fontPackage) => `packages/${fontPackage}/${fontFamily}`;
+
+const flutterFallback = (stack, monoFontFamily, sansFontFamily, fontPackage) => [
+  ...new Set(
+    stack
+      .filter((name) => !FAMILIES_FLUTTER_CANNOT_NAME.includes(name))
+      .filter((name) => !monoFontFamily.startsWith(name))
+      .map((name) =>
+        name.startsWith("Pretendard") ? bundledFontPath(sansFontFamily, fontPackage) : name,
+      ),
+  ),
+];
+
 const dartTypographyFormatter = ({ dictionary }) => {
   const palette = buildPalette(dictionary);
-  const sansFontFamily = byPath(dictionary, "font-family")
-    .find((t) => t.path[1] === "sans");
-  const baseFontFamily = sansFontFamily
-    ? val(sansFontFamily)[0]
-    : "Pretendard GOV Variable";
-  const fontFamily = baseFontFamily;
+  const [sansFontFamily] = fontStack(dictionary, "sans");
+  const [monoFontFamily, ...monoFallback] = fontStack(dictionary, "mono");
   const fontPackage = "ids_flutter";
   const members = [
-    `  static const sansFontFamily = '${fontFamily}';`,
+    `  static const sansFontFamily = '${sansFontFamily}';`,
     `  static const sansFontPackage = '${fontPackage}';`,
+    `  static const monoFontFamily = '${bundledFontPath(monoFontFamily, fontPackage)}';`,
+    `  static const monoFontFamilyFallback = ${dartList(
+      flutterFallback(monoFallback, monoFontFamily, sansFontFamily, fontPackage),
+    )};`,
     ...readTypographyEntries(palette).map(
       ({ name, fontSize, fontWeight, lineHeight, letterSpacing }) =>
         `  static const ${toCamel(name)} = ${render(T_DART_TEXT_STYLE, {
-          FONT_FAMILY: fontFamily,
+          FONT_FAMILY: sansFontFamily,
           FONT_PACKAGE: fontPackage,
           FONT_SIZE: parseFloat(fontSize),
           FONT_WEIGHT: parseInt(fontWeight),
@@ -585,8 +814,9 @@ const dartTypographyFormatter = ({ dictionary }) => {
 for (const [name, format] of [
   ["ids/css", cssFormatter],
   ["ids/ts-types", tsTypesFormatter],
+  ["ids/ts-color-roles", tsColorRolesFormatter],
   ["ids/dart-enums", dartEnumsFormatter],
-  ["ids/dart-color-tokens", dartColorTokensFormatter],
+  ["ids/dart-color-roles", dartColorRolesFormatter],
   ["ids/dart-motion", dartMotionFormatter],
   ["ids/dart-typography", dartTypographyFormatter],
 ]) {
@@ -604,15 +834,18 @@ export default {
     },
     ts: {
       transformGroup: "js",
-      files: [{ destination: "../react/src/tokens/types.ts", format: "ids/ts-types" }],
+      files: [
+        { destination: "../react/src/tokens/types.ts", format: "ids/ts-types" },
+        { destination: "../react/src/tokens/color-roles.ts", format: "ids/ts-color-roles" },
+      ],
     },
     dart: {
       transformGroup: "js",
       files: [
         { destination: "../flutter/lib/tokens/ids_enums.dart", format: "ids/dart-enums" },
         {
-          destination: "../flutter/lib/tokens/ids_color_tokens.dart",
-          format: "ids/dart-color-tokens",
+          destination: "../flutter/lib/tokens/ids_color_roles.dart",
+          format: "ids/dart-color-roles",
         },
         { destination: "../flutter/lib/tokens/ids_motion.dart", format: "ids/dart-motion" },
         {

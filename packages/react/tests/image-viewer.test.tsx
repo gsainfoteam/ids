@@ -7,6 +7,7 @@ import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Image, overlay } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 
 type Point = { x: number; y: number };
 
@@ -23,7 +24,7 @@ const PHOTOS = [
 
 function Gallery({ viewer, ...props }: Partial<Image.Group.Props> & { viewer?: ReactNode }) {
   return (
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 300 }}>
         <Image.Group aria-label="Photos" layout="grid" columns={3} {...props}>
           {PHOTOS.map((photo) => (
@@ -342,7 +343,7 @@ test('a composed viewer draws only the parts it lists', async () => {
 
 test('one image with preview opens a viewer of that image alone', async () => {
   await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div style={{ width: 200 }}>
         <Image src={PHOTOS[0]!.src} alt="Lake at dawn" caption="Only one" preview ratio={1} />
       </div>
@@ -362,7 +363,7 @@ test('one image with preview opens a viewer of that image alone', async () => {
 test('a standalone viewer takes items, and overlay.open opens one and removes it when closed', async () => {
   const onValueChange = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Image.Viewer items={PHOTOS} defaultOpen defaultValue={1} onValueChange={onValueChange} />
     </IdsProvider>,
   );
@@ -374,7 +375,7 @@ test('a standalone viewer takes items, and overlay.open opens one and removes it
   await expect.element(dialog()).not.toBeInTheDocument();
   await screen.unmount();
 
-  await render(<IdsProvider />);
+  await render(<IdsProvider theme={testTheme} />);
   const closed = overlay.open(() => <Image.Viewer items={PHOTOS} defaultValue={2} />);
   await expect.element(dialog()).toBeVisible();
   expect(counter()?.textContent).toBe('3 / 3');
@@ -386,7 +387,7 @@ test('a standalone viewer takes items, and overlay.open opens one and removes it
 
 test('an image that cannot load shows a notice in its place', async () => {
   await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Image.Viewer items={[{ src: 'data:image/png;base64,broken', alt: 'Broken' }]} defaultOpen />
     </IdsProvider>,
   );

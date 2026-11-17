@@ -290,9 +290,7 @@ export const CustomSlot: Story = {
             key={index}
             index={index}
             className={(state) =>
-              state.isFilled
-                ? 'rounded-full! bg-(--ids-color-primary) text-(--ids-color-on-primary)'
-                : 'rounded-full!'
+              state.isFilled ? 'bg-primary text-on-primary rounded-full!' : 'rounded-full!'
             }
           >
             {(state) => (state.isFilled ? '✓' : state.hasFakeCaret ? <OTPField.Caret /> : null)}

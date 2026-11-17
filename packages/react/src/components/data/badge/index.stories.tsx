@@ -14,10 +14,19 @@ import { Badge } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const variants = ['solid', 'soft', 'outline'] as const;
-const colorSchemes = ['danger', 'neutral', 'primary', 'success', 'warning', 'info'] as const;
+const colorSchemes = [
+  'danger',
+  'neutral',
+  'primary',
+  'secondary',
+  'tertiary',
+  'success',
+  'warning',
+  'info',
+] as const;
 const placements = ['top-end', 'top-start', 'bottom-end', 'bottom-start'] as const;
 
-const Box = () => <div className="rounded-standard size-10 bg-(--ids-color-muted)" />;
+const Box = () => <div className="rounded-standard bg-neutral-soft size-10" />;
 
 const meta = {
   title: 'Data/Badge',
@@ -115,7 +124,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="circular">
           <Badge content={2} shape="circular">
-            <div className="size-10 rounded-full bg-(--ids-color-muted)" />
+            <div className="bg-neutral-soft size-10 rounded-full" />
           </Badge>
         </Showcase.Row>
       </Showcase.Section>

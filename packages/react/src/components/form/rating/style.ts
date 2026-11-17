@@ -8,22 +8,21 @@ export const ratingStyle = tv({
   slots: {
     root: [
       'relative inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-standard outline-none',
-      '[--rating-accent:var(--ids-color-accent)]',
-      'data-invalid:[--rating-accent:var(--ids-color-danger)]',
-      'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-(--ids-color-primary)/40',
+      '[--rating-accent:var(--ids-color-text-primary)]',
+      'data-invalid:[--rating-accent:var(--ids-color-bg-danger)]',
+      'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-primary/40',
       'data-disabled:opacity-50',
     ],
     item: 'relative inline-flex shrink-0 items-center justify-center rounded-standard focus-ring',
     graphic: 'pointer-events-none relative block size-full [&_svg]:size-full',
-    empty:
-      'absolute inset-0 text-(--ids-color-border) in-data-invalid:text-(--ids-color-danger)/35',
+    empty: 'absolute inset-0 text-(--ids-color-border-neutral) in-data-invalid:text-danger/35',
     fill: [
       'absolute inset-0 text-(--rating-accent) in-data-previewing:opacity-50',
       '[clip-path:inset(0_calc(100%-var(--rating-fill))_0_0)]',
       'rtl:[clip-path:inset(0_0_0_calc(100%-var(--rating-fill)))]',
     ],
     option:
-      'absolute inset-y-0 cursor-pointer touch-manipulation rounded-standard outline-none disabled:cursor-not-allowed',
+      'absolute inset-y-0 m-0 cursor-pointer touch-manipulation appearance-none rounded-standard outline-none disabled:cursor-not-allowed',
   },
   variants: {
     size: {

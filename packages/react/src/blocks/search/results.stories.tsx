@@ -15,6 +15,7 @@ import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
 import { TextField } from '../../components/form/text-field';
 import { Tabs } from '../../components/navigation/tabs';
+import { Highlight } from '../../components/typography/highlight';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -94,15 +95,23 @@ const KINDS: { value: 'all' | Kind; label: string }[] = [
 
 const SUGGESTIONS = ['셔틀 막차', '광주송정역', '주말 셔틀', '셔틀 알림'];
 
+const COMBINING_ACCENTS = /[\u0300-\u036f]/g;
+
+const foldForSearch = (text: string) =>
+  text.normalize('NFD').replace(COMBINING_ACCENTS, '').normalize('NFKC').toLocaleLowerCase();
+
+const matchesQuery = (result: Result, query: string) => {
+  const needle = foldForSearch(query);
+
+  return [result.title, result.description].some((text) => foldForSearch(text).includes(needle));
+};
+
 export const PC: Story = {
   render: function Render() {
     const [draft, setDraft] = useState('셔틀');
     const [query, setQuery] = useState('셔틀');
 
-    const found = RESULTS.filter(
-      (result) =>
-        query !== '' && (result.title.includes(query) || result.description.includes(query)),
-    );
+    const found = RESULTS.filter((result) => query !== '' && matchesQuery(result, query));
 
     const search = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -170,8 +179,12 @@ export const PC: Story = {
                               {result.icon ?? <Avatar name={result.person} size="tiny" />}
                             </Item.Media>
                             <Item.Content>
-                              <Item.Title>{result.title}</Item.Title>
-                              <Item.Description>{result.description}</Item.Description>
+                              <Item.Title>
+                                <Highlight query={query}>{result.title}</Highlight>
+                              </Item.Title>
+                              <Item.Description>
+                                <Highlight query={query}>{result.description}</Highlight>
+                              </Item.Description>
                             </Item.Content>
                           </a>
                         </Item>

@@ -1,5 +1,7 @@
 # IDS 아키텍처
 
+> Flutter Provider의 최신 계약은 [Flutter README](packages/flutter/README.md)를 따른다. 아래의 고정 `IdsColor`·`ThemeProvider` 예시는 이전 설계이며, 현재는 앱 팔레트와 `IdsProvider`를 사용한다. 배율 정책은 IDS-24 결정 전까지 보류한다.
+
 ## 레퍼런스
 
 **토큰 / codegen**

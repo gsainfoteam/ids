@@ -7,9 +7,9 @@ export const fieldStyle = tv({
   slots: {
     root: 'grid min-w-0 gap-x-3 gap-y-2',
     group: 'min-w-0 gap-x-3 gap-y-5',
-    description: 'text-(--ids-color-on-muted)',
-    hint: 'text-(--ids-color-on-muted)',
-    error: 'text-(--ids-color-danger)',
+    description: 'text-neutral',
+    hint: 'text-neutral',
+    error: 'text-danger',
     control: 'min-w-0 [&>input:not([type=checkbox]):not([type=radio])]:w-full [&>textarea]:w-full',
   },
   variants: {

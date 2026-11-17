@@ -3,10 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 import 'package:ids_flutter/src/components/group/group.dart';
 
+import 'test_theme.dart';
+
 Future<void> pump(WidgetTester tester, Widget group) => tester.pumpWidget(
   Directionality(
     textDirection: TextDirection.ltr,
-    child: ThemeProvider(
+    child: IdsProvider(
+      theme: testTheme,
       child: Align(alignment: Alignment.topLeft, child: group),
     ),
   ),

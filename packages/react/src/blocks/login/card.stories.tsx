@@ -12,6 +12,7 @@ import { PasswordField } from '../../components/form/password-field';
 import { TextField } from '../../components/form/text-field';
 import { Divider } from '../../components/layout/divider';
 import { Label } from '../../components/typography/label';
+import { Link } from '../../components/typography/link';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -74,14 +75,12 @@ export const PC: Story = {
                 <Field.Label>비밀번호</Field.Label>
                 <PasswordField name="password" autoComplete="current-password" required />
               </Field>
-              <div className="flex items-center justify-between gap-3">
+              <div className="text-body-b3-regular flex items-center justify-between gap-3">
                 <Label>
                   <Checkbox name="remember" defaultChecked />
                   로그인 상태 유지
                 </Label>
-                <Button asChild variant="outline" size="tiny">
-                  <a href="#forgot-password">비밀번호 찾기</a>
-                </Button>
+                <Link href="#forgot-password">비밀번호 찾기</Link>
               </div>
               <Button type="submit" disabled={signingIn} className="w-full">
                 {signingIn && <Spinner />}
@@ -92,9 +91,7 @@ export const PC: Story = {
 
           <Card.Footer className="justify-center border-t">
             처음이신가요?
-            <Button asChild variant="soft" size="tiny">
-              <a href="#sign-up">회원가입</a>
-            </Button>
+            <Link href="#sign-up">회원가입</Link>
           </Card.Footer>
         </Card>
       </main>

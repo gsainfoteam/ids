@@ -13,7 +13,7 @@ export const drawerStyle = tv({
     content: [
       'fixed z-50 m-0 flex flex-col outline-none',
       cornerOfThePaddedViewport,
-      'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface) shadow-lg',
+      'border border-neutral bg-surface text-on-surface shadow-lg',
       'transition-[translate,transform,scale] duration-(--ids-motion-slow) ease-[cubic-bezier(0.32,0.72,0,1)]',
       'data-nested-open:scale-(--drawer-nested-scale)',
       'data-dragging:transition-none data-dragging:select-none motion-reduce:transition-none',
@@ -22,12 +22,12 @@ export const drawerStyle = tv({
     handle: [
       'relative shrink-0 cursor-grab touch-none rounded-full outline-none focus-ring',
       'before:absolute before:-inset-3',
-      'bg-(--ids-color-handle) transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'hover:bg-(--ids-color-handle-hover) data-dragging:bg-(--ids-color-handle-active)',
+      'bg-neutral transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'hover:bg-neutral-hover data-dragging:bg-neutral-active',
     ],
     header: 'flex flex-col gap-1.5 pe-8 text-start',
     title: 'text-subtitle-s1-semibold [overflow-wrap:anywhere]',
-    description: 'text-body-b3-regular text-(--ids-color-on-muted)',
+    description: 'text-body-b3-regular text-neutral',
     footer: 'mt-auto flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
     close: 'absolute end-4 top-4',
   },
@@ -35,7 +35,7 @@ export const drawerStyle = tv({
     side: {
       bottom: {
         content: [
-          'inset-x-0 top-auto bottom-0 h-fit max-h-[calc(100%-2rem)] w-full max-w-none',
+          'inset-x-0 top-auto bottom-0 h-fit max-h-[calc(100%-var(--spacing)*8)] w-full max-w-none',
           'data-[side=bottom]:rounded-b-none data-[side=bottom]:border-b-0',
           'starting:translate-y-full data-ending-style:translate-y-full data-nested-open:-translate-y-4',
         ],
@@ -44,7 +44,7 @@ export const drawerStyle = tv({
       },
       top: {
         content: [
-          'inset-x-0 top-0 bottom-auto h-fit max-h-[calc(100%-2rem)] w-full max-w-none',
+          'inset-x-0 top-0 bottom-auto h-fit max-h-[calc(100%-var(--spacing)*8)] w-full max-w-none',
           'data-[side=top]:rounded-t-none data-[side=top]:border-t-0',
           'starting:-translate-y-full data-ending-style:-translate-y-full data-nested-open:translate-y-4',
         ],
@@ -53,7 +53,7 @@ export const drawerStyle = tv({
       },
       right: {
         content: [
-          'inset-y-0 right-0 left-auto h-full max-h-none w-[min(24rem,calc(100%-2rem))]',
+          'inset-y-0 right-0 left-auto h-full max-h-none w-[min(--spacing(96),calc(100%-var(--spacing)*8))]',
           'data-[side=right]:rounded-r-none data-[side=right]:border-r-0',
           'starting:translate-x-full data-ending-style:translate-x-full data-nested-open:-translate-x-4',
         ],
@@ -61,7 +61,7 @@ export const drawerStyle = tv({
       },
       left: {
         content: [
-          'inset-y-0 right-auto left-0 h-full max-h-none w-[min(24rem,calc(100%-2rem))]',
+          'inset-y-0 right-auto left-0 h-full max-h-none w-[min(--spacing(96),calc(100%-var(--spacing)*8))]',
           'data-[side=left]:rounded-l-none data-[side=left]:border-l-0',
           'starting:-translate-x-full data-ending-style:-translate-x-full data-nested-open:translate-x-4',
         ],
@@ -71,11 +71,15 @@ export const drawerStyle = tv({
     snapping: { true: {}, false: {} },
   },
   compoundVariants: [
-    { side: ['top', 'bottom'], snapping: true, class: { content: 'h-[calc(100%-2rem)]' } },
+    {
+      side: ['top', 'bottom'],
+      snapping: true,
+      class: { content: 'h-[calc(100%-var(--spacing)*8)]' },
+    },
     {
       side: ['left', 'right'],
       snapping: true,
-      class: { content: 'w-[calc(100%-2rem)]' },
+      class: { content: 'w-[calc(100%-var(--spacing)*8)]' },
     },
   ],
   defaultVariants: { side: 'right', snapping: false },

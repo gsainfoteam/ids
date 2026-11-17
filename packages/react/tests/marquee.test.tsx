@@ -8,6 +8,7 @@ import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Marquee } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 
 const WORDS = ['Alpha', 'Bravo', 'Charlie', 'Delta'];
 
@@ -167,7 +168,7 @@ test('a declared Marquee.Pause replaces the default one outside the content, and
 });
 
 test('before hydration CSS hides the copy under reduced motion, and hydration removes it', async () => {
-  const tree = <IdsProvider>{words()}</IdsProvider>;
+  const tree = <IdsProvider theme={testTheme}>{words()}</IdsProvider>;
   const host = document.createElement('div');
   host.innerHTML = renderToString(tree);
   document.body.append(host);
@@ -195,7 +196,7 @@ test('before hydration CSS hides the copy under reduced motion, and hydration re
 
 test('following the preference, reduced motion wraps every item in place with no copy or button', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="w-40">{words({ className: 'h-8' })}</div>
     </IdsProvider>,
   );
@@ -225,12 +226,14 @@ test('following the preference, it flows without reduced motion and stops when t
     await emulateReducedMotion('reduce');
   });
 
-  const screen = await render(<IdsProvider>{words()}</IdsProvider>);
+  const screen = await render(<IdsProvider theme={testTheme}>{words()}</IdsProvider>);
   const root = () => parts(screen.container).root;
+  const pause = screen.getByRole('button', { name: '일시 정지' });
 
   expect(root().hasAttribute('data-reduced-motion')).toBe(false);
   expect(parts(screen.container).copy).not.toBeNull();
-  await expect.element(screen.getByRole('button', { name: '일시 정지' })).toBeVisible();
+  await expect.element(pause).toBeVisible();
+  await userEvent.hover(pause);
   expect(getComputedStyle(parts(screen.container).track).animationName).toBe('ids-marquee');
   expect(playState(parts(screen.container).track)).toBe('running');
 
@@ -243,7 +246,7 @@ test('following the preference, it flows without reduced motion and stops when t
 
 test('the copy is hidden and inert, so each link is read once and Tab stops once per link', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <button type="button">Before</button>
       <Marquee aria-label="Notices" reducedMotion={false}>
         {WORDS.map((word) => (
@@ -270,7 +273,7 @@ test('the copy is hidden and inert, so each link is read once and Tab stops once
 test('the Pause button stops the flow until it is pressed again, by pointer or keyboard', async () => {
   const onPlayingChange = vi.fn();
   const screen = await render(
-    <IdsProvider>{words({ reducedMotion: false, onPlayingChange })}</IdsProvider>,
+    <IdsProvider theme={testTheme}>{words({ reducedMotion: false, onPlayingChange })}</IdsProvider>,
   );
   const { root, track } = parts(screen.container);
   const pause = screen.getByRole('button', { name: '일시 정지' });
@@ -295,7 +298,7 @@ test('the Pause button stops the flow until it is pressed again, by pointer or k
 
 test('hovering the content pauses only while the pointer stays, and leaves the playing state alone', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <p>Outside</p>
       {words({ reducedMotion: false })}
       {words({ reducedMotion: false, pauseOnHover: false, 'aria-label': 'Keeps flowing' })}
@@ -326,7 +329,7 @@ test('keyboard focus inside pauses while it stays, unless pauseOnFocus is off', 
     </Marquee>
   );
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <button type="button">Start</button>
       {linked({ 'aria-label': 'Pausing' })}
       {linked({ 'aria-label': 'Flowing', pauseOnFocus: false })}
@@ -350,7 +353,9 @@ test('keyboard focus inside pauses while it stays, unless pauseOnFocus is off', 
 test('playing is controlled: the button asks through onPlayingChange and the prop decides', async () => {
   const onPlayingChange = vi.fn();
   const screen = await render(
-    <IdsProvider>{words({ reducedMotion: false, playing: true, onPlayingChange })}</IdsProvider>,
+    <IdsProvider theme={testTheme}>
+      {words({ reducedMotion: false, playing: true, onPlayingChange })}
+    </IdsProvider>,
   );
   const pause = screen.getByRole('button', { name: '일시 정지' });
 
@@ -360,7 +365,9 @@ test('playing is controlled: the button asks through onPlayingChange and the pro
   expect(parts(screen.container).root.hasAttribute('data-playing')).toBe(true);
 
   await screen.rerender(
-    <IdsProvider>{words({ reducedMotion: false, playing: false, onPlayingChange })}</IdsProvider>,
+    <IdsProvider theme={testTheme}>
+      {words({ reducedMotion: false, playing: false, onPlayingChange })}
+    </IdsProvider>,
   );
   await expect.element(pause).toHaveAttribute('aria-pressed', 'true');
   expect(parts(screen.container).root.hasAttribute('data-paused')).toBe(true);
@@ -369,7 +376,9 @@ test('playing is controlled: the button asks through onPlayingChange and the pro
 
 test('defaultPlaying={false} starts paused with the button pressed', async () => {
   const screen = await render(
-    <IdsProvider>{words({ reducedMotion: false, defaultPlaying: false })}</IdsProvider>,
+    <IdsProvider theme={testTheme}>
+      {words({ reducedMotion: false, defaultPlaying: false })}
+    </IdsProvider>,
   );
 
   await expect
@@ -379,7 +388,9 @@ test('defaultPlaying={false} starts paused with the button pressed', async () =>
 });
 
 test('a loop takes the measured length at the chosen speed, and follows the content as it resizes', async () => {
-  const screen = await render(<IdsProvider>{fixedItems({ speed: 100 })}</IdsProvider>);
+  const screen = await render(
+    <IdsProvider theme={testTheme}>{fixedItems({ speed: 100 })}</IdsProvider>,
+  );
   const { root } = parts(screen.container);
   const loopOf = (items: number, width: number, gap: number) => items * width + items * gap;
 
@@ -387,14 +398,18 @@ test('a loop takes the measured length at the chosen speed, and follows the cont
     .poll(() => root.style.getPropertyValue('--ids-marquee-duration'))
     .toBe(`${(loopOf(4, 150, 20) / 100) * 1000}ms`);
 
-  await screen.rerender(<IdsProvider>{fixedItems({ speed: 100 }, 200)}</IdsProvider>);
+  await screen.rerender(
+    <IdsProvider theme={testTheme}>{fixedItems({ speed: 100 }, 200)}</IdsProvider>,
+  );
   await expect
     .poll(() => root.style.getPropertyValue('--ids-marquee-duration'))
     .toBe(`${(loopOf(4, 200, 20) / 100) * 1000}ms`);
 });
 
 test('the gap between the two copies is the gap between items, so the copy lands where the content was', async () => {
-  const screen = await render(<IdsProvider>{fixedItems({ defaultPlaying: false })}</IdsProvider>);
+  const screen = await render(
+    <IdsProvider theme={testTheme}>{fixedItems({ defaultPlaying: false })}</IdsProvider>,
+  );
   const { track, content, copy } = parts(screen.container);
   const items = [...content.children];
   const copied = [...copy!.children];
@@ -406,7 +421,7 @@ test('the gap between the two copies is the gap between items, so the copy lands
 
 test('content shorter than the strip still fills it, spreading its items', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       {fixedItems({ className: 'w-[1000px] gap-[20px]', defaultPlaying: false }, 50)}
     </IdsProvider>,
   );
@@ -419,7 +434,9 @@ test('content shorter than the strip still fills it, spreading its items', async
 
 test('right to left flows the other way and puts the Pause button on the left', async () => {
   const screen = await render(
-    <IdsProvider dir="rtl">{words({ reducedMotion: false, defaultPlaying: false })}</IdsProvider>,
+    <IdsProvider theme={testTheme} dir="rtl">
+      {words({ reducedMotion: false, defaultPlaying: false })}
+    </IdsProvider>,
   );
   const { track, viewport, pause } = parts(screen.container);
 
@@ -434,7 +451,7 @@ test('right to left flows the other way and puts the Pause button on the left', 
 
 test('left to right flows toward the start, and reverse runs the other way', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       {words({ reducedMotion: false, defaultPlaying: false })}
       {words({ reducedMotion: false, defaultPlaying: false, reverse: true, 'aria-label': 'Back' })}
     </IdsProvider>,
@@ -454,7 +471,7 @@ test('left to right flows toward the start, and reverse runs the other way', asy
 
 test('vertical moves up along the column inside the height it is given', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       {words({
         orientation: 'vertical',
         reducedMotion: false,
@@ -477,7 +494,7 @@ test('vertical moves up along the column inside the height it is given', async (
 
 test('fade masks both ends unless fade={false}', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       {words({ reducedMotion: false })}
       {words({ reducedMotion: false, fade: false, 'aria-label': 'Sharp' })}
     </IdsProvider>,
@@ -490,7 +507,7 @@ test('fade masks both ends unless fade={false}', async () => {
 
 test('Marquee.Item keeps its content on one line and passes itself onto its child with asChild', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Marquee aria-label="Items" reducedMotion={false}>
         <Marquee.Item>A long notice that stays on one line</Marquee.Item>
         <Marquee.Item asChild>
@@ -512,7 +529,7 @@ test('Marquee.Item keeps its content on one line and passes itself onto its chil
 
 async function tabThroughCentering(props: Partial<Marquee.Props>, dir?: 'rtl') {
   const screen = await render(
-    <IdsProvider dir={dir}>
+    <IdsProvider theme={testTheme} dir={dir}>
       <button type="button">Start</button>
       {fixedItems({ defaultPlaying: false, ...props })}
     </IdsProvider>,
@@ -545,7 +562,7 @@ test('keyboard focus centers items in a right-to-left strip', async () => {
 test('pointing at a copied item puts the original under the pointer, so a click reaches it', async () => {
   const onClick = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Marquee
         aria-label="Buttons"
         reducedMotion={false}
@@ -576,7 +593,7 @@ test('pointing at a copied item puts the original under the pointer, so a click 
 
 test('size sets the Pause button: 36px standard, 32px tiny', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       {words({ reducedMotion: false })}
       {words({ reducedMotion: false, size: 'tiny', 'aria-label': 'Tiny' })}
     </IdsProvider>,
@@ -592,7 +609,7 @@ test('development warns without a name, and aria-labelledby counts as one', asyn
   onTestFinished(() => warn.mockRestore());
 
   await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <span id="partners">Partners</span>
       <Marquee aria-labelledby="partners">
         <Marquee.Item>A</Marquee.Item>
@@ -602,7 +619,7 @@ test('development warns without a name, and aria-labelledby counts as one', asyn
   expect(warn).not.toHaveBeenCalled();
 
   await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Marquee speed={0}>
         <Marquee.Item>A</Marquee.Item>
       </Marquee>

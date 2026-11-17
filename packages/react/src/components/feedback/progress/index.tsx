@@ -15,7 +15,15 @@ export function Progress(props: Progress.Props) {
 
 export namespace Progress {
   export type Shape = 'linear' | 'circular';
-  export type ColorScheme = 'primary' | 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+  export type ColorScheme =
+    | 'primary'
+    | 'secondary'
+    | 'tertiary'
+    | 'neutral'
+    | 'info'
+    | 'success'
+    | 'warning'
+    | 'danger';
 
   export type State = {
     value: number | null;

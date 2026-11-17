@@ -9,7 +9,7 @@ packages/
   core/     tokens + Style Dictionary codegen. Private — not published.
   css/      @gsainfoteam/ids-css GitHub Packages npm package. CSS variables + Tailwind @theme.
   react/    @gsainfoteam/ids-react GitHub Packages npm package. React components + IdsProvider.
-  flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + ThemeProvider.
+  flutter/  ids_flutter pub.dev package (publisher: gistory.me). Flutter components + IdsProvider.
 examples/
   next-app-router/  tanstack-start/  astro/   private apps that install IDS the way a consumer does.
 ```
@@ -20,11 +20,20 @@ stylesheet holds a class only `@source` on `ids-react/dist` produces. Changesets
 
 ## Generated files — do not edit manually
 
-These files are written by `pnpm codegen` (Style Dictionary build). Edits will be overwritten.
+These files are written by `pnpm codegen` (Style Dictionary, message generation and the font copy). Edits will be overwritten.
 
 - `packages/css/dist/ids.css`
 - `packages/react/src/tokens/types.ts`
-- `packages/flutter/lib/tokens/*.dart`
+- `packages/react/src/tokens/palette-model.ts` and
+  `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/palette-model.js`)
+- `packages/react/src/internal/messages-catalog.ts`
+- `packages/react/messages/en.json`
+- `packages/flutter/lib/tokens/*.dart`, including `ids_color_roles.dart` (`IdsColors`, written from
+  `packages/core/color-roles.json`)
+- `packages/flutter/lib/messages/ids_messages.dart`
+- `packages/flutter/messages/ko.i18n.json`
+- `packages/flutter/fonts/*` (`packages/core/fonts.build.mjs` copies them from the `pretendard-gov` and
+  `geist` npm packages, so the Flutter fonts move with the versions in `packages/core/package.json`)
 
 To change tokens: edit files under `packages/core/tokens/`, then run `pnpm codegen`.
 
@@ -101,6 +110,9 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
     its server-safe helpers imported from `@tanstack/table-core`;
   - slide dragging, snapping and auto-advance `embla-carousel` 8.6 (`embla-carousel-react`,
     `-autoplay`, `-auto-scroll`), wrapped only by `internal/slides`; Carousel adds the plugins.
+  - charts `recharts` 3, an optional peer imported only by the `@gsainfoteam/ids-react/chart`
+    entry, so an app without charts never installs it. Chart sizes, colors and labels the Recharts
+    chart the app writes; Tooltip, Legend and the screen reader table are IDS's code.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:
   - the `overlay` and `toast` stores, on React's `useSyncExternalStore`. overlay-kit leaves a
@@ -114,6 +126,10 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
     `role="listbox"` element the scroller (the options' offset parent and `scrollTop` must stay on
     the listbox), cannot place a bar by where it is declared, and does not inset the bar ends from
     a rounded corner. What is left over native scrolling is a ResizeObserver and a thumb drag.
+  - MessageScroller's follow and anchor engine. `@shadcn/react`'s message-scroller draws the
+    scroller and the list as its own `<div>`s, so the ScrollArea viewport cannot be the scroller and
+    the list cannot be an `<ol>` of `<li>`; it also puts a spacer `<div>` inside the list and has no
+    release on text selection, `onReachStart` or new-message count.
 
 **flutter** — Dart package. Platform directories (android/, ios/, etc.) intentionally absent — this is a package, not an app. Published to pub.dev via OIDC — no token.
 
@@ -141,10 +157,10 @@ packages/react/src/
     data/        Accordion, Avatar, Badge, Calendar, Card, Carousel, Chip, DataTable, Empty, Image,
                  Item, Marquee, QRCode, Table, TimePicker, ...
     feedback/    Alert, Progress, Skeleton, Spinner, Toast
-    layout/      AspectRatio, Divider, Spacer, ScrollArea, Resizable, Splitter
+    layout/      AspectRatio, Divider, Spacer, ScrollArea, MessageScroller, Resizable, Splitter
     navigation/  Breadcrumb, Pagination, Stepper, Tabs
     overlay/     Dialog, Drawer, Menu, Popover, Tooltip
-    typography/  Kbd, Label
+    typography/  Kbd, Label, Link
     utility/     Slot, Group, IdsProvider
   internal/      shared parts that are not exported:
                    surfaces     control-surface, toggle-surface, icon-square, field-surface, surface,
@@ -152,7 +168,7 @@ packages/react/src/
                    fields       text-control (shell, Clear, useMergedRef), field-popup, list-styles,
                                 temporal-field, form-value, date-locale
                    behaviour    pressable, state-props, use-checked-writes, icon-label, arc,
-                                resize-handle
+                                resize-handle, paragraph
                    feedback     status-palette
                    overlays     overlay (layer stack, top layer, presence, anchoring, modal layer)
                    slides       slides (Embla track, slide ARIA, drag cancel, keys, announcer)
@@ -288,10 +304,11 @@ changes it.
   radius, shadow or `style`. A line is a `Divider`, a surface a `Card` or an `Item`, muted text a
   component's `Description` part. The classes a part documents (`border-t` on `Card.Footer`) are
   fine.
-- A block picks `solid`, `outline` or `soft` and never `ghost`. Until IDS has a Link, a link that
-  should stand out is `Button asChild` around the `<a>`, a row or card that links is `Item asChild`
-  or `Card asChild`, a link in a table cell or a footer list is a plain `<a>`, and a link inside
-  running text sits only in a part that underlines it (`Empty.Description`).
+- A block picks `solid`, `outline` or `soft` and never `ghost`. A text link (in running text, or
+  a "forgot password" or "sign up" line) is `Link`; a link in a table cell or a footer list is
+  `Link colorScheme="neutral" underline="hover"`; a link that should stand out is `Button asChild`
+  around the `<a>`; a row or card that links is `Item asChild` or `Card asChild`. A bare `<a>`
+  appears only as the `asChild` child of one of these or of an `IconButton`.
 - The block is written inline in `render` and works from the 414px test viewport up. Its
   outermost element carries `break-keep`, so Korean wraps between words.
 - Data sits in module-level constants with fixed dates and numbers, so the server and the client
@@ -330,7 +347,7 @@ with a bare `cn('...')` when it belongs to the same component — that hides the
 variant system and duplicates the variant keys.
 
 Colors that a variant fans out to several parts go through a CSS custom property
-(`[--chip-accent:var(--ids-color-primary)]`) rather than one class per part-and-scheme pair.
+(`[--chip-accent:var(--ids-color-bg-primary)]`) rather than one class per part-and-scheme pair.
 
 **Tailwind only generates classes it can see as literal text in a source file.** A class assembled
 at runtime never reaches the stylesheet, and the failure is silent — the class lands in the DOM
@@ -357,8 +374,11 @@ controls, `[data-focus-visible]` for components driven by `useInteractive`, and
 inner element with `data-field-input` rather than adding a component-specific `has-[...]:ring`.
 Borders stay `inset-ring`, so the focus ring sits outside them and composes with `shadow-xs`
 instead of replacing it. Focus also recolors that inset-ring border to primary, and an element
-with `aria-invalid="true"` or `data-invalid` gets a danger border and a danger ring; neither
-state is repeated in component styles.
+with `aria-invalid="true"` or `data-invalid` gets a border and a ring in `border-danger`, which is
+the color of its label and error message; neither state is repeated in component styles. An element whose ring must sit above its neighbours (a joined
+Group item, an OTP slot, a Calendar day) raises itself with the `focus-ring-visible:` variant, which
+the CSS package builds from the same triggers as `focus-ring`; stacking on `focus-visible:` or
+`data-focus-visible:` alone leaves a ring drawn by another trigger under the next item.
 
 **Radius is 10px, and containers grow it concentrically.** The scale is `standard` (10px, every
 control at every size), `indicator` (4px, only for boxes under 24px such as the Checkbox box or
@@ -393,32 +413,59 @@ since the bar ends are inset from the root's own computed radius. A `<textarea>`
 too (`ScrollArea.Viewport asChild`): it scrolls itself, and ScrollArea remeasures it on `input`.
 Popover keeps its arrow outside the ScrollArea, since the viewport clips what overflows.
 
+**Colors are families × roles, and the utility prefix states the property.** Eight families
+(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`) each have
+the same ten roles: `bg-X`, `bg-X-hover`, `bg-X-active`, `bg-X-soft`, `bg-X-soft-hover`,
+`bg-X-soft-active`, `text-on-X`, `text-on-X-soft`, `text-X` and `border-X`, over the base layer
+`bg-surface` / `text-on-surface`. The table lives in `packages/core/color-roles.json`; the CSS
+variable is `--ids-color-<role>`, and each Tailwind namespace (`--background-color-*`,
+`--text-color-*`, `--border-color-*`, `--ring-color-*`, `--outline-color-*`, `--fill-*`,
+`--stroke-*`) maps only the roles that fit it, so there is no shared `--color-<role>` and
+`bg-on-primary` does not exist. Write named utilities (`bg-primary-soft`, `inset-ring-neutral`),
+not `bg-(--ids-color-…)`; an arbitrary value is only for an inverted use such as
+`bg-(--ids-color-on-surface)`. A brand family the theme leaves out (`secondary`, `tertiary`) is
+derived from primary (`ids-provider/derived-brands.ts`), so the provider always writes all three.
+
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
-`--ids-color-border` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
+`border-neutral` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
-the theme color, while `outline` and `ghost` stay neutral. `--ids-color-outline` is the
-theme-tinted line for the rare edge that should itself read as the brand.
+the theme color, while `outline` and `ghost` stay neutral. `border-neutral` is decorative and
+exempt from contrast. `border-primary` and every other family's `border-X`, for the rare edge that
+should itself read as that color, is the same step as `text-X`, so a line and the text beside it
+(an invalid field's border, its label and error message) are one color.
 
-**Brand color has one role per background.** A brand fill (`primary`) carries `on-primary`; a soft
-brand surface is `secondary` with `on-secondary` text, and its hover and press mix 6% and 12% of
-`primary` in; brand-colored text or an icon sitting on the page with no brand fill behind it (an
-outline Badge or Chip, a Rating star, a Radio dot) is `accent`. Never write `primary` as a text
-color or `primary/10` as a soft fill: light hues such as yellow and cyan fall under 4.5:1 there.
-Every pair reaches 4.5:1 in both modes, which `tests/tokens-contrast.test.ts` checks. Status
-schemes keep their own ladder: `-strong` for text, the status color at 10% to 20% for tints.
+**Each family has one role per background.** A fill (`bg-primary`) carries `text-on-primary`; a
+soft surface is `bg-primary-soft` with `text-on-primary-soft`, and its hover and press
+(`bg-primary-soft-hover`, `-active`) mix 6% and 12% of the fill in; text or an icon sitting on the
+page with no fill behind it (an outline Badge or Chip, a Rating star, a Radio dot, a Link) is
+`text-primary`. Never write `bg-primary` as a text color or `primary/10` as a soft fill: light hues
+such as yellow and cyan fall under Lc 60 there. Statuses follow the same roles (`bg-danger-soft`
+with `text-on-danger-soft`, `text-danger` for text). Text on a fill or a soft surface reaches APCA
+Lc 75, `text-X` Lc 60 on the surface and on `bg-X-soft` (short labels, links and messages), and every
+`border-X` (the `text-X` step) at least Lc 45 in both modes, for all 17 story palettes, pure and tinted neutrals and harmonized and
+fixed statuses, which `tests/tokens-contrast.test.ts` checks.
 
-**Neutral states climb one step at a time.** A transparent control goes rest → hover `muted` →
-press `muted-hover`; a filled control goes `muted` → `muted-hover` → `muted-active`; a handle (a
-ScrollArea thumb, the Drawer handle) goes `handle` → `handle-hover` → `handle-active` while
-dragged. A pressed toggle takes the press step. The ladder leaves alone translucent layers over a
-background it does not know (Item and Card `on-surface` overlays, Chip's `currentColor` layer,
-Kbd), brand states, edge rings, disabled opacity and backdrops.
+**Contrast is APCA, not WCAG 2.** Roles are picked by APCA lightness contrast (`contrastAPCA` from
+`colorjs.io/fn`, in `ids-provider/contrast.ts`). The fill starts at 600 and moves to 500 or 700,
+then 400 or 800, until white or neutral 950 text reaches Lc 75; the text is whichever reads
+better. WCAG 2's ratio rates dark text on mid-tone fills too well, so it is not used, and axe's
+`color-contrast` rule, which computes it, is off in `parameters.a11y`; the token test checks APCA
+instead.
+
+**Neutral states climb one step at a time.** A transparent control goes rest → hover
+`bg-neutral-soft` → press `bg-neutral-soft-hover`; a filled control goes `bg-neutral-soft` →
+`bg-neutral-soft-hover` → `bg-neutral-soft-active`; a handle (a ScrollArea thumb, the Drawer
+handle) goes `bg-neutral` → `bg-neutral-hover` → `bg-neutral-active` while dragged. Secondary text
+is `text-neutral`. A pressed toggle takes the press step. The ladder leaves alone translucent layers
+over a background it does not know (Item and Card `on-surface` overlays, Chip's `currentColor`
+layer, Kbd), brand states, edge rings, disabled opacity and backdrops.
 
 **A brand fill's states move away from its text.** Hover and press on a solid brand fill (solid
 Button, a selected Calendar day or TimePicker option) take `--control-fill-hover` and
-`--control-fill-press` from `internal/brand-fill.ts`: 10% and 20% toward black under white text,
-toward white under dark text, so no palette drops below the 4.5:1 it has at rest. Do not fade a
-filled brand color with `/90`: over a white page it lightens blue under white text to 4.46:1.
+`--control-fill-press` from the family's `bg-X-hover` and `bg-X-active`, which the provider mixes
+10% and 20% toward black under white text and toward white under dark text, so no palette drops
+below the contrast it has at rest. Do not fade a
+filled brand color with `/90`: over a white page it lightens the fill under white text.
 
 **Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
 TelField, ChipField, Select and the date, time and color triggers draw their box from
@@ -426,8 +473,8 @@ TelField, ChipField, Select and the date, time and color triggers draw their box
 fill) and `ghost` (no fill, no border). Put `data-field-input` on the element that takes focus and
 `data-invalid` on the shell; `focus-ring` does the rest.
 
-**A control without a native input still joins the form.** Select, a date trigger, a Rating drawn
-as buttons: render `internal/form-value.tsx` inside the component's `relative` root. It writes one
+**A control without a native input still joins the form.** Select, a date trigger, a
+ToggleGroup: render `internal/form-value.tsx` inside the component's `relative` root. It writes one
 hidden input per value for FormData and, when `required`, a nameless input covering the control
 so the browser blocks the submit, anchors its message there and hands focus to the control.
 
@@ -438,9 +485,10 @@ so the browser blocks the submit, anchors its message there and hands focus to t
 height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regular leading-none`.
 
 **Monospace text is `font-mono`, never a hand-written `font-family`.** The CSS package extends the
-utility with `font-size-adjust: var(--ids-font-size-adjust-mono)`, which sets Monaspace Neon at 95%
-so code sits level with the body text and brings any fallback font to the same x-height. Do not
-shrink it again with `text-[0.9em]`.
+utility with `font-size-adjust: var(--ids-font-size-adjust-mono)`, which matches Pretendard GOV's
+x-height (0.53), so Geist Mono draws at full size level with the body text and any fallback font
+comes to the same x-height. Pretendard follows the monospace fonts in the stack, so Hangul in code
+falls back to it. Do not shrink it again with `text-[0.9em]`.
 
 Icons come from `@heroicons/react` (a runtime dependency). Consumers can override any glyph
 through the matching `*.Indicator` / `*.Close` part.
@@ -452,9 +500,9 @@ has them all: drawn as text they fall back to a system font that sits them off c
 **Strings.** User-facing strings go through `useTranslate()` with a stable dotted key
 (`t('dialog.close')`, `t('textArea.remaining', { remaining })`), never a Korean literal and never
 a module-level read of `messages`, so the nearest `IdsProvider translate` decides the language on
-the server and the client alike. The Korean defaults live nested in `internal/messages.ts`, sorted
+the server and the client alike. The Korean defaults live in `packages/core/messages/ko.json`, sorted
 by group and key, as ICU strings with plain `{name}` arguments; a new key also goes into
-`messages/en.json` at the same place. `IdsMessageKey` is the union of their dotted leaf paths.
+`packages/core/messages/en.json` at the same place. Run `pnpm codegen` to refresh the catalogs. `IdsMessageKey` is the union of their dotted leaf paths.
 Developer warnings stay English and out of the catalog. A default that has to be a function
 (`getValueLabel`) is built in the body from `t`, not in the parameter list. Dates, times and numbers
 take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
@@ -494,6 +542,12 @@ read from `event.key`, since TanStack falls back to the key's position.
 **Parts.** Part props types are named `X.PartProps` (`OTPField.SlotProps`,
 `ButtonGroup.SeparatorProps`), one level down for a sub-component's parts
 (`Image.Viewer.CloseProps`). Every part is optional and falls back to a default.
+
+**A description is a paragraph.** A `Description` part of prose (Card, Item, Empty, Alert, Field,
+Dialog, Popover) renders a `<p>`; one inside a button (Stepper) stays a `<span>`. Block content
+goes in through `asChild` (`<Card.Description asChild><div>…</div></Card.Description>`), the way a
+Title takes another heading level. `internal/paragraph.ts` warns in development when a block
+element lands inside the `<p>`, which the HTML parser would split apart on the server.
 
 **Group-like controls keep a stable focus target.** RadioGroup, CheckboxGroup, Rating and
 ToggleGroup put `ref` and `id` on the root, with `tabIndex={-1}`, and hand `focus()` to the
@@ -564,14 +618,14 @@ projects:
 
 - `browser`: `tests/**/*.test.tsx` render from `src` in headless Chromium, Firefox and WebKit through
   Playwright (Chromium only outside Linux, see Engines below), with Tailwind and the IDS CSS loaded
-  and reduced motion on. They keep the system fonts: WebKit caches Pretendard's variable font per
+  and reduced motion on. They keep the system fonts (`tests/styles.css` imports `@gsainfoteam/ids-css/no-fonts.css`): WebKit caches Pretendard's variable font per
   size and weight and grows past several gigabytes over a story file. `tests/kbd.test.tsx`, which
   measures text, imports Pretendard for itself. `tests/stories-<category>.test.tsx` (one file per
   component category and one for the foundations, all through `checkEveryStory` in
   `tests/story-checks.ts`) render every story and run its `play` through portable stories
   (`composeStories` + `run()`), every story in light and then every story in dark mode, then run
   axe-core over the page with the WCAG 2.0, 2.1 and 2.2 A and AA tags and fail with one line per
-  rule, node and fix; a story tagged `'!test'` is skipped. The stories are split by category so
+  rule, node and fix (`color-contrast` excepted, see APCA above); a story tagged `'!test'` is skipped. The stories are split by category so
   no single page renders all of them.
   `tests/hydration.test.tsx` renders every story with `renderToString`, hydrates that HTML with
   `hydrateRoot` and fails on a recoverable error or any `console.error`.
@@ -583,7 +637,7 @@ projects:
 - `visual`: `tests/gallery.visual.test.tsx` renders every story named `Gallery` in light and dark at
   1440px wide, grows the viewport to the story's height and compares it with `toMatchScreenshot`
   against `tests/__screenshots__/gallery.visual.test.tsx/<category>-<component>-<mode>-chromium-linux.png`.
-  The fonts come from npm (`pretendard-gov`, `@fontsource/monaspace-neon`, pinned in
+  The fonts come from npm (`pretendard-gov`, `@fontsource-variable/geist-mono`, pinned in
   `tests/visual.css`), `Date` is fixed and animations are stopped, so nothing but the code and the
   image changes a pixel. The baselines are rendered only in `mcr.microsoft.com/playwright:v<playwright
   version>-noble` on `linux/amd64`, through `scripts/visual.mjs`, which `pnpm test:visual`, its
@@ -615,9 +669,19 @@ default, so on macOS `pnpm test` runs Chromium only; CI (ubuntu) runs all three,
 `pnpm test:browsers` runs all three in the Playwright Linux image through Docker.
 `IDS_BROWSERS=firefox,webkit` picks engines by hand.
 
-CI gives each engine its own runner: the JS job runs `pnpm test` with Chromium, and the
-`engines` job runs the browser project once for Firefox and once for WebKit. WebKit on Linux
-retries a failed test once (`--retry 1` in that job only): about one run in three, one test there
+CI splits the tests over runners with `vitest run --shard`: Chromium runs every project on two
+runners, Firefox and WebKit run the browser project on five each. `tests/balanced-sequencer.ts`
+deals the files out by the seconds `tests/durations.json` gives each (WebKit times from a CI run,
+the median for a file not listed), so every runner gets about the same time; Vitest's own shard
+splits by path hash and leaves one runner twice as long as another. When a file grows much slower
+or faster, take the new times from a WebKit job's log. The test runners run inside the Playwright
+Linux image of the version `pnpm-lock.yaml` holds, which ships the browsers and their system
+libraries: `playwright install --with-deps` on the plain runner took from 20 seconds to 12 minutes
+waiting on apt. The required checks are small jobs that
+pass only when every runner behind them passed: `JS (lint / typecheck / build / test)` waits for
+the lint, typecheck and build job and both Chromium runners, `Browser tests (firefox)` and
+`Browser tests (webkit)` for their five. WebKit on Linux retries a failed test once (`--retry 1`
+on its runners only): about one run in three, one test there
 stops typing or firing a timer for seconds and runs out of time, a different typing or timer
 story each time (TextArea `CharacterCount`, TelField). The same story passes alone and with its
 whole category file in the Playwright Linux image, and splitting the files by mode or across two
@@ -675,7 +739,7 @@ replays a Chromium-only result.
 **Accessibility.** The axe options live in `parameters.a11y` of `.storybook/preview.tsx`, which
 `@storybook/addon-a11y` reads for the Accessibility panel too, so the panel and the test check the
 same rules. A violation is fixed in the component, with a test, or in the story when only its
-scaffolding is wrong. A rule is never turned off for the project. A story that shows a misuse on
+scaffolding is wrong. A rule is never turned off for the project, except `color-contrast`, which APCA replaces. A story that shows a misuse on
 purpose (Button's `DevelopmentWarnings` nests a button in a button) turns off that one rule with
 `parameters: { a11y: { options: { rules: { 'nested-interactive': { enabled: false } } } } }` and
 says why in its description. The decorator paints `<body>` with the story's surface color, so a
@@ -689,20 +753,58 @@ may remount the story. Inputs whose focus a play checks carry `data-1p-ignore` a
 
 ## IdsProvider
 
-Every IDS component relies on `data-color` and `data-mode` attributes injected by `IdsProvider`
-(`ThemeProvider` in Flutter). Without it, CSS variables are undefined and colors will not render.
+Every IDS component relies on the theme `IdsProvider` writes on its root: `data-mode` and inline
+variables. Without it, the brand variables are undefined and colors will not render. Flutter's
+`IdsProvider` takes the same theme fields and resolves the same roles (see Flutter runtime provider).
 
 ```tsx
-<IdsProvider color="blue" mode="light">
+const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'round' });
+
+<IdsProvider theme={theme} mode="light">
   <App />
 </IdsProvider>
 ```
 
-## Adding a new color
+- The app owns its brand colors: `primary` (required), `secondary` and `tertiary`, each a palette
+  (`50` to `950`) or one CSS color to build one from. The provider picks every family's roles for
+  both modes by contrast (`ids-provider/theme-roles.ts`) and writes them as
+  `--ids-theme-{mode}-{role}`; `ids.css` maps the current mode's set onto `--ids-color-{role}`.
+- `neutral: 'tinted'` gives the neutral the primary hue at low chroma (`'pure'` by default).
+  `status` is `'harmonized'` by default (each status hue turns toward primary by at most 15°, or
+  half the distance, and stays in its hue range), `'fixed'`, or colors the app picks.
+- `checkIdsTheme` also reports brand families that sit too close to each other or to a status
+  (OKLab), a status hue outside its range, and success or warning that look like danger under
+  red-green color blindness. The thresholds were set from the 17 demo palettes that core used
+  to hold and are fixed values now.
+- Chart has no color tokens: a series without `color` takes `bg-primary`, `bg-secondary` and
+  `bg-tertiary` in config order (`DEFAULT_SERIES` in `data/chart/config.ts`). A fourth draws in
+  neutral and warns in development.
+- A `secondary` or `tertiary` the app leaves out is derived from primary, the Material 3 way:
+  secondary keeps primary's hue at a third of its chroma ratio, tertiary turns the hue by +60° at
+  the same ratio, or by −60° when +60° lands too close to a status. Each goes through the same
+  palette builder and role rules, so `colorScheme="tertiary"` and Chart always get three distinct
+  colors.
+- `radius` and `cornerShape` become `--ids-theme-radius-*` and `--ids-corner-shape` on the same
+  element. The fonts are fixed (Pretendard GOV, Geist Mono); `@gsainfoteam/ids-css` ships
+  their files; `@gsainfoteam/ids-css/no-fonts.css` is the same CSS without them, which the browser
+  tests import. The Tailwind bridges are `@theme inline`, so utilities
+  read the provider's variables and not the values on `:root`.
+- `IdsProvider.Scope` takes any part of a theme and overrides it for a subtree; `checkIdsTheme`
+  returns the problems the provider warns about in development.
+- Stories and tests take their palettes from `.storybook/palettes.ts` (`palettes.blue`,
+  `tests/theme.ts`'s `testTheme`).
 
-1. Add palette values to `packages/core/tokens/palette.json`
-2. Add `packages/core/tokens/semantic/[color].light.json` and `[color].dark.json`
-3. Run `pnpm codegen` and commit the generated files
+## Palettes in core
+
+IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral and the four status
+palettes (red, yellow, green, sky). The one-color palette builder evaluates a model whose
+coefficients live in `packages/core/palette-model.json` (Fourier series of the 500 hue per step,
+fitted once to 17 demo palettes that are gone now); `pnpm codegen` copies them and the status
+palettes to `src/tokens/palette-model.ts` and to `packages/flutter/lib/tokens/ids_palette_model.dart`,
+which `IdsPalette.fromSeed` evaluates to the same 8-bit colors. Stories and tests build their 17
+palettes from seed hex values in `.storybook/palettes.ts`. There are no per-hue role tables: every
+platform picks the roles from the app's palette at runtime. `packages/core/color-roles.json` names
+the roles once; the CSS, the React types and the Dart `IdsColors` class are all written from it.
 
 ## Versioning — Changesets (fixed mode)
 
@@ -745,3 +847,32 @@ graph LR
 ```
 
 `core` is never a runtime dependency of anything. It is a build-time code generator only.
+
+
+## Flutter runtime provider
+
+ids_flutter follows ids-react's theme. The design is decided in React; Flutter ports it.
+
+- `IdsProvider(theme: IdsTheme(...), mode: ...)` takes the same fields as `defineIdsTheme`:
+  `primary` (required), `secondary`, `tertiary` (each `IdsPalette` or `IdsThemeColor.seed(color)`),
+  `neutral`, `status`, `radius`, `cornerShape`, `scale`. `IdsProviderScope(theme: IdsThemeOverrides(...))`
+  is `IdsProvider.Scope`. Nested providers inherit what they leave out; a scope with its own `mode`
+  or `defaultMode` owns its mode, the others forward `setMode` and `toggleMode` to the owner.
+  `IdsMode.system` follows the platform brightness.
+- `lib/src/color` ports `ids-provider/theme-roles.ts`, `contrast.ts` (APCA from colorjs.io),
+  `derived-brands.ts`, `status.ts` and the `checkIdsTheme` checks line by line, so a theme gives the
+  same 8-bit colors on both platforms. `packages/react/tests/flutter-parity.test.ts` writes
+  `packages/core/tests/fixtures/theme-roles.json` (17 palettes × pure/tinted × harmonized/fixed ×
+  light/dark) and `test/theme_roles_parity_test.dart` checks every role against it. A change to
+  the role rules updates both ports and the fixture (`vitest run --project node
+  tests/flutter-parity.test.ts -u`) in one commit.
+- Components read roles with `IdsProvider.of(context).colors.bgPrimarySoft` and pick them the way
+  the React component does (field borders `borderNeutral`, invalid `borderDanger`, secondary text
+  `textNeutral`). Text goes through `textStyle(IdsTypography.x, color: ...)`, which sets
+  `inherit: false`, the fixed fonts (Pretendard GOV, Geist Mono) and `scale`; sizes go through
+  `dimension`, corners through `radius` and `shape()`.
+- IDS styles stay inside IDS components; Material and Cupertino themes are not touched.
+
+Flutter strings use the generated `IdsMessages` mixin. Consumers supply a slang object through `translation`; component code falls back per member with `t?.spinnerLabel ?? IdsMessages.ko.spinnerLabel`. Edit `packages/core/messages/ko.json` and `en.json`, then run `pnpm codegen`. Do not hand-edit generated Dart messages or catalogs.
+
+Before Flutter tests or analysis, run `dart run slang` in both `packages/flutter` and `packages/flutter/example` to generate the service fixtures.

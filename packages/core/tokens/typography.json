@@ -32,9 +32,9 @@
   },
   "font-family": {
     "sans": { "$value": ["Pretendard GOV Variable", "Pretendard GOV", "Pretendard Variable", "Pretendard", "sans-serif"], "$type": "fontFamily" },
-    "mono": { "$value": ["Monaspace Neon Var", "Monaspace Neon", "ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"], "$type": "fontFamily" }
+    "mono": { "$value": ["Geist Mono Variable", "Geist Mono", "ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "Pretendard GOV Variable", "Pretendard GOV", "Pretendard Variable", "Pretendard", "monospace"], "$type": "fontFamily" }
   },
   "font-size-adjust": {
-    "mono": { "$value": 0.487, "$type": "number" }
+    "mono": { "$value": 0.53, "$type": "number" }
   }
 }

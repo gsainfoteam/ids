@@ -115,7 +115,7 @@ export const Controlled: Story = {
     return (
       <div className="flex flex-col items-start gap-3">
         <Pagination page={page} pageCount={12} onPageChange={setPage} />
-        <p className="text-body-b3-regular text-(--ids-color-on-muted)">12페이지 중 {page}페이지</p>
+        <p className="text-body-b3-regular text-neutral">12페이지 중 {page}페이지</p>
       </div>
     );
   },

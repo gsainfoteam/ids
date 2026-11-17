@@ -8,6 +8,7 @@ import { render } from 'vitest-browser-react';
 
 import { Avatar, Card, IdsProvider, Skeleton } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html');
@@ -29,7 +30,7 @@ async function withMotion() {
 
 function Wrapped({ loading }: { loading: boolean }) {
   return (
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <button type="button">Before</button>
       <Skeleton loading={loading} data-testid="wrapper">
         <input aria-label="Name" data-1p-ignore data-lpignore="true" />
@@ -50,7 +51,7 @@ test('SSR: a shape is an aria-hidden span that names its shape and animation', (
   expect(rect.className).toContain('before:h-4');
   expect(rect.className).toMatch(/\bw-full\b/);
   expect(rect.className).toMatch(/\brounded-standard\b/);
-  expect(rect.className).toContain('bg-(--ids-color-muted)');
+  expect(rect.className).toContain('bg-neutral-soft');
   expect(rect.className).toContain('animate-skeleton-pulse');
   expect(rect.className).toContain('motion-reduce:animate-none');
 
@@ -91,7 +92,7 @@ test('SSR: a text shape draws one line box per line and the last of several is s
   expect(lines({ lines: 2.7 })).toHaveLength(2);
 
   const root = skeletonIn(html(<Skeleton shape="text" className="text-body-b3-medium w-1/3" />));
-  expect(root.className).not.toContain('bg-(--ids-color-muted)');
+  expect(root.className).not.toContain('bg-neutral-soft');
   expect(root.className).toBe('block text-body-b3-medium w-1/3');
 });
 
@@ -110,7 +111,7 @@ test('SSR: wrapping paints the div, marks it busy and puts the children in an in
   expect(loading.hasAttribute('data-shape')).toBe(false);
   expect(loading.hasAttribute('inert')).toBe(false);
   expect(loading.className).toMatch(/\brounded-standard\b/);
-  expect(loading.className).toContain('bg-(--ids-color-muted)');
+  expect(loading.className).toContain('bg-neutral-soft');
   const content = loading.firstElementChild as HTMLElement;
   expect(content.hasAttribute('data-skeleton-content')).toBe(true);
   expect(content.hasAttribute('inert')).toBe(true);
@@ -168,7 +169,7 @@ test('SSR: asChild paints the child itself, keeps its radius and makes it inert'
 
 test('the server markup hydrates without a mismatch in both modes', async () => {
   const tree = (
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Skeleton />
       <Skeleton shape="text" lines={2} />
       <Skeleton>
@@ -231,7 +232,7 @@ test('Tab skips the content while loading, and loading false shows the same node
 test('asChild merges into an IDS component: its radius, its ref and its own props stay', async () => {
   const ref = createRef<HTMLElement>();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Card data-testid="plain">
         <Card.Title>Plain</Card.Title>
       </Card>
@@ -240,7 +241,7 @@ test('asChild merges into an IDS component: its radius, its ref and its own prop
           <Card.Title>Painted</Card.Title>
         </Card>
       </Skeleton>
-      <span data-testid="muted" className="block bg-(--ids-color-muted)" />
+      <span data-testid="muted" className="bg-neutral-soft block" />
     </IdsProvider>,
   );
   const plain = screen.getByTestId('plain').element();
@@ -261,7 +262,7 @@ test('asChild merges into an IDS component: its radius, its ref and its own prop
 
 test('asChild on an Avatar keeps its circle and size and hides its initials and ring', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Avatar name="Lee" data-testid="plain" />
       <Skeleton loading asChild>
         <Avatar name="Kim" data-testid="painted" />
@@ -312,7 +313,7 @@ test('a rect is 16px tall until a height, an aspect ratio, insets or a stretch s
 
 test('text lines are as tall as the text they stand for, with a bar one em high', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="grid w-80 grid-cols-2 items-start gap-4">
         <Skeleton data-testid="b3" shape="text" lines={3} className="text-body-b3-regular" />
         <p data-testid="b3-text" className="text-body-b3-regular">
@@ -350,11 +351,11 @@ test('with motion reduced both animations stop on the plain muted fill', async (
   skipWithoutCdp(context);
   await withMotion();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="w-40">
         <Skeleton data-testid="pulse" />
         <Skeleton data-testid="wave" animation="wave" />
-        <span data-testid="muted" className="block bg-(--ids-color-muted)" />
+        <span data-testid="muted" className="bg-neutral-soft block" />
       </div>
     </IdsProvider>,
   );
@@ -380,7 +381,7 @@ test('the wave travels in the reading direction and backwards in right-to-left t
   skipWithoutCdp(context);
   await withMotion();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="w-40">
         <Skeleton data-testid="ltr" animation="wave" />
       </div>

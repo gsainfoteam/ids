@@ -7,13 +7,13 @@ export const telFieldStyle = tv({
   extend: textControlStyle,
   slots: {
     country: [
-      'w-auto shrink-0 rounded-standard text-(--ids-color-on-surface)',
-      'hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover) ring-0! inset-ring-transparent!',
+      'w-auto shrink-0 rounded-standard text-on-surface',
+      'hover:bg-neutral-soft active:bg-neutral-soft-hover ring-0! inset-ring-transparent!',
     ],
     countryTrigger: 'gap-1',
     countryValue: 'tabular-nums',
     countryName: 'min-w-0 flex-1 truncate',
-    countryCode: 'shrink-0 text-(--ids-color-on-muted) tabular-nums',
+    countryCode: 'shrink-0 text-neutral tabular-nums',
   },
   variants: {
     size: {

@@ -10,18 +10,18 @@ export const temporalFieldStyle = tv({
       'flex h-full min-w-0 flex-1 cursor-pointer touch-manipulation items-center self-stretch',
       'bg-transparent text-start outline-none disabled:cursor-not-allowed',
     ],
-    icon: 'shrink-0 text-(--ids-color-on-muted)',
-    value: 'min-w-0 flex-1 truncate data-placeholder:text-(--ids-color-on-muted)',
+    icon: 'shrink-0 text-neutral',
+    value: 'min-w-0 flex-1 truncate data-placeholder:text-neutral',
     clear: fieldAction.base,
     input: [
       'h-full min-w-0 flex-1 self-stretch bg-transparent outline-none',
-      'placeholder:text-(--ids-color-on-muted) disabled:cursor-not-allowed',
+      'placeholder:text-neutral disabled:cursor-not-allowed',
     ],
     button: fieldAction.base,
     content: 'flex justify-center',
     panel: 'flex flex-col gap-4 sm:flex-row',
     panelTime: 'flex min-w-0 flex-col gap-2 sm:w-52',
-    panelHint: 'text-caption-c1-regular text-(--ids-color-on-muted)',
+    panelHint: 'text-caption-c1-regular text-neutral',
   },
   variants: {
     variant: {

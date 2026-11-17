@@ -1,122 +1,137 @@
 # Color
 
-IDS 색은 이름이 역할을 말하는 시맨틱 토큰입니다. 값은 `IdsProvider` 가 붙이는 `data-color` 와 `data-mode` 에 따라 CSS가 바꿉니다.
+IDS 색은 계열 여덟 개가 같은 역할 열 개를 가지는 시맨틱 토큰입니다. 브랜드 색은 앱이 `IdsProvider theme` 에 준 색에서 오고, 모든 색은 `IdsProvider` 가 붙이는 `data-mode` 에 따라 CSS 가 바꿉니다.
 
 ```tsx
-<div className="bg-(--ids-color-surface) text-(--ids-color-on-surface)">
-  <button className="bg-(--ids-color-primary) text-(--ids-color-on-primary)">저장</button>
+<div className="bg-surface text-on-surface">
+  <button className="bg-primary text-on-primary hover:bg-primary-hover">저장</button>
+  <span className="bg-danger-soft text-on-danger-soft">실패</span>
+  <p className="text-neutral">보조 글자</p>
 </div>
 ```
 
-- 이름은 `--ids-color-{역할}` 이고, Tailwind에서는 `bg-(--ids-color-primary)` 처럼 씁니다. `bg-primary` 같은 `@theme` 이름도 있습니다.
+- 유틸리티 앞머리가 속성을 말합니다. `bg-*` 는 배경, `text-*` 는 글자(와 `fill-*`), `border-*` 는 선(과 `ring-*`, `inset-ring-*`, `outline-*`, `stroke-*`, `divide-*`)입니다.
+- CSS 변수는 `--ids-color-{역할}` 입니다(`--ids-color-bg-primary-soft`). 공유 `--color-*` 이름은 없어서 `bg-on-primary` 같은 클래스는 만들어지지 않습니다.
 - 값은 `IdsProvider` 안에서만 정의됩니다.
 
-## 브랜드
+## 계열
 
-`data-color` 와 `data-mode` 둘 다에 따라 바뀝니다.
+| 계열 | 색이 오는 곳 |
+| --- | --- |
+| `neutral` | IDS 의 회색. `neutral: 'tinted'` 면 primary 색상이 옅게 든다 |
+| `primary` | 앱의 `theme.primary` (필수) |
+| `secondary` | `theme.secondary`, 없으면 primary 와 같은 hue 에 채도 1/3 |
+| `tertiary` | `theme.tertiary`, 없으면 primary hue 를 +60°(상태 색과 겹치면 −60°) 돌리고 채도 1/3 |
+| `success`, `warning`, `danger`, `info` | 기준 green, yellow, red, sky 를 primary 쪽으로 돌린 색(`'harmonized'`), 기준 그대로(`'fixed'`), 또는 앱이 고른 색 |
 
-| 토큰                         | 쓰임                                                                   |
-| ---------------------------- | ---------------------------------------------------------------------- |
-| `primary` / `on-primary`     | 주요 동작의 채움과 그 위 글자. 포커스 링                               |
-| `secondary` / `on-secondary` | 옅은 브랜드 채움과 그 위 글자. 모든 soft variant                       |
-| `accent`                     | 채움 없이 페이지 위에 놓이는 브랜드 글자와 아이콘                      |
-| `outline`                    | 브랜드 색을 띠어야 하는 드문 선                                        |
+## 역할
+
+| 역할 | 쓰임 |
+| --- | --- |
+| `bg-X` | 채움 (solid Button, Progress 막대, solid Badge) |
+| `bg-X-hover`, `bg-X-active` | 채움의 hover, press. 글자에서 먼 쪽으로 10%, 20% |
+| `bg-X-soft` | 옅은 채움 (soft variant, 선택된 행) |
+| `bg-X-soft-hover`, `bg-X-soft-active` | 옅은 채움의 hover, press. 채움을 6%, 12% 섞는다 |
+| `text-on-X` | `bg-X` 와 그 hover, press 위 글자 |
+| `text-on-X-soft` | `bg-X-soft` 와 그 hover, press 위 글자 |
+| `text-X` | 채움 없는 바탕 위 글자와 아이콘 (Link, outline Badge, Rating 별) |
+| `border-X` | 선. 브랜드와 상태는 `text-X` 와 같은 색 |
+
+바탕 층은 따로 둘입니다.
+
+| 토큰 | 쓰임 |
+| --- | --- |
+| `surface` | 페이지와 카드 배경 (`bg-surface`) |
+| `on-surface` | 본문 글자 (`text-on-surface`) |
+
+- 채움 위 글자는 색을 직접 고르지 말고 `text-on-X` 로 칠합니다. 밝은 팔레트에서는 검은 글자가 됩니다.
+- `bg-primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않습니다. yellow, cyan 처럼 밝은 색은 흰 배경 위에서 Lc 60 도 안 됩니다.
+- 노란 `warning` 채움 위 글자도 `text-on-warning` 입니다. 흰 바탕 위 경고 글자는 `text-warning` 입니다.
+
+### 바뀐 이름
+
+| 예전 | 지금 |
+| --- | --- |
+| `secondary` / `on-secondary` | `bg-primary-soft` / `text-on-primary-soft` |
+| `accent` | `text-primary` |
+| `outline` | `border-primary` |
+| `muted`, `muted-hover`, `muted-active` | `bg-neutral-soft`, `-hover`, `-active` |
+| `on-muted` | `text-neutral` |
+| `border` | `border-neutral` |
+| `handle`, `handle-hover`, `handle-active` | `bg-neutral`, `-hover`, `-active` |
+| `{상태}` / `on-{상태}` | `bg-{상태}` / `text-on-{상태}` |
+| `{상태}-strong` | `text-{상태}` |
+| 상태 색 10~20% 틴트 | `bg-{상태}-soft` 와 `text-on-{상태}-soft` |
+| `chart-1` ~ `chart-5` | 없음. Chart 기본 색은 `bg-primary`, `bg-secondary`, `bg-tertiary` |
+
+## 팔레트에서 고르기
 
 ```tsx
-<button className="bg-(--ids-color-primary) text-(--ids-color-on-primary)">저장</button>
-<span className="bg-(--ids-color-secondary) text-(--ids-color-on-secondary)">새 글</span>
-<a className="text-(--ids-color-accent)">자세히 보기</a>
-```
-
-- `primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않습니다. yellow, cyan 처럼 밝은 색은 흰 배경 위에서 4.5:1 이 안 됩니다.
-- soft 컨트롤의 hover 와 press 는 `secondary` 에 `primary` 를 6%, 12% 섞습니다. `on-secondary` 는 이 배경에서도 4.5:1 을 지킵니다.
-- `accent` 를 쓰는 곳: outline Badge 와 Chip 의 글자, Rating 별, Radio 점.
-
-### 17색
-
-```tsx
-<IdsProvider color="emerald">
+<IdsProvider theme={defineIdsTheme({ primary: '#0d9488', secondary: palette, neutral: 'tinted' })}>
   <App />
 </IdsProvider>
 ```
 
-- `red` `orange` `amber` `yellow` `lime` `green` `emerald` `teal` `cyan` `sky` `blue` `indigo` `violet` `purple` `fuchsia` `pink` `rose`.
-- 팔레트는 Tailwind CSS v4 기본 색을 hex 로 옮긴 값입니다. `orange` 와 `green` 은 IDS 고유 값입니다.
-- 채움과 선은 모든 색이 같은 단계를 씁니다. 글자 단계는 대비로 정합니다.
-
-| 토큰           | light      | dark       |
-| -------------- | ---------- | ---------- |
-| `primary`      | 600        | 600        |
-| `secondary`    | 100        | 950        |
-| `on-secondary` | 700 또는 800 | 400        |
-| `accent`       | 600 ~ 800  | 400 또는 500 |
-| `outline`      | 200        | 800        |
-
-- `on-secondary`: light 는 700 과 800 중 soft 의 hover, press 배경까지 4.5:1 을 지키는 밝은 쪽입니다.
-  - 800: `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` `pink` `rose`.
-  - 700: 나머지 7색.
-- `accent`: light 는 600, 700, 800 중 흰 배경과 `secondary` 위에서 4.5:1 을 넘는 가장 밝은 단계, dark 는 500, 400, 300 중 `neutral.950` 과 `secondary` 위에서 4.5:1 을 넘는 가장 진한 단계입니다.
-  - light 600: `indigo` `violet` `purple`. 800: `orange`. 나머지는 700.
-  - dark 500: `orange` `amber` `yellow` `lime` `green` `emerald` `teal` `cyan` `sky`. 나머지는 400.
-- `on-primary` 는 흰 글자(`neutral.0`)가 기본입니다. 흰 글자로 4.5:1 이 안 되는 밝은 색은 검은 글자(`neutral.950`)입니다.
-  - 검은 글자: `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky`.
-  - 흰 글자: 나머지 9색.
-- 채움 위 글자와 아이콘은 색을 직접 고르지 말고 `on-primary` 로 칠합니다. 그래야 밝은 색에서도 읽힙니다.
+- 앱은 브랜드 색을 50 ~ 950 의 11단계 팔레트나 색 하나로 줍니다. IDS 에는 기본 색이 없습니다.
+- 대비는 APCA 의 Lc 입니다. 채움은 600 에서 시작해 글자가 Lc 75 에 닿을 때까지 이웃 단계로 옮기고, 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60 을 넘는 첫 단계이고, 선은 페이지 위 색 글자와 같은 단계입니다. 규칙은 [IdsProvider](../../components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 에 있습니다.
+- Storybook 의 Palette 툴바와 이 스토리는 레포 데모 팔레트 17개(Tailwind CSS v4 기본 색, `orange` 와 `green` 은 IDS 고유 값)를 씁니다. 패키지에는 들어 있지 않습니다.
 
 ## 중립
-
-`data-mode` 에만 따릅니다.
-
-| 토큰            | 쓰임                                               |
-| --------------- | -------------------------------------------------- |
-| `surface`       | 페이지와 카드 배경                                 |
-| `on-surface`    | 본문 글자                                          |
-| `muted`         | 옅은 채움 (soft 필드, 투명 컨트롤의 hover, 트랙)   |
-| `muted-hover`   | 채운 컨트롤의 hover, 투명 컨트롤을 누를 때         |
-| `muted-active`  | 채운 컨트롤을 누를 때                              |
-| `on-muted`      | 보조 글자 (설명, 힌트, 자리 표시)                  |
-| `border`        | 필드 테두리, 카드 가장자리, 구분선                 |
-| `handle`        | 잡아 끄는 손잡이 (ScrollArea thumb, Drawer 손잡이) |
-| `handle-hover`  | 손잡이에 올렸을 때                                 |
-| `handle-active` | 손잡이를 끄는 동안                                 |
 
 ### 상태 사다리
 
 중립 상태는 한 단계씩 오릅니다.
 
 ```tsx
-<button className="hover:bg-(--ids-color-muted) active:bg-(--ids-color-muted-hover)">투명</button>
-<button className="bg-(--ids-color-muted) hover:bg-(--ids-color-muted-hover) active:bg-(--ids-color-muted-active)">
+<button className="hover:bg-neutral-soft active:bg-neutral-soft-hover">투명</button>
+<button className="bg-neutral-soft hover:bg-neutral-soft-hover active:bg-neutral-soft-active">
   채움
 </button>
-<span className="bg-(--ids-color-handle) hover:bg-(--ids-color-handle-hover) data-dragging:bg-(--ids-color-handle-active)" />
+<span className="bg-neutral hover:bg-neutral-hover data-dragging:bg-neutral-active" />
 ```
 
-- 투명 컨트롤: 쉼 → hover `muted` → press `muted-hover`.
-- 채운 컨트롤: `muted` → hover `muted-hover` → press `muted-active`.
-- 손잡이: `handle` → hover `handle-hover` → 끄는 동안 `handle-active`.
+- 투명 컨트롤: 쉼 → hover `bg-neutral-soft` → press `bg-neutral-soft-hover`.
+- 채운 컨트롤: `bg-neutral-soft` → hover `bg-neutral-soft-hover` → press `bg-neutral-soft-active`.
+- 손잡이(ScrollArea thumb, Drawer 손잡이): `bg-neutral` → hover `bg-neutral-hover` → 끄는 동안 `bg-neutral-active`.
 - 눌린 토글은 press 단계로 칠합니다.
 - 사다리를 따르지 않는 것:
   - 배경을 모르는 겹침층: Item, Card 의 `on-surface` 겹침, Chip 의 `currentColor` 층, Kbd.
-  - 브랜드 상태: `/90`, `/80`, `/10`~`/20`.
+  - 브랜드 상태.
   - 테두리 링, disabled 투명도, backdrop.
 
-## 상태
+### 구조선
 
-`data-mode` 에만 따릅니다. `success`, `warning`, `danger`, `info` 마다 세 톤이 있습니다.
+- 필드 테두리, 카드 가장자리, 구분선은 `border-neutral` 입니다. 꾸밈 선이라 대비 규칙이 없습니다.
+- 선 자체가 브랜드로 읽혀야 하는 드문 자리만 `border-primary` 를 씁니다.
 
-| 토큰            | 쓰임                                                        |
-| --------------- | ----------------------------------------------------------- |
-| `{상태}`        | 채움 (Progress 막대, solid Alert 배경)                      |
-| `on-{상태}`     | `{상태}` 채움 위 글자                                       |
-| `{상태}-strong` | 흰(또는 검은) 배경 위 글자와 아이콘. 대비 4.5:1을 지키는 톤 |
+## 실시간으로 조정하기
 
-- 노란 `warning` 은 흰 배경 위 글자로 쓰면 대비가 모자랍니다. 글자에는 `warning-strong` 을 씁니다.
+- 툴바: Primary, Secondary, Tertiary, Neutral(`pure`, `tinted`), Status(`harmonized`, `fixed`), Corner, Mode 가 모든 스토리의 테마를 바꿉니다. Secondary 와 Tertiary 의 `derived` 는 primary 에서 만든 계열입니다.
+- `Foundations/Color` 의 스토리는 둘입니다.
+
+| 스토리 | 보는 것 |
+| --- | --- |
+| Lab | 테마 하나. Controls 의 색 선택기로 primary, secondary, tertiary 를 아무 CSS 색으로 고르고, 비우면 primary 에서 만든 계열을 본다 |
+| Palettes | 데모 팔레트 17개를 primary 로 줄 때의 역할 색과 대비 |
+
+- Lab 은 한 화면에 이것들을 그립니다.
+  - `checkIdsTheme` 의 문제 목록.
+  - 계열마다 11단계 팔레트와 출처(준 색, primary 에서 만듦, harmonized, fixed).
+  - 계열 × 역할 스워치와 모든 계열 짝의 대비, 두 모드.
+  - 두 모드의 컴포넌트:
+    - 여덟 colorScheme × Button 다섯 variant, IconButton, 켜진 Toggle, IconToggle.
+    - Badge, Chip, Link, Alert, Progress.
+    - TextField(보통, invalid), Select, Checkbox, Switch, RadioGroup, Slider, Rating.
+    - Tabs, Pagination, Breadcrumb, Stepper.
+    - Card, Item, Avatar, Spinner, Skeleton, Kbd, Calendar, Chart(막대, 면).
 
 ## 원칙
 
 - 구조선과 테두리는 중립입니다. 테마 색은 주요 동작과 포커스에만 씁니다.
 - 색만으로 의미를 전하지 않습니다. 아이콘이나 글자를 함께 둡니다.
-- 대비는 Storybook `Foundations/Color` 의 Contrast에서 모드와 테마마다 확인합니다.
-- Tokens 스토리는 `semantic/*.json` 과 `enums.json` 을 읽어 그리므로 토큰이나 색을 더하면 저절로 나타납니다. 원시 단계는 [Palette](../palette/README.md) 에 있습니다.
-- `tests/tokens-contrast.test.ts` 가 17색 × 두 모드의 `on-primary` / `primary`, `on-secondary` / `secondary` 와 그 hover, press 배경, `accent` / `surface`, `accent` / `secondary`, 상태 짝이 4.5:1 을 넘는지 검사합니다.
+- 대비는 Storybook `Foundations/Color` 의 Lab(테마 하나)과 Palettes(17색)에서 확인합니다.
+- Lab 의 역할 표는 `tokens/color-roles.ts`(core 의 `color-roles.json` 에서 생성)의 계열과 역할을 읽어 그리므로 계열이나 역할을 더하면 저절로 나타납니다. 데모 팔레트의 원시 단계는 [Palette](../palette/README.md) 에 있습니다.
+- 테스트:
+  - `tests/tokens-contrast.test.ts`: 데모 팔레트 17개 × 두 모드 × pure·tinted × harmonized·fixed 에서 모든 계열의 채움과 soft 위 글자가 Lc 75, `text-X` 가 Lc 60, 선이 Lc 45 이상이다.
+  - `tests/theme-roles.test.ts`: 역할 규칙이 이전 고정 표(Flutter 가 쓰는 표)와 같은 단계를 고른다.
+  - `tests/theme-colors.test.ts`: harmonize, tinted neutral, `checkIdsTheme` 의 구별 검사와 그 기준값.

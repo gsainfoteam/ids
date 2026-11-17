@@ -6,6 +6,8 @@ import { playwright } from '@vitest/browser-playwright';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { configDefaults, defineConfig } from 'vitest/config';
 
+import { BalancedSequencer } from './tests/balanced-sequencer';
+
 const TESTS = new URL('./tests/', import.meta.url);
 const SERVER_RENDER_SUITES = 'tests/**/*.ssr.test.tsx';
 const VISUAL_SUITES = 'tests/**/*.visual.test.tsx';
@@ -62,6 +64,7 @@ export default defineConfig({
   plugins: [tsconfigPaths({ projects: ['./tsconfig.json'] }), tailwindcss(), react()],
   optimizeDeps: { include: ['@floating-ui/react'] },
   test: {
+    sequence: { sequencer: BalancedSequencer },
     projects: [
       {
         extends: true,

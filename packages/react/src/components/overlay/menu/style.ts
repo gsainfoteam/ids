@@ -15,9 +15,9 @@ export const menuStyle = tv({
     viewport: 'flex flex-col p-1',
     palette: [
       'fixed inset-x-0 top-[15vh] bottom-auto z-50 mx-auto my-0 flex h-fit flex-col',
-      'max-h-[min(28rem,calc(85dvh-1rem))] w-[min(36rem,calc(100%-2rem))] max-w-none',
+      'max-h-[min(--spacing(112),calc(85dvh-var(--spacing)*4))] w-[min(--spacing(144),calc(100%-var(--spacing)*8))] max-w-none',
       'overflow-hidden concentric-p-1 outline-none',
-      'border border-(--ids-color-border) bg-(--ids-color-surface) text-(--ids-color-on-surface)',
+      'border border-neutral bg-surface text-on-surface',
       'text-body-b3-regular shadow-lg',
       'origin-top transition-[opacity,scale] duration-(--ids-motion-fast) ease-out',
       'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
@@ -29,11 +29,11 @@ export const menuStyle = tv({
     empty: [listStyles.empty, 'not-data-empty:sr-only'],
     item: [
       listStyles.option,
-      'pe-2.5 data-popup-open:bg-(--ids-color-muted-hover) [&_svg]:size-(--ids-size-icon-standard)',
+      'pe-2.5 data-popup-open:bg-neutral-soft [&_svg]:size-(--ids-size-icon-standard)',
     ],
     indicator: listStyles.indicator,
     dot: 'size-1.5 rounded-full bg-current',
-    chevron: '-me-0.5 ms-auto text-(--ids-color-on-muted)',
+    chevron: '-me-0.5 ms-auto text-neutral',
     group: 'flex flex-col',
     label: listStyles.heading,
     separator: listStyles.separator,
@@ -41,7 +41,7 @@ export const menuStyle = tv({
   },
   variants: {
     nested: {
-      false: { content: 'min-w-[max(var(--anchor-width),8rem)]' },
+      false: { content: 'min-w-[max(var(--anchor-width),--spacing(32))]' },
       true: { content: 'min-w-32' },
     },
     checkable: {

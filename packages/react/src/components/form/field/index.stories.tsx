@@ -139,7 +139,7 @@ export const Gallery: Story = {
         <Showcase.Row label="native select">
           <Field orientation="horizontal" className="w-80">
             <Field.Label>정렬</Field.Label>
-            <select className="rounded-standard h-9 px-2 inset-ring-1 inset-ring-(--ids-color-border)">
+            <select className="rounded-standard inset-ring-neutral h-9 px-2 inset-ring-1">
               <option>최신순</option>
               <option>인기순</option>
             </select>
@@ -240,7 +240,7 @@ export const MatchValidity: Story = {
 export const FieldState: Story = {
   render: () => (
     <Field
-      className="rounded-standard w-80 p-3 transition-colors data-focused:bg-(--ids-color-muted)/60"
+      className="rounded-standard data-focused:bg-neutral-soft/60 w-80 p-3 transition-colors"
       required
     >
       <Field.Label>닉네임</Field.Label>

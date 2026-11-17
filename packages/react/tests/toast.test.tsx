@@ -9,6 +9,7 @@ import { render } from 'vitest-browser-react';
 import { Button, Dialog, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
 import { MOD_AS_THE_APP_READS_IT } from './hotkeys';
+import { testTheme } from './theme';
 import { DefaultToaster, Toaster, toast } from '../src/components/feedback/toast';
 
 type Point = { x: number; y: number };
@@ -29,7 +30,7 @@ afterEach(() => {
 
 async function mount(props: Toaster.Props = {}) {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <button type="button">page</button>
       <Toaster {...props} />
     </IdsProvider>,
@@ -85,10 +86,10 @@ function hideTheTab(hidden: boolean) {
 }
 
 test('SSR renders nothing for the toaster, with or without toasts waiting', () => {
-  const without = renderToString(<IdsProvider>page</IdsProvider>);
+  const without = renderToString(<IdsProvider theme={testTheme}>page</IdsProvider>);
   expect(
     renderToString(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         page
         <Toaster />
       </IdsProvider>,
@@ -97,7 +98,7 @@ test('SSR renders nothing for the toaster, with or without toasts waiting', () =
   toast('queued');
   expect(
     renderToString(
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         page
         <DefaultToaster />
       </IdsProvider>,
@@ -410,7 +411,7 @@ test('an explicit Toaster replaces the default one, which returns when it leaves
   function App() {
     const [own, setOwn] = useState(true);
     return (
-      <IdsProvider>
+      <IdsProvider theme={testTheme}>
         <button type="button" onClick={() => setOwn(false)}>
           drop
         </button>
@@ -450,7 +451,7 @@ test('a toast above an open Dialog takes clicks and focus without closing it', a
   const onOpenChange = vi.fn();
   const onUndo = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <OpenDialog onOpenChange={onOpenChange} />
       <Toaster />
     </IdsProvider>,
@@ -481,7 +482,7 @@ test('a toast above an open Dialog takes clicks and focus without closing it', a
 
 test('raising the toaster over a newly opened Dialog replays no entry', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <OpenDialog />
       <Toaster />
     </IdsProvider>,
@@ -534,7 +535,7 @@ test('below 640px the stack spans the screen, wider screens get a fixed column',
 
 test('the icon, text, action and close button of a toast share one vertical center', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Toaster />
     </IdsProvider>,
   );

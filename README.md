@@ -64,19 +64,10 @@ pnpm codegen
 #    packages/flutter/lib/tokens/*.dart
 ```
 
-### 새 색상 추가
+### 브랜드 색
 
-```bash
-# 1. 팔레트 값 추가
-#    packages/core/tokens/palette.json
-
-# 2. semantic 파일 추가
-#    packages/core/tokens/semantic/[color].light.json
-#    packages/core/tokens/semantic/[color].dark.json
-
-# 3. codegen 실행
-pnpm codegen
-```
+- IDS 는 브랜드 팔레트를 싣지 않습니다. 앱이 `defineIdsTheme({ primary })` 로 팔레트나 색 하나를 줍니다.
+- 색 하나로 11단계를 만드는 규칙은 [IdsProvider README](packages/react/src/components/utility/ids-provider/README.md#색-하나로-팔레트-만들기) 에 있습니다.
 
 ### React 컴포넌트 개발
 
@@ -98,7 +89,7 @@ pnpm lint
 
 ```tsx
 // Storybook decorator나 App 최상단에 반드시 추가
-<IdsProvider color="blue" mode="light">
+<IdsProvider theme={defineIdsTheme({ palette: appPalette })} mode="light">
   <App />
 </IdsProvider>
 ```

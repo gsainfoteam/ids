@@ -1,4 +1,11 @@
-import { Children, cloneElement, Fragment, isValidElement, type ReactNode } from 'react';
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
 export function flattenFragments(children: ReactNode, fragmentPath = ''): ReactNode[] {
   return Children.toArray(children).flatMap((child, index) =>
@@ -27,12 +34,23 @@ export function elementTypeOf(element: { type: unknown }): unknown {
   return type;
 }
 
-export function containsElementOfType(children: unknown, types: ReadonlySet<unknown>): boolean {
-  if (typeof children === 'function') return false;
+export function findElementOfType<P = unknown>(
+  children: unknown,
+  types: ReadonlySet<unknown>,
+): ReactElement<P> | undefined {
+  if (typeof children === 'function') return undefined;
 
-  return Children.toArray(children as ReactNode).some(
-    (child) =>
-      isValidElement<{ children?: ReactNode }>(child) &&
-      (types.has(elementTypeOf(child)) || containsElementOfType(child.props.children, types)),
-  );
+  for (const child of Children.toArray(children as ReactNode)) {
+    if (!isValidElement<{ children?: ReactNode }>(child)) continue;
+    if (types.has(elementTypeOf(child))) return child as ReactElement<P>;
+
+    const found = findElementOfType<P>(child.props.children, types);
+    if (found !== undefined) return found;
+  }
+
+  return undefined;
+}
+
+export function containsElementOfType(children: unknown, types: ReadonlySet<unknown>): boolean {
+  return findElementOfType(children, types) !== undefined;
 }

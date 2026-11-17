@@ -34,7 +34,7 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 - **`colorScheme`.** 컴포넌트 색은 `colorScheme` prop이고 값은 `primary` `neutral` `danger` `success` `warning` `info`다. 공유 축이므로 처음 쓰는 컴포넌트에서 `enums.json`에 올린다.
 - **아이콘.** 기본 아이콘(Avatar fallback, Empty media 등)은 Material Icons를 쓴다.
 - **`Group`** 은 내부 전용이다. React처럼 export하지 않고 `ButtonGroup`·`ToggleGroup`이 공유한다.
-- **`Text`** 가 없는 동안 텍스트는 `lib/tokens/ids_typography.dart` 상수를 `DefaultTextStyle`로 쓴다.
+- **`Text`** 가 없는 동안 텍스트는 `IdsProvider.of(context).textStyle(IdsTypography.bodyB3Medium, color: ...)`를 `DefaultTextStyle`로 쓴다. 이름은 CSS의 `text-body-b3-medium`과 같다.
 
 ## widgetbook
 
@@ -130,9 +130,25 @@ focusVisible = focused
 
 ### control surface — Button / IconButton / Toggle / IconToggle 공통
 
-색과 상태별 값은 [control-surface.ts](../react/src/internal/control-surface.ts), [brand-fill.ts](../react/src/internal/brand-fill.ts), [toggle-surface.ts](../react/src/internal/toggle-surface.ts)에서 읽는다. `Button` 때 Figma와 대조한다. Flutter 대응:
+[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySoft`, `textOnPrimary` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
 
-- 테두리는 `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset한다
+| `colorScheme`                                 | fill / on-fill                  | fill hover / press                 | quiet         | hover / press                              | ring        |
+| --------------------------------------------- | ------------------------------- | ---------------------------------- | ------------- | ------------------------------------------ | ----------- |
+| `primary` `secondary` `tertiary`              | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderX`   |
+| `neutral`                                     | `onSurface` / `surface`         | fill을 글자 반대쪽으로 10% / 20%   | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderPrimary` |
+| `danger` `success` `warning` `info`           | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `textX`       | `bgXSoft` / `bgXSoftHover`                 | `borderX`   |
+
+|           | 배경 default                          | hover / active                         | 전경            | 테두리·그림자                        |
+| --------- | ------------------------------------- | -------------------------------------- | --------------- | ------------------------------------ |
+| `solid`   | fill                                  | fill hover / fill press                | on-fill         | 그림자 `shadow-xs`                   |
+| `soft`    | `bgXSoft`                             | `bgXSoftHover` / `bgXSoftActive`       | `textOnXSoft`   | 없음                                 |
+| `outline` | `surface` (dark: `bgNeutralSoft` 0.30) | hover / press                          | quiet           | 안쪽 1px `borderNeutral`, `shadow-xs` |
+| `ghost`   | 투명                                  | hover / press                          | quiet           | 없음                                 |
+
+- 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`, hover)이다
+- `outline` 테두리는 `colors.borderNeutral`이다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
+- 브랜드 fill을 `withValues(alpha: 0.9)`로 흐리게 하지 않는다. hover·press는 `bgXHover`·`bgXActive`이고, 글자에서 멀어지는 쪽으로 섞여 대비가 떨어지지 않는다
+- Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 hover 색이다. 켜지면(`pressed`) press 단계를 쓴다
 - `focusVisible`: 바깥 3px 링(ring 색 40%)과 안쪽 1px 테두리를 ring 색으로
 - 전환은 색·배경·테두리·그림자, 시간은 `IdsMotion.fast`. reduced motion이면 전환 없음
 - Semantics는 컴포넌트가 주입한다 (button, label, enabled. Toggle은 `toggled`)
@@ -140,8 +156,8 @@ focusVisible = focused
 
 |            | 높이 | 좌우 | 아이콘 쪽 | 간격 | 아이콘 | 글자                  |
 | ---------- | ---- | ---- | --------- | ---- | ------ | --------------------- |
-| `standard` | 36   | 16   | 12        | 8    | 16     | `buttonStandard` (14) |
-| `tiny`     | 32   | 12   | 10        | 6    | 14     | `buttonTiny` (12)     |
+| `standard` | 36   | 16   | 12        | 8    | 16     | `bodyB3Medium` (14)   |
+| `tiny`     | 32   | 12   | 10        | 6    | 14     | `captionC1Medium` (12) |
 
 ### 그룹 전파
 

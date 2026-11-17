@@ -4,7 +4,7 @@
 
 - **의미와 강도가 따로.** `colorScheme` 은 의미(info, success, warning, danger, neutral), `variant` 는 강도(solid, soft, outline, ghost)입니다. 두 축은 자유롭게 섞입니다.
 - **색만으로 말하지 않습니다.** 의미마다 기본 아이콘이 붙어 색을 구분하기 어려운 사용자도 종류를 알 수 있습니다.
-- **읽기 좋은 대비.** 제목과 아이콘은 `-strong` 톤을 써서 노란 warning도 WCAG AA(4.5:1)를 넘깁니다.
+- **읽기 좋은 대비.** 제목과 아이콘은 계열의 글자 역할을 써서 노란 warning 도 APCA Lc 60 을 넘깁니다.
 - **알맞게 알립니다.** warning과 danger는 읽던 것을 끊고 알리고(`role="alert"`), 나머지는 기다렸다 알립니다(`role="status"`).
 - **닫기.** `Alert.Close` 를 넣으면 닫을 수 있고, 부모 상태 없이도 스스로 사라집니다. 안에 포커스가 있으면 Escape로도 닫히고, 포커스는 다음 요소로 옮겨 가 페이지 맨 위로 튕기지 않습니다.
 - **한글 입력.** 조합 중에 누른 Escape는 조합만 취소하고 알림은 그대로 둡니다.
@@ -54,6 +54,7 @@ import { Alert } from '@gsainfoteam/ids-react';
 ```
 
 - 모든 파트는 `asChild` 로 다른 요소를 그릴 수 있습니다. 제목을 `h3` 로 두려면 `<Alert.Title asChild><h3>…</h3></Alert.Title>`.
+- `Alert.Description` 은 `<p>` 입니다. 목록이나 문단 여럿 같은 블록 내용은 `<Alert.Description asChild><div>...</div></Alert.Description>` 처럼 태그를 넣습니다. `<p>` 안에 블록 요소가 들어가면 개발 빌드에서 경고합니다. 목록은 `<Alert.Description asChild><ul>...</ul></Alert.Description>` 로 넣으면 글머리표가 붙습니다.
 
 ## 닫기
 

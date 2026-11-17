@@ -6,6 +6,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, Empty, IdsProvider } from '../src';
+import { testTheme } from './theme';
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html');
@@ -71,7 +72,7 @@ test('without Empty.Media an inbox icon stands in, hidden removes it, and a nest
 
 test('the title becomes a heading through asChild, and every part takes asChild', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Empty>
         <Empty.Title asChild>
           <h3>No members</h3>
@@ -100,7 +101,7 @@ test('the title becomes a heading through asChild, and every part takes asChild'
 
 test('parts stack in order and sit on the center line; align start moves them to the start edge', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <div className="w-96">{anatomy()}</div>
       <div className="w-96">{anatomy({ align: 'start' })}</div>
     </IdsProvider>,
@@ -129,7 +130,7 @@ test('parts stack in order and sit on the center line; align start moves them to
 
 test('size tiny tightens the padding and the media box; outline draws a dashed neutral border', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       {anatomy({ variant: 'outline' })}
       {anatomy({ size: 'tiny', variant: 'soft' })}
     </IdsProvider>,
@@ -148,7 +149,7 @@ test('size tiny tightens the padding and the media box; outline draws a dashed n
 test('the actions are ordinary buttons in the tab order', async () => {
   const onCreate = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Empty>
         <Empty.Title>No projects yet</Empty.Title>
         <Empty.Actions>

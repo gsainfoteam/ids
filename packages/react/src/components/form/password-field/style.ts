@@ -8,7 +8,7 @@ export const passwordFieldStyle = tv({
   extend: textControlStyle,
   slots: {
     toggle: [fieldAction.base, 'data-pressed:bg-transparent'],
-    capsLock: 'inline-flex shrink-0 items-center text-(--ids-color-on-muted)',
+    capsLock: 'inline-flex shrink-0 items-center text-neutral',
   },
   variants: {
     size: {

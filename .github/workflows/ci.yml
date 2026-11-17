@@ -3,31 +3,30 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  merge_group:
 
 jobs:
-  js:
-    name: JS (lint / typecheck / build / test)
+  checks:
+    name: Lint / typecheck / build
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
+      - uses: ./.github/actions/setup
         with:
-          node-version: 22
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
+          build: false
 
       - run: pnpm codegen
 
       - name: Check generated files are up to date
         run: |
-          if ! git diff --exit-code -- packages/css/dist packages/react/src/tokens packages/flutter/lib/tokens; then
+          if ! git diff --exit-code -- packages/css/dist packages/react/src/tokens packages/react/src/internal/messages-catalog.ts packages/react/messages packages/flutter/lib/tokens packages/flutter/lib/messages packages/flutter/messages packages/flutter/fonts; then
             echo "Generated files are out of date. Run 'pnpm codegen' and commit the result."
             exit 1
           fi
+
+      - run: node --test packages/core/dart-messages.test.mjs
 
       - run: pnpm typecheck
 
@@ -49,10 +48,39 @@ jobs:
       - name: Check the examples server-render IDS
         run: pnpm examples:check
 
-      - name: Install Chromium for browser tests
-        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell chromium
+  playwright-image:
+    name: Playwright image
+    runs-on: ubuntu-24.04
+    outputs:
+      image: ${{ steps.lockfile.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: pnpm-lock.yaml
+          sparse-checkout-cone-mode: false
 
-      - run: pnpm test
+      - id: lockfile
+        run: |
+          version=$(grep -oP '^ {2}playwright@\K\d+\.\d+\.\d+(?=:)' pnpm-lock.yaml | head -1)
+          echo "image=mcr.microsoft.com/playwright:v$version-noble" >> "$GITHUB_OUTPUT"
+
+  chromium:
+    name: Chromium tests (${{ matrix.shard }}/${{ strategy.job-total }})
+    needs: playwright-image
+    runs-on: ubuntu-24.04
+    container:
+      image: ${{ needs.playwright-image.outputs.image }}
+      options: --ipc=host --user 1001
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/setup
+
+      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --shard ${{ matrix.shard }}/${{ strategy.job-total }}
         env:
           IDS_BROWSERS: chromium
 
@@ -60,38 +88,28 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: failure-screenshots-chromium
+          name: failure-screenshots-chromium-${{ matrix.shard }}
           path: packages/react/.vitest/attachments/failure-screenshots
 
-  engines:
-    name: Browser tests (${{ matrix.browser }})
+  firefox:
+    name: Firefox tests (${{ matrix.shard }}/${{ strategy.job-total }})
+    needs: playwright-image
     runs-on: ubuntu-24.04
+    container:
+      image: ${{ needs.playwright-image.outputs.image }}
+      options: --ipc=host --user 1001
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - browser: firefox
-            retry: 0
-          - browser: webkit
-            retry: 1
-    steps:
+        browser: [firefox]
+        retry: [0]
+        shard: [1, 2, 3, 4, 5]
+    steps: &engine-steps
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - uses: ./.github/actions/setup
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - run: pnpm build
-
-      - name: Install ${{ matrix.browser }}
-        run: pnpm --filter @gsainfoteam/ids-react exec playwright install --with-deps --only-shell ${{ matrix.browser }}
-
-      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --project browser --retry ${{ matrix.retry }}
+      - run: pnpm --filter @gsainfoteam/ids-react exec vitest run --project browser --shard ${{ matrix.shard }}/${{ strategy.job-total }} --retry ${{ matrix.retry }}
         env:
           IDS_BROWSERS: ${{ matrix.browser }}
 
@@ -99,8 +117,54 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: failure-screenshots-${{ matrix.browser }}
+          name: failure-screenshots-${{ matrix.browser }}-${{ matrix.shard }}
           path: packages/react/.vitest/attachments/failure-screenshots
+
+  webkit:
+    name: WebKit tests (${{ matrix.shard }}/${{ strategy.job-total }})
+    needs: playwright-image
+    runs-on: ubuntu-24.04
+    container:
+      image: ${{ needs.playwright-image.outputs.image }}
+      options: --ipc=host --user 1001
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [webkit]
+        retry: [1]
+        shard: [1, 2, 3, 4, 5]
+    steps: *engine-steps
+
+  js:
+    name: JS (lint / typecheck / build / test)
+    needs: [checks, chromium]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - run: test "$CHECKS" = success && test "$CHROMIUM" = success
+        env:
+          CHECKS: ${{ needs.checks.result }}
+          CHROMIUM: ${{ needs.chromium.result }}
+
+  firefox-result:
+    name: Browser tests (firefox)
+    needs: firefox
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - run: test "$SHARDS" = success
+        env:
+          SHARDS: ${{ needs.firefox.result }}
+
+  webkit-result:
+    name: Browser tests (webkit)
+    needs: webkit
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - run: test "$SHARDS" = success
+        env:
+          SHARDS: ${{ needs.webkit.result }}
 
   visual:
     name: Visual regression (Playwright Linux image)
@@ -136,5 +200,31 @@ jobs:
       - run: flutter pub get
         working-directory: packages/flutter
 
+      - run: dart run slang
+        working-directory: packages/flutter
+
+      - run: dart run slang
+        working-directory: packages/flutter/example
+
+      - run: flutter analyze
+        working-directory: packages/flutter
+
       - run: flutter test
         working-directory: packages/flutter
+
+      - name: Test provider service examples
+        run: flutter test
+        working-directory: packages/flutter/example
+
+  review:
+    name: Claude review
+    needs: [js, flutter]
+    if: github.event_name == 'pull_request' && vars.ENABLE_CLAUDE_REVIEW == 'true'
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+      id-token: write
+    uses: rhseung/claude-review-plugin/.github/workflows/review.yml@2fa5d4bb8b4e8896757861d7d53237bb2f7bdeac
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}

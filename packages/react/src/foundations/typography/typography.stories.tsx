@@ -99,11 +99,6 @@ const caption = {
   },
 };
 
-const button = {
-  standard: { medium: cn('text-button-standard') },
-  tiny: { medium: cn('text-button-tiny') },
-};
-
 type TokenTree = { [key: string]: TokenTree | string | number | object };
 
 const compositeNames = (node: TokenTree, path: string[] = []): string[] =>
@@ -157,7 +152,7 @@ function Specimen({ className, sample }: { className: string; sample: string }) 
       <span data-sample="" className={cn(className, 'whitespace-nowrap')}>
         {sample}
       </span>
-      <code data-spec="" className="text-caption-c1-regular text-(--ids-color-on-muted)" />
+      <code data-spec="" className="text-caption-c1-regular text-neutral" />
     </div>
   );
 }
@@ -210,12 +205,6 @@ export const Scales: Story = {
       >
         <Scale styles={caption} sample="3분 전 · 보조 Aa" />
       </Showcase.Section>
-      <Showcase.Section
-        title="Button"
-        description="text-button-{standard, tiny}. 행간 1이라 컨트롤 안에서 세로 가운데에 맞습니다."
-      >
-        <Scale styles={button} sample="저장 Save" />
-      </Showcase.Section>
     </Showcase>
   ),
   play: async ({ canvasElement }) => {
@@ -249,7 +238,7 @@ export const Primitives: Story = {
               <code className="text-caption-c1-regular truncate font-mono">{variable}</code>
               <code
                 data-resolved=""
-                className="text-caption-c1-regular truncate font-mono text-(--ids-color-on-muted)"
+                className="text-caption-c1-regular text-neutral truncate font-mono"
               />
               <span
                 className="text-body-b3-regular whitespace-nowrap"

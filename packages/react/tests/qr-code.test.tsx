@@ -8,6 +8,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, QRCode } from '../src';
+import { testTheme } from './theme';
 
 const PROFILE = 'https://gistory.me/profile/alice';
 const RASTER_SIDE = 480;
@@ -15,7 +16,11 @@ const RASTER_SIDE = 480;
 type Inversion = NonNullable<Options['inversionAttempts']>;
 
 const renderInTheme = (node: ReactNode, mode: 'light' | 'dark' = 'light') =>
-  render(<IdsProvider mode={mode}>{node}</IdsProvider>);
+  render(
+    <IdsProvider theme={testTheme} mode={mode}>
+      {node}
+    </IdsProvider>,
+  );
 
 const codeIn = (container: HTMLElement) => container.querySelector<HTMLElement>('[data-qr-code]')!;
 
@@ -112,7 +117,10 @@ describe('accessible name', () => {
 
   test('speaks the translation for the default name', async () => {
     const screen = await render(
-      <IdsProvider translate={(key) => (key === 'qrCode.label' ? 'QR code' : undefined)}>
+      <IdsProvider
+        theme={testTheme}
+        translate={(key) => (key === 'qrCode.label' ? 'QR code' : undefined)}
+      >
         <QRCode value={PROFILE} />
       </IdsProvider>,
     );

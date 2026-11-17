@@ -6,6 +6,7 @@ import { Button } from '../../components/action/button';
 import { Badge } from '../../components/data/badge';
 import { DataTable } from '../../components/data/data-table';
 import { TextField } from '../../components/form/text-field';
+import { Link } from '../../components/typography/link';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -190,14 +191,14 @@ const COLUMNS = column.columns([
     header: '제목',
     enableSorting: false,
     cell: ({ row, getValue }) => (
-      <a href={`#${row.original.id}`}>
+      <Link href={`#${row.original.id}`} colorScheme="neutral" underline="hover">
         {row.original.pinned && (
           <>
             <Badge content="고정" variant="soft" colorScheme="primary" />{' '}
           </>
         )}
         {getValue()}
-      </a>
+      </Link>
     ),
     size: 360,
   }),

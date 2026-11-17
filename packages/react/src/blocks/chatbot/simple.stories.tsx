@@ -1,9 +1,7 @@
-import { useState, type FormEvent } from 'react';
-
 import {
-  ArrowUpIcon,
   BellAlertIcon,
   DocumentDuplicateIcon,
+  GlobeAltIcon,
   HandThumbDownIcon,
   HandThumbUpIcon,
   PlusIcon,
@@ -15,15 +13,13 @@ import { IconButton } from '../../components/action/icon-button';
 import { IconToggle } from '../../components/action/icon-toggle';
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
-import { Card } from '../../components/data/card';
-import { Chip } from '../../components/data/chip';
+import { Bubble } from '../../components/data/bubble';
 import { Item } from '../../components/data/item';
 import { Table } from '../../components/data/table';
 import { toast } from '../../components/feedback/toast';
-import { TextArea } from '../../components/form/text-area';
+import { PromptInput } from '../../components/form/prompt-input';
 import { Divider } from '../../components/layout/divider';
 import { ScrollArea } from '../../components/layout/scroll-area';
-import { Spacer } from '../../components/layout/spacer';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -49,17 +45,8 @@ const SHUTTLES = [
   { id: 'campus', route: '교내 순환', time: '12:30', wait: '16분 뒤' },
 ];
 
-const SUGGESTIONS = ['도서관 빈자리', '이번 주 행사', '수강 정정 마감'];
-
 export const PC: Story = {
   render: function Render() {
-    const [draft, setDraft] = useState('');
-
-    const ask = (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      setDraft('');
-    };
-
     const feedback = (
       <div className="flex gap-1">
         <IconToggle size="tiny" aria-label="좋은 답" icon={<HandThumbUpIcon />} />
@@ -111,9 +98,7 @@ export const PC: Story = {
         <ScrollArea fade className="min-h-0 flex-1">
           <ol aria-label="대화" className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-6">
             <li className="flex justify-end">
-              <Card variant="soft" className="max-w-[80%]">
-                <Card.Content>오늘 학식 뭐야?</Card.Content>
-              </Card>
+              <Bubble align="end">오늘 학식 뭐야?</Bubble>
             </li>
 
             <li className="flex gap-3">
@@ -144,9 +129,7 @@ export const PC: Story = {
             </li>
 
             <li className="flex justify-end">
-              <Card variant="soft" className="max-w-[80%]">
-                <Card.Content>학생회관에서 셔틀은 언제 와?</Card.Content>
-              </Card>
+              <Bubble align="end">학생회관에서 셔틀은 언제 와?</Bubble>
             </li>
 
             <li className="flex gap-3">
@@ -182,37 +165,22 @@ export const PC: Story = {
           </ol>
         </ScrollArea>
 
-        <form onSubmit={ask} className="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pb-4">
-          <div className="flex flex-wrap gap-2">
-            {SUGGESTIONS.map((suggestion) => (
-              <Chip key={suggestion} onClick={() => setDraft(suggestion)}>
-                {suggestion}
-              </Chip>
-            ))}
-          </div>
-          <TextArea
-            aria-label="GIST 도우미에게 묻기"
-            placeholder="무엇이든 물어보세요"
-            rows={1}
-            maxRows={6}
-            value={draft}
-            onValueChange={setDraft}
-          >
-            <TextArea.Input />
-            <Spacer />
-            <IconButton
-              type="submit"
-              variant="solid"
-              size="tiny"
-              aria-label="묻기"
-              icon={<ArrowUpIcon />}
-              disabled={draft.trim() === ''}
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pb-4">
+          <PromptInput onSend={() => {}}>
+            <PromptInput.Input
+              aria-label="GIST 도우미에게 묻기"
+              placeholder="학사 일정, 장학금, 셔틀버스… 무엇이든 물어보세요"
             />
-          </TextArea>
+            <PromptInput.ActionMenu />
+            <PromptInput.Tool value="search" icon={<GlobeAltIcon />}>
+              웹 검색
+            </PromptInput.Tool>
+            <PromptInput.Submit aria-label="묻기" />
+          </PromptInput>
           <p className="text-caption-c1-regular text-center">
             GIST 도우미는 틀릴 수 있어요. 중요한 일정은 학사 공지로 한 번 더 확인하세요.
           </p>
-        </form>
+        </div>
       </div>
     );
   },

@@ -1,23 +1,16 @@
 import { tv } from '../../../utils';
 
 import type { GroupOrientation } from '.';
-import type { IdsSize } from '../../../tokens/types';
 
 export const groupStyle = tv({
   slots: {
     root: [
       'relative flex w-fit items-stretch',
       '[&>:not(input,[popover],[data-floating-ui-focus-guard])]:relative',
-      '[&>[data-hovered]]:z-10 [&>[data-active]]:z-20 [&>[data-focus-visible]]:z-30',
+      '[&>*]:data-hovered:z-10 [&>*]:data-active:z-20 [&>*]:focus-ring-visible:z-30',
       'has-[>[data-group]]:gap-2',
     ],
     separator: 'relative z-25',
-    text: [
-      'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-standard shadow-xs',
-      'bg-(--ids-color-muted) text-(--ids-color-on-surface)',
-      'inset-ring-1 inset-ring-(--ids-color-border)',
-      '[&_svg]:pointer-events-none [&_svg]:shrink-0',
-    ],
   },
   variants: {
     orientation: {
@@ -34,14 +27,6 @@ export const groupStyle = tv({
       },
       false: { root: 'gap-2' },
     },
-    size: {
-      standard: {
-        text: "px-4 text-button-standard [&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
-      },
-      tiny: {
-        text: "px-3 text-button-tiny [&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
-      },
-    } satisfies Record<IdsSize, object>,
   },
   compoundVariants: [
     {
@@ -78,6 +63,5 @@ export const groupStyle = tv({
   defaultVariants: {
     orientation: 'horizontal',
     attached: true,
-    size: 'standard',
   },
 });

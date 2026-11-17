@@ -9,7 +9,15 @@ import type { Badge } from '.';
 export type BadgePlacement = 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start';
 export type BadgeShape = 'rectangular' | 'circular';
 export type BadgeVariant = 'solid' | 'soft' | 'outline';
-export type BadgeColorScheme = 'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
+export type BadgeColorScheme =
+  | 'neutral'
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'info';
 
 function flag(on: boolean) {
   return on ? '' : undefined;

@@ -60,32 +60,49 @@ Vercel 처럼 `gh` 도 `GITHUB_TOKEN` 도 없는 환경은 classic PAT 를 환�
 @import "@gsainfoteam/ids-css";
 ```
 
-루트에 `data-color` / `data-mode`를 설정한다:
+React 앱은 `IdsProvider theme` 이 아래 변수를 루트 요소에 넣는다. CSS 만 쓰는 페이지는 직접 준다:
 
 ```html
-<div data-color="blue" data-mode="light">
+<div
+  data-mode="light"
+  style="--ids-theme-light-bg-primary: #155dfc; --ids-theme-light-text-on-primary: #ffffff; /* … 계열 × 역할 × 두 모드 */"
+>
   <!-- 이 하위에서 CSS 변수 활성화 -->
 </div>
 ```
 
+- 색은 계열 여덟 개(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`)가 역할 열 개를 가진다. 바탕 층은 `surface`, `on-surface` 두 개다.
+
+  | 역할 | 쓰임 |
+  |---|---|
+  | `bg-X`, `bg-X-hover`, `bg-X-active` | 채움과 그 hover, press |
+  | `bg-X-soft`, `bg-X-soft-hover`, `bg-X-soft-active` | 옅은 채움과 그 hover, press |
+  | `text-on-X` | 채움 위 글자 |
+  | `text-on-X-soft` | 옅은 채움 위 글자 |
+  | `text-X` | 채움 없는 바탕 위 글자와 아이콘 |
+  | `border-X` | 선. 브랜드와 상태는 `text-X` 와 같은 색, `border-neutral` 은 구조선 |
+
+- 역할 변수는 `--ids-color-{역할}` 이고, `--ids-theme-{light|dark}-{역할}` 에서 읽는다. `data-mode` 가 둘 중 하나를 연결한다.
+- 브랜드와 상태 계열의 변수는 IdsProvider 가 모두 쓴다. 테마가 `secondary`, `tertiary` 를 생략해도 primary 에서 만든 값을 쓴다. neutral 과 바탕 층만 변수가 없으면 IDS 의 회색으로 그린다.
+- 공유 `--color-*` 이름은 없다. 유틸리티마다 이름공간이 따로라 앞머리가 속성을 말한다: `bg-primary-soft`(배경), `text-on-primary-soft`(글자), `border-primary`·`ring-primary`·`outline-primary`·`stroke-primary`(선), `fill-primary`(글자 역할).
+- `--ids-radius-standard`, `--ids-radius-indicator`, `--ids-radius-container`, `--ids-corner-shape` 를 요소에 주면 그 아래만 바뀐다. Tailwind 유틸리티(`rounded-standard`, `font-sans`, `bg-primary`)는 `@theme inline` 이라 이 변수를 바로 읽는다.
+
 ### 폰트
 
-IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Monaspace Neon 이다. 패키지에 글꼴 파일은 없으니 앱이 불러온다.
+IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Geist Mono 다. `@gsainfoteam/ids-css` 가 두 글꼴의 `@font-face` 와 woff2 파일을 함께 싣는다. 따로 불러올 것은 없다.
 
-```css
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-gov-dynamic-subset.min.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.3.0/400.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.3.0/500.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.3.0/600.css");
-@import url("https://cdn.jsdelivr.net/npm/@fontsource/monaspace-neon@5.3.0/700.css");
-@import "tailwindcss";
-@import "@gsainfoteam/ids-css";
-```
+- 파일은 패키지 안에 있어서 CDN 이나 다른 글꼴 패키지가 필요 없다. 번들러(Next.js, Vite, Astro)가 woff2 를 앱의 정적 파일로 내보낸다.
+- Pretendard GOV 는 dynamic subset(woff2 120개, 5.6MB)이다. 브라우저는 화면에 쓰인 글자 범위의 파일만 받는다.
+- Geist Mono 는 Fontsource 의 가변 글꼴 정체(normal)만 담는다. latin, latin-ext, cyrillic, symbols 범위다.
+- 두 글꼴 모두 SIL OFL 1.1 이다. 라이선스는 `fonts/pretendard-gov/LICENSE`, `fonts/geist-mono/LICENSE` 에 있다.
+- 글꼴은 고정이다. 고정폭 글꼴의 x-height 보정, Kbd 정렬, 타입 스케일의 행간과 자간을 이 두 글꼴에서 쟀다.
+- 글꼴 없이 토큰만 필요하면 `@gsainfoteam/ids-css/no-fonts.css` 를 가져온다. IDS 의 브라우저 테스트가 이것을 쓴다(WebKit 이 가변 글꼴을 크기와 굵기마다 캐시해 메모리가 커진다).
 
 - `font-sans` 와 `--ids-font-family-sans` 는 `'Pretendard GOV Variable'`, `'Pretendard GOV'`, 일반 Pretendard, `sans-serif` 순서다. Pretendard 만 불러온 앱은 Pretendard 로 보인다.
 - dynamic subset 은 화면에 쓰인 글자 범위만 받는다. 전체 파일(`pretendardvariable-gov.min.css`)은 woff2 5.4MB 다.
-- `font-mono` 와 `--ids-font-family-mono` 는 `'Monaspace Neon Var'`, `'Monaspace Neon'`, 시스템 고정폭 글꼴 순서다. 가변 글꼴(Var)은 CDN 에 없어서 웹에서는 Fontsource 의 굵기별 Monaspace Neon 을 쓰고, 가변 글꼴을 설치했거나 직접 호스팅한 앱은 그것을 먼저 쓴다.
-- `font-mono` 는 x-height 를 글자 크기의 0.487 로 맞춘다(`--ids-font-size-adjust-mono`, `font-size-adjust`). Monaspace Neon 을 95% 로 줄인 크기다. 같은 크기에서 글자 폭이 본문보다 18% 넓고 숫자와 대문자가 3% 높아서, 본문 사이에 넣으면 커 보이기 때문이다. 대체 글꼴이 쓰여도 같은 x-height 로 맞춰진다.
+- `font-mono` 와 `--ids-font-family-mono` 는 `'Geist Mono Variable'`(Fontsource), `'Geist Mono'`(설치하거나 직접 호스팅한 글꼴), 시스템 고정폭 글꼴, Pretendard 순서다. 한글처럼 고정폭 글꼴에 없는 글자는 Pretendard 로 그린다.
+- `font-mono` 는 x-height 를 글자 크기의 0.53 으로 맞춘다(`--ids-font-size-adjust-mono`, `font-size-adjust`). Pretendard GOV 의 x-height 와 같아서 Geist Mono 는 100% 크기로 본문과 높이가 맞는다. 대체 글꼴이 쓰여도 같은 x-height 로 맞춰진다.
+- Geist Mono 는 ascent 와 descent 가 대문자를 가운데에 두어서, 행간을 키운 줄에서도 글자가 줄 가운데에 선다.
 
 ## Tailwind 유틸리티
 
@@ -93,15 +110,16 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Monaspace Neon 이다. �
 
 ```html
 <!-- 색상 -->
-<button class="bg-primary text-on-primary">확인</button>
-<span class="bg-secondary text-on-secondary">새 글</span>
-<a class="text-accent">자세히 보기</a>
+<button class="bg-primary text-on-primary hover:bg-primary-hover">확인</button>
+<span class="bg-primary-soft text-on-primary-soft">새 글</span>
+<a class="text-primary">자세히 보기</a>
+<div class="border border-neutral bg-surface text-on-surface">카드</div>
 
 <!-- 타이포 (피그마 Text style = 크기+weight+leading+tracking 묶음) -->
 <p class="text-headline-h5-semibold">제목</p>
-<p class="text-body-b2-regular text-on-muted">본문</p>
-<button class="text-button-standard">CTA</button>
-<button class="text-button-tiny">작은 CTA</button>
+<p class="text-body-b2-regular text-neutral">본문</p>
+<button class="text-body-b3-medium">CTA</button>
+<button class="text-caption-c1-medium">작은 CTA</button>
 
 <!-- 프리미티브 -->
 <span class="text-h1 font-bold tracking-tight leading-tight">48px</span>
@@ -116,19 +134,48 @@ IDS 글꼴은 본문 Pretendard GOV Variable, 고정폭 Monaspace Neon 이다. �
 | subtitle | `text-subtitle-s1-semibold`, `text-subtitle-s2-medium` |
 | body | `text-body-b1-regular` … `text-body-b3-bold` |
 | caption | `text-caption-c1-regular`, `text-caption-c2-medium` |
-| button | `text-button-standard`, `text-button-tiny` |
 
-### 지원 색상 테마
+### focus-ring-visible
 
-| `data-color` | 설명 |
-|---|---|
-| `blue` | 기본 |
-| `orange` | 지글. IDS 고유 팔레트 |
-| `green` | 팟쥐. IDS 고유 팔레트 |
-| `red` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` `indigo` `violet` `purple` `fuchsia` `pink` `rose` | Tailwind CSS v4 기본 팔레트 |
+`focus-ring` 이 ring 을 그리는 바로 그 조건에서 맞는 variant 입니다. ring 이 옆 요소에 가리지 않게 쌓을 때 씁니다.
 
-- `orange` `amber` `yellow` `lime` `emerald` `teal` `cyan` `sky` 는 `--ids-color-on-primary` 가 검은 글자다. 흰 글자로는 대비 4.5:1 이 안 된다.
-- 브랜드 색 글자는 배경에 따라 고른다. `primary` 채움 위는 `on-primary`, `secondary` 위는 `on-secondary`, 채움 없는 페이지 위는 `accent` 다. 셋 다 두 모드에서 4.5:1 을 넘는다.
+```html
+<div class="flex [&>*]:focus-ring-visible:z-30">…</div>
+```
+
+- 조건은 `focus-ring` 과 같은 표에서 나옵니다: `:focus-visible`, `[data-focus-visible]`, 안쪽 입력(`data-field-input` 등)에 포커스가 있는 껍데기.
+- `focus-visible:` 이나 `data-focus-visible:` 하나만 쓰면 다른 조건으로 그린 ring(TextField 껍데기 같은)이 옆 요소 밑에 깔립니다.
+
+### shimmer
+
+흘러나오는 중인 글자 위로 밝은 띠가 지나가게 합니다. AI 답의 "생각하는 중" 같은 상태 줄에 씁니다.
+
+```html
+<p role="status" class="shimmer text-neutral">생각하는 중</p>
+```
+
+- 바탕은 글자색(`currentColor`)이고, 띠는 `--ids-color-on-surface` 입니다. 띠가 지나가는 동안 대비가 글자색보다 낮아지지 않습니다.
+- 글자만 칠합니다(`background-clip: text`). 같은 요소 안의 아이콘은 `currentColor` 로 그대로 그려집니다.
+- 쓰는 방향을 따릅니다. 오른쪽에서 왼쪽 글에서는 오른쪽에서 왼쪽으로 지나갑니다.
+- `prefers-reduced-motion: reduce` 면 움직이지 않고 보통 글자로 보입니다.
+
+| 변수 | 기본 | 뜻 |
+|---|---|---|
+| `--ids-shimmer-color` | `var(--ids-color-on-surface)` | 띠 색 |
+| `--ids-shimmer-spread` | `3em` | 띠 가운데에서 한쪽 끝까지의 폭 |
+| `--ids-shimmer-duration` | `2s` | 한 번 지나가는 시간 |
+
+```html
+<p class="shimmer [--ids-shimmer-duration:3s]">불러오는 중</p>
+```
+
+### 브랜드 색
+
+- 이 패키지에는 브랜드 팔레트가 없다. 앱이 `IdsProvider theme` 에 `primary`(와 `secondary`, `tertiary`)를 주면 역할 색을 대비로 골라 위 변수로 넣는다.
+- corner shape: Provider 아래 요소는 `corner-shape: var(--ids-corner-shape, round)` 를 받고, `::before` `::after` 는 자기 요소의 모양을 물려받는다. `rounded-full` 은 `before:`, `after:` 같은 variant 를 붙여도 언제나 `round` 다.
+  - `corner-shape` 를 지원하는 브라우저에서 `--ids-radius-*` 와 `concentric-p-*` 의 radius 는 `--ids-theme-corner-radius-scale`(squircle 이면 1.84) 배가 된다. squircle 모서리가 round 만큼 깊어진다.
+- 브랜드 색 글자는 배경에 따라 고른다. `bg-primary` 위는 `text-on-primary`, `bg-primary-soft` 위는 `text-on-primary-soft`, 채움 없는 페이지 위는 `text-primary` 다. 앞의 둘은 APCA Lc 75, `text-primary` 는 바탕과 soft 에서 Lc 60 을 넘는다.
+- `primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않는다. 밝은 색상은 흰 바탕에서 Lc 60 도 안 된다.
 
 `data-mode`는 `light` / `dark`.
 

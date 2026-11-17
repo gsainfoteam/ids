@@ -99,7 +99,7 @@ test('the close button is a ghost IconButton in the chip color scheme and size',
   expect(close.type).toBe('button');
   expect(close.dataset.variant).toBe('ghost');
   expect(close.dataset.size).toBe('tiny');
-  expect(close.className).toMatch(/\[--control-ring:var\(--ids-color-danger\)\]/);
+  expect(close.className).toMatch(/\[--control-ring:var\(--ids-color-border-danger\)\]/);
   expect(close.className, 'the chip keeps its own small circle').toMatch(/(^| )size-3\.5( |$)/);
   expect(close.className).toMatch(/(^| )rounded-full( |$)/);
   expect(close.className, 'in the chip text color').toMatch(/(^| )text-current( |$)/);

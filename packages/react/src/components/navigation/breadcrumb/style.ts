@@ -5,18 +5,18 @@ import type { IdsSize } from '../../../tokens/types';
 export const breadcrumbStyle = tv({
   slots: {
     root: 'min-w-0',
-    list: 'm-0 flex list-none flex-wrap items-center p-0 break-words text-(--ids-color-on-muted)',
+    list: 'm-0 flex list-none flex-wrap items-center p-0 break-words text-neutral',
     item: 'inline-flex min-w-0 items-center',
     link: [
       'inline-flex items-center rounded-indicator text-inherit no-underline outline-none focus-ring',
       'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'hover:text-(--ids-color-on-surface) [&_svg]:shrink-0',
+      'hover:text-on-surface [&_svg]:shrink-0',
     ],
-    page: 'inline-flex items-center text-(--ids-color-on-surface) [&_svg]:shrink-0',
+    page: 'inline-flex items-center text-on-surface [&_svg]:shrink-0',
     separator: 'inline-flex shrink-0 items-center select-none rtl:[&>svg]:-scale-x-100',
     ellipsis: [
-      '-my-1 text-inherit data-hovered:text-(--ids-color-on-surface)',
-      'data-popup-open:bg-(--control-press) data-popup-open:text-(--ids-color-on-surface)',
+      '-my-1 text-inherit data-hovered:text-on-surface',
+      'data-popup-open:bg-(--control-press) data-popup-open:text-on-surface',
     ],
   },
   variants: {

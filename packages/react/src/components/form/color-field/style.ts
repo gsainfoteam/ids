@@ -15,12 +15,12 @@ export const colorFieldStyle = tv({
     ],
     swatch: [
       'shrink-0 rounded-indicator inset-ring-1 inset-ring-(--ids-color-on-surface)/15',
-      'data-empty:bg-[linear-gradient(to_top_right,transparent_calc(50%-0.75px),var(--ids-color-danger)_50%,transparent_calc(50%+0.75px))]',
-      'data-empty:inset-ring-(--ids-color-border)',
+      'data-empty:bg-[linear-gradient(to_top_right,transparent_calc(50%-0.75px),var(--ids-color-bg-danger)_50%,transparent_calc(50%+0.75px))]',
+      'data-empty:inset-ring-neutral',
     ],
     value: [
       'min-w-0 flex-1 truncate font-mono',
-      'data-placeholder:font-sans data-placeholder:text-(--ids-color-on-muted)',
+      'data-placeholder:font-sans data-placeholder:text-neutral',
     ],
     clear: [fieldAction.base, alreadyDimmedByField],
     popup: 'concentric-p-3',

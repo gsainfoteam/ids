@@ -15,26 +15,67 @@ export const alertStyle = tv({
     ],
     content: 'flex min-w-0 flex-col gap-0.5',
     title: 'text-body-b3-semibold text-(--alert-title)',
-    description: 'text-(--alert-body) [&_ul]:list-disc [&_ul]:ps-5',
+    description: 'text-(--alert-body) [&_ul]:list-disc [&_ul]:ps-5 [ul&]:list-disc [ul&]:ps-5',
     actions: 'mt-2 flex flex-wrap items-center gap-2',
     close: '-my-0.5 -me-1.5 size-6 rounded-full',
   },
   variants: {
     colorScheme: {
       neutral: {
-        root: '[--alert-tint:var(--ids-color-on-surface)] [--alert-strong:var(--ids-color-on-surface)] [--alert-on:var(--ids-color-surface)]',
+        root: [
+          '[--alert-tint:var(--ids-color-on-surface)] [--alert-on:var(--ids-color-surface)]',
+          '[--alert-soft:var(--ids-color-bg-neutral-soft)] [--alert-on-soft:var(--ids-color-text-on-neutral-soft)]',
+          '[--alert-strong:var(--ids-color-on-surface)]',
+        ],
+      },
+      primary: {
+        root: [
+          '[--alert-tint:var(--ids-color-bg-primary)] [--alert-on:var(--ids-color-text-on-primary)]',
+          '[--alert-soft:var(--ids-color-bg-primary-soft)] [--alert-on-soft:var(--ids-color-text-on-primary-soft)]',
+          '[--alert-strong:var(--ids-color-text-primary)]',
+        ],
+      },
+      secondary: {
+        root: [
+          '[--alert-tint:var(--ids-color-bg-secondary)] [--alert-on:var(--ids-color-text-on-secondary)]',
+          '[--alert-soft:var(--ids-color-bg-secondary-soft)] [--alert-on-soft:var(--ids-color-text-on-secondary-soft)]',
+          '[--alert-strong:var(--ids-color-text-secondary)]',
+        ],
+      },
+      tertiary: {
+        root: [
+          '[--alert-tint:var(--ids-color-bg-tertiary)] [--alert-on:var(--ids-color-text-on-tertiary)]',
+          '[--alert-soft:var(--ids-color-bg-tertiary-soft)] [--alert-on-soft:var(--ids-color-text-on-tertiary-soft)]',
+          '[--alert-strong:var(--ids-color-text-tertiary)]',
+        ],
       },
       info: {
-        root: '[--alert-tint:var(--ids-color-info)] [--alert-strong:var(--ids-color-info-strong)] [--alert-on:var(--ids-color-on-info)]',
+        root: [
+          '[--alert-tint:var(--ids-color-bg-info)] [--alert-on:var(--ids-color-text-on-info)]',
+          '[--alert-soft:var(--ids-color-bg-info-soft)] [--alert-on-soft:var(--ids-color-text-on-info-soft)]',
+          '[--alert-strong:var(--ids-color-text-info)]',
+        ],
       },
       success: {
-        root: '[--alert-tint:var(--ids-color-success)] [--alert-strong:var(--ids-color-success-strong)] [--alert-on:var(--ids-color-on-success)]',
+        root: [
+          '[--alert-tint:var(--ids-color-bg-success)] [--alert-on:var(--ids-color-text-on-success)]',
+          '[--alert-soft:var(--ids-color-bg-success-soft)] [--alert-on-soft:var(--ids-color-text-on-success-soft)]',
+          '[--alert-strong:var(--ids-color-text-success)]',
+        ],
       },
       warning: {
-        root: '[--alert-tint:var(--ids-color-warning)] [--alert-strong:var(--ids-color-warning-strong)] [--alert-on:var(--ids-color-on-warning)]',
+        root: [
+          '[--alert-tint:var(--ids-color-bg-warning)] [--alert-on:var(--ids-color-text-on-warning)]',
+          '[--alert-soft:var(--ids-color-bg-warning-soft)] [--alert-on-soft:var(--ids-color-text-on-warning-soft)]',
+          '[--alert-strong:var(--ids-color-text-warning)]',
+        ],
       },
       danger: {
-        root: '[--alert-tint:var(--ids-color-danger)] [--alert-strong:var(--ids-color-danger-strong)] [--alert-on:var(--ids-color-on-danger)]',
+        root: [
+          '[--alert-tint:var(--ids-color-bg-danger)] [--alert-on:var(--ids-color-text-on-danger)]',
+          '[--alert-soft:var(--ids-color-bg-danger-soft)] [--alert-on-soft:var(--ids-color-text-on-danger-soft)]',
+          '[--alert-strong:var(--ids-color-text-danger)]',
+        ],
       },
     } satisfies Record<Alert.ColorScheme, object>,
     variant: {
@@ -50,21 +91,21 @@ export const alertStyle = tv({
       },
       soft: {
         root: [
-          'bg-(--alert-tint)/10 text-(--ids-color-on-surface)',
-          '[--alert-accent:var(--alert-strong)] [--alert-title:var(--alert-strong)] [--alert-body:var(--ids-color-on-surface)]',
+          'bg-(--alert-soft) text-(--alert-on-soft)',
+          '[--alert-accent:var(--alert-on-soft)] [--alert-title:var(--alert-on-soft)] [--alert-body:var(--alert-on-soft)]',
         ],
       },
       outline: {
         root: [
-          'bg-(--ids-color-surface) text-(--ids-color-on-surface) inset-ring-1 inset-ring-(--ids-color-border)',
-          'dark:bg-(--ids-color-muted)/30',
-          '[--alert-accent:var(--alert-strong)] [--alert-title:var(--alert-strong)] [--alert-body:var(--ids-color-on-muted)]',
+          'bg-surface text-on-surface inset-ring-1 inset-ring-neutral',
+          'dark:bg-neutral-soft/30',
+          '[--alert-accent:var(--alert-strong)] [--alert-title:var(--alert-strong)] [--alert-body:var(--ids-color-text-neutral)]',
         ],
       },
       ghost: {
         root: [
-          'bg-transparent text-(--ids-color-on-surface)',
-          '[--alert-accent:var(--alert-strong)] [--alert-title:var(--alert-strong)] [--alert-body:var(--ids-color-on-muted)]',
+          'bg-transparent text-on-surface',
+          '[--alert-accent:var(--alert-strong)] [--alert-title:var(--alert-strong)] [--alert-body:var(--ids-color-text-neutral)]',
         ],
       },
     } satisfies Record<Alert.Variant, object>,

@@ -27,7 +27,6 @@ function isCurrent(value: unknown) {
 export function ItemRoot({
   variant: variantProp,
   size,
-  dense,
   interactive: interactiveProp,
   selected,
   disabled = false,
@@ -51,7 +50,6 @@ export function ItemRoot({
   const group = use(ItemGroupContext);
   const variant = variantProp ?? group?.variant ?? 'ghost';
   const resolvedSize = size ?? group?.size ?? 'standard';
-  const resolvedDense = dense ?? group?.dense ?? false;
   const nativeControl =
     asChild && isValidElement(children) && (children.type === 'a' || children.type === 'button');
   const interactive = interactiveProp ?? (onClick != null || nativeControl);
@@ -78,7 +76,7 @@ export function ItemRoot({
     },
   });
   const state: Item.State = { ...interaction, interactive, selected: selected === true };
-  const styles = itemStyle({ variant, size: resolvedSize, dense: resolvedDense, interactive });
+  const styles = itemStyle({ variant, size: resolvedSize, interactive });
   const Root = asChild ? Slot : 'div';
 
   return (
@@ -93,7 +91,6 @@ export function ItemRoot({
         data-item=""
         data-variant={variant}
         data-size={resolvedSize}
-        data-dense={flag(resolvedDense)}
         data-interactive={flag(interactive)}
         data-selected={flag(selected === true)}
         data-disabled={flag(disabled)}

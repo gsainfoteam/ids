@@ -86,7 +86,10 @@ test('a Korean default uses only plain arguments, which formatDefaultMessage fil
 test('every key is used by the code', () => {
   const source = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
     .filter((file) => /\.tsx?$/.test(file) && !/\.stories\.tsx?$/.test(file))
-    .filter((file) => !file.endsWith('internal/messages.ts'))
+    .filter(
+      (file) =>
+        !file.endsWith('internal/messages.ts') && !file.endsWith('internal/messages-catalog.ts'),
+    )
     .map((file) => readFileSync(SRC + file, 'utf8'))
     .join('\n');
 
@@ -102,7 +105,10 @@ test('no Korean string is written into a component outside the defaults', () => 
   const KOREAN_STRING = /(['"`])[^'"`\n]*[ㄱ-힝][^'"`\n]*\1/;
   const withKorean = readdirSync(SRC, { recursive: true, encoding: 'utf8' })
     .filter((file) => /\.tsx?$/.test(file) && !/\.stories\.tsx?$/.test(file))
-    .filter((file) => !file.endsWith('internal/messages.ts'))
+    .filter(
+      (file) =>
+        !file.endsWith('internal/messages.ts') && !file.endsWith('internal/messages-catalog.ts'),
+    )
     .filter((file) => KOREAN_STRING.test(readFileSync(SRC + file, 'utf8')));
 
   expect(withKorean).toEqual([]);

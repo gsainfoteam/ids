@@ -14,6 +14,7 @@ import { keyHandler, withModifiers } from '../keys';
 type TextElement = HTMLInputElement | HTMLTextAreaElement;
 
 const HANDLES_ITS_OWN_PRESS = 'button, a, input, textarea, select, label, [role=button]';
+const LAYER_DRAWN_IN_PLACE = '[popover]';
 
 export type UseTextControlOptions = {
   inputRef: RefObject<TextElement | null>;
@@ -34,6 +35,7 @@ export function useTextControl({ inputRef, disabled, readOnly, clearable }: UseT
     if (disabled || event.button !== 0) return;
     const target = event.target as Element;
     if (target.closest(HANDLES_ITS_OWN_PRESS)) return;
+    if (pressedInsideLayerWithin(event.currentTarget, target)) return;
     event.preventDefault();
     inputRef.current?.focus();
   };
@@ -63,4 +65,9 @@ export function useTextControl({ inputRef, disabled, readOnly, clearable }: UseT
   };
 
   return { focused, rootProps, clear, onEscape };
+}
+
+function pressedInsideLayerWithin(shell: Element, target: Element) {
+  const layer = target.closest(LAYER_DRAWN_IN_PLACE);
+  return layer !== null && shell.contains(layer);
 }

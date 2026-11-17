@@ -1,12 +1,14 @@
-import { blend, wcagContrast } from 'culori';
+import { blend, formatHex } from 'culori';
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import enums from '../../core/tokens/enums.json';
-import { Button, ButtonGroup, IdsProvider, type IdsColor } from '../src';
+import { paletteHues, palettes } from '../.storybook/palettes';
+import { Button, ButtonGroup, IdsProvider } from '../src';
 import { skipWithoutCdp } from './engines';
+import { testTheme } from './theme';
+import { TEXT_LC, lightnessContrast } from '../src/components/utility/ids-provider/contrast';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -21,7 +23,7 @@ test('SSR: a native button that never submits by accident and names its variant 
   expect(button.type).toBe('button');
   expect(button.dataset.variant).toBe('solid');
   expect(button.dataset.size).toBe('tiny');
-  expect(button.className).toMatch(/\[--control-fill:var\(--ids-color-danger\)\]/);
+  expect(button.className).toMatch(/\[--control-fill:var\(--ids-color-bg-danger\)\]/);
   expect(button.textContent).toBe('삭제');
 });
 
@@ -307,7 +309,7 @@ async function holdMouseOn(element: Element) {
 test('glossy lays a highlight over the fill with a darker edge and a shadow, still rings on focus and sinks on press', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Button variant="glossy">저장</Button>
     </IdsProvider>,
   );
@@ -336,16 +338,15 @@ test('glossy lays a highlight over the fill with a darker edge and a shadow, sti
   await expect.element(button).not.toHaveAttribute('data-active');
 });
 
-const brandColors = enums.ids.color.values.$value as IdsColor[];
 const statusSchemes = ['danger', 'success', 'warning', 'info'] as const;
 const FORTY_TWO_HOVERS = 45_000;
 
 test(
-  'hovering a solid fill moves it away from its text, keeping 4.5:1 in every color and mode',
+  'hovering a solid fill moves it away from its text, keeping Lc 75 in every color and mode',
   { timeout: FORTY_TWO_HOVERS },
   async () => {
     const cases = (['light', 'dark'] as const).flatMap((mode) => [
-      ...brandColors.map((color) => ({ mode, color, scheme: 'primary' as const })),
+      ...paletteHues.map((color) => ({ mode, color, scheme: 'primary' as const })),
       ...statusSchemes.map((scheme) => ({ mode, color: 'blue' as const, scheme })),
     ]);
     const name = ({ mode, color, scheme }: (typeof cases)[number]) => `${mode} ${color} ${scheme}`;
@@ -353,10 +354,10 @@ test(
       <div>
         {cases.map((entry) => (
           <IdsProvider
+            theme={{ primary: palettes[entry.color] }}
             key={name(entry)}
-            color={entry.color}
             mode={entry.mode}
-            className="bg-(--ids-color-surface)"
+            className="bg-surface"
           >
             <Button colorScheme={entry.scheme}>{name(entry)}</Button>
           </IdsProvider>
@@ -372,8 +373,8 @@ test(
       const style = getComputedStyle(button.element());
       const page = getComputedStyle(button.element().parentElement!).backgroundColor;
       const shown = blend([page, style.backgroundColor], 'normal', 'rgb');
-      const ratio = wcagContrast(style.color, shown);
-      if (ratio < 4.5) failing.push(`${name(entry)}: ${ratio.toFixed(2)}`);
+      const lc = lightnessContrast(style.color, formatHex(shown));
+      if (lc < TEXT_LC) failing.push(`${name(entry)}: Lc ${lc.toFixed(1)}`);
     }
 
     expect(failing).toEqual([]);

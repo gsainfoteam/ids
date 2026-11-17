@@ -6,6 +6,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Table } from '../src';
+import { testTheme } from './theme';
 
 const html = (node: ReactNode) =>
   new DOMParser().parseFromString(renderToString(node), 'text/html');
@@ -43,7 +44,7 @@ function people(props: Table.Props = {}, rowProps: (index: number) => Table.RowP
 function colorOf(variable: string) {
   const probe = document.createElement('div');
   probe.style.backgroundColor = `var(${variable})`;
-  document.querySelector('[data-color]')!.append(probe);
+  document.querySelector('[data-mode]')!.append(probe);
   const color = getComputedStyle(probe).backgroundColor;
   probe.remove();
   return color;
@@ -73,7 +74,7 @@ test('SSR: a native table inside a scroll area, with its parts, scopes and align
 });
 
 test('rows name themselves by their cells, and a row header is a rowheader', async () => {
-  const screen = await render(<IdsProvider>{people()}</IdsProvider>);
+  const screen = await render(<IdsProvider theme={testTheme}>{people()}</IdsProvider>);
 
   await expect.element(screen.getByRole('table', { name: 'People' })).toBeInTheDocument();
   await expect.element(screen.getByRole('columnheader', { name: 'Age' })).toBeInTheDocument();
@@ -84,7 +85,7 @@ test('rows name themselves by their cells, and a row header is a rowheader', asy
 test('a row with onClick presses anywhere and hovers; selection stays a data attribute', async () => {
   const pressed = vi.fn();
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       {people({}, (index) => ({ onClick: () => pressed(PEOPLE[index]), selected: index === 1 }))}
     </IdsProvider>,
   );
@@ -104,7 +105,7 @@ test('a row with onClick presses anywhere and hovers; selection stays a data att
 
 test('the neutral ladder: stripe muted, hover a step up, selected the press step', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <p>Outside</p>
       {people({ striped: true, highlightOnHover: true }, (index) => ({ selected: index === 2 }))}
     </IdsProvider>,
@@ -115,20 +116,20 @@ test('the neutral ladder: stripe muted, hover a step up, selected the press step
 
   await expect.element(row('Ada')).toBeInTheDocument();
   expect(background('Ada')).toBe('rgba(0, 0, 0, 0)');
-  expect(background('Grace')).toBe(colorOf('--ids-color-muted'));
-  expect(background('Linus')).toBe(colorOf('--ids-color-muted-hover'));
+  expect(background('Grace')).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  expect(background('Linus')).toBe(colorOf('--ids-color-bg-neutral-soft-hover'));
 
   await userEvent.hover(row('Ada'));
-  await expect.poll(() => background('Ada')).toBe(colorOf('--ids-color-muted'));
+  await expect.poll(() => background('Ada')).toBe(colorOf('--ids-color-bg-neutral-soft'));
   await userEvent.hover(row('Grace'));
-  await expect.poll(() => background('Grace')).toBe(colorOf('--ids-color-muted-hover'));
+  await expect.poll(() => background('Grace')).toBe(colorOf('--ids-color-bg-neutral-soft-hover'));
   await userEvent.hover(row('Linus'));
-  await expect.poll(() => background('Linus')).toBe(colorOf('--ids-color-muted-active'));
+  await expect.poll(() => background('Linus')).toBe(colorOf('--ids-color-bg-neutral-soft-active'));
 });
 
 test('stickyHeader keeps the header row in view while the body scrolls', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <Table stickyHeader aria-label="Long" className="max-h-40">
         <Table.Header>
           <Table.Row>
@@ -160,7 +161,7 @@ test('stickyHeader keeps the header row in view while the body scrolls', async (
 
 test('a wide table scrolls sideways and the scroll area takes a Tab stop', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <button type="button">Before</button>
       <Table aria-label="Wide" className="w-60">
         <Table.Body>

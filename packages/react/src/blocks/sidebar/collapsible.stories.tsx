@@ -1,24 +1,25 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
+import {
+  BookOpenIcon as BookOpenSolid,
+  RocketLaunchIcon as RocketLaunchSolid,
+  TicketIcon as TicketSolid,
+} from '@heroicons/react/16/solid';
 import {
   BookmarkIcon,
   CalendarDaysIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
   Cog6ToothIcon,
+  CubeTransparentIcon,
   DocumentTextIcon,
   HomeIcon,
   MegaphoneIcon,
   TruckIcon,
 } from '@heroicons/react/24/outline';
 
-import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
-import { Item } from '../../components/data/item';
+import { Badge } from '../../components/data/badge';
 import { Skeleton } from '../../components/feedback/skeleton';
-import { Divider } from '../../components/layout/divider';
-import { Spacer } from '../../components/layout/spacer';
-import { Tooltip } from '../../components/overlay/tooltip';
+import { Sidebar } from '../../components/navigation/sidebar';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -35,78 +36,125 @@ type Story = StoryObj<typeof meta>;
 
 const ITEMS = [
   { id: 'home', label: '홈', icon: <HomeIcon /> },
-  { id: 'board', label: '게시판', icon: <MegaphoneIcon /> },
-  { id: 'shuttle', label: '셔틀', icon: <TruckIcon /> },
-  { id: 'posts', label: '내 글', icon: <DocumentTextIcon /> },
+  {
+    id: 'board',
+    label: '게시판',
+    icon: <MegaphoneIcon />,
+    badge: <Badge content={12} variant="soft" colorScheme="primary" />,
+  },
+  {
+    id: 'shuttle',
+    label: '셔틀',
+    icon: <TruckIcon />,
+    badge: <Badge content="운행 중" variant="outline" colorScheme="success" />,
+  },
+  {
+    id: 'posts',
+    label: '내 글',
+    icon: <DocumentTextIcon />,
+    badge: <Badge content={4} variant="soft" colorScheme="info" />,
+  },
   { id: 'bookmarks', label: '북마크', icon: <BookmarkIcon /> },
-  { id: 'reservations', label: '예약', icon: <CalendarDaysIcon /> },
+  {
+    id: 'reservations',
+    label: '예약',
+    icon: <CalendarDaysIcon />,
+    badge: <Badge content="D-2" variant="soft" colorScheme="warning" />,
+  },
+];
+
+const PINNED: {
+  id: string;
+  label: string;
+  icon: ReactNode;
+  colorScheme: Sidebar.Item.Props['colorScheme'];
+  badge?: ReactNode;
+}[] = [
+  {
+    id: 'ziggle',
+    label: 'Ziggle v3 출시',
+    icon: <RocketLaunchSolid />,
+    colorScheme: 'primary',
+    badge: <Badge dot colorScheme="success" />,
+  },
+  { id: 'festival', label: '축제 부스 준비', icon: <TicketSolid />, colorScheme: 'warning' },
+  {
+    id: 'study',
+    label: '알고리즘 스터디',
+    icon: <BookOpenSolid />,
+    colorScheme: 'success',
+    badge: <Badge dot colorScheme="danger" />,
+  },
 ];
 
 export const PC: Story = {
   render: function Render() {
-    const [collapsed, setCollapsed] = useState(false);
     const [current, setCurrent] = useState('shuttle');
 
-    const label = ITEMS.find((item) => item.id === current)!.label;
+    const label = [...ITEMS, ...PINNED].find((item) => item.id === current)!.label;
 
     return (
-      <div className="flex min-h-dvh break-keep">
-        <aside className="flex shrink-0 flex-col gap-4 p-2">
-          <IconButton
-            variant="outline"
-            aria-label={collapsed ? '메뉴 펼치기' : '메뉴 접기'}
-            aria-expanded={!collapsed}
-            icon={collapsed ? <ChevronDoubleRightIcon /> : <ChevronDoubleLeftIcon />}
-            onClick={() => setCollapsed(!collapsed)}
-          />
-          <nav aria-label="주 메뉴">
-            <Item.Group size="tiny" aria-label="주 메뉴">
-              {ITEMS.map((item) => {
-                const link = (
-                  <Item
-                    key={item.id}
-                    asChild
-                    selected={item.id === current}
-                    aria-current={item.id === current ? 'page' : undefined}
-                  >
-                    <a
-                      href={`#${item.id}`}
-                      aria-label={collapsed ? item.label : undefined}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        setCurrent(item.id);
-                      }}
-                    >
-                      <Item.Media>{item.icon}</Item.Media>
-                      {!collapsed && (
-                        <Item.Content>
-                          <Item.Title>{item.label}</Item.Title>
-                        </Item.Content>
-                      )}
-                    </a>
-                  </Item>
-                );
+      <Sidebar.Provider className="break-keep">
+        <Sidebar value={current} collapsible aria-label="주 메뉴">
+          <Sidebar.Header>
+            <Avatar name="인포팀" shape="square" size="tiny" aria-hidden>
+              <Avatar.Fallback>
+                <CubeTransparentIcon />
+              </Avatar.Fallback>
+            </Avatar>
+            <span className="text-subtitle-s2-semibold">GIST 인포팀</span>
+          </Sidebar.Header>
+          {ITEMS.map((item) => (
+            <Sidebar.Item
+              key={item.id}
+              value={item.id}
+              href={`#${item.id}`}
+              onClick={(event) => {
+                event.preventDefault();
+                setCurrent(item.id);
+              }}
+            >
+              {item.icon}
+              {item.label}
+              {item.badge}
+            </Sidebar.Item>
+          ))}
+          <Sidebar.Group label="고정한 페이지">
+            {PINNED.map((item) => (
+              <Sidebar.Item
+                key={item.id}
+                value={item.id}
+                href={`#${item.id}`}
+                colorScheme={item.colorScheme}
+                onClick={(event) => {
+                  event.preventDefault();
+                  setCurrent(item.id);
+                }}
+              >
+                {item.icon}
+                {item.label}
+                {item.badge}
+              </Sidebar.Item>
+            ))}
+          </Sidebar.Group>
+          <Sidebar.Footer>
+            <Sidebar.Item href="#settings">
+              <Cog6ToothIcon />
+              설정
+            </Sidebar.Item>
+            <Sidebar.Item href="#profile">
+              <Avatar name="김지수" size="tiny" />
+              김지수
+              <Badge content="관리자" variant="soft" colorScheme="primary" />
+            </Sidebar.Item>
+          </Sidebar.Footer>
+        </Sidebar>
 
-                return collapsed ? (
-                  <Tooltip key={item.id} content={item.label} side="right">
-                    {link}
-                  </Tooltip>
-                ) : (
-                  link
-                );
-              })}
-            </Item.Group>
-          </nav>
-          <Spacer />
-          <Tooltip content="설정" side="right">
-            <IconButton variant="outline" aria-label="설정" icon={<Cog6ToothIcon />} />
-          </Tooltip>
-          <Avatar name="김지수" size="tiny" />
-        </aside>
-        <Divider orientation="vertical" />
-
-        <main className="flex min-w-0 flex-1 flex-col gap-6 px-4 py-8 md:px-8">
-          <h1 className="text-headline-h3-bold">{label}</h1>
+        <Sidebar.Inset className="gap-6 px-4 py-8 md:px-8">
+          <div className="flex items-center gap-3">
+            <Sidebar.Trigger />
+            <h1 className="text-headline-h3-bold">{label}</h1>
+          </div>
           <Skeleton shape="text" lines={2} />
           <div className="grid gap-4 lg:grid-cols-3">
             <Skeleton className="h-32" />
@@ -114,8 +162,8 @@ export const PC: Story = {
             <Skeleton className="h-32" />
           </div>
           <Skeleton className="h-64" />
-        </main>
-      </div>
+        </Sidebar.Inset>
+      </Sidebar.Provider>
     );
   },
 };

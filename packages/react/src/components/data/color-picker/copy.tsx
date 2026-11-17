@@ -3,7 +3,7 @@
 import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/16/solid';
 
 import { usePicker } from './context';
-import { useClipboardSupport } from './use-color-picker';
+import { useClipboardSupport } from '../../../hooks/use-clipboard-support';
 import { useTranslate } from '../../../internal/translate';
 import { mergeEventHandlers } from '../../../utils';
 import { IconButton } from '../../action/icon-button';

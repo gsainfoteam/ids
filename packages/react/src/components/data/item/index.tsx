@@ -27,7 +27,6 @@ export namespace Item {
   export type Props = Omit<ComponentProps<'div'>, 'className' | 'style' | 'children'> & {
     variant?: ItemVariant;
     size?: IdsSize;
-    dense?: boolean;
     interactive?: boolean;
     selected?: boolean;
     disabled?: boolean;

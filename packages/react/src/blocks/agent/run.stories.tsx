@@ -18,8 +18,8 @@ import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
 import { Table } from '../../components/data/table';
 import { Alert } from '../../components/feedback/alert';
+import { Marker } from '../../components/feedback/marker';
 import { Progress } from '../../components/feedback/progress';
-import { Spinner } from '../../components/feedback/spinner';
 import { toast } from '../../components/feedback/toast';
 import { TextArea } from '../../components/form/text-area';
 import { Divider } from '../../components/layout/divider';
@@ -195,10 +195,9 @@ export const PC: Story = {
                 )}
               </li>
               <li>
-                <p role="status" className="text-body-b3-regular flex items-center gap-2 px-2">
-                  <Spinner size="tiny" decorative />
+                <Marker pending className="px-2">
                   시간표 3안을 만드는 중이에요 · 2:05
-                </p>
+                </Marker>
               </li>
             </ol>
 

@@ -2,9 +2,11 @@ import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, test } from 'vitest';
+import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Button, ButtonGroup, IdsProvider, Toggle, ToggleGroup } from '../src';
+import { Button, ButtonGroup, IdsProvider, TextField, Toggle, ToggleGroup } from '../src';
+import { testTheme } from './theme';
 
 const separator = (node: ReactNode) =>
   new DOMParser()
@@ -99,11 +101,36 @@ test('outline items either side of an open popover still share one border', asyn
   expect(getComputedStyle(more).marginInlineStart).toBe('-1px');
 });
 
+test('whatever draws the focus ring sits above the joined items beside it', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <ButtonGroup aria-label="주소">
+        <TextField aria-label="도메인" data-1p-ignore data-lpignore="true">
+          <span>https://</span>
+        </TextField>
+        <Button>이동</Button>
+      </ButtonGroup>
+    </IdsProvider>,
+  );
+  const field = screen.getByRole('textbox', { name: '도메인' });
+  const go = screen.getByRole('button', { name: '이동' });
+
+  await userEvent.click(field);
+  await expect.element(field).toHaveFocus();
+  expect(getComputedStyle(field.element().closest('[data-text-field]')!).zIndex).toBe('30');
+
+  await userEvent.keyboard('{Tab}');
+  await expect.element(go).toHaveFocus();
+  await userEvent.hover(go);
+  await expect.element(go).toHaveAttribute('data-hovered');
+  expect(getComputedStyle(go.element()).zIndex).toBe('30');
+});
+
 const dropShadow = /0px 1px 3px 0px/;
 
 test('joined glossy buttons share one edge and one shadow drawn by the group', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <ButtonGroup aria-label="저장" variant="glossy">
         <Button>저장</Button>
         <Button>더보기</Button>
@@ -123,7 +150,7 @@ test('joined glossy buttons share one edge and one shadow drawn by the group', a
 
 test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its own', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <ToggleGroup aria-label="정렬" variant="glossy" defaultValue="left">
         <Toggle value="left">왼쪽</Toggle>
         <Toggle value="right">오른쪽</Toggle>
@@ -142,7 +169,7 @@ test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its
 
 test('spaced glossy buttons keep their own shadows', async () => {
   const screen = await render(
-    <IdsProvider>
+    <IdsProvider theme={testTheme}>
       <ButtonGroup aria-label="저장" variant="glossy" attached={false}>
         <Button>저장</Button>
         <Button>더보기</Button>

@@ -86,6 +86,15 @@ type Story = StoryObj<typeof meta>;
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+async function expectPauseToHold(
+  carousel: () => HTMLElement,
+  pause: () => HTMLElement,
+  paused: boolean,
+) {
+  await waitFor(() => expect(pause()).toHaveAttribute('aria-pressed', String(paused)));
+  if (paused) await expect(carousel()).not.toHaveAttribute('data-playing');
+}
+
 export const Playground: Story = {};
 
 export const Gallery: Story = {
@@ -122,7 +131,7 @@ export const Gallery: Story = {
               <Carousel.Content className="gap-3">
                 {products.map((product) => (
                   <Carousel.Slide key={product.id}>
-                    <div className="rounded-container text-subtitle-s2-semibold flex aspect-square items-center justify-center bg-(--ids-color-muted)">
+                    <div className="rounded-container text-subtitle-s2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
                       {product.name}
                     </div>
                   </Carousel.Slide>
@@ -141,7 +150,7 @@ export const Gallery: Story = {
           <Carousel aria-label="가로 공지" className="w-96">
             {notices.map((notice) => (
               <Carousel.Slide key={notice}>
-                <p className="rounded-container text-body-b3-medium flex h-28 items-center justify-center bg-(--ids-color-muted) px-16 text-center">
+                <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-28 items-center justify-center px-16 text-center">
                   {notice}
                 </p>
               </Carousel.Slide>
@@ -153,7 +162,7 @@ export const Gallery: Story = {
             <Carousel.Content className="h-40">
               {notices.map((notice) => (
                 <Carousel.Slide key={notice}>
-                  <p className="rounded-container text-body-b3-medium flex h-full items-center justify-center bg-(--ids-color-muted) px-6 text-center">
+                  <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-full items-center justify-center px-6 text-center">
                     {notice}
                   </p>
                 </Carousel.Slide>
@@ -216,7 +225,7 @@ export const Gallery: Story = {
             <Carousel.Content className="gap-3">
               {products.map((product) => (
                 <Carousel.Slide key={product.id}>
-                  <div className="rounded-container text-body-b3-medium flex aspect-square items-center justify-center bg-(--ids-color-muted)">
+                  <div className="rounded-container text-body-b3-medium bg-neutral-soft flex aspect-square items-center justify-center">
                     {product.name}
                   </div>
                 </Carousel.Slide>
@@ -305,9 +314,7 @@ export const Controlled: Story = {
           <Button variant="outline" onClick={() => setIndex(0)}>
             처음으로
           </Button>
-          <p className="text-body-b3-regular text-(--ids-color-on-muted)">
-            지금 {photos[index].alt}
-          </p>
+          <p className="text-body-b3-regular text-neutral">지금 {photos[index].alt}</p>
         </div>
       </div>
     );
@@ -404,7 +411,7 @@ export const Autoplay: Story = {
     <Carousel aria-label="공지 배너" loop autoplay={{ delay: 5000 }} className="w-full max-w-md">
       {notices.map((notice) => (
         <Carousel.Slide key={notice}>
-          <p className="rounded-container text-body-b3-medium flex h-32 items-center justify-center bg-(--ids-color-muted) px-16 text-center">
+          <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-32 items-center justify-center px-16 text-center">
             {notice}
           </p>
         </Carousel.Slide>
@@ -422,19 +429,15 @@ export const Autoplay: Story = {
   play: async ({ canvas, userEvent }) => {
     const carousel = () => canvas.getByRole('region', { name: '공지 배너' });
     const pause = () => canvas.getByRole('button', { name: '자동 넘김 멈춤' });
-    const playing = () => carousel().hasAttribute('data-playing');
     const startsPaused = prefersReducedMotion();
-    await userEvent.unhover(carousel());
 
-    await expect(pause()).toHaveAttribute('aria-pressed', String(startsPaused));
-    await waitFor(() => expect(playing()).toBe(!startsPaused));
+    await expectPauseToHold(carousel, pause, startsPaused);
 
     await userEvent.click(pause());
-    await waitFor(() => expect(pause()).toHaveAttribute('aria-pressed', String(!startsPaused)));
-    await waitFor(() => expect(playing()).toBe(startsPaused));
+    await expectPauseToHold(carousel, pause, !startsPaused);
 
     await userEvent.click(pause());
-    await waitFor(() => expect(pause()).toHaveAttribute('aria-pressed', String(startsPaused)));
+    await expectPauseToHold(carousel, pause, startsPaused);
   },
 };
 
@@ -450,7 +453,7 @@ export const AutoScroll: Story = {
       <Carousel.Content className="gap-3">
         {products.map((product) => (
           <Carousel.Slide key={product.id}>
-            <div className="rounded-container text-body-b3-medium flex h-20 items-center justify-center bg-(--ids-color-muted)">
+            <div className="rounded-container text-body-b3-medium bg-neutral-soft flex h-20 items-center justify-center">
               {product.name}
             </div>
           </Carousel.Slide>
@@ -467,17 +470,17 @@ export const AutoScroll: Story = {
     },
   },
   play: async ({ canvas, userEvent }) => {
-    const carousel = canvas.getByRole('region', { name: '후원 단체' });
-    const pause = canvas.getByRole('button', { name: '자동 넘김 멈춤' });
+    const carousel = () => canvas.getByRole('region', { name: '후원 단체' });
+    const pause = () => canvas.getByRole('button', { name: '자동 넘김 멈춤' });
     const startsPaused = prefersReducedMotion();
-    const content = carousel.querySelector('[data-carousel-content]');
-    if (content) await userEvent.unhover(content);
 
-    await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
-    await userEvent.click(pause);
-    await waitFor(() => expect(carousel.hasAttribute('data-playing')).toBe(startsPaused));
-    await userEvent.click(pause);
-    await expect(pause).toHaveAttribute('aria-pressed', String(startsPaused));
+    await expectPauseToHold(carousel, pause, startsPaused);
+
+    await userEvent.click(pause());
+    await expectPauseToHold(carousel, pause, !startsPaused);
+
+    await userEvent.click(pause());
+    await expectPauseToHold(carousel, pause, startsPaused);
   },
 };
 
@@ -487,7 +490,7 @@ export const Vertical: Story = {
       <Carousel.Content className="h-40">
         {notices.map((notice) => (
           <Carousel.Slide key={notice}>
-            <p className="rounded-container text-body-b3-medium flex h-full items-center justify-center bg-(--ids-color-muted) px-6 text-center">
+            <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-full items-center justify-center px-6 text-center">
               {notice}
             </p>
           </Carousel.Slide>

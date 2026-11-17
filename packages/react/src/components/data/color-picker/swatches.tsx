@@ -11,7 +11,7 @@ import { RadioGroup } from '../../form/radio-group';
 import type { ColorPickerSwatchOption } from '.';
 
 export type ColorPickerSwatchesProps = Omit<
-  ComponentProps<'div'>,
+  ComponentProps<'fieldset'>,
   'defaultValue' | 'onChange' | 'role'
 >;
 

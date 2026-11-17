@@ -533,9 +533,9 @@ export const ControlledOpen: Story = {
 };
 
 const statuses = [
-  ['todo', '할 일', cn('bg-(--ids-color-on-muted)')],
-  ['doing', '진행 중', cn('bg-(--ids-color-info)')],
-  ['done', '완료', cn('bg-(--ids-color-success)')],
+  ['todo', '할 일', cn('bg-(--ids-color-text-neutral)')],
+  ['doing', '진행 중', cn('bg-info')],
+  ['done', '완료', cn('bg-success')],
 ] as const;
 
 export const CustomItems: Story = {
@@ -550,7 +550,7 @@ export const CustomItems: Story = {
       >
         <span aria-hidden="true" className={cn('size-2 shrink-0 rounded-full', dot)} />
         {label}
-        <Select.ItemIndicator className="text-(--ids-color-success)">
+        <Select.ItemIndicator className="text-success">
           <CheckCircleIcon />
         </Select.ItemIndicator>
       </Select.Item>

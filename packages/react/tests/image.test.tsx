@@ -3,17 +3,17 @@ import { createRef, type ReactNode } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { expect, onTestFinished, test, vi } from 'vitest';
-import { cdp, page, userEvent } from 'vitest/browser';
+import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Image } from '../src';
 import { skipWithoutCdp } from './engines';
+import { holdImages as holdImagesUnder } from './held-images';
 
 const PICTURE = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="6"/>';
 const INLINE_PICTURE = `data:image/svg+xml;base64,${btoa(PICTURE)}`;
 const BROKEN = 'data:image/png;base64,AAAA';
 const HELD = '/__held-image__/';
-const lazyImagesStartLateOnASlowRunner = 5_000;
 const GAP = 8;
 
 const frameOf = (container: Element) => container.querySelector<HTMLElement>('[data-image]')!;
@@ -23,50 +23,7 @@ const serverFrame = (node: ReactNode) =>
     .parseFromString(renderToString(node), 'text/html')
     .querySelector<HTMLElement>('[data-image]')!;
 
-async function cdpReadyForListeners() {
-  const session = cdp();
-  await session.send('Fetch.disable');
-  return session;
-}
-
-async function holdImages() {
-  const session = await cdpReadyForListeners();
-  const paused = new Map<string, string>();
-  const onPaused = (event: { requestId: string; request: { url: string } }) => {
-    paused.set(new URL(event.request.url).pathname, event.requestId);
-  };
-  session.on('Fetch.requestPaused', onPaused);
-  await session.send('Fetch.enable', { patterns: [{ urlPattern: `*${HELD}*` }] });
-  onTestFinished(async () => {
-    session.off('Fetch.requestPaused', onPaused);
-    await session.send('Fetch.disable');
-  });
-  const requestOf = async (src: string) => {
-    await expect
-      .poll(() => paused.get(src), {
-        message: `${src} is requested`,
-        timeout: lazyImagesStartLateOnASlowRunner,
-      })
-      .toBeDefined();
-    return paused.get(src)!;
-  };
-  return {
-    async load(src: string) {
-      await session.send('Fetch.fulfillRequest', {
-        requestId: await requestOf(src),
-        responseCode: 200,
-        responseHeaders: [{ name: 'Content-Type', value: 'image/svg+xml' }],
-        body: btoa(PICTURE),
-      });
-    },
-    async fail(src: string) {
-      await session.send('Fetch.failRequest', {
-        requestId: await requestOf(src),
-        errorReason: 'Failed',
-      });
-    },
-  };
-}
+const holdImages = () => holdImagesUnder(HELD, PICTURE);
 
 test('SSR: a plain img with its alt, lazily loaded, over a Skeleton hidden from screen readers', () => {
   const frame = serverFrame(<Image src="/lake.jpg" alt="Lake at dawn" />);

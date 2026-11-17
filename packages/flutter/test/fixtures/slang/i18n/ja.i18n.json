@@ -1,0 +1,8 @@
+{
+  "ids(singleInterface=IdsMessages)": {
+    "dialogClose": "閉じる",
+    "spinnerLabel": "読み込み中",
+    "chipFieldRemove": "{label}を削除",
+    "textAreaRemaining": "残り{remaining}文字"
+  }
+}

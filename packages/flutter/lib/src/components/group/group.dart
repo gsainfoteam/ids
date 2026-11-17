@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../theme/ids_provider.dart';
 import '../divider/divider.dart';
 
 class Group extends StatelessWidget {
@@ -27,7 +28,7 @@ class Group extends StatelessWidget {
       direction: orientation,
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      spacing: attached ? 0 : _gap,
+      spacing: attached ? 0 : IdsProvider.of(context).dimension(_gap),
       children: children,
     );
 
@@ -51,10 +52,7 @@ class GroupSeparator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final group = Group.maybeOf(context);
-    assert(
-      group != null,
-      'GroupSeparator must be rendered inside a Group.',
-    );
+    assert(group != null, 'GroupSeparator must be rendered inside an Group.');
     return Divider(
       orientation: group!.orientation == Axis.horizontal
           ? Axis.vertical

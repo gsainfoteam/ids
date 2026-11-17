@@ -7,6 +7,7 @@ import {
 import axe, { type AxeResults, type RunOptions } from 'axe-core';
 import { configure } from 'storybook/test';
 import { beforeAll, describe, expect, test } from 'vitest';
+import { userEvent } from 'vitest/browser';
 
 import * as preview from '../.storybook/preview';
 
@@ -27,6 +28,13 @@ const MODES_ONE_AFTER_THE_OTHER = ['light', 'dark'] as const;
 const A_GALLERY_OR_A_WHOLE_PAGE_RENDERS_AND_SCANS_IN_MS = 30_000;
 
 const FLOATING_UI_FOCUS_GUARDS = '[data-floating-ui-focus-guard]';
+
+async function parkTheRealPointerAboveEveryStory() {
+  const spot = document.createElement('div');
+  spot.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;z-index:2147483647';
+  document.body.append(spot);
+  await userEvent.hover(spot);
+}
 
 function describeViolations(violations: AxeResults['violations']) {
   return violations
@@ -61,6 +69,7 @@ async function checkAccessibility(storyA11y: A11yParameters | undefined) {
 export function checkEveryStory(storyFiles: StoryFiles) {
   const project = setProjectAnnotations([preview]);
   beforeAll(project.beforeAll);
+  beforeAll(parkTheRealPointerAboveEveryStory);
 
   for (const mode of MODES_ONE_AFTER_THE_OTHER)
     describe(mode, () => {

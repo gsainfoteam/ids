@@ -50,14 +50,6 @@ export function useEyeDropperSupport() {
   );
 }
 
-export function useClipboardSupport() {
-  return useSyncExternalStore(
-    noSubscription,
-    () => typeof navigator.clipboard?.writeText === 'function',
-    () => false,
-  );
-}
-
 const START: HSVA = { h: 0, s: 1, v: 1, a: 1 };
 const COPIED_FOR = 1500;
 

@@ -9,6 +9,9 @@
     "label": "Breadcrumb",
     "more": "Show hidden path"
   },
+  "bubble": {
+    "reactions": "Reactions"
+  },
   "calendar": {
     "label": "Calendar",
     "month": "Month",
@@ -27,6 +30,9 @@
     "previous": "Previous slide",
     "roleDescription": "carousel"
   },
+  "chart": {
+    "label": "Chart"
+  },
   "checkboxGroup": {
     "required": "Select at least one option."
   },
@@ -42,6 +48,12 @@
     "placeholder": "Add an item…",
     "remove": "Remove {label}",
     "search": "Search items"
+  },
+  "codeBlock": {
+    "collapse": "Show less",
+    "copied": "Copied",
+    "copy": "Copy code",
+    "expand": "{count, plural, one {Show # more line} other {Show # more lines}}"
   },
   "colorField": {
     "clear": "Clear color",
@@ -165,6 +177,9 @@
     "up": "Up Arrow",
     "windows": "Windows"
   },
+  "link": {
+    "newTab": "(opens in a new tab)"
+  },
   "marquee": {
     "pause": "Pause"
   },
@@ -174,6 +189,13 @@
     "search": "Search commands",
     "searchPlaceholder": "Search commands…",
     "submenu": "{label} submenu"
+  },
+  "messageScroller": {
+    "jump": "Scroll to bottom",
+    "jumpUnseen": "{count, plural, one {Scroll to bottom, # new message} other {Scroll to bottom, # new messages}}",
+    "label": "Messages",
+    "loading": "Loading earlier messages",
+    "unseen": "{count, plural, one {# new message} other {# new messages}}"
   },
   "numberField": {
     "decrement": "Decrease",
@@ -199,6 +221,16 @@
   "popover": {
     "close": "Close"
   },
+  "promptInput": {
+    "actions": "Add",
+    "attach": "Attach files",
+    "attachments": "Attached files",
+    "label": "Message",
+    "placeholder": "Type a message",
+    "send": "Send",
+    "sending": "Sending",
+    "stop": "Stop"
+  },
   "qrCode": {
     "label": "QR code"
   },
@@ -221,6 +253,22 @@
     "placeholder": "Select an option",
     "search": "Search options",
     "searchPlaceholder": "Search…"
+  },
+  "sidebar": {
+    "collapse": "Collapse sidebar",
+    "drag": {
+      "after": "After {target}",
+      "before": "Before {target}",
+      "cancel": "Returned {item} to its place.",
+      "end": "Moved {item}.",
+      "hint": "Press Space to pick up, the up and down arrows to choose a place, and Enter to drop. Escape cancels.",
+      "inside": "Inside {target}",
+      "origin": "Original place",
+      "start": "Picked up {item}."
+    },
+    "expand": "Expand sidebar",
+    "label": "Sidebar",
+    "open": "Open menu"
   },
   "slider": {
     "end": "End",

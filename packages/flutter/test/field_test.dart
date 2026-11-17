@@ -2,12 +2,18 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
-const danger = Color(0xFFC10007);
+import 'test_theme.dart';
+
+final danger = IdsResolvedTheme(
+  theme: testTheme,
+  mode: IdsMode.light,
+).colors.textDanger;
 
 Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
   Directionality(
     textDirection: TextDirection.ltr,
-    child: ThemeProvider(
+    child: IdsProvider(
+      theme: testTheme,
       child: Align(alignment: Alignment.topLeft, child: child),
     ),
   ),

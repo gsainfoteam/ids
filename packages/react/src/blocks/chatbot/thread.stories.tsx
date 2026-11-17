@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 import {
   ArrowPathIcon,
@@ -23,7 +23,7 @@ import { Toggle } from '../../components/action/toggle';
 import { Accordion } from '../../components/data/accordion';
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
-import { Card } from '../../components/data/card';
+import { Bubble } from '../../components/data/bubble';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
 import { Table } from '../../components/data/table';
@@ -31,7 +31,7 @@ import { Spinner } from '../../components/feedback/spinner';
 import { toast } from '../../components/feedback/toast';
 import { TextArea } from '../../components/form/text-area';
 import { Divider } from '../../components/layout/divider';
-import { ScrollArea } from '../../components/layout/scroll-area';
+import { MessageScroller } from '../../components/layout/message-scroller';
 import { Spacer } from '../../components/layout/spacer';
 import { Drawer } from '../../components/overlay/drawer';
 import { Menu } from '../../components/overlay/menu';
@@ -79,8 +79,6 @@ const FOLLOW_UPS = ['목요일 오후도 비워 줘', '다른 안도 보여 줘'
 
 const ANSWER_TAKES_MS = 2400;
 
-const NEAR_THE_END_PX = 48;
-
 type Sent = { id: number; text: string; answered: boolean };
 
 export const PC: Story = {
@@ -89,23 +87,14 @@ export const PC: Story = {
     const [sent, setSent] = useState<Sent[]>([]);
     const [draft, setDraft] = useState('');
 
-    const scroller = useRef<HTMLDivElement>(null);
-    const followingTheEnd = useRef(true);
-
     useEffect(() => {
       const timer = window.setTimeout(() => setRearranged(true), ANSWER_TAKES_MS);
       return () => window.clearTimeout(timer);
     }, []);
 
-    useEffect(() => {
-      const element = scroller.current;
-      if (element && followingTheEnd.current) element.scrollTo({ top: element.scrollHeight });
-    }, [rearranged, sent]);
-
     const ask = (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const id = sent.length;
-      followingTheEnd.current = true;
       setSent([...sent, { id, text: draft.trim(), answered: false }]);
       setDraft('');
       window.setTimeout(
@@ -237,159 +226,141 @@ export const PC: Story = {
           </header>
           <Divider />
 
-          <ScrollArea fade className="min-h-0 flex-1">
-            <ScrollArea.Viewport
-              ref={scroller}
-              onScroll={(event) => {
-                const element = event.currentTarget;
-                followingTheEnd.current =
-                  element.scrollHeight - element.scrollTop - element.clientHeight < NEAR_THE_END_PX;
-              }}
-            >
-              <ol
-                aria-label="대화"
-                className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-6"
-              >
-                <li className="flex flex-col items-end gap-2">
-                  <Item variant="outline" size="tiny" className="w-auto">
-                    <Item.Media variant="soft">
-                      <DocumentTextIcon />
-                    </Item.Media>
-                    <Item.Content>
-                      <Item.Title>성적표_2026-1.pdf</Item.Title>
-                      <Item.Description>PDF · 182KB</Item.Description>
-                    </Item.Content>
-                  </Item>
-                  <Card variant="soft" className="max-w-[80%]">
-                    <Card.Content>남은 전공 필수를 찾아서 다음 학기 시간표에 넣어 줘.</Card.Content>
-                  </Card>
-                </li>
+          <MessageScroller aria-label="대화" scrollOnAppend="start" className="min-h-0 flex-1">
+            <MessageScroller.List className="mx-auto w-full max-w-3xl gap-8 px-4 py-6">
+              <div className="flex flex-col items-end gap-2">
+                <Item variant="outline" size="tiny" className="w-auto">
+                  <Item.Media variant="soft">
+                    <DocumentTextIcon />
+                  </Item.Media>
+                  <Item.Content>
+                    <Item.Title>성적표_2026-1.pdf</Item.Title>
+                    <Item.Description>PDF · 182KB</Item.Description>
+                  </Item.Content>
+                </Item>
+                <Bubble align="end">남은 전공 필수를 찾아서 다음 학기 시간표에 넣어 줘.</Bubble>
+              </div>
 
-                <li className="flex gap-3">
-                  {assistant}
-                  <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-4">
-                    <Accordion type="multiple" variant="soft">
-                      <Accordion.Item value="reasoning">
-                        <Accordion.Header asChild>
-                          <h2>
-                            <Accordion.Trigger>12초 동안 생각했어요</Accordion.Trigger>
-                          </h2>
-                        </Accordion.Header>
-                        <Accordion.Content>
-                          성적표에서 들은 과목 31개를 찾고, 2026 학사 요람의 전공 필수와 견줬어요.
-                          남은 전공 필수는 세 과목이라, 2학기에 열리는 분반 중 서로 시간이 겹치지
-                          않는 것을 골랐어요.
-                        </Accordion.Content>
-                      </Accordion.Item>
-                      <Accordion.Item value="tool">
-                        <Accordion.Header asChild>
-                          <h2>
-                            <Accordion.Trigger>
-                              학사 시스템에서 개설 과목을 찾았어요{' '}
-                              <Badge content="38과목" variant="soft" colorScheme="success" />
-                            </Accordion.Trigger>
-                          </h2>
-                        </Accordion.Header>
-                        <Accordion.Content>
-                          <Table aria-label="도구에 넘긴 값" size="tiny">
-                            <Table.Header>
-                              <Table.Row>
-                                <Table.Head>값</Table.Head>
-                                <Table.Head>내용</Table.Head>
-                              </Table.Row>
-                            </Table.Header>
-                            <Table.Body>
-                              <Table.Row>
-                                <Table.Cell>학기</Table.Cell>
-                                <Table.Cell>2026학년도 2학기</Table.Cell>
-                              </Table.Row>
-                              <Table.Row>
-                                <Table.Cell>학과</Table.Cell>
-                                <Table.Cell>전기전자컴퓨터공학과</Table.Cell>
-                              </Table.Row>
-                            </Table.Body>
-                          </Table>
-                        </Accordion.Content>
-                      </Accordion.Item>
-                    </Accordion>
+              <div className="flex gap-3">
+                {assistant}
+                <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-4">
+                  <Accordion type="multiple" variant="soft">
+                    <Accordion.Item value="reasoning">
+                      <Accordion.Header asChild>
+                        <h2>
+                          <Accordion.Trigger>12초 동안 생각했어요</Accordion.Trigger>
+                        </h2>
+                      </Accordion.Header>
+                      <Accordion.Content>
+                        성적표에서 들은 과목 31개를 찾고, 2026 학사 요람의 전공 필수와 견줬어요.
+                        남은 전공 필수는 세 과목이라, 2학기에 열리는 분반 중 서로 시간이 겹치지 않는
+                        것을 골랐어요.
+                      </Accordion.Content>
+                    </Accordion.Item>
+                    <Accordion.Item value="tool">
+                      <Accordion.Header asChild>
+                        <h2>
+                          <Accordion.Trigger>
+                            학사 시스템에서 개설 과목을 찾았어요{' '}
+                            <Badge content="38과목" variant="soft" colorScheme="success" />
+                          </Accordion.Trigger>
+                        </h2>
+                      </Accordion.Header>
+                      <Accordion.Content>
+                        <Table aria-label="도구에 넘긴 값" size="tiny">
+                          <Table.Header>
+                            <Table.Row>
+                              <Table.Head>값</Table.Head>
+                              <Table.Head>내용</Table.Head>
+                            </Table.Row>
+                          </Table.Header>
+                          <Table.Body>
+                            <Table.Row>
+                              <Table.Cell>학기</Table.Cell>
+                              <Table.Cell>2026학년도 2학기</Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                              <Table.Cell>학과</Table.Cell>
+                              <Table.Cell>전기전자컴퓨터공학과</Table.Cell>
+                            </Table.Row>
+                          </Table.Body>
+                        </Table>
+                      </Accordion.Content>
+                    </Accordion.Item>
+                  </Accordion>
 
-                    <p>남은 전공 필수는 세 과목이에요. 2학기에 모두 열려서 이렇게 넣었어요.</p>
-                    <Table aria-label="넣은 전공 필수">
-                      <Table.Header>
-                        <Table.Row>
-                          <Table.Head>과목</Table.Head>
-                          <Table.Head>시간</Table.Head>
-                          <Table.Head align="end">학점</Table.Head>
+                  <p>남은 전공 필수는 세 과목이에요. 2학기에 모두 열려서 이렇게 넣었어요.</p>
+                  <Table aria-label="넣은 전공 필수">
+                    <Table.Header>
+                      <Table.Row>
+                        <Table.Head>과목</Table.Head>
+                        <Table.Head>시간</Table.Head>
+                        <Table.Head align="end">학점</Table.Head>
+                      </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                      {REQUIRED.map((row) => (
+                        <Table.Row key={row.course}>
+                          <Table.Cell>{row.course}</Table.Cell>
+                          <Table.Cell>{row.time}</Table.Cell>
+                          <Table.Cell align="end">{row.credits}</Table.Cell>
                         </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {REQUIRED.map((row) => (
-                          <Table.Row key={row.course}>
-                            <Table.Cell>{row.course}</Table.Cell>
-                            <Table.Cell>{row.time}</Table.Cell>
-                            <Table.Cell align="end">{row.credits}</Table.Cell>
-                          </Table.Row>
-                        ))}
-                      </Table.Body>
-                    </Table>
-                    <p>모두 9학점이라, 교양이나 선택 과목을 9학점 더 넣을 수 있어요.</p>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-caption-c1-medium">출처</span>
-                      {SOURCES.map((source) => (
-                        <Button key={source} asChild variant="outline" size="tiny">
-                          <a href={`#${source}`}>{source}</a>
-                        </Button>
                       ))}
-                    </div>
-                    {feedback}
+                    </Table.Body>
+                  </Table>
+                  <p>모두 9학점이라, 교양이나 선택 과목을 9학점 더 넣을 수 있어요.</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-caption-c1-medium">출처</span>
+                    {SOURCES.map((source) => (
+                      <Button key={source} asChild variant="outline" size="tiny">
+                        <a href={`#${source}`}>{source}</a>
+                      </Button>
+                    ))}
                   </div>
-                </li>
+                  {feedback}
+                </div>
+              </div>
 
-                <li className="flex justify-end">
-                  <Card variant="soft" className="max-w-[80%]">
-                    <Card.Content>화요일 오전 수업은 빼 줘. 그날은 근로 장학이 있어.</Card.Content>
-                  </Card>
-                </li>
+              <div className="flex justify-end">
+                <Bubble align="end">화요일 오전 수업은 빼 줘. 그날은 근로 장학이 있어.</Bubble>
+              </div>
 
-                <li className="flex gap-3">
-                  {assistant}
-                  <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-4">
-                    {rearranged ? (
-                      <>
-                        <p>
-                          화요일 오전에는 원래 수업이 없어서 그대로 두면 돼요. 운영체제가 화요일
-                          오후 1시라 근로가 12시에 끝나면 늦지 않아요.
-                        </p>
-                        {feedback}
-                      </>
-                    ) : (
-                      thinking('시간표를 다시 맞추는 중이에요')
-                    )}
+              <div className="flex gap-3">
+                {assistant}
+                <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-4">
+                  {rearranged ? (
+                    <>
+                      <p>
+                        화요일 오전에는 원래 수업이 없어서 그대로 두면 돼요. 운영체제가 화요일 오후
+                        1시라 근로가 12시에 끝나면 늦지 않아요.
+                      </p>
+                      {feedback}
+                    </>
+                  ) : (
+                    thinking('시간표를 다시 맞추는 중이에요')
+                  )}
+                </div>
+              </div>
+
+              {sent.map((message) => (
+                <div key={message.id} className="flex flex-col gap-8">
+                  <div className="flex justify-end">
+                    <Bubble align="end">{message.text}</Bubble>
                   </div>
-                </li>
-
-                {sent.map((message) => (
-                  <li key={message.id} className="flex flex-col gap-8">
-                    <div className="flex justify-end">
-                      <Card variant="soft" className="max-w-[80%]">
-                        <Card.Content>{message.text}</Card.Content>
-                      </Card>
+                  <div className="flex gap-3">
+                    {assistant}
+                    <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-4">
+                      {message.answered ? (
+                        <p>알겠어요. 바꾼 시간표를 다시 정리했어요.</p>
+                      ) : (
+                        thinking('답을 쓰는 중이에요')
+                      )}
                     </div>
-                    <div className="flex gap-3">
-                      {assistant}
-                      <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-4">
-                        {message.answered ? (
-                          <p>알겠어요. 바꾼 시간표를 다시 정리했어요.</p>
-                        ) : (
-                          thinking('답을 쓰는 중이에요')
-                        )}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </ScrollArea.Viewport>
-          </ScrollArea>
+                  </div>
+                </div>
+              ))}
+            </MessageScroller.List>
+          </MessageScroller>
 
           <form onSubmit={ask} className="mx-auto flex w-full max-w-3xl flex-col gap-3 px-4 pb-4">
             <div role="group" aria-label="이어서 물어보기" className="flex flex-wrap gap-2">

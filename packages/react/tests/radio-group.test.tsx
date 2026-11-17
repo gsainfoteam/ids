@@ -45,6 +45,7 @@ test('SSR: a radiogroup root labelled by Field, radios sharing one name and the 
     ),
   );
   const root = doc.querySelector('[role=radiogroup]')!;
+  expect(root.tagName, 'the group is a fieldset').toBe('FIELDSET');
   const label = doc.querySelector('label')!;
   expect(label.htmlFor, 'the id stays on the group').toBe(root.id);
   expect(root.getAttribute('aria-labelledby')).toBe(label.id);
@@ -131,13 +132,19 @@ test('readOnly keeps the value, disabled turns every radio off, an item can opt 
   await expect.element(circleOf(radio('pro'))).toHaveAttribute('data-state', 'unchecked');
   expect(changes).toEqual([]);
   await screen.rerender(
-    <div key="disabled">
-      <RadioGroup aria-label="Plan" disabled>
+    <form key="disabled">
+      <RadioGroup<string> aria-label="Plan" name="plan" defaultValue="pro" disabled>
         {items}
       </RadioGroup>
-    </div>,
+    </form>,
   );
-  for (const plan of plans) await expect.element(radio(plan)).toHaveAttribute('disabled');
+  const group = screen.getByRole('radiogroup', { name: 'Plan' });
+  await expect
+    .element(group, { message: 'the fieldset turns its radios off' })
+    .toHaveAttribute('disabled');
+  for (const plan of plans) await expect.element(radio(plan)).toBeDisabled();
+  await expect.element(circleOf(radio('free'))).toHaveAttribute('data-disabled');
+  expect([...new FormData(group.element().closest('form')!)], 'nothing is submitted').toEqual([]);
   await screen.rerender(
     <div key="item">
       <RadioGroup aria-label="Plan">
@@ -153,7 +160,7 @@ test('readOnly keeps the value, disabled turns every radio off, an item can opt 
 });
 
 test('focus on the root goes to the checked radio, else the first enabled one', async () => {
-  let root: HTMLDivElement | null = null;
+  let root: HTMLFieldSetElement | null = null;
   const screen = await render(
     <RadioGroup
       aria-label="Plan"

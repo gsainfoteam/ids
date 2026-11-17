@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../theme/theme_provider.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_typography.dart';
 
@@ -22,19 +22,19 @@ class Label extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ThemeProvider.of(context);
+    final ids = IdsProvider.of(context);
     final style = switch (size) {
-      IdsSize.standard => IdsTypography.bodyB3Regular,
-      IdsSize.tiny => IdsTypography.captionC1Regular,
+      IdsSize.standard => IdsTypography.bodyB3Medium,
+      IdsSize.tiny => IdsTypography.captionC1Medium,
     };
 
     return Opacity(
       opacity: disabled ? 0.5 : 1,
       child: DefaultTextStyle(
-        style: style.copyWith(color: theme.onSurface),
+        style: ids.textStyle(style, color: ids.colors.onSurface),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: 4,
+          spacing: ids.dimension(4),
           children: [
             Flexible(child: child),
             if (required)
@@ -45,7 +45,10 @@ class Label extends StatelessWidget {
                     -MediaQuery.textScalerOf(context).scale(style.fontSize!) *
                         _asteriskLiftToPretendard,
                   ),
-                  child: Text('*', style: TextStyle(color: theme.danger)),
+                  child: Text(
+                    '*',
+                    style: TextStyle(color: ids.colors.textDanger),
+                  ),
                 ),
               ),
           ],

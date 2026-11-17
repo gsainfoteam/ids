@@ -47,7 +47,6 @@ export function FileItem({ file, asChild, children, className, ...props }: FileI
         asChild={asChild}
         variant="outline"
         size={c.size}
-        dense
         data-file-field-item=""
         className={c.styles.item({ className })}
       >

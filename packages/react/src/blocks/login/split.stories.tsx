@@ -14,6 +14,7 @@ import { Field } from '../../components/form/field';
 import { PasswordField } from '../../components/form/password-field';
 import { TextField } from '../../components/form/text-field';
 import { Divider } from '../../components/layout/divider';
+import { Link } from '../../components/typography/link';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -92,13 +93,9 @@ export const PC: Story = {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <Button asChild variant="outline" size="tiny">
-              <a href="#forgot-password">비밀번호 찾기</a>
-            </Button>
-            <Button asChild variant="soft" size="tiny">
-              <a href="#sign-up">회원가입</a>
-            </Button>
+          <div className="text-body-b3-regular flex flex-wrap items-center justify-center gap-4">
+            <Link href="#forgot-password">비밀번호 찾기</Link>
+            <Link href="#sign-up">회원가입</Link>
           </div>
         </div>
 

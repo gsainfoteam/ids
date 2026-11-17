@@ -90,7 +90,7 @@ test('Close is a ghost IconButton in the alert scheme, and its child replaces th
     ).querySelector<HTMLElement>('[data-alert-close]')!;
   const danger = close({ colorScheme: 'danger' });
   expect(danger.dataset.variant).toBe('ghost');
-  expect(danger.className).toMatch(/\[--control-quiet:var\(--ids-color-danger-strong\)\]/);
+  expect(danger.className).toMatch(/\[--control-quiet:var\(--ids-color-text-danger\)\]/);
   expect(danger.className).toMatch(/rounded-full/);
   expect(
     close({ colorScheme: 'danger', variant: 'solid' }).className,

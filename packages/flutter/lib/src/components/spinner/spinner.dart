@@ -3,6 +3,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
 
+import '../../../messages/ids_messages.dart';
+import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../field/field.dart';
 
@@ -28,7 +30,6 @@ class _SpinnerState extends State<Spinner>
   static const _flutterFontSize = 14.0;
   static const _turn = Duration(seconds: 1);
   static const _announceDelay = Duration(milliseconds: 100);
-  static const _defaultLabel = '불러오는 중';
 
   late final _controller = AnimationController(vsync: this, duration: _turn);
   late final Timer _announceTimer;
@@ -73,25 +74,26 @@ class _SpinnerState extends State<Spinner>
     super.dispose();
   }
 
-  double _dimension(BuildContext context) {
-    final token = _sizes[widget.size ?? Field.maybeOf(context)?.size];
-    if (token != null) return token;
-    final iconSize = context
-        .dependOnInheritedWidgetOfExactType<IconTheme>()
-        ?.data
-        .size;
-    if (iconSize != null) return iconSize;
-    final fontSize =
-        DefaultTextStyle.of(context).style.fontSize ?? _flutterFontSize;
-    return MediaQuery.textScalerOf(context).scale(fontSize);
-  }
-
   @override
   Widget build(BuildContext context) {
     final icon = IconTheme.of(context);
-    final color = icon.color!;
+    final scope = IdsProvider.maybeOf(context);
+    final t = scope?.translation;
+    final ko = IdsMessages.ko;
+    final inheritedIcon = context
+        .dependOnInheritedWidgetOfExactType<IconTheme>();
+    final color =
+        inheritedIcon?.data.color ?? scope?.colors.onSurface ?? icon.color!;
+    final token =
+        _sizes[widget.size ?? Field.maybeOf(context)?.size] ??
+        inheritedIcon?.data.size;
+    final dimension = token == null
+        ? MediaQuery.textScalerOf(context).scale(
+            DefaultTextStyle.of(context).style.fontSize ?? _flutterFontSize,
+          )
+        : scope?.dimension(token) ?? token;
     final arc = CustomPaint(
-      size: Size.square(_dimension(context)),
+      size: Size.square(dimension),
       painter: _ArcPainter(
         color.withValues(alpha: color.a * (icon.opacity ?? 1)),
       ),
@@ -111,7 +113,9 @@ class _SpinnerState extends State<Spinner>
     if (widget.decorative) return spinning;
     return Semantics(
       liveRegion: true,
-      label: _announced ? widget.semanticLabel ?? _defaultLabel : null,
+      label: _announced
+          ? widget.semanticLabel ?? t?.spinnerLabel ?? ko.spinnerLabel
+          : null,
       child: spinning,
     );
   }

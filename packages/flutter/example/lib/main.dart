@@ -14,6 +14,8 @@ import 'components/item_usecase.dart';
 import 'components/label_usecase.dart';
 import 'components/skeleton_usecase.dart';
 import 'components/spinner_usecase.dart';
+import 'components/provider_integration_preview.dart';
+import 'components/provider_usecase.dart';
 import 'components/story_kit.dart';
 
 void main() {
@@ -50,6 +52,15 @@ final directories = [
   WidgetbookFolder(
     name: 'Typography',
     children: [docs('Label', labelUseCases)],
+  ),
+  WidgetbookFolder(
+    name: 'Utility',
+    children: [
+      WidgetbookComponent(
+        name: 'IdsProvider',
+        useCases: [...providerUseCases, ...providerIntegrationUseCases],
+      ),
+    ],
   ),
 ];
 

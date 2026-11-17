@@ -32,9 +32,9 @@
 // internal/field-surface.ts: 공유 조각은 cn('...') 값의 객체
 export const fieldAction = {
   base: cn(
-    'shrink-0 text-(--ids-color-on-muted)',
-    'data-hovered:text-(--ids-color-on-surface) data-active:text-(--ids-color-on-surface)',
-    'data-pressed:text-(--ids-color-on-surface)',
+    'shrink-0 text-neutral',
+    'data-hovered:text-on-surface data-active:text-on-surface',
+    'data-pressed:text-on-surface',
   ),
   // ...
 };
@@ -48,7 +48,7 @@ className={cn('origin-center -rotate-90', indicatorClassName)}
 | 설정                                                               | 없으면                                                                                 |
 | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
 | `theme.radius: ['standard', 'indicator']`                          | `rounded-standard` 와 `rounded-full` 이 충돌로 잡히지 않아 둘 다 남는다                |
-| `font-size` 에 IDS 글자 스타일(`text-body-*`, `text-caption-*` 등) | `text-body-b3-regular` 를 글자색으로 읽어 앞의 `text-(--ids-color-on-muted)` 를 지운다 |
+| `font-size` 에 IDS 글자 스타일(`text-body-*`, `text-caption-*` 등) | `text-body-b3-regular` 를 글자색으로 읽어 앞의 `text-neutral` 를 지운다 |
 | `concentric-p` 가 `p-*`, `rounded-*` 와 충돌                       | `p-4 concentric-p-3` 이 둘 다 남는다                                                   |
 
 - `concentric-p-*` 는 padding 과 radius 를 함께 정하므로 앞의 `p-*`, `rounded-*` 를 지웁니다.
@@ -78,7 +78,7 @@ export const passwordFieldStyle = tv({
   extend: textControlStyle,
   slots: {
     toggle: [fieldAction.base, 'data-pressed:bg-transparent'],
-    capsLock: 'inline-flex shrink-0 items-center text-(--ids-color-on-muted)',
+    capsLock: 'inline-flex shrink-0 items-center text-neutral',
   },
   variants: {
     size: {
@@ -129,13 +129,14 @@ const mergedRef = useCallback(
 
 | 키          | 방법                                                                                                         |
 | ----------- | ------------------------------------------------------------------------------------------------------------ |
-| `className` | `cn(base, next)`. 충돌하면 next                                                                              |
-| `style`     | 얕게 합친다. 같은 속성은 next                                                                                |
+| `className` | `cn(base, next)`. 충돌하면 next. 한쪽이 함수면 같은 인자로 부른 결과를 합치는 함수                           |
+| `style`     | 얕게 합친다. 같은 속성은 next. 한쪽이 함수면 같은 인자로 부른 결과를 합치는 함수                             |
 | `ref`       | `mergeRefs(base, next)`                                                                                      |
 | `on[A-Z]*`  | `mergeEventHandlers(base, next)`. base 를 먼저 부르고, base 가 `preventDefault()` 하면 next 는 부르지 않는다 |
 | 그 밖       | `next ?? base`                                                                                               |
 
 - 그래서 `asChild` 파트는 `mergeProps(사용자나 자식의 props, 내부 props)` 순서로 부릅니다. 내부 wiring(`role`, `aria-*`)이 이기고, 사용자 핸들러가 먼저 돌며 `preventDefault()` 로 내부 동작을 막을 수 있습니다.
+- `className` 과 `style` 을 함수로 받는 자식(React Router `NavLink` 의 `({ isActive }) => ...`)은 합친 뒤에도 함수를 받습니다. 문자열로 합치면 자식이 그 함수를 부르지 못해 앱의 활성 클래스가 사라집니다.
 - `mergeRefs` 는 React 19 의 ref cleanup 을 돌려줍니다. cleanup 을 돌려주지 않는 callback ref 는 cleanup 때 `ref(null)` 로, object ref 는 `current = null` 로 뗍니다.
 - `mergeRefs` 는 같은 ref 들에 같은 함수를 돌려줍니다. ref 하나마다 `WeakMap` 을 한 단계 내려가 합친 함수를 찾습니다(`callbacksByRefs`, 없는 ref 는 `NO_REF`). 그래서 렌더 중에 `mergeRefs(...)` 나 ref 가 든 `mergeProps(...)` 를 그대로 넘겨도 React 가 렌더마다 ref 를 떼었다 붙이지 않습니다. `asChild` 파트와 Slot 이 hover 로 다시 렌더될 때 ref cleanup 이 돌던 것이 이 때문이었습니다.
 
@@ -147,12 +148,13 @@ const mergedRef = useCallback(
 
 ## children.ts
 
-자식 목록에서 Fragment 를 풀어 평평한 배열로 만드는 `flattenFragments`, 요소의 실제 컴포넌트를 돌려주는 `elementTypeOf`, JSX 안 어디에든 어떤 파트가 적혀 있는지 보는 `containsElementOfType` 입니다.
+자식 목록에서 Fragment 를 풀어 평평한 배열로 만드는 `flattenFragments`, 요소의 실제 컴포넌트를 돌려주는 `elementTypeOf`, JSX 안 어디에든 적힌 파트를 찾는 `findElementOfType` 과 있는지만 보는 `containsElementOfType` 입니다.
 
 ### 쓰는 곳
 
 - [text-control](../internal/text-control/README.md) 의 `splitAroundInput`, Accordion, Alert, Avatar, AvatarGroup(`arrange.ts`), Chip, ChipField, Progress, TextArea
 - `containsElementOfType`: Card, Item 이 Title 이 있는지 보고 Title 을 버튼으로 만들지 정할 때([surface.ts](../internal/README.md#surfacets))
+- `findElementOfType`: `Sidebar.Provider` 가 자식의 `Sidebar` 를 찾아 `variant` 를 읽고, `inset` 이면 `Sidebar.Inset` 을 서버 HTML 부터 Card 로 그릴 때
 
 ### 쓰는 법
 
@@ -175,7 +177,7 @@ const indexes = items.flatMap((child, index) =>
 - 파트를 찾는 컴포넌트(TextField, Select, ChipField, FileField, ColorField, ColorPicker, TimePicker, Rating, 날짜와 시간 필드)는 모두 이 함수로 Fragment 를 풉니다.
 - 파트를 `child.type === SelectItem` 처럼 직접 비교하지 않고 `elementTypeOf(child) === SelectItem` 으로 비교합니다. Server Component 가 넘긴 `<Select.Item>` 은 클라이언트에서 `type` 이 `react.lazy` 래퍼로 도착합니다(Flight 가 client reference 를 그렇게 풉니다). `elementTypeOf` 는 그 래퍼를 `_init(_payload)` 로 풀어 실제 함수를 돌려주고, 모듈이 아직 오지 않았으면 React 의 lazy 와 똑같이 thenable 을 던져 렌더를 잠시 멈춥니다. 직접 비교하면 Next.js 의 서버 컴포넌트 페이지에서 Select 옵션, Field 라벨, Dialog.Overlay 가 파트로 보이지 않습니다(`tests/server-reference-types.test.tsx`).
 - 문자열 태그(`'input'`, `'svg'`)와 `Fragment` 비교에는 쓰지 않아도 됩니다. host 요소와 Fragment 는 lazy 로 오지 않습니다.
-- `containsElementOfType` 은 요소의 `props.children` 만 따라 내려갑니다. 컴포넌트를 실행하지 않으므로 앱이 만든 컴포넌트 안의 파트와 함수 자식 안의 파트는 찾지 못하고 `false` 입니다. 서버 렌더에서도 같은 답이 나와 역할이 hydration 뒤에 바뀌지 않습니다.
+- `findElementOfType` 과 `containsElementOfType` 은 요소의 `props.children` 만 따라 내려갑니다. 컴포넌트를 실행하지 않으므로 앱이 만든 컴포넌트 안의 파트와 함수 자식 안의 파트는 찾지 못하고 `false` 입니다. 서버 렌더에서도 같은 답이 나와 역할이 hydration 뒤에 바뀌지 않습니다.
 
 ## part.ts
 

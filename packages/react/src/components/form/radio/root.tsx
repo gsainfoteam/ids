@@ -167,7 +167,7 @@ export function RadioRoot({
           value={value}
           name={group?.name ?? name}
           form={form ?? group?.form}
-          disabled={isDisabled}
+          disabled={disabled}
           required={state.required}
           {...(controlled ? { checked } : { defaultChecked })}
           aria-invalid={ariaInvalid}

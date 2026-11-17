@@ -10,6 +10,7 @@ import { Empty } from '../../components/data/empty';
 import { toast } from '../../components/feedback/toast';
 import { Field } from '../../components/form/field';
 import { TextField } from '../../components/form/text-field';
+import { Link } from '../../components/typography/link';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -39,7 +40,7 @@ export const PC: Story = {
           </Empty.Title>
           <Empty.Description>
             서버가 요청을 처리하지 못했어요. 잠시 뒤에 다시 시도해 주세요. 계속되면{' '}
-            <a href="#status">서비스 상태</a>를 확인해 주세요.
+            <Link href="#status">서비스 상태</Link>를 확인해 주세요.
           </Empty.Description>
           <Empty.Actions>
             <Button onClick={() => window.location.reload()}>

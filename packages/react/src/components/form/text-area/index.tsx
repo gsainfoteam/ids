@@ -27,6 +27,7 @@ export namespace TextArea {
     onValueChange?: (value: string) => void;
     autoResize?: boolean;
     resize?: TextAreaResize;
+    divided?: boolean;
     minRows?: number;
     maxRows?: number;
     children?: ReactNode;

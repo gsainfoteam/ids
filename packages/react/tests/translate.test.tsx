@@ -30,6 +30,7 @@ import {
   type IdsMessageKey,
   type IdsTranslate,
 } from '../src';
+import { testTheme } from './theme';
 import { messages } from '../src/internal/messages';
 
 type StoryFile = Record<string, StoryObj> & { default: Meta };
@@ -50,7 +51,7 @@ const english: IdsTranslate = (key, values) =>
   new IntlMessageFormat(lookup(englishCatalog, key), 'en-US').format(values) as string;
 
 const inEnglish = (children: ReactNode) => (
-  <IdsProvider translate={english} locale="en-US">
+  <IdsProvider theme={testTheme} translate={english} locale="en-US">
     {children}
   </IdsProvider>
 );
@@ -236,7 +237,7 @@ test('a key the app does not translate falls back to Korean', async () => {
     key === 'calendar.nextMonth' ? key : missing.has(key) ? undefined : english(key, values);
 
   const screen = await render(
-    <IdsProvider translate={partial}>
+    <IdsProvider theme={testTheme} translate={partial}>
       <Calendar />
       <Dialog defaultOpen>
         <Dialog.Content>
@@ -256,11 +257,11 @@ test('the nearest provider translates, and one without translate inherits it', a
   const shouting: IdsTranslate = (key, values) => english(key, values)?.toUpperCase();
 
   const screen = await render(
-    <IdsProvider translate={english}>
-      <IdsProvider translate={shouting}>
+    <IdsProvider theme={testTheme} translate={english}>
+      <IdsProvider theme={testTheme} translate={shouting}>
         <Calendar aria-label="Shouting" />
       </IdsProvider>
-      <IdsProvider mode="dark">
+      <IdsProvider theme={testTheme} mode="dark">
         <Calendar aria-label="Inherited" />
       </IdsProvider>
     </IdsProvider>,
@@ -278,7 +279,7 @@ test('the nearest provider translates, and one without translate inherits it', a
 
 test('the provider locale formats dates, and a component locale overrides it', async () => {
   const screen = await render(
-    <IdsProvider locale="en-US">
+    <IdsProvider theme={testTheme} locale="en-US">
       <Calendar aria-label="Provider" />
       <Calendar aria-label="Component" locale="de-DE" />
     </IdsProvider>,

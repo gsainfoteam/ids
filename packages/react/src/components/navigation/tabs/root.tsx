@@ -7,6 +7,7 @@ import {
   TabsContext,
   type TabsActivationMode,
   type TabsAppearance,
+  type TabsColorScheme,
   type TabsOrientation,
 } from './context';
 import { TabsList, type TabsListProps } from './list';
@@ -47,6 +48,7 @@ export type TabsProps<T extends string = string> = Omit<
     activationMode?: TabsActivationMode;
     loop?: boolean;
     size?: IdsSize;
+    colorScheme?: TabsColorScheme;
     children?: ReactNode | ((parts: TabsRenderProps<T>) => ReactNode);
   };
 
@@ -63,6 +65,7 @@ export function TabsRoot<T extends string = string>(props: TabsProps<T>) {
     appearance = 'underline',
     variant = 'soft',
     size = 'standard',
+    colorScheme = 'primary',
     className,
     style,
     children,
@@ -78,7 +81,7 @@ export function TabsRoot<T extends string = string>(props: TabsProps<T>) {
     loop,
   });
 
-  const styles = tabsStyle({ orientation, appearance, variant, size });
+  const styles = tabsStyle({ colorScheme, orientation, appearance, variant, size });
   const state: TabsState<T> = { value: tabs.value as T | undefined, orientation, appearance, size };
 
   return (
@@ -89,6 +92,7 @@ export function TabsRoot<T extends string = string>(props: TabsProps<T>) {
         data-appearance={appearance}
         data-variant={appearance === 'pill' ? variant : undefined}
         data-size={size}
+        data-color-scheme={colorScheme}
         data-activation-mode={activationMode}
         className={styles.root({ className: resolveState(className, state) })}
         style={resolveState(style, state)}

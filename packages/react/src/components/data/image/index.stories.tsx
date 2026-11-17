@@ -164,9 +164,7 @@ export const Status: Story = {
           src={src}
           alt="호수 위로 뜬 해"
           ratio={4 / 3}
-          className={(state) =>
-            state.status === 'loaded' ? 'ring-2 ring-(--ids-color-success)' : undefined
-          }
+          className={(state) => (state.status === 'loaded' ? 'ring-success ring-2' : undefined)}
           onStatusChange={(status) => setLog((previous) => [...previous, status])}
         />
         <div className="flex gap-2">

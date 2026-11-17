@@ -104,13 +104,13 @@ import { Drawer } from '@gsainfoteam/ids-react';
 
 ## 뒤 페이지 줄이기
 
-- modal Drawer 가 열리면 가장 바깥 `IdsProvider` 의 요소가 `translateY(calc(env(safe-area-inset-top) + 14px)) scale((W - 26) / W)` 로 작아지고, 모서리가 8px 로 둥글어지며, `body` 는 검은색이 됩니다. 패널과 같은 시간, 같은 곡선으로 움직이고, 끄는 동안은 끄는 만큼 따라옵니다.
+- modal Drawer 가 열리면 가장 바깥 `IdsProvider` 의 요소가 `translateY(calc(env(safe-area-inset-top) + 14px)) scale((W - 26) / W)` 로 작아지고, 모서리가 8px 로 둥글어지며(squircle 테마에서는 같은 깊이의 squircle, 8 × 1.84px), `body` 는 검은색이 됩니다. 패널과 같은 시간, 같은 곡선으로 움직이고, 끄는 동안은 끄는 만큼 따라옵니다.
 - 페이지를 스크롤한 상태에서도 튀지 않습니다. 기준점은 지금 보이는 화면의 위쪽 가운데이고, 보이는 부분만 둥글게 잘라냅니다(`clip-path`).
 - `overflow: clip` 을 씁니다(`hidden` 이 아님). 스크롤 컨테이너가 생기지 않아서 `position: sticky` 가 그대로 동작합니다.
 - 가장 바깥 `IdsProvider` 가 배경색이 없으면 그 위 요소의 배경색(없으면 `Canvas`)을 칠해서 검은 `body` 가 비치지 않게 합니다.
 - 닫히면 애니메이션이 끝난 뒤 바꾼 스타일을 모두 되돌립니다.
 - 가장 아래 Drawer 하나만 줄입니다. 안에서 연 Drawer 는 뒤 페이지를 다시 줄이지 않습니다.
-- 가장 바깥 `IdsProvider` 는 화면을 채워야 자연스럽습니다(`min-h-dvh`). Provider 가 화면보다 짧으면 그 아래는 검게 보입니다. `data-color` 를 `<html>` 이나 `<body>` 에 직접 준 앱에서는 줄이지 않습니다.
+- 가장 바깥 `IdsProvider` 는 화면을 채워야 자연스럽습니다(`min-h-dvh`). Provider 가 화면보다 짧으면 그 아래는 검게 보입니다. `data-mode` 를 `<html>` 이나 `<body>` 에 직접 준 앱에서는 줄이지 않습니다.
 - `modal={false}` 이거나 `scaleBackground={false}` 면 줄이지 않습니다.
 
 ### 고정된 요소(FloatingButton)

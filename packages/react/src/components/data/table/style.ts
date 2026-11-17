@@ -7,22 +7,22 @@ export const tableStyle = tv({
   slots: {
     root: 'w-full max-w-full',
     viewport: 'isolate',
-    table: 'w-full border-separate border-spacing-0 text-(--ids-color-on-surface)',
-    caption: 'caption-bottom text-start text-(--ids-color-on-muted)',
+    table: 'w-full border-separate border-spacing-0 text-on-surface',
+    caption: 'caption-bottom text-start text-neutral',
     header: '',
     body: '',
-    footer: 'bg-(--ids-color-muted)',
+    footer: 'bg-neutral-soft',
     row: 'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-    head: 'border-b border-(--ids-color-border) align-middle whitespace-nowrap',
-    cell: 'border-b border-(--ids-color-border) align-middle',
+    head: 'border-b border-neutral align-middle whitespace-nowrap',
+    cell: 'border-b border-neutral align-middle',
   },
   variants: {
     variant: {
       outline: {
-        root: 'rounded-container border border-(--ids-color-border)',
-        header: 'bg-(--ids-color-muted)',
+        root: 'rounded-container border border-neutral',
+        header: 'bg-neutral-soft',
       },
-      ghost: { header: 'bg-(--ids-color-surface)' },
+      ghost: { header: 'bg-surface' },
     } satisfies Record<TableVariant, object>,
     size: {
       standard: {
@@ -46,18 +46,18 @@ export const tableStyle = tv({
       false: {},
     },
     section: {
-      header: { head: 'text-(--ids-color-on-muted)' },
+      header: { head: 'text-neutral' },
       body: {
         row: [
-          'data-selected:bg-(--ids-color-muted-hover)',
-          'data-selected:hover:bg-(--ids-color-muted-active)',
+          'data-selected:bg-neutral-soft-hover',
+          'data-selected:hover:bg-neutral-soft-active',
           'last:*:border-b-0',
         ],
       },
       footer: { head: 'border-t border-b-0', cell: 'border-t border-b-0' },
     } satisfies Record<TableSection, object>,
     hoverable: {
-      true: { row: 'hover:bg-(--ids-color-muted)' },
+      true: { row: 'hover:bg-neutral-soft' },
       false: {},
     },
     clickable: {
@@ -71,12 +71,12 @@ export const tableStyle = tv({
     } satisfies Record<TableAlign, object>,
   },
   compoundVariants: [
-    { striped: true, section: 'body', class: { row: 'even:bg-(--ids-color-muted)' } },
+    { striped: true, section: 'body', class: { row: 'even:bg-neutral-soft' } },
     {
       striped: true,
       section: 'body',
       hoverable: true,
-      class: { row: 'even:hover:bg-(--ids-color-muted-hover)' },
+      class: { row: 'even:hover:bg-neutral-soft-hover' },
     },
   ],
   defaultVariants: {

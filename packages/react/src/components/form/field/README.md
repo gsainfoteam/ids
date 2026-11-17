@@ -163,7 +163,7 @@ import { Field, TextField } from '@gsainfoteam/ids-react';
 </Field>
 ```
 
-- Label은 `label`, 나머지 파트는 `div` 로 렌더합니다. Label의 `asChild` 자식은 `label` 이 아니어도 누르면 입력으로 포커스가 갑니다.
+- Label은 `label`, Description은 `p`, 나머지 파트는 `div` 로 렌더합니다. Description에 블록 내용을 넣으려면 `<Field.Description asChild><div>...</div></Field.Description>` 처럼 태그를 넣습니다. `<p>` 안에 블록 요소가 들어가면 개발 빌드에서 경고합니다. Label의 `asChild` 자식은 `label` 이 아니어도 누르면 입력으로 포커스가 갑니다.
 
 ## react-hook-form
 
