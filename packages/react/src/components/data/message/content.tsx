@@ -12,8 +12,8 @@ export type MessageContentProps = ComponentProps<'div'>;
 const BUBBLE = new Set<unknown>([Bubble, BubbleRoot]);
 
 export function MessageContent({ className, children, ref, ...props }: MessageContentProps) {
-  const { styles, from, align, contentRef } = useMessageContext('Message.Content');
-  const wrapInBubble = from === 'user' && !containsElementOfType(children, BUBBLE);
+  const { styles, shape, align, contentRef } = useMessageContext('Message.Content');
+  const wrapInBubble = shape === 'bubble' && !containsElementOfType(children, BUBBLE);
 
   return (
     <div

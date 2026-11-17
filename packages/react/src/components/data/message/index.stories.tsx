@@ -16,7 +16,7 @@ import { Message } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const froms = ['user', 'assistant'] as const;
+const shapes = ['bubble', 'plain'] as const;
 const aligns = ['start', 'end'] as const;
 const statuses = ['sent', 'pending', 'error'] as const;
 
@@ -34,14 +34,15 @@ const meta = {
   component: Message,
   tags: ['autodocs'],
   argTypes: {
-    from: { control: 'radio', options: froms },
+    shape: { control: 'radio', options: shapes },
     align: { control: 'radio', options: aligns },
     status: { control: 'radio', options: statuses },
     avatar: { control: false },
     time: { control: false },
   },
   args: {
-    from: 'user',
+    shape: 'bubble',
+    align: 'end',
     name: '김지수',
     time: SENT_AT,
     status: 'sent',
@@ -64,22 +65,38 @@ export const Gallery: Story = {
   render: () => (
     <Showcase className="break-keep">
       <Showcase.Section
-        title="From"
-        description="from=user 는 끝에 붙고 본문을 Bubble 로 감쌉니다. assistant 는 시작에 붙고 본문을 그대로 그립니다."
+        title="Shape × Align"
+        description="shape 은 모양을, align 은 붙는 쪽을 고릅니다. bubble 은 본문을 Bubble 로 감싸고, plain 은 본문을 메시지 폭 그대로 그립니다. 누가 말하는지와는 상관없습니다."
       >
-        <Showcase.Row label="user">
+        <Showcase.Row label="bubble · start">
           <div className="w-96">
-            <Message from="user">오늘 셔틀 몇 시에 와?</Message>
+            <Message name="김지수" time={SENT_AT}>
+              오늘 셔틀 몇 시에 와?
+            </Message>
           </div>
         </Showcase.Row>
-        <Showcase.Row label="assistant">
+        <Showcase.Row label="bubble · end">
           <div className="w-96">
-            <Message from="assistant" name="GIST 도우미" time={ANSWERED_AT}>
+            <Message align="end" time={SENT_AT}>
+              오늘 셔틀 몇 시에 와?
+            </Message>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="plain · start">
+          <div className="w-96">
+            <Message shape="plain" name="GIST 도우미" time={ANSWERED_AT}>
               <Marker>
                 <GlobeAltIcon />웹 검색 3건
               </Marker>
               12시 20분에 광주송정역행 셔틀이 학생회관 앞에서 출발해요.
               <Message.Actions />
+            </Message>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="plain · start (내 말)">
+          <div className="w-96">
+            <Message shape="plain" name="나" time={SENT_AT}>
+              다음 학기 전공 필수 과목을 성적표와 견줘서, 남은 과목과 들을 수 있는 학기를 정리해 줘.
             </Message>
           </div>
         </Showcase.Row>
@@ -91,7 +108,7 @@ export const Gallery: Story = {
         {statuses.map((status) => (
           <Showcase.Row key={status} label={status}>
             <div className="w-96">
-              <Message from="user" time={SENT_AT} status={status} onRetry={() => {}}>
+              <Message align="end" time={SENT_AT} status={status} onRetry={() => {}}>
                 학식 메뉴 알려 줘
               </Message>
             </div>
@@ -104,21 +121,21 @@ export const Gallery: Story = {
       >
         <Showcase.Row label="3">
           <div className="w-96">
-            <Message from="user" time={SENT_AT} unread={3}>
+            <Message align="end" time={SENT_AT} unread={3}>
               12시 20분 셔틀 타자
             </Message>
           </div>
         </Showcase.Row>
         <Showcase.Row label="true">
           <div className="w-96">
-            <Message from="user" time={SENT_AT} unread>
+            <Message align="end" time={SENT_AT} unread>
               도착했어?
             </Message>
           </div>
         </Showcase.Row>
         <Showcase.Row label="0">
           <div className="w-96">
-            <Message from="user" time={SENT_AT} unread={0}>
+            <Message align="end" time={SENT_AT} unread={0}>
               다 읽었어
             </Message>
           </div>
@@ -200,8 +217,8 @@ export const Gallery: Story = {
 export const AssistantAnswer: Story = {
   render: () => (
     <div className="flex w-96 flex-col gap-6 break-keep">
-      <Message from="user">다음 학기 전공 필수 과목 정리해 줘</Message>
-      <Message from="assistant" name="GIST 도우미" time={ANSWERED_AT}>
+      <Message align="end">다음 학기 전공 필수 과목 정리해 줘</Message>
+      <Message shape="plain" name="GIST 도우미" time={ANSWERED_AT}>
         <Accordion type="multiple">
           <Accordion.Item value="reasoning">
             <Accordion.Header asChild>
@@ -253,7 +270,7 @@ export const AssistantAnswer: Story = {
 export const Copy: Story = {
   render: () => (
     <div className="w-96 break-keep">
-      <Message from="assistant" name="GIST 도우미">
+      <Message shape="plain" name="GIST 도우미">
         12시 20분에 광주송정역행 셔틀이 와요.
         <Message.Actions />
       </Message>
@@ -287,7 +304,7 @@ export const Retry: Story = {
     return (
       <div className="w-96 break-keep">
         <Message
-          from="user"
+          align="end"
           time={SENT_AT}
           status={status}
           onRetry={() => {
@@ -327,10 +344,10 @@ export const Unread: Story = {
 
     return (
       <div className="flex w-96 flex-col gap-4 break-keep">
-        <Message from="user" time={SENT_AT} unread={unread}>
+        <Message align="end" time={SENT_AT} unread={unread}>
           12시 20분 셔틀 타자
         </Message>
-        <Message from="user" time={ANSWERED_AT} unread={!seen}>
+        <Message align="end" time={ANSWERED_AT} unread={!seen}>
           도착했어?
         </Message>
         <div className="flex gap-2">
@@ -421,7 +438,7 @@ export const Group: Story = {
 export const Keyboard: Story = {
   render: () => (
     <div className="w-96 break-keep">
-      <Message from="assistant" name="GIST 도우미">
+      <Message shape="plain" name="GIST 도우미">
         도서관은 밤 11시까지 열어요.
         <Message.Actions>
           <Message.Copy />

@@ -21,7 +21,7 @@ import { BubbleRoot } from '../bubble/root';
 
 import type { Message } from '.';
 
-export type MessageFrom = 'user' | 'assistant';
+export type MessageShape = 'bubble' | 'plain';
 export type MessageAlign = 'start' | 'end';
 export type MessageStatus = 'sent' | 'pending' | 'error';
 
@@ -76,7 +76,7 @@ function Failure({
 }
 
 export function MessageRoot({
-  from = 'assistant',
+  shape = 'bubble',
   align: alignProp,
   name,
   avatar,
@@ -94,7 +94,7 @@ export function MessageRoot({
   const contentRef = useRef<HTMLDivElement>(null);
   const readContent = useCallback(() => contentRef.current?.innerText ?? '', []);
 
-  const align = alignProp ?? group?.align ?? (from === 'user' ? 'end' : 'start');
+  const align = alignProp ?? group?.align ?? 'start';
   const first = group?.first ?? true;
   const last = group?.last ?? true;
   const { body, part } = splitParts(children);
@@ -102,7 +102,7 @@ export function MessageRoot({
   const content = part(MessageContent);
   const footer = part(MessageFooter);
   const bubbled =
-    from === 'user' || containsElementOfType(content ? childrenOf(content) : body, BUBBLE);
+    shape === 'bubble' || containsElementOfType(content ? childrenOf(content) : body, BUBBLE);
   const timeIn = bubbled ? 'side' : footer !== undefined || group !== null ? 'footer' : 'header';
   const labelled = name !== undefined || childrenOf(header) != null;
   const styles = messageStyle({ align, first, bubbled, status });
@@ -119,7 +119,7 @@ export function MessageRoot({
     <MessageContext
       value={{
         styles,
-        from,
+        shape,
         align,
         name,
         avatar,
@@ -139,7 +139,7 @@ export function MessageRoot({
           aria-labelledby={labelled ? labelId : undefined}
           {...rest}
           data-message=""
-          data-from={from}
+          data-shape={shape}
           data-align={align}
           data-status={status}
           data-first={group !== null && first ? '' : undefined}

@@ -7,7 +7,7 @@ import { MessageCopy, type MessageCopyProps } from './copy';
 import { MessageFooter, type MessageFooterProps } from './footer';
 import { MessageGroup, type MessageGroupProps } from './group';
 import { MessageHeader, type MessageHeaderProps } from './header';
-import { MessageRoot, type MessageAlign, type MessageFrom, type MessageStatus } from './root';
+import { MessageRoot, type MessageAlign, type MessageShape, type MessageStatus } from './root';
 import { messageStyle } from './style';
 
 export function Message(props: Message.Props) {
@@ -15,12 +15,12 @@ export function Message(props: Message.Props) {
 }
 
 export namespace Message {
-  export type From = MessageFrom;
+  export type Shape = MessageShape;
   export type Align = MessageAlign;
   export type Status = MessageStatus;
 
   export type Props = Omit<ComponentProps<'article'>, 'children'> & {
-    from?: MessageFrom;
+    shape?: MessageShape;
     align?: MessageAlign;
     name?: string;
     avatar?: string | ReactNode;
@@ -78,4 +78,4 @@ export namespace Message {
   export const Style = messageStyle;
 }
 
-export type { MessageAlign, MessageFrom, MessageStatus } from './root';
+export type { MessageAlign, MessageShape, MessageStatus } from './root';

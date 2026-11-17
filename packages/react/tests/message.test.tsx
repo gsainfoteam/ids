@@ -34,7 +34,7 @@ const clipboardThatRecords = () => {
 test('SSR: an article named by the sender, with the time in its header', () => {
   const article = articleIn(
     parse(
-      <Message name="GIST 도우미" time={SENT_AT}>
+      <Message shape="plain" name="GIST 도우미" time={SENT_AT}>
         답입니다
       </Message>,
     ),
@@ -42,7 +42,7 @@ test('SSR: an article named by the sender, with the time in its header', () => {
   const name = article.querySelector('header > span')!;
   expect(article.getAttribute('aria-labelledby')).toBe(name.id);
   expect(name.textContent).toBe('GIST 도우미');
-  expect(article.dataset.from).toBe('assistant');
+  expect(article.dataset.shape).toBe('plain');
   expect(article.dataset.align).toBe('start');
   expect(article.dataset.status).toBe('sent');
   expect(article.querySelector('header time')!.getAttribute('datetime')).toBe(
@@ -53,16 +53,16 @@ test('SSR: an article named by the sender, with the time in its header', () => {
 });
 
 test('SSR: without a name the article has no labelledby and no header', () => {
-  const article = articleIn(parse(<Message from="user">요약해 줘</Message>));
+  const article = articleIn(parse(<Message align="end">요약해 줘</Message>));
   expect(article.hasAttribute('aria-labelledby')).toBe(false);
   expect(article.querySelector('header')).toBeNull();
 });
 
-test('from="user" wraps the body in a Bubble on the end, and a Bubble given is not wrapped again', () => {
+test('the bubble shape wraps the body in a Bubble on its side, and a Bubble given is not wrapped again', () => {
   const doc = parse(
     <>
-      <Message from="user">요약해 줘</Message>
-      <Message from="user">
+      <Message align="end">요약해 줘</Message>
+      <Message align="end">
         <Bubble align="end" variant="solid">
           직접 둔 말풍선
         </Bubble>
@@ -78,12 +78,10 @@ test('from="user" wraps the body in a Bubble on the end, and a Bubble given is n
   expect(given!.querySelector<HTMLElement>('[data-bubble]')!.dataset.variant).toBe('solid');
 });
 
-test('align overrides from, and a Bubble placed by the app keeps its own align', () => {
+test('align picks the side for the Bubble it draws, and a Bubble placed by the app keeps its own align', () => {
   const doc = parse(
     <>
-      <Message from="user" align="start">
-        시작에 붙는 내 말
-      </Message>
+      <Message align="start">시작에 붙는 내 말</Message>
       <Message align="end">
         <Bubble>앱이 align 을 주지 않은 말풍선</Bubble>
       </Message>
@@ -103,7 +101,7 @@ test('the end column pushes the content to the end', async () => {
   const screen = await render(
     withProvider(
       <div className="w-96">
-        <Message from="user">짧은 말</Message>
+        <Message align="end">짧은 말</Message>
       </div>,
     ),
   );
@@ -155,10 +153,14 @@ test('Message.Group hands out align and shows the name first and the time last',
 test('a Message inside another Message’s content is not part of the outer group', () => {
   const doc = parse(
     <Message.Group>
-      <Message name="바깥">
-        <Message name="안쪽">인용</Message>
+      <Message shape="plain" name="바깥">
+        <Message shape="plain" name="안쪽">
+          인용
+        </Message>
       </Message>
-      <Message name="바깥">둘째</Message>
+      <Message shape="plain" name="바깥">
+        둘째
+      </Message>
     </Message.Group>,
   );
   const inner = articles(doc)[1]!;
@@ -169,15 +171,15 @@ test('a Message inside another Message’s content is not part of the outer grou
 test('Message.Footer takes the time of a message without a bubble, and draws nothing without one', () => {
   const doc = parse(
     <>
-      <Message time={SENT_AT}>
+      <Message shape="plain" time={SENT_AT}>
         답
         <Message.Footer />
       </Message>
-      <Message>
+      <Message shape="plain">
         시간 없는 답
         <Message.Footer />
       </Message>
-      <Message time={SENT_AT}>
+      <Message shape="plain" time={SENT_AT}>
         글<Message.Footer>어제</Message.Footer>
       </Message>
     </>,
@@ -192,7 +194,7 @@ test('Message.Footer takes the time of a message without a bubble, and draws not
 test('a bubbled message puts its time beside the bubble, outside the copied content', () => {
   const article = articleIn(
     parse(
-      <Message from="user" name="나" time={SENT_AT}>
+      <Message align="end" name="나" time={SENT_AT}>
         요약해 줘
       </Message>,
     ),
@@ -206,19 +208,19 @@ test('a bubbled message puts its time beside the bubble, outside the copied cont
 test('unread draws a count or a dot beside the bubble, read by screen readers, only once sent', () => {
   const doc = parse(
     <>
-      <Message from="user" unread={3}>
+      <Message align="end" unread={3}>
         단체방
       </Message>
-      <Message from="user" unread>
+      <Message align="end" unread>
         1대1
       </Message>
-      <Message from="user" unread={0}>
+      <Message align="end" unread={0}>
         다 읽음
       </Message>
-      <Message from="user" unread={2} status="pending">
+      <Message align="end" unread={2} status="pending">
         보내는 중
       </Message>
-      <Message from="user" unread={2} status="error">
+      <Message align="end" unread={2} status="error">
         실패
       </Message>
     </>,
@@ -238,7 +240,7 @@ test('unread draws a count or a dot beside the bubble, read by screen readers, o
 test('unread leaves through an exit and keeps its last count while it does', async () => {
   const screen = await render(
     withProvider(
-      <Message from="user" unread={2}>
+      <Message align="end" unread={2}>
         글
       </Message>,
     ),
@@ -247,7 +249,7 @@ test('unread leaves through an exit and keeps its last count while it does', asy
   await expect.poll(unread).not.toBeNull();
   await screen.rerender(
     withProvider(
-      <Message from="user" unread={0}>
+      <Message align="end" unread={0}>
         글
       </Message>,
     ),
@@ -279,11 +281,11 @@ test('error rings the bubble in danger and pending fades its fill', async () => 
   const screen = await render(
     withProvider(
       <>
-        <Message from="user">보낸 글</Message>
-        <Message from="user" status="error">
+        <Message align="end">보낸 글</Message>
+        <Message align="end" status="error">
           실패한 글
         </Message>
-        <Message from="user" status="pending">
+        <Message align="end" status="pending">
           보내는 글
         </Message>
       </>,
@@ -302,10 +304,10 @@ test('status="error" draws the failure line under the bubble and the retry butto
   const screen = await render(
     withProvider(
       <>
-        <Message from="user" status="error" onRetry={onRetry}>
+        <Message align="end" status="error" onRetry={onRetry}>
           다시 보낼 글
         </Message>
-        <Message from="user" status="error">
+        <Message align="end" status="error">
           그냥 실패한 글
         </Message>
       </>,
@@ -329,7 +331,7 @@ test('Message.Actions without children copies the content text', async () => {
   const copied = clipboardThatRecords();
   const screen = await render(
     withProvider(
-      <Message name="GIST 도우미">
+      <Message shape="plain" name="GIST 도우미">
         <Marker>웹 검색 3건</Marker>
         <p>셔틀은 12시 20분에 와요.</p>
         <Message.Actions />
@@ -346,7 +348,7 @@ test('Message.Copy text copies that text instead', async () => {
   const copied = clipboardThatRecords();
   const screen = await render(
     withProvider(
-      <Message>
+      <Message shape="plain">
         **굵게**
         <Message.Actions>
           <Message.Copy text="**굵게** 원문" />
@@ -361,7 +363,7 @@ test('Message.Copy text copies that text instead', async () => {
 test('an explicit Message.Content is the copy source and keeps the user Bubble', () => {
   const article = articleIn(
     parse(
-      <Message from="user">
+      <Message align="end">
         <Message.Content className="custom">본문</Message.Content>
       </Message>,
     ),
@@ -377,14 +379,14 @@ test('Tab reaches the actions and the retry button in order, never the article',
   const screen = await render(
     withProvider(
       <>
-        <Message from="assistant" name="도우미">
+        <Message shape="plain" name="도우미">
           답
           <Message.Actions>
             <Message.Copy />
             <IconButton aria-label="다시 답하기" icon={<svg />} />
           </Message.Actions>
         </Message>
-        <Message from="user" status="error" onRetry={() => {}}>
+        <Message align="end" status="error" onRetry={() => {}}>
           실패
         </Message>
       </>,
@@ -404,8 +406,8 @@ test('axe finds nothing in a chat of groups, answers and failures', async () => 
   const screen = await render(
     withProvider(
       <div className="flex w-96 flex-col gap-4">
-        <Message from="user">요약해 줘</Message>
-        <Message from="assistant" name="도우미" time={SENT_AT}>
+        <Message align="end">요약해 줘</Message>
+        <Message shape="plain" name="도우미" time={SENT_AT}>
           <Marker>웹 검색 3건</Marker>
           요약입니다.
           <Message.Actions />
@@ -418,7 +420,7 @@ test('axe finds nothing in a chat of groups, answers and failures', async () => 
             <Bubble>오늘 거</Bubble>
           </Message>
         </Message.Group>
-        <Message from="user" status="error" onRetry={() => {}}>
+        <Message align="end" status="error" onRetry={() => {}}>
           실패한 글
         </Message>
       </div>,
