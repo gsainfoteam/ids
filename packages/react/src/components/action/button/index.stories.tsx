@@ -19,7 +19,7 @@ import { Button } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
+const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy', 'transparent'] as const;
 const colorSchemes = [
   'primary',
   'secondary',
@@ -63,7 +63,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Variant × Color scheme"
-        description="solid와 soft는 색을 띱니다. outline과 ghost는 primary와 neutral에서 무채색이고, 상태 색에서는 글자만 그 색을 띱니다."
+        description="solid와 soft는 색을 띱니다. outline, ghost, transparent는 primary와 neutral에서 무채색이고, 상태 색에서는 글자만 그 색을 띱니다."
       >
         <Showcase.Matrix
           rows={colorSchemes}
@@ -154,6 +154,34 @@ export const Gallery: Story = {
 };
 
 const A_SAVE_TAKES = 2000;
+
+export const Transparent: Story = {
+  render: () => (
+    <div className="flex items-center gap-2">
+      <Button variant="transparent">취소</Button>
+      <Button variant="transparent" colorScheme="danger">
+        <TrashIcon />
+        삭제
+      </Button>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'transparent는 배경과 테두리를 그리지 않고, hover와 press 때도 배경을 칠하지 않습니다. hover는 불투명도를 70%로, press는 40%로 낮춥니다. 배경이 바뀌는 조용한 버튼은 ghost입니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const remove = canvas.getByRole('button', { name: '삭제' });
+    await expect(getComputedStyle(remove).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    await userEvent.hover(remove);
+    await waitFor(() => expect(remove).toHaveAttribute('data-hovered'));
+    await expect(getComputedStyle(remove).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    await userEvent.unhover(remove);
+  },
+};
 
 export const Loading: Story = {
   args: { onClick: fn(() => new Promise((resolve) => setTimeout(resolve, A_SAVE_TAKES))) },

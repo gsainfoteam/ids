@@ -25,6 +25,23 @@ import { BoldIcon } from '@heroicons/react/16/solid';
 - 이름은 상태에 따라 바꾸지 않습니다. 켜짐 여부는 `aria-pressed` 가 알려 줍니다. 이름을 "좋아요 취소" 로 바꾸면 "좋아요 취소, 눌림" 처럼 이름과 상태가 서로 부딪칩니다.
 - `variant` 는 Toggle 과 같습니다. `outline`(기본)과 `ghost` 는 켜지면 옅은 회색, `soft` 와 `solid` 는 테마 색, `glossy` 는 테마 색 채움에 광택입니다.
 
+## transparent
+
+```tsx
+<IconToggle
+  aria-label="좋아요"
+  variant="transparent"
+  colorScheme="danger" // 켜지면 하트만 빨갛다
+  icon={(state) => (state.pressed ? <HeartIcon /> : <HeartOutlineIcon />)}
+/>
+```
+
+- 켜져도 꺼져도 배경과 테두리가 없습니다. 올려도 눌러도 배경을 칠하지 않습니다.
+- 꺼지면 아이콘이 `on-surface` 입니다. 켜지면 아이콘만 `colorScheme` 의 `text-X` 를 띱니다. `neutral` 은 켜져도 `on-surface` 라 모양으로만 구별됩니다.
+- 올리면 불투명도가 70% 로, 누르면 40% 로 내려갑니다. 켜진 동안에도 같아서, 눌러 끌 때도 불투명도가 내려갑니다.
+- 색만으로 켜짐을 알리지 않도록 `icon` 함수로 채운 아이콘과 빈 아이콘을 바꿉니다.
+- Toggle 에는 `transparent` 가 없습니다. 글자 토글은 색만으로 켜짐을 알리게 되기 때문입니다.
+
 ## 이름
 
 ```tsx
@@ -43,7 +60,7 @@ import { BoldIcon } from '@heroicons/react/16/solid';
 | `aria-label`                 | 생략하면 아이콘에서 찾는다                                     |
 | `pressed` / `defaultPressed` | 켜짐 여부. 기본 `false`                                        |
 | `onPressedChange`            | 켜짐 여부가 바뀔 때                                            |
-| `variant`                    | `outline`(기본) / `ghost` / `soft` / `solid` / `glossy`        |
+| `variant`                    | `outline`(기본) / `ghost` / `soft` / `solid` / `glossy` / `transparent` |
 | `size`                       | `standard`(36px, 기본) / `tiny`(32px). 그룹 안에서는 그룹 크기 |
 | `value`                      | `ToggleGroup` 안에서 필수                                      |
 | 그 외                        | Toggle 과 같다                                                 |

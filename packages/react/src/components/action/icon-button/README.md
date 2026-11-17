@@ -61,7 +61,11 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 <IconButton icon={<PlusIcon />} aria-label="추가" />                        // ghost, standard (기본)
 <IconButton icon={<PlusIcon />} aria-label="추가" variant="outline" size="tiny" />
 <IconButton icon={<TrashIcon />} aria-label="삭제" colorScheme="danger" />  // 아이콘만 danger 색
+<IconButton icon={<EllipsisHorizontalIcon />} aria-label="더보기" variant="transparent" />
 ```
+
+- `transparent` 는 아이콘만 그립니다. 올려도 눌러도 배경이 없고, 올리면 불투명도가 70% 로, 누르면 40% 로 내려갑니다. 규칙은 Button 의 `transparent` 와 같습니다.
+- 크기는 다른 variant 와 같은 36px, 32px 정사각형입니다. 누를 수 있는 영역은 줄지 않습니다.
 
 - 크기를 주지 않은 아이콘은 `standard` 16px, `tiny` 14px 입니다.
 - `ButtonGroup` 안에서는 그룹의 `size` 를 따르고, 직접 준 `size` 가 이깁니다.
@@ -83,7 +87,7 @@ import { XMarkIcon } from '@heroicons/react/16/solid';
 | ----------------------- | ----------------------------------------------------------------------- |
 | `icon`                  | 필수. `asChild` 면 생략하고 자식 안에 둘 수 있다                        |
 | `aria-label`            | 생략하면 아이콘에서 찾는다                                              |
-| `variant`               | `ghost`(기본) / `solid` / `soft` / `outline` / `glossy`                 |
+| `variant`               | `ghost`(기본) / `solid` / `soft` / `outline` / `glossy` / `transparent` |
 | `colorScheme`           | `primary`(기본) / `neutral` / `danger` / `success` / `warning` / `info` |
 | `size`                  | `standard`(36px, 기본) / `tiny`(32px). 그룹 안에서는 그룹 크기          |
 | `asChild`               | 자식 요소 하나를 정사각형 버튼으로 그린다                               |

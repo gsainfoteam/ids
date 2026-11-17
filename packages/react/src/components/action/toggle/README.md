@@ -45,6 +45,7 @@ import { Toggle } from '@gsainfoteam/ids-react';
 
 - 꺼진 모습은 모두 같고 `outline` 만 테두리가 있습니다. variant 는 켜진 모습의 강도입니다.
 - `glossy` 는 켜진 모습이 Button 의 `glossy` 와 같습니다. 꺼져 있을 때는 다른 variant 처럼 배경이 없습니다.
+- `transparent` 는 없습니다. 배경 없이 글자 색만 바뀌면 켜짐을 색으로만 알리게 됩니다. 배경 없는 토글은 IconToggle 의 `transparent` 에 채운 아이콘을 씁니다.
 - `colorScheme` 을 주면 `soft`, `solid`, `glossy` 가 그 색으로 켜지고, 상태 색에서는 꺼진 글자도 그 색입니다.
 
 ## 아이콘
@@ -77,6 +78,7 @@ import { Toggle } from '@gsainfoteam/ids-react';
 | `disabled`     | `data-disabled`      | 비활성               |
 
 - 켜진 토글에는 `data-hovered` 와 `data-active` 가 붙지 않습니다. 켜진 배경이 hover 배경과 다투지 않게 하기 위해서입니다.
+- 켜진 동안 올리거나 누르면 `data-pressed-hovered`, `data-pressed-active` 가 붙습니다. `data-hovered`, `data-active` 는 켜진 동안 붙지 않습니다.
 - 루트에는 `data-variant`, `data-size` 가 붙고, `ToggleGroup` 안에서는 `data-value` 도 붙습니다.
 
 ## 키보드

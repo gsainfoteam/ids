@@ -1,8 +1,8 @@
-import { controlSurface } from '../../../internal/control-surface';
+import { controlSurface, type SurfaceVariant } from '../../../internal/control-surface';
 import { tv } from '../../../utils';
 
 import type { TabsAppearance, TabsColorScheme, TabsOrientation } from './context';
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { IdsSize } from '../../../tokens/types';
 
 export const tabsStyle = tv({
   slots: {
@@ -67,7 +67,7 @@ export const tabsStyle = tv({
       soft: {},
       solid: {},
       glossy: {},
-    } satisfies Record<IdsVariant, object>,
+    } satisfies Record<SurfaceVariant, object>,
     size: {
       standard: {
         root: 'gap-4',

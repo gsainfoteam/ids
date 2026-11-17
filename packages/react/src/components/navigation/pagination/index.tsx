@@ -12,7 +12,8 @@ import { type PaginationEntry } from './range';
 import { PaginationRoot } from './root';
 import { paginationStyle } from './style';
 
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { IdsSize } from '../../../tokens/types';
 
 export function Pagination(props: Pagination.Props) {
   return <PaginationRoot {...props} />;
@@ -29,7 +30,7 @@ export namespace Pagination {
     siblingCount?: number;
     boundaryCount?: number;
     size?: IdsSize;
-    variant?: IdsVariant;
+    variant?: SurfaceVariant;
     disabled?: boolean;
     getHref?: (page: number) => string;
     children?: ReactNode;

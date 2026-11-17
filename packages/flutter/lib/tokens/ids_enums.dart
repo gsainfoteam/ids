@@ -17,4 +17,5 @@ enum IdsVariant {
   outline,
   ghost,
   glossy,
+  transparent,
 }

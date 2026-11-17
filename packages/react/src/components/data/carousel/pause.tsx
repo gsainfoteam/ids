@@ -9,11 +9,11 @@ import { useTranslate } from '../../../internal/translate';
 import { IconToggle } from '../../action/icon-toggle';
 
 import type { InteractiveState, InteractiveValue } from '../../../hooks/use-interactive';
-import type { ControlColorScheme } from '../../../internal/control-surface';
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { ControlColorScheme, SurfaceVariant } from '../../../internal/control-surface';
+import type { IdsSize } from '../../../tokens/types';
 
 export type CarouselPauseProps = Omit<ComponentProps<'button'>, 'children' | 'color' | 'value'> & {
-  variant?: IdsVariant;
+  variant?: SurfaceVariant;
   colorScheme?: ControlColorScheme;
   size?: IdsSize;
   icon?: InteractiveValue<ReactElement>;

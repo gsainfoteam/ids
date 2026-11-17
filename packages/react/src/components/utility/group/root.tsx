@@ -8,7 +8,8 @@ import { isDevelopment } from '../../../utils/dev';
 import { Divider } from '../../layout/divider';
 
 import type { Group } from '.';
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { IdsSize } from '../../../tokens/types';
 
 export type GroupOrientation = 'horizontal' | 'vertical';
 
@@ -16,7 +17,7 @@ export type GroupContextValue = {
   orientation: GroupOrientation;
   attached: boolean;
   size?: IdsSize;
-  variant?: IdsVariant;
+  variant?: SurfaceVariant;
   separator: 'semantic' | 'decorative';
 };
 

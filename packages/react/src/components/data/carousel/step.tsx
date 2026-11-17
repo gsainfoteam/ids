@@ -12,11 +12,11 @@ import {
 import { useCarouselContext } from './context';
 import { IconButton } from '../../action/icon-button';
 
-import type { ControlColorScheme } from '../../../internal/control-surface';
-import type { IdsSize, IdsVariant } from '../../../tokens/types';
+import type { ControlColorScheme, SurfaceVariant } from '../../../internal/control-surface';
+import type { IdsSize } from '../../../tokens/types';
 
 export type CarouselStepProps = Omit<ComponentProps<'button'>, 'children' | 'color'> & {
-  variant?: IdsVariant;
+  variant?: SurfaceVariant;
   colorScheme?: ControlColorScheme;
   size?: IdsSize;
   icon?: ReactElement;

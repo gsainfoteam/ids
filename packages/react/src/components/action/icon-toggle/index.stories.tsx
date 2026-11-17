@@ -19,7 +19,7 @@ import { IconToggle } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const variants = ['ghost', 'outline', 'soft', 'solid', 'glossy'] as const;
+const variants = ['ghost', 'outline', 'soft', 'solid', 'glossy', 'transparent'] as const;
 const colorSchemes = [
   'primary',
   'secondary',
@@ -75,7 +75,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Variant × Pressed"
-        description="Toggle과 같은 규칙입니다. 꺼지면 조용하고, variant는 켜진 모습을 정합니다."
+        description="Toggle과 같은 규칙입니다. 꺼지면 조용하고, variant는 켜진 모습을 정합니다. transparent는 켜져도 배경 없이 아이콘 색만 바뀝니다."
       >
         <Showcase.Matrix
           rows={pressedStates}
@@ -146,6 +146,21 @@ export const Gallery: Story = {
             icon={(state) => (state.pressed ? <HeartIcon /> : <HeartOutlineIcon />)}
           />
         </Showcase.Row>
+        <Showcase.Row label="transparent">
+          <IconToggle
+            aria-label="좋아요"
+            variant="transparent"
+            colorScheme="danger"
+            icon={(state) => (state.pressed ? <HeartIcon /> : <HeartOutlineIcon />)}
+          />
+          <IconToggle
+            aria-label="좋아요"
+            variant="transparent"
+            colorScheme="danger"
+            defaultPressed
+            icon={(state) => (state.pressed ? <HeartIcon /> : <HeartOutlineIcon />)}
+          />
+        </Showcase.Row>
       </Showcase.Section>
     </Showcase>
   ),
@@ -208,6 +223,40 @@ export const StateIcon: Story = {
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
     await expect(toggle).toHaveAccessibleName('좋아요');
     await expect(canvas.getByTestId('filled')).toBeVisible();
+  },
+};
+
+export const Transparent: Story = {
+  render: () => (
+    <IconToggle
+      aria-label="좋아요"
+      variant="transparent"
+      colorScheme="danger"
+      icon={(state) =>
+        state.pressed ? (
+          <HeartIcon data-testid="filled" />
+        ) : (
+          <HeartOutlineIcon data-testid="outline" />
+        )
+      }
+    />
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'transparent는 켜져도 배경을 칠하지 않습니다. 꺼지면 아이콘이 on-surface이고, 켜지면 아이콘만 colorScheme의 글자 색(text-X)을 띱니다. hover는 불투명도를 70%로, press는 40%로 낮추고, 켜진 동안에도 같습니다. 채운 아이콘은 icon 함수로 바꿉니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const toggle = canvas.getByRole('button', { name: '좋아요' });
+    const offColor = getComputedStyle(toggle).color;
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(canvas.getByTestId('filled')).toBeVisible();
+    await expect(getComputedStyle(toggle).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(getComputedStyle(toggle).color).not.toBe(offColor);
   },
 };
 
