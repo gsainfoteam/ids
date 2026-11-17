@@ -72,36 +72,53 @@ final iconButtonUseCases = [
                 ],
               ),
             const Text('States'),
-            for (final disabled in [true, false])
-              Row(
-                spacing: 8,
-                children: [
-                  SizedBox(
-                    width: 70,
-                    child: Text(disabled ? 'disabled' : 'loading'),
+            galleryRow('disabled', [
+              for (final variant in IdsVariant.values)
+                IdsIconButton(
+                  icon: const Icon(Icons.close),
+                  semanticLabel: '닫기',
+                  variant: variant,
+                  disabled: true,
+                ),
+            ]),
+            galleryRow('loading', [
+              for (final size in IdsSize.values)
+                for (final variant in IdsVariant.values)
+                  IdsIconButton(
+                    icon: const IdsSpinner(decorative: true),
+                    semanticLabel: '저장 중',
+                    variant: variant,
+                    size: size,
+                    disabled: true,
+                    busy: true,
                   ),
-                  for (final variant in IdsVariant.values)
-                    SizedBox(
-                      width: 52,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: IdsIconButton(
-                          icon: disabled
-                              ? const Icon(Icons.close)
-                              : const IdsSpinner(decorative: true),
-                          semanticLabel: disabled ? '닫기' : '저장 중',
-                          variant: variant,
-                          disabled: true,
-                          busy: !disabled,
-                        ),
-                      ),
-                    ),
-                ],
+            ]),
+            galleryRow('asChild · navigation', [
+              IdsIconButton(
+                icon: const Icon(Icons.open_in_new),
+                semanticLabel: '링크 열기',
+                variant: IdsVariant.outline,
+                onPressed: () => openGalleryLink(context),
               ),
+            ]),
+            galleryRow('state icon', [
+              IdsIconButton.builder(
+                icon: (context, state) => Icon(
+                  state.hovered ? Icons.favorite : Icons.favorite_border,
+                ),
+                semanticLabel: '좋아요',
+                onPressed: () {},
+              ),
+              IdsIconButton(
+                icon: const Icon(Icons.more_horiz),
+                semanticLabel: '더보기',
+                onPressed: () {},
+              ),
+            ]),
           ],
         ),
       ),
-      width: 440,
+      width: 600,
     ),
   ),
 ];
