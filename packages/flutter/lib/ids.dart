@@ -23,3 +23,4 @@ export 'src/components/icon_button/ids_icon_button.dart';
 export 'src/components/kbd/ids_kbd.dart';
 export 'src/components/label/ids_label.dart';
 export 'src/components/spinner/ids_spinner.dart';
+export 'src/components/text_field/ids_text_field.dart';

@@ -215,6 +215,7 @@
     "textAreaLimitReached": "글자 수 제한에 도달했습니다.",
     "textAreaRemaining": "{remaining}자 남았습니다.",
     "textFieldClear": "지우기",
+    "textFieldRequired": "값을 입력해 주세요.",
     "timeFieldClear": "시간 지우기",
     "timeFieldClose": "닫기",
     "timeFieldPlaceholder": "시간 선택",

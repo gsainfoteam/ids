@@ -52,6 +52,7 @@ class IdsInteractive extends StatefulWidget {
     this.onPressed,
     this.disabled = false,
     this.focusableWhenDisabled = false,
+    this.focusOnTap = true,
     this.pressed = false,
     this.onInteractionChange,
     this.focusNode,
@@ -65,6 +66,7 @@ class IdsInteractive extends StatefulWidget {
 
   final bool disabled;
   final bool focusableWhenDisabled;
+  final bool focusOnTap;
   final bool pressed;
 
   final ValueChanged<IdsInteractiveState>? onInteractionChange;
@@ -184,7 +186,8 @@ class _IdsInteractiveState extends State<IdsInteractive> {
     return Focus(
       focusNode: _node,
       autofocus: widget.autofocus,
-      canRequestFocus: enabled || widget.focusableWhenDisabled,
+      canRequestFocus:
+          widget.focusOnTap && (enabled || widget.focusableWhenDisabled),
       onFocusChange: _handleFocusChange,
       onKeyEvent: _handleKey,
       child: MouseRegion(
@@ -205,8 +208,10 @@ class _IdsInteractiveState extends State<IdsInteractive> {
           behavior: HitTestBehavior.opaque,
           onTapDown: enabled
               ? (_) {
-                  _pointerFocus = true;
-                  _node.requestFocus();
+                  if (widget.focusOnTap) {
+                    _pointerFocus = !_node.hasFocus;
+                    _node.requestFocus();
+                  }
                   _set(() => _active = true);
                 }
               : null,

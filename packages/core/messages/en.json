@@ -306,7 +306,8 @@
     "remaining": "{remaining, plural, one {# character left.} other {# characters left.}}"
   },
   "textField": {
-    "clear": "Clear"
+    "clear": "Clear",
+    "required": "Enter a value."
   },
   "timeField": {
     "clear": "Clear time",

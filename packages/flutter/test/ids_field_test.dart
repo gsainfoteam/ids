@@ -102,23 +102,33 @@ void main() {
       expect(find.text('도움말'), findsNothing);
       expect(find.text('오류'), findsOne);
       expect(styleOf(tester, '오류')?.color, danger);
-      expect(styleOf(tester, '이메일')?.color, isNot(danger));
+      expect(styleOf(tester, '이메일')?.color, danger);
+      expect(styleOf(tester, '이메일')?.fontWeight, FontWeight.w500);
     });
 
-    testWidgets('keeps 8px between parts, 6px when tiny', (tester) async {
-      for (final (size, gap) in [(IdsSize.standard, 8), (IdsSize.tiny, 6)]) {
+    testWidgets('keeps 8px between parts in both sizes', (tester) async {
+      for (final size in IdsSize.values) {
         await pump(tester, field(size: size));
         expect(
           tester.getRect(find.byKey(const Key('control'))).top,
-          tester.getRect(find.text('설명')).bottom + gap,
+          tester.getRect(find.text('설명')).bottom + 8,
         );
       }
     });
 
-    testWidgets('description, hint and error are captions', (tester) async {
-      await pump(tester, field());
-      expect(styleOf(tester, '설명')?.fontSize, 12);
-      expect(styleOf(tester, '도움말')?.fontSize, 12);
+    testWidgets('description, hint and error inherit the field text size', (
+      tester,
+    ) async {
+      for (final (size, fontSize) in [
+        (IdsSize.standard, 14),
+        (IdsSize.tiny, 12),
+      ]) {
+        await pump(tester, field(size: size));
+        expect(styleOf(tester, '설명')?.fontSize, fontSize);
+        expect(styleOf(tester, '도움말')?.fontSize, fontSize);
+        await pump(tester, field(size: size, invalid: true));
+        expect(styleOf(tester, '오류')?.fontSize, fontSize);
+      }
     });
 
     testWidgets('disabled fades the whole field once', (tester) async {
