@@ -7,7 +7,7 @@
 
 | 파일                                                     | 내용                                                 | 쓰는 곳                                                              |
 | -------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------- |
-| [`use-clipboard-support.ts`](#use-clipboard-supportts)   | `navigator.clipboard.writeText` 가 있는지            | ColorPicker, CodeBlock 의 복사 버튼                                  |
+| [`use-clipboard-support.ts`](#use-clipboard-supportts)   | `navigator.clipboard.writeText` 가 있는지            | ColorPicker, CodeBlock 과 Message 의 복사 버튼                      |
 | [`use-controllable-state.ts`](#use-controllable-statets) | 제어와 비제어를 한 모양으로 다루는 state             | 값이나 열림 상태를 가진 컴포넌트 대부분                              |
 | [`use-form-reset.ts`](#use-form-resetts)                 | native 폼 reset 뒤에 컴포넌트 state 를 되돌리는 hook | 자기 state 를 가진 폼 컨트롤                                         |
 | [`use-interactive.ts`](#use-interactivets)               | hover, press, focus 상태와 그 `data-*` 속성          | Button 계열, Checkbox, Radio, Chip, Accordion, `internal/surface.ts` |
