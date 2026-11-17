@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../../messages/ids_messages.dart';
 import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../avatar/avatar.dart';
@@ -22,7 +23,7 @@ class AvatarGroup extends StatelessWidget {
     this.stacking = AvatarGroupStacking.firstOnTop,
     this.size = IdsSize.standard,
     this.shape = AvatarShape.circle,
-    this.overflowLabel = _defaultOverflowLabel,
+    this.overflowLabel,
     this.overflowBuilder,
     this.overflowFirst = false,
     this.semanticLabel,
@@ -35,25 +36,28 @@ class AvatarGroup extends StatelessWidget {
   final AvatarGroupStacking stacking;
   final IdsSize size;
   final AvatarShape shape;
-  final String Function(int count) overflowLabel;
+  final String Function(int count)? overflowLabel;
   final Widget Function(int count)? overflowBuilder;
   final bool overflowFirst;
   final String? semanticLabel;
   final List<Widget> children;
 
-  static String _defaultOverflowLabel(int count) => '외 $count명';
-
   static const _overlaps = {IdsSize.standard: 10.0, IdsSize.tiny: 6.0};
   static const _inlineGaps = {IdsSize.standard: 6.0, IdsSize.tiny: 4.0};
 
-  Widget _overflow(int count) {
+  Widget _overflow(BuildContext context, int count) {
     final (min, factor) = switch ('$count'.length) {
       <= 2 => (9.0, 0.36),
       3 => (7.0, 0.28),
       _ => (6.0, 0.22),
     };
     return Avatar(
-      semanticLabel: overflowLabel(count),
+      semanticLabel:
+          overflowLabel?.call(count) ??
+          IdsProvider.of(
+            context,
+          ).translation?.avatarGroupOverflow(count: count) ??
+          IdsMessages.ko.avatarGroupOverflow(count: count),
       fallbackDelay: Duration.zero,
       fallback: LayoutBuilder(
         builder: (context, box) => DefaultTextStyle.merge(
@@ -92,12 +96,13 @@ class AvatarGroup extends StatelessWidget {
         .toList();
     final hidden = math.max(total ?? 0, children.length) - visible.length;
     final items = [
-      if (hidden > 0 && overflowFirst) _overflow(hidden),
+      if (hidden > 0 && overflowFirst) _overflow(context, hidden),
       ...visible,
-      if (hidden > 0 && !overflowFirst) _overflow(hidden),
+      if (hidden > 0 && !overflowFirst) _overflow(context, hidden),
     ];
     final stack = layout == AvatarGroupLayout.stack;
-    final overlap = _overlaps[size]!;
+    final ids = IdsProvider.of(context);
+    final overlap = ids.dimension(_overlaps[size]!);
 
     return Semantics(
       role: SemanticsRole.list,
@@ -106,7 +111,7 @@ class AvatarGroup extends StatelessWidget {
       child: BadgeLayer(
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          spacing: stack ? 0 : _inlineGaps[size]!,
+          spacing: stack ? 0 : ids.dimension(_inlineGaps[size]!),
           children: [
             for (final (index, item) in items.indexed)
               _Overlap(

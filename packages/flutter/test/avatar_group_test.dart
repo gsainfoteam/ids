@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -12,15 +13,27 @@ Future<void> pump(
   WidgetTester tester,
   Widget child, {
   TextDirection direction = TextDirection.ltr,
+  IdsTheme theme = testTheme,
+  IdsMode? mode,
+  IdsMessages? translation,
 }) => tester.pumpWidget(
   Directionality(
     textDirection: direction,
     child: IdsProvider(
-      theme: testTheme,
+      theme: theme,
+      mode: mode,
+      translation: translation,
       child: Center(child: child),
     ),
   ),
 );
+
+class _English with IdsMessages {
+  const _English();
+
+  @override
+  String? avatarGroupOverflow({required Object count}) => '$count more';
+}
 
 List<Widget> people(int count) => [
   for (var index = 0; index < count; index++) Avatar(name: 'Person $index'),
@@ -47,6 +60,33 @@ ShapeBorder shapeOf(WidgetTester tester, Finder avatar) =>
                 .decoration!
             as ShapeDecoration)
         .shape;
+
+Offset edgeBetween(Path path, Offset inside, Offset outside) {
+  var low = 0.0;
+  var high = 1.0;
+  while (high - low > 1e-6) {
+    final middle = (low + high) / 2;
+    if (path.contains(Offset.lerp(inside, outside, middle)!)) {
+      low = middle;
+    } else {
+      high = middle;
+    }
+  }
+  return Offset.lerp(inside, outside, low)!;
+}
+
+double cornerGap(WidgetTester tester) {
+  final avatars = find.byType(Avatar);
+  final top = tester.getRect(avatars.first);
+  final cut = tester.getRect(avatars.last);
+  final corner = top.topRight;
+  final inward = Offset(cut.left, top.top + top.right - cut.left);
+  final outline = shapeOf(tester, avatars.first).getOuterPath(top);
+  final kept = cutoutOf(tester, avatars.last)!.shift(cut.topLeft);
+  return (edgeBetween(outline, inward, corner) -
+          edgeBetween(kept, corner, inward))
+      .distance;
+}
 
 List<SemanticsRole> rolesUnder(SemanticsNode node) {
   final roles = <SemanticsRole>[];
@@ -116,6 +156,30 @@ void main() {
       semantics.dispose();
     });
 
+    testWidgets('reads the sentence from the translation of the provider', (
+      tester,
+    ) async {
+      final semantics = tester.ensureSemantics();
+      await pump(
+        tester,
+        AvatarGroup(max: 1, children: people(3)),
+        translation: const _English(),
+      );
+      expect(find.bySemanticsLabel('2 more'), findsOneWidget);
+
+      await pump(
+        tester,
+        AvatarGroup(
+          max: 1,
+          overflowLabel: (count) => '$count hidden',
+          children: people(3),
+        ),
+        translation: const _English(),
+      );
+      expect(find.bySemanticsLabel('2 hidden'), findsOneWidget);
+      semantics.dispose();
+    });
+
     testWidgets('draws given content, first when asked', (tester) async {
       await pump(
         tester,
@@ -179,6 +243,24 @@ void main() {
       expect(tester.getSize(find.text('+1000000')).height, lessThan(12));
     });
 
+    for (final mode in [IdsMode.light, IdsMode.dark]) {
+      testWidgets('draws the count in onSurface (${mode.name})', (
+        tester,
+      ) async {
+        await pump(
+          tester,
+          AvatarGroup(max: 1, children: people(3)),
+          mode: mode,
+        );
+        expect(
+          DefaultTextStyle.of(tester.element(find.text('+2'))).style.color,
+          IdsProvider.of(
+            tester.element(find.byType(AvatarGroup)),
+          ).colors.onSurface,
+        );
+      });
+    }
+
     testWidgets('adds no count when nobody is hidden', (tester) async {
       await pump(tester, AvatarGroup(max: 5, children: people(3)));
       expect(find.byType(Avatar), findsNWidgets(3));
@@ -222,6 +304,65 @@ void main() {
         ),
       );
       expect(groupSize(tester), const Size(24 * 3 + 4 * 2, 24));
+    });
+
+    testWidgets('follows the theme scale', (tester) async {
+      await pump(
+        tester,
+        AvatarGroup(max: 3, children: people(5)),
+        theme: scaledTheme,
+      );
+      expect(groupSize(tester), const Size(60 + 45 * 3, 60));
+      expect(
+        DefaultTextStyle.of(tester.element(find.text('+2'))).style.fontSize,
+        closeTo(60 * 0.36, 0.001),
+      );
+      final cut = cutoutOf(tester, find.byType(Avatar).at(1))!;
+      expect(cut.contains(const Offset(16.5, 30)), isFalse);
+      expect(cut.contains(const Offset(17.5, 30)), isTrue);
+
+      await pump(
+        tester,
+        AvatarGroup(size: IdsSize.tiny, children: people(3)),
+        theme: scaledTheme,
+      );
+      expect(groupSize(tester), const Size(36 + 27 * 2, 36));
+
+      await pump(
+        tester,
+        AvatarGroup(layout: AvatarGroupLayout.inline, children: people(3)),
+        theme: scaledTheme,
+      );
+      expect(groupSize(tester), const Size(60 * 3 + 9 * 2, 60));
+
+      await pump(
+        tester,
+        AvatarGroup(
+          layout: AvatarGroupLayout.inline,
+          size: IdsSize.tiny,
+          children: people(3),
+        ),
+        theme: scaledTheme,
+      );
+      expect(groupSize(tester), const Size(36 * 3 + 6 * 2, 36));
+
+      const smallerThanEveryFloorNeeds = 20.0;
+      for (final (total, floor) in [(3, 9.0), (101, 7.0), (1001, 6.0)]) {
+        await pump(
+          tester,
+          SizedBox(
+            height: smallerThanEveryFloorNeeds,
+            child: AvatarGroup(max: 1, total: total, children: people(1)),
+          ),
+          theme: scaledTheme,
+        );
+        expect(
+          DefaultTextStyle.of(
+            tester.element(find.text('+${total - 1}')),
+          ).style.fontSize,
+          floor,
+        );
+      }
     });
 
     testWidgets('avatars follow the group unless they say otherwise', (
@@ -330,8 +471,8 @@ void main() {
       expect(cutoutOf(tester, avatars.at(0)), isNull);
       final cut = cutoutOf(tester, avatars.at(1))!;
       expect(cut.contains(const Offset(1, 20)), isFalse);
-      expect(cut.contains(const Offset(11, 20)), isFalse);
-      expect(cut.contains(const Offset(13, 20)), isTrue);
+      expect(cut.contains(const Offset(11.5, 20)), isFalse);
+      expect(cut.contains(const Offset(12.5, 20)), isTrue);
       expect(cut.contains(const Offset(39, 20)), isTrue);
     });
 
@@ -340,8 +481,8 @@ void main() {
     ) async {
       await pump(tester, AvatarGroup(size: IdsSize.tiny, children: people(2)));
       final tiny = cutoutOf(tester, find.byType(Avatar).last)!;
-      expect(tiny.contains(const Offset(7, 12)), isFalse);
-      expect(tiny.contains(const Offset(9, 12)), isTrue);
+      expect(tiny.contains(const Offset(7.5, 12)), isFalse);
+      expect(tiny.contains(const Offset(8.5, 12)), isTrue);
 
       await pump(tester, AvatarGroup(children: people(2)));
       final round = cutoutOf(tester, find.byType(Avatar).last)!;
@@ -353,8 +494,58 @@ void main() {
       );
       final square = cutoutOf(tester, find.byType(Avatar).last)!;
       expect(square.contains(const Offset(8, 3)), isFalse);
-      expect(square.contains(const Offset(11, 20)), isFalse);
-      expect(square.contains(const Offset(13, 20)), isTrue);
+      expect(square.contains(const Offset(11.5, 20)), isFalse);
+      expect(square.contains(const Offset(12.5, 20)), isTrue);
+    });
+
+    testWidgets('cuts a square neighbour along the squircle of the theme', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        AvatarGroup(shape: AvatarShape.square, children: people(2)),
+        theme: const IdsTheme(
+          primary: IdsThemeColor.seed(Color(0xFF155DFC)),
+          cornerShape: IdsCornerShape.squircle,
+        ),
+      );
+      final cut = find.byType(Avatar).last;
+      expect(
+        shapeOf(tester, cut),
+        RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(10)),
+      );
+      final kept = cutoutOf(tester, cut)!;
+      expect(cornerGap(tester), closeTo(2, 0.01));
+      expect(kept.contains(const Offset(11.5, 20)), isFalse);
+      expect(kept.contains(const Offset(12.5, 20)), isTrue);
+
+      const neighbour = Rect.fromLTWH(-30, 0, 40, 40);
+      const whereTheShapesDifferMost = -8 * math.pi / 180;
+      final hole = neighbour.inflate(2);
+      final holeCorner = BorderRadius.circular(12);
+      final arcCentre = hole.topRight + const Offset(-12, 12);
+      final outsideTheHole =
+          arcCentre + Offset.fromDirection(whereTheShapesDifferMost, 15);
+      final squircleEdge = edgeBetween(
+        RoundedSuperellipseBorder(borderRadius: holeCorner).getOuterPath(hole),
+        arcCentre,
+        outsideTheHole,
+      );
+      final roundedEdge = edgeBetween(
+        RoundedRectangleBorder(borderRadius: holeCorner).getOuterPath(hole),
+        arcCentre,
+        outsideTheHole,
+      );
+      final cutOnlyByARoundedHole = Offset.lerp(
+        squircleEdge,
+        roundedEdge,
+        0.5,
+      )!;
+      expect((roundedEdge - squircleEdge).distance, greaterThan(0.05));
+      expect(kept.contains(cutOnlyByARoundedHole), isTrue);
+
+      await pump(tester, AvatarGroup(children: people(2)));
+      expect(cornerGap(tester), closeTo(2, 0.01));
     });
 
     testWidgets('a press on the cut side reaches the avatar on top', (
