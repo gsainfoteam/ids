@@ -46,34 +46,76 @@ final buttonUseCases = [
                     ),
                 ],
               ),
-            const Text('Icons and states'),
+            const Text('Icons'),
             for (final size in IdsSize.values)
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  IdsButton(
-                    size: size,
-                    leading: const Icon(Icons.add),
-                    onPressed: () {},
-                    child: const Text('새 글'),
-                  ),
-                  IdsButton(
-                    size: size,
-                    variant: IdsVariant.soft,
-                    trailing: const Icon(Icons.arrow_forward),
-                    onPressed: () {},
-                    child: const Text('다음'),
-                  ),
-                  IdsButton(
-                    size: size,
-                    variant: IdsVariant.outline,
-                    disabled: true,
-                    onPressed: () {},
-                    child: const Text('비활성'),
-                  ),
-                ],
+              galleryRow(size.name, [
+                IdsButton(
+                  size: size,
+                  leading: const Icon(Icons.add),
+                  onPressed: () {},
+                  child: const Text('새 글'),
+                ),
+                IdsButton(
+                  size: size,
+                  variant: IdsVariant.soft,
+                  trailing: const Icon(Icons.arrow_forward),
+                  onPressed: () {},
+                  child: const Text('다음'),
+                ),
+                IdsButton(
+                  size: size,
+                  variant: IdsVariant.outline,
+                  leading: const Icon(Icons.file_upload_outlined),
+                  trailing: const Icon(Icons.expand_more),
+                  onPressed: () {},
+                  child: const Text('내보내기'),
+                ),
+                IdsButton(
+                  size: size,
+                  variant: IdsVariant.ghost,
+                  colorScheme: IdsColorScheme.danger,
+                  leading: const Icon(Icons.delete_outline),
+                  onPressed: () {},
+                  child: const Text('삭제'),
+                ),
+              ]),
+            const Text('States'),
+            galleryRow('disabled', [
+              for (final variant in IdsVariant.values)
+                IdsButton(
+                  variant: variant,
+                  disabled: true,
+                  child: Text(variant.name),
+                ),
+            ]),
+            galleryRow('loading', [
+              for (final variant in IdsVariant.values)
+                IdsButton(
+                  variant: variant,
+                  disabled: true,
+                  busy: true,
+                  leading: const IdsSpinner(decorative: true),
+                  child: const Text('저장 중'),
+                ),
+              const IdsButton(
+                size: IdsSize.tiny,
+                disabled: true,
+                busy: true,
+                leading: IdsSpinner(decorative: true),
+                child: Text('저장 중'),
               ),
+            ]),
+            galleryRow('asChild · navigation', [
+              IdsButton(
+                onPressed: () => openGalleryLink(context),
+                child: const Text('링크'),
+              ),
+              const IdsButton(
+                variant: IdsVariant.outline,
+                disabled: true,
+                child: Text('비활성 링크'),
+              ),
+            ]),
             const Text('Full width'),
             SizedBox(
               width: double.infinity,
@@ -86,7 +128,7 @@ final buttonUseCases = [
           ],
         ),
       ),
-      width: 560,
+      width: 710,
     ),
   ),
   WidgetbookUseCase(
