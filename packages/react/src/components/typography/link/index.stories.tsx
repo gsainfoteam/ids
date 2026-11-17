@@ -9,7 +9,7 @@ import { Link } from '.';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const colorSchemes = ['primary', 'secondary', 'tertiary', 'neutral'] as const;
-const underlines = ['always', 'hover'] as const;
+const underlines = ['always', 'hover', 'none'] as const;
 
 const meta = {
   title: 'Typography/Link',

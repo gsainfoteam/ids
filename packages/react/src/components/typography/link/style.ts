@@ -19,6 +19,7 @@ export const linkStyle = tv({
     underline: {
       always: { root: 'underline decoration-current/40 hover:decoration-current' },
       hover: { root: 'no-underline hover:underline focus-visible:underline' },
+      none: { root: 'no-underline' },
     },
   },
   defaultVariants: { colorScheme: 'primary', underline: 'always' },

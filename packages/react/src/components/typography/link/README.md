@@ -39,10 +39,12 @@ import { Link } from '@gsainfoteam/ids-react';
 ```tsx
 <Link underline="always" />   // 기본. 옅은 밑줄, 가리키면 진해진다
 <Link underline="hover" />    // 가리키거나 키보드로 포커스하면 긋는다
+<Link underline="none" />     // 긋지 않는다. 메뉴 막대처럼 자리가 링크임을 말해 주는 곳
 ```
 
 - 글 속 링크는 `always` 입니다. 색만으로 링크를 가르면 색을 구별하지 못하는 사람이 놓칩니다.
 - `hover` 는 바닥글 목록, 표 칸처럼 자리만 보고도 링크인 곳에 씁니다.
+- `none` 은 Navbar 의 메뉴처럼 링크만 모여 있고 지금 페이지를 색으로 따로 표시하는 곳에 씁니다. 글 속에는 쓰지 않습니다.
 
 ## 새 탭
 
