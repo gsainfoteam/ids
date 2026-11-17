@@ -351,6 +351,30 @@ mixin IdsMessages {
 
   String? get resizableWidth => null;
 
+  String? get schedulerAllDay => null;
+
+  String? get schedulerDay => null;
+
+  String? get schedulerGoToDate => null;
+
+  String? get schedulerLabel => null;
+
+  String? get schedulerNavigation => null;
+
+  String? get schedulerNextDay => null;
+
+  String? get schedulerNextWeek => null;
+
+  String? get schedulerPreviousDay => null;
+
+  String? get schedulerPreviousWeek => null;
+
+  String? get schedulerToday => null;
+
+  String? get schedulerView => null;
+
+  String? get schedulerWeek => null;
+
   String? get selectClear => null;
 
   String? get selectEmpty => null;
@@ -987,6 +1011,42 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get resizableWidth => '너비';
+
+  @override
+  String get schedulerAllDay => '종일';
+
+  @override
+  String get schedulerDay => '일';
+
+  @override
+  String get schedulerGoToDate => '날짜로 이동';
+
+  @override
+  String get schedulerLabel => '일정표';
+
+  @override
+  String get schedulerNavigation => '날짜 이동';
+
+  @override
+  String get schedulerNextDay => '다음 날';
+
+  @override
+  String get schedulerNextWeek => '다음 주';
+
+  @override
+  String get schedulerPreviousDay => '이전 날';
+
+  @override
+  String get schedulerPreviousWeek => '이전 주';
+
+  @override
+  String get schedulerToday => '오늘';
+
+  @override
+  String get schedulerView => '보기';
+
+  @override
+  String get schedulerWeek => '주';
 
   @override
   String get selectClear => '선택 지우기';

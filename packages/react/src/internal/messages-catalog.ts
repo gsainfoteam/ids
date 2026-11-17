@@ -246,6 +246,20 @@ export const messages = {
     "value": "{value}px",
     "width": "너비"
   },
+  "scheduler": {
+    "allDay": "종일",
+    "day": "일",
+    "goToDate": "날짜로 이동",
+    "label": "일정표",
+    "navigation": "날짜 이동",
+    "nextDay": "다음 날",
+    "nextWeek": "다음 주",
+    "previousDay": "이전 날",
+    "previousWeek": "이전 주",
+    "today": "오늘",
+    "view": "보기",
+    "week": "주"
+  },
   "select": {
     "clear": "선택 지우기",
     "empty": "검색 결과가 없습니다.",
