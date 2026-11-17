@@ -1,6 +1,6 @@
+import { controlSurface, type SurfaceVariant } from './control-surface';
 import { cn } from '../utils/cn';
 
-import type { SurfaceVariant } from './control-surface';
 import type { IdsVariant } from '../tokens/types';
 
 const variant = {
@@ -39,10 +39,8 @@ export const toggleSurface = {
   glyphVariant: {
     ...variant,
     transparent: cn(
-      'bg-transparent text-on-surface',
-      'transition-[color,background-color,border-color,box-shadow,opacity]',
-      'data-hovered:opacity-70 data-active:opacity-40',
-      'data-pressed:text-(--control-glyph-on)',
+      controlSurface.variant.transparent,
+      'text-on-surface data-pressed:text-(--control-glyph-on)',
       'data-pressed-hovered:opacity-70 data-pressed-active:opacity-40',
     ),
   } satisfies Record<IdsVariant, string>,
