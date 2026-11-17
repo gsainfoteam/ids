@@ -10,6 +10,26 @@ class _Messages with IdsMessages {
 }
 
 void main() {
+  testWidgets('displays punctuation codes as their keys', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: IdsProvider(
+          theme: testTheme,
+          child: Column(
+            children: [
+              IdsKbd(keys: 'Mod+Slash', platform: TargetPlatform.windows),
+              IdsKbd(keys: 'Comma+Backslash', platform: TargetPlatform.macOS),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('/'), findsOneWidget);
+    expect(find.text(','), findsOneWidget);
+    expect(find.text(r'\'), findsOneWidget);
+  });
+
   testWidgets('draws Shift separately from arrows and renders special glyphs', (
     tester,
   ) async {

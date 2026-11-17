@@ -193,6 +193,20 @@ List<KbdFace> kbdKeys(
   ];
 }
 
+const _punctuationCodes = {
+  'backquote': '`',
+  'backslash': r'\',
+  'bracketleft': '[',
+  'bracketright': ']',
+  'comma': ',',
+  'equal': '=',
+  'minus': '-',
+  'period': '.',
+  'quote': "'",
+  'semicolon': ';',
+  'slash': '/',
+};
+
 KbdFace _face(
   String part,
   TargetPlatform platform,
@@ -206,6 +220,7 @@ KbdFace _face(
   }
   final glyph =
       RegExp(r'^(?:Key|Digit)([A-Z0-9])$').firstMatch(part)?.group(1) ??
+      _punctuationCodes[lower] ??
       (part.length == 1 ? part.toUpperCase() : part);
   return (parts: [glyph], label: glyph);
 }
