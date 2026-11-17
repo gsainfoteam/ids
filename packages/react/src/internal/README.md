@@ -679,13 +679,13 @@ Escape: () => {
 
 ## list-styles.ts
 
-팝업 안 목록(listbox)의 클래스 조각 `listStyles` 입니다. 옵션, 선택 체크, 스크롤 목록과 그 ScrollArea, 그룹 머리, 구분선, 빈 목록 문구, 목록 위 검색 줄이 있습니다.
+팝업 안 목록(listbox)의 클래스 조각 `listStyles` 입니다. 옵션, 고른 옵션의 색(`checked` 는 Menu 용), 선택 체크, 스크롤 목록과 그 ScrollArea, 그룹 머리, 구분선, 빈 목록 문구, 목록 위 검색 줄이 있습니다.
 
 ### 쓰는 곳
 
 - Select 의 `listArea`, `listbox`, `item`, `indicator`, `groupHeading`, `separator`, `empty` 슬롯
 - ChipField 의 제안 목록(`listArea`, `listbox`, ...)
-- Menu 의 `item`, `indicator`, `label`, `separator` 슬롯과 명령 팔레트의 `listArea`, `list`, `empty` 슬롯
+- Menu 의 `item`(`option` 에 `checked` 를 더함), `indicator`, `label`, `separator` 슬롯과 명령 팔레트의 `listArea`, `list`, `empty` 슬롯
 - [field-popup](./field-popup/README.md) 의 `FieldPopupSearch`(`searchRoot`, `search`)
 
 ### 쓰는 법
@@ -705,8 +705,11 @@ slots: {
 
 ### 왜 이렇게
 
-- 옵션 강조는 메뉴처럼 neutral hover 단계인 `bg-neutral-soft` 배경(`data-highlighted`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
-- 옵션에는 누르는 상태가 없어 강조가 한 단계뿐입니다. Menu 에서 하위 메뉴가 열린 항목(`data-popup-open`)은 켜진 toggle 처럼 press 단계(`bg-neutral-soft-hover`)라, 포인터가 하위 메뉴로 옮겨 가도 강조된 항목과 구별됩니다.
+- 고른 옵션(`data-selected`, Menu 는 `data-checked`)은 DataTable 의 선택 행처럼 `bg-primary-soft` 와 `text-on-primary-soft` 이고, 끝의 체크나 점은 `text-primary` 입니다. 고른 것과 가리킨 것은 색 계열로 갈립니다.
+- 가리킨 옵션(`data-highlighted`)은 neutral 사다리를 탑니다. 가리키면 `bg-neutral-soft`, 누르면 `bg-neutral-soft-hover` 입니다. 고른 옵션을 가리키면 `bg-primary-soft-hover`, 누르면 `bg-primary-soft-active` 입니다.
+- 이어진 고른 옵션은 한 덩어리로 그립니다. 다음 옵션도 골랐으면 아래 모서리를, 앞 옵션도 골랐으면 위 모서리를 각지게 합니다(`has-[+[data-selected]]`, `[[data-selected]+&]`). 둥근 칸이 붙으면 모서리 사이로 바탕이 비칩니다.
+- Menu 에서 하위 메뉴가 열린 항목(`data-popup-open`)은 켜진 toggle 처럼 press 단계(`bg-neutral-soft-hover`)라, 포인터가 하위 메뉴로 옮겨 가도 강조된 항목과 구별됩니다.
+- `selected` 와 `checked` 는 속성 이름만 다른 같은 규칙입니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 둘을 각각 적습니다.
 - 옵션은 체크가 없어도 끝 padding(`pe-8`)을 비워 둡니다. 체크가 나타날 때 라벨이 밀리지 않습니다.
 - `list` 는 옵션의 스크롤 컨테이너입니다. 키보드 이동이 팝업이 아니라 이 목록을 스크롤합니다. `relative` 라 옵션의 offset parent 입니다(`offsetParentOfOptions`). field-popup 의 `revealPopupOption` 이 옵션 위치를 `offsetTop` 으로 읽습니다.
 - `listArea` 는 목록을 감싸는 `ScrollArea` 의 root 이고, `list` 는 `ScrollArea.Viewport asChild` 로 listbox 자신이 스크롤 요소가 됩니다. 옵션과 listbox 사이에 요소가 끼지 않아 위의 offset parent 와 `scrollTop` 이 그대로입니다.

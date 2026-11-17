@@ -237,10 +237,10 @@ export const Gallery: Story = {
 
         <Showcase.Section
           title="Checkbox · Radio"
-          description="고른 상태는 끝의 표시로 보여 줍니다. 상태는 늘 제어해서 넘깁니다. onSelect 에서 preventDefault 하면 고른 뒤에도 메뉴가 열려 있습니다."
+          description="켜진 항목은 primary soft 배경에 primary 체크나 점으로 보여 줍니다. 상태는 늘 제어해서 넘깁니다. onSelect 에서 preventDefault 하면 고른 뒤에도 메뉴가 열려 있습니다."
         >
-          <Showcase.Row label="보기 설정">
-            <Menu>
+          <Showcase.Row label="보기 설정" className="h-64 items-start">
+            <Menu defaultOpen>
               <Menu.Trigger asChild>
                 <Button variant="outline">보기</Button>
               </Menu.Trigger>
