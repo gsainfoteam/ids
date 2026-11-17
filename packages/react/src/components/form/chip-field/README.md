@@ -148,10 +148,12 @@ import { ChipField, Field } from '@gsainfoteam/ids-react';
 | ------ | --------------------------------------------------------------------------------------------------------- |
 | 루트   | `data-open`, `data-disabled`, `data-readonly`, `data-invalid`, `data-required`, `data-full`, `data-empty` |
 | 칩     | `data-chip-field-chip`, 지울 수 없는 옵션이면 `data-disabled`, 방향키가 가리키면 `data-focus-visible`     |
+| 값 줄  | `data-chip-field-values`. 칩과 입력을 담고 이 안에서만 줄을 바꾼다                                        |
 | Item   | `data-selected`, `data-highlighted`, `data-disabled`                                                      |
 | Create | `data-highlighted`, 거부된 값이면 `data-invalid`                                                          |
 
 - 루트의 `className` 은 `ChipField.State` 를 받는 함수도 됩니다.
+- 칩이 줄을 넘으면 값 줄만 아래로 늘어나고, 꾸밈과 화살표는 오른쪽 열에서 세로 가운데에 남습니다. 줄 간격은 4px 입니다.
 - 칩은 `Chip` 이고 지우기 버튼은 `Chip.Close` 입니다. `data-chip`, `data-size` 같은 Chip 의 속성도 붙습니다.
 - 지우기 버튼에 포커스가 있으면 필드 테두리에 링이 그려지고 칩은 테마 색으로 칠해집니다. 버튼 자체에는 링을 그리지 않습니다.
 
@@ -241,7 +243,7 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 | `name` / `form`                         | 칩마다 hidden input                                        |
 | `required`                              | 브라우저 검증                                              |
 | `className` / `style`                   | 루트                                                       |
-| `ref`, 그 외 native 속성                | 검색 input. 기본 `placeholder="항목 추가…"`                |
+| `ref`, 그 외 native 속성                | 검색 input. 기본 `placeholder="항목 추가…"`(칩이 없을 때만)            |
 
 ## 알아둘 것
 
@@ -249,3 +251,4 @@ import { Field } from '@gsainfoteam/ids-react/react-hook-form';
 - `ChipField.Input` 의 `onChange` 는 검색어 입력 이벤트입니다. 고른 값은 루트의 `onValueChange` 로 받습니다.
 - 목록에 아직 없는 값의 칩은 값 그대로 보입니다. 새로 만든 값의 저장이나 ID 변환은 앱이 맡습니다.
 - 컨테이너의 빈 곳을 클릭하면 입력에 포커스하고 목록을 엽니다.
+- 칩이 하나라도 있으면 입력의 `placeholder` 는 앱이 준 것까지 숨기고, 입력 최소 너비가 80px 에서 48px 로 줄어 칩 줄에 남습니다. 남은 폭이 48px 보다 좁으면 입력이 다음 줄로 갑니다. 모바일 시트의 검색창은 placeholder 를 계속 보입니다.

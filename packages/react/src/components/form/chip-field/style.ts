@@ -7,7 +7,8 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const chipFieldStyle = tv({
   slots: {
-    root: ['relative', fieldTrigger.base, 'flex-wrap gap-1 py-1'],
+    root: ['relative', fieldTrigger.base],
+    values: 'flex min-w-0 flex-1 flex-wrap items-center gap-1',
     adornment: [
       'inline-flex shrink-0 items-center empty:hidden',
       'not-has-[button]:text-neutral',
@@ -22,7 +23,7 @@ export const chipFieldStyle = tv({
     ],
     chipRemove: 'relative ring-0! after:absolute after:-inset-1',
     input: [
-      'min-w-20 flex-1 bg-transparent py-1 outline-none',
+      'flex-1 bg-transparent py-0 outline-none',
       'placeholder:text-neutral disabled:cursor-not-allowed',
     ],
     icon: 'shrink-0 cursor-pointer text-neutral',
@@ -44,26 +45,40 @@ export const chipFieldStyle = tv({
     } satisfies Record<ChipFieldVariant, object>,
     size: {
       standard: {
-        root: [fieldTrigger.size.standard, 'h-auto min-h-(--ids-size-control-standard)'],
+        root: [
+          fieldTrigger.size.standard,
+          'h-auto min-h-(--ids-size-control-standard) py-1.5',
+          'not-data-empty:has-[>[data-chip-field-values]:first-child]:ps-1.5',
+        ],
         adornment: [
           'gap-1',
           'not-has-[button]:text-body-b3-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-standard)',
         ],
         chip: 'h-6 px-2.5',
+        input: 'h-6 not-first:ps-1.5',
         chipRemove: '[&_svg]:size-3',
         icon: fieldTrigger.icon.standard,
       },
       tiny: {
-        root: [fieldTrigger.size.tiny, 'h-auto min-h-(--ids-size-control-tiny)'],
+        root: [
+          fieldTrigger.size.tiny,
+          'h-auto min-h-(--ids-size-control-tiny) py-1.5',
+          'not-data-empty:has-[>[data-chip-field-values]:first-child]:ps-1.5',
+        ],
         adornment: [
           'gap-0.5',
           'not-has-[button]:text-caption-c1-regular not-has-[button]:[&_svg]:size-(--ids-size-icon-tiny)',
         ],
         chip: 'h-5 px-2',
+        input: 'h-5 not-first:ps-1',
         chipRemove: '[&_svg]:size-2.5',
         icon: fieldTrigger.icon.tiny,
       },
     } satisfies Record<IdsSize, object>,
+    empty: {
+      true: { input: 'min-w-20' },
+      false: { input: 'min-w-12' },
+    },
   },
-  defaultVariants: { variant: 'outline', size: 'standard' },
+  defaultVariants: { variant: 'outline', size: 'standard', empty: true },
 });

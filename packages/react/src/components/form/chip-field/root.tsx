@@ -228,7 +228,7 @@ export function ChipFieldRoot({
     empty: s.selected.length === 0,
   };
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = chipFieldStyle({ variant, size: resolvedSize });
+  const styles = chipFieldStyle({ variant, size: resolvedSize, empty: s.selected.length === 0 });
 
   const inputDefaults: InputAttributes = {
     placeholder: t('chipField.placeholder'),
@@ -311,8 +311,10 @@ export function ChipFieldRoot({
         }}
       >
         <Adornments items={leading} className={styles.adornment()} />
-        <Chips />
-        {input}
+        <div data-chip-field-values="" className={styles.values()}>
+          <Chips />
+          {input}
+        </div>
         <Adornments items={trailing} className={styles.adornment()} />
         {options.length > 0 && (
           <ChevronDownIcon aria-hidden="true" data-chip-field-icon="" className={styles.icon()} />

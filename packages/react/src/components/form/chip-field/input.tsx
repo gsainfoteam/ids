@@ -38,8 +38,13 @@ export function ChipInput({
   invariant(c != null, '`<ChipField.Input>` must be used inside `<ChipField>`.');
   const { inputRef } = c;
 
+  const merged = mergeProps(
+    mergeProps(c.inputDefaults, mergeProps(c.inputProps, rest)),
+    c.comboboxWiring,
+  );
   const props = {
-    ...mergeProps(mergeProps(c.inputDefaults, mergeProps(c.inputProps, rest)), c.comboboxWiring),
+    ...merged,
+    placeholder: c.field.state.selected.length === 0 ? merged.placeholder : undefined,
     className: c.styles.input({ className }),
     style,
   };
