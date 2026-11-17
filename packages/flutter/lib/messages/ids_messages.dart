@@ -153,6 +153,44 @@ mixin IdsMessages {
 
   String? get drawerHandle => null;
 
+  String? get editorBlockType => null;
+
+  String? get editorBlockquote => null;
+
+  String? get editorBold => null;
+
+  String? get editorBubbleMenu => null;
+
+  String? get editorBulletList => null;
+
+  String? get editorCode => null;
+
+  String? get editorCodeBlock => null;
+
+  String? get editorContent => null;
+
+  String? editorHeading({required Object level}) => null;
+
+  String? get editorItalic => null;
+
+  String? get editorLink => null;
+
+  String? get editorLinkApply => null;
+
+  String? get editorLinkRemove => null;
+
+  String? get editorLinkUrl => null;
+
+  String? get editorOrderedList => null;
+
+  String? get editorParagraph => null;
+
+  String? get editorStrike => null;
+
+  String? get editorToolbar => null;
+
+  String? get editorUnderline => null;
+
   String? get fileFieldClear => null;
 
   String? fileFieldCount({required Object count}) => null;
@@ -690,6 +728,63 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get drawerHandle => '끌어서 크기 조절';
+
+  @override
+  String get editorBlockType => '문단 모양';
+
+  @override
+  String get editorBlockquote => '인용';
+
+  @override
+  String get editorBold => '굵게';
+
+  @override
+  String get editorBubbleMenu => '선택한 글 서식';
+
+  @override
+  String get editorBulletList => '글머리 기호 목록';
+
+  @override
+  String get editorCode => '코드';
+
+  @override
+  String get editorCodeBlock => '코드 블록';
+
+  @override
+  String get editorContent => '본문';
+
+  @override
+  String editorHeading({required Object level}) => '제목 ${_format(level)}';
+
+  @override
+  String get editorItalic => '기울임';
+
+  @override
+  String get editorLink => '링크';
+
+  @override
+  String get editorLinkApply => '적용';
+
+  @override
+  String get editorLinkRemove => '링크 지우기';
+
+  @override
+  String get editorLinkUrl => '링크 주소';
+
+  @override
+  String get editorOrderedList => '번호 목록';
+
+  @override
+  String get editorParagraph => '문단';
+
+  @override
+  String get editorStrike => '취소선';
+
+  @override
+  String get editorToolbar => '서식';
+
+  @override
+  String get editorUnderline => '밑줄';
 
   @override
   String get fileFieldClear => '파일 모두 지우기';

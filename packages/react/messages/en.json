@@ -110,6 +110,27 @@
     "close": "Close",
     "handle": "Drag to resize"
   },
+  "editor": {
+    "blockType": "Text style",
+    "blockquote": "Quote",
+    "bold": "Bold",
+    "bubbleMenu": "Selection formatting",
+    "bulletList": "Bulleted list",
+    "code": "Code",
+    "codeBlock": "Code block",
+    "content": "Content",
+    "heading": "Heading {level}",
+    "italic": "Italic",
+    "link": "Link",
+    "linkApply": "Apply",
+    "linkRemove": "Remove link",
+    "linkUrl": "Link URL",
+    "orderedList": "Numbered list",
+    "paragraph": "Paragraph",
+    "strike": "Strikethrough",
+    "toolbar": "Formatting",
+    "underline": "Underline"
+  },
   "fileField": {
     "clear": "Remove all files",
     "count": "{count, plural, one {# file} other {# files}}",
