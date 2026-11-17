@@ -228,10 +228,11 @@ export function ChipFieldRoot({
     empty: s.selected.length === 0,
   };
   const resolvedSize = useFieldSize(size) ?? 'standard';
-  const styles = chipFieldStyle({ variant, size: resolvedSize, empty: s.selected.length === 0 });
+  const styles = chipFieldStyle({ variant, size: resolvedSize });
 
   const inputDefaults: InputAttributes = {
     placeholder: t('chipField.placeholder'),
+    size: 1,
     autoComplete: 'off',
     'aria-invalid': isInvalid || undefined,
     'aria-required': required || undefined,
