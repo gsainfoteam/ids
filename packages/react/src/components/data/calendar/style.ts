@@ -43,9 +43,12 @@ export const calendarStyle = tv({
       'first:rounded-s-standard last:rounded-e-standard',
       '[[data-hidden]+&]:rounded-s-standard [&:has(+[data-hidden])]:rounded-e-standard',
     ],
-    rangeStart: 'rounded-s-standard bg-neutral-soft',
-    rangeMiddle: 'bg-neutral-soft',
-    rangeEnd: 'rounded-e-standard bg-neutral-soft',
+    rangeStart: 'rounded-s-standard bg-primary-soft',
+    rangeMiddle: 'bg-primary-soft',
+    rangeEnd: 'rounded-e-standard bg-primary-soft',
+    previewStart: 'rounded-s-standard bg-neutral-soft',
+    previewMiddle: 'bg-neutral-soft',
+    previewEnd: 'rounded-e-standard bg-neutral-soft',
     hidden: 'invisible',
     dayButton: [
       'relative inline-flex size-full cursor-pointer items-center justify-center rounded-standard',
@@ -82,8 +85,12 @@ export const calendarStyle = tv({
         ),
       },
     },
-    onBand: {
-      true: {
+    band: {
+      none: {},
+      range: {
+        dayButton: 'text-on-primary-soft hover:bg-primary-soft-hover active:bg-primary-soft-active',
+      },
+      preview: {
         dayButton: 'hover:bg-neutral-soft-hover active:bg-neutral-soft-active',
       },
     },
@@ -92,28 +99,18 @@ export const calendarStyle = tv({
   compoundVariants: [
     {
       selected: false,
-      onBand: false,
       today: true,
-      class: { dayButton: 'bg-neutral-soft' },
+      class: { dayButton: 'text-primary inset-ring-1 inset-ring-primary' },
     },
     {
       selected: false,
-      onBand: false,
+      band: 'none',
       unavailable: false,
       class: { dayButton: 'hover:bg-neutral-soft active:bg-neutral-soft-hover' },
     },
-    {
-      selected: false,
-      onBand: false,
-      unavailable: false,
-      today: true,
-      class: {
-        dayButton: 'hover:bg-neutral-soft-hover active:bg-neutral-soft-active',
-      },
-    },
     { selected: true, unavailable: true, class: { dayButton: 'hover:bg-primary' } },
     {
-      onBand: true,
+      band: ['range', 'preview'],
       unavailable: true,
       class: { dayButton: 'hover:bg-transparent active:bg-transparent' },
     },
@@ -121,7 +118,7 @@ export const calendarStyle = tv({
   defaultVariants: {
     size: 'standard',
     selected: false,
-    onBand: false,
+    band: 'none',
     today: false,
     outside: false,
     unavailable: false,
