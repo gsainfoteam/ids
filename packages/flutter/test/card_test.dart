@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_kept.dart';
 import 'test_theme.dart';
 import 'test_image.dart';
 
@@ -993,5 +994,22 @@ void main() {
       expect(find.bySemanticsLabel('A cabin'), findsOneWidget);
       semantics.dispose();
     });
+  });
+
+  testWidgets('keyed content keeps its state when a header appears above it', (
+    tester,
+  ) async {
+    Widget card({required bool header}) => Card(
+      children: [
+        if (header)
+          const CardHeader(children: [CardTitle(child: Text('Title'))]),
+        const CardContent(key: ValueKey('content'), child: Kept()),
+      ],
+    );
+    await pump(tester, card(header: false));
+    final kept = tester.state(find.byType(Kept));
+
+    await pump(tester, card(header: true));
+    expect(tester.state(find.byType(Kept)), same(kept));
   });
 }

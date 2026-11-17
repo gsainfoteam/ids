@@ -356,6 +356,7 @@ class ItemGroup extends StatelessWidget {
             children: [
               for (final (index, child) in children.indexed)
                 Container(
+                  key: child.key == null ? null : ValueKey(child.key),
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: bordered && index < children.length - 1

@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_kept.dart';
 import 'test_theme.dart';
 import 'test_image.dart';
 
@@ -1090,5 +1091,32 @@ void main() {
         reason: '${part.runtimeType}',
       );
     }
+  });
+
+  testWidgets('a keyed row keeps its state when the rows change places', (
+    tester,
+  ) async {
+    Widget group(List<String> order) => ItemGroup(
+      children: [
+        for (final name in order)
+          Item(
+            key: ValueKey(name),
+            children: [
+              ItemActions(children: [Kept(key: ValueKey('kept $name'))]),
+            ],
+          ),
+      ],
+    );
+    await pump(tester, group(['a', 'b']));
+    final a = tester.state(find.byKey(const ValueKey('kept a')));
+    final b = tester.state(find.byKey(const ValueKey('kept b')));
+
+    await pump(tester, group(['b', 'a']));
+    expect(tester.state(find.byKey(const ValueKey('kept a'))), same(a));
+    expect(tester.state(find.byKey(const ValueKey('kept b'))), same(b));
+
+    await pump(tester, group(['c', 'b', 'a']));
+    expect(tester.state(find.byKey(const ValueKey('kept a'))), same(a));
+    expect(tester.state(find.byKey(const ValueKey('kept b'))), same(b));
   });
 }

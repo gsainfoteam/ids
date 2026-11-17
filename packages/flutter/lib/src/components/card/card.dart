@@ -120,11 +120,14 @@ class Card extends StatelessWidget {
           },
           children: [
             for (final (index, child) in children.indexed)
-              _region(
-                child,
-                index: index,
-                pad: pad,
-                lineColor: colors.borderNeutral,
+              KeyedSubtree(
+                key: child.key == null ? null : ValueKey(child.key),
+                child: _region(
+                  child,
+                  index: index,
+                  pad: pad,
+                  lineColor: colors.borderNeutral,
+                ),
               ),
           ],
         ),
