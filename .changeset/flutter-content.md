@@ -16,6 +16,8 @@ app that also imports Material imports the package `as ids`.
   without one, and grow with the system text size.
 - A `Card` or `Item` with `onPressed` presses anywhere on its surface, while a control inside
   keeps its own press and focus. `Item` takes `selected`, and `ItemGroup` reads as a list.
+- An `Image` placed directly in `AspectRatio`, `CardMedia` or a media tile of `Item` or `Empty`
+  fills it with `BoxFit.cover`, as React's `object-cover` does, unless it sets its own `fit`.
 
 `IdsColorScheme` (`primary`, `secondary`, `tertiary`, `neutral`, `danger`, `success`, `warning`,
 `info`) joins the generated enums. The components read their colors, corners, sizes and text styles

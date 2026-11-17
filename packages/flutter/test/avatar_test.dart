@@ -1,25 +1,12 @@
-import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
+import 'test_image.dart';
 import 'test_theme.dart';
-
-class _HeldImage extends ImageProvider<_HeldImage> {
-  final completer = Completer<ImageInfo>();
-
-  @override
-  Future<_HeldImage> obtainKey(ImageConfiguration configuration) =>
-      SynchronousFuture(this);
-
-  @override
-  ImageStreamCompleter loadImage(_HeldImage key, ImageDecoderCallback decode) =>
-      OneFrameImageStreamCompleter(completer.future);
-}
 
 Future<void> pump(
   WidgetTester tester,
@@ -246,7 +233,7 @@ void main() {
     testWidgets('waits before showing the fallback, then shows the image', (
       tester,
     ) async {
-      final image = _HeldImage();
+      final image = HeldImage();
       final statuses = <AvatarStatus>[];
       await pump(
         tester,
@@ -269,7 +256,7 @@ void main() {
     testWidgets('shows the fallback at once when the image fails', (
       tester,
     ) async {
-      final image = _HeldImage();
+      final image = HeldImage();
       final statuses = <AvatarStatus>[];
       await pump(
         tester,
@@ -287,7 +274,7 @@ void main() {
       await pump(
         tester,
         Avatar(
-          image: _HeldImage(),
+          image: HeldImage(),
           name: 'Alice Kim',
           fallbackDelay: Duration.zero,
         ),
@@ -298,7 +285,7 @@ void main() {
     testWidgets('a new image after a failed one loads and waits again', (
       tester,
     ) async {
-      final broken = _HeldImage();
+      final broken = HeldImage();
       final statuses = <AvatarStatus>[];
       await pump(
         tester,
@@ -311,7 +298,7 @@ void main() {
       await pump(
         tester,
         Avatar(
-          image: _HeldImage(),
+          image: HeldImage(),
           name: 'Alice Kim',
           onStatusChange: statuses.add,
         ),
@@ -328,14 +315,14 @@ void main() {
     });
 
     testWidgets('starts over when the image changes', (tester) async {
-      final first = _HeldImage();
+      final first = HeldImage();
       await pump(tester, Avatar(image: first, name: 'Alice Kim'));
       first.completer.complete(ImageInfo(image: await testImage(tester)));
       await tester.pump();
       await tester.pump();
       expect(find.byType(RawImage), findsOneWidget);
 
-      await pump(tester, Avatar(image: _HeldImage(), name: 'Alice Kim'));
+      await pump(tester, Avatar(image: HeldImage(), name: 'Alice Kim'));
       expect(find.byType(RawImage), findsNothing);
       expect(find.text('AK'), findsNothing);
       await tester.pump(const Duration(milliseconds: 600));

@@ -34,7 +34,7 @@ final _picture = PaintedImage('aspect-ratio-picture', const Size(600, 200), (
     );
 });
 
-Widget _pictureFitted(BoxFit fit) =>
+Widget _pictureImage([BoxFit? fit]) =>
     Image(image: _picture, fit: fit, semanticLabel: '그라데이션');
 
 final aspectRatioUseCases = [
@@ -86,7 +86,7 @@ final aspectRatioUseCases = [
                 SizedBox(
                   width: 160,
                   child: _Rounded(
-                    child: ids.AspectRatio(child: _pictureFitted(BoxFit.cover)),
+                    child: ids.AspectRatio(child: _pictureImage()),
                   ),
                 ),
               ],
@@ -99,7 +99,7 @@ final aspectRatioUseCases = [
                   child: _Rounded(
                     muted: true,
                     child: ids.AspectRatio(
-                      child: _pictureFitted(BoxFit.contain),
+                      child: _pictureImage(BoxFit.contain),
                     ),
                   ),
                 ),
@@ -118,9 +118,7 @@ final aspectRatioUseCases = [
     name: 'Media Fills',
     builder: (context) => SizedBox(
       width: 240,
-      child: _Rounded(
-        child: ids.AspectRatio(child: _pictureFitted(BoxFit.cover)),
-      ),
+      child: _Rounded(child: ids.AspectRatio(child: _pictureImage())),
     ),
   ),
   WidgetbookUseCase(

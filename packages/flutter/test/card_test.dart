@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
 import 'test_theme.dart';
+import 'test_image.dart';
 
 Future<void> pump(
   WidgetTester tester,
@@ -936,6 +937,42 @@ void main() {
       expect(button.label, 'Title\nDescription');
       expect(find.bySemanticsLabel('Body'), findsOneWidget);
       semantics.dispose();
+    });
+
+    testWidgets('an image in media fills it unless it says how to fit', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        Card(
+          children: [
+            CardMedia(
+              child: SizedBox(height: 40, child: Image(image: HeldImage())),
+            ),
+          ],
+        ),
+      );
+      expect(tester.widget<Image>(find.byType(Image)).fit, isNull);
+
+      await pump(
+        tester,
+        Card(
+          children: [CardMedia(child: Image(image: HeldImage()))],
+        ),
+      );
+      expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.cover);
+
+      await pump(
+        tester,
+        Card(
+          children: [
+            CardMedia(
+              child: Image(image: HeldImage(), fit: BoxFit.contain),
+            ),
+          ],
+        ),
+      );
+      expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.contain);
     });
 
     testWidgets('media keeps its own name beside the header', (tester) async {

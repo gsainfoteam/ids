@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart' as widgets;
 import 'package:flutter/widgets.dart' hide AspectRatio;
 
+import '../../layout/covering_image.dart';
+
 class AspectRatio extends StatelessWidget {
   const AspectRatio({super.key, this.ratio = 1, this.child})
     : assert(
@@ -12,6 +14,8 @@ class AspectRatio extends StatelessWidget {
   final Widget? child;
 
   @override
-  Widget build(BuildContext context) =>
-      widgets.AspectRatio(aspectRatio: ratio, child: child);
+  Widget build(BuildContext context) => widgets.AspectRatio(
+    aspectRatio: ratio,
+    child: child == null ? null : coveringItsBox(child!),
+  );
 }

@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import '../../../theme/ids_provider.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_typography.dart';
+import '../../layout/covering_image.dart';
 
 enum EmptyVariant { outline, soft, ghost }
 
@@ -173,7 +174,9 @@ class EmptyMedia extends StatelessWidget {
                 size: ids.dimension(_icons[scope.size]!),
                 color: colors.onSurface,
               ),
-              child: glyph is Image ? glyph : Center(child: glyph),
+              child: glyph is Image
+                  ? coveringItsBox(glyph)
+                  : Center(child: glyph),
             ),
           ),
         ),

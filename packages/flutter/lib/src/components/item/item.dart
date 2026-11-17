@@ -10,6 +10,7 @@ import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
 import '../../interaction/interactive.dart';
 import '../../interaction/pressable_surface.dart';
+import '../../layout/covering_image.dart';
 import '../divider/divider.dart';
 
 enum ItemVariant { ghost, outline, soft }
@@ -210,7 +211,9 @@ class ItemMedia extends StatelessWidget {
                 ),
                 child: IconTheme.merge(
                   data: IconThemeData(size: side / 2, color: colors.onSurface),
-                  child: child is Image ? child! : Center(child: child),
+                  child: child is Image
+                      ? coveringItsBox(child!)
+                      : Center(child: child),
                 ),
               ),
             ),

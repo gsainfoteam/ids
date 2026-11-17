@@ -51,7 +51,7 @@ final _photo = PaintedImage('card-photo', const Size(640, 360), (canvas, size) {
 final _media = ids.CardMedia(
   child: ids.AspectRatio(
     ratio: 16 / 9,
-    child: Image(image: _photo, fit: BoxFit.cover, excludeFromSemantics: true),
+    child: Image(image: _photo, excludeFromSemantics: true),
   ),
 );
 

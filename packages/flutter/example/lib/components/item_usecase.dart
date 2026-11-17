@@ -40,8 +40,7 @@ final _photo = PaintedImage('item-photo', const Size(256, 192), (canvas, size) {
     );
 });
 
-Widget _photoImage() =>
-    Image(image: _photo, fit: BoxFit.cover, excludeFromSemantics: true);
+Widget _photoImage() => Image(image: _photo, excludeFromSemantics: true);
 
 final itemUseCases = [
   WidgetbookUseCase(

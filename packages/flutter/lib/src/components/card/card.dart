@@ -9,6 +9,7 @@ import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
 import '../../interaction/interactive.dart';
 import '../../interaction/pressable_surface.dart';
+import '../../layout/covering_image.dart';
 
 enum CardVariant { outline, soft, ghost }
 
@@ -273,7 +274,7 @@ class CardMedia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _CardScope.check(context, 'CardMedia');
-    return child;
+    return coveringItsBox(child);
   }
 }
 

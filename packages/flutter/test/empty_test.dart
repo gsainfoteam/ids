@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
 import 'test_theme.dart';
+import 'test_image.dart';
 
 Future<void> pump(
   WidgetTester tester,
@@ -347,6 +348,26 @@ void main() {
       final number = find.byKey(const ValueKey('n'));
       expect(tester.getSize(number), const Size.square(10));
       expect(tester.getCenter(number), tester.getCenter(mediaBox().first));
+    });
+
+    testWidgets('an image fills a tile unless it says how to fit', (
+      tester,
+    ) async {
+      Widget empty(Image image) => Empty(
+        children: [
+          EmptyMedia(child: image),
+          _title,
+        ],
+      );
+      await pump(tester, empty(Image(image: HeldImage())));
+      expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.cover);
+      expect(
+        tester.getSize(find.byType(Image)),
+        tester.getSize(mediaBox().first),
+      );
+
+      await pump(tester, empty(Image(image: HeldImage(), fit: BoxFit.contain)));
+      expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.contain);
     });
 
     testWidgets('a soft tile turns to the surface on a soft Empty', (

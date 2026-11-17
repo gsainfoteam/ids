@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
 import 'test_theme.dart';
+import 'test_image.dart';
 
 Future<void> pump(
   WidgetTester tester,
@@ -175,6 +176,26 @@ void main() {
         tester.getCenter(number),
         tester.getCenter(find.byType(ItemMedia)),
       );
+    });
+
+    testWidgets('an image fills a tile unless it says how to fit', (
+      tester,
+    ) async {
+      Widget row(Image image) => Item(
+        children: [
+          ItemMedia(variant: ItemVariant.soft, child: image),
+          _content,
+        ],
+      );
+      await pump(tester, row(Image(image: HeldImage())));
+      expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.cover);
+      expect(
+        tester.getSize(find.byType(Image)),
+        tester.getSize(find.byType(ItemMedia)),
+      );
+
+      await pump(tester, row(Image(image: HeldImage(), fit: BoxFit.contain)));
+      expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.contain);
     });
 
     testWidgets('actions go to the end without content', (tester) async {

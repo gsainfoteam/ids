@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart' hide AspectRatio;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
+import 'test_image.dart';
 
 Future<void> pump(WidgetTester tester, Widget box, {double width = 200}) =>
     tester.pumpWidget(
@@ -56,5 +57,33 @@ void main() {
         ),
       );
     }
+  });
+
+  testWidgets('an image fills the box unless it says how to fit', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      AspectRatio(
+        child: Image(
+          image: HeldImage(),
+          alignment: Alignment.topLeft,
+          filterQuality: FilterQuality.high,
+        ),
+      ),
+    );
+    final image = tester.widget<Image>(find.byType(Image));
+    expect(image.fit, BoxFit.cover);
+    expect(image.alignment, Alignment.topLeft);
+    expect(image.filterQuality, FilterQuality.high);
+    expect(tester.getSize(find.byType(Image)), const Size(200, 200));
+
+    await pump(
+      tester,
+      AspectRatio(
+        child: Image(image: HeldImage(), fit: BoxFit.contain),
+      ),
+    );
+    expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.contain);
   });
 }
