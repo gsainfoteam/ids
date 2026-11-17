@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 
+import { flushSync } from 'react-dom';
 import { focusable } from 'tabbable';
 
 import {
@@ -133,7 +134,10 @@ export function QuestionnaireRoot({
     setStep(next);
   };
 
-  const advance = () => formRef.current?.requestSubmit();
+  const advance = () => {
+    flushSync(() => setDrafts(draftsRef.current));
+    formRef.current?.requestSubmit();
+  };
 
   const skip = () => {
     if (current === undefined) return;

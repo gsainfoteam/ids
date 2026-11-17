@@ -1,3 +1,4 @@
+import { fieldSurface } from '../../../internal/field-surface';
 import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -18,12 +19,17 @@ export const questionnaireStyle = tv({
     options: 'flex gap-2',
     toggles: 'flex-wrap [&>[data-toggle-group-item]]:flex-initial',
     option: [
-      'cursor-pointer items-start rounded-standard bg-surface shadow-xs',
+      fieldSurface.variant.outline,
+      'cursor-pointer items-start rounded-standard',
       'transition-[background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'dark:bg-neutral-soft/30 hover:bg-neutral-soft dark:hover:bg-neutral-soft',
+      'hover:bg-neutral-soft active:bg-neutral-soft-hover',
+      'dark:hover:bg-neutral-soft dark:active:bg-neutral-soft-hover',
       'has-checked:bg-neutral-soft has-checked:inset-ring-primary dark:has-checked:bg-neutral-soft',
+      'has-checked:hover:bg-neutral-soft-hover has-checked:active:bg-neutral-soft-active',
+      'dark:has-checked:hover:bg-neutral-soft-hover dark:has-checked:active:bg-neutral-soft-active',
       'has-disabled:cursor-not-allowed has-disabled:opacity-50',
-      'has-disabled:hover:bg-surface dark:has-disabled:hover:bg-neutral-soft/30',
+      'has-disabled:hover:bg-surface has-disabled:active:bg-surface',
+      'dark:has-disabled:hover:bg-neutral-soft/30 dark:has-disabled:active:bg-neutral-soft/30',
     ],
     indicator: 'flex h-[1lh] shrink-0 items-center',
     toggle: [

@@ -94,15 +94,25 @@ test('defaultValue puts listed values on the options and the rest in Other', asy
   expect(onComplete).toHaveBeenCalledWith({ tone: '반말로', topics: ['todo', '메모'] });
 });
 
-test('skipping the last optional question completes without its answer', async () => {
+test('skipping the last optional question completes and submits without its answer', async () => {
   const onComplete = vi.fn();
-  await render(twoQuestions({ onComplete, defaultValue: { tone: 'formal', topics: ['todo'] } }));
+  const submitted: FormData[] = [];
+  await render(
+    twoQuestions({
+      onComplete,
+      onSubmit: (event) => submitted.push(new FormData(event.currentTarget)),
+      defaultValue: { tone: 'formal', topics: ['todo'] },
+    }),
+  );
 
   await userEvent.click(button('다음'));
   await userEvent.click(button('건너뛰기'));
 
   expect(onComplete).toHaveBeenCalledOnce();
   expect(onComplete).toHaveBeenCalledWith({ tone: 'formal' });
+  expect(submitted).toHaveLength(1);
+  expect(submitted[0].get('tone')).toBe('formal');
+  expect(submitted[0].getAll('topics')).toEqual([]);
 });
 
 test('with advanceOnSelect a pick moves on, an arrow key only moves the choice', async () => {
