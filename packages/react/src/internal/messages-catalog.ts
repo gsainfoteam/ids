@@ -191,6 +191,15 @@ export const messages = {
     "searchPlaceholder": "명령 검색…",
     "submenu": "{label} 하위 메뉴"
   },
+  "message": {
+    "actions": "메시지 동작",
+    "copied": "복사했습니다",
+    "copy": "메시지 복사",
+    "error": "보내지 못했어요",
+    "pending": "보내는 중",
+    "read": "읽음",
+    "retry": "다시 보내기"
+  },
   "messageScroller": {
     "jump": "맨 아래로",
     "jumpUnseen": "맨 아래로, 새 메시지 {count}개",

@@ -281,6 +281,20 @@ mixin IdsMessages {
 
   String? menuSubmenu({required Object label}) => null;
 
+  String? get messageActions => null;
+
+  String? get messageCopied => null;
+
+  String? get messageCopy => null;
+
+  String? get messageError => null;
+
+  String? get messagePending => null;
+
+  String? get messageRead => null;
+
+  String? get messageRetry => null;
+
   String? get messageScrollerJump => null;
 
   String? messageScrollerJumpUnseen({required Object count}) => null;
@@ -882,6 +896,27 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String menuSubmenu({required Object label}) => '${_format(label)} 하위 메뉴';
+
+  @override
+  String get messageActions => '메시지 동작';
+
+  @override
+  String get messageCopied => '복사했습니다';
+
+  @override
+  String get messageCopy => '메시지 복사';
+
+  @override
+  String get messageError => '보내지 못했어요';
+
+  @override
+  String get messagePending => '보내는 중';
+
+  @override
+  String get messageRead => '읽음';
+
+  @override
+  String get messageRetry => '다시 보내기';
 
   @override
   String get messageScrollerJump => '맨 아래로';
