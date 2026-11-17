@@ -14,17 +14,54 @@ import 'components/item_usecase.dart';
 import 'components/label_usecase.dart';
 import 'components/skeleton_usecase.dart';
 import 'components/spinner_usecase.dart';
+import 'components/story_kit.dart';
 
 void main() {
   runApp(const WidgetbookApp());
 }
 
+final directories = [
+  WidgetbookFolder(name: 'Form', children: [docs('Field', fieldUseCases)]),
+  WidgetbookFolder(
+    name: 'Data',
+    children: [
+      docs('Avatar', avatarUseCases),
+      docs('AvatarGroup', avatarGroupUseCases),
+      docs('Badge', badgeUseCases),
+      docs('Card', cardUseCases),
+      docs('Empty', emptyUseCases),
+      docs('Item', itemUseCases),
+    ],
+  ),
+  WidgetbookFolder(
+    name: 'Feedback',
+    children: [
+      docs('Skeleton', skeletonUseCases),
+      docs('Spinner', spinnerUseCases),
+    ],
+  ),
+  WidgetbookFolder(
+    name: 'Layout',
+    children: [
+      docs('AspectRatio', aspectRatioUseCases),
+      docs('Divider', dividerUseCases),
+    ],
+  ),
+  WidgetbookFolder(
+    name: 'Typography',
+    children: [docs('Label', labelUseCases)],
+  ),
+];
+
 class WidgetbookApp extends StatelessWidget {
-  const WidgetbookApp({super.key});
+  const WidgetbookApp({super.key, this.initialRoute = '/'});
+
+  final String initialRoute;
 
   @override
   Widget build(BuildContext context) {
     return Widgetbook.material(
+      initialRoute: initialRoute,
       appBuilder: (context, child) => MaterialApp(
         theme: ThemeData(
           fontFamily: ids.IdsTypography.sansFontFamily,
@@ -32,20 +69,7 @@ class WidgetbookApp extends StatelessWidget {
         ),
         home: child,
       ),
-      directories: [
-        WidgetbookComponent(name: 'AspectRatio', useCases: aspectRatioUseCases),
-        WidgetbookComponent(name: 'Avatar', useCases: avatarUseCases),
-        WidgetbookComponent(name: 'AvatarGroup', useCases: avatarGroupUseCases),
-        WidgetbookComponent(name: 'Badge', useCases: badgeUseCases),
-        WidgetbookComponent(name: 'Card', useCases: cardUseCases),
-        WidgetbookComponent(name: 'Divider', useCases: dividerUseCases),
-        WidgetbookComponent(name: 'Empty', useCases: emptyUseCases),
-        WidgetbookComponent(name: 'Field', useCases: fieldUseCases),
-        WidgetbookComponent(name: 'Item', useCases: itemUseCases),
-        WidgetbookComponent(name: 'Label', useCases: labelUseCases),
-        WidgetbookComponent(name: 'Skeleton', useCases: skeletonUseCases),
-        WidgetbookComponent(name: 'Spinner', useCases: spinnerUseCases),
-      ],
+      directories: directories,
     );
   }
 }
