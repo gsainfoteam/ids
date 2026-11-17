@@ -429,7 +429,9 @@ derived from primary (`ids-provider/derived-brands.ts`), so the provider always 
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
 `border-neutral` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
-the theme color, while `outline` and `ghost` stay neutral. `border-neutral` is decorative and
+the theme color, while `outline` and `ghost` stay neutral. A current or selected mark is content,
+not chrome: the current Pagination page in `ghost` and the selected Tabs label take `text-X`.
+`border-neutral` is decorative and
 exempt from contrast. `border-primary` and every other family's `border-X`, for the rare edge that
 should itself read as that color, is the same step as `text-X`, so a line and the text beside it
 (an invalid field's border, its label and error message) are one color.

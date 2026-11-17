@@ -133,7 +133,7 @@ const [section, setSection] = useState<Section>('docs');
 | `onValueChange`          | 탭을 고를 때 새 값으로                                           |
 | `appearance`             | `underline`(기본) / `segmented` / `pill` / `enclosed`            |
 | `variant`                | `pill` 에서만. `soft`(기본) / `ghost` / `outline` / `solid` / `glossy` |
-| `colorScheme`            | `primary`(기본) / `secondary` / `tertiary`. 고른 탭의 글자, 선, 채움 |
+| `colorScheme`            | `primary`(기본) / `secondary` / `tertiary`. 고른 탭의 글자, 선, 채움. `segmented` 에서는 쓰지 않는다 |
 | `orientation`            | `horizontal`(기본) / `vertical`                                  |
 | `activationMode`         | `automatic`(기본) / `manual`                                     |
 | `loop`                   | `true`. 화살표가 끝에서 처음으로 돌아간다                        |
