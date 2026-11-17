@@ -18,7 +18,7 @@ const roundedGroups: DefaultClassGroupIds[] = [
 const config = {
   extend: {
     theme: {
-      radius: ['standard', 'indicator'],
+      radius: ['standard', 'indicator', 'container'],
     },
     classGroups: {
       'font-size': [{ text: [isTextStyle] }],
