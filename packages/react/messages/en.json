@@ -144,7 +144,9 @@
     "thumbnails": "Image list",
     "viewer": "Image viewer",
     "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out"
+    "zoomLevel": "{percent}%",
+    "zoomOut": "Zoom out",
+    "zoomReset": "{percent}%, fit to screen"
   },
   "input": {
     "clearSearch": "Clear search"

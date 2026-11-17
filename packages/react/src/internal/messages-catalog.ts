@@ -145,7 +145,9 @@ export const messages = {
     "thumbnails": "사진 목록",
     "viewer": "사진 보기",
     "zoomIn": "확대",
-    "zoomOut": "축소"
+    "zoomLevel": "{percent}%",
+    "zoomOut": "축소",
+    "zoomReset": "{percent}%, 화면에 맞추기"
   },
   "input": {
     "clearSearch": "검색어 지우기"
