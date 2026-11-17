@@ -121,7 +121,6 @@ import { theme } from './ids-theme';
 - `border-X` 는 따로 고르지 않고 `text-X` 와 같은 단계를 씁니다. 선과 그 옆 글자가 한 색이라, invalid 필드의 테두리(`border-danger`)와 라벨, 에러 문구(`text-danger`)가 같은 색입니다. `text-X` 가 Lc 60 을 넘으므로 선의 하한 Lc 45 도 넘습니다.
 - `border-neutral` 은 구조선이라 대비 규칙이 없습니다(neutral 200 / 800).
 - 결과는 Material 3 의 톤과 비슷합니다. soft 위 글자는 거의 950(M3 의 on-container, 톤 10), 다크 모드의 soft 위 글자는 200 언저리(톤 80)입니다.
-- Flutter 의 고정 표(`packages/flutter/lib/tokens`)는 이 규칙을 따르지 않고 예전 WCAG 표 그대로입니다. Flutter 가 런타임 팔레트를 받으면(#33) 맞춥니다.
 
 ### secondary 와 tertiary
 
