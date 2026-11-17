@@ -77,7 +77,7 @@ export function DataTableColumnHeader<TData extends RowData>({ header }: ColumnH
   const sortable = !header.isPlaceholder && column.getCanSort();
   const resizable = !header.isPlaceholder && column.getCanResize();
   const content = header.isPlaceholder ? null : (
-    <span className={styles.label()}>
+    <span className={styles.label({ align })}>
       <FlexRender header={header} />
     </span>
   );

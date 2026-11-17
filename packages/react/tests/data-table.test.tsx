@@ -210,6 +210,26 @@ test('row selection: named checkboxes, a mixed select-all, Shift ranges and the 
   expect(onRowSelectionChange).toHaveBeenLastCalledWith({});
 });
 
+test('a selection checkbox sits on the same center line as the text beside it', async () => {
+  const screen = await render(table({ enableRowSelection: true, enableSorting: false }));
+  const centerOf = (rect: DOMRect) => rect.top + rect.height / 2;
+  const textCenter = (cell: Element) => {
+    const range = document.createRange();
+    range.selectNodeContents(cell.querySelector('span') ?? cell);
+    return centerOf(range.getBoundingClientRect());
+  };
+
+  await expect.element(screen.getByRole('row', { name: /Ada/ })).toBeInTheDocument();
+  for (const row of [
+    screen.getByRole('row').first().element(),
+    screen.getByRole('row', { name: /Ada/ }).element(),
+  ]) {
+    const [selectCell, nameCell] = row.children;
+    const checkbox = selectCell.querySelector('[data-checkbox]')!;
+    expect(centerOf(checkbox.getBoundingClientRect())).toBeCloseTo(textCenter(nameCell), 0);
+  }
+});
+
 test('a row that cannot be selected keeps a disabled checkbox; without a label rows are numbered', async () => {
   const screen = await render(
     table({ getRowLabel: undefined, enableRowSelection: (row) => row.original.age < 80 }),

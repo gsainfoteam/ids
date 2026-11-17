@@ -18,7 +18,7 @@ export const dataTableStyle = tv({
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2',
     ],
-    label: 'inline-flex min-w-0 items-center gap-1.5 [&_svg]:size-4 [&_svg]:shrink-0',
+    label: 'flex min-w-0 items-center gap-1.5 [&_svg]:size-4 [&_svg]:shrink-0',
     sortIcon: [
       'pointer-events-none size-4 shrink-0 text-neutral opacity-0',
       'transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',
@@ -35,7 +35,7 @@ export const dataTableStyle = tv({
       'hover:before:bg-neutral-hover focus-visible:before:bg-neutral-active',
       'data-resizing:before:bg-neutral-active',
     ],
-    selectCell: 'w-0 whitespace-nowrap',
+    selectCell: 'w-0 whitespace-nowrap [&>[data-checkbox]]:flex',
     message: 'h-24 text-center text-neutral',
     overlay: 'absolute inset-0 z-20 flex items-center justify-center bg-surface/60',
     spinner: 'size-6 text-neutral',
@@ -80,8 +80,8 @@ export const dataTableStyle = tv({
     } satisfies Record<IdsSize, object>,
     align: {
       start: {},
-      center: { sortButton: 'justify-center' },
-      end: { sortButton: 'flex-row-reverse' },
+      center: { sortButton: 'justify-center', label: 'justify-center' },
+      end: { sortButton: 'flex-row-reverse', label: 'justify-end' },
     } satisfies Record<TableAlign, object>,
     loading: {
       true: { frame: 'pointer-events-none' },
