@@ -19,6 +19,15 @@ const on = (day: number) => new CalendarDate(2026, 11, day);
 
 const NOW = at(17, 10, 30);
 
+const WALL_CLOCK = 'UTC';
+const weekRange = (from: CalendarDate, to: CalendarDate, locale = 'ko-KR') =>
+  new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: WALL_CLOCK,
+  }).formatRange(from.toDate(WALL_CLOCK), to.toDate(WALL_CLOCK));
+
 const EVENTS: Scheduler.EventData[] = [
   { id: 'algo', title: 'Algorithms', start: at(17, 9), end: at(17, 10, 30) },
   { id: 'room', title: 'Study room', start: at(17, 10), end: at(17, 12) },
@@ -141,7 +150,7 @@ test('keyboard: Tab walks the toolbar and the event buttons in day and time orde
     '이전 주',
     '오늘',
     '다음 주',
-    '2026년 11월 15일 ~ 21일',
+    weekRange(on(15), on(21)),
     '주',
     'Festival',
     'Festival',
@@ -160,13 +169,13 @@ test('keyboard: Tab walks the toolbar and the event buttons in day and time orde
   await expect
     .element(screen.getByRole('region', { name: '2026년 11월 24일 화요일' }))
     .toBeInTheDocument();
-  await expect.element(screen.getByRole('status')).toHaveTextContent('2026년 11월 22일 ~ 28일');
+  await expect.element(screen.getByRole('status')).toHaveTextContent(weekRange(on(22), on(28)));
 });
 
 test('keyboard: the date button opens a calendar on the shown date, and Escape hands focus back', async () => {
   const onDateChange = vi.fn();
   const screen = await render(inProvider({ onDateChange }));
-  const trigger = screen.getByRole('button', { name: '2026년 11월 15일 ~ 21일' });
+  const trigger = screen.getByRole('button', { name: weekRange(on(15), on(21)) });
 
   await userEvent.click(trigger);
   await expect
@@ -184,13 +193,13 @@ test('keyboard: the date button opens a calendar on the shown date, and Escape h
   expect(onDateChange).toHaveBeenLastCalledWith(on(22));
   await expect.poll(() => document.querySelector('[data-calendar]')).toBeNull();
   await expect
-    .element(screen.getByRole('button', { name: '2026년 11월 22일 ~ 28일' }))
+    .element(screen.getByRole('button', { name: weekRange(on(22), on(28)) }))
     .toBeInTheDocument();
 });
 
 test('axe finds nothing with the date picker open', async () => {
   const screen = await render(inProvider({}));
-  await userEvent.click(screen.getByRole('button', { name: '2026년 11월 15일 ~ 21일' }));
+  await userEvent.click(screen.getByRole('button', { name: weekRange(on(15), on(21)) }));
   await expect.poll(() => document.querySelector('[data-calendar]')).not.toBeNull();
 
   const { violations } = await axe.run(
@@ -246,10 +255,24 @@ test('locale names the days and times, and picks the first weekday', () => {
   expect(doc.querySelector('[data-scheduler-day]')!.getAttribute('data-scheduler-day')).toBe(
     '2026-11-16',
   );
-  expect(doc.querySelector('[data-scheduler-range]')!.textContent).toBe('16.–22. November 2026');
-  expect(doc.querySelector('[data-scheduler-event="algo"] time')!.textContent).toBe('9:00');
+  expect(doc.querySelector('[data-scheduler-range]')!.textContent).toBe(
+    weekRange(on(16), on(22), 'de-DE'),
+  );
+  expect(doc.querySelector('[data-scheduler-event="algo"] time')!.textContent).toBe(
+    new Intl.DateTimeFormat('de-DE', {
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZone: WALL_CLOCK,
+    }).format(at(17, 9).toDate(WALL_CLOCK)),
+  );
   const english = parse(renderToString(inProvider({ locale: 'en-US', defaultView: 'day' })));
   expect(english.querySelector('[data-scheduler-range]')!.textContent).toBe(
-    'Tue, November 17, 2026',
+    new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short',
+      timeZone: WALL_CLOCK,
+    }).format(on(17).toDate(WALL_CLOCK)),
   );
 });

@@ -18,6 +18,15 @@ const on = (day: number) => new CalendarDate(2026, 11, day);
 const NOW = at(17, 10, 30);
 const TODAY = on(17);
 
+const WALL_CLOCK = 'UTC';
+const weekRange = (from: CalendarDate, to: CalendarDate, locale = 'ko-KR') =>
+  new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: WALL_CLOCK,
+  }).formatRange(from.toDate(WALL_CLOCK), to.toDate(WALL_CLOCK));
+
 const EVENTS: Scheduler.EventData[] = [
   { id: 'standup', title: '팀 회의', start: at(16, 9), end: at(16, 9, 30) },
   { id: 'algo', title: '알고리즘', start: at(17, 9), end: at(17, 10, 30) },
@@ -213,12 +222,12 @@ export const Navigation: Story = {
       '2026-11-20',
       '2026-11-21',
     ]);
-    await expect(range(canvasElement)).toHaveTextContent('2026년 11월 15일 ~ 21일');
+    await expect(range(canvasElement)).toHaveTextContent(weekRange(on(15), on(21)));
 
     await userEvent.click(canvas.getByRole('button', { name: '다음 주' }));
     await expect(args.onDateChange).toHaveBeenLastCalledWith(on(24));
-    await expect(range(canvasElement)).toHaveTextContent('2026년 11월 22일 ~ 28일');
-    await expect(canvas.getByRole('status')).toHaveTextContent('2026년 11월 22일 ~ 28일');
+    await expect(range(canvasElement)).toHaveTextContent(weekRange(on(22), on(28)));
+    await expect(canvas.getByRole('status')).toHaveTextContent(weekRange(on(22), on(28)));
 
     await userEvent.click(canvas.getByRole('button', { name: '오늘' }));
     await expect(args.onDateChange).toHaveBeenLastCalledWith(TODAY);
@@ -413,7 +422,7 @@ export const Locale: Story = {
     },
   },
   play: async ({ canvas, canvasElement }) => {
-    await expect(range(canvasElement)).toHaveTextContent('November 15 – 21, 2026');
+    await expect(range(canvasElement)).toHaveTextContent(weekRange(on(15), on(21), 'en-US'));
     await expect(
       canvas.getByRole('region', { name: /Tuesday, November 17, 2026/ }),
     ).toHaveAttribute('data-scheduler-column', '2026-11-17');
