@@ -97,6 +97,23 @@ test('align picks the side for the Bubble it draws, and a Bubble placed by the a
   ).toBe('start');
 });
 
+test('a plain message has no align, and ignores the one its group hands out', () => {
+  const doc = parse(
+    <>
+      {/* @ts-expect-error a plain message is drawn at full width and takes no align */}
+      <Message shape="plain" align="end">
+        넓은 답
+      </Message>
+      <Message.Group align="end">
+        <Message shape="plain">묶음 안의 넓은 답</Message>
+      </Message.Group>
+    </>,
+  );
+  const [direct, grouped] = articles(doc);
+  expect(direct!.dataset.align).toBe('start');
+  expect(grouped!.dataset.align).toBe('start');
+});
+
 test('the end column pushes the content to the end', async () => {
   const screen = await render(
     withProvider(

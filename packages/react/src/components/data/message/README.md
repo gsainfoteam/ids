@@ -63,7 +63,6 @@ import { Bubble, Marker, Message } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Message align="end">요약해 줘</Message>                 {/* 끝에 붙고 <Bubble align="end"> 로 감싼다 */}
-<Message shape="plain" align="end">…</Message>         {/* 끝에 붙고, 말풍선 없이 그린다 */}
 <Message shape="plain">…</Message>                      {/* AI 답이든 내 말이든 폭 그대로 */}
 
 <Message align="end">
@@ -72,6 +71,7 @@ import { Bubble, Marker, Message } from '@gsainfoteam/ids-react';
 ```
 
 - `align="end"` 면 아바타가 끝 쪽에 서고, 내용 열이 끝으로 붙습니다.
+- `align` 은 `shape="bubble"` 일 때만 받습니다. `plain` 은 폭 그대로 그려 붙을 쪽이 없으므로 타입에서 `align` 을 막고(`never`), 늘 `start` 입니다. 묶음이 주는 `align` 도 따르지 않습니다.
 - `shape="bubble"` 이면 본문을 저절로 감쌉니다. 본문에 Bubble 이 이미 있으면 감싸지 않습니다. `plain` 이어도 본문에 직접 둔 Bubble 은 말풍선으로 다룹니다(옆 줄, 상태 모양).
 - 저절로 감쌀 때는 Bubble 에 Message 의 `align` 을 넘기고, variant 는 Bubble 의 기본 `soft` 입니다.
 - Bubble 은 Message 안에 있는지 살피지 않습니다. 직접 둔 Bubble 의 꼬리는 앱이 `align` 으로 정합니다.

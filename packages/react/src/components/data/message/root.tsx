@@ -94,7 +94,7 @@ export function MessageRoot({
   const contentRef = useRef<HTMLDivElement>(null);
   const readContent = useCallback(() => contentRef.current?.innerText ?? '', []);
 
-  const align = alignProp ?? group?.align ?? 'start';
+  const align = shape === 'plain' ? 'start' : (alignProp ?? group?.align ?? 'start');
   const first = group?.first ?? true;
   const last = group?.last ?? true;
   const { body, part } = splitParts(children);

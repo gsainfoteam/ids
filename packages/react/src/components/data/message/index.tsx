@@ -19,18 +19,20 @@ export namespace Message {
   export type Align = MessageAlign;
   export type Status = MessageStatus;
 
-  export type Props = Omit<ComponentProps<'article'>, 'children'> & {
-    shape?: MessageShape;
-    align?: MessageAlign;
-    name?: string;
-    avatar?: string | ReactNode;
-    time?: Date;
-    locale?: string;
-    status?: MessageStatus;
-    unread?: number | boolean;
-    onRetry?: () => void;
-    children?: ReactNode;
-  };
+  export type Props = Omit<ComponentProps<'article'>, 'children'> &
+    (
+      | { shape?: Extract<MessageShape, 'bubble'>; align?: MessageAlign }
+      | { shape: Extract<MessageShape, 'plain'>; align?: never }
+    ) & {
+      name?: string;
+      avatar?: string | ReactNode;
+      time?: Date;
+      locale?: string;
+      status?: MessageStatus;
+      unread?: number | boolean;
+      onRetry?: () => void;
+      children?: ReactNode;
+    };
 
   export type AvatarProps = MessageAvatarProps;
   export type HeaderProps = MessageHeaderProps;
