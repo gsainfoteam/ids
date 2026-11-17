@@ -1191,7 +1191,7 @@ export const toggleStyle = tv({
 
 - 색은 [control-surface.ts](#control-surfacets) 의 scheme 변수에서 옵니다.
 - `transparent` 는 `glyphVariant` 에만 있습니다. 글자 Toggle 이 배경 없이 색만 바꾸면 켜짐을 색으로만 알리게 됩니다. IconToggle 은 `icon` 함수로 채운 아이콘을 바꿀 수 있습니다.
-- 꺼진 `transparent` 는 scheme 과 상관없이 `text-on-surface` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered) 올리거나 눌러 끌 때는 불투명도가 바뀌지 않습니다.
+- 꺼진 `transparent` 는 scheme 과 상관없이 `text-on-surface` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered), `transparent` 는 `useToggle` 이 켜진 동안에만 붙이는 `data-pressed-hovered`, `data-pressed-active` 로 불투명도를 내립니다. 다른 variant 는 이 속성을 읽지 않으므로 켜진 모양이 hover 와 press 에도 그대로입니다.
 - 켜진 `ghost`, `outline` 의 글자는 `--control-on-press` 입니다. 브랜드와 neutral scheme 은 press 배경이 중립이라 `on-surface`, 상태 scheme 은 press 배경이 `bg-X-soft-hover` 라 `text-on-X-soft` 입니다. `text-X` 는 바탕과 `bg-X-soft` 에서만 Lc 60 이 보장되므로, 밝은 warning 은 soft-hover 위에서 모자랍니다.
 - 켜진 `glossy` 는 control-surface 의 `glossy` 층을 `data-pressed:` 로 하나씩 풀어 적습니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 접두사를 붙여 조합할 수 없습니다.
 - 크기는 따로 두지 않습니다. 라벨이 있는 Toggle 은 Button 과 같은 padding 을 갖고, IconToggle 은 icon-square 로 정사각형이 됩니다.

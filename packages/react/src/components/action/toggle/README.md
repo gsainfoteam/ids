@@ -78,6 +78,7 @@ import { Toggle } from '@gsainfoteam/ids-react';
 | `disabled`     | `data-disabled`      | 비활성               |
 
 - 켜진 토글에는 `data-hovered` 와 `data-active` 가 붙지 않습니다. 켜진 배경이 hover 배경과 다투지 않게 하기 위해서입니다.
+- 켜진 동안 올리거나 누르면 `data-pressed-hovered`, `data-pressed-active` 가 붙습니다. `data-hovered`, `data-active` 는 켜진 동안 붙지 않습니다.
 - 루트에는 `data-variant`, `data-size` 가 붙고, `ToggleGroup` 안에서는 `data-value` 도 붙습니다.
 
 ## 키보드

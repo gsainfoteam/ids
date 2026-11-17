@@ -43,6 +43,7 @@ export const toggleSurface = {
       'transition-[color,background-color,border-color,box-shadow,opacity]',
       'data-hovered:opacity-70 data-active:opacity-40',
       'data-pressed:text-(--control-glyph-on)',
+      'data-pressed-hovered:opacity-70 data-pressed-active:opacity-40',
     ),
   } satisfies Record<IdsVariant, string>,
 } as const;

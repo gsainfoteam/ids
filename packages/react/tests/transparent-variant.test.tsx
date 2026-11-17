@@ -158,11 +158,73 @@ test('a transparent IconToggle turns on by coloring only its glyph', async () =>
     opacity: '1',
   });
 
-  await userEvent.hover(toggle);
-  await expect.element(toggle).not.toHaveAttribute('data-hovered');
-  expect(paint(element).opacity).toBe('1');
   await userEvent.hover(screen.getByText('Elsewhere'));
 });
+
+test('an on transparent IconToggle still fades on hover and on the press that turns it off', async () => {
+  const { screen, token } = await renderInTheme(
+    <IconToggle
+      aria-label="좋아요"
+      variant="transparent"
+      colorScheme="danger"
+      defaultPressed
+      icon={(state) =>
+        state.pressed ? <HeartSolidIcon data-glyph="filled" /> : <HeartIcon data-glyph="outline" />
+      }
+    />,
+  );
+  const toggle = screen.getByRole('button', { name: '좋아요' });
+  await expect.element(toggle).toHaveAttribute('data-pressed');
+  const element = toggle.element();
+  const onLook = { background: NO_BACKGROUND, color: token('--ids-color-text-danger') };
+  expect(paint(element)).toMatchObject({ ...onLook, opacity: '1' });
+
+  await userEvent.hover(toggle);
+  await expect.element(toggle).toHaveAttribute('data-pressed-hovered');
+  await expect.element(toggle).not.toHaveAttribute('data-hovered');
+  expect(paint(element)).toMatchObject({ ...onLook, opacity: HOVER_OPACITY });
+
+  (element as HTMLElement).focus();
+  await userEvent.keyboard('[Space>]');
+  await expect.element(toggle).toHaveAttribute('data-pressed-active');
+  await expect.element(toggle).toHaveAttribute('aria-pressed', 'true');
+  expect(paint(element)).toMatchObject({ ...onLook, opacity: PRESS_OPACITY });
+  await userEvent.keyboard('[/Space]');
+
+  await expect.element(toggle).toHaveAttribute('aria-pressed', 'false');
+  await expect.element(toggle).not.toHaveAttribute('data-pressed-hovered');
+  await expect.element(toggle).not.toHaveAttribute('data-pressed-active');
+  expect(element.querySelector('svg')!.dataset.glyph).toBe('outline');
+  await userEvent.hover(screen.getByText('Elsewhere'));
+});
+
+test.each(['ghost', 'outline', 'soft', 'solid', 'glossy'] as const)(
+  'an on %s IconToggle keeps its on look and full opacity on hover and press',
+  async (variant) => {
+    const { screen } = await renderInTheme(
+      <IconToggle variant={variant} defaultPressed icon={<HeartIcon />} aria-label="좋아요" />,
+    );
+    const toggle = screen.getByRole('button', { name: '좋아요' });
+    await expect.element(toggle).toHaveAttribute('data-pressed');
+    const element = toggle.element();
+    const rest = paint(element);
+
+    await userEvent.hover(toggle);
+    await expect.element(toggle).toHaveAttribute('data-pressed-hovered');
+    expect(paint(element)).toEqual(rest);
+
+    (element as HTMLElement).focus();
+    await userEvent.keyboard('[Space>]');
+    await expect.element(toggle).toHaveAttribute('data-pressed-active');
+    const { shadow: _focusRing, ...held } = paint(element);
+    const { shadow: _restShadow, ...unheld } = rest;
+    expect(held).toEqual(unheld);
+    await userEvent.keyboard('[/Space]');
+
+    (element as HTMLElement).blur();
+    await userEvent.hover(screen.getByText('Elsewhere'));
+  },
+);
 
 test('SSR: a transparent IconToggle names its variant and keeps the 36px and 32px squares', () => {
   const html = renderToString(

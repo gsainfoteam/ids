@@ -82,8 +82,15 @@ export function useToggle<P extends ToggleOwnProps>(props: P, name: string) {
   );
 
   const single = group?.selectionMode === 'single';
+  const heldWhilePressed = pressed && button.state.active;
+  const hoveredWhilePressed = pressed && button.state.hovered && !button.state.active;
+  const feedbackWhilePressed = {
+    'data-pressed-active': heldWhilePressed ? '' : undefined,
+    'data-pressed-hovered': hoveredWhilePressed ? '' : undefined,
+  };
   const toggleProps = group
     ? {
+        ...feedbackWhilePressed,
         role: single ? 'radio' : undefined,
         'aria-checked': single ? pressed : undefined,
         'aria-pressed': single ? undefined : pressed,
@@ -92,7 +99,7 @@ export function useToggle<P extends ToggleOwnProps>(props: P, name: string) {
         'data-toggle-group-item': group.id,
         'data-value': item,
       }
-    : { 'aria-pressed': pressed, 'data-value': value };
+    : { ...feedbackWhilePressed, 'aria-pressed': pressed, 'data-value': value };
 
   const { value: _value, ...rest } = button.props as typeof button.props & { value?: string };
   return { ...button, props: rest, pressed, toggleProps };
