@@ -61,6 +61,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | `Count`                                                | `maxLength` 에 대한 글자 수. TextArea.Count 와 같습니다           |
 
 - 도구는 `icon` 과 `aria-label` 로 아이콘과 이름을 바꿀 수 있습니다.
+- 위아래 바는 줄을 바꾸지 않습니다. 필드보다 넓으면 [ScrollArea](../../layout/scroll-area/README.md) 로 가로 스크롤하고, 더 남은 쪽 가장자리를 흐립니다. 키보드로 옮긴 도구는 보이는 자리까지 스크롤됩니다.
 - 마우스로 도구를 눌러도 포커스는 본문에 남습니다. 키보드로는 Tab 이 툴바의 한 도구에 닿고, 화살표로 도구 사이를 옮깁니다.
 
 ## 키

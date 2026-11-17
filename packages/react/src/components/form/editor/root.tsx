@@ -44,7 +44,7 @@ import { useControllableState } from '../../../hooks/use-controllable-state';
 import { useFormReset } from '../../../hooks/use-form-reset';
 import { FormValue } from '../../../internal/form-value';
 import { useTranslate } from '../../../internal/translate';
-import { cn, elementTypeOf, flattenFragments, invariant } from '../../../utils';
+import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { FieldNotifyContext, useFieldSize } from '../field/context';
 
 import type { Editor } from '.';
@@ -322,7 +322,7 @@ export function EditorRoot(props: Editor.Props) {
         style={typeof style === 'function' ? style(state) : style}
       >
         {top.length > 0 && (
-          <EditorBar toolbar className={styles.bar({ position: 'top' })}>
+          <EditorBar toolbar scrolls className={styles.bar({ position: 'top' })}>
             {top}
           </EditorBar>
         )}
@@ -330,7 +330,8 @@ export function EditorRoot(props: Editor.Props) {
         {bottom.length > 0 && (
           <EditorBar
             toolbar={bottom.some(isTool)}
-            className={cn(styles.bar({ position: 'bottom' }))}
+            scrolls
+            className={styles.bar({ position: 'bottom' })}
           >
             {bottom}
           </EditorBar>

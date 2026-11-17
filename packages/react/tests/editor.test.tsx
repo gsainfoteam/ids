@@ -112,6 +112,33 @@ test('the toolbar is one Tab stop and arrows move between its tools', async () =
   await expect.element(page.getByRole('textbox', { name: '본문' })).toHaveFocus();
 });
 
+test('a toolbar wider than the field stays one row and scrolls to the focused tool', async () => {
+  render(
+    <div style={{ width: 200 }}>
+      <Editor aria-label="본문" />
+    </div>,
+  );
+  await editable('본문');
+  const toolbar = page.getByRole('toolbar', { name: '서식' });
+  const bold = page.getByRole('button', { name: '굵게' });
+  const codeBlock = page.getByRole('button', { name: '코드 블록' });
+  const scroller = () =>
+    toolbar.element().querySelector<HTMLElement>('[data-scroll-area-viewport]')!;
+
+  await expect.element(codeBlock).toBeInTheDocument();
+  expect(codeBlock.element().getBoundingClientRect().top).toBe(
+    bold.element().getBoundingClientRect().top,
+  );
+  expect(scroller().scrollWidth).toBeGreaterThan(scroller().clientWidth);
+  expect(scroller().scrollLeft).toBe(0);
+
+  await userEvent.click(page.getByRole('textbox', { name: '본문' }));
+  await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
+  await userEvent.keyboard('{End}');
+  await expect.element(codeBlock).toHaveFocus();
+  await expect.poll(() => scroller().scrollLeft).toBeGreaterThan(0);
+});
+
 test('the block type select turns the paragraph into a heading', async () => {
   const onValueChange = vi.fn();
   render(

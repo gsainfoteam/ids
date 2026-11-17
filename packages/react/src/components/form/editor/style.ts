@@ -38,7 +38,8 @@ export const editorStyle = tv({
       'relative flex w-full min-w-0 cursor-text flex-col overflow-hidden rounded-standard',
       fieldSurface.base,
     ],
-    bar: ['flex shrink-0 flex-wrap items-center border-neutral empty:hidden', 'text-neutral'],
+    bar: 'shrink-0 border-neutral text-neutral',
+    barItems: 'flex items-center gap-0.5',
     separator: 'mx-0.5 h-5 self-center',
     blockType: [
       'w-auto shrink-0 rounded-standard text-on-surface',
@@ -71,13 +72,13 @@ export const editorStyle = tv({
     size: {
       standard: {
         root: 'text-body-b3-regular',
-        bar: 'gap-0.5 p-1',
+        barItems: 'p-1',
         content: 'px-3 py-2',
         count: 'px-2 text-caption-c1-regular',
       },
       tiny: {
         root: 'text-caption-c1-regular',
-        bar: 'gap-0.5 p-0.5',
+        barItems: 'p-0.5',
         content: 'px-2 py-1.5',
         count: 'px-1.5 text-caption-c2-regular',
       },
