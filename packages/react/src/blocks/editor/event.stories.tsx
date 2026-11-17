@@ -8,11 +8,11 @@ import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
 import { toast } from '../../components/feedback/toast';
 import { DateField } from '../../components/form/date-field';
+import { Editor } from '../../components/form/editor';
 import { Field } from '../../components/form/field';
 import { NumberField } from '../../components/form/number-field';
 import { Select } from '../../components/form/select';
 import { Switch } from '../../components/form/switch';
-import { TextArea } from '../../components/form/text-area';
 import { TextField } from '../../components/form/text-field';
 import { TimeField } from '../../components/form/time-field';
 import { Label } from '../../components/typography/label';
@@ -75,15 +75,20 @@ export const PC: Story = {
               </Field>
               <Field>
                 <Field.Label>소개</Field.Label>
-                <TextArea
+                <Editor
                   name="description"
-                  rows={3}
+                  format="markdown"
                   maxLength={300}
-                  defaultValue="동아리 부스, 푸드트럭, 저녁 공연까지. 이틀 동안 광장이 축제가 돼요."
+                  defaultValue="동아리 부스, 푸드트럭, 저녁 공연까지. 이틀 동안 광장이 **축제**가 돼요."
                 >
-                  <TextArea.Input />
-                  <TextArea.Count />
-                </TextArea>
+                  <Editor.Bold />
+                  <Editor.Italic />
+                  <Editor.Link />
+                  <Editor.Separator />
+                  <Editor.BulletList />
+                  <Editor.Content />
+                  <Editor.Count />
+                </Editor>
               </Field>
               <div className="grid items-start gap-4 sm:grid-cols-2">
                 <Field>
