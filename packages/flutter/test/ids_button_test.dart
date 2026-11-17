@@ -26,6 +26,35 @@ Future<void> pumpButton(
 void press() {}
 
 void main() {
+  testWidgets('icon button keeps square sizing and exposes one named action', (
+    tester,
+  ) async {
+    var presses = 0;
+    for (final (size, side, glyph) in [
+      (IdsSize.standard, 36.0, 16.0),
+      (IdsSize.tiny, 32.0, 14.0),
+    ]) {
+      await pumpButton(
+        tester,
+        IdsIconButton(
+          size: size,
+          icon: const Icon(Icons.add, semanticLabel: 'Glyph'),
+          semanticLabel: 'Add item',
+          onPressed: () => presses++,
+        ),
+      );
+      await tester.pumpAndSettle();
+      final button = find.byType(IdsIconButton);
+      expect(tester.getSize(button), Size.square(side));
+      expect(tester.getSize(find.byIcon(Icons.add)), Size.square(glyph));
+      final semantics = tester.getSemantics(button).getSemanticsData();
+      expect(semantics.label, 'Add item');
+      expect(semantics.hasAction(SemanticsAction.tap), isTrue);
+      await tester.tap(button);
+    }
+    expect(presses, 2);
+  });
+
   testWidgets('sizes the label, icon and padding from the selected size', (
     tester,
   ) async {
