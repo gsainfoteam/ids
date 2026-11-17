@@ -28,7 +28,7 @@ class Field extends StatelessWidget {
 
   static Field _of(BuildContext context, String part) {
     final field = maybeOf(context);
-    assert(field != null, '$part must be rendered inside an Field.');
+    assert(field != null, '$part must be rendered inside a Field.');
     return field!;
   }
 

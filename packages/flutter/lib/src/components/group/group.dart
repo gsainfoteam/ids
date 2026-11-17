@@ -52,7 +52,7 @@ class GroupSeparator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final group = Group.maybeOf(context);
-    assert(group != null, 'GroupSeparator must be rendered inside an Group.');
+    assert(group != null, 'GroupSeparator must be rendered inside a Group.');
     return Divider(
       orientation: group!.orientation == Axis.horizontal
           ? Axis.vertical
