@@ -46,7 +46,15 @@ export const tabsStyle = tv({
         trigger: [
           'rounded-standard',
           'after:pointer-events-none after:absolute after:bg-transparent',
-          'aria-selected:after:bg-(--control-ring)',
+          'aria-selected:text-(--control-glyph-on) aria-selected:after:bg-(--control-ring)',
+        ],
+      },
+      segmented: {
+        list: 'concentric-p-1 gap-0.5 bg-neutral-soft',
+        trigger: [
+          'rounded-standard',
+          'aria-selected:bg-surface aria-selected:shadow-xs',
+          'dark:aria-selected:bg-neutral-soft-hover',
         ],
       },
       pill: {
@@ -58,7 +66,10 @@ export const tabsStyle = tv({
         ],
       },
       enclosed: {
-        trigger: 'border border-transparent aria-selected:border-neutral aria-selected:bg-surface',
+        trigger: [
+          'border border-transparent aria-selected:border-neutral aria-selected:bg-surface',
+          'aria-selected:text-(--control-glyph-on)',
+        ],
       },
     } satisfies Record<TabsAppearance, object>,
     variant: {
@@ -104,6 +115,17 @@ export const tabsStyle = tv({
         list: 'border-e border-neutral',
         trigger: 'after:inset-y-0 after:-end-px after:w-0.5 after:rounded-full',
       },
+    },
+    { appearance: 'segmented', stretch: false, class: { list: 'self-start' } },
+    {
+      appearance: 'segmented',
+      size: 'standard',
+      class: { trigger: 'h-[calc(var(--ids-size-control-standard)-0.5rem)]' },
+    },
+    {
+      appearance: 'segmented',
+      size: 'tiny',
+      class: { trigger: 'h-[calc(var(--ids-size-control-tiny)-0.5rem)]' },
     },
     {
       appearance: 'enclosed',

@@ -5,7 +5,8 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Tabs } from '../src';
+import { IdsProvider, Tabs } from '../src';
+import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -343,4 +344,76 @@ test('a stretched list shares its width between horizontal tabs', async () => {
     .map((tab) => tab.getBoundingClientRect().width);
   expect(widths[0]).toBeCloseTo(widths[1]!, 0);
   expect(widths[0]! + widths[1]!).toBeCloseTo(list.width, 0);
+});
+
+function colorOf(variable: string, root = document.querySelector('[data-mode]')!) {
+  const probe = document.createElement('div');
+  probe.style.backgroundColor = `var(${variable})`;
+  root.append(probe);
+  const color = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  return color;
+}
+
+function lengthOf(variable: string) {
+  const probe = document.createElement('div');
+  probe.style.height = `var(${variable})`;
+  document.querySelector('[data-mode]')!.append(probe);
+  const height = probe.getBoundingClientRect().height;
+  probe.remove();
+  return height;
+}
+
+test('underline draws the selected label and its line in primary', async () => {
+  await render(<IdsProvider theme={testTheme}>{tabs({ defaultValue: 'b' })}</IdsProvider>);
+  await expect.element(tab('b')).toHaveAttribute('aria-selected', 'true');
+
+  const selected = tab('b').element();
+  await expect
+    .poll(() => getComputedStyle(selected).color)
+    .toBe(colorOf('--ids-color-text-primary'));
+  expect(getComputedStyle(selected, '::after').backgroundColor).toBe(
+    colorOf('--ids-color-border-primary'),
+  );
+  expect(getComputedStyle(tab('a').element()).color).not.toBe(colorOf('--ids-color-text-primary'));
+});
+
+test('segmented sets the selected tab as a surface card on a neutral track as tall as a control', async () => {
+  await render(
+    <IdsProvider theme={testTheme}>
+      {tabs({ defaultValue: 'b', appearance: 'segmented' })}
+    </IdsProvider>,
+  );
+  await expect.element(tab('b')).toHaveAttribute('aria-selected', 'true');
+
+  const list = page.getByRole('tablist').element();
+  const selected = tab('b').element();
+  expect(getComputedStyle(list).backgroundColor).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  await expect
+    .poll(() => getComputedStyle(selected).backgroundColor)
+    .toBe(colorOf('--ids-color-surface'));
+  expect(getComputedStyle(selected).boxShadow).not.toBe('none');
+  expect(getComputedStyle(selected).color).toBe(colorOf('--ids-color-on-surface'));
+  expect(getComputedStyle(tab('a').element()).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+  expect(list.getBoundingClientRect().height).toBeCloseTo(
+    lengthOf('--ids-size-control-standard'),
+    0,
+  );
+  expect(list.getBoundingClientRect().width).toBeLessThan(
+    list.parentElement!.getBoundingClientRect().width,
+  );
+});
+
+test('segmented lifts the selected card one neutral step above the track in dark mode', async () => {
+  await render(
+    <IdsProvider theme={testTheme} mode="dark">
+      {tabs({ defaultValue: 'a', appearance: 'segmented' })}
+    </IdsProvider>,
+  );
+  await expect.element(tab('a')).toHaveAttribute('aria-selected', 'true');
+
+  const root = document.querySelector('[data-mode="dark"]')!;
+  await expect
+    .poll(() => getComputedStyle(tab('a').element()).backgroundColor)
+    .toBe(colorOf('--ids-color-bg-neutral-soft-hover', root));
 });

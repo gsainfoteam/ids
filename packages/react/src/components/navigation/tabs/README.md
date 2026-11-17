@@ -6,7 +6,7 @@
 - **키보드 한 번에 한 칸.** 탭 목록 전체가 Tab 한 칸이고 고른 탭에 멈춥니다. 안에서는 화살표, Home, End 로 옮기고, 끝에서 처음으로 돌아가며, 비활성 탭은 건너뜁니다.
 - **자동과 수동.** 기본은 화살표로 옮기면 바로 고릅니다. `activationMode="manual"` 이면 Enter 나 Space 로 고릅니다.
 - **타입으로 막는 잘못된 값.** children 을 함수로 쓰면 탭 값의 타입으로 좁힌 `List`, `Trigger`, `Content` 를 받습니다.
-- **세 가지 모양.** 선(`underline`), 채움(`pill`), 상자(`enclosed`). `pill` 은 `variant` 로 채움 강도를 고릅니다.
+- **네 가지 모양.** 선(`underline`), 트랙 위 카드(`segmented`), 채움(`pill`), 상자(`enclosed`). `pill` 은 `variant` 로 채움 강도를 고릅니다.
 
 ```tsx
 import { Tabs } from '@gsainfoteam/ids-react';
@@ -79,7 +79,8 @@ const [section, setSection] = useState<Section>('docs');
 ## 모양
 
 ```tsx
-<Tabs appearance="underline" />                  // 기본. 고른 탭 아래 accent 선
+<Tabs appearance="underline" />                  // 기본. 고른 탭의 글자와 아래 선이 primary
+<Tabs appearance="segmented" />                  // 회색 트랙 위에 고른 탭을 카드로 올린다
 <Tabs appearance="pill" variant="soft" />        // 고른 탭을 채운다. variant 기본은 soft
 <Tabs appearance="enclosed" />                   // 고른 탭이 내용 쪽으로 열린 상자
 <Tabs orientation="vertical" />                  // 목록이 앞에, 내용이 옆에
@@ -87,7 +88,9 @@ const [section, setSection] = useState<Section>('docs');
 ```
 
 - `variant` 는 `pill` 에서만 받습니다(`ghost` `outline` `soft` `solid` `glossy`). 다른 모양에 주면 타입 오류입니다.
-- 고르지 않은 탭은 흐린 글자(`text-neutral`), 고른 탭은 본문 글자(`on-surface`)입니다. `pill` 의 `soft` 는 `secondary`, `solid` 와 `glossy` 는 `primary` 로 채웁니다.
+- 고르지 않은 탭은 흐린 글자(`text-neutral`)입니다. `underline` 과 `enclosed` 의 고른 탭은 `text-primary`, 선은 `border-primary` 입니다. `colorScheme` 을 주면 그 계열의 `text-X` 와 `border-X` 입니다.
+- `segmented` 는 `bg-neutral-soft` 트랙(`concentric-p-1`) 위에 고른 탭을 `bg-surface` 와 `shadow-xs` 의 카드로 올립니다. 어두운 모드에서는 카드가 트랙보다 한 단계 밝은 `bg-neutral-soft-hover` 입니다. 트랙 높이가 다른 컨트롤과 같도록 탭이 8px 낮고, 목록은 내용 폭만큼만 차지합니다.
+- `pill` 의 고른 탭은 `variant` 의 채움이고 글자는 그 채움의 짝입니다(`soft` 면 `bg-primary-soft` 와 `text-on-primary-soft`).
 - `enclosed` 의 고른 탭은 `surface` 로 칠해 목록 선을 덮습니다. `surface` 가 아닌 배경 위에서는 탭 색을 `className` 으로 맞춥니다.
 - `<Tabs.List stretch>` 는 가로 탭이 목록 폭을 똑같이 나눠 채웁니다. 카드 폭에 맞춘 두세 칸짜리 탭에 씁니다.
 
@@ -128,13 +131,14 @@ const [section, setSection] = useState<Section>('docs');
 | ------------------------ | ---------------------------------------------------------------- |
 | `value` / `defaultValue` | 고른 탭의 값. 없으면 첫 번째 활성 탭                             |
 | `onValueChange`          | 탭을 고를 때 새 값으로                                           |
-| `appearance`             | `underline`(기본) / `pill` / `enclosed`                          |
+| `appearance`             | `underline`(기본) / `segmented` / `pill` / `enclosed`            |
 | `variant`                | `pill` 에서만. `soft`(기본) / `ghost` / `outline` / `solid` / `glossy` |
+| `colorScheme`            | `primary`(기본) / `secondary` / `tertiary`. 고른 탭의 글자, 선, 채움 |
 | `orientation`            | `horizontal`(기본) / `vertical`                                  |
 | `activationMode`         | `automatic`(기본) / `manual`                                     |
 | `loop`                   | `true`. 화살표가 끝에서 처음으로 돌아간다                        |
 | `size`                   | `standard`(기본) / `tiny`                                        |
-| `Tabs.List`              | `tablist`. 이름은 `aria-label` 로 준다. `stretch` 면 가로 탭이 폭을 나눈다 |
+| `Tabs.List`              | `tablist`. 이름은 `aria-label` 로 준다. `stretch` 면 가로 탭이 폭을 나눈다(`segmented` 는 트랙이 폭을 채운다) |
 | `Tabs.Trigger`           | `value`(필수), `disabled`                                        |
 | `Tabs.Content`           | `value`(필수), `forceMount`                                      |
 

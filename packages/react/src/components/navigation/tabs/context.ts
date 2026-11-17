@@ -7,7 +7,7 @@ import { invariant } from '../../../utils';
 import type { tabsStyle } from './style';
 
 export type TabsOrientation = 'horizontal' | 'vertical';
-export type TabsAppearance = 'underline' | 'pill' | 'enclosed';
+export type TabsAppearance = 'underline' | 'segmented' | 'pill' | 'enclosed';
 export type TabsColorScheme = 'primary' | 'secondary' | 'tertiary';
 export type TabsActivationMode = 'automatic' | 'manual';
 

@@ -33,7 +33,7 @@ export type TabsRenderProps<T extends string = string> = {
 };
 
 type TabsLook =
-  | { appearance?: 'underline' | 'enclosed'; variant?: never }
+  | { appearance?: 'underline' | 'segmented' | 'enclosed'; variant?: never }
   | { appearance: 'pill'; variant?: SurfaceVariant };
 
 export type TabsProps<T extends string = string> = Omit<
