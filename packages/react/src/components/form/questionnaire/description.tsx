@@ -24,6 +24,7 @@ export function QuestionnaireDescription({
       id={descriptionId}
       {...props}
       ref={paragraphRef}
+      data-questionnaire-description=""
       className={questionnaireStyle({ size }).description({ className })}
     />
   );

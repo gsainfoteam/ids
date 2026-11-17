@@ -242,7 +242,7 @@
     "previous": "Previous",
     "progress": "Questionnaire progress",
     "skip": "Skip",
-    "step": "{current} of {total}",
+    "step": "Question {current} of {total}",
     "submit": "Submit"
   },
   "rating": {

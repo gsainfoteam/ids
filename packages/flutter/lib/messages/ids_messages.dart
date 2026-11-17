@@ -1007,7 +1007,7 @@ final class IdsKoreanMessages with IdsMessages {
   String get questionnaireSkip => '건너뛰기';
 
   @override
-  String questionnaireStep({required Object current, required Object total}) => '${_format(current)} / ${_format(total)}';
+  String questionnaireStep({required Object current, required Object total}) => '질문 ${_format(current)} / ${_format(total)}';
 
   @override
   String get questionnaireSubmit => '보내기';

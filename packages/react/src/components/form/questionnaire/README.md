@@ -49,7 +49,8 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 - `value` 가 답이 되고, `children` 이 제목, `description` 이 둘째 줄입니다. `children` 이 없으면 `value` 를 보입니다.
 - 보기 카드 전체가 `<label>` 이라 어디를 눌러도 고릅니다. 고른 카드에 `Item` 의 `selected` 가 붙습니다.
-- 보기 카드와 직접 입력은 높이, radius(`standard`), 가로 여백이 같습니다. `description` 이 있는 카드만 두 줄만큼 높아집니다.
+- 라디오나 체크박스는 카드 앞쪽, 제목 첫 줄 높이에 놓입니다. 고른 카드는 테두리가 primary 가 되고 바탕이 옅게 깔립니다.
+- 보기 카드와 직접 입력은 높이와 radius(`standard`)가 같습니다. `description` 이 있는 카드만 두 줄만큼 높아집니다.
 
 ## 모양
 
@@ -103,7 +104,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 | 부분     | 보일 때                                                                    |
 | -------- | -------------------------------------------------------------------------- |
-| Progress | 질문이 둘 이상. `1 / 3` 을 보이고 `aria-valuetext` 도 같다                 |
+| Progress | 질문이 둘 이상. 맨 위에 작은 글자 `질문 1 / 3` 과 짧은 막대. `aria-valuetext` 도 같다 |
 | 이전     | 첫 질문이 아닐 때                                                          |
 | 건너뛰기 | 지금 질문이 `optional`                                                     |
 | 다음     | 마지막 질문이 아닐 때. 답하지 않은 필수 질문에서는 꺼진다(포커스는 받는다) |
@@ -149,7 +150,8 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 <Questionnaire size="tiny" /> // 보기, 직접 입력, 버튼, 진행 막대가 tiny. 질문 문장도 한 단계 작다
 ```
 
-- 보기 카드의 가로 여백은 `standard` 16px, `tiny` 12px 이고, 직접 입력도 같은 여백이라 글자의 시작이 맞습니다.
+- 보기 카드의 가로 여백은 `standard` 12px, `tiny` 10px 로 직접 입력과 같아, 라디오와 입력 글자의 시작이 맞습니다.
+- 이동 버튼은 크기와 상관없이 `tiny` 입니다. 보기보다 눈에 띄지 않게 둡니다.
 
 ## 속성
 

@@ -24,9 +24,9 @@ export function QuestionnaireOption({
   className,
   children,
 }: QuestionnaireOptionProps) {
-  const { selectionMode, orientation, appearance, draft, size } =
+  const { selectionMode, orientation, appearance, size } =
     useQuestionContext('Questionnaire.Option');
-  const checked = draft.choices.includes(value);
+  const styles = questionnaireStyle({ orientation, size });
   const Control = selectionMode === 'single' ? Radio : Checkbox;
 
   if (appearance === 'toggle')
@@ -35,7 +35,7 @@ export function QuestionnaireOption({
         value={value}
         disabled={disabled}
         size={size}
-        className={className}
+        className={styles.toggle({ className })}
         data-questionnaire-option=""
       >
         {children ?? value}
@@ -47,12 +47,13 @@ export function QuestionnaireOption({
       variant="outline"
       size={size}
       asChild
-      selected={checked}
-      disabled={disabled}
-      className={questionnaireStyle({ orientation, size }).option({ className })}
+      className={styles.option({ className })}
       data-questionnaire-option=""
     >
       <label>
+        <span className={styles.indicator()}>
+          <Control value={value} disabled={disabled} />
+        </span>
         <Item.Content>
           <Item.Title>{children ?? value}</Item.Title>
           {description !== undefined && (
@@ -61,9 +62,6 @@ export function QuestionnaireOption({
             </Item.Description>
           )}
         </Item.Content>
-        <Item.Actions>
-          <Control value={value} disabled={disabled} />
-        </Item.Actions>
       </label>
     </Item>
   );

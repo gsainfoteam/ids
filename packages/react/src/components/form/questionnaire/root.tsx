@@ -204,20 +204,20 @@ export function QuestionnaireRoot({
           <Progress
             value={index + 1}
             max={total}
-            size={size}
+            size="tiny"
             getValueLabel={(value, max) => t('questionnaire.step', { current: value, total: max })}
             aria-label={t('questionnaire.progress')}
             className={styles.progress()}
           >
-            <Progress.Track />
-            <Progress.Value />
+            <Progress.Value className={styles.progressValue()} />
+            <Progress.Track className={styles.progressTrack()} />
           </Progress>
         )}
         {children}
         {(showsPrevious || showsSkip || showsForward) && (
           <ButtonGroup
             attached={false}
-            size={size}
+            size="tiny"
             aria-label={t('questionnaire.navigation')}
             className={styles.navigation()}
           >

@@ -224,14 +224,14 @@ export const MultiStep: Story = {
   },
   play: async ({ canvasElement, userEvent, args }) => {
     const progress = within(canvasElement).getByRole('progressbar', { name: '질문 진행' });
-    await expect(progress).toHaveAttribute('aria-valuetext', '1 / 3');
+    await expect(progress).toHaveAttribute('aria-valuetext', '질문 1 / 3');
     await expect(button(canvasElement, '다음')).toHaveAttribute('aria-disabled', 'true');
     await expect(within(canvasElement).queryByRole('button', { name: '이전' })).toBeNull();
 
     await userEvent.click(radio(canvasElement, /두 칸/));
     await userEvent.click(button(canvasElement, '다음'));
     await waitFor(() => expect(radio(canvasElement, /4명 이하/)).toHaveFocus());
-    await expect(progress).toHaveAttribute('aria-valuetext', '2 / 3');
+    await expect(progress).toHaveAttribute('aria-valuetext', '질문 2 / 3');
 
     await userEvent.click(button(canvasElement, '건너뛰기'));
     await waitFor(() =>

@@ -243,7 +243,7 @@ export const messages = {
     "previous": "이전",
     "progress": "질문 진행",
     "skip": "건너뛰기",
-    "step": "{current} / {total}",
+    "step": "질문 {current} / {total}",
     "submit": "보내기"
   },
   "rating": {

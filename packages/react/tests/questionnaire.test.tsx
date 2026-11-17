@@ -40,7 +40,7 @@ test('the server HTML holds every question, with only the first one shown', () =
   expect(tone.querySelector('legend')).toHaveTextContent('어떤 말투로 쓸까요?');
   expect(tone.getAttribute('aria-labelledby')).toBe(tone.querySelector('legend')!.id);
   expect(tone.getAttribute('aria-describedby')).toBe(tone.querySelector('p')!.id);
-  expect(html.querySelector('[role=progressbar]')).toHaveAttribute('aria-valuetext', '1 / 2');
+  expect(html.querySelector('[role=progressbar]')).toHaveAttribute('aria-valuetext', '질문 1 / 2');
 });
 
 test('a question is named by its legend and described by its description', async () => {
