@@ -158,7 +158,7 @@ defineIdsTheme({ primary: blue, status: 'fixed' });                    // green,
 defineIdsTheme({ primary: blue, status: { danger: '#be123c' } });      // danger 만 앱의 색
 ```
 
-- 기준 색은 success green, warning yellow, danger red, info sky 입니다(`'fixed'`).
+- 기준 색은 success green, warning yellow, danger red, info sky 입니다(`'fixed'`). `packages/core/tokens/palette.json` 에 neutral 과 함께 있고, red, yellow, sky 는 Tailwind CSS v4 기본값, green 은 IDS 고유 값입니다.
 - `'harmonized'` 는 상태 색의 hue 를 primary 쪽으로 돌립니다. 최대 15° 이고, 두 hue 거리의 절반을 넘지 않습니다. 단계별 밝기와 채도는 기준 그대로입니다.
 - 돌린 색은 그 상태의 hue 범위(danger 5–31°, warning 31–108°, success 108–200°, info 200–268°) 안에 머뭅니다.
 - 돌려서 primary 와 너무 가까워지거나 적록 색각에서 success·warning 과 danger 가 비슷해지면, 그 상태는 회전을 절반씩 줄이고 끝내 0 으로 돌아갑니다.
@@ -185,7 +185,6 @@ createIdsPalette('#0d9488'); // { 50: '#f0fdfb', …, 600: '#0d9488', …, 950: 
   - 계수는 데모 팔레트 17색(Tailwind CSS v4 기본값과 비슷한 색)에 OKLab 거리의 가중 최소제곱과 매끄러움 벌점(고조파 k 에 k⁴)으로 맞춘 뒤 고정했습니다. 17색은 레포에서 지웠습니다.
   - 고조파 수는 밝기 3, 채도 6, hue 회전 5 입니다. 한 팔레트씩 빼고 맞춘 오차(leave-one-out)가 가장 작은 값입니다.
   - 맞출 때 17색과의 오차는 ΔE_OK×100 으로 평균 1.08, 최대 6.29(green) 였습니다. green 과 lime 은 hue 가 12° 차이인데 밝기가 많이 달라서, 매끄러운 함수로는 둘 다 맞출 수 없습니다.
-  - Storybook `Foundations/Palette` 의 Model 스토리가 hue 한 바퀴와 시드 고정을 보여 줍니다.
 - 고른 색의 채도가 같은 hue·밝기의 모델보다 낮으면, 그 비율만큼 모든 단계의 채도를 줄입니다. 회색을 주면 회색 팔레트입니다.
 - 팔레트의 hue(500 의 hue)는 고른 색의 hue 입니다. 고른 색이 700 에 들어가도 500 을 모델의 hue 회전만큼 되돌리지 않습니다. 상태 hue 범위 검사와 harmonized 회전이 500 의 hue 를 읽기 때문에, 앱이 고른 hue 가 그대로 검사받아야 합니다. 그래서 고른 색이 놓인 단계만 모델의 hue 회전을 따르지 않습니다.
 - OKLCH 로 계산하고 sRGB 밖으로 나간 단계는 채도만 줄입니다. 결과는 8비트 hex 입니다.
