@@ -10,17 +10,20 @@ import { MessageContent } from './content';
 import { MessageContext, MessageGroupContext } from './context';
 import { MessageFooter } from './footer';
 import { MessageHeader } from './header';
+import { MessageSide } from './side';
 import { messageStyle } from './style';
 import { useTranslate } from '../../../internal/translate';
-import { elementTypeOf, flattenFragments } from '../../../utils';
+import { containsElementOfType, elementTypeOf, flattenFragments } from '../../../utils';
 import { Button } from '../../action/button';
 import { Marker } from '../../feedback/marker';
+import { Bubble } from '../bubble';
+import { BubbleRoot } from '../bubble/root';
 
 import type { Message } from '.';
 
 export type MessageFrom = 'user' | 'assistant';
 export type MessageAlign = 'start' | 'end';
-export type MessageStatus = 'sent' | 'pending' | 'error' | 'read';
+export type MessageStatus = 'sent' | 'pending' | 'error';
 
 const PARTS = new Set<unknown>([
   MessageAvatar,
@@ -41,8 +44,10 @@ function splitParts(children: ReactNode) {
   return { body, part: (type: unknown) => parts.get(type) };
 }
 
-function hasChildren(part: ReactNode) {
-  return isValidElement<{ children?: ReactNode }>(part) && part.props.children != null;
+const BUBBLE = new Set<unknown>([Bubble, BubbleRoot]);
+
+function childrenOf(part: ReactNode) {
+  return isValidElement<{ children?: ReactNode }>(part) ? part.props.children : undefined;
 }
 
 function Failure({
@@ -78,6 +83,7 @@ export function MessageRoot({
   time,
   locale,
   status = 'sent',
+  unread,
   onRetry,
   className,
   children,
@@ -91,14 +97,15 @@ export function MessageRoot({
   const align = alignProp ?? group?.align ?? (from === 'user' ? 'end' : 'start');
   const first = group?.first ?? true;
   const last = group?.last ?? true;
-  const styles = messageStyle({ align, first });
-
   const { body, part } = splitParts(children);
   const header = part(MessageHeader);
   const content = part(MessageContent);
   const footer = part(MessageFooter);
-  const timeIn = footer !== undefined || group !== null ? 'footer' : 'header';
-  const labelled = name !== undefined || hasChildren(header);
+  const bubbled =
+    from === 'user' || containsElementOfType(content ? childrenOf(content) : body, BUBBLE);
+  const timeIn = bubbled ? 'side' : footer !== undefined || group !== null ? 'footer' : 'header';
+  const labelled = name !== undefined || childrenOf(header) != null;
+  const styles = messageStyle({ align, first, bubbled, status });
 
   const drawnAvatar = part(MessageAvatar) ?? (avatar != null ? <MessageAvatar /> : null);
   const drawnHeader =
@@ -119,6 +126,7 @@ export function MessageRoot({
         time,
         locale,
         status,
+        unread,
         last,
         timeIn,
         labelId,
@@ -141,9 +149,14 @@ export function MessageRoot({
           {drawnAvatar}
           <div className={styles.column()}>
             {drawnHeader}
-            {drawnContent}
+            <div className={styles.body()}>
+              {drawnContent}
+              <MessageSide onRetry={bubbled ? onRetry : undefined} />
+            </div>
             {content !== undefined && body}
-            {status === 'error' && <Failure styles={styles} onRetry={onRetry} />}
+            {status === 'error' && (
+              <Failure styles={styles} onRetry={bubbled ? undefined : onRetry} />
+            )}
             {part(MessageActions)}
             {drawnFooter}
           </div>

@@ -53,7 +53,7 @@ export function MessageCopy({ text, children, onClick, ...props }: MessageCopyPr
         }
         onClick={mergeEventHandlers(onClick, copy)}
       />
-      <span role="status" className={styles.copyStatus()}>
+      <span role="status" className={styles.hint()}>
         {copied ? t('message.copied') : ''}
       </span>
     </>

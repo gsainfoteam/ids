@@ -16,8 +16,9 @@ type Context = {
   time: Date | undefined;
   locale: string | undefined;
   status: MessageStatus;
+  unread: number | boolean | undefined;
   last: boolean;
-  timeIn: 'header' | 'footer';
+  timeIn: 'header' | 'side' | 'footer';
   labelId: string;
   contentRef: RefObject<HTMLDivElement | null>;
   readContent: () => string;

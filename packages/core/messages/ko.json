@@ -196,8 +196,9 @@
     "copy": "메시지 복사",
     "error": "보내지 못했어요",
     "pending": "보내는 중",
-    "read": "읽음",
-    "retry": "다시 보내기"
+    "retry": "다시 보내기",
+    "unread": "안 읽음",
+    "unreadBy": "{count}명 안 읽음"
   },
   "messageScroller": {
     "jump": "맨 아래로",

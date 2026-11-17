@@ -27,6 +27,7 @@ export namespace Message {
     time?: Date;
     locale?: string;
     status?: MessageStatus;
+    unread?: number | boolean;
     onRetry?: () => void;
     children?: ReactNode;
   };

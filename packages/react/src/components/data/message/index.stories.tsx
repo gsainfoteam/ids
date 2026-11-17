@@ -5,6 +5,7 @@ import { expect, fn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
+import { Button } from '../../action/button';
 import { IconButton } from '../../action/icon-button';
 import { Marker } from '../../feedback/marker';
 import { Accordion } from '../accordion';
@@ -17,7 +18,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const froms = ['user', 'assistant'] as const;
 const aligns = ['start', 'end'] as const;
-const statuses = ['sent', 'pending', 'error', 'read'] as const;
+const statuses = ['sent', 'pending', 'error'] as const;
 
 function photo(hue: number) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><rect width="160" height="160" fill="hsl(${hue} 70% 78%)"/><circle cx="80" cy="66" r="30" fill="hsl(${hue} 40% 36%)"/><path d="M22 160c6-36 31-54 58-54s52 18 58 54z" fill="hsl(${hue} 40% 36%)"/></svg>`;
@@ -44,6 +45,7 @@ const meta = {
     name: '김지수',
     time: SENT_AT,
     status: 'sent',
+    unread: 1,
     children: '오늘 셔틀 몇 시에 와?',
   },
   render: (args) => (
@@ -84,22 +86,47 @@ export const Gallery: Story = {
       </Showcase.Section>
       <Showcase.Section
         title="Status"
-        description="Footer 가 시간과 상태 문구를 그리고, error 는 실패 줄과 다시 보내기 버튼을 그립니다."
+        description="pending 은 말풍선을 옅게 하고 빛을 지나가게 합니다. error 는 테두리를 빨갛게 하고, 시간 자리에 다시 보내기 버튼을, 아래에 실패 줄을 둡니다."
       >
         {statuses.map((status) => (
           <Showcase.Row key={status} label={status}>
             <div className="w-96">
               <Message from="user" time={SENT_AT} status={status} onRetry={() => {}}>
                 학식 메뉴 알려 줘
-                <Message.Footer />
               </Message>
             </div>
           </Showcase.Row>
         ))}
       </Showcase.Section>
       <Showcase.Section
+        title="Unread"
+        description="unread 에 숫자를 주면 안 읽은 사람 수를, true 를 주면 점을 말풍선 옆에 그립니다. 0 이나 false 가 되면 줄어들며 사라집니다."
+      >
+        <Showcase.Row label="3">
+          <div className="w-96">
+            <Message from="user" time={SENT_AT} unread={3}>
+              12시 20분 셔틀 타자
+            </Message>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="true">
+          <div className="w-96">
+            <Message from="user" time={SENT_AT} unread>
+              도착했어?
+            </Message>
+          </div>
+        </Showcase.Row>
+        <Showcase.Row label="0">
+          <div className="w-96">
+            <Message from="user" time={SENT_AT} unread={0}>
+              다 읽었어
+            </Message>
+          </div>
+        </Showcase.Row>
+      </Showcase.Section>
+      <Showcase.Section
         title="Group"
-        description="첫 메시지만 아바타와 이름을, 마지막 메시지만 시간을 보입니다."
+        description="첫 메시지만 아바타와 이름을, 마지막 메시지만 시간을 보입니다. 이어지는 말풍선은 맞닿는 모서리가 작아집니다."
       >
         <Showcase.Row label="start">
           <div className="w-96">
@@ -110,22 +137,24 @@ export const Gallery: Story = {
               <Message name="김지수" avatar={JISU} time={SENT_AT}>
                 <Bubble>오늘 거</Bubble>
               </Message>
+              <Message name="김지수" avatar={JISU} time={SENT_AT}>
+                <Bubble>2학생회관 기준으로</Bubble>
+              </Message>
             </Message.Group>
           </div>
         </Showcase.Row>
         <Showcase.Row label="end">
           <div className="w-96">
             <Message.Group align="end" aria-label="내 메시지">
-              <Message name="나" time={ANSWERED_AT}>
+              <Message name="나" time={ANSWERED_AT} unread={2}>
                 <Bubble align="end" variant="solid">
                   돈가스랑 우동이야
                 </Bubble>
               </Message>
-              <Message name="나" time={ANSWERED_AT} status="read">
+              <Message name="나" time={ANSWERED_AT} unread={2}>
                 <Bubble align="end" variant="solid">
                   같이 갈래?
                 </Bubble>
-                <Message.Footer />
               </Message>
             </Message.Group>
           </div>
@@ -267,7 +296,6 @@ export const Retry: Story = {
           }}
         >
           보내기 실패한 글
-          <Message.Footer />
         </Message>
       </div>
     );
@@ -276,17 +304,74 @@ export const Retry: Story = {
     docs: {
       description: {
         story:
-          '`status="error"` 면 본문 아래에 실패 줄을 그리고, `onRetry` 가 있으면 다시 보내기 버튼을 둡니다. 실패 줄은 `role="status"` 라 상태가 바뀌면 스크린 리더가 읽습니다.',
+          '`status="error"` 면 말풍선 테두리가 빨개지고, 아래에 실패 줄을 그립니다. 보내지 못한 메시지에는 보낸 시간이 없으므로 시간 자리에 다시 보내기 버튼(`onRetry`)이 섭니다. 실패 줄은 `role="status"` 라 상태가 바뀌면 스크린 리더가 읽습니다. 다시 보내면 `pending` 이 되어 말풍선이 옅어지고 빛이 지나갑니다.',
       },
     },
   },
   play: async ({ args, canvas, userEvent }) => {
     await expect(canvas.getByRole('status')).toHaveTextContent('보내지 못했어요');
+    await expect(canvas.getByRole('article').querySelector('time')).toBeNull();
     await userEvent.click(canvas.getByRole('button', { name: '다시 보내기' }));
     await expect(args.onRetry).toHaveBeenCalledOnce();
     await expect(canvas.getByRole('article')).toHaveAttribute('data-status', 'pending');
     await expect(canvas.queryByRole('button', { name: '다시 보내기' })).not.toBeInTheDocument();
     await expect(canvas.getByRole('article')).toHaveTextContent('보내는 중');
+    await expect(canvas.getByRole('article').querySelector('time')).not.toBeNull();
+  },
+};
+
+export const Unread: Story = {
+  render: function Render() {
+    const [unread, setUnread] = useState(2);
+    const [seen, setSeen] = useState(false);
+
+    return (
+      <div className="flex w-96 flex-col gap-4 break-keep">
+        <Message from="user" time={SENT_AT} unread={unread}>
+          12시 20분 셔틀 타자
+        </Message>
+        <Message from="user" time={ANSWERED_AT} unread={!seen}>
+          도착했어?
+        </Message>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="tiny"
+            onClick={() => setUnread((count) => Math.max(0, count - 1))}
+          >
+            한 명 읽음
+          </Button>
+          <Button variant="outline" size="tiny" onClick={() => setSeen(true)}>
+            1대1 읽음
+          </Button>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '단체방은 `unread` 에 안 읽은 사람 수를, 1대1은 `true` 를 줍니다. 숫자와 점은 말풍선 옆, 시간 위에 서고, 스크린 리더는 "2명 안 읽음", "안 읽음" 으로 읽습니다. 0 이나 `false` 가 되면 줄어들며 사라집니다. 보내는 중이거나 실패한 메시지에는 그리지 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const [group, direct] = canvas.getAllByRole('article');
+    await expect(group).toHaveTextContent('2명 안 읽음');
+    await expect(direct).toHaveTextContent('안 읽음');
+
+    await userEvent.click(canvas.getByRole('button', { name: '한 명 읽음' }));
+    await expect(canvas.getAllByRole('article')[0]).toHaveTextContent('1명 안 읽음');
+    await userEvent.click(canvas.getByRole('button', { name: '한 명 읽음' }));
+    await waitFor(() =>
+      expect(canvas.getAllByRole('article')[0]!.querySelector('[data-message-unread]')).toBeNull(),
+    );
+
+    await userEvent.click(canvas.getByRole('button', { name: '1대1 읽음' }));
+    await waitFor(() =>
+      expect(canvas.getAllByRole('article')[1]!.querySelector('[data-message-unread]')).toBeNull(),
+    );
   },
 };
 
@@ -300,9 +385,8 @@ export const Group: Story = {
         <Message name="김지수" avatar={JISU} time={SENT_AT}>
           <Bubble>오늘 거</Bubble>
         </Message>
-        <Message name="김지수" avatar={JISU} time={ANSWERED_AT} status="read">
+        <Message name="김지수" avatar={JISU} time={ANSWERED_AT}>
           <Bubble>2층 식당</Bubble>
-          <Message.Footer />
         </Message>
       </Message.Group>
     </div>
@@ -311,7 +395,7 @@ export const Group: Story = {
     docs: {
       description: {
         story:
-          '`Message.Group` 은 같은 사람의 연속 메시지를 `role="group"` 으로 묶고 `align` 을 안의 Message 에 줍니다. 첫 메시지만 아바타와 이름을 보이고, 다음 메시지는 아바타 자리를 비워 두고 이름을 스크린 리더에만 남깁니다. 시간은 마지막 메시지의 Footer 에 섭니다.',
+          '`Message.Group` 은 같은 사람의 연속 메시지를 `role="group"` 으로 묶고 `align` 을 안의 Message 에 줍니다. 첫 메시지만 아바타와 이름을 보이고, 다음 메시지는 아바타 자리를 비워 두고 이름을 스크린 리더에만 남깁니다. 이어지는 말풍선은 맞닿는 꼬리 쪽 모서리가 작아져 한 덩어리로 보입니다. 시간은 마지막 메시지의 말풍선 옆에 섭니다.',
       },
     },
   },
@@ -323,11 +407,14 @@ export const Group: Story = {
     await expect(headers[1]).toHaveClass('sr-only');
     await expect(articles[1]!.querySelector('[data-message-avatar]')).toHaveClass('invisible');
     await expect(articles[0]!.querySelector('time')).toBeNull();
-    await expect(articles[2]!.querySelector('footer time')).toHaveAttribute(
+    await expect(articles[2]!.querySelector('[data-message-side] time')).toHaveAttribute(
       'datetime',
       ANSWERED_AT.toISOString(),
     );
-    await expect(articles[2]).toHaveTextContent('읽음');
+    const bubbles = articles.map((article) => article.querySelector('[data-bubble]')!);
+    const corner = (bubble: Element) => getComputedStyle(bubble).borderStartStartRadius;
+    await expect(corner(bubbles[1]!)).toBe(getComputedStyle(bubbles[1]!).borderEndStartRadius);
+    await expect(corner(bubbles[0]!)).not.toBe(corner(bubbles[1]!));
   },
 };
 

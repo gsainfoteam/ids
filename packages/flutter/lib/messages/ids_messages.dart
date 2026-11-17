@@ -291,9 +291,11 @@ mixin IdsMessages {
 
   String? get messagePending => null;
 
-  String? get messageRead => null;
-
   String? get messageRetry => null;
+
+  String? get messageUnread => null;
+
+  String? messageUnreadBy({required Object count}) => null;
 
   String? get messageScrollerJump => null;
 
@@ -913,10 +915,13 @@ final class IdsKoreanMessages with IdsMessages {
   String get messagePending => '보내는 중';
 
   @override
-  String get messageRead => '읽음';
+  String get messageRetry => '다시 보내기';
 
   @override
-  String get messageRetry => '다시 보내기';
+  String get messageUnread => '안 읽음';
+
+  @override
+  String messageUnreadBy({required Object count}) => '${_format(count)}명 안 읽음';
 
   @override
   String get messageScrollerJump => '맨 아래로';

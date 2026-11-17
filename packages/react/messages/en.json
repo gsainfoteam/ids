@@ -196,8 +196,9 @@
     "copy": "Copy message",
     "error": "Not sent",
     "pending": "Sending",
-    "read": "Read",
-    "retry": "Resend"
+    "retry": "Resend",
+    "unread": "Unread",
+    "unreadBy": "Unread by {count}"
   },
   "messageScroller": {
     "jump": "Scroll to bottom",

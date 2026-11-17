@@ -147,7 +147,9 @@ test('Message.Group hands out align and shows the name first and the time last',
 
   expect(one!.querySelector('time')).toBeNull();
   expect(two!.querySelector('time')).toBeNull();
-  expect(three!.querySelector('footer time')!.getAttribute('datetime')).toBe(SENT_AT.toISOString());
+  expect(three!.querySelector('[data-message-side] time')!.getAttribute('datetime')).toBe(
+    SENT_AT.toISOString(),
+  );
 });
 
 test('a Message inside another Message’s content is not part of the outer group', () => {
@@ -164,19 +166,15 @@ test('a Message inside another Message’s content is not part of the outer grou
   expect(inner.querySelector('header')!.className).not.toMatch(/\bsr-only\b/);
 });
 
-test('Message.Footer draws time and the status line, and nothing when it has neither', () => {
+test('Message.Footer takes the time of a message without a bubble, and draws nothing without one', () => {
   const doc = parse(
     <>
-      <Message time={SENT_AT} status="read">
-        읽은 글
-        <Message.Footer />
-      </Message>
-      <Message status="pending">
-        보내는 글
+      <Message time={SENT_AT}>
+        답
         <Message.Footer />
       </Message>
       <Message>
-        보낸 글
+        시간 없는 답
         <Message.Footer />
       </Message>
       <Message time={SENT_AT}>
@@ -184,15 +182,122 @@ test('Message.Footer draws time and the status line, and nothing when it has nei
       </Message>
     </>,
   );
-  const [read, pending, sent, custom] = articles(doc);
-  expect(read!.querySelector('footer')!.textContent).toMatch(/·읽음$/);
-  expect(read!.querySelector('header'), 'the footer takes the time from the header').toBeNull();
-  expect(pending!.querySelector('footer')!.textContent).toBe('보내는 중');
-  expect(sent!.querySelector('footer')).toBeNull();
+  const [timed, untimed, custom] = articles(doc);
+  expect(timed!.querySelector('footer time')!.getAttribute('datetime')).toBe(SENT_AT.toISOString());
+  expect(timed!.querySelector('header'), 'the footer takes the time from the header').toBeNull();
+  expect(untimed!.querySelector('footer')).toBeNull();
   expect(custom!.querySelector('footer')!.textContent).toBe('어제');
 });
 
-test('status="error" draws the failure line, and the retry button only with onRetry', async () => {
+test('a bubbled message puts its time beside the bubble, outside the copied content', () => {
+  const article = articleIn(
+    parse(
+      <Message from="user" name="나" time={SENT_AT}>
+        요약해 줘
+      </Message>,
+    ),
+  );
+  const side = article.querySelector('[data-message-side]')!;
+  expect(side.querySelector('time')!.getAttribute('datetime')).toBe(SENT_AT.toISOString());
+  expect(article.querySelector('header time')).toBeNull();
+  expect(article.querySelector('[data-message-content]')!.contains(side)).toBe(false);
+});
+
+test('unread draws a count or a dot beside the bubble, read by screen readers, only once sent', () => {
+  const doc = parse(
+    <>
+      <Message from="user" unread={3}>
+        단체방
+      </Message>
+      <Message from="user" unread>
+        1대1
+      </Message>
+      <Message from="user" unread={0}>
+        다 읽음
+      </Message>
+      <Message from="user" unread={2} status="pending">
+        보내는 중
+      </Message>
+      <Message from="user" unread={2} status="error">
+        실패
+      </Message>
+    </>,
+  );
+  const [count, dot, none, pending, error] = articles(doc);
+  const unreadOf = (article: HTMLElement) => article.querySelector('[data-message-unread]');
+  expect(unreadOf(count!)!.textContent).toBe('33명 안 읽음');
+  expect(unreadOf(count!)!.querySelector('[aria-hidden]')!.textContent).toBe('3');
+  expect(unreadOf(dot!)!.querySelector('[data-dot]')).not.toBeNull();
+  expect(unreadOf(dot!)!.textContent).toBe('안 읽음');
+  expect(unreadOf(none!)).toBeNull();
+  expect(unreadOf(pending!)).toBeNull();
+  expect(pending!.querySelector('[data-message-side]')!.textContent).toBe('보내는 중');
+  expect(unreadOf(error!)).toBeNull();
+});
+
+test('unread leaves through an exit and keeps its last count while it does', async () => {
+  const screen = await render(
+    withProvider(
+      <Message from="user" unread={2}>
+        글
+      </Message>,
+    ),
+  );
+  const unread = () => screen.container.querySelector('[data-message-unread]');
+  await expect.poll(unread).not.toBeNull();
+  await screen.rerender(
+    withProvider(
+      <Message from="user" unread={0}>
+        글
+      </Message>,
+    ),
+  );
+  await expect.poll(unread).toBeNull();
+});
+
+test('a grouped bubble after the first shrinks the corner it shares with the one above', async () => {
+  const screen = await render(
+    withProvider(
+      <Message.Group align="end">
+        <Message>
+          <Bubble align="end">하나</Bubble>
+        </Message>
+        <Message>
+          <Bubble align="end">둘</Bubble>
+        </Message>
+      </Message.Group>,
+    ),
+  );
+  const [first, second] = [...screen.container.querySelectorAll('[data-bubble]')];
+  const style = (bubble: Element) => getComputedStyle(bubble);
+  expect(style(first!).borderStartEndRadius).not.toBe(style(first!).borderEndEndRadius);
+  expect(style(second!).borderStartEndRadius).toBe(style(second!).borderEndEndRadius);
+  expect(style(second!).borderStartStartRadius).toBe(style(first!).borderStartStartRadius);
+});
+
+test('error rings the bubble in danger and pending fades its fill', async () => {
+  const screen = await render(
+    withProvider(
+      <>
+        <Message from="user">보낸 글</Message>
+        <Message from="user" status="error">
+          실패한 글
+        </Message>
+        <Message from="user" status="pending">
+          보내는 글
+        </Message>
+      </>,
+    ),
+  );
+  const [sent, error, pending] = [...screen.container.querySelectorAll('[data-bubble]')].map(
+    (bubble) => getComputedStyle(bubble),
+  );
+  expect(sent!.boxShadow).toBe('none');
+  expect(error!.boxShadow).not.toBe('none');
+  expect(pending!.backgroundColor).not.toBe(sent!.backgroundColor);
+});
+
+test('status="error" draws the failure line under the bubble and the retry button beside it', async () => {
   const onRetry = vi.fn();
   const screen = await render(
     withProvider(
@@ -212,6 +317,8 @@ test('status="error" draws the failure line, and the retry button only with onRe
   expect(failure.textContent).toBe('보내지 못했어요');
   expect(without!.querySelector('[data-message-failure]')).not.toBeNull();
   expect(without!.querySelector('button')).toBeNull();
+  expect(withRetry!.querySelector('[data-message-side] button')).not.toBeNull();
+  expect(withRetry!.querySelector('time')).toBeNull();
 
   await screen.getByRole('button', { name: '다시 보내기' }).click();
   expect(onRetry).toHaveBeenCalledOnce();
@@ -307,9 +414,8 @@ test('axe finds nothing in a chat of groups, answers and failures', async () => 
           <Message name="김지수" avatar="data:image/png;base64,AAAA" time={SENT_AT}>
             <Bubble>학식 메뉴 알려 줘</Bubble>
           </Message>
-          <Message name="김지수" avatar="data:image/png;base64,AAAA" time={SENT_AT} status="read">
+          <Message name="김지수" avatar="data:image/png;base64,AAAA" time={SENT_AT} unread={2}>
             <Bubble>오늘 거</Bubble>
-            <Message.Footer />
           </Message>
         </Message.Group>
         <Message from="user" status="error" onRetry={() => {}}>
