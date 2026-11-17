@@ -679,13 +679,13 @@ Escape: () => {
 
 ## list-styles.ts
 
-팝업 안 목록(listbox)의 클래스 조각 `listStyles` 입니다. 옵션, 고른 옵션의 색(`checked` 는 Menu 용), 선택 체크, 스크롤 목록과 그 ScrollArea, 그룹 머리, 구분선, 빈 목록 문구, 목록 위 검색 줄이 있습니다.
+팝업 안 목록(listbox)의 클래스 조각 `listStyles` 입니다. 옵션, 선택 체크, 스크롤 목록과 그 ScrollArea, 그룹 머리, 구분선, 빈 목록 문구, 목록 위 검색 줄이 있습니다.
 
 ### 쓰는 곳
 
 - Select 의 `listArea`, `listbox`, `item`, `indicator`, `groupHeading`, `separator`, `empty` 슬롯
 - ChipField 의 제안 목록(`listArea`, `listbox`, ...)
-- Menu 의 `item`(`option` 에 `checked` 를 더함), `indicator`, `label`, `separator` 슬롯과 명령 팔레트의 `listArea`, `list`, `empty` 슬롯
+- Menu 의 `item`, `indicator`, `label`, `separator` 슬롯과 명령 팔레트의 `listArea`, `list`, `empty` 슬롯
 - [field-popup](./field-popup/README.md) 의 `FieldPopupSearch`(`searchRoot`, `search`)
 
 ### 쓰는 법
