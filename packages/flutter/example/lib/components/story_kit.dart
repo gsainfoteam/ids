@@ -32,6 +32,7 @@ WidgetbookComponent docs(
                 brightness: scope.isDark ? Brightness.dark : Brightness.light,
                 fontFamily: ids.IdsTypography.sansFontFamily,
                 package: ids.IdsTypography.sansFontPackage,
+                iconTheme: IconThemeData(color: theme.onSurface),
               ),
               child: Builder(
                 builder: (context) => Material(

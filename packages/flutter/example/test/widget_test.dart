@@ -15,23 +15,27 @@ void main() {
   final root = WidgetbookRoot(children: directories);
 
   for (final useCase in useCasesIn(root.children!)) {
-    testWidgets('${useCase.path} renders', (tester) async {
-      tester.view.physicalSize = const Size(1920, 1200);
-      tester.view.devicePixelRatio = 1;
-      addTearDown(tester.view.reset);
+    for (final mode in ['light', 'dark']) {
+      testWidgets('${useCase.path} renders in $mode', (tester) async {
+        tester.view.physicalSize = const Size(1920, 1200);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
 
-      await tester.pumpWidget(
-        WidgetbookApp(initialRoute: '/?path=${useCase.path}'),
-      );
-      await tester.runAsync(
-        () => Future<void>.delayed(const Duration(milliseconds: 300)),
-      );
-      await tester.pump(const Duration(milliseconds: 100));
-      expect(find.byType(IdsProvider), findsWidgets);
-      expect(tester.takeException(), isNull);
+        await tester.pumpWidget(
+          WidgetbookApp(
+            initialRoute: '/?path=${useCase.path}&knobs={Mode:$mode}',
+          ),
+        );
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 300)),
+        );
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(find.byType(IdsProvider), findsWidgets);
+        expect(tester.takeException(), isNull);
 
-      await tester.pumpWidget(const SizedBox.shrink());
-      await tester.pump(const Duration(seconds: 1));
-    });
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pump(const Duration(seconds: 1));
+      });
+    }
   }
 }
