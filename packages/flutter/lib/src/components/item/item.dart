@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show precisionErrorTolerance;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -20,7 +21,6 @@ class Item extends StatelessWidget {
     super.key,
     this.variant,
     this.size,
-    this.dense,
     this.onPressed,
     this.selected,
     this.disabled = false,
@@ -30,7 +30,6 @@ class Item extends StatelessWidget {
 
   final ItemVariant? variant;
   final IdsSize? size;
-  final bool? dense;
   final VoidCallback? onPressed;
   final bool? selected;
   final bool disabled;
@@ -38,16 +37,9 @@ class Item extends StatelessWidget {
   final List<Widget> children;
 
   static const _paddings = {IdsSize.standard: 12.0, IdsSize.tiny: 8.0};
-  static const _densePaddings = {IdsSize.standard: 6.0, IdsSize.tiny: 4.0};
   static const _heights = {IdsSize.standard: 56.0, IdsSize.tiny: 40.0};
-  static const _denseHeights = {IdsSize.standard: 48.0, IdsSize.tiny: 32.0};
   static const _gaps = {IdsSize.standard: 12.0, IdsSize.tiny: 8.0};
-
-  bool get _describes => children.any(
-    (child) =>
-        child is ItemContent &&
-        child.children.any((part) => part is ItemDescription),
-  );
+  static const _titleOnlyRows = {IdsSize.standard: 56.0, IdsSize.tiny: 44.0};
 
   Widget _region(Widget child, {required bool separate}) =>
       separate && child is! ItemContent
@@ -59,15 +51,31 @@ class Item extends StatelessWidget {
     InteractiveState state, {
     required ItemVariant variant,
     required IdsSize size,
-    required bool dense,
     required bool flat,
   }) {
     final ids = IdsProvider.of(context);
     final colors = ids.colors;
-    final pad = (dense ? _densePaddings : _paddings)[size]!;
-    final radius = BorderRadius.circular(
-      flat ? 0 : math.min(ids.radius.standard + pad, ids.radius.container),
-    );
+    final pad = ids.dimension(_paddings[size]!);
+    final textScaler = MediaQuery.textScalerOf(context);
+    double laidOutLineOf(TextStyle token) {
+      final style = ids.textStyle(token);
+      return (textScaler.scale(style.fontSize!) * style.height!)
+          .roundToDouble();
+    }
+
+    Decoration surface(BorderSide side, {Color? color}) => flat
+        ? BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.zero,
+            border: Border.fromBorderSide(side),
+          )
+        : ShapeDecoration(
+            color: color,
+            shape: ids.shape(
+              radius: math.min(ids.radius.standard + pad, ids.radius.container),
+              side: side,
+            ),
+          );
     final reduced = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final base = variant == ItemVariant.soft
         ? colors.bgNeutralSoft
@@ -81,38 +89,45 @@ class Item extends StatelessWidget {
 
     return AnimatedContainer(
       duration: reduced ? Duration.zero : IdsMotion.fast,
-      decoration: BoxDecoration(
+      decoration: surface(
+        FocusRing.around(colors, state),
         color: SurfaceLayer.over(
           base,
           colors,
           state,
           selected: selected == true,
         ),
-        borderRadius: radius,
-        border: FocusRing.around(colors, state),
       ),
       foregroundDecoration: variant == ItemVariant.outline
-          ? BoxDecoration(
-              border: Border.all(color: FocusRing.edge(colors, state)),
-              borderRadius: radius,
-            )
+          ? surface(BorderSide(color: FocusRing.edge(colors, state)))
           : null,
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: (dense ? _denseHeights : _heights)[size]!,
-        ),
+        constraints: BoxConstraints(minHeight: ids.dimension(_heights[size]!)),
         child: Padding(
           padding: EdgeInsets.all(pad),
           child: DefaultTextStyle.merge(
             style: TextStyle(color: colors.onSurface),
             child: _ItemRow(
-              gap: _gaps[size]!,
-              grow: grow == -1 ? null : grow,
-              push: push == -1 ? null : push,
-              top: {
-                if (_describes)
-                  for (final (index, child) in children.indexed)
-                    if (child is ItemMedia) index,
+              rule: (
+                gap: ids.dimension(_gaps[size]!),
+                grow: grow == -1 ? null : grow,
+                push: push == -1 ? null : push,
+                tile: (
+                  padding: pad,
+                  side: ids.dimension(ItemMedia._tiles[size]!),
+                  row: ids.dimension(_titleOnlyRows[size]!),
+                  largestRow:
+                      laidOutLineOf(ItemTitle._styles[size]!) +
+                      ids.dimension(ItemContent._gap) +
+                      laidOutLineOf(ItemDescription._styles[size]!) +
+                      2 * pad,
+                ),
+                direction: Directionality.of(context),
+              ),
+              tiles: {
+                for (final (index, child) in children.indexed)
+                  if (child is ItemMedia && child.variant != ItemVariant.ghost)
+                    index,
               },
               children: [
                 for (final child in children)
@@ -130,7 +145,6 @@ class Item extends StatelessWidget {
     final group = _ItemGroupScope.maybeOf(context);
     final resolvedSize = size ?? group?.size ?? IdsSize.standard;
     final resolvedVariant = variant ?? group?.rowVariant ?? ItemVariant.ghost;
-    final resolvedDense = dense ?? group?.dense ?? false;
     return _ItemScope(
       size: resolvedSize,
       child: PressableSurface(
@@ -143,7 +157,6 @@ class Item extends StatelessWidget {
           state,
           variant: resolvedVariant,
           size: resolvedSize,
-          dense: resolvedDense,
           flat: group?.variant == ItemGroupVariant.bordered,
         ),
       ),
@@ -167,28 +180,42 @@ class ItemMedia extends StatelessWidget {
     final colors = ids.colors;
     if (variant == ItemVariant.ghost) {
       return IconTheme.merge(
-        data: IconThemeData(size: _icon, color: colors.textNeutral),
+        data: IconThemeData(
+          size: ids.dimension(_icon),
+          color: colors.textNeutral,
+        ),
         child: child ?? const SizedBox.shrink(),
       );
     }
-    final radius = BorderRadius.circular(ids.radius.standard);
-    return SizedBox.square(
-      dimension: _tiles[size],
-      child: ClipRRect(
-        borderRadius: radius,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: variant == ItemVariant.soft ? colors.bgNeutralSoft : null,
-            border: variant == ItemVariant.outline
-                ? Border.all(color: colors.borderNeutral)
-                : null,
-            borderRadius: radius,
-          ),
-          child: IconTheme.merge(
-            data: IconThemeData(size: _icon, color: colors.onSurface),
-            child: child is Image ? child! : Center(child: child),
-          ),
-        ),
+    final base = ids.dimension(_tiles[size]!);
+    return _SquareWithoutBaseline(
+      side: base,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final side = constraints.isTight ? constraints.maxWidth : base;
+          return SizedBox.square(
+            dimension: side,
+            child: ClipPath(
+              clipper: ShapeBorderClipper(shape: ids.shape()),
+              child: DecoratedBox(
+                decoration: ShapeDecoration(
+                  color: variant == ItemVariant.soft
+                      ? colors.bgNeutralSoft
+                      : null,
+                  shape: ids.shape(
+                    side: variant == ItemVariant.outline
+                        ? BorderSide(color: colors.borderNeutral)
+                        : BorderSide.none,
+                  ),
+                ),
+                child: IconTheme.merge(
+                  data: IconThemeData(size: side / 2, color: colors.onSurface),
+                  child: child is Image ? child! : Center(child: child),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -207,7 +234,7 @@ class ItemContent extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: _gap,
+      spacing: IdsProvider.of(context).dimension(_gap),
       children: children,
     );
   }
@@ -225,13 +252,17 @@ class ItemTitle extends StatelessWidget {
   };
 
   @override
-  Widget build(BuildContext context) => DefaultTextStyle.merge(
-    style: _styles[_ItemScope.sizeOf(context, 'ItemTitle')],
-    maxLines: truncate ? 1 : null,
-    softWrap: !truncate,
-    overflow: truncate ? TextOverflow.ellipsis : null,
-    child: child,
-  );
+  Widget build(BuildContext context) {
+    final size = _ItemScope.sizeOf(context, 'ItemTitle');
+    final ids = IdsProvider.of(context);
+    return DefaultTextStyle(
+      style: ids.textStyle(_styles[size]!, color: ids.colors.onSurface),
+      maxLines: truncate ? 1 : null,
+      softWrap: !truncate,
+      overflow: truncate ? TextOverflow.ellipsis : TextOverflow.clip,
+      child: child,
+    );
+  }
 }
 
 class ItemDescription extends StatelessWidget {
@@ -246,14 +277,16 @@ class ItemDescription extends StatelessWidget {
   static const _lines = 2;
 
   @override
-  Widget build(BuildContext context) => DefaultTextStyle.merge(
-    style: _styles[_ItemScope.sizeOf(context, 'ItemDescription')]!.copyWith(
-      color: IdsProvider.of(context).colors.textNeutral,
-    ),
-    maxLines: _lines,
-    overflow: TextOverflow.ellipsis,
-    child: child,
-  );
+  Widget build(BuildContext context) {
+    final size = _ItemScope.sizeOf(context, 'ItemDescription');
+    final ids = IdsProvider.of(context);
+    return DefaultTextStyle(
+      style: ids.textStyle(_styles[size]!, color: ids.colors.textNeutral),
+      maxLines: _lines,
+      overflow: TextOverflow.ellipsis,
+      child: child,
+    );
+  }
 }
 
 class ItemActions extends StatelessWidget {
@@ -267,14 +300,15 @@ class ItemActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _ItemScope.check(context, 'ItemActions');
+    final ids = IdsProvider.of(context);
     return IconTheme.merge(
       data: IconThemeData(
-        size: _icon,
-        color: IdsProvider.of(context).colors.textNeutral,
+        size: ids.dimension(_icon),
+        color: ids.colors.textNeutral,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        spacing: _gap,
+        spacing: ids.dimension(_gap),
         children: children,
       ),
     );
@@ -286,14 +320,12 @@ class ItemGroup extends StatelessWidget {
     super.key,
     this.variant = ItemGroupVariant.bordered,
     this.size,
-    this.dense,
     this.semanticLabel,
     this.children = const [],
   });
 
   final ItemGroupVariant variant;
   final IdsSize? size;
-  final bool? dense;
   final String? semanticLabel;
   final List<Widget> children;
 
@@ -301,14 +333,12 @@ class ItemGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final line = BorderSide(
-      color: IdsProvider.of(context).colors.borderNeutral,
-    );
+    final ids = IdsProvider.of(context);
+    final line = BorderSide(color: ids.colors.borderNeutral);
     final bordered = variant == ItemGroupVariant.bordered;
     return _ItemGroupScope(
       variant: variant,
       size: size,
-      dense: dense,
       child: Semantics(
         role: SemanticsRole.list,
         label: semanticLabel,
@@ -317,7 +347,9 @@ class ItemGroup extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: variant == ItemGroupVariant.separated ? _separatedGap : 0,
+            spacing: variant == ItemGroupVariant.separated
+                ? ids.dimension(_separatedGap)
+                : 0,
             children: [
               for (final (index, child) in children.indexed)
                 Container(
@@ -374,13 +406,11 @@ class _ItemGroupScope extends InheritedWidget {
   const _ItemGroupScope({
     required this.variant,
     required this.size,
-    required this.dense,
     required super.child,
   });
 
   final ItemGroupVariant variant;
   final IdsSize? size;
-  final bool? dense;
 
   ItemVariant? get rowVariant =>
       variant == ItemGroupVariant.separated ? ItemVariant.outline : null;
@@ -390,9 +420,7 @@ class _ItemGroupScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(_ItemGroupScope oldWidget) =>
-      variant != oldWidget.variant ||
-      size != oldWidget.size ||
-      dense != oldWidget.dense;
+      variant != oldWidget.variant || size != oldWidget.size;
 }
 
 class _ShrinkWhenUnbounded extends SingleChildRenderObjectWidget {
@@ -429,100 +457,140 @@ class _RenderShrinkWhenUnbounded extends RenderProxyBox {
   }
 }
 
-class _ItemRow extends MultiChildRenderObjectWidget {
-  const _ItemRow({
-    required this.gap,
-    required this.grow,
-    required this.push,
-    required this.top,
-    super.children,
-  });
+class _SquareWithoutBaseline extends SingleChildRenderObjectWidget {
+  const _SquareWithoutBaseline({required this.side, super.child});
 
-  final double gap;
-  final int? grow;
-  final int? push;
-  final Set<int> top;
+  final double side;
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _RenderItemRow(
-    gap: gap,
-    grow: grow,
-    push: push,
-    top: top,
-    direction: Directionality.of(context),
-  );
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderSquareWithoutBaseline(side);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderSquareWithoutBaseline renderObject,
+  ) {
+    renderObject.side = side;
+  }
+}
+
+class _RenderSquareWithoutBaseline extends RenderProxyBox {
+  _RenderSquareWithoutBaseline(this._side);
+
+  double _side;
+  set side(double value) {
+    if (value == _side) return;
+    _side = value;
+    markNeedsLayout();
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) => _side;
+
+  @override
+  double computeMaxIntrinsicWidth(double height) => _side;
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _side;
+
+  @override
+  double computeMaxIntrinsicHeight(double width) => _side;
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) =>
+      constraints.constrain(Size.square(_side));
+
+  @override
+  double? computeDryBaseline(
+    BoxConstraints constraints,
+    TextBaseline baseline,
+  ) => null;
+
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) => null;
+}
+
+class _ItemRow extends MultiChildRenderObjectWidget {
+  const _ItemRow({required this.rule, required this.tiles, super.children});
+
+  final _RowRule rule;
+  final Set<int> tiles;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderItemRow(rule, tiles);
 
   @override
   void updateRenderObject(BuildContext context, _RenderItemRow renderObject) {
     renderObject
-      ..gap = gap
-      ..grow = grow
-      ..push = push
-      ..top = top
-      ..direction = Directionality.of(context);
+      ..rule = rule
+      ..tiles = tiles;
   }
 }
 
 class _ItemRowParentData extends ContainerBoxParentData<RenderBox> {}
 
+typedef _TileRule = ({
+  double padding,
+  double side,
+  double row,
+  double largestRow,
+});
+
+typedef _RowRule = ({
+  double gap,
+  int? grow,
+  int? push,
+  _TileRule tile,
+  TextDirection direction,
+});
+
 typedef _RowLayout = ({
   Size size,
   List<Size> sizes,
   List<BoxConstraints> constraints,
+  double tileInset,
 });
 
 class _RenderItemRow extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, _ItemRowParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _ItemRowParentData> {
-  _RenderItemRow({
-    required double gap,
-    required int? grow,
-    required int? push,
-    required Set<int> top,
-    required TextDirection direction,
-  }) : _gap = gap,
-       _grow = grow,
-       _push = push,
-       _top = top,
-       _direction = direction;
+  _RenderItemRow(this._rule, this._tiles);
 
-  double _gap;
-  set gap(double value) {
-    if (value == _gap) return;
-    _gap = value;
+  _RowRule _rule;
+  set rule(_RowRule value) {
+    if (value == _rule) return;
+    _rule = value;
     markNeedsLayout();
   }
 
-  int? _grow;
-  set grow(int? value) {
-    if (value == _grow) return;
-    _grow = value;
+  Set<int> _tiles;
+  set tiles(Set<int> value) {
+    if (value.length == _tiles.length && value.containsAll(_tiles)) return;
+    _tiles = value;
     markNeedsLayout();
   }
 
-  int? _push;
-  set push(int? value) {
-    if (value == _push) return;
-    _push = value;
-    markNeedsLayout();
-  }
+  double get _gaps => _rule.gap * math.max(0, childCount - 1);
 
-  Set<int> _top;
-  set top(Set<int> value) {
-    if (value.length == _top.length && value.containsAll(_top)) return;
-    _top = value;
-    markNeedsLayout();
-  }
+  double get _largestRow => math.max(_rule.tile.row, _rule.tile.largestRow);
 
-  TextDirection _direction;
-  set direction(TextDirection value) {
-    if (value == _direction) return;
-    _direction = value;
-    markNeedsLayout();
-  }
+  double _rowAround(double tallest) =>
+      (tallest + 2 * _rule.tile.padding).clamp(_rule.tile.row, _largestRow);
 
-  double get _gaps => _gap * math.max(0, childCount - 1);
+  double _tileSide(double row) => row * _rule.tile.side / _rule.tile.row;
+
+  double _tileInset(double row) =>
+      (row - _tileSide(row)) / 2 - _rule.tile.padding;
+
+  double _tileSpan(double row) => _tileInset(row) + _tileSide(row);
+
+  double _tileSpans(double row) => _tiles.length * _tileSpan(row);
+
+  Iterable<(int, RenderBox)> get _flowing =>
+      getChildrenAsList().indexed.where((entry) => !_tiles.contains(entry.$1));
 
   @override
   void setupParentData(RenderBox child) {
@@ -531,33 +599,48 @@ class _RenderItemRow extends RenderBox
     }
   }
 
-  @override
-  double computeMinIntrinsicWidth(double height) => getChildrenAsList()
-      .map((child) => child.getMinIntrinsicWidth(height))
-      .fold(_gaps, (sum, width) => sum + width);
+  double _intrinsicWidth(double Function(RenderBox child) widthOf) {
+    final row = _tiles.isEmpty
+        ? _rule.tile.row
+        : _rowAround(
+            _flowing
+                .map((entry) => entry.$2.getMaxIntrinsicHeight(double.infinity))
+                .fold(0.0, math.max),
+          );
+    return _flowing
+        .map((entry) => widthOf(entry.$2))
+        .fold(_gaps + _tileSpans(row), (sum, width) => sum + width);
+  }
 
   @override
-  double computeMaxIntrinsicWidth(double height) => getChildrenAsList()
-      .map((child) => child.getMaxIntrinsicWidth(height))
-      .fold(_gaps, (sum, width) => sum + width);
+  double computeMinIntrinsicWidth(double height) =>
+      _intrinsicWidth((child) => child.getMinIntrinsicWidth(height));
+
+  @override
+  double computeMaxIntrinsicWidth(double height) =>
+      _intrinsicWidth((child) => child.getMaxIntrinsicWidth(height));
 
   double _intrinsicHeight(
     double width,
     double Function(RenderBox child, double width) heightOf,
   ) {
-    final children = getChildrenAsList();
-    final fixed = children.indexed
-        .where((entry) => entry.$1 != _grow)
+    final fixed = _flowing
+        .where((entry) => entry.$1 != _rule.grow)
         .map((entry) => entry.$2.getMaxIntrinsicWidth(double.infinity))
         .fold(_gaps, (sum, width) => sum + width);
-    return children.indexed
+    double tallestBeside(double row) => _flowing
         .map(
           (entry) => heightOf(
             entry.$2,
-            entry.$1 == _grow ? math.max(0, width - fixed) : double.infinity,
+            entry.$1 == _rule.grow
+                ? math.max(0, width - fixed - _tileSpans(row))
+                : double.infinity,
           ),
         )
         .fold(0.0, math.max);
+    if (_tiles.isEmpty) return tallestBeside(_rule.tile.row);
+    final row = _rowAround(tallestBeside(_rule.tile.row));
+    return math.max(tallestBeside(row), _tileSpan(row));
   }
 
   @override
@@ -580,35 +663,60 @@ class _RenderItemRow extends RenderBox
     );
     final sizes = List.filled(children.length, Size.zero);
     final given = List.filled(children.length, loose);
-    var used = _gaps;
-    for (final (index, child) in children.indexed) {
-      if (index == _grow) continue;
+    var fixed = _gaps;
+    var tallest = constraints.minHeight;
+    for (final (index, child) in _flowing) {
+      if (index == _rule.grow) continue;
       sizes[index] = layoutChild(child, loose);
-      used += sizes[index].width;
+      fixed += sizes[index].width;
+      tallest = math.max(tallest, sizes[index].height);
     }
-    final grow = _grow;
-    if (grow != null && grow < children.length) {
-      final width = math.max(0.0, constraints.maxWidth - used);
-      given[grow] = constraints.hasBoundedWidth
-          ? loose.copyWith(minWidth: width, maxWidth: width)
-          : loose;
-      sizes[grow] = layoutChild(children[grow], given[grow]);
-      used += sizes[grow].width;
+    var row = _rule.tile.row;
+    final grow = _rule.grow;
+    if (grow != null) {
+      Size fitBeside(double row) {
+        final width = math.max(
+          0.0,
+          constraints.maxWidth - fixed - _tileSpans(row),
+        );
+        given[grow] = constraints.hasBoundedWidth
+            ? loose.copyWith(minWidth: width, maxWidth: width)
+            : loose;
+        return sizes[grow] = layoutChild(children[grow], given[grow]);
+      }
+
+      final settled = _rowAround(math.max(tallest, fitBeside(row).height));
+      final moved = (settled - row).abs() > precisionErrorTolerance;
+      row = settled;
+      if (moved && _tiles.isNotEmpty) fitBeside(row);
+      tallest = math.max(tallest, sizes[grow].height);
+    } else {
+      row = _rowAround(tallest);
     }
-    final height = sizes.fold(constraints.minHeight, (tallest, size) {
-      return math.max(tallest, size.height);
-    });
+    for (final index in _tiles) {
+      sizes[index] = Size.square(_tileSide(row));
+      given[index] = BoxConstraints.tight(sizes[index]);
+    }
+    final used = _flowing.fold(
+      _gaps + _tileSpans(row),
+      (sum, entry) => sum + sizes[entry.$1].width,
+    );
     return (
       size: constraints.constrain(
-        Size(constraints.hasBoundedWidth ? constraints.maxWidth : used, height),
+        Size(
+          constraints.hasBoundedWidth ? constraints.maxWidth : used,
+          _tiles.isEmpty ? tallest : math.max(tallest, _tileSpan(row)),
+        ),
       ),
       sizes: sizes,
       constraints: given,
+      tileInset: _tileInset(row),
     );
   }
 
-  double _offsetY(int index, Size size, Size child) =>
-      _top.contains(index) ? 0 : (size.height - child.height) / 2;
+  double _offsetY(int index, _RowLayout layout) => _tiles.contains(index)
+      ? layout.tileInset
+      : (layout.size.height - layout.sizes[index].height) / 2;
 
   @override
   Size computeDryLayout(BoxConstraints constraints) =>
@@ -621,13 +729,13 @@ class _RenderItemRow extends RenderBox
   ) {
     final layout = _layout(constraints, ChildLayoutHelper.dryLayoutChild);
     double? highest;
-    for (final (index, child) in getChildrenAsList().indexed) {
+    for (final (index, child) in _flowing) {
       final distance = child.getDryBaseline(
         layout.constraints[index],
         baseline,
       );
       if (distance == null) continue;
-      final y = _offsetY(index, layout.size, layout.sizes[index]) + distance;
+      final y = _offsetY(index, layout) + distance;
       highest = highest == null ? y : math.min(highest, y);
     }
     return highest;
@@ -641,17 +749,25 @@ class _RenderItemRow extends RenderBox
   void performLayout() {
     final layout = _layout(constraints, ChildLayoutHelper.layoutChild);
     size = layout.size;
-    final used = layout.sizes.fold(_gaps, (sum, child) => sum + child.width);
+    final tileInsets = _tiles.length * layout.tileInset;
+    final used = layout.sizes.fold(
+      _gaps + tileInsets,
+      (sum, child) => sum + child.width,
+    );
     final free = math.max(0.0, size.width - used);
     var x = 0.0;
     for (final (index, child) in getChildrenAsList().indexed) {
-      if (index == _push) x += free;
+      if (index == _rule.push) x += free;
+      if (_tiles.contains(index)) {
+        child.layout(layout.constraints[index]);
+        x += layout.tileInset;
+      }
       final width = layout.sizes[index].width;
       (child.parentData! as _ItemRowParentData).offset = Offset(
-        _direction == TextDirection.ltr ? x : size.width - x - width,
-        _offsetY(index, size, layout.sizes[index]),
+        _rule.direction == TextDirection.ltr ? x : size.width - x - width,
+        _offsetY(index, layout),
       );
-      x += width + _gap;
+      x += width + _rule.gap;
     }
   }
 

@@ -59,7 +59,6 @@ final itemUseCases = [
         ids.IdsSize.values,
         initial: ids.IdsSize.standard,
       );
-      final dense = context.knobs.boolean(label: 'dense');
       final interactive = context.knobs.boolean(label: 'interactive');
       final selected = context.knobs.boolean(label: 'selected');
       final disabled = context.knobs.boolean(label: 'disabled');
@@ -68,9 +67,8 @@ final itemUseCases = [
         child: ids.Item(
           variant: variant,
           size: size,
-          dense: dense,
           onPressed: interactive ? () {} : null,
-          selected: selected,
+          selected: selected ? true : null,
           disabled: disabled,
           children: [
             const ids.ItemMedia(child: ids.Avatar(name: '김철수')),
@@ -127,17 +125,16 @@ final itemUseCases = [
           ],
         ),
         ShowcaseSection(
-          title: 'Dense · Variant × Size',
+          title: 'Tile × Text',
           children: [
             ShowcaseMatrix(
               rows: ids.IdsSize.values,
-              columns: ids.ItemVariant.values,
-              builder: (size, variant) => SizedBox(
+              columns: const ['title', 'one line', 'two lines'],
+              builder: (size, text) => SizedBox(
                 width: 256,
                 child: ids.Item(
-                  variant: variant,
+                  variant: ids.ItemVariant.outline,
                   size: size,
-                  dense: true,
                   children: [
                     const ids.ItemMedia(
                       variant: ids.ItemVariant.soft,
@@ -145,10 +142,15 @@ final itemUseCases = [
                     ),
                     ids.ItemContent(
                       children: [
-                        ids.ItemTitle(child: Text(variant.name)),
-                        ids.ItemDescription(
-                          child: Text('size ${size.name} · dense'),
-                        ),
+                        const ids.ItemTitle(child: Text('알림')),
+                        if (text == 'one line')
+                          const ids.ItemDescription(child: Text('새 댓글 3개')),
+                        if (text == 'two lines')
+                          const ids.ItemDescription(
+                            child: Text(
+                              '새 댓글 3개와 멘션 1개가 있습니다. 확인하지 않은 알림이 더 있습니다.',
+                            ),
+                          ),
                       ],
                     ),
                   ],
@@ -176,6 +178,30 @@ final itemUseCases = [
                         ids.ItemContent(
                           children: [
                             ids.ItemTitle(child: Text('media ${variant.name}')),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+            ShowcaseRow(
+              label: 'description',
+              children: [
+                for (final variant in ids.ItemVariant.values)
+                  SizedBox(
+                    width: 224,
+                    child: ids.Item(
+                      variant: ids.ItemVariant.outline,
+                      children: [
+                        ids.ItemMedia(
+                          variant: variant,
+                          child: const Icon(Icons.inbox_outlined),
+                        ),
+                        ids.ItemContent(
+                          children: [
+                            ids.ItemTitle(child: Text('media ${variant.name}')),
+                            const ids.ItemDescription(child: Text('받은 편지 12통')),
                           ],
                         ),
                       ],
@@ -256,8 +282,8 @@ final itemUseCases = [
                           ids.ItemTitle(child: Text('회의록.md')),
                           ids.ItemDescription(
                             child: Text(
-                              '설명이 두 줄을 넘으면 말줄임표로 줄고, 미디어는 첫 줄에 맞춰 위에 붙습니다. 이 '
-                              '문장은 일부러 길게 썼습니다.',
+                              '설명이 두 줄을 넘으면 말줄임표로 줄고, 타일은 행 높이에 비례해 커집니다. 이 문장은 '
+                              '일부러 길게 썼습니다.',
                             ),
                           ),
                         ],
@@ -265,15 +291,16 @@ final itemUseCases = [
                       ids.ItemContent(
                         children: [
                           Builder(
-                            builder: (context) => Text(
-                              '2분 전',
-                              style: ids.IdsTypography.captionC1Regular
-                                  .copyWith(
-                                    color: ids.IdsProvider.of(
-                                      context,
-                                    ).colors.textNeutral,
-                                  ),
-                            ),
+                            builder: (context) {
+                              final theme = ids.IdsProvider.of(context);
+                              return Text(
+                                '2분 전',
+                                style: theme.textStyle(
+                                  ids.IdsTypography.captionC1Regular,
+                                  color: theme.colors.textNeutral,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -492,7 +519,6 @@ final itemUseCases = [
           ),
           ids.ItemGroup(
             variant: ids.ItemGroupVariant.separated,
-            dense: true,
             semanticLabel: '첨부 파일',
             children: [
               for (final file in const ['보고서.pdf', '예산안.xlsx'])
@@ -606,42 +632,39 @@ final itemUseCases = [
     ),
   ),
   WidgetbookUseCase(
-    name: 'Dense',
+    name: 'Attachments',
     builder: (context) => SizedBox(
       width: 320,
       child: ids.ItemGroup(
-        dense: true,
+        variant: ids.ItemGroupVariant.separated,
         semanticLabel: '첨부 파일',
         children: [
-          for (final (index, file) in _attachments.indexed)
-            Padding(
-              padding: EdgeInsets.only(top: index == 0 ? 0 : 4),
-              child: ids.Item(
-                variant: ids.ItemVariant.outline,
-                children: [
-                  ids.ItemMedia(
-                    variant: ids.ItemVariant.soft,
-                    child: file.thumbnail
-                        ? _photoImage()
-                        : const Icon(Icons.insert_drive_file_outlined),
-                  ),
-                  ids.ItemContent(
-                    children: [
-                      ids.ItemTitle(truncate: true, child: Text(file.name)),
-                      ids.ItemDescription(child: Text(file.size)),
-                    ],
-                  ),
-                  ids.ItemActions(
-                    children: [
-                      StandInIconButton(
-                        icon: const Icon(Icons.close_outlined),
-                        label: '${file.name} 삭제',
-                        size: ids.IdsSize.tiny,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          for (final file in _attachments)
+            ids.Item(
+              variant: ids.ItemVariant.outline,
+              children: [
+                ids.ItemMedia(
+                  variant: ids.ItemVariant.soft,
+                  child: file.thumbnail
+                      ? _photoImage()
+                      : const Icon(Icons.insert_drive_file_outlined),
+                ),
+                ids.ItemContent(
+                  children: [
+                    ids.ItemTitle(truncate: true, child: Text(file.name)),
+                    ids.ItemDescription(child: Text(file.size)),
+                  ],
+                ),
+                ids.ItemActions(
+                  children: [
+                    StandInIconButton(
+                      icon: const Icon(Icons.close_outlined),
+                      label: '${file.name} 삭제',
+                      size: ids.IdsSize.tiny,
+                    ),
+                  ],
+                ),
+              ],
             ),
         ],
       ),
