@@ -70,7 +70,7 @@ class _SkeletonState extends State<Skeleton>
     super.dispose();
   }
 
-  Widget _paint({required bool circle, required double radius, Widget? child}) {
+  Widget _paint({required ShapeBorder shape, Widget? child}) {
     final ids = IdsProvider.of(context);
     final colors = ids.colors;
     return CustomPaint(
@@ -78,8 +78,7 @@ class _SkeletonState extends State<Skeleton>
         progress: _controller,
         animation: _moving ? widget.animation : SkeletonAnimation.none,
         visible: _busy,
-        circle: circle,
-        radius: radius,
+        shape: shape,
         base: colors.bgNeutralSoft,
         highlight: colors.bgNeutralSoftHover,
         direction: Directionality.maybeOf(context) ?? TextDirection.ltr,
@@ -88,22 +87,27 @@ class _SkeletonState extends State<Skeleton>
     );
   }
 
-  Widget _wrap(Widget child) => _paint(
-    circle: widget.shape == SkeletonShape.circle,
-    radius: IdsProvider.of(context).radius.standard,
-    child: ExcludeSemantics(
-      excluding: _busy,
-      child: ExcludeFocus(
+  Widget _wrap(Widget child) {
+    final ids = IdsProvider.of(context);
+    return _paint(
+      shape: widget.shape == SkeletonShape.circle
+          ? const CircleBorder()
+          : ids.shape(radius: ids.radius.standard),
+      child: ExcludeSemantics(
         excluding: _busy,
-        child: IgnorePointer(
-          ignoring: _busy,
-          child: Opacity(opacity: _busy ? 0 : 1, child: child),
+        child: ExcludeFocus(
+          excluding: _busy,
+          child: IgnorePointer(
+            ignoring: _busy,
+            child: Opacity(opacity: _busy ? 0 : 1, child: child),
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 
   Widget _text() {
+    final ids = IdsProvider.of(context);
     final style = DefaultTextStyle.of(context).style.merge(widget.style);
     final scaler =
         MediaQuery.maybeTextScalerOf(context) ?? TextScaler.noScaling;
@@ -134,8 +138,7 @@ class _SkeletonState extends State<Skeleton>
                   child: SizedBox(
                     height: barHeight,
                     child: _paint(
-                      circle: false,
-                      radius: IdsProvider.of(context).radius.indicator,
+                      shape: ids.shape(radius: ids.radius.indicator),
                     ),
                   ),
                 ),
@@ -151,19 +154,17 @@ class _SkeletonState extends State<Skeleton>
     final child = widget.child;
     if (child != null) return _wrap(child);
     if (!_busy) return const SizedBox.shrink();
+    final ids = IdsProvider.of(context);
 
     return switch (widget.shape) {
       SkeletonShape.rect => SizedBox(
         width: double.infinity,
-        height: _rectHeight,
-        child: _paint(
-          circle: false,
-          radius: IdsProvider.of(context).radius.standard,
-        ),
+        height: ids.dimension(_rectHeight),
+        child: _paint(shape: ids.shape(radius: ids.radius.standard)),
       ),
       SkeletonShape.circle => SizedBox.square(
-        dimension: _circleSize,
-        child: _paint(circle: true, radius: 0),
+        dimension: ids.dimension(_circleSize),
+        child: _paint(shape: const CircleBorder()),
       ),
       SkeletonShape.text => _text(),
     };
@@ -175,8 +176,7 @@ class _SkeletonPainter extends CustomPainter {
     required this.progress,
     required this.animation,
     required this.visible,
-    required this.circle,
-    required this.radius,
+    required this.shape,
     required this.base,
     required this.highlight,
     required this.direction,
@@ -189,25 +189,10 @@ class _SkeletonPainter extends CustomPainter {
   final Animation<double> progress;
   final SkeletonAnimation animation;
   final bool visible;
-  final bool circle;
-  final double radius;
+  final ShapeBorder shape;
   final Color base;
   final Color highlight;
   final TextDirection direction;
-
-  Path _outline(Size size) {
-    final bounds = Offset.zero & size;
-    return circle
-        ? (Path()..addOval(
-            Rect.fromCircle(
-              center: bounds.center,
-              radius: size.shortestSide / 2,
-            ),
-          ))
-        : (Path()..addRRect(
-            RRect.fromRectAndRadius(bounds, Radius.circular(radius)),
-          ));
-  }
 
   Color _pulseColor(double t) {
     final rising = t < 0.5;
@@ -244,7 +229,7 @@ class _SkeletonPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (!visible) return;
-    final outline = _outline(size);
+    final outline = shape.getOuterPath(Offset.zero & size);
     final pulsing = animation == SkeletonAnimation.pulse;
     canvas.drawPath(
       outline,
