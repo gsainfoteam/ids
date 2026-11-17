@@ -36,6 +36,14 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 - **`Group`** 은 내부 전용이다. React처럼 export하지 않고 `ButtonGroup`·`ToggleGroup`이 공유한다.
 - **`Text`** 가 없는 동안 텍스트는 `lib/tokens/ids_typography.dart` 상수를 `DefaultTextStyle`로 쓴다.
 
+## widgetbook
+
+- usecase는 Storybook(React `index.stories.tsx`)과 같게 만든다. 스토리 이름·순서·문구·크기를 그대로 옮기고, 컴포넌트 하나가 한 페이지다.
+- 링크는 `onPressed`로 옮긴다. `asChild`처럼 Flutter에 없는 동작만 보여 주는 스토리는 뺀다.
+- Flutter에 아직 없는 IDS 컴포넌트는 `example/lib/components/story_kit.dart`의 `StandIn*`(Material 위젯)으로 대신한다. usecase 파일은 Material 컨트롤을 직접 쓰지 않는다.
+- 그 컴포넌트를 옮기는 PR에서 `StandIn*`을 지우고 usecase를 IDS 컴포넌트로 바꾼다.
+- `StandIn*`이 없는 컴포넌트가 필요한 스토리와 Gallery 칸은 빼 두고, 그 컴포넌트를 옮길 때 채운다.
+
 ## 분류
 
 컴포넌트 이름과 분류는 React 폴더([CLAUDE.md](../../CLAUDE.md))를 따른다.
