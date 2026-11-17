@@ -37,38 +37,20 @@ test('the separator is a Divider across the group that overlaps the joined borde
   for (const name of ['h-px', '-my-px']) expect(vertical.classList, name).toContain(name);
 
   const spaced = separator(
-    <ButtonGroup aria-label="저장" layout="spaced">
+    <ButtonGroup aria-label="저장" attached={false}>
       <ButtonGroup.Separator />
     </ButtonGroup>,
   );
   expect(spaced.classList, 'spaced controls leave no seam').not.toContain('-mx-px');
-});
-
-test('a tray draws a short separator and quiet controls', () => {
-  const doc = new DOMParser().parseFromString(
-    renderToString(
-      <ButtonGroup aria-label="사진" layout="tray">
-        <Button>이전</Button>
-        <ButtonGroup.Separator />
-        <Button variant="solid">다음</Button>
-      </ButtonGroup>,
-    ),
-    'text/html',
-  );
-  const line = doc.querySelector<HTMLElement>('[data-group-separator]')!;
-  for (const name of ['h-5', 'mx-1', 'self-center']) expect(line.classList, name).toContain(name);
-  expect(line.classList, 'nothing to overlap').not.toContain('-mx-px');
-  expect(doc.querySelector('[role=group]')!.getAttribute('data-layout')).toBe('tray');
-  const [quiet, own] = doc.querySelectorAll('button');
-  expect(quiet!.dataset.variant).toBe('ghost');
-  expect(own!.dataset.variant, 'an own variant wins').toBe('solid');
+  for (const name of ['h-5', 'min-h-0', 'self-center'])
+    expect(spaced.classList, `a spaced separator is short: ${name}`).toContain(name);
 
   const tiny = separator(
-    <ButtonGroup aria-label="사진" layout="tray" size="tiny" orientation="vertical">
+    <ButtonGroup aria-label="저장" attached={false} size="tiny" orientation="vertical">
       <ButtonGroup.Separator />
     </ButtonGroup>,
   );
-  for (const name of ['w-4', 'my-1']) expect(tiny.classList, name).toContain(name);
+  for (const name of ['w-4', 'self-center']) expect(tiny.classList, name).toContain(name);
 });
 
 test('inside a single-select ToggleGroup the separator only draws a line', () => {
@@ -197,7 +179,7 @@ test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its
 test('spaced glossy buttons keep their own shadows', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
-      <ButtonGroup aria-label="저장" variant="glossy" layout="spaced">
+      <ButtonGroup aria-label="저장" variant="glossy" attached={false}>
         <Button>저장</Button>
         <Button>더보기</Button>
       </ButtonGroup>

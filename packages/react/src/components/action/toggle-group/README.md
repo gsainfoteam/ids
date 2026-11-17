@@ -95,9 +95,8 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 ```tsx
 <ToggleGroup aria-label="정렬" variant="outline" size="tiny">  {/* 안의 토글이 따른다 */}
 <ToggleGroup aria-label="보기" orientation="vertical">         {/* 세로. 화살표도 위아래 */}
-<ToggleGroup aria-label="정렬" className="w-full">              {/* 넓히면 토글이 폭을 나눠 가진다 */}
-<ToggleGroup aria-label="태그" layout="spaced">                {/* 붙이지 않고 간격만 둔다 */}
-<ToggleGroup aria-label="서식" layout="tray">                  {/* 테두리 막대 안에 띄우고 짧은 선으로 나눈다 */}
+<ToggleGroup aria-label="정렬" className="w-full">              {/* 넓히면 붙인 토글이 폭을 나눠 가진다 */}
+<ToggleGroup aria-label="시간" attached={false} className="flex-wrap">  {/* 띄운 토글은 제 너비로 줄을 넘긴다 */}
 ```
 
 ## 속성
@@ -113,7 +112,7 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 | `name` / `form`          | FormData 이름과 대상 폼                                              |
 | `disabled`               | 모든 항목과 폼 값을 끈다                                             |
 | `size` / `variant`       | 안의 Toggle, IconToggle 이 따른다. 직접 준 값이 이긴다               |
-| `layout`                 | `attached`(기본) / `spaced` / `tray`. ButtonGroup 과 같다            |
+| `attached`               | `true`. `false` 면 간격을 두고 떨어진다                              |
 | `ToggleGroup.Separator`  | 선. 라디오 그룹에서는 읽지 않는 장식이다                             |
 
 ## 알아둘 것

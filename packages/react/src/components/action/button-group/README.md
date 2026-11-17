@@ -42,7 +42,7 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 
 - `solid`, `soft` 처럼 테두리가 없는 버튼 사이를 나눌 때 씁니다. `outline` 은 테두리가 이미 선 역할을 합니다.
 - 선은 이웃과 1px 씩 겹쳐서 outline 버튼 옆에 두어도 두 줄이 되지 않습니다.
-- `tray` 에서는 버튼보다 짧은 선이 됩니다. [레이아웃](#레이아웃)을 봅니다.
+- `attached={false}` 로 띄운 그룹에서는 버튼보다 짧은 선(standard 20px, tiny 16px)이 가운데에 섭니다.
 - 스크린 리더에는 `role="separator"` 로 읽힙니다.
 
 ## 합성
@@ -66,36 +66,47 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 </ButtonGroup>
 ```
 
-## 레이아웃
+## 방향과 간격
 
 ```tsx
-<ButtonGroup variant="outline" aria-label="보관함">   {/* attached(기본). 이어 붙이고 바깥 모서리만 둥글다 */}
-<ButtonGroup layout="spaced" aria-label="필터">       {/* 붙이지 않고 8px 띄운다 */}
-
-<ButtonGroup layout="tray" aria-label="사진 보기">    {/* 테두리 막대 안에 버튼을 4px씩 띄운다 */}
-  <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-  <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-  <ButtonGroup.Separator />                          {/* 버튼보다 짧은 선 */}
-  <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+<ButtonGroup orientation="vertical" aria-label="정렬">  {/* 세로. 버튼 너비가 가장 넓은 버튼에 맞춰진다 */}
+  <Button>위</Button>
+  <Button>아래</Button>
 </ButtonGroup>
 
-<ButtonGroup orientation="vertical" aria-label="정렬">  {/* 세로. 버튼 너비가 가장 넓은 버튼에 맞춰진다 */}
+<ButtonGroup attached={false} aria-label="필터">       {/* 붙이지 않고 간격만 둔다 */}
+  <Button>전체</Button>
+  <Button>읽지 않음</Button>
+</ButtonGroup>
 ```
 
-- `tray` 는 그룹이 테두리와 배경을 그리므로, 안의 버튼은 기본으로 배경 없이(`ghost`) 그려집니다. 버튼이나 그룹에 `variant` 를 주면 그 값이 이깁니다.
-- `tray` 는 버튼마다 모서리를 두고, 막대 모서리는 버튼 모서리에 안쪽 여백 4px 를 더한 14px 입니다. 높이는 버튼보다 10px 큽니다.
-- 구분선은 버튼 가운데에 짧게 섭니다. standard 는 20px, tiny 는 16px 입니다.
+## 툴바
+
+```tsx
+<div className="flex border border-neutral bg-surface shadow-xs concentric-p-1">  {/* 막대는 앱이 그린다 */}
+  <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+    <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+    <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+    <ButtonGroup.Separator className="mx-1" />  {/* 띄운 그룹의 선은 짧다 */}
+    <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+  </ButtonGroup>
+</div>
+```
+
+- 테두리 막대 안에 버튼이 떠 있는 툴바는 막대를 앱이 그리고, 그 안에 띄운 그룹을 넣습니다.
+- 막대가 표면 역할을 하므로 안의 버튼은 배경 없이(`ghost`) 둡니다.
+- 버튼 묶음끼리 띄우려면 그룹 안에 그룹을 넣습니다. [합성](#합성)을 봅니다.
 
 ## 속성
 
 | 속성                    | 기본 / 동작                                            |
 | ----------------------- | ------------------------------------------------------ |
 | `orientation`           | `horizontal`(기본) / `vertical`                        |
-| `layout`                | `attached`(기본) / `spaced` / `tray`                   |
+| `attached`              | `true`. `false` 면 버튼마다 모서리를 두고 8px 떨어진다 |
 | `size`                  | 안의 컨트롤이 따르는 크기. 생략하면 각자 크기          |
 | `variant`               | 안의 컨트롤이 따르는 variant. 생략하면 각자 기본값     |
 | `aria-label`            | 그룹의 이름                                            |
-| `ButtonGroup.Separator` | 선. 그룹 방향과 수직이고, `tray` 에서는 짧다           |
+| `ButtonGroup.Separator` | 선. 그룹 방향과 수직이다                               |
 | 그 외 native 속성       | `div` 로 간다                                          |
 
 ## 알아둘 것
@@ -104,5 +115,5 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 - 버튼 하나하나가 Tab 순서에 들어갑니다. 화살표 키로 옮겨 다니며 하나를 고르는 묶음은 `ToggleGroup` 을 씁니다.
 - 이어 붙인 칸이 겹치므로 hover, press, focus ring 이 있는 칸을 순서대로 위로 올립니다. focus ring 이 가장 위라 안쪽 입력에 포커스가 있는 TextField 의 ring 도 옆 버튼에 가리지 않습니다.
 - 테두리를 겹치는 기준은 `data-variant="outline"` 과 `data-variant="glossy"` 입니다. 직접 만든 컨트롤도 이 속성을 붙이면 이어 붙습니다.
-- 이어 붙인 `glossy` 버튼은 각자의 그림자를 빼고, 그룹이 그림자 하나를 둘레에 그립니다. 켜질 때만 채워지는 `glossy` 토글(`aria-pressed`, `aria-checked`)은 그룹 그림자를 만들지 않고 켜진 토글이 제 그림자를 갖습니다. `spaced` 면 버튼마다 그림자를 갖습니다.
+- 이어 붙인 `glossy` 버튼은 각자의 그림자를 빼고, 그룹이 그림자 하나를 둘레에 그립니다. 켜질 때만 채워지는 `glossy` 토글(`aria-pressed`, `aria-checked`)은 그룹 그림자를 만들지 않고 켜진 토글이 제 그림자를 갖습니다. `attached={false}` 면 버튼마다 그림자를 갖습니다.
 - 그룹 안에 제자리로 렌더된 팝오버(`[popover]`)와 그 focus guard 는 이어 붙이는 칸에서 빠집니다. 팝오버를 여는 마지막 버튼도 바깥 모서리를 지키고, 팝오버 양옆의 outline 테두리도 한 줄로 겹칩니다.

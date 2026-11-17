@@ -13,11 +13,9 @@ import type { IdsSize } from '../../../tokens/types';
 
 export type GroupOrientation = 'horizontal' | 'vertical';
 
-export type GroupLayout = 'attached' | 'spaced' | 'tray';
-
 export type GroupContextValue = {
   orientation: GroupOrientation;
-  layout: GroupLayout;
+  attached: boolean;
   size?: IdsSize;
   variant?: SurfaceVariant;
   separator: 'semantic' | 'decorative';
@@ -47,7 +45,7 @@ export function useGroupNameWarning(
 
 export function GroupRoot({
   orientation = 'horizontal',
-  layout = 'attached',
+  attached = true,
   size,
   variant,
   separator = 'semantic',
@@ -58,9 +56,9 @@ export function GroupRoot({
   const parent = useGroupContext();
   const context: GroupContextValue = {
     orientation,
-    layout,
+    attached,
     size: size ?? parent?.size,
-    variant: variant ?? parent?.variant ?? (layout === 'tray' ? 'ghost' : undefined),
+    variant: variant ?? parent?.variant,
     separator,
   };
   return (
@@ -69,10 +67,9 @@ export function GroupRoot({
         role="group"
         data-group=""
         data-orientation={orientation}
-        data-layout={layout}
         data-size={context.size}
         {...rest}
-        className={groupStyle({ orientation, layout }).root({ className })}
+        className={groupStyle({ orientation, attached }).root({ className })}
       >
         {children}
       </div>
@@ -91,7 +88,7 @@ export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
       data-group-separator=""
       className={groupStyle({
         orientation: group.orientation,
-        layout: group.layout,
+        attached: group.attached,
         size: group.size,
       }).separator({ className })}
     />

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import {
+  ArchiveBoxIcon,
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
   ChevronDownIcon,
@@ -29,7 +30,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
 const sizes = ['standard', 'tiny'] as const;
 const orientations = ['horizontal', 'vertical'] as const;
-const layouts = ['attached', 'spaced', 'tray'] as const;
 
 const meta = {
   title: 'Action/ButtonGroup',
@@ -39,14 +39,14 @@ const meta = {
     orientation: { control: 'radio', options: orientations },
     size: { control: 'radio', options: sizes },
     variant: { control: 'radio', options: variants },
-    layout: { control: 'radio', options: layouts },
+    attached: { control: 'boolean' },
   },
   args: {
     'aria-label': '보관함 동작',
     orientation: 'horizontal',
     size: 'standard',
     variant: 'outline',
-    layout: 'attached',
+    attached: true,
   },
   render: (args) => (
     <ButtonGroup {...args}>
@@ -83,51 +83,6 @@ export const Gallery: Story = {
             </ButtonGroup>
           </Showcase.Row>
         ))}
-      </Showcase.Section>
-
-      <Showcase.Section
-        title="Layout"
-        description="attached 는 버튼을 이어 붙이고, spaced 는 띄웁니다. tray 는 테두리 막대 안에 버튼을 띄우고, 구분선을 짧게 긋고, 안의 버튼을 배경 없이 그립니다."
-      >
-        <Showcase.Matrix
-          rows={layouts}
-          columns={orientations}
-          render={(layout, orientation) =>
-            orientation === 'horizontal' ? (
-              <ButtonGroup
-                layout={layout}
-                variant={layout === 'tray' ? undefined : 'outline'}
-                aria-label={`${layout} 사진 넘기기`}
-              >
-                <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-                <Button className="tabular-nums">3 / 12</Button>
-                <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-                <ButtonGroup.Separator />
-                <IconButton icon={<XMarkIcon />} aria-label="닫기" />
-              </ButtonGroup>
-            ) : (
-              <ButtonGroup
-                layout={layout}
-                orientation="vertical"
-                variant={layout === 'tray' ? undefined : 'outline'}
-                aria-label={`${layout} 지도 확대`}
-              >
-                <IconButton icon={<PlusIcon />} aria-label="확대" />
-                <IconButton icon={<MinusIcon />} aria-label="축소" />
-                <ButtonGroup.Separator />
-                <IconButton icon={<XMarkIcon />} aria-label="닫기" />
-              </ButtonGroup>
-            )
-          }
-        />
-        <Showcase.Row label="tray, tiny">
-          <ButtonGroup layout="tray" size="tiny" aria-label="작은 사진 넘기기">
-            <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-            <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-            <ButtonGroup.Separator />
-            <IconButton icon={<XMarkIcon />} aria-label="닫기" />
-          </ButtonGroup>
-        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="Size × Orientation">
@@ -181,6 +136,35 @@ export const Gallery: Story = {
             </TextField>
             <Button variant="outline">이동</Button>
           </ButtonGroup>
+        </Showcase.Row>
+        <Showcase.Row label="attached=false">
+          <ButtonGroup attached={false} variant="outline" aria-label="필터">
+            <Button>전체</Button>
+            <Button>읽지 않음</Button>
+            <Button>
+              <ArchiveBoxIcon />
+              보관함
+            </Button>
+          </ButtonGroup>
+        </Showcase.Row>
+        <Showcase.Row label="attached=false + Separator">
+          <ButtonGroup attached={false} variant="outline" aria-label="사진 넘기기">
+            <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+            <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+            <ButtonGroup.Separator />
+            <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+          </ButtonGroup>
+        </Showcase.Row>
+        <Showcase.Row label="in a tray">
+          <div className="border-neutral bg-surface concentric-p-1 flex border shadow-xs">
+            <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+              <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+              <Button className="tabular-nums">3 / 12</Button>
+              <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+              <ButtonGroup.Separator className="mx-1" />
+              <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+            </ButtonGroup>
+          </div>
         </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl">
@@ -303,38 +287,31 @@ export const Separator: Story = {
   },
 };
 
-export const Tray: Story = {
+export const SpacedSeparator: Story = {
   render: () => (
-    <ButtonGroup layout="tray" aria-label="사진 보기">
-      <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-      <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
-      <ButtonGroup.Separator />
-      <IconButton icon={<XMarkIcon />} aria-label="닫기" />
-    </ButtonGroup>
+    <div className="border-neutral bg-surface concentric-p-1 flex border shadow-xs">
+      <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+        <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+        <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+        <ButtonGroup.Separator className="mx-1" />
+        <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+      </ButtonGroup>
+    </div>
   ),
   parameters: {
     docs: {
       description: {
         story:
-          'tray 는 테두리 막대 안에 버튼을 4px씩 띄워 둡니다. 버튼은 제 모서리를 지키고, 구분선은 버튼보다 짧게 가운데에 섭니다. 막대 모서리는 버튼 모서리에 안쪽 여백을 더한 값입니다.',
+          '띄운 그룹의 Separator는 버튼보다 짧게 가운데에 섭니다. 테두리 막대는 앱이 그리고, 그 안에 띄운 그룹을 넣으면 툴바가 됩니다.',
       },
     },
   },
   play: async ({ canvas }) => {
-    const bar = canvas.getByRole('group');
-    const prev = canvas.getByRole('button', { name: '이전 사진' });
-    const next = canvas.getByRole('button', { name: '다음 사진' });
-    const line = canvas.getByRole('separator');
-    await expect(prev).toHaveAttribute('data-variant', 'ghost');
-    await expect(radii(prev)).toEqual(['10px', '10px', '10px', '10px']);
-    await expect(getComputedStyle(bar).borderTopLeftRadius).toBe('14px');
-    await expect(next.getBoundingClientRect().left - prev.getBoundingClientRect().right).toBe(4);
-    const lineBox = line.getBoundingClientRect();
-    const buttonBox = next.getBoundingClientRect();
-    await expect(lineBox.height).toBe(20);
-    await expect(lineBox.top + lineBox.height / 2).toBeCloseTo(
-      buttonBox.top + buttonBox.height / 2,
-    );
+    const line = canvas.getByRole('separator').getBoundingClientRect();
+    const close = canvas.getByRole('button', { name: '닫기' }).getBoundingClientRect();
+    await expect(line.height).toBe(20);
+    await expect(line.top + line.height / 2).toBeCloseTo(close.top + close.height / 2);
+    await expect(close.left - line.right).toBe(8);
   },
 };
 

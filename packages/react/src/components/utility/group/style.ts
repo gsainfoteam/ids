@@ -1,6 +1,6 @@
 import { tv } from '../../../utils';
 
-import type { GroupLayout, GroupOrientation } from '.';
+import type { GroupOrientation } from '.';
 import type { IdsSize } from '../../../tokens/types';
 
 export const groupStyle = tv({
@@ -18,23 +18,22 @@ export const groupStyle = tv({
       horizontal: { root: 'flex-row' },
       vertical: { root: 'flex-col' },
     } satisfies Record<GroupOrientation, object>,
-    layout: {
-      attached: {
+    attached: {
+      true: {
         root: [
           'has-[>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:rounded-standard',
           'has-[>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:shadow-sm',
           '[&>[data-variant=glossy]:not([aria-pressed],[aria-checked])]:shadow-none',
         ],
       },
-      spaced: { root: 'gap-2' },
-      tray: { root: 'gap-1 border border-neutral bg-surface shadow-xs concentric-p-1' },
-    } satisfies Record<GroupLayout, object>,
+      false: { root: 'gap-2' },
+    },
     size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
   },
   compoundVariants: [
     {
       orientation: 'horizontal',
-      layout: 'attached',
+      attached: true,
       class: {
         root: [
           '[&>:not(input,[popover],[data-floating-ui-focus-guard])~:not(input,[popover],[data-floating-ui-focus-guard])]:rounded-s-none',
@@ -49,7 +48,7 @@ export const groupStyle = tv({
     },
     {
       orientation: 'vertical',
-      layout: 'attached',
+      attached: true,
       class: {
         root: [
           '[&>:not(input,[popover],[data-floating-ui-focus-guard])~:not(input,[popover],[data-floating-ui-focus-guard])]:rounded-t-none',
@@ -64,30 +63,20 @@ export const groupStyle = tv({
     },
     {
       orientation: 'horizontal',
-      layout: 'tray',
-      class: { separator: 'mx-1 h-5 min-h-0 self-center' },
+      attached: false,
+      class: { separator: 'h-5 min-h-0 self-center' },
     },
     {
       orientation: 'vertical',
-      layout: 'tray',
-      class: { separator: 'my-1 w-5 self-center' },
+      attached: false,
+      class: { separator: 'w-5 self-center' },
     },
-    {
-      orientation: 'horizontal',
-      layout: 'tray',
-      size: 'tiny',
-      class: { separator: 'h-4' },
-    },
-    {
-      orientation: 'vertical',
-      layout: 'tray',
-      size: 'tiny',
-      class: { separator: 'w-4' },
-    },
+    { orientation: 'horizontal', attached: false, size: 'tiny', class: { separator: 'h-4' } },
+    { orientation: 'vertical', attached: false, size: 'tiny', class: { separator: 'w-4' } },
   ],
   defaultVariants: {
     orientation: 'horizontal',
-    layout: 'attached',
+    attached: true,
     size: 'standard',
   },
 });
