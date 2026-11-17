@@ -17,10 +17,14 @@ app that also imports Material imports the package `as ids`.
 - A `Card` or `Item` with `onPressed` presses anywhere on its surface, while a control inside
   keeps its own press and focus. `Item` takes `selected`, and `ItemGroup` reads as a list.
 
-`IdsColorScheme` (`primary`, `neutral`, `danger`, `success`, `warning`, `info`) joins the generated
-enums. Neutral colors are generated with the brand colors, `IdsTheme` gains `mutedHover` and the
-`success`, `warning`, `danger` and `info` families with their `on` and `strong` tones, and
-`IdsRadius` holds the radius scale.
+`IdsColorScheme` (`primary`, `secondary`, `tertiary`, `neutral`, `danger`, `success`, `warning`,
+`info`) joins the generated enums. The components read their colors, corners, sizes and text styles
+from `IdsProvider`, so they follow the theme's palette, radius, corner shape and `scale`, and
+`AvatarGroup` takes its `+N` sentence from the provider's translation.
+
+A `squircle` theme no longer multiplies the radius by 1.84. That factor makes a CSS squircle as
+deep as a round corner, but Flutter's `RoundedSuperellipseBorder` already is, so `ids.radius` is
+now the same number for both corner shapes.
 
 `Interactive` leaves a press to the innermost control: a press on a control inside another
 neither presses nor focuses the outer one, and a press that turns into a scroll takes no focus.

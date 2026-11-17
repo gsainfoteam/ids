@@ -10,5 +10,5 @@ Text styles and fonts follow the CSS package.
   `fontFamily` and `monoFontFamily` are no longer theme settings. Both fonts ship in the package:
   Geist Mono (from Vercel's `geist` npm package) is new, and glyphs it lacks, such as Hangul, fall
   back to Pretendard GOV.
-- `IdsLabel` uses the medium weight, like ids-react's Label.
+- `Label` uses the medium weight, like ids-react's Label.
 - `scale` multiplies text size, `dimension` and radius.

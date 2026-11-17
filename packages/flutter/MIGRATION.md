@@ -27,11 +27,11 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
 ## 결정 사항
 
-- **이름.** 컴포넌트에는 `Ids` prefix를 붙이지 않는다. 생성 토큰 타입과 `IdsScope`·`IdsTheme`·`IdsRadius`에만 붙인다. Flutter SDK·Material과 이름이 겹치면 사용하는 쪽이 `as ids`로 import한다.
+- **이름.** 컴포넌트에는 `Ids` prefix를 붙이지 않는다. 생성 토큰 타입과 `IdsProvider`·`IdsScope`·`IdsTheme` 같은 테마 타입에만 붙인다. Flutter SDK·Material과 이름이 겹치면 사용하는 쪽이 `as ids`로 import한다.
 - **상태.** `Interactive`가 상태를 감지하고, 컴포넌트는 배경색 알파로 표현한다. StateMask는 만들지 않는다. `Interactive`는 상태만 내보내고, 배경 알파·focus ring·disabled는 control surface 값이 정한다. React의 `useInteractive` / `control-surface.ts`와 같은 분리다. Flutter에는 `:focus-visible`이 없으므로 `TextField`도 `Interactive`를 쓴다.
-- **토큰.** 색만 코드젠한다. brand·status·neutral 색이 `lib/tokens/ids_color_tokens.dart`로 나오고 `IdsTheme` getter로 읽는다. radius는 `lib/theme/ids_radius.dart`, 컨트롤·아이콘 크기와 컴포넌트 치수는 각 컴포넌트 안의 상수로 둔다. spacing은 생성하지 않는다 (React도 Tailwind 눈금을 쓴다). 상태 알파는 core에 없고 [control-surface.ts](../react/src/internal/control-surface.ts)에만 있으며, Flutter도 한 파일에 둔다.
+- **토큰.** 색, 모서리, 치수, 글자는 `IdsProvider.of(context)`에서 읽는다. 색은 `colors`의 역할(`bgNeutralSoft` `textNeutral` `borderNeutral` …), 모서리는 `shape(radius: radius.x)`(테마가 round면 둥근 사각형, squircle이면 `RoundedSuperellipseBorder`. 반지름 숫자는 둘이 같다), 치수는 `dimension(값)`, 글자는 `textStyle(IdsTypography.x, color:)`다. React가 spacing 눈금으로 쓰는 값은 `dimension`을 거쳐 테마 `scale`을 따르고, px로 쓰는 값(테두리, 링 두께)은 거치지 않는다. 컴포넌트 치수는 각 컴포넌트 안의 상수로 둔다. 상태 알파는 core에 없고 [control-surface.ts](../react/src/internal/control-surface.ts)에만 있으며, Flutter도 한 파일에 둔다.
 - **enum.** 여러 컴포넌트가 공유하는 축(`IdsSize` `IdsVariant`, React가 `internal/`이나 `tokens/`에 둔 타입)은 `packages/core/tokens/enums.json`에서 생성한다. 컴포넌트 하나만 쓰는 축(React가 그 컴포넌트 폴더에 둔 타입)은 그 컴포넌트 파일의 enum으로 두고, 값은 React와 같게 한다. Flutter가 새 값을 정하지 않는다.
-- **`colorScheme`.** 컴포넌트 색은 `colorScheme` prop이고 값은 `primary` `neutral` `danger` `success` `warning` `info`다. 공유 축이므로 처음 쓰는 컴포넌트에서 `enums.json`에 올린다.
+- **`colorScheme`.** 컴포넌트 색은 `colorScheme` prop이고 값은 `primary` `secondary` `tertiary` `neutral` `danger` `success` `warning` `info`다. 이름이 `colors`의 계열 이름과 같아서 역할을 `colors['bg-$name']`로 읽는다. 공유 축이므로 처음 쓰는 컴포넌트에서 `enums.json`에 올린다.
 - **아이콘.** 기본 아이콘(Avatar fallback, Empty media 등)은 Material Icons를 쓴다.
 - **`Group`** 은 내부 전용이다. React처럼 export하지 않고 `ButtonGroup`·`ToggleGroup`이 공유한다.
 - **`Text`** 가 없는 동안 텍스트는 `IdsProvider.of(context).textStyle(IdsTypography.bodyB3Medium, color: ...)`를 `DefaultTextStyle`로 쓴다. 이름은 CSS의 `text-body-b3-medium`과 같다.
@@ -50,16 +50,16 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
 **FE 구현, Flutter 미구현.** 옮긴다.
 
-| 분류       | 컴포넌트                                                                                                                                                                                                                                            |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| action     | `Button` `IconButton` `ButtonGroup` `Toggle` `IconToggle` `ToggleGroup` `FloatingButton`                                                                                                                                                            |
-| form       | `Input` `TextField` `TextArea` `NumberField` `PasswordField` `TelField` `OTPField` `ChipField` `FileField` `ColorField` `Select` `Checkbox` `CheckboxGroup` `Radio` `RadioGroup` `Switch` `Slider` `Rating` `DateField` `TimeField` `DateTimeField` |
-| data       | `Accordion` `Calendar` `Carousel` `Chip` `ColorPicker` `DataTable` `Image` `Marquee` `QRCode` `Table` `TimePicker`                                                                                                                                  |
-| feedback   | `Alert` `Progress` `Toast`                                                                                                                                                                                                                          |
-| layout     | `ScrollArea` `Resizable` `Splitter`                                                                                                                                                                                                                 |
-| navigation | `Breadcrumb` `Pagination` `Stepper` `Tabs`                                                                                                                                                                                                          |
-| overlay    | `Dialog` `Drawer` `Menu` `Popover` `Tooltip`                                                                                                                                                                                                        |
-| typography | `Kbd`                                                                                                                                                                                                                                               |
+| 분류       | 컴포넌트                                                                                                                                                                                                                                                          |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| action     | `Button` `IconButton` `ButtonGroup` `Toggle` `IconToggle` `ToggleGroup` `FloatingButton`                                                                                                                                                                          |
+| form       | `Input` `TextField` `TextArea` `NumberField` `PasswordField` `TelField` `OTPField` `ChipField` `FileField` `ColorField` `Select` `Checkbox` `CheckboxGroup` `Radio` `RadioGroup` `Switch` `Slider` `Rating` `DateField` `TimeField` `DateTimeField` `PromptInput` |
+| data       | `Accordion` `Calendar` `Carousel` `Chip` `ColorPicker` `DataTable` `Image` `Marquee` `QRCode` `Table` `TimePicker` `Bubble` `Chart` `CodeBlock`                                                                                                                   |
+| feedback   | `Alert` `Progress` `Toast` `Marker`                                                                                                                                                                                                                               |
+| layout     | `ScrollArea` `Resizable` `Splitter` `MessageScroller`                                                                                                                                                                                                             |
+| navigation | `Breadcrumb` `Pagination` `Stepper` `Tabs` `Sidebar`                                                                                                                                                                                                              |
+| overlay    | `Dialog` `Drawer` `Menu` `Popover` `Tooltip`                                                                                                                                                                                                                      |
+| typography | `Kbd` `Highlight` `Link`                                                                                                                                                                                                                                          |
 
 **FE 미구현.** FE가 만든 뒤 옮긴다: `Text` `Heading` `HStack` `VStack`. `HStack`·`VStack`의 enum은 `lib/src/layout/ids_axis.dart`에 있다.
 
@@ -130,20 +130,20 @@ focusVisible = focused
 
 ### control surface — Button / IconButton / Toggle / IconToggle 공통
 
-[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySoft`, `textOnPrimary` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
+[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySoft`, `textOnPrimary` …). 치수는 `Button` 때 Figma로 덮어쓴다.
 
-| `colorScheme`                                 | fill / on-fill                  | fill hover / press                 | quiet         | hover / press                              | ring        |
-| --------------------------------------------- | ------------------------------- | ---------------------------------- | ------------- | ------------------------------------------ | ----------- |
-| `primary` `secondary` `tertiary`              | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderX`   |
-| `neutral`                                     | `onSurface` / `surface`         | fill을 글자 반대쪽으로 10% / 20%   | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderPrimary` |
-| `danger` `success` `warning` `info`           | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `textX`       | `bgXSoft` / `bgXSoftHover`                 | `borderX`   |
+| `colorScheme`                       | fill / on-fill          | fill hover / press               | quiet       | hover / press                          | ring            |
+| ----------------------------------- | ----------------------- | -------------------------------- | ----------- | -------------------------------------- | --------------- |
+| `primary` `secondary` `tertiary`    | `bgX` / `textOnX`       | `bgXHover` / `bgXActive`         | `onSurface` | `bgNeutralSoft` / `bgNeutralSoftHover` | `borderX`       |
+| `neutral`                           | `onSurface` / `surface` | fill을 글자 반대쪽으로 10% / 20% | `onSurface` | `bgNeutralSoft` / `bgNeutralSoftHover` | `borderPrimary` |
+| `danger` `success` `warning` `info` | `bgX` / `textOnX`       | `bgXHover` / `bgXActive`         | `textX`     | `bgXSoft` / `bgXSoftHover`             | `borderX`       |
 
-|           | 배경 default                          | hover / active                         | 전경            | 테두리·그림자                        |
-| --------- | ------------------------------------- | -------------------------------------- | --------------- | ------------------------------------ |
-| `solid`   | fill                                  | fill hover / fill press                | on-fill         | 그림자 `shadow-xs`                   |
-| `soft`    | `bgXSoft`                             | `bgXSoftHover` / `bgXSoftActive`       | `textOnXSoft`   | 없음                                 |
-| `outline` | `surface` (dark: `bgNeutralSoft` 0.30) | hover / press                          | quiet           | 안쪽 1px `borderNeutral`, `shadow-xs` |
-| `ghost`   | 투명                                  | hover / press                          | quiet           | 없음                                 |
+|           | 배경 default                           | hover / active                   | 전경          | 테두리·그림자                         |
+| --------- | -------------------------------------- | -------------------------------- | ------------- | ------------------------------------- |
+| `solid`   | fill                                   | fill hover / fill press          | on-fill       | 그림자 `shadow-xs`                    |
+| `soft`    | `bgXSoft`                              | `bgXSoftHover` / `bgXSoftActive` | `textOnXSoft` | 없음                                  |
+| `outline` | `surface` (dark: `bgNeutralSoft` 0.30) | hover / press                    | quiet         | 안쪽 1px `borderNeutral`, `shadow-xs` |
+| `ghost`   | 투명                                   | hover / press                    | quiet         | 없음                                  |
 
 - 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`, hover)이다
 - `outline` 테두리는 `colors.borderNeutral`이다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
@@ -152,11 +152,11 @@ focusVisible = focused
 - `focusVisible`: 바깥 3px 링(ring 색 40%)과 안쪽 1px 테두리를 ring 색으로
 - 전환은 색·배경·테두리·그림자, 시간은 `IdsMotion.fast`. reduced motion이면 전환 없음
 - Semantics는 컴포넌트가 주입한다 (button, label, enabled. Toggle은 `toggled`)
-- 크기 (radius는 모두 `IdsRadius.standard`):
+- 크기 (radius는 모두 `radius.standard`):
 
-|            | 높이 | 좌우 | 아이콘 쪽 | 간격 | 아이콘 | 글자                  |
-| ---------- | ---- | ---- | --------- | ---- | ------ | --------------------- |
-| `standard` | 36   | 16   | 12        | 8    | 16     | `bodyB3Medium` (14)   |
+|            | 높이 | 좌우 | 아이콘 쪽 | 간격 | 아이콘 | 글자                   |
+| ---------- | ---- | ---- | --------- | ---- | ------ | ---------------------- |
+| `standard` | 36   | 16   | 12        | 8    | 16     | `bodyB3Medium` (14)    |
 | `tiny`     | 32   | 12   | 10        | 6    | 14     | `captionC1Medium` (12) |
 
 ### 그룹 전파
