@@ -38,6 +38,7 @@ export const scrollAreaStyle = tv({
         scrollbar: 'bg-neutral-soft/50',
         corner: 'bg-neutral-soft/50',
       },
+      none: {},
     } satisfies Record<ScrollArea.Variant, object>,
     size: {
       standard: {
