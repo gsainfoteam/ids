@@ -451,7 +451,7 @@ class StandInTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TextField(
-    enabled: !disabled,
+    enabled: !(disabled || (ids.Field.maybeOf(context)?.disabled ?? false)),
     controller: controller,
     onChanged: onChanged,
     decoration: InputDecoration(
