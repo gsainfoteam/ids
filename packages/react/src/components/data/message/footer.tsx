@@ -8,8 +8,8 @@ import { MessageTime } from './time';
 export type MessageFooterProps = ComponentProps<'footer'>;
 
 export function MessageFooter({ className, children, ...props }: MessageFooterProps) {
-  const { styles, time, timeIn, last } = useMessageContext('Message.Footer');
-  const shownTime = timeIn === 'footer' && last ? time : undefined;
+  const { styles, time, timeIn, status, last } = useMessageContext('Message.Footer');
+  const shownTime = timeIn === 'footer' && last && status !== 'error' ? time : undefined;
 
   if (children == null && shownTime === undefined) return null;
 

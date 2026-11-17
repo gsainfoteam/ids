@@ -8,7 +8,7 @@ import { MessageTime } from './time';
 export type MessageHeaderProps = ComponentProps<'header'>;
 
 export function MessageHeader({ className, children, ...props }: MessageHeaderProps) {
-  const { styles, name, time, timeIn, labelId } = useMessageContext('Message.Header');
+  const { styles, name, time, timeIn, status, labelId } = useMessageContext('Message.Header');
   const custom = children != null;
 
   return (
@@ -27,7 +27,9 @@ export function MessageHeader({ className, children, ...props }: MessageHeaderPr
               {name}
             </span>
           )}
-          {timeIn === 'header' && time !== undefined && <MessageTime time={time} />}
+          {timeIn === 'header' && status !== 'error' && time !== undefined && (
+            <MessageTime time={time} />
+          )}
         </>
       )}
     </header>

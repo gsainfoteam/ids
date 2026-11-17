@@ -344,6 +344,29 @@ test('status="error" draws the failure line under the bubble and the retry butto
   expect(onRetry.mock.calls[0]).toEqual([]);
 });
 
+test('a message that failed to send draws no time, wherever its time would stand', () => {
+  const doc = parse(
+    <>
+      <Message align="end" time={SENT_AT} status="error">
+        말풍선
+      </Message>
+      <Message shape="plain" name="GIST 도우미" time={SENT_AT} status="error">
+        머리
+      </Message>
+      <Message shape="plain" time={SENT_AT} status="error">
+        아래 줄
+        <Message.Footer />
+      </Message>
+    </>,
+  );
+  const [bubbled, headed, footed] = articles(doc);
+  expect(bubbled!.querySelector('time')).toBeNull();
+  expect(headed!.querySelector('header')!.textContent).toBe('GIST 도우미');
+  expect(headed!.querySelector('time')).toBeNull();
+  expect(footed!.querySelector('time')).toBeNull();
+  expect(footed!.querySelector('footer')).toBeNull();
+});
+
 test('Message.Actions without children copies the content text', async () => {
   const copied = clipboardThatRecords();
   const screen = await render(

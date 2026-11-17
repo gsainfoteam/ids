@@ -125,8 +125,8 @@ import { Bubble, Marker, Message } from '@gsainfoteam/ids-react';
 | `error`   | `inset-ring-danger` 테두리                               | 다시 보내기 IconButton       | 실패 줄 `t('message.error')`      |
 
 - 빛은 CSS 패키지의 `animate-skeleton-wave` 를 말풍선 면 뒤(`::after`)로 지나가게 한 것입니다. 움직임 줄이기 설정이면 옅은 면만 남습니다.
-- 보내지 못한 메시지에는 보낸 시간이 없으므로, 시간 자리에 다시 보내기 버튼(`t('message.retry')`)이 섭니다. `onRetry` 가 없으면 비워 둡니다.
-- 말풍선이 없는 메시지는 다시 보내기 버튼을 실패 줄 옆에 둡니다.
+- 보내지 못한 메시지에는 보낸 시간이 없으므로 `time` 을 줘도 시간을 그리지 않습니다. 말풍선이 있으면 그 자리에 다시 보내기 버튼(`t('message.retry')`)이 서고, `onRetry` 가 없으면 비워 둡니다.
+- 말풍선이 없는 메시지는 머리와 아래 줄에도 시간을 그리지 않고, 다시 보내기 버튼을 실패 줄 옆에 둡니다.
 - 실패 줄은 `Marker` 이고 `role="status"` 입니다.
 - 요소에는 `data-message`, `data-shape`, `data-align`, `data-status` 가 붙고, 묶음 안이면 `data-first`, `data-last` 가 붙습니다.
 
