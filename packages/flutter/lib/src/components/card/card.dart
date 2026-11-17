@@ -86,28 +86,27 @@ class Card extends StatelessWidget {
   Widget _surface(BuildContext context, InteractiveState state) {
     final ids = IdsProvider.of(context);
     final colors = ids.colors;
-    final pad = _paddings[size]!;
+    final pad = ids.dimension(_paddings[size]!);
     final reduced = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final base = switch (variant) {
       CardVariant.outline => colors.surface,
       CardVariant.soft => colors.bgNeutralSoft,
       CardVariant.ghost => colors.surface.withValues(alpha: 0),
     };
-    final radius = BorderRadius.circular(ids.radius.container);
+    ShapeBorder outline(BorderSide side) =>
+        ids.shape(radius: ids.radius.container, side: side);
 
     return AnimatedContainer(
       duration: reduced ? Duration.zero : IdsMotion.fast,
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: SurfaceLayer.over(base, colors, state),
-        borderRadius: radius,
-        border: FocusRing.around(colors, state),
-        boxShadow: [if (variant == CardVariant.outline) _shadow],
+        shape: outline(FocusRing.around(colors, state)),
+        shadows: [if (variant == CardVariant.outline) _shadow],
       ),
       foregroundDecoration: variant == CardVariant.outline
-          ? BoxDecoration(
-              border: Border.all(color: FocusRing.edge(colors, state)),
-              borderRadius: radius,
+          ? ShapeDecoration(
+              shape: outline(BorderSide(color: FocusRing.edge(colors, state))),
             )
           : null,
       child: DefaultTextStyle.merge(
@@ -155,11 +154,12 @@ class CardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _CardScope.check(context, 'CardHeader');
+    final gap = IdsProvider.of(context).dimension(_gap);
     final action = children.whereType<CardAction>().firstOrNull;
     final text = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: _gap,
+      spacing: gap,
       children: [
         for (final child in children)
           if (child is! CardAction) child,
@@ -168,7 +168,7 @@ class CardHeader extends StatelessWidget {
     if (action == null) return text;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: _gap,
+      spacing: gap,
       children: [
         Expanded(child: text),
         action,
@@ -189,14 +189,20 @@ class CardTitle extends StatelessWidget {
   };
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    header: true,
-    headingLevel: headingLevel,
-    child: DefaultTextStyle.merge(
-      style: _styles[_CardScope.sizeOf(context, 'CardTitle')],
-      child: child,
-    ),
-  );
+  Widget build(BuildContext context) {
+    final ids = IdsProvider.of(context);
+    return Semantics(
+      header: true,
+      headingLevel: headingLevel,
+      child: DefaultTextStyle.merge(
+        style: ids.textStyle(
+          _styles[_CardScope.sizeOf(context, 'CardTitle')]!,
+          color: ids.colors.onSurface,
+        ),
+        child: child,
+      ),
+    );
+  }
 }
 
 class CardDescription extends StatelessWidget {
@@ -206,9 +212,12 @@ class CardDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _CardScope.check(context, 'CardDescription');
+    final ids = IdsProvider.of(context);
     return DefaultTextStyle.merge(
-      style: TextStyle(color: IdsProvider.of(context).colors.textNeutral),
+      style: ids.textStyle(
+        Card._textStyles[_CardScope.sizeOf(context, 'CardDescription')]!,
+        color: ids.colors.textNeutral,
+      ),
       child: child,
     );
   }
@@ -249,7 +258,10 @@ class CardFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _CardScope.check(context, 'CardFooter');
-    return Row(spacing: _gap, children: children);
+    return Row(
+      spacing: IdsProvider.of(context).dimension(_gap),
+      children: children,
+    );
   }
 }
 

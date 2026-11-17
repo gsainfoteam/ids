@@ -6,11 +6,17 @@ import 'package:ids_flutter/ids.dart';
 
 import 'test_theme.dart';
 
-Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
+Future<void> pump(
+  WidgetTester tester,
+  Widget child, {
+  IdsTheme theme = testTheme,
+  IdsMode? mode,
+}) => tester.pumpWidget(
   WidgetsApp(
     color: const Color(0xFFFFFFFF),
     builder: (context, _) => IdsProvider(
-      theme: testTheme,
+      theme: theme,
+      mode: mode,
       child: FocusScope(
         autofocus: true,
         child: Align(
@@ -24,10 +30,15 @@ Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
 
 const _box = SizedBox(height: 20);
 
+const _squircleTheme = IdsTheme(
+  primary: IdsThemeColor.seed(Color(0xFF155DFC)),
+  cornerShape: IdsCornerShape.squircle,
+);
+
 Offset offsetIn(WidgetTester tester, Finder finder) =>
     tester.getTopLeft(finder) - tester.getTopLeft(find.byType(Card));
 
-BoxDecoration surfaceOf(WidgetTester tester) =>
+ShapeDecoration surfaceOf(WidgetTester tester) =>
     tester
             .widget<AnimatedContainer>(
               find.descendant(
@@ -36,7 +47,54 @@ BoxDecoration surfaceOf(WidgetTester tester) =>
               ),
             )
             .decoration!
-        as BoxDecoration;
+        as ShapeDecoration;
+
+ShapeDecoration edgeOf(WidgetTester tester) =>
+    tester
+            .widget<AnimatedContainer>(
+              find.descendant(
+                of: find.byType(Card),
+                matching: find.byType(AnimatedContainer),
+              ),
+            )
+            .foregroundDecoration!
+        as ShapeDecoration;
+
+BorderSide sideOf(ShapeDecoration decoration) =>
+    (decoration.shape as OutlinedBorder).side;
+
+BorderRadiusGeometry cornerOf(ShapeDecoration decoration) =>
+    switch (decoration.shape) {
+      RoundedRectangleBorder(:final borderRadius) => borderRadius,
+      RoundedSuperellipseBorder(:final borderRadius) => borderRadius,
+      final shape => throw StateError('$shape has no corner radius'),
+    };
+
+Offset insideTheRoundCornerOnly(Size size, double radius) {
+  final squircle = RoundedSuperellipseBorder(
+    borderRadius: BorderRadius.circular(radius),
+  ).getOuterPath(Offset.zero & size);
+  var inset = 0.0;
+  while (!squircle.contains(Offset(radius, inset))) {
+    inset += 0.01;
+  }
+  return Offset(radius, inset / 2);
+}
+
+Border lineOf(WidgetTester tester, Finder region) =>
+    (tester
+                    .widget<DecoratedBox>(
+                      find
+                          .ancestor(
+                            of: region,
+                            matching: find.byType(DecoratedBox),
+                          )
+                          .first,
+                    )
+                    .decoration
+                as BoxDecoration)
+            .border!
+        as Border;
 
 IdsColors themeOf(WidgetTester tester) =>
     IdsProvider.of(tester.element(find.byType(Card))).colors;
@@ -370,6 +428,109 @@ void main() {
     });
   });
 
+  group('scale', () {
+    testWidgets('padding, gaps and type grow with the theme scale', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const Card(
+          children: [
+            CardHeader(
+              key: ValueKey('header'),
+              children: [
+                CardTitle(child: Text('Title')),
+                CardDescription(child: Text('Description')),
+              ],
+            ),
+            CardContent(child: Text('Body')),
+            CardFooter(
+              children: [
+                SizedBox(width: 40, height: 20, key: ValueKey('a')),
+                SizedBox(width: 40, height: 20, key: ValueKey('b')),
+              ],
+            ),
+          ],
+        ),
+        theme: scaledTheme,
+      );
+      final card = tester.getRect(find.byType(Card));
+      final title = tester.getRect(find.text('Title'));
+      final description = tester.getRect(find.text('Description'));
+      final body = tester.getRect(find.text('Body'));
+      final first = tester.getRect(find.byKey(const ValueKey('a')));
+      final second = tester.getRect(find.byKey(const ValueKey('b')));
+      expect(title.topLeft - card.topLeft, const Offset(24, 24));
+      expect(description.top - title.bottom, 6);
+      expect(
+        body.top - tester.getRect(find.byKey(const ValueKey('header'))).bottom,
+        24,
+      );
+      expect(first.top - body.bottom, 24);
+      expect(second.left - first.right, 12);
+      expect(card.bottom - first.bottom, 24);
+
+      double sizeOf(String text) =>
+          DefaultTextStyle.of(tester.element(find.text(text))).style.fontSize!;
+      expect(sizeOf('Title'), 24);
+      expect(sizeOf('Description'), 21);
+      expect(sizeOf('Body'), 21);
+      expect(sideOf(edgeOf(tester)).width, 1);
+
+      await pump(
+        tester,
+        const Card(
+          children: [
+            CardHeader(
+              key: ValueKey('header'),
+              divider: true,
+              children: [_box],
+            ),
+            CardContent(key: ValueKey('content'), child: _box),
+            CardFooter(
+              key: ValueKey('footer'),
+              divider: true,
+              children: [_box],
+            ),
+          ],
+        ),
+        theme: scaledTheme,
+      );
+      final header = find.byKey(const ValueKey('header'));
+      final footer = find.byKey(const ValueKey('footer'));
+      final content = tester.getRect(find.byKey(const ValueKey('content')));
+      expect(lineOf(tester, header).bottom.width, 1);
+      expect(lineOf(tester, footer).top.width, 1);
+      expect(content.top - tester.getRect(header).bottom, 24 + 1 + 24);
+      expect(tester.getRect(footer).top - content.bottom, 24 + 1 + 24);
+    });
+
+    testWidgets('a tiny card scales its 12 and its caption type', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        const Card(
+          size: IdsSize.tiny,
+          children: [
+            CardHeader(
+              children: [
+                CardTitle(child: Text('Title')),
+                CardDescription(child: Text('Description')),
+              ],
+            ),
+          ],
+        ),
+        theme: scaledTheme,
+      );
+      expect(offsetIn(tester, find.text('Title')), const Offset(18, 18));
+      double sizeOf(String text) =>
+          DefaultTextStyle.of(tester.element(find.text(text))).style.fontSize!;
+      expect(sizeOf('Title'), 21);
+      expect(sizeOf('Description'), 18);
+    });
+  });
+
   group('look', () {
     testWidgets('title and description take their type and colour', (
       tester,
@@ -404,8 +565,8 @@ void main() {
       await pump(tester, const Card(children: [CardContent(child: _box)]));
       final theme = themeOf(tester);
       expect(surfaceOf(tester).color, theme.surface);
-      expect(surfaceOf(tester).boxShadow, isNotEmpty);
-      expect(surfaceOf(tester).borderRadius, BorderRadius.circular(16));
+      expect(surfaceOf(tester).shadows, isNotEmpty);
+      expect(cornerOf(surfaceOf(tester)), BorderRadius.circular(16));
 
       await pump(
         tester,
@@ -415,7 +576,7 @@ void main() {
         ),
       );
       expect(surfaceOf(tester).color, theme.bgNeutralSoft);
-      expect(surfaceOf(tester).boxShadow, isEmpty);
+      expect(surfaceOf(tester).shadows, isEmpty);
 
       await pump(
         tester,
@@ -425,6 +586,101 @@ void main() {
         ),
       );
       expect(surfaceOf(tester).color!.a, 0);
+    });
+
+    for (final mode in [IdsMode.light, IdsMode.dark]) {
+      testWidgets('reads every colour from its role (${mode.name})', (
+        tester,
+      ) async {
+        Widget card(CardVariant variant) => Card(
+          variant: variant,
+          children: const [
+            CardHeader(
+              key: ValueKey('header'),
+              divider: true,
+              children: [
+                CardTitle(child: Text('Title')),
+                CardDescription(child: Text('Description')),
+              ],
+            ),
+            CardContent(child: Text('Body')),
+            CardFooter(key: ValueKey('footer'), divider: true),
+          ],
+        );
+        Color? colorOf(String text) =>
+            DefaultTextStyle.of(tester.element(find.text(text))).style.color;
+
+        await pump(tester, card(CardVariant.outline), mode: mode);
+        final colors = themeOf(tester);
+        expect(surfaceOf(tester).color, colors.surface);
+        expect(sideOf(edgeOf(tester)), BorderSide(color: colors.borderNeutral));
+        expect(
+          lineOf(tester, find.byKey(const ValueKey('header'))),
+          Border(bottom: BorderSide(color: colors.borderNeutral)),
+        );
+        expect(
+          lineOf(tester, find.byKey(const ValueKey('footer'))),
+          Border(top: BorderSide(color: colors.borderNeutral)),
+        );
+        expect(colorOf('Title'), colors.onSurface);
+        expect(colorOf('Description'), colors.textNeutral);
+        expect(colorOf('Body'), colors.onSurface);
+
+        await pump(tester, card(CardVariant.soft), mode: mode);
+        expect(surfaceOf(tester).color, colors.bgNeutralSoft);
+      });
+    }
+
+    testWidgets('the corner follows the theme radius', (tester) async {
+      await pump(
+        tester,
+        const Card(children: [CardContent(child: _box)]),
+        theme: roundedTheme,
+      );
+      final corner = BorderRadius.circular(
+        IdsProvider.of(tester.element(find.byType(Card))).radius.container,
+      );
+      expect(cornerOf(surfaceOf(tester)), corner);
+      expect(cornerOf(edgeOf(tester)), corner);
+    });
+
+    testWidgets('the surface, its edge and its clip take the theme corner '
+        'shape', (tester) async {
+      const card = Card(
+        children: [
+          CardMedia(child: _box),
+          CardContent(child: _box),
+        ],
+      );
+      Path clipOf() {
+        final clip = find
+            .descendant(of: find.byType(Card), matching: find.byType(ClipPath))
+            .first;
+        return tester
+            .widget<ClipPath>(clip)
+            .clipper!
+            .getClip(tester.getSize(clip));
+      }
+
+      await pump(tester, card);
+      final corner = cornerOf(surfaceOf(tester));
+      final point = insideTheRoundCornerOnly(
+        tester.getSize(find.byType(Card)),
+        IdsProvider.of(tester.element(find.byType(Card))).radius.container,
+      );
+      expect(point.dy, greaterThan(0));
+      expect(surfaceOf(tester).shape, isA<RoundedRectangleBorder>());
+      expect(edgeOf(tester).shape, isA<RoundedRectangleBorder>());
+      expect(cornerOf(edgeOf(tester)), corner);
+      expect(clipOf().contains(point), isTrue);
+
+      await pump(tester, card, theme: _squircleTheme);
+      await tester.pumpAndSettle();
+      expect(surfaceOf(tester).shape, isA<RoundedSuperellipseBorder>());
+      expect(edgeOf(tester).shape, isA<RoundedSuperellipseBorder>());
+      expect(cornerOf(surfaceOf(tester)), corner);
+      expect(cornerOf(edgeOf(tester)), corner);
+      expect(clipOf().contains(point), isFalse);
     });
 
     testWidgets('every part outside a card is a mistake', (tester) async {
@@ -571,24 +827,14 @@ void main() {
       await tester.pumpAndSettle();
       final theme = themeOf(tester);
       expect(
-        surfaceOf(tester).border,
-        Border.all(
+        sideOf(surfaceOf(tester)),
+        BorderSide(
           color: theme.borderPrimary.withValues(alpha: 0.4),
           width: 3,
           strokeAlign: BorderSide.strokeAlignOutside,
         ),
       );
-      final edge =
-          tester
-                  .widget<AnimatedContainer>(
-                    find.descendant(
-                      of: find.byType(Card),
-                      matching: find.byType(AnimatedContainer),
-                    ),
-                  )
-                  .foregroundDecoration!
-              as BoxDecoration;
-      expect((edge.border! as Border).top.color, theme.borderPrimary);
+      expect(sideOf(edgeOf(tester)).color, theme.borderPrimary);
     });
 
     testWidgets('a focused ghost card stays clear inside its ring', (
@@ -605,7 +851,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       await tester.pumpAndSettle();
       expect(surfaceOf(tester).color!.a, 0);
-      expect(surfaceOf(tester).boxShadow, isEmpty);
+      expect(surfaceOf(tester).shadows, isEmpty);
     });
 
     testWidgets('a disabled card drops the hover layer', (tester) async {

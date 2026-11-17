@@ -32,13 +32,14 @@ abstract final class FocusRing {
   static const _width = 3.0;
   static const _alpha = 0.4;
 
-  static Border around(IdsColors colors, InteractiveState state) => Border.all(
-    color: colors.borderPrimary.withValues(
-      alpha: state.focusVisible ? _alpha : 0,
-    ),
-    width: state.focusVisible ? _width : 0,
-    strokeAlign: BorderSide.strokeAlignOutside,
-  );
+  static BorderSide around(IdsColors colors, InteractiveState state) =>
+      BorderSide(
+        color: colors.borderPrimary.withValues(
+          alpha: state.focusVisible ? _alpha : 0,
+        ),
+        width: state.focusVisible ? _width : 0,
+        strokeAlign: BorderSide.strokeAlignOutside,
+      );
 
   static Color edge(IdsColors colors, InteractiveState state) =>
       state.focusVisible ? colors.borderPrimary : colors.borderNeutral;
