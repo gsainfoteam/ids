@@ -253,6 +253,24 @@ void main() {
       expect(statuses, [AvatarStatus.loading, AvatarStatus.loaded]);
     });
 
+    testWidgets('a delay set while it waits starts the wait again', (
+      tester,
+    ) async {
+      final image = HeldImage();
+      Widget avatar(Duration delay) =>
+          Avatar(image: image, name: 'Alice Kim', fallbackDelay: delay);
+      await pump(tester, avatar(Duration.zero));
+      await tester.pump();
+      expect(find.text('AK'), findsOneWidget);
+
+      await pump(tester, avatar(const Duration(milliseconds: 600)));
+      await tester.pump();
+      expect(find.text('AK'), findsNothing);
+
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.text('AK'), findsOneWidget);
+    });
+
     testWidgets('shows the fallback at once when the image fails', (
       tester,
     ) async {

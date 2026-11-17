@@ -84,7 +84,12 @@ class _AvatarState extends State<Avatar> {
   @override
   void didUpdateWidget(Avatar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.image != oldWidget.image) _startLoading();
+    if (widget.image != oldWidget.image) {
+      _startLoading();
+    } else if (widget.fallbackDelay != oldWidget.fallbackDelay &&
+        _status == AvatarStatus.loading) {
+      _waitForTheFallback();
+    }
     if (widget.name != oldWidget.name ||
         widget.semanticLabel != oldWidget.semanticLabel ||
         widget.excludeFromSemantics != oldWidget.excludeFromSemantics) {
@@ -108,13 +113,17 @@ class _AvatarState extends State<Avatar> {
   }
 
   void _startLoading() {
-    _delay?.cancel();
-    _waited = false;
     if (widget.image == null) {
       _report(AvatarStatus.error);
       return;
     }
     _report(AvatarStatus.loading);
+    _waitForTheFallback();
+  }
+
+  void _waitForTheFallback() {
+    _delay?.cancel();
+    _waited = false;
     if (widget.fallbackDelay > Duration.zero) {
       _delay = Timer(
         widget.fallbackDelay,
