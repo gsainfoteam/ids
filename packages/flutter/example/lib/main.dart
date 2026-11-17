@@ -9,6 +9,7 @@ import 'components/icon_button_usecase.dart';
 import 'components/kbd_usecase.dart';
 import 'components/label_usecase.dart';
 import 'components/spinner_usecase.dart';
+import 'components/text_field_usecase.dart';
 import 'components/provider_usecase.dart';
 import 'components/provider_integration_preview.dart';
 
@@ -44,6 +45,7 @@ class WidgetbookApp extends StatelessWidget {
         WidgetbookComponent(name: 'IdsKbd', useCases: kbdUseCases),
         WidgetbookComponent(name: 'IdsLabel', useCases: labelUseCases),
         WidgetbookComponent(name: 'IdsSpinner', useCases: spinnerUseCases),
+        WidgetbookComponent(name: 'IdsTextField', useCases: textFieldUseCases),
       ],
     );
   }

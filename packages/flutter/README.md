@@ -243,6 +243,20 @@ IdsButton(
 
 `IdsKbd(keys: 'Mod+Shift+K')`는 플랫폼에 맞게 키를 배열한다. `IdsKbd(child: '⌘K')`처럼 한 키캡에 직접 표시할 수도 있다. `size`를 생략하면 `IdsField`의 크기를 따르고, 스크린 리더가 읽는 키 이름은 Provider의 번역과 `labels`로 지정한다.
 
+## TextField
+
+```dart
+IdsField(
+  required: true,
+  children: [
+    const IdsFieldLabel(child: Text('검색')),
+    IdsTextField(clearable: true, onValueChange: updateQuery),
+  ],
+)
+```
+
+라벨을 누르면 입력에 포커스가 간다. `IdsField`의 크기, 비활성, 필수, 오류 상태를 입력에 적용한다. `clearable`을 켜면 지우기 버튼과 Escape로 값을 지울 수 있다. 초기값은 `defaultValue` 또는 외부 `TextEditingController`에서 가져온다. `FormState.reset()`은 초기값을 복원하며 `onValueChange`를 호출하지 않는다.
+
 ## 개발과 Widgetbook
 
 ```bash

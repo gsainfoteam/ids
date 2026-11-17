@@ -433,6 +433,8 @@ mixin IdsMessages {
 
   String? get textFieldClear => null;
 
+  String? get textFieldRequired => null;
+
   String? get timeFieldClear => null;
 
   String? get timeFieldClose => null;
@@ -1110,6 +1112,9 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get textFieldClear => '지우기';
+
+  @override
+  String get textFieldRequired => '값을 입력해 주세요.';
 
   @override
   String get timeFieldClear => '시간 지우기';

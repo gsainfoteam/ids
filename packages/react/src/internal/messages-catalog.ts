@@ -307,7 +307,8 @@ export const messages = {
     "remaining": "{remaining}자 남았습니다."
   },
   "textField": {
-    "clear": "지우기"
+    "clear": "지우기",
+    "required": "값을 입력해 주세요."
   },
   "timeField": {
     "clear": "시간 지우기",
