@@ -91,7 +91,7 @@ class _IdsInteractiveState extends State<IdsInteractive> {
   IdsInteractiveState? _reported;
 
   IdsInteractiveState get _state => IdsInteractiveState(
-    hovered: _hovered,
+    hovered: _hovered && !widget.disabled,
     active: _active,
     focused: _focused,
     focusVisible: _focusVisible,
@@ -113,7 +113,6 @@ class _IdsInteractiveState extends State<IdsInteractive> {
       return;
     }
     if (widget.disabled) {
-      _hovered = false;
       _active = false;
       _spaceHeld = false;
     }
@@ -190,7 +189,7 @@ class _IdsInteractiveState extends State<IdsInteractive> {
       onKeyEvent: _handleKey,
       child: MouseRegion(
         onEnter: (event) {
-          if (enabled && event.kind == PointerDeviceKind.mouse) {
+          if (event.kind == PointerDeviceKind.mouse) {
             _set(() => _hovered = true);
           }
         },
