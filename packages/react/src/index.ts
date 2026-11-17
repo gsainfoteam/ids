@@ -190,6 +190,7 @@ export { Questionnaire } from './components/form/questionnaire';
 export type {
   QuestionnaireAnswer,
   QuestionnaireAnswers,
+  QuestionnaireAppearance,
   QuestionnaireOrientation,
   QuestionnaireProps,
   QuestionnaireSelectionMode,

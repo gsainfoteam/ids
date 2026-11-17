@@ -17,9 +17,14 @@ import { QuestionContext, useQuestionnaireContext } from './context';
 import { QuestionnaireDescription } from './description';
 import { QuestionnaireOption } from './option';
 import { QuestionnaireOther } from './other';
-import { questionnaireStyle, type QuestionnaireOrientation } from './style';
+import {
+  questionnaireStyle,
+  type QuestionnaireAppearance,
+  type QuestionnaireOrientation,
+} from './style';
 import { keyHandler } from '../../../internal/keys';
 import { elementTypeOf, flattenFragments } from '../../../utils/children';
+import { ToggleGroup } from '../../action/toggle-group';
 import { CheckboxGroup } from '../checkbox-group';
 import { RadioGroup } from '../radio-group';
 import { EMPTY_DRAFT, type QuestionnaireSelectionMode } from './answers';
@@ -32,6 +37,7 @@ export type QuestionnaireQuestionProps = Omit<
   selectionMode?: QuestionnaireSelectionMode;
   optional?: boolean;
   orientation?: QuestionnaireOrientation;
+  appearance?: QuestionnaireAppearance;
   className?: string;
   style?: CSSProperties;
   children: ReactNode;
@@ -47,6 +53,7 @@ const isPart = (node: ReactNode, parts: ReadonlySet<unknown>) =>
   isValidElement(node) && parts.has(elementTypeOf(node));
 
 const DESCRIPTION = new Set<unknown>([QuestionnaireDescription]);
+const OPTION = new Set<unknown>([QuestionnaireOption]);
 
 function splitQuestion(children: ReactNode) {
   const nodes = flattenFragments(children);
@@ -57,6 +64,8 @@ function splitQuestion(children: ReactNode) {
     text: firstPart < 0 ? nodes : nodes.slice(0, firstPart),
     descriptions: answerNodes.filter((node) => isPart(node, DESCRIPTION)),
     answers: answerNodes.filter((node) => !isPart(node, DESCRIPTION)),
+    options: answerNodes.filter((node) => isPart(node, OPTION)),
+    rest: answerNodes.filter((node) => !isPart(node, DESCRIPTION) && !isPart(node, OPTION)),
   };
 }
 
@@ -68,11 +77,13 @@ export function QuestionnaireQuestion({
   selectionMode = 'single',
   optional: _readByTheRoot,
   orientation = 'vertical',
+  appearance = 'card',
   hidden,
   className,
   style,
   children,
   onKeyDown,
+  onKeyDownCapture,
   onKeyUp,
   onClick,
   ...rest
@@ -84,7 +95,7 @@ export function QuestionnaireQuestion({
 
   const draft = questionnaire.drafts[name] ?? EMPTY_DRAFT;
   const active = questionnaire.activeName === name;
-  const { text, descriptions, answers } = splitQuestion(children);
+  const { text, descriptions, answers, options, rest: others } = splitQuestion(children);
   const styles = questionnaireStyle({ orientation, size: questionnaire.size });
 
   const choose = (value: string, checked: boolean) => {
@@ -114,21 +125,45 @@ export function QuestionnaireQuestion({
     return false;
   };
 
+  const handleKeyDownCapture = (event: KeyboardEvent<HTMLFieldSetElement>) => {
+    onKeyDownCapture?.(event);
+
+    keyHandler<HTMLFieldSetElement>(
+      {
+        ArrowUp: markArrowChoice,
+        ArrowDown: markArrowChoice,
+        ArrowLeft: markArrowChoice,
+        ArrowRight: markArrowChoice,
+        Home: markArrowChoice,
+        End: markArrowChoice,
+      },
+      { evenIfPrevented: true },
+    )(event);
+  };
+
   const handleKeyDown = (event: KeyboardEvent<HTMLFieldSetElement>) => {
     onKeyDown?.(event);
 
     keyHandler<HTMLFieldSetElement>({
-      ArrowUp: markArrowChoice,
-      ArrowDown: markArrowChoice,
-      ArrowLeft: markArrowChoice,
-      ArrowRight: markArrowChoice,
-      Home: markArrowChoice,
-      End: markArrowChoice,
       Enter: () => {
         if (!isChoiceInput(event.target)) return false;
         questionnaire.advance();
       },
     })(event);
+  };
+
+  const toggleSingle = (value: string | null) => {
+    const current = questionnaire.draftOf(name);
+    const pressedTheChosenAgain = value === null && questionnaire.advanceOnSelect;
+    const chosen = pressedTheChosenAgain ? (current.choices[0] ?? null) : value;
+
+    questionnaire.setDraft(
+      name,
+      chosen === null ? { choices: [], other: current.other } : { choices: [chosen], other: '' },
+    );
+
+    if (chosen !== null && questionnaire.advanceOnSelect && !choosingWithArrows.current)
+      questionnaire.advance();
   };
 
   const handleClick = (event: MouseEvent<HTMLFieldSetElement>) => {
@@ -147,11 +182,8 @@ export function QuestionnaireQuestion({
     questionnaire.advance();
   };
 
-  const groupProps = {
+  const questionProps = {
     ...rest,
-    name,
-    size: questionnaire.size,
-    orientation,
     hidden: hidden || !active,
     'aria-labelledby': legendId,
     'aria-describedby': descriptions.length > 0 ? descriptionId : undefined,
@@ -159,6 +191,7 @@ export function QuestionnaireQuestion({
     'data-active': active ? '' : undefined,
     className: styles.question({ className }),
     style,
+    onKeyDownCapture: handleKeyDownCapture,
     onKeyDown: handleKeyDown,
     onKeyUp: (event: KeyboardEvent<HTMLFieldSetElement>) => {
       onKeyUp?.(event);
@@ -166,6 +199,8 @@ export function QuestionnaireQuestion({
     },
     onClick: handleClick,
   };
+
+  const groupProps = { ...questionProps, name, size: questionnaire.size, orientation };
 
   const content = (
     <>
@@ -183,13 +218,57 @@ export function QuestionnaireQuestion({
         name,
         selectionMode,
         orientation,
+        appearance,
         draft,
         descriptionId,
         size: questionnaire.size,
         setOther,
       }}
     >
-      {selectionMode === 'single' ? (
+      {appearance === 'toggle' ? (
+        <fieldset {...questionProps}>
+          <legend id={legendId} className={styles.legend()}>
+            {text}
+          </legend>
+          {descriptions}
+          <div className={styles.options()}>
+            {selectionMode === 'single' ? (
+              <ToggleGroup<string>
+                name={name}
+                size={questionnaire.size}
+                orientation={orientation}
+                attached={false}
+                aria-labelledby={legendId}
+                className={styles.toggles()}
+                value={draft.choices[0] ?? null}
+                onValueChange={toggleSingle}
+              >
+                {options}
+              </ToggleGroup>
+            ) : (
+              <ToggleGroup<string>
+                selectionMode="multiple"
+                name={name}
+                size={questionnaire.size}
+                orientation={orientation}
+                attached={false}
+                aria-labelledby={legendId}
+                className={styles.toggles()}
+                value={draft.choices}
+                onValueChange={(choices) =>
+                  questionnaire.setDraft(name, {
+                    choices,
+                    other: questionnaire.draftOf(name).other,
+                  })
+                }
+              >
+                {options}
+              </ToggleGroup>
+            )}
+            {others}
+          </div>
+        </fieldset>
+      ) : selectionMode === 'single' ? (
         <RadioGroup<string>
           {...groupProps}
           value={draft.choices[0] ?? null}

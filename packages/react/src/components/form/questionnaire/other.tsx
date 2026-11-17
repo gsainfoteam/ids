@@ -29,7 +29,7 @@ export function QuestionnaireOther({
       size={size}
       placeholder={placeholder ?? t('questionnaire.otherPlaceholder')}
       aria-label={ariaLabel ?? t('questionnaire.other')}
-      className={questionnaireStyle({ orientation }).other({ className })}
+      className={questionnaireStyle({ orientation, size }).other({ className })}
     />
   );
 }

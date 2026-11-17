@@ -8,7 +8,11 @@ import { QuestionnaireOption, type QuestionnaireOptionProps } from './option';
 import { QuestionnaireOther, type QuestionnaireOtherProps } from './other';
 import { QuestionnaireQuestion, type QuestionnaireQuestionProps } from './question';
 import { QuestionnaireRoot, type QuestionnaireProps } from './root';
-import { questionnaireStyle, type QuestionnaireOrientation } from './style';
+import {
+  questionnaireStyle,
+  type QuestionnaireAppearance,
+  type QuestionnaireOrientation,
+} from './style';
 
 export function Questionnaire(props: QuestionnaireProps) {
   return <QuestionnaireRoot {...props} />;
@@ -20,6 +24,7 @@ export namespace Questionnaire {
   export type Answers = QuestionnaireAnswers;
   export type SelectionMode = QuestionnaireSelectionMode;
   export type Orientation = QuestionnaireOrientation;
+  export type Appearance = QuestionnaireAppearance;
 
   export type QuestionProps = QuestionnaireQuestionProps;
   export type OptionProps = QuestionnaireOptionProps;
@@ -39,5 +44,5 @@ export type {
   QuestionnaireAnswers,
   QuestionnaireSelectionMode,
 } from './answers';
-export type { QuestionnaireOrientation } from './style';
+export type { QuestionnaireAppearance, QuestionnaireOrientation } from './style';
 export type { QuestionnaireProps } from './root';

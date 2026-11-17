@@ -134,6 +134,41 @@ test('with advanceOnSelect a pick moves on, an arrow key only moves the choice',
   expect(onComplete).toHaveBeenCalledWith({ size: 'two', people: 'many' });
 });
 
+test('toggle options draw no radio, join FormData and move on with advanceOnSelect', async () => {
+  const onComplete = vi.fn();
+  const screen = await render(
+    <Questionnaire advanceOnSelect onComplete={onComplete}>
+      <Questionnaire.Question name="size" appearance="toggle" orientation="horizontal">
+        몇 칸을 쓸까요?
+        <Questionnaire.Option value="one">한 칸</Questionnaire.Option>
+        <Questionnaire.Option value="two">두 칸</Questionnaire.Option>
+      </Questionnaire.Question>
+      <Questionnaire.Question name="people" appearance="toggle" orientation="horizontal">
+        몇 명인가요?
+        <Questionnaire.Option value="few">4명 이하</Questionnaire.Option>
+        <Questionnaire.Option value="many">5명 이상</Questionnaire.Option>
+      </Questionnaire.Question>
+    </Questionnaire>,
+  );
+  const form = screen.container.querySelector('form')!;
+
+  expect(form.querySelector('input[type=radio]')).toBeNull();
+  await expect
+    .element(page.getByRole('radiogroup', { name: '몇 칸을 쓸까요?' }))
+    .toBeInTheDocument();
+
+  await userEvent.click(radio('두 칸'));
+  await expect.element(radio('4명 이하')).toHaveFocus();
+  expect(new FormData(form).get('size')).toBe('two');
+
+  await userEvent.keyboard('{ArrowRight}');
+  await expect.element(radio('5명 이상')).toBeChecked();
+  expect(onComplete).not.toHaveBeenCalled();
+
+  await userEvent.keyboard('{Enter}');
+  expect(onComplete).toHaveBeenCalledWith({ size: 'two', people: 'many' });
+});
+
 test('a single question shows no progress bar', async () => {
   await render(
     <Questionnaire>

@@ -11,6 +11,8 @@ import {
   type ReactNode,
 } from 'react';
 
+import { focusable } from 'tabbable';
+
 import {
   EMPTY_DRAFT,
   answerOf,
@@ -34,6 +36,17 @@ import { ButtonGroup } from '../../action/button-group';
 import { Progress } from '../../feedback/progress';
 
 import type { IdsSize } from '../../../tokens/types';
+
+const forwardsItsOwnFocus = (element: HTMLElement) => element.hasAttribute('tabindex');
+
+const isChosen = (element: Element) =>
+  element.matches('[aria-checked="true"], [aria-pressed="true"]');
+
+function focusTarget(question: HTMLElement) {
+  if (forwardsItsOwnFocus(question)) return question;
+  const candidates = focusable(question);
+  return candidates.find(isChosen) ?? candidates[0];
+}
 
 export type QuestionnaireProps = Omit<ComponentProps<'form'>, 'defaultValue' | 'children'> & {
   defaultValue?: QuestionnaireAnswers;
@@ -131,9 +144,11 @@ export function QuestionnaireRoot({
   useEffect(() => {
     if (!focusTheNewStep.current) return;
     focusTheNewStep.current = false;
-    formRef.current
-      ?.querySelector<HTMLElement>('[data-questionnaire-question][data-active]')
-      ?.focus();
+    const question = formRef.current?.querySelector<HTMLElement>(
+      '[data-questionnaire-question][data-active]',
+    );
+    if (!question) return;
+    focusTarget(question)?.focus();
   }, [index]);
 
   useFormReset(formRef, () => {

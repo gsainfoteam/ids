@@ -2,7 +2,7 @@
 
 AI 가 사용자에게 고를 거리를 내미는 질문지입니다. 질문 여러 개를 한 번에 하나씩 묻고, 끝나면 답을 모아 `onComplete` 로 넘깁니다. 채팅 시작 화면의 추천 질문도 한 단계짜리 Questionnaire 로 그립니다.
 
-- **IDS 부품으로 짓습니다.** 루트는 `<form>`, 질문은 `RadioGroup` 이나 `CheckboxGroup`(`<fieldset>` + `<legend>`), 보기는 `Item` 카드 안의 `Radio` 나 `Checkbox`, 직접 입력은 `TextField`, 진행은 `Progress`, 이동 버튼은 `ButtonGroup` 과 `Button` 입니다.
+- **IDS 부품으로 짓습니다.** 루트는 `<form>`, 질문은 `RadioGroup` 이나 `CheckboxGroup`(`<fieldset>` + `<legend>`), 보기는 `Item` 카드 안의 `Radio` 나 `Checkbox`(`appearance="toggle"` 이면 `ToggleGroup` 의 `Toggle`), 직접 입력은 `TextField`, 진행은 `Progress`, 이동 버튼은 `ButtonGroup` 과 `Button` 입니다.
 - **한 번에 한 질문.** 모든 질문이 그려지고, 지금 질문 말고는 `hidden` 입니다. 서버 HTML 에도 질문이 다 들어 있고, 숨은 질문의 답도 FormData 에 남습니다.
 - **필수와 건너뛰기.** 질문은 기본으로 필수라 답하기 전에는 다음 버튼이 꺼져 있습니다. `optional` 이면 건너뛰기 버튼이 붙습니다.
 - **포커스가 따라갑니다.** 다음이나 이전으로 넘어가면 새 질문의 고른 보기, 없으면 첫 보기로 포커스가 갑니다.
@@ -29,10 +29,14 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Questionnaire.Question name="size">
-  부스는 몇 칸을 쓸까요?                                       {/* 첫 Option 앞 = <legend> */}
-  <Questionnaire.Description>한 칸은 3미터예요.</Questionnaire.Description>  {/* aria-describedby */}
-  <Questionnaire.Option value="one" description="굿즈 판매만 해요">한 칸</Questionnaire.Option>
-  <Questionnaire.Option value="two" disabled>두 칸</Questionnaire.Option>
+  부스는 몇 칸을 쓸까요? {/* 첫 Option 앞 = <legend> */}
+  <Questionnaire.Description>한 칸은 3미터예요.</Questionnaire.Description> {/* aria-describedby */}
+  <Questionnaire.Option value="one" description="굿즈 판매만 해요">
+    한 칸
+  </Questionnaire.Option>
+  <Questionnaire.Option value="two" disabled>
+    두 칸
+  </Questionnaire.Option>
 </Questionnaire.Question>
 ```
 
@@ -45,6 +49,30 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 - `value` 가 답이 되고, `children` 이 제목, `description` 이 둘째 줄입니다. `children` 이 없으면 `value` 를 보입니다.
 - 보기 카드 전체가 `<label>` 이라 어디를 눌러도 고릅니다. 고른 카드에 `Item` 의 `selected` 가 붙습니다.
+- 보기 카드와 직접 입력은 높이, radius(`standard`), 가로 여백이 같습니다. `description` 이 있는 카드만 두 줄만큼 높아집니다.
+
+## 모양
+
+```tsx
+<Questionnaire.Question
+  name="goods"
+  selectionMode="multiple"
+  appearance="toggle"
+  orientation="horizontal"
+>
+  어떤 굿즈를 팔까요?
+  <Questionnaire.Option value="sticker">스티커</Questionnaire.Option>
+  <Questionnaire.Option value="keyring">키링</Questionnaire.Option>
+</Questionnaire.Question>
+```
+
+| `appearance`  | 보기                                                              |
+| ------------- | ----------------------------------------------------------------- |
+| `card` (기본) | `Item` 카드 안의 `Radio` / `Checkbox`. `description` 을 보인다    |
+| `toggle`      | `ToggleGroup` 안의 `Toggle`. 라디오도 체크박스도 없고 글자 폭만큼 |
+
+- `toggle` 은 짧은 답을 한 줄에 늘어놓을 때 씁니다. `description` 은 그리지 않습니다.
+- `Other` 는 두 모양 모두 보기 아래 한 줄을 차지합니다.
 
 ## 직접 입력
 
@@ -61,8 +89,8 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Questionnaire
-  defaultValue={{ tone: 'casual', topics: ['summary', '회의 일정'] }}  // 보기에 없는 값은 Other 로 간다
-  onComplete={(answers) => {}}                                       // { tone: 'casual', topics: [...] }
+  defaultValue={{ tone: 'casual', topics: ['summary', '회의 일정'] }} // 보기에 없는 값은 Other 로 간다
+  onComplete={(answers) => {}} // { tone: 'casual', topics: [...] }
 />
 ```
 
@@ -73,13 +101,13 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 ## 진행과 이동
 
-| 부분       | 보일 때                                                                  |
-| ---------- | ------------------------------------------------------------------------ |
-| Progress   | 질문이 둘 이상. `1 / 3` 을 보이고 `aria-valuetext` 도 같다              |
-| 이전       | 첫 질문이 아닐 때                                                        |
-| 건너뛰기   | 지금 질문이 `optional`                                                   |
-| 다음       | 마지막 질문이 아닐 때. 답하지 않은 필수 질문에서는 꺼진다(포커스는 받는다) |
-| 보내기     | 마지막 질문. 글자는 `submitLabel` 로 바꾼다                              |
+| 부분     | 보일 때                                                                    |
+| -------- | -------------------------------------------------------------------------- |
+| Progress | 질문이 둘 이상. `1 / 3` 을 보이고 `aria-valuetext` 도 같다                 |
+| 이전     | 첫 질문이 아닐 때                                                          |
+| 건너뛰기 | 지금 질문이 `optional`                                                     |
+| 다음     | 마지막 질문이 아닐 때. 답하지 않은 필수 질문에서는 꺼진다(포커스는 받는다) |
+| 보내기   | 마지막 질문. 글자는 `submitLabel` 로 바꾼다                                |
 
 - 다음과 보내기는 같은 submit 버튼입니다. 질문 안에서 form 이 제출되면 마지막이 아닐 때는 다음 질문으로 넘어갑니다.
 - 이동 버튼은 `ButtonGroup attached={false}` 로 묶여 `aria-label="질문 이동"` 이 붙습니다.
@@ -88,7 +116,7 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Questionnaire advanceOnSelect size="tiny" onComplete={({ prompt }) => send(prompt)}>
-  <Questionnaire.Question name="prompt" orientation="horizontal">
+  <Questionnaire.Question name="prompt" appearance="toggle" orientation="horizontal">
     이런 걸 물어볼 수 있어요
     <Questionnaire.Option value="오늘 학식 메뉴 알려 줘">오늘 학식</Questionnaire.Option>
     <Questionnaire.Option value="다음 셔틀은 언제 와?">셔틀 시간표</Questionnaire.Option>
@@ -99,52 +127,57 @@ import { Questionnaire } from '@gsainfoteam/ids-react';
 - `advanceOnSelect` 면 하나만 고르는 질문은 보기를 누르는 순간 다음 질문으로 가고, 마지막 질문이면 바로 `onComplete` 가 불립니다.
 - 이런 질문에는 다음 버튼이 없습니다. `Other` 가 있는 질문과 여럿 고르는 질문은 다음 버튼을 그대로 둡니다.
 - 화살표 키와 `Home` `End` 로 옮겨 다니는 동안은 넘어가지 않습니다. `Space` 나 `Enter` 로 고르면 넘어갑니다.
-- 채팅 시작 화면의 추천 질문은 이렇게 질문 하나짜리 Questionnaire 입니다. 진행 막대도 버튼도 없습니다.
+- `toggle` 모양에서 이미 고른 보기를 다시 누르면 풀리지 않고 그 답으로 넘어갑니다.
+- 채팅 시작 화면의 추천 질문은 이렇게 질문 하나짜리 `toggle` Questionnaire 입니다. 라디오도, 진행 막대도, 버튼도 없습니다.
 
 ## 키보드
 
-| 키           | 동작                                                 |
-| ------------ | ---------------------------------------------------- |
-| `Tab`        | 보기, 직접 입력, 이동 버튼 사이를 옮긴다             |
-| `↑` `↓` `←` `→` | 라디오를 옮기면서 고른다 |
-| `Space`      | 라디오를 고르고, 체크박스를 켜고 끈다                |
-| `Enter`      | 보기나 직접 입력에서 다음 질문으로, 마지막이면 보낸다 |
+| 키              | 동작                                                  |
+| --------------- | ----------------------------------------------------- |
+| `Tab`           | 보기, 직접 입력, 이동 버튼 사이를 옮긴다              |
+| `↑` `↓` `←` `→` | 라디오를 옮기면서 고른다                              |
+| `Space`         | 라디오를 고르고, 체크박스와 토글을 켜고 끈다          |
+| `Enter`         | 보기나 직접 입력에서 다음 질문으로, 마지막이면 보낸다 |
 
 - 답하지 않은 필수 질문에서 `Enter` 는 아무것도 하지 않습니다.
+- `toggle` 모양에서는 `ToggleGroup` 의 키를 따릅니다. 화살표가 하나만 고르는 질문에서는 옮기면서 고르고, 여럿 고르는 질문에서는 포커스만 옮깁니다. `Enter` 는 토글을 누릅니다.
 - 질문 루트에 준 `onKeyDown` 이 먼저 불리고, `preventDefault()` 하면 `Enter` 를 Questionnaire 가 처리하지 않습니다.
 
 ## 크기
 
 ```tsx
-<Questionnaire size="tiny" />    // 보기, 직접 입력, 버튼, 진행 막대가 tiny. 질문 문장도 한 단계 작다
+<Questionnaire size="tiny" /> // 보기, 직접 입력, 버튼, 진행 막대가 tiny. 질문 문장도 한 단계 작다
 ```
+
+- 보기 카드의 가로 여백은 `standard` 16px, `tiny` 12px 이고, 직접 입력도 같은 여백이라 글자의 시작이 맞습니다.
 
 ## 속성
 
-| 속성                   | 기본 / 동작                                             |
-| ---------------------- | ------------------------------------------------------- |
-| `defaultValue`         | `Record<string, string \| string[]>`, 기본 `{}`         |
-| `onComplete`           | 마지막 질문에서 보낼 때 답을 받는다                     |
-| `advanceOnSelect`      | `false`. 하나만 고르는 질문을 고르면 바로 넘어간다      |
-| `submitLabel`          | 마지막 버튼 글자. 기본 `보내기`                         |
-| `size`                 | `standard`(기본) / `tiny`                               |
-| 그 외 속성             | `<form>` 으로 간다 (`id`, `aria-label`, `className` 등) |
-| Question `name`        | 답의 키이자 FormData 이름                               |
-| Question `selectionMode` | `single`(기본) / `multiple`                           |
-| Question `optional`    | `false`. 켜면 건너뛰기 버튼                             |
-| Question `orientation` | `vertical`(기본) / `horizontal`                         |
-| Option `value`         | 답이 되는 값                                            |
-| Option `description`   | 보기 둘째 줄                                            |
-| Option `disabled`      | 그 보기만 끈다                                          |
-| Other                  | `TextField` 의 속성. `value`, `name`, `size` 는 Questionnaire 가 정한다 |
+| 속성                     | 기본 / 동작                                                             |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `defaultValue`           | `Record<string, string \| string[]>`, 기본 `{}`                         |
+| `onComplete`             | 마지막 질문에서 보낼 때 답을 받는다                                     |
+| `advanceOnSelect`        | `false`. 하나만 고르는 질문을 고르면 바로 넘어간다                      |
+| `submitLabel`            | 마지막 버튼 글자. 기본 `보내기`                                         |
+| `size`                   | `standard`(기본) / `tiny`                                               |
+| 그 외 속성               | `<form>` 으로 간다 (`id`, `aria-label`, `className` 등)                 |
+| Question `name`          | 답의 키이자 FormData 이름                                               |
+| Question `selectionMode` | `single`(기본) / `multiple`                                             |
+| Question `optional`      | `false`. 켜면 건너뛰기 버튼                                             |
+| Question `orientation`   | `vertical`(기본) / `horizontal`                                         |
+| Question `appearance`    | `card`(기본) / `toggle`                                                 |
+| Option `value`           | 답이 되는 값                                                            |
+| Option `description`     | 보기 둘째 줄                                                            |
+| Option `disabled`        | 그 보기만 끈다                                                          |
+| Other                    | `TextField` 의 속성. `value`, `name`, `size` 는 Questionnaire 가 정한다 |
 
 ## 상태 속성
 
-| 속성                                      | 붙는 곳                       |
-| ----------------------------------------- | ----------------------------- |
-| `data-questionnaire`, `data-step`         | `<form>`. `data-step` 은 0부터 |
-| `data-questionnaire-question`, `data-active` | 질문 `<fieldset>`          |
-| `data-questionnaire-option`               | 보기 `<label>`                |
+| 속성                                         | 붙는 곳                         |
+| -------------------------------------------- | ------------------------------- |
+| `data-questionnaire`, `data-step`            | `<form>`. `data-step` 은 0부터  |
+| `data-questionnaire-question`, `data-active` | 질문 `<fieldset>`               |
+| `data-questionnaire-option`                  | 보기 `<label>`, 토글 `<button>` |
 
 ## 알아둘 것
 
