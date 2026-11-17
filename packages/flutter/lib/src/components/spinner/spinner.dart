@@ -84,14 +84,13 @@ class _SpinnerState extends State<Spinner>
         .dependOnInheritedWidgetOfExactType<IconTheme>();
     final color =
         inheritedIcon?.data.color ?? scope?.colors.onSurface ?? icon.color!;
-    final token =
-        _sizes[widget.size ?? Field.maybeOf(context)?.size] ??
-        inheritedIcon?.data.size;
-    final dimension = token == null
-        ? MediaQuery.textScalerOf(context).scale(
-            DefaultTextStyle.of(context).style.fontSize ?? _flutterFontSize,
-          )
-        : scope?.dimension(token) ?? token;
+    final token = _sizes[widget.size ?? Field.maybeOf(context)?.size];
+    final dimension = token != null
+        ? scope?.dimension(token) ?? token
+        : inheritedIcon?.data.size ??
+              MediaQuery.textScalerOf(context).scale(
+                DefaultTextStyle.of(context).style.fontSize ?? _flutterFontSize,
+              );
     final arc = CustomPaint(
       size: Size.square(dimension),
       painter: _ArcPainter(

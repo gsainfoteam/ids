@@ -81,6 +81,32 @@ void main() {
     expect(spinnerSize(tester), const Size.square(16));
   });
 
+  testWidgets('scales its own sizes with the theme, not a size it is given', (
+    tester,
+  ) async {
+    const scaled = IdsTheme(
+      primary: IdsThemeColor.seed(Color(0xFF155DFC)),
+      scale: 1.5,
+    );
+    await pump(
+      tester,
+      const IdsProvider(
+        theme: scaled,
+        child: Spinner(size: IdsSize.tiny),
+      ),
+    );
+    expect(spinnerSize(tester), const Size.square(21));
+
+    await pump(
+      tester,
+      const IdsProvider(
+        theme: scaled,
+        child: IconTheme(data: IconThemeData(size: 20), child: Spinner()),
+      ),
+    );
+    expect(spinnerSize(tester), const Size.square(20));
+  });
+
   testWidgets('spins, or pulses under reduced motion', (tester) async {
     await pump(tester, const Spinner());
     expect(find.byType(RotationTransition), findsOne);
