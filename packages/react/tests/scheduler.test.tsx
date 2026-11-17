@@ -2,7 +2,7 @@ import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import axe from 'axe-core';
 import { renderToString } from 'react-dom/server';
 import { afterEach, expect, test, vi } from 'vitest';
-import { page, userEvent } from 'vitest/browser';
+import { page, server, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { IdsProvider, Scheduler } from '../src';
@@ -132,6 +132,13 @@ test('overlapping events split the column into lanes, and the lanes end with the
   expect(instant[0].hours).toBe(0.5);
 });
 
+const FIREFOX_STOPS_ON_EVERY_SCROLLER = server.browser === 'firefox';
+const GRID_VIEWPORT = 'the grid viewport';
+const stopName = (element: HTMLElement) =>
+  element.hasAttribute('data-scroll-area-viewport')
+    ? GRID_VIEWPORT
+    : (element.getAttribute('aria-label') ?? element.textContent ?? '');
+
 test('keyboard: Tab walks the toolbar and the event buttons in day and time order', async () => {
   const opened = vi.fn();
   const screen = await render(
@@ -140,30 +147,33 @@ test('keyboard: Tab walks the toolbar and the event buttons in day and time orde
     }),
   );
 
-  const stops: string[] = [];
-  for (let index = 0; index < 11; index += 1) {
-    await userEvent.keyboard('{Tab}');
-    const active = document.activeElement as HTMLElement;
-    stops.push(active.getAttribute('aria-label') ?? active.textContent ?? '');
-  }
-  expect(stops).toEqual([
+  const gridStop = FIREFOX_STOPS_ON_EVERY_SCROLLER ? [GRID_VIEWPORT] : [];
+  const expected = [
     '이전 주',
     '오늘',
     '다음 주',
     weekRange(on(15), on(21)),
     '주',
+    ...gridStop,
     'Festival',
     'Festival',
     'Algorithms',
     'Study room',
     'Lunch',
     'Deadline',
-  ]);
+  ];
+
+  const stops: string[] = [];
+  for (let index = 0; index < expected.length; index += 1) {
+    await userEvent.keyboard('{Tab}');
+    stops.push(stopName(document.activeElement as HTMLElement));
+  }
+  expect(stops).toEqual(expected);
 
   await userEvent.keyboard('{Enter}');
   expect(opened).toHaveBeenLastCalledWith('late');
 
-  await userEvent.keyboard('{Shift>}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{Tab}{/Shift}');
+  await userEvent.keyboard(`{Shift>}${'{Tab}'.repeat(8 + gridStop.length)}{/Shift}`);
   await expect.element(screen.getByRole('button', { name: '다음 주' })).toHaveFocus();
   await userEvent.keyboard('{Enter}');
   await expect
