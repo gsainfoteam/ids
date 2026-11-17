@@ -8,6 +8,8 @@ const _colorSchemes = [
   ids.IdsColorScheme.danger,
   ids.IdsColorScheme.neutral,
   ids.IdsColorScheme.primary,
+  ids.IdsColorScheme.secondary,
+  ids.IdsColorScheme.tertiary,
   ids.IdsColorScheme.success,
   ids.IdsColorScheme.warning,
   ids.IdsColorScheme.info,

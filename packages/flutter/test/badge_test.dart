@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
+import 'package:ids_flutter/src/color/oklch.dart';
 
 import 'test_theme.dart';
 
@@ -10,11 +11,14 @@ Future<void> pump(
   WidgetTester tester,
   Widget child, {
   TextDirection direction = TextDirection.ltr,
+  IdsTheme theme = testTheme,
+  IdsMode? mode,
 }) => tester.pumpWidget(
   Directionality(
     textDirection: direction,
     child: IdsProvider(
-      theme: testTheme,
+      theme: theme,
+      mode: mode,
       child: Center(child: child),
     ),
   ),
@@ -26,6 +30,13 @@ Finder indicator() => find.byWidgetPredicate(
       widget.decoration is ShapeDecoration &&
       (widget.decoration! as ShapeDecoration).shape is StadiumBorder,
 );
+
+BorderSide? edgeOf(WidgetTester tester) =>
+    ((tester.widget<Container>(indicator()).foregroundDecoration
+                    as ShapeDecoration?)
+                ?.shape
+            as StadiumBorder?)
+        ?.side;
 
 Offset indicatorCenter(WidgetTester tester) =>
     tester.getCenter(indicator()) - tester.getTopLeft(find.byWidget(_anchor));
@@ -151,6 +162,80 @@ void main() {
     testWidgets('the anchor keeps its own size', (tester) async {
       await pump(tester, const Badge.count(count: 3, child: _anchor));
       expect(tester.getSize(find.byType(Badge)), const Size.square(40));
+    });
+
+    testWidgets('follows the theme scale on top of the system text size', (
+      tester,
+    ) async {
+      const content = SizedBox.shrink();
+      double? iconSize() =>
+          IconTheme.of(tester.element(find.byWidget(content))).size;
+
+      await pump(
+        tester,
+        const Badge(content: content, child: _anchor),
+        theme: scaledTheme,
+      );
+      expect(tester.getSize(indicator()), const Size(30, 30));
+      expect(iconSize(), 18);
+
+      await pump(
+        tester,
+        const Badge(content: content, size: IdsSize.tiny, child: _anchor),
+        theme: scaledTheme,
+      );
+      expect(tester.getSize(indicator()), const Size(24, 24));
+      expect(iconSize(), 15);
+
+      await pump(
+        tester,
+        const Badge.count(count: 120, child: _anchor),
+        theme: scaledTheme,
+      );
+      expect(
+        DefaultTextStyle.of(tester.element(find.text('99+'))).style.fontSize,
+        18,
+      );
+      expect(
+        tester.getSize(indicator()).width,
+        tester.getSize(find.text('99+')).width + 18,
+      );
+      final ring =
+          (tester.widget<Container>(indicator()).decoration! as ShapeDecoration)
+                  .shape
+              as StadiumBorder;
+      expect(ring.side.width, 2);
+
+      await pump(
+        tester,
+        const Badge.count(
+          count: 3,
+          variant: BadgeVariant.outline,
+          child: _anchor,
+        ),
+        theme: scaledTheme,
+      );
+      expect(edgeOf(tester)!.width, 1);
+
+      await pump(tester, const Badge.dot(child: _anchor), theme: scaledTheme);
+      expect(tester.getSize(indicator()), const Size.square(15));
+
+      await pump(
+        tester,
+        const Badge.dot(size: IdsSize.tiny, child: _anchor),
+        theme: scaledTheme,
+      );
+      expect(tester.getSize(indicator()), const Size.square(12));
+
+      await pump(
+        tester,
+        const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: Badge.count(count: 3, child: _anchor),
+        ),
+        theme: scaledTheme,
+      );
+      expect(tester.getSize(indicator()).height, 60);
     });
   });
 
@@ -281,6 +366,64 @@ void main() {
       final theme = IdsProvider.of(tester.element(find.byType(Badge))).colors;
       expect(fill(tester), theme.surface);
     });
+
+    for (final mode in [IdsMode.light, IdsMode.dark]) {
+      testWidgets('every scheme and variant reads its roles (${mode.name})', (
+        tester,
+      ) async {
+        for (final scheme in IdsColorScheme.values) {
+          for (final variant in BadgeVariant.values) {
+            await pump(
+              tester,
+              Badge.count(
+                count: 3,
+                variant: variant,
+                colorScheme: scheme,
+                child: _anchor,
+              ),
+              mode: mode,
+            );
+            final colors = IdsProvider.of(
+              tester.element(find.byType(Badge)),
+            ).colors;
+            final family = scheme.name;
+            final neutral = scheme == IdsColorScheme.neutral;
+            final (background, foreground, edge) = switch (variant) {
+              BadgeVariant.solid => (
+                neutral ? colors.onSurface : colors['bg-$family'],
+                neutral ? colors.surface : colors['text-on-$family'],
+                null,
+              ),
+              BadgeVariant.soft => (
+                neutral
+                    ? mixOklab(colors.surface, colors.onSurface, 0.16)
+                    : colors['bg-$family-soft'],
+                neutral ? colors.onSurface : colors['text-on-$family-soft'],
+                null,
+              ),
+              BadgeVariant.outline => (
+                colors.surface,
+                neutral ? colors.onSurface : colors['text-$family'],
+                BorderSide(
+                  color: (neutral ? colors.onSurface : colors['border-$family'])
+                      .withValues(alpha: 0.45),
+                ),
+              ),
+            };
+            final reason = '$family ${variant.name}';
+            final count = tester.element(find.text('3'));
+            expect(fill(tester), background, reason: reason);
+            expect(
+              DefaultTextStyle.of(count).style.color,
+              foreground,
+              reason: reason,
+            );
+            expect(IconTheme.of(count).color, foreground, reason: reason);
+            expect(edgeOf(tester), edge, reason: reason);
+          }
+        }
+      });
+    }
   });
 
   group('semantics', () {

@@ -8,6 +8,7 @@ import '../../../tokens/ids_color_roles.dart';
 import '../../../tokens/ids_enums.dart';
 import '../../../tokens/ids_motion.dart';
 import '../../../tokens/ids_typography.dart';
+import '../../color/oklch.dart';
 import '../avatar/avatar.dart';
 import '../avatar/avatar_scope.dart';
 
@@ -16,47 +17,6 @@ enum BadgePlacement { topEnd, topStart, bottomEnd, bottomStart }
 enum BadgeShape { rectangular, circular }
 
 enum BadgeVariant { solid, soft, outline }
-
-double _linear(double c) =>
-    c <= 0.04045 ? c / 12.92 : math.pow((c + 0.055) / 1.055, 2.4).toDouble();
-
-double _gamma(double c) =>
-    c <= 0.0031308 ? 12.92 * c : 1.055 * math.pow(c, 1 / 2.4) - 0.055;
-
-double _cbrt(double x) => math.pow(x, 1 / 3).toDouble();
-
-List<double> _toOklab(Color color) {
-  final r = _linear(color.r), g = _linear(color.g), b = _linear(color.b);
-  final l = _cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
-  final m = _cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
-  final s = _cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
-  return [
-    0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
-    1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
-    0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s,
-  ];
-}
-
-Color _fromOklab(List<double> lab) {
-  final [lightness, a, b] = lab;
-  final l = math.pow(lightness + 0.3963377774 * a + 0.2158037573 * b, 3);
-  final m = math.pow(lightness - 0.1055613458 * a - 0.0638541728 * b, 3);
-  final s = math.pow(lightness - 0.0894841775 * a - 1.2914855480 * b, 3);
-  double channel(num value) => _gamma(value.toDouble()).clamp(0.0, 1.0);
-  return Color.from(
-    alpha: 1,
-    red: channel(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
-    green: channel(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
-    blue: channel(-0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s),
-  );
-}
-
-Color _mixOklab(Color from, Color to, double amount) {
-  final a = _toOklab(from), b = _toOklab(to);
-  return _fromOklab([
-    for (var i = 0; i < 3; i++) a[i] + (b[i] - a[i]) * amount,
-  ]);
-}
 
 class Badge extends StatelessWidget {
   const Badge({
@@ -167,7 +127,7 @@ class Badge extends StatelessWidget {
       ),
       BadgeVariant.soft => (
         background: neutral
-            ? _mixOklab(colors.surface, colors.onSurface, _tintAmount)
+            ? mixOklab(colors.surface, colors.onSurface, _tintAmount)
             : colors['bg-$family-soft'],
         foreground: neutral ? colors.onSurface : colors['text-on-$family-soft'],
         edge: null,
@@ -182,7 +142,8 @@ class Badge extends StatelessWidget {
   }
 
   Widget _indicator(BuildContext context, {required bool attached}) {
-    final roles = IdsProvider.of(context).colors;
+    final ids = IdsProvider.of(context);
+    final roles = ids.colors;
     final colors = _colors(
       roles,
       colorScheme ??
@@ -191,14 +152,15 @@ class Badge extends StatelessWidget {
     final reduced = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     final duration = reduced ? Duration.zero : IdsMotion.fast;
     final style = _styles[size]!;
-    final textScale =
+    final scale =
+        ids.scale *
         MediaQuery.textScalerOf(context).scale(style.fontSize!) /
         style.fontSize!;
-    final height = _heights[size]! * textScale;
+    final height = _heights[size]! * scale;
 
     Widget box = Container(
       constraints: dot
-          ? BoxConstraints.tight(Size.square(_dotSizes[size]!))
+          ? BoxConstraints.tight(Size.square(ids.dimension(_dotSizes[size]!)))
           : BoxConstraints(
               minWidth: height,
               minHeight: height,
@@ -206,7 +168,7 @@ class Badge extends StatelessWidget {
             ),
       padding: dot
           ? null
-          : EdgeInsets.symmetric(horizontal: _paddings[size]! * textScale),
+          : EdgeInsets.symmetric(horizontal: _paddings[size]! * scale),
       decoration: ShapeDecoration(
         color: colors.background,
         shape: StadiumBorder(
@@ -227,16 +189,17 @@ class Badge extends StatelessWidget {
       child: dot
           ? null
           : DefaultTextStyle(
-              style: style.copyWith(
-                height: 1,
-                color: colors.foreground,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
+              style: ids
+                  .textStyle(style, color: colors.foreground)
+                  .copyWith(
+                    height: 1,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
               maxLines: 1,
               softWrap: false,
               child: IconTheme(
                 data: IconThemeData(
-                  size: _iconSizes[size]! * textScale,
+                  size: _iconSizes[size]! * scale,
                   color: colors.foreground,
                 ),
                 child: Center(
