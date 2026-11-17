@@ -32,6 +32,10 @@ class ThemeProvider extends StatefulWidget {
 }
 
 class _ThemeProviderState extends State<ThemeProvider> {
+  static IconThemeData _inheritedIconTheme(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<IconTheme>()?.data ??
+      const IconThemeData();
+
   late IdsColor _color = widget.color;
   late IdsMode _mode = widget.mode;
 
@@ -63,8 +67,8 @@ class _ThemeProviderState extends State<ThemeProvider> {
           fontFamily: IdsTypography.sansFontFamily,
           package: IdsTypography.sansFontPackage,
         ),
-        child: IconTheme.merge(
-          data: IconThemeData(color: onSurface),
+        child: IconTheme(
+          data: _inheritedIconTheme(context).copyWith(color: onSurface),
           child: widget.child,
         ),
       ),

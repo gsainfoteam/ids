@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/widgets.dart';
 
 import '../../../tokens/ids_enums.dart';
+import '../field/field.dart';
 
 class Spinner extends StatefulWidget {
   const Spinner({
@@ -24,6 +25,7 @@ class Spinner extends StatefulWidget {
 class _SpinnerState extends State<Spinner>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   static const _sizes = {IdsSize.standard: 16.0, IdsSize.tiny: 14.0};
+  static const _flutterFontSize = 14.0;
   static const _turn = Duration(seconds: 1);
   static const _announceDelay = Duration(milliseconds: 100);
   static const _defaultLabel = '불러오는 중';
@@ -71,12 +73,25 @@ class _SpinnerState extends State<Spinner>
     super.dispose();
   }
 
+  double _dimension(BuildContext context) {
+    final token = _sizes[widget.size ?? Field.maybeOf(context)?.size];
+    if (token != null) return token;
+    final iconSize = context
+        .dependOnInheritedWidgetOfExactType<IconTheme>()
+        ?.data
+        .size;
+    if (iconSize != null) return iconSize;
+    final fontSize =
+        DefaultTextStyle.of(context).style.fontSize ?? _flutterFontSize;
+    return MediaQuery.textScalerOf(context).scale(fontSize);
+  }
+
   @override
   Widget build(BuildContext context) {
     final icon = IconTheme.of(context);
     final color = icon.color!;
     final arc = CustomPaint(
-      size: Size.square(_sizes[widget.size] ?? icon.size!),
+      size: Size.square(_dimension(context)),
       painter: _ArcPainter(
         color.withValues(alpha: color.a * (icon.opacity ?? 1)),
       ),

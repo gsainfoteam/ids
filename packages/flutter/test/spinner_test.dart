@@ -39,6 +39,45 @@ void main() {
     expect(spinnerSize(tester), const Size.square(14));
   });
 
+  testWidgets('follows the text size when nothing sets an icon size', (
+    tester,
+  ) async {
+    const text = DefaultTextStyle(
+      style: TextStyle(fontSize: 18),
+      child: Spinner(),
+    );
+    await pump(tester, text);
+    expect(spinnerSize(tester), const Size.square(18));
+
+    await pump(tester, const ThemeProvider(child: text));
+    expect(spinnerSize(tester), const Size.square(18));
+
+    await pump(
+      tester,
+      const MediaQuery(
+        data: MediaQueryData(textScaler: TextScaler.linear(2)),
+        child: text,
+      ),
+    );
+    expect(spinnerSize(tester), const Size.square(36));
+  });
+
+  testWidgets('takes the size of the Field around it', (tester) async {
+    Widget field(IdsSize size) => ThemeProvider(
+      child: Field(
+        size: size,
+        children: const [
+          FieldHint(child: Row(children: [Spinner()])),
+        ],
+      ),
+    );
+    await pump(tester, field(IdsSize.tiny));
+    expect(spinnerSize(tester), const Size.square(14));
+
+    await pump(tester, field(IdsSize.standard));
+    expect(spinnerSize(tester), const Size.square(16));
+  });
+
   testWidgets('spins, or pulses under reduced motion', (tester) async {
     await pump(tester, const Spinner());
     expect(find.byType(RotationTransition), findsOne);
