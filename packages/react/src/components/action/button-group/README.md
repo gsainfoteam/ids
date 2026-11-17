@@ -42,7 +42,7 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 
 - `solid`, `soft` 처럼 테두리가 없는 버튼 사이를 나눌 때 씁니다. `outline` 은 테두리가 이미 선 역할을 합니다.
 - 선은 이웃과 1px 씩 겹쳐서 outline 버튼 옆에 두어도 두 줄이 되지 않습니다.
-- `tray` 와 `framed` 에서는 버튼보다 짧은 선이 됩니다. [레이아웃](#레이아웃)을 봅니다.
+- `tray` 에서는 버튼보다 짧은 선이 됩니다. [레이아웃](#레이아웃)을 봅니다.
 - 스크린 리더에는 `role="separator"` 로 읽힙니다.
 
 ## 합성
@@ -79,30 +79,23 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
   <IconButton icon={<XMarkIcon />} aria-label="닫기" />
 </ButtonGroup>
 
-<ButtonGroup layout="framed" aria-label="지도 확대">  {/* 테두리 하나 안에 이어 붙인다 */}
-  <IconButton icon={<MinusIcon />} aria-label="축소" />
-  <ButtonGroup.Separator />
-  <IconButton icon={<PlusIcon />} aria-label="확대" />
-</ButtonGroup>
-
 <ButtonGroup orientation="vertical" aria-label="정렬">  {/* 세로. 버튼 너비가 가장 넓은 버튼에 맞춰진다 */}
 ```
 
-- `tray` 와 `framed` 는 그룹이 테두리와 배경을 그리므로, 안의 버튼은 기본으로 배경 없이(`ghost`) 그려집니다. 버튼이나 그룹에 `variant` 를 주면 그 값이 이깁니다.
+- `tray` 는 그룹이 테두리와 배경을 그리므로, 안의 버튼은 기본으로 배경 없이(`ghost`) 그려집니다. 버튼이나 그룹에 `variant` 를 주면 그 값이 이깁니다.
 - `tray` 는 버튼마다 모서리를 두고, 막대 모서리는 버튼 모서리에 안쪽 여백 4px 를 더한 14px 입니다. 높이는 버튼보다 10px 큽니다.
-- `framed` 는 버튼 하나와 높이가 같아서 다른 컨트롤과 한 줄에 놓입니다. 테두리는 hover 한 버튼 위에 그려져 끊기지 않습니다.
-- 두 레이아웃의 구분선은 버튼 가운데에 짧게 섭니다. standard 는 20px, tiny 는 16px 입니다.
+- 구분선은 버튼 가운데에 짧게 섭니다. standard 는 20px, tiny 는 16px 입니다.
 
 ## 속성
 
 | 속성                    | 기본 / 동작                                            |
 | ----------------------- | ------------------------------------------------------ |
 | `orientation`           | `horizontal`(기본) / `vertical`                        |
-| `layout`                | `attached`(기본) / `spaced` / `tray` / `framed`        |
+| `layout`                | `attached`(기본) / `spaced` / `tray`                   |
 | `size`                  | 안의 컨트롤이 따르는 크기. 생략하면 각자 크기          |
 | `variant`               | 안의 컨트롤이 따르는 variant. 생략하면 각자 기본값     |
 | `aria-label`            | 그룹의 이름                                            |
-| `ButtonGroup.Separator` | 선. 그룹 방향과 수직이고, `tray`·`framed` 에서는 짧다  |
+| `ButtonGroup.Separator` | 선. 그룹 방향과 수직이고, `tray` 에서는 짧다           |
 | 그 외 native 속성       | `div` 로 간다                                          |
 
 ## 알아둘 것

@@ -29,7 +29,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const variants = ['solid', 'soft', 'outline', 'ghost', 'glossy'] as const;
 const sizes = ['standard', 'tiny'] as const;
 const orientations = ['horizontal', 'vertical'] as const;
-const layouts = ['attached', 'spaced', 'tray', 'framed'] as const;
+const layouts = ['attached', 'spaced', 'tray'] as const;
 
 const meta = {
   title: 'Action/ButtonGroup',
@@ -87,7 +87,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Layout"
-        description="attached 는 버튼을 이어 붙이고, spaced 는 띄웁니다. tray 는 테두리 막대 안에 버튼을 띄우고, framed 는 테두리 하나 안에 버튼을 이어 붙입니다. tray 와 framed 의 구분선은 짧고, 안의 버튼은 배경 없이 그려집니다."
+        description="attached 는 버튼을 이어 붙이고, spaced 는 띄웁니다. tray 는 테두리 막대 안에 버튼을 띄우고, 구분선을 짧게 긋고, 안의 버튼을 배경 없이 그립니다."
       >
         <Showcase.Matrix
           rows={layouts}
@@ -96,7 +96,7 @@ export const Gallery: Story = {
             orientation === 'horizontal' ? (
               <ButtonGroup
                 layout={layout}
-                variant={layout === 'attached' || layout === 'spaced' ? 'outline' : undefined}
+                variant={layout === 'tray' ? undefined : 'outline'}
                 aria-label={`${layout} 사진 넘기기`}
               >
                 <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
@@ -109,7 +109,7 @@ export const Gallery: Story = {
               <ButtonGroup
                 layout={layout}
                 orientation="vertical"
-                variant={layout === 'attached' || layout === 'spaced' ? 'outline' : undefined}
+                variant={layout === 'tray' ? undefined : 'outline'}
                 aria-label={`${layout} 지도 확대`}
               >
                 <IconButton icon={<PlusIcon />} aria-label="확대" />
@@ -126,13 +126,6 @@ export const Gallery: Story = {
             <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
             <ButtonGroup.Separator />
             <IconButton icon={<XMarkIcon />} aria-label="닫기" />
-          </ButtonGroup>
-        </Showcase.Row>
-        <Showcase.Row label="framed, tiny">
-          <ButtonGroup layout="framed" size="tiny" aria-label="작은 지도 확대">
-            <IconButton icon={<MinusIcon />} aria-label="축소" />
-            <ButtonGroup.Separator />
-            <IconButton icon={<PlusIcon />} aria-label="확대" />
           </ButtonGroup>
         </Showcase.Row>
       </Showcase.Section>
@@ -342,37 +335,6 @@ export const Tray: Story = {
     await expect(lineBox.top + lineBox.height / 2).toBeCloseTo(
       buttonBox.top + buttonBox.height / 2,
     );
-  },
-};
-
-export const Framed: Story = {
-  render: () => (
-    <ButtonGroup layout="framed" aria-label="지도 확대">
-      <IconButton icon={<MinusIcon />} aria-label="축소" />
-      <ButtonGroup.Separator />
-      <IconButton icon={<PlusIcon />} aria-label="확대" />
-    </ButtonGroup>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'framed 는 테두리 하나 안에 버튼을 이어 붙이고, 그 사이를 짧은 선으로 나눕니다. 그룹은 버튼 한 개와 높이가 같아 다른 컨트롤과 한 줄에 놓입니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const frame = canvas.getByRole('group');
-    const minus = canvas.getByRole('button', { name: '축소' });
-    const plus = canvas.getByRole('button', { name: '확대' });
-    await expect(minus).toHaveAttribute('data-variant', 'ghost');
-    await expect(radii(minus)).toEqual(['10px', '0px', '0px', '10px']);
-    await expect(radii(plus)).toEqual(['0px', '10px', '10px', '0px']);
-    await expect(frame.getBoundingClientRect().height).toBe(minus.getBoundingClientRect().height);
-    await expect(canvas.getByRole('separator').getBoundingClientRect().height).toBe(20);
-    await userEvent.hover(plus);
-    await expect(getComputedStyle(frame, '::after').zIndex).toBe('25');
-    await expect(Number(getComputedStyle(plus).zIndex)).toBeLessThan(25);
   },
 };
 

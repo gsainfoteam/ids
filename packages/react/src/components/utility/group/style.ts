@@ -3,9 +3,6 @@ import { tv } from '../../../utils';
 import type { GroupLayout, GroupOrientation } from '.';
 import type { IdsSize } from '../../../tokens/types';
 
-const joinedLayouts = ['attached', 'framed'] satisfies GroupLayout[];
-const shortSeamLayouts = ['tray', 'framed'] satisfies GroupLayout[];
-
 export const groupStyle = tv({
   slots: {
     root: [
@@ -31,42 +28,17 @@ export const groupStyle = tv({
       },
       spaced: { root: 'gap-2' },
       tray: { root: 'gap-1 border border-neutral bg-surface shadow-xs concentric-p-1' },
-      framed: {
-        root: [
-          'rounded-standard bg-surface shadow-xs dark:bg-neutral-soft/30',
-          'after:pointer-events-none after:absolute after:inset-0 after:z-25 after:rounded-[inherit]',
-          'after:inset-ring-1 after:inset-ring-neutral',
-        ],
-      },
     } satisfies Record<GroupLayout, object>,
     size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
   },
   compoundVariants: [
     {
       orientation: 'horizontal',
-      layout: joinedLayouts,
+      layout: 'attached',
       class: {
         root: [
           '[&>:not(input,[popover],[data-floating-ui-focus-guard])~:not(input,[popover],[data-floating-ui-focus-guard])]:rounded-s-none',
           '[&>:not(input,[popover],[data-floating-ui-focus-guard]):has(~:not(input,[popover],[data-floating-ui-focus-guard]))]:rounded-e-none',
-        ],
-      },
-    },
-    {
-      orientation: 'vertical',
-      layout: joinedLayouts,
-      class: {
-        root: [
-          '[&>:not(input,[popover],[data-floating-ui-focus-guard])~:not(input,[popover],[data-floating-ui-focus-guard])]:rounded-t-none',
-          '[&>:not(input,[popover],[data-floating-ui-focus-guard]):has(~:not(input,[popover],[data-floating-ui-focus-guard]))]:rounded-b-none',
-        ],
-      },
-    },
-    {
-      orientation: 'horizontal',
-      layout: 'attached',
-      class: {
-        root: [
           '[&>[data-variant=outline]+[data-variant=outline]]:-ms-px',
           '[&>[data-variant=outline]+[popover]+[data-variant=outline]]:-ms-px',
           '[&>[data-variant=glossy]+[data-variant=glossy]]:-ms-px',
@@ -80,6 +52,8 @@ export const groupStyle = tv({
       layout: 'attached',
       class: {
         root: [
+          '[&>:not(input,[popover],[data-floating-ui-focus-guard])~:not(input,[popover],[data-floating-ui-focus-guard])]:rounded-t-none',
+          '[&>:not(input,[popover],[data-floating-ui-focus-guard]):has(~:not(input,[popover],[data-floating-ui-focus-guard]))]:rounded-b-none',
           '[&>[data-variant=outline]+[data-variant=outline]]:-mt-px',
           '[&>[data-variant=outline]+[popover]+[data-variant=outline]]:-mt-px',
           '[&>[data-variant=glossy]+[data-variant=glossy]]:-mt-px',
@@ -90,25 +64,23 @@ export const groupStyle = tv({
     },
     {
       orientation: 'horizontal',
-      layout: shortSeamLayouts,
-      class: { separator: 'h-5 min-h-0 self-center' },
+      layout: 'tray',
+      class: { separator: 'mx-1 h-5 min-h-0 self-center' },
     },
     {
       orientation: 'vertical',
-      layout: shortSeamLayouts,
-      class: { separator: 'w-5 self-center' },
+      layout: 'tray',
+      class: { separator: 'my-1 w-5 self-center' },
     },
-    { orientation: 'horizontal', layout: 'tray', class: { separator: 'mx-1' } },
-    { orientation: 'vertical', layout: 'tray', class: { separator: 'my-1' } },
     {
       orientation: 'horizontal',
-      layout: shortSeamLayouts,
+      layout: 'tray',
       size: 'tiny',
       class: { separator: 'h-4' },
     },
     {
       orientation: 'vertical',
-      layout: shortSeamLayouts,
+      layout: 'tray',
       size: 'tiny',
       class: { separator: 'w-4' },
     },

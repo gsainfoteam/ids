@@ -44,24 +44,24 @@ test('the separator is a Divider across the group that overlaps the joined borde
   expect(spaced.classList, 'spaced controls leave no seam').not.toContain('-mx-px');
 });
 
-test('a tray or a framed group draws a short separator and quiet controls', () => {
-  for (const layout of ['tray', 'framed'] as const) {
-    const html = renderToString(
-      <ButtonGroup aria-label="사진" layout={layout}>
+test('a tray draws a short separator and quiet controls', () => {
+  const doc = new DOMParser().parseFromString(
+    renderToString(
+      <ButtonGroup aria-label="사진" layout="tray">
         <Button>이전</Button>
         <ButtonGroup.Separator />
         <Button variant="solid">다음</Button>
       </ButtonGroup>,
-    );
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const line = doc.querySelector<HTMLElement>('[data-group-separator]')!;
-    for (const name of ['h-5', 'self-center']) expect(line.classList, name).toContain(name);
-    expect(line.classList, 'nothing to overlap').not.toContain('-mx-px');
-    expect(doc.querySelector('[role=group]')!.getAttribute('data-layout')).toBe(layout);
-    const [quiet, own] = doc.querySelectorAll('button');
-    expect(quiet!.dataset.variant, layout).toBe('ghost');
-    expect(own!.dataset.variant, 'an own variant wins').toBe('solid');
-  }
+    ),
+    'text/html',
+  );
+  const line = doc.querySelector<HTMLElement>('[data-group-separator]')!;
+  for (const name of ['h-5', 'mx-1', 'self-center']) expect(line.classList, name).toContain(name);
+  expect(line.classList, 'nothing to overlap').not.toContain('-mx-px');
+  expect(doc.querySelector('[role=group]')!.getAttribute('data-layout')).toBe('tray');
+  const [quiet, own] = doc.querySelectorAll('button');
+  expect(quiet!.dataset.variant).toBe('ghost');
+  expect(own!.dataset.variant, 'an own variant wins').toBe('solid');
 
   const tiny = separator(
     <ButtonGroup aria-label="사진" layout="tray" size="tiny" orientation="vertical">

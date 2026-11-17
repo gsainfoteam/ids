@@ -13,9 +13,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export type GroupOrientation = 'horizontal' | 'vertical';
 
-export type GroupLayout = 'attached' | 'spaced' | 'tray' | 'framed';
-
-const surfaceLayouts = new Set<GroupLayout>(['tray', 'framed']);
+export type GroupLayout = 'attached' | 'spaced' | 'tray';
 
 export type GroupContextValue = {
   orientation: GroupOrientation;
@@ -62,7 +60,7 @@ export function GroupRoot({
     orientation,
     layout,
     size: size ?? parent?.size,
-    variant: variant ?? parent?.variant ?? (surfaceLayouts.has(layout) ? 'ghost' : undefined),
+    variant: variant ?? parent?.variant ?? (layout === 'tray' ? 'ghost' : undefined),
     separator,
   };
   return (
