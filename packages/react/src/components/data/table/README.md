@@ -46,31 +46,33 @@ import { Table } from '@gsainfoteam/ids-react';
 ## variant와 크기
 
 ```tsx
-<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행에 `bg-neutral-soft` 배경
+<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행은 몸통과 같은 `bg-surface`
 <Table variant="ghost" />    // 상자 없이 행 구분선만
-<Table size="standard" />    // 기본. 셀 패딩 16px × 12px, 머리글 44px, body b3
-<Table size="tiny" />        // 셀 패딩 12px × 8px, 머리글 36px, caption c1
+<Table size="standard" />    // 기본. 셀 패딩 16px × 10px, 머리글 40px, body b3
+<Table size="tiny" />        // 셀 패딩 12px × 6px, 머리글 32px, caption c1
 ```
 
 - 상자 모서리는 `rounded-container`(16px) 입니다. 안쪽 여백이 없는 상자라 concentric 계산을 쓰지 않습니다.
 - 선은 모두 `--ids-color-border-neutral` 입니다. 마지막 행은 아래 선이 없고, `Table.Footer` 는 위 선으로 몸통과 나뉩니다.
+- 머리글 행은 채우지 않고 `text-neutral` 글자와 아래 선으로만 나뉩니다. 붙는 머리글(`stickyHeader`)이 아래 행을 가리도록 배경은 `bg-surface` 입니다.
 
 ## 행 상태
 
 ```tsx
 <Table striped />              // 짝수 행에 `bg-neutral-soft`
 <Table highlightOnHover />     // 몸통 행에 올리면 `bg-neutral-soft`
-<Table.Row selected />         // 선택된 행은 `bg-neutral-soft-hover`
+<Table.Row selected />         // 선택된 행은 `bg-primary-soft`, 글자 `text-on-primary-soft`
 <Table.Row onClick={open} />   // 올리면 밝아지고 어디를 눌러도 된다(cursor-pointer)
 ```
 
-| 행               | 평소          | 올렸을 때      |
-| ---------------- | ------------- | -------------- |
-| 기본             | 투명          | `bg-neutral-soft`        |
-| 줄무늬(짝수)     | `bg-neutral-soft`       | `bg-neutral-soft-hover`  |
-| 선택             | `bg-neutral-soft-hover` | `bg-neutral-soft-active` |
+| 행           | 평소              | 올렸을 때                |
+| ------------ | ----------------- | ------------------------ |
+| 기본         | 투명              | `bg-neutral-soft`        |
+| 줄무늬(짝수) | `bg-neutral-soft` | `bg-neutral-soft-hover`  |
+| 선택         | `bg-primary-soft` | `bg-primary-soft-hover`  |
 
 - 올렸을 때 색은 `highlightOnHover` 나 `onClick` 이 있는 몸통 행에만 붙습니다. 머리글과 바닥글 행은 바뀌지 않습니다.
+- 선택은 줄무늬보다 앞섭니다. 짝수 행을 골라도 `bg-primary-soft` 입니다.
 - `selected` 는 모양과 `data-selected` 만 바꿉니다. `aria-selected` 는 `grid` 역할에서만 뜻이 있어 붙이지 않습니다. 선택은 행 안의 체크박스나 `aria-pressed` 버튼이 알립니다.
 
 ## 누를 수 있는 행

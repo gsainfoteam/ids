@@ -72,15 +72,20 @@ export function DataTableColumnHeader<TData extends RowData>({ header }: ColumnH
   const { styles, size } = useDataTableContext();
   const { column } = header;
 
+  const align = column.columnDef.meta?.align;
   const sorted = column.getIsSorted();
   const sortable = !header.isPlaceholder && column.getCanSort();
   const resizable = !header.isPlaceholder && column.getCanResize();
-  const content = header.isPlaceholder ? null : <FlexRender header={header} />;
+  const content = header.isPlaceholder ? null : (
+    <span className={styles.label()}>
+      <FlexRender header={header} />
+    </span>
+  );
 
   return (
     <TableHead
       colSpan={header.colSpan > 1 ? header.colSpan : undefined}
-      align={column.columnDef.meta?.align}
+      align={align}
       aria-sort={sorted ? ARIA_SORT[sorted] : undefined}
       data-sorted={sorted || undefined}
       className={styles.head({
@@ -92,7 +97,7 @@ export function DataTableColumnHeader<TData extends RowData>({ header }: ColumnH
           variant="ghost"
           size={size}
           data-data-table-sort=""
-          className={styles.sortButton()}
+          className={styles.sortButton({ align })}
           onClick={column.getToggleSortingHandler()}
         >
           {content}

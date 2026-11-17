@@ -71,6 +71,7 @@ export function DataTableRoot<TData extends RowData>(props: DataTable.Props<TDat
             stickyHeader={stickyHeader}
             highlightOnHover={highlightOnHover}
             layout={enableColumnResizing ? 'fixed' : 'auto'}
+            className={styles.table()}
           >
             {caption != null && <TableCaption>{caption}</TableCaption>}
             {enableColumnResizing && (
@@ -97,9 +98,12 @@ export function DataTableRoot<TData extends RowData>(props: DataTable.Props<TDat
                       <TableCell
                         key={cell.id}
                         align={cell.column.columnDef.meta?.align}
-                        className={
-                          cell.column.id === SELECTION_COLUMN_ID ? styles.selectCell() : undefined
-                        }
+                        className={styles.cell({
+                          className:
+                            cell.column.id === SELECTION_COLUMN_ID
+                              ? styles.selectCell()
+                              : undefined,
+                        })}
                       >
                         <table.FlexRender cell={cell} />
                       </TableCell>

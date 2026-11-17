@@ -20,20 +20,20 @@ export const tableStyle = tv({
     variant: {
       outline: {
         root: 'rounded-container border border-neutral',
-        header: 'bg-neutral-soft',
+        header: 'bg-surface',
       },
       ghost: { header: 'bg-surface' },
     } satisfies Record<TableVariant, object>,
     size: {
       standard: {
         caption: 'px-4 py-3 text-body-b3-regular',
-        head: 'h-11 px-4 text-body-b3-medium',
-        cell: 'px-4 py-3 text-body-b3-regular',
+        head: 'h-10 px-4 text-body-b3-medium',
+        cell: 'px-4 py-2.5 text-body-b3-regular',
       },
       tiny: {
         caption: 'px-3 py-2 text-caption-c1-regular',
-        head: 'h-9 px-3 text-caption-c1-medium',
-        cell: 'px-3 py-2 text-caption-c1-regular',
+        head: 'h-8 px-3 text-caption-c1-medium',
+        cell: 'px-3 py-1.5 text-caption-c1-regular',
       },
     } satisfies Record<IdsSize, object>,
     layout: {
@@ -49,15 +49,15 @@ export const tableStyle = tv({
       header: { head: 'text-neutral' },
       body: {
         row: [
-          'data-selected:bg-neutral-soft-hover',
-          'data-selected:hover:bg-neutral-soft-active',
+          'data-selected:bg-primary-soft data-selected:text-on-primary-soft',
+          'data-selected:hover:bg-primary-soft-hover',
           'last:*:border-b-0',
         ],
       },
       footer: { head: 'border-t border-b-0', cell: 'border-t border-b-0' },
     } satisfies Record<TableSection, object>,
     hoverable: {
-      true: { row: 'hover:bg-neutral-soft' },
+      true: { row: 'not-data-selected:hover:bg-neutral-soft' },
       false: {},
     },
     clickable: {
@@ -71,12 +71,12 @@ export const tableStyle = tv({
     } satisfies Record<TableAlign, object>,
   },
   compoundVariants: [
-    { striped: true, section: 'body', class: { row: 'even:bg-neutral-soft' } },
+    { striped: true, section: 'body', class: { row: 'even:not-data-selected:bg-neutral-soft' } },
     {
       striped: true,
       section: 'body',
       hoverable: true,
-      class: { row: 'even:hover:bg-neutral-soft-hover' },
+      class: { row: 'even:not-data-selected:hover:bg-neutral-soft-hover' },
     },
   ],
   defaultVariants: {

@@ -43,10 +43,10 @@ export function DataTableFooter<TData extends RowData>({
         >
           <Pagination.List>
             <Pagination.Item>
-              <Pagination.First focusableWhenDisabled />
+              <Pagination.First focusableWhenDisabled className={styles.pageStep()} />
             </Pagination.Item>
             <Pagination.Item>
-              <Pagination.Previous focusableWhenDisabled />
+              <Pagination.Previous focusableWhenDisabled className={styles.pageStep()} />
             </Pagination.Item>
             <Pagination.Item>
               <span aria-live="polite" data-data-table-page="" className={styles.page()}>
@@ -54,10 +54,10 @@ export function DataTableFooter<TData extends RowData>({
               </span>
             </Pagination.Item>
             <Pagination.Item>
-              <Pagination.Next focusableWhenDisabled />
+              <Pagination.Next focusableWhenDisabled className={styles.pageStep()} />
             </Pagination.Item>
             <Pagination.Item>
-              <Pagination.Last focusableWhenDisabled />
+              <Pagination.Last focusableWhenDisabled className={styles.pageStep()} />
             </Pagination.Item>
           </Pagination.List>
         </Pagination>

@@ -103,11 +103,11 @@ test('a row with onClick presses anywhere and hovers; selection stays a data att
   expect(header.hasAttribute('data-hoverable')).toBe(false);
 });
 
-test('the neutral ladder: stripe muted, hover a step up, selected the press step', async () => {
+test('stripes climb the neutral ladder, a selected row is primary soft and beats the stripe', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <p>Outside</p>
-      {people({ striped: true, highlightOnHover: true }, (index) => ({ selected: index === 2 }))}
+      {people({ striped: true, highlightOnHover: true }, (index) => ({ selected: index === 3 }))}
     </IdsProvider>,
   );
   await userEvent.hover(screen.getByText('Outside'));
@@ -117,14 +117,17 @@ test('the neutral ladder: stripe muted, hover a step up, selected the press step
   await expect.element(row('Ada')).toBeInTheDocument();
   expect(background('Ada')).toBe('rgba(0, 0, 0, 0)');
   expect(background('Grace')).toBe(colorOf('--ids-color-bg-neutral-soft'));
-  expect(background('Linus')).toBe(colorOf('--ids-color-bg-neutral-soft-hover'));
+  expect(background('Ken')).toBe(colorOf('--ids-color-bg-primary-soft'));
+  expect(getComputedStyle(row('Ken').element()).color).toBe(
+    colorOf('--ids-color-text-on-primary-soft'),
+  );
 
   await userEvent.hover(row('Ada'));
   await expect.poll(() => background('Ada')).toBe(colorOf('--ids-color-bg-neutral-soft'));
   await userEvent.hover(row('Grace'));
   await expect.poll(() => background('Grace')).toBe(colorOf('--ids-color-bg-neutral-soft-hover'));
-  await userEvent.hover(row('Linus'));
-  await expect.poll(() => background('Linus')).toBe(colorOf('--ids-color-bg-neutral-soft-active'));
+  await userEvent.hover(row('Ken'));
+  await expect.poll(() => background('Ken')).toBe(colorOf('--ids-color-bg-primary-soft-hover'));
 });
 
 test('stickyHeader keeps the header row in view while the body scrolls', async () => {
