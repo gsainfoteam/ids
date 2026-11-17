@@ -20,6 +20,22 @@ Future<void> pump(WidgetTester tester, Widget child) => tester.pumpWidget(
 );
 
 void main() {
+  testWidgets('clear button end padding follows the theme scale', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      const IdsProviderScope(
+        theme: IdsThemeOverrides(scale: 1.5),
+        child: IdsTextField(defaultValue: 'IDS', clearable: true),
+      ),
+    );
+
+    final field = tester.getRect(find.byType(IdsTextField));
+    final clear = tester.getRect(find.byType(IdsIconButton));
+    expect(field.right - clear.right, 7);
+  });
+
   testWidgets('validation uses Field spacing and styling and clears on reset', (
     tester,
   ) async {

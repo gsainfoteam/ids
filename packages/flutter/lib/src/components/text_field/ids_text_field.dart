@@ -268,7 +268,9 @@ class _IdsTextFieldState extends State<IdsTextField> {
                                   return Padding(
                                     padding: EdgeInsetsDirectional.only(
                                       start: padding,
-                                      end: showClear ? 4 : padding,
+                                      end: showClear
+                                          ? theme.dimension(4)
+                                          : padding,
                                     ),
                                     child: Row(
                                       spacing: theme.dimension(tiny ? 6 : 8),
