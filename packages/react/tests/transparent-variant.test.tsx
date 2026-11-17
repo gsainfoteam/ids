@@ -21,6 +21,7 @@ async function renderInTheme(control: ReactElement) {
       <p>Elsewhere</p>
     </IdsProvider>,
   );
+  await userEvent.hover(screen.getByText('Elsewhere'));
   const token = (name: string) => {
     const probe = document.createElement('div');
     probe.style.color = `var(${name})`;
