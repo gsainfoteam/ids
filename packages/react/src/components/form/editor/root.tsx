@@ -116,6 +116,8 @@ function splitByContent(children: ReactNode) {
   };
 }
 
+const REPORTS_AWAITING_AN_ECHO = 32;
+
 const joinIds = (...ids: (string | undefined | false)[]) =>
   ids.filter(Boolean).join(' ') || undefined;
 
@@ -200,6 +202,7 @@ export function EditorRoot(props: Editor.Props) {
   useLayoutEffect(() => {
     latest.current = { format, setCurrent };
   });
+  const reportedSinceTheLastRender = useRef<EditorValue[]>([]);
 
   const styles = editorStyle({ variant, size, editable });
   const contentAttributes = definedOnly({
@@ -235,7 +238,12 @@ export function EditorRoot(props: Editor.Props) {
         contentRef.current = instance.view.dom;
       },
       onUpdate: ({ editor: instance }) => {
-        latest.current.setCurrent(readValue(instance, latest.current.format));
+        const next = readValue(instance, latest.current.format);
+        reportedSinceTheLastRender.current = [
+          ...reportedSinceTheLastRender.current.slice(-REPORTS_AWAITING_AN_ECHO),
+          next,
+        ];
+        latest.current.setCurrent(next);
       },
       onFocus: () => setFocused(true),
       onBlur: () => setFocused(false),
@@ -256,6 +264,13 @@ export function EditorRoot(props: Editor.Props) {
 
   useEffect(() => {
     if (!editor || editor.isDestroyed || value === undefined) return;
+    const reported = reportedSinceTheLastRender.current;
+    const echo = reported.map((report) => isEqual(report, value)).lastIndexOf(true);
+    if (echo !== -1) {
+      reportedSinceTheLastRender.current = reported.slice(echo + 1);
+      return;
+    }
+    reportedSinceTheLastRender.current = [];
     if (isEqual(readValue(editor, format), value)) return;
     writeValue(editor, value, format);
   }, [editor, value, format]);
