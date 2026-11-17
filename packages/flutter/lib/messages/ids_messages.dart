@@ -337,6 +337,24 @@ mixin IdsMessages {
 
   String? get qrCodeLabel => null;
 
+  String? get questionnaireNavigation => null;
+
+  String? get questionnaireNext => null;
+
+  String? get questionnaireOther => null;
+
+  String? get questionnaireOtherPlaceholder => null;
+
+  String? get questionnairePrevious => null;
+
+  String? get questionnaireProgress => null;
+
+  String? get questionnaireSkip => null;
+
+  String? questionnaireStep({required Object current, required Object total}) => null;
+
+  String? get questionnaireSubmit => null;
+
   String? get ratingLabel => null;
 
   String? get ratingRequired => null;
@@ -966,6 +984,33 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get qrCodeLabel => 'QR 코드';
+
+  @override
+  String get questionnaireNavigation => '질문 이동';
+
+  @override
+  String get questionnaireNext => '다음';
+
+  @override
+  String get questionnaireOther => '직접 입력';
+
+  @override
+  String get questionnaireOtherPlaceholder => '다른 답을 적어 주세요';
+
+  @override
+  String get questionnairePrevious => '이전';
+
+  @override
+  String get questionnaireProgress => '질문 진행';
+
+  @override
+  String get questionnaireSkip => '건너뛰기';
+
+  @override
+  String questionnaireStep({required Object current, required Object total}) => '${_format(current)} / ${_format(total)}';
+
+  @override
+  String get questionnaireSubmit => '보내기';
 
   @override
   String get ratingLabel => '평점';

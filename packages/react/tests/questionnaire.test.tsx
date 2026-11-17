@@ -1,0 +1,149 @@
+import { renderToString } from 'react-dom/server';
+import { expect, test, vi } from 'vitest';
+import { page, userEvent } from 'vitest/browser';
+import { render } from 'vitest-browser-react';
+
+import { Questionnaire } from '../src';
+
+const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
+
+const radio = (name: string) => page.getByRole('radio', { name, exact: true });
+const button = (name: string) => page.getByRole('button', { name, exact: true });
+
+const twoQuestions = (props: Partial<Questionnaire.Props> = {}) => (
+  <Questionnaire {...props}>
+    <Questionnaire.Question name="tone">
+      어떤 말투로 쓸까요?
+      <Questionnaire.Description>나중에 바꿀 수 있어요.</Questionnaire.Description>
+      <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+      <Questionnaire.Option value="casual">편하게</Questionnaire.Option>
+      <Questionnaire.Other />
+    </Questionnaire.Question>
+    <Questionnaire.Question name="topics" selectionMode="multiple" optional>
+      무엇을 넣을까요?
+      <Questionnaire.Option value="summary">요약</Questionnaire.Option>
+      <Questionnaire.Option value="todo">할 일</Questionnaire.Option>
+      <Questionnaire.Other />
+    </Questionnaire.Question>
+  </Questionnaire>
+);
+
+test('the server HTML holds every question, with only the first one shown', () => {
+  const html = parse(renderToString(twoQuestions()));
+  const form = html.querySelector('form')!;
+  const [tone, topics] = html.querySelectorAll('fieldset');
+
+  expect(form).toHaveAttribute('data-questionnaire');
+  expect(tone).toHaveAttribute('role', 'radiogroup');
+  expect(tone).not.toHaveAttribute('hidden');
+  expect(topics).toHaveAttribute('hidden');
+  expect(tone.querySelector('legend')).toHaveTextContent('어떤 말투로 쓸까요?');
+  expect(tone.getAttribute('aria-labelledby')).toBe(tone.querySelector('legend')!.id);
+  expect(tone.getAttribute('aria-describedby')).toBe(tone.querySelector('p')!.id);
+  expect(html.querySelector('[role=progressbar]')).toHaveAttribute('aria-valuetext', '1 / 2');
+});
+
+test('a question is named by its legend and described by its description', async () => {
+  await render(twoQuestions());
+
+  await expect
+    .element(page.getByRole('radiogroup', { name: '어떤 말투로 쓸까요?' }))
+    .toHaveAccessibleDescription('나중에 바꿀 수 있어요.');
+  await expect.element(page.getByRole('group', { name: '질문 이동' })).toBeVisible();
+});
+
+test('the next button stays off until a required question is answered, and Enter waits too', async () => {
+  await render(twoQuestions());
+
+  await expect.element(button('다음')).toHaveAttribute('aria-disabled', 'true');
+  await userEvent.click(page.getByRole('textbox', { name: '직접 입력' }));
+  await userEvent.keyboard('{Enter}');
+  await expect.element(radio('격식')).toBeVisible();
+
+  await userEvent.keyboard('반말로');
+  await expect.element(button('다음')).not.toHaveAttribute('aria-disabled');
+});
+
+test('FormData holds the answers of hidden questions and the typed answer under the question name', async () => {
+  const screen = await render(twoQuestions());
+  const form = screen.container.querySelector('form')!;
+
+  await userEvent.click(radio('편하게'));
+  await userEvent.click(button('다음'));
+  await userEvent.click(page.getByRole('checkbox', { name: '요약' }));
+  await userEvent.fill(page.getByRole('textbox', { name: '직접 입력' }), '회의 일정');
+
+  const data = new FormData(form);
+  expect(data.get('tone')).toBe('casual');
+  expect(data.getAll('topics')).toEqual(['summary', '회의 일정']);
+});
+
+test('defaultValue puts listed values on the options and the rest in Other', async () => {
+  const onComplete = vi.fn();
+  await render(
+    twoQuestions({ onComplete, defaultValue: { tone: '반말로', topics: ['todo', '메모'] } }),
+  );
+
+  await expect.element(radio('격식')).not.toBeChecked();
+  await expect.element(page.getByRole('textbox', { name: '직접 입력' })).toHaveValue('반말로');
+  await userEvent.click(button('다음'));
+  await expect.element(page.getByRole('checkbox', { name: '할 일' })).toBeChecked();
+  await expect.element(page.getByRole('textbox', { name: '직접 입력' })).toHaveValue('메모');
+
+  await userEvent.click(button('보내기'));
+  expect(onComplete).toHaveBeenCalledWith({ tone: '반말로', topics: ['todo', '메모'] });
+});
+
+test('skipping the last optional question completes without its answer', async () => {
+  const onComplete = vi.fn();
+  await render(twoQuestions({ onComplete, defaultValue: { tone: 'formal', topics: ['todo'] } }));
+
+  await userEvent.click(button('다음'));
+  await userEvent.click(button('건너뛰기'));
+
+  expect(onComplete).toHaveBeenCalledOnce();
+  expect(onComplete).toHaveBeenCalledWith({ tone: 'formal' });
+});
+
+test('with advanceOnSelect a pick moves on, an arrow key only moves the choice', async () => {
+  const onComplete = vi.fn();
+  await render(
+    <Questionnaire advanceOnSelect onComplete={onComplete}>
+      <Questionnaire.Question name="size">
+        몇 칸을 쓸까요?
+        <Questionnaire.Option value="one">한 칸</Questionnaire.Option>
+        <Questionnaire.Option value="two">두 칸</Questionnaire.Option>
+      </Questionnaire.Question>
+      <Questionnaire.Question name="people">
+        몇 명인가요?
+        <Questionnaire.Option value="few">4명 이하</Questionnaire.Option>
+        <Questionnaire.Option value="many">5명 이상</Questionnaire.Option>
+      </Questionnaire.Question>
+    </Questionnaire>,
+  );
+
+  await expect.element(button('다음')).not.toBeInTheDocument();
+  await userEvent.click(radio('두 칸'));
+  await expect.element(radio('4명 이하')).toHaveFocus();
+
+  await userEvent.keyboard('{ArrowDown}');
+  await expect.element(radio('5명 이상')).toBeChecked();
+  expect(onComplete).not.toHaveBeenCalled();
+
+  await userEvent.keyboard('{Enter}');
+  expect(onComplete).toHaveBeenCalledWith({ size: 'two', people: 'many' });
+});
+
+test('a single question shows no progress bar', async () => {
+  await render(
+    <Questionnaire>
+      <Questionnaire.Question name="tone">
+        어떤 말투로 쓸까요?
+        <Questionnaire.Option value="formal">격식</Questionnaire.Option>
+      </Questionnaire.Question>
+    </Questionnaire>,
+  );
+
+  await expect.element(page.getByRole('progressbar')).not.toBeInTheDocument();
+  await expect.element(button('보내기')).toBeInTheDocument();
+});

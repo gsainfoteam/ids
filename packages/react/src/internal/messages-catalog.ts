@@ -235,6 +235,17 @@ export const messages = {
   "qrCode": {
     "label": "QR 코드"
   },
+  "questionnaire": {
+    "navigation": "질문 이동",
+    "next": "다음",
+    "other": "직접 입력",
+    "otherPlaceholder": "다른 답을 적어 주세요",
+    "previous": "이전",
+    "progress": "질문 진행",
+    "skip": "건너뛰기",
+    "step": "{current} / {total}",
+    "submit": "보내기"
+  },
   "rating": {
     "label": "평점",
     "required": "점수를 선택하세요.",
