@@ -3,30 +3,32 @@ import { cn } from '../utils/cn';
 
 import type { IdsVariant } from '../tokens/types';
 
+const toggleStates = cn(
+  'state-layer not-data-pressed:data-hovered:state-hover data-active:state-press',
+);
+
+const pressedShowsThePressLayer = cn('data-pressed:state-press');
+
 const variant = {
-  ghost: cn(
-    'bg-transparent text-(--control-quiet)',
-    'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
-    'data-pressed:bg-(--control-press) data-pressed:text-(--control-on-press)',
-  ),
+  ghost: cn('bg-transparent text-(--control-quiet)', toggleStates, pressedShowsThePressLayer),
   outline: cn(
     'bg-transparent text-(--control-quiet) shadow-xs inset-ring-1 inset-ring-neutral',
-    'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
-    'data-pressed:bg-(--control-press) data-pressed:text-(--control-on-press)',
+    toggleStates,
+    pressedShowsThePressLayer,
   ),
   soft: cn(
     'bg-transparent text-(--control-quiet)',
-    'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
+    'state-layer data-hovered:state-hover data-active:state-press',
     'data-pressed:bg-(--control-soft) data-pressed:text-(--control-on-soft)',
   ),
   solid: cn(
     'bg-transparent text-(--control-quiet)',
-    'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
+    'state-layer data-hovered:state-hover data-active:state-press',
     'data-pressed:bg-(--control-fill) data-pressed:text-(--control-on-fill) data-pressed:shadow-xs',
   ),
   glossy: cn(
     'bg-transparent text-(--control-quiet)',
-    'data-hovered:bg-(--control-hover) data-active:bg-(--control-press)',
+    'state-layer data-hovered:state-hover data-active:state-press',
     'data-pressed:bg-(--control-fill) data-pressed:text-(--control-on-fill) data-pressed:shadow-sm',
     'data-pressed:bg-linear-to-b data-pressed:from-white/20 data-pressed:to-transparent',
     'data-pressed:inset-shadow-[0_1px_0_rgb(255_255_255/0.35)]',
@@ -40,7 +42,7 @@ export const toggleSurface = {
     ...variant,
     transparent: cn(
       controlSurface.variant.transparent,
-      'text-on-surface data-pressed:text-(--control-glyph-on)',
+      'text-neutral-bold data-pressed:text-(--control-glyph-on)',
       'data-pressed-hovered:opacity-70 data-pressed-active:opacity-40',
     ),
   } satisfies Record<IdsVariant, string>,

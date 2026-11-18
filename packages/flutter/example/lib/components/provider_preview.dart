@@ -36,8 +36,8 @@ class ProviderPreview extends StatelessWidget {
           TextStyle body(Color color) =>
               ids.textStyle(IdsTypography.bodyB3Regular, color: color);
           return Material(
-            color: colors.surface,
-            textStyle: body(colors.onSurface),
+            color: colors.bgNeutralSubtlest,
+            textStyle: body(colors.textNeutralBold),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Center(
@@ -61,7 +61,7 @@ class ProviderPreview extends StatelessWidget {
                         'IDS mono: Aa Wi 0123',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: colors.onSurface,
+                          color: colors.textNeutralBold,
                           mono: true,
                         ),
                       ),
@@ -187,7 +187,7 @@ class ScopePreview extends StatelessWidget {
       width: 360,
       padding: const EdgeInsets.all(16),
       decoration: ShapeDecoration(
-        color: colors.bgPrimarySoft,
+        color: colors.bgPrimarySubtle,
         shape: ids.shape(radius: ids.radius.container),
       ),
       child: Column(
@@ -199,7 +199,7 @@ class ScopePreview extends StatelessWidget {
             '${ids.theme.primary == blue ? 'Blue' : 'Purple'} / ${ids.resolvedMode.name}',
             style: ids.textStyle(
               IdsTypography.bodyB3Regular,
-              color: colors.textOnPrimarySoft,
+              color: colors.textOnPrimarySubtle,
             ),
           ),
           FilledButton(

@@ -11,7 +11,7 @@ import { Resizable } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const panel = cn('concentric-p-4 border border-neutral bg-surface text-body-b3-regular');
+const panel = cn('concentric-p-4 border border-neutral bg-neutral-subtlest text-body-b3-regular');
 
 const meta = {
   title: 'Layout/Resizable',
@@ -88,14 +88,14 @@ export const Gallery: Story = {
           <Resizable
             defaultWidth={180}
             defaultHeight={112}
-            className="text-body-b3-regular border-neutral bg-surface rounded-none border p-4"
+            className="text-body-b3-regular border-neutral bg-neutral-subtlest rounded-none border p-4"
           >
             0
           </Resizable>
           <Resizable
             defaultWidth={180}
             defaultHeight={112}
-            className="rounded-standard text-body-b3-regular border-neutral bg-surface border p-4"
+            className="rounded-standard text-body-b3-regular border-neutral bg-neutral-subtlest border p-4"
           >
             standard
           </Resizable>
@@ -105,7 +105,7 @@ export const Gallery: Story = {
           <Resizable
             defaultWidth={180}
             defaultHeight={112}
-            className="text-body-b3-regular border-neutral bg-surface rounded-full border px-8 py-4"
+            className="text-body-b3-regular border-neutral bg-neutral-subtlest rounded-full border px-8 py-4"
           >
             full
           </Resizable>

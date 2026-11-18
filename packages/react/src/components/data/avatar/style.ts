@@ -23,9 +23,9 @@ export const avatarStyle = tv({
   slots: {
     root: [
       'relative inline-flex shrink-0 items-center justify-center overflow-hidden align-middle',
-      'bg-neutral-soft text-neutral select-none @container',
+      'bg-neutral-subtle text-neutral select-none @container',
       'after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit]',
-      'after:inset-ring-1 after:inset-ring-(--ids-color-on-surface)/8',
+      'after:inset-ring-1 after:inset-ring-(--ids-color-text-neutral-bold)/8',
     ],
     image: 'absolute inset-0 size-full object-cover',
     fallback: [

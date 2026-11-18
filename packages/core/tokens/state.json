@@ -1,0 +1,6 @@
+{
+  "state": {
+    "hover": { "$value": "6%",  "$type": "number" },
+    "press": { "$value": "10%", "$type": "number" }
+  }
+}

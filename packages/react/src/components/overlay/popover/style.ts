@@ -8,7 +8,7 @@ export const popoverStyle = tv({
     content: [
       'fixed z-50 m-0 flex max-h-(--available-height) w-72 max-w-[calc(100vw-var(--spacing)*4)] flex-col overflow-visible outline-none',
       cornerOfThePaddedViewport,
-      'border border-neutral bg-surface text-on-surface',
+      'border border-neutral bg-neutral-subtlest text-neutral-bold',
       'text-body-b3-regular shadow-md',
       'transition-[opacity,scale] duration-(--ids-motion-fast) ease-out',
       'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',

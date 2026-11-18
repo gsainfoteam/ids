@@ -10,7 +10,7 @@ export const sliderStyle = tv({
       'group/slider relative grid select-none outline-none',
       'data-disabled:cursor-not-allowed data-disabled:opacity-50',
     ],
-    track: [sliderSurface.edge, 'relative rounded-full bg-neutral-soft'],
+    track: [sliderSurface.edge, 'relative rounded-full bg-neutral-subtle'],
     range: [
       sliderSurface.edge,
       'absolute rounded-full bg-primary group-data-invalid/slider:bg-danger',
@@ -23,7 +23,7 @@ export const sliderStyle = tv({
     ],
     valueLabel: [
       'pointer-events-none absolute rounded-indicator px-1.5 py-0.5 whitespace-nowrap',
-      'bg-(--ids-color-on-surface) text-caption-c1-medium text-(--ids-color-surface) tabular-nums',
+      'bg-neutral-bold text-caption-c1-medium text-on-neutral-bold tabular-nums',
       'opacity-0 transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',
       'group-focus-visible/thumb:opacity-100 group-data-dragging/thumb:opacity-100 data-visible:opacity-100',
     ],

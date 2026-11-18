@@ -7,7 +7,7 @@ const fadeOffWhileItsRingShows = cn('focus-visible:mask-none');
 
 export const timePickerStyle = tv({
   slots: {
-    root: 'flex min-w-0 flex-wrap gap-1 text-on-surface',
+    root: 'flex min-w-0 flex-wrap gap-1 text-neutral-bold',
     header: 'flex w-full basis-full gap-1 text-neutral select-none',
     headerLabel: 'min-w-12 flex-1 text-center',
     separator: 'self-center text-neutral select-none',
@@ -21,14 +21,13 @@ export const timePickerStyle = tv({
     ],
     option: [
       'flex h-(--time-option) shrink-0 snap-center items-center justify-center rounded-standard px-2 tabular-nums select-none',
-      'cursor-pointer transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'hover:bg-neutral-soft active:bg-neutral-soft-hover',
-      'group-focus-visible/column:data-active:not-data-selected:bg-neutral-soft',
+      'cursor-pointer transition-[color,background-color,box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'state-layer not-data-disabled:hover:state-hover not-data-disabled:active:state-press',
+      'group-focus-visible/column:data-active:state-hover',
       primaryFill,
       'data-selected:bg-(--control-fill) data-selected:font-medium data-selected:text-(--control-on-fill)',
-      'data-selected:hover:bg-(--control-fill-hover)',
       'group-focus-visible/column:data-selected:data-active:inset-ring-2 group-focus-visible/column:data-selected:data-active:inset-ring-(--ids-color-text-on-primary)/60',
-      'data-disabled:cursor-not-allowed data-disabled:opacity-50 data-disabled:hover:bg-transparent data-disabled:active:bg-transparent',
+      'data-disabled:cursor-not-allowed data-disabled:opacity-50',
     ],
   },
   variants: {

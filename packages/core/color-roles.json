@@ -4,15 +4,12 @@
     "brand": ["primary", "secondary", "tertiary"],
     "status": ["success", "warning", "danger", "info"]
   },
-  "base": {
-    "surface": ["--background-color", "--fill", "--stroke", "--ring-color", "--ring-offset-color"],
-    "on-surface": ["--text-color", "--fill"]
-  },
   "slots": {
-    "bg": ["{family}", "{family}-hover", "{family}-active", "{family}-soft", "{family}-soft-hover", "{family}-soft-active"],
-    "text": ["on-{family}", "on-{family}-soft", "{family}"],
+    "bg": ["{family}-subtlest", "{family}-subtler", "{family}-subtle", "{family}", "{family}-bold"],
+    "text": ["on-{family}-subtle", "on-{family}", "on-{family}-bold", "{family}", "{family}-bold"],
     "border": ["{family}"]
   },
+  "neutralOnly": ["bg-{family}-subtlest", "bg-{family}-bold", "text-on-{family}-bold", "text-{family}-bold"],
   "namespaces": {
     "bg": ["--background-color"],
     "text": ["--text-color", "--fill"],

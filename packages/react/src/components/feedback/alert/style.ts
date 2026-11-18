@@ -23,57 +23,57 @@ export const alertStyle = tv({
     colorScheme: {
       neutral: {
         root: [
-          '[--alert-tint:var(--ids-color-on-surface)] [--alert-on:var(--ids-color-surface)]',
-          '[--alert-soft:var(--ids-color-bg-neutral-soft)] [--alert-on-soft:var(--ids-color-text-on-neutral-soft)]',
-          '[--alert-strong:var(--ids-color-on-surface)]',
+          '[--alert-tint:var(--ids-color-bg-neutral-bold)] [--alert-on:var(--ids-color-text-on-neutral-bold)]',
+          '[--alert-soft:var(--ids-color-bg-neutral-subtle)] [--alert-on-soft:var(--ids-color-text-on-neutral-subtle)]',
+          '[--alert-strong:var(--ids-color-text-neutral-bold)]',
         ],
       },
       primary: {
         root: [
           '[--alert-tint:var(--ids-color-bg-primary)] [--alert-on:var(--ids-color-text-on-primary)]',
-          '[--alert-soft:var(--ids-color-bg-primary-soft)] [--alert-on-soft:var(--ids-color-text-on-primary-soft)]',
+          '[--alert-soft:var(--ids-color-bg-primary-subtle)] [--alert-on-soft:var(--ids-color-text-on-primary-subtle)]',
           '[--alert-strong:var(--ids-color-text-primary)]',
         ],
       },
       secondary: {
         root: [
           '[--alert-tint:var(--ids-color-bg-secondary)] [--alert-on:var(--ids-color-text-on-secondary)]',
-          '[--alert-soft:var(--ids-color-bg-secondary-soft)] [--alert-on-soft:var(--ids-color-text-on-secondary-soft)]',
+          '[--alert-soft:var(--ids-color-bg-secondary-subtle)] [--alert-on-soft:var(--ids-color-text-on-secondary-subtle)]',
           '[--alert-strong:var(--ids-color-text-secondary)]',
         ],
       },
       tertiary: {
         root: [
           '[--alert-tint:var(--ids-color-bg-tertiary)] [--alert-on:var(--ids-color-text-on-tertiary)]',
-          '[--alert-soft:var(--ids-color-bg-tertiary-soft)] [--alert-on-soft:var(--ids-color-text-on-tertiary-soft)]',
+          '[--alert-soft:var(--ids-color-bg-tertiary-subtle)] [--alert-on-soft:var(--ids-color-text-on-tertiary-subtle)]',
           '[--alert-strong:var(--ids-color-text-tertiary)]',
         ],
       },
       info: {
         root: [
           '[--alert-tint:var(--ids-color-bg-info)] [--alert-on:var(--ids-color-text-on-info)]',
-          '[--alert-soft:var(--ids-color-bg-info-soft)] [--alert-on-soft:var(--ids-color-text-on-info-soft)]',
+          '[--alert-soft:var(--ids-color-bg-info-subtle)] [--alert-on-soft:var(--ids-color-text-on-info-subtle)]',
           '[--alert-strong:var(--ids-color-text-info)]',
         ],
       },
       success: {
         root: [
           '[--alert-tint:var(--ids-color-bg-success)] [--alert-on:var(--ids-color-text-on-success)]',
-          '[--alert-soft:var(--ids-color-bg-success-soft)] [--alert-on-soft:var(--ids-color-text-on-success-soft)]',
+          '[--alert-soft:var(--ids-color-bg-success-subtle)] [--alert-on-soft:var(--ids-color-text-on-success-subtle)]',
           '[--alert-strong:var(--ids-color-text-success)]',
         ],
       },
       warning: {
         root: [
           '[--alert-tint:var(--ids-color-bg-warning)] [--alert-on:var(--ids-color-text-on-warning)]',
-          '[--alert-soft:var(--ids-color-bg-warning-soft)] [--alert-on-soft:var(--ids-color-text-on-warning-soft)]',
+          '[--alert-soft:var(--ids-color-bg-warning-subtle)] [--alert-on-soft:var(--ids-color-text-on-warning-subtle)]',
           '[--alert-strong:var(--ids-color-text-warning)]',
         ],
       },
       danger: {
         root: [
           '[--alert-tint:var(--ids-color-bg-danger)] [--alert-on:var(--ids-color-text-on-danger)]',
-          '[--alert-soft:var(--ids-color-bg-danger-soft)] [--alert-on-soft:var(--ids-color-text-on-danger-soft)]',
+          '[--alert-soft:var(--ids-color-bg-danger-subtle)] [--alert-on-soft:var(--ids-color-text-on-danger-subtle)]',
           '[--alert-strong:var(--ids-color-text-danger)]',
         ],
       },
@@ -84,10 +84,7 @@ export const alertStyle = tv({
           'bg-(--alert-tint) text-(--alert-on)',
           '[--alert-accent:var(--alert-on)] [--alert-title:var(--alert-on)] [--alert-body:var(--alert-on)]',
         ],
-        close: [
-          '[--control-quiet:var(--alert-on)] [--control-ring:var(--alert-on)]',
-          '[--control-hover:color-mix(in_oklab,var(--alert-on)_15%,transparent)]',
-        ],
+        close: '[--control-quiet:var(--alert-on)] [--control-ring:var(--alert-on)]',
       },
       soft: {
         root: [
@@ -97,14 +94,14 @@ export const alertStyle = tv({
       },
       outline: {
         root: [
-          'bg-surface text-on-surface inset-ring-1 inset-ring-neutral',
-          'dark:bg-neutral-soft/30',
+          'bg-neutral-subtlest text-neutral-bold inset-ring-1 inset-ring-neutral',
+          'dark:bg-neutral-subtler',
           '[--alert-accent:var(--alert-strong)] [--alert-title:var(--alert-strong)] [--alert-body:var(--ids-color-text-neutral)]',
         ],
       },
       ghost: {
         root: [
-          'bg-transparent text-on-surface',
+          'bg-transparent text-neutral-bold',
           '[--alert-accent:var(--alert-strong)] [--alert-title:var(--alert-strong)] [--alert-body:var(--ids-color-text-neutral)]',
         ],
       },

@@ -110,20 +110,24 @@ const COLOR_ROLES = JSON.parse(readFileSync("./color-roles.json", "utf8"));
 
 const COLOR_FAMILIES = Object.values(COLOR_ROLES.families).flat();
 
+const NEUTRAL_ONLY_SLOTS = COLOR_ROLES.neutralOnly;
+
+const TEMPLATE_SLOTS = Object.entries(COLOR_ROLES.slots).flatMap(([property, names]) =>
+  names.map((name) => ({ property, name, slot: `${property}-${name}` })),
+);
+
 const slotsOf = (family) =>
-  Object.entries(COLOR_ROLES.slots).flatMap(([property, names]) =>
-    names.map((name) => ({
-      property,
-      name: name.replaceAll("{family}", family),
-      slot: `${property}-${name.replaceAll("{family}", family)}`,
-    })),
-  );
+  TEMPLATE_SLOTS.filter(
+    ({ slot }) => family === "neutral" || !NEUTRAL_ONLY_SLOTS.includes(slot),
+  ).map(({ property, name, slot }) => ({
+    property,
+    name: name.replaceAll("{family}", family),
+    slot: slot.replaceAll("{family}", family),
+  }));
 
 const FAMILY_SLOTS = COLOR_FAMILIES.flatMap((family) =>
   slotsOf(family).map((entry) => ({ ...entry, family })),
 );
-
-const BASE_SLOTS = Object.keys(COLOR_ROLES.base);
 
 const colorVar = (slot) => `--ids-color-${slot}`;
 
@@ -216,19 +220,16 @@ const T_CSS_TEXT_ROOT = `  --ids-text-{{NAME}}: {{FONT_SIZE}};
 const T_DART_TEXT_STYLE = `TextStyle(fontFamily: '{{FONT_FAMILY}}', package: '{{FONT_PACKAGE}}', fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
 
 const buildColorBridgeCSS = () => {
-  const base = Object.entries(COLOR_ROLES.base).flatMap(([slot, namespaces]) =>
-    namespaces.map((namespace) => `  ${namespace}-${slot}: var(${colorVar(slot)});`),
-  );
   const families = FAMILY_SLOTS.flatMap(({ property, name, slot }) =>
     COLOR_ROLES.namespaces[property].map(
       (namespace) => `  ${namespace}-${name}: var(${colorVar(slot)});`,
     ),
   );
-  return render(T_CSS_THEME, { THEME: [...base, ...families].join("\n") });
+  return render(T_CSS_THEME, { THEME: families.join("\n") });
 };
 
 const buildStaticCSS = (dictionary) => {
-  const lines = ["motion", "radius", "size"].flatMap((cat) =>
+  const lines = ["motion", "radius", "size", "state"].flatMap((cat) =>
     byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
   );
   const roundedUsesIdsRadius = byCategory(dictionary, "radius").map(
@@ -260,7 +261,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 
 @keyframes ids-skeleton-pulse {
   50% {
-    background-color: var(--ids-color-bg-neutral-soft-hover);
+    background-color: var(--ids-color-bg-neutral-subtler);
   }
 }
 
@@ -346,6 +347,21 @@ const T_CSS_UTILITIES = `@utility focus-ring {
   }
 }
 
+@utility state-layer {
+  background-image: linear-gradient(
+    color-mix(in srgb, var(--ids-state-color, currentColor) var(--ids-state-opacity), transparent),
+    color-mix(in srgb, var(--ids-state-color, currentColor) var(--ids-state-opacity), transparent)
+  );
+}
+
+@utility state-hover {
+  --ids-state-opacity: var(--ids-state-hover);
+}
+
+@utility state-press {
+  --ids-state-opacity: var(--ids-state-press);
+}
+
 @utility font-mono {
   font-size-adjust: var(--ids-font-size-adjust-mono);
 }
@@ -354,7 +370,7 @@ const T_CSS_UTILITIES = `@utility focus-ring {
   background-image: linear-gradient(
     90deg,
     currentColor calc(50% - var(--ids-shimmer-spread, 3em)),
-    var(--ids-shimmer-color, var(--ids-color-on-surface)) 50%,
+    var(--ids-shimmer-color, var(--ids-color-text-neutral-bold)) 50%,
     currentColor calc(50% + var(--ids-shimmer-spread, 3em))
   );
   background-size: calc(200% + 2 * var(--ids-shimmer-spread, 3em)) 100%;
@@ -485,10 +501,7 @@ const providerValue = (mode, slot, fallbacks) => {
 
 const buildColorRolesCSS = (dictionary, mode) => {
   const fallbacks = neutralFallbacks(dictionary, mode);
-  const lines = [
-    ...BASE_SLOTS,
-    ...FAMILY_SLOTS.map(({ slot }) => slot),
-  ].map((slot) => `  ${colorVar(slot)}: ${providerValue(mode, slot, fallbacks)};`);
+  const lines = FAMILY_SLOTS.map(({ slot }) => slot).map((slot) => `  ${colorVar(slot)}: ${providerValue(mode, slot, fallbacks)};`);
   return block(`[data-mode="${mode}"]`, lines);
 };
 
@@ -514,6 +527,18 @@ const T_CSS_CORNER_SHAPE = `@layer base {
   [data-mode] {
     --ids-corner-radius-scale: var(--ids-theme-corner-radius-scale, 1);
   }
+}
+`;
+
+const T_CSS_STATE_LAYER_PROPERTIES = `@property --ids-state-opacity {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --ids-state-color {
+  syntax: "*";
+  inherits: false;
 }
 `;
 
@@ -576,6 +601,7 @@ const cssFormatter = ({ dictionary }) =>
     T_CSS_CORNER_SHAPE,
     buildScaleCSS(dictionary),
     T_CSS_REGISTERED_LENGTHS,
+    T_CSS_STATE_LAYER_PROPERTIES,
     buildColorRolesCSS(dictionary, "light"),
     buildColorRolesCSS(dictionary, "dark"),
   ].join("\n");
@@ -619,6 +645,9 @@ const neutralPalette = (dictionary) =>
     byPath(dictionary, "neutral").map((t) => [t.path[1], `'${val(t)}'`]),
   );
 
+const stateOpacity = (dictionary) =>
+  Object.fromEntries(byCategory(dictionary, "state").map((t) => [slug(t), parseFloat(val(t)) / 100]));
+
 const tsColorRolesFormatter = ({ dictionary }) =>
   render(T_TS_FILE, {
     BODY: [
@@ -627,8 +656,9 @@ const tsColorRolesFormatter = ({ dictionary }) =>
           `export const IDS_${group.toUpperCase()}_FAMILIES = ${tsList(families)} as const;`,
       ),
       `export const IDS_COLOR_FAMILIES = ${tsList(COLOR_FAMILIES)} as const;`,
-      `export const IDS_BASE_SLOTS = ${tsList(BASE_SLOTS)} as const;`,
-      `export const IDS_FAMILY_SLOTS = ${tsList(slotsOf("{family}").map(({ slot }) => slot))} as const;`,
+      `export const IDS_FAMILY_SLOTS = ${tsList(TEMPLATE_SLOTS.map(({ slot }) => slot))} as const;`,
+      `export const IDS_NEUTRAL_ONLY_SLOTS = ${tsList(NEUTRAL_ONLY_SLOTS)} as const;`,
+      `export const IDS_STATE_OPACITY = ${tsRecord(stateOpacity(dictionary), "")} as const;`,
       `export const IDS_NEUTRAL_PALETTE = ${tsRecord(neutralPalette(dictionary), "")} as const;`,
       `export const IDS_NEUTRAL_STEPS = {\n${["light", "dark"]
         .map((mode) => `  ${mode}: ${tsRecord(neutralSteps(mode), "  ")},`)
@@ -679,8 +709,14 @@ abstract final class IdsColorRoles {
   };
 
   static List<String> slotsOf(String family) => [
-    for (final slot in familySlots) slot.replaceAll('{family}', family),
+    for (final slot in familySlots)
+      if (family == 'neutral' || !neutralOnlySlots.contains(slot))
+        slot.replaceAll('{family}', family),
   ];
+}
+
+abstract final class IdsStateOpacity {
+{{STATE_OPACITY}}
 }
 
 @immutable
@@ -717,14 +753,14 @@ class IdsColors {
 `;
 
 const dartColorRolesFormatter = ({ dictionary }) => {
-  const allSlots = [...BASE_SLOTS, ...FAMILY_SLOTS.map(({ slot }) => slot)];
+  const allSlots = FAMILY_SLOTS.map(({ slot }) => slot);
   const lists = [
     ...Object.entries(COLOR_ROLES.families).map(
       ([group, families]) => `  static const ${group}Families = ${dartList(families)};`,
     ),
     `  static const families = ${dartList(COLOR_FAMILIES)};`,
-    `  static const baseSlots = ${dartList(BASE_SLOTS)};`,
-    `  static const familySlots = ${dartList(slotsOf("{family}").map(({ slot }) => slot))};`,
+    `  static const familySlots = ${dartList(TEMPLATE_SLOTS.map(({ slot }) => slot))};`,
+    `  static const neutralOnlySlots = ${dartList(NEUTRAL_ONLY_SLOTS)};`,
     `  static const all = ${dartList(allSlots)};`,
   ];
   const neutral = Object.entries(neutralPalette(dictionary)).map(
@@ -740,6 +776,9 @@ const dartColorRolesFormatter = ({ dictionary }) => {
     LISTS: lists.join("\n"),
     NEUTRAL_PALETTE: neutral.join("\n"),
     NEUTRAL_STEPS: steps.join("\n"),
+    STATE_OPACITY: Object.entries(stateOpacity(dictionary))
+      .map(([name, value]) => `  static const double ${name} = ${value};`)
+      .join("\n"),
     PARAMS: allSlots.map((slot) => `    required this.${dartRoleField(slot)},`).join("\n"),
     FROM_ROLES: allSlots
       .map((slot) => `      ${dartRoleField(slot)}: role('${slot}'),`)

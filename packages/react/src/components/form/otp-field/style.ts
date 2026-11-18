@@ -30,7 +30,7 @@ export const otpFieldStyle = tv({
     separator: 'flex items-center text-neutral [&_svg]:size-4',
     caret: 'pointer-events-none absolute inset-0 flex items-center justify-center',
     caretLine:
-      'h-1/2 w-px animate-caret-blink bg-(--ids-color-on-surface) motion-reduce:animate-none',
+      'h-1/2 w-px animate-caret-blink bg-neutral-bold motion-reduce:animate-none',
   },
   variants: {
     variant: {

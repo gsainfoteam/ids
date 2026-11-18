@@ -10,9 +10,9 @@ abstract final class IdsColorRoles {
   static const brandFamilies = <String>['primary', 'secondary', 'tertiary'];
   static const statusFamilies = <String>['success', 'warning', 'danger', 'info'];
   static const families = <String>['neutral', 'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'];
-  static const baseSlots = <String>['surface', 'on-surface'];
-  static const familySlots = <String>['bg-{family}', 'bg-{family}-hover', 'bg-{family}-active', 'bg-{family}-soft', 'bg-{family}-soft-hover', 'bg-{family}-soft-active', 'text-on-{family}', 'text-on-{family}-soft', 'text-{family}', 'border-{family}'];
-  static const all = <String>['surface', 'on-surface', 'bg-neutral', 'bg-neutral-hover', 'bg-neutral-active', 'bg-neutral-soft', 'bg-neutral-soft-hover', 'bg-neutral-soft-active', 'text-on-neutral', 'text-on-neutral-soft', 'text-neutral', 'border-neutral', 'bg-primary', 'bg-primary-hover', 'bg-primary-active', 'bg-primary-soft', 'bg-primary-soft-hover', 'bg-primary-soft-active', 'text-on-primary', 'text-on-primary-soft', 'text-primary', 'border-primary', 'bg-secondary', 'bg-secondary-hover', 'bg-secondary-active', 'bg-secondary-soft', 'bg-secondary-soft-hover', 'bg-secondary-soft-active', 'text-on-secondary', 'text-on-secondary-soft', 'text-secondary', 'border-secondary', 'bg-tertiary', 'bg-tertiary-hover', 'bg-tertiary-active', 'bg-tertiary-soft', 'bg-tertiary-soft-hover', 'bg-tertiary-soft-active', 'text-on-tertiary', 'text-on-tertiary-soft', 'text-tertiary', 'border-tertiary', 'bg-success', 'bg-success-hover', 'bg-success-active', 'bg-success-soft', 'bg-success-soft-hover', 'bg-success-soft-active', 'text-on-success', 'text-on-success-soft', 'text-success', 'border-success', 'bg-warning', 'bg-warning-hover', 'bg-warning-active', 'bg-warning-soft', 'bg-warning-soft-hover', 'bg-warning-soft-active', 'text-on-warning', 'text-on-warning-soft', 'text-warning', 'border-warning', 'bg-danger', 'bg-danger-hover', 'bg-danger-active', 'bg-danger-soft', 'bg-danger-soft-hover', 'bg-danger-soft-active', 'text-on-danger', 'text-on-danger-soft', 'text-danger', 'border-danger', 'bg-info', 'bg-info-hover', 'bg-info-active', 'bg-info-soft', 'bg-info-soft-hover', 'bg-info-soft-active', 'text-on-info', 'text-on-info-soft', 'text-info', 'border-info'];
+  static const familySlots = <String>['bg-{family}-subtlest', 'bg-{family}-subtler', 'bg-{family}-subtle', 'bg-{family}', 'bg-{family}-bold', 'text-on-{family}-subtle', 'text-on-{family}', 'text-on-{family}-bold', 'text-{family}', 'text-{family}-bold', 'border-{family}'];
+  static const neutralOnlySlots = <String>['bg-{family}-subtlest', 'bg-{family}-bold', 'text-on-{family}-bold', 'text-{family}-bold'];
+  static const all = <String>['bg-neutral-subtlest', 'bg-neutral-subtler', 'bg-neutral-subtle', 'bg-neutral', 'bg-neutral-bold', 'text-on-neutral-subtle', 'text-on-neutral', 'text-on-neutral-bold', 'text-neutral', 'text-neutral-bold', 'border-neutral', 'bg-primary-subtler', 'bg-primary-subtle', 'bg-primary', 'text-on-primary-subtle', 'text-on-primary', 'text-primary', 'border-primary', 'bg-secondary-subtler', 'bg-secondary-subtle', 'bg-secondary', 'text-on-secondary-subtle', 'text-on-secondary', 'text-secondary', 'border-secondary', 'bg-tertiary-subtler', 'bg-tertiary-subtle', 'bg-tertiary', 'text-on-tertiary-subtle', 'text-on-tertiary', 'text-tertiary', 'border-tertiary', 'bg-success-subtler', 'bg-success-subtle', 'bg-success', 'text-on-success-subtle', 'text-on-success', 'text-success', 'border-success', 'bg-warning-subtler', 'bg-warning-subtle', 'bg-warning', 'text-on-warning-subtle', 'text-on-warning', 'text-warning', 'border-warning', 'bg-danger-subtler', 'bg-danger-subtle', 'bg-danger', 'text-on-danger-subtle', 'text-on-danger', 'text-danger', 'border-danger', 'bg-info-subtler', 'bg-info-subtle', 'bg-info', 'text-on-info-subtle', 'text-on-info', 'text-info', 'border-info'];
 
   static const neutralPalette = <int, Color>{
     0: Color(0xFFFFFFFF),
@@ -31,123 +31,106 @@ abstract final class IdsColorRoles {
 
   static const neutralSteps = <IdsMode, Map<String, int>>{
     IdsMode.light: {
-      'surface': 0,
-      'on-surface': 900,
+      'bg-neutral-subtlest': 0,
+      'bg-neutral-subtler': 50,
+      'bg-neutral-subtle': 100,
       'bg-neutral': 300,
-      'bg-neutral-hover': 400,
-      'bg-neutral-active': 500,
-      'bg-neutral-soft': 100,
-      'bg-neutral-soft-hover': 200,
-      'bg-neutral-soft-active': 300,
+      'bg-neutral-bold': 900,
+      'text-on-neutral-subtle': 900,
       'text-on-neutral': 950,
-      'text-on-neutral-soft': 900,
+      'text-on-neutral-bold': 0,
       'text-neutral': 600,
+      'text-neutral-bold': 900,
       'border-neutral': 200,
     },
     IdsMode.dark: {
-      'surface': 950,
-      'on-surface': 50,
+      'bg-neutral-subtlest': 950,
+      'bg-neutral-subtler': 900,
+      'bg-neutral-subtle': 800,
       'bg-neutral': 700,
-      'bg-neutral-hover': 600,
-      'bg-neutral-active': 500,
-      'bg-neutral-soft': 800,
-      'bg-neutral-soft-hover': 700,
-      'bg-neutral-soft-active': 600,
+      'bg-neutral-bold': 50,
+      'text-on-neutral-subtle': 50,
       'text-on-neutral': 50,
-      'text-on-neutral-soft': 50,
+      'text-on-neutral-bold': 950,
       'text-neutral': 300,
+      'text-neutral-bold': 50,
       'border-neutral': 800,
     },
   };
 
   static List<String> slotsOf(String family) => [
-    for (final slot in familySlots) slot.replaceAll('{family}', family),
+    for (final slot in familySlots)
+      if (family == 'neutral' || !neutralOnlySlots.contains(slot))
+        slot.replaceAll('{family}', family),
   ];
+}
+
+abstract final class IdsStateOpacity {
+  static const double hover = 0.06;
+  static const double press = 0.1;
 }
 
 @immutable
 class IdsColors {
   const IdsColors({
-    required this.surface,
-    required this.onSurface,
+    required this.bgNeutralSubtlest,
+    required this.bgNeutralSubtler,
+    required this.bgNeutralSubtle,
     required this.bgNeutral,
-    required this.bgNeutralHover,
-    required this.bgNeutralActive,
-    required this.bgNeutralSoft,
-    required this.bgNeutralSoftHover,
-    required this.bgNeutralSoftActive,
+    required this.bgNeutralBold,
+    required this.textOnNeutralSubtle,
     required this.textOnNeutral,
-    required this.textOnNeutralSoft,
+    required this.textOnNeutralBold,
     required this.textNeutral,
+    required this.textNeutralBold,
     required this.borderNeutral,
+    required this.bgPrimarySubtler,
+    required this.bgPrimarySubtle,
     required this.bgPrimary,
-    required this.bgPrimaryHover,
-    required this.bgPrimaryActive,
-    required this.bgPrimarySoft,
-    required this.bgPrimarySoftHover,
-    required this.bgPrimarySoftActive,
+    required this.textOnPrimarySubtle,
     required this.textOnPrimary,
-    required this.textOnPrimarySoft,
     required this.textPrimary,
     required this.borderPrimary,
+    required this.bgSecondarySubtler,
+    required this.bgSecondarySubtle,
     required this.bgSecondary,
-    required this.bgSecondaryHover,
-    required this.bgSecondaryActive,
-    required this.bgSecondarySoft,
-    required this.bgSecondarySoftHover,
-    required this.bgSecondarySoftActive,
+    required this.textOnSecondarySubtle,
     required this.textOnSecondary,
-    required this.textOnSecondarySoft,
     required this.textSecondary,
     required this.borderSecondary,
+    required this.bgTertiarySubtler,
+    required this.bgTertiarySubtle,
     required this.bgTertiary,
-    required this.bgTertiaryHover,
-    required this.bgTertiaryActive,
-    required this.bgTertiarySoft,
-    required this.bgTertiarySoftHover,
-    required this.bgTertiarySoftActive,
+    required this.textOnTertiarySubtle,
     required this.textOnTertiary,
-    required this.textOnTertiarySoft,
     required this.textTertiary,
     required this.borderTertiary,
+    required this.bgSuccessSubtler,
+    required this.bgSuccessSubtle,
     required this.bgSuccess,
-    required this.bgSuccessHover,
-    required this.bgSuccessActive,
-    required this.bgSuccessSoft,
-    required this.bgSuccessSoftHover,
-    required this.bgSuccessSoftActive,
+    required this.textOnSuccessSubtle,
     required this.textOnSuccess,
-    required this.textOnSuccessSoft,
     required this.textSuccess,
     required this.borderSuccess,
+    required this.bgWarningSubtler,
+    required this.bgWarningSubtle,
     required this.bgWarning,
-    required this.bgWarningHover,
-    required this.bgWarningActive,
-    required this.bgWarningSoft,
-    required this.bgWarningSoftHover,
-    required this.bgWarningSoftActive,
+    required this.textOnWarningSubtle,
     required this.textOnWarning,
-    required this.textOnWarningSoft,
     required this.textWarning,
     required this.borderWarning,
+    required this.bgDangerSubtler,
+    required this.bgDangerSubtle,
     required this.bgDanger,
-    required this.bgDangerHover,
-    required this.bgDangerActive,
-    required this.bgDangerSoft,
-    required this.bgDangerSoftHover,
-    required this.bgDangerSoftActive,
+    required this.textOnDangerSubtle,
     required this.textOnDanger,
-    required this.textOnDangerSoft,
     required this.textDanger,
     required this.borderDanger,
+    required this.bgInfoSubtler,
+    required this.bgInfoSubtle,
     required this.bgInfo,
-    required this.bgInfoHover,
-    required this.bgInfoActive,
-    required this.bgInfoSoft,
-    required this.bgInfoSoftHover,
-    required this.bgInfoSoftActive,
+    required this.textOnInfoSubtle,
     required this.textOnInfo,
-    required this.textOnInfoSoft,
     required this.textInfo,
     required this.borderInfo,
   });
@@ -156,255 +139,189 @@ class IdsColors {
     Color role(String name) =>
         roles[name] ?? (throw ArgumentError.value(name, 'roles', 'is missing'));
     return IdsColors(
-      surface: role('surface'),
-      onSurface: role('on-surface'),
+      bgNeutralSubtlest: role('bg-neutral-subtlest'),
+      bgNeutralSubtler: role('bg-neutral-subtler'),
+      bgNeutralSubtle: role('bg-neutral-subtle'),
       bgNeutral: role('bg-neutral'),
-      bgNeutralHover: role('bg-neutral-hover'),
-      bgNeutralActive: role('bg-neutral-active'),
-      bgNeutralSoft: role('bg-neutral-soft'),
-      bgNeutralSoftHover: role('bg-neutral-soft-hover'),
-      bgNeutralSoftActive: role('bg-neutral-soft-active'),
+      bgNeutralBold: role('bg-neutral-bold'),
+      textOnNeutralSubtle: role('text-on-neutral-subtle'),
       textOnNeutral: role('text-on-neutral'),
-      textOnNeutralSoft: role('text-on-neutral-soft'),
+      textOnNeutralBold: role('text-on-neutral-bold'),
       textNeutral: role('text-neutral'),
+      textNeutralBold: role('text-neutral-bold'),
       borderNeutral: role('border-neutral'),
+      bgPrimarySubtler: role('bg-primary-subtler'),
+      bgPrimarySubtle: role('bg-primary-subtle'),
       bgPrimary: role('bg-primary'),
-      bgPrimaryHover: role('bg-primary-hover'),
-      bgPrimaryActive: role('bg-primary-active'),
-      bgPrimarySoft: role('bg-primary-soft'),
-      bgPrimarySoftHover: role('bg-primary-soft-hover'),
-      bgPrimarySoftActive: role('bg-primary-soft-active'),
+      textOnPrimarySubtle: role('text-on-primary-subtle'),
       textOnPrimary: role('text-on-primary'),
-      textOnPrimarySoft: role('text-on-primary-soft'),
       textPrimary: role('text-primary'),
       borderPrimary: role('border-primary'),
+      bgSecondarySubtler: role('bg-secondary-subtler'),
+      bgSecondarySubtle: role('bg-secondary-subtle'),
       bgSecondary: role('bg-secondary'),
-      bgSecondaryHover: role('bg-secondary-hover'),
-      bgSecondaryActive: role('bg-secondary-active'),
-      bgSecondarySoft: role('bg-secondary-soft'),
-      bgSecondarySoftHover: role('bg-secondary-soft-hover'),
-      bgSecondarySoftActive: role('bg-secondary-soft-active'),
+      textOnSecondarySubtle: role('text-on-secondary-subtle'),
       textOnSecondary: role('text-on-secondary'),
-      textOnSecondarySoft: role('text-on-secondary-soft'),
       textSecondary: role('text-secondary'),
       borderSecondary: role('border-secondary'),
+      bgTertiarySubtler: role('bg-tertiary-subtler'),
+      bgTertiarySubtle: role('bg-tertiary-subtle'),
       bgTertiary: role('bg-tertiary'),
-      bgTertiaryHover: role('bg-tertiary-hover'),
-      bgTertiaryActive: role('bg-tertiary-active'),
-      bgTertiarySoft: role('bg-tertiary-soft'),
-      bgTertiarySoftHover: role('bg-tertiary-soft-hover'),
-      bgTertiarySoftActive: role('bg-tertiary-soft-active'),
+      textOnTertiarySubtle: role('text-on-tertiary-subtle'),
       textOnTertiary: role('text-on-tertiary'),
-      textOnTertiarySoft: role('text-on-tertiary-soft'),
       textTertiary: role('text-tertiary'),
       borderTertiary: role('border-tertiary'),
+      bgSuccessSubtler: role('bg-success-subtler'),
+      bgSuccessSubtle: role('bg-success-subtle'),
       bgSuccess: role('bg-success'),
-      bgSuccessHover: role('bg-success-hover'),
-      bgSuccessActive: role('bg-success-active'),
-      bgSuccessSoft: role('bg-success-soft'),
-      bgSuccessSoftHover: role('bg-success-soft-hover'),
-      bgSuccessSoftActive: role('bg-success-soft-active'),
+      textOnSuccessSubtle: role('text-on-success-subtle'),
       textOnSuccess: role('text-on-success'),
-      textOnSuccessSoft: role('text-on-success-soft'),
       textSuccess: role('text-success'),
       borderSuccess: role('border-success'),
+      bgWarningSubtler: role('bg-warning-subtler'),
+      bgWarningSubtle: role('bg-warning-subtle'),
       bgWarning: role('bg-warning'),
-      bgWarningHover: role('bg-warning-hover'),
-      bgWarningActive: role('bg-warning-active'),
-      bgWarningSoft: role('bg-warning-soft'),
-      bgWarningSoftHover: role('bg-warning-soft-hover'),
-      bgWarningSoftActive: role('bg-warning-soft-active'),
+      textOnWarningSubtle: role('text-on-warning-subtle'),
       textOnWarning: role('text-on-warning'),
-      textOnWarningSoft: role('text-on-warning-soft'),
       textWarning: role('text-warning'),
       borderWarning: role('border-warning'),
+      bgDangerSubtler: role('bg-danger-subtler'),
+      bgDangerSubtle: role('bg-danger-subtle'),
       bgDanger: role('bg-danger'),
-      bgDangerHover: role('bg-danger-hover'),
-      bgDangerActive: role('bg-danger-active'),
-      bgDangerSoft: role('bg-danger-soft'),
-      bgDangerSoftHover: role('bg-danger-soft-hover'),
-      bgDangerSoftActive: role('bg-danger-soft-active'),
+      textOnDangerSubtle: role('text-on-danger-subtle'),
       textOnDanger: role('text-on-danger'),
-      textOnDangerSoft: role('text-on-danger-soft'),
       textDanger: role('text-danger'),
       borderDanger: role('border-danger'),
+      bgInfoSubtler: role('bg-info-subtler'),
+      bgInfoSubtle: role('bg-info-subtle'),
       bgInfo: role('bg-info'),
-      bgInfoHover: role('bg-info-hover'),
-      bgInfoActive: role('bg-info-active'),
-      bgInfoSoft: role('bg-info-soft'),
-      bgInfoSoftHover: role('bg-info-soft-hover'),
-      bgInfoSoftActive: role('bg-info-soft-active'),
+      textOnInfoSubtle: role('text-on-info-subtle'),
       textOnInfo: role('text-on-info'),
-      textOnInfoSoft: role('text-on-info-soft'),
       textInfo: role('text-info'),
       borderInfo: role('border-info'),
     );
   }
 
-  final Color surface;
-  final Color onSurface;
+  final Color bgNeutralSubtlest;
+  final Color bgNeutralSubtler;
+  final Color bgNeutralSubtle;
   final Color bgNeutral;
-  final Color bgNeutralHover;
-  final Color bgNeutralActive;
-  final Color bgNeutralSoft;
-  final Color bgNeutralSoftHover;
-  final Color bgNeutralSoftActive;
+  final Color bgNeutralBold;
+  final Color textOnNeutralSubtle;
   final Color textOnNeutral;
-  final Color textOnNeutralSoft;
+  final Color textOnNeutralBold;
   final Color textNeutral;
+  final Color textNeutralBold;
   final Color borderNeutral;
+  final Color bgPrimarySubtler;
+  final Color bgPrimarySubtle;
   final Color bgPrimary;
-  final Color bgPrimaryHover;
-  final Color bgPrimaryActive;
-  final Color bgPrimarySoft;
-  final Color bgPrimarySoftHover;
-  final Color bgPrimarySoftActive;
+  final Color textOnPrimarySubtle;
   final Color textOnPrimary;
-  final Color textOnPrimarySoft;
   final Color textPrimary;
   final Color borderPrimary;
+  final Color bgSecondarySubtler;
+  final Color bgSecondarySubtle;
   final Color bgSecondary;
-  final Color bgSecondaryHover;
-  final Color bgSecondaryActive;
-  final Color bgSecondarySoft;
-  final Color bgSecondarySoftHover;
-  final Color bgSecondarySoftActive;
+  final Color textOnSecondarySubtle;
   final Color textOnSecondary;
-  final Color textOnSecondarySoft;
   final Color textSecondary;
   final Color borderSecondary;
+  final Color bgTertiarySubtler;
+  final Color bgTertiarySubtle;
   final Color bgTertiary;
-  final Color bgTertiaryHover;
-  final Color bgTertiaryActive;
-  final Color bgTertiarySoft;
-  final Color bgTertiarySoftHover;
-  final Color bgTertiarySoftActive;
+  final Color textOnTertiarySubtle;
   final Color textOnTertiary;
-  final Color textOnTertiarySoft;
   final Color textTertiary;
   final Color borderTertiary;
+  final Color bgSuccessSubtler;
+  final Color bgSuccessSubtle;
   final Color bgSuccess;
-  final Color bgSuccessHover;
-  final Color bgSuccessActive;
-  final Color bgSuccessSoft;
-  final Color bgSuccessSoftHover;
-  final Color bgSuccessSoftActive;
+  final Color textOnSuccessSubtle;
   final Color textOnSuccess;
-  final Color textOnSuccessSoft;
   final Color textSuccess;
   final Color borderSuccess;
+  final Color bgWarningSubtler;
+  final Color bgWarningSubtle;
   final Color bgWarning;
-  final Color bgWarningHover;
-  final Color bgWarningActive;
-  final Color bgWarningSoft;
-  final Color bgWarningSoftHover;
-  final Color bgWarningSoftActive;
+  final Color textOnWarningSubtle;
   final Color textOnWarning;
-  final Color textOnWarningSoft;
   final Color textWarning;
   final Color borderWarning;
+  final Color bgDangerSubtler;
+  final Color bgDangerSubtle;
   final Color bgDanger;
-  final Color bgDangerHover;
-  final Color bgDangerActive;
-  final Color bgDangerSoft;
-  final Color bgDangerSoftHover;
-  final Color bgDangerSoftActive;
+  final Color textOnDangerSubtle;
   final Color textOnDanger;
-  final Color textOnDangerSoft;
   final Color textDanger;
   final Color borderDanger;
+  final Color bgInfoSubtler;
+  final Color bgInfoSubtle;
   final Color bgInfo;
-  final Color bgInfoHover;
-  final Color bgInfoActive;
-  final Color bgInfoSoft;
-  final Color bgInfoSoftHover;
-  final Color bgInfoSoftActive;
+  final Color textOnInfoSubtle;
   final Color textOnInfo;
-  final Color textOnInfoSoft;
   final Color textInfo;
   final Color borderInfo;
 
   Map<String, Color> get roles => {
-    'surface': surface,
-    'on-surface': onSurface,
+    'bg-neutral-subtlest': bgNeutralSubtlest,
+    'bg-neutral-subtler': bgNeutralSubtler,
+    'bg-neutral-subtle': bgNeutralSubtle,
     'bg-neutral': bgNeutral,
-    'bg-neutral-hover': bgNeutralHover,
-    'bg-neutral-active': bgNeutralActive,
-    'bg-neutral-soft': bgNeutralSoft,
-    'bg-neutral-soft-hover': bgNeutralSoftHover,
-    'bg-neutral-soft-active': bgNeutralSoftActive,
+    'bg-neutral-bold': bgNeutralBold,
+    'text-on-neutral-subtle': textOnNeutralSubtle,
     'text-on-neutral': textOnNeutral,
-    'text-on-neutral-soft': textOnNeutralSoft,
+    'text-on-neutral-bold': textOnNeutralBold,
     'text-neutral': textNeutral,
+    'text-neutral-bold': textNeutralBold,
     'border-neutral': borderNeutral,
+    'bg-primary-subtler': bgPrimarySubtler,
+    'bg-primary-subtle': bgPrimarySubtle,
     'bg-primary': bgPrimary,
-    'bg-primary-hover': bgPrimaryHover,
-    'bg-primary-active': bgPrimaryActive,
-    'bg-primary-soft': bgPrimarySoft,
-    'bg-primary-soft-hover': bgPrimarySoftHover,
-    'bg-primary-soft-active': bgPrimarySoftActive,
+    'text-on-primary-subtle': textOnPrimarySubtle,
     'text-on-primary': textOnPrimary,
-    'text-on-primary-soft': textOnPrimarySoft,
     'text-primary': textPrimary,
     'border-primary': borderPrimary,
+    'bg-secondary-subtler': bgSecondarySubtler,
+    'bg-secondary-subtle': bgSecondarySubtle,
     'bg-secondary': bgSecondary,
-    'bg-secondary-hover': bgSecondaryHover,
-    'bg-secondary-active': bgSecondaryActive,
-    'bg-secondary-soft': bgSecondarySoft,
-    'bg-secondary-soft-hover': bgSecondarySoftHover,
-    'bg-secondary-soft-active': bgSecondarySoftActive,
+    'text-on-secondary-subtle': textOnSecondarySubtle,
     'text-on-secondary': textOnSecondary,
-    'text-on-secondary-soft': textOnSecondarySoft,
     'text-secondary': textSecondary,
     'border-secondary': borderSecondary,
+    'bg-tertiary-subtler': bgTertiarySubtler,
+    'bg-tertiary-subtle': bgTertiarySubtle,
     'bg-tertiary': bgTertiary,
-    'bg-tertiary-hover': bgTertiaryHover,
-    'bg-tertiary-active': bgTertiaryActive,
-    'bg-tertiary-soft': bgTertiarySoft,
-    'bg-tertiary-soft-hover': bgTertiarySoftHover,
-    'bg-tertiary-soft-active': bgTertiarySoftActive,
+    'text-on-tertiary-subtle': textOnTertiarySubtle,
     'text-on-tertiary': textOnTertiary,
-    'text-on-tertiary-soft': textOnTertiarySoft,
     'text-tertiary': textTertiary,
     'border-tertiary': borderTertiary,
+    'bg-success-subtler': bgSuccessSubtler,
+    'bg-success-subtle': bgSuccessSubtle,
     'bg-success': bgSuccess,
-    'bg-success-hover': bgSuccessHover,
-    'bg-success-active': bgSuccessActive,
-    'bg-success-soft': bgSuccessSoft,
-    'bg-success-soft-hover': bgSuccessSoftHover,
-    'bg-success-soft-active': bgSuccessSoftActive,
+    'text-on-success-subtle': textOnSuccessSubtle,
     'text-on-success': textOnSuccess,
-    'text-on-success-soft': textOnSuccessSoft,
     'text-success': textSuccess,
     'border-success': borderSuccess,
+    'bg-warning-subtler': bgWarningSubtler,
+    'bg-warning-subtle': bgWarningSubtle,
     'bg-warning': bgWarning,
-    'bg-warning-hover': bgWarningHover,
-    'bg-warning-active': bgWarningActive,
-    'bg-warning-soft': bgWarningSoft,
-    'bg-warning-soft-hover': bgWarningSoftHover,
-    'bg-warning-soft-active': bgWarningSoftActive,
+    'text-on-warning-subtle': textOnWarningSubtle,
     'text-on-warning': textOnWarning,
-    'text-on-warning-soft': textOnWarningSoft,
     'text-warning': textWarning,
     'border-warning': borderWarning,
+    'bg-danger-subtler': bgDangerSubtler,
+    'bg-danger-subtle': bgDangerSubtle,
     'bg-danger': bgDanger,
-    'bg-danger-hover': bgDangerHover,
-    'bg-danger-active': bgDangerActive,
-    'bg-danger-soft': bgDangerSoft,
-    'bg-danger-soft-hover': bgDangerSoftHover,
-    'bg-danger-soft-active': bgDangerSoftActive,
+    'text-on-danger-subtle': textOnDangerSubtle,
     'text-on-danger': textOnDanger,
-    'text-on-danger-soft': textOnDangerSoft,
     'text-danger': textDanger,
     'border-danger': borderDanger,
+    'bg-info-subtler': bgInfoSubtler,
+    'bg-info-subtle': bgInfoSubtle,
     'bg-info': bgInfo,
-    'bg-info-hover': bgInfoHover,
-    'bg-info-active': bgInfoActive,
-    'bg-info-soft': bgInfoSoft,
-    'bg-info-soft-hover': bgInfoSoftHover,
-    'bg-info-soft-active': bgInfoSoftActive,
+    'text-on-info-subtle': textOnInfoSubtle,
     'text-on-info': textOnInfo,
-    'text-on-info-soft': textOnInfoSoft,
     'text-info': textInfo,
     'border-info': borderInfo,
   };
@@ -415,86 +332,64 @@ class IdsColors {
   @override
   bool operator ==(Object other) =>
       other is IdsColors &&
-      other.surface == surface &&
-      other.onSurface == onSurface &&
+      other.bgNeutralSubtlest == bgNeutralSubtlest &&
+      other.bgNeutralSubtler == bgNeutralSubtler &&
+      other.bgNeutralSubtle == bgNeutralSubtle &&
       other.bgNeutral == bgNeutral &&
-      other.bgNeutralHover == bgNeutralHover &&
-      other.bgNeutralActive == bgNeutralActive &&
-      other.bgNeutralSoft == bgNeutralSoft &&
-      other.bgNeutralSoftHover == bgNeutralSoftHover &&
-      other.bgNeutralSoftActive == bgNeutralSoftActive &&
+      other.bgNeutralBold == bgNeutralBold &&
+      other.textOnNeutralSubtle == textOnNeutralSubtle &&
       other.textOnNeutral == textOnNeutral &&
-      other.textOnNeutralSoft == textOnNeutralSoft &&
+      other.textOnNeutralBold == textOnNeutralBold &&
       other.textNeutral == textNeutral &&
+      other.textNeutralBold == textNeutralBold &&
       other.borderNeutral == borderNeutral &&
+      other.bgPrimarySubtler == bgPrimarySubtler &&
+      other.bgPrimarySubtle == bgPrimarySubtle &&
       other.bgPrimary == bgPrimary &&
-      other.bgPrimaryHover == bgPrimaryHover &&
-      other.bgPrimaryActive == bgPrimaryActive &&
-      other.bgPrimarySoft == bgPrimarySoft &&
-      other.bgPrimarySoftHover == bgPrimarySoftHover &&
-      other.bgPrimarySoftActive == bgPrimarySoftActive &&
+      other.textOnPrimarySubtle == textOnPrimarySubtle &&
       other.textOnPrimary == textOnPrimary &&
-      other.textOnPrimarySoft == textOnPrimarySoft &&
       other.textPrimary == textPrimary &&
       other.borderPrimary == borderPrimary &&
+      other.bgSecondarySubtler == bgSecondarySubtler &&
+      other.bgSecondarySubtle == bgSecondarySubtle &&
       other.bgSecondary == bgSecondary &&
-      other.bgSecondaryHover == bgSecondaryHover &&
-      other.bgSecondaryActive == bgSecondaryActive &&
-      other.bgSecondarySoft == bgSecondarySoft &&
-      other.bgSecondarySoftHover == bgSecondarySoftHover &&
-      other.bgSecondarySoftActive == bgSecondarySoftActive &&
+      other.textOnSecondarySubtle == textOnSecondarySubtle &&
       other.textOnSecondary == textOnSecondary &&
-      other.textOnSecondarySoft == textOnSecondarySoft &&
       other.textSecondary == textSecondary &&
       other.borderSecondary == borderSecondary &&
+      other.bgTertiarySubtler == bgTertiarySubtler &&
+      other.bgTertiarySubtle == bgTertiarySubtle &&
       other.bgTertiary == bgTertiary &&
-      other.bgTertiaryHover == bgTertiaryHover &&
-      other.bgTertiaryActive == bgTertiaryActive &&
-      other.bgTertiarySoft == bgTertiarySoft &&
-      other.bgTertiarySoftHover == bgTertiarySoftHover &&
-      other.bgTertiarySoftActive == bgTertiarySoftActive &&
+      other.textOnTertiarySubtle == textOnTertiarySubtle &&
       other.textOnTertiary == textOnTertiary &&
-      other.textOnTertiarySoft == textOnTertiarySoft &&
       other.textTertiary == textTertiary &&
       other.borderTertiary == borderTertiary &&
+      other.bgSuccessSubtler == bgSuccessSubtler &&
+      other.bgSuccessSubtle == bgSuccessSubtle &&
       other.bgSuccess == bgSuccess &&
-      other.bgSuccessHover == bgSuccessHover &&
-      other.bgSuccessActive == bgSuccessActive &&
-      other.bgSuccessSoft == bgSuccessSoft &&
-      other.bgSuccessSoftHover == bgSuccessSoftHover &&
-      other.bgSuccessSoftActive == bgSuccessSoftActive &&
+      other.textOnSuccessSubtle == textOnSuccessSubtle &&
       other.textOnSuccess == textOnSuccess &&
-      other.textOnSuccessSoft == textOnSuccessSoft &&
       other.textSuccess == textSuccess &&
       other.borderSuccess == borderSuccess &&
+      other.bgWarningSubtler == bgWarningSubtler &&
+      other.bgWarningSubtle == bgWarningSubtle &&
       other.bgWarning == bgWarning &&
-      other.bgWarningHover == bgWarningHover &&
-      other.bgWarningActive == bgWarningActive &&
-      other.bgWarningSoft == bgWarningSoft &&
-      other.bgWarningSoftHover == bgWarningSoftHover &&
-      other.bgWarningSoftActive == bgWarningSoftActive &&
+      other.textOnWarningSubtle == textOnWarningSubtle &&
       other.textOnWarning == textOnWarning &&
-      other.textOnWarningSoft == textOnWarningSoft &&
       other.textWarning == textWarning &&
       other.borderWarning == borderWarning &&
+      other.bgDangerSubtler == bgDangerSubtler &&
+      other.bgDangerSubtle == bgDangerSubtle &&
       other.bgDanger == bgDanger &&
-      other.bgDangerHover == bgDangerHover &&
-      other.bgDangerActive == bgDangerActive &&
-      other.bgDangerSoft == bgDangerSoft &&
-      other.bgDangerSoftHover == bgDangerSoftHover &&
-      other.bgDangerSoftActive == bgDangerSoftActive &&
+      other.textOnDangerSubtle == textOnDangerSubtle &&
       other.textOnDanger == textOnDanger &&
-      other.textOnDangerSoft == textOnDangerSoft &&
       other.textDanger == textDanger &&
       other.borderDanger == borderDanger &&
+      other.bgInfoSubtler == bgInfoSubtler &&
+      other.bgInfoSubtle == bgInfoSubtle &&
       other.bgInfo == bgInfo &&
-      other.bgInfoHover == bgInfoHover &&
-      other.bgInfoActive == bgInfoActive &&
-      other.bgInfoSoft == bgInfoSoft &&
-      other.bgInfoSoftHover == bgInfoSoftHover &&
-      other.bgInfoSoftActive == bgInfoSoftActive &&
+      other.textOnInfoSubtle == textOnInfoSubtle &&
       other.textOnInfo == textOnInfo &&
-      other.textOnInfoSoft == textOnInfoSoft &&
       other.textInfo == textInfo &&
       other.borderInfo == borderInfo;
 

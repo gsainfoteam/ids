@@ -6,7 +6,7 @@ const ringOffSinceCaretShowsFocus = cn('ring-0! inset-ring-transparent!');
 export const listStyles = {
   option: cn(
     'relative flex cursor-default items-center gap-2 rounded-standard py-1.5 ps-2.5 pe-8 outline-none select-none wrap-anywhere',
-    'data-highlighted:bg-neutral-soft',
+    'state-layer data-highlighted:state-hover',
     'aria-disabled:opacity-50',
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
   ),

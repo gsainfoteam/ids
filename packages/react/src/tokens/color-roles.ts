@@ -8,9 +8,14 @@ export const IDS_STATUS_FAMILIES = ['success', 'warning', 'danger', 'info'] as c
 
 export const IDS_COLOR_FAMILIES = ['neutral', 'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'] as const;
 
-export const IDS_BASE_SLOTS = ['surface', 'on-surface'] as const;
+export const IDS_FAMILY_SLOTS = ['bg-{family}-subtlest', 'bg-{family}-subtler', 'bg-{family}-subtle', 'bg-{family}', 'bg-{family}-bold', 'text-on-{family}-subtle', 'text-on-{family}', 'text-on-{family}-bold', 'text-{family}', 'text-{family}-bold', 'border-{family}'] as const;
 
-export const IDS_FAMILY_SLOTS = ['bg-{family}', 'bg-{family}-hover', 'bg-{family}-active', 'bg-{family}-soft', 'bg-{family}-soft-hover', 'bg-{family}-soft-active', 'text-on-{family}', 'text-on-{family}-soft', 'text-{family}', 'border-{family}'] as const;
+export const IDS_NEUTRAL_ONLY_SLOTS = ['bg-{family}-subtlest', 'bg-{family}-bold', 'text-on-{family}-bold', 'text-{family}-bold'] as const;
+
+export const IDS_STATE_OPACITY = {
+  'hover': 0.06,
+  'press': 0.1,
+} as const;
 
 export const IDS_NEUTRAL_PALETTE = {
   '0': '#ffffff',
@@ -29,31 +34,29 @@ export const IDS_NEUTRAL_PALETTE = {
 
 export const IDS_NEUTRAL_STEPS = {
   light: {
-    'surface': 0,
-    'on-surface': 900,
+    'bg-neutral-subtlest': 0,
+    'bg-neutral-subtler': 50,
+    'bg-neutral-subtle': 100,
     'bg-neutral': 300,
-    'bg-neutral-hover': 400,
-    'bg-neutral-active': 500,
-    'bg-neutral-soft': 100,
-    'bg-neutral-soft-hover': 200,
-    'bg-neutral-soft-active': 300,
+    'bg-neutral-bold': 900,
+    'text-on-neutral-subtle': 900,
     'text-on-neutral': 950,
-    'text-on-neutral-soft': 900,
+    'text-on-neutral-bold': 0,
     'text-neutral': 600,
+    'text-neutral-bold': 900,
     'border-neutral': 200,
   },
   dark: {
-    'surface': 950,
-    'on-surface': 50,
+    'bg-neutral-subtlest': 950,
+    'bg-neutral-subtler': 900,
+    'bg-neutral-subtle': 800,
     'bg-neutral': 700,
-    'bg-neutral-hover': 600,
-    'bg-neutral-active': 500,
-    'bg-neutral-soft': 800,
-    'bg-neutral-soft-hover': 700,
-    'bg-neutral-soft-active': 600,
+    'bg-neutral-bold': 50,
+    'text-on-neutral-subtle': 50,
     'text-on-neutral': 50,
-    'text-on-neutral-soft': 50,
+    'text-on-neutral-bold': 950,
     'text-neutral': 300,
+    'text-neutral-bold': 50,
     'border-neutral': 800,
   },
 } as const;

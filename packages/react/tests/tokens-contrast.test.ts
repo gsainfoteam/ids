@@ -12,12 +12,12 @@ import {
   MODES,
   neutralRoles,
   resolveColors,
+  slotsOf,
+  underStateLayers,
 } from '../src/components/utility/ids-provider/theme-roles';
 import {
-  IDS_BASE_SLOTS,
   IDS_BRAND_FAMILIES,
   IDS_COLOR_FAMILIES,
-  IDS_FAMILY_SLOTS,
   IDS_NEUTRAL_PALETTE,
   IDS_NEUTRAL_STEPS,
   IDS_STATUS_FAMILIES,
@@ -41,62 +41,59 @@ const mappedSlots = (mode: IdsMode) =>
     ]),
   );
 
-const slotsOf = (family: string) =>
-  IDS_FAMILY_SLOTS.map((template) => template.replace('{family}', family));
-
 const themeVar = (mode: IdsMode, slot: string) => `--ids-theme-${mode}-${slot}`;
 
-const atLeast = (foreground: string, backgrounds: string[], lc: number) =>
-  Math.min(...backgrounds.map((background) => lightnessContrast(foreground, background))) >= lc;
+type Pair = { foreground: string; backgrounds: string[]; lc: number; underStates: boolean };
 
-const pairsFor = (family: string) => {
-  const [bg, bgHover, bgActive, soft, softHover, softActive, onFill, onSoft, text, border] =
-    slotsOf(family) as [
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
-      string,
+const pair = (foreground: string, backgrounds: string[], lc: number, underStates = true): Pair => ({
+  foreground,
+  backgrounds,
+  lc,
+  underStates,
+});
+
+const LAYERS = ['bg-neutral-subtlest', 'bg-neutral-subtler'];
+
+const pairsFor = (family: string): Pair[] => {
+  const layers = family === 'neutral' ? LAYERS : [...LAYERS, `bg-${family}-subtler`];
+  const pairs = [
+    pair(`text-on-${family}`, [`bg-${family}`], TEXT_LC, family !== 'neutral'),
+    pair(`text-on-${family}-subtle`, [`bg-${family}-subtle`], TEXT_LC),
+  ];
+
+  if (family === 'neutral')
+    return [
+      ...pairs,
+      pair('text-on-neutral-bold', ['bg-neutral-bold'], TEXT_LC),
+      pair('text-neutral-bold', [...layers, 'bg-neutral-subtle'], TEXT_LC),
+      pair('text-neutral', [...layers, 'bg-neutral-subtle'], TEXT_LC, false),
     ];
 
-  return {
-    text: [
-      [onFill, family === 'neutral' ? [bg] : [bg, bgHover, bgActive]],
-      [onSoft, [soft, softHover, softActive]],
-      ...(family === 'neutral' ? [[text, ['surface', soft]]] : []),
-    ] as [string, string[]][],
-    accent: family === 'neutral' ? [] : ([[text, ['surface', soft]]] as [string, string[]][]),
-    mark: family === 'neutral' ? [] : ([[border, ['surface']]] as [string, string[]][]),
-  };
+  return [
+    ...pairs,
+    pair(`text-${family}`, [...layers, `bg-${family}-subtle`], ACCENT_TEXT_LC),
+    pair(`border-${family}`, ['bg-neutral-subtlest'], MARK_LC, false),
+  ];
 };
 
-const failingPairs = (roles: { [slot: string]: string }) => {
-  const failures: string[] = [];
-  const check = (foreground: string, backgrounds: string[], lc: number) => {
-    const values = backgrounds.map((background) => roles[background]!);
-    if (!atLeast(roles[foreground]!, values, lc))
-      failures.push(`${foreground} on ${backgrounds.join(' / ')} below Lc ${lc}`);
-  };
-
-  check('on-surface', ['surface'], TEXT_LC);
-  for (const family of IDS_COLOR_FAMILIES) {
-    const { text, accent, mark } = pairsFor(family);
-    for (const [foreground, backgrounds] of text) check(foreground, backgrounds, TEXT_LC);
-    for (const [foreground, backgrounds] of accent) check(foreground, backgrounds, ACCENT_TEXT_LC);
-    for (const [foreground, backgrounds] of mark) check(foreground, backgrounds, MARK_LC);
-  }
-
-  return failures;
+const lowestContrast = (roles: { [slot: string]: string }, { foreground, backgrounds, underStates }: Pair) => {
+  const text = roles[foreground]!;
+  const bases = backgrounds.map((background) => roles[background]!);
+  const states = underStates ? bases.flatMap((base) => underStateLayers(base, text)) : bases;
+  return Math.min(...states.map((state) => lightnessContrast(text, state)));
 };
+
+const failingPairs = (roles: { [slot: string]: string }) =>
+  IDS_COLOR_FAMILIES.flatMap(pairsFor)
+    .filter((checked) => lowestContrast(roles, checked) < checked.lc)
+    .map(
+      ({ foreground, backgrounds, lc }) =>
+        `${foreground} on ${backgrounds.join(' / ')} below Lc ${lc}: ${lowestContrast(roles, { foreground, backgrounds, lc, underStates: true }).toFixed(1)}`,
+    );
 
 test.each(MODES)('ids.css maps every %s slot from the provider variables', (mode) => {
   const mapped = mappedSlots(mode);
-  const expected = [...IDS_BASE_SLOTS, ...IDS_COLOR_FAMILIES.flatMap(slotsOf)];
+  const expected = IDS_COLOR_FAMILIES.flatMap(slotsOf);
 
   expect(Object.keys(mapped).sort()).toEqual([...expected].sort());
   for (const slot of expected) expect(mapped[slot]!.startsWith(themeVar(mode, slot))).toBe(true);
@@ -123,31 +120,25 @@ test.each(MODES)('ids.css falls back to the pure %s neutral without a provider v
 
 test.each(MODES)('the pure %s neutral fallback reaches its Lc', (mode) => {
   const roles = neutralRoles({ ...IDS_NEUTRAL_PALETTE }, mode);
-  const { text } = pairsFor('neutral');
 
-  expect(atLeast(roles['on-surface']!, [roles['surface']!], TEXT_LC)).toBe(true);
-  for (const [foreground, backgrounds] of text)
-    expect(
-      atLeast(
-        roles[foreground]!,
-        backgrounds.map((background) => roles[background]!),
-        TEXT_LC,
-      ),
-      foreground,
-    ).toBe(true);
+  for (const checked of pairsFor('neutral'))
+    expect(lowestContrast(roles, checked), checked.foreground).toBeGreaterThanOrEqual(checked.lc);
 });
 
 test('ids.css emits no shared color namespace and no chart colors', () => {
   expect(css).not.toMatch(/--color-(primary|secondary|danger|neutral|surface)\b/);
+  expect(css).not.toMatch(/--ids-color-[\w-]*-(hover|active|soft)\b/);
   expect(css).not.toMatch(/--ids-color-chart-/);
   expect(css).not.toMatch(/data-color/);
 });
 
 test('every utility namespace reads a family role', () => {
   for (const family of [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES, 'neutral']) {
-    expect(css).toContain(`--background-color-${family}-soft: var(--ids-color-bg-${family}-soft);`);
     expect(css).toContain(
-      `--text-color-on-${family}-soft: var(--ids-color-text-on-${family}-soft);`,
+      `--background-color-${family}-subtle: var(--ids-color-bg-${family}-subtle);`,
+    );
+    expect(css).toContain(
+      `--text-color-on-${family}-subtle: var(--ids-color-text-on-${family}-subtle);`,
     );
     expect(css).toContain(`--border-color-${family}: var(--ids-color-border-${family});`);
     expect(css).toContain(`--ring-color-${family}: var(--ids-color-border-${family});`);

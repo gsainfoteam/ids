@@ -1,4 +1,4 @@
-import { clampChroma, converter, formatHex, interpolate, parse } from 'culori/fn';
+import { clampChroma, formatHex, interpolate, parse } from 'culori/fn';
 import { maxBy } from 'es-toolkit';
 
 import {
@@ -30,8 +30,10 @@ import {
   IDS_BRAND_FAMILIES,
   IDS_COLOR_FAMILIES,
   IDS_FAMILY_SLOTS,
+  IDS_NEUTRAL_ONLY_SLOTS,
   IDS_NEUTRAL_PALETTE,
   IDS_NEUTRAL_STEPS,
+  IDS_STATE_OPACITY,
   IDS_STATUS_FAMILIES,
 } from '../../../tokens/color-roles';
 
@@ -41,9 +43,7 @@ export { ACCENT_TEXT_LC, DARK_TEXT, LIGHT_TEXT, MARK_LC, TEXT_LC };
 
 export const MODES: readonly IdsMode[] = ['light', 'dark'];
 
-export const FILL_STATES = [0.1, 0.2] as const;
-
-export const SOFT_TINTS = [0.06, 0.12] as const;
+export const STATE_OPACITIES = [IDS_STATE_OPACITY.hover, IDS_STATE_OPACITY.press] as const;
 
 export const TINTED_NEUTRAL_CHROMA = 0.02;
 
@@ -55,22 +55,28 @@ const FILL_STEPS_OUTWARD_FROM_600: readonly (readonly IdsPaletteStep[])[] = [
 
 type ModeRule = {
   fill: readonly (readonly IdsPaletteStep[])[];
-  soft: IdsPaletteStep;
-  onSoft: readonly IdsPaletteStep[];
+  subtler: IdsPaletteStep;
+  subtlerTowardSurface: number;
+  subtle: IdsPaletteStep;
+  onSubtle: readonly IdsPaletteStep[];
   text: readonly IdsPaletteStep[];
 };
 
 export const ROLE_RULES: { [mode in IdsMode]: ModeRule } = {
   light: {
     fill: FILL_STEPS_OUTWARD_FROM_600,
-    soft: 100,
-    onSoft: [700, 800, 900, 950],
+    subtler: 50,
+    subtlerTowardSurface: 0,
+    subtle: 100,
+    onSubtle: [700, 800, 900, 950],
     text: [600, 700, 800, 900, 950],
   },
   dark: {
     fill: FILL_STEPS_OUTWARD_FROM_600,
-    soft: 950,
-    onSoft: [400, 300, 200, 100, 50],
+    subtler: 950,
+    subtlerTowardSurface: 0.5,
+    subtle: 950,
+    onSubtle: [400, 300, 200, 100, 50],
     text: [500, 400, 300, 200, 100, 50],
   },
 };
@@ -89,10 +95,12 @@ export type ResolvedColors = {
   roles: IdsThemeRoles;
 };
 
-const toOklch = converter('oklch');
+const isNeutralOnly = (slot: string) => (IDS_NEUTRAL_ONLY_SLOTS as readonly string[]).includes(slot);
 
 export const slotsOf = (family: IdsColorFamily) =>
-  IDS_FAMILY_SLOTS.map((slot) => slot.replace('{family}', family));
+  IDS_FAMILY_SLOTS.filter((slot) => family === 'neutral' || !isNeutralOnly(slot)).map((slot) =>
+    slot.replace('{family}', family),
+  );
 
 export function parsePalette(
   value: IdsThemeColor | undefined,
@@ -143,29 +151,41 @@ export function parsePalette(
 const mixed = (from: string, to: string, amount: number) =>
   formatHex(interpolate([from, to], 'oklab')(amount));
 
-export const awayFromText = (text: string) =>
-  (toOklch(parse(text)!).l ?? 0) > 0.5 ? '#000000' : '#ffffff';
+export const withStateLayer = (base: string, layer: string, opacity: number) =>
+  formatHex(interpolate([base, layer], 'rgb')(opacity));
 
-export const fillStatesOf = (fill: string, onFill: string) =>
-  FILL_STATES.map((amount) => mixed(fill, awayFromText(onFill), amount));
+export const underStateLayers = (base: string, content: string) => [
+  base,
+  ...STATE_OPACITIES.map((opacity) => withStateLayer(base, content, opacity)),
+];
 
-export const softTintsOf = (soft: string, fill: string) =>
-  SOFT_TINTS.map((amount) => mixed(soft, fill, amount));
-
-function firstReaching(
+function firstReadableOn(
   shades: IdsPalette,
   candidates: readonly IdsPaletteStep[],
-  backgrounds: string[],
+  bases: readonly string[],
   lc = TEXT_LC,
 ) {
-  const step = candidates.find((candidate) => reaches(shades[candidate], backgrounds, lc));
+  const step = candidates.find((candidate) =>
+    reaches(
+      shades[candidate],
+      bases.flatMap((base) => underStateLayers(base, shades[candidate])),
+      lc,
+    ),
+  );
   return step === undefined ? undefined : shades[step];
 }
+
+const lowestContrastUnderStateLayers = (text: string, fill: string) =>
+  Math.min(...underStateLayers(fill, text).map((state) => lightnessContrast(text, state)));
 
 function mostReadable(fills: string[]) {
   return maxBy(
     fills.flatMap((fill) =>
-      [LIGHT_TEXT, DARK_TEXT].map((text) => ({ fill, text, lc: lightnessContrast(text, fill) })),
+      [LIGHT_TEXT, DARK_TEXT].map((text) => ({
+        fill,
+        text,
+        lc: lowestContrastUnderStateLayers(text, fill),
+      })),
     ),
     (pair) => pair.lc,
   )!;
@@ -191,56 +211,41 @@ export function familyRoles(
 ): { roles: IdsColorRoles; issues: IdsThemeIssue[] } {
   const rule = ROLE_RULES[mode];
   const issues: IdsThemeIssue[] = [];
-  const soft = shades[rule.soft];
+  const subtler = mixed(shades[rule.subtler], surface, rule.subtlerTowardSurface);
+  const subtle = shades[rule.subtle];
 
   const readable = readableFill(shades, rule.fill);
   if (readable === undefined)
     issues.push({
       path,
-      message: `${mode}: neither white nor neutral 950 reaches Lc ${TEXT_LC} on ${family} steps ${rule.fill.flat().join(', ')}.`,
+      message: `${mode}: neither white nor neutral 950 reaches Lc ${TEXT_LC} on ${family} steps ${rule.fill.flat().join(', ')} and under their hover and press layers.`,
     });
   const { fill, text: onFill } = readable ?? mostReadable([shades[600]]);
 
-  const [fillHover, fillActive] = fillStatesOf(fill, onFill);
-  const [softHover, softActive] = softTintsOf(soft, fill);
-
-  const onSoft = firstReaching(shades, rule.onSoft, [soft, softHover!, softActive!]);
-  if (onSoft === undefined)
+  const onSubtle = firstReadableOn(shades, rule.onSubtle, [subtle]);
+  if (onSubtle === undefined)
     issues.push({
       path,
-      message: `${mode}: no step of ${rule.onSoft.join(', ')} reaches Lc ${TEXT_LC} on ${family}-soft (step ${rule.soft}) and its hover and press tints.`,
+      message: `${mode}: no step of ${rule.onSubtle.join(', ')} reaches Lc ${TEXT_LC} on ${family}-subtle (step ${rule.subtle}) and under its hover and press layers.`,
     });
 
-  const text = firstReaching(shades, rule.text, [surface, soft], ACCENT_TEXT_LC);
+  const text = firstReadableOn(shades, rule.text, [surface, subtler, subtle], ACCENT_TEXT_LC);
   if (text === undefined)
     issues.push({
       path,
-      message: `${mode}: no step of ${rule.text.join(', ')} reaches Lc ${ACCENT_TEXT_LC} as ${family} text on the surface and on ${family}-soft.`,
+      message: `${mode}: no step of ${rule.text.join(', ')} reaches Lc ${ACCENT_TEXT_LC} as ${family} text on the surface, ${family}-subtler and ${family}-subtle, under their hover and press layers too.`,
     });
 
-  const [
-    bg,
-    bgHover,
-    bgActive,
-    bgSoft,
-    bgSoftHover,
-    bgSoftActive,
-    textOn,
-    textOnSoft,
-    textFamily,
-    borderFamily,
-  ] = slotsOf(family);
+  const [bgSubtler, bgSubtle, bg, textOnSubtle, textOn, textFamily, borderFamily] =
+    slotsOf(family);
 
   return {
     roles: {
+      [bgSubtler!]: subtler,
+      [bgSubtle!]: subtle,
       [bg!]: fill,
-      [bgHover!]: fillHover!,
-      [bgActive!]: fillActive!,
-      [bgSoft!]: soft,
-      [bgSoftHover!]: softHover!,
-      [bgSoftActive!]: softActive!,
+      [textOnSubtle!]: onSubtle ?? lastOf(shades, rule.onSubtle),
       [textOn!]: onFill,
-      [textOnSoft!]: onSoft ?? lastOf(shades, rule.onSoft),
       [textFamily!]: text ?? lastOf(shades, rule.text),
       [borderFamily!]: text ?? lastOf(shades, rule.text),
     },
@@ -349,7 +354,7 @@ export function resolveColors(theme: IdsThemeOverrides): {
 
   const rolesIn = (mode: IdsMode) => {
     const roles = neutralRoles(neutral, mode);
-    const surface = roles['surface']!;
+    const surface = roles['bg-neutral-subtlest']!;
 
     for (const family of IDS_COLOR_FAMILIES) {
       if (family === 'neutral') continue;

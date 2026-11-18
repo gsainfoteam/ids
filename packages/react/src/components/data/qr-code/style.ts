@@ -8,7 +8,7 @@ export const qrCodeStyle = tv({
   slots: {
     root: [
       'relative inline-block shrink-0 overflow-hidden rounded-standard align-middle',
-      '[--qr-code-foreground:var(--ids-color-on-surface)] [--qr-code-background:var(--ids-color-surface)]',
+      '[--qr-code-foreground:var(--ids-color-text-neutral-bold)] [--qr-code-background:var(--ids-color-bg-neutral-subtlest)]',
     ],
     svg: 'block size-full',
     background: 'fill-(--qr-code-background)',
@@ -27,12 +27,12 @@ export const qrCodeStyle = tv({
     tone: {
       theme: {},
       'dark-on-light': {
-        root: 'dark:[--qr-code-foreground:var(--ids-color-surface)] dark:[--qr-code-background:var(--ids-color-on-surface)]',
+        root: 'dark:[--qr-code-foreground:var(--ids-color-bg-neutral-subtlest)] dark:[--qr-code-background:var(--ids-color-text-neutral-bold)]',
       },
       'light-on-dark': {
         root: [
-          '[--qr-code-foreground:var(--ids-color-surface)] [--qr-code-background:var(--ids-color-on-surface)]',
-          'dark:[--qr-code-foreground:var(--ids-color-on-surface)] dark:[--qr-code-background:var(--ids-color-surface)]',
+          '[--qr-code-foreground:var(--ids-color-bg-neutral-subtlest)] [--qr-code-background:var(--ids-color-text-neutral-bold)]',
+          'dark:[--qr-code-foreground:var(--ids-color-text-neutral-bold)] dark:[--qr-code-background:var(--ids-color-bg-neutral-subtlest)]',
         ],
       },
     } satisfies Record<QRCodeTone, object>,
