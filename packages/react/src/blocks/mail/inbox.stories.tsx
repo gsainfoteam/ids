@@ -19,6 +19,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { TextArea } from '../../components/form/text-area';
 import { Divider } from '../../components/layout/divider';
@@ -154,7 +155,7 @@ export const PC: Story = {
             편지 쓰기
           </a>
         </Button>
-        <Item.Group size="tiny" aria-label="편지함">
+        <ItemGroup size="tiny" aria-label="편지함">
           {FOLDERS.map((item) => (
             <Item
               key={item.id}
@@ -181,13 +182,13 @@ export const PC: Story = {
               </a>
             </Item>
           ))}
-        </Item.Group>
+        </ItemGroup>
       </nav>
     );
 
     const list = (
       <ScrollArea fade className="h-full">
-        <Item.Group aria-label="받은 메일" className="p-2">
+        <ItemGroup aria-label="받은 메일" className="p-2">
           {MAILS.map((mail) => (
             <Item key={mail.id} selected={mail.id === openId} onClick={() => open(mail.id)}>
               <Item.Content>
@@ -203,7 +204,7 @@ export const PC: Story = {
               </Item.Content>
             </Item>
           ))}
-        </Item.Group>
+        </ItemGroup>
       </ScrollArea>
     );
 

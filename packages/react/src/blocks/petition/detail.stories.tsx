@@ -9,6 +9,7 @@ import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
 import { Divider } from '../../components/layout/divider';
@@ -187,7 +188,7 @@ export const PC: Story = {
                   <h2>비슷한 청원</h2>
                 </Card.Title>
               </Card.Header>
-              <Item.Group size="tiny" aria-label="비슷한 청원">
+              <ItemGroup size="tiny" aria-label="비슷한 청원">
                 {RELATED.map((petition) => (
                   <Item key={petition.id} asChild>
                     <a href={`#${petition.id}`}>
@@ -205,7 +206,7 @@ export const PC: Story = {
                     </a>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           </aside>
         </div>

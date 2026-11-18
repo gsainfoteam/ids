@@ -75,7 +75,7 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
   </tr>
 </tbody>
 
-{items.length > 0 ? <Item.Group>...</Item.Group> : <Empty size="tiny">...</Empty>}
+{items.length > 0 ? <ItemGroup>...</ItemGroup> : <Empty size="tiny">...</Empty>}
 ```
 
 - 좁은 자리(목록, 표, 카드 안)는 `size="tiny"` 가 맞습니다. Notion 스펙의 `compact` 가 이것입니다.

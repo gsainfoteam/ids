@@ -11,6 +11,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Alert } from '../../components/feedback/alert';
 import { Progress } from '../../components/feedback/progress';
 import { Spinner } from '../../components/feedback/spinner';
@@ -139,7 +140,7 @@ export const PC: Story = {
         {STATES.map((state) => (
           <Tabs.Content key={state.value} value={state.value}>
             <Card size="tiny">
-              <Item.Group aria-label={`${state.label} 작업`}>
+              <ItemGroup aria-label={`${state.label} 작업`}>
                 {JOBS.filter((job) => job.state === state.value).map((job) => (
                   <Item key={job.id}>
                     <Item.Media variant="soft">
@@ -196,7 +197,7 @@ export const PC: Story = {
                     </Item.Actions>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           </Tabs.Content>
         ))}

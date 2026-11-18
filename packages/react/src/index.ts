@@ -75,6 +75,7 @@ export {
 export { Avatar, initialsOf } from './components/data/avatar';
 export { AvatarGroup } from './components/data/avatar-group';
 export { Item } from './components/data/item';
+export { ItemGroup } from './components/data/item-group';
 export { Accordion } from './components/data/accordion';
 export { Empty } from './components/data/empty';
 export { Image } from './components/data/image';

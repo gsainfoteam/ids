@@ -14,6 +14,7 @@ import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { Tabs } from '../../components/navigation/tabs';
 import { Menu } from '../../components/overlay/menu';
@@ -168,7 +169,7 @@ export const PC: Story = {
 
           <Tabs.Content value="posts">
             <Card size="tiny">
-              <Item.Group aria-label="쓴 글">
+              <ItemGroup aria-label="쓴 글">
                 {POSTS.map((post) => (
                   <Item key={post.id} asChild>
                     <a href={`#${post.id}`}>
@@ -181,13 +182,13 @@ export const PC: Story = {
                     </a>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           </Tabs.Content>
 
           <Tabs.Content value="comments">
             <Card size="tiny">
-              <Item.Group aria-label="쓴 댓글">
+              <ItemGroup aria-label="쓴 댓글">
                 {COMMENTS.map((comment) => (
                   <Item key={comment.id} asChild>
                     <a href={`#${comment.id}`}>
@@ -200,12 +201,12 @@ export const PC: Story = {
                     </a>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           </Tabs.Content>
 
           <Tabs.Content value="clubs">
-            <Item.Group variant="separated" aria-label="동아리">
+            <ItemGroup variant="separated" aria-label="동아리">
               {CLUBS.map((club) => (
                 <Item key={club.id} asChild>
                   <a href={`#${club.id}`}>
@@ -224,7 +225,7 @@ export const PC: Story = {
                   </a>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </Tabs.Content>
         </Tabs>
       </main>

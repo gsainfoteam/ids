@@ -1,6 +1,6 @@
 import { tv } from '../../../utils';
 
-import type { ItemGroupVariant, ItemVariant } from '.';
+import type { ItemVariant } from '.';
 import type { IdsSize } from '../../../tokens/types';
 
 export const itemStyle = tv({
@@ -24,17 +24,8 @@ export const itemStyle = tv({
       'ms-auto flex shrink-0 items-center gap-2',
       "[&>svg]:pointer-events-none [&>svg:not([class*='text-'])]:text-neutral [&>svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
     ],
-    group: 'flex min-w-0 flex-col',
-    groupItem: 'flex',
   },
   variants: {
-    groupVariant: {
-      bordered: {
-        group: 'divide-y divide-neutral [&>li>[data-item]]:rounded-none',
-      },
-      separated: { group: 'gap-2' },
-      ghost: {},
-    } satisfies Record<ItemGroupVariant, object>,
     variant: {
       ghost: {},
       outline: { root: 'inset-ring-1 inset-ring-neutral' },
@@ -98,7 +89,6 @@ export const itemStyle = tv({
     },
   ],
   defaultVariants: {
-    groupVariant: 'ghost',
     variant: 'ghost',
     media: 'ghost',
     size: 'standard',

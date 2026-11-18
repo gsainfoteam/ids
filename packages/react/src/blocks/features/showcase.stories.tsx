@@ -5,6 +5,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 import { Stepper } from '../../components/navigation/stepper';
 
@@ -43,7 +44,7 @@ export const PC: Story = {
         </div>
         <Card variant="soft" aria-hidden>
           <Card>
-            <Item.Group size="tiny">
+            <ItemGroup size="tiny">
               {[
                 ['2학기 수강 정정 안내', '학사 · 내일 마감', 'D-1'],
                 ['근로 장학생 추가 모집', '장학 · 10월 6일까지', 'D-5'],
@@ -66,7 +67,7 @@ export const PC: Story = {
                   </Item.Actions>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </Card>
         </Card>
       </section>
@@ -130,7 +131,7 @@ export const PC: Story = {
         </div>
         <Card variant="soft" aria-hidden>
           <Card>
-            <Item.Group size="tiny">
+            <ItemGroup size="tiny">
               {[
                 ['박서연', '부스 배치도 나왔어요! 우리는 B-4 자리예요.'],
                 ['이도윤', '좋다! 데모는 Ziggle 새 게시판으로 가요.'],
@@ -146,7 +147,7 @@ export const PC: Story = {
                   </Item.Content>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </Card>
         </Card>
       </section>
