@@ -8,19 +8,18 @@ import { testTheme } from './theme';
 import { IdsProvider } from '../src';
 import { Editor } from '../src/editor';
 
-
 const PICTURE = `data:image/svg+xml;base64,${btoa(
   '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="160" viewBox="0 0 480 160"><rect width="480" height="160" fill="hsl(210 70% 88%)"/><circle cx="350" cy="50" r="20" fill="hsl(40 90% 66%)"/><path d="M0 160 L130 72 L250 128 L350 84 L480 160 Z" fill="hsl(210 32% 40%)"/></svg>',
 )}`;
 
 const NOTICE =
-  '<h2>박람회 준비</h2><p style="text-align: center">부스마다 <mark>안내판</mark>을 세웁니다.</p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>부스 신청</p></li><li data-type="taskItem" data-checked="false"><p>장소 배정</p></li></ul><hr><p>학생회관 가는 길</p>';
+  '<h2>박람회 준비</h2><p style="text-align: center">부스마다 <mark>안내판</mark>을 세웁니다.</p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>부스 신청</p></li><li data-type="taskItem" data-checked="false"><p>장소 배정</p></li></ul><hr><table><tbody><tr><th><p>시간</p></th><th><p>장소</p></th></tr><tr><td><p>10:00</p></td><td><p>학생회관</p></td></tr></tbody></table><p>학생회관 가는 길</p>';
 
 const png = () => new File(['png'], '지도.png', { type: 'image/png' });
 
 for (const mode of ['light', 'dark'] as const) {
   test(`tools ${mode}`, async () => {
-    await page.viewport(760, 900);
+    await page.viewport(760, 1040);
     let release: (url: string) => void = () => {};
     render(
       <IdsProvider theme={testTheme} mode={mode}>
@@ -46,6 +45,7 @@ for (const mode of ['light', 'dark'] as const) {
             <Editor.Separator />
             <Editor.Image />
             <Editor.HorizontalRule />
+            <Editor.Table />
             <Editor.Content />
           </Editor>
           <Editor
