@@ -2,8 +2,6 @@
 
 import { type MouseEvent } from 'react';
 
-import { EditorContent } from '@tiptap/react';
-
 import { useEditorContext } from './context';
 import { ScrollArea } from '../../layout/scroll-area';
 
@@ -17,7 +15,8 @@ function asReactProps({ class: className, ...attributes }: Record<string, string
 }
 
 export function EditorContentPart(_: EditorContentProps) {
-  const { editor, styles, contentAttributes, bubbles } = useEditorContext('Editor.Content');
+  const { editor, styles, contentAttributes, bubbles, EngineContent } =
+    useEditorContext('Editor.Content');
 
   const focusTheEndFromTheSpaceBelow = (event: MouseEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget || !editor?.isEditable) return;
@@ -33,8 +32,8 @@ export function EditorContentPart(_: EditorContentProps) {
           className={styles.document()}
           onMouseDown={focusTheEndFromTheSpaceBelow}
         >
-          {editor ? (
-            <EditorContent editor={editor} />
+          {editor && EngineContent ? (
+            <EngineContent editor={editor} />
           ) : (
             <div {...asReactProps(contentAttributes)} />
           )}

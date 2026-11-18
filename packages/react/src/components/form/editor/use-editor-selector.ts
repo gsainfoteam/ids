@@ -1,7 +1,8 @@
 'use client';
 
-import { useEditorState } from '@tiptap/react';
-import { isEqual } from 'es-toolkit';
+import { useCallback, useRef, useSyncExternalStore } from 'react';
+
+import { isEqual, noop } from 'es-toolkit';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
@@ -10,14 +11,28 @@ export function useEditorSelector<T>(
   select: (editor: TiptapEditor) => T,
   beforeTheEngineMounts: T,
 ): T {
-  const selectFromTheMountedEditorNotTheSnapshot = () =>
-    editor && !editor.isDestroyed ? select(editor) : beforeTheEngineMounts;
+  const lastSelected = useRef(beforeTheEngineMounts);
 
-  return (
-    useEditorState({
-      editor,
-      selector: selectFromTheMountedEditorNotTheSnapshot,
-      equalityFn: isEqual,
-    }) ?? beforeTheEngineMounts
+  const subscribe = useCallback(
+    (notify: () => void) => {
+      if (!editor) return noop;
+      editor.on('transaction', notify);
+      return () => {
+        editor.off('transaction', notify);
+      };
+    },
+    [editor],
+  );
+
+  const selectTheSameObjectWhileNothingChanged = () => {
+    const next = editor && !editor.isDestroyed ? select(editor) : beforeTheEngineMounts;
+    if (!isEqual(next, lastSelected.current)) lastSelected.current = next;
+    return lastSelected.current;
+  };
+
+  return useSyncExternalStore(
+    subscribe,
+    selectTheSameObjectWhileNothingChanged,
+    () => beforeTheEngineMounts,
   );
 }

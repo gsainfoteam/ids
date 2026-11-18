@@ -3,6 +3,7 @@
 굵게, 목록, 링크 같은 서식을 넣는 글 편집기입니다. [Tiptap](https://tiptap.dev) 3 (ProseMirror) 위에서 돌고, 테두리와 툴바, 글자 수는 IDS 컴포넌트로 그립니다.
 
 - **따로 가져옴.** `@gsainfoteam/ids-react/editor` 에서 가져옵니다. Editor 를 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다.
+- **엔진은 나중에 불러옴.** `import { Editor }` 는 테두리, 툴바, 부품만 가져옵니다(약 86 kB). Tiptap 은 Editor 가 마운트될 때 `import()` 로 따로 불러오므로(약 146 kB) 첫 화면의 JavaScript 에 들어가지 않습니다.
 - **필드와 같은 테두리.** TextField, TextArea 와 같은 `field-surface` 라 `outline`, `soft`, 포커스 링, 오류 테두리가 같습니다.
 - **폼에 들어감.** `name` 을 주면 숨은 input 으로 FormData 에 들어가고, `required` 면 빈 본문의 제출을 브라우저가 막습니다. Field 안에 두면 라벨, 설명, 오류가 본문에 연결됩니다.
 - **세 가지 값.** `format` 이 `html`(기본), `markdown`, `json` 중 무엇이냐에 따라 값의 모양이 바뀝니다.
@@ -28,7 +29,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 
 - 빈 문서는 `html`, `markdown` 에서 `''` 입니다. `<p></p>` 가 아닙니다.
 - `onValueChange` 는 사용자가 글을 바꿀 때만 불립니다. `value` 를 바꾸거나 폼 reset 으로 돌아갈 때는 부르지 않습니다.
-- 마크다운은 Tiptap 공식 `@tiptap/markdown`(MIT, `marked`) 으로 읽고 씁니다.
+- 마크다운은 Tiptap 공식 `@tiptap/markdown`(MIT, `marked`) 으로 읽고 씁니다. `format="markdown"` 일 때만 불러옵니다.
 - `format` 이나 `maxLength` 를 바꾸면 편집기를 새로 만듭니다. 그 사이의 실행 취소 기록은 사라집니다.
 
 ## 바와 부품
@@ -96,7 +97,8 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 
 ## 서버 렌더링
 
-- 서버와 첫 클라이언트 렌더는 본문 자리에 같은 속성의 빈 상자를 그립니다. 마운트한 뒤 편집기가 그 자리에서 내용을 그립니다.
+- 서버와 첫 클라이언트 렌더는 본문 자리에 같은 속성의 빈 상자를 그립니다. 마운트한 뒤 엔진을 불러오면 편집기가 그 자리에서 내용을 그립니다.
+- 엔진을 불러오는 동안 툴바는 그려져 있지만 누른 상태를 읽지 않습니다. 본문은 그 사이에 입력을 받지 않습니다.
 - 모듈을 가져올 때 `window` 를 읽지 않습니다. Server Component 에서 `<Editor>` 를 그대로 그릴 수 있습니다.
 
 ## 하지 않는 것

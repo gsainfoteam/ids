@@ -13,10 +13,6 @@ import {
   type ReactNode,
 } from 'react';
 
-import { CharacterCount, Placeholder } from '@tiptap/extensions';
-import { Markdown } from '@tiptap/markdown';
-import { useEditor } from '@tiptap/react';
-import { StarterKit } from '@tiptap/starter-kit';
 import { isEqual } from 'es-toolkit';
 
 import { EditorBar } from './bar';
@@ -26,8 +22,8 @@ import { EditorBubbleMenu } from './bubble-menu';
 import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorContext } from './context';
 import { EditorCount } from './count';
-import { LeaveEscapeToTheLayers } from './escape-to-layers';
 import { EditorLink } from './link';
+import { loadEngine, type LoadedEngine } from './load-engine';
 import { EditorBold, EditorCode, EditorItalic, EditorStrike, EditorUnderline } from './marks';
 import { EditorSeparator } from './separator';
 import { editorStyle } from './style';
@@ -48,7 +44,7 @@ import { elementTypeOf, flattenFragments, invariant } from '../../../utils';
 import { FieldNotifyContext, useFieldSize } from '../field/context';
 
 import type { Editor } from '.';
-import type { Editor as TiptapEditor, Extensions } from '@tiptap/core';
+import type { Editor as TiptapEditor } from '@tiptap/core';
 
 export type EditorVariant = 'outline' | 'soft';
 
@@ -127,28 +123,20 @@ function definedOnly(record: Record<string, string | undefined>) {
   );
 }
 
-const placeholderOfTheTextbox = ({ editor }: { editor: TiptapEditor }) =>
-  editor.view.dom.getAttribute('aria-placeholder') ?? '';
+function useLoadedEngine(format: EditorFormat) {
+  const [loaded, setLoaded] = useState<LoadedEngine | null>(null);
 
-function extensionsFor({
-  format,
-  maxLength,
-}: {
-  format: EditorFormat;
-  maxLength: number | undefined;
-}): Extensions {
-  return [
-    StarterKit.configure({
-      heading: { levels: [1, 2, 3, 4] },
-      gapcursor: false,
-      trailingNode: false,
-      link: { openOnClick: false, autolink: true, defaultProtocol: 'https' },
-    }),
-    Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
-    CharacterCount.configure({ limit: maxLength }),
-    LeaveEscapeToTheLayers,
-    ...(format === 'markdown' ? [Markdown] : []),
-  ];
+  useEffect(() => {
+    let mounted = true;
+    void loadEngine(format).then((next) => {
+      if (mounted) setLoaded(next);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [format]);
+
+  return loaded?.format === format ? loaded : null;
 }
 
 export function EditorRoot(props: Editor.Props) {
@@ -222,34 +210,46 @@ export function EditorRoot(props: Editor.Props) {
     class: styles.content({ className: content.props.className }),
   });
 
-  const extensions = useMemo(() => extensionsFor({ format, maxLength }), [format, maxLength]);
-
-  const editor = useEditor(
-    {
-      immediatelyRender: false,
-      shouldRerenderOnTransaction: false,
-      injectCSS: false,
-      editable,
-      extensions,
-      content: current ?? '',
-      contentType: format,
-      editorProps: { attributes: contentAttributes },
-      onCreate: ({ editor: instance }) => {
-        contentRef.current = instance.view.dom;
-      },
-      onUpdate: ({ editor: instance }) => {
-        const next = readValue(instance, latest.current.format);
-        reportedSinceTheLastRender.current = [
-          ...reportedSinceTheLastRender.current.slice(-REPORTS_AWAITING_AN_ECHO),
-          next,
-        ];
-        latest.current.setCurrent(next);
-      },
-      onFocus: () => setFocused(true),
-      onBlur: () => setFocused(false),
-    },
-    [extensions],
+  const loaded = useLoadedEngine(format);
+  const extensions = useMemo(
+    () => loaded?.engine.extensionsFor({ maxLength, markdown: loaded.markdown }),
+    [loaded, maxLength],
   );
+  const [editor, setEditor] = useState<TiptapEditor | null>(null);
+
+  const engineOptions = extensions && {
+    immediatelyRender: false,
+    shouldRerenderOnTransaction: false,
+    injectCSS: false,
+    editable,
+    extensions,
+    content: current ?? '',
+    contentType: format,
+    editorProps: { attributes: contentAttributes },
+  };
+
+  useEffect(() => {
+    contentRef.current = editor?.view.dom ?? null;
+    if (!editor) return;
+    const report = () => {
+      const next = readValue(editor, latest.current.format);
+      reportedSinceTheLastRender.current = [
+        ...reportedSinceTheLastRender.current.slice(-REPORTS_AWAITING_AN_ECHO),
+        next,
+      ];
+      latest.current.setCurrent(next);
+    };
+    const focus = () => setFocused(true);
+    const blur = () => setFocused(false);
+    editor.on('update', report);
+    editor.on('focus', focus);
+    editor.on('blur', blur);
+    return () => {
+      editor.off('update', report);
+      editor.off('focus', focus);
+      editor.off('blur', blur);
+    };
+  }, [editor]);
 
   const attributesKey = JSON.stringify(contentAttributes);
   useLayoutEffect(() => {
@@ -304,6 +304,7 @@ export function EditorRoot(props: Editor.Props) {
         contentAttributes,
         bubbles,
         styles,
+        EngineContent: loaded?.engine.EditorContent ?? null,
       }}
     >
       <div
@@ -321,6 +322,9 @@ export function EditorRoot(props: Editor.Props) {
         })}
         style={typeof style === 'function' ? style(state) : style}
       >
+        {loaded && engineOptions && (
+          <loaded.engine.EditorEngine options={engineOptions} onEditor={setEditor} />
+        )}
         {top.length > 0 && (
           <EditorBar toolbar scrolls className={styles.bar({ position: 'top' })}>
             {top}

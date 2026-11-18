@@ -7,6 +7,7 @@ import { invariant } from '../../../utils';
 import type { editorStyle } from './style';
 import type { IdsSize } from '../../../tokens/types';
 import type { Editor as TiptapEditor } from '@tiptap/core';
+import type { EditorContent } from '@tiptap/react';
 
 export type EditorContextValue = {
   editor: TiptapEditor | null;
@@ -20,6 +21,7 @@ export type EditorContextValue = {
   contentAttributes: Record<string, string>;
   bubbles: ReactNode;
   styles: ReturnType<typeof editorStyle>;
+  EngineContent: typeof EditorContent | null;
 };
 
 export const EditorContext = createContext<EditorContextValue | null>(null);
