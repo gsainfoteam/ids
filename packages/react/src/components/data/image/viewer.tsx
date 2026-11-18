@@ -131,7 +131,7 @@ function useStateOwnedByTheGroupWarning(props: ImageViewerProps) {
   useEffect(() => {
     if (isDevelopment && ownState)
       console.warn(
-        '[IDS] Image.Viewer: inside Image.Group the group owns the images, open, value, loop and zoom. Pass them to Image.Group instead.',
+        '[IDS] Image.Viewer: inside ImageGroup the group owns the images, open, value, loop and zoom. Pass them to ImageGroup instead.',
       );
   }, [ownState]);
 }

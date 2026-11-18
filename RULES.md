@@ -224,8 +224,9 @@ drawer/
   `const` alias cannot merge with a namespace that holds values, and a Server Component cannot
   read a part off a client reference. Its parts are `ImageViewerClose` with `displayName`
   `'Image.Viewer.Close'`. A client file cannot import that function without a cycle through
-  `index.tsx`, so a sibling that picks the sub-component out of its children does so there too:
-  `Image.Group` finds `[Image.Viewer, ImageViewer]` and hands it to the client `ImageGroup`.
+  `index.tsx`, so a component that picks the sub-component out of its children does so in its own
+  server-safe `index.tsx`: `ImageGroup` finds `[Image.Viewer, ImageViewer]` and hands it to its
+  client `ImageGroupRoot`.
 - Parts and `root.tsx` import `./context`, `./style` and sibling parts directly. They import `'.'`
   only with `import type`, so no runtime cycle runs through `index.tsx`. The root recognises its parts
   (`elementTypeOf(child) === DrawerOverlay`, a set of part functions) by importing them, never

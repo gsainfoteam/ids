@@ -6,7 +6,7 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Image } from '../src';
+import { Image, ImageGroup } from '../src';
 import { skipWithoutCdp } from './engines';
 import { holdImages as holdImagesUnder } from './held-images';
 
@@ -222,15 +222,15 @@ test('the focus ring is drawn on the image box while its button has keyboard foc
   await expect.poll(() => getComputedStyle(frame).boxShadow).not.toBe('none');
 });
 
-test('Image.Group lists its images and opens the viewer at the pressed one, by pointer and keys', async () => {
+test('ImageGroup lists its images and opens the viewer at the pressed one, by pointer and keys', async () => {
   const onValueChange = vi.fn();
   const onOpenChange = vi.fn();
   const screen = await render(
-    <Image.Group aria-label="Photos" onValueChange={onValueChange} onOpenChange={onOpenChange}>
+    <ImageGroup aria-label="Photos" onValueChange={onValueChange} onOpenChange={onOpenChange}>
       <Image src={INLINE_PICTURE} alt="First" />
       <Image src={INLINE_PICTURE} alt="Second" preview={false} />
       <Image src={INLINE_PICTURE} alt="Third" />
-    </Image.Group>,
+    </ImageGroup>,
   );
   await expect.element(screen.getByRole('list', { name: 'Photos' })).toBeInTheDocument();
   expect(screen.getByRole('listitem').all()).toHaveLength(3);
@@ -263,11 +263,11 @@ test('Image.Group lists its images and opens the viewer at the pressed one, by p
 test('a controlled group shows and marks the image at its value, in the document order', async () => {
   const onValueChange = vi.fn();
   const gallery = (names: string[], open: boolean) => (
-    <Image.Group value={2} open={open} onValueChange={onValueChange}>
+    <ImageGroup value={2} open={open} onValueChange={onValueChange}>
       {names.map((name) => (
         <Image key={name} src={INLINE_PICTURE} alt={name} />
       ))}
-    </Image.Group>
+    </ImageGroup>
   );
   const shown = () => page.getByRole('group', { name: '3장 중 3번째' });
   const trigger = (name: string) =>
@@ -290,11 +290,11 @@ test('a controlled group shows and marks the image at its value, in the document
 
 test('images that move keep the group value in document order before any press', async () => {
   const gallery = (names: string[], open: boolean) => (
-    <Image.Group value={2} open={open}>
+    <ImageGroup value={2} open={open}>
       {names.map((name) => (
         <Image key={name} src={INLINE_PICTURE} alt={name} />
       ))}
-    </Image.Group>
+    </ImageGroup>
   );
   const screen = await render(gallery(['A', 'B', 'C'], false));
   await screen.rerender(gallery(['C', 'A', 'B'], false));
@@ -315,9 +315,9 @@ test('the group lays images in a row, a column or a grid of columns', async () =
     ));
   const screen = await render(
     <div style={{ width: 300 }}>
-      <Image.Group layout="grid" columns={3} aria-label="Grid">
+      <ImageGroup layout="grid" columns={3} aria-label="Grid">
         {photos(6)}
-      </Image.Group>
+      </ImageGroup>
     </div>,
   );
   const cells = screen.getByRole('listitem').elements();
@@ -334,9 +334,9 @@ test('the group lays images in a row, a column or a grid of columns', async () =
 
   await screen.rerender(
     <div style={{ width: 300 }}>
-      <Image.Group layout="row" aria-label="Row">
+      <ImageGroup layout="row" aria-label="Row">
         {photos(2)}
-      </Image.Group>
+      </ImageGroup>
     </div>,
   );
   const [left, right] = screen.getByRole('listitem').elements();
@@ -348,9 +348,9 @@ test('the group lays images in a row, a column or a grid of columns', async () =
 
   await screen.rerender(
     <div style={{ width: 300 }}>
-      <Image.Group layout="column" aria-label="Column">
+      <ImageGroup layout="column" aria-label="Column">
         {photos(2)}
-      </Image.Group>
+      </ImageGroup>
     </div>,
   );
   const [top, bottom] = screen.getByRole('listitem').elements();
@@ -362,6 +362,6 @@ test('the group lays images in a row, a column or a grid of columns', async () =
 });
 
 test('a group with columns that are not a positive whole number throws, and parts need an Image', () => {
-  expect(() => renderToString(<Image.Group layout="grid" columns={0} />)).toThrow(/columns/);
+  expect(() => renderToString(<ImageGroup layout="grid" columns={0} />)).toThrow(/columns/);
   expect(() => renderToString(<Image.Fallback />)).toThrow(/inside `<Image>`/);
 });
