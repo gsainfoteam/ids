@@ -14,7 +14,7 @@ export const ratingStyle = tv({
     ],
     item: 'relative inline-flex shrink-0 items-center justify-center rounded-standard focus-ring',
     graphic: 'pointer-events-none relative block size-full [&_svg]:size-full',
-    empty: 'absolute inset-0 text-(--ids-color-border-neutral) in-data-invalid:text-danger/35',
+    empty: 'absolute inset-0 text-(--ids-color-border-neutral) in-data-invalid:text-(--ids-color-border-danger)',
     fill: [
       'absolute inset-0 text-scheme in-data-previewing:opacity-50',
       '[clip-path:inset(0_calc(100%-var(--rating-fill))_0_0)]',

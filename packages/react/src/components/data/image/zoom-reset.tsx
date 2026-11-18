@@ -6,7 +6,7 @@ import { useImageViewerContext } from './context';
 import { useTranslate } from '../../../internal/translate';
 import { Button } from '../../action/button';
 
-import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type ImageViewerZoomResetProps = Omit<ComponentProps<'button'>, 'children' | 'color'> & {

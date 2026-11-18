@@ -150,7 +150,7 @@ focusVisible = focused
 
 ### control surface — Button / IconButton / Toggle / IconToggle 공통
 
-[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySubtle`, `textOnPrimary` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
+[control-surface.ts](../react/src/internal/surfaces/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySubtle`, `textOnPrimary` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
 
 | `colorScheme`                       | fill / on-fill                         | soft / on-soft                         | quiet             | ring            |
 | ----------------------------------- | -------------------------------------- | -------------------------------------- | ----------------- | --------------- |
@@ -170,7 +170,7 @@ focusVisible = focused
 - `outline` 테두리는 `colors.borderNeutral`이다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
 - 브랜드 fill을 `withValues(alpha: 0.9)`로 흐리게 하지 않는다. hover·press는 state layer다
 - `glossy`는 state layer 대신 광택 그라디언트를 옮긴다(React에서 `state-layer`가 `background-image`를 차지하기 때문)
-- Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 state layer 0.06 / 0.1 이다. 켜지면(`pressed`) `ghost`·`outline`은 press 층(0.1)만 남기고 글자는 quiet 그대로, `soft`·`solid`·`glossy`는 그 variant의 채움과 전경을 쓴다
+- Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/surfaces/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 state layer 0.06 / 0.1 이다. 켜지면(`pressed`) `ghost`·`outline`은 press 층(0.1)만 남기고 글자는 quiet 그대로, `soft`·`solid`·`glossy`는 그 variant의 채움과 전경을 쓴다
 - `active`는 배경만 바뀐다. scale 없음
 - `focusVisible`: 바깥 3px 링(ring 색 0.40)과 안쪽 1px 테두리를 ring 색으로. offset outline이 아니다
 - `disabled`: opacity 0.50. 로딩(`aria-busy`) 중에는 커서만 바뀐다

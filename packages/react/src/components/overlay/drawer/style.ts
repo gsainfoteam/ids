@@ -13,7 +13,7 @@ export const drawerStyle = tv({
     content: [
       'fixed z-50 m-0 flex flex-col outline-none',
       cornerOfThePaddedViewport,
-      'border border-neutral bg-neutral-subtlest text-neutral-bold shadow-lg',
+      'border border-neutral bg-panel text-neutral-bold shadow-lg',
       'transition-[translate,transform,scale] duration-(--ids-motion-slow) ease-[cubic-bezier(0.32,0.72,0,1)]',
       'data-nested-open:scale-(--drawer-nested-scale)',
       'data-dragging:transition-none data-dragging:select-none motion-reduce:transition-none',

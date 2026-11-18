@@ -3,7 +3,7 @@ import {
   neutralKeepsThePrimaryRing,
   pressStates,
   statusSchemes,
-} from '../../../internal/control-surface';
+} from '../../../internal/surfaces/control-surface';
 import { cn, tv } from '../../../utils';
 
 import type { FloatingButton } from '.';

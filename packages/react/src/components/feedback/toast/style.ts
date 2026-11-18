@@ -10,7 +10,7 @@ export const toasterStyle = tv({
     ],
     toast: [
       'absolute inset-x-0 z-(--toast-z) touch-none concentric-p-3 px-4',
-      'bg-neutral-subtlest text-body-b3-regular text-neutral-bold',
+      'bg-panel text-body-b3-regular text-neutral-bold',
       'shadow-lg inset-ring-1 inset-ring-neutral',
       'after:absolute after:inset-x-0 after:h-(--gap)',
       'h-(--front-toast-height) [scale:calc(1-0.05*var(--toasts-before))]',

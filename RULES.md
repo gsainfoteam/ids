@@ -171,8 +171,8 @@ packages/react/src/
     typography/  Kbd, Label, Link
     utility/     Slot, Group, IdsProvider
   internal/      shared parts that are not exported:
-                   surfaces     control-surface, toggle-surface, icon-square, field-surface, surface,
-                                slider-surface
+                   surfaces     surfaces/ (control-surface, toggle-surface, icon-square,
+                                field-surface, slider-surface), surface
                    fields       text-control (shell, Clear, useMergedRef), field-popup, list-styles,
                                 temporal-field, form-value, date-locale
                    behaviour    pressable, state-props, use-checked-writes, icon-label, arc,
@@ -501,7 +501,7 @@ opacity to `--ids-state-layer-hover` and `state-press` to `--ids-state-layer-pre
 to `--ids-state-hover` (6%) and `--ids-state-press` (10%), all from
 `packages/core/tokens/state.json`. A component writes
 `state-layer data-hovered:state-hover data-active:state-press` (`pressStates` in
-`internal/control-surface.ts`), and a selected, current or pressed item that should read as
+`internal/surfaces/control-surface.ts`), and a selected, current or pressed item that should read as
 pressed takes `state-press` (a ghost or outline Toggle, a selected Table row or Item, the current
 ghost Pagination link); an open Menu item or a highlighted option takes `state-hover`. Add
 `--ids-state-opacity` to the element's `transition-[…]` list so the layer fades with the rest.
@@ -533,7 +533,7 @@ layer, subtle, subtler and accent text under the text-color layer and the family
 
 **Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
 TelField, ChipField, Select and the date, time and color triggers draw their box from
-`internal/field-surface.ts`. Their `variant` is intensity only: `outline` (default), `soft` (muted
+`internal/surfaces/field-surface.ts`. Their `variant` is intensity only: `outline` (default), `soft` (muted
 fill) and `ghost` (no fill, no border). Put `data-field-input` on the element that takes focus and
 `data-invalid` on the shell; `focus-ring` does the rest.
 

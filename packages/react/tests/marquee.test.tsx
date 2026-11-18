@@ -63,7 +63,7 @@ async function measured(track: HTMLElement) {
   const vertical = root.dataset.orientation === 'vertical';
   const loop = Math.round((vertical ? track.offsetHeight : track.offsetWidth) / 2);
   await expect
-    .poll(() => root.style.getPropertyValue('--ids-marquee-duration'))
+    .poll(() => root.style.getPropertyValue('--marquee-duration'))
     .toBe(`${Math.round((loop / NORMAL_PIXELS_PER_SECOND) * 1000)}ms`);
 }
 
@@ -117,7 +117,7 @@ test('SSR: before measuring, a loop takes 1000px at the chosen speed', () => {
 
   for (const [speed, time] of loops) {
     const { root } = parts(html(words({ speed })));
-    expect(root.style.getPropertyValue('--ids-marquee-duration'), String(speed)).toBe(time);
+    expect(root.style.getPropertyValue('--marquee-duration'), String(speed)).toBe(time);
   }
 });
 
@@ -395,14 +395,14 @@ test('a loop takes the measured length at the chosen speed, and follows the cont
   const loopOf = (items: number, width: number, gap: number) => items * width + items * gap;
 
   await expect
-    .poll(() => root.style.getPropertyValue('--ids-marquee-duration'))
+    .poll(() => root.style.getPropertyValue('--marquee-duration'))
     .toBe(`${(loopOf(4, 150, 20) / 100) * 1000}ms`);
 
   await screen.rerender(
     <IdsProvider theme={testTheme}>{fixedItems({ speed: 100 }, 200)}</IdsProvider>,
   );
   await expect
-    .poll(() => root.style.getPropertyValue('--ids-marquee-duration'))
+    .poll(() => root.style.getPropertyValue('--marquee-duration'))
     .toBe(`${(loopOf(4, 200, 20) / 100) * 1000}ms`);
 });
 
@@ -440,7 +440,7 @@ test('right to left flows the other way and puts the Pause button on the left', 
   );
   const { track, viewport, pause } = parts(screen.container);
 
-  expect(getComputedStyle(track).getPropertyValue('--ids-marquee-translate').trim()).toBe('50%');
+  expect(getComputedStyle(track).getPropertyValue('--marquee-translate').trim()).toBe('50%');
   expect(pause!.getBoundingClientRect().right).toBeLessThanOrEqual(leftOf(viewport));
 
   const atRest = track.getBoundingClientRect().right;

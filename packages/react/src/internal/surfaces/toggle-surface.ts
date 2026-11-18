@@ -6,9 +6,9 @@ import {
   type ControlCompoundVariant,
   type SurfaceVariant,
 } from './control-surface';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
-import type { IdsVariant } from '../tokens/types';
+import type { IdsVariant } from '../../tokens/types';
 
 const toggleStates = cn(
   'state-layer not-data-pressed:data-hovered:state-hover data-active:state-press',

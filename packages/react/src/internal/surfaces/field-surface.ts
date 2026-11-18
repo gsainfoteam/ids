@@ -1,6 +1,6 @@
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
-import type { IdsSize } from '../tokens/types';
+import type { IdsSize } from '../../tokens/types';
 
 export type FieldSurfaceVariant = 'outline' | 'soft' | 'ghost';
 
@@ -12,10 +12,7 @@ export const fieldSurface = {
     'disabled:cursor-not-allowed disabled:opacity-50',
   ),
   variant: {
-    outline: cn(
-      'bg-neutral-subtlest shadow-xs inset-ring-1 inset-ring-neutral',
-      'dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)',
-    ),
+    outline: cn('bg-field-outline shadow-xs inset-ring-1 inset-ring-field-outline'),
     soft: cn('bg-neutral-subtle inset-ring-1 inset-ring-transparent'),
     ghost: cn('bg-transparent inset-ring-1 inset-ring-transparent'),
   } satisfies Record<FieldSurfaceVariant, string>,

@@ -1,7 +1,7 @@
 import { tv } from '../../../utils';
 
 import type { TabsAppearance, TabsColorScheme, TabsOrientation } from './context';
-import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export const tabsStyle = tv({
@@ -138,9 +138,8 @@ export const tabsStyle = tv({
       variant: 'outline',
       class: {
         trigger: [
-          'aria-selected:bg-neutral-subtlest aria-selected:shadow-xs',
-          'aria-selected:inset-ring-1 aria-selected:inset-ring-neutral',
-          'dark:aria-selected:bg-neutral-subtle',
+          'aria-selected:bg-control-outline aria-selected:shadow-xs',
+          'aria-selected:inset-ring-1 aria-selected:inset-ring-control-outline',
         ],
       },
     },

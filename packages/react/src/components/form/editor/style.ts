@@ -1,4 +1,4 @@
-import { fieldSurface } from '../../../internal/field-surface';
+import { fieldSurface } from '../../../internal/surfaces/field-surface';
 import { cn, tv } from '../../../utils';
 
 import type { EditorVariant } from './root';

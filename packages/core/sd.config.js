@@ -375,7 +375,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 
 @keyframes ids-marquee {
   to {
-    translate: var(--ids-marquee-translate, -50%);
+    translate: var(--marquee-translate, -50%);
   }
 }
 
@@ -388,7 +388,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 `;
 
 const T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES = `@theme inline {
-  --animate-marquee: ids-marquee var(--ids-marquee-duration, 20s) linear infinite var(--ids-marquee-direction, normal) var(--ids-marquee-play-state, running);
+  --animate-marquee: ids-marquee var(--marquee-duration, 20s) linear infinite var(--marquee-direction, normal) var(--marquee-play-state, running);
 }
 `;
 

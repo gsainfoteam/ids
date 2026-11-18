@@ -37,10 +37,7 @@ export const alertStyle = tv({
       },
       soft: { root: 'bg-scheme-subtle text-on-scheme-subtle' },
       outline: {
-        root: [
-          'bg-neutral-subtlest text-neutral-bold inset-ring-1 inset-ring-neutral',
-          'dark:bg-neutral-subtler',
-        ],
+        root: 'bg-panel text-neutral-bold inset-ring-1 inset-ring-neutral',
         icon: 'text-scheme',
         title: 'text-scheme',
         description: 'text-neutral',

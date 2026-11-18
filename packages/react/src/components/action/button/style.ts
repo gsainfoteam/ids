@@ -1,4 +1,4 @@
-import { controlSurface } from '../../../internal/control-surface';
+import { controlSurface } from '../../../internal/surfaces/control-surface';
 import { tv } from '../../../utils';
 
 export const buttonStyle = tv({

@@ -1,6 +1,6 @@
-import { controlSurface } from '../../../internal/control-surface';
-import { iconSquare } from '../../../internal/icon-square';
-import { toggleSurface } from '../../../internal/toggle-surface';
+import { controlSurface } from '../../../internal/surfaces/control-surface';
+import { iconSquare } from '../../../internal/surfaces/icon-square';
+import { toggleSurface } from '../../../internal/surfaces/toggle-surface';
 import { tv } from '../../../utils';
 
 export const iconToggleStyle = tv({

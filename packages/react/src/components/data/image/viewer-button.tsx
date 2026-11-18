@@ -4,7 +4,7 @@ import { type ComponentProps, type MouseEvent, type ReactElement } from 'react';
 
 import { IconButton } from '../../action/icon-button';
 
-import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type ImageViewerButtonProps = Omit<ComponentProps<'button'>, 'children' | 'color'> & {

@@ -1,7 +1,7 @@
-import { IDS_STATUS_FAMILIES } from '../tokens/color-roles';
-import { cn } from '../utils/cn';
+import { IDS_STATUS_FAMILIES } from '../../tokens/color-roles';
+import { cn } from '../../utils/cn';
 
-import type { IdsSize, IdsVariant } from '../tokens/types';
+import type { IdsSize, IdsVariant } from '../../tokens/types';
 
 export type SurfaceVariant = Exclude<IdsVariant, 'transparent'>;
 
@@ -86,9 +86,8 @@ export const controlSurface = {
     solid: cn('bg-scheme text-on-scheme shadow-xs', pressStates, 'state-fill'),
     soft: cn('bg-scheme-subtle text-on-scheme-subtle', pressStates, 'state-scheme'),
     outline: cn(
-      'bg-neutral-subtlest text-neutral-bold shadow-xs',
-      'inset-ring-1 inset-ring-neutral',
-      'dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)',
+      'bg-control-outline text-neutral-bold shadow-xs',
+      'inset-ring-1 inset-ring-control-outline',
       pressStates,
     ),
     ghost: cn('bg-transparent text-neutral-bold', pressStates),

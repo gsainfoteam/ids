@@ -1,4 +1,4 @@
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
 export const sliderSurface = {
   edge: cn('inset-ring-1 inset-ring-(--ids-color-text-neutral-bold)/10'),
