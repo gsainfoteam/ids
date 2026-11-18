@@ -13,7 +13,7 @@ export const textAreaStyle = tv({
       fieldSurface.base,
     ],
     bar: [
-      'flex shrink-0 items-center empty:hidden',
+      'mx-px flex shrink-0 items-center empty:hidden',
       'border-neutral',
       'not-has-[button]:text-neutral',
       '[&_svg]:shrink-0',
@@ -34,8 +34,8 @@ export const textAreaStyle = tv({
   },
   variants: {
     variant: {
-      outline: { root: fieldSurface.variant.outline },
-      soft: { root: fieldSurface.variant.soft },
+      outline: { root: fieldSurface.variant.outline, bar: 'dark:border-(--ids-color-bg-neutral)' },
+      soft: { root: fieldSurface.variant.soft, bar: 'dark:border-(--ids-color-bg-neutral)' },
       ghost: { root: fieldSurface.variant.ghost },
     } satisfies Record<TextAreaVariant, object>,
     size: {
