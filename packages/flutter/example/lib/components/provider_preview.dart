@@ -129,10 +129,10 @@ class _FamilySwatch extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: ShapeDecoration(
-              color: role('bg-$family-soft'),
+              color: role('bg-$family-subtle'),
               shape: ids.shape(side: BorderSide(color: role('border-$family'))),
             ),
-            child: Text('$family soft', style: on('text-on-$family-soft')),
+            child: Text('$family subtle', style: on('text-on-$family-subtle')),
           ),
         ),
         Expanded(child: Text(family, style: on('text-$family'))),
