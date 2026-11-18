@@ -153,6 +153,14 @@ mixin IdsMessages {
 
   String? get drawerHandle => null;
 
+  String? get editorAlignCenter => null;
+
+  String? get editorAlignJustify => null;
+
+  String? get editorAlignLeft => null;
+
+  String? get editorAlignRight => null;
+
   String? get editorBlockType => null;
 
   String? get editorBlockquote => null;
@@ -171,6 +179,22 @@ mixin IdsMessages {
 
   String? editorHeading({required Object level}) => null;
 
+  String? get editorHighlight => null;
+
+  String? get editorHorizontalRule => null;
+
+  String? get editorImage => null;
+
+  String? get editorImageAlt => null;
+
+  String? get editorImageAltPlaceholder => null;
+
+  String? get editorImageNotSupported => null;
+
+  String? get editorImageUploadFailed => null;
+
+  String? get editorImageUploading => null;
+
   String? get editorItalic => null;
 
   String? get editorLink => null;
@@ -186,6 +210,14 @@ mixin IdsMessages {
   String? get editorParagraph => null;
 
   String? get editorStrike => null;
+
+  String? editorTaskItem({required Object text}) => null;
+
+  String? get editorTaskItemEmpty => null;
+
+  String? get editorTaskList => null;
+
+  String? get editorTextAlign => null;
 
   String? get editorToolbar => null;
 
@@ -730,6 +762,18 @@ final class IdsKoreanMessages with IdsMessages {
   String get drawerHandle => '끌어서 크기 조절';
 
   @override
+  String get editorAlignCenter => '가운데 정렬';
+
+  @override
+  String get editorAlignJustify => '양쪽 정렬';
+
+  @override
+  String get editorAlignLeft => '왼쪽 정렬';
+
+  @override
+  String get editorAlignRight => '오른쪽 정렬';
+
+  @override
   String get editorBlockType => '문단 모양';
 
   @override
@@ -757,6 +801,30 @@ final class IdsKoreanMessages with IdsMessages {
   String editorHeading({required Object level}) => '제목 ${_format(level)}';
 
   @override
+  String get editorHighlight => '형광펜';
+
+  @override
+  String get editorHorizontalRule => '구분선';
+
+  @override
+  String get editorImage => '그림';
+
+  @override
+  String get editorImageAlt => '대체 텍스트';
+
+  @override
+  String get editorImageAltPlaceholder => '그림을 설명하는 글';
+
+  @override
+  String get editorImageNotSupported => '그림 파일이 아니라 올리지 않았습니다';
+
+  @override
+  String get editorImageUploadFailed => '그림을 올리지 못했습니다';
+
+  @override
+  String get editorImageUploading => '그림을 올리는 중입니다';
+
+  @override
   String get editorItalic => '기울임';
 
   @override
@@ -779,6 +847,18 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get editorStrike => '취소선';
+
+  @override
+  String editorTaskItem({required Object text}) => '할 일: ${_format(text)}';
+
+  @override
+  String get editorTaskItemEmpty => '빈 할 일';
+
+  @override
+  String get editorTaskList => '할 일 목록';
+
+  @override
+  String get editorTextAlign => '정렬';
 
   @override
   String get editorToolbar => '서식';
