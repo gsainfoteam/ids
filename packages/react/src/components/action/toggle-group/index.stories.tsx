@@ -15,6 +15,7 @@ import { Showcase } from '~story-kit';
 
 import { isDevelopment } from '../../../utils/dev';
 import { Button } from '../button';
+import { ButtonGroup } from '../button-group';
 import { IconToggle } from '../icon-toggle';
 import { Toggle } from '../toggle';
 
@@ -155,6 +156,31 @@ export const Gallery: Story = {
             <Toggle value="design">디자인</Toggle>
           </ToggleGroup>
         </Showcase.Row>
+        <Showcase.Row label="in a ButtonGroup">
+          <ButtonGroup variant="outline" aria-label="서식">
+            <ToggleGroup selectionMode="multiple" aria-label="강조" defaultValue={['bold']}>
+              <IconToggle value="bold" icon={<BoldIcon />} aria-label="굵게" />
+              <IconToggle value="italic" icon={<ItalicIcon />} aria-label="기울임" />
+            </ToggleGroup>
+            <ToggleGroup aria-label="정렬" defaultValue="left">
+              <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
+              <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
+              <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
+            </ToggleGroup>
+          </ButtonGroup>
+        </Showcase.Row>
+        <Showcase.Row label="split by ButtonGroup">
+          <ToggleGroup aria-label="기간" variant="outline" defaultValue="day">
+            <ButtonGroup>
+              <Toggle value="day">일</Toggle>
+              <Toggle value="week">주</Toggle>
+            </ButtonGroup>
+            <ButtonGroup>
+              <Toggle value="month">월</Toggle>
+              <Toggle value="year">년</Toggle>
+            </ButtonGroup>
+          </ToggleGroup>
+        </Showcase.Row>
       </Showcase.Section>
 
       <Showcase.Section title="States">
@@ -208,6 +234,82 @@ export const SpacedWrap: Story = {
     const last = canvas.getByRole('radio', { name: '13:00' }).getBoundingClientRect();
     await expect(last.top).toBeGreaterThan(first.top);
     await expect(last.width).toBeLessThan(first.width * 1.5);
+  },
+};
+
+export const GroupedToggleGroups: Story = {
+  render: () => (
+    <ButtonGroup variant="outline" aria-label="서식">
+      <ToggleGroup selectionMode="multiple" aria-label="강조" defaultValue={['bold']}>
+        <IconToggle value="bold" icon={<BoldIcon />} aria-label="굵게" />
+        <IconToggle value="italic" icon={<ItalicIcon />} aria-label="기울임" />
+      </ToggleGroup>
+      <ToggleGroup aria-label="정렬" defaultValue="left">
+        <IconToggle value="left" icon={<Bars3BottomLeftIcon />} aria-label="왼쪽 정렬" />
+        <IconToggle value="center" icon={<Bars3Icon />} aria-label="가운데 정렬" />
+        <IconToggle value="right" icon={<Bars3BottomRightIcon />} aria-label="오른쪽 정렬" />
+      </ToggleGroup>
+    </ButtonGroup>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '선택이 서로 다른 묶음은 ButtonGroup 안에 ToggleGroup을 나란히 둡니다. 묶음끼리 떨어지고, 화살표는 제 묶음 안에서만 돌고, Tab이 다음 묶음으로 넘어갑니다. 바깥을 ToggleGroup으로 두면 고를 항목이 없는 빈 라디오 그룹이 되므로 ButtonGroup을 씁니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const marks = canvas.getByRole('toolbar', { name: '강조' }).getBoundingClientRect();
+    const align = canvas.getByRole('radiogroup', { name: '정렬' }).getBoundingClientRect();
+    await expect(align.left - marks.right).toBe(8);
+    const bold = canvas.getByRole('button', { name: '굵게' });
+    await userEvent.click(bold);
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(canvas.getByRole('button', { name: '기울임' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(bold).toHaveFocus();
+    await userEvent.keyboard('{Tab}');
+    await expect(canvas.getByRole('radio', { name: '왼쪽 정렬' })).toHaveFocus();
+  },
+};
+
+export const SplitSelection: Story = {
+  args: { onValueChange: fn() },
+  render: (args) => (
+    <ToggleGroup
+      aria-label="기간"
+      variant="outline"
+      defaultValue="day"
+      onValueChange={args.onValueChange}
+    >
+      <ButtonGroup>
+        <Toggle value="day">일</Toggle>
+        <Toggle value="week">주</Toggle>
+      </ButtonGroup>
+      <ButtonGroup>
+        <Toggle value="month">월</Toggle>
+        <Toggle value="year">년</Toggle>
+      </ButtonGroup>
+    </ToggleGroup>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '하나의 선택을 보기 좋게 나누려면 ToggleGroup 안에 ButtonGroup을 둡니다. 토글은 모두 같은 라디오 그룹이고, 화살표가 묶음을 건너 다음 항목을 고릅니다.',
+      },
+    },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const group = canvas.getByRole('radiogroup', { name: '기간' });
+    await expect(group.querySelectorAll('[role=radio]')).toHaveLength(4);
+    await userEvent.click(canvas.getByRole('radio', { name: '주' }));
+    await userEvent.keyboard('{ArrowRight}');
+    const month = canvas.getByRole('radio', { name: '월' });
+    await expect(month).toHaveFocus();
+    await expect(month).toHaveAttribute('aria-checked', 'true');
+    await expect(args.onValueChange).toHaveBeenLastCalledWith('month');
   },
 };
 
