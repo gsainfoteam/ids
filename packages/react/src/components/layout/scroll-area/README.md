@@ -213,14 +213,15 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 
 ## 색
 
-| 토큰                            | 불투명도 | 쓰임                                    |
-| ------------------------------- | -------- | --------------------------------------- |
-| `--ids-color-bg-neutral`        | 60%      | thumb                                   |
-| `--ids-color-bg-neutral-hover`  | 75%      | thumb 에 올렸을 때                      |
-| `--ids-color-bg-neutral-active` | 90%      | thumb 을 끌 때                          |
-| `--ids-color-bg-neutral-soft`   | 50%      | `always` 트랙, 막대에 올렸을 때, Corner |
+| 토큰                              | 불투명도 | 쓰임                                    |
+| --------------------------------- | -------- | --------------------------------------- |
+| `--ids-color-bg-neutral`          | 60%      | thumb                                   |
+| `--ids-color-bg-neutral`          | 100%     | thumb 에 올렸을 때                      |
+| `--ids-color-text-neutral`        | 100%     | thumb 을 끌 때                          |
+| `--ids-color-bg-neutral-subtle`   | 50%      | `always` 트랙, 막대에 올렸을 때, Corner |
 
 - 막대는 내용 위에 겹쳐 그려지므로 반투명합니다. 밑의 글자가 비쳐 보여 막대가 내용을 덜 가립니다.
+- thumb 은 글자색 층(`state-layer`)을 쓰지 않습니다. 몇 px 막대에서 6~10% 층은 보이지 않아 색 자체를 바꿉니다.
 - 중립 토큰이라 `data-mode` 에만 따릅니다. 다크 모드는 토큰이 바꿉니다.
 
 ## 속성

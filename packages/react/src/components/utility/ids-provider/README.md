@@ -3,8 +3,8 @@
 앱의 테마(브랜드 색, 중립과 상태 색의 방식, radius, corner shape, 배율)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
 
 - **테마는 앱이 줍니다.** IDS 에는 기본 색이 없습니다. `theme` 이 없으면 타입 오류입니다.
-- **브랜드 색 하나로 두 모드를 칠합니다.** `primary` 하나만 있으면 됩니다. 계열마다 라이트와 다크의 역할 색(`bg-primary`, `bg-primary-soft`, `text-primary` …)을 IDS 가 APCA 대비(채움과 soft 위 글자 Lc 75, 페이지 위 색 글자와 선 Lc 60)를 지키도록 고릅니다. 팔레트 대신 색 하나를 주면 IDS 가 11단계를 만듭니다.
-- **계열 여덟 개.** neutral, primary, secondary, tertiary, success, warning, danger, info 가 같은 역할 열 개를 가집니다.
+- **브랜드 색 하나로 두 모드를 칠합니다.** `primary` 하나만 있으면 됩니다. 계열마다 라이트와 다크의 역할 색(`bg-primary`, `bg-primary-subtle`, `text-primary` …)을 IDS 가 APCA 대비(채움과 subtle 위 글자 Lc 75, 페이지 위 색 글자 Lc 60, 선 Lc 45)를 hover, press 층 아래에서도 지키도록 고릅니다. 팔레트 대신 색 하나를 주면 IDS 가 11단계를 만듭니다.
+- **계열 여덟 개.** neutral, primary, secondary, tertiary, success, warning, danger, info 가 같은 역할 일곱 개를 가지고, neutral 은 네 개를 더 가집니다.
 - **CSS 변수로 칠합니다.** 테마는 감싸는 요소의 inline 변수가 되고, `@gsainfoteam/ids-css` 가 `data-mode` 에 따라 연결합니다. 서버 HTML 에 들어가므로 깜빡이지 않습니다.
 - **제어와 비제어.** `mode` 를 넘기면 부모가 값을 가지고, `defaultMode` 를 넘기면 Provider 가 가집니다.
 - **시스템 모드.** `mode="system"` 은 운영체제의 다크 모드 설정을 따르고, 설정을 바꾸면 새로고침 없이 바로 바뀝니다.
@@ -78,49 +78,72 @@ import { theme } from './ids-theme';
 
 ### 계열과 역할
 
+역할 이름은 `{bg|text|border}-{계열}[-{세기}]`, `text-on-{계열}[-{세기}]` 입니다. 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 입니다.
+
 | 역할 | 쓰임 |
 | --- | --- |
-| `bg-X`, `bg-X-hover`, `bg-X-active` | 채움과 그 hover, press |
-| `bg-X-soft`, `bg-X-soft-hover`, `bg-X-soft-active` | 옅은 채움과 그 hover, press |
+| `bg-X-subtler` | 띠. subtle 보다 옅은 면 |
+| `bg-X-subtle` | 옅은 채움 |
+| `bg-X` | 채움 |
+| `text-on-X-subtle` | 옅은 채움 위 글자 |
 | `text-on-X` | 채움 위 글자 |
-| `text-on-X-soft` | 옅은 채움 위 글자 |
-| `text-X` | 채움 없는 바탕 위 글자와 아이콘 |
+| `text-X` | 채움 없는 바탕, subtler, subtle 위 글자와 아이콘 |
 | `border-X` | 선 |
 
+neutral 만 가지는 역할: `bg-neutral-subtlest`(페이지), `bg-neutral-bold` 와 `text-on-neutral-bold`(뒤집힌 채움: Tooltip, neutral solid Button), `text-neutral-bold`(본문 글자).
+
 ```tsx
-<button className="bg-primary text-on-primary hover:bg-primary-hover">저장</button>
-<span className="bg-danger-soft text-on-danger-soft">실패</span>
+<button className="bg-primary text-on-primary state-layer hover:state-hover active:state-press">저장</button>
+<span className="bg-danger-subtle text-on-danger-subtle">실패</span>
 <a className="text-secondary">자세히 보기</a>
 ```
 
-- `X` 는 neutral, primary, secondary, tertiary, success, warning, danger, info 중 하나입니다. 바탕 층은 `bg-surface` 와 `text-on-surface` 입니다.
-- 이름은 [`packages/core/color-roles.json`](../../../../../core/color-roles.json) 한 표에서 나옵니다.
-- 바뀐 이름: `secondary` → `primary-soft`, `accent` → `text-primary`, `outline` → `border-primary`, `muted` → `neutral-soft`, `on-muted` → `text-neutral`, `border` → `border-neutral`, `handle` → `bg-neutral`, `X-strong` → `text-X`.
+- `X` 는 neutral, primary, secondary, tertiary, success, warning, danger, info 중 하나입니다.
+- hover, active 역할은 없습니다. 컴포넌트가 `state-layer` 로 글자색을 6%(`state-hover`), 10%(`state-press`) 덮습니다. 비율은 `packages/core/tokens/state.json` 에 있습니다.
+- 이름은 [`packages/core/color-roles.json`](../../../../../core/color-roles.json) 한 표(`slots`, `neutralOnly`)에서 나옵니다.
+- 바뀐 이름:
+
+| 예전 | 지금 |
+| --- | --- |
+| `surface` / `on-surface` | `bg-neutral-subtlest` / `text-neutral-bold` |
+| `bg-X-soft` / `text-on-X-soft` | `bg-X-subtle` / `text-on-X-subtle` |
+| `bg-X-hover`, `-active`, `bg-X-soft-hover`, `-soft-active` | 없음. state layer |
+| `secondary` | `bg-primary-subtle` |
+| `accent` | `text-primary` |
+| `outline` | `border-primary` |
+| `muted` / `on-muted` | `bg-neutral-subtle` / `text-neutral` |
+| `border` | `border-neutral` |
+| `handle` | `bg-neutral` |
+| `X-strong` | `text-X` |
 
 ### 팔레트에서 역할 색 고르기
 
-브랜드와 상태 계열은 같은 규칙입니다.
+브랜드와 상태 계열은 같은 규칙입니다(`theme-roles.ts` 의 `ROLE_RULES`).
 
 | 역할 | light | dark |
 | --- | --- | --- |
-| `bg-X` | 600. 흰 글자도 neutral 950 글자도 Lc 75 에 못 미치면 500·700, 그다음 400·800 중 가장 읽히는 단계 | 같음 |
-| `bg-X-hover`, `-active` | 600 을 글자에서 먼 쪽(흰 글자면 검정, 검은 글자면 흰색)으로 10%, 20% 섞는다 | 같음 |
-| `bg-X-soft` | 100 | 950 |
-| `bg-X-soft-hover`, `-active` | soft 에 `bg-X` 를 6%, 12% 섞는다 | 같음 |
-| `text-on-X` | 흰색과 neutral 950 중 채움 위 Lc 가 높은 쪽 | 같음 |
-| `text-on-X-soft` | 700, 800, 900, 950 중 처음 통과하는 단계 | 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
+| `bg-X` | 600. 흰 글자도 neutral 950 글자도 쉴 때와 hover, press 층 아래에서 Lc 75 에 못 미치면 500·700, 그다음 400·800 중 가장 읽히는 단계 | 같음 |
+| `bg-X-subtler` | 50 | 950 을 페이지(`bg-neutral-subtlest`) 쪽으로 절반(OKLab) 섞은 색 |
+| `bg-X-subtle` | 100 | 950 |
+| `text-on-X` | 흰색과 neutral 950 중 채움과 그 hover, press 층 위의 가장 낮은 Lc 가 높은 쪽 | 같음 |
+| `text-on-X-subtle` | 700, 800, 900, 950 중 처음 통과하는 단계 | 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
 | `text-X` | 600, 700, 800, 900, 950 중 처음 통과하는 단계 | 500, 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
 | `border-X` | `text-X` 와 같은 단계 | 같음 |
 
 - 대비는 [APCA](https://git.apcacontrast.com/) 의 Lc 입니다. WCAG 2 의 대비비는 쓰지 않습니다.
   - WCAG 2 는 중간 밝기 채움 위의 검은 글자를 실제보다 잘 읽힌다고 봅니다. 그래서 보라색 채움 위에 검은 글자를 골랐습니다. APCA 는 글자 쪽(어두운 글자, 밝은 글자)에 따라 다르게 재서 이런 짝을 걸러 냅니다.
-  - 채움과 soft 위 글자는 Lc 75(본문 글자의 기준), 페이지 위 색 글자(`text-X`)는 Lc 60(라벨, 링크, 에러 문구 같은 짧은 글자의 기준), 선과 아이콘 같은 표시의 하한은 Lc 45 입니다.
+  - 채움과 subtle 위 글자는 Lc 75(본문 글자의 기준), 페이지 위 색 글자(`text-X`)는 Lc 60(라벨, 링크, 에러 문구 같은 짧은 글자의 기준), 선과 아이콘 같은 표시의 하한은 Lc 45 입니다.
   - 계산은 `colorjs.io` 의 `contrastAPCA` 입니다(MIT).
-- `text-on-X-soft` 는 soft 와 그 hover, press 에서 모두 Lc 75 를 넘어야 합니다.
-- `text-X` 는 `surface` 와 `bg-X-soft` 에서 모두 Lc 60 을 넘어야 합니다. 그래서 라이트는 채움과 같거나 한 단계 진하고, 다크도 200 까지 옅어지지 않습니다.
+- 모든 글자는 쉴 때의 배경과, 그 배경에 글자색을 hover(6%), press(10%)로 덮은 색 위에서 함께 잽니다.
+  - `withStateLayer(base, layer, opacity)`: 배경에 층 색을 sRGB 로 섞은 색. CSS `state-layer` 와 같은 계산입니다.
+  - `underStateLayers(base, content)`: 쉴 때, hover, press 세 배경.
+  - `firstReadableOn`: 후보 단계 중 세 배경 모두에서 기준을 넘는 첫 단계.
+  - `lowestContrastUnderStateLayers`: 채움 위 글자를 고를 때 세 배경 중 가장 낮은 Lc.
+- `text-on-X-subtle` 은 subtle 과 그 hover, press 에서 Lc 75 를 넘어야 합니다.
+- `text-X` 는 페이지, `bg-X-subtler`, `bg-X-subtle` 과 그 hover, press 에서 모두 Lc 60 을 넘어야 합니다. 그래서 라이트는 채움과 같거나 한 단계 진하고, 다크도 200 까지 옅어지지 않습니다.
 - `border-X` 는 따로 고르지 않고 `text-X` 와 같은 단계를 씁니다. 선과 그 옆 글자가 한 색이라, invalid 필드의 테두리(`border-danger`)와 라벨, 에러 문구(`text-danger`)가 같은 색입니다. `text-X` 가 Lc 60 을 넘으므로 선의 하한 Lc 45 도 넘습니다.
-- `border-neutral` 은 구조선이라 대비 규칙이 없습니다(neutral 200 / 800).
-- 결과는 Material 3 의 톤과 비슷합니다. soft 위 글자는 거의 950(M3 의 on-container, 톤 10), 다크 모드의 soft 위 글자는 200 언저리(톤 80)입니다.
+- neutral 역할은 고르지 않고 `packages/core/tokens/semantic/neutral.{light,dark}.json` 의 단계를 씁니다. `border-neutral` 은 구조선이라 대비 규칙이 없습니다(neutral 200 / 800).
+- 결과는 Material 3 의 톤과 비슷합니다. subtle 위 글자는 거의 950(M3 의 on-container, 톤 10), 다크 모드의 subtle 위 글자는 200 언저리(톤 80)입니다.
 
 ### secondary 와 tertiary
 
@@ -292,7 +315,7 @@ const { mode, resolvedMode } = useTheme();
 
 - `IdsProvider.Scope` 의 `theme` 은 모든 키가 선택입니다. 준 키만 그 아래에서 바뀝니다.
 - `mode` 를 주지 않은 Scope 에서 부르는 `setMode` 는 mode 를 가진 바깥 Provider 로 갑니다.
-- 바깥과 모드가 다른 영역은 `--ids-color-surface` 배경과 `--ids-color-on-surface` 글자색을 칠합니다. 그렇지 않으면 다크 글자색이 라이트 배경 위에 그려집니다.
+- 바깥과 모드가 다른 영역은 `--ids-color-bg-neutral-subtlest` 배경과 `--ids-color-text-neutral-bold` 글자색을 칠합니다. 그렇지 않으면 다크 글자색이 라이트 배경 위에 그려집니다.
 - `dark:` 변형도 가장 가까운 `data-mode` 를 따릅니다. 다크 안의 라이트 영역은 `dark:` 에 걸리지 않습니다.
 - `IdsProvider` 를 다른 `IdsProvider` 안에 두어도 됩니다. 그때도 `theme` 은 전부 줘야 하고, 대화상자와 토스트는 가장 바깥 Provider 가 그립니다.
 
@@ -346,7 +369,7 @@ function ThemeMenu() {
 | `className` / `style` / `ref` / 그 외 | 감싸는 요소(또는 자식)로 간다                                                                        |
 
 - 요소에는 `data-mode`(항상 `light` / `dark`), `style.colorScheme`, 준 테마의 변수, `scale` 을 준 경우 `--ids-scale` 변수와 `data-scale` 이 붙습니다.
-  - 역할 색: `--ids-theme-light-bg-primary`, `--ids-theme-dark-text-on-danger-soft` … (두 모드 다). 최상위 Provider 는 primary 와 상태, 준 secondary·tertiary, `'tinted'` 일 때 neutral 과 바탕 층을 씁니다
+  - 역할 색: `--ids-theme-light-bg-primary`, `--ids-theme-dark-text-on-danger-subtle` … (두 모드 다). 최상위 Provider 는 neutral 을 뺀 모든 계열(만든 secondary·tertiary 포함)과, `'tinted'` 일 때 neutral 을 씁니다. `'pure'` neutral 은 `ids.css` 의 값입니다
   - 색 키를 준 Scope 는 바깥 테마와 합친 모든 계열을 다시 씁니다
   - radius: `--ids-theme-radius-standard`, `-indicator`, `-container`. `ids.css` 가 배율을 곱해 `--ids-radius-*` 로 씁니다
   - corner shape: `--ids-corner-shape`, `--ids-theme-corner-radius-scale`
@@ -360,8 +383,8 @@ function ThemeMenu() {
   - 같은 radius 의 squircle 은 round 보다 모서리가 얕아 각져 보입니다. 그래서 squircle 테마는 모든 radius 를 1.84배로 키워, 45° 지점의 모서리 깊이를 round 와 맞춥니다.
   - `corner-shape` 를 지원하지 않는 브라우저는 둥근 모서리와 원래 radius 로 그립니다.
   - `rounded-full` 은 squircle 테마에서도 원입니다.
-  - `::before` `::after` 는 자기 요소의 모양을 따릅니다. `before:rounded-[inherit]` 로 위에 칠한 hover 색이 squircle 모서리를 그대로 덮습니다.
-- 최상위 Provider 는 배경을 칠하지 않습니다. 페이지 배경은 앱이 `bg-surface` 로 칠합니다.
+  - `::before` `::after` 는 자기 요소의 모양을 따릅니다. `before:rounded-[inherit]` 로 위에 칠한 겹침층이 squircle 모서리를 그대로 덮습니다.
+- 최상위 Provider 는 배경을 칠하지 않습니다. 페이지 배경은 앱이 `bg-neutral-subtlest` 로 칠합니다.
 - 최상위 Provider 는 `overlay.open` 으로 연 대화상자와 기본 `Toaster` 를 자기 요소 안(`asChild` 면 그 옆)에 그립니다. 최상위 Provider 가 여럿이면 먼저 마운트된 하나가 그립니다. 앱이 `<Toaster />` 를 직접 두면 기본 Toaster 는 물러납니다. `useOverlay()` 로 연 항목은 연 곳의 테마 변수를 받습니다.
 - 서버 HTML 에는 테마 변수 말고 아무것도 더하지 않습니다. 브라우저에서는 토스트를 읽어 줄 빈 `aria-live` 영역 하나가 붙습니다. 역할(role)이 없어 스크린 리더에게 드러나지 않습니다.
 - 최상위 Provider 는 Tooltip 의 지연 그룹(`TooltipDelayGroup`)도 둡니다. 툴팁 하나가 열린 뒤 곧바로 다른 툴팁에 올라가면 기다리지 않고 열립니다.

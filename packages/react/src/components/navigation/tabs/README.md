@@ -87,8 +87,8 @@ const [section, setSection] = useState<Section>('docs');
 ```
 
 - `variant` 는 `pill` 에서만 받습니다(`ghost` `outline` `soft` `solid` `glossy`). 다른 모양에 주면 타입 오류입니다.
-- 고르지 않은 탭은 흐린 글자(`text-neutral`), 고른 탭은 본문 글자(`on-surface`)입니다. `pill` 의 `soft` 는 `secondary`, `solid` 와 `glossy` 는 `primary` 로 채웁니다.
-- `enclosed` 의 고른 탭은 `surface` 로 칠해 목록 선을 덮습니다. `surface` 가 아닌 배경 위에서는 탭 색을 `className` 으로 맞춥니다.
+- 고르지 않은 탭은 흐린 글자(`text-neutral`), 고른 탭은 본문 글자(`text-neutral-bold`)입니다. `pill` 의 고르지 않은 탭은 올리고 누르면 글자색 층(`state-hover`, `state-press`)을 얹고, `ghost` 의 고른 탭은 `state-press` 층입니다. `pill` 의 `soft` 는 `secondary`, `solid` 와 `glossy` 는 `primary` 로 채웁니다.
+- `enclosed` 의 고른 탭은 `bg-neutral-subtlest` 로 칠해 목록 선을 덮습니다. `bg-neutral-subtlest` 가 아닌 배경 위에서는 탭 색을 `className` 으로 맞춥니다.
 - `<Tabs.List stretch>` 는 가로 탭이 목록 폭을 똑같이 나눠 채웁니다. 카드 폭에 맞춘 두세 칸짜리 탭에 씁니다.
 
 ```tsx

@@ -95,8 +95,9 @@ import { Chip } from '@gsainfoteam/ids-react';
 <Chip disabled />             // 누를 수도, 지울 수도 없다
 ```
 
-- `primary` 의 `soft` 는 `bg-primary-soft` 배경에 `text-on-primary-soft` 글자, `outline` 은 `text-primary` 글자입니다. 밝은 테마 색에서도 soft 는 APCA Lc 75, outline 은 Lc 60 을 지킵니다.
-- 상태 색의 `soft` 와 `outline` 글자는 `*-strong` 입니다.
+- `primary` 의 `soft` 는 `bg-primary-subtle` 배경에 `text-on-primary-subtle` 글자, `outline` 은 `text-primary` 글자입니다. 밝은 테마 색에서도 soft 는 APCA Lc 75, outline 은 Lc 60 을 지킵니다.
+- 상태 색도 같아서 `soft` 는 `bg-X-subtle` 에 `text-on-X-subtle`, `outline` 은 `text-X` 글자입니다.
+- 누를 수 있는 칩은 올리고 누르면 글자색 층(`state-hover`, `state-press`)을 얹습니다.
 
 ## 상태와 data 속성
 

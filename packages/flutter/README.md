@@ -130,15 +130,17 @@ IdsProviderScope(
 final colors = IdsProvider.of(context).colors;
 
 Container(
-  color: colors.bgPrimarySoft,
-  child: Text('저장됨', style: TextStyle(color: colors.textOnPrimarySoft)),
+  color: colors.bgPrimarySubtle,
+  child: Text('저장됨', style: TextStyle(color: colors.textOnPrimarySubtle)),
 );
 ```
 
-- 계열 8개(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`) × 역할 10개에 바탕 층 `surface`, `onSurface` 다.
-- 역할: `bgX`, `bgXHover`, `bgXActive`, `bgXSoft`, `bgXSoftHover`, `bgXSoftActive`, `textOnX`, `textOnXSoft`, `textX`, `borderX`.
-- 이름은 CSS 의 `--ids-color-bg-primary-soft` 를 camelCase 로 바꾼 것이다. `colors['bg-primary-soft']` 로도 읽는다.
-- 채움(`bgX`)에는 `textOnX`, soft 면(`bgXSoft`)에는 `textOnXSoft`, 채움 없는 글자와 아이콘에는 `textX` 를 쓴다.
+- 계열 8개(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`)가 같은 역할을 가진다. 이름은 `{bg|text|border}-{계열}[-{세기}]` 문법이고, 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 다.
+- 역할: `bgXSubtler`, `bgXSubtle`, `bgX`, `textOnXSubtle`, `textOnX`, `textX`, `borderX`.
+- neutral 만 가진 역할: 페이지 바탕 `bgNeutralSubtlest`, 본문 글자 `textNeutralBold`, 중립 채움 `bgNeutralBold` 와 그 위 글자 `textOnNeutralBold`.
+- 이름은 CSS 의 `--ids-color-bg-primary-subtle` 을 camelCase 로 바꾼 것이다. `colors['bg-primary-subtle']` 로도 읽는다.
+- 채움(`bgX`)에는 `textOnX`, 옅은 면(`bgXSubtle`)에는 `textOnXSubtle`, 채움 없는 글자와 아이콘에는 `textX` 를 쓴다.
+- hover 와 press 역할은 없다. 글자색을 `IdsStateOpacity.hover`(6%), `IdsStateOpacity.press`(10%) 만큼 바탕 위에 얹는다. IdsProvider 는 그 층 아래에서도 글자 대비를 확인한다.
 - 구조선(필드 테두리, 구분선)은 `borderNeutral`, 보조 글자는 `textNeutral` 이다.
 
 ## radius 와 글자
@@ -148,12 +150,12 @@ final ids = IdsProvider.of(context);
 
 DecoratedBox(
   decoration: ShapeDecoration(
-    color: ids.colors.surface,
+    color: ids.colors.bgNeutralSubtlest,
     shape: ids.shape(radius: ids.radius.container),
   ),
   child: Text(
     '제목',
-    style: ids.textStyle(IdsTypography.bodyB3Medium, color: ids.colors.onSurface),
+    style: ids.textStyle(IdsTypography.bodyB3Medium, color: ids.colors.textNeutralBold),
   ),
 );
 ```
@@ -211,7 +213,7 @@ return IdsProvider(
 - `IdsThemeData` 와 `palette:` 는 `IdsTheme` 하나로 합쳤다. `IdsProvider(theme: IdsTheme(primary: ...))` 로 쓴다.
 - `setColor`, `defaultPalette`, `onPaletteChange` 는 없다. 색을 바꾸려면 앱이 새 `IdsTheme` 을 넘기거나 `IdsProviderScope` 로 덮는다.
 - 안쪽 `IdsProvider(theme: ...)` 는 `IdsProviderScope(theme: IdsThemeOverrides(...))` 로 바꾼다.
-- `theme.primary`, `onPrimary`, `secondary`, `onSecondary`, `accent`, `outline`, `muted` 같은 이전 역할은 `colors` 의 역할로 바꾼다. 예: `secondary` → `bgPrimarySoft`, `outline` → `borderNeutral`, `muted` → `bgNeutralSoft`.
+- `theme.primary`, `onPrimary`, `secondary`, `onSecondary`, `accent`, `outline`, `muted` 같은 이전 역할은 `colors` 의 역할로 바꾼다. 예: `secondary` → `bgPrimarySubtle`, `outline` → `borderNeutral`, `muted` → `bgNeutralSubtle`.
 - `fontFamily`, `monoFontFamily` 는 없다. 글꼴은 고정이다.
 - `IdsTypography.buttonStandard`, `buttonTiny` 는 `bodyB3Medium`, `captionC1Medium` 이다.
 
@@ -230,7 +232,7 @@ flutter test
 ```
 
 - Widgetbook 은 `packages/flutter/example` 에서 `flutter run` 으로 연다.
-- `Runtime theme and slang`: primary, neutral, status, radius, 모서리, 모드, 번역, 글자 배율을 바꾸며 계열마다 fill, soft, text, border 역할을 본다.
+- `Runtime theme and slang`: primary, neutral, status, radius, 모서리, 모드, 번역, 글자 배율을 바꾸며 계열마다 fill, subtle, text, border 역할을 본다.
 - `Nested scopes`: 부모, 모드를 물려받는 scope, 색과 모드를 따로 가진 scope 의 범위를 비교한다.
 - `Service integration`: 실제 slang `TranslationProvider` 아래에서 테마와 언어를 바꿔도 자식 상태가 남는지 본다.
 - slang 이 만든 Dart 파일은 커밋하지 않는다. CI 가 위 순서로 만든다.
