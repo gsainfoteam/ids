@@ -245,6 +245,62 @@ test('variants: hover shows the bar only while the pointer is over, auto on over
   expect(q('[data-scroll-area-thumb]', barOf('always-short')).hidden).toBe(true);
 });
 
+test('variant none: no bar or corner on hover or while scrolling, and the viewport still scrolls and fades', async () => {
+  const screen = await render(
+    <div className="flex flex-col gap-4">
+      <ScrollArea
+        variant="none"
+        orientation="horizontal"
+        fade="x"
+        className="w-48"
+        data-testid="toolbar"
+      >
+        <div className="h-10 w-[600px]" />
+      </ScrollArea>
+      <ScrollArea variant="none" orientation="both" className="size-32" data-testid="both">
+        <div className="size-[400px]" />
+      </ScrollArea>
+    </div>,
+  );
+  const toolbar = screen.getByTestId('toolbar');
+  const both = screen.getByTestId('both');
+  const view = q('[data-scroll-area-viewport]', toolbar.element());
+  const toolbarBar = q('[data-scroll-area-scrollbar]', toolbar.element());
+  const bothBars = () => [...both.element().querySelectorAll('[data-scroll-area-scrollbar]')];
+  const corner = () => q('[data-scroll-area-corner]', both.element());
+
+  await expect.element(toolbar).toHaveAttribute('data-variant', 'none');
+  await expect.element(toolbar).toHaveAttribute('data-overflow-x');
+  await expect.element(view).toHaveAttribute('data-overflow-x-end');
+  expect(toolbarBar.hasAttribute('data-visible')).toBe(false);
+  expect(getComputedStyle(toolbarBar).opacity).toBe('0');
+  expect(getComputedStyle(toolbarBar).pointerEvents).toBe('none');
+  await expect.poll(() => fadeLengths(view)).toEqual([0, 24]);
+
+  await userEvent.hover(toolbar);
+  await expect.element(toolbar).toHaveAttribute('data-hovering');
+  expect(toolbarBar.hasAttribute('data-visible')).toBe(false);
+
+  await userEvent.wheel(view, { delta: { x: 120 } });
+  await expect.poll(() => view.scrollLeft).toBeGreaterThan(0);
+  await expect.element(toolbar).toHaveAttribute('data-scrolling');
+  expect(toolbarBar.hasAttribute('data-visible')).toBe(false);
+  await expect.element(view).toHaveAttribute('data-overflow-x-start');
+  await expect.poll(() => fadeLengths(view)).toEqual([24, 24]);
+
+  view.scrollLeft = view.scrollWidth;
+  await expect.element(view).not.toHaveAttribute('data-overflow-x-end');
+  await expect.poll(() => fadeLengths(view)).toEqual([24, 0]);
+
+  await userEvent.hover(both);
+  await expect.element(both).toHaveAttribute('data-overflow-x');
+  await expect.element(both).toHaveAttribute('data-overflow-y');
+  await expect.element(both).toHaveAttribute('data-hovering');
+  expect(bothBars()).toHaveLength(2);
+  for (const bar of bothBars()) expect(bar.hasAttribute('data-visible')).toBe(false);
+  expect(corner().hidden).toBe(true);
+});
+
 test('dragging the thumb scrolls by the content-to-track ratio and holds the pointer', async (context) => {
   skipWithoutCdp(context);
   const screen = await render(

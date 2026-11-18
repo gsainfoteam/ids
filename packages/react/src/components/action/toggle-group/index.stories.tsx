@@ -179,6 +179,38 @@ export const Gallery: Story = {
   ),
 };
 
+export const SpacedWrap: Story = {
+  render: (args) => (
+    <ToggleGroup
+      aria-label="시작 시간"
+      attached={false}
+      variant="outline"
+      defaultValue="10:00"
+      onValueChange={args.onValueChange}
+      className="max-w-60 flex-wrap"
+    >
+      <Toggle value="09:00">09:00</Toggle>
+      <Toggle value="10:00">10:00</Toggle>
+      <Toggle value="11:00">11:00</Toggle>
+      <Toggle value="13:00">13:00</Toggle>
+    </ToggleGroup>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '띄운 그룹은 줄이 넘어가도 토글이 제 너비를 지킵니다. 붙인 그룹만 넓히면 토글이 폭을 나눠 가집니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const first = canvas.getByRole('radio', { name: '09:00' }).getBoundingClientRect();
+    const last = canvas.getByRole('radio', { name: '13:00' }).getBoundingClientRect();
+    await expect(last.top).toBeGreaterThan(first.top);
+    await expect(last.width).toBeLessThan(first.width * 1.5);
+  },
+};
+
 export const RadioKeyboard: Story = {
   render: (args) => (
     <ToggleGroup

@@ -38,7 +38,8 @@ export function ScrollAreaScrollbar({
   const { area, variant, size } = c;
   const overflowing = area.overflow[axis];
   const active = area.hovering || area.scrolling || area.dragging !== null;
-  const visible = variant === 'always' || (overflowing && (variant === 'auto' || active));
+  const visible =
+    variant !== 'none' && (variant === 'always' || (overflowing && (variant === 'auto' || active)));
   const styles = scrollAreaStyle({ variant, size, axis, placement });
 
   return (

@@ -95,8 +95,8 @@ import { IconToggle, ToggleGroup } from '@gsainfoteam/ids-react';
 ```tsx
 <ToggleGroup aria-label="정렬" variant="outline" size="tiny">  {/* 안의 토글이 따른다 */}
 <ToggleGroup aria-label="보기" orientation="vertical">         {/* 세로. 화살표도 위아래 */}
-<ToggleGroup aria-label="정렬" className="w-full">              {/* 넓히면 토글이 폭을 나눠 가진다 */}
-<ToggleGroup aria-label="태그" attached={false}>               {/* 붙이지 않고 간격만 둔다 */}
+<ToggleGroup aria-label="정렬" className="w-full">              {/* 넓히면 붙인 토글이 폭을 나눠 가진다 */}
+<ToggleGroup aria-label="시간" attached={false} className="flex-wrap">  {/* 띄운 토글은 제 너비로 줄을 넘긴다 */}
 ```
 
 ## 속성

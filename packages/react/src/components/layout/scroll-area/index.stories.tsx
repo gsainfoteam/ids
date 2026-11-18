@@ -14,7 +14,7 @@ const meta = {
   component: ScrollArea,
   tags: ['autodocs'],
   argTypes: {
-    variant: { control: 'radio', options: ['hover', 'auto', 'always'] },
+    variant: { control: 'radio', options: ['hover', 'auto', 'always', 'none'] },
     size: { control: 'radio', options: ['standard', 'tiny'] },
     orientation: { control: 'radio', options: ['vertical', 'horizontal', 'both'] },
     fade: { control: 'radio', options: [false, true, 'y', 'x'] },
@@ -25,7 +25,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const variants = ['hover', 'auto', 'always'] as const;
+const variants = ['hover', 'auto', 'always', 'none'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const frame = cn('h-40 w-56 rounded-standard border border-neutral text-body-b3-regular');
@@ -115,7 +115,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Variant × Size"
-        description="hover 는 포인터를 올리거나 스크롤할 때, auto 는 넘칠 때, always 는 늘 트랙과 함께 보입니다."
+        description="hover 는 포인터를 올리거나 스크롤할 때, auto 는 넘칠 때, always 는 늘 트랙과 함께 보입니다. none 은 막대를 그리지 않습니다."
       >
         <Showcase.Matrix
           rows={sizes}
@@ -231,6 +231,13 @@ export const Gallery: Story = {
           <ScrollArea fade size="tiny" variant="always" className={frame}>
             <ScrollArea.Viewport ref={startClearOfBothEdges}>
               <Text />
+            </ScrollArea.Viewport>
+          </ScrollArea>
+        </Showcase.Row>
+        <Showcase.Row label="none">
+          <ScrollArea fade="x" variant="none" orientation="horizontal" className="w-72">
+            <ScrollArea.Viewport ref={startClearOfBothEdges}>
+              <Wide />
             </ScrollArea.Viewport>
           </ScrollArea>
         </Showcase.Row>
