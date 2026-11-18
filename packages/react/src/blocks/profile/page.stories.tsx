@@ -126,7 +126,7 @@ export const PC: Story = {
               ))}
             </dl>
           </Card.Content>
-          <Card.Footer className="border-t">
+          <Card.Footer>
             <Button
               variant={following ? 'outline' : 'solid'}
               className="flex-1"

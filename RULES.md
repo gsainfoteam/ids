@@ -310,7 +310,7 @@ changes it.
   className lays out (flex, grid, gaps, padding, widths, alignment, `hidden md:flex`) and sets the
   IDS type scale on plain headings and paragraphs; it never sets a color, border, background,
   radius, shadow or `style`. A line is a `Divider`, a surface a `Card` or an `Item`, muted text a
-  component's `Description` part. The classes a part documents (`border-t` on `Card.Footer`) are
+  component's `Description` part. The classes a part documents (`border-b` on `Card.Header`) are
   fine.
 - A block picks `solid`, `outline` or `soft` and never `ghost`, except for the buttons inside a
   bar that already draws the surface (a toolbar `Card`), which stay `ghost`. A text link (in running text, or

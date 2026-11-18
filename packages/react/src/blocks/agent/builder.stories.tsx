@@ -228,7 +228,7 @@ export const PC: Story = {
               </Field>
             </Card.Content>
 
-            <Card.Footer className="justify-end border-t">
+            <Card.Footer className="justify-end">
               <Button variant="outline" onClick={() => toast('초안을 저장했어요')}>
                 초안 저장
               </Button>
@@ -266,7 +266,7 @@ export const PC: Story = {
                   ))}
                 </div>
               </Card.Content>
-              <Card.Footer className="border-t">
+              <Card.Footer>
                 <TextField
                   aria-label="미리 물어보기"
                   placeholder="미리 물어보기"

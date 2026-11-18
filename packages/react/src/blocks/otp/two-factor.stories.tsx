@@ -113,7 +113,7 @@ export const PC: Story = {
           </Tabs>
         </Card.Content>
 
-        <Card.Footer className="justify-center border-t">
+        <Card.Footer className="justify-center">
           휴대폰을 잃어버렸나요?
           <Link href="#account-recovery">도움 받기</Link>
         </Card.Footer>

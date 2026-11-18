@@ -159,7 +159,7 @@ export const PC: Story = {
                 </Progress>
                 <p className="text-body-b3-regular">오늘 38명이 동의했어요 · 20일 남음</p>
               </Card.Content>
-              <Card.Footer className="border-t">
+              <Card.Footer>
                 <Button
                   variant={signed ? 'soft' : 'solid'}
                   className="flex-1"

@@ -238,7 +238,7 @@ export const PC: Story = {
                     )}
                   </Card.Header>
                   <Card.Content>{post.excerpt}</Card.Content>
-                  <Card.Footer className="border-t">
+                  <Card.Footer>
                     <Avatar name={post.author} size="tiny" />
                     {post.author}
                     <Spacer />

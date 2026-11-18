@@ -224,7 +224,7 @@ export const PC: Story = {
                     )}
                   </RadioGroup>
                 </Card.Content>
-                <Card.Footer className="flex-col items-stretch gap-3 border-t">
+                <Card.Footer className="flex-col items-stretch gap-3">
                   <Label>
                     <Switch name="searchable" defaultChecked />
                     이름으로 나를 찾을 수 있게 하기
