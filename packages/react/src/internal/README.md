@@ -174,11 +174,19 @@ export const iconToggleStyle = tv({
 | `--control-glyph-on` | 켜진 transparent IconToggle 의 아이콘. 계열의 `text-X`, neutral 은 `text-neutral-bold`   |
 
 - hover 와 press 색 변수는 없습니다. solid, soft, outline, ghost 는 모두 `pressStates`(`state-layer data-hovered:state-hover data-active:state-press`)를 씁니다.
-  - state layer 는 글자색(`currentColor`)을 배경 위에 hover 6%, press 10% 로 덮습니다(`--ids-state-hover`, `--ids-state-press`).
-  - 어두운 글자 아래에서는 어두워지고 밝은 글자 아래에서는 밝아지므로, 채움, soft 면, 페이지 어디서나 같은 규칙입니다.
-  - IdsProvider 가 이 두 층 아래에서도 글자 대비를 지키는 단계를 고릅니다(`theme-roles.ts` 의 `underStateLayers`). `tests/tokens-contrast.test.ts` 가 확인합니다.
+  - solid 는 `state-fill` 을 더합니다. 층이 검정 hover 10%, press 18% 라 채움이 같은 색의 진한 쪽으로 갑니다.
+  - soft 는 `drawsSoftLayer`, outline 과 ghost 는 `drawsQuietLayer` 로 scheme 이 정한 층을 그립니다. scheme 마다 `--control-soft-layer`, `--control-quiet-layer` 와 그 `-hover`, `-press` 를 둡니다.
+
+    | scheme | soft 층 | outline, ghost 층 |
+    | --- | --- | --- |
+    | primary, secondary, tertiary | 계열 채움 8% / 12% | 글자색 6% / 10% |
+    | neutral | 글자색 6% / 10% | 글자색 6% / 10% |
+    | danger, success, warning, info | 계열 채움 8% / 12% | 계열 채움 8% / 12% |
+
+  - 계열 채움 층은 빨간 버튼이 hover 때 거뭇해지지 않고 더 붉어지게 합니다. 글자색 층이었을 때는 진한 글자색이 섞여 탁해졌습니다.
+  - IdsProvider 가 이 층들 아래에서도 글자 대비를 지키는 단계를 고릅니다(`theme-roles.ts` 의 `underStateLayers`). `tests/tokens-contrast.test.ts` 가 확인합니다.
   - `base` 의 `transition-[…]` 에 `--ids-state-opacity` 가 있어 층이 다른 색과 함께 바뀝니다.
-- outline 은 `bg-neutral-subtlest` 에 `inset-ring-neutral`, 어두운 모드는 `dark:bg-neutral-subtler` 입니다.
+- outline 은 `bg-neutral-subtlest` 에 `inset-ring-neutral`, 어두운 모드는 `dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)`(800 면, 700 테두리)입니다. 900 띠 위에서도 띠보다 밝고 테두리가 보입니다.
 - soft 는 `bg-X-subtle` 위 `text-on-X-subtle` 짝입니다.
 - scheme 은 primary, secondary, tertiary, neutral, danger, success, warning, info 입니다. 테마가 secondary 나 tertiary 를 주지 않아도 IdsProvider 가 primary 에서 만든 값을 쓰므로 변수는 늘 정의됩니다.
 - `glossy` 는 state layer 를 쓰지 않습니다. `state-layer` 가 `background-image` 를 차지하는데 glossy 의 광택도 `background-image` 입니다. solid 의 채움(`--control-fill`) 위에 층을 얹습니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택(`background-image` 라 채움 색 위에 그려진다), 안쪽 위 1px 하이라이트(`inset-shadow`), 채움보다 20% 진한 가장자리(`inset-ring` 의 `color-mix`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다. focus 때는 `ringFollowsScheme` 이 가장자리를 `--control-ring` 으로 바꿉니다. outline 과 같은 방식입니다.
@@ -368,7 +376,7 @@ size: {
 
 ### 왜 이렇게
 
-- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 `inset-ring-neutral` 테두리와 `bg-neutral-subtlest` 배경(어두운 모드는 `dark:bg-neutral-subtler`), `soft` 는 `bg-neutral-subtle` 배경, `ghost` 는 배경과 테두리가 없습니다.
+- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 `inset-ring-neutral` 테두리와 `bg-neutral-subtlest` 배경(어두운 모드는 `dark:bg-neutral-subtle` 배경에 `bg-neutral` 테두리), `soft` 는 `bg-neutral-subtle` 배경, `ghost` 는 배경과 테두리가 없습니다.
 - 글자는 `text-neutral-bold` 입니다. 상자 안 버튼(`fieldAction`)은 `text-neutral` 에서 hover, press, 켜짐에 `text-neutral-bold` 로 바뀝니다.
 - focus 와 invalid 색은 여기서 정하지 않습니다. `focus-ring` 이 이 파일이 그린 `inset-ring` 테두리의 색을 바꾸므로 그 상태를 되풀이해 적지 않습니다.
 - `soft` 와 `ghost` 도 투명한 `inset-ring-1` 을 그립니다. `focus-ring` 은 inset ring 의 색만 바꾸므로, 폭이 있는 inset ring 이 있어야 focus 와 invalid 테두리가 보입니다.
@@ -1188,11 +1196,11 @@ export const toggleStyle = tv({
 - 꺼진 동안의 hover 와 press 는 모든 variant 가 state layer(`state-hover`, `state-press`)입니다. 켜진 동안에는 `data-hovered`, `data-active` 가 붙지 않으므로 층이 켜진 모양을 바꾸지 않습니다.
 - `transparent` 는 `glyphVariant` 에만 있습니다. 글자 Toggle 이 배경 없이 색만 바꾸면 켜짐을 색으로만 알리게 됩니다. IconToggle 은 `icon` 함수로 채운 아이콘을 바꿀 수 있습니다.
 - 꺼진 `transparent` 는 scheme 과 상관없이 `text-neutral-bold` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered), `transparent` 는 `useToggle` 이 켜진 동안에만 붙이는 `data-pressed-hovered`, `data-pressed-active` 로 불투명도를 내립니다. 다른 variant 는 이 속성을 읽지 않으므로 켜진 모양이 hover 와 press 에도 그대로입니다.
-- 켜진 `ghost`, `outline` 은 색 있는 배경을 칠하지 않고 press 층(10%)만 남깁니다. 층은 글자색이라 상태 scheme 에서는 `text-X` 쪽으로 물들고, `text-X` 는 그 층 아래에서도 Lc 60 을 지킵니다(IdsProvider 가 확인).
+- 켜진 `ghost`, `outline` 은 색 있는 배경을 칠하지 않고 press 층만 남깁니다. 층은 control-surface 의 quiet 층이라 상태 scheme 에서는 계열 채움 12%, 나머지는 글자색 10% 이고, `text-X` 는 그 층 아래에서도 Lc 60 을 지킵니다(IdsProvider 가 확인). 켜진 soft 는 soft 층, 켜진 solid 는 `state-fill` 입니다.
 - 켜진 `glossy` 는 control-surface 의 `glossy` 층을 `data-pressed:` 로 하나씩 풀어 적습니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 접두사를 붙여 조합할 수 없습니다.
 - 크기는 따로 두지 않습니다. 라벨이 있는 Toggle 은 Button 과 같은 padding 을 갖고, IconToggle 은 icon-square 로 정사각형이 됩니다.
 - hovered, active, pressed 를 각각 적습니다. `interactiveDataProps` 가 셋 중 하나만 붙이므로(pressed > active > hovered), 켜진 toggle 에 마우스를 올려도 켜진 모양이 유지됩니다.
-- 켜진 ghost, outline 과 누르는 동안(`data-active`)은 `state-press`(10%)이고, hover(`state-hover`, 6%)보다 진합니다. 그래서 켜진 toggle 이 hover 한 꺼진 toggle 과 구별됩니다.
+- 켜진 ghost, outline 과 누르는 동안(`data-active`)은 `state-press` 이고, hover(`state-hover`)보다 진합니다. 그래서 켜진 toggle 이 hover 한 꺼진 toggle 과 구별됩니다.
 
 ### 알아둘 것
 

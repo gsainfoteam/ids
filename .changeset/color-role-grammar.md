@@ -27,10 +27,18 @@ New roles:
   Button or Badge.
 
 Hover and press are no longer colors. The CSS package adds `state-layer`, `state-hover` and
-`state-press`: the content color laid over the background at `--ids-state-hover` (6%) and
-`--ids-state-press` (10%). Every IDS component draws its states this way, and IdsProvider picks
-text that keeps its contrast under the layer, so a few solid fills (danger, tertiary) move one
-step darker. Flutter exposes the same opacities as `IdsStateOpacity`.
+`state-press`, which lay a color over the background. Its color depends on the surface, so a
+colored control deepens in its own hue instead of turning gray:
 
-Outline controls and fields in dark mode fill with `bg-neutral-subtler` instead of a 30% neutral
-tint.
+- a fill (solid Button, Chip, Badge, a selected Calendar day) takes `state-fill`, black at 10% on
+  hover and 18% on press;
+- a colored soft surface and a status outline or ghost take the family fill at 8% and 12%
+  (`--ids-state-tint-hover`, `--ids-state-tint-press`);
+- everything else takes its text color at 6% and 10% (`--ids-state-hover`, `--ids-state-press`).
+
+Every IDS component draws its states this way, and IdsProvider picks text that keeps its contrast
+under the layer it sits on. Flutter exposes the same values as `IdsStateOpacity` and
+`IdsStateLayer.fillColor`.
+
+Outline controls and fields in dark mode fill with `bg-neutral-subtle` with a `bg-neutral` border
+instead of a 30% neutral tint, so they stay lighter than a band.

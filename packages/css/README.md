@@ -161,8 +161,15 @@ hover 와 press 를 배경 위에 얹는 층으로 그린다. 색 역할이 아�
 ```
 
 - `state-layer` 는 `--ids-state-color`(기본 `currentColor`, 요소의 글자색)를 `--ids-state-opacity` 만큼 `background-image` 로 칠한다. 쉴 때 불투명도는 0% 다.
-- `state-hover` 는 불투명도를 `--ids-state-hover`(6%), `state-press` 는 `--ids-state-press`(10%)로 둔다.
-- 층이 글자색이라 페이지, 띠, 카드, 색 칩 어느 바탕에서나 보인다. IdsProvider 는 press 층 아래에서도 글자 대비를 확인한다.
+- `state-hover` 는 불투명도를 `--ids-state-layer-hover`, `state-press` 는 `--ids-state-layer-press` 로 둔다. 둘이 없으면 `--ids-state-hover`(6%), `--ids-state-press`(10%)다.
+- `state-fill` 은 채움 위의 층이다. 색을 검정(`--ids-state-fill-color`)으로, 불투명도를 `--ids-state-fill-hover`(10%), `--ids-state-fill-press`(18%)로 둔다. 채움이 회색 쪽이 아니라 같은 색의 진한 쪽으로 간다.
+
+  ```html
+  <button class="bg-danger text-on-danger state-layer state-fill data-hovered:state-hover data-active:state-press">삭제</button>
+  ```
+
+- 색 있는 soft 면과 상태 색의 outline, ghost 는 층 색을 계열 채움(`bg-X`)으로, 불투명도를 `--ids-state-tint-hover`(8%), `--ids-state-tint-press`(12%)로 둔다. 컴포넌트가 `--ids-state-color`, `--ids-state-layer-hover`, `--ids-state-layer-press` 에 직접 넣는다.
+- 나머지(neutral, 브랜드 색의 outline, ghost)는 글자색 층이다. IdsProvider 는 각 면이 그리는 층 아래에서도 글자 대비를 확인한다.
 - 고른, 켜진, 현재 항목도 같은 층을 쓴다(`state-press`, 열린 메뉴 항목과 강조된 목록 옵션은 `state-hover`).
 - 2~4px 막대(ScrollArea thumb, Drawer 손잡이, 크기 조절 손잡이)에서는 6~10% 층이 보이지 않는다. 이들은 `bg-neutral` 에서 hover 와 끌기 때 `text-neutral` 색(`bg-(--ids-color-text-neutral)`)으로 바뀐다.
 

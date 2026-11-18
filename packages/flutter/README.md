@@ -140,7 +140,7 @@ Container(
 - neutral 만 가진 역할: 페이지 바탕 `bgNeutralSubtlest` 와 그 위 글자 `textOnNeutralSubtlest`, 본문 글자 `textNeutralBold`, 중립 채움 `bgNeutralBold` 와 그 위 글자 `textOnNeutralBold`.
 - 이름은 CSS 의 `--ids-color-bg-primary-subtle` 을 camelCase 로 바꾼 것이다. `colors['bg-primary-subtle']` 로도 읽는다.
 - 배경마다 짝이 있다. `bgX` 에는 `textOnX`, `bgXSubtle` 에는 `textOnXSubtle`, `bgXSubtler` 에는 `textOnXSubtler` 를 쓴다. 채움 없는 글자와 아이콘에는 `textX` 를 쓴다.
-- hover 와 press 역할은 없다. 글자색을 `IdsStateOpacity.hover`(6%), `IdsStateOpacity.press`(10%) 만큼 바탕 위에 얹는다. IdsProvider 는 그 층 아래에서도 글자 대비를 확인한다.
+- hover 와 press 역할은 없다. 바탕 위에 층을 얹는다. 채움은 `IdsStateLayer.fillColor`(검정)를 `IdsStateOpacity.fillHover`(10%), `.fillPress`(18%), 색 있는 soft 면과 상태 색의 outline, ghost 는 계열 채움을 `.tintHover`(8%), `.tintPress`(12%), 나머지는 글자색을 `.hover`(6%), `.press`(10%) 만큼 얹는다. IdsProvider 는 그 층들 아래에서도 글자 대비를 확인한다.
 - 구조선(필드 테두리, 구분선)은 `borderNeutral`, 보조 글자는 `textNeutral` 이다.
 
 ## radius 와 글자

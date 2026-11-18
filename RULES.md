@@ -440,9 +440,9 @@ to one raw step each and are named `{property}-{family}[-{strength}]` or
 | Neutral role | light | dark | used for |
 |---|---|---|---|
 | `bg-neutral-subtlest` | 0 | 950 | the page, a popup, a card |
-| `bg-neutral-subtler` | 50 | 900 | a band or tray: a Card or Dialog footer, a table header, an outline control in dark |
-| `bg-neutral-subtle` | 100 | 800 | a soft control, a muted row |
-| `bg-neutral` | 300 | 700 | a handle, a track |
+| `bg-neutral-subtler` | 50 | 900 | a band or tray: a Card or Dialog footer, a table header |
+| `bg-neutral-subtle` | 100 | 800 | a soft control, a muted row, an outline control in dark |
+| `bg-neutral` | 300 | 700 | a handle, a track, an outline control's border in dark |
 | `bg-neutral-bold` | 900 | 50 | an inverted fill |
 | `text-on-neutral-subtlest`, `text-on-neutral-subtler` | 900 | 50 | text on the page or a band |
 | `text-neutral-bold` | 900 | 50 | body text |
@@ -488,16 +488,30 @@ the token test checks APCA instead.
 
 **Hover and press are a state layer, drawn by the component.** The CSS package's `state-layer`
 utility paints a `background-image` of `--ids-state-color` (the element's `currentColor` unless
-set) at `--ids-state-opacity`, over whatever background the element has; `state-hover` sets the
-opacity to `--ids-state-hover` (6%) and `state-press` to `--ids-state-press` (10%), from
+set) at `--ids-state-opacity`, over whatever background the element has. `state-hover` sets the
+opacity to `--ids-state-layer-hover` and `state-press` to `--ids-state-layer-press`, which fall back
+to `--ids-state-hover` (6%) and `--ids-state-press` (10%), all from
 `packages/core/tokens/state.json`. A component writes
 `state-layer data-hovered:state-hover data-active:state-press` (`pressStates` in
 `internal/control-surface.ts`), and a selected, current or pressed item that should read as
 pressed takes `state-press` (a ghost or outline Toggle, a selected Table row or Item, the current
-ghost Pagination link); an open Menu item or a highlighted option takes `state-hover`. The layer is
-the content's own color, so it darkens under dark text and lightens under light text on any
-background (page, band, fill, a colored Chip), and the provider checks text contrast under it.
-Add `--ids-state-opacity` to the element's `transition-[…]` list so the layer fades with the rest.
+ghost Pagination link); an open Menu item or a highlighted option takes `state-hover`. Add
+`--ids-state-opacity` to the element's `transition-[…]` list so the layer fades with the rest.
+
+The layer's color depends on what it lies over, so a colored control turns deeper in its own hue
+and not toward gray:
+
+| Surface | Layer | Hover / press |
+|---|---|---|
+| A fill (solid Button, Chip, Badge, a selected Calendar day, a completed Stepper step) | black, `state-fill` | 10% / 18% |
+| A colored soft surface, a status outline or ghost | the family fill (`bg-X`), `--ids-state-tint-*` | 8% / 12% |
+| Neutral, and brand outline or ghost | the text color | 6% / 10% |
+
+`state-fill` sets the black color and its opacities. Control and Chip styles set the other two per
+`colorScheme` as component tokens (`--control-soft-layer`, `--control-quiet-layer`, `--chip-layer`
+with their `-hover` and `-press`) and hand them to the layer (`drawsSoftLayer`, `drawsQuietLayer`).
+The provider checks text contrast under the layer each surface draws: a fill's text under the black
+layer, subtle, subtler and accent text under the text-color layer and the family-fill layer.
 
 - Do not write a hover color (`hover:bg-neutral-subtle`) or fade a filled brand color with `/90`.
 - `state-layer` takes the `background-image`, so an element with a gradient of its own (glossy)
@@ -911,8 +925,10 @@ ids_flutter follows ids-react's theme. The design is decided in React; Flutter p
 - Components read roles with `IdsProvider.of(context).colors.bgPrimarySubtle` and pick them the
   way the React component does (the page `bgNeutralSubtlest`, body text `textNeutralBold`, field
   borders `borderNeutral`, invalid `borderDanger`, secondary text `textNeutral`). Hover and press
-  lay the content color over the background at `IdsStateOpacity.hover` and `.press` (6% and 10%),
-  the same state layer as React, and `theme_roles.dart` checks contrast under it. Text goes through `textStyle(IdsTypography.x, color: ...)`, which sets
+  are the same state layers as React: a fill takes `IdsStateLayer.fillColor` at
+  `IdsStateOpacity.fillHover` and `.fillPress`, a colored soft surface the family fill at
+  `.tintHover` and `.tintPress`, the rest the content color at `.hover` and `.press`, and
+  `theme_roles.dart` checks contrast under them. Text goes through `textStyle(IdsTypography.x, color: ...)`, which sets
   `inherit: false`, the fixed fonts (Pretendard GOV, Geist Mono) and `scale`; sizes go through
   `dimension`, corners through `radius` and `shape()`.
 - IDS styles stay inside IDS components; Material and Cupertino themes are not touched.

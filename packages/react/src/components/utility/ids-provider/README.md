@@ -102,7 +102,7 @@ neutral 만 가지는 역할: `bg-neutral-subtlest` 와 `text-on-neutral-subtles
 ```
 
 - `X` 는 neutral, primary, secondary, tertiary, success, warning, danger, info 중 하나입니다.
-- hover, active 역할은 없습니다. 컴포넌트가 `state-layer` 로 글자색을 6%(`state-hover`), 10%(`state-press`) 덮습니다. 비율은 `packages/core/tokens/state.json` 에 있습니다.
+- hover, active 역할은 없습니다. 컴포넌트가 `state-layer` 로 층을 덮습니다. 채움은 검정 10%, 18%(`state-fill`), 색 있는 soft 면과 상태 색의 outline, ghost 는 계열 채움 8%, 12%, 나머지는 글자색 6%, 10% 입니다. 비율은 `packages/core/tokens/state.json` 에 있습니다.
 - 이름은 [`packages/core/color-roles.json`](../../../../../core/color-roles.json) 한 표(`slots`, `neutralOnly`)에서 나옵니다.
 - 바뀐 이름:
 
@@ -138,12 +138,13 @@ neutral 만 가지는 역할: `bg-neutral-subtlest` 와 `text-on-neutral-subtles
   - WCAG 2 는 중간 밝기 채움 위의 검은 글자를 실제보다 잘 읽힌다고 봅니다. 그래서 보라색 채움 위에 검은 글자를 골랐습니다. APCA 는 글자 쪽(어두운 글자, 밝은 글자)에 따라 다르게 재서 이런 짝을 걸러 냅니다.
   - `text-on-` 글자는 Lc 75(본문 글자의 기준), 페이지 위 색 글자(`text-X`)는 Lc 60(라벨, 링크, 에러 문구 같은 짧은 글자의 기준), 선과 아이콘 같은 표시의 하한은 Lc 45 입니다.
   - 계산은 `colorjs.io` 의 `contrastAPCA` 입니다(MIT).
-- 모든 글자는 쉴 때의 배경과, 그 배경에 글자색을 hover(6%), press(10%)로 덮은 색 위에서 함께 잽니다.
+- 모든 글자는 쉴 때의 배경과, 그 배경에 컴포넌트가 그리는 층을 덮은 색 위에서 함께 잽니다.
   - `withStateLayer(base, layer, opacity)`: 배경에 층 색을 sRGB 로 섞은 색. CSS `state-layer` 와 같은 계산입니다.
     - 채널마다 `base + opacity × (layer − base)` 로 섞고 8비트로 반올림합니다. Flutter 도 이 식을 씁니다. `Color.lerp` 의 `base × (1 − opacity) + layer × opacity` 는 .5 에서 반올림이 갈려 한 단계 다른 글자를 고릅니다.
-  - `underStateLayers(base, content)`: 쉴 때, hover, press 세 배경.
-  - `firstReadableOn`: 후보 단계 중 세 배경 모두에서 기준을 넘는 첫 단계.
-  - `lowestContrastUnderStateLayers`: 채움 위 글자를 고를 때 세 배경 중 가장 낮은 Lc.
+  - `StateLayer`: 층 색과 hover, press 불투명도. `contentLayer(text)` 는 글자색 6%, 10%, `tintLayer(fill)` 은 계열 채움 8%, 12%, `FILL_LAYER` 는 검정 10%, 18% 입니다.
+  - `underStateLayers(base, layers)`: 쉴 때의 배경과 층마다의 hover, press 배경.
+  - `firstReadableOn`: 후보 단계 중 그 배경 모두에서 기준을 넘는 첫 단계. 글자색 층과 계열 채움 층을 함께 잽니다.
+  - `lowestContrastUnderStateLayers`: 채움 위 글자를 고를 때 `FILL_LAYER` 아래 배경 중 가장 낮은 Lc.
 - `text-on-X-subtler` 와 `text-on-X-subtle` 은 각자의 배경과 그 hover, press 에서 Lc 75 를 넘어야 합니다.
 - `text-X` 는 페이지, `bg-X-subtler`, `bg-X-subtle` 과 그 hover, press 에서 모두 Lc 60 을 넘어야 합니다. 그래서 라이트는 채움과 같거나 한 단계 진하고, 다크도 200 까지 옅어지지 않습니다.
 - `border-X` 는 따로 고르지 않고 `text-X` 와 같은 단계를 씁니다. 선과 그 옆 글자가 한 색이라, invalid 필드의 테두리(`border-danger`)와 라벨, 에러 문구(`text-danger`)가 같은 색입니다. `text-X` 가 Lc 60 을 넘으므로 선의 하한 Lc 45 도 넘습니다.

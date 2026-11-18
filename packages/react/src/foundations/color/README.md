@@ -48,7 +48,7 @@ neutral 만 가지는 역할입니다.
 | 역할 | light | dark | 쓰임 |
 | --- | --- | --- | --- |
 | `bg-neutral-subtlest` / `text-on-neutral-subtlest` | 0 / 900 | 950 / 50 | 페이지, 팝업, 카드 |
-| `bg-neutral-subtler` / `text-on-neutral-subtler` | 50 / 900 | 900 / 50 | 띠, 트레이: Card, Dialog 의 footer, 표 머리, 어두운 모드의 outline 컨트롤 |
+| `bg-neutral-subtler` / `text-on-neutral-subtler` | 50 / 900 | 900 / 50 | 띠, 트레이: Card, Dialog 의 footer, 표 머리 |
 | `bg-neutral-subtle` | 100 | 800 | soft 컨트롤, 흐린 행 |
 | `bg-neutral` | 300 | 700 | 손잡이, 트랙 |
 | `bg-neutral-bold` / `text-on-neutral-bold` | 900 / 0 | 50 / 950 | 뒤집힌 채움: Tooltip, neutral solid Button, Badge |
@@ -117,12 +117,20 @@ hover 와 press 는 색 역할이 아니라 컴포넌트가 그리는 층입니�
 | 유틸리티 | 하는 일 |
 | --- | --- |
 | `state-layer` | `--ids-state-color`(없으면 `currentColor`)를 `--ids-state-opacity` 만큼 `background-image` 로 덮는다 |
-| `state-hover` | `--ids-state-opacity: var(--ids-state-hover)`, 6% |
-| `state-press` | `--ids-state-opacity: var(--ids-state-press)`, 10% |
+| `state-hover` | `--ids-state-opacity: var(--ids-state-layer-hover, var(--ids-state-hover))` |
+| `state-press` | `--ids-state-opacity: var(--ids-state-layer-press, var(--ids-state-press))` |
+| `state-fill` | 층을 검정으로, hover 10%, press 18% 로 둔다 |
 
 - 비율은 `packages/core/tokens/state.json` 에 있습니다.
-- 층이 글자색이라 어두운 글자 아래에서는 어두워지고 밝은 글자 아래에서는 밝아집니다. 페이지, 띠, 채움, 색 있는 Chip 어디서나 같은 규칙입니다.
-- IdsProvider 는 글자 단계를 고를 때 이 두 층 아래의 대비까지 잽니다.
+- 층 색은 면에 따라 다릅니다. 색 있는 컨트롤이 회색 쪽이 아니라 같은 색의 진한 쪽으로 가게 하려는 것입니다.
+
+| 면 | 층 | hover / press |
+| --- | --- | --- |
+| 채움(solid Button, Chip, Badge, 고른 Calendar 날짜, 끝난 Stepper 단계) | 검정, `state-fill` | 10% / 18% |
+| 색 있는 soft 면, 상태 색의 outline, ghost | 계열 채움(`bg-X`), `--ids-state-tint-*` | 8% / 12% |
+| neutral, 브랜드 색의 outline, ghost | 글자색 | 6% / 10% |
+
+- IdsProvider 는 글자 단계를 고를 때 각 면이 그리는 층 아래의 대비까지 잽니다.
 - 켜진 ghost, outline Toggle, 선택한 Table 행과 Item, 현재 ghost Pagination 링크는 `state-press` 입니다. 열린 Menu 항목과 강조된 옵션은 `state-hover` 입니다.
 - `transition-[…]` 에 `--ids-state-opacity` 를 넣어 층이 함께 바뀌게 합니다.
 - hover 색(`hover:bg-neutral-subtle`)을 쓰거나 채운 브랜드 색을 `/90` 으로 흐리지 않습니다.
