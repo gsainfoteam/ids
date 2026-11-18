@@ -1,7 +1,7 @@
 'use client';
 
 import { ListBulletIcon, NumberedListIcon } from '@heroicons/react/16/solid';
-import { SquareCode, TextQuote } from 'lucide-react';
+import { ListTodo, SquareCode, TextQuote } from 'lucide-react';
 
 import { EditorToggleTool, type EditorToggleSpec, type EditorToolProps } from './tool';
 
@@ -23,6 +23,16 @@ const ORDERED_LIST: EditorToggleSpec = {
   isActive: (editor) => editor.isActive('orderedList'),
   can: (editor) => editor.can().toggleOrderedList(),
   run: (editor) => editor.chain().toggleOrderedList().run(),
+};
+
+const TASK_LIST: EditorToggleSpec = {
+  name: 'TaskList',
+  label: 'editor.taskList',
+  icon: <ListTodo />,
+  isActive: (editor) => editor.isActive('taskList'),
+  can: (editor) => editor.can().toggleTaskList(),
+  run: (editor) => editor.chain().toggleTaskList().run(),
+  extension: 'taskList',
 };
 
 const BLOCKQUOTE: EditorToggleSpec = {
@@ -54,6 +64,12 @@ export function EditorOrderedList(props: EditorBlockProps) {
 }
 
 EditorOrderedList.displayName = 'Editor.OrderedList';
+
+export function EditorTaskList(props: EditorBlockProps) {
+  return <EditorToggleTool {...props} spec={TASK_LIST} />;
+}
+
+EditorTaskList.displayName = 'Editor.TaskList';
 
 export function EditorBlockquote(props: EditorBlockProps) {
   return <EditorToggleTool {...props} spec={BLOCKQUOTE} />;

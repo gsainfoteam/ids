@@ -30,6 +30,15 @@ const documentBlocks = cn(
   '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:bg-neutral-soft [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
   '[&_hr]:my-3 [&_hr]:border-neutral',
+  '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard [&_.ProseMirror-selectednode]:outline-offset-2',
+  '[&_mark]:bg-warning-soft [&_mark]:text-on-warning-soft',
+);
+
+const taskList = cn(
+  '[&_ul[data-type=taskList]]:list-none [&_ul[data-type=taskList]]:ps-0',
+  '[&_ul[data-type=taskList]>li]:flex [&_ul[data-type=taskList]>li]:items-start [&_ul[data-type=taskList]>li]:gap-2',
+  '[&_ul[data-type=taskList]>li>div]:min-w-0 [&_ul[data-type=taskList]>li>div]:grow',
+  '[&_ul[data-type=taskList]>li[data-checked=true]>div>p]:text-neutral [&_ul[data-type=taskList]>li[data-checked=true]>div>p]:line-through',
 );
 
 export const editorStyle = tv({
@@ -55,6 +64,7 @@ export const editorStyle = tv({
       'selection:bg-primary/30 selection:text-on-surface',
       proseMirrorBaseline,
       documentBlocks,
+      taskList,
       placeholder,
     ],
     count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-on-surface'],
@@ -63,6 +73,10 @@ export const editorStyle = tv({
     bubbleAnchor: 'pointer-events-none absolute',
     linkForm: 'flex flex-col gap-2',
     linkActions: 'flex justify-end gap-2',
+    imageInput: 'hidden',
+    uploadPlaceholder: 'inline-block h-24 w-40 max-w-full align-middle before:hidden',
+    taskBox: 'mt-[calc((1lh_-_1rem)/2)]',
+    textAlign: 'flex items-center gap-0.5',
   },
   variants: {
     variant: {

@@ -8,6 +8,11 @@ import type { editorStyle } from './style';
 import type { IdsSize } from '../../../tokens/types';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
+export type EditorImages = {
+  upload: (files: readonly File[], at: number) => void;
+  pending: number;
+};
+
 export type EditorContextValue = {
   editor: TiptapEditor | null;
   editable: boolean;
@@ -19,6 +24,7 @@ export type EditorContextValue = {
   maxLength: number | undefined;
   contentAttributes: Record<string, string>;
   bubbles: ReactNode;
+  images: EditorImages | null;
   styles: ReturnType<typeof editorStyle>;
 };
 

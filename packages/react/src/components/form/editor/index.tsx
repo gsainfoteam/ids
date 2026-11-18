@@ -1,14 +1,23 @@
 import { type CSSProperties, type ReactNode } from 'react';
 
 import { EditorBlockType, type EditorBlockTypeProps, type EditorHeadingLevel } from './block-type';
-import { EditorBlockquote, EditorBulletList, EditorCodeBlock, EditorOrderedList } from './blocks';
+import {
+  EditorBlockquote,
+  EditorBulletList,
+  EditorCodeBlock,
+  EditorOrderedList,
+  EditorTaskList,
+} from './blocks';
 import { EditorBubbleMenu, type EditorBubbleMenuProps } from './bubble-menu';
 import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorCount, type EditorCountProps, type EditorCountState } from './count';
+import { EditorHorizontalRule, type EditorHorizontalRuleProps } from './horizontal-rule';
+import { EditorImage, type EditorImageProps } from './image';
 import { EditorLink, type EditorLinkProps } from './link';
 import {
   EditorBold,
   EditorCode,
+  EditorHighlight,
   EditorItalic,
   EditorStrike,
   EditorUnderline,
@@ -17,6 +26,7 @@ import {
 import { EditorRoot, type EditorState, type EditorVariant } from './root';
 import { EditorSeparator, type EditorSeparatorProps } from './separator';
 import { editorStyle } from './style';
+import { EditorTextAlign, type EditorTextAlignment, type EditorTextAlignProps } from './text-align';
 import { type EditorFormat } from './value';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -49,6 +59,7 @@ export namespace Editor {
     readOnly?: boolean;
     invalid?: boolean;
     maxLength?: number;
+    onImageUpload?: (file: File) => Promise<string>;
     variant?: EditorVariant;
     size?: IdsSize;
     id?: string;
@@ -67,11 +78,15 @@ export namespace Editor {
   export type Json = JSONContent;
   export type HeadingLevel = EditorHeadingLevel;
   export type CountState = EditorCountState;
+  export type TextAlignment = EditorTextAlignment;
 
   export type ContentProps = EditorContentProps;
   export type ToolProps = EditorMarkProps;
   export type BlockTypeProps = EditorBlockTypeProps;
   export type LinkProps = EditorLinkProps;
+  export type ImageProps = EditorImageProps;
+  export type HorizontalRuleProps = EditorHorizontalRuleProps;
+  export type TextAlignProps = EditorTextAlignProps;
   export type SeparatorProps = EditorSeparatorProps;
   export type BubbleMenuProps = EditorBubbleMenuProps;
   export type CountProps = EditorCountProps;
@@ -83,11 +98,16 @@ export namespace Editor {
   export const Underline = EditorUnderline;
   export const Strike = EditorStrike;
   export const Code = EditorCode;
+  export const Highlight = EditorHighlight;
   export const Link = EditorLink;
+  export const Image = EditorImage;
   export const BulletList = EditorBulletList;
   export const OrderedList = EditorOrderedList;
+  export const TaskList = EditorTaskList;
   export const Blockquote = EditorBlockquote;
   export const CodeBlock = EditorCodeBlock;
+  export const HorizontalRule = EditorHorizontalRule;
+  export const TextAlign = EditorTextAlign;
   export const Separator = EditorSeparator;
   export const BubbleMenu = EditorBubbleMenu;
   export const Count = EditorCount;

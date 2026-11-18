@@ -1,0 +1,106 @@
+'use client';
+
+import type { ReactElement } from 'react';
+
+import { TextAlignCenter, TextAlignEnd, TextAlignJustify, TextAlignStart } from 'lucide-react';
+
+import { useEditorContext } from './context';
+import { extensionIsLoaded, hasExtension, useEditorToolProps } from './tool';
+import { useEditorSelector } from './use-editor-selector';
+import { useTranslate } from '../../../internal/translate';
+import { IconToggle } from '../../action/icon-toggle';
+
+import type { IdsMessageKey } from '../../../internal/messages';
+import type { Editor as TiptapEditor } from '@tiptap/core';
+
+export type EditorTextAlignment = 'left' | 'center' | 'right' | 'justify';
+
+export type EditorTextAlignProps = {
+  alignments?: readonly EditorTextAlignment[];
+  'aria-label'?: string;
+  className?: string;
+};
+
+const THE_DEFAULT: EditorTextAlignment = 'left';
+
+const DEFAULT_ALIGNMENTS: readonly EditorTextAlignment[] = ['left', 'center', 'right'];
+
+const ALIGNMENT: Record<EditorTextAlignment, { label: IdsMessageKey; icon: ReactElement }> = {
+  left: { label: 'editor.alignLeft', icon: <TextAlignStart /> },
+  center: { label: 'editor.alignCenter', icon: <TextAlignCenter /> },
+  right: { label: 'editor.alignRight', icon: <TextAlignEnd /> },
+  justify: { label: 'editor.alignJustify', icon: <TextAlignJustify /> },
+};
+
+function currentAlignment(editor: TiptapEditor, alignments: readonly EditorTextAlignment[]) {
+  if (!hasExtension(editor, 'textAlign')) return null;
+  const set = alignments.find((alignment) => editor.isActive({ textAlign: alignment }));
+  return set ?? (editor.isActive({ textAlign: null }) ? THE_DEFAULT : null);
+}
+
+function AlignmentToggle({
+  alignment,
+  pressed,
+  disabled,
+  editor,
+}: {
+  alignment: EditorTextAlignment;
+  pressed: boolean;
+  disabled: boolean;
+  editor: TiptapEditor | null;
+}) {
+  const t = useTranslate();
+  const tool = useEditorToolProps(`TextAlign-${alignment}`);
+
+  return (
+    <IconToggle
+      {...tool}
+      variant="soft"
+      size="tiny"
+      icon={ALIGNMENT[alignment].icon}
+      aria-label={t(ALIGNMENT[alignment].label)}
+      pressed={pressed}
+      disabled={disabled}
+      onPressedChange={() => {
+        if (!editor) return;
+        if (pressed || alignment === THE_DEFAULT) editor.chain().unsetTextAlign().run();
+        else editor.chain().setTextAlign(alignment).run();
+      }}
+    />
+  );
+}
+
+export function EditorTextAlign({
+  alignments = DEFAULT_ALIGNMENTS,
+  'aria-label': ariaLabel,
+  className,
+}: EditorTextAlignProps) {
+  const t = useTranslate();
+  const { editor, editable, styles } = useEditorContext('Editor.TextAlign');
+  const loaded = extensionIsLoaded(editor, 'TextAlign', 'textAlign');
+  const current = useEditorSelector(
+    editor,
+    (instance) => currentAlignment(instance, alignments),
+    null,
+  );
+
+  return (
+    <div
+      role="group"
+      aria-label={ariaLabel ?? t('editor.textAlign')}
+      className={styles.textAlign({ className })}
+    >
+      {alignments.map((alignment) => (
+        <AlignmentToggle
+          key={alignment}
+          alignment={alignment}
+          pressed={current === alignment}
+          disabled={!editable || !loaded}
+          editor={editor}
+        />
+      ))}
+    </div>
+  );
+}
+
+EditorTextAlign.displayName = 'Editor.TextAlign';

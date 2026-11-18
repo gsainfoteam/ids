@@ -5,7 +5,9 @@ import { expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Button, Field } from '../src';
+import { testTheme } from './theme';
+import { Button, Field, IdsProvider } from '../src';
+import { toast } from '../src/components/feedback/toast';
 import { Editor } from '../src/editor';
 
 const MOD_AS_PROSEMIRROR_READS_IT = /Mac|iP(hone|[oa]d)/.test(navigator.platform)
@@ -14,6 +16,36 @@ const MOD_AS_PROSEMIRROR_READS_IT = /Mac|iP(hone|[oa]d)/.test(navigator.platform
 
 const press = (key: string) =>
   userEvent.keyboard(`{${MOD_AS_PROSEMIRROR_READS_IT}>}${key}{/${MOD_AS_PROSEMIRROR_READS_IT}}`);
+
+function heldUpload() {
+  const calls: { file: File; resolve: (url: string) => void; reject: (reason: unknown) => void }[] =
+    [];
+  const upload = vi.fn(
+    (file: File) =>
+      new Promise<string>((resolve, reject) => {
+        calls.push({ file, resolve, reject });
+      }),
+  );
+  return { upload, calls };
+}
+
+const PICTURE = `data:image/svg+xml;base64,${btoa(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="48"><rect width="80" height="48" fill="#3b82f6"/></svg>',
+)}`;
+
+const png = (name = 'map.png') => new File(['png'], name, { type: 'image/png' });
+
+function transfer(files: File[], html?: string) {
+  const data = new DataTransfer();
+  for (const file of files) data.items.add(file);
+  if (html !== undefined) data.setData('text/html', html);
+  return data;
+}
+
+const imageInput = () =>
+  page.elementLocator(document.querySelector<HTMLInputElement>('[data-editor-image-input]')!);
+
+const placeholders = () => document.querySelectorAll('[data-editor-upload]').length;
 
 async function editable(name: string) {
   const content = page.getByRole('textbox', { name });
@@ -380,4 +412,379 @@ test('BubbleMenu opens over a selection and Escape closes it', async () => {
   await userEvent.keyboard('{Escape}');
   await expect.element(bubble).not.toBeInTheDocument();
   await expect.element(content).toHaveFocus();
+});
+
+test('Image uploads the picked file, holds a placeholder while it waits and inserts the URL it returns', async () => {
+  const { upload, calls } = heldUpload();
+  const onValueChange = vi.fn();
+  render(
+    <Editor aria-label="본문" defaultValue="<p>지도</p>" onImageUpload={upload} onValueChange={onValueChange}>
+      <Editor.Image />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  const tool = page.getByRole('button', { name: '그림' });
+  await userEvent.click(content);
+
+  await userEvent.upload(imageInput(), png());
+  await expect.poll(() => calls.length).toBe(1);
+  expect(calls[0]!.file.name).toBe('map.png');
+  await expect.element(tool).toHaveAttribute('aria-busy', 'true');
+  expect(placeholders()).toBe(1);
+  await expect.element(page.getByRole('status').filter({ hasText: '그림을 올리는 중' })).toBeInTheDocument();
+  expect(onValueChange).not.toHaveBeenCalled();
+
+  calls[0]!.resolve('https://cdn.gistory.me/map.png');
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('<p>지도</p><img src="https://cdn.gistory.me/map.png" alt="">');
+  await expect.element(tool).not.toHaveAttribute('aria-busy');
+  expect(placeholders()).toBe(0);
+});
+
+test('a failed upload removes its placeholder and says so in a toast', async () => {
+  const { upload, calls } = heldUpload();
+  const onValueChange = vi.fn();
+  render(
+    <IdsProvider theme={testTheme}>
+      <Editor aria-label="본문" onImageUpload={upload} onValueChange={onValueChange}>
+        <Editor.Image />
+        <Editor.Content />
+      </Editor>
+    </IdsProvider>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+
+  await userEvent.upload(imageInput(), png('broken.png'));
+  await expect.poll(() => calls.length).toBe(1);
+  calls[0]!.reject(new Error('503'));
+
+  await expect.element(page.getByText('그림을 올리지 못했습니다')).toBeVisible();
+  await expect.element(page.getByText('broken.png')).toBeVisible();
+  expect(placeholders()).toBe(0);
+  expect(content.element().querySelector('img')).toBeNull();
+  expect(onValueChange).not.toHaveBeenCalled();
+  toast.dismissAll();
+});
+
+test('a pasted or dropped image file goes through the upload, and other files do not', async () => {
+  const upload = vi.fn(async (file: File) => `https://cdn.gistory.me/${file.name}`);
+  const onValueChange = vi.fn();
+  render(
+    <Editor aria-label="본문" onImageUpload={upload} onValueChange={onValueChange}>
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+
+  const pasted = new ClipboardEvent('paste', {
+    bubbles: true,
+    cancelable: true,
+    clipboardData: transfer([png('pasted.png')], '<img src="https://elsewhere.example/pasted.png">'),
+  });
+  content.element().dispatchEvent(pasted);
+  expect(pasted.defaultPrevented).toBe(true);
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('<img src="https://cdn.gistory.me/pasted.png" alt="">');
+
+  const box = content.element().getBoundingClientRect();
+  content.element().dispatchEvent(
+    new DragEvent('drop', {
+      bubbles: true,
+      cancelable: true,
+      clientX: box.left + 4,
+      clientY: box.bottom - 4,
+      dataTransfer: transfer([png('dropped.png')]),
+    }),
+  );
+  await expect.poll(() => content.element().querySelectorAll('img').length).toBe(2);
+  expect(upload.mock.calls.map(([file]) => file.name)).toEqual(['pasted.png', 'dropped.png']);
+
+  const pdf = new ClipboardEvent('paste', {
+    bubbles: true,
+    cancelable: true,
+    clipboardData: transfer([new File(['%PDF'], 'notes.pdf', { type: 'application/pdf' })]),
+  });
+  content.element().dispatchEvent(pdf);
+  expect(pdf.defaultPrevented).toBe(false);
+  await expect.element(content).toHaveFocus();
+  expect(upload).toHaveBeenCalledTimes(2);
+});
+
+test('without onImageUpload there is no Image tool, files are not pasted and pasted images are dropped, but saved images stay', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      aria-label="본문"
+      defaultValue='<p>본문</p><img src="https://cdn.gistory.me/saved.png" alt="저장된 그림">'
+      onValueChange={onValueChange}
+    >
+      <Editor.Bold />
+      <Editor.Image />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await expect.element(page.getByRole('img', { name: '저장된 그림' })).toBeVisible();
+  await expect.element(page.getByRole('button', { name: '그림' })).not.toBeInTheDocument();
+  expect(document.querySelector('[data-editor-image-input]')).toBeNull();
+
+  await userEvent.click(content.element().querySelector('p')!);
+  const file = new ClipboardEvent('paste', {
+    bubbles: true,
+    cancelable: true,
+    clipboardData: transfer([png()]),
+  });
+  content.element().dispatchEvent(file);
+  expect(file.defaultPrevented).toBe(false);
+  await expect.element(content).toHaveFocus();
+
+  content.element().dispatchEvent(
+    new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: transfer([], '<p>붙인 글</p><img src="https://elsewhere.example/a.png">'),
+    }),
+  );
+  await expect.element(content).toMatchTextContent('붙인 글');
+  expect(content.element().querySelectorAll('img')).toHaveLength(1);
+});
+
+test('javascript: and data: addresses never become images, in HTML, markdown or JSON', async () => {
+  render(
+    <>
+      <Editor
+        aria-label="HTML"
+        defaultValue='<img src="javascript:alert(1)"><img src=" java&#10;script:alert(1)"><img src="data:image/png;base64,AAAA"><img src="/uploads/kept.png" alt="상대 주소">'
+      >
+        <Editor.Content />
+      </Editor>
+      <Editor format="markdown" aria-label="마크다운" defaultValue={'![x](javascript:alert(1))\n\n![y](data:image/png;base64,AAAA)\n\n![지도](https://cdn.gistory.me/map.png)'}>
+        <Editor.Content />
+      </Editor>
+      <Editor
+        format="json"
+        aria-label="JSON"
+        defaultValue={{
+          type: 'doc',
+          content: [
+            { type: 'image', attrs: { src: 'javascript:alert(1)', alt: 'x' } },
+            { type: 'image', attrs: { src: 'https://cdn.gistory.me/ok.png', alt: '괜찮은 그림' } },
+          ],
+        }}
+      >
+        <Editor.Content />
+      </Editor>
+    </>,
+  );
+  for (const [name, alt] of [
+    ['HTML', '상대 주소'],
+    ['마크다운', '지도'],
+    ['JSON', '괜찮은 그림'],
+  ] as const) {
+    const content = await editable(name);
+    const images = [...content.element().querySelectorAll('img')];
+    expect(images.map((image) => image.alt)).toEqual([alt]);
+  }
+});
+
+test('Image sets the alt text of the selected image from a popover', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      aria-label="본문"
+      defaultValue="<p>지도</p>"
+      onImageUpload={async () => PICTURE}
+      onValueChange={onValueChange}
+    >
+      <Editor.Image />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  const tool = page.getByRole('button', { name: '그림' });
+  await userEvent.click(content);
+  await userEvent.upload(imageInput(), png());
+  await expect.poll(() => content.element().querySelector('img')).not.toBeNull();
+  const image = page.elementLocator(content.element().querySelector('img')!);
+  await expect.element(image).toBeVisible();
+  await expect.element(tool).toHaveAttribute('aria-pressed', 'false');
+
+  await userEvent.click(image);
+  await expect.element(tool).toHaveAttribute('aria-pressed', 'true');
+  await userEvent.click(tool);
+  const alt = page.getByRole('textbox', { name: '대체 텍스트' });
+  await expect.element(alt).toHaveFocus();
+  await userEvent.keyboard('학생회관 가는 길{Enter}');
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe(`<p>지도</p><img src="${PICTURE}" alt="학생회관 가는 길">`);
+  await expect.element(page.getByRole('img', { name: '학생회관 가는 길' })).toBeVisible();
+  await expect.element(content).toHaveFocus();
+});
+
+test('markdown and JSON keep an uploaded image and its alt text', async () => {
+  const markdown = vi.fn();
+  const json = vi.fn();
+  render(
+    <>
+      <Editor
+        format="markdown"
+        aria-label="마크다운"
+        defaultValue="![지도](https://cdn.gistory.me/map.png)"
+        onImageUpload={async () => 'blob:https://gistory.me/0f3c'}
+        onValueChange={markdown}
+      >
+        <Editor.Image />
+        <Editor.Content />
+      </Editor>
+      <Editor
+        format="json"
+        aria-label="JSON"
+        onImageUpload={async () => 'data:image/png;base64,AAAA'}
+        onValueChange={json}
+      >
+        <Editor.Image />
+        <Editor.Content />
+      </Editor>
+    </>,
+  );
+  const md = await editable('마크다운');
+  await expect.element(md).toContainHTML('alt="지도"');
+  await userEvent.click(md.element().querySelector('img')!);
+  await userEvent.upload(imageInput(), png());
+  await expect
+    .poll(() => markdown.mock.lastCall?.[0])
+    .toBe('![지도](https://cdn.gistory.me/map.png)\n\n![](blob:https://gistory.me/0f3c)');
+
+  const doc = await editable('JSON');
+  await userEvent.click(doc);
+  await userEvent.upload(
+    page.elementLocator(document.querySelectorAll<HTMLInputElement>('[data-editor-image-input]')[1]!),
+    png(),
+  );
+  await expect
+    .poll(() => json.mock.lastCall?.[0]?.content?.find((node: Editor.Json) => node.type === 'image')?.attrs)
+    .toMatchObject({ src: 'data:image/png;base64,AAAA', alt: '' });
+});
+
+test('Highlight marks the selection and writes == in markdown', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <IdsProvider theme={testTheme}>
+      <Editor format="markdown" aria-label="본문" defaultValue="중요한 글" onValueChange={onValueChange}>
+        <Editor.Highlight />
+        <Editor.Content />
+      </Editor>
+    </IdsProvider>,
+  );
+  const content = await editable('본문');
+  const highlight = page.getByRole('button', { name: '형광펜' });
+  await userEvent.click(content);
+  await press('a');
+  await userEvent.click(highlight);
+
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('==중요한 글==');
+  await expect.element(highlight).toHaveAttribute('aria-pressed', 'true');
+  await expect.element(content).toContainHTML('<mark>중요한 글</mark>');
+  const mark = content.element().querySelector('mark')!;
+  expect(getComputedStyle(mark).backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+});
+
+test('an extension loads only when its part is in the Editor', async () => {
+  render(
+    <>
+      <Editor aria-label="없음" defaultValue='<p><mark>형광</mark></p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>할 일</p></li></ul><p style="text-align: center">가운데</p>'>
+        <Editor.Content />
+      </Editor>
+      <Editor aria-label="있음" defaultValue='<p><mark>형광</mark></p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>할 일</p></li></ul><p style="text-align: center">가운데</p>'>
+        <Editor.Content />
+        <Editor.BubbleMenu>
+          <Editor.Highlight />
+          <Editor.TaskList />
+          <Editor.TextAlign />
+        </Editor.BubbleMenu>
+      </Editor>
+    </>,
+  );
+  const without = await editable('없음');
+  expect(without.element().querySelector('mark')).toBeNull();
+  expect(without.element().querySelector('input[type="checkbox"]')).toBeNull();
+  expect(without.element().querySelector('[style*="text-align"]')).toBeNull();
+
+  const within = await editable('있음');
+  expect(within.element().querySelector('mark')).not.toBeNull();
+  expect(within.element().querySelector('input[type="checkbox"]')).not.toBeNull();
+  expect(within.element().querySelector('[style*="text-align"]')).not.toBeNull();
+});
+
+test('TaskList turns the paragraph into a task whose IDS checkbox checks it, and markdown writes [x]', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor format="markdown" aria-label="본문" defaultValue="부스 신청" onValueChange={onValueChange}>
+      <Editor.TaskList />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.click(page.getByRole('button', { name: '할 일 목록' }));
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('- [ ] 부스 신청');
+
+  const checkbox = page.getByRole('checkbox', { name: '할 일: 부스 신청' });
+  await expect.element(checkbox).not.toBeChecked();
+  expect(checkbox.element().closest('[data-state]')).toHaveAttribute('data-state', 'unchecked');
+  await userEvent.click(checkbox);
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('- [x] 부스 신청');
+  await expect.element(checkbox).toBeChecked();
+  expect(checkbox.element().closest('[data-state]')).toHaveAttribute('data-state', 'checked');
+});
+
+test('HorizontalRule inserts a divider that markdown writes as ---', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor format="markdown" aria-label="본문" defaultValue="위" onValueChange={onValueChange}>
+      <Editor.HorizontalRule />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.click(page.getByRole('button', { name: '구분선' }));
+
+  await expect.element(content).toContainHTML('<hr');
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('위\n\n---\n\n');
+  await expect.element(content).toHaveFocus();
+});
+
+test('TextAlign is a group of toggles that align the block and unset back to left', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor aria-label="본문" defaultValue="<p>가운데로</p>" onValueChange={onValueChange}>
+      <Editor.TextAlign alignments={['left', 'center', 'right', 'justify']} />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  const group = page.getByRole('group', { name: '정렬' });
+  const left = group.getByRole('button', { name: '왼쪽 정렬' });
+  const center = group.getByRole('button', { name: '가운데 정렬' });
+  await userEvent.click(content);
+  await expect.element(left).toHaveAttribute('aria-pressed', 'true');
+
+  await userEvent.click(center);
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('<p style="text-align: center;">가운데로</p>');
+  await expect.element(center).toHaveAttribute('aria-pressed', 'true');
+  await expect.element(left).toHaveAttribute('aria-pressed', 'false');
+
+  await userEvent.click(left);
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('<p>가운데로</p>');
+  await expect.element(group.getByRole('button', { name: '양쪽 정렬' })).toBeVisible();
 });
