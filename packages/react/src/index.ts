@@ -126,6 +126,7 @@ export { Marker } from './components/feedback/marker';
 export { Label } from './components/typography/label';
 export { Highlight } from './components/typography/highlight';
 export { Kbd } from './components/typography/kbd';
+export { KbdGroup } from './components/typography/kbd-group';
 export { Link } from './components/typography/link';
 
 export { Pagination } from './components/navigation/pagination';
