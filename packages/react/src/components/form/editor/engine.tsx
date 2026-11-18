@@ -1,0 +1,73 @@
+'use client';
+
+import { useEffect } from 'react';
+
+import { CharacterCount, Placeholder } from '@tiptap/extensions';
+import { EditorContent, useEditor, type UseEditorOptions } from '@tiptap/react';
+import { StarterKit } from '@tiptap/starter-kit';
+
+import { LeaveEscapeToTheLayers } from './escape-to-layers';
+import { EditorImageNode, imageFileHandler } from './image-node';
+
+import type { PartExtensions } from './load-engine';
+import type { AnyExtension, Editor as TiptapEditor, Extensions } from '@tiptap/core';
+
+export { EditorContent };
+export { uploadImage } from './image-node';
+
+export type ImageSetup = {
+  uploaded: ReadonlySet<string>;
+  start: ((editor: TiptapEditor, files: File[], at: number) => void) | null;
+};
+
+const placeholderOfTheTextbox = ({ editor }: { editor: TiptapEditor }) =>
+  editor.view.dom.getAttribute('aria-placeholder') ?? '';
+
+export function extensionsFor({
+  maxLength,
+  markdown,
+  parts,
+  images,
+  taskLabel,
+}: {
+  maxLength: number | undefined;
+  markdown: AnyExtension | undefined;
+  parts: PartExtensions;
+  images: ImageSetup;
+  taskLabel: (text: string) => string;
+}): Extensions {
+  return [
+    StarterKit.configure({
+      heading: { levels: [1, 2, 3, 4] },
+      gapcursor: false,
+      trailingNode: false,
+      link: { openOnClick: false, autolink: true, defaultProtocol: 'https' },
+    }),
+    Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
+    CharacterCount.configure({ limit: maxLength }),
+    LeaveEscapeToTheLayers,
+    EditorImageNode.configure({ uploaded: images.uploaded, insertable: images.start !== null }),
+    ...(images.start ? [imageFileHandler(images.start)] : []),
+    ...(parts.highlight ? [parts.highlight] : []),
+    ...(parts.taskList ? parts.taskList(taskLabel) : []),
+    ...(parts.textAlign ? [parts.textAlign.configure({ types: ['heading', 'paragraph'] })] : []),
+    ...(markdown ? [markdown] : []),
+  ];
+}
+
+export function EditorEngine({
+  options,
+  onEditor,
+}: {
+  options: UseEditorOptions;
+  onEditor: (editor: TiptapEditor | null) => void;
+}) {
+  const editor = useEditor(options, [options.extensions]);
+
+  useEffect(() => {
+    onEditor(editor);
+    return () => onEditor(null);
+  }, [editor, onEditor]);
+
+  return null;
+}

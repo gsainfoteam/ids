@@ -634,7 +634,7 @@ Recharts 차트를 테마의 브랜드 계열에서 고른 계열 색, 툴팁, �
 ## Editor
 
 Tiptap 3 위의 서식 편집기입니다. 툴바, 버블 메뉴, 링크 Popover, 글자 수를 IDS 부품으로 그리고, 값은 HTML, 마크다운, JSON 으로 받습니다.
-`@gsainfoteam/ids-react/editor` 에서 가져오고, Editor 를 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다.
+`@gsainfoteam/ids-react/editor` 에서 가져오고, Editor 를 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다. Tiptap 은 Editor 가 마운트될 때 `import()` 로 불러옵니다.
 [Editor API](./src/components/form/editor/README.md).
 
 ## Interaction feedback

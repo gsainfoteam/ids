@@ -58,6 +58,11 @@ export function EditorLink({ icon, 'aria-label': ariaLabel, className }: EditorL
       return;
     }
     const url = withProtocol(typed);
+    const theLinkExtensionAllowsTheAddress = editor.can().setLink({ href: url });
+    if (!theLinkExtensionAllowsTheAddress) {
+      setOpen(false);
+      return;
+    }
     const insertsTheAddressAsText = editor.state.selection.empty && !editor.isActive('link');
     const chain = editor.chain().focus().extendMarkRange('link');
     const linked = insertsTheAddressAsText

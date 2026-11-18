@@ -242,6 +242,31 @@ test('a javascript: address is not linked', async () => {
   expect(onValueChange).not.toHaveBeenCalled();
 });
 
+test('a javascript: address typed with nothing selected is neither linked nor inserted', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      aria-label="본문"
+      format="json"
+      defaultValue={{ type: 'doc', content: [{ type: 'paragraph' }] }}
+      onValueChange={onValueChange}
+    >
+      <Editor.Link />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+
+  await userEvent.click(page.getByRole('button', { name: '링크' }));
+  await userEvent.keyboard('javascript:alert(1){Enter}');
+
+  await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
+  expect(content.element().querySelector('a')).toBeNull();
+  expect(content.element().textContent).toBe('');
+  expect(onValueChange).not.toHaveBeenCalled();
+});
+
 test('Field names the body, blocks an empty required submit and reports the browser message', async () => {
   const onSubmit = vi.fn();
   render(

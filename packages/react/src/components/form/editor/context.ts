@@ -7,6 +7,7 @@ import { invariant } from '../../../utils';
 import type { editorStyle } from './style';
 import type { IdsSize } from '../../../tokens/types';
 import type { Editor as TiptapEditor } from '@tiptap/core';
+import type { EditorContent } from '@tiptap/react';
 
 export type EditorImages = {
   upload: (files: readonly File[], at: number) => void;
@@ -26,6 +27,7 @@ export type EditorContextValue = {
   bubbles: ReactNode;
   images: EditorImages | null;
   styles: ReturnType<typeof editorStyle>;
+  EngineContent: typeof EditorContent | null;
 };
 
 export const EditorContext = createContext<EditorContextValue | null>(null);

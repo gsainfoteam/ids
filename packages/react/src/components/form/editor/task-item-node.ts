@@ -1,4 +1,4 @@
-import { TaskItem } from '@tiptap/extension-list';
+import { TaskItem, TaskList } from '@tiptap/extension-list';
 
 import { editorStyle } from './style';
 import { checkboxStyle } from '../checkbox/style';
@@ -25,7 +25,7 @@ function checkIcon(document: Document) {
 const checkbox = checkboxStyle({ variant: 'outline', size: 'standard' });
 const { taskBox } = editorStyle();
 
-export const EditorTaskItemNode = TaskItem.extend({
+const EditorTaskItemNode = TaskItem.extend({
   addNodeView() {
     const tiptapView = this.parent?.();
     if (!tiptapView) return null;
@@ -65,3 +65,13 @@ export const EditorTaskItemNode = TaskItem.extend({
     };
   },
 });
+
+export function taskListExtensions(checkboxLabel: (text: string) => string) {
+  return [
+    TaskList,
+    EditorTaskItemNode.configure({
+      nested: true,
+      a11y: { checkboxLabel: (node) => checkboxLabel(node.textContent) },
+    }),
+  ];
+}

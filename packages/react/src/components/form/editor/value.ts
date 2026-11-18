@@ -1,4 +1,4 @@
-import { keepAllowedImages } from './image-node';
+import { keepAllowedImages } from './image-source';
 
 import type { Editor as TiptapEditor, JSONContent } from '@tiptap/core';
 

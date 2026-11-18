@@ -13,13 +13,6 @@ import {
   type ReactNode,
 } from 'react';
 
-import { Highlight } from '@tiptap/extension-highlight';
-import { TaskList } from '@tiptap/extension-list';
-import { TextAlign } from '@tiptap/extension-text-align';
-import { CharacterCount, Placeholder } from '@tiptap/extensions';
-import { Markdown } from '@tiptap/markdown';
-import { useEditor } from '@tiptap/react';
-import { StarterKit } from '@tiptap/starter-kit';
 import { isEqual } from 'es-toolkit';
 
 import { EditorBar } from './bar';
@@ -35,17 +28,11 @@ import { EditorBubbleMenu } from './bubble-menu';
 import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorContext, type EditorImages } from './context';
 import { EditorCount } from './count';
-import { LeaveEscapeToTheLayers } from './escape-to-layers';
 import { EditorHorizontalRule } from './horizontal-rule';
 import { EditorImage } from './image';
-import {
-  EditorImageNode,
-  imageFileHandler,
-  isImageFile,
-  uploadImage,
-  type ImageUpload,
-} from './image-node';
+import { isImageFile, type ImageUpload } from './image-source';
 import { EditorLink } from './link';
+import { loadEngine, engineKey, type EditorParts, type LoadedEngine } from './load-engine';
 import {
   EditorBold,
   EditorCode,
@@ -56,7 +43,6 @@ import {
 } from './marks';
 import { EditorSeparator } from './separator';
 import { editorStyle } from './style';
-import { EditorTaskItemNode } from './task-item-node';
 import { EditorTextAlign } from './text-align';
 import { useEditorSelector } from './use-editor-selector';
 import {
@@ -77,7 +63,7 @@ import { toast } from '../../feedback/toast/toast-store';
 import { FieldNotifyContext, useFieldSize } from '../field/context';
 
 import type { Editor } from '.';
-import type { Editor as TiptapEditor, Extensions } from '@tiptap/core';
+import type { Editor as TiptapEditor } from '@tiptap/core';
 
 export type EditorVariant = 'outline' | 'soft';
 
@@ -167,10 +153,21 @@ function definedOnly(record: Record<string, string | undefined>) {
   );
 }
 
-const placeholderOfTheTextbox = ({ editor }: { editor: TiptapEditor }) =>
-  editor.view.dom.getAttribute('aria-placeholder') ?? '';
+function useLoadedEngine(format: EditorFormat, { highlight, taskList, textAlign }: EditorParts) {
+  const [loaded, setLoaded] = useState<LoadedEngine | null>(null);
 
-type EditorParts = { highlight: boolean; taskList: boolean; textAlign: boolean };
+  useEffect(() => {
+    let mounted = true;
+    void loadEngine(format, { highlight, taskList, textAlign }).then((next) => {
+      if (mounted) setLoaded(next);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [format, highlight, taskList, textAlign]);
+
+  return loaded?.key === engineKey(format, { highlight, taskList, textAlign }) ? loaded : null;
+}
 
 const usesPart = (source: ReactNode, part: unknown) => containsElementOfType(source, new Set([part]));
 
@@ -180,51 +177,6 @@ function partsIn(source: ReactNode): EditorParts {
     taskList: usesPart(source, EditorTaskList),
     textAlign: usesPart(source, EditorTextAlign),
   };
-}
-
-type ImageSetup = {
-  uploaded: ReadonlySet<string>;
-  start: ((editor: TiptapEditor, files: File[], at: number) => void) | null;
-};
-
-function extensionsFor({
-  format,
-  maxLength,
-  parts,
-  images,
-  taskLabel,
-}: {
-  format: EditorFormat;
-  maxLength: number | undefined;
-  parts: EditorParts;
-  images: ImageSetup;
-  taskLabel: (text: string) => string;
-}): Extensions {
-  return [
-    StarterKit.configure({
-      heading: { levels: [1, 2, 3, 4] },
-      gapcursor: false,
-      trailingNode: false,
-      link: { openOnClick: false, autolink: true, defaultProtocol: 'https' },
-    }),
-    Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
-    CharacterCount.configure({ limit: maxLength }),
-    LeaveEscapeToTheLayers,
-    EditorImageNode.configure({ uploaded: images.uploaded, insertable: images.start !== null }),
-    ...(images.start ? [imageFileHandler(images.start)] : []),
-    ...(parts.highlight ? [Highlight] : []),
-    ...(parts.taskList
-      ? [
-          TaskList,
-          EditorTaskItemNode.configure({
-            nested: true,
-            a11y: { checkboxLabel: (node) => taskLabel(node.textContent) },
-          }),
-        ]
-      : []),
-    ...(parts.textAlign ? [TextAlign.configure({ types: ['heading', 'paragraph'] })] : []),
-    ...(format === 'markdown' ? [Markdown] : []),
-  ];
 }
 
 function taskLabelIn(t: Translate) {
@@ -282,12 +234,14 @@ export function EditorRoot(props: Editor.Props) {
     onValueChange: onValueChange as ((next: EditorValue | undefined) => void) | undefined,
   });
   const [focused, setFocused] = useState(false);
+  const loaded = useLoadedEngine(format, parts);
   const [uploaded] = useState(() => new Set<string>());
   const [pendingUploads, setPendingUploads] = useState(0);
 
   const startUploads = (instance: TiptapEditor, files: readonly File[], at: number) => {
     const upload = latest.current.onImageUpload;
-    if (!upload) return;
+    if (!upload || !loaded) return;
+    const { uploadImage } = loaded.engine;
     const accepted = files.filter(isImageFile);
     for (const file of files.filter((candidate) => !isImageFile(candidate)))
       toast.error(t('editor.imageNotSupported'), { description: file.name });
@@ -334,45 +288,52 @@ export function EditorRoot(props: Editor.Props) {
     taskLabel: (text: string) => taskLabelIn(latest.current.t)(text),
   }));
 
-  const { highlight, taskList, textAlign } = parts;
   const extensions = useMemo(
     () =>
-      extensionsFor({
-        format,
+      loaded?.engine.extensionsFor({
         maxLength,
-        parts: { highlight, taskList, textAlign },
+        markdown: loaded.markdown,
+        parts: loaded.parts,
         images: { uploaded, start: insertable ? callIntoTheLatestRender.startUploads : null },
         taskLabel: callIntoTheLatestRender.taskLabel,
       }),
-    [format, maxLength, highlight, taskList, textAlign, insertable, uploaded, callIntoTheLatestRender],
+    [loaded, maxLength, insertable, uploaded, callIntoTheLatestRender],
   );
+  const [editor, setEditor] = useState<TiptapEditor | null>(null);
 
-  const editor = useEditor(
-    {
-      immediatelyRender: false,
-      shouldRerenderOnTransaction: false,
-      injectCSS: false,
-      editable,
-      extensions,
-      content: writable(current ?? '', format, uploaded),
-      contentType: format,
-      editorProps: { attributes: contentAttributes },
-      onCreate: ({ editor: instance }) => {
-        contentRef.current = instance.view.dom;
-      },
-      onUpdate: ({ editor: instance }) => {
-        const next = readValue(instance, latest.current.format);
-        reportedSinceTheLastRender.current = [
-          ...reportedSinceTheLastRender.current.slice(-REPORTS_AWAITING_AN_ECHO),
-          next,
-        ];
-        latest.current.setCurrent(next);
-      },
-      onFocus: () => setFocused(true),
-      onBlur: () => setFocused(false),
-    },
-    [extensions],
-  );
+  const engineOptions = extensions && {
+    immediatelyRender: false,
+    shouldRerenderOnTransaction: false,
+    injectCSS: false,
+    editable,
+    extensions,
+    content: writable(current ?? '', format, uploaded),
+    contentType: format,
+    editorProps: { attributes: contentAttributes },
+  };
+
+  useEffect(() => {
+    contentRef.current = editor?.view.dom ?? null;
+    if (!editor) return;
+    const report = () => {
+      const next = readValue(editor, latest.current.format);
+      reportedSinceTheLastRender.current = [
+        ...reportedSinceTheLastRender.current.slice(-REPORTS_AWAITING_AN_ECHO),
+        next,
+      ];
+      latest.current.setCurrent(next);
+    };
+    const focus = () => setFocused(true);
+    const blur = () => setFocused(false);
+    editor.on('update', report);
+    editor.on('focus', focus);
+    editor.on('blur', blur);
+    return () => {
+      editor.off('update', report);
+      editor.off('focus', focus);
+      editor.off('blur', blur);
+    };
+  }, [editor]);
 
   const attributesKey = JSON.stringify(contentAttributes);
   useLayoutEffect(() => {
@@ -437,6 +398,7 @@ export function EditorRoot(props: Editor.Props) {
         bubbles,
         images,
         styles,
+        EngineContent: loaded?.engine.EditorContent ?? null,
       }}
     >
       <div
@@ -454,6 +416,9 @@ export function EditorRoot(props: Editor.Props) {
         })}
         style={typeof style === 'function' ? style(state) : style}
       >
+        {loaded && engineOptions && (
+          <loaded.engine.EditorEngine options={engineOptions} onEditor={setEditor} />
+        )}
         {top.length > 0 && (
           <EditorBar toolbar scrolls className={styles.bar({ position: 'top' })}>
             {top}
