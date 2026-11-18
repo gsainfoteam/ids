@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../messages/ids_messages.dart';
 import '../tokens/ids_color_roles.dart';
+import '../tokens/ids_component_tokens.dart';
 import '../tokens/ids_enums.dart';
 import 'ids_resolved_theme.dart';
 import 'ids_theme.dart';
@@ -29,6 +30,8 @@ class IdsScope extends InheritedWidget {
   IdsMode get resolvedMode => resolved.mode;
   bool get isDark => resolved.isDark;
   IdsColors get colors => resolved.colors;
+  IdsComponentColors get componentColors => resolved.componentColors;
+  IdsComponentShadows get componentShadows => resolved.componentShadows;
   IdsRadius get radius => resolved.radius;
   double get scale => resolved.scale;
   IdsCornerShape get cornerShape => resolved.cornerShape;

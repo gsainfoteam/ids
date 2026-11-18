@@ -26,6 +26,9 @@ These files are written by `pnpm codegen` (Style Dictionary, message generation 
 - `packages/react/src/tokens/types.ts`
 - `packages/react/src/tokens/palette-model.ts` and
   `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/palette-model.js`)
+- `packages/react/src/tokens/component-tokens.ts` and
+  `packages/flutter/lib/tokens/ids_component_tokens.dart` (`IdsComponentColors`,
+  `IdsComponentShadows`), written from `packages/core/tokens/component.json` and `shadow.json`
 - `packages/react/src/internal/messages-catalog.ts`
 - `packages/react/messages/en.json`
 - `packages/flutter/lib/tokens/*.dart`, including `ids_color_roles.dart` (`IdsColors`, written from

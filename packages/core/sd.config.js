@@ -145,6 +145,42 @@ const schemeTarget = (family, slot) =>
 
 const SCHEME_LAYER_IN_TEXT_COLOR = ["neutral"];
 
+const MODES = ["light", "dark"];
+
+const readTokenFile = (file, key) =>
+  Object.entries(JSON.parse(readFileSync(`./tokens/${file}`, "utf8"))[key]);
+
+const SHADOW_STEPS = readTokenFile("shadow.json", "shadow").map(([step, token]) => ({
+  step,
+  layers: token.$value,
+}));
+
+const COMPONENT_TOKENS = readTokenFile("component.json", "component").map(([name, token]) => ({
+  name,
+  property: name.slice(0, name.indexOf("-")),
+  part: name.slice(name.indexOf("-") + 1),
+  modes: token.$value,
+}));
+
+const COMPONENT_COLORS = COMPONENT_TOKENS.filter(({ property }) => property !== "shadow");
+
+const COMPONENT_SHADOWS = COMPONENT_TOKENS.filter(({ property }) => property === "shadow");
+
+const shadowStepOf = (reference) => reference.match(/^\{shadow\.([^}]+)\}$/)[1];
+
+const shadowVar = (name) => `--ids-shadow-${name}`;
+
+const px = (n) => (n === 0 ? "0" : `${n}px`);
+
+const NO_SHADOW_THAT_STILL_COMPOSES = "0 0 #0000";
+
+const cssShadow = (layers) =>
+  layers.length === 0
+    ? NO_SHADOW_THAT_STILL_COMPOSES
+    : layers
+        .map(({ x, y, blur, spread, color }) => `${px(x)} ${px(y)} ${px(blur)} ${px(spread)} ${color}`)
+        .join(", ");
+
 const themeVar = (mode, slot) => `--ids-theme-${mode}-${slot}`;
 
 const TW_NS = {
@@ -244,9 +280,18 @@ const SCHEME_BRIDGE_SLOTS = SCHEME_SLOTS.map(({ property, name, slot }) => ({
   slot: slot.replaceAll("{family}", SCHEME),
 }));
 
+const COMPONENT_BRIDGE_SLOTS = COMPONENT_COLORS.map(({ property, part, name }) => ({
+  property,
+  name: part,
+  slot: name,
+}));
+
 const buildColorBridgeCSS = () =>
   render(T_CSS_THEME, {
-    THEME: [...FAMILY_SLOTS, ...SCHEME_BRIDGE_SLOTS].flatMap(bridgeLines).join("\n"),
+    THEME: [
+      ...[...FAMILY_SLOTS, ...SCHEME_BRIDGE_SLOTS, ...COMPONENT_BRIDGE_SLOTS].flatMap(bridgeLines),
+      ...COMPONENT_SHADOWS.map(({ name, part }) => `  --shadow-${part}: var(--ids-${name});`),
+    ].join("\n"),
   });
 
 const schemeLayer = (family) =>
@@ -270,9 +315,12 @@ const buildSchemeCSS = () =>
   }).join("\n");
 
 const buildStaticCSS = (dictionary) => {
-  const lines = ["motion", "radius", "size", "state"].flatMap((cat) =>
-    byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
-  );
+  const lines = [
+    ...["motion", "radius", "size", "state"].flatMap((cat) =>
+      byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
+    ),
+    ...SHADOW_STEPS.map(({ step, layers }) => `  ${shadowVar(step)}: ${cssShadow(layers)};`),
+  ];
   const roundedUsesIdsRadius = byCategory(dictionary, "radius").map(
     (t) => `  --radius-${slug(t)}: var(${idsVar("radius", t)});`,
   );
@@ -559,7 +607,13 @@ const providerValue = (mode, slot, fallbacks) => {
 
 const buildColorRolesCSS = (dictionary, mode) => {
   const fallbacks = neutralFallbacks(dictionary, mode);
-  const lines = FAMILY_SLOTS.map(({ slot }) => slot).map((slot) => `  ${colorVar(slot)}: ${providerValue(mode, slot, fallbacks)};`);
+  const lines = [
+    ...FAMILY_SLOTS.map(({ slot }) => `  ${colorVar(slot)}: ${providerValue(mode, slot, fallbacks)};`),
+    ...COMPONENT_COLORS.map(({ name, modes }) => `  ${colorVar(name)}: var(${colorVar(modes[mode])});`),
+    ...COMPONENT_SHADOWS.map(
+      ({ name, modes }) => `  --ids-${name}: var(${shadowVar(shadowStepOf(modes[mode]))});`,
+    ),
+  ];
   return block(`[data-mode="${mode}"]`, lines);
 };
 
@@ -871,6 +925,159 @@ const dartColorRolesFormatter = ({ dictionary }) => {
   });
 };
 
+const tsComponentTokensFormatter = () =>
+  render(T_TS_FILE, {
+    BODY: [
+      `export const IDS_SHADOWS = ${tsRecord(
+        Object.fromEntries(SHADOW_STEPS.map(({ step, layers }) => [step, `'${cssShadow(layers)}'`])),
+        "",
+      )} as const;`,
+      `export const IDS_COMPONENT_COLORS = ${tsRecord(
+        Object.fromEntries(
+          COMPONENT_COLORS.map(({ name, modes }) => [
+            name,
+            `{ ${MODES.map((mode) => `${mode}: '${modes[mode]}'`).join(", ")} }`,
+          ]),
+        ),
+        "",
+      )} as const;`,
+      `export const IDS_COMPONENT_SHADOWS = ${tsRecord(
+        Object.fromEntries(
+          COMPONENT_SHADOWS.map(({ name, modes }) => [
+            name,
+            `{ ${MODES.map((mode) => `${mode}: '${shadowStepOf(modes[mode])}'`).join(", ")} }`,
+          ]),
+        ),
+        "",
+      )} as const;`,
+    ].join("\n\n"),
+  });
+
+const dartColor = (hex) => {
+  const [r, g, b, a = "ff"] = hex.slice(1).match(/../g);
+  return `Color(0x${(a + r + g + b).toUpperCase()})`;
+};
+
+const dartBoxShadow = ({ x, y, blur, spread, color }) =>
+  `BoxShadow(color: ${dartColor(color)}, offset: Offset(${x}, ${y}), blurRadius: ${blur}, spreadRadius: ${spread})`;
+
+const dartModeMap = (type, entries) =>
+  `<IdsMode, Map<String, ${type}>>{\n${MODES.map(
+    (mode) =>
+      `    IdsMode.${mode}: {\n${entries
+        .map(([name, value]) => `      '${name}': ${value(mode)},`)
+        .join("\n")}\n    },`,
+  ).join("\n")}\n  }`;
+
+const T_DART_COMPONENT_TOKENS = `${GENERATED}
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
+
+import 'ids_color_roles.dart';
+import 'ids_enums.dart';
+
+abstract final class IdsShadows {
+  static const steps = <String, List<BoxShadow>>{
+{{SHADOW_STEPS}}
+  };
+}
+
+abstract final class IdsComponentTokens {
+  static const colorRoles = {{COLOR_ROLES}};
+
+  static const shadowSteps = {{SHADOW_TOKENS}};
+
+  static Map<String, T> inMode<T>(Map<IdsMode, Map<String, T>> table, IdsMode mode) =>
+      table[mode] ?? (throw ArgumentError.value(mode, 'mode', 'is not light or dark'));
+}
+
+@immutable
+class IdsComponentColors {
+  const IdsComponentColors({
+{{COLOR_PARAMS}}
+  });
+
+  factory IdsComponentColors.of(IdsColors colors, IdsMode mode) {
+    final roles = IdsComponentTokens.inMode(IdsComponentTokens.colorRoles, mode);
+    Color token(String name) => colors[roles[name]!];
+    return IdsComponentColors(
+{{COLOR_FROM}}
+    );
+  }
+
+{{COLOR_FIELDS}}
+
+  Map<String, Color> get tokens => {
+{{COLOR_TOKENS}}
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsComponentColors &&
+{{COLOR_EQUALS}};
+
+  @override
+  int get hashCode => Object.hashAll(tokens.values);
+}
+
+@immutable
+class IdsComponentShadows {
+  const IdsComponentShadows({
+{{SHADOW_PARAMS}}
+  });
+
+  factory IdsComponentShadows.of(IdsMode mode) {
+    final steps = IdsComponentTokens.inMode(IdsComponentTokens.shadowSteps, mode);
+    List<BoxShadow> token(String name) => IdsShadows.steps[steps[name]!]!;
+    return IdsComponentShadows(
+{{SHADOW_FROM}}
+    );
+  }
+
+{{SHADOW_FIELDS}}
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsComponentShadows &&
+{{SHADOW_EQUALS}};
+
+  @override
+  int get hashCode => Object.hashAll([{{SHADOW_HASH}}]);
+}
+`;
+
+const dartComponentTokensFormatter = () => {
+  const colors = COMPONENT_COLORS.map(({ name }) => [name, toCamel(name)]);
+  const shadows = COMPONENT_SHADOWS.map(({ name }) => [name, toCamel(name)]);
+  return render(T_DART_COMPONENT_TOKENS, {
+    SHADOW_STEPS: SHADOW_STEPS.map(
+      ({ step, layers }) =>
+        `    '${step}': <BoxShadow>[${layers.map(dartBoxShadow).join(", ")}],`,
+    ).join("\n"),
+    COLOR_ROLES: dartModeMap(
+      "String",
+      COMPONENT_COLORS.map(({ name, modes }) => [name, (mode) => `'${modes[mode]}'`]),
+    ),
+    SHADOW_TOKENS: dartModeMap(
+      "String",
+      COMPONENT_SHADOWS.map(({ name, modes }) => [name, (mode) => `'${shadowStepOf(modes[mode])}'`]),
+    ),
+    COLOR_PARAMS: colors.map(([, field]) => `    required this.${field},`).join("\n"),
+    COLOR_FROM: colors.map(([name, field]) => `      ${field}: token('${name}'),`).join("\n"),
+    COLOR_FIELDS: colors.map(([, field]) => `  final Color ${field};`).join("\n"),
+    COLOR_TOKENS: colors.map(([name, field]) => `    '${name}': ${field},`).join("\n"),
+    COLOR_EQUALS: colors.map(([, field]) => `      other.${field} == ${field}`).join(" &&\n"),
+    SHADOW_PARAMS: shadows.map(([, field]) => `    required this.${field},`).join("\n"),
+    SHADOW_FROM: shadows.map(([name, field]) => `      ${field}: token('${name}'),`).join("\n"),
+    SHADOW_FIELDS: shadows.map(([, field]) => `  final List<BoxShadow> ${field};`).join("\n"),
+    SHADOW_EQUALS: shadows
+      .map(([, field]) => `      listEquals(other.${field}, ${field})`)
+      .join(" &&\n"),
+    SHADOW_HASH: shadows.map(([, field]) => `...${field}`).join(", "),
+  });
+};
+
 const dartMotionFormatter = ({ dictionary }) =>
   render(T_DART_CLASS, {
     NAME: "IdsMotion",
@@ -937,6 +1144,8 @@ for (const [name, format] of [
   ["ids/dart-enums", dartEnumsFormatter],
   ["ids/dart-color-roles", dartColorRolesFormatter],
   ["ids/dart-motion", dartMotionFormatter],
+  ["ids/ts-component-tokens", tsComponentTokensFormatter],
+  ["ids/dart-component-tokens", dartComponentTokensFormatter],
   ["ids/dart-typography", dartTypographyFormatter],
 ]) {
   StyleDictionary.registerFormat({ name, format });
@@ -956,6 +1165,7 @@ export default {
       files: [
         { destination: "../react/src/tokens/types.ts", format: "ids/ts-types" },
         { destination: "../react/src/tokens/color-roles.ts", format: "ids/ts-color-roles" },
+        { destination: "../react/src/tokens/component-tokens.ts", format: "ids/ts-component-tokens" },
       ],
     },
     dart: {
@@ -967,6 +1177,10 @@ export default {
           format: "ids/dart-color-roles",
         },
         { destination: "../flutter/lib/tokens/ids_motion.dart", format: "ids/dart-motion" },
+        {
+          destination: "../flutter/lib/tokens/ids_component_tokens.dart",
+          format: "ids/dart-component-tokens",
+        },
         {
           destination: "../flutter/lib/tokens/ids_typography.dart",
           format: "ids/dart-typography",

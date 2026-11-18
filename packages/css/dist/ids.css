@@ -142,6 +142,30 @@
   --ring-color-scheme: var(--ids-color-border-scheme);
   --outline-color-scheme: var(--ids-color-border-scheme);
   --stroke-scheme: var(--ids-color-border-scheme);
+  --background-color-panel: var(--ids-color-bg-panel);
+  --background-color-band: var(--ids-color-bg-band);
+  --background-color-control-outline: var(--ids-color-bg-control-outline);
+  --border-color-control-outline: var(--ids-color-border-control-outline);
+  --ring-color-control-outline: var(--ids-color-border-control-outline);
+  --outline-color-control-outline: var(--ids-color-border-control-outline);
+  --stroke-control-outline: var(--ids-color-border-control-outline);
+  --background-color-field-outline: var(--ids-color-bg-field-outline);
+  --border-color-field-outline: var(--ids-color-border-field-outline);
+  --ring-color-field-outline: var(--ids-color-border-field-outline);
+  --outline-color-field-outline: var(--ids-color-border-field-outline);
+  --stroke-field-outline: var(--ids-color-border-field-outline);
+  --border-color-field-bar: var(--ids-color-border-field-bar);
+  --ring-color-field-bar: var(--ids-color-border-field-bar);
+  --outline-color-field-bar: var(--ids-color-border-field-bar);
+  --stroke-field-bar: var(--ids-color-border-field-bar);
+  --background-color-switch-thumb: var(--ids-color-bg-switch-thumb);
+  --background-color-qr-code-light: var(--ids-color-bg-qr-code-light);
+  --text-color-qr-code-light: var(--ids-color-text-qr-code-light);
+  --fill-qr-code-light: var(--ids-color-text-qr-code-light);
+  --background-color-qr-code-dark: var(--ids-color-bg-qr-code-dark);
+  --text-color-qr-code-dark: var(--ids-color-text-qr-code-dark);
+  --fill-qr-code-dark: var(--ids-color-text-qr-code-dark);
+  --shadow-panel: var(--ids-shadow-panel);
 }
 
 :root {
@@ -163,6 +187,9 @@
   --ids-state-fill-color: #000000;
   --ids-state-fill-hover: 10%;
   --ids-state-fill-press: 18%;
+  --ids-shadow-0: 0 0 #0000;
+  --ids-shadow-1: 0 1px 2px 0 #0000000d;
+  --ids-shadow-2: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a;
 }
 
 @theme inline {
@@ -1744,6 +1771,19 @@
   --ids-color-text-on-info: var(--ids-theme-light-text-on-info);
   --ids-color-text-info: var(--ids-theme-light-text-info);
   --ids-color-border-info: var(--ids-theme-light-border-info);
+  --ids-color-bg-panel: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-bg-band: var(--ids-color-bg-neutral-subtler);
+  --ids-color-bg-control-outline: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-border-control-outline: var(--ids-color-border-neutral);
+  --ids-color-bg-field-outline: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-border-field-outline: var(--ids-color-border-neutral);
+  --ids-color-border-field-bar: var(--ids-color-border-neutral);
+  --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-bg-qr-code-light: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-text-qr-code-light: var(--ids-color-text-neutral-bold);
+  --ids-color-bg-qr-code-dark: var(--ids-color-bg-neutral-bold);
+  --ids-color-text-qr-code-dark: var(--ids-color-text-on-neutral-bold);
+  --ids-shadow-panel: var(--ids-shadow-1);
 }
 
 [data-mode="dark"] {
@@ -1816,4 +1856,17 @@
   --ids-color-text-on-info: var(--ids-theme-dark-text-on-info);
   --ids-color-text-info: var(--ids-theme-dark-text-info);
   --ids-color-border-info: var(--ids-theme-dark-border-info);
+  --ids-color-bg-panel: var(--ids-color-bg-neutral-subtler);
+  --ids-color-bg-band: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-bg-control-outline: var(--ids-color-bg-neutral-subtle);
+  --ids-color-border-control-outline: var(--ids-color-bg-neutral);
+  --ids-color-bg-field-outline: var(--ids-color-bg-neutral-subtle);
+  --ids-color-border-field-outline: var(--ids-color-bg-neutral);
+  --ids-color-border-field-bar: var(--ids-color-bg-neutral);
+  --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-bold);
+  --ids-color-bg-qr-code-light: var(--ids-color-bg-neutral-bold);
+  --ids-color-text-qr-code-light: var(--ids-color-text-on-neutral-bold);
+  --ids-color-bg-qr-code-dark: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-text-qr-code-dark: var(--ids-color-text-neutral-bold);
+  --ids-shadow-panel: var(--ids-shadow-0);
 }

@@ -1,8 +1,11 @@
 import { createCn, validators, type ConfigExtension, type DefaultClassGroupIds } from 'cn/config';
 
 import { IDS_COLOR_FAMILIES } from '../tokens/color-roles';
+import { IDS_COMPONENT_SHADOWS } from '../tokens/component-tokens';
 
 import type { CnFunction } from 'cn';
+
+const componentShadows = Object.keys(IDS_COMPONENT_SHADOWS).map((token) => token.replace(/^shadow-/, ''));
 
 const isTextStyle = (value: string) => /^(headline|subtitle|body|caption|button)-/.test(value);
 
@@ -21,6 +24,7 @@ const config = {
   extend: {
     theme: {
       radius: ['standard', 'indicator'],
+      shadow: componentShadows,
     },
     classGroups: {
       'font-size': [{ text: [isTextStyle] }],
