@@ -158,18 +158,12 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="in a tray">
           <Card className="concentric-p-1 w-fit flex-row gap-0">
-            <ButtonGroup attached={false} variant="soft" aria-label="사진 보기" className="gap-1">
-              <IconButton colorScheme="neutral" icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-              <Button colorScheme="neutral" className="tabular-nums">
-                3 / 12
-              </Button>
-              <IconButton
-                colorScheme="neutral"
-                icon={<ChevronRightIcon />}
-                aria-label="다음 사진"
-              />
+            <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+              <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+              <Button className="tabular-nums">3 / 12</Button>
+              <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
               <ButtonGroup.Separator className="mx-1" />
-              <IconButton colorScheme="neutral" icon={<XMarkIcon />} aria-label="닫기" />
+              <IconButton icon={<XMarkIcon />} aria-label="닫기" />
             </ButtonGroup>
           </Card>
         </Showcase.Row>
@@ -297,11 +291,11 @@ export const Separator: Story = {
 export const SpacedSeparator: Story = {
   render: () => (
     <Card className="concentric-p-1 w-fit flex-row gap-0">
-      <ButtonGroup attached={false} variant="soft" aria-label="사진 보기" className="gap-1">
-        <IconButton colorScheme="neutral" icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-        <IconButton colorScheme="neutral" icon={<ChevronRightIcon />} aria-label="다음 사진" />
+      <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
+        <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+        <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
         <ButtonGroup.Separator className="mx-1" />
-        <IconButton colorScheme="neutral" icon={<XMarkIcon />} aria-label="닫기" />
+        <IconButton icon={<XMarkIcon />} aria-label="닫기" />
       </ButtonGroup>
     </Card>
   ),
