@@ -113,6 +113,11 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
   - charts `recharts` 3, an optional peer imported only by the `@gsainfoteam/ids-react/chart`
     entry, so an app without charts never installs it. Chart sizes, colors and labels the Recharts
     chart the app writes; Tooltip, Legend and the screen reader table are IDS's code.
+  - rich text editing `@tiptap/*` 3 (MIT parts only: core, react, pm, starter-kit, extensions,
+    markdown), imported only by the `@gsainfoteam/ids-react/editor` entry. Only
+    `editor/engine.tsx` imports it at runtime, and `load-engine.ts` loads that with `import()`
+    when an Editor mounts; Markdown goes through `@tiptap/markdown`, loaded the same way only for
+    `format="markdown"`. The shell, toolbar and parts are IDS's code and use Tiptap's types only.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:
   - the `overlay` and `toast` stores, on React's `useSyncExternalStore`. overlay-kit leaves a
