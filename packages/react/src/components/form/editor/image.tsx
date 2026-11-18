@@ -6,7 +6,7 @@ import { PhotoIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
 import { useEditorContext } from './context';
-import { IMAGE_TYPES } from './image-source';
+import { IMAGE_ACCEPT } from './image-source';
 import { useEditorToolProps, useToolState, type EditorToolProps } from './tool';
 import { useTranslate } from '../../../internal/translate';
 import { isDevelopment } from '../../../utils/dev';
@@ -24,8 +24,6 @@ const IMAGE = {
   isActive: (editor: TiptapEditor) => editor.isActive('image'),
   can: () => true,
 };
-
-const ACCEPTED = IMAGE_TYPES.join(',');
 
 const isPlainEnter = (event: KeyboardEvent) =>
   event.key === 'Enter' &&
@@ -129,7 +127,7 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
       <input
         ref={inputRef}
         type="file"
-        accept={ACCEPTED}
+        accept={IMAGE_ACCEPT}
         multiple
         tabIndex={-1}
         aria-hidden="true"

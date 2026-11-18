@@ -3,7 +3,7 @@
 굵게, 목록, 링크 같은 서식을 넣는 글 편집기입니다. [Tiptap](https://tiptap.dev) 3 (ProseMirror) 위에서 돌고, 테두리와 툴바, 글자 수는 IDS 컴포넌트로 그립니다.
 
 - **따로 가져옴.** `@gsainfoteam/ids-react/editor` 에서 가져옵니다. Editor 를 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다.
-- **엔진은 나중에 불러옴.** `import { Editor }` 는 테두리, 툴바, 부품만 가져옵니다(약 90 kB). Tiptap 은 Editor 가 마운트될 때 `import()` 로 따로 불러오므로(약 154 kB) 첫 화면의 JavaScript 에 들어가지 않습니다.
+- **엔진은 나중에 불러옴.** `import { Editor }` 는 테두리, 툴바, 부품만 가져옵니다(약 109 kB). Tiptap 은 Editor 가 마운트될 때 `import()` 로 따로 불러오므로(약 169 kB) 첫 화면의 JavaScript 에 들어가지 않습니다.
 - **필드와 같은 테두리.** TextField, TextArea 와 같은 `field-surface` 라 `outline`, `soft`, 포커스 링, 오류 테두리가 같습니다.
 - **폼에 들어감.** `name` 을 주면 숨은 input 으로 FormData 에 들어가고, `required` 면 빈 본문의 제출을 브라우저가 막습니다. Field 안에 두면 라벨, 설명, 오류가 본문에 연결됩니다.
 - **세 가지 값.** `format` 이 `html`(기본), `markdown`, `json` 중 무엇이냐에 따라 값의 모양이 바뀝니다.
@@ -58,6 +58,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | `BulletList` `OrderedList` `Blockquote` `CodeBlock`    | 블록 서식                                                       |
 | `TaskList`                                             | 할 일 목록. 체크박스는 IDS Checkbox 와 같은 모양입니다           |
 | `HorizontalRule`                                       | 구분선을 넣는 버튼                                              |
+| `Table`                                                | 표를 넣고, 커서가 있는 칸 기준으로 행과 열을 더하고 지우는 Menu |
 | `TextAlign`                                            | 문단과 제목의 정렬 토글 묶음(`alignments`, 기본 왼쪽, 가운데, 오른쪽) |
 | `Image`                                                | 그림 파일을 고르는 버튼. 그림을 고른 채 누르면 대체 텍스트 Popover |
 | `BlockType`                                            | 문단과 제목(`levels`, 기본 2와 3)을 고르는 Select                |
@@ -67,8 +68,9 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | `Count`                                                | `maxLength` 에 대한 글자 수. TextArea.Count 와 같습니다           |
 
 - 도구는 `icon` 과 `aria-label` 로 아이콘과 이름을 바꿀 수 있습니다.
-- `Highlight`, `TaskList`, `TextAlign` 은 Editor 의 자식(`BubbleMenu` 의 자식 포함)에 있을 때만 그 Tiptap 확장을 엔진과 함께 `import()` 로 불러옵니다. 쓰지 않는 앱은 그 코드를 받지 않고, 스키마와 플러그인도 돌리지 않습니다.
-- 그래서 그 부품이 없으면 값에 있던 형광펜, 할 일, 정렬도 읽지 않고 버립니다. 저장한 글에 쓰인 서식의 부품은 계속 둡니다.
+- `Highlight`, `TaskList`, `TextAlign`, `Table` 은 Editor 의 자식(`BubbleMenu` 의 자식 포함)에 있을 때만 그 Tiptap 확장을 엔진과 함께 `import()` 로 불러옵니다. 쓰지 않는 앱은 그 코드를 받지 않고, 스키마와 플러그인도 돌리지 않습니다.
+- 그래서 그 부품이 없으면 값에 있던 형광펜, 할 일, 정렬, 표도 읽지 않고 버립니다. 저장한 글에 쓰인 서식의 부품은 계속 둡니다.
+- 그림 노드는 저장된 그림을 지키려고 늘 엔진에 있습니다. 올리기, 자리표시, 파일 붙여넣기와 끌어 놓기는 `onImageUpload` 가 있을 때만 따로 불러옵니다.
 - 부품을 앱의 컴포넌트 안에 감싸 넣으면 Editor 가 찾지 못합니다. 개발 중에는 콘솔 경고가 뜨고 도구가 꺼집니다.
 - 위아래 바는 줄을 바꾸지 않습니다. 필드보다 넓으면 [ScrollArea](../../layout/scroll-area/README.md) 로 가로 스크롤합니다. 스크롤바는 그리지 않고(`variant="none"`), 더 남은 쪽 가장자리를 흐립니다. 키보드로 옮긴 도구는 보이는 자리까지 스크롤됩니다.
 - 마우스로 도구를 눌러도 포커스는 본문에 남습니다. 키보드로는 Tab 이 툴바의 한 도구에 닿고, 화살표로 도구 사이를 옮깁니다.
@@ -109,7 +111,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 ```
 
 - `onImageUpload` 는 파일을 받아 올린 그림의 주소를 돌려줍니다. Editor 는 파일을 서버로 보내지 않습니다.
-- `Editor.Image` 로 고른 파일, 붙여 넣은 파일, 끌어 놓은 파일이 모두 이 함수로 갑니다. PNG, JPEG, GIF, WebP, AVIF 만 받습니다.
+- `Editor.Image` 로 고른 파일, 붙여 넣은 파일, 끌어 놓은 파일이 모두 이 함수로 갑니다. PNG, JPEG, GIF, WebP, AVIF 만 받습니다. 형식은 FileField 의 `accept` 규칙으로 가리고, 다른 파일은 FileField 와 같은 "허용되지 않는 파일 형식입니다." 를 toast 로 알립니다.
 - 올리는 동안 본문의 그 자리에 Skeleton 모양의 자리표시가 서고, `Editor.Image` 는 Spinner 와 `aria-busy` 를 보입니다. 화면 읽기 프로그램에는 "그림을 올리는 중입니다" 를 알립니다.
 - 올리기에 실패하면(Promise 가 거부되거나 주소가 아니면) 자리표시를 지우고 toast 로 알립니다. 오류는 앱이 Field 오류로 다시 그릴 값의 문제가 아니라 한 번의 작업 결과라서 toast 입니다. IdsProvider 가 기본 Toaster 를 둡니다.
 - 그림을 누르거나 화살표로 고른 채 `Editor.Image` 를 누르면 대체 텍스트를 넣는 Popover 가 열립니다. 새 그림의 대체 텍스트는 `""` 입니다. 파일 이름은 그림을 설명하지 않아서 넣지 않습니다.
@@ -137,9 +139,10 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 
 ## 하지 않는 것
 
-- Tiptap Pro 확장(협업, 댓글, AI)은 쓰지 않습니다. MIT 인 core, StarterKit, extensions, markdown, extension-image, extension-file-handler, extension-highlight, extension-list, extension-text-align 만 씁니다.
+- Tiptap Pro 확장(협업, 댓글, AI)은 쓰지 않습니다. MIT 인 core, StarterKit, extensions, markdown, extension-image, extension-file-handler, extension-highlight, extension-list, extension-text-align, extension-table 만 씁니다.
 - 실행 취소와 다시 실행 버튼 부품은 없습니다. 단축키로 됩니다.
-- 표, 수식, 멘션, 블록을 끌어 옮기는 손잡이(drag handle)는 없습니다.
+- 수식, 멘션, 블록을 끌어 옮기는 손잡이(drag handle)는 없습니다.
+- 표의 칸 합치기와 나누기, 열 너비를 끌어 바꾸기는 없습니다. 마크다운의 GFM 표로 쓸 수 없기 때문입니다. 표는 본문 너비에 맞춰 칸을 나눕니다.
 - 그림 크기 조절, 그림 설명(caption), 그림 정렬은 없습니다. 그림은 본문 너비를 넘지 않게 줄어듭니다.
 - 형광펜 색 고르기는 없습니다. 한 가지 색만 씁니다.
 - 마크다운에는 정렬 문법이 없어 `TextAlign` 의 정렬은 `markdown` 값에 남지 않습니다.

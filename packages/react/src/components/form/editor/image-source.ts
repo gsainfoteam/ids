@@ -1,3 +1,5 @@
+import { acceptsFile, parseAccept } from '../file-field/file-rules';
+
 import type { JSONContent } from '@tiptap/core';
 
 export const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/avif'];
@@ -25,4 +27,8 @@ export function keepAllowedImages(node: JSONContent, uploaded: ReadonlySet<strin
   };
 }
 
-export const isImageFile = (file: File) => IMAGE_TYPES.includes(file.type);
+export const IMAGE_ACCEPT = IMAGE_TYPES.join(',');
+
+const IMAGE_TOKENS = parseAccept(IMAGE_ACCEPT);
+
+export const isImageFile = (file: File) => acceptsFile(file, IMAGE_TOKENS);

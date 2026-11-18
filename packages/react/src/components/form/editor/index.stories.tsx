@@ -161,6 +161,7 @@ export const Gallery: Story = {
             <Editor.Separator />
             <Editor.Image />
             <Editor.HorizontalRule />
+            <Editor.Table />
             <Editor.Content />
           </Editor>
         </Showcase.Row>
@@ -555,6 +556,38 @@ export const HorizontalRule: Story = {
     await waitFor(() =>
       expect(args.onValueChange).toHaveBeenLastCalledWith('<p>1부</p><hr><p></p>'),
     );
+  },
+};
+
+export const Table: Story = {
+  args: {
+    defaultValue:
+      '<table><tbody><tr><th><p>시간</p></th><th><p>순서</p></th></tr><tr><td><p>10:00</p></td><td><p>개회</p></td></tr></tbody></table><p></p>',
+    'aria-label': '표 본문',
+  },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.Bold />
+      <Editor.Table />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.Table 은 표를 넣고, 커서가 있는 칸을 기준으로 행과 열을 더하거나 지우는 메뉴입니다. 새 표는 3×3 에 머리글 행이 있고, 마크다운에서는 GFM 표로 씁니다. 칸을 합치거나 너비를 끌어 바꾸지는 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const content = await editableContent(canvas, '표 본문');
+    await userEvent.click(content);
+    selectText(content, '개회', { caretAfter: true });
+    await userEvent.click(canvas.getByRole('button', { name: '표' }));
+    await userEvent.click(await canvas.findByRole('menuitem', { name: '아래에 행 추가' }));
+    await waitFor(() => expect(content.querySelectorAll('tr')).toHaveLength(3));
+    await waitFor(() => expect(content).toHaveFocus());
   },
 };
 

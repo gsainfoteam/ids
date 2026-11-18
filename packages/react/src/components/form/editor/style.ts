@@ -32,6 +32,9 @@ const documentBlocks = cn(
   '[&_hr]:my-3 [&_hr]:border-neutral',
   '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard [&_.ProseMirror-selectednode]:outline-offset-2',
   '[&_mark]:bg-warning-soft [&_mark]:text-on-warning-soft',
+  '[&_table]:my-2 [&_table]:w-full! [&_table]:table-fixed [&_table]:border-collapse',
+  '[&_:is(td,th)]:border [&_:is(td,th)]:border-neutral [&_:is(td,th)]:px-2 [&_:is(td,th)]:py-1 [&_:is(td,th)]:align-top [&_:is(td,th)]:break-words',
+  '[&_th]:bg-neutral-soft [&_th]:text-start [&_th]:font-semibold [&_.selectedCell]:bg-primary-soft',
 );
 
 const taskList = cn(

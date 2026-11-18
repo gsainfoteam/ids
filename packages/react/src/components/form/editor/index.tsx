@@ -26,6 +26,7 @@ import {
 import { EditorRoot, type EditorState, type EditorVariant } from './root';
 import { EditorSeparator, type EditorSeparatorProps } from './separator';
 import { editorStyle } from './style';
+import { EditorTable, type EditorTableProps } from './table';
 import { EditorTextAlign, type EditorTextAlignment, type EditorTextAlignProps } from './text-align';
 import { type EditorFormat } from './value';
 
@@ -86,6 +87,7 @@ export namespace Editor {
   export type LinkProps = EditorLinkProps;
   export type ImageProps = EditorImageProps;
   export type HorizontalRuleProps = EditorHorizontalRuleProps;
+  export type TableProps = EditorTableProps;
   export type TextAlignProps = EditorTextAlignProps;
   export type SeparatorProps = EditorSeparatorProps;
   export type BubbleMenuProps = EditorBubbleMenuProps;
@@ -107,6 +109,7 @@ export namespace Editor {
   export const Blockquote = EditorBlockquote;
   export const CodeBlock = EditorCodeBlock;
   export const HorizontalRule = EditorHorizontalRule;
+  export const Table = EditorTable;
   export const TextAlign = EditorTextAlign;
   export const Separator = EditorSeparator;
   export const BubbleMenu = EditorBubbleMenu;

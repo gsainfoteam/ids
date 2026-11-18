@@ -7,17 +7,15 @@ import { EditorContent, useEditor, type UseEditorOptions } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
 
 import { LeaveEscapeToTheLayers } from './escape-to-layers';
-import { EditorImageNode, imageFileHandler } from './image-node';
+import { EditorImageNode } from './image-node';
 
 import type { PartExtensions } from './load-engine';
 import type { AnyExtension, Editor as TiptapEditor, Extensions } from '@tiptap/core';
 
 export { EditorContent };
-export { uploadImage } from './image-node';
-
 export type ImageSetup = {
   uploaded: ReadonlySet<string>;
-  start: ((editor: TiptapEditor, files: File[], at: number) => void) | null;
+  start: (editor: TiptapEditor, files: File[], at: number) => void;
 };
 
 const placeholderOfTheTextbox = ({ editor }: { editor: TiptapEditor }) =>
@@ -46,11 +44,19 @@ export function extensionsFor({
     Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
     CharacterCount.configure({ limit: maxLength }),
     LeaveEscapeToTheLayers,
-    EditorImageNode.configure({ uploaded: images.uploaded, insertable: images.start !== null }),
-    ...(images.start ? [imageFileHandler(images.start)] : []),
+    EditorImageNode.configure({ uploaded: images.uploaded, insertable: !!parts.imageUpload }),
+    ...(parts.imageUpload ? parts.imageUpload.imageUploadExtensions(images.start) : []),
     ...(parts.highlight ? [parts.highlight] : []),
     ...(parts.taskList ? parts.taskList(taskLabel) : []),
     ...(parts.textAlign ? [parts.textAlign.configure({ types: ['heading', 'paragraph'] })] : []),
+    ...(parts.table
+      ? [
+          parts.table.Table.configure({ resizable: false }),
+          parts.table.TableRow,
+          parts.table.TableHeader,
+          parts.table.TableCell,
+        ]
+      : []),
     ...(markdown ? [markdown] : []),
   ];
 }

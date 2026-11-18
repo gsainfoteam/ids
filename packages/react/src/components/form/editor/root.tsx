@@ -43,6 +43,7 @@ import {
 } from './marks';
 import { EditorSeparator } from './separator';
 import { editorStyle } from './style';
+import { EditorTable } from './table';
 import { EditorTextAlign } from './text-align';
 import { useEditorSelector } from './use-editor-selector';
 import {
@@ -91,6 +92,7 @@ const TOOLS = new Set<unknown>([
   EditorBlockquote,
   EditorCodeBlock,
   EditorHorizontalRule,
+  EditorTable,
   EditorTextAlign,
 ]);
 
@@ -153,26 +155,32 @@ function definedOnly(record: Record<string, string | undefined>) {
   );
 }
 
-function useLoadedEngine(format: EditorFormat, { highlight, taskList, textAlign }: EditorParts) {
+function useLoadedEngine(
+  format: EditorFormat,
+  { highlight, taskList, textAlign, table, imageUpload }: EditorParts,
+) {
   const [loaded, setLoaded] = useState<LoadedEngine | null>(null);
 
   useEffect(() => {
     let mounted = true;
-    void loadEngine(format, { highlight, taskList, textAlign }).then((next) => {
+    void loadEngine(format, { highlight, taskList, textAlign, table, imageUpload }).then((next) => {
       if (mounted) setLoaded(next);
     });
     return () => {
       mounted = false;
     };
-  }, [format, highlight, taskList, textAlign]);
+  }, [format, highlight, taskList, textAlign, table, imageUpload]);
 
-  return loaded?.key === engineKey(format, { highlight, taskList, textAlign }) ? loaded : null;
+  const key = engineKey(format, { highlight, taskList, textAlign, table, imageUpload });
+  return loaded?.key === key ? loaded : null;
 }
 
 const usesPart = (source: ReactNode, part: unknown) => containsElementOfType(source, new Set([part]));
 
-function partsIn(source: ReactNode): EditorParts {
+function partsIn(source: ReactNode, imageUpload: boolean): EditorParts {
   return {
+    imageUpload,
+    table: usesPart(source, EditorTable),
     highlight: usesPart(source, EditorHighlight),
     taskList: usesPart(source, EditorTaskList),
     textAlign: usesPart(source, EditorTextAlign),
@@ -221,7 +229,7 @@ export function EditorRoot(props: Editor.Props) {
   const shown =
     children === undefined ? (insertable ? DEFAULT_TOOLBAR_WITH_IMAGE : DEFAULT_TOOLBAR) : children;
   const { bubbles, top, content, bottom, items } = splitByContent(shown);
-  const parts = partsIn(shown);
+  const parts = partsIn(shown, insertable);
   const hasCount = items.some(isOfType(EditorCount));
   const editable = !disabled && !readOnly;
   const invalid = Boolean(
@@ -240,11 +248,11 @@ export function EditorRoot(props: Editor.Props) {
 
   const startUploads = (instance: TiptapEditor, files: readonly File[], at: number) => {
     const upload = latest.current.onImageUpload;
-    if (!upload || !loaded) return;
-    const { uploadImage } = loaded.engine;
+    const uploadImage = loaded?.parts.imageUpload?.uploadImage;
+    if (!upload || !uploadImage) return;
     const accepted = files.filter(isImageFile);
     for (const file of files.filter((candidate) => !isImageFile(candidate)))
-      toast.error(t('editor.imageNotSupported'), { description: file.name });
+      toast.error(file.name, { description: t('fileField.rejectType') });
     setPendingUploads((count) => count + accepted.length);
     for (const file of accepted)
       void uploadImage(instance, file, at, { upload, uploaded })
@@ -294,10 +302,10 @@ export function EditorRoot(props: Editor.Props) {
         maxLength,
         markdown: loaded.markdown,
         parts: loaded.parts,
-        images: { uploaded, start: insertable ? callIntoTheLatestRender.startUploads : null },
+        images: { uploaded, start: callIntoTheLatestRender.startUploads },
         taskLabel: callIntoTheLatestRender.taskLabel,
       }),
-    [loaded, maxLength, insertable, uploaded, callIntoTheLatestRender],
+    [loaded, maxLength, uploaded, callIntoTheLatestRender],
   );
   const [editor, setEditor] = useState<TiptapEditor | null>(null);
 

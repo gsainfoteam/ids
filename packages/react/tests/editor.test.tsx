@@ -443,7 +443,12 @@ test('Image uploads the picked file, holds a placeholder while it waits and inse
   const { upload, calls } = heldUpload();
   const onValueChange = vi.fn();
   render(
-    <Editor aria-label="본문" defaultValue="<p>지도</p>" onImageUpload={upload} onValueChange={onValueChange}>
+    <Editor
+      aria-label="본문"
+      defaultValue="<p>지도</p>"
+      onImageUpload={upload}
+      onValueChange={onValueChange}
+    >
       <Editor.Image />
       <Editor.Content />
     </Editor>,
@@ -457,7 +462,9 @@ test('Image uploads the picked file, holds a placeholder while it waits and inse
   expect(calls[0]!.file.name).toBe('map.png');
   await expect.element(tool).toHaveAttribute('aria-busy', 'true');
   expect(placeholders()).toBe(1);
-  await expect.element(page.getByRole('status').filter({ hasText: '그림을 올리는 중' })).toBeInTheDocument();
+  await expect
+    .element(page.getByRole('status').filter({ hasText: '그림을 올리는 중' }))
+    .toBeInTheDocument();
   expect(onValueChange).not.toHaveBeenCalled();
 
   calls[0]!.resolve('https://cdn.gistory.me/map.png');
@@ -508,7 +515,10 @@ test('a pasted or dropped image file goes through the upload, and other files do
   const pasted = new ClipboardEvent('paste', {
     bubbles: true,
     cancelable: true,
-    clipboardData: transfer([png('pasted.png')], '<img src="https://elsewhere.example/pasted.png">'),
+    clipboardData: transfer(
+      [png('pasted.png')],
+      '<img src="https://elsewhere.example/pasted.png">',
+    ),
   });
   content.element().dispatchEvent(pasted);
   expect(pasted.defaultPrevented).toBe(true);
@@ -588,7 +598,13 @@ test('javascript: and data: addresses never become images, in HTML, markdown or 
       >
         <Editor.Content />
       </Editor>
-      <Editor format="markdown" aria-label="마크다운" defaultValue={'![x](javascript:alert(1))\n\n![y](data:image/png;base64,AAAA)\n\n![지도](https://cdn.gistory.me/map.png)'}>
+      <Editor
+        format="markdown"
+        aria-label="마크다운"
+        defaultValue={
+          '![x](javascript:alert(1))\n\n![y](data:image/png;base64,AAAA)\n\n![지도](https://cdn.gistory.me/map.png)'
+        }
+      >
         <Editor.Content />
       </Editor>
       <Editor
@@ -690,11 +706,16 @@ test('markdown and JSON keep an uploaded image and its alt text', async () => {
   const doc = await editable('JSON');
   await userEvent.click(doc);
   await userEvent.upload(
-    page.elementLocator(document.querySelectorAll<HTMLInputElement>('[data-editor-image-input]')[1]!),
+    page.elementLocator(
+      document.querySelectorAll<HTMLInputElement>('[data-editor-image-input]')[1]!,
+    ),
     png(),
   );
   await expect
-    .poll(() => json.mock.lastCall?.[0]?.content?.find((node: Editor.Json) => node.type === 'image')?.attrs)
+    .poll(
+      () =>
+        json.mock.lastCall?.[0]?.content?.find((node: Editor.Json) => node.type === 'image')?.attrs,
+    )
     .toMatchObject({ src: 'data:image/png;base64,AAAA', alt: '' });
 });
 
@@ -702,7 +723,12 @@ test('Highlight marks the selection and writes == in markdown', async () => {
   const onValueChange = vi.fn();
   render(
     <IdsProvider theme={testTheme}>
-      <Editor format="markdown" aria-label="본문" defaultValue="중요한 글" onValueChange={onValueChange}>
+      <Editor
+        format="markdown"
+        aria-label="본문"
+        defaultValue="중요한 글"
+        onValueChange={onValueChange}
+      >
         <Editor.Highlight />
         <Editor.Content />
       </Editor>
@@ -724,15 +750,22 @@ test('Highlight marks the selection and writes == in markdown', async () => {
 test('an extension loads only when its part is in the Editor', async () => {
   render(
     <>
-      <Editor aria-label="없음" defaultValue='<p><mark>형광</mark></p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>할 일</p></li></ul><p style="text-align: center">가운데</p>'>
+      <Editor
+        aria-label="없음"
+        defaultValue='<p><mark>형광</mark></p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>할 일</p></li></ul><p style="text-align: center">가운데</p><table><tbody><tr><th><p>시간</p></th></tr></tbody></table>'
+      >
         <Editor.Content />
       </Editor>
-      <Editor aria-label="있음" defaultValue='<p><mark>형광</mark></p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>할 일</p></li></ul><p style="text-align: center">가운데</p>'>
+      <Editor
+        aria-label="있음"
+        defaultValue='<p><mark>형광</mark></p><ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>할 일</p></li></ul><p style="text-align: center">가운데</p><table><tbody><tr><th><p>시간</p></th></tr></tbody></table>'
+      >
         <Editor.Content />
         <Editor.BubbleMenu>
           <Editor.Highlight />
           <Editor.TaskList />
           <Editor.TextAlign />
+          <Editor.Table />
         </Editor.BubbleMenu>
       </Editor>
     </>,
@@ -741,17 +774,24 @@ test('an extension loads only when its part is in the Editor', async () => {
   expect(without.element().querySelector('mark')).toBeNull();
   expect(without.element().querySelector('input[type="checkbox"]')).toBeNull();
   expect(without.element().querySelector('[style*="text-align"]')).toBeNull();
+  expect(without.element().querySelector('table')).toBeNull();
 
   const within = await editable('있음');
   expect(within.element().querySelector('mark')).not.toBeNull();
   expect(within.element().querySelector('input[type="checkbox"]')).not.toBeNull();
   expect(within.element().querySelector('[style*="text-align"]')).not.toBeNull();
+  expect(within.element().querySelector('th')).not.toBeNull();
 });
 
 test('TaskList turns the paragraph into a task whose IDS checkbox checks it, and markdown writes [x]', async () => {
   const onValueChange = vi.fn();
   render(
-    <Editor format="markdown" aria-label="본문" defaultValue="부스 신청" onValueChange={onValueChange}>
+    <Editor
+      format="markdown"
+      aria-label="본문"
+      defaultValue="부스 신청"
+      onValueChange={onValueChange}
+    >
       <Editor.TaskList />
       <Editor.Content />
     </Editor>,
@@ -812,4 +852,64 @@ test('TextAlign is a group of toggles that align the block and unset back to lef
   await userEvent.click(left);
   await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('<p>가운데로</p>');
   await expect.element(group.getByRole('button', { name: '양쪽 정렬' })).toBeVisible();
+});
+
+test('a picked file that is not an image is turned away with the FileField message', async () => {
+  const upload = vi.fn(async (file: File) => `https://cdn.gistory.me/${file.name}`);
+  render(
+    <IdsProvider theme={testTheme}>
+      <Editor aria-label="본문" onImageUpload={upload}>
+        <Editor.Image />
+        <Editor.Content />
+      </Editor>
+    </IdsProvider>,
+  );
+  await editable('본문');
+  await userEvent.upload(
+    imageInput(),
+    new File(['%PDF'], 'notes.pdf', { type: 'application/pdf' }),
+  );
+
+  await expect.element(page.getByText('notes.pdf')).toBeVisible();
+  await expect.element(page.getByText('허용되지 않는 파일 형식입니다.')).toBeVisible();
+  expect(upload).not.toHaveBeenCalled();
+  toast.dismissAll();
+});
+
+test('Table inserts a table with a header row, edits it from its menu, and markdown writes a pipe table', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor format="markdown" aria-label="본문" defaultValue="일정" onValueChange={onValueChange}>
+      <Editor.Table />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  const table = page.getByRole('button', { name: '표' });
+  const choose = async (name: string) => {
+    await userEvent.click(table);
+    await userEvent.click(page.getByRole('menuitem', { name }));
+  };
+  await userEvent.click(content);
+  await userEvent.click(table);
+  await expect.element(page.getByRole('menuitem', { name: '행 지우기' })).toBeDisabled();
+  await userEvent.click(page.getByRole('menuitem', { name: '표 넣기' }));
+
+  await expect.element(content).toHaveFocus();
+  expect(content.element().querySelectorAll('tr')).toHaveLength(3);
+  expect(content.element().querySelectorAll('th')).toHaveLength(3);
+  await userEvent.keyboard('시간');
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toContain('| 시간  |     |     |\n| --- | --- | --- |\n|     |     |     |\n');
+
+  await choose('아래에 행 추가');
+  expect(content.element().querySelectorAll('tr')).toHaveLength(4);
+  await choose('열 지우기');
+  expect(content.element().querySelectorAll('th')).toHaveLength(2);
+  await expect.element(content).toHaveFocus();
+
+  await choose('표 지우기');
+  expect(content.element().querySelector('table')).toBeNull();
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('일정\n\n');
 });
