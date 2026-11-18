@@ -44,16 +44,17 @@ hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에
   "families": { "neutral": ["neutral"], "brand": ["primary", "secondary", "tertiary"], "status": ["success", "warning", "danger", "info"] },
   "slots": {
     "bg": ["{family}-subtlest", "{family}-subtler", "{family}-subtle", "{family}", "{family}-bold"],
-    "text": ["on-{family}-subtle", "on-{family}", "on-{family}-bold", "{family}", "{family}-bold"],
+    "text": ["on-{family}-subtlest", "on-{family}-subtler", "on-{family}-subtle", "on-{family}", "on-{family}-bold", "{family}", "{family}-bold"],
     "border": ["{family}"]
   },
-  "neutralOnly": ["bg-{family}-subtlest", "bg-{family}-bold", "text-on-{family}-bold", "text-{family}-bold"],
+  "neutralOnly": ["bg-{family}-subtlest", "text-on-{family}-subtlest", "bg-{family}-bold", "text-on-{family}-bold", "text-{family}-bold"],
   "namespaces": { "bg": ["--background-color"], "text": ["--text-color", "--fill"], "border": ["--border-color", "--ring-color", "--outline-color", "--stroke"] }
 }
 ```
 
 - `slots` 는 `{family}` 를 넣는 틀이다. 역할은 `{속성}-{틀}` 이다(`bg-{family}-subtle` → `bg-primary-subtle`).
-- `neutralOnly` 의 역할은 neutral 에만 있다. 다른 계열은 `bg-X-subtler`, `bg-X-subtle`, `bg-X`, `text-on-X-subtle`, `text-on-X`, `text-X`, `border-X` 일곱 개다.
+- `neutralOnly` 의 역할은 neutral 에만 있다. 다른 계열은 `bg-X-subtler`, `bg-X-subtle`, `bg-X`, `text-on-X-subtler`, `text-on-X-subtle`, `text-on-X`, `text-X`, `border-X` 여덟 개다.
+- `bg` 틀마다 같은 세기의 `text-on` 틀이 있다. 그래서 `bg-X[-세기]` 위 글자는 언제나 `text-on-X[-세기]` 다.
 - 역할 변수는 `--ids-color-{역할}` 이다. 앞머리 없는 역할(`surface`)이나 hover, active 역할은 없다.
 - 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 다.
 - Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-subtle` 은 있고 `--color-primary` 나 `--background-color-on-primary` 는 없다.

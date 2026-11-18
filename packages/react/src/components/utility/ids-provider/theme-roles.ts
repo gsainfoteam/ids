@@ -222,6 +222,13 @@ export function familyRoles(
     });
   const { fill, text: onFill } = readable ?? mostReadable([shades[600]]);
 
+  const onSubtler = firstReadableOn(shades, rule.onSubtle, [subtler]);
+  if (onSubtler === undefined)
+    issues.push({
+      path,
+      message: `${mode}: no step of ${rule.onSubtle.join(', ')} reaches Lc ${TEXT_LC} on ${family}-subtler and under its hover and press layers.`,
+    });
+
   const onSubtle = firstReadableOn(shades, rule.onSubtle, [subtle]);
   if (onSubtle === undefined)
     issues.push({
@@ -236,18 +243,18 @@ export function familyRoles(
       message: `${mode}: no step of ${rule.text.join(', ')} reaches Lc ${ACCENT_TEXT_LC} as ${family} text on the surface, ${family}-subtler and ${family}-subtle, under their hover and press layers too.`,
     });
 
-  const [bgSubtler, bgSubtle, bg, textOnSubtle, textOn, textFamily, borderFamily] =
-    slotsOf(family);
+  const accent = text ?? lastOf(shades, rule.text);
 
   return {
     roles: {
-      [bgSubtler!]: subtler,
-      [bgSubtle!]: subtle,
-      [bg!]: fill,
-      [textOnSubtle!]: onSubtle ?? lastOf(shades, rule.onSubtle),
-      [textOn!]: onFill,
-      [textFamily!]: text ?? lastOf(shades, rule.text),
-      [borderFamily!]: text ?? lastOf(shades, rule.text),
+      [`bg-${family}-subtler`]: subtler,
+      [`bg-${family}-subtle`]: subtle,
+      [`bg-${family}`]: fill,
+      [`text-on-${family}-subtler`]: onSubtler ?? lastOf(shades, rule.onSubtle),
+      [`text-on-${family}-subtle`]: onSubtle ?? lastOf(shades, rule.onSubtle),
+      [`text-on-${family}`]: onFill,
+      [`text-${family}`]: accent,
+      [`border-${family}`]: accent,
     },
     issues,
   };

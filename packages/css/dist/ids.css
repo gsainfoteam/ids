@@ -4,6 +4,10 @@
   --background-color-neutral-subtle: var(--ids-color-bg-neutral-subtle);
   --background-color-neutral: var(--ids-color-bg-neutral);
   --background-color-neutral-bold: var(--ids-color-bg-neutral-bold);
+  --text-color-on-neutral-subtlest: var(--ids-color-text-on-neutral-subtlest);
+  --fill-on-neutral-subtlest: var(--ids-color-text-on-neutral-subtlest);
+  --text-color-on-neutral-subtler: var(--ids-color-text-on-neutral-subtler);
+  --fill-on-neutral-subtler: var(--ids-color-text-on-neutral-subtler);
   --text-color-on-neutral-subtle: var(--ids-color-text-on-neutral-subtle);
   --fill-on-neutral-subtle: var(--ids-color-text-on-neutral-subtle);
   --text-color-on-neutral: var(--ids-color-text-on-neutral);
@@ -21,6 +25,8 @@
   --background-color-primary-subtler: var(--ids-color-bg-primary-subtler);
   --background-color-primary-subtle: var(--ids-color-bg-primary-subtle);
   --background-color-primary: var(--ids-color-bg-primary);
+  --text-color-on-primary-subtler: var(--ids-color-text-on-primary-subtler);
+  --fill-on-primary-subtler: var(--ids-color-text-on-primary-subtler);
   --text-color-on-primary-subtle: var(--ids-color-text-on-primary-subtle);
   --fill-on-primary-subtle: var(--ids-color-text-on-primary-subtle);
   --text-color-on-primary: var(--ids-color-text-on-primary);
@@ -34,6 +40,8 @@
   --background-color-secondary-subtler: var(--ids-color-bg-secondary-subtler);
   --background-color-secondary-subtle: var(--ids-color-bg-secondary-subtle);
   --background-color-secondary: var(--ids-color-bg-secondary);
+  --text-color-on-secondary-subtler: var(--ids-color-text-on-secondary-subtler);
+  --fill-on-secondary-subtler: var(--ids-color-text-on-secondary-subtler);
   --text-color-on-secondary-subtle: var(--ids-color-text-on-secondary-subtle);
   --fill-on-secondary-subtle: var(--ids-color-text-on-secondary-subtle);
   --text-color-on-secondary: var(--ids-color-text-on-secondary);
@@ -47,6 +55,8 @@
   --background-color-tertiary-subtler: var(--ids-color-bg-tertiary-subtler);
   --background-color-tertiary-subtle: var(--ids-color-bg-tertiary-subtle);
   --background-color-tertiary: var(--ids-color-bg-tertiary);
+  --text-color-on-tertiary-subtler: var(--ids-color-text-on-tertiary-subtler);
+  --fill-on-tertiary-subtler: var(--ids-color-text-on-tertiary-subtler);
   --text-color-on-tertiary-subtle: var(--ids-color-text-on-tertiary-subtle);
   --fill-on-tertiary-subtle: var(--ids-color-text-on-tertiary-subtle);
   --text-color-on-tertiary: var(--ids-color-text-on-tertiary);
@@ -60,6 +70,8 @@
   --background-color-success-subtler: var(--ids-color-bg-success-subtler);
   --background-color-success-subtle: var(--ids-color-bg-success-subtle);
   --background-color-success: var(--ids-color-bg-success);
+  --text-color-on-success-subtler: var(--ids-color-text-on-success-subtler);
+  --fill-on-success-subtler: var(--ids-color-text-on-success-subtler);
   --text-color-on-success-subtle: var(--ids-color-text-on-success-subtle);
   --fill-on-success-subtle: var(--ids-color-text-on-success-subtle);
   --text-color-on-success: var(--ids-color-text-on-success);
@@ -73,6 +85,8 @@
   --background-color-warning-subtler: var(--ids-color-bg-warning-subtler);
   --background-color-warning-subtle: var(--ids-color-bg-warning-subtle);
   --background-color-warning: var(--ids-color-bg-warning);
+  --text-color-on-warning-subtler: var(--ids-color-text-on-warning-subtler);
+  --fill-on-warning-subtler: var(--ids-color-text-on-warning-subtler);
   --text-color-on-warning-subtle: var(--ids-color-text-on-warning-subtle);
   --fill-on-warning-subtle: var(--ids-color-text-on-warning-subtle);
   --text-color-on-warning: var(--ids-color-text-on-warning);
@@ -86,6 +100,8 @@
   --background-color-danger-subtler: var(--ids-color-bg-danger-subtler);
   --background-color-danger-subtle: var(--ids-color-bg-danger-subtle);
   --background-color-danger: var(--ids-color-bg-danger);
+  --text-color-on-danger-subtler: var(--ids-color-text-on-danger-subtler);
+  --fill-on-danger-subtler: var(--ids-color-text-on-danger-subtler);
   --text-color-on-danger-subtle: var(--ids-color-text-on-danger-subtle);
   --fill-on-danger-subtle: var(--ids-color-text-on-danger-subtle);
   --text-color-on-danger: var(--ids-color-text-on-danger);
@@ -99,6 +115,8 @@
   --background-color-info-subtler: var(--ids-color-bg-info-subtler);
   --background-color-info-subtle: var(--ids-color-bg-info-subtle);
   --background-color-info: var(--ids-color-bg-info);
+  --text-color-on-info-subtler: var(--ids-color-text-on-info-subtler);
+  --fill-on-info-subtler: var(--ids-color-text-on-info-subtler);
   --text-color-on-info-subtle: var(--ids-color-text-on-info-subtle);
   --fill-on-info-subtle: var(--ids-color-text-on-info-subtle);
   --text-color-on-info: var(--ids-color-text-on-info);
@@ -1457,6 +1475,8 @@
   --ids-color-bg-neutral-subtle: var(--ids-theme-light-bg-neutral-subtle, #f5f5f5);
   --ids-color-bg-neutral: var(--ids-theme-light-bg-neutral, #d4d4d4);
   --ids-color-bg-neutral-bold: var(--ids-theme-light-bg-neutral-bold, #171717);
+  --ids-color-text-on-neutral-subtlest: var(--ids-theme-light-text-on-neutral-subtlest, #171717);
+  --ids-color-text-on-neutral-subtler: var(--ids-theme-light-text-on-neutral-subtler, #171717);
   --ids-color-text-on-neutral-subtle: var(--ids-theme-light-text-on-neutral-subtle, #171717);
   --ids-color-text-on-neutral: var(--ids-theme-light-text-on-neutral, #0a0a0a);
   --ids-color-text-on-neutral-bold: var(--ids-theme-light-text-on-neutral-bold, #ffffff);
@@ -1466,6 +1486,7 @@
   --ids-color-bg-primary-subtler: var(--ids-theme-light-bg-primary-subtler);
   --ids-color-bg-primary-subtle: var(--ids-theme-light-bg-primary-subtle);
   --ids-color-bg-primary: var(--ids-theme-light-bg-primary);
+  --ids-color-text-on-primary-subtler: var(--ids-theme-light-text-on-primary-subtler);
   --ids-color-text-on-primary-subtle: var(--ids-theme-light-text-on-primary-subtle);
   --ids-color-text-on-primary: var(--ids-theme-light-text-on-primary);
   --ids-color-text-primary: var(--ids-theme-light-text-primary);
@@ -1473,6 +1494,7 @@
   --ids-color-bg-secondary-subtler: var(--ids-theme-light-bg-secondary-subtler);
   --ids-color-bg-secondary-subtle: var(--ids-theme-light-bg-secondary-subtle);
   --ids-color-bg-secondary: var(--ids-theme-light-bg-secondary);
+  --ids-color-text-on-secondary-subtler: var(--ids-theme-light-text-on-secondary-subtler);
   --ids-color-text-on-secondary-subtle: var(--ids-theme-light-text-on-secondary-subtle);
   --ids-color-text-on-secondary: var(--ids-theme-light-text-on-secondary);
   --ids-color-text-secondary: var(--ids-theme-light-text-secondary);
@@ -1480,6 +1502,7 @@
   --ids-color-bg-tertiary-subtler: var(--ids-theme-light-bg-tertiary-subtler);
   --ids-color-bg-tertiary-subtle: var(--ids-theme-light-bg-tertiary-subtle);
   --ids-color-bg-tertiary: var(--ids-theme-light-bg-tertiary);
+  --ids-color-text-on-tertiary-subtler: var(--ids-theme-light-text-on-tertiary-subtler);
   --ids-color-text-on-tertiary-subtle: var(--ids-theme-light-text-on-tertiary-subtle);
   --ids-color-text-on-tertiary: var(--ids-theme-light-text-on-tertiary);
   --ids-color-text-tertiary: var(--ids-theme-light-text-tertiary);
@@ -1487,6 +1510,7 @@
   --ids-color-bg-success-subtler: var(--ids-theme-light-bg-success-subtler);
   --ids-color-bg-success-subtle: var(--ids-theme-light-bg-success-subtle);
   --ids-color-bg-success: var(--ids-theme-light-bg-success);
+  --ids-color-text-on-success-subtler: var(--ids-theme-light-text-on-success-subtler);
   --ids-color-text-on-success-subtle: var(--ids-theme-light-text-on-success-subtle);
   --ids-color-text-on-success: var(--ids-theme-light-text-on-success);
   --ids-color-text-success: var(--ids-theme-light-text-success);
@@ -1494,6 +1518,7 @@
   --ids-color-bg-warning-subtler: var(--ids-theme-light-bg-warning-subtler);
   --ids-color-bg-warning-subtle: var(--ids-theme-light-bg-warning-subtle);
   --ids-color-bg-warning: var(--ids-theme-light-bg-warning);
+  --ids-color-text-on-warning-subtler: var(--ids-theme-light-text-on-warning-subtler);
   --ids-color-text-on-warning-subtle: var(--ids-theme-light-text-on-warning-subtle);
   --ids-color-text-on-warning: var(--ids-theme-light-text-on-warning);
   --ids-color-text-warning: var(--ids-theme-light-text-warning);
@@ -1501,6 +1526,7 @@
   --ids-color-bg-danger-subtler: var(--ids-theme-light-bg-danger-subtler);
   --ids-color-bg-danger-subtle: var(--ids-theme-light-bg-danger-subtle);
   --ids-color-bg-danger: var(--ids-theme-light-bg-danger);
+  --ids-color-text-on-danger-subtler: var(--ids-theme-light-text-on-danger-subtler);
   --ids-color-text-on-danger-subtle: var(--ids-theme-light-text-on-danger-subtle);
   --ids-color-text-on-danger: var(--ids-theme-light-text-on-danger);
   --ids-color-text-danger: var(--ids-theme-light-text-danger);
@@ -1508,6 +1534,7 @@
   --ids-color-bg-info-subtler: var(--ids-theme-light-bg-info-subtler);
   --ids-color-bg-info-subtle: var(--ids-theme-light-bg-info-subtle);
   --ids-color-bg-info: var(--ids-theme-light-bg-info);
+  --ids-color-text-on-info-subtler: var(--ids-theme-light-text-on-info-subtler);
   --ids-color-text-on-info-subtle: var(--ids-theme-light-text-on-info-subtle);
   --ids-color-text-on-info: var(--ids-theme-light-text-on-info);
   --ids-color-text-info: var(--ids-theme-light-text-info);
@@ -1520,6 +1547,8 @@
   --ids-color-bg-neutral-subtle: var(--ids-theme-dark-bg-neutral-subtle, #262626);
   --ids-color-bg-neutral: var(--ids-theme-dark-bg-neutral, #404040);
   --ids-color-bg-neutral-bold: var(--ids-theme-dark-bg-neutral-bold, #fafafa);
+  --ids-color-text-on-neutral-subtlest: var(--ids-theme-dark-text-on-neutral-subtlest, #fafafa);
+  --ids-color-text-on-neutral-subtler: var(--ids-theme-dark-text-on-neutral-subtler, #fafafa);
   --ids-color-text-on-neutral-subtle: var(--ids-theme-dark-text-on-neutral-subtle, #fafafa);
   --ids-color-text-on-neutral: var(--ids-theme-dark-text-on-neutral, #fafafa);
   --ids-color-text-on-neutral-bold: var(--ids-theme-dark-text-on-neutral-bold, #0a0a0a);
@@ -1529,6 +1558,7 @@
   --ids-color-bg-primary-subtler: var(--ids-theme-dark-bg-primary-subtler);
   --ids-color-bg-primary-subtle: var(--ids-theme-dark-bg-primary-subtle);
   --ids-color-bg-primary: var(--ids-theme-dark-bg-primary);
+  --ids-color-text-on-primary-subtler: var(--ids-theme-dark-text-on-primary-subtler);
   --ids-color-text-on-primary-subtle: var(--ids-theme-dark-text-on-primary-subtle);
   --ids-color-text-on-primary: var(--ids-theme-dark-text-on-primary);
   --ids-color-text-primary: var(--ids-theme-dark-text-primary);
@@ -1536,6 +1566,7 @@
   --ids-color-bg-secondary-subtler: var(--ids-theme-dark-bg-secondary-subtler);
   --ids-color-bg-secondary-subtle: var(--ids-theme-dark-bg-secondary-subtle);
   --ids-color-bg-secondary: var(--ids-theme-dark-bg-secondary);
+  --ids-color-text-on-secondary-subtler: var(--ids-theme-dark-text-on-secondary-subtler);
   --ids-color-text-on-secondary-subtle: var(--ids-theme-dark-text-on-secondary-subtle);
   --ids-color-text-on-secondary: var(--ids-theme-dark-text-on-secondary);
   --ids-color-text-secondary: var(--ids-theme-dark-text-secondary);
@@ -1543,6 +1574,7 @@
   --ids-color-bg-tertiary-subtler: var(--ids-theme-dark-bg-tertiary-subtler);
   --ids-color-bg-tertiary-subtle: var(--ids-theme-dark-bg-tertiary-subtle);
   --ids-color-bg-tertiary: var(--ids-theme-dark-bg-tertiary);
+  --ids-color-text-on-tertiary-subtler: var(--ids-theme-dark-text-on-tertiary-subtler);
   --ids-color-text-on-tertiary-subtle: var(--ids-theme-dark-text-on-tertiary-subtle);
   --ids-color-text-on-tertiary: var(--ids-theme-dark-text-on-tertiary);
   --ids-color-text-tertiary: var(--ids-theme-dark-text-tertiary);
@@ -1550,6 +1582,7 @@
   --ids-color-bg-success-subtler: var(--ids-theme-dark-bg-success-subtler);
   --ids-color-bg-success-subtle: var(--ids-theme-dark-bg-success-subtle);
   --ids-color-bg-success: var(--ids-theme-dark-bg-success);
+  --ids-color-text-on-success-subtler: var(--ids-theme-dark-text-on-success-subtler);
   --ids-color-text-on-success-subtle: var(--ids-theme-dark-text-on-success-subtle);
   --ids-color-text-on-success: var(--ids-theme-dark-text-on-success);
   --ids-color-text-success: var(--ids-theme-dark-text-success);
@@ -1557,6 +1590,7 @@
   --ids-color-bg-warning-subtler: var(--ids-theme-dark-bg-warning-subtler);
   --ids-color-bg-warning-subtle: var(--ids-theme-dark-bg-warning-subtle);
   --ids-color-bg-warning: var(--ids-theme-dark-bg-warning);
+  --ids-color-text-on-warning-subtler: var(--ids-theme-dark-text-on-warning-subtler);
   --ids-color-text-on-warning-subtle: var(--ids-theme-dark-text-on-warning-subtle);
   --ids-color-text-on-warning: var(--ids-theme-dark-text-on-warning);
   --ids-color-text-warning: var(--ids-theme-dark-text-warning);
@@ -1564,6 +1598,7 @@
   --ids-color-bg-danger-subtler: var(--ids-theme-dark-bg-danger-subtler);
   --ids-color-bg-danger-subtle: var(--ids-theme-dark-bg-danger-subtle);
   --ids-color-bg-danger: var(--ids-theme-dark-bg-danger);
+  --ids-color-text-on-danger-subtler: var(--ids-theme-dark-text-on-danger-subtler);
   --ids-color-text-on-danger-subtle: var(--ids-theme-dark-text-on-danger-subtle);
   --ids-color-text-on-danger: var(--ids-theme-dark-text-on-danger);
   --ids-color-text-danger: var(--ids-theme-dark-text-danger);
@@ -1571,6 +1606,7 @@
   --ids-color-bg-info-subtler: var(--ids-theme-dark-bg-info-subtler);
   --ids-color-bg-info-subtle: var(--ids-theme-dark-bg-info-subtle);
   --ids-color-bg-info: var(--ids-theme-dark-bg-info);
+  --ids-color-text-on-info-subtler: var(--ids-theme-dark-text-on-info-subtler);
   --ids-color-text-on-info-subtle: var(--ids-theme-dark-text-on-info-subtle);
   --ids-color-text-on-info: var(--ids-theme-dark-text-on-info);
   --ids-color-text-info: var(--ids-theme-dark-text-info);

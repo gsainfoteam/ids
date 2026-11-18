@@ -80,10 +80,12 @@ React 앱은 `IdsProvider theme` 이 아래 변수를 루트 요소에 넣는다
   | `bg-X-subtler` | 페이지와 `subtle` 사이의 띠, 트레이 |
   | `text-on-X` | 채움 위 글자 |
   | `text-on-X-subtle` | 옅은 채움 위 글자 |
+  | `text-on-X-subtler` | 띠 위 글자 |
   | `text-X` | 채움 없는 바탕 위 글자와 아이콘 |
   | `border-X` | 선. 브랜드와 상태는 `text-X` 와 같은 색, `border-neutral` 은 구조선 |
 
-- neutral 만 가진 역할: 페이지 바탕 `bg-neutral-subtlest`(light 0, dark 950), 본문 글자 `text-neutral-bold`(900 / 50), 중립 채움 `bg-neutral-bold` 와 그 위 글자 `text-on-neutral-bold`. `bg-neutral`(300 / 700)은 손잡이 회색, `text-neutral`(600 / 300)은 흐린 글자다.
+- 배경마다 짝이 있다. `bg-X[-세기]` 위 글자는 언제나 `text-on-X[-세기]` 다.
+- neutral 만 가진 역할: 페이지 바탕 `bg-neutral-subtlest`(light 0, dark 950)와 그 위 글자 `text-on-neutral-subtlest`, 본문 글자 `text-neutral-bold`(900 / 50), 중립 채움 `bg-neutral-bold` 와 그 위 글자 `text-on-neutral-bold`. `bg-neutral`(300 / 700)은 손잡이 회색, `text-neutral`(600 / 300)은 흐린 글자다.
 - hover 와 press 역할은 없다. 컴포넌트가 [`state-layer`](#state-layer) 로 그린다.
 
 - 역할 변수는 `--ids-color-{역할}` 이고, `--ids-theme-{light|dark}-{역할}` 에서 읽는다. `data-mode` 가 둘 중 하나를 연결한다.

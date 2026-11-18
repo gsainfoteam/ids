@@ -85,12 +85,15 @@ import { theme } from './ids-theme';
 | `bg-X-subtler` | 띠. subtle 보다 옅은 면 |
 | `bg-X-subtle` | 옅은 채움 |
 | `bg-X` | 채움 |
+| `text-on-X-subtler` | 띠 위 글자 |
 | `text-on-X-subtle` | 옅은 채움 위 글자 |
 | `text-on-X` | 채움 위 글자 |
 | `text-X` | 채움 없는 바탕, subtler, subtle 위 글자와 아이콘 |
 | `border-X` | 선 |
 
-neutral 만 가지는 역할: `bg-neutral-subtlest`(페이지), `bg-neutral-bold` 와 `text-on-neutral-bold`(뒤집힌 채움: Tooltip, neutral solid Button), `text-neutral-bold`(본문 글자).
+배경마다 짝이 있습니다. `bg-X[-세기]` 위 글자는 언제나 `text-on-X[-세기]` 입니다.
+
+neutral 만 가지는 역할: `bg-neutral-subtlest` 와 `text-on-neutral-subtlest`(페이지), `bg-neutral-bold` 와 `text-on-neutral-bold`(뒤집힌 채움: Tooltip, neutral solid Button), `text-neutral-bold`(본문 글자).
 
 ```tsx
 <button className="bg-primary text-on-primary state-layer hover:state-hover active:state-press">저장</button>
@@ -126,20 +129,22 @@ neutral 만 가지는 역할: `bg-neutral-subtlest`(페이지), `bg-neutral-bold
 | `bg-X-subtler` | 50 | 950 을 페이지(`bg-neutral-subtlest`) 쪽으로 절반(OKLab) 섞은 색 |
 | `bg-X-subtle` | 100 | 950 |
 | `text-on-X` | 흰색과 neutral 950 중 채움과 그 hover, press 층 위의 가장 낮은 Lc 가 높은 쪽 | 같음 |
+| `text-on-X-subtler` | 700, 800, 900, 950 중 처음 통과하는 단계 | 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
 | `text-on-X-subtle` | 700, 800, 900, 950 중 처음 통과하는 단계 | 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
 | `text-X` | 600, 700, 800, 900, 950 중 처음 통과하는 단계 | 500, 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
 | `border-X` | `text-X` 와 같은 단계 | 같음 |
 
 - 대비는 [APCA](https://git.apcacontrast.com/) 의 Lc 입니다. WCAG 2 의 대비비는 쓰지 않습니다.
   - WCAG 2 는 중간 밝기 채움 위의 검은 글자를 실제보다 잘 읽힌다고 봅니다. 그래서 보라색 채움 위에 검은 글자를 골랐습니다. APCA 는 글자 쪽(어두운 글자, 밝은 글자)에 따라 다르게 재서 이런 짝을 걸러 냅니다.
-  - 채움과 subtle 위 글자는 Lc 75(본문 글자의 기준), 페이지 위 색 글자(`text-X`)는 Lc 60(라벨, 링크, 에러 문구 같은 짧은 글자의 기준), 선과 아이콘 같은 표시의 하한은 Lc 45 입니다.
+  - `text-on-` 글자는 Lc 75(본문 글자의 기준), 페이지 위 색 글자(`text-X`)는 Lc 60(라벨, 링크, 에러 문구 같은 짧은 글자의 기준), 선과 아이콘 같은 표시의 하한은 Lc 45 입니다.
   - 계산은 `colorjs.io` 의 `contrastAPCA` 입니다(MIT).
 - 모든 글자는 쉴 때의 배경과, 그 배경에 글자색을 hover(6%), press(10%)로 덮은 색 위에서 함께 잽니다.
   - `withStateLayer(base, layer, opacity)`: 배경에 층 색을 sRGB 로 섞은 색. CSS `state-layer` 와 같은 계산입니다.
+    - 채널마다 `base + opacity × (layer − base)` 로 섞고 8비트로 반올림합니다. Flutter 도 이 식을 씁니다. `Color.lerp` 의 `base × (1 − opacity) + layer × opacity` 는 .5 에서 반올림이 갈려 한 단계 다른 글자를 고릅니다.
   - `underStateLayers(base, content)`: 쉴 때, hover, press 세 배경.
   - `firstReadableOn`: 후보 단계 중 세 배경 모두에서 기준을 넘는 첫 단계.
   - `lowestContrastUnderStateLayers`: 채움 위 글자를 고를 때 세 배경 중 가장 낮은 Lc.
-- `text-on-X-subtle` 은 subtle 과 그 hover, press 에서 Lc 75 를 넘어야 합니다.
+- `text-on-X-subtler` 와 `text-on-X-subtle` 은 각자의 배경과 그 hover, press 에서 Lc 75 를 넘어야 합니다.
 - `text-X` 는 페이지, `bg-X-subtler`, `bg-X-subtle` 과 그 hover, press 에서 모두 Lc 60 을 넘어야 합니다. 그래서 라이트는 채움과 같거나 한 단계 진하고, 다크도 200 까지 옅어지지 않습니다.
 - `border-X` 는 따로 고르지 않고 `text-X` 와 같은 단계를 씁니다. 선과 그 옆 글자가 한 색이라, invalid 필드의 테두리(`border-danger`)와 라벨, 에러 문구(`text-danger`)가 같은 색입니다. `text-X` 가 Lc 60 을 넘으므로 선의 하한 Lc 45 도 넘습니다.
 - neutral 역할은 고르지 않고 `packages/core/tokens/semantic/neutral.{light,dark}.json` 의 단계를 씁니다. `border-neutral` 은 구조선이라 대비 규칙이 없습니다(neutral 200 / 800).

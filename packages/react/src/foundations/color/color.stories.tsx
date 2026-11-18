@@ -77,6 +77,7 @@ type Pairing = readonly [background: string, foreground: string, kind: 'text' | 
 
 const pairsOf = (family: string): Pairing[] => [
   [`bg-${family}`, `text-on-${family}`, 'text'],
+  [`bg-${family}-subtler`, `text-on-${family}-subtler`, 'text'],
   [`bg-${family}-subtle`, `text-on-${family}-subtle`, 'text'],
   ['bg-neutral-subtlest', `text-${family}`, 'accent'],
   [`bg-${family}-subtler`, `text-${family}`, 'accent'],
@@ -84,8 +85,9 @@ const pairsOf = (family: string): Pairing[] => [
 ];
 
 const pairs: Pairing[] = [
+  ['bg-neutral-subtlest', 'text-on-neutral-subtlest', 'text'],
+  ['bg-neutral-subtler', 'text-on-neutral-subtler', 'text'],
   ['bg-neutral-subtlest', 'text-neutral-bold', 'text'],
-  ['bg-neutral-subtler', 'text-neutral-bold', 'text'],
   ['bg-neutral-subtlest', 'text-neutral', 'text'],
   ['bg-neutral-subtle', 'text-on-neutral-subtle', 'text'],
   ['bg-neutral', 'text-on-neutral', 'text'],
@@ -355,7 +357,7 @@ export const Lab: Story = {
         </Showcase.Section>
         <Showcase.Section
           title="Families × Roles"
-          description="계열 여덟 개가 같은 역할 일곱 개를 가지고, neutral 은 페이지와 본문, 반전 채움 역할 넷을 더 가집니다. bg-primary-subtle 는 배경, text-on-primary-subtle 는 그 위 글자, border-primary 는 선입니다."
+          description="계열 여덟 개가 같은 역할 여덟 개를 가지고, neutral 은 페이지와 본문, 반전 채움 역할 다섯을 더 가집니다. 배경 bg-X-세기 위 글자는 언제나 text-on-X-세기입니다. bg-primary-subtle 는 배경, text-on-primary-subtle 는 그 위 글자, border-primary 는 선입니다."
         >
           <FamilyTable />
         </Showcase.Section>

@@ -136,10 +136,10 @@ Container(
 ```
 
 - 계열 8개(`neutral`, `primary`, `secondary`, `tertiary`, `success`, `warning`, `danger`, `info`)가 같은 역할을 가진다. 이름은 `{bg|text|border}-{계열}[-{세기}]` 문법이고, 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 다.
-- 역할: `bgXSubtler`, `bgXSubtle`, `bgX`, `textOnXSubtle`, `textOnX`, `textX`, `borderX`.
-- neutral 만 가진 역할: 페이지 바탕 `bgNeutralSubtlest`, 본문 글자 `textNeutralBold`, 중립 채움 `bgNeutralBold` 와 그 위 글자 `textOnNeutralBold`.
+- 역할: `bgXSubtler`, `bgXSubtle`, `bgX`, `textOnXSubtler`, `textOnXSubtle`, `textOnX`, `textX`, `borderX`.
+- neutral 만 가진 역할: 페이지 바탕 `bgNeutralSubtlest` 와 그 위 글자 `textOnNeutralSubtlest`, 본문 글자 `textNeutralBold`, 중립 채움 `bgNeutralBold` 와 그 위 글자 `textOnNeutralBold`.
 - 이름은 CSS 의 `--ids-color-bg-primary-subtle` 을 camelCase 로 바꾼 것이다. `colors['bg-primary-subtle']` 로도 읽는다.
-- 채움(`bgX`)에는 `textOnX`, 옅은 면(`bgXSubtle`)에는 `textOnXSubtle`, 채움 없는 글자와 아이콘에는 `textX` 를 쓴다.
+- 배경마다 짝이 있다. `bgX` 에는 `textOnX`, `bgXSubtle` 에는 `textOnXSubtle`, `bgXSubtler` 에는 `textOnXSubtler` 를 쓴다. 채움 없는 글자와 아이콘에는 `textX` 를 쓴다.
 - hover 와 press 역할은 없다. 글자색을 `IdsStateOpacity.hover`(6%), `IdsStateOpacity.press`(10%) 만큼 바탕 위에 얹는다. IdsProvider 는 그 층 아래에서도 글자 대비를 확인한다.
 - 구조선(필드 테두리, 구분선)은 `borderNeutral`, 보조 글자는 `textNeutral` 이다.
 

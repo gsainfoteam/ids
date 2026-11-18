@@ -58,12 +58,14 @@ const pairsFor = (family: string): Pair[] => {
   const layers = family === 'neutral' ? LAYERS : [...LAYERS, `bg-${family}-subtler`];
   const pairs = [
     pair(`text-on-${family}`, [`bg-${family}`], TEXT_LC, family !== 'neutral'),
+    pair(`text-on-${family}-subtler`, [`bg-${family}-subtler`], TEXT_LC),
     pair(`text-on-${family}-subtle`, [`bg-${family}-subtle`], TEXT_LC),
   ];
 
   if (family === 'neutral')
     return [
       ...pairs,
+      pair('text-on-neutral-subtlest', ['bg-neutral-subtlest'], TEXT_LC),
       pair('text-on-neutral-bold', ['bg-neutral-bold'], TEXT_LC),
       pair('text-neutral-bold', [...layers, 'bg-neutral-subtle'], TEXT_LC),
       pair('text-neutral', [...layers, 'bg-neutral-subtle'], TEXT_LC, false),

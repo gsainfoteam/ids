@@ -19,8 +19,10 @@ Color roles are named by grammar only: `{bg|text|border}-{family}[-{strength}]` 
 
 New roles:
 
-- `bg-X-subtler` for every family: a band between the page and `subtle` (neutral 50 light, 900
-  dark), for a Card or Dialog footer or a table header.
+- `bg-X-subtler` with `text-on-X-subtler` for every family: a band between the page and `subtle`
+  (neutral 50 light, 900 dark), for a Card or Dialog footer or a table header.
+- `text-on-neutral-subtlest`, so every background `bg-X[-strength]` has its text
+  `text-on-X[-strength]`.
 - `bg-neutral-bold` with `text-on-neutral-bold`, the inverted fill of Tooltip and a neutral solid
   Button or Badge.
 

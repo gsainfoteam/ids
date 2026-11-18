@@ -8,9 +8,9 @@ export const IDS_STATUS_FAMILIES = ['success', 'warning', 'danger', 'info'] as c
 
 export const IDS_COLOR_FAMILIES = ['neutral', 'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'] as const;
 
-export const IDS_FAMILY_SLOTS = ['bg-{family}-subtlest', 'bg-{family}-subtler', 'bg-{family}-subtle', 'bg-{family}', 'bg-{family}-bold', 'text-on-{family}-subtle', 'text-on-{family}', 'text-on-{family}-bold', 'text-{family}', 'text-{family}-bold', 'border-{family}'] as const;
+export const IDS_FAMILY_SLOTS = ['bg-{family}-subtlest', 'bg-{family}-subtler', 'bg-{family}-subtle', 'bg-{family}', 'bg-{family}-bold', 'text-on-{family}-subtlest', 'text-on-{family}-subtler', 'text-on-{family}-subtle', 'text-on-{family}', 'text-on-{family}-bold', 'text-{family}', 'text-{family}-bold', 'border-{family}'] as const;
 
-export const IDS_NEUTRAL_ONLY_SLOTS = ['bg-{family}-subtlest', 'bg-{family}-bold', 'text-on-{family}-bold', 'text-{family}-bold'] as const;
+export const IDS_NEUTRAL_ONLY_SLOTS = ['bg-{family}-subtlest', 'text-on-{family}-subtlest', 'bg-{family}-bold', 'text-on-{family}-bold', 'text-{family}-bold'] as const;
 
 export const IDS_STATE_OPACITY = {
   'hover': 0.06,
@@ -39,6 +39,8 @@ export const IDS_NEUTRAL_STEPS = {
     'bg-neutral-subtle': 100,
     'bg-neutral': 300,
     'bg-neutral-bold': 900,
+    'text-on-neutral-subtlest': 900,
+    'text-on-neutral-subtler': 900,
     'text-on-neutral-subtle': 900,
     'text-on-neutral': 950,
     'text-on-neutral-bold': 0,
@@ -52,6 +54,8 @@ export const IDS_NEUTRAL_STEPS = {
     'bg-neutral-subtle': 800,
     'bg-neutral': 700,
     'bg-neutral-bold': 50,
+    'text-on-neutral-subtlest': 50,
+    'text-on-neutral-subtler': 50,
     'text-on-neutral-subtle': 50,
     'text-on-neutral': 50,
     'text-on-neutral-bold': 950,

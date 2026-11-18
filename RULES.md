@@ -425,10 +425,13 @@ to one raw step each and are named `{property}-{family}[-{strength}]` or
 - Strengths run `subtlest` < `subtler` < `subtle` < (none) < `bold`. `bolder` and `boldest` are
   reserved. A strength names a place on the ladder, not a palette step: the steps are picked by
   use, so the ends sit at or near the end of the palette.
-- Every family has `bg-X-subtler`, `bg-X-subtle`, `bg-X`, `text-on-X-subtle`, `text-on-X`, `text-X`
-  and `border-X`. Neutral adds `bg-neutral-subtlest` (the page), `bg-neutral-bold` with
-  `text-on-neutral-bold` (an inverted fill: Tooltip, a neutral solid Button or Badge) and
-  `text-neutral-bold` (body text).
+- Every family has `bg-X-subtler`, `bg-X-subtle`, `bg-X`, `text-on-X-subtler`, `text-on-X-subtle`,
+  `text-on-X`, `text-X` and `border-X`. Neutral adds `bg-neutral-subtlest` with
+  `text-on-neutral-subtlest` (the page), `bg-neutral-bold` with `text-on-neutral-bold` (an inverted
+  fill: Tooltip, a neutral solid Button or Badge) and `text-neutral-bold` (body text).
+- Every background has its pair: text on `bg-X[-strength]` is `text-on-X[-strength]`, with no
+  exception. `text-neutral-bold` and `text-neutral` are body and secondary text that read on every
+  neutral background.
 - There is no hover or active role. States are component code, see the state layer below.
 - The table lives in `packages/core/color-roles.json` (`slots`, `neutralOnly`); the neutral steps in
   `packages/core/tokens/semantic/neutral.{light,dark}.json`.
@@ -440,6 +443,7 @@ to one raw step each and are named `{property}-{family}[-{strength}]` or
 | `bg-neutral-subtle` | 100 | 800 | a soft control, a muted row |
 | `bg-neutral` | 300 | 700 | a handle, a track |
 | `bg-neutral-bold` | 900 | 50 | an inverted fill |
+| `text-on-neutral-subtlest`, `text-on-neutral-subtler` | 900 | 50 | text on the page or a band |
 | `text-neutral-bold` | 900 | 50 | body text |
 | `text-neutral` | 600 | 300 | secondary text |
 | `border-neutral` | 200 | 800 | structural lines |
@@ -465,10 +469,10 @@ should itself read as that color, is the same step as `text-X`, so a line and th
 subtle surface is `bg-primary-subtle` with `text-on-primary-subtle`; text or an icon sitting on the
 page with no fill behind it (an outline Badge or Chip, a Rating star, a Radio dot, a Link) is
 `text-primary`. `bg-X-subtler` is a lighter band than subtle (palette 50 in light, 950 mixed
-halfway to the page in dark) and takes `text-X` or `text-neutral-bold`. Never write `bg-primary`
+halfway to the page in dark) and takes `text-on-X-subtler`, or `text-X` for an accent. Never write `bg-primary`
 as a text color or `primary/10` as a subtle fill: light hues such as yellow and cyan fall under
 Lc 60 there. Statuses follow the same roles (`bg-danger-subtle` with `text-on-danger-subtle`,
-`text-danger` for text). Text on a fill or a subtle surface reaches APCA Lc 75, `text-X` Lc 60 on
+`text-danger` for text). Every `text-on-` role reaches APCA Lc 75 on its background, `text-X` Lc 60 on
 the page, on `bg-X-subtler` and on `bg-X-subtle` (short labels, links and messages), and every
 `border-X` (the `text-X` step) at least Lc 45 in both modes, for all 17 story palettes, pure and
 tinted neutrals and harmonized and fixed statuses, under the hover and press layers as well,

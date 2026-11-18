@@ -5,6 +5,8 @@
     "bg-neutral-subtle":      { "$value": "{neutral.100}", "$type": "color" },
     "bg-neutral":             { "$value": "{neutral.300}", "$type": "color" },
     "bg-neutral-bold":        { "$value": "{neutral.900}", "$type": "color" },
+    "text-on-neutral-subtlest": { "$value": "{neutral.900}", "$type": "color" },
+    "text-on-neutral-subtler":  { "$value": "{neutral.900}", "$type": "color" },
     "text-on-neutral-subtle": { "$value": "{neutral.900}", "$type": "color" },
     "text-on-neutral":        { "$value": "{neutral.950}", "$type": "color" },
     "text-on-neutral-bold":   { "$value": "{neutral.0}", "$type": "color" },

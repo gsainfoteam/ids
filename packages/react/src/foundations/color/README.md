@@ -37,6 +37,7 @@ IDS 색은 세 층입니다. 팔레트(`neutral-50`, 테마의 `primary-600`)는
 | `bg-X-subtler` | 띠. subtle 보다 옅다. light 는 팔레트 50, dark 는 950 을 페이지 쪽으로 절반(OKLab) 섞은 색 |
 | `bg-X-subtle` | 옅은 채움 (soft variant, soft Badge, 상태 Alert) |
 | `bg-X` | 채움 (solid Button, Progress 막대, solid Badge) |
+| `text-on-X-subtler` | `bg-X-subtler` 위 글자 |
 | `text-on-X-subtle` | `bg-X-subtle` 위 글자 |
 | `text-on-X` | `bg-X` 위 글자 |
 | `text-X` | 채움 없는 바탕, `bg-X-subtler`, `bg-X-subtle` 위 글자와 아이콘 (Link, outline Badge, Rating 별) |
@@ -46,8 +47,8 @@ neutral 만 가지는 역할입니다.
 
 | 역할 | light | dark | 쓰임 |
 | --- | --- | --- | --- |
-| `bg-neutral-subtlest` | 0 | 950 | 페이지, 팝업, 카드 |
-| `bg-neutral-subtler` | 50 | 900 | 띠, 트레이: Card, Dialog 의 footer, 표 머리, 어두운 모드의 outline 컨트롤 |
+| `bg-neutral-subtlest` / `text-on-neutral-subtlest` | 0 / 900 | 950 / 50 | 페이지, 팝업, 카드 |
+| `bg-neutral-subtler` / `text-on-neutral-subtler` | 50 / 900 | 900 / 50 | 띠, 트레이: Card, Dialog 의 footer, 표 머리, 어두운 모드의 outline 컨트롤 |
 | `bg-neutral-subtle` | 100 | 800 | soft 컨트롤, 흐린 행 |
 | `bg-neutral` | 300 | 700 | 손잡이, 트랙 |
 | `bg-neutral-bold` / `text-on-neutral-bold` | 900 / 0 | 50 / 950 | 뒤집힌 채움: Tooltip, neutral solid Button, Badge |
@@ -57,7 +58,8 @@ neutral 만 가지는 역할입니다.
 
 - hover, active 역할은 없습니다. 상태는 컴포넌트가 그리는 state layer 입니다([상태 층](#상태-층)).
 - 채움 위 글자는 색을 직접 고르지 말고 `text-on-X` 로 칠합니다. 밝은 팔레트에서는 검은 글자가 됩니다.
-- `bg-X-subtler` 위 글자는 `text-X` 나 `text-neutral-bold` 입니다.
+- 배경마다 짝이 있습니다. `bg-X[-세기]` 위 글자는 언제나 `text-on-X[-세기]` 입니다. 색 글자로 강조할 때만 `text-X` 를 씁니다.
+- `text-neutral-bold`, `text-neutral` 은 neutral 바탕 어디에나 놓는 본문 글자와 보조 글자입니다.
 - `bg-primary` 를 글자색으로, `primary/10` 을 옅은 채움으로 쓰지 않습니다. yellow, cyan 처럼 밝은 색은 흰 배경 위에서 Lc 60 도 안 됩니다.
 - 노란 `warning` 채움 위 글자도 `text-on-warning` 입니다. 흰 바탕 위 경고 글자는 `text-warning` 입니다.
 
@@ -94,7 +96,7 @@ neutral 만 가지는 역할입니다.
 - 앱은 브랜드 색을 50 ~ 950 의 11단계 팔레트나 색 하나로 줍니다. IDS 에는 기본 색이 없습니다.
 - 대비는 APCA 의 Lc 입니다.
   - 채움은 600 에서 시작해 글자가 Lc 75 에 닿을 때까지 이웃 단계로 옮깁니다.
-  - 채움과 subtle 위 글자는 Lc 75, 페이지와 subtler, subtle 위 색 글자는 Lc 60 을 넘는 첫 단계입니다.
+  - `text-on-` 글자는 Lc 75, 페이지와 subtler, subtle 위 색 글자는 Lc 60 을 넘는 첫 단계입니다.
   - 모두 쉴 때뿐 아니라 hover, press 층 아래에서도 잽니다.
   - 선은 색 글자와 같은 단계입니다. 규칙은 [IdsProvider](../../components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 에 있습니다.
 - Storybook 툴바의 Primary 는 레포 데모 팔레트 17개(Tailwind CSS v4 기본 색, `orange` 와 `green` 은 IDS 고유 값)에서 고릅니다. 패키지에는 들어 있지 않습니다.

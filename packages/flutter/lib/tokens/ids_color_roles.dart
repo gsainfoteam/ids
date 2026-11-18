@@ -10,9 +10,9 @@ abstract final class IdsColorRoles {
   static const brandFamilies = <String>['primary', 'secondary', 'tertiary'];
   static const statusFamilies = <String>['success', 'warning', 'danger', 'info'];
   static const families = <String>['neutral', 'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'];
-  static const familySlots = <String>['bg-{family}-subtlest', 'bg-{family}-subtler', 'bg-{family}-subtle', 'bg-{family}', 'bg-{family}-bold', 'text-on-{family}-subtle', 'text-on-{family}', 'text-on-{family}-bold', 'text-{family}', 'text-{family}-bold', 'border-{family}'];
-  static const neutralOnlySlots = <String>['bg-{family}-subtlest', 'bg-{family}-bold', 'text-on-{family}-bold', 'text-{family}-bold'];
-  static const all = <String>['bg-neutral-subtlest', 'bg-neutral-subtler', 'bg-neutral-subtle', 'bg-neutral', 'bg-neutral-bold', 'text-on-neutral-subtle', 'text-on-neutral', 'text-on-neutral-bold', 'text-neutral', 'text-neutral-bold', 'border-neutral', 'bg-primary-subtler', 'bg-primary-subtle', 'bg-primary', 'text-on-primary-subtle', 'text-on-primary', 'text-primary', 'border-primary', 'bg-secondary-subtler', 'bg-secondary-subtle', 'bg-secondary', 'text-on-secondary-subtle', 'text-on-secondary', 'text-secondary', 'border-secondary', 'bg-tertiary-subtler', 'bg-tertiary-subtle', 'bg-tertiary', 'text-on-tertiary-subtle', 'text-on-tertiary', 'text-tertiary', 'border-tertiary', 'bg-success-subtler', 'bg-success-subtle', 'bg-success', 'text-on-success-subtle', 'text-on-success', 'text-success', 'border-success', 'bg-warning-subtler', 'bg-warning-subtle', 'bg-warning', 'text-on-warning-subtle', 'text-on-warning', 'text-warning', 'border-warning', 'bg-danger-subtler', 'bg-danger-subtle', 'bg-danger', 'text-on-danger-subtle', 'text-on-danger', 'text-danger', 'border-danger', 'bg-info-subtler', 'bg-info-subtle', 'bg-info', 'text-on-info-subtle', 'text-on-info', 'text-info', 'border-info'];
+  static const familySlots = <String>['bg-{family}-subtlest', 'bg-{family}-subtler', 'bg-{family}-subtle', 'bg-{family}', 'bg-{family}-bold', 'text-on-{family}-subtlest', 'text-on-{family}-subtler', 'text-on-{family}-subtle', 'text-on-{family}', 'text-on-{family}-bold', 'text-{family}', 'text-{family}-bold', 'border-{family}'];
+  static const neutralOnlySlots = <String>['bg-{family}-subtlest', 'text-on-{family}-subtlest', 'bg-{family}-bold', 'text-on-{family}-bold', 'text-{family}-bold'];
+  static const all = <String>['bg-neutral-subtlest', 'bg-neutral-subtler', 'bg-neutral-subtle', 'bg-neutral', 'bg-neutral-bold', 'text-on-neutral-subtlest', 'text-on-neutral-subtler', 'text-on-neutral-subtle', 'text-on-neutral', 'text-on-neutral-bold', 'text-neutral', 'text-neutral-bold', 'border-neutral', 'bg-primary-subtler', 'bg-primary-subtle', 'bg-primary', 'text-on-primary-subtler', 'text-on-primary-subtle', 'text-on-primary', 'text-primary', 'border-primary', 'bg-secondary-subtler', 'bg-secondary-subtle', 'bg-secondary', 'text-on-secondary-subtler', 'text-on-secondary-subtle', 'text-on-secondary', 'text-secondary', 'border-secondary', 'bg-tertiary-subtler', 'bg-tertiary-subtle', 'bg-tertiary', 'text-on-tertiary-subtler', 'text-on-tertiary-subtle', 'text-on-tertiary', 'text-tertiary', 'border-tertiary', 'bg-success-subtler', 'bg-success-subtle', 'bg-success', 'text-on-success-subtler', 'text-on-success-subtle', 'text-on-success', 'text-success', 'border-success', 'bg-warning-subtler', 'bg-warning-subtle', 'bg-warning', 'text-on-warning-subtler', 'text-on-warning-subtle', 'text-on-warning', 'text-warning', 'border-warning', 'bg-danger-subtler', 'bg-danger-subtle', 'bg-danger', 'text-on-danger-subtler', 'text-on-danger-subtle', 'text-on-danger', 'text-danger', 'border-danger', 'bg-info-subtler', 'bg-info-subtle', 'bg-info', 'text-on-info-subtler', 'text-on-info-subtle', 'text-on-info', 'text-info', 'border-info'];
 
   static const neutralPalette = <int, Color>{
     0: Color(0xFFFFFFFF),
@@ -36,6 +36,8 @@ abstract final class IdsColorRoles {
       'bg-neutral-subtle': 100,
       'bg-neutral': 300,
       'bg-neutral-bold': 900,
+      'text-on-neutral-subtlest': 900,
+      'text-on-neutral-subtler': 900,
       'text-on-neutral-subtle': 900,
       'text-on-neutral': 950,
       'text-on-neutral-bold': 0,
@@ -49,6 +51,8 @@ abstract final class IdsColorRoles {
       'bg-neutral-subtle': 800,
       'bg-neutral': 700,
       'bg-neutral-bold': 50,
+      'text-on-neutral-subtlest': 50,
+      'text-on-neutral-subtler': 50,
       'text-on-neutral-subtle': 50,
       'text-on-neutral': 50,
       'text-on-neutral-bold': 950,
@@ -78,6 +82,8 @@ class IdsColors {
     required this.bgNeutralSubtle,
     required this.bgNeutral,
     required this.bgNeutralBold,
+    required this.textOnNeutralSubtlest,
+    required this.textOnNeutralSubtler,
     required this.textOnNeutralSubtle,
     required this.textOnNeutral,
     required this.textOnNeutralBold,
@@ -87,6 +93,7 @@ class IdsColors {
     required this.bgPrimarySubtler,
     required this.bgPrimarySubtle,
     required this.bgPrimary,
+    required this.textOnPrimarySubtler,
     required this.textOnPrimarySubtle,
     required this.textOnPrimary,
     required this.textPrimary,
@@ -94,6 +101,7 @@ class IdsColors {
     required this.bgSecondarySubtler,
     required this.bgSecondarySubtle,
     required this.bgSecondary,
+    required this.textOnSecondarySubtler,
     required this.textOnSecondarySubtle,
     required this.textOnSecondary,
     required this.textSecondary,
@@ -101,6 +109,7 @@ class IdsColors {
     required this.bgTertiarySubtler,
     required this.bgTertiarySubtle,
     required this.bgTertiary,
+    required this.textOnTertiarySubtler,
     required this.textOnTertiarySubtle,
     required this.textOnTertiary,
     required this.textTertiary,
@@ -108,6 +117,7 @@ class IdsColors {
     required this.bgSuccessSubtler,
     required this.bgSuccessSubtle,
     required this.bgSuccess,
+    required this.textOnSuccessSubtler,
     required this.textOnSuccessSubtle,
     required this.textOnSuccess,
     required this.textSuccess,
@@ -115,6 +125,7 @@ class IdsColors {
     required this.bgWarningSubtler,
     required this.bgWarningSubtle,
     required this.bgWarning,
+    required this.textOnWarningSubtler,
     required this.textOnWarningSubtle,
     required this.textOnWarning,
     required this.textWarning,
@@ -122,6 +133,7 @@ class IdsColors {
     required this.bgDangerSubtler,
     required this.bgDangerSubtle,
     required this.bgDanger,
+    required this.textOnDangerSubtler,
     required this.textOnDangerSubtle,
     required this.textOnDanger,
     required this.textDanger,
@@ -129,6 +141,7 @@ class IdsColors {
     required this.bgInfoSubtler,
     required this.bgInfoSubtle,
     required this.bgInfo,
+    required this.textOnInfoSubtler,
     required this.textOnInfoSubtle,
     required this.textOnInfo,
     required this.textInfo,
@@ -144,6 +157,8 @@ class IdsColors {
       bgNeutralSubtle: role('bg-neutral-subtle'),
       bgNeutral: role('bg-neutral'),
       bgNeutralBold: role('bg-neutral-bold'),
+      textOnNeutralSubtlest: role('text-on-neutral-subtlest'),
+      textOnNeutralSubtler: role('text-on-neutral-subtler'),
       textOnNeutralSubtle: role('text-on-neutral-subtle'),
       textOnNeutral: role('text-on-neutral'),
       textOnNeutralBold: role('text-on-neutral-bold'),
@@ -153,6 +168,7 @@ class IdsColors {
       bgPrimarySubtler: role('bg-primary-subtler'),
       bgPrimarySubtle: role('bg-primary-subtle'),
       bgPrimary: role('bg-primary'),
+      textOnPrimarySubtler: role('text-on-primary-subtler'),
       textOnPrimarySubtle: role('text-on-primary-subtle'),
       textOnPrimary: role('text-on-primary'),
       textPrimary: role('text-primary'),
@@ -160,6 +176,7 @@ class IdsColors {
       bgSecondarySubtler: role('bg-secondary-subtler'),
       bgSecondarySubtle: role('bg-secondary-subtle'),
       bgSecondary: role('bg-secondary'),
+      textOnSecondarySubtler: role('text-on-secondary-subtler'),
       textOnSecondarySubtle: role('text-on-secondary-subtle'),
       textOnSecondary: role('text-on-secondary'),
       textSecondary: role('text-secondary'),
@@ -167,6 +184,7 @@ class IdsColors {
       bgTertiarySubtler: role('bg-tertiary-subtler'),
       bgTertiarySubtle: role('bg-tertiary-subtle'),
       bgTertiary: role('bg-tertiary'),
+      textOnTertiarySubtler: role('text-on-tertiary-subtler'),
       textOnTertiarySubtle: role('text-on-tertiary-subtle'),
       textOnTertiary: role('text-on-tertiary'),
       textTertiary: role('text-tertiary'),
@@ -174,6 +192,7 @@ class IdsColors {
       bgSuccessSubtler: role('bg-success-subtler'),
       bgSuccessSubtle: role('bg-success-subtle'),
       bgSuccess: role('bg-success'),
+      textOnSuccessSubtler: role('text-on-success-subtler'),
       textOnSuccessSubtle: role('text-on-success-subtle'),
       textOnSuccess: role('text-on-success'),
       textSuccess: role('text-success'),
@@ -181,6 +200,7 @@ class IdsColors {
       bgWarningSubtler: role('bg-warning-subtler'),
       bgWarningSubtle: role('bg-warning-subtle'),
       bgWarning: role('bg-warning'),
+      textOnWarningSubtler: role('text-on-warning-subtler'),
       textOnWarningSubtle: role('text-on-warning-subtle'),
       textOnWarning: role('text-on-warning'),
       textWarning: role('text-warning'),
@@ -188,6 +208,7 @@ class IdsColors {
       bgDangerSubtler: role('bg-danger-subtler'),
       bgDangerSubtle: role('bg-danger-subtle'),
       bgDanger: role('bg-danger'),
+      textOnDangerSubtler: role('text-on-danger-subtler'),
       textOnDangerSubtle: role('text-on-danger-subtle'),
       textOnDanger: role('text-on-danger'),
       textDanger: role('text-danger'),
@@ -195,6 +216,7 @@ class IdsColors {
       bgInfoSubtler: role('bg-info-subtler'),
       bgInfoSubtle: role('bg-info-subtle'),
       bgInfo: role('bg-info'),
+      textOnInfoSubtler: role('text-on-info-subtler'),
       textOnInfoSubtle: role('text-on-info-subtle'),
       textOnInfo: role('text-on-info'),
       textInfo: role('text-info'),
@@ -207,6 +229,8 @@ class IdsColors {
   final Color bgNeutralSubtle;
   final Color bgNeutral;
   final Color bgNeutralBold;
+  final Color textOnNeutralSubtlest;
+  final Color textOnNeutralSubtler;
   final Color textOnNeutralSubtle;
   final Color textOnNeutral;
   final Color textOnNeutralBold;
@@ -216,6 +240,7 @@ class IdsColors {
   final Color bgPrimarySubtler;
   final Color bgPrimarySubtle;
   final Color bgPrimary;
+  final Color textOnPrimarySubtler;
   final Color textOnPrimarySubtle;
   final Color textOnPrimary;
   final Color textPrimary;
@@ -223,6 +248,7 @@ class IdsColors {
   final Color bgSecondarySubtler;
   final Color bgSecondarySubtle;
   final Color bgSecondary;
+  final Color textOnSecondarySubtler;
   final Color textOnSecondarySubtle;
   final Color textOnSecondary;
   final Color textSecondary;
@@ -230,6 +256,7 @@ class IdsColors {
   final Color bgTertiarySubtler;
   final Color bgTertiarySubtle;
   final Color bgTertiary;
+  final Color textOnTertiarySubtler;
   final Color textOnTertiarySubtle;
   final Color textOnTertiary;
   final Color textTertiary;
@@ -237,6 +264,7 @@ class IdsColors {
   final Color bgSuccessSubtler;
   final Color bgSuccessSubtle;
   final Color bgSuccess;
+  final Color textOnSuccessSubtler;
   final Color textOnSuccessSubtle;
   final Color textOnSuccess;
   final Color textSuccess;
@@ -244,6 +272,7 @@ class IdsColors {
   final Color bgWarningSubtler;
   final Color bgWarningSubtle;
   final Color bgWarning;
+  final Color textOnWarningSubtler;
   final Color textOnWarningSubtle;
   final Color textOnWarning;
   final Color textWarning;
@@ -251,6 +280,7 @@ class IdsColors {
   final Color bgDangerSubtler;
   final Color bgDangerSubtle;
   final Color bgDanger;
+  final Color textOnDangerSubtler;
   final Color textOnDangerSubtle;
   final Color textOnDanger;
   final Color textDanger;
@@ -258,6 +288,7 @@ class IdsColors {
   final Color bgInfoSubtler;
   final Color bgInfoSubtle;
   final Color bgInfo;
+  final Color textOnInfoSubtler;
   final Color textOnInfoSubtle;
   final Color textOnInfo;
   final Color textInfo;
@@ -269,6 +300,8 @@ class IdsColors {
     'bg-neutral-subtle': bgNeutralSubtle,
     'bg-neutral': bgNeutral,
     'bg-neutral-bold': bgNeutralBold,
+    'text-on-neutral-subtlest': textOnNeutralSubtlest,
+    'text-on-neutral-subtler': textOnNeutralSubtler,
     'text-on-neutral-subtle': textOnNeutralSubtle,
     'text-on-neutral': textOnNeutral,
     'text-on-neutral-bold': textOnNeutralBold,
@@ -278,6 +311,7 @@ class IdsColors {
     'bg-primary-subtler': bgPrimarySubtler,
     'bg-primary-subtle': bgPrimarySubtle,
     'bg-primary': bgPrimary,
+    'text-on-primary-subtler': textOnPrimarySubtler,
     'text-on-primary-subtle': textOnPrimarySubtle,
     'text-on-primary': textOnPrimary,
     'text-primary': textPrimary,
@@ -285,6 +319,7 @@ class IdsColors {
     'bg-secondary-subtler': bgSecondarySubtler,
     'bg-secondary-subtle': bgSecondarySubtle,
     'bg-secondary': bgSecondary,
+    'text-on-secondary-subtler': textOnSecondarySubtler,
     'text-on-secondary-subtle': textOnSecondarySubtle,
     'text-on-secondary': textOnSecondary,
     'text-secondary': textSecondary,
@@ -292,6 +327,7 @@ class IdsColors {
     'bg-tertiary-subtler': bgTertiarySubtler,
     'bg-tertiary-subtle': bgTertiarySubtle,
     'bg-tertiary': bgTertiary,
+    'text-on-tertiary-subtler': textOnTertiarySubtler,
     'text-on-tertiary-subtle': textOnTertiarySubtle,
     'text-on-tertiary': textOnTertiary,
     'text-tertiary': textTertiary,
@@ -299,6 +335,7 @@ class IdsColors {
     'bg-success-subtler': bgSuccessSubtler,
     'bg-success-subtle': bgSuccessSubtle,
     'bg-success': bgSuccess,
+    'text-on-success-subtler': textOnSuccessSubtler,
     'text-on-success-subtle': textOnSuccessSubtle,
     'text-on-success': textOnSuccess,
     'text-success': textSuccess,
@@ -306,6 +343,7 @@ class IdsColors {
     'bg-warning-subtler': bgWarningSubtler,
     'bg-warning-subtle': bgWarningSubtle,
     'bg-warning': bgWarning,
+    'text-on-warning-subtler': textOnWarningSubtler,
     'text-on-warning-subtle': textOnWarningSubtle,
     'text-on-warning': textOnWarning,
     'text-warning': textWarning,
@@ -313,6 +351,7 @@ class IdsColors {
     'bg-danger-subtler': bgDangerSubtler,
     'bg-danger-subtle': bgDangerSubtle,
     'bg-danger': bgDanger,
+    'text-on-danger-subtler': textOnDangerSubtler,
     'text-on-danger-subtle': textOnDangerSubtle,
     'text-on-danger': textOnDanger,
     'text-danger': textDanger,
@@ -320,6 +359,7 @@ class IdsColors {
     'bg-info-subtler': bgInfoSubtler,
     'bg-info-subtle': bgInfoSubtle,
     'bg-info': bgInfo,
+    'text-on-info-subtler': textOnInfoSubtler,
     'text-on-info-subtle': textOnInfoSubtle,
     'text-on-info': textOnInfo,
     'text-info': textInfo,
@@ -337,6 +377,8 @@ class IdsColors {
       other.bgNeutralSubtle == bgNeutralSubtle &&
       other.bgNeutral == bgNeutral &&
       other.bgNeutralBold == bgNeutralBold &&
+      other.textOnNeutralSubtlest == textOnNeutralSubtlest &&
+      other.textOnNeutralSubtler == textOnNeutralSubtler &&
       other.textOnNeutralSubtle == textOnNeutralSubtle &&
       other.textOnNeutral == textOnNeutral &&
       other.textOnNeutralBold == textOnNeutralBold &&
@@ -346,6 +388,7 @@ class IdsColors {
       other.bgPrimarySubtler == bgPrimarySubtler &&
       other.bgPrimarySubtle == bgPrimarySubtle &&
       other.bgPrimary == bgPrimary &&
+      other.textOnPrimarySubtler == textOnPrimarySubtler &&
       other.textOnPrimarySubtle == textOnPrimarySubtle &&
       other.textOnPrimary == textOnPrimary &&
       other.textPrimary == textPrimary &&
@@ -353,6 +396,7 @@ class IdsColors {
       other.bgSecondarySubtler == bgSecondarySubtler &&
       other.bgSecondarySubtle == bgSecondarySubtle &&
       other.bgSecondary == bgSecondary &&
+      other.textOnSecondarySubtler == textOnSecondarySubtler &&
       other.textOnSecondarySubtle == textOnSecondarySubtle &&
       other.textOnSecondary == textOnSecondary &&
       other.textSecondary == textSecondary &&
@@ -360,6 +404,7 @@ class IdsColors {
       other.bgTertiarySubtler == bgTertiarySubtler &&
       other.bgTertiarySubtle == bgTertiarySubtle &&
       other.bgTertiary == bgTertiary &&
+      other.textOnTertiarySubtler == textOnTertiarySubtler &&
       other.textOnTertiarySubtle == textOnTertiarySubtle &&
       other.textOnTertiary == textOnTertiary &&
       other.textTertiary == textTertiary &&
@@ -367,6 +412,7 @@ class IdsColors {
       other.bgSuccessSubtler == bgSuccessSubtler &&
       other.bgSuccessSubtle == bgSuccessSubtle &&
       other.bgSuccess == bgSuccess &&
+      other.textOnSuccessSubtler == textOnSuccessSubtler &&
       other.textOnSuccessSubtle == textOnSuccessSubtle &&
       other.textOnSuccess == textOnSuccess &&
       other.textSuccess == textSuccess &&
@@ -374,6 +420,7 @@ class IdsColors {
       other.bgWarningSubtler == bgWarningSubtler &&
       other.bgWarningSubtle == bgWarningSubtle &&
       other.bgWarning == bgWarning &&
+      other.textOnWarningSubtler == textOnWarningSubtler &&
       other.textOnWarningSubtle == textOnWarningSubtle &&
       other.textOnWarning == textOnWarning &&
       other.textWarning == textWarning &&
@@ -381,6 +428,7 @@ class IdsColors {
       other.bgDangerSubtler == bgDangerSubtler &&
       other.bgDangerSubtle == bgDangerSubtle &&
       other.bgDanger == bgDanger &&
+      other.textOnDangerSubtler == textOnDangerSubtler &&
       other.textOnDangerSubtle == textOnDangerSubtle &&
       other.textOnDanger == textOnDanger &&
       other.textDanger == textDanger &&
@@ -388,6 +436,7 @@ class IdsColors {
       other.bgInfoSubtler == bgInfoSubtler &&
       other.bgInfoSubtle == bgInfoSubtle &&
       other.bgInfo == bgInfo &&
+      other.textOnInfoSubtler == textOnInfoSubtler &&
       other.textOnInfoSubtle == textOnInfoSubtle &&
       other.textOnInfo == textOnInfo &&
       other.textInfo == textInfo &&

@@ -108,8 +108,21 @@ ParsedPalette parsePalette(
   ),
 };
 
-Color withStateLayer(Color base, Color layer, double opacity) =>
-    _eightBitOpaque(Color.lerp(base, layer, opacity)!);
+double _towardLikeCulori(double from, double to, double amount) =>
+    from + amount * (to - from);
+
+Color withStateLayer(Color base, Color layer, double opacity) {
+  final from = base.withValues(colorSpace: ColorSpace.sRGB);
+  final to = layer.withValues(colorSpace: ColorSpace.sRGB);
+  return _eightBitOpaque(
+    Color.from(
+      alpha: 1,
+      red: _towardLikeCulori(from.r, to.r, opacity),
+      green: _towardLikeCulori(from.g, to.g, opacity),
+      blue: _towardLikeCulori(from.b, to.b, opacity),
+    ),
+  );
+}
 
 List<Color> underStateLayers(Color base, Color content) => [
   base,
@@ -189,6 +202,16 @@ Color _subtlerOf(IdsPalette shades, ModeRule rule, Color surface) =>
   }
   final chosen = readable ?? _mostReadable([shades[600]]);
 
+  final onSubtler = _firstReadableOn(shades, rule.onSubtle, [subtler]);
+  if (onSubtler == null) {
+    issues.add(
+      IdsThemeIssue(
+        at,
+        '${mode.name}: no step of ${_stepsText(rule.onSubtle)} reaches Lc ${textLc.round()} on $family-subtler and under its hover and press layers.',
+      ),
+    );
+  }
+
   final onSubtle = _firstReadableOn(shades, rule.onSubtle, [subtle]);
   if (onSubtle == null) {
     issues.add(
@@ -213,17 +236,18 @@ Color _subtlerOf(IdsPalette shades, ModeRule rule, Color surface) =>
     );
   }
 
-  final slots = IdsColorRoles.slotsOf(family);
-  final lastText = shades[rule.text.last];
+  final accent = text ?? shades[rule.text.last];
+  final lastOnSubtle = shades[rule.onSubtle.last];
   return (
     roles: {
-      slots[0]: subtler,
-      slots[1]: subtle,
-      slots[2]: chosen.fill,
-      slots[3]: onSubtle ?? shades[rule.onSubtle.last],
-      slots[4]: chosen.text,
-      slots[5]: text ?? lastText,
-      slots[6]: text ?? lastText,
+      'bg-$family-subtler': subtler,
+      'bg-$family-subtle': subtle,
+      'bg-$family': chosen.fill,
+      'text-on-$family-subtler': onSubtler ?? lastOnSubtle,
+      'text-on-$family-subtle': onSubtle ?? lastOnSubtle,
+      'text-on-$family': chosen.text,
+      'text-$family': accent,
+      'border-$family': accent,
     },
     issues: issues,
   );
