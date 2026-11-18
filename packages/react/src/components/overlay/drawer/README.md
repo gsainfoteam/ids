@@ -150,7 +150,7 @@ const choice = await overlay.open<string>(({ close }) => (
 
 - Drawer 안에서 연 Drawer, Dialog, Select 시트는 위에 쌓입니다. Escape 는 맨 위부터 하나씩 닫습니다.
 - 위에 modal 이 열리면 아래 Drawer 는 `scale((W - 16) / W)` 로 작아지고 자기 축을 따라 16px 안쪽으로 물러납니다(`data-nested-open`).
-- 가장 아래 Drawer 만 배경을 어둡게 합니다.
+- 가장 아래 Drawer 만 배경을 어둡고 흐리게 합니다.
 - modal 을 세 개 이상 겹치면 개발 모드에서 경고합니다.
 
 ## 상태

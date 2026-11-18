@@ -7,7 +7,7 @@ export const drawerStyle = tv({
   slots: {
     backdrop: [
       overlayStyles.backdrop,
-      'touch-none opacity-[var(--drawer-fade,1)] data-stacked:bg-transparent',
+      'touch-none opacity-[var(--drawer-fade,1)]',
       'duration-(--ids-motion-slow) ease-[cubic-bezier(0.32,0.72,0,1)] data-dragging:transition-none',
     ],
     content: [

@@ -78,6 +78,7 @@ function ViewerSession({
   const [backdrop, setBackdrop] = useState<HTMLElement | null>(null);
   const [area, setArea] = useState<HTMLElement | null>(null);
   const [box, setBox] = useState<HTMLElement | null>(null);
+  const [stacked, setStacked] = useState(false);
   const boxRef = useRef<HTMLElement | null>(null);
   const pressedAt = useRef<{ x: number; y: number } | null>(null);
 
@@ -152,6 +153,7 @@ function ViewerSession({
     onDismiss: (reason) => {
       if (reason === 'escape-key') close();
     },
+    onPositionChange: ({ modalsBelow }) => setStacked(modalsBelow > 0),
   });
 
   useLayoutEffect(() => {
@@ -238,6 +240,7 @@ function ViewerSession({
       backdrop={{
         ref: attachBackdrop,
         'data-image-viewer-backdrop': '',
+        'data-stacked': stacked ? '' : undefined,
         'data-ending-style': ending ? '' : undefined,
         className: styles.backdrop(),
       }}
