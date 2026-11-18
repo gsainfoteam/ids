@@ -25,10 +25,10 @@ abstract final class IdsComponentTokens {
       'border-field-outline': 'border-neutral',
       'border-field-bar': 'border-neutral',
       'bg-switch-thumb': 'bg-neutral-subtlest',
-      'bg-qr-code-light': 'bg-neutral-subtlest',
-      'text-qr-code-light': 'text-neutral-bold',
-      'bg-qr-code-dark': 'bg-neutral-bold',
-      'text-qr-code-dark': 'text-on-neutral-bold',
+      'bg-qr-code': 'bg-neutral-subtlest',
+      'text-qr-code': 'text-neutral-bold',
+      'bg-qr-code-inverse': 'bg-neutral-bold',
+      'text-qr-code-inverse': 'text-on-neutral-bold',
     },
     IdsMode.dark: {
       'bg-panel': 'bg-neutral-subtler',
@@ -39,10 +39,10 @@ abstract final class IdsComponentTokens {
       'border-field-outline': 'bg-neutral',
       'border-field-bar': 'bg-neutral',
       'bg-switch-thumb': 'bg-neutral-bold',
-      'bg-qr-code-light': 'bg-neutral-bold',
-      'text-qr-code-light': 'text-on-neutral-bold',
-      'bg-qr-code-dark': 'bg-neutral-subtlest',
-      'text-qr-code-dark': 'text-neutral-bold',
+      'bg-qr-code': 'bg-neutral-bold',
+      'text-qr-code': 'text-on-neutral-bold',
+      'bg-qr-code-inverse': 'bg-neutral-subtlest',
+      'text-qr-code-inverse': 'text-neutral-bold',
     },
   };
 
@@ -70,10 +70,10 @@ class IdsComponentColors {
     required this.borderFieldOutline,
     required this.borderFieldBar,
     required this.bgSwitchThumb,
-    required this.bgQrCodeLight,
-    required this.textQrCodeLight,
-    required this.bgQrCodeDark,
-    required this.textQrCodeDark,
+    required this.bgQrCode,
+    required this.textQrCode,
+    required this.bgQrCodeInverse,
+    required this.textQrCodeInverse,
   });
 
   factory IdsComponentColors.of(IdsColors colors, IdsMode mode) {
@@ -88,10 +88,10 @@ class IdsComponentColors {
       borderFieldOutline: token('border-field-outline'),
       borderFieldBar: token('border-field-bar'),
       bgSwitchThumb: token('bg-switch-thumb'),
-      bgQrCodeLight: token('bg-qr-code-light'),
-      textQrCodeLight: token('text-qr-code-light'),
-      bgQrCodeDark: token('bg-qr-code-dark'),
-      textQrCodeDark: token('text-qr-code-dark'),
+      bgQrCode: token('bg-qr-code'),
+      textQrCode: token('text-qr-code'),
+      bgQrCodeInverse: token('bg-qr-code-inverse'),
+      textQrCodeInverse: token('text-qr-code-inverse'),
     );
   }
 
@@ -103,10 +103,10 @@ class IdsComponentColors {
   final Color borderFieldOutline;
   final Color borderFieldBar;
   final Color bgSwitchThumb;
-  final Color bgQrCodeLight;
-  final Color textQrCodeLight;
-  final Color bgQrCodeDark;
-  final Color textQrCodeDark;
+  final Color bgQrCode;
+  final Color textQrCode;
+  final Color bgQrCodeInverse;
+  final Color textQrCodeInverse;
 
   Map<String, Color> get tokens => {
     'bg-panel': bgPanel,
@@ -117,10 +117,10 @@ class IdsComponentColors {
     'border-field-outline': borderFieldOutline,
     'border-field-bar': borderFieldBar,
     'bg-switch-thumb': bgSwitchThumb,
-    'bg-qr-code-light': bgQrCodeLight,
-    'text-qr-code-light': textQrCodeLight,
-    'bg-qr-code-dark': bgQrCodeDark,
-    'text-qr-code-dark': textQrCodeDark,
+    'bg-qr-code': bgQrCode,
+    'text-qr-code': textQrCode,
+    'bg-qr-code-inverse': bgQrCodeInverse,
+    'text-qr-code-inverse': textQrCodeInverse,
   };
 
   @override
@@ -134,10 +134,10 @@ class IdsComponentColors {
       other.borderFieldOutline == borderFieldOutline &&
       other.borderFieldBar == borderFieldBar &&
       other.bgSwitchThumb == bgSwitchThumb &&
-      other.bgQrCodeLight == bgQrCodeLight &&
-      other.textQrCodeLight == textQrCodeLight &&
-      other.bgQrCodeDark == bgQrCodeDark &&
-      other.textQrCodeDark == textQrCodeDark;
+      other.bgQrCode == bgQrCode &&
+      other.textQrCode == textQrCode &&
+      other.bgQrCodeInverse == bgQrCodeInverse &&
+      other.textQrCodeInverse == textQrCodeInverse;
 
   @override
   int get hashCode => Object.hashAll(tokens.values);

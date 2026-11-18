@@ -9,9 +9,9 @@
     "border-field-outline":   { "$type": "component", "$value": { "light": "border-neutral", "dark": "bg-neutral" } },
     "border-field-bar":       { "$type": "component", "$value": { "light": "border-neutral", "dark": "bg-neutral" } },
     "bg-switch-thumb":        { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-bold" } },
-    "bg-qr-code-light":       { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-bold" } },
-    "text-qr-code-light":     { "$type": "component", "$value": { "light": "text-neutral-bold", "dark": "text-on-neutral-bold" } },
-    "bg-qr-code-dark":        { "$type": "component", "$value": { "light": "bg-neutral-bold", "dark": "bg-neutral-subtlest" } },
-    "text-qr-code-dark":      { "$type": "component", "$value": { "light": "text-on-neutral-bold", "dark": "text-neutral-bold" } }
+    "bg-qr-code":       { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-bold" } },
+    "text-qr-code":     { "$type": "component", "$value": { "light": "text-neutral-bold", "dark": "text-on-neutral-bold" } },
+    "bg-qr-code-inverse":        { "$type": "component", "$value": { "light": "bg-neutral-bold", "dark": "bg-neutral-subtlest" } },
+    "text-qr-code-inverse":      { "$type": "component", "$value": { "light": "text-on-neutral-bold", "dark": "text-neutral-bold" } }
   }
 }

@@ -9,13 +9,13 @@ Add scheme classes and component tokens. `scheme-{family}` points `bg-scheme`, `
 `scheme-primary`, and every component with `colorScheme` writes its own scheme. Component tokens
 (`bg-panel`, `shadow-panel`, `bg-band`, `bg-control-outline`, `border-control-outline`,
 `bg-field-outline`, `border-field-outline`, `border-field-bar`, `bg-switch-thumb`,
-`bg-qr-code-*`, `text-qr-code-*`) pick one role per mode, from `component.json` and `shadow.json`;
+`bg-qr-code`, `text-qr-code`, `bg-qr-code-inverse`, `text-qr-code-inverse`) pick one role per mode, from `component.json` and `shadow.json`;
 Flutter reads them as `IdsProvider.of(context).componentColors` and `.componentShadows`.
 
 Component code no longer uses `dark:` colors. Card, Dialog, popups, toasts, the outline Alert and
 FileField items sit on `bg-panel`, which is one step lighter than the page in dark mode; the outline
 Card adds `shadow-panel`. Outline Chip and Badge borders are `border-neutral`. The invalid empty
-Rating star takes the danger line color.
+Rating star is `text-neutral`.
 
 Breaking: the layout variables `--ids-marquee-*` and `--ids-text-area-pad-y` are now
 `--marquee-*` and `--text-area-pad-y`.

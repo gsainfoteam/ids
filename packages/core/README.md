@@ -74,7 +74,7 @@ hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에
 ## 컴포넌트 토큰
 
 - `component.json` 의 토큰은 `$value` 에 `light`, `dark` 두 역할을 갖는다. 그림자 토큰은 `{shadow.N}` 단계를 가리킨다.
-- 이름은 `{속성}-{그룹}[-{부분}][-{변형}]` 이다. 속성 `bg` 는 배경, `text` 는 글자와 `fill`, `border` 는 선과 `ring`·`outline`·`stroke` 이름공간에 붙는다(`bg-panel`, `inset-ring-control-outline`, `fill-qr-code-light`).
+- 이름은 `{속성}-{그룹}[-{부분}][-{변형}]` 이다. 속성 `bg` 는 배경, `text` 는 글자와 `fill`, `border` 는 선과 `ring`·`outline`·`stroke` 이름공간에 붙는다(`bg-panel`, `inset-ring-control-outline`, `fill-qr-code`).
 - CSS 는 `[data-mode]` 마다 `--ids-color-{토큰}: var(--ids-color-{역할})`, `--ids-shadow-{토큰}: var(--ids-shadow-{단계})` 를 쓴다. 단계 `0` 은 `0 0 #0000` 이라 Tailwind 의 그림자 목록 안에서도 합쳐진다.
 - 이름 규칙과 대비는 `packages/react/tests/component-tokens.test.ts` 가, Flutter 와 같은 색인지는 `tests/fixtures/theme-roles.json` 의 `components` 가 확인한다.
 

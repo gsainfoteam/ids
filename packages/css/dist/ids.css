@@ -159,12 +159,12 @@
   --outline-color-field-bar: var(--ids-color-border-field-bar);
   --stroke-field-bar: var(--ids-color-border-field-bar);
   --background-color-switch-thumb: var(--ids-color-bg-switch-thumb);
-  --background-color-qr-code-light: var(--ids-color-bg-qr-code-light);
-  --text-color-qr-code-light: var(--ids-color-text-qr-code-light);
-  --fill-qr-code-light: var(--ids-color-text-qr-code-light);
-  --background-color-qr-code-dark: var(--ids-color-bg-qr-code-dark);
-  --text-color-qr-code-dark: var(--ids-color-text-qr-code-dark);
-  --fill-qr-code-dark: var(--ids-color-text-qr-code-dark);
+  --background-color-qr-code: var(--ids-color-bg-qr-code);
+  --text-color-qr-code: var(--ids-color-text-qr-code);
+  --fill-qr-code: var(--ids-color-text-qr-code);
+  --background-color-qr-code-inverse: var(--ids-color-bg-qr-code-inverse);
+  --text-color-qr-code-inverse: var(--ids-color-text-qr-code-inverse);
+  --fill-qr-code-inverse: var(--ids-color-text-qr-code-inverse);
   --shadow-panel: var(--ids-shadow-panel);
 }
 
@@ -1779,10 +1779,10 @@
   --ids-color-border-field-outline: var(--ids-color-border-neutral);
   --ids-color-border-field-bar: var(--ids-color-border-neutral);
   --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-subtlest);
-  --ids-color-bg-qr-code-light: var(--ids-color-bg-neutral-subtlest);
-  --ids-color-text-qr-code-light: var(--ids-color-text-neutral-bold);
-  --ids-color-bg-qr-code-dark: var(--ids-color-bg-neutral-bold);
-  --ids-color-text-qr-code-dark: var(--ids-color-text-on-neutral-bold);
+  --ids-color-bg-qr-code: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-text-qr-code: var(--ids-color-text-neutral-bold);
+  --ids-color-bg-qr-code-inverse: var(--ids-color-bg-neutral-bold);
+  --ids-color-text-qr-code-inverse: var(--ids-color-text-on-neutral-bold);
   --ids-shadow-panel: var(--ids-shadow-1);
 }
 
@@ -1864,9 +1864,9 @@
   --ids-color-border-field-outline: var(--ids-color-bg-neutral);
   --ids-color-border-field-bar: var(--ids-color-bg-neutral);
   --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-bold);
-  --ids-color-bg-qr-code-light: var(--ids-color-bg-neutral-bold);
-  --ids-color-text-qr-code-light: var(--ids-color-text-on-neutral-bold);
-  --ids-color-bg-qr-code-dark: var(--ids-color-bg-neutral-subtlest);
-  --ids-color-text-qr-code-dark: var(--ids-color-text-neutral-bold);
+  --ids-color-bg-qr-code: var(--ids-color-bg-neutral-bold);
+  --ids-color-text-qr-code: var(--ids-color-text-on-neutral-bold);
+  --ids-color-bg-qr-code-inverse: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-text-qr-code-inverse: var(--ids-color-text-neutral-bold);
   --ids-shadow-panel: var(--ids-shadow-0);
 }

@@ -12,7 +12,7 @@
 - 그룹 이름은 계열(`primary`, `neutral` …), `scheme`, 세기(`subtle`, `bold` …)와 겹치지 않습니다.
 - `fill`, `tint`, `strong`, `accent`, `on`, `line`, `quiet`, `glyph`, `foreground`, `background` 는 이름에 쓰지 않습니다. `soft` 는 변형 자리에만 옵니다.
 - 원본은 `packages/core/tokens/component.json` 과 `shadow.json` 이고, `pnpm codegen` 이 `ids.css`, `src/tokens/component-tokens.ts`, Flutter 의 `IdsComponentColors`, `IdsComponentShadows` 를 씁니다.
-- CSS 변수는 `--ids-color-{토큰}`, `--ids-shadow-{토큰}` 이고, Tailwind 유틸리티는 속성의 namespace 에 붙습니다(`bg-panel`, `inset-ring-control-outline`, `fill-qr-code-light`, `shadow-panel`).
+- CSS 변수는 `--ids-color-{토큰}`, `--ids-shadow-{토큰}` 이고, Tailwind 유틸리티는 속성의 namespace 에 붙습니다(`bg-panel`, `inset-ring-control-outline`, `fill-qr-code`, `shadow-panel`).
 
 ## 토큰
 
@@ -25,8 +25,8 @@
 | `bg-field-outline`, `border-field-outline` | `bg-neutral-subtlest`, `border-neutral` | `bg-neutral-subtle`, `bg-neutral` | outline 입력 상자 |
 | `border-field-bar` | `border-neutral` | `bg-neutral` | TextArea 막대의 구분선 |
 | `bg-switch-thumb` | `bg-neutral-subtlest` | `bg-neutral-bold` | 꺼진 Switch 의 thumb |
-| `bg-qr-code-light`, `text-qr-code-light` | 밝은 바탕, 어두운 모듈 | 같음 | QRCode `inverted={false}` |
-| `bg-qr-code-dark`, `text-qr-code-dark` | 어두운 바탕, 밝은 모듈 | 같음 | QRCode `inverted` |
+| `bg-qr-code`, `text-qr-code` | 밝은 바탕, 어두운 모듈 | 같음 | QRCode `inverted={false}` |
+| `bg-qr-code-inverse`, `text-qr-code-inverse` | 어두운 바탕, 밝은 모듈 | 같음 | QRCode `inverted` |
 
 ## 그림자
 

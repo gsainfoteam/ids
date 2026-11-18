@@ -109,8 +109,8 @@ describe.each(themes)('component tokens for $name', ({ roles }) => {
           { text: roles[mode]['text-neutral']!, background, lc: ACCENT_TEXT_LC },
         ],
       ),
-      { text: token('text-qr-code-light'), background: 'bg-qr-code-light' as const, lc: TEXT_LC },
-      { text: token('text-qr-code-dark'), background: 'bg-qr-code-dark' as const, lc: TEXT_LC },
+      { text: token('text-qr-code'), background: 'bg-qr-code' as const, lc: TEXT_LC },
+      { text: token('text-qr-code-inverse'), background: 'bg-qr-code-inverse' as const, lc: TEXT_LC },
     ];
 
     for (const { text, background, lc } of pairs)

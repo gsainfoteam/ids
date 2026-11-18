@@ -15,10 +15,10 @@ export const IDS_COMPONENT_COLORS = {
   'border-field-outline': { light: 'border-neutral', dark: 'bg-neutral' },
   'border-field-bar': { light: 'border-neutral', dark: 'bg-neutral' },
   'bg-switch-thumb': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-bold' },
-  'bg-qr-code-light': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-bold' },
-  'text-qr-code-light': { light: 'text-neutral-bold', dark: 'text-on-neutral-bold' },
-  'bg-qr-code-dark': { light: 'bg-neutral-bold', dark: 'bg-neutral-subtlest' },
-  'text-qr-code-dark': { light: 'text-on-neutral-bold', dark: 'text-neutral-bold' },
+  'bg-qr-code': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-bold' },
+  'text-qr-code': { light: 'text-neutral-bold', dark: 'text-on-neutral-bold' },
+  'bg-qr-code-inverse': { light: 'bg-neutral-bold', dark: 'bg-neutral-subtlest' },
+  'text-qr-code-inverse': { light: 'text-on-neutral-bold', dark: 'text-neutral-bold' },
 } as const;
 
 export const IDS_COMPONENT_SHADOWS = {

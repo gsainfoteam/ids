@@ -27,12 +27,12 @@ export const qrCodeStyle = tv({
         background: 'fill-[var(--qr-code-background,var(--ids-color-bg-neutral-subtlest))]',
       },
       'dark-on-light': {
-        root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-qr-code-light))]',
-        background: 'fill-[var(--qr-code-background,var(--ids-color-bg-qr-code-light))]',
+        root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-qr-code))]',
+        background: 'fill-[var(--qr-code-background,var(--ids-color-bg-qr-code))]',
       },
       'light-on-dark': {
-        root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-qr-code-dark))]',
-        background: 'fill-[var(--qr-code-background,var(--ids-color-bg-qr-code-dark))]',
+        root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-qr-code-inverse))]',
+        background: 'fill-[var(--qr-code-background,var(--ids-color-bg-qr-code-inverse))]',
       },
     } satisfies Record<QRCodeTone, object>,
     flush: {
