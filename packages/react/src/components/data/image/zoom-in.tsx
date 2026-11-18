@@ -19,7 +19,6 @@ export function ImageViewerZoomIn(props: ImageViewerZoomInProps) {
       glyph={<MagnifyingGlassPlusIcon aria-hidden="true" />}
       act={viewer.zoomIn}
       unavailable={!viewer.canZoomIn}
-      quiet
     />
   );
 }

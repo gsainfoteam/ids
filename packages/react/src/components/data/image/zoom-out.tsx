@@ -19,7 +19,6 @@ export function ImageViewerZoomOut(props: ImageViewerZoomOutProps) {
       glyph={<MagnifyingGlassMinusIcon aria-hidden="true" />}
       act={viewer.zoomOut}
       unavailable={!viewer.canZoomOut}
-      quiet
     />
   );
 }

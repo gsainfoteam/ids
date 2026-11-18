@@ -211,7 +211,11 @@ mixin IdsMessages {
 
   String? get imageZoomIn => null;
 
+  String? imageZoomLevel({required Object percent}) => null;
+
   String? get imageZoomOut => null;
+
+  String? imageZoomReset({required Object percent}) => null;
 
   String? get inputClearSearch => null;
 
@@ -779,7 +783,13 @@ final class IdsKoreanMessages with IdsMessages {
   String get imageZoomIn => '확대';
 
   @override
+  String imageZoomLevel({required Object percent}) => '${_format(percent)}%';
+
+  @override
   String get imageZoomOut => '축소';
+
+  @override
+  String imageZoomReset({required Object percent}) => '${_format(percent)}%, 화면에 맞추기';
 
   @override
   String get inputClearSearch => '검색어 지우기';
