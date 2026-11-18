@@ -18,7 +18,6 @@ export function ImageViewerClose(props: ImageViewerCloseProps) {
       label={t('image.close')}
       glyph={<XMarkIcon aria-hidden="true" />}
       act={viewer.close}
-      quiet
     />
   );
 }

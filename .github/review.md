@@ -85,7 +85,7 @@
 
 - IDS 부품이 있는데 손으로 그린 경우: 선은 `Divider`, 면은 `Card`나 `Item`, 아이콘 버튼은 `IconButton`, 흐린 글자는 `Description` 부품, 라벨은 `Label`입니다
 - 다른 컴포넌트 안에 있는지 감지해서 동작을 바꾸는 경우. prop으로 고르게 합니다
-- 예제, 패턴, block에서 `ghost` variant를 쓴 경우
+- 예제, 패턴, block에서 `ghost` variant를 쓴 경우. 툴바 막대처럼 이미 면을 그린 컨테이너 안의 버튼은 예외입니다.
 
 ### 패키지
 

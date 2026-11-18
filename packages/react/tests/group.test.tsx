@@ -43,6 +43,15 @@ test('the separator is a Divider across the group that overlaps the joined borde
     </ButtonGroup>,
   );
   expect(spaced.classList, 'spaced controls leave no seam').not.toContain('-mx-px');
+  for (const name of ['h-5', 'min-h-0', 'self-center'])
+    expect(spaced.classList, `a spaced separator is short: ${name}`).toContain(name);
+
+  const tiny = separator(
+    <ButtonGroup aria-label="저장" attached={false} size="tiny" orientation="vertical">
+      <ButtonGroup.Separator />
+    </ButtonGroup>,
+  );
+  for (const name of ['w-4', 'self-center']) expect(tiny.classList, name).toContain(name);
 });
 
 test('inside a single-select ToggleGroup the separator only draws a line', () => {

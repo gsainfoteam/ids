@@ -304,7 +304,8 @@ changes it.
   radius, shadow or `style`. A line is a `Divider`, a surface a `Card` or an `Item`, muted text a
   component's `Description` part. The classes a part documents (`border-t` on `Card.Footer`) are
   fine.
-- A block picks `solid`, `outline` or `soft` and never `ghost`. A text link (in running text, or
+- A block picks `solid`, `outline` or `soft` and never `ghost`, except for the buttons inside a
+  bar that already draws the surface (a toolbar `Card`), which stay `ghost`. A text link (in running text, or
   a "forgot password" or "sign up" line) is `Link`; a link in a table cell or a footer list is
   `Link colorScheme="neutral" underline="hover"`; a link that should stand out is `Button asChild`
   around the `<a>`; a row or card that links is `Item asChild` or `Card asChild`. A bare `<a>`

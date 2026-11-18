@@ -13,10 +13,7 @@ import {
 import { ImageViewerCaption } from './caption';
 import { ImageViewerContext, type ImageViewerContextValue } from './context';
 import { enterFrom, exitTo } from './flip';
-import { ImageViewerNext } from './next';
-import { ImageViewerPrev } from './prev';
 import { imageStyle } from './style';
-import { ImageViewerThumbnails } from './thumbnails';
 import { ImageViewerToolbar } from './toolbar';
 import { ImageViewerSlide } from './viewer-slide';
 import { keyHandler } from '../../../internal/keys';
@@ -47,16 +44,19 @@ const A_TAP_NOT_A_DRAG = 10;
 const PRESENCE = '--image-viewer-presence';
 const SWIPING = 'data-swiping';
 const WHAT_IS_NOT_EMPTY = '[data-image-viewer-box], [data-image-viewer-notice]';
+const THE_STAGE = '[data-image-viewer-stage]';
 
 const DEFAULT_PARTS = (
   <>
-    <ImageViewerToolbar />
-    <ImageViewerPrev />
-    <ImageViewerNext />
     <ImageViewerCaption />
-    <ImageViewerThumbnails />
+    <ImageViewerToolbar />
   </>
 );
+
+function isEmptyGround(target: Element, viewer: Element) {
+  if (target === viewer) return true;
+  return target.closest(THE_STAGE) !== null && target.closest(WHAT_IS_NOT_EMPTY) === null;
+}
 
 function isNear(index: number, current: number, count: number, loop: boolean) {
   const apart = Math.abs(index - current);
@@ -203,8 +203,8 @@ function ViewerSession({
     if (!from) return;
 
     const travel = Math.hypot(event.clientX - from.x, event.clientY - from.y);
-    const onThePicture = (event.target as Element).closest(WHAT_IS_NOT_EMPTY);
-    if (travel <= A_TAP_NOT_A_DRAG && !onThePicture) close();
+    const empty = isEmptyGround(event.target as Element, event.currentTarget);
+    if (travel <= A_TAP_NOT_A_DRAG && empty) close();
   };
 
   const current = slides.selected;
@@ -222,6 +222,9 @@ function ViewerSession({
     canZoomOut: box !== null && zoomPan.canZoomOut,
     zoomIn: zoomPan.zoomIn,
     zoomOut: zoomPan.zoomOut,
+    zoom: zoomPan.scale,
+    canResetZoom: box !== null && zoomPan.canZoomOut,
+    resetZoom: zoomPan.reset,
     close,
     styles,
   };
@@ -248,10 +251,13 @@ function ViewerSession({
         tabIndex={-1}
         data-image-viewer=""
         data-open={open ? '' : undefined}
+        data-zoomed={zoomPan.zoomed ? '' : undefined}
         data-ending-style={ending ? '' : undefined}
         className={styles.viewer({ className: look.className })}
         style={look.style}
         onKeyDown={onKeyDown}
+        onPointerDown={notePress}
+        onClick={closeOnAnEmptyPress}
       >
         <section
           ref={attachViewport}
@@ -259,8 +265,6 @@ function ViewerSession({
           aria-label={t('image.photos')}
           data-image-viewer-stage=""
           className={styles.stage()}
-          onPointerDown={notePress}
-          onClick={closeOnAnEmptyPress}
         >
           <div {...slides.trackProps} className={styles.track()}>
             {items.map((item, index) => (
