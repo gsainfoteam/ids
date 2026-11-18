@@ -355,11 +355,17 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 }
 
 @utility state-hover {
-  --ids-state-opacity: var(--ids-state-hover);
+  --ids-state-opacity: var(--ids-state-layer-hover, var(--ids-state-hover));
 }
 
 @utility state-press {
-  --ids-state-opacity: var(--ids-state-press);
+  --ids-state-opacity: var(--ids-state-layer-press, var(--ids-state-press));
+}
+
+@utility state-fill {
+  --ids-state-color: var(--ids-state-fill-color);
+  --ids-state-layer-hover: var(--ids-state-fill-hover);
+  --ids-state-layer-press: var(--ids-state-fill-press);
 }
 
 @utility font-mono {
@@ -540,6 +546,16 @@ const T_CSS_STATE_LAYER_PROPERTIES = `@property --ids-state-opacity {
   syntax: "*";
   inherits: false;
 }
+
+@property --ids-state-layer-hover {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --ids-state-layer-press {
+  syntax: "*";
+  inherits: false;
+}
 `;
 
 const LENGTHS_SCRIPTS_READ_IN_PIXELS = ["--scroll-area-thickness", "--scroll-area-gap"];
@@ -645,8 +661,13 @@ const neutralPalette = (dictionary) =>
     byPath(dictionary, "neutral").map((t) => [t.path[1], `'${val(t)}'`]),
   );
 
+const stateTokens = (dictionary, type) =>
+  byCategory(dictionary, "state").filter((t) => (t.$type ?? t.type) === type);
+
 const stateOpacity = (dictionary) =>
-  Object.fromEntries(byCategory(dictionary, "state").map((t) => [slug(t), parseFloat(val(t)) / 100]));
+  Object.fromEntries(stateTokens(dictionary, "number").map((t) => [toCamel(slug(t)), parseFloat(val(t)) / 100]));
+
+const stateFillColor = (dictionary) => val(stateTokens(dictionary, "color").find((t) => slug(t) === "fill-color"));
 
 const tsColorRolesFormatter = ({ dictionary }) =>
   render(T_TS_FILE, {
@@ -659,6 +680,7 @@ const tsColorRolesFormatter = ({ dictionary }) =>
       `export const IDS_FAMILY_SLOTS = ${tsList(TEMPLATE_SLOTS.map(({ slot }) => slot))} as const;`,
       `export const IDS_NEUTRAL_ONLY_SLOTS = ${tsList(NEUTRAL_ONLY_SLOTS)} as const;`,
       `export const IDS_STATE_OPACITY = ${tsRecord(stateOpacity(dictionary), "")} as const;`,
+      `export const IDS_STATE_FILL_COLOR = '${stateFillColor(dictionary)}';`,
       `export const IDS_NEUTRAL_PALETTE = ${tsRecord(neutralPalette(dictionary), "")} as const;`,
       `export const IDS_NEUTRAL_STEPS = {\n${["light", "dark"]
         .map((mode) => `  ${mode}: ${tsRecord(neutralSteps(mode), "  ")},`)
@@ -719,6 +741,10 @@ abstract final class IdsStateOpacity {
 {{STATE_OPACITY}}
 }
 
+abstract final class IdsStateLayer {
+  static const fillColor = Color({{STATE_FILL_COLOR}});
+}
+
 @immutable
 class IdsColors {
   const IdsColors({
@@ -776,6 +802,7 @@ const dartColorRolesFormatter = ({ dictionary }) => {
     LISTS: lists.join("\n"),
     NEUTRAL_PALETTE: neutral.join("\n"),
     NEUTRAL_STEPS: steps.join("\n"),
+    STATE_FILL_COLOR: `0xFF${stateFillColor(dictionary).slice(1).toUpperCase()}`,
     STATE_OPACITY: Object.entries(stateOpacity(dictionary))
       .map(([name, value]) => `  static const double ${name} = ${value};`)
       .join("\n"),

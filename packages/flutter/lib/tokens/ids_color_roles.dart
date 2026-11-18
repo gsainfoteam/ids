@@ -72,6 +72,14 @@ abstract final class IdsColorRoles {
 abstract final class IdsStateOpacity {
   static const double hover = 0.06;
   static const double press = 0.1;
+  static const double tintHover = 0.08;
+  static const double tintPress = 0.12;
+  static const double fillHover = 0.1;
+  static const double fillPress = 0.18;
+}
+
+abstract final class IdsStateLayer {
+  static const fillColor = Color(0xFF000000);
 }
 
 @immutable

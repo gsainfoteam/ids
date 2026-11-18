@@ -7,13 +7,17 @@ import { paletteHues, palettes } from '../.storybook/palettes';
 import { lightnessContrast } from '../src/components/utility/ids-provider/contrast';
 import {
   ACCENT_TEXT_LC,
+  FILL_LAYER,
   MARK_LC,
   TEXT_LC,
   MODES,
   neutralRoles,
   resolveColors,
   slotsOf,
+  contentLayer,
+  tintLayer,
   underStateLayers,
+  type StateLayer,
 } from '../src/components/utility/ids-provider/theme-roles';
 import {
   IDS_BRAND_FAMILIES,
@@ -43,54 +47,73 @@ const mappedSlots = (mode: IdsMode) =>
 
 const themeVar = (mode: IdsMode, slot: string) => `--ids-theme-${mode}-${slot}`;
 
-type Pair = { foreground: string; backgrounds: string[]; lc: number; underStates: boolean };
+type Roles = { [slot: string]: string };
 
-const pair = (foreground: string, backgrounds: string[], lc: number, underStates = true): Pair => ({
+type LayersOf = (roles: Roles, text: string) => StateLayer[];
+
+type Pair = { foreground: string; backgrounds: string[]; lc: number; layers: LayersOf };
+
+const noLayer: LayersOf = () => [];
+
+const fillLayer: LayersOf = () => [FILL_LAYER];
+
+const textLayer: LayersOf = (_, text) => [contentLayer(text)];
+
+const textAndFamilyLayers =
+  (family: string): LayersOf =>
+  (roles, text) => [contentLayer(text), tintLayer(roles[`bg-${family}`]!)];
+
+const pair = (foreground: string, backgrounds: string[], lc: number, layers: LayersOf): Pair => ({
   foreground,
   backgrounds,
   lc,
-  underStates,
+  layers,
 });
 
 const LAYERS = ['bg-neutral-subtlest', 'bg-neutral-subtler'];
 
 const pairsFor = (family: string): Pair[] => {
-  const layers = family === 'neutral' ? LAYERS : [...LAYERS, `bg-${family}-subtler`];
-  const pairs = [
-    pair(`text-on-${family}`, [`bg-${family}`], TEXT_LC, family !== 'neutral'),
-    pair(`text-on-${family}-subtler`, [`bg-${family}-subtler`], TEXT_LC),
-    pair(`text-on-${family}-subtle`, [`bg-${family}-subtle`], TEXT_LC),
-  ];
-
   if (family === 'neutral')
     return [
-      ...pairs,
-      pair('text-on-neutral-subtlest', ['bg-neutral-subtlest'], TEXT_LC),
-      pair('text-on-neutral-bold', ['bg-neutral-bold'], TEXT_LC),
-      pair('text-neutral-bold', [...layers, 'bg-neutral-subtle'], TEXT_LC),
-      pair('text-neutral', [...layers, 'bg-neutral-subtle'], TEXT_LC, false),
+      pair('text-on-neutral', ['bg-neutral'], TEXT_LC, noLayer),
+      pair('text-on-neutral-subtler', ['bg-neutral-subtler'], TEXT_LC, textLayer),
+      pair('text-on-neutral-subtle', ['bg-neutral-subtle'], TEXT_LC, textLayer),
+      pair('text-on-neutral-subtlest', ['bg-neutral-subtlest'], TEXT_LC, textLayer),
+      pair('text-on-neutral-bold', ['bg-neutral-bold'], TEXT_LC, fillLayer),
+      pair('text-neutral-bold', [...LAYERS, 'bg-neutral-subtle'], TEXT_LC, textLayer),
+      pair('text-neutral', [...LAYERS, 'bg-neutral-subtle'], TEXT_LC, noLayer),
     ];
 
+  const familyLayers = textAndFamilyLayers(family);
+
   return [
-    ...pairs,
-    pair(`text-${family}`, [...layers, `bg-${family}-subtle`], ACCENT_TEXT_LC),
-    pair(`border-${family}`, ['bg-neutral-subtlest'], MARK_LC, false),
+    pair(`text-on-${family}`, [`bg-${family}`], TEXT_LC, fillLayer),
+    pair(`text-on-${family}-subtler`, [`bg-${family}-subtler`], TEXT_LC, familyLayers),
+    pair(`text-on-${family}-subtle`, [`bg-${family}-subtle`], TEXT_LC, familyLayers),
+    pair(
+      `text-${family}`,
+      [...LAYERS, `bg-${family}-subtler`, `bg-${family}-subtle`],
+      ACCENT_TEXT_LC,
+      familyLayers,
+    ),
+    pair(`border-${family}`, ['bg-neutral-subtlest'], MARK_LC, noLayer),
   ];
 };
 
-const lowestContrast = (roles: { [slot: string]: string }, { foreground, backgrounds, underStates }: Pair) => {
+const lowestContrast = (roles: Roles, { foreground, backgrounds, layers }: Pair) => {
   const text = roles[foreground]!;
-  const bases = backgrounds.map((background) => roles[background]!);
-  const states = underStates ? bases.flatMap((base) => underStateLayers(base, text)) : bases;
+  const states = backgrounds.flatMap((background) =>
+    underStateLayers(roles[background]!, layers(roles, text)),
+  );
   return Math.min(...states.map((state) => lightnessContrast(text, state)));
 };
 
-const failingPairs = (roles: { [slot: string]: string }) =>
+const failingPairs = (roles: Roles) =>
   IDS_COLOR_FAMILIES.flatMap(pairsFor)
     .filter((checked) => lowestContrast(roles, checked) < checked.lc)
     .map(
-      ({ foreground, backgrounds, lc }) =>
-        `${foreground} on ${backgrounds.join(' / ')} below Lc ${lc}: ${lowestContrast(roles, { foreground, backgrounds, lc, underStates: true }).toFixed(1)}`,
+      (checked) =>
+        `${checked.foreground} on ${checked.backgrounds.join(' / ')} below Lc ${checked.lc}: ${lowestContrast(roles, checked).toFixed(1)}`,
     );
 
 test.each(MODES)('ids.css maps every %s slot from the provider variables', (mode) => {

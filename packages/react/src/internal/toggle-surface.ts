@@ -1,4 +1,4 @@
-import { controlSurface, type SurfaceVariant } from './control-surface';
+import { controlSurface, drawsQuietLayer, type SurfaceVariant } from './control-surface';
 import { cn } from '../utils/cn';
 
 import type { IdsVariant } from '../tokens/types';
@@ -9,22 +9,38 @@ const toggleStates = cn(
 
 const pressedShowsThePressLayer = cn('data-pressed:state-press');
 
+const pressedSoftDrawsTheSoftLayer = cn(
+  'data-pressed:[--ids-state-color:var(--control-soft-layer)]',
+  'data-pressed:[--ids-state-layer-hover:var(--control-soft-hover)]',
+  'data-pressed:[--ids-state-layer-press:var(--control-soft-press)]',
+);
+
 const variant = {
-  ghost: cn('bg-transparent text-(--control-quiet)', toggleStates, pressedShowsThePressLayer),
+  ghost: cn(
+    'bg-transparent text-(--control-quiet)',
+    toggleStates,
+    pressedShowsThePressLayer,
+    drawsQuietLayer,
+  ),
   outline: cn(
     'bg-transparent text-(--control-quiet) shadow-xs inset-ring-1 inset-ring-neutral',
     toggleStates,
     pressedShowsThePressLayer,
+    drawsQuietLayer,
   ),
   soft: cn(
     'bg-transparent text-(--control-quiet)',
     'state-layer data-hovered:state-hover data-active:state-press',
+    drawsQuietLayer,
     'data-pressed:bg-(--control-soft) data-pressed:text-(--control-on-soft)',
+    pressedSoftDrawsTheSoftLayer,
   ),
   solid: cn(
     'bg-transparent text-(--control-quiet)',
     'state-layer data-hovered:state-hover data-active:state-press',
+    drawsQuietLayer,
     'data-pressed:bg-(--control-fill) data-pressed:text-(--control-on-fill) data-pressed:shadow-xs',
+    'data-pressed:state-fill',
   ),
   glossy: cn(
     'bg-transparent text-(--control-quiet)',

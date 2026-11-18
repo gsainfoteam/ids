@@ -24,7 +24,7 @@ export const radioStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-neutral-subtlest shadow-xs inset-ring-1 inset-ring-neutral dark:bg-neutral-subtler',
+        root: 'bg-neutral-subtlest shadow-xs inset-ring-1 inset-ring-neutral dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)',
       },
       soft: { root: 'bg-neutral-subtle inset-ring-1 inset-ring-transparent' },
     } satisfies Record<RadioVariant, object>,

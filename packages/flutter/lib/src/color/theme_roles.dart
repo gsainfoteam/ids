@@ -14,7 +14,22 @@ import 'status.dart';
 
 const modes = [IdsMode.light, IdsMode.dark];
 
-const stateOpacities = [IdsStateOpacity.hover, IdsStateOpacity.press];
+typedef StateLayer = ({Color color, List<double> opacities});
+
+StateLayer contentLayer(Color content) => (
+  color: content,
+  opacities: const [IdsStateOpacity.hover, IdsStateOpacity.press],
+);
+
+StateLayer tintLayer(Color fill) => (
+  color: fill,
+  opacities: const [IdsStateOpacity.tintHover, IdsStateOpacity.tintPress],
+);
+
+const StateLayer fillLayer = (
+  color: IdsStateLayer.fillColor,
+  opacities: [IdsStateOpacity.fillHover, IdsStateOpacity.fillPress],
+);
 
 const tintedNeutralChroma = 0.02;
 
@@ -124,21 +139,28 @@ Color withStateLayer(Color base, Color layer, double opacity) {
   );
 }
 
-List<Color> underStateLayers(Color base, Color content) => [
+List<Color> underStateLayers(Color base, List<StateLayer> layers) => [
   base,
-  for (final opacity in stateOpacities) withStateLayer(base, content, opacity),
+  for (final layer in layers)
+    for (final opacity in layer.opacities)
+      withStateLayer(base, layer.color, opacity),
 ];
 
 Color? _firstReadableOn(
   IdsPalette shades,
   List<int> candidates,
-  List<Color> bases, [
+  List<Color> bases,
+  Color familyFill, [
   double lc = textLc,
 ]) {
   for (final step in candidates) {
     final candidate = shades[step];
     final states = [
-      for (final base in bases) ...underStateLayers(base, candidate),
+      for (final base in bases)
+        ...underStateLayers(base, [
+          contentLayer(candidate),
+          tintLayer(familyFill),
+        ]),
     ];
     if (reaches(candidate, states, lc)) return candidate;
   }
@@ -146,7 +168,7 @@ Color? _firstReadableOn(
 }
 
 double _lowestContrastUnderStateLayers(Color text, Color fill) => [
-  for (final state in underStateLayers(fill, text))
+  for (final state in underStateLayers(fill, [fillLayer]))
     lightnessContrast(text, state),
 ].reduce((a, b) => a < b ? a : b);
 
@@ -202,7 +224,9 @@ Color _subtlerOf(IdsPalette shades, ModeRule rule, Color surface) =>
   }
   final chosen = readable ?? _mostReadable([shades[600]]);
 
-  final onSubtler = _firstReadableOn(shades, rule.onSubtle, [subtler]);
+  final onSubtler = _firstReadableOn(shades, rule.onSubtle, [
+    subtler,
+  ], chosen.fill);
   if (onSubtler == null) {
     issues.add(
       IdsThemeIssue(
@@ -212,7 +236,9 @@ Color _subtlerOf(IdsPalette shades, ModeRule rule, Color surface) =>
     );
   }
 
-  final onSubtle = _firstReadableOn(shades, rule.onSubtle, [subtle]);
+  final onSubtle = _firstReadableOn(shades, rule.onSubtle, [
+    subtle,
+  ], chosen.fill);
   if (onSubtle == null) {
     issues.add(
       IdsThemeIssue(
@@ -222,11 +248,13 @@ Color _subtlerOf(IdsPalette shades, ModeRule rule, Color surface) =>
     );
   }
 
-  final text = _firstReadableOn(shades, rule.text, [
-    surface,
-    subtler,
-    subtle,
-  ], accentTextLc);
+  final text = _firstReadableOn(
+    shades,
+    rule.text,
+    [surface, subtler, subtle],
+    chosen.fill,
+    accentTextLc,
+  );
   if (text == null) {
     issues.add(
       IdsThemeIssue(

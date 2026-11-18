@@ -15,7 +15,13 @@ export const IDS_NEUTRAL_ONLY_SLOTS = ['bg-{family}-subtlest', 'text-on-{family}
 export const IDS_STATE_OPACITY = {
   'hover': 0.06,
   'press': 0.1,
+  'tintHover': 0.08,
+  'tintPress': 0.12,
+  'fillHover': 0.1,
+  'fillPress': 0.18,
 } as const;
+
+export const IDS_STATE_FILL_COLOR = '#000000';
 
 export const IDS_NEUTRAL_PALETTE = {
   '0': '#ffffff',

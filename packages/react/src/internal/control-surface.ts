@@ -14,6 +14,26 @@ export type ControlColorScheme =
   | 'warning'
   | 'info';
 
+const softLayerInFamilyColor = cn(
+  '[--control-soft-layer:var(--control-fill)]',
+  '[--control-soft-hover:var(--ids-state-tint-hover)] [--control-soft-press:var(--ids-state-tint-press)]',
+);
+
+const softLayerInTextColor = cn(
+  '[--control-soft-layer:currentColor]',
+  '[--control-soft-hover:var(--ids-state-hover)] [--control-soft-press:var(--ids-state-press)]',
+);
+
+const quietLayerInFamilyColor = cn(
+  '[--control-quiet-layer:var(--control-fill)]',
+  '[--control-quiet-hover:var(--ids-state-tint-hover)] [--control-quiet-press:var(--ids-state-tint-press)]',
+);
+
+const quietLayerInTextColor = cn(
+  '[--control-quiet-layer:currentColor]',
+  '[--control-quiet-hover:var(--ids-state-hover)] [--control-quiet-press:var(--ids-state-press)]',
+);
+
 const schemes = {
   primary: cn(
     '[--control-fill:var(--ids-color-bg-primary)] [--control-on-fill:var(--ids-color-text-on-primary)]',
@@ -21,6 +41,8 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-neutral-bold)]',
     '[--control-ring:var(--ids-color-border-primary)]',
     '[--control-glyph-on:var(--ids-color-text-primary)]',
+    softLayerInFamilyColor,
+    quietLayerInTextColor,
   ),
   secondary: cn(
     '[--control-fill:var(--ids-color-bg-secondary)] [--control-on-fill:var(--ids-color-text-on-secondary)]',
@@ -28,6 +50,8 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-neutral-bold)]',
     '[--control-ring:var(--ids-color-border-secondary)]',
     '[--control-glyph-on:var(--ids-color-text-secondary)]',
+    softLayerInFamilyColor,
+    quietLayerInTextColor,
   ),
   tertiary: cn(
     '[--control-fill:var(--ids-color-bg-tertiary)] [--control-on-fill:var(--ids-color-text-on-tertiary)]',
@@ -35,6 +59,8 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-neutral-bold)]',
     '[--control-ring:var(--ids-color-border-tertiary)]',
     '[--control-glyph-on:var(--ids-color-text-tertiary)]',
+    softLayerInFamilyColor,
+    quietLayerInTextColor,
   ),
   neutral: cn(
     '[--control-fill:var(--ids-color-bg-neutral-bold)] [--control-on-fill:var(--ids-color-text-on-neutral-bold)]',
@@ -42,6 +68,8 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-neutral-bold)]',
     '[--control-ring:var(--ids-color-border-primary)]',
     '[--control-glyph-on:var(--ids-color-text-neutral-bold)]',
+    softLayerInTextColor,
+    quietLayerInTextColor,
   ),
   danger: cn(
     '[--control-fill:var(--ids-color-bg-danger)] [--control-on-fill:var(--ids-color-text-on-danger)]',
@@ -49,6 +77,8 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-danger)]',
     '[--control-ring:var(--ids-color-border-danger)]',
     '[--control-glyph-on:var(--ids-color-text-danger)]',
+    softLayerInFamilyColor,
+    quietLayerInFamilyColor,
   ),
   success: cn(
     '[--control-fill:var(--ids-color-bg-success)] [--control-on-fill:var(--ids-color-text-on-success)]',
@@ -56,6 +86,8 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-success)]',
     '[--control-ring:var(--ids-color-border-success)]',
     '[--control-glyph-on:var(--ids-color-text-success)]',
+    softLayerInFamilyColor,
+    quietLayerInFamilyColor,
   ),
   warning: cn(
     '[--control-fill:var(--ids-color-bg-warning)] [--control-on-fill:var(--ids-color-text-on-warning)]',
@@ -63,6 +95,8 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-warning)]',
     '[--control-ring:var(--ids-color-border-warning)]',
     '[--control-glyph-on:var(--ids-color-text-warning)]',
+    softLayerInFamilyColor,
+    quietLayerInFamilyColor,
   ),
   info: cn(
     '[--control-fill:var(--ids-color-bg-info)] [--control-on-fill:var(--ids-color-text-on-info)]',
@@ -70,6 +104,8 @@ const schemes = {
     '[--control-quiet:var(--ids-color-text-info)]',
     '[--control-ring:var(--ids-color-border-info)]',
     '[--control-glyph-on:var(--ids-color-text-info)]',
+    softLayerInFamilyColor,
+    quietLayerInFamilyColor,
   ),
 } satisfies Record<ControlColorScheme, string>;
 
@@ -81,6 +117,16 @@ const ringFollowsScheme = cn(
 );
 
 export const pressStates = cn('state-layer data-hovered:state-hover data-active:state-press');
+
+export const drawsSoftLayer = cn(
+  '[--ids-state-color:var(--control-soft-layer)]',
+  '[--ids-state-layer-hover:var(--control-soft-hover)] [--ids-state-layer-press:var(--control-soft-press)]',
+);
+
+export const drawsQuietLayer = cn(
+  '[--ids-state-color:var(--control-quiet-layer)]',
+  '[--ids-state-layer-hover:var(--control-quiet-hover)] [--ids-state-layer-press:var(--control-quiet-press)]',
+);
 
 const trimBesideIconOrSpinner = {
   standard: cn(
@@ -118,14 +164,16 @@ export const controlSurface = {
     ),
   } satisfies Record<IdsSize, string>,
   variant: {
-    solid: cn('bg-(--control-fill) text-(--control-on-fill) shadow-xs', pressStates),
-    soft: cn('bg-(--control-soft) text-(--control-on-soft)', pressStates),
+    solid: cn('bg-(--control-fill) text-(--control-on-fill) shadow-xs', pressStates, 'state-fill'),
+    soft: cn('bg-(--control-soft) text-(--control-on-soft)', pressStates, drawsSoftLayer),
     outline: cn(
       'bg-neutral-subtlest text-(--control-quiet) shadow-xs',
-      'inset-ring-1 inset-ring-neutral dark:bg-neutral-subtler',
+      'inset-ring-1 inset-ring-neutral',
+      'dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)',
       pressStates,
+      drawsQuietLayer,
     ),
-    ghost: cn('bg-transparent text-(--control-quiet)', pressStates),
+    ghost: cn('bg-transparent text-(--control-quiet)', pressStates, drawsQuietLayer),
     glossy: cn(
       'bg-(--control-fill) text-(--control-on-fill) shadow-sm',
       'bg-linear-to-b from-white/20 to-transparent',

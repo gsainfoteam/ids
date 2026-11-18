@@ -18,7 +18,7 @@ export const stepperStyle = tv({
       'group-has-[[data-stepper-description]]/stepper-trigger:row-span-2',
       'inline-flex shrink-0 items-center justify-center rounded-full tabular-nums',
       'bg-neutral-subtle text-neutral',
-      'data-completed:bg-(--control-fill) data-completed:text-(--control-on-fill)',
+      'data-completed:bg-(--control-fill) data-completed:text-(--control-on-fill) data-completed:state-fill',
       'data-current:bg-(--control-fill) data-current:text-(--control-on-fill)',
       'data-current:ring-4 data-current:ring-(--ids-color-bg-primary-subtle)',
       'data-error:bg-danger-subtle data-error:text-on-danger-subtle',

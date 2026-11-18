@@ -12,7 +12,10 @@ export const fieldSurface = {
     'disabled:cursor-not-allowed disabled:opacity-50',
   ),
   variant: {
-    outline: cn('bg-neutral-subtlest shadow-xs inset-ring-1 inset-ring-neutral', 'dark:bg-neutral-subtler'),
+    outline: cn(
+      'bg-neutral-subtlest shadow-xs inset-ring-1 inset-ring-neutral',
+      'dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)',
+    ),
     soft: cn('bg-neutral-subtle inset-ring-1 inset-ring-transparent'),
     ghost: cn('bg-transparent inset-ring-1 inset-ring-transparent'),
   } satisfies Record<FieldSurfaceVariant, string>,

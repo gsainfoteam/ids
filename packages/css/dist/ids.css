@@ -143,6 +143,11 @@
   --ids-size-icon-tiny: 14px;
   --ids-state-hover: 6%;
   --ids-state-press: 10%;
+  --ids-state-tint-hover: 8%;
+  --ids-state-tint-press: 12%;
+  --ids-state-fill-color: #000000;
+  --ids-state-fill-hover: 10%;
+  --ids-state-fill-press: 18%;
 }
 
 @theme inline {
@@ -260,11 +265,17 @@
 }
 
 @utility state-hover {
-  --ids-state-opacity: var(--ids-state-hover);
+  --ids-state-opacity: var(--ids-state-layer-hover, var(--ids-state-hover));
 }
 
 @utility state-press {
-  --ids-state-opacity: var(--ids-state-press);
+  --ids-state-opacity: var(--ids-state-layer-press, var(--ids-state-press));
+}
+
+@utility state-fill {
+  --ids-state-color: var(--ids-state-fill-color);
+  --ids-state-layer-hover: var(--ids-state-fill-hover);
+  --ids-state-layer-press: var(--ids-state-fill-press);
 }
 
 @utility font-mono {
@@ -1465,6 +1476,16 @@
 }
 
 @property --ids-state-color {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --ids-state-layer-hover {
+  syntax: "*";
+  inherits: false;
+}
+
+@property --ids-state-layer-press {
   syntax: "*";
   inherits: false;
 }

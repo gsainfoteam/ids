@@ -33,6 +33,7 @@ import {
   IDS_NEUTRAL_ONLY_SLOTS,
   IDS_NEUTRAL_PALETTE,
   IDS_NEUTRAL_STEPS,
+  IDS_STATE_FILL_COLOR,
   IDS_STATE_OPACITY,
   IDS_STATUS_FAMILIES,
 } from '../../../tokens/color-roles';
@@ -43,7 +44,22 @@ export { ACCENT_TEXT_LC, DARK_TEXT, LIGHT_TEXT, MARK_LC, TEXT_LC };
 
 export const MODES: readonly IdsMode[] = ['light', 'dark'];
 
-export const STATE_OPACITIES = [IDS_STATE_OPACITY.hover, IDS_STATE_OPACITY.press] as const;
+export type StateLayer = { color: string; opacities: readonly number[] };
+
+export const contentLayer = (content: string): StateLayer => ({
+  color: content,
+  opacities: [IDS_STATE_OPACITY.hover, IDS_STATE_OPACITY.press],
+});
+
+export const tintLayer = (fill: string): StateLayer => ({
+  color: fill,
+  opacities: [IDS_STATE_OPACITY.tintHover, IDS_STATE_OPACITY.tintPress],
+});
+
+export const FILL_LAYER: StateLayer = {
+  color: IDS_STATE_FILL_COLOR,
+  opacities: [IDS_STATE_OPACITY.fillHover, IDS_STATE_OPACITY.fillPress],
+};
 
 export const TINTED_NEUTRAL_CHROMA = 0.02;
 
@@ -154,21 +170,26 @@ const mixed = (from: string, to: string, amount: number) =>
 export const withStateLayer = (base: string, layer: string, opacity: number) =>
   formatHex(interpolate([base, layer], 'rgb')(opacity));
 
-export const underStateLayers = (base: string, content: string) => [
+export const underStateLayers = (base: string, layers: readonly StateLayer[]) => [
   base,
-  ...STATE_OPACITIES.map((opacity) => withStateLayer(base, content, opacity)),
+  ...layers.flatMap(({ color, opacities }) =>
+    opacities.map((opacity) => withStateLayer(base, color, opacity)),
+  ),
 ];
 
 function firstReadableOn(
   shades: IdsPalette,
   candidates: readonly IdsPaletteStep[],
   bases: readonly string[],
+  familyFill: string,
   lc = TEXT_LC,
 ) {
   const step = candidates.find((candidate) =>
     reaches(
       shades[candidate],
-      bases.flatMap((base) => underStateLayers(base, shades[candidate])),
+      bases.flatMap((base) =>
+        underStateLayers(base, [contentLayer(shades[candidate]), tintLayer(familyFill)]),
+      ),
       lc,
     ),
   );
@@ -176,7 +197,7 @@ function firstReadableOn(
 }
 
 const lowestContrastUnderStateLayers = (text: string, fill: string) =>
-  Math.min(...underStateLayers(fill, text).map((state) => lightnessContrast(text, state)));
+  Math.min(...underStateLayers(fill, [FILL_LAYER]).map((state) => lightnessContrast(text, state)));
 
 function mostReadable(fills: string[]) {
   return maxBy(
@@ -222,21 +243,21 @@ export function familyRoles(
     });
   const { fill, text: onFill } = readable ?? mostReadable([shades[600]]);
 
-  const onSubtler = firstReadableOn(shades, rule.onSubtle, [subtler]);
+  const onSubtler = firstReadableOn(shades, rule.onSubtle, [subtler], fill);
   if (onSubtler === undefined)
     issues.push({
       path,
       message: `${mode}: no step of ${rule.onSubtle.join(', ')} reaches Lc ${TEXT_LC} on ${family}-subtler and under its hover and press layers.`,
     });
 
-  const onSubtle = firstReadableOn(shades, rule.onSubtle, [subtle]);
+  const onSubtle = firstReadableOn(shades, rule.onSubtle, [subtle], fill);
   if (onSubtle === undefined)
     issues.push({
       path,
       message: `${mode}: no step of ${rule.onSubtle.join(', ')} reaches Lc ${TEXT_LC} on ${family}-subtle (step ${rule.subtle}) and under its hover and press layers.`,
     });
 
-  const text = firstReadableOn(shades, rule.text, [surface, subtler, subtle], ACCENT_TEXT_LC);
+  const text = firstReadableOn(shades, rule.text, [surface, subtler, subtle], fill, ACCENT_TEXT_LC);
   if (text === undefined)
     issues.push({
       path,

@@ -76,7 +76,7 @@ export const calendarStyle = tv({
     outside: { true: { dayButton: 'text-neutral' } },
     selected: {
       true: {
-        dayButton: cn(primaryFill, 'bg-(--control-fill) font-medium text-(--control-on-fill)'),
+        dayButton: cn(primaryFill, 'bg-(--control-fill) font-medium text-(--control-on-fill) state-fill'),
       },
     },
     onBand: { true: {} },
