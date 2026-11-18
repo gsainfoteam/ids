@@ -53,8 +53,6 @@ const DEFAULT_PARTS = (
   </>
 );
 
-const ALWAYS_DARK = 'dark';
-
 function isEmptyGround(target: Element, viewer: Element) {
   if (target === viewer) return true;
   return target.closest(THE_STAGE) !== null && target.closest(WHAT_IS_NOT_EMPTY) === null;
@@ -240,7 +238,6 @@ function ViewerSession({
       backdrop={{
         ref: attachBackdrop,
         'data-image-viewer-backdrop': '',
-        'data-mode': ALWAYS_DARK,
         'data-ending-style': ending ? '' : undefined,
         className: styles.backdrop(),
       }}
@@ -253,7 +250,6 @@ function ViewerSession({
         aria-label={look['aria-label'] ?? t('image.viewer')}
         tabIndex={-1}
         data-image-viewer=""
-        data-mode={ALWAYS_DARK}
         data-open={open ? '' : undefined}
         data-zoomed={zoomPan.zoomed ? '' : undefined}
         data-ending-style={ending ? '' : undefined}

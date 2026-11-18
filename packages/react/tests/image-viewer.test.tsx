@@ -22,9 +22,13 @@ const PHOTOS = [
   { alt: 'Third', src: picture(240), caption: undefined },
 ];
 
-function Gallery({ viewer, ...props }: Partial<Image.Group.Props> & { viewer?: ReactNode }) {
+function Gallery({
+  viewer,
+  mode,
+  ...props
+}: Partial<Image.Group.Props> & { viewer?: ReactNode; mode?: 'light' | 'dark' }) {
   return (
-    <IdsProvider theme={testTheme}>
+    <IdsProvider theme={testTheme} mode={mode}>
       <div style={{ width: 300 }}>
         <Image.Group aria-label="Photos" layout="grid" columns={3} {...props}>
           {PHOTOS.map((photo) => (
@@ -273,15 +277,22 @@ test('on a phone the toolbar leaves the zoom level out and stays inside the scre
   await expect.element(page.getByRole('button', { name: '닫기' })).toBeVisible();
 });
 
-test('the viewer is dark whatever the page mode is', async () => {
-  await render(<Gallery />);
-  await openAt('First');
+test('the viewer follows the page mode', async () => {
+  const toolbarColor = () =>
+    getComputedStyle(document.querySelector('[data-image-viewer-toolbar]')!).backgroundColor;
 
-  expect(document.querySelector('[data-image-viewer]')).toHaveAttribute('data-mode', 'dark');
-  expect(document.querySelector('[data-image-viewer-backdrop]')).toHaveAttribute(
-    'data-mode',
-    'dark',
-  );
+  const light = await render(<Gallery mode="light" />);
+  await openAt('First');
+  expect(document.querySelector('[data-image-viewer]')).not.toHaveAttribute('data-mode');
+  expect(document.querySelector('[data-image-viewer-backdrop]')).not.toHaveAttribute('data-mode');
+  const onALightPage = toolbarColor();
+  await userEvent.keyboard('{Escape}');
+  await expect.element(dialog()).not.toBeInTheDocument();
+  await light.unmount();
+
+  await render(<Gallery mode="dark" />);
+  await openAt('First');
+  expect(toolbarColor()).not.toBe(onALightPage);
 });
 
 test('the zoom level shows the scale, and pressing it fits the image again', async () => {

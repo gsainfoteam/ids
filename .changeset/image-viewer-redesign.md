@@ -1,9 +1,9 @@
 ---
-'@gsainfoteam/ids-react': minor
+"@gsainfoteam/ids-react": minor
 ---
 
-Redesign `Image.Viewer` after Modrinth's gallery viewer. The viewer is always dark (`data-mode="dark"`
-on the dialog and the backdrop, a 95% `bg-surface` backdrop), the caption sits at the top left as
+Redesign `Image.Viewer` after Modrinth's gallery viewer. The viewer follows the page mode over a 95%
+`bg-surface` backdrop, the caption sits at the top left as
 plain text and hides while the image is zoomed, and one toolbar at the bottom center holds
 Prev, Counter, Next | ZoomOut, ZoomReset, ZoomIn | Download | Close. A fitted image sits between
 the caption and the toolbar, and a zoomed one runs under them. A press on the empty space beside
