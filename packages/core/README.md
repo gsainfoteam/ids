@@ -12,6 +12,8 @@
 | `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등) |
 | `packages/react/src/tokens/color-roles.ts` | 계열 목록, `IDS_FAMILY_SLOTS`, `IDS_NEUTRAL_ONLY_SLOTS`, `IDS_STATE_OPACITY`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IDS_STATE_FILL_COLOR`, `IDS_NEUTRAL_PALETTE`, `IDS_NEUTRAL_STEPS` |
 | `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스. `ids_color_roles.dart` 는 `color-roles.json` 에서 `IdsColors`, `IdsColorRoles`(계열, `familySlots`, `neutralOnlySlots`, `slotsOf`, `neutralSteps`), `state.json` 에서 `IdsStateOpacity`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IdsStateLayer.fillColor` 를 만든다 |
+| `packages/react/src/tokens/component-tokens.ts` | `component.json`, `shadow.json` 에서 `IDS_COMPONENT_COLORS`, `IDS_COMPONENT_SHADOWS`, `IDS_SHADOWS` |
+| `packages/flutter/lib/tokens/ids_component_tokens.dart` | 같은 표의 Dart 판. `IdsComponentColors`, `IdsComponentShadows`, `IdsShadows`, `IdsComponentTokens` |
 | `packages/react/src/tokens/palette-model.ts` | 17색에 맞춘 팔레트 모델의 계수와 상태 색의 기준 넷. `palette-model.js` 가 쓴다 |
 | `packages/flutter/lib/tokens/ids_palette_model.dart` | 같은 계수와 상태 색 넷의 Dart 판. `palette-model.js` 가 쓴다 |
 | `packages/flutter/fonts/*` | Flutter 패키지에 넣는 글꼴과 라이선스. `fonts.build.mjs` 가 npm 패키지에서 복사한다 |
@@ -24,6 +26,8 @@ tokens/
   spacing.json          # 간격 원시값 (xs, sm, md, ...)
   typography.json       # 폰트 패밀리·사이즈·웨이트·행간 원시값
   motion.json           # 애니메이션 지속시간 원시값
+  component.json        # 컴포넌트 토큰. 모드마다 역할 하나(`bg-panel`: light `bg-neutral-subtlest`, dark `bg-neutral-subtler`)
+  shadow.json           # 그림자 원시 단계 0, 1, 2. sm/md 이름은 없다
   state.json            # state layer 의 불투명도와 채움 층 색. hover 6%, press 10%, tint 8% / 12%, fill 검정 10% / 18%
   enums.json            # IdsMode·IdsSize·IdsVariant 열거값. color 는 데모 hue 이름 목록(스토리 전용)이라 어디에도 나가지 않는다
   semantic/
@@ -66,6 +70,13 @@ hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에
   - `focus-ring-scheme` 은 `focus-ring` 과 같은 trigger 로 ring 을 `border-scheme` 으로 칠한다. `focus-ring-current` 는 글자색으로 칠한다(채움 위의 닫기 버튼).
 - Dart 포매터도 이 표를 읽는다. `--ids-color-bg-primary-subtle` 은 `IdsColors.bgPrimarySubtle` 이 되고, `colors['bg-primary-subtle']` 로도 읽는다.
 - `ids_palette_model.dart` 는 아래 팔레트 모델의 계수를 옮긴 것이라, 계수가 바뀌면 함께 바뀐다.
+
+## 컴포넌트 토큰
+
+- `component.json` 의 토큰은 `$value` 에 `light`, `dark` 두 역할을 갖는다. 그림자 토큰은 `{shadow.N}` 단계를 가리킨다.
+- 이름은 `{속성}-{그룹}[-{부분}][-{변형}]` 이다. 속성 `bg` 는 배경, `text` 는 글자와 `fill`, `border` 는 선과 `ring`·`outline`·`stroke` 이름공간에 붙는다(`bg-panel`, `inset-ring-control-outline`, `fill-qr-code-light`).
+- CSS 는 `[data-mode]` 마다 `--ids-color-{토큰}: var(--ids-color-{역할})`, `--ids-shadow-{토큰}: var(--ids-shadow-{단계})` 를 쓴다. 단계 `0` 은 `0 0 #0000` 이라 Tailwind 의 그림자 목록 안에서도 합쳐진다.
+- 이름 규칙과 대비는 `packages/react/tests/component-tokens.test.ts` 가, Flutter 와 같은 색인지는 `tests/fixtures/theme-roles.json` 의 `components` 가 확인한다.
 
 ## state layer
 

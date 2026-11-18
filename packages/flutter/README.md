@@ -143,6 +143,26 @@ Container(
 - hover 와 press 역할은 없다. 바탕 위에 층을 얹는다. 채움은 `IdsStateLayer.fillColor`(검정)를 `IdsStateOpacity.fillHover`(10%), `.fillPress`(18%), 색 있는 soft 면과 상태 색의 outline, ghost 는 계열 채움을 `.tintHover`(8%), `.tintPress`(12%), 나머지는 글자색을 `.hover`(6%), `.press`(10%) 만큼 얹는다. IdsProvider 는 그 층들 아래에서도 글자 대비를 확인한다.
 - 구조선(필드 테두리, 구분선)은 `borderNeutral`, 보조 글자는 `textNeutral` 이다.
 
+## 컴포넌트 토큰
+
+```dart
+final ids = IdsProvider.of(context);
+
+DecoratedBox(
+  decoration: BoxDecoration(
+    color: ids.componentColors.bgPanel,
+    boxShadow: ids.componentShadows.shadowPanel,
+  ),
+  child: child,
+);
+```
+
+- 모드마다 시맨틱 역할 하나를 가리키는 이름이다. 라이트와 다크에서 다른 역할을 쓰는 면은 `isDark` 로 고르지 않고 이 토큰을 쓴다.
+- 이름은 ids-react 와 같은 `{속성}-{그룹}[-{부분}][-{변형}]` 을 camelCase 로 바꾼 것이다. `bg-panel` 은 `bgPanel`, `border-control-outline` 은 `borderControlOutline` 이다.
+- `bgPanel` 은 카드, 다이얼로그, 팝업의 면이다. 다크에서는 페이지(`bgNeutralSubtlest`)보다 한 단계 밝다. `bgBand` 는 면 안의 띠, `bgControlOutline` 과 `borderControlOutline` 은 outline 컨트롤, `bgFieldOutline` 과 `borderFieldOutline` 은 outline 입력 상자다.
+- 그림자는 `IdsShadows.steps` 의 단계 `0`, `1`, `2` 이고, `componentShadows.shadowPanel` 처럼 토큰이 단계를 고른다.
+- 원본은 `packages/core/tokens/component.json` 과 `shadow.json` 이고, `pnpm codegen` 이 `lib/tokens/ids_component_tokens.dart` 를 쓴다. `test/theme_roles_parity_test.dart` 가 17개 팔레트에서 ids-react 와 같은 색인지 확인한다.
+
 ## radius 와 글자
 
 ```dart
