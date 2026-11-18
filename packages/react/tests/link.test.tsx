@@ -160,6 +160,7 @@ test('hover underline appears on hover and on keyboard focus', async () => {
       </Link>
     </div>,
   );
+  await userEvent.hover(screen.getByRole('button'));
   const link = screen.getByRole('link').element() as HTMLElement;
   expect(getComputedStyle(link).textDecorationLine).toBe('none');
 

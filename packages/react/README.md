@@ -631,6 +631,12 @@ Recharts 차트를 테마의 브랜드 계열에서 고른 계열 색, 툴팁, �
 `@gsainfoteam/ids-react/chart` 에서 가져오고, `recharts` 와 `react-is` 는 차트를 쓰는 앱만 설치합니다.
 [Chart API](./src/components/data/chart/README.md).
 
+## Editor
+
+Tiptap 3 위의 서식 편집기입니다. 툴바, 버블 메뉴, 링크 Popover, 글자 수를 IDS 부품으로 그리고, 값은 HTML, 마크다운, JSON 으로 받습니다.
+`@gsainfoteam/ids-react/editor` 에서 가져오고, Editor 를 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다. Tiptap 은 Editor 가 마운트될 때 `import()` 로 불러옵니다.
+[Editor API](./src/components/form/editor/README.md).
+
 ## Interaction feedback
 
 Button/Toggle 계열은 색상·그림자·투명도·포인터 누름 배율만 150ms로 전환합니다. 키보드 포커스에서는 전환과 누름 배율을 적용하지 않으며 reduced-motion도 지원합니다. TextField 계열은 색상만 전환하고 포커스 표시는 즉시 반영합니다. IdsProvider는 `color-scheme`도 모드에 맞춰 네이티브 폼 컨트롤과 스크롤바에 전달합니다.
