@@ -15,6 +15,7 @@ export function ToggleGroupRoot<T extends string = string>(props: ToggleGroup.Pr
     defaultValue,
     onValueChange,
     orientation,
+    attached,
     disabled,
     loop,
     required,
@@ -46,8 +47,9 @@ export function ToggleGroupRoot<T extends string = string>(props: ToggleGroup.Pr
         {...rest}
         {...rootProps}
         orientation={orientation}
+        attached={attached}
         separator={rootProps.role === 'radiogroup' ? 'decorative' : 'semantic'}
-        className={toggleGroupStyle({ orientation, className })}
+        className={toggleGroupStyle({ orientation, attached, className })}
       >
         {children}
         <FormValue {...formValue} />

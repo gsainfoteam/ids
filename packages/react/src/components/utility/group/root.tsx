@@ -86,11 +86,11 @@ export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
       orientation={group.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
       decorative={group.separator === 'decorative'}
       data-group-separator=""
-      className={groupStyle({ orientation: group.orientation, attached: group.attached }).separator(
-        {
-          className,
-        },
-      )}
+      className={groupStyle({
+        orientation: group.orientation,
+        attached: group.attached,
+        size: group.size,
+      }).separator({ className })}
     />
   );
 }

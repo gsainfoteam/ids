@@ -5,17 +5,21 @@ import {
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   ClipboardIcon,
   DocumentDuplicateIcon,
   MinusIcon,
   PlusIcon,
   ScissorsIcon,
+  XMarkIcon,
 } from '@heroicons/react/16/solid';
 import { expect, spyOn, waitFor } from 'storybook/test';
 
 import { Showcase } from '~story-kit';
 
 import { isDevelopment } from '../../../utils/dev';
+import { Card } from '../../data/card';
 import { TextField } from '../../form/text-field';
 import { Button } from '../button';
 import { IconButton } from '../icon-button';
@@ -144,6 +148,31 @@ export const Gallery: Story = {
             </Button>
           </ButtonGroup>
         </Showcase.Row>
+        <Showcase.Row label="attached=false + Separator">
+          <ButtonGroup attached={false} variant="outline" aria-label="사진 넘기기">
+            <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+            <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+            <ButtonGroup.Separator />
+            <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+          </ButtonGroup>
+        </Showcase.Row>
+        <Showcase.Row label="in a tray">
+          <Card className="concentric-p-1 w-fit flex-row gap-0">
+            <ButtonGroup attached={false} variant="soft" aria-label="사진 보기" className="gap-1">
+              <IconButton colorScheme="neutral" icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+              <Button colorScheme="neutral" className="tabular-nums">
+                3 / 12
+              </Button>
+              <IconButton
+                colorScheme="neutral"
+                icon={<ChevronRightIcon />}
+                aria-label="다음 사진"
+              />
+              <ButtonGroup.Separator className="mx-1" />
+              <IconButton colorScheme="neutral" icon={<XMarkIcon />} aria-label="닫기" />
+            </ButtonGroup>
+          </Card>
+        </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl">
             <ButtonGroup variant="outline" aria-label="오른쪽에서 왼쪽">
@@ -262,6 +291,34 @@ export const Separator: Story = {
     const more = canvas.getByRole('button', { name: '저장 옵션' });
     await expect(separator.getBoundingClientRect().width).toBe(1);
     await expect(more.getBoundingClientRect().left - save.getBoundingClientRect().right).toBe(-1);
+  },
+};
+
+export const SpacedSeparator: Story = {
+  render: () => (
+    <Card className="concentric-p-1 w-fit flex-row gap-0">
+      <ButtonGroup attached={false} variant="soft" aria-label="사진 보기" className="gap-1">
+        <IconButton colorScheme="neutral" icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+        <IconButton colorScheme="neutral" icon={<ChevronRightIcon />} aria-label="다음 사진" />
+        <ButtonGroup.Separator className="mx-1" />
+        <IconButton colorScheme="neutral" icon={<XMarkIcon />} aria-label="닫기" />
+      </ButtonGroup>
+    </Card>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '띄운 그룹의 Separator는 버튼보다 짧게 가운데에 섭니다. 테두리 막대는 앱이 그리고, 그 안에 띄운 그룹을 넣으면 툴바가 됩니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const line = canvas.getByRole('separator').getBoundingClientRect();
+    const close = canvas.getByRole('button', { name: '닫기' }).getBoundingClientRect();
+    await expect(line.height).toBe(20);
+    await expect(line.top + line.height / 2).toBeCloseTo(close.top + close.height / 2);
+    await expect(close.left - line.right).toBe(8);
   },
 };
 
