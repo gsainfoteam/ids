@@ -550,6 +550,13 @@ read from `event.key`, since TanStack falls back to the key's position.
 `ButtonGroup.SeparatorProps`), one level down for a sub-component's parts
 (`Image.Viewer.CloseProps`). Every part is optional and falls back to a default.
 
+**A group of several X is not a part of X.** `X.Part` names something inside one X. A container
+that holds several X is a component of its own in `<category>/<x>-group/` (`ButtonGroup`,
+`AvatarGroup`, `ItemGroup`, `ImageGroup`, `FieldGroup`, `KbdGroup`), never `X.Group`. It hands
+each X what it needs through a context declared in X's own folder (`ItemGroupContext` in
+`item/context.ts`), which X reads. A section of parts inside one X (`Select.Group`,
+`Menu.Group`, `Sidebar.Group`, `ChipField.Group`, `OTPField.Group`) stays a part.
+
 **A description is a paragraph.** A `Description` part of prose (Card, Item, Empty, Alert, Field,
 Dialog, Popover) renders a `<p>`; one inside a button (Stepper) stays a `<span>`. Block content
 goes in through `asChild` (`<Card.Description asChild><div>…</div></Card.Description>`), the way a
