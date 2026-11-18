@@ -141,42 +141,6 @@ export const Gallery: Story = {
           </div>
         </Showcase.Row>
       </Showcase.Section>
-      <Showcase.Section
-        title="Group"
-        description="첫 메시지만 아바타와 이름을, 마지막 메시지만 시간을 보입니다. 이어지는 말풍선은 맞닿는 모서리가 작아집니다."
-      >
-        <Showcase.Row label="start">
-          <div className="w-96">
-            <Message.Group align="start" aria-label="김지수의 메시지">
-              <Message name="김지수" avatar={JISU} time={SENT_AT}>
-                <Bubble>학식 메뉴 알려 줘</Bubble>
-              </Message>
-              <Message name="김지수" avatar={JISU} time={SENT_AT}>
-                <Bubble>오늘 거</Bubble>
-              </Message>
-              <Message name="김지수" avatar={JISU} time={SENT_AT}>
-                <Bubble>2학생회관 기준으로</Bubble>
-              </Message>
-            </Message.Group>
-          </div>
-        </Showcase.Row>
-        <Showcase.Row label="end">
-          <div className="w-96">
-            <Message.Group align="end" aria-label="내 메시지">
-              <Message name="나" time={ANSWERED_AT} unread={2}>
-                <Bubble align="end" variant="solid">
-                  돈가스랑 우동이야
-                </Bubble>
-              </Message>
-              <Message name="나" time={ANSWERED_AT} unread={2}>
-                <Bubble align="end" variant="solid">
-                  같이 갈래?
-                </Bubble>
-              </Message>
-            </Message.Group>
-          </div>
-        </Showcase.Row>
-      </Showcase.Section>
       <Showcase.Section title="Avatar">
         <Showcase.Row label="src">
           <div className="w-96">
@@ -389,49 +353,6 @@ export const Unread: Story = {
     await waitFor(() =>
       expect(canvas.getAllByRole('article')[1]!.querySelector('[data-message-unread]')).toBeNull(),
     );
-  },
-};
-
-export const Group: Story = {
-  render: () => (
-    <div className="w-96 break-keep">
-      <Message.Group align="start" aria-label="김지수의 메시지">
-        <Message name="김지수" avatar={JISU} time={SENT_AT}>
-          <Bubble>학식 메뉴 알려 줘</Bubble>
-        </Message>
-        <Message name="김지수" avatar={JISU} time={SENT_AT}>
-          <Bubble>오늘 거</Bubble>
-        </Message>
-        <Message name="김지수" avatar={JISU} time={ANSWERED_AT}>
-          <Bubble>2층 식당</Bubble>
-        </Message>
-      </Message.Group>
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '`Message.Group` 은 같은 사람의 연속 메시지를 `role="group"` 으로 묶고 `align` 을 안의 Message 에 줍니다. 첫 메시지만 아바타와 이름을 보이고, 다음 메시지는 아바타 자리를 비워 두고 이름을 스크린 리더에만 남깁니다. 이어지는 말풍선은 맞닿는 꼬리 쪽 모서리가 작아져 한 덩어리로 보입니다. 시간은 마지막 메시지의 말풍선 옆에 섭니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    const articles = canvas.getAllByRole('article', { name: '김지수' });
-    await expect(articles).toHaveLength(3);
-    const headers = articles.map((article) => article.querySelector('header'));
-    await expect(headers[0]).not.toHaveClass('sr-only');
-    await expect(headers[1]).toHaveClass('sr-only');
-    await expect(articles[1]!.querySelector('[data-message-avatar]')).toHaveClass('invisible');
-    await expect(articles[0]!.querySelector('time')).toBeNull();
-    await expect(articles[2]!.querySelector('[data-message-side] time')).toHaveAttribute(
-      'datetime',
-      ANSWERED_AT.toISOString(),
-    );
-    const bubbles = articles.map((article) => article.querySelector('[data-bubble]')!);
-    const corner = (bubble: Element) => getComputedStyle(bubble).borderStartStartRadius;
-    await expect(corner(bubbles[1]!)).toBe(getComputedStyle(bubbles[1]!).borderEndStartRadius);
-    await expect(corner(bubbles[0]!)).not.toBe(corner(bubbles[1]!));
   },
 };
 

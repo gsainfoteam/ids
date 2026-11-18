@@ -6,7 +6,7 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Bubble, IconButton, IdsProvider, Marker, Message } from '../src';
+import { Bubble, IconButton, IdsProvider, Marker, Message, MessageGroup } from '../src';
 import { testTheme } from './theme';
 
 const SENT_AT = new Date('2026-11-17T12:20:00+09:00');
@@ -104,9 +104,9 @@ test('a plain message has no align, and ignores the one its group hands out', ()
       <Message shape="plain" align="end">
         넓은 답
       </Message>
-      <Message.Group align="end">
+      <MessageGroup align="end">
         <Message shape="plain">묶음 안의 넓은 답</Message>
-      </Message.Group>
+      </MessageGroup>
     </>,
   );
   const [direct, grouped] = articles(doc);
@@ -129,9 +129,9 @@ test('the end column pushes the content to the end', async () => {
   ).toBeLessThan(1);
 });
 
-test('Message.Group hands out align and shows the name first and the time last', () => {
+test('MessageGroup hands out align and shows the name first and the time last', () => {
   const doc = parse(
-    <Message.Group align="end" aria-label="내 메시지">
+    <MessageGroup align="end" aria-label="내 메시지">
       <Message name="나" avatar="data:image/png;base64,AAAA" time={SENT_AT}>
         <Bubble align="end">하나</Bubble>
       </Message>
@@ -141,7 +141,7 @@ test('Message.Group hands out align and shows the name first and the time last',
       <Message name="나" avatar="data:image/png;base64,AAAA" time={SENT_AT} align="start">
         <Bubble>셋</Bubble>
       </Message>
-    </Message.Group>,
+    </MessageGroup>,
   );
   const group = doc.querySelector('[role="group"]')!;
   expect(group.getAttribute('aria-label')).toBe('내 메시지');
@@ -169,7 +169,7 @@ test('Message.Group hands out align and shows the name first and the time last',
 
 test('a Message inside another Message’s content is not part of the outer group', () => {
   const doc = parse(
-    <Message.Group>
+    <MessageGroup>
       <Message shape="plain" name="바깥">
         <Message shape="plain" name="안쪽">
           인용
@@ -178,7 +178,7 @@ test('a Message inside another Message’s content is not part of the outer grou
       <Message shape="plain" name="바깥">
         둘째
       </Message>
-    </Message.Group>,
+    </MessageGroup>,
   );
   const inner = articles(doc)[1]!;
   expect(inner.hasAttribute('data-first')).toBe(false);
@@ -277,14 +277,14 @@ test('unread leaves through an exit and keeps its last count while it does', asy
 test('a grouped bubble after the first shrinks the corner it shares with the one above', async () => {
   const screen = await render(
     withProvider(
-      <Message.Group align="end">
+      <MessageGroup align="end">
         <Message>
           <Bubble align="end">하나</Bubble>
         </Message>
         <Message>
           <Bubble align="end">둘</Bubble>
         </Message>
-      </Message.Group>,
+      </MessageGroup>,
     ),
   );
   const [first, second] = [...screen.container.querySelectorAll('[data-bubble]')];
@@ -452,14 +452,14 @@ test('axe finds nothing in a chat of groups, answers and failures', async () => 
           요약입니다.
           <Message.Actions />
         </Message>
-        <Message.Group align="start" aria-label="김지수의 메시지">
+        <MessageGroup align="start" aria-label="김지수의 메시지">
           <Message name="김지수" avatar="data:image/png;base64,AAAA" time={SENT_AT}>
             <Bubble>학식 메뉴 알려 줘</Bubble>
           </Message>
           <Message name="김지수" avatar="data:image/png;base64,AAAA" time={SENT_AT} unread={2}>
             <Bubble>오늘 거</Bubble>
           </Message>
-        </Message.Group>
+        </MessageGroup>
         <Message align="end" status="error" onRetry={() => {}}>
           실패한 글
         </Message>

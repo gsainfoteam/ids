@@ -4,13 +4,13 @@
 
 - **모양.** `shape="bubble"`(기본)은 본문을 Bubble 로 감싸고, `shape="plain"` 은 본문(Marker, Accordion, 문단)을 메시지 폭 그대로 그립니다. 누가 말하는지와 상관없이 고릅니다.
 - **방향.** `align` 이 붙는 쪽을 고릅니다. 기본은 `start` 입니다.
-- **연속 메시지.** `Message.Group` 이 같은 사람의 메시지를 묶습니다. 첫 메시지만 아바타와 이름을, 마지막 메시지만 시간을 보이고, 이어지는 말풍선은 맞닿는 모서리를 줄입니다.
+- **연속 메시지.** [MessageGroup](../message-group/README.md) 이 같은 사람의 메시지를 묶습니다. 첫 메시지만 아바타와 이름을, 마지막 메시지만 시간을 보이고, 이어지는 말풍선은 맞닿는 모서리를 줄입니다.
 - **읽음.** `unread` 에 안 읽은 사람 수(단체방)나 `true`(1대1)를 주면 말풍선 옆에 숫자나 점을 그립니다.
 - **보내는 중과 실패.** `pending` 은 말풍선을 옅게 하고 빛을 지나가게 합니다. `error` 는 말풍선 테두리를 빨갛게 하고, 시간 자리에 다시 보내기 버튼을, 아래에 실패 줄을 둡니다.
-- **시멘틱 구성.** 루트는 이름을 가리키는 `<article aria-labelledby>`, 이름과 시간은 `<header>` 와 `<time dateTime>`, 아래 줄은 `<footer>`, 묶음은 `<div role="group">` 입니다.
+- **시멘틱 구성.** 루트는 이름을 가리키는 `<article aria-labelledby>`, 이름과 시간은 `<header>` 와 `<time dateTime>`, 아래 줄은 `<footer>` 입니다.
 
 ```tsx
-import { Bubble, Marker, Message } from '@gsainfoteam/ids-react';
+import { Bubble, Marker, Message, MessageGroup } from '@gsainfoteam/ids-react';
 
 <Message align="end">요약해 줘</Message>
 
@@ -24,10 +24,10 @@ import { Bubble, Marker, Message } from '@gsainfoteam/ids-react';
 
 <Message align="end" time={sentAt} unread={2}>단체방에 보낸 글</Message>
 
-<Message.Group align="start" aria-label="김지수의 메시지">
+<MessageGroup align="start" aria-label="김지수의 메시지">
   <Message name="김지수" avatar={src} time={t1}><Bubble>학식 메뉴 알려 줘</Bubble></Message>
   <Message name="김지수" avatar={src} time={t2}><Bubble>오늘 거</Bubble></Message>
-</Message.Group>
+</MessageGroup>
 ```
 
 | Property  | Type                                         | Default                          |
@@ -171,22 +171,9 @@ import { Bubble, Marker, Message } from '@gsainfoteam/ids-react';
 
 ## 묶음
 
-```tsx
-<Message.Group align="start" aria-label="김지수의 메시지">
-  <Message name="김지수" avatar={src} time={t1}>…</Message>  {/* 아바타, 이름 */}
-  <Message name="김지수" avatar={src} time={t2}>…</Message>  {/* 아바타 자리만, 이름은 스크린 리더에만 */}
-  <Message name="김지수" avatar={src} time={t3}>…</Message>  {/* 아래 줄에 시간 */}
-</Message.Group>
-```
-
-- `align` 을 안의 Message 에 줍니다. Message 에 직접 준 `align` 이 이깁니다.
-- 묶음 안의 Message 에도 `name` 과 `avatar` 를 모두 줍니다. 첫 메시지가 아닌 메시지는 아바타를 `invisible` 로 그려 자리를 맞추고, 머리를 `sr-only` 로 숨겨 이름을 남깁니다.
-- 첫 메시지가 아닌 말풍선은 꼬리 쪽 위 모서리를 `indicator`(4px)로 줄입니다. 꼬리 쪽 아래 모서리는 원래 4px 이라, 이어지는 말풍선이 한 덩어리로 보입니다.
-- 시간은 마지막 메시지만 그립니다. 말풍선이 없는 메시지라면 마지막 메시지에 시간을 그리는 아래 줄을 저절로 둡니다.
-- 메시지 사이 간격은 4px 입니다. 묶음끼리의 간격과 목록, 새 메시지 알림은 MessageScroller 가 맡습니다.
+같은 사람의 연속 메시지는 [MessageGroup](../message-group/README.md) 으로 묶습니다. Message 는 묶음 안에서 자기 위치(처음, 끝)를 읽어 아바타, 이름, 시간, 말풍선 모서리를 정합니다.
 
 ## 알아둘 것
 
 - 한국어는 바깥 요소에 `break-keep` 을 줍니다.
-- 묶음은 자식 순서로 처음과 끝을 정합니다. Fragment 는 펼쳐 셉니다.
 - 메시지 안에 둔 Message(인용 등)는 바깥 묶음의 위치를 물려받지 않습니다.

@@ -1,16 +1,14 @@
 'use client';
 
-import { isValidElement, type ComponentProps } from 'react';
+import { isValidElement } from 'react';
 
-import { MessageGroupContext } from './context';
-import { messageStyle } from './style';
+import { messageGroupStyle } from './style';
 import { flattenFragments } from '../../../utils';
+import { MessageGroupContext } from '../message/context';
 
-import type { MessageAlign } from '.';
+import type { MessageGroup } from '.';
 
-export type MessageGroupProps = ComponentProps<'div'> & { align?: MessageAlign };
-
-export function MessageGroup({ align, className, children, ...props }: MessageGroupProps) {
+export function MessageGroupRoot({ align, className, children, ...props }: MessageGroup.Props) {
   const items = flattenFragments(children);
   const messages = items.filter((item) => isValidElement(item));
 
@@ -20,7 +18,7 @@ export function MessageGroup({ align, className, children, ...props }: MessageGr
       {...props}
       data-message-group=""
       data-align={align}
-      className={messageStyle().group({ className })}
+      className={messageGroupStyle({ className })}
     >
       {items.map((item) => {
         if (!isValidElement(item)) return item;
@@ -37,5 +35,3 @@ export function MessageGroup({ align, className, children, ...props }: MessageGr
     </div>
   );
 }
-
-MessageGroup.displayName = 'Message.Group';

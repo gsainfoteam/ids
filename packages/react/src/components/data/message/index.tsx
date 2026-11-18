@@ -5,7 +5,6 @@ import { MessageAvatar, type MessageAvatarProps } from './avatar';
 import { MessageContent, type MessageContentProps } from './content';
 import { MessageCopy, type MessageCopyProps } from './copy';
 import { MessageFooter, type MessageFooterProps } from './footer';
-import { MessageGroup, type MessageGroupProps } from './group';
 import { MessageHeader, type MessageHeaderProps } from './header';
 import { MessageRoot, type MessageAlign, type MessageShape, type MessageStatus } from './root';
 import { messageStyle } from './style';
@@ -40,7 +39,6 @@ export namespace Message {
   export type ActionsProps = MessageActionsProps;
   export type CopyProps = MessageCopyProps;
   export type FooterProps = MessageFooterProps;
-  export type GroupProps = MessageGroupProps;
 
   export const Avatar = MessageAvatar;
   export namespace Avatar {
@@ -70,11 +68,6 @@ export namespace Message {
   export const Footer = MessageFooter;
   export namespace Footer {
     export type Props = MessageFooterProps;
-  }
-
-  export const Group = MessageGroup;
-  export namespace Group {
-    export type Props = MessageGroupProps;
   }
 
   export const Style = messageStyle;

@@ -27,7 +27,6 @@ export const messageStyle = tv({
     failureText: 'w-auto text-danger',
     actions: '',
     footer: 'flex items-center gap-1 text-caption-c1-regular text-neutral',
-    group: 'flex w-full min-w-0 flex-col gap-1',
   },
   variants: {
     align: {
