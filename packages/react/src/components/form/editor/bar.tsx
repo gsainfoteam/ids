@@ -55,7 +55,7 @@ export function EditorBar({
       }}
     >
       {scrolls ? (
-        <ScrollArea asChild orientation="horizontal" size="tiny" fade="x">
+        <ScrollArea asChild orientation="horizontal" variant="none" fade="x">
           <div {...barProps}>
             <ScrollArea.Viewport className={styles.barItems()}>{children}</ScrollArea.Viewport>
           </div>
