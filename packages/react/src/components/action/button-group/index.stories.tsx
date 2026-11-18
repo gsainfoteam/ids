@@ -19,6 +19,7 @@ import { expect, spyOn, waitFor } from 'storybook/test';
 import { Showcase } from '~story-kit';
 
 import { isDevelopment } from '../../../utils/dev';
+import { Card } from '../../data/card';
 import { TextField } from '../../form/text-field';
 import { Button } from '../button';
 import { IconButton } from '../icon-button';
@@ -156,15 +157,21 @@ export const Gallery: Story = {
           </ButtonGroup>
         </Showcase.Row>
         <Showcase.Row label="in a tray">
-          <div className="border-neutral bg-surface concentric-p-1 flex border shadow-xs">
-            <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
-              <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-              <Button className="tabular-nums">3 / 12</Button>
-              <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+          <Card className="concentric-p-1 w-fit flex-row gap-0">
+            <ButtonGroup attached={false} variant="soft" aria-label="사진 보기" className="gap-1">
+              <IconButton colorScheme="neutral" icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+              <Button colorScheme="neutral" className="tabular-nums">
+                3 / 12
+              </Button>
+              <IconButton
+                colorScheme="neutral"
+                icon={<ChevronRightIcon />}
+                aria-label="다음 사진"
+              />
               <ButtonGroup.Separator className="mx-1" />
-              <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+              <IconButton colorScheme="neutral" icon={<XMarkIcon />} aria-label="닫기" />
             </ButtonGroup>
-          </div>
+          </Card>
         </Showcase.Row>
         <Showcase.Row label="rtl">
           <div dir="rtl">
@@ -289,14 +296,14 @@ export const Separator: Story = {
 
 export const SpacedSeparator: Story = {
   render: () => (
-    <div className="border-neutral bg-surface concentric-p-1 flex border shadow-xs">
-      <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
-        <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-        <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+    <Card className="concentric-p-1 w-fit flex-row gap-0">
+      <ButtonGroup attached={false} variant="soft" aria-label="사진 보기" className="gap-1">
+        <IconButton colorScheme="neutral" icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+        <IconButton colorScheme="neutral" icon={<ChevronRightIcon />} aria-label="다음 사진" />
         <ButtonGroup.Separator className="mx-1" />
-        <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+        <IconButton colorScheme="neutral" icon={<XMarkIcon />} aria-label="닫기" />
       </ButtonGroup>
-    </div>
+    </Card>
   ),
   parameters: {
     docs: {

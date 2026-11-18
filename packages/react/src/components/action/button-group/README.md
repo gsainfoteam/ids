@@ -83,18 +83,18 @@ import { Button, ButtonGroup, IconButton } from '@gsainfoteam/ids-react';
 ## 툴바
 
 ```tsx
-<div className="flex border border-neutral bg-surface shadow-xs concentric-p-1">  {/* 막대는 앱이 그린다 */}
-  <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
-    <IconButton icon={<ChevronLeftIcon />} aria-label="이전 사진" />
-    <IconButton icon={<ChevronRightIcon />} aria-label="다음 사진" />
+<Card className="w-fit flex-row gap-0 concentric-p-1">  {/* 막대는 Card 로 그린다 */}
+  <ButtonGroup attached={false} variant="soft" aria-label="사진 보기" className="gap-1">
+    <IconButton colorScheme="neutral" icon={<ChevronLeftIcon />} aria-label="이전 사진" />
+    <IconButton colorScheme="neutral" icon={<ChevronRightIcon />} aria-label="다음 사진" />
     <ButtonGroup.Separator className="mx-1" />  {/* 띄운 그룹의 선은 짧다 */}
-    <IconButton icon={<XMarkIcon />} aria-label="닫기" />
+    <IconButton colorScheme="neutral" icon={<XMarkIcon />} aria-label="닫기" />
   </ButtonGroup>
-</div>
+</Card>
 ```
 
-- 테두리 막대 안에 버튼이 떠 있는 툴바는 막대를 앱이 그리고, 그 안에 띄운 그룹을 넣습니다.
-- 막대가 표면 역할을 하므로 안의 버튼은 배경 없이(`ghost`) 둡니다.
+- 테두리 막대 안에 버튼이 떠 있는 툴바는 `Card` 로 막대를 그리고, 그 안에 띄운 그룹을 넣습니다.
+- 막대 안의 버튼은 `soft` 에 `colorScheme="neutral"` 을 줘서 옅은 회색 면으로 둡니다.
 - 버튼 묶음끼리 띄우려면 그룹 안에 그룹을 넣습니다. [합성](#합성)을 봅니다.
 
 ## 속성
