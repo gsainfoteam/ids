@@ -189,8 +189,6 @@ mixin IdsMessages {
 
   String? get editorImageAltPlaceholder => null;
 
-  String? get editorImageNotSupported => null;
-
   String? get editorImageUploadFailed => null;
 
   String? get editorImageUploading => null;
@@ -210,6 +208,24 @@ mixin IdsMessages {
   String? get editorParagraph => null;
 
   String? get editorStrike => null;
+
+  String? get editorTable => null;
+
+  String? get editorTableAddColumnAfter => null;
+
+  String? get editorTableAddColumnBefore => null;
+
+  String? get editorTableAddRowAfter => null;
+
+  String? get editorTableAddRowBefore => null;
+
+  String? get editorTableDelete => null;
+
+  String? get editorTableDeleteColumn => null;
+
+  String? get editorTableDeleteRow => null;
+
+  String? get editorTableInsert => null;
 
   String? editorTaskItem({required Object text}) => null;
 
@@ -816,9 +832,6 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorImageAltPlaceholder => '그림을 설명하는 글';
 
   @override
-  String get editorImageNotSupported => '그림 파일이 아니라 올리지 않았습니다';
-
-  @override
   String get editorImageUploadFailed => '그림을 올리지 못했습니다';
 
   @override
@@ -847,6 +860,33 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get editorStrike => '취소선';
+
+  @override
+  String get editorTable => '표';
+
+  @override
+  String get editorTableAddColumnAfter => '오른쪽에 열 추가';
+
+  @override
+  String get editorTableAddColumnBefore => '왼쪽에 열 추가';
+
+  @override
+  String get editorTableAddRowAfter => '아래에 행 추가';
+
+  @override
+  String get editorTableAddRowBefore => '위에 행 추가';
+
+  @override
+  String get editorTableDelete => '표 지우기';
+
+  @override
+  String get editorTableDeleteColumn => '열 지우기';
+
+  @override
+  String get editorTableDeleteRow => '행 지우기';
+
+  @override
+  String get editorTableInsert => '표 넣기';
 
   @override
   String editorTaskItem({required Object text}) => '할 일: ${_format(text)}';
