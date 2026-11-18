@@ -8,7 +8,7 @@
 
 | 출력 파일 | 설명 |
 |---|---|
-| `packages/css/dist/ids.css` | CSS 변수 + Tailwind `@theme`. `state.json` 에서 `--ids-state-hover`, `--ids-state-press`, `--ids-state-tint-*`, `--ids-state-fill-*`, `state-layer`·`state-hover`·`state-press`·`state-fill` 유틸리티, `@property --ids-state-opacity`·`--ids-state-color`·`--ids-state-layer-hover`·`--ids-state-layer-press` |
+| `packages/css/dist/ids.css` | CSS 변수 + Tailwind `@theme`. `state.json` 에서 `--ids-state-hover`, `--ids-state-press`, `--ids-state-tint-*`, `--ids-state-fill-*`, `state-layer`·`state-hover`·`state-press`·`state-fill`·`state-scheme` 유틸리티, `color-roles.json` 에서 `scheme-{계열}`·`focus-ring-scheme` 유틸리티, `@property --ids-state-opacity`·`--ids-state-color`·`--ids-state-layer-hover`·`--ids-state-layer-press` |
 | `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등) |
 | `packages/react/src/tokens/color-roles.ts` | 계열 목록, `IDS_FAMILY_SLOTS`, `IDS_NEUTRAL_ONLY_SLOTS`, `IDS_STATE_OPACITY`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IDS_STATE_FILL_COLOR`, `IDS_NEUTRAL_PALETTE`, `IDS_NEUTRAL_STEPS` |
 | `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스. `ids_color_roles.dart` 는 `color-roles.json` 에서 `IdsColors`, `IdsColorRoles`(계열, `familySlots`, `neutralOnlySlots`, `slotsOf`, `neutralSteps`), `state.json` 에서 `IdsStateOpacity`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IdsStateLayer.fillColor` 를 만든다 |
@@ -47,6 +47,7 @@ hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에
     "text": ["on-{family}-subtlest", "on-{family}-subtler", "on-{family}-subtle", "on-{family}", "on-{family}-bold", "{family}", "{family}-bold"],
     "border": ["{family}"]
   },
+  "scheme": { "neutral": { "bg-{family}": "bg-{family}-bold", "text-on-{family}": "text-on-{family}-bold", "text-{family}": "text-{family}-bold" } },
   "neutralOnly": ["bg-{family}-subtlest", "text-on-{family}-subtlest", "bg-{family}-bold", "text-on-{family}-bold", "text-{family}-bold"],
   "namespaces": { "bg": ["--background-color"], "text": ["--text-color", "--fill"], "border": ["--border-color", "--ring-color", "--outline-color", "--stroke"] }
 }
@@ -59,6 +60,10 @@ hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에
 - 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 다.
 - Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-subtle` 은 있고 `--color-primary` 나 `--background-color-on-primary` 는 없다.
 - `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다. 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다). neutral 은 없으면 `neutral.*.json` 의 단계를 읽는다.
+- `scheme-{계열}` utility 는 모든 계열에 있는 여덟 역할을 `--ids-color-*-scheme[-세기]` 로 다시 가리킨다(`bg-scheme-subtle` → `bg-primary-subtle`). 이름공간도 같은 규칙으로 만든다(`bg-scheme`, `text-on-scheme`, `inset-ring-scheme`).
+  - `scheme.neutral` 은 neutral 이 다른 역할을 가리키는 자리다. `bg-scheme` 은 `bg-neutral-bold`, `text-on-scheme` 은 `text-on-neutral-bold`, `text-scheme` 은 `text-neutral-bold` 다.
+  - scheme 은 층 색도 정한다. `--ids-state-layer-scheme` 은 계열 채움(`bg-X`)에 tint 불투명도, neutral 은 `currentColor` 에 기본 불투명도다. `state-scheme` 이 그것을 `--ids-state-color`, `--ids-state-layer-*` 에 넣는다.
+  - `focus-ring-scheme` 은 `focus-ring` 과 같은 trigger 로 ring 을 `border-scheme` 으로 칠한다. `focus-ring-current` 는 글자색으로 칠한다(채움 위의 닫기 버튼).
 - Dart 포매터도 이 표를 읽는다. `--ids-color-bg-primary-subtle` 은 `IdsColors.bgPrimarySubtle` 이 되고, `colors['bg-primary-subtle']` 로도 읽는다.
 - `ids_palette_model.dart` 는 아래 팔레트 모델의 계수를 옮긴 것이라, 계수가 바뀌면 함께 바뀐다.
 
@@ -78,7 +83,7 @@ hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에
 
 - `ids.css` 의 `state-layer` 는 `--ids-state-color`(없으면 `currentColor`)를 `--ids-state-opacity` 만큼 `background-image` 로 덮는다.
 - `state-hover`, `state-press` 는 `--ids-state-layer-hover`, `--ids-state-layer-press` 를 먼저 읽고, 없으면 `--ids-state-hover`, `--ids-state-press` 를 쓴다. `state-fill` 은 층 색과 그 둘을 채움 값으로 둔다.
-- tint 는 유틸리티가 없다. 컴포넌트가 scheme 마다 층 색(`bg-X`)과 tint 불투명도를 자기 변수로 정해 `--ids-state-color`, `--ids-state-layer-*` 에 넣는다.
+- tint 는 `state-scheme` 으로 쓴다. `scheme-{계열}` 이 층 색(`bg-X`)과 tint 불투명도를 `--ids-state-layer-scheme[-hover|-press]` 에 둔다.
 - `@property --ids-state-opacity`(`<percentage>`, 0%, 상속 안 함)라서 transition 으로 바뀐다. `--ids-state-color`, `--ids-state-layer-hover`, `--ids-state-layer-press` 도 상속하지 않는다. 그래서 채움 버튼 안의 요소가 바깥 층을 물려받지 않는다.
 - IdsProvider(`theme-roles.ts`)와 Flutter(`theme_roles.dart`)는 같은 값으로 층 아래의 글자 대비를 잰다. 값을 바꾸면 parity fixture 를 다시 쓴다.
 

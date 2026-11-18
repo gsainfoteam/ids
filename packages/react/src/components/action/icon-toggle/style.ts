@@ -10,6 +10,7 @@ export const iconToggleStyle = tv({
     colorScheme: controlSurface.colorScheme,
     size: iconSquare.size,
   },
+  compoundVariants: toggleSurface.compoundVariants,
   defaultVariants: {
     variant: 'outline',
     colorScheme: 'primary',

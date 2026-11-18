@@ -84,13 +84,13 @@ export const sidebarStyle = tv({
     standalone: { true: {}, false: { root: 'max-sm:hidden' } },
     iconColor: {
       neutral: {},
-      primary: { icon: 'text-primary' },
-      secondary: { icon: 'text-secondary' },
-      tertiary: { icon: 'text-tertiary' },
-      info: { icon: 'text-info' },
-      success: { icon: 'text-success' },
-      warning: { icon: 'text-warning' },
-      danger: { icon: 'text-danger' },
+      primary: { icon: 'scheme-primary text-scheme' },
+      secondary: { icon: 'scheme-secondary text-scheme' },
+      tertiary: { icon: 'scheme-tertiary text-scheme' },
+      info: { icon: 'scheme-info text-scheme' },
+      success: { icon: 'scheme-success text-scheme' },
+      warning: { icon: 'scheme-warning text-scheme' },
+      danger: { icon: 'scheme-danger text-scheme' },
     } satisfies Record<SidebarIconColorScheme, object>,
     touch: {
       true: {

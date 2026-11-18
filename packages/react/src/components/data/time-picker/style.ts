@@ -1,4 +1,3 @@
-import { primaryFill } from '../../../internal/brand-fill';
 import { cn, tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -24,8 +23,7 @@ export const timePickerStyle = tv({
       'cursor-pointer transition-[color,background-color,box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
       'state-layer not-data-disabled:hover:state-hover not-data-disabled:active:state-press',
       'group-focus-visible/column:data-active:state-hover',
-      primaryFill,
-      'data-selected:bg-(--control-fill) data-selected:font-medium data-selected:text-(--control-on-fill)',
+      'data-selected:bg-primary data-selected:font-medium data-selected:text-on-primary',
       'group-focus-visible/column:data-selected:data-active:inset-ring-2 group-focus-visible/column:data-selected:data-active:inset-ring-(--ids-color-text-on-primary)/60',
       'data-disabled:cursor-not-allowed data-disabled:opacity-50',
     ],

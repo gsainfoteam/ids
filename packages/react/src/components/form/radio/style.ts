@@ -9,13 +9,13 @@ export const radioStyle = tv({
       'relative inline-flex shrink-0 items-center justify-center align-middle',
       'rounded-full focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      '[--radio-accent:var(--ids-color-text-primary)] data-invalid:[--radio-accent:var(--ids-color-text-danger)]',
+      'scheme-primary data-invalid:scheme-danger',
       'data-disabled:opacity-50',
     ],
     input:
       'absolute inset-0 m-0 size-full cursor-pointer appearance-none rounded-[inherit] opacity-0 disabled:cursor-not-allowed',
     indicator: [
-      'pointer-events-none flex shrink-0 items-center justify-center text-(--radio-accent) [&>svg]:size-full',
+      'pointer-events-none flex shrink-0 items-center justify-center text-scheme [&>svg]:size-full',
       'transition-[opacity,scale] duration-(--ids-motion-fast) motion-reduce:transition-none',
       'data-[state=unchecked]:scale-50 data-[state=unchecked]:opacity-0',
     ],

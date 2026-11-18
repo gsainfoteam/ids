@@ -15,61 +15,19 @@ export const badgeStyle = tv({
   },
   variants: {
     colorScheme: {
-      neutral: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-text-neutral-bold)] [--badge-fill:var(--ids-color-bg-neutral-bold)] [--badge-on-fill:var(--ids-color-text-on-neutral-bold)] [--badge-text:var(--ids-color-text-neutral-bold)]',
-          '[--badge-tint:var(--ids-color-bg-neutral-subtle)] [--badge-on-tint:var(--ids-color-text-on-neutral-subtle)]',
-        ],
-      },
-      primary: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-primary)] [--badge-fill:var(--ids-color-bg-primary)] [--badge-on-fill:var(--ids-color-text-on-primary)] [--badge-text:var(--ids-color-text-primary)]',
-          '[--badge-tint:var(--ids-color-bg-primary-subtle)] [--badge-on-tint:var(--ids-color-text-on-primary-subtle)]',
-        ],
-      },
-      secondary: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-secondary)] [--badge-fill:var(--ids-color-bg-secondary)] [--badge-on-fill:var(--ids-color-text-on-secondary)] [--badge-text:var(--ids-color-text-secondary)]',
-          '[--badge-tint:var(--ids-color-bg-secondary-subtle)] [--badge-on-tint:var(--ids-color-text-on-secondary-subtle)]',
-        ],
-      },
-      tertiary: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-tertiary)] [--badge-fill:var(--ids-color-bg-tertiary)] [--badge-on-fill:var(--ids-color-text-on-tertiary)] [--badge-text:var(--ids-color-text-tertiary)]',
-          '[--badge-tint:var(--ids-color-bg-tertiary-subtle)] [--badge-on-tint:var(--ids-color-text-on-tertiary-subtle)]',
-        ],
-      },
-      success: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-success)] [--badge-fill:var(--ids-color-bg-success)] [--badge-on-fill:var(--ids-color-text-on-success)] [--badge-text:var(--ids-color-text-success)]',
-          '[--badge-tint:var(--ids-color-bg-success-subtle)] [--badge-on-tint:var(--ids-color-text-on-success-subtle)]',
-        ],
-      },
-      warning: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-warning)] [--badge-fill:var(--ids-color-bg-warning)] [--badge-on-fill:var(--ids-color-text-on-warning)] [--badge-text:var(--ids-color-text-warning)]',
-          '[--badge-tint:var(--ids-color-bg-warning-subtle)] [--badge-on-tint:var(--ids-color-text-on-warning-subtle)]',
-        ],
-      },
-      danger: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-danger)] [--badge-fill:var(--ids-color-bg-danger)] [--badge-on-fill:var(--ids-color-text-on-danger)] [--badge-text:var(--ids-color-text-danger)]',
-          '[--badge-tint:var(--ids-color-bg-danger-subtle)] [--badge-on-tint:var(--ids-color-text-on-danger-subtle)]',
-        ],
-      },
-      info: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-info)] [--badge-fill:var(--ids-color-bg-info)] [--badge-on-fill:var(--ids-color-text-on-info)] [--badge-text:var(--ids-color-text-info)]',
-          '[--badge-tint:var(--ids-color-bg-info-subtle)] [--badge-on-tint:var(--ids-color-text-on-info-subtle)]',
-        ],
-      },
+      neutral: { indicator: 'scheme-neutral' },
+      primary: { indicator: 'scheme-primary' },
+      secondary: { indicator: 'scheme-secondary' },
+      tertiary: { indicator: 'scheme-tertiary' },
+      success: { indicator: 'scheme-success' },
+      warning: { indicator: 'scheme-warning' },
+      danger: { indicator: 'scheme-danger' },
+      info: { indicator: 'scheme-info' },
     } satisfies Record<BadgeColorScheme, object>,
     variant: {
-      solid: { indicator: 'bg-(--badge-fill) text-(--badge-on-fill)' },
-      soft: { indicator: 'bg-(--badge-tint) text-(--badge-on-tint)' },
-      outline: {
-        indicator: 'bg-neutral-subtlest text-(--badge-text) inset-ring-1 inset-ring-(--badge-accent)/45',
-      },
+      solid: { indicator: 'bg-scheme text-on-scheme' },
+      soft: { indicator: 'bg-scheme-subtle text-on-scheme-subtle' },
+      outline: { indicator: 'bg-neutral-subtlest text-scheme inset-ring-1 inset-ring-neutral' },
     } satisfies Record<BadgeVariant, object>,
     size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
     dot: { true: {}, false: {} },

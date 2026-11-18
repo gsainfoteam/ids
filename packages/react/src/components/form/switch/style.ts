@@ -8,9 +8,8 @@ export const switchStyle = tv({
       'relative inline-flex shrink-0 items-center rounded-full p-0.5 align-middle',
       'bg-(--ids-color-border-neutral) shadow-xs inset-ring-1 inset-ring-transparent focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      '[--switch-accent:var(--ids-color-bg-primary)] [--switch-on-accent:var(--ids-color-text-on-primary)]',
-      'data-invalid:[--switch-accent:var(--ids-color-bg-danger)] data-invalid:[--switch-on-accent:var(--ids-color-text-on-danger)]',
-      'data-[state=checked]:bg-(--switch-accent)',
+      'scheme-primary data-invalid:scheme-danger',
+      'data-[state=checked]:bg-scheme',
       'data-disabled:opacity-50',
     ],
     input:
@@ -18,7 +17,7 @@ export const switchStyle = tv({
     thumb: [
       'pointer-events-none flex shrink-0 items-center justify-center rounded-full shadow-sm',
       'bg-neutral-subtlest text-neutral dark:bg-neutral-bold',
-      'data-[state=checked]:bg-(--switch-on-accent) data-[state=checked]:text-(--switch-accent)',
+      'data-[state=checked]:bg-(--ids-color-text-on-scheme) data-[state=checked]:text-(--ids-color-bg-scheme)',
       'transition-[translate,background-color] duration-(--ids-motion-fast) motion-reduce:transition-none',
       '[&>svg]:size-3/4',
     ],

@@ -8,6 +8,7 @@ export const buttonStyle = tv({
     colorScheme: controlSurface.colorScheme,
     size: controlSurface.size,
   },
+  compoundVariants: controlSurface.compoundVariants,
   defaultVariants: {
     variant: 'solid',
     colorScheme: 'primary',

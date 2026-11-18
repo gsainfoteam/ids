@@ -131,6 +131,20 @@ const FAMILY_SLOTS = COLOR_FAMILIES.flatMap((family) =>
 
 const colorVar = (slot) => `--ids-color-${slot}`;
 
+const SCHEME = "scheme";
+
+const SCHEME_SLOTS = TEMPLATE_SLOTS.filter(({ slot }) => !NEUTRAL_ONLY_SLOTS.includes(slot));
+
+const NEUTRAL_SCHEME_REDIRECTS = COLOR_ROLES.scheme.neutral;
+
+const schemeTarget = (family, slot) =>
+  (family === "neutral" ? (NEUTRAL_SCHEME_REDIRECTS[slot] ?? slot) : slot).replaceAll(
+    "{family}",
+    family,
+  );
+
+const SCHEME_LAYER_IN_TEXT_COLOR = ["neutral"];
+
 const themeVar = (mode, slot) => `--ids-theme-${mode}-${slot}`;
 
 const TW_NS = {
@@ -219,14 +233,41 @@ const T_CSS_TEXT_ROOT = `  --ids-text-{{NAME}}: {{FONT_SIZE}};
 
 const T_DART_TEXT_STYLE = `TextStyle(fontFamily: '{{FONT_FAMILY}}', package: '{{FONT_PACKAGE}}', fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
 
-const buildColorBridgeCSS = () => {
-  const families = FAMILY_SLOTS.flatMap(({ property, name, slot }) =>
-    COLOR_ROLES.namespaces[property].map(
-      (namespace) => `  ${namespace}-${name}: var(${colorVar(slot)});`,
-    ),
+const bridgeLines = ({ property, name, slot }) =>
+  COLOR_ROLES.namespaces[property].map(
+    (namespace) => `  ${namespace}-${name}: var(${colorVar(slot)});`,
   );
-  return render(T_CSS_THEME, { THEME: families.join("\n") });
-};
+
+const SCHEME_BRIDGE_SLOTS = SCHEME_SLOTS.map(({ property, name, slot }) => ({
+  property,
+  name: name.replaceAll("{family}", SCHEME),
+  slot: slot.replaceAll("{family}", SCHEME),
+}));
+
+const buildColorBridgeCSS = () =>
+  render(T_CSS_THEME, {
+    THEME: [...FAMILY_SLOTS, ...SCHEME_BRIDGE_SLOTS].flatMap(bridgeLines).join("\n"),
+  });
+
+const schemeLayer = (family) =>
+  SCHEME_LAYER_IN_TEXT_COLOR.includes(family)
+    ? ["currentColor", "var(--ids-state-hover)", "var(--ids-state-press)"]
+    : [`var(${colorVar(`bg-${family}`)})`, "var(--ids-state-tint-hover)", "var(--ids-state-tint-press)"];
+
+const buildSchemeCSS = () =>
+  COLOR_FAMILIES.map((family) => {
+    const [layer, hover, press] = schemeLayer(family);
+    const lines = [
+      ...SCHEME_SLOTS.map(
+        ({ slot }) =>
+          `  ${colorVar(slot.replaceAll("{family}", SCHEME))}: var(${colorVar(schemeTarget(family, slot))});`,
+      ),
+      `  --ids-state-layer-${SCHEME}: ${layer};`,
+      `  --ids-state-layer-${SCHEME}-hover: ${hover};`,
+      `  --ids-state-layer-${SCHEME}-press: ${press};`,
+    ];
+    return `@utility ${SCHEME}-${family} {\n${lines.join("\n")}\n}\n`;
+  }).join("\n");
 
 const buildStaticCSS = (dictionary) => {
   const lines = ["motion", "radius", "size", "state"].flatMap((cat) =>
@@ -330,11 +371,11 @@ const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:wh
 }
 `;
 
-const T_CSS_UTILITIES = `@utility focus-ring {
+const focusRingUtility = (name, family) => `@utility ${name} {
   outline: none;
 
   ${focusRingTriggers("  ")} {
-    @apply ring-[3px] ring-primary/40 inset-ring-primary;
+    @apply ring-[3px] ring-${family}/40 inset-ring-${family};
   }
 
   &[aria-invalid="true"],
@@ -346,6 +387,11 @@ const T_CSS_UTILITIES = `@utility focus-ring {
     }
   }
 }
+`;
+
+const T_CSS_UTILITIES = `${focusRingUtility("focus-ring", "primary")}
+${focusRingUtility("focus-ring-scheme", "scheme")}
+${focusRingUtility("focus-ring-current", "current")}
 
 @utility state-layer {
   background-image: linear-gradient(
@@ -360,6 +406,12 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 
 @utility state-press {
   --ids-state-opacity: var(--ids-state-layer-press, var(--ids-state-press));
+}
+
+@utility state-scheme {
+  --ids-state-color: var(--ids-state-layer-scheme);
+  --ids-state-layer-hover: var(--ids-state-layer-scheme-hover);
+  --ids-state-layer-press: var(--ids-state-layer-scheme-press);
 }
 
 @utility state-fill {
@@ -612,6 +664,7 @@ const cssFormatter = ({ dictionary }) =>
     T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES,
     T_CSS_VARIANTS,
     T_CSS_UTILITIES,
+    buildSchemeCSS(),
     buildConcentricCSS(),
     buildTypographyCSS(dictionary),
     T_CSS_CORNER_SHAPE,

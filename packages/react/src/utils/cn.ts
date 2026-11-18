@@ -1,5 +1,7 @@
 import { createCn, validators, type ConfigExtension, type DefaultClassGroupIds } from 'cn/config';
 
+import { IDS_COLOR_FAMILIES } from '../tokens/color-roles';
+
 import type { CnFunction } from 'cn';
 
 const isTextStyle = (value: string) => /^(headline|subtitle|body|caption|button)-/.test(value);
@@ -23,6 +25,9 @@ const config = {
     classGroups: {
       'font-size': [{ text: [isTextStyle] }],
       'concentric-p': [{ 'concentric-p': [validators.isNumber] }],
+      scheme: [{ scheme: [...IDS_COLOR_FAMILIES] }],
+      'focus-ring': ['focus-ring', 'focus-ring-scheme', 'focus-ring-current'],
+      'state-color': ['state-scheme', 'state-fill'],
     },
     conflictingClassGroups: {
       'concentric-p': [...paddingGroups, ...roundedGroups],

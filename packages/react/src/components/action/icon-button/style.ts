@@ -9,6 +9,7 @@ export const iconButtonStyle = tv({
     colorScheme: controlSurface.colorScheme,
     size: iconSquare.size,
   },
+  compoundVariants: controlSurface.compoundVariants,
   defaultVariants: {
     variant: 'ghost',
     colorScheme: 'primary',

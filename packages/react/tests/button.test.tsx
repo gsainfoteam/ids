@@ -23,7 +23,7 @@ test('SSR: a native button that never submits by accident and names its variant 
   expect(button.type).toBe('button');
   expect(button.dataset.variant).toBe('solid');
   expect(button.dataset.size).toBe('tiny');
-  expect(button.className).toMatch(/\[--control-fill:var\(--ids-color-bg-danger\)\]/);
+  expect(button.className).toMatch(/(^| )scheme-danger( |$)/);
   expect(button.textContent).toBe('삭제');
 });
 

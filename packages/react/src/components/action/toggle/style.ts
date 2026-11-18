@@ -9,6 +9,7 @@ export const toggleStyle = tv({
     colorScheme: controlSurface.colorScheme,
     size: controlSurface.size,
   },
+  compoundVariants: toggleSurface.compoundVariants,
   defaultVariants: {
     variant: 'outline',
     colorScheme: 'primary',
