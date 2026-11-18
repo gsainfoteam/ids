@@ -236,6 +236,17 @@
   "qrCode": {
     "label": "QR code"
   },
+  "questionnaire": {
+    "navigation": "Question navigation",
+    "next": "Next",
+    "other": "Other",
+    "otherPlaceholder": "Type another answer",
+    "previous": "Previous",
+    "progress": "Questionnaire progress",
+    "skip": "Skip",
+    "step": "Question {current} of {total}",
+    "submit": "Submit"
+  },
   "rating": {
     "label": "Rating",
     "required": "Select a rating.",
