@@ -26,8 +26,8 @@ const documentBlocks = cn(
   '[&_:is(h1,h2,h3,h4)+*]:mt-1',
   '[&_ul]:list-disc [&_ol]:list-decimal [&_:is(ul,ol)]:ps-6 [&_li>*+*]:mt-1 [&_li+li]:mt-1',
   '[&_blockquote]:border-s-2 [&_blockquote]:border-neutral [&_blockquote]:ps-3 [&_blockquote]:text-neutral',
-  '[&_pre]:rounded-standard [&_pre]:bg-neutral-soft [&_pre]:px-3 [&_pre]:py-2 [&_pre]:font-mono [&_pre]:whitespace-pre-wrap',
-  '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:bg-neutral-soft [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
+  '[&_pre]:rounded-standard [&_pre]:bg-(--editor-code) [&_pre]:px-3 [&_pre]:py-2 [&_pre]:font-mono [&_pre]:whitespace-pre-wrap',
+  '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:bg-(--editor-code) [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
   '[&_hr]:my-3 [&_hr]:border-neutral',
 );
@@ -38,12 +38,13 @@ export const editorStyle = tv({
       'relative flex w-full min-w-0 cursor-text flex-col overflow-hidden rounded-standard',
       fieldSurface.base,
     ],
-    bar: 'shrink-0 border-neutral text-neutral',
+    bar: 'mx-px shrink-0 border-neutral text-neutral',
     barItems: 'flex items-center gap-0.5',
     separator: 'mx-0.5 h-5 self-center',
     blockType: [
-      'w-auto shrink-0 rounded-standard text-on-surface',
-      'hover:bg-neutral-soft active:bg-neutral-soft-hover ring-0! inset-ring-transparent!',
+      'w-auto shrink-0 rounded-standard text-neutral-bold',
+      'transition-[color,background-color,box-shadow,--ids-state-opacity]',
+      'state-layer hover:state-hover active:state-press ring-0! inset-ring-transparent!',
     ],
     scrollArea: [
       'min-h-0 grow rounded-[inherit]',
@@ -51,13 +52,13 @@ export const editorStyle = tv({
     ],
     document: 'relative',
     content: [
-      'min-h-24 outline-none text-on-surface',
-      'selection:bg-primary/30 selection:text-on-surface',
+      'min-h-24 outline-none text-neutral-bold',
+      'selection:bg-primary/30 selection:text-neutral-bold',
       proseMirrorBaseline,
       documentBlocks,
       placeholder,
     ],
-    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-on-surface'],
+    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-bold'],
     bubble: 'w-auto concentric-p-1 p-0 [&>[data-scroll-area]>[data-scroll-area-viewport]]:p-0',
     bubbleBar: 'flex items-center gap-0.5 p-1',
     bubbleAnchor: 'pointer-events-none absolute',
@@ -66,8 +67,18 @@ export const editorStyle = tv({
   },
   variants: {
     variant: {
-      outline: { root: fieldSurface.variant.outline },
-      soft: { root: fieldSurface.variant.soft },
+      outline: {
+        root: [
+          fieldSurface.variant.outline,
+          '[--editor-code:var(--ids-color-bg-neutral-subtle)]',
+          'dark:[--editor-code:var(--ids-color-bg-neutral-subtler)]',
+        ],
+        bar: 'dark:border-(--ids-color-bg-neutral)',
+      },
+      soft: {
+        root: [fieldSurface.variant.soft, '[--editor-code:var(--ids-color-bg-neutral-subtler)]'],
+        bar: 'dark:border-(--ids-color-bg-neutral)',
+      },
     } satisfies Record<EditorVariant, object>,
     size: {
       standard: {
