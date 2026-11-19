@@ -6,7 +6,7 @@ import { PasswordFieldInput } from './input';
 import { passwordFieldStyle } from './style';
 import { usePasswordField } from './use-password-field';
 import { PasswordFieldVisibilityToggle } from './visibility-toggle';
-import { type FieldSurfaceVariant } from '../../../internal/field-surface';
+import { type FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
 import {
   Adornments,
   TextControlClear,

@@ -29,7 +29,7 @@
 ### 쓰는 법
 
 ```ts
-// internal/field-surface.ts: 공유 조각은 cn('...') 값의 객체
+// internal/surfaces/field-surface.ts: 공유 조각은 cn('...') 값의 객체
 export const fieldAction = {
   base: cn(
     'shrink-0 text-neutral',

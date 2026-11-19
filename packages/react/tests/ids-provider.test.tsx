@@ -367,7 +367,7 @@ test('asChild puts the attributes on the child element', async () => {
   const section = screen.container.querySelector<HTMLElement>('#area')!;
   expect(section.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(palettes.blue[600]);
   expect(section.dataset.mode).toBe('light');
-  expect(section.className).toBe('x');
+  expect([...section.classList].sort()).toEqual(['scheme-primary', 'x']);
   expect(screen.container.firstElementChild).toBe(section);
 });
 

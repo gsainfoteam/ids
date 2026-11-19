@@ -29,7 +29,7 @@ import {
 } from '../../../utils';
 import { useFieldSize } from '../field/context';
 
-import type { FieldTriggerVariant } from '../../../internal/field-surface';
+import type { FieldTriggerVariant } from '../../../internal/surfaces/field-surface';
 import type { IdsSize } from '../../../tokens/types';
 import type { ColorPickerSwatchOption } from '../../data/color-picker';
 import type { ColorFormat } from '../../data/color-picker/color';

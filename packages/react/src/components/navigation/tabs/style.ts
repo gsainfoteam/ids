@@ -1,7 +1,7 @@
-import { controlSurface, type SurfaceVariant } from '../../../internal/control-surface';
 import { tv } from '../../../utils';
 
 import type { TabsAppearance, TabsColorScheme, TabsOrientation } from './context';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export const tabsStyle = tv({
@@ -24,9 +24,9 @@ export const tabsStyle = tv({
   },
   variants: {
     colorScheme: {
-      primary: { list: controlSurface.colorScheme.primary },
-      secondary: { list: controlSurface.colorScheme.secondary },
-      tertiary: { list: controlSurface.colorScheme.tertiary },
+      primary: { list: 'scheme-primary' },
+      secondary: { list: 'scheme-secondary' },
+      tertiary: { list: 'scheme-tertiary' },
     } satisfies Record<TabsColorScheme, object>,
     stretch: { true: {}, false: {} },
     orientation: {
@@ -46,7 +46,7 @@ export const tabsStyle = tv({
         trigger: [
           'rounded-standard',
           'after:pointer-events-none after:absolute after:bg-transparent',
-          'aria-selected:after:bg-(--control-ring)',
+          'aria-selected:after:bg-(--ids-color-border-scheme)',
         ],
       },
       pill: {
@@ -58,7 +58,7 @@ export const tabsStyle = tv({
         ],
       },
       enclosed: {
-        trigger: 'border border-transparent aria-selected:border-neutral aria-selected:bg-neutral-subtlest',
+        trigger: 'border border-transparent aria-selected:border-neutral aria-selected:bg-(--ids-bg-current)',
       },
     } satisfies Record<TabsAppearance, object>,
     variant: {
@@ -130,7 +130,7 @@ export const tabsStyle = tv({
       appearance: 'pill',
       variant: 'soft',
       class: {
-        trigger: 'aria-selected:bg-(--control-soft) aria-selected:text-(--control-on-soft)',
+        trigger: 'aria-selected:bg-scheme-subtle aria-selected:text-on-scheme-subtle',
       },
     },
     {
@@ -138,9 +138,8 @@ export const tabsStyle = tv({
       variant: 'outline',
       class: {
         trigger: [
-          'aria-selected:bg-neutral-subtlest aria-selected:shadow-xs',
-          'aria-selected:inset-ring-1 aria-selected:inset-ring-neutral',
-          'dark:aria-selected:bg-neutral-subtle',
+          'aria-selected:bg-control-outline aria-selected:shadow-xs',
+          'aria-selected:inset-ring-1 aria-selected:inset-ring-control-outline',
         ],
       },
     },
@@ -149,7 +148,7 @@ export const tabsStyle = tv({
       variant: 'solid',
       class: {
         trigger: [
-          'aria-selected:bg-(--control-fill) aria-selected:text-(--control-on-fill)',
+          'aria-selected:bg-scheme aria-selected:text-on-scheme',
           'aria-selected:shadow-xs',
         ],
       },
@@ -159,12 +158,12 @@ export const tabsStyle = tv({
       variant: 'glossy',
       class: {
         trigger: [
-          'aria-selected:bg-(--control-fill) aria-selected:text-(--control-on-fill)',
+          'aria-selected:bg-scheme aria-selected:text-on-scheme',
           'aria-selected:shadow-sm aria-selected:bg-linear-to-b',
           'aria-selected:from-white/20 aria-selected:to-transparent',
           'aria-selected:inset-shadow-[0_1px_0_rgb(255_255_255/0.35)]',
           'aria-selected:inset-ring-1',
-          'aria-selected:inset-ring-[color-mix(in_oklab,var(--control-fill),black_20%)]',
+          'aria-selected:inset-ring-black/20',
         ],
       },
     },

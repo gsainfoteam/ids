@@ -22,7 +22,7 @@ export const tableStyle = tv({
         root: 'rounded-container border border-neutral',
         header: 'bg-neutral-subtle',
       },
-      ghost: { header: 'bg-neutral-subtlest' },
+      ghost: { header: 'bg-(--ids-bg-current)' },
     } satisfies Record<TableVariant, object>,
     size: {
       standard: {

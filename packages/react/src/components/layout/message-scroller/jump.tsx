@@ -27,7 +27,7 @@ export function MessageScrollerJump({
 
   const ownContent = children !== undefined;
   const iconOnly = !ownContent && unseen === 0;
-  const styles = messageScrollerStyle({ opaque: variant === 'outline', iconOnly });
+  const styles = messageScrollerStyle({ iconOnly });
 
   const defaultLabel =
     unseen > 0 ? t('messageScroller.jumpUnseen', { count: unseen }) : t('messageScroller.jump');

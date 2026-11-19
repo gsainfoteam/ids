@@ -127,6 +127,46 @@
   --ring-color-info: var(--ids-color-border-info);
   --outline-color-info: var(--ids-color-border-info);
   --stroke-info: var(--ids-color-border-info);
+  --background-color-scheme-subtler: var(--ids-color-bg-scheme-subtler);
+  --background-color-scheme-subtle: var(--ids-color-bg-scheme-subtle);
+  --background-color-scheme: var(--ids-color-bg-scheme);
+  --text-color-on-scheme-subtler: var(--ids-color-text-on-scheme-subtler);
+  --fill-on-scheme-subtler: var(--ids-color-text-on-scheme-subtler);
+  --text-color-on-scheme-subtle: var(--ids-color-text-on-scheme-subtle);
+  --fill-on-scheme-subtle: var(--ids-color-text-on-scheme-subtle);
+  --text-color-on-scheme: var(--ids-color-text-on-scheme);
+  --fill-on-scheme: var(--ids-color-text-on-scheme);
+  --text-color-scheme: var(--ids-color-text-scheme);
+  --fill-scheme: var(--ids-color-text-scheme);
+  --border-color-scheme: var(--ids-color-border-scheme);
+  --ring-color-scheme: var(--ids-color-border-scheme);
+  --outline-color-scheme: var(--ids-color-border-scheme);
+  --stroke-scheme: var(--ids-color-border-scheme);
+  --background-color-panel: var(--ids-color-bg-panel);
+  --background-color-band: var(--ids-color-bg-band);
+  --background-color-control-outline: var(--ids-color-bg-control-outline);
+  --border-color-control-outline: var(--ids-color-border-control-outline);
+  --ring-color-control-outline: var(--ids-color-border-control-outline);
+  --outline-color-control-outline: var(--ids-color-border-control-outline);
+  --stroke-control-outline: var(--ids-color-border-control-outline);
+  --background-color-field-outline: var(--ids-color-bg-field-outline);
+  --border-color-field-outline: var(--ids-color-border-field-outline);
+  --ring-color-field-outline: var(--ids-color-border-field-outline);
+  --outline-color-field-outline: var(--ids-color-border-field-outline);
+  --stroke-field-outline: var(--ids-color-border-field-outline);
+  --border-color-field-bar: var(--ids-color-border-field-bar);
+  --ring-color-field-bar: var(--ids-color-border-field-bar);
+  --outline-color-field-bar: var(--ids-color-border-field-bar);
+  --stroke-field-bar: var(--ids-color-border-field-bar);
+  --background-color-field-code-outline: var(--ids-color-bg-field-code-outline);
+  --background-color-switch-thumb: var(--ids-color-bg-switch-thumb);
+  --background-color-qr-code: var(--ids-color-bg-qr-code);
+  --text-color-qr-code: var(--ids-color-text-qr-code);
+  --fill-qr-code: var(--ids-color-text-qr-code);
+  --background-color-qr-code-inverse: var(--ids-color-bg-qr-code-inverse);
+  --text-color-qr-code-inverse: var(--ids-color-text-qr-code-inverse);
+  --fill-qr-code-inverse: var(--ids-color-text-qr-code-inverse);
+  --shadow-panel: var(--ids-shadow-panel);
 }
 
 :root {
@@ -148,6 +188,9 @@
   --ids-state-fill-color: #000000;
   --ids-state-fill-hover: 10%;
   --ids-state-fill-press: 18%;
+  --ids-shadow-0: 0 0 #0000;
+  --ids-shadow-1: 0 1px 2px 0 #0000000d;
+  --ids-shadow-2: 0 10px 15px -3px #0000001a, 0 4px 6px -4px #0000001a;
 }
 
 @theme inline {
@@ -205,7 +248,7 @@
 
 @keyframes ids-marquee {
   to {
-    translate: var(--ids-marquee-translate, -50%);
+    translate: var(--marquee-translate, -50%);
   }
 }
 
@@ -217,7 +260,7 @@
 }
 
 @theme inline {
-  --animate-marquee: ids-marquee var(--ids-marquee-duration, 20s) linear infinite var(--ids-marquee-direction, normal) var(--ids-marquee-play-state, running);
+  --animate-marquee: ids-marquee var(--marquee-duration, 20s) linear infinite var(--marquee-direction, normal) var(--marquee-play-state, running);
 }
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *):not(:where([data-mode="dark"] [data-mode="light"], [data-mode="dark"] [data-mode="light"] *)));
@@ -257,6 +300,57 @@
   }
 }
 
+@utility focus-ring-scheme {
+  outline: none;
+
+  &:focus-visible,
+  &[data-focus-visible],
+  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
+  &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
+  &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+    @apply ring-[3px] ring-scheme/40 inset-ring-scheme;
+  }
+
+  &[aria-invalid="true"],
+  &[data-invalid] {
+    @apply inset-ring-danger;
+
+    &:focus-visible,
+    &[data-focus-visible],
+    &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
+    &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
+    &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+      @apply ring-danger/40 inset-ring-danger;
+    }
+  }
+}
+
+@utility focus-ring-current {
+  outline: none;
+
+  &:focus-visible,
+  &[data-focus-visible],
+  &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
+  &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
+  &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+    @apply ring-[3px] ring-current/40 inset-ring-current;
+  }
+
+  &[aria-invalid="true"],
+  &[data-invalid] {
+    @apply inset-ring-danger;
+
+    &:focus-visible,
+    &[data-focus-visible],
+    &:has([data-field-input]:focus-visible):not(:has([popover] [data-field-input]:focus-visible)),
+    &:has([data-text-field-input]:focus-visible):not(:has([popover] [data-text-field-input]:focus-visible)),
+    &:has([data-text-area-input]:focus-visible):not(:has([popover] [data-text-area-input]:focus-visible)) {
+      @apply ring-danger/40 inset-ring-danger;
+    }
+  }
+}
+
+
 @utility state-layer {
   background-image: linear-gradient(
     color-mix(in srgb, var(--ids-state-color, currentColor) var(--ids-state-opacity), transparent),
@@ -270,6 +364,12 @@
 
 @utility state-press {
   --ids-state-opacity: var(--ids-state-layer-press, var(--ids-state-press));
+}
+
+@utility state-scheme {
+  --ids-state-color: var(--ids-state-layer-scheme);
+  --ids-state-layer-hover: var(--ids-state-layer-scheme-hover);
+  --ids-state-layer-press: var(--ids-state-layer-scheme-press);
 }
 
 @utility state-fill {
@@ -304,6 +404,118 @@
     -webkit-text-fill-color: currentColor;
     animation: none;
   }
+}
+
+@utility scheme-neutral {
+  --ids-color-bg-scheme-subtler: var(--ids-color-bg-neutral-subtler);
+  --ids-color-bg-scheme-subtle: var(--ids-color-bg-neutral-subtle);
+  --ids-color-bg-scheme: var(--ids-color-bg-neutral-bold);
+  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-neutral-subtler);
+  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-neutral-subtle);
+  --ids-color-text-on-scheme: var(--ids-color-text-on-neutral-bold);
+  --ids-color-text-scheme: var(--ids-color-text-neutral-bold);
+  --ids-color-border-scheme: var(--ids-color-border-neutral);
+  --ids-state-layer-scheme: currentColor;
+  --ids-state-layer-scheme-hover: var(--ids-state-hover);
+  --ids-state-layer-scheme-press: var(--ids-state-press);
+}
+
+@utility scheme-primary {
+  --ids-color-bg-scheme-subtler: var(--ids-color-bg-primary-subtler);
+  --ids-color-bg-scheme-subtle: var(--ids-color-bg-primary-subtle);
+  --ids-color-bg-scheme: var(--ids-color-bg-primary);
+  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-primary-subtler);
+  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-primary-subtle);
+  --ids-color-text-on-scheme: var(--ids-color-text-on-primary);
+  --ids-color-text-scheme: var(--ids-color-text-primary);
+  --ids-color-border-scheme: var(--ids-color-border-primary);
+  --ids-state-layer-scheme: var(--ids-color-bg-primary);
+  --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
+  --ids-state-layer-scheme-press: var(--ids-state-tint-press);
+}
+
+@utility scheme-secondary {
+  --ids-color-bg-scheme-subtler: var(--ids-color-bg-secondary-subtler);
+  --ids-color-bg-scheme-subtle: var(--ids-color-bg-secondary-subtle);
+  --ids-color-bg-scheme: var(--ids-color-bg-secondary);
+  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-secondary-subtler);
+  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-secondary-subtle);
+  --ids-color-text-on-scheme: var(--ids-color-text-on-secondary);
+  --ids-color-text-scheme: var(--ids-color-text-secondary);
+  --ids-color-border-scheme: var(--ids-color-border-secondary);
+  --ids-state-layer-scheme: var(--ids-color-bg-secondary);
+  --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
+  --ids-state-layer-scheme-press: var(--ids-state-tint-press);
+}
+
+@utility scheme-tertiary {
+  --ids-color-bg-scheme-subtler: var(--ids-color-bg-tertiary-subtler);
+  --ids-color-bg-scheme-subtle: var(--ids-color-bg-tertiary-subtle);
+  --ids-color-bg-scheme: var(--ids-color-bg-tertiary);
+  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-tertiary-subtler);
+  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-tertiary-subtle);
+  --ids-color-text-on-scheme: var(--ids-color-text-on-tertiary);
+  --ids-color-text-scheme: var(--ids-color-text-tertiary);
+  --ids-color-border-scheme: var(--ids-color-border-tertiary);
+  --ids-state-layer-scheme: var(--ids-color-bg-tertiary);
+  --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
+  --ids-state-layer-scheme-press: var(--ids-state-tint-press);
+}
+
+@utility scheme-success {
+  --ids-color-bg-scheme-subtler: var(--ids-color-bg-success-subtler);
+  --ids-color-bg-scheme-subtle: var(--ids-color-bg-success-subtle);
+  --ids-color-bg-scheme: var(--ids-color-bg-success);
+  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-success-subtler);
+  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-success-subtle);
+  --ids-color-text-on-scheme: var(--ids-color-text-on-success);
+  --ids-color-text-scheme: var(--ids-color-text-success);
+  --ids-color-border-scheme: var(--ids-color-border-success);
+  --ids-state-layer-scheme: var(--ids-color-bg-success);
+  --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
+  --ids-state-layer-scheme-press: var(--ids-state-tint-press);
+}
+
+@utility scheme-warning {
+  --ids-color-bg-scheme-subtler: var(--ids-color-bg-warning-subtler);
+  --ids-color-bg-scheme-subtle: var(--ids-color-bg-warning-subtle);
+  --ids-color-bg-scheme: var(--ids-color-bg-warning);
+  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-warning-subtler);
+  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-warning-subtle);
+  --ids-color-text-on-scheme: var(--ids-color-text-on-warning);
+  --ids-color-text-scheme: var(--ids-color-text-warning);
+  --ids-color-border-scheme: var(--ids-color-border-warning);
+  --ids-state-layer-scheme: var(--ids-color-bg-warning);
+  --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
+  --ids-state-layer-scheme-press: var(--ids-state-tint-press);
+}
+
+@utility scheme-danger {
+  --ids-color-bg-scheme-subtler: var(--ids-color-bg-danger-subtler);
+  --ids-color-bg-scheme-subtle: var(--ids-color-bg-danger-subtle);
+  --ids-color-bg-scheme: var(--ids-color-bg-danger);
+  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-danger-subtler);
+  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-danger-subtle);
+  --ids-color-text-on-scheme: var(--ids-color-text-on-danger);
+  --ids-color-text-scheme: var(--ids-color-text-danger);
+  --ids-color-border-scheme: var(--ids-color-border-danger);
+  --ids-state-layer-scheme: var(--ids-color-bg-danger);
+  --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
+  --ids-state-layer-scheme-press: var(--ids-state-tint-press);
+}
+
+@utility scheme-info {
+  --ids-color-bg-scheme-subtler: var(--ids-color-bg-info-subtler);
+  --ids-color-bg-scheme-subtle: var(--ids-color-bg-info-subtle);
+  --ids-color-bg-scheme: var(--ids-color-bg-info);
+  --ids-color-text-on-scheme-subtler: var(--ids-color-text-on-info-subtler);
+  --ids-color-text-on-scheme-subtle: var(--ids-color-text-on-info-subtle);
+  --ids-color-text-on-scheme: var(--ids-color-text-on-info);
+  --ids-color-text-scheme: var(--ids-color-text-info);
+  --ids-color-border-scheme: var(--ids-color-border-info);
+  --ids-state-layer-scheme: var(--ids-color-bg-info);
+  --ids-state-layer-scheme-hover: var(--ids-state-tint-hover);
+  --ids-state-layer-scheme-press: var(--ids-state-tint-press);
 }
 
 @property --ids-concentric-pad {
@@ -1390,6 +1602,21 @@
   }
 }
 
+@layer base {
+  [data-mode]:not([data-mode] [data-mode]),
+  [data-mode].bg-neutral-subtlest {
+    --ids-bg-current: var(--ids-color-bg-neutral-subtlest);
+  }
+
+  .bg-panel {
+    --ids-bg-current: var(--ids-color-bg-panel);
+  }
+
+  .bg-band {
+    --ids-bg-current: var(--ids-color-bg-band);
+  }
+}
+
 [data-mode] {
   --ids-radius-standard: round(calc(var(--ids-theme-radius-standard, 10px) * var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)), 1px);
   --ids-radius-indicator: round(calc(var(--ids-theme-radius-indicator, 4px) * var(--ids-corner-radius-scale, 1) * var(--ids-scale, 1)), 1px);
@@ -1560,6 +1787,20 @@
   --ids-color-text-on-info: var(--ids-theme-light-text-on-info);
   --ids-color-text-info: var(--ids-theme-light-text-info);
   --ids-color-border-info: var(--ids-theme-light-border-info);
+  --ids-color-bg-panel: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-bg-band: var(--ids-color-bg-neutral-subtler);
+  --ids-color-bg-control-outline: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-border-control-outline: var(--ids-color-border-neutral);
+  --ids-color-bg-field-outline: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-border-field-outline: var(--ids-color-border-neutral);
+  --ids-color-border-field-bar: var(--ids-color-border-neutral);
+  --ids-color-bg-field-code-outline: var(--ids-color-bg-neutral-subtle);
+  --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-bg-qr-code: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-text-qr-code: var(--ids-color-text-neutral-bold);
+  --ids-color-bg-qr-code-inverse: var(--ids-color-bg-neutral-bold);
+  --ids-color-text-qr-code-inverse: var(--ids-color-text-on-neutral-bold);
+  --ids-shadow-panel: var(--ids-shadow-1);
 }
 
 [data-mode="dark"] {
@@ -1632,4 +1873,18 @@
   --ids-color-text-on-info: var(--ids-theme-dark-text-on-info);
   --ids-color-text-info: var(--ids-theme-dark-text-info);
   --ids-color-border-info: var(--ids-theme-dark-border-info);
+  --ids-color-bg-panel: var(--ids-color-bg-neutral-subtler);
+  --ids-color-bg-band: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-bg-control-outline: var(--ids-color-bg-neutral-subtle);
+  --ids-color-border-control-outline: var(--ids-color-bg-neutral);
+  --ids-color-bg-field-outline: var(--ids-color-bg-neutral-subtle);
+  --ids-color-border-field-outline: var(--ids-color-bg-neutral);
+  --ids-color-border-field-bar: var(--ids-color-bg-neutral);
+  --ids-color-bg-field-code-outline: var(--ids-color-bg-neutral-subtler);
+  --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-bold);
+  --ids-color-bg-qr-code: var(--ids-color-bg-neutral-bold);
+  --ids-color-text-qr-code: var(--ids-color-text-on-neutral-bold);
+  --ids-color-bg-qr-code-inverse: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-text-qr-code-inverse: var(--ids-color-text-neutral-bold);
+  --ids-shadow-panel: var(--ids-shadow-0);
 }

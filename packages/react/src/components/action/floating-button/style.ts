@@ -1,4 +1,9 @@
-import { controlSurface, pressStates } from '../../../internal/control-surface';
+import {
+  controlSurface,
+  neutralKeepsThePrimaryRing,
+  pressStates,
+  statusSchemes,
+} from '../../../internal/surfaces/control-surface';
 import { cn, tv } from '../../../utils';
 
 import type { FloatingButton } from '.';
@@ -8,7 +13,7 @@ const opaqueFills = {
   solid: cn(controlSurface.variant.solid, 'shadow-lg'),
   soft: cn(controlSurface.variant.soft),
   outline: cn(
-    'bg-neutral-subtlest text-(--control-quiet) inset-ring-1 inset-ring-neutral',
+    'bg-neutral-subtlest text-neutral-bold inset-ring-1 inset-ring-neutral',
     pressStates,
   ),
   glossy: cn(controlSurface.variant.glossy, 'shadow-lg data-active:shadow-lg'),
@@ -51,6 +56,8 @@ export const floatingButtonStyle = tv({
     } satisfies Record<FloatingButton.Placement, string[]>,
   },
   compoundVariants: [
+    neutralKeepsThePrimaryRing,
+    { colorScheme: statusSchemes, variant: 'outline', class: 'text-scheme' },
     { size: 'standard', iconOnly: true, class: 'size-14' },
     { size: 'tiny', iconOnly: true, class: 'size-11' },
     {

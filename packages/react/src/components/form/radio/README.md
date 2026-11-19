@@ -74,7 +74,7 @@ import { Label, Radio, RadioGroup } from '@gsainfoteam/ids-react';
 ```
 
 - 표시자는 선택되지 않으면 투명해지고, 선택되면 짧게 커지며 나타납니다. `prefers-reduced-motion` 이면 바로 바뀝니다.
-- 표시자 색은 `currentColor` 이고 기본은 `--radio-accent` 입니다.
+- 표시자 색은 `currentColor` 이고 기본은 `text-scheme` 입니다.
 
 ## 상태와 스타일
 
@@ -99,7 +99,7 @@ import { Label, Radio, RadioGroup } from '@gsainfoteam/ids-react';
 | `focused`      | `data-focused`           | 포커스                            |
 | `focusVisible` | `data-focus-visible`     | 키보드 포커스. 포커스 링이 보인다 |
 
-- 선택 색은 `--radio-accent` 입니다. 기본은 primary, 오류면 danger입니다.
+- 선택 색은 `text-scheme` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다.
 
 ## react-hook-form
 

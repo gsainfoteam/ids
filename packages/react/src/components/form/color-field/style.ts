@@ -1,4 +1,4 @@
-import { fieldAction, fieldTrigger } from '../../../internal/field-surface';
+import { fieldAction, fieldTrigger } from '../../../internal/surfaces/field-surface';
 import { cn, tv } from '../../../utils';
 
 import type { ColorFieldVariant } from '.';

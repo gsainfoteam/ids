@@ -1,6 +1,6 @@
 # Color
 
-IDS 색은 세 층입니다. 팔레트(`neutral-50`, 테마의 `primary-600`)는 값일 뿐이고, 시맨틱 역할(`--ids-color-<역할>`)이 팔레트 한 단계를 가리키고, 컴포넌트 토큰(`--control-fill`, `--chip-accent`)이 역할 하나를 가리킵니다. 브랜드 색은 앱이 `IdsProvider theme` 에 준 색에서 오고, 모든 색은 `IdsProvider` 가 붙이는 `data-mode` 에 따라 CSS 가 바꿉니다.
+IDS 색은 네 층입니다. 팔레트(`neutral-50`, 테마의 `primary-600`)는 값일 뿐이고, 시맨틱 역할(`--ids-color-<역할>`)이 팔레트 한 단계를 가리키고, scheme(`bg-scheme`, `text-on-scheme`)이 한 계열의 역할을 가리키고, 컴포넌트 토큰(`bg-panel`, `border-control-outline`)이 모드마다 역할 하나를 가리킵니다. 컴포넌트 토큰은 [ComponentTokens](../component-tokens/README.md) 에 있습니다. 브랜드 색은 앱이 `IdsProvider theme` 에 준 색에서 오고, 모든 색은 `IdsProvider` 가 붙이는 `data-mode` 에 따라 CSS 가 바꿉니다.
 
 ```tsx
 <div className="bg-neutral-subtlest text-neutral-bold">

@@ -1,4 +1,3 @@
-import { primaryFill } from '../../../internal/brand-fill';
 import { tv } from '../../../utils';
 
 import type { StepperOrientation } from './root';
@@ -6,7 +5,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const stepperStyle = tv({
   slots: {
-    root: ['flex w-full flex-col gap-6', primaryFill],
+    root: 'flex w-full flex-col gap-6',
     list: 'flex w-full',
     item: 'flex min-w-0',
     trigger: [
@@ -18,8 +17,8 @@ export const stepperStyle = tv({
       'group-has-[[data-stepper-description]]/stepper-trigger:row-span-2',
       'inline-flex shrink-0 items-center justify-center rounded-full tabular-nums',
       'bg-neutral-subtle text-neutral',
-      'data-completed:bg-(--control-fill) data-completed:text-(--control-on-fill) data-completed:state-fill',
-      'data-current:bg-(--control-fill) data-current:text-(--control-on-fill)',
+      'data-completed:bg-primary data-completed:text-on-primary data-completed:state-fill',
+      'data-current:bg-primary data-current:text-on-primary',
       'data-current:ring-4 data-current:ring-(--ids-color-bg-primary-subtle)',
       'data-error:bg-danger-subtle data-error:text-on-danger-subtle',
       'data-neutral:empty:bg-transparent data-neutral:empty:before:size-2.5',

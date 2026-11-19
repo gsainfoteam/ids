@@ -1,6 +1,5 @@
-import { primaryFill } from '../../../internal/brand-fill';
-import { fieldSurface } from '../../../internal/field-surface';
-import { cn, tv } from '../../../utils';
+import { fieldSurface } from '../../../internal/surfaces/field-surface';
+import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -76,7 +75,7 @@ export const calendarStyle = tv({
     outside: { true: { dayButton: 'text-neutral' } },
     selected: {
       true: {
-        dayButton: cn(primaryFill, 'bg-(--control-fill) font-medium text-(--control-on-fill) state-fill'),
+        dayButton: 'bg-primary font-medium text-on-primary state-fill',
       },
     },
     onBand: { true: {} },
