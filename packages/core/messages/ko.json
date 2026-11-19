@@ -110,6 +110,27 @@
     "close": "닫기",
     "handle": "끌어서 크기 조절"
   },
+  "editor": {
+    "blockType": "문단 모양",
+    "blockquote": "인용",
+    "bold": "굵게",
+    "bubbleMenu": "선택한 글 서식",
+    "bulletList": "글머리 기호 목록",
+    "code": "코드",
+    "codeBlock": "코드 블록",
+    "content": "본문",
+    "heading": "제목 {level}",
+    "italic": "기울임",
+    "link": "링크",
+    "linkApply": "적용",
+    "linkRemove": "링크 지우기",
+    "linkUrl": "링크 주소",
+    "orderedList": "번호 목록",
+    "paragraph": "문단",
+    "strike": "취소선",
+    "toolbar": "서식",
+    "underline": "밑줄"
+  },
   "fileField": {
     "clear": "파일 모두 지우기",
     "count": "파일 {count}개",

@@ -7,7 +7,7 @@ export const dialogStyle = tv({
   slots: {
     backdrop: [
       overlayStyles.backdrop,
-      'duration-(--ids-motion-normal) ease-out data-stacked:bg-transparent',
+      'duration-(--ids-motion-normal) ease-out',
     ],
     content: [
       'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-var(--spacing)*8)] w-[calc(100%-var(--spacing)*8)] max-w-sm flex-col outline-none',
