@@ -60,13 +60,14 @@
 
 ### 색
 
-- 텍스트나 아이콘에 `primary`를 쓰거나, 옅은 brand 배경에 `primary/10`을 쓴 경우. 순서대로 `accent`, `secondary`를 씁니다
-- brand fill 위 글자가 `on-primary`가 아닌 경우, `secondary` 위 글자가 `on-secondary`가 아닌 경우
-- solid brand fill의 hover와 press를 `/90` 같은 투명도로 만든 경우. `--control-fill-hover`, `--control-fill-press`를 씁니다
-- 구조선(필드 테두리, 카드 모서리, Divider, group 경계)에 theme 색을 쓴 경우. `--ids-color-border`가 기본입니다
-- `outline`이나 `ghost` 버튼이 theme 색을 가진 경우
-- 중립 상태가 한 단계씩 오르지 않는 경우: 투명 control은 rest, `muted`, `muted-hover`이고, 채워진 control은 `muted`, `muted-hover`, `muted-active`입니다
-- status 색 글자에 `-strong`이 아닌 색을 쓴 경우
+- 색 역할 이름이 문법(`{bg|text|border}-{계열}[-{세기}]`, `text-on-{계열}[-{세기}]`)을 따르지 않는 경우. `surface`, `soft`, `accent`, `muted`, `-strong` 같은 쓰임새 이름이나 옛 이름은 `ids.css` 에 없어 Tailwind 가 조용히 클래스를 만들지 않습니다
+- 배경 `bg-X[-세기]` 위 글자가 짝인 `text-on-X[-세기]` 가 아닌 경우. neutral 바탕의 본문은 `text-neutral-bold`, 보조 글자는 `text-neutral` 입니다
+- 채움 없이 페이지 위에 놓인 계열 글자나 아이콘에 `bg-X` 의 색이나 `primary/10` 같은 투명도를 쓴 경우. `text-X` 와 `bg-X-subtle` 을 씁니다
+- hover, press 를 색(`hover:bg-neutral-subtle`, `-hover`, `-active`)이나 `/90` 같은 투명도로 만든 경우. `state-layer` 와 `state-hover`, `state-press` 를 쓰고, 채움은 `state-fill` 을 더합니다
+- 색 있는 soft 면, 상태 색의 outline, ghost 가 글자색 층을 쓰는 경우. control-surface 의 `drawsSoftLayer`, `drawsQuietLayer` 처럼 계열 채움 층을 씁니다
+- 구조선(필드 테두리, 카드 모서리, Divider, group 경계)에 theme 색을 쓴 경우. `border-neutral` 이 기본입니다
+- `outline` 이나 `ghost` 버튼이 brand 색을 가진 경우. brand 는 `solid`, `soft` 만 색을 갖습니다
+- 두 토큰을 `color-mix` 로 섞어 새 색을 만든 경우
 
 ### Focus와 테두리
 
