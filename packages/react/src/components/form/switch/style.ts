@@ -17,7 +17,7 @@ export const switchStyle = tv({
       'absolute inset-0 m-0 size-full cursor-pointer appearance-none rounded-full opacity-0 disabled:cursor-not-allowed',
     thumb: [
       'pointer-events-none flex shrink-0 items-center justify-center rounded-full shadow-sm',
-      'bg-surface text-neutral dark:bg-(--ids-color-on-surface)',
+      'bg-neutral-subtlest text-neutral dark:bg-neutral-bold',
       'data-[state=checked]:bg-(--switch-on-accent) data-[state=checked]:text-(--switch-accent)',
       'transition-[translate,background-color] duration-(--ids-motion-fast) motion-reduce:transition-none',
       '[&>svg]:size-3/4',

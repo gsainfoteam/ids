@@ -1,6 +1,7 @@
 import { tv } from '../../../utils';
 
 import type { GroupOrientation } from '.';
+import type { IdsSize } from '../../../tokens/types';
 
 export const groupStyle = tv({
   slots: {
@@ -27,6 +28,7 @@ export const groupStyle = tv({
       },
       false: { root: 'gap-2' },
     },
+    size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
   },
   compoundVariants: [
     {
@@ -59,9 +61,22 @@ export const groupStyle = tv({
         separator: '-my-px',
       },
     },
+    {
+      orientation: 'horizontal',
+      attached: false,
+      class: { separator: 'h-5 min-h-0 self-center' },
+    },
+    {
+      orientation: 'vertical',
+      attached: false,
+      class: { separator: 'w-5 self-center' },
+    },
+    { orientation: 'horizontal', attached: false, size: 'tiny', class: { separator: 'h-4' } },
+    { orientation: 'vertical', attached: false, size: 'tiny', class: { separator: 'w-4' } },
   ],
   defaultVariants: {
     orientation: 'horizontal',
     attached: true,
+    size: 'standard',
   },
 });

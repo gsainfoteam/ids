@@ -11,7 +11,11 @@ const chrome = cn(
   'group-data-swiping/viewer:transition-none',
 );
 
-const floatingSurface = cn('border border-neutral bg-surface text-on-surface shadow-md');
+const roomForTwoCaptionLines = cn(
+  'text-body-b2-medium pt-[calc(--spacing(6)+2lh)] sm:pt-[calc(--spacing(8)+2lh)]',
+);
+
+const floatingSurface = cn('border border-neutral bg-neutral-subtlest text-neutral-bold shadow-md');
 
 export const imageStyle = tv({
   slots: {
@@ -26,26 +30,27 @@ export const imageStyle = tv({
     placeholder: 'absolute inset-0 flex items-center justify-center rounded-none',
     fallback: [
       'flex size-full items-center justify-center gap-2 p-2 text-center',
-      'bg-neutral-soft text-body-b3-regular text-neutral',
+      'bg-neutral-subtle text-body-b3-regular text-neutral',
       '[&_svg]:size-[min(--spacing(6),40%)] [&_svg]:shrink-0',
     ],
     group: 'min-w-0',
     groupItem: 'flex min-w-0',
     backdrop: [
       overlayStyles.backdrop,
-      'touch-none opacity-[var(--image-viewer-presence,1)]',
+      'touch-none bg-neutral-subtlest/95 opacity-[var(--image-viewer-presence,1)]',
       'duration-(--ids-motion-normal) ease-out data-swiping:transition-none',
     ],
     viewer: [
       'group/viewer fixed inset-0 z-50 m-0 grid size-full max-h-none max-w-none overflow-hidden',
-      'grid-cols-1 grid-rows-[auto_minmax(0,1fr)_auto_auto]',
-      'border-0 bg-transparent p-0 text-on-surface outline-none',
+      'grid-cols-1 grid-rows-[minmax(0,1fr)_auto_auto]',
+      'border-0 bg-transparent p-0 text-neutral-bold outline-none',
     ],
-    stage: [slidesLayout.viewport, 'relative col-start-1 row-[1/4] min-h-0'],
+    stage: 'relative col-start-1 row-start-1 min-h-0 overflow-x-clip overflow-y-visible',
     track: slidesLayout.track.horizontal,
     slide: [slidesLayout.slide, 'relative h-full'],
     area: [
-      'flex size-full items-center justify-center p-3 [container-type:size]',
+      'flex size-full items-center justify-center px-3 pb-2 sm:px-6 [container-type:size]',
+      roomForTwoCaptionLines,
       'group-data-ending-style/viewer:pointer-events-none',
     ],
     box: [
@@ -58,32 +63,28 @@ export const imageStyle = tv({
       floatingSurface,
       'flex items-center gap-2 concentric-p-3 text-body-b3-regular [&_svg]:size-5 [&_svg]:shrink-0',
     ],
+    caption: [
+      chrome,
+      'col-start-1 row-start-1 mx-4 mt-4 line-clamp-2 max-w-2xl self-start justify-self-start sm:mx-6 sm:mt-6',
+      'text-body-b2-medium text-neutral-bold',
+      'group-data-zoomed/viewer:pointer-events-none group-data-zoomed/viewer:opacity-0',
+    ],
     toolbar: [
       chrome,
       floatingSurface,
-      'col-start-1 row-start-1 m-3 flex items-center gap-1 self-start justify-self-end concentric-p-1',
+      'col-start-1 row-start-2 mx-3 mb-4 flex max-w-[calc(100%-var(--spacing)*6)] items-center gap-1 justify-self-center concentric-p-1 sm:mb-6',
     ],
-    counter: 'px-2 text-body-b3-medium tabular-nums',
-    prev: [
-      chrome,
-      'col-start-1 row-start-2 ms-3 self-center justify-self-start rtl:[&_svg]:-scale-x-100',
-    ],
-    next: [
-      chrome,
-      'col-start-1 row-start-2 me-3 self-center justify-self-end rtl:[&_svg]:-scale-x-100',
-    ],
-    caption: [
-      chrome,
-      floatingSurface,
-      'col-start-1 row-start-3 mb-3 max-w-[min(--spacing(160),calc(100%-var(--spacing)*6))] justify-self-center',
-      'concentric-p-3 text-center text-body-b3-regular',
-    ],
-    thumbnails: [chrome, 'col-start-1 row-start-4 min-w-0 border-t border-neutral bg-surface'],
-    thumbnailList: 'flex gap-2 p-2 [justify-content:safe_center]',
+    separator: 'mx-1 h-5 min-h-0 self-center',
+    counter: 'px-1.5 text-body-b3-medium whitespace-nowrap tabular-nums',
+    zoomReset: 'min-w-14 px-1.5 tabular-nums',
+    prev: 'rtl:[&_svg]:-scale-x-100',
+    next: 'rtl:[&_svg]:-scale-x-100',
+    thumbnails: [chrome, 'col-start-1 row-start-3 min-w-0 justify-self-center'],
+    thumbnailList: 'flex gap-2 px-3 pt-1 pb-4 [justify-content:safe_center] sm:pb-6',
     thumbnail: [
       'relative size-12 shrink-0 cursor-pointer overflow-hidden rounded-standard focus-ring',
-      'opacity-60 transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'hover:opacity-100 data-current:opacity-100 data-current:ring-2 data-current:ring-(--ids-color-on-surface)',
+      'opacity-50 transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'hover:opacity-100 data-current:opacity-100 data-current:ring-2 data-current:ring-(--ids-color-text-neutral-bold)',
     ],
     thumbnailImage: 'size-full object-cover',
     announcer: 'sr-only',
@@ -95,7 +96,7 @@ export const imageStyle = tv({
       grid: { group: 'grid grid-cols-[repeat(var(--image-columns),minmax(0,1fr))] gap-2' },
     } satisfies Record<ImageGroupLayout, object>,
     painted: {
-      true: { placeholder: 'bg-neutral-soft' },
+      true: { placeholder: 'bg-neutral-subtle' },
       false: {},
     },
   },

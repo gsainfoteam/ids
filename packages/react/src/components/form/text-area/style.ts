@@ -13,7 +13,7 @@ export const textAreaStyle = tv({
       fieldSurface.base,
     ],
     bar: [
-      'flex shrink-0 items-center empty:hidden',
+      'mx-px flex shrink-0 items-center empty:hidden',
       'border-neutral',
       'not-has-[button]:text-neutral',
       '[&_svg]:shrink-0',
@@ -26,16 +26,16 @@ export const textAreaStyle = tv({
     input: [
       'w-full min-w-0 grow resize-none bg-transparent outline-none',
       'text-inherit placeholder:text-neutral',
-      'selection:bg-primary/30 selection:text-on-surface',
+      'selection:bg-primary/30 selection:text-neutral-bold',
       'disabled:cursor-not-allowed',
       'py-(--ids-text-area-pad-y)',
     ],
-    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-on-surface'],
+    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-bold'],
   },
   variants: {
     variant: {
-      outline: { root: fieldSurface.variant.outline },
-      soft: { root: fieldSurface.variant.soft },
+      outline: { root: fieldSurface.variant.outline, bar: 'dark:border-(--ids-color-bg-neutral)' },
+      soft: { root: fieldSurface.variant.soft, bar: 'dark:border-(--ids-color-bg-neutral)' },
       ghost: { root: fieldSurface.variant.ghost },
     } satisfies Record<TextAreaVariant, object>,
     size: {

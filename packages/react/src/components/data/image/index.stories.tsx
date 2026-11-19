@@ -311,7 +311,7 @@ export const Viewer: Story = {
     docs: {
       description: {
         story:
-          '뷰어는 화면을 덮는 모달입니다. ←/→ 로 넘기고(오른쪽에서 왼쪽으로 쓰는 문서에서는 반대), Home/End 로 처음과 끝, `+` `-` `0` 으로 확대, 축소, 원래 크기, Escape 로 닫습니다. 확대한 사진에서는 ←/→ 가 사진을 옮깁니다. 휠과 두 손가락으로 확대하고, 두 번 누르면 확대와 원래 크기를 오갑니다. 원래 크기에서 아래로 쓸어내리면 닫힙니다. 닫으면 누른 사진으로 포커스가 돌아갑니다.',
+          '뷰어는 화면을 덮는 어두운 모달입니다. 설명은 위 왼쪽에, 도구 막대는 아래 가운데에 있습니다. 막대의 백분율은 지금 배율이고, 누르면 화면에 맞춥니다. ←/→ 로 넘기고(오른쪽에서 왼쪽으로 쓰는 문서에서는 반대), Home/End 로 처음과 끝, `+` `-` `0` 으로 확대, 축소, 원래 크기, Escape 로 닫습니다. 확대한 사진에서는 ←/→ 가 사진을 옮깁니다. 휠과 두 손가락으로 확대하고, 두 번 누르면 확대와 원래 크기를 오갑니다. 원래 크기에서 아래로 쓸어내리면 닫힙니다. 닫으면 누른 사진으로 포커스가 돌아갑니다.',
       },
     },
   },
@@ -340,15 +340,10 @@ export const Viewer: Story = {
       expect(canvas.getByRole('button', { name: '축소' })).not.toHaveAttribute('aria-disabled'),
     );
     await userEvent.keyboard('0');
-
-    const thumbnails = canvas.getByRole('group', { name: '사진 목록' });
-    await userEvent.click(within(thumbnails).getByRole('button', { name: '노을 진 산등성이' }));
-    await waitFor(() => expect(canvas.getByText('3 / 6')).toBeInTheDocument());
-    await expect(
-      within(canvas.getByRole('group', { name: '사진 목록' })).getByRole('button', {
-        name: '노을 진 산등성이',
-      }),
-    ).toHaveAttribute('aria-current', 'true');
+    await waitFor(() =>
+      expect(canvas.getByRole('button', { name: '축소' })).toHaveAttribute('aria-disabled', 'true'),
+    );
+    await expect(canvas.queryByRole('group', { name: '사진 목록' })).toBeNull();
   },
 };
 
@@ -360,15 +355,17 @@ export const ComposedViewer: Story = {
           <Image key={photo.id} src={photo.src} alt={photo.alt} caption={photo.caption} ratio={1} />
         ))}
         <Image.Viewer aria-label="풍경 사진 보기">
+          <Image.Viewer.Caption />
           <Image.Viewer.Toolbar>
+            <Image.Viewer.Prev />
             <Image.Viewer.Counter />
+            <Image.Viewer.Next />
+            <Image.Viewer.Separator />
             <Image.Viewer.Share />
             <Image.Viewer.Download />
             <Image.Viewer.Close />
           </Image.Viewer.Toolbar>
-          <Image.Viewer.Prev />
-          <Image.Viewer.Next />
-          <Image.Viewer.Caption />
+          <Image.Viewer.Thumbnails />
         </Image.Viewer>
       </Image.Group>
     </div>
@@ -377,20 +374,28 @@ export const ComposedViewer: Story = {
     docs: {
       description: {
         story:
-          'Image.Group 안에 Image.Viewer 를 두고 그 부품(Image.Viewer.Toolbar, Image.Viewer.Prev 등)을 고르면 그 부품만 그립니다. 도구 막대는 Image.Viewer.Toolbar 안에 Counter, ZoomIn, ZoomOut, Download, Share, Close 를 원하는 순서로 담습니다. Share 는 브라우저가 공유를 지원할 때만 보입니다. `loop` 을 주면 끝에서 처음으로 넘어갑니다.',
+          'Image.Group 안에 Image.Viewer 를 두고 그 부품(Image.Viewer.Caption, Image.Viewer.Toolbar 등)을 고르면 그 부품만 그립니다. 도구 막대는 Image.Viewer.Toolbar 안에 Prev, Counter, Next, ZoomOut, ZoomReset, ZoomIn, Download, Share, Close 와 칸을 나누는 Separator 를 원하는 순서로 담습니다. Image.Viewer.Thumbnails 를 넣으면 도구 막대 아래에 썸네일 줄이 생깁니다. Share 는 브라우저가 공유를 지원할 때만 보입니다. `loop` 을 주면 끝에서 처음으로 넘어갑니다.',
       },
     },
   },
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole('button', { name: '호수 위로 뜬 해 크게 보기' }));
     await canvas.findByRole('dialog', { name: '풍경 사진 보기' });
-    await expect(canvas.queryByRole('group', { name: '사진 목록' })).toBeNull();
     await expect(canvas.queryByRole('button', { name: '확대' })).toBeNull();
     await expect(canvas.getByRole('link', { name: '내려받기' })).toHaveAttribute('download');
 
     await userEvent.keyboard('{ArrowLeft}');
     await waitFor(() => expect(canvas.getByText('6 / 6')).toBeInTheDocument());
     await expect(canvas.getByText('숲')).toBeVisible();
+
+    const thumbnails = canvas.getByRole('group', { name: '사진 목록' });
+    await userEvent.click(within(thumbnails).getByRole('button', { name: '노을 진 산등성이' }));
+    await waitFor(() => expect(canvas.getByText('3 / 6')).toBeInTheDocument());
+    await expect(
+      within(canvas.getByRole('group', { name: '사진 목록' })).getByRole('button', {
+        name: '노을 진 산등성이',
+      }),
+    ).toHaveAttribute('aria-current', 'true');
   },
 };
 

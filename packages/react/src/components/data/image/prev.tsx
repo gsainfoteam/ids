@@ -22,7 +22,6 @@ export function ImageViewerPrev({ className, ...props }: ImageViewerPrevProps) {
       glyph={<ChevronLeftIcon aria-hidden="true" />}
       act={viewer.prev}
       unavailable={!viewer.canPrev}
-      quiet={false}
     />
   );
 }

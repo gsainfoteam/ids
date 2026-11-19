@@ -18,7 +18,6 @@ type Behaviour = {
   glyph: ReactElement;
   act: () => void;
   unavailable?: boolean;
-  quiet: boolean;
 };
 
 export function ViewerButton({
@@ -26,7 +25,6 @@ export function ViewerButton({
   glyph,
   act,
   unavailable = false,
-  quiet,
   icon,
   variant,
   size,
@@ -39,7 +37,7 @@ export function ViewerButton({
       {...rest}
       aria-label={rest['aria-label'] ?? label}
       icon={icon ?? glyph}
-      variant={variant ?? (quiet ? 'ghost' : 'outline')}
+      variant={variant ?? 'ghost'}
       size={size}
       disabled={disabled || unavailable}
       focusableWhenDisabled

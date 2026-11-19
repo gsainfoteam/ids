@@ -21,23 +21,23 @@ export const scrollAreaStyle = tv({
     thumb: [
       'absolute rounded-full bg-neutral/60',
       'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'hover:bg-neutral-hover/75',
-      'group-data-dragging/scrollbar:bg-neutral-active/90',
+      'hover:bg-neutral group-data-dragging/scrollbar:bg-(--ids-color-text-neutral)',
     ],
     corner: 'absolute size-(--scroll-area-thickness) rounded-full',
   },
   variants: {
     variant: {
       auto: {
-        scrollbar: 'hover:bg-neutral-soft/50 data-dragging:bg-neutral-soft/50',
+        scrollbar: 'hover:bg-neutral-subtle/50 data-dragging:bg-neutral-subtle/50',
       },
       hover: {
-        scrollbar: 'hover:bg-neutral-soft/50 data-dragging:bg-neutral-soft/50',
+        scrollbar: 'hover:bg-neutral-subtle/50 data-dragging:bg-neutral-subtle/50',
       },
       always: {
-        scrollbar: 'bg-neutral-soft/50',
-        corner: 'bg-neutral-soft/50',
+        scrollbar: 'bg-neutral-subtle/50',
+        corner: 'bg-neutral-subtle/50',
       },
+      none: {},
     } satisfies Record<ScrollArea.Variant, object>,
     size: {
       standard: {

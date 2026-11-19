@@ -14,7 +14,7 @@ export const colorFieldStyle = tv({
       'disabled:cursor-not-allowed data-readonly:cursor-default',
     ],
     swatch: [
-      'shrink-0 rounded-indicator inset-ring-1 inset-ring-(--ids-color-on-surface)/15',
+      'shrink-0 rounded-indicator inset-ring-1 inset-ring-(--ids-color-text-neutral-bold)/15',
       'data-empty:bg-[linear-gradient(to_top_right,transparent_calc(50%-0.75px),var(--ids-color-bg-danger)_50%,transparent_calc(50%+0.75px))]',
       'data-empty:inset-ring-neutral',
     ],

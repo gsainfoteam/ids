@@ -18,7 +18,7 @@ pnpm --filter @gsainfoteam/ids-react exec vitest run --project node tests/flutte
 | `contrast.dart`         | `contrast.ts`, colorjs.io           | APCA `contrastApca`, Lc 기준(75, 60, 45), 적록 색약 시뮬레이션        |
 | `status.dart`           | `status.ts`                         | 상태 hue 범위, harmonized(primary 쪽 최대 15°), fixed 팔레트          |
 | `derived_brands.dart`   | `derived-brands.ts`                 | 빠진 secondary(채도 1/3), tertiary(+60° 또는 −60°)                   |
-| `theme_roles.dart`      | `theme-roles.ts`                    | 계열마다 fill, soft, 텍스트, 테두리 단계 고르기, neutral, `resolveColors` |
+| `theme_roles.dart`      | `theme-roles.ts`                    | 계열마다 fill, subtler, subtle, 텍스트, 테두리 단계 고르기, state layer 아래 대비, neutral, `resolveColors` |
 | `theme_checks.dart`     | `theme-checks.ts`                   | 브랜드끼리, 브랜드와 상태가 너무 가까운지, 색약에서 danger 와 겹치는지 |
 | `color_distance.dart`   | `color-distance.ts`                 | OKLab 거리 기준값                                                   |
 
@@ -26,5 +26,9 @@ pnpm --filter @gsainfoteam/ids-react exec vitest run --project node tests/flutte
 
 - OKLab 행렬은 culori 4 의 값입니다. Flutter 에 OKLab 보간이 없어 직접 둡니다. 행렬이나 반올림을 바꾸면 경계에 있는 단계가 대비 검사를 다르게 통과합니다.
 - APCA 는 colorjs.io 0.0.98G 상수를 씁니다. WCAG 2 대비는 쓰지 않습니다.
-- fill 의 hover, press 는 글자색 반대쪽(검정 또는 흰색)으로 10%, 20% 섞고, soft 의 hover, press 는 fill 쪽으로 6%, 12% 섞습니다. 모두 OKLab 에서 섞고 8비트로 자릅니다.
+- hover, press 역할은 없습니다. 글자는 쉴 때의 배경과 그 위 state layer 두 겹 아래에서 함께 잽니다.
+  - `withStateLayer(base, layer, opacity)`: `Color.lerp` 로 sRGB 에서 섞고 8비트로 자른다. React 의 `withStateLayer`(culori `rgb` 보간)와 같다.
+  - `underStateLayers(base, content)`: 쉴 때, `IdsStateOpacity.hover`(0.06), `.press`(0.1) 세 배경.
+  - `_firstReadableOn`, `_lowestContrastUnderStateLayers`: React 의 `firstReadableOn`, `lowestContrastUnderStateLayers`.
+- `bgXSubtler` 는 light 에서 팔레트 50, dark 에서 950 을 `bgNeutralSubtlest` 쪽으로 절반 섞은 색입니다(`mixOklab`, OKLab).
 - 입력 색은 먼저 불투명 8비트 sRGB 로 맞춥니다(`parsePalette`). 알파와 P3 는 React 의 CSS 색 파싱처럼 버려집니다.

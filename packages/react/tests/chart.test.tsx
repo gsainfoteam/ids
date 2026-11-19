@@ -113,7 +113,7 @@ test('series take the default order, skip a series with its own color, and an ow
           <BarChart data={[{ name: 'x', a: 1, b: 2, c: 3, d: 4 }]}>
             <XAxis dataKey="name" />
             <Bar dataKey="a" />
-            <Bar dataKey="b" fill="var(--ids-color-bg-neutral-soft)" />
+            <Bar dataKey="b" fill="var(--ids-color-bg-neutral-subtle)" />
           </BarChart>
         </Chart>
       </div>
@@ -131,7 +131,7 @@ test('series take the default order, skip a series with its own color, and an ow
         bar.getAttribute('fill'),
       ),
     )
-    .toEqual(['var(--chart-a)', 'var(--ids-color-bg-neutral-soft)']);
+    .toEqual(['var(--chart-a)', 'var(--ids-color-bg-neutral-subtle)']);
 });
 
 test('more series without a color than the default order is warned about in development', async () => {
@@ -210,7 +210,7 @@ test('areas fade from their series color to transparent, and an own fill wins', 
           <AreaChart data={ROWS}>
             <XAxis dataKey="day" />
             <Area dataKey="web" />
-            <Area dataKey="app" fill="var(--ids-color-bg-neutral-soft)" />
+            <Area dataKey="app" fill="var(--ids-color-bg-neutral-subtle)" />
           </AreaChart>
         </Chart>
       </div>
@@ -223,7 +223,7 @@ test('areas fade from their series color to transparent, and an own fill wins', 
         area.getAttribute('fill'),
       ),
     )
-    .toEqual([expect.stringMatching(/^url\(#.+-fade-web\)$/), 'var(--ids-color-bg-neutral-soft)']);
+    .toEqual([expect.stringMatching(/^url\(#.+-fade-web\)$/), 'var(--ids-color-bg-neutral-subtle)']);
   const fadeId = document.querySelector('.recharts-area-area')!.getAttribute('fill')!.slice(5, -1);
   const stops = [...document.getElementById(fadeId)!.querySelectorAll('stop')].map((stop) =>
     getComputedStyle(stop),

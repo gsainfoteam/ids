@@ -7,12 +7,12 @@ export const dialogStyle = tv({
   slots: {
     backdrop: [
       overlayStyles.backdrop,
-      'duration-(--ids-motion-normal) ease-out data-stacked:bg-transparent',
+      'duration-(--ids-motion-normal) ease-out',
     ],
     content: [
       'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-var(--spacing)*8)] w-[calc(100%-var(--spacing)*8)] max-w-sm flex-col outline-none',
       cornerOfThePaddedViewport,
-      'border border-neutral bg-surface text-on-surface shadow-lg',
+      'border border-neutral bg-neutral-subtlest text-neutral-bold shadow-lg',
       'transition-[opacity,scale] duration-(--ids-motion-normal) ease-out',
       'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
       'data-nested-open:scale-[0.96] motion-reduce:transition-none',

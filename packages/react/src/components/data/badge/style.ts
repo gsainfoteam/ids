@@ -17,50 +17,50 @@ export const badgeStyle = tv({
     colorScheme: {
       neutral: {
         indicator: [
-          '[--badge-accent:var(--ids-color-on-surface)] [--badge-fill:var(--ids-color-on-surface)] [--badge-on-fill:var(--ids-color-surface)] [--badge-text:var(--ids-color-on-surface)]',
-          '[--badge-tint:color-mix(in_oklab,var(--ids-color-on-surface)_16%,var(--ids-color-surface))] [--badge-on-tint:var(--ids-color-on-surface)]',
+          '[--badge-accent:var(--ids-color-text-neutral-bold)] [--badge-fill:var(--ids-color-bg-neutral-bold)] [--badge-on-fill:var(--ids-color-text-on-neutral-bold)] [--badge-text:var(--ids-color-text-neutral-bold)]',
+          '[--badge-tint:var(--ids-color-bg-neutral-subtle)] [--badge-on-tint:var(--ids-color-text-on-neutral-subtle)]',
         ],
       },
       primary: {
         indicator: [
           '[--badge-accent:var(--ids-color-border-primary)] [--badge-fill:var(--ids-color-bg-primary)] [--badge-on-fill:var(--ids-color-text-on-primary)] [--badge-text:var(--ids-color-text-primary)]',
-          '[--badge-tint:var(--ids-color-bg-primary-soft)] [--badge-on-tint:var(--ids-color-text-on-primary-soft)]',
+          '[--badge-tint:var(--ids-color-bg-primary-subtle)] [--badge-on-tint:var(--ids-color-text-on-primary-subtle)]',
         ],
       },
       secondary: {
         indicator: [
           '[--badge-accent:var(--ids-color-border-secondary)] [--badge-fill:var(--ids-color-bg-secondary)] [--badge-on-fill:var(--ids-color-text-on-secondary)] [--badge-text:var(--ids-color-text-secondary)]',
-          '[--badge-tint:var(--ids-color-bg-secondary-soft)] [--badge-on-tint:var(--ids-color-text-on-secondary-soft)]',
+          '[--badge-tint:var(--ids-color-bg-secondary-subtle)] [--badge-on-tint:var(--ids-color-text-on-secondary-subtle)]',
         ],
       },
       tertiary: {
         indicator: [
           '[--badge-accent:var(--ids-color-border-tertiary)] [--badge-fill:var(--ids-color-bg-tertiary)] [--badge-on-fill:var(--ids-color-text-on-tertiary)] [--badge-text:var(--ids-color-text-tertiary)]',
-          '[--badge-tint:var(--ids-color-bg-tertiary-soft)] [--badge-on-tint:var(--ids-color-text-on-tertiary-soft)]',
+          '[--badge-tint:var(--ids-color-bg-tertiary-subtle)] [--badge-on-tint:var(--ids-color-text-on-tertiary-subtle)]',
         ],
       },
       success: {
         indicator: [
           '[--badge-accent:var(--ids-color-border-success)] [--badge-fill:var(--ids-color-bg-success)] [--badge-on-fill:var(--ids-color-text-on-success)] [--badge-text:var(--ids-color-text-success)]',
-          '[--badge-tint:var(--ids-color-bg-success-soft)] [--badge-on-tint:var(--ids-color-text-on-success-soft)]',
+          '[--badge-tint:var(--ids-color-bg-success-subtle)] [--badge-on-tint:var(--ids-color-text-on-success-subtle)]',
         ],
       },
       warning: {
         indicator: [
           '[--badge-accent:var(--ids-color-border-warning)] [--badge-fill:var(--ids-color-bg-warning)] [--badge-on-fill:var(--ids-color-text-on-warning)] [--badge-text:var(--ids-color-text-warning)]',
-          '[--badge-tint:var(--ids-color-bg-warning-soft)] [--badge-on-tint:var(--ids-color-text-on-warning-soft)]',
+          '[--badge-tint:var(--ids-color-bg-warning-subtle)] [--badge-on-tint:var(--ids-color-text-on-warning-subtle)]',
         ],
       },
       danger: {
         indicator: [
           '[--badge-accent:var(--ids-color-border-danger)] [--badge-fill:var(--ids-color-bg-danger)] [--badge-on-fill:var(--ids-color-text-on-danger)] [--badge-text:var(--ids-color-text-danger)]',
-          '[--badge-tint:var(--ids-color-bg-danger-soft)] [--badge-on-tint:var(--ids-color-text-on-danger-soft)]',
+          '[--badge-tint:var(--ids-color-bg-danger-subtle)] [--badge-on-tint:var(--ids-color-text-on-danger-subtle)]',
         ],
       },
       info: {
         indicator: [
           '[--badge-accent:var(--ids-color-border-info)] [--badge-fill:var(--ids-color-bg-info)] [--badge-on-fill:var(--ids-color-text-on-info)] [--badge-text:var(--ids-color-text-info)]',
-          '[--badge-tint:var(--ids-color-bg-info-soft)] [--badge-on-tint:var(--ids-color-text-on-info-soft)]',
+          '[--badge-tint:var(--ids-color-bg-info-subtle)] [--badge-on-tint:var(--ids-color-text-on-info-subtle)]',
         ],
       },
     } satisfies Record<BadgeColorScheme, object>,
@@ -68,7 +68,7 @@ export const badgeStyle = tv({
       solid: { indicator: 'bg-(--badge-fill) text-(--badge-on-fill)' },
       soft: { indicator: 'bg-(--badge-tint) text-(--badge-on-tint)' },
       outline: {
-        indicator: 'bg-surface text-(--badge-text) inset-ring-1 inset-ring-(--badge-accent)/45',
+        indicator: 'bg-neutral-subtlest text-(--badge-text) inset-ring-1 inset-ring-(--badge-accent)/45',
       },
     } satisfies Record<BadgeVariant, object>,
     size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
@@ -102,7 +102,7 @@ export const badgeStyle = tv({
     {
       placement: ['top-end', 'top-start', 'bottom-end', 'bottom-start'],
       class: {
-        indicator: ['pointer-events-none absolute z-10', 'ring-2 ring-surface'],
+        indicator: ['pointer-events-none absolute z-10', 'ring-2 ring-(--ids-color-bg-neutral-subtlest)'],
       },
     },
     {

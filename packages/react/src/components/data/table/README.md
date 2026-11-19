@@ -4,7 +4,7 @@
 
 - **native 시멘틱.** `<table>`, `<thead>`, `<tbody>`, `<tfoot>`, `<tr>`, `<th>`, `<td>`, `<caption>` 그대로라 스크린 리더가 행과 열, 머리글을 스스로 읽습니다.
 - **스크롤은 ScrollArea.** 표는 ScrollArea 안에 들어 있어 넓으면 가로로, 높이를 제한하면 세로로 스크롤하고, OS 막대 대신 IDS 막대를 그립니다.
-- **중립 상태.** 줄무늬, 올렸을 때, 선택된 행은 `bg-neutral-soft` 사다리를 한 칸씩 오릅니다. 브랜드 색을 쓰지 않습니다.
+- **중립 상태.** 줄무늬는 `bg-neutral-subtle`, 올렸을 때와 선택된 행은 글자색 층(`state-hover`, `state-press`)입니다. 브랜드 색을 쓰지 않습니다.
 - **shadcn/ui 구성.** `Table.Header`, `Table.Body`, `Table.Footer`, `Table.Row`, `Table.Head`, `Table.Cell`, `Table.Caption` 입니다.
 
 ```tsx
@@ -46,7 +46,7 @@ import { Table } from '@gsainfoteam/ids-react';
 ## variant와 크기
 
 ```tsx
-<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행은 `bg-neutral-soft`
+<Table variant="outline" />  // 기본. 둥근 테두리 상자, 머리글 행은 `bg-neutral-subtle`
 <Table variant="ghost" />    // 상자 없이 행 구분선만
 <Table size="standard" />    // 기본. 셀 패딩 16px × 10px, 머리글 40px, body b3
 <Table size="tiny" />        // 셀 패딩 12px × 6px, 머리글 32px, caption c1
@@ -55,25 +55,27 @@ import { Table } from '@gsainfoteam/ids-react';
 - 상자 모서리는 `--table-radius`(기본 `rounded-container`, 16px) 입니다. 안쪽 여백이 없는 상자라 concentric 계산을 쓰지 않습니다.
 - 스크롤 영역은 테두리 1px 를 뺀 `--table-radius - 1px` 로 깎습니다. 같은 값이면 채운 머리글 모서리와 테두리 사이로 바탕색이 비칩니다. 모서리를 바꾸려면 `rounded-*` 가 아니라 `[--table-radius:...]` 를 줍니다.
 - 선은 모두 `--ids-color-border-neutral` 입니다. 마지막 행은 아래 선이 없고, `Table.Footer` 는 위 선으로 몸통과 나뉩니다.
-- `outline` 의 머리글 행은 `bg-neutral-soft` 로 채우고 글자는 `text-neutral` 입니다. `ghost` 의 머리글은 채우지 않지만, 붙는 머리글(`stickyHeader`)이 아래 행을 가리도록 배경은 `bg-surface` 입니다.
+- `outline` 의 머리글 행은 `bg-neutral-subtle` 로 채우고 글자는 `text-neutral` 입니다. `ghost` 의 머리글은 채우지 않지만, 붙는 머리글(`stickyHeader`)이 아래 행을 가리도록 배경은 `bg-neutral-subtlest` 입니다.
 
 ## 행 상태
 
 ```tsx
-<Table striped />              // 짝수 행에 `bg-neutral-soft`
-<Table highlightOnHover />     // 몸통 행에 올리면 `bg-neutral-soft`
-<Table.Row selected />         // 선택된 행은 `bg-primary-soft`, 글자 `text-on-primary-soft`
-<Table.Row onClick={open} />   // 올리면 밝아지고 어디를 눌러도 된다(cursor-pointer)
+<Table striped />              // 짝수 행에 `bg-neutral-subtle`
+<Table highlightOnHover />     // 몸통 행에 올리면 `state-hover` 층
+<Table.Row selected />         // 선택된 행은 `bg-primary-subtle`, 글자 `text-on-primary-subtle`
+<Table.Row onClick={open} />   // 올리면 층이 깔리고 어디를 눌러도 된다(cursor-pointer)
 ```
 
-| 행           | 평소              | 올렸을 때                |
-| ------------ | ----------------- | ------------------------ |
-| 기본         | 투명              | `bg-neutral-soft`        |
-| 줄무늬(짝수) | `bg-neutral-soft` | `bg-neutral-soft-hover`  |
-| 선택         | `bg-primary-soft` | `bg-primary-soft-hover`  |
+| 행           | 평소                | 올렸을 때                             |
+| ------------ | ------------------- | ------------------------------------- |
+| 기본         | 투명                | `state-hover`                         |
+| 줄무늬(짝수) | `bg-neutral-subtle` | `bg-neutral-subtle` 위 `state-hover`  |
+| 선택         | `bg-primary-subtle` | `bg-primary-subtle` 위 primary 층(8%) |
 
-- 올렸을 때 색은 `highlightOnHover` 나 `onClick` 이 있는 몸통 행에만 붙습니다. 머리글과 바닥글 행은 바뀌지 않습니다.
-- 선택은 줄무늬보다 앞섭니다. 짝수 행을 골라도 `bg-primary-soft` 입니다.
+- 층은 글자색(`text-neutral-bold`)을 6% 얹은 것이라 줄무늬, 머리글 띠 어느 바탕에서나 보입니다.
+- 선택된 행은 층 색을 `bg-primary` 로, 세기를 `--ids-state-tint-hover` 로 바꿔 올렸을 때 primary 쪽으로 짙어집니다.
+- 올렸을 때 층은 `highlightOnHover` 나 `onClick` 이 있는 몸통 행에만 붙습니다. 머리글과 바닥글 행은 바뀌지 않습니다.
+- 선택은 줄무늬보다 앞섭니다. 짝수 행을 골라도 `bg-primary-subtle` 입니다.
 - `selected` 는 모양과 `data-selected` 만 바꿉니다. `aria-selected` 는 `grid` 역할에서만 뜻이 있어 붙이지 않습니다. 선택은 행 안의 체크박스나 `aria-pressed` 버튼이 알립니다.
 
 ## 누를 수 있는 행
@@ -169,8 +171,8 @@ import { Table } from '@gsainfoteam/ids-react';
 | `variant`          | `outline`(기본) / `ghost`                             |
 | `size`             | `standard`(기본) / `tiny`                             |
 | `layout`           | `auto`(기본) / `fixed`                                |
-| `striped`          | 짝수 몸통 행에 `bg-neutral-soft`                                |
-| `highlightOnHover` | 몸통 행에 올리면 한 단계 진하게                       |
+| `striped`          | 짝수 몸통 행에 `bg-neutral-subtle`                                |
+| `highlightOnHover` | 몸통 행에 올리면 `state-hover` 층                     |
 | `stickyHeader`     | 스크롤해도 머리글 행이 위에 붙는다                    |
 | `className`, `style` | 바깥 스크롤 상자                                    |
 | 그 외 속성         | `<table>`                                             |
@@ -179,7 +181,7 @@ import { Table } from '@gsainfoteam/ids-react';
 | --------------- | ----------- | -------------------------------------- |
 | `Table.Header`  | `<thead>`   | 안의 `Head` 가 열 머리글이 된다        |
 | `Table.Body`    | `<tbody>`   |                                        |
-| `Table.Footer`  | `<tfoot>`   | `bg-neutral-soft` 배경, 위 선                      |
+| `Table.Footer`  | `<tfoot>`   | `bg-neutral-subtle` 배경, 위 선                      |
 | `Table.Row`     | `<tr>`      | `selected`, `onClick`                  |
 | `Table.Head`    | `<th>`      | `align`, `scope`(자동)                 |
 | `Table.Cell`    | `<td>`      | `align`, `colSpan`, `rowSpan`          |

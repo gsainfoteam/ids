@@ -7,11 +7,11 @@ export const tableStyle = tv({
   slots: {
     root: 'w-full max-w-full',
     viewport: 'isolate',
-    table: 'w-full border-separate border-spacing-0 text-on-surface',
+    table: 'w-full border-separate border-spacing-0 text-neutral-bold',
     caption: 'caption-bottom text-start text-neutral',
     header: '',
     body: '',
-    footer: 'bg-neutral-soft',
+    footer: 'bg-neutral-subtle',
     row: 'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
     head: 'border-b border-neutral align-middle whitespace-nowrap',
     cell: 'border-b border-neutral align-middle',
@@ -21,9 +21,9 @@ export const tableStyle = tv({
       outline: {
         root: '[--table-radius:var(--radius-container)] rounded-(--table-radius) border border-neutral',
         viewport: 'rounded-[calc(var(--table-radius)-1px)]',
-        header: 'bg-neutral-soft',
+        header: 'bg-neutral-subtle',
       },
-      ghost: { header: 'bg-surface' },
+      ghost: { header: 'bg-neutral-subtlest' },
     } satisfies Record<TableVariant, object>,
     size: {
       standard: {
@@ -50,15 +50,17 @@ export const tableStyle = tv({
       header: { head: 'text-neutral' },
       body: {
         row: [
-          'data-selected:bg-primary-soft data-selected:text-on-primary-soft',
-          'data-selected:hover:bg-primary-soft-hover',
+          'state-layer',
+          'data-selected:bg-primary-subtle data-selected:text-on-primary-subtle',
+          'data-selected:[--ids-state-color:var(--ids-color-bg-primary)]',
+          'data-selected:[--ids-state-layer-hover:var(--ids-state-tint-hover)]',
           'last:*:border-b-0',
         ],
       },
       footer: { head: 'border-t border-b-0', cell: 'border-t border-b-0' },
     } satisfies Record<TableSection, object>,
     hoverable: {
-      true: { row: 'not-data-selected:hover:bg-neutral-soft' },
+      true: { row: 'hover:state-hover' },
       false: {},
     },
     clickable: {
@@ -72,13 +74,7 @@ export const tableStyle = tv({
     } satisfies Record<TableAlign, object>,
   },
   compoundVariants: [
-    { striped: true, section: 'body', class: { row: 'even:not-data-selected:bg-neutral-soft' } },
-    {
-      striped: true,
-      section: 'body',
-      hoverable: true,
-      class: { row: 'even:not-data-selected:hover:bg-neutral-soft-hover' },
-    },
+    { striped: true, section: 'body', class: { row: 'even:not-data-selected:bg-neutral-subtle' } },
   ],
   defaultVariants: {
     variant: 'outline',

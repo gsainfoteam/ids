@@ -14,7 +14,7 @@ export const linkStyle = tv({
       primary: { root: 'text-primary' },
       secondary: { root: 'text-secondary' },
       tertiary: { root: 'text-tertiary' },
-      neutral: { root: 'text-inherit hover:text-on-surface' },
+      neutral: { root: 'text-inherit hover:text-neutral-bold' },
     },
     underline: {
       always: { root: 'underline decoration-current/40 hover:decoration-current' },

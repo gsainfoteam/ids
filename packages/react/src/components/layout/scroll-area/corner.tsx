@@ -51,7 +51,7 @@ export function ScrollAreaCorner({ className, children, ref, ...props }: ScrollA
       ref={ref}
       aria-hidden="true"
       data-scroll-area-corner=""
-      hidden={c.area.cornerShown ? undefined : true}
+      hidden={c.area.cornerShown && c.variant !== 'none' ? undefined : true}
       className={styles.corner({ className })}
     />
   );

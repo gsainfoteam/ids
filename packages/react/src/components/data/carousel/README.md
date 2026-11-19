@@ -165,7 +165,7 @@ import { Carousel } from '@gsainfoteam/ids-react';
 ```
 
 - `size` 는 이전, 다음, 멈춤 버튼과 점의 크기입니다. 슬라이드 크기는 `slidesPerView` 나 슬라이드의 `className` 이 정합니다.
-- 점은 8px(tiny 6px)이고 누르는 영역은 24px 입니다. 현재 점은 `primary` 색으로 길어지고, 나머지는 `handle` 에서 hover `handle-hover`, 누름 `handle-active` 로 한 단계씩 진해집니다.
+- 점은 8px(tiny 6px)이고 누르는 영역은 24px 입니다. 현재 점은 `primary` 색으로 길어지고, 나머지는 `bg-neutral` 이고 올리거나 누르면 `text-neutral` 색(`bg-(--ids-color-text-neutral)`)으로 진해집니다. 6px 점에서는 글자색 층이 보이지 않아 색을 바꿉니다.
 - 기본 버튼은 Content 위에 겹쳐 그립니다. `outline` 이라 사진 위에서도 보입니다.
 
 ## 상태

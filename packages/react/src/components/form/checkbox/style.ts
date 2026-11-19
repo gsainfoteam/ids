@@ -26,9 +26,9 @@ export const checkboxStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-surface shadow-xs inset-ring-1 inset-ring-neutral dark:bg-neutral-soft/30',
+        root: 'bg-neutral-subtlest shadow-xs inset-ring-1 inset-ring-neutral dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)',
       },
-      soft: { root: 'bg-neutral-soft inset-ring-1 inset-ring-transparent' },
+      soft: { root: 'bg-neutral-subtle inset-ring-1 inset-ring-transparent' },
     } satisfies Record<CheckboxVariant, object>,
     size: {
       standard: { root: 'size-4', indicator: 'size-3.5' },

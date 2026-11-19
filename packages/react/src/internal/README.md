@@ -11,7 +11,7 @@
 | 모듈                                             | 내용                                                                                  | 쓰는 곳                                                                                                                                                                                                               |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`arc.tsx`](#arctsx)                             | 원호 SVG 와 그 치수                                                                   | Spinner, Progress                                                                                                                                                                                                     |
-| [`brand-fill.ts`](#brand-fillts)                 | 브랜드 채움의 hover, press 색. 글자색에서 멀어지는 쪽으로 섞는다                      | `control-surface.ts`(solid), Calendar, TimePicker                                                                                                                                                                     |
+| [`brand-fill.ts`](#brand-fillts)                 | control surface 밖의 primary 채움 변수(`--control-fill`, `--control-on-fill`)         | Calendar, TimePicker, Stepper                                                                                                                                                                                         |
 | [`control-surface.ts`](#control-surfacets)       | 버튼류 컨트롤의 클래스 조각과 color scheme 변수                                       | Button, IconButton, Toggle, IconToggle, FloatingButton                                                                                                                                                                |
 | [`corner-shape.ts`](#corner-shapets)           | 요소 모서리의 `corner-shape` 를 초타원 지수로 읽기, 그 모서리로 자르는 `clip-path`  | `resize-handle/`, ScrollArea, Image, Drawer                                                                                                                                                                                       |
 | [`date-locale.ts`](#date-localets)               | BCP 47 locale 풀이, Intl 로 읽는 시간제, 날짜 순서, 월 이름, 주 시작                  | Calendar, TimePicker, DateField, TimeField, DateTimeField, `temporal-field/`                                                                                                                                          |
@@ -94,37 +94,30 @@ Spinner 와 원형 Progress 가 그리는 원호의 SVG 와 치수입니다.
 
 ## brand-fill.ts
 
-브랜드 채움(흰 글자나 검은 글자가 올라간 테마 색 면)의 hover 와 press 색입니다.
+control surface 밖에서 primary 채움을 그리는 요소에 `--control-fill`, `--control-on-fill` 을 정합니다.
 
-- `primaryFill` 은 `--control-fill`, `--control-on-fill`, `--control-fill-hover`, `--control-fill-press` 를 primary 계열의 토큰(`bg-primary`, `text-on-primary`, `bg-primary-hover`, `bg-primary-active`)으로 정합니다.
-- `fillStatesAwayFromText` 는 토큰이 없는 채움(neutral scheme 의 `on-surface` 채움)에서 같은 상태를 CSS 로 만듭니다.
+- `primaryFill` = `[--control-fill:var(--ids-color-bg-primary)] [--control-on-fill:var(--ids-color-text-on-primary)]`
+- hover 와 press 색은 없습니다. 상태는 요소가 직접 쓰는 state layer 가 그립니다([control-surface.ts](#control-surfacets) 의 `pressStates`).
 
 ### 쓰는 곳
 
-- Calendar 의 선택한 날, TimePicker 의 선택한 옵션, Stepper 의 완료와 현재 단계 표시: `primaryFill`
-- [control-surface.ts](#control-surfacets) 의 neutral scheme: `fillStatesAwayFromText`
+- Calendar 의 선택한 날, TimePicker 의 선택한 옵션, Stepper 의 완료와 현재 단계 표시
 
 ### 쓰는 법
 
 ```ts
 // components/data/time-picker/style.ts
 option: [
+  'state-layer not-data-disabled:hover:state-hover not-data-disabled:active:state-press',
   primaryFill,
   'data-selected:bg-(--control-fill) data-selected:text-(--control-on-fill)',
-  'data-selected:hover:bg-(--control-fill-hover)',
 ],
 ```
 
 ### 왜 이렇게
 
-- hover 는 채움을 글자색의 반대쪽으로 10%, press 는 20% 섞습니다. 흰 글자 아래에서는 검정 쪽, 어두운 글자 아래에서는 흰색 쪽입니다. 그래서 쉬는 때 Lc 75 인 채움은 hover 와 press 에서도 Lc 75 이상입니다.
-- 브랜드와 상태 계열은 이 섞기를 IdsProvider 가 미리 해서 `bg-X-hover`, `bg-X-active` 로 씁니다(`theme-roles.ts` 의 `fillStatesOf`). 그래서 `tokens-contrast.test.ts` 가 그 값을 직접 잴 수 있습니다.
-- `fillStatesAwayFromText` 의 반대쪽 색은 relative color syntax 로 글자색의 밝기에서 고릅니다(`oklch(from var(--control-on-fill) clamp(0, (0.5 - l) * 1000, 1) 0 0)`). 밝기 0.5 를 넘는 글자면 검정, 아니면 흰색입니다.
-- `/90` 으로 흐리면 흰 페이지 위에서 채움이 밝아져 흰 글자의 대비가 떨어집니다.
-
-### 알아둘 것
-
-- 섞는 비율(`FILL_STATES`)을 줄이면 hover 가 눈에 띄지 않고, 반대 방향으로 섞으면 `tests/button.test.tsx` 의 hover 대비 테스트가 17색 x 두 모드에서 실패합니다.
+- 변수 이름을 control surface 와 맞춰서, 선택한 날과 옵션이 solid 버튼과 같은 채움과 글자를 씁니다.
+- `/90` 으로 흐리지 않습니다. 흰 페이지 위에서 채움이 밝아져 흰 글자의 대비가 떨어집니다.
 
 ## control-surface.ts
 
@@ -138,7 +131,7 @@ option: [
 | Toggle         | `base`, `size`, `colorScheme`. variant 는 [toggle-surface.ts](#toggle-surfacets) |
 | IconButton     | `base`, `variant`, `colorScheme`. 크기는 [icon-square.ts](#icon-squarets)        |
 | IconToggle     | `base`, `colorScheme`. variant 는 toggle-surface, 크기는 icon-square             |
-| FloatingButton | `base`, `colorScheme`. variant 는 자기 `opaqueFills`                             |
+| FloatingButton | `base`, `colorScheme`. variant 는 자기 `opaqueFills`(outline 은 `pressStates`)   |
 
 ### 쓰는 법
 
@@ -168,28 +161,36 @@ export const iconToggleStyle = tv({
 
 ### 왜 이렇게
 
-- color scheme 은 CSS 변수만 정하고 variant 는 그 변수만 읽습니다. variant 5 개와 scheme 6 개의 조합마다 클래스를 따로 쓰지 않아도 모든 조합이 맞습니다.
+- color scheme 은 CSS 변수만 정하고 variant 는 그 변수만 읽습니다. variant 와 scheme 의 조합마다 클래스를 따로 쓰지 않아도 모든 조합이 맞습니다.
 
-| 변수                   | 쓰는 곳                                                                                            |
-| ---------------------- | -------------------------------------------------------------------------------------------------- |
-| `--control-fill`       | solid, glossy 배경. soft 의 hover, press 가 섞어 드는 색                                           |
-| `--control-on-fill`    | solid, glossy 배경 위의 글자                                                                       |
-| `--control-soft`       | soft 배경과 켜진 soft toggle. 계열의 `bg-X-soft`                                                   |
-| `--control-on-soft`    | soft 글자. 계열의 `text-on-X-soft`                                                                 |
-| `--control-soft-hover` | soft 의 hover 배경. 계열의 `bg-X-soft-hover`                                                       |
-| `--control-soft-press` | soft 의 press 배경. 계열의 `bg-X-soft-active`                                                      |
-| `--control-quiet`      | outline, ghost 글자. 브랜드와 neutral 은 `on-surface`, 상태는 `text-X`                              |
-| `--control-on-press`   | 켜진 outline, ghost toggle 글자. 브랜드와 neutral 은 `on-surface`, 상태는 `text-on-X-soft`          |
-| `--control-hover`      | outline, ghost 의 hover 배경. 브랜드와 neutral 은 `bg-neutral-soft`, 상태는 `bg-X-soft`             |
-| `--control-press`      | outline, ghost 의 press 배경과 켜진 ghost, outline toggle. 한 단계 위(`-soft-hover`)               |
-| `--control-ring`       | focus ring 과 focus 때의 테두리. 계열의 `border-X`, neutral 은 `border-primary`                    |
-| `--control-glyph-on`   | 켜진 transparent IconToggle 의 아이콘. 계열의 `text-X`, neutral 은 `on-surface`                    |
+| 변수                 | 쓰는 곳                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------- |
+| `--control-fill`     | solid, glossy 배경. 계열의 `bg-X`, neutral 은 `bg-neutral-bold`                          |
+| `--control-on-fill`  | solid, glossy 배경 위의 글자. 계열의 `text-on-X`, neutral 은 `text-on-neutral-bold`      |
+| `--control-soft`     | soft 배경과 켜진 soft toggle. 계열의 `bg-X-subtle`                                       |
+| `--control-on-soft`  | soft 글자. 계열의 `text-on-X-subtle`                                                     |
+| `--control-quiet`    | outline, ghost, transparent 글자. 브랜드와 neutral 은 `text-neutral-bold`, 상태는 `text-X` |
+| `--control-ring`     | focus ring 과 focus 때의 테두리. 계열의 `border-X`, neutral 은 `border-primary`          |
+| `--control-glyph-on` | 켜진 transparent IconToggle 의 아이콘. 계열의 `text-X`, neutral 은 `text-neutral-bold`   |
 
-- outline 과 ghost 는 중립 상태 사다리를 따릅니다. hover 는 `--control-hover`, press 는 한 단계 진한 `--control-press` 입니다. solid 는 [brand-fill.ts](#brand-fillts) 의 `--control-fill-hover`, `--control-fill-press` 라 사다리 밖이고, glossy 는 색 대신 광택과 그림자로 상태를 보입니다.
-- soft 는 `bg-X-soft` 위 `text-on-X-soft` 짝입니다. hover 와 press 는 IdsProvider 가 배경에 채움 색을 6%, 12% 섞어 둔 `bg-X-soft-hover`, `bg-X-soft-active` 입니다. `text-on-X-soft` 는 이 두 배경에서도 Lc 75 를 지키는 단계라, `SOFT_TINTS` 를 올리면 `tests/tokens-contrast.test.ts` 가 실패합니다.
+- hover 와 press 색 변수는 없습니다. solid, soft, outline, ghost 는 모두 `pressStates`(`state-layer data-hovered:state-hover data-active:state-press`)를 씁니다.
+  - solid 는 `state-fill` 을 더합니다. 층이 검정 hover 10%, press 18% 라 채움이 같은 색의 진한 쪽으로 갑니다.
+  - soft 는 `drawsSoftLayer`, outline 과 ghost 는 `drawsQuietLayer` 로 scheme 이 정한 층을 그립니다. scheme 마다 `--control-soft-layer`, `--control-quiet-layer` 와 그 `-hover`, `-press` 를 둡니다.
+
+    | scheme | soft 층 | outline, ghost 층 |
+    | --- | --- | --- |
+    | primary, secondary, tertiary | 계열 채움 8% / 12% | 글자색 6% / 10% |
+    | neutral | 글자색 6% / 10% | 글자색 6% / 10% |
+    | danger, success, warning, info | 계열 채움 8% / 12% | 계열 채움 8% / 12% |
+
+  - 계열 채움 층은 빨간 버튼이 hover 때 거뭇해지지 않고 더 붉어지게 합니다. 글자색 층이었을 때는 진한 글자색이 섞여 탁해졌습니다.
+  - IdsProvider 가 이 층들 아래에서도 글자 대비를 지키는 단계를 고릅니다(`theme-roles.ts` 의 `underStateLayers`). `tests/tokens-contrast.test.ts` 가 확인합니다.
+  - `base` 의 `transition-[…]` 에 `--ids-state-opacity` 가 있어 층이 다른 색과 함께 바뀝니다.
+- outline 은 `bg-neutral-subtlest` 에 `inset-ring-neutral`, 어두운 모드는 `dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)`(800 면, 700 테두리)입니다. 900 띠 위에서도 띠보다 밝고 테두리가 보입니다.
+- soft 는 `bg-X-subtle` 위 `text-on-X-subtle` 짝입니다.
 - scheme 은 primary, secondary, tertiary, neutral, danger, success, warning, info 입니다. 테마가 secondary 나 tertiary 를 주지 않아도 IdsProvider 가 primary 에서 만든 값을 쓰므로 변수는 늘 정의됩니다.
-- `glossy` 는 solid 의 채움(`--control-fill`) 위에 층을 얹습니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택(`background-image` 라 채움 색 위에 그려진다), 안쪽 위 1px 하이라이트(`inset-shadow`), 채움보다 20% 진한 가장자리(`inset-ring` 의 `color-mix`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다. focus 때는 `ringFollowsScheme` 이 가장자리를 `--control-ring` 으로 바꿉니다. outline 과 같은 방식입니다.
-- `transparent` 는 어느 상태에서도 배경을 칠하지 않습니다. 쉴 때 글자는 ghost 와 같은 `--control-quiet`, hover 는 `opacity-70`, press 는 `opacity-40` 입니다. 그래서 `transition` 에 `opacity` 를 더합니다. 글자 색으로 hover 를 보이면 이미 `on-surface` 인 브랜드와 neutral scheme 에서 아무것도 바뀌지 않으므로, 모든 scheme 이 불투명도로 반응합니다.
+- `glossy` 는 state layer 를 쓰지 않습니다. `state-layer` 가 `background-image` 를 차지하는데 glossy 의 광택도 `background-image` 입니다. solid 의 채움(`--control-fill`) 위에 층을 얹습니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택(`background-image` 라 채움 색 위에 그려진다), 안쪽 위 1px 하이라이트(`inset-shadow`), 채움보다 20% 진한 가장자리(`inset-ring` 의 `color-mix`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다. focus 때는 `ringFollowsScheme` 이 가장자리를 `--control-ring` 으로 바꿉니다. outline 과 같은 방식입니다.
+- `transparent` 는 어느 상태에서도 배경을 칠하지 않습니다. 쉴 때 글자는 ghost 와 같은 `--control-quiet`, hover 는 `opacity-70`, press 는 `opacity-40` 입니다. 그래서 `transition` 에 `opacity` 를 더합니다. 배경을 칠하지 않으므로 state layer 도 쓰지 않고, 모든 scheme 이 불투명도로 반응합니다.
 - `SurfaceVariant` 는 `transparent` 를 뺀 variant 입니다. Toggle, Group(ToggleGroup 포함), Pagination, Tabs, Carousel 과 Image 의 버튼이 받습니다. 배경 없이 글자 색만 바뀌는 상태를 이 컴포넌트들에 들이지 않기 위해서입니다.
 - scheme 색은 solid, soft, glossy 만 씁니다. outline 과 ghost 는 primary 에서도 neutral 이고, 브랜드 색은 focus 에 남깁니다. shadcn/ui 가 primary 버튼 옆의 보조 버튼을 조용하게 두는 방식입니다.
 - `base` 에는 primary 의 변수를 담은 `fallbackScheme` 이 들어 있습니다. `colorScheme` 을 받지 않는 컴포넌트도 scheme 변수가 모두 정의돼야 하기 때문입니다. `colorScheme` 을 주면 `cn` 이 같은 변수의 뒤쪽 값만 남깁니다.
@@ -375,7 +376,8 @@ size: {
 
 ### 왜 이렇게
 
-- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 테두리와 surface 배경, `soft` 는 `bg-neutral-soft` 배경, `ghost` 는 배경과 테두리가 없습니다.
+- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 `inset-ring-neutral` 테두리와 `bg-neutral-subtlest` 배경(어두운 모드는 `dark:bg-neutral-subtle` 배경에 `bg-neutral` 테두리), `soft` 는 `bg-neutral-subtle` 배경, `ghost` 는 배경과 테두리가 없습니다.
+- 글자는 `text-neutral-bold` 입니다. 상자 안 버튼(`fieldAction`)은 `text-neutral` 에서 hover, press, 켜짐에 `text-neutral-bold` 로 바뀝니다.
 - focus 와 invalid 색은 여기서 정하지 않습니다. `focus-ring` 이 이 파일이 그린 `inset-ring` 테두리의 색을 바꾸므로 그 상태를 되풀이해 적지 않습니다.
 - `soft` 와 `ghost` 도 투명한 `inset-ring-1` 을 그립니다. `focus-ring` 은 inset ring 의 색만 바꾸므로, 폭이 있는 inset ring 이 있어야 focus 와 invalid 테두리가 보입니다.
 - `fieldAction` 은 상자 안의 버튼(Clear, 보기 버튼, stepper, 달력 버튼)입니다. standard 는 36px 상자에 28px(`size-7`), tiny 는 32px 상자에 24px(`size-6`)라서 위아래로 4px 씩 남습니다. 양 끝의 버튼도 테두리에서 4px 떨어지도록 geometry 가 두 가지입니다.
@@ -705,8 +707,9 @@ slots: {
 
 ### 왜 이렇게
 
-- 옵션 강조는 메뉴처럼 neutral hover 단계인 `bg-neutral-soft` 배경(`data-highlighted`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
-- 옵션에는 누르는 상태가 없어 강조가 한 단계뿐입니다. Menu 에서 하위 메뉴가 열린 항목(`data-popup-open`)은 켜진 toggle 처럼 press 단계(`bg-neutral-soft-hover`)라, 포인터가 하위 메뉴로 옮겨 가도 강조된 항목과 구별됩니다.
+- 옵션 강조(`data-highlighted`)는 hover state layer(`state-layer data-highlighted:state-hover`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
+- 옵션에는 누르는 상태가 없어 강조가 한 단계뿐입니다. Menu 에서 하위 메뉴가 열린 항목(`data-popup-open`)도 `state-hover` 라, 포인터가 하위 메뉴로 옮겨 가도 강조가 남습니다(`overlay/menu/style.ts`).
+- 층은 글자색으로 덮으므로 팝업 배경이 무엇이든 같은 세기로 보입니다.
 - 옵션은 체크가 없어도 끝 padding(`pe-8`)을 비워 둡니다. 체크가 나타날 때 라벨이 밀리지 않습니다.
 - `list` 는 옵션의 스크롤 컨테이너입니다. 키보드 이동이 팝업이 아니라 이 목록을 스크롤합니다. `relative` 라 옵션의 offset parent 입니다(`offsetParentOfOptions`). field-popup 의 `revealPopupOption` 이 옵션 위치를 `offsetTop` 으로 읽습니다.
 - `listArea` 는 목록을 감싸는 `ScrollArea` 의 root 이고, `list` 는 `ScrollArea.Viewport asChild` 로 listbox 자신이 스크롤 요소가 됩니다. 옵션과 listbox 사이에 요소가 끼지 않아 위의 offset parent 와 `scrollTop` 이 그대로입니다.
@@ -914,7 +917,7 @@ searchChunks('Café ＧＩＳＴ', ['cafe', 'gist']);
 
 ```tsx
 // components/form/slider/style.ts
-track: [sliderSurface.edge, 'relative rounded-full bg-neutral-soft'],
+track: [sliderSurface.edge, 'relative rounded-full bg-neutral-subtle'],
 thumb: [
   sliderSurface.thumb,
   'group/thumb absolute block size-(--slider-thumb)',
@@ -946,7 +949,7 @@ thumb: [
 ### 쓰는 곳
 
 - Carousel: 모두. `root.tsx` 가 `useSlides`, `moveWithKeys`, `SlidesAnnouncer` 를, `style.ts` 가 `slidesLayout` 을 씁니다.
-- Image 의 뷰어(`components/data/image/viewer-layer.tsx`): 전체 화면 레이어 안에서 `useSlides`, `SlidesAnnouncer`, `slidesLayout`. "2 / 6" 은 `Image.Viewer.Counter` 가 그리므로 `counter` 를 켜지 않습니다. 확대 중에는 방향키가 사진을 옮기므로 키는 자기 `keyHandler` 로 받고 `moveWithKeys` 를 싣지 않습니다. 확대 중에는 `watchDrag` 가 끌기를 막고, 두 번째 손가락이 닿거나 아래로 쓸기 시작하면 `cancelDrag()` 로 끌던 트랙을 돌려놓습니다.
+- Image 의 뷰어(`components/data/image/viewer-layer.tsx`): 전체 화면 레이어 안에서 `useSlides`, `SlidesAnnouncer`, `slidesLayout` 의 `track` 과 `slide`. 영역은 `slidesLayout.viewport` 대신 `overflow-x-clip overflow-y-visible` 이라, 확대한 사진이 위의 설명과 아래 도구 막대 쪽으로 넘쳐 보입니다(`overflow-hidden` 이면 그 경계에서 잘린다). "2 / 6" 은 `Image.Viewer.Counter` 가 그리므로 `counter` 를 켜지 않습니다. 확대 중에는 방향키가 사진을 옮기므로 키는 자기 `keyHandler` 로 받고 `moveWithKeys` 를 싣지 않습니다. 확대 중에는 `watchDrag` 가 끌기를 막고, 두 번째 손가락이 닿거나 아래로 쓸기 시작하면 `cancelDrag()` 로 끌던 트랙을 돌려놓습니다.
 
 ### 쓰는 법
 
@@ -1183,24 +1186,25 @@ export const toggleStyle = tv({
 
 | variant            | 켜짐(`data-pressed`)                                                     |
 | ------------------ | ------------------------------------------------------------------------ |
-| `ghost`, `outline` | press 배경(`--control-press`)과 `--control-on-press` 글자                 |
+| `ghost`, `outline` | press state layer(`data-pressed:state-press`). 글자는 그대로 `--control-quiet` |
 | `soft`             | `--control-soft` 배경과 `--control-on-soft` 글자                         |
 | `solid`            | scheme 배경과 `--control-on-fill` 글자, `shadow-xs`                      |
 | `glossy`           | scheme 배경과 `--control-on-fill` 글자, 광택, 진한 가장자리, `shadow-sm` |
 | `transparent`      | 배경 없이 아이콘만 `--control-glyph-on`. IconToggle 만                   |
 
 - 색은 [control-surface.ts](#control-surfacets) 의 scheme 변수에서 옵니다.
+- 꺼진 동안의 hover 와 press 는 모든 variant 가 state layer(`state-hover`, `state-press`)입니다. 켜진 동안에는 `data-hovered`, `data-active` 가 붙지 않으므로 층이 켜진 모양을 바꾸지 않습니다.
 - `transparent` 는 `glyphVariant` 에만 있습니다. 글자 Toggle 이 배경 없이 색만 바꾸면 켜짐을 색으로만 알리게 됩니다. IconToggle 은 `icon` 함수로 채운 아이콘을 바꿀 수 있습니다.
-- 꺼진 `transparent` 는 scheme 과 상관없이 `text-on-surface` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered), `transparent` 는 `useToggle` 이 켜진 동안에만 붙이는 `data-pressed-hovered`, `data-pressed-active` 로 불투명도를 내립니다. 다른 variant 는 이 속성을 읽지 않으므로 켜진 모양이 hover 와 press 에도 그대로입니다.
-- 켜진 `ghost`, `outline` 의 글자는 `--control-on-press` 입니다. 브랜드와 neutral scheme 은 press 배경이 중립이라 `on-surface`, 상태 scheme 은 press 배경이 `bg-X-soft-hover` 라 `text-on-X-soft` 입니다. `text-X` 는 바탕과 `bg-X-soft` 에서만 Lc 60 이 보장되므로, 밝은 warning 은 soft-hover 위에서 모자랍니다.
+- 꺼진 `transparent` 는 scheme 과 상관없이 `text-neutral-bold` 입니다. ghost 처럼 상태 scheme 에서 `text-X` 를 쓰면 `colorScheme="danger"` 하트가 꺼져서도 빨갛습니다. 켜진 동안은 `data-hovered` 와 `data-active` 가 붙지 않으므로(pressed > active > hovered), `transparent` 는 `useToggle` 이 켜진 동안에만 붙이는 `data-pressed-hovered`, `data-pressed-active` 로 불투명도를 내립니다. 다른 variant 는 이 속성을 읽지 않으므로 켜진 모양이 hover 와 press 에도 그대로입니다.
+- 켜진 `ghost`, `outline` 은 색 있는 배경을 칠하지 않고 press 층만 남깁니다. 층은 control-surface 의 quiet 층이라 상태 scheme 에서는 계열 채움 12%, 나머지는 글자색 10% 이고, `text-X` 는 그 층 아래에서도 Lc 60 을 지킵니다(IdsProvider 가 확인). 켜진 soft 는 soft 층, 켜진 solid 는 `state-fill` 입니다.
 - 켜진 `glossy` 는 control-surface 의 `glossy` 층을 `data-pressed:` 로 하나씩 풀어 적습니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 접두사를 붙여 조합할 수 없습니다.
 - 크기는 따로 두지 않습니다. 라벨이 있는 Toggle 은 Button 과 같은 padding 을 갖고, IconToggle 은 icon-square 로 정사각형이 됩니다.
 - hovered, active, pressed 를 각각 적습니다. `interactiveDataProps` 가 셋 중 하나만 붙이므로(pressed > active > hovered), 켜진 toggle 에 마우스를 올려도 켜진 모양이 유지됩니다.
-- 켜진 ghost, outline 과 누르는 동안(`data-active`)은 press 단계(`--control-press`)이고, hover(`--control-hover`)보다 한 단계 진합니다. 그래서 켜진 toggle 이 hover 한 꺼진 toggle 과 구별됩니다.
+- 켜진 ghost, outline 과 누르는 동안(`data-active`)은 `state-press` 이고, hover(`state-hover`)보다 진합니다. 그래서 켜진 toggle 이 hover 한 꺼진 toggle 과 구별됩니다.
 
 ### 알아둘 것
 
-- 꺼진 outline 은 `bg-transparent` 입니다. Button 의 outline(`bg-surface`)과 다릅니다.
+- 꺼진 outline 은 `bg-transparent` 입니다. Button 의 outline(`bg-neutral-subtlest`)과 다릅니다.
 
 ## translate.ts
 

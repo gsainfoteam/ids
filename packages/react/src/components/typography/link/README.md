@@ -27,7 +27,7 @@ import { Link } from '@gsainfoteam/ids-react';
 <Link colorScheme="primary" />    // 기본. 브랜드 글자색(text-primary)
 <Link colorScheme="secondary" />  // text-secondary, 테마에 없으면 primary 에서 만든 색
 <Link colorScheme="tertiary" />   // text-tertiary, 테마에 없으면 primary 에서 만든 색
-<Link colorScheme="neutral" />    // 둘레 글자색을 따르고, 가리키면 on-surface
+<Link colorScheme="neutral" />    // 둘레 글자색을 따르고, 가리키면 text-neutral-bold
 ```
 
 - 브랜드 색은 채우기(`bg-primary`)가 아니라 글자 역할(`text-primary`)을 씁니다. 모든 테마에서 바탕과 APCA Lc 60 을 넘습니다.

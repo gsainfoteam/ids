@@ -14,7 +14,7 @@ export const dataTableStyle = tv({
     cell: '',
     sortButton: [
       'group/sort -mx-2 w-[calc(100%+1rem)] justify-between gap-2 px-2 text-inherit',
-      'data-hovered:text-on-surface data-active:text-on-surface',
+      'data-hovered:text-neutral-bold data-active:text-neutral-bold',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2',
     ],
@@ -32,34 +32,28 @@ export const dataTableStyle = tv({
       'absolute inset-y-0 end-0 z-10 flex w-3 translate-x-1/2 cursor-col-resize justify-center rounded-full rtl:-translate-x-1/2',
       'before:h-full before:w-0.5 before:rounded-full before:bg-transparent',
       'before:transition-colors before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
-      'hover:before:bg-neutral-hover focus-visible:before:bg-neutral-active',
-      'data-resizing:before:bg-neutral-active',
+      'hover:before:bg-(--ids-color-text-neutral) focus-visible:before:bg-(--ids-color-text-neutral)',
+      'data-resizing:before:bg-(--ids-color-text-neutral)',
     ],
     selectCell: 'w-0 whitespace-nowrap [&>[data-checkbox]]:flex',
     message: 'h-24 text-center text-neutral',
-    overlay: 'absolute inset-0 z-20 flex items-center justify-center bg-surface/60',
+    overlay: 'absolute inset-0 z-20 flex items-center justify-center bg-neutral-subtlest/60',
     spinner: 'size-6 text-neutral',
     footer: 'flex flex-wrap items-center justify-between gap-3',
     summary: 'text-neutral',
     pagination: 'ms-auto',
-    pageStep: '',
     page: 'min-w-16 px-1 text-center whitespace-nowrap tabular-nums',
   },
   variants: {
     variant: {
       outline: {
-        root: 'concentric-p-1 bg-neutral-soft',
-        table: '[--table-radius:var(--radius-standard)] bg-surface shadow-xs',
-        header:
-          '[--data-table-header:color-mix(in_oklab,var(--ids-color-bg-neutral-soft),var(--ids-color-surface))] bg-(--data-table-header)',
+        root: 'concentric-p-1 bg-neutral-subtle',
+        table: '[--table-radius:var(--radius-standard)] bg-neutral-subtlest shadow-xs',
+        header: 'bg-neutral-subtler',
         head: 'not-last:border-e not-last:border-neutral',
         cell: 'not-last:border-e not-last:border-neutral',
-        sortButton:
-          '[--control-hover:var(--ids-color-bg-neutral-soft-hover)] [--control-press:var(--ids-color-bg-neutral-soft-active)]',
         overlay: 'rounded-standard',
         footer: 'gap-2 ps-3 pe-1 pt-1',
-        pageStep:
-          '[--control-hover:var(--ids-color-bg-neutral-soft-hover)] [--control-press:var(--ids-color-bg-neutral-soft-active)]',
       },
       ghost: {
         root: 'gap-3',

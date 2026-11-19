@@ -19,7 +19,7 @@ export const textControlStyle = tv({
     input: [
       'h-full w-full min-w-0 flex-1 bg-transparent outline-none',
       'text-inherit placeholder:text-neutral',
-      'selection:bg-primary/30 selection:text-on-surface',
+      'selection:bg-primary/30 selection:text-neutral-bold',
       'disabled:cursor-not-allowed',
       '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none',
       '[&::-ms-clear]:hidden [&::-ms-reveal]:hidden',

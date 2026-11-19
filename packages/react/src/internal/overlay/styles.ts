@@ -8,12 +8,13 @@ export const overlayStyles = {
     'fixed z-50 m-0 flex flex-col outline-none',
     cornerOfThePaddedViewport,
     borderOptionsCannotCover,
-    'bg-surface text-on-surface',
+    'bg-neutral-subtlest text-neutral-bold',
     'text-body-b3-regular shadow-md',
   ),
   backdrop: cn(
     'fixed inset-0 z-50 m-0 size-full max-h-none max-w-none border-0 p-0',
-    'bg-black/50 transition-opacity starting:opacity-0 data-ending-style:opacity-0',
+    'bg-black/40 backdrop-blur-xs data-stacked:bg-transparent data-stacked:backdrop-blur-none',
+    'transition-opacity starting:opacity-0 data-ending-style:opacity-0',
     'motion-reduce:transition-none',
   ),
 } as const;

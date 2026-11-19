@@ -51,6 +51,7 @@ export default defineConfig({
       entry: {
         index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         chart: fileURLToPath(new URL('./src/chart.ts', import.meta.url)),
+        editor: fileURLToPath(new URL('./src/editor.ts', import.meta.url)),
         'react-hook-form': fileURLToPath(new URL('./src/react-hook-form.tsx', import.meta.url)),
         'tanstack-form': fileURLToPath(new URL('./src/tanstack-form.tsx', import.meta.url)),
       },
