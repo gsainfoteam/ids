@@ -2,7 +2,7 @@
   "component": {
     "bg-panel":               { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-subtler" } },
     "shadow-panel":           { "$type": "component", "$value": { "light": "{shadow.1}", "dark": "{shadow.0}" } },
-    "bg-band":                { "$type": "component", "$value": { "light": "bg-neutral-subtler", "dark": "bg-neutral-subtlest" } },
+    "bg-band":                { "$type": "component", "$value": { "light": "bg-neutral-subtler", "dark": "bg-neutral-subtle" } },
     "bg-control-outline":     { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-subtle" } },
     "border-control-outline": { "$type": "component", "$value": { "light": "border-neutral", "dark": "bg-neutral" } },
     "bg-field-outline":       { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-subtle" } },

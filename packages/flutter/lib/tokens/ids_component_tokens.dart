@@ -33,7 +33,7 @@ abstract final class IdsComponentTokens {
     },
     IdsMode.dark: {
       'bg-panel': 'bg-neutral-subtler',
-      'bg-band': 'bg-neutral-subtlest',
+      'bg-band': 'bg-neutral-subtle',
       'bg-control-outline': 'bg-neutral-subtle',
       'border-control-outline': 'bg-neutral',
       'bg-field-outline': 'bg-neutral-subtle',

@@ -8,7 +8,7 @@ export const IDS_SHADOWS = {
 
 export const IDS_COMPONENT_COLORS = {
   'bg-panel': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-subtler' },
-  'bg-band': { light: 'bg-neutral-subtler', dark: 'bg-neutral-subtlest' },
+  'bg-band': { light: 'bg-neutral-subtler', dark: 'bg-neutral-subtle' },
   'bg-control-outline': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-subtle' },
   'border-control-outline': { light: 'border-neutral', dark: 'bg-neutral' },
   'bg-field-outline': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-subtle' },

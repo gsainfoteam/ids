@@ -49,7 +49,7 @@ neutral 만 가지는 역할입니다.
 | --- | --- | --- | --- |
 | `bg-neutral-subtlest` / `text-on-neutral-subtlest` | 0 / 900 | 950 / 50 | 페이지, 팝업, 카드 |
 | `bg-neutral-subtler` / `text-on-neutral-subtler` | 50 / 900 | 900 / 50 | 표 머리. light 의 `bg-band`, dark 의 `bg-panel` |
-| `bg-neutral-subtle` | 100 | 800 | soft 컨트롤, 흐린 행 |
+| `bg-neutral-subtle` | 100 | 800 | soft 컨트롤, 흐린 행. dark 의 outline 컨트롤과 `bg-band` |
 | `bg-neutral` | 300 | 700 | 손잡이, 트랙 |
 | `bg-neutral-bold` / `text-on-neutral-bold` | 900 / 0 | 50 / 950 | 뒤집힌 채움: Tooltip, neutral solid Button, Badge |
 | `text-neutral-bold` | 900 | 50 | 본문 글자 |

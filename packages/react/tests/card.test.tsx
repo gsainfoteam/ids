@@ -245,7 +245,9 @@ test.each(['light', 'dark'] as const)(
     expect(style.backgroundColor).not.toBe(getComputedStyle(root).backgroundColor);
 
     const cancel = screen.getByRole('button', { name: 'Cancel' }).element();
-    expect(getComputedStyle(cancel).backgroundColor).not.toBe(style.backgroundColor);
+    const outlineBorder = colorOf('--ids-color-border-control-outline', root);
+    expect(getComputedStyle(cancel).boxShadow).toContain(outlineBorder);
+    expect(outlineBorder).not.toBe(style.backgroundColor);
   },
 );
 

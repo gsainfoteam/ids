@@ -1874,7 +1874,7 @@
   --ids-color-text-info: var(--ids-theme-dark-text-info);
   --ids-color-border-info: var(--ids-theme-dark-border-info);
   --ids-color-bg-panel: var(--ids-color-bg-neutral-subtler);
-  --ids-color-bg-band: var(--ids-color-bg-neutral-subtlest);
+  --ids-color-bg-band: var(--ids-color-bg-neutral-subtle);
   --ids-color-bg-control-outline: var(--ids-color-bg-neutral-subtle);
   --ids-color-border-control-outline: var(--ids-color-bg-neutral);
   --ids-color-bg-field-outline: var(--ids-color-bg-neutral-subtle);

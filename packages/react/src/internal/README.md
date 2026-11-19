@@ -394,7 +394,8 @@ footer: [
 
 ### 알아둘 것
 
-- 배경은 component 토큰 `bg-band` 입니다. light 에서는 흰 `bg-panel` 아래 `neutral-50`, dark 에서는 `neutral-900` 인 `bg-panel` 아래 `neutral-950` 이라, 두 모드 모두 면보다 한 단계 들어간 띠가 됩니다. 다크 outline 버튼의 채움(`bg-control-outline`, 800)과도 겹치지 않습니다.
+- 배경은 component 토큰 `bg-band` 입니다. light 에서는 흰 `bg-panel` 아래 `neutral-50`, dark 에서는 `neutral-900` 인 `bg-panel` 아래 `neutral-800` 입니다. dark 에서는 위에 놓인 면일수록 밝으므로 띠도 면보다 밝습니다.
+- dark 에서 띠는 outline 버튼의 채움(`bg-control-outline`)과 같은 800 입니다. 띠 위 outline 버튼은 `border-control-outline`(700) 테두리로 구분되고, light 에서 흰 면 위의 흰 outline 버튼과 같은 모양입니다.
 - 글자색은 따로 두지 않습니다. `text-neutral-bold` 는 모든 neutral 배경에서 읽히는 본문 색입니다.
 - 띠 위 버튼은 따로 맞추지 않습니다. hover 와 press 는 글자색을 덮는 state layer 라 띠 위에서도 보입니다.
 - Card `ghost` 는 배경을 `bg-transparent` 로 덮어 선만 남깁니다.
