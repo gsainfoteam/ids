@@ -8,6 +8,7 @@
     "bg-field-outline":       { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-subtle" } },
     "border-field-outline":   { "$type": "component", "$value": { "light": "border-neutral", "dark": "bg-neutral" } },
     "border-field-bar":       { "$type": "component", "$value": { "light": "border-neutral", "dark": "bg-neutral" } },
+    "bg-field-code-outline":  { "$type": "component", "$value": { "light": "bg-neutral-subtle", "dark": "bg-neutral-subtler" } },
     "bg-switch-thumb":        { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-bold" } },
     "bg-qr-code":       { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-bold" } },
     "text-qr-code":     { "$type": "component", "$value": { "light": "text-neutral-bold", "dark": "text-on-neutral-bold" } },

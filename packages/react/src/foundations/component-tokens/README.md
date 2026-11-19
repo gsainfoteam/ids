@@ -23,7 +23,8 @@
 | `bg-band` | `bg-neutral-subtler` | `bg-neutral-subtlest` | 면 안의 띠 |
 | `bg-control-outline`, `border-control-outline` | `bg-neutral-subtlest`, `border-neutral` | `bg-neutral-subtle`, `bg-neutral` | outline 버튼, Checkbox, Radio, pill Tabs |
 | `bg-field-outline`, `border-field-outline` | `bg-neutral-subtlest`, `border-neutral` | `bg-neutral-subtle`, `bg-neutral` | outline 입력 상자 |
-| `border-field-bar` | `border-neutral` | `bg-neutral` | TextArea 막대의 구분선 |
+| `border-field-bar` | `border-neutral` | `bg-neutral` | TextArea, Editor 막대의 구분선 |
+| `bg-field-code-outline` | `bg-neutral-subtle` | `bg-neutral-subtler` | outline Editor 의 코드와 코드 블록 |
 | `bg-switch-thumb` | `bg-neutral-subtlest` | `bg-neutral-bold` | 꺼진 Switch 의 thumb |
 | `bg-qr-code`, `text-qr-code` | 밝은 바탕, 어두운 모듈 | 같음 | QRCode `inverted={false}` |
 | `bg-qr-code-inverse`, `text-qr-code-inverse` | 어두운 바탕, 밝은 모듈 | 같음 | QRCode `inverted` |

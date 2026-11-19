@@ -103,7 +103,7 @@ describe.each(themes)('component tokens for $name', ({ roles }) => {
   test.each(MODES)('text on every component background reaches its contrast in %s mode', (mode) => {
     const token = tokenIn(roles, mode);
     const pairs = [
-      ...(['bg-panel', 'bg-band', 'bg-control-outline', 'bg-field-outline'] as const).flatMap(
+      ...(['bg-panel', 'bg-band', 'bg-control-outline', 'bg-field-outline', 'bg-field-code-outline'] as const).flatMap(
         (background) => [
           { text: roles[mode]['text-neutral-bold']!, background, lc: TEXT_LC },
           { text: roles[mode]['text-neutral']!, background, lc: ACCENT_TEXT_LC },

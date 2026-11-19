@@ -26,8 +26,8 @@ const documentBlocks = cn(
   '[&_:is(h1,h2,h3,h4)+*]:mt-1',
   '[&_ul]:list-disc [&_ol]:list-decimal [&_:is(ul,ol)]:ps-6 [&_li>*+*]:mt-1 [&_li+li]:mt-1',
   '[&_blockquote]:border-s-2 [&_blockquote]:border-neutral [&_blockquote]:ps-3 [&_blockquote]:text-neutral',
-  '[&_pre]:rounded-standard [&_pre]:bg-(--editor-code) [&_pre]:px-3 [&_pre]:py-2 [&_pre]:font-mono [&_pre]:whitespace-pre-wrap',
-  '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:bg-(--editor-code) [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
+  '[&_pre]:rounded-standard [&_pre]:px-3 [&_pre]:py-2 [&_pre]:font-mono [&_pre]:whitespace-pre-wrap',
+  '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
   '[&_hr]:my-3 [&_hr]:border-neutral',
 );
@@ -38,7 +38,7 @@ export const editorStyle = tv({
       'relative flex w-full min-w-0 cursor-text flex-col overflow-hidden rounded-standard',
       fieldSurface.base,
     ],
-    bar: 'mx-px shrink-0 border-neutral text-neutral',
+    bar: 'mx-px shrink-0 text-neutral',
     barItems: 'flex items-center gap-0.5',
     separator: 'mx-0.5 h-5 self-center',
     blockType: [
@@ -68,16 +68,14 @@ export const editorStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: [
-          fieldSurface.variant.outline,
-          '[--editor-code:var(--ids-color-bg-neutral-subtle)]',
-          'dark:[--editor-code:var(--ids-color-bg-neutral-subtler)]',
-        ],
-        bar: 'dark:border-(--ids-color-bg-neutral)',
+        root: fieldSurface.variant.outline,
+        bar: 'border-field-bar',
+        content: '[&_pre]:bg-field-code-outline [&_:not(pre)>code]:bg-field-code-outline',
       },
       soft: {
-        root: [fieldSurface.variant.soft, '[--editor-code:var(--ids-color-bg-neutral-subtler)]'],
-        bar: 'dark:border-(--ids-color-bg-neutral)',
+        root: fieldSurface.variant.soft,
+        bar: 'border-field-bar',
+        content: '[&_pre]:bg-neutral-subtler [&_:not(pre)>code]:bg-neutral-subtler',
       },
     } satisfies Record<EditorVariant, object>,
     size: {
