@@ -15,7 +15,7 @@ const serverRenderedIds = [
   ['Menu.Trigger', 'aria-haspopup="menu"'],
 ];
 
-const utilityOnlyIdsUses = '.bg-surface';
+const utilityOnlyIdsUses = '.bg-neutral-subtlest';
 
 const idsFonts = ['Pretendard GOV Variable', 'Geist Mono Variable'];
 

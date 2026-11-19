@@ -6,11 +6,11 @@ export const toasterStyle = tv({
   slots: {
     region: [
       'fixed inset-x-4 z-50 m-0 h-(--front-toast-height) w-auto overflow-visible border-0 bg-transparent p-0',
-      'text-on-surface outline-none sm:w-89',
+      'text-neutral-bold outline-none sm:w-89',
     ],
     toast: [
       'absolute inset-x-0 z-(--toast-z) touch-none concentric-p-3 px-4',
-      'bg-surface text-body-b3-regular text-on-surface',
+      'bg-neutral-subtlest text-body-b3-regular text-neutral-bold',
       'shadow-lg inset-ring-1 inset-ring-neutral',
       'after:absolute after:inset-x-0 after:h-(--gap)',
       'h-(--front-toast-height) [scale:calc(1-0.05*var(--toasts-before))]',
@@ -75,7 +75,7 @@ export const toasterStyle = tv({
       },
     } satisfies Record<Toaster.Placement, object>,
     colorScheme: {
-      neutral: { toast: '[--toast-accent:var(--ids-color-on-surface)]' },
+      neutral: { toast: '[--toast-accent:var(--ids-color-text-neutral-bold)]' },
       primary: { toast: '[--toast-accent:var(--ids-color-text-primary)]' },
       secondary: { toast: '[--toast-accent:var(--ids-color-text-secondary)]' },
       tertiary: { toast: '[--toast-accent:var(--ids-color-text-tertiary)]' },

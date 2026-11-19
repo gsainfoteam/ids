@@ -12,10 +12,10 @@ export const bubbleStyle = tv({
   },
   variants: {
     variant: {
-      soft: { root: 'bg-neutral-soft text-on-surface' },
+      soft: { root: 'bg-neutral-subtle text-neutral-bold' },
       solid: { root: 'bg-primary text-on-primary' },
       outline: {
-        root: 'bg-surface text-on-surface inset-ring-1 inset-ring-neutral',
+        root: 'bg-neutral-subtlest text-neutral-bold inset-ring-1 inset-ring-neutral',
       },
     } satisfies Record<BubbleVariant, object>,
     align: {
@@ -27,7 +27,7 @@ export const bubbleStyle = tv({
         root: 'mb-4',
         reactions: [
           'absolute top-full w-max min-w-[calc(100%-var(--spacing)*6)] -translate-y-1.5 flex-nowrap',
-          'pointer-events-none *:pointer-events-auto *:ring-2 *:ring-surface',
+          'pointer-events-none *:pointer-events-auto *:ring-2 *:ring-(--ids-color-bg-neutral-subtlest)',
         ],
       },
       false: { reactions: 'flex-wrap not-first:mt-2' },

@@ -2,11 +2,11 @@ import { expect, test } from 'vitest';
 
 import { paletteHues, palettes, paletteSeeds } from '../.storybook/palettes';
 import { MODES, resolveColors, slotsOf } from '../src/components/utility/ids-provider/theme-roles';
-import { IDS_BASE_SLOTS, IDS_COLOR_FAMILIES } from '../src/tokens/color-roles';
+import { IDS_COLOR_FAMILIES } from '../src/tokens/color-roles';
 
 import type { IdsNeutral, IdsStatus } from '../src/components/utility/ids-provider/theme';
 
-const ROLES = [...IDS_BASE_SLOTS, ...IDS_COLOR_FAMILIES.flatMap(slotsOf)];
+const ROLES = IDS_COLOR_FAMILIES.flatMap(slotsOf);
 
 const NEUTRALS: IdsNeutral[] = ['pure', 'tinted'];
 

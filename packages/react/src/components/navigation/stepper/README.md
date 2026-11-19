@@ -99,7 +99,7 @@ const [step, setStep] = useState(0);
 - 표시하지 않은 항목은 `neutral` 입니다.
   - 표시 자리에 10px 점을 그리고, 점은 제목의 첫 줄에 맞춥니다.
   - 제목은 보통 글자색이고, 스크린 리더가 읽을 상태 문구와 `aria-current` 가 없습니다.
-  - Indicator 에 아이콘을 주면 점 대신 `bg-neutral-soft` 원 안에 그립니다.
+  - Indicator 에 아이콘을 주면 점 대신 `bg-neutral-subtle` 원 안에 그립니다.
 - `completed`, `error` 를 준 항목은 진행에서처럼 체크와 X 로 그리고 "완료", "오류" 를 읽습니다. 배포 성공과 실패에 씁니다.
 - 연결선은 completed 뒤에도 중립색이고, 표시 칸의 아래 끝에서 다음 표시 칸의 위 끝까지 틈 없이 이어집니다.
 - 늘 표시 전용이라 버튼이 없습니다. `value`, `defaultValue`, `onValueChange`, `linear` 는 쓰지 않고, 주면 개발 모드에서 경고합니다.

@@ -10,15 +10,15 @@ export const tabsStyle = tv({
     list: 'relative flex shrink-0',
     trigger: [
       'relative inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap select-none',
-      'text-neutral aria-selected:text-on-surface',
-      'not-aria-selected:data-hovered:text-on-surface focus-ring',
+      'text-neutral aria-selected:text-neutral-bold',
+      'not-aria-selected:data-hovered:text-neutral-bold focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
       'disabled:cursor-not-allowed disabled:opacity-50',
       '[&_svg]:pointer-events-none [&_svg]:shrink-0',
     ],
     content: [
-      'min-w-0 flex-1 rounded-standard text-on-surface focus-ring',
+      'min-w-0 flex-1 rounded-standard text-neutral-bold focus-ring',
       '[&[hidden]:not([hidden=until-found])]:hidden',
     ],
   },
@@ -53,12 +53,12 @@ export const tabsStyle = tv({
         list: 'gap-1',
         trigger: [
           'rounded-standard',
-          'not-aria-selected:data-hovered:bg-(--control-hover)',
-          'not-aria-selected:data-active:bg-(--control-press)',
+          'state-layer not-aria-selected:data-hovered:state-hover',
+          'not-aria-selected:data-active:state-press',
         ],
       },
       enclosed: {
-        trigger: 'border border-transparent aria-selected:border-neutral aria-selected:bg-surface',
+        trigger: 'border border-transparent aria-selected:border-neutral aria-selected:bg-neutral-subtlest',
       },
     } satisfies Record<TabsAppearance, object>,
     variant: {
@@ -124,7 +124,7 @@ export const tabsStyle = tv({
     {
       appearance: 'pill',
       variant: 'ghost',
-      class: { trigger: 'aria-selected:bg-(--control-press)' },
+      class: { trigger: 'aria-selected:state-press' },
     },
     {
       appearance: 'pill',
@@ -138,9 +138,9 @@ export const tabsStyle = tv({
       variant: 'outline',
       class: {
         trigger: [
-          'aria-selected:bg-surface aria-selected:shadow-xs',
+          'aria-selected:bg-neutral-subtlest aria-selected:shadow-xs',
           'aria-selected:inset-ring-1 aria-selected:inset-ring-neutral',
-          'dark:aria-selected:bg-neutral-soft',
+          'dark:aria-selected:bg-neutral-subtle',
         ],
       },
     },

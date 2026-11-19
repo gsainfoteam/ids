@@ -36,8 +36,8 @@ class ProviderPreview extends StatelessWidget {
           TextStyle body(Color color) =>
               ids.textStyle(IdsTypography.bodyB3Regular, color: color);
           return Material(
-            color: colors.surface,
-            textStyle: body(colors.onSurface),
+            color: colors.bgNeutralSubtlest,
+            textStyle: body(colors.textNeutralBold),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Center(
@@ -61,7 +61,7 @@ class ProviderPreview extends StatelessWidget {
                         'IDS mono: Aa Wi 0123',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: colors.onSurface,
+                          color: colors.textNeutralBold,
                           mono: true,
                         ),
                       ),
@@ -129,10 +129,10 @@ class _FamilySwatch extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: ShapeDecoration(
-              color: role('bg-$family-soft'),
+              color: role('bg-$family-subtle'),
               shape: ids.shape(side: BorderSide(color: role('border-$family'))),
             ),
-            child: Text('$family soft', style: on('text-on-$family-soft')),
+            child: Text('$family subtle', style: on('text-on-$family-subtle')),
           ),
         ),
         Expanded(child: Text(family, style: on('text-$family'))),
@@ -187,7 +187,7 @@ class ScopePreview extends StatelessWidget {
       width: 360,
       padding: const EdgeInsets.all(16),
       decoration: ShapeDecoration(
-        color: colors.bgPrimarySoft,
+        color: colors.bgPrimarySubtle,
         shape: ids.shape(radius: ids.radius.container),
       ),
       child: Column(
@@ -199,7 +199,7 @@ class ScopePreview extends StatelessWidget {
             '${ids.theme.primary == blue ? 'Blue' : 'Purple'} / ${ids.resolvedMode.name}',
             style: ids.textStyle(
               IdsTypography.bodyB3Regular,
-              color: colors.textOnPrimarySoft,
+              color: colors.textOnPrimarySubtle,
             ),
           ),
           FilledButton(

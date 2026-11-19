@@ -6,14 +6,17 @@ export type FieldSurfaceVariant = 'outline' | 'soft' | 'ghost';
 
 export const fieldSurface = {
   base: cn(
-    'text-on-surface focus-ring',
+    'text-neutral-bold focus-ring',
     'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
     'data-disabled:cursor-not-allowed data-disabled:opacity-50',
     'disabled:cursor-not-allowed disabled:opacity-50',
   ),
   variant: {
-    outline: cn('bg-surface shadow-xs inset-ring-1 inset-ring-neutral', 'dark:bg-neutral-soft/30'),
-    soft: cn('bg-neutral-soft inset-ring-1 inset-ring-transparent'),
+    outline: cn(
+      'bg-neutral-subtlest shadow-xs inset-ring-1 inset-ring-neutral',
+      'dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)',
+    ),
+    soft: cn('bg-neutral-subtle inset-ring-1 inset-ring-transparent'),
     ghost: cn('bg-transparent inset-ring-1 inset-ring-transparent'),
   } satisfies Record<FieldSurfaceVariant, string>,
   size: {
@@ -27,8 +30,8 @@ export const fieldSurface = {
 export const fieldAction = {
   base: cn(
     'shrink-0 text-neutral',
-    'data-hovered:text-on-surface data-active:text-on-surface',
-    'data-pressed:text-on-surface',
+    'data-hovered:text-neutral-bold data-active:text-neutral-bold',
+    'data-pressed:text-neutral-bold',
   ),
   padded: {
     standard: cn('size-7 first:-ms-2 last:-me-2'),
