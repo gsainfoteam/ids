@@ -17,6 +17,7 @@
 | [`decimal.ts`](#decimalts)                       | step 계산에 쓰는 정확한 십진수(decimal.js)                                            | NumberField, Slider                                                                                                                                                                                                   |
 | [`field-popup/`](./field-popup/README.md)        | 필드가 여는 팝업(popover, drawer)과 그 머리, 검색 상자                                | Select, ChipField, ColorField, Menu, `temporal-field/`                                                                                                                                                                |
 | [`surfaces/field-surface.ts`](#surfacesfield-surfacets)           | 텍스트류 필드와 팝업 trigger 의 상자, 상자 안 버튼의 클래스 조각                      | `text-control/`, `temporal-field/`, Select, ChipField, ColorField, FileField, PasswordField, TextArea                                                                                                                 |
+| [`surfaces/footer-band.ts`](#surfacesfooter-bandts)             | 카드와 대화상자 바닥의 버튼 띠 클래스 조각                                          | Card, Dialog                                                                                                                                                                                                          |
 | [`form-bridge.ts`](#form-bridgets)               | 폼 라이브러리 bridge 가 Field 의 컨트롤에 값을 잇는 공용 함수                         | `react-hook-form.tsx`, `tanstack-form.tsx`                                                                                                                                                                            |
 | [`form-value.tsx`](#form-valuetsx)               | native input 이 없는 컨트롤을 FormData 와 제약 검증에 넣는 컴포넌트                   | Select, ChipField, ColorField, FileField, Slider, CheckboxGroup, ToggleGroup, `temporal-field/`                                                                                                                       |
 | [`icon-label.ts`](#icon-labelts)                 | 아이콘만 있는 컨트롤의 이름을 아이콘에서 찾는 hook                                    | IconButton, IconToggle, FloatingButton                                                                                                                                                                                |
@@ -371,6 +372,33 @@ size: {
 - `size-7`, `size-6` 과 음수 margin 은 control 높이 토큰(36px, 32px)과 상자 padding 에 맞춘 값입니다. 둘 중 하나를 바꾸면 이 값도 다시 계산합니다.
 - disabled 필드는 루트에서 이미 흐려집니다(`data-disabled:opacity-50`). ColorField 와 FileField 는 disabled Clear 가 한 번 더 흐려지지 않도록 `alreadyDimmedByField`(`data-disabled:opacity-100`)를 더합니다.
 - `FieldSurfaceVariant` 에 값을 더하면 가져가는 컴포넌트의 `variants` 에도 각각 더해야 적용됩니다. Select, ChipField, ColorField 는 variant 타입이 `FieldTriggerVariant` 라서, 빠뜨리면 `satisfies Record<..., object>` 가 타입 오류를 냅니다. FileField 는 자기 `FileFieldVariant` 와 `compoundVariants` 를 따로 고칩니다.
+
+## surfaces/footer-band.ts
+
+Card 와 Dialog 의 Footer 를 바닥 띠로 그리는 클래스 조각입니다. 위쪽 `border-neutral` 선과 `bg-band` 배경을 담습니다. 글자는 루트의 `text-neutral-bold` 를 그대로 씁니다.
+
+### 쓰는 곳
+
+- Card: `Card.Footer`. 좌우 가장자리까지 나가는 음수 margin 과 마지막 자식일 때의 아래 margin, 둥근 모서리는 Card 의 `style.ts` 가 더합니다.
+- Dialog: `Dialog.Footer`. 스크롤하는 본문 밖, `Dialog.Content` 바닥에 놓입니다. 모서리는 `Dialog.Content` 의 `overflow-hidden` 이 깎습니다.
+
+### 쓰는 법
+
+```ts
+footer: [
+  'flex items-center gap-2',
+  footerBand,
+  '-mx-[calc(var(--card-pad)_-_var(--card-ring))] px-[calc(var(--card-pad)_-_var(--card-ring))]',
+],
+```
+
+### 알아둘 것
+
+- 배경은 component 토큰 `bg-band` 입니다. light 에서는 흰 `bg-panel` 아래 `neutral-50`, dark 에서는 `neutral-900` 인 `bg-panel` 아래 `neutral-950` 이라, 두 모드 모두 면보다 한 단계 들어간 띠가 됩니다. 다크 outline 버튼의 채움(`bg-control-outline`, 800)과도 겹치지 않습니다.
+- 글자색은 따로 두지 않습니다. `text-neutral-bold` 는 모든 neutral 배경에서 읽히는 본문 색입니다.
+- 띠 위 버튼은 따로 맞추지 않습니다. hover 와 press 는 글자색을 덮는 state layer 라 띠 위에서도 보입니다.
+- Card `ghost` 는 배경을 `bg-transparent` 로 덮어 선만 남깁니다.
+- Card 의 띠는 outline 테두리(`--card-ring`) 1px 안쪽에서 멈춥니다. 테두리는 루트의 `inset-ring` 이라 자식 배경이 그 위를 덮기 때문입니다.
 
 ## form-bridge.ts
 

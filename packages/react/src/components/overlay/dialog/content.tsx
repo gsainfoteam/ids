@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, type ComponentProps } from 'react';
+import { isValidElement, useEffect, type ComponentProps, type ReactNode } from 'react';
 
 import { DialogClose } from './close';
 import { useDialogContext } from './context';
+import { DialogFooter } from './footer';
 import { ModalLayer, OverlayItemContext } from '../../../internal/overlay';
+import { elementTypeOf, flattenFragments } from '../../../utils';
 import { isDevelopment } from '../../../utils/dev';
 import { ScrollArea } from '../../layout/scroll-area';
 
@@ -18,6 +20,15 @@ export function DialogContent(props: DialogContentProps) {
 }
 
 DialogContent.displayName = 'Dialog.Content';
+
+const isFooter = (node: ReactNode) => isValidElement(node) && elementTypeOf(node) === DialogFooter;
+
+function splitOffTheFooter(children: ReactNode) {
+  const parts = flattenFragments(children);
+  let footerStart = parts.length;
+  while (footerStart > 0 && isFooter(parts[footerStart - 1])) footerStart -= 1;
+  return { body: parts.slice(0, footerStart), footer: parts.slice(footerStart) };
+}
 
 function DialogPopup({ className, style, children, ...props }: DialogContentProps) {
   const c = useDialogContext('Dialog.Content');
@@ -37,6 +48,8 @@ function DialogPopup({ className, style, children, ...props }: DialogContentProp
         '[IDS] Dialog: add Dialog.Title, or aria-label on Dialog.Content, so screen readers can name the dialog.',
       );
   }, [content, props]);
+
+  const { body, footer } = splitOffTheFooter(children);
 
   const labelledBy =
     props['aria-labelledby'] ??
@@ -60,33 +73,32 @@ function DialogPopup({ className, style, children, ...props }: DialogContentProp
         if (c.dismissible) dialog.setOpen(false);
       }}
     >
-      <ScrollArea asChild>
-        <div
-          {...props}
-          popover="manual"
-          id={ids.content}
-          role={c.role}
-          aria-modal="true"
-          aria-labelledby={labelledBy}
-          aria-describedby={
-            props['aria-describedby'] ?? (c.described ? ids.description : undefined)
-          }
-          tabIndex={-1}
-          data-dialog-content=""
-          data-open={open ? '' : undefined}
-          data-ending-style={ending ? '' : undefined}
-          data-nested-open={position.covered ? '' : undefined}
-          className={styles.content({ className })}
-          style={style}
-        >
-          <ScrollArea.Viewport className={styles.viewport()}>
-            <OverlayItemContext value={null}>
-              {children}
-              {!c.hideClose && <DialogClose className={styles.close()} />}
-            </OverlayItemContext>
-          </ScrollArea.Viewport>
-        </div>
-      </ScrollArea>
+      <div
+        {...props}
+        popover="manual"
+        id={ids.content}
+        role={c.role}
+        aria-modal="true"
+        aria-labelledby={labelledBy}
+        aria-describedby={props['aria-describedby'] ?? (c.described ? ids.description : undefined)}
+        tabIndex={-1}
+        data-dialog-content=""
+        data-open={open ? '' : undefined}
+        data-ending-style={ending ? '' : undefined}
+        data-nested-open={position.covered ? '' : undefined}
+        className={styles.content({ className })}
+        style={style}
+      >
+        <OverlayItemContext value={null}>
+          <ScrollArea asChild>
+            <div data-dialog-body="" className={styles.body()}>
+              <ScrollArea.Viewport className={styles.viewport()}>{body}</ScrollArea.Viewport>
+            </div>
+          </ScrollArea>
+          {footer}
+          {!c.hideClose && <DialogClose className={styles.close()} />}
+        </OverlayItemContext>
+      </div>
     </ModalLayer>
   );
 }

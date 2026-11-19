@@ -474,11 +474,11 @@ tokens with `color-mix`.
 | Neutral role | light | dark | used for |
 |---|---|---|---|
 | `bg-neutral-subtlest` | 0 | 950 | the page, a popup, a card |
-| `bg-neutral-subtler` | 50 | 900 | a band or tray: a Card or Dialog footer, a table header |
+| `bg-neutral-subtler` | 50 | 900 | a table header; `bg-band` in light, `bg-panel` in dark |
 | `bg-neutral-subtle` | 100 | 800 | a soft control, a muted row, an outline control in dark |
 | `bg-neutral` | 300 | 700 | a handle, a track, an outline control's border in dark |
 | `bg-neutral-bold` | 900 | 50 | an inverted fill |
-| `text-on-neutral-subtlest`, `text-on-neutral-subtler` | 900 | 50 | text on the page or a band |
+| `text-on-neutral-subtlest`, `text-on-neutral-subtler` | 900 | 50 | text on the page, a panel or a band |
 | `text-neutral-bold` | 900 | 50 | body text |
 | `text-neutral` | 600 | 300 | secondary text |
 | `border-neutral` | 200 | 800 | structural lines |

@@ -7,6 +7,7 @@
 - **카드 어디를 눌러도 열린다.** `onClick` 만 주면 카드 어디를 눌러도 열리고, 키보드와 스크린 리더에는 `Card.Title` 이 버튼이 됩니다. 설명은 `Card.Description` 입니다. 카드 안에 다른 버튼을 둬도 버튼이 버튼 안에 들어가지 않습니다.
 - **안쪽 버튼은 따로.** 카드 안의 버튼이나 링크를 눌러도 카드의 `onClick` 은 불리지 않습니다.
 - **링크 카드.** `asChild` 로 `<a>` 나 라우터 링크가 카드가 됩니다.
+- **바닥글은 띠.** `Card.Footer` 는 위쪽 선과 옅은 배경을 깐 띠로 카드 바닥을 가장자리까지 채웁니다.
 
 ```tsx
 import { Button, Card } from '@gsainfoteam/ids-react';
@@ -16,12 +17,12 @@ import { Button, Card } from '@gsainfoteam/ids-react';
     <Card.Title>새 프로젝트 만들기</Card.Title>
     <Card.Description>프로젝트 정보를 입력해주세요.</Card.Description>
     <Card.Action>
-      <IconButton aria-label="더보기" variant="ghost" icon={<EllipsisHorizontalIcon />} />
+      <IconButton aria-label="더보기" variant="outline" icon={<EllipsisHorizontalIcon />} />
     </Card.Action>
   </Card.Header>
   <Card.Content>...</Card.Content>
   <Card.Footer>
-    <Button variant="ghost">취소</Button>
+    <Button variant="outline">취소</Button>
     <Button>만들기</Button>
   </Card.Footer>
 </Card>;
@@ -53,10 +54,28 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 
 ```tsx
 <Card.Header className="border-b">...</Card.Header>   {/* 카드 너비만큼 선, 아래 간격 */}
-<Card.Footer className="border-t">...</Card.Footer>   {/* 위쪽 선 */}
 ```
 
 - 선 색은 `--ids-color-border-neutral` 입니다. 선이 있는 쪽에 패딩이 붙어 간격이 맞습니다.
+
+## 바닥글
+
+```tsx
+<Card>
+  <Card.Header>...</Card.Header>
+  <Card.Content>...</Card.Content>
+  <Card.Footer className="justify-end">         {/* 위쪽 선과 옅은 배경의 띠 */}
+    <Button variant="outline">취소</Button>
+    <Button>저장</Button>
+  </Card.Footer>
+</Card>
+```
+
+- `Card.Footer` 는 카드 좌우 가장자리까지 나가고, 마지막 자식이면 아래 가장자리와 둥근 모서리까지 채웁니다. 글자와 버튼은 카드 안 내용과 세로줄이 맞습니다.
+- 배경은 `bg-band` 이고, 위쪽에 `border-neutral` 선이 있습니다. light 에서는 흰 카드 아래 `neutral-50`, dark 에서는 `neutral-900` 카드 아래 `neutral-950` 이라 두 모드 모두 카드보다 한 단계 들어가 보입니다. `soft` 카드(`bg-neutral-subtle`)에서도 카드와 다른 색이고, `ghost` 카드에서는 배경 없이 선만 남습니다.
+- outline 테두리는 가리지 않습니다. 띠는 테두리 1px 안쪽에서 멈춥니다.
+- 띠 위 버튼의 hover 와 press 는 다른 곳과 같은 state layer 라, 띠 위에서도 따로 맞추지 않고 보입니다.
+- 위쪽 선은 늘 있으므로 `className="border-t"` 는 주지 않습니다.
 
 ## 누를 수 있는 카드
 
