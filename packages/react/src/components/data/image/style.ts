@@ -15,7 +15,7 @@ const roomForTwoCaptionLines = cn(
   'text-body-b2-medium pt-[calc(--spacing(6)+2lh)] sm:pt-[calc(--spacing(8)+2lh)]',
 );
 
-const floatingSurface = cn('border border-neutral bg-neutral-subtlest text-neutral-bold shadow-md');
+const floatingSurface = cn('border border-neutral bg-panel text-neutral-bold shadow-md');
 
 export const imageStyle = tv({
   slots: {

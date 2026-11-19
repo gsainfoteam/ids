@@ -2,7 +2,7 @@
 
 필드가 여는 팝업을 그리는 공용 코드입니다. 보통은 trigger 에 붙는 popover 이고, `mobileVariant="drawer"` 인 필드는 640px 보다 좁은 화면에서 아래에서 올라오는 modal drawer 가 됩니다.
 
-- 팝업 안 목록의 클래스는 [`list-styles.ts`](../README.md#list-stylests), 팝업을 여는 trigger 상자는 [`field-surface.ts`](../README.md#field-surfacets) 의 `fieldTrigger` 입니다.
+- 팝업 안 목록의 클래스는 [`list-styles.ts`](../README.md#list-stylests), 팝업을 여는 trigger 상자는 [`surfaces/field-surface.ts`](../README.md#surfacesfield-surfacets) 의 `fieldTrigger` 입니다.
 - 파트 헬퍼 `part` 는 [`utils/part.ts`](../../utils/README.md#partts) 입니다.
 
 | 파일                       | 내용                                                                                              |

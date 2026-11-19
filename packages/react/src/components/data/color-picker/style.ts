@@ -1,4 +1,4 @@
-import { sliderSurface } from '../../../internal/slider-surface';
+import { sliderSurface } from '../../../internal/surfaces/slider-surface';
 import { cn, tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -33,8 +33,8 @@ export const colorPickerStyle = tv({
     swatches: 'gap-2',
     swatch: [
       'rounded-standard shadow-none inset-ring-(--ids-color-text-neutral-bold)/10',
-      'data-[state=checked]:ring-2 data-[state=checked]:ring-(--radio-accent)',
-      'data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-(--ids-color-bg-neutral-subtlest)',
+      'data-[state=checked]:ring-2 data-[state=checked]:ring-scheme',
+      'data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-(--ids-bg-current)',
     ],
   },
   variants: {

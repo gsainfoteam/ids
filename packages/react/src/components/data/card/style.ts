@@ -32,7 +32,7 @@ export const cardStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-neutral-subtlest shadow-xs inset-ring-1 inset-ring-neutral [--card-ring:1px]',
+        root: 'bg-panel shadow-panel inset-ring-1 inset-ring-neutral [--card-ring:1px]',
       },
       soft: { root: 'bg-neutral-subtle [--card-ring:0px]' },
       ghost: { root: 'bg-transparent [--card-ring:0px]' },

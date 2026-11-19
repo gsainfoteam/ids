@@ -3,7 +3,7 @@
 import { cloneElement, createContext, isValidElement, use } from 'react';
 
 import { useTextField } from './use-text-field';
-import { type FieldSurfaceVariant } from '../../../internal/field-surface';
+import { type FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
 import {
   Adornments,
   TextControlClear,

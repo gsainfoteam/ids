@@ -26,6 +26,7 @@ import {
   IDS_NEUTRAL_STEPS,
   IDS_STATUS_FAMILIES,
 } from '../src/tokens/color-roles';
+import { IDS_COMPONENT_COLORS } from '../src/tokens/component-tokens';
 
 import type { IdsNeutral, IdsStatus } from '../src/components/utility/ids-provider/theme';
 import type { IdsMode } from '../src/tokens/types';
@@ -37,13 +38,18 @@ const css = readFileSync(resolveCss('@gsainfoteam/ids-css/no-fonts.css'), 'utf8'
 const modeBlock = (mode: IdsMode) =>
   css.match(new RegExp(`\\[data-mode="${mode}"\\] \\{([^}]*)\\}`))?.[1] ?? '';
 
-const mappedSlots = (mode: IdsMode) =>
-  Object.fromEntries(
-    [...modeBlock(mode).matchAll(/--ids-color-([\w-]+): var\((.+)\);/g)].map(([, slot, value]) => [
-      slot!,
-      value!,
-    ]),
+const isComponentToken = (slot: string) => slot in IDS_COMPONENT_COLORS;
+
+const mappedVariables = (mode: IdsMode) =>
+  [...modeBlock(mode).matchAll(/--ids-color-([\w-]+): var\((.+)\);/g)].map(
+    ([, slot, value]) => [slot!, value!] as const,
   );
+
+const mappedSlots = (mode: IdsMode) =>
+  Object.fromEntries(mappedVariables(mode).filter(([slot]) => !isComponentToken(slot)));
+
+const mappedComponentTokens = (mode: IdsMode) =>
+  Object.fromEntries(mappedVariables(mode).filter(([slot]) => isComponentToken(slot)));
 
 const themeVar = (mode: IdsMode, slot: string) => `--ids-theme-${mode}-${slot}`;
 
@@ -122,6 +128,17 @@ test.each(MODES)('ids.css maps every %s slot from the provider variables', (mode
 
   expect(Object.keys(mapped).sort()).toEqual([...expected].sort());
   for (const slot of expected) expect(mapped[slot]!.startsWith(themeVar(mode, slot))).toBe(true);
+});
+
+test.each(MODES)('ids.css points every %s component token at one semantic role', (mode) => {
+  expect(mappedComponentTokens(mode)).toEqual(
+    Object.fromEntries(
+      Object.entries(IDS_COMPONENT_COLORS).map(([token, roles]) => [
+        token,
+        `--ids-color-${roles[mode]}`,
+      ]),
+    ),
+  );
 });
 
 test.each(MODES)(

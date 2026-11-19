@@ -131,7 +131,7 @@ export const Gallery: Story = {
           <Checkbox
             defaultChecked
             aria-label="둥근 체크박스"
-            className="rounded-full data-[state=checked]:[--checkbox-accent:var(--ids-color-bg-success)]"
+            className="rounded-full data-[state=checked]:scheme-success"
           />
         </Showcase.Row>
       </Showcase.Section>
@@ -375,7 +375,7 @@ export const CustomIndicator: Story = {
         <Checkbox
           defaultChecked="indeterminate"
           className={(state) =>
-            state.checked ? '[--checkbox-accent:var(--ids-color-bg-success)]' : undefined
+            state.checked ? 'scheme-success' : undefined
           }
         >
           <Checkbox.Indicator>
@@ -403,8 +403,6 @@ export const CustomIndicator: Story = {
     const favorite = canvas.getByRole('checkbox', { name: '즐겨찾기' });
     await userEvent.click(favorite);
     await expect(favorite).toBeChecked();
-    await expect(favorite.closest('[data-checkbox]')!.className).toContain(
-      '--ids-color-bg-success',
-    );
+    await expect(favorite.closest('[data-checkbox]')!.className).toContain('scheme-success');
   },
 };

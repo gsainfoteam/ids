@@ -9,6 +9,13 @@
     "text": ["on-{family}-subtlest", "on-{family}-subtler", "on-{family}-subtle", "on-{family}", "on-{family}-bold", "{family}", "{family}-bold"],
     "border": ["{family}"]
   },
+  "scheme": {
+    "neutral": {
+      "bg-{family}": "bg-{family}-bold",
+      "text-on-{family}": "text-on-{family}-bold",
+      "text-{family}": "text-{family}-bold"
+    }
+  },
   "neutralOnly": ["bg-{family}-subtlest", "text-on-{family}-subtlest", "bg-{family}-bold", "text-on-{family}-bold", "text-{family}-bold"],
   "namespaces": {
     "bg": ["--background-color"],

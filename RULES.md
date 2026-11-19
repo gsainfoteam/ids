@@ -26,6 +26,9 @@ These files are written by `pnpm codegen` (Style Dictionary, message generation 
 - `packages/react/src/tokens/types.ts`
 - `packages/react/src/tokens/palette-model.ts` and
   `packages/flutter/lib/tokens/ids_palette_model.dart` (`packages/core/palette-model.js`)
+- `packages/react/src/tokens/component-tokens.ts` and
+  `packages/flutter/lib/tokens/ids_component_tokens.dart` (`IdsComponentColors`,
+  `IdsComponentShadows`), written from `packages/core/tokens/component.json` and `shadow.json`
 - `packages/react/src/internal/messages-catalog.ts`
 - `packages/react/messages/en.json`
 - `packages/flutter/lib/tokens/*.dart`, including `ids_color_roles.dart` (`IdsColors`, written from
@@ -168,8 +171,8 @@ packages/react/src/
     typography/  Kbd, Label, Link
     utility/     Slot, Group, IdsProvider
   internal/      shared parts that are not exported:
-                   surfaces     control-surface, toggle-surface, icon-square, field-surface, surface,
-                                slider-surface
+                   surfaces     surfaces/ (control-surface, toggle-surface, icon-square,
+                                field-surface, slider-surface), surface
                    fields       text-control (shell, Clear, useMergedRef), field-popup, list-styles,
                                 temporal-field, form-value, date-locale
                    behaviour    pressable, state-props, use-checked-writes, icon-label, arc,
@@ -352,8 +355,10 @@ Do not declare `Root`/`TrackStyle`/`ThumbStyle` as separate `tv()` calls, and do
 with a bare `cn('...')` when it belongs to the same component — that hides the part from the
 variant system and duplicates the variant keys.
 
-Colors that a variant fans out to several parts go through a CSS custom property
-(`[--chip-accent:var(--ids-color-bg-primary)]`) rather than one class per part-and-scheme pair.
+Colors that `colorScheme` fans out to several parts go through the scheme: the root carries
+`scheme-X` and its parts write `bg-scheme`, `text-on-scheme`, `text-scheme`, rather than one class
+per part-and-scheme pair. A component never points a variable of its own at a color role
+(`[--x:var(--ids-color-…)]`).
 
 **Tailwind only generates classes it can see as literal text in a source file.** A class assembled
 at runtime never reaches the stylesheet, and the failure is silent — the class lands in the DOM
@@ -419,12 +424,36 @@ since the bar ends are inset from the root's own computed radius. A `<textarea>`
 too (`ScrollArea.Viewport asChild`): it scrolls itself, and ScrollArea remeasures it on `input`.
 Popover keeps its arrow outside the ScrollArea, since the viewport clips what overflows.
 
-**Colors come in three layers, and each layer names its tokens by grammar.** Raw palettes
+**Colors come in four layers, and each layer names its tokens by grammar.** Raw palettes
 (`neutral-50`, a theme's `primary-600`) are values only. Semantic roles (`--ids-color-<role>`) point
 to one raw step each and are named `{property}-{family}[-{strength}]` or
-`text-on-{family}[-{strength}]`, never by a use such as `surface`. Component tokens
-(`--control-fill`, `--chip-accent`) point to one semantic role. No layer mixes two tokens with
-`color-mix`.
+`text-on-{family}[-{strength}]`, never by a use such as `surface`. The scheme (`bg-scheme`,
+`text-on-scheme-subtle`) points to one family's roles. Component tokens (`bg-panel`,
+`border-control-outline`, `shadow-panel`) point to one semantic role per mode. No layer mixes two
+tokens with `color-mix`.
+
+- **Scheme.** `scheme-{family}` sets every `{property}-scheme[-{strength}]` slot to that family's
+  role, and the state layer to that family (`--ids-state-layer-scheme`, `-hover`, `-press`). For
+  neutral, `bg-scheme` is `bg-neutral-bold` and `text-on-scheme` `text-on-neutral-bold`. The
+  IdsProvider root carries `scheme-primary`; a component with `colorScheme` always writes its own
+  `scheme-X`, so a Button inside a danger Alert stays primary. Choices that depend on another prop
+  (a status family's outline text) are `tv` compoundVariants.
+- **Component tokens.** `packages/core/tokens/component.json` names them
+  `{property}-{group}[-{part}][-{variant}]`: property `bg`, `text`, `border` or `shadow`; a group
+  that is no family, `scheme` or strength word; never `fill`, `tint`, `strong`, `accent`, `on`,
+  `line`, `quiet`, `glyph`, `foreground` or `background`; `soft` only as the variant. Each token
+  points to a role in light and in dark, and `shadow-*` to a raw step of `shadow.json` (`0`, `1`,
+  `2`, no `sm`/`md`). A surface whose role differs by mode uses a component token, never `dark:`:
+  `bg-panel shadow-panel` for Card, Dialog, popups and toasts (one step lighter than the page in
+  dark), `bg-band` for a band inside one, `bg-control-outline` with `inset-ring-control-outline` for
+  outline controls and `bg-field-outline` for fields.
+- **The color underneath.** A part that copies the color of the surface it sits on (a Badge
+  cutout, a ColorPicker ring offset, a ghost Table header, Chart dots) reads `--ids-bg-current`,
+  never `bg-neutral-subtlest`. `ids.css` sets it to the page on the outermost provider and on a
+  Scope that paints its own page, and to `bg-panel` or `bg-band` on an element with that class, so
+  the cutout matches a dark Card or popup as well as the page.
+- Layout variables a component sets for itself carry no `--ids-` prefix (`--marquee-duration`,
+  `--text-area-pad-y`); `--ids-*` is the CSS package's and the provider's.
 
 - Properties are `bg`, `text` and `border`. Families are `neutral`, `primary`, `secondary`,
   `tertiary`, `success`, `warning`, `danger` and `info`.
@@ -498,7 +527,7 @@ opacity to `--ids-state-layer-hover` and `state-press` to `--ids-state-layer-pre
 to `--ids-state-hover` (6%) and `--ids-state-press` (10%), all from
 `packages/core/tokens/state.json`. A component writes
 `state-layer data-hovered:state-hover data-active:state-press` (`pressStates` in
-`internal/control-surface.ts`), and a selected, current or pressed item that should read as
+`internal/surfaces/control-surface.ts`), and a selected, current or pressed item that should read as
 pressed takes `state-press` (a ghost or outline Toggle, a selected Table row or Item, the current
 ghost Pagination link); an open Menu item or a highlighted option takes `state-hover`. Add
 `--ids-state-opacity` to the element's `transition-[…]` list so the layer fades with the rest.
@@ -512,9 +541,9 @@ and not toward gray:
 | A colored soft surface, a status outline or ghost | the family fill (`bg-X`), `--ids-state-tint-*` | 8% / 12% |
 | Neutral, and brand outline or ghost | the text color | 6% / 10% |
 
-`state-fill` sets the black color and its opacities. Control and Chip styles set the other two per
-`colorScheme` as component tokens (`--control-soft-layer`, `--control-quiet-layer`, `--chip-layer`
-with their `-hover` and `-press`) and hand them to the layer (`drawsSoftLayer`, `drawsQuietLayer`).
+`state-fill` sets the black color and its opacities. `state-scheme` hands the layer the one
+`scheme-X` set: the family fill with `--ids-state-tint-*` for a colored family, the text color
+with `--ids-state-hover` and `-press` for neutral.
 The provider checks text contrast under the layer each surface draws: a fill's text under the black
 layer, subtle, subtler and accent text under the text-color layer and the family-fill layer.
 
@@ -526,12 +555,17 @@ layer, subtle, subtler and accent text under the text-color layer and the family
   `bg-(--ids-color-text-neutral)` on hover and while dragged. A ScrollArea thumb rests at
   `bg-neutral/60`, takes full `bg-neutral` on hover and `text-neutral`'s color while dragged.
 - Translucent layers over a background IDS does not know stay as they are: Image's hover scrim,
-  Chip lines, the ScrollArea track, the DataTable loading veil, disabled opacity and backdrops.
+  Chip lines, the ScrollArea track, the DataTable loading veil, disabled opacity and backdrops,
+  the hairline round an image, a color swatch or a slider track (`inset-ring-(--ids-color-text-neutral-bold)/N`),
+  with the focus halo and text selection. They are the only opacity modifiers on an IDS color;
+  `tests/color-rules.test.ts` lists them and fails on any other, on `dark:`, on `color-mix` and on
+  an `--ids-*` variable `ids.css` does not have.
 
 **Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
 TelField, ChipField, Select and the date, time and color triggers draw their box from
-`internal/field-surface.ts`. Their `variant` is intensity only: `outline` (default), `soft` (muted
-fill) and `ghost` (no fill, no border). Put `data-field-input` on the element that takes focus and
+`internal/surfaces/field-surface.ts`. Their `variant` is intensity only: `outline` (default,
+`bg-field-outline` with `inset-ring-field-outline`), `soft` (muted fill) and `ghost` (no fill, no
+border). Put `data-field-input` on the element that takes focus and
 `data-invalid` on the shell; `focus-ring` does the rest.
 
 **A control without a native input still joins the form.** Select, a date trigger, a
@@ -541,6 +575,7 @@ so the browser blocks the submit, anchors its message there and hands focus to t
 
 **`dark:` follows `data-mode`.** The CSS package defines the `dark` variant against the nearest
 `data-mode`, so it works in any app and inside a nested IdsProvider, not only when the OS is dark.
+It is there for apps; IDS component code picks a mode's color through a component token instead.
 
 **`cn` needs line height after text size.** `text-*` composites carry their own line
 height, and a `leading-*` placed before one is dropped. Write `text-body-b3-regular leading-none`.

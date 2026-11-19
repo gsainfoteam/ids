@@ -12,7 +12,7 @@ export const promptInputStyle = tv({
     attachments: 'w-full py-0.5',
     submit: 'ms-auto!',
     tool: [
-      'data-pressed:bg-(--control-soft) data-pressed:text-(--control-on-soft)',
+      'data-pressed:bg-scheme-subtle data-pressed:text-on-scheme-subtle',
       'data-pressed:inset-ring-transparent data-pressed:shadow-none',
     ],
   },

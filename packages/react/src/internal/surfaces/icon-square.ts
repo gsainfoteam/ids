@@ -1,6 +1,6 @@
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
-import type { IdsSize } from '../tokens/types';
+import type { IdsSize } from '../../tokens/types';
 
 export const iconSquare = {
   base: cn('shrink-0 gap-0 p-0 rounded-standard [&_svg]:shrink-0'),

@@ -131,6 +131,56 @@ const FAMILY_SLOTS = COLOR_FAMILIES.flatMap((family) =>
 
 const colorVar = (slot) => `--ids-color-${slot}`;
 
+const SCHEME = "scheme";
+
+const SCHEME_SLOTS = TEMPLATE_SLOTS.filter(({ slot }) => !NEUTRAL_ONLY_SLOTS.includes(slot));
+
+const NEUTRAL_SCHEME_REDIRECTS = COLOR_ROLES.scheme.neutral;
+
+const schemeTarget = (family, slot) =>
+  (family === "neutral" ? (NEUTRAL_SCHEME_REDIRECTS[slot] ?? slot) : slot).replaceAll(
+    "{family}",
+    family,
+  );
+
+const SCHEME_LAYER_IN_TEXT_COLOR = ["neutral"];
+
+const MODES = ["light", "dark"];
+
+const readTokenFile = (file, key) =>
+  Object.entries(JSON.parse(readFileSync(`./tokens/${file}`, "utf8"))[key]);
+
+const SHADOW_STEPS = readTokenFile("shadow.json", "shadow").map(([step, token]) => ({
+  step,
+  layers: token.$value,
+}));
+
+const COMPONENT_TOKENS = readTokenFile("component.json", "component").map(([name, token]) => ({
+  name,
+  property: name.slice(0, name.indexOf("-")),
+  part: name.slice(name.indexOf("-") + 1),
+  modes: token.$value,
+}));
+
+const COMPONENT_COLORS = COMPONENT_TOKENS.filter(({ property }) => property !== "shadow");
+
+const COMPONENT_SHADOWS = COMPONENT_TOKENS.filter(({ property }) => property === "shadow");
+
+const shadowStepOf = (reference) => reference.match(/^\{shadow\.([^}]+)\}$/)[1];
+
+const shadowVar = (name) => `--ids-shadow-${name}`;
+
+const px = (n) => (n === 0 ? "0" : `${n}px`);
+
+const NO_SHADOW_THAT_STILL_COMPOSES = "0 0 #0000";
+
+const cssShadow = (layers) =>
+  layers.length === 0
+    ? NO_SHADOW_THAT_STILL_COMPOSES
+    : layers
+        .map(({ x, y, blur, spread, color }) => `${px(x)} ${px(y)} ${px(blur)} ${px(spread)} ${color}`)
+        .join(", ");
+
 const themeVar = (mode, slot) => `--ids-theme-${mode}-${slot}`;
 
 const TW_NS = {
@@ -219,19 +269,58 @@ const T_CSS_TEXT_ROOT = `  --ids-text-{{NAME}}: {{FONT_SIZE}};
 
 const T_DART_TEXT_STYLE = `TextStyle(fontFamily: '{{FONT_FAMILY}}', package: '{{FONT_PACKAGE}}', fontSize: {{FONT_SIZE}}, fontWeight: FontWeight.w{{FONT_WEIGHT}}, height: {{LINE_HEIGHT}}, letterSpacing: {{LETTER_SPACING}})`;
 
-const buildColorBridgeCSS = () => {
-  const families = FAMILY_SLOTS.flatMap(({ property, name, slot }) =>
-    COLOR_ROLES.namespaces[property].map(
-      (namespace) => `  ${namespace}-${name}: var(${colorVar(slot)});`,
-    ),
+const bridgeLines = ({ property, name, slot }) =>
+  COLOR_ROLES.namespaces[property].map(
+    (namespace) => `  ${namespace}-${name}: var(${colorVar(slot)});`,
   );
-  return render(T_CSS_THEME, { THEME: families.join("\n") });
-};
+
+const SCHEME_BRIDGE_SLOTS = SCHEME_SLOTS.map(({ property, name, slot }) => ({
+  property,
+  name: name.replaceAll("{family}", SCHEME),
+  slot: slot.replaceAll("{family}", SCHEME),
+}));
+
+const COMPONENT_BRIDGE_SLOTS = COMPONENT_COLORS.map(({ property, part, name }) => ({
+  property,
+  name: part,
+  slot: name,
+}));
+
+const buildColorBridgeCSS = () =>
+  render(T_CSS_THEME, {
+    THEME: [
+      ...[...FAMILY_SLOTS, ...SCHEME_BRIDGE_SLOTS, ...COMPONENT_BRIDGE_SLOTS].flatMap(bridgeLines),
+      ...COMPONENT_SHADOWS.map(({ name, part }) => `  --shadow-${part}: var(--ids-${name});`),
+    ].join("\n"),
+  });
+
+const schemeLayer = (family) =>
+  SCHEME_LAYER_IN_TEXT_COLOR.includes(family)
+    ? ["currentColor", "var(--ids-state-hover)", "var(--ids-state-press)"]
+    : [`var(${colorVar(`bg-${family}`)})`, "var(--ids-state-tint-hover)", "var(--ids-state-tint-press)"];
+
+const buildSchemeCSS = () =>
+  COLOR_FAMILIES.map((family) => {
+    const [layer, hover, press] = schemeLayer(family);
+    const lines = [
+      ...SCHEME_SLOTS.map(
+        ({ slot }) =>
+          `  ${colorVar(slot.replaceAll("{family}", SCHEME))}: var(${colorVar(schemeTarget(family, slot))});`,
+      ),
+      `  --ids-state-layer-${SCHEME}: ${layer};`,
+      `  --ids-state-layer-${SCHEME}-hover: ${hover};`,
+      `  --ids-state-layer-${SCHEME}-press: ${press};`,
+    ];
+    return `@utility ${SCHEME}-${family} {\n${lines.join("\n")}\n}\n`;
+  }).join("\n");
 
 const buildStaticCSS = (dictionary) => {
-  const lines = ["motion", "radius", "size", "state"].flatMap((cat) =>
-    byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
-  );
+  const lines = [
+    ...["motion", "radius", "size", "state"].flatMap((cat) =>
+      byCategory(dictionary, cat).map((t) => `  ${idsVar(cat, t)}: ${toVal(t)};`),
+    ),
+    ...SHADOW_STEPS.map(({ step, layers }) => `  ${shadowVar(step)}: ${cssShadow(layers)};`),
+  ];
   const roundedUsesIdsRadius = byCategory(dictionary, "radius").map(
     (t) => `  --radius-${slug(t)}: var(${idsVar("radius", t)});`,
   );
@@ -286,7 +375,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 
 @keyframes ids-marquee {
   to {
-    translate: var(--ids-marquee-translate, -50%);
+    translate: var(--marquee-translate, -50%);
   }
 }
 
@@ -299,7 +388,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 `;
 
 const T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES = `@theme inline {
-  --animate-marquee: ids-marquee var(--ids-marquee-duration, 20s) linear infinite var(--ids-marquee-direction, normal) var(--ids-marquee-play-state, running);
+  --animate-marquee: ids-marquee var(--marquee-duration, 20s) linear infinite var(--marquee-direction, normal) var(--marquee-play-state, running);
 }
 `;
 
@@ -330,11 +419,11 @@ const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:wh
 }
 `;
 
-const T_CSS_UTILITIES = `@utility focus-ring {
+const focusRingUtility = (name, family) => `@utility ${name} {
   outline: none;
 
   ${focusRingTriggers("  ")} {
-    @apply ring-[3px] ring-primary/40 inset-ring-primary;
+    @apply ring-[3px] ring-${family}/40 inset-ring-${family};
   }
 
   &[aria-invalid="true"],
@@ -346,6 +435,11 @@ const T_CSS_UTILITIES = `@utility focus-ring {
     }
   }
 }
+`;
+
+const T_CSS_UTILITIES = `${focusRingUtility("focus-ring", "primary")}
+${focusRingUtility("focus-ring-scheme", "scheme")}
+${focusRingUtility("focus-ring-current", "current")}
 
 @utility state-layer {
   background-image: linear-gradient(
@@ -360,6 +454,12 @@ const T_CSS_UTILITIES = `@utility focus-ring {
 
 @utility state-press {
   --ids-state-opacity: var(--ids-state-layer-press, var(--ids-state-press));
+}
+
+@utility state-scheme {
+  --ids-state-color: var(--ids-state-layer-scheme);
+  --ids-state-layer-hover: var(--ids-state-layer-scheme-hover);
+  --ids-state-layer-press: var(--ids-state-layer-scheme-press);
 }
 
 @utility state-fill {
@@ -507,7 +607,13 @@ const providerValue = (mode, slot, fallbacks) => {
 
 const buildColorRolesCSS = (dictionary, mode) => {
   const fallbacks = neutralFallbacks(dictionary, mode);
-  const lines = FAMILY_SLOTS.map(({ slot }) => slot).map((slot) => `  ${colorVar(slot)}: ${providerValue(mode, slot, fallbacks)};`);
+  const lines = [
+    ...FAMILY_SLOTS.map(({ slot }) => `  ${colorVar(slot)}: ${providerValue(mode, slot, fallbacks)};`),
+    ...COMPONENT_COLORS.map(({ name, modes }) => `  ${colorVar(name)}: var(${colorVar(modes[mode])});`),
+    ...COMPONENT_SHADOWS.map(
+      ({ name, modes }) => `  --ids-${name}: var(${shadowVar(shadowStepOf(modes[mode]))});`,
+    ),
+  ];
   return block(`[data-mode="${mode}"]`, lines);
 };
 
@@ -532,6 +638,22 @@ const T_CSS_CORNER_SHAPE = `@layer base {
 @supports (corner-shape: squircle) {
   [data-mode] {
     --ids-corner-radius-scale: var(--ids-theme-corner-radius-scale, 1);
+  }
+}
+`;
+
+const T_CSS_BACKGROUND_UNDERNEATH = `@layer base {
+  [data-mode]:not([data-mode] [data-mode]),
+  [data-mode].bg-neutral-subtlest {
+    --ids-bg-current: var(--ids-color-bg-neutral-subtlest);
+  }
+
+  .bg-panel {
+    --ids-bg-current: var(--ids-color-bg-panel);
+  }
+
+  .bg-band {
+    --ids-bg-current: var(--ids-color-bg-band);
   }
 }
 `;
@@ -612,9 +734,11 @@ const cssFormatter = ({ dictionary }) =>
     T_CSS_ANIMATIONS_READING_THE_ELEMENTS_VARIABLES,
     T_CSS_VARIANTS,
     T_CSS_UTILITIES,
+    buildSchemeCSS(),
     buildConcentricCSS(),
     buildTypographyCSS(dictionary),
     T_CSS_CORNER_SHAPE,
+    T_CSS_BACKGROUND_UNDERNEATH,
     buildScaleCSS(dictionary),
     T_CSS_REGISTERED_LENGTHS,
     T_CSS_STATE_LAYER_PROPERTIES,
@@ -818,6 +942,159 @@ const dartColorRolesFormatter = ({ dictionary }) => {
   });
 };
 
+const tsComponentTokensFormatter = () =>
+  render(T_TS_FILE, {
+    BODY: [
+      `export const IDS_SHADOWS = ${tsRecord(
+        Object.fromEntries(SHADOW_STEPS.map(({ step, layers }) => [step, `'${cssShadow(layers)}'`])),
+        "",
+      )} as const;`,
+      `export const IDS_COMPONENT_COLORS = ${tsRecord(
+        Object.fromEntries(
+          COMPONENT_COLORS.map(({ name, modes }) => [
+            name,
+            `{ ${MODES.map((mode) => `${mode}: '${modes[mode]}'`).join(", ")} }`,
+          ]),
+        ),
+        "",
+      )} as const;`,
+      `export const IDS_COMPONENT_SHADOWS = ${tsRecord(
+        Object.fromEntries(
+          COMPONENT_SHADOWS.map(({ name, modes }) => [
+            name,
+            `{ ${MODES.map((mode) => `${mode}: '${shadowStepOf(modes[mode])}'`).join(", ")} }`,
+          ]),
+        ),
+        "",
+      )} as const;`,
+    ].join("\n\n"),
+  });
+
+const dartColor = (hex) => {
+  const [r, g, b, a = "ff"] = hex.slice(1).match(/../g);
+  return `Color(0x${(a + r + g + b).toUpperCase()})`;
+};
+
+const dartBoxShadow = ({ x, y, blur, spread, color }) =>
+  `BoxShadow(color: ${dartColor(color)}, offset: Offset(${x}, ${y}), blurRadius: ${blur}, spreadRadius: ${spread})`;
+
+const dartModeMap = (type, entries) =>
+  `<IdsMode, Map<String, ${type}>>{\n${MODES.map(
+    (mode) =>
+      `    IdsMode.${mode}: {\n${entries
+        .map(([name, value]) => `      '${name}': ${value(mode)},`)
+        .join("\n")}\n    },`,
+  ).join("\n")}\n  }`;
+
+const T_DART_COMPONENT_TOKENS = `${GENERATED}
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/painting.dart';
+
+import 'ids_color_roles.dart';
+import 'ids_enums.dart';
+
+abstract final class IdsShadows {
+  static const steps = <String, List<BoxShadow>>{
+{{SHADOW_STEPS}}
+  };
+}
+
+abstract final class IdsComponentTokens {
+  static const colorRoles = {{COLOR_ROLES}};
+
+  static const shadowSteps = {{SHADOW_TOKENS}};
+
+  static Map<String, T> inMode<T>(Map<IdsMode, Map<String, T>> table, IdsMode mode) =>
+      table[mode] ?? (throw ArgumentError.value(mode, 'mode', 'is not light or dark'));
+}
+
+@immutable
+class IdsComponentColors {
+  const IdsComponentColors({
+{{COLOR_PARAMS}}
+  });
+
+  factory IdsComponentColors.of(IdsColors colors, IdsMode mode) {
+    final roles = IdsComponentTokens.inMode(IdsComponentTokens.colorRoles, mode);
+    Color token(String name) => colors[roles[name]!];
+    return IdsComponentColors(
+{{COLOR_FROM}}
+    );
+  }
+
+{{COLOR_FIELDS}}
+
+  Map<String, Color> get tokens => {
+{{COLOR_TOKENS}}
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsComponentColors &&
+{{COLOR_EQUALS}};
+
+  @override
+  int get hashCode => Object.hashAll(tokens.values);
+}
+
+@immutable
+class IdsComponentShadows {
+  const IdsComponentShadows({
+{{SHADOW_PARAMS}}
+  });
+
+  factory IdsComponentShadows.of(IdsMode mode) {
+    final steps = IdsComponentTokens.inMode(IdsComponentTokens.shadowSteps, mode);
+    List<BoxShadow> token(String name) => IdsShadows.steps[steps[name]!]!;
+    return IdsComponentShadows(
+{{SHADOW_FROM}}
+    );
+  }
+
+{{SHADOW_FIELDS}}
+
+  @override
+  bool operator ==(Object other) =>
+      other is IdsComponentShadows &&
+{{SHADOW_EQUALS}};
+
+  @override
+  int get hashCode => Object.hashAll([{{SHADOW_HASH}}]);
+}
+`;
+
+const dartComponentTokensFormatter = () => {
+  const colors = COMPONENT_COLORS.map(({ name }) => [name, toCamel(name)]);
+  const shadows = COMPONENT_SHADOWS.map(({ name }) => [name, toCamel(name)]);
+  return render(T_DART_COMPONENT_TOKENS, {
+    SHADOW_STEPS: SHADOW_STEPS.map(
+      ({ step, layers }) =>
+        `    '${step}': <BoxShadow>[${layers.map(dartBoxShadow).join(", ")}],`,
+    ).join("\n"),
+    COLOR_ROLES: dartModeMap(
+      "String",
+      COMPONENT_COLORS.map(({ name, modes }) => [name, (mode) => `'${modes[mode]}'`]),
+    ),
+    SHADOW_TOKENS: dartModeMap(
+      "String",
+      COMPONENT_SHADOWS.map(({ name, modes }) => [name, (mode) => `'${shadowStepOf(modes[mode])}'`]),
+    ),
+    COLOR_PARAMS: colors.map(([, field]) => `    required this.${field},`).join("\n"),
+    COLOR_FROM: colors.map(([name, field]) => `      ${field}: token('${name}'),`).join("\n"),
+    COLOR_FIELDS: colors.map(([, field]) => `  final Color ${field};`).join("\n"),
+    COLOR_TOKENS: colors.map(([name, field]) => `    '${name}': ${field},`).join("\n"),
+    COLOR_EQUALS: colors.map(([, field]) => `      other.${field} == ${field}`).join(" &&\n"),
+    SHADOW_PARAMS: shadows.map(([, field]) => `    required this.${field},`).join("\n"),
+    SHADOW_FROM: shadows.map(([name, field]) => `      ${field}: token('${name}'),`).join("\n"),
+    SHADOW_FIELDS: shadows.map(([, field]) => `  final List<BoxShadow> ${field};`).join("\n"),
+    SHADOW_EQUALS: shadows
+      .map(([, field]) => `      listEquals(other.${field}, ${field})`)
+      .join(" &&\n"),
+    SHADOW_HASH: shadows.map(([, field]) => `...${field}`).join(", "),
+  });
+};
+
 const dartMotionFormatter = ({ dictionary }) =>
   render(T_DART_CLASS, {
     NAME: "IdsMotion",
@@ -884,6 +1161,8 @@ for (const [name, format] of [
   ["ids/dart-enums", dartEnumsFormatter],
   ["ids/dart-color-roles", dartColorRolesFormatter],
   ["ids/dart-motion", dartMotionFormatter],
+  ["ids/ts-component-tokens", tsComponentTokensFormatter],
+  ["ids/dart-component-tokens", dartComponentTokensFormatter],
   ["ids/dart-typography", dartTypographyFormatter],
 ]) {
   StyleDictionary.registerFormat({ name, format });
@@ -903,6 +1182,7 @@ export default {
       files: [
         { destination: "../react/src/tokens/types.ts", format: "ids/ts-types" },
         { destination: "../react/src/tokens/color-roles.ts", format: "ids/ts-color-roles" },
+        { destination: "../react/src/tokens/component-tokens.ts", format: "ids/ts-component-tokens" },
       ],
     },
     dart: {
@@ -914,6 +1194,10 @@ export default {
           format: "ids/dart-color-roles",
         },
         { destination: "../flutter/lib/tokens/ids_motion.dart", format: "ids/dart-motion" },
+        {
+          destination: "../flutter/lib/tokens/ids_component_tokens.dart",
+          format: "ids/dart-component-tokens",
+        },
         {
           destination: "../flutter/lib/tokens/ids_typography.dart",
           format: "ids/dart-typography",

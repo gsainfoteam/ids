@@ -5,7 +5,7 @@ import { TelFieldCountrySelect } from './country-select';
 import { TelFieldInput } from './input';
 import { telFieldStyle } from './style';
 import { useTelField } from './use-tel-field';
-import { type FieldSurfaceVariant } from '../../../internal/field-surface';
+import { type FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
 import {
   Adornments,
   TextControlClear,

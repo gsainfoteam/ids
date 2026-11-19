@@ -1,4 +1,4 @@
-import { fieldAction, fieldTrigger } from '../../../internal/field-surface';
+import { fieldAction, fieldTrigger } from '../../../internal/surfaces/field-surface';
 import { cn, tv } from '../../../utils';
 
 import type { FileFieldVariant } from '.';
@@ -24,7 +24,7 @@ export const fileFieldStyle = tv({
     dropzoneTitle: 'font-medium break-keep text-balance',
     dropzoneHint: 'text-caption-c1-regular text-neutral break-keep text-balance',
     list: 'flex flex-col gap-1',
-    item: 'bg-neutral-subtlest dark:bg-neutral-subtler',
+    item: 'bg-panel',
     preview: 'text-neutral',
     itemSize: 'text-caption-c1-regular',
     itemRemove: fieldAction.base,

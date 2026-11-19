@@ -23,7 +23,7 @@ export const tableStyle = tv({
         viewport: 'rounded-[calc(var(--table-radius)-1px)]',
         header: 'bg-neutral-subtle',
       },
-      ghost: { header: 'bg-neutral-subtlest' },
+      ghost: { header: 'bg-(--ids-bg-current)' },
     } satisfies Record<TableVariant, object>,
     size: {
       standard: {
@@ -51,9 +51,8 @@ export const tableStyle = tv({
       body: {
         row: [
           'state-layer',
-          'data-selected:bg-primary-subtle data-selected:text-on-primary-subtle',
-          'data-selected:[--ids-state-color:var(--ids-color-bg-primary)]',
-          'data-selected:[--ids-state-layer-hover:var(--ids-state-tint-hover)]',
+          'data-selected:scheme-primary data-selected:state-scheme',
+          'data-selected:bg-scheme-subtle data-selected:text-on-scheme-subtle',
           'last:*:border-b-0',
         ],
       },

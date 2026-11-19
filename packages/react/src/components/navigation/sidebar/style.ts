@@ -58,7 +58,7 @@ export const sidebarStyle = tv({
     dropLayer: 'relative',
     dropLine: [
       'pointer-events-none absolute z-10 h-0.5 -translate-y-1/2 rounded-full bg-primary',
-      'before:absolute before:-start-1 before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full before:border-[1.5px] before:border-primary before:bg-neutral-subtlest',
+      'before:absolute before:-start-1 before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full before:border-[1.5px] before:border-primary before:bg-(--ids-bg-current)',
     ],
     dragPreview: 'w-full cursor-grabbing bg-neutral-subtlest opacity-75 shadow-lg',
     inset: 'flex min-w-0 flex-1 flex-col',
@@ -84,13 +84,13 @@ export const sidebarStyle = tv({
     standalone: { true: {}, false: { root: 'max-sm:hidden' } },
     iconColor: {
       neutral: {},
-      primary: { icon: 'text-primary' },
-      secondary: { icon: 'text-secondary' },
-      tertiary: { icon: 'text-tertiary' },
-      info: { icon: 'text-info' },
-      success: { icon: 'text-success' },
-      warning: { icon: 'text-warning' },
-      danger: { icon: 'text-danger' },
+      primary: { icon: 'scheme-primary text-scheme' },
+      secondary: { icon: 'scheme-secondary text-scheme' },
+      tertiary: { icon: 'scheme-tertiary text-scheme' },
+      info: { icon: 'scheme-info text-scheme' },
+      success: { icon: 'scheme-success text-scheme' },
+      warning: { icon: 'scheme-warning text-scheme' },
+      danger: { icon: 'scheme-danger text-scheme' },
     } satisfies Record<SidebarIconColorScheme, object>,
     touch: {
       true: {

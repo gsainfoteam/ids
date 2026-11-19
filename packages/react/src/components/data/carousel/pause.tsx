@@ -9,7 +9,7 @@ import { useTranslate } from '../../../internal/translate';
 import { IconToggle } from '../../action/icon-toggle';
 
 import type { InteractiveState, InteractiveValue } from '../../../hooks/use-interactive';
-import type { ControlColorScheme, SurfaceVariant } from '../../../internal/control-surface';
+import type { ControlColorScheme, SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type CarouselPauseProps = Omit<ComponentProps<'button'>, 'children' | 'color' | 'value'> & {

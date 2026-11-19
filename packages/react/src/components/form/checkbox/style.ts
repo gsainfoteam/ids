@@ -9,10 +9,9 @@ export const checkboxStyle = tv({
       'relative inline-flex shrink-0 items-center justify-center align-middle',
       'rounded-indicator focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      '[--checkbox-accent:var(--ids-color-bg-primary)] [--checkbox-on-accent:var(--ids-color-text-on-primary)]',
-      'data-invalid:[--checkbox-accent:var(--ids-color-bg-danger)] data-invalid:[--checkbox-on-accent:var(--ids-color-text-on-danger)]',
-      'data-[state=checked]:bg-(--checkbox-accent) data-[state=checked]:text-(--checkbox-on-accent) data-[state=checked]:inset-ring-(--checkbox-accent)',
-      'data-[state=indeterminate]:bg-(--checkbox-accent) data-[state=indeterminate]:text-(--checkbox-on-accent) data-[state=indeterminate]:inset-ring-(--checkbox-accent)',
+      'scheme-primary data-invalid:scheme-danger',
+      'data-[state=checked]:bg-scheme data-[state=checked]:text-on-scheme data-[state=checked]:inset-ring-(--ids-color-bg-scheme)',
+      'data-[state=indeterminate]:bg-scheme data-[state=indeterminate]:text-on-scheme data-[state=indeterminate]:inset-ring-(--ids-color-bg-scheme)',
       'data-disabled:opacity-50',
     ],
     input:
@@ -26,7 +25,7 @@ export const checkboxStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-neutral-subtlest shadow-xs inset-ring-1 inset-ring-neutral dark:bg-neutral-subtle dark:inset-ring-(--ids-color-bg-neutral)',
+        root: 'bg-control-outline shadow-xs inset-ring-1 inset-ring-control-outline',
       },
       soft: { root: 'bg-neutral-subtle inset-ring-1 inset-ring-transparent' },
     } satisfies Record<CheckboxVariant, object>,

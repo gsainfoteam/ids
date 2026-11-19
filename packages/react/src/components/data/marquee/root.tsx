@@ -85,7 +85,7 @@ export function MarqueeRoot({
       {node}
     </li>
   ));
-  const duration = { '--ids-marquee-duration': loopDuration(length, speed) } as CSSProperties;
+  const duration = { '--marquee-duration': loopDuration(length, speed) } as CSSProperties;
 
   return (
     <MarqueeContext value={{ styles, size, playing, setPlaying: setChosen }}>

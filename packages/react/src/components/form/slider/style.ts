@@ -1,4 +1,4 @@
-import { sliderSurface } from '../../../internal/slider-surface';
+import { sliderSurface } from '../../../internal/surfaces/slider-surface';
 import { tv } from '../../../utils';
 
 import type { SliderOrientation } from '.';

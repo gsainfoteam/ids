@@ -73,7 +73,7 @@ import { Table } from '@gsainfoteam/ids-react';
 | 선택         | `bg-primary-subtle` | `bg-primary-subtle` 위 primary 층(8%) |
 
 - 층은 글자색(`text-neutral-bold`)을 6% 얹은 것이라 줄무늬, 머리글 띠 어느 바탕에서나 보입니다.
-- 선택된 행은 층 색을 `bg-primary` 로, 세기를 `--ids-state-tint-hover` 로 바꿔 올렸을 때 primary 쪽으로 짙어집니다.
+- 선택된 행은 `scheme-primary` 와 `state-scheme` 를 얹어, 올렸을 때 층이 primary 채움색으로 짙어집니다.
 - 올렸을 때 층은 `highlightOnHover` 나 `onClick` 이 있는 몸통 행에만 붙습니다. 머리글과 바닥글 행은 바뀌지 않습니다.
 - 선택은 줄무늬보다 앞섭니다. 짝수 행을 골라도 `bg-primary-subtle` 입니다.
 - `selected` 는 모양과 `data-selected` 만 바꿉니다. `aria-selected` 는 `grid` 역할에서만 뜻이 있어 붙이지 않습니다. 선택은 행 안의 체크박스나 `aria-pressed` 버튼이 알립니다.
