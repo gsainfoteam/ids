@@ -18,5 +18,10 @@ Card adds `shadow-panel`. Outline Chip and Badge borders are `border-neutral`. T
 Rating star is `text-neutral`. The Editor bar takes `border-field-bar` and the outline Editor's
 code `bg-field-code-outline`.
 
+Parts that copy the color underneath them (the Badge cutout, the ColorPicker ring offset, Bubble
+reaction rings, the selected enclosed Tab, the ghost Table header, Chart dots, the Sidebar drop
+marker) read the new `--ids-bg-current`, which the page, `bg-panel` and `bg-band` set, so they
+match a dark Card or popup.
+
 Breaking: the layout variables `--ids-marquee-*` and `--ids-text-area-pad-y` are now
 `--marquee-*` and `--text-area-pad-y`.

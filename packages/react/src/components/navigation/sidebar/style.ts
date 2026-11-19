@@ -58,7 +58,7 @@ export const sidebarStyle = tv({
     dropLayer: 'relative',
     dropLine: [
       'pointer-events-none absolute z-10 h-0.5 -translate-y-1/2 rounded-full bg-primary',
-      'before:absolute before:-start-1 before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full before:border-[1.5px] before:border-primary before:bg-neutral-subtlest',
+      'before:absolute before:-start-1 before:top-1/2 before:size-1.5 before:-translate-y-1/2 before:rounded-full before:border-[1.5px] before:border-primary before:bg-(--ids-bg-current)',
     ],
     dragPreview: 'w-full cursor-grabbing bg-neutral-subtlest opacity-75 shadow-lg',
     inset: 'flex min-w-0 flex-1 flex-col',

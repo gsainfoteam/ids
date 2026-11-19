@@ -642,6 +642,22 @@ const T_CSS_CORNER_SHAPE = `@layer base {
 }
 `;
 
+const T_CSS_BACKGROUND_UNDERNEATH = `@layer base {
+  [data-mode]:not([data-mode] [data-mode]),
+  [data-mode].bg-neutral-subtlest {
+    --ids-bg-current: var(--ids-color-bg-neutral-subtlest);
+  }
+
+  .bg-panel {
+    --ids-bg-current: var(--ids-color-bg-panel);
+  }
+
+  .bg-band {
+    --ids-bg-current: var(--ids-color-bg-band);
+  }
+}
+`;
+
 const T_CSS_STATE_LAYER_PROPERTIES = `@property --ids-state-opacity {
   syntax: "<percentage>";
   inherits: false;
@@ -722,6 +738,7 @@ const cssFormatter = ({ dictionary }) =>
     buildConcentricCSS(),
     buildTypographyCSS(dictionary),
     T_CSS_CORNER_SHAPE,
+    T_CSS_BACKGROUND_UNDERNEATH,
     buildScaleCSS(dictionary),
     T_CSS_REGISTERED_LENGTHS,
     T_CSS_STATE_LAYER_PROPERTIES,

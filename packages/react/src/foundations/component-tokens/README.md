@@ -29,6 +29,15 @@
 | `bg-qr-code`, `text-qr-code` | 밝은 바탕, 어두운 모듈 | 같음 | QRCode `inverted={false}` |
 | `bg-qr-code-inverse`, `text-qr-code-inverse` | 어두운 바탕, 밝은 모듈 | 같음 | QRCode `inverted` |
 
+## 놓인 면의 색
+
+- Badge cutout, ColorPicker 선택 ring 의 offset, Bubble 반응 ring, enclosed Tabs 의 선택 탭, ghost Table 머리글, Chart 점과 조각 테두리, Sidebar 끌어 놓기 표시는 놓인 면의 색을 흉내 냅니다.
+- 이 부분은 `--ids-bg-current` 를 읽습니다(`ring-(--ids-bg-current)`).
+- `ids.css` 가 값을 정합니다.
+  - 가장 바깥 provider 와 자기 페이지를 칠하는 Scope: `bg-neutral-subtlest`
+  - `bg-panel`, `bg-band` 클래스가 붙은 요소: 그 토큰
+- 그래서 다크 모드의 Card 나 팝업 안에서도 바탕과 같은 색이 됩니다.
+
 ## 그림자
 
 `shadow.json` 은 단계 세 개(`0`, `1`, `2`)만 둡니다. `sm`, `md` 같은 이름은 없고, 컴포넌트는 `shadow-panel` 같은 토큰으로 단계를 고릅니다. `0` 은 `0 0 #0000` 이라 Tailwind 의 그림자 목록 안에서도 그대로 합쳐집니다.
@@ -36,4 +45,5 @@
 ## 테스트
 
 - `tests/component-tokens.test.ts` 가 이름 규칙, 다크 모드에서 `bg-panel` 과 페이지의 차이, `bg-panel` 과 `bg-band` 위 outline 컨트롤의 구분, 토큰 바탕 위 글자의 APCA 대비를 17개 팔레트에서 확인합니다.
+- `tests/current-background.test.tsx` 가 페이지, Card, 모드를 바꾼 Scope 위의 ghost Table 머리글이 그 면과 같은 색인지 확인합니다.
 - `tests/color-rules.test.ts` 가 컴포넌트 코드에 `dark:`, 역할을 가리키는 자체 변수, `color-mix`, IDS 색의 opacity modifier(의도한 반투명 층 제외), `ids.css` 에 없는 `--ids-*` 변수가 없는지 확인합니다.

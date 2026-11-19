@@ -447,6 +447,11 @@ tokens with `color-mix`.
   `bg-panel shadow-panel` for Card, Dialog, popups and toasts (one step lighter than the page in
   dark), `bg-band` for a band inside one, `bg-control-outline` with `inset-ring-control-outline` for
   outline controls and `bg-field-outline` for fields.
+- **The color underneath.** A part that copies the color of the surface it sits on (a Badge
+  cutout, a ColorPicker ring offset, a ghost Table header, Chart dots) reads `--ids-bg-current`,
+  never `bg-neutral-subtlest`. `ids.css` sets it to the page on the outermost provider and on a
+  Scope that paints its own page, and to `bg-panel` or `bg-band` on an element with that class, so
+  the cutout matches a dark Card or popup as well as the page.
 - Layout variables a component sets for itself carry no `--ids-` prefix (`--marquee-duration`,
   `--text-area-pad-y`); `--ids-*` is the CSS package's and the provider's.
 

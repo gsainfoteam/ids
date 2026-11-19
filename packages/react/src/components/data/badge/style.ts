@@ -60,7 +60,7 @@ export const badgeStyle = tv({
     {
       placement: ['top-end', 'top-start', 'bottom-end', 'bottom-start'],
       class: {
-        indicator: ['pointer-events-none absolute z-10', 'ring-2 ring-(--ids-color-bg-neutral-subtlest)'],
+        indicator: ['pointer-events-none absolute z-10', 'ring-2 ring-(--ids-bg-current)'],
       },
     },
     {

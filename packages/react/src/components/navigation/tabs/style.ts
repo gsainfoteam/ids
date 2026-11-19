@@ -58,7 +58,7 @@ export const tabsStyle = tv({
         ],
       },
       enclosed: {
-        trigger: 'border border-transparent aria-selected:border-neutral aria-selected:bg-neutral-subtlest',
+        trigger: 'border border-transparent aria-selected:border-neutral aria-selected:bg-(--ids-bg-current)',
       },
     } satisfies Record<TabsAppearance, object>,
     variant: {
