@@ -27,20 +27,26 @@ const ROLE_REDEFINED = /\[--[\w-]+:var\(--ids-color-[\w-]+\)\]/g;
 const COLOR_MIX = /color-mix\(/g;
 const IDS_VARIABLE = /--ids-[a-z0-9-]*[a-z0-9](?![\w$-])/g;
 const COLOR_WITH_OPACITY =
-  /(?<![\w-])(?:bg|text|border|ring|inset-ring|fill|stroke|outline|shadow|divide|from|via|to|decoration|caret|accent)-([a-z][\w-]*)\/\d+/g;
+  /(?<![\w-])(?:bg|text|border|ring|inset-ring|fill|stroke|outline|shadow|divide|from|via|to|decoration|caret|accent)-([a-z][\w-]*|\(--ids-color-[\w-]+\))\/\d+/g;
 
 const COLORS_OUTSIDE_IDS = new Set(['black', 'white', 'current', 'transparent', 'inherit']);
 
-const FOCUS_HALO = ['ring-primary/40', 'stroke-primary/40'];
+const FOCUS_HALO = ['ring-primary/40', 'stroke-primary/40', 'inset-ring-(--ids-color-text-on-primary)/60'];
 const TEXT_SELECTION = ['bg-primary/30'];
 const VEIL_OVER_UNKNOWN_CONTENT = ['bg-neutral-subtlest/60', 'bg-neutral-subtlest/95'];
 const SCROLL_AREA_TRACK = ['bg-neutral-subtle/50', 'bg-neutral/60'];
+const EDGE_OVER_UNKNOWN_CONTENT = [
+  'inset-ring-(--ids-color-text-neutral-bold)/8',
+  'inset-ring-(--ids-color-text-neutral-bold)/10',
+  'inset-ring-(--ids-color-text-neutral-bold)/15',
+];
 
 const translucentOnPurpose = new Set([
   ...FOCUS_HALO,
   ...TEXT_SELECTION,
   ...VEIL_OVER_UNKNOWN_CONTENT,
   ...SCROLL_AREA_TRACK,
+  ...EDGE_OVER_UNKNOWN_CONTENT,
 ]);
 
 test('component code has no dark: variant, since a component token picks the color per mode', () => {
