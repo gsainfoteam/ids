@@ -2,14 +2,14 @@
 
 import { TableCellsIcon } from '@heroicons/react/16/solid';
 
-import { useEditorContext } from './context';
-import { extensionIsLoaded, hasExtension, useEditorToolProps, type EditorToolProps } from './tool';
-import { useEditorSelector } from './use-editor-selector';
-import { useTranslate } from '../../../internal/translate';
-import { IconButton } from '../../action/icon-button';
-import { Menu } from '../../overlay/menu';
+import { useTranslate } from '../../../../internal/translate';
+import { IconButton } from '../../../action/icon-button';
+import { Menu } from '../../../overlay/menu';
+import { useEditorContext } from '../context';
+import { extensionIsLoaded, hasExtension, useEditorToolProps, type EditorToolProps } from '../tool';
+import { useEditorSelector } from '../use-editor-selector';
 
-import type { IdsMessageKey } from '../../../internal/messages';
+import type { IdsMessageKey } from '../../../../internal/messages';
 import type { ChainedCommands, Editor as TiptapEditor } from '@tiptap/core';
 
 export type EditorTableProps = EditorToolProps;

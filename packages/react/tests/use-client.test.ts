@@ -26,16 +26,16 @@ const isReexportOnly = (code: string) =>
         line.trim() === '' || /^(import |export (type )?\{|export \* from |\}|\s)/.test(line),
     );
 
-const RENDERED_ONLY_ON_THE_SERVER = new Set([
-  'components/typography/rich-text/index.tsx',
-  'components/typography/rich-text/render.tsx',
-]);
+const RICH_TEXT = 'components/typography/rich-text/';
+const RENDERED_ONLY_ON_THE_SERVER = new Set([`${RICH_TEXT}index.tsx`, `${RICH_TEXT}render.tsx`]);
+const isRenderedOnlyOnTheServer = (file: string) =>
+  RENDERED_ONLY_ON_THE_SERVER.has(file) || file.startsWith(`${RICH_TEXT}nodes/`);
 
 const isComponentIndex = (file: string) => COMPONENT_INDEX.test(file);
 const rootOf = (file: string) => file.replace(/index\.tsx$/, 'root.tsx');
 
 const runsOnTheClient = (file: string, code: string) =>
-  !RENDERED_ONLY_ON_THE_SERVER.has(file) &&
+  !isRenderedOnlyOnTheServer(file) &&
   (CALLS_A_HOOK.test(code) ||
     CREATES_A_CONTEXT.test(code) ||
     (file.endsWith('.tsx') && !isReexportOnly(code) && !isComponentIndex(file)));
@@ -56,7 +56,7 @@ test('every component keeps its index server-safe and its root in root.tsx', () 
   });
   const rootsMissingOrServerSide = componentIndexes.filter(
     (file) =>
-      !RENDERED_ONLY_ON_THE_SERVER.has(file) &&
+      !isRenderedOnlyOnTheServer(file) &&
       (!existsSync(SRC + rootOf(file)) || !USE_CLIENT.test(source(rootOf(file)))),
   );
 

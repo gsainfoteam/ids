@@ -5,16 +5,16 @@ import { useRef, useState, type KeyboardEvent } from 'react';
 import { PhotoIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
-import { useEditorContext } from './context';
-import { IMAGE_ACCEPT } from './image-types';
-import { useEditorToolProps, useToolState, type EditorToolProps } from './tool';
-import { useTranslate } from '../../../internal/translate';
-import { isDevelopment } from '../../../utils/dev';
-import { Button } from '../../action/button';
-import { IconToggle } from '../../action/icon-toggle';
-import { Spinner } from '../../feedback/spinner';
-import { Popover } from '../../overlay/popover';
-import { TextField } from '../text-field';
+import { useEditorContext } from '../context';
+import { IMAGE_ACCEPT } from './types';
+import { useTranslate } from '../../../../internal/translate';
+import { isDevelopment } from '../../../../utils/dev';
+import { Button } from '../../../action/button';
+import { IconToggle } from '../../../action/icon-toggle';
+import { Spinner } from '../../../feedback/spinner';
+import { Popover } from '../../../overlay/popover';
+import { TextField } from '../../text-field';
+import { useEditorToolProps, useToolState, type EditorToolProps } from '../tool';
 
 import type { Editor as TiptapEditor } from '@tiptap/core';
 

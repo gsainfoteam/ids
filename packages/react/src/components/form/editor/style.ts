@@ -1,5 +1,6 @@
 import { fieldSurface } from '../../../internal/surfaces/field-surface';
 import { cn, tv } from '../../../utils';
+import { codeTokens } from '../../data/code-block/style';
 import { documentText } from '../../typography/rich-text/style';
 
 import type { EditorVariant } from './root';
@@ -22,7 +23,6 @@ const proseMirrorBaseline = cn(
 );
 
 const editorBlocks = cn(
-  '[&_pre]:rounded-standard [&_pre]:px-3 [&_pre]:py-2 [&_pre]:font-mono [&_pre]:whitespace-pre-wrap',
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
   '[&_hr]:my-3 [&_hr]:border-neutral',
   '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard [&_.ProseMirror-selectednode]:outline-offset-2',
@@ -56,6 +56,7 @@ export const editorStyle = tv({
       proseMirrorBaseline,
       documentText,
       editorBlocks,
+      codeTokens,
       placeholder,
     ],
     count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-bold'],
@@ -68,18 +69,25 @@ export const editorStyle = tv({
     uploadPlaceholder: 'inline-block h-24 w-40 max-w-full align-middle before:hidden',
     taskBox: 'mt-[calc((1lh_-_1rem)/2)]',
     textAlign: 'flex items-center gap-0.5',
+    codeBlock: 'flex flex-col concentric-p-1',
+    codeBlockBar: 'flex items-center justify-between gap-1',
+    codeLanguage: 'w-auto shrink-0 text-neutral',
+    codeCopyStatus: 'sr-only',
+    codePre: 'px-2 py-1 font-mono whitespace-pre-wrap',
   },
   variants: {
     variant: {
       outline: {
         root: fieldSurface.variant.outline,
         bar: 'border-field-bar',
-        content: '[&_:is(pre,th)]:bg-field-code-outline [&_:not(pre)>code]:bg-field-code-outline',
+        content:
+          '[&_:is([data-code-block],th)]:bg-field-code-outline [&_:not(pre)>code]:bg-field-code-outline',
       },
       soft: {
         root: fieldSurface.variant.soft,
         bar: 'border-field-bar',
-        content: '[&_:is(pre,th)]:bg-neutral-subtler [&_:not(pre)>code]:bg-neutral-subtler',
+        content:
+          '[&_:is([data-code-block],th)]:bg-neutral-subtler [&_:not(pre)>code]:bg-neutral-subtler',
       },
     } satisfies Record<EditorVariant, object>,
     size: {

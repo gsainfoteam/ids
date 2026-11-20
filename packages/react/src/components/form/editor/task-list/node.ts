@@ -1,7 +1,7 @@
 import { TaskItem, TaskList } from '@tiptap/extension-list';
 
-import { editorStyle } from './style';
-import { checkboxStyle } from '../checkbox/style';
+import { checkboxStyle } from '../../checkbox/style';
+import { editorStyle } from '../style';
 
 import type { NodeView } from '@tiptap/pm/view';
 

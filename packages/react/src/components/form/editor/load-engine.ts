@@ -1,8 +1,8 @@
 import { once } from 'es-toolkit';
 
 import type * as Engine from './engine';
-import type * as ImageUploadModule from './image-upload';
-import type * as TaskListModule from './task-item-node';
+import type * as ImageUploadModule from './image/upload';
+import type * as TaskListModule from './task-list/node';
 import type { EditorFormat } from './value';
 import type { AnyExtension } from '@tiptap/core';
 import type { Highlight } from '@tiptap/extension-highlight';
@@ -49,7 +49,7 @@ const loadHighlight = once(() =>
 );
 
 const loadTaskList = once(() =>
-  import('./task-item-node').then((module) => module.taskListExtensions),
+  import('./task-list/node').then((module) => module.taskListExtensions),
 );
 
 const loadTextAlign = once(() =>
@@ -58,7 +58,7 @@ const loadTextAlign = once(() =>
 
 const loadTable = once(() => import('@tiptap/extension-table'));
 
-const loadImageUpload = once(() => import('./image-upload'));
+const loadImageUpload = once(() => import('./image/upload'));
 
 export async function loadEngine(format: EditorFormat, parts: EditorParts): Promise<LoadedEngine> {
   const [engine, markdown, highlight, taskList, textAlign, table, imageUpload] = await Promise.all([

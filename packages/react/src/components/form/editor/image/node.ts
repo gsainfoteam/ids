@@ -1,7 +1,10 @@
 import { Fragment, Slice, type Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { Plugin } from '@tiptap/pm/state';
 
-import { DocumentImage, type DocumentImageOptions } from '../../typography/rich-text/schema/image';
+import {
+  DocumentImage,
+  type DocumentImageOptions,
+} from '../../../typography/rich-text/schema/image';
 
 function withoutImages(fragment: Fragment): Fragment {
   const kept: ProseMirrorNode[] = [];

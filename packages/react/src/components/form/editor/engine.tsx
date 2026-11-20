@@ -5,8 +5,9 @@ import { useEffect } from 'react';
 import { CharacterCount, Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, type UseEditorOptions } from '@tiptap/react';
 
+import { EditorCodeBlockNode } from './code-block/node';
 import { LeaveEscapeToTheLayers } from './escape-to-layers';
-import { EditorImageNode } from './image-node';
+import { EditorImageNode } from './image/node';
 import { documentStarterKit } from '../../typography/rich-text/schema/starter-kit';
 
 import type { PartExtensions } from './load-engine';
@@ -35,7 +36,8 @@ export function extensionsFor({
   taskLabel: (text: string) => string;
 }): Extensions {
   return [
-    documentStarterKit([1, 2, 3, 4]),
+    documentStarterKit([1, 2, 3, 4], { codeBlock: false }),
+    EditorCodeBlockNode,
     Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
     CharacterCount.configure({ limit: maxLength }),
     LeaveEscapeToTheLayers,

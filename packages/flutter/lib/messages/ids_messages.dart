@@ -175,6 +175,12 @@ mixin IdsMessages {
 
   String? get editorCodeBlock => null;
 
+  String? get editorCodeLanguage => null;
+
+  String? get editorCodeLanguageSearch => null;
+
+  String? get editorCodePlainText => null;
+
   String? get editorContent => null;
 
   String? editorHeading({required Object level}) => null;
@@ -841,6 +847,15 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get editorCodeBlock => '코드 블록';
+
+  @override
+  String get editorCodeLanguage => '코드 언어';
+
+  @override
+  String get editorCodeLanguageSearch => '언어 찾기';
+
+  @override
+  String get editorCodePlainText => '일반 텍스트';
 
   @override
   String get editorContent => '본문';

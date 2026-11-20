@@ -913,3 +913,46 @@ test('Table inserts a table with a header row, edits it from its menu, and markd
   expect(content.element().querySelector('table')).toBeNull();
   await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('일정\n\n');
 });
+
+test('a code block is highlighted with CodeBlock tokens, and its language picker rewrites the fence', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      format="markdown"
+      aria-label="본문"
+      defaultValue={'```ts\nconst answer = 42;\n```'}
+      onValueChange={onValueChange}
+    >
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await expect
+    .poll(() => content.element().querySelector('[data-token="keyword"]')?.textContent)
+    .toBe('const');
+  expect(content.element().querySelector('[data-token="number"]')?.textContent).toBe('42');
+
+  const language = page.getByRole('combobox', { name: '코드 언어' });
+  await expect.element(language).toHaveTextContent('typescript');
+  await userEvent.click(language);
+  await userEvent.keyboard('pyth');
+  await userEvent.click(page.getByRole('option', { name: 'python' }));
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('```python\nconst answer = 42;\n```');
+  await expect.element(language).toHaveTextContent('python');
+});
+
+test('a code block in a lazy language is highlighted once the language arrives', async () => {
+  render(
+    <Editor format="markdown" aria-label="본문" defaultValue={'```rust\nfn main() {}\n```'}>
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+
+  await expect
+    .poll(() => content.element().querySelector('[data-token="keyword"]')?.textContent)
+    .toBe('fn');
+});

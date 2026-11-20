@@ -4,9 +4,10 @@ import { isAllowedLinkHref } from './image-source';
 
 type Level = 1 | 2 | 3 | 4 | 5 | 6;
 
-export const documentStarterKit = (levels: Level[]) =>
+export const documentStarterKit = (levels: Level[], { codeBlock = true } = {}) =>
   StarterKit.configure({
     heading: { levels },
+    ...(codeBlock ? {} : { codeBlock: false }),
     gapcursor: false,
     trailingNode: false,
     link: {

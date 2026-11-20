@@ -18,7 +18,7 @@ export function RichText({
 
   return (
     <div data-rich-text="" {...props} className={richTextStyle({ size }).root({ className })}>
-      {renderDocument(document, { size, mentionHref })}
+      {renderDocument(document, { mentionHref })}
     </div>
   );
 }

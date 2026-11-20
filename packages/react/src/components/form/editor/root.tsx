@@ -29,8 +29,8 @@ import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorContext, type EditorImages } from './context';
 import { EditorCount } from './count';
 import { EditorHorizontalRule } from './horizontal-rule';
-import { EditorImage } from './image';
-import { isImageFile, type ImageUpload } from './image-types';
+import { EditorImage } from './image/tool';
+import { isImageFile, type ImageUpload } from './image/types';
 import { EditorLink } from './link';
 import { loadEngine, engineKey, type EditorParts, type LoadedEngine } from './load-engine';
 import {
@@ -43,7 +43,7 @@ import {
 } from './marks';
 import { EditorSeparator } from './separator';
 import { editorStyle } from './style';
-import { EditorTable } from './table';
+import { EditorTable } from './table/tool';
 import { EditorTextAlign } from './text-align';
 import { useEditorSelector } from './use-editor-selector';
 import {

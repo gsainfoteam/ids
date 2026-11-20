@@ -32,8 +32,8 @@ export const richTextStyle = tv({
   },
   variants: {
     size: {
-      standard: { root: 'text-body-b3-regular', caption: 'text-caption-c1-regular' },
-      tiny: { root: 'text-caption-c1-regular', caption: 'text-caption-c2-regular' },
+      standard: { root: 'text-body-b3-regular [&_figcaption]:text-caption-c1-regular' },
+      tiny: { root: 'text-caption-c1-regular [&_figcaption]:text-caption-c2-regular' },
     } satisfies Record<IdsSize, object>,
   },
   defaultVariants: { size: 'standard' },

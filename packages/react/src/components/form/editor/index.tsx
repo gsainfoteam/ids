@@ -12,7 +12,7 @@ import { EditorBubbleMenu, type EditorBubbleMenuProps } from './bubble-menu';
 import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorCount, type EditorCountProps, type EditorCountState } from './count';
 import { EditorHorizontalRule, type EditorHorizontalRuleProps } from './horizontal-rule';
-import { EditorImage, type EditorImageProps } from './image';
+import { EditorImage, type EditorImageProps } from './image/tool';
 import { EditorLink, type EditorLinkProps } from './link';
 import {
   EditorBold,
@@ -26,7 +26,7 @@ import {
 import { EditorRoot, type EditorState, type EditorVariant } from './root';
 import { EditorSeparator, type EditorSeparatorProps } from './separator';
 import { editorStyle } from './style';
-import { EditorTable, type EditorTableProps } from './table';
+import { EditorTable, type EditorTableProps } from './table/tool';
 import { EditorTextAlign, type EditorTextAlignment, type EditorTextAlignProps } from './text-align';
 import { type EditorFormat } from './value';
 
