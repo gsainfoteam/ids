@@ -1,3 +1,4 @@
+import { segmentSurface } from '../../../internal/surfaces/segment-surface';
 import { tv } from '../../../utils';
 
 import type { TabsAppearance, TabsColorScheme, TabsOrientation } from './context';
@@ -50,8 +51,8 @@ export const tabsStyle = tv({
         ],
       },
       segmented: {
-        list: 'concentric-p-1 gap-0.5 bg-neutral-subtle',
-        trigger: ['rounded-standard', 'aria-selected:bg-tabs-segment aria-selected:shadow-xs'],
+        list: segmentSurface.track,
+        trigger: [segmentSurface.segment, segmentSurface.selected.ariaSelected],
       },
       pill: {
         list: 'gap-1',
@@ -112,16 +113,16 @@ export const tabsStyle = tv({
         trigger: 'after:inset-y-0 after:-end-px after:w-0.5 after:rounded-full',
       },
     },
-    { appearance: 'segmented', stretch: false, class: { list: 'self-start' } },
+    { appearance: 'segmented', stretch: false, class: { list: segmentSurface.fit } },
     {
       appearance: 'segmented',
       size: 'standard',
-      class: { trigger: 'h-[calc(var(--ids-size-control-standard)-0.5rem)]' },
+      class: { trigger: segmentSurface.height.standard },
     },
     {
       appearance: 'segmented',
       size: 'tiny',
-      class: { trigger: 'h-[calc(var(--ids-size-control-tiny)-0.5rem)]' },
+      class: { trigger: segmentSurface.height.tiny },
     },
     {
       appearance: 'enclosed',
