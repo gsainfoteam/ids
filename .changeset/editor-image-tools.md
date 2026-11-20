@@ -3,12 +3,25 @@
 ---
 
 `Editor` takes images and more tools. `onImageUpload(file)` returns the URL of an uploaded image;
-with it, `Editor.Image` picks files, pasted and dropped image files go through the same function,
-a placeholder holds the spot while it uploads and a failed upload is reported in a toast. A
-selected image takes its alt text from `Editor.Image`'s popover. Only `http(s)`, relative URLs and
-URLs the upload returned become images, so `javascript:` and `data:` never do.
+with it, `Editor.Image` picks files or takes an image address, pasted and dropped image files go
+through the same function, a placeholder holds the spot while it uploads and a failed upload is
+reported in a toast. A selected image takes its alt text from `Editor.Image`'s popover, and in
+`html` and `json` its side handles change its width. Only `http(s)`, relative URLs and URLs the
+upload returned become images, so `javascript:` and `data:` never do.
 
 New tools: `Editor.Highlight`, `Editor.TaskList` (drawn as IDS Checkboxes), `Editor.HorizontalRule`,
-`Editor.TextAlign` and `Editor.Table` (insert a table, add and delete rows and columns; GFM tables
-in markdown). Highlight, task lists, alignment and tables load their Tiptap extension with
-`import()` only when their part is in the Editor, and image uploading only with `onImageUpload`.
+`Editor.TextAlign`, `Editor.Table` (pick a size from a grid; add and delete rows and columns; outside
+markdown, toggle the header row and merge and split cells), `Editor.Callout` (GitHub alerts in
+markdown) and `Editor.Details` (a toggle block). Code blocks pick their language and are
+highlighted like `CodeBlock`. Each of these loads its Tiptap extension with `import()` only when
+its part is in the Editor, and image uploading only with `onImageUpload`.
+
+An editable Editor opens a block menu on `/` and shows a handle beside the hovered block, which
+drags it or opens a menu to insert, turn into, duplicate or delete it. `mentions(query, signal)`
+turns on `@` mentions, saved as `[@ id="" label=""]` in markdown. Lists and blank paragraphs
+pasted from Word and Google Docs are cleaned up.
+
+Add `RichText` from the new `@gsainfoteam/ids-react/rich-text` entry. It draws saved markdown or
+Editor JSON with IDS components (CodeBlock, Alert, Accordion, Table, Image, Checkbox, Chip, Link)
+and has no hooks, so a Server Component renders a post without sending Tiptap to the browser. It
+shares the Editor's schema and text styles.
