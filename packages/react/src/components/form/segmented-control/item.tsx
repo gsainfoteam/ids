@@ -76,6 +76,7 @@ export function SegmentedControlItem<T extends string>({
     <label
       data-segmented-control-item=""
       data-state={checked ? 'checked' : 'unchecked'}
+      data-selected={checked ? '' : undefined}
       data-disabled={isDisabled ? '' : undefined}
       data-hovered={interaction.hovered ? '' : undefined}
       data-active={interaction.active ? '' : undefined}
