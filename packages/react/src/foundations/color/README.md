@@ -1,6 +1,6 @@
 # Color
 
-IDS 색은 네 층입니다. 팔레트(`neutral-50`, 테마의 `primary-600`)는 값일 뿐이고, 시맨틱 역할(`--ids-color-<역할>`)이 팔레트 한 단계를 가리키고, scheme(`bg-scheme`, `text-on-scheme`)이 한 계열의 역할을 가리키고, 컴포넌트 토큰(`bg-panel`, `border-control-outline`)이 모드마다 역할 하나를 가리킵니다. 컴포넌트 토큰은 [ComponentTokens](../component-tokens/README.md) 에 있습니다. 브랜드 색은 앱이 `IdsProvider theme` 에 준 색에서 오고, 모든 색은 `IdsProvider` 가 붙이는 `data-mode` 에 따라 CSS 가 바꿉니다.
+IDS 색은 네 층입니다. 팔레트(계열마다 라이트와 다크의 8단계 스케일)는 값일 뿐이고, 시맨틱 역할(`--ids-color-<역할>`)이 스케일 한 단계를 가리키고, scheme(`bg-scheme`, `text-on-scheme`)이 한 계열의 역할을 가리키고, 컴포넌트 토큰(`bg-panel`, `border-control-outline`)이 모드마다 역할 하나를 가리킵니다. 컴포넌트 토큰은 [ComponentTokens](../component-tokens/README.md) 에 있습니다. 브랜드 색은 앱이 `IdsProvider theme` 에 준 색에서 오고, 모든 색은 `IdsProvider` 가 붙이는 `data-mode` 에 따라 CSS 가 바꿉니다.
 
 ```tsx
 <div className="bg-neutral-subtlest text-neutral-bold">
@@ -34,7 +34,7 @@ IDS 색은 네 층입니다. 팔레트(`neutral-50`, 테마의 `primary-600`)는
 
 | 역할 | 쓰임 |
 | --- | --- |
-| `bg-X-subtler` | 띠. subtle 보다 옅다. light 는 팔레트 50, dark 는 950 을 페이지 쪽으로 절반(OKLab) 섞은 색 |
+| `bg-X-subtler` | 띠. subtle 보다 옅다. 스케일 2단계 |
 | `bg-X-subtle` | 옅은 채움 (soft variant, soft Badge, 상태 Alert) |
 | `bg-X` | 채움 (solid Button, Progress 막대, solid Badge) |
 | `text-on-X-subtler` | `bg-X-subtler` 위 글자 |
@@ -45,16 +45,18 @@ IDS 색은 네 층입니다. 팔레트(`neutral-50`, 테마의 `primary-600`)는
 
 neutral 만 가지는 역할입니다.
 
-| 역할 | light | dark | 쓰임 |
-| --- | --- | --- | --- |
-| `bg-neutral-subtlest` / `text-on-neutral-subtlest` | 0 / 900 | 950 / 50 | 페이지, 팝업, 카드 |
-| `bg-neutral-subtler` / `text-on-neutral-subtler` | 50 / 900 | 900 / 50 | 표 머리. light 의 `bg-band`, dark 의 `bg-panel` |
-| `bg-neutral-subtle` | 100 | 850 | soft 컨트롤, 흐린 행. dark 의 outline 컨트롤과 `bg-band` |
-| `bg-neutral` | 300 | 700 | 손잡이, 트랙 |
-| `bg-neutral-bold` / `text-on-neutral-bold` | 900 / 0 | 50 / 950 | 뒤집힌 채움: Tooltip, neutral solid Button, Badge |
-| `text-neutral-bold` | 900 | 50 | 본문 글자 |
-| `text-neutral` | 600 | 300 | 보조 글자 |
-| `border-neutral` | 200 | 800 | 구조선 |
+| 역할 | 단계 | light | dark | 쓰임 |
+| --- | --- | --- | --- | --- |
+| `bg-neutral-subtlest` / `text-on-neutral-subtlest` | 1 / 8 | `#ffffff` / `#0a0a0a` | `#0a0a0a` / `#fafafa` | 페이지, 팝업, 카드 |
+| `bg-neutral-subtler` / `text-on-neutral-subtler` | 2 / 8 | `#fafafa` / `#0a0a0a` | `#171717` / `#fafafa` | 표 머리. light 의 `bg-band`, dark 의 `bg-panel` |
+| `bg-neutral-subtle` | 3 | `#f5f5f5` | `#1e1e1e` | soft 컨트롤, 흐린 행. dark 의 outline 컨트롤과 `bg-band` |
+| `border-neutral` | 4 | `#e5e5e5` | `#232323` | 구조선 |
+| `bg-neutral` | 5 | `#d4d4d4` | `#2f2f2f` | 손잡이, 트랙 |
+| `text-neutral` | 6 | `#525252` | `#d4d4d4` | 보조 글자 |
+| `bg-neutral-bold` / `text-on-neutral-bold` | 7 / 2 | `#171717` / `#fafafa` | `#fafafa` / `#171717` | 뒤집힌 채움: Tooltip, neutral solid Button, Badge |
+| `text-neutral-bold` | 8 | `#0a0a0a` | `#fafafa` | 본문 글자 |
+
+- 스케일은 모드마다 따로 고른 8단계이고, 번호는 쓰임새 순서입니다(1 페이지, 2 띠, 3 옅은 채움, 4 선, 5 손잡이, 6 흐린 글자, 7 채움, 8 진한 글자). 값은 shadcn/ui 의 neutral 테마를 따릅니다.
 
 - hover, active 역할은 없습니다. 상태는 컴포넌트가 그리는 state layer 입니다([상태 층](#상태-층)).
 - 채움 위 글자는 색을 직접 고르지 말고 `text-on-X` 로 칠합니다. 밝은 팔레트에서는 검은 글자가 됩니다.
@@ -93,7 +95,7 @@ neutral 만 가지는 역할입니다.
 </IdsProvider>
 ```
 
-- 앱은 브랜드 색을 50 ~ 950 의 11단계 팔레트나 색 하나로 줍니다. IDS 에는 기본 색이 없습니다.
+- 앱은 브랜드 색을 색 하나, 50 ~ 950 의 램프, 또는 모드별 8단계 스케일 둘로 줍니다. 앞의 둘은 IDS 가 두 스케일로 바꿉니다. IDS 에는 기본 색이 없습니다.
 - 대비는 APCA 의 Lc 입니다.
   - 채움은 600 에서 시작해 글자가 Lc 75 에 닿을 때까지 이웃 단계로 옮깁니다.
   - `text-on-` 글자는 Lc 75, 페이지와 subtler, subtle 위 색 글자는 Lc 60 을 넘는 첫 단계입니다.

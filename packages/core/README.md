@@ -10,8 +10,8 @@
 |---|---|
 | `packages/css/dist/ids.css` | CSS 변수 + Tailwind `@theme`. `state.json` 에서 `--ids-state-hover`, `--ids-state-press`, `--ids-state-tint-*`, `--ids-state-fill-*`, `state-layer`·`state-hover`·`state-press`·`state-fill`·`state-scheme` 유틸리티, `color-roles.json` 에서 `scheme-{계열}`·`focus-ring-scheme` 유틸리티, `@property --ids-state-opacity`·`--ids-state-color`·`--ids-state-layer-hover`·`--ids-state-layer-press` |
 | `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등) |
-| `packages/react/src/tokens/color-roles.ts` | 계열 목록, `IDS_FAMILY_SLOTS`, `IDS_NEUTRAL_ONLY_SLOTS`, `IDS_STATE_OPACITY`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IDS_STATE_FILL_COLOR`, `IDS_NEUTRAL_PALETTE`, `IDS_NEUTRAL_STEPS` |
-| `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스. `ids_color_roles.dart` 는 `color-roles.json` 에서 `IdsColors`, `IdsColorRoles`(계열, `familySlots`, `neutralOnlySlots`, `slotsOf`, `neutralSteps`), `state.json` 에서 `IdsStateOpacity`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IdsStateLayer.fillColor` 를 만든다 |
+| `packages/react/src/tokens/color-roles.ts` | 계열 목록, `IDS_FAMILY_SLOTS`, `IDS_NEUTRAL_ONLY_SLOTS`, `IDS_STATE_OPACITY`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IDS_STATE_FILL_COLOR`, `IDS_NEUTRAL_SCALES`(light, dark 8단계), `IDS_NEUTRAL_STEPS`(역할마다 읽는 단계) |
+| `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스. `ids_color_roles.dart` 는 `color-roles.json` 에서 `IdsColors`, `IdsColorRoles`(계열, `familySlots`, `neutralOnlySlots`, `slotsOf`, `neutralScales`, `neutralSteps`), `state.json` 에서 `IdsStateOpacity`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IdsStateLayer.fillColor` 를 만든다 |
 | `packages/react/src/tokens/component-tokens.ts` | `component.json`, `shadow.json` 에서 `IDS_COMPONENT_COLORS`, `IDS_COMPONENT_SHADOWS`, `IDS_SHADOWS` |
 | `packages/flutter/lib/tokens/ids_component_tokens.dart` | 같은 표의 Dart 판. `IdsComponentColors`, `IdsComponentShadows`, `IdsShadows`, `IdsComponentTokens` |
 | `packages/react/src/tokens/palette-model.ts` | 17색에 맞춘 팔레트 모델의 계수와 상태 색의 기준 넷. `palette-model.js` 가 쓴다 |
@@ -22,7 +22,7 @@
 
 ```
 tokens/
-  palette.json          # 원시 색상 팔레트. neutral 과 상태 색의 기준 넷(red, yellow, green, sky)
+  palette.json          # 원시 색상 팔레트. neutral 의 light, dark 8단계 스케일과 상태 색의 기준 램프 넷(red, yellow, green, sky, 50~950)
   spacing.json          # 간격 원시값 (xs, sm, md, ...)
   typography.json       # 폰트 패밀리·사이즈·웨이트·행간 원시값
   motion.json           # 애니메이션 지속시간 원시값
@@ -31,8 +31,8 @@ tokens/
   state.json            # state layer 의 불투명도와 채움 층 색. hover 6%, press 10%, tint 8% / 12%, fill 검정 10% / 18%
   enums.json            # IdsMode·IdsSize·IdsVariant 열거값. color 는 데모 hue 이름 목록(스토리 전용)이라 어디에도 나가지 않는다
   semantic/
-    neutral.{light,dark}.json  # neutral 역할의 단계(`bg-neutral-subtlest` 0 / 950 …). CSS fallback, tokens/color-roles.ts, Dart 의 neutralSteps 로 나간다
     typography.json     # 텍스트 스타일. CSS 와 Dart 가 같은 이름으로 받는다
+neutral-roles.json      # neutral 역할마다 읽는 스케일 단계(`bg-neutral-subtlest` 1, `border-neutral` 4 …). 두 모드가 같다. CSS fallback, tokens/color-roles.ts, Dart 의 neutralSteps 로 나간다. tokens/ 밖에 두어 Style Dictionary 가 토큰으로 읽지 않는다
 color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지, React 의 tokens/color-roles.ts, Dart 의 IdsColors 를 만든다
 tests/fixtures/theme-roles.json  # ids-react 가 데모 seed 17개 × 조합별로 쓴 역할 색. Flutter 테스트가 같은 값을 내는지 비교한다
 ```
@@ -63,7 +63,7 @@ hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에
 - 역할 변수는 `--ids-color-{역할}` 이다. 앞머리 없는 역할(`surface`)이나 hover, active 역할은 없다.
 - 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 다.
 - Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-subtle` 은 있고 `--color-primary` 나 `--background-color-on-primary` 는 없다.
-- `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다. 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다). neutral 은 없으면 `neutral.*.json` 의 단계를 읽는다.
+- `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다. 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다). neutral 은 없으면 `neutral-roles.json` 이 가리키는 `palette.json` 스케일 단계를 읽는다.
 - `scheme-{계열}` utility 는 모든 계열에 있는 여덟 역할을 `--ids-color-*-scheme[-세기]` 로 다시 가리킨다(`bg-scheme-subtle` → `bg-primary-subtle`). 이름공간도 같은 규칙으로 만든다(`bg-scheme`, `text-on-scheme`, `inset-ring-scheme`).
   - `scheme.neutral` 은 neutral 이 다른 역할을 가리키는 자리다. `bg-scheme` 은 `bg-neutral-bold`, `text-on-scheme` 은 `text-on-neutral-bold`, `text-scheme` 은 `text-neutral-bold` 다.
   - scheme 은 층 색도 정한다. `--ids-state-layer-scheme` 은 계열 채움(`bg-X`)에 tint 불투명도, neutral 은 `currentColor` 에 기본 불투명도다. `state-scheme` 이 그것을 `--ids-state-color`, `--ids-state-layer-*` 에 넣는다.
@@ -100,7 +100,7 @@ hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에
 
 ## 팔레트 모델
 
-`palette-model.json` 이 IdsProvider 와 `IdsPalette.fromSeed` 가 색 하나로 11단계를 만들 때 읽는 모델의 계수다. `palette-model.js` 는 Style Dictionary 다음에 돌며, 이 계수와 `palette.json` 의 상태 색 넷을 `react/src/tokens/palette-model.ts` 와 `flutter/lib/tokens/ids_palette_model.dart` 로 옮긴다.
+`palette-model.json` 이 IdsProvider 와 `IdsRamp.fromSeed` 가 색 하나로 50~950 램프를 만들 때 읽는 모델의 계수다. `palette-model.js` 는 Style Dictionary 다음에 돌며, 이 계수와 `palette.json` 의 상태 색 넷을 `react/src/tokens/palette-model.ts` 와 `flutter/lib/tokens/ids_palette_model.dart` 로 옮긴다.
 
 - 단계마다 500 의 hue 를 받는 푸리에 급수 셋이다: 밝기, sRGB 최대 채도에 대한 채도 비율, 500 에서의 hue 회전. 한 줄이 한 단계이고, 값은 `[a0, a1, b1, a2, b2, …]` 순서다.
 - 계수는 데모 팔레트 17색에 맞춰 구한 뒤 고정했다. 17색과 맞추던 코드는 지웠다. 다시 맞추려면 `f3b8fc4b` 커밋의 `palette-model.js` 와 17색이 있던 `tokens/palette.json` 을 꺼낸다.

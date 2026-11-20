@@ -32,7 +32,7 @@ IdsProvider(
 
 | 필드          | 값                                                      | 기본                 |
 | ------------- | ------------------------------------------------------- | -------------------- |
-| `primary`     | `IdsPalette` 또는 `IdsThemeColor.seed(color)`           | 필수                 |
+| `primary`     | `IdsThemeColor.seed(color)`, `IdsRamp`, `IdsPalette`    | 필수                 |
 | `secondary`   | 같음                                                    | primary 에서 만든다  |
 | `tertiary`    | 같음                                                    | primary 에서 만든다  |
 | `neutral`     | `IdsNeutral.pure`, `IdsNeutral.tinted`                  | `pure`               |
@@ -42,11 +42,11 @@ IdsProvider(
 | `scale`       | 0.5 – 2. 글자 크기, `dimension`, radius 에 곱한다       | 1                    |
 
 ```dart
-// 색 하나: hue 와 채도 비율만 읽고 11단계를 만든다
+// 색 하나: hue 와 채도 비율만 읽고 램프와 모드별 스케일을 만든다
 const IdsThemeColor.seed(Color(0xFF155DFC));
 
-// 정확한 브랜드 색이 필요하면 11단계(50 – 950)를 직접 준다
-final brand = IdsPalette(const [
+// 정확한 브랜드 색이 필요하면 램프(50 – 950)를 직접 준다
+final brand = IdsRamp(const [
   Color(0xFFEFF6FF), Color(0xFFDBEAFE), Color(0xFFBEDBFF), Color(0xFF8EC5FF),
   Color(0xFF51A2FF), Color(0xFF2B7FFF), Color(0xFF155DFC), Color(0xFF1447E6),
   Color(0xFF193CB8), Color(0xFF1C398E), Color(0xFF162456),
@@ -63,8 +63,9 @@ final theme = IdsTheme(
 
 - `secondary` 를 빼면 primary 의 hue 에 채도 1/3, `tertiary` 를 빼면 hue 를 +60° (상태 색과 겹치면 −60°) 돌린다.
 - `harmonized` 는 상태 hue 를 primary 쪽으로 최대 15° 돌린다. `IdsStatusColors(danger: ...)` 로 일부만 고를 수 있다.
-- `IdsPalette.fromSeed(color)` 는 seed 로 만든 팔레트를 직접 읽을 때 쓴다.
-- seed 모델은 ids-react 의 `createIdsPalette` 와 같아 같은 8비트 색을 낸다. 계수는 `packages/core/palette-model.json` 에 고정돼 있고 `pnpm codegen` 이 `lib/tokens/ids_palette_model.dart` 로 옮긴다.
+- 모드마다 값을 직접 고르려면 `IdsPalette(light: [...], dark: [...])` 로 8단계 스케일 둘을 준다. 단계의 쓰임새는 1 페이지, 2 띠, 3 옅은 채움, 4 선, 5 손잡이, 6 색 글자, 7 채움, 8 진한 글자다.
+- `IdsRamp.fromSeed(color)` 와 `IdsPalette.fromSeed(color)` 는 seed 로 만든 램프와 스케일을 직접 읽을 때 쓴다.
+- seed 모델은 ids-react 의 `createIdsRamp`, `createIdsPalette` 와 같아 같은 8비트 색을 낸다. 계수는 `packages/core/palette-model.json` 에 고정돼 있고 `pnpm codegen` 이 `lib/tokens/ids_palette_model.dart` 로 옮긴다.
 - 상태 팔레트는 `IdsStatusPalettes.red` `yellow` `green` `sky` 에 있다.
 - 입력 색은 불투명 sRGB 로 맞춘다. 알파와 Display P3 는 버린다.
 

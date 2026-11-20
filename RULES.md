@@ -424,8 +424,10 @@ since the bar ends are inset from the root's own computed radius. A `<textarea>`
 too (`ScrollArea.Viewport asChild`): it scrolls itself, and ScrollArea remeasures it on `input`.
 Popover keeps its arrow outside the ScrollArea, since the viewport clips what overflows.
 
-**Colors come in four layers, and each layer names its tokens by grammar.** Raw palettes
-(`neutral-50`, a theme's `primary-600`) are values only. Semantic roles (`--ids-color-<role>`) point
+**Colors come in four layers, and each layer names its tokens by grammar.** Raw palettes are
+values only: each family has a light and a dark scale of eight steps, numbered by use (`neutral`
+light 1 is the page, dark 4 the line), so a mode picks its own values and no step needs a name
+like `850`. Semantic roles (`--ids-color-<role>`) point
 to one raw step each and are named `{property}-{family}[-{strength}]` or
 `text-on-{family}[-{strength}]`, never by a use such as `surface`. The scheme (`bg-scheme`,
 `text-on-scheme-subtle`) points to one family's roles. Component tokens (`bg-panel`,
@@ -468,20 +470,45 @@ tokens with `color-mix`.
   exception. `text-neutral-bold` and `text-neutral` are body and secondary text that read on every
   neutral background.
 - There is no hover or active role. States are component code, see the state layer below.
-- The table lives in `packages/core/color-roles.json` (`slots`, `neutralOnly`); the neutral steps in
-  `packages/core/tokens/semantic/neutral.{light,dark}.json`.
+- The table lives in `packages/core/color-roles.json` (`slots`, `neutralOnly`); the neutral scales
+  in `packages/core/tokens/palette.json` and the step each neutral role reads in
+  `packages/core/neutral-roles.json`, the same step in both modes.
 
-| Neutral role | light | dark | used for |
+Every scale has eight steps, read by the same roles in both modes:
+
+| Step | Use | Read by |
+|---|---|---|
+| 1 | the page | `bg-neutral-subtlest` |
+| 2 | a band | `bg-X-subtler`, `text-on-neutral-bold` |
+| 3 | a soft surface | `bg-X-subtle` |
+| 4 | a line | `border-neutral` |
+| 5 | a handle | `bg-neutral` |
+| 6 | muted or accent text | `text-neutral`, `text-X`, `border-X` |
+| 7 | a fill | `bg-X`, `bg-neutral-bold` |
+| 8 | strong text | `text-neutral-bold`, `text-on-X-subtler`, `text-on-X-subtle`, `text-on-neutral-*` |
+
+The neutral values follow shadcn/ui's neutral theme, with its translucent dark borders and inputs
+flattened onto the page:
+
+| Neutral step | light | dark | used for |
 |---|---|---|---|
-| `bg-neutral-subtlest` | 0 | 950 | the page, a popup, a card |
-| `bg-neutral-subtler` | 50 | 900 | a table header; `bg-band` in light, `bg-panel` in dark |
-| `bg-neutral-subtle` | 100 | 850 | a soft control, a muted row, an outline control and `bg-band` in dark |
-| `bg-neutral` | 300 | 700 | a handle, a track, an outline control's border in dark |
-| `bg-neutral-bold` | 900 | 50 | an inverted fill |
-| `text-on-neutral-subtlest`, `text-on-neutral-subtler` | 900 | 50 | text on the page, a panel or a band |
-| `text-neutral-bold` | 900 | 50 | body text |
-| `text-neutral` | 600 | 300 | secondary text |
-| `border-neutral` | 200 | 800 | structural lines |
+| 1 | `#ffffff` | `#0a0a0a` | the page, a popup, a card |
+| 2 | `#fafafa` | `#171717` | a table header; `bg-band` in light, `bg-panel` in dark |
+| 3 | `#f5f5f5` | `#1e1e1e` | a soft control, a muted row, an outline control and `bg-band` in dark |
+| 4 | `#e5e5e5` | `#232323` | structural lines |
+| 5 | `#d4d4d4` | `#2f2f2f` | a handle, a track, an outline control's border in dark |
+| 6 | `#525252` | `#d4d4d4` | secondary text |
+| 7 | `#171717` | `#fafafa` | an inverted fill |
+| 8 | `#0a0a0a` | `#fafafa` | body text, text on the page, a panel or a band |
+
+Dark 7 is `#fafafa` and not shadcn's `#e5e5e5`, which leaves `text-on-neutral-bold` under Lc 75
+under the press layer.
+
+A brand or status family builds its two scales from a 50 to 950 ramp (one color through the
+palette model, or the ramp an app passes): light 2 to 5 are ramp 50 to 300, dark 1 to 5 sit on the
+ramp at the lightness of the dark neutral step with the same number, 7 is the fill picked by
+contrast, and 6 and 8 the first ramp steps that reach Lc 60 and Lc 75 on the surfaces
+(`SCALE_RULES` in `ids-provider/palette-scales.ts`). An app may also pass both scales itself.
 
 Each Tailwind namespace (`--background-color-*`, `--text-color-*`, `--border-color-*`,
 `--ring-color-*`, `--outline-color-*`, `--fill-*`, `--stroke-*`) maps only the roles that fit it,
@@ -493,7 +520,7 @@ out (`secondary`, `tertiary`) is derived from primary (`ids-provider/derived-bra
 provider always writes all three.
 
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
-`border-neutral` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
+`border-neutral` (neutral step 4), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
 the theme color, while `outline` and `ghost` stay neutral. `border-neutral` is decorative and
 exempt from contrast. `border-primary` and every other family's `border-X`, for the rare edge that
@@ -503,8 +530,8 @@ should itself read as that color, is the same step as `text-X`, so a line and th
 **Each family has one role per background.** A fill (`bg-primary`) carries `text-on-primary`; a
 subtle surface is `bg-primary-subtle` with `text-on-primary-subtle`; text or an icon sitting on the
 page with no fill behind it (an outline Badge or Chip, a Rating star, a Radio dot, a Link) is
-`text-primary`. `bg-X-subtler` is a lighter band than subtle (palette 50 in light, 950 mixed
-halfway to the page in dark) and takes `text-on-X-subtler`, or `text-X` for an accent. Never write `bg-primary`
+`text-primary`. `bg-X-subtler` is a lighter band than subtle (step 2, ramp 50 in light, the ramp
+at the lightness of neutral 2 in dark) and takes `text-on-X-subtler`, or `text-X` for an accent. Never write `bg-primary`
 as a text color or `primary/10` as a subtle fill: light hues such as yellow and cyan fall under
 Lc 60 there. Statuses follow the same roles (`bg-danger-subtle` with `text-on-danger-subtle`,
 `text-danger` for text). Every `text-on-` role reaches APCA Lc 75 on its background, `text-X` Lc 60 on
@@ -892,12 +919,12 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
 
 ## Palettes in core
 
-IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral and the four status
-palettes (red, yellow, green, sky). The one-color palette builder evaluates a model whose
+IDS ships no brand palette. `packages/core/tokens/palette.json` holds the neutral light and dark
+scales and the four status ramps (red, yellow, green, sky). The one-color palette builder evaluates a model whose
 coefficients live in `packages/core/palette-model.json` (Fourier series of the 500 hue per step,
 fitted once to 17 demo palettes that are gone now); `pnpm codegen` copies them and the status
 palettes to `src/tokens/palette-model.ts` and to `packages/flutter/lib/tokens/ids_palette_model.dart`,
-which `IdsPalette.fromSeed` evaluates to the same 8-bit colors. Stories and tests build their 17
+which `IdsRamp.fromSeed` evaluates to the same 8-bit colors. Stories and tests build their 17
 palettes from seed hex values in `.storybook/palettes.ts`. There are no per-hue role tables: every
 platform picks the roles from the app's palette at runtime. `packages/core/color-roles.json` names
 the roles once; the CSS, the React types and the Dart `IdsColors` class are all written from it.
@@ -950,7 +977,8 @@ graph LR
 ids_flutter follows ids-react's theme. The design is decided in React; Flutter ports it.
 
 - `IdsProvider(theme: IdsTheme(...), mode: ...)` takes the same fields as `defineIdsTheme`:
-  `primary` (required), `secondary`, `tertiary` (each `IdsPalette` or `IdsThemeColor.seed(color)`),
+  `primary` (required), `secondary`, `tertiary` (each `IdsThemeColor.seed(color)`, an `IdsRamp` of 50 to 950 or an `IdsPalette` of light
+  and dark scales),
   `neutral`, `status`, `radius`, `cornerShape`, `scale`. `IdsProviderScope(theme: IdsThemeOverrides(...))`
   is `IdsProvider.Scope`. Nested providers inherit what they leave out; a scope with its own `mode`
   or `defaultMode` owns its mode, the others forward `setMode` and `toggleMode` to the owner.
