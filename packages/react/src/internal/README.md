@@ -31,7 +31,6 @@
 | [`pressable.ts`](#pressablets)                   | `div` 가 `button` 처럼 눌리게 하는 hook                                               | Button, `surface.ts`                                                                                                                                                                                                  |
 | [`resize-handle/`](./resize-handle/README.md)    | 크기 조절 손잡이의 키 표, separator ARIA, 포인터 끌기, 클래스 조각, 가장자리와 모서리 손잡이 | DataTable, Resizable, Splitter, TextArea                                                                                                                                                                                                   |
 | [`search-text.ts`](#search-textts)               | 검색어로 항목을 거르는 글자 비교(대소문자, 폭, 악센트 무시)                           | Select, ChipField, Menu                                                                                                                                                                                               |
-| [`surfaces/segment-surface.ts`](#surfacessegment-surfacets)       | 트랙 위에 고른 칸을 카드로 올리는 segmented 면                                         | SegmentedControl, Tabs `appearance="segmented"`                                                                                                                                                                    |
 | [`surfaces/slider-surface.ts`](#surfacesslider-surfacets)         | 슬라이더 트랙의 가장자리와 thumb 모양                                                 | Slider, ColorPicker                                                                                                                                                                                                   |
 | [`slides/`](#slides)                             | Embla Carousel 을 감싼 슬라이드 엔진, 장마다의 ARIA, 키, 넘김 알림                    | Carousel, Image |
 | [`state-props.ts`](#state-propsts)               | state 를 받는 `className`, `style`, `children` 의 타입과 풀이 함수                    | Accordion, Avatar, AvatarGroup, Badge, Card, Chip, Image, Item, ColorPicker, Select, ChipField, ColorField, FileField                                                                                                 |
@@ -877,50 +876,6 @@ searchChunks('Café ＧＩＳＴ', ['cafe', 'gist']);
 - 한글 자모 하나(`ㅅ`)는 음절(`설`)의 일부로 맞지 않습니다. 초성 검색은 하지 않습니다.
 - 비교를 바꾸면 Select, ChipField, Menu 의 거르기, ChipField 의 중복 판정, Highlight 의 칠하기가 함께 바뀝니다. `tests/search-text.test.ts` 는 `matchRanges` 가 `matchesSearch` 와 같은 판정을 내는지 봅니다.
 - `searchChunks` 의 조각을 이어 붙이면 언제나 받은 글과 같습니다. 서버와 클라이언트가 같은 HTML 을 내려면 이 함수는 순수해야 합니다.
-
-## surfaces/segment-surface.ts
-
-트랙 위에 고른 칸을 카드로 올리는 segmented 면의 클래스 조각입니다. SegmentedControl 과 segmented Tabs 가 같은 모양이 되도록 한 곳에 둡니다.
-
-### 쓰는 곳
-
-- SegmentedControl: 루트가 `track` 과 `fit`, 칸이 `segment`, `selected.checked`, `height`
-- Tabs: `appearance="segmented"` 의 목록이 `track` 과 `fit`, 탭이 `segment`, `selected.ariaSelected`, `height`
-
-### 쓰는 법
-
-```tsx
-// components/form/segmented-control/style.ts
-export const segmentedControlStyle = tv({
-  slots: {
-    root: ['m-0 flex border-0', segmentSurface.track],
-    item: [segmentSurface.segment, segmentSurface.selected.checked, 'text-neutral ...'],
-  },
-  variants: {
-    stretch: { true: { root: 'w-full' }, false: { root: ['w-fit', segmentSurface.fit] } },
-    size: { standard: { item: segmentSurface.height.standard }, tiny: { item: segmentSurface.height.tiny } },
-  },
-});
-```
-
-| 조각       | 클래스                                                         |
-| ---------- | -------------------------------------------------------------- |
-| `track`    | `concentric-p-1 gap-0.5 bg-neutral-subtle`                     |
-| `fit`      | `self-start`. 늘이지 않을 때 트랙이 내용 폭만큼만 차지한다     |
-| `segment`  | `rounded-standard`                                             |
-| `selected` | 고른 칸의 `bg-segment` 와 `shadow-xs`                          |
-| `height`   | `calc(var(--ids-size-control-*) - 0.5rem)`                     |
-
-### 왜 이렇게
-
-- 칸이 8px 낮아서 `concentric-p-1`(4px) 트랙까지 더한 높이가 다른 컨트롤과 같습니다. 트랙의 모서리는 칸의 10px 에 padding 을 더한 14px 입니다.
-- 고른 칸의 색은 component token `bg-segment` 입니다. 밝은 모드는 `bg-neutral-subtlest`, 어두운 모드는 트랙(`bg-neutral-subtle`)보다 한 단계 밝은 `bg-neutral` 이라 어느 모드에서도 카드가 트랙 위로 떠 보입니다.
-- `selected` 는 고른 상태를 읽는 속성마다 따로 적습니다. Tabs 의 탭은 `aria-selected`, SegmentedControl 의 칸(`<label>`)은 `data-state="checked"` 로 고른 상태를 알립니다. Tailwind 는 소스에 글자 그대로 있는 클래스만 만들므로 variant 접두사를 붙여 조합할 수 없습니다.
-
-### 알아둘 것
-
-- 글자색, hover, 크기별 padding 과 글자 크기는 이 조각에 없습니다. Tabs 는 `appearance` 와 상관없이 같은 탭 글자 규칙을 쓰고, SegmentedControl 은 hover 를 state layer 로 그립니다.
-- 이 조각을 바꾸면 SegmentedControl 과 segmented Tabs 의 모양이 함께 바뀝니다. `tests/tabs.test.tsx` 와 `tests/segmented-control.test.tsx` 가 둘의 색과 높이를 확인합니다.
 
 ## surfaces/slider-surface.ts
 

@@ -13,8 +13,7 @@ import { Tabs } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const appearances = ['underline', 'segmented', 'pill', 'enclosed'] as const;
-const variants = ['ghost', 'outline', 'soft', 'solid', 'glossy'] as const;
+const appearances = ['underline', 'pill', 'enclosed'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const meta = {
@@ -23,7 +22,6 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     appearance: { control: 'radio', options: appearances },
-    variant: { control: 'radio', options: variants, if: { arg: 'appearance', eq: 'pill' } },
     orientation: { control: 'radio', options: ['horizontal', 'vertical'] },
     activationMode: { control: 'radio', options: ['automatic', 'manual'] },
     size: { control: 'radio', options: sizes },
@@ -64,7 +62,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Appearance × Size"
-        description="underline 은 고른 탭의 글자와 아래 선을 primary 로, segmented 는 회색 트랙 위에 고른 탭을 카드로 올리고, pill 은 고른 탭을 채우고, enclosed 는 고른 탭을 내용 쪽으로 열린 상자로 그립니다."
+        description="underline 은 고른 탭의 글자와 아래 선을 primary 로, pill 은 고른 탭을 primary 의 옅은 채움으로, enclosed 는 고른 탭을 내용 쪽으로 열린 상자로 그리고 글자를 primary 로 칠합니다."
       >
         <Showcase.Matrix
           rows={sizes}
@@ -84,43 +82,9 @@ export const Gallery: Story = {
         />
       </Showcase.Section>
 
-      <Showcase.Section
-        title="Pill variant"
-        description="pill 의 variant 는 고른 탭의 채움 강도입니다. 고르지 않은 탭은 모두 투명합니다."
-      >
-        <Showcase.Matrix
-          rows={sizes}
-          columns={variants}
-          render={(size, variant) => (
-            <Tabs defaultValue="day" appearance="pill" variant={variant} size={size}>
-              <Tabs.List aria-label="기간">
-                <Tabs.Trigger value="day">일</Tabs.Trigger>
-                <Tabs.Trigger value="week">주</Tabs.Trigger>
-                <Tabs.Trigger value="month">월</Tabs.Trigger>
-              </Tabs.List>
-              <Tabs.Content value="day">오늘</Tabs.Content>
-              <Tabs.Content value="week">이번 주</Tabs.Content>
-              <Tabs.Content value="month">이번 달</Tabs.Content>
-            </Tabs>
-          )}
-        />
-      </Showcase.Section>
-
       <Showcase.Section title="Vertical">
         <Showcase.Row label="underline">
           <Tabs defaultValue="profile" orientation="vertical">
-            <Tabs.List aria-label="설정">
-              <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
-              <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
-              <Tabs.Trigger value="account">계정</Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content value="profile">이름과 사진</Tabs.Content>
-            <Tabs.Content value="alerts">알림 받을 곳</Tabs.Content>
-            <Tabs.Content value="account">비밀번호와 탈퇴</Tabs.Content>
-          </Tabs>
-        </Showcase.Row>
-        <Showcase.Row label="segmented">
-          <Tabs defaultValue="profile" orientation="vertical" appearance="segmented">
             <Tabs.List aria-label="설정">
               <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
               <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
@@ -173,7 +137,7 @@ export const Gallery: Story = {
           </Tabs>
         </Showcase.Row>
         <Showcase.Row label="icons">
-          <Tabs defaultValue="profile" appearance="pill">
+          <Tabs defaultValue="profile">
             <Tabs.List aria-label="설정">
               <Tabs.Trigger value="profile">
                 <UserIcon />
@@ -193,20 +157,8 @@ export const Gallery: Story = {
             <Tabs.Content value="account">비밀번호와 탈퇴</Tabs.Content>
           </Tabs>
         </Showcase.Row>
-        <Showcase.Row label="stretch" className="w-full max-w-md">
-          <Tabs defaultValue="new" className="w-full">
-            <Tabs.List aria-label="정렬" stretch>
-              <Tabs.Trigger value="new">최신</Tabs.Trigger>
-              <Tabs.Trigger value="popular">인기</Tabs.Trigger>
-              <Tabs.Trigger value="comments">댓글 많은</Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content value="new">최신 글</Tabs.Content>
-            <Tabs.Content value="popular">인기 글</Tabs.Content>
-            <Tabs.Content value="comments">댓글 많은 글</Tabs.Content>
-          </Tabs>
-        </Showcase.Row>
-        <Showcase.Row label="segmented stretch" className="w-full max-w-md">
-          <Tabs defaultValue="new" appearance="segmented" className="w-full">
+        <Showcase.Row label="pill stretch" className="w-full max-w-md">
+          <Tabs defaultValue="new" appearance="pill" className="w-full">
             <Tabs.List aria-label="정렬" stretch>
               <Tabs.Trigger value="new">최신</Tabs.Trigger>
               <Tabs.Trigger value="popular">인기</Tabs.Trigger>
@@ -318,7 +270,7 @@ export const ManualActivation: Story = {
 
 export const Vertical: Story = {
   render: () => (
-    <Tabs defaultValue="profile" orientation="vertical" appearance="pill">
+    <Tabs defaultValue="profile" orientation="vertical">
       <Tabs.List aria-label="설정">
         <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
         <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
@@ -387,7 +339,7 @@ export const Controlled: Story = {
 
     return (
       <div className="flex flex-col items-start gap-3">
-        <Tabs value={tab} onValueChange={setTab} appearance="pill" variant="outline">
+        <Tabs value={tab} onValueChange={setTab}>
           <Tabs.List aria-label="설정">
             <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
             <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
@@ -463,7 +415,7 @@ export const TypedParts: Story = {
     const [section, setSection] = useState<'docs' | 'api'>('docs');
 
     return (
-      <Tabs value={section} onValueChange={setSection} appearance="pill">
+      <Tabs value={section} onValueChange={setSection}>
         {({ List, Trigger, Content }) => (
           <>
             <List aria-label="문서">

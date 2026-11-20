@@ -2,7 +2,7 @@
 
 트랙 위에 칸을 나란히 놓고 그중 하나를 고르는 값 입력입니다. 보기 방식(목록, 격자), 차트 단위(일, 주, 월)처럼 선택지가 두세 개이고 바로 보여야 할 때 씁니다.
 
-- **값을 고르면 SegmentedControl, 패널을 바꾸면 Tabs.** 고른 값이 폼에 들어가거나 화면의 설정을 바꾸면 SegmentedControl 입니다. 같은 자리에서 내용 패널을 바꾸면 `Tabs appearance="segmented"` 입니다. 둘은 같은 면을 씁니다.
+- **Tabs 는 탭 이동, SegmentedControl 은 값이나 모드 고르기.** `Tabs` 는 `tablist`, `tab`, `tabpanel` 로 한 자리의 패널을 오가는 탭 이동입니다. SegmentedControl 은 값(차트 단위)이나 모드(로그인 방법)를 고르는 `radiogroup` 이고, 고른 값으로 아래 내용을 바꿀 수도 있습니다.
 - **선택지가 많거나 길면** `RadioGroup` 이나 `Select` 가 낫습니다. 여러 개를 고르면 `ToggleGroup selectionMode="multiple"` 입니다.
 - **native 라디오 그대로.** 칸마다 같은 `name` 의 `<input type="radio">` 가 있어 키보드, `required`, 폼 초기화, react-hook-form 이 RadioGroup 과 같습니다.
 - **타입이 좁혀진 항목.** 렌더 함수의 `Item` 은 `value` 가 컨트롤의 타입으로 좁혀집니다.
@@ -80,7 +80,7 @@ type Period = 'day' | 'week' | 'month';
 
 ## 모양
 
-- 트랙은 `bg-neutral-subtle`, 고른 칸은 `bg-segment` 카드에 `shadow-xs` 입니다. 카드는 밝은 모드에서 `bg-neutral-subtlest`, 어두운 모드에서 트랙보다 한 단계 밝은 `bg-neutral` 입니다.
+- 트랙은 `bg-neutral-subtle`, 고른 칸은 `bg-segmented-control-item` 카드에 `shadow-xs` 입니다. 카드는 밝은 모드에서 `bg-neutral-subtlest`, 어두운 모드에서 트랙보다 한 단계 밝은 `bg-neutral` 입니다.
 - 글자는 고르지 않은 칸이 `text-neutral`, 고른 칸이 `text-neutral-bold` 입니다.
 - 고르지 않은 칸의 hover 와 press 는 state layer 입니다. 글자색은 바뀌지 않습니다.
 - 키보드 포커스는 칸에 ring 을 그립니다. `invalid` 면 트랙에 `border-danger` 테두리가 붙습니다.

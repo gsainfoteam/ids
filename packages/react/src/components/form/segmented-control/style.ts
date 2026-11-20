@@ -1,4 +1,3 @@
-import { segmentSurface } from '../../../internal/surfaces/segment-surface';
 import { tv } from '../../../utils';
 
 import type { SegmentedControlOrientation } from './context';
@@ -8,13 +7,13 @@ export const segmentedControlStyle = tv({
   slots: {
     root: [
       'm-0 flex min-w-0 border-0 outline-none',
-      segmentSurface.track,
+      'concentric-p-1 gap-0.5 bg-neutral-subtle',
       'data-invalid:inset-ring-1 data-invalid:inset-ring-danger',
     ],
     item: [
       'relative inline-flex min-w-0 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap select-none',
-      segmentSurface.segment,
-      segmentSurface.selected.checked,
+      'rounded-standard',
+      'data-[state=checked]:bg-segmented-control-item data-[state=checked]:shadow-xs',
       'text-neutral data-[state=checked]:text-neutral-bold',
       'state-layer not-data-[state=checked]:data-hovered:state-hover',
       'not-data-[state=checked]:data-active:state-press',
@@ -36,19 +35,19 @@ export const segmentedControlStyle = tv({
     } satisfies Record<SegmentedControlOrientation, object>,
     stretch: {
       true: { root: 'w-full' },
-      false: { root: ['w-fit', segmentSurface.fit] },
+      false: { root: 'w-fit self-start' },
     },
     size: {
       standard: {
         item: [
-          segmentSurface.height.standard,
+          'h-[calc(var(--ids-size-control-standard)-0.5rem)]',
           'px-3 text-body-b3-medium',
           "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-standard)",
         ],
       },
       tiny: {
         item: [
-          segmentSurface.height.tiny,
+          'h-[calc(var(--ids-size-control-tiny)-0.5rem)]',
           'gap-1.5 px-2.5 text-caption-c1-medium',
           "[&_svg:not([class*='size-'])]:size-(--ids-size-icon-tiny)",
         ],

@@ -245,7 +245,7 @@ test('light: the selected segment is a card on a neutral track as tall as a cont
   await expect
     .poll(() => getComputedStyle(track).backgroundColor)
     .toBe(colorOf('--ids-color-bg-neutral-subtle'));
-  expect(getComputedStyle(selected).backgroundColor).toBe(colorOf('--ids-color-bg-segment'));
+  expect(getComputedStyle(selected).backgroundColor).toBe(colorOf('--ids-color-bg-segmented-control-item'));
   expect(getComputedStyle(selected).backgroundColor).toBe(
     colorOf('--ids-color-bg-neutral-subtlest'),
   );

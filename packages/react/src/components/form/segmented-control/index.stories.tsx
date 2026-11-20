@@ -7,7 +7,6 @@ import { Showcase } from '~story-kit';
 
 import { isDevelopment } from '../../../utils/dev';
 import { Button } from '../../action/button';
-import { Tabs } from '../../navigation/tabs';
 import { Field } from '../field';
 
 import { SegmentedControl } from '.';
@@ -201,18 +200,6 @@ export const Gallery: Story = {
               }
             </SegmentedControl>
           </Field>
-        </Showcase.Row>
-        <Showcase.Row label="Tabs segmented">
-          <Tabs defaultValue="week" appearance="segmented">
-            <Tabs.List aria-label="같은 면의 Tabs">
-              <Tabs.Trigger value="day">일</Tabs.Trigger>
-              <Tabs.Trigger value="week">주</Tabs.Trigger>
-              <Tabs.Trigger value="month">월</Tabs.Trigger>
-            </Tabs.List>
-            <Tabs.Content value="day">오늘의 일정</Tabs.Content>
-            <Tabs.Content value="week">이번 주 일정</Tabs.Content>
-            <Tabs.Content value="month">이번 달 일정</Tabs.Content>
-          </Tabs>
         </Showcase.Row>
       </Showcase.Section>
     </Showcase>
