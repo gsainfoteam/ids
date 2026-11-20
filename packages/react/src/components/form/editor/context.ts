@@ -24,7 +24,7 @@ export type EditorContextValue = {
   countId: string;
   maxLength: number | undefined;
   contentAttributes: Record<string, string>;
-  bubbles: ReactNode;
+  floating: ReactNode;
   images: EditorImages | null;
   styles: ReturnType<typeof editorStyle>;
   EngineContent: typeof EditorContent | null;

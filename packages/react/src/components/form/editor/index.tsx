@@ -32,6 +32,7 @@ import { EditorTable, type EditorTableProps } from './table/tool';
 import { EditorTextAlign, type EditorTextAlignment, type EditorTextAlignProps } from './text-align';
 import { type EditorFormat } from './value';
 
+import type { EditorMention, FindMentions } from './mention/node';
 import type { IdsSize } from '../../../tokens/types';
 import type { JSONContent } from '@tiptap/core';
 
@@ -63,6 +64,7 @@ export namespace Editor {
     invalid?: boolean;
     maxLength?: number;
     onImageUpload?: (file: File) => Promise<string>;
+    mentions?: FindMentions;
     variant?: EditorVariant;
     size?: IdsSize;
     id?: string;
@@ -82,6 +84,7 @@ export namespace Editor {
   export type HeadingLevel = EditorHeadingLevel;
   export type CountState = EditorCountState;
   export type TextAlignment = EditorTextAlignment;
+  export type Mention = EditorMention;
 
   export type ContentProps = EditorContentProps;
   export type ToolProps = EditorMarkProps;

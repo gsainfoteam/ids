@@ -12,6 +12,7 @@ const FEATURE_LOADERS = {
   imageUpload: once(() => import('./image/upload')),
   callout: once(() => import('./callout/node').then((module) => module.EditorCalloutNode)),
   details: once(() => import('./details/node').then((module) => module.detailsExtensions)),
+  mention: once(() => import('./mention')),
 };
 
 export type EditorFeature = keyof typeof FEATURE_LOADERS;

@@ -72,6 +72,7 @@ import { toast } from '../../feedback/toast/toast-store';
 import { FieldNotifyContext, useFieldSize } from '../field/context';
 
 import type { Editor } from '.';
+import type { FindMentions } from './mention/node';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 
 export type EditorVariant = 'outline' | 'soft';
@@ -165,7 +166,9 @@ function definedOnly(record: Record<string, string | undefined>) {
   );
 }
 
-const FEATURE_TOOLS: Record<Exclude<EditorFeature, 'imageUpload'>, unknown> = {
+type ToolFeature = Exclude<EditorFeature, 'imageUpload' | 'mention'>;
+
+const FEATURE_TOOLS: Record<ToolFeature, unknown> = {
   highlight: EditorHighlight,
   taskList: EditorTaskList,
   textAlign: EditorTextAlign,
@@ -174,10 +177,13 @@ const FEATURE_TOOLS: Record<Exclude<EditorFeature, 'imageUpload'>, unknown> = {
   details: EditorDetails,
 };
 
-function featuresIn(source: ReactNode, imageUpload: boolean): EditorFeature[] {
+function featuresIn(
+  source: ReactNode,
+  props: Record<'imageUpload' | 'mention', boolean>,
+): EditorFeature[] {
   return EDITOR_FEATURES.filter((feature) =>
-    feature === 'imageUpload'
-      ? imageUpload
+    feature === 'imageUpload' || feature === 'mention'
+      ? props[feature]
       : containsElementOfType(source, new Set([FEATURE_TOOLS[feature]])),
   );
 }
@@ -212,6 +218,7 @@ export function EditorRoot(props: Editor.Props) {
   const {
     format = 'html',
     onImageUpload,
+    mentions,
     value,
     defaultValue,
     onValueChange,
@@ -246,7 +253,10 @@ export function EditorRoot(props: Editor.Props) {
   const shown =
     children === undefined ? (insertable ? DEFAULT_TOOLBAR_WITH_IMAGE : DEFAULT_TOOLBAR) : children;
   const { bubbles, top, content, bottom, items } = splitByContent(shown);
-  const features = featuresIn(shown, insertable);
+  const features = featuresIn(shown, {
+    imageUpload: insertable,
+    mention: mentions !== undefined,
+  });
   const hasCount = items.some(isOfType(EditorCount));
   const editable = !disabled && !readOnly;
   const invalid = Boolean(
@@ -281,11 +291,12 @@ export function EditorRoot(props: Editor.Props) {
     format: EditorFormat;
     setCurrent: typeof setCurrent;
     onImageUpload: ImageUpload | undefined;
+    mentions: FindMentions | undefined;
     startUploads: typeof startUploads;
     t: Translate;
-  }>({ format, setCurrent, onImageUpload, startUploads, t });
+  }>({ format, setCurrent, onImageUpload, mentions, startUploads, t });
   useLayoutEffect(() => {
-    latest.current = { format, setCurrent, onImageUpload, startUploads, t };
+    latest.current = { format, setCurrent, onImageUpload, mentions, startUploads, t };
   });
   const reportedSinceTheLastRender = useRef<EditorValue[]>([]);
 
@@ -311,9 +322,12 @@ export function EditorRoot(props: Editor.Props) {
     startUploads: (instance: TiptapEditor, files: File[], at: number) =>
       latest.current.startUploads(instance, files, at),
     taskLabel: (text: string) => taskLabelIn(latest.current.t)(text),
+    t: ((key, values) => latest.current.t(key, values)) satisfies Translate,
+    findMentions: ((query, signal) =>
+      latest.current.mentions?.(query, signal) ?? []) satisfies FindMentions,
   }));
 
-  const extensions = useMemo(
+  const setup = useMemo(
     () =>
       loaded?.engine.extensionsFor({
         maxLength,
@@ -321,17 +335,27 @@ export function EditorRoot(props: Editor.Props) {
         features: loaded.features,
         images: { uploaded, start: callIntoTheLatestRender.startUploads },
         taskLabel: callIntoTheLatestRender.taskLabel,
+        t: callIntoTheLatestRender.t,
+        findMentions: callIntoTheLatestRender.findMentions,
       }),
     [loaded, maxLength, uploaded, callIntoTheLatestRender],
   );
+  const mention = loaded?.features.mention;
+  const floating = (
+    <>
+      {bubbles}
+      {loaded && setup && <loaded.engine.EditorSlashMenu store={setup.slashMenu} />}
+      {mention && setup?.mentionMenu && <mention.EditorMentionMenu store={setup.mentionMenu} />}
+    </>
+  );
   const [editor, setEditor] = useState<TiptapEditor | null>(null);
 
-  const engineOptions = extensions && {
+  const engineOptions = setup && {
     immediatelyRender: false,
     shouldRerenderOnTransaction: false,
     injectCSS: false,
     editable,
-    extensions,
+    extensions: setup.extensions,
     content: writable(current ?? '', format, uploaded),
     contentType: format,
     editorProps: { attributes: contentAttributes },
@@ -420,7 +444,7 @@ export function EditorRoot(props: Editor.Props) {
         countId,
         maxLength,
         contentAttributes,
-        bubbles,
+        floating,
         images,
         styles,
         EngineContent: loaded?.engine.EditorContent ?? null,

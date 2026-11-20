@@ -1,4 +1,5 @@
 import { cn, tv } from '../../../utils';
+import { chipStyle } from '../../data/chip/style';
 
 import type { IdsSize } from '../../../tokens/types';
 
@@ -16,6 +17,10 @@ export const documentText = cn(
   '[&_ul[data-type=taskList]>li>div]:min-w-0 [&_ul[data-type=taskList]>li>div]:grow',
   '[&_ul[data-type=taskList]>li[data-checked=true]>div>p]:text-neutral [&_ul[data-type=taskList]>li[data-checked=true]>div>p]:line-through',
 );
+
+export const mentionChip = chipStyle({ variant: 'soft', size: 'tiny' }).root({
+  className: 'align-baseline',
+});
 
 export const richTextStyle = tv({
   slots: {

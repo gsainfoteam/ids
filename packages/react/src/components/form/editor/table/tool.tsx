@@ -8,6 +8,7 @@ import { Menu } from '../../../overlay/menu';
 import { useEditorContext } from '../context';
 import { extensionIsLoaded, hasExtension, useEditorToolProps, type EditorToolProps } from '../tool';
 import { useEditorSelector } from '../use-editor-selector';
+import { insertTable, NEW_TABLE } from './insert';
 
 import type { IdsMessageKey } from '../../../../internal/messages';
 import type { ChainedCommands, Editor as TiptapEditor } from '@tiptap/core';
@@ -31,15 +32,6 @@ const DELETE: readonly TableCommand[] = [
   { label: 'editor.tableDeleteColumn', run: (chain) => chain.deleteColumn() },
   { label: 'editor.tableDelete', run: (chain) => chain.deleteTable() },
 ];
-
-const NEW_TABLE = { rows: 3, cols: 3, withHeaderRow: true };
-
-const leaveALineAfterATableAtTheEnd = (chain: ChainedCommands) =>
-  chain.command(({ tr, state }) => {
-    if (tr.doc.lastChild?.type.name === 'table')
-      tr.insert(tr.doc.content.size, state.schema.nodes.paragraph.create());
-    return true;
-  });
 
 function tableState(editor: TiptapEditor) {
   if (!hasExtension(editor, 'table')) return { inTable: false, insertable: false };
@@ -84,12 +76,7 @@ export function EditorTable({ icon, 'aria-label': ariaLabel, className }: Editor
         />
       </Menu.Trigger>
       <Menu.Content side="bottom" align="start">
-        <Menu.Item
-          disabled={inTable || !insertable}
-          onSelect={() =>
-            run((chain) => leaveALineAfterATableAtTheEnd(chain.insertTable(NEW_TABLE)))
-          }
-        >
+        <Menu.Item disabled={inTable || !insertable} onSelect={() => run(insertTable)}>
           {t('editor.tableInsert')}
         </Menu.Item>
         <Menu.Separator />

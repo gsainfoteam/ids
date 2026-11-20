@@ -221,9 +221,19 @@ mixin IdsMessages {
 
   String? get editorLinkUrl => null;
 
+  String? get editorMentionEmpty => null;
+
+  String? get editorMentionMenu => null;
+
+  String? get editorMentionSearching => null;
+
   String? get editorOrderedList => null;
 
   String? get editorParagraph => null;
+
+  String? get editorSlashMenu => null;
+
+  String? get editorSlashMenuEmpty => null;
 
   String? get editorStrike => null;
 
@@ -930,10 +940,25 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorLinkUrl => '링크 주소';
 
   @override
+  String get editorMentionEmpty => '맞는 사람이 없습니다';
+
+  @override
+  String get editorMentionMenu => '멘션';
+
+  @override
+  String get editorMentionSearching => '찾는 중…';
+
+  @override
   String get editorOrderedList => '번호 목록';
 
   @override
   String get editorParagraph => '문단';
+
+  @override
+  String get editorSlashMenu => '블록 넣기';
+
+  @override
+  String get editorSlashMenuEmpty => '맞는 블록이 없습니다';
 
   @override
   String get editorStrike => '취소선';

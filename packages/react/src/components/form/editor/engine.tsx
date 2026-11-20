@@ -5,15 +5,28 @@ import { useEffect } from 'react';
 import { CharacterCount, Placeholder } from '@tiptap/extensions';
 import { EditorContent, useEditor, type UseEditorOptions } from '@tiptap/react';
 
+import { blockMatches, blocksAvailableIn, type EditorBlock } from './blocks/catalog';
 import { EditorCodeBlockNode } from './code-block/node';
 import { LeaveEscapeToTheLayers } from './escape-to-layers';
 import { EditorImageNode } from './image/node';
+import { SlashMenu } from './slash/extension';
+import { slashMenuKey, mentionMenuKey } from './suggestion/keys';
+import { createSuggestionStore, type SuggestionStore } from './suggestion/store';
 import { documentStarterKit } from '../../typography/rich-text/schema/starter-kit';
 
 import type { FeatureExtensions } from './load-engine';
+import type { EditorMention, FindMentions } from './mention';
+import type { Translate } from '../../../internal/translate';
 import type { AnyExtension, Editor as TiptapEditor, Extensions } from '@tiptap/core';
 
 export { EditorContent };
+export { EditorSlashMenu } from './slash/menu';
+
+export type EngineSetup = {
+  extensions: Extensions;
+  slashMenu: SuggestionStore<EditorBlock>;
+  mentionMenu: SuggestionStore<EditorMention> | null;
+};
 export type ImageSetup = {
   uploaded: ReadonlySet<string>;
   start: (editor: TiptapEditor, files: File[], at: number) => void;
@@ -28,14 +41,23 @@ export function extensionsFor({
   features,
   images,
   taskLabel,
+  t,
+  findMentions,
 }: {
   maxLength: number | undefined;
   markdown: AnyExtension | undefined;
   features: FeatureExtensions;
   images: ImageSetup;
   taskLabel: (text: string) => string;
-}): Extensions {
-  return [
+  t: Translate;
+  findMentions: FindMentions;
+}): EngineSetup {
+  const slashMenu = createSuggestionStore<EditorBlock>(slashMenuKey);
+  const mentionMenu = features.mention
+    ? createSuggestionStore<EditorMention>(mentionMenuKey)
+    : null;
+
+  const extensions = [
     documentStarterKit([1, 2, 3, 4], { codeBlock: false }),
     EditorCodeBlockNode,
     Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
@@ -58,8 +80,18 @@ export function extensionsFor({
       : []),
     ...(features.callout ? [features.callout] : []),
     ...(features.details ?? []),
+    ...(features.mention && mentionMenu
+      ? [features.mention.mentionExtension(mentionMenu, findMentions)]
+      : []),
+    SlashMenu.configure({
+      store: slashMenu,
+      blocks: (editor, query) =>
+        blocksAvailableIn(editor).filter((block) => blockMatches(block, query, t)),
+    }),
     ...(markdown ? [markdown] : []),
   ];
+
+  return { extensions, slashMenu, mentionMenu };
 }
 
 export function EditorEngine({

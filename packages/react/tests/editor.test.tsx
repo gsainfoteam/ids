@@ -6,7 +6,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { testTheme } from './theme';
-import { Button, Field, IdsProvider } from '../src';
+import { Button, Dialog, Field, IdsProvider } from '../src';
 import { toast } from '../src/components/feedback/toast';
 import { Editor } from '../src/editor';
 
@@ -1001,9 +1001,7 @@ test('typing [!tip] in a fresh quote turns the quote into a tip callout', async 
   await userEvent.click(content);
   await userEvent.keyboard('> [[!tip] 물 많이 마시기');
 
-  await expect
-    .poll(() => onValueChange.mock.lastCall?.[0])
-    .toBe('> [!TIP]\n> 물 많이 마시기');
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('> [!TIP]\n> 물 많이 마시기');
   expect(content.element().querySelector('blockquote')).toBeNull();
 });
 
@@ -1034,4 +1032,120 @@ test('Details wraps the block in a toggle that opens, closes and keeps its state
   await expect.element(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect.element(page.getByText('숨은 내용')).not.toBeVisible();
   expect(onValueChange.mock.lastCall?.[0]).not.toContain('{open}');
+});
+
+test('typing / opens the block menu, the query filters it and Enter turns the line into the block', async () => {
+  const onValueChange = vi.fn();
+  render(<Editor format="markdown" aria-label="본문" onValueChange={onValueChange} />);
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.keyboard('/');
+
+  const menu = page.getByRole('listbox', { name: '블록 넣기' });
+  await expect.element(menu).toBeVisible();
+  await expect.element(content).toHaveAttribute('aria-activedescendant');
+  await expect.element(menu.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');
+
+  await userEvent.keyboard('제목 2');
+  await expect.element(menu.getByRole('option')).toHaveTextContent('제목 2');
+  await userEvent.keyboard('{Enter}');
+  await expect.element(menu).not.toBeInTheDocument();
+  await userEvent.keyboard('소개');
+
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('## 소개');
+  expect(content.element().hasAttribute('aria-activedescendant')).toBe(false);
+});
+
+test('the block menu offers only the blocks the Editor loaded and says when nothing matches', async () => {
+  render(
+    <Editor aria-label="본문">
+      <Editor.Callout />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.keyboard('/');
+
+  const menu = page.getByRole('listbox', { name: '블록 넣기' });
+  await expect.element(menu.getByRole('option', { name: '콜아웃' })).toBeVisible();
+  expect(menu.getByRole('option', { name: '표' }).query()).toBeNull();
+
+  await userEvent.keyboard('없는블록');
+  await expect
+    .element(page.getByRole('status').filter({ hasText: '맞는 블록이 없습니다' }))
+    .toBeVisible();
+  await userEvent.keyboard(' ');
+  await expect.element(page.getByRole('dialog', { name: '블록 넣기' })).not.toBeInTheDocument();
+});
+
+test('Escape closes the block menu and leaves the Dialog around the Editor open', async () => {
+  render(
+    <IdsProvider theme={testTheme}>
+      <Dialog defaultOpen>
+        <Dialog.Content>
+          <Dialog.Title>글쓰기</Dialog.Title>
+          <Editor aria-label="본문" />
+        </Dialog.Content>
+      </Dialog>
+    </IdsProvider>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.keyboard('/');
+  const menu = page.getByRole('listbox', { name: '블록 넣기' });
+  await expect.element(menu).toBeVisible();
+
+  await userEvent.keyboard('{Escape}');
+  await expect.element(menu).not.toBeInTheDocument();
+  await expect.element(page.getByRole('dialog', { name: '글쓰기' })).toBeVisible();
+  await expect.element(content).toHaveFocus();
+
+  await userEvent.keyboard('{Escape}');
+  await expect.element(page.getByRole('dialog', { name: '글쓰기' })).not.toBeInTheDocument();
+});
+
+test('typing @ asks mentions for people, and the chosen one is written as a mention in markdown', async () => {
+  const onValueChange = vi.fn();
+  const people = [
+    { id: 'u1', label: '김지스트', description: '디자인' },
+    { id: 'u2', label: '이인포', description: '프론트엔드' },
+  ];
+  const mentions = vi.fn(async (query: string) =>
+    people.filter((person) => person.label.includes(query)),
+  );
+  render(
+    <Editor
+      format="markdown"
+      aria-label="본문"
+      mentions={mentions}
+      onValueChange={onValueChange}
+    />,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.keyboard('검토: @인');
+
+  const menu = page.getByRole('listbox', { name: '멘션' });
+  await expect.element(menu.getByRole('option')).toMatchTextContent('이인포프론트엔드');
+  expect(mentions).toHaveBeenLastCalledWith('인', expect.any(AbortSignal));
+  await userEvent.keyboard('{Enter}');
+  await expect.element(menu).not.toBeInTheDocument();
+  await userEvent.keyboard('님 확인');
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('검토: [@ id="u2" label="이인포"] 님 확인');
+  await expect.element(content.getByText('@이인포')).toBeVisible();
+});
+
+test('without mentions, @ is plain text', async () => {
+  const onValueChange = vi.fn();
+  render(<Editor format="markdown" aria-label="본문" onValueChange={onValueChange} />);
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.keyboard('me@ids');
+
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('me@ids');
+  expect(page.getByRole('listbox').query()).toBeNull();
 });

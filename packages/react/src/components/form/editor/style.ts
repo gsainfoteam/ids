@@ -23,6 +23,7 @@ const proseMirrorBaseline = cn(
 );
 
 const editorBlocks = cn(
+  '[&_.suggestion]:text-primary',
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
   '[&_hr:not([data-divider])]:my-3 [&_hr:not([data-divider])]:border-neutral',
   '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard [&_.ProseMirror-selectednode]:outline-offset-2',
@@ -91,6 +92,13 @@ export const editorStyle = tv({
       '[&_svg]:transition-transform [&_svg]:duration-(--ids-motion-normal) motion-reduce:[&_svg]:transition-none',
       'data-open:[&_svg]:rotate-180',
     ],
+    suggestion: 'w-64 concentric-p-1 p-0',
+    suggestionScroll: 'max-h-72 rounded-[inherit]',
+    suggestionList: 'flex flex-col p-1 outline-none',
+    suggestionOption: 'pe-2.5 [&_svg]:size-(--ids-size-icon-standard)',
+    mentionText: 'flex min-w-0 flex-col',
+    mentionLabel: 'truncate',
+    mentionDescription: 'truncate text-caption-c1-regular text-neutral',
     detailsPlaceholder: 'pointer-events-none absolute start-0 top-2 font-medium text-neutral',
   },
   variants: {

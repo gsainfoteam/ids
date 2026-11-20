@@ -18,6 +18,12 @@ const sizes = ['standard', 'tiny'] as const;
 const NOTICE =
   '<h2>동아리 박람회</h2><p>3월 12일 학생회관 앞에서 <strong>동아리 박람회</strong>가 열립니다. 자세한 일정은 <a href="https://gistory.me">공지</a>를 보세요.</p><ul><li>부스 신청: 3월 5일까지</li><li>장소 배정: 3월 8일</li></ul>';
 
+const MEMBERS = [
+  { id: 'kim', label: '김지스트', description: '회장' },
+  { id: 'lee', label: '이인포', description: '프론트엔드' },
+  { id: 'park', label: '박디자인', description: '디자인' },
+];
+
 const meta = {
   title: 'Form/Editor',
   component: Editor,
@@ -619,6 +625,42 @@ export const CalloutAndDetails: Story = {
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
     await userEvent.click(toggle);
     await waitFor(() => expect(toggle).toHaveAttribute('aria-expanded', 'false'));
+  },
+};
+
+export const SlashMenuAndMentions: Story = {
+  args: {
+    format: 'markdown',
+    defaultValue: '',
+    'aria-label': '회의록 본문',
+  },
+  render: (args) => (
+    <Editor
+      {...args}
+      mentions={(query) => MEMBERS.filter((member) => member.label.includes(query))}
+    >
+      <Editor.Callout />
+      <Editor.Details />
+      <Editor.Table />
+      <Editor.Content placeholder="/ 로 블록을, @ 로 사람을 넣으세요" />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '줄에서 / 를 치면 블록 메뉴가 열립니다. 메뉴에는 Editor 가 불러온 블록만 나오고, 글자를 더 치면 이름과 영어 키워드(h2, todo, quote)로 좁혀집니다. 위아래 화살표로 고르고 Enter 로 넣으며, Escape 는 메뉴만 닫습니다. mentions 를 주면 @ 뒤의 글자로 그 함수를 불러 사람을 찾고, 고른 사람은 마크다운에 [@ id="" label=""] 로 남습니다. 함수는 Promise 를 돌려줘도 되고, 두 번째 인자인 AbortSignal 로 지난 요청을 끊을 수 있습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const content = await editableContent(canvas, '회의록 본문');
+    await userEvent.click(content);
+    await userEvent.keyboard('/');
+    const menu = await canvas.findByRole('listbox', { name: '블록 넣기' });
+    await expect(menu).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(canvas.queryByRole('listbox')).toBeNull());
   },
 };
 
