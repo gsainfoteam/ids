@@ -61,7 +61,49 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const radii = (element: HTMLElement) => {
+  const style = getComputedStyle(element);
+  return [
+    style.borderStartStartRadius,
+    style.borderStartEndRadius,
+    style.borderEndEndRadius,
+    style.borderEndStartRadius,
+  ];
+};
+
 export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => (
+    <ButtonGroup variant="outline" aria-label="보관함 동작">
+      <Button>보관</Button>
+      <Button>신고</Button>
+      <Button>미루기</Button>
+    </ButtonGroup>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '바깥 모서리만 둥글고 맞닿는 테두리는 한 줄로 겹칩니다. 포커스한 버튼은 앞으로 나와 링과 테두리가 가려지지 않습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const [first, middle, last] = canvas.getAllByRole('button');
+    await expect(radii(first!)).toEqual(['10px', '0px', '0px', '10px']);
+    await expect(radii(middle!)).toEqual(['0px', '0px', '0px', '0px']);
+    await expect(radii(last!)).toEqual(['0px', '10px', '10px', '0px']);
+    await expect(middle!.getBoundingClientRect().left - first!.getBoundingClientRect().right).toBe(
+      -1,
+    );
+    await userEvent.tab();
+    await userEvent.tab();
+    await expect(middle).toHaveFocus();
+    await expect(getComputedStyle(middle!).zIndex).toBe('30');
+    await expect(canvas.getByRole('group')).toHaveAccessibleName('보관함 동작');
+  },
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -188,49 +230,7 @@ export const Gallery: Story = {
   ),
 };
 
-const radii = (element: HTMLElement) => {
-  const style = getComputedStyle(element);
-  return [
-    style.borderStartStartRadius,
-    style.borderStartEndRadius,
-    style.borderEndEndRadius,
-    style.borderEndStartRadius,
-  ];
-};
-
-export const Joined: Story = {
-  render: () => (
-    <ButtonGroup variant="outline" aria-label="보관함 동작">
-      <Button>보관</Button>
-      <Button>신고</Button>
-      <Button>미루기</Button>
-    </ButtonGroup>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '바깥 모서리만 둥글고 맞닿는 테두리는 한 줄로 겹칩니다. 포커스한 버튼은 앞으로 나와 링과 테두리가 가려지지 않습니다.',
-      },
-    },
-  },
-  play: async ({ canvas, userEvent }) => {
-    const [first, middle, last] = canvas.getAllByRole('button');
-    await expect(radii(first!)).toEqual(['10px', '0px', '0px', '10px']);
-    await expect(radii(middle!)).toEqual(['0px', '0px', '0px', '0px']);
-    await expect(radii(last!)).toEqual(['0px', '10px', '10px', '0px']);
-    await expect(middle!.getBoundingClientRect().left - first!.getBoundingClientRect().right).toBe(
-      -1,
-    );
-    await userEvent.tab();
-    await userEvent.tab();
-    await expect(middle).toHaveFocus();
-    await expect(getComputedStyle(middle!).zIndex).toBe('30');
-    await expect(canvas.getByRole('group')).toHaveAccessibleName('보관함 동작');
-  },
-};
-
-export const SizeAndVariant: Story = {
+export const SetSizeAndVariantForEveryButton: Story = {
   render: () => (
     <ButtonGroup size="tiny" variant="outline" aria-label="확대">
       <IconButton icon={<MinusIcon />} aria-label="줄이기" />
@@ -262,7 +262,7 @@ export const SizeAndVariant: Story = {
   },
 };
 
-export const Separator: Story = {
+export const BuildASplitButton: Story = {
   render: () => (
     <ButtonGroup variant="solid" aria-label="저장">
       <Button>저장</Button>
@@ -288,7 +288,7 @@ export const Separator: Story = {
   },
 };
 
-export const SpacedSeparator: Story = {
+export const BuildAToolbar: Story = {
   render: () => (
     <Card className="concentric-p-1 w-fit flex-row gap-0">
       <ButtonGroup attached={false} variant="ghost" aria-label="사진 보기" className="gap-1">
@@ -317,6 +317,7 @@ export const SpacedSeparator: Story = {
 };
 
 export const RightToLeft: Story = {
+  tags: ['verification'],
   render: () => (
     <div dir="rtl">
       <ButtonGroup variant="outline" aria-label="오른쪽에서 왼쪽">
@@ -341,6 +342,7 @@ export const RightToLeft: Story = {
 };
 
 export const DevelopmentWarnings: Story = {
+  tags: ['verification'],
   render: function Render() {
     const [shown, setShown] = useState(false);
 
