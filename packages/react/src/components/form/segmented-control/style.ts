@@ -35,7 +35,7 @@ export const segmentedControlStyle = tv({
     } satisfies Record<SegmentedControlOrientation, object>,
     stretch: {
       true: { root: 'w-full' },
-      false: { root: 'w-fit self-start' },
+      false: { root: 'w-fit' },
     },
     size: {
       standard: {

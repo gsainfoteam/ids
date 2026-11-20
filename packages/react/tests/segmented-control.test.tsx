@@ -245,7 +245,9 @@ test('light: the selected segment is a card on a neutral track as tall as a cont
   await expect
     .poll(() => getComputedStyle(track).backgroundColor)
     .toBe(colorOf('--ids-color-bg-neutral-subtle'));
-  expect(getComputedStyle(selected).backgroundColor).toBe(colorOf('--ids-color-bg-segmented-control-item'));
+  expect(getComputedStyle(selected).backgroundColor).toBe(
+    colorOf('--ids-color-bg-segmented-control-item'),
+  );
   expect(getComputedStyle(selected).backgroundColor).toBe(
     colorOf('--ids-color-bg-neutral-subtlest'),
   );
@@ -290,6 +292,23 @@ test('dark: the selected card sits one neutral step above the track', async () =
     colorOf('--ids-color-bg-neutral-subtle', root),
   );
   expect(getComputedStyle(selected).color).toBe(colorOf('--ids-color-text-neutral-bold', root));
+});
+
+test('an unstretched control keeps its width and follows the parent alignment', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <div style={{ width: 400, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <SegmentedControl<string> aria-label="Period" defaultValue="day">
+          {items}
+        </SegmentedControl>
+      </div>
+    </IdsProvider>,
+  );
+  const track = screen.getByRole('radiogroup').element();
+  const parent = track.parentElement!.getBoundingClientRect();
+  const box = track.getBoundingClientRect();
+  expect(box.width).toBeLessThan(parent.width);
+  expect(box.left - parent.left, 'centred by the parent').toBeCloseTo(parent.right - box.right, 0);
 });
 
 test('stretch shares the width; keyboard focus rings the segment label', async () => {
