@@ -245,7 +245,7 @@ export const Transparent: Story = {
     docs: {
       description: {
         story:
-          'transparent는 켜져도 배경을 칠하지 않습니다. 꺼지면 아이콘이 on-surface이고, 켜지면 아이콘만 colorScheme의 글자 색(text-X)을 띱니다. hover는 불투명도를 70%로, press는 40%로 낮추고, 켜진 동안에도 같습니다. 채운 아이콘은 icon 함수로 바꿉니다.',
+          'transparent는 켜져도 배경을 칠하지 않습니다. 꺼지면 아이콘이 text-neutral-bold이고, 켜지면 아이콘만 colorScheme의 글자 색(text-X)을 띱니다. hover는 불투명도를 70%로, press는 40%로 낮추고, 켜진 동안에도 같습니다. 채운 아이콘은 icon 함수로 바꿉니다.',
       },
     },
   },

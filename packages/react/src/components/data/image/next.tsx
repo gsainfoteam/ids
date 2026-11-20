@@ -22,7 +22,6 @@ export function ImageViewerNext({ className, ...props }: ImageViewerNextProps) {
       glyph={<ChevronRightIcon aria-hidden="true" />}
       act={viewer.next}
       unavailable={!viewer.canNext}
-      quiet={false}
     />
   );
 }

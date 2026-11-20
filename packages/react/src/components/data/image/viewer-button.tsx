@@ -4,7 +4,7 @@ import { type ComponentProps, type MouseEvent, type ReactElement } from 'react';
 
 import { IconButton } from '../../action/icon-button';
 
-import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type ImageViewerButtonProps = Omit<ComponentProps<'button'>, 'children' | 'color'> & {
@@ -18,7 +18,6 @@ type Behaviour = {
   glyph: ReactElement;
   act: () => void;
   unavailable?: boolean;
-  quiet: boolean;
 };
 
 export function ViewerButton({
@@ -26,7 +25,6 @@ export function ViewerButton({
   glyph,
   act,
   unavailable = false,
-  quiet,
   icon,
   variant,
   size,
@@ -39,7 +37,7 @@ export function ViewerButton({
       {...rest}
       aria-label={rest['aria-label'] ?? label}
       icon={icon ?? glyph}
-      variant={variant ?? (quiet ? 'ghost' : 'outline')}
+      variant={variant ?? 'ghost'}
       size={size}
       disabled={disabled || unavailable}
       focusableWhenDisabled

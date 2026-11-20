@@ -6,6 +6,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, ButtonGroup, IdsProvider, TextField, Toggle, ToggleGroup } from '../src';
+import { paintedLayersOf } from './painted-layers';
 import { testTheme } from './theme';
 
 const separator = (node: ReactNode) =>
@@ -42,6 +43,15 @@ test('the separator is a Divider across the group that overlaps the joined borde
     </ButtonGroup>,
   );
   expect(spaced.classList, 'spaced controls leave no seam').not.toContain('-mx-px');
+  for (const name of ['h-5', 'min-h-0', 'self-center'])
+    expect(spaced.classList, `a spaced separator is short: ${name}`).toContain(name);
+
+  const tiny = separator(
+    <ButtonGroup aria-label="저장" attached={false} size="tiny" orientation="vertical">
+      <ButtonGroup.Separator />
+    </ButtonGroup>,
+  );
+  for (const name of ['w-4', 'self-center']) expect(tiny.classList, name).toContain(name);
 });
 
 test('inside a single-select ToggleGroup the separator only draws a line', () => {
@@ -163,7 +173,7 @@ test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its
 
   expect(getComputedStyle(group).boxShadow).not.toMatch(dropShadow);
   expect(getComputedStyle(left!).boxShadow).toMatch(dropShadow);
-  expect(getComputedStyle(right!).backgroundImage).toBe('none');
+  expect(paintedLayersOf(right!)).toEqual([]);
   expect(getComputedStyle(right!).marginInlineStart).toBe('-1px');
 });
 

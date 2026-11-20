@@ -57,7 +57,7 @@ export const Durations: Story = {
                 <span className="text-body-b3-medium">{name}</span>
                 <code className="text-caption-c1-regular text-neutral font-mono">{value}</code>
                 <div className="flex flex-col gap-1">
-                  <div className="bg-neutral-soft relative h-4 w-full max-w-80 rounded-full">
+                  <div className="bg-neutral-subtle relative h-4 w-full max-w-80 rounded-full">
                     <span
                       data-dot=""
                       className="bg-primary absolute inset-y-0 left-0 size-4 rounded-full transition-[left] ease-out data-moved:left-[calc(100%-1rem)] motion-reduce:transition-none"

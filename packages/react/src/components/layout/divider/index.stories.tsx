@@ -62,11 +62,11 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="label">
           <div className="flex h-32 items-stretch gap-6">
-            <div className="rounded-standard text-body-b3-regular bg-neutral-soft flex w-24 items-center justify-center">
+            <div className="rounded-standard text-body-b3-regular bg-neutral-subtle flex w-24 items-center justify-center">
               이메일
             </div>
             <Divider orientation="vertical">또는</Divider>
-            <div className="rounded-standard text-body-b3-regular bg-neutral-soft flex w-24 items-center justify-center">
+            <div className="rounded-standard text-body-b3-regular bg-neutral-subtle flex w-24 items-center justify-center">
               소셜 로그인
             </div>
           </div>

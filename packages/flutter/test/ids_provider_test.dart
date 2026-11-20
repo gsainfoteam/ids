@@ -39,13 +39,13 @@ void main() {
       ),
     );
     final colors = scope.colors;
-    expect(colors.surface, const Color(0xFFFFFFFF));
-    expect(colors.onSurface, const Color(0xFF171717));
+    expect(colors.bgNeutralSubtlest, const Color(0xFFFFFFFF));
+    expect(colors.textNeutralBold, const Color(0xFF171717));
     expect(colors.borderNeutral, const Color(0xFFE5E5E5));
     expect(colors.textNeutral, const Color(0xFF525252));
     expect(colors.bgPrimary, const Color(0xFF155DFC));
-    expect(colors['bg-primary-soft'], colors.bgPrimarySoft);
-    expect(colors['text-on-primary-soft'], colors.textOnPrimarySoft);
+    expect(colors['bg-primary-subtle'], colors.bgPrimarySubtle);
+    expect(colors['text-on-primary-subtle'], colors.textOnPrimarySubtle);
     expect(colors.roles.keys, IdsColorRoles.all);
   });
 
@@ -67,21 +67,21 @@ void main() {
                         'Sans',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: ids.colors.onSurface,
+                          color: ids.colors.textNeutralBold,
                         ),
                       ),
                       Text(
                         'Mono',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: ids.colors.onSurface,
+                          color: ids.colors.textNeutralBold,
                           mono: true,
                         ),
                       ),
                       TextField(
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: ids.colors.onSurface,
+                          color: ids.colors.textNeutralBold,
                           mono: true,
                         ),
                       ),
@@ -294,7 +294,7 @@ void main() {
       ),
     );
     expect(scope.colors.bgPrimary, isNot(root.colors.bgPrimary));
-    expect(scope.colors.surface, root.colors.surface);
+    expect(scope.colors.bgNeutralSubtlest, root.colors.bgNeutralSubtlest);
     expect(scope.colors.borderNeutral, isNot(root.colors.borderNeutral));
     expect(root.colors, colorsOf(testTheme, IdsMode.light));
   });

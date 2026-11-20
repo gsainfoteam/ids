@@ -1,12 +1,11 @@
-import { primaryFill } from '../../../internal/brand-fill';
-import { fieldSurface } from '../../../internal/field-surface';
-import { cn, tv } from '../../../utils';
+import { fieldSurface } from '../../../internal/surfaces/field-surface';
+import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
 
 export const calendarStyle = tv({
   slots: {
-    root: 'relative w-fit min-w-0 text-on-surface',
+    root: 'relative w-fit min-w-0 text-neutral-bold',
     months: 'flex flex-wrap gap-4',
     month:
       'grid grid-cols-[var(--calendar-cell)_minmax(0,1fr)_var(--calendar-cell)] content-start gap-y-2',
@@ -43,17 +42,17 @@ export const calendarStyle = tv({
       'first:rounded-s-standard last:rounded-e-standard',
       '[[data-hidden]+&]:rounded-s-standard [&:has(+[data-hidden])]:rounded-e-standard',
     ],
-    rangeStart: 'rounded-s-standard bg-primary-soft',
-    rangeMiddle: 'bg-primary-soft',
-    rangeEnd: 'rounded-e-standard bg-primary-soft',
-    previewStart: 'rounded-s-standard bg-neutral-soft',
-    previewMiddle: 'bg-neutral-soft',
-    previewEnd: 'rounded-e-standard bg-neutral-soft',
+    rangeStart: 'rounded-s-standard bg-primary-subtle',
+    rangeMiddle: 'bg-primary-subtle',
+    rangeEnd: 'rounded-e-standard bg-primary-subtle',
+    previewStart: 'rounded-s-standard bg-neutral-subtle',
+    previewMiddle: 'bg-neutral-subtle',
+    previewEnd: 'rounded-e-standard bg-neutral-subtle',
     hidden: 'invisible',
     dayButton: [
       'relative inline-flex size-full cursor-pointer items-center justify-center rounded-standard',
       'tabular-nums select-none focus-ring focus-ring-visible:z-10',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+      'transition-[color,background-color,box-shadow,--ids-state-opacity] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
     ],
     footer: 'mt-3 text-caption-c1-regular text-neutral',
@@ -79,20 +78,13 @@ export const calendarStyle = tv({
     outside: { true: { dayButton: 'text-neutral' } },
     selected: {
       true: {
-        dayButton: cn(
-          primaryFill,
-          'bg-(--control-fill) font-medium text-(--control-on-fill) hover:bg-(--control-fill-hover)',
-        ),
+        dayButton: 'bg-primary font-medium text-on-primary state-fill',
       },
     },
     band: {
       none: {},
-      range: {
-        dayButton: 'text-on-primary-soft hover:bg-primary-soft-hover active:bg-primary-soft-active',
-      },
-      preview: {
-        dayButton: 'hover:bg-neutral-soft-hover active:bg-neutral-soft-active',
-      },
+      range: { dayButton: 'scheme-primary text-on-scheme-subtle state-scheme' },
+      preview: {},
     },
     unavailable: { true: { dayButton: 'cursor-not-allowed opacity-50' } },
   },
@@ -103,16 +95,8 @@ export const calendarStyle = tv({
       class: { dayButton: 'text-primary inset-ring-1 inset-ring-primary' },
     },
     {
-      selected: false,
-      band: 'none',
       unavailable: false,
-      class: { dayButton: 'hover:bg-neutral-soft active:bg-neutral-soft-hover' },
-    },
-    { selected: true, unavailable: true, class: { dayButton: 'hover:bg-primary' } },
-    {
-      band: ['range', 'preview'],
-      unavailable: true,
-      class: { dayButton: 'hover:bg-transparent active:bg-transparent' },
+      class: { dayButton: 'state-layer hover:state-hover active:state-press' },
     },
   ],
   defaultVariants: {

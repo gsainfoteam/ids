@@ -1,4 +1,4 @@
-import { fieldAction, fieldTrigger } from '../../../internal/field-surface';
+import { fieldAction, fieldTrigger } from '../../../internal/surfaces/field-surface';
 import { cn, tv } from '../../../utils';
 
 import type { FileFieldVariant } from '.';
@@ -6,7 +6,7 @@ import type { IdsSize } from '../../../tokens/types';
 
 const alreadyDimmedByField = cn('data-disabled:opacity-100');
 
-const ownTriggerLook = cn('flex min-w-0 cursor-pointer items-center text-start text-on-surface');
+const ownTriggerLook = cn('flex min-w-0 cursor-pointer items-center text-start text-neutral-bold');
 
 export const fileFieldStyle = tv({
   slots: {
@@ -24,7 +24,7 @@ export const fileFieldStyle = tv({
     dropzoneTitle: 'font-medium break-keep text-balance',
     dropzoneHint: 'text-caption-c1-regular text-neutral break-keep text-balance',
     list: 'flex flex-col gap-1',
-    item: 'bg-surface dark:bg-neutral-soft/30',
+    item: 'bg-panel',
     preview: 'text-neutral',
     itemSize: 'text-caption-c1-regular',
     itemRemove: fieldAction.base,
@@ -41,8 +41,8 @@ export const fileFieldStyle = tv({
           'min-h-32 w-full flex-col justify-center gap-1 text-center concentric-p-4',
           'border border-dashed focus-ring',
           'transition-[color,background-color,border-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-          'data-dragging:border-primary data-dragging:bg-primary-soft',
-          'data-dragging:text-on-primary-soft',
+          'data-dragging:border-primary data-dragging:bg-primary-subtle',
+          'data-dragging:text-on-primary-subtle',
           'aria-invalid:border-danger',
           'disabled:opacity-50',
         ],
@@ -95,7 +95,7 @@ export const fileFieldStyle = tv({
       appearance: 'dropzone',
       variant: 'outline',
       class: {
-        trigger: 'border-neutral hover:bg-neutral-soft active:bg-neutral-soft-hover',
+        trigger: 'border-neutral state-layer hover:state-hover active:state-press',
       },
     },
     {
@@ -103,8 +103,8 @@ export const fileFieldStyle = tv({
       variant: 'soft',
       class: {
         trigger: [
-          'border-transparent bg-neutral-soft',
-          'hover:bg-neutral-soft-hover active:bg-neutral-soft-active',
+          'border-transparent bg-neutral-subtle',
+          'state-layer hover:state-hover active:state-press',
         ],
       },
     },
@@ -112,7 +112,7 @@ export const fileFieldStyle = tv({
       appearance: 'dropzone',
       variant: 'ghost',
       class: {
-        trigger: 'border-transparent hover:bg-neutral-soft active:bg-neutral-soft-hover',
+        trigger: 'border-transparent state-layer hover:state-hover active:state-press',
       },
     },
   ],

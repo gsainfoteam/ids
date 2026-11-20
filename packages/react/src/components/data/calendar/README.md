@@ -49,7 +49,7 @@ const [range, setRange] = useState<DateRange | null>(null);
 // 세 번째   { start: 새 날, end: null }    새 기간을 시작
 ```
 
-- 기간 안의 날은 `bg-primary-soft` 위에 `text-on-primary-soft` 입니다. 끝을 고르기 전 미리 보기는 `bg-neutral-soft` 라 확정된 기간과 구분됩니다.
+- 기간 안의 날은 `bg-primary-subtle` 위에 `text-on-primary-subtle` 입니다. 끝을 고르기 전 미리 보기는 `bg-neutral-subtle` 이라 확정된 기간과 구분됩니다.
 - 미리 보기 중인 날에는 `data-range-preview` 가 붙습니다. 포인터가 달력을 벗어나면 키보드 포커스가 있는 날까지 보여 줍니다.
 - 기간은 양 끝만 검사합니다. 사이에 막힌 날이 있어도 기간을 만들 수 있습니다.
 

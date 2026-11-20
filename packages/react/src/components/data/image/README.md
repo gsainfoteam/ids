@@ -120,25 +120,35 @@ const [index, setIndex] = useState(0);
 <Image.Group aria-label="풍경 사진">
   {photos.map((photo) => <Image key={photo.id} ... />)}
   <Image.Viewer aria-label="풍경 사진 보기">          {/* 적은 부품만 그린다 */}
+    <Image.Viewer.Caption />
     <Image.Viewer.Toolbar>
+      <Image.Viewer.Prev />
       <Image.Viewer.Counter />
-      <Image.Viewer.ZoomIn />
+      <Image.Viewer.Next />
+      <Image.Viewer.Separator />
       <Image.Viewer.ZoomOut />
+      <Image.Viewer.ZoomReset />
+      <Image.Viewer.ZoomIn />
+      <Image.Viewer.Separator />
       <Image.Viewer.Share />
       <Image.Viewer.Download />
       <Image.Viewer.Close />
     </Image.Viewer.Toolbar>
-    <Image.Viewer.Prev />
-    <Image.Viewer.Next />
-    <Image.Viewer.Caption />
-    <Image.Viewer.Thumbnails />
+    <Image.Viewer.Thumbnails />                     {/* 기본 뷰어에는 없다 */}
   </Image.Viewer>
 </Image.Group>
 ```
 
-- 기본 뷰어는 도구 막대(번호, 확대, 축소, 내려받기, 닫기), 이전과 다음 버튼, 설명, 아래 썸네일 줄입니다.
-- 뷰어 부품은 `Image.Viewer` 아래에 있습니다(`Image.Viewer.Close`). 모두 뷰어의 상태를 읽으므로 `Image.Viewer` 안이면 도구 막대 밖에 두어도 됩니다.
+- 기본 뷰어는 위 왼쪽의 설명과 아래 가운데의 도구 막대 하나입니다. 도구 막대는 세 칸입니다.
+  - 이전, 번호("2 / 6"), 다음
+  - 축소, 배율("150%"), 확대. 배율을 누르면 화면에 맞춘다. 폭이 640px 보다 좁으면 배율은 빠진다
+  - 내려받기 | 닫기
+- 뷰어는 페이지 모드를 따릅니다. 밝은 모드에서는 밝고, 어두운 모드에서는 어둡습니다. 뒤 배경은 `bg-neutral-subtlest` 의 95% 라서 뒤 페이지가 거의 보이지 않습니다.
+- 맞춘 사진은 설명 두 줄의 자리와 도구 막대 사이에 놓입니다. 설명이 없는 장도 그 자리를 비워 두므로, 넘겨도 사진 크기가 바뀌지 않습니다. 설명은 두 줄까지 보이고 넘치면 말줄임표로 잘립니다(스크린 리더는 전부 읽습니다).
+- 확대하면 사진이 설명과 도구 막대 아래로 넘어갑니다. 설명은 숨고 포인터도 받지 않아서, 그 자리에서 시작한 끌기, 휠, 두 번 누르기가 사진에 닿습니다.
+- 뷰어 부품은 `Image.Viewer` 아래에 있습니다(`Image.Viewer.Close`). 모두 뷰어의 상태를 읽으므로 `Image.Viewer` 안이면 어디에 두어도 됩니다. 버튼 부품은 도구 막대 안에 두는 것을 전제로 자리를 잡지 않습니다.
 - `Image.Viewer` 에 자식을 주면 그 부품만 그립니다. `Image.Viewer.Toolbar` 에 자식을 주지 않으면 기본 도구 막대입니다.
+- 썸네일 줄(`Image.Viewer.Thumbnails`)은 기본 뷰어에 없습니다. 넣으면 도구 막대 아래에 놓입니다.
 - 한 장뿐이면 번호, 이전과 다음, 썸네일은 그리지 않습니다.
 - 이전과 다음은 끝에서 `aria-disabled` 가 되고, `loop` 이면 넘어갑니다. 확대와 축소도 끝에서 `aria-disabled` 입니다.
 - 넘기면 배율이 1 로 돌아갑니다.
@@ -153,7 +163,7 @@ const [index, setIndex] = useState(0);
 | `Home` `End`    | 처음, 끝 장                                                     |
 | `+` `-` `0`     | 확대, 축소, 원래 크기(`=` 도 확대)                              |
 | `←` `→` `↑` `↓` | 확대한 사진을 옮긴다                                            |
-| `Tab`           | 도구 막대, 이전과 다음, 썸네일 사이. 뷰어 밖으로 나가지 않는다  |
+| `Tab`           | 도구 막대와 썸네일 사이. 뷰어 밖으로 나가지 않는다              |
 | `Escape`        | 닫는다. 누른 사진(뷰어만 쓸 때는 연 버튼)으로 포커스가 돌아간다 |
 
 ### 포인터와 터치
@@ -165,7 +175,7 @@ const [index, setIndex] = useState(0);
 | 두 손가락 벌리기, 오므리기      | 두 손가락 사이를 중심으로 확대, 축소                   |
 | 두 번 누르기                    | 그 자리로 확대하거나 원래 크기로                       |
 | 원래 크기에서 아래로 쓸어내리기 | 뒤가 비쳐 보이다가, 충분히 내리거나 빠르게 쓸면 닫는다 |
-| 사진 밖 빈 곳 누르기            | 닫는다                                                 |
+| 사진 밖 빈 곳 누르기            | 닫는다. 설명, 도구 막대, 썸네일 줄을 누르면 닫지 않는다 |
 
 - 확대한 사진을 끌다 놓으면 관성으로 조금 더 미끄러지고, 사진 가장자리에서 멈춥니다.
 - 배율은 1 에서 4 까지입니다.
@@ -211,6 +221,8 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 - 뷰어는 `role="dialog"`, `aria-modal="true"` 이고 이름은 "사진 보기" 입니다(`aria-label` 로 바꿉니다). 열린 동안 뒤 페이지는 `aria-hidden` 이고 스크롤이 잠깁니다.
 - 사진들은 `aria-roledescription="캐러셀"` 인 영역 "사진" 안에 있고, 한 장은 `role="group"`, `aria-roledescription="슬라이드"`, 이름 "6장 중 2번째" 입니다. 넘기면 같은 문장을 `aria-live="polite"` 로 읽습니다.
 - 도구 막대의 "2 / 6" 은 스크린 리더에게 숨깁니다. 위 알림이 같은 내용을 읽습니다.
+- 배율 버튼의 이름은 "150%, 화면에 맞추기" 입니다. 보이는 글자가 이름 앞에 옵니다. 맞춘 상태에서는 `aria-disabled` 입니다.
+- 도구 막대의 칸 구분선(`Image.Viewer.Separator`)은 스크린 리더에게 숨깁니다.
 - 썸네일 줄은 이름이 "사진 목록" 인 `role="group"` 이고, 지금 장의 썸네일은 `aria-current="true"` 입니다.
 - 깨진 큰 그림의 알림에서 그림 아이콘은 `role="img"` 와 `alt` 를 이름으로 가집니다.
 
@@ -229,6 +241,7 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | ------------------------------ | ---------------------------------------- | ----------------------------------------- |
 | `data-image-viewer`            | 대화상자                                 |                                           |
 | `data-open`                    | 대화상자                                 | 열려 있다                                 |
+| `data-zoomed`                  | 대화상자                                 | 확대되어 있다                             |
 | `data-ending-style`            | 대화상자, 뒤 배경                        | 닫히는 중                                 |
 | `data-swiping`                 | 대화상자, 뒤 배경                        | 아래로 쓸어내리는 중                      |
 | `--image-viewer-presence`      | 대화상자, 뒤 배경                        | 쓸어내리는 동안 1 에서 0 으로 줄어드는 값 |
@@ -240,6 +253,8 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | `data-image-viewer-notice`     | 깨진 큰 그림의 알림                      |                                           |
 | `data-image-viewer-toolbar`    | `Image.Viewer.Toolbar`                   |                                           |
 | `data-image-viewer-counter`    | `Image.Viewer.Counter`                   |                                           |
+| `data-image-viewer-zoom-reset` | `Image.Viewer.ZoomReset`                 |                                           |
+| `data-image-viewer-separator`  | `Image.Viewer.Separator`                 |                                           |
 | `data-image-viewer-step`       | `Image.Viewer.Prev`, `Image.Viewer.Next` | `prev` / `next`                           |
 | `data-image-viewer-caption`    | `Image.Viewer.Caption`                   |                                           |
 | `data-image-viewer-thumbnails` | `Image.Viewer.Thumbnails`                |                                           |
@@ -297,15 +312,17 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 
 | 부품                                           | 기본 / 동작                                                               |
 | ---------------------------------------------- | ------------------------------------------------------------------------- |
-| `Image.Viewer.Toolbar`                         | 위 오른쪽의 막대. 자식이 없으면 Counter, ZoomIn, ZoomOut, Download, Close |
+| `Image.Viewer.Toolbar`                         | 아래 가운데의 막대. 자식이 없으면 위의 세 칸                              |
 | `Image.Viewer.Counter`                         | "2 / 6". 스크린 리더에게 숨긴다                                           |
 | `Image.Viewer.ZoomIn` / `Image.Viewer.ZoomOut` | `IconButton` 속성. 이름 "확대" / "축소"                                   |
+| `Image.Viewer.ZoomReset`                       | `Button` 속성. 글자는 배율("150%"), 누르면 화면에 맞춘다                  |
+| `Image.Viewer.Separator`                       | 도구 막대의 칸을 나누는 세로 `Divider`                                    |
 | `Image.Viewer.Share`                           | `IconButton` 속성. 이름 "공유하기". `navigator.share` 가 있을 때만        |
 | `Image.Viewer.Download`                        | `IconButton` 속성과 `<a>` 속성. 이름 "내려받기"                           |
 | `Image.Viewer.Close`                           | `IconButton` 속성. 이름 "닫기"                                            |
-| `Image.Viewer.Prev` / `Image.Viewer.Next`      | `IconButton` 속성. 이름 "이전 사진" / "다음 사진". 양옆 가운데            |
-| `Image.Viewer.Caption`                         | 지금 장의 `caption`. 없으면 그리지 않는다                                 |
-| `Image.Viewer.Thumbnails`                      | 아래 썸네일 줄. 넘치면 가로로 스크롤한다                                  |
+| `Image.Viewer.Prev` / `Image.Viewer.Next`      | `IconButton` 속성. 이름 "이전 사진" / "다음 사진"                         |
+| `Image.Viewer.Caption`                         | 위 왼쪽의 지금 장 `caption`, 두 줄까지. 없으면 그리지 않는다              |
+| `Image.Viewer.Thumbnails`                      | 도구 막대 아래 썸네일 줄. 넘치면 가로로 스크롤한다                        |
 
 ## 알아둘 것
 
@@ -314,4 +331,4 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 - `columns` 가 1 이상의 정수가 아니면 오류를 던집니다.
 - 뷰어 부품을 `Image.Viewer` 밖에 두면 오류를 던집니다.
 - `<a download>` 는 같은 출처의 주소에서만 내려받습니다. 다른 출처의 사진은 브라우저가 열기만 합니다.
-- 뷰어는 제자리에 그려지고 top layer 로 올라갑니다. 포털을 쓰지 않으므로 그 자리의 테마를 따릅니다.
+- 뷰어는 제자리에 그려지고 top layer 로 올라갑니다. 포털을 쓰지 않으므로 그 자리의 테마(브랜드 색, radius)와 모드를 따릅니다.

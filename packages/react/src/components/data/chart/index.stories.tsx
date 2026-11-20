@@ -415,10 +415,10 @@ export const RechartsTooltip: Story = {
         <Tooltip
           cursor={false}
           contentStyle={{
-            background: 'var(--ids-color-surface)',
+            background: 'var(--ids-color-bg-neutral-subtlest)',
             borderColor: 'var(--ids-color-border-neutral)',
           }}
-          itemStyle={{ color: 'var(--ids-color-on-surface)' }}
+          itemStyle={{ color: 'var(--ids-color-text-neutral-bold)' }}
         />
       </BarChart>
     </Chart>

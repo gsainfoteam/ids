@@ -23,6 +23,7 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 <ScrollArea variant="hover" />   // 기본. 포인터를 올리거나 스크롤하거나 끄는 동안
 <ScrollArea variant="auto" />    // 넘치면 늘
 <ScrollArea variant="always" />  // 넘치지 않아도 트랙과 함께 늘
+<ScrollArea variant="none" />    // 그리지 않음
 ```
 
 - `hover` 는 포인터가 나가거나 스크롤이 멈추면 300ms 뒤에 사라집니다. 스크롤이 멈췄다고 보는 것은 마지막 `scroll` 500ms 뒤입니다.
@@ -30,6 +31,14 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 - 막대에 올리거나 끄는 동안 막대가 2px 두꺼워지고 트랙이 보입니다.
 - 나타나고 사라지는 것은 `opacity` 전환입니다. `prefers-reduced-motion` 이면 전환 없이 바로 바뀝니다.
 - 숨은 막대는 포인터를 받지 않습니다. 그 자리의 클릭은 내용으로 갑니다.
+- `none` 은 올리거나 스크롤하거나 끄는 동안에도 막대와 Corner 를 그리지 않습니다. 스크롤, `fade`, `data-overflow-*` 와 `--scroll-area-overflow-*` 는 다른 variant 와 같습니다.
+- `none` 에서는 마우스만 쓰는 사람이 끌 손잡이가 없습니다. `fade` 같은 다른 표시와 함께 씁니다. 옆으로 넘기는 툴바가 그런 예입니다.
+
+```tsx
+<ScrollArea asChild orientation="horizontal" variant="none" fade="x">
+  <div role="toolbar">…</div>
+</ScrollArea>
+```
 
 ## 크기와 방향
 
@@ -204,21 +213,22 @@ import { ScrollArea } from '@gsainfoteam/ids-react';
 
 ## 색
 
-| 토큰                            | 불투명도 | 쓰임                                    |
-| ------------------------------- | -------- | --------------------------------------- |
-| `--ids-color-bg-neutral`        | 60%      | thumb                                   |
-| `--ids-color-bg-neutral-hover`  | 75%      | thumb 에 올렸을 때                      |
-| `--ids-color-bg-neutral-active` | 90%      | thumb 을 끌 때                          |
-| `--ids-color-bg-neutral-soft`   | 50%      | `always` 트랙, 막대에 올렸을 때, Corner |
+| 토큰                              | 불투명도 | 쓰임                                    |
+| --------------------------------- | -------- | --------------------------------------- |
+| `--ids-color-bg-neutral`          | 60%      | thumb                                   |
+| `--ids-color-bg-neutral`          | 100%     | thumb 에 올렸을 때                      |
+| `--ids-color-text-neutral`        | 100%     | thumb 을 끌 때                          |
+| `--ids-color-bg-neutral-subtle`   | 50%      | `always` 트랙, 막대에 올렸을 때, Corner |
 
 - 막대는 내용 위에 겹쳐 그려지므로 반투명합니다. 밑의 글자가 비쳐 보여 막대가 내용을 덜 가립니다.
+- thumb 은 글자색 층(`state-layer`)을 쓰지 않습니다. 몇 px 막대에서 6~10% 층은 보이지 않아 색 자체를 바꿉니다.
 - 중립 토큰이라 `data-mode` 에만 따릅니다. 다크 모드는 토큰이 바꿉니다.
 
 ## 속성
 
 | 속성                  | 기본 / 동작                              |
 | --------------------- | ---------------------------------------- |
-| `variant`             | `hover`(기본) / `auto` / `always`        |
+| `variant`             | `hover`(기본) / `auto` / `always` / `none` |
 | `size`                | `standard`(기본, 8px) / `tiny`(6px)      |
 | `orientation`         | 선언한 막대의 방향, 없으면 `vertical` |
 | `fade`                | `false`(기본) / `true` / `'y'` / `'x'`   |

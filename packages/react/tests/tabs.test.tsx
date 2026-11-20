@@ -378,7 +378,7 @@ test('underline draws the selected label and its line in primary', async () => {
   expect(getComputedStyle(tab('a').element()).color).not.toBe(colorOf('--ids-color-text-primary'));
 });
 
-test('segmented sets the selected tab as a surface card on a neutral track as tall as a control', async () => {
+test('segmented sets the selected tab as a card on a neutral track as tall as a control', async () => {
   await render(
     <IdsProvider theme={testTheme}>
       {tabs({ defaultValue: 'b', appearance: 'segmented' })}
@@ -388,12 +388,12 @@ test('segmented sets the selected tab as a surface card on a neutral track as ta
 
   const list = page.getByRole('tablist').element();
   const selected = tab('b').element();
-  expect(getComputedStyle(list).backgroundColor).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  expect(getComputedStyle(list).backgroundColor).toBe(colorOf('--ids-color-bg-neutral-subtle'));
   await expect
     .poll(() => getComputedStyle(selected).backgroundColor)
-    .toBe(colorOf('--ids-color-surface'));
+    .toBe(colorOf('--ids-color-bg-neutral-subtlest'));
   expect(getComputedStyle(selected).boxShadow).not.toBe('none');
-  expect(getComputedStyle(selected).color).toBe(colorOf('--ids-color-on-surface'));
+  expect(getComputedStyle(selected).color).toBe(colorOf('--ids-color-text-neutral-bold'));
   expect(getComputedStyle(tab('a').element()).backgroundColor).toBe('rgba(0, 0, 0, 0)');
   expect(list.getBoundingClientRect().height).toBeCloseTo(
     lengthOf('--ids-size-control-standard'),
@@ -415,5 +415,5 @@ test('segmented lifts the selected card one neutral step above the track in dark
   const root = document.querySelector('[data-mode="dark"]')!;
   await expect
     .poll(() => getComputedStyle(tab('a').element()).backgroundColor)
-    .toBe(colorOf('--ids-color-bg-neutral-soft-hover', root));
+    .toBe(colorOf('--ids-color-bg-neutral', root));
 });

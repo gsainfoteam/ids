@@ -16,7 +16,7 @@ import { TabsTrigger, type TabsTriggerProps } from './trigger';
 import { useTabs } from './use-tabs';
 import { resolveState, type StateRenderProps } from '../../../internal/state-props';
 
-import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type TabsState<T extends string = string> = {

@@ -32,13 +32,13 @@ import { Bubble, Chip } from '@gsainfoteam/ids-react';
 ## Variant
 
 ```tsx
-<Bubble variant="soft">     {/* 기본. 옅은 중립 면 (`bg-neutral-soft`). 받은 말 */}
+<Bubble variant="soft">     {/* 기본. 옅은 중립 면 (`bg-neutral-subtle`). 받은 말 */}
 <Bubble variant="solid">    {/* 브랜드 채움 (primary). 보낸 말 */}
 <Bubble variant="outline">  {/* 바탕색 면에 중립 테두리. 시스템 안내에 가까운 말 */}
 ```
 
 - 흔한 조합은 보낸 말 `align="end" variant="solid"`, 받은 말 `align="start"` 의 기본 `soft` 입니다.
-- 글자는 바탕과 짝인 색을 씁니다. `solid` 는 `on-primary`, `soft` 와 `outline` 은 `on-surface` 입니다. 링크와 아이콘은 이 색을 이어받습니다.
+- 글자는 바탕과 짝인 색을 씁니다. `solid` 는 `text-on-primary`, `soft` 와 `outline` 은 `text-neutral-bold` 입니다. 링크와 아이콘은 이 색을 이어받습니다.
 - 안쪽 여백은 12px(`concentric-p-3`), 모서리는 16px, 꼬리 쪽 모서리는 4px 입니다.
 
 ## 줄 배치

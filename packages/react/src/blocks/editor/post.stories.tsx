@@ -7,12 +7,12 @@ import { Card } from '../../components/data/card';
 import { toast } from '../../components/feedback/toast';
 import { ChipField } from '../../components/form/chip-field';
 import { DateTimeField } from '../../components/form/date-time-field';
+import { Editor } from '../../components/form/editor';
 import { Field } from '../../components/form/field';
 import { FileField } from '../../components/form/file-field';
 import { RadioGroup } from '../../components/form/radio-group';
 import { Select } from '../../components/form/select';
 import { Switch } from '../../components/form/switch';
-import { TextArea } from '../../components/form/text-area';
 import { TextField } from '../../components/form/text-field';
 import { Tabs } from '../../components/navigation/tabs';
 import { Label } from '../../components/typography/label';
@@ -99,17 +99,27 @@ export const PC: Story = {
                 <Tabs.Trigger value="preview">미리 보기</Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value="write" forceMount>
-                <TextArea
+                <Editor
                   aria-label="본문"
-                  rows={14}
-                  maxRows={28}
+                  format="markdown"
                   maxLength={5000}
                   value={body}
                   onValueChange={setBody}
                 >
-                  <TextArea.Input />
-                  <TextArea.Count />
-                </TextArea>
+                  <Editor.BlockType />
+                  <Editor.Separator />
+                  <Editor.Bold />
+                  <Editor.Italic />
+                  <Editor.Strike />
+                  <Editor.Link />
+                  <Editor.Separator />
+                  <Editor.BulletList />
+                  <Editor.OrderedList />
+                  <Editor.Blockquote />
+                  <Editor.Content className="min-h-80" />
+                  <Editor.BubbleMenu />
+                  <Editor.Count />
+                </Editor>
               </Tabs.Content>
               <Tabs.Content value="preview">
                 <Card>
@@ -118,10 +128,10 @@ export const PC: Story = {
                       <h2 className="text-headline-h4-bold">{title || '제목 없음'}</h2>
                     </Card.Title>
                   </Card.Header>
-                  <Card.Content className="text-body-b1-regular flex flex-col gap-3">
-                    {body.split('\n\n').map((paragraph) => (
-                      <p key={paragraph}>{paragraph}</p>
-                    ))}
+                  <Card.Content>
+                    <Editor aria-label="미리 보기 본문" format="markdown" value={body} readOnly>
+                      <Editor.Content />
+                    </Editor>
                   </Card.Content>
                 </Card>
               </Tabs.Content>

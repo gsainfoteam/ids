@@ -89,9 +89,9 @@ const [section, setSection] = useState<Section>('docs');
 
 - `variant` 는 `pill` 에서만 받습니다(`ghost` `outline` `soft` `solid` `glossy`). 다른 모양에 주면 타입 오류입니다.
 - 고르지 않은 탭은 흐린 글자(`text-neutral`)입니다. `underline` 과 `enclosed` 의 고른 탭은 `text-primary`, 선은 `border-primary` 입니다. `colorScheme` 을 주면 그 계열의 `text-X` 와 `border-X` 입니다.
-- `segmented` 는 `bg-neutral-soft` 트랙(`concentric-p-1`) 위에 고른 탭을 `bg-surface` 와 `shadow-xs` 의 카드로 올립니다. 어두운 모드에서는 카드가 트랙보다 한 단계 밝은 `bg-neutral-soft-hover` 입니다. 트랙 높이가 다른 컨트롤과 같도록 탭이 8px 낮고, 목록은 내용 폭만큼만 차지합니다.
-- `pill` 의 고른 탭은 `variant` 의 채움이고 글자는 그 채움의 짝입니다(`soft` 면 `bg-primary-soft` 와 `text-on-primary-soft`).
-- `enclosed` 의 고른 탭은 `surface` 로 칠해 목록 선을 덮습니다. `surface` 가 아닌 배경 위에서는 탭 색을 `className` 으로 맞춥니다.
+- `segmented` 는 `bg-neutral-subtle` 트랙(`concentric-p-1`) 위에 고른 탭을 `bg-tabs-segment` 와 `shadow-xs` 의 카드로 올립니다. 카드는 밝은 모드에서 `bg-neutral-subtlest`, 어두운 모드에서 트랙보다 한 단계 밝은 `bg-neutral` 입니다. 트랙 높이가 다른 컨트롤과 같도록 탭이 8px 낮고, 목록은 내용 폭만큼만 차지합니다.
+- `pill` 의 고르지 않은 탭은 올리고 누르면 글자색 층(`state-hover`, `state-press`)을 얹고, `ghost` 의 고른 탭은 `state-press` 층입니다. 다른 `variant` 의 고른 탭은 그 채움이고 글자는 채움의 짝입니다(`soft` 면 `bg-primary-subtle` 과 `text-on-primary-subtle`).
+- `enclosed` 의 고른 탭은 `bg-neutral-subtlest` 로 칠해 목록 선을 덮습니다. `bg-neutral-subtlest` 가 아닌 배경 위에서는 탭 색을 `className` 으로 맞춥니다.
 - `<Tabs.List stretch>` 는 가로 탭이 목록 폭을 똑같이 나눠 채웁니다. 카드 폭에 맞춘 두세 칸짜리 탭에 씁니다.
 
 ```tsx

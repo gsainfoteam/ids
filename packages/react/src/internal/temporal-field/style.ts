@@ -1,5 +1,5 @@
 import { tv } from '../../utils';
-import { fieldAction, fieldSurface, type FieldSurfaceVariant } from '../field-surface';
+import { fieldAction, fieldSurface, type FieldSurfaceVariant } from '../surfaces/field-surface';
 
 import type { IdsSize } from '../../tokens/types';
 

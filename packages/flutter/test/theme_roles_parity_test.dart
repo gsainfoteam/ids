@@ -17,9 +17,17 @@ Map<String, dynamic> _readJson(String path) =>
 void main() {
   final fixture = _readJson('../core/tests/fixtures/theme-roles.json');
   final roles = (fixture['roles'] as List).cast<String>();
+  final components = (fixture['components'] as List).cast<String>();
 
   test('the fixture lists every Dart color role', () {
     expect(roles, IdsColorRoles.all);
+  });
+
+  test('the fixture lists every Dart component color', () {
+    expect(
+      components,
+      IdsComponentTokens.colorRoles[IdsMode.light]!.keys.toList(),
+    );
   });
 
   for (final theme
@@ -36,7 +44,9 @@ void main() {
       );
 
       for (final mode in [IdsMode.light, IdsMode.dark]) {
-        final colors = IdsResolvedTheme(theme: resolved, mode: mode).colors;
+        final resolvedInMode = IdsResolvedTheme(theme: resolved, mode: mode);
+        final colors = resolvedInMode.colors;
+        final componentColors = resolvedInMode.componentColors.tokens;
         expect(
           {for (final role in roles) role: _hex(colors[role])},
           {
@@ -44,6 +54,19 @@ void main() {
               role: (theme[mode.name] as List)[index],
           },
           reason: mode.name,
+        );
+        expect(
+          {
+            for (final token in components)
+              token: _hex(componentColors[token]!),
+          },
+          {
+            for (final (index, token) in components.indexed)
+              token:
+                  ((theme['components'] as Map<String, dynamic>)[mode.name]
+                      as List)[index],
+          },
+          reason: '${mode.name} component tokens',
         );
       }
     });

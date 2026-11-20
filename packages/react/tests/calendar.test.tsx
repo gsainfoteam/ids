@@ -562,7 +562,7 @@ function colorOf(variable: string) {
   return color;
 }
 
-test('a range band is primary soft, a preview neutral, and today a primary label and ring', async () => {
+test('a range band is primary subtle, a preview neutral, and today a primary label and ring', async () => {
   await render(
     <IdsProvider theme={testTheme}>
       <Calendar
@@ -575,10 +575,10 @@ test('a range band is primary soft, a preview neutral, and today a primary label
   await expect.element(day('2026-09-12')).toHaveAttribute('data-range-middle');
 
   const background = (key: string) => getComputedStyle(day(key).parentElement!).backgroundColor;
-  expect(background('2026-09-12')).toBe(colorOf('--ids-color-bg-primary-soft'));
+  expect(background('2026-09-12')).toBe(colorOf('--ids-color-bg-primary-subtle'));
   expect(background('2026-09-20')).toBe('rgba(0, 0, 0, 0)');
   expect(getComputedStyle(day('2026-09-12')).color).toBe(
-    colorOf('--ids-color-text-on-primary-soft'),
+    colorOf('--ids-color-text-on-primary-subtle'),
   );
 
   const today = getComputedStyle(day('2026-09-15'));
@@ -591,5 +591,5 @@ test('a range band is primary soft, a preview neutral, and today a primary label
   await userEvent.click(day('2026-09-20'));
   await userEvent.hover(day('2026-09-23'));
   await expect.element(day('2026-09-22')).toHaveAttribute('data-range-preview');
-  await expect.poll(() => background('2026-09-22')).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  await expect.poll(() => background('2026-09-22')).toBe(colorOf('--ids-color-bg-neutral-subtle'));
 });

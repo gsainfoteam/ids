@@ -305,7 +305,7 @@ function colorOf(variable: string) {
   return color;
 }
 
-test('the current page is primary soft by default; ghost marks it with primary text', async () => {
+test('the current page is primary subtle by default; ghost marks it with primary text', async () => {
   await render(
     <IdsProvider theme={testTheme}>
       <Pagination defaultPage={2} pageCount={3} aria-label="Soft" />
@@ -321,9 +321,9 @@ test('the current page is primary soft by default; ghost marks it with primary t
   await expect.element(button('Soft', 2)).toHaveAttribute('data-variant', 'soft');
   await expect
     .poll(() => getComputedStyle(button('Soft', 2)).backgroundColor)
-    .toBe(colorOf('--ids-color-bg-primary-soft'));
+    .toBe(colorOf('--ids-color-bg-primary-subtle'));
   expect(getComputedStyle(button('Soft', 2)).color).toBe(
-    colorOf('--ids-color-text-on-primary-soft'),
+    colorOf('--ids-color-text-on-primary-subtle'),
   );
   expect(getComputedStyle(button('Soft', 1)).backgroundColor).toBe('rgba(0, 0, 0, 0)');
 

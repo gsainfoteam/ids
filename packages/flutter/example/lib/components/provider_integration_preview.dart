@@ -114,14 +114,14 @@ class _ScopeReadoutState extends State<ScopeReadout> {
     final ids = IdsProvider.of(context);
     final text = ids.textStyle(
       IdsTypography.bodyB3Regular,
-      color: ids.colors.textOnPrimarySoft,
+      color: ids.colors.textOnPrimarySubtle,
     );
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: DecoratedBox(
         decoration: ShapeDecoration(
-          color: ids.colors.bgPrimarySoft,
+          color: ids.colors.bgPrimarySubtle,
           shape: ids.shape(),
         ),
         child: Padding(

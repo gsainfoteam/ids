@@ -8,10 +8,10 @@ export const markerStyle = tv({
     root: [
       'flex w-full min-w-0 items-center text-start wrap-break-word text-neutral',
       '[&_svg]:shrink-0',
-      '[&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-on-surface',
+      '[&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-neutral-bold',
       'focus-ring [a&]:underline [a&]:underline-offset-2',
       '[&:is(a,button)]:cursor-pointer [&:is(a,button)]:transition-colors [&:is(a,button)]:duration-(--ids-motion-fast) motion-reduce:transition-none',
-      '[&:is(a,button)]:hover:text-on-surface',
+      '[&:is(a,button)]:hover:text-neutral-bold',
     ],
     content: 'flex min-w-0 items-center',
     line: 'w-auto min-w-4 flex-1',

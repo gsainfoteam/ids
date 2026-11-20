@@ -6,7 +6,7 @@ import type { IdsSize } from '../../../tokens/types';
 export const cardStyle = tv({
   slots: {
     root: [
-      'relative isolate flex flex-col text-on-surface',
+      'relative isolate flex flex-col text-neutral-bold',
       '[--card-pad:var(--ids-concentric-pad)]',
     ],
     header: [
@@ -32,9 +32,9 @@ export const cardStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-surface shadow-xs inset-ring-1 inset-ring-neutral [--card-ring:1px]',
+        root: 'bg-panel shadow-panel inset-ring-1 inset-ring-neutral [--card-ring:1px]',
       },
-      soft: { root: 'bg-neutral-soft [--card-ring:0px]' },
+      soft: { root: 'bg-neutral-subtle [--card-ring:0px]' },
       ghost: { root: 'bg-transparent [--card-ring:0px]' },
     } satisfies Record<CardVariant, object>,
     size: {
@@ -53,11 +53,8 @@ export const cardStyle = tv({
       true: {
         root: [
           'cursor-pointer select-none focus-ring',
-          'transition-[box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-          'before:pointer-events-none before:absolute before:inset-0 before:-z-10',
-          'before:rounded-[inherit] before:bg-(--ids-color-on-surface) before:opacity-0',
-          'before:transition-opacity before:duration-(--ids-motion-fast) motion-reduce:before:transition-none',
-          'data-hovered:before:opacity-4 data-active:before:opacity-8',
+          'transition-[box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
+          'state-layer data-hovered:state-hover data-active:state-press',
           'data-disabled:cursor-not-allowed data-disabled:opacity-50',
         ],
       },
