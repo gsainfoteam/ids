@@ -83,7 +83,7 @@ import { Skeleton } from '@gsainfoteam/ids-react';
   )}
 </section>
 
-<Item.Group aria-label="멤버" aria-busy={isLoading}>
+<ItemGroup aria-label="멤버" aria-busy={isLoading}>
   {isLoading
     ? Array.from({ length: 5 }, (_, index) => (
         <Item key={index}>
@@ -97,7 +97,7 @@ import { Skeleton } from '@gsainfoteam/ids-react';
         </Item>
       ))
     : members.map((member) => <Item key={member.id}>...</Item>)}
-</Item.Group>
+</ItemGroup>
 ```
 
 - 모양만 여러 개 쓰는 영역은 앱이 그 영역에 `aria-busy={isLoading}` 을 둡니다. 모양은 `aria-hidden` 이라서 스크린 리더에는 없는 요소입니다.

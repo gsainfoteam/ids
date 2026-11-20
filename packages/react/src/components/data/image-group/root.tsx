@@ -5,30 +5,23 @@ import {
   useCallback,
   useLayoutEffect,
   useState,
-  type ComponentProps,
   type CSSProperties,
   type ReactNode,
 } from 'react';
 
-import { ImageGroupContext } from './context';
-import { imageStyle } from './style';
-import { useImageGroup, type UseImageGroupOptions } from './use-image-group';
-import { ImageViewer } from './viewer';
+import { imageGroupStyle } from './style';
 import { flattenFragments, invariant, mergeRefs } from '../../../utils';
+import { ImageGroupContext } from '../image/context';
+import { useImageGroup } from '../image/use-image-group';
+import { ImageViewer } from '../image/viewer';
 
-export type ImageGroupLayout = 'row' | 'column' | 'grid';
+import type { ImageGroup } from '.';
 
 const keepListRoleInSafari = { role: 'list' } as const;
 
-export type ImageGroupProps = Omit<ComponentProps<'ul'>, 'defaultValue' | 'onChange'> &
-  UseImageGroupOptions & {
-    layout?: ImageGroupLayout;
-    columns?: number;
-  };
+type ImageGroupRootProps = ImageGroup.Props & { viewer?: ReactNode };
 
-type ImageGroupRootProps = ImageGroupProps & { viewer?: ReactNode };
-
-export function ImageGroup({
+export function ImageGroupRoot({
   layout = 'row',
   columns = 3,
   value,
@@ -49,7 +42,7 @@ export function ImageGroup({
 }: ImageGroupRootProps) {
   invariant(
     Number.isInteger(columns) && columns > 0,
-    'Image.Group: columns must be a positive whole number.',
+    'ImageGroup: columns must be a positive whole number.',
   );
 
   const group = useImageGroup({
@@ -79,7 +72,7 @@ export function ImageGroup({
     return () => observer.disconnect();
   }, [list, followTheDocumentOrder]);
 
-  const styles = imageStyle({ layout });
+  const styles = imageGroupStyle({ layout });
   const columnCount = layout === 'grid' ? ({ '--image-columns': columns } as CSSProperties) : null;
 
   const images = flattenFragments(children);
@@ -92,7 +85,7 @@ export function ImageGroup({
         ref={attachList}
         data-image-group=""
         data-layout={layout}
-        className={styles.group({ className })}
+        className={styles.root({ className })}
         style={{ ...columnCount, ...style }}
       >
         {images.map((child, index) => {
@@ -100,7 +93,7 @@ export function ImageGroup({
 
           const key = isValidElement(child) ? (child.key ?? index) : index;
           return (
-            <li key={key} className={styles.groupItem()}>
+            <li key={key} className={styles.item()}>
               {child}
             </li>
           );

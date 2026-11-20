@@ -1,12 +1,12 @@
 # Image
 
-native `<img>` 에 불러오는 동안의 자리, 깨졌을 때 대신할 그림, 비율 상자를 더한 컴포넌트입니다. `Image.Group` 으로 여러 장을 가로, 세로, 격자로 늘어놓으면 누른 장부터 크게 봅니다.
+native `<img>` 에 불러오는 동안의 자리, 깨졌을 때 대신할 그림, 비율 상자를 더한 컴포넌트입니다. [ImageGroup](../image-group/README.md) 으로 여러 장을 가로, 세로, 격자로 늘어놓으면 누른 장부터 크게 봅니다.
 
 - **서버에서도 그냥 `<img>`.** 서버 HTML 에 `src` 와 `alt` 가 든 `<img>` 가 그대로 있어서, JavaScript 가 오기 전에 그림을 불러옵니다.
 - **불러오는 동안.** 그림 뒤에 [Skeleton](../../feedback/skeleton/README.md)(`Image.Placeholder`)이 사진 상자를 채워 깜빡이고, 다 불러오면 사라집니다. 그림을 가리지 않으므로 서버 HTML 의 그림은 hydration 을 기다리지 않고 보입니다.
 - **깨지면.** 깨진 `<img>` 는 DOM 에서 빠지고 그림 아이콘(`Image.Fallback`)이 자리를 채웁니다. 스크린 리더는 `alt` 를 그림의 이름으로 계속 읽습니다.
 - **비율.** `ratio` 를 주면 [AspectRatio](../../layout/aspect-ratio/README.md) 가 폭에 맞춘 높이를 정하고, 그림은 칸을 채우고 넘치는 부분은 잘립니다.
-- **크게 보기.** `preview` 를 준 그림과 `Image.Group` 안의 그림은 버튼이 되어, 누르면 그 장부터 화면을 덮는 뷰어(`Image.Viewer`)를 엽니다. 넘기기, 확대, 쓸어 닫기가 됩니다.
+- **크게 보기.** `preview` 를 준 그림과 `ImageGroup` 안의 그림은 버튼이 되어, 누르면 그 장부터 화면을 덮는 뷰어(`Image.Viewer`)를 엽니다. 넘기기, 확대, 쓸어 닫기가 됩니다.
 - **뷰어는 따로 불러옵니다.** 뷰어 코드(Embla, 확대 엔진)는 처음 열 때 받습니다. 사진에 마우스를 올리거나 포커스하면 미리 받기 시작합니다.
 
 ```tsx
@@ -59,31 +59,9 @@ import { Image } from '@gsainfoteam/ids-react';
 - 이미지는 `loading="lazy"`, `decoding="async"` 가 기본입니다. 첫 화면의 큰 그림은 `loading="eager"` 와 `fetchPriority="high"` 를 줍니다.
 - 상태는 Avatar 와 같은 로직(`internal/image-status`)입니다.
 
-## 여러 장: Image.Group
+## 여러 장
 
-```tsx
-<Image.Group layout="grid" columns={3} aria-label="풍경 사진">
-  {photos.map((photo) => (
-    <Image
-      key={photo.id}
-      src={photo.thumb}
-      previewSrc={photo.full}                    // 뷰어에서 보여 줄 큰 그림
-      alt={photo.alt}
-      caption={photo.caption}                    // 뷰어 아래에 보일 설명
-      ratio={1}
-    />
-  ))}
-</Image.Group>
-
-<Image.Group layout="row" />                     // 가로로 같은 폭씩(기본)
-<Image.Group layout="column" />                  // 세로로 쌓는다
-<Image.Group layout="grid" columns={4} />        // 격자. columns 기본 3
-```
-
-- `<ul role="list">` 이고 사진마다 `<li>` 로 감쌉니다. 직접 `<li>` 를 적으면 그대로 둡니다. `aria-label` 로 목록의 이름을 줍니다.
-- 간격은 `gap-2`(8px)입니다. `className` 으로 바꿉니다.
-- 사진은 컴포넌트 안에 감싸 둬도(`<figure>` 등) 문서 순서대로 번호가 매겨집니다.
-- `preview={false}` 인 사진은 누를 수 없고 번호에서 빠집니다.
+- 여러 장을 늘어놓고 한 뷰어로 넘겨 보려면 [ImageGroup](../image-group/README.md) 으로 묶습니다.
 
 ## 크게 보기
 
@@ -91,7 +69,7 @@ import { Image } from '@gsainfoteam/ids-react';
 <Image src={src} alt="..." preview />            // 한 장도 누르면 크게 본다
 
 const [index, setIndex] = useState(0);
-<Image.Group
+<ImageGroup
   value={index}                                   // 지금 보는 장
   onValueChange={setIndex}
   open={open}                                     // 뷰어가 열렸는가
@@ -101,7 +79,7 @@ const [index, setIndex] = useState(0);
   onZoomChange={setZoom}
 >
   ...
-</Image.Group>
+</ImageGroup>
 ```
 
 - 사진을 누르거나, Tab 으로 가서 `Enter` `Space` 를 누르면 그 장이 `value` 가 되고 `open` 이 `true` 가 됩니다. 열 때 배율은 1 로 돌아갑니다.
@@ -113,11 +91,11 @@ const [index, setIndex] = useState(0);
 ## 뷰어
 
 ```tsx
-<Image.Group aria-label="풍경 사진">
+<ImageGroup aria-label="풍경 사진">
   {photos.map((photo) => <Image key={photo.id} ... />)}
-</Image.Group>                                     // Image.Viewer 를 적지 않아도 기본 뷰어가 붙는다
+</ImageGroup>                                     // Image.Viewer 를 적지 않아도 기본 뷰어가 붙는다
 
-<Image.Group aria-label="풍경 사진">
+<ImageGroup aria-label="풍경 사진">
   {photos.map((photo) => <Image key={photo.id} ... />)}
   <Image.Viewer aria-label="풍경 사진 보기">          {/* 적은 부품만 그린다 */}
     <Image.Viewer.Caption />
@@ -136,7 +114,7 @@ const [index, setIndex] = useState(0);
     </Image.Viewer.Toolbar>
     <Image.Viewer.Thumbnails />                     {/* 기본 뷰어에는 없다 */}
   </Image.Viewer>
-</Image.Group>
+</ImageGroup>
 ```
 
 - 기본 뷰어는 위 왼쪽의 설명과 아래 가운데의 도구 막대 하나입니다. 도구 막대는 세 칸입니다.
@@ -195,8 +173,8 @@ const [open, setOpen] = useState(false);
 overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 없이 항목에 묶인다
 ```
 
-- 썸네일 목록 없이 뷰어만 쓸 때는 `items` 를 줍니다. `open`, `value`, `loop`, `zoom` 과 그 콜백은 `Image.Group` 과 같습니다.
-- `Image.Group` 안의 `Image.Viewer` 에 이 상태들을 주면 개발 모드에서 경고합니다. 묶음이 가진 상태이므로 `Image.Group` 에 줍니다.
+- 썸네일 목록 없이 뷰어만 쓸 때는 `items` 를 줍니다. `open`, `value`, `loop`, `zoom` 과 그 콜백은 `ImageGroup` 과 같습니다.
+- `ImageGroup` 안의 `Image.Viewer` 에 이 상태들을 주면 개발 모드에서 경고합니다. 묶음이 가진 상태이므로 `ImageGroup` 에 줍니다.
 - `overlay.open` 안에서는 `open` 없이 그 항목에 묶이고, 닫히는 애니메이션이 끝나면 항목이 사라집니다.
 
 ### 불러오기
@@ -269,24 +247,12 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | --------------------- | --------------------------------------------------------------- |
 | `alt`                 | 필수. 장식용은 `""`                                             |
 | `ratio`               | 없음(그림의 비율). 숫자면 AspectRatio                           |
-| `preview`             | 혼자면 `false`, `Image.Group` 안이면 `true`                     |
+| `preview`             | 혼자면 `false`, `ImageGroup` 안이면 `true`                     |
 | `previewSrc`          | 뷰어에서 보여 줄 그림. 기본 `src`                               |
 | `caption`             | 뷰어에서 보여 줄 설명                                           |
 | `onStatusChange`      | 불러오는 상태가 바뀔 때                                         |
 | `className` / `style` | 사진 상자로 간다. 상태를 받는 함수도 된다                       |
 | `ref` / 그 외 속성    | `<img>` 로 간다(`srcSet`, `sizes`, `loading`, `crossOrigin` 등) |
-
-### Image.Group
-
-| 속성                                       | 기본 / 동작                                  |
-| ------------------------------------------ | -------------------------------------------- |
-| `layout`                                   | `row`(기본) / `column` / `grid`              |
-| `columns`                                  | `grid` 의 열 수. 기본 `3`                    |
-| `value` / `defaultValue` / `onValueChange` | 지금 보는 장(0부터). 기본 `0`                |
-| `open` / `defaultOpen` / `onOpenChange`    | 뷰어가 열렸는가. 기본 `false`                |
-| `loop`                                     | 끝에서 처음으로 넘어가는가. 기본 `false`     |
-| `zoom` / `onZoomChange`                    | 확대 배율. 기본 `1`                          |
-| 그 외 속성                                 | `<ul>` 로 간다(`aria-label`, `className` 등) |
 
 ### Image.Viewer
 
@@ -295,7 +261,7 @@ overlay.open(() => <Image.Viewer items={photos} defaultValue={2} />);   // open 
 | `items`                                    | 뷰어만 쓸 때의 사진. 아래 표                              |
 | `value` / `defaultValue` / `onValueChange` | 뷰어만 쓸 때. 지금 보는 장. 기본 `0`                      |
 | `open` / `defaultOpen` / `onOpenChange`    | 뷰어만 쓸 때. 기본 `false`. `overlay.open` 안이면 그 항목 |
-| `loop`, `zoom` / `onZoomChange`            | 뷰어만 쓸 때. `Image.Group` 과 같다                       |
+| `loop`, `zoom` / `onZoomChange`            | 뷰어만 쓸 때. `ImageGroup` 과 같다                       |
 | `aria-label`                               | 대화상자의 이름. 기본 "사진 보기"                         |
 | `className` / `style`                      | 대화상자로 간다                                           |
 | `children`                                 | 그릴 부품. 없으면 기본 부품 모두                          |

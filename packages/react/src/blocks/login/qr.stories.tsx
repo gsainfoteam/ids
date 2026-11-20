@@ -10,6 +10,7 @@ import {
 import { Button } from '../../components/action/button';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { QRCode } from '../../components/data/qr-code';
 import { Spinner } from '../../components/feedback/spinner';
 import { toast } from '../../components/feedback/toast';
@@ -90,7 +91,7 @@ export const PC: Story = {
                   </QRCode.Logo>
                 </QRCode>
 
-                <Item.Group
+                <ItemGroup
                   ordered
                   aria-label="QR 코드로 로그인하는 법"
                   size="tiny"
@@ -106,7 +107,7 @@ export const PC: Story = {
                       </Item.Content>
                     </Item>
                   ))}
-                </Item.Group>
+                </ItemGroup>
 
                 <Button
                   variant="outline"

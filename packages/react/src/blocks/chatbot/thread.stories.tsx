@@ -26,6 +26,7 @@ import { Badge } from '../../components/data/badge';
 import { Bubble } from '../../components/data/bubble';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
 import { Spinner } from '../../components/feedback/spinner';
 import { toast } from '../../components/feedback/toast';
@@ -113,7 +114,7 @@ export const PC: Story = {
         {HISTORY.map((group) => (
           <div key={group.day} className="flex flex-col gap-1">
             <h2 className="text-caption-c1-medium px-2">{group.day}</h2>
-            <Item.Group size="tiny" aria-label={group.day}>
+            <ItemGroup size="tiny" aria-label={group.day}>
               {group.chats.map((chat) => (
                 <Item
                   key={chat.id}
@@ -130,7 +131,7 @@ export const PC: Story = {
                   </a>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </div>
         ))}
       </nav>

@@ -5,7 +5,7 @@ import { expect, onTestFinished, test, vi } from 'vitest';
 import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IdsProvider, Image, overlay } from '../src';
+import { IdsProvider, Image, ImageGroup, overlay } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 
@@ -26,11 +26,11 @@ function Gallery({
   viewer,
   mode,
   ...props
-}: Partial<Image.Group.Props> & { viewer?: ReactNode; mode?: 'light' | 'dark' }) {
+}: Partial<ImageGroup.Props> & { viewer?: ReactNode; mode?: 'light' | 'dark' }) {
   return (
     <IdsProvider theme={testTheme} mode={mode}>
       <div style={{ width: 300 }}>
-        <Image.Group aria-label="Photos" layout="grid" columns={3} {...props}>
+        <ImageGroup aria-label="Photos" layout="grid" columns={3} {...props}>
           {PHOTOS.map((photo) => (
             <Image
               key={photo.alt}
@@ -41,7 +41,7 @@ function Gallery({
             />
           ))}
           {viewer}
-        </Image.Group>
+        </ImageGroup>
       </div>
     </IdsProvider>
   );
@@ -534,7 +534,7 @@ test('state passed to a viewer inside a group warns in development, since the gr
   onTestFinished(() => warn.mockRestore());
 
   await render(<Gallery viewer={<Image.Viewer open loop />} />);
-  expect(warn).toHaveBeenCalledWith(expect.stringContaining('Pass them to Image.Group instead'));
+  expect(warn).toHaveBeenCalledWith(expect.stringContaining('Pass them to ImageGroup instead'));
   await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
 });
 
