@@ -1,4 +1,4 @@
-import { mergeAttributes, Node, wrappingInputRule } from '@tiptap/core';
+import { mergeAttributes, Node } from '@tiptap/core';
 
 import type { JSONContent, MarkdownToken } from '@tiptap/core';
 
@@ -18,7 +18,6 @@ const GITHUB_ALERT =
   /^ {0,3}> ?\[!(note|tip|important|warning|caution)\][ \t]*(?:\n|$)((?: {0,3}>.*(?:\n|$))*)/i;
 const GITHUB_ALERT_START = /^ {0,3}> ?\[!/m;
 const QUOTE_MARKER = /^ {0,3}> ?/gm;
-const TYPED_ALERT = /^\s*>?\s?\[!(note|tip|important|warning|caution)\]\s$/i;
 
 const quoted = (markdown: string) =>
   markdown
@@ -109,15 +108,5 @@ export const Callout = Node.create({
         ({ commands }) =>
           commands.lift(this.name),
     };
-  },
-
-  addInputRules() {
-    return [
-      wrappingInputRule({
-        find: TYPED_ALERT,
-        type: this.type,
-        getAttributes: (match) => ({ kind: calloutKindOf(match[1]) }),
-      }),
-    ];
   },
 });

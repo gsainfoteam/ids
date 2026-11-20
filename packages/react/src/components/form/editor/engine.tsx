@@ -10,7 +10,7 @@ import { LeaveEscapeToTheLayers } from './escape-to-layers';
 import { EditorImageNode } from './image/node';
 import { documentStarterKit } from '../../typography/rich-text/schema/starter-kit';
 
-import type { PartExtensions } from './load-engine';
+import type { FeatureExtensions } from './load-engine';
 import type { AnyExtension, Editor as TiptapEditor, Extensions } from '@tiptap/core';
 
 export { EditorContent };
@@ -25,13 +25,13 @@ const placeholderOfTheTextbox = ({ editor }: { editor: TiptapEditor }) =>
 export function extensionsFor({
   maxLength,
   markdown,
-  parts,
+  features,
   images,
   taskLabel,
 }: {
   maxLength: number | undefined;
   markdown: AnyExtension | undefined;
-  parts: PartExtensions;
+  features: FeatureExtensions;
   images: ImageSetup;
   taskLabel: (text: string) => string;
 }): Extensions {
@@ -41,19 +41,23 @@ export function extensionsFor({
     Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
     CharacterCount.configure({ limit: maxLength }),
     LeaveEscapeToTheLayers,
-    EditorImageNode.configure({ uploaded: images.uploaded, insertable: !!parts.imageUpload }),
-    ...(parts.imageUpload ? parts.imageUpload.imageUploadExtensions(images.start) : []),
-    ...(parts.highlight ? [parts.highlight] : []),
-    ...(parts.taskList ? parts.taskList(taskLabel) : []),
-    ...(parts.textAlign ? [parts.textAlign.configure({ types: ['heading', 'paragraph'] })] : []),
-    ...(parts.table
+    EditorImageNode.configure({ uploaded: images.uploaded, insertable: !!features.imageUpload }),
+    ...(features.imageUpload ? features.imageUpload.imageUploadExtensions(images.start) : []),
+    ...(features.highlight ? [features.highlight] : []),
+    ...(features.taskList ? features.taskList(taskLabel) : []),
+    ...(features.textAlign
+      ? [features.textAlign.configure({ types: ['heading', 'paragraph'] })]
+      : []),
+    ...(features.table
       ? [
-          parts.table.Table.configure({ resizable: false }),
-          parts.table.TableRow,
-          parts.table.TableHeader,
-          parts.table.TableCell,
+          features.table.Table.configure({ resizable: false }),
+          features.table.TableRow,
+          features.table.TableHeader,
+          features.table.TableCell,
         ]
       : []),
+    ...(features.callout ? [features.callout] : []),
+    ...(features.details ?? []),
     ...(markdown ? [markdown] : []),
   ];
 }

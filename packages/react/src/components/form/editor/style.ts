@@ -24,7 +24,7 @@ const proseMirrorBaseline = cn(
 
 const editorBlocks = cn(
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
-  '[&_hr]:my-3 [&_hr]:border-neutral',
+  '[&_hr:not([data-divider])]:my-3 [&_hr:not([data-divider])]:border-neutral',
   '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard [&_.ProseMirror-selectednode]:outline-offset-2',
   '[&_table]:my-2 [&_table]:w-full! [&_table]:table-fixed [&_table]:border-collapse',
   '[&_:is(td,th)]:border [&_:is(td,th)]:border-neutral [&_:is(td,th)]:px-2 [&_:is(td,th)]:py-1 [&_:is(td,th)]:align-top [&_:is(td,th)]:break-words',
@@ -74,6 +74,24 @@ export const editorStyle = tv({
     codeLanguage: 'w-auto shrink-0 text-neutral',
     codeCopyStatus: 'sr-only',
     codePre: 'px-2 py-1 font-mono whitespace-pre-wrap',
+    glyphButton: [
+      '-m-1 inline-flex shrink-0 cursor-pointer items-center justify-center rounded-indicator p-1',
+      'focus-ring state-layer data-hovered:state-hover data-active:state-press',
+      'transition-[box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'disabled:cursor-default',
+    ],
+    details: [
+      'relative',
+      '[&_[data-type=detailsSummary]]:py-2 [&_[data-type=detailsSummary]]:pe-8 [&_[data-type=detailsSummary]]:font-medium',
+      '[&_[data-type=detailsContent]]:pb-2',
+      '[&:not([data-open])_[data-type=detailsContent]]:hidden',
+    ],
+    detailsToggle: [
+      'absolute end-1 top-[calc(--spacing(2)+(1lh-var(--spacing)*6)/2)] m-0 size-6 text-neutral [&_svg]:size-4',
+      '[&_svg]:transition-transform [&_svg]:duration-(--ids-motion-normal) motion-reduce:[&_svg]:transition-none',
+      'data-open:[&_svg]:rotate-180',
+    ],
+    detailsPlaceholder: 'pointer-events-none absolute start-0 top-2 font-medium text-neutral',
   },
   variants: {
     variant: {

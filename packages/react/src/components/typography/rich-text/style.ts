@@ -3,7 +3,7 @@ import { cn, tv } from '../../../utils';
 import type { IdsSize } from '../../../tokens/types';
 
 export const documentText = cn(
-  '[&>*+*]:mt-2',
+  '[&>*+*]:mt-2 [&_:is(blockquote,[data-document-blocks],[data-type=detailsContent])>*+*]:mt-2',
   '[&_h1]:text-headline-h4-bold [&_h2]:text-headline-h5-bold [&_h3]:text-headline-h6-bold',
   '[&_h4]:text-body-b1-bold [&_h5]:text-body-b2-bold [&_h6]:text-body-b3-bold',
   '[&_:is(h1,h2,h3,h4,h5,h6)+*]:mt-1',

@@ -1,79 +1,56 @@
 import { once } from 'es-toolkit';
 
 import type * as Engine from './engine';
-import type * as ImageUploadModule from './image/upload';
-import type * as TaskListModule from './task-list/node';
 import type { EditorFormat } from './value';
 import type { AnyExtension } from '@tiptap/core';
-import type { Highlight } from '@tiptap/extension-highlight';
-import type * as TableModule from '@tiptap/extension-table';
-import type { TextAlign } from '@tiptap/extension-text-align';
 
-export type EditorParts = {
-  highlight: boolean;
-  taskList: boolean;
-  textAlign: boolean;
-  table: boolean;
-  imageUpload: boolean;
+const FEATURE_LOADERS = {
+  highlight: once(() => import('@tiptap/extension-highlight').then((module) => module.Highlight)),
+  taskList: once(() => import('./task-list/node').then((module) => module.taskListExtensions)),
+  textAlign: once(() => import('@tiptap/extension-text-align').then((module) => module.TextAlign)),
+  table: once(() => import('@tiptap/extension-table')),
+  imageUpload: once(() => import('./image/upload')),
+  callout: once(() => import('./callout/node').then((module) => module.EditorCalloutNode)),
+  details: once(() => import('./details/node').then((module) => module.detailsExtensions)),
 };
 
-export type PartExtensions = {
-  highlight: typeof Highlight | undefined;
-  taskList: typeof TaskListModule.taskListExtensions | undefined;
-  textAlign: typeof TextAlign | undefined;
-  table: typeof TableModule | undefined;
-  imageUpload: typeof ImageUploadModule | undefined;
+export type EditorFeature = keyof typeof FEATURE_LOADERS;
+
+export const EDITOR_FEATURES = Object.keys(FEATURE_LOADERS) as EditorFeature[];
+
+export type FeatureExtensions = {
+  [Feature in EditorFeature]?: Awaited<ReturnType<(typeof FEATURE_LOADERS)[Feature]>>;
 };
 
 export type LoadedEngine = {
   key: string;
   engine: typeof Engine;
   markdown: AnyExtension | undefined;
-  parts: PartExtensions;
+  features: FeatureExtensions;
 };
 
-export const engineKey = (format: EditorFormat, parts: EditorParts) =>
-  [
-    format,
-    ...Object.entries(parts)
-      .filter(([, used]) => used)
-      .map(([part]) => part),
-  ].join(' ');
+export const engineKey = (format: EditorFormat, features: readonly EditorFeature[]) =>
+  [format, ...features].join(' ');
 
 const loadTheEngine = once(() => import('./engine'));
 
 const loadMarkdown = once(() => import('@tiptap/markdown').then((module) => module.Markdown));
 
-const loadHighlight = once(() =>
-  import('@tiptap/extension-highlight').then((module) => module.Highlight),
-);
+const loadFeatures = async (features: readonly EditorFeature[]): Promise<FeatureExtensions> =>
+  Object.fromEntries(
+    await Promise.all(
+      features.map(async (feature) => [feature, await FEATURE_LOADERS[feature]()] as const),
+    ),
+  );
 
-const loadTaskList = once(() =>
-  import('./task-list/node').then((module) => module.taskListExtensions),
-);
-
-const loadTextAlign = once(() =>
-  import('@tiptap/extension-text-align').then((module) => module.TextAlign),
-);
-
-const loadTable = once(() => import('@tiptap/extension-table'));
-
-const loadImageUpload = once(() => import('./image/upload'));
-
-export async function loadEngine(format: EditorFormat, parts: EditorParts): Promise<LoadedEngine> {
-  const [engine, markdown, highlight, taskList, textAlign, table, imageUpload] = await Promise.all([
+export async function loadEngine(
+  format: EditorFormat,
+  features: readonly EditorFeature[],
+): Promise<LoadedEngine> {
+  const [engine, markdown, loaded] = await Promise.all([
     loadTheEngine(),
     format === 'markdown' ? loadMarkdown() : undefined,
-    parts.highlight ? loadHighlight() : undefined,
-    parts.taskList ? loadTaskList() : undefined,
-    parts.textAlign ? loadTextAlign() : undefined,
-    parts.table ? loadTable() : undefined,
-    parts.imageUpload ? loadImageUpload() : undefined,
+    loadFeatures(features),
   ]);
-  return {
-    key: engineKey(format, parts),
-    engine,
-    markdown,
-    parts: { highlight, taskList, textAlign, table, imageUpload },
-  };
+  return { key: engineKey(format, features), engine, markdown, features: loaded };
 }

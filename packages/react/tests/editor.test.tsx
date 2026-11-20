@@ -956,3 +956,82 @@ test('a code block in a lazy language is highlighted once the language arrives',
     .poll(() => content.element().querySelector('[data-token="keyword"]')?.textContent)
     .toBe('fn');
 });
+
+test('a GitHub alert in markdown is a callout whose kind menu rewrites the marker', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      format="markdown"
+      aria-label="본문"
+      defaultValue={'> [!NOTE]\n> 마감은 금요일입니다.'}
+      onValueChange={onValueChange}
+    >
+      <Editor.Callout />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await expect
+    .poll(() => content.element().querySelector('[data-callout]')?.getAttribute('data-kind'))
+    .toBe('note');
+  await expect.element(content).toMatchTextContent('참고');
+
+  await userEvent.click(page.getByRole('button', { name: '콜아웃 종류' }));
+  await userEvent.click(page.getByRole('menuitemradio', { name: '경고' }));
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('> [!WARNING]\n> 마감은 금요일입니다.');
+
+  await userEvent.click(page.getByRole('button', { name: '콜아웃 종류' }));
+  await userEvent.click(page.getByRole('menuitem', { name: '콜아웃 해제' }));
+
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('마감은 금요일입니다.');
+});
+
+test('typing [!tip] in a fresh quote turns the quote into a tip callout', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor format="markdown" aria-label="본문" onValueChange={onValueChange}>
+      <Editor.Callout />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.keyboard('> [[!tip] 물 많이 마시기');
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('> [!TIP]\n> 물 많이 마시기');
+  expect(content.element().querySelector('blockquote')).toBeNull();
+});
+
+test('Details wraps the block in a toggle that opens, closes and keeps its state in markdown', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor format="markdown" aria-label="본문" onValueChange={onValueChange}>
+      <Editor.Details />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.keyboard('숨은 내용');
+  await userEvent.click(page.getByRole('button', { name: '토글' }));
+
+  const toggle = page.getByRole('button', { name: '내용 펼치기' });
+  await expect.element(toggle).toHaveAttribute('aria-expanded', 'true');
+  await userEvent.keyboard('더 보기');
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe(
+      ':::details {open}\n\n:::detailsSummary\n\n더 보기\n\n:::\n\n:::detailsContent\n\n숨은 내용\n\n:::\n\n:::',
+    );
+
+  await userEvent.click(toggle);
+  await expect.element(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect.element(page.getByText('숨은 내용')).not.toBeVisible();
+  expect(onValueChange.mock.lastCall?.[0]).not.toContain('{open}');
+});

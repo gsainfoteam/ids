@@ -171,6 +171,12 @@ mixin IdsMessages {
 
   String? get editorBulletList => null;
 
+  String? get editorCallout => null;
+
+  String? get editorCalloutKind => null;
+
+  String? get editorCalloutRemove => null;
+
   String? get editorCode => null;
 
   String? get editorCodeBlock => null;
@@ -182,6 +188,12 @@ mixin IdsMessages {
   String? get editorCodePlainText => null;
 
   String? get editorContent => null;
+
+  String? get editorDetails => null;
+
+  String? get editorDetailsSummary => null;
+
+  String? get editorDetailsToggle => null;
 
   String? editorHeading({required Object level}) => null;
 
@@ -843,6 +855,15 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorBulletList => '글머리 기호 목록';
 
   @override
+  String get editorCallout => '콜아웃';
+
+  @override
+  String get editorCalloutKind => '콜아웃 종류';
+
+  @override
+  String get editorCalloutRemove => '콜아웃 해제';
+
+  @override
   String get editorCode => '코드';
 
   @override
@@ -859,6 +880,15 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get editorContent => '본문';
+
+  @override
+  String get editorDetails => '토글';
+
+  @override
+  String get editorDetailsSummary => '제목';
+
+  @override
+  String get editorDetailsToggle => '내용 펼치기';
 
   @override
   String editorHeading({required Object level}) => '제목 ${_format(level)}';

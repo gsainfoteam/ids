@@ -25,14 +25,22 @@ import {
   EditorTaskList,
 } from './blocks';
 import { EditorBubbleMenu } from './bubble-menu';
+import { EditorCallout } from './callout/tool';
 import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorContext, type EditorImages } from './context';
 import { EditorCount } from './count';
+import { EditorDetails } from './details/tool';
 import { EditorHorizontalRule } from './horizontal-rule';
 import { EditorImage } from './image/tool';
 import { isImageFile, type ImageUpload } from './image/types';
 import { EditorLink } from './link';
-import { loadEngine, engineKey, type EditorParts, type LoadedEngine } from './load-engine';
+import {
+  EDITOR_FEATURES,
+  engineKey,
+  loadEngine,
+  type EditorFeature,
+  type LoadedEngine,
+} from './load-engine';
 import {
   EditorBold,
   EditorCode,
@@ -94,6 +102,8 @@ const TOOLS = new Set<unknown>([
   EditorHorizontalRule,
   EditorTable,
   EditorTextAlign,
+  EditorCallout,
+  EditorDetails,
 ]);
 
 function defaultToolbar({ withImage }: { withImage: boolean }) {
@@ -155,37 +165,42 @@ function definedOnly(record: Record<string, string | undefined>) {
   );
 }
 
-function useLoadedEngine(
-  format: EditorFormat,
-  { highlight, taskList, textAlign, table, imageUpload }: EditorParts,
-) {
+const FEATURE_TOOLS: Record<Exclude<EditorFeature, 'imageUpload'>, unknown> = {
+  highlight: EditorHighlight,
+  taskList: EditorTaskList,
+  textAlign: EditorTextAlign,
+  table: EditorTable,
+  callout: EditorCallout,
+  details: EditorDetails,
+};
+
+function featuresIn(source: ReactNode, imageUpload: boolean): EditorFeature[] {
+  return EDITOR_FEATURES.filter((feature) =>
+    feature === 'imageUpload'
+      ? imageUpload
+      : containsElementOfType(source, new Set([FEATURE_TOOLS[feature]])),
+  );
+}
+
+function useLoadedEngine(format: EditorFormat, features: readonly EditorFeature[]) {
+  const key = engineKey(format, features);
   const [loaded, setLoaded] = useState<LoadedEngine | null>(null);
+  const requested = useRef({ format, features });
+  useLayoutEffect(() => {
+    requested.current = { format, features };
+  });
 
   useEffect(() => {
     let mounted = true;
-    void loadEngine(format, { highlight, taskList, textAlign, table, imageUpload }).then((next) => {
+    void loadEngine(requested.current.format, requested.current.features).then((next) => {
       if (mounted) setLoaded(next);
     });
     return () => {
       mounted = false;
     };
-  }, [format, highlight, taskList, textAlign, table, imageUpload]);
+  }, [key]);
 
-  const key = engineKey(format, { highlight, taskList, textAlign, table, imageUpload });
   return loaded?.key === key ? loaded : null;
-}
-
-const usesPart = (source: ReactNode, part: unknown) =>
-  containsElementOfType(source, new Set([part]));
-
-function partsIn(source: ReactNode, imageUpload: boolean): EditorParts {
-  return {
-    imageUpload,
-    table: usesPart(source, EditorTable),
-    highlight: usesPart(source, EditorHighlight),
-    taskList: usesPart(source, EditorTaskList),
-    textAlign: usesPart(source, EditorTextAlign),
-  };
 }
 
 function taskLabelIn(t: Translate) {
@@ -231,7 +246,7 @@ export function EditorRoot(props: Editor.Props) {
   const shown =
     children === undefined ? (insertable ? DEFAULT_TOOLBAR_WITH_IMAGE : DEFAULT_TOOLBAR) : children;
   const { bubbles, top, content, bottom, items } = splitByContent(shown);
-  const parts = partsIn(shown, insertable);
+  const features = featuresIn(shown, insertable);
   const hasCount = items.some(isOfType(EditorCount));
   const editable = !disabled && !readOnly;
   const invalid = Boolean(
@@ -244,13 +259,13 @@ export function EditorRoot(props: Editor.Props) {
     onValueChange: onValueChange as ((next: EditorValue | undefined) => void) | undefined,
   });
   const [focused, setFocused] = useState(false);
-  const loaded = useLoadedEngine(format, parts);
+  const loaded = useLoadedEngine(format, features);
   const [uploaded] = useState(() => new Set<string>());
   const [pendingUploads, setPendingUploads] = useState(0);
 
   const startUploads = (instance: TiptapEditor, files: readonly File[], at: number) => {
     const upload = latest.current.onImageUpload;
-    const uploadImage = loaded?.parts.imageUpload?.uploadImage;
+    const uploadImage = loaded?.features.imageUpload?.uploadImage;
     if (!upload || !uploadImage) return;
     const accepted = files.filter(isImageFile);
     for (const file of files.filter((candidate) => !isImageFile(candidate)))
@@ -303,7 +318,7 @@ export function EditorRoot(props: Editor.Props) {
       loaded?.engine.extensionsFor({
         maxLength,
         markdown: loaded.markdown,
-        parts: loaded.parts,
+        features: loaded.features,
         images: { uploaded, start: callIntoTheLatestRender.startUploads },
         taskLabel: callIntoTheLatestRender.taskLabel,
       }),

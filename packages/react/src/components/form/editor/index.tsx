@@ -9,8 +9,10 @@ import {
   EditorTaskList,
 } from './blocks';
 import { EditorBubbleMenu, type EditorBubbleMenuProps } from './bubble-menu';
+import { EditorCallout, type EditorCalloutProps } from './callout/tool';
 import { EditorContentPart, type EditorContentProps } from './content';
 import { EditorCount, type EditorCountProps, type EditorCountState } from './count';
+import { EditorDetails, type EditorDetailsProps } from './details/tool';
 import { EditorHorizontalRule, type EditorHorizontalRuleProps } from './horizontal-rule';
 import { EditorImage, type EditorImageProps } from './image/tool';
 import { EditorLink, type EditorLinkProps } from './link';
@@ -89,6 +91,8 @@ export namespace Editor {
   export type HorizontalRuleProps = EditorHorizontalRuleProps;
   export type TableProps = EditorTableProps;
   export type TextAlignProps = EditorTextAlignProps;
+  export type CalloutProps = EditorCalloutProps;
+  export type DetailsProps = EditorDetailsProps;
   export type SeparatorProps = EditorSeparatorProps;
   export type BubbleMenuProps = EditorBubbleMenuProps;
   export type CountProps = EditorCountProps;
@@ -111,6 +115,8 @@ export namespace Editor {
   export const HorizontalRule = EditorHorizontalRule;
   export const Table = EditorTable;
   export const TextAlign = EditorTextAlign;
+  export const Callout = EditorCallout;
+  export const Details = EditorDetails;
   export const Separator = EditorSeparator;
   export const BubbleMenu = EditorBubbleMenu;
   export const Count = EditorCount;

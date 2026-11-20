@@ -591,6 +591,37 @@ export const Table: Story = {
   },
 };
 
+export const CalloutAndDetails: Story = {
+  args: {
+    format: 'markdown',
+    defaultValue:
+      '> [!TIP]\n> 신청 전에 졸업 요건 점검표를 확인하세요.\n\n:::details {open}\n\n:::detailsSummary\n\n재수강 규정\n\n:::\n\n:::detailsContent\n\n재수강한 과목은 성적이 A0 를 넘지 않습니다.\n\n:::\n\n:::',
+    'aria-label': '안내 본문',
+  },
+  render: (args) => (
+    <Editor {...args}>
+      <Editor.Callout />
+      <Editor.Details />
+      <Editor.Content />
+    </Editor>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Editor.Callout 은 GitHub alert(> [!TIP])를 RichText 와 같은 Alert 모양으로 편집합니다. 왼쪽 아이콘을 누르면 종류를 바꾸거나 콜아웃을 풀 수 있고, 인용문 첫 줄에 [!tip] 을 쓰면 인용문이 콜아웃이 됩니다. Editor.Details 는 고른 블록을 접히는 토글로 감싸고, 펼침 상태는 마크다운의 {open} 으로 남습니다.',
+      },
+    },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await editableContent(canvas, '안내 본문');
+    const toggle = canvas.getByRole('button', { name: '내용 펼치기' });
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.click(toggle);
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-expanded', 'false'));
+  },
+};
+
 export const TextAlign: Story = {
   args: { defaultValue: '<p>행사 안내</p>', 'aria-label': '정렬 본문' },
   render: (args) => (

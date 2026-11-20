@@ -23,5 +23,9 @@ export function DetailsSummaryNode({ children }: DocumentNodeProps) {
 }
 
 export function DetailsContentNode({ children }: DocumentNodeProps) {
-  return <Accordion.Content>{children}</Accordion.Content>;
+  return (
+    <Accordion.Content>
+      <div data-document-blocks="">{children}</div>
+    </Accordion.Content>
+  );
 }
