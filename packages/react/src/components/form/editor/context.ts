@@ -5,6 +5,7 @@ import { createContext, use, type KeyboardEvent, type ReactNode } from 'react';
 import { invariant } from '../../../utils';
 
 import type { editorStyle } from './style';
+import type { EditorFormat } from './value';
 import type { IdsSize } from '../../../tokens/types';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 import type { EditorContent } from '@tiptap/react';
@@ -16,6 +17,7 @@ export type EditorImages = {
 
 export type EditorContextValue = {
   editor: TiptapEditor | null;
+  format: EditorFormat;
   editable: boolean;
   disabled: boolean;
   readOnly: boolean;

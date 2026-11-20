@@ -179,7 +179,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
     icon: <TableCellsIcon />,
     keywords: ['table', 'grid'],
     available: withExtension('table'),
-    insert: insertTable,
+    insert: (chain) => insertTable(chain),
     isActive: (editor) => editor.isActive('table'),
     holdsText: false,
   },

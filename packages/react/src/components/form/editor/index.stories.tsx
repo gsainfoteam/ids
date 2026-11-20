@@ -582,7 +582,7 @@ export const Table: Story = {
     docs: {
       description: {
         story:
-          'Editor.Table 은 표를 넣고, 커서가 있는 칸을 기준으로 행과 열을 더하거나 지우는 메뉴입니다. 새 표는 3×3 에 머리글 행이 있고, 마크다운에서는 GFM 표로 씁니다. 칸을 합치거나 너비를 끌어 바꾸지는 않습니다.',
+          'Editor.Table 은 표 밖에서 누르면 크기 격자를 엽니다. 포인터나 화살표로 행과 열 수를 고르고 누르거나 Enter 를 치면 그 크기의 표가 머리글 행과 함께 들어갑니다. 표 안에서 누르면 커서가 있는 칸을 기준으로 행과 열을 더하거나 지우는 메뉴가 열립니다. HTML 과 JSON 에서는 머리글 행을 끄고, 고른 칸을 합치거나 합친 칸을 나눌 수도 있습니다. 마크다운의 GFM 표는 머리글 행이 꼭 있고 칸을 합칠 수 없어서, 마크다운에서는 이 셋을 메뉴에 두지 않습니다. 열 너비를 끌어 바꾸지는 않습니다.',
       },
     },
   },
@@ -590,6 +590,9 @@ export const Table: Story = {
     const content = await editableContent(canvas, '표 본문');
     await userEvent.click(content);
     selectText(content, '개회', { caretAfter: true });
+    await waitFor(() =>
+      expect(canvas.getByRole('button', { name: '표' })).toHaveAttribute('aria-haspopup', 'menu'),
+    );
     await userEvent.click(canvas.getByRole('button', { name: '표' }));
     await userEvent.click(await canvas.findByRole('menuitem', { name: '아래에 행 추가' }));
     await waitFor(() => expect(content.querySelectorAll('tr')).toHaveLength(3));

@@ -944,8 +944,9 @@ test('Table inserts a table with a header row, edits it from its menu, and markd
   };
   await userEvent.click(content);
   await userEvent.click(table);
-  await expect.element(page.getByRole('menuitem', { name: '행 지우기' })).toBeDisabled();
-  await userEvent.click(page.getByRole('menuitem', { name: '표 넣기' }));
+  const picker = page.getByRole('group', { name: '표 넣기' });
+  await expect.element(picker.getByRole('button', { name: '3행 3열' })).toHaveFocus();
+  await userEvent.keyboard('{Enter}');
 
   await expect.element(content).toHaveFocus();
   expect(content.element().querySelectorAll('tr')).toHaveLength(3);
@@ -964,6 +965,82 @@ test('Table inserts a table with a header row, edits it from its menu, and markd
   await choose('표 지우기');
   expect(content.element().querySelector('table')).toBeNull();
   await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('일정\n\n');
+});
+
+test('the table size grid grows with the arrow keys and the pointer, and inserts the size it shows', async () => {
+  render(
+    <Editor aria-label="본문">
+      <Editor.Table />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.click(page.getByRole('button', { name: '표' }));
+
+  const picker = page.getByRole('group', { name: '표 넣기' });
+  await userEvent.keyboard('{ArrowRight}{ArrowDown}{ArrowDown}');
+  await expect.element(picker.getByRole('button', { name: '5행 4열' })).toHaveFocus();
+  await expect.element(page.getByText('5행 4열', { exact: true })).toBeVisible();
+  await userEvent.keyboard('{Enter}');
+
+  await expect.poll(() => content.element().querySelectorAll('tr').length).toBe(5);
+  expect(content.element().querySelectorAll('tr:first-child th')).toHaveLength(4);
+
+  await userEvent.click(content.getByRole('cell').last());
+  await userEvent.click(page.getByRole('button', { name: '표' }));
+  expect(page.getByRole('group', { name: '표 넣기' }).query()).toBeNull();
+  await expect.element(page.getByRole('menuitemcheckbox', { name: '머리글 행' })).toBeChecked();
+});
+
+test('in HTML the table menu turns the header row off and merges and splits cells', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      aria-label="본문"
+      defaultValue="<table><tbody><tr><th><p>가</p></th><th><p>나</p></th></tr><tr><td><p>1</p></td><td><p>2</p></td></tr></tbody></table><p></p>"
+      onValueChange={onValueChange}
+    >
+      <Editor.Table />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  const table = page.getByRole('button', { name: '표' });
+  await userEvent.click(content.getByText('1'));
+  await userEvent.click(table);
+  await expect.element(page.getByRole('menuitem', { name: '셀 합치기' })).toBeDisabled();
+  await userEvent.click(page.getByRole('menuitemcheckbox', { name: '머리글 행' }));
+  await expect.poll(() => content.element().querySelectorAll('th').length).toBe(0);
+
+  await userEvent.click(content.getByText('1'));
+  await userEvent.click(content.getByText('2'), { modifiers: ['Shift'] });
+  await userEvent.click(table);
+  await userEvent.click(page.getByRole('menuitem', { name: '셀 합치기' }));
+  await expect.poll(() => content.element().querySelector('td[colspan="2"]')).not.toBeNull();
+
+  await userEvent.click(table);
+  await userEvent.click(page.getByRole('menuitem', { name: '셀 나누기' }));
+  await expect.poll(() => content.element().querySelector('td[colspan="2"]')).toBeNull();
+});
+
+test('in markdown the table menu leaves out what a pipe table cannot keep', async () => {
+  render(
+    <Editor
+      format="markdown"
+      aria-label="본문"
+      defaultValue={'| 가 | 나 |\n| --- | --- |\n| 1 | 2 |'}
+    >
+      <Editor.Table />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content.getByText('1'));
+  await userEvent.click(page.getByRole('button', { name: '표' }));
+  await expect.element(page.getByRole('menuitem', { name: '아래에 행 추가' })).toBeVisible();
+  expect(page.getByRole('menuitemcheckbox', { name: '머리글 행' }).query()).toBeNull();
+  expect(page.getByRole('menuitem', { name: '셀 합치기' }).query()).toBeNull();
 });
 
 test('a code block is highlighted with CodeBlock tokens, and its language picker rewrites the fence', async () => {

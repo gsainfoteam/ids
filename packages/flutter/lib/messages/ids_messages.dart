@@ -263,7 +263,15 @@ mixin IdsMessages {
 
   String? get editorTableDeleteRow => null;
 
+  String? get editorTableHeaderRow => null;
+
   String? get editorTableInsert => null;
+
+  String? get editorTableMergeCells => null;
+
+  String? editorTableSize({required Object rows, required Object cols}) => null;
+
+  String? get editorTableSplitCell => null;
 
   String? editorTaskItem({required Object text}) => null;
 
@@ -1013,7 +1021,19 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorTableDeleteRow => '행 지우기';
 
   @override
+  String get editorTableHeaderRow => '머리글 행';
+
+  @override
   String get editorTableInsert => '표 넣기';
+
+  @override
+  String get editorTableMergeCells => '셀 합치기';
+
+  @override
+  String editorTableSize({required Object rows, required Object cols}) => '${_format(rows)}행 ${_format(cols)}열';
+
+  @override
+  String get editorTableSplitCell => '셀 나누기';
 
   @override
   String editorTaskItem({required Object text}) => '할 일: ${_format(text)}';

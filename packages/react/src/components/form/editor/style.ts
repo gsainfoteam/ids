@@ -101,6 +101,14 @@ export const editorStyle = tv({
     mentionDescription: 'truncate text-caption-c1-regular text-neutral',
     blockHandle:
       'absolute start-1.5 z-10 m-0 cursor-grab text-neutral active:cursor-grabbing [&_svg]:size-4 data-hidden:pointer-events-none data-hidden:invisible',
+    tableSizePicker: 'flex flex-col gap-2',
+    tableSizeGrid: 'grid grid-cols-10 gap-1',
+    tableSizeCell: [
+      'size-4 cursor-pointer rounded-indicator bg-field-outline inset-ring-1 inset-ring-neutral',
+      'focus-ring focus-ring-visible:z-10',
+      'data-covered:bg-primary-subtle data-covered:inset-ring-primary',
+    ],
+    tableSizeLabel: 'text-center text-caption-c1-regular text-neutral tabular-nums',
     detailsPlaceholder: 'pointer-events-none absolute start-0 top-2 font-medium text-neutral',
   },
   variants: {

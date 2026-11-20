@@ -437,6 +437,7 @@ export function EditorRoot(props: Editor.Props) {
     <EditorContext
       value={{
         editor,
+        format,
         editable,
         disabled,
         readOnly,

@@ -1,6 +1,8 @@
 import type { ChainedCommands } from '@tiptap/core';
 
-export const NEW_TABLE = { rows: 3, cols: 3, withHeaderRow: true };
+export type TableSize = { rows: number; cols: number };
+
+export const NEW_TABLE_SIZE: TableSize = { rows: 3, cols: 3 };
 
 const leaveALineAfterATableAtTheEnd = (chain: ChainedCommands) =>
   chain.command(({ tr, state }) => {
@@ -9,5 +11,5 @@ const leaveALineAfterATableAtTheEnd = (chain: ChainedCommands) =>
     return true;
   });
 
-export const insertTable = (chain: ChainedCommands) =>
-  leaveALineAfterATableAtTheEnd(chain.insertTable(NEW_TABLE));
+export const insertTable = (chain: ChainedCommands, size: TableSize = NEW_TABLE_SIZE) =>
+  leaveALineAfterATableAtTheEnd(chain.insertTable({ ...size, withHeaderRow: true }));
