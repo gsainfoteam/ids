@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type KeyboardEvent } from 'react';
+import { useId, useRef, useState, type KeyboardEvent } from 'react';
 
 import { PhotoIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
@@ -13,6 +13,7 @@ import { Button } from '../../../action/button';
 import { IconToggle } from '../../../action/icon-toggle';
 import { Spinner } from '../../../feedback/spinner';
 import { Popover } from '../../../overlay/popover';
+import { isAllowedImageSource } from '../../../typography/rich-text/schema/image-source';
 import { TextField } from '../../text-field';
 import { useEditorToolProps, useToolState, type EditorToolProps } from '../tool';
 
@@ -24,6 +25,8 @@ const IMAGE = {
   isActive: (editor: TiptapEditor) => editor.isActive('image'),
   can: () => true,
 };
+
+const NO_UPLOADS: ReadonlySet<string> = new Set();
 
 const isPlainEnter = (event: KeyboardEvent) =>
   event.key === 'Enter' &&
@@ -43,14 +46,19 @@ function warnThereIsNoUpload() {
   );
 }
 
+type ImagePopover = 'insert' | 'alt';
+
 export function EditorImage({ icon, 'aria-label': ariaLabel, className }: EditorImageProps) {
   const t = useTranslate();
   const { editor, editable, images, styles } = useEditorContext('Editor.Image');
   const state = useToolState(IMAGE);
   const tool = useEditorToolProps('Image');
   const inputRef = useRef<HTMLInputElement>(null);
-  const [open, setOpen] = useState(false);
+  const urlErrorId = useId();
+  const [open, setOpen] = useState<ImagePopover | null>(null);
   const [alt, setAlt] = useState('');
+  const [url, setUrl] = useState('');
+  const [urlRejected, setUrlRejected] = useState(false);
 
   if (!images) {
     warnThereIsNoUpload();
@@ -61,24 +69,47 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
 
   const applyAlt = () => {
     editor?.chain().focus().updateAttributes('image', { alt: alt.trim() }).run();
-    setOpen(false);
+    setOpen(null);
+  };
+
+  const insertUrl = () => {
+    const src = url.trim();
+    if (!isAllowedImageSource(src, NO_UPLOADS)) {
+      setUrlRejected(true);
+      return;
+    }
+    editor?.chain().focus().setImage({ src }).run();
+    setOpen(null);
+  };
+
+  const pickFiles = () => {
+    setOpen(null);
+    inputRef.current?.click();
+  };
+
+  const onEnter = (action: () => void) => (event: KeyboardEvent) => {
+    if (!isPlainEnter(event)) return;
+    event.preventDefault();
+    action();
   };
 
   return (
     <>
       <Popover
-        open={open}
+        open={open !== null}
         onOpenChange={(next) => {
           if (!next) {
-            setOpen(false);
+            setOpen(null);
             return;
           }
-          if (!editor?.isActive('image')) {
-            inputRef.current?.click();
+          if (editor?.isActive('image')) {
+            setAlt((editor.getAttributes('image').alt as string | null | undefined) ?? '');
+            setOpen('alt');
             return;
           }
-          setAlt((editor.getAttributes('image').alt as string | null | undefined) ?? '');
-          setOpen(true);
+          setUrl('');
+          setUrlRejected(false);
+          setOpen('insert');
         }}
       >
         <Popover.Trigger asChild>
@@ -96,32 +127,62 @@ export function EditorImage({ icon, 'aria-label': ariaLabel, className }: Editor
           />
         </Popover.Trigger>
         <Popover.Content
-          aria-label={t('editor.imageAlt')}
+          aria-label={open === 'alt' ? t('editor.imageAlt') : t('editor.image')}
           initialFocus="input"
           side="bottom"
           align="start"
         >
-          <div className={styles.linkForm()}>
-            <TextField
-              size="tiny"
-              aria-label={t('editor.imageAlt')}
-              placeholder={t('editor.imageAltPlaceholder')}
-              value={alt}
-              onValueChange={setAlt}
-              onKeyDown={(event) => {
-                if (!isPlainEnter(event)) return;
-                event.preventDefault();
-                applyAlt();
-              }}
-              data-1p-ignore=""
-              data-lpignore="true"
-            />
-            <div className={styles.linkActions()}>
-              <Button size="tiny" onClick={applyAlt}>
-                {t('editor.linkApply')}
-              </Button>
+          {open === 'alt' ? (
+            <div className={styles.linkForm()}>
+              <TextField
+                size="tiny"
+                aria-label={t('editor.imageAlt')}
+                placeholder={t('editor.imageAltPlaceholder')}
+                value={alt}
+                onValueChange={setAlt}
+                onKeyDown={onEnter(applyAlt)}
+                data-1p-ignore=""
+                data-lpignore="true"
+              />
+              <div className={styles.linkActions()}>
+                <Button size="tiny" onClick={applyAlt}>
+                  {t('editor.linkApply')}
+                </Button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className={styles.linkForm()}>
+              <TextField
+                size="tiny"
+                type="url"
+                aria-label={t('editor.imageUrl')}
+                placeholder="https://"
+                value={url}
+                invalid={urlRejected}
+                aria-describedby={urlRejected ? urlErrorId : undefined}
+                onValueChange={(next) => {
+                  setUrl(next);
+                  setUrlRejected(false);
+                }}
+                onKeyDown={onEnter(insertUrl)}
+                data-1p-ignore=""
+                data-lpignore="true"
+              />
+              {urlRejected && (
+                <p id={urlErrorId} className={styles.imageUrlError()}>
+                  {t('editor.imageUrlInvalid')}
+                </p>
+              )}
+              <div className={styles.linkActions()}>
+                <Button size="tiny" variant="outline" colorScheme="neutral" onClick={pickFiles}>
+                  {t('editor.imagePickFiles')}
+                </Button>
+                <Button size="tiny" onClick={insertUrl}>
+                  {t('editor.imageInsert')}
+                </Button>
+              </div>
+            </div>
+          )}
         </Popover.Content>
       </Popover>
       <input

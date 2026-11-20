@@ -27,6 +27,10 @@ const editorBlocks = cn(
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
   '[&_hr:not([data-divider])]:my-3 [&_hr:not([data-divider])]:border-neutral',
   '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard [&_.ProseMirror-selectednode]:outline-offset-2',
+  '[&_[data-resize-container]]:w-fit [&_[data-resize-container]]:max-w-full [&_[data-resize-container]]:rounded-standard [&_[data-resize-wrapper]_img]:h-auto!',
+  '[&_[data-resize-handle]]:z-10 [&_[data-resize-handle]]:flex [&_[data-resize-handle]]:w-3 [&_[data-resize-handle]]:cursor-ew-resize [&_[data-resize-handle]]:items-center [&_[data-resize-handle]]:justify-center',
+  '[&_[data-resize-handle]]:opacity-0 [&_[data-resize-handle]]:transition-opacity [&_[data-resize-wrapper]:hover_[data-resize-handle]]:opacity-100 [&_.ProseMirror-selectednode_[data-resize-handle]]:opacity-100',
+  '[&_[data-resize-handle]]:after:h-10 [&_[data-resize-handle]]:after:max-h-[50%] [&_[data-resize-handle]]:after:w-1 [&_[data-resize-handle]]:after:rounded-full [&_[data-resize-handle]]:after:bg-neutral-bold [&_[data-resize-handle]]:after:shadow-panel',
   '[&_table]:my-2 [&_table]:w-full! [&_table]:table-fixed [&_table]:border-collapse',
   '[&_:is(td,th)]:border [&_:is(td,th)]:border-neutral [&_:is(td,th)]:px-2 [&_:is(td,th)]:py-1 [&_:is(td,th)]:align-top [&_:is(td,th)]:break-words',
   '[&_th]:text-start [&_th]:font-semibold [&_.selectedCell]:bg-primary-subtle',
@@ -101,6 +105,7 @@ export const editorStyle = tv({
     mentionDescription: 'truncate text-caption-c1-regular text-neutral',
     blockHandle:
       'absolute start-1.5 z-10 m-0 cursor-grab text-neutral active:cursor-grabbing [&_svg]:size-4 data-hidden:pointer-events-none data-hidden:invisible',
+    imageUrlError: 'text-caption-c1-regular text-danger',
     tableSizePicker: 'flex flex-col gap-2',
     tableSizeGrid: 'grid grid-cols-10 gap-1',
     tableSizeCell: [
@@ -148,7 +153,7 @@ export const editorStyle = tv({
     },
     editable: {
       true: {},
-      false: { content: 'cursor-default' },
+      false: { content: 'cursor-default [&_[data-resize-handle]]:hidden' },
     },
   },
   compoundVariants: [

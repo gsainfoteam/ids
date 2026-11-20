@@ -441,7 +441,7 @@ export const ImageUpload: Story = {
     docs: {
       description: {
         story:
-          'onImageUpload 는 파일을 받아 올린 그림의 주소를 돌려줍니다. Editor.Image 는 파일을 고르게 하고, 붙여넣거나 끌어 놓은 그림도 같은 함수로 올립니다. 올리는 동안 본문의 그 자리에 자리표시가 서고 도구가 aria-busy 가 됩니다. 그림을 고른 채 Editor.Image 를 누르면 대체 텍스트를 넣는 Popover 가 열립니다.',
+          'onImageUpload 는 파일을 받아 올린 그림의 주소를 돌려줍니다. Editor.Image 를 누르면 그림 주소를 넣거나 파일을 고르는 Popover 가 열리고, 붙여넣거나 끌어 놓은 그림도 같은 함수로 올립니다. 주소는 http 나 https 만 받습니다. 올리는 동안 본문의 그 자리에 자리표시가 서고 도구가 aria-busy 가 됩니다. 그림을 고른 채 Editor.Image 를 누르면 대체 텍스트를 넣는 Popover 가 열립니다. html 과 json 에서는 그림 좌우의 손잡이를 끌어 너비를 바꾸고, 마크다운은 너비를 담지 못해 손잡이가 없습니다.',
       },
     },
   },

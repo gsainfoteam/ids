@@ -20,6 +20,7 @@ import type { FeatureExtensions } from './load-engine';
 import type { EditorMention, FindMentions } from './mention';
 import type { Translate } from '../../../internal/translate';
 import type { AnyExtension, Editor as TiptapEditor, Extensions } from '@tiptap/core';
+import type { ImageOptions } from '@tiptap/extension-image';
 
 export { EditorContent };
 export { EditorSlashMenu } from './slash/menu';
@@ -35,6 +36,13 @@ export type ImageSetup = {
   uploaded: ReadonlySet<string>;
   start: (editor: TiptapEditor, files: File[], at: number) => void;
 };
+
+const IMAGE_RESIZE = {
+  enabled: true,
+  directions: ['left', 'right'],
+  minWidth: 48,
+  alwaysPreserveAspectRatio: true,
+} as const satisfies ImageOptions['resize'];
 
 const placeholderOfTheTextbox = ({ editor }: { editor: TiptapEditor }) =>
   editor.view.dom.getAttribute('aria-placeholder') ?? '';
@@ -69,7 +77,11 @@ export function extensionsFor({
     Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
     CharacterCount.configure({ limit: maxLength }),
     LeaveEscapeToTheLayers,
-    EditorImageNode.configure({ uploaded: images.uploaded, insertable: !!features.imageUpload }),
+    EditorImageNode.configure({
+      uploaded: images.uploaded,
+      insertable: !!features.imageUpload,
+      resize: markdown ? false : IMAGE_RESIZE,
+    }),
     ...(features.imageUpload ? features.imageUpload.imageUploadExtensions(images.start) : []),
     ...(features.highlight ? [features.highlight] : []),
     ...(features.taskList ? features.taskList(taskLabel) : []),

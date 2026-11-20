@@ -217,9 +217,17 @@ mixin IdsMessages {
 
   String? get editorImageAltPlaceholder => null;
 
+  String? get editorImageInsert => null;
+
+  String? get editorImagePickFiles => null;
+
   String? get editorImageUploadFailed => null;
 
   String? get editorImageUploading => null;
+
+  String? get editorImageUrl => null;
+
+  String? get editorImageUrlInvalid => null;
 
   String? get editorItalic => null;
 
@@ -952,10 +960,22 @@ final class IdsKoreanMessages with IdsMessages {
   String get editorImageAltPlaceholder => '그림을 설명하는 글';
 
   @override
+  String get editorImageInsert => '넣기';
+
+  @override
+  String get editorImagePickFiles => '파일에서 고르기';
+
+  @override
   String get editorImageUploadFailed => '그림을 올리지 못했습니다';
 
   @override
   String get editorImageUploading => '그림을 올리는 중입니다';
+
+  @override
+  String get editorImageUrl => '그림 주소';
+
+  @override
+  String get editorImageUrlInvalid => 'http 나 https 로 시작하는 주소를 넣어 주세요';
 
   @override
   String get editorItalic => '기울임';

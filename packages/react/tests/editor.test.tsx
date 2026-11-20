@@ -1361,3 +1361,103 @@ test('a read-only Editor has no block handle', async () => {
   await userEvent.hover(content.getByText('읽기만'));
   expect(page.getByRole('button', { name: '블록 메뉴' }).query()).toBeNull();
 });
+
+test('Image inserts a picture from an address and turns away a script address', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      aria-label="본문"
+      defaultValue="<p>지도</p>"
+      onImageUpload={async () => PICTURE}
+      onValueChange={onValueChange}
+    >
+      <Editor.Image />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.click(page.getByRole('button', { name: '그림' }));
+
+  const address = page.getByRole('textbox', { name: '그림 주소' });
+  await expect.element(address).toHaveFocus();
+  await userEvent.keyboard('javascript:alert(1){Enter}');
+  await expect.element(address).toHaveAttribute('aria-invalid', 'true');
+  await expect
+    .element(address)
+    .toHaveAccessibleDescription('http 나 https 로 시작하는 주소를 넣어 주세요');
+  expect(content.element().querySelector('img')).toBeNull();
+
+  await userEvent.fill(address, 'https://gistory.me/map.png');
+  await userEvent.click(page.getByRole('button', { name: '넣기' }));
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('<p>지도</p><img src="https://gistory.me/map.png">');
+  await expect.element(content).toHaveFocus();
+});
+
+test('Image hands Choose files to the file picker', async () => {
+  render(
+    <Editor aria-label="본문" onImageUpload={async () => PICTURE}>
+      <Editor.Image />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  const picked = vi.fn((event: Event) => event.preventDefault());
+  document.querySelector('[data-editor-image-input]')!.addEventListener('click', picked);
+  await userEvent.click(page.getByRole('button', { name: '그림' }));
+  await userEvent.click(page.getByRole('button', { name: '파일에서 고르기' }));
+
+  expect(picked).toHaveBeenCalledOnce();
+  await expect.element(page.getByRole('textbox', { name: '그림 주소' })).not.toBeInTheDocument();
+});
+
+test('an image is resized by its side handle, and HTML keeps the width', async (context) => {
+  skipWithoutCdp(context);
+  const onValueChange = vi.fn();
+  render(
+    <Editor aria-label="본문" onImageUpload={async () => PICTURE} onValueChange={onValueChange}>
+      <Editor.Image />
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  await userEvent.upload(imageInput(), png());
+  await expect.poll(() => content.element().querySelector('img')?.complete).toBe(true);
+  const image = content.element().querySelector('img')!;
+  await expect.element(page.elementLocator(image)).toBeVisible();
+  const handle = content.element().querySelector('[data-resize-handle="right"]')!;
+  const start = centerOf(handle);
+
+  const press = (type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', point: Point) =>
+    cdp().send('Input.dispatchMouseEvent', {
+      type,
+      ...inTheTopPage(point),
+      button: 'left',
+      buttons: type === 'mouseReleased' ? 0 : 1,
+      clickCount: 1,
+    });
+  await press('mousePressed', start);
+  await press('mouseMoved', { x: start.x + 20, y: start.y });
+  await press('mouseMoved', { x: start.x + 40, y: start.y });
+  await press('mouseReleased', { x: start.x + 40, y: start.y });
+
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toMatch(/<img [^>]*width="120"/);
+});
+
+test('a markdown Editor draws no resize handles, since markdown keeps no width', async () => {
+  render(
+    <Editor
+      format="markdown"
+      aria-label="본문"
+      defaultValue="![지도](/map.png)"
+      onImageUpload={async () => PICTURE}
+    />,
+  );
+  const content = await editable('본문');
+  await expect.poll(() => content.element().querySelector('img')).not.toBeNull();
+  expect(content.element().querySelector('[data-resize-handle]')).toBeNull();
+});
