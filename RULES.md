@@ -238,16 +238,34 @@ drawer/
 
 ## Stories
 
-Every component's `index.stories.tsx` has the same shape, in this order:
+A component's `index.stories.tsx` holds three layers, in this order. The docs (the Docs page now,
+MDX pages with `<Canvas of={Stories.X}>` later) are built from the first two; the third is for
+tests and maintainers.
 
-1. `Playground` — args wired to controls, nothing else.
-2. `Gallery` — **required.** Every variant, size and state on one screen, built from the `Showcase` kit
-   so all galleries read alike. Import it as `~story-kit`.
-3. One story per feature worth showing (keyboard, paste, form integration, composition), each with
-   a `play` function when the behaviour can be asserted.
+1. **Basic**, first in the file and in exactly this order:
+   - `Playground`: args wired to controls, nothing else.
+   - `Usage`: the smallest real use, written inline in `render` with no `args` (a Select inside a
+     `Field` with its label, a ButtonGroup of three buttons). It may carry a `play`.
+   - `Gallery`: **required.** Every variant, size and state on one screen, built from the
+     `Showcase` kit so all galleries read alike. Import it as `~story-kit`.
+2. **Examples**: one story per task a reader wants to do, named for that task
+   (`ShowProgressWhileSaving`, `BuildASplitButton`, `GroupTogglesInAToolbar`; not `Loading`,
+   `Separator` or `Mixed`). Each sets `parameters.docs.description.story`, which says what the
+   reader gets and which props do it, and has a `play` when the behaviour can be asserted. An
+   example that composes several components (ButtonGroup with ToggleGroup, Select in a react-hook-form
+   `Field`) lives in the file of the component the reader came for, not in each one.
+3. **Verification**: keyboard maps (`Keyboard`), right-to-left (`RightToLeft`), development
+   warnings (`DevelopmentWarnings`), edge cases (`LongList`) and regression fixtures. Each carries
+   `tags: ['verification']` and comes after every example. A description is optional.
 
 ```tsx
 import { Showcase } from '~story-kit';
+
+export const Playground: Story = {};
+
+export const Usage: Story = {
+  render: () => <Button>저장</Button>,
+};
 
 export const Gallery: Story = {
   render: () => (
@@ -263,7 +281,32 @@ export const Gallery: Story = {
     </Showcase>
   ),
 };
+
+export const SubmitAForm: Story = {
+  render: function Render() { ... },
+  parameters: { docs: { description: { story: '...' } } },
+  play: async ({ canvas, userEvent }) => { ... },
+};
+
+export const DevelopmentWarnings: Story = {
+  tags: ['verification'],
+  render: function Render() { ... },
+  play: async ({ canvas, userEvent }) => { ... },
+};
 ```
+
+**`'verification'` is the one marker.** `.storybook/main.ts` declares it with
+`excludeFromDocsStories`, so Storybook 10 leaves those stories off the Docs page while the sidebar
+still lists them. A story keeps the default `dev` and `test` tags, so `checkEveryStory`, the SSR,
+hydration and translation checks run it like any other. A future MDX page shows only the stories
+it names with `<Canvas of>` and never names a verification story. Do not use `'!autodocs'` or a
+name prefix for this.
+
+**`tests/story-layers.ssr.test.tsx` checks the layers** for the files in its
+`FILES_ON_THE_THREE_LAYERS` list: the basic three first and in order, examples before verification
+stories, a description on every example, and the verification tag on every `Keyboard`,
+`RightToLeft` and `DevelopmentWarnings` story. Most files predate the layers. A new story file,
+and an existing one a change touches, moves to the layers and joins the list in the same commit.
 
 Declare the meta as `const meta = { ... } satisfies Meta<typeof X>` with `tags: ['autodocs']`, which
 gives each component a Docs page (every story with Show code, plus the props table); foundation
