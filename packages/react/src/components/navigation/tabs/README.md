@@ -6,7 +6,7 @@
 - **키보드 한 번에 한 칸.** 탭 목록 전체가 Tab 한 칸이고 고른 탭에 멈춥니다. 안에서는 화살표, Home, End 로 옮기고, 끝에서 처음으로 돌아가며, 비활성 탭은 건너뜁니다.
 - **자동과 수동.** 기본은 화살표로 옮기면 바로 고릅니다. `activationMode="manual"` 이면 Enter 나 Space 로 고릅니다.
 - **타입으로 막는 잘못된 값.** children 을 함수로 쓰면 탭 값의 타입으로 좁힌 `List`, `Trigger`, `Content` 를 받습니다.
-- **두 가지 모양.** 선(`underline`)과 상자(`enclosed`).
+- **세 가지 모양.** 선(`underline`), 옅은 채움(`pill`), 상자(`enclosed`). 모양마다 한 가지로 고정되어 있고, 다른 모양은 Trigger의 `className`으로 바꿉니다.
 
 ```tsx
 import { Tabs } from '@gsainfoteam/ids-react';
@@ -80,12 +80,14 @@ const [section, setSection] = useState<Section>('docs');
 
 ```tsx
 <Tabs appearance="underline" />                  // 기본. 고른 탭의 글자와 아래 선이 primary
+<Tabs appearance="pill" />                       // 고른 탭을 bg-primary-subtle 로 채운다
 <Tabs appearance="enclosed" />                   // 고른 탭이 내용 쪽으로 열린 상자
 <Tabs orientation="vertical" />                  // 목록이 앞에, 내용이 옆에
 <Tabs size="tiny" />                             // standard(기본) / tiny
 ```
 
 - 고르지 않은 탭은 흐린 글자(`text-neutral`)입니다. `underline` 과 `enclosed` 의 고른 탭은 `text-primary`, 선은 `border-primary` 입니다. `colorScheme` 을 주면 그 계열의 `text-X` 와 `border-X` 입니다.
+- `pill` 의 고른 탭은 `bg-primary-subtle` 과 `text-on-primary-subtle` 입니다. 고르지 않은 탭은 올리고 누르면 글자색 층(`state-hover`, `state-press`)을 얹습니다.
 - `enclosed` 의 고른 탭은 놓인 면의 색(`--ids-bg-current`)으로 칠해 목록 선을 덮습니다. 페이지, `bg-panel` 카드, `bg-band` 띠 위에서 따로 맞추지 않아도 됩니다.
 - `<Tabs.List stretch>` 는 가로 탭이 목록 폭을 똑같이 나눠 채웁니다. 카드 폭에 맞춘 두세 칸짜리 탭에 씁니다.
 
@@ -126,8 +128,8 @@ const [section, setSection] = useState<Section>('docs');
 | ------------------------ | ---------------------------------------------------------------- |
 | `value` / `defaultValue` | 고른 탭의 값. 없으면 첫 번째 활성 탭                             |
 | `onValueChange`          | 탭을 고를 때 새 값으로                                           |
-| `appearance`             | `underline`(기본) / `enclosed`                                   |
-| `colorScheme`            | `primary`(기본) / `secondary` / `tertiary`. 고른 탭의 글자와 선 |
+| `appearance`             | `underline`(기본) / `pill` / `enclosed`                          |
+| `colorScheme`            | `primary`(기본) / `secondary` / `tertiary`. 고른 탭의 글자, 선, 채움 |
 | `orientation`            | `horizontal`(기본) / `vertical`                                  |
 | `activationMode`         | `automatic`(기본) / `manual`                                     |
 | `loop`                   | `true`. 화살표가 끝에서 처음으로 돌아간다                        |

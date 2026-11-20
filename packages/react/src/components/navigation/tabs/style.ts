@@ -11,7 +11,7 @@ export const tabsStyle = tv({
       'relative inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap select-none',
       'text-neutral aria-selected:text-neutral-bold',
       'not-aria-selected:data-hovered:text-neutral-bold focus-ring',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+      'transition-[color,background-color,box-shadow,--ids-state-opacity] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
       'disabled:cursor-not-allowed disabled:opacity-50',
       '[&_svg]:pointer-events-none [&_svg]:shrink-0',
@@ -46,6 +46,14 @@ export const tabsStyle = tv({
           'rounded-standard',
           'after:pointer-events-none after:absolute after:bg-transparent',
           'aria-selected:text-scheme aria-selected:after:bg-(--ids-color-border-scheme)',
+        ],
+      },
+      pill: {
+        list: 'gap-1',
+        trigger: [
+          'rounded-standard',
+          'state-layer not-aria-selected:data-hovered:state-hover not-aria-selected:data-active:state-press',
+          'aria-selected:bg-scheme-subtle aria-selected:text-on-scheme-subtle',
         ],
       },
       enclosed: {

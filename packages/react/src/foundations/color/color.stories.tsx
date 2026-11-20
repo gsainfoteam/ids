@@ -521,8 +521,8 @@ export const Lab: Story = {
                     <Tabs.Content value="overview">가볍고 오래 가는 키보드입니다.</Tabs.Content>
                     <Tabs.Content value="reviews">리뷰 128개.</Tabs.Content>
                   </Tabs>
-                  <Tabs defaultValue="overview" appearance="enclosed">
-                    <Tabs.List aria-label={`상자 탭 ${mode}`}>
+                  <Tabs defaultValue="overview" appearance="pill">
+                    <Tabs.List aria-label={`알약 탭 ${mode}`}>
                       <Tabs.Trigger value="overview">개요</Tabs.Trigger>
                       <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>
                     </Tabs.List>

@@ -13,7 +13,7 @@ import { Tabs } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const appearances = ['underline', 'enclosed'] as const;
+const appearances = ['underline', 'pill', 'enclosed'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const meta = {
@@ -62,7 +62,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Appearance × Size"
-        description="underline 은 고른 탭의 글자와 아래 선을 primary 로, enclosed 는 고른 탭을 내용 쪽으로 열린 상자로 그리고 글자를 primary 로 칠합니다."
+        description="underline 은 고른 탭의 글자와 아래 선을 primary 로, pill 은 고른 탭을 primary 의 옅은 채움으로, enclosed 는 고른 탭을 내용 쪽으로 열린 상자로 그리고 글자를 primary 로 칠합니다."
       >
         <Showcase.Matrix
           rows={sizes}
@@ -85,6 +85,18 @@ export const Gallery: Story = {
       <Showcase.Section title="Vertical">
         <Showcase.Row label="underline">
           <Tabs defaultValue="profile" orientation="vertical">
+            <Tabs.List aria-label="설정">
+              <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
+              <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
+              <Tabs.Trigger value="account">계정</Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="profile">이름과 사진</Tabs.Content>
+            <Tabs.Content value="alerts">알림 받을 곳</Tabs.Content>
+            <Tabs.Content value="account">비밀번호와 탈퇴</Tabs.Content>
+          </Tabs>
+        </Showcase.Row>
+        <Showcase.Row label="pill">
+          <Tabs defaultValue="profile" orientation="vertical" appearance="pill">
             <Tabs.List aria-label="설정">
               <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
               <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
@@ -145,8 +157,8 @@ export const Gallery: Story = {
             <Tabs.Content value="account">비밀번호와 탈퇴</Tabs.Content>
           </Tabs>
         </Showcase.Row>
-        <Showcase.Row label="stretch" className="w-full max-w-md">
-          <Tabs defaultValue="new" className="w-full">
+        <Showcase.Row label="pill stretch" className="w-full max-w-md">
+          <Tabs defaultValue="new" appearance="pill" className="w-full">
             <Tabs.List aria-label="정렬" stretch>
               <Tabs.Trigger value="new">최신</Tabs.Trigger>
               <Tabs.Trigger value="popular">인기</Tabs.Trigger>

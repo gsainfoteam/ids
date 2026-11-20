@@ -381,3 +381,18 @@ test('enclosed draws the selected label in primary', async () => {
     .toBe(colorOf('--ids-color-text-primary'));
   expect(getComputedStyle(tab('a').element()).color).not.toBe(colorOf('--ids-color-text-primary'));
 });
+
+test('pill fills the selected tab with the primary subtle pair', async () => {
+  await render(
+    <IdsProvider theme={testTheme}>{tabs({ defaultValue: 'b', appearance: 'pill' })}</IdsProvider>,
+  );
+  await expect.element(tab('b')).toHaveAttribute('aria-selected', 'true');
+
+  await expect
+    .poll(() => getComputedStyle(tab('b').element()).backgroundColor)
+    .toBe(colorOf('--ids-color-bg-primary-subtle'));
+  expect(getComputedStyle(tab('b').element()).color).toBe(
+    colorOf('--ids-color-text-on-primary-subtle'),
+  );
+  expect(getComputedStyle(tab('a').element()).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+});

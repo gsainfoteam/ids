@@ -99,7 +99,12 @@ export const PC: Story = {
           </Button>
         </div>
 
-        <Tabs value={topic} onValueChange={setTopic} className="flex flex-col gap-6">
+        <Tabs
+          value={topic}
+          onValueChange={setTopic}
+          appearance="pill"
+          className="flex flex-col gap-6"
+        >
           <Tabs.List aria-label="주제">
             {TOPICS.map((item) => (
               <Tabs.Trigger key={item.id} value={item.id}>
