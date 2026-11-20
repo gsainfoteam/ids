@@ -43,7 +43,7 @@ import {
   lightnessContrast,
 } from '../../components/utility/ids-provider/contrast';
 import {
-  PALETTE_STEPS,
+  SCALE_STEPS,
   type IdsStatus,
   type IdsThemeOverrides,
 } from '../../components/utility/ids-provider/theme';
@@ -242,7 +242,7 @@ const labMarkVariants = ['solid', 'soft', 'outline'] as const;
 
 const labToday = new CalendarDate(2026, 9, 15);
 
-const labPaletteFamilies = [...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES];
+const labPaletteFamilies = ['neutral', ...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES] as const;
 
 const LAB_CHART_CONFIG = {
   web: { label: '웹' },
@@ -276,7 +276,7 @@ const sourceOf = (family: string, given: readonly string[], status: IdsStatus | 
 
 const labPaletteRow = cn('grid items-center gap-x-2');
 const labPaletteColumns = {
-  gridTemplateColumns: `6rem 8rem repeat(${PALETTE_STEPS.length}, 4.5rem)`,
+  gridTemplateColumns: `6rem 8rem 3rem repeat(${SCALE_STEPS.length}, 4.5rem)`,
 };
 
 export const Lab: Story = {
@@ -321,38 +321,44 @@ export const Lab: Story = {
         </Showcase.Section>
         <Showcase.Section
           title="Palettes"
-          description="IdsProvider 가 역할을 고르는 11단계입니다. 채움은 600, 나머지 역할은 대비를 넘는 첫 단계입니다."
+          description="모드마다 역할이 읽는 8단계입니다. 1 페이지, 2 띠, 3 옅은 채움, 4 선, 5 손잡이, 6 흐린 글자, 7 채움, 8 진한 글자."
         >
           <div data-lab-palettes="" className={cn('flex flex-col gap-2', panel)}>
             <div className={labPaletteRow} style={labPaletteColumns}>
               <span className={columnLabel}>계열</span>
               <span className={columnLabel}>출처</span>
-              {PALETTE_STEPS.map((step) => (
+              <span className={columnLabel}>모드</span>
+              {SCALE_STEPS.map((step) => (
                 <span key={step} className={columnLabel}>
                   {step}
                 </span>
               ))}
             </div>
             {colors &&
-              labPaletteFamilies.map((family) => (
-                <div key={family} className={labPaletteRow} style={labPaletteColumns}>
-                  <span className="text-body-b3-regular font-mono">{family}</span>
-                  <span className="text-caption-c1-regular text-neutral">
-                    {sourceOf(family, colors.given, theme.status)}
-                  </span>
-                  {PALETTE_STEPS.map((step) => (
-                    <div key={step} className="flex flex-col gap-1">
-                      <span
-                        className="rounded-indicator inset-ring-neutral h-7 w-full inset-ring-1"
-                        style={{ background: colors.palettes[family][step] }}
-                      />
-                      <code className="text-caption-c1-regular text-neutral font-mono">
-                        {colors.palettes[family][step]}
-                      </code>
+              labPaletteFamilies.flatMap((family) =>
+                modes.map((mode) => {
+                  const scale =
+                    family === 'neutral' ? colors.neutral[mode] : colors.palettes[family][mode];
+                  return (
+                    <div key={`${family}-${mode}`} className={labPaletteRow} style={labPaletteColumns}>
+                      <span className="text-body-b3-regular font-mono">{family}</span>
+                      <span className="text-caption-c1-regular text-neutral">
+                        {family === 'neutral' ? (theme.neutral ?? 'pure') : sourceOf(family, colors.given, theme.status)}
+                      </span>
+                      <span className="text-caption-c1-regular text-neutral">{mode}</span>
+                      {scale.map((color, index) => (
+                        <div key={SCALE_STEPS[index]} className="flex flex-col gap-1">
+                          <span
+                            className="rounded-indicator inset-ring-neutral h-7 w-full inset-ring-1"
+                            style={{ background: color }}
+                          />
+                          <code className="text-caption-c1-regular text-neutral font-mono">{color}</code>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              ))}
+                  );
+                }),
+              )}
           </div>
         </Showcase.Section>
         <Showcase.Section
@@ -619,7 +625,7 @@ export const Lab: Story = {
   play: async ({ canvasElement }) => {
     await expect(canvasElement.textContent).toContain('문제 없음');
     const rows = canvasElement.querySelectorAll('[data-lab-palettes] code');
-    await expect(rows.length).toBe(PALETTE_STEPS.length * labPaletteFamilies.length);
+    await expect(rows.length).toBe(SCALE_STEPS.length * labPaletteFamilies.length * modes.length);
     for (const row of rows) await expect(row.textContent).toMatch(/^#[0-9a-f]{6}$/);
 
     const outputs = [...canvasElement.querySelectorAll('[data-ratio]')];

@@ -25,14 +25,18 @@ export { ThemeContext } from './use-ids-provider';
 export { useTheme } from './use-theme';
 export { defineIdsTheme } from './theme';
 export { checkIdsTheme } from './theme-variables';
-export { createIdsPalette } from './palette-seed';
+export { createIdsPalette } from './palette-scales';
+export { createIdsRamp } from './palette-seed';
 export type {
   IdsBrandFamily,
   IdsColorFamily,
   IdsCornerShape,
   IdsNeutral,
   IdsPalette,
-  IdsPaletteStep,
+  IdsRamp,
+  IdsRampStep,
+  IdsScale,
+  IdsScaleStep,
   IdsStatus,
   IdsStatusColors,
   IdsStatusFamily,

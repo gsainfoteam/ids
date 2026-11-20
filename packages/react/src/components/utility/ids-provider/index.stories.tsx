@@ -84,7 +84,11 @@ function Readout() {
     <dl className="text-caption-c1-regular text-neutral grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 font-mono">
       <dt>primary</dt>
       <dd data-testid="palette">
-        {typeof theme.primary === 'string' ? theme.primary : theme.primary?.[600]}
+        {typeof theme.primary === 'string'
+          ? theme.primary
+          : theme.primary !== undefined && 'light' in theme.primary
+            ? theme.primary.light[6]
+            : theme.primary?.[600]}
       </dd>
       <dt>scale</dt>
       <dd data-testid="scale">{scale ?? 1}</dd>

@@ -1,7 +1,6 @@
-import palette from '../../core/tokens/palette.json';
-import { createIdsPalette } from '../src';
+import { createIdsRamp } from '../src';
 
-import type { IdsPalette } from '../src/components/utility/ids-provider/theme';
+import type { IdsRamp } from '../src/components/utility/ids-provider/theme';
 
 export const paletteSeeds = {
   red: '#fb2c36',
@@ -28,9 +27,5 @@ export type PaletteHue = keyof typeof paletteSeeds;
 export const paletteHues = Object.keys(paletteSeeds) as PaletteHue[];
 
 export const palettes = Object.fromEntries(
-  paletteHues.map((hue) => [hue, createIdsPalette(paletteSeeds[hue])!]),
-) as { [hue in PaletteHue]: IdsPalette };
-
-export const neutralShades = Object.fromEntries(
-  Object.entries(palette.neutral).map(([step, token]) => [step, token.$value]),
-) as { [step: string]: string };
+  paletteHues.map((hue) => [hue, createIdsRamp(paletteSeeds[hue])!]),
+) as { [hue in PaletteHue]: IdsRamp };

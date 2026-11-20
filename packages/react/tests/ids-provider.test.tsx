@@ -9,6 +9,7 @@ import { palettes } from '../.storybook/palettes';
 import { Button, IdsProvider, createIdsPalette, useTheme } from '../src';
 import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
+import { paletteFromRamp } from '../src/components/utility/ids-provider/palette-scales';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -56,7 +57,7 @@ test('SSR: the root writes both modes of the theme into its style', () => {
     palettes.blue[100],
   );
   expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-subtle')).toBe(
-    palettes.blue[950],
+    paletteFromRamp(palettes.blue).dark[2],
   );
   expect(element.style.getPropertyValue('--ids-theme-dark-text-on-primary-subtle')).toBe(
     palettes.blue[200],
@@ -92,8 +93,8 @@ test('SSR: one color is enough, the provider builds the palette from it', () => 
     renderToString(<IdsProvider theme={{ primary: palettes.violet[500] }} />),
   ).querySelector<HTMLElement>('[data-mode]')!;
   const built = createIdsPalette(palettes.violet[500])!;
-  expect(element.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(built[600]);
-  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-subtle')).toBe(built[950]);
+  expect(element.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(built.light[6]);
+  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-subtle')).toBe(built.dark[2]);
 });
 
 test('SSR: a scale is an attribute, and no scale writes none', () => {
@@ -138,9 +139,9 @@ test('the primary role follows the mode the element shows', async () => {
     getComputedStyle(screen.getByTestId(testId).element()).getPropertyValue(`--ids-color-${name}`);
 
   await expect.poll(() => role('light', 'bg-primary-subtle')).toBe(palettes.blue[100]);
-  expect(role('dark', 'bg-primary-subtle')).toBe(palettes.blue[950]);
+  expect(role('dark', 'bg-primary-subtle')).toBe(paletteFromRamp(palettes.blue).dark[2]);
   expect(role('dark', 'bg-secondary-subtle'), 'secondary is derived from primary').not.toBe(
-    palettes.blue[950],
+    paletteFromRamp(palettes.blue).dark[2],
   );
 });
 

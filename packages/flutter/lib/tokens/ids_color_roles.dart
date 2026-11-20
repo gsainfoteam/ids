@@ -14,53 +14,43 @@ abstract final class IdsColorRoles {
   static const neutralOnlySlots = <String>['bg-{family}-subtlest', 'text-on-{family}-subtlest', 'bg-{family}-bold', 'text-on-{family}-bold', 'text-{family}-bold'];
   static const all = <String>['bg-neutral-subtlest', 'bg-neutral-subtler', 'bg-neutral-subtle', 'bg-neutral', 'bg-neutral-bold', 'text-on-neutral-subtlest', 'text-on-neutral-subtler', 'text-on-neutral-subtle', 'text-on-neutral', 'text-on-neutral-bold', 'text-neutral', 'text-neutral-bold', 'border-neutral', 'bg-primary-subtler', 'bg-primary-subtle', 'bg-primary', 'text-on-primary-subtler', 'text-on-primary-subtle', 'text-on-primary', 'text-primary', 'border-primary', 'bg-secondary-subtler', 'bg-secondary-subtle', 'bg-secondary', 'text-on-secondary-subtler', 'text-on-secondary-subtle', 'text-on-secondary', 'text-secondary', 'border-secondary', 'bg-tertiary-subtler', 'bg-tertiary-subtle', 'bg-tertiary', 'text-on-tertiary-subtler', 'text-on-tertiary-subtle', 'text-on-tertiary', 'text-tertiary', 'border-tertiary', 'bg-success-subtler', 'bg-success-subtle', 'bg-success', 'text-on-success-subtler', 'text-on-success-subtle', 'text-on-success', 'text-success', 'border-success', 'bg-warning-subtler', 'bg-warning-subtle', 'bg-warning', 'text-on-warning-subtler', 'text-on-warning-subtle', 'text-on-warning', 'text-warning', 'border-warning', 'bg-danger-subtler', 'bg-danger-subtle', 'bg-danger', 'text-on-danger-subtler', 'text-on-danger-subtle', 'text-on-danger', 'text-danger', 'border-danger', 'bg-info-subtler', 'bg-info-subtle', 'bg-info', 'text-on-info-subtler', 'text-on-info-subtle', 'text-on-info', 'text-info', 'border-info'];
 
-  static const neutralPalette = <int, Color>{
-    0: Color(0xFFFFFFFF),
-    50: Color(0xFFFAFAFA),
-    100: Color(0xFFF5F5F5),
-    200: Color(0xFFE5E5E5),
-    300: Color(0xFFD4D4D4),
-    400: Color(0xFFA3A3A3),
-    500: Color(0xFF737373),
-    600: Color(0xFF525252),
-    700: Color(0xFF404040),
-    800: Color(0xFF262626),
-    850: Color(0xFF1E1E1E),
-    900: Color(0xFF171717),
-    950: Color(0xFF0A0A0A),
+  static const neutralScales = <IdsMode, List<Color>>{
+    IdsMode.light: [
+      Color(0xFFFFFFFF),
+      Color(0xFFFAFAFA),
+      Color(0xFFF5F5F5),
+      Color(0xFFE5E5E5),
+      Color(0xFFD4D4D4),
+      Color(0xFF525252),
+      Color(0xFF171717),
+      Color(0xFF0A0A0A),
+    ],
+    IdsMode.dark: [
+      Color(0xFF0A0A0A),
+      Color(0xFF171717),
+      Color(0xFF1E1E1E),
+      Color(0xFF232323),
+      Color(0xFF2F2F2F),
+      Color(0xFFD4D4D4),
+      Color(0xFFFAFAFA),
+      Color(0xFFFAFAFA),
+    ],
   };
 
-  static const neutralSteps = <IdsMode, Map<String, int>>{
-    IdsMode.light: {
-      'bg-neutral-subtlest': 0,
-      'bg-neutral-subtler': 50,
-      'bg-neutral-subtle': 100,
-      'bg-neutral': 300,
-      'bg-neutral-bold': 900,
-      'text-on-neutral-subtlest': 900,
-      'text-on-neutral-subtler': 900,
-      'text-on-neutral-subtle': 900,
-      'text-on-neutral': 950,
-      'text-on-neutral-bold': 0,
-      'text-neutral': 600,
-      'text-neutral-bold': 900,
-      'border-neutral': 200,
-    },
-    IdsMode.dark: {
-      'bg-neutral-subtlest': 950,
-      'bg-neutral-subtler': 900,
-      'bg-neutral-subtle': 850,
-      'bg-neutral': 700,
-      'bg-neutral-bold': 50,
-      'text-on-neutral-subtlest': 50,
-      'text-on-neutral-subtler': 50,
-      'text-on-neutral-subtle': 50,
-      'text-on-neutral': 50,
-      'text-on-neutral-bold': 950,
-      'text-neutral': 300,
-      'text-neutral-bold': 50,
-      'border-neutral': 800,
-    },
+  static const neutralSteps = <String, int>{
+    'bg-neutral-subtlest': 1,
+    'bg-neutral-subtler': 2,
+    'bg-neutral-subtle': 3,
+    'bg-neutral': 5,
+    'bg-neutral-bold': 7,
+    'text-on-neutral-subtlest': 8,
+    'text-on-neutral-subtler': 8,
+    'text-on-neutral-subtle': 8,
+    'text-on-neutral': 8,
+    'text-on-neutral-bold': 2,
+    'text-neutral': 6,
+    'text-neutral-bold': 8,
+    'border-neutral': 4,
   };
 
   static List<String> slotsOf(String family) => [

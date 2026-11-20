@@ -22,7 +22,7 @@ import {
 import {
   IDS_BRAND_FAMILIES,
   IDS_COLOR_FAMILIES,
-  IDS_NEUTRAL_PALETTE,
+  IDS_NEUTRAL_SCALES,
   IDS_NEUTRAL_STEPS,
   IDS_STATUS_FAMILIES,
 } from '../src/tokens/color-roles';
@@ -154,14 +154,12 @@ test.each(MODES)(
 test.each(MODES)('ids.css falls back to the pure %s neutral without a provider value', (mode) => {
   const mapped = mappedSlots(mode);
 
-  for (const [slot, step] of Object.entries(IDS_NEUTRAL_STEPS[mode]))
-    expect(mapped[slot]).toBe(
-      `${themeVar(mode, slot)}, ${IDS_NEUTRAL_PALETTE[String(step) as keyof typeof IDS_NEUTRAL_PALETTE]}`,
-    );
+  for (const [slot, step] of Object.entries(IDS_NEUTRAL_STEPS))
+    expect(mapped[slot]).toBe(`${themeVar(mode, slot)}, ${IDS_NEUTRAL_SCALES[mode][step - 1]}`);
 });
 
 test.each(MODES)('the pure %s neutral fallback reaches its Lc', (mode) => {
-  const roles = neutralRoles({ ...IDS_NEUTRAL_PALETTE }, mode);
+  const roles = neutralRoles(IDS_NEUTRAL_SCALES[mode]);
 
   for (const checked of pairsFor('neutral'))
     expect(lowestContrast(roles, checked), checked.foreground).toBeGreaterThanOrEqual(checked.lc);

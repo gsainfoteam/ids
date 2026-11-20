@@ -1,0 +1,15 @@
+{
+  "bg-neutral-subtlest": 1,
+  "bg-neutral-subtler": 2,
+  "bg-neutral-subtle": 3,
+  "bg-neutral": 5,
+  "bg-neutral-bold": 7,
+  "text-on-neutral-subtlest": 8,
+  "text-on-neutral-subtler": 8,
+  "text-on-neutral-subtle": 8,
+  "text-on-neutral": 8,
+  "text-on-neutral-bold": 2,
+  "text-neutral": 6,
+  "text-neutral-bold": 8,
+  "border-neutral": 4
+}

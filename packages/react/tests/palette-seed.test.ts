@@ -5,13 +5,18 @@ import { clampChroma, formatHex } from 'culori/fn';
 import { expect, test } from 'vitest';
 
 import palette from '../../core/tokens/palette.json';
-import { createIdsPalette, shadeOf } from '../src/components/utility/ids-provider/palette-seed';
-import { PALETTE_STEPS, type IdsPalette } from '../src/components/utility/ids-provider/theme';
+import {
+  SCALE_RULES,
+  createIdsPalette,
+} from '../src/components/utility/ids-provider/palette-scales';
+import { createIdsRamp, shadeOf } from '../src/components/utility/ids-provider/palette-seed';
+import { RAMP_STEPS, type IdsRamp } from '../src/components/utility/ids-provider/theme';
 import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
 import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
+import { IDS_NEUTRAL_SCALES } from '../src/tokens/color-roles';
 import { STATUS_PALETTES } from '../src/tokens/palette-model';
 
-const stepsOf = (built: IdsPalette) => PALETTE_STEPS.map((step) => built[step]);
+const stepsOf = (built: IdsRamp) => RAMP_STEPS.map((step) => built[step]);
 
 const seedAt = (l: number, c: number, h: number) =>
   formatHex(clampChroma({ mode: 'oklch', l, c, h }, 'oklch'));
@@ -19,7 +24,7 @@ const seedAt = (l: number, c: number, h: number) =>
 test('the status palettes are the four in core', () => {
   for (const [name, steps] of Object.entries(STATUS_PALETTES))
     expect(steps).toEqual(
-      PALETTE_STEPS.map((step) => palette[name as keyof typeof STATUS_PALETTES][step].$value),
+      RAMP_STEPS.map((step) => palette[name as keyof typeof STATUS_PALETTES][step].$value),
     );
 });
 
@@ -29,7 +34,7 @@ test.each([
   ['#1e3a8a', 900],
   ['#7c3aed', 600],
 ] as const)('the seed %s lands on the step with the nearest lightness, %s', (seed, step) => {
-  const built = createIdsPalette(seed)!;
+  const built = createIdsRamp(seed)!;
 
   expect(built[step]).toBe(seed);
   expect(stepsOf(built).filter((hex) => hex === seed)).toHaveLength(1);
@@ -72,22 +77,46 @@ test(
 
 test('every seed builds a palette that runs from light to dark', () => {
   const unordered = everySeed().filter((seed) => {
-    const lightness = stepsOf(createIdsPalette(seed)!).map((hex) => shadeOf(hex).l);
+    const lightness = stepsOf(createIdsRamp(seed)!).map((hex) => shadeOf(hex).l);
     return lightness.some((l, index) => index > 0 && l >= lightness[index - 1]!);
   });
   expect(unordered).toEqual([]);
 });
 
+test('a seed builds an 8-step scale for each mode', () => {
+  const ramp = createIdsRamp('#2b7fff')!;
+  const { light, dark } = createIdsPalette('#2b7fff')!;
+
+  expect([...light, ...dark].every((hex) => /^#[0-9a-f]{6}$/.test(hex))).toBe(true);
+  expect(light).toHaveLength(8);
+  expect(dark).toHaveLength(8);
+  expect([light[1], light[2], light[3], light[4]]).toEqual([ramp[50], ramp[100], ramp[200], ramp[300]]);
+});
+
+test('the dark surfaces of a built scale sit at the lightness of the dark neutral', () => {
+  const darkSurfaces = SCALE_RULES.dark.surfaces.length;
+
+  for (const seed of everySeed()) {
+    const { dark } = createIdsPalette(seed)!;
+    dark.slice(0, darkSurfaces).forEach((hex, index) =>
+      expect(shadeOf(hex).l, `${seed} step ${index + 1}`).toBeCloseTo(
+        shadeOf(IDS_NEUTRAL_SCALES.dark[index]!).l,
+        2,
+      ),
+    );
+  }
+});
+
 test('a built palette is in 8-bit hex', () => {
-  const palette = createIdsPalette('oklch(0.62 0.19 150)')!;
+  const palette = createIdsRamp('oklch(0.62 0.19 150)')!;
   expect(stepsOf(palette).every((hex) => /^#[0-9a-f]{6}$/.test(hex))).toBe(true);
 });
 
 test('a gray seed builds a gray palette, and a bad seed is reported', () => {
   const isGray = (hex: string) =>
     hex.slice(1, 3) === hex.slice(3, 5) && hex.slice(3, 5) === hex.slice(5, 7);
-  expect(stepsOf(createIdsPalette('#808080')!).every(isGray)).toBe(true);
-  expect(createIdsPalette('not a color')).toBeUndefined();
+  expect(stepsOf(createIdsRamp('#808080')!).every(isGray)).toBe(true);
+  expect(createIdsRamp('not a color')).toBeUndefined();
   expect(checkIdsTheme({ primary: 'not a color' })).toEqual([
     { path: 'primary', message: 'primary is not a CSS color: not a color.' },
   ]);
@@ -103,8 +132,8 @@ test(
         '--input-type=module',
         '-e',
         `
-    const { createIdsPalette } = await import('./dist/components/utility/ids-provider/palette-seed.js');
-    process.stdout.write(createIdsPalette('#0d9488')?.[600] ?? 'undefined');
+    const { createIdsRamp } = await import('./dist/components/utility/ids-provider/palette-seed.js');
+    process.stdout.write(createIdsRamp('#0d9488')?.[600] ?? 'undefined');
   `,
       ],
       { cwd: fileURLToPath(new URL('../', import.meta.url)), encoding: 'utf8' },

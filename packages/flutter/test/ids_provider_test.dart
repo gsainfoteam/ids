@@ -40,7 +40,7 @@ void main() {
     );
     final colors = scope.colors;
     expect(colors.bgNeutralSubtlest, const Color(0xFFFFFFFF));
-    expect(colors.textNeutralBold, const Color(0xFF171717));
+    expect(colors.textNeutralBold, const Color(0xFF0A0A0A));
     expect(colors.borderNeutral, const Color(0xFFE5E5E5));
     expect(colors.textNeutral, const Color(0xFF525252));
     expect(colors.bgPrimary, const Color(0xFF155DFC));
@@ -115,7 +115,7 @@ void main() {
         expect(style.fontFamilyFallback, fallback);
         expect(style.fontSize, IdsTypography.bodyB3Regular.fontSize);
         expect(style.fontWeight, IdsTypography.bodyB3Regular.fontWeight);
-        expect(style.color, const Color(0xff171717));
+        expect(style.color, const Color(0xff0a0a0a));
       }
     },
   );
