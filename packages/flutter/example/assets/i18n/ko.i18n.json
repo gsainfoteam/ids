@@ -1,5 +1,49 @@
 {
   "ids(singleInterface=IdsMessages)": {
     "spinnerLabel": "불러오는 중"
+  },
+  "demo": {
+    "specimen": "Aa Wi 0123 한글",
+    "divider": {
+      "above": "위",
+      "below": "아래",
+      "or": "또는",
+      "account": "계정",
+      "settings": "설정",
+      "help": "도움말",
+      "signInWithEmail": "이메일로 로그인",
+      "signInWithSchool": "학교 계정으로 로그인"
+    },
+    "field": {
+      "label": "이메일",
+      "description": "안내를 받을 이메일 주소입니다.",
+      "hint": "예시 주소이며 실제로 발송되지 않습니다.",
+      "error": "올바른 이메일 주소를 입력해 주세요.",
+      "value": "hello@ids.example",
+      "longLabel": "공지를 받을 학교 이메일 또는 개인 이메일 주소"
+    },
+    "label": {
+      "text": "이메일",
+      "longText": "공지를 받을 학교 이메일 또는 개인 이메일 주소"
+    },
+    "spinner": {
+      "loadingList": "목록을 불러오는 중"
+    }
+  },
+  "examples": {
+    "divider": {
+      "separateAlternatives": "로그인 방법처럼 하나만 고르는 선택지 사이에 레이블 있는 구분선을 둡니다.",
+      "splitAToolbar": "툴바 Row를 IntrinsicHeight로 감싸면 세로 구분선이 글자 줄 높이만큼만 그려집니다."
+    },
+    "field": {
+      "reportAnInvalidValue": "값이 틀리면 invalid를 켭니다. 테두리와 오류 문구가 danger 색으로 바뀌고 오류 문구가 안내 문구를 대신합니다."
+    },
+    "spinner": {
+      "showProgressBesideText": "크기를 정하지 않은 스피너는 IconTheme을 따르므로 옆 글자와 크기와 색이 맞습니다."
+    },
+    "provider": {
+      "nestScopes": "IdsProviderScope는 부모 테마를 물려받고 정한 값만 바꿉니다. mode를 정한 scope만 자기 모드를 가집니다.",
+      "connectSlang": "slang 번역을 translation으로 넘기면 앱 언어를 바꿀 때 IDS 문구도 같이 바뀝니다. scope 아래 상태는 유지됩니다."
+    }
   }
 }

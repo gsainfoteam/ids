@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ids_flutter/ids.dart';
-import 'package:widgetbook/widgetbook.dart';
 
-import '../i18n/translations.g.dart';
-import '../ids_theme.dart';
-
-final providerIntegrationUseCases = [
-  WidgetbookUseCase(
-    name: 'Service integration',
-    builder: (context) =>
-        TranslationProvider(child: const ProviderIntegration()),
-  ),
-];
+import '../../catalog/palettes.dart';
+import '../../catalog/strings.dart';
+import '../../i18n/translations.g.dart';
 
 class ProviderIntegration extends StatefulWidget {
   const ProviderIntegration({super.key});
@@ -129,7 +121,9 @@ class _ScopeReadoutState extends State<ScopeReadout> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IdsLabel(child: Text('${widget.name} Aa Wi 0123 한글')),
+              IdsLabel(
+                child: Text('${widget.name} ${context.strings.demo.specimen}'),
+              ),
               Text(
                 '${widget.name}: count $count, radius ${ids.radius.standard}, locale ${ids.locale}, corner ${ids.cornerShape.name}',
                 style: text,

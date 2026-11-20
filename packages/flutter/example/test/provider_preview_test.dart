@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
-import 'package:ids_flutter_example/components/provider_preview.dart';
+import 'package:ids_flutter_example/components/utility/provider_preview.dart';
 import 'package:ids_flutter_example/i18n/translations.g.dart';
-import 'package:ids_flutter_example/ids_theme.dart';
+import 'package:ids_flutter_example/catalog/palettes.dart';
 
 void main() {
   testWidgets(
