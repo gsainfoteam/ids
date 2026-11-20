@@ -275,43 +275,6 @@ export const Controlled: Story = {
   },
 };
 
-export const SwitchingContent: Story = {
-  parameters: {
-    docs: {
-      description: {
-        story:
-          '고른 모드로 아래 내용을 바꿉니다. 제어 값으로 내용을 조건부로 그립니다. 탭과 패널을 오가는 탭 이동이면 `Tabs` 를 씁니다.',
-      },
-    },
-  },
-  render: function Render() {
-    const [method, setMethod] = useState('app');
-
-    return (
-      <div className="flex w-80 flex-col gap-4">
-        <SegmentedControl value={method} onValueChange={setMethod} aria-label="인증 방법" stretch>
-          <SegmentedControl.Item value="app">인증 앱</SegmentedControl.Item>
-          <SegmentedControl.Item value="sms">문자</SegmentedControl.Item>
-        </SegmentedControl>
-
-        {method === 'app' ? (
-          <p className="text-body-b3-regular">인증 앱에 뜬 6자리 코드를 입력하세요.</p>
-        ) : (
-          <p className="text-body-b3-regular">휴대폰으로 받은 6자리 코드를 입력하세요.</p>
-        )}
-      </div>
-    );
-  },
-  play: async ({ canvas, userEvent }) => {
-    await expect(canvas.getByText('인증 앱에 뜬 6자리 코드를 입력하세요.')).toBeVisible();
-    await userEvent.click(canvas.getByRole('radio', { name: '문자' }));
-    await expect(canvas.getByText('휴대폰으로 받은 6자리 코드를 입력하세요.')).toBeVisible();
-    await expect(canvas.queryByText('인증 앱에 뜬 6자리 코드를 입력하세요.')).toBeNull();
-    await userEvent.keyboard('{ArrowLeft}');
-    await expect(canvas.getByText('인증 앱에 뜬 6자리 코드를 입력하세요.')).toBeVisible();
-  },
-};
-
 export const Form: Story = {
   parameters: {
     docs: {

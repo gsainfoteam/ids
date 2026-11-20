@@ -13,7 +13,7 @@ import { Tabs } from '.';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const appearances = ['underline', 'pill', 'enclosed'] as const;
+const appearances = ['underline', 'pill', 'enclosed', 'segmented'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const meta = {
@@ -62,7 +62,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Appearance × Size"
-        description="underline 은 고른 탭의 글자와 아래 선을 primary 로, pill 은 고른 탭을 primary 의 옅은 채움으로, enclosed 는 고른 탭을 내용 쪽으로 열린 상자로 그리고 글자를 primary 로 칠합니다."
+        description="underline 은 고른 탭의 글자와 아래 선을 primary 로, pill 은 고른 탭을 primary 의 옅은 채움으로, enclosed 는 고른 탭을 내용 쪽으로 열린 상자로 그리고 글자를 primary 로 칠합니다. segmented 는 SegmentedControl 과 같은 트랙 위에 고른 탭을 칸으로 띄웁니다."
       >
         <Showcase.Matrix
           rows={sizes}
@@ -109,6 +109,18 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="enclosed">
           <Tabs defaultValue="profile" orientation="vertical" appearance="enclosed">
+            <Tabs.List aria-label="설정">
+              <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
+              <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
+              <Tabs.Trigger value="account">계정</Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="profile">이름과 사진</Tabs.Content>
+            <Tabs.Content value="alerts">알림 받을 곳</Tabs.Content>
+            <Tabs.Content value="account">비밀번호와 탈퇴</Tabs.Content>
+          </Tabs>
+        </Showcase.Row>
+        <Showcase.Row label="segmented">
+          <Tabs defaultValue="profile" orientation="vertical" appearance="segmented">
             <Tabs.List aria-label="설정">
               <Tabs.Trigger value="profile">프로필</Tabs.Trigger>
               <Tabs.Trigger value="alerts">알림</Tabs.Trigger>
@@ -167,6 +179,16 @@ export const Gallery: Story = {
             <Tabs.Content value="new">최신 글</Tabs.Content>
             <Tabs.Content value="popular">인기 글</Tabs.Content>
             <Tabs.Content value="comments">댓글 많은 글</Tabs.Content>
+          </Tabs>
+        </Showcase.Row>
+        <Showcase.Row label="segmented stretch" className="w-full max-w-md">
+          <Tabs defaultValue="qr" appearance="segmented" className="w-full">
+            <Tabs.List aria-label="로그인 방법" stretch>
+              <Tabs.Trigger value="qr">QR 코드</Tabs.Trigger>
+              <Tabs.Trigger value="password">비밀번호</Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="qr">휴대폰으로 QR 코드를 비춰요</Tabs.Content>
+            <Tabs.Content value="password">이메일과 비밀번호로 로그인해요</Tabs.Content>
           </Tabs>
         </Showcase.Row>
       </Showcase.Section>

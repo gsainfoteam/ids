@@ -2,7 +2,7 @@
 
 트랙 위에 칸을 나란히 놓고 그중 하나를 고르는 값 입력입니다. 보기 방식(목록, 격자), 차트 단위(일, 주, 월)처럼 선택지가 두세 개이고 바로 보여야 할 때 씁니다.
 
-- **Tabs 는 탭 이동, SegmentedControl 은 값이나 모드 고르기.** `Tabs` 는 `tablist`, `tab`, `tabpanel` 로 한 자리의 패널을 오가는 탭 이동입니다. SegmentedControl 은 값(차트 단위)이나 모드(로그인 방법)를 고르는 `radiogroup` 이고, 고른 값으로 아래 내용을 바꿀 수도 있습니다.
+- **패널을 오가면 `Tabs appearance="segmented"`.** 같은 트랙과 칸으로 그리면서 `tablist`, `tab`, `tabpanel` 과 `aria-controls` 를 이어 줍니다. 로그인 방법처럼 고른 모드마다 다른 내용을 보여 줄 때 씁니다. SegmentedControl 은 값(차트 단위, 보기 방식)을 고르는 `radiogroup` 입니다.
 - **선택지가 많거나 길면** `RadioGroup` 이나 `Select` 가 낫습니다. 여러 개를 고르면 `ToggleGroup selectionMode="multiple"` 입니다.
 - **native 라디오 그대로.** 칸마다 같은 `name` 의 `<input type="radio">` 가 있어 키보드, `required`, 폼 초기화, react-hook-form 이 RadioGroup 과 같습니다.
 - **타입이 좁혀진 항목.** 렌더 함수의 `Item` 은 `value` 가 컨트롤의 타입으로 좁혀집니다.
@@ -54,23 +54,6 @@ type Period = 'day' | 'week' | 'month';
 - `onValueChange` 는 사용자가 고를 때만 불립니다. 부모가 바꾼 값이나 폼 초기화는 알리지 않습니다.
 - 한 번 고르면 선택을 비울 수 없습니다. native 라디오 그룹과 같습니다.
 
-## 고른 모드로 내용 바꾸기
-
-```tsx
-const [method, setMethod] = useState('qr');
-
-<SegmentedControl value={method} onValueChange={setMethod} aria-label="로그인 방법" stretch>
-  <SegmentedControl.Item value="qr">QR 코드</SegmentedControl.Item>
-  <SegmentedControl.Item value="password">비밀번호</SegmentedControl.Item>
-</SegmentedControl>
-
-{method === 'qr' ? <QRLogin /> : <PasswordLogin />}
-```
-
-- 제어 값으로 아래 내용을 조건부로 그립니다. 로그인 QR 블록과 2단계 인증 블록이 이 모양입니다.
-- 화살표 키는 칸을 옮기면서 바로 골라서 내용도 곧바로 바뀝니다. 고르지 않은 모드의 내용은 DOM 에 남지 않으므로, 입력한 값을 모드 사이에서 지켜야 하면 상태를 컨트롤 바깥에 둡니다.
-- 탭과 패널의 관계(`aria-controls`)를 알려야 하는 탭 이동이면 `Tabs` 를 씁니다.
-
 ## 키보드
 
 | 키           | 동작                                           |
@@ -97,7 +80,7 @@ const [method, setMethod] = useState('qr');
 
 ## 모양
 
-- 트랙은 `bg-neutral-subtle`, 고른 칸은 `bg-segmented-control-item` 카드에 `shadow-xs` 입니다. 카드는 밝은 모드에서 `bg-neutral-subtlest`, 어두운 모드에서 트랙보다 한 단계 밝은 `bg-neutral` 입니다.
+- 모양은 segmented `Tabs` 와 같습니다. 트랙은 `bg-neutral-subtle`, 고른 칸은 `bg-segment` 카드에 `shadow-xs` 입니다. 카드는 밝은 모드에서 `bg-neutral-subtlest`, 어두운 모드에서 트랙보다 한 단계 밝은 `bg-neutral` 입니다.
 - 글자는 고르지 않은 칸이 `text-neutral`, 고른 칸이 `text-neutral-bold` 입니다.
 - 고르지 않은 칸의 hover 와 press 는 state layer 입니다. 글자색은 바뀌지 않습니다.
 - 키보드 포커스는 칸에 ring 을 그립니다. `invalid` 면 트랙에 `border-danger` 테두리가 붙습니다.
