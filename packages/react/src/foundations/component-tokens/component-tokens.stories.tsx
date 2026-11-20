@@ -122,8 +122,8 @@ export const Surfaces: Story = {
   render: () => (
     <Showcase>
       <Showcase.Section
-        title="panel 과 band"
-        description="bg-surface 은 Card, Dialog, 팝업의 면입니다. 다크 모드에서는 페이지보다 한 단계 밝아 그림자 없이도 떠 보입니다. bg-block 는 면 안의 띠이고, outline 컨트롤은 두 면 어디서나 테두리나 바탕으로 구분됩니다."
+        title="base, surface, block"
+        description="bg-base 는 페이지, bg-surface 는 Card, Dialog, 팝업의 면입니다. 다크 모드에서 surface 는 페이지보다 한 단계 밝아 그림자 없이도 떠 보입니다. bg-block 은 base 나 surface 위에서 구역을 나누는 바탕(Card footer, soft Card)이고, outline 컨트롤은 세 바탕 어디서나 테두리나 바탕으로 구분됩니다."
       >
         <div className="flex flex-col gap-4">
           {modes.map((mode) => (
@@ -136,6 +136,19 @@ export const Surfaces: Story = {
                 <Card.Header>
                   <Card.Title>{mode} · bg-surface</Card.Title>
                   <Card.Description>shadow-surface 은 라이트 모드에서만 그립니다.</Card.Description>
+                </Card.Header>
+                <Card.Content className="flex flex-col gap-3">
+                  <TextField aria-label="이름" placeholder="이름" />
+                  <Button variant="outline">outline</Button>
+                </Card.Content>
+                <Card.Footer className="justify-end">
+                  <Button variant="outline">bg-block footer</Button>
+                </Card.Footer>
+              </Card>
+              <Card variant="soft" className="w-72">
+                <Card.Header>
+                  <Card.Title>{mode} · bg-block</Card.Title>
+                  <Card.Description>soft Card 는 바탕 위의 구역입니다.</Card.Description>
                 </Card.Header>
                 <Card.Content className="flex flex-col gap-3">
                   <TextField aria-label="이름" placeholder="이름" />
