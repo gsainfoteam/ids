@@ -7,6 +7,7 @@
 - **자동과 수동.** 기본은 화살표로 옮기면 바로 고릅니다. `activationMode="manual"` 이면 Enter 나 Space 로 고릅니다.
 - **타입으로 막는 잘못된 값.** children 을 함수로 쓰면 탭 값의 타입으로 좁힌 `List`, `Trigger`, `Content` 를 받습니다.
 - **네 가지 모양.** 선(`underline`), 트랙 위 카드(`segmented`), 채움(`pill`), 상자(`enclosed`). `pill` 은 `variant` 로 채움 강도를 고릅니다.
+- **값을 고르면 SegmentedControl.** 패널을 바꾸지 않고 값만 고르는 칸(보기 방식, 차트 단위)은 `SegmentedControl` 입니다. `segmented` 와 같은 면을 씁니다.
 
 ```tsx
 import { Tabs } from '@gsainfoteam/ids-react';
