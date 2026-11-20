@@ -27,9 +27,11 @@ import { hasExtension } from '../tool';
 
 import type { Translate } from '../../../../internal/translate';
 import type { ChainedCommands, Editor as TiptapEditor } from '@tiptap/core';
+import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 
 export type EditorBlock = {
   id: string;
+  nodeType: string;
   label: (t: Translate) => string;
   icon: ReactElement;
   keywords: readonly string[];
@@ -56,6 +58,7 @@ const headingLevelsOf = (editor: TiptapEditor): readonly number[] =>
 
 const heading = (level: HeadingLevel): EditorBlock => ({
   id: `heading-${level}`,
+  nodeType: 'heading',
   label: (t) => t('editor.heading', { level }),
   icon: HEADING_ICONS[level],
   keywords: [`h${level}`, 'heading', 'title'],
@@ -68,6 +71,7 @@ const heading = (level: HeadingLevel): EditorBlock => ({
 export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   {
     id: 'paragraph',
+    nodeType: 'paragraph',
     label: (t) => t('editor.paragraph'),
     icon: <Pilcrow />,
     keywords: ['text', 'paragraph', 'plain'],
@@ -82,6 +86,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   heading(4),
   {
     id: 'bulletList',
+    nodeType: 'bulletList',
     label: (t) => t('editor.bulletList'),
     icon: <ListBulletIcon />,
     keywords: ['ul', 'bullet', 'list', '-'],
@@ -92,6 +97,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   },
   {
     id: 'orderedList',
+    nodeType: 'orderedList',
     label: (t) => t('editor.orderedList'),
     icon: <NumberedListIcon />,
     keywords: ['ol', 'numbered', 'ordered', 'list', '1.'],
@@ -102,6 +108,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   },
   {
     id: 'taskList',
+    nodeType: 'taskList',
     label: (t) => t('editor.taskList'),
     icon: <ListTodo />,
     keywords: ['todo', 'task', 'checkbox', '[]'],
@@ -112,6 +119,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   },
   {
     id: 'blockquote',
+    nodeType: 'blockquote',
     label: (t) => t('editor.blockquote'),
     icon: <TextQuote />,
     keywords: ['quote', 'blockquote', '>'],
@@ -122,6 +130,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   },
   {
     id: 'codeBlock',
+    nodeType: 'codeBlock',
     label: (t) => t('editor.codeBlock'),
     icon: <SquareCode />,
     keywords: ['code', 'pre', '```'],
@@ -132,6 +141,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   },
   {
     id: 'callout',
+    nodeType: 'callout',
     label: (t) => t('editor.callout'),
     icon: <InformationCircleIcon />,
     keywords: ['callout', 'note', 'tip', 'warning', 'alert'],
@@ -142,6 +152,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   },
   {
     id: 'details',
+    nodeType: 'details',
     label: (t) => t('editor.details'),
     icon: <ListCollapse />,
     keywords: ['toggle', 'details', 'collapse', 'fold'],
@@ -152,6 +163,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   },
   {
     id: 'horizontalRule',
+    nodeType: 'horizontalRule',
     label: (t) => t('editor.horizontalRule'),
     icon: <MinusIcon />,
     keywords: ['divider', 'hr', 'line', 'separator', '---'],
@@ -162,6 +174,7 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
   },
   {
     id: 'table',
+    nodeType: 'table',
     label: (t) => t('editor.table'),
     icon: <TableCellsIcon />,
     keywords: ['table', 'grid'],
@@ -171,6 +184,9 @@ export const EDITOR_BLOCKS: readonly EditorBlock[] = [
     holdsText: false,
   },
 ];
+
+export const turnsIntoOtherBlocks = (node: ProseMirrorNode) =>
+  EDITOR_BLOCKS.some((block) => block.holdsText && block.nodeType === node.type.name);
 
 export const blocksAvailableIn = (editor: TiptapEditor) =>
   EDITOR_BLOCKS.filter((block) => block.available(editor));

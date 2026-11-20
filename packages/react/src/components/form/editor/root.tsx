@@ -345,6 +345,7 @@ export function EditorRoot(props: Editor.Props) {
     <>
       {bubbles}
       {loaded && setup && <loaded.engine.EditorSlashMenu store={setup.slashMenu} />}
+      {loaded && setup && <loaded.engine.EditorBlockHandle store={setup.blockHandle} />}
       {mention && setup?.mentionMenu && <mention.EditorMentionMenu store={setup.mentionMenu} />}
     </>
   );

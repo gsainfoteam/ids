@@ -99,6 +99,8 @@ export const editorStyle = tv({
     mentionText: 'flex min-w-0 flex-col',
     mentionLabel: 'truncate',
     mentionDescription: 'truncate text-caption-c1-regular text-neutral',
+    blockHandle:
+      'absolute start-1.5 z-10 m-0 cursor-grab text-neutral active:cursor-grabbing [&_svg]:size-4 data-hidden:pointer-events-none data-hidden:invisible',
     detailsPlaceholder: 'pointer-events-none absolute start-0 top-2 font-medium text-neutral',
   },
   variants: {
@@ -121,12 +123,14 @@ export const editorStyle = tv({
         root: 'text-body-b3-regular',
         barItems: 'p-1',
         content: 'px-3 py-2',
+        blockHandle: 'size-6',
         count: 'px-2 text-caption-c1-regular',
       },
       tiny: {
         root: 'text-caption-c1-regular',
         barItems: 'p-0.5',
         content: 'px-2 py-1.5',
+        blockHandle: 'size-5 p-0.5',
         count: 'px-1.5 text-caption-c2-regular',
       },
     } satisfies Record<IdsSize, object>,
@@ -139,6 +143,10 @@ export const editorStyle = tv({
       false: { content: 'cursor-default' },
     },
   },
+  compoundVariants: [
+    { editable: true, size: 'standard', class: { content: 'ps-9' } },
+    { editable: true, size: 'tiny', class: { content: 'ps-8' } },
+  ],
   defaultVariants: {
     variant: 'outline',
     size: 'standard',

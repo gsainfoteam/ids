@@ -2,9 +2,10 @@ import { useState } from 'react';
 
 import { renderToString } from 'react-dom/server';
 import { expect, test, vi } from 'vitest';
-import { page, userEvent } from 'vitest/browser';
+import { cdp, page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
+import { skipWithoutCdp } from './engines';
 import { testTheme } from './theme';
 import { Button, Dialog, Field, IdsProvider } from '../src';
 import { toast } from '../src/components/feedback/toast';
@@ -46,6 +47,57 @@ const imageInput = () =>
   page.elementLocator(document.querySelector<HTMLInputElement>('[data-editor-image-input]')!);
 
 const placeholders = () => document.querySelectorAll('[data-editor-upload]').length;
+
+type Point = { x: number; y: number };
+
+const inTheTopPage = (point: Point) => {
+  const frame = window.frameElement!.getBoundingClientRect();
+  const scale = frame.width / window.innerWidth;
+  return { x: frame.left + point.x * scale, y: frame.top + point.y * scale };
+};
+
+const centerOf = (element: Element): Point => {
+  const box = element.getBoundingClientRect();
+  return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+};
+
+async function dragNatively(source: Element, target: Point) {
+  const session = cdp();
+  await session.send('Input.setInterceptDrags', { enabled: true });
+  const from = inTheTopPage(centerOf(source));
+  const to = inTheTopPage(target);
+  const dropped = new Promise<void>((resolve) => {
+    session.on('Input.dragIntercepted', async ({ data }) => {
+      for (const type of ['dragEnter', 'dragOver', 'drop'] as const)
+        await session.send('Input.dispatchDragEvent', { type, ...to, data });
+      resolve();
+    });
+  });
+  const held = { button: 'left', buttons: 1 } as const;
+
+  await session.send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    ...from,
+    ...held,
+    clickCount: 1,
+  });
+  const pastTheDragThreshold = { x: from.x + 8, y: from.y - 8 };
+  await session.send('Input.dispatchMouseEvent', {
+    type: 'mouseMoved',
+    ...pastTheDragThreshold,
+    ...held,
+  });
+  await session.send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...to, ...held });
+  await dropped;
+  await session.send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    ...to,
+    button: 'left',
+    buttons: 0,
+    clickCount: 1,
+  });
+  await session.send('Input.setInterceptDrags', { enabled: false });
+}
 
 async function editable(name: string) {
   const content = page.getByRole('textbox', { name });
@@ -1148,4 +1200,87 @@ test('without mentions, @ is plain text', async () => {
 
   await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('me@ids');
   expect(page.getByRole('listbox').query()).toBeNull();
+});
+
+test('hovering a block shows its handle, whose menu turns, duplicates and deletes the block', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      format="markdown"
+      aria-label="본문"
+      defaultValue={'첫 줄\n\n둘째 줄'}
+      onValueChange={onValueChange}
+    />,
+  );
+  const content = await editable('본문');
+  const handle = page.getByRole('button', { name: '블록 메뉴' });
+  await expect.element(handle).not.toBeInTheDocument();
+
+  await userEvent.hover(content.getByText('둘째 줄'));
+  await expect.element(handle).toBeVisible();
+  await userEvent.click(handle);
+  await userEvent.click(page.getByRole('menuitem', { name: '바꾸기' }));
+  await userEvent.click(page.getByRole('menuitem', { name: '제목 2' }));
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('첫 줄\n\n## 둘째 줄');
+  await expect.element(content).toHaveFocus();
+
+  await userEvent.hover(content.getByText('첫 줄'));
+  await userEvent.click(handle);
+  await userEvent.click(page.getByRole('menuitem', { name: '복제' }));
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('첫 줄\n\n첫 줄\n\n## 둘째 줄');
+
+  await userEvent.hover(content.getByText('둘째 줄'));
+  await userEvent.click(handle);
+  await userEvent.click(page.getByRole('menuitem', { name: '삭제' }));
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('첫 줄\n\n첫 줄');
+});
+
+test('Add a block below opens the block menu on a new line under the block', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      format="markdown"
+      aria-label="본문"
+      defaultValue={'위\n\n아래'}
+      onValueChange={onValueChange}
+    />,
+  );
+  const content = await editable('본문');
+  await userEvent.hover(content.getByText('위'));
+  await userEvent.click(page.getByRole('button', { name: '블록 메뉴' }));
+  await userEvent.click(page.getByRole('menuitem', { name: '아래에 블록 넣기' }));
+
+  await expect.element(page.getByRole('listbox', { name: '블록 넣기' })).toBeVisible();
+  await userEvent.keyboard('인용{Enter}가운데');
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('위\n\n> 가운데\n\n아래');
+});
+
+test('dragging a block by its handle moves it', async (context) => {
+  skipWithoutCdp(context);
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      format="markdown"
+      aria-label="본문"
+      defaultValue={'하나\n\n둘\n\n- 셋'}
+      onValueChange={onValueChange}
+    />,
+  );
+  const content = await editable('본문');
+  await userEvent.hover(content.getByText('셋'));
+  const handle = page.getByRole('button', { name: '블록 메뉴' });
+  await expect.element(handle).toBeVisible();
+
+  const first = content.getByText('하나').element().getBoundingClientRect();
+  await dragNatively(handle.element(), { x: first.left + 4, y: first.top + 2 });
+
+  await expect.poll(() => onValueChange.mock.lastCall?.[0]).toBe('- 셋\n\n하나\n\n둘');
+});
+
+test('a read-only Editor has no block handle', async () => {
+  render(<Editor readOnly aria-label="본문" defaultValue="<p>읽기만</p>" />);
+  const content = page.getByRole('textbox', { name: '본문' });
+  await expect.element(content).toHaveAttribute('contenteditable', 'false');
+  await userEvent.hover(content.getByText('읽기만'));
+  expect(page.getByRole('button', { name: '블록 메뉴' }).query()).toBeNull();
 });

@@ -161,6 +161,16 @@ mixin IdsMessages {
 
   String? get editorAlignRight => null;
 
+  String? get editorBlockDelete => null;
+
+  String? get editorBlockDuplicate => null;
+
+  String? get editorBlockHandle => null;
+
+  String? get editorBlockInsertBelow => null;
+
+  String? get editorBlockTurnInto => null;
+
   String? get editorBlockType => null;
 
   String? get editorBlockquote => null;
@@ -848,6 +858,21 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get editorAlignRight => '오른쪽 정렬';
+
+  @override
+  String get editorBlockDelete => '삭제';
+
+  @override
+  String get editorBlockDuplicate => '복제';
+
+  @override
+  String get editorBlockHandle => '블록 메뉴';
+
+  @override
+  String get editorBlockInsertBelow => '아래에 블록 넣기';
+
+  @override
+  String get editorBlockTurnInto => '바꾸기';
 
   @override
   String get editorBlockType => '문단 모양';

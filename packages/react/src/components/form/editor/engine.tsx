@@ -7,6 +7,8 @@ import { EditorContent, useEditor, type UseEditorOptions } from '@tiptap/react';
 
 import { blockMatches, blocksAvailableIn, type EditorBlock } from './blocks/catalog';
 import { EditorCodeBlockNode } from './code-block/node';
+import { BlockHandle } from './drag-handle/extension';
+import { createBlockHoverStore, type BlockHoverStore } from './drag-handle/store';
 import { LeaveEscapeToTheLayers } from './escape-to-layers';
 import { EditorImageNode } from './image/node';
 import { SlashMenu } from './slash/extension';
@@ -21,11 +23,13 @@ import type { AnyExtension, Editor as TiptapEditor, Extensions } from '@tiptap/c
 
 export { EditorContent };
 export { EditorSlashMenu } from './slash/menu';
+export { EditorBlockHandle } from './drag-handle/handle';
 
 export type EngineSetup = {
   extensions: Extensions;
   slashMenu: SuggestionStore<EditorBlock>;
   mentionMenu: SuggestionStore<EditorMention> | null;
+  blockHandle: BlockHoverStore;
 };
 export type ImageSetup = {
   uploaded: ReadonlySet<string>;
@@ -56,6 +60,8 @@ export function extensionsFor({
   const mentionMenu = features.mention
     ? createSuggestionStore<EditorMention>(mentionMenuKey)
     : null;
+
+  const blockHandle = createBlockHoverStore();
 
   const extensions = [
     documentStarterKit([1, 2, 3, 4], { codeBlock: false }),
@@ -88,10 +94,11 @@ export function extensionsFor({
       blocks: (editor, query) =>
         blocksAvailableIn(editor).filter((block) => blockMatches(block, query, t)),
     }),
+    BlockHandle.configure({ store: blockHandle }),
     ...(markdown ? [markdown] : []),
   ];
 
-  return { extensions, slashMenu, mentionMenu };
+  return { extensions, slashMenu, mentionMenu, blockHandle };
 }
 
 export function EditorEngine({
