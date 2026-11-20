@@ -641,6 +641,50 @@ test('without onImageUpload there is no Image tool, files are not pasted and pas
   expect(content.element().querySelectorAll('img')).toHaveLength(1);
 });
 
+const WORD_CLIPBOARD = `<html xmlns:o="urn:schemas-microsoft-com:office:office"><body><!--StartFragment-->
+<p class=MsoNormal>목록 앞<o:p></o:p></p>
+<p class=MsoListParagraphCxSpFirst style='mso-list:l0 level1 lfo1'><![if !supportLists]><span style='mso-list:Ignore'>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp; </span></span><![endif]>하나<o:p></o:p></p>
+<p class=MsoListParagraphCxSpMiddle style='mso-list:l0 level2 lfo1'><![if !supportLists]><span style='mso-list:Ignore'>·<span>&nbsp;</span></span><![endif]>안쪽<o:p></o:p></p>
+<p class=MsoListParagraphCxSpLast style='mso-list:l0 level1 lfo1'><![if !supportLists]><span style='mso-list:Ignore'>2.<span>&nbsp;</span></span><![endif]>둘<o:p></o:p></p>
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+<p class=MsoNormal><b>굵게</b> 끝<o:p></o:p></p>
+<!--EndFragment--></body></html>`;
+
+const GOOGLE_DOCS_CLIPBOARD = `<meta charset="utf-8"><b style="font-weight:normal;" id="docs-internal-guid-5f1c"><p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span style="font-size:11pt;font-weight:700;">굵게</span><span style="font-size:11pt;"> 보통</span></p><br><ul style="margin-top:0;margin-bottom:0;"><li dir="ltr" style="list-style-type:disc;" aria-level="1"><p dir="ltr" role="presentation"><span>하나</span></p></li><ul><li dir="ltr" style="list-style-type:circle;" aria-level="2"><p dir="ltr" role="presentation"><span>안쪽</span></p></li></ul></ul></b>`;
+
+async function pasteHtml(html: string) {
+  const onValueChange = vi.fn();
+  render(
+    <Editor aria-label="본문" onValueChange={onValueChange}>
+      <Editor.Content />
+    </Editor>,
+  );
+  const content = await editable('본문');
+  await userEvent.click(content);
+  content.element().dispatchEvent(
+    new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: transfer([], html) }),
+  );
+  return onValueChange;
+}
+
+test('a list pasted from Word becomes a nested list, without its markers and blank paragraphs', async () => {
+  const onValueChange = await pasteHtml(WORD_CLIPBOARD);
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe(
+      '<p>목록 앞</p><ol><li><p>하나</p><ul><li><p>안쪽</p></li></ul></li><li><p>둘</p></li></ol><p><strong>굵게</strong> 끝</p>',
+    );
+});
+
+test('a paste from Google Docs keeps its bold and lists, without blank paragraphs between blocks', async () => {
+  const onValueChange = await pasteHtml(GOOGLE_DOCS_CLIPBOARD);
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('<p><strong>굵게</strong> 보통</p><ul><li><p>하나</p><ul><li><p>안쪽</p></li></ul></li></ul>');
+});
+
 test('javascript: and data: addresses never become images, in HTML, markdown or JSON', async () => {
   render(
     <>

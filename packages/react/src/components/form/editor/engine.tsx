@@ -11,6 +11,7 @@ import { BlockHandle } from './drag-handle/extension';
 import { createBlockHoverStore, type BlockHoverStore } from './drag-handle/store';
 import { LeaveEscapeToTheLayers } from './escape-to-layers';
 import { EditorImageNode } from './image/node';
+import { CleanPastedHtml } from './paste/extension';
 import { SlashMenu } from './slash/extension';
 import { slashMenuKey, mentionMenuKey } from './suggestion/keys';
 import { createSuggestionStore, type SuggestionStore } from './suggestion/store';
@@ -77,6 +78,7 @@ export function extensionsFor({
     Placeholder.configure({ placeholder: placeholderOfTheTextbox }),
     CharacterCount.configure({ limit: maxLength }),
     LeaveEscapeToTheLayers,
+    CleanPastedHtml,
     EditorImageNode.configure({
       uploaded: images.uploaded,
       insertable: !!features.imageUpload,
