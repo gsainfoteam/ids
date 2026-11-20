@@ -8,9 +8,9 @@ export const IDS_STATUS_FAMILIES = ['success', 'warning', 'danger', 'info'] as c
 
 export const IDS_COLOR_FAMILIES = ['neutral', 'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'] as const;
 
-export const IDS_FAMILY_SLOTS = ['bg-{family}-subtlest', 'bg-{family}-subtler', 'bg-{family}-subtle', 'bg-{family}', 'bg-{family}-bold', 'text-on-{family}-subtlest', 'text-on-{family}-subtler', 'text-on-{family}-subtle', 'text-on-{family}', 'text-on-{family}-bold', 'text-{family}', 'text-{family}-bold', 'border-{family}'] as const;
+export const IDS_FAMILY_SLOTS = ['bg-base', 'bg-surface', 'bg-block', 'bg-{family}-soft', 'bg-{family}-solid', 'text-on-base', 'text-on-surface', 'text-on-block', 'text-on-{family}-soft', 'text-on-{family}-solid', 'text-{family}', 'text-{family}-strong', 'border-{family}', 'border-{family}-strong'] as const;
 
-export const IDS_NEUTRAL_ONLY_SLOTS = ['bg-{family}-subtlest', 'text-on-{family}-subtlest', 'bg-{family}-bold', 'text-on-{family}-bold', 'text-{family}-bold'] as const;
+export const IDS_NEUTRAL_ONLY_SLOTS = ['bg-base', 'bg-surface', 'bg-block', 'text-on-base', 'text-on-surface', 'text-on-block'] as const;
 
 export const IDS_STATE_OPACITY = {
   'hover': 0.06,
@@ -24,22 +24,18 @@ export const IDS_STATE_OPACITY = {
 export const IDS_STATE_FILL_COLOR = '#000000';
 
 export const IDS_NEUTRAL_SCALES = {
-  light: ['#ffffff', '#fafafa', '#f5f5f5', '#e5e5e5', '#d4d4d4', '#525252', '#171717', '#0a0a0a'],
-  dark: ['#0a0a0a', '#171717', '#1e1e1e', '#232323', '#2f2f2f', '#d4d4d4', '#fafafa', '#fafafa'],
+  light: ['#ffffff', '#ffffff', '#fafafa', '#f5f5f5', '#e5e5e5', '#d4d4d4', '#a3a3a3', '#525252', '#0a0a0a'],
+  dark: ['#0a0a0a', '#171717', '#1e1e1e', '#262626', '#2e2e2e', '#3a3a3a', '#737373', '#d4d4d4', '#fafafa'],
 } as const;
 
 export const IDS_NEUTRAL_STEPS = {
-  'bg-neutral-subtlest': 1,
-  'bg-neutral-subtler': 2,
-  'bg-neutral-subtle': 3,
-  'bg-neutral': 5,
-  'bg-neutral-bold': 7,
-  'text-on-neutral-subtlest': 8,
-  'text-on-neutral-subtler': 8,
-  'text-on-neutral-subtle': 8,
-  'text-on-neutral': 8,
-  'text-on-neutral-bold': 2,
-  'text-neutral': 6,
-  'text-neutral-bold': 8,
-  'border-neutral': 4,
+  'bg-base': 1,
+  'bg-surface': 2,
+  'bg-block': 3,
+  'bg-neutral-soft': 4,
+  'bg-neutral-solid': 9,
+  'border-neutral': 5,
+  'border-neutral-strong': 6,
+  'text-neutral': 8,
+  'text-neutral-strong': 9,
 } as const;

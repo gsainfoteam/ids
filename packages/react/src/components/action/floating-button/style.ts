@@ -12,10 +12,7 @@ import type { IdsSize } from '../../../tokens/types';
 const opaqueFills = {
   solid: cn(controlSurface.variant.solid, 'shadow-lg'),
   soft: cn(controlSurface.variant.soft),
-  outline: cn(
-    'bg-neutral-subtlest text-neutral-bold inset-ring-1 inset-ring-neutral',
-    pressStates,
-  ),
+  outline: cn('bg-base text-neutral-strong inset-ring-1 inset-ring-neutral', pressStates),
   glossy: cn(controlSurface.variant.glossy, 'shadow-lg data-active:shadow-lg'),
 } satisfies Record<FloatingButton.Variant, string>;
 

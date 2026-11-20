@@ -67,17 +67,17 @@ describe('checkIdsTheme', () => {
     expect(checkIdsTheme({ primary: palettes.blue, scale: 0.875 })).toEqual([]);
   });
 
-  test('reports a scale that is not 8 colors, and a step that is not a color', () => {
+  test('reports a scale that is not 9 colors, and a step that is not a color', () => {
     const { light, dark } = createIdsPalette('#2b7fff')!;
 
     expect(
-      checkIdsTheme({ primary: { light: light.slice(0, 7) as never, dark } }).map(
+      checkIdsTheme({ primary: { light: light.slice(0, 8) as never, dark } }).map(
         (issue) => issue.path,
       ),
     ).toEqual(['primary.light']);
     expect(
-      checkIdsTheme({ primary: { light, dark: [...dark.slice(0, 7), 'bluish'] as never } }),
-    ).toEqual([{ path: 'primary.dark.8', message: 'Step 8 is not a CSS color: bluish.' }]);
+      checkIdsTheme({ primary: { light, dark: [...dark.slice(0, 8), 'bluish'] as never } }),
+    ).toEqual([{ path: 'primary.dark.9', message: 'Step 9 is not a CSS color: bluish.' }]);
   });
 
   test('accepts any CSS color for a step', () => {
@@ -95,11 +95,12 @@ describe('a palette given as light and dark scales', () => {
     expect(issues).toEqual([]);
     expect(colors!.palettes.primary).toEqual(given);
     for (const mode of ['light', 'dark'] as const) {
-      expect(colors!.roles[mode]['bg-primary-subtler']).toBe(given[mode][1]);
-      expect(colors!.roles[mode]['bg-primary-subtle']).toBe(given[mode][2]);
-      expect(colors!.roles[mode]['text-primary']).toBe(given[mode][5]);
-      expect(colors!.roles[mode]['bg-primary']).toBe(given[mode][6]);
-      expect(colors!.roles[mode]['text-on-primary-subtle']).toBe(given[mode][7]);
+      expect(colors!.roles[mode]['bg-primary-soft']).toBe(given[mode][3]);
+      expect(colors!.roles[mode]['border-primary']).toBe(given[mode][4]);
+      expect(colors!.roles[mode]['border-primary-strong']).toBe(given[mode][5]);
+      expect(colors!.roles[mode]['bg-primary-solid']).toBe(given[mode][6]);
+      expect(colors!.roles[mode]['text-primary']).toBe(given[mode][7]);
+      expect(colors!.roles[mode]['text-primary-strong']).toBe(given[mode][8]);
     }
   });
 

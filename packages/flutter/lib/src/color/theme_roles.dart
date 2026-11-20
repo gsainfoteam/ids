@@ -90,11 +90,33 @@ ParsedColors _parsePalette(List<Color> light, List<Color> dark, String path) {
   );
   return (
     colors: (
-      ramp: IdsRamp.fromSeed(stepOf(palette.light, ScaleStep.fill)),
+      ramp: IdsRamp.fromSeed(stepOf(palette.light, ScaleStep.solid)),
       palette: palette,
     ),
     issues: const [],
   );
+}
+
+Color _textOnRole(
+  String role,
+  Color background,
+  Backdrop backdrop,
+  List<Color> scale,
+  IdsMode mode,
+  IdsRamp? ramp,
+  String path,
+  List<IdsThemeIssue> issues,
+) {
+  final on = textOn(background, backdrop, scale, mode, ramp);
+  if (!on.reaches) {
+    issues.add(
+      IdsThemeIssue(
+        path,
+        '${mode.name}: no color of the scale, its ramp, white or neutral 950 reaches Lc ${textLc.round()} as $role, under the hover and press layers too.',
+      ),
+    );
+  }
+  return on.text;
 }
 
 ({Roles roles, List<IdsThemeIssue> issues}) familyRoles(
@@ -102,55 +124,74 @@ ParsedColors _parsePalette(List<Color> light, List<Color> dark, String path) {
   List<Color> scale,
   IdsMode mode,
   List<Color> neutral, [
+  IdsRamp? ramp,
   String? path,
 ]) {
   final at = path ?? family;
   final issues = <IdsThemeIssue>[];
-  final page = stepOf(neutral, ScaleStep.page);
-  final band = stepOf(scale, ScaleStep.band);
   final soft = stepOf(scale, ScaleStep.soft);
-  final fill = stepOf(scale, ScaleStep.fill);
+  final solid = stepOf(scale, ScaleStep.solid);
+  final strongBorder = stepOf(scale, ScaleStep.strongBorder);
   final text = stepOf(scale, ScaleStep.text);
   final strongText = stepOf(scale, ScaleStep.strongText);
+  final bases = textBases(neutral, soft);
+  final surfaces = 'base, surface, block and $family-soft';
 
-  final onFill = mostReadable([fill]);
-  if (onFill.lc < textLc) {
+  if (!reaches(strongBorder, bases, markLc)) {
     issues.add(
       IdsThemeIssue(
         at,
-        '${mode.name}: neither white nor neutral 950 reaches Lc ${textLc.round()} on the $family fill (step ${ScaleStep.fill}) and under its hover and press layers.',
+        '${mode.name}: border-$family-strong (step ${ScaleStep.strongBorder}) does not reach Lc ${markLc.round()} on $surfaces.',
       ),
     );
   }
 
-  if (!readsOn(strongText, [band, soft], fill)) {
+  if (!readsOn(text, bases, solid, accentTextLc)) {
     issues.add(
       IdsThemeIssue(
         at,
-        '${mode.name}: $family step ${ScaleStep.strongText} does not reach Lc ${textLc.round()} on $family-subtler and $family-subtle (steps ${ScaleStep.band} and ${ScaleStep.soft}) and under their hover and press layers.',
+        '${mode.name}: text-$family (step ${ScaleStep.text}) does not reach Lc ${accentTextLc.round()} on $surfaces, under their hover and press layers too.',
       ),
     );
   }
 
-  if (!readsOn(text, [page, band, soft], fill, accentTextLc)) {
+  if (!readsOn(strongText, bases, solid)) {
     issues.add(
       IdsThemeIssue(
         at,
-        '${mode.name}: $family step ${ScaleStep.text} does not reach Lc ${accentTextLc.round()} as $family text on the surface, $family-subtler and $family-subtle, under their hover and press layers too.',
+        '${mode.name}: text-$family-strong (step ${ScaleStep.strongText}) does not reach Lc ${textLc.round()} on $surfaces, under their hover and press layers too.',
       ),
     );
   }
 
   return (
     roles: {
-      'bg-$family-subtler': band,
-      'bg-$family-subtle': soft,
-      'bg-$family': fill,
-      'text-on-$family-subtler': strongText,
-      'text-on-$family-subtle': strongText,
-      'text-on-$family': onFill.text,
+      'bg-$family-soft': soft,
+      'bg-$family-solid': solid,
+      'border-$family': stepOf(scale, ScaleStep.border),
+      'border-$family-strong': strongBorder,
       'text-$family': text,
-      'border-$family': text,
+      'text-$family-strong': strongText,
+      'text-on-$family-soft': _textOnRole(
+        'text-on-$family-soft',
+        soft,
+        TintedBackdrop(solid),
+        scale,
+        mode,
+        ramp,
+        at,
+        issues,
+      ),
+      'text-on-$family-solid': _textOnRole(
+        'text-on-$family-solid',
+        solid,
+        const SolidBackdrop(),
+        scale,
+        mode,
+        ramp,
+        at,
+        issues,
+      ),
     },
     issues: issues,
   );
@@ -175,11 +216,40 @@ IdsPalette neutralPalette(IdsNeutral kind, IdsRamp primary) {
   );
 }
 
-Roles neutralRoles(List<Color> neutral) => {
-  for (final MapEntry(key: slot, value: step)
-      in IdsColorRoles.neutralSteps.entries)
-    slot: neutral[step - 1],
-};
+const _neutralTextOn = <(String, String, Backdrop)>[
+  ('text-on-base', 'bg-base', NeutralBackdrop()),
+  ('text-on-surface', 'bg-surface', NeutralBackdrop()),
+  ('text-on-block', 'bg-block', NeutralBackdrop()),
+  ('text-on-neutral-soft', 'bg-neutral-soft', NeutralBackdrop()),
+  ('text-on-neutral-solid', 'bg-neutral-solid', SolidBackdrop()),
+];
+
+Roles neutralRoles(
+  List<Color> neutral,
+  IdsMode mode, [
+  List<IdsThemeIssue>? issues,
+]) {
+  final roles = <String, Color>{
+    for (final MapEntry(key: slot, value: step)
+        in IdsColorRoles.neutralSteps.entries)
+      slot: neutral[step - 1],
+  };
+
+  for (final (role, background, backdrop) in _neutralTextOn) {
+    roles[role] = _textOnRole(
+      role,
+      roles[background]!,
+      backdrop,
+      neutral,
+      mode,
+      null,
+      'neutral',
+      issues ?? [],
+    );
+  }
+
+  return roles;
+}
 
 bool _isStatus(String family) => IdsColorRoles.statusFamilies.contains(family);
 
@@ -268,7 +338,7 @@ ColorResolution resolveColors(IdsThemeOverrides theme) {
   };
 
   Roles rolesIn(IdsMode mode) {
-    final roles = neutralRoles(neutral[mode]);
+    final roles = neutralRoles(neutral[mode], mode, issues);
 
     for (final family in coloredFamilies) {
       final resolved = familyRoles(
@@ -276,6 +346,7 @@ ColorResolution resolveColors(IdsThemeOverrides theme) {
         palettes[family]![mode],
         mode,
         neutral[mode],
+        ramps[family],
         _isStatus(family) ? 'status.$family' : family,
       );
       issues.addAll(resolved.issues);

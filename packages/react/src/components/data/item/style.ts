@@ -6,7 +6,7 @@ import type { IdsSize } from '../../../tokens/types';
 export const itemStyle = tv({
   slots: {
     root: [
-      'group/item relative isolate flex w-full min-w-0 items-center text-start text-neutral-bold',
+      'group/item relative isolate flex w-full min-w-0 items-center text-start text-neutral-strong',
       'state-layer data-selected:state-press',
       'transition-[--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
     ],
@@ -36,13 +36,13 @@ export const itemStyle = tv({
     variant: {
       ghost: {},
       outline: { root: 'inset-ring-1 inset-ring-neutral' },
-      soft: { root: 'bg-neutral-subtle' },
+      soft: { root: 'bg-block' },
     } satisfies Record<ItemVariant, object>,
     media: {
       ghost: {},
-      soft: { media: 'rounded-standard bg-neutral-subtle text-neutral-bold' },
+      soft: { media: 'rounded-standard bg-neutral-soft text-neutral-strong' },
       outline: {
-        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-neutral-bold',
+        media: 'rounded-standard inset-ring-1 inset-ring-neutral text-neutral-strong',
       },
     } satisfies Record<ItemVariant, object>,
     size: {

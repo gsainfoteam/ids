@@ -237,11 +237,11 @@ test.each(['light', 'dark'] as const)(
 
     await expect.element(screen.getByRole('button', { name: 'Save' })).toBeVisible();
     const style = getComputedStyle(footer);
-    expect(style.backgroundColor).toBe(colorOf('--ids-color-bg-band', root));
-    expect(style.color).toBe(textColorOf('--ids-color-text-neutral-bold', root));
+    expect(style.backgroundColor).toBe(colorOf('--ids-color-bg-block', root));
+    expect(style.color).toBe(textColorOf('--ids-color-text-neutral-strong', root));
     expect(style.borderTopWidth).toBe('1px');
     expect(style.borderTopColor).toBe(colorOf('--ids-color-border-neutral', root));
-    expect(getComputedStyle(root).backgroundColor).toBe(colorOf('--ids-color-bg-panel', root));
+    expect(getComputedStyle(root).backgroundColor).toBe(colorOf('--ids-color-bg-surface', root));
     expect(style.backgroundColor).not.toBe(getComputedStyle(root).backgroundColor);
 
     const cancel = screen.getByRole('button', { name: 'Cancel' }).element();

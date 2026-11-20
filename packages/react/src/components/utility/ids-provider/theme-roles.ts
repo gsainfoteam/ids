@@ -1,6 +1,6 @@
 import { clampChroma, formatHex, parse } from 'culori/fn';
 
-import { ACCENT_TEXT_LC, DARK_TEXT, LIGHT_TEXT, MARK_LC, TEXT_LC } from './contrast';
+import { ACCENT_TEXT_LC, DARK_TEXT, LIGHT_TEXT, MARK_LC, TEXT_LC, reaches } from './contrast';
 import { derivedSecondary, derivedTertiary } from './derived-brands';
 import {
   FILL_LAYER,
@@ -8,13 +8,15 @@ import {
   SCALE_RULES,
   SCALE_STEP,
   contentLayer,
-  mostReadable,
   paletteFromRamp,
   readsOn,
   stepOf,
+  textBases,
+  textOn,
   tintLayer,
   underStateLayers,
   withStateLayer,
+  type Backdrop,
   type StateLayer,
 } from './palette-scales';
 import { createIdsRamp, hueOf, shadeOf } from './palette-seed';
@@ -78,14 +80,16 @@ export type ResolvedColors = {
 
 type FamilyColors = { ramp: IdsRamp; palette?: IdsPalette };
 
-const isNeutralOnly = (slot: string) => (IDS_NEUTRAL_ONLY_SLOTS as readonly string[]).includes(slot);
+const isNeutralOnly = (slot: string) =>
+  (IDS_NEUTRAL_ONLY_SLOTS as readonly string[]).includes(slot);
 
 export const slotsOf = (family: IdsColorFamily) =>
   IDS_FAMILY_SLOTS.filter((slot) => family === 'neutral' || !isNeutralOnly(slot)).map((slot) =>
     slot.replace('{family}', family),
   );
 
-const isPalette = (value: object): value is Partial<IdsPalette> => 'light' in value || 'dark' in value;
+const isPalette = (value: object): value is Partial<IdsPalette> =>
+  'light' in value || 'dark' in value;
 
 function parseScale(value: unknown, path: string, issues: IdsThemeIssue[]): IdsScale | undefined {
   if (!Array.isArray(value) || value.length !== SCALE_STEPS.length) {
@@ -163,7 +167,7 @@ export function parseThemeColor(
     const dark = parseScale(value.dark, `${path}.dark`, issues);
     if (light === undefined || dark === undefined) return { colors: undefined, issues };
     return {
-      colors: { ramp: createIdsRamp(stepOf(light, SCALE_STEP.fill))!, palette: { light, dark } },
+      colors: { ramp: createIdsRamp(stepOf(light, SCALE_STEP.solid))!, palette: { light, dark } },
       issues,
     };
   }
@@ -172,50 +176,88 @@ export function parseThemeColor(
   return { colors: ramp === undefined ? undefined : { ramp }, issues };
 }
 
+const textOnRole = (
+  role: string,
+  background: string,
+  backdrop: Backdrop,
+  scale: IdsScale,
+  mode: IdsMode,
+  ramp: IdsRamp | undefined,
+  path: string,
+  issues: IdsThemeIssue[],
+) => {
+  const on = textOn(background, backdrop, scale, mode, ramp);
+  if (!on.reaches)
+    issues.push({
+      path,
+      message: `${mode}: no color of the scale, its ramp, white or neutral 950 reaches Lc ${TEXT_LC} as ${role}, under the hover and press layers too.`,
+    });
+  return on.text;
+};
+
 export function familyRoles(
   family: ColoredFamily,
   scale: IdsScale,
   mode: IdsMode,
   neutral: IdsScale,
+  ramp?: IdsRamp,
   path: string = family,
 ): { roles: IdsColorRoles; issues: IdsThemeIssue[] } {
   const issues: IdsThemeIssue[] = [];
-  const page = stepOf(neutral, SCALE_STEP.page);
-  const band = stepOf(scale, SCALE_STEP.band);
   const soft = stepOf(scale, SCALE_STEP.soft);
-  const fill = stepOf(scale, SCALE_STEP.fill);
+  const solid = stepOf(scale, SCALE_STEP.solid);
+  const strongBorder = stepOf(scale, SCALE_STEP.strongBorder);
   const text = stepOf(scale, SCALE_STEP.text);
   const strongText = stepOf(scale, SCALE_STEP.strongText);
+  const bases = textBases(neutral, soft);
+  const surfaces = `base, surface, block and ${family}-soft`;
 
-  const onFill = mostReadable([fill]);
-  if (onFill.lc < TEXT_LC)
+  if (!reaches(strongBorder, bases, MARK_LC))
     issues.push({
       path,
-      message: `${mode}: neither white nor neutral 950 reaches Lc ${TEXT_LC} on the ${family} fill (step ${SCALE_STEP.fill}) and under its hover and press layers.`,
+      message: `${mode}: border-${family}-strong (step ${SCALE_STEP.strongBorder}) does not reach Lc ${MARK_LC} on ${surfaces}.`,
     });
 
-  if (!readsOn(strongText, [band, soft], fill))
+  if (!readsOn(text, bases, solid, ACCENT_TEXT_LC))
     issues.push({
       path,
-      message: `${mode}: ${family} step ${SCALE_STEP.strongText} does not reach Lc ${TEXT_LC} on ${family}-subtler and ${family}-subtle (steps ${SCALE_STEP.band} and ${SCALE_STEP.soft}) and under their hover and press layers.`,
+      message: `${mode}: text-${family} (step ${SCALE_STEP.text}) does not reach Lc ${ACCENT_TEXT_LC} on ${surfaces}, under their hover and press layers too.`,
     });
 
-  if (!readsOn(text, [page, band, soft], fill, ACCENT_TEXT_LC))
+  if (!readsOn(strongText, bases, solid))
     issues.push({
       path,
-      message: `${mode}: ${family} step ${SCALE_STEP.text} does not reach Lc ${ACCENT_TEXT_LC} as ${family} text on the surface, ${family}-subtler and ${family}-subtle, under their hover and press layers too.`,
+      message: `${mode}: text-${family}-strong (step ${SCALE_STEP.strongText}) does not reach Lc ${TEXT_LC} on ${surfaces}, under their hover and press layers too.`,
     });
 
   return {
     roles: {
-      [`bg-${family}-subtler`]: band,
-      [`bg-${family}-subtle`]: soft,
-      [`bg-${family}`]: fill,
-      [`text-on-${family}-subtler`]: strongText,
-      [`text-on-${family}-subtle`]: strongText,
-      [`text-on-${family}`]: onFill.text,
+      [`bg-${family}-soft`]: soft,
+      [`bg-${family}-solid`]: solid,
+      [`border-${family}`]: stepOf(scale, SCALE_STEP.border),
+      [`border-${family}-strong`]: strongBorder,
       [`text-${family}`]: text,
-      [`border-${family}`]: text,
+      [`text-${family}-strong`]: strongText,
+      [`text-on-${family}-soft`]: textOnRole(
+        `text-on-${family}-soft`,
+        soft,
+        { kind: 'tinted', solid },
+        scale,
+        mode,
+        ramp,
+        path,
+        issues,
+      ),
+      [`text-on-${family}-solid`]: textOnRole(
+        `text-on-${family}-solid`,
+        solid,
+        { kind: 'solid' },
+        scale,
+        mode,
+        ramp,
+        path,
+        issues,
+      ),
     },
     issues,
   };
@@ -240,10 +282,36 @@ export function neutralPalette(kind: IdsNeutral, primary: IdsRamp): IdsPalette {
   };
 }
 
-export function neutralRoles(neutral: IdsScale): IdsColorRoles {
-  return Object.fromEntries(
+const NEUTRAL_TEXT_ON: readonly (readonly [string, string, Backdrop])[] = [
+  ['text-on-base', 'bg-base', { kind: 'neutral' }],
+  ['text-on-surface', 'bg-surface', { kind: 'neutral' }],
+  ['text-on-block', 'bg-block', { kind: 'neutral' }],
+  ['text-on-neutral-soft', 'bg-neutral-soft', { kind: 'neutral' }],
+  ['text-on-neutral-solid', 'bg-neutral-solid', { kind: 'solid' }],
+];
+
+export function neutralRoles(
+  neutral: IdsScale,
+  mode: IdsMode,
+  issues: IdsThemeIssue[] = [],
+): IdsColorRoles {
+  const roles: IdsColorRoles = Object.fromEntries(
     Object.entries(IDS_NEUTRAL_STEPS).map(([slot, step]) => [slot, neutral[step - 1]!]),
   );
+
+  for (const [role, background, backdrop] of NEUTRAL_TEXT_ON)
+    roles[role] = textOnRole(
+      role,
+      roles[background]!,
+      backdrop,
+      neutral,
+      mode,
+      undefined,
+      'neutral',
+      issues,
+    );
+
+  return roles;
 }
 
 const isStatus = (family: IdsColorFamily): family is IdsStatusFamily =>
@@ -345,11 +413,18 @@ export function resolveColors(theme: IdsThemeOverrides): {
   ) as ResolvedColors['palettes'];
 
   const rolesIn = (mode: IdsMode) => {
-    const roles = neutralRoles(neutral[mode]);
+    const roles = neutralRoles(neutral[mode], mode, issues);
 
     for (const family of coloredFamilies) {
       const path = isStatus(family) ? `status.${family}` : family;
-      const resolved = familyRoles(family, palettes[family][mode], mode, neutral[mode], path);
+      const resolved = familyRoles(
+        family,
+        palettes[family][mode],
+        mode,
+        neutral[mode],
+        ramps[family],
+        path,
+      );
       issues.push(...resolved.issues);
       Object.assign(roles, resolved.roles);
     }
@@ -358,7 +433,13 @@ export function resolveColors(theme: IdsThemeOverrides): {
   };
 
   return {
-    colors: { ramps, palettes, neutral, given, roles: { light: rolesIn('light'), dark: rolesIn('dark') } },
+    colors: {
+      ramps,
+      palettes,
+      neutral,
+      given,
+      roles: { light: rolesIn('light'), dark: rolesIn('dark') },
+    },
     issues,
   };
 }

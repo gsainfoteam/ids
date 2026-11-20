@@ -39,13 +39,13 @@ void main() {
       ),
     );
     final colors = scope.colors;
-    expect(colors.bgNeutralSubtlest, const Color(0xFFFFFFFF));
-    expect(colors.textNeutralBold, const Color(0xFF0A0A0A));
+    expect(colors.bgBase, const Color(0xFFFFFFFF));
+    expect(colors.textNeutralStrong, const Color(0xFF0A0A0A));
     expect(colors.borderNeutral, const Color(0xFFE5E5E5));
     expect(colors.textNeutral, const Color(0xFF525252));
-    expect(colors.bgPrimary, const Color(0xFF155DFC));
-    expect(colors['bg-primary-subtle'], colors.bgPrimarySubtle);
-    expect(colors['text-on-primary-subtle'], colors.textOnPrimarySubtle);
+    expect(colors.bgPrimarySolid, const Color(0xFF155DFC));
+    expect(colors['bg-primary-soft'], colors.bgPrimarySoft);
+    expect(colors['text-on-primary-soft'], colors.textOnPrimarySoft);
     expect(colors.roles.keys, IdsColorRoles.all);
   });
 
@@ -67,21 +67,21 @@ void main() {
                         'Sans',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: ids.colors.textNeutralBold,
+                          color: ids.colors.textNeutralStrong,
                         ),
                       ),
                       Text(
                         'Mono',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: ids.colors.textNeutralBold,
+                          color: ids.colors.textNeutralStrong,
                           mono: true,
                         ),
                       ),
                       TextField(
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: ids.colors.textNeutralBold,
+                          color: ids.colors.textNeutralStrong,
                           mono: true,
                         ),
                       ),
@@ -293,8 +293,8 @@ void main() {
         ),
       ),
     );
-    expect(scope.colors.bgPrimary, isNot(root.colors.bgPrimary));
-    expect(scope.colors.bgNeutralSubtlest, root.colors.bgNeutralSubtlest);
+    expect(scope.colors.bgPrimarySolid, isNot(root.colors.bgPrimarySolid));
+    expect(scope.colors.bgBase, root.colors.bgBase);
     expect(scope.colors.borderNeutral, isNot(root.colors.borderNeutral));
     expect(root.colors, colorsOf(testTheme, IdsMode.light));
   });

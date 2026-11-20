@@ -197,7 +197,7 @@ export const Gallery: Story = {
                     key={`${neutral}:${mode}`}
                     theme={{ primary: palettes[hue], neutral }}
                     mode={mode}
-                    className="bg-neutral-subtlest text-neutral-bold"
+                    className="bg-base text-neutral-strong"
                   >
                     <Card className="w-56">
                       <Card.Header>
@@ -463,8 +463,8 @@ export const Scope: Story = {
     await expect(dark).toHaveAttribute('data-mode', 'dark');
     await expect(within(orange).getByTestId('palette')).toHaveTextContent(palettes.orange[600]);
     await expect(orange).toHaveAttribute('data-mode', 'light');
-    await expect(dark.className).toContain('bg-neutral-subtlest');
-    await expect(orange.className).not.toContain('bg-neutral-subtlest');
+    await expect(dark.className).toContain('bg-base');
+    await expect(orange.className).not.toContain('bg-base');
     await userEvent.click(within(orange).getByRole('button', { name: 'dark' }));
     await expect(outer).toHaveAttribute('data-mode', 'dark');
     await expect(orange).toHaveAttribute('data-mode', 'dark');
@@ -497,7 +497,7 @@ export const AsChild: Story = {
     const section = canvas.getByRole('region', { name: '녹색 영역' });
     await expect(section).toHaveAttribute('data-mode', 'dark');
     await expect(Object.values(palettes.green)).toContain(
-      section.style.getPropertyValue('--ids-theme-dark-bg-primary'),
+      section.style.getPropertyValue('--ids-theme-dark-bg-primary-solid'),
     );
     await expect(section.parentElement).not.toBe(null);
   },

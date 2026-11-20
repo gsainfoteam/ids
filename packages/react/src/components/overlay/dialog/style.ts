@@ -6,14 +6,11 @@ const cornerOfThePaddedViewport = cn('concentric-p-6 p-0');
 
 export const dialogStyle = tv({
   slots: {
-    backdrop: [
-      overlayStyles.backdrop,
-      'duration-(--ids-motion-normal) ease-out',
-    ],
+    backdrop: [overlayStyles.backdrop, 'duration-(--ids-motion-normal) ease-out'],
     content: [
       'fixed inset-0 z-50 m-auto flex h-fit max-h-[calc(100dvh-var(--spacing)*8)] w-[calc(100%-var(--spacing)*8)] max-w-sm flex-col overflow-hidden outline-none',
       cornerOfThePaddedViewport,
-      'border border-neutral bg-panel text-neutral-bold shadow-lg',
+      'border border-neutral bg-surface text-neutral-strong shadow-lg',
       'transition-[opacity,scale] duration-(--ids-motion-normal) ease-out',
       'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
       'data-nested-open:scale-[0.96] motion-reduce:transition-none',

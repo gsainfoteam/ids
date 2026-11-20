@@ -5,7 +5,7 @@ export const tooltipStyle = tv({
     content: [
       'pointer-events-none fixed z-50 m-0 w-max max-w-xs overflow-visible border-0',
       'rounded-standard px-2.5 py-1.5 text-start text-caption-c1-medium break-keep [overflow-wrap:anywhere]',
-      'bg-neutral-bold text-on-neutral-bold shadow-md',
+      'bg-neutral-solid text-on-neutral-solid shadow-md',
       'transition-[opacity,scale] duration-(--ids-motion-fast) ease-out',
       'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
       'data-[side=bottom]:origin-top data-[side=left]:origin-right data-[side=right]:origin-left data-[side=top]:origin-bottom',

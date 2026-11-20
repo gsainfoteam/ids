@@ -9,10 +9,7 @@ export const alertStyle = tv({
       'transition-[opacity,translate] duration-(--ids-motion-fast) ease-out motion-reduce:transition-none',
       'data-ending-style:-translate-y-1 data-ending-style:opacity-0',
     ],
-    icon: [
-      'flex h-[1lh] shrink-0 items-center',
-      '[&_svg]:size-(--ids-size-icon-standard)',
-    ],
+    icon: ['flex h-[1lh] shrink-0 items-center', '[&_svg]:size-(--ids-size-icon-standard)'],
     content: 'flex min-w-0 flex-col gap-0.5',
     title: 'text-body-b3-semibold',
     description: '[&_ul]:list-disc [&_ul]:ps-5 [ul&]:list-disc [ul&]:ps-5',
@@ -32,18 +29,18 @@ export const alertStyle = tv({
     } satisfies Record<Alert.ColorScheme, object>,
     variant: {
       solid: {
-        root: 'bg-scheme text-on-scheme',
-        close: 'text-on-scheme focus-ring-current',
+        root: 'bg-scheme-solid text-on-scheme-solid',
+        close: 'text-on-scheme-solid focus-ring-current',
       },
-      soft: { root: 'bg-scheme-subtle text-on-scheme-subtle' },
+      soft: { root: 'bg-scheme-soft text-on-scheme-soft' },
       outline: {
-        root: 'bg-panel text-neutral-bold inset-ring-1 inset-ring-neutral',
+        root: 'bg-surface text-neutral-strong inset-ring-1 inset-ring-neutral',
         icon: 'text-scheme',
         title: 'text-scheme',
         description: 'text-neutral',
       },
       ghost: {
-        root: 'bg-transparent text-neutral-bold',
+        root: 'bg-transparent text-neutral-strong',
         icon: 'text-scheme',
         title: 'text-scheme',
         description: 'text-neutral',

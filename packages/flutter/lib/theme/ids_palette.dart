@@ -91,7 +91,7 @@ final class IdsPalette extends IdsThemeColor {
 
   factory IdsPalette.fromSeed(Color seed) => paletteFromSeed(seed);
 
-  static const steps = <int>[1, 2, 3, 4, 5, 6, 7, 8];
+  static const steps = <int>[1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   final List<Color> light;
 

@@ -1,7 +1,15 @@
-import { formatHex, interpolate } from 'culori/fn';
+import { clampChroma, formatHex, interpolate } from 'culori/fn';
 import { maxBy } from 'es-toolkit';
 
-import { ACCENT_TEXT_LC, DARK_TEXT, LIGHT_TEXT, TEXT_LC, lightnessContrast, reaches } from './contrast';
+import {
+  ACCENT_TEXT_LC,
+  DARK_TEXT,
+  LIGHT_TEXT,
+  MARK_LC,
+  TEXT_LC,
+  lightnessContrast,
+  reaches,
+} from './contrast';
 import { createIdsRamp, shadeOf } from './palette-seed';
 import {
   RAMP_STEPS,
@@ -20,14 +28,15 @@ import {
 import type { IdsMode } from '../../../tokens/types';
 
 export const SCALE_STEP = {
-  page: 1,
-  band: 2,
-  soft: 3,
-  line: 4,
-  handle: 5,
-  text: 6,
-  fill: 7,
-  strongText: 8,
+  base: 1,
+  surface: 2,
+  block: 3,
+  soft: 4,
+  border: 5,
+  strongBorder: 6,
+  solid: 7,
+  text: 8,
+  strongText: 9,
 } as const satisfies { [use: string]: IdsScaleStep };
 
 export const stepOf = (scale: IdsScale, step: IdsScaleStep) => scale[step - 1]!;
@@ -90,53 +99,142 @@ export function mostReadable(fills: readonly string[]) {
   )!;
 }
 
+export type Backdrop = { kind: 'solid' } | { kind: 'neutral' } | { kind: 'tinted'; solid: string };
+
+const layersOver = (backdrop: Backdrop, text: string): StateLayer[] => {
+  if (backdrop.kind === 'solid') return [FILL_LAYER];
+  if (backdrop.kind === 'neutral') return [contentLayer(text)];
+  return [contentLayer(text), tintLayer(backdrop.solid)];
+};
+
+const lowestContrastOver = (text: string, background: string, backdrop: Backdrop) =>
+  Math.min(
+    ...underStateLayers(background, layersOver(backdrop, text)).map((state) =>
+      lightnessContrast(text, state),
+    ),
+  );
+
+const lightnessOf = (color: string) => shadeOf(color).l;
+
+function candidatesToward(
+  end: string,
+  absoluteEnd: string,
+  ramp: IdsRamp | undefined,
+  darker: boolean,
+) {
+  const endL = lightnessOf(end);
+  const beyond = (ramp === undefined ? [] : RAMP_STEPS.map((step) => ramp[step])).filter((color) =>
+    darker ? lightnessOf(color) < endL : lightnessOf(color) > endL,
+  );
+  const outward = beyond.sort((a, b) =>
+    darker ? lightnessOf(b) - lightnessOf(a) : lightnessOf(a) - lightnessOf(b),
+  );
+  return [end, ...outward, absoluteEnd];
+}
+
+export type TextOn = { text: string; lc: number; reaches: boolean };
+
+export function textOn(
+  background: string,
+  backdrop: Backdrop,
+  scale: IdsScale,
+  mode: IdsMode,
+  ramp?: IdsRamp,
+): TextOn {
+  const darkEnd = stepOf(scale, mode === 'light' ? SCALE_STEP.strongText : SCALE_STEP.base);
+  const lightEnd = stepOf(scale, mode === 'light' ? SCALE_STEP.base : SCALE_STEP.strongText);
+  const directions = [
+    candidatesToward(darkEnd, DARK_TEXT, ramp, true),
+    candidatesToward(lightEnd, LIGHT_TEXT, ramp, false),
+  ];
+  const contrastOf = (text: string) => ({
+    text,
+    lc: lowestContrastOver(text, background, backdrop),
+  });
+
+  const firstReaching = directions
+    .map((candidates) => {
+      for (const text of candidates) {
+        const candidate = contrastOf(text);
+        if (candidate.lc >= TEXT_LC) return candidate;
+      }
+      return undefined;
+    })
+    .filter((candidate) => candidate !== undefined);
+
+  if (firstReaching.length > 0)
+    return { ...maxBy(firstReaching, (pair) => pair.lc)!, reaches: true };
+  return { ...maxBy(directions.flat().map(contrastOf), (pair) => pair.lc)!, reaches: false };
+}
+
 type SurfaceRule = { at: IdsRampStep } | { lightnessOf: IdsScaleStep };
 
 type ScaleRule = {
   surfaces: readonly SurfaceRule[];
-  fill: readonly (readonly IdsRampStep[])[];
-  text: readonly IdsRampStep[];
-  strongText: readonly IdsRampStep[];
+  strongBorder: readonly IdsRampStep[];
+  solid: readonly (readonly IdsRampStep[])[];
+  outward: readonly IdsRampStep[];
 };
 
-const FILL_STEPS_OUTWARD_FROM_600: ScaleRule['fill'] = [[600], [500, 700], [400, 800]];
+const SOLID_STEPS_OUTWARD_FROM_600: ScaleRule['solid'] = [[600], [500, 700], [400, 800]];
 
-const SAME_LIGHTNESS_AS_THE_NEUTRAL: readonly SurfaceRule[] = [
-  { lightnessOf: SCALE_STEP.page },
-  { lightnessOf: SCALE_STEP.band },
-  { lightnessOf: SCALE_STEP.soft },
-  { lightnessOf: SCALE_STEP.line },
-  { lightnessOf: SCALE_STEP.handle },
-];
+const LIGHT_OUTWARD: readonly IdsRampStep[] = RAMP_STEPS;
+
+const DARK_OUTWARD: readonly IdsRampStep[] = [...RAMP_STEPS].reverse();
 
 export const SCALE_RULES: { [mode in IdsMode]: ScaleRule } = {
   light: {
-    surfaces: [{ lightnessOf: SCALE_STEP.page }, { at: 50 }, { at: 100 }, { at: 200 }, { at: 300 }],
-    fill: FILL_STEPS_OUTWARD_FROM_600,
-    text: [600, 700, 800, 900, 950],
-    strongText: [700, 800, 900, 950],
+    surfaces: [
+      { lightnessOf: SCALE_STEP.base },
+      { lightnessOf: SCALE_STEP.surface },
+      { lightnessOf: SCALE_STEP.block },
+      { at: 100 },
+      { at: 200 },
+    ],
+    strongBorder: LIGHT_OUTWARD.slice(LIGHT_OUTWARD.indexOf(300)),
+    solid: SOLID_STEPS_OUTWARD_FROM_600,
+    outward: LIGHT_OUTWARD,
   },
   dark: {
-    surfaces: SAME_LIGHTNESS_AS_THE_NEUTRAL,
-    fill: FILL_STEPS_OUTWARD_FROM_600,
-    text: [500, 400, 300, 200, 100, 50],
-    strongText: [400, 300, 200, 100, 50],
+    surfaces: [
+      { lightnessOf: SCALE_STEP.base },
+      { lightnessOf: SCALE_STEP.surface },
+      { lightnessOf: SCALE_STEP.block },
+      { lightnessOf: SCALE_STEP.soft },
+      { lightnessOf: SCALE_STEP.border },
+    ],
+    strongBorder: DARK_OUTWARD.slice(DARK_OUTWARD.indexOf(900)),
+    solid: SOLID_STEPS_OUTWARD_FROM_600,
+    outward: DARK_OUTWARD,
   },
 };
 
-const rampFromThePage = (ramp: IdsRamp, mode: IdsMode, page: string) => {
-  const steps = mode === 'light' ? RAMP_STEPS : [...RAMP_STEPS].reverse();
-  return [page, ...steps.map((step) => ramp[step])];
-};
+const rampFromThePage = (ramp: IdsRamp, mode: IdsMode) =>
+  (mode === 'light' ? LIGHT_OUTWARD : DARK_OUTWARD).map((step) => ramp[step]);
+
+function towardTheRampKeepingChroma(page: string, rampEnd: string, lightness: number) {
+  const pageL = lightnessOf(page);
+  if (lightness === pageL) return page;
+
+  const end = shadeOf(rampEnd);
+  const along = (lightness - pageL) / (end.l - pageL);
+  const tinted = { mode: 'oklch' as const, l: lightness, c: end.c * Math.sqrt(along), h: end.h };
+  return formatHex(clampChroma(tinted, 'oklch'));
+}
 
 export function onRampAtLightness(ramp: IdsRamp, mode: IdsMode, page: string, lightness: number) {
-  const points = rampFromThePage(ramp, mode, page);
+  const points = rampFromThePage(ramp, mode);
+  const pageL = lightnessOf(page);
+  const firstL = lightnessOf(points[0]!);
+
+  if (lightness >= Math.min(pageL, firstL) && lightness <= Math.max(pageL, firstL))
+    return towardTheRampKeepingChroma(page, points[0]!, lightness);
 
   for (let index = 0; index < points.length - 1; index++) {
     const from = points[index]!;
     const to = points[index + 1]!;
-    const fromL = shadeOf(from).l;
-    const toL = shadeOf(to).l;
+    const fromL = lightnessOf(from);
+    const toL = lightnessOf(to);
     if (lightness < Math.min(fromL, toL) || lightness > Math.max(fromL, toL)) continue;
     return toL === fromL ? from : mixed(from, to, (lightness - fromL) / (toL - fromL));
   }
@@ -144,41 +242,52 @@ export function onRampAtLightness(ramp: IdsRamp, mode: IdsMode, page: string, li
   return points[points.length - 1]!;
 }
 
-function readableFill(ramp: IdsRamp, stepsOutward: ScaleRule['fill']) {
+function readableSolid(ramp: IdsRamp, stepsOutward: ScaleRule['solid']): IdsRampStep {
   for (const steps of stepsOutward) {
-    const best = mostReadable(steps.map((step) => ramp[step]));
-    if (best.lc >= TEXT_LC) return best.fill;
+    const best = maxBy(
+      steps.map((step) => ({ step, lc: mostReadable([ramp[step]]).lc })),
+      (pair) => pair.lc,
+    )!;
+    if (best.lc >= TEXT_LC) return best.step;
   }
-  return mostReadable([ramp[600]]).fill;
+  return 600;
 }
 
-const firstReadableOn = (
-  ramp: IdsRamp,
-  candidates: readonly IdsRampStep[],
-  bases: readonly string[],
-  fill: string,
-  lc = TEXT_LC,
-) =>
-  ramp[
-    candidates.find((candidate) => readsOn(ramp[candidate], bases, fill, lc)) ??
-      candidates[candidates.length - 1]!
-  ];
+const firstStep = (candidates: readonly IdsRampStep[], passes: (step: IdsRampStep) => boolean) =>
+  candidates.find(passes) ?? candidates[candidates.length - 1]!;
+
+export const textBases = (neutral: IdsScale, soft: string) => [
+  stepOf(neutral, SCALE_STEP.base),
+  stepOf(neutral, SCALE_STEP.surface),
+  stepOf(neutral, SCALE_STEP.block),
+  soft,
+];
 
 export function scaleFromRamp(ramp: IdsRamp, mode: IdsMode, neutral: IdsScale): IdsScale {
   const rule = SCALE_RULES[mode];
-  const page = stepOf(neutral, SCALE_STEP.page);
+  const page = stepOf(neutral, SCALE_STEP.base);
   const surfaces = rule.surfaces.map((surface) =>
     'at' in surface
       ? ramp[surface.at]
-      : onRampAtLightness(ramp, mode, page, shadeOf(stepOf(neutral, surface.lightnessOf)).l),
+      : onRampAtLightness(ramp, mode, page, lightnessOf(stepOf(neutral, surface.lightnessOf))),
   );
-  const band = surfaces[SCALE_STEP.band - 1]!;
-  const soft = surfaces[SCALE_STEP.soft - 1]!;
-  const fill = readableFill(ramp, rule.fill);
-  const text = firstReadableOn(ramp, rule.text, [page, band, soft], fill, ACCENT_TEXT_LC);
-  const strongText = firstReadableOn(ramp, rule.strongText, [band, soft], fill);
+  const bases = textBases(neutral, surfaces[SCALE_STEP.soft - 1]!);
+  const solidStep = readableSolid(ramp, rule.solid);
+  const solid = ramp[solidStep];
+  const strongBorder = firstStep(rule.strongBorder, (step) => reaches(ramp[step], bases, MARK_LC));
+  const fromTheSolid = rule.outward.slice(rule.outward.indexOf(solidStep));
+  const text = firstStep(fromTheSolid, (step) => readsOn(ramp[step], bases, solid, ACCENT_TEXT_LC));
+  const strongText = firstStep(fromTheSolid.slice(fromTheSolid.indexOf(text)), (step) =>
+    readsOn(ramp[step], bases, solid),
+  );
 
-  return [...surfaces, text, fill, strongText] as unknown as IdsScale;
+  return [
+    ...surfaces,
+    ramp[strongBorder],
+    solid,
+    ramp[text],
+    ramp[strongText],
+  ] as unknown as IdsScale;
 }
 
 export const paletteFromRamp = (ramp: IdsRamp, neutral: IdsPalette = IDS_NEUTRAL_PALETTE) => ({

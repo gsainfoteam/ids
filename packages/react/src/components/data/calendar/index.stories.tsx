@@ -387,7 +387,7 @@ export const Parts: Story = {
                   state.modifiers.event
                     ? state.selected
                       ? 'mt-0.5 size-1 rounded-full bg-current'
-                      : 'bg-primary mt-0.5 size-1 rounded-full'
+                      : 'bg-primary-solid mt-0.5 size-1 rounded-full'
                     : 'mt-0.5 size-1'
                 }
               />

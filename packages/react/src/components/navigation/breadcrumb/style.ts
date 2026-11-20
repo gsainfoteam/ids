@@ -10,13 +10,13 @@ export const breadcrumbStyle = tv({
     link: [
       'inline-flex items-center rounded-indicator text-inherit no-underline outline-none focus-ring',
       'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'hover:text-neutral-bold [&_svg]:shrink-0',
+      'hover:text-neutral-strong [&_svg]:shrink-0',
     ],
-    page: 'inline-flex items-center text-neutral-bold [&_svg]:shrink-0',
+    page: 'inline-flex items-center text-neutral-strong [&_svg]:shrink-0',
     separator: 'inline-flex shrink-0 items-center select-none rtl:[&>svg]:-scale-x-100',
     ellipsis: [
-      '-my-1 text-inherit data-hovered:text-neutral-bold',
-      'data-popup-open:state-press data-popup-open:text-neutral-bold',
+      '-my-1 text-inherit data-hovered:text-neutral-strong',
+      'data-popup-open:state-press data-popup-open:text-neutral-strong',
     ],
   },
   variants: {

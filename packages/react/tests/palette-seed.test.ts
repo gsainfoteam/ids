@@ -83,27 +83,76 @@ test('every seed builds a palette that runs from light to dark', () => {
   expect(unordered).toEqual([]);
 });
 
-test('a seed builds an 8-step scale for each mode', () => {
+test('a seed builds a 9-step scale for each mode', () => {
   const ramp = createIdsRamp('#2b7fff')!;
   const { light, dark } = createIdsPalette('#2b7fff')!;
 
   expect([...light, ...dark].every((hex) => /^#[0-9a-f]{6}$/.test(hex))).toBe(true);
-  expect(light).toHaveLength(8);
-  expect(dark).toHaveLength(8);
-  expect([light[1], light[2], light[3], light[4]]).toEqual([ramp[50], ramp[100], ramp[200], ramp[300]]);
+  expect(light).toHaveLength(9);
+  expect(dark).toHaveLength(9);
+  expect([light[0], light[1]]).toEqual([IDS_NEUTRAL_SCALES.light[0], IDS_NEUTRAL_SCALES.light[1]]);
+  expect([light[3], light[4]]).toEqual([ramp[100], ramp[200]]);
+  expect(dark[0]).toBe(IDS_NEUTRAL_SCALES.dark[0]);
 });
 
-test('the dark surfaces of a built scale sit at the lightness of the dark neutral', () => {
+const SCALE_ENDS_THAT_KEEP_THEIR_ORDER = [
+  [0, 1, 2, 3, 4, 5],
+  [7, 8],
+];
+
+test(
+  'every scale moves away from the page step by step, the solid aside',
+  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  () => {
+    const pageL = (mode: 'light' | 'dark') => shadeOf(IDS_NEUTRAL_SCALES[mode][0]!).l;
+    const outOfOrder = [...everySeed(), 'neutral'].flatMap((seed) =>
+      (['light', 'dark'] as const).flatMap((mode) => {
+        const scale = seed === 'neutral' ? IDS_NEUTRAL_SCALES[mode] : createIdsPalette(seed)![mode];
+        const distance = scale.map((hex) => Math.abs(shadeOf(hex).l - pageL(mode)));
+        return SCALE_ENDS_THAT_KEEP_THEIR_ORDER.flatMap((steps) =>
+          steps
+            .slice(1)
+            .flatMap((step, index) =>
+              distance[step]! + 1e-9 < distance[steps[index]!]!
+                ? [
+                    `${seed} ${mode} step ${step + 1} is nearer the page than step ${steps[index]! + 1}`,
+                  ]
+                : [],
+            ),
+        );
+      }),
+    );
+    expect(outOfOrder).toEqual([]);
+  },
+);
+
+test(
+  'text sits at or beyond the solid, away from the page',
+  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  () => {
+    for (const seed of everySeed())
+      for (const mode of ['light', 'dark'] as const) {
+        const scale = createIdsPalette(seed)![mode];
+        const pageL = shadeOf(IDS_NEUTRAL_SCALES[mode][0]!).l;
+        const distance = (step: number) => Math.abs(shadeOf(scale[step]!).l - pageL);
+        expect(distance(7) + 1e-9, `${seed} ${mode}`).toBeGreaterThanOrEqual(distance(6));
+      }
+  },
+);
+
+test('the dark surfaces of a built scale sit at the lightness of the dark neutral, with the ramp hue', () => {
   const darkSurfaces = SCALE_RULES.dark.surfaces.length;
 
   for (const seed of everySeed()) {
     const { dark } = createIdsPalette(seed)!;
-    dark.slice(0, darkSurfaces).forEach((hex, index) =>
-      expect(shadeOf(hex).l, `${seed} step ${index + 1}`).toBeCloseTo(
-        shadeOf(IDS_NEUTRAL_SCALES.dark[index]!).l,
-        2,
-      ),
-    );
+    dark
+      .slice(0, darkSurfaces)
+      .forEach((hex, index) =>
+        expect(shadeOf(hex).l, `${seed} step ${index + 1}`).toBeCloseTo(
+          shadeOf(IDS_NEUTRAL_SCALES.dark[index]!).l,
+          2,
+        ),
+      );
   }
 });
 

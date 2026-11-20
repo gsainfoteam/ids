@@ -289,7 +289,7 @@ const buildColorBridgeCSS = () =>
 const schemeLayer = (family) =>
   SCHEME_LAYER_IN_TEXT_COLOR.includes(family)
     ? ["currentColor", "var(--ids-state-hover)", "var(--ids-state-press)"]
-    : [`var(${colorVar(`bg-${family}`)})`, "var(--ids-state-tint-hover)", "var(--ids-state-tint-press)"];
+    : [`var(${colorVar(`bg-${family}-solid`)})`, "var(--ids-state-tint-hover)", "var(--ids-state-tint-press)"];
 
 const buildSchemeCSS = () =>
   COLOR_FAMILIES.map((family) => {
@@ -342,7 +342,7 @@ const T_CSS_ANIMATIONS = `@keyframes ids-progress-slide {
 
 @keyframes ids-skeleton-pulse {
   50% {
-    background-color: var(--ids-color-bg-neutral-subtler);
+    background-color: var(--ids-color-bg-block);
   }
 }
 
@@ -411,26 +411,26 @@ const T_CSS_VARIANTS = `@custom-variant dark (&:where(${darkModeRegion}):not(:wh
 }
 `;
 
-const focusRingUtility = (name, family) => `@utility ${name} {
+const focusRingUtility = (name, line) => `@utility ${name} {
   outline: none;
 
   ${focusRingTriggers("  ")} {
-    @apply ring-[3px] ring-${family}/40 inset-ring-${family};
+    @apply ring-[3px] ring-${line}/40 inset-ring-${line};
   }
 
   &[aria-invalid="true"],
   &[data-invalid] {
-    @apply inset-ring-danger;
+    @apply inset-ring-danger-strong;
 
     ${focusRingTriggers("    ")} {
-      @apply ring-danger/40 inset-ring-danger;
+      @apply ring-danger-strong/40 inset-ring-danger-strong;
     }
   }
 }
 `;
 
-const T_CSS_UTILITIES = `${focusRingUtility("focus-ring", "primary")}
-${focusRingUtility("focus-ring-scheme", "scheme")}
+const T_CSS_UTILITIES = `${focusRingUtility("focus-ring", "primary-strong")}
+${focusRingUtility("focus-ring-scheme", "scheme-strong")}
 ${focusRingUtility("focus-ring-current", "current")}
 
 @utility state-layer {
@@ -468,7 +468,7 @@ ${focusRingUtility("focus-ring-current", "current")}
   background-image: linear-gradient(
     90deg,
     currentColor calc(50% - var(--ids-shimmer-spread, 3em)),
-    var(--ids-shimmer-color, var(--ids-color-text-neutral-bold)) 50%,
+    var(--ids-shimmer-color, var(--ids-color-text-neutral-strong)) 50%,
     currentColor calc(50% + var(--ids-shimmer-spread, 3em))
   );
   background-size: calc(200% + 2 * var(--ids-shimmer-spread, 3em)) 100%;
@@ -636,16 +636,16 @@ const T_CSS_CORNER_SHAPE = `@layer base {
 
 const T_CSS_BACKGROUND_UNDERNEATH = `@layer base {
   [data-mode]:not([data-mode] [data-mode]),
-  [data-mode].bg-neutral-subtlest {
-    --ids-bg-current: var(--ids-color-bg-neutral-subtlest);
+  [data-mode].bg-base {
+    --ids-bg-current: var(--ids-color-bg-base);
   }
 
-  .bg-panel {
-    --ids-bg-current: var(--ids-color-bg-panel);
+  .bg-surface {
+    --ids-bg-current: var(--ids-color-bg-surface);
   }
 
-  .bg-band {
-    --ids-bg-current: var(--ids-color-bg-band);
+  .bg-block {
+    --ids-bg-current: var(--ids-color-bg-block);
   }
 }
 `;

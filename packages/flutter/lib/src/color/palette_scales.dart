@@ -10,14 +10,15 @@ import 'contrast.dart';
 import 'oklch.dart';
 
 abstract final class ScaleStep {
-  static const page = 1;
-  static const band = 2;
-  static const soft = 3;
-  static const line = 4;
-  static const handle = 5;
-  static const text = 6;
-  static const fill = 7;
-  static const strongText = 8;
+  static const base = 1;
+  static const surface = 2;
+  static const block = 3;
+  static const soft = 4;
+  static const border = 5;
+  static const strongBorder = 6;
+  static const solid = 7;
+  static const text = 8;
+  static const strongText = 9;
 }
 
 Color stepOf(List<Color> scale, int step) => scale[step - 1];
@@ -97,6 +98,107 @@ Readable mostReadable(List<Color> fills) {
   return best!;
 }
 
+sealed class Backdrop {
+  const Backdrop();
+}
+
+final class SolidBackdrop extends Backdrop {
+  const SolidBackdrop();
+}
+
+final class NeutralBackdrop extends Backdrop {
+  const NeutralBackdrop();
+}
+
+final class TintedBackdrop extends Backdrop {
+  const TintedBackdrop(this.solid);
+
+  final Color solid;
+}
+
+List<StateLayer> _layersOver(Backdrop backdrop, Color text) =>
+    switch (backdrop) {
+      SolidBackdrop() => [fillLayer],
+      NeutralBackdrop() => [contentLayer(text)],
+      TintedBackdrop(:final solid) => [contentLayer(text), tintLayer(solid)],
+    };
+
+double _lowestContrastOver(Color text, Color background, Backdrop backdrop) => [
+  for (final state in underStateLayers(background, _layersOver(backdrop, text)))
+    lightnessContrast(text, state),
+].reduce(math.min);
+
+double _lightnessOf(Color color) => oklchOf(color).l;
+
+List<Color> _candidatesToward(
+  Color end,
+  Color absoluteEnd,
+  IdsRamp? ramp,
+  bool darker,
+) {
+  final endL = _lightnessOf(end);
+  final beyond = [
+    if (ramp != null)
+      for (final step in IdsRamp.steps)
+        if (darker
+            ? _lightnessOf(ramp[step]) < endL
+            : _lightnessOf(ramp[step]) > endL)
+          ramp[step],
+  ];
+  beyond.sort(
+    (a, b) => darker
+        ? _lightnessOf(b).compareTo(_lightnessOf(a))
+        : _lightnessOf(a).compareTo(_lightnessOf(b)),
+  );
+  return [end, ...beyond, absoluteEnd];
+}
+
+typedef TextOn = ({Color text, double lc, bool reaches});
+
+typedef _Candidate = ({Color text, double lc});
+
+_Candidate _highest(Iterable<_Candidate> candidates) =>
+    candidates.reduce((best, next) => next.lc > best.lc ? next : best);
+
+TextOn textOn(
+  Color background,
+  Backdrop backdrop,
+  List<Color> scale,
+  IdsMode mode, [
+  IdsRamp? ramp,
+]) {
+  final darkEnd = stepOf(
+    scale,
+    mode == IdsMode.light ? ScaleStep.strongText : ScaleStep.base,
+  );
+  final lightEnd = stepOf(
+    scale,
+    mode == IdsMode.light ? ScaleStep.base : ScaleStep.strongText,
+  );
+  final directions = [
+    for (final candidates in [
+      _candidatesToward(darkEnd, darkText, ramp, true),
+      _candidatesToward(lightEnd, lightText, ramp, false),
+    ])
+      [
+        for (final text in candidates)
+          (text: text, lc: _lowestContrastOver(text, background, backdrop)),
+      ],
+  ];
+
+  final firstReaching = [
+    for (final candidates in directions)
+      ...candidates.where((candidate) => candidate.lc >= textLc).take(1),
+  ];
+
+  if (firstReaching.isNotEmpty) {
+    final best = _highest(firstReaching);
+    return (text: best.text, lc: best.lc, reaches: true);
+  }
+  final best = _highest(directions.expand((candidates) => candidates));
+  return (text: best.text, lc: best.lc, reaches: false);
+}
+
 sealed class SurfaceRule {
   const SurfaceRule();
 }
@@ -115,52 +217,61 @@ final class AtNeutralLightness extends SurfaceRule {
 
 typedef ScaleRule = ({
   List<SurfaceRule> surfaces,
-  List<List<int>> fill,
-  List<int> text,
-  List<int> strongText,
+  List<int> strongBorder,
+  List<List<int>> solid,
+  List<int> outward,
 });
 
-const _fillStepsOutwardFrom600 = [
+const _solidStepsOutwardFrom600 = [
   [600],
   [500, 700],
   [400, 800],
 ];
 
-const _sameLightnessAsTheNeutral = <SurfaceRule>[
-  AtNeutralLightness(ScaleStep.page),
-  AtNeutralLightness(ScaleStep.band),
-  AtNeutralLightness(ScaleStep.soft),
-  AtNeutralLightness(ScaleStep.line),
-  AtNeutralLightness(ScaleStep.handle),
-];
+const _lightOutward = IdsRamp.steps;
 
-const scaleRules = <IdsMode, ScaleRule>{
+final _darkOutward = IdsRamp.steps.reversed.toList();
+
+final scaleRules = <IdsMode, ScaleRule>{
   IdsMode.light: (
-    surfaces: [
-      AtNeutralLightness(ScaleStep.page),
-      AtRampStep(50),
+    surfaces: const [
+      AtNeutralLightness(ScaleStep.base),
+      AtNeutralLightness(ScaleStep.surface),
+      AtNeutralLightness(ScaleStep.block),
       AtRampStep(100),
       AtRampStep(200),
-      AtRampStep(300),
     ],
-    fill: _fillStepsOutwardFrom600,
-    text: [600, 700, 800, 900, 950],
-    strongText: [700, 800, 900, 950],
+    strongBorder: _lightOutward.sublist(_lightOutward.indexOf(300)),
+    solid: _solidStepsOutwardFrom600,
+    outward: _lightOutward,
   ),
   IdsMode.dark: (
-    surfaces: _sameLightnessAsTheNeutral,
-    fill: _fillStepsOutwardFrom600,
-    text: [500, 400, 300, 200, 100, 50],
-    strongText: [400, 300, 200, 100, 50],
+    surfaces: const [
+      AtNeutralLightness(ScaleStep.base),
+      AtNeutralLightness(ScaleStep.surface),
+      AtNeutralLightness(ScaleStep.block),
+      AtNeutralLightness(ScaleStep.soft),
+      AtNeutralLightness(ScaleStep.border),
+    ],
+    strongBorder: _darkOutward.sublist(_darkOutward.indexOf(900)),
+    solid: _solidStepsOutwardFrom600,
+    outward: _darkOutward,
   ),
 };
 
-List<Color> _rampFromThePage(IdsRamp ramp, IdsMode mode, Color page) => [
-  page,
-  for (final step
-      in mode == IdsMode.light ? IdsRamp.steps : IdsRamp.steps.reversed)
+List<Color> _rampFromThePage(IdsRamp ramp, IdsMode mode) => [
+  for (final step in mode == IdsMode.light ? _lightOutward : _darkOutward)
     ramp[step],
 ];
+
+Color _towardTheRampKeepingChroma(Color page, Color rampEnd, double lightness) {
+  final pageL = _lightnessOf(page);
+  if (lightness == pageL) return page;
+
+  final end = oklchOf(rampEnd);
+  final along = (lightness - pageL) / (end.l - pageL);
+  return colorOf((l: lightness, c: end.c * math.sqrt(along), h: end.h));
+}
 
 Color onRampAtLightness(
   IdsRamp ramp,
@@ -168,13 +279,20 @@ Color onRampAtLightness(
   Color page,
   double lightness,
 ) {
-  final points = _rampFromThePage(ramp, mode, page);
+  final points = _rampFromThePage(ramp, mode);
+  final pageL = _lightnessOf(page);
+  final firstL = _lightnessOf(points.first);
+
+  if (lightness >= math.min(pageL, firstL) &&
+      lightness <= math.max(pageL, firstL)) {
+    return _towardTheRampKeepingChroma(page, points.first, lightness);
+  }
 
   for (var index = 0; index < points.length - 1; index++) {
     final from = points[index];
     final to = points[index + 1];
-    final fromL = oklchOf(from).l;
-    final toL = oklchOf(to).l;
+    final fromL = _lightnessOf(from);
+    final toL = _lightnessOf(to);
     if (lightness < math.min(fromL, toL) || lightness > math.max(fromL, toL)) {
       continue;
     }
@@ -186,30 +304,31 @@ Color onRampAtLightness(
   return points.last;
 }
 
-Color _readableFill(IdsRamp ramp, List<List<int>> stepsOutward) {
+int _readableSolid(IdsRamp ramp, List<List<int>> stepsOutward) {
   for (final steps in stepsOutward) {
-    final best = mostReadable([for (final step in steps) ramp[step]]);
-    if (best.lc >= textLc) return best.fill;
+    ({int step, double lc})? best;
+    for (final step in steps) {
+      final lc = mostReadable([ramp[step]]).lc;
+      if (best == null || lc > best.lc) best = (step: step, lc: lc);
+    }
+    if (best!.lc >= textLc) return best.step;
   }
-  return mostReadable([ramp[600]]).fill;
+  return 600;
 }
 
-Color _firstReadableOn(
-  IdsRamp ramp,
-  List<int> candidates,
-  List<Color> bases,
-  Color fill, [
-  double lc = textLc,
-]) {
-  for (final step in candidates) {
-    if (readsOn(ramp[step], bases, fill, lc)) return ramp[step];
-  }
-  return ramp[candidates.last];
-}
+int _firstStep(List<int> candidates, bool Function(int step) passes) =>
+    candidates.firstWhere(passes, orElse: () => candidates.last);
+
+List<Color> textBases(List<Color> neutral, Color soft) => [
+  stepOf(neutral, ScaleStep.base),
+  stepOf(neutral, ScaleStep.surface),
+  stepOf(neutral, ScaleStep.block),
+  soft,
+];
 
 List<Color> scaleFromRamp(IdsRamp ramp, IdsMode mode, List<Color> neutral) {
   final rule = scaleRules[mode]!;
-  final page = stepOf(neutral, ScaleStep.page);
+  final page = stepOf(neutral, ScaleStep.base);
   final surfaces = [
     for (final surface in rule.surfaces)
       switch (surface) {
@@ -218,26 +337,28 @@ List<Color> scaleFromRamp(IdsRamp ramp, IdsMode mode, List<Color> neutral) {
           ramp,
           mode,
           page,
-          oklchOf(stepOf(neutral, step)).l,
+          _lightnessOf(stepOf(neutral, step)),
         ),
       },
   ];
-  final band = surfaces[ScaleStep.band - 1];
-  final soft = surfaces[ScaleStep.soft - 1];
-  final fill = _readableFill(ramp, rule.fill);
-  final text = _firstReadableOn(
-    ramp,
-    rule.text,
-    [page, band, soft],
-    fill,
-    accentTextLc,
+  final bases = textBases(neutral, surfaces[ScaleStep.soft - 1]);
+  final solidStep = _readableSolid(ramp, rule.solid);
+  final solid = ramp[solidStep];
+  final strongBorder = _firstStep(
+    rule.strongBorder,
+    (step) => reaches(ramp[step], bases, markLc),
   );
-  final strongText = _firstReadableOn(ramp, rule.strongText, [
-    band,
-    soft,
-  ], fill);
+  final fromTheSolid = rule.outward.sublist(rule.outward.indexOf(solidStep));
+  final text = _firstStep(
+    fromTheSolid,
+    (step) => readsOn(ramp[step], bases, solid, accentTextLc),
+  );
+  final strongText = _firstStep(
+    fromTheSolid.sublist(fromTheSolid.indexOf(text)),
+    (step) => readsOn(ramp[step], bases, solid),
+  );
 
-  return [...surfaces, text, fill, strongText];
+  return [...surfaces, ramp[strongBorder], solid, ramp[text], ramp[strongText]];
 }
 
 IdsPalette paletteFromRamp(IdsRamp ramp, [IdsPalette? neutral]) {

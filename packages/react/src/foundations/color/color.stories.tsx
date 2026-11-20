@@ -76,22 +76,22 @@ const slotOf = (template: string, family: string) => template.replace('{family}'
 type Pairing = readonly [background: string, foreground: string, kind: 'text' | 'accent' | 'mark'];
 
 const pairsOf = (family: string): Pairing[] => [
-  [`bg-${family}`, `text-on-${family}`, 'text'],
-  [`bg-${family}-subtler`, `text-on-${family}-subtler`, 'text'],
-  [`bg-${family}-subtle`, `text-on-${family}-subtle`, 'text'],
-  ['bg-neutral-subtlest', `text-${family}`, 'accent'],
-  [`bg-${family}-subtler`, `text-${family}`, 'accent'],
-  ['bg-neutral-subtlest', `border-${family}`, 'mark'],
+  [`bg-${family}-solid`, `text-on-${family}-solid`, 'text'],
+  [`bg-${family}-soft`, `text-on-${family}-soft`, 'text'],
+  ['bg-base', `text-${family}`, 'accent'],
+  [`bg-${family}-soft`, `text-${family}`, 'accent'],
+  ['bg-base', `text-${family}-strong`, 'text'],
+  ['bg-base', `border-${family}-strong`, 'mark'],
 ];
 
 const pairs: Pairing[] = [
-  ['bg-neutral-subtlest', 'text-on-neutral-subtlest', 'text'],
-  ['bg-neutral-subtler', 'text-on-neutral-subtler', 'text'],
-  ['bg-neutral-subtlest', 'text-neutral-bold', 'text'],
-  ['bg-neutral-subtlest', 'text-neutral', 'text'],
-  ['bg-neutral-subtle', 'text-on-neutral-subtle', 'text'],
-  ['bg-neutral', 'text-on-neutral', 'text'],
-  ['bg-neutral-bold', 'text-on-neutral-bold', 'text'],
+  ['bg-base', 'text-on-base', 'text'],
+  ['bg-surface', 'text-on-surface', 'text'],
+  ['bg-block', 'text-on-block', 'text'],
+  ['bg-base', 'text-neutral-strong', 'text'],
+  ['bg-base', 'text-neutral', 'text'],
+  ['bg-neutral-soft', 'text-on-neutral-soft', 'text'],
+  ['bg-neutral-solid', 'text-on-neutral-solid', 'text'],
   ...[...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES].flatMap(pairsOf),
 ];
 
@@ -209,9 +209,13 @@ function FamilyTable() {
             {IDS_FAMILY_SLOTS.map((template, index) => (
               <div key={template} className={familyRow} style={familyColumns}>
                 <span className="text-body-b3-regular font-mono">{slotTemplates[index]}</span>
-                {IDS_COLOR_FAMILIES.map((family) => (
-                  <Swatch key={family} token={slotOf(template, family)} />
-                ))}
+                {IDS_COLOR_FAMILIES.map((family) =>
+                  template.includes('{family}') || family === 'neutral' ? (
+                    <Swatch key={family} token={slotOf(template, family)} />
+                  ) : (
+                    <span key={family} />
+                  ),
+                )}
               </div>
             ))}
           </div>
@@ -321,7 +325,7 @@ export const Lab: Story = {
         </Showcase.Section>
         <Showcase.Section
           title="Palettes"
-          description="모드마다 역할이 읽는 8단계입니다. 1 페이지, 2 띠, 3 옅은 채움, 4 선, 5 손잡이, 6 흐린 글자, 7 채움, 8 진한 글자."
+          description="모드마다 9단계이고, 번호가 클수록 페이지에서 멀어집니다. 1 base, 2 surface, 3 block, 4 soft, 5 선, 6 진한 선, 7 solid, 8 글자, 9 진한 글자. solid 는 그 위 글자 대비로 고르므로 6 보다 페이지에 가까울 수 있습니다."
         >
           <div data-lab-palettes="" className={cn('flex flex-col gap-2', panel)}>
             <div className={labPaletteRow} style={labPaletteColumns}>
@@ -340,10 +344,16 @@ export const Lab: Story = {
                   const scale =
                     family === 'neutral' ? colors.neutral[mode] : colors.palettes[family][mode];
                   return (
-                    <div key={`${family}-${mode}`} className={labPaletteRow} style={labPaletteColumns}>
+                    <div
+                      key={`${family}-${mode}`}
+                      className={labPaletteRow}
+                      style={labPaletteColumns}
+                    >
                       <span className="text-body-b3-regular font-mono">{family}</span>
                       <span className="text-caption-c1-regular text-neutral">
-                        {family === 'neutral' ? (theme.neutral ?? 'pure') : sourceOf(family, colors.given, theme.status)}
+                        {family === 'neutral'
+                          ? (theme.neutral ?? 'pure')
+                          : sourceOf(family, colors.given, theme.status)}
                       </span>
                       <span className="text-caption-c1-regular text-neutral">{mode}</span>
                       {scale.map((color, index) => (
@@ -352,7 +362,9 @@ export const Lab: Story = {
                             className="rounded-indicator inset-ring-neutral h-7 w-full inset-ring-1"
                             style={{ background: color }}
                           />
-                          <code className="text-caption-c1-regular text-neutral font-mono">{color}</code>
+                          <code className="text-caption-c1-regular text-neutral font-mono">
+                            {color}
+                          </code>
                         </div>
                       ))}
                     </div>
@@ -363,13 +375,13 @@ export const Lab: Story = {
         </Showcase.Section>
         <Showcase.Section
           title="Families × Roles"
-          description="계열 여덟 개가 같은 역할 여덟 개를 가지고, neutral 은 페이지와 본문, 반전 채움 역할 다섯을 더 가집니다. 배경 bg-X-세기 위 글자는 언제나 text-on-X-세기입니다. bg-primary-subtle 는 배경, text-on-primary-subtle 는 그 위 글자, border-primary 는 선입니다."
+          description="배경은 쓰임새(bg-base, bg-surface, bg-block, bg-X-soft, bg-X-solid), 선과 글자는 세기(border-X, border-X-strong, text-X, text-X-strong)로 부릅니다. base, surface, block 은 neutral 만 가집니다. 배경 위 글자 text-on-{배경} 은 provider 가 APCA 로 골라 둡니다."
         >
           <FamilyTable />
         </Showcase.Section>
         <Showcase.Section
           title="Contrast"
-          description="같이 쓰는 짝의 APCA 대비(Lc)입니다. 채움과 subtle 위 글자는 hover, press 층 아래에서도 Lc 75, 페이지 위 색 글자는 Lc 60, 선과 아이콘 같은 표시는 Lc 45 이상이어야 합니다."
+          description="같이 쓰는 짝의 APCA 대비(Lc)입니다. text-on 과 text-X-strong 은 hover, press 층 아래에서도 Lc 75, text-X 는 Lc 60, border-X-strong 같은 표시는 Lc 45 이상이어야 합니다."
         >
           <div className="flex flex-wrap gap-4">
             {modes.map((mode) => (

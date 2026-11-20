@@ -278,10 +278,12 @@ test('the footer is a band below the body that scrolls', async () => {
   const footer = content.querySelector<HTMLElement>(':scope > [data-dialog-footer]')!;
 
   expect(body.contains(footer)).toBe(false);
-  expect(getComputedStyle(content).backgroundColor).toBe(colorOf('--ids-color-bg-panel', content));
-  expect(getComputedStyle(footer).backgroundColor).toBe(colorOf('--ids-color-bg-band', content));
+  expect(getComputedStyle(content).backgroundColor).toBe(
+    colorOf('--ids-color-bg-surface', content),
+  );
+  expect(getComputedStyle(footer).backgroundColor).toBe(colorOf('--ids-color-bg-block', content));
   expect(getComputedStyle(footer).color).toBe(
-    textColorOf('--ids-color-text-neutral-bold', content),
+    textColorOf('--ids-color-text-neutral-strong', content),
   );
   expect(getComputedStyle(footer).borderTopColor).toBe(
     colorOf('--ids-color-border-neutral', content),

@@ -9,7 +9,7 @@ export const switchStyle = tv({
       'bg-(--ids-color-border-neutral) shadow-xs inset-ring-1 inset-ring-transparent focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
       'scheme-primary data-invalid:scheme-danger',
-      'data-[state=checked]:bg-scheme',
+      'data-[state=checked]:bg-scheme-solid',
       'data-disabled:opacity-50',
     ],
     input:
@@ -17,7 +17,7 @@ export const switchStyle = tv({
     thumb: [
       'pointer-events-none flex shrink-0 items-center justify-center rounded-full shadow-sm',
       'bg-switch-thumb text-neutral',
-      'data-[state=checked]:bg-(--ids-color-text-on-scheme) data-[state=checked]:text-(--ids-color-bg-scheme)',
+      'data-[state=checked]:bg-(--ids-color-text-on-scheme-solid) data-[state=checked]:text-(--ids-color-bg-scheme-solid)',
       'transition-[translate,background-color] duration-(--ids-motion-fast) motion-reduce:transition-none',
       '[&>svg]:size-3/4',
     ],

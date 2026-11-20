@@ -1,15 +1,11 @@
 {
-  "bg-neutral-subtlest": 1,
-  "bg-neutral-subtler": 2,
-  "bg-neutral-subtle": 3,
-  "bg-neutral": 5,
-  "bg-neutral-bold": 7,
-  "text-on-neutral-subtlest": 8,
-  "text-on-neutral-subtler": 8,
-  "text-on-neutral-subtle": 8,
-  "text-on-neutral": 8,
-  "text-on-neutral-bold": 2,
-  "text-neutral": 6,
-  "text-neutral-bold": 8,
-  "border-neutral": 4
+  "bg-base": 1,
+  "bg-surface": 2,
+  "bg-block": 3,
+  "bg-neutral-soft": 4,
+  "bg-neutral-solid": 9,
+  "border-neutral": 5,
+  "border-neutral-strong": 6,
+  "text-neutral": 8,
+  "text-neutral-strong": 9
 }
