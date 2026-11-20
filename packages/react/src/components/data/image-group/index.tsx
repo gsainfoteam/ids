@@ -10,12 +10,13 @@ import type { UseImageGroupOptions } from '../image/use-image-group';
 
 export type ImageGroupLayout = 'row' | 'column' | 'grid';
 
-export function ImageGroup({ children, ...props }: ImageGroup.Props) {
+export function ImageGroup(props: ImageGroup.Props) {
+  const { children, ...rest } = props;
   const nodes = flattenFragments(children);
   const viewer = nodes.find(isTheViewer);
 
   return (
-    <ImageGroupRoot {...props} viewer={viewer}>
+    <ImageGroupRoot {...rest} viewer={viewer}>
       {nodes.filter((node) => node !== viewer)}
     </ImageGroupRoot>
   );
