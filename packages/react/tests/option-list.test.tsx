@@ -28,7 +28,16 @@ const indicatorOf = (element: Element) =>
 
 const transparent = 'rgba(0, 0, 0, 0)';
 
-test('Select: a selected option keeps the surface and a primary check, the highlight is neutral', async () => {
+function layerAlpha(element: Element) {
+  const image = getComputedStyle(element).backgroundImage;
+  const color = image.match(/linear-gradient\(((?:color|rgba?)\([^)]*\))/)?.[1];
+  if (!color) return 0;
+  const alpha =
+    color.match(/\/\s*([\d.]+)\)$/)?.[1] ?? color.match(/rgba\([^)]*,\s*([\d.]+)\)$/)?.[1];
+  return alpha === undefined ? 1 : Number(alpha);
+}
+
+test('Select: a selected option keeps the surface and a primary check, the highlight is the hover layer', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <Select
@@ -47,20 +56,19 @@ test('Select: a selected option keeps the surface and a primary check, the highl
   await expect.element(screen.getByRole('option', { name: 'Grape' })).toBeVisible();
 
   expect(option('Apple').hasAttribute('data-highlighted')).toBe(true);
-  expect(background(option('Apple'))).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  expect(layerAlpha(option('Apple'))).toBeGreaterThan(0);
   expect(background(option('Grape'))).toBe(transparent);
-  expect(text(option('Grape'))).toBe(colorOf('--ids-color-on-surface'));
+  expect(layerAlpha(option('Grape'))).toBe(0);
+  expect(text(option('Grape'))).toBe(text(option('Cherry')));
   expect(text(indicatorOf(option('Grape')))).toBe(colorOf('--ids-color-text-primary'));
   expect(background(option('Cherry'))).toBe(transparent);
 
   await userEvent.hover(option('Cherry'));
-  await expect
-    .poll(() => background(option('Cherry')))
-    .toBe(colorOf('--ids-color-bg-neutral-soft'));
+  await expect.poll(() => layerAlpha(option('Cherry'))).toBeGreaterThan(0);
+  const hoverLayer = getComputedStyle(option('Cherry')).backgroundImage;
   await userEvent.hover(option('Banana'));
-  await expect
-    .poll(() => background(option('Banana')))
-    .toBe(colorOf('--ids-color-bg-neutral-soft'));
+  await expect.poll(() => getComputedStyle(option('Banana')).backgroundImage).toBe(hoverLayer);
+  expect(background(option('Banana'))).toBe(transparent);
 });
 
 test('Menu: checked checkbox and radio items keep the surface and a primary indicator', async () => {
@@ -98,7 +106,8 @@ test('Menu: checked checkbox and radio items keep the surface and a primary indi
 
   expect(grid.element().hasAttribute('data-highlighted')).toBe(false);
   expect(background(grid.element())).toBe(transparent);
-  expect(text(grid.element())).toBe(colorOf('--ids-color-on-surface'));
+  expect(layerAlpha(grid.element())).toBe(0);
+  expect(text(grid.element())).toBe(text(ruler.element()));
   expect(text(indicatorOf(grid.element()))).toBe(colorOf('--ids-color-text-primary'));
   expect(background(zoom.element())).toBe(transparent);
   expect(background(indicatorOf(zoom.element()).firstElementChild!)).toBe(
@@ -106,9 +115,11 @@ test('Menu: checked checkbox and radio items keep the surface and a primary indi
   );
 
   await userEvent.hover(ruler);
-  await expect.poll(() => background(ruler.element())).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  await expect.poll(() => layerAlpha(ruler.element())).toBeGreaterThan(0);
+  const hoverLayer = getComputedStyle(ruler.element()).backgroundImage;
   await userEvent.hover(grid);
-  await expect.poll(() => background(grid.element())).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  await expect.poll(() => getComputedStyle(grid.element()).backgroundImage).toBe(hoverLayer);
+  expect(background(grid.element())).toBe(transparent);
 });
 
 test('ChipField: a chosen option keeps the surface and a primary check', async () => {
@@ -125,9 +136,10 @@ test('ChipField: a chosen option keeps the surface and a primary check', async (
 
   expect(option('Svelte').hasAttribute('data-highlighted')).toBe(false);
   expect(background(option('Svelte'))).toBe(transparent);
-  expect(text(option('Svelte'))).toBe(colorOf('--ids-color-on-surface'));
+  expect(layerAlpha(option('Svelte'))).toBe(0);
+  expect(text(option('Svelte'))).toBe(text(option('React')));
   expect(text(indicatorOf(option('Svelte')))).toBe(colorOf('--ids-color-text-primary'));
 
   await userEvent.hover(option('Vue'));
-  await expect.poll(() => background(option('Vue'))).toBe(colorOf('--ids-color-bg-neutral-soft'));
+  await expect.poll(() => layerAlpha(option('Vue'))).toBeGreaterThan(0);
 });

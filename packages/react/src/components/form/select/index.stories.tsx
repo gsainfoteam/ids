@@ -72,7 +72,7 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Open"
-        description="고른 옵션에는 primary 체크가 붙고, 키보드나 마우스로 가리킨 옵션만 neutral soft 배경이 됩니다."
+        description="고른 옵션에는 primary 체크가 붙고, 키보드나 마우스로 가리킨 옵션에만 hover state layer 가 깔립니다."
       >
         <Showcase.Row label="multiple, groups" className="h-64 items-start">
           <div className="w-56">

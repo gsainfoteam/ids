@@ -27,7 +27,7 @@ export type TextAreaInputPartProps = TextAreaInputProps & {
 const MEASURED_HEIGHTS = ['height', 'minHeight', 'maxHeight'] as const;
 
 function rowsToHeight(rows: number | undefined) {
-  return rows == null ? undefined : `calc(${rows} * 1lh + var(--ids-text-area-pad-y) * 2)`;
+  return rows == null ? undefined : `calc(${rows} * 1lh + var(--text-area-pad-y) * 2)`;
 }
 
 export function TextAreaInput({ asChild, children, className, style }: TextAreaInputPartProps) {

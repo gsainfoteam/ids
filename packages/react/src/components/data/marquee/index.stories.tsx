@@ -45,7 +45,7 @@ const content = (root: Element) => root.querySelector<HTMLElement>('[data-marque
 const copy = (root: Element) => root.querySelector<HTMLElement>('[data-marquee-copy]');
 const playState = (root: Element) => getComputedStyle(track(root)).animationPlayState;
 const duration = (root: Element) =>
-  parseFloat((root as HTMLElement).style.getPropertyValue('--ids-marquee-duration'));
+  parseFloat((root as HTMLElement).style.getPropertyValue('--marquee-duration'));
 
 const meta = {
   title: 'Data/Marquee',

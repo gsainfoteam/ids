@@ -110,6 +110,27 @@
     "close": "Close",
     "handle": "Drag to resize"
   },
+  "editor": {
+    "blockType": "Text style",
+    "blockquote": "Quote",
+    "bold": "Bold",
+    "bubbleMenu": "Selection formatting",
+    "bulletList": "Bulleted list",
+    "code": "Code",
+    "codeBlock": "Code block",
+    "content": "Content",
+    "heading": "Heading {level}",
+    "italic": "Italic",
+    "link": "Link",
+    "linkApply": "Apply",
+    "linkRemove": "Remove link",
+    "linkUrl": "Link URL",
+    "orderedList": "Numbered list",
+    "paragraph": "Paragraph",
+    "strike": "Strikethrough",
+    "toolbar": "Formatting",
+    "underline": "Underline"
+  },
   "fileField": {
     "clear": "Remove all files",
     "count": "{count, plural, one {# file} other {# files}}",
@@ -144,7 +165,9 @@
     "thumbnails": "Image list",
     "viewer": "Image viewer",
     "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out"
+    "zoomLevel": "{percent}%",
+    "zoomOut": "Zoom out",
+    "zoomReset": "{percent}%, fit to screen"
   },
   "input": {
     "clearSearch": "Clear search"
@@ -233,6 +256,17 @@
   },
   "qrCode": {
     "label": "QR code"
+  },
+  "questionnaire": {
+    "navigation": "Question navigation",
+    "next": "Next",
+    "other": "Other",
+    "otherPlaceholder": "Type another answer",
+    "previous": "Previous",
+    "progress": "Questionnaire progress",
+    "skip": "Skip",
+    "step": "Question {current} of {total}",
+    "submit": "Submit"
   },
   "rating": {
     "label": "Rating",

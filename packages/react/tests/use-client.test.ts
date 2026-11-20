@@ -70,7 +70,13 @@ test('dist keeps use client exactly where the source has it', () => {
 });
 
 test('dist keeps one module per source file behind the same entry paths', () => {
-  for (const entry of ['index.js', 'chart.js', 'react-hook-form.js', 'tanstack-form.js'])
+  for (const entry of [
+    'index.js',
+    'chart.js',
+    'editor.js',
+    'react-hook-form.js',
+    'tanstack-form.js',
+  ])
     expect(existsSync(DIST + entry), entry).toBe(true);
 
   expect(existsSync(DIST + 'components/action/button/index.js')).toBe(true);

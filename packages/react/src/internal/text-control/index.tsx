@@ -14,7 +14,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 
 import { IconButton } from '../../components/action/icon-button';
 import { elementTypeOf, flattenFragments, invariant, mergeProps } from '../../utils';
-import { type FieldSurfaceVariant } from '../field-surface';
+import { type FieldSurfaceVariant } from '../surfaces/field-surface';
 import { useTranslate } from '../translate';
 import { type textControlStyle } from './style';
 

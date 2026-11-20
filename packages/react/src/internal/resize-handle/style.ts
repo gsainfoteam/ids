@@ -19,16 +19,15 @@ export const resizeHandle = {
   focusWithin: cn('has-focus-visible:ring-[3px] has-focus-visible:ring-primary/40'),
   ladder: {
     ink: cn(
-      'text-(--ids-color-bg-neutral) hover:text-(--ids-color-bg-neutral-hover)',
-      'data-dragging:text-(--ids-color-bg-neutral-active)',
+      'text-(--ids-color-bg-neutral) hover:text-neutral data-dragging:text-neutral',
     ),
     pill: cn(
-      'before:bg-neutral hover:before:bg-neutral-hover',
-      'data-dragging:before:bg-neutral-active',
+      'before:bg-neutral hover:before:bg-(--ids-color-text-neutral)',
+      'data-dragging:before:bg-(--ids-color-text-neutral)',
     ),
     line: cn(
-      'bg-(--ids-color-border-neutral) hover:bg-neutral-hover',
-      'data-dragging:bg-neutral-active',
+      'bg-(--ids-color-border-neutral) hover:bg-(--ids-color-text-neutral)',
+      'data-dragging:bg-(--ids-color-text-neutral)',
     ),
   },
   motion: cn(

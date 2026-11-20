@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 
 import { IconButtonRoot } from './root';
 import { iconButtonStyle } from './style';
-import { type ControlColorScheme } from '../../../internal/control-surface';
+import { type ControlColorScheme } from '../../../internal/surfaces/control-surface';
 
 import type {
   InteractiveState,

@@ -32,6 +32,9 @@ export type ImageViewerContextValue = {
   canZoomOut: boolean;
   zoomIn: () => void;
   zoomOut: () => void;
+  zoom: number;
+  canResetZoom: boolean;
+  resetZoom: () => void;
   close: () => void;
   styles: ReturnType<typeof imageStyle>;
 };

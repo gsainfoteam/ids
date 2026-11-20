@@ -102,6 +102,7 @@ function CommandPopup({
   const {
     open,
     ending,
+    stacked,
     layer,
     content,
     ids,
@@ -136,6 +137,7 @@ function CommandPopup({
       backdrop={{
         ref: setBackdrop,
         'data-menu-backdrop': '',
+        'data-stacked': stacked ? '' : undefined,
         'data-ending-style': ending ? '' : undefined,
         className: styles.backdrop(),
       }}

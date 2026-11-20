@@ -38,11 +38,25 @@ export function ChipInput({
   invariant(c != null, '`<ChipField.Input>` must be used inside `<ChipField>`.');
   const { inputRef } = c;
 
+  const merged = mergeProps(
+    mergeProps(c.inputDefaults, mergeProps(c.inputProps, rest)),
+    c.comboboxWiring,
+  );
+  const placeholder = c.field.state.selected.length === 0 ? merged.placeholder : undefined;
   const props = {
-    ...mergeProps(mergeProps(c.inputDefaults, mergeProps(c.inputProps, rest)), c.comboboxWiring),
+    ...merged,
+    placeholder,
     className: c.styles.input({ className }),
     style,
   };
+  const widthFromText = (control: ReactNode) => (
+    <span data-chip-field-sizer="" className={c.styles.inputSizer()}>
+      {control}
+      <span aria-hidden="true" className={c.styles.inputMirror()}>
+        {c.field.state.query || placeholder}
+      </span>
+    </span>
+  );
 
   if (asChild === true) {
     invariant(
@@ -50,16 +64,16 @@ export function ChipInput({
       '`<ChipField.Input asChild>` requires one input, or a component forwarding input props and ref.',
     );
 
-    return (
+    return widthFromText(
       <Slot {...(props as Slot.Props)} ref={mergeRefs(inputRef, c.inputProps.ref, ref)}>
         {children}
-      </Slot>
+      </Slot>,
     );
   }
 
   invariant(children == null, '`<ChipField.Input>` renders the search text itself, not children.');
 
-  return <input {...props} ref={mergeRefs(inputRef, c.inputProps.ref, ref)} />;
+  return widthFromText(<input {...props} ref={mergeRefs(inputRef, c.inputProps.ref, ref)} />);
 }
 
 ChipInput.displayName = 'ChipField.Input';

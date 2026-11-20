@@ -26,7 +26,7 @@ const colorSchemes = [
 ] as const;
 const placements = ['top-end', 'top-start', 'bottom-end', 'bottom-start'] as const;
 
-const Box = () => <div className="rounded-standard bg-neutral-soft size-10" />;
+const Box = () => <div className="rounded-standard bg-neutral-subtle size-10" />;
 
 const meta = {
   title: 'Data/Badge',
@@ -124,7 +124,7 @@ export const Gallery: Story = {
         </Showcase.Row>
         <Showcase.Row label="circular">
           <Badge content={2} shape="circular">
-            <div className="bg-neutral-soft size-10 rounded-full" />
+            <div className="bg-neutral-subtle size-10 rounded-full" />
           </Badge>
         </Showcase.Row>
       </Showcase.Section>

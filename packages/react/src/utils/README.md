@@ -29,12 +29,12 @@
 ### 쓰는 법
 
 ```ts
-// internal/field-surface.ts: 공유 조각은 cn('...') 값의 객체
+// internal/surfaces/field-surface.ts: 공유 조각은 cn('...') 값의 객체
 export const fieldAction = {
   base: cn(
     'shrink-0 text-neutral',
-    'data-hovered:text-on-surface data-active:text-on-surface',
-    'data-pressed:text-on-surface',
+    'data-hovered:text-neutral-bold data-active:text-neutral-bold',
+    'data-pressed:text-neutral-bold',
   ),
   // ...
 };
@@ -58,6 +58,7 @@ className={cn('origin-center -rotate-90', indicatorClassName)}
 ### 알아둘 것
 
 - 글자 스타일(`text-body-b3-regular` 등)은 줄 높이를 함께 가지므로, 그 앞에 둔 `leading-*` 는 지워집니다. `text-body-b3-regular leading-none` 순서로 씁니다.
+- `state-layer`, `state-hover`, `state-press` 는 CSS 패키지의 IDS 유틸리티라 `cn` 설정에 없습니다. 충돌로 잡히지 않아 둘 다 남으므로, `state-hover` 와 `state-press` 는 같은 조건에 함께 두지 않고 `data-hovered:` 와 `data-active:` 처럼 다른 조건에 나눠 씁니다.
 - 새 radius 이름이나 글자 스타일 접두사를 토큰에 더하면 여기에도 더합니다. 아니면 충돌을 알아보지 못합니다.
 - 결과는 빈 문자열일 수 있습니다(`cn(undefined)` 는 `''`). `tv` 는 이것을 `undefined` 로 바꿉니다.
 

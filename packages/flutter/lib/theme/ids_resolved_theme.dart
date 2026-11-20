@@ -6,6 +6,7 @@ import 'package:flutter/painting.dart';
 import '../src/color/theme_checks.dart';
 import '../src/color/theme_roles.dart';
 import '../tokens/ids_color_roles.dart';
+import '../tokens/ids_component_tokens.dart';
 import '../tokens/ids_enums.dart';
 import '../tokens/ids_typography.dart';
 import 'ids_theme.dart';
@@ -173,6 +174,15 @@ class IdsResolvedTheme {
   late final IdsColors colors = IdsColors.fromRoles(_roles![mode]!);
 
   IdsColors colorsIn(IdsMode mode) => IdsColors.fromRoles(_roles![mode]!);
+
+  late final IdsComponentColors componentColors = IdsComponentColors.of(
+    colors,
+    mode,
+  );
+
+  late final IdsComponentShadows componentShadows = IdsComponentShadows.of(
+    mode,
+  );
 
   bool get isDark => mode == IdsMode.dark;
 

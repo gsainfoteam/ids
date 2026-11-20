@@ -29,11 +29,11 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 
 ## 결정 사항
 
-- **StateMask는 만들지 않는다.** 상태는 배경색 알파로 표현한다. 상태 감지는 `useInteractive`의 Flutter 대응물 `IdsInteractive`.
+- **hover·press는 state layer다.** 배경 위에 전경색(React의 `currentColor`)을 `IdsStateOpacity.hover`(0.06), `.press`(0.1)로 덮는다. React `state-layer`와 같은 계산이다. 별도 StateMask 위젯은 만들지 않는다. 상태 감지는 `useInteractive`의 Flutter 대응물 `IdsInteractive`.
 - **`IdsInteractive`는 그리지 않는다.** 상태만 내보내고 배경 알파·scale·focus ring·disabled는 control surface 값 파일이 정한다. React의 `useInteractive` / `control-surface.ts` 분리와 같다. 그래서 Figma를 보지 않는다.
 - **`IdsTextField`도 `IdsInteractive`를 쓴다.** React는 `Button`·`Toggle`만 쓰고 `TextField`는 네이티브 `:focus-visible`로 처리한다. Flutter엔 의사클래스가 없다.
 - **로컬 enum은 만들지 않는다.** `IdsSize`/`IdsVariant`로 안 되는 축은 `packages/core/tokens/enums.json`에 추가한다. 추가는 FE가 그 컴포넌트를 만들 때 한다.
-- **치수·상태 알파는 Figma가 기준.** Figma에 없으면 React 값을 쓴다. core에 `radius.json`·`size.json`은 있으나 dart formatter가 없어 `lib/tokens/`로 나오지 않는다. 상태 알파(`--ids-state-*`)는 core에 아예 없고 [control-surface.ts](../react/src/internal/control-surface.ts)에만 있다. Flutter는 이 값을 파일 한 곳에만 둔다. 값이 굳으면 core로 올리고 `sd.config.js`에 dart formatter를 켠다.
+- **치수·상태 알파는 Figma가 기준.** Figma에 없으면 React 값을 쓴다. core에 `radius.json`·`size.json`은 있으나 dart formatter가 없어 `lib/tokens/`로 나오지 않는다. 상태 알파는 core의 `tokens/state.json`에 있고 `pnpm codegen`이 `lib/tokens/ids_color_roles.dart`의 `IdsStateOpacity`로 쓴다. 손으로 적지 않는다.
 - **컴포넌트 색은 `colorScheme` prop이다.** FE의 Button, IconButton, Toggle, IconToggle, FloatingButton, Badge, Chip, Alert, Progress에 있다. 컨트롤의 값은 `primary` `neutral` `danger` `success` `warning` `info`. `enums.json`에는 아직 없고 React의 TS 타입(`ControlColorScheme`)이다. 옮기는 컴포넌트에서 쓰일 때 `enums.json`에 올린다.
 - **설계 문서(Notion, `IDS Architecture.md`)와 다른 곳.** 시각값은 Figma를 보고 닫는다. 나머지는 코드를 따르고 미결로 둔다.
 
@@ -80,6 +80,27 @@ git show ed74578:packages/flutter/example/lib/components/card_usecase.dart
 FE의 `Slot` `FocusTrap` `DirectionProvider` `When`은 Flutter에 필요 없을 수 있다. 차례에 판단.
 
 `Text`가 없는 동안 컨트롤 안의 텍스트는 `IdsProvider.of(context).textStyle(IdsTypography.bodyB3Medium, color: ...)`를 `DefaultTextStyle`로 쓴다. 이름은 CSS의 `text-body-b3-medium`과 같다.
+
+## 색 역할 이름 변경
+
+React와 같은 문법(`{bg|text|border}-{계열}[-{세기}]`, 세기 `subtlest` < `subtler` < `subtle` < (없음) < `bold`)으로 바뀌었다. `IdsColors` 필드는 `lib/tokens/ids_color_roles.dart`가 `packages/core/color-roles.json`에서 만든다.
+
+| 예전 | 지금 |
+| --- | --- |
+| `colors.surface` | `colors.bgNeutralSubtlest` |
+| `colors.onSurface` | `colors.textNeutralBold` |
+| `bgXSoft` (`bgPrimarySoft`, `bgNeutralSoft` …) | `bgXSubtle` |
+| `textOnXSoft` | `textOnXSubtle` |
+| `bgXHover`, `bgXActive` | 없음. `IdsStateOpacity`로 state layer |
+| `bgXSoftHover`, `bgXSoftActive` | 없음. 위와 같다 |
+| `IdsColorRoles.baseSlots` | 없음. `IdsColorRoles.neutralOnlySlots` |
+
+새로 생긴 것:
+
+- 모든 계열: `bgXSubtler`. light 는 팔레트 50, dark 는 950 을 `bgNeutralSubtlest` 쪽으로 절반(OKLab) 섞은 색
+- neutral만: `bgNeutralSubtlest`, `bgNeutralBold`, `textOnNeutralBold`, `textNeutralBold`
+- `IdsStateOpacity.hover` (0.06), `IdsStateOpacity.press` (0.1)
+- `IdsColorRoles.slotsOf(family)`: neutral 이 아니면 `neutralOnlySlots`를 뺀다
 
 ## 옮겨야 할 규약
 
@@ -129,29 +150,31 @@ focusVisible = focused
 
 ### control surface — Button / IconButton / Toggle / IconToggle 공통
 
-[control-surface.ts](../react/src/internal/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySoft`, `textOnPrimary` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
+[control-surface.ts](../react/src/internal/surfaces/control-surface.ts) 그대로. `colorScheme`이 계열 하나(X)를 고르고 variant가 그 계열의 역할을 쓴다. 역할은 `IdsProvider.of(context).colors`의 필드다(`bgPrimarySubtle`, `textOnPrimary` …). 치수는 `IdsButton` 때 Figma로 덮어쓴다.
 
-| `colorScheme`                                 | fill / on-fill                  | fill hover / press                 | quiet         | hover / press                              | ring        |
-| --------------------------------------------- | ------------------------------- | ---------------------------------- | ------------- | ------------------------------------------ | ----------- |
-| `primary` `secondary` `tertiary`              | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderX`   |
-| `neutral`                                     | `onSurface` / `surface`         | fill을 글자 반대쪽으로 10% / 20%   | `onSurface`   | `bgNeutralSoft` / `bgNeutralSoftHover`     | `borderPrimary` |
-| `danger` `success` `warning` `info`           | `bgX` / `textOnX`               | `bgXHover` / `bgXActive`           | `textX`       | `bgXSoft` / `bgXSoftHover`                 | `borderX`   |
+| `colorScheme`                       | fill / on-fill                         | soft / on-soft                         | quiet             | ring            |
+| ----------------------------------- | -------------------------------------- | -------------------------------------- | ----------------- | --------------- |
+| `primary` `secondary` `tertiary`    | `bgX` / `textOnX`                      | `bgXSubtle` / `textOnXSubtle`          | `textNeutralBold` | `borderX`       |
+| `neutral`                           | `bgNeutralBold` / `textOnNeutralBold`  | `bgNeutralSubtle` / `textOnNeutralSubtle` | `textNeutralBold` | `borderPrimary` |
+| `danger` `success` `warning` `info` | `bgX` / `textOnX`                      | `bgXSubtle` / `textOnXSubtle`          | `textX`           | `borderX`       |
 
-|           | 배경 default                          | hover / active                         | 전경            | 테두리·그림자                        |
-| --------- | ------------------------------------- | -------------------------------------- | --------------- | ------------------------------------ |
-| `solid`   | fill                                  | fill hover / fill press                | on-fill         | 그림자 `shadow-xs`                   |
-| `soft`    | `bgXSoft`                             | `bgXSoftHover` / `bgXSoftActive`       | `textOnXSoft`   | 없음                                 |
-| `outline` | `surface` (dark: `bgNeutralSoft` 0.30) | hover / press                          | quiet           | 안쪽 1px `borderNeutral`, `shadow-xs` |
-| `ghost`   | 투명                                  | hover / press                          | quiet           | 없음                                 |
+|           | 배경 default                                    | hover / active               | 전경    | 테두리·그림자                         |
+| --------- | ----------------------------------------------- | ---------------------------- | ------- | ------------------------------------- |
+| `solid`   | fill                                            | state layer 0.06 / 0.1       | on-fill | 그림자 `shadow-xs`                    |
+| `soft`    | soft                                            | state layer 0.06 / 0.1       | on-soft | 없음                                  |
+| `outline` | `bgNeutralSubtlest` (dark: `bgNeutralSubtler`)  | state layer 0.06 / 0.1       | quiet   | 안쪽 1px `borderNeutral`, `shadow-xs` |
+| `ghost`   | 투명                                            | state layer 0.06 / 0.1       | quiet   | 없음                                  |
 
-- 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`, hover)이다
+- state layer: 배경 위에 전경색을 `IdsStateOpacity.hover`·`.press` 알파로 한 겹 더 칠한다(`Color.lerp(background, foreground, IdsStateOpacity.hover)`, `theme_roles.dart` 의 `withStateLayer`와 같은 계산). 어두운 글자 아래에서는 어두워지고 밝은 글자 아래에서는 밝아진다. 테마가 이 두 층 아래의 글자 대비까지 지키도록 역할을 고른다(`theme_roles.dart`)
+- 테마 색은 `solid`·`soft`만 쓴다. `outline`·`ghost`는 중립(`quiet`)이다
 - `outline` 테두리는 `colors.borderNeutral`이다. `DecoratedBox` + `Border.all(width: 1)` (기본 `strokeAlignInside`, 높이 불변) + 안쪽 `Padding`. `Container(decoration:)`는 자식을 1px inset하므로 쓰지 않는다
-- 브랜드 fill을 `withValues(alpha: 0.9)`로 흐리게 하지 않는다. hover·press는 `bgXHover`·`bgXActive`이고, 글자에서 멀어지는 쪽으로 섞여 대비가 떨어지지 않는다
-- Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 hover 색이다. 켜지면(`pressed`) press 단계를 쓴다
+- 브랜드 fill을 `withValues(alpha: 0.9)`로 흐리게 하지 않는다. hover·press는 state layer다
+- `glossy`는 state layer 대신 광택 그라디언트를 옮긴다(React에서 `state-layer`가 `background-image`를 차지하기 때문)
+- Toggle·IconToggle은 크기와 `colorScheme`은 같고 variant만 [toggle-surface.ts](../react/src/internal/surfaces/toggle-surface.ts)를 따른다. 꺼져 있으면 모두 투명(`outline`만 테두리)이고 hover·active는 state layer 0.06 / 0.1 이다. 켜지면(`pressed`) `ghost`·`outline`은 press 층(0.1)만 남기고 글자는 quiet 그대로, `soft`·`solid`·`glossy`는 그 variant의 채움과 전경을 쓴다
 - `active`는 배경만 바뀐다. scale 없음
 - `focusVisible`: 바깥 3px 링(ring 색 0.40)과 안쪽 1px 테두리를 ring 색으로. offset outline이 아니다
 - `disabled`: opacity 0.50. 로딩(`aria-busy`) 중에는 커서만 바뀐다
-- 전환은 색·배경·테두리·그림자, 시간은 `IdsMotion.fast`. reduced motion: 전환 없음
+- 전환은 색·배경·테두리·그림자·state layer 알파, 시간은 `IdsMotion.fast`. reduced motion: 전환 없음
 - Semantics는 컴포넌트가 내부에서 주입 (button, label, enabled. Toggle은 `toggled` 추가 — React의 `aria-pressed`)
 - 크기(radius는 모두 `standard` 10):
 
@@ -163,6 +186,10 @@ focusVisible = focused
 ### 그룹 전파
 
 그룹은 `orientation`, `size`, `variant`를 내려준다. 자식은 자기 값이 있으면 그것을 쓰고, 없으면 그룹 값을 쓴다(`size ?? group.size ?? standard`, `variant ?? group.variant ?? solid`). 어긋나도 throw하지 않는다. 그룹 안의 그룹은 바깥 그룹 값을 물려받는다. [group](../react/src/components/utility/group/index.tsx) `useGroupContext`.
+
+- 컨트롤은 `IdsGroup.maybeOf(context)`로 그룹 값(`IdsGroupData`: `orientation`, `attached`, `size`)을 읽는다
+- `attached: false`인 그룹의 `IdsGroupSeparator`는 컨트롤 가운데에 서는 짧은 선이다. standard 20, tiny 16. 8px 간격이 이미 떼어 놓으므로 여백은 없다
+- 떨어진 `ToggleGroup`은 토글을 늘이지 않는다. 늘이는 건 `attached`일 때뿐이다(React `flex-1`). `IdsToggleGroup`을 만들 때 따른다
 
 ## 순서
 

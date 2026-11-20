@@ -44,7 +44,7 @@ void main() {
     expect(rectOf(tester, 'b'), const Rect.fromLTWH(0, 20, 40, 36));
   });
 
-  testWidgets('separator crosses the group', (tester) async {
+  testWidgets('separator crosses an attached group', (tester) async {
     await pump(tester, const IdsGroup(children: [a, IdsGroupSeparator(), b]));
     expect(tester.getSize(find.byType(IdsDivider)), const Size(1, 36));
     expect(rectOf(tester, 'b').left, 41);
@@ -57,6 +57,60 @@ void main() {
       ),
     );
     expect(tester.getSize(find.byType(IdsDivider)), const Size(40, 1));
+  });
+
+  testWidgets('spaced separator is a short line centered in the gap', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      const IdsGroup(attached: false, children: [a, IdsGroupSeparator(), b]),
+    );
+    final line = tester.getRect(find.byType(IdsDivider));
+    expect(line.size, const Size(1, 20));
+    expect(line.left, 48);
+    expect(line.center.dy, rectOf(tester, 'b').center.dy);
+    expect(rectOf(tester, 'b').left, 57);
+
+    await pump(
+      tester,
+      const IdsGroup(
+        attached: false,
+        size: IdsSize.tiny,
+        children: [a, IdsGroupSeparator(), b],
+      ),
+    );
+    expect(tester.getSize(find.byType(IdsDivider)), const Size(1, 16));
+  });
+
+  testWidgets('vertical spaced separator is a short horizontal line', (
+    tester,
+  ) async {
+    await pump(
+      tester,
+      const IdsGroup(
+        orientation: Axis.vertical,
+        attached: false,
+        children: [a, IdsGroupSeparator(), b],
+      ),
+    );
+    final line = tester.getRect(find.byType(IdsDivider));
+    expect(line.size, const Size(20, 1));
+    expect(line.top, 28);
+    expect(line.center.dx, rectOf(tester, 'a').center.dx);
+  });
+
+  testWidgets('a nested group takes the outer size', (tester) async {
+    await pump(
+      tester,
+      const IdsGroup(
+        size: IdsSize.tiny,
+        children: [
+          IdsGroup(attached: false, children: [a, IdsGroupSeparator(), b]),
+        ],
+      ),
+    );
+    expect(tester.getSize(find.byType(IdsDivider)), const Size(1, 16));
   });
 
   testWidgets('separator outside a group fails', (tester) async {

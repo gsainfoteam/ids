@@ -10,103 +10,43 @@ export const alertStyle = tv({
       'data-ending-style:-translate-y-1 data-ending-style:opacity-0',
     ],
     icon: [
-      'flex h-[1lh] shrink-0 items-center text-(--alert-accent)',
+      'flex h-[1lh] shrink-0 items-center',
       '[&_svg]:size-(--ids-size-icon-standard)',
     ],
     content: 'flex min-w-0 flex-col gap-0.5',
-    title: 'text-body-b3-semibold text-(--alert-title)',
-    description: 'text-(--alert-body) [&_ul]:list-disc [&_ul]:ps-5 [ul&]:list-disc [ul&]:ps-5',
+    title: 'text-body-b3-semibold',
+    description: '[&_ul]:list-disc [&_ul]:ps-5 [ul&]:list-disc [ul&]:ps-5',
     actions: 'mt-2 flex flex-wrap items-center gap-2',
     close: '-my-0.5 -me-1.5 size-6 rounded-full',
   },
   variants: {
     colorScheme: {
-      neutral: {
-        root: [
-          '[--alert-tint:var(--ids-color-on-surface)] [--alert-on:var(--ids-color-surface)]',
-          '[--alert-soft:var(--ids-color-bg-neutral-soft)] [--alert-on-soft:var(--ids-color-text-on-neutral-soft)]',
-          '[--alert-strong:var(--ids-color-on-surface)]',
-        ],
-      },
-      primary: {
-        root: [
-          '[--alert-tint:var(--ids-color-bg-primary)] [--alert-on:var(--ids-color-text-on-primary)]',
-          '[--alert-soft:var(--ids-color-bg-primary-soft)] [--alert-on-soft:var(--ids-color-text-on-primary-soft)]',
-          '[--alert-strong:var(--ids-color-text-primary)]',
-        ],
-      },
-      secondary: {
-        root: [
-          '[--alert-tint:var(--ids-color-bg-secondary)] [--alert-on:var(--ids-color-text-on-secondary)]',
-          '[--alert-soft:var(--ids-color-bg-secondary-soft)] [--alert-on-soft:var(--ids-color-text-on-secondary-soft)]',
-          '[--alert-strong:var(--ids-color-text-secondary)]',
-        ],
-      },
-      tertiary: {
-        root: [
-          '[--alert-tint:var(--ids-color-bg-tertiary)] [--alert-on:var(--ids-color-text-on-tertiary)]',
-          '[--alert-soft:var(--ids-color-bg-tertiary-soft)] [--alert-on-soft:var(--ids-color-text-on-tertiary-soft)]',
-          '[--alert-strong:var(--ids-color-text-tertiary)]',
-        ],
-      },
-      info: {
-        root: [
-          '[--alert-tint:var(--ids-color-bg-info)] [--alert-on:var(--ids-color-text-on-info)]',
-          '[--alert-soft:var(--ids-color-bg-info-soft)] [--alert-on-soft:var(--ids-color-text-on-info-soft)]',
-          '[--alert-strong:var(--ids-color-text-info)]',
-        ],
-      },
-      success: {
-        root: [
-          '[--alert-tint:var(--ids-color-bg-success)] [--alert-on:var(--ids-color-text-on-success)]',
-          '[--alert-soft:var(--ids-color-bg-success-soft)] [--alert-on-soft:var(--ids-color-text-on-success-soft)]',
-          '[--alert-strong:var(--ids-color-text-success)]',
-        ],
-      },
-      warning: {
-        root: [
-          '[--alert-tint:var(--ids-color-bg-warning)] [--alert-on:var(--ids-color-text-on-warning)]',
-          '[--alert-soft:var(--ids-color-bg-warning-soft)] [--alert-on-soft:var(--ids-color-text-on-warning-soft)]',
-          '[--alert-strong:var(--ids-color-text-warning)]',
-        ],
-      },
-      danger: {
-        root: [
-          '[--alert-tint:var(--ids-color-bg-danger)] [--alert-on:var(--ids-color-text-on-danger)]',
-          '[--alert-soft:var(--ids-color-bg-danger-soft)] [--alert-on-soft:var(--ids-color-text-on-danger-soft)]',
-          '[--alert-strong:var(--ids-color-text-danger)]',
-        ],
-      },
+      neutral: { root: 'scheme-neutral' },
+      primary: { root: 'scheme-primary' },
+      secondary: { root: 'scheme-secondary' },
+      tertiary: { root: 'scheme-tertiary' },
+      info: { root: 'scheme-info' },
+      success: { root: 'scheme-success' },
+      warning: { root: 'scheme-warning' },
+      danger: { root: 'scheme-danger' },
     } satisfies Record<Alert.ColorScheme, object>,
     variant: {
       solid: {
-        root: [
-          'bg-(--alert-tint) text-(--alert-on)',
-          '[--alert-accent:var(--alert-on)] [--alert-title:var(--alert-on)] [--alert-body:var(--alert-on)]',
-        ],
-        close: [
-          '[--control-quiet:var(--alert-on)] [--control-ring:var(--alert-on)]',
-          '[--control-hover:color-mix(in_oklab,var(--alert-on)_15%,transparent)]',
-        ],
+        root: 'bg-scheme text-on-scheme',
+        close: 'text-on-scheme focus-ring-current',
       },
-      soft: {
-        root: [
-          'bg-(--alert-soft) text-(--alert-on-soft)',
-          '[--alert-accent:var(--alert-on-soft)] [--alert-title:var(--alert-on-soft)] [--alert-body:var(--alert-on-soft)]',
-        ],
-      },
+      soft: { root: 'bg-scheme-subtle text-on-scheme-subtle' },
       outline: {
-        root: [
-          'bg-surface text-on-surface inset-ring-1 inset-ring-neutral',
-          'dark:bg-neutral-soft/30',
-          '[--alert-accent:var(--alert-strong)] [--alert-title:var(--alert-strong)] [--alert-body:var(--ids-color-text-neutral)]',
-        ],
+        root: 'bg-panel text-neutral-bold inset-ring-1 inset-ring-neutral',
+        icon: 'text-scheme',
+        title: 'text-scheme',
+        description: 'text-neutral',
       },
       ghost: {
-        root: [
-          'bg-transparent text-on-surface',
-          '[--alert-accent:var(--alert-strong)] [--alert-title:var(--alert-strong)] [--alert-body:var(--ids-color-text-neutral)]',
-        ],
+        root: 'bg-transparent text-neutral-bold',
+        icon: 'text-scheme',
+        title: 'text-scheme',
+        description: 'text-neutral',
       },
     } satisfies Record<Alert.Variant, object>,
     icon: { true: {}, false: {} },
