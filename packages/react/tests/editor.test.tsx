@@ -43,6 +43,12 @@ function transfer(files: File[], html?: string) {
   return data;
 }
 
+function pasteEvent(files: File[], html?: string) {
+  const event = new ClipboardEvent('paste', { bubbles: true, cancelable: true });
+  Object.defineProperty(event, 'clipboardData', { value: transfer(files, html) });
+  return event;
+}
+
 const imageInput = () =>
   page.elementLocator(document.querySelector<HTMLInputElement>('[data-editor-image-input]')!);
 
@@ -564,14 +570,7 @@ test('a pasted or dropped image file goes through the upload, and other files do
   const content = await editable('본문');
   await userEvent.click(content);
 
-  const pasted = new ClipboardEvent('paste', {
-    bubbles: true,
-    cancelable: true,
-    clipboardData: transfer(
-      [png('pasted.png')],
-      '<img src="https://elsewhere.example/pasted.png">',
-    ),
-  });
+  const pasted = pasteEvent([png('pasted.png')], '<img src="https://elsewhere.example/pasted.png">');
   content.element().dispatchEvent(pasted);
   expect(pasted.defaultPrevented).toBe(true);
   await expect
@@ -591,11 +590,7 @@ test('a pasted or dropped image file goes through the upload, and other files do
   await expect.poll(() => content.element().querySelectorAll('img').length).toBe(2);
   expect(upload.mock.calls.map(([file]) => file.name)).toEqual(['pasted.png', 'dropped.png']);
 
-  const pdf = new ClipboardEvent('paste', {
-    bubbles: true,
-    cancelable: true,
-    clipboardData: transfer([new File(['%PDF'], 'notes.pdf', { type: 'application/pdf' })]),
-  });
+  const pdf = pasteEvent([new File(['%PDF'], 'notes.pdf', { type: 'application/pdf' })]);
   content.element().dispatchEvent(pdf);
   expect(pdf.defaultPrevented).toBe(false);
   await expect.element(content).toHaveFocus();
@@ -621,21 +616,13 @@ test('without onImageUpload there is no Image tool, files are not pasted and pas
   expect(document.querySelector('[data-editor-image-input]')).toBeNull();
 
   await userEvent.click(content.element().querySelector('p')!);
-  const file = new ClipboardEvent('paste', {
-    bubbles: true,
-    cancelable: true,
-    clipboardData: transfer([png()]),
-  });
+  const file = pasteEvent([png()]);
   content.element().dispatchEvent(file);
   expect(file.defaultPrevented).toBe(false);
   await expect.element(content).toHaveFocus();
 
   content.element().dispatchEvent(
-    new ClipboardEvent('paste', {
-      bubbles: true,
-      cancelable: true,
-      clipboardData: transfer([], '<p>붙인 글</p><img src="https://elsewhere.example/a.png">'),
-    }),
+    pasteEvent([], '<p>붙인 글</p><img src="https://elsewhere.example/a.png">'),
   );
   await expect.element(content).toMatchTextContent('붙인 글');
   expect(content.element().querySelectorAll('img')).toHaveLength(1);
@@ -661,9 +648,7 @@ async function pasteHtml(html: string) {
   );
   const content = await editable('본문');
   await userEvent.click(content);
-  content.element().dispatchEvent(
-    new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: transfer([], html) }),
-  );
+  content.element().dispatchEvent(pasteEvent([], html));
   return onValueChange;
 }
 
