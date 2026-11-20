@@ -1,8 +1,7 @@
-import { Image, type ImageOptions } from '@tiptap/extension-image';
 import { Fragment, Slice, type Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { Plugin } from '@tiptap/pm/state';
 
-import { isAllowedImageSource } from './image-source';
+import { DocumentImage, type DocumentImageOptions } from '../../typography/rich-text/schema/image';
 
 function withoutImages(fragment: Fragment): Fragment {
   const kept: ProseMirrorNode[] = [];
@@ -23,40 +22,14 @@ const pastedImagesAreDropped = new Plugin({
   },
 });
 
-type EditorImageOptions = ImageOptions & {
-  uploaded: ReadonlySet<string>;
-  insertable: boolean;
-};
+export const EditorImageNode = DocumentImage.extend<DocumentImageOptions & { insertable: boolean }>(
+  {
+    addOptions() {
+      return { ...(this.parent?.() as DocumentImageOptions), insertable: false };
+    },
 
-export const EditorImageNode = Image.extend<EditorImageOptions>({
-  addOptions() {
-    return {
-      ...(this.parent?.() as ImageOptions),
-      uploaded: new Set<string>(),
-      insertable: false,
-    };
+    addProseMirrorPlugins() {
+      return this.options.insertable ? [] : [pastedImagesAreDropped];
+    },
   },
-
-  parseHTML() {
-    return [
-      {
-        tag: 'img[src]',
-        getAttrs: (element) =>
-          isAllowedImageSource(element.getAttribute('src'), this.options.uploaded) ? null : false,
-      },
-    ];
-  },
-
-  parseMarkdown(token, helpers) {
-    if (!isAllowedImageSource(token.href, this.options.uploaded)) return [];
-    return helpers.createNode('image', { src: token.href, title: token.title, alt: token.text });
-  },
-
-  addInputRules() {
-    return [];
-  },
-
-  addProseMirrorPlugins() {
-    return this.options.insertable ? [] : [pastedImagesAreDropped];
-  },
-});
+);

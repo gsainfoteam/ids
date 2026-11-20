@@ -6,7 +6,7 @@ import { PhotoIcon } from '@heroicons/react/16/solid';
 import { noop } from 'es-toolkit';
 
 import { useEditorContext } from './context';
-import { IMAGE_ACCEPT } from './image-source';
+import { IMAGE_ACCEPT } from './image-types';
 import { useEditorToolProps, useToolState, type EditorToolProps } from './tool';
 import { useTranslate } from '../../../internal/translate';
 import { isDevelopment } from '../../../utils/dev';

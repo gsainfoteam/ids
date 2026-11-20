@@ -92,6 +92,10 @@ A root that recognises another component also accepts that component's root
 root (`docsReadFromTheRoot` in `.storybook/main.ts`), because the wrapper has no destructured
 defaults to read. `tests/use-client.test.ts` checks both directions, and
 `tests/server-components.test.ts` renders components, parts and `Style` from a Server Component.
+`RichText` (`typography/rich-text`) is the one component rendered only on the server: its
+`index.tsx` and `render.tsx` parse and draw the document with no client root, so a Server Component
+sends IDS components and no Tiptap. `tests/use-client.test.ts` lists them in
+`RENDERED_ONLY_ON_THE_SERVER`.
 
 **What we build and what we install.** Prefer a well-maintained package over hand-rolled logic:
 
@@ -121,6 +125,9 @@ defaults to read. `tests/use-client.test.ts` checks both directions, and
     `editor/engine.tsx` imports it at runtime, and `load-engine.ts` loads that with `import()`
     when an Editor mounts; Markdown goes through `@tiptap/markdown`, loaded the same way only for
     `format="markdown"`. The shell, toolbar and parts are IDS's code and use Tiptap's types only.
+    The document schema (nodes, markdown rules, image and link checks) and the text styles live in
+    `typography/rich-text`, which the `@gsainfoteam/ids-react/rich-text` entry renders on the
+    server with `@tiptap/static-renderer`, mapping each block to an IDS component.
 - Unstyled component packages are allowed only when they do not depend on Radix (for example `react-day-picker`). Radix, Base UI, cmdk and vaul are not used.
 - Write it yourself only when no package fits IDS's API, or when wrapping one would keep most of the code anyway (OTPField: `input-otp` cannot take `register()`'s event `onChange`, form reset or partial-code validation). Written in-house for that reason:
   - the `overlay` and `toast` stores, on React's `useSyncExternalStore`. overlay-kit leaves a

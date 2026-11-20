@@ -303,6 +303,13 @@
     "value": "{value}px",
     "width": "너비"
   },
+  "richText": {
+    "calloutCaution": "주의",
+    "calloutImportant": "중요",
+    "calloutNote": "참고",
+    "calloutTip": "팁",
+    "calloutWarning": "경고"
+  },
   "select": {
     "clear": "선택 지우기",
     "empty": "검색 결과가 없습니다.",

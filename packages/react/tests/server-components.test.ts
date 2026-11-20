@@ -273,6 +273,16 @@ const renderEditorFromAServerComponent = renderEntryFromAServerComponent({
   )`,
 });
 
+const renderRichTextFromAServerComponent = renderEntryFromAServerComponent({
+  entry: 'rich-text',
+  component: 'RichText',
+  parts: ['Style'],
+  page: `h(RichText, {
+    value: '# 공지\\n\\n> [!NOTE]\\n> 참고하세요\\n\\n\\u0060\\u0060\\u0060ts\\nconst a = 1;\\n\\u0060\\u0060\\u0060',
+    mentionHref: (id) => '/users/' + id,
+  })`,
+});
+
 test(
   'a Server Component renders Chart and its parts from the chart entry',
   () => {
@@ -304,6 +314,21 @@ test(
       'EditorCount',
     ])
       expect(rendered.stdout).toContain(`"${reference}"`);
+  },
+  coldNodeStartOnABusyRunner,
+);
+
+test(
+  'a Server Component renders RichText from the rich-text entry without shipping Tiptap',
+  () => {
+    const rendered = runNode(['react-server'], renderRichTextFromAServerComponent);
+    expect(rendered.status, rendered.stderr).toBe(0);
+
+    expect(rendered.stdout).toContain('공지');
+    expect(rendered.stdout).toContain('"h1"');
+    for (const reference of ['AlertRoot', 'CodeBlockRoot', 'RichTextCalloutTitle'])
+      expect(rendered.stdout).toContain(`"${reference}"`);
+    expect(rendered.stdout).not.toMatch(/@tiptap/);
   },
   coldNodeStartOnABusyRunner,
 );

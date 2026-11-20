@@ -1,4 +1,4 @@
-import { keepAllowedImages } from './image-source';
+import { keepAllowedImages } from '../../typography/rich-text/schema/image-source';
 
 import type { Editor as TiptapEditor, JSONContent } from '@tiptap/core';
 
@@ -13,7 +13,9 @@ export function readValue(editor: TiptapEditor, format: EditorFormat): EditorVal
 }
 
 export function writable(value: EditorValue, format: EditorFormat, uploaded: ReadonlySet<string>) {
-  return format === 'json' && typeof value !== 'string' ? keepAllowedImages(value, uploaded) : value;
+  return format === 'json' && typeof value !== 'string'
+    ? keepAllowedImages(value, uploaded)
+    : value;
 }
 
 export function writeValue(

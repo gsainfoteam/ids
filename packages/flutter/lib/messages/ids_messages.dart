@@ -459,6 +459,16 @@ mixin IdsMessages {
 
   String? get resizableWidth => null;
 
+  String? get richTextCalloutCaution => null;
+
+  String? get richTextCalloutImportant => null;
+
+  String? get richTextCalloutNote => null;
+
+  String? get richTextCalloutTip => null;
+
+  String? get richTextCalloutWarning => null;
+
   String? get selectClear => null;
 
   String? get selectEmpty => null;
@@ -1257,6 +1267,21 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get resizableWidth => '너비';
+
+  @override
+  String get richTextCalloutCaution => '주의';
+
+  @override
+  String get richTextCalloutImportant => '중요';
+
+  @override
+  String get richTextCalloutNote => '참고';
+
+  @override
+  String get richTextCalloutTip => '팁';
+
+  @override
+  String get richTextCalloutWarning => '경고';
 
   @override
   String get selectClear => '선택 지우기';

@@ -210,5 +210,21 @@
     ],
     "limit": "310 kB",
     "gzip": true
+  },
+  {
+    "name": "import { RichText } from rich-text",
+    "path": "dist/rich-text.js",
+    "import": "{ RichText }",
+    "ignore": [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "@gsainfoteam/ids-css",
+      "@tanstack/react-form",
+      "react-hook-form",
+      "tailwindcss"
+    ],
+    "limit": "330 kB",
+    "gzip": true
   }
 ]

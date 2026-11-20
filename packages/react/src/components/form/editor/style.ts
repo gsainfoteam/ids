@@ -1,5 +1,6 @@
 import { fieldSurface } from '../../../internal/surfaces/field-surface';
 import { cn, tv } from '../../../utils';
+import { documentText } from '../../typography/rich-text/style';
 
 import type { EditorVariant } from './root';
 import type { IdsSize } from '../../../tokens/types';
@@ -20,28 +21,14 @@ const proseMirrorBaseline = cn(
   '[&_.ProseMirror-selectednode]:outline-2 [&_.ProseMirror-selectednode]:outline-primary',
 );
 
-const documentBlocks = cn(
-  '[&>*+*]:mt-2',
-  '[&_h1]:text-headline-h4-bold [&_h2]:text-headline-h5-bold [&_h3]:text-headline-h6-bold [&_h4]:text-body-b1-bold',
-  '[&_:is(h1,h2,h3,h4)+*]:mt-1',
-  '[&_ul]:list-disc [&_ol]:list-decimal [&_:is(ul,ol)]:ps-6 [&_li>*+*]:mt-1 [&_li+li]:mt-1',
-  '[&_blockquote]:border-s-2 [&_blockquote]:border-neutral [&_blockquote]:ps-3 [&_blockquote]:text-neutral',
+const editorBlocks = cn(
   '[&_pre]:rounded-standard [&_pre]:px-3 [&_pre]:py-2 [&_pre]:font-mono [&_pre]:whitespace-pre-wrap',
-  '[&_:not(pre)>code]:rounded-indicator [&_:not(pre)>code]:px-1 [&_:not(pre)>code]:font-mono',
   '[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2',
   '[&_hr]:my-3 [&_hr]:border-neutral',
   '[&_img]:block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-standard [&_.ProseMirror-selectednode]:outline-offset-2',
-  '[&_mark]:bg-warning-subtle [&_mark]:text-on-warning-subtle',
   '[&_table]:my-2 [&_table]:w-full! [&_table]:table-fixed [&_table]:border-collapse',
   '[&_:is(td,th)]:border [&_:is(td,th)]:border-neutral [&_:is(td,th)]:px-2 [&_:is(td,th)]:py-1 [&_:is(td,th)]:align-top [&_:is(td,th)]:break-words',
   '[&_th]:text-start [&_th]:font-semibold [&_.selectedCell]:bg-primary-subtle',
-);
-
-const taskList = cn(
-  '[&_ul[data-type=taskList]]:list-none [&_ul[data-type=taskList]]:ps-0',
-  '[&_ul[data-type=taskList]>li]:flex [&_ul[data-type=taskList]>li]:items-start [&_ul[data-type=taskList]>li]:gap-2',
-  '[&_ul[data-type=taskList]>li>div]:min-w-0 [&_ul[data-type=taskList]>li>div]:grow',
-  '[&_ul[data-type=taskList]>li[data-checked=true]>div>p]:text-neutral [&_ul[data-type=taskList]>li[data-checked=true]>div>p]:line-through',
 );
 
 export const editorStyle = tv({
@@ -67,8 +54,8 @@ export const editorStyle = tv({
       'min-h-24 outline-none text-neutral-bold',
       'selection:bg-primary/30 selection:text-neutral-bold',
       proseMirrorBaseline,
-      documentBlocks,
-      taskList,
+      documentText,
+      editorBlocks,
       placeholder,
     ],
     count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-bold'],

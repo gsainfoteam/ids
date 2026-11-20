@@ -30,7 +30,7 @@ import { EditorContext, type EditorImages } from './context';
 import { EditorCount } from './count';
 import { EditorHorizontalRule } from './horizontal-rule';
 import { EditorImage } from './image';
-import { isImageFile, type ImageUpload } from './image-source';
+import { isImageFile, type ImageUpload } from './image-types';
 import { EditorLink } from './link';
 import { loadEngine, engineKey, type EditorParts, type LoadedEngine } from './load-engine';
 import {
@@ -175,7 +175,8 @@ function useLoadedEngine(
   return loaded?.key === key ? loaded : null;
 }
 
-const usesPart = (source: ReactNode, part: unknown) => containsElementOfType(source, new Set([part]));
+const usesPart = (source: ReactNode, part: unknown) =>
+  containsElementOfType(source, new Set([part]));
 
 function partsIn(source: ReactNode, imageUpload: boolean): EditorParts {
   return {
@@ -188,7 +189,8 @@ function partsIn(source: ReactNode, imageUpload: boolean): EditorParts {
 }
 
 function taskLabelIn(t: Translate) {
-  return (text: string) => (text === '' ? t('editor.taskItemEmpty') : t('editor.taskItem', { text }));
+  return (text: string) =>
+    text === '' ? t('editor.taskItemEmpty') : t('editor.taskItem', { text });
 }
 
 export function EditorRoot(props: Editor.Props) {

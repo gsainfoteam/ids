@@ -3,7 +3,7 @@ import { FileHandler } from '@tiptap/extension-file-handler';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
-import { IMAGE_TYPES, type ImageUpload } from './image-source';
+import { IMAGE_TYPES, type ImageUpload } from './image-types';
 import { editorStyle } from './style';
 import { cn } from '../../../utils';
 import { skeletonStyle } from '../../feedback/skeleton/style';
