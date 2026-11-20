@@ -26,7 +26,6 @@ abstract final class IdsComponentTokens {
       'border-field-bar': 'border-neutral',
       'bg-field-code-outline': 'bg-neutral-subtle',
       'bg-switch-thumb': 'bg-neutral-subtlest',
-      'bg-tabs-segment': 'bg-neutral-subtlest',
       'bg-qr-code': 'bg-neutral-subtlest',
       'text-qr-code': 'text-neutral-bold',
       'bg-qr-code-inverse': 'bg-neutral-bold',
@@ -42,7 +41,6 @@ abstract final class IdsComponentTokens {
       'border-field-bar': 'bg-neutral',
       'bg-field-code-outline': 'bg-neutral-subtler',
       'bg-switch-thumb': 'bg-neutral-bold',
-      'bg-tabs-segment': 'bg-neutral',
       'bg-qr-code': 'bg-neutral-bold',
       'text-qr-code': 'text-on-neutral-bold',
       'bg-qr-code-inverse': 'bg-neutral-subtlest',
@@ -75,7 +73,6 @@ class IdsComponentColors {
     required this.borderFieldBar,
     required this.bgFieldCodeOutline,
     required this.bgSwitchThumb,
-    required this.bgTabsSegment,
     required this.bgQrCode,
     required this.textQrCode,
     required this.bgQrCodeInverse,
@@ -95,7 +92,6 @@ class IdsComponentColors {
       borderFieldBar: token('border-field-bar'),
       bgFieldCodeOutline: token('bg-field-code-outline'),
       bgSwitchThumb: token('bg-switch-thumb'),
-      bgTabsSegment: token('bg-tabs-segment'),
       bgQrCode: token('bg-qr-code'),
       textQrCode: token('text-qr-code'),
       bgQrCodeInverse: token('bg-qr-code-inverse'),
@@ -112,7 +108,6 @@ class IdsComponentColors {
   final Color borderFieldBar;
   final Color bgFieldCodeOutline;
   final Color bgSwitchThumb;
-  final Color bgTabsSegment;
   final Color bgQrCode;
   final Color textQrCode;
   final Color bgQrCodeInverse;
@@ -128,7 +123,6 @@ class IdsComponentColors {
     'border-field-bar': borderFieldBar,
     'bg-field-code-outline': bgFieldCodeOutline,
     'bg-switch-thumb': bgSwitchThumb,
-    'bg-tabs-segment': bgTabsSegment,
     'bg-qr-code': bgQrCode,
     'text-qr-code': textQrCode,
     'bg-qr-code-inverse': bgQrCodeInverse,
@@ -147,7 +141,6 @@ class IdsComponentColors {
       other.borderFieldBar == borderFieldBar &&
       other.bgFieldCodeOutline == bgFieldCodeOutline &&
       other.bgSwitchThumb == bgSwitchThumb &&
-      other.bgTabsSegment == bgTabsSegment &&
       other.bgQrCode == bgQrCode &&
       other.textQrCode == textQrCode &&
       other.bgQrCodeInverse == bgQrCodeInverse &&
