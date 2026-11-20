@@ -9,7 +9,7 @@ IdsProvider 와 그 테마 객체입니다. 앱이 넘긴 `IdsTheme` 을 색 역
 
 | 모듈                       | 내용                                                                                  | 쓰는 곳                                  |
 | -------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `ids_palette.dart`         | `IdsThemeColor`(`seed`, 50~950 `IdsRamp`, 모드별 8단계 `IdsPalette`), `fromSeed`  | 앱, `ids_theme.dart`, `src/color`        |
+| `ids_palette.dart`         | `IdsThemeColor`(`seed`, 50~950 `IdsRamp`, 모드별 9단계 `IdsPalette`), `fromSeed`  | 앱, `ids_theme.dart`, `src/color`        |
 | `ids_theme.dart`           | `IdsTheme`, `IdsThemeOverrides`, `IdsNeutral`, `IdsStatus`, `IdsCornerShape`, `IdsThemeIssue` | 앱, `ids_provider.dart`                  |
 | `ids_resolved_theme.dart`  | `IdsResolvedTheme`(색, radius, `textStyle`, `dimension`, `shape`), `IdsRadius`, `checkIdsTheme` | `ids_provider.dart`, `ids_scope.dart`, 테스트 |
 | `ids_provider.dart`        | `IdsProvider`, `IdsProviderScope`. 모드 소유, 테마 병합, 캐시, 개발 경고               | 앱                                       |

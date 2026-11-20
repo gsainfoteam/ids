@@ -3,8 +3,8 @@
 앱의 테마(브랜드 색, 중립과 상태 색의 방식, radius, corner shape, 배율)와 라이트/다크 모드(`mode`)를 정하는 컨텍스트 컴포넌트입니다. 앱 최상단에 한 번 둡니다.
 
 - **테마는 앱이 줍니다.** IDS 에는 기본 색이 없습니다. `theme` 이 없으면 타입 오류입니다.
-- **브랜드 색 하나로 두 모드를 칠합니다.** `primary` 하나만 있으면 됩니다. 계열마다 라이트와 다크의 역할 색(`bg-primary`, `bg-primary-subtle`, `text-primary` …)을 IDS 가 APCA 대비(채움과 subtle 위 글자 Lc 75, 페이지 위 색 글자 Lc 60, 선 Lc 45)를 hover, press 층 아래에서도 지키도록 고릅니다. 계열마다 라이트와 다크의 8단계 스케일을 따로 두고, 색 하나나 50~950 램프를 주면 IDS 가 두 스케일을 만듭니다.
-- **계열 여덟 개.** neutral, primary, secondary, tertiary, success, warning, danger, info 가 같은 역할 일곱 개를 가지고, neutral 은 네 개를 더 가집니다.
+- **브랜드 색 하나로 두 모드를 칠합니다.** `primary` 하나만 있으면 됩니다. 계열마다 라이트와 다크의 역할 색(`bg-primary-solid`, `bg-primary-soft`, `text-primary` …)을 IDS 가 APCA 대비(배경 위 글자와 진한 글자 Lc 75, 색 글자 Lc 60, 진한 선 Lc 45)를 hover, press 층 아래에서도 지키도록 고릅니다. 계열마다 라이트와 다크의 9단계 스케일을 따로 두고, 색 하나나 50~950 램프를 주면 IDS 가 두 스케일을 만듭니다.
+- **계열 여덟 개.** neutral, primary, secondary, tertiary, success, warning, danger, info 가 같은 역할 여덟 개를 가지고, neutral 은 페이지, surface, block 의 바탕과 그 위 글자 여섯 개를 더 가집니다.
 - **CSS 변수로 칠합니다.** 테마는 감싸는 요소의 inline 변수가 되고, `@gsainfoteam/ids-css` 가 `data-mode` 에 따라 연결합니다. 서버 HTML 에 들어가므로 깜빡이지 않습니다.
 - **제어와 비제어.** `mode` 를 넘기면 부모가 값을 가지고, `defaultMode` 를 넘기면 Provider 가 가집니다.
 - **시스템 모드.** `mode="system"` 은 운영체제의 다크 모드 설정을 따르고, 설정을 바꾸면 새로고침 없이 바로 바뀝니다.
@@ -53,7 +53,7 @@ import { theme } from './ids-theme';
 
 | 키            | 값                                                                                   | 기본                |
 | ------------- | ------------------------------------------------------------------------------------ | ------------------- |
-| `primary`     | 색 하나, 50 … 950 의 램프, 또는 `{ light, dark }` 8단계 스케일 둘. 값은 CSS 색(hex, `oklch()` …) | 없음 (필수)         |
+| `primary`     | 색 하나, 50 … 950 의 램프, 또는 `{ light, dark }` 9단계 스케일 둘. 값은 CSS 색(hex, `oklch()` …) | 없음 (필수)         |
 | `secondary`   | `primary` 와 같은 형식                                                               | [primary 에서 만든다](#secondary-와-tertiary) |
 | `tertiary`    | `primary` 와 같은 형식                                                               | [primary 에서 만든다](#secondary-와-tertiary) |
 | `neutral`     | `'pure'` / `'tinted'`                                                                | `'pure'`            |
@@ -78,95 +78,125 @@ import { theme } from './ids-theme';
 
 ### 계열과 역할
 
-역할 이름은 `{bg|text|border}-{계열}[-{세기}]`, `text-on-{계열}[-{세기}]` 입니다. 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 입니다.
+배경은 쓰임새로, 선과 글자는 세기로 부릅니다. 세기 단어는 `strong` 하나입니다.
 
 | 역할 | 쓰임 |
 | --- | --- |
-| `bg-X-subtler` | 띠. subtle 보다 옅은 면 |
-| `bg-X-subtle` | 옅은 채움 |
-| `bg-X` | 채움 |
-| `text-on-X-subtler` | 띠 위 글자 |
-| `text-on-X-subtle` | 옅은 채움 위 글자 |
-| `text-on-X` | 채움 위 글자 |
-| `text-X` | 채움 없는 바탕, subtler, subtle 위 글자와 아이콘 |
-| `border-X` | 선 |
+| `bg-X-soft` | 옅은 채움: soft 컨트롤과 필드, soft Badge, 상태 Alert |
+| `bg-X-solid` | 채움: solid Button, Progress 막대 |
+| `text-on-X-soft` | 옅은 채움 위 글자 |
+| `text-on-X-solid` | 채움 위 글자 |
+| `text-X` | 색 글자와 아이콘(Link, outline Badge, Rating 별). neutral 은 보조 글자 |
+| `text-X-strong` | 진한 글자. neutral 은 본문 |
+| `border-X` | 옅은 선. `border-neutral` 은 구조선 |
+| `border-X-strong` | 진한 선. 브랜드와 상태는 focus ring, invalid 테두리 |
 
-배경마다 짝이 있습니다. `bg-X[-세기]` 위 글자는 언제나 `text-on-X[-세기]` 입니다.
+neutral 만 가지는 역할:
 
-neutral 만 가지는 역할: `bg-neutral-subtlest` 와 `text-on-neutral-subtlest`(페이지), `bg-neutral-bold` 와 `text-on-neutral-bold`(뒤집힌 채움: Tooltip, neutral solid Button), `text-neutral-bold`(본문 글자).
+| 역할 | 쓰임 |
+| --- | --- |
+| `bg-base`, `text-on-base` | 페이지 |
+| `bg-surface`, `text-on-surface` | 카드, 다이얼로그, 팝업, 토스트. 다크에서 페이지보다 한 단계 밝다 |
+| `bg-block`, `text-on-block` | base 나 surface 위에서 구역을 나누는 바탕: Card, Dialog footer, Table 머리와 줄무늬, CodeBlock |
 
 ```tsx
-<button className="bg-primary text-on-primary state-layer hover:state-hover active:state-press">저장</button>
-<span className="bg-danger-subtle text-on-danger-subtle">실패</span>
+<button className="bg-primary-solid text-on-primary-solid state-layer hover:state-hover active:state-press">저장</button>
+<span className="bg-danger-soft text-on-danger-soft">실패</span>
 <a className="text-secondary">자세히 보기</a>
 ```
 
 - `X` 는 neutral, primary, secondary, tertiary, success, warning, danger, info 중 하나입니다.
+- 배경마다 짝이 있습니다. `bg-{배경}` 위 글자는 언제나 `text-on-{배경}` 입니다.
+- neutral 의 solid(`bg-neutral-solid`, `text-on-neutral-solid`)는 뒤집힌 채움입니다: Tooltip, neutral solid Button.
 - hover, active 역할은 없습니다. 컴포넌트가 `state-layer` 로 층을 덮습니다. 채움은 검정 10%, 18%(`state-fill`), 색 있는 soft 면과 상태 색의 outline, ghost 는 계열 채움 8%, 12%, 나머지는 글자색 6%, 10% 입니다. 비율은 `packages/core/tokens/state.json` 에 있습니다.
 - 이름은 [`packages/core/color-roles.json`](../../../../../core/color-roles.json) 한 표(`slots`, `neutralOnly`)에서 나옵니다.
-- 바뀐 이름:
+- 최근에 바뀐 이름은 [Color](../../../foundations/color/README.md#바뀐-이름) 에 있습니다. 그보다 예전 이름:
 
 | 예전 | 지금 |
 | --- | --- |
-| `surface` / `on-surface` | `bg-neutral-subtlest` / `text-neutral-bold` |
-| `bg-X-soft` / `text-on-X-soft` | `bg-X-subtle` / `text-on-X-subtle` |
+| `surface` / `on-surface` | `bg-base` / `text-neutral-strong` |
 | `bg-X-hover`, `-active`, `bg-X-soft-hover`, `-soft-active` | 없음. state layer |
-| `secondary` | `bg-primary-subtle` |
+| `secondary` | `bg-primary-soft` |
 | `accent` | `text-primary` |
-| `outline` | `border-primary` |
-| `muted` / `on-muted` | `bg-neutral-subtle` / `text-neutral` |
+| `outline` | `border-primary-strong` |
+| `muted` / `on-muted` | `bg-neutral-soft` / `text-neutral` |
 | `border` | `border-neutral` |
-| `handle` | `bg-neutral` |
-| `X-strong` | `text-X` |
+| `handle` | `bg-(--ids-color-border-neutral-strong)` |
 
 ### 팔레트에서 역할 색 고르기
 
-계열마다 팔레트는 모드별 스케일 둘(`{ light, dark }`)이고, 스케일은 쓰임새 순서로 번호를 매긴 8단계입니다. 역할은 두 모드에서 같은 번호를 읽습니다.
+계열마다 팔레트는 모드별 스케일 둘(`{ light, dark }`)이고, 스케일은 9단계입니다. 번호가 클수록 페이지에서 멉니다. 역할은 두 모드에서 같은 번호를 읽습니다.
 
-| 단계 | 쓰임새 | 읽는 역할 |
-| --- | --- | --- |
-| 1 | 페이지 | `bg-neutral-subtlest` |
-| 2 | 띠 | `bg-X-subtler`, `text-on-neutral-bold` |
-| 3 | 옅은 채움 | `bg-X-subtle` |
-| 4 | 선 | `border-neutral` |
-| 5 | 손잡이 | `bg-neutral` |
-| 6 | 흐린 글자, 색 글자 | `text-neutral`, `text-X`, `border-X` |
-| 7 | 채움 | `bg-X`, `bg-neutral-bold` |
-| 8 | 진한 글자 | `text-neutral-bold`, `text-on-X-subtler`, `text-on-X-subtle`, `text-on-neutral-*` |
+| 단계 | 쓰임새 | 읽는 역할 | neutral light | neutral dark |
+| --- | --- | --- | --- | --- |
+| 1 | base | `bg-base` | `#ffffff` | `#0a0a0a` |
+| 2 | surface | `bg-surface` | `#ffffff` | `#171717` |
+| 3 | block | `bg-block` | `#fafafa` | `#1e1e1e` |
+| 4 | soft | `bg-X-soft` | `#f5f5f5` | `#262626` |
+| 5 | 선 | `border-X` | `#e5e5e5` | `#2e2e2e` |
+| 6 | 진한 선 | `border-X-strong` | `#d4d4d4` | `#3a3a3a` |
+| 7 | solid | `bg-X-solid` (neutral 은 없음) | `#a3a3a3` | `#737373` |
+| 8 | 글자 | `text-X` | `#525252` | `#d4d4d4` |
+| 9 | 진한 글자 | `text-X-strong`, `bg-neutral-solid` | `#0a0a0a` | `#fafafa` |
 
-- `text-on-X` 는 단계가 아니라 흰색과 neutral 950 중 채움과 그 hover, press 층 위의 가장 낮은 Lc 가 높은 쪽입니다.
+- base, surface, block 역할은 neutral 만 읽습니다. 브랜드 스케일의 1~3단계는 순서를 맞추려고 있을 뿐 역할이 없습니다.
+- neutral 의 7단계는 역할이 없습니다. `bg-neutral-solid` 는 9단계를 읽습니다.
+- 1~6단계와 8~9단계는 언제나 순서대로입니다. solid(7)는 그 위 글자로 고르므로 순서에서 벗어날 수 있습니다.
+  - 다크에서는 Lc 45 를 넘는 진한 선(6)이 solid 보다 밝습니다.
+  - 노랑처럼 밝은 색은 라이트 solid 가 진한 선보다 옅습니다.
+  - 글자(8, 9)는 solid 와 같은 단계이거나 그보다 바깥입니다.
+- `text-on-*` 는 단계를 읽지 않습니다. [아래](#배경-위-글자)처럼 Provider 가 계산합니다.
 - 앱이 스케일을 직접 주면 그 값을 그대로 쓰고 대비만 검사합니다.
+- neutral 은 `packages/core/tokens/palette.json` 의 스케일 둘이고, 역할마다 읽는 단계는 `packages/core/neutral-roles.json` 에 있습니다. `border-neutral` 은 구조선이라 대비 규칙이 없습니다.
+- neutral 값은 shadcn/ui 의 neutral 테마를 따릅니다.
+  - 다크 선 `#2e2e2e` 는 shadcn 의 반투명 선(흰색 10%)을 카드(`#171717`) 위에 칠한 색입니다.
+  - 다크 진한 글자는 shadcn 의 `#e5e5e5` 대신 `#fafafa` 입니다. `#e5e5e5` 위 `#171717` 글자는 press 층 아래에서 Lc 75 에 못 미칩니다.
 
 색 하나나 50~950 램프를 주면 브랜드와 상태 계열은 같은 규칙으로 스케일을 만듭니다(`palette-scales.ts` 의 `SCALE_RULES`).
 
 | 단계 | light | dark |
 | --- | --- | --- |
-| 1 | 페이지(neutral 1) | 페이지(neutral 1) |
-| 2~5 | 램프 50, 100, 200, 300 | 페이지에서 950, 900 … 으로 이어지는 램프 위에서 같은 번호 dark neutral 단계와 밝기(OKLab L)가 같은 점 |
-| 6 | 600, 700, 800, 900, 950 중 처음 통과하는 단계 | 500, 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
-| 7 | 600. 흰 글자도 neutral 950 글자도 쉴 때와 hover, press 층 아래에서 Lc 75 에 못 미치면 500·700, 그다음 400·800 중 가장 읽히는 단계 | 같음 |
-| 8 | 700, 800, 900, 950 중 처음 통과하는 단계 | 400, 300, 200, 100, 50 중 처음 통과하는 단계 |
+| 1~3 | neutral 1~3 과 같은 밝기(OKLab L)의 램프 위 점 | neutral 1~3 과 같은 밝기의 램프 위 점 |
+| 4 | 램프 100 | neutral 4 와 같은 밝기의 점 |
+| 5 | 램프 200 | neutral 5 와 같은 밝기의 점 |
+| 6 | 300, 400 … 950 중 처음 통과하는 단계 | 900, 800 … 50 중 처음 통과하는 단계 |
+| 7 | 600. 흰 글자도 neutral 950 글자도 채움 층 아래에서 Lc 75 에 못 미치면 500·700, 그다음 400·800 중 가장 읽히는 단계 | 같음 |
+| 8 | solid 단계부터 바깥(700, 800 …)으로 처음 통과하는 단계 | solid 단계부터 바깥(500, 400 …)으로 처음 통과하는 단계 |
+| 9 | 글자(8)의 단계부터 바깥으로 처음 통과하는 단계 | 같음 |
 
-- 다크 표면을 neutral 의 밝기에 맞추므로 `bg-primary-subtle` 은 같은 모드의 `bg-neutral-subtle` 과 밝기가 같고 색만 다릅니다.
+- 램프 위 점은 페이지에서 램프의 첫 단계(라이트 50, 다크 950)를 거쳐 램프를 따라가는 선 위에서 고릅니다.
+  - 램프 단계 사이는 OKLab 으로 섞습니다.
+  - 페이지와 첫 단계 사이는 섞지 않습니다. hue 는 첫 단계의 hue 이고, 채도는 첫 단계의 채도에 밝기가 나아간 비율의 제곱근을 곱합니다. 단순히 섞을 때보다 채도가 남아서 덜 칙칙합니다.
+  - 다크 soft 는 같은 모드의 `bg-neutral-soft` 와 밝기가 같고 색만 다릅니다.
+- 통과 조건의 바탕은 `bg-base`, `bg-surface`, `bg-block` 과 그 계열의 `bg-X-soft` 넷입니다.
+  - 진한 선(6): Lc 45.
+  - 글자(8): Lc 60. 쉴 때와 글자색 층, 계열 채움 층의 hover, press 아래에서 모두.
+  - 진한 글자(9): Lc 75. 같은 층 아래에서 모두.
+
+#### 배경 위 글자
+
+`text-on-{배경}` 은 단계가 아니라 Provider 가 배경마다 고르는 색입니다(`palette-scales.ts` 의 `textOn`).
+
+- 후보는 두 방향입니다. 그 배경 계열 스케일의 어두운 끝(라이트 9, 다크 1)에서 램프의 더 어두운 단계를 지나 neutral 950 까지, 밝은 끝(라이트 1, 다크 9)에서 램프의 더 밝은 단계를 지나 흰색까지입니다. neutral 은 램프가 없어 스케일 끝에서 바로 흰색이나 neutral 950 으로 갑니다.
+- 방향마다 그 배경의 hover, press 층 아래에서 Lc 75 를 처음 넘는 후보를 고르고, 두 방향이 다 넘으면 Lc 가 큰 쪽입니다. 어느 쪽도 넘지 못하면 가장 높은 후보를 쓰고 `checkIdsTheme` 이 알립니다.
+- 층은 배경에 따라 다릅니다. `bg-X-solid` 는 검정 채움 층, 색 있는 `bg-X-soft` 는 글자색 층과 계열 채움 층, neutral 바탕은 글자색 층입니다.
+- 그래서 solid 위 글자도 계열 색이 섞일 수 있습니다(다크 노랑 solid 위 `#fefdec`).
+- `text-on-*` 는 CSS fallback 이 없습니다. 두 플랫폼 모두 런타임에 계산합니다.
+
+#### 대비
 
 - 대비는 [APCA](https://git.apcacontrast.com/) 의 Lc 입니다. WCAG 2 의 대비비는 쓰지 않습니다.
   - WCAG 2 는 중간 밝기 채움 위의 검은 글자를 실제보다 잘 읽힌다고 봅니다. 그래서 보라색 채움 위에 검은 글자를 골랐습니다. APCA 는 글자 쪽(어두운 글자, 밝은 글자)에 따라 다르게 재서 이런 짝을 걸러 냅니다.
-  - `text-on-` 글자는 Lc 75(본문 글자의 기준), 페이지 위 색 글자(`text-X`)는 Lc 60(라벨, 링크, 에러 문구 같은 짧은 글자의 기준), 선과 아이콘 같은 표시의 하한은 Lc 45 입니다.
+  - `text-on-*` 와 `text-X-strong` 은 Lc 75(본문 글자의 기준), `text-X` 는 Lc 60(라벨, 링크, 에러 문구 같은 짧은 글자의 기준), `border-X-strong` 은 Lc 45(선과 표시의 하한)입니다.
   - 계산은 `colorjs.io` 의 `contrastAPCA` 입니다(MIT).
 - 모든 글자는 쉴 때의 배경과, 그 배경에 컴포넌트가 그리는 층을 덮은 색 위에서 함께 잽니다.
   - `withStateLayer(base, layer, opacity)`: 배경에 층 색을 sRGB 로 섞은 색. CSS `state-layer` 와 같은 계산입니다.
     - 채널마다 `base + opacity × (layer − base)` 로 섞고 8비트로 반올림합니다. Flutter 도 이 식을 씁니다. `Color.lerp` 의 `base × (1 − opacity) + layer × opacity` 는 .5 에서 반올림이 갈려 한 단계 다른 글자를 고릅니다.
   - `StateLayer`: 층 색과 hover, press 불투명도. `contentLayer(text)` 는 글자색 6%, 10%, `tintLayer(fill)` 은 계열 채움 8%, 12%, `FILL_LAYER` 는 검정 10%, 18% 입니다.
   - `underStateLayers(base, layers)`: 쉴 때의 배경과 층마다의 hover, press 배경.
-  - `firstReadableOn`: 후보 단계 중 그 배경 모두에서 기준을 넘는 첫 단계. 글자색 층과 계열 채움 층을 함께 잽니다.
-  - `lowestContrastUnderStateLayers`: 채움 위 글자를 고를 때 `FILL_LAYER` 아래 배경 중 가장 낮은 Lc.
-- `text-on-X-subtler` 와 `text-on-X-subtle` 은 각자의 배경과 그 hover, press 에서 Lc 75 를 넘어야 합니다.
-- `text-X` 는 페이지, `bg-X-subtler`, `bg-X-subtle` 과 그 hover, press 에서 모두 Lc 60 을 넘어야 합니다. 그래서 라이트는 채움과 같거나 한 단계 진하고, 다크도 200 까지 옅어지지 않습니다.
-- `border-X` 는 따로 고르지 않고 `text-X` 와 같은 단계를 씁니다. 선과 그 옆 글자가 한 색이라, invalid 필드의 테두리(`border-danger`)와 라벨, 에러 문구(`text-danger`)가 같은 색입니다. `text-X` 가 Lc 60 을 넘으므로 선의 하한 Lc 45 도 넘습니다.
-- neutral 은 `packages/core/tokens/palette.json` 의 스케일 둘이고, 역할마다 읽는 단계는 `packages/core/neutral-roles.json` 에 있습니다. `border-neutral` 은 구조선이라 대비 규칙이 없습니다.
-- neutral 값은 shadcn/ui 의 neutral 테마를 따릅니다. 다크의 반투명 선(흰색 10%)과 입력(15%)은 페이지 위에 칠한 색(`#232323`, `#2f2f2f`)으로 바꿨습니다.
-  - 다크 7(`bg-neutral-bold`)만 shadcn 의 `#e5e5e5` 대신 `#fafafa` 입니다. `#e5e5e5` 위 `#171717` 글자는 press 층 아래에서 Lc 66 이라 Lc 75 에 못 미칩니다.
-- 결과는 Material 3 의 톤과 비슷합니다. subtle 위 글자는 거의 950(M3 의 on-container, 톤 10), 다크 모드의 subtle 위 글자는 200 언저리(톤 80)입니다.
+  - `readsOn`: 글자가 바탕 모두에서, 글자색 층과 계열 채움 층 아래에서도 기준을 넘는지.
+  - `textOn`: 위의 배경 위 글자.
+- `border-X` 는 옅은 선이라 대비 규칙이 없습니다. 읽혀야 하는 색 선(focus ring, invalid 테두리)은 `border-X-strong` 입니다. invalid 필드의 테두리는 `border-danger-strong`, 라벨과 에러 문구는 `text-danger` 입니다.
 
 ### secondary 와 tertiary
 
@@ -217,7 +247,7 @@ import { createIdsPalette, createIdsRamp, defineIdsTheme } from '@gsainfoteam/id
 export const theme = defineIdsTheme({ primary: '#0d9488' });
 
 createIdsRamp('#0d9488');    // { 50: '#f0fdfb', …, 600: '#0d9488', …, 950: '#013031' }
-createIdsPalette('#0d9488'); // { light: ['#ffffff', '#f0fdfb', …], dark: ['#0a0a0a', '#0b1a1a', …] }
+createIdsPalette('#0d9488'); // { light: ['#ffffff', '#ffffff', …], dark: ['#0a0a0a', …] }
 ```
 
 - 색 하나는 먼저 50~950 램프(`createIdsRamp`)가 되고, 램프가 [위 규칙](#팔레트에서-역할-색-고르기)으로 두 스케일(`createIdsPalette`)이 됩니다. 아래는 램프를 만드는 방법입니다.
@@ -278,8 +308,8 @@ test('the app theme passes IDS', () => {
 
 | 문제 | `path` |
 | --- | --- |
-| 빠진 램프 단계, 8개가 아닌 스케일, CSS 색이 아닌 값 | `primary.500`, `primary.dark`, `primary.light.8`, `status.danger` … |
-| 대비를 넘는 단계가 없는 역할 | 그 계열 |
+| 빠진 램프 단계, 9개가 아닌 스케일, CSS 색이 아닌 값 | `primary.500`, `primary.dark`, `primary.light.9`, `status.danger` … |
+| 대비를 넘는 단계나 글자가 없는 역할 | 그 계열 |
 | 모르는 `neutral`, `status`, `cornerShape`, 범위를 벗어난 `radius`, `scale` | 그 키 |
 | 브랜드 계열 둘이 너무 가깝다 (OKLab 600 단계 거리 0.039 미만) | 뒤의 계열 |
 | 브랜드 계열이 상태 색과 너무 가깝다 | 그 브랜드 계열 |
@@ -341,7 +371,7 @@ const { mode, resolvedMode } = useTheme();
 
 - `IdsProvider.Scope` 의 `theme` 은 모든 키가 선택입니다. 준 키만 그 아래에서 바뀝니다.
 - `mode` 를 주지 않은 Scope 에서 부르는 `setMode` 는 mode 를 가진 바깥 Provider 로 갑니다.
-- 바깥과 모드가 다른 영역은 `--ids-color-bg-neutral-subtlest` 배경과 `--ids-color-text-neutral-bold` 글자색을 칠합니다. 그렇지 않으면 다크 글자색이 라이트 배경 위에 그려집니다.
+- 바깥과 모드가 다른 영역은 `--ids-color-bg-base` 배경과 `--ids-color-text-neutral-strong` 글자색을 칠합니다. 그렇지 않으면 다크 글자색이 라이트 배경 위에 그려집니다.
 - `dark:` 변형도 가장 가까운 `data-mode` 를 따릅니다. 다크 안의 라이트 영역은 `dark:` 에 걸리지 않습니다.
 - `IdsProvider` 를 다른 `IdsProvider` 안에 두어도 됩니다. 그때도 `theme` 은 전부 줘야 하고, 대화상자와 토스트는 가장 바깥 Provider 가 그립니다.
 
@@ -395,7 +425,7 @@ function ThemeMenu() {
 | `className` / `style` / `ref` / 그 외 | 감싸는 요소(또는 자식)로 간다                                                                        |
 
 - 요소에는 `data-mode`(항상 `light` / `dark`), `style.colorScheme`, 준 테마의 변수, `scale` 을 준 경우 `--ids-scale` 변수와 `data-scale` 이 붙습니다.
-  - 역할 색: `--ids-theme-light-bg-primary`, `--ids-theme-dark-text-on-danger-subtle` … (두 모드 다). 최상위 Provider 는 neutral 을 뺀 모든 계열(만든 secondary·tertiary 포함)과, `'tinted'` 일 때 neutral 을 씁니다. `'pure'` neutral 은 `ids.css` 의 값입니다
+  - 역할 색: `--ids-theme-light-bg-primary-solid`, `--ids-theme-dark-text-on-danger-soft` … (두 모드 다). 최상위 Provider 는 neutral 을 뺀 모든 계열(만든 secondary·tertiary 포함)과, `'tinted'` 일 때 neutral 을 씁니다. `'pure'` neutral 은 `ids.css` 의 값입니다
   - 색 키를 준 Scope 는 바깥 테마와 합친 모든 계열을 다시 씁니다
   - radius: `--ids-theme-radius-standard`, `-indicator`, `-container`. `ids.css` 가 배율을 곱해 `--ids-radius-*` 로 씁니다
   - corner shape: `--ids-corner-shape`, `--ids-theme-corner-radius-scale`
@@ -410,7 +440,7 @@ function ThemeMenu() {
   - `corner-shape` 를 지원하지 않는 브라우저는 둥근 모서리와 원래 radius 로 그립니다.
   - `rounded-full` 은 squircle 테마에서도 원입니다.
   - `::before` `::after` 는 자기 요소의 모양을 따릅니다. `before:rounded-[inherit]` 로 위에 칠한 겹침층이 squircle 모서리를 그대로 덮습니다.
-- 최상위 Provider 는 배경을 칠하지 않습니다. 페이지 배경은 앱이 `bg-neutral-subtlest` 로 칠합니다.
+- 최상위 Provider 는 배경을 칠하지 않습니다. 페이지 배경은 앱이 `bg-base` 로 칠합니다.
 - 최상위 Provider 는 `overlay.open` 으로 연 대화상자와 기본 `Toaster` 를 자기 요소 안(`asChild` 면 그 옆)에 그립니다. 최상위 Provider 가 여럿이면 먼저 마운트된 하나가 그립니다. 앱이 `<Toaster />` 를 직접 두면 기본 Toaster 는 물러납니다. `useOverlay()` 로 연 항목은 연 곳의 테마 변수를 받습니다.
 - 서버 HTML 에는 테마 변수 말고 아무것도 더하지 않습니다. 브라우저에서는 토스트를 읽어 줄 빈 `aria-live` 영역 하나가 붙습니다. 역할(role)이 없어 스크린 리더에게 드러나지 않습니다.
 - 최상위 Provider 는 Tooltip 의 지연 그룹(`TooltipDelayGroup`)도 둡니다. 툴팁 하나가 열린 뒤 곧바로 다른 툴팁에 올라가면 기다리지 않고 열립니다.

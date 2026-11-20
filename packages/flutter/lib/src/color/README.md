@@ -15,7 +15,7 @@ pnpm --filter @gsainfoteam/ids-react exec vitest run --project node tests/flutte
 | ----------------------- | ----------------------------------- | -------------------------------------------------------------------- |
 | `oklch.dart`            | culori                              | sRGB, OKLab, OKLCH 변환, `clampChroma`, OKLab 섞기와 거리           |
 | `palette_seed.dart`     | `palette-seed.ts`                   | 색 하나로 50~950 램프 만들기, hue·채도 비율 읽기, hue 돌리기          |
-| `palette_scales.dart`   | `palette-scales.ts`                 | 램프에서 모드별 8단계 스케일 만들기(`scaleRules`), state layer 아래 대비, neutral 스케일 |
+| `palette_scales.dart`   | `palette-scales.ts`                 | 램프에서 모드별 9단계 스케일 만들기(`scaleRules`), state layer 아래 대비, neutral 스케일 |
 | `contrast.dart`         | `contrast.ts`, colorjs.io           | APCA `contrastApca`, Lc 기준(75, 60, 45), 적록 색약 시뮬레이션        |
 | `status.dart`           | `status.ts`                         | 상태 hue 범위, harmonized(primary 쪽 최대 15°), fixed 팔레트          |
 | `derived_brands.dart`   | `derived-brands.ts`                 | 빠진 secondary(채도 1/3), tertiary(+60° 또는 −60°)                   |

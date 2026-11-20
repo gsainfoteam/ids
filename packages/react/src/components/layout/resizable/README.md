@@ -78,7 +78,7 @@ import { Resizable } from '@gsainfoteam/ids-react';
 ```tsx
 <Resizable direction="horizontal">
   내용
-  <Resizable.Handle className="inset-y-3 w-1 bg-primary before:hidden" />
+  <Resizable.Handle className="inset-y-3 w-1 bg-primary-solid before:hidden" />
 </Resizable>
 
 <Resizable>
@@ -96,7 +96,7 @@ import { Resizable } from '@gsainfoteam/ids-react';
 <Resizable direction="vertical">
   내용
   <Resizable.Handle asChild>
-    <div className="bg-neutral-subtle" />   {/* 자식 요소가 손잡이가 된다 */}
+    <div className="bg-neutral-soft" />   {/* 자식 요소가 손잡이가 된다 */}
   </Resizable.Handle>
 </Resizable>
 ```
@@ -164,7 +164,7 @@ import { Resizable } from '@gsainfoteam/ids-react';
 
 | 토큰                       | 쓰임                               |
 | -------------------------- | ---------------------------------- |
-| `--ids-color-bg-neutral`   | 가장자리 막대와 모서리의 호        |
+| `--ids-color-border-neutral-strong`   | 가장자리 막대와 모서리의 호        |
 | `--ids-color-text-neutral` | 손잡이에 올렸을 때와 끄는 동안     |
 
 ## 속성

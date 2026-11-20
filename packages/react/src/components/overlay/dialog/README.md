@@ -74,7 +74,7 @@ import { Dialog } from '@gsainfoteam/ids-react';
 </Dialog.Content>
 ```
 
-- 마지막에 오는 `Dialog.Footer` 는 스크롤하는 본문 밖, 대화상자 바닥에 놓입니다. 배경은 `bg-band` 로, 대화상자 면(`bg-panel`)보다 한 단계 들어가 보입니다. 위쪽에 `border-neutral` 선이 있습니다.
+- 마지막에 오는 `Dialog.Footer` 는 스크롤하는 본문 밖, 대화상자 바닥에 놓입니다. 배경은 `bg-block` 로, 대화상자 면(`bg-surface`)보다 한 단계 들어가 보입니다. 위쪽에 `border-neutral` 선이 있습니다.
 - `Dialog.Footer` 를 `form` 안에 두면 본문 안에 남아 함께 스크롤합니다. 바닥에 두려면 폼은 본문에 두고 Footer 는 폼 밖에 둔 뒤, 제출 버튼을 `form` 속성으로 잇습니다: `<Button type="submit" form="profile">`.
 
 ## 열고 닫기

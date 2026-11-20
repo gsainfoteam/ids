@@ -106,7 +106,7 @@ type FaqId = 'shipping' | 'returns';
 
 ```tsx
 <Accordion variant="outline" />  // 기본. 섹션 사이에 구분선
-<Accordion variant="soft" />      // 섹션마다 `bg-neutral-subtle` 블록. 헤더는 올리고 누를 때 글자색 층(`state-hover`, `state-press`)이 얹힌다
+<Accordion variant="soft" />      // 섹션마다 `bg-neutral-soft` 블록. 헤더는 올리고 누를 때 글자색 층(`state-hover`, `state-press`)이 얹힌다
 <Accordion variant="ghost" />     // 구분선 없음. 헤더에 hover 와 press 층
 <Accordion size="tiny" />         // standard(기본) / tiny
 <Accordion disabled />            // 모든 섹션 비활성
