@@ -10,7 +10,7 @@ export const accordionStyle = tv({
     heading: 'flex',
     trigger: [
       'flex w-full flex-1 cursor-pointer items-start gap-2 rounded-standard text-start',
-      'text-on-surface focus-ring',
+      'text-neutral-bold focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
       'disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-default',
@@ -26,7 +26,7 @@ export const accordionStyle = tv({
       'data-open:grid-rows-[1fr] data-instant:transition-none motion-reduce:transition-none',
     ],
     clip: 'min-h-0 overflow-hidden',
-    body: 'text-on-surface',
+    body: 'text-neutral-bold',
   },
   variants: {
     variant: {
@@ -36,13 +36,13 @@ export const accordionStyle = tv({
       },
       soft: {
         root: 'gap-2',
-        item: 'bg-neutral-soft concentric-p-1',
-        trigger: 'px-3 data-hovered:bg-neutral-soft-hover data-active:bg-neutral-soft-active',
+        item: 'bg-neutral-subtle concentric-p-1',
+        trigger: 'px-3 state-layer data-hovered:state-hover data-active:state-press',
         body: 'px-3',
       },
       ghost: {
         root: 'gap-1',
-        trigger: 'px-3 data-hovered:bg-neutral-soft data-active:bg-neutral-soft-hover',
+        trigger: 'px-3 state-layer data-hovered:state-hover data-active:state-press',
         body: 'px-3',
       },
     } satisfies Record<AccordionVariant, object>,

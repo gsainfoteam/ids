@@ -63,7 +63,7 @@ import { Field, Rating } from '@gsainfoteam/ids-react';
   </Rating.Item>
 </Rating>
 
-<Rating className="[--rating-accent:var(--ids-color-bg-warning)]" />   {/* 채운 색. 기본 primary */}
+<Rating className="scheme-warning" />   {/* 채운 색은 text-scheme. 기본 scheme-primary */}
 ```
 
 - 아이콘은 빈 층과 채운 층에 두 번 그려지고, 채운 층을 잘라서 반 점을 표시합니다. `currentColor` 로 그리는 아이콘이면 됩니다.

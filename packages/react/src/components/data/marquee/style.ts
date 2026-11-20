@@ -11,7 +11,7 @@ export const marqueeStyle = tv({
   slots: {
     root: [
       'grid w-full min-w-0 grid-cols-1 grid-rows-1 gap-8 [--marquee-fade:min(15%,--spacing(20))]',
-      '[--ids-marquee-play-state:running] data-paused:[--ids-marquee-play-state:paused]',
+      '[--marquee-play-state:running] data-paused:[--marquee-play-state:paused]',
       'data-reduced-motion:h-auto data-reduced-motion:max-h-none',
     ],
     viewport: 'col-start-1 row-start-1 flex min-h-0 min-w-0 gap-[inherit]',
@@ -64,7 +64,7 @@ export const marqueeStyle = tv({
       true: {},
     },
     reverse: {
-      true: { track: '[--ids-marquee-direction:reverse]' },
+      true: { track: '[--marquee-direction:reverse]' },
     },
     fade: {
       true: {},
@@ -75,10 +75,10 @@ export const marqueeStyle = tv({
       tiny: { viewport: 'me-[calc(var(--ids-size-control-tiny)+--spacing(2))]' },
     } satisfies Record<MarqueePauseSpace, object>,
     pauseOnHover: {
-      true: { viewport: 'hover:[--ids-marquee-play-state:paused]' },
+      true: { viewport: 'hover:[--marquee-play-state:paused]' },
     },
     pauseOnFocus: {
-      true: { viewport: 'has-focus-visible:[--ids-marquee-play-state:paused]' },
+      true: { viewport: 'has-focus-visible:[--marquee-play-state:paused]' },
     },
   },
   compoundVariants: [
@@ -98,7 +98,7 @@ export const marqueeStyle = tv({
       motion: ['on', 'media'],
       class: {
         viewport: '@container',
-        track: '[--ids-marquee-translate:-50%] rtl:[--ids-marquee-translate:50%]',
+        track: '[--marquee-translate:-50%] rtl:[--marquee-translate:50%]',
         content: 'min-w-[100cqw]',
       },
     },
@@ -107,7 +107,7 @@ export const marqueeStyle = tv({
       motion: ['on', 'media'],
       class: {
         viewport: '@container-[size]',
-        track: '[--ids-marquee-translate:0_-50%]',
+        track: '[--marquee-translate:0_-50%]',
         content: 'min-h-[100cqh]',
       },
     },

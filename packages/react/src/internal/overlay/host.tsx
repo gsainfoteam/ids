@@ -79,7 +79,7 @@ function OverlayItemView({ item }: { item: OverlayItem }) {
   return (
     <ThemeContext value={theme}>
       <div
-        className="contents"
+        className="contents scheme-primary"
         data-overlay-item={item.id}
         data-mode={theme.resolvedMode}
         data-scale={theme.scale}

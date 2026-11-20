@@ -1,4 +1,3 @@
-import { primaryFill } from '../../../internal/brand-fill';
 import { tv } from '../../../utils';
 
 import type { StepperOrientation } from './root';
@@ -6,45 +5,41 @@ import type { IdsSize } from '../../../tokens/types';
 
 export const stepperStyle = tv({
   slots: {
-    root: ['flex w-full flex-col gap-6', primaryFill],
+    root: 'flex w-full flex-col gap-6',
     list: 'flex w-full',
     item: 'flex min-w-0',
     trigger: [
       'group/stepper-trigger grid min-w-0 grid-cols-[auto_minmax(0,1fr)] rounded-standard text-start',
-      'text-on-surface focus-ring',
+      'text-neutral-bold focus-ring',
       'data-disabled:opacity-50',
     ],
     indicator: [
       'group-has-[[data-stepper-description]]/stepper-trigger:row-span-2',
       'inline-flex shrink-0 items-center justify-center rounded-full tabular-nums',
-      'bg-neutral-soft text-neutral',
-      'data-completed:bg-(--control-fill) data-completed:text-(--control-on-fill)',
-      'data-current:bg-(--control-fill) data-current:text-(--control-on-fill)',
-      'data-current:ring-4 data-current:ring-(--ids-color-bg-primary-soft)',
-      'data-error:bg-danger-soft data-error:text-on-danger-soft',
+      'bg-neutral-subtle text-neutral',
+      'data-completed:bg-primary data-completed:text-on-primary data-completed:state-fill',
+      'data-current:bg-primary data-current:text-on-primary',
+      'data-current:ring-4 data-current:ring-(--ids-color-bg-primary-subtle)',
+      'data-error:bg-danger-subtle data-error:text-on-danger-subtle',
       'data-neutral:empty:bg-transparent data-neutral:empty:before:size-2.5',
       'data-neutral:empty:before:rounded-full data-neutral:empty:before:bg-current',
-      'transition-[background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'group-data-hovered/stepper-trigger:data-upcoming:bg-neutral-soft-hover',
-      'group-data-active/stepper-trigger:data-upcoming:bg-neutral-soft-active',
-      'group-data-hovered/stepper-trigger:data-completed:bg-(--control-fill-hover)',
-      'group-data-active/stepper-trigger:data-completed:bg-(--control-fill-press)',
-      'group-data-hovered/stepper-trigger:data-error:bg-danger-soft-hover',
-      'group-data-active/stepper-trigger:data-error:bg-danger-soft-active',
+      'transition-[background-color,box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'state-layer not-data-current:group-data-hovered/stepper-trigger:state-hover',
+      'not-data-current:group-data-active/stepper-trigger:state-press',
     ],
     title: [
-      'col-start-2 self-center text-on-surface',
+      'col-start-2 self-center text-neutral-bold',
       'data-upcoming:text-neutral data-error:text-danger',
       'underline-offset-4 group-data-hovered/stepper-trigger:underline',
     ],
     description: 'col-start-2 text-neutral',
-    body: 'min-w-0 text-on-surface',
+    body: 'min-w-0 text-neutral-bold',
     status: 'sr-only',
     separator: [
       'shrink-0 bg-(--ids-color-border-neutral)',
       'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
     ],
-    content: 'text-on-surface',
+    content: 'text-neutral-bold',
   },
   variants: {
     orientation: {

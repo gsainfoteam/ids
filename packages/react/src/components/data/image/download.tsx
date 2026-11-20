@@ -8,7 +8,7 @@ import { useImageViewerContext } from './context';
 import { useTranslate } from '../../../internal/translate';
 import { IconButton } from '../../action/icon-button';
 
-import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type ImageViewerDownloadProps = Omit<ComponentProps<'a'>, 'children' | 'href' | 'color'> & {

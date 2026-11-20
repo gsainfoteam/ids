@@ -1,4 +1,4 @@
-import { fieldSurface } from '../../../internal/field-surface';
+import { fieldSurface } from '../../../internal/surfaces/field-surface';
 import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -14,27 +14,21 @@ export const questionnaireStyle = tv({
     progressTrack: 'w-16',
     progressValue: 'ms-0 text-caption-c1-medium text-neutral',
     question: 'flex min-w-0 flex-col gap-4',
-    legend: 'p-0 text-on-surface',
+    legend: 'p-0 text-neutral-bold',
     description: 'text-neutral',
     options: 'flex gap-2',
     toggles: 'flex-wrap [&>[data-toggle-group-item]]:flex-initial',
     option: [
       fieldSurface.variant.outline,
       'cursor-pointer items-start rounded-standard',
-      'transition-[background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
-      'hover:bg-neutral-soft active:bg-neutral-soft-hover',
-      'dark:hover:bg-neutral-soft dark:active:bg-neutral-soft-hover',
-      'has-checked:bg-neutral-soft has-checked:inset-ring-primary dark:has-checked:bg-neutral-soft',
-      'has-checked:hover:bg-neutral-soft-hover has-checked:active:bg-neutral-soft-active',
-      'dark:has-checked:hover:bg-neutral-soft-hover dark:has-checked:active:bg-neutral-soft-active',
+      'transition-[background-color,box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'state-layer not-has-disabled:hover:state-hover not-has-disabled:active:state-press',
+      'has-checked:bg-neutral-subtle has-checked:inset-ring-primary',
       'has-disabled:cursor-not-allowed has-disabled:opacity-50',
-      'has-disabled:hover:bg-surface has-disabled:active:bg-surface',
-      'dark:has-disabled:hover:bg-neutral-soft/30 dark:has-disabled:active:bg-neutral-soft/30',
     ],
     indicator: 'flex h-[1lh] shrink-0 items-center',
     toggle: [
-      'data-pressed:bg-primary-soft data-pressed:text-on-primary-soft data-pressed:inset-ring-primary',
-      'data-pressed-hovered:bg-primary-soft-hover data-pressed-active:bg-primary-soft-active',
+      'data-pressed:bg-primary-subtle data-pressed:text-on-primary-subtle data-pressed:inset-ring-primary',
     ],
     other: 'w-full',
     navigation: 'w-full flex-wrap justify-end',

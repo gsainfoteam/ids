@@ -123,7 +123,7 @@ export const Gallery: Story = {
         description="겹친 쪽은 투명하게 오려내므로 어떤 배경에서도 틈이 배경색 그대로 보입니다."
       >
         <Showcase.Row label="muted">
-          <div className="rounded-standard bg-neutral-soft p-3">
+          <div className="rounded-standard bg-neutral-subtle p-3">
             <AvatarGroup max={4} aria-label="muted">
               {MEMBERS.map((member) => (
                 <Avatar key={member.name} src={member.src} name={member.name} />

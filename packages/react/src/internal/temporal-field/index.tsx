@@ -34,9 +34,9 @@ import {
   part,
 } from '../../utils';
 import { FieldPopup, FieldPopupHeader } from '../field-popup';
-import { type FieldSurfaceVariant } from '../field-surface';
 import { FormValue } from '../form-value';
 import { keyHandler, withModifiers } from '../keys';
+import { type FieldSurfaceVariant } from '../surfaces/field-surface';
 
 import type { IdsSize } from '../../tokens/types';
 

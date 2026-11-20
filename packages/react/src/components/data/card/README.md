@@ -89,7 +89,7 @@ import { Button, Card } from '@gsainfoteam/ids-react';
 
 - 제목 버튼은 `data-surface-trigger` 로 표시되고, 제목의 글자 모양을 그대로 씁니다. 제목은 heading 이라 버튼은 heading 안에 들어갑니다.
 - `Card.Title` 이 없거나 다른 컴포넌트 안에 숨어 있으면(자식이 함수이거나 직접 만든 컴포넌트 안) 카드 자신이 `role="button"` 이 됩니다. 이때는 안에 다른 버튼을 두지 않습니다.
-- hover와 누름은 배경 위에 반투명 층을 얹어 표시하므로 어느 variant에서나 같게 보입니다.
+- hover와 누름은 배경 위에 글자색 층(`state-layer`)을 6%(`state-hover`), 10%(`state-press`) 얹어 표시하므로 어느 variant에서나 같게 보입니다.
 - 포커스는 `focus-ring` 입니다. 제목 버튼에 포커스가 가면 카드 전체에 링이 그려지고, outline 카드는 테두리도 primary 색으로 바뀝니다.
 
 ## variant와 크기

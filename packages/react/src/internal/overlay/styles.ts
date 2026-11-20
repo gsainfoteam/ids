@@ -8,7 +8,7 @@ export const overlayStyles = {
     'fixed z-50 m-0 flex flex-col outline-none',
     cornerOfThePaddedViewport,
     borderOptionsCannotCover,
-    'bg-surface text-on-surface',
+    'bg-panel text-neutral-bold',
     'text-body-b3-regular shadow-md',
   ),
   backdrop: cn(

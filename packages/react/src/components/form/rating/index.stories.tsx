@@ -87,7 +87,7 @@ export const Gallery: Story = {
           <Rating
             defaultValue={3}
             aria-label="하트"
-            className="[--rating-accent:var(--ids-color-bg-danger)]"
+            className="scheme-danger"
           >
             <Rating.Item>
               <HeartIcon />

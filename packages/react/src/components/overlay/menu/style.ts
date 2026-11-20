@@ -17,7 +17,7 @@ export const menuStyle = tv({
       'fixed inset-x-0 top-[15vh] bottom-auto z-50 mx-auto my-0 flex h-fit flex-col',
       'max-h-[min(--spacing(112),calc(85dvh-var(--spacing)*4))] w-[min(--spacing(144),calc(100%-var(--spacing)*8))] max-w-none',
       'overflow-hidden concentric-p-1 outline-none',
-      'border border-neutral bg-surface text-on-surface',
+      'border border-neutral bg-panel text-neutral-bold',
       'text-body-b3-regular shadow-lg',
       'origin-top transition-[opacity,scale] duration-(--ids-motion-fast) ease-out',
       'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
@@ -29,7 +29,7 @@ export const menuStyle = tv({
     empty: [listStyles.empty, 'not-data-empty:sr-only'],
     item: [
       listStyles.option,
-      'pe-2.5 data-popup-open:bg-neutral-soft [&_svg]:size-(--ids-size-icon-standard)',
+      'pe-2.5 data-popup-open:state-hover [&_svg]:size-(--ids-size-icon-standard)',
     ],
     indicator: listStyles.indicator,
     dot: 'size-1.5 rounded-full bg-current',

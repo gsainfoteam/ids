@@ -17,10 +17,7 @@ export const splitterStyle = tv({
       'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
     ],
     group: 'relative z-10 flex shrink-0',
-    toggle: [
-      'absolute z-20 size-6 rounded-full',
-      'dark:bg-[color-mix(in_oklab,var(--ids-color-bg-neutral-soft)_30%,var(--ids-color-surface))]',
-    ],
+    toggle: 'absolute z-20 size-6 rounded-full',
     toggleIcon: 'pointer-events-none size-3.5',
   },
   variants: {

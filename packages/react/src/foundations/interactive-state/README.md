@@ -29,7 +29,9 @@ const [interaction, setInteraction] = useState(INTERACTIVE_STATE_DEFAULTS);
 | `focusVisible` | 키보드로 포커스가 왔다                         |
 | `disabled`     | 비활성이다                                     |
 
-- DOM에는 `pressed` > `active` > `hovered` 순서로 하나만 붙어, 같은 배경색을 두고 다투지 않습니다.
+- DOM에는 `pressed` > `active` > `hovered` 순서로 하나만 붙어, 같은 층 세기를 두고 다투지 않습니다.
+- IDS 컴포넌트는 hover 와 press 를 색 역할이 아니라 글자색 층으로 그립니다: `state-layer data-hovered:state-hover data-active:state-press`(6%, 10%). 고른, 켜진, 현재 항목은 `state-press` 를 그대로 둡니다.
+- 몇 px 짜리 손잡이(ScrollArea thumb, 크기 조절 손잡이, Carousel 점)만 층 대신 `bg-neutral` 에서 `text-neutral` 색으로 바뀝니다.
 
 ## 알아둘 것
 

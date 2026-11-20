@@ -1,5 +1,5 @@
-import { controlSurface } from '../../../internal/control-surface';
-import { toggleSurface } from '../../../internal/toggle-surface';
+import { controlSurface } from '../../../internal/surfaces/control-surface';
+import { toggleSurface } from '../../../internal/surfaces/toggle-surface';
 import { tv } from '../../../utils';
 
 export const toggleStyle = tv({
@@ -9,6 +9,7 @@ export const toggleStyle = tv({
     colorScheme: controlSurface.colorScheme,
     size: controlSurface.size,
   },
+  compoundVariants: toggleSurface.compoundVariants,
   defaultVariants: {
     variant: 'outline',
     colorScheme: 'primary',

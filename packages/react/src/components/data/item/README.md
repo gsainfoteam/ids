@@ -5,7 +5,7 @@
 - **shadcn/ui 구성.** `Item.Media`, `Item.Content` 안의 `Item.Title` 과 `Item.Description`, 그리고 `Item.Actions` 입니다. 전부 선택입니다.
 - **두 줄이 되면.** 설명은 두 줄에서 말줄임표로 줄고, 타일 미디어(`soft`, `outline`)는 한 줄일 때의 크기로 왼쪽 위에 남고 맨 아이콘은 세로 가운데에 놓입니다.
 - **행 어디를 눌러도 열린다.** `onClick` 만 주면 행 어디를 눌러도 열리고, 키보드와 스크린 리더에는 `Item.Title` 이 버튼이 됩니다. 설명은 `Item.Description` 입니다. `Item.Actions` 의 버튼을 눌러도 행은 눌리지 않고, 버튼이 버튼 안에 들어가지 않습니다.
-- **선택.** `selected` 는 옅은 층을 깔고, 버튼인 행에서는 `aria-pressed` 로 알립니다. `aria-current` 를 주면 그쪽이 선택을 말합니다.
+- **선택.** `selected` 는 글자색 press 층(`state-press`)을 깔고, 버튼인 행에서는 `aria-pressed` 로 알립니다. `aria-current` 를 주면 그쪽이 선택을 말합니다.
 - **목록.** 여러 행은 [ItemGroup](../item-group/README.md) 으로 묶습니다. `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다.
 
 ```tsx
@@ -115,7 +115,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 </Item>
 ```
 
-- 선택된 행은 variant와 상관없이 옅은 층이 깔리고 `data-selected` 가 붙습니다.
+- 선택된 행은 variant와 상관없이 글자색 press 층(`state-press`)이 깔리고 `data-selected` 가 붙습니다. 선택된 행은 올려도 hover 층으로 바뀌지 않습니다.
 
 ## 목록
 

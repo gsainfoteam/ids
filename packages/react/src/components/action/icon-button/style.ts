@@ -1,5 +1,5 @@
-import { controlSurface } from '../../../internal/control-surface';
-import { iconSquare } from '../../../internal/icon-square';
+import { controlSurface } from '../../../internal/surfaces/control-surface';
+import { iconSquare } from '../../../internal/surfaces/icon-square';
 import { tv } from '../../../utils';
 
 export const iconButtonStyle = tv({
@@ -9,6 +9,7 @@ export const iconButtonStyle = tv({
     colorScheme: controlSurface.colorScheme,
     size: iconSquare.size,
   },
+  compoundVariants: controlSurface.compoundVariants,
   defaultVariants: {
     variant: 'ghost',
     colorScheme: 'primary',

@@ -38,7 +38,8 @@ test('SSR: a native link with primary color and an underline by default', () => 
   expect(element.hasAttribute('data-link')).toBe(true);
   expect(element.dataset.colorScheme).toBe('primary');
   expect(element.dataset.underline).toBe('always');
-  expect(element.className).toMatch(/(^| )text-primary( |$)/);
+  expect(element.className).toMatch(/(^| )scheme-primary( |$)/);
+  expect(element.className).toMatch(/(^| )text-scheme( |$)/);
   expect(element.className).toMatch(/focus-ring/);
   expect(element.hasAttribute('rel')).toBe(false);
   expect(element.querySelector('[data-link-new-tab]')).toBeNull();

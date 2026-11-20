@@ -97,7 +97,7 @@ export const Gallery: Story = {
               {(state) => (state.checked ? <CheckIcon /> : <XMarkIcon />)}
             </Switch.Thumb>
           </Switch>
-          <Switch aria-label="테마" className="data-[state=checked]:bg-(--ids-color-on-surface)">
+          <Switch aria-label="테마" className="data-[state=checked]:bg-neutral-bold">
             <Switch.Thumb>{(state) => (state.checked ? <MoonIcon /> : <SunIcon />)}</Switch.Thumb>
           </Switch>
         </Showcase.Row>

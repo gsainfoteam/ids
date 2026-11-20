@@ -91,7 +91,7 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
 ```
 
 - 패딩은 `concentric-p-8`, `concentric-p-4` 라 모서리가 `container`(16px) 까지 따라 둥글어집니다.
-- 테두리와 배경은 중립색(`--ids-color-border-neutral`, `--ids-color-bg-neutral-soft`)입니다.
+- 테두리와 배경은 중립색(`--ids-color-border-neutral`, `--ids-color-bg-neutral-subtle`)입니다.
 
 ## data 속성
 
