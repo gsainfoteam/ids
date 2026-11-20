@@ -54,6 +54,23 @@ type Period = 'day' | 'week' | 'month';
 - `onValueChange` 는 사용자가 고를 때만 불립니다. 부모가 바꾼 값이나 폼 초기화는 알리지 않습니다.
 - 한 번 고르면 선택을 비울 수 없습니다. native 라디오 그룹과 같습니다.
 
+## 고른 모드로 내용 바꾸기
+
+```tsx
+const [method, setMethod] = useState('qr');
+
+<SegmentedControl value={method} onValueChange={setMethod} aria-label="로그인 방법" stretch>
+  <SegmentedControl.Item value="qr">QR 코드</SegmentedControl.Item>
+  <SegmentedControl.Item value="password">비밀번호</SegmentedControl.Item>
+</SegmentedControl>
+
+{method === 'qr' ? <QRLogin /> : <PasswordLogin />}
+```
+
+- 제어 값으로 아래 내용을 조건부로 그립니다. 로그인 QR 블록과 2단계 인증 블록이 이 모양입니다.
+- 화살표 키는 칸을 옮기면서 바로 골라서 내용도 곧바로 바뀝니다. 고르지 않은 모드의 내용은 DOM 에 남지 않으므로, 입력한 값을 모드 사이에서 지켜야 하면 상태를 컨트롤 바깥에 둡니다.
+- 탭과 패널의 관계(`aria-controls`)를 알려야 하는 탭 이동이면 `Tabs` 를 씁니다.
+
 ## 키보드
 
 | 키           | 동작                                           |

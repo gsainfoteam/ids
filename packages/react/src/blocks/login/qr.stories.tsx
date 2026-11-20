@@ -15,8 +15,8 @@ import { Spinner } from '../../components/feedback/spinner';
 import { toast } from '../../components/feedback/toast';
 import { Field } from '../../components/form/field';
 import { PasswordField } from '../../components/form/password-field';
+import { SegmentedControl } from '../../components/form/segmented-control';
 import { TextField } from '../../components/form/text-field';
-import { Tabs } from '../../components/navigation/tabs';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -43,6 +43,7 @@ const STEPS = [
 
 export const PC: Story = {
   render: function Render() {
+    const [method, setMethod] = useState('qr');
     const [session, setSession] = useState(0);
     const [signingIn, setSigningIn] = useState(false);
 
@@ -66,58 +67,63 @@ export const PC: Story = {
           </Card.Header>
 
           <Card.Content>
-            <Tabs defaultValue="qr" appearance="pill" className="flex flex-col gap-5">
-              <Tabs.List aria-label="로그인 방법" stretch>
-                <Tabs.Trigger value="qr">
+            <div className="flex flex-col gap-5">
+              <SegmentedControl
+                value={method}
+                onValueChange={setMethod}
+                aria-label="로그인 방법"
+                stretch
+              >
+                <SegmentedControl.Item value="qr">
                   <QrCodeIcon />
                   QR 코드
-                </Tabs.Trigger>
-                <Tabs.Trigger value="password">
+                </SegmentedControl.Item>
+                <SegmentedControl.Item value="password">
                   <KeyIcon />
                   비밀번호
-                </Tabs.Trigger>
-              </Tabs.List>
+                </SegmentedControl.Item>
+              </SegmentedControl>
 
-              <Tabs.Content value="qr" className="flex flex-col items-center gap-5">
-                <QRCode
-                  value={`https://gistory.me/login/qr/${SESSIONS[session]}`}
-                  aria-label="로그인 QR 코드"
-                  shape="rounded"
-                  size={176}
-                >
-                  <QRCode.Logo>
-                    <CubeTransparentIcon />
-                  </QRCode.Logo>
-                </QRCode>
+              {method === 'qr' ? (
+                <div className="flex flex-col items-center gap-5">
+                  <QRCode
+                    value={`https://gistory.me/login/qr/${SESSIONS[session]}`}
+                    aria-label="로그인 QR 코드"
+                    shape="rounded"
+                    size={176}
+                  >
+                    <QRCode.Logo>
+                      <CubeTransparentIcon />
+                    </QRCode.Logo>
+                  </QRCode>
 
-                <Item.Group
-                  ordered
-                  aria-label="QR 코드로 로그인하는 법"
-                  size="tiny"
-                  className="w-full"
-                >
-                  {STEPS.map((step, index) => (
-                    <Item key={step}>
-                      <Item.Media variant="soft" aria-hidden>
-                        {index + 1}
-                      </Item.Media>
-                      <Item.Content>
-                        <Item.Title>{step}</Item.Title>
-                      </Item.Content>
-                    </Item>
-                  ))}
-                </Item.Group>
+                  <Item.Group
+                    ordered
+                    aria-label="QR 코드로 로그인하는 법"
+                    size="tiny"
+                    className="w-full"
+                  >
+                    {STEPS.map((step, index) => (
+                      <Item key={step}>
+                        <Item.Media variant="soft" aria-hidden>
+                          {index + 1}
+                        </Item.Media>
+                        <Item.Content>
+                          <Item.Title>{step}</Item.Title>
+                        </Item.Content>
+                      </Item>
+                    ))}
+                  </Item.Group>
 
-                <Button
-                  variant="outline"
-                  size="tiny"
-                  onClick={() => setSession((session + 1) % SESSIONS.length)}
-                >
-                  <ArrowPathIcon />새 코드 받기
-                </Button>
-              </Tabs.Content>
-
-              <Tabs.Content value="password">
+                  <Button
+                    variant="outline"
+                    size="tiny"
+                    onClick={() => setSession((session + 1) % SESSIONS.length)}
+                  >
+                    <ArrowPathIcon />새 코드 받기
+                  </Button>
+                </div>
+              ) : (
                 <form onSubmit={signIn} className="flex flex-col gap-4">
                   <Field>
                     <Field.Label>이메일</Field.Label>
@@ -138,8 +144,8 @@ export const PC: Story = {
                     {signingIn ? '로그인하는 중' : '로그인'}
                   </Button>
                 </form>
-              </Tabs.Content>
-            </Tabs>
+              )}
+            </div>
           </Card.Content>
         </Card>
       </main>
