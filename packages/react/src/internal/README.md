@@ -163,7 +163,7 @@ export const iconToggleStyle = tv({
   - 계열 채움 층은 빨간 버튼이 hover 때 거뭇해지지 않고 더 붉어지게 합니다.
   - IdsProvider 가 이 층들 아래에서도 글자 대비를 지키는 단계를 고릅니다(`theme-roles.ts` 의 `underStateLayers`). `tests/tokens-contrast.test.ts` 가 확인합니다.
   - `base` 의 `transition-[…]` 에 `--ids-state-opacity` 가 있어 층이 다른 색과 함께 바뀝니다.
-- outline 은 컴포넌트 토큰 `bg-control-outline` 과 `inset-ring-control-outline` 입니다. 라이트는 페이지 색에 `border-neutral` 테두리, 다크는 800 면에 700 테두리라 `bg-panel`(900) 위에서도 면보다 밝고 테두리가 보입니다. `dark:` 클래스는 쓰지 않습니다.
+- outline 은 컴포넌트 토큰 `bg-control-outline` 과 `inset-ring-control-outline` 입니다. 라이트는 페이지 색에 `border-neutral` 테두리, 다크는 850 면에 700 테두리라 `bg-panel`(900) 위에서도 면보다 밝고 테두리가 보입니다. `dark:` 클래스는 쓰지 않습니다.
 - scheme 은 상속하지 않습니다. 기본값이라도 `tv` 의 `defaultVariants` 가 자기 클래스를 붙이므로, danger Alert 안의 Button 도 자기 primary 로 그립니다.
 - `glossy` 는 state layer 를 쓰지 않습니다. `state-layer` 가 `background-image` 를 차지하는데 glossy 의 광택도 `background-image` 입니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택, 안쪽 위 1px 하이라이트(`inset-shadow`), 채움 위에 검정 20% 를 얹은 가장자리(`inset-ring-black/20`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다.
 - `transparent` 는 어느 상태에서도 배경을 칠하지 않습니다. hover 는 `opacity-70`, press 는 `opacity-40` 입니다. 그래서 `transition` 에 `opacity` 를 더합니다.
@@ -350,7 +350,7 @@ size: {
 
 ### 왜 이렇게
 
-- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 컴포넌트 토큰 `bg-field-outline` 배경과 `inset-ring-field-outline` 테두리(다크는 800 배경에 700 테두리), `soft` 는 `bg-neutral-subtle` 배경, `ghost` 는 배경과 테두리가 없습니다.
+- TextField 의 컨테이너, Select 와 날짜 필드의 trigger, ChipField 가 모두 같은 상자를 그립니다. `variant` 는 강도만 정합니다: `outline` 은 컴포넌트 토큰 `bg-field-outline` 배경과 `inset-ring-field-outline` 테두리(다크는 850 배경에 700 테두리), `soft` 는 `bg-neutral-subtle` 배경, `ghost` 는 배경과 테두리가 없습니다.
 - 글자는 `text-neutral-bold` 입니다. 상자 안 버튼(`fieldAction`)은 `text-neutral` 에서 hover, press, 켜짐에 `text-neutral-bold` 로 바뀝니다.
 - focus 와 invalid 색은 여기서 정하지 않습니다. `focus-ring` 이 이 파일이 그린 `inset-ring` 테두리의 색을 바꾸므로 그 상태를 되풀이해 적지 않습니다.
 - `soft` 와 `ghost` 도 투명한 `inset-ring-1` 을 그립니다. `focus-ring` 은 inset ring 의 색만 바꾸므로, 폭이 있는 inset ring 이 있어야 focus 와 invalid 테두리가 보입니다.
@@ -394,8 +394,8 @@ footer: [
 
 ### 알아둘 것
 
-- 배경은 component 토큰 `bg-band` 입니다. light 에서는 흰 `bg-panel` 아래 `neutral-50`, dark 에서는 `neutral-900` 인 `bg-panel` 아래 `neutral-800` 입니다. dark 에서는 위에 놓인 면일수록 밝으므로 띠도 면보다 밝습니다.
-- dark 에서 띠는 outline 버튼의 채움(`bg-control-outline`)과 같은 800 입니다. 띠 위 outline 버튼은 `border-control-outline`(700) 테두리로 구분되고, light 에서 흰 면 위의 흰 outline 버튼과 같은 모양입니다.
+- 배경은 component 토큰 `bg-band` 입니다. light 에서는 흰 `bg-panel` 아래 `neutral-50`, dark 에서는 `neutral-900` 인 `bg-panel` 아래 `neutral-850` 입니다. dark 에서는 위에 놓인 면일수록 밝으므로 띠도 면보다 반 단계 밝습니다. 850 은 이 반 단계를 위해 neutral 팔레트에 둔 단계이고, `bg-neutral-subtle` 이 dark 에서 가리킵니다.
+- dark 에서 띠는 outline 버튼의 채움(`bg-control-outline`)과 같은 850 입니다. 띠 위 outline 버튼은 `border-control-outline`(700) 테두리로 구분되고, light 에서 흰 면 위의 흰 outline 버튼과 같은 모양입니다.
 - 글자색은 따로 두지 않습니다. `text-neutral-bold` 는 모든 neutral 배경에서 읽히는 본문 색입니다.
 - 띠 위 버튼은 따로 맞추지 않습니다. hover 와 press 는 글자색을 덮는 state layer 라 띠 위에서도 보입니다.
 - Card `ghost` 는 배경을 `bg-transparent` 로 덮어 선만 남깁니다.

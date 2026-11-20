@@ -34,6 +34,7 @@ export const IDS_NEUTRAL_PALETTE = {
   '600': '#525252',
   '700': '#404040',
   '800': '#262626',
+  '850': '#1e1e1e',
   '900': '#171717',
   '950': '#0a0a0a',
 } as const;
@@ -57,7 +58,7 @@ export const IDS_NEUTRAL_STEPS = {
   dark: {
     'bg-neutral-subtlest': 950,
     'bg-neutral-subtler': 900,
-    'bg-neutral-subtle': 800,
+    'bg-neutral-subtle': 850,
     'bg-neutral': 700,
     'bg-neutral-bold': 50,
     'text-on-neutral-subtlest': 50,

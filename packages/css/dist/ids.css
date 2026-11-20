@@ -1806,7 +1806,7 @@
 [data-mode="dark"] {
   --ids-color-bg-neutral-subtlest: var(--ids-theme-dark-bg-neutral-subtlest, #0a0a0a);
   --ids-color-bg-neutral-subtler: var(--ids-theme-dark-bg-neutral-subtler, #171717);
-  --ids-color-bg-neutral-subtle: var(--ids-theme-dark-bg-neutral-subtle, #262626);
+  --ids-color-bg-neutral-subtle: var(--ids-theme-dark-bg-neutral-subtle, #1e1e1e);
   --ids-color-bg-neutral: var(--ids-theme-dark-bg-neutral, #404040);
   --ids-color-bg-neutral-bold: var(--ids-theme-dark-bg-neutral-bold, #fafafa);
   --ids-color-text-on-neutral-subtlest: var(--ids-theme-dark-text-on-neutral-subtlest, #fafafa);

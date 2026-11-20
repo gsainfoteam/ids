@@ -25,6 +25,7 @@ abstract final class IdsColorRoles {
     600: Color(0xFF525252),
     700: Color(0xFF404040),
     800: Color(0xFF262626),
+    850: Color(0xFF1E1E1E),
     900: Color(0xFF171717),
     950: Color(0xFF0A0A0A),
   };
@@ -48,7 +49,7 @@ abstract final class IdsColorRoles {
     IdsMode.dark: {
       'bg-neutral-subtlest': 950,
       'bg-neutral-subtler': 900,
-      'bg-neutral-subtle': 800,
+      'bg-neutral-subtle': 850,
       'bg-neutral': 700,
       'bg-neutral-bold': 50,
       'text-on-neutral-subtlest': 50,
