@@ -1,17 +1,12 @@
 import { useState } from 'react';
 
-import { ArrowLeftIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon } from '@heroicons/react/24/outline';
 
-import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
-import { Progress } from '../../components/feedback/progress';
 import { Spinner } from '../../components/feedback/spinner';
-import { Field } from '../../components/form/field';
-import { RadioGroup } from '../../components/form/radio-group';
-import { TextField } from '../../components/form/text-field';
-import { Spacer } from '../../components/layout/spacer';
+import { Questionnaire } from '../../components/form/questionnaire';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -58,19 +53,7 @@ const QUESTIONS = [
 
 export const PC: Story = {
   render: function Render() {
-    const [index, setIndex] = useState(0);
-    const [answers, setAnswers] = useState<Record<string, string>>({});
-    const [other, setOther] = useState('');
-
-    const done = index === QUESTIONS.length;
-    const current = QUESTIONS[Math.min(index, QUESTIONS.length - 1)];
-    const answer = answers[current.id];
-
-    const next = () => {
-      if (other.trim() !== '') setAnswers({ ...answers, [current.id]: other.trim() });
-      setOther('');
-      setIndex(index + 1);
-    };
+    const [answers, setAnswers] = useState<Questionnaire.Answers | null>(null);
 
     const agent = (
       <Avatar name="행사 준비 도우미" size="tiny" aria-hidden>
@@ -93,22 +76,19 @@ export const PC: Story = {
           <div className="text-body-b2-regular flex min-w-0 flex-1 flex-col gap-4">
             <p>좋아요. 계획을 세우기 전에 세 가지만 물어볼게요.</p>
 
-            {done ? (
+            {answers ? (
               <>
                 <Card size="tiny">
                   <Item.Group size="tiny" aria-label="고른 답">
                     {QUESTIONS.map((question) => {
-                      const chosen = question.choices.find(
-                        (choice) => choice.value === answers[question.id],
-                      );
+                      const answer = answers[question.id];
+                      const chosen = question.choices.find((choice) => choice.value === answer);
 
                       return (
                         <Item key={question.id}>
                           <Item.Content>
                             <Item.Description>{question.title}</Item.Description>
-                            <Item.Title>
-                              {chosen?.label ?? answers[question.id] ?? '건너뜀'}
-                            </Item.Title>
+                            <Item.Title>{chosen?.label ?? answer ?? '건너뜀'}</Item.Title>
                           </Item.Content>
                         </Item>
                       );
@@ -122,76 +102,28 @@ export const PC: Story = {
               </>
             ) : (
               <Card>
-                <Card.Header>
-                  <Card.Description>
-                    질문 {index + 1} / {QUESTIONS.length}
-                  </Card.Description>
-                  <Card.Title asChild>
-                    <h2 id={`${current.id}-question`}>{current.title}</h2>
-                  </Card.Title>
-                  <Card.Description>{current.description}</Card.Description>
-                </Card.Header>
-                <Card.Content className="flex flex-col gap-4">
-                  <Progress value={(index / QUESTIONS.length) * 100} aria-label="질문 진행" />
-                  <RadioGroup<string>
-                    key={current.id}
-                    name={current.id}
-                    value={answer ?? null}
-                    onValueChange={(value) => {
-                      setAnswers({ ...answers, [current.id]: value });
-                      setOther('');
-                    }}
-                    aria-labelledby={`${current.id}-question`}
-                  >
-                    {({ Item: Radio }) => (
-                      <div className="flex flex-col gap-2">
-                        {current.choices.map((choice) => (
-                          <Item
+                <Card.Content>
+                  <Questionnaire submitLabel="계획 세우기" onComplete={setAnswers}>
+                    {QUESTIONS.map((question) => (
+                      <Questionnaire.Question key={question.id} name={question.id} optional>
+                        {question.title}
+                        <Questionnaire.Description>
+                          {question.description}
+                        </Questionnaire.Description>
+                        {question.choices.map((choice) => (
+                          <Questionnaire.Option
                             key={choice.value}
-                            variant="outline"
-                            asChild
-                            selected={answer === choice.value}
+                            value={choice.value}
+                            description={choice.description}
                           >
-                            <label>
-                              <Item.Content>
-                                <Item.Title>{choice.label}</Item.Title>
-                                <Item.Description>{choice.description}</Item.Description>
-                              </Item.Content>
-                              <Item.Actions>
-                                <Radio value={choice.value} />
-                              </Item.Actions>
-                            </label>
-                          </Item>
+                            {choice.label}
+                          </Questionnaire.Option>
                         ))}
-                      </div>
-                    )}
-                  </RadioGroup>
-                  <Field>
-                    <Field.Label>직접 적기</Field.Label>
-                    <TextField
-                      value={other}
-                      onValueChange={setOther}
-                      placeholder="다른 답이 있으면 적어 주세요"
-                    />
-                  </Field>
+                        <Questionnaire.Other placeholder="다른 답이 있으면 적어 주세요" />
+                      </Questionnaire.Question>
+                    ))}
+                  </Questionnaire>
                 </Card.Content>
-                <Card.Footer className="border-t">
-                  <Button
-                    variant="outline"
-                    disabled={index === 0}
-                    onClick={() => setIndex(index - 1)}
-                  >
-                    <ArrowLeftIcon />
-                    이전
-                  </Button>
-                  <Spacer />
-                  <Button variant="outline" onClick={() => setIndex(index + 1)}>
-                    건너뛰기
-                  </Button>
-                  <Button disabled={!answer && other.trim() === ''} onClick={next}>
-                    {index === QUESTIONS.length - 1 ? '계획 세우기' : '다음'}
-                  </Button>
-                </Card.Footer>
               </Card>
             )}
           </div>

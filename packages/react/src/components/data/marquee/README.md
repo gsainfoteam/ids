@@ -47,7 +47,7 @@ import { Marquee } from '@gsainfoteam/ids-react';
 ```
 
 - 가로 띠는 LTR 에서 왼쪽으로, `dir="rtl"` 에서 오른쪽으로 흐릅니다. 세로 띠는 위로 흐릅니다.
-- 속도는 초당 px 이라 항목 수와 상관없이 같은 빠르기로 읽힙니다. 한 바퀴 시간은 ResizeObserver 로 잰 길이를 속도로 나눈 값이고, 루트의 `--ids-marquee-duration` 에 들어갑니다.
+- 속도는 초당 px 이라 항목 수와 상관없이 같은 빠르기로 읽힙니다. 한 바퀴 시간은 ResizeObserver 로 잰 길이를 속도로 나눈 값이고, 루트의 `--marquee-duration` 에 들어갑니다.
 - 재기 전(서버 HTML, 첫 그림)에는 1000px 을 한 바퀴로 보고 흐릅니다. `normal` 이면 20초입니다.
 - 세로 띠는 높이가 있어야 보입니다. 가로 띠는 부모의 폭을 채웁니다.
 

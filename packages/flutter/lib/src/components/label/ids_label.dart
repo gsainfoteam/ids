@@ -31,7 +31,7 @@ class IdsLabel extends StatelessWidget {
     return Opacity(
       opacity: disabled ? 0.5 : 1,
       child: DefaultTextStyle(
-        style: ids.textStyle(style, color: ids.colors.onSurface),
+        style: ids.textStyle(style, color: ids.colors.textNeutralBold),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           spacing: ids.dimension(4),

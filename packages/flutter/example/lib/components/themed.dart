@@ -16,9 +16,9 @@ Widget themed(BuildContext context, Widget child) {
     mode: mode,
     child: Builder(
       builder: (context) => Material(
-        color: IdsProvider.of(context).colors.surface,
+        color: IdsProvider.of(context).colors.bgNeutralSubtlest,
         textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-          color: IdsProvider.of(context).colors.onSurface,
+          color: IdsProvider.of(context).colors.textNeutralBold,
         ),
         child: Center(child: SizedBox(width: 320, child: child)),
       ),

@@ -193,7 +193,7 @@ export const Gallery: Story = {
                     key={`${neutral}:${mode}`}
                     theme={{ primary: palettes[hue], neutral }}
                     mode={mode}
-                    className="bg-surface text-on-surface"
+                    className="bg-neutral-subtlest text-neutral-bold"
                   >
                     <Card className="w-56">
                       <Card.Header>
@@ -459,8 +459,8 @@ export const Scope: Story = {
     await expect(dark).toHaveAttribute('data-mode', 'dark');
     await expect(within(orange).getByTestId('palette')).toHaveTextContent(palettes.orange[600]);
     await expect(orange).toHaveAttribute('data-mode', 'light');
-    await expect(dark.className).toContain('bg-surface');
-    await expect(orange.className).not.toContain('bg-surface');
+    await expect(dark.className).toContain('bg-neutral-subtlest');
+    await expect(orange.className).not.toContain('bg-neutral-subtlest');
     await userEvent.click(within(orange).getByRole('button', { name: 'dark' }));
     await expect(outer).toHaveAttribute('data-mode', 'dark');
     await expect(orange).toHaveAttribute('data-mode', 'dark');

@@ -6,6 +6,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { Button, ButtonGroup, IdsProvider, TextField, Toggle, ToggleGroup } from '../src';
+import { paintedLayersOf } from './painted-layers';
 import { testTheme } from './theme';
 
 const separator = (node: ReactNode) =>
@@ -172,7 +173,7 @@ test('a glossy ToggleGroup draws no group shadow, and the pressed item keeps its
 
   expect(getComputedStyle(group).boxShadow).not.toMatch(dropShadow);
   expect(getComputedStyle(left!).boxShadow).toMatch(dropShadow);
-  expect(getComputedStyle(right!).backgroundImage).toBe('none');
+  expect(paintedLayersOf(right!)).toEqual([]);
   expect(getComputedStyle(right!).marginInlineStart).toBe('-1px');
 });
 

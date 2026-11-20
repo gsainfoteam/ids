@@ -23,7 +23,7 @@ function StateDump({ state }: { state: InteractiveState }) {
   return (
     <pre
       data-testid="state"
-      className="rounded-standard text-caption-c1-regular bg-neutral-soft text-neutral px-3 py-2 font-mono"
+      className="rounded-standard text-caption-c1-regular bg-neutral-subtle text-neutral px-3 py-2 font-mono"
     >
       {JSON.stringify(state, null, 2)}
     </pre>

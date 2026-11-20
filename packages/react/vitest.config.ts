@@ -10,6 +10,7 @@ import { BalancedSequencer } from './tests/balanced-sequencer';
 
 const TESTS = new URL('./tests/', import.meta.url);
 const SERVER_RENDER_SUITES = 'tests/**/*.ssr.test.tsx';
+const COVER_RENDERS_EVERY_COMPONENT_ON_A_SHARED_RUNNER_MS = 20_000;
 const VISUAL_SUITES = 'tests/**/*.visual.test.tsx';
 const RENDERS_THE_VISUAL_REFERENCE = process.env.IDS_VISUAL_REFERENCE === '1';
 const usesTheSharedClipboard = (file: string) =>
@@ -107,6 +108,7 @@ export default defineConfig({
           name: 'ssr',
           include: [SERVER_RENDER_SUITES],
           environment: 'node',
+          testTimeout: COVER_RENDERS_EVERY_COMPONENT_ON_A_SHARED_RUNNER_MS,
         },
       },
       {

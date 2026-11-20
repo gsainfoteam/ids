@@ -14,9 +14,22 @@ import 'status.dart';
 
 const modes = [IdsMode.light, IdsMode.dark];
 
-const fillStates = [0.1, 0.2];
+typedef StateLayer = ({Color color, List<double> opacities});
 
-const softTints = [0.06, 0.12];
+StateLayer contentLayer(Color content) => (
+  color: content,
+  opacities: const [IdsStateOpacity.hover, IdsStateOpacity.press],
+);
+
+StateLayer tintLayer(Color fill) => (
+  color: fill,
+  opacities: const [IdsStateOpacity.tintHover, IdsStateOpacity.tintPress],
+);
+
+const StateLayer fillLayer = (
+  color: IdsStateLayer.fillColor,
+  opacities: [IdsStateOpacity.fillHover, IdsStateOpacity.fillPress],
+);
 
 const tintedNeutralChroma = 0.02;
 
@@ -28,22 +41,28 @@ const _fillStepsOutwardFrom600 = [
 
 typedef ModeRule = ({
   List<List<int>> fill,
-  int soft,
-  List<int> onSoft,
+  int subtler,
+  double subtlerTowardSurface,
+  int subtle,
+  List<int> onSubtle,
   List<int> text,
 });
 
 const roleRules = <IdsMode, ModeRule>{
   IdsMode.light: (
     fill: _fillStepsOutwardFrom600,
-    soft: 100,
-    onSoft: [700, 800, 900, 950],
+    subtler: 50,
+    subtlerTowardSurface: 0,
+    subtle: 100,
+    onSubtle: [700, 800, 900, 950],
     text: [600, 700, 800, 900, 950],
   ),
   IdsMode.dark: (
     fill: _fillStepsOutwardFrom600,
-    soft: 950,
-    onSoft: [400, 300, 200, 100, 50],
+    subtler: 950,
+    subtlerTowardSurface: 0.5,
+    subtle: 950,
+    onSubtle: [400, 300, 200, 100, 50],
     text: [500, 400, 300, 200, 100, 50],
   ),
 };
@@ -104,29 +123,54 @@ ParsedPalette parsePalette(
   ),
 };
 
-Color _awayFromText(Color text) =>
-    oklchOf(text).l > 0.5 ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
+double _towardLikeCulori(double from, double to, double amount) =>
+    from + amount * (to - from);
 
-List<Color> fillStatesOf(Color fill, Color onFill) => [
-  for (final amount in fillStates)
-    mixOklab(fill, _awayFromText(onFill), amount),
+Color withStateLayer(Color base, Color layer, double opacity) {
+  final from = base.withValues(colorSpace: ColorSpace.sRGB);
+  final to = layer.withValues(colorSpace: ColorSpace.sRGB);
+  return _eightBitOpaque(
+    Color.from(
+      alpha: 1,
+      red: _towardLikeCulori(from.r, to.r, opacity),
+      green: _towardLikeCulori(from.g, to.g, opacity),
+      blue: _towardLikeCulori(from.b, to.b, opacity),
+    ),
+  );
+}
+
+List<Color> underStateLayers(Color base, List<StateLayer> layers) => [
+  base,
+  for (final layer in layers)
+    for (final opacity in layer.opacities)
+      withStateLayer(base, layer.color, opacity),
 ];
 
-List<Color> softTintsOf(Color soft, Color fill) => [
-  for (final amount in softTints) mixOklab(soft, fill, amount),
-];
-
-Color? _firstReaching(
+Color? _firstReadableOn(
   IdsPalette shades,
   List<int> candidates,
-  List<Color> backgrounds, [
+  List<Color> bases,
+  Color familyFill, [
   double lc = textLc,
 ]) {
   for (final step in candidates) {
-    if (reaches(shades[step], backgrounds, lc)) return shades[step];
+    final candidate = shades[step];
+    final states = [
+      for (final base in bases)
+        ...underStateLayers(base, [
+          contentLayer(candidate),
+          tintLayer(familyFill),
+        ]),
+    ];
+    if (reaches(candidate, states, lc)) return candidate;
   }
   return null;
 }
+
+double _lowestContrastUnderStateLayers(Color text, Color fill) => [
+  for (final state in underStateLayers(fill, [fillLayer]))
+    lightnessContrast(text, state),
+].reduce((a, b) => a < b ? a : b);
 
 typedef _Readable = ({Color fill, Color text, double lc});
 
@@ -134,7 +178,7 @@ _Readable _mostReadable(List<Color> fills) {
   _Readable? best;
   for (final fill in fills) {
     for (final text in const [lightText, darkText]) {
-      final lc = lightnessContrast(text, fill);
+      final lc = _lowestContrastUnderStateLayers(text, fill);
       if (best == null || lc > best.lc) best = (fill: fill, text: text, lc: lc);
     }
   }
@@ -151,6 +195,11 @@ _Readable? _readableFill(IdsPalette shades, List<List<int>> stepsOutward) {
 
 String _stepsText(Iterable<int> steps) => steps.join(', ');
 
+Color _subtlerOf(IdsPalette shades, ModeRule rule, Color surface) =>
+    rule.subtlerTowardSurface == 0
+    ? shades[rule.subtler]
+    : mixOklab(shades[rule.subtler], surface, rule.subtlerTowardSurface);
+
 ({Roles roles, List<IdsThemeIssue> issues}) familyRoles(
   String family,
   IdsPalette shades,
@@ -161,61 +210,72 @@ String _stepsText(Iterable<int> steps) => steps.join(', ');
   final at = path ?? family;
   final rule = roleRules[mode]!;
   final issues = <IdsThemeIssue>[];
-  final soft = shades[rule.soft];
+  final subtler = _subtlerOf(shades, rule, surface);
+  final subtle = shades[rule.subtle];
 
   final readable = _readableFill(shades, rule.fill);
   if (readable == null) {
     issues.add(
       IdsThemeIssue(
         at,
-        '${mode.name}: neither white nor neutral 950 reaches Lc ${textLc.round()} on $family steps ${_stepsText(rule.fill.expand((steps) => steps))}.',
+        '${mode.name}: neither white nor neutral 950 reaches Lc ${textLc.round()} on $family steps ${_stepsText(rule.fill.expand((steps) => steps))} and under their hover and press layers.',
       ),
     );
   }
   final chosen = readable ?? _mostReadable([shades[600]]);
-  final fill = chosen.fill;
-  final onFill = chosen.text;
 
-  final fillHoverActive = fillStatesOf(fill, onFill);
-  final softHoverActive = softTintsOf(soft, fill);
-
-  final onSoft = _firstReaching(shades, rule.onSoft, [
-    soft,
-    ...softHoverActive,
-  ]);
-  if (onSoft == null) {
+  final onSubtler = _firstReadableOn(shades, rule.onSubtle, [
+    subtler,
+  ], chosen.fill);
+  if (onSubtler == null) {
     issues.add(
       IdsThemeIssue(
         at,
-        '${mode.name}: no step of ${_stepsText(rule.onSoft)} reaches Lc ${textLc.round()} on $family-soft (step ${rule.soft}) and its hover and press tints.',
+        '${mode.name}: no step of ${_stepsText(rule.onSubtle)} reaches Lc ${textLc.round()} on $family-subtler and under its hover and press layers.',
       ),
     );
   }
 
-  final text = _firstReaching(shades, rule.text, [surface, soft], accentTextLc);
+  final onSubtle = _firstReadableOn(shades, rule.onSubtle, [
+    subtle,
+  ], chosen.fill);
+  if (onSubtle == null) {
+    issues.add(
+      IdsThemeIssue(
+        at,
+        '${mode.name}: no step of ${_stepsText(rule.onSubtle)} reaches Lc ${textLc.round()} on $family-subtle (step ${rule.subtle}) and under its hover and press layers.',
+      ),
+    );
+  }
+
+  final text = _firstReadableOn(
+    shades,
+    rule.text,
+    [surface, subtler, subtle],
+    chosen.fill,
+    accentTextLc,
+  );
   if (text == null) {
     issues.add(
       IdsThemeIssue(
         at,
-        '${mode.name}: no step of ${_stepsText(rule.text)} reaches Lc ${accentTextLc.round()} as $family text on the surface and on $family-soft.',
+        '${mode.name}: no step of ${_stepsText(rule.text)} reaches Lc ${accentTextLc.round()} as $family text on the surface, $family-subtler and $family-subtle, under their hover and press layers too.',
       ),
     );
   }
 
-  final slots = IdsColorRoles.slotsOf(family);
-  final lastText = shades[rule.text.last];
+  final accent = text ?? shades[rule.text.last];
+  final lastOnSubtle = shades[rule.onSubtle.last];
   return (
     roles: {
-      slots[0]: fill,
-      slots[1]: fillHoverActive[0],
-      slots[2]: fillHoverActive[1],
-      slots[3]: soft,
-      slots[4]: softHoverActive[0],
-      slots[5]: softHoverActive[1],
-      slots[6]: onFill,
-      slots[7]: onSoft ?? shades[rule.onSoft.last],
-      slots[8]: text ?? lastText,
-      slots[9]: text ?? lastText,
+      'bg-$family-subtler': subtler,
+      'bg-$family-subtle': subtle,
+      'bg-$family': chosen.fill,
+      'text-on-$family-subtler': onSubtler ?? lastOnSubtle,
+      'text-on-$family-subtle': onSubtle ?? lastOnSubtle,
+      'text-on-$family': chosen.text,
+      'text-$family': accent,
+      'border-$family': accent,
     },
     issues: issues,
   );
@@ -304,7 +364,7 @@ ColorResolution resolveColors(IdsThemeOverrides theme) {
 
   Roles rolesIn(IdsMode mode) {
     final roles = neutralRoles(neutral, mode);
-    final surface = roles['surface']!;
+    final surface = roles['bg-neutral-subtlest']!;
 
     for (final family in IdsColorRoles.families) {
       if (family == 'neutral') continue;

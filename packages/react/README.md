@@ -300,8 +300,8 @@ IDS 에는 기본 색이 없다. 앱이 `defineIdsTheme` 으로 테마를 만들
 | `mode` / `defaultMode` | `'light' \| 'dark' \| 'system'` | 바깥 Provider, 최상위는 `'light'` | 모드 (제어 / 비제어) |
 | `onModeChange` | `(mode) => void` | | 모드를 바꾸려 할 때 |
 
-- 색은 계열 여덟 개(neutral, primary, secondary, tertiary, success, warning, danger, info)가 같은 역할을 가진다. 유틸리티 앞머리가 속성을 말한다: `bg-primary`, `bg-primary-soft`, `text-on-primary`, `text-on-primary-soft`, `text-primary`, `border-primary`.
-- 라이트와 다크의 역할 색은 팔레트에서 IDS 가 APCA 대비(채움과 soft 위 글자 Lc 75, 페이지 위 색 글자와 선 Lc 60)를 지키도록 고른다.
+- 색은 계열 여덟 개(neutral, primary, secondary, tertiary, success, warning, danger, info)가 같은 역할을 가진다. 유틸리티 앞머리가 속성을 말한다: `bg-primary`, `bg-primary-subtle`, `text-on-primary`, `text-on-primary-subtle`, `text-primary`, `border-primary`.
+- 라이트와 다크의 역할 색은 팔레트에서 IDS 가 APCA 대비(채움과 subtle 위 글자 Lc 75, 페이지 위 색 글자 Lc 60, 선 Lc 45)를 지키도록 고른다. hover, press 역할은 없고, 컴포넌트가 글자색을 6%, 10% 덮는 state layer(`state-layer`, `state-hover`, `state-press`)로 그린다. 대비는 그 층 아래에서도 잰다.
 - `primary`, `secondary`, `tertiary` 에 색 하나(`'#0d9488'`)를 주면 IDS 가 50~950 을 만든다. `createIdsPalette(color)` 로 결과를 미리 볼 수 있다.
 - `secondary` 와 `tertiary` 를 생략하면 IdsProvider 가 primary 에서 만든다. secondary 는 같은 hue 의 옅은 채도, tertiary 는 hue 를 60° 돌린 색이다.
 - `neutral: 'tinted'` 는 중립색에 primary 색상을 옅게 섞는다. 기본은 `'pure'`.
@@ -475,7 +475,7 @@ Tabs·Menu처럼 **진짜 compound**가 생기면 그때 Root Context(또는 sto
 | Firefox | 128 | Firefox 155 |
 | Safari (macOS, iOS) | 18 | WebKit 26.6 |
 
-- 최소 버전은 IDS 가 기대는 기능에서 나옵니다. 브랜드 채움의 hover 와 press 를 글자색에서 멀어지게 섞는 relative color syntax(Chrome 119, Firefox 128, Safari 18), 배율을 px 에 맞추는 CSS `round()`(Chrome 125, Firefox 118, Safari 15.4), top layer 에 올리는 `popover` API(Chrome 114, Firefox 125, Safari 17), Tailwind CSS v4(Chrome 111, Firefox 128, Safari 16.4)입니다.
+- 최소 버전은 IDS 가 기대는 기능에서 나옵니다. 배율을 px 에 맞추는 CSS `round()`(Chrome 125, Firefox 118, Safari 15.4), top layer 에 올리는 `popover` API(Chrome 114, Firefox 125, Safari 17), Tailwind CSS v4(Chrome 111, Firefox 128, Safari 16.4)입니다.
 - 아래 기능은 없는 브라우저에서 모양만 덜 다듬어집니다.
   - `@starting-style` 이 없으면 여는 애니메이션 없이 바로 나타납니다.
 - 모든 브라우저 테스트가 CI(ubuntu)에서 세 엔진으로 돕니다. macOS 에서는 `pnpm test` 가 Chromium 만 돌리고, `pnpm test:browsers` 가 Docker 의 Playwright Linux 이미지에서 세 엔진을 모두 돌립니다.

@@ -112,7 +112,7 @@ const config = {
 ```
 
 - 기본은 차트 안에 `Chart.Tooltip`/`Chart.Legend` 나 Recharts `Tooltip`/`Legend` 가 없을 때만 붙습니다. Server Component 가 넘긴 차트도 같은 방법으로 찾습니다.
-- Recharts `Tooltip` 을 그대로 쓰면 흰 바탕에 값을 계열 색으로 씁니다. 다크 모드에서는 대비가 모자라므로 `contentStyle` 에 `var(--ids-color-surface)`, `itemStyle` 에 `var(--ids-color-on-surface)` 를 줍니다.
+- Recharts `Tooltip` 을 그대로 쓰면 흰 바탕에 값을 계열 색으로 씁니다. 다크 모드에서는 대비가 모자라므로 `contentStyle` 에 `var(--ids-color-bg-neutral-subtlest)`, `itemStyle` 에 `var(--ids-color-text-neutral-bold)` 를 줍니다.
 - 두 파트는 Recharts `Tooltip`/`Legend` 의 속성을 그대로 받고, 더해서 `indicator`(`'dot' | 'line' | 'dashed'`)를 받습니다.
 - `Chart.Tooltip` 의 `formatter(value, name, item, index, payload)` 와 `labelFormatter(label, payload)` 는 Recharts 와 같습니다. `[값, 이름]` 배열을 돌려주면 이름도 바꿉니다. `hideLabel` 은 맨 위 항목 이름을 숨깁니다.
 - `Chart.Legend` 의 `formatter(label, item, index)` 는 config 의 label 을 받아 바꿉니다.

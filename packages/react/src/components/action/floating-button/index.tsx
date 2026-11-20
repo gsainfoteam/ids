@@ -3,7 +3,7 @@ import type { ComponentProps, CSSProperties, ReactNode, Ref } from 'react';
 import { FloatingButtonRoot } from './root';
 import { floatingButtonStyle } from './style';
 import { type FloatingPlacement } from './use-floating-button';
-import { type ControlColorScheme } from '../../../internal/control-surface';
+import { type ControlColorScheme } from '../../../internal/surfaces/control-surface';
 
 import type { InteractiveState, WithInteractiveValues } from '../../../hooks/use-interactive';
 import type { IdsSize } from '../../../tokens/types';

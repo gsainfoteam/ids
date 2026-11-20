@@ -52,18 +52,18 @@ test('SSR: the root writes both modes of the theme into its style', () => {
   expect(element.hasAttribute('data-color')).toBe(false);
   expect(element.style.colorScheme).toBe('light');
   expect(element.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(palettes.blue[600]);
-  expect(element.style.getPropertyValue('--ids-theme-light-bg-primary-soft')).toBe(
+  expect(element.style.getPropertyValue('--ids-theme-light-bg-primary-subtle')).toBe(
     palettes.blue[100],
   );
-  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-soft')).toBe(
+  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-subtle')).toBe(
     palettes.blue[950],
   );
-  expect(element.style.getPropertyValue('--ids-theme-dark-text-on-primary-soft')).toBe(
+  expect(element.style.getPropertyValue('--ids-theme-dark-text-on-primary-subtle')).toBe(
     palettes.blue[200],
   );
   expect(element.style.getPropertyValue('--ids-theme-light-bg-danger')).toMatch(/^#/);
   expect(element.style.getPropertyValue('--ids-theme-light-bg-secondary')).toMatch(/^#/);
-  expect(element.getAttribute('style')).not.toMatch(/--ids-theme-light-surface/);
+  expect(element.getAttribute('style')).not.toMatch(/--ids-theme-light-bg-neutral-subtlest/);
 });
 
 test('SSR: radius and corner shape become variables on the element', () => {
@@ -93,7 +93,7 @@ test('SSR: one color is enough, the provider builds the palette from it', () => 
   ).querySelector<HTMLElement>('[data-mode]')!;
   const built = createIdsPalette(palettes.violet[500])!;
   expect(element.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(built[600]);
-  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-soft')).toBe(built[950]);
+  expect(element.style.getPropertyValue('--ids-theme-dark-bg-primary-subtle')).toBe(built[950]);
 });
 
 test('SSR: a scale is an attribute, and no scale writes none', () => {
@@ -137,9 +137,9 @@ test('the primary role follows the mode the element shows', async () => {
   const role = (testId: string, name: string) =>
     getComputedStyle(screen.getByTestId(testId).element()).getPropertyValue(`--ids-color-${name}`);
 
-  await expect.poll(() => role('light', 'bg-primary-soft')).toBe(palettes.blue[100]);
-  expect(role('dark', 'bg-primary-soft')).toBe(palettes.blue[950]);
-  expect(role('dark', 'bg-secondary-soft'), 'secondary is derived from primary').not.toBe(
+  await expect.poll(() => role('light', 'bg-primary-subtle')).toBe(palettes.blue[100]);
+  expect(role('dark', 'bg-primary-subtle')).toBe(palettes.blue[950]);
+  expect(role('dark', 'bg-secondary-subtle'), 'secondary is derived from primary').not.toBe(
     palettes.blue[950],
   );
 });
@@ -157,7 +157,7 @@ test('a Scope with one color key keeps the colors it inherits', async () => {
 
   await expect.poll(() => value('secondary', 'bg-secondary')).toBe(palettes.violet[600]);
   expect(value('secondary', 'bg-primary')).toBe(palettes.blue[600]);
-  expect(value('secondary', 'surface')).toBe('#ffffff');
+  expect(value('secondary', 'bg-neutral-subtlest')).toBe('#ffffff');
   expect(value('tinted', 'bg-secondary')).toBe(palettes.violet[600]);
   expect(value('tinted', 'border-neutral')).not.toBe('#e5e5e5');
 });
@@ -212,7 +212,7 @@ test('a Scope inherits what it does not set, and the mode setter reaches the own
   expect(themeSeenBy.orange.theme.primary).toBe(palettes.orange);
   expect(themeSeenBy.dark.theme.primary).toBe(palettes.blue);
 
-  await expect.element(dark, { message: 'a mode switch paints' }).toHaveClass('bg-surface');
+  await expect.element(dark, { message: 'a mode switch paints' }).toHaveClass('bg-neutral-subtlest');
   await expect.element(orange, { message: 'a palette switch does not' }).not.toHaveClass(/bg-/);
   await expect.element(outer, { message: 'the root never paints' }).not.toHaveClass(/bg-/);
 
@@ -367,7 +367,7 @@ test('asChild puts the attributes on the child element', async () => {
   const section = screen.container.querySelector<HTMLElement>('#area')!;
   expect(section.style.getPropertyValue('--ids-theme-light-bg-primary')).toBe(palettes.blue[600]);
   expect(section.dataset.mode).toBe('light');
-  expect(section.className).toBe('x');
+  expect([...section.classList].sort()).toEqual(['scheme-primary', 'x']);
   expect(screen.container.firstElementChild).toBe(section);
 });
 

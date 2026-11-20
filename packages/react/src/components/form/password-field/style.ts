@@ -1,4 +1,4 @@
-import { fieldAction } from '../../../internal/field-surface';
+import { fieldAction } from '../../../internal/surfaces/field-surface';
 import { textControlStyle } from '../../../internal/text-control/style';
 import { tv } from '../../../utils';
 

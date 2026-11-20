@@ -72,7 +72,7 @@ export function IdsProviderRoot({
 
   useEffect(() => {
     if (!isDevelopment || !hasPrimary || !elementRef.current) return;
-    const surface = getComputedStyle(elementRef.current).getPropertyValue('--ids-color-surface');
+    const surface = getComputedStyle(elementRef.current).getPropertyValue('--ids-color-bg-neutral-subtlest');
     if (surface.trim() === '')
       console.warn(
         '[IDS] IdsProvider: no IDS color tokens on this element. Import @gsainfoteam/ids-css after tailwindcss.',
@@ -96,7 +96,7 @@ export function IdsProviderRoot({
             ref={mergedRef}
             data-mode={context.resolvedMode}
             data-scale={ownScale}
-            className={cn(paintsSurface && 'bg-surface text-on-surface', className)}
+            className={cn('scheme-primary', paintsSurface && 'bg-neutral-subtlest text-neutral-bold', className)}
             style={{ colorScheme: context.resolvedMode, ...ownVariables, ...style }}
           >
             {asChild ? (

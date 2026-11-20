@@ -103,6 +103,7 @@ export function useCommandPalette({
   const [content, setContent] = useState<HTMLElement | null>(null);
   const [backdrop, setBackdrop] = useState<HTMLElement | null>(null);
   const [list, setList] = useState<HTMLElement | null>(null);
+  const [stacked, setStacked] = useState(false);
 
   const [query, setQuery] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -127,6 +128,7 @@ export function useCommandPalette({
     onDismiss: (reason) => {
       if (reason === 'escape-key') setOpen(false);
     },
+    onPositionChange: ({ modalsBelow }) => setStacked(modalsBelow > 0),
   });
 
   useLayoutEffect(() => {
@@ -215,6 +217,7 @@ export function useCommandPalette({
     setOpen,
     mounted: presence.mounted,
     ending: presence.ending,
+    stacked,
     layer,
     content,
     setTrigger,

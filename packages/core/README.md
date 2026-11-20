@@ -8,9 +8,12 @@
 
 | 출력 파일 | 설명 |
 |---|---|
-| `packages/css/dist/ids.css` | CSS 변수 + Tailwind `@theme` |
+| `packages/css/dist/ids.css` | CSS 변수 + Tailwind `@theme`. `state.json` 에서 `--ids-state-hover`, `--ids-state-press`, `--ids-state-tint-*`, `--ids-state-fill-*`, `state-layer`·`state-hover`·`state-press`·`state-fill`·`state-scheme` 유틸리티, `color-roles.json` 에서 `scheme-{계열}`·`focus-ring-scheme` 유틸리티, `@property --ids-state-opacity`·`--ids-state-color`·`--ids-state-layer-hover`·`--ids-state-layer-press` |
 | `packages/react/src/tokens/types.ts` | TypeScript 타입 (`IdsMode`, `IdsSize` 등) |
-| `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스. `ids_color_roles.dart` 는 `color-roles.json` 에서 `IdsColors` 와 계열·역할 목록을 만든다 |
+| `packages/react/src/tokens/color-roles.ts` | 계열 목록, `IDS_FAMILY_SLOTS`, `IDS_NEUTRAL_ONLY_SLOTS`, `IDS_STATE_OPACITY`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IDS_STATE_FILL_COLOR`, `IDS_NEUTRAL_PALETTE`, `IDS_NEUTRAL_STEPS` |
+| `packages/flutter/lib/tokens/*.dart` | Dart 토큰 클래스. `ids_color_roles.dart` 는 `color-roles.json` 에서 `IdsColors`, `IdsColorRoles`(계열, `familySlots`, `neutralOnlySlots`, `slotsOf`, `neutralSteps`), `state.json` 에서 `IdsStateOpacity`(`hover`, `press`, `tintHover`, `tintPress`, `fillHover`, `fillPress`), `IdsStateLayer.fillColor` 를 만든다 |
+| `packages/react/src/tokens/component-tokens.ts` | `component.json`, `shadow.json` 에서 `IDS_COMPONENT_COLORS`, `IDS_COMPONENT_SHADOWS`, `IDS_SHADOWS` |
+| `packages/flutter/lib/tokens/ids_component_tokens.dart` | 같은 표의 Dart 판. `IdsComponentColors`, `IdsComponentShadows`, `IdsShadows`, `IdsComponentTokens` |
 | `packages/react/src/tokens/palette-model.ts` | 17색에 맞춘 팔레트 모델의 계수와 상태 색의 기준 넷. `palette-model.js` 가 쓴다 |
 | `packages/flutter/lib/tokens/ids_palette_model.dart` | 같은 계수와 상태 색 넷의 Dart 판. `palette-model.js` 가 쓴다 |
 | `packages/flutter/fonts/*` | Flutter 패키지에 넣는 글꼴과 라이선스. `fonts.build.mjs` 가 npm 패키지에서 복사한다 |
@@ -23,9 +26,12 @@ tokens/
   spacing.json          # 간격 원시값 (xs, sm, md, ...)
   typography.json       # 폰트 패밀리·사이즈·웨이트·행간 원시값
   motion.json           # 애니메이션 지속시간 원시값
+  component.json        # 컴포넌트 토큰. 모드마다 역할 하나(`bg-panel`: light `bg-neutral-subtlest`, dark `bg-neutral-subtler`)
+  shadow.json           # 그림자 원시 단계 0, 1, 2. sm/md 이름은 없다
+  state.json            # state layer 의 불투명도와 채움 층 색. hover 6%, press 10%, tint 8% / 12%, fill 검정 10% / 18%
   enums.json            # IdsMode·IdsSize·IdsVariant 열거값. color 는 데모 hue 이름 목록(스토리 전용)이라 어디에도 나가지 않는다
   semantic/
-    neutral.{light,dark}.json  # 중립 계열과 바탕 층의 단계. CSS fallback, tokens/color-roles.ts, Dart 의 neutralSteps 로 나간다
+    neutral.{light,dark}.json  # neutral 역할의 단계(`bg-neutral-subtlest` 0 / 950 …). CSS fallback, tokens/color-roles.ts, Dart 의 neutralSteps 로 나간다
     typography.json     # 텍스트 스타일. CSS 와 Dart 가 같은 이름으로 받는다
 color-roles.json        # 색 계열과 역할 이름의 표. CSS 브리지, React 의 tokens/color-roles.ts, Dart 의 IdsColors 를 만든다
 tests/fixtures/theme-roles.json  # ids-react 가 데모 seed 17개 × 조합별로 쓴 역할 색. Flutter 테스트가 같은 값을 내는지 비교한다
@@ -40,16 +46,57 @@ hue 별 역할 표는 없다. 역할 색은 두 플랫폼이 앱의 팔레트에
 ```json
 {
   "families": { "neutral": ["neutral"], "brand": ["primary", "secondary", "tertiary"], "status": ["success", "warning", "danger", "info"] },
-  "slots": { "bg": ["{family}", "{family}-hover", "…"], "text": ["on-{family}", "on-{family}-soft", "{family}"], "border": ["{family}"] },
+  "slots": {
+    "bg": ["{family}-subtlest", "{family}-subtler", "{family}-subtle", "{family}", "{family}-bold"],
+    "text": ["on-{family}-subtlest", "on-{family}-subtler", "on-{family}-subtle", "on-{family}", "on-{family}-bold", "{family}", "{family}-bold"],
+    "border": ["{family}"]
+  },
+  "scheme": { "neutral": { "bg-{family}": "bg-{family}-bold", "text-on-{family}": "text-on-{family}-bold", "text-{family}": "text-{family}-bold" } },
+  "neutralOnly": ["bg-{family}-subtlest", "text-on-{family}-subtlest", "bg-{family}-bold", "text-on-{family}-bold", "text-{family}-bold"],
   "namespaces": { "bg": ["--background-color"], "text": ["--text-color", "--fill"], "border": ["--border-color", "--ring-color", "--outline-color", "--stroke"] }
 }
 ```
 
-- 역할 변수는 `--ids-color-{bg|text|border}-{이름}` 이다. 바탕 층(`surface`, `on-surface`)만 앞머리가 없다.
-- Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-soft` 는 있고 `--color-primary` 나 `--background-color-on-primary` 는 없다.
-- `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다. 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다). neutral 과 바탕 층은 없으면 `neutral.*.json` 의 단계를 읽는다.
-- Dart 포매터도 이 표를 읽는다. `--ids-color-bg-primary-soft` 는 `IdsColors.bgPrimarySoft` 가 되고, `colors['bg-primary-soft']` 로도 읽는다.
+- `slots` 는 `{family}` 를 넣는 틀이다. 역할은 `{속성}-{틀}` 이다(`bg-{family}-subtle` → `bg-primary-subtle`).
+- `neutralOnly` 의 역할은 neutral 에만 있다. 다른 계열은 `bg-X-subtler`, `bg-X-subtle`, `bg-X`, `text-on-X-subtler`, `text-on-X-subtle`, `text-on-X`, `text-X`, `border-X` 여덟 개다.
+- `bg` 틀마다 같은 세기의 `text-on` 틀이 있다. 그래서 `bg-X[-세기]` 위 글자는 언제나 `text-on-X[-세기]` 다.
+- 역할 변수는 `--ids-color-{역할}` 이다. 앞머리 없는 역할(`surface`)이나 hover, active 역할은 없다.
+- 세기는 `subtlest` < `subtler` < `subtle` < (없음) < `bold` 다.
+- Tailwind 이름공간은 `namespaces` 에 적힌 것만 만든다. `--background-color-primary-subtle` 은 있고 `--color-primary` 나 `--background-color-on-primary` 는 없다.
+- `[data-mode]` 블록은 역할마다 `--ids-theme-{mode}-{역할}` 을 읽는다. 브랜드와 상태 계열은 fallback 이 없다(IdsProvider 가 모두 쓴다). neutral 은 없으면 `neutral.*.json` 의 단계를 읽는다.
+- `scheme-{계열}` utility 는 모든 계열에 있는 여덟 역할을 `--ids-color-*-scheme[-세기]` 로 다시 가리킨다(`bg-scheme-subtle` → `bg-primary-subtle`). 이름공간도 같은 규칙으로 만든다(`bg-scheme`, `text-on-scheme`, `inset-ring-scheme`).
+  - `scheme.neutral` 은 neutral 이 다른 역할을 가리키는 자리다. `bg-scheme` 은 `bg-neutral-bold`, `text-on-scheme` 은 `text-on-neutral-bold`, `text-scheme` 은 `text-neutral-bold` 다.
+  - scheme 은 층 색도 정한다. `--ids-state-layer-scheme` 은 계열 채움(`bg-X`)에 tint 불투명도, neutral 은 `currentColor` 에 기본 불투명도다. `state-scheme` 이 그것을 `--ids-state-color`, `--ids-state-layer-*` 에 넣는다.
+  - `focus-ring-scheme` 은 `focus-ring` 과 같은 trigger 로 ring 을 `border-scheme` 으로 칠한다. `focus-ring-current` 는 글자색으로 칠한다(채움 위의 닫기 버튼).
+- Dart 포매터도 이 표를 읽는다. `--ids-color-bg-primary-subtle` 은 `IdsColors.bgPrimarySubtle` 이 되고, `colors['bg-primary-subtle']` 로도 읽는다.
 - `ids_palette_model.dart` 는 아래 팔레트 모델의 계수를 옮긴 것이라, 계수가 바뀌면 함께 바뀐다.
+
+## 컴포넌트 토큰
+
+- `component.json` 의 토큰은 `$value` 에 `light`, `dark` 두 역할을 갖는다. 그림자 토큰은 `{shadow.N}` 단계를 가리킨다.
+- 이름은 `{속성}-{그룹}[-{부분}][-{변형}]` 이다. 속성 `bg` 는 배경, `text` 는 글자와 `fill`, `border` 는 선과 `ring`·`outline`·`stroke` 이름공간에 붙는다(`bg-panel`, `inset-ring-control-outline`, `fill-qr-code`).
+- CSS 는 `[data-mode]` 마다 `--ids-color-{토큰}: var(--ids-color-{역할})`, `--ids-shadow-{토큰}: var(--ids-shadow-{단계})` 를 쓴다. 단계 `0` 은 `0 0 #0000` 이라 Tailwind 의 그림자 목록 안에서도 합쳐진다.
+- 이름 규칙과 대비는 `packages/react/tests/component-tokens.test.ts` 가, Flutter 와 같은 색인지는 `tests/fixtures/theme-roles.json` 의 `components` 가 확인한다.
+
+## state layer
+
+`tokens/state.json` 이 hover 와 press 의 불투명도, 채움 층의 색을 정한다.
+
+| 토큰 | 값 | CSS | React | Dart |
+|---|---|---|---|---|
+| `state.hover` | 6% | `--ids-state-hover` | `IDS_STATE_OPACITY.hover` (0.06) | `IdsStateOpacity.hover` |
+| `state.press` | 10% | `--ids-state-press` | `IDS_STATE_OPACITY.press` (0.1) | `IdsStateOpacity.press` |
+| `state.tint.hover` | 8% | `--ids-state-tint-hover` | `IDS_STATE_OPACITY.tintHover` | `IdsStateOpacity.tintHover` |
+| `state.tint.press` | 12% | `--ids-state-tint-press` | `IDS_STATE_OPACITY.tintPress` | `IdsStateOpacity.tintPress` |
+| `state.fill.color` | `#000000` | `--ids-state-fill-color` | `IDS_STATE_FILL_COLOR` | `IdsStateLayer.fillColor` |
+| `state.fill.hover` | 10% | `--ids-state-fill-hover` | `IDS_STATE_OPACITY.fillHover` | `IdsStateOpacity.fillHover` |
+| `state.fill.press` | 18% | `--ids-state-fill-press` | `IDS_STATE_OPACITY.fillPress` | `IdsStateOpacity.fillPress` |
+
+- `ids.css` 의 `state-layer` 는 `--ids-state-color`(없으면 `currentColor`)를 `--ids-state-opacity` 만큼 `background-image` 로 덮는다.
+- `state-hover`, `state-press` 는 `--ids-state-layer-hover`, `--ids-state-layer-press` 를 먼저 읽고, 없으면 `--ids-state-hover`, `--ids-state-press` 를 쓴다. `state-fill` 은 층 색과 그 둘을 채움 값으로 둔다.
+- tint 는 `state-scheme` 으로 쓴다. `scheme-{계열}` 이 층 색(`bg-X`)과 tint 불투명도를 `--ids-state-layer-scheme[-hover|-press]` 에 둔다.
+- `@property --ids-state-opacity`(`<percentage>`, 0%, 상속 안 함)라서 transition 으로 바뀐다. `--ids-state-color`, `--ids-state-layer-hover`, `--ids-state-layer-press` 도 상속하지 않는다. 그래서 채움 버튼 안의 요소가 바깥 층을 물려받지 않는다.
+- IdsProvider(`theme-roles.ts`)와 Flutter(`theme_roles.dart`)는 같은 값으로 층 아래의 글자 대비를 잰다. 값을 바꾸면 parity fixture 를 다시 쓴다.
 
 ## 팔레트 모델
 

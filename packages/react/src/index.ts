@@ -185,6 +185,16 @@ export { Select } from './components/form/select';
 export type { SelectProps, SelectVariant } from './components/form/select';
 
 export { PromptInput } from './components/form/prompt-input';
+
+export { Questionnaire } from './components/form/questionnaire';
+export type {
+  QuestionnaireAnswer,
+  QuestionnaireAnswers,
+  QuestionnaireAppearance,
+  QuestionnaireOrientation,
+  QuestionnaireProps,
+  QuestionnaireSelectionMode,
+} from './components/form/questionnaire';
 export type {
   PromptInputMessage,
   PromptInputProps,

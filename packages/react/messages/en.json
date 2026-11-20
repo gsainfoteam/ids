@@ -189,7 +189,9 @@
     "thumbnails": "Image list",
     "viewer": "Image viewer",
     "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out"
+    "zoomLevel": "{percent}%",
+    "zoomOut": "Zoom out",
+    "zoomReset": "{percent}%, fit to screen"
   },
   "input": {
     "clearSearch": "Clear search"
@@ -278,6 +280,17 @@
   },
   "qrCode": {
     "label": "QR code"
+  },
+  "questionnaire": {
+    "navigation": "Question navigation",
+    "next": "Next",
+    "other": "Other",
+    "otherPlaceholder": "Type another answer",
+    "previous": "Previous",
+    "progress": "Questionnaire progress",
+    "skip": "Skip",
+    "step": "Question {current} of {total}",
+    "submit": "Submit"
   },
   "rating": {
     "label": "Rating",

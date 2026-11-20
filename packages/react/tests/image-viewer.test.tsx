@@ -22,9 +22,13 @@ const PHOTOS = [
   { alt: 'Third', src: picture(240), caption: undefined },
 ];
 
-function Gallery({ viewer, ...props }: Partial<Image.Group.Props> & { viewer?: ReactNode }) {
+function Gallery({
+  viewer,
+  mode,
+  ...props
+}: Partial<Image.Group.Props> & { viewer?: ReactNode; mode?: 'light' | 'dark' }) {
   return (
-    <IdsProvider theme={testTheme}>
+    <IdsProvider theme={testTheme} mode={mode}>
       <div style={{ width: 300 }}>
         <Image.Group aria-label="Photos" layout="grid" columns={3} {...props}>
           {PHOTOS.map((photo) => (
@@ -49,6 +53,11 @@ const announcer = () => document.querySelector('[data-slides-announcer]')!;
 const currentBox = () =>
   document.querySelector<HTMLElement>('[data-slide][data-selected] [data-image-viewer-box]')!;
 const scaleOf = (element: Element) => new DOMMatrixReadOnly(getComputedStyle(element).transform).a;
+
+async function onADesktop() {
+  onTestFinished(() => page.viewport(414, 896));
+  await page.viewport(1024, 768);
+}
 
 const fadeUntilFinished = { '--ids-motion-fast': '60s' } as CSSProperties;
 
@@ -233,8 +242,114 @@ test('keys and buttons zoom the image, arrows pan it while zoomed, and a new ima
   await expect.poll(() => scaleOf(currentBox())).toBe(1);
 });
 
-test('thumbnails jump to an image and mark the one shown', async () => {
+test('the default viewer is a caption and one toolbar, with thumbnails left to compose', async () => {
+  await onADesktop();
   await render(<Gallery />);
+  await openAt('First');
+
+  const toolbar = document.querySelector('[data-image-viewer-toolbar]')!;
+  const names = [...toolbar.querySelectorAll('button, a')].map((control) =>
+    control.getAttribute('aria-label'),
+  );
+  expect(names).toEqual([
+    '이전 사진',
+    '다음 사진',
+    '축소',
+    '100%, 화면에 맞추기',
+    '확대',
+    '내려받기',
+    '닫기',
+  ]);
+  expect(toolbar.querySelectorAll('[data-image-viewer-separator]')).toHaveLength(3);
+  expect(document.querySelector('[data-image-viewer-thumbnails]')).toBeNull();
+  await expect.element(page.getByText('Morning lake')).toBeVisible();
+});
+
+test('on a phone the toolbar leaves the zoom level out and stays inside the screen', async () => {
+  await render(<Gallery />);
+  await openAt('First');
+
+  const reset = document.querySelector('[data-image-viewer-zoom-reset]')!;
+  expect(getComputedStyle(reset).display).toBe('none');
+  const toolbar = document.querySelector('[data-image-viewer-toolbar]')!.getBoundingClientRect();
+  expect(toolbar.left).toBeGreaterThanOrEqual(0);
+  expect(toolbar.right).toBeLessThanOrEqual(window.innerWidth);
+  await expect.element(page.getByRole('button', { name: '닫기' })).toBeVisible();
+});
+
+test('the viewer follows the page mode', async () => {
+  const toolbarColor = () =>
+    getComputedStyle(document.querySelector('[data-image-viewer-toolbar]')!).backgroundColor;
+
+  const light = await render(<Gallery mode="light" />);
+  await openAt('First');
+  expect(document.querySelector('[data-image-viewer]')).not.toHaveAttribute('data-mode');
+  expect(document.querySelector('[data-image-viewer-backdrop]')).not.toHaveAttribute('data-mode');
+  const onALightPage = toolbarColor();
+  await userEvent.keyboard('{Escape}');
+  await expect.element(dialog()).not.toBeInTheDocument();
+  await light.unmount();
+
+  await render(<Gallery mode="dark" />);
+  await openAt('First');
+  expect(toolbarColor()).not.toBe(onALightPage);
+});
+
+test('the zoom level shows the scale, and pressing it fits the image again', async () => {
+  await onADesktop();
+  await render(<Gallery />);
+  await openAt('Second');
+  const fitted = page.getByRole('button', { name: '100%, 화면에 맞추기' });
+  await expect.element(fitted).toBeDisabled();
+
+  await userEvent.keyboard('+');
+  const zoomed = page.getByRole('button', { name: '200%, 화면에 맞추기' });
+  await expect.element(zoomed).toHaveTextContent('200%');
+  await expect.element(zoomed).toBeEnabled();
+
+  await userEvent.click(zoomed);
+  await expect.poll(() => scaleOf(currentBox())).toBe(1);
+  await expect.element(fitted).toHaveTextContent('100%');
+});
+
+test('the caption hides while the image is zoomed and lets presses through to the image', async () => {
+  await render(<Gallery />);
+  await openAt('First');
+  const caption = document.querySelector('[data-image-viewer-caption]')!;
+  expect(getComputedStyle(caption).opacity).toBe('1');
+
+  await userEvent.keyboard('+');
+  await expect.poll(() => getComputedStyle(caption).opacity).toBe('0');
+  const { left, top, width, height } = caption.getBoundingClientRect();
+  const underTheCaption = document.elementFromPoint(left + width / 2, top + height / 2);
+  expect(caption.contains(underTheCaption)).toBe(false);
+  expect(document.querySelector('[data-image-viewer-stage]')!.contains(underTheCaption)).toBe(true);
+});
+
+test('the fitted image keeps its room whether or not the image shown has a caption', async () => {
+  await render(<Gallery />);
+  await openAt('Second');
+  const stage = document.querySelector('[data-image-viewer-stage]')!;
+  const withACaption = stage.getBoundingClientRect();
+
+  await userEvent.keyboard('{ArrowRight}');
+  await expect.poll(counter).toHaveTextContent('3 / 3');
+  expect(document.querySelector('[data-image-viewer-caption]')).toBeNull();
+  expect(stage.getBoundingClientRect().top).toBe(withACaption.top);
+  expect(stage.getBoundingClientRect().height).toBe(withACaption.height);
+});
+
+test('thumbnails jump to an image and mark the one shown', async () => {
+  await render(
+    <Gallery
+      viewer={
+        <Image.Viewer>
+          <Image.Viewer.Toolbar />
+          <Image.Viewer.Thumbnails />
+        </Image.Viewer>
+      }
+    />,
+  );
   await openAt('First');
   const thumbnails = page.getByRole('group', { name: '사진 목록' });
   await expect
@@ -275,6 +390,23 @@ test('a press on the empty stage closes the viewer, a press on the picture does 
   await expect.element(dialog()).toBeVisible();
   const stage = document.querySelector('[data-image-viewer-stage]')!;
   await userEvent.click(page.elementLocator(stage), { position: { x: 4, y: 90 } });
+  await expect.element(dialog()).not.toBeInTheDocument();
+  expect(onOpenChange).toHaveBeenLastCalledWith(false);
+});
+
+test('a press beside the toolbar closes the viewer, a press on the toolbar or the caption does not', async () => {
+  const onOpenChange = vi.fn();
+  await render(<Gallery onOpenChange={onOpenChange} />);
+  await openAt('First');
+
+  const toolbar = document.querySelector('[data-image-viewer-toolbar]')!;
+  await userEvent.click(page.elementLocator(counter()!));
+  await userEvent.click(page.getByText('Morning lake'));
+  await expect.element(dialog()).toBeVisible();
+
+  const viewer = document.querySelector('[data-image-viewer]')!;
+  const besideTheToolbar = toolbar.getBoundingClientRect().top + 4;
+  await userEvent.click(page.elementLocator(viewer), { position: { x: 4, y: besideTheToolbar } });
   await expect.element(dialog()).not.toBeInTheDocument();
   expect(onOpenChange).toHaveBeenLastCalledWith(false);
 });

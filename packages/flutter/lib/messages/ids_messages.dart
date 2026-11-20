@@ -297,7 +297,11 @@ mixin IdsMessages {
 
   String? get imageZoomIn => null;
 
+  String? imageZoomLevel({required Object percent}) => null;
+
   String? get imageZoomOut => null;
+
+  String? imageZoomReset({required Object percent}) => null;
 
   String? get inputClearSearch => null;
 
@@ -422,6 +426,24 @@ mixin IdsMessages {
   String? get promptInputStop => null;
 
   String? get qrCodeLabel => null;
+
+  String? get questionnaireNavigation => null;
+
+  String? get questionnaireNext => null;
+
+  String? get questionnaireOther => null;
+
+  String? get questionnaireOtherPlaceholder => null;
+
+  String? get questionnairePrevious => null;
+
+  String? get questionnaireProgress => null;
+
+  String? get questionnaireSkip => null;
+
+  String? questionnaireStep({required Object current, required Object total}) => null;
+
+  String? get questionnaireSubmit => null;
 
   String? get ratingLabel => null;
 
@@ -994,7 +1016,13 @@ final class IdsKoreanMessages with IdsMessages {
   String get imageZoomIn => '확대';
 
   @override
+  String imageZoomLevel({required Object percent}) => '${_format(percent)}%';
+
+  @override
   String get imageZoomOut => '축소';
+
+  @override
+  String imageZoomReset({required Object percent}) => '${_format(percent)}%, 화면에 맞추기';
 
   @override
   String get inputClearSearch => '검색어 지우기';
@@ -1181,6 +1209,33 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String get qrCodeLabel => 'QR 코드';
+
+  @override
+  String get questionnaireNavigation => '질문 이동';
+
+  @override
+  String get questionnaireNext => '다음';
+
+  @override
+  String get questionnaireOther => '직접 입력';
+
+  @override
+  String get questionnaireOtherPlaceholder => '다른 답을 적어 주세요';
+
+  @override
+  String get questionnairePrevious => '이전';
+
+  @override
+  String get questionnaireProgress => '질문 진행';
+
+  @override
+  String get questionnaireSkip => '건너뛰기';
+
+  @override
+  String questionnaireStep({required Object current, required Object total}) => '질문 ${_format(current)} / ${_format(total)}';
+
+  @override
+  String get questionnaireSubmit => '보내기';
 
   @override
   String get ratingLabel => '평점';

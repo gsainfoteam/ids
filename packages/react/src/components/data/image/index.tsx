@@ -10,6 +10,7 @@ import { ImageViewerNext, type ImageViewerNextProps } from './next';
 import { ImagePlaceholder, type ImagePlaceholderProps } from './placeholder';
 import { ImageViewerPrev, type ImageViewerPrevProps } from './prev';
 import { ImageRoot } from './root';
+import { ImageViewerSeparator, type ImageViewerSeparatorProps } from './separator';
 import { ImageViewerShare, type ImageViewerShareProps } from './share';
 import { imageStyle } from './style';
 import { ImageViewerThumbnails, type ImageViewerThumbnailsProps } from './thumbnails';
@@ -17,6 +18,7 @@ import { ImageViewerToolbar, type ImageViewerToolbarProps } from './toolbar';
 import { ImageViewer, type ImageViewerItem, type ImageViewerProps } from './viewer';
 import { ImageViewerZoomIn, type ImageViewerZoomInProps } from './zoom-in';
 import { ImageViewerZoomOut, type ImageViewerZoomOutProps } from './zoom-out';
+import { ImageViewerZoomReset, type ImageViewerZoomResetProps } from './zoom-reset';
 import { type ImageStatus } from '../../../internal/image-status';
 import { type StateValue } from '../../../internal/state-props';
 import { elementTypeOf, flattenFragments } from '../../../utils';
@@ -91,6 +93,7 @@ export namespace Image {
     export type CounterProps = ImageViewerCounterProps;
     export type ZoomInProps = ImageViewerZoomInProps;
     export type ZoomOutProps = ImageViewerZoomOutProps;
+    export type ZoomResetProps = ImageViewerZoomResetProps;
     export type DownloadProps = ImageViewerDownloadProps;
     export type ShareProps = ImageViewerShareProps;
     export type CloseProps = ImageViewerCloseProps;
@@ -98,6 +101,7 @@ export namespace Image {
     export type NextProps = ImageViewerNextProps;
     export type CaptionProps = ImageViewerCaptionProps;
     export type ThumbnailsProps = ImageViewerThumbnailsProps;
+    export type SeparatorProps = ImageViewerSeparatorProps;
 
     export const Toolbar = ImageViewerToolbar;
     export namespace Toolbar {
@@ -119,6 +123,11 @@ export namespace Image {
       export type Props = ImageViewerZoomOutProps;
     }
 
+    export const ZoomReset = ImageViewerZoomReset;
+    export namespace ZoomReset {
+      export type Props = ImageViewerZoomResetProps;
+    }
+
     export const Download = ImageViewerDownload;
     export namespace Download {
       export type Props = ImageViewerDownloadProps;
@@ -132,6 +141,11 @@ export namespace Image {
     export const Close = ImageViewerClose;
     export namespace Close {
       export type Props = ImageViewerCloseProps;
+    }
+
+    export const Separator = ImageViewerSeparator;
+    export namespace Separator {
+      export type Props = ImageViewerSeparatorProps;
     }
 
     export const Prev = ImageViewerPrev;

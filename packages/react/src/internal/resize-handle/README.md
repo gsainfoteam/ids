@@ -269,11 +269,11 @@ gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4�
 ### 왜 이렇게
 
 - SVG 한 장에 path 셋을 겹칩니다. 아래부터 포커스 띠, 선, 누를 띠입니다.
-  - 선은 `stroke: currentColor` 라 손잡이 상자의 글자색 사다리(`handle` → `handle-hover` → `data-dragging` 의 `handle-active`)를 그대로 따릅니다.
+  - 선은 `stroke: currentColor` 라 손잡이 상자의 글자색(쉴 때 `bg-neutral` 색, hover 와 `data-dragging` 에서 `text-neutral`)을 그대로 따릅니다.
   - 포커스 띠는 선보다 양쪽 3px 넓은 `primary` 40% 선이고, 안의 separator 에 포커스가 있을 때(`:has(:focus-visible)`)만 보입니다. 그때 선은 `primary` 가 됩니다. `focus-ring` 의 3px 링과 테두리 색을 호에 옮긴 것입니다.
   - 누를 띠는 투명한 24px 선에 `pointer-events="stroke"` 를 줍니다. 손잡이 상자와 SVG 는 `pointer-events: none` 이라, 누를 곳은 호를 따라가는 띠뿐이고 상자의 나머지(호 안쪽의 내용)는 그대로 눌립니다.
 - 띠에서 시작한 `pointerdown` 은 손잡이 상자의 React 핸들러로 올라가고, 끌기는 상자에 pointer capture 를 겁니다. capture 는 `pointer-events` 와 상관없이 걸립니다.
-- 띠 위에 올리면 상자도 `:hover` 가 됩니다(자손을 가리키면 조상도 hover 입니다). 그래서 사다리가 띠 위에서만 한 단계 오릅니다. 커서는 띠에 걸고, `disabled` 면 띠가 포인터를 받지 않습니다(`group-data-disabled`).
+- 띠 위에 올리면 상자도 `:hover` 가 됩니다(자손을 가리키면 조상도 hover 입니다). 그래서 색이 띠 위에서만 진해집니다. 커서는 띠에 걸고, `disabled` 면 띠가 포인터를 받지 않습니다(`group-data-disabled`).
 - `children` 이나 `asChild` 를 받으면(`custom`) 호 대신 그 표시를 모서리 안쪽 16px 상자에 그립니다. 이때는 상자 자신이 포인터를 받고, 누를 영역은 상자 둘레 24px(`after:`), 포커스는 상자 둘레의 링입니다.
 
 ### 알아둘 것
@@ -290,12 +290,13 @@ gripArc(28, 'centered', 4); // squircle 모서리: 반지름 28 의 초타원 4�
 | `resizeHandle.cursor.*`        | `ew-resize`, `ns-resize`, `nwse-resize`(RTL `nesw-resize`)                                   |
 | `resizeHandle.focus`           | `focus-ring`                                                                                 |
 | `resizeHandle.focusWithin`     | 안의 separator 가 `:focus-visible` 일 때 그리는 링                                           |
-| `resizeHandle.ladder.ink/pill` | 손잡이 사다리: `handle` → hover `handle-hover` → `data-dragging` `handle-active`             |
-| `resizeHandle.ladder.line`     | 배경으로 그린 선: `border` → hover `handle-hover` → `data-dragging` `handle-active`          |
+| `resizeHandle.ladder.ink/pill` | 손잡이 색: `bg-neutral` → hover 와 `data-dragging` 에서 `text-neutral` 색                     |
+| `resizeHandle.ladder.line`     | 배경으로 그린 선: `border-neutral` 색 → hover 와 `data-dragging` 에서 `text-neutral` 색       |
 | `resizeHandle.disabled`        | `data-disabled` 면 포인터를 받지 않고 흐리게                                                 |
 | `resizeEdgeStyle`              | 가장자리 손잡이. `dimension` 이 자리와 막대, `band` 가 누를 띠를 정한다                      |
 | `resizeGripStyle`              | 모서리 손잡이의 `grip`(모서리에 서는 상자), `drawing`(SVG), `halo`, `arc`, `target`, `separator` 슬롯. `custom` 변형은 표시를 담는 16px 상자 |
 
+- 손잡이는 글자색 층(`state-layer`)을 쓰지 않습니다. 2~4px 막대에서 6~10% 층은 보이지 않아 색 자체를 `text-neutral` 로 바꿉니다.
 - 보이는 선이나 표시가 얇아도 누를 영역은 24px 입니다. `hitArea.*` 는 가운데 정렬이라 손잡이 요소의 두께와 상관없습니다.
 - DataTable 은 선을 `before:` 로 그리고 쉬는 때 투명하게 둡니다. 열 경계마다 선이 보이지 않게 하려는 것입니다. 커서는 `col-resize` 로 바꿔 씁니다.
 - Splitter 의 핸들은 1px 요소 자신이 선이라 `ladder.line` 을 씁니다. 쉬는 때는 패널 사이의 구분선이고 올리거나 끌 때만 손잡이 색이 됩니다. 배경이 바뀌므로 전환은 `motion` 대신 `transition-colors` 입니다. `className="bg-..."` 로 쉬는 색만 바꿔도 hover 와 끄는 동안의 색은 남습니다.

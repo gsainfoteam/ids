@@ -54,7 +54,7 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 | 부품                                                   | 하는 일                                                         |
 | ------------------------------------------------------ | --------------------------------------------------------------- |
 | `Bold` `Italic` `Underline` `Strike` `Code`            | 글자 서식. 누른 상태가 커서 자리의 서식을 따릅니다               |
-| `Highlight`                                            | 형광펜. 색은 `bg-warning-soft` 와 `text-on-warning-soft` 입니다  |
+| `Highlight`                                            | 형광펜. 색은 `bg-warning-subtle` 와 `text-on-warning-subtle` 입니다  |
 | `BulletList` `OrderedList` `Blockquote` `CodeBlock`    | 블록 서식                                                       |
 | `TaskList`                                             | 할 일 목록. 체크박스는 IDS Checkbox 와 같은 모양입니다           |
 | `HorizontalRule`                                       | 구분선을 넣는 버튼                                              |

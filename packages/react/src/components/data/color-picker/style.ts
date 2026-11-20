@@ -1,4 +1,4 @@
-import { sliderSurface } from '../../../internal/slider-surface';
+import { sliderSurface } from '../../../internal/surfaces/slider-surface';
 import { cn, tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
@@ -12,7 +12,7 @@ const dimOnceAtRoot = {
 
 export const colorPickerStyle = tv({
   slots: {
-    root: 'grid w-full min-w-0 gap-3 text-on-surface data-disabled:opacity-50',
+    root: 'grid w-full min-w-0 gap-3 text-neutral-bold data-disabled:opacity-50',
     area: [
       sliderSurface.edge,
       'relative w-full cursor-crosshair touch-none rounded-standard select-none',
@@ -32,9 +32,9 @@ export const colorPickerStyle = tv({
     tool: '',
     swatches: 'gap-2',
     swatch: [
-      'rounded-standard shadow-none inset-ring-(--ids-color-on-surface)/10',
-      'data-[state=checked]:ring-2 data-[state=checked]:ring-(--radio-accent)',
-      'data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-surface',
+      'rounded-standard shadow-none inset-ring-(--ids-color-text-neutral-bold)/10',
+      'data-[state=checked]:ring-2 data-[state=checked]:ring-scheme',
+      'data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-(--ids-bg-current)',
     ],
   },
   variants: {

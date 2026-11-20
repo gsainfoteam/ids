@@ -1,7 +1,7 @@
 import { COLOR_KEYS, type IdsCornerShape, type IdsTheme, type IdsThemeOverrides } from './theme';
 import { checkColorDistinction } from './theme-checks';
 import { MODES, resolveColorsOnce, slotsOf, type IdsThemeIssue } from './theme-roles';
-import { IDS_BASE_SLOTS, IDS_COLOR_FAMILIES } from '../../../tokens/color-roles';
+import { IDS_COLOR_FAMILIES } from '../../../tokens/color-roles';
 
 import type { IdsMode } from '../../../tokens/types';
 
@@ -95,10 +95,7 @@ function colorVariables(
   issues.push(...checkColorDistinction(colors));
 
   const families = writtenFamilies(theme, complete);
-  const slots = [
-    ...(families.includes('neutral') ? IDS_BASE_SLOTS : []),
-    ...families.flatMap(slotsOf),
-  ];
+  const slots = families.flatMap(slotsOf);
 
   const variables: ThemeVariables = {};
   for (const mode of MODES)

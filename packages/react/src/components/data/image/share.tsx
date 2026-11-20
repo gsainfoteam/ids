@@ -28,7 +28,6 @@ export function ImageViewerShare(props: ImageViewerShareProps) {
       label={t('image.share')}
       glyph={<ShareIcon aria-hidden="true" />}
       act={share}
-      quiet
     />
   );
 }

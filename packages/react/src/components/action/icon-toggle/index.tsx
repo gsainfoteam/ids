@@ -2,7 +2,7 @@ import type { ComponentProps, CSSProperties, ReactElement } from 'react';
 
 import { IconToggleRoot } from './root';
 import { iconToggleStyle } from './style';
-import { type ControlColorScheme } from '../../../internal/control-surface';
+import { type ControlColorScheme } from '../../../internal/surfaces/control-surface';
 
 import type {
   InteractiveState,

@@ -1,4 +1,4 @@
-import { controlSurface } from '../../../internal/control-surface';
+import { controlSurface } from '../../../internal/surfaces/control-surface';
 import { tv } from '../../../utils';
 
 export const buttonStyle = tv({
@@ -8,6 +8,7 @@ export const buttonStyle = tv({
     colorScheme: controlSurface.colorScheme,
     size: controlSurface.size,
   },
+  compoundVariants: controlSurface.compoundVariants,
   defaultVariants: {
     variant: 'solid',
     colorScheme: 'primary',
