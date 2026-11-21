@@ -14,6 +14,7 @@ import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Select } from '../../components/form/select';
 import { TextField } from '../../components/form/text-field';
 import { Pagination } from '../../components/navigation/pagination';
@@ -303,7 +304,7 @@ export const PC: Story = {
                 </Empty>
               ) : (
                 <Card size="tiny">
-                  <Item.Group aria-label="글 목록">
+                  <ItemGroup aria-label="글 목록">
                     {shown.map((post) => (
                       <Item key={post.id} asChild>
                         <a href={`#${post.id}`}>
@@ -326,7 +327,7 @@ export const PC: Story = {
                         </a>
                       </Item>
                     ))}
-                  </Item.Group>
+                  </ItemGroup>
                 </Card>
               )}
 

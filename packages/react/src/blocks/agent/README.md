@@ -17,7 +17,7 @@ Storybook `Blocks/Agent/*`. AI 에이전트 화면 네 가지입니다.
   - 승인 요청(Confirmation): `Alert colorScheme="warning"` 과 `Alert.Actions`. 고른 뒤에는 success 나 neutral Alert 로 바뀐다.
   - 결과물(Artifact): 내려받기 버튼을 단 `Card`.
   - 문맥 사용량(Context): `Progress.Label` 과 `Progress.Value`.
-  - 작업 목록(Queue): `Item.Group` 과 `Spinner`, `Progress`.
+  - 작업 목록(Queue): `ItemGroup` 과 `Spinner`, `Progress`.
 - **알아둘 것.**
   - Run 의 계획은 넓은 화면에서 오른쪽에 붙어 따라오고, 좁은 화면에서는 실행 기록 위로 올라옵니다(`order-first lg:order-none`).
   - 물어보고 쓰는 도구는 Builder 와 Run 모두 warning 배지로 같은 말("물어보고 써요")을 씁니다.

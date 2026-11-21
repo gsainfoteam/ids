@@ -7,6 +7,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
 import { Field } from '../../components/form/field';
@@ -79,7 +80,7 @@ export const PC: Story = {
               maxSize={100 * 1024 * 1024}
             />
 
-            <Item.Group size="tiny" aria-label="올리는 파일">
+            <ItemGroup size="tiny" aria-label="올리는 파일">
               {UPLOADS.map((upload) => (
                 <Item key={upload.id}>
                   <Item.Media variant="soft">{upload.icon}</Item.Media>
@@ -120,7 +121,7 @@ export const PC: Story = {
                   </Item.Actions>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
 
             <Field>
               <Field.Label>볼 수 있는 사람</Field.Label>

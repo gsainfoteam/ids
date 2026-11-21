@@ -227,8 +227,9 @@ drawer/
   `const` alias cannot merge with a namespace that holds values, and a Server Component cannot
   read a part off a client reference. Its parts are `ImageViewerClose` with `displayName`
   `'Image.Viewer.Close'`. A client file cannot import that function without a cycle through
-  `index.tsx`, so a sibling that picks the sub-component out of its children does so there too:
-  `Image.Group` finds `[Image.Viewer, ImageViewer]` and hands it to the client `ImageGroup`.
+  `index.tsx`, so a component that picks the sub-component out of its children does so in its own
+  server-safe `index.tsx`: `ImageGroup` finds `[Image.Viewer, ImageViewer]` and hands it to its
+  client `ImageGroupRoot`.
 - Parts and `root.tsx` import `./context`, `./style` and sibling parts directly. They import `'.'`
   only with `import type`, so no runtime cycle runs through `index.tsx`. The root recognises its parts
   (`elementTypeOf(child) === DrawerOverlay`, a set of part functions) by importing them, never
@@ -696,6 +697,13 @@ read from `event.key`, since TanStack falls back to the key's position.
 **Parts.** Part props types are named `X.PartProps` (`OTPField.SlotProps`,
 `ButtonGroup.SeparatorProps`), one level down for a sub-component's parts
 (`Image.Viewer.CloseProps`). Every part is optional and falls back to a default.
+
+**A group of several X is not a part of X.** `X.Part` names something inside one X. A container
+that holds several X is a component of its own in `<category>/<x>-group/` (`ButtonGroup`,
+`AvatarGroup`, `ItemGroup`, `ImageGroup`, `FieldGroup`, `KbdGroup`), never `X.Group`. It hands
+each X what it needs through a context declared in X's own folder (`ItemGroupContext` in
+`item/context.ts`), which X reads. A section of parts inside one X (`Select.Group`,
+`Menu.Group`, `Sidebar.Group`, `ChipField.Group`, `OTPField.Group`) stays a part.
 
 **A description is a paragraph.** A `Description` part of prose (Card, Item, Empty, Alert, Field,
 Dialog, Popover) renders a `<p>`; one inside a button (Stepper) stays a `<span>`. Block content

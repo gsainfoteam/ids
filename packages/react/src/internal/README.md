@@ -709,7 +709,7 @@ slots: {
 
 ### 왜 이렇게
 
-- 옵션 강조(`data-highlighted`)는 hover state layer(`state-layer data-highlighted:state-hover`)이고, 선택한 옵션은 끝에 체크를 둡니다(shadcn/ui 방식). theme 색은 trigger 의 focus 에 남깁니다.
+- 고른 옵션(`data-selected`, Menu 는 `data-checked`)은 배경 없이 끝의 체크나 점만 `text-primary` 입니다(shadcn/ui 방식). 목록에서 배경은 가리킨 옵션 하나에만 깔립니다. 고른 옵션에도 primary 배경을 깔면 여러 개를 고른 목록이 primary 로 덮여, 가리킨 옵션보다 고른 옵션이 더 크게 보입니다.
 - 옵션에는 누르는 상태가 없어 강조가 한 단계뿐입니다. Menu 에서 하위 메뉴가 열린 항목(`data-popup-open`)도 `state-hover` 라, 포인터가 하위 메뉴로 옮겨 가도 강조가 남습니다(`overlay/menu/style.ts`).
 - 층은 글자색으로 덮으므로 팝업 배경이 무엇이든 같은 세기로 보입니다.
 - 옵션은 체크가 없어도 끝 padding(`pe-8`)을 비워 둡니다. 체크가 나타날 때 라벨이 밀리지 않습니다.

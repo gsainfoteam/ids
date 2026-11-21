@@ -11,6 +11,7 @@ import { AvatarGroup } from '../../components/data/avatar-group';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { Breadcrumb } from '../../components/navigation/breadcrumb';
 import { Stepper } from '../../components/navigation/stepper';
@@ -100,7 +101,7 @@ export const PC: Story = {
             </header>
 
             <Card size="tiny">
-              <Item.Group aria-label="행사 정보">
+              <ItemGroup aria-label="행사 정보">
                 {FACTS.map((fact) => (
                   <Item key={fact.id}>
                     <Item.Media variant="soft">{fact.icon}</Item.Media>
@@ -110,7 +111,7 @@ export const PC: Story = {
                     </Item.Content>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
 
             <section aria-labelledby="schedule" className="flex flex-col gap-4">

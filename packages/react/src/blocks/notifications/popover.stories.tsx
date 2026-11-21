@@ -7,6 +7,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Skeleton } from '../../components/feedback/skeleton';
 import { Divider } from '../../components/layout/divider';
 import { Popover } from '../../components/overlay/popover';
@@ -67,7 +68,7 @@ export const PC: Story = {
                     모두 읽음
                   </Button>
                 </div>
-                <Item.Group size="tiny" aria-label="최근 알림">
+                <ItemGroup size="tiny" aria-label="최근 알림">
                   {RECENT.map((notification) => (
                     <Item
                       key={notification.id}
@@ -87,7 +88,7 @@ export const PC: Story = {
                       </Item.Content>
                     </Item>
                   ))}
-                </Item.Group>
+                </ItemGroup>
                 <Divider />
                 <Button asChild variant="soft" size="tiny" className="w-full">
                   <a href="#notifications">알림 모두 보기</a>

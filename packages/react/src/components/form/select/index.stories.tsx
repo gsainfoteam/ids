@@ -72,11 +72,16 @@ export const Gallery: Story = {
     <Showcase>
       <Showcase.Section
         title="Open"
-        description="선택한 옵션에는 체크가 붙고, 키보드나 마우스로 가리킨 옵션은 muted 배경이 됩니다."
+        description="고른 옵션에는 primary 체크가 붙고, 키보드나 마우스로 가리킨 옵션에만 hover state layer 가 깔립니다."
       >
-        <Showcase.Row label="groups" className="h-64 items-start">
+        <Showcase.Row label="multiple, groups" className="h-64 items-start">
           <div className="w-56">
-            <Select aria-label="음식" defaultValue="kimchi" defaultOpen>
+            <Select
+              aria-label="음식"
+              selectionMode="multiple"
+              defaultValue={['bibimbap', 'kimchi', 'pasta']}
+              defaultOpen
+            >
               <Select.Group heading="한식">
                 <Select.Item value="bibimbap">비빔밥</Select.Item>
                 <Select.Item value="kimchi">김치찌개</Select.Item>
@@ -550,7 +555,7 @@ export const CustomItems: Story = {
       >
         <span aria-hidden="true" className={cn('size-2 shrink-0 rounded-full', dot)} />
         {label}
-        <Select.ItemIndicator className="text-success">
+        <Select.ItemIndicator>
           <CheckCircleIcon />
         </Select.ItemIndicator>
       </Select.Item>

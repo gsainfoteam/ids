@@ -7,7 +7,7 @@ import { renderToString } from 'react-dom/server';
 import { expect, onTestFinished, test, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 
-import { Field, Kbd } from '../src';
+import { Field, Kbd, KbdGroup } from '../src';
 
 const devices = {
   mac: { platform: 'MacIntel', userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)' },
@@ -160,10 +160,10 @@ test('labels override the spoken names, separator overrides the joiner', () => {
 
 test('size comes from the prop, then the group, then a Field', () => {
   const group = doc(
-    <Kbd.Group size="tiny" platform="mac">
+    <KbdGroup size="tiny" platform="mac">
       <Kbd keys="Mod" />
       <Kbd>G</Kbd>
-    </Kbd.Group>,
+    </KbdGroup>,
   );
   const caps = [...group.querySelectorAll<HTMLElement>('kbd[data-kbd]')];
   expect(caps.map((cap) => cap.dataset.size)).toEqual(['tiny', 'tiny']);

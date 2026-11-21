@@ -7,6 +7,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
 import { toast } from '../../components/feedback/toast';
 import { Checkbox } from '../../components/form/checkbox';
@@ -85,7 +86,7 @@ export const PC: Story = {
 
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-10">
           <nav aria-label="설정 분류" className="hidden w-52 shrink-0 md:block">
-            <Item.Group size="tiny" aria-label="설정 분류">
+            <ItemGroup size="tiny" aria-label="설정 분류">
               {SECTIONS.map(({ id, label, icon }) => (
                 <Item
                   key={id}
@@ -107,7 +108,7 @@ export const PC: Story = {
                   </a>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </nav>
 
           <Select
@@ -135,7 +136,7 @@ export const PC: Story = {
 
             {section === 'account' && (
               <Card>
-                <Item.Group aria-label="계정 정보">
+                <ItemGroup aria-label="계정 정보">
                   {ACCOUNT.map((row) => (
                     <Item key={row.id}>
                       <Item.Content>
@@ -155,7 +156,7 @@ export const PC: Story = {
                       )}
                     </Item>
                   ))}
-                </Item.Group>
+                </ItemGroup>
               </Card>
             )}
 
@@ -238,7 +239,7 @@ export const PC: Story = {
             )}
 
             {section === 'apps' && (
-              <Item.Group variant="separated" aria-label="연결된 앱">
+              <ItemGroup variant="separated" aria-label="연결된 앱">
                 {APPS.map((app) => (
                   <Item key={app.id}>
                     <Item.Media>
@@ -271,7 +272,7 @@ export const PC: Story = {
                     </Item.Actions>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             )}
           </section>
         </div>

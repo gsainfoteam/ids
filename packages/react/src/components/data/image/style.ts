@@ -2,8 +2,6 @@ import { overlayStyles } from '../../../internal/overlay/styles';
 import { slidesLayout } from '../../../internal/slides/layout';
 import { cn, tv } from '../../../utils';
 
-import type { ImageGroupLayout } from './group';
-
 const chrome = cn(
   'z-10 opacity-[var(--image-viewer-presence,1)]',
   'transition-opacity duration-(--ids-motion-normal) ease-out motion-reduce:transition-none',
@@ -33,8 +31,6 @@ export const imageStyle = tv({
       'bg-block text-body-b3-regular text-neutral',
       '[&_svg]:size-[min(--spacing(6),40%)] [&_svg]:shrink-0',
     ],
-    group: 'min-w-0',
-    groupItem: 'flex min-w-0',
     backdrop: [
       overlayStyles.backdrop,
       'touch-none bg-base/95 opacity-[var(--image-viewer-presence,1)]',
@@ -90,15 +86,10 @@ export const imageStyle = tv({
     announcer: 'sr-only',
   },
   variants: {
-    layout: {
-      row: { group: 'flex flex-row gap-2', groupItem: 'flex-1' },
-      column: { group: 'flex flex-col gap-2' },
-      grid: { group: 'grid grid-cols-[repeat(var(--image-columns),minmax(0,1fr))] gap-2' },
-    } satisfies Record<ImageGroupLayout, object>,
     painted: {
       true: { placeholder: 'bg-block' },
       false: {},
     },
   },
-  defaultVariants: { layout: 'row', painted: false },
+  defaultVariants: { painted: false },
 });
