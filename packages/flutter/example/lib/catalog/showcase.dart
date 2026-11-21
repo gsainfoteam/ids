@@ -212,3 +212,7 @@ class _ShowcaseHeading extends StatelessWidget {
         : heading;
   }
 }
+
+extension IdsDimensionOf on BuildContext {
+  double dimension(double value) => IdsProvider.of(this).dimension(value);
+}

@@ -62,7 +62,7 @@ final labelChecks = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Long text wraps before the asterisk',
       builder: (context) => SizedBox(
-        width: 200,
+        width: context.dimension(200),
         child: IdsLabel(
           required: true,
           child: Text(context.strings.demo.label.longText),

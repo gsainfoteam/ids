@@ -27,7 +27,7 @@ final divider = WidgetbookComponent(
           child: label == null ? null : Text(label),
         );
         return SizedBox(
-          width: 320,
+          width: context.dimension(320),
           height: orientation == Axis.vertical ? 160 : null,
           child: line,
         );
@@ -36,10 +36,10 @@ final divider = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Usage',
       builder: (context) => SizedBox(
-        width: 320,
+        width: context.dimension(320),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          spacing: 16,
+          spacing: context.dimension(16),
           children: [
             Text(context.strings.demo.divider.above),
             const IdsDivider(),
@@ -57,15 +57,20 @@ final divider = WidgetbookComponent(
             ShowcaseSection(
               title: 'Horizontal',
               children: [
-                const ShowcaseRow(
+                ShowcaseRow(
                   label: 'plain',
-                  children: [SizedBox(width: 320, child: IdsDivider())],
+                  children: [
+                    SizedBox(
+                      width: context.dimension(320),
+                      child: const IdsDivider(),
+                    ),
+                  ],
                 ),
                 ShowcaseRow(
                   label: 'child',
                   children: [
                     SizedBox(
-                      width: 320,
+                      width: context.dimension(320),
                       child: IdsDivider(child: Text(strings.or)),
                     ),
                   ],
@@ -74,15 +79,14 @@ final divider = WidgetbookComponent(
             ),
             ShowcaseSection(
               title: 'Vertical',
-              description:
-                  'Without a height to fill, it is as tall as the line of text.',
+              description: context.strings.notes.divider.vertical,
               children: [
                 ShowcaseRow(
                   label: 'plain',
                   children: [
                     Row(
                       mainAxisSize: MainAxisSize.min,
-                      spacing: 12,
+                      spacing: context.dimension(12),
                       children: [
                         Text(strings.account),
                         const IdsDivider(orientation: Axis.vertical),
@@ -95,7 +99,7 @@ final divider = WidgetbookComponent(
                   label: 'child',
                   children: [
                     SizedBox(
-                      height: 120,
+                      height: context.dimension(120),
                       child: IdsDivider(
                         orientation: Axis.vertical,
                         child: Text(strings.or),
@@ -116,10 +120,10 @@ final divider = WidgetbookComponent(
         return Example(
           description: context.strings.examples.divider.separateAlternatives,
           child: SizedBox(
-            width: 320,
+            width: context.dimension(320),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 16,
+              spacing: context.dimension(16),
               children: [
                 Text(strings.signInWithSchool),
                 IdsDivider(child: Text(strings.or)),
@@ -138,7 +142,7 @@ final divider = WidgetbookComponent(
           description: context.strings.examples.divider.splitAToolbar,
           child: IntrinsicHeight(
             child: Row(
-              spacing: 12,
+              spacing: context.dimension(12),
               children: [
                 Text(strings.account),
                 const IdsDivider(orientation: Axis.vertical, decorative: true),
@@ -162,13 +166,13 @@ final dividerChecks = WidgetbookComponent(
       builder: (context) => Directionality(
         textDirection: TextDirection.rtl,
         child: SizedBox(
-          width: 320,
+          width: context.dimension(320),
           child: Column(
-            spacing: 24,
+            spacing: context.dimension(24),
             children: [
               IdsDivider(child: Text(context.strings.demo.divider.or)),
               Row(
-                spacing: 12,
+                spacing: context.dimension(12),
                 children: [
                   Text(context.strings.demo.divider.account),
                   const IdsDivider(orientation: Axis.vertical),
@@ -183,7 +187,7 @@ final dividerChecks = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Long child',
       builder: (context) => SizedBox(
-        width: 240,
+        width: context.dimension(240),
         child: IdsDivider(child: Text(context.strings.demo.field.longLabel)),
       ),
     ),

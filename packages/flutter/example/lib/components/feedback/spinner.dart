@@ -13,7 +13,7 @@ final spinner = WidgetbookComponent(
       builder: (context) => IdsSpinner(
         size: context.knobs.objectOrNull.segmented(
           label: 'size',
-          description: 'Leave it off to follow IconTheme.',
+          description: context.strings.notes.spinner.size,
           options: IdsSize.values,
           labelBuilder: (size) => size.name,
           defaultToNull: true,
@@ -54,7 +54,7 @@ final spinner = WidgetbookComponent(
             ),
             ShowcaseSection(
               title: 'Color',
-              description: 'The color comes from IconTheme.',
+              description: context.strings.notes.spinner.color,
               children: [
                 const ShowcaseRow(
                   label: 'textNeutralStrong',

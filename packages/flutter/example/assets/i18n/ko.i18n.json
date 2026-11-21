@@ -45,5 +45,18 @@
       "nestScopes": "IdsProviderScope는 부모 테마를 물려받고 정한 값만 바꿉니다. mode를 정한 scope만 자기 모드를 가집니다.",
       "connectSlang": "slang 번역을 translation으로 넘기면 앱 언어를 바꿀 때 IDS 문구도 같이 바뀝니다. scope 아래 상태는 유지됩니다."
     }
+  },
+  "notes": {
+    "divider": {
+      "vertical": "채울 높이가 없으면 글자 줄 높이만큼 그립니다."
+    },
+    "spinner": {
+      "size": "끄면 IconTheme의 크기를 따릅니다.",
+      "color": "색은 IconTheme에서 옵니다."
+    },
+    "provider": {
+      "familyByMode": "계열마다 solid 채움, soft 면, 글자를 IDS theme addon이 고른 테마로 그립니다.",
+      "translation": "IdsProvider에 넘기는 slang 카탈로그입니다."
+    }
   }
 }

@@ -99,11 +99,13 @@ WidgetbookUseCase(
 
 - 컴포넌트 문구는 `IdsMessages`가 정한다(`IdsProvider`의 `translation`). use case는 이 문구를
   직접 쓰지 않는다.
-- 데모 문구와 예제 설명은 `example/assets/i18n/{ko,en}.i18n.json`의 `demo`와 `examples`에 두고
-  `context.strings`로 읽는다. Dart 파일에는 한글 리터럴을 두지 않는다.
+- 데모 문구는 `example/assets/i18n/{ko,en}.i18n.json`의 `demo`에, 예제 설명은 `examples`에,
+  섹션 설명과 knob 설명은 `notes`에 두고 `context.strings`로 읽는다. 설명 문장은 영어여도
+  카탈로그에 둔다. Dart 파일에는 한글 리터럴을 두지 않는다.
 - API 이름인 라벨은 영어 리터럴로 쓴다. 섹션 제목, 행 라벨, enum 값, knob label이 여기에 속한다.
-- 색은 IDS 역할(`ids.colors.textNeutral`)로만 쓴다. 치수는 `ids.dimension`, 모서리는
-  `ids.shape()`로 쓴다. `Color(0x…)`와 `Colors.*`는 `palettes.dart`의 seed에만 둔다.
+- 색은 IDS 역할(`ids.colors.textNeutral`)로만 쓴다. 치수는 `ids.dimension`이나
+  `context.dimension(320)`(`catalog/showcase.dart`), 모서리는 `ids.shape()`로 쓴다. 숫자를 그대로
+  쓰면 `IdsTheme.scale`을 따라가지 않는다. `Color(0x…)`와 `Colors.*`는 `palettes.dart`의 seed에만 둔다.
 
 ### 테스트
 

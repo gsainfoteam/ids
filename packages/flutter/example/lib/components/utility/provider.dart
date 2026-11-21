@@ -20,6 +20,14 @@ final provider = WidgetbookComponent(
           options: paletteSeeds.keys.toList(),
           initialOption: 'blue',
         );
+        final secondary = context.knobs.object.dropdown(
+          label: 'secondary',
+          options: ['derived', ...paletteSeeds.keys],
+        );
+        final tertiary = context.knobs.object.dropdown(
+          label: 'tertiary',
+          options: ['derived', ...paletteSeeds.keys],
+        );
         final neutral = context.knobs.object.segmented(
           label: 'neutral',
           options: IdsNeutral.values,
@@ -42,6 +50,13 @@ final provider = WidgetbookComponent(
           options: IdsCornerShape.values,
           labelBuilder: (value) => value.name,
         );
+        final scale = context.knobs.double.slider(
+          label: 'scale',
+          initialValue: 1,
+          min: 0.75,
+          max: 1.5,
+          divisions: 6,
+        );
         final mode = context.knobs.object.segmented(
           label: 'mode',
           options: IdsMode.values,
@@ -49,7 +64,7 @@ final provider = WidgetbookComponent(
         );
         final translation = context.knobs.objectOrNull.segmented(
           label: 'translation',
-          description: 'The slang catalog handed to IdsProvider.',
+          description: context.strings.notes.provider.translation,
           options: AppLocale.values,
           labelBuilder: (value) => value.languageCode,
         );
@@ -68,10 +83,13 @@ final provider = WidgetbookComponent(
         return ProviderPreview(
           theme: IdsTheme(
             primary: paletteSeeds[primary]!,
+            secondary: paletteSeeds[secondary],
+            tertiary: paletteSeeds[tertiary],
             neutral: neutral,
             status: status,
             radius: radius,
             cornerShape: cornerShape,
+            scale: scale,
           ),
           mode: mode,
           translation: translation?.translations.ids,
@@ -104,8 +122,7 @@ final provider = WidgetbookComponent(
         children: [
           ShowcaseSection(
             title: 'Family × Mode',
-            description:
-                'Each family as a solid fill, a soft surface and text, from the theme the IDS theme addon picks.',
+            description: context.strings.notes.provider.familyByMode,
             children: [
               ShowcaseMatrix(
                 rows: IdsColorRoles.families,
@@ -120,7 +137,7 @@ final provider = WidgetbookComponent(
                         child: Padding(
                           padding: EdgeInsets.all(ids.dimension(8)),
                           child: SizedBox(
-                            width: 360,
+                            width: ids.dimension(360),
                             child: FamilySwatch(
                               family: family,
                               colors: ids.colors,

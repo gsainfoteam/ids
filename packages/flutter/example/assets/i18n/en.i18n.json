@@ -45,5 +45,18 @@
       "nestScopes": "IdsProviderScope inherits the parent theme and changes only what it sets. Only a scope that sets mode owns its mode.",
       "connectSlang": "Pass slang's translations as translation and IDS strings follow the app language. State under a scope survives the change."
     }
+  },
+  "notes": {
+    "divider": {
+      "vertical": "Without a height to fill, it is as tall as the line of text."
+    },
+    "spinner": {
+      "size": "Leave it off to follow IconTheme.",
+      "color": "The color comes from IconTheme."
+    },
+    "provider": {
+      "familyByMode": "Each family as a solid fill, a soft surface and text, from the theme the IDS theme addon picks.",
+      "translation": "The slang catalog handed to IdsProvider."
+    }
   }
 }

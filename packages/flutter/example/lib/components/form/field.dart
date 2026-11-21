@@ -13,7 +13,7 @@ final field = WidgetbookComponent(
       builder: (context) {
         final strings = context.strings.demo.field;
         return SizedBox(
-          width: 320,
+          width: context.dimension(320),
           child: IdsField(
             size: context.knobs.object.segmented(
               label: 'size',
@@ -37,7 +37,7 @@ final field = WidgetbookComponent(
     WidgetbookUseCase(
       name: 'Usage',
       builder: (context) => SizedBox(
-        width: 320,
+        width: context.dimension(320),
         child: IdsField(
           children: [
             IdsFieldLabel(child: Text(context.strings.demo.field.label)),
@@ -60,7 +60,7 @@ final field = WidgetbookComponent(
                     label: size.name,
                     children: [
                       SizedBox(
-                        width: 320,
+                        width: context.dimension(320),
                         child: IdsField(
                           size: size,
                           children: [
@@ -90,7 +90,7 @@ final field = WidgetbookComponent(
                     label: label,
                     children: [
                       SizedBox(
-                        width: 320,
+                        width: context.dimension(320),
                         child: IdsField(
                           required: required,
                           disabled: disabled,
@@ -141,7 +141,7 @@ final fieldChecks = WidgetbookComponent(
       builder: (context) {
         final strings = context.strings.demo.field;
         return SizedBox(
-          width: 200,
+          width: context.dimension(200),
           child: IdsField(
             required: true,
             children: [
