@@ -2,22 +2,28 @@ import { resizeHandle } from '../../../internal/resize-handle';
 import { tv } from '../../../utils';
 
 import type { IdsSize } from '../../../tokens/types';
-import type { TableVariant } from '../table/context';
+import type { TableAlign, TableVariant } from '../table/context';
 
 export const dataTableStyle = tv({
   slots: {
-    root: 'flex w-full min-w-0 flex-col gap-3',
+    root: 'flex w-full min-w-0 flex-col',
     frame: 'relative',
+    table: '',
+    header: '',
     head: 'group/head relative',
+    cell: '',
     sortButton: [
-      'group/sort -mx-2 max-w-full gap-1 px-2 text-inherit',
+      'group/sort -mx-2 w-[calc(100%+1rem)] justify-between gap-2 px-2 text-inherit',
       'data-hovered:text-neutral-strong data-active:text-neutral-strong',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2',
     ],
+    label: 'flex min-w-0 items-center gap-1.5 [&>svg]:size-4 [&>svg]:shrink-0',
     sortIcon: [
-      'pointer-events-none size-4 shrink-0 text-neutral',
-      'opacity-60 group-hover/sort:opacity-100 group-data-sorted/head:opacity-100',
+      'pointer-events-none size-4 shrink-0 text-neutral opacity-0',
+      'transition-opacity duration-(--ids-motion-fast) motion-reduce:transition-none',
+      'group-data-hovered/sort:opacity-100 group-data-focus-visible/sort:opacity-100',
+      'group-data-sorted/head:text-primary group-data-sorted/head:opacity-100',
     ],
     resizer: [
       resizeHandle.base,
@@ -29,12 +35,9 @@ export const dataTableStyle = tv({
       'hover:before:bg-(--ids-color-text-neutral) focus-visible:before:bg-(--ids-color-text-neutral)',
       'data-resizing:before:bg-(--ids-color-text-neutral)',
     ],
-    selectCell: 'w-0 whitespace-nowrap',
+    selectCell: 'w-0 whitespace-nowrap [&>[data-checkbox]]:flex',
     message: 'h-24 text-center text-neutral',
-    overlay: [
-      'absolute inset-0 z-20 flex items-center justify-center rounded-container',
-      'bg-base/60',
-    ],
+    overlay: 'absolute inset-0 z-20 flex items-center justify-center bg-base/60',
     spinner: 'size-6 text-neutral',
     footer: 'flex flex-wrap items-center justify-between gap-3',
     summary: 'text-neutral',
@@ -43,8 +46,19 @@ export const dataTableStyle = tv({
   },
   variants: {
     variant: {
-      outline: {},
-      ghost: {},
+      outline: {
+        root: 'concentric-p-1 bg-neutral-soft',
+        table: '[--table-radius:var(--radius-standard)] bg-surface shadow-xs',
+        header: 'bg-block',
+        head: 'not-last:border-e not-last:border-neutral',
+        cell: 'not-last:border-e not-last:border-neutral',
+        overlay: 'rounded-standard',
+        footer: 'gap-2 ps-3 pe-1 pt-1',
+      },
+      ghost: {
+        root: 'gap-3',
+        overlay: 'rounded-container',
+      },
     } satisfies Record<TableVariant, object>,
     size: {
       standard: {
@@ -58,10 +72,15 @@ export const dataTableStyle = tv({
         page: 'text-caption-c1-regular',
       },
     } satisfies Record<IdsSize, object>,
+    align: {
+      start: {},
+      center: { sortButton: 'justify-center', label: 'justify-center' },
+      end: { sortButton: 'flex-row-reverse', label: 'justify-end' },
+    } satisfies Record<TableAlign, object>,
     loading: {
       true: { frame: 'pointer-events-none' },
       false: {},
     },
   },
-  defaultVariants: { variant: 'outline', size: 'standard', loading: false },
+  defaultVariants: { variant: 'outline', size: 'standard', align: 'start', loading: false },
 });
