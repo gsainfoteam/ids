@@ -22,6 +22,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Empty } from '../../components/data/empty';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 import { toast } from '../../components/feedback/toast';
 import { FileField } from '../../components/form/file-field';
@@ -239,7 +240,7 @@ export const PC: Story = {
             </ul>
           ) : (
             <Card size="tiny">
-              <Item.Group aria-label="파일">
+              <ItemGroup aria-label="파일">
                 {shown.map((file) => (
                   <Item key={file.id}>
                     <Item.Media variant="soft">{KIND_ICON[file.kind]}</Item.Media>
@@ -252,7 +253,7 @@ export const PC: Story = {
                     <Item.Actions>{fileMenu(file.name)}</Item.Actions>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           )}
         </section>

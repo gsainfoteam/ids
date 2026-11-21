@@ -12,6 +12,7 @@ import { Button } from '../../components/action/button';
 import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { Checkbox } from '../../components/form/checkbox';
 import { Field } from '../../components/form/field';
@@ -73,7 +74,7 @@ export const PC: Story = {
                 <br />
                 학교생활이 가벼워져요
               </h2>
-              <Item.Group aria-label="가입하면 좋은 점">
+              <ItemGroup aria-label="가입하면 좋은 점">
                 {BENEFITS.map((benefit) => (
                   <Item key={benefit.title}>
                     <Item.Media variant="outline">{benefit.icon}</Item.Media>
@@ -83,7 +84,7 @@ export const PC: Story = {
                     </Item.Content>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </div>
 
             <Item>

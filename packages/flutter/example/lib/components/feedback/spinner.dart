@@ -57,7 +57,7 @@ final spinner = WidgetbookComponent(
               description: 'The color comes from IconTheme.',
               children: [
                 const ShowcaseRow(
-                  label: 'textNeutralBold',
+                  label: 'textNeutralStrong',
                   children: [IdsSpinner(decorative: true)],
                 ),
                 ShowcaseRow(
@@ -70,17 +70,19 @@ final spinner = WidgetbookComponent(
                   ],
                 ),
                 ShowcaseRow(
-                  label: 'textOnPrimary',
+                  label: 'textOnPrimarySolid',
                   children: [
                     DecoratedBox(
                       decoration: ShapeDecoration(
-                        color: ids.colors.bgPrimary,
+                        color: ids.colors.bgPrimarySolid,
                         shape: ids.shape(),
                       ),
                       child: Padding(
                         padding: EdgeInsets.all(ids.dimension(8)),
                         child: IconTheme.merge(
-                          data: IconThemeData(color: ids.colors.textOnPrimary),
+                          data: IconThemeData(
+                            color: ids.colors.textOnPrimarySolid,
+                          ),
                           child: const IdsSpinner(decorative: true),
                         ),
                       ),

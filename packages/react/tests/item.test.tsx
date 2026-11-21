@@ -5,7 +5,7 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { IdsProvider, Item } from '../src';
+import { IdsProvider, Item, ItemGroup } from '../src';
 import { testTheme } from './theme';
 
 const html = (node: ReactNode) =>
@@ -162,14 +162,14 @@ test('asChild: a link row keeps its role and is named by its title', async () =>
 
 test('Group: a list with an item per row; separators are hidden and size is shared', () => {
   const doc = html(
-    <Item.Group size="tiny" aria-label="Menu">
+    <ItemGroup size="tiny" aria-label="Menu">
       <Item>One</Item>
       <Item.Separator />
       <Item>Two</Item>
       <li className="own">
         <Item>Three</Item>
       </li>
-    </Item.Group>,
+    </ItemGroup>,
   );
   const list = doc.querySelector('ul')!;
   expect(list.getAttribute('role')).toBe('list');
@@ -193,12 +193,12 @@ test('Group: a list with an item per row; separators are hidden and size is shar
 });
 
 test('Group variant: bordered draws seams between square rows, separated spaces outlined rows', async () => {
-  const group = (variant: Item.Group.Variant) => (
-    <Item.Group variant={variant} aria-label={variant}>
+  const group = (variant: ItemGroup.Variant) => (
+    <ItemGroup variant={variant} aria-label={variant}>
       <Item>One</Item>
       <Item>Two</Item>
       <Item variant="soft">Three</Item>
-    </Item.Group>
+    </ItemGroup>
   );
   const screen = await render(
     <>
@@ -241,11 +241,11 @@ test('Group variant: bordered draws seams between square rows, separated spaces 
 test('Group ordered: an ol a screen reader counts, still a list in Safari', async () => {
   const ref = vi.fn();
   const screen = await render(
-    <Item.Group ordered ref={ref} aria-label="Steps">
+    <ItemGroup ordered ref={ref} aria-label="Steps">
       <Item>Verify email</Item>
       <Item.Separator />
       <Item>Choose a name</Item>
-    </Item.Group>,
+    </ItemGroup>,
   );
   const list = screen.getByRole('list', { name: 'Steps' });
 
@@ -253,7 +253,7 @@ test('Group ordered: an ol a screen reader counts, still a list in Safari', asyn
   expect(list.element().tagName).toBe('OL');
   expect(ref).toHaveBeenCalledWith(list.element());
   expect(screen.getByRole('listitem').all()).toHaveLength(2);
-  expect(html(<Item.Group aria-label="x" />).querySelector('ul')).not.toBeNull();
+  expect(html(<ItemGroup aria-label="x" />).querySelector('ul')).not.toBeNull();
 });
 
 test('a truncated title stays on one line within its row', () => {
@@ -278,11 +278,11 @@ test('a truncated title stays on one line within its row', () => {
 
 test('a group and its rows shrink with their parent, so a truncated title cannot widen them', () => {
   const doc = html(
-    <Item.Group>
+    <ItemGroup>
       <Item>
         <Item.Title truncate>x</Item.Title>
       </Item>
-    </Item.Group>,
+    </ItemGroup>,
   );
   expect(doc.querySelector('[data-item-group]')!.className).toMatch(/(^| )min-w-0( |$)/);
   expect(doc.querySelector('[data-item]')!.className).toMatch(/(^| )min-w-0( |$)/);

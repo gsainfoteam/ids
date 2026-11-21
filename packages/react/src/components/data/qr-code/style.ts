@@ -23,8 +23,8 @@ export const qrCodeStyle = tv({
     } satisfies Record<IdsSize, object>,
     tone: {
       theme: {
-        root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-neutral-bold))]',
-        background: 'fill-[var(--qr-code-background,var(--ids-color-bg-neutral-subtlest))]',
+        root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-neutral-strong))]',
+        background: 'fill-[var(--qr-code-background,var(--ids-color-bg-base))]',
       },
       'dark-on-light': {
         root: 'text-[color:var(--qr-code-foreground,var(--ids-color-text-qr-code))]',

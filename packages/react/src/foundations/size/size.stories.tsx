@@ -34,7 +34,7 @@ function Measured({ name, value }: { name: string; value: string }) {
       <code data-resolved="" className="text-caption-c1-regular text-neutral font-mono" />
       <span
         data-box=""
-        className="rounded-indicator bg-primary-subtle inset-ring-primary/40 inset-ring-1"
+        className="rounded-indicator bg-primary-soft inset-ring-primary-strong/40 inset-ring-1"
         style={{
           height: `var(--ids-size-${name})`,
           width: isIcon ? `var(--ids-size-${name})` : '6rem',

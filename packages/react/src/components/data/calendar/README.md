@@ -33,6 +33,7 @@ const [date, setDate] = useState<CalendarDate | null>(null);
 - 값은 `instanceof` 가 아니라 모양(`year`, `month`, `day`, `calendar.identifier`, `compare`)으로 검사합니다. 다른 버전의 패키지여도 되고, `Date` 나 문자열은 오류입니다.
 - 그레고리력(`gregory`)만 받습니다. 다른 달력의 날짜는 `toCalendar(date, new GregorianCalendar())` 로 바꿔 넘깁니다. 다른 달력으로 보여 주기만 하려면 `locale="ja-JP-u-ca-japanese"` 처럼 태그에 적습니다.
 - `onValueChange` 는 값이 바뀔 때만 부릅니다. 이미 고른 날을 다시 눌러도 부르지 않습니다.
+- 고른 날은 primary 로 채웁니다. 오늘은 `text-primary` 글자에 primary 테두리를 두르고, 고른 날이 오늘이면 채움만 보입니다. `renderDay` 로 칸 안에 점을 그려도 오늘 표시와 겹치지 않습니다.
 - `multiple` 에서 고른 날을 다시 누르면 빠집니다.
 
 ## 기간
@@ -48,6 +49,7 @@ const [range, setRange] = useState<DateRange | null>(null);
 // 세 번째   { start: 새 날, end: null }    새 기간을 시작
 ```
 
+- 기간 안의 날은 `bg-primary-soft` 위에 `text-on-primary-soft` 입니다. 끝을 고르기 전 미리 보기는 `bg-neutral-soft` 이라 확정된 기간과 구분됩니다.
 - 미리 보기 중인 날에는 `data-range-preview` 가 붙습니다. 포인터가 달력을 벗어나면 키보드 포커스가 있는 날까지 보여 줍니다.
 - 기간은 양 끝만 검사합니다. 사이에 막힌 날이 있어도 기간을 만들 수 있습니다.
 

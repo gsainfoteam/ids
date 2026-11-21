@@ -14,6 +14,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Progress } from '../../components/feedback/progress';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -98,7 +99,7 @@ export const PC: Story = {
           <Card.Content>
             <Progress value={percent} aria-label="시작하기 진행" />
           </Card.Content>
-          <Item.Group aria-label="할 일">
+          <ItemGroup aria-label="할 일">
             {TASKS.map((task) => {
               const done = finished.includes(task.id);
 
@@ -128,7 +129,7 @@ export const PC: Story = {
                 </Item>
               );
             })}
-          </Item.Group>
+          </ItemGroup>
         </Card>
 
         <Card variant="soft" size="tiny">

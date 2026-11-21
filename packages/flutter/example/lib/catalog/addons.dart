@@ -120,10 +120,10 @@ class _Canvas extends StatelessWidget {
   Widget build(BuildContext context) {
     final ids = IdsProvider.of(context);
     return Material(
-      color: ids.colors.bgNeutralSubtlest,
+      color: ids.colors.bgBase,
       textStyle: ids.textStyle(
         IdsTypography.bodyB3Regular,
-        color: ids.colors.textNeutralBold,
+        color: ids.colors.textNeutralStrong,
       ),
       child: Padding(
         padding: EdgeInsets.all(ids.dimension(32)),

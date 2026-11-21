@@ -1,6 +1,7 @@
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
 import { IdsProvider, defineIdsTheme } from '../../components/utility/ids-provider';
 
@@ -247,7 +248,7 @@ export const PC: Story = {
               <h2>듣는 과목</h2>
             </Card.Title>
           </Card.Header>
-          <Item.Group size="tiny" aria-label="듣는 과목">
+          <ItemGroup size="tiny" aria-label="듣는 과목">
             {COURSES.map((course) => (
               <Item key={course.id}>
                 <Item.Content>
@@ -266,7 +267,7 @@ export const PC: Story = {
                 </Item.Actions>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         </Card>
       </div>
     </main>

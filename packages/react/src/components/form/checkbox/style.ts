@@ -10,8 +10,8 @@ export const checkboxStyle = tv({
       'rounded-indicator focus-ring',
       'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast) motion-reduce:transition-none',
       'scheme-primary data-invalid:scheme-danger',
-      'data-[state=checked]:bg-scheme data-[state=checked]:text-on-scheme data-[state=checked]:inset-ring-(--ids-color-bg-scheme)',
-      'data-[state=indeterminate]:bg-scheme data-[state=indeterminate]:text-on-scheme data-[state=indeterminate]:inset-ring-(--ids-color-bg-scheme)',
+      'data-[state=checked]:bg-scheme-solid data-[state=checked]:text-on-scheme-solid data-[state=checked]:inset-ring-(--ids-color-bg-scheme-solid)',
+      'data-[state=indeterminate]:bg-scheme-solid data-[state=indeterminate]:text-on-scheme-solid data-[state=indeterminate]:inset-ring-(--ids-color-bg-scheme-solid)',
       'data-disabled:opacity-50',
     ],
     input:
@@ -27,7 +27,7 @@ export const checkboxStyle = tv({
       outline: {
         root: 'bg-control-outline shadow-xs inset-ring-1 inset-ring-control-outline',
       },
-      soft: { root: 'bg-neutral-subtle inset-ring-1 inset-ring-transparent' },
+      soft: { root: 'bg-neutral-soft inset-ring-1 inset-ring-transparent' },
     } satisfies Record<CheckboxVariant, object>,
     size: {
       standard: { root: 'size-4', indicator: 'size-3.5' },

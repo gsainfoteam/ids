@@ -91,7 +91,7 @@ WidgetbookUseCase(
   - `IdsLocaleAddon`: ko 또는 en이다. `IdsProviderScope`의 `locale`과 `translation`, 데모 문구를
     함께 바꾼다.
   - `TextScaleAddon`: 1부터 3까지다.
-- 캔버스는 페이지 색(`bgNeutralSubtlest`)에 32px padding을 둔다. 캔버스 자체는 스크롤하지
+- 캔버스는 페이지 색(`bgBase`)에 32px padding을 둔다. 캔버스 자체는 스크롤하지
   않는다. `Showcase`는 스스로 스크롤하고, 페이지 전체를 그리는 데모는 자기 scroll view를 가진다.
   캔버스까지 스크롤하면 그 안의 scroll view가 높이 제한을 받지 못한다.
 

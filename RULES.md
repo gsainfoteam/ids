@@ -227,8 +227,9 @@ drawer/
   `const` alias cannot merge with a namespace that holds values, and a Server Component cannot
   read a part off a client reference. Its parts are `ImageViewerClose` with `displayName`
   `'Image.Viewer.Close'`. A client file cannot import that function without a cycle through
-  `index.tsx`, so a sibling that picks the sub-component out of its children does so there too:
-  `Image.Group` finds `[Image.Viewer, ImageViewer]` and hands it to the client `ImageGroup`.
+  `index.tsx`, so a component that picks the sub-component out of its children does so in its own
+  server-safe `index.tsx`: `ImageGroup` finds `[Image.Viewer, ImageViewer]` and hands it to its
+  client `ImageGroupRoot`.
 - Parts and `root.tsx` import `./context`, `./style` and sibling parts directly. They import `'.'`
   only with `import type`, so no runtime cycle runs through `index.tsx`. The root recognises its parts
   (`elementTypeOf(child) === DrawerOverlay`, a set of part functions) by importing them, never
@@ -310,7 +311,7 @@ changes it.
   className lays out (flex, grid, gaps, padding, widths, alignment, `hidden md:flex`) and sets the
   IDS type scale on plain headings and paragraphs; it never sets a color, border, background,
   radius, shadow or `style`. A line is a `Divider`, a surface a `Card` or an `Item`, muted text a
-  component's `Description` part. The classes a part documents (`border-t` on `Card.Footer`) are
+  component's `Description` part. The classes a part documents (`border-b` on `Card.Header`) are
   fine.
 - A block picks `solid`, `outline` or `soft` and never `ghost`, except for the buttons inside a
   bar that already draws the surface (a toolbar `Card`), which stay `ghost`. A text link (in running text, or
@@ -356,7 +357,7 @@ with a bare `cn('...')` when it belongs to the same component — that hides the
 variant system and duplicates the variant keys.
 
 Colors that `colorScheme` fans out to several parts go through the scheme: the root carries
-`scheme-X` and its parts write `bg-scheme`, `text-on-scheme`, `text-scheme`, rather than one class
+`scheme-X` and its parts write `bg-scheme-solid`, `text-on-scheme-solid`, `text-scheme`, rather than one class
 per part-and-scheme pair. A component never points a variable of its own at a color role
 (`[--x:var(--ids-color-…)]`).
 
@@ -384,9 +385,10 @@ controls, `[data-focus-visible]` for components driven by `useInteractive`, and
 `:has([data-field-input]:focus-visible)` for a shell wrapping its own input or trigger. Mark that
 inner element with `data-field-input` rather than adding a component-specific `has-[...]:ring`.
 Borders stay `inset-ring`, so the focus ring sits outside them and composes with `shadow-xs`
-instead of replacing it. Focus also recolors that inset-ring border to primary, and an element
-with `aria-invalid="true"` or `data-invalid` gets a border and a ring in `border-danger`, which is
-the color of its label and error message; neither state is repeated in component styles. An element whose ring must sit above its neighbours (a joined
+instead of replacing it. Focus also recolors that inset-ring border to `primary-strong` (the ring is
+`ring-primary-strong/40`), and an element with `aria-invalid="true"` or `data-invalid` gets a
+border and a ring in `danger-strong`, while its label and error message are `text-danger`; neither
+state is repeated in component styles. An element whose ring must sit above its neighbours (a joined
 Group item, an OTP slot, a Calendar day) raises itself with the `focus-ring-visible:` variant, which
 the CSS package builds from the same triggers as `focus-ring`; stacking on `focus-visible:` or
 `data-focus-visible:` alone leaves a ring drawn by another trigger under the next item.
@@ -424,101 +426,160 @@ since the bar ends are inset from the root's own computed radius. A `<textarea>`
 too (`ScrollArea.Viewport asChild`): it scrolls itself, and ScrollArea remeasures it on `input`.
 Popover keeps its arrow outside the ScrollArea, since the viewport clips what overflows.
 
-**Colors come in four layers, and each layer names its tokens by grammar.** Raw palettes
-(`neutral-50`, a theme's `primary-600`) are values only. Semantic roles (`--ids-color-<role>`) point
-to one raw step each and are named `{property}-{family}[-{strength}]` or
-`text-on-{family}[-{strength}]`, never by a use such as `surface`. The scheme (`bg-scheme`,
-`text-on-scheme-subtle`) points to one family's roles. Component tokens (`bg-panel`,
-`border-control-outline`, `shadow-panel`) point to one semantic role per mode. No layer mixes two
-tokens with `color-mix`.
+**Colors come in four layers, and each layer names its tokens by grammar.** Raw palettes are
+values only: each family has a light and a dark scale of nine steps, numbered outward from the
+page (neutral light 1 is the page, dark 5 the line), so a mode picks its own values and no step
+needs a name like `850`. Semantic roles (`--ids-color-<role>`) point to one raw step each, except
+`text-on-*`, which the provider computes. A background is named by use (`bg-base`, `bg-surface`,
+`bg-block`, `bg-X-soft`, `bg-X-solid`), a line or text by strength (`border-X`, `border-X-strong`,
+`text-X`, `text-X-strong`), and text on a background `text-on-{background}`. The scheme
+(`bg-scheme-solid`, `text-on-scheme-soft`) points to one family's roles. Component tokens
+(`bg-control-outline`, `border-field-outline`, `shadow-surface`) point to one semantic role per
+mode. No layer mixes two tokens with `color-mix`.
 
-- **Scheme.** `scheme-{family}` sets every `{property}-scheme[-{strength}]` slot to that family's
-  role, and the state layer to that family (`--ids-state-layer-scheme`, `-hover`, `-press`). For
-  neutral, `bg-scheme` is `bg-neutral-bold` and `text-on-scheme` `text-on-neutral-bold`. The
+- **Scheme.** `scheme-{family}` sets every `{property}-scheme[-…]` slot (`bg-scheme-soft`,
+  `bg-scheme-solid`, `text-on-scheme-soft`, `text-on-scheme-solid`, `text-scheme`,
+  `text-scheme-strong`, `border-scheme`, `border-scheme-strong`) to that family's role, and the
+  state layer to that family (`--ids-state-layer-scheme`, `-hover`, `-press`). For neutral,
+  `text-scheme` reads `text-neutral-strong`, not `text-neutral`; the others keep their names. The
   IdsProvider root carries `scheme-primary`; a component with `colorScheme` always writes its own
   `scheme-X`, so a Button inside a danger Alert stays primary. Choices that depend on another prop
   (a status family's outline text) are `tv` compoundVariants.
 - **Component tokens.** `packages/core/tokens/component.json` names them
   `{property}-{group}[-{part}][-{variant}]`: property `bg`, `text`, `border` or `shadow`; a group
-  that is no family, `scheme` or strength word; never `fill`, `tint`, `strong`, `accent`, `on`,
-  `line`, `quiet`, `glyph`, `foreground` or `background`; `soft` only as the variant. Each token
-  points to a role in light and in dark, and `shadow-*` to a raw step of `shadow.json` (`0`, `1`,
-  `2`, no `sm`/`md`). A surface whose role differs by mode uses a component token, never `dark:`:
-  `bg-panel shadow-panel` for Card, Dialog, popups and toasts (one step lighter than the page in
-  dark), `bg-band` for a band inside one, `bg-control-outline` with `inset-ring-control-outline` for
-  outline controls and `bg-field-outline` for fields.
+  that is no family, `scheme`, use word (`base`, `surface`, `block`, `soft`, `solid`) or `strong`;
+  never `fill`, `tint`, `strong`, `accent`, `on`, `line`, `quiet`, `glyph`, `foreground` or
+  `background`; `soft` only as the variant. Each token points to a role in light and in dark, and
+  `shadow-*` to a raw step of `shadow.json` (`0`, `1`, `2`, no `sm`/`md`). A surface whose role
+  differs by mode uses a component token, never `dark:`:
+
+  | Token | light | dark | Used by |
+  |---|---|---|---|
+  | `shadow-surface` | `shadow-1` | `shadow-0` | an outline Card |
+  | `bg-control-outline`, `border-control-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline buttons, Checkbox, Radio, pill Tabs |
+  | `bg-field-outline`, `border-field-outline` | `bg-base`, `border-neutral` | `bg-block`, `border-neutral-strong` | outline fields |
+  | `border-field-bar` | `border-neutral` | `border-neutral-strong` | the TextArea and Editor bar seam |
+  | `bg-field-code-outline` | `bg-neutral-soft` | `bg-surface` | code in an outline Editor |
+  | `bg-switch-thumb` | `bg-base` | `bg-neutral-solid` | an off Switch thumb |
+  | `bg-qr-code`, `text-qr-code` | `bg-base`, `text-neutral-strong` | `bg-neutral-solid`, `text-on-neutral-solid` | QRCode |
+  | `bg-qr-code-inverse`, `text-qr-code-inverse` | `bg-neutral-solid`, `text-on-neutral-solid` | `bg-base`, `text-neutral-strong` | an inverted QRCode |
+
+- **Surfaces are roles.** `bg-surface` is Card, Dialog, popups and toasts (one step lighter than
+  the page in dark). `bg-block` is a background that marks off a region on base or surface: the
+  Card and Dialog footer, a Table header, footer or striped row, CodeBlock, a soft Card, Item or
+  Empty, a soft Accordion item, the Image placeholder, Editor code. `bg-X-soft` is for controls and
+  fills: soft buttons and fields, a Calendar range, Avatar, Skeleton, Bubble, FileField,
+  Questionnaire.
 - **The color underneath.** A part that copies the color of the surface it sits on (a Badge
   cutout, a ColorPicker ring offset, a ghost Table header, Chart dots) reads `--ids-bg-current`,
-  never `bg-neutral-subtlest`. `ids.css` sets it to the page on the outermost provider and on a
-  Scope that paints its own page, and to `bg-panel` or `bg-band` on an element with that class, so
-  the cutout matches a dark Card or popup as well as the page.
+  never `bg-base`. `ids.css` sets it to `bg-base` on the outermost provider and on a `[data-mode]`
+  element that paints `bg-base` (a Scope with its own page), and to `bg-surface` or `bg-block` on
+  an element with that class, so the cutout matches a dark Card or popup as well as the page.
 - Layout variables a component sets for itself carry no `--ids-` prefix (`--marquee-duration`,
   `--text-area-pad-y`); `--ids-*` is the CSS package's and the provider's.
 
 - Properties are `bg`, `text` and `border`. Families are `neutral`, `primary`, `secondary`,
   `tertiary`, `success`, `warning`, `danger` and `info`.
-- Strengths run `subtlest` < `subtler` < `subtle` < (none) < `bold`. `bolder` and `boldest` are
-  reserved. A strength names a place on the ladder, not a palette step: the steps are picked by
-  use, so the ends sit at or near the end of the palette.
-- Every family has `bg-X-subtler`, `bg-X-subtle`, `bg-X`, `text-on-X-subtler`, `text-on-X-subtle`,
-  `text-on-X`, `text-X` and `border-X`. Neutral adds `bg-neutral-subtlest` with
-  `text-on-neutral-subtlest` (the page), `bg-neutral-bold` with `text-on-neutral-bold` (an inverted
-  fill: Tooltip, a neutral solid Button or Badge) and `text-neutral-bold` (body text).
-- Every background has its pair: text on `bg-X[-strength]` is `text-on-X[-strength]`, with no
-  exception. `text-neutral-bold` and `text-neutral` are body and secondary text that read on every
-  neutral background.
+- The only strength word is `strong`; `bold` reads as a font weight and is not used. There is no
+  `subtle` ladder.
+- Every family has `bg-X-soft`, `bg-X-solid`, `text-on-X-soft`, `text-on-X-solid`, `text-X`,
+  `text-X-strong`, `border-X` and `border-X-strong`. Neutral adds `bg-base`, `bg-surface` and
+  `bg-block` with `text-on-base`, `text-on-surface` and `text-on-block`. `bg-neutral-solid` with
+  `text-on-neutral-solid` is the inverted fill (Tooltip, a neutral solid Button or Badge).
+- Every background has its pair: text on `bg-{background}` is `text-on-{background}`, with no
+  exception. `text-neutral-strong` and `text-neutral` are body and secondary text that read on
+  every neutral background.
 - There is no hover or active role. States are component code, see the state layer below.
-- The table lives in `packages/core/color-roles.json` (`slots`, `neutralOnly`); the neutral steps in
-  `packages/core/tokens/semantic/neutral.{light,dark}.json`.
+- The table lives in `packages/core/color-roles.json` (`slots`, `neutralOnly`, `scheme`); the
+  neutral scales in `packages/core/tokens/palette.json` and the step each neutral role reads in
+  `packages/core/neutral-roles.json`, the same step in both modes. `text-on-*` roles read no step,
+  are absent from `neutral-roles.json` and have no CSS fallback.
 
-| Neutral role | light | dark | used for |
-|---|---|---|---|
-| `bg-neutral-subtlest` | 0 | 950 | the page, a popup, a card |
-| `bg-neutral-subtler` | 50 | 900 | a band or tray: a Card or Dialog footer, a table header |
-| `bg-neutral-subtle` | 100 | 800 | a soft control, a muted row, an outline control in dark |
-| `bg-neutral` | 300 | 700 | a handle, a track, an outline control's border in dark |
-| `bg-neutral-bold` | 900 | 50 | an inverted fill |
-| `text-on-neutral-subtlest`, `text-on-neutral-subtler` | 900 | 50 | text on the page or a band |
-| `text-neutral-bold` | 900 | 50 | body text |
-| `text-neutral` | 600 | 300 | secondary text |
-| `border-neutral` | 200 | 800 | structural lines |
+Every scale has nine steps, read by the same roles in both modes:
+
+| Step | Use | Read by | Neutral light | Neutral dark |
+|---|---|---|---|---|
+| 1 | base | `bg-base` | `#ffffff` | `#0a0a0a` |
+| 2 | surface | `bg-surface` | `#ffffff` | `#171717` |
+| 3 | block | `bg-block` | `#fafafa` | `#1e1e1e` |
+| 4 | soft | `bg-X-soft` | `#f5f5f5` | `#262626` |
+| 5 | border | `border-X` | `#e5e5e5` | `#2e2e2e` |
+| 6 | strong border | `border-X-strong`, a handle | `#d4d4d4` | `#3a3a3a` |
+| 7 | solid | `bg-X-solid` (no neutral role) | `#a3a3a3` | `#737373` |
+| 8 | text | `text-X` | `#525252` | `#d4d4d4` |
+| 9 | strong text | `text-X-strong`, `bg-neutral-solid` | `#0a0a0a` | `#fafafa` |
+
+- Steps 1 to 3 are neutral roles only; a brand scale has them to keep the order.
+- Neutral 7 has no role: `bg-neutral-solid` reads step 9.
+- Steps 1 to 6 and 8 to 9 always keep their order. The solid is chosen for the text on it, so it
+  can sit out of order: in dark the Lc 45 strong border is lighter than the solid, and for light
+  hues such as yellow the light solid is paler than the line. Text (8, 9) is at the solid or
+  beyond it.
+- The neutral values follow shadcn/ui's neutral theme, its translucent dark lines flattened onto
+  the card (`#2e2e2e`). Dark 9 is `#fafafa` and not shadcn's `#e5e5e5`, which leaves
+  `text-on-neutral-solid` under Lc 75 under the press layer.
+
+A brand or status family builds its two scales from a 50 to 950 ramp (one color through the
+palette model, or the ramp an app passes), by `SCALE_RULES` in `ids-provider/palette-scales.ts`:
+
+- Light 1 to 3 sit on the ramp at the lightness of neutral 1 to 3, 4 is ramp 100 and 5 ramp 200.
+  Dark 1 to 5 sit on the ramp at the lightness of the dark neutral step with the same number.
+  Between the page and the first ramp step (50 in light, 950 in dark) the point keeps that step's
+  hue and its chroma times the square root of how far the lightness is along, which keeps more
+  chroma than a plain mix.
+- 7, the solid, starts at ramp 600 and moves outward (500 or 700, then 400 or 800) until white or
+  neutral 950 reaches Lc 75 on it under the fill layer.
+- 6, the strong border, is the first ramp step from 300 (dark: 900) outward that reaches Lc 45 on
+  `bg-base`, `bg-surface`, `bg-block` and the family's `bg-X-soft`.
+- 8, the text, is the first step from the solid outward that reaches Lc 60 on those four under the
+  hover and press layers; 9, the strong text, the first step beyond the text that reaches Lc 75,
+  so the two never match.
+- An app may also pass both scales itself; the provider then only checks them.
+
+`text-on-{background}` is computed for each background (`textOn`): from the end of that family's
+scale toward the dark side and toward the light side, then on along the ramp, then white or
+neutral 950, the first color that reaches Lc 75 under the hover and press layers that background
+draws; if both directions reach, the higher Lc wins. So the text on a solid may be tinted (dark
+yellow solid takes `#fefdec`).
 
 Each Tailwind namespace (`--background-color-*`, `--text-color-*`, `--border-color-*`,
 `--ring-color-*`, `--outline-color-*`, `--fill-*`, `--stroke-*`) maps only the roles that fit it,
 so there is no shared `--color-<role>` and `bg-on-primary` does not exist. Write named utilities
-(`bg-primary-subtle`, `inset-ring-neutral`), not `bg-(--ids-color-…)`; an arbitrary value is only
-for a role used as another property, such as `bg-(--ids-color-text-neutral)` on a dragged handle
-or `stroke-(--ids-color-bg-neutral-subtlest)` around a chart dot. A brand family the theme leaves
-out (`secondary`, `tertiary`) is derived from primary (`ids-provider/derived-brands.ts`), so the
-provider always writes all three.
+(`bg-primary-soft`, `inset-ring-neutral`), not `bg-(--ids-color-…)`; an arbitrary value is only
+for a role used as another property, such as `bg-(--ids-color-border-neutral-strong)` on a handle,
+`bg-(--ids-color-text-neutral)` on a dragged handle or `stroke-(--ids-color-bg-base)` around a
+chart dot. A brand family the theme leaves out (`secondary`, `tertiary`) is derived from primary
+(`ids-provider/derived-brands.ts`), so the provider always writes all three.
 
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
-`border-neutral` (neutral 200 light, 800 dark), the way shadcn/ui keeps chrome gray and lets
+`border-neutral` (neutral step 5), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
-the theme color, while `outline` and `ghost` stay neutral. `border-neutral` is decorative and
-exempt from contrast. `border-primary` and every other family's `border-X`, for the rare edge that
-should itself read as that color, is the same step as `text-X`, so a line and the text beside it
-(an invalid field's border, its label and error message) are one color.
+the theme color, while `outline` and `ghost` stay neutral. A current or selected mark is content,
+not chrome: the current Pagination page in `ghost` and the selected Tabs label take `text-X`.
+`border-neutral` and every family's `border-X` are pale lines, decorative and exempt from
+contrast. A colored line that must read (the focus ring, an invalid field's border, the selected
+Tabs underline, the rare edge that should itself read as that color) is `border-X-strong`, which
+reaches Lc 45.
 
-**Each family has one role per background.** A fill (`bg-primary`) carries `text-on-primary`; a
-subtle surface is `bg-primary-subtle` with `text-on-primary-subtle`; text or an icon sitting on the
-page with no fill behind it (an outline Badge or Chip, a Rating star, a Radio dot, a Link) is
-`text-primary`. `bg-X-subtler` is a lighter band than subtle (palette 50 in light, 950 mixed
-halfway to the page in dark) and takes `text-on-X-subtler`, or `text-X` for an accent. Never write `bg-primary`
-as a text color or `primary/10` as a subtle fill: light hues such as yellow and cyan fall under
-Lc 60 there. Statuses follow the same roles (`bg-danger-subtle` with `text-on-danger-subtle`,
-`text-danger` for text). Every `text-on-` role reaches APCA Lc 75 on its background, `text-X` Lc 60 on
-the page, on `bg-X-subtler` and on `bg-X-subtle` (short labels, links and messages), and every
-`border-X` (the `text-X` step) at least Lc 45 in both modes, for all 17 story palettes, pure and
+**Each family has one role per background.** A fill (`bg-primary-solid`) carries
+`text-on-primary-solid`; a soft fill is `bg-primary-soft` with `text-on-primary-soft`; text or an
+icon sitting on a background with no fill of its own (an outline Badge or Chip, a Rating star, a
+Radio dot, a Link) is `text-primary`, or `text-primary-strong` for body-weight text. Never write
+`bg-primary-solid` as a text color or `primary/10` as a soft fill: light hues such as yellow and
+cyan fall under Lc 60 there. Statuses follow the same roles (`bg-danger-soft` with
+`text-on-danger-soft`, `text-danger` for text, `border-danger-strong` for an invalid border).
+Every `text-on-` role and every `text-X-strong` reaches APCA Lc 75 on its background, `text-X`
+Lc 60 on `bg-base`, `bg-surface`, `bg-block` and `bg-X-soft` (short labels, links and messages),
+and every `border-X-strong` Lc 45 on those, in both modes, for all 17 story palettes, pure and
 tinted neutrals and harmonized and fixed statuses, under the hover and press layers as well,
 which `tests/tokens-contrast.test.ts` checks.
 
 **Contrast is APCA, not WCAG 2.** Roles are picked by APCA lightness contrast (`contrastAPCA` from
-`colorjs.io/fn`, in `ids-provider/contrast.ts`). The fill starts at 600 and moves to 500 or 700,
+`colorjs.io/fn`, in `ids-provider/contrast.ts`). The solid starts at 600 and moves to 500 or 700,
 then 400 or 800, until white or neutral 950 text reaches Lc 75 at rest and under the press layer;
-the text is whichever reads better. WCAG 2's ratio rates dark text on mid-tone fills too well, so
-it is not used, and axe's `color-contrast` rule, which computes it, is off in `parameters.a11y`;
-the token test checks APCA instead.
+the text on it is then computed like every `text-on-*`. WCAG 2's ratio rates dark text on mid-tone
+fills too well, so it is not used, and axe's `color-contrast` rule, which computes it, is off in
+`parameters.a11y`; the token test checks APCA instead.
 
 **Hover and press are a state layer, drawn by the component.** The CSS package's `state-layer`
 utility paints a `background-image` of `--ids-state-color` (the element's `currentColor` unless
@@ -538,25 +599,25 @@ and not toward gray:
 | Surface | Layer | Hover / press |
 |---|---|---|
 | A fill (solid Button, Chip, Badge, a selected Calendar day, a completed Stepper step) | black, `state-fill` | 10% / 18% |
-| A colored soft surface, a status outline or ghost | the family fill (`bg-X`), `--ids-state-tint-*` | 8% / 12% |
+| A colored soft surface, a status outline or ghost | the family fill (`bg-X-solid`), `--ids-state-tint-*` | 8% / 12% |
 | Neutral, and brand outline or ghost | the text color | 6% / 10% |
 
 `state-fill` sets the black color and its opacities. `state-scheme` hands the layer the one
 `scheme-X` set: the family fill with `--ids-state-tint-*` for a colored family, the text color
 with `--ids-state-hover` and `-press` for neutral.
 The provider checks text contrast under the layer each surface draws: a fill's text under the black
-layer, subtle, subtler and accent text under the text-color layer and the family-fill layer.
+layer, soft and accent text under the text-color layer and the family-fill layer.
 
-- Do not write a hover color (`hover:bg-neutral-subtle`) or fade a filled brand color with `/90`.
+- Do not write a hover color (`hover:bg-neutral-soft`) or fade a filled brand color with `/90`.
 - `state-layer` takes the `background-image`, so an element with a gradient of its own (glossy)
   keeps its gradient and moves its stops on hover instead.
 - Handles are the exception: a 6–10% layer does not show on a 2–4px bar, so the Drawer handle,
-  resize handles, the DataTable column resizer and Carousel dots go from `bg-neutral` to
+  resize handles, the DataTable column resizer and Carousel dots go from `bg-(--ids-color-border-neutral-strong)` to
   `bg-(--ids-color-text-neutral)` on hover and while dragged. A ScrollArea thumb rests at
-  `bg-neutral/60`, takes full `bg-neutral` on hover and `text-neutral`'s color while dragged.
+  `bg-(--ids-color-border-neutral-strong)/60`, takes full `bg-(--ids-color-border-neutral-strong)` on hover and `text-neutral`'s color while dragged.
 - Translucent layers over a background IDS does not know stay as they are: Image's hover scrim,
   Chip lines, the ScrollArea track, the DataTable loading veil, disabled opacity and backdrops,
-  the hairline round an image, a color swatch or a slider track (`inset-ring-(--ids-color-text-neutral-bold)/N`),
+  the hairline round an image, a color swatch or a slider track (`inset-ring-(--ids-color-text-neutral-strong)/N`),
   with the focus halo and text selection. They are the only opacity modifiers on an IDS color;
   `tests/color-rules.test.ts` lists them and fails on any other, on `dark:`, on `color-mix` and on
   an `--ids-*` variable `ids.css` does not have.
@@ -564,7 +625,7 @@ layer, subtle, subtler and accent text under the text-color layer and the family
 **Text-like controls share one surface.** TextField, TextArea, NumberField, PasswordField,
 TelField, ChipField, Select and the date, time and color triggers draw their box from
 `internal/surfaces/field-surface.ts`. Their `variant` is intensity only: `outline` (default,
-`bg-field-outline` with `inset-ring-field-outline`), `soft` (muted fill) and `ghost` (no fill, no
+`bg-field-outline` with `inset-ring-field-outline`), `soft` (`bg-neutral-soft`) and `ghost` (no fill, no
 border). Put `data-field-input` on the element that takes focus and
 `data-invalid` on the shell; `focus-ring` does the rest.
 
@@ -605,6 +666,14 @@ take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks
 keys and that no Korean literal sits in component code; `tests/translate.test.tsx` renders every
 story in English.
 
+**Variants are the looks an app cannot build from IDS parts.** A `variant` or `appearance` value is
+a component's own basic look that only CSS inside IDS can draw: Button's `solid`, `soft`, `outline`
+and `ghost`, Tabs' `underline`, `pill`, `enclosed` and `segmented`. A look an app can compose from
+IDS components and props (a Card holding a Tabs, a Field around a SegmentedControl) stays a
+composition and never becomes a prop value. Two components that read alike share an internal
+surface (`internal/surfaces/segment-surface.ts` for SegmentedControl and segmented Tabs) instead of
+one copying the other's classes.
+
 **Callbacks.** A value callback is `onValueChange(value)`; other state callbacks are
 `onCheckedChange`, `onPressedChange`, `onOpenChange` and so on. `onChange` keeps the native event
 signature and only exists where a real input does. react-hook-form's `field.onChange` and TanStack
@@ -638,6 +707,13 @@ read from `event.key`, since TanStack falls back to the key's position.
 **Parts.** Part props types are named `X.PartProps` (`OTPField.SlotProps`,
 `ButtonGroup.SeparatorProps`), one level down for a sub-component's parts
 (`Image.Viewer.CloseProps`). Every part is optional and falls back to a default.
+
+**A group of several X is not a part of X.** `X.Part` names something inside one X. A container
+that holds several X is a component of its own in `<category>/<x>-group/` (`ButtonGroup`,
+`AvatarGroup`, `ItemGroup`, `ImageGroup`, `FieldGroup`, `KbdGroup`), never `X.Group`. It hands
+each X what it needs through a context declared in X's own folder (`ItemGroupContext` in
+`item/context.ts`), which X reads. A section of parts inside one X (`Select.Group`,
+`Menu.Group`, `Sidebar.Group`, `ChipField.Group`, `OTPField.Group`) stays a part.
 
 **A description is a paragraph.** A `Description` part of prose (Card, Item, Empty, Alert, Field,
 Dialog, Popover) renders a `<p>`; one inside a button (Stepper) stays a `<span>`. Block content
@@ -861,8 +937,8 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
 </IdsProvider>
 ```
 
-- The app owns its brand colors: `primary` (required), `secondary` and `tertiary`, each a palette
-  (`50` to `950`) or one CSS color to build one from. The provider picks every family's roles for
+- The app owns its brand colors: `primary` (required), `secondary` and `tertiary`, each one CSS color, a
+  `50` to `950` ramp, or `{ light, dark }` scales of nine colors. The provider picks every family's roles for
   both modes by contrast (`ids-provider/theme-roles.ts`) and writes them as
   `--ids-theme-{mode}-{role}`; `ids.css` maps the current mode's set onto `--ids-color-{role}`.
 - `neutral: 'tinted'` gives the neutral the primary hue at low chroma (`'pure'` by default).
@@ -872,8 +948,8 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
   (OKLab), a status hue outside its range, and success or warning that look like danger under
   red-green color blindness. The thresholds were set from the 17 demo palettes that core used
   to hold and are fixed values now.
-- Chart has no color tokens: a series without `color` takes `bg-primary`, `bg-secondary` and
-  `bg-tertiary` in config order (`DEFAULT_SERIES` in `data/chart/config.ts`). A fourth draws in
+- Chart has no color tokens: a series without `color` takes `bg-primary-solid`, `bg-secondary-solid` and
+  `bg-tertiary-solid` in config order (`DEFAULT_SERIES` in `data/chart/config.ts`). A fourth draws in
   neutral and warns in development.
 - A `secondary` or `tertiary` the app leaves out is derived from primary, the Material 3 way:
   secondary keeps primary's hue at a third of its chroma ratio, tertiary turns the hue by +60° at
@@ -892,15 +968,16 @@ const theme = defineIdsTheme({ primary: appPalette, radius: 10, cornerShape: 'ro
 
 ## Palettes in core
 
-IDS ships no brand palette. `packages/core/tokens/palette.json` holds neutral and the four status
-palettes (red, yellow, green, sky). The one-color palette builder evaluates a model whose
+IDS ships no brand palette. `packages/core/tokens/palette.json` holds the neutral light and dark
+scales and the four status ramps (red, yellow, green, sky). The one-color palette builder evaluates a model whose
 coefficients live in `packages/core/palette-model.json` (Fourier series of the 500 hue per step,
 fitted once to 17 demo palettes that are gone now); `pnpm codegen` copies them and the status
 palettes to `src/tokens/palette-model.ts` and to `packages/flutter/lib/tokens/ids_palette_model.dart`,
-which `IdsPalette.fromSeed` evaluates to the same 8-bit colors. Stories and tests build their 17
+which `IdsRamp.fromSeed` evaluates to the same 8-bit colors. Stories and tests build their 17
 palettes from seed hex values in `.storybook/palettes.ts`. There are no per-hue role tables: every
-platform picks the roles from the app's palette at runtime. `packages/core/color-roles.json` names
-the roles once; the CSS, the React types and the Dart `IdsColors` class are all written from it.
+platform picks the roles from the app's palette at runtime. The neutral scales hold nine steps per
+mode, and `packages/core/neutral-roles.json` names the step each neutral role reads (`text-on-*`
+roles read none). `packages/core/color-roles.json` names the roles once; the CSS, the React types and the Dart `IdsColors` class are all written from it.
 
 ## Versioning — Changesets (fixed mode)
 
@@ -950,7 +1027,8 @@ graph LR
 ids_flutter follows ids-react's theme. The design is decided in React; Flutter ports it.
 
 - `IdsProvider(theme: IdsTheme(...), mode: ...)` takes the same fields as `defineIdsTheme`:
-  `primary` (required), `secondary`, `tertiary` (each `IdsPalette` or `IdsThemeColor.seed(color)`),
+  `primary` (required), `secondary`, `tertiary` (each `IdsThemeColor.seed(color)`, an `IdsRamp` of 50 to 950 or an `IdsPalette` of light
+  and dark scales),
   `neutral`, `status`, `radius`, `cornerShape`, `scale`. `IdsProviderScope(theme: IdsThemeOverrides(...))`
   is `IdsProvider.Scope`. Nested providers inherit what they leave out; a scope with its own `mode`
   or `defaultMode` owns its mode, the others forward `setMode` and `toggleMode` to the owner.
@@ -962,9 +1040,12 @@ ids_flutter follows ids-react's theme. The design is decided in React; Flutter p
   light/dark) and `test/theme_roles_parity_test.dart` checks every role against it. A change to
   the role rules updates both ports and the fixture (`vitest run --project node
   tests/flutter-parity.test.ts -u`) in one commit.
-- Components read roles with `IdsProvider.of(context).colors.bgPrimarySubtle` and pick them the
-  way the React component does (the page `bgNeutralSubtlest`, body text `textNeutralBold`, field
-  borders `borderNeutral`, invalid `borderDanger`, secondary text `textNeutral`). Hover and press
+- Components read roles with `IdsProvider.of(context).colors.bgPrimarySoft` and pick them the
+  way the React component does (the page `bgBase`, a card `bgSurface`, a region inside it
+  `bgBlock`, a fill `bgPrimarySolid` with `textOnPrimarySolid`, body text `textNeutralStrong`,
+  field borders `borderNeutral`, focus `borderPrimaryStrong`, invalid `borderDangerStrong`,
+  secondary text `textNeutral`). `IdsPalette(light:, dark:)` takes nine colors per mode, and
+  `textOn*` is computed by the same rule as React. Hover and press
   are the same state layers as React: a fill takes `IdsStateLayer.fillColor` at
   `IdsStateOpacity.fillHover` and `.fillPress`, a colored soft surface the family fill at
   `.tintHover` and `.tintPress`, the rest the content color at `.hover` and `.press`, and

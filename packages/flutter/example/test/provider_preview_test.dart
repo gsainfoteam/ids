@@ -27,13 +27,13 @@ void main() {
             ),
           );
           await tester.pump();
-          final bgPrimary = IdsResolvedTheme(
+          final bgPrimarySolid = IdsResolvedTheme(
             theme: theme,
             mode: mode,
-          ).colors.bgPrimary;
+          ).colors.bgPrimarySolid;
           expect(find.text('Loading'), findsOneWidget);
           expect(find.text('닫기'), findsOneWidget);
-          expect(find.text('primary ${hexOf(bgPrimary)}'), findsOneWidget);
+          expect(find.text('primary ${hexOf(bgPrimarySolid)}'), findsOneWidget);
           expect(tester.takeException(), isNull);
         }
       }

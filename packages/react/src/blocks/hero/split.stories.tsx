@@ -7,6 +7,7 @@ import { Avatar } from '../../components/data/avatar';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -65,7 +66,7 @@ export const PC: Story = {
           <p className="text-body-b1-regular">
             학교 공지와 시간표를 읽어 두었다가, 궁금한 걸 물으면 출처와 함께 알려 줘요.
           </p>
-          <Item.Group size="tiny" aria-label="도우미가 하는 일">
+          <ItemGroup size="tiny" aria-label="도우미가 하는 일">
             {POINTS.map((point) => (
               <Item key={point}>
                 <Item.Media variant="soft">
@@ -76,7 +77,7 @@ export const PC: Story = {
                 </Item.Content>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
           <div className="flex flex-wrap gap-3">
             <Button asChild>
               <a href="#assistant">
@@ -128,7 +129,7 @@ export const PC: Story = {
                 </Table>
               </Card.Content>
             )}
-            <Card.Footer className="border-t">출처 · {current.source}</Card.Footer>
+            <Card.Footer>출처 · {current.source}</Card.Footer>
           </Card>
         </Card>
       </main>

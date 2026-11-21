@@ -17,7 +17,7 @@ const proseMirrorBaseline = cn(
   '[&_[contenteditable=false]]:whitespace-normal',
   '[&_img.ProseMirror-separator]:m-0! [&_img.ProseMirror-separator]:inline! [&_img.ProseMirror-separator]:size-0! [&_img.ProseMirror-separator]:border-0!',
   '[&.ProseMirror-hideselection]:caret-transparent',
-  '[&_.ProseMirror-selectednode]:outline-2 [&_.ProseMirror-selectednode]:outline-primary',
+  '[&_.ProseMirror-selectednode]:outline-2 [&_.ProseMirror-selectednode]:outline-primary-strong',
 );
 
 const documentBlocks = cn(
@@ -42,7 +42,7 @@ export const editorStyle = tv({
     barItems: 'flex items-center gap-0.5',
     separator: 'mx-0.5 h-5 self-center',
     blockType: [
-      'w-auto shrink-0 rounded-standard text-neutral-bold',
+      'w-auto shrink-0 rounded-standard text-neutral-strong',
       'transition-[color,background-color,box-shadow,--ids-state-opacity]',
       'state-layer hover:state-hover active:state-press ring-0! inset-ring-transparent!',
     ],
@@ -52,13 +52,13 @@ export const editorStyle = tv({
     ],
     document: 'relative',
     content: [
-      'min-h-24 outline-none text-neutral-bold',
-      'selection:bg-primary/30 selection:text-neutral-bold',
+      'min-h-24 outline-none text-neutral-strong',
+      'selection:bg-primary-solid/30 selection:text-neutral-strong',
       proseMirrorBaseline,
       documentBlocks,
       placeholder,
     ],
-    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-bold'],
+    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-strong'],
     bubble: 'w-auto concentric-p-1 p-0 [&>[data-scroll-area]>[data-scroll-area-viewport]]:p-0',
     bubbleBar: 'flex items-center gap-0.5 p-1',
     bubbleAnchor: 'pointer-events-none absolute',
@@ -75,7 +75,7 @@ export const editorStyle = tv({
       soft: {
         root: fieldSurface.variant.soft,
         bar: 'border-field-bar',
-        content: '[&_pre]:bg-neutral-subtler [&_:not(pre)>code]:bg-neutral-subtler',
+        content: '[&_pre]:bg-block [&_:not(pre)>code]:bg-block',
       },
     } satisfies Record<EditorVariant, object>,
     size: {

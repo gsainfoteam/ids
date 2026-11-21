@@ -18,6 +18,7 @@ import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Chip } from '../../components/data/chip';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { toast } from '../../components/feedback/toast';
 import { TextArea } from '../../components/form/text-area';
 import { Divider } from '../../components/layout/divider';
@@ -148,7 +149,7 @@ export const PC: Story = {
                 <h2>첨부 파일 {ATTACHMENTS.length}개</h2>
               </Card.Title>
             </Card.Header>
-            <Item.Group size="tiny" aria-label="첨부 파일">
+            <ItemGroup size="tiny" aria-label="첨부 파일">
               {ATTACHMENTS.map((file) => (
                 <Item key={file.name}>
                   <Item.Media variant="soft">{file.icon}</Item.Media>
@@ -166,7 +167,7 @@ export const PC: Story = {
                   </Item.Actions>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </Card>
 
           <div className="flex flex-wrap items-center justify-between gap-3">

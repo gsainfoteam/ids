@@ -5,18 +5,16 @@
     "status": ["success", "warning", "danger", "info"]
   },
   "slots": {
-    "bg": ["{family}-subtlest", "{family}-subtler", "{family}-subtle", "{family}", "{family}-bold"],
-    "text": ["on-{family}-subtlest", "on-{family}-subtler", "on-{family}-subtle", "on-{family}", "on-{family}-bold", "{family}", "{family}-bold"],
-    "border": ["{family}"]
+    "bg": ["base", "surface", "block", "{family}-soft", "{family}-solid"],
+    "text": ["on-base", "on-surface", "on-block", "on-{family}-soft", "on-{family}-solid", "{family}", "{family}-strong"],
+    "border": ["{family}", "{family}-strong"]
   },
   "scheme": {
     "neutral": {
-      "bg-{family}": "bg-{family}-bold",
-      "text-on-{family}": "text-on-{family}-bold",
-      "text-{family}": "text-{family}-bold"
+      "text-{family}": "text-{family}-strong"
     }
   },
-  "neutralOnly": ["bg-{family}-subtlest", "text-on-{family}-subtlest", "bg-{family}-bold", "text-on-{family}-bold", "text-{family}-bold"],
+  "neutralOnly": ["bg-base", "bg-surface", "bg-block", "text-on-base", "text-on-surface", "text-on-block"],
   "namespaces": {
     "bg": ["--background-color"],
     "text": ["--text-color", "--fill"],

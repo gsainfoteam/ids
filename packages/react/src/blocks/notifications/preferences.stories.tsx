@@ -7,6 +7,7 @@ import { Toggle } from '../../components/action/toggle';
 import { ToggleGroup } from '../../components/action/toggle-group';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Alert } from '../../components/feedback/alert';
 import { toast } from '../../components/feedback/toast';
 import { Field } from '../../components/form/field';
@@ -126,7 +127,7 @@ export const PC: Story = {
                   <h2>{group.title}</h2>
                 </Card.Title>
               </Card.Header>
-              <Item.Group aria-label={group.title}>
+              <ItemGroup aria-label={group.title}>
                 {group.events.map((event) => (
                   <Item key={event.id}>
                     <Item.Content>
@@ -153,7 +154,7 @@ export const PC: Story = {
                     </Item.Actions>
                   </Item>
                 ))}
-              </Item.Group>
+              </ItemGroup>
             </Card>
           ))}
 

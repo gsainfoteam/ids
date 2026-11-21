@@ -50,7 +50,7 @@ class ShowcaseSection extends StatelessWidget {
               title,
               style: ids.textStyle(
                 IdsTypography.subtitleS2Semibold,
-                color: ids.colors.textNeutralBold,
+                color: ids.colors.textNeutralStrong,
               ),
             ),
             if (description case final description?)

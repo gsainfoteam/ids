@@ -173,10 +173,12 @@ class _EmailInput extends StatelessWidget {
         end: ids.dimension(4),
       ),
       decoration: ShapeDecoration(
-        color: colors.bgNeutralSubtlest,
+        color: colors.bgBase,
         shape: ids.shape(
           side: BorderSide(
-            color: field.invalid ? colors.borderDanger : colors.borderNeutral,
+            color: field.invalid
+                ? colors.borderDangerStrong
+                : colors.borderNeutral,
           ),
         ),
       ),

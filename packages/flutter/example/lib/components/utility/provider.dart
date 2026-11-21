@@ -105,7 +105,7 @@ final provider = WidgetbookComponent(
           ShowcaseSection(
             title: 'Family × Mode',
             description:
-                'Each family as a fill, a subtle surface and text, from the theme the IDS theme addon picks.',
+                'Each family as a solid fill, a soft surface and text, from the theme the IDS theme addon picks.',
             children: [
               ShowcaseMatrix(
                 rows: IdsColorRoles.families,
@@ -116,7 +116,7 @@ final provider = WidgetbookComponent(
                     builder: (context) {
                       final ids = IdsProvider.of(context);
                       return ColoredBox(
-                        color: ids.colors.bgNeutralSubtlest,
+                        color: ids.colors.bgBase,
                         child: Padding(
                           padding: EdgeInsets.all(ids.dimension(8)),
                           child: SizedBox(

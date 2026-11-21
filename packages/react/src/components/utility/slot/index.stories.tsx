@@ -32,7 +32,7 @@ function Tag({
       {...props}
       data-tag=""
       className={cn(
-        'text-caption-c1-medium bg-primary-subtle text-on-primary-subtle inline-flex h-6 items-center rounded-full px-2.5',
+        'text-caption-c1-medium bg-primary-soft text-on-primary-soft inline-flex h-6 items-center rounded-full px-2.5',
         className,
       )}
     />
@@ -41,7 +41,7 @@ function Tag({
 
 export const Playground: Story = {
   render: () => (
-    <Slot className="rounded-standard bg-primary text-on-primary px-4 py-2">
+    <Slot className="rounded-standard bg-primary-solid text-on-primary-solid px-4 py-2">
       <a href="#slot">Slot이 감싼 링크</a>
     </Slot>
   ),

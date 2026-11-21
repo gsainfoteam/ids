@@ -29,7 +29,7 @@ const variants = ['hover', 'auto', 'always', 'none'] as const;
 const sizes = ['standard', 'tiny'] as const;
 
 const frame = cn('h-40 w-56 rounded-standard border border-neutral text-body-b3-regular');
-const panel = cn('h-56 w-64 concentric-p-1 p-0 border border-neutral bg-neutral-subtlest shadow-md');
+const panel = cn('h-56 w-64 concentric-p-1 p-0 border border-neutral bg-base shadow-md');
 
 const paragraphs = [
   '스크롤 영역은 브라우저의 스크롤을 그대로 씁니다. 휠, 트랙패드, 터치, 키보드가 평소처럼 움직입니다.',
@@ -58,7 +58,7 @@ function Wide() {
       {Array.from({ length: 16 }, (_, index) => (
         <div
           key={index}
-          className="rounded-standard text-body-b3-medium bg-neutral-subtle flex size-20 shrink-0 items-center justify-center"
+          className="rounded-standard text-body-b3-medium bg-neutral-soft flex size-20 shrink-0 items-center justify-center"
         >
           {index + 1}
         </div>
@@ -73,7 +73,7 @@ function Grid() {
       {Array.from({ length: 96 }, (_, index) => (
         <div
           key={index}
-          className="rounded-standard text-caption-c1-regular bg-neutral-subtle flex h-12 items-center justify-center"
+          className="rounded-standard text-caption-c1-regular bg-neutral-soft flex h-12 items-center justify-center"
         >
           {index + 1}
         </div>
@@ -249,7 +249,7 @@ export const Gallery: Story = {
             <IdsProvider.Scope
               key={mode}
               mode={mode}
-              className="rounded-standard bg-neutral-subtlest text-neutral-bold p-4"
+              className="rounded-standard bg-base text-neutral-strong p-4"
             >
               <ScrollArea variant="always" className={frame}>
                 <Text />
@@ -356,7 +356,7 @@ export const ListboxAsViewport: Story = {
               role="option"
               aria-selected={index === 0}
               tabIndex={index === 0 ? 0 : -1}
-              className="focus-ring rounded-standard aria-selected:bg-neutral-subtle px-2.5 py-1.5"
+              className="focus-ring rounded-standard aria-selected:bg-neutral-soft px-2.5 py-1.5"
             >
               도시 {index + 1}
             </div>
@@ -451,7 +451,7 @@ export const CustomThumb: Story = {
     <ScrollArea variant="auto" className={frame}>
       <Text />
       <ScrollArea.Scrollbar>
-        <ScrollArea.Thumb className="bg-primary hover:bg-primary" />
+        <ScrollArea.Thumb className="bg-primary-solid hover:bg-primary-solid" />
       </ScrollArea.Scrollbar>
     </ScrollArea>
   ),
@@ -465,6 +465,6 @@ export const CustomThumb: Story = {
   play: async ({ canvasElement }) => {
     const thumb = canvasElement.querySelector<HTMLElement>('[data-scroll-area-thumb]')!;
     await waitFor(() => expect(thumb).toBeVisible());
-    await expect(thumb.className).toMatch(/(^| )bg-primary( |$)/);
+    await expect(thumb.className).toMatch(/(^| )bg-primary-solid( |$)/);
   },
 };

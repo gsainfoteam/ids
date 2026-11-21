@@ -5,6 +5,7 @@ import { IconButton } from '../../components/action/icon-button';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { Table } from '../../components/data/table';
 import { Alert } from '../../components/feedback/alert';
 import { Breadcrumb } from '../../components/navigation/breadcrumb';
@@ -99,8 +100,8 @@ export const PC: Story = {
             <p>문의는 학사팀(062-715-2000)으로 해 주세요.</p>
           </Card.Content>
 
-          <Card.Footer className="flex-col items-stretch border-t">
-            <Item.Group size="tiny" aria-label="첨부 파일">
+          <Card.Footer className="flex-col items-stretch">
+            <ItemGroup size="tiny" aria-label="첨부 파일">
               {ATTACHMENTS.map((file) => (
                 <Item key={file.name}>
                   <Item.Media variant="soft">
@@ -120,14 +121,14 @@ export const PC: Story = {
                   </Item.Actions>
                 </Item>
               ))}
-            </Item.Group>
+            </ItemGroup>
           </Card.Footer>
         </article>
       </Card>
 
       <nav aria-label="다른 글">
         <Card size="tiny">
-          <Item.Group aria-label="이전 글과 다음 글">
+          <ItemGroup aria-label="이전 글과 다음 글">
             {NEIGHBORS.map((neighbor) => (
               <Item key={neighbor.id} asChild>
                 <a href={`#${neighbor.id}`}>
@@ -138,7 +139,7 @@ export const PC: Story = {
                 </a>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         </Card>
       </nav>
 

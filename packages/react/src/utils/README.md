@@ -33,8 +33,8 @@
 export const fieldAction = {
   base: cn(
     'shrink-0 text-neutral',
-    'data-hovered:text-neutral-bold data-active:text-neutral-bold',
-    'data-pressed:text-neutral-bold',
+    'data-hovered:text-neutral-strong data-active:text-neutral-strong',
+    'data-pressed:text-neutral-strong',
   ),
   // ...
 };

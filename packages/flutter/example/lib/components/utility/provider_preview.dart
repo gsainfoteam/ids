@@ -37,8 +37,8 @@ class ProviderPreview extends StatelessWidget {
           TextStyle body(Color color) =>
               ids.textStyle(IdsTypography.bodyB3Regular, color: color);
           return Material(
-            color: colors.bgNeutralSubtlest,
-            textStyle: body(colors.textNeutralBold),
+            color: colors.bgBase,
+            textStyle: body(colors.textNeutralStrong),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Center(
@@ -64,7 +64,7 @@ class ProviderPreview extends StatelessWidget {
                         'IDS mono: Aa Wi 0123',
                         style: ids.textStyle(
                           IdsTypography.bodyB3Regular,
-                          color: colors.textNeutralBold,
+                          color: colors.textNeutralStrong,
                           mono: true,
                         ),
                       ),
@@ -119,12 +119,12 @@ class FamilySwatch extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: ShapeDecoration(
-              color: role('bg-$family'),
+              color: role('bg-$family-solid'),
               shape: ids.shape(),
             ),
             child: Text(
-              '$family ${hexOf(role('bg-$family'))}',
-              style: on('text-on-$family'),
+              '$family ${hexOf(role('bg-$family-solid'))}',
+              style: on('text-on-$family-solid'),
             ),
           ),
         ),
@@ -132,10 +132,10 @@ class FamilySwatch extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: ShapeDecoration(
-              color: role('bg-$family-subtle'),
+              color: role('bg-$family-soft'),
               shape: ids.shape(side: BorderSide(color: role('border-$family'))),
             ),
-            child: Text('$family subtle', style: on('text-on-$family-subtle')),
+            child: Text('$family soft', style: on('text-on-$family-soft')),
           ),
         ),
         Expanded(child: Text(family, style: on('text-$family'))),
@@ -190,7 +190,7 @@ class ScopePreview extends StatelessWidget {
       width: 360,
       padding: const EdgeInsets.all(16),
       decoration: ShapeDecoration(
-        color: colors.bgPrimarySubtle,
+        color: colors.bgPrimarySoft,
         shape: ids.shape(radius: ids.radius.container),
       ),
       child: Column(
@@ -202,13 +202,13 @@ class ScopePreview extends StatelessWidget {
             '${ids.theme.primary == blue ? 'Blue' : 'Purple'} / ${ids.resolvedMode.name}',
             style: ids.textStyle(
               IdsTypography.bodyB3Regular,
-              color: colors.textOnPrimarySubtle,
+              color: colors.textOnPrimarySoft,
             ),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: colors.bgPrimary,
-              foregroundColor: colors.textOnPrimary,
+              backgroundColor: colors.bgPrimarySolid,
+              foregroundColor: colors.textOnPrimarySolid,
             ),
             onPressed: ids.toggleMode,
             child: Text('Toggle $name mode'),
