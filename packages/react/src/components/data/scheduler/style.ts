@@ -57,7 +57,7 @@ export const schedulerStyle = tv({
     ],
     event: [
       'min-h-0 overflow-hidden rounded-standard px-1.5 py-1',
-      'bg-scheme-soft text-on-scheme-soft [&_[data-item-description]]:text-on-scheme-soft',
+      'bg-scheme-soft text-on-scheme-soft state-scheme [&_[data-item-description]]:text-on-scheme-soft',
     ],
     now: [
       'pointer-events-none absolute inset-x-0 z-1 h-0.5 bg-danger-solid',
