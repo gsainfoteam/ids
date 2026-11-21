@@ -26,11 +26,11 @@ export const textAreaStyle = tv({
     input: [
       'w-full min-w-0 grow resize-none bg-transparent outline-none',
       'text-inherit placeholder:text-neutral',
-      'selection:bg-primary/30 selection:text-neutral-bold',
+      'selection:bg-primary-solid/30 selection:text-neutral-strong',
       'disabled:cursor-not-allowed',
       'py-(--text-area-pad-y)',
     ],
-    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-bold'],
+    count: ['ms-auto shrink-0 text-neutral tabular-nums', 'data-near-limit:text-neutral-strong'],
   },
   variants: {
     variant: {

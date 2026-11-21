@@ -88,7 +88,7 @@ import { ColorPicker } from '@gsainfoteam/ids-react';
 - `Swatches` 는 `RadioGroup`, `Swatch` 는 색 네모로 그린 `Radio` 입니다. 고른 색은 둘레의 고리로 보이고, `Swatch` 의 `ref` 와 속성은 라디오 input으로 갑니다.
 - 팔레트의 라디오는 어느 폼에도 속하지 않습니다. 피커를 폼 안에 두어도 제출되거나 검증되지 않습니다.
 - `swatches` 는 색 문자열이나 `{ value, label }` 입니다. 읽을 수 없는 색은 건너뜁니다. 이름이 없으면 값이 이름이 됩니다.
-- 반투명 색은 체크무늬 위에 그려서 투명도가 보입니다. 체크무늬는 `bg-neutral-subtlest` 와 `bg-neutral-subtle` 색이라 다크 모드에서도 튀지 않습니다.
+- 반투명 색은 체크무늬 위에 그려서 투명도가 보입니다. 체크무늬는 `bg-base` 와 `bg-neutral-soft` 색이라 다크 모드에서도 튀지 않습니다.
 
 ## 상태와 data 속성
 

@@ -6,20 +6,20 @@ const derivedChromaRatio = 1 / 3;
 
 const tertiaryHueTurn = 60.0;
 
-double _derivedChroma(IdsPalette primary) =>
+double _derivedChroma(IdsRamp primary) =>
     chromaRatioOf(primary.colors) * derivedChromaRatio;
 
-IdsPalette derivedSecondary(IdsPalette primary) =>
-    IdsPalette(paletteAtHue(hueOf(primary.colors), _derivedChroma(primary)));
+IdsRamp derivedSecondary(IdsRamp primary) =>
+    IdsRamp(rampAtHue(hueOf(primary.colors), _derivedChroma(primary)));
 
-bool _closeToAny(IdsPalette palette, Iterable<IdsPalette> others) =>
+bool _closeToAny(IdsRamp palette, Iterable<IdsRamp> others) =>
     others.any((other) => tooClose(palette[comparedStep], other[comparedStep]));
 
-IdsPalette derivedTertiary(IdsPalette primary, Iterable<IdsPalette> others) {
+IdsRamp derivedTertiary(IdsRamp primary, Iterable<IdsRamp> others) {
   final hue = hueOf(primary.colors);
   final chroma = _derivedChroma(primary);
-  final turned = IdsPalette(paletteAtHue(hue + tertiaryHueTurn, chroma));
+  final turned = IdsRamp(rampAtHue(hue + tertiaryHueTurn, chroma));
   return _closeToAny(turned, others)
-      ? IdsPalette(paletteAtHue(hue - tertiaryHueTurn, chroma))
+      ? IdsRamp(rampAtHue(hue - tertiaryHueTurn, chroma))
       : turned;
 }

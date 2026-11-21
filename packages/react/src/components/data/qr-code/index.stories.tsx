@@ -172,7 +172,7 @@ export const Contrast: Story = {
     docs: {
       description: {
         story:
-          '색은 `text-neutral-bold` 모듈에 `bg-neutral-subtlest` 바탕이라 다크 모드에서는 밝은 모듈이 어두운 바탕에 놓입니다. 휴대폰 카메라 앱은 반전된 코드도 읽지만 오래된 스캐너는 못 읽을 수 있습니다. 결제나 출입처럼 어떤 스캐너가 읽을지 모를 때는 `inverted={false}` 로 항상 밝은 바탕에 어두운 모듈을 그립니다.',
+          '색은 `text-neutral-strong` 모듈에 `bg-base` 바탕이라 다크 모드에서는 밝은 모듈이 어두운 바탕에 놓입니다. 휴대폰 카메라 앱은 반전된 코드도 읽지만 오래된 스캐너는 못 읽을 수 있습니다. 결제나 출입처럼 어떤 스캐너가 읽을지 모를 때는 `inverted={false}` 로 항상 밝은 바탕에 어두운 모듈을 그립니다.',
       },
     },
   },

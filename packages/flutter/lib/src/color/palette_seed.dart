@@ -87,7 +87,7 @@ List<Oklch> shadesOf(List<ModelShade> model, double chromaRatio) => [
     ),
 ];
 
-List<Color> paletteFromSeed(Color seed) {
+List<Color> rampFromSeed(Color seed) {
   final shade = oklchOf(seed);
   final model = modelAt(shade.h);
   final steps = shadesOf(model, chromaRatioAgainst(model, shade));
@@ -106,14 +106,14 @@ double chromaRatioOf(List<Color> palette) {
   return chromaRatioAgainst(modelAt(shade.h), shade);
 }
 
-List<Color> paletteAtHue(double hue, double chromaRatio) => [
+List<Color> rampAtHue(double hue, double chromaRatio) => [
   for (final step in shadesOf(modelAt(hue), chromaRatio)) colorOf(step),
 ];
 
 Oklch _turned(Oklch shade, double degrees) =>
     (l: shade.l, c: shade.c, h: shade.h + degrees);
 
-List<Color> rotatedPalette(List<Color> palette, double degrees) => [
+List<Color> rotatedRamp(List<Color> palette, double degrees) => [
   for (final color in palette) colorOf(_turned(oklchOf(color), degrees)),
 ];
 

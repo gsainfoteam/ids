@@ -207,5 +207,5 @@ test('SSR: glossy keeps the floating shadow and layers the highlight over its fi
   expect(node.dataset.variant).toBe('glossy');
   expect(node.className).toMatch(/(^| )shadow-lg( |$)/);
   expect(node.className).toMatch(/(^| )bg-linear-to-b( |$)/);
-  expect(node.className).toMatch(/(^| )bg-scheme( |$)/);
+  expect(node.className).toMatch(/(^| )bg-scheme-solid( |$)/);
 });

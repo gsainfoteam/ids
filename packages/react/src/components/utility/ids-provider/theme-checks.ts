@@ -18,9 +18,9 @@ const pathOf = (family: IdsColorFamily) =>
 
 const rounded = (value: number) => value.toFixed(3);
 
-export function checkColorDistinction({ palettes, given }: ResolvedColors): IdsThemeIssue[] {
+export function checkColorDistinction({ ramps, given }: ResolvedColors): IdsThemeIssue[] {
   const issues: IdsThemeIssue[] = [];
-  const fill = (family: Exclude<IdsColorFamily, 'neutral'>) => palettes[family][COMPARED_STEP];
+  const fill = (family: Exclude<IdsColorFamily, 'neutral'>) => ramps[family][COMPARED_STEP];
   const brands = IDS_BRAND_FAMILIES.filter((family) => given.includes(family));
 
   const tooClose = (
@@ -41,7 +41,7 @@ export function checkColorDistinction({ palettes, given }: ResolvedColors): IdsT
   for (const brand of brands) for (const status of IDS_STATUS_FAMILIES) tooClose(status, brand);
 
   for (const status of IDS_STATUS_FAMILIES) {
-    const hue = hueOf(palettes[status]);
+    const hue = hueOf(ramps[status]);
     if (!readsAs(status, hue)) {
       const { from, to } = STATUS_HUES[status];
       issues.push({

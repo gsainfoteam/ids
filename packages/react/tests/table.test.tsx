@@ -104,7 +104,7 @@ test('a row with onClick presses anywhere and hovers; selection stays a data att
   expect(header.hasAttribute('data-hoverable')).toBe(false);
 });
 
-test('the stripe is a muted row, and hover and selection lay the state layer over it', async () => {
+test('the stripe is a block row, and hover and selection lay the state layer over it', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <p>Outside</p>
@@ -121,7 +121,7 @@ test('the stripe is a muted row, and hover and selection lay the state layer ove
 
   await expect.element(row('Ada')).toBeInTheDocument();
   expect(background('Ada')).toBe('rgba(0, 0, 0, 0)');
-  expect(background('Grace')).toBe(colorOf('--ids-color-bg-neutral-subtle'));
+  expect(background('Grace')).toBe(colorOf('--ids-color-bg-block'));
   expect(layer('Ada')).toBe('0%');
   expect(layer('Linus')).toBe(press);
 
@@ -129,7 +129,7 @@ test('the stripe is a muted row, and hover and selection lay the state layer ove
   await expect.poll(() => layer('Ada')).toBe(hover);
   await userEvent.hover(row('Grace'));
   await expect.poll(() => layer('Grace')).toBe(hover);
-  expect(background('Grace')).toBe(colorOf('--ids-color-bg-neutral-subtle'));
+  expect(background('Grace')).toBe(colorOf('--ids-color-bg-block'));
   await userEvent.hover(row('Linus'));
   await expect.poll(() => layer('Linus')).toBe(press);
 });

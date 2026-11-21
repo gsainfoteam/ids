@@ -17,43 +17,39 @@ abstract final class IdsShadows {
 abstract final class IdsComponentTokens {
   static const colorRoles = <IdsMode, Map<String, String>>{
     IdsMode.light: {
-      'bg-panel': 'bg-neutral-subtlest',
-      'bg-band': 'bg-neutral-subtler',
-      'bg-control-outline': 'bg-neutral-subtlest',
+      'bg-control-outline': 'bg-base',
       'border-control-outline': 'border-neutral',
-      'bg-field-outline': 'bg-neutral-subtlest',
+      'bg-field-outline': 'bg-base',
       'border-field-outline': 'border-neutral',
       'border-field-bar': 'border-neutral',
-      'bg-field-code-outline': 'bg-neutral-subtle',
-      'bg-switch-thumb': 'bg-neutral-subtlest',
-      'bg-qr-code': 'bg-neutral-subtlest',
-      'text-qr-code': 'text-neutral-bold',
-      'bg-qr-code-inverse': 'bg-neutral-bold',
-      'text-qr-code-inverse': 'text-on-neutral-bold',
+      'bg-field-code-outline': 'bg-neutral-soft',
+      'bg-switch-thumb': 'bg-base',
+      'bg-qr-code': 'bg-base',
+      'text-qr-code': 'text-neutral-strong',
+      'bg-qr-code-inverse': 'bg-neutral-solid',
+      'text-qr-code-inverse': 'text-on-neutral-solid',
     },
     IdsMode.dark: {
-      'bg-panel': 'bg-neutral-subtler',
-      'bg-band': 'bg-neutral-subtle',
-      'bg-control-outline': 'bg-neutral-subtle',
-      'border-control-outline': 'bg-neutral',
-      'bg-field-outline': 'bg-neutral-subtle',
-      'border-field-outline': 'bg-neutral',
-      'border-field-bar': 'bg-neutral',
-      'bg-field-code-outline': 'bg-neutral-subtler',
-      'bg-switch-thumb': 'bg-neutral-bold',
-      'bg-qr-code': 'bg-neutral-bold',
-      'text-qr-code': 'text-on-neutral-bold',
-      'bg-qr-code-inverse': 'bg-neutral-subtlest',
-      'text-qr-code-inverse': 'text-neutral-bold',
+      'bg-control-outline': 'bg-block',
+      'border-control-outline': 'border-neutral-strong',
+      'bg-field-outline': 'bg-block',
+      'border-field-outline': 'border-neutral-strong',
+      'border-field-bar': 'border-neutral-strong',
+      'bg-field-code-outline': 'bg-surface',
+      'bg-switch-thumb': 'bg-neutral-solid',
+      'bg-qr-code': 'bg-neutral-solid',
+      'text-qr-code': 'text-on-neutral-solid',
+      'bg-qr-code-inverse': 'bg-base',
+      'text-qr-code-inverse': 'text-neutral-strong',
     },
   };
 
   static const shadowSteps = <IdsMode, Map<String, String>>{
     IdsMode.light: {
-      'shadow-panel': '1',
+      'shadow-surface': '1',
     },
     IdsMode.dark: {
-      'shadow-panel': '0',
+      'shadow-surface': '0',
     },
   };
 
@@ -64,8 +60,6 @@ abstract final class IdsComponentTokens {
 @immutable
 class IdsComponentColors {
   const IdsComponentColors({
-    required this.bgPanel,
-    required this.bgBand,
     required this.bgControlOutline,
     required this.borderControlOutline,
     required this.bgFieldOutline,
@@ -83,8 +77,6 @@ class IdsComponentColors {
     final roles = IdsComponentTokens.inMode(IdsComponentTokens.colorRoles, mode);
     Color token(String name) => colors[roles[name]!];
     return IdsComponentColors(
-      bgPanel: token('bg-panel'),
-      bgBand: token('bg-band'),
       bgControlOutline: token('bg-control-outline'),
       borderControlOutline: token('border-control-outline'),
       bgFieldOutline: token('bg-field-outline'),
@@ -99,8 +91,6 @@ class IdsComponentColors {
     );
   }
 
-  final Color bgPanel;
-  final Color bgBand;
   final Color bgControlOutline;
   final Color borderControlOutline;
   final Color bgFieldOutline;
@@ -114,8 +104,6 @@ class IdsComponentColors {
   final Color textQrCodeInverse;
 
   Map<String, Color> get tokens => {
-    'bg-panel': bgPanel,
-    'bg-band': bgBand,
     'bg-control-outline': bgControlOutline,
     'border-control-outline': borderControlOutline,
     'bg-field-outline': bgFieldOutline,
@@ -132,8 +120,6 @@ class IdsComponentColors {
   @override
   bool operator ==(Object other) =>
       other is IdsComponentColors &&
-      other.bgPanel == bgPanel &&
-      other.bgBand == bgBand &&
       other.bgControlOutline == bgControlOutline &&
       other.borderControlOutline == borderControlOutline &&
       other.bgFieldOutline == bgFieldOutline &&
@@ -153,24 +139,24 @@ class IdsComponentColors {
 @immutable
 class IdsComponentShadows {
   const IdsComponentShadows({
-    required this.shadowPanel,
+    required this.shadowSurface,
   });
 
   factory IdsComponentShadows.of(IdsMode mode) {
     final steps = IdsComponentTokens.inMode(IdsComponentTokens.shadowSteps, mode);
     List<BoxShadow> token(String name) => IdsShadows.steps[steps[name]!]!;
     return IdsComponentShadows(
-      shadowPanel: token('shadow-panel'),
+      shadowSurface: token('shadow-surface'),
     );
   }
 
-  final List<BoxShadow> shadowPanel;
+  final List<BoxShadow> shadowSurface;
 
   @override
   bool operator ==(Object other) =>
       other is IdsComponentShadows &&
-      listEquals(other.shadowPanel, shadowPanel);
+      listEquals(other.shadowSurface, shadowSurface);
 
   @override
-  int get hashCode => Object.hashAll([...shadowPanel]);
+  int get hashCode => Object.hashAll([...shadowSurface]);
 }

@@ -6,7 +6,7 @@ const fadeOffWhileItsRingShows = cn('focus-visible:mask-none');
 
 export const timePickerStyle = tv({
   slots: {
-    root: 'flex min-w-0 flex-wrap gap-1 text-neutral-bold',
+    root: 'flex min-w-0 flex-wrap gap-1 text-neutral-strong',
     header: 'flex w-full basis-full gap-1 text-neutral select-none',
     headerLabel: 'min-w-12 flex-1 text-center',
     separator: 'self-center text-neutral select-none',
@@ -23,8 +23,8 @@ export const timePickerStyle = tv({
       'cursor-pointer transition-[color,background-color,box-shadow,--ids-state-opacity] duration-(--ids-motion-fast) motion-reduce:transition-none',
       'state-layer not-data-disabled:hover:state-hover not-data-disabled:active:state-press',
       'group-focus-visible/column:data-active:state-hover',
-      'data-selected:bg-primary data-selected:font-medium data-selected:text-on-primary',
-      'group-focus-visible/column:data-selected:data-active:inset-ring-2 group-focus-visible/column:data-selected:data-active:inset-ring-(--ids-color-text-on-primary)/60',
+      'data-selected:bg-primary-solid data-selected:font-medium data-selected:text-on-primary-solid',
+      'group-focus-visible/column:data-selected:data-active:inset-ring-2 group-focus-visible/column:data-selected:data-active:inset-ring-(--ids-color-text-on-primary-solid)/60',
       'data-disabled:cursor-not-allowed data-disabled:opacity-50',
     ],
   },

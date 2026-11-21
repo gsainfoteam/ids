@@ -93,9 +93,9 @@ export const Gallery: Story = {
           <Radio
             defaultChecked
             aria-label="채운 원"
-            className="data-[state=checked]:bg-primary data-[state=checked]:inset-ring-primary"
+            className="data-[state=checked]:bg-primary-solid data-[state=checked]:inset-ring-primary-strong"
           >
-            <Radio.Indicator className="text-on-primary" />
+            <Radio.Indicator className="text-on-primary-solid" />
           </Radio>
         </Showcase.Row>
       </Showcase.Section>

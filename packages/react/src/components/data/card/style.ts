@@ -7,7 +7,7 @@ import type { IdsSize } from '../../../tokens/types';
 export const cardStyle = tv({
   slots: {
     root: [
-      'relative isolate flex flex-col text-neutral-bold',
+      'relative isolate flex flex-col text-neutral-strong',
       '[--card-pad:var(--ids-concentric-pad)]',
     ],
     header: [
@@ -35,9 +35,9 @@ export const cardStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'bg-panel shadow-panel inset-ring-1 inset-ring-neutral [--card-ring:1px]',
+        root: 'bg-surface shadow-surface inset-ring-1 inset-ring-neutral [--card-ring:1px]',
       },
-      soft: { root: 'bg-neutral-subtle [--card-ring:0px]' },
+      soft: { root: 'bg-block [--card-ring:0px]' },
       ghost: { root: 'bg-transparent [--card-ring:0px]', footer: 'bg-transparent' },
     } satisfies Record<CardVariant, object>,
     size: {

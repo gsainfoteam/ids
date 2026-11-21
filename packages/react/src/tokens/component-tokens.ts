@@ -7,21 +7,19 @@ export const IDS_SHADOWS = {
 } as const;
 
 export const IDS_COMPONENT_COLORS = {
-  'bg-panel': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-subtler' },
-  'bg-band': { light: 'bg-neutral-subtler', dark: 'bg-neutral-subtle' },
-  'bg-control-outline': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-subtle' },
-  'border-control-outline': { light: 'border-neutral', dark: 'bg-neutral' },
-  'bg-field-outline': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-subtle' },
-  'border-field-outline': { light: 'border-neutral', dark: 'bg-neutral' },
-  'border-field-bar': { light: 'border-neutral', dark: 'bg-neutral' },
-  'bg-field-code-outline': { light: 'bg-neutral-subtle', dark: 'bg-neutral-subtler' },
-  'bg-switch-thumb': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-bold' },
-  'bg-qr-code': { light: 'bg-neutral-subtlest', dark: 'bg-neutral-bold' },
-  'text-qr-code': { light: 'text-neutral-bold', dark: 'text-on-neutral-bold' },
-  'bg-qr-code-inverse': { light: 'bg-neutral-bold', dark: 'bg-neutral-subtlest' },
-  'text-qr-code-inverse': { light: 'text-on-neutral-bold', dark: 'text-neutral-bold' },
+  'bg-control-outline': { light: 'bg-base', dark: 'bg-block' },
+  'border-control-outline': { light: 'border-neutral', dark: 'border-neutral-strong' },
+  'bg-field-outline': { light: 'bg-base', dark: 'bg-block' },
+  'border-field-outline': { light: 'border-neutral', dark: 'border-neutral-strong' },
+  'border-field-bar': { light: 'border-neutral', dark: 'border-neutral-strong' },
+  'bg-field-code-outline': { light: 'bg-neutral-soft', dark: 'bg-surface' },
+  'bg-switch-thumb': { light: 'bg-base', dark: 'bg-neutral-solid' },
+  'bg-qr-code': { light: 'bg-base', dark: 'bg-neutral-solid' },
+  'text-qr-code': { light: 'text-neutral-strong', dark: 'text-on-neutral-solid' },
+  'bg-qr-code-inverse': { light: 'bg-neutral-solid', dark: 'bg-base' },
+  'text-qr-code-inverse': { light: 'text-on-neutral-solid', dark: 'text-neutral-strong' },
 } as const;
 
 export const IDS_COMPONENT_SHADOWS = {
-  'shadow-panel': { light: '1', dark: '0' },
+  'shadow-surface': { light: '1', dark: '0' },
 } as const;

@@ -45,7 +45,7 @@ export const Scale: Story = {
               </code>
               <span
                 data-bar=""
-                className="bg-primary h-4 rounded-full"
+                className="bg-primary-solid h-4 rounded-full"
                 style={{ width: `calc(var(--spacing) * ${step})` }}
               />
             </div>

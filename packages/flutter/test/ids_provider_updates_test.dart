@@ -30,7 +30,7 @@ class _ConsumerState extends State<_Consumer> {
       child: DecoratedBox(
         key: ValueKey('${widget.name}-surface'),
         decoration: ShapeDecoration(
-          color: scope.colors.bgPrimary,
+          color: scope.colors.bgPrimarySolid,
           shape: scope.shape(),
         ),
         child: Text(
@@ -38,7 +38,7 @@ class _ConsumerState extends State<_Consumer> {
           key: ValueKey(widget.name),
           style: scope.textStyle(
             IdsTypography.bodyB3Regular,
-            color: scope.colors.textOnPrimary,
+            color: scope.colors.textOnPrimarySolid,
           ),
         ),
       ),
@@ -89,14 +89,14 @@ void main() {
                   )
                   .decoration
               as ShapeDecoration;
-      expect(decoration.color, scopeOf(tester, 'child').colors.bgPrimary);
+      expect(decoration.color, scopeOf(tester, 'child').colors.bgPrimarySolid);
       expect(
         decoration.color,
         isNot(
           IdsResolvedTheme(
             theme: testTheme,
             mode: IdsMode.light,
-          ).colors.bgPrimary,
+          ).colors.bgPrimarySolid,
         ),
       );
       expect(decoration.shape, isA<RoundedSuperellipseBorder>());

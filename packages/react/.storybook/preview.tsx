@@ -62,10 +62,10 @@ const withIdsTheme: Decorator = (Story, context) => {
       onModeChange={(mode) => updateGlobals({ idsMode: mode })}
       className={
         oneBlockAmongMany
-          ? 'rounded-standard bg-neutral-subtlest text-neutral-bold w-full p-6'
+          ? 'rounded-standard bg-base text-neutral-strong w-full p-6'
           : pageFillsTheCanvas
-            ? 'bg-neutral-subtlest text-neutral-bold min-h-screen w-full'
-            : 'bg-neutral-subtlest text-neutral-bold min-h-screen w-full p-8'
+            ? 'bg-base text-neutral-strong min-h-screen w-full'
+            : 'bg-base text-neutral-strong min-h-screen w-full p-8'
       }
     >
       <PaintThePageBehindWideStories />

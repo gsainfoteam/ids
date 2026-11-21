@@ -6,7 +6,11 @@ import { Button } from '../../components/action/button';
 import { Card } from '../../components/data/card';
 import { TextField } from '../../components/form/text-field';
 import { IdsProvider } from '../../components/utility/ids-provider';
-import { IDS_COMPONENT_COLORS, IDS_COMPONENT_SHADOWS, IDS_SHADOWS } from '../../tokens/component-tokens';
+import {
+  IDS_COMPONENT_COLORS,
+  IDS_COMPONENT_SHADOWS,
+  IDS_SHADOWS,
+} from '../../tokens/component-tokens';
 import { cn } from '../../utils';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -43,11 +47,7 @@ function ColorRow({ token, role }: { token: string; role: string }) {
         className="rounded-indicator inset-ring-neutral size-7 inset-ring-1"
         style={{ background: `var(--ids-color-${token})` }}
       />
-      <span
-        data-role-swatch=""
-        hidden
-        style={{ background: `var(--ids-color-${role})` }}
-      />
+      <span data-role-swatch="" hidden style={{ background: `var(--ids-color-${role})` }} />
     </div>
   );
 }
@@ -61,7 +61,7 @@ function ShadowRow({ token, step }: { token: string; step: string }) {
       </code>
       <span
         data-token-swatch=""
-        className="rounded-indicator bg-panel size-7"
+        className="rounded-indicator bg-surface size-7"
         style={{ boxShadow: `var(--ids-${token})` }}
       />
     </div>
@@ -107,11 +107,13 @@ export const Table: Story = {
       const table = canvasElement.querySelector<HTMLElement>(`[data-token-table="${mode}"]`)!;
       const rows = [...table.querySelectorAll<HTMLElement>('[data-component-token]')];
 
-      await expect(rows.map((row) => row.dataset.componentToken)).toEqual(Object.keys(IDS_COMPONENT_COLORS));
+      await expect(rows.map((row) => row.dataset.componentToken)).toEqual(
+        Object.keys(IDS_COMPONENT_COLORS),
+      );
       for (const row of rows)
-        await expect(getComputedStyle(row.querySelector('[data-token-swatch]')!).backgroundColor).toBe(
-          getComputedStyle(row.querySelector('[data-role-swatch]')!).backgroundColor,
-        );
+        await expect(
+          getComputedStyle(row.querySelector('[data-token-swatch]')!).backgroundColor,
+        ).toBe(getComputedStyle(row.querySelector('[data-role-swatch]')!).backgroundColor);
     }
   },
 };
@@ -120,16 +122,33 @@ export const Surfaces: Story = {
   render: () => (
     <Showcase>
       <Showcase.Section
-        title="panel 과 band"
-        description="bg-panel 은 Card, Dialog, 팝업의 면입니다. 다크 모드에서는 페이지보다 한 단계 밝아 그림자 없이도 떠 보입니다. bg-band 는 면 안의 띠이고, outline 컨트롤은 두 면 어디서나 테두리나 바탕으로 구분됩니다."
+        title="base, surface, block"
+        description="bg-base 는 페이지, bg-surface 는 Card, Dialog, 팝업의 면입니다. 다크 모드에서 surface 는 페이지보다 한 단계 밝아 그림자 없이도 떠 보입니다. bg-block 은 base 나 surface 위에서 구역을 나누는 바탕(Card footer, soft Card)이고, outline 컨트롤은 세 바탕 어디서나 테두리나 바탕으로 구분됩니다."
       >
         <div className="flex flex-col gap-4">
           {modes.map((mode) => (
-            <IdsProvider.Scope key={mode} mode={mode} className="flex flex-wrap gap-4 concentric-p-4">
+            <IdsProvider.Scope
+              key={mode}
+              mode={mode}
+              className="concentric-p-4 flex flex-wrap gap-4"
+            >
               <Card variant="outline" className="w-72">
                 <Card.Header>
-                  <Card.Title>{mode} · bg-panel</Card.Title>
-                  <Card.Description>shadow-panel 은 라이트 모드에서만 그립니다.</Card.Description>
+                  <Card.Title>{mode} · bg-surface</Card.Title>
+                  <Card.Description>shadow-surface 은 라이트 모드에서만 그립니다.</Card.Description>
+                </Card.Header>
+                <Card.Content className="flex flex-col gap-3">
+                  <TextField aria-label="이름" placeholder="이름" />
+                  <Button variant="outline">outline</Button>
+                </Card.Content>
+                <Card.Footer className="justify-end">
+                  <Button variant="outline">bg-block footer</Button>
+                </Card.Footer>
+              </Card>
+              <Card variant="soft" className="w-72">
+                <Card.Header>
+                  <Card.Title>{mode} · bg-block</Card.Title>
+                  <Card.Description>soft Card 는 바탕 위의 구역입니다.</Card.Description>
                 </Card.Header>
                 <Card.Content className="flex flex-col gap-3">
                   <TextField aria-label="이름" placeholder="이름" />

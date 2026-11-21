@@ -239,10 +239,7 @@ export const MatchValidity: Story = {
 
 export const FieldState: Story = {
   render: () => (
-    <Field
-      className="rounded-standard data-focused:bg-neutral-subtler w-80 p-3 transition-colors"
-      required
-    >
+    <Field className="rounded-standard data-focused:bg-block w-80 p-3 transition-colors" required>
       <Field.Label>닉네임</Field.Label>
       <TextField placeholder="닉네임" />
       <Field.Description>
