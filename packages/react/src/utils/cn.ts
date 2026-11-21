@@ -23,7 +23,7 @@ const roundedGroups: DefaultClassGroupIds[] = [
 const config = {
   extend: {
     theme: {
-      radius: ['standard', 'indicator'],
+      radius: ['standard', 'indicator', 'container'],
       shadow: componentShadows,
     },
     classGroups: {

@@ -44,6 +44,7 @@
 | [`surfaces/toggle-surface.ts`](#surfacestoggle-surfacets)         | 켜진 모양을 그리는 toggle variant                                                     | Toggle, IconToggle                                                                                                                                                                                                    |
 | [`translate.ts`](#translatets)                   | `IdsProvider` 의 `translate`, `locale` context 와 `useTranslate`, `useProviderLocale` | `IdsProvider`, 문구를 그리는 모든 컴포넌트                                                                                                                                                                            |
 | [`use-checked-writes.ts`](#use-checked-writests) | 바깥 코드가 `input.checked` 에 직접 쓴 값을 알아채는 hook                             | Checkbox, Radio                                                                                                                                                                                                       |
+| [`use-copy-feedback.ts`](#use-copy-feedbackts)   | 클립보드에 쓰고 1.5초 동안 복사했다고 알리는 hook                                    | CodeBlock.Copy, Message.Copy |
 | [`zoom-pan/`](./zoom-pan/README.md)              | 그림의 확대, 이동, 관성, 아래로 쓸어 닫기 제스처                                      | Image |
 
 ## arc.tsx
@@ -1308,3 +1309,35 @@ useFormReset(inputRef, () => {
 - 컴포넌트가 `input.checked` 에 직접 쓸 때는 반드시 `silently(() => ...)` 안에서 씁니다. 그 안의 쓰기는 `writingSilently` 로 표시돼 모으지 않습니다. 밖에서 쓰면 자기 쓰기가 바깥 쓰기로 알려져 `onCheckedChange` 가 불립니다.
 - cleanup 은 인스턴스에 있던 descriptor 를 되돌리고, 없었으면 인스턴스 속성을 지워 prototype 의 setter 로 돌아갑니다.
 - 브라우저의 폼 reset 은 JS setter 를 거치지 않으므로 이 hook 이 보지 못합니다. reset 은 [`useFormReset`](../hooks/README.md#use-form-resetts) 이 맡습니다.
+
+## use-copy-feedback.ts
+
+복사 버튼의 hook 입니다. `read()` 가 돌려준 글을 클립보드에 쓰고, 쓰기에 성공하면 1.5초 동안 `copied` 를 `true` 로 둡니다.
+
+### 쓰는 곳
+
+- CodeBlock(`code-block/copy.tsx`), Message(`message/copy.tsx`)
+
+### 쓰는 법
+
+```tsx
+const { copied, copy } = useCopyFeedback(() => text ?? readContent());
+
+<IconButton
+  aria-label={copied ? t('message.copied') : t('message.copy')}
+  data-copied={copied ? '' : undefined}
+  onClick={mergeEventHandlers(onClick, copy)}
+/>
+<span role="status" className="sr-only">{copied ? t('message.copied') : ''}</span>
+```
+
+### 왜 이렇게
+
+- 글은 누를 때 `read()` 로 읽습니다. Message 는 본문의 `innerText` 를 그때 읽어야 바뀐 본문이 복사됩니다.
+- 상태는 불린이 아니라 복사한 횟수입니다. 1.5초 안에 다시 누르면 횟수가 바뀌어 effect 가 타이머를 새로 걸고, 마지막 복사로부터 1.5초를 셉니다.
+- `writeText` 가 거절되면(권한, 포커스 없음) `copied` 를 켜지 않습니다. 복사하지 못했는데 복사했다고 알리지 않기 위해서입니다.
+
+### 알아둘 것
+
+- 문구와 `role="status"` 알림은 컴포넌트가 그립니다. 문구 키가 컴포넌트마다 달라서입니다.
+- 클립보드를 쓸 수 없는 환경은 [`useClipboardSupport`](../hooks/README.md#use-clipboard-supportts) 로 먼저 거릅니다. 이 hook 은 그 판정을 하지 않습니다.
