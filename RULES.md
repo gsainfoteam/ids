@@ -531,7 +531,8 @@ palette model, or the ramp an app passes), by `SCALE_RULES` in `ids-provider/pal
 - 6, the strong border, is the first ramp step from 300 (dark: 900) outward that reaches Lc 45 on
   `bg-base`, `bg-surface`, `bg-block` and the family's `bg-X-soft`.
 - 8, the text, is the first step from the solid outward that reaches Lc 60 on those four under the
-  hover and press layers; 9, the strong text, the first from there that reaches Lc 75.
+  hover and press layers; 9, the strong text, the first step beyond the text that reaches Lc 75,
+  so the two never match.
 - An app may also pass both scales itself; the provider then only checks them.
 
 `text-on-{background}` is computed for each background (`textOn`): from the end of that family's

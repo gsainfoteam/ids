@@ -256,6 +256,11 @@ function readableSolid(ramp: IdsRamp, stepsOutward: ScaleRule['solid']): IdsRamp
 const firstStep = (candidates: readonly IdsRampStep[], passes: (step: IdsRampStep) => boolean) =>
   candidates.find(passes) ?? candidates[candidates.length - 1]!;
 
+const stepsBeyond = (outward: readonly IdsRampStep[], step: IdsRampStep) => {
+  const beyond = outward.slice(outward.indexOf(step) + 1);
+  return beyond.length > 0 ? beyond : [step];
+};
+
 export const textBases = (neutral: IdsScale, soft: string) => [
   stepOf(neutral, SCALE_STEP.base),
   stepOf(neutral, SCALE_STEP.surface),
@@ -277,7 +282,7 @@ export function scaleFromRamp(ramp: IdsRamp, mode: IdsMode, neutral: IdsScale): 
   const strongBorder = firstStep(rule.strongBorder, (step) => reaches(ramp[step], bases, MARK_LC));
   const fromTheSolid = rule.outward.slice(rule.outward.indexOf(solidStep));
   const text = firstStep(fromTheSolid, (step) => readsOn(ramp[step], bases, solid, ACCENT_TEXT_LC));
-  const strongText = firstStep(fromTheSolid.slice(fromTheSolid.indexOf(text)), (step) =>
+  const strongText = firstStep(stepsBeyond(fromTheSolid, text), (step) =>
     readsOn(ramp[step], bases, solid),
   );
 

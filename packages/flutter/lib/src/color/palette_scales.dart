@@ -319,6 +319,11 @@ int _readableSolid(IdsRamp ramp, List<List<int>> stepsOutward) {
 int _firstStep(List<int> candidates, bool Function(int step) passes) =>
     candidates.firstWhere(passes, orElse: () => candidates.last);
 
+List<int> _stepsBeyond(List<int> outward, int step) {
+  final beyond = outward.sublist(outward.indexOf(step) + 1);
+  return beyond.isNotEmpty ? beyond : [step];
+}
+
 List<Color> textBases(List<Color> neutral, Color soft) => [
   stepOf(neutral, ScaleStep.base),
   stepOf(neutral, ScaleStep.surface),
@@ -354,7 +359,7 @@ List<Color> scaleFromRamp(IdsRamp ramp, IdsMode mode, List<Color> neutral) {
     (step) => readsOn(ramp[step], bases, solid, accentTextLc),
   );
   final strongText = _firstStep(
-    fromTheSolid.sublist(fromTheSolid.indexOf(text)),
+    _stepsBeyond(fromTheSolid, text),
     (step) => readsOn(ramp[step], bases, solid),
   );
 

@@ -103,7 +103,7 @@ IDS 색은 네 층입니다. 팔레트(계열마다 라이트와 다크의 9단�
 - 대비는 APCA 의 Lc 입니다.
   - solid 는 600 에서 시작해 흰 글자나 neutral 950 이 Lc 75 에 닿을 때까지 이웃 단계로 옮깁니다.
   - 진한 선은 300(다크 900)부터, base, surface, block, 자기 soft 위에서 Lc 45 를 넘는 첫 단계입니다.
-  - 글자는 solid 단계부터 바깥으로 Lc 60 을, 진한 글자는 거기서 Lc 75 를 넘는 첫 단계입니다.
+  - 글자는 solid 단계부터 바깥으로 Lc 60 을, 진한 글자는 글자 다음 단계부터 Lc 75 를 넘는 첫 단계입니다. 그래서 둘이 같은 색이 되지 않습니다.
   - 모두 쉴 때뿐 아니라 hover, press 층 아래에서도 잽니다.
   - 다크 1~5단계는 같은 번호 neutral 의 밝기에 놓고, 램프 끝(950)의 채도를 밝기 비율의 제곱근만큼 남깁니다. 단순히 섞을 때보다 덜 칙칙합니다. 규칙은 [IdsProvider](../../components/utility/ids-provider/README.md#팔레트에서-역할-색-고르기) 에 있습니다.
 - Storybook 툴바의 Primary 는 레포 데모 팔레트 17개(Tailwind CSS v4 기본 색, `orange` 와 `green` 은 IDS 고유 값)에서 고릅니다. 패키지에는 들어 있지 않습니다.

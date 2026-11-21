@@ -140,6 +140,22 @@ test(
   },
 );
 
+test(
+  'strong text is a step beyond text, so the two never read the same',
+  { timeout: SWEEP_OF_EVERY_SEED_MS },
+  () => {
+    const same = [...everySeed(), ...Object.values(STATUS_PALETTES).map((steps) => steps[6]!)]
+      .flatMap((seed) =>
+        (['light', 'dark'] as const).map(
+          (mode) => [seed, mode, createIdsPalette(seed)![mode]] as const,
+        ),
+      )
+      .filter(([, , scale]) => scale[7] === scale[8])
+      .map(([seed, mode]) => `${seed} ${mode}`);
+    expect(same).toEqual([]);
+  },
+);
+
 test('the dark surfaces of a built scale sit at the lightness of the dark neutral, with the ramp hue', () => {
   const darkSurfaces = SCALE_RULES.dark.surfaces.length;
 
