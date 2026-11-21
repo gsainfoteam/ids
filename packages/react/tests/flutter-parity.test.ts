@@ -19,6 +19,8 @@ const STATUSES: IdsStatus[] = ['harmonized', 'fixed'];
 
 const FIXTURE = '../../core/tests/fixtures/theme-roles.json';
 
+const EVERY_PALETTE_RESOLVES_ON_A_RUNNER_SHARED_WITH_THE_BROWSER_TESTS_MS = 30_000;
+
 function resolvedRoles(primary: (typeof paletteHues)[number], neutral: IdsNeutral, status: IdsStatus) {
   const { colors } = resolveColors({ primary: palettes[primary], neutral, status });
   return {
@@ -42,13 +44,17 @@ function resolvedRoles(primary: (typeof paletteHues)[number], neutral: IdsNeutra
   };
 }
 
-test('the fixture ids_flutter checks its roles against is what React resolves', async () => {
-  const themes = paletteHues.flatMap((primary) =>
-    NEUTRALS.flatMap((neutral) => STATUSES.map((status) => resolvedRoles(primary, neutral, status))),
-  );
-  const fixture = `{\n"roles": ${JSON.stringify(ROLES)},\n"families": ${JSON.stringify(IDS_COLOR_FAMILIES)},\n"components": ${JSON.stringify(COMPONENT_COLORS)},\n"themes": [\n${themes
-    .map((theme) => JSON.stringify(theme))
-    .join(',\n')}\n]\n}\n`;
+test(
+  'the fixture ids_flutter checks its roles against is what React resolves',
+  { timeout: EVERY_PALETTE_RESOLVES_ON_A_RUNNER_SHARED_WITH_THE_BROWSER_TESTS_MS },
+  async () => {
+    const themes = paletteHues.flatMap((primary) =>
+      NEUTRALS.flatMap((neutral) => STATUSES.map((status) => resolvedRoles(primary, neutral, status))),
+    );
+    const fixture = `{\n"roles": ${JSON.stringify(ROLES)},\n"families": ${JSON.stringify(IDS_COLOR_FAMILIES)},\n"components": ${JSON.stringify(COMPONENT_COLORS)},\n"themes": [\n${themes
+      .map((theme) => JSON.stringify(theme))
+      .join(',\n')}\n]\n}\n`;
 
-  await expect(fixture).toMatchFileSnapshot(FIXTURE);
-});
+    await expect(fixture).toMatchFileSnapshot(FIXTURE);
+  },
+);
