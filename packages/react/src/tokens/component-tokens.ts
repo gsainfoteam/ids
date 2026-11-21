@@ -14,6 +14,7 @@ export const IDS_COMPONENT_COLORS = {
   'border-field-bar': { light: 'border-neutral', dark: 'border-neutral-strong' },
   'bg-field-code-outline': { light: 'bg-neutral-soft', dark: 'bg-surface' },
   'bg-switch-thumb': { light: 'bg-base', dark: 'bg-neutral-solid' },
+  'bg-segment': { light: 'bg-base', dark: 'border-neutral-strong' },
   'bg-qr-code': { light: 'bg-base', dark: 'bg-neutral-solid' },
   'text-qr-code': { light: 'text-neutral-strong', dark: 'text-on-neutral-solid' },
   'bg-qr-code-inverse': { light: 'bg-neutral-solid', dark: 'bg-base' },

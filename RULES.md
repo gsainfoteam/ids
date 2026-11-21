@@ -554,10 +554,12 @@ chart dot. A brand family the theme leaves out (`secondary`, `tertiary`) is deri
 **Structural lines are neutral.** Field borders, card edges, dividers and group seams use
 `border-neutral` (neutral step 5), the way shadcn/ui keeps chrome gray and lets
 only content and focus carry color. Buttons follow the same rule: only `solid` and `soft` carry
-the theme color, while `outline` and `ghost` stay neutral. `border-neutral` and every family's
-`border-X` are pale lines, decorative and exempt from contrast. A colored line that must read (the
-focus ring, an invalid field's border, the rare edge that should itself read as that color) is
-`border-X-strong`, which reaches Lc 45.
+the theme color, while `outline` and `ghost` stay neutral. A current or selected mark is content,
+not chrome: the current Pagination page in `ghost` and the selected Tabs label take `text-X`.
+`border-neutral` and every family's `border-X` are pale lines, decorative and exempt from
+contrast. A colored line that must read (the focus ring, an invalid field's border, the selected
+Tabs underline, the rare edge that should itself read as that color) is `border-X-strong`, which
+reaches Lc 45.
 
 **Each family has one role per background.** A fill (`bg-primary-solid`) carries
 `text-on-primary-solid`; a soft fill is `bg-primary-soft` with `text-on-primary-soft`; text or an
@@ -663,6 +665,14 @@ Developer warnings stay English and out of the catalog. A default that has to be
 take `locale ?? useProviderLocale() ?? default`. `tests/messages.test.ts` checks the catalogs, the
 keys and that no Korean literal sits in component code; `tests/translate.test.tsx` renders every
 story in English.
+
+**Variants are the looks an app cannot build from IDS parts.** A `variant` or `appearance` value is
+a component's own basic look that only CSS inside IDS can draw: Button's `solid`, `soft`, `outline`
+and `ghost`, Tabs' `underline`, `pill`, `enclosed` and `segmented`. A look an app can compose from
+IDS components and props (a Card holding a Tabs, a Field around a SegmentedControl) stays a
+composition and never becomes a prop value. Two components that read alike share an internal
+surface (`internal/surfaces/segment-surface.ts` for SegmentedControl and segmented Tabs) instead of
+one copying the other's classes.
 
 **Callbacks.** A value callback is `onValueChange(value)`; other state callbacks are
 `onCheckedChange`, `onPressedChange`, `onOpenChange` and so on. `onChange` keeps the native event

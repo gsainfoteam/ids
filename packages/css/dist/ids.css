@@ -186,6 +186,7 @@
   --stroke-field-bar: var(--ids-color-border-field-bar);
   --background-color-field-code-outline: var(--ids-color-bg-field-code-outline);
   --background-color-switch-thumb: var(--ids-color-bg-switch-thumb);
+  --background-color-segment: var(--ids-color-bg-segment);
   --background-color-qr-code: var(--ids-color-bg-qr-code);
   --text-color-qr-code: var(--ids-color-text-qr-code);
   --fill-qr-code: var(--ids-color-text-qr-code);
@@ -1821,6 +1822,7 @@
   --ids-color-border-field-bar: var(--ids-color-border-neutral);
   --ids-color-bg-field-code-outline: var(--ids-color-bg-neutral-soft);
   --ids-color-bg-switch-thumb: var(--ids-color-bg-base);
+  --ids-color-bg-segment: var(--ids-color-bg-base);
   --ids-color-bg-qr-code: var(--ids-color-bg-base);
   --ids-color-text-qr-code: var(--ids-color-text-neutral-strong);
   --ids-color-bg-qr-code-inverse: var(--ids-color-bg-neutral-solid);
@@ -1906,6 +1908,7 @@
   --ids-color-border-field-bar: var(--ids-color-border-neutral-strong);
   --ids-color-bg-field-code-outline: var(--ids-color-bg-surface);
   --ids-color-bg-switch-thumb: var(--ids-color-bg-neutral-solid);
+  --ids-color-bg-segment: var(--ids-color-border-neutral-strong);
   --ids-color-bg-qr-code: var(--ids-color-bg-neutral-solid);
   --ids-color-text-qr-code: var(--ids-color-text-on-neutral-solid);
   --ids-color-bg-qr-code-inverse: var(--ids-color-bg-base);

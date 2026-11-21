@@ -187,9 +187,9 @@ export function CalendarRoot(props: CalendarProps) {
         footer={footer}
         modifiers={api.modifiers(modifiers)}
         modifiersClassNames={{
-          range_preview: styles.rangeMiddle(),
-          range_preview_start: styles.rangeStart(),
-          range_preview_end: styles.rangeEnd(),
+          range_preview: styles.previewMiddle(),
+          range_preview_start: styles.previewStart(),
+          range_preview_end: styles.previewEnd(),
           ...modifiersClassNames,
         }}
         style={typeof style === 'function' ? style(state) : style}

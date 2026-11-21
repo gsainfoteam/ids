@@ -24,6 +24,7 @@ abstract final class IdsComponentTokens {
       'border-field-bar': 'border-neutral',
       'bg-field-code-outline': 'bg-neutral-soft',
       'bg-switch-thumb': 'bg-base',
+      'bg-segment': 'bg-base',
       'bg-qr-code': 'bg-base',
       'text-qr-code': 'text-neutral-strong',
       'bg-qr-code-inverse': 'bg-neutral-solid',
@@ -37,6 +38,7 @@ abstract final class IdsComponentTokens {
       'border-field-bar': 'border-neutral-strong',
       'bg-field-code-outline': 'bg-surface',
       'bg-switch-thumb': 'bg-neutral-solid',
+      'bg-segment': 'border-neutral-strong',
       'bg-qr-code': 'bg-neutral-solid',
       'text-qr-code': 'text-on-neutral-solid',
       'bg-qr-code-inverse': 'bg-base',
@@ -67,6 +69,7 @@ class IdsComponentColors {
     required this.borderFieldBar,
     required this.bgFieldCodeOutline,
     required this.bgSwitchThumb,
+    required this.bgSegment,
     required this.bgQrCode,
     required this.textQrCode,
     required this.bgQrCodeInverse,
@@ -84,6 +87,7 @@ class IdsComponentColors {
       borderFieldBar: token('border-field-bar'),
       bgFieldCodeOutline: token('bg-field-code-outline'),
       bgSwitchThumb: token('bg-switch-thumb'),
+      bgSegment: token('bg-segment'),
       bgQrCode: token('bg-qr-code'),
       textQrCode: token('text-qr-code'),
       bgQrCodeInverse: token('bg-qr-code-inverse'),
@@ -98,6 +102,7 @@ class IdsComponentColors {
   final Color borderFieldBar;
   final Color bgFieldCodeOutline;
   final Color bgSwitchThumb;
+  final Color bgSegment;
   final Color bgQrCode;
   final Color textQrCode;
   final Color bgQrCodeInverse;
@@ -111,6 +116,7 @@ class IdsComponentColors {
     'border-field-bar': borderFieldBar,
     'bg-field-code-outline': bgFieldCodeOutline,
     'bg-switch-thumb': bgSwitchThumb,
+    'bg-segment': bgSegment,
     'bg-qr-code': bgQrCode,
     'text-qr-code': textQrCode,
     'bg-qr-code-inverse': bgQrCodeInverse,
@@ -127,6 +133,7 @@ class IdsComponentColors {
       other.borderFieldBar == borderFieldBar &&
       other.bgFieldCodeOutline == bgFieldCodeOutline &&
       other.bgSwitchThumb == bgSwitchThumb &&
+      other.bgSegment == bgSegment &&
       other.bgQrCode == bgQrCode &&
       other.textQrCode == textQrCode &&
       other.bgQrCodeInverse == bgQrCodeInverse &&
