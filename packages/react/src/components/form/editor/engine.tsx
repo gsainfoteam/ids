@@ -20,8 +20,8 @@ import { documentStarterKit } from '../../typography/rich-text/schema/starter-ki
 import type { FeatureExtensions } from './load-engine';
 import type { EditorMention, FindMentions } from './mention';
 import type { Translate } from '../../../internal/translate';
+import type { IdsSize } from '../../../tokens/types';
 import type { AnyExtension, Editor as TiptapEditor, Extensions } from '@tiptap/core';
-import type { ImageOptions } from '@tiptap/extension-image';
 
 export { EditorContent };
 export { EditorSlashMenu } from './slash/menu';
@@ -38,17 +38,11 @@ export type ImageSetup = {
   start: (editor: TiptapEditor, files: File[], at: number) => void;
 };
 
-const IMAGE_RESIZE = {
-  enabled: true,
-  directions: ['left', 'right'],
-  minWidth: 48,
-  alwaysPreserveAspectRatio: true,
-} as const satisfies ImageOptions['resize'];
-
 const placeholderOfTheTextbox = ({ editor }: { editor: TiptapEditor }) =>
   editor.view.dom.getAttribute('aria-placeholder') ?? '';
 
 export function extensionsFor({
+  size,
   maxLength,
   markdown,
   features,
@@ -57,6 +51,7 @@ export function extensionsFor({
   t,
   findMentions,
 }: {
+  size: IdsSize;
   maxLength: number | undefined;
   markdown: AnyExtension | undefined;
   features: FeatureExtensions;
@@ -82,7 +77,7 @@ export function extensionsFor({
     EditorImageNode.configure({
       uploaded: images.uploaded,
       insertable: !!features.imageUpload,
-      resize: markdown ? false : IMAGE_RESIZE,
+      resizable: !markdown,
     }),
     ...(features.imageUpload ? features.imageUpload.imageUploadExtensions(images.start) : []),
     ...(features.highlight ? [features.highlight] : []),
@@ -90,16 +85,9 @@ export function extensionsFor({
     ...(features.textAlign
       ? [features.textAlign.configure({ types: ['heading', 'paragraph'] })]
       : []),
-    ...(features.table
-      ? [
-          features.table.Table.configure({ resizable: false }),
-          features.table.TableRow,
-          features.table.TableHeader,
-          features.table.TableCell,
-        ]
-      : []),
+    ...(features.table ? features.table(size) : []),
     ...(features.callout ? [features.callout] : []),
-    ...(features.details ?? []),
+    ...(features.details ? features.details(size) : []),
     ...(features.mention && mentionMenu
       ? [features.mention.mentionExtension(mentionMenu, findMentions)]
       : []),

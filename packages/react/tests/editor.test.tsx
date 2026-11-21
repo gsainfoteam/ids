@@ -10,6 +10,7 @@ import { testTheme } from './theme';
 import { Button, Dialog, Field, IdsProvider } from '../src';
 import { toast } from '../src/components/feedback/toast';
 import { Editor } from '../src/editor';
+import { RichText } from '../src/rich-text';
 
 const MOD_AS_PROSEMIRROR_READS_IT = /Mac|iP(hone|[oa]d)/.test(navigator.platform)
   ? 'Meta'
@@ -1448,7 +1449,7 @@ test('Image hands Choose files to the file picker', async () => {
   await expect.element(page.getByRole('textbox', { name: '그림 주소' })).not.toBeInTheDocument();
 });
 
-test('an image is resized by its side handle, and HTML keeps the width', async (context) => {
+test('an image is resized by its Resizable handle, and HTML keeps the width', async (context) => {
   skipWithoutCdp(context);
   const onValueChange = vi.fn();
   render(
@@ -1463,7 +1464,7 @@ test('an image is resized by its side handle, and HTML keeps the width', async (
   await expect.poll(() => content.element().querySelector('img')?.complete).toBe(true);
   const image = content.element().querySelector('img')!;
   await expect.element(page.elementLocator(image)).toBeVisible();
-  const handle = content.element().querySelector('[data-resize-handle="right"]')!;
+  const handle = content.element().querySelector('[data-resizable-handle]')!;
   const start = centerOf(handle);
 
   const press = (type: 'mousePressed' | 'mouseMoved' | 'mouseReleased', point: Point) =>
@@ -1482,6 +1483,27 @@ test('an image is resized by its side handle, and HTML keeps the width', async (
   await expect.poll(() => onValueChange.mock.lastCall?.[0]).toMatch(/<img [^>]*width="120"/);
 });
 
+test('an image width also changes from the keyboard on its Width separator', async () => {
+  const onValueChange = vi.fn();
+  render(
+    <Editor
+      aria-label="본문"
+      defaultValue='<img src="/map.png" width="200">'
+      onImageUpload={async () => PICTURE}
+      onValueChange={onValueChange}
+    />,
+  );
+  await editable('본문');
+  const separator = page.getByRole('separator', { name: '너비' });
+  await expect.element(separator).toBeInTheDocument();
+  separator.element().focus();
+  await userEvent.keyboard('{ArrowRight}');
+
+  await expect
+    .poll(() => onValueChange.mock.lastCall?.[0])
+    .toBe('<img src="/map.png" width="216">');
+});
+
 test('a markdown Editor draws no resize handles, since markdown keeps no width', async () => {
   render(
     <Editor
@@ -1493,5 +1515,43 @@ test('a markdown Editor draws no resize handles, since markdown keeps no width',
   );
   const content = await editable('본문');
   await expect.poll(() => content.element().querySelector('img')).not.toBeNull();
-  expect(content.element().querySelector('[data-resize-handle]')).toBeNull();
+  expect(content.element().querySelector('[data-resizable-handle]')).toBeNull();
+});
+
+function lineCenterOf(paragraph: Element) {
+  const range = document.createRange();
+  range.selectNodeContents(paragraph);
+  const [line] = range.getClientRects();
+  return line!.top + line!.height / 2;
+}
+
+function boxCenterOf(item: Element) {
+  const { top, height } = item.querySelector('[data-state]')!.getBoundingClientRect();
+  return top + height / 2;
+}
+
+test('a task checkbox sits on the middle of its first line, in Editor and in RichText', async () => {
+  const tasks =
+    '<ul data-type="taskList"><li data-type="taskItem" data-checked="true"><p>부스 신청</p></li></ul>';
+  render(
+    <IdsProvider theme={testTheme}>
+      <Editor aria-label="본문" defaultValue={tasks}>
+        <Editor.TaskList />
+        <Editor.Content />
+      </Editor>
+      <div data-testid="rich-text">
+        <RichText value={'- [x] 부스 신청'} />
+      </div>
+    </IdsProvider>,
+  );
+  const content = await editable('본문');
+  await expect.poll(() => content.element().querySelector('li[data-checked] p')).not.toBeNull();
+
+  for (const item of [
+    content.element().querySelector('li[data-checked]')!,
+    page.getByTestId('rich-text').element().querySelector('li[data-checked]')!,
+  ])
+    expect(
+      Math.abs(boxCenterOf(item) - lineCenterOf(item.querySelector('p')!)),
+    ).toBeLessThanOrEqual(1);
 });

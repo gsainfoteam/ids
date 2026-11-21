@@ -3,7 +3,7 @@
 굵게, 목록, 링크 같은 서식을 넣는 글 편집기입니다. [Tiptap](https://tiptap.dev) 3 (ProseMirror) 위에서 돌고, 테두리와 툴바, 글자 수는 IDS 컴포넌트로 그립니다.
 
 - **따로 가져옴.** `@gsainfoteam/ids-react/editor` 에서 가져옵니다. Editor 를 쓰지 않는 앱의 번들에는 Tiptap 이 들어가지 않습니다.
-- **엔진은 나중에 불러옴.** `import { Editor }` 는 테두리, 툴바, 부품만 가져옵니다(약 115 kB). Tiptap 은 Editor 가 마운트될 때 `import()` 로 따로 불러오므로(약 237 kB) 첫 화면의 JavaScript 에 들어가지 않습니다.
+- **엔진은 나중에 불러옴.** `import { Editor }` 는 테두리, 툴바, 부품만 가져옵니다(약 114 kB). Tiptap 은 Editor 가 마운트될 때 `import()` 로 따로 불러오므로(약 245 kB) 첫 화면의 JavaScript 에 들어가지 않습니다.
 - **RichText 와 같은 문서.** 스키마와 글자 스타일을 [RichText](../../typography/rich-text/README.md) 와 함께 씁니다. Editor 로 쓴 글을 RichText 로 서버에서 그리면 같은 모양이 됩니다.
 - **필드와 같은 테두리.** TextField, TextArea 와 같은 `field-surface` 라 `outline`, `soft`, 포커스 링, 오류 테두리가 같습니다.
 - **폼에 들어감.** `name` 을 주면 숨은 input 으로 FormData 에 들어가고, `required` 면 빈 본문의 제출을 브라우저가 막습니다. Field 안에 두면 라벨, 설명, 오류가 본문에 연결됩니다.
@@ -137,7 +137,9 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 
 ## 코드 블록, 콜아웃, 접는 블록
 
-- 코드 블록은 [CodeBlock](../../data/code-block/README.md) 과 같은 색으로 칠합니다. 언어를 고르면 마크다운에 ```` ```python ```` 처럼 남습니다.
+- 본문의 블록은 RichText 가 그리는 IDS 컴포넌트와 같은 모양입니다. 그래서 Editor 로 쓴 글을 RichText 로 그려도 모양이 같습니다.
+  - 코드 블록은 [CodeBlock](../../data/code-block/README.md) 의 모양, 색, 복사 버튼을 씁니다. 언어 이름 자리에 언어 Select 가 있습니다. 언어를 고르면 마크다운에 ```` ```python ```` 처럼 남습니다.
+  - 콜아웃은 [Alert](../../feedback/alert/README.md), 접는 블록은 [Accordion](../../data/accordion/README.md), 표는 [Table](../../data/table/README.md) 의 모양입니다.
 - 콜아웃은 GitHub 의 `> [!NOTE]` 문법으로 저장합니다. 왼쪽 아이콘을 누르면 종류를 바꾸거나 콜아웃을 풉니다.
 - 접는 블록은 요약과 내용을 모두 고칠 수 있고, 오른쪽 버튼으로 펼치고 접습니다. 펼친 상태도 값에 남습니다.
 
@@ -165,7 +167,10 @@ import { Editor } from '@gsainfoteam/ids-react/editor';
 - 올리기에 실패하면(Promise 가 거부되거나 주소가 아니면) 자리표시를 지우고 toast 로 알립니다. 오류는 앱이 Field 오류로 다시 그릴 값의 문제가 아니라 한 번의 작업 결과라서 toast 입니다. IdsProvider 가 기본 Toaster 를 둡니다.
 - 그림을 누르거나 화살표로 고른 채 `Editor.Image` 를 누르면 대체 텍스트를 넣는 Popover 가 열립니다. 새 그림의 대체 텍스트는 `""` 입니다. 파일 이름은 그림을 설명하지 않아서 넣지 않습니다.
 - 그림은 `html`, `markdown`(`![대체 텍스트](주소)`), `json` 모두에서 주소와 대체 텍스트가 그대로 오갑니다.
-- `html` 과 `json` 에서는 그림 좌우의 손잡이를 끌어 너비를 바꿉니다. 비율은 그대로 두고, 너비는 `width` 로 저장합니다. 마크다운은 너비를 담지 못해 손잡이가 없습니다.
+- `html` 과 `json` 에서는 그림이 [Resizable](../../layout/resizable/README.md) 안에 들어가, 끝 가장자리의 손잡이로 너비를 바꿉니다. 손잡이는 그림에 마우스를 올리거나 그림을 골랐을 때 보입니다.
+  - 손잡이는 `role="separator"` 라 포커스를 두고 방향키로도 너비를 바꿉니다.
+  - 비율은 그대로 두고, 너비는 `width` 로 저장합니다. 본문 너비를 넘지 않습니다.
+  - 마크다운은 너비를 담지 못해 손잡이가 없습니다.
 - `onImageUpload` 가 없으면 그림을 넣는 길이 모두 닫힙니다. `Editor.Image` 는 그리지 않고, 파일은 붙지 않고, 붙여 넣은 HTML 의 `<img>` 는 버립니다. 값에 이미 있던 그림은 그대로 보입니다.
 - 그림이 되는 주소는 `http:`, `https:`, 스킴 없는 상대 주소, 그리고 이 Editor 의 `onImageUpload` 가 돌려준 주소뿐입니다. `javascript:` 나 `data:` 는 값, 마크다운, JSON, 붙여넣기 어디서 와도 그림이 되지 않습니다.
 - 그래서 `data:` 나 `blob:` 을 돌려주는 업로드는 그 화면에서만 그림이 남습니다. 저장했다가 다시 열면 사라지므로 서버 주소를 돌려줍니다.

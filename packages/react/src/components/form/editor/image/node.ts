@@ -1,6 +1,8 @@
 import { Fragment, Slice, type Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { Plugin } from '@tiptap/pm/state';
+import { ReactNodeViewRenderer } from '@tiptap/react';
 
+import { EditorImageView } from './view';
 import {
   DocumentImage,
   type DocumentImageOptions,
@@ -25,14 +27,18 @@ const pastedImagesAreDropped = new Plugin({
   },
 });
 
-export const EditorImageNode = DocumentImage.extend<DocumentImageOptions & { insertable: boolean }>(
-  {
-    addOptions() {
-      return { ...(this.parent?.() as DocumentImageOptions), insertable: false };
-    },
+type EditorImageOptions = DocumentImageOptions & { insertable: boolean; resizable: boolean };
 
-    addProseMirrorPlugins() {
-      return this.options.insertable ? [] : [pastedImagesAreDropped];
-    },
+export const EditorImageNode = DocumentImage.extend<EditorImageOptions>({
+  addOptions() {
+    return { ...(this.parent?.() as DocumentImageOptions), insertable: false, resizable: false };
   },
-);
+
+  addNodeView() {
+    return this.options.resizable ? ReactNodeViewRenderer(EditorImageView) : null;
+  },
+
+  addProseMirrorPlugins() {
+    return this.options.insertable ? [] : [pastedImagesAreDropped];
+  },
+});

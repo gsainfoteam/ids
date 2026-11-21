@@ -9,10 +9,16 @@ import { useTranslate } from '../../../../internal/translate';
 import { EditorGlyphButton } from '../glyph-button';
 import { editorStyle } from '../style';
 
-const styles = editorStyle();
+import type { EditorDetailsOptions } from './node';
 
-export function EditorDetailsView({ node, editor, updateAttributes }: ReactNodeViewProps) {
+export function EditorDetailsView({
+  node,
+  editor,
+  extension,
+  updateAttributes,
+}: ReactNodeViewProps) {
   const t = useTranslate();
+  const styles = editorStyle({ size: (extension.options as EditorDetailsOptions).size });
   const [openWhileReading, setOpenWhileReading] = useState<boolean | null>(null);
   const open = (editor.isEditable ? null : openWhileReading) ?? Boolean(node.attrs.open);
   const summaryIsEmpty = node.firstChild?.content.size === 0;

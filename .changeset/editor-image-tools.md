@@ -6,14 +6,15 @@
 with it, `Editor.Image` picks files or takes an image address, pasted and dropped image files go
 through the same function, a placeholder holds the spot while it uploads and a failed upload is
 reported in a toast. A selected image takes its alt text from `Editor.Image`'s popover, and in
-`html` and `json` its side handles change its width. Only `http(s)`, relative URLs and URLs the
+`html` and `json` it sits in a `Resizable` whose handle (or arrow keys) changes its width. Only `http(s)`, relative URLs and URLs the
 upload returned become images, so `javascript:` and `data:` never do.
 
 New tools: `Editor.Highlight`, `Editor.TaskList` (drawn as IDS Checkboxes), `Editor.HorizontalRule`,
 `Editor.TextAlign`, `Editor.Table` (pick a size from a grid; add and delete rows and columns; outside
 markdown, toggle the header row and merge and split cells), `Editor.Callout` (GitHub alerts in
-markdown) and `Editor.Details` (a toggle block). Code blocks pick their language and are
-highlighted like `CodeBlock`. Each of these loads its Tiptap extension with `import()` only when
+markdown) and `Editor.Details` (a toggle block). Blocks in the Editor are drawn like the IDS
+components RichText renders: code blocks as `CodeBlock` (with its copy button and a language
+Select), callouts as `Alert`, toggle blocks as `Accordion` and tables as `Table`. Each of these loads its Tiptap extension with `import()` only when
 its part is in the Editor, and image uploading only with `onImageUpload`.
 
 An editable Editor opens a block menu on `/` and shows a handle beside the hovered block, which

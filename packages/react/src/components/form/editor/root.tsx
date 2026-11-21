@@ -330,6 +330,7 @@ export function EditorRoot(props: Editor.Props) {
   const setup = useMemo(
     () =>
       loaded?.engine.extensionsFor({
+        size,
         maxLength,
         markdown: loaded.markdown,
         features: loaded.features,
@@ -338,7 +339,7 @@ export function EditorRoot(props: Editor.Props) {
         t: callIntoTheLatestRender.t,
         findMentions: callIntoTheLatestRender.findMentions,
       }),
-    [loaded, maxLength, uploaded, callIntoTheLatestRender],
+    [loaded, size, maxLength, uploaded, callIntoTheLatestRender],
   );
   const mention = loaded?.features.mention;
   const floating = (
