@@ -48,6 +48,7 @@ import { Dialog } from '@gsainfoteam/ids-react';
 
 - 모든 파트는 생략할 수 있습니다. `Dialog.Title` 이 없으면 `Dialog.Content` 에 `aria-label` 을 줍니다. 둘 다 없으면 개발 모드에서 경고합니다.
 - 모서리의 닫기 버튼(X)은 늘 붙습니다. 빼려면 `hideClose` 를 줍니다.
+- 닫기 버튼은 대화상자 오른쪽 위에 고정되어 본문이 스크롤돼도 그 자리에 있고, Tab 순서는 Footer 다음 마지막입니다. `Dialog.Header` 만 버튼 자리(`pe-8`)를 비켜 주므로, 긴 본문은 스크롤할 때 버튼 아래로 지나갑니다.
 
 ## 크기
 

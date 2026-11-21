@@ -91,7 +91,7 @@ function DialogPopup({ className, style, children, ...props }: DialogContentProp
       >
         <OverlayItemContext value={null}>
           <ScrollArea asChild>
-            <div data-dialog-body="" className={styles.body()}>
+            <div data-dialog-body="" className={styles.body({ footed: footer.length > 0 })}>
               <ScrollArea.Viewport className={styles.viewport()}>{body}</ScrollArea.Viewport>
             </div>
           </ScrollArea>

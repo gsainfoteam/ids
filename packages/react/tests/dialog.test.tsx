@@ -294,6 +294,10 @@ test('the footer is a band below the body that scrolls', async () => {
 
   const viewport = body.querySelector<HTMLElement>('[data-scroll-area-viewport]')!;
   expect(viewport.scrollHeight).toBeGreaterThan(viewport.clientHeight);
+  expect(getComputedStyle(body).borderTopLeftRadius).toBe(
+    getComputedStyle(content).borderTopLeftRadius,
+  );
+  expect(getComputedStyle(body).borderBottomLeftRadius).toBe('0px');
 
   const decline = () => screen.getByRole('button', { name: 'Decline' }).element();
   expect(layerOf(decline())).toBe('0%');

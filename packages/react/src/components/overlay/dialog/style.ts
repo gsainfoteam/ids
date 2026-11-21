@@ -15,7 +15,7 @@ export const dialogStyle = tv({
       'starting:scale-95 starting:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0',
       'data-nested-open:scale-[0.96] motion-reduce:transition-none',
     ],
-    body: 'relative flex min-h-0 flex-col rounded-[inherit]',
+    body: 'relative flex min-h-0 flex-col',
     viewport: 'relative flex flex-col gap-4 p-6',
     header: 'flex flex-col gap-1.5 pe-8 text-start',
     title: 'text-subtitle-s1-semibold [overflow-wrap:anywhere]',
@@ -27,4 +27,11 @@ export const dialogStyle = tv({
     ],
     close: 'absolute end-4 top-4',
   },
+  variants: {
+    footed: {
+      true: { body: 'rounded-t-[inherit]' },
+      false: { body: 'rounded-[inherit]' },
+    },
+  },
+  defaultVariants: { footed: false },
 });
