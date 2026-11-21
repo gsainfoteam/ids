@@ -11,7 +11,7 @@ export const listStyles = {
     '[&_svg]:pointer-events-none [&_svg]:shrink-0',
   ),
   indicator: cn(
-    'pointer-events-none absolute end-2.5 flex items-center justify-center',
+    'pointer-events-none absolute end-2.5 flex items-center justify-center text-primary',
     '[&_svg]:size-(--ids-size-icon-standard)',
   ),
   listArea: cn('-mx-1 rounded-[inherit]'),

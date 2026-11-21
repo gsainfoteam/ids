@@ -6,11 +6,11 @@ export const toasterStyle = tv({
   slots: {
     region: [
       'fixed inset-x-4 z-50 m-0 h-(--front-toast-height) w-auto overflow-visible border-0 bg-transparent p-0',
-      'text-neutral-bold outline-none sm:w-89',
+      'text-neutral-strong outline-none sm:w-89',
     ],
     toast: [
       'absolute inset-x-0 z-(--toast-z) touch-none concentric-p-3 px-4',
-      'bg-panel text-body-b3-regular text-neutral-bold',
+      'bg-surface text-body-b3-regular text-neutral-strong',
       'shadow-lg inset-ring-1 inset-ring-neutral',
       'after:absolute after:inset-x-0 after:h-(--gap)',
       'h-(--front-toast-height) [scale:calc(1-0.05*var(--toasts-before))]',
@@ -31,10 +31,7 @@ export const toasterStyle = tv({
       'flex items-center gap-3 transition-opacity duration-(--ids-motion-fast) ease-out',
       'motion-reduce:transition-none',
     ],
-    icon: [
-      'flex shrink-0 items-center text-scheme',
-      '[&_svg]:size-(--ids-size-icon-standard)',
-    ],
+    icon: ['flex shrink-0 items-center text-scheme', '[&_svg]:size-(--ids-size-icon-standard)'],
     content: 'flex min-w-0 flex-1 flex-col gap-0.5',
     title: 'text-body-b3-semibold [overflow-wrap:anywhere]',
     description: 'text-neutral [overflow-wrap:anywhere]',

@@ -104,7 +104,7 @@ test('a row with onClick presses anywhere and hovers; selection stays a data att
   expect(header.hasAttribute('data-hoverable')).toBe(false);
 });
 
-test('the stripe is a muted row, a selected row is primary subtle over it, and hover lays the state layer', async () => {
+test('the stripe is a block row, a selected row is primary soft over it, and hover lays the state layer', async () => {
   const screen = await render(
     <IdsProvider theme={testTheme}>
       <p>Outside</p>
@@ -122,10 +122,10 @@ test('the stripe is a muted row, a selected row is primary subtle over it, and h
 
   await expect.element(row('Ada')).toBeInTheDocument();
   expect(background('Ada')).toBe('rgba(0, 0, 0, 0)');
-  expect(background('Grace')).toBe(colorOf('--ids-color-bg-neutral-subtle'));
-  expect(background('Ken')).toBe(colorOf('--ids-color-bg-primary-subtle'));
+  expect(background('Grace')).toBe(colorOf('--ids-color-bg-block'));
+  expect(background('Ken')).toBe(colorOf('--ids-color-bg-primary-soft'));
   expect(getComputedStyle(row('Ken').element()).color).toBe(
-    colorOf('--ids-color-text-on-primary-subtle'),
+    colorOf('--ids-color-text-on-primary-soft'),
   );
   expect(layer('Ada')).toBe('0%');
   expect(layer('Ken')).toBe('0%');
@@ -134,7 +134,7 @@ test('the stripe is a muted row, a selected row is primary subtle over it, and h
   await expect.poll(() => layer('Ada')).toBe(percent(IDS_STATE_OPACITY.hover));
   await userEvent.hover(row('Grace'));
   await expect.poll(() => layer('Grace')).toBe(percent(IDS_STATE_OPACITY.hover));
-  expect(background('Grace')).toBe(colorOf('--ids-color-bg-neutral-subtle'));
+  expect(background('Grace')).toBe(colorOf('--ids-color-bg-block'));
   await userEvent.hover(row('Ken'));
   await expect.poll(() => layer('Ken')).toBe(percent(IDS_STATE_OPACITY.tintHover));
   expect(layerColor('Ken')).not.toBe(layerColor('Ada'));

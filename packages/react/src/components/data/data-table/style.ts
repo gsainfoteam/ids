@@ -14,7 +14,7 @@ export const dataTableStyle = tv({
     cell: '',
     sortButton: [
       'group/sort -mx-2 w-[calc(100%+1rem)] justify-between gap-2 px-2 text-inherit',
-      'data-hovered:text-neutral-bold data-active:text-neutral-bold',
+      'data-hovered:text-neutral-strong data-active:text-neutral-strong',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):first-child]:ps-2',
       'has-[>:is(svg,[aria-hidden=true],[role=status]):last-child]:pe-2',
     ],
@@ -37,7 +37,7 @@ export const dataTableStyle = tv({
     ],
     selectCell: 'w-0 whitespace-nowrap [&>[data-checkbox]]:flex',
     message: 'h-24 text-center text-neutral',
-    overlay: 'absolute inset-0 z-20 flex items-center justify-center bg-neutral-subtlest/60',
+    overlay: 'absolute inset-0 z-20 flex items-center justify-center bg-base/60',
     spinner: 'size-6 text-neutral',
     footer: 'flex flex-wrap items-center justify-between gap-3',
     summary: 'text-neutral',
@@ -47,9 +47,9 @@ export const dataTableStyle = tv({
   variants: {
     variant: {
       outline: {
-        root: 'concentric-p-1 bg-neutral-subtle',
-        table: '[--table-radius:var(--radius-standard)] bg-neutral-subtlest shadow-xs',
-        header: 'bg-neutral-subtler',
+        root: 'concentric-p-1 bg-neutral-soft',
+        table: '[--table-radius:var(--radius-standard)] bg-surface shadow-xs',
+        header: 'bg-block',
         head: 'not-last:border-e not-last:border-neutral',
         cell: 'not-last:border-e not-last:border-neutral',
         overlay: 'rounded-standard',

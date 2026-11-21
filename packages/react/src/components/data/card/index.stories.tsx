@@ -40,7 +40,7 @@ const meta = {
       </Card.Header>
       <Card.Content>이름과 설명을 채우면 바로 시작할 수 있습니다.</Card.Content>
       <Card.Footer className="justify-end">
-        <Button variant="ghost">취소</Button>
+        <Button variant="outline">취소</Button>
         <Button>만들기</Button>
       </Card.Footer>
     </Card>
@@ -67,7 +67,7 @@ export const Gallery: Story = {
                 <Card.Action>
                   <IconButton
                     aria-label="더보기"
-                    variant="ghost"
+                    variant="outline"
                     size="tiny"
                     icon={<EllipsisHorizontalIcon />}
                   />
@@ -122,7 +122,7 @@ export const Gallery: Story = {
               <img src={PHOTO} alt="" />
             </Card.Media>
             <Card.Footer>
-              <Button variant="ghost" size="tiny">
+              <Button variant="outline" size="tiny">
                 <HeartIcon />
                 좋아요
               </Button>
@@ -141,7 +141,7 @@ export const Gallery: Story = {
 
       <Showcase.Section
         title="Sections"
-        description="Header에 border-b, Footer에 border-t를 주면 카드 너비만큼 구분선이 그어지고 간격이 맞춰집니다."
+        description="Header에 border-b를 주면 카드 너비만큼 구분선이 그어지고 간격이 맞춰집니다. Footer는 늘 위쪽 선과 옅은 배경의 띠로 카드 바닥을 채웁니다."
       >
         <Showcase.Row label="dividers">
           <Card className="w-72">
@@ -150,7 +150,7 @@ export const Gallery: Story = {
               <Card.Description>받을 알림을 고릅니다.</Card.Description>
             </Card.Header>
             <Card.Content>메일, 푸시, 문자</Card.Content>
-            <Card.Footer className="justify-end border-t">
+            <Card.Footer className="justify-end">
               <Button size="tiny">저장</Button>
             </Card.Footer>
           </Card>

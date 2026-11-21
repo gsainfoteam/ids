@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState, type ComponentProps, type ReactElement } from 'react';
+import { type ComponentProps, type ReactElement } from 'react';
 
 import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/16/solid';
 
 import { useCodeBlockContext } from './context';
 import { useClipboardSupport } from '../../../hooks/use-clipboard-support';
 import { useTranslate } from '../../../internal/translate';
+import { useCopyFeedback } from '../../../internal/use-copy-feedback';
 import { mergeEventHandlers } from '../../../utils';
 import { IconButton } from '../../action/icon-button';
 
@@ -14,29 +15,11 @@ export type CodeBlockCopyProps = Omit<ComponentProps<'button'>, 'children'> & {
   children?: ReactElement;
 };
 
-const COPIED_FOR = 1500;
-
 export function CodeBlockCopy({ className, children, onClick, ...props }: CodeBlockCopyProps) {
   const t = useTranslate();
   const { code, styles } = useCodeBlockContext('CodeBlock.Copy');
   const supported = useClipboardSupport();
-  const [copyRun, setCopyRun] = useState(0);
-  const copied = copyRun > 0;
-
-  useEffect(() => {
-    if (copyRun === 0) return;
-    const timer = setTimeout(() => setCopyRun(0), COPIED_FOR);
-    return () => clearTimeout(timer);
-  }, [copyRun]);
-
-  const copy = async () => {
-    const written = await navigator.clipboard.writeText(code).then(
-      () => true,
-      () => false,
-    );
-    if (!written) return;
-    setCopyRun((run) => run + 1);
-  };
+  const { copied, copy } = useCopyFeedback(() => code);
 
   if (!supported) return null;
 

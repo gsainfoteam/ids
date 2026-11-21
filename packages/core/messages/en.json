@@ -213,6 +213,16 @@
     "searchPlaceholder": "Search commands…",
     "submenu": "{label} submenu"
   },
+  "message": {
+    "actions": "Message actions",
+    "copied": "Copied",
+    "copy": "Copy message",
+    "error": "Not sent",
+    "pending": "Sending",
+    "retry": "Resend",
+    "unread": "Unread",
+    "unreadBy": "Unread by {count}"
+  },
   "messageScroller": {
     "jump": "Scroll to bottom",
     "jumpUnseen": "{count, plural, one {Scroll to bottom, # new message} other {Scroll to bottom, # new messages}}",

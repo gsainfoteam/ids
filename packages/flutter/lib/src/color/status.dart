@@ -5,7 +5,7 @@ import '../../tokens/ids_palette_model.dart';
 import 'color_distance.dart';
 import 'palette_seed.dart';
 
-typedef StatusPalettes = Map<String, IdsPalette>;
+typedef StatusPalettes = Map<String, IdsRamp>;
 
 final _fixedStatusSteps = {
   'success': IdsStatusPalettes.green,
@@ -50,8 +50,8 @@ double harmonizedRotation(String family, double hue, double primaryHue) {
   );
 }
 
-IdsPalette fixedStatusPalette(String family) =>
-    IdsPalette(_fixedStatusSteps[family]!);
+IdsRamp fixedStatusPalette(String family) =>
+    IdsRamp(_fixedStatusSteps[family]!);
 
 StatusPalettes _fixedPalettes() => {
   for (final family in statusFamilies) family: fixedStatusPalette(family),
@@ -60,7 +60,7 @@ StatusPalettes _fixedPalettes() => {
 Set<String> _familiesLosingDistinction(
   StatusPalettes palettes,
   StatusPalettes fixed,
-  IdsPalette primary,
+  IdsRamp primary,
 ) {
   final losing = <String>{};
   final primaryFill = primary[comparedStep];
@@ -86,7 +86,7 @@ Set<String> _familiesLosingDistinction(
   return losing;
 }
 
-StatusPalettes harmonizedStatusPalettes(IdsPalette primary) {
+StatusPalettes harmonizedStatusPalettes(IdsRamp primary) {
   final fixed = _fixedPalettes();
   if (chromaOf(primary.colors) < _achromatic) return fixed;
 
@@ -104,9 +104,7 @@ StatusPalettes harmonizedStatusPalettes(IdsPalette primary) {
     for (final family in statusFamilies)
       family: rotations[family] == 0
           ? fixed[family]!
-          : IdsPalette(
-              rotatedPalette(fixed[family]!.colors, rotations[family]!),
-            ),
+          : IdsRamp(rotatedRamp(fixed[family]!.colors, rotations[family]!)),
   };
 
   var palettes = rotate();

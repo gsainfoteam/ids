@@ -13,4 +13,4 @@ Storybook `Blocks/PostDetail/*`. 게시글 화면 두 가지입니다.
   - 댓글 입력은 `TextArea.Input` 뒤에 둔 글자 수와 버튼이 입력 칸 아래 막대가 됩니다.
   - 댓글은 `Item` 이 아니라 배치 클래스로 짭니다. `Item.Description` 은 두 줄에서 잘려 긴 댓글에 맞지 않습니다.
   - 답글의 세로선은 `Divider orientation="vertical"` 입니다.
-  - 공지는 `Card asChild` 로 `<article>` 을 그리고, `Card.Header` 와 `Card.Footer` 의 `border-b`, `border-t` 로 머리와 첨부를 나눕니다.
+  - 공지는 `Card asChild` 로 `<article>` 을 그리고, `Card.Header` 의 `border-b` 와 `Card.Footer` 의 띠로 머리와 첨부를 나눕니다.

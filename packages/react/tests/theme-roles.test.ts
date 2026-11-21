@@ -1,10 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
 import { palettes } from '../.storybook/palettes';
-import { resolveColors } from '../src/components/utility/ids-provider/theme-roles';
+import { createIdsPalette } from '../src/components/utility/ids-provider/palette-scales';
+import { resolveColors, slotsOf } from '../src/components/utility/ids-provider/theme-roles';
 import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
 
-import type { IdsPalette } from '../src/components/utility/ids-provider/theme';
+import type { IdsRamp } from '../src/components/utility/ids-provider/theme';
 
 describe.each(Object.keys(palettes))('%s', (hue) => {
   const { issues } = resolveColors({ primary: palettes[hue as keyof typeof palettes] });
@@ -20,7 +21,7 @@ describe('checkIdsTheme', () => {
 
     const { 500: _, ...withoutFiveHundred } = palettes.blue;
     expect(
-      checkIdsTheme({ primary: withoutFiveHundred as IdsPalette }).map((issue) => issue.path),
+      checkIdsTheme({ primary: withoutFiveHundred as IdsRamp }).map((issue) => issue.path),
     ).toEqual(['primary.500']);
   });
 
@@ -39,7 +40,7 @@ describe('checkIdsTheme', () => {
   test('reports a palette whose text roles cannot reach their Lc', () => {
     const washedOut = Object.fromEntries(
       Object.keys(palettes.blue).map((step) => [step, '#9ca3af']),
-    ) as unknown as IdsPalette;
+    ) as unknown as IdsRamp;
 
     expect(checkIdsTheme({ primary: washedOut }).length).toBeGreaterThan(0);
   });
@@ -66,9 +67,47 @@ describe('checkIdsTheme', () => {
     expect(checkIdsTheme({ primary: palettes.blue, scale: 0.875 })).toEqual([]);
   });
 
+  test('reports a scale that is not 9 colors, and a step that is not a color', () => {
+    const { light, dark } = createIdsPalette('#2b7fff')!;
+
+    expect(
+      checkIdsTheme({ primary: { light: light.slice(0, 8) as never, dark } }).map(
+        (issue) => issue.path,
+      ),
+    ).toEqual(['primary.light']);
+    expect(
+      checkIdsTheme({ primary: { light, dark: [...dark.slice(0, 8), 'bluish'] as never } }),
+    ).toEqual([{ path: 'primary.dark.9', message: 'Step 9 is not a CSS color: bluish.' }]);
+  });
+
   test('accepts any CSS color for a step', () => {
     expect(
       checkIdsTheme({ primary: { ...palettes.blue, 600: 'oklch(0.546 0.245 262.9)' } }),
     ).toEqual([]);
+  });
+});
+
+describe('a palette given as light and dark scales', () => {
+  const given = createIdsPalette('#2b7fff')!;
+  const { colors, issues } = resolveColors({ primary: given });
+
+  test('is used as it is, each role reading its step', () => {
+    expect(issues).toEqual([]);
+    expect(colors!.palettes.primary).toEqual(given);
+    for (const mode of ['light', 'dark'] as const) {
+      expect(colors!.roles[mode]['bg-primary-soft']).toBe(given[mode][3]);
+      expect(colors!.roles[mode]['border-primary']).toBe(given[mode][4]);
+      expect(colors!.roles[mode]['border-primary-strong']).toBe(given[mode][5]);
+      expect(colors!.roles[mode]['bg-primary-solid']).toBe(given[mode][6]);
+      expect(colors!.roles[mode]['text-primary']).toBe(given[mode][7]);
+      expect(colors!.roles[mode]['text-primary-strong']).toBe(given[mode][8]);
+    }
+  });
+
+  test('gives the same primary roles as the color it was built from', () => {
+    const fromSeed = resolveColors({ primary: '#2b7fff' }).colors!.roles;
+    for (const mode of ['light', 'dark'] as const)
+      for (const role of slotsOf('primary'))
+        expect(colors!.roles[mode][role], `${mode} ${role}`).toBe(fromSeed[mode][role]);
   });
 });

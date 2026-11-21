@@ -7,11 +7,11 @@ export const tableStyle = tv({
   slots: {
     root: 'w-full max-w-full',
     viewport: 'isolate',
-    table: 'w-full border-separate border-spacing-0 text-neutral-bold',
+    table: 'w-full border-separate border-spacing-0 text-neutral-strong',
     caption: 'caption-bottom text-start text-neutral',
     header: '',
     body: '',
-    footer: 'bg-neutral-subtle',
+    footer: 'bg-block',
     row: 'transition-colors duration-(--ids-motion-fast) motion-reduce:transition-none',
     head: 'border-b border-neutral align-middle whitespace-nowrap',
     cell: 'border-b border-neutral align-middle',
@@ -21,7 +21,7 @@ export const tableStyle = tv({
       outline: {
         root: '[--table-radius:var(--radius-container)] rounded-(--table-radius) border border-neutral',
         viewport: 'rounded-[calc(var(--table-radius)-1px)]',
-        header: 'bg-neutral-subtle',
+        header: 'bg-block',
       },
       ghost: { header: 'bg-(--ids-bg-current)' },
     } satisfies Record<TableVariant, object>,
@@ -52,7 +52,7 @@ export const tableStyle = tv({
         row: [
           'state-layer',
           'data-selected:scheme-primary data-selected:state-scheme',
-          'data-selected:bg-scheme-subtle data-selected:text-on-scheme-subtle',
+          'data-selected:bg-scheme-soft data-selected:text-on-scheme-soft',
           'last:*:border-b-0',
         ],
       },
@@ -73,7 +73,7 @@ export const tableStyle = tv({
     } satisfies Record<TableAlign, object>,
   },
   compoundVariants: [
-    { striped: true, section: 'body', class: { row: 'even:not-data-selected:bg-neutral-subtle' } },
+    { striped: true, section: 'body', class: { row: 'even:not-data-selected:bg-block' } },
   ],
   defaultVariants: {
     variant: 'outline',

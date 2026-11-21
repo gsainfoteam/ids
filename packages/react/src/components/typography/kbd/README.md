@@ -64,16 +64,8 @@ import { Kbd } from '@gsainfoteam/ids-react';
 
 ## 묶기
 
-```tsx
-<Kbd.Group size="tiny">
-  <Kbd keys="Mod" />
-  <span>다음</span>
-  <Kbd>G</Kbd>
-</Kbd.Group>
-```
-
-- `Kbd.Group` 은 `<kbd>` 안에 `<kbd>` 를 넣어 여러 키가 하나의 입력임을 나타냅니다. `size`, `platform`, `labels` 는 안쪽 Kbd로 이어집니다.
-- `keys` 에 키를 여럿 적으면 Kbd가 알아서 같은 묶음을 만듭니다.
+- `keys` 에 키를 여럿 적으면 Kbd가 알아서 하나의 `<kbd>` 묶음을 만듭니다.
+- 문자열 하나로 적을 수 없는 입력(`G` 다음 `S`)은 [KbdGroup](../kbd-group/README.md) 으로 묶습니다.
 
 ## 크기
 
@@ -82,7 +74,7 @@ import { Kbd } from '@gsainfoteam/ids-react';
 <Kbd size="tiny" />       // 16px 높이
 ```
 
-- 크기를 주지 않으면 `Kbd.Group`, 그다음 `Field` 의 크기를 따릅니다.
+- 크기를 주지 않으면 `KbdGroup`, 그다음 `Field` 의 크기를 따릅니다.
 
 ## 읽는 이름 바꾸기
 
@@ -107,7 +99,7 @@ import { Kbd } from '@gsainfoteam/ids-react';
 | 속성        | 기본 / 동작                                                    |
 | ----------- | -------------------------------------------------------------- |
 | `keys`      | 단축키 문자열(`Kbd.Keys`). 없으면 `children` 을 그린다         |
-| `size`      | `standard` / `tiny`. 생략하면 Group → Field → `standard`       |
+| `size`      | `standard` / `tiny`. 생략하면 KbdGroup → Field → `standard`     |
 | `platform`  | `mac` / `windows` / `linux`. 생략하면 기기를 따른다            |
 | `separator` | 키 사이 표시. Mac은 없음, 그 밖은 `+`                          |
 | `labels`    | 스크린 리더가 읽을 키 이름                                     |

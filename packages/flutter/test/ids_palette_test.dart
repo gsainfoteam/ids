@@ -4,7 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ids_flutter/ids.dart';
 
-const _createIdsPaletteResults = <int, List<int>>{
+const _createIdsRampResults = <int, List<int>>{
   0xFF0D9488: [
     0xFFF0FDFB,
     0xFFCDFBF3,
@@ -59,29 +59,29 @@ const _createIdsPaletteResults = <int, List<int>>{
   ],
 };
 
-List<int> _argbOf(IdsPalette palette) => [
-  for (final color in palette.colors) color.toARGB32(),
+List<int> _argbOf(IdsRamp ramp) => [
+  for (final color in ramp.colors) color.toARGB32(),
 ];
 
 void main() {
-  group('IdsPalette.fromSeed', () {
+  group('IdsRamp.fromSeed', () {
     for (final MapEntry(key: seed, value: expected)
-        in _createIdsPaletteResults.entries) {
+        in _createIdsRampResults.entries) {
       final hex = '#${(seed & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
 
-      test('matches createIdsPalette from ids-react for $hex', () {
-        expect(_argbOf(IdsPalette.fromSeed(Color(seed))), expected);
+      test('matches createIdsRamp from ids-react for $hex', () {
+        expect(_argbOf(IdsRamp.fromSeed(Color(seed))), expected);
       });
 
       test('keeps $hex unchanged at one step', () {
-        expect(_argbOf(IdsPalette.fromSeed(Color(seed))), contains(seed));
+        expect(_argbOf(IdsRamp.fromSeed(Color(seed))), contains(seed));
       });
     }
 
     test('ignores the seed alpha', () {
       expect(
-        IdsPalette.fromSeed(const Color(0x800D9488)),
-        IdsPalette.fromSeed(const Color(0xFF0D9488)),
+        IdsRamp.fromSeed(const Color(0x800D9488)),
+        IdsRamp.fromSeed(const Color(0xFF0D9488)),
       );
     });
 
@@ -90,27 +90,27 @@ void main() {
       final p3Seed = seed.withValues(colorSpace: ColorSpace.displayP3);
 
       expect(
-        _argbOf(IdsPalette.fromSeed(p3Seed)),
-        _argbOf(IdsPalette.fromSeed(seed)),
+        _argbOf(IdsRamp.fromSeed(p3Seed)),
+        _argbOf(IdsRamp.fromSeed(seed)),
       );
     });
   });
 
-  group('IdsPalette', () {
-    final palette = IdsPalette.fromSeed(const Color(0xFF7C3AED));
+  group('IdsRamp', () {
+    final ramp = IdsRamp.fromSeed(const Color(0xFF7C3AED));
 
     test('reads a color by its step', () {
-      expect(palette[600], const Color(0xFF7C3AED));
-      expect(palette[50], palette.colors.first);
-      expect(palette[950], palette.colors.last);
+      expect(ramp[600], const Color(0xFF7C3AED));
+      expect(ramp[50], ramp.colors.first);
+      expect(ramp[950], ramp.colors.last);
     });
 
     test('rejects a step outside 50 to 950', () {
-      expect(() => palette[550], throwsArgumentError);
+      expect(() => ramp[550], throwsArgumentError);
     });
 
     test('asserts eleven colors', () {
-      expect(() => IdsPalette(const [Color(0xFF000000)]), throwsAssertionError);
+      expect(() => IdsRamp(const [Color(0xFF000000)]), throwsAssertionError);
     });
 
     test('status palettes have eleven steps each', () {
@@ -120,8 +120,34 @@ void main() {
         IdsStatusPalettes.green,
         IdsStatusPalettes.sky,
       ]) {
-        expect(IdsPalette(steps).colors, hasLength(IdsPalette.steps.length));
+        expect(IdsRamp(steps).colors, hasLength(IdsRamp.steps.length));
       }
+    });
+  });
+
+  group('IdsPalette', () {
+    final palette = IdsPalette.fromSeed(const Color(0xFF7C3AED));
+
+    test('builds eight steps for each mode', () {
+      expect(palette.light, hasLength(IdsPalette.steps.length));
+      expect(palette.dark, hasLength(IdsPalette.steps.length));
+    });
+
+    test('reads a scale by its mode', () {
+      expect(palette[IdsMode.light], palette.light);
+      expect(palette[IdsMode.dark], palette.dark);
+    });
+
+    test('starts each scale at the page of its mode', () {
+      expect(palette.light.first, const Color(0xFFFFFFFF));
+      expect(palette.dark.first, const Color(0xFF0A0A0A));
+    });
+
+    test('asserts eight colors in each mode', () {
+      expect(
+        () => IdsPalette(light: const [Color(0xFF000000)], dark: palette.dark),
+        throwsAssertionError,
+      );
     });
   });
 }

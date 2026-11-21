@@ -129,7 +129,7 @@ export const PC: Story = {
             </form>
           </Card.Content>
 
-          <Card.Footer className="justify-center border-t">
+          <Card.Footer className="justify-center">
             이미 계정이 있나요?
             <Link href="#login">로그인</Link>
           </Card.Footer>

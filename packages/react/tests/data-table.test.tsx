@@ -162,9 +162,9 @@ test('outline sets the table on a neutral tray and divides the columns', async (
   const firstCell = root.querySelector('tbody td')!;
 
   await expect.element(screen.getByRole('table')).toBeVisible();
-  expect(getComputedStyle(root).backgroundColor).toBe(colorOf('--ids-color-bg-neutral-subtle'));
+  expect(getComputedStyle(root).backgroundColor).toBe(colorOf('--ids-color-bg-neutral-soft'));
   expect(getComputedStyle(root.querySelector('thead')!).backgroundColor).toBe(
-    colorOf('--ids-color-bg-neutral-subtler'),
+    colorOf('--ids-color-bg-block'),
   );
   expect(root.contains(footer)).toBe(true);
   expect(getComputedStyle(firstCell).borderInlineEndWidth).toBe('1px');

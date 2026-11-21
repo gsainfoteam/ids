@@ -13,7 +13,7 @@ String _rounded(double value) => value.toStringAsFixed(3);
 
 List<IdsThemeIssue> checkColorDistinction(ResolvedColors colors) {
   final issues = <IdsThemeIssue>[];
-  final palettes = colors.palettes;
+  final palettes = colors.ramps;
   fill(String family) => palettes[family]![comparedStep];
   final brands = [
     for (final family in IdsColorRoles.brandFamilies)

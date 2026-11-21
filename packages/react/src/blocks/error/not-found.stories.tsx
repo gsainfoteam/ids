@@ -12,6 +12,7 @@ import { Button } from '../../components/action/button';
 import { Badge } from '../../components/data/badge';
 import { Card } from '../../components/data/card';
 import { Item } from '../../components/data/item';
+import { ItemGroup } from '../../components/data/item-group';
 import { TextField } from '../../components/form/text-field';
 import { Kbd } from '../../components/typography/kbd';
 
@@ -70,7 +71,7 @@ export const PC: Story = {
               <h2>자주 찾는 페이지</h2>
             </Card.Title>
           </Card.Header>
-          <Item.Group aria-label="자주 찾는 페이지">
+          <ItemGroup aria-label="자주 찾는 페이지">
             {POPULAR.map(({ id, label, description, icon }) => (
               <Item key={id} asChild>
                 <a href={`#${id}`}>
@@ -85,7 +86,7 @@ export const PC: Story = {
                 </a>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         </Card>
 
         <div className="flex flex-wrap justify-center gap-2">

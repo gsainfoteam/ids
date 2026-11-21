@@ -1,0 +1,11 @@
+{
+  "bg-base": 1,
+  "bg-surface": 2,
+  "bg-block": 3,
+  "bg-neutral-soft": 4,
+  "bg-neutral-solid": 9,
+  "border-neutral": 5,
+  "border-neutral-strong": 6,
+  "text-neutral": 8,
+  "text-neutral-strong": 9
+}

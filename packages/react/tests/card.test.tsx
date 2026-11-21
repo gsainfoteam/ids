@@ -3,7 +3,9 @@ import { expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Card } from '../src';
+import { Button, Card, IdsProvider } from '../src';
+import { testTheme } from './theme';
+import { IDS_STATE_OPACITY } from '../src/tokens/color-roles';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -182,6 +184,130 @@ test('media bleeds to the edge and takes the corner where it touches one', () =>
   expect(doc.querySelector('[data-card]')!.className).toContain('[--card-ring:1px]');
   const soft = parse(renderToString(<Card variant="soft" />));
   expect(soft.querySelector('[data-card]')!.className).toContain('[--card-ring:0px]');
+});
+
+function colorOf(variable: string, inside: Element) {
+  const probe = document.createElement('div');
+  probe.style.backgroundColor = `var(${variable})`;
+  inside.closest('[data-mode]')!.append(probe);
+  const color = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  return color;
+}
+
+function textColorOf(variable: string, inside: Element) {
+  const probe = document.createElement('div');
+  probe.style.color = `var(${variable})`;
+  inside.closest('[data-mode]')!.append(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
+}
+
+const hoverLayer = `${IDS_STATE_OPACITY.hover * 100}%`;
+const layerOf = (element: Element) =>
+  getComputedStyle(element).getPropertyValue('--ids-state-opacity');
+
+function withFooter(props: Card.Props = {}, mode: 'light' | 'dark' = 'light') {
+  return (
+    <IdsProvider theme={testTheme} mode={mode}>
+      <Card {...props}>
+        <Card.Header>
+          <Card.Title>Design review</Card.Title>
+          <Card.Action>
+            <Button variant="outline">Copy</Button>
+          </Card.Action>
+        </Card.Header>
+        <Card.Content>Agenda</Card.Content>
+        <Card.Footer className="justify-end">
+          <Button variant="outline">Cancel</Button>
+          <Button>Save</Button>
+        </Card.Footer>
+      </Card>
+    </IdsProvider>
+  );
+}
+
+test.each(['light', 'dark'] as const)(
+  'the footer is a band under a neutral line, apart from the card, %s',
+  async (mode) => {
+    const screen = await render(withFooter({}, mode));
+    const root = screen.container.querySelector<HTMLElement>('[data-card]')!;
+    const footer = root.querySelector<HTMLElement>('[data-card-footer]')!;
+
+    await expect.element(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+    const style = getComputedStyle(footer);
+    expect(style.backgroundColor).toBe(colorOf('--ids-color-bg-block', root));
+    expect(style.color).toBe(textColorOf('--ids-color-text-neutral-strong', root));
+    expect(style.borderTopWidth).toBe('1px');
+    expect(style.borderTopColor).toBe(colorOf('--ids-color-border-neutral', root));
+    expect(getComputedStyle(root).backgroundColor).toBe(colorOf('--ids-color-bg-surface', root));
+    expect(style.backgroundColor).not.toBe(getComputedStyle(root).backgroundColor);
+
+    const cancel = screen.getByRole('button', { name: 'Cancel' }).element();
+    const outlineBorder = colorOf('--ids-color-border-control-outline', root);
+    expect(getComputedStyle(cancel).boxShadow).toContain(outlineBorder);
+    expect(outlineBorder).not.toBe(style.backgroundColor);
+  },
+);
+
+test('the footer band fills the card to its outline and lines up with the content', async () => {
+  const screen = await render(withFooter());
+  const root = screen.container.querySelector<HTMLElement>('[data-card]')!;
+  const footer = root.querySelector<HTMLElement>('[data-card-footer]')!.getBoundingClientRect();
+  const content = root.querySelector<HTMLElement>('[data-card-content]')!.getBoundingClientRect();
+  const edge = root.getBoundingClientRect();
+
+  await expect.element(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+  expect(footer.left - edge.left).toBeCloseTo(1, 0);
+  expect(edge.right - footer.right).toBeCloseTo(1, 0);
+  expect(edge.bottom - footer.bottom).toBeCloseTo(1, 0);
+
+  const save = screen.getByRole('button', { name: 'Save' }).element().getBoundingClientRect();
+  expect(save.right).toBeCloseTo(content.right, 0);
+});
+
+test('a quiet button on the footer band hovers with the state layer', async () => {
+  const screen = await render(withFooter());
+  const cancel = () => screen.getByRole('button', { name: 'Cancel' }).element();
+
+  await expect.element(screen.getByRole('button', { name: 'Cancel' })).toBeVisible();
+  expect(layerOf(cancel())).toBe('0%');
+  await userEvent.hover(screen.getByRole('button', { name: 'Cancel' }));
+  await expect.poll(() => layerOf(cancel())).toBe(hoverLayer);
+});
+
+test('a ghost card keeps only the line of the footer band', async () => {
+  const screen = await render(withFooter({ variant: 'ghost' }));
+  const root = screen.container.querySelector<HTMLElement>('[data-card]')!;
+  const footer = root.querySelector<HTMLElement>('[data-card-footer]')!;
+
+  await expect.element(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+  expect(getComputedStyle(footer).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+  expect(getComputedStyle(footer).borderTopColor).toBe(colorOf('--ids-color-border-neutral', root));
+});
+
+test('the footer band reaches the bottom of an asChild form card', async () => {
+  const screen = await render(
+    <IdsProvider theme={testTheme}>
+      <Card asChild>
+        <form>
+          <Card.Content>Fields</Card.Content>
+          <Card.Footer>
+            <Button type="submit">Save</Button>
+          </Card.Footer>
+        </form>
+      </Card>
+    </IdsProvider>,
+  );
+  const form = screen.container.querySelector<HTMLElement>('form[data-card]')!;
+  const footer = form.querySelector<HTMLElement>(':scope > [data-card-footer]')!;
+
+  await expect.element(screen.getByRole('button', { name: 'Save' })).toBeVisible();
+  expect(form.getBoundingClientRect().bottom - footer.getBoundingClientRect().bottom).toBeCloseTo(
+    1,
+    0,
+  );
 });
 
 test('parts outside Card throw', () => {

@@ -1,18 +1,17 @@
 {
   "component": {
-    "bg-panel":               { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-subtler" } },
-    "shadow-panel":           { "$type": "component", "$value": { "light": "{shadow.1}", "dark": "{shadow.0}" } },
-    "bg-band":                { "$type": "component", "$value": { "light": "bg-neutral-subtler", "dark": "bg-neutral-subtlest" } },
-    "bg-control-outline":     { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-subtle" } },
-    "border-control-outline": { "$type": "component", "$value": { "light": "border-neutral", "dark": "bg-neutral" } },
-    "bg-field-outline":       { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-subtle" } },
-    "border-field-outline":   { "$type": "component", "$value": { "light": "border-neutral", "dark": "bg-neutral" } },
-    "border-field-bar":       { "$type": "component", "$value": { "light": "border-neutral", "dark": "bg-neutral" } },
-    "bg-field-code-outline":  { "$type": "component", "$value": { "light": "bg-neutral-subtle", "dark": "bg-neutral-subtler" } },
-    "bg-switch-thumb":        { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-bold" } },
-    "bg-qr-code":       { "$type": "component", "$value": { "light": "bg-neutral-subtlest", "dark": "bg-neutral-bold" } },
-    "text-qr-code":     { "$type": "component", "$value": { "light": "text-neutral-bold", "dark": "text-on-neutral-bold" } },
-    "bg-qr-code-inverse":        { "$type": "component", "$value": { "light": "bg-neutral-bold", "dark": "bg-neutral-subtlest" } },
-    "text-qr-code-inverse":      { "$type": "component", "$value": { "light": "text-on-neutral-bold", "dark": "text-neutral-bold" } }
+    "shadow-surface":         { "$type": "component", "$value": { "light": "{shadow.1}", "dark": "{shadow.0}" } },
+    "bg-control-outline":     { "$type": "component", "$value": { "light": "bg-base", "dark": "bg-block" } },
+    "border-control-outline": { "$type": "component", "$value": { "light": "border-neutral", "dark": "border-neutral-strong" } },
+    "bg-field-outline":       { "$type": "component", "$value": { "light": "bg-base", "dark": "bg-block" } },
+    "border-field-outline":   { "$type": "component", "$value": { "light": "border-neutral", "dark": "border-neutral-strong" } },
+    "border-field-bar":       { "$type": "component", "$value": { "light": "border-neutral", "dark": "border-neutral-strong" } },
+    "bg-field-code-outline":  { "$type": "component", "$value": { "light": "bg-neutral-soft", "dark": "bg-surface" } },
+    "bg-switch-thumb":        { "$type": "component", "$value": { "light": "bg-base", "dark": "bg-neutral-solid" } },
+    "bg-segment":             { "$type": "component", "$value": { "light": "bg-base", "dark": "border-neutral-strong" } },
+    "bg-qr-code":             { "$type": "component", "$value": { "light": "bg-base", "dark": "bg-neutral-solid" } },
+    "text-qr-code":           { "$type": "component", "$value": { "light": "text-neutral-strong", "dark": "text-on-neutral-solid" } },
+    "bg-qr-code-inverse":     { "$type": "component", "$value": { "light": "bg-neutral-solid", "dark": "bg-base" } },
+    "text-qr-code-inverse":   { "$type": "component", "$value": { "light": "text-on-neutral-solid", "dark": "text-neutral-strong" } }
   }
 }

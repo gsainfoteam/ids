@@ -8,6 +8,7 @@ import { Button } from '../../action/button';
 import { Avatar } from '../../data/avatar';
 import { Card } from '../../data/card';
 import { Item } from '../../data/item';
+import { ItemGroup } from '../../data/item-group';
 
 import { Skeleton } from '.';
 
@@ -111,8 +112,8 @@ export const Gallery: Story = {
             <Skeleton className="aspect-video" />
           </Card>
         </Showcase.Row>
-        <Showcase.Row label="Item.Group" className="items-start">
-          <Item.Group aria-label="멤버" aria-busy className="w-80">
+        <Showcase.Row label="ItemGroup" className="items-start">
+          <ItemGroup aria-label="멤버" aria-busy className="w-80">
             {[0, 1, 2].map((index) => (
               <Item key={index}>
                 <Item.Media>
@@ -124,7 +125,7 @@ export const Gallery: Story = {
                 </Item.Content>
               </Item>
             ))}
-          </Item.Group>
+          </ItemGroup>
         </Showcase.Row>
       </Showcase.Section>
 
@@ -331,7 +332,7 @@ export const BusyRegion: Story = {
         <Button variant="outline" onClick={() => setLoading((value) => !value)}>
           {loading ? '불러오기 끝내기' : '다시 불러오기'}
         </Button>
-        <Item.Group aria-label="멤버" aria-busy={loading} className="w-full">
+        <ItemGroup aria-label="멤버" aria-busy={loading} className="w-full">
           {loading
             ? members.map((name) => (
                 <Item key={name}>
@@ -355,7 +356,7 @@ export const BusyRegion: Story = {
                   </Item.Content>
                 </Item>
               ))}
-        </Item.Group>
+        </ItemGroup>
       </div>
     );
   },

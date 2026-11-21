@@ -9,6 +9,8 @@ import type { IdsNeutral, IdsStatus } from '../src/components/utility/ids-provid
 
 const ROLES = IDS_COLOR_FAMILIES.flatMap(slotsOf);
 
+const COLORED_FAMILIES = IDS_COLOR_FAMILIES.filter((family) => family !== 'neutral');
+
 const COMPONENT_COLORS = Object.keys(IDS_COMPONENT_COLORS) as (keyof typeof IDS_COMPONENT_COLORS)[];
 
 const NEUTRALS: IdsNeutral[] = ['pure', 'tinted'];
@@ -25,6 +27,12 @@ function resolvedRoles(primary: (typeof paletteHues)[number], neutral: IdsNeutra
     neutral,
     status,
     ...Object.fromEntries(MODES.map((mode) => [mode, ROLES.map((role) => colors!.roles[mode][role])])),
+    scales: Object.fromEntries(
+      MODES.map((mode) => [
+        mode,
+        [colors!.neutral[mode], ...COLORED_FAMILIES.map((family) => colors!.palettes[family][mode])],
+      ]),
+    ),
     components: Object.fromEntries(
       MODES.map((mode) => [
         mode,
@@ -38,7 +46,7 @@ test('the fixture ids_flutter checks its roles against is what React resolves', 
   const themes = paletteHues.flatMap((primary) =>
     NEUTRALS.flatMap((neutral) => STATUSES.map((status) => resolvedRoles(primary, neutral, status))),
   );
-  const fixture = `{\n"roles": ${JSON.stringify(ROLES)},\n"components": ${JSON.stringify(COMPONENT_COLORS)},\n"themes": [\n${themes
+  const fixture = `{\n"roles": ${JSON.stringify(ROLES)},\n"families": ${JSON.stringify(IDS_COLOR_FAMILIES)},\n"components": ${JSON.stringify(COMPONENT_COLORS)},\n"themes": [\n${themes
     .map((theme) => JSON.stringify(theme))
     .join(',\n')}\n]\n}\n`;
 

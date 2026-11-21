@@ -6,7 +6,7 @@
 - **기능은 켜는 것만.** 정렬은 기본으로 켜져 있고, 선택(`enableRowSelection`), 페이지(`enablePagination`), 열 너비(`enableColumnResizing`)는 켤 때만 붙습니다.
 - **접근성.** 정렬 머리글은 ghost `Button` 이고 `th` 에 `aria-sort`, 선택은 이름 있는 체크박스, 너비 핸들은 키보드로 움직이는 `separator`, 로딩은 `aria-busy` 입니다.
 - **Table 의 모양.** `variant`, `size`, `striped`, `highlightOnHover`, `stickyHeader` 는 `Table` 과 같습니다. 가로로 넘치면 열이 더 남은 가장자리가 흐려지는 것도 Table 과 같습니다.
-- **트레이 위의 표.** `outline` 은 표 카드를 `bg-neutral-subtle` 트레이에 올리고, 선택 수와 페이지 이동을 트레이 아래 줄에 둡니다. 아래 [모양](#모양)에 있습니다.
+- **트레이 위의 표.** `outline` 은 표 카드를 `bg-neutral-soft` 트레이에 올리고, 선택 수와 페이지 이동을 트레이 아래 줄에 둡니다. 아래 [모양](#모양)에 있습니다.
 
 ```tsx
 import { DataTable } from '@gsainfoteam/ids-react';
@@ -93,7 +93,7 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 - 머리글 체크박스는 모든 행(모든 페이지)을 고르고 풉니다. 일부만 골랐으면 `indeterminate` 입니다.
 - `Shift` 를 누른 채 체크박스를 누르면 마지막으로 누른 행부터 그 행까지 같은 값으로 바꿉니다.
 - 체크박스 이름은 `getRowLabel` 이 있으면 "{label} 선택", 없으면 "{n}번째 행 선택" 입니다.
-- 선택된 행은 `Table.Row selected` 로 `bg-primary-subtle` 가 깔리고 `data-selected` 가 붙습니다.
+- 선택된 행은 `Table.Row selected` 로 `bg-primary-soft` 가 깔리고 `data-selected` 가 붙습니다.
 - 표 아래 "{n}개 선택됨" 이 `aria-live="polite"` 로 바뀐 수를 알립니다.
 - 값은 `{ [rowId]: true }` 입니다. 지운 행의 id 는 스스로 빠지지 않으니 데이터에서 행을 지울 때 선택에서도 뺍니다.
 
@@ -159,9 +159,9 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 <DataTable variant="ghost" />     // 트레이와 세로선 없이 Table ghost 그대로
 ```
 
-- `outline` 의 바깥 `div` 는 `concentric-p-1 bg-neutral-subtle` 트레이입니다. 표 카드는 `rounded-standard`(10px) 라 트레이 모서리는 14px 이 됩니다.
-- 표 카드는 `bg-neutral-subtlest`, `border-neutral` 테두리와 `shadow-xs` 이고, 열 사이에 `border-neutral` 세로선이 들어갑니다.
-- 머리글 행은 트레이(`subtle`)와 카드(`subtlest`) 사이 단계인 `bg-neutral-subtler` 입니다. 트레이와 같은 `bg-neutral-subtle` 이면 다크 모드에서 머리글이 트레이에 묻힙니다.
+- `outline` 의 바깥 `div` 는 `concentric-p-1 bg-neutral-soft` 트레이입니다. 표 카드는 `rounded-standard`(10px) 라 트레이 모서리는 14px 이 됩니다.
+- 표 카드는 `bg-surface`, `border-neutral` 테두리와 `shadow-xs` 이고, 열 사이에 `border-neutral` 세로선이 들어갑니다.
+- 머리글 행은 트레이(`bg-neutral-soft`, 4단계)와 카드(`bg-surface`, 2단계) 사이인 `bg-block`(3단계) 입니다. 트레이와 같은 색이면 다크 모드에서 머리글이 트레이에 묻힙니다.
 - 바닥글은 트레이 안쪽 아래 줄입니다. 페이지 버튼과 정렬 버튼의 hover 와 press 는 글자색 state layer 라 트레이와 머리글 위에서도 따로 맞추지 않아도 보입니다.
 - 바닥글이 없으면(선택과 페이지가 모두 꺼짐) 트레이는 표 둘레 4px 테두리로만 보입니다.
 
