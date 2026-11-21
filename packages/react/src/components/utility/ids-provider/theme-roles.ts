@@ -22,6 +22,7 @@ import {
 import { createIdsRamp, hueOf, shadeOf } from './palette-seed';
 import { fixedStatusPalette, harmonizedStatusPalettes } from './status';
 import {
+  COLOR_KEYS,
   RAMP_STEPS,
   SCALE_STEPS,
   type IdsColorFamily,
@@ -444,13 +445,32 @@ export function resolveColors(theme: IdsThemeOverrides): {
   };
 }
 
-const resolvedThemes = new WeakMap<object, ReturnType<typeof resolveColors>>();
+const RESOLVED_COLOR_SETS_KEPT = 64;
+
+const resolvedColorSets = new Map<string, ReturnType<typeof resolveColors>>();
+
+function colorSetKey(theme: IdsThemeOverrides) {
+  try {
+    return JSON.stringify(COLOR_KEYS.map((key) => theme[key]));
+  } catch {
+    return undefined;
+  }
+}
 
 export function resolveColorsOnce(theme: IdsThemeOverrides) {
-  let resolved = resolvedThemes.get(theme);
-  if (resolved === undefined) {
-    resolved = resolveColors(theme);
-    resolvedThemes.set(theme, resolved);
+  const key = colorSetKey(theme);
+  if (key === undefined) return resolveColors(theme);
+
+  const kept = resolvedColorSets.get(key);
+  if (kept !== undefined) {
+    resolvedColorSets.delete(key);
+    resolvedColorSets.set(key, kept);
+    return kept;
   }
+
+  const resolved = resolveColors(theme);
+  resolvedColorSets.set(key, resolved);
+  if (resolvedColorSets.size > RESOLVED_COLOR_SETS_KEPT)
+    resolvedColorSets.delete(resolvedColorSets.keys().next().value!);
   return resolved;
 }

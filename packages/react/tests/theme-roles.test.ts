@@ -2,7 +2,11 @@ import { describe, expect, test } from 'vitest';
 
 import { palettes } from '../.storybook/palettes';
 import { createIdsPalette } from '../src/components/utility/ids-provider/palette-scales';
-import { resolveColors, slotsOf } from '../src/components/utility/ids-provider/theme-roles';
+import {
+  resolveColors,
+  resolveColorsOnce,
+  slotsOf,
+} from '../src/components/utility/ids-provider/theme-roles';
 import { checkIdsTheme } from '../src/components/utility/ids-provider/theme-variables';
 
 import type { IdsRamp } from '../src/components/utility/ids-provider/theme';
@@ -12,6 +16,25 @@ describe.each(Object.keys(palettes))('%s', (hue) => {
 
   test('passes every role rule', () => {
     expect(issues).toEqual([]);
+  });
+});
+
+describe('resolveColorsOnce', () => {
+  test('a new theme object with the same colors reuses the resolved roles', () => {
+    const first = resolveColorsOnce({ primary: palettes.teal, radius: 8 });
+
+    expect(resolveColorsOnce({ primary: { ...palettes.teal }, cornerShape: 'squircle' })).toBe(
+      first,
+    );
+    expect(resolveColorsOnce({ primary: palettes.teal, neutral: 'tinted' })).not.toBe(first);
+  });
+
+  test('a color set pushed out by 64 newer ones is resolved again', () => {
+    const first = resolveColorsOnce({ primary: '#3366cc' });
+    for (let lightness = 0; lightness < 64; lightness++)
+      resolveColorsOnce({ primary: `oklch(${0.3 + lightness / 200} 0.1 250)` });
+
+    expect(resolveColorsOnce({ primary: '#3366cc' })).not.toBe(first);
   });
 });
 
