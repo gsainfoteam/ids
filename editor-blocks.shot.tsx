@@ -61,7 +61,7 @@ const MODES = ['light', 'dark'] as const;
 function Shot({ mode, children }: { mode: (typeof MODES)[number]; children: ReactNode }) {
   return (
     <IdsProvider theme={testTheme} mode={mode}>
-      <div data-testid="shot" className="flex min-h-[34rem] w-[44rem] flex-col gap-4 bg-neutral-subtlest p-6">
+      <div data-testid="shot" className="flex min-h-[34rem] w-[44rem] flex-col gap-4 bg-base p-6">
         {children}
       </div>
     </IdsProvider>
