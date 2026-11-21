@@ -220,10 +220,6 @@
     "loading": "Loading earlier messages",
     "unseen": "{count, plural, one {# new message} other {# new messages}}"
   },
-  "navbar": {
-    "label": "Main",
-    "open": "Open menu"
-  },
   "numberField": {
     "decrement": "Decrease",
     "increment": "Increase",

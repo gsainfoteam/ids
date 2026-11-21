@@ -333,10 +333,6 @@ mixin IdsMessages {
 
   String? messageScrollerUnseen({required Object count}) => null;
 
-  String? get navbarLabel => null;
-
-  String? get navbarOpen => null;
-
   String? get numberFieldDecrement => null;
 
   String? get numberFieldIncrement => null;
@@ -1024,12 +1020,6 @@ final class IdsKoreanMessages with IdsMessages {
 
   @override
   String messageScrollerUnseen({required Object count}) => '새 메시지 ${_format(count)}개';
-
-  @override
-  String get navbarLabel => '주 메뉴';
-
-  @override
-  String get navbarOpen => '메뉴 열기';
 
   @override
   String get numberFieldDecrement => '값 줄이기';

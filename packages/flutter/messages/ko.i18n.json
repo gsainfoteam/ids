@@ -165,8 +165,6 @@
     "messageScrollerLabel": "메시지",
     "messageScrollerLoading": "이전 메시지를 불러오는 중",
     "messageScrollerUnseen": "새 메시지 {count}개",
-    "navbarLabel": "주 메뉴",
-    "navbarOpen": "메뉴 열기",
     "numberFieldDecrement": "값 줄이기",
     "numberFieldIncrement": "값 늘리기",
     "numberFieldRangeOverflow": "값은 {max} 이하여야 합니다.",
