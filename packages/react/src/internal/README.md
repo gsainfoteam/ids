@@ -163,7 +163,7 @@ export const iconToggleStyle = tv({
   - 계열 채움 층은 빨간 버튼이 hover 때 거뭇해지지 않고 더 붉어지게 합니다.
   - IdsProvider 가 이 층들 아래에서도 글자 대비를 지키는 단계를 고릅니다(`theme-roles.ts` 의 `underStateLayers`). `tests/tokens-contrast.test.ts` 가 확인합니다.
   - `base` 의 `transition-[…]` 에 `--ids-state-opacity` 가 있어 층이 다른 색과 함께 바뀝니다.
-- outline 은 컴포넌트 토큰 `bg-control-outline` 과 `inset-ring-control-outline` 입니다. 라이트는 페이지 색에 `border-neutral` 테두리, 다크는 850 면에 700 테두리라 `bg-surface`(900) 위에서도 면보다 밝고 테두리가 보입니다. `dark:` 클래스는 쓰지 않습니다.
+- outline 은 컴포넌트 토큰 `bg-control-outline` 과 `inset-ring-control-outline` 입니다. 라이트는 `bg-base` 면에 `border-neutral` 테두리, 다크는 `bg-block` 면에 `border-neutral-strong` 테두리라 `bg-surface` 위에서도 면보다 밝고 테두리가 보입니다. `dark:` 클래스는 쓰지 않습니다.
 - scheme 은 상속하지 않습니다. 기본값이라도 `tv` 의 `defaultVariants` 가 자기 클래스를 붙이므로, danger Alert 안의 Button 도 자기 primary 로 그립니다.
 - `glossy` 는 state layer 를 쓰지 않습니다. `state-layer` 가 `background-image` 를 차지하는데 glossy 의 광택도 `background-image` 입니다. 위쪽이 밝은 `bg-linear-to-b from-white/20` 광택, 안쪽 위 1px 하이라이트(`inset-shadow`), 채움 위에 검정 20% 를 얹은 가장자리(`inset-ring-black/20`), `shadow-sm` 입니다. hover 는 광택을 `from-white/30` 으로 밝히고, press 는 광택과 그림자를 빼고 안쪽 그림자로 눌려 들어갑니다.
 - `transparent` 는 어느 상태에서도 배경을 칠하지 않습니다. hover 는 `opacity-70`, press 는 `opacity-40` 입니다. 그래서 `transition` 에 `opacity` 를 더합니다.
