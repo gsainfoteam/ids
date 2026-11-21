@@ -11,10 +11,10 @@ export const linkStyle = tv({
   },
   variants: {
     colorScheme: {
-      primary: { root: 'text-primary' },
-      secondary: { root: 'text-secondary' },
-      tertiary: { root: 'text-tertiary' },
-      neutral: { root: 'text-inherit hover:text-on-surface' },
+      primary: { root: 'scheme-primary text-scheme' },
+      secondary: { root: 'scheme-secondary text-scheme' },
+      tertiary: { root: 'scheme-tertiary text-scheme' },
+      neutral: { root: 'scheme-neutral text-inherit hover:text-scheme' },
     },
     underline: {
       always: { root: 'underline decoration-current/40 hover:decoration-current' },

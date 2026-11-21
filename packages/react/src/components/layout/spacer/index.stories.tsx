@@ -23,7 +23,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const frame = cn('rounded-standard inset-ring-1 inset-ring-neutral');
-const fill = cn('self-stretch bg-primary-soft');
+const fill = cn('self-stretch bg-primary-subtle');
 
 export const Playground: Story = {
   render: (args) => (

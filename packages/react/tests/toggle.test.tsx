@@ -6,6 +6,7 @@ import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
 import { ButtonGroup, IdsProvider, Toggle, ToggleGroup } from '../src';
+import { paintedLayersOf } from './painted-layers';
 import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
@@ -138,14 +139,14 @@ test('a glossy toggle is quiet while off and takes the glossy layers once presse
   await expect.element(toggle).not.toHaveAttribute('data-hovered');
   const element = toggle.element();
 
-  expect(getComputedStyle(element).backgroundImage).toBe('none');
+  expect(paintedLayersOf(element)).toEqual([]);
   expect(getComputedStyle(element).backgroundColor).toBe('rgba(0, 0, 0, 0)');
 
   await userEvent.click(toggle);
   await expect.element(toggle).toHaveAttribute('data-pressed');
   const on = getComputedStyle(element);
   expect(on.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
-  expect(on.backgroundImage).toMatch(/^linear-gradient\(/);
+  expect(paintedLayersOf(element)).not.toEqual([]);
   expect(on.boxShadow).toMatch(/rgba\(255, 255, 255, 0\.35\) 0px 1px 0px 0px inset/);
   expect(on.boxShadow).toMatch(/0px 1px 3px 0px/);
 });

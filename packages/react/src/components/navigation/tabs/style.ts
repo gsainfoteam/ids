@@ -1,4 +1,4 @@
-import { controlSurface, type SurfaceVariant } from '../../../internal/control-surface';
+import { segmentSurface } from '../../../internal/surfaces/segment-surface';
 import { tv } from '../../../utils';
 
 import type { TabsAppearance, TabsColorScheme, TabsOrientation } from './context';
@@ -10,23 +10,23 @@ export const tabsStyle = tv({
     list: 'relative flex shrink-0',
     trigger: [
       'relative inline-flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap select-none',
-      'text-neutral aria-selected:text-on-surface',
-      'not-aria-selected:data-hovered:text-on-surface focus-ring',
-      'transition-[color,background-color,box-shadow] duration-(--ids-motion-fast)',
+      'text-neutral aria-selected:text-neutral-bold',
+      'not-aria-selected:data-hovered:text-neutral-bold focus-ring',
+      'transition-[color,background-color,box-shadow,--ids-state-opacity] duration-(--ids-motion-fast)',
       'motion-reduce:transition-none',
       'disabled:cursor-not-allowed disabled:opacity-50',
       '[&_svg]:pointer-events-none [&_svg]:shrink-0',
     ],
     content: [
-      'min-w-0 flex-1 rounded-standard text-on-surface focus-ring',
+      'min-w-0 flex-1 rounded-standard text-neutral-bold focus-ring',
       '[&[hidden]:not([hidden=until-found])]:hidden',
     ],
   },
   variants: {
     colorScheme: {
-      primary: { list: controlSurface.colorScheme.primary },
-      secondary: { list: controlSurface.colorScheme.secondary },
-      tertiary: { list: controlSurface.colorScheme.tertiary },
+      primary: { list: 'scheme-primary' },
+      secondary: { list: 'scheme-secondary' },
+      tertiary: { list: 'scheme-tertiary' },
     } satisfies Record<TabsColorScheme, object>,
     stretch: { true: {}, false: {} },
     orientation: {
@@ -46,28 +46,28 @@ export const tabsStyle = tv({
         trigger: [
           'rounded-standard',
           'after:pointer-events-none after:absolute after:bg-transparent',
-          'aria-selected:after:bg-(--control-ring)',
+          'aria-selected:text-scheme aria-selected:after:bg-(--ids-color-border-scheme)',
         ],
       },
       pill: {
         list: 'gap-1',
         trigger: [
           'rounded-standard',
-          'not-aria-selected:data-hovered:bg-(--control-hover)',
-          'not-aria-selected:data-active:bg-(--control-press)',
+          'state-layer not-aria-selected:data-hovered:state-hover not-aria-selected:data-active:state-press',
+          'aria-selected:bg-scheme-subtle aria-selected:text-on-scheme-subtle',
         ],
       },
       enclosed: {
-        trigger: 'border border-transparent aria-selected:border-neutral aria-selected:bg-surface',
+        trigger: [
+          'border border-transparent aria-selected:border-neutral aria-selected:bg-(--ids-bg-current)',
+          'aria-selected:text-scheme',
+        ],
+      },
+      segmented: {
+        list: segmentSurface.track,
+        trigger: [segmentSurface.segment, 'not-aria-selected:data-hovered:text-neutral'],
       },
     } satisfies Record<TabsAppearance, object>,
-    variant: {
-      ghost: {},
-      outline: {},
-      soft: {},
-      solid: {},
-      glossy: {},
-    } satisfies Record<SurfaceVariant, object>,
     size: {
       standard: {
         root: 'gap-4',
@@ -122,58 +122,23 @@ export const tabsStyle = tv({
       },
     },
     {
-      appearance: 'pill',
-      variant: 'ghost',
-      class: { trigger: 'aria-selected:bg-(--control-press)' },
+      appearance: 'segmented',
+      orientation: 'horizontal',
+      stretch: false,
+      class: { list: 'w-fit' },
     },
+    { appearance: 'segmented', orientation: 'vertical', class: { list: 'self-start' } },
     {
-      appearance: 'pill',
-      variant: 'soft',
-      class: {
-        trigger: 'aria-selected:bg-(--control-soft) aria-selected:text-(--control-on-soft)',
-      },
+      appearance: 'segmented',
+      size: 'standard',
+      class: { trigger: segmentSurface.height.standard },
     },
-    {
-      appearance: 'pill',
-      variant: 'outline',
-      class: {
-        trigger: [
-          'aria-selected:bg-surface aria-selected:shadow-xs',
-          'aria-selected:inset-ring-1 aria-selected:inset-ring-neutral',
-          'dark:aria-selected:bg-neutral-soft',
-        ],
-      },
-    },
-    {
-      appearance: 'pill',
-      variant: 'solid',
-      class: {
-        trigger: [
-          'aria-selected:bg-(--control-fill) aria-selected:text-(--control-on-fill)',
-          'aria-selected:shadow-xs',
-        ],
-      },
-    },
-    {
-      appearance: 'pill',
-      variant: 'glossy',
-      class: {
-        trigger: [
-          'aria-selected:bg-(--control-fill) aria-selected:text-(--control-on-fill)',
-          'aria-selected:shadow-sm aria-selected:bg-linear-to-b',
-          'aria-selected:from-white/20 aria-selected:to-transparent',
-          'aria-selected:inset-shadow-[0_1px_0_rgb(255_255_255/0.35)]',
-          'aria-selected:inset-ring-1',
-          'aria-selected:inset-ring-[color-mix(in_oklab,var(--control-fill),black_20%)]',
-        ],
-      },
-    },
+    { appearance: 'segmented', size: 'tiny', class: { trigger: segmentSurface.height.tiny } },
   ],
   defaultVariants: {
     colorScheme: 'primary',
     orientation: 'horizontal',
     appearance: 'underline',
-    variant: 'soft',
     size: 'standard',
   },
 });

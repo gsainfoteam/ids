@@ -32,7 +32,7 @@ function Tag({
       {...props}
       data-tag=""
       className={cn(
-        'text-caption-c1-medium bg-primary-soft text-on-primary-soft inline-flex h-6 items-center rounded-full px-2.5',
+        'text-caption-c1-medium bg-primary-subtle text-on-primary-subtle inline-flex h-6 items-center rounded-full px-2.5',
         className,
       )}
     />

@@ -91,7 +91,7 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 - 머리글 체크박스는 모든 행(모든 페이지)을 고르고 풉니다. 일부만 골랐으면 `indeterminate` 입니다.
 - `Shift` 를 누른 채 체크박스를 누르면 마지막으로 누른 행부터 그 행까지 같은 값으로 바꿉니다.
 - 체크박스 이름은 `getRowLabel` 이 있으면 "{label} 선택", 없으면 "{n}번째 행 선택" 입니다.
-- 선택된 행은 `Table.Row selected` 로 `bg-neutral-soft-hover` 가 깔리고 `data-selected` 가 붙습니다.
+- 선택된 행은 `Table.Row selected` 로 글자색 press 층(`state-press`)이 깔리고 `data-selected` 가 붙습니다.
 - 표 아래 "{n}개 선택됨" 이 `aria-live="polite"` 로 바뀐 수를 알립니다.
 - 값은 `{ [rowId]: true }` 입니다. 지운 행의 id 는 스스로 빠지지 않으니 데이터에서 행을 지울 때 선택에서도 뺍니다.
 
@@ -135,7 +135,7 @@ column.display({ id: 'actions', header: '', cell: ({ row }) => <Menu>...</Menu> 
 - 머리글 끝의 핸들은 `role="separator"` + `aria-orientation="vertical"`, 이름은 "{열} 열 너비", 값은 `aria-valuenow` `aria-valuemin` `aria-valuemax`(px)입니다. Tab 으로 갑니다.
 - 기본 너비는 150px, 최소 48px, 최대 960px 입니다. 열의 `size`, `minSize`, `maxSize` 로 바꿉니다.
 - 켜면 표가 `layout="fixed"` 가 되고 `<colgroup>` 이 열 너비를 정합니다. 열 합이 상자보다 좁으면 남는 폭을 나눠 채우고, 넓으면 가로로 스크롤합니다.
-- 끄는 동안 핸들에 `data-resizing` 이 붙고 선이 `handle-active` 가 됩니다.
+- 핸들의 선은 쉴 때 투명하고, 올리거나 포커스하거나 끄는 동안(`data-resizing`) `text-neutral` 색(`bg-(--ids-color-text-neutral)`)입니다.
 
 ## 빈 상태와 로딩
 

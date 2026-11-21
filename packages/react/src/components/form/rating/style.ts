@@ -8,16 +8,15 @@ export const ratingStyle = tv({
   slots: {
     root: [
       'relative inline-flex max-w-full flex-wrap items-center gap-0.5 rounded-standard outline-none',
-      '[--rating-accent:var(--ids-color-text-primary)]',
-      'data-invalid:[--rating-accent:var(--ids-color-bg-danger)]',
+      'scheme-primary data-invalid:scheme-danger',
       'has-[[data-rating-value="0"]:focus-visible]:ring-[3px] has-[[data-rating-value="0"]:focus-visible]:ring-primary/40',
       'data-disabled:opacity-50',
     ],
     item: 'relative inline-flex shrink-0 items-center justify-center rounded-standard focus-ring',
     graphic: 'pointer-events-none relative block size-full [&_svg]:size-full',
-    empty: 'absolute inset-0 text-(--ids-color-border-neutral) in-data-invalid:text-danger/35',
+    empty: 'absolute inset-0 text-(--ids-color-border-neutral) in-data-invalid:text-neutral',
     fill: [
-      'absolute inset-0 text-(--rating-accent) in-data-previewing:opacity-50',
+      'absolute inset-0 text-scheme in-data-previewing:opacity-50',
       '[clip-path:inset(0_calc(100%-var(--rating-fill))_0_0)]',
       'rtl:[clip-path:inset(0_0_0_calc(100%-var(--rating-fill)))]',
     ],

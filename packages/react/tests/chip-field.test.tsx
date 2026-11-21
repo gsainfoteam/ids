@@ -30,13 +30,19 @@ const chips = () =>
   Array.from(document.querySelectorAll('[data-chip-field-chip]'), (chip) => chip.textContent);
 
 const layout = (container: HTMLElement) =>
-  Array.from(container.querySelector('[data-chip-field]')!.children, (element) =>
-    element.hasAttribute('data-chip-field-adornment')
-      ? element.textContent
-      : element.hasAttribute('data-chip-field-chip')
-        ? 'CHIP'
-        : element.tagName.toUpperCase(),
-  );
+  Array.from(container.querySelector('[data-chip-field]')!.children)
+    .flatMap((element) =>
+      element.hasAttribute('data-chip-field-values') ? Array.from(element.children) : [element],
+    )
+    .map((element) =>
+      element.hasAttribute('data-chip-field-sizer')
+        ? element.firstElementChild!.tagName.toUpperCase()
+        : element.hasAttribute('data-chip-field-adornment')
+        ? element.textContent
+        : element.hasAttribute('data-chip-field-chip')
+          ? 'CHIP'
+          : element.tagName.toUpperCase(),
+    );
 
 const settle = () => new Promise((resolve) => setTimeout(resolve));
 
@@ -570,4 +576,73 @@ test('invalid structures fail clearly', () => {
     </ChipField>,
   ])
     expect(() => renderToString(node)).toThrow(/\[IDS\] `<ChipField/);
+});
+
+test('chips that wrap keep even rows, the chevron stays in its own column', async () => {
+  const languages = ['react', 'vue', 'svelte', 'angular', 'solid', 'flutter', 'swift'];
+  const screen = await render(
+    <div className="w-64">
+      <ChipField aria-label="Stack" defaultValue={languages} placeholder="Add">
+        {languages.map((language) => (
+          <ChipField.Item key={language} value={language}>
+            {language}
+          </ChipField.Item>
+        ))}
+      </ChipField>
+    </div>,
+  );
+  await expect.element(screen.getByRole('combobox')).toBeVisible();
+
+  const box = (element: Element) => element.getBoundingClientRect();
+  const root = box(document.querySelector('[data-chip-field]')!);
+  const chipBoxes = Array.from(document.querySelectorAll('[data-chip-field-chip]'), box);
+  const input = box(screen.getByRole('combobox').element());
+  const chevron = box(document.querySelector('[data-chip-field-icon]')!);
+  const rows = [...new Set(chipBoxes.map((chip) => chip.top))];
+
+  expect(rows.length).toBeGreaterThan(1);
+  expect(rows[1]! - rows[0]!).toBe(chipBoxes[0]!.height + 4);
+  expect(input.height).toBe(chipBoxes[0]!.height);
+  expect(chipBoxes[0]!.left - root.left).toBe(chipBoxes[0]!.top - root.top);
+  expect(input.top).toBe(chipBoxes.at(-1)!.top);
+  for (const chip of chipBoxes) expect(chevron.left).toBeGreaterThan(chip.right);
+  expect(chevron.top + chevron.height / 2).toBeCloseTo(root.top + root.height / 2, 0);
+});
+
+test('the placeholder shows only while no chip is chosen', async () => {
+  const screen = await render(
+    <ChipField aria-label="Stack" placeholder="Add">
+      <ChipField.Item value="react">React</ChipField.Item>
+      <ChipField.Item value="vue">Vue</ChipField.Item>
+    </ChipField>,
+  );
+  const input = screen.getByRole('combobox');
+  await expect.element(input).toHaveAttribute('placeholder', 'Add');
+
+  await userEvent.click(input);
+  await userEvent.click(screen.getByRole('option', { name: 'React' }));
+  await expect.element(screen.getByRole('combobox')).not.toHaveAttribute('placeholder');
+
+  await userEvent.keyboard('{Backspace}{Backspace}');
+  await expect.element(screen.getByRole('combobox')).toHaveAttribute('placeholder', 'Add');
+});
+
+test('the input takes the width of its text, so it wraps only when the text does not fit', async () => {
+  const screen = await render(
+    <div className="w-64">
+      <ChipField aria-label="Stack" defaultValue={['react', 'vue']} creatable>
+        <ChipField.Item value="react">react</ChipField.Item>
+        <ChipField.Item value="vue">vue</ChipField.Item>
+      </ChipField>
+    </div>,
+  );
+  const top = (element: Element) => element.getBoundingClientRect().top;
+  const lastChip = () => Array.from(document.querySelectorAll('[data-chip-field-chip]')).at(-1)!;
+  await expect.element(screen.getByRole('combobox')).toBeVisible();
+  expect(top(screen.getByRole('combobox').element())).toBe(top(lastChip()));
+
+  await userEvent.type(screen.getByRole('combobox'), 'a much longer search text');
+  await expect
+    .poll(() => top(screen.getByRole('combobox').element()))
+    .toBeGreaterThan(top(lastChip()));
 });

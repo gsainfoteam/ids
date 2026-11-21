@@ -296,6 +296,42 @@ test('variant styles the current page, size reaches every control, disabled stop
   expect(controls.every((control) => control.disabled)).toBe(true);
 });
 
+function colorOf(variable: string) {
+  const probe = document.createElement('div');
+  probe.style.backgroundColor = `var(${variable})`;
+  document.querySelector('[data-mode]')!.append(probe);
+  const color = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  return color;
+}
+
+test('the current page is primary subtle by default; ghost marks it with primary text', async () => {
+  await render(
+    <IdsProvider theme={testTheme}>
+      <Pagination defaultPage={2} pageCount={3} aria-label="Soft" />
+      <Pagination defaultPage={2} pageCount={3} variant="ghost" aria-label="Ghost" />
+    </IdsProvider>,
+  );
+  const button = (nav: string, n: number) =>
+    page
+      .getByRole('navigation', { name: nav })
+      .getByRole('button', { name: `${n}페이지`, exact: true })
+      .element();
+
+  await expect.element(button('Soft', 2)).toHaveAttribute('data-variant', 'soft');
+  await expect
+    .poll(() => getComputedStyle(button('Soft', 2)).backgroundColor)
+    .toBe(colorOf('--ids-color-bg-primary-subtle'));
+  expect(getComputedStyle(button('Soft', 2)).color).toBe(
+    colorOf('--ids-color-text-on-primary-subtle'),
+  );
+  expect(getComputedStyle(button('Soft', 1)).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+
+  expect(getComputedStyle(button('Ghost', 2)).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+  expect(getComputedStyle(button('Ghost', 2)).color).toBe(colorOf('--ids-color-text-primary'));
+  expect(getComputedStyle(button('Ghost', 1)).color).not.toBe(colorOf('--ids-color-text-primary'));
+});
+
 test('out-of-range pages clamp and warn in development', async () => {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   await render(<Pagination page={9} pageCount={5} />);

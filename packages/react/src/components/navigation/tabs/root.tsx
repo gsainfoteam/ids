@@ -16,7 +16,6 @@ import { TabsTrigger, type TabsTriggerProps } from './trigger';
 import { useTabs } from './use-tabs';
 import { resolveState, type StateRenderProps } from '../../../internal/state-props';
 
-import type { SurfaceVariant } from '../../../internal/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type TabsState<T extends string = string> = {
@@ -32,16 +31,12 @@ export type TabsRenderProps<T extends string = string> = {
   Content: ComponentType<TabsContentProps<T>>;
 };
 
-type TabsLook =
-  | { appearance?: 'underline' | 'enclosed'; variant?: never }
-  | { appearance: 'pill'; variant?: SurfaceVariant };
-
 export type TabsProps<T extends string = string> = Omit<
   ComponentProps<'div'>,
   'children' | 'className' | 'style' | 'defaultValue' | 'onChange'
 > &
-  Omit<StateRenderProps<TabsState<T>>, 'children'> &
-  TabsLook & {
+  Omit<StateRenderProps<TabsState<T>>, 'children'> & {
+    appearance?: TabsAppearance;
     value?: T;
     defaultValue?: NoInfer<T>;
     onValueChange?: (value: T) => void;
@@ -64,7 +59,6 @@ export function TabsRoot<T extends string = string>(props: TabsProps<T>) {
     activationMode = 'automatic',
     loop = true,
     appearance = 'underline',
-    variant = 'soft',
     size = 'standard',
     colorScheme = 'primary',
     className,
@@ -82,7 +76,7 @@ export function TabsRoot<T extends string = string>(props: TabsProps<T>) {
     loop,
   });
 
-  const styles = tabsStyle({ colorScheme, orientation, appearance, variant, size });
+  const styles = tabsStyle({ colorScheme, orientation, appearance, size });
   const state: TabsState<T> = { value: tabs.value as T | undefined, orientation, appearance, size };
 
   return (
@@ -91,7 +85,6 @@ export function TabsRoot<T extends string = string>(props: TabsProps<T>) {
         {...rest}
         data-orientation={orientation}
         data-appearance={appearance}
-        data-variant={appearance === 'pill' ? variant : undefined}
         data-size={size}
         data-color-scheme={colorScheme}
         data-activation-mode={activationMode}

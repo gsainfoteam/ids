@@ -67,12 +67,14 @@ export function FieldPopup({
   const presentation: PopupPresentation = drawer ? 'drawer' : 'popover';
   const initialFocusDone = useRef(false);
   const [titleId, setTitleId] = useState<string>();
+  const [stacked, setStacked] = useState(false);
 
   const layer = useLayer(true, {
     kind: drawer ? 'modal' : 'popup',
     element: () => popup,
     anchor: () => anchor.current,
     onDismiss: (reason) => onClose(reason === 'escape-key'),
+    onPositionChange: ({ modalsBelow }) => setStacked(modalsBelow > 0),
   });
 
   const anchored = useAnchored({
@@ -141,7 +143,13 @@ export function FieldPopup({
       layer={layer}
       element={popup}
       contentRef={setPopup}
-      backdrop={drawer && { 'data-field-popup-backdrop': '', className: styles.backdrop() }}
+      backdrop={
+        drawer && {
+          'data-field-popup-backdrop': '',
+          'data-stacked': stacked ? '' : undefined,
+          className: styles.backdrop(),
+        }
+      }
       onBackdropClick={() => onClose(true)}
     >
       <ScrollArea asChild fade="y">

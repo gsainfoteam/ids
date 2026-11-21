@@ -6,7 +6,7 @@
 - **키보드 한 번에 한 칸.** 탭 목록 전체가 Tab 한 칸이고 고른 탭에 멈춥니다. 안에서는 화살표, Home, End 로 옮기고, 끝에서 처음으로 돌아가며, 비활성 탭은 건너뜁니다.
 - **자동과 수동.** 기본은 화살표로 옮기면 바로 고릅니다. `activationMode="manual"` 이면 Enter 나 Space 로 고릅니다.
 - **타입으로 막는 잘못된 값.** children 을 함수로 쓰면 탭 값의 타입으로 좁힌 `List`, `Trigger`, `Content` 를 받습니다.
-- **세 가지 모양.** 선(`underline`), 채움(`pill`), 상자(`enclosed`). `pill` 은 `variant` 로 채움 강도를 고릅니다.
+- **네 가지 모양.** 선(`underline`), 옅은 채움(`pill`), 상자(`enclosed`), 트랙 위 칸(`segmented`). 모양마다 한 가지로 고정되어 있고, 다른 모양은 Trigger의 `className`으로 바꿉니다.
 
 ```tsx
 import { Tabs } from '@gsainfoteam/ids-react';
@@ -79,16 +79,19 @@ const [section, setSection] = useState<Section>('docs');
 ## 모양
 
 ```tsx
-<Tabs appearance="underline" />                  // 기본. 고른 탭 아래 accent 선
-<Tabs appearance="pill" variant="soft" />        // 고른 탭을 채운다. variant 기본은 soft
+<Tabs appearance="underline" />                  // 기본. 고른 탭의 글자와 아래 선이 primary
+<Tabs appearance="pill" />                       // 고른 탭을 bg-primary-subtle 로 채운다
 <Tabs appearance="enclosed" />                   // 고른 탭이 내용 쪽으로 열린 상자
+<Tabs appearance="segmented" />                  // SegmentedControl 과 같은 트랙과 칸
 <Tabs orientation="vertical" />                  // 목록이 앞에, 내용이 옆에
 <Tabs size="tiny" />                             // standard(기본) / tiny
 ```
 
-- `variant` 는 `pill` 에서만 받습니다(`ghost` `outline` `soft` `solid` `glossy`). 다른 모양에 주면 타입 오류입니다.
-- 고르지 않은 탭은 흐린 글자(`text-neutral`), 고른 탭은 본문 글자(`on-surface`)입니다. `pill` 의 `soft` 는 `secondary`, `solid` 와 `glossy` 는 `primary` 로 채웁니다.
-- `enclosed` 의 고른 탭은 `surface` 로 칠해 목록 선을 덮습니다. `surface` 가 아닌 배경 위에서는 탭 색을 `className` 으로 맞춥니다.
+- 고르지 않은 탭은 흐린 글자(`text-neutral`)입니다. `underline` 과 `enclosed` 의 고른 탭은 `text-primary`, 선은 `border-primary` 입니다. `colorScheme` 을 주면 그 계열의 `text-X` 와 `border-X` 입니다.
+- `pill` 의 고른 탭은 `bg-primary-subtle` 과 `text-on-primary-subtle` 입니다. 고르지 않은 탭은 올리고 누르면 글자색 층(`state-hover`, `state-press`)을 얹습니다.
+- `enclosed` 의 고른 탭은 놓인 면의 색(`--ids-bg-current`)으로 칠해 목록 선을 덮습니다. 페이지, `bg-panel` 카드, `bg-band` 띠 위에서 따로 맞추지 않아도 됩니다.
+- `segmented` 는 `SegmentedControl` 과 같은 모양입니다. 목록이 `bg-neutral-subtle` 트랙이고, 고른 탭이 `bg-segment` 칸에 `shadow-xs` 입니다. 글자는 `text-neutral` 에서 `text-neutral-bold` 로 바뀌고 `colorScheme` 은 쓰지 않습니다. 트랙은 탭 높이에 `concentric-p-1` 을 두른 다른 컨트롤과 같은 높이이고, `stretch` 가 아니면 내용 폭만큼만 차지합니다.
+- 로그인 방법(QR 코드, 비밀번호)처럼 패널을 오가지만 컨트롤처럼 보여야 하면 `segmented` 를 씁니다. 패널 없이 값만 고르면 `SegmentedControl` 입니다.
 - `<Tabs.List stretch>` 는 가로 탭이 목록 폭을 똑같이 나눠 채웁니다. 카드 폭에 맞춘 두세 칸짜리 탭에 씁니다.
 
 ```tsx
@@ -120,7 +123,7 @@ const [section, setSection] = useState<Section>('docs');
 
 - `Tabs.Trigger` 와 `Tabs.Content` 의 `className`, `style`, `children` 은 상태 함수를 받습니다. Trigger 는 `selected` 와 `hovered`, `focusVisible` 같은 상호작용 상태, Content 는 `selected` 를 줍니다.
 - `Tabs` 의 `className` 과 `style` 은 `value`, `orientation`, `appearance`, `size` 를 받습니다. `Tabs` 의 함수 children 은 상태가 아니라 파트를 받습니다.
-- `data-selected` 가 고른 탭과 내용에, `data-orientation` 이 모든 파트에 붙습니다. 루트에는 `data-appearance`, `data-variant`(pill), `data-size`, `data-activation-mode` 가 붙습니다.
+- `data-selected` 가 고른 탭과 내용에, `data-orientation` 이 모든 파트에 붙습니다. 루트에는 `data-appearance`, `data-size`, `data-activation-mode` 가 붙습니다.
 
 ## 속성
 
@@ -128,8 +131,8 @@ const [section, setSection] = useState<Section>('docs');
 | ------------------------ | ---------------------------------------------------------------- |
 | `value` / `defaultValue` | 고른 탭의 값. 없으면 첫 번째 활성 탭                             |
 | `onValueChange`          | 탭을 고를 때 새 값으로                                           |
-| `appearance`             | `underline`(기본) / `pill` / `enclosed`                          |
-| `variant`                | `pill` 에서만. `soft`(기본) / `ghost` / `outline` / `solid` / `glossy` |
+| `appearance`             | `underline`(기본) / `pill` / `enclosed` / `segmented`            |
+| `colorScheme`            | `primary`(기본) / `secondary` / `tertiary`. 고른 탭의 글자, 선, 채움 |
 | `orientation`            | `horizontal`(기본) / `vertical`                                  |
 | `activationMode`         | `automatic`(기본) / `manual`                                     |
 | `loop`                   | `true`. 화살표가 끝에서 처음으로 돌아간다                        |

@@ -83,7 +83,7 @@ import { Skeleton } from '@gsainfoteam/ids-react';
   )}
 </section>
 
-<Item.Group aria-label="멤버" aria-busy={isLoading}>
+<ItemGroup aria-label="멤버" aria-busy={isLoading}>
   {isLoading
     ? Array.from({ length: 5 }, (_, index) => (
         <Item key={index}>
@@ -97,7 +97,7 @@ import { Skeleton } from '@gsainfoteam/ids-react';
         </Item>
       ))
     : members.map((member) => <Item key={member.id}>...</Item>)}
-</Item.Group>
+</ItemGroup>
 ```
 
 - 모양만 여러 개 쓰는 영역은 앱이 그 영역에 `aria-busy={isLoading}` 을 둡니다. 모양은 `aria-hidden` 이라서 스크린 리더에는 없는 요소입니다.
@@ -108,14 +108,14 @@ import { Skeleton } from '@gsainfoteam/ids-react';
 ## 애니메이션
 
 ```tsx
-<Skeleton animation="pulse" />  // 기본. `bg-neutral-soft` 와 `bg-neutral-soft-hover` 사이를 오간다
-<Skeleton animation="wave" />   // `bg-neutral-soft-hover` 빛 줄기가 글 방향으로 지나간다. RTL 이면 반대로
+<Skeleton animation="pulse" />  // 기본. `bg-neutral-subtle` 와 페이지에 가까운 `bg-neutral-subtler` 사이를 오간다
+<Skeleton animation="wave" />   // `bg-neutral-subtler` 빛 줄기가 글 방향으로 지나간다. RTL 이면 반대로
 <Skeleton animation="none" />   // 움직이지 않는다
 ```
 
-- 바탕은 `--ids-color-bg-neutral-soft`, 밝아질 때와 빛 줄기는 `--ids-color-bg-neutral-soft-hover` 입니다(중립 사다리 한 칸).
+- 바탕은 `--ids-color-bg-neutral-subtle`, 밝아질 때와 빛 줄기는 `--ids-color-bg-neutral-subtler` 입니다(페이지 쪽으로 한 세기).
 - 움직임은 CSS 패키지의 `animate-skeleton-pulse`, `animate-skeleton-wave` 이고 한 번에 2초입니다.
-- `prefers-reduced-motion` 이면 움직이지 않고 `bg-neutral-soft` 바탕만 남습니다.
+- `prefers-reduced-motion` 이면 움직이지 않고 `bg-neutral-subtle` 바탕만 남습니다.
 
 ## data 속성
 

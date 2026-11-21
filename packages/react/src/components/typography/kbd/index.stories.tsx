@@ -184,29 +184,3 @@ export const SymbolNames: Story = {
     await expect(glyph).toHaveAttribute('aria-hidden', 'true');
   },
 };
-
-export const Group: Story = {
-  render: () => (
-    <Kbd.Group size="tiny" platform="mac" data-testid="group">
-      <Kbd keys="Mod" />
-      <span>then</span>
-      <Kbd>G</Kbd>
-    </Kbd.Group>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Kbd.Group은 여러 키를 하나의 입력으로 묶습니다. 크기와 플랫폼은 안쪽 Kbd로 이어집니다.',
-      },
-    },
-  },
-  play: async ({ canvas }) => {
-    const group = canvas.getByTestId('group');
-    await expect(group.tagName).toBe('KBD');
-    const caps = group.querySelectorAll('kbd[data-kbd]');
-    await expect(caps).toHaveLength(2);
-    for (const cap of caps) await expect(cap).toHaveAttribute('data-size', 'tiny');
-    await expect(visible(caps[0]!)).toBe('⌘');
-  },
-};

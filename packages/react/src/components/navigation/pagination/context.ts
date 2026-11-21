@@ -5,7 +5,7 @@ import { createContext, use } from 'react';
 import { invariant } from '../../../utils';
 
 import type { paginationStyle } from './style';
-import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type PaginationContextValue = {

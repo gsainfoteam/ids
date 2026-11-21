@@ -15,61 +15,19 @@ export const badgeStyle = tv({
   },
   variants: {
     colorScheme: {
-      neutral: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-on-surface)] [--badge-fill:var(--ids-color-on-surface)] [--badge-on-fill:var(--ids-color-surface)] [--badge-text:var(--ids-color-on-surface)]',
-          '[--badge-tint:color-mix(in_oklab,var(--ids-color-on-surface)_16%,var(--ids-color-surface))] [--badge-on-tint:var(--ids-color-on-surface)]',
-        ],
-      },
-      primary: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-primary)] [--badge-fill:var(--ids-color-bg-primary)] [--badge-on-fill:var(--ids-color-text-on-primary)] [--badge-text:var(--ids-color-text-primary)]',
-          '[--badge-tint:var(--ids-color-bg-primary-soft)] [--badge-on-tint:var(--ids-color-text-on-primary-soft)]',
-        ],
-      },
-      secondary: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-secondary)] [--badge-fill:var(--ids-color-bg-secondary)] [--badge-on-fill:var(--ids-color-text-on-secondary)] [--badge-text:var(--ids-color-text-secondary)]',
-          '[--badge-tint:var(--ids-color-bg-secondary-soft)] [--badge-on-tint:var(--ids-color-text-on-secondary-soft)]',
-        ],
-      },
-      tertiary: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-tertiary)] [--badge-fill:var(--ids-color-bg-tertiary)] [--badge-on-fill:var(--ids-color-text-on-tertiary)] [--badge-text:var(--ids-color-text-tertiary)]',
-          '[--badge-tint:var(--ids-color-bg-tertiary-soft)] [--badge-on-tint:var(--ids-color-text-on-tertiary-soft)]',
-        ],
-      },
-      success: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-success)] [--badge-fill:var(--ids-color-bg-success)] [--badge-on-fill:var(--ids-color-text-on-success)] [--badge-text:var(--ids-color-text-success)]',
-          '[--badge-tint:var(--ids-color-bg-success-soft)] [--badge-on-tint:var(--ids-color-text-on-success-soft)]',
-        ],
-      },
-      warning: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-warning)] [--badge-fill:var(--ids-color-bg-warning)] [--badge-on-fill:var(--ids-color-text-on-warning)] [--badge-text:var(--ids-color-text-warning)]',
-          '[--badge-tint:var(--ids-color-bg-warning-soft)] [--badge-on-tint:var(--ids-color-text-on-warning-soft)]',
-        ],
-      },
-      danger: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-danger)] [--badge-fill:var(--ids-color-bg-danger)] [--badge-on-fill:var(--ids-color-text-on-danger)] [--badge-text:var(--ids-color-text-danger)]',
-          '[--badge-tint:var(--ids-color-bg-danger-soft)] [--badge-on-tint:var(--ids-color-text-on-danger-soft)]',
-        ],
-      },
-      info: {
-        indicator: [
-          '[--badge-accent:var(--ids-color-border-info)] [--badge-fill:var(--ids-color-bg-info)] [--badge-on-fill:var(--ids-color-text-on-info)] [--badge-text:var(--ids-color-text-info)]',
-          '[--badge-tint:var(--ids-color-bg-info-soft)] [--badge-on-tint:var(--ids-color-text-on-info-soft)]',
-        ],
-      },
+      neutral: { indicator: 'scheme-neutral' },
+      primary: { indicator: 'scheme-primary' },
+      secondary: { indicator: 'scheme-secondary' },
+      tertiary: { indicator: 'scheme-tertiary' },
+      success: { indicator: 'scheme-success' },
+      warning: { indicator: 'scheme-warning' },
+      danger: { indicator: 'scheme-danger' },
+      info: { indicator: 'scheme-info' },
     } satisfies Record<BadgeColorScheme, object>,
     variant: {
-      solid: { indicator: 'bg-(--badge-fill) text-(--badge-on-fill)' },
-      soft: { indicator: 'bg-(--badge-tint) text-(--badge-on-tint)' },
-      outline: {
-        indicator: 'bg-surface text-(--badge-text) inset-ring-1 inset-ring-(--badge-accent)/45',
-      },
+      solid: { indicator: 'bg-scheme text-on-scheme' },
+      soft: { indicator: 'bg-scheme-subtle text-on-scheme-subtle' },
+      outline: { indicator: 'bg-neutral-subtlest text-scheme inset-ring-1 inset-ring-neutral' },
     } satisfies Record<BadgeVariant, object>,
     size: { standard: {}, tiny: {} } satisfies Record<IdsSize, object>,
     dot: { true: {}, false: {} },
@@ -102,7 +60,7 @@ export const badgeStyle = tv({
     {
       placement: ['top-end', 'top-start', 'bottom-end', 'bottom-start'],
       class: {
-        indicator: ['pointer-events-none absolute z-10', 'ring-2 ring-surface'],
+        indicator: ['pointer-events-none absolute z-10', 'ring-2 ring-(--ids-bg-current)'],
       },
     },
     {

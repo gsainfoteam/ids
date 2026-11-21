@@ -75,7 +75,7 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
   </tr>
 </tbody>
 
-{items.length > 0 ? <Item.Group>...</Item.Group> : <Empty size="tiny">...</Empty>}
+{items.length > 0 ? <ItemGroup>...</ItemGroup> : <Empty size="tiny">...</Empty>}
 ```
 
 - 좁은 자리(목록, 표, 카드 안)는 `size="tiny"` 가 맞습니다. Notion 스펙의 `compact` 가 이것입니다.
@@ -91,7 +91,7 @@ import { Button, Empty } from '@gsainfoteam/ids-react';
 ```
 
 - 패딩은 `concentric-p-8`, `concentric-p-4` 라 모서리가 `container`(16px) 까지 따라 둥글어집니다.
-- 테두리와 배경은 중립색(`--ids-color-border-neutral`, `--ids-color-bg-neutral-soft`)입니다.
+- 테두리와 배경은 중립색(`--ids-color-border-neutral`, `--ids-color-bg-neutral-subtle`)입니다.
 
 ## data 속성
 

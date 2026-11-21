@@ -87,7 +87,7 @@ import { Field, Switch } from '@gsainfoteam/ids-react';
 | `focused`      | `data-focused`           | 포커스                            |
 | `focusVisible` | `data-focus-visible`     | 키보드 포커스. 포커스 링이 보인다 |
 
-- 켜진 트랙 색은 `--switch-accent`, 켜진 thumb 색은 `--switch-on-accent` 입니다.
+- 켜진 트랙 색은 `bg-scheme`, 켜진 thumb 색은 `text-on-scheme` 입니다. 기본은 `scheme-primary`, 오류면 `scheme-danger` 입니다.
 
 ## 폼
 

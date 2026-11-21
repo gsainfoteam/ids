@@ -7,7 +7,7 @@ import { NumberFieldInput } from './input';
 import { NumberFieldStepper } from './stepper';
 import { numberFieldStyle } from './style';
 import { useNumberField } from './use-number-field';
-import { type FieldSurfaceVariant } from '../../../internal/field-surface';
+import { type FieldSurfaceVariant } from '../../../internal/surfaces/field-surface';
 import {
   Adornments,
   TextControlClear,

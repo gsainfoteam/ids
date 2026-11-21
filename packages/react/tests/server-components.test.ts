@@ -98,7 +98,7 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     (name) => /^[A-Z][a-z]/.test(name) && ids[name].$$typeof === clientReference,
   );
 
-  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image, defineIdsTheme, checkIdsTheme } = ids;
+  const { IdsProvider, Dialog, Select, Card, Field, TextField, Button, Badge, Bubble, Divider, Image, ImageGroup, defineIdsTheme, checkIdsTheme } = ids;
   const palette = { 50: '#eff6ff', 100: '#dbeafe', 200: '#bedbff', 300: '#8ec5ff', 400: '#51a2ff', 500: '#2b7fff', 600: '#155dfc', 700: '#1447e6', 800: '#193cb8', 900: '#1c398e', 950: '#162456' };
   const theme = defineIdsTheme({ primary: palette, radius: 12 });
   if (checkIdsTheme(theme).length) {
@@ -133,7 +133,7 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
     ),
     h(TextField, { name: 'note' }, h(TextField.Clear)),
     h(
-      Image.Group,
+      ImageGroup,
       { 'aria-label': 'Photos' },
       h(Image, { src: '/lake.png', alt: 'Lake' }),
       h(
@@ -167,30 +167,34 @@ const renderFromAServerComponent = (namespaced: Record<string, string[]>) => `
   console.log(JSON.stringify({ clientComponents, payload }));
 `;
 
-const renderChartFromAServerComponent = `
+const renderEntryFromAServerComponent = ({
+  entry,
+  component,
+  parts,
+  page,
+}: {
+  entry: string;
+  component: string;
+  parts: string[];
+  page: string;
+}) => `
   ${clientModulesAsReferences}
 
   const { createElement: h } = await import('react');
   const { renderToPipeableStream } = await import('react-server-dom-turbopack/server');
   const { Writable } = await import('node:stream');
-  const { Chart } = await import('./dist/chart.js');
+  const { ${component} } = await import('./dist/${entry}.js');
 
   const clientReference = Symbol.for('react.client.reference');
-  const parts = ['Title', 'Description', 'Tooltip', 'TooltipContent', 'Legend', 'LegendContent', 'Table', 'Style'];
-  const unreachable = Chart.$$typeof === clientReference ? ['Chart'] : parts.filter((part) => Chart[part] === undefined);
+  const parts = ${JSON.stringify(parts)};
+  const unreachable = ${component}.$$typeof === clientReference ? ['${component}'] : parts.filter((part) => ${component}[part] === undefined);
   if (unreachable.length) {
     console.error('Parts a Server Component cannot reach: ' + unreachable.join(', '));
     process.exit(1);
   }
-  Chart.Style();
+  ${component}.Style();
 
-  const page = h(
-    Chart,
-    { config: { web: { label: 'Web' } } },
-    h(Chart.Title, null, 'Visits'),
-    h(Chart.Description, null, 'Last week'),
-    h(Chart.Table),
-  );
+  const page = ${page};
   const manifest = new Proxy({}, {
     get: (_, id) => {
       const [module, name] = String(id).split('#');
@@ -213,6 +217,42 @@ const renderChartFromAServerComponent = `
   console.log(payload);
 `;
 
+const renderChartFromAServerComponent = renderEntryFromAServerComponent({
+  entry: 'chart',
+  component: 'Chart',
+  parts: [
+    'Title',
+    'Description',
+    'Tooltip',
+    'TooltipContent',
+    'Legend',
+    'LegendContent',
+    'Table',
+    'Style',
+  ],
+  page: `h(
+    Chart,
+    { config: { web: { label: 'Web' } } },
+    h(Chart.Title, null, 'Visits'),
+    h(Chart.Description, null, 'Last week'),
+    h(Chart.Table),
+  )`,
+});
+
+const renderEditorFromAServerComponent = renderEntryFromAServerComponent({
+  entry: 'editor',
+  component: 'Editor',
+  parts: ['Content', 'BlockType', 'Bold', 'Link', 'Separator', 'BubbleMenu', 'Count', 'Style'],
+  page: `h(
+    Editor,
+    { name: 'body', defaultValue: '<p>Hello</p>' },
+    h(Editor.Bold),
+    h(Editor.Link),
+    h(Editor.Content),
+    h(Editor.Count),
+  )`,
+});
+
 test(
   'a Server Component renders Chart and its parts from the chart entry',
   () => {
@@ -220,6 +260,24 @@ test(
     expect(rendered.status, rendered.stderr).toBe(0);
 
     for (const reference of ['ChartRoot', 'ChartTitle', 'ChartDescription', 'ChartTable'])
+      expect(rendered.stdout).toContain(`"${reference}"`);
+  },
+  coldNodeStartOnABusyRunner,
+);
+
+test(
+  'a Server Component renders Editor and its parts from the editor entry',
+  () => {
+    const rendered = runNode(['react-server'], renderEditorFromAServerComponent);
+    expect(rendered.status, rendered.stderr).toBe(0);
+
+    for (const reference of [
+      'EditorRoot',
+      'EditorBold',
+      'EditorLink',
+      'EditorContentPart',
+      'EditorCount',
+    ])
       expect(rendered.stdout).toContain(`"${reference}"`);
   },
   coldNodeStartOnABusyRunner,
@@ -244,7 +302,7 @@ test(
 
     expect(clientComponents).toEqual(['ThemeContext', 'TooltipDelayGroup']);
     expect(namespaced.Image).toEqual(
-      expect.arrayContaining(['Group', 'Viewer', 'Viewer.Toolbar', 'Viewer.Close']),
+      expect.arrayContaining(['Viewer', 'Viewer.Toolbar', 'Viewer.Close']),
     );
     expect(payload).toContain('"600":"#155dfc"');
     for (const reference of [
@@ -258,7 +316,7 @@ test(
       'SelectRoot',
       'SelectItem',
       'FieldLabel',
-      'ImageGroup',
+      'ImageGroupRoot',
       'ImageViewer',
       'ImageViewerToolbar',
       'ImageViewerClose',

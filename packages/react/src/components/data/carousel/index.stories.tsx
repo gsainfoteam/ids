@@ -131,7 +131,7 @@ export const Gallery: Story = {
               <Carousel.Content className="gap-3">
                 {products.map((product) => (
                   <Carousel.Slide key={product.id}>
-                    <div className="rounded-container text-subtitle-s2-semibold bg-neutral-soft flex aspect-square items-center justify-center">
+                    <div className="rounded-container text-subtitle-s2-semibold bg-neutral-subtle flex aspect-square items-center justify-center">
                       {product.name}
                     </div>
                   </Carousel.Slide>
@@ -150,7 +150,7 @@ export const Gallery: Story = {
           <Carousel aria-label="가로 공지" className="w-96">
             {notices.map((notice) => (
               <Carousel.Slide key={notice}>
-                <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-28 items-center justify-center px-16 text-center">
+                <p className="rounded-container text-body-b3-medium bg-neutral-subtle flex h-28 items-center justify-center px-16 text-center">
                   {notice}
                 </p>
               </Carousel.Slide>
@@ -162,7 +162,7 @@ export const Gallery: Story = {
             <Carousel.Content className="h-40">
               {notices.map((notice) => (
                 <Carousel.Slide key={notice}>
-                  <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-full items-center justify-center px-6 text-center">
+                  <p className="rounded-container text-body-b3-medium bg-neutral-subtle flex h-full items-center justify-center px-6 text-center">
                     {notice}
                   </p>
                 </Carousel.Slide>
@@ -225,7 +225,7 @@ export const Gallery: Story = {
             <Carousel.Content className="gap-3">
               {products.map((product) => (
                 <Carousel.Slide key={product.id}>
-                  <div className="rounded-container text-body-b3-medium bg-neutral-soft flex aspect-square items-center justify-center">
+                  <div className="rounded-container text-body-b3-medium bg-neutral-subtle flex aspect-square items-center justify-center">
                     {product.name}
                   </div>
                 </Carousel.Slide>
@@ -411,7 +411,7 @@ export const Autoplay: Story = {
     <Carousel aria-label="공지 배너" loop autoplay={{ delay: 5000 }} className="w-full max-w-md">
       {notices.map((notice) => (
         <Carousel.Slide key={notice}>
-          <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-32 items-center justify-center px-16 text-center">
+          <p className="rounded-container text-body-b3-medium bg-neutral-subtle flex h-32 items-center justify-center px-16 text-center">
             {notice}
           </p>
         </Carousel.Slide>
@@ -453,7 +453,7 @@ export const AutoScroll: Story = {
       <Carousel.Content className="gap-3">
         {products.map((product) => (
           <Carousel.Slide key={product.id}>
-            <div className="rounded-container text-body-b3-medium bg-neutral-soft flex h-20 items-center justify-center">
+            <div className="rounded-container text-body-b3-medium bg-neutral-subtle flex h-20 items-center justify-center">
               {product.name}
             </div>
           </Carousel.Slide>
@@ -490,7 +490,7 @@ export const Vertical: Story = {
       <Carousel.Content className="h-40">
         {notices.map((notice) => (
           <Carousel.Slide key={notice}>
-            <p className="rounded-container text-body-b3-medium bg-neutral-soft flex h-full items-center justify-center px-6 text-center">
+            <p className="rounded-container text-body-b3-medium bg-neutral-subtle flex h-full items-center justify-center px-6 text-center">
               {notice}
             </p>
           </Carousel.Slide>

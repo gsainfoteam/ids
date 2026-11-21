@@ -4,7 +4,8 @@ import { expect, test, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 
-import { Calendar } from '../src';
+import { Calendar, IdsProvider } from '../src';
+import { testTheme } from './theme';
 
 const parse = (html: string) => new DOMParser().parseFromString(html, 'text/html');
 const ssr = (props: Calendar.Props) => parse(renderToString(<Calendar {...props} />));
@@ -550,4 +551,45 @@ test('root className and style accept a function of the calendar state; native p
   day('2026-09-18').focus();
   await userEvent.keyboard('x');
   expect(pressed).toBe('x');
+});
+
+function colorOf(variable: string) {
+  const probe = document.createElement('div');
+  probe.style.backgroundColor = `var(${variable})`;
+  document.querySelector('[data-mode]')!.append(probe);
+  const color = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+  return color;
+}
+
+test('a range band is primary subtle, a preview neutral, and today a primary label and ring', async () => {
+  await render(
+    <IdsProvider theme={testTheme}>
+      <Calendar
+        selectionMode="range"
+        defaultValue={{ start: d(2026, 9, 10), end: d(2026, 9, 17) }}
+        today={d(2026, 9, 15)}
+      />
+    </IdsProvider>,
+  );
+  await expect.element(day('2026-09-12')).toHaveAttribute('data-range-middle');
+
+  const background = (key: string) => getComputedStyle(day(key).parentElement!).backgroundColor;
+  expect(background('2026-09-12')).toBe(colorOf('--ids-color-bg-primary-subtle'));
+  expect(background('2026-09-20')).toBe('rgba(0, 0, 0, 0)');
+  expect(getComputedStyle(day('2026-09-12')).color).toBe(
+    colorOf('--ids-color-text-on-primary-subtle'),
+  );
+
+  const today = getComputedStyle(day('2026-09-15'));
+  expect(today.color).toBe(colorOf('--ids-color-text-primary'));
+  expect(today.boxShadow).toContain(colorOf('--ids-color-border-primary'));
+  expect(getComputedStyle(day('2026-09-14')).boxShadow).not.toContain(
+    colorOf('--ids-color-border-primary'),
+  );
+
+  await userEvent.click(day('2026-09-20'));
+  await userEvent.hover(day('2026-09-23'));
+  await expect.element(day('2026-09-22')).toHaveAttribute('data-range-preview');
+  await expect.poll(() => background('2026-09-22')).toBe(colorOf('--ids-color-bg-neutral-subtle'));
 });

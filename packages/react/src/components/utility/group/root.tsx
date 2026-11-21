@@ -8,7 +8,7 @@ import { isDevelopment } from '../../../utils/dev';
 import { Divider } from '../../layout/divider';
 
 import type { Group } from '.';
-import type { SurfaceVariant } from '../../../internal/control-surface';
+import type { SurfaceVariant } from '../../../internal/surfaces/control-surface';
 import type { IdsSize } from '../../../tokens/types';
 
 export type GroupOrientation = 'horizontal' | 'vertical';
@@ -86,11 +86,11 @@ export function GroupSeparator({ className, ...props }: Group.SeparatorProps) {
       orientation={group.orientation === 'horizontal' ? 'vertical' : 'horizontal'}
       decorative={group.separator === 'decorative'}
       data-group-separator=""
-      className={groupStyle({ orientation: group.orientation, attached: group.attached }).separator(
-        {
-          className,
-        },
-      )}
+      className={groupStyle({
+        orientation: group.orientation,
+        attached: group.attached,
+        size: group.size,
+      }).separator({ className })}
     />
   );
 }

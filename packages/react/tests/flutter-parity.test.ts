@@ -2,11 +2,14 @@ import { expect, test } from 'vitest';
 
 import { paletteHues, palettes, paletteSeeds } from '../.storybook/palettes';
 import { MODES, resolveColors, slotsOf } from '../src/components/utility/ids-provider/theme-roles';
-import { IDS_BASE_SLOTS, IDS_COLOR_FAMILIES } from '../src/tokens/color-roles';
+import { IDS_COLOR_FAMILIES } from '../src/tokens/color-roles';
+import { IDS_COMPONENT_COLORS } from '../src/tokens/component-tokens';
 
 import type { IdsNeutral, IdsStatus } from '../src/components/utility/ids-provider/theme';
 
-const ROLES = [...IDS_BASE_SLOTS, ...IDS_COLOR_FAMILIES.flatMap(slotsOf)];
+const ROLES = IDS_COLOR_FAMILIES.flatMap(slotsOf);
+
+const COMPONENT_COLORS = Object.keys(IDS_COMPONENT_COLORS) as (keyof typeof IDS_COMPONENT_COLORS)[];
 
 const NEUTRALS: IdsNeutral[] = ['pure', 'tinted'];
 
@@ -22,6 +25,12 @@ function resolvedRoles(primary: (typeof paletteHues)[number], neutral: IdsNeutra
     neutral,
     status,
     ...Object.fromEntries(MODES.map((mode) => [mode, ROLES.map((role) => colors!.roles[mode][role])])),
+    components: Object.fromEntries(
+      MODES.map((mode) => [
+        mode,
+        COMPONENT_COLORS.map((token) => colors!.roles[mode][IDS_COMPONENT_COLORS[token][mode]]),
+      ]),
+    ),
   };
 }
 
@@ -29,7 +38,7 @@ test('the fixture ids_flutter checks its roles against is what React resolves', 
   const themes = paletteHues.flatMap((primary) =>
     NEUTRALS.flatMap((neutral) => STATUSES.map((status) => resolvedRoles(primary, neutral, status))),
   );
-  const fixture = `{\n"roles": ${JSON.stringify(ROLES)},\n"themes": [\n${themes
+  const fixture = `{\n"roles": ${JSON.stringify(ROLES)},\n"components": ${JSON.stringify(COMPONENT_COLORS)},\n"themes": [\n${themes
     .map((theme) => JSON.stringify(theme))
     .join(',\n')}\n]\n}\n`;
 

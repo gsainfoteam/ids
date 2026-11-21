@@ -4,6 +4,7 @@ export 'tokens/ids_enums.dart';
 export 'tokens/ids_motion.dart';
 export 'tokens/ids_typography.dart';
 export 'tokens/ids_color_roles.dart';
+export 'tokens/ids_component_tokens.dart';
 export 'tokens/ids_palette_model.dart' show IdsStatusPalettes;
 
 export 'theme/ids_provider.dart';

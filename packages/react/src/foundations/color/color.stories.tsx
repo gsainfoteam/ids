@@ -49,7 +49,6 @@ import {
 } from '../../components/utility/ids-provider/theme';
 import { resolveColorsOnce } from '../../components/utility/ids-provider/theme-roles';
 import {
-  IDS_BASE_SLOTS,
   IDS_BRAND_FAMILIES,
   IDS_COLOR_FAMILIES,
   IDS_FAMILY_SLOTS,
@@ -78,18 +77,21 @@ type Pairing = readonly [background: string, foreground: string, kind: 'text' | 
 
 const pairsOf = (family: string): Pairing[] => [
   [`bg-${family}`, `text-on-${family}`, 'text'],
-  [`bg-${family}-hover`, `text-on-${family}`, 'text'],
-  [`bg-${family}-soft`, `text-on-${family}-soft`, 'text'],
-  [`bg-${family}-soft-active`, `text-on-${family}-soft`, 'text'],
-  ['surface', `text-${family}`, 'accent'],
-  ['surface', `border-${family}`, 'mark'],
+  [`bg-${family}-subtler`, `text-on-${family}-subtler`, 'text'],
+  [`bg-${family}-subtle`, `text-on-${family}-subtle`, 'text'],
+  ['bg-neutral-subtlest', `text-${family}`, 'accent'],
+  [`bg-${family}-subtler`, `text-${family}`, 'accent'],
+  ['bg-neutral-subtlest', `border-${family}`, 'mark'],
 ];
 
 const pairs: Pairing[] = [
-  ['surface', 'on-surface', 'text'],
-  ['surface', 'text-neutral', 'text'],
-  ['bg-neutral-soft', 'text-on-neutral-soft', 'text'],
+  ['bg-neutral-subtlest', 'text-on-neutral-subtlest', 'text'],
+  ['bg-neutral-subtler', 'text-on-neutral-subtler', 'text'],
+  ['bg-neutral-subtlest', 'text-neutral-bold', 'text'],
+  ['bg-neutral-subtlest', 'text-neutral', 'text'],
+  ['bg-neutral-subtle', 'text-on-neutral-subtle', 'text'],
   ['bg-neutral', 'text-on-neutral', 'text'],
+  ['bg-neutral-bold', 'text-on-neutral-bold', 'text'],
   ...[...IDS_BRAND_FAMILIES, ...IDS_STATUS_FAMILIES].flatMap(pairsOf),
 ];
 
@@ -210,12 +212,6 @@ function FamilyTable() {
                 {IDS_COLOR_FAMILIES.map((family) => (
                   <Swatch key={family} token={slotOf(template, family)} />
                 ))}
-              </div>
-            ))}
-            {IDS_BASE_SLOTS.map((slot) => (
-              <div key={slot} className={familyRow} style={familyColumns}>
-                <span className="text-body-b3-regular font-mono">{slot}</span>
-                <Swatch token={slot} />
               </div>
             ))}
           </div>
@@ -361,13 +357,13 @@ export const Lab: Story = {
         </Showcase.Section>
         <Showcase.Section
           title="Families × Roles"
-          description="계열 여덟 개가 같은 역할 열 개를 가집니다. bg-primary-soft 는 배경, text-on-primary-soft 는 그 위 글자, border-primary 는 선입니다."
+          description="계열 여덟 개가 같은 역할 여덟 개를 가지고, neutral 은 페이지와 본문, 반전 채움 역할 다섯을 더 가집니다. 배경 bg-X-세기 위 글자는 언제나 text-on-X-세기입니다. bg-primary-subtle 는 배경, text-on-primary-subtle 는 그 위 글자, border-primary 는 선입니다."
         >
           <FamilyTable />
         </Showcase.Section>
         <Showcase.Section
           title="Contrast"
-          description="같이 쓰는 짝의 APCA 대비(Lc)입니다. 채움과 soft 위 글자는 Lc 75, 페이지 위 색 글자는 Lc 60, 선과 아이콘 같은 표시는 Lc 45 이상이어야 합니다."
+          description="같이 쓰는 짝의 APCA 대비(Lc)입니다. 채움과 subtle 위 글자는 hover, press 층 아래에서도 Lc 75, 페이지 위 색 글자는 Lc 60, 선과 아이콘 같은 표시는 Lc 45 이상이어야 합니다."
         >
           <div className="flex flex-wrap gap-4">
             {modes.map((mode) => (
@@ -525,7 +521,7 @@ export const Lab: Story = {
                     <Tabs.Content value="overview">가볍고 오래 가는 키보드입니다.</Tabs.Content>
                     <Tabs.Content value="reviews">리뷰 128개.</Tabs.Content>
                   </Tabs>
-                  <Tabs defaultValue="overview" appearance="pill" variant="soft">
+                  <Tabs defaultValue="overview" appearance="pill">
                     <Tabs.List aria-label={`알약 탭 ${mode}`}>
                       <Tabs.Trigger value="overview">개요</Tabs.Trigger>
                       <Tabs.Trigger value="reviews">리뷰</Tabs.Trigger>

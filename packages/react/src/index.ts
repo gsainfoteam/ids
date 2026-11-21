@@ -75,10 +75,12 @@ export {
 export { Avatar, initialsOf } from './components/data/avatar';
 export { AvatarGroup } from './components/data/avatar-group';
 export { Item } from './components/data/item';
+export { ItemGroup } from './components/data/item-group';
 export { Accordion } from './components/data/accordion';
 export { Empty } from './components/data/empty';
 export { Image } from './components/data/image';
-export type { ImageGroupLayout, ImageViewerItem } from './components/data/image';
+export type { ImageViewerItem } from './components/data/image';
+export { ImageGroup, type ImageGroupLayout } from './components/data/image-group';
 export { QRCode } from './components/data/qr-code';
 export { CodeBlock } from './components/data/code-block';
 export { Marquee } from './components/data/marquee';
@@ -111,6 +113,7 @@ export { Checkbox } from './components/form/checkbox';
 export { Switch } from './components/form/switch';
 export { Radio } from './components/form/radio';
 export { RadioGroup } from './components/form/radio-group';
+export { SegmentedControl } from './components/form/segmented-control';
 export { CheckboxGroup } from './components/form/checkbox-group';
 export { Slider } from './components/form/slider';
 export { TextField } from './components/form/text-field';
@@ -126,6 +129,7 @@ export { Marker } from './components/feedback/marker';
 export { Label } from './components/typography/label';
 export { Highlight } from './components/typography/highlight';
 export { Kbd } from './components/typography/kbd';
+export { KbdGroup } from './components/typography/kbd-group';
 export { Link } from './components/typography/link';
 
 export { Pagination } from './components/navigation/pagination';
@@ -166,6 +170,7 @@ export type { IdsMessageKey, IdsMessageValues } from './internal/messages';
 export type { IdsTranslate } from './internal/translate';
 
 export { Field } from './components/form/field';
+export { FieldGroup } from './components/form/field-group';
 export type {
   FieldProps,
   FieldState,
@@ -186,6 +191,16 @@ export { Select } from './components/form/select';
 export type { SelectProps, SelectVariant } from './components/form/select';
 
 export { PromptInput } from './components/form/prompt-input';
+
+export { Questionnaire } from './components/form/questionnaire';
+export type {
+  QuestionnaireAnswer,
+  QuestionnaireAnswers,
+  QuestionnaireAppearance,
+  QuestionnaireOrientation,
+  QuestionnaireProps,
+  QuestionnaireSelectionMode,
+} from './components/form/questionnaire';
 export type {
   PromptInputMessage,
   PromptInputProps,

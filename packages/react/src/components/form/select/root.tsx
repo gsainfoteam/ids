@@ -28,9 +28,9 @@ import { SelectTrigger } from './trigger';
 import { useSelect, type SelectValue as SelectSelection } from './use-select';
 import { SelectValue } from './value';
 import { FieldPopup, useDrawerPresentation } from '../../../internal/field-popup';
-import { type FieldTriggerVariant } from '../../../internal/field-surface';
 import { FormValue } from '../../../internal/form-value';
 import { resolveState } from '../../../internal/state-props';
+import { type FieldTriggerVariant } from '../../../internal/surfaces/field-surface';
 import { useTranslate } from '../../../internal/translate';
 import {
   elementTypeOf,

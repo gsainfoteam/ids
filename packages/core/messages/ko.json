@@ -110,6 +110,27 @@
     "close": "닫기",
     "handle": "끌어서 크기 조절"
   },
+  "editor": {
+    "blockType": "문단 모양",
+    "blockquote": "인용",
+    "bold": "굵게",
+    "bubbleMenu": "선택한 글 서식",
+    "bulletList": "글머리 기호 목록",
+    "code": "코드",
+    "codeBlock": "코드 블록",
+    "content": "본문",
+    "heading": "제목 {level}",
+    "italic": "기울임",
+    "link": "링크",
+    "linkApply": "적용",
+    "linkRemove": "링크 지우기",
+    "linkUrl": "링크 주소",
+    "orderedList": "번호 목록",
+    "paragraph": "문단",
+    "strike": "취소선",
+    "toolbar": "서식",
+    "underline": "밑줄"
+  },
   "fileField": {
     "clear": "파일 모두 지우기",
     "count": "파일 {count}개",
@@ -144,7 +165,9 @@
     "thumbnails": "사진 목록",
     "viewer": "사진 보기",
     "zoomIn": "확대",
-    "zoomOut": "축소"
+    "zoomLevel": "{percent}%",
+    "zoomOut": "축소",
+    "zoomReset": "{percent}%, 화면에 맞추기"
   },
   "input": {
     "clearSearch": "검색어 지우기"
@@ -237,6 +260,17 @@
   },
   "qrCode": {
     "label": "QR 코드"
+  },
+  "questionnaire": {
+    "navigation": "질문 이동",
+    "next": "다음",
+    "other": "직접 입력",
+    "otherPlaceholder": "다른 답을 적어 주세요",
+    "previous": "이전",
+    "progress": "질문 진행",
+    "skip": "건너뛰기",
+    "step": "질문 {current} / {total}",
+    "submit": "보내기"
   },
   "rating": {
     "label": "평점",

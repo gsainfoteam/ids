@@ -7,7 +7,7 @@ import { fileKey } from './file-rules';
 import { FileItem } from './item';
 import { useTranslate } from '../../../internal/translate';
 import { mergeProps, part } from '../../../utils';
-import { Item } from '../../data/item';
+import { ItemGroup } from '../../data/item-group';
 
 export type FileListProps = Omit<ComponentProps<'ul'>, 'children'> & {
   asChild?: boolean;
@@ -33,9 +33,9 @@ export function FileList({ asChild, children, className, ...props }: FileListPro
   if (asChild) return part('div', true, items, mergeProps(props, { ...list, role: 'list' }));
 
   return (
-    <Item.Group variant="ghost" {...props} {...list} size={c.size}>
+    <ItemGroup variant="ghost" {...props} {...list} size={c.size}>
       {items}
-    </Item.Group>
+    </ItemGroup>
   );
 }
 

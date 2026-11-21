@@ -1,4 +1,9 @@
-import { controlSurface } from '../../../internal/control-surface';
+import {
+  controlSurface,
+  neutralKeepsThePrimaryRing,
+  pressStates,
+  statusSchemes,
+} from '../../../internal/surfaces/control-surface';
 import { cn, tv } from '../../../utils';
 
 import type { FloatingButton } from '.';
@@ -6,15 +11,10 @@ import type { IdsSize } from '../../../tokens/types';
 
 const opaqueFills = {
   solid: cn(controlSurface.variant.solid, 'shadow-lg'),
-  soft: cn(
-    'bg-surface text-(--control-on-soft)',
-    'bg-[image:linear-gradient(var(--control-soft),var(--control-soft))]',
-    'data-hovered:bg-[image:linear-gradient(var(--control-soft-hover),var(--control-soft-hover))]',
-    'data-active:bg-[image:linear-gradient(var(--control-soft-press),var(--control-soft-press))]',
-  ),
+  soft: cn(controlSurface.variant.soft),
   outline: cn(
-    'bg-surface text-(--control-quiet) inset-ring-1 inset-ring-neutral',
-    'data-hovered:bg-neutral-soft data-active:bg-neutral-soft-hover',
+    'bg-neutral-subtlest text-neutral-bold inset-ring-1 inset-ring-neutral',
+    pressStates,
   ),
   glossy: cn(controlSurface.variant.glossy, 'shadow-lg data-active:shadow-lg'),
 } satisfies Record<FloatingButton.Variant, string>;
@@ -23,7 +23,7 @@ export const floatingButtonStyle = tv({
   base: [
     controlSurface.base,
     'fixed z-40 max-w-[calc(100vw-var(--spacing)*12)] shadow-lg data-hovered:shadow-xl print:hidden',
-    'transition-[color,background-color,box-shadow,scale] motion-safe:data-active:scale-95',
+    'transition-[color,background-color,box-shadow,scale,--ids-state-opacity] motion-safe:data-active:scale-95',
   ],
   variants: {
     variant: opaqueFills,
@@ -56,6 +56,8 @@ export const floatingButtonStyle = tv({
     } satisfies Record<FloatingButton.Placement, string[]>,
   },
   compoundVariants: [
+    neutralKeepsThePrimaryRing,
+    { colorScheme: statusSchemes, variant: 'outline', class: 'text-scheme' },
     { size: 'standard', iconOnly: true, class: 'size-14' },
     { size: 'tiny', iconOnly: true, class: 'size-11' },
     {

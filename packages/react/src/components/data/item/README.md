@@ -5,8 +5,8 @@
 - **shadcn/ui 구성.** `Item.Media`, `Item.Content` 안의 `Item.Title` 과 `Item.Description`, 그리고 `Item.Actions` 입니다. 전부 선택입니다.
 - **두 줄이 되면.** 설명은 두 줄에서 말줄임표로 줄고, 타일 미디어(`soft`, `outline`)는 한 줄일 때의 크기로 왼쪽 위에 남고 맨 아이콘은 세로 가운데에 놓입니다.
 - **행 어디를 눌러도 열린다.** `onClick` 만 주면 행 어디를 눌러도 열리고, 키보드와 스크린 리더에는 `Item.Title` 이 버튼이 됩니다. 설명은 `Item.Description` 입니다. `Item.Actions` 의 버튼을 눌러도 행은 눌리지 않고, 버튼이 버튼 안에 들어가지 않습니다.
-- **선택.** `selected` 는 옅은 층을 깔고, 버튼인 행에서는 `aria-pressed` 로 알립니다. `aria-current` 를 주면 그쪽이 선택을 말합니다.
-- **목록.** `Item.Group` 은 `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다. Safari가 목록 의미를 잃지 않습니다.
+- **선택.** `selected` 는 글자색 press 층(`state-press`)을 깔고, 버튼인 행에서는 `aria-pressed` 로 알립니다. `aria-current` 를 주면 그쪽이 선택을 말합니다.
+- **목록.** 여러 행은 [ItemGroup](../item-group/README.md) 으로 묶습니다. `role="list"` 인 `<ul>` 이고 각 행을 `<li>` 로 감쌉니다.
 
 ```tsx
 import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
@@ -62,7 +62,7 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 
 - `truncate` 는 제목을 행 폭 안의 한 줄로 자릅니다. 파일 이름처럼 끝까지 읽을 필요가 적은 제목에 씁니다.
 - 잘린 부분은 보이지 않으니 `title` 로 전체 이름을 함께 둡니다.
-- 행과 `Item.Group` 은 grid 나 flex 부모를 따라 줄어듭니다. 잘린 제목의 전체 길이만큼 넓어지지 않습니다.
+- 행과 `ItemGroup` 은 grid 나 flex 부모를 따라 줄어듭니다. 잘린 제목의 전체 길이만큼 넓어지지 않습니다.
 
 ## 여러 칸
 
@@ -115,48 +115,12 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 </Item>
 ```
 
-- 선택된 행은 variant와 상관없이 옅은 층이 깔리고 `data-selected` 가 붙습니다.
+- 선택된 행은 variant와 상관없이 글자색 press 층(`state-press`)이 깔리고 `data-selected` 가 붙습니다. 선택된 행은 올려도 hover 층으로 바뀌지 않습니다.
 
 ## 목록
 
-```tsx
-<Item.Group aria-label="설정" size="tiny">
-  {' '}
-  {/* 안의 행이 size를 따른다 */}
-  <Item>...</Item> {/* <li> 로 감싼다 */}
-  <Item.Separator /> {/* 목록 항목으로 세지 않는 구분선 */}
-  <Item>...</Item>
-</Item.Group>
-```
-
-- 이미 `<li>` 로 감싼 자식은 다시 감싸지 않습니다.
-- `Item.Separator` 는 `Divider` 입니다. 그룹 안에서는 목록 항목으로 세지 않는 `<li>`, 밖에서는 `<hr>` 로 그립니다.
-
-### 구분선과 간격
-
-```tsx
-<Item.Group variant="bordered" />   // 기본. 행 사이 구분선. 행 모서리는 각지게 편다
-<Item.Group variant="ghost" />      // 구분선도 간격도 없다
-<Item.Group variant="separated" />  // 행마다 테두리 카드(Item outline), 8px 간격
-```
-
-- 구분선은 `--ids-color-border-neutral` 입니다. 목록 바깥 테두리는 그리지 않으니, 필요하면 `Card` 안에 둡니다.
-- `bordered` 는 구분선을 스스로 긋습니다. `Item.Separator` 는 `ghost` 에서 쓰는 것입니다.
-- `separated` 에서도 `Item` 에 `variant` 를 주면 그 값이 이깁니다.
-
-### 순서 있는 목록
-
-```tsx
-<Item.Group ordered aria-label="가입 절차">
-  <Item>
-    <Item.Media variant="soft" aria-hidden>1</Item.Media>
-    <Item.Content>이메일 인증</Item.Content>
-  </Item>
-</Item.Group>
-```
-
-- `<ol>` 로 그려 스크린 리더가 순서를 읽습니다. 번호는 그리지 않으니 보여야 하면 `Item.Media` 에 둡니다.
-- 여러 행 중 하나를 고르는 목록(방향키, 폼 값)은 아직 없습니다. 페이지 안의 고르기는 `RadioGroup`, 팝업은 `Select` 를 씁니다.
+- 여러 행을 목록으로 묶는 일은 [ItemGroup](../item-group/README.md) 이 맡습니다. 구분선, 간격, 순서 있는 목록도 거기서 고릅니다.
+- `Item.Separator` 는 `Divider` 입니다. ItemGroup 안에서는 목록 항목으로 세지 않는 `<li>`, 밖에서는 `<hr>` 로 그립니다.
 
 ## variant와 크기
 
@@ -184,8 +148,8 @@ import { Avatar, IconButton, Item } from '@gsainfoteam/ids-react';
 
 | 속성             | 기본 / 동작                                                        |
 | ---------------- | ------------------------------------------------------------------ |
-| `variant`        | `ghost`(기본) / `outline` / `soft`. `Item.Group variant="separated"` 안에서는 `outline` |
-| `size`           | `standard`(기본) / `tiny`. `Item.Group` 안에서는 그룹을 따른다     |
+| `variant`        | `ghost`(기본) / `outline` / `soft`. `ItemGroup variant="separated"` 안에서는 `outline` |
+| `size`           | `standard`(기본) / `tiny`. `ItemGroup` 안에서는 그룹을 따른다     |
 | `onClick`        | 주면 행 어디를 눌러도 불린다. 제목이 버튼이 된다                   |
 | `interactive`    | hover와 포커스 표시. `onClick` 이나 `<a>`, `<button>` 이면 자동    |
 | `selected`       | 선택 표시                                                          |
