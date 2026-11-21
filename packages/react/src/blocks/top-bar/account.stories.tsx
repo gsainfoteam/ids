@@ -123,7 +123,7 @@ export const PC: Story = {
           <Menu>
             <Menu.Trigger asChild>
               <Button variant="outline" size="tiny">
-                <Avatar name="김지수" size="tiny" />
+                <Avatar name="김지수" size="tiny" alt="" />
                 <span className="max-sm:sr-only">김지수</span>
                 <ChevronDownIcon />
               </Button>
