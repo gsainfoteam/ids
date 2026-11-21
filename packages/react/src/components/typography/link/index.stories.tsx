@@ -60,6 +60,31 @@ export const Gallery: Story = {
         </Showcase.Row>
       </Showcase.Section>
 
+      <Showcase.Section
+        title="Current page"
+        description="neutral 링크에 aria-current='page' 가 붙으면 primary 글자색이 됩니다."
+      >
+        <Showcase.Row label="neutral · none">
+          <ul className="text-body-b3-medium flex gap-6">
+            <li>
+              <Link href="#notices" colorScheme="neutral" underline="none">
+                공지
+              </Link>
+            </li>
+            <li>
+              <Link href="#groups" colorScheme="neutral" underline="none" aria-current="page">
+                그룹
+              </Link>
+            </li>
+            <li>
+              <Link href="#shuttle" colorScheme="neutral" underline="none">
+                셔틀
+              </Link>
+            </li>
+          </ul>
+        </Showcase.Row>
+      </Showcase.Section>
+
       <Showcase.Section title="Placement">
         <Showcase.Row label="running text">
           <p className="text-body-b2-regular max-w-md">
@@ -222,5 +247,39 @@ export const LinkList: Story = {
       await expect(link).toHaveAttribute('data-underline', 'hover');
       await expect(getComputedStyle(link).textDecorationLine).toBe('none');
     }
+  },
+};
+
+export const CurrentPage: Story = {
+  render: () => (
+    <nav aria-label="주 메뉴">
+      <ul className="text-body-b3-medium flex gap-6">
+        <li>
+          <Link href="#notices" colorScheme="neutral" underline="none">
+            공지
+          </Link>
+        </li>
+        <li>
+          <Link href="#groups" colorScheme="neutral" underline="none" aria-current="page">
+            그룹
+          </Link>
+        </li>
+      </ul>
+    </nav>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '상단 바처럼 링크만 모인 메뉴는 neutral 과 none 으로 둘레 글자색을 따르고, 지금 페이지 링크(aria-current="page")만 primary 글자색으로 표시합니다. 라우터 링크는 aria-current 를 스스로 붙입니다.',
+      },
+    },
+  },
+  play: async ({ canvas }) => {
+    const current = canvas.getByRole('link', { name: '그룹' });
+    const other = canvas.getByRole('link', { name: '공지' });
+    await expect(current).toHaveAttribute('aria-current', 'page');
+    await expect(getComputedStyle(current).color).not.toBe(getComputedStyle(other).color);
+    await expect(getComputedStyle(current).textDecorationLine).toBe('none');
   },
 };

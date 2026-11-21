@@ -14,7 +14,9 @@ export const linkStyle = tv({
       primary: { root: 'scheme-primary text-scheme' },
       secondary: { root: 'scheme-secondary text-scheme' },
       tertiary: { root: 'scheme-tertiary text-scheme' },
-      neutral: { root: 'scheme-neutral text-inherit hover:text-scheme' },
+      neutral: {
+        root: 'scheme-neutral text-inherit hover:text-scheme aria-[current=page]:text-primary',
+      },
     },
     underline: {
       always: { root: 'underline decoration-current/40 hover:decoration-current' },
