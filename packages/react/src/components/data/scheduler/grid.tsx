@@ -23,7 +23,7 @@ import { useTranslate } from '../../../internal/translate';
 import { Divider } from '../../layout/divider';
 import { ScrollArea } from '../../layout/scroll-area';
 import { sameDay } from '../calendar/date';
-import { Item } from '../item';
+import { ItemGroup } from '../item-group';
 
 const HOURS = range(24);
 const WORKDAY_START_HOUR = 8;
@@ -103,7 +103,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                 {days.map((day, index) => (
                   <div key={day.toString()} className={styles.allDayCell()}>
                     {allDayByDay[index].length > 0 && (
-                      <Item.Group
+                      <ItemGroup
                         variant="ghost"
                         aria-labelledby={`${headId(day)} ${allDayLabelId}`}
                         className={styles.allDayList()}
@@ -113,7 +113,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                             {renderEvent(event)}
                           </SchedulerEventContext>
                         ))}
-                      </Item.Group>
+                      </ItemGroup>
                     )}
                   </div>
                 ))}
@@ -148,7 +148,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                     />
                   )}
                   {segments.length > 0 && (
-                    <Item.Group variant="ghost" className={styles.dayEvents()}>
+                    <ItemGroup variant="ghost" className={styles.dayEvents()}>
                       {segments.map((segment) => (
                         <li
                           key={segment.event.id}
@@ -174,7 +174,7 @@ export function SchedulerGrid<E extends SchedulerEventData>({
                           </SchedulerEventContext>
                         </li>
                       ))}
-                    </Item.Group>
+                    </ItemGroup>
                   )}
                 </section>
               );

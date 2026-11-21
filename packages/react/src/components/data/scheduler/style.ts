@@ -5,7 +5,7 @@ import type { SchedulerColorScheme, SchedulerView } from './layout';
 export const schedulerStyle = tv({
   slots: {
     root: [
-      'flex h-144 min-h-0 w-full min-w-0 flex-col gap-3 text-on-surface',
+      'flex h-144 min-h-0 w-full min-w-0 flex-col gap-3 text-neutral-strong',
       '[--scheduler-hour:calc(var(--spacing)*12)] [--scheduler-gutter:calc(var(--spacing)*16)]',
     ],
     toolbar: 'flex flex-wrap items-center gap-2',
@@ -19,26 +19,26 @@ export const schedulerStyle = tv({
     ],
     sticky: 'sticky top-0 z-20',
     columns: 'grid grid-cols-[var(--scheduler-gutter)_repeat(var(--scheduler-days),minmax(0,1fr))]',
-    header: 'border-b border-neutral bg-neutral-soft',
-    corner: 'sticky start-0 z-10 border-e border-neutral bg-neutral-soft',
+    header: 'border-b border-neutral bg-block',
+    corner: 'sticky start-0 z-10 border-e border-neutral bg-block',
     dayHead: [
       'flex min-w-0 flex-col items-center gap-0.5 border-e border-neutral py-2 last:border-e-0',
       'text-caption-c1-medium text-neutral',
     ],
     dayNumber: [
       'flex size-8 items-center justify-center rounded-full',
-      'text-body-b2-medium text-on-surface tabular-nums',
+      'text-body-b2-medium text-neutral-strong tabular-nums',
     ],
     hidden: 'sr-only',
-    allDay: 'border-b border-neutral bg-surface',
+    allDay: 'border-b border-neutral bg-(--ids-bg-current)',
     allDayLabel: [
-      'sticky start-0 z-10 flex items-start justify-end border-e border-neutral bg-surface pe-2 pt-2',
+      'sticky start-0 z-10 flex items-start justify-end border-e border-neutral bg-(--ids-bg-current) pe-2 pt-2',
       'text-caption-c1-regular whitespace-nowrap text-neutral',
     ],
     allDayCell: 'min-w-0 border-e border-neutral p-1 last:border-e-0',
     allDayList: 'gap-1',
     body: 'relative',
-    gutter: 'sticky start-0 z-10 flex flex-col border-e border-neutral bg-surface',
+    gutter: 'sticky start-0 z-10 flex flex-col border-e border-neutral bg-(--ids-bg-current)',
     hour: [
       'h-(--scheduler-hour) shrink-0 pe-2 text-end text-caption-c1-regular whitespace-nowrap text-neutral',
       'first:invisible [&>span]:relative [&>span]:-top-[0.6lh]',
@@ -55,16 +55,19 @@ export const schedulerStyle = tv({
       'start-[calc(100%*var(--scheduler-event-lane)/var(--scheduler-event-lanes))]',
       'w-[calc(100%/var(--scheduler-event-lanes))]',
     ],
-    event: 'min-h-0 overflow-hidden rounded-standard px-1.5 py-1',
+    event: [
+      'min-h-0 overflow-hidden rounded-standard px-1.5 py-1',
+      'bg-scheme-soft text-on-scheme-soft [&_[data-item-description]]:text-on-scheme-soft',
+    ],
     now: [
-      'pointer-events-none absolute inset-x-0 z-1 h-0.5 bg-danger',
+      'pointer-events-none absolute inset-x-0 z-1 h-0.5 bg-danger-solid',
       'top-[calc(var(--scheduler-hour)*var(--scheduler-now)-1px)]',
-      'before:absolute before:-start-1 before:-top-1 before:size-2.5 before:rounded-full before:bg-danger',
+      'before:absolute before:-start-1 before:-top-1 before:size-2.5 before:rounded-full before:bg-danger-solid',
     ],
   },
   variants: {
     today: {
-      true: { dayHead: 'text-primary', dayNumber: 'bg-primary text-on-primary' },
+      true: { dayHead: 'text-primary', dayNumber: 'bg-primary-solid text-on-primary-solid' },
       false: {},
     },
     view: {
@@ -76,33 +79,14 @@ export const schedulerStyle = tv({
       false: { event: 'h-full items-start' },
     },
     colorScheme: {
-      neutral: { event: 'bg-neutral-soft text-on-surface' },
-      primary: {
-        event:
-          'bg-primary-soft text-on-primary-soft [&_[data-item-description]]:text-on-primary-soft',
-      },
-      secondary: {
-        event:
-          'bg-secondary-soft text-on-secondary-soft [&_[data-item-description]]:text-on-secondary-soft',
-      },
-      tertiary: {
-        event:
-          'bg-tertiary-soft text-on-tertiary-soft [&_[data-item-description]]:text-on-tertiary-soft',
-      },
-      success: {
-        event:
-          'bg-success-soft text-on-success-soft [&_[data-item-description]]:text-on-success-soft',
-      },
-      warning: {
-        event:
-          'bg-warning-soft text-on-warning-soft [&_[data-item-description]]:text-on-warning-soft',
-      },
-      danger: {
-        event: 'bg-danger-soft text-on-danger-soft [&_[data-item-description]]:text-on-danger-soft',
-      },
-      info: {
-        event: 'bg-info-soft text-on-info-soft [&_[data-item-description]]:text-on-info-soft',
-      },
+      neutral: { event: 'scheme-neutral' },
+      primary: { event: 'scheme-primary' },
+      secondary: { event: 'scheme-secondary' },
+      tertiary: { event: 'scheme-tertiary' },
+      success: { event: 'scheme-success' },
+      warning: { event: 'scheme-warning' },
+      danger: { event: 'scheme-danger' },
+      info: { event: 'scheme-info' },
     } satisfies Record<SchedulerColorScheme, object>,
   },
   defaultVariants: { view: 'week', today: false, allDay: false, colorScheme: 'primary' },

@@ -38,7 +38,7 @@ const events = [
 | 날짜로 이동     | Popover, Calendar                 | 기간을 적은 `<button>`                      |
 | 보기 전환       | ToggleGroup, Toggle               | `radiogroup`                                |
 | 시간 격자       | ScrollArea (가로, 세로)           | 날마다 `<section aria-labelledby>`          |
-| 하루의 일정     | Item.Group                        | `<ul>`                                      |
+| 하루의 일정     | ItemGroup                         | `<ul>`                                      |
 | 일정 하나       | Item (`onClick` 이면 Title 이 버튼) | `<li>`, 시작과 끝은 `<time dateTime>`       |
 | 지금 시각       | Divider                           | `<hr aria-hidden>`                          |
 
