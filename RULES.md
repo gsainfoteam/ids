@@ -805,10 +805,10 @@ projects:
   recoverable error or any `console.error`. `tests/translate-<category>.test.tsx`
   (`checkEveryStoryInEnglish` in `tests/translation-checks.tsx`) renders every story under an
   English `translate` and fails on a Korean default that the story did not write itself. Both are
-  split by category like the story checks. WebKit keeps every finished file's frame alive until its
-  shard ends (a forced GC frees none of it), so a shard's memory is the sum of its files; a file that
-  renders every story put most of that sum on one shard and crashed its page out of memory, while
-  files per category let the balanced sequencer spread it.
+  split by category like the story checks: WebKit's page crashed out of memory inside the files that
+  rendered every story in one frame. WebKit keeps every finished file's frame alive until its shard
+  ends (about 20 MB for an empty file, 55 MB for one that imports IDS, and a forced GC frees none of
+  it), so a shard's memory also grows with the number of files.
 - `clipboard`: the browser files that call `userEvent.copy` / `cut` / `paste` or
   `navigator.clipboard`, one file at a time, in Chromium. Every browser context shares
   one system clipboard, so two such files in parallel paste each other's text. The config finds them
